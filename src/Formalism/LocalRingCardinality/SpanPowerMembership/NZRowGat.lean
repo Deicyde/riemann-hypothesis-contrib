@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Formalism.LocalRingCardinality.SpanPowerMembership.NZLevM
 import Formalism.LocalRingCardinality.SpanPowerMembership.NStageTrivialCharacterCoeffEq
 import Formalism.LocalRingCardinality.SpanPowerMembership.NZRowE
+import Formalism.Statement -- for syntax quotation of Formalism.G
 
 noncomputable section
 

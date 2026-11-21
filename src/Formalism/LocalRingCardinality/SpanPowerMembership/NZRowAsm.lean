@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Formalism.LocalRingCardinality.SpanPowerMembership.NZRowZ
 import Formalism.LocalRingCardinality.SpanPowerMembership.ThetaFamilyAdmissibleThree
 import Formalism.SharpRestriction.InertJacobiLevels.GaugeExists
+import Formalism.Statement -- for syntax quotation of Formalism.G
 
 noncomputable section
 

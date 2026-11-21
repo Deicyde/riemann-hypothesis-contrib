@@ -2,6 +2,7 @@ import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Formalism.LocalRingCardinality.DataKerP
 import Formalism.LocalRingCardinality.SpanPowerMembership.NZRowE
+import Formalism.Statement -- for syntax quotation of Formalism.G
 
 noncomputable section
 

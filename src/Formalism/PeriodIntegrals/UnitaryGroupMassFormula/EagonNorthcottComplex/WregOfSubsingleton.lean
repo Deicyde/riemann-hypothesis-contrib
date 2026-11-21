@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.EagonNorthcottComplex.StSpecOf
 import Mathlib.RingTheory.MvPolynomial.Ideal
 import Mathlib.RingTheory.TotallySplit
+import Mathlib.FieldTheory.Finite.Polynomial -- for syntax quotation of MvPolynomial.R
 
 universe u v
 

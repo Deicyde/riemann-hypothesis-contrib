@@ -6,6 +6,7 @@ import Formalism.LocalRingCardinality.SpanPowerMembership.EntPlNonempty
 import Formalism.LocalRingCardinality.Lemmas
 import Formalism.LocalRingCardinality.SpanPowerMembership.NZRowF
 import Mathlib.RingTheory.Coalgebra.CoassocSimps
+import Formalism.Statement -- for syntax quotation of Formalism.G
 
 noncomputable section
 
