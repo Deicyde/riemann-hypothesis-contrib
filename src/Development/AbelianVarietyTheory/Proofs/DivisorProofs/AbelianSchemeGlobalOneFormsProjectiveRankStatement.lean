@@ -13,4 +13,4 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 attribute [local instance] Over.cartesianMonoidalCategory
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.abelianScheme_global_oneForms_projective_rank : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] (g : ℕ), IsAbelianScheme A → SmoothOfRelativeDimension g A.hom → FP R (GlobForm A.hom) g := by
-  first | exact @GlobalTheory.AbCoh.globForm_FP | exact GlobalTheory.AbCoh.globForm_FP | (intros; apply GlobalTheory.AbCoh.globForm_FP <;> assumption)
+  exact @GlobalTheory.AbCoh.globForm_FP

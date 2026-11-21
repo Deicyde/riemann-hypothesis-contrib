@@ -40,4 +40,4 @@ open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.R
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic GlobalTheory.ChartGlue GlobalTheory.Mix
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.archLogNormChernIntegrable_of_principalisation : GlobalTheory.Published.Principalisation → GlobalTheory.MixHt.ArchInteg := by
-  first | exact @GlobalTheory.ArchIntegClosing.archInteg | exact GlobalTheory.ArchIntegClosing.archInteg | (intros; apply GlobalTheory.ArchIntegClosing.archInteg <;> assumption)
+  exact @GlobalTheory.ArchIntegClosing.archInteg

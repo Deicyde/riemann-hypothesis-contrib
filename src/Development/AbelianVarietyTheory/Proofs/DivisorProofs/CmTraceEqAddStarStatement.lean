@@ -17,4 +17,4 @@ open scoped TensorProduct
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.cmTrace_eq_add_star : ∀ {D : D7} (x : D.host.E), ((Algebra.trace D.host.F D.host.E x : D.host.F) : D.host.E) = x + star x := by
-  first | exact @GlobalTheory.TraceAddStar.trace_eq_add_star | exact GlobalTheory.TraceAddStar.trace_eq_add_star | (intros; apply GlobalTheory.TraceAddStar.trace_eq_add_star <;> assumption)
+  exact @GlobalTheory.TraceAddStar.trace_eq_add_star

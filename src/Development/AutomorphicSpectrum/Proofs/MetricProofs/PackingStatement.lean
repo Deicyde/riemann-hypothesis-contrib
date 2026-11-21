@@ -9,4 +9,4 @@ public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.HasMulti
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.Small Filter Topology
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.packing' : PackingStatement := by
-  first | exact @GlobalTheory.CompanionTheory.Ar.Small.packing | exact GlobalTheory.CompanionTheory.Ar.Small.packing | (intros; apply GlobalTheory.CompanionTheory.Ar.Small.packing <;> assumption)
+  exact @GlobalTheory.CompanionTheory.Ar.Small.packing

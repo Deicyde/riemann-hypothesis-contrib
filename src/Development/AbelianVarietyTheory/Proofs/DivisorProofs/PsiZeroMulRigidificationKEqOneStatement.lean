@@ -21,4 +21,4 @@ set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.psi_zero_mul_rigidificationK_eq_one : ∀ (V : Type) [CommRing V] [IsDomain V] (D : DegPre V), D.TauBimult →
     ∀ (Z : Scheme.{0}) (r : Z ⟶ (TK V).left) (z : Z) J, Good D.P.L z J →
       val (D.psi 0) r z J * val D.rigK r z J = 1 := by
-  first | exact @GlobalTheory.Poinc.Sep.PsiZero.psi_zero_mul_rigK | exact GlobalTheory.Poinc.Sep.PsiZero.psi_zero_mul_rigK | (intros; apply GlobalTheory.Poinc.Sep.PsiZero.psi_zero_mul_rigK <;> assumption)
+  exact @GlobalTheory.Poinc.Sep.PsiZero.psi_zero_mul_rigK

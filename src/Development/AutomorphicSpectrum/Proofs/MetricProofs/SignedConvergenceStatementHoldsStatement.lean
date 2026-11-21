@@ -10,4 +10,4 @@ open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTh
 open scoped ContDiff
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.signed_convergence_statement_holds : ConvergenceSignedStatement := by
-  first | exact @GlobalTheory.CompanionTheory.Ar.Giv.SignedConv.convergenceSigned | exact GlobalTheory.CompanionTheory.Ar.Giv.SignedConv.convergenceSigned | (intros; apply GlobalTheory.CompanionTheory.Ar.Giv.SignedConv.convergenceSigned <;> assumption)
+  exact @GlobalTheory.CompanionTheory.Ar.Giv.SignedConv.convergenceSigned

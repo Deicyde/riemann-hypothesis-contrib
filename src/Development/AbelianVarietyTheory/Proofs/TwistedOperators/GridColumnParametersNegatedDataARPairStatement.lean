@@ -29,4 +29,4 @@ theorem _root_.GlobalTheory.T.gridColumnParameters_negated_dataAR_pair : ∀ (D 
     GlobalTheory.Grid.parP D i τ = dualPar (signed (al ++ be) (ga ++ de) (-(GlobalTheory.Grid.cen D τ (D.R.m - i) : ℚ))) ∧
     GlobalTheory.Grid.parP D (i + 1) τ =
       dualPar (signed (al ++ block (GlobalTheory.Grid.sLen D - 1) ++ de) (ga ++ be) (-(GlobalTheory.Grid.cen D τ (D.R.m - i) : ℚ))) := by
-  first | exact @GlobalTheory.NegPair.params | exact GlobalTheory.NegPair.params | (intros; apply GlobalTheory.NegPair.params <;> assumption)
+  exact @GlobalTheory.NegPair.params

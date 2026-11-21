@@ -12,4 +12,4 @@ public import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.Admiss
 open CompanionTheory.Bmu
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.RootVectors : RootVec := by
-  first | exact @GlobalTheory.CompanionTheory.BmuRootVec.rootVec | exact GlobalTheory.CompanionTheory.BmuRootVec.rootVec | (intros; apply GlobalTheory.CompanionTheory.BmuRootVec.rootVec <;> assumption)
+  exact @GlobalTheory.CompanionTheory.BmuRootVec.rootVec

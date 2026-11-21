@@ -21,4 +21,4 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.exists_volumeOne_measure_definite_openCompact : ∀ {D : D7} (V : HSp D) (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))), IsDefiniteSpace V → IsOpenCompactLevel V K →
   ∃ (μ : Measure (GA D V)) (𝓕 : Set (GA D V)), Links.IsMeasDef V K μ 𝓕 := by
-  first | exact @GlobalTheory.DefiniteLevelMeasure.exists_isMeasDef_openCompact | exact GlobalTheory.DefiniteLevelMeasure.exists_isMeasDef_openCompact | (intros; apply GlobalTheory.DefiniteLevelMeasure.exists_isMeasDef_openCompact <;> assumption)
+  exact @GlobalTheory.DefiniteLevelMeasure.exists_isMeasDef_openCompact

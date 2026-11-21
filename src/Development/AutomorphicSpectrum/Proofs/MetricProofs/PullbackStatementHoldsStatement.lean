@@ -10,4 +10,4 @@ open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTh
 open scoped ContDiff
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.pullback_statement_holds : PullbackStatement := by
-  first | exact @GlobalTheory.CompanionTheory.Ar.Giv.pullbackStatement | exact GlobalTheory.CompanionTheory.Ar.Giv.pullbackStatement | (intros; apply GlobalTheory.CompanionTheory.Ar.Giv.pullbackStatement <;> assumption)
+  exact @GlobalTheory.CompanionTheory.Ar.Giv.pullbackStatement

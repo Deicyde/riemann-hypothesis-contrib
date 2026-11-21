@@ -8,4 +8,4 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.finite_euler_product_of : PositivityTheory.Rg.BcB.G8.Fin.EulerFinOf' := by
-  first | exact @GlobalTheory.CompanionTheory.EulerAsm.eulerFinOf' | exact GlobalTheory.CompanionTheory.EulerAsm.eulerFinOf' | (intros; apply GlobalTheory.CompanionTheory.EulerAsm.eulerFinOf' <;> assumption)
+  exact @GlobalTheory.CompanionTheory.EulerAsm.eulerFinOf'

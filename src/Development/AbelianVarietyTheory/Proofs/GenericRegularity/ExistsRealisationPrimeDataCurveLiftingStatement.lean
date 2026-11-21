@@ -71,4 +71,3 @@ theorem _root_.GlobalTheory.T.exists_realisationPrimeData_curve_lifting : ∀ (D
       fun hlt => hnz _ G.et (GlobalTheory.PrimeData.nzAt_of_nonZeroComp h j hj hG hT hV hC G hH.2.1 G.et (het hlt))⟩
   choose y hw h1 h2 h3 using key
   exact ⟨y, hw, h1, h2, h3⟩
-

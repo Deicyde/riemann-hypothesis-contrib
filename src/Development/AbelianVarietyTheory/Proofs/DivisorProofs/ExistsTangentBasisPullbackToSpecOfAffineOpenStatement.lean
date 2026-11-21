@@ -39,4 +39,3 @@ theorem _root_.GlobalTheory.T.exists_tangentBasis_pullback_to_spec_of_affineOpen
   have h := hb' (w ≫ φ.φ) ((GlobalTheory.ShFam.OpenReg.tan_iff φ rfl hw.1).2 hw)
   rw [e] at h
   exact (existsUnique_congr fun cf => GlobalTheory.ShFam.OpenReg.comb_iff φ rfl hvR1 cf hw.1).1 h
-

@@ -8,4 +8,4 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FactorRa
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.wave_uniqueness : GlobalTheory.CompanionTheory.KerFc.WaveUniq := by
-  first | exact @GlobalTheory.CompanionTheory.KerFc.waveUniq | exact GlobalTheory.CompanionTheory.KerFc.waveUniq | (intros; apply GlobalTheory.CompanionTheory.KerFc.waveUniq <;> assumption)
+  exact @GlobalTheory.CompanionTheory.KerFc.waveUniq
