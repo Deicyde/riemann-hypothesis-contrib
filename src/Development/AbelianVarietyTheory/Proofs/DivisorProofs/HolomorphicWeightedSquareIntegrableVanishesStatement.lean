@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HolomorphicWeightedSquareIntegrableVanishes
 public import Development.AbelianVarietyTheory.Definitions.Divisors.BudgetAt
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ToKnownTheoremsOf

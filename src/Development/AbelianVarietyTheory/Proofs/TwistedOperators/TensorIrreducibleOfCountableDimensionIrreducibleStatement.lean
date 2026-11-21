@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.TensorIrreducibleOfCountableDimensionIrreducible
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsRtensOp
 

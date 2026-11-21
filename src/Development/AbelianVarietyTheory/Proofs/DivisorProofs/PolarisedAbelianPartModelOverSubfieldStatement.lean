@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PolarisedAbelianPartModelOverSubfield
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SepAtBIff
 

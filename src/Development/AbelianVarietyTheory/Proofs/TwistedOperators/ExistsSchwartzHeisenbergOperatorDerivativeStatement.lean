@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsSchwartzHeisenbergOperatorDerivative
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PairInfApply
 

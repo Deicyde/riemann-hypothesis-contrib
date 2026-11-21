@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FrameDomainInSegreChart
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ContDiffUncentre
 

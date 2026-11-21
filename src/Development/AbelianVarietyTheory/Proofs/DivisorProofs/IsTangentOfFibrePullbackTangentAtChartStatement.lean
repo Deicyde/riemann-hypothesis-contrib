@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTangentOfFibrePullbackTangentAtChart
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTransl
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsChartPtChartPt

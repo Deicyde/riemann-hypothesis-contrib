@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HeckeCharacterOfIdeleClass
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTensorModels
 

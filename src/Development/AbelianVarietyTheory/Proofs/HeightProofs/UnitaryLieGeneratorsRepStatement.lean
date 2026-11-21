@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.UnitaryLieGeneratorsRep
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.DenomBound
 

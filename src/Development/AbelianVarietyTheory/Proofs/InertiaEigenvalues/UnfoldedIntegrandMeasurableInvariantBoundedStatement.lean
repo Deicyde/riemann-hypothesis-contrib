@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UnfoldedIntegrandMeasurableInvariantBounded
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RsTermZero
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CellLintegral

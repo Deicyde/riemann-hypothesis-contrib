@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SectionValueEqAtFirstOrderOfTangents
 public import Development.AbelianVarietyTheory.Definitions.Divisors.TanRel
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsPolAVSectionInverseImage

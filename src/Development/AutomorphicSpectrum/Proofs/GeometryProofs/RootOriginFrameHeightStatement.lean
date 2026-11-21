@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RootOriginFrameHeight
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LabelSigBijective
 

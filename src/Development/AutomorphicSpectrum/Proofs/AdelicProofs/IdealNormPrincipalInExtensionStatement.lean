@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.AdelicProofs.IdealNormPrincipalInExtension
 public import GroundTheory.HeightsAndTheta.Heights.KernelsLattice
 

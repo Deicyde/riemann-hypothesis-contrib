@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemInertiaInvariantsCyclotomicAlgebraIff
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemCycAlgOfPow
 

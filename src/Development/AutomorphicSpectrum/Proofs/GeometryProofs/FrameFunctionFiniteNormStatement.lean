@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FrameFunctionFiniteNorm
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HasBareNormDisc
 public import Development.AutomorphicSpectrum.PublishedTheorems.Geometry₂.GagaSections

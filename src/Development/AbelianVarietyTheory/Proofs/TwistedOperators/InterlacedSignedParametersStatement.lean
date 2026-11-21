@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.InterlacedSignedParameters
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.ProjExists
 public import Development.AbelianVarietyTheory.Definitions.Foundations.StrictInterlaceIffDescEnum

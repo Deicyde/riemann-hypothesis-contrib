@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.InertiaTransportsKaehlerRelationsOverInvariants
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemCycAlgOfPow
 

@@ -2,7 +2,6 @@ module
 
 public import Formalism.PolynomialDimension.MultinomialDepth.DvdPowOfNotPowSuccDvd
 public import Formalism.PolynomialDimension.MultinomialDepth.FockGaussComparisonHolds
-public import Mathlib
 public import Formalism.PolynomialDimension.EdgeSumGoodRank
 
 @[expose] public section

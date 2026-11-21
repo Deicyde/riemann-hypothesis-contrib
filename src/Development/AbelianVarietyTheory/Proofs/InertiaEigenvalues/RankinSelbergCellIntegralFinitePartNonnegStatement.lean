@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RankinSelbergCellIntegralFinitePartNonneg
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PadNatZero
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RsTermZero

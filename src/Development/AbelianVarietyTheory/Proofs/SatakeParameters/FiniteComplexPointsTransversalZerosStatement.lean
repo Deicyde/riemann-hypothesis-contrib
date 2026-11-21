@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FiniteComplexPointsTransversalZeros
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FRatioSelf
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsAffCoverSpec

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HeckeCharIsUnitaryOfUnitaryInfinityType
 public import Formalism.LocalToGlobal.UnitaryNorms.IsUnitaryNormOf
 

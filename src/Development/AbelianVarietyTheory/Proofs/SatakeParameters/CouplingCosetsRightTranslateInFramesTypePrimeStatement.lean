@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CouplingCosetsRightTranslateInFramesTypePrime
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.XiTopEqProd
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SmulCompSmul

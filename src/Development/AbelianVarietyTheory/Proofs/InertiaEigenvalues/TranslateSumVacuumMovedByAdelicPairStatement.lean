@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TranslateSumVacuumMovedByAdelicPair
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsInertTop
 

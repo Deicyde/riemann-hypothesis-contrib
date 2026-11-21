@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RegularizedWeightTendstoC2
 public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FlagIndices
 public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.Objects

@@ -24,7 +24,6 @@ public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.PLocalIntegra
 public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.PMChartDehomog
 public import GroundTheory.HeightsAndTheta.Heights.FieldsOfNumbers.PNoetherIntegralClosure
 public import GroundTheory.HeightsAndTheta.Heights.HilbertSamuel.AssemblyBase
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.Statements
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StGenericPrimitive
 public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StDiscrAdjoin

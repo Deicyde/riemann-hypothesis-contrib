@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WeilRepresentationPreservesNorm
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsFlipDet
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FlipIdxNeZero

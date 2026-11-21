@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsKFiniteReproducingFunction
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.DecompAtZero
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RangeSndRel

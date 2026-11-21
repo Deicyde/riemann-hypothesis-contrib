@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RationalVectorMemIdealCompletedLatticeIff
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.UniformLevelMultiplicity
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.LevelLiftConditions

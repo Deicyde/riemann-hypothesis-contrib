@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LemmaBTHolds
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.NonemptyEquivOfCardHom
 

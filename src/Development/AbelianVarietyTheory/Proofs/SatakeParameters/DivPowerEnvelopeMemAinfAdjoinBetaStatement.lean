@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DivPowerEnvelopeMemAinfAdjoinBeta
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LMulBeta
 

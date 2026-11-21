@@ -9,7 +9,6 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BaseMetricExis
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelArithDimensionBoundaryStatement
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagCoverRealisationPullbackStatement
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptFlagXdegStatement
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.GoodOrigin
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.CmpPair
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.CmpSt

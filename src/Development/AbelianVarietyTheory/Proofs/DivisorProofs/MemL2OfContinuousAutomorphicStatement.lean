@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemL2OfContinuousAutomorphic
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VacTheta
 

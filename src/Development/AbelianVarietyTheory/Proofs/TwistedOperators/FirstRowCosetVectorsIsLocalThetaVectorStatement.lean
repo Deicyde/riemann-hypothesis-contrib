@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FirstRowCosetVectorsIsLocalThetaVector
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsChainPols
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RangeSndRel

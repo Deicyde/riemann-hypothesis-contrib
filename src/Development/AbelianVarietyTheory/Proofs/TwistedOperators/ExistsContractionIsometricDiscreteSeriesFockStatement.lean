@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsContractionIsometricDiscreteSeriesFock
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ChosenSeries
 

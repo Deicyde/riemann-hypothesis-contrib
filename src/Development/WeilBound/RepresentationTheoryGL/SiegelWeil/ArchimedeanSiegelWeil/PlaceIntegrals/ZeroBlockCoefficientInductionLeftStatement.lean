@@ -1,7 +1,6 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.SiegelWeil.ArchimedeanSiegelWeil.PlaceIntegrals.ZeroBlockCoefficientInductionLeft
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCovolOne
 
 @[expose] public section

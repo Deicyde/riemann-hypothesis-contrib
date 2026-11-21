@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CouplingCosetRepresentativesCongrAtTwistPrime
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.XiTopEqProd
 public import Formalism.LocalToGlobal.Columns.XtPhiTopGCongr

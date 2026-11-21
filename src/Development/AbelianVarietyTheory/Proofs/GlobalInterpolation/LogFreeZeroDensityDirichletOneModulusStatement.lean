@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.LogFreeZeroDensityDirichletOneModulus
 public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.ZerosDisc
 

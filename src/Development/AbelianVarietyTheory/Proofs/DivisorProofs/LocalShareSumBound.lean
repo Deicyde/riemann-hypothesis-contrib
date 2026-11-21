@@ -19,7 +19,6 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
 public import Formalism.LocalToGlobal.GlobalTheory.ConcNWeight
 public import Formalism.PadicSubsetSums.StableGradedCounts.DominantNumbersEighthOfSharp
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LemmaLSeriesWeightsOfGreenCuspidalParametrisatio
-public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.GreenCuspidalIff
 public import Formalism.LocalToGlobal.GlobalTheory.ConcNP
 
 @[expose] public section

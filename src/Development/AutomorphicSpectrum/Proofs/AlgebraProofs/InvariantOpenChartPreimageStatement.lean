@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.InvariantOpenChartPreimage
 public import Development.AutomorphicSpectrum.PublishedTheorems.Algebra₂.RegularHypothesesAndConclusion
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.HasAffineChartId

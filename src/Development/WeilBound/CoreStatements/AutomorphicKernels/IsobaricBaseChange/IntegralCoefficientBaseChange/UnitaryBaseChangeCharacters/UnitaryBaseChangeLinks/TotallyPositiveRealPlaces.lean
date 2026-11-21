@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TotallyPositiveRealPlaces
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CTUnitsLeft
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteTwistedClassesCharpoly

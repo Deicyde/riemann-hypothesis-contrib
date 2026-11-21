@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LastStepDatumLawK1DepthTwiceM
 public import Formalism.LocalToGlobal.Columns.KOneCharacterTrivialNearOne
 public import Formalism.LocalToGlobal.Columns.ChainInstY

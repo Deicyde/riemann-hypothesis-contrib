@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CechClassPullHO1EqZeroOfPullbackCoboundary
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CmpOfIsCocycle
 

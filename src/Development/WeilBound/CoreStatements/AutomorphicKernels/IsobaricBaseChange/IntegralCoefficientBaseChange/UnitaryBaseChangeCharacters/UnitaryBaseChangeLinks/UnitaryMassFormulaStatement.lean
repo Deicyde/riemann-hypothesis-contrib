@@ -1,7 +1,6 @@
 module
 
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.IsobaricBaseChange.IntegralCoefficientBaseChange.UnitaryBaseChangeCharacters.UnitaryBaseChangeLinks.UnitaryMassFormula
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnifAt
 
 @[expose] public section

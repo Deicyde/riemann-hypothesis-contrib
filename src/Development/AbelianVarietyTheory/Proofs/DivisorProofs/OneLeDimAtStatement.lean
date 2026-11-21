@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OneLeDimAt
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MeasAtOf
 

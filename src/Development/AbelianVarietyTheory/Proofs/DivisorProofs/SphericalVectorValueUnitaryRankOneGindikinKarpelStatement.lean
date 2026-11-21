@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SphericalVectorValueUnitaryRankOneGindikinKarpel
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConvUAbsU
 

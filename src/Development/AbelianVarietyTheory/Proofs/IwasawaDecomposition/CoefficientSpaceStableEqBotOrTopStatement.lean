@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CoefficientSpaceStableEqBotOrTop
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IncludeLInjective
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PreimageDiagOneGeneralLinearEmbeddingIntegralGLS
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormMulApplyLeOne
 

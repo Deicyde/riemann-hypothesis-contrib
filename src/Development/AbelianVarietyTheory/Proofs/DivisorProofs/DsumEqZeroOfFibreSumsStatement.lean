@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DsumEqZeroOfFibreSums
 public import Development.AbelianVarietyTheory.Definitions.Divisors.MaxWeightGL1EqOne
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BlockParOpp

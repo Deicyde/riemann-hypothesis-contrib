@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TupleChainFormsRationalIffFrameValues
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EWtApply
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UfGLRatHom

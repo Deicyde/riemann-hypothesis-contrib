@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsRosatiCoordinatesDivisibleOfPow
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLinearHomProd
 

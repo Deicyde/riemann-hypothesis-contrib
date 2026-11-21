@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RiemannianHaarFrameBallLowerBound
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PermMMulTranspose
 

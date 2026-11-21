@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MeasurePreservingPolarGaussianProbabilityComplex
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ContinuousFirstCoords
 public import ReciprocityTheory.SemistableReduction.TorusL2CauchyInequality

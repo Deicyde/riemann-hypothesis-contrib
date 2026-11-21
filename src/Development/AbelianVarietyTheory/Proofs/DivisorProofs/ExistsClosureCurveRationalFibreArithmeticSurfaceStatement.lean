@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsClosureCurveRationalFibreArithmeticSurface
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CharZeroFunctionField
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.SmallSecTensTriv

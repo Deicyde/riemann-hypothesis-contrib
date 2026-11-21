@@ -5,7 +5,6 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CardAffi
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CardTwoAffineHyperplanesStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermitianCountFromHyperplanesStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CardFunctionalsVanishingSubspaceStatement
-public import Mathlib
 
 @[expose] public section
 

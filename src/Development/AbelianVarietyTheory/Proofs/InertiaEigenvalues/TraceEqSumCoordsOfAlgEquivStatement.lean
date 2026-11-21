@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TraceEqSumCoordsOfAlgEquiv
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsTestRep
 

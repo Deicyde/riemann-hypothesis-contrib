@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RouteDatumMemAlgebraicVectorsGridFrames
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsIsGridFr
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SquareStanding

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCoeffwiseDerivationMvPowerSeries
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntDerApply
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EqZeroOfForallMemFilt

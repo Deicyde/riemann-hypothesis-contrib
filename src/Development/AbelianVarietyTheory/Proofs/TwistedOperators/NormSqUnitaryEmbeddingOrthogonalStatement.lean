@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.NormSqUnitaryEmbeddingOrthogonal
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.DepthPays
 

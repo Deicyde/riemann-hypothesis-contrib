@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FrameCoeffsRegularInChart
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CoordTieCompEquiv
 

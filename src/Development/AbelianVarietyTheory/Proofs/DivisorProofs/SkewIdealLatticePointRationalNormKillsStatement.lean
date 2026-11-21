@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SkewIdealLatticePointRationalNormKills
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CosetVecEq
 

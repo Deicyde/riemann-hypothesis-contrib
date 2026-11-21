@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.VacuumFixedByLevelPairAtSelfDualPlaces
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ValueDoubleExact
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.TwistHeightIntegralDecomposition
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsHorizontalTwist
 

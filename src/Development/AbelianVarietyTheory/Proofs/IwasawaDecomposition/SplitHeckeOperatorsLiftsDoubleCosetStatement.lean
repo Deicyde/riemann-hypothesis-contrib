@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SplitHeckeOperatorsLiftsDoubleCoset
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NVNeZero
 

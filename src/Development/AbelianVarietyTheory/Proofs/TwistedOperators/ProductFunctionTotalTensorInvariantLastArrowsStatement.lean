@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ProductFunctionTotalTensorInvariantLastArrows
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RowShiftTheta
 

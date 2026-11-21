@@ -76,7 +76,6 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ShintaniLift
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwistedHarishChandraIsotypicPartStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarishChandraProductCuspidalGLListPropertiesStatement
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EveryElementIsNorm
-public import Mathlib
 
 @[expose] public section
 

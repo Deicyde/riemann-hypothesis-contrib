@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.PenultimateDatumUnchangedFramesCongruentOne
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.Live
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsStdFr

@@ -1,7 +1,6 @@
 module
 
 public import Development.AutomorphicArithmetic.CyclotomicBounds.RamifiedDiscriminants.FunKit
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsRealFam
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsCombAt
 public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeriesHermitianUnique

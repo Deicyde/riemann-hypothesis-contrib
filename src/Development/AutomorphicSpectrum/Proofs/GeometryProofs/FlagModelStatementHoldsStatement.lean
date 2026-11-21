@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FlagModelStatementHolds
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.FlagModelStatement
 

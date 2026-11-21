@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DualWeylModuleLeSpanExtremalTranslates
 public import Formalism.LocalToGlobal.Divisibility.CoefMod
 public import Formalism.GradedWeylDivisibility.DualWeylDominanceOf

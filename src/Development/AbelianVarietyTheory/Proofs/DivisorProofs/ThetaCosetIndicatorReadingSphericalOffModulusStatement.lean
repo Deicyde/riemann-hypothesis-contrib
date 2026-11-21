@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaCosetIndicatorReadingSphericalOffModulus
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GoodModModT
 

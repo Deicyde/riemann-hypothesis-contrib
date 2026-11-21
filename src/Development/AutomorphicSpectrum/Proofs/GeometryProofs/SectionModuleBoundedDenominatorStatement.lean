@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SectionModuleBoundedDenominator
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.KeyBadSt
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsThetaMeanSquareNorm

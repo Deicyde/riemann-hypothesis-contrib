@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TopDegreeFormCoeffProdDetHermitianSquarePowNonne
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsNegSqZero
 

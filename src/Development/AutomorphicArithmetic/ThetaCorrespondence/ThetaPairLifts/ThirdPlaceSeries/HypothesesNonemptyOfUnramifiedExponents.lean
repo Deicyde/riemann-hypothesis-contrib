@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.CmQuadraticFormEqAlternatingForm
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NotBaseCondFalse
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NotGeoClFalse

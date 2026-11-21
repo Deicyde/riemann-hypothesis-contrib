@@ -1,7 +1,6 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.SiegelWeil.ArchimedeanSiegelWeil.PlaceIntegrals.SiegelWeilRankCoefficient
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsBlockNFZeroOne
 
 @[expose] public section

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsStarSubdivisionRemovesMaxMultiplicityCells
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MultCellsAmong
 

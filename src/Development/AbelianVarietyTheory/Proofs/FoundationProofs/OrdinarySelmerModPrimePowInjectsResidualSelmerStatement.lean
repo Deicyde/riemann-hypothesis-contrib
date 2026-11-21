@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.OrdinarySelmerModPrimePowInjectsResidualSelmer
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ContinuousMatQApply
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SelNZero

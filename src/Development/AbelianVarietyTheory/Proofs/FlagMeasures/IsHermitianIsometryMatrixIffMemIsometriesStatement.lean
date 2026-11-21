@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsHermitianIsometryMatrixIffMemIsometries
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CoordEquivSymmApply
 

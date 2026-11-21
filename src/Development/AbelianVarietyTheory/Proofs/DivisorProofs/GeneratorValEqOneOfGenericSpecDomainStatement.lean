@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GeneratorValEqOneOfGenericSpecDomain
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TorusHomOfIff
 public import Development.AbelianVarietyTheory.Definitions.Divisors.TateProductRigidificationTrivial

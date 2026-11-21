@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemCompletedLatticeOfFrameMatrixIntegral
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RestrictHalfApply
 

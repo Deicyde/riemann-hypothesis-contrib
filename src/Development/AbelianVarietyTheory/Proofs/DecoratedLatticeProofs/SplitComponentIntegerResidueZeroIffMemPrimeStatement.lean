@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitComponentIntegerResidueZeroIffMemPrime
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ColCond
 

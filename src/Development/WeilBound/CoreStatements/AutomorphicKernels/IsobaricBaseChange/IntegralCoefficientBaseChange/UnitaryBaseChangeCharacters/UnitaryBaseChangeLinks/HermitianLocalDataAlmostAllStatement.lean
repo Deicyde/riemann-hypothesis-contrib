@@ -1,7 +1,6 @@
 module
 
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.IsobaricBaseChange.IntegralCoefficientBaseChange.UnitaryBaseChangeCharacters.UnitaryBaseChangeLinks.HermitianLocalDataAlmostAll
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CTUnitsLeft
 
 @[expose] public section

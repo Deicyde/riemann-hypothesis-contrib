@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RamificationIndexEqOneOfAdjoinRangeEqTop
 public import GroundTheory.LocalFields.UnramifiedNormSurj
 public import GroundTheory.LocalFields.UnramifiedGalois

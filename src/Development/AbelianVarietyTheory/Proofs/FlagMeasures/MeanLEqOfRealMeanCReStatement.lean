@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MeanLEqOfRealMeanCRe
 public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLattice
 

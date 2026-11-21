@@ -1,7 +1,6 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PlanePairingEquivariantTwistCartierDual
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DvdOfMemIk
 
 @[expose] public section

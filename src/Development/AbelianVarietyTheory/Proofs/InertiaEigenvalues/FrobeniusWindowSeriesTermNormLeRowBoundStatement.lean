@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FrobeniusWindowSeriesTermNormLeRowBound
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.MooreNorm
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RowTEqRowS

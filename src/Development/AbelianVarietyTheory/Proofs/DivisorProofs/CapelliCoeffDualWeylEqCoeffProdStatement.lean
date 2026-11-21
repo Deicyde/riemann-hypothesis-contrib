@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CapelliCoeffDualWeylEqCoeffProd
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EvalPol
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsGenFamAlgebraicIndependentFinrank
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ColFlags
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.GenUIsGenFam

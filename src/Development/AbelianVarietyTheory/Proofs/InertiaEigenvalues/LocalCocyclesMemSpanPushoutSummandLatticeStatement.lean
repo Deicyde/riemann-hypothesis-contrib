@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LocalCocyclesMemSpanPushoutSummandLattice
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsSummandTw
 

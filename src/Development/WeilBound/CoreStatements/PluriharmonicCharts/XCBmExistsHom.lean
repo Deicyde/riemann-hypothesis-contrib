@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Statements.TowerExistence.GoodTowerExistsX
 public import Development.AutomorphicSpectrum.Statements.MetricStatements.ExistsFlagModelBaseMetric
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.RootOnFund

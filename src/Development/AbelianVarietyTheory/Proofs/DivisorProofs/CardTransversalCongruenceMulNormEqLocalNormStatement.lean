@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CardTransversalCongruenceMulNormEqLocalNorm
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GoodModModT
 

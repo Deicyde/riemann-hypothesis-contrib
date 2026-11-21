@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Formalism.MeanHeightDescent.MuMaxMinkowski
 public import Formalism.MeanHeightDescent.BadRowsNumeric
 public import Formalism.MeanHeightDescent.AverageDegreeBounds.DescentSlope

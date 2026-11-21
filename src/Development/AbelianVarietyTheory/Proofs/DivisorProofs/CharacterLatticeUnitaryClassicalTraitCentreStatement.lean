@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharacterLatticeUnitaryClassicalTraitCentre
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTorsExt
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LabRange

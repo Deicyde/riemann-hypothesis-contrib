@@ -1,7 +1,6 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwistedGLMassFormula
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnifAt
 
 @[expose] public section

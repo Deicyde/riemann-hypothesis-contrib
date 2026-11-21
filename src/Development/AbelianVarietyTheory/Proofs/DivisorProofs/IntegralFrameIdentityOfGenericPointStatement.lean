@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralFrameIdentityOfGenericPoint
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SepAtBIff
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.GoodClass

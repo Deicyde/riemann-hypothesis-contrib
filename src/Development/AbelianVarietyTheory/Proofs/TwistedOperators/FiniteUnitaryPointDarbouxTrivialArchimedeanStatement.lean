@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FiniteUnitaryPointDarbouxTrivialArchimedean
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsRtensOp
 

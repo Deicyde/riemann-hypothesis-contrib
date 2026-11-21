@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsFinitePlaceValuationCompRingEquiv
 public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.TwistSeries
 

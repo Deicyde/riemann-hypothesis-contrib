@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SymplecticPolydiscPeriodBasis
 public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.ClopenCondOnto
 

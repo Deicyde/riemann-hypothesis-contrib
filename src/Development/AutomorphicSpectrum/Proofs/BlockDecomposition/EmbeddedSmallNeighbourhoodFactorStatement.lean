@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EmbeddedSmallNeighbourhoodFactor
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsCIndValue
 

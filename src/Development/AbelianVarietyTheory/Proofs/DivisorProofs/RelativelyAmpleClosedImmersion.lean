@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinitenessOfClosedSubscheme
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FibreKilled
 public import Development.AbelianVarietyTheory.PublishedTheorems.RelativeAmpleness.RelAmpleAndKTrivIff

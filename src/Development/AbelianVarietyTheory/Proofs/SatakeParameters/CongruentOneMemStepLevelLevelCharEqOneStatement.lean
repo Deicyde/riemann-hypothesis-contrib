@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CongruentOneMemStepLevelLevelCharEqOne
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsMoveRight
 

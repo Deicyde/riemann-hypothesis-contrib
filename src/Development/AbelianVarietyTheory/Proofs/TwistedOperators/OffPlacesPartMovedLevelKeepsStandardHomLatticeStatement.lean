@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.OffPlacesPartMovedLevelKeepsStandardHomLattice
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SmulMtCutPartCompl
 

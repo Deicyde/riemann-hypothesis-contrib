@@ -3,7 +3,6 @@ module
 public import Formalism.ThetaLogCoordinates.UniformThetaSubstitution.KernelFromKOneK
 public import Formalism.ThetaLogCoordinates.UniformThetaSubstitution.EdgeNoTrunc
 public import Formalism.ThetaLogCoordinates.UniformThetaSubstitution.FrobeniusLiftNorms.EChain
-public import Mathlib
 public import Formalism.ThetaLogCoordinates.UniformThetaSubstitution.StatementE
 public import Formalism.ThetaLogCoordinates.UniformThetaSubstitution.CyclicPowerClassOfExpEquiv
 public import Formalism.GaussJetBounds.StatementI

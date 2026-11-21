@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsPrimePowKillsFiniteLengthIntegralPowerSeri
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DiagScaleApply
 

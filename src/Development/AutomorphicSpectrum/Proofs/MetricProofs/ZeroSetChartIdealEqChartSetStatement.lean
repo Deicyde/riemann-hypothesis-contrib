@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ZeroSetChartIdealEqChartSet
 public import Development.AutomorphicSpectrum.PublishedTheorems.Metrics₂.PoincareLelong
 public import Development.AutomorphicSpectrum.PublishedTheorems.Metrics₂.SheetDensityEqSetSheetDensity

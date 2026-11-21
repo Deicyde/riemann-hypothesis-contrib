@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FiniteNonsplitSignPlaces
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CTUnitsLeft
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NonsplitCentraliserNormElement

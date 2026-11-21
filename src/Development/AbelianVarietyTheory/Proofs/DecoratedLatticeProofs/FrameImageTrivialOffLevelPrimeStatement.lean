@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.FrameImageTrivialOffLevelPrime
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.TwTransAlt
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DecoStabTrivial

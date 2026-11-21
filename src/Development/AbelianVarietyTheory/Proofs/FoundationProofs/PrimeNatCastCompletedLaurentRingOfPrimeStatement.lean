@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PrimeNatCastCompletedLaurentRingOfPrime
 public import Development.AbelianVarietyTheory.Definitions.Foundations.IntegralLocallyConstCochainModPow
 

@@ -6,7 +6,6 @@ public import Formalism.FrobeniusContraction.FrobeniusContractionProofs.Contract
 public import Formalism.EisensteinCokernelLengths.FactorialValuationBounds.ToolsB
 public import Formalism.EisensteinCokernelLengths.FactorialValuationBounds.FactorialValuationBoundsProofFact
 public import Formalism.EisensteinCokernelLengths.FactorialValuationBounds.LagrangeIdealSgProof
-public import Mathlib
 public import Formalism.GaloisIrreducibility.NoSolvableTransitive
 public import Formalism.ResultantValuation.ResultantAdjugateProofs.Window
 public import Formalism.ResultantValuation.ResultantAdjugateProofs.Laplace

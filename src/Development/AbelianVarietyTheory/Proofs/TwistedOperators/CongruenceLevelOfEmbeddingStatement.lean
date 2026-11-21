@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.CongruenceLevelOfEmbedding
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.DepthPays
 

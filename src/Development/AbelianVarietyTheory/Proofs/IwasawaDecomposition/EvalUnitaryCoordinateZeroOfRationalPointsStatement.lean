@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EvalUnitaryCoordinateZeroOfRationalPoints
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPolyRep
 

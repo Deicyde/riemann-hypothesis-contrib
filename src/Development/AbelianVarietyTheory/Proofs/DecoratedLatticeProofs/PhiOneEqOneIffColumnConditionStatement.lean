@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.PhiOneEqOneIffColumnCondition
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ColCond
 

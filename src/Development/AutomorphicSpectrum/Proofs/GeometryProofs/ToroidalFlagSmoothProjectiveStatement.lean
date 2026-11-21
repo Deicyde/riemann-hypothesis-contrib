@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ToroidalFlagSmoothProjective
 public import Development.AbelianVarietyTheory.Definitions.Divisors.BarCompSubsetClosure
 

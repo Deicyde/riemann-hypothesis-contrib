@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.GMatIsGenericFlag
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ColFlags
 

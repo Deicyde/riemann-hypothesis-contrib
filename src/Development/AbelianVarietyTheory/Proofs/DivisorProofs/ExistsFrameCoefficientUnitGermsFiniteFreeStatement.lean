@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFrameCoefficientUnitGermsFiniteFree
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrameCarriedAlong
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SecCarriedOver

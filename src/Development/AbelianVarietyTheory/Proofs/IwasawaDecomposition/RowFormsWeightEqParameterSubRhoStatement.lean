@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RowFormsWeightEqParameterSubRho
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EWtApply
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UfGLRatHom

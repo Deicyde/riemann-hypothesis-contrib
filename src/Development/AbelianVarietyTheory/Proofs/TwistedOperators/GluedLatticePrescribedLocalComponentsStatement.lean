@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.GluedLatticePrescribedLocalComponents
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemHatGlueLatIffDual
 

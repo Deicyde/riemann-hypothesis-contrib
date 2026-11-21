@@ -8,7 +8,6 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Kaw
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsLogCanonicalMultipleCanonical
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsAffineOpenPreimageOfIsPullback
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsEtCoord
-public import Mathlib
 public import Development.WeilBound.CoreStatements.PublishedTheorems.NadelVanishingPairs.NadelVanishingLemmas.FrobeniusDecompositionAtlasModP
 
 @[expose] public section

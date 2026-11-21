@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.BesselDoubleStepLinearInSecondDatum
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.ValueDoubleExact
 

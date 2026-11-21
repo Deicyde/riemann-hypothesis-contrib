@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SplitsPullbackSndOfSplitsDiagonalComplement
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FibrePointsLEId
 

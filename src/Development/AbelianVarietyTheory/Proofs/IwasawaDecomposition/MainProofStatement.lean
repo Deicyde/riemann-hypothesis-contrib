@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MainProof
 public import Formalism.UnipotentAdelicQuotients.WeylLatDual
 

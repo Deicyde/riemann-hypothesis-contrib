@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilDatumFinitePartMovesVacuumAsThetaModel
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormPeriodSq
 

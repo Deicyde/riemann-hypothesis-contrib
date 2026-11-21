@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.HodgeCptFrameChangeDeterminant
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ColFlags
 

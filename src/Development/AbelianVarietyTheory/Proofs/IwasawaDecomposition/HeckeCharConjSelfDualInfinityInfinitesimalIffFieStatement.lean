@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HeckeCharConjSelfDualInfinityInfinitesimalIffFie
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.CGTrue
 

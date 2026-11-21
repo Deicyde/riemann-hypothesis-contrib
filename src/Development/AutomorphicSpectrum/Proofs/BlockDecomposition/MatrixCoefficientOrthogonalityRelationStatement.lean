@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MatrixCoefficientOrthogonalityRelation
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IntegrableMulInner
 

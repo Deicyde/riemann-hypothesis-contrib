@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.TrueChainKernelsBoundConjugatePrimePlaces
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MoveStep
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsClosedInertiaCyclotomicKernel
 public import Development.AbelianVarietyTheory.Definitions.Foundations.HTLawAt
 public import Development.AbelianVarietyTheory.Statements.CuspidalUnitaryTwists.ZetaUr

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsBaseIdempotentOfSplitIdempotentSum
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ActOOneResGCompl
 

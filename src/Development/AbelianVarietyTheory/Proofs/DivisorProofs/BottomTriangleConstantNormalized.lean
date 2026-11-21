@@ -36,4 +36,3 @@ theorem GlobalTheory.BotFormula.root_unit {ζ : ℂ} {n : ℕ} (hn : 0 < n) (h :
   have h4 : ‖lam ⟨ζ, hQ⟩‖ ^ n = 1 := by rw [← norm_pow, ← map_pow, h2, map_one, norm_one]
   rw [h3]
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hn.ne').1 h4
-

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.CenterActionCommutesLeviDifference
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.Bdy
 

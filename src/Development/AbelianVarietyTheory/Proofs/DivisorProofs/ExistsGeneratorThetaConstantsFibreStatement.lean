@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsGeneratorThetaConstantsFibre
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsChartMember
 public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.GoodClass

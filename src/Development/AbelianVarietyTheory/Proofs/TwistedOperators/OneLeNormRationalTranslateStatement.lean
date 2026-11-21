@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.OneLeNormRationalTranslate
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.DepthPays
 

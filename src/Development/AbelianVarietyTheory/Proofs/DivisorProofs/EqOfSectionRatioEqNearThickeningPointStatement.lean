@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EqOfSectionRatioEqNearThickeningPoint
 public import Development.AbelianVarietyTheory.Definitions.Divisors.FormalEnd
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SecRatioEqRefl

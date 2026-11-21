@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LiftFormLevelSplitsAtOffLevelSplitPlace
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NVNeZero
 public import Formalism.LocalToGlobal.Columns.MtHeckeSum

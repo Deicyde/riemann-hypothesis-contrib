@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GaloisActionPeriodProduct
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EvalMod
 public import GroundTheory.PAdicHodge.ExistsGalFixCyclotomicLayerCycloCharNeOne

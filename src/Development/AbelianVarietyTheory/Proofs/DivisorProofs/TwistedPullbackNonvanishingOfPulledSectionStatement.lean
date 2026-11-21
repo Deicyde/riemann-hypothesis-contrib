@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwistedPullbackNonvanishingOfPulledSection
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsPolAVSectionInverseImage
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.AbsoluteSiegel

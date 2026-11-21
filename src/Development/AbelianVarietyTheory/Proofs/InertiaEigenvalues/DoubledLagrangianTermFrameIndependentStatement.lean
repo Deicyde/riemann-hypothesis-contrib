@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DoubledLagrangianTermFrameIndependent
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IntegrandPeriodic
 

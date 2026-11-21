@@ -1,7 +1,6 @@
 module
 
 public import ReciprocityTheory.GeometryOfNumbers.AsymptoticSequences.DefectSt
-public import Mathlib
 
 @[expose] public section
 

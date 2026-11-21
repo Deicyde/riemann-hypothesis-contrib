@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EffCartierOfProportionalSections
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GeneratesAlong
 

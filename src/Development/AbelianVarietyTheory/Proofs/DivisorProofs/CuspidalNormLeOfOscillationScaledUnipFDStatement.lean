@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspidalNormLeOfOscillationScaledUnipFD
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OneMemBand
 public import GroundTheory.AutomorphicForms.CuspidalDiscreteness.ExistsNormRconvLeSiegel

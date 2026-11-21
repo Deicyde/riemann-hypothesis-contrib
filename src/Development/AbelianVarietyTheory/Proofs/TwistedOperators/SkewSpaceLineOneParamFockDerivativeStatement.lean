@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SkewSpaceLineOneParamFockDerivative
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HasInfExpDiv
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsPairReading

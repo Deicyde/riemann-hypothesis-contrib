@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenericPointsGoodStatement
 public import GroundTheory.HeightsAndTheta.Heights.Intersections.PtsOverPt
 
