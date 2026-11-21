@@ -16,6 +16,15 @@ SPEC.loader.exec_module(ci)
 
 class Validation(unittest.TestCase):
     def setUp(self):
+        baseline = patch.multiple(ci.prep, REVISION="0" * 40, MAP_SHA="1" * 64)
+        baseline.start()
+        self.addCleanup(baseline.stop)
+        original_selector = ci.prep.settings.for_toolchain
+        def fixture_baseline(toolchain):
+            return SimpleNamespace(**{**vars(original_selector(toolchain)), "REVISION": "0" * 40, "MAP_SHA": "1" * 64})
+        descriptor = patch.object(ci.prep.settings, "for_toolchain", side_effect=fixture_baseline)
+        descriptor.start()
+        self.addCleanup(descriptor.stop)
         self.identity = dict(schema=1, candidate_head="a" * 40, candidate_tree="b" * 40,
                              source_tree="c" * 40, build_roots={}, lakefile_sha256="d" * 64,
                              manifest_sha256="e" * 64, toolchain=ci.pub.transport.TOOLCHAIN)

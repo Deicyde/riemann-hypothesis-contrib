@@ -43,6 +43,10 @@ else
     exit "$RH_CI_CACHE_STATUS"
   fi
 fi
+if [[ "$(<lean-toolchain)" != 'leanprover/lean4:v4.33.1' ]]; then
+  echo 'No validated cache matches these build inputs; use lake build.' >&2
+  exit 3
+fi
 printf 'Fetching project cache (4.94 GB; processing the index takes a few minutes)...\n'
 CURL_HOME="$RH_CACHE_CURL_HOME" lake -q cache get --repo leanprover-community/riemann-hypothesis \
   --rev e50d09817ad81469f737e8f637561e6ccf86c670
