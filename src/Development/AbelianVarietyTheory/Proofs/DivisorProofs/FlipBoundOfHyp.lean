@@ -56,7 +56,7 @@ private theorem cong_le_givenLevel {μ₀ : T} (hL : L.Is μ₀) {t : T} {w : Pl
       refine le_trans (fun g hg => mem_KOne.2 fun a b => ((GivenAdm.mem_glLatCong.1 hg).2 a b).trans_lt ?_)
         (TypeDatum.KOne_le _)
       rw [Units.val_pow_eq_pow_val, map_pow]
-      exact pow_lt_one₀ zero_le' (isUnif_unifAt w ▸ uniformizer_lt_one) (by rw [depthAt]; omega)
+      exact pow_lt_one₀ zero_le (isUnif_unifAt w ▸ uniformizer_lt_one) (by rw [depthAt]; omega)
     · exact fun g hg => (GivenAdm.mem_glLatCong.1 hg).1
 
 private theorem nu_un {K : Type} [Field K] {ι τ : K →+* ℂ} (t : T) (w : Pl D.host.E)

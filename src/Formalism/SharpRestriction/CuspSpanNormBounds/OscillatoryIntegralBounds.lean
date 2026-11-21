@@ -49,7 +49,7 @@ theorem rho_lt {u : Fin (k0 + 1) → ℝ} {ρ : Fin k0 → ℝ} (h : Interlace u
     (hj : l.val ≤ j.val) : ρ j < u l := by
   have ha := (interlace_strictAnti h).antitone
   have hle : l ≤ j.castSucc := by
-    rw [Fin.le_def, Fin.coe_castSucc]; exact hj
+    rw [Fin.le_def, Fin.val_castSucc]; exact hj
   exact lt_of_lt_of_le (h j).1 (ha hle)
 
 theorem cut_bounds {k : ℕ} {u u' : Fin k → ℝ} {l : Fin k} {a b Y : ℝ}
@@ -1104,7 +1104,7 @@ def ch {d : ℕ} (n : Fin d → ℤ) (x : Tor d) : ℂ := ∏ j, fourier (n j) (
 
 theorem ch_cont {d : ℕ} (n : Fin d → ℤ) : Continuous (ch n) := by
   unfold ch
-  exact continuous_finset_prod _ fun j _ => (fourier (n j)).continuous.comp (continuous_apply j)
+  exact continuous_finsetProd _ fun j _ => (fourier (n j)).continuous.comp (continuous_apply j)
 
 theorem ch_add {d : ℕ} (m n : Fin d → ℤ) (x : Tor d) : ch (m + n) x = ch m x * ch n x := by
   simp only [ch, Pi.add_apply, fourier_add, Finset.prod_mul_distrib]
@@ -1170,7 +1170,7 @@ theorem posDef_finset {d : ℕ} {φ : (Fin d → ℤ) → ℂ} (h : Formalism.Ma
 
 theorem posDef_zero {d : ℕ} {φ : (Fin d → ℤ) → ℂ} (h : Formalism.MainNotions.S.UnitaryLevelOperators.IsPosDefZ φ) :
     0 ≤ (φ 0).re ∧ (φ 0).im = 0 := by
-  simpa [Finsupp.support_single_ne_zero _ one_ne_zero] using h (Finsupp.single 0 1)
+  simpa [Finsupp.support_single _ one_ne_zero] using h (Finsupp.single 0 1)
 
 theorem posDef_herm {d : ℕ} {φ : (Fin d → ℤ) → ℂ} (h : Formalism.MainNotions.S.UnitaryLevelOperators.IsPosDefZ φ) (n : Fin d → ℤ) :
     φ (-n) = conj (φ n) := by
@@ -1221,7 +1221,7 @@ def fej {d : ℕ} (φ : (Fin d → ℤ) → ℂ) (N : ℕ) (x : Tor d) : ℂ :=
 
 theorem fej_cont {d : ℕ} (φ : (Fin d → ℤ) → ℂ) (N : ℕ) : Continuous (fej φ N) := by
   unfold fej
-  exact continuous_finset_sum _ fun σ _ => continuous_const.mul (ch_cont σ)
+  exact continuous_finsetSum _ fun σ _ => continuous_const.mul (ch_cont σ)
 
 theorem fej_nonneg {d : ℕ} {φ : (Fin d → ℤ) → ℂ} (h : Formalism.MainNotions.S.UnitaryLevelOperators.IsPosDefZ φ) (N : ℕ) (x : Tor d) :
     0 ≤ (fej φ N x).re := by
@@ -1324,7 +1324,7 @@ theorem fw_tendsto {d : ℕ} (n : Fin d → ℤ) : Tendsto (fun N : ℕ => fw N 
     have h0 : Tendsto (fun N : ℕ => |((n j : ℤ) : ℝ)| / ((N : ℝ) + 1)) atTop (𝓝 0) :=
       tendsto_const_nhds.div_atTop (tendsto_atTop_add_const_right _ 1 tendsto_natCast_atTop_atTop)
     simpa using (tendsto_const_nhds (x := (1 : ℝ))).sub h0
-  have h := tendsto_finset_prod Finset.univ (fun j _ => hj j)
+  have h := tendsto_finsetProd Finset.univ (fun j _ => hj j)
   simpa using h
 
 theorem eventually_mem_box {d : ℕ} (n : Fin d → ℤ) : ∀ᶠ N : ℕ in atTop, n ∈ box d N := by
@@ -3163,7 +3163,7 @@ theorem isClosed_LUs (s : ℕ) : IsClosed (LUs s) := by
   have h : LUs s = ((⋂ i, {p : Msq s × Msq s | p.1 i i = 1}) ∩ (⋂ i, ⋂ j, ⋂ (_ : j < i), {p : Msq s × Msq s | p.1 j i = 0})) ∩
       ((⋂ i, {p : Msq s × Msq s | p.2 i i = 1}) ∩ (⋂ i, ⋂ j, ⋂ (_ : j < i), {p : Msq s × Msq s | p.2 i j = 0})) := by
     ext p
-    simp only [LUs, IsLowerUni, IsUpperUni, Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_iInter, Matrix.transpose_apply,
+    simp only [LUs, IsLowerUni, IsUpperUni, Set.mem_ofPred_eq, Set.mem_inter_iff, Set.mem_iInter, Matrix.transpose_apply,
       Matrix.of_apply]
   rw [h]
   have c1 : ∀ i j : Fin s, Continuous fun p : Msq s × Msq s => p.1 i j := fun i j =>
@@ -3841,7 +3841,7 @@ theorem subSum_one {n : ℕ} : subSum (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) �
   unfold subSum
   apply Finset.sum_eq_zero
   intro i _
-  exact Matrix.one_apply_ne (by rw [Ne, Fin.ext_iff, Fin.val_succ, Fin.coe_castSucc]; omega)
+  exact Matrix.one_apply_ne (by rw [Ne, Fin.ext_iff, Fin.val_succ, Fin.val_castSucc]; omega)
 
 theorem OmG_long (hS : StabMeasLong) (n : ℕ) (β z : ℂ) (hβ : β ≠ 0) (hz : z ≠ 0)
     {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E] (Φ : Msq (n + 1) → E)
@@ -3894,7 +3894,7 @@ open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G F
 theorem LUs_compl (s : ℕ) :
     (LUs s)ᶜ = {p | ¬ (Formalism.MainNotions.S.IsLoUni (Matrix.of p.1) ∧ Formalism.MainNotions.S.IsUpUni (Matrix.of p.2))} := by
   ext p
-  simp only [LUs, Set.mem_compl_iff, Set.mem_setOf_eq, not_iff_not]
+  simp only [LUs, Set.mem_compl_iff, Set.mem_ofPred_eq, not_iff_not]
   constructor
   · rintro ⟨⟨h1, h2⟩, ⟨h3, h4⟩⟩
     exact ⟨fun i j => ⟨fun h => h2 j i h, fun h => h ▸ h1 i⟩, fun i j => ⟨fun h => h4 i j h, fun h => h ▸ h3 i⟩⟩
@@ -4314,7 +4314,7 @@ theorem det_phiS {d : ℕ} {X : Matrix (Fin d) (Fin d) ℂ} (hX : SUk 1 X) : (ph
   have hbt : (phiS X).BlockTriangular id := by
     intro i j hij
     exact h.2 i j hij
-  rw [Matrix.det_of_upperTriangular hbt]
+  rw [Matrix.det_of_isUpperTriangular hbt]
   simp [h.1]
 
 theorem blk_add {n : ℕ} (A A' : Matrix (Fin n) (Fin n) ℂ) (b a b' a' : Fin n → ℂ) (e e' : ℂ) :

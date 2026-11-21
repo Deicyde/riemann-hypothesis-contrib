@@ -37,7 +37,7 @@ theorem bchar_congr {μ₁ μ₂ : kˣ →* ℂˣ} (h₁ : IsUnram μ₁) (h₂ 
     unram_congr (isUnram_absPow k (-1 / 2)) hd]
 
 theorem ne_zero_of_lt {R : kˣ} {x : k} (hx : valuation k (R : k) < valuation k x) : x ≠ 0 := by
-  rintro rfl; rw [map_zero] at hx; exact not_lt_zero' hx
+  rintro rfl; rw [map_zero] at hx; exact not_lt_zero hx
 
 theorem isEvRad_coord (hasy : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (μ₁ μ₂ : kˣ →* ℂˣ) (f : GlobalTheory.PrinTwo.PSp μ₁ μ₂), ∃ R : kˣ, ∀ x : kˣ, ValuativeRel.valuation k (R : k) < ValuativeRel.valuation k (x : k) → GlobalTheory.PrinTwo.coord f x = GlobalTheory.PrinTwo.bchar μ₁ μ₂ (-x⁻¹) x * GlobalTheory.PrinTwo.ev f 1) {μ₁ μ₂ : kˣ →* ℂˣ} (h₁ : IsUnram μ₁) (h₂ : IsUnram μ₂)
     (f : PSp μ₁ μ₂) : IsEvRad (coord f) := by
