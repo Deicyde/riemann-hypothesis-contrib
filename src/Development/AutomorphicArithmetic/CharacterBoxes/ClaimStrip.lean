@@ -11,14 +11,12 @@ namespace Claim
 theorem prim_zero {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) [NeZero χ.conductor] {s : ℂ}
     (hs0 : 0 < s.re) (hs1 : s.re < 1) (h : DirichletCharacter.LFunction χ s = 0) :
     DirichletCharacter.LFunction χ.primitiveCharacter s = 0 := by
-  have hs : s ≠ 1 := fun e => by rw [e, Complex.one_re] at hs1; exact lt_irrefl _ hs1
+  have hs : s ≠ 1 := by rintro rfl; norm_num at hs1
   have key := DirichletCharacter.LFunction_changeLevel χ.conductor_dvd_level
     χ.primitiveCharacter (Or.inr hs)
   rw [χ.changeLevel_primitiveCharacter, h] at key
-  rcases mul_eq_zero.mp key.symm with h' | h'
-  · exact h'
-  · obtain ⟨p, hp, hp0⟩ := Finset.prod_eq_zero_iff.mp h'
-    exact absurd hp0 (factor_ne_zero _ hs0 p (Nat.prime_of_mem_primeFactors hp))
+  exact (mul_eq_zero.mp key.symm).resolve_right <| Finset.prod_ne_zero_iff.mpr fun p hp =>
+    factor_ne_zero _ hs0 p (Nat.prime_of_mem_primeFactors hp)
 
 theorem gamma_ne_zero {M : ℕ} [NeZero M] (φ : DirichletCharacter ℂ M) {t : ℂ} (ht : 0 < t.re) :
     DirichletCharacter.gammaFactor φ t ≠ 0 := by
