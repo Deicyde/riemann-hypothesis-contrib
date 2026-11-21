@@ -1,7 +1,6 @@
 module
 
 public import CompanionTheory.AutomorphicTheory.BesselWaveGrids.BigCellDerivativeExpansionOfIsDSOfCoefOf
-public import Mathlib
 
 @[expose] public section
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TensorMapEigenvalueNormBound
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPowMemConj
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SimilitudePairRegularImageAtP

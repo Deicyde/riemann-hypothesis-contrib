@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIntegralClosureFiniteGaloisStableThetaRing
 public import Development.AbelianVarietyTheory.Definitions.Divisors.LamRange
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems

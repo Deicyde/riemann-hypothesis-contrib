@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TotalDegreePencilLineDiscriminantLe
 public import Development.AbelianVarietyTheory.Definitions.Divisors.JoinCastSucc
 public import ReciprocityTheory.SemistableReduction.TorusL2CauchyInequality

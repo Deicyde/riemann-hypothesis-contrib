@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.GenericPointFieldIso
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.RootOnFund
 

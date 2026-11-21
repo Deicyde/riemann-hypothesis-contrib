@@ -1,7 +1,6 @@
 module
 
 public import CompanionTheory.RealGroups.GeneralUnitaryRepresentations.ArchimedeanJacquetSegments.Complementary
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DualClassTwistNeg
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.GlobalTheory.BernsteinZelevinskyFiniteness
 

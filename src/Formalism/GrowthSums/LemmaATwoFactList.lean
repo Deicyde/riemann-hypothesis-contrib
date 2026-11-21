@@ -6,7 +6,6 @@ public import Formalism.GrowthSums.FactorialBaseGrowth.QuadraticExponentIdentity
 public import Formalism.GrowthSums.FactorialBaseGrowth.Segment
 public import Formalism.GrowthSums.FactorialBaseGrowth.NextEvenTopHolds
 public import Formalism.GrowthSums.FactorialBaseGrowth.LogCoef
-public import Mathlib
 public import Formalism.GrowthSums.FactorialBaseGrowth.PathBasisOfCount
 
 @[expose] public section

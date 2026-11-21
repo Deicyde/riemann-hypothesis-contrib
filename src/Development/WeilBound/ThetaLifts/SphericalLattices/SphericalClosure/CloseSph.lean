@@ -4,7 +4,6 @@ public import Development.WeilBound.ThetaLifts.AgreeOfLeaves
 public import Development.WeilBound.ThetaLifts.LeviDeterminants.ThetaEvaluationZeroCone
 public import Development.WeilBound.ThetaLifts.WeilDomination.ExistsUnitChrWNe
 public import Development.WeilBound.ThetaLifts.CartanFactorisation.InjPure
-public import Mathlib
 public import Development.WeilBound.ThetaLifts.CartanFactorisation.PolCountFinal
 public import Development.WeilBound.ThetaLifts.LatticeBasics.HgtInt
 public import Development.WeilBound.ThetaLifts.WeilDomination.SwAnisoXOf

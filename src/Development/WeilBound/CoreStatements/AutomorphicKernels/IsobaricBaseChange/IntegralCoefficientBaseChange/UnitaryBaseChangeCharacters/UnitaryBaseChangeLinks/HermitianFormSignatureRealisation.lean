@@ -1,7 +1,6 @@
 module
 
 public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HermitianFormSignatureRealisation
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CTUnitsLeft
 
 @[expose] public section

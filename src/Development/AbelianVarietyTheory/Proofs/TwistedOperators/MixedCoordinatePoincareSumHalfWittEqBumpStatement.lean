@@ -1,9 +1,10 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MixedCoordinatePoincareSumHalfWittEqBump
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsAuxiliaryVectorWittDec
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.WittExtensionSumMulMiddleCoordinate
+
+@[expose] public section
 
 namespace I195MixedCoordinates_2b9c4e7ee460bdf0c3844320
 
@@ -21,7 +22,6 @@ public noncomputable abbrev source
 
 end I195MixedCoordinates_2b9c4e7ee460bdf0c3844320
 
-@[expose] public section
 
 noncomputable section
 

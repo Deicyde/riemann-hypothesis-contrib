@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PenultimateChartLocalGroupMemNearLevelSet
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ChartWiden
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValLtOfRedM

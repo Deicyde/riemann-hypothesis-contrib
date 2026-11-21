@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnitaryRationalPointMatrixHomSurjectiveOnto
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IncludeLInjective
 

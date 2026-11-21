@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FreeHomGlueOfCovering
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CoveringOfForallMem
 

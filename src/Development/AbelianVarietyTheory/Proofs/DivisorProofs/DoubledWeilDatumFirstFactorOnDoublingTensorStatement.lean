@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DoubledWeilDatumFirstFactorOnDoublingTensor
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ImportsBis
 public import Development.AbelianVarietyTheory.Definitions.Foundations.T2SpaceAdeleRing

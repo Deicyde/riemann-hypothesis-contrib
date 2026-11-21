@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsCoboundaryReadOfTwistedCharacterCoboundary
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LiftQMk
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ConstOneMem

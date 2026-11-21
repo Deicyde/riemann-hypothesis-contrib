@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CoordsSingleBlockSegre
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsSncPatchRat
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EmbedsGeneric

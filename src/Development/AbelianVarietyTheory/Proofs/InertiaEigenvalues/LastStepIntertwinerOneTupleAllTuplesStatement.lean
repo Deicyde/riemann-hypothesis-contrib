@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LastStepIntertwinerOneTupleAllTuples
 public import Formalism.LocalToGlobal.IndefiniteReal.LinksW
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsStepWeil

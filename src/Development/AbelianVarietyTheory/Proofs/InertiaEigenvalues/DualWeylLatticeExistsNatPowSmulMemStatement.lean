@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DualWeylLatticeExistsNatPowSmulMem
 public import Formalism.LocalToGlobal.Columns.CoefModAt
 public import Formalism.LocalToGlobal.Divisibility.CoefModLemmas

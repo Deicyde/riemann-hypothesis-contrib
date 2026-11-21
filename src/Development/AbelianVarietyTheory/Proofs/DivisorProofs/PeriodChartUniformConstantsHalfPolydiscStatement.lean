@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PeriodChartUniformConstantsHalfPolydisc
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.HodgePeriodGram
 

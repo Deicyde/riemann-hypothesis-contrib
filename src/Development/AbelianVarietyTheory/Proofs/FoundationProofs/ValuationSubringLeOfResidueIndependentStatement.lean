@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ValuationSubringLeOfResidueIndependent
 public import Development.AbelianVarietyTheory.Definitions.Foundations.EigenOfTwoStep
 

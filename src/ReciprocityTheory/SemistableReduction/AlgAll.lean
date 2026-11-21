@@ -1,7 +1,6 @@
 module
 
 public import ReciprocityTheory.SemistableReduction.FinrankRestrictTotalDegree
-public import Mathlib
 public import ReciprocityTheory.SemistableReduction.ComapInclusionIsLocalHom
 public import ReciprocityTheory.SemistableReduction.CauchyInequalityOnTorus
 public import ReciprocityTheory.SemistableReduction.GenericImageFinite

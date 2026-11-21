@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLocalSectionOfOpenImmersionSpec
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLocSecZero
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SymTupOne

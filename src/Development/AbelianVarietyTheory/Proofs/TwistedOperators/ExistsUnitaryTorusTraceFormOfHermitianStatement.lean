@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsUnitaryTorusTraceFormOfHermitian
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.ExistsHasCls
 

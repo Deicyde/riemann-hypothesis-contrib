@@ -1,7 +1,6 @@
 module
 
 public import Formalism.SubspaceCounting.GoodOrbitIntervalTileCondition
-public import Mathlib
 
 @[expose] public section
 

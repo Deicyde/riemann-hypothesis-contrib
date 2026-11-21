@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.NormLevelIndicatorCoefficientTestLeDecay
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.DepthPays
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FrameAdmissibleOfCongrUnitriangular
 public import Formalism.SharpRestriction.CuspSpanNormBounds.IsPrimitiveSub
 

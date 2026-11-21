@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FiniteEmbeddingMemStabilizerAuxiliaryLattice
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RowShiftEq
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevRowSuccInfUA

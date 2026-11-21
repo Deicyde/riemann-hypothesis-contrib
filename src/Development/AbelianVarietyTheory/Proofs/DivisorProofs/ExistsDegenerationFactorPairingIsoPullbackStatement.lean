@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsDegenerationFactorPairingIsoPullback
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LinHomIffLinEnd
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CFxi

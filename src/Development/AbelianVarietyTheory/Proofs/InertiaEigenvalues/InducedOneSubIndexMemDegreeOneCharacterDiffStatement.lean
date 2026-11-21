@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.InducedOneSubIndexMemDegreeOneCharacterDiff
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IndApplyOne
 

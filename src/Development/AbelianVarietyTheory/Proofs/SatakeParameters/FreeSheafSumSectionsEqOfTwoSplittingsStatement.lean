@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FreeSheafSumSectionsEqOfTwoSplittings
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CoveringOfForallMem
 

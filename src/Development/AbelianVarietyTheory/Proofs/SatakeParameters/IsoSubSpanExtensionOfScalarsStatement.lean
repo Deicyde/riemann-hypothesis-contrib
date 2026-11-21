@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsoSubSpanExtensionOfScalars
 public import Formalism.SharpRestriction.LevelLetterCocycles.QuotientHomNonvanishingBound
 

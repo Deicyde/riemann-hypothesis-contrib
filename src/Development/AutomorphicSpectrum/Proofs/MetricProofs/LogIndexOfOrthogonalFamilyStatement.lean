@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogIndexOfOrthogonalFamily
 public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsAdapted
 

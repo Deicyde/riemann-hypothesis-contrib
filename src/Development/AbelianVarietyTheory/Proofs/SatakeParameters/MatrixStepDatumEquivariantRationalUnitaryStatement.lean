@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MatrixStepDatumEquivariantRationalUnitary
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.UnderTie
 

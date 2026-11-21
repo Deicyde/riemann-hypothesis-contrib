@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsAbPartBaseChange
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TorusOver
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCompactInvertibleKrylovMatrices
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ParP
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KrylovApply

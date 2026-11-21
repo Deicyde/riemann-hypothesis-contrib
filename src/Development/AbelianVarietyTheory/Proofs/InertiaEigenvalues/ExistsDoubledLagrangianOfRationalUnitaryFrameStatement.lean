@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsDoubledLagrangianOfRationalUnitaryFrame
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FrameOfFst
 

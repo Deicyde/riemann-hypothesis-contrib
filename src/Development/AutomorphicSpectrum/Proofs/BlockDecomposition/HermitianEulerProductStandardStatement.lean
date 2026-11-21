@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermitianEulerProductStandard
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GramNear
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsUnitHermOfDet

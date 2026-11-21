@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CardRankLowerLeftEqLowerRight
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JpUnif
 

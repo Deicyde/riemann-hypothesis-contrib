@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LogDefectCoeffEqZero
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AevalLogDefect
 

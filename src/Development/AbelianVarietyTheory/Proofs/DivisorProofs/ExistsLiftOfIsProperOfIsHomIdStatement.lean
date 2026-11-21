@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLiftOfIsProperOfIsHomId
 public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.ImmersedBy
 

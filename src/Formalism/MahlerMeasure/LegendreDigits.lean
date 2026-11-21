@@ -3,7 +3,6 @@ module
 public import Formalism.MahlerMeasure.MahlerMeasureProofs.DeterminantBlockLeadingTerm
 public import Formalism.MahlerMeasure.Statement
 public import Formalism.MahlerMeasure.MahlerMeasureProofs.Mahler
-public import Mathlib
 
 @[expose] public section
 

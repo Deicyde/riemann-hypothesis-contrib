@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CechHomologyEquivFam
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.SortSign
 

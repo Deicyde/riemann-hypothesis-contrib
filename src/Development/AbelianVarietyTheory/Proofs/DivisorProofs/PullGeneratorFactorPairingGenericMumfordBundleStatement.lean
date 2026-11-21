@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PullGeneratorFactorPairingGenericMumfordBundle
 public import Development.AbelianVarietyTheory.Definitions.Divisors.FacAlg
 public import Development.AbelianVarietyTheory.Definitions.Divisors.FormalEnd

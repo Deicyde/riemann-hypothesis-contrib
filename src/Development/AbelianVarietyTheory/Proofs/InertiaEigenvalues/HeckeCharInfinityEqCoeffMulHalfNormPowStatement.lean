@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HeckeCharInfinityEqCoeffMulHalfNormPow
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsFlipDet
 

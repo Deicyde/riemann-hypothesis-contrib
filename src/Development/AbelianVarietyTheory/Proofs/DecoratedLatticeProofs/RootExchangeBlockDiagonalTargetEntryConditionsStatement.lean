@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.RootExchangeBlockDiagonalTargetEntryConditions
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.AllPositions
 

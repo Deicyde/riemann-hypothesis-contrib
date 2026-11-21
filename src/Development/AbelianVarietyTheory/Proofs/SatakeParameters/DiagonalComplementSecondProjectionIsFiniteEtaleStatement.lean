@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DiagonalComplementSecondProjectionIsFiniteEtale
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FibrePointsLEId
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CrystallineClassRestrictDecompositionGroup
 public import Development.AbelianVarietyTheory.Definitions.Foundations.FinalTheorems
 

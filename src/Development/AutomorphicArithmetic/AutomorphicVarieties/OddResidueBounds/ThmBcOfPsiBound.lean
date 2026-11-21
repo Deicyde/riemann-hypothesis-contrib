@@ -8,7 +8,6 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.OddResidueB
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.OddResidueBounds.ProdVal
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.OddResidueBounds.AtPrime
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.OddResidueBounds.DegExistsLift
-public import Mathlib
 
 @[expose] public section
 

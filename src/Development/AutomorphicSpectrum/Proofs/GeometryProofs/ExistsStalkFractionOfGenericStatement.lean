@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsStalkFractionOfGeneric
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsCptGen
 

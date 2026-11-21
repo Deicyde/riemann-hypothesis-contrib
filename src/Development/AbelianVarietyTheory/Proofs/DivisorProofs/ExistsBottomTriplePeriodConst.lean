@@ -31,4 +31,3 @@ theorem conj_finsum {α : Type*} (f : α → ℂ) : starRingEnd ℂ (∑ᶠ a, f
     rw [finsum_of_infinite_support hs, finsum_of_infinite_support hs', map_zero]
 
 end GlobalTheory.BotFormula
-

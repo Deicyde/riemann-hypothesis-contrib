@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AddCharConductorIntegersContinuousNeOne
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.CosInj
 

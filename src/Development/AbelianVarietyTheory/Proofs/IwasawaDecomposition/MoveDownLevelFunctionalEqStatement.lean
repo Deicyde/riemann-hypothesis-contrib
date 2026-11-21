@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MoveDownLevelFunctionalEq
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LatAtLattice
 

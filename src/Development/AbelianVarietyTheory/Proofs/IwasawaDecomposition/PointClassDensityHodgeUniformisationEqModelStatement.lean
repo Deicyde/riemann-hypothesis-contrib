@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PointClassDensityHodgeUniformisationEqModel
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PointPoly
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.FirstIndexEqOfUnfolded

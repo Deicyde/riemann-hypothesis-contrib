@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BlockOneDetHermitianGram
 public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSupportCondition
 

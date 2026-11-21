@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GenericFibreInvariantVectorFieldsAtGenericPoint
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RingOpSub
 

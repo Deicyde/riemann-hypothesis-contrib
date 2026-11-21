@@ -9,7 +9,6 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StExpDeriv
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConjTransposeSignFormDiagEqSignedSumCol
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IteratedDerivScale
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StConstHolds
-public import Mathlib
 
 @[expose] public section
 

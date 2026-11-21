@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsSelfDualLatticeMoves
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.SymRead
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsStdFr

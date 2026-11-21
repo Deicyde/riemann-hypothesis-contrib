@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaCombinationJetsAlgebraicConjEqConjSeries
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EmbLLMem
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PairIntAt

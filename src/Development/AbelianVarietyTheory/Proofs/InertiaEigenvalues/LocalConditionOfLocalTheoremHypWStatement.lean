@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LocalConditionOfLocalTheoremHypW
 public import Formalism.SharpRestriction.LevelLetterCocycles.EmbeddingTypeJumps
 public import Formalism.SharpRestriction.LevelLetterCocycles.LargeLevelLemmas

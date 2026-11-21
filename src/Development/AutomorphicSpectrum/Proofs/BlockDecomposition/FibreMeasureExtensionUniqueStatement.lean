@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FibreMeasureExtensionUnique
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermitianMeasureData
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LinearlyIndependentFramesOpenStatement

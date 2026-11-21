@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemLevelIffUnipotentAtTypePlace
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ReadsHecke
 

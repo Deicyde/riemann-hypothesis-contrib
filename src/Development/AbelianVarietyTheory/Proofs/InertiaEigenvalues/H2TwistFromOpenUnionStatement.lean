@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.H2TwistFromOpenUnion
 public import ReciprocityTheory.ReductiveGroups.TraceFormulas.LatDefs
 

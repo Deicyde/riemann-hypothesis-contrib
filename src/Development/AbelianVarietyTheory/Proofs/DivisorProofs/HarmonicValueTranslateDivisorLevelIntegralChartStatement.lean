@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarmonicValueTranslateDivisorLevelIntegralChart
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.JetsOnCopiesAny
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PhiAt

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LamIsLattice
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsLatIntVec
 

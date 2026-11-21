@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProperBirationalPrimeExists
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PowIdeal
 

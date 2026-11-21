@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdelicSchwartzPointValuesAdmitted
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsoRows
 

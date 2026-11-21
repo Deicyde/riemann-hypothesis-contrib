@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsNontrivialAddCharZmodEqOfNeOne
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ReadsHecke
 

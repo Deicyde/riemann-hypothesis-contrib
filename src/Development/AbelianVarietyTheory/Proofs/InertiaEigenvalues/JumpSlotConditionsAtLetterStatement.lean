@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.JumpPositionConditionsAtLetter
 public import Formalism.SharpRestriction.LevelLetterCocycles.TableLineDegreeTwo
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemIntPts

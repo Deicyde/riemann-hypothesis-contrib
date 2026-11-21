@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.TraceFormGramPowerBasisHermitianNondegenerate
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.CoordEquivApply
 

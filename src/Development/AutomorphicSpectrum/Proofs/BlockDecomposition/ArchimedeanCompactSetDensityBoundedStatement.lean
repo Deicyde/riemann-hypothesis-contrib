@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanCompactSetDensityBounded
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsSplitK
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermInf

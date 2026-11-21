@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.HeckeCharRamifiedOfRamifiedLocalComponent
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.ThetaMod
 

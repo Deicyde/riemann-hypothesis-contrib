@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SumSymmetricTranslatesThetaPullbackExtends
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsTranslSum
 

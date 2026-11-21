@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasSumHilbertEisensteinConstantTermPartialZeta
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.OmegaFactorization
 

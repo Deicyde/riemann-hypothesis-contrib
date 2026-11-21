@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SquarefreeMonicPolyLabelsSemisimpleParameter
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LabelsCharOne
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspidalCharacterFormula

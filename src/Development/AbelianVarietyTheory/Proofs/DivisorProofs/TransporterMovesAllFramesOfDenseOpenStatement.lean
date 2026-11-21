@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TransporterMovesAllFramesOfDenseOpen
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTranspOfMovesAt
 

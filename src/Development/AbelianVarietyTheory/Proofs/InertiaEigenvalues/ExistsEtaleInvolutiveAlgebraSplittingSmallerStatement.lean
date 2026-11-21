@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsEtaleInvolutiveAlgebraSplittingSmaller
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsSplitting
 

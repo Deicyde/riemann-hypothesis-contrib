@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieValuePullbackFieldExt
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelComplexBaseChange
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ValAtComplexEmbedding

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ContinuousRepOfMatrixTuplePadicBasis
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TupMemLatT
 

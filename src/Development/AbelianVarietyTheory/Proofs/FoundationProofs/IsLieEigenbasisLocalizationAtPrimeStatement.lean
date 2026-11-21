@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsLieEigenbasisLocalizationAtPrime
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FibreIff
 

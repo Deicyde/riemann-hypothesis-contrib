@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.TrueChainKernelEqPointKernelAtRepresentatives
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MoveStep
 

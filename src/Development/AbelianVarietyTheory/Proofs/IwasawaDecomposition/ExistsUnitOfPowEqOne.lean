@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LocStOfLoc
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsFiniteQCHomModOfExact
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.LinearIndependentFlagVec

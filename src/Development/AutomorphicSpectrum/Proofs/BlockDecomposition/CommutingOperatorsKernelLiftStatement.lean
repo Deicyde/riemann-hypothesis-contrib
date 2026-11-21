@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CommutingOperatorsKernelLift
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SubPairRight
 public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.ExistsHomLocBijectiveGrSum

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AutomorphicFormFnInvIffTwistedSubstitutionMem
 public import Formalism.LocalToGlobal.HermitianForms.IsLocBasis
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PolFunApply

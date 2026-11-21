@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LintegralWeightedAtlasFrameEtaleTransfer
 public import ReciprocityTheory.L2DbarEstimates.Imports
 public import ReciprocityTheory.L2DbarEstimates.PlurisubharmonicCharts.FourSignHolds

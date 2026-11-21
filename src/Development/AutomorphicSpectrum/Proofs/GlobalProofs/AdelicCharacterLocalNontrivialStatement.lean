@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.AdelicCharacterLocalNontrivial
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.IsAdaptedEmpty
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsBlockEmb

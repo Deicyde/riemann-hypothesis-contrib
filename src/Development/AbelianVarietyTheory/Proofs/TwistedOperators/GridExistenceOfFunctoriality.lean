@@ -15,7 +15,6 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.NormSumPa
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsWeilOverOfClauses
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AuxiliaryVectorDecompositionEqZero
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NonemptyVertices
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsOverBoth
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPrimeOfMemChiGridBadPlaces
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemMulInvIff
 public import Development.AbelianVarietyTheory.Statements.HeckeThetaIntegrals.FormulaAt

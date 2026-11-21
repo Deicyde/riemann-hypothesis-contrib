@@ -6,7 +6,6 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.AutomorphyLifting.PrimeIndexConstruction.IndAutLOfAutCsP
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.CuspidalTwists.Sp4In
 public import PositivityTheory.AutomorphicForms.PublishedInputs.CuspidalContinuity.ArchimedeanCuspidal.SquareIntegrable.WhittakerModelGL2
-public import Mathlib
 public import GroundTheory.AutomorphicForms.GL2.GodementSectionLocal
 public import GroundTheory.AutomorphicForms.GL2.GJMatrixLocal
 public import GroundTheory.AutomorphicForms.MeasuresGL

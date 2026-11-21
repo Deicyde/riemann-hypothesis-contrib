@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CubicalStructureE8Power
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.E8LB
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceLevelPrimePhiOneEqOneIffColumns
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ColCond
 

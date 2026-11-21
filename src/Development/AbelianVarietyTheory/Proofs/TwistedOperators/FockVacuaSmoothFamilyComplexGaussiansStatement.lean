@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FockVacuaSmoothFamilyComplexGaussians
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PairInfApply
 

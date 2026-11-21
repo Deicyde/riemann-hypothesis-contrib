@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GroupSchemeEndProductPowersTransportGrpPullback
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsMonHomProdPow
 

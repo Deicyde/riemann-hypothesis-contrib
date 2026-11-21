@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GenericEighthPowerUniformisedIsPolarised
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.E8LB
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems

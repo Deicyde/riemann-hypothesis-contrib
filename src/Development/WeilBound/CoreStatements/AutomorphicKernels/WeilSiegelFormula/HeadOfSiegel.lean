@@ -1,7 +1,6 @@
 module
 
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.WeilSiegelFormula.WeilSiegelSchwartz.EcHeisSch
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EisCells
 public import Development.WeilBound.CoreStatements.AutomorphicKernels.WeilSiegelFormula.WeilSiegelSchwartz.HermitianIntegrability.SiegelND
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PoissonHermMain

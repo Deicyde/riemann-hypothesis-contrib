@@ -2,7 +2,6 @@ module
 
 public import Formalism.HermitianCurvature.LevelRecursionCondNeeded
 public import Formalism.LatticeRigidity.StatementC
-public import Mathlib
 
 @[expose] public section
 

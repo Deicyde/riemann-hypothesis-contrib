@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.FormTranslateRealPointReadByPeriod
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.TrcSingleApply
 

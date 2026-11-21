@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HolomorphicFrameFamilyChartCoordinatesHolomorphi
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PointPoly
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsNegSqZero

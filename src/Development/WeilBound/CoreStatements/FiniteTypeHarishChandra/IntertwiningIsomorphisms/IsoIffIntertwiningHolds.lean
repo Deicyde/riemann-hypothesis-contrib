@@ -1,7 +1,6 @@
 module
 
 public import Development.WeilBound.CoreStatements.FiniteTypeHarishChandra.SupportExistsAll
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.IrreducibleCharacterSeries.ConjugateCharacterFormula
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SimpleIffIrreducibleStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SeparableIrreducibleStatement

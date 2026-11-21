@@ -1,7 +1,6 @@
 module
 
 public import Formalism.HermitianCurvature.StatementQ
-public import Mathlib
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.SumDualVectorEqZeta
 
 @[expose] public section

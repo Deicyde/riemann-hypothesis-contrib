@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AppLEOpensInclusionAppLEEqSecMapIsoSpec
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CmpOfIsCocycle
 

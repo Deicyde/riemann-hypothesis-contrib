@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsLargeVonMangoldtLogPowerSeriesNearZero
 public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.ZerosDisc
 

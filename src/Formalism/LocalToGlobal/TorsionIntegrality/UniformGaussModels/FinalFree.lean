@@ -3,7 +3,6 @@ module
 public import Formalism.LocalToGlobal.TorsionIntegrality.UniformGaussModels.OneLetterGaussSharpTranslateHolds
 public import Formalism.LocalToGlobal.TorsionIntegrality.UniformGaussModels.StatementK
 public import Formalism.LocalToGlobal.TorsionIntegrality.UniformGaussModels.StatementL
-public import Mathlib
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.DyadicStableLattices.HalfMain
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.DyadicStableLattices.DeuringScale
 public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.DyadicStableLattices.ChainPC

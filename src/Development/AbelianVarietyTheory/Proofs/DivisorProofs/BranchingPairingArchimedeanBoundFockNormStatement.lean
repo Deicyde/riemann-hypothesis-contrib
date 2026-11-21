@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BranchingPairingArchimedeanBoundFockNorm
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BrPairFApply
 public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.InfClassAt

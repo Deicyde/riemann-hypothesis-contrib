@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.DoubleThetaLiftValueBilinear
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemTranslate
 

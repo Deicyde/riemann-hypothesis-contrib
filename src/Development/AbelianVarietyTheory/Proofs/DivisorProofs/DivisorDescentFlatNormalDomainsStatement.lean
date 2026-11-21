@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DivisorDescentFlatNormalDomains
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DivConstClosedPts
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OriginIdeal

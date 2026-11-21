@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaVacuumEqKappaPowMulBlockKernels
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BlkLat
 public import Formalism.LocalToGlobal.InertKernelTheory.StatementAlg

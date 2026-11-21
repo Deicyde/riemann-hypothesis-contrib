@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TameHeckeCharacterSplitPlaceLocalComponent
 public import Formalism.LocalToGlobal.GaloisLevelStructure.DefsLevel
 public import ReciprocityTheory.Automorphisms.SplitCoeAlgebraMap

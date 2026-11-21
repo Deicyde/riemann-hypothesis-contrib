@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RationalIsometryCoordinateMatrixRealPlace
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CoordEquivSymmApply
 

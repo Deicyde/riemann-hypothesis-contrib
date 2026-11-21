@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Formalism.MeanHeightDescent.CombinedAverageDegreeBound
 public import Formalism.MonomialMeanResidues.FilteredDegree
 public import Formalism.MeanHeightDescent.DivisionInequalityWithCovolume

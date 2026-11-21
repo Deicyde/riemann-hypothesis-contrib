@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CongruenceOnSelfDualLatticeCompletion
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTransp
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MulVecMemOfFrame

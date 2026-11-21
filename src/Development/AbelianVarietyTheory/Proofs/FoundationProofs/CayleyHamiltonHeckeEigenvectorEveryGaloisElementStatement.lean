@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CayleyHamiltonHeckeEigenvectorEveryGaloisElement
 public import Development.AbelianVarietyTheory.Definitions.Foundations.EigenOfTwoStep
 

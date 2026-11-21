@@ -1,10 +1,8 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.GoodOrigin
 public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.FullIntersectionTowerI8Identity
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.CmpPair
-public import Development.AutomorphicSpectrum.Statements.GeometryStatements.CmpSt
 public import Development.AutomorphicSpectrum.Statements.TowerExistence.GoodTowerExistsX
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.HodgeLatticeFlagBound
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.TrivFlagOnHodge
