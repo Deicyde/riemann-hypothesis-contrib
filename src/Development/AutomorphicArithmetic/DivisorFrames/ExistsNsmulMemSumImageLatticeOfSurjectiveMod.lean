@@ -50,9 +50,7 @@ theorem UpperTheory.exists_nsmul_mem_sum_image_lattice_of_surjective_mod :
     obtain ⟨v, rfl⟩ := hΦs u
     rw [hΦapp]
     refine Submodule.sum_mem _ (fun a _ => ?_)
-    have hva : v a ∈ Submodule.span ℝ (ΛA : Set (Fin gA → ℂ)) := by
-      rw [hA]
-      trivial
+    have hva : v a ∈ Submodule.span ℝ (ΛA : Set (Fin gA → ℂ)) := hA ▸ Submodule.mem_top
     have hsub : ((J a).restrictScalars ℝ) '' (ΛA : Set (Fin gA → ℂ)) ⊆ (Sz : Set (Fin gB → ℂ)) := by
       rintro _ ⟨z, hz, rfl⟩
       refine ⟨Pi.single a z, Submodule.mem_pi.mpr (fun b _ => ?_), ?_⟩
@@ -96,8 +94,7 @@ theorem UpperTheory.exists_nsmul_mem_sum_image_lattice_of_surjective_mod :
     have h2 : n • l - m • l = (ZSpan.floor b (n • l) : Fin gB → ℂ) - ZSpan.floor b (m • l) := by
       rw [sub_eq_sub_iff_sub_eq_sub]
       exact heq.symm
-    rw [h1, h2]
-    exact Sz.sub_mem (hzS (ZSpan.floor b _).2) (hzS (ZSpan.floor b _).2)
+    simpa only [h1, h2] using Sz.sub_mem (hzS (ZSpan.floor b _).2) (hzS (ZSpan.floor b _).2)
   obtain ⟨x, hx, hxe⟩ := hdiff
   refine ⟨n - m, x, Nat.sub_pos_of_lt hmn, fun a => Submodule.mem_pi.mp hx a (Set.mem_univ a), ?_⟩
   rw [← hxe]
