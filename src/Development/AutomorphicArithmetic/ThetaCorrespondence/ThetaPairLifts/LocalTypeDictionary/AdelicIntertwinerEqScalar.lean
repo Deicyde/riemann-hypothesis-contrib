@@ -38,7 +38,7 @@ theorem adelic_schur_lemma : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ 
       rw [ofReal_integral_eq_lintegral_ofReal (hint g hg) (Filter.Eventually.of_forall fun x => by positivity)]
       congr 1
       funext x
-      rw [ENNReal.ofReal_pow (norm_nonneg _), ofReal_norm_eq_enorm]
+      rw [ENNReal.ofReal_pow (norm_nonneg _), ofReal_norm]
     rw [e _ (hpres φ hφ), e φ hφ] at h
     exact (ENNReal.ofReal_eq_ofReal_iff (integral_nonneg fun x => by positivity)
       (integral_nonneg fun x => by positivity)).1 h
