@@ -5,6 +5,7 @@ import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.HidaSetting
 import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Bridge
 import Mathlib.RingTheory.Etale.Weakly
 import Mathlib.RingTheory.TotallySplit
+import Formalism.SharpRestriction.CuspSpanNormBounds.BesselShellMomentBounds -- shake: keep (elaboration only (instance): Formalism.MainNotions.BesselShellMomentBounds.instCM)
 
 noncomputable section
 

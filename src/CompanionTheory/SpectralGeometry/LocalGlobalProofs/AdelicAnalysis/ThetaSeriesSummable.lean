@@ -4,6 +4,7 @@ import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.FiniteA
 import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SummableGaussianCoset
 import ReciprocityTheory.ThetaSummability.TailSumEstimates.LatSumPi
 import Mathlib.Analysis.Normed.Group.Tannery
+import Mathlib.Analysis.InnerProductSpace.Reproducing -- shake: keep (elaboration only (found by bisection; probably the instance RKHS.instFunLike): Mathlib.Analysis.InnerProductSpace.Reproducing)
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology GlobalTheory.CompanionTheory.SW.Core
 open scoped ENNReal NNReal MatrixGroups
 

@@ -2,6 +2,7 @@ import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Formalism.SharpRestriction.GlobalSchurBounds.LinkMin
 import Formalism.LocalToGlobal.GlobalTheory.GL5.FamilyMassVolumeIdentityOfClassDecomp
+import Formalism.SharpRestriction.CuspSpanNormBounds.BesselShellMomentBounds -- shake: keep (elaboration only (instance): Formalism.MainNotions.BesselShellMomentBounds.instCM)
 
 noncomputable section
 

@@ -5,6 +5,7 @@ import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.Unitary
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.ArithmeticUnitaryGroupDiscrete
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelesLocallyCompactSecondCountable
 import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.AdelicUnitaryGroupLocallyCompactStatement
+import Mathlib.Analysis.InnerProductSpace.Reproducing -- shake: keep (elaboration only (found by bisection; probably the instance RKHS.instFunLike): Mathlib.Analysis.InnerProductSpace.Reproducing)
 
 open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix

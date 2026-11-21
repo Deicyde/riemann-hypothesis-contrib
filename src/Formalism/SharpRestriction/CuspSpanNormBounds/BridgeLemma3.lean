@@ -4,6 +4,7 @@ import Formalism.SharpRestriction.CuspSpanNormBounds.RadialGaugeOfGaugeIdentityS
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.OppositeWeylSubgroupClosed
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.UnipotentHeisenbergDecomposition
 import Formalism.HermitianCurvature.HermitianCurvatureProofs.RegularisedPairingViaPhase
+import Mathlib.Algebra.Ring.BooleanRing -- shake: keep (elaboration only (instance): instBooleanRingBool, instAddBool_mathlib, instOneBool_mathlib)
 
 section PartHU
 
