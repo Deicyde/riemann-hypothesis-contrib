@@ -1,5 +1,0 @@
--- shake: keep-all (import-only aggregator)
-import Supplements.Kernels.MainTheorems
-import Development.AutomorphicArithmetic.AutomorphicVarieties.SmallClassNumbers.ClassNumberThree
-import Development.AutomorphicArithmetic.AutomorphicVarieties.SmallClassNumbers.LenEqZeroIff
-import Development.AutomorphicArithmetic.AutomorphicVarieties.SmallClassNumbers.OnePoint

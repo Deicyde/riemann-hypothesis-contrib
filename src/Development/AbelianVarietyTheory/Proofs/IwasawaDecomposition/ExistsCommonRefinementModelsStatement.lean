@@ -1,8 +1,0 @@
-import BuildAid.Leniency.Open
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCommonRefinementModels
-open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.Geo GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad GlobalTheory.TrueGeo GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.TrueCx
-
-set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_common_refinement_models : ∀ (F : Type) [Field F] [NumberField F] (Y : Var F) (M₀ : GlobalTheory.TrueGeo.Model Y) (ι : Type) [Fintype ι] (M : ι → GlobalTheory.TrueGeo.Model Y), ∃ (P : GlobalTheory.TrueGeo.Model Y) (π : ∀ i, P.X ⟶ (M i).X), ∀ i, π i ≫ (M i).p = P.p ∧ P.j ≫ π i = (M i).j := by
-  first | exact @GlobalTheory.Member.DomFin.exists_dominating_fintype | exact GlobalTheory.Member.DomFin.exists_dominating_fintype | (intros; apply GlobalTheory.Member.DomFin.exists_dominating_fintype <;> assumption)

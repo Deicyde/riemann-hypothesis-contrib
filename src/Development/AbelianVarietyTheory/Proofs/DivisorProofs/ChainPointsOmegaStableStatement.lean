@@ -1,6 +1,0 @@
-import BuildAid.Leniency.Open
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChainPointsOmegaStable
-open GlobalTheory GlobalTheory.ChainPts
-set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.chain_points_omega_stable : GlobalTheory.ChainPts.ReadsOmSt := by
-  first | exact @GlobalTheory.ChainPts.readsOmSt | exact GlobalTheory.ChainPts.readsOmSt | (intros; apply GlobalTheory.ChainPts.readsOmSt <;> assumption)
