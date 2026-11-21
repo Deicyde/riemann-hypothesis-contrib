@@ -1,3 +1,4 @@
+import Mathlib.Algebra.Ring.Defs -- shake: keep (import ordering (instances): loaded first to restore the instance order in which the universe levels in `isCharacter_zero` can be inferred)
 import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Mathlib.Algebra.Order.Floor.Extended

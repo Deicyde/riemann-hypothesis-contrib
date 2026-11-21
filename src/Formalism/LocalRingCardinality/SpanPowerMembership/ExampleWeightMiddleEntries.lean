@@ -1,3 +1,4 @@
+import Mathlib.Algebra.Ring.Defs -- shake: keep (import ordering (instances): loaded first to restore the instance order in which type-class search here stays within `synthInstance.maxHeartbeats`)
 import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Formalism.LocalRingCardinality.RhoDetPrimeEqMuTildeMulChiPow

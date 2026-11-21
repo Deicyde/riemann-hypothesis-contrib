@@ -1,3 +1,4 @@
+import Mathlib.CategoryTheory.Monoidal.Transport -- shake: keep (import ordering (instances): loaded first to restore the instance order in which type-class search here stays within `synthInstance.maxHeartbeats`)
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsIsoOfDensePartOfIsIntegral
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.CompPowEqOneOfPullbackHom

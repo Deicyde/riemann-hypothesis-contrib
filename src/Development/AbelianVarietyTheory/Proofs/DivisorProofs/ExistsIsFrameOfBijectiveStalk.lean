@@ -1,3 +1,4 @@
+import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.IsQuasicoherentOfForallExistsAffine -- shake: keep (import ordering (instances): loaded first so that its stalk `Module` instances don't take precedence; otherwise `convert … using 3` leaves a goal `rfl` can't close)
 import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.Divisors.ToBidualNaturalityDualSheafTranspose
