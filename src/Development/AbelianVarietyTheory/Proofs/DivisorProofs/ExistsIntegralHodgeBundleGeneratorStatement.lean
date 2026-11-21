@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIntegralHodgeBundleGenerator
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsMumfordFamOfSubsingleton
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsThetaCompact

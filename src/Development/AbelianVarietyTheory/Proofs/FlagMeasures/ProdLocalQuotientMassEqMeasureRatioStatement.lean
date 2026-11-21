@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ProdLocalQuotientMassEqMeasureRatio
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ConstC
 

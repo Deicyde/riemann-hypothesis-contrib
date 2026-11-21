@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIntegralClosureCompleteNormalFiniteExtensi
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsChartMemberP
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems

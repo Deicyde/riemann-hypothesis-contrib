@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsUnitaryCoordinateOfRationalPointDefiniteVe
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SplitOff
 public import Formalism.LocalToGlobal.InertKernelTheory.DefsInt

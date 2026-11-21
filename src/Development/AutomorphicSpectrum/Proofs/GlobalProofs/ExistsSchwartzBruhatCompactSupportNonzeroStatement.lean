@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ExistsSchwartzBruhatCompactSupportNonzero
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.IsCovolOne
 public import GroundTheory.HeightsAndTheta.Theta.AdelicFourier

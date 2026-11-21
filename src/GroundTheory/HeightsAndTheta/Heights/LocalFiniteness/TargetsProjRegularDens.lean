@@ -11,7 +11,6 @@ public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.PLinearNo
 public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PChartEnergyDiagonal
 public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PSectionQuotLocal
 public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.PVertPointLength
-public import Mathlib
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterDivPushA
 public import ReciprocityTheory.AnalyticForms.PlurisubharmonicFunctions.LintegralImageEqLintegralNormSqDetMul
 public import ReciprocityTheory.AnalyticForms.AnalyticCharts.MaDensCompEqZeroOfRankLt

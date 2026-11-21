@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EventuallyExistsIntegralCharpolySplitPlace
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnifAt
 

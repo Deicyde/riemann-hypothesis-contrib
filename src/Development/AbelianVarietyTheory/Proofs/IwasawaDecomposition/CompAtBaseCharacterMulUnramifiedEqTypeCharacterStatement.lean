@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CompAtBaseCharacterMulUnramifiedEqTypeCharacter
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ReadsHecke
 

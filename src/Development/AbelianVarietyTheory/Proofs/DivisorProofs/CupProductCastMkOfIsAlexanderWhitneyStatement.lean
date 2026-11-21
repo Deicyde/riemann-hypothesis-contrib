@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CupProductCastMkOfIsAlexanderWhitney
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CrossTZeroRight
 

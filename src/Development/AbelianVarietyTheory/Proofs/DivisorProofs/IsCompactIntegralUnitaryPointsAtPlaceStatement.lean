@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsCompactIntegralUnitaryPointsAtPlace
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InvMemIntV
 

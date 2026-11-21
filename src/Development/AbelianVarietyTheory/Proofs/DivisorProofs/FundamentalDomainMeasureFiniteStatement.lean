@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FundamentalDomainMeasureFinite
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CentralNilGL
 

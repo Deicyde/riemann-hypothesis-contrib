@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AnnihilatorKaehlerDerivationPrimitiveRoot
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemCycAlgOfPow
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLevelStructureNormalModelUnitaryModuliPoin
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UOver
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLiftGenericFibre

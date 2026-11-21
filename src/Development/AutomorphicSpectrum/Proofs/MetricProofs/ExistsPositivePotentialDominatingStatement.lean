@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ExistsPositivePotentialDominating
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PositionPot
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterNamed

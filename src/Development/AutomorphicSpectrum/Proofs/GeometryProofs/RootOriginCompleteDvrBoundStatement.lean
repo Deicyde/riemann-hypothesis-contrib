@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RootOriginCompleteDvrBound
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsFrameVec
 

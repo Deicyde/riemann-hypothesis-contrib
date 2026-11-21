@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsProperOfRepresentsHilbertFunctorOfLocal
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsHilbRep
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ComapEqKerIff

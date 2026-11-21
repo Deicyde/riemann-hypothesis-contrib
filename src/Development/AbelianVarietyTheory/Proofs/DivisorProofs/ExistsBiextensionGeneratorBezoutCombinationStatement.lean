@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBiextensionGeneratorBezoutCombination
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InvTranspose
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIsFactorNontrivial

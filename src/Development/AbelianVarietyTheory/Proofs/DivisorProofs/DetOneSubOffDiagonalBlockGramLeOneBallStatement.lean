@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DetOneSubOffDiagonalBlockGramLeOneBall
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NmatEqLowMat
 public import Development.AbelianVarietyTheory.BlockTheory.PoincareCuspForms.ExhaustionFrames

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PeriodStepInvMulPointShape
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.StepLin
 

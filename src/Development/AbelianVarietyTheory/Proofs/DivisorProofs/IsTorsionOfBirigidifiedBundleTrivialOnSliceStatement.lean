@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTorsionOfBirigidifiedBundleTrivialOnSlice
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsGPull
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsEtPlace

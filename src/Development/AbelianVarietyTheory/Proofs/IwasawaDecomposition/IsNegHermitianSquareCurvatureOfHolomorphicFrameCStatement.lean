@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsNegHermitianSquareCurvatureOfHolomorphicFrameC
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsNegSqZero
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FubiniStudyCoordinateCombinationsNoCommonZero
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SemiposAtOfPositive
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ToKnownTheoremsOf

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ComplexSectionFiniteCombination
 public import Development.AbelianVarietyTheory.Definitions.Divisors.NoCommonZeroCombVal
 

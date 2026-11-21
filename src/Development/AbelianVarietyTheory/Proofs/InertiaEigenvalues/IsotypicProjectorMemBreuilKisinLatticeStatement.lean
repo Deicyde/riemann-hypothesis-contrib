@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsotypicProjectorMemBreuilKisinLattice
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DiagScaleApply
 

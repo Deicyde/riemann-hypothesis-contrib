@@ -2,7 +2,6 @@ module
 
 public import Development.EtaleCohomology.EtaleSheaves.SpreadingOutQuasiFiniteness
 public import Development.EtaleCohomology.EtaleSheaves.LeafSpreadSmoothAffSmPf
-public import Mathlib
 
 @[expose] public section
 

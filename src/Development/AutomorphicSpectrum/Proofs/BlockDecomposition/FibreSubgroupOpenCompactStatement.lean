@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FibreSubgroupOpenCompact
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsUMOfMem
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemTwKerIffAverage

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsStdFr
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PinColL
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.FrameTopAlt

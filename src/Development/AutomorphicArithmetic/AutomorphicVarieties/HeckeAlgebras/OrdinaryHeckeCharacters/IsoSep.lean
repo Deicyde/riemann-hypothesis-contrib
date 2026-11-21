@@ -4,7 +4,6 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebr
 public import Mathlib.RingTheory.SimpleModule.Basic
 public import Mathlib.RepresentationTheory.Irreducible
 public import Mathlib.LinearAlgebra.Basis.VectorSpace
-public import Mathlib
 public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.IsoSeparation
 
 @[expose] public section

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalLatticeGaussSumEstimate
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EMatMulNegCol
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.FibreMassEq

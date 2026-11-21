@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ArchimedeanWeilOperatorIntertwinesSchroedinger
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ArchActOne
 

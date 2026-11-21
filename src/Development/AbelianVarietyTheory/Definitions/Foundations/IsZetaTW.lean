@@ -2,7 +2,6 @@ module
 
 public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Foundations.CycMOfNot
-public import Development.AbelianVarietyTheory.Definitions.Foundations.EeProd
 
 @[expose] public section
 

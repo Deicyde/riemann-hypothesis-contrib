@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ZetaIntegralEisensteinResidue
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PrinInf
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsThetaFam

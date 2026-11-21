@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIsIsoMorphismRestrictOfIsProjOver
 public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.ImmersedBy
 

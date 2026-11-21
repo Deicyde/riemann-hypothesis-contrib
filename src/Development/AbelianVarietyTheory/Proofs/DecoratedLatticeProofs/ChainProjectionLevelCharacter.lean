@@ -1,7 +1,6 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.FrameTopAlt
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PairForm
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.TailRd
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.NotBadPrimeBase

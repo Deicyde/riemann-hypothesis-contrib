@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntersectedLatticeDetIdealTypeNormIntegral
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSmulShortNonneg
 public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.IndexRangeMatrix

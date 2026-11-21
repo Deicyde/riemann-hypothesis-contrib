@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbelianSchemePrimeToCharTorsionRational
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsChartMember
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems

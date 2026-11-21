@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SurjOfStrictHenselisationPolynomial
 public import Development.AbelianVarietyTheory.Definitions.Divisors.GalMapMul
 

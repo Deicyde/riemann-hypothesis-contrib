@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LaplaceIntegralEntireBoundedInVerticalStrips
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.CompletedLStripBounds
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormWt

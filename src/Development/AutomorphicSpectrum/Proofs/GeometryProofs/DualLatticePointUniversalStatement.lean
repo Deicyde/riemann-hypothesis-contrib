@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.DualLatticePointUniversal
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.DerRingInjective
 

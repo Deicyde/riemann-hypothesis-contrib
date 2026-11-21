@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPowSmulEqLogDerivationExtendLocalizationAw
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExtLAlgebraMap
 

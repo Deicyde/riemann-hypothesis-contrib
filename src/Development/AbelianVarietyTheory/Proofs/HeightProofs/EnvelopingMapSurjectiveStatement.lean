@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.EnvelopingMapSurjective
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.DenomBound
 

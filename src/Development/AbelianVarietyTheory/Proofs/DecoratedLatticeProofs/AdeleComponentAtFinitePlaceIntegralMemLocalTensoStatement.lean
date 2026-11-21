@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.AdeleComponentAtFinitePlaceIntegralMemLocalTenso
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SigV
 

@@ -2,7 +2,6 @@ module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IntegralBound
 public import Formalism.HarderNarasimhan.StatementPl
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsDataOfPositivity
 
 @[expose] public section

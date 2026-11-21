@@ -1,7 +1,6 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.SiegelWeil.ArchimedeanSiegelWeil.PlaceIntegrals.AdelicSiegelWeilCoefficientEq
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GramNear
 
 @[expose] public section

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.DoubleThetaLiftValueInvariantMiddleGL
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemTranslate
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsBiSmooth

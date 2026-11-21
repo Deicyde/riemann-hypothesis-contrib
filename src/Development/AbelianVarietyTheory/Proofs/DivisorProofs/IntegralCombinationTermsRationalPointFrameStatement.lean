@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralCombinationTermsRationalPointFrame
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HRedFst
 public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.ValueAtOrigin

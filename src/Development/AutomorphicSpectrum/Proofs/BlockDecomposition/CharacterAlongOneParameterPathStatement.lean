@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CharacterAlongOneParameterPath
 public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.WeilSiegelTheta.BigCellDefs
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ContinuousRs

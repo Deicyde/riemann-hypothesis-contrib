@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RankOneSiegelWeilThetaAverage
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OfE
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SectionIntegralEqualCharAbelianLocus
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.BddGood
 public import Formalism.LocalToGlobal.ProjectiveLattices.ThGerm

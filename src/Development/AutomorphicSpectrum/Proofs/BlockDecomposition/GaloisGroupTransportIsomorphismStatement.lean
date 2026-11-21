@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GaloisGroupTransportIsomorphism
 public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.GelfandSpectralNormalisation.NormalisedInvariants.PTConclAt
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NineTermExactIff

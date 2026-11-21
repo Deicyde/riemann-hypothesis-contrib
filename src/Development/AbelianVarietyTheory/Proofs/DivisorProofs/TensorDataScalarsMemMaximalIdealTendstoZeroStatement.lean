@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TensorDataScalarsMemMaximalIdealTendstoZero
 public import Development.AbelianVarietyTheory.Definitions.Divisors.OfFactorE
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsProjOverWeierstrass

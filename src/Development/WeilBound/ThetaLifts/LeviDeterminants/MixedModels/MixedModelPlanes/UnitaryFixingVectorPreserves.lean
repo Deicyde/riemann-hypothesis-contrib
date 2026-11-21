@@ -1,7 +1,6 @@
 module
 
 public import Development.WeilBound.ThetaLifts.LeviDeterminants.MixedModels.UnitaryFixingIsotropicComplement
-public import Mathlib
 public import Development.WeilBound.ThetaLifts.LeviDeterminants.MixedModels.MixedModelPlanes.Imports
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 

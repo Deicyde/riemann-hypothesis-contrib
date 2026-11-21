@@ -1,11 +1,6 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.OrientedPairFockMapsLieEquivariant
-public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HasInfExpDiv
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DiagonalHermitianFrameSignsPosOfDefiniteStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DefiniteBottomTripleWeightNaturalStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ColumnSubstitutionUnitaryOfKillsLieCoinvariantsStatement
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DefiniteBottomRowTransportContragredientStatement
 
 @[expose] public section
 
@@ -36,4 +31,3 @@ theorem GlobalTheory.RealQuotBot.det_unitary_ne_zero {n : ℕ} (g : Matrix.unita
   have h1 := congrArg Matrix.det (Matrix.mem_unitaryGroup_iff'.1 g.2)
   rw [Matrix.det_mul, h, mul_zero, Matrix.det_one] at h1
   exact zero_ne_one h1
-

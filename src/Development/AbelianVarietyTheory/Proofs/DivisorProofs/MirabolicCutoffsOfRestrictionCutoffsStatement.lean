@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MirabolicCutoffsOfRestrictionCutoffs
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemSupportComp
 

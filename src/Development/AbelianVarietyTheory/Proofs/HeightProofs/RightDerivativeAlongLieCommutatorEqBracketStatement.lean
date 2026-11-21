@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.RightDerivativeAlongLieCommutatorEqBracket
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.IsLieDataCircle
 

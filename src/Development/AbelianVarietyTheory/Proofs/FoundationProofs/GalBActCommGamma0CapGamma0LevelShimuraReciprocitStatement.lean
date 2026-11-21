@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GalBActCommGamma0CapGamma0LevelShimuraReciprocit
 public import Development.AbelianVarietyTheory.Definitions.Foundations.EigenOfTwoStep
 

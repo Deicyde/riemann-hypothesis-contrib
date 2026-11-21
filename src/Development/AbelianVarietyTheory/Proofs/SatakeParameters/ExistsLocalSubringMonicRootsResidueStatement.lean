@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsLocalSubringMonicRootsResidue
 public import Development.AbelianVarietyTheory.Definitions.Divisors.GalMapMul
 

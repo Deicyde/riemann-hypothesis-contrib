@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsImagQuadraticSubfieldOfToricCMFieldData
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.VpBounds
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.LatticeNormTransport

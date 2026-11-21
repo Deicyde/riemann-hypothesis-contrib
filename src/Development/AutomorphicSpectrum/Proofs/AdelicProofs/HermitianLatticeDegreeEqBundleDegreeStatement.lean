@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.AdelicProofs.HermitianLatticeDegreeEqBundleDegree
 public import GroundTheory.HeightsAndTheta.Heights.KernelsLattice
 public import GroundTheory.HeightsAndTheta.Heights.LatticeLemmas.StatementsBundles

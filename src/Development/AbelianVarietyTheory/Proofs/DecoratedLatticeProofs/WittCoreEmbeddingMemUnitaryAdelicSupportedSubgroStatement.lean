@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.WittCoreEmbeddingMemUnitaryAdelicSupportedSubgro
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PlacesToAdeles
 

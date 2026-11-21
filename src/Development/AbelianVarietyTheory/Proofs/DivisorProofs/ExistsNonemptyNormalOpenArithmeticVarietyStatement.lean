@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNonemptyNormalOpenArithmeticVariety
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsMemChart
 

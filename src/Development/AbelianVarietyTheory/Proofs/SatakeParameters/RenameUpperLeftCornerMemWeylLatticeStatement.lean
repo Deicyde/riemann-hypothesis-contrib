@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.RenameUpperLeftCornerMemWeylLattice
 public import Formalism.GradedWeylDivisibility.DualWeylDominanceOf
 public import Formalism.SatakeDualWeyl.KpqSubgroupCompact

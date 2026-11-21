@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.AbsDetOnStableSubspaceConjTranspose
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.DefClassNum
 

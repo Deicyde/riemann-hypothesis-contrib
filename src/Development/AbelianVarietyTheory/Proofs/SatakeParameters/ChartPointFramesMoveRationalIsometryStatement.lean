@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ChartPointFramesMoveRationalIsometry
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.UnderTie
 

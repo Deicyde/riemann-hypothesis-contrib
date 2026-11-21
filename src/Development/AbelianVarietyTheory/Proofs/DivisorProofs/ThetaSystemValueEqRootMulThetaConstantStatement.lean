@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaSystemValueEqRootMulThetaConstant
 public import Development.AbelianVarietyTheory.Definitions.Degenerations.RigGen
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BlockUpperTriangularGLMulDetInv
 public import Formalism.LocalToGlobal.Divisibility.QLocTied
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.HostPins

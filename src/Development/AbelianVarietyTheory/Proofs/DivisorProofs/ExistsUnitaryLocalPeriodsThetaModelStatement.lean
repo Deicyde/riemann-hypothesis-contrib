@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnitaryLocalPeriodsThetaModel
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UValThruTopOfDisjoint
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SharpOverIff

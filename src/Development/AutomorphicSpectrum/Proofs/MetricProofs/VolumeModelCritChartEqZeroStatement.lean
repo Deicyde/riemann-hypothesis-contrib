@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.VolumeModelCritChartEqZero
 public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.StatementsPtsBddConv
 public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.FlagIndices

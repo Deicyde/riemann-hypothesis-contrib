@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FgSpanTopOfLatticeCompatibleSemilinear
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FrmOfPosDef
 public import Formalism.LocalToGlobal.HilbertRowConditions.CenterIdempotentAction

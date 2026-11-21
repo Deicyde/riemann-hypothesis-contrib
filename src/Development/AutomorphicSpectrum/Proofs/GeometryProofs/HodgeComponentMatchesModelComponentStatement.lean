@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeComponentMatchesModelComponent
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsPullWedge
 

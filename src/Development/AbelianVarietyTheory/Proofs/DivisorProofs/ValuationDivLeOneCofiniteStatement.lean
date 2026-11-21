@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ValuationDivLeOneCofinite
 public import Formalism.LocalToGlobal.CMDeterminantIdeals.DetIdeal
 

@@ -3,7 +3,6 @@ module
 public import Formalism.LocalToGlobal.TorsionIntegrality.SecondCoefficientNorms.IsotropicVanish
 public import Formalism.LocalToGlobal.TorsionIntegrality.SecondCoefficientNorms.BinomialSeriesCoefficients.Points
 public import Formalism.LocalToGlobal.TorsionIntegrality.SecondCoefficientNorms.SecondCoeffConsistency
-public import Mathlib
 public import Formalism.GL3MeanSquares.InvariantSeriesBidegreeOneOne
 public import Formalism.GL3MeanSquares.HookFormulaTorsion.HyperbolicPlaneSplit
 public import Formalism.GL3MeanSquares.HookFormulaTorsion.FourFoldOrthogonalSum

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.BaseCosetRepresentativeBoundedAtBadPrimes
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.UnderTie
 

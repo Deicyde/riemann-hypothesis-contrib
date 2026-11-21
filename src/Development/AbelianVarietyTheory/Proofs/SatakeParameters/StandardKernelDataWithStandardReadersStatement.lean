@@ -4,7 +4,6 @@ public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.StandardKernelDataWithStandardBaseLevels
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.IsEntC
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.ColNorm
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.JetsInIffStepField
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.FixedVectorEqOfStandardData
 public import Formalism.LocalToGlobal.KernelLattices.TopPin
 public import Formalism.LocalToGlobal.KernelLattices.InterlaceAll

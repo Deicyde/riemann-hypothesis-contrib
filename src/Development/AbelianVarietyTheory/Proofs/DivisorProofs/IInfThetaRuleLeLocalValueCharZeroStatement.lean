@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IInfThetaRuleLeLocalValueCharZero
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PhiAt
 public import Development.AbelianVarietyTheory.Definitions.Divisors.PolyBetween

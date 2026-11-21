@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.VarietyStalkRegularDim
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.ChernDegreeComplex
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.ExistsPresents

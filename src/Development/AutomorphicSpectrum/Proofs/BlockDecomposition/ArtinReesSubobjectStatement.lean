@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArtinReesSubobject
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PowSubSuccLe
 

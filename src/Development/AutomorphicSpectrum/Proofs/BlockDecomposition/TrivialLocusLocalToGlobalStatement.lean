@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TrivialLocusLocalToGlobal
 public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.LeftZeroDuality.H1StructureDimLe
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsPowMulOfAway

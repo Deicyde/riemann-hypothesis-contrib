@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSkewLatticeMoverWithDeterminant
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CosetVecEq
 

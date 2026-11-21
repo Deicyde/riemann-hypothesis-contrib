@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.OrthonormalBasesMemUnitaryLieAlgebra
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.InnerDRepSq
 

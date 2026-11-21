@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasSumGaussianConvolutionSeriesTermIntegral
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowForm
 

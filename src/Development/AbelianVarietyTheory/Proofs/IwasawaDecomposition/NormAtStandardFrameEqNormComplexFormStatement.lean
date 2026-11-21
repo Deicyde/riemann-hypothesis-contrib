@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NormAtStandardFrameEqNormComplexForm
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FrmOfPosDef
 public import Formalism.LocalToGlobal.HilbertRowConditions.CenterIdempotentAction

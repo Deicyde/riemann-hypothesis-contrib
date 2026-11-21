@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TensorDegenerationPsiCoordEqUnitMulProd
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LinHomIffLinEnd
 public import Development.AbelianVarietyTheory.BlockTheory.ExistenceTori.GeneratorValues

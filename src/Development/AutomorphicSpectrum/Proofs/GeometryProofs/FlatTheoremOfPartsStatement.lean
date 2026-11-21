@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FlatTheoremOfParts
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.ThmFlatA
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.FlatLineGenerator

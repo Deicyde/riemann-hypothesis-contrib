@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HermitianMeasureConjugation
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IntegralCompChar
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AddHaarCharLeftRightMatrixMulAdeleTensor

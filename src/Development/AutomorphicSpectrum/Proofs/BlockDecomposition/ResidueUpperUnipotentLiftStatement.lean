@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ResidueUpperUnipotentLift
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JpUnif
 

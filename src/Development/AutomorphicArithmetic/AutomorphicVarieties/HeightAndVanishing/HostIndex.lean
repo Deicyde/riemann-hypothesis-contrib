@@ -1,7 +1,6 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVanishing.LayerLe
-public import Mathlib
 
 @[expose] public section
 

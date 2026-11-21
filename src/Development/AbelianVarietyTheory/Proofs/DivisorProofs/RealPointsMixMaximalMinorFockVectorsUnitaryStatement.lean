@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RealPointsMixMaximalMinorFockVectorsUnitary
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VacTheta
 

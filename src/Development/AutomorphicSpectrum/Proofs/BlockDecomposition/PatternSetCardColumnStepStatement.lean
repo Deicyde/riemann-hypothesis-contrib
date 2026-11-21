@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PatternSetCardColumnStep
 public import Development.WeilBound.CoreStatements.FiniteTypeHarishChandra.SupportExistsAll
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ColGeR

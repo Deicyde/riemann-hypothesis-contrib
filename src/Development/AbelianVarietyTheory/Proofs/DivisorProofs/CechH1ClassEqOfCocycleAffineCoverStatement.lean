@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CechH1ClassEqOfCocycleAffineCover
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CmpOfIsCocycle
 

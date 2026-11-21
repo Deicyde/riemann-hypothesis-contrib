@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevMoveCommLevelMapOfTrivialMod
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CongModRefl
 public import Formalism.LocalToGlobal.ProjectiveLattices.IsLevMove

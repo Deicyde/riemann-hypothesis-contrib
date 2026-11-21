@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.EquivariantOfGeneratorOneParameterGroup
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ChosenSeries
 

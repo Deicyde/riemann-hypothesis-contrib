@@ -1,7 +1,6 @@
 module
 
 public import Development.AutomorphicArithmetic.CyclotomicBounds.RamifiedDiscriminants.FunKit
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SumOKEx
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RowTestExistsCombinationsOfExpansion
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsRealFam

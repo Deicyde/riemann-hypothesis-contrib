@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MahlerJetCoefficientMulOfDisjointSupport
 public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.LatIntZero
 

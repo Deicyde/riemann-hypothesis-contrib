@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLocalSpreadUniversalAbelianScheme
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UOver
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsThetaSysUOver

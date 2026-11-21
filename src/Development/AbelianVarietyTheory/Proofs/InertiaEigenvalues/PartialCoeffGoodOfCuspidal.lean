@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AugmentationLengthColengthBound
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PadNatZero
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.RsTermZero

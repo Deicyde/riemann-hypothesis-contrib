@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaConstantsFiniteOfPolarisedAVIsoAlgClosed
 public import Development.AbelianVarietyTheory.Definitions.Divisors.NotSymEOfNe
 public import Development.AbelianVarietyTheory.Definitions.Divisors.UnifAlong

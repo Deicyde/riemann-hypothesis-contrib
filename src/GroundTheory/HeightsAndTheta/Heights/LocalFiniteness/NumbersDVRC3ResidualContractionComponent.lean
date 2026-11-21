@@ -3,7 +3,6 @@ module
 public import GroundTheory.HeightsAndTheta.Heights.LocalFiniteness.HilbertSamuelGrowthOffHypersurfacePolynomial
 public import GroundTheory.HeightsAndTheta.Heights.LocalFiniteness.IsolatedPointsCount
 public import GroundTheory.HeightsAndTheta.Heights.HeightComparison.PLocalLengthPlaces
-public import Mathlib
 public import GroundTheory.HeightsAndTheta.Heights.HeightComparison.HeightOrbitChart
 public import GroundTheory.HeightsAndTheta.Heights.HeightComparison.PLocalQuotCard
 public import GroundTheory.HeightsAndTheta.Heights.HeightComparison.POrbitCenterDivSupp

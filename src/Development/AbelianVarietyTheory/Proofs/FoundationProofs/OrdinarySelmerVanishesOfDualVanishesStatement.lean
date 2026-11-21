@@ -1,7 +1,6 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.OrdinarySelmerVanishesOfDualVanishes
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.Foundations.FinalTheorems
 
 @[expose] public section

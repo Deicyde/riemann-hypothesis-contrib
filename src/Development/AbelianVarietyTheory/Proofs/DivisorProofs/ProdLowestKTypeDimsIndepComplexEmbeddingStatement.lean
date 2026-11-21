@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ProdLowestKTypeDimsIndepComplexEmbedding
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.OneMeasureSizes
 

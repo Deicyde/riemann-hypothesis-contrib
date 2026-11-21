@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GoodIrrGLTransportAlongFieldIso
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Langlands
 public import CompanionTheory.EightfoldTheory.ZeroLevelTheory.LocalLanglands.Imports

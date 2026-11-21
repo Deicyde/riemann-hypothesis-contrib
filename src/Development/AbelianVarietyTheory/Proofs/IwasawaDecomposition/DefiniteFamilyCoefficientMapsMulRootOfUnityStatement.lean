@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DefiniteFamilyCoefficientMapsMulRootOfUnity
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsOmPinsLev
 

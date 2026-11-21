@@ -1,7 +1,6 @@
 module
 
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.AgreementPos
-public import Mathlib
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.PotentialsBoundedRegSettingEqReference
 public import GroundTheory.HeightsAndTheta.Heights.Regularisation.BoundedStatements
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterSt

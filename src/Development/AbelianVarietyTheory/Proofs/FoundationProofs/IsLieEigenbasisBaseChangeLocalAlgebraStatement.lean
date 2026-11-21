@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsLieEigenbasisBaseChangeLocalAlgebra
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FibreIff
 

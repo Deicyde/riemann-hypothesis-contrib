@@ -1,7 +1,6 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsArchimedeanSignatureFrames
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RealVectorsAllPlacesOfLocalDataStatement
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.RealBands.BranchDefs
 

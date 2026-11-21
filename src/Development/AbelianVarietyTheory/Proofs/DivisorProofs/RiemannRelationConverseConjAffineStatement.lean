@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RiemannRelationConverseConjAffine
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsHolPeriods
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsContinuousChartIsotropicUnipotentRadical
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ScalesBy
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsLv
