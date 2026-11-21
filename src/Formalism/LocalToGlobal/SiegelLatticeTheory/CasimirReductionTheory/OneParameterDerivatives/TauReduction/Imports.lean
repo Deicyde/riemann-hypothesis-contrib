@@ -1,5 +1,5 @@
--- shake: keep-downstream (defines `export` aliases, which importers use without referencing this file)
 -- shake: keep-all
+import BuildAid.Shake.Export
 import Formalism.LocalToGlobal.SiegelLatticeTheory.CasimirReductionTheory.GgExistsAddCharNeOne
 
 namespace Formalism.L2.SG.Pf.Tau

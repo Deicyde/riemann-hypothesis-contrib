@@ -1,5 +1,5 @@
--- shake: keep-downstream (defines `export` aliases, which importers use without referencing this file)
 -- shake: keep-all
+import BuildAid.Shake.Export
 import Mathlib
 import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.TriDefs
 

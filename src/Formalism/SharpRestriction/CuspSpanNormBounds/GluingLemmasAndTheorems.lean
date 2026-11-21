@@ -1,4 +1,4 @@
--- shake: keep-downstream (defines `export` aliases, which importers use without referencing this file)
+import BuildAid.Shake.Export
 import BuildAid.Leniency.Open
 import Formalism.SharpRestriction.ParConsts
 import Formalism.SharpRestriction.CuspSpanNormBounds.CongruenceAtSplitFrobeniusHolds
