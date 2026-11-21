@@ -1,3 +1,4 @@
+-- shake: keep-downstream (defines `export` aliases, which importers use without referencing this file)
 import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Formalism.SharpRestriction.CuspSpanNormBounds.FamilyBlockLiftEstimate

@@ -1,1 +1,6 @@
-import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.EvalFrameOrd
+-- shake: keep-all (import-only aggregator)
+import Development.AbelianVarietyTheory.Proofs.JetHarmonics.CasimirScalarOfCapelliDeterminantEigenvalueStatement
+import CompanionTheory.AutomorphicTheory.PieriRules.PieriDegreeBounds.Imports
+import Development.AbelianVarietyTheory.Definitions.Jets.SumIoPr
+import Formalism.RealPlaceAnalysis.StatementE
+import Formalism.RealPlaceAnalysis.StatementKT

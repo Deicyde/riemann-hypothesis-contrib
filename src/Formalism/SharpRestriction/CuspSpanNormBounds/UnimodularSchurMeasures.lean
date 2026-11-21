@@ -1,3 +1,4 @@
+-- shake: keep-all (import-only aggregator)
 import Formalism.SharpRestriction.CuspSpanNormBounds.UnimodularSchurMeasures.DedekindResidueLeOfAdmitted
 import Formalism.SharpRestriction.CuspSpanNormBounds.UnimodularSchurMeasures.UnimodF
 import Formalism.SharpRestriction.CuspSpanNormBounds.UnimodularSchurMeasures.RrExistsMeasRep
@@ -65,3 +66,4 @@ import Formalism.SharpRestriction.CuspSpanNormBounds.UnimodularSchurMeasures.Ide
 import Formalism.SharpRestriction.CuspSpanNormBounds.UnimodularSchurMeasures.SmoothVectorsTranslateUnitary
 import Formalism.SharpRestriction.CuspSpanNormBounds.UnimodularSchurMeasures.BesselExistenceUniformOfReduced
 import Formalism.SharpRestriction.CuspSpanNormBounds.UnimodularSchurMeasures.LowestProjectionAllOfAdmitted
+import Formalism.SharpRestriction.CuspSpanNormBounds.ThresholdCubicInequalitySignPattern

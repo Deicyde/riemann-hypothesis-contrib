@@ -1,3 +1,4 @@
+-- shake: keep-downstream (defines `export` aliases, which importers use without referencing this file)
 import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Example
 import BuildAid.Leniency.Open

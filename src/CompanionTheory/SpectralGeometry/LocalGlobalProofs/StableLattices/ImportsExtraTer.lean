@@ -1,1 +1,8 @@
-import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.EvalFrameOrd
+-- shake: keep-all (import-only aggregator)
+import Mathlib
+import Formalism.RealPlaceAnalysis.ThirdArithmeticHolds
+import Formalism.PeriodIntegrals.DSInfCharCap
+import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.DiscreteSpectrumKFiniteDecomposition
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CapelliOperatorOnUnitaryCoefficientEqDerived
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SmoothVecUnitaryModule
+import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UnitActGlRel

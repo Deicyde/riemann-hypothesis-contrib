@@ -1,4 +1,7 @@
-import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.EvalFrameOrd
+-- shake: keep-downstream (defines `export` aliases, which importers use without referencing this file)
+-- shake: keep-all
+import Mathlib
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.TriDefs
 
 namespace GlobalTheory.OrdLoc
 
