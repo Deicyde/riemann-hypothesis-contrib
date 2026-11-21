@@ -1,4 +1,3 @@
-import Mathlib
 import Development.AutomorphicArithmetic.CharacterBoxes.EveryCharacter
 
 theorem UpperTheory.zeta_ne_zero_of_everyCharacter (h : UpperTheory.EveryCharacter) : ∀ s : ℂ, 1 / 2 < s.re → s ≠ 1 → riemannZeta s ≠ 0 := fun s hs h1 => by
