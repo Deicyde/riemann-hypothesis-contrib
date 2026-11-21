@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFixedComplexPointOfFixedFieldPoint
 public import Development.AbelianVarietyTheory.Definitions.Divisors.EigLatLe
 public import Formalism.LocalToGlobal.ProjectiveLattices.LiftLaSpec

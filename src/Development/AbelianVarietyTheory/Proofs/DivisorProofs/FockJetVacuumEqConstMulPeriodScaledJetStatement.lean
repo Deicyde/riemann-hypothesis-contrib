@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockJetVacuumEqConstMulPeriodScaledJet
 public import Development.AbelianVarietyTheory.Definitions.Divisors.KernelNormConstantSpec
 public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLatticesGL3

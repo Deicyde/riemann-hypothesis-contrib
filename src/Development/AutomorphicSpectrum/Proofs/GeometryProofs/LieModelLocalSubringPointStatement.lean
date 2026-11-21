@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelLocalSubringPoint
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EigLat
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LatticeRegularAtLocalPoint

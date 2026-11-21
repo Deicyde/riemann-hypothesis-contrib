@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RealCoordinateActionUnitaryPreservesHermitianFor
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTopologicalRingAE
 

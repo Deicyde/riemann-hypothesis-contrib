@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExponentsIntegralOfTranslationInvariant
 public import Development.AbelianVarietyTheory.Definitions.Foundations.EigenOfTwoStep
 public import Development.AbelianVarietyTheory.Definitions.Foundations.SiegelNeZeroIff

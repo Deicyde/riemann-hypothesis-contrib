@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.FiniteDimKStableSubspaceKFiniteLie
 public import Formalism.LocalToGlobal.BesselHermitianTheta.DefsReal
 public import Formalism.LocalToGlobal.BesselHermitianTheta.TiedSmooth

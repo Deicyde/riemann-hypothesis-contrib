@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PolAVDimEqOfGrpPullbackField
 public import Development.AbelianVarietyTheory.Definitions.Divisors.LabRange
 public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsUnivBasis

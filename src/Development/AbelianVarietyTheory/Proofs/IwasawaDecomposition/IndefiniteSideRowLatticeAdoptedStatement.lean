@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IndefiniteSideRowLatticeAdopted
 public import Formalism.LocalToGlobal.Divisibility.DivisionCompatibleToSub2Indef2
 

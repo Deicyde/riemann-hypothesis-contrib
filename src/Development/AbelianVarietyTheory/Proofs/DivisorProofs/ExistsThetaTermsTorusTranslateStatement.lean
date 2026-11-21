@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsThetaTermsTorusTranslate
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsStalkZeta
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems

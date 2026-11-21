@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IntegralEntriesOfCarriesStandardLattice
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PinColL
 

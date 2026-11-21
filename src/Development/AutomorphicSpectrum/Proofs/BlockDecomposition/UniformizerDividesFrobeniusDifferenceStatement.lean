@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UniformizerDividesFrobeniusDifference
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EvalMod
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ValuationLtOneOfEq

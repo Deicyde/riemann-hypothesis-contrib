@@ -2,7 +2,6 @@ module
 
 public import Formalism.LocalToGlobal.GlobalTheory.GL4.ThirdLinkOfArchimedean
 public import Formalism.LocalToGlobal.GlobalTheory.GL4.BcBasisApply
-public import Mathlib
 public import Formalism.LocalToGlobal.Columns.FockNormSubstitutionBound
 public import Formalism.LocalToGlobal.Columns.TwistedLocalisationComparable
 

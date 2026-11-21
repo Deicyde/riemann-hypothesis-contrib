@@ -1,7 +1,6 @@
 module
 
 public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentations.KunnethLefschetz.BasisOne
-public import Mathlib
 
 @[expose] public section
 

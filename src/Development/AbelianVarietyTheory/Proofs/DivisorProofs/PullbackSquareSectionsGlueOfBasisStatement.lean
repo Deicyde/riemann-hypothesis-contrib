@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PullbackSquareSectionsGlueOfBasis
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Glues
 

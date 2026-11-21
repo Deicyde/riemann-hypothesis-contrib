@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnitaryHeckeCharacterPhaseTypeCm
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 public import Formalism.LocalToGlobal.IndefiniteReal.DatumF

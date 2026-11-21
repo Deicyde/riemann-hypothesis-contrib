@@ -1,7 +1,6 @@
 module
 
 public import Formalism.SatakeDualWeyl.Statement
-public import Mathlib
 public import Formalism.GL3MeanSquares.HookFormulaTorsion.InvariantKernelTraceVanishes
 
 @[expose] public section

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LeviNonnegInChartOfPsh
 public import ReciprocityTheory.AnalyticForms.LeviForms.RegGlue
 public import ReciprocityTheory.AnalyticForms.LeviForms.RegChartC

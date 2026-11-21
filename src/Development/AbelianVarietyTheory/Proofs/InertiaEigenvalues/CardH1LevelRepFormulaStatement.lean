@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CardH1LevelRepFormula
 public import Formalism.CharacterColumnKernels.StatementRho
 public import Formalism.GaloisCohomology.LocalTateDualityK

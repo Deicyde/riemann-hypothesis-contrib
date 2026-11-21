@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.UniformEnergyBoundOfSection
 public import ReciprocityTheory.AnalyticForms.LeviForms.UnifInt
 public import GroundTheory.HeightsAndTheta.Heights.AnalyticLimit.UIObjects

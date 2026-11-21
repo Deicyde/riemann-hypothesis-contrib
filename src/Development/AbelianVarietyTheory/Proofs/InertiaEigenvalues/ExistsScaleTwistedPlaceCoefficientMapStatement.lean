@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsScaleTwistedPlaceCoefficientMap
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FockOfApply
 

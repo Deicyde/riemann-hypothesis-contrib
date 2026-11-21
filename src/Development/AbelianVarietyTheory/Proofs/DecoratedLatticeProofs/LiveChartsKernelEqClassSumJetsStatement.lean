@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.LiveChartsKernelEqClassSumJets
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PinColL
 

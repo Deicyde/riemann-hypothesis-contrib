@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LatticeTransportOfPolarisationIdealTimesLattice
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ThPDatumEq
 

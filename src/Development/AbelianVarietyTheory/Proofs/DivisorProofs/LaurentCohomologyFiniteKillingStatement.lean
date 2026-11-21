@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LaurentCohomologyFiniteKilling
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LaurentVarUnit
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LaurentMapIsIntegral

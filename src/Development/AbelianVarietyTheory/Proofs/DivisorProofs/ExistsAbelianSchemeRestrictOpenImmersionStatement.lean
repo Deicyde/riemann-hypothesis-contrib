@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsAbelianSchemeRestrictOpenImmersion
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ToRingActOpOfRingAct
 public import Development.AbelianVarietyTheory.Definitions.Divisors.NonemptyHomFixRepTrivial

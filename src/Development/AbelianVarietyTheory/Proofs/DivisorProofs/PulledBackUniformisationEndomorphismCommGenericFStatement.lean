@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PulledBackUniformisationEndomorphismCommGenericF
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsActIffIsDiagEnd
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems

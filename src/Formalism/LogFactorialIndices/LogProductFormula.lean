@@ -1,7 +1,6 @@
 module
 
 public import Formalism.LogFactorialIndices.SignedSubspaceIndex.SumInterlacedBoundFails
-public import Mathlib
 public import Formalism.LogFactorialIndices.SignedSubspaceIndex.LogProductFormula
 public import Formalism.LogFactorialIndices.SignedSubspaceIndex.IdxBase
 public import Formalism.LogFactorialIndices.SignedSubspaceIndex.IdxDet

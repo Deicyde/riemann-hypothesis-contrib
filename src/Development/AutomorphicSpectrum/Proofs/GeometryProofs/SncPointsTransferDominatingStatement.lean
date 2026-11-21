@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SncPointsTransferDominating
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsPeriodAtRestrict
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EmbedsGeneric

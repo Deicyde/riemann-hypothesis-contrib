@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SecondBlockDetEqBlockDetOfSumPartitions
 public import Formalism.LocalToGlobal.Columns.GenericUnipotentCharacter
 public import Formalism.LocalToGlobal.Divisibility.DefGroup

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IteratedIntegralValueSuccPlacesOuter
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ValQOfValQr
 

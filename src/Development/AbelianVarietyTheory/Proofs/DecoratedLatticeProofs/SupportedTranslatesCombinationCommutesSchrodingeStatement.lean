@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SupportedTranslatesCombinationCommutesSchrodinge
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.FrameTopAlt
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.PairForm

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RosatiGeneratorValueCompEndomorphisms
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BalTau
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsTauLattice

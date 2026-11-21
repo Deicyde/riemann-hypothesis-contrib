@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.LeviActionCommutesWithTotalBoundary
 public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.Bdy
 

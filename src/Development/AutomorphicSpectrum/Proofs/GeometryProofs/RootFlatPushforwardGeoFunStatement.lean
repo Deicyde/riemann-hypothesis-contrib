@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RootFlatPushforwardGeoFun
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.PropFTop
 

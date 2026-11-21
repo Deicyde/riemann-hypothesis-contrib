@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.CuspFormsOfVertexTypeZeroMemAndSmulMem
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.DecompAtZero
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RangeSndRel

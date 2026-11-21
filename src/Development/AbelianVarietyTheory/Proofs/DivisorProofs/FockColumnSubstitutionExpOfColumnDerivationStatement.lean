@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockColumnSubstitutionExpOfColumnDerivation
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ColDerApply
 

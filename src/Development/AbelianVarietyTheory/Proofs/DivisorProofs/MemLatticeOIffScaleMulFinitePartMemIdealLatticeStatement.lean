@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemLatticeOIffScaleMulFinitePartMemIdealLattice
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormPeriodSq
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemLsB

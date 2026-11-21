@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MumfordBundleIsoCartesianSquareTrivialFirstAxis
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExtId
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnimodMod

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PeriodMatrixLocalTrivialization
 public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.ClopenCondOnto
 

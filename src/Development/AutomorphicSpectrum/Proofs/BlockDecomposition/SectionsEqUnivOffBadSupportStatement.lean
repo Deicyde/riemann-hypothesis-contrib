@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SectionsEqUnivOffBadSupport
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UniformVanishing
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SubsetOfClosedFibre

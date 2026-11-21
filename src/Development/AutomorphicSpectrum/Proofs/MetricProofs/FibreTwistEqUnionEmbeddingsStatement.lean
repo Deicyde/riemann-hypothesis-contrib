@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FibreTwistEqUnionEmbeddings
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IsHorizontalTwist
 

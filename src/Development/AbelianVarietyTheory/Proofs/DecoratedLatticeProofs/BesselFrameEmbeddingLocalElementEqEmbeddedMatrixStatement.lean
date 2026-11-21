@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.BesselFrameEmbeddingLocalElementEqEmbeddedMatrix
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.UpZeroMemLev
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsCombAt

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DetFactorDepthInChartChartIndependent
 public import Development.AbelianVarietyTheory.Definitions.Divisors.NonemptyValExtOfOverLa
 

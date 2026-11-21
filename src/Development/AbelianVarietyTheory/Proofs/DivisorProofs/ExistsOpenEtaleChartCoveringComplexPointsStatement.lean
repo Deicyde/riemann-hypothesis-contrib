@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsOpenEtaleChartCoveringComplexPoints
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsIsFlagBundleRankOne
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsFlagModelHermSum

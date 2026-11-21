@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenericFibreOpenCoords
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsPeriodAtRestrict
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EmbedsGeneric

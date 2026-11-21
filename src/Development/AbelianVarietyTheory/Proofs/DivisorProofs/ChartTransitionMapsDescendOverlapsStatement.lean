@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChartTransitionMapsDescendOverlaps
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChartSome
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsDescentOfEqualisedProperCoverNormalStatement

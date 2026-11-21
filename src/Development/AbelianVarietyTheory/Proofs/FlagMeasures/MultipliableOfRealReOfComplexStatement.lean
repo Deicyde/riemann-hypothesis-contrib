@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MultipliableOfRealReOfComplex
 public import Formalism.SharpRestriction.GlobalSchurBounds.StandardLattice
 

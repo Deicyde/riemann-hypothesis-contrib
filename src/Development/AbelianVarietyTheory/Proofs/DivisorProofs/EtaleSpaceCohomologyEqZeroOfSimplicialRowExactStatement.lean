@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleSpaceCohomologyEqZeroOfSimplicialRowExact
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LaurentVarUnit
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LaurentMapIsIntegral

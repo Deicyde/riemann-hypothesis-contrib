@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHarmonicPolyLocalInvariantNonposChar0
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PhiAt
 public import Development.AbelianVarietyTheory.Definitions.Divisors.PolyBetween

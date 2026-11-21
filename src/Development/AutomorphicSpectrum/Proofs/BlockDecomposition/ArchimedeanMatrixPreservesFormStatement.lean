@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanMatrixPreservesForm
 public import Development.WeilBound.ThetaLifts.Reductions.SiegelCore
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.StabUpTo

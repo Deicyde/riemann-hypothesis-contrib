@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FlatTensorDependsBelowAndSmallTranslationInvaria
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSBArgs
 

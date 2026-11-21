@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaGroupOfPointEqAlongModelHom
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTorPartTorusExtension
 public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsToricRankOne

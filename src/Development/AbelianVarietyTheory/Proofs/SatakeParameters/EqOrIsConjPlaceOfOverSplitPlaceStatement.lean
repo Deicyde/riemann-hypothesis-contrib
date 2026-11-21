@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.EqOrIsConjPlaceOfOverSplitPlace
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.ThetaMod
 

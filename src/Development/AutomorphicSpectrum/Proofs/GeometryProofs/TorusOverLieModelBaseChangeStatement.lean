@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TorusOverLieModelBaseChange
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TorusOver
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsCocharacterLieModelStatement

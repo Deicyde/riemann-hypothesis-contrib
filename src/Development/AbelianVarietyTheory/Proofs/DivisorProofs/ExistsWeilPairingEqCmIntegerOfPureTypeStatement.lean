@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsWeilPairingEqCmIntegerOfPureType
 public import Development.AbelianVarietyTheory.Definitions.Divisors.PointShiftSt
 public import Development.AbelianVarietyTheory.Definitions.Divisors.HtValOnSubset

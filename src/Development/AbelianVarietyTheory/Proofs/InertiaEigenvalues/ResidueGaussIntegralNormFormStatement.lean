@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ResidueGaussIntegralNormForm
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsStableGauss
 

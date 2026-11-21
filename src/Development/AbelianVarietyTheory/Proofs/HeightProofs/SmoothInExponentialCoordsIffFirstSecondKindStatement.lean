@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.SmoothInExponentialCoordsIffFirstSecondKind
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.IsLieDataCircle
 

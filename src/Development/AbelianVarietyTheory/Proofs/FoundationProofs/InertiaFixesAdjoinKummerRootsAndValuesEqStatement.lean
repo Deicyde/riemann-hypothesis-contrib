@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.InertiaFixesAdjoinKummerRootsAndValuesEq
 public import Development.AbelianVarietyTheory.Definitions.Foundations.IsFirstChernClassOfLineBundle
 

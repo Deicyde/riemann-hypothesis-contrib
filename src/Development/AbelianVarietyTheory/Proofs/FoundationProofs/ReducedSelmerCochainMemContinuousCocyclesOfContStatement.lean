@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ReducedSelmerCochainMemContinuousCocyclesOfCont
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ResPlaneSmulEqZero
 

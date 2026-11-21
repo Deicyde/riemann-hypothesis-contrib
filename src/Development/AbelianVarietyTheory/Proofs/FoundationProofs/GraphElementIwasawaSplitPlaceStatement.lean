@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GraphElementIwasawaSplitPlace
 public import Development.AbelianVarietyTheory.BlockTheory.TorsionBlocks.GraphHeightLattice
 

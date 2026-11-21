@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LinkedStatesFramesLatticesModelsAgree
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.RealMoveOfParts
 

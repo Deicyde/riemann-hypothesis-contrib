@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogDerivativeTransitionUnitsIsoLineBundles
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTransl
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsChartPtChartPt

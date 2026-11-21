@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GeneratorNotMemTwistPlace
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ReadsHecke
 

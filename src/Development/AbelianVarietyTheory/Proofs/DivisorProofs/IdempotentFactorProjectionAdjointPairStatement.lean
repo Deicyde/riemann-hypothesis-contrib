@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IdempotentFactorProjectionAdjointPair
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LinHomIffLinEnd
 

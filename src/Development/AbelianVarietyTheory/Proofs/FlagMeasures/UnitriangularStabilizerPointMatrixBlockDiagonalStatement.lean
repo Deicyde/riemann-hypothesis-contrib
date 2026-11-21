@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.UnitriangularStabilizerPointMatrixBlockDiagonal
 public import Formalism.SharpRestriction.CuspSpanNormBounds.Point
 public import Formalism.SharpRestriction.CuspSpanNormBounds.RelevantZeroGramTerms

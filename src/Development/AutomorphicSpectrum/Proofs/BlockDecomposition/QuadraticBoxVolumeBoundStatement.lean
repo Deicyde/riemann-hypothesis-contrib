@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.QuadraticBoxVolumeBound
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CoreR
 

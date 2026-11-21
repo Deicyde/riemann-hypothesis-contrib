@@ -15,7 +15,6 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.OnePl
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SumPlacesEqTrace
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.JEqOrbInt
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsBesselCellGapConstantStatement
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BesselCoefficientNonzero
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BigCellTrivialStabiliserAndMeasuresStatement
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.PairSpaceMajorantIntegrableBigCellStatement

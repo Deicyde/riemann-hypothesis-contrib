@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsVolumeTransportOfLatticeIsometry
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ReLatSelf
 public import Development.AbelianVarietyTheory.BlockTheory.HeightDefect.AdelicUnitaryGroups

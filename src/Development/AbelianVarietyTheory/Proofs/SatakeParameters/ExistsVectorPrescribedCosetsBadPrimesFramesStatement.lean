@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsVectorPrescribedCosetsBadPrimesFrames
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.UnderTie
 public import Formalism.LocalToGlobal.Columns.XtPhiTopGCongr

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.CMFieldDegreeEqTwiceCard
 public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.GroupDict
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsSheetCover

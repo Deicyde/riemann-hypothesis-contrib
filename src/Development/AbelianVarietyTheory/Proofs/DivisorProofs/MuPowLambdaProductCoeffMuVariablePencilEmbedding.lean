@@ -1,7 +1,6 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.TCoefMInMMul
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeightedDetDivergenceMemIdeal
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TDualProd
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BarMSingle

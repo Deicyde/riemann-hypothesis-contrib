@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsCongruenceModulusIdelicCharacterTrivial
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitLoc
 

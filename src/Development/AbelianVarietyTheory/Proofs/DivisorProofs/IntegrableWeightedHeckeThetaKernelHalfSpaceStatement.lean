@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegrableWeightedHeckeThetaKernelHalfSpace
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.CompletedLStripBounds
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormWt

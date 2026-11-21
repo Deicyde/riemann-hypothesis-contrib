@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HyperbolicFiniteVolumeIntegralBound
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TorsorsTrivial
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OriginIdeal

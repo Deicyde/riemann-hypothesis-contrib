@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SplitPlaceReductionsConjOfNestedFrameStabilisers
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IsPatOne
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsTransportAdelicCorrection

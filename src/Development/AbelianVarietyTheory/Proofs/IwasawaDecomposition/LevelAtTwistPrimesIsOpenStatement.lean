@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelAtTwistPrimesIsOpen
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemCutQGrp
 

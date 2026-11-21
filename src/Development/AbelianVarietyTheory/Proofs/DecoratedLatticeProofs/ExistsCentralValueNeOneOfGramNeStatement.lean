@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsCentralValueNeOneOfGramNe
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.KerBF
 public import Formalism.LocalToGlobal.IndefiniteReal.OrthogonalComplementCharacterisation

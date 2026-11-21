@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PullDegKeepsBimultActionPolarisationElement
 public import Development.AbelianVarietyTheory.Definitions.Divisors.HasRigidCoords
 public import Development.AbelianVarietyTheory.Definitions.Divisors.TateProductRigidificationTrivial

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLowerObjectAbelianPartTateIsometry
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiltGraded
 

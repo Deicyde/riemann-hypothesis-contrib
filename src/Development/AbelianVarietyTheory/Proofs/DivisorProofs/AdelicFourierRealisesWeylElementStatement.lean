@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdelicFourierRealisesWeylElement
 public import Development.AbelianVarietyTheory.Definitions.Divisors.DblActId
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RealisedOne

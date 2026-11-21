@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteClosureThetaRatiosOfIsCl
 public import Development.AbelianVarietyTheory.Statements.SemistableTorsion.ImmersedBy
 

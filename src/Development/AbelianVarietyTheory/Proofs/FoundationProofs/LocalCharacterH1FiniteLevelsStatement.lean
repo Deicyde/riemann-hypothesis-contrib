@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LocalCharacterH1FiniteLevels
 public import Development.AbelianVarietyTheory.Definitions.Foundations.FinalTheorems
 

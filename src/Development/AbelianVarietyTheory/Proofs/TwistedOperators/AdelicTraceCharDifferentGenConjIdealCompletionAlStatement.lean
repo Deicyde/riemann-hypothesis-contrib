@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.AdelicTraceCharDifferentGenConjIdealCompletionAl
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.TmulMemComplId
 

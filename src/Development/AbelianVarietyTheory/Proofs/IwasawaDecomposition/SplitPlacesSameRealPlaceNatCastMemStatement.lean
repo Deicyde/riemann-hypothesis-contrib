@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SplitPlacesSameRealPlaceNatCastMem
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ReadsHecke
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsFieldExtensionOfIntegralRetraction
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LiftQMk
 

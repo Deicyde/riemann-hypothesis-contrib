@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LinkedStatesCoefficientFieldFiniteGroupEq
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.RealMoveOfParts
 

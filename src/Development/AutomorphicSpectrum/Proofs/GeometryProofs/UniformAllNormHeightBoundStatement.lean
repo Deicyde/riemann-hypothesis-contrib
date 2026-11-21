@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.UniformAllNormHeightBound
 public import Development.AutomorphicSpectrum.PublishedTheorems.Geometry₂.NefRR
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.ModelSmall

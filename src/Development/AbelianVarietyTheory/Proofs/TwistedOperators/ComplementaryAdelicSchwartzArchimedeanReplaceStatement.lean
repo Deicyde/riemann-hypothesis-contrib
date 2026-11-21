@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ComplementaryAdelicSchwartzArchimedeanReplace
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HasInfExpDiv
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsPairReading

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsThetaTraceBaseChangeIff
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsTranslSum
 

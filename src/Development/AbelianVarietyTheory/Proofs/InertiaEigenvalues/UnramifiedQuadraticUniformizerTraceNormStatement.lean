@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UnramifiedQuadraticUniformizerTraceNorm
 public import GroundTheory.LocalFields.UnramifiedNormSurj
 public import GroundTheory.LocalFields.UnramifiedGalois

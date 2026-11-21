@@ -1,7 +1,6 @@
 module
 
 public import Formalism.LocalToGlobal.CharacterGerms.RowTieUpFBrS
-public import Mathlib
 
 @[expose] public section
 

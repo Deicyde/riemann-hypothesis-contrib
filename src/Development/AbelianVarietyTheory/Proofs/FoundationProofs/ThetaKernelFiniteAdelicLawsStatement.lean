@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaKernelFiniteAdelicLaws
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GoodLiftOnto
 

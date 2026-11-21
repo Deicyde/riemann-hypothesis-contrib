@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsIdempotentSumSubsetAndConjugateFlip
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsFlipDet
 

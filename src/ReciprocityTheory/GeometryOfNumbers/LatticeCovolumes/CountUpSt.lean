@@ -1,7 +1,6 @@
 module
 
 public import ReciprocityTheory.GeometryOfNumbers.LatticeCovolumes.CountSt
-public import Mathlib
 
 @[expose] public section
 

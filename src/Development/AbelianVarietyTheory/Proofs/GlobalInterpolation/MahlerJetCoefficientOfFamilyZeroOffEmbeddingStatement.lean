@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MahlerJetCoefficientOfFamilyZeroOffEmbedding
 public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.LatIntZero
 

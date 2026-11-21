@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Sl2SquareKillsVector
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCliff
 

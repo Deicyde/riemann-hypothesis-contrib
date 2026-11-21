@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ExtendByZeroApplyOfNe
 public import Formalism.RealPlaceAnalysis.SmoothOnGVIff
 public import Formalism.FormalDegreeBessel.StatementG

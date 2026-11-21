@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsAinfFrobeniusIterateEqXiMul
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsCrisP
 

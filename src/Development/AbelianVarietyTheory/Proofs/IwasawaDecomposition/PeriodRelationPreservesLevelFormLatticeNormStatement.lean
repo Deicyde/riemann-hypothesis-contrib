@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PeriodRelationPreservesLevelFormLatticeNorm
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ReadPk
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SameForm

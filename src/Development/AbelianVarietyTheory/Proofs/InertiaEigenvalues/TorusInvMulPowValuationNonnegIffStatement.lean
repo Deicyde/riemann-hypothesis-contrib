@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TorusInvMulPowValuationNonnegIff
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ValsAtApply
 

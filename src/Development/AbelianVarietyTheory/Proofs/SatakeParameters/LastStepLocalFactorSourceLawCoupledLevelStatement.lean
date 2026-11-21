@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LastStepLocalFactorSourceLawCoupledLevel
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.XiTopEqProd
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SmulCompSmul

@@ -1,7 +1,6 @@
 module
 
 public import Development.AutomorphicArithmetic.CyclotomicBounds.RamifiedDiscriminants.FunKit
-public import Mathlib
 public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.NormSmall
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHeckeUNuInv
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBetaInvHeckeU

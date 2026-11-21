@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HilbertSubgroupLeKerOfKillsInertia
 public import ReciprocityTheory.GaloisValuations.Global
 public import ReciprocityTheory.NeutralLocalFields.HilbertClassField

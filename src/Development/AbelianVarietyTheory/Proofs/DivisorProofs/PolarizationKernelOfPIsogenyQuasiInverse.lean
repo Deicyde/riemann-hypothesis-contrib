@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.PolarizationKernelOfPIsogenyQuasiInverse
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsQuasiInv
 

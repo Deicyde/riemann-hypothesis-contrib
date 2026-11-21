@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.EqZeroOfOrthogonalSchrodingerGaussian
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsSchwartzTranslate
 public import GroundTheory.GlobalFields.TateThesis.GaussianSchwartz

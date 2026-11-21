@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ConjFockPureTensorMapNegFormSpaceEq
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ConjRepApply
 

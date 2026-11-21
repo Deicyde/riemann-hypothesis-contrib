@@ -1,7 +1,6 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HermitianAdaptedPairOfPair
-public import Mathlib
 public import Development.WeilBound.ThetaLifts.LeviDeterminants.MixedModels.MixedModelPlanes.Imports
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 

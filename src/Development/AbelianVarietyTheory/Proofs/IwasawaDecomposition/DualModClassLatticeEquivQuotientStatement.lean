@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DualModClassLatticeEquivQuotient
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemSmulLk
 

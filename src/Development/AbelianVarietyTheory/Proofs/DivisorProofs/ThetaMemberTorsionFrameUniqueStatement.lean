@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaMemberTorsionFrameUnique
 public import Development.AbelianVarietyTheory.Definitions.Divisors.TwistAtEach
 public import Development.AbelianVarietyTheory.Definitions.Divisors.HasTraitsOnOfHasTraitsP

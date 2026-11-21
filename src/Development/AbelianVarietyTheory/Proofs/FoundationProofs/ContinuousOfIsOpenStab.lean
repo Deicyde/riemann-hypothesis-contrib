@@ -4,7 +4,6 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.PublishedTheorems.
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.Hypotheses2
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.RTwist
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DiscreteTopologyRatN
-public import Mathlib
 public import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.NormNatCastLtOne
 public import GroundTheory.AutomorphicForms.StrongApproximationSLDense
 

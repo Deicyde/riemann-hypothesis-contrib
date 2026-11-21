@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TwistWeightWellDefinedOnLatticeClass
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsStalkZeta
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems

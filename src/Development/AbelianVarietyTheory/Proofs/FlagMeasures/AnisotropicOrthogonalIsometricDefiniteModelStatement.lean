@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AnisotropicOrthogonalIsometricDefiniteModel
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HbApply
 

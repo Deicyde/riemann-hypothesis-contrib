@@ -1,7 +1,6 @@
 module
 
 public import CompanionTheory.RealGroups.FormalDegrees.ArchimedeanFormalDegrees.NormIndOfSteps
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NormInductionOfEstimates
 public import CompanionTheory.RealGroups.FormalDegrees.ArchimedeanFormalDegrees.FormalDegreeFormula.CoefPow
 

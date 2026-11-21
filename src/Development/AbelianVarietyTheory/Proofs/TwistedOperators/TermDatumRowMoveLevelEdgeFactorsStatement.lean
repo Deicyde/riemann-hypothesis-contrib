@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.TermDatumRowMoveLevelEdgeFactors
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PairPtsClasses
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PairPtsEqSum

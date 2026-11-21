@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IntersectionFinalEstimate
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.HasBaseDegreeSettingStrict
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsSheetCover

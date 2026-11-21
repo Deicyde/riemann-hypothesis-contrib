@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RunSizesQuotientGapsLarge
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CovolXOfCovol
 public import Development.AbelianVarietyTheory.Definitions.Divisors.CuspIso

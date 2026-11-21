@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ContinuousAtZeroOfSqueezePowBounds
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.UpperDens
 

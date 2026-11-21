@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistOneToRootsOfUnitySectionsInjective
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MuValInjective
 public import Development.AbelianVarietyTheory.Definitions.Divisors.SecClass

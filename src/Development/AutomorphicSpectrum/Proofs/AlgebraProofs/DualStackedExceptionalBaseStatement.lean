@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DualStackedExceptionalBase
 public import GroundTheory.HeightsAndTheta.Heights.HeightKernels.StatementsDualStackedExcChart
 

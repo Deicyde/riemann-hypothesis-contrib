@@ -2,7 +2,6 @@ module
 
 public import Formalism.HermitianCurvature.LevelRecursionCondNeeded
 public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ChebyshevExtremalPolynomials
-public import Mathlib
 
 @[expose] public section
 

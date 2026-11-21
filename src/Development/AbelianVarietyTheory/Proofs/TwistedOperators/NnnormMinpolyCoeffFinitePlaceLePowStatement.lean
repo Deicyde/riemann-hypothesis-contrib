@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.NnnormMinpolyCoeffFinitePlaceLePow
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.OneLeHtE
 

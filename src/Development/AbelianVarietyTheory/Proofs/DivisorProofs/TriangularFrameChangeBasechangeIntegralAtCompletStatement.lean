@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TriangularFrameChangeBasechangeIntegralAtComplet
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrameCoord
 public import Development.AbelianVarietyTheory.Definitions.CMLattices.IntegralOf

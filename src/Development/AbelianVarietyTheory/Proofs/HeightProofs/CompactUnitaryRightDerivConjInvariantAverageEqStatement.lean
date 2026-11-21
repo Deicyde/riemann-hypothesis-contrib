@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.CompactUnitaryRightDerivConjInvariantAverageEq
 public import Formalism.LocalToGlobal.BesselHermitianTheta.AllTied
 public import Development.AbelianVarietyTheory.BlockTheory.HeightDefect.FinitePartTypes

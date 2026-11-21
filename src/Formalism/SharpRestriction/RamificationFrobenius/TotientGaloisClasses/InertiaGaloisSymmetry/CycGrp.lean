@@ -1,7 +1,6 @@
 module
 
 public import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.InertiaGaloisSymmetry.RootEqOfSubMem
-public import Mathlib
 
 @[expose] public section
 

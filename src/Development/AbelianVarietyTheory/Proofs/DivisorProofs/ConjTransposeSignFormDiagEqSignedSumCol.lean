@@ -1,7 +1,6 @@
 module
 
 public import Development.AbelianVarietyTheory.Definitions.Divisors.RangeShape
-public import Mathlib
 public import Formalism.RealPlaceAnalysis.SmoothOnGVIff
 public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.KoszulLowersPower
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsMulCommutativeCentRealUJ

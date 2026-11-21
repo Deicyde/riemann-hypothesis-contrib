@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.AdaptedAtlasSncSection
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.MumfordProportionality
 public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.GoodOrigin

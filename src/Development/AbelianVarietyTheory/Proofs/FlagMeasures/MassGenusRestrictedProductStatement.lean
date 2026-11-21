@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MassGenusRestrictedProduct
 public import Development.AbelianVarietyTheory.Definitions.Foundations.IsHermND
 

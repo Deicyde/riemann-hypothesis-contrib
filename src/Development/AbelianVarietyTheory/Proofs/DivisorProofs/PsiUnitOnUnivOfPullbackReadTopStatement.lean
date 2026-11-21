@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PsiUnitOnUnivOfPullbackReadTop
 public import Development.AbelianVarietyTheory.Definitions.Divisors.HasRigidCoords
 public import Development.AbelianVarietyTheory.Definitions.Divisors.TateProductRigidificationTrivial

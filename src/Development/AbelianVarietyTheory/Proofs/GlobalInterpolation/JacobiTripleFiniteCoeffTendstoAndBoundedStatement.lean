@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.JacobiTripleFiniteCoeffTendstoAndBounded
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MultipliableTpFactor
 

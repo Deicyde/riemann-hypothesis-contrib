@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.E8ProductTorsionSectionBound
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsE8WeightedBundle
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsChartMember

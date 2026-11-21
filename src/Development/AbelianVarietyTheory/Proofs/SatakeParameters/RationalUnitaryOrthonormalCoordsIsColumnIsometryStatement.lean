@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.RationalUnitaryOrthonormalCoordsIsColumnIsometry
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.UnderTie
 

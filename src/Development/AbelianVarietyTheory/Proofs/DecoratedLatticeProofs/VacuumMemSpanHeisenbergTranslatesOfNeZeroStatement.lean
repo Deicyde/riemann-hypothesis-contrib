@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.VacuumMemSpanHeisenbergTranslatesOfNeZero
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ChainStepsAreGridArrows
 

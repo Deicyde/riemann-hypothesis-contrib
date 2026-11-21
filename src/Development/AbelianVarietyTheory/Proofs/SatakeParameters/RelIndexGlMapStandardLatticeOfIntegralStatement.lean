@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.RelIndexGlMapStandardLatticeOfIntegral
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.EsymmInvMulEsymmCard
 

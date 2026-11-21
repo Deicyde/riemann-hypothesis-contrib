@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.HeightProofs.EqMatrixCoeffOfLocallyUniformLimitKFinite
 public import Formalism.LocalToGlobal.BesselHermitianTheta.AllTied
 public import Development.AbelianVarietyTheory.BlockTheory.HeightDefect.FinitePartTypes

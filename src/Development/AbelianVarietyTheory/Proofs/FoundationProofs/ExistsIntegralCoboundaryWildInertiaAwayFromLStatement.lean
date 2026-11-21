@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsIntegralCoboundaryWildInertiaAwayFromL
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemCoc
 public import Formalism.SharpRestriction.LevelLetterCocycles.DataN

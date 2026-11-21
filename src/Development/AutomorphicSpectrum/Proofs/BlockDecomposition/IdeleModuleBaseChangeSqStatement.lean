@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IdeleModuleBaseChangeSq
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OfE
 

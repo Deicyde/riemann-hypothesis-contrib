@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AlexanderWhitneyCompShuffleHomotopicId
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasTotalBiChains
 

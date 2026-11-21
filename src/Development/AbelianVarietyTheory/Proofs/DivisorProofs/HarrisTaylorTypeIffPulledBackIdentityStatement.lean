@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HarrisTaylorTypeIffPulledBackIdentity
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsQuasiInv
 

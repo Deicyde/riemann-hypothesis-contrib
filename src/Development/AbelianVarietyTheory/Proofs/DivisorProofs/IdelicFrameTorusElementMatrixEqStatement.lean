@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IdelicFrameTorusElementMatrixEq
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIdTorusEltOne
 

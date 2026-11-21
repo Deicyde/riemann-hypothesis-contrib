@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFiniteSurjectiveCoverFromOpens
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UOver
 

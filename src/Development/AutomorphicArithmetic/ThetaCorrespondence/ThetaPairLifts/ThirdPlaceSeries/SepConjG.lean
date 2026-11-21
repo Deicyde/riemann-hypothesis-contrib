@@ -9,7 +9,6 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.CGTrueT
 public import Development.AbelianVarietyTheory.Definitions.Divisors.IsRecTLocRecT
 public import Development.AutomorphicArithmetic.Foundations.UnitarySphericalFixing.SatakeParameters.Imports
-public import Development.AutomorphicArithmetic.Foundations.UnitarySphericalFixing.SatakeParameters.AbsCentralAlt
 
 @[expose] public section
 

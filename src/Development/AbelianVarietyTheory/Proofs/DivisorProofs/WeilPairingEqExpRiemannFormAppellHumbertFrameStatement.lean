@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilPairingEqExpRiemannFormAppellHumbertFrame
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilPairingRiemannForm
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsAHOfIsFactorAH

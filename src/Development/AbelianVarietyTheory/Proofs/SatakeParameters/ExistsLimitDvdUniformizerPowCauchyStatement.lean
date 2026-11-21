@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsLimitDvdUniformizerPowCauchy
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SelfDualOne
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DvdPowZeroIff

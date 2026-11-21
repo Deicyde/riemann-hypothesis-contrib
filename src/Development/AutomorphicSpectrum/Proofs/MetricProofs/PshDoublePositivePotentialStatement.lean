@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.PshDoublePositivePotential
 public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PStokesLimitTTop
 public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.InterNamed

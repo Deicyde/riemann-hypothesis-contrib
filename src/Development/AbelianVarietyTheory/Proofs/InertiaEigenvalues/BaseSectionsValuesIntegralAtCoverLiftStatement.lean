@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BaseSectionsValuesIntegralAtCoverLift
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.CompIntField
 public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.RationalRayLevels

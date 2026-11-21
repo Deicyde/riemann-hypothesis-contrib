@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IntegralRightInvariantEqSumOpenSubgroupCosets
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HasLenOfLatLen
 

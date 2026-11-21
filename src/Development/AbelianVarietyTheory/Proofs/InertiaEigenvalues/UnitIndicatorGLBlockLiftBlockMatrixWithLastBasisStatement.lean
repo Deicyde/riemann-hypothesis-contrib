@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UnitIndicatorGLBlockLiftBlockMatrixWithLastBasis
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormMulApplyLeOne
 

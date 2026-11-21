@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobeniusOrbitRootPolynomialFactorization
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LabelsCharOne
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspidalCharacterFormula

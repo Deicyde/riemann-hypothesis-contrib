@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.StandardLiftReadingOfDecoratedLatticePresentatio
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.BrgStdR
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NVNeZero

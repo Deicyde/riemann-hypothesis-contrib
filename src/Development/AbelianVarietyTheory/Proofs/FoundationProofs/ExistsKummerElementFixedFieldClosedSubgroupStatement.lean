@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsKummerElementFixedFieldClosedSubgroup
 public import Development.AbelianVarietyTheory.Definitions.Foundations.HTLawAt
 public import Development.AbelianVarietyTheory.Statements.CuspidalUnitaryTwists.ZetaUr

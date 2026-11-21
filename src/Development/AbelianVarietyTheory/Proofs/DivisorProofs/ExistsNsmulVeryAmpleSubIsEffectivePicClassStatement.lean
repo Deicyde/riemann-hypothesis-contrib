@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNsmulVeryAmpleSubIsEffectivePicClass
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EffOfSec
 

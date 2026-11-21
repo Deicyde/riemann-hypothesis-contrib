@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ContinuousIotaOQOfData
 public import Formalism.SharpRestriction.LevelLetterCocycles.DataN
 

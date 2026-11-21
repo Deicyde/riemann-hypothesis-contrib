@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SplitByBaseChange
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CoveringOfForallMem
 

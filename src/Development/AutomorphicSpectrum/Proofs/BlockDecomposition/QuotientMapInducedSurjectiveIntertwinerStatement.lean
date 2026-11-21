@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.QuotientMapInducedSurjectiveIntertwiner
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsCIndValue
 

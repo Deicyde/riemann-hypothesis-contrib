@@ -1,7 +1,6 @@
 module
 
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.LinkedUnramifiedChains.TeichmullerParts.UnramifiedTrivialInertialType
-public import Mathlib
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Lbc
 public import GroundTheory.AutomorphicForms.SmoothRepSchur
 

@@ -1,7 +1,6 @@
 module
 
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalGramFibreIntegralEq
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FreeCell
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HyperbolicFibreFreeExtensionStatement
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FreeCellOpenIndependentStatement

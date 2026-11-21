@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.ThetaCorrespondence.FockModels.BoxIntegrals.MeanBlocks
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MeanTransport
 

@@ -4,7 +4,6 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GlobalTheta.Her
 public import Development.AbelianVarietyTheory.PublishedTheorems.GlobalTheta.ThetaRationalInvarianceHolds
 public import Development.AbelianVarietyTheory.PublishedTheorems.GlobalTheta.PlaneFormNondegenerate
 public import Development.AbelianVarietyTheory.PublishedTheorems.GlobalTheta.FiniteDimensionalNablaSq
-public import Mathlib
 public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.PageThm
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.OrderNeTop
 

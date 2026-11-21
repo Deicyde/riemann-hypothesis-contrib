@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CmDataConjIsConjOf
 public import Formalism.LocalRingCardinality.DataSpaces
 public import Formalism.LocalToGlobal.Divisibility.TuplesLemmas

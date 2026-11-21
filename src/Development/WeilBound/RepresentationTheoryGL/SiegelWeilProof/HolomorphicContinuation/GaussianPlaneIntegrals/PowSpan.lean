@@ -1,7 +1,6 @@
 module
 
 public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.HolomorphicContinuation.GaussianPlaneIntegrals.AssemblyAlt
-public import Mathlib
 
 @[expose] public section
 

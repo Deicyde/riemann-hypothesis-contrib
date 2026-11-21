@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ProdXbPowEqXcOfPow
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.DetMemSubring
 

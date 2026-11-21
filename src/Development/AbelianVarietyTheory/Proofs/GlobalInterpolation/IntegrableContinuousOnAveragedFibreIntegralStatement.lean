@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IntegrableContinuousOnAveragedFibreIntegral
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.FibOfZero
 

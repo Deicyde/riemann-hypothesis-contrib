@@ -4,7 +4,6 @@ public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsPrimesOk
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.IsEntC
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.ColNorm
-public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.JetsInIffStepField
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.FixedVectorEqOfStandardData
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DetIdStdBot
 public import Formalism.LocalToGlobal.KernelLattices.TopPin

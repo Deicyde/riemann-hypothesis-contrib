@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BesselLowestVectorLocalMassEqTransported
 public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.ConstC
 
