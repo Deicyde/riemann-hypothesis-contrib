@@ -1,6 +1,0 @@
-import BuildAid.Leniency.Open
-import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LinearityResult
-open GlobalTheory.HalfGeo
-set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.linearity_result : LinSt := by
-  first | exact @GlobalTheory.HalfGeo.linSt | exact GlobalTheory.HalfGeo.linSt | (intros; apply GlobalTheory.HalfGeo.linSt <;> assumption)

@@ -1,9 +1,0 @@
-import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.FinitelyManyWithInfinitesimalCharacter
-import Formalism.UnipotentAdelicQuotients.SiegelWeilUnitaryConvergent
-
-namespace GlobalTheory.Fc.S0
-
-structure GeneralHypV : Prop extends GeneralHypU where
-  siegelWeilUnitaryConvergent2 : HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryConvergent
-
-end GlobalTheory.Fc.S0

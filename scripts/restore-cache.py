@@ -67,16 +67,23 @@ def manifest_rows(contents):
 
 
 def local_path(root, relative, checked):
-    """Reject symlinks in source/output paths, including existing output files."""
-    path = root
-    for part in relative.parts:
-        if part in ("", ".", "..") or "/" in part or "\\" in part:
-            raise ValueError("unsafe module path")
-        path = path / part
-        if path not in checked:
-            if path.is_symlink():
-                raise ValueError(f"symlink in source/output path: {path}")
-            checked.add(path)
+    """Reject symlinks in source/output paths, including existing output files.
+
+    Populate the ancestor-closed ``checked`` set only through this helper.
+    """
+    if any(part in ("", ".", "..") or "/" in part or "\\" in part
+           for part in relative.parts):
+        raise ValueError("unsafe module path")
+    path = root / relative
+    pending = []
+    current = path
+    while current != root and current not in checked:
+        pending.append(current)
+        current = current.parent
+    for current in reversed(pending):
+        if current.is_symlink():
+            raise ValueError(f"symlink in source/output path: {current}")
+        checked.add(current)
     return path
 
 
@@ -141,4 +148,6 @@ if __name__ == "__main__":
     try:
         main()
     except (ValueError, OSError, subprocess.CalledProcessError) as error:
-        sys.exit(f"Bulk restore stopped: {error}\nUse stock lake cache get and lake build for other source/configurations.")
+        sys.exit(f"Bulk restore stopped: {error}\n"
+                 "For other source/configurations, stock Lake reuses downloaded outputs of unchanged modules:\n"
+                 "  source scripts/cache-env.sh && lake build")

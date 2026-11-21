@@ -1,6 +1,0 @@
-import BuildAid.Leniency.Open
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HorizontalHolds
-open GlobalTheory.TorRef
-set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.horizontal_holds : HorizSt := by
-  first | exact @GlobalTheory.HorizProof.horizSt | exact GlobalTheory.HorizProof.horizSt | (intros; apply GlobalTheory.HorizProof.horizSt <;> assumption)

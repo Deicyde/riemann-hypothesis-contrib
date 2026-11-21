@@ -1,6 +1,0 @@
-import BuildAid.Leniency.Open
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DominationHolds
-open GlobalTheory.TorRef GlobalTheory.ShFam
-set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.domination_holds : DomSt := by
-  first | exact @GlobalTheory.DomModels.domSt_holds | exact GlobalTheory.DomModels.domSt_holds | (intros; apply GlobalTheory.DomModels.domSt_holds <;> assumption)

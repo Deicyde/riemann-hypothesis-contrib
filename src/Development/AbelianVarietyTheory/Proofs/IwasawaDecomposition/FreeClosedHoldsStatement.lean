@@ -1,6 +1,0 @@
-import BuildAid.Leniency.Open
-import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FreeClosedHolds
-open GlobalTheory.TorRef
-set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.free_closed_holds : FreeClosedSt := by
-  first | exact @GlobalTheory.TorRef.freeClosedSt | exact GlobalTheory.TorRef.freeClosedSt | (intros; apply GlobalTheory.TorRef.freeClosedSt <;> assumption)
