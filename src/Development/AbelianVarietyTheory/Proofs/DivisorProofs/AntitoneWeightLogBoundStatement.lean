@@ -138,4 +138,3 @@ theorem _root_.GlobalTheory.T.antitone_weight_log_bound : Hypotheses2 → ∃ C 
     rcases (show (0 : ℝ) ≤ Y.rkC la Z by unfold Deep.rkC; positivity).eq_or_lt with h0 | h0
     · rw [← h0, Real.log_zero]; exact hpos
     · exact (Real.log_le_log h0 hrk).trans hβ
-

@@ -21,4 +21,4 @@ open GlobalTheory.OrbitSep
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.isIntegral_smoothProjectiveModification_of_nonempty : ∀ (F : Type) [Field F] (Y : Scheme.{0}) [IsIntegral Y] (p : Y ⟶ Sp F) (U : Y.Opens) (d : ℕ)
     (M : Modif p U d), (U : Set Y).Nonempty → IsIntegral M.X := by
-  first | exact @GlobalTheory.isIntegral_of_nonempty_modif | exact GlobalTheory.isIntegral_of_nonempty_modif | (intros; apply GlobalTheory.isIntegral_of_nonempty_modif <;> assumption)
+  exact @GlobalTheory.isIntegral_of_nonempty_modif

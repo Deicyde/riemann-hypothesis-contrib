@@ -17,4 +17,4 @@ theorem _root_.GlobalTheory.T.adelicIsometry_transport_unique_mod_stabilizer : �
   intro D W Y L Λ S hS n be be' hL hbe x hx x'
   first
   | exact GlobalTheory.TransportUnique.transport_unique D W Y L Λ S hS n be be' hL hbe x hx x'
-  | exact GlobalTheory.TransportUnique.transport_unique D W Y L Λ S hS n be be' hL.toIsLattice hbe x hx x' 
+  | exact GlobalTheory.TransportUnique.transport_unique D W Y L Λ S hS n be be' hL.toIsLattice hbe x hx x'

@@ -15,4 +15,4 @@ theorem _root_.GlobalTheory.T.chiDeltaU_conj_longSimpleReflection_unitary : ∀ 
     chiDeltaU q (fun i => (α i : ℂ)) (y⁻¹ * t * y) *
         (q : ℂ) ^ (-2 * ordL (((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) (lo k) (lo k))) =
       chiDeltaU q (fun i => (actU k α i : ℂ)) t := by
-  first | exact @GlobalTheory.GKUnitary.chiDeltaU_conj_simpleU_long | exact GlobalTheory.GKUnitary.chiDeltaU_conj_simpleU_long | (intros; apply GlobalTheory.GKUnitary.chiDeltaU_conj_simpleU_long <;> assumption)
+  exact @GlobalTheory.GKUnitary.chiDeltaU_conj_simpleU_long

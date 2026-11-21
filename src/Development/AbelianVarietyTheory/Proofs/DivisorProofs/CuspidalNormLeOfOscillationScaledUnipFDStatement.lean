@@ -15,4 +15,4 @@ theorem _root_.GlobalTheory.T.cuspidal_norm_le_of_oscillation_scaledUnipFD : ∀
     ∀ φ : GA E a → ℂ, (∀ γ g, φ (ratGL E a γ * g) = φ g) → IsCuspidal φ → Continuous φ →
     ∀ M : ℕ, 0 < M → ∀ (x : GA E a) (B : ℝ),
       (∀ X ∈ GroundTheory.Automorphic.scaledUnipFD E a r M, ‖φ (unip X * x) - φ x‖ ≤ B) → ‖φ x‖ ≤ B := by
-  first | exact @GlobalTheory.CuspTail.norm_le_of_osc_scaledUnipFD | exact GlobalTheory.CuspTail.norm_le_of_osc_scaledUnipFD | (intros; apply GlobalTheory.CuspTail.norm_le_of_osc_scaledUnipFD <;> assumption)
+  exact @GlobalTheory.CuspTail.norm_le_of_osc_scaledUnipFD

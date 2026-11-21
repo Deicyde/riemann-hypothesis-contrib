@@ -18,4 +18,4 @@ open scoped TensorProduct nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.fractionalIdeal_locallyPrincipal_adelic : ∀ (D : D7) (v : Pl D) (𝔞 : FI D), 𝔞 ≠ 0 → ∃ g ∈ idV 𝔞 v, ∃ g' ∈ idAt D (· = v), (∀ s ∈ idAt D (· = v), g' * g * s = s) ∧ ∀ s, s ∈ idV 𝔞 v ↔ s ∈ idAt D (· = v) ∧ g' * s ∈ intAt D (· = v) := by
-  first | exact @GlobalTheory.FinPl.idV_principal_at | exact GlobalTheory.FinPl.idV_principal_at | (intros; apply GlobalTheory.FinPl.idV_principal_at <;> assumption)
+  exact @GlobalTheory.FinPl.idV_principal_at

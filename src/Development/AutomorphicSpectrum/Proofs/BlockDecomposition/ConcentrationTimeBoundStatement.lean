@@ -8,4 +8,4 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.concentration_time_bound : PositivityTheory.RgBcC.Fc.ConcT := by
-  first | exact @GlobalTheory.CompanionTheory.FcConcT.concT | exact GlobalTheory.CompanionTheory.FcConcT.concT | (intros; apply GlobalTheory.CompanionTheory.FcConcT.concT <;> assumption)
+  exact @GlobalTheory.CompanionTheory.FcConcT.concT

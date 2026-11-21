@@ -25,4 +25,4 @@ open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
 open GlobalTheory.Mum.TensPos GlobalTheory.PsiScalUnit GlobalTheory.Mum.TensPol
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.exists_periodScalarCoordinate_polarisedData_local : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (Q : GlobalTheory.PolDeg.Data R) (a b : Q.X), ∃ k, Q.TauCoord a b k := by
-  first | exact @GlobalTheory.Mum.TensPol.exists_tauCoord | exact GlobalTheory.Mum.TensPol.exists_tauCoord | (intros; apply GlobalTheory.Mum.TensPol.exists_tauCoord <;> assumption)
+  exact @GlobalTheory.Mum.TensPol.exists_tauCoord

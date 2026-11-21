@@ -9,4 +9,4 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpow
 open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.WeaklyAdmissibleFiltrations
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.padicIntegers_finiteExt_goodCoefficientRing : LitGoodO := by
-  first | exact @GlobalTheory.LitGood.litGoodO | exact GlobalTheory.LitGood.litGoodO | (intros; apply GlobalTheory.LitGood.litGoodO <;> assumption)
+  exact @GlobalTheory.LitGood.litGoodO

@@ -24,4 +24,4 @@ theorem _root_.GlobalTheory.T.exists_addChar_normalizing_schrodinger_action : �
       ∀ (v : Pl (F := F)) [Invertible (2 : Fv F v)], ∃ ψv : AddChar (Fv F v) ℂ, Continuous ψv ∧ ψv ≠ 1 ∧
         ∃ A : (Fin n × Fin d → Fv F v) × (Fin n × Fin d → Fv F v) → (Fin n × Fin d → Fv F v) × (Fin n × Fin d → Fv F v),
           ∀ w, ∀ φ ∈ SB (Fin n × Fin d → Fv F v), ev v (schr ψv w φ) = schr ψv (A w) (ev v φ) := by
-  first | exact @GlobalTheory.ThK.ModelLocInt.exists_loc_schr | exact GlobalTheory.ThK.ModelLocInt.exists_loc_schr | (intros; apply GlobalTheory.ThK.ModelLocInt.exists_loc_schr <;> assumption)
+  exact @GlobalTheory.ThK.ModelLocInt.exists_loc_schr

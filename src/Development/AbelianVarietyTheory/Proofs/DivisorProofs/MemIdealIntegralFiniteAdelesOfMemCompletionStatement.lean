@@ -26,4 +26,4 @@ open GlobalTheory.CosetOrth
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.mem_idealIntegralFiniteAdeles_of_memCompletion : ∀ {D : D7} (𝔪 : Ideal (𝓞 D.host.E)), 𝔪 ≠ ⊥ → ∀ x : Formalism.MainNotions.StandardLatticesGL3.AE D,
   InHat (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) (GlobalTheory.BotFormula.toFinE D x) → x ∈ hatId D 𝔪 := by
-  first | exact @GlobalTheory.CosetOrth.mem_hatId_of_inHat | exact GlobalTheory.CosetOrth.mem_hatId_of_inHat | (intros; apply GlobalTheory.CosetOrth.mem_hatId_of_inHat <;> assumption)
+  exact @GlobalTheory.CosetOrth.mem_hatId_of_inHat

@@ -15,4 +15,4 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.exists_conjugatePlace_cmField : ∀ (D : D7) (PP : Formalism.L2.DIV.Pl D.host.E), ∃ PP' : Formalism.L2.DIV.Pl D.host.E, PP'.asIdeal = conjI PP.asIdeal ∧ Formalism.IndefR.Lev.IsConjPl PP' PP := by
-  first | exact @GlobalTheory.ConjPlace.exists_conj_place | exact GlobalTheory.ConjPlace.exists_conj_place | (intros; apply GlobalTheory.ConjPlace.exists_conj_place <;> assumption)
+  exact @GlobalTheory.ConjPlace.exists_conj_place
