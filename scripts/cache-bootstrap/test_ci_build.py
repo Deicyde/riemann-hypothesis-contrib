@@ -52,6 +52,14 @@ def resource_tests(ci):
             pass
         assert (retained.path / "finished.olean").exists()
         assert json.loads((retained.path / "checkpoint.json").read_text())["state"] == "interrupted"
+        old_checkpoint = (retained.path / "checkpoint.json").read_bytes()
+        try:
+            ci.DurableBuildWork(retained.path.parent, staging, {"candidate_head": "b" * 40}, adopt=retained.path)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("adoption relabeled an existing checkpoint identity")
+        assert (retained.path / "checkpoint.json").read_bytes() == old_checkpoint
         try:
             ci.release_uploaded_work(retained.path / "checkpoint.json", 123, "a" * 64)
         except ValueError:
@@ -73,6 +81,25 @@ def resource_tests(ci):
             log.write(b" second"); log.flush()
             ci.sync_visible_log(log, visible)
         assert primary.read_bytes() == visible.read_bytes() == b"first second"
+    with tempfile.TemporaryDirectory(prefix="rh-ci-proc-") as temporary:
+        proc = Path(temporary)
+        (proc / "99/task/99").mkdir(parents=True)
+        (proc / "99/task/100").mkdir()
+        (proc / "99/cmdline").write_bytes(b"python3\0ci-build.py\0")
+        (proc / "99/status").write_text("State:\tT (stopped)\n")
+        for thread in ("99", "100"):
+            (proc / f"99/task/{thread}/children").write_text("")
+        (proc / "99/task/99/status").write_text("State:\tT (stopped)\n")
+        for state in ("R", "D"):
+            (proc / "99/task/100/status").write_text(f"State:\t{state}\n")
+            try:
+                ci.verify_quiesced_controller(99, proc)
+            except ValueError:
+                pass
+            else:
+                raise AssertionError("a stopped leader concealed an active/uninterruptible thread")
+        (proc / "99/task/100/status").write_text("State:\tT (stopped)\n")
+        assert ci.verify_quiesced_controller(99, proc) == [99]
     with tempfile.TemporaryDirectory(prefix="rh-ci-root-link-") as directory:
         directory = Path(directory)
         (directory / "outside/lib").mkdir(parents=True)
@@ -183,9 +210,9 @@ def main():
     ci = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(ci)
     resource_tests(ci)
-    recovery_tests(ci)
     if args.resource_tests_only:
         return
+    recovery_tests(ci)
     with (nullcontext(str(args.keep.resolve())) if args.keep else tempfile.TemporaryDirectory(prefix="rh-ci-fixture-")) as temporary:
         temporary = Path(temporary)
         root, packages, cache = temporary / "candidate", temporary / "packages", temporary / "cache"

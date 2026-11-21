@@ -8,6 +8,7 @@ stock toolchain must already be prepared by the trusted runner.
 import argparse
 import gzip
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -22,9 +23,13 @@ import tarfile
 import tempfile
 import tomllib
 
-TOOLCHAIN = "leanprover/lean4:v4.33.1"
-DEPENDENCIES = "fee57ee9ed399d0a638ca955e5ad40a37a36eeb9b6dfd9f5964114fa7bbe4774"
-BASE_MANIFEST = "292caa386a620d935cfc736b56fcceaab9fe7073086693b62e899c1ee4725f04"
+
+_SETTINGS_SPEC = importlib.util.spec_from_file_location("rh_cache_settings", Path(__file__).with_name("cache-settings.py"))
+settings = importlib.util.module_from_spec(_SETTINGS_SPEC)
+_SETTINGS_SPEC.loader.exec_module(settings)
+TOOLCHAIN = settings.TOOLCHAIN
+DEPENDENCIES = settings.DEPENDENCIES
+BASE_MANIFEST = settings.MANIFEST_SHA
 HASH = re.compile(r"[0-9a-f]{16}\Z")
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 MODULE = re.compile(r"[\w']+(?:\.[\w']+)*\Z")
@@ -101,6 +106,18 @@ class DurableBuildWork:
             if (self.path.parent != parent or not self.path.name.startswith("run-") or self.path.is_symlink()
                     or not self.path.is_dir() or self.path.stat().st_uid != os.getuid()):
                 raise ValueError("recovered work must be an owned run-* directory in the durable work parent")
+            previous = self.path / "checkpoint.json"
+            if previous.exists() or previous.is_symlink():
+                previous = safe_file(self.path, "checkpoint.json")
+                if previous.stat().st_size > 2 * 1024**2:
+                    raise ValueError("existing checkpoint exceeds its metadata bound")
+                contents = previous.read_bytes()
+                recorded = json.loads(contents)
+                if (recorded.get("schema") != 1 or not isinstance(recorded.get("identity"), dict) or
+                        any(recorded["identity"].get(key) != value for key, value in identity.items())):
+                    raise ValueError("existing checkpoint identity differs from the requested recovery")
+                backup = self.path / f"checkpoint-before-recovery-{os.getpid()}-{os.urandom(4).hex()}.json"
+                backup.write_bytes(contents)
         self.output, self.identity, self.state = output, identity, "preparing"
         self.exit_code = None
 
@@ -164,6 +181,34 @@ def release_uploaded_work(checkpoint, artifact_id, artifact_digest):
     marker = checkpoint.parent.parent / (checkpoint.parent.name + ".uploaded.json")
     marker.write_text(json.dumps(acknowledgement, sort_keys=True, indent=2) + "\n")
     shutil.rmtree(checkpoint.parent)
+
+
+def verify_quiesced_controller(pid, proc=Path("/proc")):
+    if pid <= 1 or b"ci-build.py" not in (proc / str(pid) / "cmdline").read_bytes():
+        raise ValueError("recovery requires the original trusted CI controller")
+    pending, seen = [pid], set()
+    while pending:
+        current = pending.pop()
+        if current in seen:
+            continue
+        seen.add(current)
+        if len(seen) > 10000:
+            raise ValueError("unexpectedly large controller process tree")
+        try:
+            status = (proc / str(current) / "status").read_text()
+            state = next(line.split()[1] for line in status.splitlines() if line.startswith("State:"))
+            if state not in ("T", "t", "Z"):
+                raise ValueError(f"controller/candidate process {current} is not quiesced")
+            for task in (proc / str(current) / "task").iterdir():
+                thread = (task / "status").read_text()
+                thread_state = next(line.split()[1] for line in thread.splitlines() if line.startswith("State:"))
+                if thread_state not in ("T", "t", "Z"):
+                    raise ValueError(f"controller/candidate thread {task.name} is not quiesced")
+                pending.extend(map(int, (task / "children").read_text().split()))
+        except FileNotFoundError:
+            if current == pid:
+                raise ValueError("original controller exited before recovery completed") from None
+    return sorted(seen)
 
 
 def stop_build_process(process, command, environment):
@@ -281,7 +326,10 @@ def verify_snapshot(candidate, head, destination):
         if kind != "blob" or mode not in ("100644", "100755"):
             raise ValueError("source symlinks, submodules and special files are not supported")
         expected[raw_path.decode()] = (mode, blob)
-    actual = {path.relative_to(destination).as_posix() for path in destination.rglob("*") if path.is_file()}
+    source_paths = (destination / "src").rglob("*")
+    actual = {path.relative_to(destination).as_posix() for path in source_paths if not path.is_dir() or path.is_symlink()}
+    actual.update(name for name in ("lakefile.toml", "lake-manifest.json", "lean-toolchain")
+                  if (destination / name).exists() or (destination / name).is_symlink())
     if actual != set(expected):
         raise ValueError("archived input inventory differs from Git blobs (check export-ignore attributes)")
     for relative, (mode, blob) in expected.items():
@@ -298,7 +346,7 @@ def verify_snapshot(candidate, head, destination):
 def validate_inputs(project, expected_dependencies):
     config = tomllib.loads(safe_file(project, "lakefile.toml").read_text())
     if safe_file(project, "lean-toolchain").read_text().strip() != TOOLCHAIN:
-        raise ValueError("candidate must use the trusted stock Lean 4.33.1 toolchain")
+        raise ValueError(f"candidate must use the trusted stock toolchain {TOOLCHAIN}")
     if sha256(safe_file(project, "lake-manifest.json")) != expected_dependencies:
         raise ValueError("dependency manifest changed; prepare and attest its dependency cache first")
     if config.get("srcDir", ".") != "src" or config.get("extern_lib"):
@@ -346,7 +394,7 @@ def validate_packages(project, packages):
         directory = packages / name
         if directory.is_symlink() or git(directory, "rev-parse", "HEAD") != package["rev"]:
             raise ValueError(f"dependency checkout differs from its locked revision: {name}")
-        subprocess.run(["git", "-C", str(directory), "diff", "--no-ext-diff", "--quiet", "HEAD", "--"],
+        subprocess.run(["git", "-C", str(directory), "diff", "--no-ext-diff", "--no-textconv", "--quiet", "HEAD", "--"],
                        env=trusted_env(), check=True)
 
 
@@ -384,6 +432,43 @@ def private_package_builds(project, packages, destination):
             raise ValueError("dependency build cache must not be a symlink")
         (target / ".lake").mkdir(exist_ok=True)
     return destination
+
+
+def verify_private_packages(project, packages, private):
+    """Keep generated target sidecars, but require locked tracked dependency sources."""
+    for package in json.loads((project / "lake-manifest.json").read_text()).get("packages", []):
+        public, copied = packages / package["name"], private / package["name"]
+        if copied.is_symlink() or not copied.is_dir():
+            raise ValueError("missing private dependency view during recovery")
+        inventory = subprocess.check_output(["git", "-C", str(public), "ls-tree", "-r", "-z", "HEAD"], env=trusted_env())
+        for entry in inventory.split(b"\0"):
+            if not entry:
+                continue
+            metadata, raw_name = entry.split(b"\t", 1)
+            mode, kind, blob = metadata.decode().split()
+            name = raw_name.decode()
+            if kind != "blob" or mode not in ("100644", "100755", "120000"):
+                raise ValueError("unsupported private dependency source type")
+            if mode == "120000":
+                path = copied / name
+                if not path.is_symlink():
+                    raise ValueError("private dependency symlink changed")
+                data = os.readlink(path).encode()
+                actual = hashlib.sha1(f"blob {len(data)}\0".encode() + data).hexdigest()
+            else:
+                path = safe_file(copied, name)
+                if bool(path.stat().st_mode & 0o111) != (mode == "100755"):
+                    raise ValueError("private dependency executable mode changed")
+                if path.stat().st_size != safe_file(public, name).stat().st_size:
+                    raise ValueError("private dependency source size changed")
+                value = hashlib.sha1(f"blob {path.stat().st_size}\0".encode())
+                with path.open("rb") as stream:
+                    while chunk := stream.read(1024 * 1024):
+                        value.update(chunk)
+                actual = value.hexdigest()
+            if actual != blob:
+                raise ValueError("private dependency tracked source differs from its locked Git blob")
+    return private
 
 
 def baseline(args, project, cache, restore=True):
@@ -506,7 +591,8 @@ def native_hashes(toolchain, paths, work, basenames=True):
     source, jobs, output = work / "Hash.lean", work / "hash-jobs.jsonl", work / "hashes.jsonl"
     source.write_text(HASH_SOURCE)
     jobs.write_text("".join(json.dumps({"file": str(path)}) + "\n" for path in paths))
-    subprocess.run([str(toolchain / "bin/lean"), "--load-dynlib=" + str(toolchain / "lib/lean/libLake_shared.so"),
+    library = "libLake_shared.dylib" if sys.platform == "darwin" else "libLake_shared.so"
+    subprocess.run([str(toolchain / "bin/lean"), "--load-dynlib=" + str(toolchain / "lib/lean" / library),
                     "--run", str(source), str(jobs), str(output)], cwd=work, env=trusted_env(), check=True)
     return {(Path(row["file"]).name if basenames else row["file"]): row["actual"]
             for row in map(json.loads, output.read_text().splitlines())}
@@ -589,26 +675,35 @@ def recover_completed_map(project, cache, toolchain, work, destination, known_ha
 
 
 def recover_raw_outputs(project, cache, work, control, command, prefix, environment, reserve_gib,
-                        known_mappings, existing):
+                        known_mappings, existing, workers=8):
     names = []
+    summary = {"already_mapped": 0, "known_cache": 0, "missing_raw": 0}
     for name, module, dep_hash in module_traces(project, incomplete=True):
         if dep_hash in existing:
+            summary["already_mapped"] += 1
             continue
         filename = known_mappings.get(dep_hash)
         if filename and (cache / "artifacts" / filename).is_file():
+            summary["known_cache"] += 1
             continue
         try:
-            for directory, extension in (("lib/lean", ".olean"), ("lib/lean", ".ilean"), ("ir", ".c")):
+            for directory, extension in (("lib/lean", ".olean"), ("lib/lean", ".ilean")):
                 safe_file(project / ".lake/build" / directory, str(module.parent / (module.name + extension)))
         except FileNotFoundError:
+            summary["missing_raw"] += 1
             continue
         names.append(name)
+    summary.update(candidates=len(names), accepted=0, stock_rejected=0, unreported=0)
     if not names:
+        (work / "raw-recovery-summary.json").write_text(json.dumps(summary, sort_keys=True, indent=2) + "\n")
         return {}
     source = Path(__file__).parent / "cache-bootstrap/RecoverCompleted.lean"
     contents = source.read_text()
     if TOOLCHAIN == "leanprover/lean4:v4.36.0":
-        contents = contents.replace("mod.leanArts.fetch", "mod.irArts.fetch")
+        # New module-system elaboration may postpone C/IR generation. Recover
+        # only trace-attested parts; normal builds can run leanir afterwards.
+        contents = contents.replace("mod.leanArts.fetch", "mod.elabArts.fetch")
+        contents = contents.replace("-- OPTIONAL_C_436", "c? := if expected.c?.isSome then arts.c? else none")
     (control / "RecoverCompleted.lean").write_text(contents)
     (control / "raw-recovery-jobs.json").write_text(json.dumps(names))
     report = work / "result/raw-recovery.jsonl"
@@ -618,10 +713,10 @@ def recover_raw_outputs(project, cache, work, control, command, prefix, environm
     with (work / "raw-recovery.log").open("wb") as log:
         code = supervised_build(fresh_prefix + command + ["/opt/lean/bin/lean",
             "--load-dynlib=/opt/lean/lib/lean/libLake_shared.so", "--run", "/control/RecoverCompleted.lean",
-            "/work/project", "/control/raw-recovery-jobs.json", "/work/result/raw-recovery.jsonl", "/control/packages.json"],
+            "/work/project", "/control/raw-recovery-jobs.json", "/work/result/raw-recovery.jsonl", "/control/packages.json", str(min(workers, 32))],
             environment, log, (work,), reserve_gib)
     print(f"Stock no-build raw recovery processed {len(names)} candidate modules (exit {code}); raw work remains retained", flush=True)
-    verified, seen = {}, set()
+    verified, seen, requested = {}, set(), set(names)
     if report.exists():
         report = safe_file(work / "result", "raw-recovery.jsonl")
         if report.stat().st_size > 64 * 1024**2:
@@ -629,10 +724,11 @@ def recover_raw_outputs(project, cache, work, control, command, prefix, environm
         for line in report.read_text().splitlines():
             row = json.loads(line)
             name = row.get("name")
-            if name not in names or name in seen or type(row.get("ok")) is not bool:
+            if name not in requested or name in seen or type(row.get("ok")) is not bool:
                 raise ValueError("unexpected raw recovery decision")
             seen.add(name)
             if not row["ok"]:
+                summary["stock_rejected"] += 1
                 continue
             input_hash, artifact = row.get("input", ""), row.get("artifact", "")
             if (not HASH.fullmatch(input_hash) or not artifact.endswith(".ltar") or
@@ -644,6 +740,9 @@ def recover_raw_outputs(project, cache, work, control, command, prefix, environm
                 raise ValueError("recovery decision differs from the verified current trace")
             safe_file(cache, "artifacts/" + artifact)
             verified[input_hash] = artifact
+    summary.update(accepted=len(verified), unreported=len(names) - len(seen), helper_exit_code=code)
+    (work / "raw-recovery-summary.json").write_text(json.dumps(summary, sort_keys=True, indent=2) + "\n")
+    print("Raw recovery coverage: " + json.dumps(summary, sort_keys=True), flush=True)
     return verified
 
 
@@ -693,9 +792,21 @@ def main():
     parser.add_argument("--baseline-cache", type=Path)
     parser.add_argument("--cache-map", type=Path, action="append", default=[],
                         help="newer PR/ancestor map; LTARs must already be in --baseline-cache")
+    parser.add_argument("--recover-work", type=Path, help="adopt a quiesced old run-* directory already moved outside the GitHub workspace")
+    parser.add_argument("--recover-request", type=Path, help="original independently recorded hosted CI request")
+    parser.add_argument("--recover-controller-pid", type=int)
+    parser.add_argument("--recover-log", type=Path)
+    parser.add_argument("--recover-exit-code", type=int, help="actual nonzero exit the original workflow will record (137 for SIGKILL)")
     args = parser.parse_args()
     if args.jobs < 1:
         parser.error("--jobs must be positive")
+    recovery_values = (args.recover_request, args.recover_controller_pid, args.recover_log, args.recover_exit_code)
+    if args.recover_work:
+        if any(value is None for value in recovery_values) or not 1 <= args.recover_exit_code <= 255:
+            parser.error("recovery requires original request, frozen controller PID, original log and a nonzero matching workflow exit code")
+        verify_quiesced_controller(args.recover_controller_pid)
+    elif any(value is not None for value in recovery_values):
+        parser.error("recovery arguments require --recover-work")
     if ((args.memory_gib is not None and args.memory_gib < 1) or
             args.tasks_max < 1 or args.reserve_disk_gib < 0):
         parser.error("memory/tasks limits must be positive; disk reserve must be nonnegative")
@@ -704,8 +815,9 @@ def main():
         env = {**trusted_env(), "ELAN_TOOLCHAIN": TOOLCHAIN}
         args.toolchain = Path(subprocess.check_output(["elan", "which", "lean"], env=env, text=True).strip()).parent.parent
     toolchain = args.toolchain.resolve()
-    if not subprocess.check_output([str(toolchain / "bin/lean"), "--version"], env=trusted_env(), text=True).startswith("Lean (version 4.33.1,"):
-        raise ValueError("trusted toolchain is not stock Lean 4.33.1")
+    version = subprocess.check_output([str(toolchain / "bin/lean"), "--version"], env=trusted_env(), text=True)
+    if not version.startswith(f"Lean (version {settings.VERSION},") or settings.COMMIT not in version:
+        raise ValueError(f"trusted toolchain must be the pinned stock Lean {settings.VERSION} release")
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     if any(output.iterdir()):
@@ -713,7 +825,8 @@ def main():
     head = git(args.candidate, "rev-parse", "HEAD")
     provenance = {"candidate_head": head, "candidate_tree": git(args.candidate, "rev-parse", "HEAD^{tree}"),
                   "source_tree": git(args.candidate, "rev-parse", "HEAD:src"), "build_roots": {},
-                  "toolchain": TOOLCHAIN}
+                  "toolchain": TOOLCHAIN, "lakefile_sha256": sha256(safe_file(args.candidate, "lakefile.toml")),
+                  "manifest_sha256": sha256(safe_file(args.candidate, "lake-manifest.json"))}
     # Stack/file limits affect this controller and its children only; hard limits remain unchanged.
     for kind, preferred in ((resource.RLIMIT_STACK, None), (resource.RLIMIT_NOFILE, 65536)):
         soft, hard = resource.getrlimit(kind)
@@ -723,25 +836,40 @@ def main():
     work_parent = choose_work_directory(output, args.work_dir or (state_root / "failed-work"))
     if os.environ.get("GITHUB_WORKSPACE") and work_parent.is_relative_to(Path(os.environ["GITHUB_WORKSPACE"]).resolve()):
         raise ValueError("durable CI work must stay outside the disposable GitHub workspace")
-    with DurableBuildWork(work_parent, output, provenance) as workspace:
+    with DurableBuildWork(work_parent, output, provenance, adopt=args.recover_work) as workspace:
         work = workspace.path
         project, cache, result, control = work / "project", work / "cache", work / "result", work / "control"
         for directory in (project, cache / "artifacts", result, control):
-            directory.mkdir(parents=True)
-        snapshot(args.candidate, head, project)
+            if directory.is_symlink():
+                raise ValueError("recovery directories must not be symlinks")
+            directory.mkdir(parents=True, exist_ok=bool(args.recover_work))
+        if args.recover_work:
+            verify_snapshot(args.candidate, head, project)
+        else:
+            snapshot(args.candidate, head, project)
         config_sha = validate_inputs(project, args.dependency_manifest_sha256)
         packages = args.packages.resolve()
         if packages.is_relative_to(args.candidate.resolve()):
             raise ValueError("dependencies must come from a trusted cache outside the candidate checkout")
         validate_packages(project, packages)
         overrides = package_overrides(project, control)
-        dependency_builds = private_package_builds(project, packages, work / "dependency-builds")
+        dependency_builds = (verify_private_packages(project, packages, work / "dependency-builds") if args.recover_work else
+                             private_package_builds(project, packages, work / "dependency-builds"))
         provenance.update(lakefile_sha256=config_sha, manifest_sha256=sha256(project / "lake-manifest.json"))
+        if args.recover_work:
+            request_path = safe_file(args.recover_request.parent.absolute(), args.recover_request.name)
+            if request_path.stat().st_size > 2 * 1024**2:
+                raise ValueError("original CI request exceeds its metadata bound")
+            request = json.loads(request_path.read_text())
+            if (request.get("repository") != "leanprover-community/riemann-hypothesis" or
+                    type(request.get("run_id")) is not int or request["run_id"] <= 0 or
+                    any(request.get("expected", {}).get(key) != value for key, value in provenance.items())):
+                raise ValueError("recovered source/config identity differs from the original hosted CI request")
         # validate_inputs has checked layout/toolchain/dependencies. Stock
         # --rehash checks semantic options and clears stale module LTARs.
-        base_hashes, warm_jobs, base_map_sha = baseline(args, project, cache)
+        base_hashes, warm_jobs, base_map_sha = baseline(args, project, cache, restore=not args.recover_work)
         base_mapping = load_map(args.baseline_map) if args.baseline_map else {}
-        extra_maps = prepare_cache_maps(args, base_mapping, cache, control, toolchain, work, base_hashes)
+        extra_maps = [] if args.recover_work else prepare_cache_maps(args, base_mapping, cache, control, toolchain, work, base_hashes)
         known_mappings = dict(base_mapping)
         for path in args.cache_map:
             known_mappings.update(load_map(path))
@@ -753,12 +881,21 @@ def main():
         for cache_map in extra_maps:
             subprocess.run(command + ["/opt/lean/bin/lake", "--packages", overrides, "cache", "add", cache_map],
                            env=trusted_env(), check=True)
-        workspace.checkpoint("building")
-        with (work / "build.log").open("wb") as log:
+        if args.recover_work:
+            original_log = safe_file(args.recover_log.parent.absolute(), args.recover_log.name)
+            if not (work / "build.log").exists():
+                build_log_link(original_log, work / "build.log")
+            elif sha256(work / "build.log") != sha256(original_log):
+                raise ValueError("recovered durable log differs from the original frozen job")
             build_log_link(work / "build.log", output / "build.log")
-            build_exit_code = supervised_build(
-                resource_prefix + command + ["/opt/lean/bin/lake", "--packages", overrides, "--rehash", "build", "-o", "/work/result/outputs.jsonl"],
-                build_environment, log, (work, output), args.reserve_disk_gib, output / "build.log")
+            build_exit_code = args.recover_exit_code
+        else:
+            workspace.checkpoint("building")
+            with (work / "build.log").open("wb") as log:
+                build_log_link(work / "build.log", output / "build.log")
+                build_exit_code = supervised_build(
+                    resource_prefix + command + ["/opt/lean/bin/lake", "--packages", overrides, "--rehash", "build", "-o", "/work/result/outputs.jsonl"],
+                    build_environment, log, (work, output), args.reserve_disk_gib, output / "build.log")
         mapping_file = result / "outputs.jsonl"
         if build_exit_code:
             workspace.checkpoint("recovering", build_exit_code)
@@ -772,7 +909,7 @@ def main():
                     shutil.copyfile(mapping_file, work / "interrupted-outputs.jsonl")
                     mapping_file.unlink()
             verified = recover_raw_outputs(project, cache, work, control, command, resource_prefix, build_environment,
-                                           args.reserve_disk_gib, known_mappings, existing)
+                                           args.reserve_disk_gib, known_mappings, existing, workers=args.jobs)
             # Only actual stock -o successes and explicit current no-build
             # recovery successes are fresh partial completions. A rejected
             # stale/corrupt module must not reenter via an old LTAR/cache pair.
@@ -784,7 +921,8 @@ def main():
         # Lean 4.33.1 omits the portable flag when reusing arts.ltar?, so -o
         # filters those entries from a platformIndependent map. Supplement only
         # current traces whose LTAR has an identical completed cache copy.
-        if not build_exit_code and tomllib.loads((project / "lakefile.toml").read_text()).get("platformIndependent") is True:
+        if (TOOLCHAIN == "leanprover/lean4:v4.33.1" and not build_exit_code and
+                tomllib.loads((project / "lakefile.toml").read_text()).get("platformIndependent") is True):
             recover_completed_map(project, cache, toolchain, work, mapping_file, base_hashes, mapping, known_mappings)
             mapping = load_map(mapping_file)
         collect_mapped_ltars(project, cache, mapping)
@@ -832,6 +970,16 @@ def main():
             for row in sorted(module_rows):
                 zipped.write((json.dumps(row, separators=(",", ":")) + "\n").encode())
         receipt.update(module_manifest_sha256=sha256(manifest), module_manifest_bytes=manifest.stat().st_size)
+        if args.recover_work:
+            quiesced = verify_quiesced_controller(args.recover_controller_pid)
+            verify_snapshot(args.candidate, head, project)
+            audit = {"schema": 1, "operation": "quiesced interrupted-build recovery",
+                     "identity": provenance, "original_run_id": request["run_id"],
+                     "original_request_sha256": sha256(request_path),
+                     "original_controller_pid": args.recover_controller_pid, "quiesced_processes": quiesced,
+                     "build_exit_code": build_exit_code, "map_sha256": receipt["map_sha256"],
+                     "mapped_modules": len(mapping), "delta_artifacts": len(artifacts)}
+            (work / "handoff-audit.json").write_text(json.dumps(audit, sort_keys=True, indent=2) + "\n")
         (output / "receipt.json").write_text(json.dumps(receipt, sort_keys=True, indent=2) + "\n")
         workspace.checkpoint("staged" if build_exit_code == 0 else "failed", build_exit_code)
         print(json.dumps({"build_exit_code": build_exit_code, "mapped_modules": len(mapping), "delta_artifacts": len(artifacts)}))
