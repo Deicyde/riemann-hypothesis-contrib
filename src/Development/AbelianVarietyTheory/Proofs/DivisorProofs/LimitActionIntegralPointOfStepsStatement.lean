@@ -9,4 +9,4 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MvIsIntMapMa
 open GlobalTheory.IsoTriv
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.limitActionIntegralPoint_of_steps : AddSt → ActSt → ContSt → LimPtSt := by
-  first | exact @GlobalTheory.IsoTriv.limPt_of_steps | exact GlobalTheory.IsoTriv.limPt_of_steps | (intros; apply GlobalTheory.IsoTriv.limPt_of_steps <;> assumption)
+  exact @GlobalTheory.IsoTriv.limPt_of_steps

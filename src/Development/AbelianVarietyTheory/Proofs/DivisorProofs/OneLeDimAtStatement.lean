@@ -12,4 +12,4 @@ open Formalism.MainNotions
 open MeasureTheory Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.IndefR.Mult Formalism.BasicNotions.TH Formalism.L2.Theta
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.one_le_dimAt' : ∀ (D : D7) (i : Fin D.R.m) (τ : D.what₂.Tau), 1 ≤ GlobalTheory.IndefiniteRowSideFullHecke.OneMeasureSizes.dimAt D i τ := by
-  first | exact @GlobalTheory.DimAtOne.one_le_dimAt | exact GlobalTheory.DimAtOne.one_le_dimAt | (intros; apply GlobalTheory.DimAtOne.one_le_dimAt <;> assumption)
+  exact @GlobalTheory.DimAtOne.one_le_dimAt

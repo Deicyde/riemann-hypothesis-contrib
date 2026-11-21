@@ -20,4 +20,4 @@ theorem _root_.GlobalTheory.T.twistedSeries_specialisedUniversalDatum_mem_span :
       ρ.IsDatum i j b s h P → (∀ v ∈ Q, ((normProd s : ℕ) : 𝓞 D.host.E) ∉ v.asIdeal) →
       specSer ρ Y i j b k Q M χ h P ∈
         Submodule.span (ρ.eOk i b k).range (ρ.gens i j b k Q (χ.comp (Y.delU i Q M)) h P) := by
-  first | exact @GlobalTheory.SpecSpan.specSer_mem_span | exact GlobalTheory.SpecSpan.specSer_mem_span | (intros; apply GlobalTheory.SpecSpan.specSer_mem_span <;> assumption)
+  exact @GlobalTheory.SpecSpan.specSer_mem_span

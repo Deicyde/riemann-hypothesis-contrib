@@ -42,4 +42,3 @@ theorem _root_.GlobalTheory.T.flagSpacePullback_eigenDeterminantDivisor_eq_grade
     exact algebraMap_germ h2 _
   · congr 3
     exact Units.ext (gm_val_stalk _ y _ h2 _).symm
-

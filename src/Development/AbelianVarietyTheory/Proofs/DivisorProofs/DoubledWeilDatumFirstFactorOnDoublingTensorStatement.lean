@@ -22,4 +22,4 @@ theorem _root_.GlobalTheory.T.doubledWeilDatum_firstFactor_on_doublingTensor : �
       Formalism.IndefR.Datum.IsThetaFunO ψ S T f₁ → Formalism.IndefR.Datum.IsThetaFunO ψ S T f₂ →
       ωd (GlobalTheory.Doubling.io S (g, 1), 1) (GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero.delta S T f₁ f₂) =
         GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero.delta S T (ω (g, 1) f₁) f₂ := by
-  first | exact @GlobalTheory.Adopt.doubledWeilDatum_firstFactor_on_doublingTensor | exact GlobalTheory.Adopt.doubledWeilDatum_firstFactor_on_doublingTensor | (intros; apply GlobalTheory.Adopt.doubledWeilDatum_firstFactor_on_doublingTensor <;> assumption)
+  exact @GlobalTheory.Adopt.doubledWeilDatum_firstFactor_on_doublingTensor

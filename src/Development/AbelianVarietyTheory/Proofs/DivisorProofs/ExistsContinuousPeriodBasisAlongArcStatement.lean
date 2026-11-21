@@ -132,4 +132,3 @@ theorem _root_.GlobalTheory.T.exists_continuous_period_basis_along_arc : ∀ (E 
       _ ≤ Ch * ‖lamE (sOf w)‖ := mul_le_mul hCu (norm_le_pi_norm _ j) (norm_nonneg _) hCh0
       _ ≤ Ch * (max C' 0 * (D ^ k * w.im ^ k)) := mul_le_mul_of_nonneg_left hlamn hCh0
       _ = Ch * max C' 0 * D ^ k * w.im ^ k := by ring
-

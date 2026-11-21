@@ -26,4 +26,4 @@ open GlobalTheory.Core.Rk.IP (Pair Unram SphFun openOff integrand wcoef rcoef up
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.hermitianWittIndex_eq_zero_definiteBottom : GBig fun {D} T Lc _ G _ _ _ _ => ∀ (W : G.Weil) (i j : Fin D.R.m) (A A' WW : HSp D) (X : Tri T A A' WW),
   IsBottomTri W i j X → ∀ t : T, wittIndex WW = 0 := by
-  first | exact @GlobalTheory.BottomWitt.wittIndex_eq_zero | exact GlobalTheory.BottomWitt.wittIndex_eq_zero | (intros; apply GlobalTheory.BottomWitt.wittIndex_eq_zero <;> assumption)
+  exact @GlobalTheory.BottomWitt.wittIndex_eq_zero

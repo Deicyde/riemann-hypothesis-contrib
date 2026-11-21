@@ -18,4 +18,4 @@ attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT ReciprocityTheory.ChartRestriction.G.DVR
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.exists_semiabelianExtensionModel_above_thetaSetup : ∀ (g n : ℕ) (F : SFam g n (zetaAway n)) (W : Matrix (Fin 8) (Fin 8) ℤ) (Z : Scheme.{0}) (i : F.X ⟶ Z) (X₁ : Setup F W i), ∃ (Y : RatModel X₁.o₁ X₁.Ω₁) (πY : Y.Z ⟶ X₁.M.Z), Cmp.ZHAbove X₁ Y πY := by
-  first | exact @GlobalTheory.Poinc.Sep.Cmp.exists_zhAbove | exact GlobalTheory.Poinc.Sep.Cmp.exists_zhAbove | (intros; apply GlobalTheory.Poinc.Sep.Cmp.exists_zhAbove <;> assumption)
+  exact @GlobalTheory.Poinc.Sep.Cmp.exists_zhAbove

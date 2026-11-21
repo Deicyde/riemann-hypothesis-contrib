@@ -25,4 +25,4 @@ theorem _root_.GlobalTheory.T.standard_pair_second_eq_moved_bottom_datum : ∀ {
         A.rank A' WW X.rA'.β X.rW.β)
       (((splitFacO (GlobalTheory.BotFrames.botAlpha L i j t) (GlobalTheory.BotFrames.botAlpha L i j t / GlobalTheory.BotFrames.botBeta G i j) x' y : Circle)
         : ℂ) • Y.ω' t (g'⁻¹, h⁻¹) (Y.f' t)) := by
-  first | exact @GlobalTheory.BotFrames.isThetaAt_stdSnd_move | exact GlobalTheory.BotFrames.isThetaAt_stdSnd_move | (intros; apply GlobalTheory.BotFrames.isThetaAt_stdSnd_move <;> assumption)
+  exact @GlobalTheory.BotFrames.isThetaAt_stdSnd_move

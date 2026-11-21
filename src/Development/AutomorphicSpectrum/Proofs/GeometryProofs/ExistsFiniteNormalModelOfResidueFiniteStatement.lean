@@ -14,4 +14,4 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.exists_finite_normal_model_of_residue_finite : ∀ (X : Scheme.{0}) (s : X ⟶ Sp ℤ), IsProjOver s → ∀ (Ω : Type) [Field Ω] [CharZero Ω] (ξ : Sp Ω ⟶ X), (Scheme.descResidueField (Scheme.stalkClosedPointTo ξ)).hom.Finite → ∃ (n : ℕ) (x : Fin n → Ω) (M : PModel ℤ x) (π : M.X ⟶ X), Flat.NormalCpt M.ξ ∧ IsFinite π ∧ M.ξ ≫ π = ξ := by
-  first | exact @GlobalTheory.CompanionTheory.Relay.exists_finite_normal_model_of_residue_finite | exact GlobalTheory.CompanionTheory.Relay.exists_finite_normal_model_of_residue_finite | (intros; apply GlobalTheory.CompanionTheory.Relay.exists_finite_normal_model_of_residue_finite <;> assumption)
+  exact @GlobalTheory.CompanionTheory.Relay.exists_finite_normal_model_of_residue_finite

@@ -10,6 +10,8 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.WeilDatumExistence
 public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.AdjointIsotropicDecomposition
 
+@[expose] public section
+
 namespace I195MixedCoordinates_fc0f2fb3767bfc57c3512e89
 
 open Formalism.BasicNotions Formalism.BasicNotions.TH
@@ -26,7 +28,6 @@ public noncomputable abbrev source
 
 end I195MixedCoordinates_fc0f2fb3767bfc57c3512e89
 
-@[expose] public section
 
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
@@ -35,4 +36,4 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.wittMixedModel_unipotent_formulas : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S S₀ T : HSp D) (ρ : ℕ) (d : HypDec S S₀ ρ) (χS χT : (AE D)ˣ →* Circle) (om : Om S T), IsWeilDatumO ψ S T χS χT om → ∀ (μ : Measure (Mx D T.rank ρ)) (𝓕 : Set (Mx D T.rank ρ)), IsCovolOne (ratMx D T.rank ρ) μ 𝓕 → ∀ f, IsThetaFunO ψ S T f → ∀ x : Mx D T.rank ρ, (∀ b, (_root_.I195MixedCoordinates_fc0f2fb3767bfc57c3512e89.source d) T ψ μ 𝓕 (om (d.nB b, 1) f) x = heisO ψ S₀ T (x ⬝ b) ((_root_.I195MixedCoordinates_fc0f2fb3767bfc57c3512e89.source d) T ψ μ 𝓕 (f) x)) ∧ ∀ c, (_root_.I195MixedCoordinates_fc0f2fb3767bfc57c3512e89.source d) T ψ μ 𝓕 (om (d.nC c, 1) f) x = ψ (d.qS T c x) • (_root_.I195MixedCoordinates_fc0f2fb3767bfc57c3512e89.source d) T ψ μ 𝓕 (f) x := by
-  first | exact @GlobalTheory.MixUnip.mixS_unip | exact GlobalTheory.MixUnip.mixS_unip | (intros; apply GlobalTheory.MixUnip.mixS_unip <;> assumption)
+  exact @GlobalTheory.MixUnip.mixS_unip

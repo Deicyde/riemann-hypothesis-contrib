@@ -47,4 +47,3 @@ theorem _root_.GlobalTheory.T.block_central_element_commutes_levi : ∀ (k : Typ
   · have h0 : (y : Matrix (Fin N) (Fin N) k) i l = 0 :=
       GroundTheory.Automorphic.Parabolic.mem_levi.1 hy i l hil
     rw [h0, mul_zero, zero_mul]
-
