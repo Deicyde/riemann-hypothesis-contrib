@@ -32,6 +32,9 @@ ARCHIVES = {
     "arm64": "670adb2f268fe21dcbb58b3db0e0aa9d5b3bddfe2c651481336e561ff86de945",
 }
 DEFAULT_DIRECTORY = Path.home() / ".local/share/riemann-build-runner"
+# Lean maps every imported .olean; Main imports all 175,186 other modules. The Linux default
+# of 65530 fails with "failed to read file" on modules high in the import graph (issue #29).
+MINIMUM_MAX_MAP_COUNT = 1048576
 IDENTITY_FILES = (".runner", ".credentials", ".credentials_rsaparams")
 
 
@@ -46,7 +49,7 @@ def architecture():
 
 def private_file(path):
     """Read a credential without accepting a symlink, another owner, or public bits."""
-    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
     try:
         info = os.fstat(fd)
         if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid()
@@ -81,6 +84,21 @@ def runner_directory(path):
     return path
 
 
+def max_map_count(path=Path("/proc/sys/vm/max_map_count")):
+    try:
+        return int(path.read_text())
+    except (OSError, ValueError):
+        return None
+
+
+def required_commands():
+    commands = {name: shutil.which(name) for name in ("git", "cc", "python3", "bwrap")}
+    # The build workflow prepends this directory before preparing toolchains.
+    search_path = os.pathsep.join((str(Path.home() / ".elan/bin"), os.environ.get("PATH", os.defpath)))
+    commands["elan"] = shutil.which("elan", path=search_path)
+    return commands
+
+
 def doctor(args):
     if sys.platform != "linux":
         raise ValueError("Linux is required")
@@ -91,7 +109,7 @@ def doctor(args):
         "architecture": architecture(),
         "uid": os.getuid(),
         "free_disk_gib": round(shutil.disk_usage(existing).free / 2**30, 1),
-        "commands": {name: shutil.which(name) for name in ("git", "cc", "python3", "bwrap")},
+        "commands": required_commands(),
         "systemd_user": subprocess.run(
             ["systemctl", "--user", "show-environment"], stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL).returncode == 0 if shutil.which("systemctl") else False,
@@ -99,6 +117,8 @@ def doctor(args):
     }
     memory = Path("/proc/meminfo").read_text()
     report["physical_ram_gib"] = round(int(re.search(r"MemTotal:\s+(\d+)", memory)[1]) / 2**20, 1)
+    # Read only: in a container this is the host's value and cannot be raised from inside.
+    report["max_map_count"] = max_map_count()
     if report["commands"]["bwrap"]:
         # This harmless probe checks namespaces/network, not the build harness's mount policy.
         probe = (
@@ -118,7 +138,8 @@ def doctor(args):
     else:
         report["offline_bwrap"] = False
     report["ready"] = (os.getuid() != 0 and all(report["commands"].values()) and report["offline_bwrap"]
-                       and report["free_disk_gib"] >= args.minimum_disk_gib)
+                       and report["free_disk_gib"] >= args.minimum_disk_gib
+                       and (report["max_map_count"] or 0) >= args.minimum_max_map_count)
     print(json.dumps(report, indent=2))
     if not report["ready"]:
         raise ValueError("runner prerequisites failed; no host security settings were changed")
@@ -319,6 +340,13 @@ def systemd_quote(value):
 
 
 def unit(args):
+    resources = []
+    for option, variable in (("jobs", "RH_CI_JOBS"), ("memory_gib", "RH_CI_MEMORY_GIB")):
+        value = getattr(args, option, None)
+        if value is not None:
+            if type(value) is not int or value < 1:
+                raise ValueError("service resource limits must be positive integers")
+            resources.append(f"Environment={variable}={value}\n")
     directory = runner_directory(args.directory)
     # WorkingDirectory is one literal path, unlike ExecStart's word parser.
     # Quoting it makes the quote part of the path and fails validation.
@@ -342,7 +370,7 @@ UMask=0077
 LimitNOFILE=65536
 Nice=10
 Delegate=yes
-
+{''.join(resources)}
 [Install]
 WantedBy=default.target""")
 
@@ -393,6 +421,7 @@ def main():
     check = commands.add_parser("doctor", help="probe prerequisites without changing host settings")
     check.add_argument("--work-directory", type=Path, default=Path.home())
     check.add_argument("--minimum-disk-gib", type=int, default=250)
+    check.add_argument("--minimum-max-map-count", type=int, default=MINIMUM_MAX_MAP_COUNT)
     check.set_defaults(function=doctor)
     download = commands.add_parser("install", help="install checksum-pinned official GitHub runner")
     download.add_argument("--directory", type=Path, default=DEFAULT_DIRECTORY)
@@ -415,6 +444,8 @@ def main():
     adopt.set_defaults(function=adopt_identity)
     service = commands.add_parser("systemd-unit", help="print a persistent user service; does not install/start it")
     service.add_argument("--directory", type=Path, default=DEFAULT_DIRECTORY)
+    service.add_argument("--jobs", type=int, help="number of parallel Lean jobs for this host")
+    service.add_argument("--memory-gib", type=int, help="candidate build memory limit in GiB")
     service.set_defaults(function=unit)
     jit = commands.add_parser("run-jit", help="run one operator-issued JIT job; no automatic replenishment")
     jit.add_argument("--directory", type=Path, default=DEFAULT_DIRECTORY)
