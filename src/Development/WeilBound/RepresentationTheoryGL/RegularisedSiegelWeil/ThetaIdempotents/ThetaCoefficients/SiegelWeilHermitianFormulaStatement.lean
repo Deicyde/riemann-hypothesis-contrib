@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.WeilBound.RepresentationTheoryGL.RegularisedSiegelWeil.ThetaIdempotents.ThetaCoefficients.SiegelWeilHermitianFormula
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ThetaPartD
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsBoundUnitary

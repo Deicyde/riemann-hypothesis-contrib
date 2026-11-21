@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.FourierBesselBasePointRationalWithRationalLeftIn
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.QuasiOfFam
 public import Formalism.LocalToGlobal.IndefiniteReal.OrthogonalComplementCharacterisation

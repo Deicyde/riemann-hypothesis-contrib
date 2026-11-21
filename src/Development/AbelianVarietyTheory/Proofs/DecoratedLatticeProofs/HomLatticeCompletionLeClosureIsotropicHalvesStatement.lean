@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.HomLatticeCompletionLeClosureIsotropicHalves
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.SmallPair
 

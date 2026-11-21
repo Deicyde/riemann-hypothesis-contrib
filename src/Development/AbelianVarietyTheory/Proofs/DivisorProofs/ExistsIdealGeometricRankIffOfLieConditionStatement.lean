@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsIdealGeometricRankIffOfLieCondition
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MatActApply
 

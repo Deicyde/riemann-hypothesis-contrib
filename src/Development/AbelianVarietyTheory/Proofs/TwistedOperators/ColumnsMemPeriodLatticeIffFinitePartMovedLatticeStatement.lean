@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ColumnsMemPeriodLatticeIffFinitePartMovedLattice
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ThetaAtEqProdAhG
 

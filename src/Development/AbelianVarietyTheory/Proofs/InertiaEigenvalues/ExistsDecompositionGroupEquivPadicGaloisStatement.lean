@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsDecompositionGroupEquivPadicGalois
 public import Formalism.GaloisCohomology.LocalTateDualityK
 public import ReciprocityTheory.Hypotheses.GalCohDefs

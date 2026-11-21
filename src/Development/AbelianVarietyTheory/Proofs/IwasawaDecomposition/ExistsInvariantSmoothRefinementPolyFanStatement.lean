@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsInvariantSmoothRefinementPolyFan
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SimpLabMinValOne
 

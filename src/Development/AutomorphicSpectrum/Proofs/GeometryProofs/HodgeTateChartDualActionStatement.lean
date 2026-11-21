@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeTateChartDualAction
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsExtendLin
 

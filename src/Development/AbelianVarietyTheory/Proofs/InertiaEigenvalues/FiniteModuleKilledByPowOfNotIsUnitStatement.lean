@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FiniteModuleKilledByPowOfNotIsUnit
 public import Formalism.SharpRestriction.LevelLetterCocycles.InvariantsGenerators
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.JSmul

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AbsIrrSubOfIsIrrSubMap
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.SplitRep
 

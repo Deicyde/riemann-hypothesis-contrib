@@ -1,7 +1,6 @@
 module
 
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DualCocycleCoboundaryOnStableLineOfOrthogonal
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DvdOfMemIk
 
 @[expose] public section

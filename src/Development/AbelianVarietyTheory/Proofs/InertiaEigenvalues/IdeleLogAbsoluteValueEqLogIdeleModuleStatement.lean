@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IdeleLogAbsoluteValueEqLogIdeleModule
 public import Development.AbelianVarietyTheory.Definitions.Foundations.AbsCharNotUnitary
 public import GroundTheory.GlobalFields.IdeleGroups.IdeleNorms

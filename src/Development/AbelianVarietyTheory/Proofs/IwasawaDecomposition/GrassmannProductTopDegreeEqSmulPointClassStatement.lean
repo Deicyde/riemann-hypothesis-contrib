@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GrassmannProductTopDegreeEqSmulPointClass
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RootToFlag
 

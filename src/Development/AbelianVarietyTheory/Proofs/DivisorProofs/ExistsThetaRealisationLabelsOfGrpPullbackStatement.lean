@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsThetaRealisationLabelsOfGrpPullback
 public import Development.AbelianVarietyTheory.Definitions.Divisors.LamRange
 public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems

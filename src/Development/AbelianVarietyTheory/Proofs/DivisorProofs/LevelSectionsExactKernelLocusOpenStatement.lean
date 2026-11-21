@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelSectionsExactKernelLocusOpen
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsQProjOverCompImmersion
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSemiAbelianImage

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLocallyDirectedOfBasis
 public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.ExistsSchemeOfThickenings
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PreimageUpOpen

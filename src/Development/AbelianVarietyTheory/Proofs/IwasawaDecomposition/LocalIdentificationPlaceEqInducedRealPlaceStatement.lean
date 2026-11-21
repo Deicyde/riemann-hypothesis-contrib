@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LocalIdentificationPlaceEqInducedRealPlace
 public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.TieIwLevTieOf
 public import Formalism.LocalToGlobal.GroupLattices.TiedFamilies.FullTiedCBase

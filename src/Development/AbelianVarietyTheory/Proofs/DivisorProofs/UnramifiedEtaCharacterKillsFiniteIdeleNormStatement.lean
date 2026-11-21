@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnramifiedEtaCharacterKillsFiniteIdeleNorm
 public import Development.AbelianVarietyTheory.Definitions.Divisors.FinitePrimesUnder
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SymmetricPositionLevelCharacterEqOneSingleRow
 public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.FramePositiveSum
 
@@ -35,4 +34,3 @@ theorem _root_.GlobalTheory.T.symmetricPositionLevel_character_eq_one_single_row
   apply Units.ext
   rw [hP.2 g, hs, hu]
   simp
-

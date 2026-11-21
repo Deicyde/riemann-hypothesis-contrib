@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ExistsAdelicHaarCovolumeOne
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.IsCovolOne
 

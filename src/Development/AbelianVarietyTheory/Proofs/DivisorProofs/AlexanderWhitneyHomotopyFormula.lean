@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VerticalNumberZeroOfHorizontal
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasTotalBiChains
 

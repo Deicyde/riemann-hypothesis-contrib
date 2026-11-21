@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SpecialUnitaryEqProdQuasiReflectionPairs
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TruncMemSUAdelic
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ClosureDivMem

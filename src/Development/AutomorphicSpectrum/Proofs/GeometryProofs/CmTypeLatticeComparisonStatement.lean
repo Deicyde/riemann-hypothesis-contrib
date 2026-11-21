@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CmTypeLatticeComparison
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.IsPullWedge
 

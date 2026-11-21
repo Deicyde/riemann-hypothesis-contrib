@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.VertexLatticeCoordsRationalPointMulEqCoordMatrix
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SplitOff
 public import Formalism.LocalToGlobal.InertKernelTheory.DefsInt

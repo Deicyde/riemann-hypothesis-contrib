@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.TheoremOfCubeSectionValue
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SumMulFG
 

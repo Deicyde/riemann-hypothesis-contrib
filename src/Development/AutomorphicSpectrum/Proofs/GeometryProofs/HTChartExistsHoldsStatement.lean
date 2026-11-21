@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HTChartExistsHolds
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.HTChartExists
 

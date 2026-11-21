@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.ExistsChartLiftOfFiniteCover
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.Edge1
 

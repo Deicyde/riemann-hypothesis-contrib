@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Formalism.LogFactorialIndices.StatementSize
 public import Formalism.ThetaSupremumBounds.GaussianShiftBounds.HeightsoundOf
 public import Formalism.ThetaSupremumBounds.GaussianShiftBounds.BlockIntegralOf

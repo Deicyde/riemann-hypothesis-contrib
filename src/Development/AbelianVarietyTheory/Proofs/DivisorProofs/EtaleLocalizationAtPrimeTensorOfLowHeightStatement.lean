@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleLocalizationAtPrimeTensorOfLowHeight
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TorsionFreeOver
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GalMapGalElt

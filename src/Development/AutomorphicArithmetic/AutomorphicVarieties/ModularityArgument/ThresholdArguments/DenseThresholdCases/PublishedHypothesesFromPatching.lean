@@ -25,7 +25,6 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TensorHomCu
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.TensorHomCubes.DedekindSR
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.TensorHomCubes.StabDirectedSystem
 public import Formalism.GaloisCohomology.Statement
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LengthEqLengthInvariantsOfTorsionLevels
 public import Mathlib.RingTheory.Flat.TorsionFree
 public import Mathlib.NumberTheory.Padics.PadicIntegers

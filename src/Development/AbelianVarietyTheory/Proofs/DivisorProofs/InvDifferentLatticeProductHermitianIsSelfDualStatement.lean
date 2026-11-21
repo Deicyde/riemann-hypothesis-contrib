@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InvDifferentLatticeProductHermitianIsSelfDual
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemLsB
 

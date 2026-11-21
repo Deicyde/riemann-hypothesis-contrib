@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.EigenDecompositionExactSequence
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.EigLat
 public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.CmTypeEigenMultiplicityOfDensePrimes

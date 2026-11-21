@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsOpenSubgroupHalfCharactersSeparate
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HalfSymplZeroRight
 

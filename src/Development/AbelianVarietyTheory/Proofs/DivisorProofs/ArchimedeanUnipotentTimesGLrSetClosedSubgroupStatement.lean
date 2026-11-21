@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArchimedeanUnipotentTimesGLrSetClosedSubgroup
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OnMatInfOfIsUnit
 

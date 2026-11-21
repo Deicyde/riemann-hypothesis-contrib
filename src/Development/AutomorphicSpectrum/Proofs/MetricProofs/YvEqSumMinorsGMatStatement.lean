@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.YvEqSumMinorsGMat
 public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ColFlags
 

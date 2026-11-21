@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.InertiaCocycleBlockLengthLeOfQuadraticRelation
 public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LenCob
 public import Formalism.SharpRestriction.LevelLetterCocycles.IdempotentChoiceDepthZero

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HomogeneousFormNonvanishingPoint
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SncChartPoint
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsSncModel

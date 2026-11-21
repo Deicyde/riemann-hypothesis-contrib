@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsConjLevelElemExponentShimura
 public import Development.AbelianVarietyTheory.Definitions.Foundations.EigenOfTwoStep
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Klm

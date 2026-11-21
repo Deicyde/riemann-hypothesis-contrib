@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.MinimalParabolicUnipotentLeviDecomp
 public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ExistsKInfEqMul
 public import Development.WeilBound.ThetaLifts.Reductions.SiegelCore

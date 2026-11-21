@@ -1,7 +1,6 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.StatementOfDegreeAndBound
-public import Mathlib
 public import Formalism.ThetaLogCoordinates.JacobiPathWeights.PathBasisTheorem
 public import Formalism.ThetaLogCoordinates.JacobiPathWeights.JacobiMinorProofs.UnitAndFieldPowerLemmas
 public import Formalism.ThetaLogCoordinates.JacobiPathWeights.CorA3primeB

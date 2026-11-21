@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IteratedDerivativeBoundByPartials
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasTemperateGrowthElim
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ClmSupBound

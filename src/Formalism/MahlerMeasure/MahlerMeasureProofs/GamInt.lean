@@ -1,7 +1,6 @@
 module
 
 public import Formalism.MahlerMeasure.HasOrder
-public import Mathlib
 
 @[expose] public section
 

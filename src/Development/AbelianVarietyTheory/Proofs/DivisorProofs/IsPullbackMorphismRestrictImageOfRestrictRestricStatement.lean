@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsPullbackMorphismRestrictImageOfRestrictRestric
 public import Development.AbelianVarietyTheory.Definitions.Divisors.QuasiCompact
 

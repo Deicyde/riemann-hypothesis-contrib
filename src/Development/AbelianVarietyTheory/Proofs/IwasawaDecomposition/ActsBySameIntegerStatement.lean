@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ActsBySameInteger
 public import Formalism.LocalRingCardinality.DataLevel
 public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Afsplit

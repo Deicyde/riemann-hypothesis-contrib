@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSmulOfTwistedPullbacksSameBundle
 public import Development.AbelianVarietyTheory.Definitions.Divisors.KeyPBIff
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.AbsoluteSiegel

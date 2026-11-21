@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsVectorFieldAffineOpenTransport
 public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.DenseInterior
 

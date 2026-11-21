@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FiniteNormZeroOutsideDenom
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.ThmFlatA
 public import Development.AutomorphicSpectrum.Statements.GeometryStatements.FlatLineGenerator

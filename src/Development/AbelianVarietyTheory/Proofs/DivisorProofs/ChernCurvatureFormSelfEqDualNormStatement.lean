@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChernCurvatureFormSelfEqDualNorm
 public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.HodgePeriodGram
 

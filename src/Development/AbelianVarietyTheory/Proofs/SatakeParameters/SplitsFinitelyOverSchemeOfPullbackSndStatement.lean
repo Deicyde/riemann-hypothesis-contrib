@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SplitsFinitelyOverSchemeOfPullbackSnd
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FibrePointsLEId
 

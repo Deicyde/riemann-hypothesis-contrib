@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FormOffSpecializationRing
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LabelSigBijective
 

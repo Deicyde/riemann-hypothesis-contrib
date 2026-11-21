@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LevelActsTriviallyOnDiscriminantGroup
 public import Formalism.LocalToGlobal.HermitianForms.DefsGH
 public import Formalism.LocalToGlobal.Columns.RecLevelLocT

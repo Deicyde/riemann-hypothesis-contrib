@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.UniformNormAllTowerBound
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GeoRead
 public import Development.AutomorphicSpectrum.PublishedTheorems.Geometry₂.NefRR

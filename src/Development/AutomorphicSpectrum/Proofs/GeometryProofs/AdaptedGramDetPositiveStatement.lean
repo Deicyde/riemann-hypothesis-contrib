@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.AdaptedGramDetPositive
 public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsAdapted
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GramDetNeZeroOfIndep

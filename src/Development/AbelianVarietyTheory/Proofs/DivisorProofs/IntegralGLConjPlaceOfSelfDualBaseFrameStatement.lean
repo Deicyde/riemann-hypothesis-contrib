@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralGLConjPlaceOfSelfDualBaseFrame
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocCO
 public import Development.AbelianVarietyTheory.Definitions.Divisors.BplusOfEquivariant

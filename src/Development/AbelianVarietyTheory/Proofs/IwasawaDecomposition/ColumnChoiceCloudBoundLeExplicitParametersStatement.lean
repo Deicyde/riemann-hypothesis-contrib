@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ColumnChoiceCloudBoundLeExplicit
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SameForm
 public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.TiedColumnData

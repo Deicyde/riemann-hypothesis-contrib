@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PsiValueFractionRingOfPsiCoord
 public import Development.AbelianVarietyTheory.Definitions.Divisors.LabRange
 public import Formalism.LocalToGlobal.ProjectiveLattices.BetaAtSymm

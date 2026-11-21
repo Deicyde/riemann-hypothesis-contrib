@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.PartialReductionEvaluateEntryOfMulLaw
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ChLApply
 

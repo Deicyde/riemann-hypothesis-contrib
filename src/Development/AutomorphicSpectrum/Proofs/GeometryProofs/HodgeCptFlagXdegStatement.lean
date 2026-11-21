@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeCptFlagXdeg
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
 

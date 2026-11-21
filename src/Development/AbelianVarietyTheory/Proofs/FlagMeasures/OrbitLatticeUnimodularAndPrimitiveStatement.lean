@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OrbitLatticeUnimodularAndPrimitive
 public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HbApply
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LubinTateSeriesDeRhamPeriod
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EvalMod
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PeriodQuadFormExtendsHolomorphicPunctPolydisc
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PerValNeZero
 

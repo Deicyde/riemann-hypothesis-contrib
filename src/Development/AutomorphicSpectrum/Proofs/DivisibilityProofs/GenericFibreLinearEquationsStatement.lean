@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.GenericFibreLinearEquations
 public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.IsChainFirst
 public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.IsBlockMapDrop

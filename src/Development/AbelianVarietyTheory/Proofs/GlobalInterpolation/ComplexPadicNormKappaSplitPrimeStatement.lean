@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ComplexPadicNormKappaSplitPrime
 public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.BaseEx
 

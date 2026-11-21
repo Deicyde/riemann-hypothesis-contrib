@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LeftTranslateRightDerivative
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DwCons
 

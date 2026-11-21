@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsMixedSectionJoinBundles
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralRelationUniformisedHomConvolutionExpansiAlt
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TorusHomOfIff

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.CollisionAbsSumBoundOfTwoRowBounds
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.RowsPtAt
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.CollSBound

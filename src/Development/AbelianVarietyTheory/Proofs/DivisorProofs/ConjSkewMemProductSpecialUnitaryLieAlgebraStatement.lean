@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConjSkewMemProductSpecialUnitaryLieAlgebra
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemDomOfOrth
 

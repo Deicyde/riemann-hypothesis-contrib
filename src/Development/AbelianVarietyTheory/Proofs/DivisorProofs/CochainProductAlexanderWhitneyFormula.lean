@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GagaLineGeneratorEmbedding
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CrossTZeroRight
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PullAwChainsBijective

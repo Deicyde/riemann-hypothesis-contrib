@@ -1,7 +1,5 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.ExistsClopenLocusOfAnnihilator
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsQuasiInv
 
 @[expose] public section

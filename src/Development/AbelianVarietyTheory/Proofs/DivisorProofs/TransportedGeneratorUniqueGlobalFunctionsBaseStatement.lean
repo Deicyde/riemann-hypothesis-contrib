@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TransportedGeneratorUniqueGlobalFunctionsBase
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RosVec
 

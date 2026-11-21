@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeInnerProductMapIff
 public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsHodgeLine
 

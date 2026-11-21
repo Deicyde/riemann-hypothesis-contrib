@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralArchimedeanMatricesLeftMulJacobian
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OnMatInfOfIsUnit
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SandCLMInfApply

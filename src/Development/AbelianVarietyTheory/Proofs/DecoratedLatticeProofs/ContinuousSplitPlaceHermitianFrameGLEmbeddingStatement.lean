@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ContinuousSplitPlaceHermitianFrameGLEmbedding
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.IsSumFrame
 

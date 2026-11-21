@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SymmetricDoubleIntegralFiniteCombination
 public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.CosInj
 

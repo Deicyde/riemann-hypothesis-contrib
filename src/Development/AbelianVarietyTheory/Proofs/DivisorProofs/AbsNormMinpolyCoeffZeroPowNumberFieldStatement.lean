@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbsNormMinpolyCoeffZeroPowNumberField
 public import Development.AbelianVarietyTheory.Definitions.Divisors.FinitePrimesUnder
 public import Formalism.PairingDivisors.StatementH

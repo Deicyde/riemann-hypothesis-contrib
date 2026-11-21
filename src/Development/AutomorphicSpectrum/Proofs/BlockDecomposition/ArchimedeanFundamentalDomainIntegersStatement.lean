@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ArchimedeanFundamentalDomainIntegers
 public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CosetOff
 

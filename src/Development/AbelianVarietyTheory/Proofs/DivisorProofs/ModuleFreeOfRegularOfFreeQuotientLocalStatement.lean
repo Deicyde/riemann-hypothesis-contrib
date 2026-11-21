@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ModuleFreeOfRegularOfFreeQuotientLocal
 public import ReciprocityTheory.CommutativeAlgebra.CohenMacaulay.ModDepthGE
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PurityFree

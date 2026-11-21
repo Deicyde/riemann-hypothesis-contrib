@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.DoubleStepValueEqTrilinearTensorValue
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.MemTranslate
 

@@ -2,7 +2,6 @@ module
 
 public import Formalism.SharpRestriction.GrowthBounds.SegmentDegree.GoodPathWeightOfParts
 public import Formalism.SharpRestriction.GrowthBounds.SegmentDegree.ReflectionMemGlevCastSucc
-public import Mathlib
 
 @[expose] public section
 

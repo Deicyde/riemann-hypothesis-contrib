@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RankSchwartzBruhatAdicCompletionPiLeAleph0
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsRtensOp
 

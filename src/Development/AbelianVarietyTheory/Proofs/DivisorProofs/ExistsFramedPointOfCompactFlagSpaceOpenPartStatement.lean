@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsFramedPointOfCompactFlagSpaceOpenPart
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PhiAt
 

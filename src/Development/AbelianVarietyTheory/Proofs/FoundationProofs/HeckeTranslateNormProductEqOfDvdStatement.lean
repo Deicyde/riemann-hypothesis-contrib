@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HeckeTranslateNormProductEqOfDvd
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DiagMod
 

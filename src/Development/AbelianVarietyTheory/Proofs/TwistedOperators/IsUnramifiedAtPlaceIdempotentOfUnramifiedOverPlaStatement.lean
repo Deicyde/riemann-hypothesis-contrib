@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsUnramifiedAtPlaceIdempotentOfUnramifiedOverPla
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsIsGridFr
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SquareStanding

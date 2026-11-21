@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsHarishChandraParamGridColumnRealParameter
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.NodeAgree
 public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.NormalFam

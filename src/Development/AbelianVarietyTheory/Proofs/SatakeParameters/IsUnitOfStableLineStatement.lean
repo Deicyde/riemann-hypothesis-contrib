@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsUnitOfStableLine
 public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LMulBeta
 

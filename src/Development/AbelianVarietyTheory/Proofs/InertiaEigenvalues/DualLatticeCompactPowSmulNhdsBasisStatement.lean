@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DualLatticeCompactPowSmulNhdsBasis
 public import Formalism.WachLatticeTwists.LatticeDualFibres.FibreDualStable
 public import Formalism.GaloisCohomology.LocalTateDualityK

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCoordinateModelOfAlgWeight
 public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InfOfNodupAlg
 

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsClosedFibreChartPointMumfordMultiplierNonz
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NonzeroAt
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ChartExpOn

@@ -1,6 +1,5 @@
 module
 
-public import Mathlib
 public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.PadicEmbeddingsConjugateOfUnits
 public import Development.AutomorphicSpectrum.Definitions.AdelicLattices.FactPrimes
 
