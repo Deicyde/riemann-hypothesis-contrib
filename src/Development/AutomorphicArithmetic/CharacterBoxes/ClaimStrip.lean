@@ -11,30 +11,22 @@ namespace Claim
 theorem factor_ne_zero {M : ℕ} (ψ : DirichletCharacter ℂ M) {s : ℂ} (hs : 0 < s.re) (p : ℕ)
     (hp : p.Prime) : (1 : ℂ) - ψ p * (p : ℂ) ^ (-s) ≠ 0 := by
   intro h
-  have h1 : ψ p * (p : ℂ) ^ (-s) = 1 := by linear_combination -h
-  have hp1 : (1 : ℝ) < p := by exact_mod_cast hp.one_lt
-  have hpow : ‖(p : ℂ) ^ (-s)‖ < 1 := by
-    rw [Complex.norm_natCast_cpow_of_pos hp.pos, Complex.neg_re]
-    exact Real.rpow_lt_one_of_one_lt_of_neg hp1 (by linarith)
-  have hn : ‖ψ p * (p : ℂ) ^ (-s)‖ < 1 := by
-    rw [norm_mul]
-    calc ‖ψ p‖ * ‖(p : ℂ) ^ (-s)‖ ≤ 1 * ‖(p : ℂ) ^ (-s)‖ := by
-          gcongr; exact ψ.norm_le_one _
-      _ < 1 := by rw [one_mul]; exact hpow
-  rw [h1, norm_one] at hn
-  exact lt_irrefl _ hn
+  have hlt : ‖ψ p * (p : ℂ) ^ (-s)‖ < 1 := by
+    calc ‖ψ p * (p : ℂ) ^ (-s)‖ = ‖ψ p‖ * (p : ℝ) ^ (-s.re) := by
+          rw [norm_mul, Complex.norm_natCast_cpow_of_pos hp.pos, Complex.neg_re]
+      _ ≤ (p : ℝ) ^ (-s.re) := mul_le_of_le_one_left (by positivity) (ψ.norm_le_one p)
+      _ < 1 := Real.rpow_lt_one_of_one_lt_of_neg (by exact_mod_cast hp.one_lt) (by linarith)
+  exact hlt.ne (by rw [← sub_eq_zero.mp h, norm_one])
 
 theorem prim_zero {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) [NeZero χ.conductor] {s : ℂ}
     (hs0 : 0 < s.re) (hs1 : s.re < 1) (h : DirichletCharacter.LFunction χ s = 0) :
     DirichletCharacter.LFunction χ.primitiveCharacter s = 0 := by
-  have hs : s ≠ 1 := fun e => by rw [e, Complex.one_re] at hs1; exact lt_irrefl _ hs1
+  have hs : s ≠ 1 := by rintro rfl; norm_num at hs1
   have key := DirichletCharacter.LFunction_changeLevel χ.conductor_dvd_level
     χ.primitiveCharacter (Or.inr hs)
   rw [χ.changeLevel_primitiveCharacter, h] at key
-  rcases mul_eq_zero.mp key.symm with h' | h'
-  · exact h'
-  · obtain ⟨p, hp, hp0⟩ := Finset.prod_eq_zero_iff.mp h'
-    exact absurd hp0 (factor_ne_zero _ hs0 p (Nat.prime_of_mem_primeFactors hp))
+  exact (mul_eq_zero.mp key.symm).resolve_right <| Finset.prod_ne_zero_iff.mpr fun p hp =>
+    factor_ne_zero _ hs0 p (Nat.prime_of_mem_primeFactors hp)
 
 theorem gamma_ne_zero {M : ℕ} [NeZero M] (φ : DirichletCharacter ℂ M) {t : ℂ} (ht : 0 < t.re) :
     DirichletCharacter.gammaFactor φ t ≠ 0 := by
