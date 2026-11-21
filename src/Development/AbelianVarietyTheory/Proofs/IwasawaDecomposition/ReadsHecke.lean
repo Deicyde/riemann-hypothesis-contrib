@@ -5,6 +5,7 @@ import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.GoodSetupCo
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValuationPowSubPowLt
 import Formalism.LocalToGlobal.NormalizedHeckeFactors.RingHomOfBaseOrderToFraction
 import Formalism.SharpRestriction.CuspSpanNormBounds.BesselShellMomentBounds
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.hcharSub (+1 more)
 
 noncomputable section
 

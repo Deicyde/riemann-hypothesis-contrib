@@ -1,6 +1,7 @@
 import BuildAid.Leniency.Open
 import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.ScalarMap
 import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.DiagonalizeThreeByThree
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.CrystallineOrdinaryIdeals.Imports -- for `export` of UpperTheory.V.Loc.Dat3.On
 open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.Published IsLocalRing Polynomial
 
 namespace UpperTheory.V.Loc

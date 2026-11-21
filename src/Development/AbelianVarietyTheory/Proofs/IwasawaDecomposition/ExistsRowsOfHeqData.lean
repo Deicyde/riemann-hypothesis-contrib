@@ -6,6 +6,7 @@ import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ThetaC
 import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.DivRows3GIff
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsSelfDualLatticeNormOneIdealRankOne
 import Formalism.LocalToGlobal.IndefiniteReal.HeckeNonvanishing.Imports
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Fields (+5 more)
 
 noncomputable section
 

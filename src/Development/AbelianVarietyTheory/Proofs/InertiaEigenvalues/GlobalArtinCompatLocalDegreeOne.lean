@@ -12,6 +12,7 @@ import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ProdIdeleChara
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormTotallyPositiveOfTotallyPositiveNeZeroStatement
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ArtinTransportAlgClosureEquivStatement
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UnitsAdicCompletionHomExtOfIsOpenKerStatement
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Neutral.B1.Ideles
 
 noncomputable section
 

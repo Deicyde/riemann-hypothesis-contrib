@@ -1,6 +1,7 @@
 import BuildAid.Leniency.Open
 import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.EvalFrameOrd
 import ReciprocityTheory.NeutralLocalFields.Reciprocity
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Neutral.B1.Ideles
 open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.LatVal Neutral.B1
 open scoped nonZeroDivisors
 

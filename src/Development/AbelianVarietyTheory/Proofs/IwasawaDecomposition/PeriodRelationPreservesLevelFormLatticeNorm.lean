@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ReadPk
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsEquivFormsTie
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ExistsUniqueIsCrd
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Fields (+4 more)
 open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain Formalism.L2.DIV Formalism.L2.Rows
 open scoped TensorProduct InnerProductSpace ComplexOrder
 open GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw

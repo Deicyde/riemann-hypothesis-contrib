@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TprodMemTensSpan
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Eab, Formalism.BasicNotions.TH.IsKC (+7 more)
 open scoped TensorProduct
 
 noncomputable section

@@ -2,6 +2,7 @@ import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CrystallineClassMemHodgeFiltrationOfCechRepZero
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ClsLinCombSingle
+import Development.AbelianVarietyTheory.Definitions.Degenerations.PullChartIsLB -- for `export` of ReciprocityTheory.ChartRestriction.G.Geo.Tor.valR
 
 set_option autoImplicit false
 

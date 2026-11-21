@@ -13,6 +13,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsEquiva
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GreenSeriesIdempotentEqClassFunctionIdempotentStatement
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ThetaIoExtensionOfWeakCharacterisationFramesStatement
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OneFormMapRowThreeLevelOfCharacterisation
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Fields.Ok, Formalism.L2.Col.Primes.vGs
 
 noncomputable section
 

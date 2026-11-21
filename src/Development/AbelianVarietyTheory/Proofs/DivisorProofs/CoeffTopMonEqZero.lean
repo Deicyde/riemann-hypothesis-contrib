@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HasArcDataIff
 import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.EvalFrameOrd
 import Mathlib.RingTheory.MvPolynomial.IrreducibleQuadratic
+import Development.AbelianVarietyTheory.Definitions.Degenerations.PullChartIsLB -- for `export` of ReciprocityTheory.ChartRestriction.G.Geo.Tor.valR
 
 noncomputable section
 

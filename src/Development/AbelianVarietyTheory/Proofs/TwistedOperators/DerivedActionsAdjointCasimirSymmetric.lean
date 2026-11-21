@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SameBlockOfPosC
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Eab, Formalism.BasicNotions.TH.GrpData (+6 more)
 
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible
 

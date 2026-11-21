@@ -2,6 +2,7 @@ import BuildAid.Leniency.Example
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.FlagMeasures.GelfValTwoEqCvalR
 import Formalism.LocalRingCardinality.DataTheta
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.rhoSq
 
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible Formalism.L2.Theta Matrix GlobalTheory.RealPar GlobalTheory.CoverDS
 open GlobalTheory.IndefiniteRowSideFullHecke.IsotypicSignedParameters (SignedPar IsDSPar)

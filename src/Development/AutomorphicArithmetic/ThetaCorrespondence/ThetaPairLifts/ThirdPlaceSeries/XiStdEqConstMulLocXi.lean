@@ -4,6 +4,7 @@ import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.XiStdEqCon
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.FamilyConstants
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.QuadraticExtensionData
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.EmbeddingAtLocalFactor
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Primes.vGs, Formalism.L2.Col.Primes.vT
 
 set_option synthInstance.maxHeartbeats 200000
 

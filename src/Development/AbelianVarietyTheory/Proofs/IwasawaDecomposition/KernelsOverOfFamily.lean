@@ -11,6 +11,7 @@ import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.KAtTopEquiv
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.KmapOfOkOfVecP
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ChThOkOfColIn
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IntAtOfLocTop
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Chars.Ok (+9 more)
 
 noncomputable section
 

@@ -1,6 +1,7 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.DenseInterior
 import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.EvalFrameOrd
+import Development.AbelianVarietyTheory.Definitions.Degenerations.PullChartIsLB -- for `export` of ReciprocityTheory.ChartRestriction.G.Geo.Tor.valR
 open AlgebraicGeometry CategoryTheory Limits NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LogKS Formalism.L2.Pj
 

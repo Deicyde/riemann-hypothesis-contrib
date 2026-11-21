@@ -14,6 +14,7 @@ import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ThetaModelTors
 import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsLabelOfPowEqOneStatement
 import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ModelPointExtendsTorsionPointMulStatement
 import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ClosureEqKerOfMeetsTorsionCosetsStatement
+import Development.AbelianVarietyTheory.Definitions.Degenerations.PullChartIsLB -- for `export` of ReciprocityTheory.ChartRestriction.G.Geo.Tor.valR
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj

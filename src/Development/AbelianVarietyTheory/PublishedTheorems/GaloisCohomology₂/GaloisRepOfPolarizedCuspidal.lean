@@ -5,6 +5,7 @@ import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.Finite
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.LocalLanglandsGL
 import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.TrivialOnInertiaOfUnr
 import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.ContinuousAdeleNorm
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.hcharSub (+1 more)
 
 noncomputable section
 

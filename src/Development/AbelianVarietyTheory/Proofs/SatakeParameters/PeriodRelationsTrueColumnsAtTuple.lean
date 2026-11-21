@@ -8,6 +8,7 @@ import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ChainCompatibleT
 import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.HostFieldsPrimesTies
 import Formalism.LocalToGlobal.Divisibility.DivisibilityProofs.NumbersP
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.StdLvPr
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Fields (+3 more)
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.AtG
 
 open Formalism.L2.Col GlobalTheory.ColPeriodCompare

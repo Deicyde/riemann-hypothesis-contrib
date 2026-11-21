@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.TorusWeightVectorIffCartanWeightVector
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.FiniteDimKStableSubspaceKFiniteLie
 import Mathlib.Analysis.Real.Pi.Irrational
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Eab, Formalism.BasicNotions.TH.GKMod (+5 more)
 
 open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.MatrixMinorProducts MeasureTheory
 open Formalism.MainNotions.SchurIrreducible (IrrU IrrGK IsHCMod)

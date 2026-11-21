@@ -2,6 +2,7 @@ import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NonzeroPlacesOverPrimes
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.StepColWPinned
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Fields.Ok, Formalism.L2.Col.Primes.vGs
 
 noncomputable section
 

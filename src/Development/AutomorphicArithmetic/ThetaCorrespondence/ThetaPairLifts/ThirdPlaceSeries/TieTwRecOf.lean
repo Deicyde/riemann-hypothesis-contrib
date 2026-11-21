@@ -4,6 +4,7 @@ import Formalism.LocalToGlobal.TieTwRecOf
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.IndefRRealRec
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.IndefiniteRealisationChoice
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.IndefRRealTB
+import Development.AbelianVarietyTheory.Definitions.Divisors.TupleReadBaseTupleEqFamily -- for `export` of Formalism.IndefR.phEff
 
 set_option synthInstance.maxHeartbeats 200000
 

@@ -6,6 +6,7 @@ import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.C
 import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.ChartGraded
 import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.ChartSpan
 import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.CoSqz
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.CrystallineOrdinaryIdeals.Imports -- for `export` of UpperTheory.V.Loc.Dat3.It
 open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.Published IsLocalRing Polynomial
 
 private theorem count_weights_eq_local_dims (w : Fin 12 → ℤ) (h : ∀ j, Nat.card {i // w i = j} ≤ locDims j) (j : ℤ) :

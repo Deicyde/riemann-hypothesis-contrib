@@ -2,6 +2,7 @@ import BuildAid.Leniency.Open
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ProdFactorialSupportSubSingle
 import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.CommuteRowOpRightMixedOp
 import Formalism.LocalRingCardinality.DataTheta
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Eab, Formalism.BasicNotions.TH.IsKC (+2 more)
 
 noncomputable section
 

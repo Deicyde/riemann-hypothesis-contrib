@@ -2,6 +2,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.InstSecondCountable
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.BlockOrdFinSumFinEquiv
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ModularCharacterEqOneOnExpHermitian
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GrpData
 
 open Formalism.BasicNotions Formalism.BasicNotions.TH GlobalTheory.HolDS Matrix MeasureTheory Filter Topology
 open scoped InnerProductSpace

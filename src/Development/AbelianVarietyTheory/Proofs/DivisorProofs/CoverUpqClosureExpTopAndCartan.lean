@@ -2,6 +2,7 @@ import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.NotTrivialAndTwist
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactExponentialSurjective
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GrpData, Formalism.BasicNotions.TH.IsKC (+6 more)
 
 noncomputable section
 

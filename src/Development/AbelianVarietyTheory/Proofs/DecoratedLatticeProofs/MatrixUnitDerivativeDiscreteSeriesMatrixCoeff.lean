@@ -1,6 +1,7 @@
 import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsBlockOrd
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.DSRep, Formalism.BasicNotions.TH.Eab (+4 more)
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible Formalism.L2.Theta Matrix GlobalTheory.RealPar GlobalTheory.CoverDS
 open GlobalTheory.IndefiniteRowSideFullHecke.IsotypicSignedParameters (SignedPar IsDSPar)
 open Formalism.MainNotions.S (IsURepOn IsIrredOn IsKFin IsKStableOn IsWtOn IsKTypeOf IsDS IsSqIntOn UJset)

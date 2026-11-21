@@ -9,6 +9,7 @@ import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.DecoratedLatt
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.XiEntryInvariant
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.FirstCoupledKernelEquivariantCosets
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.KAtTopEquiv
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Wts.lamTrue
 
 noncomputable section
 

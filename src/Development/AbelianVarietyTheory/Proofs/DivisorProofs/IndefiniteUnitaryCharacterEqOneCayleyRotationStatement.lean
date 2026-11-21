@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IndefiniteUnitaryCharacterEqOneCayleyRotation
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Ix, Formalism.BasicNotions.TH.Jm (+1 more)
 open scoped Matrix
 open Formalism.BasicNotions.TH
 set_option maxHeartbeats 1000000 in

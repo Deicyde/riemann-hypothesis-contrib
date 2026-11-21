@@ -7,6 +7,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsUnrami
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HeckeCharFiniteOrderOfTrivialAtInfinity
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ResFinEqOneOfAway
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsSplitPlOfTwoMem
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.HChar.UnrAt (+1 more)
 open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory IsDedekindDomain NumberField
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Pj Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.FWT
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilGramSignature

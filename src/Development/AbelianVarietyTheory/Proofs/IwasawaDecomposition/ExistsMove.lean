@@ -5,6 +5,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RingSpecNorm
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ChoiceOfLocalAdmissible
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsGeoExtN
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RealMoveOfLink
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Primes.vGs
 
 noncomputable section
 

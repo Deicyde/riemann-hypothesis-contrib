@@ -3,6 +3,7 @@ import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument
 import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.CrystallineOrdinaryIdeals.OrdinaryComponentUniquePrimeDimThirteenNearBaseStatement
 import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.CrystallineOrdinaryIdeals.ReducedOrdinaryIdealLeKerOfConjOfSaturatingNeZerStatement
 import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebra.CoEvLow
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.CrystallineOrdinaryIdeals.Imports -- for `export` of UpperTheory.V.Loc.Dat3.On
 open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
 
 namespace GlobalTheory.OrdLoc.RootConjugation

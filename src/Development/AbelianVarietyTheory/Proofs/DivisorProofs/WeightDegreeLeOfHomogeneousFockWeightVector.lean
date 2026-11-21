@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PderivEqZeroOfColOp
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Ix, Formalism.BasicNotions.TH.Ln (+8 more)
 
 noncomputable section
 

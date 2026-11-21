@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.CasimirNumberIdentityDualPair
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.HypA, Formalism.BasicNotions.TH.lamA (+4 more)
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.casimir_number_identity_dualPair : ∀ (t : ℕ) (al be ga de : List ℚ), HypA t al be ga de → normSq (lamA' t al be ga de) - rhoSq (al.length + be.length + ga.length + de.length + t) = normSq (lamA al be ga de) - rhoSq (al.length + be.length + ga.length + de.length) - ((al.length + be.length + ga.length + de.length : ℕ) : ℚ) * ((al.length + be.length + ga.length + de.length + t : ℕ) : ℚ) * (t : ℚ) / 4 ∧ normSq (lamM' t al be ga de) = normSq (lamA' t al be ga de) := by

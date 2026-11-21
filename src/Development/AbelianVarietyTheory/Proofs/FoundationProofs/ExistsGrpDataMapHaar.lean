@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.NotTrivialAndTwist
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.BlockOrderedSquareIntegrable
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.HaarUpqEqOfOmegaDensity
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GrpData, Formalism.BasicNotions.TH.Ix (+3 more)
 
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta MeasureTheory Matrix
 open scoped NNReal

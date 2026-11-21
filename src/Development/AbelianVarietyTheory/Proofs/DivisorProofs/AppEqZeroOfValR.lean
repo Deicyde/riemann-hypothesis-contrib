@@ -7,6 +7,7 @@ import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsConstKOfIsPu
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsIsoOfIdModEpsThickening
 import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.DenseInterior
 import Formalism.LocalToGlobal.ProjectiveLattices.IntAllProof
+import Development.AbelianVarietyTheory.Definitions.Degenerations.PullChartIsLB -- for `export` of ReciprocityTheory.ChartRestriction.G.Geo.Tor.valR
 
 set_option autoImplicit false
 

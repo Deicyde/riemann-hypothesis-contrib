@@ -17,6 +17,7 @@ import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.UnitsAdicCompl
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsWeilOfFixesStatement
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.LocalEmbeddingWeilActionFiniteExtensionStatement
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.CompletionEmbeddingCompatibleClosuresStatement
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Neutral.B1.Ideles
 
 noncomputable section
 

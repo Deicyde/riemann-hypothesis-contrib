@@ -5,6 +5,7 @@ import Development.AbelianVarietyTheory.Definitions.Foundations.AbsCharNotUnitar
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitRealOfCongrOneStatement
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ProdArgRealUnitEqOneStatement
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CmAlgCharEqArgMulAbsStatement
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.HChar.UnrAt
 
 noncomputable section
 

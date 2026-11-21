@@ -8,6 +8,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HeckeCharFin
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FiniteChars
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.HasExponentZeroIff
 import GroundTheory.GlobalFields.CompletionAtPlace.Integers
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Neutral.B1.Ideles
 
 noncomputable section
 

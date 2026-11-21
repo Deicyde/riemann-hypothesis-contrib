@@ -5,6 +5,7 @@ import Development.AbelianVarietyTheory.Proofs.SatakeParameters.AlternatingWordH
 import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpowers.CommutingEndomorphismCondition
 import Development.AbelianVarietyTheory.Proofs.SatakeParameters.FrobGIsArithFrobAndSign
 import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsNeZeroMemJumpTypeTwo
+import Formalism.SharpRestriction.LevelLetterCocycles.WachCoordinates -- for `export` of Formalism.MainNotions.TruncatedSeriesCountingBounds.Clusters, Formalism.MainNotions.TruncatedSeriesCountingBounds.Thick
 
 noncomputable section
 

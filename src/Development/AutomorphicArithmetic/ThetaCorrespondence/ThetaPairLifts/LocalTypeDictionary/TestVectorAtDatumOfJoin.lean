@@ -6,6 +6,7 @@ import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.Loca
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.LocalTypeDictionary.ThetaLiftExtensionFieldExists
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.AtDatRowTestOfExField
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.InjKOfSeparatesLinB
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Fields.Ok, Formalism.L2.Col.Primes.vGs
 
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH NumberField IsDedekindDomain Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links

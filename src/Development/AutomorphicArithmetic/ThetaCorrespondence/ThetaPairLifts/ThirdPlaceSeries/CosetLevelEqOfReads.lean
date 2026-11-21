@@ -6,6 +6,7 @@ import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.Thir
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.NotTopPtOne
 import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.CommuteOfOff
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.StepLevelLocalGroupEqOfAgreeOffPlaces
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Primes.vGs, Formalism.L2.Col.Primes.vT
 
 set_option synthInstance.maxHeartbeats 200000
 

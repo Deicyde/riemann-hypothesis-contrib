@@ -8,6 +8,7 @@ import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries.HeckeT
 import Development.AbelianVarietyTheory.Definitions.Divisors.RealisedChainTorusEq
 import Development.AbelianVarietyTheory.Definitions.HeightFunctions.NormComparisonConstants
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ClsAt
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.hcharSub, Neutral.B1.Ideles
 
 set_option autoImplicit false
 

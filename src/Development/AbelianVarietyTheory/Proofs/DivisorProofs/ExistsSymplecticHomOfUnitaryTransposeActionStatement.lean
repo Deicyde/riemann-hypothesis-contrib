@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSymplecticHomOfUnitaryTransposeAction
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Ix, Formalism.BasicNotions.TH.Jm (+2 more)
 open scoped TensorProduct Matrix
 open MeasureTheory Formalism.BasicNotions.TH GlobalTheory.RealLift GlobalTheory.RealWeil
 open GlobalTheory.HoweD

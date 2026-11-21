@@ -4,6 +4,7 @@ import Formalism.LocalToGlobal.NumberFieldFamilies.EvRowSurjective
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsAbsIrrCharCompIff
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EvaluationDatumOkBaseTuple
 import Formalism.LocalToGlobal.Divisibility.RecBridgeTied
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Fields, Formalism.L2.Col.Fields.Ok (+1 more)
 
 noncomputable section
 

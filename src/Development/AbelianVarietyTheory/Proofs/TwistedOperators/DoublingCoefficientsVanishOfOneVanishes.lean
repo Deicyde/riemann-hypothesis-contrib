@@ -2,6 +2,7 @@ import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EqOneOfSmulHaarEq
 import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GrpData, Formalism.BasicNotions.TH.URep
 
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible MeasureTheory
 

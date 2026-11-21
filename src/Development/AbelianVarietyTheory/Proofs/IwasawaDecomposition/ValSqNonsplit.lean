@@ -4,6 +4,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnramifiedHe
 import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
 import Formalism.LocalToGlobal.NormalizedHeckeFactors.RingSpecSidedEmbeddingFixedField
 import Formalism.LocalToGlobal.UnitaryNorms.CharGal
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.HChar.UnrAt (+3 more)
 
 noncomputable section
 

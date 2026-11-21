@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Formalism.LocalToGlobal.ProjectiveLattices.IsChartIff
 import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.EvalFrameOrd
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HasArcDataIff
+import Development.AbelianVarietyTheory.Definitions.Degenerations.PullChartIsLB -- for `export` of ReciprocityTheory.ChartRestriction.G.Geo.Tor.valR
 
 set_option autoImplicit false
 

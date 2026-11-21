@@ -1,6 +1,7 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.Divisors.HasDefect
 import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.MemRangeCompIffOfIsClosedImmersion
+import Development.AbelianVarietyTheory.Definitions.Degenerations.PullChartIsLB -- for `export` of ReciprocityTheory.ChartRestriction.G.Geo.Tor.valR
 
 set_option autoImplicit false
 

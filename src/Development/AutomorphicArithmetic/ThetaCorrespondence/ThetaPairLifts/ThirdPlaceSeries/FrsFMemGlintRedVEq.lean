@@ -1,6 +1,7 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.TrueGeometryFiniteFamily
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.XiStdEqConstMulLocXi
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Primes.vGs, Formalism.L2.Col.Primes.vT
 
 set_option synthInstance.maxHeartbeats 200000
 

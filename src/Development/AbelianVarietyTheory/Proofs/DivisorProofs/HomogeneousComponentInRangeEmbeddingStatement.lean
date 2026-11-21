@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HomogeneousComponentInRangeEmbedding
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Ix, Formalism.BasicNotions.TH.Pol
 open MvPolynomial Formalism.BasicNotions.TH GlobalTheory.CharPair
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.homogeneous_component_in_range_embedding : ∀ (P Q R : ℕ) (h : P ≤ R) (k : ℕ) (G : Mdl P Q) (n : ℕ), homogeneousComponent n (embR P Q R h k G) ∈ LinearMap.range (embR P Q R h k) := by

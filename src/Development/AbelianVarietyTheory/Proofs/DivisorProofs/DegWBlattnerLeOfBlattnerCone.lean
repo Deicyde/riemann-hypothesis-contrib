@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.Foundations.IsFockIPOfFockData
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GKMod, Formalism.BasicNotions.TH.IsHW (+4 more)
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg MvPolynomial
 
 namespace GlobalTheory.FlowLemma

@@ -7,6 +7,7 @@ import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsIsHeckeD
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HeckeCharacterValueAtSplitPlaceDeterminant
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LinearIndependentRowsMap
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SplitOffOutsideS0
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar.val
 
 set_option autoImplicit false
 

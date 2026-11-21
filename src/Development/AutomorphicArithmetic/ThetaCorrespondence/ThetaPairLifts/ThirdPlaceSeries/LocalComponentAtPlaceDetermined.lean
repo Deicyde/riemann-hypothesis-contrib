@@ -5,6 +5,7 @@ import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.Thir
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.ExistsLocalTupleAtPlace
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.LocalConjExpansionAtPlace
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ChoiceSideTwistedConsistent
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Primes.vGs
 
 set_option synthInstance.maxHeartbeats 200000
 

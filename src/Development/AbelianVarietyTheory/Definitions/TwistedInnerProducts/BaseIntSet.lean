@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.RationalRayLevels
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsInertTop
 import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.CompIntField
+import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsLevDatHalfLatInd -- for `export` of GlobalTheory.TowerCov.AdaptL, GlobalTheory.TowerCov.IsCompFn (+1 more)
 
 open NumberField Matrix Complex IsDedekindDomain
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.AdTh GlobalTheory.ClsVal

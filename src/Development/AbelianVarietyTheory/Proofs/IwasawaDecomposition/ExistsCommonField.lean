@@ -7,6 +7,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.AlgebraicHec
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCharactersPrescribedValuesStatement
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.DefiniteBaseDataAdmissibleStatement
 import Development.AutomorphicArithmetic.FrobeniusLocalisation.MuProdtameeqone
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Chars.Ok (+8 more)
 
 open UpperTheory.HF
 

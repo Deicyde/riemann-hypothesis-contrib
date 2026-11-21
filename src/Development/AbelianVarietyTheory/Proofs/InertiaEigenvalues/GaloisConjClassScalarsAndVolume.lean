@@ -4,6 +4,7 @@ import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ConjugateTuple
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsNumerator
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HeckeCharOnIdMulSqrtAbsNormInvMemSubring
 import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.NotIsOfFinOrderUnitQuot
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.HChar.val
 
 set_option autoImplicit false
 

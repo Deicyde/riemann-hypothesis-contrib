@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.IqBasic
 import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.FrobDense
 import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.IsInertiaInfiniteCyclotomic
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.CrystallineOrdinaryIdeals.Imports -- for `export` of UpperTheory.V.Loc.Dat3.IsFr, UpperTheory.V.Loc.Dat3.fr
 
 open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
 

@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AutomorphicArithmetic.ResidueCharacters.TwistedPlaces
 import Formalism.SharpRestriction.LevelLetterCocycles.CrystallineMapLemmas
 import Formalism.SharpRestriction.LevelLetterCocycles.DecompositionData
+import Formalism.SharpRestriction.LevelLetterCocycles.WachCoordinates -- for `export` of Formalism.MainNotions.TruncatedSeriesCountingBounds.Clusters, Formalism.MainNotions.TruncatedSeriesCountingBounds.ColLeR (+1 more)
 
 noncomputable section
 

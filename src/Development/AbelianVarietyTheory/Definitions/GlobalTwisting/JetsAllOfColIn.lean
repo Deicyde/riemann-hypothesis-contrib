@@ -9,6 +9,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.OrdSubConjEq
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValPowClassNumber
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.NormOneDetIdealTransportedLattice
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.PredMemGamRanks
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars.Tied, Formalism.L2.Col.Dat (+1 more)
 
 noncomputable section
 

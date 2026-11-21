@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Formalism.LocalRingCardinality.DataTheta
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.DSRep, Formalism.BasicNotions.TH.GrpData
 
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg MvPolynomial MeasureTheory
 

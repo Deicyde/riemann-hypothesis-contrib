@@ -2,6 +2,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.RealMetaplecticRepresentation
 import Formalism.LocalRingCardinality.DataTheta
 import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Upqcpt
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Ix, Formalism.BasicNotions.TH.Jm (+2 more)
 open scoped TensorProduct Matrix
 open MeasureTheory Formalism.BasicNotions.TH GlobalTheory.RealLift GlobalTheory.RealWeil
 

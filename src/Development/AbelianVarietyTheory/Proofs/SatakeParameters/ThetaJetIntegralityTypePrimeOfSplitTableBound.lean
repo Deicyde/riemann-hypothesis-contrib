@@ -13,6 +13,7 @@ import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormalisedFamilyNon
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KernelConstantExponentsFinite
 import Development.AbelianVarietyTheory.Proofs.JetHarmonics.NotDvdDiscrHost
 import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.EntryG
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Fields, Formalism.L2.Col.Fields.conjO (+1 more)
 
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker GlobalTheory.AtG
 open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound (recFields recPrimes recSeam HostTie AnTie badS)

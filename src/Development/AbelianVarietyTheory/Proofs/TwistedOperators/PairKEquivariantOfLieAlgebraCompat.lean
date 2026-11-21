@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.IsKStableOnOfLieStableFiniteDim
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GrpData, Formalism.BasicNotions.TH.IsKC (+4 more)
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible
 
 namespace GlobalTheory.RealPar

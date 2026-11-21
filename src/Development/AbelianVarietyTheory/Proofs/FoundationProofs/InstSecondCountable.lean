@@ -1,6 +1,7 @@
 import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.BlockOrderedSquareIntegrable
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GrpData, Formalism.BasicNotions.TH.Ix (+2 more)
 
 open Formalism.BasicNotions Formalism.BasicNotions.TH Matrix MeasureTheory
 open scoped ComplexOrder

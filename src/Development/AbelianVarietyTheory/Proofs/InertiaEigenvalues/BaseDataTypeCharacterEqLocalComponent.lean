@@ -1,6 +1,7 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FinPartMulIncAMem
 import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ToUnitsCompToCircle
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.StandardLattice Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2 Formalism.L2.Host Formalism.L2.DIV Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.NX GlobalTheory.HeightCounting GlobalTheory.TwInputs GlobalTheory.SeriesTie GlobalTheory.ExportSeries NumberField IsDedekindDomain
 open Formalism.MainNotions.IntegralHeckeForms (TwOK)
 open Formalism.AUTREP (GAf)

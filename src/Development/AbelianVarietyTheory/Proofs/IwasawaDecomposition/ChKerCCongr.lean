@@ -6,6 +6,7 @@ import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.NrmStepZer
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsEquivOfRangeEq
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.SameForm
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ColRecCEvBijective
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Fields (+7 more)
 
 noncomputable section
 

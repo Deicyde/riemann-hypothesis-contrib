@@ -4,6 +4,7 @@ import Development.AbelianVarietyTheory.PublishedTheorems.GaloisGeometry₂.Loca
 import Development.AbelianVarietyTheory.PublishedTheorems.GaloisGeometry₂.RegularAlgebraicPurity
 import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.DeRhamPotSemistable
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LocalGlobalAboveL
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.hcharSub (+1 more)
 
 noncomputable section
 

@@ -1,6 +1,7 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LineKroneckerRightMatrixConjTranspose
 import Mathlib.Analysis.InnerProductSpace.l2Space
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.IsPC, Formalism.BasicNotions.TH.Ix (+6 more)
 
 noncomputable section
 

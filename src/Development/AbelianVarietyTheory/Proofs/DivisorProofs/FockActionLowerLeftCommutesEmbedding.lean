@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DetSNeZero
 import ReciprocityTheory.SemistableReduction.AlgebraicIndependentOfDerivations
 import Mathlib.RingTheory.Derivation.Lie
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Eab, Formalism.BasicNotions.TH.Ix (+4 more)
 
 open MvPolynomial Formalism.BasicNotions.TH GlobalTheory.CharPair
 

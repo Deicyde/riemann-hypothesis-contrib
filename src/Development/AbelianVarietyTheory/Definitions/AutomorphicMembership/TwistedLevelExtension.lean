@@ -4,6 +4,7 @@ import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsTwIf
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ExistsOkPins
 import Formalism.LocalToGlobal.Columns.ChainTwKer
 import Development.AbelianVarietyTheory.Proofs.SatakeParameters.InertAtLeCongN
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Fields (+3 more)
 
 noncomputable section
 namespace GlobalTheory.Mem.Col2.TC.TwModel

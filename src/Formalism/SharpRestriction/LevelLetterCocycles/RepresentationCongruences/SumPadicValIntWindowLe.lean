@@ -2,6 +2,7 @@ import BuildAid.Leniency.Open
 import Formalism.SharpRestriction.LevelLetterCocycles.AdmBoundsBOfAdm
 import Mathlib.Algebra.Order.Field.GeomSum
 import Mathlib.Order.Interval.Finset.Box
+import Formalism.SharpRestriction.LevelLetterCocycles.WachCoordinates -- for `export` of Formalism.MainNotions.LocalTheoryWindows.LT, Formalism.MainNotions.LocalTheoryWindows.LT.down (+3 more)
 
 noncomputable section
 

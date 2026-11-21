@@ -2,6 +2,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.Foundations.IsUnitaryOfOrder
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsOfBalanced
 import Formalism.LocalToGlobal.Columns.StdLatUnimodular
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.HChar.UnrAt (+2 more)
 open scoped Pointwise
 open Formalism.BasicNotions Formalism.IndefR.Links IsDedekindDomain NumberField
 open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3

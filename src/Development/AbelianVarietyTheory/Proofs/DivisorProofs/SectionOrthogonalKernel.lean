@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiltrationStepFromSectionKernelStatement
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GKMod, Formalism.BasicNotions.TH.KStable
 
 noncomputable section
 

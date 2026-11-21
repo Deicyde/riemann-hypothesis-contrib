@@ -5,6 +5,7 @@ import Development.AbelianVarietyTheory.Counterexamples.LevelGroupExamples.Exist
 import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.HeckeCharTameAtOfFactorsThroughResidue
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FinPartMulIncAMem
 import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ToUnitsCompToCircle
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar
 open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Links Formalism.L2.JoinChr Formalism.L2.Host
 open ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.Member GlobalTheory.CoverHalf Formalism.IndefR.FWT Formalism.L2.DIV
 open scoped TensorProduct

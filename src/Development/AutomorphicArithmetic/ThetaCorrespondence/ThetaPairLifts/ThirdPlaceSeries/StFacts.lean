@@ -2,6 +2,7 @@ import BuildAid.Leniency.Open
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.SameGaloisLevelExists
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.RealMoveOfParts
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.KeepsMatHeqRefl
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Primes.vGs
 
 set_option synthInstance.maxHeartbeats 200000
 

@@ -11,6 +11,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContinuousOs
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HasDerivAtInnerPolynomialMovingGaussianStatement
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.InnerLieActionAdjointGaussianPolynomialStatement
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HasDerivAtGaussianParametersAtIdentityStatement
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GrpData, Formalism.BasicNotions.TH.Ix (+4 more)
 
 noncomputable section
 

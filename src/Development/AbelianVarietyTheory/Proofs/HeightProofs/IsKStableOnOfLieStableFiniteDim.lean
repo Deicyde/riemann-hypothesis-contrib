@@ -2,6 +2,7 @@ import BuildAid.Leniency.Open
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactExponentialSurjective
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsBlockOrd
 import Mathlib.Analysis.ODE.ExistUnique
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.DSRep, Formalism.BasicNotions.TH.GrpData (+2 more)
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.RealPar Matrix MeasureTheory
 open scoped TensorProduct
 

@@ -2,6 +2,7 @@ import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Formalism.LocalRingCardinality.DataTheta
 import Formalism.SharpRestriction.CuspSpanNormBounds.RelevantZeroGramTerms
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GrpData, Formalism.BasicNotions.TH.Ix (+5 more)
 
 noncomputable section
 

@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Formalism.SharpRestriction.CuspSpanNormBounds.CayleyDegreeNondegeneracy.RowsDef
 import Formalism.FlagUnipotentLattices.CardSubgroupsOfIndexLe
 import Formalism.SharpRestriction.CuspSpanNormBounds.CongruenceAtSplitFrobeniusHolds
+import Formalism.SharpRestriction.CuspSpanNormBounds.AmplitudeAndVolumeBounds -- for `export` of Formalism.MainNotions.S.UnitaryVolumeMass.absMinor
 
 noncomputable section
 

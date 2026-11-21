@@ -20,6 +20,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsMotive
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EigenAdjointOfReadRelationStatement
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MotiveThetaOfReadRelationStatement
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.CenUsedOfCenReal
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Fields.Ok, Formalism.L2.Col.Primes.vGs
 
 noncomputable section
 

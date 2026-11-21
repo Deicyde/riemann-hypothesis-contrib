@@ -3,6 +3,7 @@ import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MoveStep
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.KmapOfOkOfVecP
 import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.JetStepEqZeroExample
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IntAtOfLocTop
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Wts.lamTrue
 
 noncomputable section
 

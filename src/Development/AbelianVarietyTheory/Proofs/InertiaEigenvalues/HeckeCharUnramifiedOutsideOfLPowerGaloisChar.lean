@@ -5,6 +5,7 @@ import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsFinitePlac
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteIdeleExistsLocalApprox
 import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsPlaceModelPlaceMap
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ResFinEqOneOfAway
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Neutral.B1.Ideles
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.ExportSeries GlobalTheory.SeriesTie
 open Formalism.IndefR.Links
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

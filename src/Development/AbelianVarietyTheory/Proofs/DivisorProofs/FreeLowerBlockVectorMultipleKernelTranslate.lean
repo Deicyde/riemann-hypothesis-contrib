@@ -9,6 +9,7 @@ import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MulVecMemHatSwap
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GramMapMulInv
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsPowLocKMulInf
 import Formalism.LocalToGlobal.UnitaryNorms.CharProd
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.HChar.UnrAt (+3 more)
 
 set_option autoImplicit false
 set_option synthInstance.maxHeartbeats 400000

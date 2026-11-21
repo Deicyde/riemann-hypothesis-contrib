@@ -3,6 +3,7 @@ import Formalism.LocalRingCardinality.DataTheta
 import Mathlib.RingTheory.Etale.Weakly
 import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
 import Mathlib.RingTheory.TotallySplit
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.FockData, Formalism.BasicNotions.TH.GrpData (+10 more)
 
 noncomputable section
 namespace GlobalTheory.FockDegree

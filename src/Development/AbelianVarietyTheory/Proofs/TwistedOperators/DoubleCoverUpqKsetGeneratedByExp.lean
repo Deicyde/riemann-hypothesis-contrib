@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.FiniteDimKStableSubspaceKFiniteLie
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.TorusWeightVectorIffCartanWeightVector
 import Formalism.RealPlaceAnalysis.RealPlaceTaylor.CompactExponentialSurjective
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GrpData, Formalism.BasicNotions.TH.IsKC (+3 more)
 
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible
 

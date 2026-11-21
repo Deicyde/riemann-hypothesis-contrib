@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LocKIntMem
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExpNegOneLtOne
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HeckeCharacterUnramifiedAeAndExistsLevel
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.HChar.LevelLe (+2 more)
 
 namespace HeckeCharacterValueBounds
 section

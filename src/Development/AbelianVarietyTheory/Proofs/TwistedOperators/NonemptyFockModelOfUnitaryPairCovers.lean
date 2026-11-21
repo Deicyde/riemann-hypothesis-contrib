@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NonemptyFockModelUnitaryDualPairStatement
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.FockData, Formalism.BasicNotions.TH.GrpData
 
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible
 

@@ -13,6 +13,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ChebSplitNd
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FittingLaterStagesRowIsConstructionStateStatement
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GapRAllSt
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GoodTypesOfTypesTrueReal
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Primes.vGs
 
 set_option synthInstance.maxHeartbeats 200000
 

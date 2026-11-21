@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PinsMerge
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VectorValuedLiftFieldChange
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.PredMemGamRanks
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.hcharSub (+1 more)
 
 set_option autoImplicit false
 set_option synthInstance.maxHeartbeats 200000

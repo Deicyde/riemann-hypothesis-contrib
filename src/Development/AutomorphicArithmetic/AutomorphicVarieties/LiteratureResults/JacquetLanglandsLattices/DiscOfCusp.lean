@@ -2,6 +2,7 @@ import BuildAid.Leniency.Open
 import GroundTheory.AutomorphicForms.ReductionIdele
 import Development.AbelianVarietyTheory.Definitions.Foundations.AbsCharNotUnitary
 import Formalism.LocalToGlobal.UnitaryNorms.IsUnitaryNormOf
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.hcharSub (+1 more)
 open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.BasicNotions GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Lit UpperTheory.V.Lit.JL
 
 open GroundTheory.Global GroundTheory.Global.IdeleGroup GroundTheory.Automorphic.Reduction in

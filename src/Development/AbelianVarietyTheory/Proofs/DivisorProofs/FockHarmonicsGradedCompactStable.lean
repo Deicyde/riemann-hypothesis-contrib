@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.Foundations.IsFockIPOfFockData
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FockOperatorsLieRepresentationCommuteStatement
 import Mathlib.RingTheory.MvPolynomial.EulerIdentity
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.IsKC, Formalism.BasicNotions.TH.IsPC (+12 more)
 
 noncomputable section
 

@@ -5,6 +5,7 @@ import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.Contin
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsGrpDataMapHaar
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCoverTensorHom
 import Mathlib.RingTheory.Derivation.Lie
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Eab, Formalism.BasicNotions.TH.FockData (+17 more)
 
 noncomputable section
 

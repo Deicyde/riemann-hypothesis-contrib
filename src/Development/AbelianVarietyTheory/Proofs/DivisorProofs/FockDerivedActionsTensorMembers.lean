@@ -1,6 +1,7 @@
 import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Formalism.LocalRingCardinality.DataTheta
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.FockData, Formalism.BasicNotions.TH.GrpData (+9 more)
 
 noncomputable section
 namespace GlobalTheory.FockEmbExp

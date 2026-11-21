@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharacterComponentDegreeLowerBound
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Ix, Formalism.BasicNotions.TH.Pol (+1 more)
 open scoped TensorProduct
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.character_component_degree_lower_bound : ∀ (P Q R S : ℕ) (x : ℚ) (k k' : ℕ), x - Formalism.BasicNotions.TH.cPair R S = k → x + Formalism.BasicNotions.TH.cPair R S = k' → ∀ f ∈ GlobalTheory.KFixIrr.chiOne P Q R S x, f ≠ 0 → P * k + Q * k' ≤ f.totalDegree := by

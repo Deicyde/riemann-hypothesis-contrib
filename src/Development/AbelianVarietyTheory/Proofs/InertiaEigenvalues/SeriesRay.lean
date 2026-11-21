@@ -4,6 +4,7 @@ import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.IntegralSerie
 import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.TwistSeries
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelExtensionFirst
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IntegralCombIdempotentSectionsNonnegOverPlace
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.hcharSub (+1 more)
 
 set_option autoImplicit false
 

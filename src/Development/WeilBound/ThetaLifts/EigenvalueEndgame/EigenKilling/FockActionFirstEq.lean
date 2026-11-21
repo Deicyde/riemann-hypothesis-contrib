@@ -5,6 +5,7 @@ import Mathlib.RingTheory.Etale.Weakly
 import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
 import Mathlib.RingTheory.TotallySplit
 import Std.Tactic.BVDecide.Normalize.Bool
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.IsKC, Formalism.BasicNotions.TH.Ix (+3 more)
 
 noncomputable section
 

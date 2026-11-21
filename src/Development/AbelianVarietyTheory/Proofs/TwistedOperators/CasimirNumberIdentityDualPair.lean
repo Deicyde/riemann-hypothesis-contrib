@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Formalism.LocalRingCardinality.DataTheta
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.HypA, Formalism.BasicNotions.TH.block (+6 more)
 
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible
 

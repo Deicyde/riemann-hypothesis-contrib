@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.Foundations.IsFockIPOfFockData
 import Mathlib.Algebra.Ring.IsFormallyReal
 import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Eab, Formalism.BasicNotions.TH.GapGt (+16 more)
 
 noncomputable section
 namespace GlobalTheory.FiltrationEquivalenceRelation

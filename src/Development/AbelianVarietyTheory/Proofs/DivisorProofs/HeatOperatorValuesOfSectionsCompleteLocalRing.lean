@@ -7,6 +7,7 @@ import Development.AbelianVarietyTheory.Proofs.JetHarmonics.ConstantCoeffDmonOfP
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.LogDerivativePrincipalPolarisationIndependent
 import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.ExpansionTranslateTorus
 import Development.AbelianVarietyTheory.Definitions.Divisors.IsProperToroidalModelStructureMap
+import Development.AbelianVarietyTheory.Definitions.Degenerations.PullChartIsLB -- for `export` of ReciprocityTheory.ChartRestriction.G.Geo.Tor.valR
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj

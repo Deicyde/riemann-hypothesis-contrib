@@ -8,6 +8,7 @@ import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClasses.Eva
 import GroundTheory.GlobalFields.TateThesis.IdeleMeasureQuotient
 import Mathlib.Combinatorics.Quiver.ReflQuiver
 import Mathlib.Topology.Algebra.Group.OpenMapping
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.hcharSub (+1 more)
 
 noncomputable section
 

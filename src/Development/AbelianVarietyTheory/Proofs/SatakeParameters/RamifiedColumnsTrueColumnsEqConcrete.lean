@@ -4,6 +4,7 @@ import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.EmbFColFor
 import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ColStep0MemLat
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.TwistedChainInitialLatticeCompatibleTrueColumns
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.KernelsOverOfFamily
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Primes.vGs, Formalism.L2.Col.Primes.vT
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.AtG
 
 attribute [local instance] GlobalTheory.Mem.Col2.starE

@@ -2,6 +2,7 @@ import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Formalism.LocalRingCardinality.DataTheta
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Ix, Formalism.BasicNotions.TH.Mat
 
 noncomputable section
 namespace GlobalTheory.CartanLip

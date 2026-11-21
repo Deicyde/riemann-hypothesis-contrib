@@ -2,6 +2,7 @@ import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpowers.IsTwistedDualOfGaloisRep
 import Formalism.SharpRestriction.LevelLetterCocycles.RamifiedCoefficientChains
+import Formalism.SharpRestriction.LevelLetterCocycles.WachCoordinates -- for `export` of Formalism.MainNotions.TruncatedSeriesCountingBounds.Thick
 
 noncomputable section
 

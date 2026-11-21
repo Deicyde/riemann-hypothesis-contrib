@@ -2,6 +2,7 @@ import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.Divisors.MeasurableCompInfGL
 import Development.AbelianVarietyTheory.Definitions.Divisors.NAInterSupSSubset
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar
 
 noncomputable section
 

@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpowers.TwentyWordsLeB
 import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpowers.LiftingConditionOfWindows
 import Formalism.SharpRestriction.LevelLetterCocycles.JointConditionsZpowers.GaloisConditionFiveExtraOf
+import Formalism.SharpRestriction.LevelLetterCocycles.WachCoordinates -- for `export` of Formalism.MainNotions.TruncatedSeriesCountingBounds.Thick
 
 noncomputable section
 

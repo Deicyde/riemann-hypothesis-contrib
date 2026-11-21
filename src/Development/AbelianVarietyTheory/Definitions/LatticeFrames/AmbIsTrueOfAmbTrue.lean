@@ -11,6 +11,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IntegralForm
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsDivStageStandIn
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsUnitsOrderOfEq
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsCombOfMemClosureFinset
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Fields.Ok, Formalism.L2.Col.Primes.vGs
 
 noncomputable section
 

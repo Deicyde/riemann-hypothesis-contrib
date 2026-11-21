@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Formalism.SharpRestriction.LevelLetterCocycles.AdmBoundsBOfAdm
+import Formalism.SharpRestriction.LevelLetterCocycles.WachCoordinates -- for `export` of Formalism.MainNotions.LocalTheoryWindows.ro, Formalism.MainNotions.TruncatedSeriesCountingBounds.Thick
 
 noncomputable section
 

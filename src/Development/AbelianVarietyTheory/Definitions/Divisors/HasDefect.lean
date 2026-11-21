@@ -5,6 +5,7 @@ import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsInvDer
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.RosLevel
 import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.LieBridgeA
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsLinearHomPull
+import Development.AbelianVarietyTheory.Definitions.Degenerations.PullChartIsLB -- for `export` of ReciprocityTheory.ChartRestriction.G.Geo.Tor.valR
 
 set_option autoImplicit false
 

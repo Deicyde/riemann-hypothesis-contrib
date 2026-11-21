@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.JetsAllOfColIn
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ThetaStepDistributionEquivariantRationalStatement
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.FiniteQuotOfReps
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Dat (+4 more)
 
 open NumberField IsDedekindDomain
 

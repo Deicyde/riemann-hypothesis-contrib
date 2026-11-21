@@ -4,6 +4,7 @@ import Formalism.LocalRingCardinality.DataTheta
 import Mathlib.RingTheory.Etale.Weakly
 import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
 import Mathlib.RingTheory.TotallySplit
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Eab, Formalism.BasicNotions.TH.IsKC (+7 more)
 open scoped TensorProduct Matrix
 
 noncomputable section

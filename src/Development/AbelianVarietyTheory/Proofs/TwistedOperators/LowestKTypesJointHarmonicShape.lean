@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LowestKTypesJointShapeBlockInUnitarySStatement
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.HypA, Formalism.BasicNotions.TH.IsParam (+5 more)
 
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible
 

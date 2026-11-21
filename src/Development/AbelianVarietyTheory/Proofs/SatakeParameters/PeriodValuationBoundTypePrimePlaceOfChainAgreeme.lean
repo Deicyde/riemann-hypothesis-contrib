@@ -5,6 +5,7 @@ import Formalism.LocalToGlobal.Divisibility.BrJoint
 import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsStdSplit
 import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SmulMemLocPOfVal
 import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ValLocCharUnit
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Wts.nuW
 
 noncomputable section
 

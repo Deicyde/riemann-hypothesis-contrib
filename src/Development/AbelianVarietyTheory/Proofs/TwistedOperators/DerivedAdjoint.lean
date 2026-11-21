@@ -1,6 +1,7 @@
 import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Formalism.LocalRingCardinality.DataTheta
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GKMod, Formalism.BasicNotions.TH.GrpData (+6 more)
 
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible Matrix
 

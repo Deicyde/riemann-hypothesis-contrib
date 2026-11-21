@@ -4,6 +4,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HeckeCharact
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsCmAdeleUnitCharacterReadingHeckeChar
 import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ResFinEqOneOfAway
 import Formalism.LocalToGlobal.UnitaryNorms.CharExHost
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Neutral.B1.Ideles
 
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Links NumberField IsDedekindDomain
 open Formalism.L2.JoinChr Formalism.L2.Host Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR

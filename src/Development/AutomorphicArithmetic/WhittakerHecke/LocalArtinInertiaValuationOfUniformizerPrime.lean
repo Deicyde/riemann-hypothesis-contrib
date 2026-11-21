@@ -6,6 +6,7 @@ import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ArtinTransport
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ChevalleyUnits
 import CompanionTheory.AutomorphicTheory.UnitriangularMeasure.AdeleCoordinateMeasure.EllipticTorusNorm
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GlobalArtinReciprocityHolds
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Neutral.B1.Ideles
 
 section Norm
 

@@ -2,6 +2,7 @@ import BuildAid.Leniency.Variable
 import BuildAid.Leniency.Open
 import Formalism.LocalRingCardinality.DataTheta
 import Mathlib.Algebra.Ring.IsFormallyReal
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.GrpData, Formalism.BasicNotions.TH.Mat (+2 more)
 
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible MeasureTheory
 open scoped ComplexOrder

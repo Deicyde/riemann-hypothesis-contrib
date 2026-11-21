@@ -12,6 +12,7 @@ import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.NonemptyCo
 import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.OneSubIdemQMulSelf
 import Development.AbelianVarietyTheory.Definitions.LatticeFrames.Live
 import Formalism.LocalToGlobal.Columns.RecLevelStep
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Primes.vGs, Formalism.L2.Col.Primes.vT
 
 noncomputable section
 

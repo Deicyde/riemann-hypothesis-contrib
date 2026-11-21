@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.LatticeFrames.BuiltGIntro
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ExistsOkPins
 import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.LevelNotMemRowSG
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Primes.vT
 
 noncomputable section
 

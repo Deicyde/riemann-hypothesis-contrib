@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.LowerTieTwAt
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.KernelsOverOfFamily
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsFiniteDetermining
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Fields (+5 more)
 
 noncomputable section
 

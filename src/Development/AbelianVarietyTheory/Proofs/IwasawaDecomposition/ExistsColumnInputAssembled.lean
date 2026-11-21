@@ -8,6 +8,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.BaseFieldsPr
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NotMemVGsOfMemQE
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ContinuousOfCongSet
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ResCharConj
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Primes.vGs
 
 noncomputable section
 

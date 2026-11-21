@@ -3,6 +3,7 @@ import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TypePlaceResid
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CurveOverOfRayIn
 import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ConjTupRefl
 import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.HChar.val (+2 more)
 
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.FWT Formalism.IndefR.Links IsDedekindDomain NumberField GlobalTheory.ExportSeries Formalism.L2.Pj GlobalTheory.CoverRead GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels GlobalTheory.ConjTwist
 open Formalism.L2.Host (embLL0)

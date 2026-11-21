@@ -6,6 +6,7 @@ import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ToUnitsComp
 import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FinPartMulIncAMem
 import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsSplitOfMemAdmissibleConjugatePairPlaces
 import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExistsGenerators
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Neutral.B1.Ideles
 
 noncomputable section
 

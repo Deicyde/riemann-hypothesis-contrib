@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.CommuteRowOpRightMixedOp
 import Formalism.LocalRingCardinality.DataTheta
 import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Ix, Formalism.BasicNotions.TH.cPair (+1 more)
 
 noncomputable section
 

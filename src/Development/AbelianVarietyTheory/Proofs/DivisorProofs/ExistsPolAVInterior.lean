@@ -6,6 +6,7 @@ import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsTangentOfFibrePul
 import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsPolAVPullbackOfIsLocalRing
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsAffineHomOfField
 import Development.AbelianVarietyTheory.Proofs.ModuliProofs.KsCocLinear
+import Development.AbelianVarietyTheory.Definitions.Degenerations.PullChartIsLB -- for `export` of ReciprocityTheory.ChartRestriction.G.Geo.Tor.valR
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open scoped CategoryTheory.Obj

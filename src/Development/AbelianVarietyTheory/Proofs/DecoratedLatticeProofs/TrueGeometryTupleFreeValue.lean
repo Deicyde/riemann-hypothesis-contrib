@@ -7,6 +7,7 @@ import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.TwistPrime
 import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ContinuousSwapR
 import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.TrueGeometryTwistLocalData
 import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ToBlocksMulFinZero
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Fields (+3 more)
 
 noncomputable section
 

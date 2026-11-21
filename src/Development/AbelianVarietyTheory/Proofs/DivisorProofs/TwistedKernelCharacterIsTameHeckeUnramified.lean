@@ -6,6 +6,7 @@ import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OscillatorModelValu
 import Development.AbelianVarietyTheory.Definitions.Divisors.RealisedChainTorusEq
 import Development.AbelianVarietyTheory.Definitions.Foundations.RootOfUnityEightQMemCoeffGaloisSubfield
 import Development.AbelianVarietyTheory.Definitions.HeightFunctions.NormComparisonConstants
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar, Formalism.L2.Host.HChar.UnrAt (+2 more)
 
 namespace GlobalTheory.TwistedKernelChar
 

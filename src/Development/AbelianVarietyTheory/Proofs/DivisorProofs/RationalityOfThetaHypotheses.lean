@@ -6,6 +6,7 @@ import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RatioOfLocalMatc
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TowerOfThetaMatching
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TripleExistenceOfTheta
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExplicitFieldOfThetaHypothesesStatement
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Fields.Ok, Formalism.L2.Col.Primes.vGs
 
 open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH NumberField IsDedekindDomain Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links
 attribute [local instance] Formalism.BasicNotions.Host.cmStar

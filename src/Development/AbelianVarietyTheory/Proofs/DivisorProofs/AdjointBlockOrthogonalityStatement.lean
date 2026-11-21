@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdjointBlockOrthogonality
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Eab, Formalism.BasicNotions.TH.Ix (+1 more)
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg GlobalTheory.SteepMult
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.adjoint_block_orthogonality : ∀ (R S : ℕ) (z w : NC R S), ∑ a : Ix R S, ∑ b : Ix R S, (if sameBlock a b then ∑ y : NC R S, (starRingEnd ℂ) (adP (Eab b a) y z) * adP (Eab b a) y w else 0) = if z = w then ((R + S : ℕ) : ℂ) else 0 := by

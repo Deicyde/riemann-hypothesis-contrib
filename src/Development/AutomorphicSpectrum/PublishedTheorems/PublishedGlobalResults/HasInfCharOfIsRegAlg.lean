@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AutomorphicSpectrum.PublishedTheorems.PublishedGlobalResults.RegularAlgebraicPurity
 import Development.AbelianVarietyTheory.PublishedTheorems.GaloisGeometry₂.IsCohomologicalRankOne
 import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsEqMulMultOfUnits
+import Development.AbelianVarietyTheory.Definitions.Divisors.EntireEqOfHalfPlane -- for `export` of Formalism.L2.Host.HChar
 
 noncomputable section
 

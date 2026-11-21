@@ -9,6 +9,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GoodIdempote
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PartsPositiveScalarsWithoutCongruenceLengthsStatement
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.StandardLatticesDiagonal
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.GoodTypesOfTypesTrue
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Fields.Ok, Formalism.L2.Col.Primes.vGs
 
 set_option synthInstance.maxHeartbeats 200000
 

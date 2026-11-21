@@ -9,6 +9,7 @@ import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.StandardLatt
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.InfinitesimalCharacterReference
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ParametersParametersNonemptyStatement
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PartsPositiveScalarsWithoutCongruenceLengthsStatement
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Fields.Ok, Formalism.L2.Col.Primes.vGs
 
 namespace GlobalTheory.HeightCounting.Up.RowsAtStates
 

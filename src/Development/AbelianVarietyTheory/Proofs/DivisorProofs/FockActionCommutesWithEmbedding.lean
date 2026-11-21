@@ -1,5 +1,6 @@
 import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DetSNeZero
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Eab, Formalism.BasicNotions.TH.Ix (+3 more)
 open MvPolynomial Formalism.BasicNotions.TH GlobalTheory.CharPair
 
 namespace GlobalTheory.CharPair

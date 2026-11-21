@@ -4,6 +4,7 @@ import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LineKroneckerRig
 import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsEqMulProdMinors
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ISupEigenspaceEqTop
 import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.Eab, Formalism.BasicNotions.TH.IsHW (+17 more)
 
 noncomputable section
 

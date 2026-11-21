@@ -10,6 +10,7 @@ import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ExistsHypJets
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.ModelLamPDef
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsAdelicPointDecoratedLatticeAllTwists
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ExistsUnitaryDiagonalBasePointLevelPrime
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Fields, Formalism.L2.Col.Fields.conjO (+3 more)
 
 noncomputable section
 

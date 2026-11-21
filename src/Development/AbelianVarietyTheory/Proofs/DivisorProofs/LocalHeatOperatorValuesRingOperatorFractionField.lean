@@ -7,6 +7,7 @@ import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSectionValueI
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PointValueFractionFieldCommVectorFieldStatement
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsDerivationFractionRingOfVectorFieldStatement
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HeatRingOperatorConjByPowNonzeroStatement
+import Development.AbelianVarietyTheory.Definitions.Degenerations.PullChartIsLB -- for `export` of ReciprocityTheory.ChartRestriction.G.Geo.Tor.valR
 
 set_option autoImplicit false
 

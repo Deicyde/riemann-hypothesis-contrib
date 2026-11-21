@@ -5,6 +5,7 @@ import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.IsAbsI
 import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EvaluationDatumOkBaseTuple
 import Formalism.LocalToGlobal.Columns.InvariantSubspaceCoordsX
 import Formalism.LocalToGlobal.Columns.RecPerFF
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Fields (+6 more)
 
 noncomputable section
 

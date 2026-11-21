@@ -4,6 +4,7 @@ import Formalism.LocalToGlobal.BesselHermitianTheta.DefsReal
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.TorusWeightVectorIffCartanWeightVector
 import Development.AbelianVarietyTheory.Proofs.HeightProofs.FiniteDimKStableSubspaceKFiniteLie
 import ReciprocityTheory.GeometryOfNumbers.PluriharmonicAnalysis.LogDetSt
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.DSRep, Formalism.BasicNotions.TH.Eab (+15 more)
 
 noncomputable section
 

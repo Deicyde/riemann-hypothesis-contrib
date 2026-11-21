@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.ReadsMove
 import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.TwistedLevelExtension
 import Formalism.LocalToGlobal.GlobalTheory.GL6.PBwLocBases
+import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.OverOnePrimeOfCardLeOne -- for `export` of Formalism.L2.Col.Chars, Formalism.L2.Col.Fields (+3 more)
 
 noncomputable section
 

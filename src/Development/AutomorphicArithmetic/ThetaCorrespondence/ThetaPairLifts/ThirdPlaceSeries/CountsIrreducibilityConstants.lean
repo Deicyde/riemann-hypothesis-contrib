@@ -3,6 +3,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.CountsIrreducibilityConstants
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.ColumnChoiceWithTies
 import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLifts.ThirdPlaceSeries.ColJoinSOfSTiesR
+import Development.AbelianVarietyTheory.Definitions.Divisors.TupleReadBaseTupleEqFamily -- for `export` of Formalism.IndefR.phEff
 
 set_option synthInstance.maxHeartbeats 200000
 

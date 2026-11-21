@@ -2,6 +2,7 @@ import BuildAid.Leniency.Open
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SameBlockOfPosC
 import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoverUpqClosureExpTopAndCartanStatement
 import Development.AbelianVarietyTheory.Proofs.TwistedOperators.EqZeroOfFactorialBoundStatement
+import Formalism.SharpRestriction.Divisibility.SchurIrreducible -- for `export` of Formalism.BasicNotions.TH.DSRep, Formalism.BasicNotions.TH.GrpData (+4 more)
 
 open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible
 
