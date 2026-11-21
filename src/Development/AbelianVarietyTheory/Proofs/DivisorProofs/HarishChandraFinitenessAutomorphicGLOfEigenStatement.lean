@@ -9,4 +9,4 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.harishChandra_finiteness_automorphic_GL_of_eigen : GlobalTheory.HCF.CoreFiniteGL → GlobalTheory.Published.AutomorphicFormsFiniteGL := by
-  first | exact @GlobalTheory.HCF.automorphicFormsFiniteGL_of_core | exact GlobalTheory.HCF.automorphicFormsFiniteGL_of_core | (intros; apply GlobalTheory.HCF.automorphicFormsFiniteGL_of_core <;> assumption)
+  exact @GlobalTheory.HCF.automorphicFormsFiniteGL_of_core

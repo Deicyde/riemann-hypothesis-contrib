@@ -8,4 +8,4 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.fontaineBcrisBasicTheorems_proof : GlobalTheory.Published.FontaineBcris := by
-  first | exact @GlobalTheory.MemLoc.fontaineBcris | exact GlobalTheory.MemLoc.fontaineBcris | (intros; apply GlobalTheory.MemLoc.fontaineBcris <;> assumption)
+  exact @GlobalTheory.MemLoc.fontaineBcris

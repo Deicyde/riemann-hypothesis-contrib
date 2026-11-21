@@ -35,4 +35,3 @@ theorem _root_.GlobalTheory.T.symmetricPositionLevel_character_eq_one_single_row
   apply Units.ext
   rw [hP.2 g, hs, hu]
   simp
-

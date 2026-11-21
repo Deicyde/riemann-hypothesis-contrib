@@ -21,4 +21,4 @@ open GlobalTheory.LevelSeries
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.isIdemSum_conjugatePlaces_subset_eq_flip : ∀ (D : D7) (e eT e' : AE D) (P T : Finset (Formalism.L2.DIV.Pl D.host.E)), IsIdemSum e P → IsIdemSum eT T → T ⊆ P → IsIdemSum e' ((P \ T) ∪ T.image Formalism.L2.DIV.conjPl) → e' = e - eT + cA D eT := by
-  first | exact @GlobalTheory.FlipIdemSum.idemSum_flip_subset | exact GlobalTheory.FlipIdemSum.idemSum_flip_subset | (intros; apply GlobalTheory.FlipIdemSum.idemSum_flip_subset <;> assumption)
+  exact @GlobalTheory.FlipIdemSum.idemSum_flip_subset

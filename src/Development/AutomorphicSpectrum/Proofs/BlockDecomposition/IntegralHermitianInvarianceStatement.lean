@@ -8,4 +8,4 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.integral_hermitian_invariance : PositivityTheory.SiegelWeilFormula.Gunr.HermitianLatticeInvariance := by
-  first | exact @GlobalTheory.CompanionTheory.GunrInv.integrand_invariant_integral_hermitian | exact GlobalTheory.CompanionTheory.GunrInv.integrand_invariant_integral_hermitian | (intros; apply GlobalTheory.CompanionTheory.GunrInv.integrand_invariant_integral_hermitian <;> assumption)
+  exact @GlobalTheory.CompanionTheory.GunrInv.integrand_invariant_integral_hermitian

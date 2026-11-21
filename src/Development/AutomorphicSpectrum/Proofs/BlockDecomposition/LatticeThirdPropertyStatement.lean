@@ -8,4 +8,4 @@ public import Development.WeilBound.RepresentationTheoryGL.TwistedFactors.Integr
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.lattice_third_property : PositivityTheory.Rg.Tf.Loc.TraceOneIntegralElement → PositivityTheory.Rg.Tf.Loc.L1 → PositivityTheory.Rg.Tf.Loc.L3 := by
-  first | exact @GlobalTheory.CompanionTheory.TfLoc.Descent.unramified_descent_coset | exact GlobalTheory.CompanionTheory.TfLoc.Descent.unramified_descent_coset | (intros; apply GlobalTheory.CompanionTheory.TfLoc.Descent.unramified_descent_coset <;> assumption)
+  exact @GlobalTheory.CompanionTheory.TfLoc.Descent.unramified_descent_coset

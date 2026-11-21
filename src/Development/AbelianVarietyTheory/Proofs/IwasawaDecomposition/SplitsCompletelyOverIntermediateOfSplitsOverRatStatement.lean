@@ -16,4 +16,4 @@ set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.splits_completely_over_intermediate_of_splits_over_rat : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] (p : ℕ), p.Prime →
     ((Ideal.span {(p : ℤ)}).primesOver (𝓞 L)).ncard = Module.finrank ℚ L →
       ∀ 𝔭 : HeightOneSpectrum (𝓞 K), (p : 𝓞 K) ∈ 𝔭.asIdeal → (𝔭.asIdeal.primesOver (𝓞 L)).ncard = Module.finrank K L := by
-  first | exact @GlobalTheory.SplitTower.splits_completely_of_intermediate | exact GlobalTheory.SplitTower.splits_completely_of_intermediate | (intros; apply GlobalTheory.SplitTower.splits_completely_of_intermediate <;> assumption)
+  exact @GlobalTheory.SplitTower.splits_completely_of_intermediate

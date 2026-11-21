@@ -34,4 +34,4 @@ theorem _root_.GlobalTheory.T.thetaTransform_transportedWeil_continuous : ∀ (D
       GlobalTheory.WeilM.UG (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.cA D.sp.cm.sig) (incM D.host.F JB) →* Module.End ℂ ((κ → AF D.host.F) → ℂ),
                        GlobalTheory.WeilSchrodinger.IsTransport ψ co ω om →
   ∀ Φ ∈ GlobalTheory.WeilM.schA D.host.F κ, ∀ w, Continuous fun p => GlobalTheory.WeilSchrodinger.thetaTr D.host.F co ψ (om p Φ) w := by
-  first | exact @GlobalTheory.ThetaTransportCont.thetaTr_om_continuous | exact GlobalTheory.ThetaTransportCont.thetaTr_om_continuous | (intros; apply GlobalTheory.ThetaTransportCont.thetaTr_om_continuous <;> assumption)
+  exact @GlobalTheory.ThetaTransportCont.thetaTr_om_continuous
