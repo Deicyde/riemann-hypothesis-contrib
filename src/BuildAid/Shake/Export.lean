@@ -22,6 +22,11 @@ not show (`Lean/ExtraModUses.lean`):
 It also records a use of its own module (`recordExtraModUseFromDecl` of `elabExport`), since nothing
 else shows that a file needs this override; without it, shake would drop the import of this module
 from exactly the files that run an `export`.
+
+---
+
+This should possibly be upstreamed, but it would be better if *identifier elaboration* recorded the extra mod uses only when actually relying on an alias, instead of using an indirect mod use (which applies even when not using the `export` contribution.)
+
 -/
 
 namespace BuildAid.Shake.Export
@@ -45,9 +50,9 @@ def elabExport : CommandElab := fun stx => do
     -- shake: importers using the alias need this module; this module needs the target's module
     recordIndirectModUse "export" declName
     recordExtraModUseFromDecl declName (isMeta := false)
-  modify fun s => { s with env := aliases.foldl (init := s.env) fun env p => addAlias env p.1 p.2 }
+  modifyEnv fun env => aliases.foldl (init := env) fun env p => addAlias env p.1 p.2
   -- shake: this file needs this override
   -- (a single-backtick name: the constant does not exist yet while this body is elaborated)
-  recordExtraModUseFromDecl `BuildAid.Shake.Export.elabExport (isMeta := false)
+  recordExtraModUseFromDecl decl_name% (isMeta := false)
 
 end BuildAid.Shake.Export
