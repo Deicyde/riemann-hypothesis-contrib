@@ -152,7 +152,7 @@ theorem UpperTheory.Lit.Rallis.ThetaDens.om_compact_sobCont : ∀ (D : D7) (ψ :
   let U' : AddSubgroup (WO S T) :=
     { carrier := {u | ∀ x ∈ K, Formalism.IndefR.Datum.actO S T x.1⁻¹ x.2⁻¹ u ∈ U}
       add_mem' := fun {a b} ha hb x hx => by
-        rw [Set.mem_setOf_eq] at ha hb
+        rw [Set.mem_ofPred_eq] at ha hb
         show Formalism.IndefR.Datum.actO S T x.1⁻¹ x.2⁻¹ (a + b) ∈ U
         rw [actO_add']; exact U.add_mem (ha x hx) (hb x hx)
       zero_mem' := fun x _ => by
@@ -610,8 +610,8 @@ theorem contDiff_of_class_tendstoLocallyUniformly : ∀ {E : Type} [NormedAddCom
     ext x
     conv_lhs => rw [← hc x]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, (h y).2, ContinuousLinearMap.sum_apply,
-      ContinuousLinearMap.smul_apply, ContinuousLinearMap.smulRight_apply]
+      simp only [map_sum, map_smul, (h y).2, sum_apply,
+      smul_apply, ContinuousLinearMap.smulRight_apply]
     refine Finset.sum_congr rfl fun a _ => ?_
     simp only [Complex.real_smul, smul_eq_mul]
     ring
@@ -902,7 +902,7 @@ theorem exists_bound_of_complete {E : Type} [AddCommGroup E] [Module ℂ E] (p :
     | refl => exact le_rfl
     | step _ ih => exact ih.trans (hmono _ x)
   refine ⟨s.sup id, C, fun x => (hle x).trans ?_⟩
-  rw [Seminorm.smul_apply, NNReal.smul_def, smul_eq_mul]
+  rw [smul_apply, NNReal.smul_def, smul_eq_mul]
   refine mul_le_mul_of_nonneg_left ?_ C.2
   exact Seminorm.finset_sup_apply_le (apply_nonneg _ _) fun i hi => hmono' _ _ _ (Finset.le_sup (f := id) hi)
 
