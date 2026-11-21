@@ -234,7 +234,8 @@ def lake_hashes(paths: dict[str, Path], temporary: Path) -> dict[str, str]:
         raise ValueError("elan with stock Lean 4.33.1 is required to verify artifact hashes")
     command = [elan, "run", transport.TOOLCHAIN, "lean"]
     library = subprocess.run([*command, "--print-libdir"], cwd=temporary, env=env, check=True, capture_output=True, text=True).stdout.strip()
-    subprocess.run([*command, "--load-dynlib=" + str(Path(library) / "libLake_shared.so"), "--run", str(helper), str(jobs), str(report)],
+    shared = "libLake_shared.dylib" if sys.platform == "darwin" else "libLake_shared.so"
+    subprocess.run([*command, "--load-dynlib=" + str(Path(library) / shared), "--run", str(helper), str(jobs), str(report)],
                    cwd=temporary, env=env, check=True, capture_output=True, text=True)
     result = {}
     for line in regular_bytes(report).splitlines():

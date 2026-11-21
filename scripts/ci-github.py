@@ -168,8 +168,11 @@ def bind_manual_resolve_log(run, request, identity):
     if jobs.get("total_count") != len(rows) or len(selected) != 1:
         raise ValueError("Cannot identify the original hosted resolve job")
     job = selected[0]
+    # GitHub-hosted REST jobs report either null or integer zero for this ID.
+    group_id = job.get("runner_group_id", -1)
     if (job.get("status") != "completed" or job.get("conclusion") != "success"
-            or job.get("runner_group_id") != 0 or job.get("runner_group_name") != "GitHub Actions"
+            or not (group_id is None or type(group_id) is int and group_id == 0)
+            or job.get("runner_group_name") != "GitHub Actions"
             or "self-hosted" in job.get("labels", []) or type(job.get("id")) is not int or job["id"] <= 0):
         raise ValueError("Original resolve job was not a successful GitHub-hosted job")
     with tempfile.TemporaryDirectory(prefix="rh-ci-resolve-log-") as name:

@@ -9,6 +9,13 @@ fi
 RH_CACHE_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$RH_CACHE_ROOT"
 
+# scripts/ci-cache-get.py needs Python 3.11 for tomllib. Say so before downloading anything.
+if ! python3 -c 'import sys; sys.exit(sys.version_info < (3, 11))'; then
+  RH_CACHE_PYTHON="$(command -v python3 >/dev/null && python3 --version 2>&1 || echo none)"
+  echo "lake exe cache get needs Python 3.11 or newer as python3; found: $RH_CACHE_PYTHON" >&2
+  exit 1
+fi
+
 # Mathlib's parallel unpacker can exceed the usual 1024-file soft limit.
 RH_CACHE_FD_HARD="$(ulimit -Hn)"
 if [[ "$RH_CACHE_FD_HARD" == unlimited || "$RH_CACHE_FD_HARD" -gt 65536 ]]; then
