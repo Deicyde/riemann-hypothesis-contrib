@@ -12,4 +12,4 @@ open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Forma
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.archimedeanTracePairingBilinear_nondegenerate : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (y : κ → mixedEmbedding.mixedSpace F),
     (∀ x, trPair F κ x y = 0) → y = 0 := by
-  first | exact @GlobalTheory.VacLn.trPair_nondeg | exact GlobalTheory.VacLn.trPair_nondeg | (intros; apply GlobalTheory.VacLn.trPair_nondeg <;> assumption)
+  exact @GlobalTheory.VacLn.trPair_nondeg

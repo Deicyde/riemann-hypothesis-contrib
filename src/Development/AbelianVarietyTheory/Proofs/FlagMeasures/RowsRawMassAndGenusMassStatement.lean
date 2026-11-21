@@ -12,4 +12,4 @@ open NumberField Matrix GlobalTheory.Mass Formalism.HermitianLatticesTheory Form
 open scoped ENNReal Classical
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.rows_raw_mass_and_genus_mass : ∀ (D : D7) (u : D.what₂.Word), UnitaryVolumeMass.stLem3L0 D u := by
-  first | exact @GlobalTheory.Mass.RowsRawMass.main | exact GlobalTheory.Mass.RowsRawMass.main | (intros; apply GlobalTheory.Mass.RowsRawMass.main <;> assumption)
+  exact @GlobalTheory.Mass.RowsRawMass.main

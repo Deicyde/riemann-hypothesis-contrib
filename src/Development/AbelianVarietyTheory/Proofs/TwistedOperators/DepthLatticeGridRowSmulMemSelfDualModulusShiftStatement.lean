@@ -15,4 +15,4 @@ open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.depthLatticeGridRow_smul_mem_selfDualModulusShift : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {μ₀ : T}, L.Is μ₀ → OffQ D → ∀ (G : GridData L sc) (i : ℕ), i < D.R.m → ∀ e : AE D, IsIdemSum e G.pl.W0 → ∀ u ∈ latRow G i, e • u ∈ latBig G i := by
-  first | exact @GlobalTheory.DepHalf.smul_mem_latBig | exact GlobalTheory.DepHalf.smul_mem_latBig | (intros; apply GlobalTheory.DepHalf.smul_mem_latBig <;> assumption)
+  exact @GlobalTheory.DepHalf.smul_mem_latBig

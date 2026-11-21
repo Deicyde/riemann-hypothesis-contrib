@@ -16,4 +16,4 @@ open scoped TensorProduct ComplexConjugate Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.compactTorusProductRealPlaces_spec : ∀ (D : D7) (S T : HSp D) (C : Ctx S T) (B : C.Bas), C.IsB B → ∀ (s : D.what₂.Tau → Fin T.rank → ℝ), GlobalTheory.AdSpan.ConjHol.torProd C.θ T B s ∈ GinfC T ∧ ∀ ρ, compAt C.θ ρ (Formalism.L2.Theta.mt T (GlobalTheory.AdSpan.ConjHol.torProd C.θ T B s)) = B ρ * diagonal (fun c => cexp ((s ρ c : ℂ) * I)) * (B ρ)⁻¹ := by
-  first | exact @GlobalTheory.AdSpan.ConjHol.torProd_spec | exact GlobalTheory.AdSpan.ConjHol.torProd_spec | (intros; apply GlobalTheory.AdSpan.ConjHol.torProd_spec <;> assumption)
+  exact @GlobalTheory.AdSpan.ConjHol.torProd_spec

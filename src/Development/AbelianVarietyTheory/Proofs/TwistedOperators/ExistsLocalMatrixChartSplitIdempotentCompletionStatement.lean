@@ -26,4 +26,4 @@ theorem _root_.GlobalTheory.T.exists_local_matrix_chart_split_idempotent_complet
     ∃ C : GL (Fin n) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv D.host.F v), ∀ y : Fin n → GlobalTheory.SplitPlace.RF D,
       finPart D e • y ∈ GlobalTheory.AdLat.hat D.host.F (L : Set (Fin n → D.host.E)) ↔
         ∀ i, ((C⁻¹ : GL (Fin n) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv D.host.F v)).1 *ᵥ fun j => π (y j)) i ∈ Formalism.UG.Ov D.host.F v := by
-  first | exact @GlobalTheory.HatLocalChart.exists_chart | exact GlobalTheory.HatLocalChart.exists_chart | (intros; apply GlobalTheory.HatLocalChart.exists_chart <;> assumption)
+  exact @GlobalTheory.HatLocalChart.exists_chart

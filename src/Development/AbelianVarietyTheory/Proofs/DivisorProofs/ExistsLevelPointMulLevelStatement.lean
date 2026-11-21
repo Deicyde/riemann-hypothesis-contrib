@@ -17,4 +17,4 @@ attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.exists_levelPoint_mul_level : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] (D : DegData R (maximalIdeal R)) (F : Type) [Field F] [Algebra (FractionRing R) F] (k d : ℕ) (p : QkPt D.toPre F k), ∃ q : QkPt D.toPre F (k * d), q.y = d • p.y ∧ q.g = p.g := by
-  first | exact @GlobalTheory.Mum.QkMul.exists_qk_mul | exact GlobalTheory.Mum.QkMul.exists_qk_mul | (intros; apply GlobalTheory.Mum.QkMul.exists_qk_mul <;> assumption)
+  exact @GlobalTheory.Mum.QkMul.exists_qk_mul

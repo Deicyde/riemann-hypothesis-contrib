@@ -8,4 +8,4 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.TwTrans
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.twistFiniteDatum_theta_at_levelPrime : GlobalTheory.AdForm.TwVec' := by
-  first | exact @GlobalTheory.AdForm.twVec' | exact GlobalTheory.AdForm.twVec' | (intros; apply GlobalTheory.AdForm.twVec' <;> assumption)
+  exact @GlobalTheory.AdForm.twVec'

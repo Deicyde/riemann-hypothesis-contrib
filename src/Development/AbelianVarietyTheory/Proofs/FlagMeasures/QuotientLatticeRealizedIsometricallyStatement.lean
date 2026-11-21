@@ -139,4 +139,3 @@ theorem _root_.GlobalTheory.T.quotient_lattice_realized_isometrically : ∀ (K :
     intro w y hy
     rw [hQ4 w _ (GlobalTheory.QuotCoord.toLp_mem_pv X A w _ (Submodule.subset_span ⟨y, hy, rfl⟩)), normAt]
     exact congrArg cnorm (hc w y hy)
-

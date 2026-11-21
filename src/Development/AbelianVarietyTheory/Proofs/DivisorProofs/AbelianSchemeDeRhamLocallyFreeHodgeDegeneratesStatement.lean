@@ -13,4 +13,4 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 attribute [local instance] Over.cartesianMonoidalCategory
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.abelianScheme_deRham_locallyFree_hodgeDegenerates : GlobalTheory.Published.AbelianHodgeDeRham := by
-  first | exact @GlobalTheory.AbCoh.abelianHodgeDeRham | exact GlobalTheory.AbCoh.abelianHodgeDeRham | (intros; apply GlobalTheory.AbCoh.abelianHodgeDeRham <;> assumption)
+  exact @GlobalTheory.AbCoh.abelianHodgeDeRham

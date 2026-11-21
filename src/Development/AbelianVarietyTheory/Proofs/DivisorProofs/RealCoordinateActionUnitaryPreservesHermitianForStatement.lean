@@ -16,4 +16,4 @@ theorem _root_.GlobalTheory.T.realCoordinateAction_unitary_preserves_hermitianFo
       IsHermND σ JS → IsHermND σ JT → ∀ ξ₀ : E, ξ₀ ≠ 0 → σ ξ₀ = -ξ₀ → ∀ θ : InfinitePlace F → (Ainf F ⊗[F] E →+* ℂ),
       IsInfFamF (fun w : InfinitePlace F => (B.emb w).1) θ → ∀ ι : (InfinitePlace F → ℂ) →+ AEF F E, IsChartF θ ι →
       ∀ p : GAF σ JS × GAF σ JT, (mMF σ JS JT θ p)ᴴ * HMF JS JT ξ₀ (fun w : InfinitePlace F => (B.emb w).1) * mMF σ JS JT θ p = HMF JS JT ξ₀ (fun w : InfinitePlace F => (B.emb w).1) := by
-  first | exact @GlobalTheory.RealWeilF.mMF_unitary | exact GlobalTheory.RealWeilF.mMF_unitary | (intros; apply GlobalTheory.RealWeilF.mMF_unitary <;> assumption)
+  exact @GlobalTheory.RealWeilF.mMF_unitary

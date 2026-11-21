@@ -14,4 +14,4 @@ open Formalism.IndefR.Fin.LevelGroupLemmas (resG detAt)
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.exists_baseIdempotent_of_splitIdempotentSum : ∀ {D : D7} {P : Finset (Pl D.host.E)} {e : AE D}, IsIdemSum e P →
     ∃ ε : AF D.host.F, IsIdempotentElem ε ∧ algebraMap (AF D.host.F) (AE D) ε = e + cA D e := by
-  first | exact @GlobalTheory.IdemSumF.exists_idem_below | exact GlobalTheory.IdemSumF.exists_idem_below | (intros; apply GlobalTheory.IdemSumF.exists_idem_below <;> assumption)
+  exact @GlobalTheory.IdemSumF.exists_idem_below

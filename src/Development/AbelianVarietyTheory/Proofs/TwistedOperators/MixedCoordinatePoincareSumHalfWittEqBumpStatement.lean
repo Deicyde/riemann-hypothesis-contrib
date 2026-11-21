@@ -5,6 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MixedCoor
 public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.IsAuxiliaryVectorWittDec
 public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.WittExtensionSumMulMiddleCoordinate
 
+@[expose] public section
+
 namespace I195MixedCoordinates_2b9c4e7ee460bdf0c3844320
 
 open Formalism.BasicNotions Formalism.BasicNotions.TH
@@ -21,7 +23,6 @@ public noncomputable abbrev source
 
 end I195MixedCoordinates_2b9c4e7ee460bdf0c3844320
 
-@[expose] public section
 
 noncomputable section
 
@@ -36,4 +37,4 @@ open GlobalTheory.BumpMix
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.mixedCoordinate_poincareSum_halfWitt_eq_bump : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (S S₀ T : HSp D) (ρ : ℕ) (d : HypDec S S₀ ρ) (v : VolM D T.rank ρ) (β : Mx D T.rank ρ → ℂ), IsBump β → ∀ x, (_root_.I195MixedCoordinates_2b9c4e7ee460bdf0c3844320.source d) T ψ v.μ v.𝓕 (poinX ψ d T β) x 0 = β x := by
-  first | exact @GlobalTheory.BumpMixSum.mixS_poinX | exact GlobalTheory.BumpMixSum.mixS_poinX | (intros; apply GlobalTheory.BumpMixSum.mixS_poinX <;> assumption)
+  exact @GlobalTheory.BumpMixSum.mixS_poinX

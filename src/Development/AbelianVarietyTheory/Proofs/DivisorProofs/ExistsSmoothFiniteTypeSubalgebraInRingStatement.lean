@@ -17,4 +17,4 @@ theorem _root_.GlobalTheory.T.exists_smooth_finiteType_subalgebra_in_ring : ∀ 
     (∀ x ∈ S, x ∈ F.ring) → ∃ A : Subalgebra ℂ κ', Algebra.Smooth ℂ A ∧
       A.toSubring ≤ F.ring.toSubring ∧ (∀ x ∈ S, x ∈ A) ∧
       ∀ f : κ', ∃ a ∈ A, ∃ b ∈ A, b ≠ 0 ∧ f * b = a := by
-  first | exact @GlobalTheory.FieldPair.Place.exists_smooth_subalgebra | exact GlobalTheory.FieldPair.Place.exists_smooth_subalgebra | (intros; apply GlobalTheory.FieldPair.Place.exists_smooth_subalgebra <;> assumption)
+  exact @GlobalTheory.FieldPair.Place.exists_smooth_subalgebra

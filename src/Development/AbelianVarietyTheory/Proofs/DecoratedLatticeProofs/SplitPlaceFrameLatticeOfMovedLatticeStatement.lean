@@ -15,4 +15,4 @@ open GlobalTheory.IndefiniteRowSideFullHecke.AppendedVectorData (lastKer lastPai
 open GlobalTheory.FinPl
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.splitPlaceFrameLattice_of_movedLattice : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (p : SplitPt D k) (S : HSp D) (n : Type) [Fintype n] [DecidableEq n] (β : Frame p S n) (γ : GA D S) (L M : Lat S) (Λ : Submodule 𝒪[k] (n → k)), Moves S γ L M (· = p.v) → β.IsLatMoved γ L Λ → β.IsLat M Λ := by
-  first | exact @GlobalTheory.FinPl.Frame.isLat_of_isLatMoved | exact GlobalTheory.FinPl.Frame.isLat_of_isLatMoved | (intros; apply GlobalTheory.FinPl.Frame.isLat_of_isLatMoved <;> assumption)
+  exact @GlobalTheory.FinPl.Frame.isLat_of_isLatMoved

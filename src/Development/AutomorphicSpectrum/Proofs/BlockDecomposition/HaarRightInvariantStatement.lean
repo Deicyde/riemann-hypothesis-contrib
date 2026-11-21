@@ -17,4 +17,4 @@ open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs Positivi
 open scoped GlobalTheory.CuspRep.CuspidalL2GL
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.haar_right_invariant : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (N : ℕ) (μ : Measure (GA E N)) [μ.IsHaarMeasure], μ.IsMulRightInvariant := by
-  first | exact @GlobalTheory.CompanionTheory.AdelicUnimod.isMulRightInvariant_GA_CM | exact GlobalTheory.CompanionTheory.AdelicUnimod.isMulRightInvariant_GA_CM | (intros; apply GlobalTheory.CompanionTheory.AdelicUnimod.isMulRightInvariant_GA_CM <;> assumption)
+  exact @GlobalTheory.CompanionTheory.AdelicUnimod.isMulRightInvariant_GA_CM

@@ -8,4 +8,4 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.absolute_cutoff_bound : PositivityTheory.RgBcC.Fc.AbsCut := by
-  first | exact @GlobalTheory.CompanionTheory.FcCut.absCut | exact GlobalTheory.CompanionTheory.FcCut.absCut | (intros; apply GlobalTheory.CompanionTheory.FcCut.absCut <;> assumption)
+  exact @GlobalTheory.CompanionTheory.FcCut.absCut

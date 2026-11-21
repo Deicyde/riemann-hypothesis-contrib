@@ -13,4 +13,4 @@ open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheo
 open scoped ENNReal InnerProductSpace
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.cm_field_small_integral_basis : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], ∃ a : Fin (Module.finrank ℚ E) → 𝓞 E, LinearIndependent ℚ (fun i => (a i : E)) ∧ ∀ i (σ : E →+* ℂ), ‖σ (a i)‖ ≤ Module.finrank ℚ E * hostRd E := by
-  first | exact @GlobalTheory.CompanionTheory.Ar.Cusp.exists_full_family_conjugates_le | exact GlobalTheory.CompanionTheory.Ar.Cusp.exists_full_family_conjugates_le | (intros; apply GlobalTheory.CompanionTheory.Ar.Cusp.exists_full_family_conjugates_le <;> assumption)
+  exact @GlobalTheory.CompanionTheory.Ar.Cusp.exists_full_family_conjugates_le

@@ -8,4 +8,4 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Cub
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.theoremOfCubeAbelianScheme_over_arbitrary_base : GlobalTheory.Published.CubeTheorem := by
-  first | exact @GlobalTheory.CubeTop.cubeTheorem | exact GlobalTheory.CubeTop.cubeTheorem | (intros; apply GlobalTheory.CubeTop.cubeTheorem <;> assumption)
+  exact @GlobalTheory.CubeTop.cubeTheorem

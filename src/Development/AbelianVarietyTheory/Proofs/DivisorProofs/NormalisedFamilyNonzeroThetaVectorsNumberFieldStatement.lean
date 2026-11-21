@@ -9,4 +9,4 @@ public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.TopPlaceL
 
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.normalisedFamily_nonzeroThetaVectors_numberField : GlobalTheory.ColNorms.FamilyVectors := by
-  first | exact @GlobalTheory.ColNorms.familyVectors | exact GlobalTheory.ColNorms.familyVectors | (intros; apply GlobalTheory.ColNorms.familyVectors <;> assumption)
+  exact @GlobalTheory.ColNorms.familyVectors

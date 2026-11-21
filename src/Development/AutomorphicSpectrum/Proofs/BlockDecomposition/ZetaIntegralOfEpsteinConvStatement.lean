@@ -9,4 +9,4 @@ public import Development.WeilBound.RepresentationTheoryGL.EisensteinSeries.Sieg
 open PositivityTheory.RgEis PositivityTheory.RgEis.MG
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.zeta_integral_of_epstein_conv : EpConv → ZetaK := by
-  first | exact @GlobalTheory.CompanionTheory.ZetaAlongK.zetaK | exact GlobalTheory.CompanionTheory.ZetaAlongK.zetaK | (intros; apply GlobalTheory.CompanionTheory.ZetaAlongK.zetaK <;> assumption)
+  exact @GlobalTheory.CompanionTheory.ZetaAlongK.zetaK

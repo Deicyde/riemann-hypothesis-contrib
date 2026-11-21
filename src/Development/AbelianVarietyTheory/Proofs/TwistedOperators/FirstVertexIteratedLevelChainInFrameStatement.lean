@@ -30,4 +30,4 @@ theorem _root_.GlobalTheory.T.firstVertex_iteratedLevelChain_in_frame :
         ∀ hm : u ∈ ((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).J,
           (((_root_.GlobalTheory.StepData.typeChain t ϖ P μ hμ).lev 0 c H).lam ⟨u, hm⟩ : ℂ) =
             ψ (simpleSum u) := by
-  first | exact @GlobalTheory.FirstVertexFrame.firstVertex_typeChain | exact GlobalTheory.FirstVertexFrame.firstVertex_typeChain | (intros; apply GlobalTheory.FirstVertexFrame.firstVertex_typeChain <;> assumption)
+  exact @GlobalTheory.FirstVertexFrame.firstVertex_typeChain
