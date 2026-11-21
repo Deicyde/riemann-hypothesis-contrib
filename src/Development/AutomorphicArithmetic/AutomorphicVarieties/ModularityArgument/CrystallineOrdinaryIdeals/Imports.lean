@@ -1,7 +1,5 @@
--- shake: keep-all
 import BuildAid.Shake.Export
-import Mathlib
-import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.TriDefs
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.IsInertiaInfiniteCyclotomic
 
 namespace GlobalTheory.OrdLoc
 
