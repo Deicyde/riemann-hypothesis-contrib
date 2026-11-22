@@ -1,0 +1,11 @@
+{
+  "number": 88,
+  "title": "Add a formal-conjectures Comparator setup and gather the setups in comparator/",
+  "original_head": "24e73b1ff2c9c965e39c68c32e50bdaf13a7db7a",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "comparator/formal-conjectures",
+  "maintainer_can_modify": false,
+  "old_merge_base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "status": "error",
+  "error": "Preparation ref already exists with another head: maintenance/rebase-report-fbf2468e1c-45053662564-docs-pending-0"
+}
