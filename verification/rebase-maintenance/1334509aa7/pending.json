@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/FoundationProofs/ExistsUnitNormOfSelfDualHermitianLattice.lean",
+      "stages": {
+        "1": "fcd5a799e1b7940f0a8fc5ee7e8d3db2d57932d1",
+        "2": "399406944223db14ca1911d4604fbf9796cb508d",
+        "3": "2af8fbf8da13102a956dc5de41c7a1b47834eb54"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "e42523ac10f03d9dfddd30b6f3a3bfde7dad04a3",
+  "checkpoint_head": "73412f4ce0c521df8968fc5ca60697c937260a28"
+}
