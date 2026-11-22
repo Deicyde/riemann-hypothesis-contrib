@@ -1,0 +1,22 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/WeilBound/CoreStatements/HodgeTatePoints/HtatHopfMul.lean",
+      "stages": {
+        "1": "a1623860c405eeb215dec815d39782f20230bc04",
+        "2": "99750cedf1e575449f8d2eb4a4c08a70c6d39e62",
+        "3": "43c5be2aaead624a94ce9151a80efefa879b795b"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "d1c5a3bae13bf35248a9cc2503d6ba8170848651",
+  "checkpoint_head": "9d561419dc4a3158f7d5b4a141e96dffb1405c24",
+  "checkpoint_branch": "maintenance/checkpoint-pr-54-8f32827748-45048636006-remaining-pending-68"
+}
