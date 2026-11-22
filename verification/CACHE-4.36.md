@@ -1,9 +1,9 @@
 # Lean 4.36 cache bootstrap
 
-The completed volunteer build for PR #66 is useful build evidence, but is not a
-drop-in stock Lake cache. A separate stock default-target build is running on
-ffmain to produce the accepted cache map and receipt. The active public baseline
-remains unchanged until the new cache has passed publication and cold restoration.
+The selected route is to reuse PR #66's completed volunteer OLeans and supply
+the missing Lake cache metadata and runtime outputs. The full archive has passed
+integrity verification. The cache adapter is still under test; a full source
+rebuild was stopped and its completed work preserved. No new baseline is published.
 
 ## Verified release
 
@@ -35,7 +35,7 @@ python3 scripts/cache-import-436/fetch-release.py \
 
 This verifies artifact identity and integrity, not proofs.
 
-## Why package normalization is insufficient
+## Preserve the archive's declaration identities
 
 The published `cbuild.py` runs Lean from the repository directory with a source
 argument such as `src/CompanionTheory/.../FourLeOfFive.lean`. It supplies neither
@@ -59,41 +59,42 @@ It compiles the same fixture using stock Lake and the volunteer driver's command
 The public declaration keeps its name, while the private definition is respectively
 `_private.Probe.0.hidden` and `_private.src.Probe.0.hidden`.
 
-The archive also lacks Lake traces, native output maps and generated C. Simply
-normalizing package metadata and recompiling executable modules can therefore
-mix incompatible private identities and native symbols. A general converter would
-need to account for these identities throughout constants, proofs, compiler data
-and environment extensions. The running stock build avoids that transformation.
+The archive also lacks Lake traces, native output maps and generated C. An initial
+prototype tried to generate runtime outputs using stock Lake's private identities,
+which did not match the archived identities. That establishes a limitation of that
+prototype, not that the OLeans must be rebuilt. The adapter should keep the actual
+archived private names and proof values. Runtime code generation must match those
+names while providing the initializer names expected by canonical imports.
 
-## Native producer on ffmain
+## Stopped source-build attempt on ffmain
 
 - Checkout: `/home/jack/rh436-cache-import/project`, at the PR head above.
 - Controller: `/home/jack/rh436-cache-import/run-native-build.sh`.
-- Service: `rh436-cache-native-20261122-v2.service` in jack's user manager.
+- Service: `rh436-cache-native-20261122-v2.service` in jack's user manager, stopped.
 - Resources: 48 Lake workers, 48 CPU cores of quota, 160 GiB memory cap.
 - Build: stock `run-complete-build.py --release leanprover/lean4:v4.36.0`.
 - Isolation: no network; home and runtime credentials hidden; writable dependency
   copies belong only to this task. The pre-existing RH comparator is untouched.
 - Outputs: `/home/jack/rh436-cache-import/build-records/`.
-- Checkpoint/finalizer: `rh436-cache-finish-20261122-v2.service`; durable completed
+- Checkpoint/finalizer: `rh436-cache-finish-20261122-v2.service`, also stopped; durable completed
   LTARs and its status live under `/home/jack/rh436-cache-import/cache-data/`.
 - Raw build and native-cache data: dedicated `/tmp/rh436-cache-*` directories on
   ffmain's adequately sized memory filesystem; the root filesystem was too small.
 
-The standard wrapper verifies committed source and locked dependency inputs both
-before and after the build. It writes `build-receipt.json` only on successful
-completion. No volunteer artifacts are installed into this build.
+At shutdown, 3,218 root module traces and 3,200 durable LTAR checkpoints were
+preserved. This was an incomplete source build; it produced no success receipt.
+Its finalizer is disabled so it cannot restart work, delete raw outputs, stage,
+publish, or activate a baseline.
 
-The finalizer checkpoints completed compressed outputs to disk while the build
-runs. On a successful receipt it invokes the standard stager, checks the staged
-archives with stock hashes and SHA256, and performs a full cold stock restoration
-with `--rehash --no-build`. It revalidates source/dependency identity afterwards.
-Only after durable staging may it replace this task's reproducible raw memory-file
-outputs to make room for that restoration. A failure stops the pipeline and leaves
-its status and durable artifacts available for inspection.
+## Import work
 
-After a passed cold restoration, publish from the credential host, verify the
-public map and index, and fill the 4.36 baseline pins in `scripts/cache-baselines.json`.
-The finalizer writes `cache-data/ready-baseline.json` and never publishes or
-activates it. Cache production does not replace the independent mathematical
-verification described in the main README.
+The volunteer archive is being restored on ffmain in a private user/mount
+namespace, under `/home/jack/rh436-cache-import/volunteer-fs`. It has a dedicated
+inode allowance because the shared `/tmp` filesystem cannot hold all 1.2 million
+files. This does not change the host's shared mount settings.
+
+The importer must demonstrate retained archived proof artifacts, valid runtime
+symbols, correct stock Lake input hashes, and a cold restoration that elaborates
+no project modules. Successful source compilation alone is not that test.
+Publication and baseline activation remain pending those checks. Cache production
+does not replace the independent mathematical verification in the main README.
