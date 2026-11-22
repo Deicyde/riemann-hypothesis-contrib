@@ -43,6 +43,7 @@ def main():
     git('config','user.name','github-actions[bot]')
     git('config','user.email','41898282+github-actions[bot]@users.noreply.github.com')
     git('config','gc.auto','0')
+    git('config','core.quotePath','false')
     git('fetch','--no-tags',worker.UPSTREAM,'refs/heads/main:refs/remotes/upstream/main',timeout=1800)
     base=value('rev-parse','refs/remotes/upstream/main')
     git('fetch','--no-tags',worker.OWN,*['refs/heads/'+r['prepared_branch']+':refs/remotes/prepared/'+str(r['number']) for r in cfg['results']],timeout=1800)
