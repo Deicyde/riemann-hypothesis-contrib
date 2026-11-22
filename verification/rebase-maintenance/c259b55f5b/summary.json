@@ -1,0 +1,99 @@
+{
+  "base": "c259b55f5b1e0c29f82abf235e21a48ad2f9e34e",
+  "run": "45050787651-refreshed-three",
+  "results": [
+    {
+      "number": 98,
+      "title": "Minimize and privatize imports (stacked on #79)",
+      "original_head": "86692ef803d35b2ad0ea1ec0ebddadd3f860b33c",
+      "original_repo": "Vilin97/rh-lc",
+      "original_branch": "port-lean-4.36-imports",
+      "maintainer_can_modify": true,
+      "old_merge_base": "507a75d91d131d627b380df4e32f6e9fb21dd067",
+      "automatic_resolution_count": 1,
+      "automatic_resolutions": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/AutomorphicFormsFiniteGL.lean",
+          "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+        }
+      ],
+      "rebased_head": "141096fadd34124ac81abe756ff6e4e56f99c2d6",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "149270 files changed, 6328082 insertions(+), 700118 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-98-c259b55f5b-45050787651-refreshed-three",
+      "status": "rebased"
+    },
+    {
+      "number": 86,
+      "title": "Report vm.max_map_count at job start, fix the AWS template, clarify doctor output",
+      "original_head": "9422ada52f367cf8b1da05ce8df9ca0b7ff727a0",
+      "original_repo": "leanprover-community/riemann-hypothesis",
+      "original_branch": "ci/job-start-map-count-preflight",
+      "maintainer_can_modify": false,
+      "old_merge_base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "rebased_head": "0df91c1f72bafe5a689eccd3d8a3f4d4b5d1557f",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "5 files changed, 192 insertions(+), 8 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-86-c259b55f5b-45050787651-refreshed-three",
+      "status": "rebased"
+    },
+    {
+      "number": 87,
+      "title": "Shorten checked proofs across 816 Lean modules",
+      "original_head": "dbbf5d8bdf07025202ee4954437d41481ae69847",
+      "original_repo": "graohene10-spec/riemann-hypothesis",
+      "original_branch": "proof-shortening/verified-disjoint-20261122",
+      "maintainer_can_modify": true,
+      "old_merge_base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+      "automatic_resolution_count": 0,
+      "automatic_resolutions": [],
+      "rebased_head": "d298dd2c53cd548ec662aca50620fe74cd964f0b",
+      "diff_check": true,
+      "diff_check_output": "",
+      "protected_files": {
+        "lean-toolchain": true,
+        "lake-manifest.json": true,
+        "src/Challenge.lean": true
+      },
+      "changes": "816 files changed, 4509 insertions(+), 9560 deletions(-)",
+      "imports": {
+        "modules": 149396,
+        "missing_count": 0,
+        "missing": [],
+        "acyclic": true,
+        "cycle_sample": []
+      },
+      "prepared_branch": "maintenance/rebased-pr-87-c259b55f5b-45050787651-refreshed-three",
+      "status": "rebased"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
