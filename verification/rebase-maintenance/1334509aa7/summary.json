@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-88",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/SubmoduleMultiplication.lean",
+          "stages": {
+            "1": "b3a99b08deb70a7f92fb837b785772c03bde8bbb",
+            "2": "bdbcae40d55277c73ee78a93b1cc1fec18bca0a6",
+            "3": "aced8b1cc000d9a62f5972f49296b1dba36ece3c"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "60c2c2410c93b01341755a2dad2065d5f63c4039",
+      "checkpoint_head": "0e12d9f0827ed081c3818a2667e96c0bcdbf8da2"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
