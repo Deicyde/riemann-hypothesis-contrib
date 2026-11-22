@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Formalism/LocalToGlobal/ProjectiveLattices/ExistsOfValILeOne.lean",
+      "stages": {
+        "1": "9f5d2a10f4d1f19eb327558ade44f07412249e5d",
+        "2": "e5274bd6faa98a765c724e02958ae069c920fc0e",
+        "3": "b2953c2d9b3045933c9a8efa5692281d84d2f5ee"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "bf82747756dd9ce10b2f885b5bab74c2082c57d9",
+  "checkpoint_head": "38edcd045d04e49e892218740d6c8852be1cf183"
+}
