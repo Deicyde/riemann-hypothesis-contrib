@@ -451,6 +451,16 @@
             "resolution": "resolutions/54-complete-nakayama.lean"
           }
         ]
+      },
+      {
+        "commit": "60c2c2410c93b01341755a2dad2065d5f63c4039",
+        "files": [
+          {
+            "path": "src/Formalism/HermitianCurvature/HermitianCurvatureProofs/SubmoduleMultiplication.lean",
+            "ours": "bdbcae40d55277c73ee78a93b1cc1fec18bca0a6",
+            "resolution": "resolutions/54-adic-neighbourhood.lean"
+          }
+        ]
       }
     ]
   }
