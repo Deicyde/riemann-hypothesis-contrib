@@ -13,7 +13,8 @@ namespace Formalism.HN
 
 namespace PframeLA1
 
-open Finset Module LinearMap Formalism.CorankShareLayerCake.FR Formalism.CorankShareLayerCake.FR.Pgsn2pfrla
+open Finset Module LinearMap Formalism.CorankShareLayerCake.FR
+  Formalism.CorankShareLayerCake.FR.Pgsn2pfrla
 open scoped InnerProductSpace
 
 lemma final_real1 (D R w e ε η t X tW : ℝ) (hD : 0 < D) (hR : 0 < R) (he0 : 0 ≤ e) (he : e ≤ 1/4)
@@ -69,7 +70,8 @@ lemma final_real1 (D R w e ε η t X tW : ℝ) (hD : 0 < D) (hR : 0 < R) (he0 : 
 
 end PframeLA1
 
-open Finset Module LinearMap Formalism.CorankShareLayerCake.FR Formalism.CorankShareLayerCake.FR.Pgsn2pfrla PframeLA1
+open Finset Module LinearMap Formalism.CorankShareLayerCake.FR
+  Formalism.CorankShareLayerCake.FR.Pgsn2pfrla PframeLA1
 open scoped InnerProductSpace
 
 private lemma hs2_nonneg {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
@@ -97,23 +99,27 @@ theorem frame_linear_algebra_first : FrameLA1 := by
     have : ε * ∑ i, (finrank ℂ (V i) : ℝ) < 0 := mul_neg_of_neg_of_pos h hR
     linarith
 
-  have hfull : ∀ i, (finrank ℂ (V i) : ℝ) - √(finrank ℂ (V i) : ℝ) * √(hs2 (frK (c i) (B i) - LinearMap.id))
-      ≤ c i * ∑ m, ‖B i (stdOrthonormalBasis ℂ (V i) m)‖ ^ 2 := by
+  have hfull
+      : ∀ i,
+        (finrank ℂ (V i) : ℝ) - √(finrank ℂ (V i) : ℝ) * √(hs2 (frK (c i) (B i) - LinearMap.id))
+          ≤ c i * ∑ m, ‖B i (stdOrthonormalBasis ℂ (V i) m)‖ ^ 2 := by
     intro i
     have h := fam_bound (c i) (B i) (stdOrthonormalBasis ℂ (V i)).orthonormal
     simp only [Fintype.card_fin] at h
     have := (abs_le.mp h).1
     linarith
-  have hCS1 : ∑ i, √(finrank ℂ (V i) : ℝ) * √(hs2 (frK (c i) (B i) - LinearMap.id))
-      ≤ (∑ i, (finrank ℂ (V i) : ℝ)) * √e := by
-    calc _ ≤ √(∑ i, (finrank ℂ (V i) : ℝ)) * √(∑ i, hs2 (frK (c i) (B i) - LinearMap.id)) :=
-          Real.sum_sqrt_mul_sqrt_le Finset.univ (fun i => Nat.cast_nonneg _) (fun i => hs2_nonneg _)
+  have hCS1
+      : ∑ i, √(finrank ℂ (V i) : ℝ) * √(hs2 (frK (c i) (B i) - LinearMap.id))
+        ≤ (∑ i, (finrank ℂ (V i) : ℝ)) * √e := by
+    calc
+      _ ≤ √(∑ i, (finrank ℂ (V i) : ℝ)) * √(∑ i, hs2 (frK (c i) (B i) - LinearMap.id)) :=
+        Real.sum_sqrt_mul_sqrt_le Finset.univ (fun i => Nat.cast_nonneg _) (fun i => hs2_nonneg _)
       _ ≤ √(∑ i, (finrank ℂ (V i) : ℝ)) * √(e * ∑ i, (finrank ℂ (V i) : ℝ)) :=
-          mul_le_mul_of_nonneg_left (Real.sqrt_le_sqrt hK) (Real.sqrt_nonneg _)
+        mul_le_mul_of_nonneg_left (Real.sqrt_le_sqrt hK) (Real.sqrt_nonneg _)
       _ = (∑ i, (finrank ℂ (V i) : ℝ)) * √e := by
-          rw [Real.sqrt_mul he0]
-          have := Real.mul_self_sqrt hR.le
-          linear_combination √e * this
+        rw [Real.sqrt_mul he0]
+        have := Real.mul_self_sqrt hR.le
+        linear_combination √e * this
   have ht : (∑ i, (finrank ℂ (V i) : ℝ)) * (1 - √e) ≤ (LinearMap.trace ℂ H (frQ c B)).re := by
     rw [tQ_eq c B]
     have h2 := Finset.sum_le_sum (fun i (_ : i ∈ Finset.univ) => hfull i)
@@ -128,9 +134,12 @@ theorem frame_linear_algebra_first : FrameLA1 := by
     rw [htWdef]
     simp only [re_inner_Q, Finset.mul_sum]
     exact Finset.sum_comm
-  have hWi : ∀ i, c i * ∑ l, ‖adjoint (B i) (g l)‖ ^ 2 ≤
-      ((finrank ℂ (V i) : ℝ) - finrank ℂ (Nτ i)) +
-        √((finrank ℂ (V i) : ℝ) - finrank ℂ (Nτ i)) * √(hs2 (frK (c i) (B i) - LinearMap.id)) := by
+  have hWi
+      : ∀ i,
+        c i * ∑ l, ‖adjoint (B i) (g l)‖ ^ 2
+          ≤ ((finrank ℂ (V i) : ℝ) - finrank ℂ (Nτ i))
+            + √((finrank ℂ (V i) : ℝ) - finrank ℂ (Nτ i))
+              * √(hs2 (frK (c i) (B i) - LinearMap.id)) := by
     intro i
     have hperp : ∀ l, ∀ n ∈ Nτ i, ⟪B i n, g l⟫_ℂ = 0 := by
       intro l n hn
@@ -154,33 +163,37 @@ theorem frame_linear_algebra_first : FrameLA1 := by
     rw [htW]
     have h1 := Finset.sum_le_sum (fun i (_ : i ∈ Finset.univ) => hWi i)
     rw [Finset.sum_add_distrib] at h1
-    have hCS : ∑ i, √((finrank ℂ (V i) : ℝ) - finrank ℂ (Nτ i)) * √(hs2 (frK (c i) (B i) - LinearMap.id))
-        ≤ (∑ i, (finrank ℂ (V i) : ℝ)) * √(ε * e) := by
-      calc _ ≤ √(∑ i, ((finrank ℂ (V i) : ℝ) - finrank ℂ (Nτ i))) *
-              √(∑ i, hs2 (frK (c i) (B i) - LinearMap.id)) :=
-            Real.sum_sqrt_mul_sqrt_le Finset.univ (fun i => sub_nonneg.mpr (hnk i))
-              (fun i => hs2_nonneg _)
+    have hCS
+        : ∑ i, √((finrank ℂ (V i) : ℝ) - finrank ℂ (Nτ i)) * √(hs2 (frK (c i) (B i) - LinearMap.id))
+          ≤ (∑ i, (finrank ℂ (V i) : ℝ)) * √(ε * e) := by
+      calc
+        _ ≤ √(∑ i, ((finrank ℂ (V i) : ℝ) - finrank ℂ (Nτ i)))
+            * √(∑ i, hs2 (frK (c i) (B i) - LinearMap.id)) :=
+          Real.sum_sqrt_mul_sqrt_le Finset.univ
+            (fun i => sub_nonneg.mpr (hnk i))
+            (fun i => hs2_nonneg _)
         _ ≤ √(ε * ∑ i, (finrank ℂ (V i) : ℝ)) * √(e * ∑ i, (finrank ℂ (V i) : ℝ)) :=
-            mul_le_mul (Real.sqrt_le_sqrt hN) (Real.sqrt_le_sqrt hK) (Real.sqrt_nonneg _)
-              (Real.sqrt_nonneg _)
+          mul_le_mul (Real.sqrt_le_sqrt hN) (Real.sqrt_le_sqrt hK) (Real.sqrt_nonneg _)
+            (Real.sqrt_nonneg _)
         _ = (∑ i, (finrank ℂ (V i) : ℝ)) * √(ε * e) := by
-            rw [← Real.sqrt_mul (mul_nonneg hε hR.le),
-              show ε * (∑ i, (finrank ℂ (V i) : ℝ)) * (e * ∑ i, (finrank ℂ (V i) : ℝ))
-                = ε * e * (∑ i, (finrank ℂ (V i) : ℝ)) ^ 2 by ring,
-              Real.sqrt_mul (mul_nonneg hε he0), Real.sqrt_sq hR.le]
-            ring
+          rw [← Real.sqrt_mul (mul_nonneg hε hR.le),
+            show ε * (∑ i, (finrank ℂ (V i) : ℝ)) * (e * ∑ i, (finrank ℂ (V i) : ℝ))
+                = ε * e * (∑ i, (finrank ℂ (V i) : ℝ)) ^ 2 by
+              ring,
+            Real.sqrt_mul (mul_nonneg hε he0), Real.sqrt_sq hR.le]
+          ring
     linarith
 
   set s : ℝ := (LinearMap.trace ℂ H (frQ c B)).re / (finrank ℂ H : ℝ) with hs
   set A : H →ₗ[ℂ] H := frQ c B - (s : ℂ) • LinearMap.id with hA
-  have hlow : (LinearMap.trace ℂ H (frQ c B)).re / (finrank ℂ H : ℝ) * (finrank ℂ W : ℝ)
-      - √(finrank ℂ W : ℝ) * √(hs2 A) ≤ tW := by
+  have hlow
+      : (LinearMap.trace ℂ H (frQ c B)).re / (finrank ℂ H : ℝ) * (finrank ℂ W : ℝ)
+          - √(finrank ℂ W : ℝ) * √(hs2 A)
+        ≤ tW := by
     have h := sum_re_inner_bound A hg
     simp only [Fintype.card_fin] at h
-    have h1 : ∀ l, ⟪g l, g l⟫_ℂ = 1 := fun l => by
-      rw [inner_self_eq_norm_sq_to_K, hg.1 l]; simp
-    have hsum : ∑ l, (⟪g l, A (g l)⟫_ℂ).re
-        = tW - s * (finrank ℂ W : ℝ) := by
+    have h1 : ∀ l, ⟪g l, g l⟫_ℂ = 1 := fun l => by rw [inner_self_eq_norm_sq_to_K, hg.1 l]; simp
+    have hsum : ∑ l, (⟪g l, A (g l)⟫_ℂ).re = tW - s * (finrank ℂ W : ℝ) := by
       simp only [hA, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply, inner_sub_right,
         inner_smul_right, h1, mul_one, Complex.sub_re, Complex.ofReal_re, Finset.sum_sub_distrib,
         Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, htWdef]
@@ -188,11 +201,11 @@ theorem frame_linear_algebra_first : FrameLA1 := by
     rw [hsum] at h
     have := (abs_le.mp h).1
     linarith
-  have hX : hs2 A
-      ≤ η * (LinearMap.trace ℂ H (frQ c B)).re ^ 2 / (finrank ℂ H : ℝ) := by
+  have hX : hs2 A ≤ η * (LinearMap.trace ℂ H (frQ c B)).re ^ 2 / (finrank ℂ H : ℝ) := by
     set u := stdOrthonormalBasis ℂ H with hu
-    have hterm : ∀ n, ‖A (u n)‖ ^ 2
-        = ‖frQ c B (u n)‖ ^ 2 - 2 * s * (⟪u n, frQ c B (u n)⟫_ℂ).re + s ^ 2 := by
+    have hterm
+        : ∀ n,
+          ‖A (u n)‖ ^ 2 = ‖frQ c B (u n)‖ ^ 2 - 2 * s * (⟪u n, frQ c B (u n)⟫_ℂ).re + s ^ 2 := by
       intro n
       simp only [hA, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply]
       have hsym : (⟪frQ c B (u n), u n⟫_ℂ).re = (⟪u n, frQ c B (u n)⟫_ℂ).re :=
@@ -203,25 +216,30 @@ theorem frame_linear_algebra_first : FrameLA1 := by
       ring
     have htr : (LinearMap.trace ℂ H (frQ c B)).re = ∑ n, (⟪u n, frQ c B (u n)⟫_ℂ).re := by
       rw [LinearMap.trace_eq_sum_inner (frQ c B) u, Complex.re_sum]
-    have hT2 : (LinearMap.trace ℂ H (frQ c B ∘ₗ frQ c B)).re = ∑ n, ‖frQ c B (u n)‖ ^ 2 := trace_frame_sq_eq_sum c B
+    have hT2 : (LinearMap.trace ℂ H (frQ c B ∘ₗ frQ c B)).re = ∑ n, ‖frQ c B (u n)‖ ^ 2 :=
+      trace_frame_sq_eq_sum c B
     rw [hilbert_schmidt_eq_basis_sum _ u]
     simp only [hterm, Finset.sum_add_distrib, Finset.sum_sub_distrib, ← Finset.mul_sum,
       Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
     rw [← htr, ← hT2]
-    have hsD : s * (finrank ℂ H : ℝ) = (LinearMap.trace ℂ H (frQ c B)).re := by
+    have hsD : s * (finrank ℂ H : ℝ) = (LinearMap.trace ℂ H (frQ c B)).re := by rw [hs]; field_simp
+    have hst
+        : (LinearMap.trace ℂ H (frQ c B)).re ^ 2 / (finrank ℂ H : ℝ)
+          = s * (LinearMap.trace ℂ H (frQ c B)).re := by
       rw [hs]; field_simp
-    have hst : (LinearMap.trace ℂ H (frQ c B)).re ^ 2 / (finrank ℂ H : ℝ)
-        = s * (LinearMap.trace ℂ H (frQ c B)).re := by
-      rw [hs]; field_simp
-    have hQ' : (LinearMap.trace ℂ H (frQ c B ∘ₗ frQ c B)).re
-        ≤ (1 + η) * (LinearMap.trace ℂ H (frQ c B)).re ^ 2 / (finrank ℂ H : ℝ) := hQ
+    have hQ'
+        : (LinearMap.trace ℂ H (frQ c B ∘ₗ frQ c B)).re
+          ≤ (1 + η) * (LinearMap.trace ℂ H (frQ c B)).re ^ 2 / (finrank ℂ H : ℝ) :=
+      hQ
     rw [show (1 + η) * (LinearMap.trace ℂ H (frQ c B)).re ^ 2 / (finrank ℂ H : ℝ)
-        = (LinearMap.trace ℂ H (frQ c B)).re ^ 2 / (finrank ℂ H : ℝ)
-          + η * (LinearMap.trace ℂ H (frQ c B)).re ^ 2 / (finrank ℂ H : ℝ) by ring] at hQ'
+          = (LinearMap.trace ℂ H (frQ c B)).re ^ 2 / (finrank ℂ H : ℝ)
+            + η * (LinearMap.trace ℂ H (frQ c B)).re ^ 2 / (finrank ℂ H : ℝ) by
+        ring]
+      at hQ'
     have hDs2 : (finrank ℂ H : ℝ) * s ^ 2 = s * (LinearMap.trace ℂ H (frQ c B)).re := by
       rw [← hsD]; ring
     linarith
-  exact final_real1 _ _ _ e ε η _ _ tW hD hR he0 he hε (Nat.cast_nonneg _) hwD ht
-    (hs2_nonneg _) hX hlow hup
+  exact final_real1 _ _ _ e ε η _ _ tW hD hR he0 he hε (Nat.cast_nonneg _) hwD ht (hs2_nonneg _) hX
+    hlow hup
 
 end Formalism.HN

@@ -13,8 +13,8 @@ open Formalism.BasicNotions NumberField IsDedekindDomain
 
 variable (D : D7)
 
-theorem val_nonneg_iff (w : D.what₂.places.Pl) (x : D.what₂.LL) :
-    (0 : WithTop ℤ) ≤ D.what₂.places.val w x ↔ (D.plEq w).valuation D.what₂.LL x ≤ 1 := by
+theorem val_nonneg_iff (w : D.what₂.places.Pl) (x : D.what₂.LL)
+    : (0 : WithTop ℤ) ≤ D.what₂.places.val w x ↔ (D.plEq w).valuation D.what₂.LL x ≤ 1 := by
   by_cases hx : x = 0
   · subst hx
     simp
@@ -23,8 +23,8 @@ theorem val_nonneg_iff (w : D.what₂.places.Pl) (x : D.what₂.LL) :
     conv_rhs => rw [← WithZero.exp_log hv]
     rw [← WithZero.exp_zero, WithZero.exp_le_exp]
 
-theorem resChar_mem (w : D.what₂.places.Pl) :
-    ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
+theorem resChar_mem (w : D.what₂.places.Pl)
+    : ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) ∈ (D.plEq w).asIdeal := by
   rw [← IsDedekindDomain.HeightOneSpectrum.valuation_lt_one_iff_mem (K := D.what₂.LL)]
   suffices hs : (D.plEq w).valuation D.what₂.LL ((D.what₂.places.resChar w : ℕ) : D.what₂.LL) < 1 by
     first | exact_mod_cast hs | simpa using hs
@@ -34,8 +34,11 @@ theorem resChar_mem (w : D.what₂.places.Pl) :
     (Valuation.ne_zero_iff _).2 hp
   have h1 := D.what₂.places.val_resChar w
   rw [D.val_eq w _ hp, vAdd] at h1
-  have h2 : -WithZero.log ((D.plEq w).valuation D.what₂.LL ((D.what₂.places.resChar w : ℕ) : D.what₂.LL)) =
-      ((D.what₂.places.ramIdx w : ℕ) : ℤ) := WithTop.coe_inj.1 h1
+  have h2
+      : - WithZero.log ((D.plEq w).valuation D.what₂.LL
+          ((D.what₂.places.resChar w : ℕ) : D.what₂.LL))
+        = ((D.what₂.places.ramIdx w : ℕ) : ℤ) :=
+    WithTop.coe_inj.1 h1
   have hpos := D.what₂.places.ramIdx_pos w
   rw [← WithZero.exp_log hv, ← WithZero.exp_zero, WithZero.exp_lt_exp]
   omega
@@ -51,12 +54,14 @@ abbrev ORec : Type := Ot (tauRec D w n)
 
 def embRec : D.what₂.LL →+* KfRec D w n := embL (tauRec D w n)
 
-def extRec : ExtOf (OO (D.what₂.places.resChar w) n) (KO (D.what₂.places.resChar w) n) (ORec D w n) (KfRec D w n) :=
+def extRec
+    : ExtOf (OO (D.what₂.places.resChar w) n) (KO (D.what₂.places.resChar w) n) (ORec D w n)
+      (KfRec D w n) :=
   extOt (tauRec D w n)
 
-theorem embRec_int (x : D.what₂.LL) :
-    (0 : WithTop ℤ) ≤ D.what₂.places.val w x ↔
-      embRec D w n x ∈ Set.range (algebraMap (ORec D w n) (KfRec D w n)) := by
+theorem embRec_int (x : D.what₂.LL)
+    : (0 : WithTop ℤ) ≤ D.what₂.places.val w x
+      ↔ embRec D w n x ∈ Set.range (algebraMap (ORec D w n) (KfRec D w n)) := by
   rw [val_nonneg_iff]
   exact induces_tauAt (D.plEq w) (resChar_mem D w) x
 

@@ -22,15 +22,16 @@ namespace GlobalTheory.HL.Frames
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-theorem stab_span_of_integral {L : LocE F E} {r k : ℕ} (S : Frames L r k) (h : S.GLV)
-    (g : Fin (r + 1) → S.V) (s si : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
-    (hs : ∀ i j, s i j ∈ L.O) (hsi : ∀ i j, si i j ∈ L.O) (hm : s * si = 1)
-    (hg : ∀ j, h (g j) = ∑ i, s i j • g i) :
-    h ∈ MulAction.stabilizer S.GLV (Submodule.span L.O (Set.range g)) := by
+theorem stab_span_of_integral
+    {L : LocE F E} {r k : ℕ} (S : Frames L r k) (h : S.GLV) (g : Fin (r + 1) → S.V)
+    (s si : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (hs : ∀ i j, s i j ∈ L.O)
+    (hsi : ∀ i j, si i j ∈ L.O) (hm : s * si = 1) (hg : ∀ j, h (g j) = ∑ i, s i j • g i)
+    : h ∈ MulAction.stabilizer S.GLV (Submodule.span L.O (Set.range g)) := by
   rw [MulAction.mem_stabilizer_iff]
   set N := Submodule.span L.O (Set.range g) with hN
-  have mem : ∀ (c : Matrix (Fin (r + 1)) (Fin (r + 1)) E), (∀ i j, c i j ∈ L.O) →
-      ∀ j, ∑ i, c i j • g i ∈ N := by
+  have mem
+      : ∀ (c : Matrix (Fin (r + 1)) (Fin (r + 1)) E),
+        (∀ i j, c i j ∈ L.O) → ∀ j, ∑ i, c i j • g i ∈ N := by
     intro c hc j
     refine Submodule.sum_mem _ fun i _ => ?_
     have : c i j • g i = (⟨c i j, hc i j⟩ : L.O) • g i := rfl
@@ -57,10 +58,19 @@ theorem stab_span_of_integral {L : LocE F E} {r k : ℕ} (S : Frames L r k) (h :
     rw [key]
     exact Submodule.smul_mem_pointwise_smul _ h _ (mem si hsi j)
 
-theorem mem_K0_of_integral : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E) (r k : ℕ) (S : Frames L r k) (h : S.GLV) (s si s' si' : Matrix (Fin (r + 1)) (Fin (r + 1)) E), h ∈ S.St → (∀ i j, s i j ∈ L.O) → (∀ i j, si i j ∈ L.O) → s * si = 1 → (∀ i j, s' i j ∈ L.O) → (∀ i j, si' i j ∈ L.O) → s' * si' = 1 → (∀ j, h (S.f j) = ∑ i, s i j • S.f i) → (∀ j, h (S.f' j) = ∑ i, s' i j • S.f' i) → h ∈ S.K0 := by
+theorem mem_K0_of_integral
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] (L : LocE F E) (r k : ℕ) (S : Frames L r k) (h : S.GLV)
+        (s si s' si' : Matrix (Fin (r + 1)) (Fin (r + 1)) E),
+      h ∈ S.St → (∀ i j, s i j ∈ L.O) → (∀ i j, si i j ∈ L.O) → s * si = 1 → (∀ i j, s' i j ∈ L.O)
+        → (∀ i j, si' i j ∈ L.O) → s' * si' = 1 → (∀ j, h (S.f j) = ∑ i, s i j • S.f i)
+        → (∀ j, h (S.f' j) = ∑ i, s' i j • S.f' i)
+        → h ∈ S.K0 := by
   intro F _ _ _ E _ _ _ L r k S h s si s' si' hSt hs hsi hm hs' hsi' hm' hg hg'
   unfold Frames.K0
-  exact ⟨⟨hSt, S.stab_span_of_integral h S.f s si hs hsi hm hg⟩,
-    S.stab_span_of_integral h S.f' s' si' hs' hsi' hm' hg'⟩
+  exact ⟨
+    ⟨hSt, S.stab_span_of_integral h S.f s si hs hsi hm hg⟩,
+    S.stab_span_of_integral h S.f' s' si' hs' hsi' hm' hg'
+  ⟩
 
 end GlobalTheory.HL.Frames

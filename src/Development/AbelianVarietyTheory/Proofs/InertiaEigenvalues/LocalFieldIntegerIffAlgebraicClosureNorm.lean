@@ -7,7 +7,8 @@ public import GroundTheory.LocalFields.Integers
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField GlobalTheory.PMon.Ram
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField
+  GlobalTheory.PMon.Ram
 
 noncomputable section
 
@@ -19,8 +20,8 @@ theorem padic_mem_integer_iff (l : ℕ) [Fact l.Prime] (a : ℚ_[l]) : a ∈ �
     Valuation.Compatible.vle_iff_le (v := Padic.mulValuation),
     GroundTheory.LocalField.Padic.mulValuation_le_iff_norm_le, norm_one]
 
-theorem isIntegral_integer_iff_norm_le (l : ℕ) [Fact l.Prime] (y : Om l) :
-    IsIntegral 𝒪[ℚ_[l]] y ↔ ‖y‖ ≤ 1 := by
+theorem isIntegral_integer_iff_norm_le (l : ℕ) [Fact l.Prime] (y : Om l)
+    : IsIntegral 𝒪[ℚ_[l]] y ↔ ‖y‖ ≤ 1 := by
   have hy : IsIntegral ℚ_[l] y := Algebra.IsIntegral.isIntegral y
   rw [← PadicAlgCl.spectralNorm_eq, spectralNorm, spectralValue_le_one_iff (minpoly.monic hy)]
   constructor
@@ -39,11 +40,14 @@ end GlobalTheory.PMon.Ram
 
 namespace GlobalTheory.PMon.Ram
 
-theorem mem_integer_iff_norm_le_and_valuation_lt_one_iff_norm_lt (l : ℕ) [Fact l.Prime] (L : Type) [Field L]
-    [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra ℚ_[l] L]
-    [ValuativeExtension ℚ_[l] L] [FiniteDimensional ℚ_[l] L] [IsGalois ℚ_[l] L] [Algebra L (Om l)]
-    [IsScalarTower ℚ_[l] L (Om l)] (x : L) :
-    (x ∈ 𝒪[L] ↔ ‖algebraMap L (Om l) x‖ ≤ 1) ∧ (valuation L x < 1 ↔ ‖algebraMap L (Om l) x‖ < 1) := by
+theorem mem_integer_iff_norm_le_and_valuation_lt_one_iff_norm_lt
+    (l : ℕ) [Fact l.Prime]
+    (L : Type) [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
+    [Algebra ℚ_[l] L] [ValuativeExtension ℚ_[l] L] [FiniteDimensional ℚ_[l] L] [IsGalois ℚ_[l] L]
+    [Algebra L (Om l)] [IsScalarTower ℚ_[l] L (Om l)]
+    (x : L)
+    : (x ∈ 𝒪[L] ↔ ‖algebraMap L (Om l) x‖ ≤ 1)
+      ∧ (valuation L x < 1 ↔ ‖algebraMap L (Om l) x‖ < 1) := by
   have key : ∀ z : L, z ∈ 𝒪[L] ↔ ‖algebraMap L (Om l) z‖ ≤ 1 := by
     intro z
     let f : L →ₐ[𝒪[ℚ_[l]]] Om l := (IsScalarTower.toAlgHom ℚ_[l] L (Om l)).restrictScalars 𝒪[ℚ_[l]]

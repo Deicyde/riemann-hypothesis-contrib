@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PlaceConjuga
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -17,9 +18,11 @@ namespace PositivityTheory.Rg.BcB.F.Inert
 
 namespace UniformizerOfValuationOne
 
-theorem v_of_ordL_eq_one {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {x : L}
-    (hx0 : x ≠ 0) (hx : ordL x = 1) :
-    Valued.v x = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+theorem v_of_ordL_eq_one
+    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+    {x : L} (hx0 : x ≠ 0) (hx : ordL x = 1)
+    : Valued.v x
+      = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
   have h0 : Valued.v x ≠ 0 := by
     intro h
     exact hx0 ((Valuation.zero_iff _).mp h)

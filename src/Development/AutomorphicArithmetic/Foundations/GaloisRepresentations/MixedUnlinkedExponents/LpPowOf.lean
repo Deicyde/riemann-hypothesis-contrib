@@ -92,8 +92,8 @@ theorem lpPowOf : LpPowOf := by
   rw [expand_eq_comp_X_pow, expand_eq_comp_X_pow, ← prod_lp hf, lp_nsmul, pow_comp]
   have e : ∀ u ∈ nthRootsFinset f (1 : ℂ), (lp A).comp (C u * X) = (lp B).comp (X ^ f) := by
     intro u hu
-    rw [h, comp_assoc, pow_comp, X_comp, mul_pow, ← C_pow, (mem_nthRootsFinset hf 1).1 hu,
-      C_1, one_mul]
+    rw [h, comp_assoc, pow_comp, X_comp, mul_pow, ← C_pow, (mem_nthRootsFinset hf 1).1 hu, C_1,
+      one_mul]
   rw [Finset.prod_congr rfl e, Finset.prod_const, hζ.card_nthRootsFinset]
 
 end UpperTheory.Gal.GamX

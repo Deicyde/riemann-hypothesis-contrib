@@ -25,15 +25,18 @@ theorem stSInt (h : UnitaryGroupStructuralFacts) : StSInt := by
   have hmeas : Measurable (fun p : Mt k r × Mt k r => gN (Matrix.of p.2 * Matrix.of p.1) ^ (-b)) :=
     ((bc_gN_cont_mt.comp (bc_continuous_mulM.comp continuous_swap)).measurable).pow_const _
   refine ⟨hmeas.aestronglyMeasurable, ?_⟩
-  rw [hasFiniteIntegral_iff_ofReal (Filter.Eventually.of_forall fun p => Real.rpow_nonneg (bc_gN_nonneg _) _)]
+  rw [hasFiniteIntegral_iff_ofReal (Filter.Eventually.of_forall fun p =>
+    Real.rpow_nonneg (bc_gN_nonneg _) _)]
   refine lt_of_le_of_lt (lintegral_mono_ae ?_) hfin
-  have aeS : ∀ᵐ p1 ∂(D.μW.prod D.μN), (Matrix.of p1.1 : Mat k r) ∈ UWset k r D.z ∧
-      (Matrix.of p1.2 : Mat k r) ∈ Nset k r :=
+  have aeS
+      : ∀ᵐ p1 ∂(D.μW.prod D.μN), (Matrix.of p1.1 : Mat k r) ∈ UWset k r D.z ∧
+        (Matrix.of p1.2 : Mat k r) ∈ Nset k r :=
     bc_ae_prod_and (bc_isHaarOn_ae_mem D.haarW) (bc_isHaarOn_ae_mem D.haarN)
   filter_upwards [aeS] with p hp
-  have hG : (Matrix.of p.2 : Mat k r) * Matrix.of p.1 ∈ GV k r := (hCG k r).mul_mem _ hp.2.1 _ hp.1.1
-  change ENNReal.ofReal (gN (Matrix.of p.2 * Matrix.of p.1) ^ (-b)) ≤
-    ENNReal.ofReal (gN (Matrix.of p.2 * Matrix.of p.1) ^ (-AB k r))
+  have hG : (Matrix.of p.2 : Mat k r) * Matrix.of p.1 ∈ GV k r :=
+    (hCG k r).mul_mem _ hp.2.1 _ hp.1.1
+  change ENNReal.ofReal (gN (Matrix.of p.2 * Matrix.of p.1) ^ (-b))
+    ≤ ENNReal.ofReal (gN (Matrix.of p.2 * Matrix.of p.1) ^ (- AB k r))
   exact ENNReal.ofReal_le_ofReal (Real.rpow_le_rpow_of_exponent_le (hGL k r _ hG) (by linarith))
 
 end ReciprocityTheory.ChartRestriction.DS.Mult1

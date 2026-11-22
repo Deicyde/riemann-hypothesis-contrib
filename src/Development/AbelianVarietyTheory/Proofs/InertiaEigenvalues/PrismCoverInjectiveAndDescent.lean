@@ -7,20 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Faithfu
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP
 
-theorem eq_zero_of_mem_adI_pow {l : ℕ} {R : Type} [CommRing R] (B : Obj l R) (x : B.A)
-    (hx : ∀ n : ℕ, x ∈ adI B ^ n) : x = 0 := by
+theorem eq_zero_of_mem_adI_pow
+    {l : ℕ} {R : Type} [CommRing R] (B : Obj l R) (x : B.A) (hx : ∀ n : ℕ, x ∈ adI B ^ n)
+    : x = 0 := by
   refine B.complete.toIsHausdorff.haus x fun n => ?_
   rw [SModEq.sub_mem, sub_zero, smul_eq_mul, Ideal.mul_top]
   exact hx n
 
-theorem cover_injective_and_descent : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (B C : Obj l R) (h : Hom B C),
-    Cover h → Function.Injective h.f ∧ ∀ (D : Obj l R) (p q : Hom C D), IsPO h h p q →
-      ∀ c, p.f c = q.f c → c ∈ h.f.range := by
+theorem cover_injective_and_descent
+    : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (B C : Obj l R) (h : Hom B C),
+      Cover h
+        → Function.Injective h.f
+          ∧ ∀ (D : Obj l R) (p q : Hom C D), IsPO h h p q → ∀ c, p.f c = q.f c → c ∈ h.f.range := by
   intro l _ R _ B C h hc
 
   have hinj : ∀ m : ℕ, Function.Injective (qmap h m) := fun m =>
@@ -34,11 +39,12 @@ theorem cover_injective_and_descent : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [C
   refine ⟨fun x y hxy => ?_, fun D p q hpo c hpq => ?_⟩
   · rw [← sub_eq_zero]
     refine eq_zero_of_mem_adI_pow B _ fun n => hlev n _ ?_
-    rw [map_sub, hxy, sub_self]; exact Ideal.zero_mem _
-  ·
-    have happ : ∀ m : ℕ, ∃ b : B.A, h.f b - c ∈ adI C ^ m := fun m => by
-      have hd := (GlobalTheory.T.faithfullyFlat_descent_elements_pushout _ _ _ (qmap h m) (qmap p m) (qmap q m) (hc.ff m) (hpo.po m)).2
-        (Ideal.Quotient.mk _ c) (by rw [qmap_mk, qmap_mk, hpq])
+    rw [map_sub, hxy, sub_self]
+    exact Ideal.zero_mem _
+  · have happ : ∀ m : ℕ, ∃ b : B.A, h.f b - c ∈ adI C ^ m := fun m => by
+      have hd :=
+        (GlobalTheory.T.faithfullyFlat_descent_elements_pushout _ _ _ (qmap h m) (qmap p m)
+          (qmap q m) (hc.ff m) (hpo.po m)).2 (Ideal.Quotient.mk _ c) (by rw [qmap_mk, qmap_mk, hpq])
       obtain ⟨b', hb'⟩ := hd
       obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective b'
       refine ⟨b, ?_⟩

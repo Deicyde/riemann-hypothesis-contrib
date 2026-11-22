@@ -18,18 +18,14 @@ variable {E : Type} [Field E] [NumberField E]
 def IsRanks [IsCMField E] (r : ℕ) (rk : (E ≃ₐ[ℚ] E) → ℕ) : Prop :=
   ∀ σ : E ≃ₐ[ℚ] E, rk σ + rk ((IsCMField.complexConj E).restrictScalars ℚ * σ) = r
 
-
 variable (E) in
 structure ClassBasis where
-
   k : ℕ
-
   c : Fin k → (FractionalIdeal (𝓞 E)⁰ E)ˣ
-
   γ : Fin k → Eˣ
   span : ∀ x : ClassGroup (𝓞 E), ∃ a : Fin k → ℤ, x = ∏ i, ClassGroup.mk E (c i) ^ a i
-  indep : ∀ a : Fin k → ℤ, ∏ i, ClassGroup.mk E (c i) ^ a i = 1 →
-    ∀ i, ClassGroup.mk E (c i) ^ a i = 1
+  indep
+    : ∀ a : Fin k → ℤ, ∏ i, ClassGroup.mk E (c i) ^ a i = 1 → ∀ i, ClassGroup.mk E (c i) ^ a i = 1
   pow_eq : ∀ i, c i ^ orderOf (ClassGroup.mk E (c i)) = toPrincipalIdeal (𝓞 E) E (γ i)
 
 def ClassBasis.h (B : ClassBasis E) (i : Fin B.k) : ℕ := orderOf (ClassGroup.mk E (B.c i))
@@ -56,20 +52,22 @@ private lemma prod_mulSingle_zpow_eq_symm {ι : Type} [Fintype ι] [DecidableEq 
   rw [← ofAdd_zsmul]
   simp
 
-theorem exists_basis (G : Type) [CommGroup G] [Finite G] :
-    ∃ (k : ℕ) (g : Fin k → G), (∀ x, ∃ a : Fin k → ℤ, x = ∏ i, g i ^ a i) ∧
-      ∀ a : Fin k → ℤ, ∏ i, g i ^ a i = 1 → ∀ i, g i ^ a i = 1 := by
+theorem exists_basis (G : Type) [CommGroup G] [Finite G]
+    : ∃ (k : ℕ) (g : Fin k → G),
+      (∀ x, ∃ a : Fin k → ℤ, x = ∏ i, g i ^ a i)
+        ∧ ∀ a : Fin k → ℤ, ∏ i, g i ^ a i = 1 → ∀ i, g i ^ a i = 1 := by
   obtain ⟨ι, _, n, -, ⟨e⟩⟩ := CommGroup.equiv_prod_multiplicative_zmod_of_finite G
   classical
   set q := Fintype.equivFin ι
-  have key : ∀ a : Fin (Fintype.card ι) → ℤ,
-      ∏ i, e.symm (Pi.mulSingle (q.symm i) (Multiplicative.ofAdd 1)) ^ a i =
-        e.symm (fun j => Multiplicative.ofAdd (a (q j) : ZMod (n j))) := by
+  have key
+      : ∀ a : Fin (Fintype.card ι) → ℤ,
+        ∏ i, e.symm (Pi.mulSingle (q.symm i) (Multiplicative.ofAdd 1)) ^ a i
+          = e.symm (fun j => Multiplicative.ofAdd (a (q j) : ZMod (n j))) := by
     intro a
     rw [← prod_mulSingle_zpow_eq_symm e (fun j => a (q j))]
     exact Fintype.prod_equiv q.symm _ _ (fun i => by simp)
-  refine ⟨Fintype.card ι, fun i => e.symm (Pi.mulSingle (q.symm i) (Multiplicative.ofAdd 1)),
-    ?_, ?_⟩
+  refine
+    ⟨Fintype.card ι, fun i => e.symm (Pi.mulSingle (q.symm i) (Multiplicative.ofAdd 1)), ?_, ?_⟩
   · intro x
     choose b hb using fun j => ZMod.intCast_surjective (Multiplicative.toAdd (e x j))
     refine ⟨fun i => b (q.symm i), ?_⟩
@@ -91,8 +89,8 @@ theorem exists_basis (G : Type) [CommGroup G] [Finite G] :
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem exists_gen {I : (FractionalIdeal (𝓞 E)⁰ E)ˣ} (h : ClassGroup.mk E I = 1) :
-    ∃ γ : Eˣ, I = toPrincipalIdeal (𝓞 E) E γ := by
+theorem exists_gen {I : (FractionalIdeal (𝓞 E)⁰ E)ˣ} (h : ClassGroup.mk E I = 1)
+    : ∃ γ : Eˣ, I = toPrincipalIdeal (𝓞 E) E γ := by
   obtain ⟨x, hx⟩ := (ClassGroup.mk_eq_one_iff.mp h).principal
   have hx0 : x ≠ 0 := by
     rintro rfl

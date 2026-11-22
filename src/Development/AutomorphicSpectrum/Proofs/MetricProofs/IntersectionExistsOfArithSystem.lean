@@ -8,12 +8,14 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticInt
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
 
-theorem exists_family_of_system :
-    ReciprocityTheory.ChartRestriction.G.Geo.ArithIntersectionSystemStatement → ReciprocityTheory.ChartRestriction.G.AI.I2.ExistsStatement := by
+theorem exists_family_of_system
+    : ReciprocityTheory.ChartRestriction.G.Geo.ArithIntersectionSystemStatement
+      → ReciprocityTheory.ChartRestriction.G.AI.I2.ExistsStatement := by
   rintro ⟨II, hII, -⟩
   exact ⟨II, hII⟩
 

@@ -6,11 +6,11 @@ public import Mathlib
 
 namespace Bl.general_b_fact_upper_version
 
-theorem goal1 :
-  ∀ {R : Type} [inst : CommRing.{0} R] [IsDomain.{0} R] (ζ : R) (M : Nat) (P : Ideal.{0} R),
-  Ne.{1} ζ 1 →
-    Eq.{1} (HPow.hPow.{0, 0, 0} ζ M) 1 →
-      Membership.mem.{0, 0} P (HSub.hSub.{0, 0, 0} ζ 1) → Membership.mem.{0, 0} P (Nat.cast.{0} M) := by
+theorem goal1
+    : ∀ {R : Type} [inst : CommRing.{0} R] [IsDomain.{0} R] (ζ : R) (M : Nat) (P : Ideal.{0} R),
+      Ne.{1} ζ 1 → Eq.{1} (HPow.hPow.{0, 0, 0} ζ M) 1
+        → Membership.mem.{0, 0} P (HSub.hSub.{0, 0, 0} ζ 1)
+        → Membership.mem.{0, 0} P (Nat.cast.{0} M) := by
   intro R _ _ ζ M P h1 hM hP
   have hs : (∑ i ∈ Finset.range M, ζ ^ i) = 0 := by
     have h := geom_sum_mul ζ M
@@ -22,6 +22,6 @@ theorem goal1 :
     exact hP
   have h3 := congrArg (Ideal.Quotient.mk P) hs
   set_option synthInstance.maxHeartbeats 100000 in
-    simpa [map_sum, map_pow, h2] using h3
+  simpa [map_sum, map_pow, h2] using h3
 
 end Bl.general_b_fact_upper_version

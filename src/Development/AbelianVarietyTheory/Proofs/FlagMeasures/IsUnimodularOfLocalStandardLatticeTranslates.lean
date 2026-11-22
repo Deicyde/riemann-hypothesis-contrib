@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.InnerPreimage
 noncomputable section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full
-  Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -54,22 +56,22 @@ theorem h_neg_right (x y : V) : H.h x (-y) = - H.h x y := by
 theorem h_sub_right (x y y' : V) : H.h x (y - y') = H.h x y - H.h x y' := by
   rw [sub_eq_add_neg, h_add_right, h_neg_right, ← sub_eq_add_neg]
 
-theorem h_sum_left {ι : Type*} (s : Finset ι) (c : ι → E) (u : ι → V) (y : V) :
-    H.h (∑ i ∈ s, c i • u i) y = ∑ i ∈ s, c i * H.h (u i) y := by
+theorem h_sum_left {ι : Type*} (s : Finset ι) (c : ι → E) (u : ι → V) (y : V)
+    : H.h (∑ i ∈ s, c i • u i) y = ∑ i ∈ s, c i * H.h (u i) y := by
   refine Finset.induction_on s ?_ ?_
   · simpa using H.h_zero_left y
   · intro a s ha ih
     rw [Finset.sum_insert ha, Finset.sum_insert ha, H.h_add_left, H.h_smul_left, ih]
 
-theorem h_sum_right {ι : Type*} (s : Finset ι) (c : ι → E) (u : ι → V) (x : V) :
-    H.h x (∑ i ∈ s, c i • u i) = ∑ i ∈ s, M.L.cj (c i) * H.h x (u i) := by
+theorem h_sum_right {ι : Type*} (s : Finset ι) (c : ι → E) (u : ι → V) (x : V)
+    : H.h x (∑ i ∈ s, c i • u i) = ∑ i ∈ s, M.L.cj (c i) * H.h x (u i) := by
   refine Finset.induction_on s ?_ ?_
   · simpa using h_zero_right H x
   · intro a s ha ih
     rw [Finset.sum_insert ha, Finset.sum_insert ha, h_add_right, h_smul_right, ih]
 
-theorem int_span_right (x : V) (S : Set V) (hS : ∀ y ∈ S, H.h x y ∈ M.L.O) :
-    ∀ y ∈ Submodule.span M.L.O S, H.h x y ∈ M.L.O := by
+theorem int_span_right (x : V) (S : Set V) (hS : ∀ y ∈ S, H.h x y ∈ M.L.O)
+    : ∀ y ∈ Submodule.span M.L.O S, H.h x y ∈ M.L.O := by
   intro y hy
   induction hy using Submodule.span_induction with
   | mem y h => exact hS y h
@@ -79,8 +81,8 @@ theorem int_span_right (x : V) (S : Set V) (hS : ∀ y ∈ S, H.h x y ∈ M.L.O)
     rw [show (c • y : V) = (c : E) • y from rfl, h_smul_right]
     exact M.L.O.mul_mem (cj_mem c.2) h
 
-theorem int_span_left (S : Set V) (y : V) (hS : ∀ x ∈ S, H.h x y ∈ M.L.O) :
-    ∀ x ∈ Submodule.span M.L.O S, H.h x y ∈ M.L.O := by
+theorem int_span_left (S : Set V) (y : V) (hS : ∀ x ∈ S, H.h x y ∈ M.L.O)
+    : ∀ x ∈ Submodule.span M.L.O S, H.h x y ∈ M.L.O := by
   intro x hx
   induction hx using Submodule.span_induction with
   | mem x h => exact hS x h
@@ -96,8 +98,9 @@ section Frame
 
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-variable {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : HermSp M V} {r : ℕ}
-  (Fr : LocNG.FrameD H r)
+variable
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  {H : HermSp M V} {r : ℕ} (Fr : LocNG.FrameD H r)
 
 theorem h_e_e (a b : Fin r) : H.h (Fr.e a) (Fr.e b) = 0 :=
   Fr.h_iso _ _ (Or.inl (Fin.castSucc_lt_last a).ne)
@@ -123,8 +126,8 @@ theorem h_e_prF (v : V) (b : Fin r) : H.h (Fr.e b) (Fr.prF v) = 0 := by
 theorem h_es_prF (v : V) (b : Fin r) : H.h (Fr.es b) (Fr.prF v) = 0 := by
   rw [H.h_herm, h_prF_es, map_zero]
 
-theorem decomp (v : V) :
-    v = ∑ a, H.h v (Fr.es a) • Fr.e a + Fr.prF v + ∑ a, H.h v (Fr.e a) • Fr.es a := by
+theorem decomp (v : V)
+    : v = ∑ a, H.h v (Fr.es a) • Fr.e a + Fr.prF v + ∑ a, H.h v (Fr.e a) • Fr.es a := by
   unfold FrameD.prF; abel
 
 theorem h_left_prF (v u : V) : H.h v (Fr.prF u) = H.h (Fr.prF v) (Fr.prF u) := by
@@ -132,14 +135,16 @@ theorem h_left_prF (v u : V) : H.h v (Fr.prF u) = H.h (Fr.prF v) (Fr.prF u) := b
   rw [H.h_add_left, H.h_add_left, h_sum_left, h_sum_left]
   simp [h_e_prF, h_es_prF]
 
-theorem h_prF_right (w y : V) (h1 : ∀ a, H.h w (Fr.e a) = 0) (h2 : ∀ a, H.h w (Fr.es a) = 0) :
-    H.h w (Fr.prF y) = H.h w y := by
+theorem h_prF_right (w y : V) (h1 : ∀ a, H.h w (Fr.e a) = 0) (h2 : ∀ a, H.h w (Fr.es a) = 0)
+    : H.h w (Fr.prF y) = H.h w y := by
   unfold FrameD.prF
   rw [h_sub_right, h_sub_right, h_sum_right, h_sum_right]
   simp [h1, h2]
 
-theorem h_expand (v u : V) : H.h v u = ∑ a, M.L.cj (H.h u (Fr.es a)) * H.h v (Fr.e a) +
-    H.h v (Fr.prF u) + ∑ a, M.L.cj (H.h u (Fr.e a)) * H.h v (Fr.es a) := by
+theorem h_expand (v u : V)
+    : H.h v u
+      = ∑ a, M.L.cj (H.h u (Fr.es a)) * H.h v (Fr.e a) + H.h v (Fr.prF u)
+        + ∑ a, M.L.cj (H.h u (Fr.e a)) * H.h v (Fr.es a) := by
   conv_lhs => rw [decomp Fr u]
   rw [h_add_right, h_add_right, h_sum_right, h_sum_right]
 
@@ -159,14 +164,17 @@ def gen (L : Submodule M.L.O (H.Wb Fr.f)) : Set V :=
   {v | (∀ a, H.h v (Fr.es a) ∈ M.L.O) ∧ (∀ a, H.h v (Fr.e a) ∈ M.L.O) ∧
     ∃ w : ↥(H.perp (H.X Fr.f)), (w : V) = Fr.prF v ∧ H.mkW Fr.f w ∈ L}
 
-theorem lamStd_eq (L : Submodule M.L.O (H.Wb Fr.f)) : Fr.LamStd L = Submodule.span M.L.O (gen Fr L) := rfl
+theorem lamStd_eq (L : Submodule M.L.O (H.Wb Fr.f))
+    : Fr.LamStd L = Submodule.span M.L.O (gen Fr L) :=
+  rfl
 
 theorem e_mem (L : Submodule M.L.O (H.Wb Fr.f)) (j : Fin r) : Fr.e j ∈ gen Fr L := by
   have hp : Fr.prF (Fr.e j) = 0 := by
     unfold FrameD.prF
     simp [h_e_es, h_e_e]
   refine ⟨fun a => ?_, fun a => ?_, 0, by simp [hp], by simp⟩
-  · rw [h_e_es]; split_ifs
+  · rw [h_e_es]
+    split_ifs
     · exact M.L.O.one_mem
     · exact M.L.O.zero_mem
   · rw [h_e_e]; exact M.L.O.zero_mem
@@ -177,12 +185,13 @@ theorem es_mem (L : Submodule M.L.O (H.Wb Fr.f)) (j : Fin r) : Fr.es j ∈ gen F
     simp [h_es_e, Fr.h_ss]
   refine ⟨fun a => ?_, fun a => ?_, 0, by simp [hp], by simp⟩
   · rw [Fr.h_ss]; exact M.L.O.zero_mem
-  · rw [h_es_e]; split_ifs
+  · rw [h_es_e]
+    split_ifs
     · exact M.L.O.one_mem
     · exact M.L.O.zero_mem
 
-theorem prF_gen (L : Submodule M.L.O (H.Wb Fr.f)) (y : ↥(H.perp (H.X Fr.f))) (hy : H.mkW Fr.f y ∈ L) :
-    Fr.prF y ∈ gen Fr L := by
+theorem prF_gen (L : Submodule M.L.O (H.Wb Fr.f)) (y : ↥(H.perp (H.X Fr.f))) (hy : H.mkW Fr.f y ∈ L)
+    : Fr.prF y ∈ gen Fr L := by
   have hy0 : ∀ a, H.h y (Fr.e a) = 0 := fun a => y.2 _ (Submodule.subset_span ⟨a, rfl⟩)
   refine ⟨fun a => ?_, fun a => ?_, ⟨Fr.prF y, prF_mem_perp Fr y⟩, (prF_prF Fr y).symm, ?_⟩
   · rw [h_prF_es]; exact M.L.O.zero_mem
@@ -195,8 +204,10 @@ theorem prF_gen (L : Submodule M.L.O (H.Wb Fr.f)) (y : ↥(H.perp (H.X Fr.f))) (
       rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq]
       show Fr.prF (y : V) - y ∈ H.X Fr.f
       rw [hd]
-      exact neg_mem (Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩))
-    rw [heq]; exact hy
+      exact neg_mem (Submodule.sum_mem _ fun a _ =>
+        Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩))
+    rw [heq]
+    exact hy
 
 end Frame
 
@@ -204,11 +215,14 @@ section SelfDual
 
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-variable {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : HermSp M V} {r : ℕ}
-  (Fr : LocNG.FrameD H r)
+variable
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  {H : HermSp M V} {r : ℕ} (Fr : LocNG.FrameD H r)
 
-theorem gen_pair (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.IsInner L) {v u : V}
-    (hv : v ∈ gen Fr L) (hu : u ∈ gen Fr L) : H.h v u ∈ M.L.O := by
+theorem gen_pair
+    (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.IsInner L)
+    {v u : V} (hv : v ∈ gen Fr L) (hu : u ∈ gen Fr L)
+    : H.h v u ∈ M.L.O := by
   obtain ⟨hv1, hv2, wv, hwv, hwvL⟩ := hv
   obtain ⟨hu1, hu2, wu, hwu, hwuL⟩ := hu
   rw [h_expand Fr, h_left_prF, ← hwv, ← hwu]
@@ -216,8 +230,8 @@ theorem gen_pair (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.IsInner L) {v u : V}
   · exact M.L.O.sum_mem fun a _ => M.L.O.mul_mem (cj_mem (hu1 a)) (hv2 a)
   · exact M.L.O.sum_mem fun a _ => M.L.O.mul_mem (cj_mem (hu2 a)) (hv1 a)
 
-theorem lamStd_selfDual (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.IsInner L) (x : V) :
-    x ∈ Fr.LamStd L ↔ ∀ y ∈ Fr.LamStd L, H.h x y ∈ M.L.O := by
+theorem lamStd_selfDual (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.IsInner L) (x : V)
+    : x ∈ Fr.LamStd L ↔ ∀ y ∈ Fr.LamStd L, H.h x y ∈ M.L.O := by
   rw [lamStd_eq]
   constructor
   · intro hx y hy
@@ -226,16 +240,23 @@ theorem lamStd_selfDual (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.IsInner L) (x
     exact int_span_right H x' _ (fun y' hy' => gen_pair Fr L hL hx' hy') y hy
   · intro h
     apply Submodule.subset_span
-    refine ⟨fun a => h _ (Submodule.subset_span (es_mem Fr L a)),
-      fun a => h _ (Submodule.subset_span (e_mem Fr L a)), ⟨Fr.prF x, prF_mem_perp Fr x⟩, rfl, ?_⟩
+    refine ⟨
+      fun a => h _ (Submodule.subset_span (es_mem Fr L a)),
+      fun a => h _ (Submodule.subset_span (e_mem Fr L a)),
+      ⟨Fr.prF x, prF_mem_perp Fr x⟩,
+      rfl,
+      ?_
+    ⟩
     rw [hL.2.1]
     intro y hy
     have := h _ (Submodule.subset_span (prF_gen Fr L y hy))
     rwa [h_left_prF, h_prF_right Fr _ _ (h_prF_e Fr x) (h_prF_es Fr x)] at this
 
-theorem img_selfDual (g : V ≃ₗ[E] V) (hg : IsUnitary H g) (Λ : Submodule M.L.O V)
-    (hΛ : ∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, H.h x y ∈ M.L.O) (x : V) :
-    x ∈ img g Λ ↔ ∀ y ∈ img g Λ, H.h x y ∈ M.L.O := by
+theorem img_selfDual
+    (g : V ≃ₗ[E] V) (hg : IsUnitary H g)
+    (Λ : Submodule M.L.O V) (hΛ : ∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, H.h x y ∈ M.L.O)
+    (x : V)
+    : x ∈ img g Λ ↔ ∀ y ∈ img g Λ, H.h x y ∈ M.L.O := by
   have hm : ∀ z, z ∈ img g Λ ↔ g.symm z ∈ Λ := by
     intro z
     unfold img
@@ -268,9 +289,9 @@ theorem N_unitary {g : V ≃ₗ[E] V} (hg : g ∈ Fr.N) : IsUnitary H g := by
     rw [← ha (a.symm x) (a.symm y)]
     simp
 
-theorem img_lamStd_selfDual {n : V ≃ₗ[E] V} (hn : n ∈ Fr.N) (L : Submodule M.L.O (H.Wb Fr.f))
-    (hL : Fr.IsInner L) (x : V) :
-    x ∈ img n (Fr.LamStd L) ↔ ∀ y ∈ img n (Fr.LamStd L), H.h x y ∈ M.L.O :=
+theorem img_lamStd_selfDual
+    {n : V ≃ₗ[E] V} (hn : n ∈ Fr.N) (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.IsInner L) (x : V)
+    : x ∈ img n (Fr.LamStd L) ↔ ∀ y ∈ img n (Fr.LamStd L), H.h x y ∈ M.L.O :=
   img_selfDual n (N_unitary Fr hn) _ (lamStd_selfDual Fr L hL) x
 
 end SelfDual
@@ -279,25 +300,37 @@ section Global
 
 variable {D : D7}
 
-theorem mem_iff_local (Z : LocDat D) (Λ : LV D) (hΛ : Submodule.IsLattice D.host.E Λ) (x : (VS D).V) :
-    x ∈ Λ ↔ ∀ p, baseChange₂ D p x ∈ lattice₂ D Z.M p Λ := by
-  exact ⟨fun hx p => Submodule.subset_span ⟨x, hx, rfl⟩,
-    GlobalTheory.Unfold.LsubG.mem_of_local Z Λ hΛ x⟩
+theorem mem_iff_local (Z : LocDat D) (Λ : LV D) (hΛ : Submodule.IsLattice D.host.E Λ) (x : (VS D).V)
+    : x ∈ Λ ↔ ∀ p, baseChange₂ D p x ∈ lattice₂ D Z.M p Λ := by
+  exact ⟨
+    fun hx p => Submodule.subset_span ⟨x, hx, rfl⟩,
+    GlobalTheory.Unfold.LsubG.mem_of_local Z Λ hΛ x
+  ⟩
 
-theorem unimodular_of_local : ∀ (D : D7) (Z : LocDat D) (A : ∀ p : PlF D, LocNG.FrameD (locH Z p) D.R.rS) (Λ : LV D), Submodule.IsLattice D.host.E Λ → (∀ p, ∃ n ∈ (A p).N, ∃ L, (A p).IsInner L ∧ lattice₂ D Z.M p Λ = LocNG.img n ((A p).LamStd L)) → Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ := by
+theorem unimodular_of_local
+    : ∀ (D : D7) (Z : LocDat D) (A : ∀ p : PlF D, LocNG.FrameD (locH Z p) D.R.rS) (Λ : LV D),
+      Submodule.IsLattice D.host.E Λ
+        → (∀ p, ∃ n ∈ (A p).N, ∃ L,
+          (A p).IsInner L ∧ lattice₂ D Z.M p Λ = LocNG.img n ((A p).LamStd L))
+        → Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ := by
   intro D Z A Λ hΛ hloc
-  have hsd : ∀ p x, x ∈ lattice₂ D Z.M p Λ ↔ ∀ y ∈ lattice₂ D Z.M p Λ, LocFacts₂ Z.M p x y ∈ (Z.M p).L.O := by
+  have hsd
+      : ∀ p x,
+        x ∈ lattice₂ D Z.M p Λ ↔ ∀ y ∈ lattice₂ D Z.M p Λ, LocFacts₂ Z.M p x y ∈ (Z.M p).L.O := by
     intro p
     obtain ⟨n, hn, L, hL, he⟩ := hloc p
     rw [he]
     exact img_lamStd_selfDual (A p) hn L hL
-  have hsub : ∀ p, ∀ x ∈ Λ, baseChange₂ D p x ∈ lattice₂ D Z.M p Λ := fun p x hx => Submodule.subset_span ⟨x, hx, rfl⟩
-  have hform : ∀ p x y, LocFacts₂ Z.M p (baseChange₂ D p x) (baseChange₂ D p y) = (D.s.atP p).ιE ((VS D).hT y x) :=
+  have hsub : ∀ p, ∀ x ∈ Λ, baseChange₂ D p x ∈ lattice₂ D Z.M p Λ := fun p x hx =>
+    Submodule.subset_span ⟨x, hx, rfl⟩
+  have hform
+      : ∀ p x y,
+        LocFacts₂ Z.M p (baseChange₂ D p x) (baseChange₂ D p y) = (D.s.atP p).ιE ((VS D).hT y x) :=
     fun p x y => baseChangeAt_form Z.M p (Z.hcj p) x y
   unfold Formalism.HermitianLatticesTheory.IsUnimodular
   ext x
-  simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
-    LinearMap.restrictScalars_apply, Submodule.mem_one]
+  simp only [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+    Submodule.mem_comap, LinearMap.restrictScalars_apply, Submodule.mem_one]
   constructor
   · intro hx
     rw [mem_iff_local Z Λ hΛ]
@@ -310,10 +343,11 @@ theorem unimodular_of_local : ∀ (D : D7) (Z : LocDat D) (A : ∀ p : PlF D, Lo
     rw [hform, ← ho]
     exact GlobalTheory.HL.PlacesRec.int_mem (GlobalTheory.HL.placesOf Z) p o
   · intro hx y hy
-    obtain ⟨o, ho⟩ := ((GlobalTheory.HL.PlacesInt.integers_local (GlobalTheory.HL.placesOf Z)).1 ((VS D).hT y x)).1
-      (fun p => by
-        have := (hsd p (baseChange₂ D p x)).1 (hsub p x hx) (baseChange₂ D p y) (hsub p y hy)
-        rwa [hform] at this)
+    obtain ⟨o, ho⟩ :=
+      ((GlobalTheory.HL.PlacesInt.integers_local (GlobalTheory.HL.placesOf Z)).1 ((VS D).hT y x)).1
+        (fun p => by
+          have := (hsd p (baseChange₂ D p x)).1 (hsub p x hx) (baseChange₂ D p y) (hsub p y hy)
+          rwa [hform] at this)
     exact ⟨o, ho⟩
 
 end Global

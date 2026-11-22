@@ -9,9 +9,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AdditiveVal
 
 open UpperTheory.V UpperTheory.V.PropA Formalism.GaloisCohomology
 
-theorem UpperTheory.V.PropA.dualDiv :
-    ∀ (l : ℕ) [Fact l.Prime] (D : Type) [AddCommGroup D] [Module ℤ_[l] D] (x : D →ₗ[ℤ_[l]] QZ l), (∀ φ : D, (l : ℤ_[l]) • φ = 0 → x φ = 0) →
-      ∃ y : D →ₗ[ℤ_[l]] QZ l, x = (l : ℤ_[l]) • y := by
+theorem UpperTheory.V.PropA.dualDiv
+    : ∀ (l : ℕ) [Fact l.Prime] (D : Type) [AddCommGroup D] [Module ℤ_[l] D] (x : D →ₗ[ℤ_[l]] QZ l),
+      (∀ φ : D, (l : ℤ_[l]) • φ = 0 → x φ = 0) → ∃ y : D →ₗ[ℤ_[l]] QZ l, x = (l : ℤ_[l]) • y := by
   intro l _ D _ _ x hx
   let μ : D →ₗ[ℤ_[l]] D := (l : ℤ_[l]) • LinearMap.id
   have hker : LinearMap.ker μ ≤ LinearMap.ker x := by

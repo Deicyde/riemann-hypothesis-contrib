@@ -87,8 +87,10 @@ private lemma card_sq_div_le_two_mul_sum_of_bounds {ι : Type} [Fintype ι] [Non
     _ = 2 * ∑ i, d i / ν i * K := by rw [← Finset.sum_mul]; ring
     _ ≤ 2 * ∑ i, R i := mul_le_mul_of_nonneg_left (Finset.sum_le_sum fun i _ => hR i) (by norm_num)
 
-theorem coefficient_index_lower_bound (h2 : UnipotentLatticeLift (E := E)) (h3d : FourierCoefficientSupport (E := E))
-    (h5 : NonvanishingCoefficientPositivity (E := E)) : CoefficientIndexLowerBound (E := E) := by
+theorem coefficient_index_lower_bound
+    (h2 : UnipotentLatticeLift (E := E)) (h3d : FourierCoefficientSupport (E := E))
+    (h5 : NonvanishingCoefficientPositivity (E := E))
+    : CoefficientIndexLowerBound (E := E) := by
   intro r X la P ξ ν c1 w z0 x a ε hS hε hmaj χ hy
   obtain ⟨hH, hxL, hxξ, hxx, hne, hu0, hu⟩ := hS
   obtain ⟨_, hSS, hIso, hc1, hνc1, _, _, _, hchar, hz0, _⟩ := hH
@@ -102,8 +104,11 @@ theorem coefficient_index_lower_bound (h2 : UnipotentLatticeLift (E := E)) (h3d 
     rw [if_neg hn]
   have hSS' : X.IsBddSec la P ∧ _ := hSS
   have h3 := h3d r X ![ξ, (X.NC : E) • x] hpair hmem la P hSS'.1.1 hchar ν χ y hyd
-  have hy' : X.fz ![ξ, (X.NC : E) • x] X.g χ
-      (X.fj la ((![ξ, (X.NC : E) • x] : Fin 2 → Fin r → E) 0) ν P) y ≠ 0 := hy
+  have hy'
+      : X.fz ![ξ, (X.NC : E) • x] X.g χ (X.fj la ((![ξ, (X.NC : E) • x] : Fin 2 → Fin r → E) 0) ν P)
+          y
+        ≠ 0 :=
+    hy
   rw [h3] at hy'
   by_cases hcond : ∀ τ, χ τ 0 0 = (ν τ : ℂ)
   swap
@@ -112,28 +117,38 @@ theorem coefficient_index_lower_bound (h2 : UnipotentLatticeLift (E := E)) (h3d 
   rw [if_pos hcond] at hy'
   have hPD := h5 r X ![ξ, (X.NC : E) • x] hpair hmem la P hSS hchar χ ⟨y, hyd, hy'⟩
   obtain ⟨β, -, hβ, hβint⟩ := (h2 r X ![ξ, (X.NC : E) • x] hpair hmem).2.2 χ hHF.1 hHF.2
-  have hne0 : Nonempty X.Ψ := Fintype.card_pos_iff.mp (QuadraticCoefficientForms.card_Psi_pos (X := X.toData))
+  have hne0 : Nonempty X.Ψ :=
+    Fintype.card_pos_iff.mp (QuadraticCoefficientForms.card_Psi_pos (X := X.toData))
 
   have hz0dom : z0 ∈ X.dom := hz0.1
-  have hmpos : ∀ τ, 0 < X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ) :=
-    fun τ => X.maj_pos hz0dom τ (hu0 τ)
+  have hmpos : ∀ τ, 0 < X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ) := fun τ =>
+    X.maj_pos hz0dom τ (hu0 τ)
   have hck : ∀ τ, X.c τ = X.k0 := by
     intro τ
     show 2 * ‖τ.1 X.ξ0‖ = X.k0
     rw [X.ξ0_abs τ]
     ring
 
-  have ha1 : ∀ τ, Complex.normSq (a τ 1) *
-      ((X.NC : ℝ) ^ 2 * X.k0 * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ)) = 1 := by
+  have ha1
+      : ∀ τ,
+        Complex.normSq (a τ 1) * ((X.NC : ℝ) ^ 2 * X.k0 * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ))
+          = 1 := by
     intro τ
-    obtain ⟨T, hT, h⟩ : ∃ T : ℂ,
-        T = ((Real.sqrt (X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ)))⁻¹ : ℂ) ∧
-        X.uvec ![ξ, (X.NC : E) • x] a τ = T • X.ucomp z0 ξ (X.embV x) τ := ⟨_, rfl, hu τ⟩
-    have hV : X.ucomp z0 ξ (X.embV x) τ = Data.emb τ.1 x -
-        (X.Hf z0 τ (Data.emb τ.1 x) (Data.emb τ.1 ξ) / X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ)) •
-          Data.emb τ.1 ξ := rfl
-    have hU : X.uvec ![ξ, (X.NC : E) • x] a τ =
-        a τ 0 • Data.emb τ.1 ξ + a τ 1 • ((X.NC : ℂ) • Data.emb τ.1 x) := by
+    obtain ⟨T, hT, h⟩
+        : ∃ T : ℂ,
+          T = ((Real.sqrt (X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ)))⁻¹ : ℂ)
+            ∧ X.uvec ![ξ, (X.NC : E) • x] a τ = T • X.ucomp z0 ξ (X.embV x) τ :=
+      ⟨_, rfl, hu τ⟩
+    have hV
+        : X.ucomp z0 ξ (X.embV x) τ
+          = Data.emb τ.1 x
+            - (X.Hf z0 τ (Data.emb τ.1 x) (Data.emb τ.1 ξ)
+                / X.Hf z0 τ (Data.emb τ.1 ξ) (Data.emb τ.1 ξ))
+              • Data.emb τ.1 ξ :=
+      rfl
+    have hU
+        : X.uvec ![ξ, (X.NC : E) • x] a τ
+          = a τ 0 • Data.emb τ.1 ξ + a τ 1 • ((X.NC : ℂ) • Data.emb τ.1 x) := by
       ext i
       simp [Data.uvec, Data.emb, Fin.sum_univ_two, smul_eq_mul, map_mul, map_natCast]
     rw [hU, hV] at h
@@ -149,18 +164,21 @@ theorem coefficient_index_lower_bound (h2 : UnipotentLatticeLift (E := E)) (h3d 
       rw [hck τ]; exact mul_pos X.minWeight_pos (hmpos τ)
     have hT2 : Complex.normSq T = (X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ))⁻¹ := by
       rw [hT, map_inv₀, Complex.normSq_ofReal, Real.mul_self_sqrt hpos.le]
-    have h4 : Complex.normSq (a τ 1) * (X.NC : ℝ) ^ 2 =
-        (X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ))⁻¹ := by
+    have h4
+        : Complex.normSq (a τ 1) * (X.NC : ℝ) ^ 2
+          = (X.c τ * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ))⁻¹ := by
       rw [← hT2, ← hTa, Complex.normSq_mul, Complex.normSq_natCast]
       ring
     rw [hck τ] at h4 hpos
-    rw [show Complex.normSq (a τ 1) * ((X.NC : ℝ) ^ 2 * X.k0 * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ))
-        = (Complex.normSq (a τ 1) * (X.NC : ℝ) ^ 2) * (X.k0 * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ))
-        by ring, h4]
+    rw [show Complex.normSq (a τ 1)
+            * ((X.NC : ℝ) ^ 2 * X.k0 * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ))
+          = (Complex.normSq (a τ 1) * (X.NC : ℝ) ^ 2)
+            * (X.k0 * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ)) by
+        ring,
+      h4]
     exact inv_mul_cancel₀ hpos.ne'
 
-  have hχβ : ∀ (τ : X.Ψ) i k, χ τ i k = τ.1 (β i k) := by
-    intro τ i k; rw [hβ]; rfl
+  have hχβ : ∀ (τ : X.Ψ) i k, χ τ i k = τ.1 (β i k) := by intro τ i k; rw [hβ]; rfl
   have hdpos : ∀ τ, 0 < (Matrix.of (χ τ)).det.re ∧ (Matrix.of (χ τ)).det.im = 0 := by
     intro τ
     have h := (hPD τ).det_pos
@@ -181,16 +199,14 @@ theorem coefficient_index_lower_bound (h2 : UnipotentLatticeLift (E := E)) (h3d 
     have h1 : 0 < dEnat E := Int.natAbs_pos.mpr (NumberField.discr_ne_zero E)
     have h2 := X.g_pos
     positivity
-  have hNcast : ((Nn : ℕ) : ℝ) = (X.g : ℝ) * dE E ^ 2 := by
-    rw [hNn, hdE]; push_cast; ring
+  have hNcast : ((Nn : ℕ) : ℝ) = (X.g : ℝ) * dE E ^ 2 := by rw [hNn, hdE]; push_cast; ring
   set γ : E := (((X.g * dEnat E ^ 2 : ℕ) : E) * β 0 0) * (((X.g * dEnat E ^ 2 : ℕ) : E) * β 1 1) -
       (((X.g * dEnat E ^ 2 : ℕ) : E) * β 0 1) * (((X.g * dEnat E ^ 2 : ℕ) : E) * β 1 0) with hγ
-  have hint : IsIntegral ℤ γ :=
-    ((hβint 0 0).mul (hβint 1 1)).sub ((hβint 0 1).mul (hβint 1 0))
+  have hint : IsIntegral ℤ γ := ((hβint 0 0).mul (hβint 1 1)).sub ((hβint 0 1).mul (hβint 1 0))
   have hγτ : ∀ τ : X.Ψ, τ.1 γ = ((Nn : ℂ)) ^ 2 * (Matrix.of (χ τ)).det := by
     intro τ
-    rw [Matrix.det_fin_two, Matrix.of_apply, Matrix.of_apply, Matrix.of_apply, Matrix.of_apply,
-      hχβ, hχβ, hχβ, hχβ, hγ]
+    rw [Matrix.det_fin_two, Matrix.of_apply, Matrix.of_apply, Matrix.of_apply, Matrix.of_apply, hχβ,
+      hχβ, hχβ, hχβ, hγ]
     simp only [map_sub, map_mul, map_natCast, hNn]
     push_cast
     ring
@@ -221,8 +237,9 @@ theorem coefficient_index_lower_bound (h2 : UnipotentLatticeLift (E := E)) (h3d 
     have := pow_lt_one₀ hnn hlt (two_ne_zero)
     linarith
 
-  have hq : ∀ τ : X.Ψ, (Matrix.of (χ τ)).det.re * Complex.normSq (a τ 1) ≤
-      ν τ * (X.chiAt χ a τ).re := by
+  have hq
+      : ∀ τ : X.Ψ,
+        (Matrix.of (χ τ)).det.re * Complex.normSq (a τ 1) ≤ ν τ * (X.chiAt χ a τ).re := by
     intro τ
     have h := QuadraticCoefficientForms.quad2 (Matrix.of (χ τ)) (hPD τ).1 (a τ)
     simp only [Matrix.of_apply] at h
@@ -237,13 +254,20 @@ theorem coefficient_index_lower_bound (h2 : UnipotentLatticeLift (E := E)) (h3d 
     have hk := X.minWeight_pos
     rw [div_le_iff₀ (by positivity)]
     have hns := Complex.normSq_nonneg (a τ 1)
-    have : Complex.normSq (a τ 1) * ((X.NC : ℝ) ^ 2 * X.k0 * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ)) ≤
-        Complex.normSq (a τ 1) * ((X.NC : ℝ) ^ 2 * X.k0 * ε) :=
+    have : Complex.normSq (a τ 1) * ((X.NC : ℝ) ^ 2 * X.k0 * X.maj z0 τ (X.ucomp z0 ξ (X.embV x) τ))
+        ≤ Complex.normSq (a τ 1) * ((X.NC : ℝ) ^ 2 * X.k0 * ε) :=
       mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hme (by positivity)) hns
     linarith
-  have key := card_sq_div_le_two_mul_sum_of_bounds (fun τ : X.Ψ => (Matrix.of (χ τ)).det.re) ν (fun τ => Complex.normSq (a τ 1))
-    (fun τ => (X.chiAt χ a τ).re) ((X.g : ℝ) * dE E ^ 2) (X.NC : ℝ) X.k0 c1 ε hNpos
-    (by exact_mod_cast X.NC_pos) X.minWeight_pos X.k0_le hε hc1 (fun τ => (hdpos τ).1) hνpos hνc1 hprod hA hq
+  have key :=
+    card_sq_div_le_two_mul_sum_of_bounds
+      (fun τ : X.Ψ => (Matrix.of (χ τ)).det.re)
+      ν
+      (fun τ => Complex.normSq (a τ 1))
+      (fun τ => (X.chiAt χ a τ).re)
+      ((X.g : ℝ) * dE E ^ 2) (X.NC : ℝ) X.k0 c1 ε hNpos (by exact_mod_cast X.NC_pos) X.minWeight_pos
+      X.k0_le hε hc1
+      (fun τ => (hdpos τ).1)
+      hνpos hνc1 hprod hA hq
   rw [QuadraticCoefficientForms.card_Psi (X := X.toData)] at key
   exact key
 

@@ -12,19 +12,30 @@ open GlobalTheory.UnitLemma Polynomial
 
 namespace GlobalTheory.SesqAsym
 
-theorem trace_σ {K : UQ} (B : InvAlg K) (a : B.A) :
-    Algebra.trace K.E B.A (B.σ a) = K.c (Algebra.trace K.E B.A a) := by
+theorem trace_σ {K : UQ} (B : InvAlg K) (a : B.A)
+    : Algebra.trace K.E B.A (B.σ a) = K.c (Algebra.trace K.E B.A a) := by
   have h := Algebra.trace_eq_of_equiv_equiv K.c B.σ (by ext e; simp [B.σ_alg]) a
   rw [h, RingEquiv.apply_symm_apply]
 
-theorem sesq_asym : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g = 1 → B.P.Separable → ∀ (ε : B.A), (ε = 1 ∨ ε = -1) → (∃ β : B.Aˣ, B.σ (β : B.A) = β * (ε * B.g)) ∧ ∀ (s : B.A → B.A → K.E), (∀ x y z, s (x + y) z = s x z + s y z) → (∀ (c : K.E) x z, s (c • x) z = c * s x z) → (∀ y, (∀ z, s y z = 0) → y = 0) → (∀ y z, K.c (s z y) = s (ε * B.g * y) z) → ∃ β : B.Aˣ, B.σ (β : B.A) = β * (ε * B.g) ∧ ∀ y z, s y z = B.herm β y z := by
+theorem sesq_asym
+    : ∀ (K : UQ) (B : InvAlg K),
+      B.g * B.σ B.g = 1 → B.P.Separable
+        → ∀ (ε : B.A),
+          (ε = 1 ∨ ε = -1)
+            → (∃ β : B.Aˣ, B.σ (β : B.A) = β * (ε * B.g))
+              ∧ ∀ (s : B.A → B.A → K.E),
+                (∀ x y z, s (x + y) z = s x z + s y z) → (∀ (c : K.E) x z, s (c • x) z = c * s x z)
+                  → (∀ y, (∀ z, s y z = 0) → y = 0) → (∀ y z, K.c (s z y) = s (ε * B.g * y) z)
+                  → ∃ β : B.Aˣ, B.σ (β : B.A) = β * (ε * B.g) ∧ ∀ y z, s y z = B.herm β y z := by
   intro K B hg hP ε hε
   have hσε : B.σ ε = ε := by rcases hε with rfl | rfl <;> simp
   have hεε : ε * ε = 1 := by rcases hε with rfl | rfl <;> simp
   set u := ε * B.g with hu_def
   have hu : u * B.σ u = 1 := by
     rw [hu_def, map_mul, hσε]
-    calc ε * B.g * (ε * B.σ B.g) = (ε * ε) * (B.g * B.σ B.g) := by ring
+    calc
+      ε * B.g * (ε * B.σ B.g)
+        = (ε * ε) * (B.g * B.σ B.g) := by ring
       _ = 1 := by rw [hεε, hg, one_mul]
   refine ⟨GlobalTheory.T.exists_unit_sigma_eq_mul_invAlg K B u hu, ?_⟩
   intro s hadd hlin hnd hsym
@@ -79,19 +90,22 @@ theorem sesq_asym : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g = 1 → B.P.Sepa
       rw [map_mul B.σ _ B.g]
       ring
 
-  let ℓ : Module.Dual K.E B.A :=
-    { toFun := fun y => s y 1
-      map_add' := fun x y => hadd x y 1
-      map_smul' := fun c x => hlin c x 1 }
+  let ℓ : Module.Dual K.E B.A := {
+    toFun := fun y => s y 1
+    map_add' := fun x y => hadd x y 1
+    map_smul' := fun c x => hlin c x 1
+  }
   let φ : B.A →ₗ[K.E] Module.Dual K.E B.A := Algebra.traceForm K.E B.A
   have hφi : Function.Injective φ := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro w hw
-    refine GlobalTheory.T.eq_zero_of_trace_mul_of_separable_generated K B hP (GlobalTheory.T.exists_aeval_eq_of_charpoly_separable_involution K B hP) w fun y => ?_
+    refine GlobalTheory.T.eq_zero_of_trace_mul_of_separable_generated K B hP
+      (GlobalTheory.T.exists_aeval_eq_of_charpoly_separable_involution K B hP) w fun y => ?_
     have := LinearMap.congr_fun hw y
     simpa [φ, Algebra.traceForm_apply] using this
   have hφs : Function.Surjective φ :=
-    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (Subspace.dual_finrank_eq).symm).mp hφi
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (Subspace.dual_finrank_eq).symm).mp
+      hφi
   obtain ⟨β, hβ⟩ := hφs ℓ
   have hβs : ∀ y, s y 1 = Algebra.trace K.E B.A (β * y) := by
     intro y
@@ -103,7 +117,8 @@ theorem sesq_asym : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g = 1 → B.P.Sepa
     rw [B.σ_σ, mul_one] at h1
     rw [← h1, hβs]
     unfold InvAlg.herm
-    congr 1; ring
+    congr 1
+    ring
 
   have hβinj : Function.Injective (LinearMap.mulLeft K.E β) := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
@@ -118,14 +133,17 @@ theorem sesq_asym : ∀ (K : UQ) (B : InvAlg K), B.g * B.σ B.g = 1 → B.P.Sepa
   refine ⟨⟨β, x, hxβ, by rw [mul_comm]; exact hxβ⟩, ?_, hform⟩
   show B.σ β = β * u
   rw [← sub_eq_zero]
-  refine GlobalTheory.T.eq_zero_of_trace_mul_of_separable_generated K B hP (GlobalTheory.T.exists_aeval_eq_of_charpoly_separable_involution K B hP) _ fun y => ?_
+  refine GlobalTheory.T.eq_zero_of_trace_mul_of_separable_generated K B hP
+    (GlobalTheory.T.exists_aeval_eq_of_charpoly_separable_involution K B hP) _ fun y => ?_
   have h3 : Algebra.trace K.E B.A (B.σ β * y) = Algebra.trace K.E B.A (β * u * y) := by
     have h2 := hsym y 1
     rw [hform, hform] at h2
     unfold InvAlg.herm at h2
     rw [← trace_σ] at h2
     simp only [map_mul B.σ, map_one, B.σ_σ, mul_one] at h2
-    rw [h2]; congr 1; ring
+    rw [h2]
+    congr 1
+    ring
   rw [sub_mul, map_sub, h3, sub_self]
 
 end GlobalTheory.SesqAsym

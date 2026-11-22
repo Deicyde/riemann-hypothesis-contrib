@@ -12,8 +12,9 @@ namespace PI.AlgValsFin.W
 
 variable {L : Type} [Field L] [NumberField L]
 
-theorem valued_atFin (v : HeightOneSpectrum (𝓞 L)) (k : Lˣ) :
-    Valued.v ((atFin v k : (v.adicCompletion L)ˣ) : v.adicCompletion L) = WithZero.exp (-ordF v k) := by
+theorem valued_atFin (v : HeightOneSpectrum (𝓞 L)) (k : Lˣ)
+    : Valued.v ((atFin v k : (v.adicCompletion L)ˣ) : v.adicCompletion L)
+      = WithZero.exp (- ordF v k) := by
   unfold ordF
   rw [neg_neg, WithZero.exp_log ((Valuation.ne_zero_iff _).2 k.ne_zero)]
   simp only [atFin, Units.coe_map, MonoidHom.coe_coe, RingHom.toMonoidHom_eq_coe]
@@ -33,8 +34,8 @@ theorem locVal : LocVal L := by
   unfold IsUnifAt at hu
   have hunit : IsUnitAt v (atFin v k * (atFin v (unif v) ^ ordF v k)⁻¹) := by
     unfold IsUnitAt
-    rw [Units.val_mul, Units.val_inv_eq_inv_val, Units.val_zpow_eq_zpow_val, map_mul, map_inv₀, map_zpow₀, hu,
-      valued_atFin, ← WithZero.exp_zsmul, smul_neg, smul_eq_mul, mul_one,
+    rw [Units.val_mul, Units.val_inv_eq_inv_val, Units.val_zpow_eq_zpow_val, map_mul, map_inv₀,
+      map_zpow₀, hu, valued_atFin, ← WithZero.exp_zsmul, smul_neg, smul_eq_mul, mul_one,
       mul_inv_cancel₀ WithZero.exp_ne_zero]
   have h1 := hχ _ hunit
   rw [map_mul, map_inv, map_zpow, mul_inv_eq_one] at h1

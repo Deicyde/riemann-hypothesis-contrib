@@ -158,8 +158,8 @@ lemma fockR_expand {τ : Type*} (f g : MvPolynomial τ K) :
   rw [fockR_sum_left]
   exact Finset.sum_congr rfl fun m _ => fockR_sum_right _ _ _
 
-theorem fockR_block (F G : S → MvPolynomial (Fin k × Fin n) K) :
-    fockR (∏ s, blockEmb K s (F s)) (∏ s, blockEmb K s (G s)) = ∏ s, fockR (F s) (G s) := by
+theorem fockR_block (F G : S → MvPolynomial (Fin k × Fin n) K)
+    : fockR (∏ s, blockEmb K s (F s)) (∏ s, blockEmb K s (G s)) = ∏ s, fockR (F s) (G s) := by
   classical
   rw [prod_blockEmb_expand F, prod_blockEmb_expand G, fockR_sum_left]
   simp_rw [fockR_sum_right, fockR_expand (F _) (G _)]
@@ -189,14 +189,15 @@ lemma fockR_int_self_pos {σ : Type*} (f : MvPolynomial σ ℤ) (hf : f ≠ 0) :
     exact_mod_cast Finset.prod_pos fun k _ => Nat.factorial_pos _
   exact mul_pos h1 h2
 
-theorem fockR_hw_norm (r n : ℕ) (hn : n ≤ r) (ν : Fin n → ℕ) : ∃ N : ℕ, 0 < N ∧
-    ∀ (R : Type) [CommRing R], fockR (hw R hn ν) (hw R hn ν) = (N : R) := by
+theorem fockR_hw_norm (r n : ℕ) (hn : n ≤ r) (ν : Fin n → ℕ)
+    : ∃ N : ℕ, 0 < N ∧ ∀ (R : Type) [CommRing R], fockR (hw R hn ν) (hw R hn ν) = (N : R) := by
   have pos : 0 < fockR (hw ℤ hn ν) (hw ℤ hn ν) := fockR_int_self_pos _ (hwNe ℤ r n hn ν)
   refine ⟨(fockR (hw ℤ hn ν) (hw ℤ hn ν)).toNat, by omega, fun R _ => ?_⟩
   rw [← lclosedeq_hw_map (Int.castRingHom R) hn ν, fockR_map]
   have e : (((fockR (hw ℤ hn ν) (hw ℤ hn ν)).toNat : ℕ) : ℤ) = fockR (hw ℤ hn ν) (hw ℤ hn ν) :=
     Int.toNat_of_nonneg pos.le
-  calc (Int.castRingHom R) (fockR (hw ℤ hn ν) (hw ℤ hn ν))
+  calc
+    (Int.castRingHom R) (fockR (hw ℤ hn ν) (hw ℤ hn ν))
       = (Int.castRingHom R) (((fockR (hw ℤ hn ν) (hw ℤ hn ν)).toNat : ℕ) : ℤ) := by rw [e]
     _ = _ := by rw [eq_intCast, Int.cast_natCast]
 

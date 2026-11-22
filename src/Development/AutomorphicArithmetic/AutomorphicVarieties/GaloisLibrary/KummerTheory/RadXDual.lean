@@ -7,11 +7,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-theorem UpperTheory.V.Kum.radXDual :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (K : Type) [Field K] [NumberField K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω] [IsAlgClosure K Ω] (U : Subgroup (G F Ω)) (n : ℕ) [NeZero n] (N : ℕ) (ζ : K), U = galOf F K Ω → IsPrimitiveRoot ζ n → (∀ φ ∈ XDual N U (ZMod n) (ZMod n), ∃ (β : Ω) (a : Kˣ), IsRad (algebraMap K Ω ζ) U φ β ∧ β ^ n = algebraMap K Ω a ∧ a ∈ SelK (∅ : Set (HeightOneSpectrum (𝓞 K))) n) ∧
-    ∀ (φ : U → ZMod n) (β β' : Ω), IsRad (algebraMap K Ω ζ) U φ β → IsRad (algebraMap K Ω ζ) U φ β' → ∃ c : Kˣ, β' = algebraMap K Ω c * β := by
+theorem UpperTheory.V.Kum.radXDual
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (K : Type)
+        [Field K] [NumberField K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω]
+        [IsAlgClosure K Ω] (U : Subgroup (G F Ω)) (n : ℕ) [NeZero n] (N : ℕ) (ζ : K),
+      U = galOf F K Ω → IsPrimitiveRoot ζ n
+        → (∀ φ ∈ XDual N U (ZMod n) (ZMod n), ∃ (β : Ω) (a : Kˣ),
+            IsRad (algebraMap K Ω ζ) U φ β ∧ β ^ n = algebraMap K Ω a
+              ∧ a ∈ SelK (∅ : Set (HeightOneSpectrum (𝓞 K))) n)
+          ∧ ∀ (φ : U → ZMod n) (β β' : Ω),
+            IsRad (algebraMap K Ω ζ) U φ β → IsRad (algebraMap K Ω ζ) U φ β'
+              → ∃ c : Kˣ, β' = algebraMap K Ω c * β := by
   intro F Ω _ _ _ _ _ K _ _ _ _ _ _ U n _ N ζ hU hζ
   subst hU
   have hζ' : IsPrimitiveRoot (algebraMap K Ω ζ) n := hζ.map_of_injective (algebraMap K Ω).injective
@@ -22,17 +32,23 @@ theorem UpperTheory.V.Kum.radXDual :
   have hs' : ∀ u, s (toGal K le_rfl u) = u := fun u => Subtype.ext (AlgEquiv.ext fun x => rfl)
   have hsm : ∀ σ τ, s (σ * τ) = s σ * s τ := fun σ τ => Subtype.ext (map_mul (galEmb F K Ω) σ τ)
   have hsc : Continuous s := by
-    have e : s = hH.homeomorph.symm := funext fun σ => by
-      rw [eq_comm, Homeomorph.symm_apply_eq]
-      exact (hs σ).symm
+    have e : s = hH.homeomorph.symm :=
+      funext fun σ => by
+        rw [eq_comm, Homeomorph.symm_apply_eq]
+        exact (hs σ).symm
     rw [e]
     exact hH.homeomorph.symm.continuous
   refine ⟨fun φ hφ => ?_, fun φ β β' hβ hβ' => ?_⟩
   · obtain ⟨hlc, hadd, hine, -⟩ := hφ
-    obtain ⟨β, a, hβa, hβ⟩ := radExists K Ω n (algebraMap K Ω ζ) (fun _ => 1) (fun σ => φ (s σ)) hζ'
-      (fun g => by
-        rw [g.commutes, ZMod.val_one_eq_one_mod, hζ'.eq_orderOf, pow_mod_orderOf, pow_one])
-      (hlc.comp_continuous hsc) (fun g h => by rw [hsm, hadd, one_mul])
+    obtain ⟨β, a, hβa, hβ⟩ :=
+      radExists K Ω n (algebraMap K Ω ζ)
+        (fun _ => 1)
+        (fun σ => φ (s σ))
+        hζ'
+        (fun g => by
+          rw [g.commutes, ZMod.val_one_eq_one_mod, hζ'.eq_orderOf, pow_mod_orderOf, pow_one])
+        (hlc.comp_continuous hsc)
+        (fun g h => by rw [hsm, hadd, one_mul])
     refine ⟨β, a, ⟨?_, fun u => ?_⟩, hβa, fun v _ => ?_⟩
     · rintro rfl
       rw [zero_pow (NeZero.ne n), eq_comm, map_eq_zero] at hβa

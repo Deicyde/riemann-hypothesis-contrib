@@ -26,9 +26,12 @@ def ev (d : Mat n) : Poly n →+* ℂ := MvPolynomial.eval fun x => ![d, dᴴ, d
 def sigP (n : ℕ) : Matrix (Fin n) (Fin n) (Poly n) := Xm 0 * Xm 1 - Xm 3 * Xm 2
 
 def hb (p : Fin n × Fin n) : Mat n :=
-  if p.1 = p.2 then Matrix.single p.1 p.1 1
-  else if p.1 < p.2 then ((Real.sqrt 2)⁻¹ : ℂ) • (Matrix.single p.1 p.2 1 + Matrix.single p.2 p.1 1)
-  else (((Real.sqrt 2)⁻¹ : ℂ) * Complex.I) • (Matrix.single p.1 p.2 1 - Matrix.single p.2 p.1 1)
+  if p.1 = p.2 then
+    Matrix.single p.1 p.1 1
+  else if p.1 < p.2 then
+    ((Real.sqrt 2)⁻¹ : ℂ) • (Matrix.single p.1 p.2 1 + Matrix.single p.2 p.1 1)
+  else
+    (((Real.sqrt 2)⁻¹ : ℂ) * Complex.I) • (Matrix.single p.1 p.2 1 - Matrix.single p.2 p.1 1)
 
 def sP (p : Fin n × Fin n) : Poly n := Matrix.trace (sigP n * (hb p).map C)
 

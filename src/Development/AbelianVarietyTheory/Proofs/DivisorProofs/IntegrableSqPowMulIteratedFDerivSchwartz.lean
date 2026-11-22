@@ -10,10 +10,12 @@ open scoped ENNReal
 namespace GlobalTheory
 
 theorem integrable_sq_pow_mul_iteratedFDeriv_schwartz
-    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure]
-    {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F] (f : SchwartzMap E F) (i j : ℕ) :
-    Integrable (fun z => (‖z‖ ^ i * ‖iteratedFDeriv ℝ j f z‖) ^ 2) μ := by
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F]
+    (f : SchwartzMap E F) (i j : ℕ)
+    : Integrable (fun z => (‖z‖ ^ i * ‖iteratedFDeriv ℝ j f z‖) ^ 2) μ := by
   have hint : Integrable (fun z => ‖z‖ ^ i * ‖iteratedFDeriv ℝ j f z‖) μ :=
     SchwartzMap.integrable_pow_mul_iteratedFDeriv μ f i j
   set C := SchwartzMap.seminorm ℝ i j f

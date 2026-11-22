@@ -10,7 +10,9 @@ open Formalism.BasicNotions NumberField Formalism.UG
 
 namespace Formalism.L2.G
 
-variable {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+variable
+  {R : Ranks} {F E : Type}
+  [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
 
 theorem isUnit_det_gram0 (sp : Spaces R F E) : IsUnit sp.gram0.det := by
   rw [isUnit_iff_ne_zero]

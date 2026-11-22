@@ -15,6 +15,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 namespace UpperTheory.Gal.FiniteEtaleModels
 
 theorem liesAbs_holds : LiesAbs :=
-  liesAbs_of (lPts_holds lGrp_holds) (lCount_holds lSigPt_holds lSigFin_holds) lIdx_holds sigmaFEt_holds
+  liesAbs_of (lPts_holds lGrp_holds) (lCount_holds lSigPt_holds lSigFin_holds) lIdx_holds
+    sigmaFEt_holds
 
 end UpperTheory.Gal.FiniteEtaleModels

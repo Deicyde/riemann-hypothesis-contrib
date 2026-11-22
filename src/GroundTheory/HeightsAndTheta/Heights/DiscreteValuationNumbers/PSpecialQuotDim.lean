@@ -15,8 +15,7 @@ theorem SpecialQuotDim.proof : SpecialQuotDim.Statement := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ W hW
   let π : MRing ι O →+* MRing ι (IsLocalRing.ResidueField O) :=
     MvPolynomial.map (IsLocalRing.residue O)
-  have hsurj : Function.Surjective π :=
-    MvPolynomial.map_surjective _ IsLocalRing.residue_surjective
+  have hsurj : Function.Surjective π := MvPolynomial.map_surjective _ IsLocalRing.residue_surjective
   have hker : RingHom.ker π ≤ W := by
     change RingHom.ker (MvPolynomial.map (IsLocalRing.residue O)) ≤ W
     rw [MvPolynomial.ker_map, IsLocalRing.ker_residue,
@@ -32,7 +31,7 @@ theorem SpecialQuotDim.proof : SpecialQuotDim.Statement := by
     ext x
     change Ideal.Quotient.mk _ (π x) = 0 ↔ x ∈ W
     rw [Ideal.Quotient.eq_zero_iff_mem, ← Ideal.mem_comap, hcomap]
-  exact (ringKrullDim_eq_of_ringEquiv
-    ((Ideal.quotEquivOfEq hkf.symm).trans (RingHom.quotientKerEquivOfSurjective hf))).symm
+  exact (ringKrullDim_eq_of_ringEquiv ((Ideal.quotEquivOfEq hkf.symm).trans
+    (RingHom.quotientKerEquivOfSurjective hf))).symm
 
 end GroundTheory.Heights₂.Heights.NumbersDVR

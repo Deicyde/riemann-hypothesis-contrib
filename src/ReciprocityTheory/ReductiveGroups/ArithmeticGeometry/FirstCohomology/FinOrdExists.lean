@@ -14,9 +14,11 @@ open CategoryTheory AlgebraicGeometry IsLocalRing
 
 namespace ReciprocityTheory.ChartRestriction.G.H1
 
-open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.DVR
+open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.DVR
 
-theorem finOrdExists_of (hΦ : DVR.PhiFunStatement) (hP : PhiPowStatement) : FinOrdExistsStatement := by
+theorem finOrdExists_of (hΦ : DVR.PhiFunStatement) (hP : PhiPowStatement)
+    : FinOrdExistsStatement := by
   intro V _ _ _ D F _ _ _ k hk p w hw
   obtain ⟨Φ, hΦr⟩ := hΦ V (maximalIdeal V) D F k hk p w hw
   obtain ⟨c, hc, hcp⟩ := hP V (maximalIdeal V) D F k hk p w hw
@@ -30,10 +32,11 @@ theorem finOrdExists_of (hΦ : DVR.PhiFunStatement) (hP : PhiPowStatement) : Fin
   intro ss ts h
 
   have hpow : (Φ ^ k) (ss 0) = c • ss 0 := by
-    have := hcp (fun i => (Φ ^ (i : ℕ)) (ss 0)) (by
-      intro i
-      rw [hΦr]
-      simp only [Fin.val_succ, Fin.coe_castSucc, pow_succ', Module.End.mul_apply])
+    have :=
+      hcp (fun i => (Φ ^ (i : ℕ)) (ss 0)) (by
+        intro i
+        rw [hΦr]
+        simp only [Fin.val_succ, Fin.coe_castSucc, pow_succ', Module.End.mul_apply])
     rw [isSmul_iff] at this
     simpa using this
   have key : ∀ n : ℕ, (hn : n ≤ k) → ss ⟨n, by omega⟩ = ζ ^ n • (Φ ^ n) (ss 0) := by
@@ -47,8 +50,8 @@ theorem finOrdExists_of (hΦ : DVR.PhiFunStatement) (hP : PhiPowStatement) : Fin
       rw [isSmul_iff] at h2
       have e : ss ⟨n + 1, by omega⟩ = ss (Fin.succ ⟨n, by omega⟩) := rfl
       have e0 : ss ⟨n, by omega⟩ = ss (Fin.castSucc ⟨n, by omega⟩) := rfl
-      rw [e, h2, h1, ← e0, ih (by omega), LinearMap.map_smul, smul_smul, pow_succ' ζ n, pow_succ' Φ n,
-        Module.End.mul_apply]
+      rw [e, h2, h1, ← e0, ih (by omega), LinearMap.map_smul, smul_smul, pow_succ' ζ n,
+        pow_succ' Φ n, Module.End.mul_apply]
   have hlast : ss (Fin.last k) = ss 0 := by
     have := key k le_rfl
     have e : ss (Fin.last k) = ss ⟨k, by omega⟩ := rfl

@@ -16,9 +16,11 @@ end Lin
 
 section Mu
 
-variable {O Λ B K : Type} [CommRing O] [CommRing Λ] [CommRing B] [Field K] [Algebra O Λ] [Algebra O B]
-  (lam : Λ →ₐ[O] B) {M M' : Type} [AddCommGroup M] [Module B M] [Module Λ M]
-  [AddCommGroup M'] [Module B M'] [Module Λ M']
+variable
+  {O Λ B K : Type} [CommRing O] [CommRing Λ] [CommRing B] [Field K] [Algebra O Λ] [Algebra O B]
+  (lam : Λ →ₐ[O] B)
+  {M M' : Type}
+  [AddCommGroup M] [Module B M] [Module Λ M] [AddCommGroup M'] [Module B M'] [Module Λ M']
   (hs : ∀ (a : Λ) (m : M), a • m = lam a • m) (hs' : ∀ (a : Λ) (m : M'), a • m = lam a • m)
 
 end Mu
@@ -27,27 +29,29 @@ end UpperTheory.V.Z.Desc.V0.GeneralizedEigenRange
 
 open UpperTheory.V.Z.Desc.V0.GeneralizedEigenRange
 
-theorem UpperTheory.V.Z.Desc.V0.muRange :
-    MuRange := by
+theorem UpperTheory.V.Z.Desc.V0.muRange : MuRange := by
   unfold MuRange
   intro O L B K _ _ _ _ _ _ _ _ _ lam J M _ _ _ h e he
   letI : Algebra L B := (lam : L →+* B).toAlgebra
   haveI : IsScalarTower L B M := ⟨fun a b m => by
     rw [Algebra.smul_def, mul_smul, h.hs]
     rfl⟩
-  let eB : M →ₗ[B] M :=
-    { toFun := e, map_add' := e.map_add, map_smul' := fun b m => he.2 b m }
+  let eB : M →ₗ[B] M := { toFun := e, map_add' := e.map_add, map_smul' := fun b m => he.2 b m }
   let P : Submodule B M := LinearMap.range eB
   have hsP : ∀ (a : L) (m : P), a • m = lam a • m := fun a m => Subtype.ext (h.hs a m.1)
   have hee : ∀ m, e (e m) = e m := fun m => by
     have := congrArg (fun f : Module.End L M => f m) he.1
     simpa using this
-  let i : P →ₗ[L] M :=
-    { toFun := Subtype.val, map_add' := fun _ _ => rfl, map_smul' := fun _ _ => rfl }
-  let s : M →ₗ[L] P :=
-    { toFun := fun m => ⟨e m, m, rfl⟩
-      map_add' := fun x y => Subtype.ext (e.map_add x y)
-      map_smul' := fun a m => Subtype.ext (e.map_smul a m) }
+  let i : P →ₗ[L] M := {
+    toFun := Subtype.val
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
+  let s : M →ₗ[L] P := {
+    toFun := fun m => ⟨e m, m, rfl⟩
+    map_add' := fun x y => Subtype.ext (e.map_add x y)
+    map_smul' := fun a m => Subtype.ext (e.map_smul a m)
+  }
   have hsi : s.comp i = LinearMap.id := by
     ext ⟨x, m, rfl⟩
     exact hee m
@@ -64,20 +68,21 @@ theorem UpperTheory.V.Z.Desc.V0.muRange :
     rw [← LinearMap.comp_apply, hsi, LinearMap.id_apply]⟩)
   haveI : Module.Free L P := Module.free_of_flat_of_isLocalRing
   let J' : Ideal B := (Module.annihilator B P).radical
-  have hD : Dat lam J' P :=
-    { hs := hsP
-      free := inferInstance
-      fin := inferInstance
-      rad := Ideal.radical_isRadical _
-      supp := fun p hp => hp.radical_le_iff.symm
-      tf := by
-        rintro c hc a ⟨n, hn⟩
-        refine ⟨n, ?_⟩
-        rw [Module.mem_annihilator] at hn ⊢
-        intro m
-        have h1 := hn m
-        rw [mul_pow, mul_smul, ← map_pow, ← hsP] at h1
-        exact (smul_eq_zero.mp h1).resolve_left (pow_ne_zero n hc) }
+  have hD : Dat lam J' P := {
+    hs := hsP
+    free := inferInstance
+    fin := inferInstance
+    rad := Ideal.radical_isRadical _
+    supp := fun p hp => hp.radical_le_iff.symm
+    tf := by
+      rintro c hc a ⟨n, hn⟩
+      refine ⟨n, ?_⟩
+      rw [Module.mem_annihilator] at hn ⊢
+      intro m
+      have h1 := hn m
+      rw [mul_pow, mul_smul, ← map_pow, ← hsP] at h1
+      exact (smul_eq_zero.mp h1).resolve_left (pow_ne_zero n hc)
+  }
   have hJ : J ≤ J' := by
     have h0 : J ≤ (Module.annihilator B M).radical := by
       rw [Ideal.radical_eq_sInf]
@@ -96,14 +101,10 @@ theorem UpperTheory.V.Z.Desc.V0.muRange :
   let σ : K ⊗[L] M →ₗ[K] K ⊗[L] P := LinearMap.baseChange K s
   have hσι : σ.comp ι = LinearMap.id := by
     simp only [σ, ι, ← LinearMap.baseChange_comp, hsi, LinearMap.baseChange_id]
-  have hσιa : ∀ w, σ (ι w) = w := fun w => by
-    rw [← LinearMap.comp_apply, hσι, LinearMap.id_apply]
-  have hinj : Function.Injective ι := fun a b hab => by
-    rw [← hσιa a, hab, hσιa]
-  have hισ : ι.comp σ = E := by
-    simp only [ι, σ, E, ← LinearMap.baseChange_comp, hie]
-  have hEι : E.comp ι = ι := by
-    simp only [ι, E, ← LinearMap.baseChange_comp, hei]
+  have hσιa : ∀ w, σ (ι w) = w := fun w => by rw [← LinearMap.comp_apply, hσι, LinearMap.id_apply]
+  have hinj : Function.Injective ι := fun a b hab => by rw [← hσιa a, hab, hσιa]
+  have hισ : ι.comp σ = E := by simp only [ι, σ, E, ← LinearMap.baseChange_comp, hie]
+  have hEι : E.comp ι = ι := by simp only [ι, E, ← LinearMap.baseChange_comp, hei]
   have hact : ∀ b, (actL lam M h.hs b).comp i = i.comp (actL lam P hsP b) := fun b => by
     ext
     rfl
@@ -112,13 +113,14 @@ theorem UpperTheory.V.Z.Desc.V0.muRange :
       Module.End.one_eq_id, Module.End.one_eq_id, LinearMap.id_comp, LinearMap.comp_id]
     congr 1
     simp only [F, G, ι, ← LinearMap.baseChange_comp, hact]
-  have hpow : ∀ b (μ : K) (k : ℕ) w,
-      ((F b - μ • 1) ^ k) (ι w) = ι (((G b - μ • 1) ^ k) w) :=
-    fun b μ k w => by
-      rw [← LinearMap.comp_apply, Module.End.commute_pow_left_of_commute (hFι b μ) k,
-        LinearMap.comp_apply]
-  have key : (⨅ b, Module.End.maxGenEigenspace (G b) (y b)).map ι =
-      (⨅ b, Module.End.maxGenEigenspace (F b) (y b)) ⊓ Module.End.eigenspace E 1 := by
+  have hpow
+      : ∀ b (μ : K) (k : ℕ) w,
+        ((F b - μ • 1) ^ k) (ι w) = ι (((G b - μ • 1) ^ k) w) := fun b μ k w => by
+    rw [← LinearMap.comp_apply, Module.End.commute_pow_left_of_commute (hFι b μ) k,
+      LinearMap.comp_apply]
+  have key
+      : (⨅ b, Module.End.maxGenEigenspace (G b) (y b)).map ι
+        = (⨅ b, Module.End.maxGenEigenspace (F b) (y b)) ⊓ Module.End.eigenspace E 1 := by
     ext v
     simp only [Submodule.mem_map, Submodule.mem_inf, Submodule.mem_iInf,
       Module.End.mem_maxGenEigenspace, Module.End.mem_eigenspace_iff, one_smul]

@@ -14,8 +14,8 @@ open GroundTheory.Heights₂.Heights.Kleiman
 
 universe u v w
 
-theorem LineTwist.full_of_charts : LineTwist.Statement.{u, w} :=
-  fun _ _ _ _ _ _ _ Q₁ Q₂ => ⟨KThm.lbTwist Q₁ Q₂, rfl⟩
+theorem LineTwist.full_of_charts : LineTwist.Statement.{u, w} := fun _ _ _ _ _ _ _ Q₁ Q₂ =>
+  ⟨KThm.lbTwist Q₁ Q₂, rfl⟩
 
 theorem TwistAlg.full_of_charts : TwistAlg.Statement.{u, w} := by
   intro S _ Ω _ _ N x M p q m m' b₁ b₂ h
@@ -31,16 +31,19 @@ theorem TwistAlg.full_of_charts : TwistAlg.Statement.{u, w} := by
     linear_combination (b₁ : ℤ) * h
   rw [e1, e2]
 
-theorem StepTwo.assembled (hRed : StepTwo.Reduce.Statement.{u, v, w})
-    (hRL : RestrLenRestrict.Statement.{u, w}) (hRQ : PrimeFiltration.RestrictQuot.Statement.{u, w})
-    (hS : TwistSplit.Statement.{u, w}) : StepTwo.Statement.{u, v, w} :=
+theorem StepTwo.assembled
+    (hRed : StepTwo.Reduce.Statement.{u, v, w}) (hRL : RestrLenRestrict.Statement.{u, w})
+    (hRQ : PrimeFiltration.RestrictQuot.Statement.{u, w}) (hS : TwistSplit.Statement.{u, w})
+    : StepTwo.Statement.{u, v, w} :=
   StepTwo.proof hRed LineTwist.full_of_charts TwistAlg.full_of_charts RestrictTwist.full
     (NefRestrict.assembled hRL) StepData.JProper.full SubvarDrop.full PrimeFiltration.Point.full
     PrimeFiltration.Restrict.full hRQ (TwistVanish.assembled hS)
 
-theorem ClaimVanish.assembled (hRed : StepTwo.Reduce.Statement.{u, w, w})
-    (hRL : RestrLenRestrict.Statement.{u, w}) (hRQ : PrimeFiltration.RestrictQuot.Statement.{u, w})
-    (hS : TwistSplit.Statement.{u, w}) (hCS : ClaimSeq.Statement.{u, w}) : ClaimVanish.Statement.{u, w} :=
+theorem ClaimVanish.assembled
+    (hRed : StepTwo.Reduce.Statement.{u, w, w}) (hRL : RestrLenRestrict.Statement.{u, w})
+    (hRQ : PrimeFiltration.RestrictQuot.Statement.{u, w}) (hS : TwistSplit.Statement.{u, w})
+    (hCS : ClaimSeq.Statement.{u, w})
+    : ClaimVanish.Statement.{u, w} :=
   ClaimVanish.proof (StepTwo.assembled hRed hRL hRQ hS) (TwistVanish.assembled hS) hCS
 
 end PositivityTheory.HtPt.KtwS

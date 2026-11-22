@@ -13,9 +13,13 @@ namespace GlobalTheory.IntTerm
 
 variable {E : Type} [Field E]
 
-theorem ptEntry_inj : ∀ (bs cs : List (E × ℕ)), (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2) → (∀ b ∈ cs, b.1 ≠ 0 ∧ 1 ≤ b.2) →
-    (bs.map Prod.snd).sum = (cs.map Prod.snd).sum →
-    (∀ a < (bs.map Prod.snd).sum, ∀ b < (bs.map Prod.snd).sum, ptEntry bs a b = ptEntry cs a b) → bs = cs
+theorem ptEntry_inj
+    : ∀ (bs cs : List (E × ℕ)),
+      (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2) → (∀ b ∈ cs, b.1 ≠ 0 ∧ 1 ≤ b.2)
+        → (bs.map Prod.snd).sum = (cs.map Prod.snd).sum
+        → (∀ a < (bs.map Prod.snd).sum, ∀ b < (bs.map Prod.snd).sum,
+          ptEntry bs a b = ptEntry cs a b)
+        → bs = cs
   | [], [], _, _, _, _ => rfl
   | [], (t, s) :: cs, _, h, e, _ => by
     have := (h (t, s) (by simp)).2
@@ -41,20 +45,26 @@ theorem ptEntry_inj : ∀ (bs cs : List (E × ℕ)), (∀ b ∈ bs, b.1 ≠ 0 �
       · exact absurd k0 ht
     rcases hss with ⟨rfl, rfl⟩
     apply congrArg (List.cons (t, s))
-    refine ptEntry_inj bs cs (fun b hb => h b (by simp [hb])) (fun b hb => h' b (by simp [hb])) (by omega)
+    refine ptEntry_inj bs cs
+      (fun b hb => h b (by simp [hb]))
+      (fun b hb => h' b (by simp [hb]))
+      (by omega)
       fun a ha b hb => ?_
     have shifted := k (a + s) (by omega) (b + s) (by omega)
-    have outside : ¬ (a + s < s ∧ b + s < s) := by omega
+    have outside : ¬(a + s < s ∧ b + s < s) := by omega
     have inside : s ≤ a + s ∧ s ≤ b + s := by omega
     simpa only [ptEntry, ite_eq_right outside, ite_eq_left inside, Nat.add_sub_cancel] using shifted
 
-theorem ptMat_injective {m : ℕ} : Function.Injective (ptMat : Point E m → Matrix (Fin m) (Fin m) E) := by
+theorem ptMat_injective {m : ℕ}
+    : Function.Injective (ptMat : Point E m → Matrix (Fin m) (Fin m) E) := by
   intro w w' h
   refine Subtype.ext (ptEntry_inj _ _ w.2.1 w'.2.1 (w.2.2.trans w'.2.2.symm) fun a ha b hb => ?_)
   rw [w.2.2] at ha hb
   exact congrFun (congrFun h ⟨a, ha⟩) ⟨b, hb⟩
 
-variable [NumberField E] {σ : E →+* E} {n r g : ℕ} {J : Matrix (Fin n) (Fin n) E} {T' : E}
-  {P : Matrix (Fin n) (Fin (r + 1)) E}
+variable
+  [NumberField E]
+  {σ : E →+* E} {n r g : ℕ}
+  {J : Matrix (Fin n) (Fin n) E} {T' : E} {P : Matrix (Fin n) (Fin (r + 1)) E}
 
 end GlobalTheory.IntTerm

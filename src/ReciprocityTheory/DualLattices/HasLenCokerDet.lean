@@ -17,15 +17,21 @@ lemma hasLen_of_equiv {C : Type} [Field C] {v : Valuation C NNReal} {R : Type} [
   obtain ⟨k, c, ⟨f⟩, hx⟩ := h
   exact ⟨k, c, ⟨e.trans f⟩, hx⟩
 
-theorem hasLen_coker_det' {C : Type} [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R]
-    [Algebra R C] (hv : v.Integers R) (κ : Type) [Fintype κ] [DecidableEq κ] (X : Matrix κ κ R) :
-    HasLen v R ((κ → R) ⧸ LinearMap.range X.mulVecLin) (v (algebraMap R C X.det)) := by
+theorem hasLen_coker_det'
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : v.Integers R)
+    (κ : Type) [Fintype κ] [DecidableEq κ]
+    (X : Matrix κ κ R)
+    : HasLen v R ((κ → R) ⧸ LinearMap.range X.mulVecLin) (v (algebraMap R C X.det)) := by
   set e := Fintype.equivFin κ
   set X' := X.submatrix e.symm e.symm
   have hdet : X'.det = X.det := Matrix.det_submatrix_equiv_self e.symm X
   let Φ : (κ → R) ≃ₗ[R] (Fin (Fintype.card κ) → R) := LinearEquiv.funCongrLeft R R e.symm
-  have hrange : (LinearMap.range X.mulVecLin).map (Φ : (κ → R) →ₗ[R] (Fin (Fintype.card κ) → R)) =
-      LinearMap.range X'.mulVecLin := by
+  have hrange
+      : (LinearMap.range X.mulVecLin).map (Φ : (κ → R) →ₗ[R] (Fin (Fintype.card κ) → R))
+        = LinearMap.range X'.mulVecLin := by
     ext z
     constructor
     · rintro ⟨_, ⟨y, rfl⟩, rfl⟩

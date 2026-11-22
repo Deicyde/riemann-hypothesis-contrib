@@ -6,8 +6,8 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.Domination
 
-theorem isUnit_subring_iff {K : Type} [Field K] (D : Subring K) (d : D) :
-    IsUnit d ↔ (d : K) ≠ 0 ∧ (d : K)⁻¹ ∈ D := by
+theorem isUnit_subring_iff {K : Type} [Field K] (D : Subring K) (d : D)
+    : IsUnit d ↔ (d : K) ≠ 0 ∧ (d : K)⁻¹ ∈ D := by
   constructor
   · rintro ⟨u, rfl⟩
     have h : ((u : D) : K) * (((u⁻¹ : Dˣ) : D) : K) = 1 := by
@@ -18,19 +18,24 @@ theorem isUnit_subring_iff {K : Type} [Field K] (D : Subring K) (d : D) :
   · rintro ⟨h0, h⟩
     exact isUnit_iff_exists_inv.2 ⟨⟨_, h⟩, Subtype.ext (by simp [h0])⟩
 
-theorem isMaximal_of_comap {K : Type} [Field K] (R T : Subring K) (hRT : R ≤ T)
-    (hint : ∀ t ∈ T, IsIntegral R t) (P : Ideal T) [P.IsPrime]
-    (hc : (P.comap (Subring.inclusion hRT)).IsMaximal) : P.IsMaximal := by
+theorem isMaximal_of_comap
+    {K : Type} [Field K]
+    (R T : Subring K) (hRT : R ≤ T) (hint : ∀ t ∈ T, IsIntegral R t) (P : Ideal T) [P.IsPrime]
+    (hc : (P.comap (Subring.inclusion hRT)).IsMaximal)
+    : P.IsMaximal := by
   let _ : Algebra R T := (Subring.inclusion hRT).toAlgebra
-  have : Algebra.IsIntegral R T := ⟨fun t ↦ by
-    let f : T →ₐ[R] K := { T.subtype with commutes' := fun r ↦ rfl }
-    exact (isIntegral_algHom_iff f Subtype.val_injective).1 (hint t t.2)⟩
+  have : Algebra.IsIntegral R T :=
+    ⟨fun t ↦ by
+      let f : T →ₐ[R] K := { T.subtype with commutes' := fun r ↦ rfl }
+      exact (isIntegral_algHom_iff f Subtype.val_injective).1 (hint t t.2)⟩
   exact Ideal.isMaximal_of_isIntegral_of_isMaximal_under P hc
 
-theorem eq_ofPrime {K : Type} [Field K] (T D : Subring K) (P : Ideal T) [P.IsPrime]
-    (hP : ∀ t : T, t ∈ P ↔ ¬ ((t : K) ≠ 0 ∧ (t : K)⁻¹ ∈ D)) (hTD : T ≤ D)
-    (gen : ∀ a ∈ D, ∃ u ∈ T, ∃ v ∈ T, v ≠ 0 ∧ v⁻¹ ∈ D ∧ a = u / v) :
-    D = (LocalSubring.ofPrime T P).toSubring := by
+theorem eq_ofPrime
+    {K : Type} [Field K]
+    (T D : Subring K) (P : Ideal T) [P.IsPrime]
+    (hP : ∀ t : T, t ∈ P ↔ ¬((t : K) ≠ 0 ∧ (t : K)⁻¹ ∈ D)) (hTD : T ≤ D)
+    (gen : ∀ a ∈ D, ∃ u ∈ T, ∃ v ∈ T, v ≠ 0 ∧ v⁻¹ ∈ D ∧ a = u / v)
+    : D = (LocalSubring.ofPrime T P).toSubring := by
   ext a
   simp only [LocalSubring.ofPrime, LocalSubring.range_toSubring]
   show a ∈ D ↔ a ∈ Set.range _
@@ -48,7 +53,7 @@ theorem eq_ofPrime {K : Type} [Field K] (T D : Subring K) (P : Ideal T) [P.IsPri
     field_simp
   · rintro ⟨y, rfl⟩
     obtain ⟨⟨u, s⟩, rfl⟩ := IsLocalization.mk'_surjective P.primeCompl y
-    have hs : ¬ ((s : T) ∈ P) := s.2
+    have hs : ¬((s : T) ∈ P) := s.2
     rw [hP, not_not] at hs
     have key : ∀ z : K, ((u : T) : K) = ((s : T) : K) * z → z ∈ D := by
       intro z hz
@@ -59,20 +64,21 @@ theorem eq_ofPrime {K : Type} [Field K] (T D : Subring K) (P : Ideal T) [P.IsPri
       exact D.mul_mem (hTD u.2) hs.2
     dsimp only
     apply key
-    exact (IsLocalization.lift_mk'_spec (S := Localization.AtPrime P) (g := T.subtype) _ _ _ _).1 rfl
+    exact (IsLocalization.lift_mk'_spec (S := Localization.AtPrime P) (g := T.subtype) _ _ _ _).1
+      rfl
 
-theorem eq_localisation_integralClosure :
-    ∀ {K : Type} [Field K] (R D B : Subring K) [IsLocalRing R] [IsLocalRing D], R ≤ D →
-      (∀ r ∈ R, r ≠ 0 → r⁻¹ ∈ D → r⁻¹ ∈ R) → (integralClosure R K).toSubring ≤ D →
-      B ≤ (integralClosure R K).toSubring →
-      (∀ a ∈ D, ∃ u ∈ B, ∃ v ∈ B, v ≠ 0 ∧ v⁻¹ ∈ D ∧ a = u / v) →
-      ∃ (P : Ideal (integralClosure R K).toSubring) (_ : P.IsMaximal),
-        D = (LocalSubring.ofPrime _ P).toSubring ∧
-        ∀ t : (integralClosure R K).toSubring, t ∈ P ↔ ¬ ((t : K) ≠ 0 ∧ (t : K)⁻¹ ∈ D) := by
+theorem eq_localisation_integralClosure
+    : ∀ {K : Type} [Field K] (R D B : Subring K) [IsLocalRing R] [IsLocalRing D],
+      R ≤ D → (∀ r ∈ R, r ≠ 0 → r⁻¹ ∈ D → r⁻¹ ∈ R) → (integralClosure R K).toSubring ≤ D
+        → B ≤ (integralClosure R K).toSubring
+        → (∀ a ∈ D, ∃ u ∈ B, ∃ v ∈ B, v ≠ 0 ∧ v⁻¹ ∈ D ∧ a = u / v)
+        → ∃ (P : Ideal (integralClosure R K).toSubring) (_ : P.IsMaximal),
+          D = (LocalSubring.ofPrime _ P).toSubring
+            ∧ ∀ t : (integralClosure R K).toSubring, t ∈ P ↔ ¬((t : K) ≠ 0 ∧ (t : K)⁻¹ ∈ D) := by
   intro K _ R D B _ _ hRD hdom hTD hBT gen
   let P : Ideal (integralClosure R K).toSubring :=
     (IsLocalRing.maximalIdeal D).comap (Subring.inclusion hTD)
-  have hP : ∀ t : (integralClosure R K).toSubring, t ∈ P ↔ ¬ ((t : K) ≠ 0 ∧ (t : K)⁻¹ ∈ D) := by
+  have hP : ∀ t : (integralClosure R K).toSubring, t ∈ P ↔ ¬((t : K) ≠ 0 ∧ (t : K)⁻¹ ∈ D) := by
     intro t
     show Subring.inclusion hTD t ∈ IsLocalRing.maximalIdeal D ↔ _
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, isUnit_subring_iff]

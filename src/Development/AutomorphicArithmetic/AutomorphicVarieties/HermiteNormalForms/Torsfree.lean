@@ -7,14 +7,16 @@ public import Mathlib
 open Matrix
 open scoped ComplexOrder
 
-private theorem UpperTheory.V.KT.torsfree_sep {R : Type} [Ring R] [Module.Free ℤ R]
-    (z w : R) (h : z = (3 : ℤ) • (z * w)) : z = 0 := by
+private theorem UpperTheory.V.KT.torsfree_sep
+    {R : Type} [Ring R] [Module.Free ℤ R] (z w : R) (h : z = (3 : ℤ) • (z * w))
+    : z = 0 := by
   have hn : ∀ n : ℕ, z = (3 : ℤ) ^ n • (z * w ^ n) := by
     intro n
     induction n with
     | zero => simp
     | succ n ih =>
-      calc z = (3 : ℤ) • (z * w) := h
+      calc
+        z = (3 : ℤ) • (z * w) := h
         _ = (3 : ℤ) • (((3 : ℤ) ^ n • (z * w ^ n)) * w) := by rw [← ih]
         _ = (3 : ℤ) ^ (n + 1) • (z * w ^ (n + 1)) := by
           rw [smul_mul_assoc, smul_smul, pow_succ', pow_succ, mul_assoc]
@@ -36,8 +38,8 @@ private theorem UpperTheory.V.KT.torsfree_sep {R : Type} [Ring R] [Module.Free �
   rw [h3] at h1
   omega
 
-private theorem UpperTheory.V.KT.torsfree_binom {R : Type} [Ring R] (z : R) (k : ℕ) :
-    ∃ w : R, (1 + z) ^ k = 1 + (k : ℤ) • z + z * z * w := by
+private theorem UpperTheory.V.KT.torsfree_binom {R : Type} [Ring R] (z : R) (k : ℕ)
+    : ∃ w : R, (1 + z) ^ k = 1 + (k : ℤ) • z + z * z * w := by
   induction k with
   | zero => exact ⟨0, by simp⟩
   | succ k ih =>
@@ -49,13 +51,14 @@ private theorem UpperTheory.V.KT.torsfree_binom {R : Type} [Ring R] (z : R) (k :
       mul_smul_comm, mul_assoc]
     abel
 
-theorem UpperTheory.V.KT.torsfree :
-    ∀ (R : Type) [Ring R] [Module.Free ℤ R] [Module.Finite ℤ R] (u x : R) (k : ℕ), 0 < k →
-    u = 1 + 3 * x → u ^ k = 1 → u = 1 := by
+theorem UpperTheory.V.KT.torsfree
+    : ∀ (R : Type) [Ring R] [Module.Free ℤ R] [Module.Finite ℤ R] (u x : R) (k : ℕ),
+      0 < k → u = 1 + 3 * x → u ^ k = 1 → u = 1 := by
   intro R _ _ _ u x k
   have h3 : ∀ y : R, 3 * y = (3 : ℤ) • y := by
     intro y
-    rw [zsmul_eq_mul]; norm_num
+    rw [zsmul_eq_mul]
+    norm_num
   induction k using Nat.strong_induction_on generalizing u x with
   | _ k ih =>
     intro hk hu hpow
@@ -69,15 +72,15 @@ theorem UpperTheory.V.KT.torsfree :
       have hv : u ^ m = 1 + (3 : ℤ) • y := by
         rw [hw, hy, smul_add, smul_comm (3 : ℤ) (m : ℤ), add_assoc, smul_mul_assoc (3 : ℤ) x,
           smul_mul_assoc (3 : ℤ)]
-      have hv3 : (1 + (3 : ℤ) • y) ^ 3 = 1 := by
-        rw [← hv, ← pow_mul, mul_comm, hpow]
+      have hv3 : (1 + (3 : ℤ) • y) ^ 3 = 1 := by rw [← hv, ← pow_mul, mul_comm, hpow]
       have hz : (3 : ℤ) • y = 0 := by
         apply UpperTheory.V.KT.torsfree_sep _ (-y - y * y)
         have hinj : Function.Injective (fun t : R => (3 : ℤ) • t) :=
           smul_right_injective R (by norm_num)
         apply hinj
-        have e : (3 : ℤ) • ((3 : ℤ) • y) - (3 : ℤ) • ((3 : ℤ) • (((3 : ℤ) • y) * (-y - y * y)))
-            = (1 + (3 : ℤ) • y) ^ 3 - 1 := by
+        have e
+            : (3 : ℤ) • ((3 : ℤ) • y) - (3 : ℤ) • ((3 : ℤ) • (((3 : ℤ) • y) * (-y - y * y)))
+              = (1 + (3 : ℤ) • y) ^ 3 - 1 := by
           simp only [pow_succ, pow_zero, mul_add, add_mul, mul_sub, mul_neg, mul_one, one_mul,
             smul_mul_assoc, mul_smul_comm, mul_assoc]
           module
@@ -94,9 +97,10 @@ theorem UpperTheory.V.KT.torsfree :
         · exact ⟨-1, (k : ℤ) / 3 + 1, by omega⟩
       have hz : (3 : ℤ) • x = 0 := by
         apply UpperTheory.V.KT.torsfree_sep _ (b • 1 - a • (x * w))
-        have e : (3 : ℤ) • (((3 : ℤ) • x) * (b • 1 - a • (x * w)))
-            = (a * k + 3 * b) • ((3 : ℤ) • x)
-              - a • ((k : ℤ) • ((3 : ℤ) • x) + (3 : ℤ) • x * (3 : ℤ) • x * w) := by
+        have e
+            : (3 : ℤ) • (((3 : ℤ) • x) * (b • 1 - a • (x * w)))
+              = (a * k + 3 * b) • ((3 : ℤ) • x)
+                - a • ((k : ℤ) • ((3 : ℤ) • x) + (3 : ℤ) • x * (3 : ℤ) • x * w) := by
           simp only [mul_sub, mul_one, smul_mul_assoc, mul_smul_comm, mul_assoc]
           module
         rw [e, hw, hab, smul_zero, sub_zero, one_smul]

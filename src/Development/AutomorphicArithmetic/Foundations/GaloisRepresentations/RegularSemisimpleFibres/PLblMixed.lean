@@ -5,14 +5,17 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem perm_lift {α β : Type*} (f : α → β) {m m' : List β} (h : m.Perm m') :
-    ∀ l : List α, l.map f = m' → ∃ l' : List α, l'.Perm l ∧ l'.map f = m := by
+private theorem perm_lift {α β : Type*} (f : α → β) {m m' : List β} (h : m.Perm m')
+    : ∀ l : List α, l.map f = m' → ∃ l' : List α, l'.Perm l ∧ l'.map f = m := by
   induction h with
   | nil => intro l hl; exact ⟨l, .refl _, hl⟩
   | cons b _ ih =>
@@ -35,47 +38,63 @@ private theorem perm_lift {α β : Type*} (f : α → β) {m m' : List β} (h : 
     obtain ⟨l₁, hp₁, hm₁⟩ := ih₁ l₂ hm₂
     exact ⟨l₁, hp₁.trans hp₂, hm₁⟩
 
-private theorem pairwise_filter_sym {α : Type*} (r : α → α → Prop) (p : α → Prop) [DecidablePred p] (l : List α)
-    (h : (Multiset.filter p (l : Multiset α)).Pairwise r) :
-    (l.filter fun b => decide (p b)).Pairwise fun y z => r y z ∨ r z y := by
+private theorem pairwise_filter_sym
+    {α : Type*} (r : α → α → Prop) (p : α → Prop) [DecidablePred p]
+    (l : List α) (h : (Multiset.filter p (l : Multiset α)).Pairwise r)
+    : (l.filter fun b => decide (p b)).Pairwise fun y z => r y z ∨ r z y := by
   obtain ⟨l', hl', hp⟩ := h
   rw [Multiset.filter_coe, Multiset.coe_eq_coe] at hl'
   exact (List.Perm.pairwise_iff (fun h => h.symm) hl').2 (hp.imp Or.inl)
 
-private theorem inert_both {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (hIn : ∀ (m : ℕ) (x y : IrrCl (GL (Fin m) k)), IrrGL.IsCusp ⟨m, x⟩ → IrrGL.IsCusp ⟨m, y⟩ →
-      UpperTheory.Zero.LLC.DZ ⟨m, x⟩ → UpperTheory.Zero.LLC.DZ ⟨m, y⟩ →
-      (∀ γ, LinearMap.trace ℂ _ (levelZero x.rep.ρ γ) = LinearMap.trace ℂ _ (levelZero y.rep.ρ γ)) →
-      IrrGL.Inert ⟨m, x⟩ ⟨m, y⟩)
-    (θ : AlgebraicClosure 𝓀[k] →* ℂ) (y z : IrrGL (k := k)) (hy : y.IsCusp) (hz : z.IsCusp)
-    (hy' : UpperTheory.Zero.LLC.DZ y) (hz' : UpperTheory.Zero.LLC.DZ z) (cy cz : ℕ)
-    (ty : ∀ γ, LinearMap.trace ℂ _ (levelZero y.rep γ) = cusp θ y.1 cy γ)
+private theorem inert_both
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (hIn : ∀ (m : ℕ) (x y : IrrCl (GL (Fin m) k)),
+      IrrGL.IsCusp ⟨m, x⟩ → IrrGL.IsCusp ⟨m, y⟩ → UpperTheory.Zero.LLC.DZ ⟨m, x⟩
+        → UpperTheory.Zero.LLC.DZ ⟨m, y⟩
+        → (∀ γ,
+          LinearMap.trace ℂ _ (levelZero x.rep.ρ γ) = LinearMap.trace ℂ _ (levelZero y.rep.ρ γ))
+        → IrrGL.Inert ⟨m, x⟩ ⟨m, y⟩)
+    (θ : AlgebraicClosure 𝓀[k] →* ℂ)
+    (y z : IrrGL (k := k)) (hy : y.IsCusp) (hz : z.IsCusp) (hy' : UpperTheory.Zero.LLC.DZ y)
+    (hz' : UpperTheory.Zero.LLC.DZ z)
+    (cy cz : ℕ) (ty : ∀ γ, LinearMap.trace ℂ _ (levelZero y.rep γ) = cusp θ y.1 cy γ)
     (tz : ∀ γ, LinearMap.trace ℂ _ (levelZero z.rep γ) = cusp θ z.1 cz γ)
-    (h : y.1 = z.1) (hc : cusp θ y.1 cz = cusp θ y.1 cy) : y.Inert z ∧ z.Inert y := by
+    (h : y.1 = z.1) (hc : cusp θ y.1 cz = cusp θ y.1 cy)
+    : y.Inert z ∧ z.Inert y := by
   obtain ⟨m, X⟩ := y
   obtain ⟨m', Y⟩ := z
   obtain rfl : m = m' := h
-  have e : ∀ γ, LinearMap.trace ℂ _ (levelZero X.rep.ρ γ) = LinearMap.trace ℂ _ (levelZero Y.rep.ρ γ) := fun γ => by
+  have e
+      : ∀ γ,
+        LinearMap.trace ℂ _ (levelZero X.rep.ρ γ)
+          = LinearMap.trace ℂ _ (levelZero Y.rep.ρ γ) := fun γ => by
     have h1 := ty γ
     have h2 := tz γ
     exact h1.trans ((congrFun hc γ).symm.trans h2.symm)
   exact ⟨hIn m X Y hy hz hy' hz' e, hIn m Y X hz hy hz' hy' fun γ => (e γ).symm⟩
 
-private theorem core {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k]
+private theorem core
+    {k : Type}
+    [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k]
     (hG : Group1) (hCF : CuspFrob) (hUF : UnlFull) (hJP : JDPair) (hJC : JDChar) (hLF : LblFull)
-    (hIn : ∀ (m : ℕ) (x y : IrrCl (GL (Fin m) k)), IrrGL.IsCusp ⟨m, x⟩ → IrrGL.IsCusp ⟨m, y⟩ →
-      UpperTheory.Zero.LLC.DZ ⟨m, x⟩ → UpperTheory.Zero.LLC.DZ ⟨m, y⟩ →
-      (∀ γ, LinearMap.trace ℂ _ (levelZero x.rep.ρ γ) = LinearMap.trace ℂ _ (levelZero y.rep.ρ γ)) →
-      IrrGL.Inert ⟨m, x⟩ ⟨m, y⟩)
-    (θ : AlgebraicClosure 𝓀[k] →* ℂ) (hθ : Inj θ) (n : ℕ) {V : Type} [AddCommGroup V] [Module ℂ V]
+    (hIn : ∀ (m : ℕ) (x y : IrrCl (GL (Fin m) k)),
+      IrrGL.IsCusp ⟨m, x⟩ → IrrGL.IsCusp ⟨m, y⟩ → UpperTheory.Zero.LLC.DZ ⟨m, x⟩
+        → UpperTheory.Zero.LLC.DZ ⟨m, y⟩
+        → (∀ γ,
+          LinearMap.trace ℂ _ (levelZero x.rep.ρ γ) = LinearMap.trace ℂ _ (levelZero y.rep.ρ γ))
+        → IrrGL.Inert ⟨m, x⟩ ⟨m, y⟩)
+    (θ : AlgebraicClosure 𝓀[k] →* ℂ) (hθ : Inj θ)
+    (n : ℕ)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
     (π : Representation ℂ (GL (Fin n) k) V) (hsm : IsSmooth π) (hirr : π.IsIrreducible)
     (s : Multiset (IrrGL (k := k))) (hs : HasSupport π s) (hU : GlobalTheory.RoadU.Unlinked s)
     (hP : (s.filter fun y => 2 ≤ y.1).Pairwise fun y z => ¬ y.Inert z)
     (m : ℕ) (x : Fin m → IrrGL (k := k)) (c : Fin m → ℕ) (hxs : Finset.univ.val.map x = s)
-    (hx : ∀ a, (x a).IsCusp ∧ UpperTheory.Zero.LLC.DZ (x a) ∧ Reg (Nat.card 𝓀[k]) (x a).1 (c a) ∧
-        ∀ γ, LinearMap.trace ℂ _ (levelZero (x a).rep γ) = cusp θ (x a).1 (c a) γ)
-    (hL : HasLbl θ π ⟨Nat.card 𝓀[k], [], List.ofFn fun a => ((x a).1, c a)⟩) :
-    ∃ a : Lbl, HasLbl θ π a ∧ a.Apart ∧ ∀ p ∈ a.L, ∃ y ∈ s, y.1 = p.1 := by
+    (hx : ∀ a,
+      (x a).IsCusp ∧ UpperTheory.Zero.LLC.DZ (x a) ∧ Reg (Nat.card 𝓀[k]) (x a).1 (c a)
+        ∧ ∀ γ, LinearMap.trace ℂ _ (levelZero (x a).rep γ) = cusp θ (x a).1 (c a) γ)
+    (hL : HasLbl θ π ⟨Nat.card 𝓀[k], [], List.ofFn fun a => ((x a).1, c a)⟩)
+    : ∃ a : Lbl, HasLbl θ π a ∧ a.Apart ∧ ∀ p ∈ a.L, ∃ y ∈ s, y.1 = p.1 := by
   obtain ⟨⟨hq2, -, hOk⟩, -, hn, -⟩ := hL
   have hpos : ∀ a, 0 < (x a).1 := fun a => (hOk _ (List.mem_ofFn.2 ⟨a, rfl⟩)).1
   set q := Nat.card 𝓀[k] with hq
@@ -103,9 +122,10 @@ private theorem core {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] 
     obtain ⟨t, ht, rfl⟩ := List.mem_map.1 hp
     obtain ⟨a, rfl⟩ := hmem t ht
     exact ⟨a, rfl⟩
-  obtain ⟨D, hD, hDn, hDp⟩ := hG (T₀.map f) (fun p hp => by
-    obtain ⟨a, rfl⟩ := hmemL p hp
-    exact hpos a)
+  obtain ⟨D, hD, hDn, hDp⟩ :=
+    hG (T₀.map f) (fun p hp => by
+      obtain ⟨a, rfl⟩ := hmemL p hp
+      exact hpos a)
   obtain ⟨T, hTp, hTm⟩ := perm_lift f hDp T₀ rfl
 
   let x' : Fin T.length → IrrGL (k := k) := fun a => (T.get a).1
@@ -120,11 +140,14 @@ private theorem core {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] 
       rfl
     rw [e1, e2]
     exact hTp.map _
-  have hofn : List.ofFn (fun a => ((x' a).1, c' a)) = expand D ++ (T₀.map f).filter fun p => 2 ≤ p.1 := by
+  have hofn
+      : List.ofFn (fun a => ((x' a).1, c' a)) = expand D ++ (T₀.map f).filter fun p => 2 ≤ p.1 := by
     rw [← hTm]
     conv_rhs => rw [← List.ofFn_get T, List.map_ofFn]
     rfl
-  have hdegP : GlobalTheory.Shin.deg (expand D ++ (T₀.map f).filter fun p => 2 ≤ p.1) = GlobalTheory.Shin.deg (T₀.map f) := by
+  have hdegP
+      : GlobalTheory.Shin.deg (expand D ++ (T₀.map f).filter fun p => 2 ≤ p.1)
+        = GlobalTheory.Shin.deg (T₀.map f) := by
     unfold GlobalTheory.Shin.deg
     exact (hDp.map _).sum_eq
   have hdeg₀ : GlobalTheory.Shin.deg (T₀.map f) = n := by
@@ -199,15 +222,16 @@ private theorem core {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] 
     have hcong' : c b ≡ c a * q ^ i [MOD q ^ (x a).1 - 1] := by
       have : c₁ b ≡ c₁ a * q ^ i [MOD q ^ (x a).1 - 1] := hcong
       simpa only [c₁, if_neg na, if_neg nb] using this
-    have := inert_both hIn θ (x a) (x b) (hx a).1 (hx b).1 (hx a).2.1 (hx b).2.1 (c a) (c b) (hx a).2.2.2 (hx b).2.2.2
-      heq (hCF 𝓀[k] θ hθ (x a).1 (c a) (c b) i (hpos a) hcong')
+    have :=
+      inert_both hIn θ (x a) (x b) (hx a).1 (hx b).1 (hx a).2.1 (hx b).2.1 (c a) (c b) (hx a).2.2.2
+        (hx b).2.2.2 heq (hCF 𝓀[k] θ hθ (x a).1 (c a) (c b) i (hpos a) hcong')
     exact hh.elim (· this.1) (· this.2)
   · intro p hp
     obtain ⟨a, rfl, -⟩ := hLm p hp
     exact ⟨x a, by rw [← hxs]; exact Multiset.mem_map_of_mem _ (Finset.mem_univ a), rfl⟩
 
-theorem UpperTheory.Gal.InertialTypesAlt.lblMixed :
-    LblOf → Group1 → CuspFrob → InertOf → UnlFull → JDPair → JDChar → LblFull → LblMixed := by
+theorem UpperTheory.Gal.InertialTypesAlt.lblMixed
+    : LblOf → Group1 → CuspFrob → InertOf → UnlFull → JDPair → JDChar → LblFull → LblMixed := by
   intro hOf hG hCF hIn hUF hJP hJC hLF E Ω _ _ _ _ _ A v hv g _ i hi θ hθ n τ hM
   haveI : CharZero (v.adicCompletion E) :=
     charZero_of_injective_algebraMap (R := E) (algebraMap E (v.adicCompletion E)).injective
@@ -217,6 +241,7 @@ theorem UpperTheory.Gal.InertialTypesAlt.lblMixed :
   have hfix : fixed τ.ρ (KOne (v.adicCompletion E) (Fin n)) ≠ ⊥ :=
     GlobalTheory.LocLanglands.fixed_ne_bot_of_equiv e₀.symm hDZ
   obtain ⟨m, x, c, hxs, hx, hL⟩ := hOf (v.adicCompletion E) θ hθ n τ.V τ.ρ s hs' hfix
-  obtain ⟨a, h1, h2, h3⟩ := core hG hCF hUF hJP hJC hLF (hIn E Ω A v hv g i hi) θ hθ n τ.ρ τ.smooth τ.irred s hs' hU hP
-    m x c hxs hx hL
+  obtain ⟨a, h1, h2, h3⟩ :=
+    core hG hCF hUF hJP hJC hLF (hIn E Ω A v hv g i hi) θ hθ n τ.ρ τ.smooth τ.irred s hs' hU hP m x
+      c hxs hx hL
   exact ⟨a, s, h1, h2, hs', h3⟩

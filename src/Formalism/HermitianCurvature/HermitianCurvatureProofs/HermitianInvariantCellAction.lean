@@ -7,7 +7,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.MemLevelZero
 @[expose] public section
 
 open Matrix
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q
 
 namespace Formalism.FourierDecayAlt.P.CutMP.TemperedBoundGL3
 
@@ -21,20 +22,29 @@ theorem lr_succ (hr : 1 ≤ r) : (lr hr).succ = Fin.last r := Fin.ext (by simp [
 
 section Br1
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
+variable
+  {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] [NormedAddCommGroup Wq] [NormedSpace ℂ Wq]
   {z z' : Fin (2 * r + k + 1) → ℂ} {π : Mx k r → (Wp →L[ℂ] Wp)} {π' : Mx k r → (Wq →L[ℂ] Wq)}
 
-theorem br1 (hz : inWb k r z) (hz' : inWb k r z') {D : Set (Mx k r)} (hD : IsDom k r z z' 0 D)
-    {J : Mx k r → (Wq →L[ℂ] Wp)} (hJ : J ∈ FFl k r z z' π π' 0 D) {c : Fin r → ℂ} (hc : c ∈ OmX r) (l : Fin r) :
-    resG k r l.castSucc J c ∈ FFl k r z z' π π' l.castSucc (Qx6.Dcell D l.castSucc c) ∧
-      IsDom k r z z' l.castSucc (Qx6.Dcell D l.castSucc c) :=
-  ⟨(Formalism.FourierDecayAlt.P.restriction_good_family Wp Wq k r z z' π π' D hz hz' hD J hJ l.castSucc).2 c hc,
-    Qx6.dom_Dcell Formalism.FourierDecayAlt.P.restriction_mem hz hz' hD l.castSucc c hc⟩
+theorem br1
+    (hz : inWb k r z) (hz' : inWb k r z')
+    {D : Set (Mx k r)} (hD : IsDom k r z z' 0 D)
+    {J : Mx k r → (Wq →L[ℂ] Wp)} (hJ : J ∈ FFl k r z z' π π' 0 D)
+    {c : Fin r → ℂ} (hc : c ∈ OmX r)
+    (l : Fin r)
+    : resG k r l.castSucc J c ∈ FFl k r z z' π π' l.castSucc (Qx6.Dcell D l.castSucc c)
+      ∧ IsDom k r z z' l.castSucc (Qx6.Dcell D l.castSucc c) := ⟨
+  (Formalism.FourierDecayAlt.P.restriction_good_family Wp Wq k r z z' π π' D hz hz' hD J hJ
+    l.castSucc).2 c hc,
+  Qx6.dom_Dcell Formalism.FourierDecayAlt.P.restriction_mem hz hz' hD l.castSucc c hc
+⟩
 
 end Br1
 
-theorem cell_preimage_mem_domain {D : Set (Mx k r)} {c : Fin r → ℂ} (l : Fin r) {g : Mx k r}
-    (hg : wCell k r l.succ c * g ∈ D) : g ∈ Qx6.Dc1 l (Qx6.Dcell D l.castSucc c) c := by
+theorem cell_preimage_mem_domain
+    {D : Set (Mx k r)} {c : Fin r → ℂ} (l : Fin r) {g : Mx k r} (hg : wCell k r l.succ c * g ∈ D)
+    : g ∈ Qx6.Dc1 l (Qx6.Dcell D l.castSucc c) c := by
   show wCell k r l.castSucc c * (w1 k r l (c l) * g) ∈ D
   rw [← Matrix.mul_assoc, ← Qx6.wCell_succ]
   exact hg
@@ -43,17 +53,22 @@ section Br2
 
 variable {X : Type} [NormedAddCommGroup X] [NormedSpace ℂ X]
 
-theorem br2 (l : Fin r) (Θ : (Mx k r → X) → (Mx k r → X)) (hS : Formalism.FourierDecayAlt.P5.SmulC Θ) (c : Fin r → ℂ)
+theorem br2
+    (l : Fin r)
+    (Θ : (Mx k r → X) → (Mx k r → X)) (hS : Formalism.FourierDecayAlt.P5.SmulC Θ)
+    (c : Fin r → ℂ)
     (hL : ∀ f : Mx k r → X,
       Θ (fun x => f (wCell k r l.castSucc c * x)) = fun x => Θ f (wCell k r l.castSucc c * x))
-    (J : Mx k r → X) (g : Mx k r) :
-    resG k r l.succ (Θ J) c g =
-      ((‖c l‖ ^ (Mdim k r l - 1) : ℝ) : ℂ) • Θ (resG k r l.castSucc J c) (w1 k r l (c l) * g) := by
+    (J : Mx k r → X) (g : Mx k r)
+    : resG k r l.succ (Θ J) c g
+      = ((‖c l‖ ^ (Mdim k r l - 1) : ℝ) : ℂ)
+        • Θ (resG k r l.castSucc J c) (w1 k r l (c l) * g) := by
   rw [Qx6.resG_succ]
   show ((‖c l‖ ^ (Mdim k r l - 1) : ℝ) : ℂ) • resG k r l.castSucc (Θ J) c (w1 k r l (c l) * g) = _
   congr 1
-  have e : resG k r l.castSucc J c =
-      ((Qx6.gam k r l.castSucc c : ℝ) : ℂ) • fun x => J (wCell k r l.castSucc c * x) := by
+  have e
+      : resG k r l.castSucc J c
+        = ((Qx6.gam k r l.castSucc c : ℝ) : ℂ) • fun x => J (wCell k r l.castSucc c * x) := by
     funext x
     rfl
   rw [e, hS, hL]
@@ -61,8 +76,9 @@ theorem br2 (l : Fin r) (Θ : (Mx k r → X) → (Mx k r → X)) (hS : Formalism
 
 end Br2
 
-theorem unipotent_fixes_base_vector (l : Fin r) (a : ℂ) {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) :
-    w1 k r l a *ᵥ z = z := by
+theorem unipotent_fixes_base_vector
+    (l : Fin r) (a : ℂ) {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    : w1 k r l a *ᵥ z = z := by
   have hl := l.isLt
   have ze : z (eI k r l) = 0 := hz _ (Or.inl (by simp [eI]))
   have zs : z (esI k r l) = 0 := hz _ (Or.inr (by simp [esI]; omega))
@@ -80,26 +96,36 @@ theorem unipotent_fixes_base_vector (l : Fin r) (a : ℂ) {z : Fin (2 * r + k + 
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem wCell_fix_wb (i : Fin (r + 1)) (c : Fin r → ℂ) {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) :
-    wCell k r i c *ᵥ z = z := by
+theorem wCell_fix_wb
+    (i : Fin (r + 1)) (c : Fin r → ℂ) {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    : wCell k r i c *ᵥ z = z := by
   unfold wCell
   induction ((List.finRange r).filter fun a => a.val < i.val) with
   | nil => simp
-  | cons a l ih => rw [List.map_cons, List.prod_cons, ← Matrix.mulVec_mulVec, ih, unipotent_fixes_base_vector a _ hz]
+  | cons a l ih =>
+    rw [List.map_cons, List.prod_cons, ← Matrix.mulVec_mulVec, ih,
+      unipotent_fixes_base_vector a _ hz]
 
-theorem hermitian_invariant_unipotent (l : Fin r) {a : ℂ} (ha : a ≠ 0) {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
-    (x : Mx k r) (v : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) ((w1 k r l a * x) *ᵥ v) z = herm (Hpk k r) (x *ᵥ v) z := by
+theorem hermitian_invariant_unipotent
+    (l : Fin r)
+    {a : ℂ} (ha : a ≠ 0)
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    (x : Mx k r) (v : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) ((w1 k r l a * x) *ᵥ v) z = herm (Hpk k r) (x *ᵥ v) z := by
   rw [← Matrix.mulVec_mulVec]
   conv_lhs => rw [← unipotent_fixes_base_vector l a hz]
   exact Formalism.FourierDecayAlt.P.TwoByOneBlock.herm_UH (Qx3.weyl_cell_mem_unitary l ha) _ _
 
-theorem hermitian_invariant_cell_action (i : Fin (r + 1)) {c : Fin r → ℂ} (hc : c ∈ OmX r) {z : Fin (2 * r + k + 1) → ℂ}
-    (hz : inWb k r z) (x : Mx k r) (v : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) ((wCell k r i c * x) *ᵥ v) z = herm (Hpk k r) (x *ᵥ v) z := by
+theorem hermitian_invariant_cell_action
+    (i : Fin (r + 1))
+    {c : Fin r → ℂ} (hc : c ∈ OmX r)
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    (x : Mx k r) (v : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) ((wCell k r i c * x) *ᵥ v) z = herm (Hpk k r) (x *ᵥ v) z := by
   rw [← Matrix.mulVec_mulVec]
   conv_lhs => rw [← wCell_fix_wb i c hz]
-  exact Formalism.FourierDecayAlt.P.TwoByOneBlock.herm_UH (Formalism.FourierDecayAlt.P.PBF.prod_w1_mem_unitary_Hpk c hc _) _ _
+  exact Formalism.FourierDecayAlt.P.TwoByOneBlock.herm_UH
+    (Formalism.FourierDecayAlt.P.PBF.prod_w1_mem_unitary_Hpk c hc _) _ _
 
 end
 

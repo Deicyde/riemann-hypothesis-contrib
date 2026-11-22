@@ -36,11 +36,11 @@ lemma ne_one_of_primitive {N : ℕ} (hN : N ≠ 0) {χ : DirichletCharacter ℂ 
   rw [isPrimitive_def, conductor_one] at h
   omega
 
-private theorem exists_subset_injOn_card_image {α β : Type*} [DecidableEq α] [DecidableEq β]
-    [Nonempty α] (U : Finset α) (f : α → β) :
-    ∃ R ⊆ U, (U.image f).card = R.card ∧ ∀ r ∈ R, ∀ r' ∈ R, f r = f r' → r = r' := by
-  have hback : ∀ r ∈ (U.image f).image (Function.invFunOn f ↑U),
-      Function.invFunOn f ↑U (f r) = r := by
+private theorem exists_subset_injOn_card_image
+    {α β : Type*} [DecidableEq α] [DecidableEq β] [Nonempty α] (U : Finset α) (f : α → β)
+    : ∃ R ⊆ U, (U.image f).card = R.card ∧ ∀ r ∈ R, ∀ r' ∈ R, f r = f r' → r = r' := by
+  have hback
+      : ∀ r ∈ (U.image f).image (Function.invFunOn f ↑U), Function.invFunOn f ↑U (f r) = r := by
     intro r hr
     obtain ⟨c, hc, rfl⟩ := Finset.mem_image.1 hr
     obtain ⟨p, hp, rfl⟩ := Finset.mem_image.1 hc
@@ -54,14 +54,29 @@ private theorem exists_subset_injOn_card_image {α β : Type*} [DecidableEq α] 
     intro c hc c' hc' h
     obtain ⟨p, hp, rfl⟩ := Finset.mem_image.1 (Finset.mem_coe.1 hc)
     obtain ⟨p', hp', rfl⟩ := Finset.mem_image.1 (Finset.mem_coe.1 hc')
-    calc f p = f (Function.invFunOn f ↑U (f p)) :=
-          (Function.invFunOn_eq (f := f) (s := ↑U) ⟨p, hp, rfl⟩).symm
+    calc
+      f p = f (Function.invFunOn f ↑U (f p)) :=
+        (Function.invFunOn_eq (f := f) (s := ↑U) ⟨p, hp, rfl⟩).symm
       _ = f (Function.invFunOn f ↑U (f p')) := by rw [h]
       _ = f p' := Function.invFunOn_eq (f := f) (s := ↑U) ⟨p', hp', rfl⟩
   · intro r hr r' hr' h
     rw [← hback r hr, ← hback r' hr', h]
 
-theorem ncard_cells_le : ∃ C : ℝ, 0 < C ∧ ∀ Q : ℝ, 3 ≤ Q → ∀ T : Finset (Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℂ), (∀ p ∈ T, ((p.1 + 1 : ℕ) : ℝ) ≤ Q ∧ p.2.1.IsPrimitive ∧ LFunction p.2.1 p.2.2 = 0 ∧ 1 - 1 / 400 ≤ p.2.2.re ∧ |p.2.2.im| ≤ Q) → ((((fun p : (Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℂ) => (⟨p.1, p.2.1, ⌊p.2.2.im⌋⟩ : Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℤ)) '' (T : Set (Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℂ))).ncard : ℕ) : ℝ) ≤ C * Q ^ ((1 : ℝ) / 8) := by
+theorem ncard_cells_le
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ Q : ℝ,
+          3 ≤ Q
+            → ∀ T : Finset (Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℂ),
+              (∀ p ∈ T,
+                  ((p.1 + 1 : ℕ) : ℝ) ≤ Q ∧ p.2.1.IsPrimitive ∧ LFunction p.2.1 p.2.2 = 0
+                    ∧ 1 - 1 / 400 ≤ p.2.2.re ∧ |p.2.2.im| ≤ Q)
+                → ((((fun p : (Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℂ) =>
+                          (⟨p.1, p.2.1, ⌊p.2.2.im⌋⟩ : Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℤ))
+                        '' (T : Set (Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℂ))).ncard
+                      : ℕ)
+                    : ℝ)
+                  ≤ C * Q ^ ((1 : ℝ) / 8) := by
   classical
   obtain ⟨Q₁, hQ₁⟩ := GlobalTheory.ZeroDetect.zero_detect
   obtain ⟨Q₂, hQ₂⟩ := GlobalTheory.ZeroDetect.zeta_zero_detect
@@ -84,23 +99,31 @@ theorem ncard_cells_le : ∃ C : ℝ, 0 < C ∧ ∀ Q : ℝ, 3 ≤ Q → ∀ T :
     nlinarith
   have hpow : (Qn : ℝ) ^ ((1 : ℝ) / 8) ≤ ((Q₁ + Q₂ + 2 : ℕ) : ℝ) * Q ^ ((1 : ℝ) / 8) := by
     have hB : (1 : ℝ) ≤ ((Q₁ + Q₂ + 2 : ℕ) : ℝ) := by exact_mod_cast (by omega : 1 ≤ Q₁ + Q₂ + 2)
-    calc (Qn : ℝ) ^ ((1 : ℝ) / 8) ≤ (((Q₁ + Q₂ + 2 : ℕ) : ℝ) * Q) ^ ((1 : ℝ) / 8) :=
-          Real.rpow_le_rpow hQnpos.le hQnle (by norm_num)
+    calc
+      (Qn : ℝ) ^ ((1 : ℝ) / 8) ≤ (((Q₁ + Q₂ + 2 : ℕ) : ℝ) * Q) ^ ((1 : ℝ) / 8) :=
+        Real.rpow_le_rpow hQnpos.le hQnle (by norm_num)
       _ = ((Q₁ + Q₂ + 2 : ℕ) : ℝ) ^ ((1 : ℝ) / 8) * Q ^ ((1 : ℝ) / 8) :=
-          Real.mul_rpow (by positivity) (by linarith)
+        Real.mul_rpow (by positivity) (by linarith)
       _ ≤ ((Q₁ + Q₂ + 2 : ℕ) : ℝ) * Q ^ ((1 : ℝ) / 8) := by
-          gcongr
-          calc ((Q₁ + Q₂ + 2 : ℕ) : ℝ) ^ ((1 : ℝ) / 8) ≤ ((Q₁ + Q₂ + 2 : ℕ) : ℝ) ^ (1 : ℝ) :=
-                Real.rpow_le_rpow_of_exponent_le hB (by norm_num)
-            _ = _ := Real.rpow_one _
-  have hA : ∀ p ∈ T, ¬ (p.1 = 0 ∧ |p.2.2.im| < (Qn : ℝ) ^ ((1 : ℝ) / 20)) →
-      p.1 + 1 ≤ Qn ∧ p.2.1.IsPrimitive ∧ 1 - 1 / 400 ≤ p.2.2.re ∧ p.2.2.re ≤ 1 ∧
-        |p.2.2.im| ≤ Qn ∧ (1 / 2 : ℝ) ≤ ‖∑ n ∈ Finset.Ioc (Qn ^ 3) (Qn ^ 6),
-          ((∑ d ∈ n.divisors.filter (fun d => d ≤ Qn ^ 3), (moebius d : ℤ) : ℤ) : ℂ) *
-            p.2.1 (n : ZMod (p.1 + 1)) * (n : ℂ) ^ (-p.2.2)‖ := by
+        gcongr
+        calc
+          ((Q₁ + Q₂ + 2 : ℕ) : ℝ) ^ ((1 : ℝ) / 8)
+            ≤ ((Q₁ + Q₂ + 2 : ℕ) : ℝ) ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_le hB (by norm_num)
+          _ = _ := Real.rpow_one _
+  have hA
+      : ∀ p ∈ T,
+        ¬(p.1 = 0 ∧ |p.2.2.im| < (Qn : ℝ) ^ ((1 : ℝ) / 20))
+          → p.1 + 1 ≤ Qn ∧ p.2.1.IsPrimitive ∧ 1 - 1 / 400 ≤ p.2.2.re ∧ p.2.2.re ≤ 1
+            ∧ |p.2.2.im| ≤ Qn
+            ∧ (1 / 2 : ℝ)
+              ≤ ‖∑ n ∈ Finset.Ioc (Qn ^ 3) (Qn ^ 6),
+                ((∑ d ∈ n.divisors.filter (fun d => d ≤ Qn ^ 3), (moebius d : ℤ) : ℤ) : ℂ) *
+                  p.2.1 (n : ZMod (p.1 + 1)) * (n : ℂ) ^ (-p.2.2)‖ := by
     rintro ⟨N, χ, ρ⟩ hp hns
-    obtain ⟨hlev, hprim, hL, hre, him⟩ : ((N + 1 : ℕ) : ℝ) ≤ Q ∧ χ.IsPrimitive ∧
-        LFunction χ ρ = 0 ∧ 1 - 1 / 400 ≤ ρ.re ∧ |ρ.im| ≤ Q := hT _ hp
+    obtain ⟨hlev, hprim, hL, hre, him⟩
+        : ((N + 1 : ℕ) : ℝ) ≤ Q ∧ χ.IsPrimitive ∧ LFunction χ ρ = 0 ∧ 1 - 1 / 400 ≤ ρ.re
+          ∧ |ρ.im| ≤ Q :=
+      hT _ hp
     have hlevN : N + 1 ≤ Qn := by
       have : ((N + 1 : ℕ) : ℝ) ≤ (Qn : ℝ) := hlev.trans hQle
       exact_mod_cast this
@@ -148,9 +171,11 @@ theorem ncard_cells_le : ∃ C : ℝ, 0 < C ∧ ∀ Q : ℝ, 3 ≤ Q → ∀ T :
   set f : (Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℂ) → (Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℤ) :=
     fun p => ⟨p.1, p.2.1, ⌊p.2.2.im⌋⟩ with hf
   have : Nonempty (Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℂ) := ⟨⟨0, 1, 0⟩⟩
-  have hcount : ∀ U ⊆ T, (∀ p ∈ U, ¬ (p.1 = 0 ∧ |p.2.2.im| < (Qn : ℝ) ^ ((1 : ℝ) / 20))) →
-      (∀ p ∈ U, ∀ p' ∈ U, ⌊p.2.2.im⌋ % 2 = ⌊p'.2.2.im⌋ % 2) →
-      ((U.image f).card : ℝ) ≤ C₁ * (Qn : ℝ) ^ ((1 : ℝ) / 8) := by
+  have hcount
+      : ∀ U ⊆ T,
+        (∀ p ∈ U, ¬(p.1 = 0 ∧ |p.2.2.im| < (Qn : ℝ) ^ ((1 : ℝ) / 20)))
+          → (∀ p ∈ U, ∀ p' ∈ U, ⌊p.2.2.im⌋ % 2 = ⌊p'.2.2.im⌋ % 2)
+          → ((U.image f).card : ℝ) ≤ C₁ * (Qn : ℝ) ^ ((1 : ℝ) / 8) := by
     intro U hU hns hpar
     obtain ⟨R, hRU, hcard, hinj⟩ := exists_subset_injOn_card_image U f
     rw [hcard]
@@ -161,9 +186,10 @@ theorem ncard_cells_le : ∃ C : ℝ, 0 < C ∧ ∀ Q : ℝ, 3 ≤ Q → ∀ T :
       by_cases hfl : ⌊ρ.im⌋ = ⌊ρ'.im⌋
       · exfalso
         apply hne
-        have e := hinj _ h1 _ h2 (by
-          show (⟨N, χ, ⌊ρ.im⌋⟩ : Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℤ) = ⟨N, χ, ⌊ρ'.im⌋⟩
-          rw [hfl])
+        have e :=
+          hinj _ h1 _ h2 (by
+            show (⟨N, χ, ⌊ρ.im⌋⟩ : Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℤ) = ⟨N, χ, ⌊ρ'.im⌋⟩
+            rw [hfl])
         exact congrArg (fun p : (Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℂ) => p.2.2) e
       · exact one_le_abs_sub_of_floor hfl (hpar _ (hRU h1) _ (hRU h2))
   set Ts := T.filter (fun p => p.1 = 0 ∧ |p.2.2.im| < (Qn : ℝ) ^ ((1 : ℝ) / 20)) with hTs
@@ -176,16 +202,20 @@ theorem ncard_cells_le : ∃ C : ℝ, 0 < C ∧ ∀ Q : ℝ, 3 ≤ Q → ∀ T :
     by_cases h1 : p.1 = 0 ∧ |p.2.2.im| < (Qn : ℝ) ^ ((1 : ℝ) / 20)
     · exact Finset.mem_union_left _ (Finset.mem_image_of_mem f (Finset.mem_filter.2 ⟨hp, h1⟩))
     · by_cases h2 : ⌊p.2.2.im⌋ % 2 = 0
-      · exact Finset.mem_union_right _ (Finset.mem_union_left _ (Finset.mem_image_of_mem f
-          (Finset.mem_filter.2 ⟨Finset.mem_filter.2 ⟨hp, h1⟩, h2⟩)))
-      · exact Finset.mem_union_right _ (Finset.mem_union_right _ (Finset.mem_image_of_mem f
-          (Finset.mem_filter.2 ⟨Finset.mem_filter.2 ⟨hp, h1⟩, h2⟩)))
+      · exact Finset.mem_union_right _
+          (Finset.mem_union_left _
+            (Finset.mem_image_of_mem f (Finset.mem_filter.2 ⟨Finset.mem_filter.2 ⟨hp, h1⟩, h2⟩)))
+      · exact Finset.mem_union_right _
+          (Finset.mem_union_right _
+            (Finset.mem_image_of_mem f (Finset.mem_filter.2 ⟨Finset.mem_filter.2 ⟨hp, h1⟩, h2⟩)))
   have hb0 : ((T0.image f).card : ℝ) ≤ C₁ * (Qn : ℝ) ^ ((1 : ℝ) / 8) :=
-    hcount T0 (fun p hp => (Finset.mem_filter.1 (Finset.mem_filter.1 hp).1).1)
+    hcount T0
+      (fun p hp => (Finset.mem_filter.1 (Finset.mem_filter.1 hp).1).1)
       (fun p hp => (Finset.mem_filter.1 (Finset.mem_filter.1 hp).1).2)
       (fun p hp p' hp' => by rw [(Finset.mem_filter.1 hp).2, (Finset.mem_filter.1 hp').2])
   have hb1 : ((T1.image f).card : ℝ) ≤ C₁ * (Qn : ℝ) ^ ((1 : ℝ) / 8) :=
-    hcount T1 (fun p hp => (Finset.mem_filter.1 (Finset.mem_filter.1 hp).1).1)
+    hcount T1
+      (fun p hp => (Finset.mem_filter.1 (Finset.mem_filter.1 hp).1).1)
       (fun p hp => (Finset.mem_filter.1 (Finset.mem_filter.1 hp).1).2)
       (fun p hp p' hp' => by
         have e1 := (Finset.mem_filter.1 hp).2
@@ -194,8 +224,10 @@ theorem ncard_cells_le : ∃ C : ℝ, 0 < C ∧ ∀ Q : ℝ, 3 ≤ Q → ∀ T :
   set M : ℕ := ⌈(Qn : ℝ) ^ ((1 : ℝ) / 20)⌉₊ with hM
   have : Subsingleton (DirichletCharacter ℂ (0 + 1)) :=
     (inferInstance : Subsingleton (DirichletCharacter ℂ 1))
-  have hsmallsub : Ts.image f ⊆ (Finset.range (2 * M + 1)).image
-      (fun k : ℕ => (⟨0, 1, (k : ℤ) - M⟩ : Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℤ)) := by
+  have hsmallsub
+      : Ts.image f
+        ⊆ (Finset.range (2 * M + 1)).image
+          (fun k : ℕ => (⟨0, 1, (k : ℤ) - M⟩ : Σ N : ℕ, DirichletCharacter ℂ (N + 1) × ℤ)) := by
     intro c hc
     obtain ⟨p, hp, rfl⟩ := Finset.mem_image.1 hc
     obtain ⟨N, χ, ρ⟩ := p
@@ -223,18 +255,21 @@ theorem ncard_cells_le : ∃ C : ℝ, 0 < C ∧ ∀ Q : ℝ, 3 ≤ Q → ∀ T :
     have h := (Finset.card_le_card hsmallsub).trans Finset.card_image_le
     rw [Finset.card_range] at h
     exact_mod_cast h
-  have hcard : ((T.image f).card : ℝ) ≤
-      (Ts.image f).card + ((T0.image f).card + (T1.image f).card) := by
-    have h := (Finset.card_le_card hsub).trans ((Finset.card_union_le _ _).trans
-      (add_le_add (le_refl _) (Finset.card_union_le _ _)))
+  have hcard
+      : ((T.image f).card : ℝ) ≤ (Ts.image f).card + ((T0.image f).card + (T1.image f).card) := by
+    have h :=
+      (Finset.card_le_card hsub).trans
+        ((Finset.card_union_le _ _).trans (add_le_add (le_refl _) (Finset.card_union_le _ _)))
     exact_mod_cast h
   have hM1 : (M : ℝ) < (Qn : ℝ) ^ ((1 : ℝ) / 20) + 1 := Nat.ceil_lt_add_one (by positivity)
   have he1 : (Qn : ℝ) ^ ((1 : ℝ) / 20) ≤ (Qn : ℝ) ^ ((1 : ℝ) / 8) :=
     Real.rpow_le_rpow_of_exponent_le hQn1 (by norm_num)
   have he2 : (1 : ℝ) ≤ (Qn : ℝ) ^ ((1 : ℝ) / 8) := Real.one_le_rpow hQn1 (by norm_num)
-  calc ((T.image f).card : ℝ) ≤ (2 * C₁ + 5) * (Qn : ℝ) ^ ((1 : ℝ) / 8) := by linarith
+  calc
+    ((T.image f).card : ℝ)
+      ≤ (2 * C₁ + 5) * (Qn : ℝ) ^ ((1 : ℝ) / 8) := by linarith
     _ ≤ (2 * C₁ + 5) * (((Q₁ + Q₂ + 2 : ℕ) : ℝ) * Q ^ ((1 : ℝ) / 8)) :=
-        mul_le_mul_of_nonneg_left hpow (by linarith)
+      mul_le_mul_of_nonneg_left hpow (by linarith)
     _ = (2 * C₁ + 5) * ((Q₁ + Q₂ + 2 : ℕ) : ℝ) * Q ^ ((1 : ℝ) / 8) := by ring
 
 end GlobalTheory.ZeroCells

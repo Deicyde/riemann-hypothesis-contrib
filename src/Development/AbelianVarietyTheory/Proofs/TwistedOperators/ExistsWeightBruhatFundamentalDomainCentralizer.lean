@@ -10,8 +10,19 @@ open scoped ENNReal
 
 namespace GlobalTheory.WeightUnfold
 
-theorem exists_weight (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [SecondCountableTopology H] [LocallyCompactSpace H] [T2Space H] [MeasurableSpace H] [BorelSpace H] (Γ : Subgroup H) [DiscreteTopology Γ] (γ : H) (hcomm : IsMulCommutative (cent γ)) (μ : Measure H) [μ.IsHaarMeasure] (dt : Measure (cent γ)) [dt.IsHaarMeasure] (𝓣 : Set (cent γ)) (hfd : IsFundamentalDomain (Γ.subgroupOf (cent γ)) 𝓣 dt) :
-    ∃ α : H → ℝ≥0∞, Measurable α ∧ (∀ y, ∑' h : Γ.subgroupOf (cent γ), α (((h : cent γ) : H) * y) = 1) ∧ ∀ ψ : H → ℝ≥0∞, Measurable ψ → LeftInv (cent γ) ψ → ∫⁻ y, α y * ψ y ∂μ = dt 𝓣 * ∫⁻ q, descend (cent γ) ψ q ∂(quotMeas (cent γ) dt μ) := by
+theorem exists_weight
+    (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [SecondCountableTopology H]
+    [LocallyCompactSpace H] [T2Space H] [MeasurableSpace H] [BorelSpace H]
+    (Γ : Subgroup H) [DiscreteTopology Γ]
+    (γ : H) (hcomm : IsMulCommutative (cent γ))
+    (μ : Measure H) [μ.IsHaarMeasure]
+    (dt : Measure (cent γ)) [dt.IsHaarMeasure]
+    (𝓣 : Set (cent γ)) (hfd : IsFundamentalDomain (Γ.subgroupOf (cent γ)) 𝓣 dt)
+    : ∃ α : H → ℝ≥0∞,
+      Measurable α ∧ (∀ y, ∑' h : Γ.subgroupOf (cent γ), α (((h : cent γ) : H) * y) = 1)
+        ∧ ∀ ψ : H → ℝ≥0∞,
+          Measurable ψ → LeftInv (cent γ) ψ
+            → ∫⁻ y, α y * ψ y ∂μ = dt 𝓣 * ∫⁻ q, descend (cent γ) ψ q ∂(quotMeas (cent γ) dt μ) := by
   have hTcl : IsClosed ((cent γ : Subgroup H) : Set H) := Set.isClosed_centralizer _
   have hc : ∀ a b : cent γ, a * b = b * a := fun a b => hcomm.is_comm.comm a b
   haveI : LocallyCompactSpace (cent γ) := hTcl.isClosedEmbedding_subtypeVal.locallyCompactSpace
@@ -47,24 +58,26 @@ theorem exists_weight (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGr
       intro t
       have : (fun y => β ((t : H) * y) * ψ y) = fun y => (fun z => β z * ψ z) ((t : H) * y) := by
         funext y; show _ = β _ * ψ _; rw [hψ (t : H) t.2 y]
-      rw [this]; exact lintegral_mul_left_eq_self (fun z => β z * ψ z) (t : H)
+      rw [this]
+      exact lintegral_mul_left_eq_self (fun z => β z * ψ z) (t : H)
     have hC : ∫⁻ y, β y * ψ y ∂μ = ∫⁻ q, descend (cent γ) ψ q ∂(quotMeas (cent γ) dt μ) := by
       rw [hq (fun y => β y * ψ y) (hβm.mul hψm)]
       refine lintegral_congr fun q => ?_
-      have : (fun t : cent γ => β ((t : H) * Quotient.out q) * ψ ((t : H) * Quotient.out q)) = fun t : cent γ => β ((t : H) * Quotient.out q) * ψ (Quotient.out q) := by
+      have : (fun t : cent γ => β ((t : H) * Quotient.out q) * ψ ((t : H) * Quotient.out q))
+          = fun t : cent γ => β ((t : H) * Quotient.out q) * ψ (Quotient.out q) := by
         funext t; rw [hψ (t : H) t.2]
       rw [this, lintegral_mul_const _ (hsec _), hβ, one_mul]
       rfl
-    calc ∫⁻ y, (∫⁻ t in 𝓣, β ((t : H) * y) ∂dt) * ψ y ∂μ
-        = ∫⁻ y, ∫⁻ t in 𝓣, β ((t : H) * y) * ψ y ∂dt ∂μ := by
-          refine lintegral_congr fun y => ?_
-          rw [lintegral_mul_const _ (hsec y)]
+    calc
+      ∫⁻ y, (∫⁻ t in 𝓣, β ((t : H) * y) ∂dt) * ψ y ∂μ
+          = ∫⁻ y, ∫⁻ t in 𝓣, β ((t : H) * y) * ψ y ∂dt ∂μ := by
+        refine lintegral_congr fun y => ?_
+        rw [lintegral_mul_const _ (hsec y)]
       _ = ∫⁻ t in 𝓣, ∫⁻ y, β ((t : H) * y) * ψ y ∂μ ∂dt := by
-          refine lintegral_lintegral_swap ?_
-          exact (hprod.mul (hψm.comp measurable_fst)).aemeasurable
-      _ = ∫⁻ t in 𝓣, ∫⁻ y, β y * ψ y ∂μ ∂dt := by
-          refine lintegral_congr fun t => hinner t
+        refine lintegral_lintegral_swap ?_
+        exact (hprod.mul (hψm.comp measurable_fst)).aemeasurable
+      _ = ∫⁻ t in 𝓣, ∫⁻ y, β y * ψ y ∂μ ∂dt := by refine lintegral_congr fun t => hinner t
       _ = dt 𝓣 * ∫⁻ q, descend (cent γ) ψ q ∂(quotMeas (cent γ) dt μ) := by
-          rw [lintegral_const, Measure.restrict_apply_univ, hC, mul_comm]
+        rw [lintegral_const, Measure.restrict_apply_univ, hC, mul_comm]
 
 end GlobalTheory.WeightUnfold

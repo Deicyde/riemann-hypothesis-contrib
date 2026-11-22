@@ -11,17 +11,21 @@ open MvPolynomial
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
 def LateVectorsDistinctLeadingTerms : Prop :=
-  ∀ (p n' r K : ℕ) [NeZero n'] [NeZero r] [NeZero K] (X : Dat n' r), X.Hyp p K → ∀ j, ∀ x ∈ X.toLate j,
-    Function.Injective fun a : Fin r => posOf n' (X.row j x a)
-
+  ∀ (p n' r K : ℕ) [NeZero n'] [NeZero r] [NeZero K] (X : Dat n' r),
+    X.Hyp p K → ∀ j, ∀ x ∈ X.toLate j, Function.Injective fun a : Fin r => posOf n' (X.row j x a)
 
 open Classical in
-theorem ph_detPl_ne_zero {R : Type} [CommRing R] [Nontrivial R] {n' r : ℕ} [NeZero n'] (X : Dat n' r) (p K : ℕ)
-    (hp : 0 < p) (j x : ℤ) (hinj : Function.Injective fun a : Fin r => posOf n' (X.row j x a)) :
-    phSeg R K p X.F j (plEmb R r K (X.detPl R j x)) ≠ 0 := by
+theorem ph_detPl_ne_zero
+    {R : Type} [CommRing R] [Nontrivial R]
+    {n' r : ℕ} [NeZero n']
+    (X : Dat n' r)
+    (p K : ℕ) (hp : 0 < p)
+    (j x : ℤ) (hinj : Function.Injective fun a : Fin r => posOf n' (X.row j x a))
+    : phSeg R K p X.F j (plEmb R r K (X.detPl R j x)) ≠ 0 := by
   intro h
   let v : Fin n' × Fin (r + K) → R := fun tc =>
     if ∃ a : Fin r, posOf n' (X.row j x a) = tc.1 ∧ tc.2 = Fin.castAdd K a then 1 else 0
@@ -52,11 +56,14 @@ theorem ph_detPl_ne_zero {R : Type} [CommRing R] [Nontrivial R] {n' r : ℕ} [Ne
   rw [h1] at h2
   exact zero_ne_one h2
 
-theorem discriminant_nonzero_of_injective_tops (hInj : LateVectorsDistinctLeadingTerms) : DiscriminantNonzeroModUniformiser := by
+theorem discriminant_nonzero_of_injective_tops (hInj : LateVectorsDistinctLeadingTerms)
+    : DiscriminantNonzeroModUniformiser := by
   intro p n' r K _ _ _ X O _ _ _ hX
   have hp : 0 < p := hX.prime.pos
-  have hpl : ∀ P : MvPolynomial (ℤ × Fin r) O,
-      map (IsLocalRing.residue O) (plEmb O r K P) = plEmb _ r K (map (IsLocalRing.residue O) P) := by
+  have hpl
+      : ∀ P : MvPolynomial (ℤ × Fin r) O,
+        map (IsLocalRing.residue O) (plEmb O r K P)
+          = plEmb _ r K (map (IsLocalRing.residue O) P) := by
     intro P
     simp [plEmb, MvPolynomial.map_rename]
   simp only [Dat.Dl, Dat.DlSeg, map_prod, map_pow, map_phSeg, hpl, map_detPl]

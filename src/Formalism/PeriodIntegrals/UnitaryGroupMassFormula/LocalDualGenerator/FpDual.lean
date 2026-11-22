@@ -15,20 +15,25 @@ open PI.LocDualGen.W
 
 section
 
-variable {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   (l : ℕ) [Fact l.Prime] [Algebra ℚ_[l] K] [FiniteDimensional ℚ_[l] K]
 
 def P (x : K) : Prop := ∀ b : 𝒪[K], ‖Algebra.trace ℚ_[l] K (x * (b : K))‖ ≤ 1
 
-theorem tr_alg_mul (q : ℚ_[l]) (z : K) :
-    Algebra.trace ℚ_[l] K (algebraMap ℚ_[l] K q * z) = q * Algebra.trace ℚ_[l] K z := by
+theorem tr_alg_mul (q : ℚ_[l]) (z : K)
+    : Algebra.trace ℚ_[l] K (algebraMap ℚ_[l] K q * z) = q * Algebra.trace ℚ_[l] K z := by
   rw [← Algebra.smul_def, LinearMap.map_smul, smul_eq_mul]
 
 private theorem t2_lemma : T2Space K := by
   refine IsTopologicalAddGroup.t2Space_of_zero_sep ?_
   intro x hx
   have hv : ValuativeRel.valuation K x ≠ 0 := (Valuation.ne_zero_iff _).2 hx
-  refine ⟨{z | ValuativeRel.valuation K z < ValuativeRel.valuation K x}, ?_, fun h => lt_irrefl (ValuativeRel.valuation K x) h⟩
+  refine ⟨
+    {z | ValuativeRel.valuation K z < ValuativeRel.valuation K x},
+    ?_,
+    fun h => lt_irrefl (ValuativeRel.valuation K x) h
+  ⟩
   exact (IsValuativeTopology.mem_nhds_zero_iff _).2 ⟨Units.mk0 _ hv, fun z hz => hz⟩
 
 private theorem isOpen_lemma_2 : IsOpen (𝒪[K] : Set K) := by
@@ -38,16 +43,16 @@ private theorem isOpen_lemma_2 : IsOpen (𝒪[K] : Set K) := by
     exact (Valuation.mem_integer_iff _ _).2 hz'.le
   exact AddSubgroup.isOpen_of_mem_nhds _ h0
 
-private theorem trace_cont_lemma_3 (hcont : Continuous (algebraMap ℚ_[l] K)) :
-    Continuous (Algebra.trace ℚ_[l] K) := by
+private theorem trace_cont_lemma_3 (hcont : Continuous (algebraMap ℚ_[l] K))
+    : Continuous (Algebra.trace ℚ_[l] K) := by
   haveI := t2_lemma (K := K)
   haveI : ContinuousSMul ℚ_[l] K := ⟨by
     simp only [Algebra.smul_def]
     exact (hcont.comp continuous_fst).mul continuous_snd⟩
   exact LinearMap.continuous_of_finiteDimensional _
 
-private theorem int_lemma_4 (hcont : Continuous (algebraMap ℚ_[l] K)) (z : ℚ_[l]) (hz : ‖z‖ ≤ 1) :
-    algebraMap ℚ_[l] K z ∈ 𝒪[K] := by
+private theorem int_lemma_4 (hcont : Continuous (algebraMap ℚ_[l] K)) (z : ℚ_[l]) (hz : ‖z‖ ≤ 1)
+    : algebraMap ℚ_[l] K z ∈ 𝒪[K] := by
   have hcl : IsClosed (𝒪[K] : Set K) :=
     AddSubgroup.isClosed_of_isOpen ((𝒪[K]).toAddSubgroup) (isOpen_lemma_2 (K := K))
   let w : ℤ_[l] := ⟨z, hz⟩
@@ -60,13 +65,18 @@ private theorem int_lemma_4 (hcont : Continuous (algebraMap ℚ_[l] K)) (z : ℚ
 
   exact key
 
-private theorem small_lemma_5 (hcont : Continuous (algebraMap ℚ_[l] K)) (y : K) :
-    ∃ N : ℕ, ∀ k ≥ N, algebraMap ℚ_[l] K ((l : ℚ_[l]) ^ k) * y ∈ 𝒪[K] := by
+private theorem small_lemma_5 (hcont : Continuous (algebraMap ℚ_[l] K)) (y : K)
+    : ∃ N : ℕ, ∀ k ≥ N, algebraMap ℚ_[l] K ((l : ℚ_[l]) ^ k) * y ∈ 𝒪[K] := by
   have h1 : Filter.Tendsto (fun k : ℕ => (l : ℚ_[l]) ^ k) Filter.atTop (nhds 0) :=
-    tendsto_pow_atTop_nhds_zero_of_norm_lt_one (by first
+    tendsto_pow_atTop_nhds_zero_of_norm_lt_one (by
+      first
       | exact Padic.norm_p_lt_one
-      | (rw [Padic.norm_p]; exact inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : l.Prime).one_lt)))
-  have h2 : Filter.Tendsto (fun k : ℕ => algebraMap ℚ_[l] K ((l : ℚ_[l]) ^ k) * y)
+      | (
+          rw [Padic.norm_p]
+          exact inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : l.Prime).one_lt)
+        ))
+  have h2 : Filter.Tendsto
+      (fun k : ℕ => algebraMap ℚ_[l] K ((l : ℚ_[l]) ^ k) * y)
       Filter.atTop (nhds 0) := by
     have := ((hcont.tendsto 0).comp h1).mul_const y
     rw [map_zero, zero_mul] at this
@@ -82,15 +92,15 @@ private theorem mul_mem_dual₂ {x : K} (hx : P l x) (c : 𝒪[K]) : P l (x * c)
   rw [mul_assoc]
   exact hx (c * b)
 
-private theorem bound_lemma_8 (hcont : Continuous (algebraMap ℚ_[l] K)) :
-    ∃ m : ℕ, ∀ x : K, P l x → algebraMap ℚ_[l] K ((l : ℚ_[l]) ^ m) * x ∈ 𝒪[K] := by
+private theorem bound_lemma_8 (hcont : Continuous (algebraMap ℚ_[l] K))
+    : ∃ m : ℕ, ∀ x : K, P l x → algebraMap ℚ_[l] K ((l : ℚ_[l]) ^ m) * x ∈ 𝒪[K] := by
   classical
   have hl0 : (l : ℚ_[l]) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero
   have hnd := traceForm_nondegenerate ℚ_[l] K
   let B := Module.finBasis ℚ_[l] K
   choose N hN using fun i => small_lemma_5 l hcont (B i)
-  let b := B.isUnitSMul (w := fun i => (l : ℚ_[l]) ^ N i)
-    (fun i => (isUnit_iff_ne_zero.2 hl0).pow _)
+  let b :=
+    B.isUnitSMul (w := fun i => (l : ℚ_[l]) ^ N i) (fun i => (isUnit_iff_ne_zero.2 hl0).pow _)
   have hb : ∀ i, b i ∈ 𝒪[K] := fun i => by
     simp only [b, Module.Basis.isUnitSMul_apply, Algebra.smul_def]
     exact hN i (N i) le_rfl
@@ -112,9 +122,13 @@ theorem exists_ne_zero (hcont : Continuous (algebraMap ℚ_[l] K)) : ∃ x : K, 
     have h : CompactSpace 𝒪[K] := inferInstance
     exact isCompact_iff_compactSpace.2 h
   obtain ⟨C, hC⟩ := hcpt.exists_bound_of_continuousOn hT.continuousOn
-  have hl1 : ‖(l : ℚ_[l])‖ < 1 := (by first
-      | exact Padic.norm_p_lt_one
-      | (rw [Padic.norm_p]; exact inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : l.Prime).one_lt)))
+  have hl1 : ‖(l : ℚ_[l])‖ < 1 := (by
+    first
+    | exact Padic.norm_p_lt_one
+    | (
+        rw [Padic.norm_p]
+        exact inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : l.Prime).one_lt)
+      ))
   have hpos : (0 : ℝ) < max C 1 := lt_of_lt_of_le one_pos (le_max_right C 1)
   obtain ⟨n, hn⟩ := exists_pow_lt_of_lt_one (inv_pos.2 hpos) hl1
   refine ⟨algebraMap ℚ_[l] K ((l : ℚ_[l]) ^ n), ?_, fun b => ?_⟩
@@ -122,18 +136,21 @@ theorem exists_ne_zero (hcont : Continuous (algebraMap ℚ_[l] K)) : ∃ x : K, 
     exact pow_ne_zero _ (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero)
   · rw [tr_alg_mul, norm_mul, norm_pow]
     have h1 : ‖Algebra.trace ℚ_[l] K (b : K)‖ ≤ max C 1 := (hC b b.2).trans (le_max_left _ _)
-    calc ‖(l : ℚ_[l])‖ ^ n * ‖Algebra.trace ℚ_[l] K (b : K)‖
+    calc
+      ‖(l : ℚ_[l])‖ ^ n * ‖Algebra.trace ℚ_[l] K (b : K)‖
         ≤ ‖(l : ℚ_[l])‖ ^ n * max C 1 := mul_le_mul_of_nonneg_left h1 (by positivity)
       _ ≤ (max C 1)⁻¹ * max C 1 := mul_le_mul_of_nonneg_right hn.le hpos.le
       _ = 1 := inv_mul_cancel₀ hpos.ne'
 
 end
 
-private theorem main_lemma_9 {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K]
-    [IsNonarchimedeanLocalField K] (l : ℕ) [Fact l.Prime] [Algebra ℚ_[l] K]
-    [FiniteDimensional ℚ_[l] K] (hcont : Continuous (algebraMap ℚ_[l] K)) :
-    ∃ d : K, d ≠ 0 ∧ ∀ a : K,
-      (∀ b : 𝒪[K], ‖Algebra.trace ℚ_[l] K (a * (b : K) * d⁻¹)‖ ≤ 1) ↔ a ∈ 𝒪[K] := by
+private theorem main_lemma_9
+    {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+    (l : ℕ) [Fact l.Prime] [Algebra ℚ_[l] K] [FiniteDimensional ℚ_[l] K]
+    (hcont : Continuous (algebraMap ℚ_[l] K))
+    : ∃ d : K,
+      d ≠ 0
+        ∧ ∀ a : K, (∀ b : 𝒪[K], ‖Algebra.trace ℚ_[l] K (a * (b : K) * d⁻¹)‖ ≤ 1) ↔ a ∈ 𝒪[K] := by
   classical
   obtain ⟨m, hm⟩ := bound_lemma_8 l hcont
   obtain ⟨x0, hx0, hPx0⟩ := exists_ne_zero l hcont
@@ -141,25 +158,26 @@ private theorem main_lemma_9 {K : Type} [Field K] [ValuativeRel K] [TopologicalS
   have ht0 : t ≠ 0 := by
     rw [ht, Ne, map_eq_zero_iff _ (algebraMap ℚ_[l] K).injective]
     exact pow_ne_zero _ (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero)
-  let I : Ideal 𝒪[K] :=
-    { carrier := {c | P l ((c : K) * t⁻¹)}
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq] at *
+  let I : Ideal 𝒪[K] := {
+    carrier := {c | P l ((c : K) * t⁻¹)}
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq] at *
+      push_cast
+      rw [add_mul]
+      exact P_add_mem l ha hb
+    zero_mem' := by
+      simp only [Set.mem_setOf_eq]
+      intro b
+      simp
+    smul_mem' := fun c a ha => by
+      simp only [Set.mem_setOf_eq, smul_eq_mul] at *
+      have h := mul_mem_dual₂ l ha c
+      have e : ((c * a : 𝒪[K]) : K) * t⁻¹ = (a : K) * t⁻¹ * (c : K) := by
         push_cast
-        rw [add_mul]
-        exact P_add_mem l ha hb
-      zero_mem' := by
-        simp only [Set.mem_setOf_eq]
-        intro b
-        simp
-      smul_mem' := fun c a ha => by
-        simp only [Set.mem_setOf_eq, smul_eq_mul] at *
-        have h := mul_mem_dual₂ l ha c
-        have e : ((c * a : 𝒪[K]) : K) * t⁻¹ = (a : K) * t⁻¹ * (c : K) := by
-          push_cast
-          ring
-        rw [e]
-        exact h }
+        ring
+      rw [e]
+      exact h
+  }
   obtain ⟨g0, hg0⟩ := Submodule.IsPrincipal.principal I
   have hmem : ∀ c : 𝒪[K], c ∈ I ↔ P l ((c : K) * t⁻¹) := fun c => Iff.rfl
   have hspan : ∀ c : 𝒪[K], c ∈ I ↔ ∃ r : 𝒪[K], r * g0 = c := fun c => by

@@ -7,12 +7,22 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsTo
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory AlgebraicGeometry NumberField MonoidalCategory CartesianMonoidalCategory MonObj
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory CategoryTheory.Hom.group
 
 namespace GlobalTheory.SemiAbAct
 
-theorem exists_torus_quotient_act : ∀ (O : Type) [CommRing O] (k : Type) [Field k] [IsAlgClosed k] (G : Over (Sp k)) [GrpObj G] (act : OAct O G), IsSemiAbelian G → ∀ (T : TorusExtension G), letI := T.addCommGroup; letI := T.grpB; ∃ (actB : OAct O T.B) (actT : OAct O (splitTorus (Sp k) T.X)), (∀ a, T.q ≫ actB.act a = act.act a ≫ T.q) ∧ (∀ a, actT.act a ≫ T.i = T.i ≫ act.act a) := by
+theorem exists_torus_quotient_act
+    : ∀ (O : Type) [CommRing O] (k : Type) [Field k] [IsAlgClosed k] (G : Over (Sp k)) [GrpObj G]
+        (act : OAct O G),
+      IsSemiAbelian G
+        → ∀ (T : TorusExtension G),
+          letI := T.addCommGroup
+          letI := T.grpB
+          ∃ (actB : OAct O T.B) (actT : OAct O (splitTorus (Sp k) T.X)),
+            (∀ a, T.q ≫ actB.act a = act.act a ≫ T.q)
+              ∧ (∀ a, actT.act a ≫ T.i = T.i ≫ act.act a) := by
   intro O _ k _ _ G _ act _ T
   letI := T.addCommGroup
   letI := T.grpB
@@ -57,11 +67,14 @@ theorem exists_torus_quotient_act : ∀ (O : Type) [CommRing O] (k : Type) [Fiel
         have : Epi (T.q ▷ G) := GlobalTheory.SemiRigid.epi_of_fpqc _
         have : Epi (T.q ▷ T.B) := GlobalTheory.SemiRigid.epi_of_fpqc _
         have : Epi (lift (snd T.B G) (fst T.B G)) :=
-          epi_of_epi_fac (h := 𝟙 _) (f := lift (snd G T.B) (fst G T.B)) (by apply CartesianMonoidalCategory.hom_ext <;> simp)
+          epi_of_epi_fac (h := 𝟙 _) (f := lift (snd G T.B) (fst G T.B))
+            (by apply CartesianMonoidalCategory.hom_ext <;> simp)
         have : Epi (lift (snd T.B T.B) (fst T.B T.B)) :=
-          epi_of_epi_fac (h := 𝟙 _) (f := lift (snd T.B T.B) (fst T.B T.B)) (by apply CartesianMonoidalCategory.hom_ext <;> simp)
-        have hs : T.B ◁ T.q =
-            lift (snd T.B G) (fst T.B G) ≫ (T.q ▷ T.B) ≫ lift (snd T.B T.B) (fst T.B T.B) := by
+          epi_of_epi_fac (h := 𝟙 _) (f := lift (snd T.B T.B) (fst T.B T.B))
+            (by apply CartesianMonoidalCategory.hom_ext <;> simp)
+        have hs
+            : T.B ◁ T.q
+              = lift (snd T.B G) (fst T.B G) ≫ (T.q ▷ T.B) ≫ lift (snd T.B T.B) (fst T.B T.B) := by
           apply CartesianMonoidalCategory.hom_ext <;> simp
         rw [MonoidalCategory.tensorHom_def, hs]
         infer_instance

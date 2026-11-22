@@ -11,10 +11,13 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial
 
-theorem BaseChangeAvoid.comap_eq_of_mem_minimalPrimes {K L : Type*} [Field K] [Field L] {n : ℕ}
-    (σ : K →+* L) (I : Ideal (MvPolynomial (Fin n) K)) [I.IsPrime]
-    {W : Ideal (MvPolynomial (Fin n) L)} (hW : W ∈ (I.map (MvPolynomial.map σ)).minimalPrimes) :
-    W.comap (MvPolynomial.map σ) = I := by
+theorem BaseChangeAvoid.comap_eq_of_mem_minimalPrimes
+    {K L : Type*} [Field K] [Field L]
+    {n : ℕ}
+    (σ : K →+* L)
+    (I : Ideal (MvPolynomial (Fin n) K)) [I.IsPrime]
+    {W : Ideal (MvPolynomial (Fin n) L)} (hW : W ∈ (I.map (MvPolynomial.map σ)).minimalPrimes)
+    : W.comap (MvPolynomial.map σ) = I := by
   let : Algebra K L := σ.toAlgebra
   let : Algebra (MvPolynomial (Fin n) K) (MvPolynomial (Fin n) L) := algebraMvPolynomial
   have : Module.Free K L := Module.Free.of_divisionRing K L
@@ -46,6 +49,6 @@ theorem BaseChangeAvoid.proof : BaseChangeAvoid.Statement := by
   rw [← hc, Ideal.mem_comap]
   convert h using 1
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [linForm, map_sum]
+  simp [linForm, map_sum]
 
 end GroundTheory.Heights₂.Heights

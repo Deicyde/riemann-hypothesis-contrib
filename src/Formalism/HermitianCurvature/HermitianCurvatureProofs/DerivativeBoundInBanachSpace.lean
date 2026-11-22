@@ -22,13 +22,15 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ChangeOfVari
 namespace Formalism.FourierDecayAlt.P
 
 theorem coordinate_sizes_in_norm : Formalism.FourierDecayAlt.U.SliceCoordinateSizes :=
-  coordinate_sizes_of_parts slice_membership block3_apply_embedding aux_statement_17 hat_z_on_slice level_determinant_z
+  coordinate_sizes_of_parts slice_membership block3_apply_embedding aux_statement_17 hat_z_on_slice
+    level_determinant_z
 
 theorem norm_decay_in_coordinates : Formalism.FourierDecayAlt.U.CoordinateDecay :=
   norm_decay_of_coordinate_sizes coordinate_sizes_in_norm
 
 theorem phi_pointwise_bound : Formalism.FourierDecayAlt.U.PointwiseIntegralBound :=
-  phi_bound_of_parts slice_membership derivative_cost_bound norm_decay_in_coordinates weight_integrability
+  phi_bound_of_parts slice_membership derivative_cost_bound norm_decay_in_coordinates
+    weight_integrability
 
 theorem theorem_u : Formalism.FourierDecayAlt.U.TheoremU :=
   theorem_u_of_parts phi_pointwise_bound phi_support_determinant weak_to_strong_smoothness
@@ -41,8 +43,8 @@ theorem corollary_u2_germ_hypothesis : Formalism.FourierDecayAlt.U.GermExpansion
     thresholds_second_corollary phi_support_level_function
 
 theorem germ_expansion_applies : Formalism.FourierDecayAlt.U.UseGerm :=
-  germ_expansion_of_parts germ_rate det_weyl_matrix corollary_u2_germ_hypothesis derivative_bound_of_decay
-    power_matching scale_matching
+  germ_expansion_of_parts germ_rate det_weyl_matrix corollary_u2_germ_hypothesis
+    derivative_bound_of_decay power_matching scale_matching
 
 theorem germ_expansion_top_level : Formalism.FourierDecayAlt.U.UseGermTop :=
   germ_top_level_of_parts germ_rate det_weyl_matrix top_cells derivative_bound_of_decay

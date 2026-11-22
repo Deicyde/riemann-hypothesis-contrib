@@ -6,20 +6,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-private theorem mem_princ_iff_pow_dvd_sub_one (l : ℕ) [Fact l.Prime] (m : ℕ) (u : ℤ_[l]ˣ) :
-    u ∈ KStar.TotallyRealRoots.princ l m ↔ (l : ℤ_[l]) ^ m ∣ (u : ℤ_[l]) - 1 := by
+private theorem mem_princ_iff_pow_dvd_sub_one (l : ℕ) [Fact l.Prime] (m : ℕ) (u : ℤ_[l]ˣ)
+    : u ∈ KStar.TotallyRealRoots.princ l m ↔ (l : ℤ_[l]) ^ m ∣ (u : ℤ_[l]) - 1 := by
   unfold KStar.TotallyRealRoots.princ KStar.TotallyRealRoots.redPow
   rw [MonoidHom.mem_ker, ← Ideal.mem_span_singleton, ← PadicInt.ker_toZModPow, RingHom.mem_ker,
     map_sub, map_one, sub_eq_zero, Units.ext_iff]
   simp
 
-private theorem pow_succ_dvd_pow_prime_sub_one (l : ℕ) [Fact l.Prime] (j : ℕ) (v : ℤ_[l])
-    (h : (l : ℤ_[l]) ^ (j + 1) ∣ v - 1) : (l : ℤ_[l]) ^ (j + 2) ∣ v ^ l - 1 := by
+private theorem pow_succ_dvd_pow_prime_sub_one
+    (l : ℕ) [Fact l.Prime] (j : ℕ) (v : ℤ_[l]) (h : (l : ℤ_[l]) ^ (j + 1) ∣ v - 1)
+    : (l : ℤ_[l]) ^ (j + 2) ∣ v ^ l - 1 := by
   obtain ⟨c, hc⟩ := h
-  have hg : v ^ l - 1 = (v - 1) * ∑ i ∈ Finset.range l, v ^ i := by
-    rw [mul_comm, geom_sum_mul]
+  have hg : v ^ l - 1 = (v - 1) * ∑ i ∈ Finset.range l, v ^ i := by rw [mul_comm, geom_sum_mul]
   have hs : v - 1 ∣ (∑ i ∈ Finset.range l, v ^ i) - l := by
     have e : (∑ i ∈ Finset.range l, v ^ i) - l = ∑ i ∈ Finset.range l, (v ^ i - 1) := by
       rw [Finset.sum_sub_distrib]
@@ -32,24 +34,28 @@ private theorem pow_succ_dvd_pow_prime_sub_one (l : ℕ) [Fact l.Prime] (j : ℕ
   rw [hg, hsum, hc]
   ring
 
-private theorem exists_prime_pow_smul_eq_zero_qz (l : ℕ) [Fact l.Prime] (v : QZ l) : ∃ m : ℕ, (l : ℤ_[l]) ^ m • v = 0 := by
+private theorem exists_prime_pow_smul_eq_zero_qz (l : ℕ) [Fact l.Prime] (v : QZ l)
+    : ∃ m : ℕ, (l : ℤ_[l]) ^ m • v = 0 := by
   obtain ⟨q, rfl⟩ := Submodule.Quotient.mk_surjective (ZlSub l) v
-  obtain ⟨m, hm⟩ := pow_unbounded_of_one_lt ‖q‖
-    (by exact_mod_cast (Fact.out : l.Prime).one_lt : (1 : ℝ) < l)
+  obtain ⟨m, hm⟩ :=
+    pow_unbounded_of_one_lt ‖q‖ (by exact_mod_cast (Fact.out : l.Prime).one_lt : (1 : ℝ) < l)
   refine ⟨m, ?_⟩
   show ((l : ℤ_[l]) ^ m • (Submodule.Quotient.mk q : ℚ_[l] ⧸ ZlSub l)) = 0
   rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
   unfold ZlSub
   refine ⟨(⟨(l : ℚ_[l]) ^ m * q, ?_⟩ : ℤ_[l]), ?_⟩
-  · rw [PadicInt.mem_subring_iff, norm_mul, norm_pow, Padic.norm_p, inv_pow, inv_mul_le_iff₀ (pow_pos (by exact_mod_cast (Fact.out : l.Prime).pos) m)]
+  · rw [PadicInt.mem_subring_iff, norm_mul, norm_pow, Padic.norm_p, inv_pow,
+      inv_mul_le_iff₀ (pow_pos (by exact_mod_cast (Fact.out : l.Prime).pos) m)]
     simpa using hm.le
   · show (l : ℚ_[l]) ^ m * q = _
     simp [Algebra.smul_def]
 
-private theorem exists_princ_subset_of_mem_nhds_one (l : ℕ) [Fact l.Prime] (V : Set ℤ_[l]ˣ) (hV : V ∈ nhds (1 : ℤ_[l]ˣ)) :
-    ∃ n, ∀ u ∈ KStar.TotallyRealRoots.princ l n, u ∈ V := by
+private theorem exists_princ_subset_of_mem_nhds_one
+    (l : ℕ) [Fact l.Prime] (V : Set ℤ_[l]ˣ) (hV : V ∈ nhds (1 : ℤ_[l]ˣ))
+    : ∃ n, ∀ u ∈ KStar.TotallyRealRoots.princ l n, u ∈ V := by
   rw [(Units.isOpenEmbedding_val (R := ℤ_[l])).isEmbedding.isInducing.nhds_eq_comap,
-    Filter.mem_comap] at hV
+      Filter.mem_comap]
+    at hV
   obtain ⟨t, ht, htV⟩ := hV
   rw [Units.val_one, Metric.mem_nhds_iff] at ht
   obtain ⟨ε, εpos, hball⟩ := ht
@@ -59,21 +65,28 @@ private theorem exists_princ_subset_of_mem_nhds_one (l : ℕ) [Fact l.Prime] (V 
   rw [mem_princ_iff_pow_dvd_sub_one] at hu
   obtain ⟨c, hc⟩ := hu
   rw [Metric.mem_ball, dist_eq_norm, hc, norm_mul, norm_pow, PadicInt.norm_p]
-  calc ((l : ℝ)⁻¹) ^ n * ‖c‖ ≤ ((l : ℝ)⁻¹) ^ n * 1 :=
-        mul_le_mul_of_nonneg_left (PadicInt.norm_le_one c) (by positivity)
+  calc
+    ((l : ℝ)⁻¹) ^ n * ‖c‖
+      ≤ ((l : ℝ)⁻¹) ^ n * 1 := mul_le_mul_of_nonneg_left (PadicInt.norm_le_one c) (by positivity)
     _ < ε := by rwa [mul_one]
 
-theorem UpperTheory.V.Kum.dinfNil :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (N : ℕ) (U : Subgroup (G F Ω)) [U.Normal], IsClosed (U : Set (G F Ω)) → ∀ φ ∈ Dinf l N U, (∃ n, ∀ g ∈ levU l U n, funRep ℤ_[l] (QZ l) (cycU l U) g φ = φ) ∧
-    ∀ γ ∈ levU l U 1, ∃ k : ℕ, (l : ℤ_[l]) ^ k • φ = 0 ∧ ((funRep ℤ_[l] (QZ l) (cycU l U) γ - 1) ^ k) φ = 0 := by
+theorem UpperTheory.V.Kum.dinfNil
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (N : ℕ) (U : Subgroup (G F Ω)) [U.Normal],
+      IsClosed (U : Set (G F Ω))
+        → ∀ φ ∈ Dinf l N U,
+          (∃ n, ∀ g ∈ levU l U n, funRep ℤ_[l] (QZ l) (cycU l U) g φ = φ)
+            ∧ ∀ γ ∈ levU l U 1, ∃ k : ℕ,
+              (l : ℤ_[l]) ^ k • φ = 0 ∧ ((funRep ℤ_[l] (QZ l) (cycU l U) γ - 1) ^ k) φ = 0 := by
   intro F Ω _ _ _ _ _ l _ N U _ hU φ hφ
   classical
   have memC : ∀ x : G F Ω, x ∈ cycU l U ↔ x ∈ U ∧ cycZ F Ω l x = 1 := by
     intro x
     unfold cycU
     rw [Subgroup.mem_inf, MonoidHom.mem_ker]
-  have memLev : ∀ (m : ℕ) (x : G F Ω),
-      x ∈ levU l U m ↔ x ∈ U ∧ cycZ F Ω l x ∈ KStar.TotallyRealRoots.princ l m := by
+  have memLev
+      : ∀ (m : ℕ) (x : G F Ω),
+        x ∈ levU l U m ↔ x ∈ U ∧ cycZ F Ω l x ∈ KStar.TotallyRealRoots.princ l m := by
     intro m x
     unfold levU
     rw [Subgroup.mem_inf, Subgroup.mem_comap]
@@ -105,8 +118,9 @@ theorem UpperTheory.V.Kum.dinfNil :
     have h2 : (⟨d, hd⟩ : cycU l U) ∈ Subtype.val ⁻¹' O := hW hdW
     rw [hOeq] at h2
     exact h2
-  have conj_val : ∀ (γ : G F Ω) (x : cycU l U),
-      ((conjHom (cycU l U) γ x : cycU l U) : G F Ω) = γ⁻¹ * x * γ := fun _ _ => rfl
+  have conj_val
+      : ∀ (γ : G F Ω) (x : cycU l U), ((conjHom (cycU l U) γ x : cycU l U) : G F Ω) = γ⁻¹ * x * γ :=
+    fun _ _ => rfl
   have stabC : ∀ γ ∈ cycU l U, ∀ x, φ (conjHom (cycU l U) γ x) = φ x := by
     intro γ hγ x
     have e : conjHom (cycU l U) γ x = (⟨γ, hγ⟩ : cycU l U)⁻¹ * x * ⟨γ, hγ⟩ :=
@@ -124,16 +138,18 @@ theorem UpperTheory.V.Kum.dinfNil :
     have e : conjHom (cycU l U) γ x = ⟨_, hdC⟩ * x :=
       Subtype.ext (by simp only [conj_val, Subgroup.coe_mul, Subgroup.coe_mk]; group)
     rw [e, hadd, hWker _ hdC hdW, zero_add]
-  have stabMul : ∀ a b : G F Ω, (∀ x, φ (conjHom (cycU l U) a x) = φ x) →
-      (∀ x, φ (conjHom (cycU l U) b x) = φ x) → ∀ x, φ (conjHom (cycU l U) (a * b) x) = φ x := by
+  have stabMul
+      : ∀ a b : G F Ω,
+        (∀ x, φ (conjHom (cycU l U) a x) = φ x) → (∀ x, φ (conjHom (cycU l U) b x) = φ x)
+          → ∀ x, φ (conjHom (cycU l U) (a * b) x) = φ x := by
     intro a b ha hb x
     have e : conjHom (cycU l U) (a * b) x = conjHom (cycU l U) b (conjHom (cycU l U) a x) :=
       Subtype.ext (by simp only [conj_val]; group)
     rw [e, hb, ha]
   let S : Set (G F Ω) :=
     ⋃ c : cycU l U, (fun γ => γ * (c : G F Ω)⁻¹) ⁻¹' (W.toSubgroup : Set (G F Ω))
-  have hSo : IsOpen S := isOpen_iUnion fun c =>
-    W.toOpenSubgroup.isOpen'.preimage (continuous_id.mul continuous_const)
+  have hSo : IsOpen S :=
+    isOpen_iUnion fun c => W.toOpenSubgroup.isOpen'.preimage (continuous_id.mul continuous_const)
   have hSstab : ∀ γ ∈ S, ∀ x, φ (conjHom (cycU l U) γ x) = φ x := by
     intro γ hγ
     obtain ⟨c, hc⟩ := Set.mem_iUnion.mp hγ
@@ -174,7 +190,8 @@ theorem UpperTheory.V.Kum.dinfNil :
     rw [memLev] at hγ ⊢
     refine ⟨pow_mem hγ.1 q, ?_⟩
     rw [map_pow, mem_princ_iff_pow_dvd_sub_one]
-    have key : ∀ j : ℕ, (l : ℤ_[l]) ^ (j + 1) ∣ ((cycZ F Ω l γ ^ (l ^ j) : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
+    have key
+        : ∀ j : ℕ, (l : ℤ_[l]) ^ (j + 1) ∣ ((cycZ F Ω l γ ^ (l ^ j) : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
       intro j
       induction j with
       | zero => simpa [mem_princ_iff_pow_dvd_sub_one] using hγ.2
@@ -184,15 +201,16 @@ theorem UpperTheory.V.Kum.dinfNil :
     exact dvd_trans (pow_dvd_pow _ (Nat.le_succ n)) (key n)
   let ρ := funRep ℤ_[l] (QZ l) (cycU l U)
   let Tm : Module.End ℤ_[l] (cycU l U → QZ l) := ρ γ - 1
-  let J : Ideal (Polynomial ℤ) :=
-    { carrier := {p | Polynomial.aeval Tm p φ = 0}
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq, map_add (f := _), LinearMap.add_apply] at *
-        rw [ha, hb, add_zero]
-      zero_mem' := by simp
-      smul_mem' := fun c p hp => by
-        simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul, Module.End.mul_apply] at *
-        rw [hp, map_zero] }
+  let J : Ideal (Polynomial ℤ) := {
+    carrier := {p | Polynomial.aeval Tm p φ = 0}
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq, map_add (f := _), LinearMap.add_apply] at *
+      rw [ha, hb, add_zero]
+    zero_mem' := by simp
+    smul_mem' := fun c p hp => by
+      simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul, Module.End.mul_apply] at *
+      rw [hp, map_zero]
+  }
   have hB : (Polynomial.X + 1) ^ q - 1 ∈ J := by
     show (Polynomial.aeval Tm ((Polynomial.X + 1) ^ q - 1)) φ = 0
     simp only [map_sub, map_pow, map_add (f := _), Polynomial.aeval_X, map_one]
@@ -209,30 +227,35 @@ theorem UpperTheory.V.Kum.dinfNil :
   have hP : Polynomial.C (l : ℤ) ∣ (Polynomial.X + 1) ^ q - Polynomial.X ^ q - 1 := by
     rw [Polynomial.C_dvd_iff_dvd_coeff]
     intro i
-    have hmap : Polynomial.map (Int.castRingHom (ZMod l))
-        ((Polynomial.X + 1) ^ q - Polynomial.X ^ q - 1) = 0 := by
-      simp only [Polynomial.map_sub, Polynomial.map_pow, Polynomial.map_add (f := _), Polynomial.map_X,
-        Polynomial.map_one]
+    have hmap
+        : Polynomial.map (Int.castRingHom (ZMod l)) ((Polynomial.X + 1) ^ q - Polynomial.X ^ q - 1)
+          = 0 := by
+      simp only [Polynomial.map_sub, Polynomial.map_pow, Polynomial.map_add (f := _),
+        Polynomial.map_X, Polynomial.map_one]
       rw [hqdef, add_pow_char_pow, one_pow]
       ring
     have h2 := congrArg (fun P => _root_.AddMonoidAlgebra.coeff (M := ℕ) P i) hmap
     simp only [Polynomial.coeff_map, Polynomial.coeff_zero, eq_intCast] at h2
     exact (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mp h2
   obtain ⟨Qp, hQp⟩ := hP
-  have hXq : (Polynomial.X : Polynomial ℤ) ^ q =
-      ((Polynomial.X + 1) ^ q - 1) - Polynomial.C (l : ℤ) * Qp := by
+  have hXq
+      : (Polynomial.X : Polynomial ℤ) ^ q
+        = ((Polynomial.X + 1) ^ q - 1) - Polynomial.C (l : ℤ) * Qp := by
     linear_combination (-1 : Polynomial ℤ) * hQp
   have hmem : (Polynomial.X : Polynomial ℤ) ^ (q * k0) ∈ J := by
     rw [← Ideal.Quotient.eq_zero_iff_mem, pow_mul, map_pow, hXq, map_sub,
       Ideal.Quotient.eq_zero_iff_mem.mpr hB, zero_sub, map_mul]
-    calc (-(Ideal.Quotient.mk J (Polynomial.C (l : ℤ)) * Ideal.Quotient.mk J Qp)) ^ k0
-        = (-(Ideal.Quotient.mk J Qp)) ^ k0 * Ideal.Quotient.mk J (Polynomial.C ((l : ℤ) ^ k0)) := by
-          rw [Polynomial.C_pow, map_pow]
-          ring
+    calc
+      (-(Ideal.Quotient.mk J (Polynomial.C (l : ℤ)) * Ideal.Quotient.mk J Qp)) ^ k0
+          = (-(Ideal.Quotient.mk J Qp)) ^ k0
+            * Ideal.Quotient.mk J (Polynomial.C ((l : ℤ) ^ k0)) := by
+        rw [Polynomial.C_pow, map_pow]
+        ring
       _ = 0 := by rw [Ideal.Quotient.eq_zero_iff_mem.mpr hL, mul_zero]
   refine ⟨q * k0, ?_, ?_⟩
   · rw [show q * k0 = (q * k0 - k0) + k0 from
-      (Nat.sub_add_cancel (Nat.le_mul_of_pos_left k0 hqpos)).symm, pow_add, mul_smul, hk0, smul_zero]
+        (Nat.sub_add_cancel (Nat.le_mul_of_pos_left k0 hqpos)).symm,
+      pow_add, mul_smul, hk0, smul_zero]
   · have h2 := hmem
     change (Polynomial.aeval Tm (Polynomial.X ^ (q * k0))) φ = 0 at h2
     rw [map_pow, Polynomial.aeval_X] at h2

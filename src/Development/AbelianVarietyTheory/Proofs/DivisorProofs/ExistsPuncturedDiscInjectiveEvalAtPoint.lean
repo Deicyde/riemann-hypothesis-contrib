@@ -8,9 +8,13 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsF
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl
+  GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -32,16 +36,22 @@ noncomputable def absConv (u : ℂ) : Subring (PowerSeries ℂ) where
     simpa [map_neg, neg_mul, norm_neg] using hf
   mul_mem' := by
     intro f g hf hg
-    have e : ∀ n, PowerSeries.coeff n (f * g) * u ^ n = ∑ kl ∈ Finset.HasAntidiagonal.antidiagonal n,
-        (PowerSeries.coeff kl.1 f * u ^ kl.1) * (PowerSeries.coeff kl.2 g * u ^ kl.2) := fun n => by
-      rw [PowerSeries.coeff_mul, Finset.sum_mul]
-      refine Finset.sum_congr rfl fun kl h => ?_
-      rw [← Finset.HasAntidiagonal.mem_antidiagonal.1 h, pow_add]
-      ring
+    have e
+        : ∀ n,
+          PowerSeries.coeff n (f * g) * u ^ n
+            = ∑ kl ∈ Finset.HasAntidiagonal.antidiagonal n,
+              (PowerSeries.coeff kl.1 f * u ^ kl.1) * (PowerSeries.coeff kl.2 g * u ^ kl.2) :=
+      fun n => by
+        rw [PowerSeries.coeff_mul, Finset.sum_mul]
+        refine Finset.sum_congr rfl fun kl h => ?_
+        rw [← Finset.HasAntidiagonal.mem_antidiagonal.1 h, pow_add]
+        ring
     show Summable fun n => ‖PowerSeries.coeff n (f * g) * u ^ n‖
     simp only [e]
     exact summable_norm_sum_mul_antidiagonal_of_summable_norm
-      (f := fun n => PowerSeries.coeff n f * u ^ n) (g := fun n => PowerSeries.coeff n g * u ^ n) hf hg
+      (f := fun n => PowerSeries.coeff n f * u ^ n)
+      (g := fun n => PowerSeries.coeff n g * u ^ n)
+      hf hg
 
 noncomputable def evalAt (u : ℂ) : absConv u →+* ℂ where
   toFun Φ := ∑' n, PowerSeries.coeff n (Φ : PowerSeries ℂ) * u ^ n
@@ -67,21 +77,21 @@ noncomputable def evalAt (u : ℂ) : absConv u →+* ℂ where
     rw [← Finset.HasAntidiagonal.mem_antidiagonal.1 h, pow_add]
     ring
 
-theorem countable_closure {A : Type} [CommRing A] (S : Set A) (hS : S.Countable) :
-    Countable (Subring.closure S) := by
+theorem countable_closure {A : Type} [CommRing A] (S : Set A) (hS : S.Countable)
+    : Countable (Subring.closure S) := by
   have : Countable S := hS.to_subtype
-  have : Countable (MvPolynomial S ℤ) :=
-    (MvPolynomial.basisMonomials S ℤ).repr.injective.countable
+  have : Countable (MvPolynomial S ℤ) := (MvPolynomial.basisMonomials S ℤ).repr.injective.countable
   let φ : MvPolynomial S ℤ →+* A := MvPolynomial.eval₂Hom (Int.castRingHom A) Subtype.val
-  have hle : Subring.closure S ≤ φ.range := Subring.closure_le.2 fun s hs =>
-    ⟨MvPolynomial.X ⟨s, hs⟩, by simp [φ]⟩
-  have hc : (φ.range : Set A).Countable := by
-    rw [RingHom.coe_range]; exact Set.countable_range _
+  have hle : Subring.closure S ≤ φ.range :=
+    Subring.closure_le.2 fun s hs => ⟨MvPolynomial.X ⟨s, hs⟩, by simp [φ]⟩
+  have hc : (φ.range : Set A).Countable := by rw [RingHom.coe_range]; exact Set.countable_range _
   exact (hc.mono hle).to_subtype
 
-theorem radius_ge (ε : ℝ) (Φ : PowerSeries ℂ)
-    (h : ∀ u : ℂ, u ≠ 0 → ‖u‖ < ε → Summable fun n => ‖PowerSeries.coeff n Φ * u ^ n‖) :
-    ENNReal.ofReal ε ≤ (FormalMultilinearSeries.ofScalars ℂ fun n => PowerSeries.coeff n Φ).radius := by
+theorem radius_ge
+    (ε : ℝ) (Φ : PowerSeries ℂ)
+    (h : ∀ u : ℂ, u ≠ 0 → ‖u‖ < ε → Summable fun n => ‖PowerSeries.coeff n Φ * u ^ n‖)
+    : ENNReal.ofReal ε
+      ≤ (FormalMultilinearSeries.ofScalars ℂ fun n => PowerSeries.coeff n Φ).radius := by
   refine ENNReal.le_of_forall_nnreal_lt fun r hr => ?_
   by_cases hr0 : r = 0
   · simp [hr0]
@@ -96,9 +106,15 @@ theorem radius_ge (ε : ℝ) (Φ : PowerSeries ℂ)
 
 end GlobalTheory.PowEval
 
-
 open GlobalTheory.PowEval in
-theorem GlobalTheory.exists_injective_evalAt_closure : ∀ (ε : ℝ) (S : Set (PowerSeries ℂ)), 0 < ε → S.Countable → (∀ Φ ∈ S, ∀ u : ℂ, u ≠ 0 → ‖u‖ < ε → Summable fun n => ‖PowerSeries.coeff n Φ * u ^ n‖) → ∃ (u : ℂ) (i : Subring.closure S →+* ℂ), u ≠ 0 ∧ ‖u‖ < ε ∧ Function.Injective i ∧ ∀ Φ : Subring.closure S, i Φ = ∑' n, PowerSeries.coeff n (Φ : PowerSeries ℂ) * u ^ n := by
+theorem GlobalTheory.exists_injective_evalAt_closure
+    : ∀ (ε : ℝ) (S : Set (PowerSeries ℂ)),
+      0 < ε → S.Countable
+        → (∀ Φ ∈ S, ∀ u : ℂ, u ≠ 0 → ‖u‖ < ε → Summable fun n => ‖PowerSeries.coeff n Φ * u ^ n‖)
+        → ∃ (u : ℂ) (i : Subring.closure S →+* ℂ),
+          u ≠ 0 ∧ ‖u‖ < ε ∧ Function.Injective i
+            ∧ ∀ Φ : Subring.closure S,
+              i Φ = ∑' n, PowerSeries.coeff n (Φ : PowerSeries ℂ) * u ^ n := by
   intro ε S hε hS h
   have : Countable (Subring.closure S) := countable_closure S hS
   let p : PowerSeries ℂ → FormalMultilinearSeries ℂ ℂ ℂ := fun Φ =>
@@ -108,8 +124,9 @@ theorem GlobalTheory.exists_injective_evalAt_closure : ∀ (ε : ℝ) (S : Set (
     show FormalMultilinearSeries.ofScalarsSum _ u = _
     rw [FormalMultilinearSeries.ofScalars_sum_eq]
     simp [smul_eq_mul]
-  have hcl : ∀ Φ ∈ Subring.closure S, ∀ u : ℂ, u ≠ 0 → ‖u‖ < ε →
-      Summable fun n => ‖PowerSeries.coeff n Φ * u ^ n‖ := by
+  have hcl
+      : ∀ Φ ∈ Subring.closure S, ∀ u : ℂ,
+        u ≠ 0 → ‖u‖ < ε → Summable fun n => ‖PowerSeries.coeff n Φ * u ^ n‖ := by
     intro Φ hΦ u hu0 hu
     have hle : Subring.closure S ≤ absConv u := Subring.closure_le.2 fun Ψ hΨ => h Ψ hΨ u hu0 hu
     exact hle hΦ
@@ -122,7 +139,8 @@ theorem GlobalTheory.exists_injective_evalAt_closure : ∀ (ε : ℝ) (S : Set (
     rw [← Metric.eball_ofReal]
     exact Metric.eball_subset_eball (hrad Φ hΦ)
   let J := Option {Φ : Subring.closure S // Φ ≠ 0}
-  let f : J → ℂ → ℂ := fun i => match i with
+  let f : J → ℂ → ℂ := fun i =>
+    match i with
     | none => id
     | some Φ => (p (Φ.1 : PowerSeries ℂ)).sum
   have han : ∀ i, AnalyticOnNhd ℂ (f i) (Metric.ball 0 ε) := by
@@ -146,14 +164,19 @@ theorem GlobalTheory.exists_injective_evalAt_closure : ∀ (ε : ℝ) (S : Set (
       have hev : (p (Φ.1 : PowerSeries ℂ)).sum =ᶠ[nhds 0] 0 := by
         filter_upwards [Metric.ball_mem_nhds (0 : ℂ) hε] with y hy
         exact hcon y hy
-      have h0 := ((p _).hasFPowerSeriesOnBall (hpos _ Φ.1.2)).hasFPowerSeriesAt.eq_zero_of_eventually hev
+      have h0 :=
+        ((p _).hasFPowerSeriesOnBall (hpos _ Φ.1.2)).hasFPowerSeriesAt.eq_zero_of_eventually hev
       apply Φ.2
       apply Subtype.ext
       ext n
       have := congrArg (fun q : FormalMultilinearSeries ℂ ℂ ℂ => q n) h0
-      simpa using (FormalMultilinearSeries.ofScalars_eq_zero (E := ℂ) (c := fun n => PowerSeries.coeff n (Φ.1 : PowerSeries ℂ)) n).1 this
-  obtain ⟨u, hu, hx⟩ := GlobalTheory.exists_forall_ne_zero_of_countable_analytic ℂ (Metric.ball 0 ε)
-    Metric.isOpen_ball (convex_ball 0 ε).isPreconnected (Metric.nonempty_ball.2 hε) J f han hnz
+      simpa using
+        (FormalMultilinearSeries.ofScalars_eq_zero (E := ℂ)
+          (c := fun n => PowerSeries.coeff n (Φ.1 : PowerSeries ℂ))
+          n).1 this
+  obtain ⟨u, hu, hx⟩ :=
+    GlobalTheory.exists_forall_ne_zero_of_countable_analytic ℂ (Metric.ball 0 ε) Metric.isOpen_ball
+      (convex_ball 0 ε).isPreconnected (Metric.nonempty_ball.2 hε) J f han hnz
   have hu0 : u ≠ 0 := hx none
   have hun : ‖u‖ < ε := mem_ball_zero_iff.1 hu
   have hle : Subring.closure S ≤ absConv u := Subring.closure_le.2 fun Ψ hΨ => h Ψ hΨ u hu0 hun

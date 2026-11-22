@@ -11,21 +11,26 @@ namespace GlobalTheory.CuspGL.PrimOrth
 
 variable {F : Type} [Field F] {V : Type} [AddCommGroup V] [Module F V]
 
-theorem neg_mem_nilRad {A : Submodule F V} {h : Module.End F V} (hh : h ∈ nilRad A) : -h ∈ nilRad A :=
+theorem neg_mem_nilRad {A : Submodule F V} {h : Module.End F V} (hh : h ∈ nilRad A)
+    : -h ∈ nilRad A :=
   ⟨fun x => by simpa using hh.1 x, fun x hx => by simpa using hh.2 x hx⟩
 
-theorem add_preserves {A : Submodule F V} {g h : Module.End F V} (hh : h ∈ nilRad A)
-    (hg : ∀ x ∈ A, g x ∈ A) : ∀ x ∈ A, (g + h) x ∈ A :=
-  fun x hx => A.add_mem (hg x hx) (hh.1 x)
+theorem add_preserves
+    {A : Submodule F V} {g h : Module.End F V} (hh : h ∈ nilRad A) (hg : ∀ x ∈ A, g x ∈ A)
+    : ∀ x ∈ A, (g + h) x ∈ A := fun x hx =>
+  A.add_mem (hg x hx) (hh.1 x)
 
-theorem add_preserves_iff {A : Submodule F V} {g h : Module.End F V} (hh : h ∈ nilRad A) :
-    (∀ x ∈ A, (g + h) x ∈ A) ↔ ∀ x ∈ A, g x ∈ A := by
+theorem add_preserves_iff {A : Submodule F V} {g h : Module.End F V} (hh : h ∈ nilRad A)
+    : (∀ x ∈ A, (g + h) x ∈ A) ↔ ∀ x ∈ A, g x ∈ A := by
   refine ⟨fun H => ?_, add_preserves hh⟩
   have := add_preserves (neg_mem_nilRad hh) H
   simpa using this
 
-theorem isUnit_add [FiniteDimensional F V] {A : Submodule F V} {g h : Module.End F V} (hh : h ∈ nilRad A)
-    (hg : ∀ x ∈ A, g x ∈ A) (hu : IsUnit g) : IsUnit (g + h) := by
+theorem isUnit_add
+    [FiniteDimensional F V]
+    {A : Submodule F V} {g h : Module.End F V}
+    (hh : h ∈ nilRad A) (hg : ∀ x ∈ A, g x ∈ A) (hu : IsUnit g)
+    : IsUnit (g + h) := by
   rw [LinearMap.isUnit_iff_ker_eq_bot, LinearMap.ker_eq_bot] at hu
   rw [LinearMap.isUnit_iff_ker_eq_bot, LinearMap.ker_eq_bot']
   intro x hx
@@ -43,22 +48,30 @@ theorem isUnit_add [FiniteDimensional F V] {A : Submodule F V} {g h : Module.End
   rw [hh.2 x hxA, add_zero] at hx'
   exact hu (by rw [hx', map_zero])
 
-theorem isUnit_add_iff [FiniteDimensional F V] {A : Submodule F V} {g h : Module.End F V} (hh : h ∈ nilRad A)
-    (hg : ∀ x ∈ A, g x ∈ A) : IsUnit (g + h) ↔ IsUnit g := by
+theorem isUnit_add_iff
+    [FiniteDimensional F V]
+    {A : Submodule F V} {g h : Module.End F V} (hh : h ∈ nilRad A) (hg : ∀ x ∈ A, g x ∈ A)
+    : IsUnit (g + h) ↔ IsUnit g := by
   refine ⟨fun H => ?_, isUnit_add hh hg⟩
   have := isUnit_add (neg_mem_nilRad hh) (add_preserves hh hg) H
   simpa using this
 
-theorem sum_mul_eq_zero [Fintype (Module.End F V)] {φ : Module.End F V → ℂ} (hφ : IsPrimitive φ)
-    {A : Submodule F V} (h0 : A ≠ ⊥) (h1 : A ≠ ⊤) (f : Module.End F V → ℂ)
-    (hf : ∀ g, ∀ h ∈ nilRad A, f (g + h) = f g) (hf0 : ∀ g, ¬ (∀ x ∈ A, g x ∈ A) → f g = 0) :
-    ∑ g, φ g * f g = 0 := by
+theorem sum_mul_eq_zero
+    [Fintype (Module.End F V)]
+    {φ : Module.End F V → ℂ} (hφ : IsPrimitive φ)
+    {A : Submodule F V} (h0 : A ≠ ⊥) (h1 : A ≠ ⊤)
+    (f : Module.End F V → ℂ)
+    (hf : ∀ g, ∀ h ∈ nilRad A, f (g + h) = f g) (hf0 : ∀ g, ¬(∀ x ∈ A, g x ∈ A) → f g = 0)
+    : ∑ g, φ g * f g = 0 := by
   classical
   have hfin : (nilRad A).Finite := Set.toFinite _
   have hne : (hfin.toFinset.card : ℂ) ≠ 0 := by
-    have : hfin.toFinset.Nonempty := ⟨0, by
-      rw [Set.Finite.mem_toFinset]
-      exact ⟨fun x => by simp, fun x _ => by simp⟩⟩
+    have : hfin.toFinset.Nonempty := ⟨
+      0,
+      by
+        rw [Set.Finite.mem_toFinset]
+        exact ⟨fun x => by simp, fun x _ => by simp⟩
+    ⟩
     exact_mod_cast this.card_pos.ne'
   have key : ∑ h ∈ hfin.toFinset, ∑ g, φ g * f g = 0 := by
     have : ∀ h ∈ hfin.toFinset, ∑ g, φ g * f g = ∑ g, φ (g + h) * f g := by
@@ -78,8 +91,11 @@ theorem sum_mul_eq_zero [Fintype (Module.End F V)] {φ : Module.End F V → ℂ}
   rw [Finset.sum_const, nsmul_eq_mul] at key
   exact (mul_eq_zero.mp key).resolve_left hne
 
-theorem psi_bot {s : F[X] → ℂ} (hs : IsAdditive s) (U : Type) [AddCommGroup U] [Module F U]
-    [FiniteDimensional F U] [Subsingleton U] (g : Module.End F U) : psi s U g = 0 := by
+theorem psi_bot
+    {s : F[X] → ℂ} (hs : IsAdditive s)
+    (U : Type) [AddCommGroup U] [Module F U] [FiniteDimensional F U] [Subsingleton U]
+    (g : Module.End F U)
+    : psi s U g = 0 := by
   have h1 : s 1 = 0 := by
     have := hs 1 1 monic_one monic_one
     simpa using this
@@ -91,11 +107,13 @@ theorem psi_bot {s : F[X] → ℂ} (hs : IsAdditive s) (U : Type) [AddCommGroup 
     ⟨fun W => W.2.1 (Subsingleton.elim _ _)⟩
   rw [psi_eq, hc, h1, finsum_of_isEmpty, sub_zero]
 
-
 open Classical in
-theorem ipGL_psi_eq (F : Type) [Field F] [Finite F] (V : Type) [AddCommGroup V] [Module F V]
-    [FiniteDimensional F V] (s : F[X] → ℂ) (hs : IsAdditive s) (φ : Module.End F V → ℂ)
-    (hφ : IsPrimitive φ) : ipGL φ (psi s V) = ipGL φ (fun g => s (LinearMap.charpoly g)) := by
+theorem ipGL_psi_eq
+    (F : Type) [Field F] [Finite F]
+    (V : Type) [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+    (s : F[X] → ℂ) (hs : IsAdditive s)
+    (φ : Module.End F V → ℂ) (hφ : IsPrimitive φ)
+    : ipGL φ (psi s V) = ipGL φ (fun g => s (LinearMap.charpoly g)) := by
   classical
   haveI : Finite V := Module.finite_of_finite F
   haveI : Finite (Module.End F V) := Finite.of_injective _ (DFunLike.coe_injective (F := V →ₗ[F] V))
@@ -108,8 +126,11 @@ theorem ipGL_psi_eq (F : Type) [Field F] [Finite F] (V : Type) [AddCommGroup V] 
     intro g
     rw [psi_eq, finsum_eq_sum_of_fintype]
     congr 1
-    rw [← Finset.sum_filter_add_sum_filter_not Finset.univ (fun W : Submodule F V => W ≠ ⊤ ∧ ∀ x ∈ W, g x ∈ W)]
-    rw [Finset.sum_eq_zero (s := Finset.univ.filter fun W : Submodule F V => ¬ (W ≠ ⊤ ∧ ∀ x ∈ W, g x ∈ W)), add_zero,
+    rw [← Finset.sum_filter_add_sum_filter_not Finset.univ
+      (fun W : Submodule F V => W ≠ ⊤ ∧ ∀ x ∈ W, g x ∈ W)]
+    rw [Finset.sum_eq_zero
+        (s := Finset.univ.filter fun W : Submodule F V => ¬(W ≠ ⊤ ∧ ∀ x ∈ W, g x ∈ W)),
+      add_zero,
       Finset.sum_subtype (p := fun W : Submodule F V => W ≠ ⊤ ∧ ∀ x ∈ W, g x ∈ W) _ (by simp)]
     · refine Finset.sum_congr rfl fun W _ => ?_
       simp only [R, dif_pos W.2]
@@ -146,8 +167,8 @@ theorem ipGL_psi_eq (F : Type) [Field F] [Finite F] (V : Type) [AddCommGroup V] 
     · intro g hg
       have e1 : R W g = 0 := dif_neg (fun H => hg H.2)
       simp [e1]
-  have hsum : ∀ ψ : Module.End F V → ℂ,
-      ipGL φ ψ = ∑ g, φ g * (if IsUnit g then star (ψ g) else 0) := by
+  have hsum
+      : ∀ ψ : Module.End F V → ℂ, ipGL φ ψ = ∑ g, φ g * (if IsUnit g then star (ψ g) else 0) := by
     intro ψ
     rw [ipGL, finsum_mem_def, finsum_eq_sum_of_fintype]
     refine Finset.sum_congr rfl fun g _ => ?_

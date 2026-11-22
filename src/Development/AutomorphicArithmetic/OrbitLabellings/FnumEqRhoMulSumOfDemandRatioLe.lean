@@ -140,9 +140,12 @@ end Helpers
 end UpperTheory.AlternatingNumberFlow
 
 open UpperTheory.AlternatingNumberFlow in
-theorem UpperTheory.fnum_eq_rho_mul_sum_of_demand_ratio_le :
-    ∀ (l d : ℕ) [NeZero d], 3 ≤ l → 2 ≤ d → ∀ D : ZMod d → ℝ, 0 ≤ D →
-    (∀ s s' : ZMod d, D s' ≤ (l : ℝ) * D s) → Fnum l d D = rho l * (∑ s : ZMod d, D s) := by
+theorem UpperTheory.fnum_eq_rho_mul_sum_of_demand_ratio_le
+    : ∀ (l d : ℕ) [NeZero d],
+      3 ≤ l → 2 ≤ d
+        → ∀ D : ZMod d → ℝ,
+          0 ≤ D → (∀ s s' : ZMod d, D s' ≤ (l : ℝ) * D s)
+            → Fnum l d D = rho l * (∑ s : ZMod d, D s) := by
   intro l d _ hl hd D hD0 hr
   have hD : 0 ≤ D := fun a => hD0 a
   have hr' : ∀ s s' : ZMod d, D s' ≤ (l : ℝ) * D s := fun s s' => hr s s'

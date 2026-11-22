@@ -5,8 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RosVec
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -96,14 +98,19 @@ lemma per (A A' : Matrix (Fin r) (Fin r) ℤ) (i j : Fin r) :
   simp [Fin.sum_univ_six, rosVec, rosatiε, map_add (f := _), LinearMap.add_apply]
   abel
 
-theorem main {r : ℕ} (W A A' : Matrix (Fin r) (Fin r) ℤ)
-    (h : A.transpose * (W + W.transpose) = (W + W.transpose) * A') :
-    GlobalTheory.TensBal.sig W A A' ∈ Submodule.span ℤ
-      (Set.range fun p : GlobalTheory.TensBal.Vec r × GlobalTheory.TensBal.Vec r × GlobalTheory.TensBal.Vec r =>
-        GlobalTheory.TensBal.theta p.1 p.2.1 p.2.2) := by
+theorem main
+    {r : ℕ} (W A A' : Matrix (Fin r) (Fin r) ℤ)
+    (h : A.transpose * (W + W.transpose) = (W + W.transpose) * A')
+    : GlobalTheory.TensBal.sig W A A' ∈ Submodule.span ℤ
+      (Set.range
+        fun p
+            : GlobalTheory.TensBal.Vec r × GlobalTheory.TensBal.Vec r
+              × GlobalTheory.TensBal.Vec r =>
+          GlobalTheory.TensBal.theta p.1 p.2.1 p.2.2) := by
   rw [← Submodule.Quotient.mk_eq_zero]
-  have e : (Submodule.Quotient.mk (sig W A A') : (Vec r →₀ ℤ) ⧸ S r) =
-      ∑ i, ∑ j, W i j • ∑ a : Fin 6, rosatiε a • B r (rosVec A A' a i) (rosVec A A' a j) := by
+  have e
+      : (Submodule.Quotient.mk (sig W A A') : (Vec r →₀ ℤ) ⧸ S r)
+        = ∑ i, ∑ j, W i j • ∑ a : Fin 6, rosatiε a • B r (rosVec A A' a i) (rosVec A A' a j) := by
     rw [sig, ← Submodule.mkQ_apply]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_zsmul, Submodule.mkQ_apply, ← B_apply, Finset.smul_sum, smul_smul]

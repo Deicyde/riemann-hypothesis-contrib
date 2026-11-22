@@ -5,13 +5,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
 
 set_option maxHeartbeats 200000 in
-theorem UpperTheory.V.Base.inflUnique :
-    ∀ (k E Ω : Type) [Field k] [NumberField k] [Field E] [NumberField E] [Field Ω] [Algebra k E] [Algebra k Ω] [Algebra E Ω]
-      [IsScalarTower k E Ω] [IsAlgClosure k Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (D : LData E Ω l) (e : ℤ),
-      (∀ x, ∃ y, Infl k D e x y) ∧ ∀ x x' y y', Infl k D e x y → Infl k D e x' y' → (x = x' ↔ y = y') := by
+theorem UpperTheory.V.Base.inflUnique
+    : ∀ (k E Ω : Type) [Field k] [NumberField k] [Field E] [NumberField E] [Field Ω] [Algebra k E]
+        [Algebra k Ω] [Algebra E Ω] [IsScalarTower k E Ω] [IsAlgClosure k Ω] [IsAlgClosure E Ω]
+        (l : ℕ) [Fact l.Prime] (D : LData E Ω l) (e : ℤ),
+      (∀ x, ∃ y, Infl k D e x y)
+        ∧ ∀ x x' y y', Infl k D e x y → Infl k D e x' y' → (x = x' ↔ y = y') := by
   intro k E Ω _ _ _ _ _ _ _ _ _ _ _ l _ D e
   obtain ⟨hemb, -, -⟩ := galEmbTop k E Ω
   let ψ : G E Ω →* galOf k E Ω := (galEmb k E Ω).codRestrict _ (galEmb_mem k E Ω)
@@ -32,7 +35,9 @@ theorem UpperTheory.V.Base.inflUnique :
       rw [Ψ.apply_symm_apply]
     rw [hc]
     exact continuous_subtype_val
-  have hEk : ∀ σ : G E Ω, LDataCardLeFinrank.qzG k Ω l e (galEmb k E Ω σ) = LDataCardLeFinrank.qzG E Ω l e σ := by
+  have hEk
+      : ∀ σ : G E Ω,
+        LDataCardLeFinrank.qzG k Ω l e (galEmb k E Ω σ) = LDataCardLeFinrank.qzG E Ω l e σ := by
     intro σ
     have hχ : (cycZ k Ω l ^ (-e)).comp (galEmb k E Ω) = cycZ E Ω l ^ (-e) := by
       refine MonoidHom.ext fun τ => ?_
@@ -42,7 +47,10 @@ theorem UpperTheory.V.Base.inflUnique :
     show scalRep (QZ l) (cycZ k Ω l ^ (-e)) (galEmb k E Ω σ) = scalRep (QZ l) (cycZ E Ω l ^ (-e)) σ
     rw [← hχ]
     rfl
-  have hrep : ∀ σ : G E Ω, LDataCardLeFinrank.qzG k Ω l e (galEmb k E Ω σ) = qzTw D e (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 E))) σ) := by
+  have hrep
+      : ∀ σ : G E Ω,
+        LDataCardLeFinrank.qzG k Ω l e (galEmb k E Ω σ)
+          = qzTw D e (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 E))) σ) := by
     intro σ
     have h := DFunLike.congr_fun (LDataCardLeFinrank.qzTw_comp_toGS D e) σ
     rw [MonoidHom.comp_apply] at h
@@ -57,7 +65,9 @@ theorem UpperTheory.V.Base.inflUnique :
   constructor
   · intro x
     obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
-    let f : galOf k E Ω → QZ l := fun u => (z : GS Ω (D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 E))) (Ψ.symm u))
+    let f : galOf k E Ω → QZ l := fun u =>
+      (z : GS Ω (D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (toGS Ω
+        (D.S : Set (HeightOneSpectrum (𝓞 E))) (Ψ.symm u))
     have hf : f ∈ Z1U (LDataCardLeFinrank.qzG k Ω l e) (galOf k E Ω) := by
       refine ⟨z.2.1.comp ((continuous_toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 E)))).comp hcont), ?_⟩
       intro u v
@@ -70,7 +80,8 @@ theorem UpperTheory.V.Base.inflUnique :
     show (z : GS Ω (D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 E))) (Ψ.symm ⟨galEmb k E Ω σ, _⟩)) = _
     rw [← hΨ, Ψ.symm_apply_apply]
   · rintro x x' y y' ⟨z1, w1, rfl, rfl, h1⟩ ⟨z2, w2, rfl, rfl, h2⟩
-    rw [mk_eq_mk, Submodule.Quotient.eq, Submodule.mem_comap, Submodule.coe_subtype, mem_coboundaries1]
+    rw [mk_eq_mk, Submodule.Quotient.eq, Submodule.mem_comap, Submodule.coe_subtype,
+      mem_coboundaries1]
     apply exists_congr
     intro m
     constructor

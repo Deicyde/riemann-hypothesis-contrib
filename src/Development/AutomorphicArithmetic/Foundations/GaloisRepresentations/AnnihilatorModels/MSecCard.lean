@@ -7,15 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.GeomClaus
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.secCard_of :
-    SecCard := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.secCard_of : SecCard := by
   intro p _ D R _ b N M r w j c T hm K _ _ hp x y hxy
   subst hxy
   let β : R →+* K := (Spec.preimage (y ≫ T.s ≫ M.s)).hom
@@ -36,14 +38,15 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.secCard_of :
   rw [hm, Nat.one_mul] at hcard
   rw [← hcard]
   symm
-  have hK : ∀ a : Over.mk y ⟶ T.o.A,
-      KilledBy T.o w a ↔ KilledBy M.univ w (T.ms.ptEquiv (Over.mk y) a) := by
+  have hK
+      : ∀ a : Over.mk y ⟶ T.o.A,
+        KilledBy T.o w a ↔ KilledBy M.univ w (T.ms.ptEquiv (Over.mk y) a) := by
     intro a
     unfold KilledBy
     refine forall₂_congr (fun c _ => ?_)
     rw [← ObjMap.ptEquiv_act, MulEquiv.map_eq_one_iff]
-  have hker : ∀ a : Over.mk y ⟶ T.o.A,
-      KerAt T y (T.ms.ptEquiv (Over.mk y) a).left ↔ a ≫ T.ψ = 1 := by
+  have hker
+      : ∀ a : Over.mk y ⟶ T.o.A, KerAt T y (T.ms.ptEquiv (Over.mk y) a).left ↔ a ≫ T.ψ = 1 := by
     intro a
     rw [ObjMap.ptEquiv_left]
     constructor

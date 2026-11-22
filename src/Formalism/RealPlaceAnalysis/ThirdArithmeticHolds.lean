@@ -42,9 +42,10 @@ theorem wdCas : WDCas := by
     by_cases h : ε a = ε b
     · simp only [if_pos h, if_pos h.symm]
     · simp only [if_neg h]
-  have hS : (∑ a, ∑ b, ‖E a b w‖ ^ 2) =
-      (∑ a, ∑ b, ‖(if ε a = ε b then E a b else 0) w‖ ^ 2) +
-        ∑ a, ∑ b, (if ε a = ε b then 0 else ‖E a b w‖ ^ 2) := by
+  have hS
+      : (∑ a, ∑ b, ‖E a b w‖ ^ 2)
+        = (∑ a, ∑ b, ‖(if ε a = ε b then E a b else 0) w‖ ^ 2)
+          + ∑ a, ∑ b, (if ε a = ε b then 0 else ‖E a b w‖ ^ 2) := by
     rw [← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl (fun a _ => ?_)
     rw [← Finset.sum_add_distrib]
@@ -57,7 +58,8 @@ theorem wdCas : WDCas := by
   first | rw [two_nsmul] at h1 h2 | rw [two_smul] at h1 h2
   rw [add_sub_cancel_right, hK, inner_smul_right, inner_self_eq_norm_sq_to_K] at h2
   rw [LinearMap.sub_apply, LinearMap.add_apply, inner_sub_right, inner_add_right, hK,
-    inner_smul_right, inner_self_eq_norm_sq_to_K] at h1
+      inner_smul_right, inner_self_eq_norm_sq_to_K]
+    at h1
   push_cast at h1 h2 hSc ⊢
   linear_combination h1 - hSc - h2
 theorem rhoStd : RhoStd := half_sum_roots_standard
@@ -84,6 +86,7 @@ namespace Formalism.REAL
 theorem qSkewRow : QSkewRow := quantumMinorRowSkew_holds
 theorem qSkewCol : QSkewCol := quantumMinorColSkew_holds
 theorem qDetHW : QDetHW := quantumDetHighestWeight_holds
-theorem qDetCentral : QDetCentral := qDetCentral_of quantumMinorRowSkew_holds quantumMinorColSkew_holds
+theorem qDetCentral : QDetCentral :=
+  qDetCentral_of quantumMinorRowSkew_holds quantumMinorColSkew_holds
 theorem qComatrix : QComatrix := qComatrix_of quantumMinorRowSkew_holds quantumMinorColSkew_holds
 end Formalism.REAL

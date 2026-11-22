@@ -11,17 +11,20 @@ open Matrix Complex
 
 namespace PositivityTheory.Rg.Sw.Glob.VacG
 
-open PositivityTheory.Rg.Sw PositivityTheory.Rg.Sw.Glob PositivityTheory.Rg.Sw.Glob.VacB PositivityTheory.Rg.Sw.Glob.VacD PositivityTheory.Rg.Sw.Glob.VacU
+open PositivityTheory.Rg.Sw PositivityTheory.Rg.Sw.Glob PositivityTheory.Rg.Sw.Glob.VacB
+  PositivityTheory.Rg.Sw.Glob.VacD PositivityTheory.Rg.Sw.Glob.VacU
 
 variable {n : ℕ}
 
-theorem inK_blocks (k : M2 n) (hk : InK k) :
-    k.toBlocks₂₁ = -k.toBlocks₁₂ ∧ k.toBlocks₂₂ = k.toBlocks₁₁ := by
+theorem inK_blocks (k : M2 n) (hk : InK k)
+    : k.toBlocks₂₁ = -k.toBlocks₁₂ ∧ k.toBlocks₂₂ = k.toBlocks₁₁ := by
   unfold InK InG at hk
   obtain ⟨hG, hU⟩ := hk
   have hU' : k * kᴴ = 1 := mul_eq_one_comm.mp hU
   have hc : JJ n * k = k * JJ n := by
-    calc JJ n * k = (k * kᴴ) * JJ n * k := by rw [hU', Matrix.one_mul]
+    calc
+      JJ n * k
+        = (k * kᴴ) * JJ n * k := by rw [hU', Matrix.one_mul]
       _ = k * (kᴴ * JJ n * k) := by simp only [Matrix.mul_assoc]
       _ = k * JJ n := by rw [hG]
   rw [← fromBlocks_toBlocks k] at hc
@@ -30,29 +33,34 @@ theorem inK_blocks (k : M2 n) (hk : InK k) :
   simp at hc
   exact ⟨hc.1, hc.2.1⟩
 
-theorem mM_unitary (u : Matrix (Fin n) (Fin n) ℂ) (hu : uᴴ * u = 1) : mM u = fromBlocks u 0 0 u := by
+theorem mM_unitary (u : Matrix (Fin n) (Fin n) ℂ) (hu : uᴴ * u = 1)
+    : mM u = fromBlocks u 0 0 u := by
   rw [mM, Matrix.inv_eq_right_inv hu]
 
-theorem dR_cos_add_sin (θ : Fin n → ℝ) :
-    (dR fun j => Real.cos (θ j)) + I • (dR fun j => Real.sin (θ j)) = diagonal fun j => cexp (I * (θ j : ℂ)) := by
+theorem dR_cos_add_sin (θ : Fin n → ℝ)
+    : (dR fun j => Real.cos (θ j)) + I • (dR fun j => Real.sin (θ j))
+      = diagonal fun j => cexp (I * (θ j : ℂ)) := by
   ext i j
   by_cases h : i = j
   · subst h
-    simp [dR, Matrix.diagonal_apply_eq, Complex.ofReal_cos, Complex.ofReal_sin, mul_comm I, Complex.exp_mul_I]
+    simp [dR, Matrix.diagonal_apply_eq, Complex.ofReal_cos, Complex.ofReal_sin, mul_comm I,
+      Complex.exp_mul_I]
   · simp [dR, Matrix.diagonal_apply_ne _ h]
 
-theorem dR_cos_sub_sin (θ : Fin n → ℝ) :
-    (dR fun j => Real.cos (θ j)) - I • (dR fun j => Real.sin (θ j)) = diagonal fun j => cexp (-(I * (θ j : ℂ))) := by
+theorem dR_cos_sub_sin (θ : Fin n → ℝ)
+    : (dR fun j => Real.cos (θ j)) - I • (dR fun j => Real.sin (θ j))
+      = diagonal fun j => cexp (-(I * (θ j : ℂ))) := by
   ext i j
   by_cases h : i = j
   · subst h
-    simp [dR, Matrix.diagonal_apply_eq, Complex.ofReal_cos, Complex.ofReal_sin, ← neg_mul, mul_comm I,
-      Complex.exp_mul_I, Complex.cos_neg, Complex.sin_neg]
+    simp [dR, Matrix.diagonal_apply_eq, Complex.ofReal_cos, Complex.ofReal_sin, ← neg_mul,
+      mul_comm I, Complex.exp_mul_I, Complex.cos_neg, Complex.sin_neg]
     ring
   · simp [dR, Matrix.diagonal_apply_ne _ h]
 
-theorem uni_I (A B : Matrix (Fin n) (Fin n) ℂ) (e11 : Aᴴ * A + Bᴴ * B = 1) (e12 : Aᴴ * B + -(Bᴴ * A) = 0) :
-    (A + I • B)ᴴ * (A + I • B) = 1 := by
+theorem uni_I
+    (A B : Matrix (Fin n) (Fin n) ℂ) (e11 : Aᴴ * A + Bᴴ * B = 1) (e12 : Aᴴ * B + -(Bᴴ * A) = 0)
+    : (A + I • B)ᴴ * (A + I • B) = 1 := by
   have hs : star (I : ℂ) = -I := by rw [Complex.star_def, Complex.conj_I]
   simp only [conjTranspose_add, conjTranspose_smul, hs, add_mul, mul_add, Matrix.smul_mul,
     Matrix.mul_smul, smul_smul]
@@ -62,8 +70,9 @@ theorem uni_I (A B : Matrix (Fin n) (Fin n) ℂ) (e11 : Aᴴ * A + Bᴴ * B = 1)
   rw [hI, one_smul, h2, neg_smul]
   abel
 
-theorem uni_mI (A B : Matrix (Fin n) (Fin n) ℂ) (e11 : Aᴴ * A + Bᴴ * B = 1) (e12 : Aᴴ * B + -(Bᴴ * A) = 0) :
-    (A - I • B)ᴴ * (A - I • B) = 1 := by
+theorem uni_mI
+    (A B : Matrix (Fin n) (Fin n) ℂ) (e11 : Aᴴ * A + Bᴴ * B = 1) (e12 : Aᴴ * B + -(Bᴴ * A) = 0)
+    : (A - I • B)ᴴ * (A - I • B) = 1 := by
   have hs : star (I : ℂ) = -I := by rw [Complex.star_def, Complex.conj_I]
   simp only [conjTranspose_sub, conjTranspose_smul, hs, sub_mul, mul_sub, Matrix.smul_mul,
     Matrix.mul_smul, smul_smul]
@@ -73,9 +82,10 @@ theorem uni_mI (A B : Matrix (Fin n) (Fin n) ℂ) (e11 : Aᴴ * A + Bᴴ * B = 1
   rw [hI, one_smul, h2, neg_smul]
   abel
 
-theorem kak (k : M2 n) (hk : InK k) :
-    ∃ (u u' : Matrix (Fin n) (Fin n) ℂ) (θ : Fin n → ℝ), uᴴ * u = 1 ∧ u'ᴴ * u' = 1 ∧
-      (∀ j, -(Real.pi / 2) < θ j ∧ θ j ≤ Real.pi / 2) ∧ k = mM u * kth θ * mM u' := by
+theorem kak (k : M2 n) (hk : InK k)
+    : ∃ (u u' : Matrix (Fin n) (Fin n) ℂ) (θ : Fin n → ℝ),
+      uᴴ * u = 1 ∧ u'ᴴ * u' = 1 ∧ (∀ j, -(Real.pi / 2) < θ j ∧ θ j ≤ Real.pi / 2)
+        ∧ k = mM u * kth θ * mM u' := by
   obtain ⟨h21, h22⟩ := inK_blocks k hk
   have hU : kᴴ * k = 1 := hk.2
   set A := k.toBlocks₁₁ with hA0
@@ -103,17 +113,20 @@ theorem kak (k : M2 n) (hk : InK k) :
   set Db : Matrix (Fin n) (Fin n) ℂ := diagonal fun j => cexp (-(I * (θ j : ℂ))) with hDb
   have hDDb : D * Db = 1 := by
     rw [hD, hDb, diagonal_mul_diagonal, ← diagonal_one]
-    congr 1; funext j
+    congr 1
+    funext j
     rw [← Complex.exp_add, add_neg_cancel, Complex.exp_zero]
   have hDbH : Dbᴴ = D := by
     rw [hD, hDb, diagonal_conjTranspose]
-    congr 1; funext j
+    congr 1
+    funext j
     simp only [Pi.star_apply]
     rw [Complex.star_def, ← Complex.exp_conj, map_neg, map_mul, Complex.conj_I, Complex.conj_ofReal,
       neg_mul, neg_neg]
   have hDb2 : Db * Db = (diagonal w)ᴴ := by
     rw [hDb, diagonal_mul_diagonal, diagonal_conjTranspose]
-    congr 1; funext j
+    congr 1
+    funext j
     simp only [Pi.star_apply]
     have hwj : w j = cexp (↑(Complex.arg (w j)) * I) := by
       conv_lhs => rw [← Complex.norm_mul_exp_arg_mul_I (w j)]
@@ -128,20 +141,25 @@ theorem kak (k : M2 n) (hk : InK k) :
   set u' := Db * Pᴴ * W with hu0
   have hu' : u'ᴴ * u' = 1 := by
     rw [hu0, conjTranspose_mul, conjTranspose_mul, conjTranspose_conjTranspose, hDbH]
-    calc Wᴴ * (P * D) * (Db * Pᴴ * W) = Wᴴ * (P * (D * Db) * Pᴴ) * W := by
-          simp only [Matrix.mul_assoc]
+    calc
+      Wᴴ * (P * D) * (Db * Pᴴ * W)
+        = Wᴴ * (P * (D * Db) * Pᴴ) * W := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hDDb, Matrix.mul_one, hP', Matrix.mul_one, hW]
   have hPD : P * D * u' = W := by
-    calc P * D * u' = P * (D * Db) * Pᴴ * W := by simp only [hu0, Matrix.mul_assoc]
+    calc
+      P * D * u'
+        = P * (D * Db) * Pᴴ * W := by simp only [hu0, Matrix.mul_assoc]
       _ = W := by rw [hDDb, Matrix.mul_one, hP', Matrix.one_mul]
   have hPDb : P * Db * u' = V := by
-    calc P * Db * u' = (P * (Db * Db) * Pᴴ) * W := by simp only [hu0, Matrix.mul_assoc]
+    calc
+      P * Db * u'
+        = (P * (Db * Db) * Pᴴ) * W := by simp only [hu0, Matrix.mul_assoc]
       _ = (W * Vᴴ)ᴴ * W := by
-          rw [hDb2, hXd, conjTranspose_mul, conjTranspose_mul, conjTranspose_conjTranspose,
-            Matrix.mul_assoc]
-          simp only [Matrix.mul_assoc]
+        rw [hDb2, hXd, conjTranspose_mul, conjTranspose_mul, conjTranspose_conjTranspose,
+          Matrix.mul_assoc]
+        simp only [Matrix.mul_assoc]
       _ = V := by
-          rw [conjTranspose_mul, conjTranspose_conjTranspose, Matrix.mul_assoc, hW, Matrix.mul_one]
+        rw [conjTranspose_mul, conjTranspose_conjTranspose, Matrix.mul_assoc, hW, Matrix.mul_one]
   have hCS := dR_cos_add_sin θ
   have hCSm := dR_cos_sub_sin θ
   rw [← hD] at hCS

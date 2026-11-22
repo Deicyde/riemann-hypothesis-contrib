@@ -10,20 +10,26 @@ namespace Formalism.L2.Pj.CompSplitPfC
 
 open TensorProduct
 
-variable {P S : Type} [CommRing P] [IsDomain P] [IsIntegrallyClosed P] [CommRing S] [Algebra P S]
-  [Algebra.Etale P S]
+variable
+  {P S : Type}
+  [CommRing P] [IsDomain P] [IsIntegrallyClosed P] [CommRing S] [Algebra P S] [Algebra.Etale P S]
 
 theorem cspC_alg (s : S) : algebraMap S (S ⊗[P] FractionRing P) s = s ⊗ₜ (1 : FractionRing P) := rfl
 
 theorem cspC_inj : Function.Injective (algebraMap S (S ⊗[P] FractionRing P)) := by
   have hf : Function.Injective (Algebra.linearMap P (FractionRing P)) :=
     IsFractionRing.injective P (FractionRing P)
-  have h2 := Module.Flat.lTensor_preserves_injective_linearMap (M := S)
-    (Algebra.linearMap P (FractionRing P)) hf
-  have key : ∀ s : S, algebraMap S (S ⊗[P] FractionRing P) s =
-      (LinearMap.lTensor S (Algebra.linearMap P (FractionRing P))) ((TensorProduct.rid P S).symm s) := by
+  have h2 :=
+    Module.Flat.lTensor_preserves_injective_linearMap (M := S)
+      (Algebra.linearMap P (FractionRing P)) hf
+  have key
+      : ∀ s : S,
+        algebraMap S (S ⊗[P] FractionRing P) s
+          = (LinearMap.lTensor S (Algebra.linearMap P (FractionRing P)))
+            ((TensorProduct.rid P S).symm s) := by
     intro s
-    rw [cspC_alg, TensorProduct.rid_symm_apply, LinearMap.lTensor_tmul, Algebra.linearMap_apply, map_one]
+    rw [cspC_alg, TensorProduct.rid_symm_apply, LinearMap.lTensor_tmul, Algebra.linearMap_apply,
+      map_one]
   intro a b h
   rw [key, key] at h
   exact (TensorProduct.rid P S).symm.injective (h2 h)
@@ -36,9 +42,10 @@ theorem cspC_artinian : IsArtinianRing (S ⊗[P] FractionRing P) := by
   exact Function.Surjective.isArtinianRing (f := (Algebra.TensorProduct.comm P (FractionRing P) S))
     (Algebra.TensorProduct.comm P (FractionRing P) S).surjective
 
-theorem cspC_range (y : S ⊗[P] integralClosure P (FractionRing P)) :
-    ∃ s : S, algebraMap S (S ⊗[P] FractionRing P) s =
-      Algebra.TensorProduct.map (AlgHom.id P S) (integralClosure P (FractionRing P)).val y := by
+theorem cspC_range (y : S ⊗[P] integralClosure P (FractionRing P))
+    : ∃ s : S,
+      algebraMap S (S ⊗[P] FractionRing P) s
+        = Algebra.TensorProduct.map (AlgHom.id P S) (integralClosure P (FractionRing P)).val y := by
   induction y using TensorProduct.induction_on with
   | zero => exact ⟨0, by simp⟩
   | tmul s z =>
@@ -51,21 +58,28 @@ theorem cspC_range (y : S ⊗[P] integralClosure P (FractionRing P)) :
     obtain ⟨s', hs'⟩ := hb
     exact ⟨s + s', by rw [map_add (f := _), map_add (f := _), hs, hs']⟩
 
-theorem cspC_idem_of {r : S ⊗[P] FractionRing P} (hr : IsIdempotentElem r) :
-    ∃ s : S, algebraMap S (S ⊗[P] FractionRing P) s = r := by
+theorem cspC_idem_of {r : S ⊗[P] FractionRing P} (hr : IsIdempotentElem r)
+    : ∃ s : S, algebraMap S (S ⊗[P] FractionRing P) s = r := by
   have hint : IsIntegral S r := by
-    refine ⟨Polynomial.X * (Polynomial.X - Polynomial.C 1), Polynomial.monic_X.mul (Polynomial.monic_X_sub_C 1), ?_⟩
+    refine ⟨
+      Polynomial.X * (Polynomial.X - Polynomial.C 1),
+      Polynomial.monic_X.mul (Polynomial.monic_X_sub_C 1),
+      ?_
+    ⟩
     simp [mul_sub, hr.eq]
-  obtain ⟨y, hy⟩ := (TensorProduct.toIntegralClosure_bijective_of_smooth (R := P) (S := S)
-    (B := FractionRing P)).2 ⟨r, hint⟩
+  obtain ⟨y, hy⟩ :=
+    (TensorProduct.toIntegralClosure_bijective_of_smooth (R := P) (S := S) (B := FractionRing P)).2
+      ⟨r, hint⟩
   obtain ⟨s, hs⟩ := cspC_range y
   refine ⟨s, hs.trans ?_⟩
   exact congrArg Subtype.val hy
 
 variable (P) in
 include P in
-theorem cspC_minimal_unique {q P1 P2 : Ideal S} [hq : q.IsPrime] (h1 : P1 ∈ minimalPrimes S)
-    (h2 : P2 ∈ minimalPrimes S) (hq1 : P1 ≤ q) (hq2 : P2 ≤ q) : P1 = P2 := by
+theorem cspC_minimal_unique
+    {q P1 P2 : Ideal S} [hq : q.IsPrime]
+    (h1 : P1 ∈ minimalPrimes S) (h2 : P2 ∈ minimalPrimes S) (hq1 : P1 ≤ q) (hq2 : P2 ≤ q)
+    : P1 = P2 := by
   by_contra hne
   let M := Algebra.algebraMapSubmonoid S (nonZeroDivisors P)
   have hP1 : P1.IsPrime := Ideal.minimalPrimes_isPrime h1
@@ -76,7 +90,9 @@ theorem cspC_minimal_unique {q P1 P2 : Ideal S} [hq : q.IsPrime] (h1 : P1 ∈ mi
     have hnzd : m ∈ nonZeroDivisors S := by
       refine mem_nonZeroDivisors_iff_right.2 fun x hx => cspC_inj (P := P) ?_
       have hu := IsLocalization.map_units (S ⊗[P] FractionRing P) (⟨m, hm⟩ : M)
-      have h0 : algebraMap S (S ⊗[P] FractionRing P) x * algebraMap S (S ⊗[P] FractionRing P) m = 0 := by
+      have h0
+          : algebraMap S (S ⊗[P] FractionRing P) x * algebraMap S (S ⊗[P] FractionRing P) m
+            = 0 := by
         rw [← map_mul, hx, map_zero]
       rw [map_zero]
       exact (hu.mul_left_eq_zero).1 h0

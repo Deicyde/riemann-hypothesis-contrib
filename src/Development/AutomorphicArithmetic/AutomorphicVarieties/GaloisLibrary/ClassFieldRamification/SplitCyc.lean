@@ -9,8 +9,11 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.splitCyc :
-    ∀ (N : ℕ) [NeZero N] (C : Type) [Field C] [NumberField C] [IsCyclotomicExtension {N} ℚ C] (v : HeightOneSpectrum (𝓞 ℚ)) (p : ℕ), p.Prime → (p : 𝓞 ℚ) ∈ v.asIdeal → ¬ p ∣ N → GroundTheory.Global.SplitsCompletely C v → p ≡ 1 [MOD N] := by
+theorem UpperTheory.V.CF.splitCyc
+    : ∀ (N : ℕ) [NeZero N] (C : Type) [Field C] [NumberField C] [IsCyclotomicExtension {N} ℚ C]
+        (v : HeightOneSpectrum (𝓞 ℚ)) (p : ℕ),
+      p.Prime → (p : 𝓞 ℚ) ∈ v.asIdeal → ¬ p ∣ N → GroundTheory.Global.SplitsCompletely C v
+        → p ≡ 1 [MOD N] := by
   intro N _ C _ _ _ v p hp hpv hpN hspl
   haveI := Fact.mk hp
   haveI := v.isMaximal
@@ -21,11 +24,14 @@ theorem UpperTheory.V.CF.splitCyc :
     rw [Ideal.span_singleton_le_iff_mem, Ideal.under, Ideal.mem_comap, map_natCast]
     exact hpv
   haveI : v.asIdeal.LiesOver (Ideal.span {(p : ℤ)}) := ⟨hvZ.symm⟩
-  have hsurj : Function.Surjective (algebraMap ℤ (𝓞 ℚ)) := fun y => ⟨Rat.ringOfIntegersEquiv y, by
-    have h : (Rat.ringOfIntegersEquiv.symm : ℤ →+* 𝓞 ℚ) = algebraMap ℤ (𝓞 ℚ) :=
-      Subsingleton.elim _ _
-    rw [← h]
-    exact Rat.ringOfIntegersEquiv.symm_apply_apply y⟩
+  have hsurj : Function.Surjective (algebraMap ℤ (𝓞 ℚ)) := fun y => ⟨
+    Rat.ringOfIntegersEquiv y,
+    by
+      have h : (Rat.ringOfIntegersEquiv.symm : ℤ →+* 𝓞 ℚ) = algebraMap ℤ (𝓞 ℚ) :=
+        Subsingleton.elim _ _
+      rw [← h]
+      exact Rat.ringOfIntegersEquiv.symm_apply_apply y
+  ⟩
   have hv1 : v.asIdeal.inertiaDeg ℤ = 1 := by
     letI := Ideal.Quotient.field (Ideal.span {(p : ℤ)})
     letI := Ideal.Quotient.field v.asIdeal

@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Local
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
@@ -18,11 +20,13 @@ namespace GlobalTheory
 
 namespace SurjIsogeny
 
-theorem eq_bot_of_comap_eq_bot {K R S : Type} [Field K] [CommRing R] [CommRing S] [IsDomain R]
-    [IsDomain S] [Algebra K R] [Algebra K S] (φ : R →+* S)
-    (hφ : φ.comp (algebraMap K R) = algebraMap K S) {g : ℕ}
-    (hR : Algebra.trdeg K R = g) (hS : Algebra.trdeg K S = g) {p : Ideal S}
-    (hp : p.comap φ = ⊥) : p = ⊥ := by
+theorem eq_bot_of_comap_eq_bot
+    {K R S : Type}
+    [Field K] [CommRing R] [CommRing S] [IsDomain R] [IsDomain S] [Algebra K R] [Algebra K S]
+    (φ : R →+* S) (hφ : φ.comp (algebraMap K R) = algebraMap K S)
+    {g : ℕ} (hR : Algebra.trdeg K R = g) (hS : Algebra.trdeg K S = g)
+    {p : Ideal S} (hp : p.comap φ = ⊥)
+    : p = ⊥ := by
   algebraize [φ]
   have : IsScalarTower K R S := IsScalarTower.of_algebraMap_eq' hφ.symm
   have : FaithfulSMul R S := by
@@ -38,20 +42,27 @@ theorem eq_bot_of_comap_eq_bot {K R S : Type} [Field K] [CommRing R] [CommRing S
   obtain ⟨x, hx, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
   exact Ideal.comap_ne_bot_of_algebraic_mem hx0 hx (halg.1 x) hp
 
-theorem eq_genericPoint_iff {X : Scheme.{0}} [IsIntegral X] {R : CommRingCat.{0}} [IsDomain R]
-    (j : Spec R ⟶ X) [IsOpenImmersion j] (p : Spec R) :
-    j p = genericPoint X ↔ p.asIdeal = ⊥ := by
+theorem eq_genericPoint_iff
+    {X : Scheme.{0}} [IsIntegral X]
+    {R : CommRingCat.{0}} [IsDomain R]
+    (j : Spec R ⟶ X) [IsOpenImmersion j]
+    (p : Spec R)
+    : j p = genericPoint X ↔ p.asIdeal = ⊥ := by
   rw [← genericPoint_eq_of_isOpenImmersion j, j.isOpenEmbedding.injective.eq_iff,
     genericPoint_eq_bot_of_affine]
   exact ⟨fun h => h ▸ rfl, fun h => PrimeSpectrum.ext h⟩
 
-theorem eq_genericPoint_of_apply_eq {K : Type} [Field K] {X Y : Scheme.{0}} [IsIntegral X]
-    [IsIntegral Y] (f : X ⟶ Y) (s : Y ⟶ Spec (CommRingCat.of K)) {g : ℕ}
-    (hY : SmoothOfRelativeDimension g s) (hX : SmoothOfRelativeDimension g (f ≫ s)) {x : X}
-    (hx : f x = genericPoint Y) : x = genericPoint X := by
+theorem eq_genericPoint_of_apply_eq
+    {K : Type} [Field K]
+    {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y]
+    (f : X ⟶ Y)
+    (s : Y ⟶ Spec (CommRingCat.of K))
+    {g : ℕ} (hY : SmoothOfRelativeDimension g s) (hX : SmoothOfRelativeDimension g (f ≫ s))
+    {x : X} (hx : f x = genericPoint Y)
+    : x = genericPoint X := by
   obtain ⟨R, j, hj, y, hy⟩ := Scheme.exists_Spec_apply_eq (f x)
-  obtain ⟨S, k, hk, ⟨p, rfl⟩, hsub⟩ := Scheme.exists_affine_mem_range_and_range_subset
-    (x := x) (U := f ⁻¹ᵁ j.opensRange) ⟨y, hy⟩
+  obtain ⟨S, k, hk, ⟨p, rfl⟩, hsub⟩ :=
+    Scheme.exists_affine_mem_range_and_range_subset (x := x) (U := f ⁻¹ᵁ j.opensRange) ⟨y, hy⟩
   have hr : Set.range (k ≫ f) ⊆ Set.range j := by
     rintro _ ⟨z, rfl⟩
     exact hsub ⟨z, rfl⟩
@@ -67,21 +78,29 @@ theorem eq_genericPoint_of_apply_eq {K : Type} [Field K] {X Y : Scheme.{0}} [IsI
   letI : Algebra K R := α.hom.toAlgebra
   letI : Algebra K S := (α ≫ φ).hom.toAlgebra
   have hR := trdeg_eq_of_smoothOfRelativeDimension K Y s g hY R j hj hα.symm
-  have hS := trdeg_eq_of_smoothOfRelativeDimension K X (f ≫ s) g hX S k hk (by
-    rw [← reassoc_of% hw, ← hα, ← Spec.map_comp]; rfl)
+  have hS :=
+    trdeg_eq_of_smoothOfRelativeDimension K X (f ≫ s) g hX S k hk
+      (by rw [← reassoc_of% hw, ← hα, ← Spec.map_comp]; rfl)
   rw [eq_genericPoint_iff]
   refine eq_bot_of_comap_eq_bot φ.hom rfl hR hS ?_
   refine (eq_genericPoint_iff j (Spec.map φ p)).1 ?_
   rw [← Scheme.Hom.comp_apply, hw, Scheme.Hom.comp_apply, hx]
 
-theorem isPullback_kernel_mul {C : Type*} [Category C] [CartesianMonoidalCategory C]
-    {Z A B : C} [GrpObj A] [GrpObj B] {i : Z ⟶ A} {ψ : A ⟶ B} [IsMonHom ψ]
-    (hp : IsPullback i (toUnit Z) ψ η[B]) :
-    IsPullback ((fst Z A ≫ i) * snd Z A) (snd Z A) ψ ψ := by
+theorem isPullback_kernel_mul
+    {C : Type*} [Category C] [CartesianMonoidalCategory C]
+    {Z A B : C} [GrpObj A] [GrpObj B]
+    {i : Z ⟶ A} {ψ : A ⟶ B} [IsMonHom ψ]
+    (hp : IsPullback i (toUnit Z) ψ η[B])
+    : IsPullback ((fst Z A ≫ i) * snd Z A) (snd Z A) ψ ψ := by
   have hi : i ≫ ψ = 1 := hp.w
-  refine ⟨⟨?_⟩, ⟨PullbackCone.IsLimit.mk _
-    (fun s => lift (hp.lift (s.fst * s.snd⁻¹) (toUnit _) ?_) s.snd) (fun s => ?_) (fun s => ?_)
-    (fun s m h1 h2 => ?_)⟩⟩
+  refine ⟨
+    ⟨?_⟩,
+    ⟨PullbackCone.IsLimit.mk _
+      (fun s => lift (hp.lift (s.fst * s.snd⁻¹) (toUnit _) ?_) s.snd)
+      (fun s => ?_)
+      (fun s => ?_)
+      (fun s m h1 h2 => ?_)⟩
+  ⟩
   · rw [MonObj.mul_comp, Category.assoc, hi, MonObj.comp_one, _root_.one_mul]
   · rw [MonObj.mul_comp, GrpObj.inv_comp, s.condition, mul_inv_cancel, Hom.one_def]
   · rw [MonObj.comp_mul, lift_fst_assoc, hp.lift_fst, lift_snd, inv_mul_cancel_right]
@@ -90,10 +109,12 @@ theorem isPullback_kernel_mul {C : Type*} [Category C] [CartesianMonoidalCategor
     refine hp.hom_ext ?_ (toUnit_unique _ _)
     rw [lift_fst, hp.lift_fst, ← h1, ← h2, MonObj.comp_mul, mul_inv_cancel_right, Category.assoc]
 
-theorem locallyQuasiFinite_of_finite_fibre {S : Scheme.{0}} [Subsingleton S] {A B : Over S}
-    [GrpObj A] [GrpObj B] (ψ : A ⟶ B) [IsMonHom ψ] [Surjective ψ.left]
-    [LocallyOfFiniteType ψ.left] [QuasiCompact ψ.left] (a : A.left)
-    (h : (ψ.left ⁻¹' {ψ.left a}).Finite) : LocallyQuasiFinite ψ.left := by
+theorem locallyQuasiFinite_of_finite_fibre
+    {S : Scheme.{0}} [Subsingleton S]
+    {A B : Over S} [GrpObj A] [GrpObj B]
+    (ψ : A ⟶ B) [IsMonHom ψ] [Surjective ψ.left] [LocallyOfFiniteType ψ.left] [QuasiCompact ψ.left]
+    (a : A.left) (h : (ψ.left ⁻¹' {ψ.left a}).Finite)
+    : LocallyQuasiFinite ψ.left := by
   have hp : IsPullback (pullback.fst ψ η[B]) (toUnit _) ψ η[B] := by
     have := IsPullback.of_hasPullback ψ η[B]
     rwa [toUnit_unique (pullback.snd ψ η[B]) (toUnit _)] at this
@@ -117,8 +138,8 @@ theorem locallyQuasiFinite_of_finite_fibre {S : Scheme.{0}} [Subsingleton S] {A 
       inferInstanceAs (LocallyOfFiniteType (pullback.snd _ _))
     exact LocallyQuasiFinite.of_finite_preimage_singleton _ fun _ => Set.toFinite _
   rw [← Scheme.Hom.SpecMap_residueFieldMap_fromSpecResidueField] at h3
-  have h5 := h3.of_right' (IsPullback.of_hasPullback ψ.left
-    (B.left.fromSpecResidueField (ψ.left a)))
+  have h5 :=
+    h3.of_right' (IsPullback.of_hasPullback ψ.left (B.left.fromSpecResidueField (ψ.left a)))
   have h6 : LocallyQuasiFinite (pullback.snd (pullback.snd Z.hom A.hom) j) :=
     MorphismProperty.of_isPullback (P := @LocallyQuasiFinite) h5 hF
   have h7 : LocallyQuasiFinite Z.hom :=
@@ -129,25 +150,32 @@ theorem locallyQuasiFinite_of_finite_fibre {S : Scheme.{0}} [Subsingleton S] {A 
 
 end SurjIsogeny
 
-
 open SurjIsogeny IsogenyModel in
-theorem isogeny_of_surjective_of_dim_eq : Out.Laws → ∀ (K : Type) [Field K] (P : Out.PolAV (Sp K)) (B : Over (Sp K)) [GrpObj B] (ψ : P.A ⟶ B), IsAbelianScheme B → SmoothOfRelativeDimension P.g B.hom → IsMonHom ψ → Surjective ψ.left → IsFinite ψ.left ∧ Flat ψ.left ∧ ∃ n : ℕ, 1 ≤ n ∧ ∀ (T : Over (Sp K)) (x : T ⟶ P.A), x ≫ ψ = 1 → x ^ n = 1 := by
+theorem isogeny_of_surjective_of_dim_eq
+    : Out.Laws
+      → ∀ (K : Type) [Field K] (P : Out.PolAV (Sp K)) (B : Over (Sp K)) [GrpObj B] (ψ : P.A ⟶ B),
+        IsAbelianScheme B → SmoothOfRelativeDimension P.g B.hom → IsMonHom ψ → Surjective ψ.left
+          → IsFinite ψ.left ∧ Flat ψ.left
+            ∧ ∃ n : ℕ, 1 ≤ n ∧ ∀ (T : Over (Sp K)) (x : T ⟶ P.A), x ≫ ψ = 1 → x ^ n = 1 := by
   intro hL K _ P B _ ψ hB hg _ _
   have := hB.proper
   have := P.isAb.proper
   have := P.isAb.comm
-  have := forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ B.hom hB.smooth
-    hB.geomConnected
+  have :=
+    forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ B.hom hB.smooth
+      hB.geomConnected
   have : IsIntegral B.left := GeometricallyIntegral.isIntegral_of_subsingleton B.hom
-  have := forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ P.A.hom
-    P.isAb.smooth P.isAb.geomConnected
+  have :=
+    forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ P.A.hom P.isAb.smooth
+      P.isAb.geomConnected
   have : IsIntegral P.A.left := GeometricallyIntegral.isIntegral_of_subsingleton P.A.hom
   have : IsProper (ψ.left ≫ B.hom) := by rw [Over.w]; infer_instance
   have : IsProper ψ.left := IsProper.of_comp ψ.left B.hom
   have hA : SmoothOfRelativeDimension P.g (ψ.left ≫ B.hom) := by rw [Over.w]; exact P.smoothDim
   obtain ⟨a, ha⟩ := ψ.left.surjective (genericPoint B.left)
   have : LocallyQuasiFinite ψ.left := by
-    refine locallyQuasiFinite_of_finite_fibre ψ a ((Set.finite_singleton (genericPoint _)).subset ?_)
+    refine locallyQuasiFinite_of_finite_fibre ψ a
+      ((Set.finite_singleton (genericPoint _)).subset ?_)
     intro x hx
     exact eq_genericPoint_of_apply_eq ψ.left B.hom hg hA (ha ▸ hx)
   have hf : IsFinite ψ.left := .of_isProper_of_locallyQuasiFinite _
@@ -162,12 +190,16 @@ theorem isogeny_of_surjective_of_dim_eq : Out.Laws → ∀ (K : Type) [Field K] 
   · have : IsIso e.hom.left := inferInstanceAs (IsIso ((Over.forget _).map e.hom))
     rw [← he, Over.comp_left]
     infer_instance
-  · have h1 : i ^ N = 1 := by
-      rw [← Category.id_comp i, ← MonObj.pow_comp, hZN, MonObj.one_comp]
+  · have h1 : i ^ N = 1 := by rw [← Category.id_comp i, ← MonObj.pow_comp, hZN, MonObj.one_comp]
     rw [← hk.lift_fst x (toUnit _) hx, ← MonObj.comp_pow, h1, MonObj.comp_one]
 
-theorem isogeny_of_surjective_polAV : ThetaUnifAV → Out.Laws → ∀ (K : Type) [Field K] (σ : K →+* ℂ) (P P' : Out.PolAV (Sp K)) (ψ : P.A ⟶ P'.A), P.g = P'.g → IsMonHom ψ → Surjective ψ.left → IsFinite ψ.left ∧ Flat ψ.left ∧ ∃ n : ℕ, 1 ≤ n ∧ ∀ (T : Over (Sp K)) (x : T ⟶ P.A), x ≫ ψ = 1 → x ^ n = 1 :=
-  fun _ hL K _ _ P P' ψ hg => isogeny_of_surjective_of_dim_eq hL K P P'.A ψ P'.isAb
-    (hg ▸ P'.smoothDim)
+theorem isogeny_of_surjective_polAV
+    : ThetaUnifAV → Out.Laws
+      → ∀ (K : Type) [Field K] (σ : K →+* ℂ) (P P' : Out.PolAV (Sp K)) (ψ : P.A ⟶ P'.A),
+        P.g = P'.g → IsMonHom ψ → Surjective ψ.left
+          → IsFinite ψ.left ∧ Flat ψ.left
+            ∧ ∃ n : ℕ, 1 ≤ n ∧ ∀ (T : Over (Sp K)) (x : T ⟶ P.A), x ≫ ψ = 1 → x ^ n = 1 :=
+  fun _ hL K _ _ P P' ψ hg =>
+    isogeny_of_surjective_of_dim_eq hL K P P'.A ψ P'.isAb (hg ▸ P'.smoothDim)
 
 end GlobalTheory

@@ -6,9 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory
 
-
 open Module in
-theorem _root_.GlobalTheory.exists_representatives_mod_nsmul : ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (k : ℕ), 1 ≤ k → (∀ a b : X, k • a = k • b → a = b) ∧ ∃ e : Fin (k ^ Module.finrank ℤ X) → X, ∀ χ : X, ∃! i, ∃ m : X, χ = e i + k • m := by
+theorem _root_.GlobalTheory.exists_representatives_mod_nsmul
+    : ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (k : ℕ),
+      1 ≤ k
+        → (∀ a b : X, k • a = k • b → a = b)
+          ∧ ∃ e : Fin (k ^ Module.finrank ℤ X) → X, ∀ χ : X, ∃! i, ∃ m : X, χ = e i + k • m := by
   intro X _ _ _ k hk
   classical
   set n := Module.finrank ℤ X
@@ -31,10 +34,13 @@ theorem _root_.GlobalTheory.exists_representatives_mod_nsmul : ∀ (X : Type) [A
   have rep : ∀ i j, b.repr (∑ j', d i j' • b j') j = d i j := by
     intro i j
     rw [b.repr_sum_self]
-  let r : Fin n → Fin k := fun j => ⟨(b.repr χ j % k).toNat, by
-    have h1 := Int.emod_nonneg (b.repr χ j) hk0
-    have h2 := Int.emod_lt_of_pos (b.repr χ j) hkpos
-    omega⟩
+  let r : Fin n → Fin k := fun j => ⟨
+    (b.repr χ j % k).toNat,
+    by
+      have h1 := Int.emod_nonneg (b.repr χ j) hk0
+      have h2 := Int.emod_lt_of_pos (b.repr χ j) hkpos
+      omega
+  ⟩
   refine ⟨finFunctionFinEquiv r, ⟨∑ j, (b.repr χ j / k) • b j, ?_⟩, ?_⟩
   · apply b.ext_elem
     intro j

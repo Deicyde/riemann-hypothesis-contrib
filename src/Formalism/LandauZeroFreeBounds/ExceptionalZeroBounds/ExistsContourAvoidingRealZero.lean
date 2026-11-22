@@ -12,9 +12,10 @@ noncomputable section
 
 namespace Formalism.ZeroFreeDirichlet
 
-theorem exists_contour_avoiding_real_zero (B : Finset ℝ) (hB : B.card ≤ 1) (L c₁ : ℝ) (hL : 0 < L) (hc₁ : 0 < c₁) :
-    ∃ σ₁ : ℝ, (σ₁ = 1 - c₁ / (3 * L) ∨ σ₁ = 1 - c₁ / (4 * L)) ∧
-      ∀ β ∈ B, c₁ / (24 * L) ≤ |σ₁ - β| := by
+theorem exists_contour_avoiding_real_zero
+    (B : Finset ℝ) (hB : B.card ≤ 1) (L c₁ : ℝ) (hL : 0 < L) (hc₁ : 0 < c₁)
+    : ∃ σ₁ : ℝ,
+      (σ₁ = 1 - c₁ / (3 * L) ∨ σ₁ = 1 - c₁ / (4 * L)) ∧ ∀ β ∈ B, c₁ / (24 * L) ≤ |σ₁ - β| := by
   have hab : (1 - c₁ / (3 * L)) - (1 - c₁ / (4 * L)) = -(2 * (c₁ / (24 * L))) := by
     field_simp
     ring
@@ -31,18 +32,21 @@ theorem exists_contour_avoiding_real_zero (B : Finset ℝ) (hB : B.card ≤ 1) (
     rw [hab, abs_neg, abs_of_pos (by positivity), abs_sub_comm β] at tri
     linarith
 
-theorem perron_contour_decomposition (hP : PerronChi) {q : ℕ} [NeZero q] (χ : DirichletCharacter ℂ q)
-    (y σ₁ σ₀ T : ℝ) (R : ℂ) (hy : 1 ≤ y) (hσ₀ : 1 < σ₀) (hT : 0 ≤ T)
-    (hrect : Formalism.ZF.rectInt (Fchi χ y) σ₁ σ₀ (-T) T = 2 * Real.pi * I * R) :
-    2 * Real.pi * ‖Schi χ y - R‖ ≤
-      ‖∫ t in (Set.Ioc (-T) T)ᶜ, Fchi χ y ((σ₀ : ℂ) + t * I)‖
-      + ‖∫ x in σ₁..σ₀, Fchi χ y ((x : ℂ) + ((-T : ℝ) : ℂ) * I)‖
-      + ‖∫ x in σ₁..σ₀, Fchi χ y ((x : ℂ) + (T : ℂ) * I)‖
-      + ‖∫ u in (-T)..T, Fchi χ y ((σ₁ : ℂ) + u * I)‖ := by
+theorem perron_contour_decomposition
+    (hP : PerronChi)
+    {q : ℕ} [NeZero q]
+    (χ : DirichletCharacter ℂ q) (y σ₁ σ₀ T : ℝ) (R : ℂ) (hy : 1 ≤ y) (hσ₀ : 1 < σ₀) (hT : 0 ≤ T)
+    (hrect : Formalism.ZF.rectInt (Fchi χ y) σ₁ σ₀ (-T) T = 2 * Real.pi * I * R)
+    : 2 * Real.pi * ‖Schi χ y - R‖
+      ≤ ‖∫ t in (Set.Ioc (-T) T)ᶜ, Fchi χ y ((σ₀ : ℂ) + t * I)‖
+        + ‖∫ x in σ₁..σ₀, Fchi χ y ((x : ℂ) + ((-T : ℝ) : ℂ) * I)‖
+        + ‖∫ x in σ₁..σ₀, Fchi χ y ((x : ℂ) + (T : ℂ) * I)‖
+        + ‖∫ u in (-T)..T, Fchi χ y ((σ₁ : ℂ) + u * I)‖ := by
   obtain ⟨hint, hS⟩ := hP q χ y hy σ₀ hσ₀
   have hsplit := integral_add_compl (s := Set.Ioc (-T) T) measurableSet_Ioc hint
-  have hIoc : ∫ t in Set.Ioc (-T) T, Fchi χ y ((σ₀ : ℂ) + t * I) =
-      ∫ t in (-T)..T, Fchi χ y ((σ₀ : ℂ) + t * I) :=
+  have hIoc
+      : ∫ t in Set.Ioc (-T) T, Fchi χ y ((σ₀ : ℂ) + t * I)
+        = ∫ t in (-T)..T, Fchi χ y ((σ₀ : ℂ) + t * I) :=
     (intervalIntegral.integral_of_le (by linarith)).symm
   unfold Formalism.ZF.rectInt at hrect
   set Cp := ∫ t in (Set.Ioc (-T) T)ᶜ, Fchi χ y ((σ₀ : ℂ) + t * I) with hCp
@@ -61,12 +65,13 @@ theorem perron_contour_decomposition (hP : PerronChi) {q : ℕ} [NeZero q] (χ :
     rw [show (2 * (Real.pi : ℂ)) = ((2 * Real.pi : ℝ) : ℂ) by push_cast; ring,
       Complex.norm_of_nonneg (by positivity)]
   have hsub := norm_sub_le Bt Tp
-  calc 2 * Real.pi * ‖Schi χ y - R‖ = ‖(2 * (Real.pi : ℂ)) * (Schi χ y - R)‖ := by
-        rw [norm_mul, hn]
+  calc
+    2 * Real.pi * ‖Schi χ y - R‖
+      = ‖(2 * (Real.pi : ℂ)) * (Schi χ y - R)‖ := by rw [norm_mul, hn]
     _ = ‖Cp + I * (Bt - Tp) + Lf‖ := by rw [key]
     _ ≤ ‖Cp‖ + ‖I * (Bt - Tp)‖ + ‖Lf‖ := norm_add₃_le
     _ ≤ ‖Cp‖ + ‖Bt‖ + ‖Tp‖ + ‖Lf‖ := by
-        rw [norm_mul, Complex.norm_I, one_mul]
-        linarith
+      rw [norm_mul, Complex.norm_I, one_mul]
+      linarith
 
 end Formalism.ZeroFreeDirichlet

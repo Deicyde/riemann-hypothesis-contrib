@@ -6,10 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.Unitary
 
-theorem wirtinger_combination_ne_zero : ∀ (χ : ℂ → ℂ), Continuous χ → (∀ z w, χ (z + w) = χ z * χ w) →
-    (∀ z, ‖χ z‖ = 1) → (∃ z, χ z ≠ 1) → ∀ (D : ℂ → ℂ),
-    (∀ z, HasDerivAt (fun t : ℝ => χ (t * z)) (D z) 0) →
-    ∀ β : ℂ, β ≠ 0 → D β - Complex.I * D (β * Complex.I) ≠ 0 := by
+theorem wirtinger_combination_ne_zero
+    : ∀ (χ : ℂ → ℂ),
+      Continuous χ → (∀ z w, χ (z + w) = χ z * χ w) → (∀ z, ‖χ z‖ = 1) → (∃ z, χ z ≠ 1)
+        → ∀ (D : ℂ → ℂ),
+          (∀ z, HasDerivAt (fun t : ℝ => χ (t * z)) (D z) 0)
+            → ∀ β : ℂ, β ≠ 0 → D β - Complex.I * D (β * Complex.I) ≠ 0 := by
   intro χ _ hmul hnorm hnt D hD β hβ
   have χ0 : χ 0 = 1 := by
     have h1 := hmul 0 0
@@ -26,7 +28,8 @@ theorem wirtinger_combination_ne_zero : ∀ (χ : ℂ → ℂ), Continuous χ �
   have hre : ∀ w, (D w).re = 0 := by
     intro w
     have h1 := (hD w).mul (hD w).star
-    have hconst : ((fun t : ℝ => χ (t * w)) * fun t : ℝ => star (χ (t * w))) = fun _ => (1 : ℂ) := by
+    have hconst
+        : ((fun t : ℝ => χ (t * w)) * fun t : ℝ => star (χ (t * w))) = fun _ => (1 : ℂ) := by
       funext t
       simp only [Pi.mul_apply]
       rw [← starRingEnd_apply, RCLike.mul_conj, hnorm]
@@ -41,7 +44,8 @@ theorem wirtinger_combination_ne_zero : ∀ (χ : ℂ → ℂ), Continuous χ �
   have hadd : ∀ z w, D (z + w) = D z + D w := by
     intro z w
     have h1 := (hD z).mul (hD w)
-    have hfun : ((fun t : ℝ => χ (t * z)) * fun t : ℝ => χ (t * w)) = fun t : ℝ => χ (t * (z + w)) := by
+    have hfun
+        : ((fun t : ℝ => χ (t * z)) * fun t : ℝ => χ (t * w)) = fun t : ℝ => χ (t * (z + w)) := by
       funext t
       simp only [Pi.mul_apply]
       rw [mul_add, hmul]
@@ -72,7 +76,8 @@ theorem wirtinger_combination_ne_zero : ∀ (χ : ℂ → ℂ), Continuous χ �
       have h1 : HasDerivAt (fun t : ℝ => χ (((t - s : ℝ) : ℂ) * z)) (D z) s :=
         HasDerivAt.comp_sub_const (f := fun t : ℝ => χ (t * z)) s s (by rw [sub_self]; exact hD z)
       have h2 := h1.const_mul (χ (s * z))
-      have hfun : (fun t : ℝ => χ (s * z) * χ (((t - s : ℝ) : ℂ) * z)) = fun t : ℝ => χ (t * z) := by
+      have hfun
+          : (fun t : ℝ => χ (s * z) * χ (((t - s : ℝ) : ℂ) * z)) = fun t : ℝ => χ (t * z) := by
         funext t
         rw [← hmul]
         congr 1
@@ -80,7 +85,8 @@ theorem wirtinger_combination_ne_zero : ∀ (χ : ℂ → ℂ), Continuous χ �
         ring
       rw [hfun, h0, mul_zero] at h2
       exact h2
-    have hc := is_const_of_deriv_eq_zero (fun s => (hder s).differentiableAt) (fun s => (hder s).deriv) 1 0
+    have hc :=
+      is_const_of_deriv_eq_zero (fun s => (hder s).differentiableAt) (fun s => (hder s).deriv) 1 0
     simp only [Complex.ofReal_one, one_mul] at hc
     rw [hc, hf0]
   intro hcomb

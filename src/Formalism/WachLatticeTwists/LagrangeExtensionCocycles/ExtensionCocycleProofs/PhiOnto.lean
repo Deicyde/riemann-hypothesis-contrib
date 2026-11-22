@@ -16,12 +16,13 @@ theorem phi_map_surjective : StatPhiOnto := by
   obtain ⟨v, hv⟩ := hk
   obtain ⟨d, hd⟩ : ∃ d, k * b = M + 1 + d := ⟨k * b - (M + 1), by omega⟩
 
-  have hmem : ∀ x : W.N, (B.Q * (B.Q ^ d * v ^ b)) • (B.Q ^ M • W.φ (x : D)) ∈ W.N :=
-    fun x => W.N.smul_mem _ (W.φ_N x x.2)
-  let g : W.N →+ W.N :=
-    { toFun := fun x => ⟨_, hmem x⟩
-      map_zero' := by ext; simp
-      map_add' := fun x y => by ext; simp [smul_add] }
+  have hmem : ∀ x : W.N, (B.Q * (B.Q ^ d * v ^ b)) • (B.Q ^ M • W.φ (x : D)) ∈ W.N := fun x =>
+    W.N.smul_mem _ (W.φ_N x x.2)
+  let g : W.N →+ W.N := {
+    toFun := fun x => ⟨_, hmem x⟩
+    map_zero' := by ext; simp
+    map_add' := fun x y => by ext; simp [smul_add]
+  }
   have hg : ∀ x : W.N, W.φ (B.X ^ b • (x : D)) = B.X ^ b • ((g x : W.N) : D) := by
     intro x
     show _ = B.X ^ b • ((B.Q * (B.Q ^ d * v ^ b)) • (B.Q ^ M • W.φ (x : D)))
@@ -31,17 +32,21 @@ theorem phi_map_surjective : StatPhiOnto := by
     ring
   have hφpow : ∀ (j : ℕ) (r : A), r ∈ I ^ j → B.φ r ∈ I ^ j := by
     intro j r hr
-    have h1 : Ideal.map (B.φ : A →+* A) I ≤ I :=
-      Ideal.map_le_iff_le_comap.2 (fun a ha => hφI a ha)
+    have h1 : Ideal.map (B.φ : A →+* A) I ≤ I := Ideal.map_le_iff_le_comap.2 (fun a ha => hφI a ha)
     have h2 : (B.φ : A →+* A) r ∈ Ideal.map (B.φ : A →+* A) (I ^ j) := Ideal.mem_map_of_mem _ hr
     rw [Ideal.map_pow] at h2
     exact Ideal.pow_right_mono h1 j h2
-  have hcontr : ∀ j : ℕ, ∀ x ∈ (I ^ j • ⊤ : Submodule A W.N), g x ∈ (I ^ (j + 1) • ⊤ : Submodule A W.N) := by
+  have hcontr
+      : ∀ j : ℕ, ∀ x ∈ (I ^ j • ⊤ : Submodule A W.N),
+        g x ∈ (I ^ (j + 1) • ⊤ : Submodule A W.N) := by
     intro j x hx
     refine Submodule.smul_induction_on hx ?_ ?_
     · intro r hr m _
-      have e : g (r • m) = (B.φ r * B.Q) •
-          (⟨(B.Q ^ d * v ^ b) • (B.Q ^ M • W.φ (m : D)), W.N.smul_mem _ (W.φ_N m m.2)⟩ : W.N) := by
+      have e
+          : g (r • m)
+            = (B.φ r * B.Q)
+              • (⟨(B.Q ^ d * v ^ b) • (B.Q ^ M • W.φ (m : D)), W.N.smul_mem _ (W.φ_N m m.2)⟩
+                : W.N) := by
         ext
         show (B.Q * (B.Q ^ d * v ^ b)) • (B.Q ^ M • W.φ (r • (m : D))) = _
         rw [W.φ_smul]

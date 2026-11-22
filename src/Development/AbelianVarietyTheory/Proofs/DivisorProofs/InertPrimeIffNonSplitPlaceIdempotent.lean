@@ -14,7 +14,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Hilbert90
 
 open NumberField MeasureTheory IsDedekindDomain
 open scoped Classical
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum
 open Formalism.MainNotions.TaylorLogMetric (VC embT tor0 Hf lamOf area Th U)
 open Formalism.MainNotions.StandardLatticesGL3 (WeilO HeckeU TT stdL pt oddE0)
 open GlobalTheory.NormExact
@@ -27,19 +29,23 @@ namespace GlobalTheory.InertPlace
 
 open GlobalTheory.IdemSupport
 
-theorem inertQ_iff_cP {D : D7} {q : ℕ} (hq : q.Prime) (P : HeightOneSpectrum (𝓞 D.host.E))
-    (hqP : (q : 𝓞 D.host.E) ∈ P.asIdeal) : Formalism.MainNotions.StandardLatticesGL3.InertQ D q ↔ cP P = P := by
+theorem inertQ_iff_cP
+    {D : D7} {q : ℕ}
+    (hq : q.Prime) (P : HeightOneSpectrum (𝓞 D.host.E)) (hqP : (q : 𝓞 D.host.E) ∈ P.asIdeal)
+    : Formalism.MainNotions.StandardLatticesGL3.InertQ D q ↔ cP P = P := by
   constructor
   · intro hI
-    exact ((isConjPl_iff P P).1 (GlobalTheory.XiSplit.isConjPl_of_smul_eq (hI P.asIdeal P.isPrime P.ne_bot hqP))).symm
+    exact ((isConjPl_iff P P).1
+      (GlobalTheory.XiSplit.isConjPl_of_smul_eq (hI P.asIdeal P.isPrime P.ne_bot hqP))).symm
   · intro hc
     by_contra h
     exact GlobalTheory.NormSum.VacInt.conj_smul_ne D hq h P.asIdeal P.isPrime hqP
       (GlobalTheory.XiSplit.smul_eq_of_isConjPl ((isConjPl_iff P P).2 hc.symm))
 
-theorem nonSplitAt_iff_cP {D : D7} {v : HeightOneSpectrum (𝓞 D.host.F)} {η : AF D.host.F}
-    (hη : IsPlaceIdem D v η) (P : HeightOneSpectrum (𝓞 D.host.E)) (hP : P.under (𝓞 D.host.F) = v) :
-    GlobalTheory.WeilParts.NonSplitAt D v η ↔ cP P = P := by
+theorem nonSplitAt_iff_cP
+    {D : D7} {v : HeightOneSpectrum (𝓞 D.host.F)} {η : AF D.host.F}
+    (hη : IsPlaceIdem D v η) (P : HeightOneSpectrum (𝓞 D.host.E)) (hP : P.under (𝓞 D.host.F) = v)
+    : GlobalTheory.WeilParts.NonSplitAt D v η ↔ cP P = P := by
   obtain ⟨Φ, hΦ⟩ := exists_comp D
   obtain ⟨h0, h1, h2⟩ := place_comp hΦ hη
   constructor
@@ -60,10 +66,8 @@ theorem nonSplitAt_iff_cP {D : D7} {v : HeightOneSpectrum (𝓞 D.host.F)} {η :
   · intro hc
     refine ⟨hη, ?_⟩
     rintro ⟨e, ⟨ee, ec, -⟩, hs⟩
-    have he : e * algebraMap (AF D.host.F) (AE D) η = e := by
-      rw [← hs, mul_add, ee, ec, add_zero]
-    have hi : infPart D e = 0 := by
-      rw [← he, RingHom.map_mul, h0, mul_zero]
+    have he : e * algebraMap (AF D.host.F) (AE D) η = e := by rw [← hs, mul_add, ee, ec, add_zero]
+    have hi : infPart D e = 0 := by rw [← he, RingHom.map_mul, h0, mul_zero]
     have hout : ∀ Q : HeightOneSpectrum (𝓞 D.host.E), Q ≠ P → Φ e Q = 0 := by
       intro Q hQ
       have hQv : Q.under (𝓞 D.host.F) ≠ v := by
@@ -95,8 +99,13 @@ theorem nonSplitAt_iff_cP {D : D7} {v : HeightOneSpectrum (𝓞 D.host.F)} {η :
       rw [ec, ev_zero] at h
       exact zero_ne_one h
 
-theorem inertQ_iff_nonSplitAt : ∀ (D : D7) (q : ℕ), q.Prime → ∀ (v : HeightOneSpectrum (𝓞 D.host.F)) (η : AF D.host.F), IsPlaceIdem D v η →
-    (q : 𝓞 D.host.F) ∈ v.asIdeal → (Formalism.MainNotions.StandardLatticesGL3.InertQ D q ↔ GlobalTheory.WeilParts.NonSplitAt D v η) := by
+theorem inertQ_iff_nonSplitAt
+    : ∀ (D : D7) (q : ℕ),
+      q.Prime
+        → ∀ (v : HeightOneSpectrum (𝓞 D.host.F)) (η : AF D.host.F),
+          IsPlaceIdem D v η → (q : 𝓞 D.host.F) ∈ v.asIdeal
+            → (Formalism.MainNotions.StandardLatticesGL3.InertQ D q
+              ↔ GlobalTheory.WeilParts.NonSplitAt D v η) := by
   intro D q hq v η hη hqv
   have := v.isPrime
   obtain ⟨Q, hQ, hl⟩ := (Ideal.nonempty_primesOver v.asIdeal (S := 𝓞 D.host.E)).some

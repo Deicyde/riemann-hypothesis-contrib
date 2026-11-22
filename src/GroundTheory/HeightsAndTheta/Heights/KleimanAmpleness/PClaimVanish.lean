@@ -21,14 +21,17 @@ section ClaimLemmas
 
 variable {k : Type u} [Field k] {Ω : Type w} [Field Ω] [Algebra k Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
 
-theorem coordGraded_tilde_mem_chartRing {I : Chart x} {y : Ω}
-    (hy : y ∈ (coordGraded k x).tilde 0 I) : y ∈ chartRing k x I := by
+theorem coordGraded_tilde_mem_chartRing {I : Chart x} {y : Ω} (hy : y ∈ (coordGraded k x).tilde 0 I)
+    : y ∈ chartRing k x I := by
   refine Submodule.span_induction (p := fun y _ => y ∈ chartRing k x I) ?_ ?_ ?_ ?_ hy
   · rintro _ ⟨m, s, a, e, hs, hse, hm, hae, rfl⟩
-    have hm' : m ∈ Submodule.span k {z | ∃ (f : Poly k N) (e' : ℕ), f.IsHomogeneous e' ∧
-        (e' : ℤ) = a ∧ z = aeval x f} := hm
-    refine Submodule.span_induction (p := fun m _ => (aeval x s)⁻¹ • m ∈ chartRing k x I)
-      ?_ ?_ ?_ ?_ hm'
+    have hm'
+        : m ∈ Submodule.span k
+          {z | ∃ (f : Poly k N) (e' : ℕ), f.IsHomogeneous e' ∧
+            (e' : ℤ) = a ∧ z = aeval x f} :=
+      hm
+    refine
+      Submodule.span_induction (p := fun m _ => (aeval x s)⁻¹ • m ∈ chartRing k x I) ?_ ?_ ?_ ?_ hm'
     · rintro _ ⟨f, e', hf, he', rfl⟩
       have hee : e' = e := by omega
       subst hee
@@ -40,8 +43,8 @@ theorem coordGraded_tilde_mem_chartRing {I : Chart x} {y : Ω}
   · intro a b _ _ ha hb; exact (chartRing k x I).add_mem ha hb
   · intro a y _ hy; rw [chartRing_smul_def]; exact (chartRing k x I).mul_mem a.2 hy
 
-theorem coordGraded_tildeSys_twist (X : SubSystem k x Ω) :
-    ((coordGraded k x).tildeSys 0).twist X = X := by
+theorem coordGraded_tildeSys_twist (X : SubSystem k x Ω)
+    : ((coordGraded k x).tildeSys 0).twist X = X := by
   refine SubSystem.ext_sub fun I => le_antisymm ?_ ?_
   · refine Submodule.span_le.mpr ?_
     rintro _ ⟨q, hq, y, hy, rfl⟩
@@ -52,12 +55,22 @@ theorem coordGraded_tildeSys_twist (X : SubSystem k x Ω) :
     exact (X.sub I).smul_mem _ hq
   · intro q hq
     refine Submodule.subset_span ⟨q, hq, 1, ?_, by rw [smul_eq_mul, mul_one]⟩
-    exact Submodule.subset_span ⟨1, 1, 0, 0, one_mem _, isHomogeneous_one _ _,
-      Submodule.subset_span ⟨1, 0, isHomogeneous_one _ _, by simp, by simp⟩, by simp, by simp⟩
+    exact Submodule.subset_span ⟨
+      1,
+      1,
+      0,
+      0,
+      one_mem _,
+      isHomogeneous_one _ _,
+      Submodule.subset_span ⟨1, 0, isHomogeneous_one _ _, by simp, by simp⟩,
+      by simp,
+      by simp
+    ⟩
 
-theorem twist_tildeSys_mono {M₁ M₂ : FinGradedSub (S := k) (x := x) Ω}
-    (h : ∀ c, M₂.piece c ≤ M₁.piece c) (X : SubSystem k x Ω) (I : Chart x) :
-    ∀ y ∈ ((M₂.tildeSys 0).twist X).sub I, y ∈ ((M₁.tildeSys 0).twist X).sub I := by
+theorem twist_tildeSys_mono
+    {M₁ M₂ : FinGradedSub (S := k) (x := x) Ω} (h : ∀ c, M₂.piece c ≤ M₁.piece c)
+    (X : SubSystem k x Ω) (I : Chart x)
+    : ∀ y ∈ ((M₂.tildeSys 0).twist X).sub I, y ∈ ((M₁.tildeSys 0).twist X).sub I := by
   intro y hy
   refine Submodule.span_mono ?_ hy
   rintro _ ⟨q, hq, z, hz, rfl⟩
@@ -65,10 +78,13 @@ theorem twist_tildeSys_mono {M₁ M₂ : FinGradedSub (S := k) (x := x) Ω}
   rintro _ ⟨m, s, a, e, hs, hse, hm, hae, rfl⟩
   exact ⟨m, s, a, e, hs, hse, h a hm, hae, rfl⟩
 
-variable (T : StepData k x) (Jg : FinGradedSub (S := k) (x := x) Ω)
-  (hJg : ∀ c : ℤ, Jg.piece c = Submodule.span k {z | ∃ (f : Poly k N) (e : ℕ), f ∈ T.J ∧
-    f.IsHomogeneous e ∧ (e : ℤ) = c ∧ z = aeval x f})
-
+variable
+  (T : StepData k x) (Jg : FinGradedSub (S := k) (x := x) Ω)
+  (hJg : ∀ c : ℤ,
+    Jg.piece c
+      = Submodule.span k
+        {z | ∃ (f : Poly k N) (e : ℕ), f ∈ T.J ∧
+          f.IsHomogeneous e ∧ (e : ℤ) = c ∧ z = aeval x f})
 
 include hJg in
 theorem claim_le : ∀ c, Jg.piece c ≤ (coordGraded k x).piece c := by
@@ -78,39 +94,52 @@ theorem claim_le : ∀ c, Jg.piece c ≤ (coordGraded k x).piece c := by
   rintro _ ⟨f, e, -, hf, he, rfl⟩
   exact ⟨f, e, hf, he, rfl⟩
 
-
 include hJg in
-theorem claim_kill : ∀ (f : Poly k N) (e : ℕ), f ∈ T.J → f.IsHomogeneous e → ∀ (a : ℤ),
-    ∀ z ∈ (coordGraded k x).piece a, aeval x f • z ∈ Jg.piece (a + e) := by
+theorem claim_kill
+    : ∀ (f : Poly k N) (e : ℕ),
+      f ∈ T.J → f.IsHomogeneous e
+        → ∀ (a : ℤ), ∀ z ∈ (coordGraded k x).piece a, aeval x f • z ∈ Jg.piece (a + e) := by
   intro f e hf hfe a z hz
-  have hz' : z ∈ Submodule.span k {z | ∃ (g : Poly k N) (e' : ℕ), g.IsHomogeneous e' ∧
-      (e' : ℤ) = a ∧ z = aeval x g} := hz
+  have hz'
+      : z ∈ Submodule.span k
+        {z | ∃ (g : Poly k N) (e' : ℕ), g.IsHomogeneous e' ∧
+          (e' : ℤ) = a ∧ z = aeval x g} :=
+    hz
   refine Submodule.span_induction (p := fun z _ => aeval x f • z ∈ Jg.piece (a + e)) ?_ ?_ ?_ ?_ hz'
   · rintro _ ⟨g, e', hg, he', rfl⟩
     rw [hJg]
-    exact Submodule.subset_span ⟨f * g, e + e', T.J.mul_mem_right g hf, hfe.mul hg,
-      by push_cast; omega, by rw [map_mul, smul_eq_mul]⟩
+    exact Submodule.subset_span ⟨
+      f * g,
+      e + e',
+      T.J.mul_mem_right g hf,
+      hfe.mul hg,
+      by push_cast; omega,
+      by rw [map_mul, smul_eq_mul]
+    ⟩
   · rw [smul_zero]; exact Submodule.zero_mem _
   · intro a b _ _ ha hb; rw [smul_add]; exact Submodule.add_mem _ ha hb
   · intro r a _ ha; rw [smul_comm]; exact Submodule.smul_mem _ r ha
 
 end ClaimLemmas
 
-theorem ClaimVanish.proof (h₁ : StepTwo.Statement.{u, w, w}) (h₂ : TwistVanish.Statement.{u, w})
-    (h₃ : ClaimSeq.Statement.{u, w}) : ClaimVanish.Statement.{u, w} := by
+theorem ClaimVanish.proof
+    (h₁ : StepTwo.Statement.{u, w, w}) (h₂ : TwistVanish.Statement.{u, w})
+    (h₃ : ClaimSeq.Statement.{u, w})
+    : ClaimVanish.Statement.{u, w} := by
   intro k _ Ω _ _ N x T hK
   obtain ⟨Jg, hJg, hseq⟩ := h₃ k Ω N x T
-  obtain ⟨cS, hS⟩ := h₁ k Ω N x T hK Ω (coordGraded k x) Jg (claim_le T Jg hJg)
-    (claim_kill T Jg hJg)
-  obtain ⟨cB, hB⟩ := h₂ k Ω N x (twistBundle k x 0) (twistBundle k x 1) N x (twist_hyps k N x).1
-    (twist_hyps k N x).2
+  obtain ⟨cS, hS⟩ :=
+    h₁ k Ω N x T hK Ω (coordGraded k x) Jg (claim_le T Jg hJg) (claim_kill T Jg hJg)
+  obtain ⟨cB, hB⟩ :=
+    h₂ k Ω N x (twistBundle k x 0) (twistBundle k x 1) N x (twist_hyps k N x).1 (twist_hyps k N x).2
   refine ⟨max cS cB, fun b => ?_⟩
   induction b with
   | zero =>
     intro c hc
     have h0 := hB 0 c (le_trans (le_max_right _ _) hc)
-    have e : ((twistBundle k x 0).twist ((twistBundle k x 1).pow 0)).twist (twistSys k x c) =
-        (T.L.pow 0).twist (twistSys k x c) := by
+    have e
+        : ((twistBundle k x 0).twist ((twistBundle k x 1).pow 0)).twist (twistSys k x c)
+          = (T.L.pow 0).twist (twistSys k x c) := by
       show ((twistSys k x 0).twist (twistSys k x 0)).twist (twistSys k x c) =
         (twistSys k x 0).twist (twistSys k x c)
       rw [twistSys_zero_twist]

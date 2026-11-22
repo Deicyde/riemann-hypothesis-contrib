@@ -7,8 +7,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain UpperTheory.V.Kum UpperTheory.V.Stick
 open scoped nonZeroDivisors
 
-private theorem combFloor_step (M : ℕ) [NeZero M] (k : ℕ) (t : ZMod M) :
-    (k + 1) * t.val / M = k * t.val / M + carry M ((k : ZMod M) * t) (1 * t) := by
+private theorem combFloor_step (M : ℕ) [NeZero M] (k : ℕ) (t : ZMod M)
+    : (k + 1) * t.val / M = k * t.val / M + carry M ((k : ZMod M) * t) (1 * t) := by
   have hM : 0 < M := Nat.pos_of_ne_zero (NeZero.ne M)
   have key : ∀ a v : ℕ, v < M → (a + v) / M = a / M + (if M ≤ a % M + v then 1 else 0) := by
     intro a v hv
@@ -23,10 +23,10 @@ private theorem combFloor_step (M : ℕ) [NeZero M] (k : ℕ) (t : ZMod M) :
   show _ = _ + (if M ≤ ((k : ZMod M) * t).val + (1 * t).val then 1 else 0)
   rw [hkt, one_mul, add_mul, one_mul, key _ _ (ZMod.val_lt t)]
 
-theorem UpperTheory.V.Stick.combFloor :
-    ∀ (M : ℕ) [NeZero M] (A : Type) [CommGroup A] (x : (ZMod M)ˣ → A),
-    (∀ a b : ZMod M, ∏ t : (ZMod M)ˣ, x t ^ carry M (a * t) (b * t) = 1) →
-    ∀ k : ℕ, ∏ t : (ZMod M)ˣ, x t ^ (k * (t : ZMod M).val / M) = 1 := by
+theorem UpperTheory.V.Stick.combFloor
+    : ∀ (M : ℕ) [NeZero M] (A : Type) [CommGroup A] (x : (ZMod M)ˣ → A),
+      (∀ a b : ZMod M, ∏ t : (ZMod M)ˣ, x t ^ carry M (a * t) (b * t) = 1)
+        → ∀ k : ℕ, ∏ t : (ZMod M)ˣ, x t ^ (k * (t : ZMod M).val / M) = 1 := by
   intro M _ A _ x hx k
   induction k with
   | zero => simp

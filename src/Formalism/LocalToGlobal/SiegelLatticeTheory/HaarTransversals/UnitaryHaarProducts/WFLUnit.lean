@@ -7,7 +7,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 
 noncomputable section
 
-open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.CayleySignature
+open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.L2.SG.HidaSetting
+  Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.CayleySignature
 open Formalism.L2.SG.SplitPrimeNormLemmas
 open scoped InnerProductSpace
 
@@ -18,25 +19,29 @@ namespace Formalism.L2.SG.Pf.WFL
 variable {k r : ℕ}
 
 section Unit
-variable {ε : Fin (2 * r + k + 1) → Bool} {e f : Fin r → Fin (2 * r + k + 1) → ℂ}
+variable
+  {ε : Fin (2 * r + k + 1) → Bool} {e f : Fin r → Fin (2 * r + k + 1) → ℂ}
   {wf : Fin k → Fin (2 * r + k + 1) → ℂ} {z0 : Fin (2 * r + k + 1) → ℂ}
 
-private theorem Hpk_apply_eq_zero_of_ne_sig (p b : Fin (2 * r + k + 1)) (hb : b ≠ GBasic.sig k r p) :
-    Hpk k r p b = 0 := by
+private theorem Hpk_apply_eq_zero_of_ne_sig (p b : Fin (2 * r + k + 1)) (hb : b ≠ GBasic.sig k r p)
+    : Hpk k r p b = 0 := by
   have hb' : b.val ≠ (GBasic.sig k r p).val := fun h => hb (Fin.ext h)
   unfold GBasic.sig at hb'
   unfold Hpk
   split_ifs at hb' ⊢ <;> (try simp only [Fin.ext_iff, Fin.val_mk, ne_eq] at *) <;> omega
 
-private theorem Hpk_apply_sig_ne_zero (p : Fin (2 * r + k + 1)) : Hpk k r p (GBasic.sig k r p) ≠ 0 := by
+private theorem Hpk_apply_sig_ne_zero (p : Fin (2 * r + k + 1))
+    : Hpk k r p (GBasic.sig k r p) ≠ 0 := by
   have hp := p.isLt
   unfold Hpk GBasic.sig
-  split_ifs <;> (try simp only [Fin.ext_iff, Fin.val_mk, ne_eq] at *) <;>
-    first | omega | (simp only [and_true] at *; omega) | norm_num
+  split_ifs <;> (try simp only [Fin.ext_iff, Fin.val_mk, ne_eq] at *)
+    <;> first | omega | (simp only [and_true] at *; omega) | norm_num
 
-theorem fix_row {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hU : h ∈ UH (Hpk k r))
-    {p : Fin (2 * r + k + 1)} (hp : h *ᵥ bvec p = bvec p) (j : Fin (2 * r + k + 1)) :
-    h (GBasic.sig k r p) j = if j = GBasic.sig k r p then 1 else 0 := by
+theorem fix_row
+    {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hU : h ∈ UH (Hpk k r))
+    {p : Fin (2 * r + k + 1)} (hp : h *ᵥ bvec p = bvec p)
+    (j : Fin (2 * r + k + 1))
+    : h (GBasic.sig k r p) j = if j = GBasic.sig k r p then 1 else 0 := by
   have hU0 : hᴴ * Hpk k r * h = Hpk k r := hU
   have hcol : ∀ a, h a p = if a = p then 1 else 0 := by
     intro a
@@ -57,13 +62,14 @@ theorem fix_row {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hU
         simp [hcol, ha]
       · simp
     · simp
-  have e : Hpk k r p (GBasic.sig k r p) * h (GBasic.sig k r p) j = Hpk k r p j := by
-    rw [← key, hU0]
+  have e : Hpk k r p (GBasic.sig k r p) * h (GBasic.sig k r p) j = Hpk k r p j := by rw [← key, hU0]
   by_cases hj : j = GBasic.sig k r p
   · subst hj
     rw [if_pos rfl]
-    have e1 : Hpk k r p (GBasic.sig k r p) * h (GBasic.sig k r p) (GBasic.sig k r p) =
-        Hpk k r p (GBasic.sig k r p) * 1 := by rw [mul_one]; exact e
+    have e1
+        : Hpk k r p (GBasic.sig k r p) * h (GBasic.sig k r p) (GBasic.sig k r p)
+          = Hpk k r p (GBasic.sig k r p) * 1 := by
+      rw [mul_one]; exact e
     exact mul_left_cancel₀ (Hpk_apply_sig_ne_zero p) e1
   · rw [if_neg hj]
     rw [Hpk_apply_eq_zero_of_ne_sig p j hj] at e
@@ -71,13 +77,15 @@ theorem fix_row {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hU
 
 theorem wI_last_eq : wI k r (Fin.last k) = GBasic.sig k r (wI k r (Fin.last k)) := by
   unfold GBasic.sig
-  have hn : ¬ ((wI k r (Fin.last k)).val < r ∨ r + k < (wI k r (Fin.last k)).val) := by
-    simp [wI]
+  have hn : ¬((wI k r (Fin.last k)).val < r ∨ r + k < (wI k r (Fin.last k)).val) := by simp [wI]
   rw [if_neg hn]
 
-theorem UW_colW {T : ℝ} (hT : 0 < T) {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (hh : h ∈ UWset k r (zBv k r T)) (b : Fin k) (t : Fin (2 * r + k + 1))
-    (ht : ∀ a : Fin k, t ≠ wI k r ⟨a.val, by omega⟩) : h t (wI k r ⟨b.val, by omega⟩) = 0 := by
+theorem UW_colW
+    {T : ℝ} (hT : 0 < T)
+    {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hh : h ∈ UWset k r (zBv k r T))
+    (b : Fin k)
+    (t : Fin (2 * r + k + 1)) (ht : ∀ a : Fin k, t ≠ wI k r ⟨a.val, by omega⟩)
+    : h t (wI k r ⟨b.val, by omega⟩) = 0 := by
   unfold zBv at hh
   obtain ⟨hU, hfix, hz⟩ := hh
   have hb := b.isLt
@@ -110,29 +118,33 @@ theorem UW_colW {T : ℝ} (hT : 0 < T) {h : Matrix (Fin (2 * r + k + 1)) (Fin (2
 end Unit
 
 section Unit2
-variable {ε : Fin (2 * r + k + 1) → Bool} {e f : Fin r → Fin (2 * r + k + 1) → ℂ}
+variable
+  {ε : Fin (2 * r + k + 1) → Bool} {e f : Fin r → Fin (2 * r + k + 1) → ℂ}
   {wf : Fin k → Fin (2 * r + k + 1) → ℂ} {z0 : Fin (2 * r + k + 1) → ℂ}
 
-private theorem hJ_eq_star_hJ_swap {n : ℕ} (ε1 : Fin n → Bool) (x y : Fin n → ℂ) :
-    hJ ε1 x y = star (hJ ε1 y x) := by
+private theorem hJ_eq_star_hJ_swap {n : ℕ} (ε1 : Fin n → Bool) (x y : Fin n → ℂ)
+    : hJ ε1 x y = star (hJ ε1 y x) := by
   unfold hJ Formalism.REAL.Jm
   simp only [dotProduct, Matrix.mulVec_diagonal, Pi.star_apply, star_sum, star_mul', star_star]
   refine Finset.sum_congr rfl fun i _ => ?_
   split_ifs <;> simp only [star_one, star_neg] <;> ring
 
-private theorem conjTranspose_Qm_mulVec_Jm_apply_eq_hJ_colQ (y : Fin (2 * r + k + 1) → ℂ) (t : Fin (2 * r + k + 1)) :
-    ((Qm e f wf z0)ᴴ *ᵥ (Formalism.REAL.Jm ε *ᵥ y)) t = hJ ε (colQ e f wf z0 t) y := by
+private theorem conjTranspose_Qm_mulVec_Jm_apply_eq_hJ_colQ
+    (y : Fin (2 * r + k + 1) → ℂ) (t : Fin (2 * r + k + 1))
+    : ((Qm e f wf z0)ᴴ *ᵥ (Formalism.REAL.Jm ε *ᵥ y)) t = hJ ε (colQ e f wf z0 t) y := by
   unfold hJ
-  simp only [Matrix.mulVec, dotProduct, Matrix.conjTranspose_apply, Qm, Matrix.of_apply, Pi.star_apply]
+  simp only [Matrix.mulVec, dotProduct, Matrix.conjTranspose_apply, Qm, Matrix.of_apply,
+    Pi.star_apply]
 
-private theorem Hpk_apply_middle_right_eq_ite (t' t : Fin (2 * r + k + 1)) (h1 : r ≤ t.val) (h2 : t.val < r + k) :
-    Hpk k r t' t = if t' = t then 1 else 0 := by
+private theorem Hpk_apply_middle_right_eq_ite
+    (t' t : Fin (2 * r + k + 1)) (h1 : r ≤ t.val) (h2 : t.val < r + k)
+    : Hpk k r t' t = if t' = t then 1 else 0 := by
   unfold Hpk
   simp only [Fin.ext_iff]
   split_ifs <;> first | rfl | omega | (exfalso; omega) | norm_num
 
-private theorem hJ_Qm_mulVec_eq_sum (x c : Fin (2 * r + k + 1) → ℂ) :
-    hJ ε x (Qm e f wf z0 *ᵥ c) = ∑ t, c t * hJ ε x (colQ e f wf z0 t) := by
+private theorem hJ_Qm_mulVec_eq_sum (x c : Fin (2 * r + k + 1) → ℂ)
+    : hJ ε x (Qm e f wf z0 *ᵥ c) = ∑ t, c t * hJ ε x (colQ e f wf z0 t) := by
   have hq : Qm e f wf z0 *ᵥ c = ∑ t, c t • colQ e f wf z0 t := by
     ext i
     simp only [Matrix.mulVec, dotProduct, Qm, Matrix.of_apply, Finset.sum_apply, Pi.smul_apply,
@@ -142,18 +154,22 @@ private theorem hJ_Qm_mulVec_eq_sum (x c : Fin (2 * r + k + 1) → ℂ) :
   rw [Matrix.mulVec_sum, dotProduct_sum]
   simp only [Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul]
 
-theorem piB_entry (hF : IsFrameJ ε e f wf z0) (h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (a b : Fin k) :
-    hJ ε (wf a) ((Qm e f wf z0 * h * Qi ε e f wf z0) *ᵥ wf b) = h (wI k r ⟨a.val, by omega⟩) (wI k r ⟨b.val, by omega⟩) := by
+theorem piB_entry
+    (hF : IsFrameJ ε e f wf z0) (h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    (a b : Fin k)
+    : hJ ε (wf a) ((Qm e f wf z0 * h * Qi ε e f wf z0) *ᵥ wf b)
+      = h (wI k r ⟨a.val, by omega⟩) (wI k r ⟨b.val, by omega⟩) := by
   obtain ⟨hee, hff, hef, hez, hfz, hzz, hww, hew, hfw, hzw⟩ := hF
-  have hcol : ∀ t (c : Fin k), hJ ε (colQ e f wf z0 t) (wf c) =
-      if t = wI k r ⟨c.val, by omega⟩ then 1 else 0 := by
+  have hcol
+      : ∀ t (c : Fin k),
+        hJ ε (colQ e f wf z0 t) (wf c) = if t = wI k r ⟨c.val, by omega⟩ then 1 else 0 := by
     intro t c
     have ht := t.isLt
     have hc := c.isLt
     have hw : (wI k r ⟨c.val, by omega⟩).val = r + c.val := rfl
     unfold colQ
-    split_ifs <;> simp only [hew, hfw, hzw, hww, Fin.ext_iff, wI, Fin.val_mk] <;> (try split_ifs) <;>
-      first | rfl | omega | (exfalso; omega)
+    split_ifs <;> simp only [hew, hfw, hzw, hww, Fin.ext_iff, wI, Fin.val_mk] <;> (try split_ifs)
+      <;> first | rfl | omega | (exfalso; omega)
   have v1 : (Qm e f wf z0)ᴴ *ᵥ (Formalism.REAL.Jm ε *ᵥ wf b) = bvec (wI k r ⟨b.val, by omega⟩) := by
     ext t
     rw [conjTranspose_Qm_mulVec_Jm_apply_eq_hJ_colQ, hcol]
@@ -180,17 +196,23 @@ theorem Jm_allPos : Formalism.REAL.Jm (allPos k) = 1 := by
   ext a b
   simp [Formalism.REAL.Jm, allPos, Matrix.diagonal, Matrix.one_apply]
 
-private theorem Hpk_apply_middle_left_eq_ite (t t' : Fin (2 * r + k + 1)) (h1 : r ≤ t.val) (h2 : t.val < r + k) :
-    Hpk k r t t' = if t' = t then 1 else 0 := by
+private theorem Hpk_apply_middle_left_eq_ite
+    (t t' : Fin (2 * r + k + 1)) (h1 : r ≤ t.val) (h2 : t.val < r + k)
+    : Hpk k r t t' = if t' = t then 1 else 0 := by
   unfold Hpk
   simp only [Fin.ext_iff]
   split_ifs <;> first | rfl | omega | (exfalso; omega) | norm_num
 
-theorem piB_mat_unitary (hF : IsFrameJ ε e f wf z0) {T : ℝ} (hT : 0 < T)
-    {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hh : h ∈ UWset k r (zBv k r T)) :
-    (fun a b => hJ ε (wf a) ((Qm e f wf z0 * h * Qi ε e f wf z0) *ᵥ wf b)) ∈ UJset (allPos k) := by
-  have hM : (fun a b => hJ ε (wf a) ((Qm e f wf z0 * h * Qi ε e f wf z0) *ᵥ wf b)) =
-      (fun a b => h (wI k r ⟨a.val, by omega⟩) (wI k r ⟨b.val, by omega⟩) : Matrix (Fin k) (Fin k) ℂ) := by
+theorem piB_mat_unitary
+    (hF : IsFrameJ ε e f wf z0)
+    {T : ℝ} (hT : 0 < T)
+    {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hh : h ∈ UWset k r (zBv k r T))
+    : (fun a b => hJ ε (wf a) ((Qm e f wf z0 * h * Qi ε e f wf z0) *ᵥ wf b))
+      ∈ UJset (allPos k) := by
+  have hM
+      : (fun a b => hJ ε (wf a) ((Qm e f wf z0 * h * Qi ε e f wf z0) *ᵥ wf b))
+        = (fun a b => h (wI k r ⟨a.val, by omega⟩) (wI k r ⟨b.val, by omega⟩)
+          : Matrix (Fin k) (Fin k) ℂ) := by
     funext a b
     exact piB_entry hF h a b
   rw [hM]
@@ -198,8 +220,9 @@ theorem piB_mat_unitary (hF : IsFrameJ ε e f wf z0) {T : ℝ} (hT : 0 < T)
   unfold Formalism.REAL.inUJ
   rw [Jm_allPos, Matrix.mul_one]
   have hU0 : hᴴ * Hpk k r * h = Hpk k r := hh.1
-  have hz : ∀ (c : Fin k) (t : Fin (2 * r + k + 1)), ¬ (r ≤ t.val ∧ t.val < r + k) →
-      h t (wI k r ⟨c.val, by omega⟩) = 0 := by
+  have hz
+      : ∀ (c : Fin k) (t : Fin (2 * r + k + 1)),
+        ¬(r ≤ t.val ∧ t.val < r + k) → h t (wI k r ⟨c.val, by omega⟩) = 0 := by
     intro c t ht
     apply UW_colW hT hh c t
     intro a hta
@@ -207,8 +230,9 @@ theorem piB_mat_unitary (hF : IsFrameJ ε e f wf z0) {T : ℝ} (hT : 0 < T)
     have := congrArg Fin.val hta
     simp only [wI] at this
     omega
-  have hrow : ∀ (c : Fin k) (t' : Fin (2 * r + k + 1)),
-      (hᴴ * Hpk k r) (wI k r ⟨c.val, by omega⟩) t' = star (h t' (wI k r ⟨c.val, by omega⟩)) := by
+  have hrow
+      : ∀ (c : Fin k) (t' : Fin (2 * r + k + 1)),
+        (hᴴ * Hpk k r) (wI k r ⟨c.val, by omega⟩) t' = star (h t' (wI k r ⟨c.val, by omega⟩)) := by
     intro c t'
     rw [Matrix.mul_apply, Finset.sum_eq_single t']
     · simp only [Matrix.conjTranspose_apply]
@@ -228,16 +252,18 @@ theorem piB_mat_unitary (hF : IsFrameJ ε e f wf z0) {T : ℝ} (hT : 0 < T)
   rw [Matrix.mul_apply] at e
   simp only [hrow] at e
   rw [Hpk_apply_middle_left_eq_ite (wI k r ⟨a.val, by omega⟩) (wI k r ⟨b.val, by omega⟩)
-    (by simp only [wI]; omega) (by simp only [wI]; omega)] at e
+      (by simp only [wI]; omega) (by simp only [wI]; omega)]
+    at e
   have hinj : Function.Injective (fun c : Fin k => wI k r ⟨c.val, by omega⟩) := by
     intro c c' hcc
     have := congrArg Fin.val hcc
     simp only [wI] at this
     exact Fin.ext (by omega)
-  have hzero : ∀ x ∉ Set.range (fun c : Fin k => wI k r ⟨c.val, by omega⟩),
-      star (h x (wI k r ⟨a.val, by omega⟩)) * h x (wI k r ⟨b.val, by omega⟩) = 0 := by
+  have hzero
+      : ∀ x ∉ Set.range (fun c : Fin k => wI k r ⟨c.val, by omega⟩),
+        star (h x (wI k r ⟨a.val, by omega⟩)) * h x (wI k r ⟨b.val, by omega⟩) = 0 := by
     intro x hx
-    have hw : ¬ (r ≤ x.val ∧ x.val < r + k) := by
+    have hw : ¬(r ≤ x.val ∧ x.val < r + k) := by
       rintro ⟨h1, h2⟩
       exact hx ⟨⟨x.val - r, by omega⟩, Fin.ext (by simp only [wI]; omega)⟩
     rw [hz a x hw]
@@ -251,36 +277,49 @@ theorem piB_mat_unitary (hF : IsFrameJ ε e f wf z0) {T : ℝ} (hT : 0 < T)
       have := congrArg Fin.val hh'
       simp only [wI] at this
       exact Fin.ext (by omega)
-  change ∑ c : Fin k, star (h (wI k r ⟨c.val, by omega⟩) (wI k r ⟨a.val, by omega⟩)) *
-      h (wI k r ⟨c.val, by omega⟩) (wI k r ⟨b.val, by omega⟩) = (if a = b then 1 else 0)
+  change
+    ∑ c : Fin k, star (h (wI k r ⟨c.val, by omega⟩) (wI k r ⟨a.val, by omega⟩)) *
+        h (wI k r ⟨c.val, by omega⟩) (wI k r ⟨b.val, by omega⟩)
+      = (if a = b then 1 else 0)
   rw [if_congr hab rfl rfl]
   exact hsum.trans e
 
-theorem piB_norm (hF : IsFrameJ ε e f wf z0) {T : ℝ} (hT : 0 < T) {u : Fin k → ℝ}
-    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {πl : Matrix (Fin k) (Fin k) ℂ → (V →L[ℂ] V)}
-    (hπ : IsHCTypeU k u πl) {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    (hh : h ∈ UWset k r (zBv k r T)) (x : V) : ‖piB ε e f wf z0 πl h x‖ = ‖x‖ := by
+theorem piB_norm
+    (hF : IsFrameJ ε e f wf z0)
+    {T : ℝ} (hT : 0 < T)
+    {u : Fin k → ℝ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {πl : Matrix (Fin k) (Fin k) ℂ → (V →L[ℂ] V)} (hπ : IsHCTypeU k u πl)
+    {h : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hh : h ∈ UWset k r (zBv k r T))
+    (x : V)
+    : ‖piB ε e f wf z0 πl h x‖ = ‖x‖ := by
   unfold piB
   exact hπ.2.2.1.2.1 _ (piB_mat_unitary hF hT hh) x
 
-theorem psiR_norm {n r' : ℕ} (ε : Fin n → Bool) (gg : ℕ) (e f : Fin r' → Fin n → ℂ) (z : Fin n → ℂ)
-    (g : Matrix (Fin n) (Fin n) ℂ) : ‖psiR ε gg e f z g‖ = 1 := by
+theorem psiR_norm
+    {n r' : ℕ} (ε : Fin n → Bool)
+    (gg : ℕ) (e f : Fin r' → Fin n → ℂ) (z : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ)
+    : ‖psiR ε gg e f z g‖ = 1 := by
   exact Formalism.L2.SG.Pf.psiR_norm ε gg e f z g
 
 end Unit2
 
 section Inv
-variable {ε : Fin (2 * r + k + 1) → Bool} {e f : Fin r → Fin (2 * r + k + 1) → ℂ}
+variable
+  {ε : Fin (2 * r + k + 1) → Bool} {e f : Fin r → Fin (2 * r + k + 1) → ℂ}
   {wf : Fin k → Fin (2 * r + k + 1) → ℂ}
 
-theorem loc_norm_inv {T : ℝ} (hT : 0 < T) {z : Fin (2 * r + k + 1) → ℂ} (hF : IsFrameJ ε e f wf (z0v T z))
+theorem loc_norm_inv
+    {T : ℝ} (hT : 0 < T)
+    {z : Fin (2 * r + k + 1) → ℂ} (hF : IsFrameJ ε e f wf (z0v T z))
     {gg : ℕ} {u : Fin k → ℝ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
-    {πl : Matrix (Fin k) (Fin k) ℂ → (V →L[ℂ] V)} (hπ : IsHCTypeU k u πl) {W : Formalism.REAL.UJ ε → V}
+    {πl : Matrix (Fin k) (Fin k) ℂ → (V →L[ℂ] V)} (hπ : IsHCTypeU k u πl)
+    {W : Formalism.REAL.UJ ε → V}
     (hW : ∀ s x : Formalism.REAL.UJ ε, ∀ h ∈ UWset k r (zBv k r T), ∀ m ∈ Nset k r,
-      Qi ε e f wf (z0v T z) * uMat s * Qm e f wf (z0v T z) = h * m →
-      W (s * x) = psiR ε gg e f z (uMat s) • piB ε e f wf (z0v T z) πl h (W x))
-    {s : Formalism.REAL.UJ ε} (hs : s ∈ HNset ε e f wf (z0v T z) (zBv k r T)) (y : Formalism.REAL.UJ ε) :
-    ‖W (s * y)‖ = ‖W y‖ := by
+      Qi ε e f wf (z0v T z) * uMat s * Qm e f wf (z0v T z) = h * m
+        → W (s * x) = psiR ε gg e f z (uMat s) • piB ε e f wf (z0v T z) πl h (W x))
+    {s : Formalism.REAL.UJ ε} (hs : s ∈ HNset ε e f wf (z0v T z) (zBv k r T))
+    (y : Formalism.REAL.UJ ε)
+    : ‖W (s * y)‖ = ‖W y‖ := by
   unfold HNset at hs
   obtain ⟨h, hh, m, hm, hhm⟩ := hs
   rw [hW s y h hh m hm hhm, norm_smul, psiR_norm, one_mul]
@@ -298,9 +337,10 @@ theorem mEqR (R : Ranks) : 2 * R.rS + 2 = R.m := by
   show 2 * (R.m / 2 - 1) + 2 = R.m
   omega
 
-theorem lam_matchR (R : Ranks) (P : HCParam R) (i : Fin (2 * R.rS + R.k + 1)) (hr : 2 * R.rS + R.k + 1 = R.r) :
-    lamS R P (Fin.cast hr i) =
-      lam48 R.k R.rS (fun i => (P.v i : ℝ)) (fun j => (P.b (Fin.cast (mEqR R) j) : ℝ)) i := by
+theorem lam_matchR
+    (R : Ranks) (P : HCParam R) (i : Fin (2 * R.rS + R.k + 1)) (hr : 2 * R.rS + R.k + 1 = R.r)
+    : lamS R P (Fin.cast hr i)
+      = lam48 R.k R.rS (fun i => (P.v i : ℝ)) (fun j => (P.b (Fin.cast (mEqR R) j) : ℝ)) i := by
   have hm := mEqR R
   have hk := R.m_add_three_le_k
   have hi := i.isLt
@@ -308,8 +348,11 @@ theorem lam_matchR (R : Ranks) (P : HCParam R) (i : Fin (2 * R.rS + R.k + 1)) (h
   simp only [Fin.coe_cast]
   split_ifs with h1 h2 <;> first | rfl | (exfalso; omega)
 
-theorem interlace_of (R : Ranks) (P Q : HCParam R) (hv : Q.v = P.v) (hb : Q.b = P.b) :
-    InterlacingCondition R.k R.rS (fun i => (Q.u i : ℝ)) (fun i => (P.v i : ℝ)) (fun j => (P.b (Fin.cast (mEqR R) j) : ℝ)) := by
+theorem interlace_of (R : Ranks) (P Q : HCParam R) (hv : Q.v = P.v) (hb : Q.b = P.b)
+    : InterlacingCondition R.k R.rS
+      (fun i => (Q.u i : ℝ))
+      (fun i => (P.v i : ℝ))
+      (fun j => (P.b (Fin.cast (mEqR R) j) : ℝ)) := by
   refine ⟨fun i => ⟨?_, ?_⟩, fun h => ?_⟩
   · have := Q.u_gt_v i
     rw [hv] at this
@@ -325,8 +368,11 @@ theorem interlace_of (R : Ranks) (P Q : HCParam R) (hv : Q.v = P.v) (hb : Q.b = 
     simp only [Fin.cast_mk]
     exact_mod_cast this
 
-theorem halfInt_of (R : Ranks) (P Q : HCParam R) :
-    HalfIntegralDifference R.k R.rS (fun i => (Q.u i : ℝ)) (fun i => (P.v i : ℝ)) (fun j => (P.b (Fin.cast (mEqR R) j) : ℝ)) := by
+theorem halfInt_of (R : Ranks) (P Q : HCParam R)
+    : HalfIntegralDifference R.k R.rS
+      (fun i => (Q.u i : ℝ))
+      (fun i => (P.v i : ℝ))
+      (fun j => (P.b (Fin.cast (mEqR R) j) : ℝ)) := by
   intro i s
   choose gv hgv using P.v_int
   choose gb hgb using P.b_int

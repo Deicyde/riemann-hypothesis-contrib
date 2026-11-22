@@ -11,6 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BinaryHermiti
 namespace GlobalTheory.Mass
 
 theorem siegelMassRatio_holds : Formalism.HermitianLatticesTheory.SiegelMassRatio :=
-  Formalism.HermitianLattices.Ext.L3.siegelMassRatio_of_LI binary_hermitian_represents Formalism.HermitianLattices.Ext.L3.liStat
+  Formalism.HermitianLattices.Ext.L3.siegelMassRatio_of_LI binary_hermitian_represents
+    Formalism.HermitianLattices.Ext.L3.liStat
 
 end GlobalTheory.Mass

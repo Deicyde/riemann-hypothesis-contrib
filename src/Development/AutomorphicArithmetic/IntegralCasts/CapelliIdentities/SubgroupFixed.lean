@@ -4,11 +4,13 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.SubgroupFixed.HasFixed :
-    {Γ V : Type} →
-      [inst : Group Γ] → [inst_1 : AddCommGroup V] → [inst_2 : _root_.Module ℂ V] → Representation ℂ Γ V → Subgroup Γ → Prop :=
-    fun {Γ V : Type} [Group Γ] [AddCommGroup V] [_root_.Module ℂ V] (ρ : Representation ℂ Γ V) (U : Subgroup Γ) ↦
-      ∃ (v : V), v ≠ (0 : V) ∧ ∀ u ∈ U, ((ρ : Γ → V →ₗ[ℂ] V) u : V → V) v = v
+noncomputable def UpperTheory.Reformulated.B.SubgroupFixed.HasFixed
+    : {Γ V : Type} → [inst : Group Γ] → [inst_1 : AddCommGroup V] → [inst_2 : _root_.Module ℂ V]
+      → Representation ℂ Γ V → Subgroup Γ
+      → Prop :=
+  fun {Γ V : Type} [Group Γ] [AddCommGroup V] [_root_.Module ℂ V] (ρ : Representation ℂ Γ V)
+      (U : Subgroup Γ) ↦
+    ∃ (v : V), v ≠ (0 : V) ∧ ∀ u ∈ U, ((ρ : Γ → V →ₗ[ℂ] V) u : V → V) v = v
 
 private lemma UpperTheory.Reformulated.B.SubgroupFixed.core {R M N : Type*} [Ring R] [AddCommGroup M] [_root_.Module R M]
     [AddCommGroup N] [_root_.Module R N] [IsSimpleModule R M]
@@ -42,40 +44,41 @@ private lemma UpperTheory.Reformulated.B.SubgroupFixed.core {R M N : Type*} [Rin
   rintro _ ⟨x, rfl⟩
   exact (p (f x)).2
 
-theorem UpperTheory.Reformulated.B.SubgroupFixed.sub_fixed :
-    ∀ {Γ X V : Type} [inst : Group Γ] [inst_1 : AddCommGroup X] [inst_2 : _root_.Module ℂ X] [inst_3 : AddCommGroup V]
-      [inst_4 : _root_.Module ℂ V] (σ : Representation ℂ Γ X),
-      σ.IsIrreducible →
-        ∀ (τ : Representation ℂ Γ V),
+theorem UpperTheory.Reformulated.B.SubgroupFixed.sub_fixed
+    : ∀ {Γ X V : Type} [inst : Group Γ] [inst_1 : AddCommGroup X] [inst_2 : _root_.Module ℂ X]
+        [inst_3 : AddCommGroup V] [inst_4 : _root_.Module ℂ V] (σ : Representation ℂ Γ X),
+      σ.IsIrreducible
+        → ∀ (τ : Representation ℂ Γ V),
           ⨆ (f :
                 { f : X →ₗ[ℂ] V //
                   ∀ (g : Γ) (v : X),
                     (f : X → V) (((σ : Γ → X →ₗ[ℂ] X) g : X → X) v) = ((τ : Γ → V →ₗ[ℂ] V) g : V → V) ((f : X → V) v) }),
-                (↑f : X →ₗ[ℂ] V).range =
-              ⊤ →
-            ∀ (W : Submodule ℂ V),
-              (∀ (g : Γ), ∀ v ∈ W, ((τ : Γ → V →ₗ[ℂ] V) g : V → V) v ∈ W) →
-                W ≠ ⊥ →
-                  ∀ (K : Subgroup Γ),
-                    UpperTheory.Reformulated.B.SubgroupFixed.HasFixed σ K → ∃ v ∈ W, v ≠ (0 : V) ∧ ∀ u ∈ K, ((τ : Γ → V →ₗ[ℂ] V) u : V → V) v = v := by
+                (↑f : X →ₗ[ℂ] V).range
+              = ⊤
+            → ∀ (W : Submodule ℂ V),
+              (∀ (g : Γ), ∀ v ∈ W, ((τ : Γ → V →ₗ[ℂ] V) g : V → V) v ∈ W) → W ≠ ⊥
+                → ∀ (K : Subgroup Γ),
+                  UpperTheory.Reformulated.B.SubgroupFixed.HasFixed σ K
+                    → ∃ v ∈ W, v ≠ (0 : V) ∧ ∀ u ∈ K, ((τ : Γ → V →ₗ[ℂ] V) u : V → V) v = v := by
   intro Γ X V _ _ _ _ _ σ hσ τ h W hWinv hW K hK
   obtain ⟨x0, hx0, hfix⟩ := hK
   haveI : IsSimpleModule (MonoidAlgebra ℂ Γ) σ.asModule :=
     (Representation.irreducible_iff_isSimpleModule_asModule σ).mp hσ
-  let W' : Submodule (MonoidAlgebra ℂ Γ) τ.asModule :=
-    { carrier := {x | τ.asModuleEquiv x ∈ W}
-      add_mem' := fun {a b} ha hb => by
-        show τ.asModuleEquiv (a + b) ∈ W
-        rw [map_add (f := _)]
-        exact W.add_mem ha hb
-      zero_mem' := by
-        show τ.asModuleEquiv 0 ∈ W
-        rw [map_zero]
-        exact W.zero_mem
-      smul_mem' := fun r x hx => by
-        show τ.asModuleEquiv (r • x) ∈ W
-        rw [Representation.asModuleEquiv_map_smul]
-        exact τ.asAlgebraHom_mem_of_forall_mem W hWinv _ hx r }
+  let W' : Submodule (MonoidAlgebra ℂ Γ) τ.asModule := {
+    carrier := {x | τ.asModuleEquiv x ∈ W}
+    add_mem' := fun {a b} ha hb => by
+      show τ.asModuleEquiv (a + b) ∈ W
+      rw [map_add (f := _)]
+      exact W.add_mem ha hb
+    zero_mem' := by
+      show τ.asModuleEquiv 0 ∈ W
+      rw [map_zero]
+      exact W.zero_mem
+    smul_mem' := fun r x hx => by
+      show τ.asModuleEquiv (r • x) ∈ W
+      rw [Representation.asModuleEquiv_map_smul]
+      exact τ.asAlgebraHom_mem_of_forall_mem W hWinv _ hx r
+  }
   have hW' : W' ≠ ⊥ := by
     intro hbot
     apply hW
@@ -86,8 +89,9 @@ theorem UpperTheory.Reformulated.B.SubgroupFixed.sub_fixed :
       simpa using hw
     rw [hbot, Submodule.mem_bot] at hmem
     simpa using hmem
-  have hsup : ∀ S : Submodule (MonoidAlgebra ℂ Γ) τ.asModule,
-      (∀ f : σ.asModule →ₗ[MonoidAlgebra ℂ Γ] τ.asModule, LinearMap.range f ≤ S) → S = ⊤ := by
+  have hsup
+      : ∀ S : Submodule (MonoidAlgebra ℂ Γ) τ.asModule,
+        (∀ f : σ.asModule →ₗ[MonoidAlgebra ℂ Γ] τ.asModule, LinearMap.range f ≤ S) → S = ⊤ := by
     intro S hS
     let S0 : Submodule ℂ V :=
       (S.restrictScalars ℂ).comap (τ.asModuleEquiv.symm : V →ₗ[ℂ] τ.asModule)
@@ -95,8 +99,7 @@ theorem UpperTheory.Reformulated.B.SubgroupFixed.sub_fixed :
       rw [eq_top_iff, ← h]
       refine iSup_le fun f => ?_
       rintro _ ⟨x, rfl⟩
-      let F : Representation.IntertwiningMap σ τ :=
-        f.1.intertwiningMap_of_isIntertwiningMap σ τ f.2
+      let F : Representation.IntertwiningMap σ τ := f.1.intertwiningMap_of_isIntertwiningMap σ τ f.2
       exact hS (Representation.IntertwiningMap.equivLinearMapAsModule σ τ F)
         ⟨σ.asModuleEquiv.symm x, rfl⟩
     rw [eq_top_iff]

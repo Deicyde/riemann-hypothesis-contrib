@@ -10,7 +10,11 @@ open GlobalTheory.UnitLemma Polynomial
 
 namespace GlobalTheory.NotIntegral
 
-theorem inv_small_not_integral : ∀ (K : UQ) (B : InvAlg K) (a : K.O), K.Small a → ∀ m : MaximalSpectrum B.A, ¬ IsIntegral K.O (algebraMap K.E (B.A ⧸ m.asIdeal) (algebraMap K.O K.E a)⁻¹) := by
+theorem inv_small_not_integral
+    : ∀ (K : UQ) (B : InvAlg K) (a : K.O),
+      K.Small a
+        → ∀ m : MaximalSpectrum B.A,
+          ¬ IsIntegral K.O (algebraMap K.E (B.A ⧸ m.asIdeal) (algebraMap K.O K.E a)⁻¹) := by
   intro K B a ha m hint
   obtain ⟨ha0, hmax, -⟩ := ha
   haveI : m.asIdeal.IsMaximal := m.isMaximal

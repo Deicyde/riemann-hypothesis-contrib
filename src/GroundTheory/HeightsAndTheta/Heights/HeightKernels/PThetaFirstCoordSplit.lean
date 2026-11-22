@@ -15,11 +15,13 @@ open Matrix Real
 
 namespace KThetaFirstCoordSplit
 
-theorem term_le {g : ℕ} [NeZero g] (Y : Matrix (Fin g) (Fin g) ℝ) (ρ : ℝ) (a u₁ : Fin g → ℝ)
-    (hY : Y.PosDef) (hρ : 0 < ρ) (hρY : Y⁻¹ 0 0 = ρ ^ 2) (k : Fin g → ℤ) :
-    exp (-π * qf Y (intVec k + a + u₁)) ≤
-      exp (-(π / (2 * ρ ^ 2)) * Metric.infDist (u₁ 0 + a 0) (Set.range ((↑) : ℤ → ℝ)) ^ 2) *
-        exp (-(π / 2) * qf Y (intVec k + (a + u₁))) := by
+theorem term_le
+    {g : ℕ} [NeZero g]
+    (Y : Matrix (Fin g) (Fin g) ℝ) (ρ : ℝ)
+    (a u₁ : Fin g → ℝ) (hY : Y.PosDef) (hρ : 0 < ρ) (hρY : Y⁻¹ 0 0 = ρ ^ 2) (k : Fin g → ℤ)
+    : exp (-π * qf Y (intVec k + a + u₁))
+      ≤ exp (-(π / (2 * ρ ^ 2)) * Metric.infDist (u₁ 0 + a 0) (Set.range ((↑) : ℤ → ℝ)) ^ 2)
+        * exp (-(π / 2) * qf Y (intVec k + (a + u₁))) := by
   set v := intVec k + (a + u₁) with hv
   have hassoc : intVec k + a + u₁ = v := add_assoc _ _ _
   rw [hassoc]
@@ -27,8 +29,9 @@ theorem term_le {g : ℕ} [NeZero g] (Y : Matrix (Fin g) (Fin g) ℝ) (ρ : ℝ)
   have hδ0 : 0 ≤ δ := Metric.infDist_nonneg
   have hv0 : v 0 = (k 0 : ℝ) + (a 0 + u₁ 0) := by simp [hv, intVec]
   have hδle : δ ≤ |v 0| := by
-    have h := Metric.infDist_le_dist_of_mem (x := u₁ 0 + a 0)
-      (Set.mem_range_self (f := ((↑) : ℤ → ℝ)) (-(k 0)))
+    have h :=
+      Metric.infDist_le_dist_of_mem (x := u₁ 0 + a 0)
+        (Set.mem_range_self (f := ((↑) : ℤ → ℝ)) (-(k 0)))
     refine h.trans (le_of_eq ?_)
     rw [Real.dist_eq, hv0]
     congr 1
@@ -46,8 +49,7 @@ theorem term_le {g : ℕ} [NeZero g] (Y : Matrix (Fin g) (Fin g) ℝ) (ρ : ℝ)
     linarith [mul_comm (ρ ^ 2) (qf Y v)]
   have hexp : exp (-(π / 2) * qf Y v) ≤ exp (-(π / (2 * ρ ^ 2)) * δ ^ 2) := by
     apply exp_le_exp.2
-    have h1 : (π / (2 * ρ ^ 2)) * δ ^ 2 = (π / 2) * (δ ^ 2 / ρ ^ 2) := by
-      field_simp
+    have h1 : (π / (2 * ρ ^ 2)) * δ ^ 2 = (π / 2) * (δ ^ 2 / ρ ^ 2) := by field_simp
     have h2 : (π / 2) * (δ ^ 2 / ρ ^ 2) ≤ (π / 2) * qf Y v :=
       mul_le_mul_of_nonneg_left hkey (by positivity)
     linarith
@@ -68,6 +70,7 @@ theorem ThetaFirstCoordSplit.proof : ThetaFirstCoordSplit.Statement := by
     KTheta.summable_exp_qf Y hY (π / 2) (by positivity) (a + u₁)
   rw [← tsum_mul_left]
   exact Summable.tsum_le_tsum
-    (fun k => KThetaFirstCoordSplit.term_le Y ρ a u₁ hY hρ hρY k) hs1 (hs2.mul_left _)
+    (fun k => KThetaFirstCoordSplit.term_le Y ρ a u₁ hY hρ hρY k)
+    hs1 (hs2.mul_left _)
 
 end GroundTheory.Heights₂.Heights

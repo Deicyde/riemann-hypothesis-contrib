@@ -23,8 +23,8 @@ set_option linter.unusedSectionVars false
 
 variable {K : Type*} [Field K] [NumberField K] {n : ℕ}
 
-theorem exists_height_le_of_isCompact {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCompact ω) :
-    ∃ M : ℝ, ∀ b ∈ ω, height b ≤ M := by
+theorem exists_height_le_of_isCompact {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCompact ω)
+    : ∃ M : ℝ, ∀ b ∈ ω, height b ≤ M := by
   obtain ⟨C₀, hC₀c, hC₀⟩ := exists_compact_mem_nhds (1 : archGroup K n)
   obtain ⟨MA, hMA⟩ := exists_height_infEmb_le (K := K) (n := n) hC₀c
   set W : Set (AdelicGLn.AdelicGL K n) :=
@@ -49,18 +49,21 @@ theorem exists_height_le_of_isCompact {ω : Set (AdelicGLn.AdelicGL K n)} (hω :
     refine (height_mul_le _ _).trans ?_
     rw [height_eq_one_of_mem_maxCompact (finEmb_mem_maxCompact hw.2), mul_one]
     exact mul_le_mul_of_nonneg_left ((hMA _ hw.1).trans (le_max_left _ _)) hc0
-  obtain ⟨s, -, hs⟩ := hω.elim_nhds_subcover (fun g => (fun y => g * y) '' W) fun g _ => by
-    have := (Homeomorph.mulLeft g).isOpenMap.image_mem_nhds hW
-    change (fun y => g * y) '' W ∈ 𝓝 (g * 1) at this
-    simpa only [mul_one] using this
+  obtain ⟨s, -, hs⟩ :=
+    hω.elim_nhds_subcover
+      (fun g => (fun y => g * y) '' W)
+      fun g _ => by
+        have := (Homeomorph.mulLeft g).isOpenMap.image_mem_nhds hW
+        change (fun y => g * y) '' W ∈ 𝓝 (g * 1) at this
+        simpa only [mul_one] using this
   refine ⟨∑ g ∈ s, c * height g * (c * max MA 1), fun b hb => ?_⟩
   obtain ⟨g, hg, hbg⟩ := mem_iUnion₂.1 (hs hb)
   obtain ⟨w, hw, rfl⟩ := hbg
   have hterm : height (g * w) ≤ c * height g * (c * max MA 1) :=
-    (height_mul_le _ _).trans (mul_le_mul_of_nonneg_left (hWb w hw)
-      (mul_nonneg hc0 (height_pos g).le))
-  refine hterm.trans (Finset.single_le_sum (f := fun g => c * height g * (c * max MA 1))
-    (fun g _ => ?_) hg)
+    (height_mul_le _ _).trans
+      (mul_le_mul_of_nonneg_left (hWb w hw) (mul_nonneg hc0 (height_pos g).le))
+  refine hterm.trans
+    (Finset.single_le_sum (f := fun g => c * height g * (c * max MA 1)) (fun g _ => ?_) hg)
   have := height_pos g
   have : 0 ≤ max MA 1 := le_trans zero_le_one (le_max_right _ _)
   positivity
@@ -69,15 +72,16 @@ theorem mult_le_two (w : InfinitePlace K) : w.mult ≤ 2 := by
   unfold InfinitePlace.mult
   split_ifs <;> norm_num
 
-theorem height_diagUnits_posIdele_le {ρ : Fin n → ℝ} (hρ : ∀ i, 0 < ρ i) {L : ℝ} (hL1 : 1 ≤ L)
-    (hL : ∀ i, ρ i ≤ L ∧ (ρ i)⁻¹ ≤ L) :
-    height (Reduction.diagUnits n fun i => Reduction.posIdele (K := K) (ρ i) (hρ i)) ≤
-      L ^ (2 * Fintype.card (InfinitePlace K)) := by
+theorem height_diagUnits_posIdele_le
+    {ρ : Fin n → ℝ} (hρ : ∀ i, 0 < ρ i) {L : ℝ} (hL1 : 1 ≤ L) (hL : ∀ i, ρ i ≤ L ∧ (ρ i)⁻¹ ≤ L)
+    : height (Reduction.diagUnits n fun i => Reduction.posIdele (K := K) (ρ i) (hρ i))
+      ≤ L ^ (2 * Fintype.card (InfinitePlace K)) := by
   set a := Reduction.diagUnits n fun i => Reduction.posIdele (K := K) (ρ i) (hρ i)
   have hfin : ∀ v : HeightOneSpectrum (𝓞 K), Reduction.finAt v a = 1 := by
     intro v
     refine Units.ext (Matrix.ext fun i j => ?_)
-    rw [Reduction.finAt_apply, Reduction.coe_diagUnits, Matrix.diagonal_apply, Units.val_one, Matrix.one_apply]
+    rw [Reduction.finAt_apply, Reduction.coe_diagUnits, Matrix.diagonal_apply, Units.val_one,
+      Matrix.one_apply]
     split_ifs with h
     · subst h
       exact Reduction.posIdele_finite (K := K) (ρ i) (hρ i) v
@@ -95,39 +99,52 @@ theorem height_diagUnits_posIdele_le {ρ : Fin n → ℝ} (hρ : ∀ i, 0 < ρ i
     · rw [← map_inv, Reduction.coe_diagUnits, Matrix.diagonal_apply]
       split_ifs with h
       · subst h
-        rw [Pi.inv_apply, Units.val_inv_eq_inv_val, norm_inv, Reduction.norm_posRealToUnits w (hρ i)]
+        rw [Pi.inv_apply, Units.val_inv_eq_inv_val, norm_inv,
+          Reduction.norm_posRealToUnits w (hρ i)]
         exact (hL i).2
       · simp only [norm_zero]; linarith
   unfold height
   rw [finprod_eq_one_of_forall_eq_one (fun v => by rw [hfin v, locHeight_one]), mul_one]
-  calc ∏ w : InfinitePlace K, locHeight (Reduction.infAt w a) ^ w.mult
-      ≤ ∏ _w : InfinitePlace K, L ^ 2 :=
-        Finset.prod_le_prod₀ (fun w _ => pow_nonneg (locHeight_pos _).le _) fun w _ =>
+  calc
+    ∏ w : InfinitePlace K, locHeight (Reduction.infAt w a) ^ w.mult
+        ≤ ∏ _w : InfinitePlace K, L ^ 2 :=
+      Finset.prod_le_prod₀
+        (fun w _ => pow_nonneg (locHeight_pos _).le _)
+        fun w _ =>
           (pow_le_pow_left₀ (locHeight_pos _).le (hinf w) _).trans
             (pow_le_pow_right₀ hL1 (mult_le_two w))
     _ = L ^ (2 * Fintype.card (InfinitePlace K)) := by
-        rw [Finset.prod_const, Finset.card_univ, ← pow_mul]
+      rw [Finset.prod_const, Finset.card_univ, ← pow_mul]
 
-theorem detModule_diagUnits_posIdele {ρ : Fin n → ℝ} (hρ : ∀ i, 0 < ρ i) :
-    (Reduction.detModule K n (Reduction.diagUnits n fun i =>
-      Reduction.posIdele (K := K) (ρ i) (hρ i)) : ℝ) = (∏ i, ρ i) ^ Module.finrank ℚ K := by
+theorem detModule_diagUnits_posIdele {ρ : Fin n → ℝ} (hρ : ∀ i, 0 < ρ i)
+    : (Reduction.detModule K n
+          (Reduction.diagUnits n fun i => Reduction.posIdele (K := K) (ρ i) (hρ i))
+        : ℝ)
+      = (∏ i, ρ i) ^ Module.finrank ℚ K := by
   rw [Reduction.detModule, MonoidHom.comp_apply, Reduction.det_diagUnits, map_prod,
     Reduction.coe_finset_prod_pos, ← Finset.prod_pow]
   exact Finset.prod_congr rfl fun i _ => Reduction.ideleModule_posIdele (ρ i) (hρ i)
 
-theorem exists_height_le_normOne {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCompact ω) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ b ∈ ω, ∀ (ρ : Fin n → ℝ) (hρ : ∀ i, 0 < ρ i),
-      ∀ kk ∈ (Reduction.maxCompact : Subgroup (AdelicGLn.AdelicGL K n)),
-      ∀ x : AdelicGLn.AdelicGL K n, x ∈ Reduction.normOneGL (K := K) (n := n) →
-      x = b * Reduction.diagUnits n (fun i => Reduction.posIdele (K := K) (ρ i) (hρ i)) * kk →
-      ∀ A : ℝ, 1 ≤ A → (∀ i j : Fin n, ρ i / ρ j ≤ A) →
-      height x ≤ C * A ^ (2 * Fintype.card (InfinitePlace K)) := by
+theorem exists_height_le_normOne {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCompact ω)
+    : ∃ C : ℝ,
+      0 ≤ C
+        ∧ ∀ b ∈ ω, ∀ (ρ : Fin n → ℝ) (hρ : ∀ i, 0 < ρ i),
+          ∀ kk ∈ (Reduction.maxCompact : Subgroup (AdelicGLn.AdelicGL K n)),
+            ∀ x : AdelicGLn.AdelicGL K n,
+              x ∈ Reduction.normOneGL (K := K) (n := n)
+                → x
+                  = b * Reduction.diagUnits n (fun i => Reduction.posIdele (K := K) (ρ i) (hρ i))
+                    * kk
+                → ∀ A : ℝ,
+                  1 ≤ A → (∀ i j : Fin n, ρ i / ρ j ≤ A)
+                    → height x ≤ C * A ^ (2 * Fintype.card (InfinitePlace K)) := by
   obtain ⟨Mb, hMb⟩ := exists_height_le_of_isCompact hω
   have hdc : Continuous fun g : AdelicGLn.AdelicGL K n => (Reduction.detModule K n g : ℝ) :=
     continuous_subtype_val.comp Reduction.continuous_detModule
   obtain ⟨M₁, hM₁⟩ := hω.exists_bound_of_continuousOn hdc.continuousOn
-  obtain ⟨M₂, hM₂⟩ := hω.exists_bound_of_continuousOn
-    (hdc.inv₀ fun g => (Reduction.detModule K n g).2.ne').continuousOn
+  obtain ⟨M₂, hM₂⟩ :=
+    hω.exists_bound_of_continuousOn (hdc.inv₀ fun g =>
+      (Reduction.detModule K n g).2.ne').continuousOn
   set e := 2 * Fintype.card (InfinitePlace K)
   set c₀ := max 1 (max M₁ M₂)
   have hc₀1 : 1 ≤ c₀ := le_max_left _ _
@@ -183,7 +200,9 @@ theorem exists_height_le_normOne {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCo
       exact mul_le_mul_of_nonneg_right (le_self_pow₀ hc₀1 hn) (pow_nonneg hA0 _)
     have hprodA : ∀ f : Fin n → ℝ, (∀ j, 0 ≤ f j) → (∀ j, f j ≤ A) → ∏ j, f j ≤ A ^ n := by
       intro f hf0 hfA
-      calc ∏ j, f j ≤ ∏ _j : Fin n, A := Finset.prod_le_prod₀ (fun j _ => hf0 j) fun j _ => hfA j
+      calc
+        ∏ j, f j
+          ≤ ∏ _j : Fin n, A := Finset.prod_le_prod₀ (fun j _ => hf0 j) fun j _ => hfA j
         _ = A ^ n := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
     constructor
     · have e1 : ρ i ^ n = P * ∏ j, (ρ i / ρ j) := by
@@ -210,14 +229,16 @@ theorem exists_height_le_normOne {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCo
   have hha := height_diagUnits_posIdele_le (K := K) hρ hL1 hbound
   rw [← ha] at hha
   rw [hxe]
-  calc height (b * a * kk) ≤ c * height (b * a) * height kk := height_mul_le _ _
+  calc
+    height (b * a * kk)
+      ≤ c * height (b * a) * height kk := height_mul_le _ _
     _ = c * height (b * a) := by rw [height_eq_one_of_mem_maxCompact hkk, mul_one]
-    _ ≤ c * (c * height b * height a) :=
-        mul_le_mul_of_nonneg_left (height_mul_le _ _) hc0
+    _ ≤ c * (c * height b * height a) := mul_le_mul_of_nonneg_left (height_mul_le _ _) hc0
     _ ≤ c * (c * max Mb 1 * (c₀ * A) ^ e) := by
-        refine mul_le_mul_of_nonneg_left (mul_le_mul (mul_le_mul_of_nonneg_left
-          ((hMb b hb).trans (le_max_left _ _)) hc0) hha (height_pos _).le
-          (mul_nonneg hc0 hMb1)) hc0
+      refine mul_le_mul_of_nonneg_left
+        (mul_le_mul (mul_le_mul_of_nonneg_left ((hMb b hb).trans (le_max_left _ _)) hc0) hha
+          (height_pos _).le (mul_nonneg hc0 hMb1))
+        hc0
     _ = c * (c * max Mb 1 * c₀ ^ e) * A ^ e := by rw [mul_pow]; ring
 
 end CuspidalSpectrum

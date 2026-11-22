@@ -12,23 +12,24 @@ open scoped ENNReal Pointwise
 
 namespace UpperTheory.V.Z.Tf.Orb
 
-private theorem unfold_eq {G : Type} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
+private theorem unfold_eq
+    {G : Type} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
     {μG : Measure G} [μG.IsMulLeftInvariant] [SFinite μG]
     {H : Subgroup G} {μ : Measure H} [SFinite μ] [μ.IsInvInvariant]
-    {ψ ρ : G → ℝ≥0∞} (hψ : Measurable ψ) (hρ : IsQuotNormaliser H μ ρ) :
-    ∫⁻ g, ρ g * ∫⁻ h : H, ψ ((h : G) * g) ∂μ ∂μG = ∫⁻ g, ψ g ∂μG := by
+    {ψ ρ : G → ℝ≥0∞} (hψ : Measurable ψ) (hρ : IsQuotNormaliser H μ ρ)
+    : ∫⁻ g, ρ g * ∫⁻ h : H, ψ ((h : G) * g) ∂μ ∂μG = ∫⁻ g, ψ g ∂μG := by
   have : MeasurableInv H := ⟨(measurable_subtype_coe.inv).subtype_mk⟩
   have hmulH : Measurable fun p : H × G => (p.1 : G) * p.2 :=
     (measurable_subtype_coe.comp measurable_fst).mul measurable_snd
-  have e1 : ∫⁻ g, ρ g * ∫⁻ h : H, ψ ((h : G) * g) ∂μ ∂μG
-      = ∫⁻ h : H, ∫⁻ g, ρ g * ψ ((h : G) * g) ∂μG ∂μ := by
+  have e1
+      : ∫⁻ g, ρ g * ∫⁻ h : H, ψ ((h : G) * g) ∂μ ∂μG
+        = ∫⁻ h : H, ∫⁻ g, ρ g * ψ ((h : G) * g) ∂μG ∂μ := by
     rw [lintegral_lintegral_swap]
     · refine lintegral_congr fun g => ?_
       rw [lintegral_const_mul]
       exact hψ.comp (measurable_subtype_coe.mul_const g)
     · exact ((hρ.1.comp measurable_snd).mul (hψ.comp hmulH)).aemeasurable
-  have e2 : ∀ h : H, ∫⁻ g, ρ g * ψ ((h : G) * g) ∂μG =
-      ∫⁻ g, ψ g * ρ (((h⁻¹ : H) : G) * g) ∂μG := by
+  have e2 : ∀ h : H, ∫⁻ g, ρ g * ψ ((h : G) * g) ∂μG = ∫⁻ g, ψ g * ρ (((h⁻¹ : H) : G) * g) ∂μG := by
     intro h
     rw [← lintegral_mul_left_eq_self _ ((h : G)⁻¹)]
     refine lintegral_congr fun g => ?_
@@ -50,9 +51,11 @@ theorem quotMass : QuotMass := by
   haveI : μ.IsMulRightInvariant := by
     have h := (inferInstance : μ.inv.IsMulRightInvariant)
     rwa [Measure.inv_eq_self] at h
-  have key : ∀ C : Set G, IsCompact C →
-      IsClosed {g | ∃ h ∈ H, ∃ c ∈ C, g = h * c} ∧
-        ∫⁻ g in {g | ∃ h ∈ H, ∃ c ∈ C, g = h * c}, ρ g ∂μG ≠ ∞ := by
+  have key
+      : ∀ C : Set G,
+        IsCompact C
+          → IsClosed {g | ∃ h ∈ H, ∃ c ∈ C, g = h * c}
+            ∧ ∫⁻ g in {g | ∃ h ∈ H, ∃ c ∈ C, g = h * c}, ρ g ∂μG ≠ ∞ := by
     intro C hC
     have hcl : IsClosed {g | ∃ h ∈ H, ∃ c ∈ C, g = h * c} := by
       have e : {g | ∃ h ∈ H, ∃ c ∈ C, g = h * c} = (H : Set G) * C := by
@@ -64,29 +67,33 @@ theorem quotMass : QuotMass := by
     obtain ⟨V, hV, hV1⟩ := exists_compact_mem_nhds (1 : G)
     have hD : IsCompact (V * C) := hV.mul hC
     have hDm : MeasurableSet (V * C) := hD.isClosed.measurableSet
-    have hVm : MeasurableSet ((↑) ⁻¹' V : Set H) :=
-      measurable_subtype_coe hV.isClosed.measurableSet
+    have hVm : MeasurableSet ((↑) ⁻¹' V : Set H) := measurable_subtype_coe hV.isClosed.measurableSet
     have hm : μ ((↑) ⁻¹' V : Set H) ≠ 0 := by
       refine (Measure.measure_pos_of_mem_nhds μ (x := 1) ?_).ne'
       exact continuous_subtype_val.continuousAt.preimage_mem_nhds hV1
     have hψ : Measurable ((V * C).indicator (1 : G → ℝ≥0∞)) := measurable_one.indicator hDm
     have hE := unfold_eq (μG := μG) hψ hρ
     rw [lintegral_indicator_one hDm] at hE
-    have hlow : ∀ g ∈ {g | ∃ h ∈ H, ∃ c ∈ C, g = h * c},
-        μ ((↑) ⁻¹' V : Set H) ≤ ∫⁻ h : H, (V * C).indicator (1 : G → ℝ≥0∞) ((h : G) * g) ∂μ := by
+    have hlow
+        : ∀ g ∈ {g | ∃ h ∈ H, ∃ c ∈ C, g = h * c},
+          μ ((↑) ⁻¹' V : Set H) ≤ ∫⁻ h : H, (V * C).indicator (1 : G → ℝ≥0∞) ((h : G) * g) ∂μ := by
       rintro g ⟨h0, hh0, c, hc, rfl⟩
-      have := lintegral_mul_right_eq_self (μ := μ)
-        (fun h : H => (V * C).indicator (1 : G → ℝ≥0∞) ((h : G) * c)) ⟨h0, hh0⟩
+      have :=
+        lintegral_mul_right_eq_self (μ := μ)
+          (fun h : H => (V * C).indicator (1 : G → ℝ≥0∞) ((h : G) * c))
+          ⟨h0, hh0⟩
       simp only [Subgroup.coe_mul, mul_assoc] at this
       rw [this, ← lintegral_indicator_one hVm]
       refine lintegral_mono fun h => ?_
       by_cases hh : h ∈ ((↑) ⁻¹' V : Set H)
-      · rw [Set.indicator_of_mem hh, Set.indicator_of_mem (Set.mul_mem_mul (show (h : G) ∈ V from hh) hc)]
+      · rw [Set.indicator_of_mem hh,
+          Set.indicator_of_mem (Set.mul_mem_mul (show (h : G) ∈ V from hh) hc)]
         rfl
       · rw [Set.indicator_of_notMem hh]
         exact zero_le
-    have hle : (∫⁻ g in {g | ∃ h ∈ H, ∃ c ∈ C, g = h * c}, ρ g ∂μG) * μ ((↑) ⁻¹' V : Set H)
-        ≤ μG (V * C) := by
+    have hle
+        : (∫⁻ g in {g | ∃ h ∈ H, ∃ c ∈ C, g = h * c}, ρ g ∂μG) * μ ((↑) ⁻¹' V : Set H)
+          ≤ μG (V * C) := by
       rw [← hE, ← lintegral_mul_const _ hρ.1]
       refine le_trans (setLIntegral_mono' hcl.measurableSet fun g hg => ?_)
         (setLIntegral_le_lintegral _ _)

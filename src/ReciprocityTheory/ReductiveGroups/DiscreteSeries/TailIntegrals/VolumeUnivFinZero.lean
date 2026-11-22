@@ -17,7 +17,8 @@ instance xpBorel (p m : ℕ) : BorelSpace (Xp p m) := by
   exact Prod.borelSpace
 
 instance xpHaar (p m : ℕ) : (volume : Measure (Xp p m)).IsAddHaarMeasure := by
-  have : (volume : Measure ((Fin m → ℂ) × ℝ)).IsAddHaarMeasure := Measure.prod.instIsAddHaarMeasure _ _
+  have : (volume : Measure ((Fin m → ℂ) × ℝ)).IsAddHaarMeasure :=
+    Measure.prod.instIsAddHaarMeasure _ _
   have : (volume : Measure ((Fin p → ℂ) × (Fin m → ℂ) × ℝ)).IsAddHaarMeasure :=
     Measure.prod.instIsAddHaarMeasure _ _
   exact Measure.prod.instIsAddHaarMeasure _ _
@@ -146,7 +147,8 @@ lemma split_cons' {p : ℕ} {R : Type*} [MeasureSpace R] [SFinite (volume : Meas
   exact h2
 
 def sclL (p m : ℕ) (t : ℝ) : Xp p m →ₗ[ℝ] Xp p m :=
-  (t • LinearMap.id).prodMap ((t • LinearMap.id).prodMap ((t • LinearMap.id).prodMap ((t ^ 2) • LinearMap.id)))
+  (t • LinearMap.id).prodMap
+    ((t • LinearMap.id).prodMap ((t • LinearMap.id).prodMap ((t ^ 2) • LinearMap.id)))
 
 lemma sclL_apply (p m : ℕ) (t : ℝ) (x : Xp p m) :
     sclL p m t x = (t • x.1, t • x.2.1, t • x.2.2.1, t ^ 2 * x.2.2.2) := rfl

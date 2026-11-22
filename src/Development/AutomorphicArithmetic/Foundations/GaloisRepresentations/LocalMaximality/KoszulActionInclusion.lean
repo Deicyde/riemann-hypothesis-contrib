@@ -5,13 +5,16 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.productCup_of_system.KoszulColumns
 
 section Gen
-variable {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (act : S →ₐ[ℂ] Module.End ℂ E)
+variable
+  {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
+  (act : S →ₐ[ℂ] Module.End ℂ E)
 
 private lemma sm_image {ι : Type} (M : Submodule ℂ E) (f : ι → S) (A : Set ι) :
     sm act M (f '' A) = ⨆ k ∈ A, M.map (act (f k)) := by
@@ -24,7 +27,8 @@ private lemma sm_range {ι : Type} (M : Submodule ℂ E) (f : ι → S) :
 end Gen
 
 section Sysx
-variable {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E)
+variable
+  {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E)
 
 private lemma r_formula (i j a : Fin (d + 1)) :
     T.r n11 T.mu i j (toLex (a, j)) =
@@ -36,8 +40,9 @@ private lemma r_formula (i j a : Fin (d + 1)) :
 end Sysx
 
 section Inst
-variable {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K] {d : ℕ}
-  (x : Fin (d + 1) → Fˣ)
+variable
+  {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
+  {d : ℕ} (x : Fin (d + 1) → Fˣ)
 
 variable (F K) in
 private def i0 : F ⊗[ℂ] F →ₐ[ℂ] F ⊗[ℂ] K :=
@@ -69,7 +74,8 @@ private lemma ctrF_eq (ψ : F →ₗ[F] F) (m : F ⊗[ℂ] DR ℂ K) :
 end Inst
 
 section Sysy
-variable {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E)
+variable
+  {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E] (T : Sys d S E)
 
 private lemma r_mem (hg : T.Good) {I J : Finset (Fin (d + 1))} {i j : Fin (d + 1)} (hi : i ∈ I) (hj : j ∈ J)
     (a : Fin (d + 1)) : T.r n11 T.mu i j (toLex (a, j)) ∈ T.R I J := by
@@ -94,8 +100,9 @@ private lemma koszulEntry_diagonal (i j : Fin (d + 1)) :
 end Sysy
 
 section Main
-variable {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K] {d : ℕ}
-  (x : Fin (d + 1) → Fˣ)
+variable
+  {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
+  {d : ℕ} (x : Fin (d + 1) → Fˣ)
 
 private lemma r_jj (a : ℕ) (j : Fin (d + 1)) (l : Fin d) :
     (sysP K x a).r n11 (sysP K x a).mu j j (dj j l) = i0 F K (f0 x j l) := by
@@ -189,8 +196,8 @@ end Main
 
 end UpperTheory.Gal.productCup_of_system.KoszulColumns
 
-theorem UpperTheory.Gal.productCup_of_system.colP_of :
-    RegLat → LatOm → LatA → K1 → LocD → GoodZ → ColP := by
+theorem UpperTheory.Gal.productCup_of_system.colP_of
+    : RegLat → LatOm → LatA → K1 → LocD → GoodZ → ColP := by
   intro hR hO hA hK hL hG F K _ _ _ _ _ _ d x hc a I J i hi j hj
   have hg : (sysP K x a).Good := (hG F K d x hc a).2.1
   by_cases hij : i = j
@@ -206,24 +213,35 @@ theorem UpperTheory.Gal.productCup_of_system.colP_of :
     have hle : (sysP K x a).M I J ≤ (sysP K x a).M (insert j I) J :=
       hg.monoM I (insert j I) J J Ine Jne (Finset.subset_insert j I) subset_rfl
     have hst' := hg.stab (insert j I) J Ine' Jne
-    have LD := hL _ _ (sysP K x a).act (Fin d) ((sysP K x a).R I J) ((sysP K x a).M I J) ((sysP K x a).M (insert j I) J)
-      (fun l => (sysP K x a).r n11 (sysP K x a).mu i j (dj j l)) ((sysP K x a).X i * ((sysP K x a).X j)⁻¹)
-      (((sysP K x a).X j * ((sysP K x a).X i)⁻¹ : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K)
-      (((sysP K x a).Y i * ((sysP K x a).Y j)⁻¹ : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K) l0 d
-      (hg.stab I J Ine Jne) (fun l => KoszulColumns.r_mem _ hg hi hj _) (hg.memX I J Jne i hi j) (hg.memY I J Ine j hj i)
-      (by
-        have h : dj j l0 = toLex (i, j) := by rw [← hl0]; rfl
-        simp only [h]
-        exact KoszulColumns.koszulEntry_diagonal _ i j)
-      hle (KoszulColumns.loc_step x hA hc a hg I J i j hi hj)
-      (fun m hm => ⟨hst' _ (hg.memX _ J Jne j hjI' i) m hm, by
-        have : (((sysP K x a).X i * ((sysP K x a).X j)⁻¹)⁻¹ : (F ⊗[ℂ] K)ˣ) = (sysP K x a).X j * ((sysP K x a).X i)⁻¹ := by
-          simp [mul_comm]
-        rw [this]
-        exact hst' _ (hg.memX _ J Jne i hiI' j) m hm⟩)
-    have hrv : (fun l => (sysP K x a).r n11 (sysP K x a).mu i j (dj j l) *
-        (((sysP K x a).X i * ((sysP K x a).X j)⁻¹ : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K)) =
-        fun l => (sysP K x a).r n11 (sysP K x a).mu j j (dj j l) := by
+    have LD :=
+      hL _ _ (sysP K x a).act (Fin d) ((sysP K x a).R I J) ((sysP K x a).M I J)
+        ((sysP K x a).M (insert j I) J)
+        (fun l => (sysP K x a).r n11 (sysP K x a).mu i j (dj j l))
+        ((sysP K x a).X i * ((sysP K x a).X j)⁻¹)
+        (((sysP K x a).X j * ((sysP K x a).X i)⁻¹ : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K)
+        (((sysP K x a).Y i * ((sysP K x a).Y j)⁻¹ : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K) l0 d
+        (hg.stab I J Ine Jne)
+        (fun l => KoszulColumns.r_mem _ hg hi hj _)
+        (hg.memX I J Jne i hi j) (hg.memY I J Ine j hj i)
+        (by
+          have h : dj j l0 = toLex (i, j) := by rw [← hl0]; rfl
+          simp only [h]
+          exact KoszulColumns.koszulEntry_diagonal _ i j)
+        hle (KoszulColumns.loc_step x hA hc a hg I J i j hi hj)
+        (fun m hm => ⟨
+          hst' _ (hg.memX _ J Jne j hjI' i) m hm,
+          by
+            have : (((sysP K x a).X i * ((sysP K x a).X j)⁻¹)⁻¹ : (F ⊗[ℂ] K)ˣ)
+                = (sysP K x a).X j * ((sysP K x a).X i)⁻¹ := by
+              simp [mul_comm]
+            rw [this]
+            exact hst' _ (hg.memX _ J Jne i hiI' j) m hm
+        ⟩)
+    have hrv
+        : (fun l =>
+            (sysP K x a).r n11 (sysP K x a).mu i j (dj j l)
+              * (((sysP K x a).X i * ((sysP K x a).X j)⁻¹ : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K))
+          = fun l => (sysP K x a).r n11 (sysP K x a).mu j j (dj j l) := by
       funext l
       exact KoszulColumns.r_mul_v _ i j _
     rw [hrv] at LD

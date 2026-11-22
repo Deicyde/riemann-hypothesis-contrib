@@ -11,8 +11,11 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
-open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC
+  PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F
+  PositivityTheory.Rg.BcB.Desc
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf TypeB TypeH)
 open UpperTheory.V.Z.Tf.GlobalTraceComparison
@@ -25,10 +28,13 @@ namespace UpperTheory.Zero.ConvolutionTheory.EB
 
 attribute [local instance] borelG borelF borelA borelH
 
-private theorem levelFam_of {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} (Z : Finset (Pl E))
-    (K : ∀ w : Pl E, Subgroup (GLw n w)) (hZ : ∀ w ∈ Z, IsSplitAt w) (ho : ∀ w, IsOpen (K w : Set (GLw n w)))
-    (hle : ∀ w, K w ≤ GlobalTheory.LFun.KGL w (n := n)) (hoff : ∀ w ∉ Z, K w = GlobalTheory.LFun.KGL w (n := n)) :
-    IsLevelFam (GlobalTheory.BCT.thL n) (fun w : Pl E => GlobalTheory.LFun.KGL w (n := n)) K := by
+private theorem levelFam_of
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {n : ℕ}
+    (Z : Finset (Pl E)) (K : ∀ w : Pl E, Subgroup (GLw n w)) (hZ : ∀ w ∈ Z, IsSplitAt w)
+    (ho : ∀ w, IsOpen (K w : Set (GLw n w))) (hle : ∀ w, K w ≤ GlobalTheory.LFun.KGL w (n := n))
+    (hoff : ∀ w ∉ Z, K w = GlobalTheory.LFun.KGL w (n := n))
+    : IsLevelFam (GlobalTheory.BCT.thL n) (fun w : Pl E => GlobalTheory.LFun.KGL w (n := n)) K := by
   refine ⟨fun w => ?_, ?_⟩
   · by_cases hw : w ∈ Z
     · refine ⟨ho w, hle w, fun k hk => ?_⟩
@@ -48,12 +54,16 @@ theorem positionTest : PositionTest := by
   have h₁ := levelFam_of Z L.L₁ hZ L.open₁ L.le₁ fun w hw => (L.off w hw).1
   have h₂ := levelFam_of Z L.L₂ hZ L.open₂ L.le₂ fun w hw => (L.off w hw).2
   have hH : ∀ w, IsHecke ((L.L₁ w).prod (L.L₂ w)) (L.ln w) := fun w => (locAlg E a b Z L w).1
-  have hI : ∀ w ∉ Z, L.ln w = (K2 a b w : Set _).indicator 1 := fun w hw => (locAlg E a b Z L w).2.2.1 hw
+  have hI : ∀ w ∉ Z, L.ln w = (K2 a b w : Set _).indicator 1 := fun w hw =>
+    (locAlg E a b Z L w).2.2.1 hw
   have hK : ∀ w ∉ Z, (L.L₁ w).prod (L.L₂ w) = K2 a b w := by
     intro w hw
     rw [(L.off w hw).1, (L.off w hw).2]
-  refine ⟨fun w _ => hH w, ⟨L.L₁, L.L₂, h₁, h₂, hH, ?_⟩, fun φ hφ => ⟨fun w hw => ?_, fun T e =>
-    ⟨L.L₁, L.L₂, h₁, h₂, fun w => ?_, ?_⟩⟩⟩
+  refine ⟨
+    fun w _ => hH w,
+    ⟨L.L₁, L.L₂, h₁, h₂, hH, ?_⟩,
+    fun φ hφ => ⟨fun w hw => ?_, fun T e => ⟨L.L₁, L.L₂, h₁, h₂, fun w => ?_, ?_⟩⟩
+  ⟩
   · filter_upwards [Z.finite_toSet.compl_mem_cofinite] with w hw
     exact hI w hw
   · have h := PositivityTheory.Rg.BcB.F.LocOk.prod_open_le (h₁.1 w) (h₂.1 w)

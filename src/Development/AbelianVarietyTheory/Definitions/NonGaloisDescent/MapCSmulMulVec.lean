@@ -14,7 +14,6 @@ structure Fr (l : ℕ) (O : Type) [CommRing O] where
   prime : l.Prime
   odd : l ≠ 2
   l_nonunit : ¬ IsUnit (l : O)
-
   root : ∃ x : O, Associated (x ^ (l - 1)) (l : O)
   e : ℕ
   s : ℕ
@@ -34,18 +33,12 @@ structure Fr (l : ℕ) (O : Type) [CommRing O] where
   χ : Oˣ
   χ_gen : Associated ((χ : O) - 1) (l : O)
   χ_zero : constantCoeff (1 + (κ : O⟦X⟧) * E) = (χ : O) ^ s
-
   lev : Fin e → (O⟦X⟧ ≃ₐ[O] O⟦X⟧)
   lev_X : ∀ τ, lev τ X = X + C (ϖ τ)
-
   χ_lev : ∀ τ, ∃ w : O⟦X⟧, γ (X - C (ϖ τ)) = (X - C (ϖ τ)) * w ∧ constantCoeff (lev τ w) = (χ : O)
-
   lvl_red : ∀ (k : ℕ) (a : O⟦X⟧), (φ ^ k) E ∣ a ^ 2 → (φ ^ k) E ∣ a
-
   lvl_triv : ∀ (k : ℕ) (a : O⟦X⟧), (φ ^ k) E ∣ (γ ^ (l ^ k)) a - a
-
   lvl_inv : e = 1 → ∀ (k : ℕ) (a : O⟦X⟧), (φ ^ k) E ∣ γ a - a → ∃ c : O, (φ ^ k) E ∣ a - C c
-
   EE : Type
   [eeRing : CommRing EE]
   [eeAlgA : Algebra O⟦X⟧ EE]
@@ -54,16 +47,17 @@ structure Fr (l : ℕ) (O : Type) [CommRing O] where
   EE_inj : Function.Injective (algebraMap O⟦X⟧ EE)
   EE_X : IsUnit (algebraMap O⟦X⟧ EE X)
   EE_complete : IsAdicComplete (Ideal.span {(l : EE)}) EE
-  EE_dense : ∀ (x : EE) (k : ℕ), ∃ (a : O⟦X⟧) (m : ℕ),
-    (l : EE) ^ k ∣ x * algebraMap O⟦X⟧ EE (X ^ m) - algebraMap O⟦X⟧ EE a
+  EE_dense
+    : ∀ (x : EE) (k : ℕ), ∃ (a : O⟦X⟧) (m : ℕ),
+      (l : EE) ^ k ∣ x * algebraMap O⟦X⟧ EE (X ^ m) - algebraMap O⟦X⟧ EE a
   EE_sat : ∀ (a : O⟦X⟧) (k : ℕ), (l : EE) ^ k ∣ algebraMap O⟦X⟧ EE a → (l : O⟦X⟧) ^ k ∣ a
   φE : EE →ₐ[O] EE
   φE_ext : ∀ a, φE (algebraMap O⟦X⟧ EE a) = algebraMap O⟦X⟧ EE (φ a)
   γE : EE →ₐ[O] EE
   γE_ext : ∀ a, γE (algebraMap O⟦X⟧ EE a) = algebraMap O⟦X⟧ EE (γ a)
-
-  coeffRing : ∃ (_ : IsDomain O) (_ : IsDiscreteValuationRing O),
-      IsAdicComplete (IsLocalRing.maximalIdeal O) O ∧ CharZero O := by
+  coeffRing
+      : ∃ (_ : IsDomain O) (_ : IsDiscreteValuationRing O),
+        IsAdicComplete (IsLocalRing.maximalIdeal O) O ∧ CharZero O := by
     exact ⟨inferInstance, inferInstance, inferInstance, inferInstance⟩
 
 attribute [instance] Fr.eeRing Fr.eeAlgA Fr.eeAlgO Fr.eeTow
@@ -118,16 +112,18 @@ variable [IsDomain O]
 
 end Sys
 
-structure Hom {l : ℕ} {O : Type} [CommRing O] {R : Fr l O} {n r r' : ℕ} (S : Sys R n r)
-    (S' : Sys R n r') where
+structure Hom
+    {l : ℕ} {O : Type} [CommRing O]
+    {R : Fr l O} {n r r' : ℕ} (S : Sys R n r) (S' : Sys R n r') where
   F : ZMod n → Matrix (Fin r') (Fin r) O⟦X⟧
   φ_comm : ∀ i x, ((F i).map R.ι).mulVec (S.φl i x) = S'.φl i (((F (i - 1)).map R.ι).mulVec x)
   γ_comm : ∀ i x, ((F i).map R.ι).mulVec (S.γl i x) = S'.γl i (((F i).map R.ι).mulVec x)
 
 namespace Hom
 
-variable {l : ℕ} {O : Type} [CommRing O] {R : Fr l O} {n r r' r'' : ℕ} {S : Sys R n r} {S' : Sys R n r'}
-  {S'' : Sys R n r''} (F : Hom S S')
+variable
+  {l : ℕ} {O : Type} [CommRing O]
+  {R : Fr l O} {n r r' r'' : ℕ} {S : Sys R n r} {S' : Sys R n r'} {S'' : Sys R n r''} (F : Hom S S')
 
 def comp (F' : Hom S' S'') (F : Hom S S') : Hom S S'' where
   F := fun i => F'.F i * F.F i

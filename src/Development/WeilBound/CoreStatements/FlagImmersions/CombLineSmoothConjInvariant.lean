@@ -9,18 +9,22 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeome
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar.Top
 
 namespace RootFieldNumerics
 
 namespace Ii
 
-theorem contDiffOn_zpow_h {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] (A : HermLine ι)
-    (hA : IsSmoothHerm A) (n : ℤ) :
-    ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun z => A.h z ^ n) {z | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} := by
+theorem contDiffOn_zpow_h
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    (A : HermLine ι) (hA : IsSmoothHerm A)
+    (n : ℤ)
+    : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun z => A.h z ^ n) {z | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} := by
   unfold IsSmoothHerm at hA
-  have hne : ∀ z ∈ {z : (k : K) × ι k → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0}, A.h z ≠ 0 :=
-    fun z hz => (A.pos z hz).ne'
+  have hne : ∀ z ∈ {z : (k : K) × ι k → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0}, A.h z ≠ 0 := fun z hz =>
+    (A.pos z hz).ne'
   rcases Int.eq_nat_or_neg n with ⟨m, rfl | rfl⟩
   · simpa using hA.pow m
   · simp only [zpow_neg, zpow_natCast]
@@ -29,7 +33,12 @@ theorem contDiffOn_zpow_h {K : Type} [Fintype K] {ι : K → Type} [∀ k, Finty
 end Ii
 
 open Ii in
-theorem combLine_smooth_conj_invariant : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (J : Type) [Fintype J] (ℓ : J → HermLine ι) (n : J → ℤ), ((∀ j, IsSmoothHerm (ℓ j)) → IsSmoothHerm (combLine ℓ n)) ∧ ((∀ j, IsConjInvariantH (ℓ j)) → IsConjInvariantH (combLine ℓ n)) ∧ IsSmoothHerm (trivLine ι) := by
+theorem combLine_smooth_conj_invariant
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (J : Type) [Fintype J]
+        (ℓ : J → HermLine ι) (n : J → ℤ),
+      ((∀ j, IsSmoothHerm (ℓ j)) → IsSmoothHerm (combLine ℓ n))
+        ∧ ((∀ j, IsConjInvariantH (ℓ j)) → IsConjInvariantH (combLine ℓ n))
+        ∧ IsSmoothHerm (trivLine ι) := by
   intro K _ ι _ J _ ℓ n
   refine ⟨fun h => ?_, fun h z => ?_, ?_⟩
   · exact contDiffOn_prod fun j _ => contDiffOn_zpow_h (ℓ j) (h j) (n j)

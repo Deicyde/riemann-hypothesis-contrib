@@ -24,24 +24,28 @@ def chartSubst (a : J → MRing ι R) : (Σ o, extIdx ι J o) → Polynomial (MR
   | ⟨none, j⟩ => Polynomial.C (a j) * Polynomial.X
   | ⟨some k, i⟩ => Polynomial.C (X ⟨k, i⟩)
 
-theorem aeval_chartSubst_liftForm (a : J → MRing ι R) (p : MRing ι R) :
-    aeval (chartSubst a) (liftForm p) = Polynomial.C p := by
-  have e : (aeval (chartSubst a)).comp (liftForm : MRing ι R →ₐ[R] MRing (extIdx ι J) R) =
-      Polynomial.CAlgHom := by
+theorem aeval_chartSubst_liftForm (a : J → MRing ι R) (p : MRing ι R)
+    : aeval (chartSubst a) (liftForm p) = Polynomial.C p := by
+  have e
+      : (aeval (chartSubst a)).comp (liftForm : MRing ι R →ₐ[R] MRing (extIdx ι J) R)
+        = Polynomial.CAlgHom := by
     apply MvPolynomial.algHom_ext
     intro v
     simp [liftForm, chartSubst]
   exact DFunLike.congr_fun e p
 
-theorem aeval_chartSubst_mem_of_mem_blowUpOf {P : Ideal (MRing ι R)} (hP : P.IsPrime)
+theorem aeval_chartSubst_mem_of_mem_blowUpOf
+    {P : Ideal (MRing ι R)} (hP : P.IsPrime)
     {u a : J → MRing ι R} {u₀ g : MRing ι R} (hg : g ∉ P) (h : ∀ j, u₀ * u j - g * a j ∈ P)
-    {F : MRing (extIdx ι J) R} (hF : F ∈ blowUpOf P u) :
-    aeval (chartSubst a) F ∈ Ideal.map (Polynomial.C : MRing ι R →+* Polynomial (MRing ι R)) P := by
+    {F : MRing (extIdx ι J) R} (hF : F ∈ blowUpOf P u)
+    : aeval (chartSubst a) F
+      ∈ Ideal.map (Polynomial.C : MRing ι R →+* Polynomial (MRing ι R)) P := by
   let π := Polynomial.mapRingHom (Ideal.Quotient.mk P)
-  have key : (Polynomial.compRingHom (Polynomial.C (Ideal.Quotient.mk P g) * Polynomial.X)).comp
-        (π.comp (aeval (R := R) (chartSubst a)).toRingHom) =
-      (Polynomial.compRingHom (Polynomial.C (Ideal.Quotient.mk P u₀) * Polynomial.X)).comp
-        (aeval (R := R) (blowUpSubst P u)).toRingHom := by
+  have key
+      : (Polynomial.compRingHom (Polynomial.C (Ideal.Quotient.mk P g) * Polynomial.X)).comp
+          (π.comp (aeval (R := R) (chartSubst a)).toRingHom)
+        = (Polynomial.compRingHom (Polynomial.C (Ideal.Quotient.mk P u₀) * Polynomial.X)).comp
+          (aeval (R := R) (blowUpSubst P u)).toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro r
       simp [π, Polynomial.compRingHom]
@@ -51,9 +55,12 @@ theorem aeval_chartSubst_mem_of_mem_blowUpOf {P : Ideal (MRing ι R)} (hP : P.Is
           Ideal.Quotient.eq.mpr (h i)
         simp only [map_mul] at e
         simp [π, chartSubst, blowUpSubst, Polynomial.compRingHom]
-        have e' : Polynomial.C (Ideal.Quotient.mk P (a i)) * Polynomial.C (Ideal.Quotient.mk P g) =
-            Polynomial.C (Ideal.Quotient.mk P (u i)) * Polynomial.C (Ideal.Quotient.mk P u₀) := by
-          rw [← Polynomial.C_mul, ← Polynomial.C_mul, mul_comm (Ideal.Quotient.mk P (u i)), e, mul_comm]
+        have e'
+            : Polynomial.C (Ideal.Quotient.mk P (a i)) * Polynomial.C (Ideal.Quotient.mk P g)
+              = Polynomial.C (Ideal.Quotient.mk P (u i))
+                * Polynomial.C (Ideal.Quotient.mk P u₀) := by
+          rw [← Polynomial.C_mul, ← Polynomial.C_mul, mul_comm (Ideal.Quotient.mk P (u i)), e,
+            mul_comm]
         rw [← mul_assoc, ← mul_assoc, e']
       · simp [π, chartSubst, blowUpSubst, Polynomial.compRingHom]
   have hF' : π (aeval (chartSubst a) F) = 0 := by
@@ -66,13 +73,15 @@ theorem aeval_chartSubst_mem_of_mem_blowUpOf {P : Ideal (MRing ι R)} (hP : P.Is
   have hk : aeval (chartSubst a) F ∈ RingHom.ker π := hF'
   rwa [Polynomial.ker_mapRingHom, Ideal.mk_ker] at hk
 
-theorem mem_of_aeval_chartSubst_mem {a : J → MRing ι R} {H : Ideal (MRing (extIdx ι J) R)}
-    (hH : H.IsPrime) {P' : Ideal (MRing ι R)} (hP'H : P' ≤ H.comap (liftForm (J := J))) (j₀ : J)
-    (ha : liftForm (a j₀) ∉ H)
+theorem mem_of_aeval_chartSubst_mem
+    {a : J → MRing ι R} {H : Ideal (MRing (extIdx ι J) R)} (hH : H.IsPrime)
+    {P' : Ideal (MRing ι R)} (hP'H : P' ≤ H.comap (liftForm (J := J)))
+    (j₀ : J) (ha : liftForm (a j₀) ∉ H)
     (hrel : ∀ j, newVar j * liftForm (a j₀) - newVar j₀ * liftForm (a j) ∈ H)
     {F : MRing (extIdx ι J) R}
-    (hF : aeval (chartSubst a) F ∈ Ideal.map (Polynomial.C : MRing ι R →+* Polynomial (MRing ι R)) P') :
-    F ∈ H := by
+    (hF
+      : aeval (chartSubst a) F ∈ Ideal.map (Polynomial.C : MRing ι R →+* Polynomial (MRing ι R)) P')
+    : F ∈ H := by
   let L := FractionRing (MRing (extIdx ι J) R ⧸ H)
   let q : MRing (extIdx ι J) R →+* L := (algebraMap _ L).comp (Ideal.Quotient.mk H)
   have hq : ∀ y, q y = 0 ↔ y ∈ H := by
@@ -116,8 +125,9 @@ theorem BlowUpStrictTransform.proof : BlowUpStrictTransform.Statement.{u} := by
   set Q := blowUpOf P (blowUpGens s g f m e) with hQ
   have hPp : P.IsPrime := hP.multiProj.isPrime
 
-  obtain ⟨x, hx, hHmin⟩ : ∃ x : MRing (extIdx ι (BlowUpIdx ι)) O,
-      (x = liftForm s ∨ x = newVar none) ∧ H ∈ (Q ⊔ Ideal.span {x}).minimalPrimes := by
+  obtain ⟨x, hx, hHmin⟩
+      : ∃ x : MRing (extIdx ι (BlowUpIdx ι)) O,
+        (x = liftForm s ∨ x = newVar none) ∧ H ∈ (Q ⊔ Ideal.span {x}).minimalPrimes := by
     have hm : ∀ {F}, divCycle Q F H ≠ 0 → H ∈ (Q ⊔ Ideal.span {F}).minimalPrimes := by
       intro F hF
       unfold divCycle at hF
@@ -142,9 +152,11 @@ theorem BlowUpStrictTransform.proof : BlowUpStrictTransform.Statement.{u} := by
   set a := blowUpCof s m e u₀ v₀ with ha_def
   have haS : liftForm (a (some (some i))) ∉ H := by
     show liftForm (v₀ * powMonomial e i) ∉ H
-    rw [map_mul]; exact mnm hv hpm
-  have hrelH : ∀ j, newVar j * liftForm (a (some (some i))) -
-      newVar (some (some i)) * liftForm (a j) ∈ H :=
+    rw [map_mul]
+    exact mnm hv hpm
+  have hrelH
+      : ∀ j,
+        newVar j * liftForm (a (some (some i))) - newVar (some (some i)) * liftForm (a j) ∈ H :=
     fun j => hQH (blowUpCof_relation hPp e hD.den_not_mem h j _)
 
   have hsH₀ : s ∈ H₀ := by
@@ -157,17 +169,20 @@ theorem BlowUpStrictTransform.proof : BlowUpStrictTransform.Statement.{u} := by
       exact (hHp.mem_or_mem h4).resolve_left hu
 
   have hmin₀ : H₀ ∈ (P ⊔ Ideal.span {s}).minimalPrimes := by
-    refine ⟨⟨hH₀p, sup_le hPH₀ ((Ideal.span_singleton_le_iff_mem _).mpr hsH₀)⟩,
-      fun P' hP' hP'H₀ => ?_⟩
+    refine
+      ⟨⟨hH₀p, sup_le hPH₀ ((Ideal.span_singleton_le_iff_mem _).mpr hsH₀)⟩, fun P' hP' hP'H₀ => ?_⟩
     have := hP'.1
     have hsP' : s ∈ P' := hP'.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self s))
-    let Q' := (Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) P').comap
-      (aeval (R := O) (chartSubst a))
+    let Q' :=
+      (Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) P').comap
+        (aeval (R := O) (chartSubst a))
     have hQ'p : Q'.IsPrime := Ideal.comap_isPrime _ _
     have hQQ' : Q ⊔ Ideal.span {x} ≤ Q' := by
       refine sup_le (fun F hF => ?_) ((Ideal.span_singleton_le_iff_mem _).mpr ?_)
       · exact Ideal.map_mono (le_sup_left.trans hP'.2)
-          (aeval_chartSubst_mem_of_mem_blowUpOf hPp hD.den_not_mem (fun j => blowUpCof_spec e h j) hF)
+          (aeval_chartSubst_mem_of_mem_blowUpOf hPp hD.den_not_mem
+            (fun j => blowUpCof_spec e h j)
+            hF)
       · rw [Ideal.mem_comap]
         rcases hx with rfl | rfl
         · rw [aeval_chartSubst_liftForm]
@@ -177,7 +192,8 @@ theorem BlowUpStrictTransform.proof : BlowUpStrictTransform.Statement.{u} := by
     have hQ'H : Q' ≤ H := fun F hF => mem_of_aeval_chartSubst_mem hHp hP'H₀ _ haS hrelH hF
     have hHQ' := hHmin.2 ⟨hQ'p, hQQ'⟩ hQ'H
     intro p hp
-    have h5 : Polynomial.C p ∈ Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) P' := by
+    have h5
+        : Polynomial.C p ∈ Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) P' := by
       rw [← aeval_chartSubst_liftForm a p]
       exact hHQ' hp
     simpa using Ideal.mem_map_C_iff.mp h5 0
@@ -192,10 +208,11 @@ theorem BlowUpStrictTransform.proof : BlowUpStrictTransform.Statement.{u} := by
     intro hs
     obtain ⟨r, hr, hr0⟩ := hs (Ideal.Quotient.mk _ 1)
     rw [Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul, mul_one,
-      Ideal.Quotient.eq_zero_iff_mem] at hr0
+        Ideal.Quotient.eq_zero_iff_mem]
+      at hr0
     exact hr (hmin₀.1.2 hr0)
-  have htn : (multAt (P ⊔ Ideal.span {s}) H₀).toNat ≠ 0 :=
-    fun h0 => (ENat.toNat_eq_zero.mp h0).elim hnz hne
+  have htn : (multAt (P ⊔ Ideal.span {s}) H₀).toNat ≠ 0 := fun h0 =>
+    (ENat.toNat_eq_zero.mp h0).elim hnz hne
   exact_mod_cast htn
 
 end

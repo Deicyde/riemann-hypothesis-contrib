@@ -11,13 +11,22 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.NadelVanish
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 namespace GlobalTheory.Discrepancy
 
-theorem isOpen_kltLocus_lcLocus : GlobalTheory.Published.Principalisation → ∀ (k : Type) [Field k] [CharZero k] (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] [GlobalTheory.IsNormalScheme X] (p : X ⟶ Sp k) (n : ℕ), IsProjOver p → topologicalKrullDim X = n → ∀ (Δ : X → ℚ) (m : ℕ) (G : CartierDiv X), 0 < m → IsLogCanonicalMultiple p n Δ m G → IsOpen {x : X | KltAt p n Δ x} ∧ IsOpen {x : X | LcAt p n Δ x} := by
+theorem isOpen_kltLocus_lcLocus
+    : GlobalTheory.Published.Principalisation
+      → ∀ (k : Type) [Field k] [CharZero k] (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X]
+          [GlobalTheory.IsNormalScheme X] (p : X ⟶ Sp k) (n : ℕ),
+        IsProjOver p → topologicalKrullDim X = n
+          → ∀ (Δ : X → ℚ) (m : ℕ) (G : CartierDiv X),
+            0 < m → IsLogCanonicalMultiple p n Δ m G
+              → IsOpen {x : X | KltAt p n Δ x} ∧ IsOpen {x : X | LcAt p n Δ x} := by
   intro hP k _ _ X _ _ _ p n hp hdim Δ m G hm hG
   obtain ⟨η, hη⟩ := hG.exists_isLogMult hm
   have hZ : (⊥ : Closeds X) ≠ ⊤ := by
@@ -26,7 +35,8 @@ theorem isOpen_kltLocus_lcLocus : GlobalTheory.Published.Principalisation → �
     have : x ∈ ((⊤ : Closeds X) : Set X) := trivial
     rw [← h] at this
     exact this
-  obtain ⟨Y, hY, s, hs, K, B, hres, -⟩ := GlobalTheory.T.exists_log_resolution hP k X p n hp hdim η m G hη.ne_zero ⊥ hZ
+  obtain ⟨Y, hY, s, hs, K, B, hres, -⟩ :=
+    GlobalTheory.T.exists_log_resolution hP k X p n hp hdim η m G hη.ne_zero ⊥ hZ
   haveI := hres.smooth
   haveI : Smooth (s ≫ p) := hres.smooth.smooth
   haveI : IsLocallyNoetherian Y := LocallyOfFiniteType.isLocallyNoetherian (s ≫ p)

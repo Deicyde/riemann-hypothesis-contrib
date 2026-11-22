@@ -9,11 +9,15 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD
 
-theorem holSub_comp_SS {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} {Comp : Type}
-    (X : Comp → Data E r) (la : ∀ c, Wt (X c).Ψ r) (P : FDSec X) (hP : P ∈ holSub X la) (k : Comp) :
-    P k ∈ (X k).SS (la k) := by
+theorem holSub_comp_SS
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ} {Comp : Type}
+    (X : Comp → Data E r) (la : ∀ c, Wt (X c).Ψ r) (P : FDSec X) (hP : P ∈ holSub X la) (k : Comp)
+    : P k ∈ (X k).SS (la k) := by
   have hM := siegelSpaceAlgebra_holds (E := E)
   induction hP using Submodule.span_induction with
   | mem x hx => exact hx k

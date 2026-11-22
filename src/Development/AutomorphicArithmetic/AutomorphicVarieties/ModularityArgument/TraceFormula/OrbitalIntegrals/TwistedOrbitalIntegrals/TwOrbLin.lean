@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open MeasureTheory Topology PositivityTheory.Rg.Tf.Loc UpperTheory.V.Z.Tf.Orb
 
-theorem UpperTheory.V.Z.Tf.Orb.twOrbLin :
-    UpperTheory.V.Z.Tf.Orb.TwOrbFin → UpperTheory.V.Z.Tf.Orb.TwOrbLin := by
+theorem UpperTheory.V.Z.Tf.Orb.twOrbLin
+    : UpperTheory.V.Z.Tf.Orb.TwOrbFin → UpperTheory.V.Z.Tf.Orb.TwOrbLin := by
   intro hT k _ _ _ _ _ E _ _ _ _ _ _ _ _ σ hσ n _ _ μE hμE δ hδ μ hμ
   refine ⟨fun c φ => ?_, fun φ ψ a1 a2 b1 b2 => ?_⟩
   · simp only [twOrbIntegralC, quotIntegral]

@@ -18,10 +18,11 @@ namespace GroundTheory.Heights₂.Heights
 open MvPolynomial MeasureTheory Filter Topology Matrix ComplexSets ReciprocityTheory.AnForm
 open scoped ContDiff
 
-theorem hessC_half_log_normSq_add {D : ℕ} (h : (Fin D → ℂ) → ℂ) (y : Fin D → ℂ)
-    (hh : AnalyticAt ℂ h y) (hy : h y ≠ 0) {ε : ℝ} (hε : 0 < ε) :
-    hessC (fun w => Real.log (‖h w‖ ^ 2 + ε) / 2) y =
-      ((ε / (2 * (‖h y‖ ^ 2 + ε) ^ 2) : ℝ) : ℂ) • hessC (fun w => ‖h w‖ ^ 2) y := by
+theorem hessC_half_log_normSq_add
+    {D : ℕ} (h : (Fin D → ℂ) → ℂ) (y : Fin D → ℂ) (hh : AnalyticAt ℂ h y) (hy : h y ≠ 0)
+    {ε : ℝ} (hε : 0 < ε)
+    : hessC (fun w => Real.log (‖h w‖ ^ 2 + ε) / 2) y
+      = ((ε / (2 * (‖h y‖ ^ 2 + ε) ^ 2) : ℝ) : ℂ) • hessC (fun w => ‖h w‖ ^ 2) y := by
   set L : (Fin D → ℂ) → ℝ := fun w => Real.log ‖h w‖ with hLdef
   set F : ℝ → ℝ := fun t => Real.log (Real.exp (2 * t) + ε) / 2 with hFdef
   set G : ℝ → ℝ := fun t => Real.exp (2 * t) with hGdef
@@ -32,7 +33,8 @@ theorem hessC_half_log_normSq_add {D : ℕ} (h : (Fin D → ℂ) → ℂ) (y : F
     simpa using ((hasDerivAt_id t).const_mul 2).exp
   have hFc : ContDiff ℝ 2 F :=
     ((Real.contDiff_exp.comp (contDiff_const.mul contDiff_id)).add contDiff_const).log
-      (fun t => by simp only [Function.comp_apply, id]; positivity) |>.div_const 2
+        (fun t => by simp only [Function.comp_apply, id]; positivity)
+      |>.div_const 2
   have hGc : ContDiff ℝ 2 G := Real.contDiff_exp.comp (contDiff_const.mul contDiff_id)
   have hF := HessCCompPluri.proof D F L y hFc.contDiffAt hLc hL0
   have hG := HessCCompPluri.proof D G L y hGc.contDiffAt hLc hL0
@@ -66,7 +68,8 @@ theorem hessC_half_log_normSq_add {D : ℕ} (h : (Fin D → ℂ) → ℂ) (y : F
   push_cast
   field_simp
 
-theorem LelongLimitOffZero.proof (hM : ChartMassCompact.Statement) : LelongLimitOffZero.Statement := by
+theorem LelongLimitOffZero.proof (hM : ChartMassCompact.Statement)
+    : LelongLimitOffZero.Statement := by
   classical
   intro n d J u f φ hJ hdim hu hf hfc hφ hdisj
   unfold varInt
@@ -95,8 +98,12 @@ theorem LelongLimitOffZero.proof (hM : ChartMassCompact.Statement) : LelongLimit
     refine Fin.cases ?_ (fun j => ?_) i
     · simpa using smoothNear_of_contDiff (S := zeroSet J) hqc
     · simpa using hφ j
-  have hb : ∀ ε : ℝ, 0 < ε → ∀ y, ‖chartDens J A f (vecCons (logReg u ε) φ) y‖ ≤
-      ε / (2 * m ^ 2) * chartAbsDens J A f (vecCons q φ) y := by
+  have hb
+      : ∀ ε : ℝ,
+        0 < ε
+          → ∀ y,
+            ‖chartDens J A f (vecCons (logReg u ε) φ) y‖
+              ≤ ε / (2 * m ^ 2) * chartAbsDens J A f (vecCons q φ) y := by
     intro ε hε y
     rw [Real.norm_eq_abs]
     refine (abs_chartDens_le J A f _ y).trans ?_
@@ -108,28 +115,38 @@ theorem LelongLimitOffZero.proof (hM : ChartMassCompact.Statement) : LelongLimit
     have hxK : x ∈ tsupport f ∩ zeroSet J := ⟨subset_tsupport _ hfx, hx.1⟩
     obtain rfl : A *ᵥ x = y := hx.2
     obtain ⟨U, hU, hxU, hsd, hsx, -, -⟩ := hs
-    have hsa : AnalyticAt ℂ s (A *ᵥ x) := analyticAt_pi_iff.2 fun i =>
-      ReciprocityTheory.AnForm.Osgood.osgood _ U (fun z => s z i) hU (differentiableOn_pi.1 hsd i) _ hxU
+    have hsa : AnalyticAt ℂ s (A *ᵥ x) :=
+      analyticAt_pi_iff.2 fun i =>
+        ReciprocityTheory.AnForm.Osgood.osgood _ U
+          (fun z => s z i)
+          hU (differentiableOn_pi.1 hsd i) _ hxU
     have hha : AnalyticAt ℂ (fun w => linEval u (s w)) (A *ᵥ x) := by
       unfold linEval
-      exact Finset.analyticAt_fun_sum _ fun j _ => analyticAt_const.mul ((analyticAt_pi_iff.1 hsa) j)
+      exact Finset.analyticAt_fun_sum _ fun j _ =>
+        analyticAt_const.mul ((analyticAt_pi_iff.1 hsa) j)
     have hne : linEval u (s (A *ᵥ x)) ≠ 0 := by rw [hsx]; exact hu0 x hxK
     have hH0 := hessC_half_log_normSq_add (fun w => linEval u (s w)) _ hha hne hε
     simp only [hsx] at hH0
-    have hH : hessC (logReg u ε ∘ s) (A *ᵥ x) =
-        ((ε / (2 * (q x + ε) ^ 2) : ℝ) : ℂ) • hessC (q ∘ s) (A *ᵥ x) := hH0
+    have hH
+        : hessC (logReg u ε ∘ s) (A *ᵥ x)
+          = ((ε / (2 * (q x + ε) ^ 2) : ℝ) : ℂ) • hessC (q ∘ s) (A *ᵥ x) :=
+      hH0
     rw [vecCons_comp, vecCons_comp, maDens_cons_of_hessC_eq_smul (logReg u ε ∘ s) (q ∘ s) _ _ _ hH]
     have ha : m ≤ q x := hm x hxK
     have hc0 : 0 ≤ ε / (2 * (q x + ε) ^ 2) := by positivity
     have hc : ε / (2 * (q x + ε) ^ 2) ≤ ε / (2 * m ^ 2) :=
       div_le_div_of_nonneg_left hε.le (by positivity) (by nlinarith)
-    calc |f x * (ε / (2 * (q x + ε) ^ 2) * maDens (Fin.cons (q ∘ s) fun k => φ k ∘ s) (A *ᵥ x))|
-        = ε / (2 * (q x + ε) ^ 2) * |f x * maDens (Fin.cons (q ∘ s) fun k => φ k ∘ s) (A *ᵥ x)| := by
-          rw [mul_left_comm, abs_mul, abs_of_nonneg hc0]
+    calc
+      |f x * (ε / (2 * (q x + ε) ^ 2) * maDens (Fin.cons (q ∘ s) fun k => φ k ∘ s) (A *ᵥ x))|
+          = ε / (2 * (q x + ε) ^ 2)
+            * |f x * maDens (Fin.cons (q ∘ s) fun k => φ k ∘ s) (A *ᵥ x)| := by
+        rw [mul_left_comm, abs_mul, abs_of_nonneg hc0]
       _ ≤ _ := mul_le_mul_of_nonneg_right hc (abs_nonneg _)
-  have hlim : Tendsto (fun ε : ℝ => ε / (2 * m ^ 2) * ∫ y, chartAbsDens J A f (vecCons q φ) y)
+  have hlim : Tendsto
+      (fun ε : ℝ => ε / (2 * m ^ 2) * ∫ y, chartAbsDens J A f (vecCons q φ) y)
       (𝓝[>] 0) (𝓝 0) := by
-    have hc : Continuous (fun ε : ℝ => ε / (2 * m ^ 2) * ∫ y, chartAbsDens J A f (vecCons q φ) y) := by
+    have hc
+        : Continuous (fun ε : ℝ => ε / (2 * m ^ 2) * ∫ y, chartAbsDens J A f (vecCons q φ) y) := by
       fun_prop
     exact tendsto_nhdsWithin_of_tendsto_nhds (hc.tendsto' 0 0 (by simp))
   refine squeeze_zero_norm' ?_ hlim

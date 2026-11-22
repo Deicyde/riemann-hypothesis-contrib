@@ -8,12 +8,13 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem exists_finitePresentation_isLocalization_of_localization (A B E : Type) [CommRing A]
-    [CommRing B] [CommRing E] [Algebra A B] (M : Submonoid A) [IsLocalization M B] [Algebra B E]
-    [Algebra.FinitePresentation B E] :
-    ∃ (D : Type) (_ : CommRing D) (_ : Algebra A D) (_ : Algebra.FinitePresentation A D)
-      (φ : D →+* E), φ.comp (algebraMap A D) = (algebraMap B E).comp (algebraMap A B) ∧
-      @IsLocalization D _ (Algebra.algebraMapSubmonoid D M) E _ φ.toAlgebra := by
+theorem exists_finitePresentation_isLocalization_of_localization
+    (A B E : Type) [CommRing A] [CommRing B] [CommRing E] [Algebra A B]
+    (M : Submonoid A) [IsLocalization M B] [Algebra B E] [Algebra.FinitePresentation B E]
+    : ∃ (D : Type) (_ : CommRing D) (_ : Algebra A D) (_ : Algebra.FinitePresentation A D)
+        (φ : D →+* E),
+      φ.comp (algebraMap A D) = (algebraMap B E).comp (algebraMap A B)
+        ∧ @IsLocalization D _ (Algebra.algebraMapSubmonoid D M) E _ φ.toAlgebra := by
   classical
   obtain ⟨n, f, hf, hK⟩ := ‹Algebra.FinitePresentation B E›
   letI : Algebra (MvPolynomial (Fin n) A) (MvPolynomial (Fin n) B) :=
@@ -24,8 +25,8 @@ theorem exists_finitePresentation_isLocalization_of_localization (A B E : Type) 
   choose p hp using fun g : (s : Set (MvPolynomial (Fin n) B)) =>
     IsLocalization.surj (M.map (MvPolynomial.C (σ := Fin n))) (g : MvPolynomial (Fin n) B)
   let J₀ : Ideal (MvPolynomial (Fin n) A) := Ideal.span (Set.range fun g => (p g).1)
-  have hJ : J₀.map (algebraMap (MvPolynomial (Fin n) A) (MvPolynomial (Fin n) B)) =
-      RingHom.ker f := by
+  have hJ
+      : J₀.map (algebraMap (MvPolynomial (Fin n) A) (MvPolynomial (Fin n) B)) = RingHom.ker f := by
     have hs' : Ideal.span (s : Set (MvPolynomial (Fin n) B)) = RingHom.ker f := hs
     rw [Ideal.map_span, ← hs']
     apply le_antisymm
@@ -35,27 +36,32 @@ theorem exists_finitePresentation_isLocalization_of_localization (A B E : Type) 
       exact Ideal.mul_mem_right _ _ (Ideal.subset_span g.2)
     · rw [Ideal.span_le]
       intro g hg
-      rw [SetLike.mem_coe, ← Ideal.mul_unit_mem_iff_mem _ (IsLocalization.map_units _ (p ⟨g, hg⟩).2),
-        hp ⟨g, hg⟩]
+      rw [SetLike.mem_coe,
+        ← Ideal.mul_unit_mem_iff_mem _ (IsLocalization.map_units _ (p ⟨g, hg⟩).2), hp ⟨g, hg⟩]
       exact Ideal.subset_span ⟨_, ⟨⟨g, hg⟩, rfl⟩, rfl⟩
   have hJfg : J₀.FG := Submodule.fg_span (Set.finite_range _)
   let D := MvPolynomial (Fin n) A ⧸ J₀
   haveI : Algebra.FinitePresentation A D := Algebra.FinitePresentation.quotient hJfg
-  let Dl := MvPolynomial (Fin n) B ⧸ J₀.map (algebraMap (MvPolynomial (Fin n) A) (MvPolynomial (Fin n) B))
+  let Dl :=
+    MvPolynomial (Fin n) B ⧸ J₀.map (algebraMap (MvPolynomial (Fin n) A) (MvPolynomial (Fin n) B))
   haveI hDl : IsLocalization (Algebra.algebraMapSubmonoid D (M.map (MvPolynomial.C (σ := Fin n)))) Dl :=
     inferInstance
-  let e : Dl ≃+* E := (Ideal.quotEquivOfEq hJ).trans (Ideal.quotientKerAlgEquivOfSurjective hf).toRingEquiv
+  let e : Dl ≃+* E :=
+    (Ideal.quotEquivOfEq hJ).trans (Ideal.quotientKerAlgEquivOfSurjective hf).toRingEquiv
   let φ : D →+* E := e.toRingHom.comp (algebraMap D Dl)
   refine ⟨D, inferInstance, inferInstance, inferInstance, φ, ?_, ?_⟩
   · ext a
-    change e (Ideal.Quotient.mk _ (algebraMap (MvPolynomial (Fin n) A) (MvPolynomial (Fin n) B)
-      (MvPolynomial.C a))) = algebraMap B E (algebraMap A B a)
+    change e (Ideal.Quotient.mk _
+        (algebraMap (MvPolynomial (Fin n) A) (MvPolynomial (Fin n) B) (MvPolynomial.C a)))
+      = algebraMap B E (algebraMap A B a)
     have he : ∀ x, e (Ideal.Quotient.mk _ x) = f x := fun x => rfl
-    rw [he, MvPolynomial.algebraMap_def, MvPolynomial.map_C, ← MvPolynomial.algebraMap_eq, f.commutes]
+    rw [he, MvPolynomial.algebraMap_def, MvPolynomial.map_C, ← MvPolynomial.algebraMap_eq,
+      f.commutes]
   · letI : Algebra D E := φ.toAlgebra
     let e' : Dl ≃ₐ[D] E := AlgEquiv.ofRingEquiv (f := e) (fun x => rfl)
-    have hsub : Algebra.algebraMapSubmonoid D (M.map (MvPolynomial.C (σ := Fin n))) =
-        Algebra.algebraMapSubmonoid D M := by
+    have hsub
+        : Algebra.algebraMapSubmonoid D (M.map (MvPolynomial.C (σ := Fin n)))
+          = Algebra.algebraMapSubmonoid D M := by
       ext x
       simp only [Algebra.algebraMapSubmonoid, Submonoid.mem_map]
       constructor
@@ -67,11 +73,12 @@ theorem exists_finitePresentation_isLocalization_of_localization (A B E : Type) 
       (Algebra.algebraMapSubmonoid D (M.map (MvPolynomial.C (σ := Fin n)))) e'
     rwa [hsub] at this
 
-theorem exists_etale_atPrime_algEquiv_of_isEtaleAt (R D : Type) [CommRing R] [CommRing D]
-    [Algebra R D] [Algebra.FinitePresentation R D] (P' : Ideal D) [P'.IsPrime]
-    [Algebra.IsEtaleAt R P'] :
-    ∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (_ : Algebra.Etale R A) (q : Ideal A)
-      (_ : q.IsPrime), Nonempty (Localization.AtPrime q ≃ₐ[R] Localization.AtPrime P') := by
+theorem exists_etale_atPrime_algEquiv_of_isEtaleAt
+    (R D : Type) [CommRing R] [CommRing D] [Algebra R D] [Algebra.FinitePresentation R D]
+    (P' : Ideal D) [P'.IsPrime] [Algebra.IsEtaleAt R P']
+    : ∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (_ : Algebra.Etale R A) (q : Ideal A)
+        (_ : q.IsPrime),
+      Nonempty (Localization.AtPrime q ≃ₐ[R] Localization.AtPrime P') := by
   obtain ⟨f, hfP, hfet⟩ := Algebra.exists_etale_of_isEtaleAt (R := R) P'
   let A' := Localization.Away f
   have hdisj : Disjoint (Submonoid.powers f : Set D) P' :=
@@ -93,10 +100,18 @@ theorem exists_etale_atPrime_algEquiv_of_isEtaleAt (R D : Type) [CommRing R] [Co
     IsLocalization.algEquiv P'.primeCompl _ _
   exact ⟨A', inferInstance, inferInstance, hfet, q', hq', ⟨e.restrictScalars R⟩⟩
 
-theorem essEtale_atPrime_of_etale_over_atPrime : ∀ (R A E : Type) [CommRing R] [CommRing A] [CommRing E] [Algebra R A] [Algebra.Etale R A] (q : Ideal A) [q.IsPrime] [Algebra (Localization.AtPrime q) E] [Algebra.Etale (Localization.AtPrime q) E] [Algebra R E] [IsScalarTower R (Localization.AtPrime q) E] (P : Ideal E) [P.IsPrime], (∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (_ : Algebra.Etale R A) (q : Ideal A) (_ : q.IsPrime), Nonempty (Localization.AtPrime q ≃ₐ[R] Localization.AtPrime P)) := by
+theorem essEtale_atPrime_of_etale_over_atPrime
+    : ∀ (R A E : Type) [CommRing R] [CommRing A] [CommRing E] [Algebra R A] [Algebra.Etale R A]
+        (q : Ideal A) [q.IsPrime] [Algebra (Localization.AtPrime q) E]
+        [Algebra.Etale (Localization.AtPrime q) E] [Algebra R E]
+        [IsScalarTower R (Localization.AtPrime q) E] (P : Ideal E) [P.IsPrime],
+      (∃ (A : Type) (_ : CommRing A) (_ : Algebra R A) (_ : Algebra.Etale R A) (q : Ideal A)
+          (_ : q.IsPrime),
+        Nonempty (Localization.AtPrime q ≃ₐ[R] Localization.AtPrime P)) := by
   intro R A E _ _ _ _ _ q _ _ _ _ _ P _
   obtain ⟨D, _, _, _, φ, hφ, hloc⟩ :=
-    exists_finitePresentation_isLocalization_of_localization A (Localization.AtPrime q) E q.primeCompl
+    exists_finitePresentation_isLocalization_of_localization A (Localization.AtPrime q) E
+      q.primeCompl
   letI : Algebra R D := ((algebraMap A D).comp (algebraMap R A)).toAlgebra
   haveI : IsScalarTower R A D := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   haveI : Algebra.FinitePresentation R D := Algebra.FinitePresentation.trans R A D

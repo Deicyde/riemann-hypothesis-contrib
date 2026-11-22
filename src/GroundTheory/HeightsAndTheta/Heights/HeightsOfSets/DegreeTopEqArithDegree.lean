@@ -13,27 +13,31 @@ open NumberField
 
 noncomputable section
 
-theorem HermitianBundle.degree_top_eq_arithDegree {K : Type*} [Field K] [NumberField K]
-    (E : HermitianBundle K) : E.degree ⊤ = E.arithDegree := by
+theorem HermitianBundle.degree_top_eq_arithDegree
+    {K : Type*} [Field K] [NumberField K] (E : HermitianBundle K)
+    : E.degree ⊤ = E.arithDegree := by
   obtain ⟨s, hs⟩ := exists_linearIndependent_fin (K := K) (E := E.carrier)
-  let s' : Fin (Module.finrank (𝓞 K) E.carrier) → (⊤ : Submodule (𝓞 K) E.carrier) :=
-    fun i ↦ ⟨s i, Submodule.mem_top⟩
+  let s' : Fin (Module.finrank (𝓞 K) E.carrier) → (⊤ : Submodule (𝓞 K) E.carrier) := fun i ↦
+    ⟨s i, Submodule.mem_top⟩
   have hs' : LinearIndependent (𝓞 K) s' :=
     LinearIndependent.of_comp (⊤ : Submodule (𝓞 K) E.carrier).subtype hs
   have hcard : Fintype.card (Fin (Module.finrank (𝓞 K) E.carrier)) = E.rank ⊤ := by
     rw [Fintype.card_fin, HermitianBundle.rank, finrank_top]
   rw [E.degree_eq_of_linearIndependent ⊤ hs' hcard, HermitianBundle.arithDegree,
     arithDegree_eq E.metric hs (Fintype.card_fin _), GroundTheory.Heights₂.Heights.degreeWith]
-  have hmap : (Submodule.span (𝓞 K) (Set.range s')).map
-      (Submodule.topEquiv : (⊤ : Submodule (𝓞 K) E.carrier) ≃ₗ[𝓞 K] E.carrier).toLinearMap =
-      Submodule.span (𝓞 K) (Set.range s) := by
+  have hmap
+      : (Submodule.span (𝓞 K) (Set.range s')).map
+          (Submodule.topEquiv : (⊤ : Submodule (𝓞 K) E.carrier) ≃ₗ[𝓞 K] E.carrier).toLinearMap
+        = Submodule.span (𝓞 K) (Set.range s) := by
     rw [Submodule.map_span, ← Set.range_comp]
     rfl
   rw [Nat.card_congr (Submodule.Quotient.equiv _ _ Submodule.topEquiv hmap).toEquiv]
 
-theorem HermitianBundle.normDegree_le_rank_mul {K : Type} [Field K] [NumberField K]
-    (E : HermitianBundle.{0} K) (G : Submodule (𝓞 K) E.carrier) (m : ℝ)
-    (hm : E.slopeMax ≤ (m : EReal)) : E.normDegree G ≤ E.rank G * m := by
+theorem HermitianBundle.normDegree_le_rank_mul
+    {K : Type} [Field K] [NumberField K]
+    (E : HermitianBundle.{0} K) (G : Submodule (𝓞 K) E.carrier)
+    (m : ℝ) (hm : E.slopeMax ≤ (m : EReal))
+    : E.normDegree G ≤ E.rank G * m := by
   by_cases hr : E.rank G = 0
   · have hbot : G = ⊥ := (Submodule.finrank_eq_zero (R := 𝓞 K) (S := G)).mp hr
     rw [hr, HermitianBundle.normDegree, hbot, HermitianBundle.degree_bot]
@@ -98,7 +102,9 @@ theorem slopeMaxExtension : SlopeMaxExtension.Statement := by
   have hs : E.slope F ≤ m := by
     unfold HermitianBundle.slope
     rw [div_le_iff₀ hrpos, hr]
-    calc E.normDegree F ≤ E'.rank (F.comap X.incl) * m + E''.rank (F.map X.proj) * m := by linarith
+    calc
+      E.normDegree F
+        ≤ E'.rank (F.comap X.incl) * m + E''.rank (F.map X.proj) * m := by linarith
       _ = m * (E'.rank (F.comap X.incl) + E''.rank (F.map X.proj)) := by ring
   rw [hMm]
   exact EReal.coe_le_coe_iff.mpr hs

@@ -6,19 +6,25 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.QvalAdd
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex GlobalTheory.Ex.Arch
 
 namespace GlobalTheory.Ex.Arch
 
-
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField in
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField in
 open scoped CategoryTheory.Obj BigOperators in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.Ex.Arch.towerSt_of : _root_.GlobalTheory.Ex.BrGtSt → _root_.GlobalTheory.Ex.BrWpSt → _root_.GlobalTheory.Ex.Arch.PtSt → _root_.GlobalTheory.Ex.Arch.QkSt → _root_.GlobalTheory.Ex.Arch.WpSt → _root_.GlobalTheory.Ex.Arch.TowerSt := by
+theorem _root_.GlobalTheory.Ex.Arch.towerSt_of
+    : _root_.GlobalTheory.Ex.BrGtSt → _root_.GlobalTheory.Ex.BrWpSt
+      → _root_.GlobalTheory.Ex.Arch.PtSt → _root_.GlobalTheory.Ex.Arch.QkSt
+      → _root_.GlobalTheory.Ex.Arch.WpSt
+      → _root_.GlobalTheory.Ex.Arch.TowerSt := by
   intro hGt hWp hPt hQk hWA
   unfold _root_.GlobalTheory.Ex.BrGtSt _root_.GlobalTheory.Ex.AllN at hGt
   unfold _root_.GlobalTheory.Ex.BrWpSt _root_.GlobalTheory.Ex.AllN at hWp
@@ -35,8 +41,11 @@ theorem _root_.GlobalTheory.Ex.Arch.towerSt_of : _root_.GlobalTheory.Ex.BrGtSt �
   have hL := hQk (𝓞 E) A.N _ dd
   have hE := hWA (𝓞 E) A.N _ dd
   have hq := A.hq
-  have hT := _root_.GlobalTheory.NestQVal.qval_add_tower E H D R A.D₀ A.oa A.even A.bimult ℂ A.I A.N A.ν A.q
-    hG.1 hG.2.2.1 (fun k => ⟨(hG.2.2.2.2 k).1, (hG.2.2.2.2 k).2.2⟩) hq
+  have hT :=
+    _root_.GlobalTheory.NestQVal.qval_add_tower E H D R A.D₀ A.oa A.even A.bimult ℂ A.I A.N A.ν A.q
+      hG.1 hG.2.2.1
+      (fun k => ⟨(hG.2.2.2.2 k).1, (hG.2.2.2.2 k).2.2⟩)
+      hq
   choose! f hf using fun n (hn : 0 < n) (a : D.La) => (hL n hn).1 (A.q n a)
   have hpow : ∀ (m : ℕ) v g, dd.IsPt v g → dd.IsPt (m • v) (g ^ m) := by
     obtain ⟨g₀, hg₀, hu⟩ := hV.1 0
@@ -76,7 +85,9 @@ theorem _root_.GlobalTheory.Ex.Arch.towerSt_of : _root_.GlobalTheory.Ex.BrGtSt �
       rw [add_zero] at he
       refine ⟨-e, ?_⟩
       rw [smul_neg, eq_neg_iff_add_eq_zero]
-      calc f n 0 + n • e = (f n 0 + f n 0 + n • e) - f n 0 := by abel
+      calc
+        f n 0 + n • e
+          = (f n 0 + f n 0 + n • e) - f n 0 := by abel
         _ = 0 := by rw [← he, sub_self]
     have key : (∃ e, f n 0 = f n a + n • e) ↔ ∃ b, a = n • b := by
       rw [← hmod _ _ _ _ (hf n hn a) (hf n hn 0), ← hQn _ _ _ _ (hq n a) (hq n 0), A.I.ker n hn a 0]
@@ -97,10 +108,14 @@ theorem _root_.GlobalTheory.Ex.Arch.towerSt_of : _root_.GlobalTheory.Ex.BrGtSt �
     have hnm : 0 < n * m := Nat.mul_pos hn hm
     obtain ⟨p, hp, -⟩ := hRep (f (n * m) a)
     have hR := hf (n * m) hnm a
-    have h1 : (p : Multiplicative A.N.X × A.N.Gt).1 = (A.q (n * m) a : Multiplicative A.N.X × A.N.Gt).1 := by
+    have h1
+        : (p : Multiplicative A.N.X × A.N.Gt).1
+          = (A.q (n * m) a : Multiplicative A.N.X × A.N.Gt).1 := by
       apply Multiplicative.toAdd.injective
       rw [hp.1, hR.1]
-    have h2 : (p : Multiplicative A.N.X × A.N.Gt).2 = (A.q (n * m) a : Multiplicative A.N.X × A.N.Gt).2 ^ m := by
+    have h2
+        : (p : Multiplicative A.N.X × A.N.Gt).2
+          = (A.q (n * m) a : Multiplicative A.N.X × A.N.Gt).2 ^ m := by
       apply (hV.1 _).unique hp.2
       convert hpow m _ _ hR.2 using 1
       rw [← Nat.cast_smul_eq_nsmul ℂ, smul_smul]

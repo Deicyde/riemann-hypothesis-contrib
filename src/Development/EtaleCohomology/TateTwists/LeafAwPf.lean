@@ -173,10 +173,10 @@ theorem leaf_aw_of : LateralTheory.EtaleFoundations.SteenPf.leaf_aw := by
     rw [aw_eq, aw_eq, map_sum, bd_sum]
   simp only [d_S]
   rw [Finset.sum_add_distrib, Finset.Nat.sum_antidiagonal_succ, Finset.Nat.sum_antidiagonal_succ']
-  have z1 : g1 (N + 1) (0, N + 1) = 0 := by
-    unfold g1; rw [dite_eq_left (by simp)]; rfl
+  have z1 : g1 (N + 1) (0, N + 1) = 0 := by unfold g1; rw [dite_eq_left (by simp)]; rfl
   have z2 : g2 (N + 1) (N + 1, 0) = 0 := by
-    unfold g2; rw [dite_eq_left (by simp)]
+    unfold g2
+    rw [dite_eq_left (by simp)]
     show (-1 : ℤ) ^ (N + 1) • (0 : Pr (N + 1) →₀ ℤ) = 0
     exact smul_zero _
   rw [z1, z2, zero_add, zero_add, ← Finset.sum_add_distrib]

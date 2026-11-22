@@ -20,8 +20,10 @@ open Formalism.L2.Indef.Tree
 
 namespace Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
 
-def ArchimedeanHeightBound {K : Type} [Field K] [NumberField K] {ι : Type} (zA zA' : ι → K) (B : ℝ) : Prop :=
-  ∀ ij, meanInf K (fun v => Real.posLog ‖v.embedding (zA ij)‖) ≤ B ∧
-    meanInf K (fun v => Real.posLog ‖v.embedding (zA' ij)‖) ≤ B
+def ArchimedeanHeightBound {K : Type} [Field K] [NumberField K] {ι : Type} (zA zA' : ι → K) (B : ℝ)
+    : Prop :=
+  ∀ ij,
+    meanInf K (fun v => Real.posLog ‖v.embedding (zA ij)‖) ≤ B
+      ∧ meanInf K (fun v => Real.posLog ‖v.embedding (zA' ij)‖) ≤ B
 
 end Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts

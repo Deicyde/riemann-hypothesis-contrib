@@ -6,11 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Matrix IsLocalRing
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Matrix
+  IsLocalRing
 open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
 
-private theorem cycMod_cc {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] {σ : G ℚ Ω}
-    (h : IsConjOm σ.toRingEquiv) : cycMod ℚ Ω l 1 σ = -1 := by
+private theorem cycMod_cc
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (l : ℕ) [Fact l.Prime]
+    {σ : G ℚ Ω} (h : IsConjOm σ.toRingEquiv)
+    : cycMod ℚ Ω l 1 σ = -1 := by
   obtain ⟨j, hj⟩ := h
   have hlp : l.Prime := Fact.out
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
@@ -21,13 +25,16 @@ private theorem cycMod_cc {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ
   have hσζ : σ.toRingEquiv ζ = ζ⁻¹ := by
     apply j.injective
     rw [hj, map_inv₀]
-    have hn : ‖j ζ‖ = 1 := Complex.norm_eq_one_of_pow_eq_one (n := l)
-      (by rw [← map_pow, hζl, map_one]) hlp.ne_zero
+    have hn : ‖j ζ‖ = 1 :=
+      Complex.norm_eq_one_of_pow_eq_one (n := l) (by rw [← map_pow, hζl, map_one]) hlp.ne_zero
     rw [Complex.inv_def, Complex.normSq_eq_norm_sq, hn]
     simp
-  have hspec := cyclotomicCharacter.spec (L := Ω) l σ.toRingEquiv ζ (n := 1) (by rw [pow_one]; exact hζl)
-  have hval : ((cycMod ℚ Ω l 1 σ : (ZMod (l ^ 1))ˣ) : ZMod (l ^ 1)) =
-      PadicInt.toZModPow 1 (cyclotomicCharacter Ω l σ.toRingEquiv).val := rfl
+  have hspec :=
+    cyclotomicCharacter.spec (L := Ω) l σ.toRingEquiv ζ (n := 1) (by rw [pow_one]; exact hζl)
+  have hval
+      : ((cycMod ℚ Ω l 1 σ : (ZMod (l ^ 1))ˣ) : ZMod (l ^ 1))
+        = PadicInt.toZModPow 1 (cyclotomicCharacter Ω l σ.toRingEquiv).val :=
+    rfl
   set a : ZMod (l ^ 1) := PadicInt.toZModPow 1 (cyclotomicCharacter Ω l σ.toRingEquiv).val with ha
   haveI : NeZero (l ^ 1) := ⟨by simp [hlp.ne_zero]⟩
   have hlt : a.val < l := by simpa using ZMod.val_lt a
@@ -44,10 +51,12 @@ private theorem cycMod_cc {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ
     simp
   rw [← h0, ← Nat.cast_succ, Nat.succ_eq_add_one, Nat.sub_add_cancel hlp.one_le]
 
-theorem UpperTheory.exists_galois_cyclotomic_neg_one_trivial_on_eta_psi :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
-          {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ),
-          ∃ g : G ℚ Ω, D.η g = 1 ∧ barChar c.O D.Ψ g = 1 ∧ cycMod ℚ Ω l 1 g = -1 := by
+theorem UpperTheory.exists_galois_cyclotomic_neg_one_trivial_on_eta_psi
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K]
+        [Algebra K Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ}
+        {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ),
+      ∃ g : G ℚ Ω,
+        D.η g = 1 ∧ barChar c.O D.Ψ g = 1 ∧ cycMod ℚ Ω l 1 g = -1 := by
   intro Ω _ _ _ K _ _ _ l _ c N _ e ψ D
   obtain ⟨-, hηcc, hΨcc, -⟩ := dat_facts D
   have hcyc_cc : cycMod ℚ Ω l 1 D.cc = -1 := by

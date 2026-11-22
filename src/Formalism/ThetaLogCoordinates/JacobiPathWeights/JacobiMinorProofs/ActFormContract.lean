@@ -53,24 +53,31 @@ theorem contractWedge : ContractWedge := by
   intro R _ n K X Y
   funext I
   simp only [contrF, wedgeF, Pi.sub_apply]
-  have hsgi : ∀ m, m ∉ I → sg (insert m I) m = sg I m := fun m hm => by
-    rw [sg_insert hm]; simp
+  have hsgi : ∀ m, m ∉ I → sg (insert m I) m = sg I m := fun m hm => by rw [sg_insert hm]; simp
   have hsge : ∀ m', m' ∈ I → sg (I.erase m') m' = sg I m' := fun m' hm' => by
     rw [sg_erase hm']; simp
-  have hL : ∀ m ∈ Iᶜ, ∑ m' ∈ insert m I, ((sg (insert m I) m' : ℤ) : R) * K ((insert m I).erase m') * X m' =
-      ((sg I m : ℤ) : R) * K I * X m +
-        ∑ m' ∈ I, ((sg (insert m I) m' : ℤ) : R) * K ((insert m I).erase m') * X m' := by
+  have hL
+      : ∀ m ∈ Iᶜ,
+        ∑ m' ∈ insert m I, ((sg (insert m I) m' : ℤ) : R) * K ((insert m I).erase m') * X m'
+          = ((sg I m : ℤ) : R) * K I * X m
+            + ∑ m' ∈ I, ((sg (insert m I) m' : ℤ) : R) * K ((insert m I).erase m') * X m' := by
     intro m hm
     rw [Finset.mem_compl] at hm
     rw [Finset.sum_insert hm, Finset.erase_insert hm, hsgi m hm]
-  have hR : ∀ m' ∈ I, ∑ m ∈ (I.erase m')ᶜ, ((sg (I.erase m') m : ℤ) : R) * Y m * K (insert m (I.erase m')) =
-      ((sg I m' : ℤ) : R) * Y m' * K I +
-        ∑ m ∈ Iᶜ, ((sg (I.erase m') m : ℤ) : R) * Y m * K (insert m (I.erase m')) := by
+  have hR
+      : ∀ m' ∈ I,
+        ∑ m ∈ (I.erase m')ᶜ, ((sg (I.erase m') m : ℤ) : R) * Y m * K (insert m (I.erase m'))
+          = ((sg I m' : ℤ) : R) * Y m' * K I
+            + ∑ m ∈ Iᶜ, ((sg (I.erase m') m : ℤ) : R) * Y m * K (insert m (I.erase m')) := by
     intro m' hm'
-    rw [Finset.compl_erase, Finset.sum_insert (by simpa using hm'), Finset.insert_erase hm', hsge m' hm']
-  have hcross : ∀ m ∈ Iᶜ, ∀ m' ∈ I,
-      ((sg I m : ℤ) : R) * Y m * (((sg (insert m I) m' : ℤ) : R) * K ((insert m I).erase m') * X m') =
-        -(((sg I m' : ℤ) : R) * (((sg (I.erase m') m : ℤ) : R) * Y m * K (insert m (I.erase m'))) * X m') := by
+    rw [Finset.compl_erase, Finset.sum_insert (by simpa using hm'), Finset.insert_erase hm',
+      hsge m' hm']
+  have hcross
+      : ∀ m ∈ Iᶜ, ∀ m' ∈ I,
+        ((sg I m : ℤ) : R) * Y m
+            * (((sg (insert m I) m' : ℤ) : R) * K ((insert m I).erase m') * X m')
+          = -(((sg I m' : ℤ) : R)
+            * (((sg (I.erase m') m : ℤ) : R) * Y m * K (insert m (I.erase m'))) * X m') := by
     intro m hm m' hm'
     rw [Finset.mem_compl] at hm
     have hne : m ≠ m' := fun h => hm (h ▸ hm')
@@ -87,10 +94,11 @@ theorem contractWedge : ContractWedge := by
     intro m
     linear_combination (Y m * K I * X m) * sgR_mul_self (R := R) I m
   conv_lhs => rw [Finset.sum_congr rfl (fun m hm => by rw [hL m hm])]
-  have hRs : ∑ m' ∈ I, ((sg I m' : ℤ) : R) *
-      (∑ m ∈ (I.erase m')ᶜ, ((sg (I.erase m') m : ℤ) : R) * Y m * K (insert m (I.erase m'))) * X m' =
-      ∑ m' ∈ I, ((sg I m' : ℤ) : R) * (((sg I m' : ℤ) : R) * Y m' * K I +
-        ∑ m ∈ Iᶜ, ((sg (I.erase m') m : ℤ) : R) * Y m * K (insert m (I.erase m'))) * X m' :=
+  have hRs
+      : ∑ m' ∈ I, ((sg I m' : ℤ) : R) *
+          (∑ m ∈ (I.erase m')ᶜ, ((sg (I.erase m') m : ℤ) : R) * Y m * K (insert m (I.erase m'))) * X m'
+        = ∑ m' ∈ I, ((sg I m' : ℤ) : R) * (((sg I m' : ℤ) : R) * Y m' * K I +
+            ∑ m ∈ Iᶜ, ((sg (I.erase m') m : ℤ) : R) * Y m * K (insert m (I.erase m'))) * X m' :=
     Finset.sum_congr rfl (fun m' hm' => by rw [hR m' hm'])
   rw [hRs]
   simp only [mul_add, add_mul, Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul]
@@ -247,30 +255,33 @@ theorem actFormWedge : FactX2wedge := by
   intro R _ n K X m
   funext J
   simp only [actF, wedgeF]
-  have hR : ∑ b ∈ J, ((sg J b : ℤ) : R) * (∑ I', K I' * minorF m I' (J.erase b)) * Matrix.vecMul X m b =
-      ∑ I', ∑ a, K I' * X a * ∑ b ∈ J, ((sg J b : ℤ) : R) * minorF m I' (J.erase b) * m a b := by
-    simp only [Matrix.vecMul, dotProduct, Finset.mul_sum, Finset.sum_mul]
-    rw [Finset.sum_congr rfl (fun a _ => Finset.sum_comm)]
-    rw [Finset.sum_comm]
-    apply Finset.sum_congr rfl
-    intro I' _
-    rw [Finset.sum_comm]
-    apply Finset.sum_congr rfl
-    intro a _
-    apply Finset.sum_congr rfl
-    intro b _
-    ring
+  have hR
+      : ∑ b ∈ J, ((sg J b : ℤ) : R) * (∑ I', K I' * minorF m I' (J.erase b)) * Matrix.vecMul X m b
+        = ∑ I', ∑ a, K I' * X a * ∑ b ∈ J, ((sg J b : ℤ) : R) * minorF m I' (J.erase b) * m a b :=
+    by
+      simp only [Matrix.vecMul, dotProduct, Finset.mul_sum, Finset.sum_mul]
+      rw [Finset.sum_congr rfl (fun a _ => Finset.sum_comm)]
+      rw [Finset.sum_comm]
+      apply Finset.sum_congr rfl
+      intro I' _
+      rw [Finset.sum_comm]
+      apply Finset.sum_congr rfl
+      intro a _
+      apply Finset.sum_congr rfl
+      intro b _
+      ring
   rw [hR]
   simp only [lap_row]
   simp only [Finset.sum_mul]
-  rw [Finset.sum_comm' (t' := Finset.univ) (s' := fun a => Finset.univ.filter (fun I => a ∈ I))
-    (by intro I a; simp)]
+  rw [Finset.sum_comm' (t' := Finset.univ) (s' := fun a => Finset.univ.filter (fun I => a ∈ I)) (by
+    intro I a; simp)]
   rw [Finset.sum_comm]
   apply Finset.sum_congr rfl
   intro a _
-  have hZ : ∑ I', K I' * X a * (if a ∈ I' then 0 else ((sg (insert a I') a : ℤ) : R) * minorF m (insert a I') J) =
-      ∑ I' ∈ Finset.univ.filter (fun I' => a ∉ I'),
-        K I' * X a * (((sg (insert a I') a : ℤ) : R) * minorF m (insert a I') J) := by
+  have hZ
+      : ∑ I', K I' * X a * (if a ∈ I' then 0 else ((sg (insert a I') a : ℤ) : R) * minorF m (insert a I') J)
+        = ∑ I' ∈ Finset.univ.filter (fun I' => a ∉ I'),
+            K I' * X a * (((sg (insert a I') a : ℤ) : R) * minorF m (insert a I') J) := by
     rw [Finset.sum_filter]
     apply Finset.sum_congr rfl
     intro I' _
@@ -285,7 +296,8 @@ theorem actFormWedge : FactX2wedge := by
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hI
     exact Finset.insert_erase hI
   · intro I' hI'
-    simp only [Finset.coe_filter, Finset.mem_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq] at hI'
+    simp only [Finset.coe_filter, Finset.mem_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq]
+      at hI'
     exact Finset.erase_insert hI'
   · intro I hI
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hI
@@ -324,9 +336,11 @@ lemma basisF_insert {a : Fin n} {s : Finset (Fin n)} (hs : ∀ x ∈ s, x < a) :
     rintro rfl
     exact ha (Finset.mem_insert_self a s)
 
-theorem form_induction {P : Form R n → Prop} (h1 : P oneF)
-    (hadd : ∀ K K', P K → P K' → P (K + K')) (hsmul : ∀ (c : R) K, P K → P (c • K))
-    (hw : ∀ K X, P K → P (wedgeF K X)) (K : Form R n) : P K := by
+theorem form_induction
+    {P : Form R n → Prop} (h1 : P oneF) (hadd : ∀ K K', P K → P K' → P (K + K'))
+    (hsmul : ∀ (c : R) K, P K → P (c • K)) (hw : ∀ K X, P K → P (wedgeF K X))
+    (K : Form R n)
+    : P K := by
   classical
   have hzero : P 0 := by
     have := hsmul 0 oneF h1
@@ -362,16 +376,22 @@ lemma actF_zero (m : Matrix (Fin n) (Fin n) R) : actF (0 : Form R n) m = 0 := by
 
 theorem actFormContract : FactX2contr := by
   intro R _ n K Y g
-  have hc : ∀ X : Fin n → R, ∑ a, Matrix.vecMul X (↑g : Matrix (Fin n) (Fin n) R) a *
-      Matrix.vecMul Y (↑g⁻¹ : Matrix (Fin n) (Fin n) R).transpose a = ∑ a, X a * Y a := by
+  have hc
+      : ∀ X : Fin n → R,
+        ∑ a, Matrix.vecMul X (↑g : Matrix (Fin n) (Fin n) R) a *
+            Matrix.vecMul Y (↑g⁻¹ : Matrix (Fin n) (Fin n) R).transpose a
+          = ∑ a, X a * Y a := by
     intro X
     show dotProduct (Matrix.vecMul X (↑g : Matrix (Fin n) (Fin n) R))
         (Matrix.vecMul Y (↑g⁻¹ : Matrix (Fin n) (Fin n) R).transpose) = dotProduct X Y
     rw [Matrix.vecMul_transpose, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Units.mul_inv,
       Matrix.one_mulVec]
-  refine form_induction (P := fun K => actF (contrF K Y) (↑g : Matrix (Fin n) (Fin n) R) =
-      contrF (actF K (↑g : Matrix (Fin n) (Fin n) R))
-        (Matrix.vecMul Y (↑g⁻¹ : Matrix (Fin n) (Fin n) R).transpose)) ?_ ?_ ?_ ?_ K
+  refine form_induction
+    (P := fun K =>
+      actF (contrF K Y) (↑g : Matrix (Fin n) (Fin n) R)
+        = contrF (actF K (↑g : Matrix (Fin n) (Fin n) R))
+          (Matrix.vecMul Y (↑g⁻¹ : Matrix (Fin n) (Fin n) R).transpose))
+    ?_ ?_ ?_ ?_ K
   · try dsimp only
     rw [contrF_oneF, actF_zero, actF_oneF, contrF_oneF]
   · intro K K' h h'

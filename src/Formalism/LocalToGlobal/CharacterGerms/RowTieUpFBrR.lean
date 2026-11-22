@@ -30,7 +30,8 @@ structure RingPk {C : Type} [Field C] (V : VF C) where
 
 def RingPkSt : Prop :=
   ∀ (C : Type) [Field C] [CharZero C] (V : VF C),
-    (∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n)) → Nonempty (RingPk V)
+    (∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n))
+      → Nonempty (RingPk V)
 
 end UpFBr
 

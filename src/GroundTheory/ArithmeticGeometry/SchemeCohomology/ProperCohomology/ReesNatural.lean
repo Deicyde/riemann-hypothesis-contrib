@@ -15,14 +15,15 @@ universe u
 
 noncomputable section
 
-variable {A : Type u} [CommRing A] {I : Ideal A} {X : Scheme.{u}} [X.Over (Spec (.of A))]
+variable
+  {A : Type u} [CommRing A]
+  {I : Ideal A} {X : Scheme.{u}} [X.Over (Spec (.of A))]
   {F : X.Modules} {V V' : X.Opens} (hle : V' ≤ V)
 
 lemma algV_res (a : A) : resO hle (algV X V a) = algV X V' a := by
   have := Scheme.Hom.appLE_map (X ↘ Spec (.of A)) (U := ⊤) (le_top : V ≤ _) (homOfLE hle).op
   exact congrArg (fun f : Γ(Spec (.of A), ⊤) ⟶ Γ(X, V') => f.hom ((Scheme.ΓSpecIso (.of A)).inv a))
     this
-
 
 variable (I) in
 abbrev resS : Γ(reesScheme I X, reesPr I X ⁻¹ᵁ V) →+* Γ(reesScheme I X, reesPr I X ⁻¹ᵁ V') :=
@@ -59,7 +60,6 @@ lemma reesRingHom_res (hV : IsAffineOpen V) (hV' : IsAffineOpen V')
       exact RingHom.ext fun a => (algV_res hle a).symm)
   exact congrArg (fun f : Γ(reesScheme I X, reesPr I X ⁻¹ᵁ V) ⟶
     CommRingCat.of (Polynomial Γ(X, V')) => f.hom s) h
-
 
 variable (F) in
 def resFA : Γ(F, V) →ₗ[A] Γ(F, V') where
@@ -107,10 +107,11 @@ lemma theta₁_res_coeff
     refine Finset.sum_congr rfl fun x _ => ?_
     rw [Polynomial.coeff_map, hz, resF_smul]
 
-theorem reesSectionsEquiv_res (x : Γ(reesSheaf I F, reesPr I X ⁻¹ᵁ V)) :
-    (reesSectionsEquiv I hF hV' (resF _ (Scheme.Hom.preimage_mono _ hle) x) :
-      PolynomialModule A Γ(F, V')) =
-      PolynomialModule.map A (resFA F hle) (reesSectionsEquiv I hF hV x : PolynomialModule A Γ(F, V)) := by
+theorem reesSectionsEquiv_res (x : Γ(reesSheaf I F, reesPr I X ⁻¹ᵁ V))
+    : (reesSectionsEquiv I hF hV' (resF _ (Scheme.Hom.preimage_mono _ hle) x)
+        : PolynomialModule A Γ(F, V'))
+      = PolynomialModule.map A (resFA F hle)
+        (reesSectionsEquiv I hF hV x : PolynomialModule A Γ(F, V)) := by
   obtain ⟨y, rfl⟩ := surjective_reesSheafπ_app hF (hV.preimage (reesPr I X)) x
   rw [← app_resF, reesSectionsEquiv_apply, reesSectionsEquiv_apply, reesSectionsMap_π,
     reesSectionsMap_π]

@@ -12,15 +12,16 @@ namespace PI.AddIntG.Wk
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem wq_const {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]} (h : IsWq W wq) :
-    PowerSeries.constantCoeff wq = 1 := by
+theorem wq_const {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]} (h : IsWq W wq)
+    : PowerSeries.constantCoeff wq = 1 := by
   simp only [IsWq] at h
   have h1 := congrArg PowerSeries.constantCoeff h
   simpa using h1
 
-theorem coeff_mul_memS {S : Subring ℂ_[p]} {f g : PowerSeries ℂ_[p]} {m : ℕ}
-    (hf : ∀ i ≤ m, PowerSeries.coeff i f ∈ S) (hg : ∀ i ≤ m, PowerSeries.coeff i g ∈ S) :
-    PowerSeries.coeff m (f * g) ∈ S := by
+theorem coeff_mul_memS
+    {S : Subring ℂ_[p]} {f g : PowerSeries ℂ_[p]} {m : ℕ}
+    (hf : ∀ i ≤ m, PowerSeries.coeff i f ∈ S) (hg : ∀ i ≤ m, PowerSeries.coeff i g ∈ S)
+    : PowerSeries.coeff m (f * g) ∈ S := by
   rw [PowerSeries.coeff_mul]
   refine S.sum_mem fun x hx => S.mul_mem (hf _ ?_) (hg _ ?_)
   · have := Finset.HasAntidiagonal.mem_antidiagonal.mp hx
@@ -28,8 +29,10 @@ theorem coeff_mul_memS {S : Subring ℂ_[p]} {f g : PowerSeries ℂ_[p]} {m : �
   · have := Finset.HasAntidiagonal.mem_antidiagonal.mp hx
     omega
 
-theorem coeff_pow_memS {S : Subring ℂ_[p]} {f : PowerSeries ℂ_[p]} {m : ℕ}
-    (hf : ∀ i ≤ m, PowerSeries.coeff i f ∈ S) (k : ℕ) : ∀ i ≤ m, PowerSeries.coeff i (f ^ k) ∈ S := by
+theorem coeff_pow_memS
+    {S : Subring ℂ_[p]} {f : PowerSeries ℂ_[p]} {m : ℕ} (hf : ∀ i ≤ m, PowerSeries.coeff i f ∈ S)
+    (k : ℕ)
+    : ∀ i ≤ m, PowerSeries.coeff i (f ^ k) ∈ S := by
   induction k with
   | zero =>
     intro i _
@@ -42,18 +45,20 @@ theorem coeff_pow_memS {S : Subring ℂ_[p]} {f : PowerSeries ℂ_[p]} {m : ℕ}
     rw [pow_succ]
     exact coeff_mul_memS (fun j hj => ih j (hj.trans hi)) (fun j hj => hf j (hj.trans hi))
 
-theorem coeff_termS (a : ℂ_[p]) (k n : ℕ) (f : PowerSeries ℂ_[p]) :
-    PowerSeries.coeff n (algebraMap ℂ_[p] (PowerSeries ℂ_[p]) a * PowerSeries.X ^ k * f) =
-      if k ≤ n then a * PowerSeries.coeff (n - k) f else 0 := by
+theorem coeff_termS (a : ℂ_[p]) (k n : ℕ) (f : PowerSeries ℂ_[p])
+    : PowerSeries.coeff n (algebraMap ℂ_[p] (PowerSeries ℂ_[p]) a * PowerSeries.X ^ k * f)
+      = if k ≤ n then a * PowerSeries.coeff (n - k) f else 0 := by
   rw [mul_assoc, ← Algebra.smul_def, PowerSeries.coeff_smul, PowerSeries.coeff_X_pow_mul']
   split_ifs <;> simp
 
-theorem wq_mem {S : Subring ℂ_[p]} {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]}
-    (h1 : W.a₁ ∈ S) (h2 : W.a₂ ∈ S) (h3 : W.a₃ ∈ S) (h4 : W.a₄ ∈ S) (h6 : W.a₆ ∈ S) (h : IsWq W wq) :
-    ∀ n, PowerSeries.coeff n wq ∈ S := by
-  have t1 : ∀ (a : ℂ_[p]) (f : PowerSeries ℂ_[p]) (n : ℕ),
-      PowerSeries.coeff n (algebraMap ℂ_[p] (PowerSeries ℂ_[p]) a * PowerSeries.X * f) =
-        if 1 ≤ n then a * PowerSeries.coeff (n - 1) f else 0 := by
+theorem wq_mem
+    {S : Subring ℂ_[p]} {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]}
+    (h1 : W.a₁ ∈ S) (h2 : W.a₂ ∈ S) (h3 : W.a₃ ∈ S) (h4 : W.a₄ ∈ S) (h6 : W.a₆ ∈ S) (h : IsWq W wq)
+    : ∀ n, PowerSeries.coeff n wq ∈ S := by
+  have t1
+      : ∀ (a : ℂ_[p]) (f : PowerSeries ℂ_[p]) (n : ℕ),
+        PowerSeries.coeff n (algebraMap ℂ_[p] (PowerSeries ℂ_[p]) a * PowerSeries.X * f)
+          = if 1 ≤ n then a * PowerSeries.coeff (n - 1) f else 0 := by
     intro a f n
     rw [← coeff_termS, pow_one]
   simp only [IsWq] at h
@@ -83,8 +88,8 @@ theorem wq_mem {S : Subring ℂ_[p]} {W : WeierstrassCurve ℂ_[p]} {wq : PowerS
       · exact S.mul_mem h6 (coeff_pow_memS (m := n - 6) (fun i hi => ih i (by omega)) 3 _ le_rfl)
       · exact S.zero_mem
 
-theorem G_wser {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]} (h : IsWq W wq) :
-    G W (PowerSeries.X : PowerSeries ℂ_[p]) (wser wq) = 0 := by
+theorem G_wser {W : WeierstrassCurve ℂ_[p]} {wq : PowerSeries ℂ_[p]} (h : IsWq W wq)
+    : G W (PowerSeries.X : PowerSeries ℂ_[p]) (wser wq) = 0 := by
   simp only [IsWq] at h
   unfold G wser
   rw [sub_eq_zero]

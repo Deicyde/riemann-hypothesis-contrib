@@ -16,12 +16,14 @@ private theorem ee_one : ee F 1 = 1 := if_pos rfl
 
 private theorem ee_neg : ee F (-1) = F.c := if_neg (by decide)
 
-private noncomputable def pr (hc : F.del F.c = -1) (s : F.Γ) : F.G0 :=
-  ⟨s * ee F (F.del s), by
+private noncomputable def pr (hc : F.del F.c = -1) (s : F.Γ) : F.G0 := ⟨
+  s * ee F (F.del s),
+  by
     rw [MonoidHom.mem_ker, map_mul]
     rcases Int.units_eq_one_or (F.del s) with h | h
     · rw [h, ee_one, map_one, mul_one]
-    · rw [h, ee_neg, hc]; simp⟩
+    · rw [h, ee_neg, hc]; simp
+⟩
 
 private theorem pr_val (hc : F.del F.c = -1) (s : F.Γ) : (pr hc s : F.Γ) = s * ee F (F.del s) := rfl
 
@@ -41,16 +43,19 @@ private theorem del_lc (ho : IsOpen (F.del.ker : Set F.Γ)) : IsLocallyConstant 
   rw [map_mul, map_inv, inv_mul_eq_one] at h2
   exact h2.symm
 
-private theorem pr_cont (hc : F.del F.c = -1) (ho : IsOpen (F.del.ker : Set F.Γ)) : Continuous (pr hc) :=
+private theorem pr_cont (hc : F.del F.c = -1) (ho : IsOpen (F.del.ker : Set F.Γ))
+    : Continuous (pr hc) :=
   Continuous.subtype_mk (continuous_id.mul ((del_lc ho).comp (ee F)).continuous) _
 
-private theorem theta_r {n : ℕ} {C : Type} [CommRing C] (ρ : NRep F n C) (g : F.G0) :
-    theta (ρ.r.toHomUnits g) = ρ.r.toHomUnits (F.conj g) := by
+private theorem theta_r {n : ℕ} {C : Type} [CommRing C] (ρ : NRep F n C) (g : F.G0)
+    : theta (ρ.r.toHomUnits g) = ρ.r.toHomUnits (F.conj g) := by
   apply Units.ext
-  rw [theta_val, ← map_inv, MonoidHom.coe_toHomUnits, MonoidHom.coe_toHomUnits, ← ρ.pol, Frame.star, inv_inv]
+  rw [theta_val, ← map_inv, MonoidHom.coe_toHomUnits, MonoidHom.coe_toHomUnits, ← ρ.pol, Frame.star,
+    inv_inv]
 
-private noncomputable def rp (hc : F.del F.c = -1) (hs : F.c * F.c = 1) {n : ℕ} {C : Type} [CommRing C]
-    (ρ : NRep F n C) : F.Γ →* GG (m := n) (R := C) where
+private noncomputable def rp
+    (hc : F.del F.c = -1) (hs : F.c * F.c = 1) {n : ℕ} {C : Type} [CommRing C] (ρ : NRep F n C)
+    : F.Γ →* GG (m := n) (R := C) where
   toFun s := ⟨ρ.r.toHomUnits (pr hc s), F.del s⟩
   map_one' := by
     have h : pr hc (1 : F.Γ) = 1 := pr_coe hc 1
@@ -67,7 +72,8 @@ private noncomputable def rp (hc : F.del F.c = -1) (hs : F.c * F.c = 1) {n : ℕ
       · rw [h, sgnAct_one, ← map_mul]
         congr 1
         apply Subtype.ext
-        rw [Subgroup.coe_mul, pr_val, pr_val, pr_val, map_mul, h, ee_one, one_mul, mul_one, mul_assoc]
+        rw [Subgroup.coe_mul, pr_val, pr_val, pr_val, map_mul, h, ee_one, one_mul, mul_one,
+          mul_assoc]
       · rw [h, sgnAct_neg_one, theta_r, ← map_mul]
         congr 1
         apply Subtype.ext
@@ -81,13 +87,20 @@ private noncomputable def rp (hc : F.del F.c = -1) (hs : F.c * F.c = 1) {n : ℕ
 
 end UpperTheory.V.Fr
 
-theorem UpperTheory.V.Fr.pr_box :
-    ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ n : ℕ}, F.Ok C₀ → ∀ (C : Type) [CommRing C] (I : Ideal C) (ρ : NRep F n C), ρ.Cont I → (∀ v, UpperTheory.V.W.HasFlag (ρ.r.comp (F.loc0 v)).toHomUnits (ρ.ψ v)) → ∃ B : Box F n C, B.Of ρ ∧ B.Cont I := by
+theorem UpperTheory.V.Fr.pr_box
+    : ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ n : ℕ},
+      F.Ok C₀
+        → ∀ (C : Type) [CommRing C] (I : Ideal C) (ρ : NRep F n C),
+          ρ.Cont I → (∀ v, UpperTheory.V.W.HasFlag (ρ.r.comp (F.loc0 v)).toHomUnits (ρ.ψ v))
+            → ∃ B : Box F n C, B.Of ρ ∧ B.Cont I := by
   intro l _ k _ _ F C₀ n hF C _ I ρ hc hf
   choose g hg using hf
   have hm : ∀ s, (rp hF.del_c hF.c_sq ρ s).mat = ρ.r (pr hF.del_c s) := fun s => rfl
-  refine ⟨⟨rp hF.del_c hF.c_sq ρ, fun s => rfl, g, fun v s i j h => ?_⟩, ⟨?_, fun s => ?_, fun v i s => ?_⟩,
-    fun i j N => ?_⟩
+  refine ⟨
+    ⟨rp hF.del_c hF.c_sq ρ, fun s => rfl, g, fun v s i j h => ?_⟩,
+    ⟨?_, fun s => ?_, fun v i s => ?_⟩,
+    fun i j N => ?_
+  ⟩
   · have e : pr hF.del_c (F.loc v s) = F.loc0 v s := pr_coe hF.del_c (F.loc0 v s)
     rw [hm, e]
     exact (hg v s).1 i j h

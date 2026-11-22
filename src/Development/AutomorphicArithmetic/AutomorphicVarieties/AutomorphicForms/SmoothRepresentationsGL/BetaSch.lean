@@ -5,15 +5,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
 open UpperTheory.V UpperTheory.V.Af.Smo
 open UpperTheory.V.TR (Rinf Lie chart infGL pInf sInf toL lmul oneL invSet CuspSub)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 
-theorem UpperTheory.V.Af.Smo.betaSch :
-    UpperTheory.V.Af.Smo.PftSch → UpperTheory.V.Af.Smo.BetaSch := by
+theorem UpperTheory.V.Af.Smo.betaSch
+    : UpperTheory.V.Af.Smo.PftSch → UpperTheory.V.Af.Smo.BetaSch := by
   intro hP V M _ _ _ _ _ _ _ _ B hB K
   set Φ : V × M → V × M := fun z => (z.1, z.2 - B z.1 z.2) with hΦdef
   have hΦ : Function.HasTemperateGrowth Φ := by
@@ -32,11 +33,12 @@ theorem UpperTheory.V.Af.Smo.betaSch :
     set t := ‖Φ (u, x)‖ with ht
     have hu : ‖u‖ ≤ t := norm_fst_le (Φ (u, x))
     have hy : ‖x - B u x‖ ≤ t := norm_snd_le (Φ (u, x))
-    have hx : x = (x - B u x) + B u (x - B u x) := by
-      rw [map_sub, hB, sub_zero, sub_add_cancel]
+    have hx : x = (x - B u x) + B u (x - B u x) := by rw [map_sub, hB, sub_zero, sub_add_cancel]
     have hBu : ‖B u (x - B u x)‖ ≤ ‖B‖ * ‖u‖ * ‖x - B u x‖ := B.le_opNorm₂ _ _
     have hxle : ‖x‖ ≤ t + ‖B‖ * t * t := by
-      calc ‖x‖ = ‖(x - B u x) + B u (x - B u x)‖ := by rw [← hx]
+      calc
+        ‖x‖
+          = ‖(x - B u x) + B u (x - B u x)‖ := by rw [← hx]
         _ ≤ ‖x - B u x‖ + ‖B u (x - B u x)‖ := norm_add_le _ _
         _ ≤ t + ‖B‖ * t * t := by
           have := norm_nonneg B
@@ -63,4 +65,5 @@ theorem UpperTheory.V.Af.Smo.betaSch :
   refine ⟨K', SchwartzMap.compCLM ℂ hι hιb L, fun u x => rfl, fun x => ?_⟩
   change L ((0 : V), x) = _
   rw [hL]
-  simp only [UpperTheory.V.Af.Smo.pft, Real.fourier_eq, inner_zero_right, neg_zero, AddChar.map_zero_eq_one, one_smul]
+  simp only [UpperTheory.V.Af.Smo.pft, Real.fourier_eq, inner_zero_right, neg_zero,
+    AddChar.map_zero_eq_one, one_smul]

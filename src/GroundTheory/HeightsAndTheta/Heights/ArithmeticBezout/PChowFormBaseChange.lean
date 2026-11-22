@@ -15,9 +15,12 @@ open MvPolynomial
 
 attribute [local instance] MvPolynomial.gradedAlgebra
 
-theorem isHomogIdeal_map {R S : Type*} [CommRing R] [CommRing S] {n : ℕ} (φ : R →+* S)
-    {I : Ideal (MvPolynomial (Fin n) R)} (hI : IsHomogIdeal I) :
-    IsHomogIdeal (I.map (MvPolynomial.map φ)) := by
+theorem isHomogIdeal_map
+    {R S : Type*} [CommRing R] [CommRing S]
+    {n : ℕ}
+    (φ : R →+* S)
+    {I : Ideal (MvPolynomial (Fin n) R)} (hI : IsHomogIdeal I)
+    : IsHomogIdeal (I.map (MvPolynomial.map φ)) := by
   rw [isHomogIdeal_iff] at hI ⊢
   obtain ⟨T, hT⟩ := (Ideal.IsHomogeneous.iff_exists _ _).mp hI
   rw [hT, Ideal.map_span]
@@ -28,9 +31,10 @@ theorem isHomogIdeal_map {R S : Type*} [CommRing R] [CommRing S] {n : ℕ} (φ :
   rw [mem_homogeneousSubmodule] at hd ⊢
   exact hd.map φ
 
-theorem ChowFormBaseChange.proof (hRad : RadicalBaseChange.Statement)
-    (hExt : ChowFormExtend.Statement) (hRed : ChowFormReduced.Statement) :
-    ChowFormBaseChange.Statement := by
+theorem ChowFormBaseChange.proof
+    (hRad : RadicalBaseChange.Statement) (hExt : ChowFormExtend.Statement)
+    (hRed : ChowFormReduced.Statement)
+    : ChowFormBaseChange.Statement := by
   intro K _ _ n k I f σ hI hf
   have hJ : IsHomogIdeal (I.map (MvPolynomial.map σ)) := isHomogIdeal_map σ hI.isHomog
   refine ⟨fun W hW => isProjPrime_of_mem_support_fundCycle hJ hW, ?_⟩

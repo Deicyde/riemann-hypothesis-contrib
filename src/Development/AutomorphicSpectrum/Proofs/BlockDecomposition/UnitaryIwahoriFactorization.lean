@@ -8,7 +8,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemIwUIf
 
 @[expose] public section
 
-open GlobalTheory.PRep Formalism.UG GlobalTheory.LFun PositivityTheory.SphericalProduct GlobalTheory.CompanionTheory.SatPow
+open GlobalTheory.PRep Formalism.UG GlobalTheory.LFun PositivityTheory.SphericalProduct
+  GlobalTheory.CompanionTheory.SatPow
 
 noncomputable section
 
@@ -29,8 +30,10 @@ theorem upI_one : UpI (1 : Matrix (Fin n) (Fin n) L) := by
   · simp [Matrix.one_apply_ne h]
 
 omit [Valued L (WithZero (Multiplicative ℤ))] in
-theorem upper_mul_diag {A B : Matrix (Fin n) (Fin n) L} (hA : ∀ a b, b < a → A a b = 0)
-    (hB : ∀ a b, b < a → B a b = 0) (a : Fin n) : (A * B) a a = A a a * B a a := by
+theorem upper_mul_diag
+    {A B : Matrix (Fin n) (Fin n) L} (hA : ∀ a b, b < a → A a b = 0) (hB : ∀ a b, b < a → B a b = 0)
+    (a : Fin n)
+    : (A * B) a a = A a a * B a a := by
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_single a (fun k _ hk => ?_) (by simp)
   rcases lt_or_gt_of_ne hk with h | h
@@ -38,8 +41,10 @@ theorem upper_mul_diag {A B : Matrix (Fin n) (Fin n) L} (hA : ∀ a b, b < a →
   · rw [hB k a h, mul_zero]
 
 omit [Valued L (WithZero (Multiplicative ℤ))] in
-theorem upper_mul {A B : Matrix (Fin n) (Fin n) L} (hA : ∀ a b, b < a → A a b = 0)
-    (hB : ∀ a b, b < a → B a b = 0) (a b : Fin n) (h : b < a) : (A * B) a b = 0 := by
+theorem upper_mul
+    {A B : Matrix (Fin n) (Fin n) L} (hA : ∀ a b, b < a → A a b = 0) (hB : ∀ a b, b < a → B a b = 0)
+    (a b : Fin n) (h : b < a)
+    : (A * B) a b = 0 := by
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_zero fun k _ => ?_
   rcases lt_or_ge k a with h1 | h1
@@ -54,9 +59,10 @@ theorem UpI.mul {A B : Matrix (Fin n) (Fin n) L} (hA : UpI A) (hB : UpI B) : UpI
     rw [map_mul]
     exact (mul_le_of_le_one_right' (hB.2.2 k b)).trans (hA.2.2 a k)
 
-theorem elim_step {N : Matrix (Fin n) (Fin n) L} (hN : IwM N) (c : Fin n) :
-    ∃ E E' : Matrix (Fin n) (Fin n) L, UpI E ∧ E * E' = 1 ∧ IwM (E' * N) ∧
-      (∀ a, a < c → (E' * N) a c = 0) ∧ ∀ a b, N c b = 0 → (E' * N) a b = N a b := by
+theorem elim_step {N : Matrix (Fin n) (Fin n) L} (hN : IwM N) (c : Fin n)
+    : ∃ E E' : Matrix (Fin n) (Fin n) L,
+      UpI E ∧ E * E' = 1 ∧ IwM (E' * N) ∧ (∀ a, a < c → (E' * N) a c = 0)
+        ∧ ∀ a b, N c b = 0 → (E' * N) a b = N a b := by
   classical
   obtain ⟨h1, h2, h3⟩ := hN
   have hc0 : N c c ≠ 0 := by
@@ -91,8 +97,15 @@ theorem elim_step {N : Matrix (Fin n) (Fin n) L} (hN : IwM N) (c : Fin n) :
   have hxN : ∀ a b, Valued.v (x a * N c b) ≤ 1 := fun a b => by
     rw [map_mul]
     exact (mul_le_of_le_one_right' (h1 c b)).trans (hxv a)
-  refine ⟨1 + R, 1 - R, ⟨fun a b hba => ?_, fun a => ?_, fun a b => ?_⟩, ?_, ⟨fun a b => ?_, fun a b hba => ?_, fun a => ?_⟩,
-    fun a ha => ?_, fun a b hb => ?_⟩
+  refine ⟨
+    1 + R,
+    1 - R,
+    ⟨fun a b hba => ?_, fun a => ?_, fun a b => ?_⟩,
+    ?_,
+    ⟨fun a b => ?_, fun a b hba => ?_, fun a => ?_⟩,
+    fun a ha => ?_,
+    fun a b hb => ?_
+  ⟩
   · rw [Matrix.add_apply, Matrix.one_apply_ne hba.ne', hR, zero_add]
     split_ifs with h
     · subst h; exact hxa a (not_lt.2 hba.le)
@@ -131,12 +144,11 @@ theorem elim_step {N : Matrix (Fin n) (Fin n) L} (hN : IwM N) (c : Fin n) :
     simp
   · rw [hE', hb, mul_zero, sub_zero]
 
-theorem exists_fact {M : Matrix (Fin n) (Fin n) L} (hM : IwM M) (k : ℕ) (hk : k ≤ n) :
-    ∃ W N : Matrix (Fin n) (Fin n) L, UpI W ∧ IwM N ∧ M = W * N ∧
-      ∀ a b : Fin n, a < b → n ≤ b.val + k → N a b = 0 := by
+theorem exists_fact {M : Matrix (Fin n) (Fin n) L} (hM : IwM M) (k : ℕ) (hk : k ≤ n)
+    : ∃ W N : Matrix (Fin n) (Fin n) L,
+      UpI W ∧ IwM N ∧ M = W * N ∧ ∀ a b : Fin n, a < b → n ≤ b.val + k → N a b = 0 := by
   induction k with
-  | zero =>
-    exact ⟨1, M, upI_one, hM, by simp, fun a b _ h => absurd b.2 (by omega)⟩
+  | zero => exact ⟨1, M, upI_one, hM, by simp, fun a b _ h => absurd b.2 (by omega)⟩
   | succ k ih =>
     obtain ⟨W, N, hW, hN, hMW, hz⟩ := ih (by omega)
     have hcn : n - 1 - k < n := by omega
@@ -154,20 +166,23 @@ theorem exists_fact {M : Matrix (Fin n) (Fin n) L} (hM : IwM M) (k : ℕ) (hk : 
           omega
         rw [hs a b (hz _ b hcb (by omega)), hz a b hab (by omega)]
 
-def tau (σ : L →+* L) (A : Matrix (Fin n) (Fin n) L) : Matrix (Fin n) (Fin n) L :=
-  fun a b => σ (A b.rev a.rev)
+def tau (σ : L →+* L) (A : Matrix (Fin n) (Fin n) L) : Matrix (Fin n) (Fin n) L := fun a b =>
+  σ (A b.rev a.rev)
 
 omit [Valued L (WithZero (Multiplicative ℤ))] in
-theorem tau_mul (σ : L →+* L) (A B : Matrix (Fin n) (Fin n) L) : tau σ (A * B) = tau σ B * tau σ A := by
+theorem tau_mul (σ : L →+* L) (A B : Matrix (Fin n) (Fin n) L)
+    : tau σ (A * B) = tau σ B * tau σ A := by
   ext a b
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [tau, Matrix.mul_apply, map_sum, map_mul]
   refine Fintype.sum_equiv Fin.revPerm _ _ fun k => ?_
   simp [mul_comm]
 
-theorem tau_mul_self {σ : L →+* L} (g : GL (Fin n) L) (hg : g ∈ GU σ n) {W Y : Matrix (Fin n) (Fin n) L}
-    (hW : UpI W) (hY : ∀ a b : Fin n, a < b → Y a b = 0) (hgW : (g : Matrix (Fin n) (Fin n) L) = W * Y) :
-    tau σ W * W = 1 := by
+theorem tau_mul_self
+    {σ : L →+* L} (g : GL (Fin n) L) (hg : g ∈ GU σ n)
+    {W Y : Matrix (Fin n) (Fin n) L} (hW : UpI W) (hY : ∀ a b : Fin n, a < b → Y a b = 0)
+    (hgW : (g : Matrix (Fin n) (Fin n) L) = W * Y)
+    : tau σ W * W = 1 := by
   have hinv : tau σ (g : Matrix (Fin n) (Fin n) L) = (g⁻¹).val := by
     ext a b
     exact ((GlobalTheory.LGrp.mem_GU_iff σ n g).1 hg a b).symm
@@ -181,8 +196,7 @@ theorem tau_mul_self {σ : L →+* L} (g : GL (Fin n) L) (hg : g ∈ GU σ n) {W
     show σ (Y b.rev a.rev) = 0
     rw [hY _ _ (Fin.rev_lt_rev.2 h), map_zero]
   have hPQ : (tau σ W * W) * (Y * tau σ Y) = 1 := by
-    have h2 : tau σ Y * (tau σ W * W * Y) = 1 := by
-      simpa only [Matrix.mul_assoc] using h1
+    have h2 : tau σ Y * (tau σ W * W * Y) = 1 := by simpa only [Matrix.mul_assoc] using h1
     have h3 := mul_eq_one_comm.1 h2
     simpa only [Matrix.mul_assoc] using h3
   have hQ : Matrix.BlockTriangular (Y * tau σ Y) OrderDual.toDual := by
@@ -201,8 +215,8 @@ theorem tau_mul_self {σ : L →+* L} (g : GL (Fin n) L) (hg : g ∈ GU σ n) {W
     rw [hW.2.1, map_one]
   · rw [upper_mul hup hW.1 a b h, Matrix.one_apply_ne h.ne']
 
-theorem v_lt_of_ordL_lt {x y : L} (hx : x ≠ 0) (hy : y ≠ 0) (h : ordL x < ordL y) :
-    Valued.v y < Valued.v x := by
+theorem v_lt_of_ordL_lt {x y : L} (hx : x ≠ 0) (hy : y ≠ 0) (h : ordL x < ordL y)
+    : Valued.v y < Valued.v x := by
   have hx0 : Valued.v x ≠ 0 := (Valuation.ne_zero_iff _).2 hx
   have hy0 : Valued.v y ≠ 0 := (Valuation.ne_zero_iff _).2 hy
   unfold ordL at h
@@ -211,18 +225,25 @@ theorem v_lt_of_ordL_lt {x y : L} (hx : x ≠ 0) (hy : y ≠ 0) (h : ordL x < or
   show Multiplicative.toAdd (WithZero.unzero hy0) < Multiplicative.toAdd (WithZero.unzero hx0)
   omega
 
-theorem diag_conj_apply {t : GL (Fin n) L} (ht : IsDiagM t) (Y : Matrix (Fin n) (Fin n) L) (a b : Fin n) :
-    ((t⁻¹).val * Y * t.val) a b = ((t : Matrix (Fin n) (Fin n) L) a a)⁻¹ * Y a b * (t : Matrix (Fin n) (Fin n) L) b b ∧
-      (t : Matrix (Fin n) (Fin n) L) a a ≠ 0 := by
+theorem diag_conj_apply
+    {t : GL (Fin n) L} (ht : IsDiagM t) (Y : Matrix (Fin n) (Fin n) L) (a b : Fin n)
+    : ((t⁻¹).val * Y * t.val) a b
+        = ((t : Matrix (Fin n) (Fin n) L) a a)⁻¹ * Y a b * (t : Matrix (Fin n) (Fin n) L) b b
+      ∧ (t : Matrix (Fin n) (Fin n) L) a a ≠ 0 := by
   classical
-  have hd : (t : Matrix (Fin n) (Fin n) L) = Matrix.diagonal fun i => (t : Matrix (Fin n) (Fin n) L) i i := by
+  have hd
+      : (t : Matrix (Fin n) (Fin n) L)
+        = Matrix.diagonal fun i => (t : Matrix (Fin n) (Fin n) L) i i := by
     ext i j
     by_cases hij : i = j
     · subst hij; simp
     · simp [Matrix.diagonal_apply_ne _ hij, ht i j hij]
   have hone : (t⁻¹).val * (t : Matrix (Fin n) (Fin n) L) = 1 := by
     rw [← Units.val_mul, inv_mul_cancel, Units.val_one]
-  have hentry : ∀ i j, (t⁻¹).val i j * (t : Matrix (Fin n) (Fin n) L) j j = (1 : Matrix (Fin n) (Fin n) L) i j := by
+  have hentry
+      : ∀ i j,
+        (t⁻¹).val i j * (t : Matrix (Fin n) (Fin n) L) j j
+          = (1 : Matrix (Fin n) (Fin n) L) i j := by
     intro i j
     have h := congrFun (congrFun hone i) j
     rw [hd, Matrix.mul_diagonal] at h
@@ -244,20 +265,24 @@ theorem diag_conj_apply {t : GL (Fin n) L} (ht : IsDiagM t) (Y : Matrix (Fin n) 
       rw [Matrix.one_apply_ne hij] at this
       exact (mul_eq_zero.1 this).resolve_right (hne j)
   refine ⟨?_, hne a⟩
-  have h4 : ((t⁻¹).val * Y * t.val) a b = ((t⁻¹).val * Y) a b * (t : Matrix (Fin n) (Fin n) L) b b := by
+  have h4
+      : ((t⁻¹).val * Y * t.val) a b = ((t⁻¹).val * Y) a b * (t : Matrix (Fin n) (Fin n) L) b b := by
     conv_lhs => rw [hd]
     rw [Matrix.mul_diagonal]
   rw [h4, hTi, Matrix.diagonal_mul]
 
-theorem iwahori_fact : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (σ : L →+* L) (n : ℕ),
-    (∀ x, σ (σ x) = x) → (∀ x, Valued.v (σ x) = Valued.v x) → ∀ t : GU σ n, IsDiagM (t : GL (Fin n) L) →
-    IsStrictDom (t : GL (Fin n) L) → ∀ i ∈ IwU σ n, ∃ u ∈ IwU σ n, IsUnipU u ∧ ∃ y ∈ IwU σ n,
-      t⁻¹ * y * t ∈ IwU σ n ∧ i = u * y := by
+theorem iwahori_fact
+    : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (σ : L →+* L) (n : ℕ),
+      (∀ x, σ (σ x) = x) → (∀ x, Valued.v (σ x) = Valued.v x)
+        → ∀ t : GU σ n,
+          IsDiagM (t : GL (Fin n) L) → IsStrictDom (t : GL (Fin n) L)
+            → ∀ i ∈ IwU σ n, ∃ u ∈ IwU σ n,
+              IsUnipU u ∧ ∃ y ∈ IwU σ n, t⁻¹ * y * t ∈ IwU σ n ∧ i = u * y := by
   intro L _ _ σ n _ hσv t hD hS i hi
   obtain ⟨hi1, hi2⟩ := (mem_iwU_iff hσv i).1 hi
   have hi3 := iwU_diag hσv hi
-  obtain ⟨W, Y, hW, hY, hMW, hz⟩ := exists_fact (M := ((i : GL (Fin n) L) : Matrix (Fin n) (Fin n) L))
-    ⟨hi1, hi2, hi3⟩ n le_rfl
+  obtain ⟨W, Y, hW, hY, hMW, hz⟩ :=
+    exists_fact (M := ((i : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)) ⟨hi1, hi2, hi3⟩ n le_rfl
   have hz' : ∀ a b : Fin n, a < b → Y a b = 0 := fun a b h => hz a b h (by omega)
   have hPW : tau σ W * W = 1 := tau_mul_self (i : GL (Fin n) L) i.2 hW hz' hMW
   let Wg : GL (Fin n) L := ⟨W, tau σ W, mul_eq_one_comm.1 hPW, hPW⟩
@@ -267,17 +292,23 @@ theorem iwahori_fact : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicat
   have hyval : ((y : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) = Y := by
     show tau σ W * ((i : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) = Y
     rw [hMW, ← Matrix.mul_assoc, hPW, Matrix.one_mul]
-  have hconj : ∀ a b, (((t⁻¹ * y * t : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) a b =
-      (((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) a a)⁻¹ * Y a b *
-        ((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) b b := by
+  have hconj
+      : ∀ a b,
+        (((t⁻¹ * y * t : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) a b
+          = (((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) a a)⁻¹ * Y a b
+            * ((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) b b := by
     intro a b
     rw [← (diag_conj_apply hD Y a b).1, ← hyval]
     rfl
   have hne : ∀ a, ((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) a a ≠ 0 := fun a =>
     (diag_conj_apply hD Y a a).2
-  have hlow : ∀ a b : Fin n, b < a → Valued.v
-      ((((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) a a)⁻¹ * Y a b *
-        ((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) b b) < 1 := by
+  have hlow
+      : ∀ a b : Fin n,
+        b < a
+          → Valued.v
+              ((((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) a a)⁻¹ * Y a b
+                * ((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) b b)
+            < 1 := by
     intro a b h
     have hlt := v_lt_of_ordL_lt (hne a) (hne b) (hS b a h)
     have hva : Valued.v (((t : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) a a) ≠ 0 :=
@@ -286,8 +317,15 @@ theorem iwahori_fact : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicat
     refine (mul_le_of_le_one_left' (hY.1 a b)).trans_lt ?_
     rw [inv_mul_lt_iff₀ (zero_lt_iff.2 hva), mul_one]
     exact hlt
-  refine ⟨u, (mem_iwU_iff hσv u).2 ⟨hW.2.2, fun a b h => ?_⟩, ⟨hW.1, hW.2.1⟩, y,
-    (mem_iwU_iff hσv y).2 ⟨?_, ?_⟩, (mem_iwU_iff hσv _).2 ⟨fun a b => ?_, fun a b h => ?_⟩, ?_⟩
+  refine ⟨
+    u,
+    (mem_iwU_iff hσv u).2 ⟨hW.2.2, fun a b h => ?_⟩,
+    ⟨hW.1, hW.2.1⟩,
+    y,
+    (mem_iwU_iff hσv y).2 ⟨?_, ?_⟩,
+    (mem_iwU_iff hσv _).2 ⟨fun a b => ?_, fun a b h => ?_⟩,
+    ?_
+  ⟩
   · show Valued.v (W a b) < 1
     rw [hW.1 a b h, map_zero]
     exact zero_lt_one

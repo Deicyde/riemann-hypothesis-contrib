@@ -6,22 +6,30 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.Integer
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
 namespace GlobalTheory.CM
 
-private theorem okAct_group_identity {A : Type*} [CommGroup A] (i w : A) (k m n m' n' : ℤ) :
-    i ^ (m * m' - n * n' * k) * w ^ (m * n' + n * m' + n * n') =
-      (i ^ m * w ^ n) ^ m' * (w ^ m * (w * i ^ (-k)) ^ n) ^ n' := by
+private theorem okAct_group_identity {A : Type*} [CommGroup A] (i w : A) (k m n m' n' : ℤ)
+    : i ^ (m * m' - n * n' * k) * w ^ (m * n' + n * m' + n * n')
+      = (i ^ m * w ^ n) ^ m' * (w ^ m * (w * i ^ (-k)) ^ n) ^ n' := by
   have h1 : m * m' - n * n' * k = m * m' + (-k) * n * n' := by ring
   rw [h1]
   simp only [mul_zpow, ← zpow_mul, zpow_add]
   ac_rfl
 
-theorem exists_okAct_of_equation : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (W : G ⟶ G), IsMonHom W → (W ≫ W) * (𝟙 G) ^ ((1 + H.d) / 4) = W → ∃ a : OAct (OK H) G, a.act (wK H) = W ∧ ∀ m n : ℤ, a.act ((m : OK H) + (n : OK H) * wK H) = (𝟙 G) ^ m * W ^ n := by
+theorem exists_okAct_of_equation
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (S : Scheme.{0})
+        (G : Over S) [GrpObj G] [IsCommMonObj G] (W : G ⟶ G),
+      IsMonHom W → (W ≫ W) * (𝟙 G) ^ ((1 + H.d) / 4) = W
+        → ∃ a : OAct (OK H) G,
+          a.act (wK H) = W
+            ∧ ∀ m n : ℤ, a.act ((m : OK H) + (n : OK H) * wK H) = (𝟙 G) ^ m * W ^ n := by
   intro E _ _ _ H S G _ _ W hW hEq
   obtain ⟨-, hco, -, hsq, -⟩ := OK_isDedekindDomain_and_projective E H
   set k : ℕ := (1 + H.d) / 4 with hk
@@ -43,18 +51,21 @@ theorem exists_okAct_of_equation : ∀ (E : Type) [Field E] [NumberField E] [IsC
     simpa using this
   · obtain ⟨m, n, rfl⟩ := hex a
     obtain ⟨m', n', rfl⟩ := hex b
-    have e : ((m : OK H) + (n : OK H) * wK H) * ((m' : OK H) + (n' : OK H) * wK H) =
-        ((m * m' - n * n' * (k : ℤ) : ℤ) : OK H) + ((m * n' + n * m' + n * n' : ℤ) : OK H) * wK H := by
+    have e
+        : ((m : OK H) + (n : OK H) * wK H) * ((m' : OK H) + (n' : OK H) * wK H)
+          = ((m * m' - n * n' * (k : ℤ) : ℤ) : OK H)
+            + ((m * n' + n * m' + n * n' : ℤ) : OK H) * wK H := by
       push_cast
       linear_combination ((n : OK H) * (n' : OK H)) * hsq
     rw [e, hF, hF, hF]
-    simp only [MonObj.comp_mul, GrpObj.comp_zpow, MonObj.mul_comp, GrpObj.zpow_comp, Category.comp_id,
-      Category.id_comp, hWW]
+    simp only [MonObj.comp_mul, GrpObj.comp_zpow, MonObj.mul_comp, GrpObj.zpow_comp,
+      Category.comp_id, Category.id_comp, hWW]
     exact okAct_group_identity _ _ _ _ _ _ _
   · obtain ⟨m, n, rfl⟩ := hex a
     obtain ⟨m', n', rfl⟩ := hex b
-    have e : ((m : OK H) + (n : OK H) * wK H) + ((m' : OK H) + (n' : OK H) * wK H) =
-        ((m + m' : ℤ) : OK H) + ((n + n' : ℤ) : OK H) * wK H := by
+    have e
+        : ((m : OK H) + (n : OK H) * wK H) + ((m' : OK H) + (n' : OK H) * wK H)
+          = ((m + m' : ℤ) : OK H) + ((n + n' : ℤ) : OK H) * wK H := by
       push_cast
       ring
     rw [e, hF, hF, hF, zpow_add, zpow_add]

@@ -8,9 +8,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.NormsOfInduc
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.CovHt GlobalTheory.Mean4 GlobalTheory.Mean4O
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop
+  GlobalTheory.CovHt GlobalTheory.Mean4 GlobalTheory.Mean4O
 open scoped ENNReal Classical
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory GlobalTheory.ArInt GlobalTheory.ProjVar GlobalTheory.TrueGeo GlobalTheory.ShFam.Pad GlobalTheory.VertForm GlobalTheory.CoverNorm
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory
+  GlobalTheory.ArInt GlobalTheory.ProjVar GlobalTheory.TrueGeo GlobalTheory.ShFam.Pad
+  GlobalTheory.VertForm GlobalTheory.CoverNorm
 open GlobalTheory.Cartier
 set_option autoImplicit false
 
@@ -18,15 +23,23 @@ noncomputable section
 
 namespace GlobalTheory.FibreNef
 
-theorem lbIso_pull_comp {X Y Z : Scheme.{0}} {L : LB X} (hL : L.IsLB) (a : Y ⟶ X) (b : Z ⟶ Y) :
-    LBIso (L.pull (b ≫ a)) ((L.pull a).pull b) :=
-  LBIso.symm (LBIso.chartPull (chartPullLinComb L a (fun _ : PUnit => b)
-      (fun _ => b ≫ a) (fun _ => 1) (𝟙 _) fun _ => (Category.id_comp _).symm)
-      (chartPullId _) (PolBaseChange.lbIso_refl (LB.isLB_pull hL _)))
+theorem lbIso_pull_comp {X Y Z : Scheme.{0}} {L : LB X} (hL : L.IsLB) (a : Y ⟶ X) (b : Z ⟶ Y)
+    : LBIso (L.pull (b ≫ a)) ((L.pull a).pull b) :=
+  LBIso.symm (LBIso.chartPull
+    (chartPullLinComb L a
+      (fun _ : PUnit => b)
+      (fun _ => b ≫ a)
+      (fun _ => 1)
+      (𝟙 _)
+      fun _ => (Category.id_comp _).symm)
+    (chartPullId _) (PolBaseChange.lbIso_refl (LB.isLB_pull hL _)))
 
-theorem isProjOver_fibre {k : Type} [CommRing k] [Module.Finite ℤ k] {X : Scheme.{0}} {p : X ⟶ Sp k}
-    (hp : IsProjOver p) (l : ℕ) [Fact l.Prime] {Z : Scheme.{0}} (i : Z ⟶ X) [IsClosedImmersion i]
-    [Algebra (ZMod l) Γ(Z, ⊤)] : IsProjOver (strHom (ZMod l) (X := Z)) := by
+theorem isProjOver_fibre
+    {k : Type} [CommRing k] [Module.Finite ℤ k]
+    {X : Scheme.{0}} {p : X ⟶ Sp k} (hp : IsProjOver p)
+    (l : ℕ) [Fact l.Prime]
+    {Z : Scheme.{0}} (i : Z ⟶ X) [IsClosedImmersion i] [Algebra (ZMod l) Γ(Z, ⊤)]
+    : IsProjOver (strHom (ZMod l) (X := Z)) := by
   obtain ⟨N, e, he, -⟩ := hp
   have hb : IsFinite (spMap (Int.castRingHom k)) := by
     rw [spMap, IsFinite.SpecMap_iff]
@@ -34,7 +47,8 @@ theorem isProjOver_fibre {k : Type} [CommRing k] [Module.Finite ℤ k] {X : Sche
   have P₀ := GlobalTheory.ProjSpace.isPullback_baseChange N (Int.castRingHom k)
   have hf : IsFinite (GlobalTheory.ProjSpace.baseChange N (Int.castRingHom k)) :=
     MorphismProperty.of_isPullback P₀.flip hb
-  have hZ : IsProjOver ((i ≫ e ≫ GlobalTheory.ProjSpace.baseChange N (Int.castRingHom k)) ≫ PSpace.str ℤ N) :=
+  have hZ : IsProjOver
+      ((i ≫ e ≫ GlobalTheory.ProjSpace.baseChange N (Int.castRingHom k)) ≫ PSpace.str ℤ N) :=
     GlobalTheory.isProjOver_comp_of_isFinite _ ⟨N, 𝟙 _, inferInstance, Category.id_comp _⟩
   obtain ⟨M, φ, hφ, -⟩ := hZ
   have P := GlobalTheory.ProjSpace.isPullback_baseChange M (Int.castRingHom (ZMod l))
@@ -44,15 +58,26 @@ theorem isProjOver_fibre {k : Type} [CommRing k] [Module.Finite ℤ k] {X : Sche
     MorphismProperty.of_isPullback P.flip hc
   let ψ := P.lift φ (strHom (ZMod l) Z) (specZIsTerminal.hom_ext _ _)
   have hψ : ψ ≫ PSpace.str (ZMod l) M = strHom (ZMod l) Z := P.lift_snd _ _ _
-  have hψ' : ψ ≫ GlobalTheory.ProjSpace.baseChange M (Int.castRingHom (ZMod l)) = φ := P.lift_fst _ _ _
-  have : IsClosedImmersion (ψ ≫ GlobalTheory.ProjSpace.baseChange M (Int.castRingHom (ZMod l))) := by
+  have hψ' : ψ ≫ GlobalTheory.ProjSpace.baseChange M (Int.castRingHom (ZMod l)) = φ :=
+    P.lift_fst _ _ _
+  have : IsClosedImmersion
+      (ψ ≫ GlobalTheory.ProjSpace.baseChange M (Int.castRingHom (ZMod l))) := by
     rw [hψ']; exact hφ
-  exact ⟨M, ψ, IsClosedImmersion.of_comp_isClosedImmersion ψ
-    (GlobalTheory.ProjSpace.baseChange M (Int.castRingHom (ZMod l))), hψ⟩
+  exact ⟨
+    M,
+    ψ,
+    IsClosedImmersion.of_comp_isClosedImmersion ψ
+      (GlobalTheory.ProjSpace.baseChange M (Int.castRingHom (ZMod l))),
+    hψ
+  ⟩
 
-theorem isNef_pull_of_nefOver {k : Type} [CommRing k] {X : Scheme.{0}} {p : X ⟶ Sp k} (l : ℕ)
-    [Fact l.Prime] {Z : Scheme.{0}} (i : Z ⟶ X) [IsClosedImmersion i] [Algebra (ZMod l) Γ(Z, ⊤)]
-    (L : HermLB p) (hL : NefOver L l) : IsNef (ZMod l) (L.B.pull i) := by
+theorem isNef_pull_of_nefOver
+    {k : Type} [CommRing k]
+    {X : Scheme.{0}} {p : X ⟶ Sp k}
+    (l : ℕ) [Fact l.Prime]
+    {Z : Scheme.{0}} (i : Z ⟶ X) [IsClosedImmersion i] [Algebra (ZMod l) Γ(Z, ⊤)]
+    (L : HermLB p) (hL : NefOver L l)
+    : IsNef (ZMod l) (L.B.pull i) := by
   have hLi := LB.isLB_pull L.isLB i
   refine isNef_iff_isClosedImmersion.2 ⟨hLi, fun C c hc hC hd _ => ?_⟩
   letI := algebraΓAlong (ZMod l) c
@@ -60,8 +85,10 @@ theorem isNef_pull_of_nefOver {k : Type} [CommRing k] {X : Scheme.{0}} {p : X �
   have h := hL C (c ≫ i) (ZMod l) hd
   rw [interNumOn_eq_interNum_pull (fun r => rfl) (fun j => by fin_cases j; exact hLi)]
   rw [topSelfIntersection] at h
-  refine h.trans_eq (interNum_congr_lbIso _ _ (fun _ => LB.isLB_pull L.isLB _)
-    (fun j => by fin_cases j; exact LB.isLB_pull hLi c) fun j => ?_)
+  refine h.trans_eq (interNum_congr_lbIso _ _
+    (fun _ => LB.isLB_pull L.isLB _)
+    (fun j => by fin_cases j; exact LB.isLB_pull hLi c)
+    fun j => ?_)
   fin_cases j
   exact lbIso_pull_comp L.isLB i c
 

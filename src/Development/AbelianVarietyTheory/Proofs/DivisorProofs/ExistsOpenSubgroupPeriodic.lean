@@ -10,21 +10,26 @@ open Filter Topology
 
 namespace GlobalTheory.WeilM
 
-theorem SB.exists_periodic {X : Type} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] {ι : Type}
-    (L : ι → AddSubgroup X) (hL : ∀ i, IsOpen (L i : Set X)) (hb : ∀ W ∈ 𝓝 (0 : X), ∃ i, (L i : Set X) ⊆ W) :
-    ∀ f ∈ GlobalTheory.WeilM.SB X, ∃ i, ∀ Y, ∀ C ∈ L i, f (Y + C) = f Y := by
+theorem SB.exists_periodic
+    {X : Type} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X]
+    {ι : Type} (L : ι → AddSubgroup X) (hL : ∀ i, IsOpen (L i : Set X))
+    (hb : ∀ W ∈ 𝓝 (0 : X), ∃ i, (L i : Set X) ⊆ W)
+    : ∀ f ∈ GlobalTheory.WeilM.SB X, ∃ i, ∀ Y, ∀ C ∈ L i, f (Y + C) = f Y := by
   intro f hf
   obtain ⟨hlc, hcs⟩ := hf
   have key : ∀ Y : X, ∃ i, ∀ C ∈ L i, f (Y + C) = f Y := by
     intro Y
     have h1 : f ⁻¹' {f Y} ∈ 𝓝 (Y + 0) := by rw [add_zero]; exact (hlc.isOpen_fiber _).mem_nhds rfl
-    have h2 : {C : X | f (Y + C) = f Y} ∈ 𝓝 (0 : X) := (continuous_const_add Y).continuousAt.preimage_mem_nhds h1
+    have h2 : {C : X | f (Y + C) = f Y} ∈ 𝓝 (0 : X) :=
+      (continuous_const_add Y).continuousAt.preimage_mem_nhds h1
     obtain ⟨i, hi⟩ := hb _ h2
     exact ⟨i, fun C hC => hi hC⟩
   choose g hg using key
-  obtain ⟨t, ht⟩ := hcs.isCompact.elim_finite_subcover (fun Y => {Z : X | Z - Y ∈ L (g Y)})
-    (fun Y => (hL _).preimage (continuous_sub_right Y))
-    (fun Z _ => Set.mem_iUnion.2 ⟨Z, by simp⟩)
+  obtain ⟨t, ht⟩ :=
+    hcs.isCompact.elim_finite_subcover
+      (fun Y => {Z : X | Z - Y ∈ L (g Y)})
+      (fun Y => (hL _).preimage (continuous_sub_right Y))
+      (fun Z _ => Set.mem_iUnion.2 ⟨Z, by simp⟩)
   have hW : (⋂ Y ∈ t, (L (g Y) : Set X)) ∈ 𝓝 (0 : X) :=
     (Filter.biInter_finset_mem t).2 fun Y _ => (hL _).mem_nhds (L (g Y)).zero_mem
   obtain ⟨j, hj⟩ := hb _ hW

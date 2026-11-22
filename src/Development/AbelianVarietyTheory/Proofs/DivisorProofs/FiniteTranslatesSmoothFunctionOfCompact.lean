@@ -6,15 +6,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SelfMemSpanK
 
 @[expose] public section
 
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory
+  GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
 
 namespace GlobalTheory
 
-theorem finite_translates_of_isCompact (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
-    (a : ℕ) (φ : Sm E a) (h : IsOpen {k | finRep E a k φ = φ})
-    (Kf : Set (GL (Fin a) (Af E))) (hK : IsCompact Kf) :
-    ∃ S : Finset (GL (Fin a) (Af E)), ∀ f ∈ Kf, ∃ f' ∈ S,
-      finRep E a f φ = finRep E a f' φ := by
+theorem finite_translates_of_isCompact
+    (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    (a : ℕ) (φ : Sm E a) (h : IsOpen {k | finRep E a k φ = φ}) (Kf : Set (GL (Fin a) (Af E)))
+    (hK : IsCompact Kf)
+    : ∃ S : Finset (GL (Fin a) (Af E)), ∀ f ∈ Kf, ∃ f' ∈ S, finRep E a f φ = finRep E a f' φ := by
   have hn : ∀ f ∈ Kf, {g | finRep E a g φ = finRep E a f φ} ∈ nhds f := by
     intro f _
     have hc : Continuous (fun g : GL (Fin a) (Af E) => f⁻¹ * g) :=
@@ -26,7 +27,9 @@ theorem finite_translates_of_isCompact (E : Type) [Field E] [NumberField E] [_ro
       have hg' : finRep E a (f⁻¹ * g) φ = φ := hg
       have e : g = f * (f⁻¹ * g) := by simp
       show finRep E a g φ = finRep E a f φ
-      calc finRep E a g φ = finRep E a (f * (f⁻¹ * g)) φ := by rw [← e]
+      calc
+        finRep E a g φ
+          = finRep E a (f * (f⁻¹ * g)) φ := by rw [← e]
         _ = finRep E a f (finRep E a (f⁻¹ * g) φ) := by rw [map_mul]; rfl
         _ = finRep E a f φ := by rw [hg']
   obtain ⟨t, -, ht⟩ := hK.elim_nhds_subcover (fun f => {g | finRep E a g φ = finRep E a f φ}) hn

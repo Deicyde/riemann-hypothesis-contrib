@@ -8,7 +8,8 @@ public import Development.WeilBound.ThetaLifts.LatticeBasics.LocDistE
 
 namespace GlobalTheory.ThK.Dbl
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 attribute [local instance] GlobalTheory.LocalData.complRel
 

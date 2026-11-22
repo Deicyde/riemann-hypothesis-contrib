@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed UpperTheory.Gal.G1
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed
+  UpperTheory.Gal.G1
 open scoped TensorProduct
 
 private lemma unit_add_nonunit {R : Type*} [CommRing R] [IsLocalRing R] {x y : R}
@@ -30,8 +32,7 @@ private lemma natCast_not_isUnit (F : Type) [Field F] [NumberField F]
   rw [h2, h3, h4] at hu
   exact (ne_of_lt h1) hu
 
-theorem UpperTheory.Gal.G1.pLocRoot :
-    HenselV → LocRoot := by
+theorem UpperTheory.Gal.G1.pLocRoot : HenselV → LocRoot := by
   intro hH F _ _ v tr nm q hqp hqv hdisc hr
   obtain ⟨r, k, hk⟩ := hr
   have hq : ¬ IsUnit (q : v.adicCompletionIntegers F) := natCast_not_isUnit F v q hqv
@@ -39,12 +40,15 @@ theorem UpperTheory.Gal.G1.pLocRoot :
   have hint : ∀ n : ℤ, ¬ (q : ℤ) ∣ n → IsUnit (n : v.adicCompletionIntegers F) := by
     intro n hn
     obtain ⟨a, b, hab⟩ := (hqi.coprime_iff_not_dvd).2 hn
-    have hab' : ((a : v.adicCompletionIntegers F)) * (q : v.adicCompletionIntegers F)
-        + (b : v.adicCompletionIntegers F) * (n : v.adicCompletionIntegers F) = 1 := by
+    have hab'
+        : ((a : v.adicCompletionIntegers F)) * (q : v.adicCompletionIntegers F)
+            + (b : v.adicCompletionIntegers F) * (n : v.adicCompletionIntegers F)
+          = 1 := by
       have := congrArg (fun z : ℤ => (z : v.adicCompletionIntegers F)) hab
       push_cast at this
       exact this
-    have hnu : ¬ IsUnit (-((a : v.adicCompletionIntegers F) * (q : v.adicCompletionIntegers F))) := by
+    have hnu
+        : ¬ IsUnit (-((a : v.adicCompletionIntegers F) * (q : v.adicCompletionIntegers F))) := by
       rw [IsUnit.neg_iff]
       exact fun h => hq (isUnit_of_mul_isUnit_right h)
     have hbn := unit_add_nonunit isUnit_one hnu
@@ -65,12 +69,13 @@ theorem UpperTheory.Gal.G1.pLocRoot :
   have hev : ∀ x, f.eval x = x ^ 2 - (tr : v.adicCompletionIntegers F) * x + nm := by
     intro x
     simp [hf]
-  have hdev : ∀ x, (Polynomial.derivative f).eval x = 2 * x - (tr : v.adicCompletionIntegers F) := by
+  have hdev
+      : ∀ x, (Polynomial.derivative f).eval x = 2 * x - (tr : v.adicCompletionIntegers F) := by
     intro x
-    simp only [hf, Polynomial.derivative_add, Polynomial.derivative_sub, Polynomial.derivative_X_pow,
-      Polynomial.derivative_C_mul_X, Polynomial.derivative_C, Polynomial.eval_add,
-      Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow,
-      Polynomial.eval_X, Polynomial.eval_zero]
+    simp only [hf, Polynomial.derivative_add, Polynomial.derivative_sub,
+      Polynomial.derivative_X_pow, Polynomial.derivative_C_mul_X, Polynomial.derivative_C,
+      Polynomial.eval_add, Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_C,
+      Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_zero]
     push_cast
     ring
   have h0 : ¬ IsUnit (f.eval (r : v.adicCompletionIntegers F)) := by
@@ -88,8 +93,8 @@ theorem UpperTheory.Gal.G1.pLocRoot :
   refine ⟨ρ, ?_, ?_⟩
   · rw [hev] at hρ
     exact hρ
-  · have h2 : ¬ IsUnit (2 * (ρ - (r : v.adicCompletionIntegers F))) :=
-      fun h => hρr (isUnit_of_mul_isUnit_right h)
+  · have h2 : ¬ IsUnit (2 * (ρ - (r : v.adicCompletionIntegers F))) := fun h =>
+      hρr (isUnit_of_mul_isUnit_right h)
     have h3 := unit_add_nonunit ((hdev _) ▸ h1) h2
     have e : 2 * (r : v.adicCompletionIntegers F) - tr + 2 * (ρ - r) = 2 * ρ - tr := by ring
     rw [e] at h3

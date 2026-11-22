@@ -25,17 +25,14 @@ theorem herm_sub_left (u v w : EuclideanSpace ℂ ι) : Hf (u - v) w = Hf u w - 
 theorem herm_sub_right (u v w : EuclideanSpace ℂ ι) : Hf u (v - w) = Hf u v - Hf u w := by
   simp [Hf, mul_sub, Finset.sum_sub_distrib]
 
-theorem herm_neg_left (u w : EuclideanSpace ℂ ι) : Hf (-u) w = -Hf u w := by
-  simp [Hf]
+theorem herm_neg_left (u w : EuclideanSpace ℂ ι) : Hf (-u) w = - Hf u w := by simp [Hf]
 
-theorem herm_neg_right (u w : EuclideanSpace ℂ ι) : Hf u (-w) = -Hf u w := by
-  simp [Hf]
+theorem herm_neg_right (u w : EuclideanSpace ℂ ι) : Hf u (-w) = - Hf u w := by simp [Hf]
 
-theorem herm_zero_right (u : EuclideanSpace ℂ ι) : Hf u 0 = 0 := by
-  simp [Hf]
+theorem herm_zero_right (u : EuclideanSpace ℂ ι) : Hf u 0 = 0 := by simp [Hf]
 
-theorem herm_smul_right (c : ℂ) (u w : EuclideanSpace ℂ ι) :
-    Hf u (c • w) = (starRingEnd ℂ) c * Hf u w := by
+theorem herm_smul_right (c : ℂ) (u w : EuclideanSpace ℂ ι)
+    : Hf u (c • w) = (starRingEnd ℂ) c * Hf u w := by
   simp only [Hf, PiLp.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => by ring
 
@@ -44,8 +41,7 @@ theorem herm_conj (u w : EuclideanSpace ℂ ι) : (starRingEnd ℂ) (Hf u w) = H
     simp only [Hf, map_sum, map_mul, Complex.conj_conj]
   exact Finset.sum_congr rfl fun i _ => by ring
 
-theorem herm_sub_swap (u w : EuclideanSpace ℂ ι) :
-    Hf w u = Hf u w - 2 * I * ((Hf u w).im : ℂ) := by
+theorem herm_sub_swap (u w : EuclideanSpace ℂ ι) : Hf w u = Hf u w - 2 * I * ((Hf u w).im : ℂ) := by
   have h := Complex.sub_conj (Hf u w)
   rw [herm_conj] at h
   push_cast at h
@@ -69,27 +65,32 @@ theorem herm_re_swap (u w : EuclideanSpace ℂ ι) : (Hf w u).re = (Hf u w).re :
 theorem herm_im_swap (u w : EuclideanSpace ℂ ι) : (Hf w u).im = -(Hf u w).im := by
   rw [← herm_conj u w, Complex.conj_im]
 
-theorem herm_differentiable (a : EuclideanSpace ℂ ι) :
-    Differentiable ℂ fun v : EuclideanSpace ℂ ι => Hf v a := by
+theorem herm_differentiable (a : EuclideanSpace ℂ ι)
+    : Differentiable ℂ fun v : EuclideanSpace ℂ ι => Hf v a := by
   unfold Hf
   fun_prop
 
 end FockTranslation
 
-
 open FockTranslation in
-theorem fock_translation_laws {ι : Type} [Fintype ι] (U : ℕ → EuclideanSpace ℂ ι → (EuclideanSpace ℂ ι → ℂ) → EuclideanSpace ℂ ι → ℂ)
-    (hU : ∀ (q : ℕ) a F v, U q a F v = cexp (q * Real.pi * Hf v a - q * Real.pi * Hf a a / 2) * F (v - a)) (q : ℕ) :
-    (∀ a b F, U q a (U q b F) = cexp (-(q * Real.pi * I * (Hf a b).im)) • U q (a + b) F) ∧ (∀ F, U q 0 F = F) ∧
-    (∀ a F, (fun v => U q a F (-v)) = U q (-a) (fun v => F (-v))) ∧
-    (∀ a F (M : ℕ), (U q a)^[M] F = U q ((M : ℂ) • a) F) ∧
-    (∀ a F v, ‖U q a F v‖ ^ 2 * Real.exp (-(q * Real.pi) * ‖v‖ ^ 2) = ‖F (v - a)‖ ^ 2 * Real.exp (-(q * Real.pi) * ‖v - a‖ ^ 2)) ∧
-    (∀ (Y : GT ι) F, F ∈ Y.Sec q ↔ Differentiable ℂ F ∧ ∀ γ ∈ lat Y.b, Y.ka γ • U q γ F = F) ∧
-    (∀ (Y : GT ι) a, (∀ γ ∈ lat Y.b, ∃ k : ℤ, q * (Hf a γ).im = k) → ∀ F ∈ Y.Sec q, U q a F ∈ Y.Sec q) ∧
-    (∀ (φ : EuclideanSpace ℂ ι →L[ℂ] EuclideanSpace ℂ ι) (N : ℕ), (∀ v w, Hf (φ v) (φ w) = N * Hf v w) →
-      ∀ a F, U (q * N) a (F ∘ φ) = U q (φ a) F ∘ φ) := by
-  have h1 : ∀ a b F, U q a (U q b F) =
-      cexp (-(q * Real.pi * I * (Hf a b).im)) • U q (a + b) F := by
+theorem fock_translation_laws
+    {ι : Type} [Fintype ι]
+    (U : ℕ → EuclideanSpace ℂ ι → (EuclideanSpace ℂ ι → ℂ) → EuclideanSpace ℂ ι → ℂ)
+    (hU : ∀ (q : ℕ) a F v,
+      U q a F v = cexp (q * Real.pi * Hf v a - q * Real.pi * Hf a a / 2) * F (v - a))
+    (q : ℕ)
+    : (∀ a b F, U q a (U q b F) = cexp (-(q * Real.pi * I * (Hf a b).im)) • U q (a + b) F)
+      ∧ (∀ F, U q 0 F = F) ∧ (∀ a F, (fun v => U q a F (-v)) = U q (-a) (fun v => F (-v)))
+      ∧ (∀ a F (M : ℕ), (U q a)^[M] F = U q ((M : ℂ) • a) F)
+      ∧ (∀ a F v,
+        ‖U q a F v‖ ^ 2 * Real.exp (-(q * Real.pi) * ‖v‖ ^ 2)
+          = ‖F (v - a)‖ ^ 2 * Real.exp (-(q * Real.pi) * ‖v - a‖ ^ 2))
+      ∧ (∀ (Y : GT ι) F, F ∈ Y.Sec q ↔ Differentiable ℂ F ∧ ∀ γ ∈ lat Y.b, Y.ka γ • U q γ F = F)
+      ∧ (∀ (Y : GT ι) a,
+        (∀ γ ∈ lat Y.b, ∃ k : ℤ, q * (Hf a γ).im = k) → ∀ F ∈ Y.Sec q, U q a F ∈ Y.Sec q)
+      ∧ (∀ (φ : EuclideanSpace ℂ ι →L[ℂ] EuclideanSpace ℂ ι) (N : ℕ),
+        (∀ v w, Hf (φ v) (φ w) = N * Hf v w) → ∀ a F, U (q * N) a (F ∘ φ) = U q (φ a) F ∘ φ) := by
+  have h1 : ∀ a b F, U q a (U q b F) = cexp (-(q * Real.pi * I * (Hf a b).im)) • U q (a + b) F := by
     intro a b F
     funext v
     simp only [hU, Pi.smul_apply, smul_eq_mul]
@@ -103,11 +104,13 @@ theorem fock_translation_laws {ι : Type} [Fintype ι] (U : ℕ → EuclideanSpa
     intro F
     funext v
     simp [hU, FockTranslation.herm_zero_right]
-  have h6 : ∀ (Y : GT ι) F, F ∈ Y.Sec q ↔
-      Differentiable ℂ F ∧ ∀ γ ∈ lat Y.b, Y.ka γ • U q γ F = F := by
+  have h6
+      : ∀ (Y : GT ι) F, F ∈ Y.Sec q ↔ Differentiable ℂ F ∧ ∀ γ ∈ lat Y.b, Y.ka γ • U q γ F = F := by
     intro Y F
-    have key : ∀ γ v, (Y.ka γ • U q γ F) (v + γ) =
-        Y.ka γ * cexp (q * Real.pi * Hf v γ + q * Real.pi * Hf γ γ / 2) * F v := by
+    have key
+        : ∀ γ v,
+          (Y.ka γ • U q γ F) (v + γ)
+            = Y.ka γ * cexp (q * Real.pi * Hf v γ + q * Real.pi * Hf γ γ / 2) * F v := by
       intro γ v
       simp only [hU, Pi.smul_apply, smul_eq_mul, add_sub_cancel_right,
         FockTranslation.herm_add_left]
@@ -144,8 +147,9 @@ theorem fock_translation_laws {ι : Type} [Fintype ι] (U : ℕ → EuclideanSpa
       ← Real.exp_nat_mul, ← Real.exp_add]
     congr 2
     rw [← FockTranslation.herm_self_re v, ← FockTranslation.herm_self_re (v - a)]
-    have e : (q * Real.pi * Hf v a - q * Real.pi * Hf a a / 2 : ℂ) =
-        ((q * Real.pi : ℝ) : ℂ) * Hf v a - ((q * Real.pi / 2 : ℝ) : ℂ) * Hf a a := by
+    have e
+        : (q * Real.pi * Hf v a - q * Real.pi * Hf a a / 2 : ℂ)
+          = ((q * Real.pi : ℝ) : ℂ) * Hf v a - ((q * Real.pi / 2 : ℝ) : ℂ) * Hf a a := by
       push_cast
       ring
     rw [e]
@@ -157,8 +161,8 @@ theorem fock_translation_laws {ι : Type} [Fintype ι] (U : ℕ → EuclideanSpa
     rw [h6] at hF ⊢
     obtain ⟨hd, hF⟩ := hF
     refine ⟨?_, fun γ hγ => ?_⟩
-    · have e : U q a F = fun v =>
-          cexp (q * Real.pi * Hf v a - q * Real.pi * Hf a a / 2) * F (v - a) :=
+    · have e
+          : U q a F = fun v => cexp (q * Real.pi * Hf v a - q * Real.pi * Hf a a / 2) * F (v - a) :=
         funext fun v => hU q a F v
       rw [e]
       have := FockTranslation.herm_differentiable a

@@ -44,14 +44,15 @@ namespace GAll
 
 variable (A : GAll) (K : G.Consts)
 
-
-
 end GAll
 
-def allOf {D : D7} {L : SizeData₂ D} (X : G.Inst D L) : GAll := ⟨viewD D, viewL L, viewX X, G.aL L, G.bL L⟩
+def allOf {D : D7} {L : SizeData₂ D} (X : G.Inst D L) : GAll :=
+  ⟨viewD D, viewL L, viewX X, G.aL L, G.bL L⟩
 
-theorem host_cls_eq {R R' : Ranks} {H : Host R} {H' : Host R'} (hq : H.q = H'.q) (hd : H.d = H'.d)
-    (hQS : H.QS = H'.QS) : H.cls = H'.cls := by
+theorem host_cls_eq
+    {R R' : Ranks} {H : Host R} {H' : Host R'}
+    (hq : H.q = H'.q) (hd : H.d = H'.d) (hQS : H.QS = H'.QS)
+    : H.cls = H'.cls := by
   have hN : H.toHostRaw.condN = H'.toHostRaw.condN := by
     simp only [Formalism.HC.HostRaw.condN, hq, hd, hQS]
 
@@ -79,11 +80,12 @@ theorem host_cls_eq {R R' : Ranks} {H : Host R} {H' : Host R'} (hq : H.q = H'.q)
 
 section Tied
 
-variable {D : D7} (L0 : SizeData₂ D) (X0 : G.Inst D L0) (K : G.Consts) (dr : Set ℕ)
-  (len : D.what₂.Word → D.what₂.places.Pl → ℚ) (hw : 1 ≤ L0.sc.w'' D.R.n)
-  (hg : ∀ i, ¬ (G.IsResidueClassZero D (D.host.g i) ∨ G.IsSg D (D.host.g i)))
+variable
+  {D : D7} (L0 : SizeData₂ D) (X0 : G.Inst D L0)
+  (K : G.Consts) (dr : Set ℕ) (len : D.what₂.Word → D.what₂.places.Pl → ℚ)
+  (hw : 1 ≤ L0.sc.w'' D.R.n)
+  (hg : ∀ i, ¬(G.IsResidueClassZero D (D.host.g i) ∨ G.IsSg D (D.host.g i)))
   (hu : ∀ w, D.what₂.muAt w = D.what₂.mu0 → ∀ j, 1 ≤ j → j ≤ D.R.m → Fval L0 j w = 0)
-
 
 end Tied
 

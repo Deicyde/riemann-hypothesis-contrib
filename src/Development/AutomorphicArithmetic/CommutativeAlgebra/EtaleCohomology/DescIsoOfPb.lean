@@ -94,26 +94,42 @@ theorem hkOfPush : UpperTheory.Ru.crystallineComparison.HkOfPush := by
   have hzp : ∀ i, z i ≫ (corrM M T).p = W.p := fun i => by
     show z i ≫ T.p ≫ M.p = W.p
     rw [← Category.assoc, hz, hw]
-  have hs : ∀ i, G (M := W) (N := corrM M T) (z i) (hzp i) ≫ corrP M T = G (M := W) (N := M) w hw := fun i => by
+  have hs
+      : ∀ i,
+        G (M := W) (N := corrM M T) (z i) (hzp i) ≫ corrP M T
+          = G (M := W) (N := M) w hw := fun i => by
     have e := G_comp (A := W) (B := corrM M T) (C := M) (z i) (hzp i) T.p rfl (by rw [hz, hw])
-    have e' : G (M := W) (N := M) (z i ≫ T.p) (by rw [hz, hw] : (z i ≫ T.p) ≫ M.p = W.p) = G (M := W) (N := M) w hw := by
+    have e'
+        : G (M := W) (N := M) (z i ≫ T.p) (by rw [hz, hw] : (z i ≫ T.p) ≫ M.p = W.p)
+          = G (M := W) (N := M) w hw := by
       have := hz i
       subst this
       rfl
     exact e.trans e'
-  have hsplit : SplitOn T.p (G (M := W) (N := M) w hw ≫ gX M) fun i => G (M := W) (N := corrM M T) (z i) (hzp i) ≫ gX (corrM M T) := by
+  have hsplit : SplitOn T.p (G (M := W) (N := M) w hw ≫ gX M) fun i =>
+      G (M := W) (N := corrM M T) (z i) (hzp i) ≫ gX (corrM M T) := by
     have H := hsp (E.gb W) (gX W) (unit_gb W)
     have e1 : G (M := W) (N := M) w hw ≫ gX M = gX W ≫ w := G_gX (M := W) (N := M) w hw
-    have e2 : (fun i => G (M := W) (N := corrM M T) (z i) (hzp i) ≫ gX (corrM M T)) = fun i => gX W ≫ z i :=
+    have e2
+        : (fun i => G (M := W) (N := corrM M T) (z i) (hzp i) ≫ gX (corrM M T))
+          = fun i => gX W ≫ z i :=
       funext fun i => G_gX (M := W) (N := corrM M T) (z i) (hzp i)
     rw [e1, e2]
     exact H
-  have hI := desc_iso_of_pb (corr_pb M T) (G (M := W) (N := M) w hw) (fun i => G (M := W) (N := corrM M T) (z i) (hzp i)) hs hsplit
-  have key := hP (E.gb W) (G (M := W) (N := M) w hw) T.d (fun i => G (M := W) (N := corrM M T) (z i) (hzp i)) hs hI (Model.pullV (M := corrM M T) (N := M) T.r hr j v)
+  have hI :=
+    desc_iso_of_pb (corr_pb M T) (G (M := W) (N := M) w hw)
+      (fun i => G (M := W) (N := corrM M T) (z i) (hzp i))
+      hs hsplit
+  have key :=
+    hP (E.gb W) (G (M := W) (N := M) w hw) T.d
+      (fun i => G (M := W) (N := corrM M T) (z i) (hzp i))
+      hs hI (Model.pullV (M := corrM M T) (N := M) T.r hr j v)
   refine key.trans (Finset.sum_congr rfl fun i _ => ?_)
-  have e := G_comp (A := W) (B := corrM M T) (C := M) (z i) (hzp i) T.r hr
-    (by rw [Category.assoc, hr, ← Category.assoc, hz, hw])
-  have := pb_comp l (G (M := W) (N := corrM M T) (z i) (hzp i)) (G (M := corrM M T) (N := M) T.r hr) j v
+  have e :=
+    G_comp (A := W) (B := corrM M T) (C := M) (z i) (hzp i) T.r hr
+      (by rw [Category.assoc, hr, ← Category.assoc, hz, hw])
+  have :=
+    pb_comp l (G (M := W) (N := corrM M T) (z i) (hzp i)) (G (M := corrM M T) (N := M) T.r hr) j v
   rw [e] at this
   exact this.symm
 

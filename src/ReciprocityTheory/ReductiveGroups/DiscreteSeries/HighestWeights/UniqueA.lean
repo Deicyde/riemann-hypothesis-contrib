@@ -16,7 +16,8 @@ variable {n : ℕ}
 
 section
 
-variable {V : Type*} [AddCommGroup V] [Module ℂ V] (ε : Fin n → Bool) (F : Fin n → Fin n → Module.End ℂ V)
+variable
+  {V : Type*} [AddCommGroup V] [Module ℂ V] (ε : Fin n → Bool) (F : Fin n → Fin n → Module.End ℂ V)
 
 lemma uq_mem_kSpan (x : V) : x ∈ kSpan ε F x := by
     unfold kSpan
@@ -54,11 +55,12 @@ lemma uq_kRel_prod {A B : Type*} [Ring A] [Ring B] (ε : Fin n → Bool) (F : Fi
 
 section
 
-variable {V V' : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+variable
+  {V V' : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
   [NormedAddCommGroup V'] [InnerProductSpace ℂ V'] [FiniteDimensional ℂ V']
 
-def uqG (F : Fin n → Fin n → Module.End ℂ V) (F' : Fin n → Fin n → Module.End ℂ V') (a b : Fin n) :
-    Module.End ℂ (WithLp 2 (V × V')) :=
+def uqG (F : Fin n → Fin n → Module.End ℂ V) (F' : Fin n → Fin n → Module.End ℂ V') (a b : Fin n)
+    : Module.End ℂ (WithLp 2 (V × V')) :=
   LinearEquiv.conjRingEquiv (WithLp.linearEquiv 2 ℂ (V × V')).symm
     (LinearMap.prodMapRingHom ℂ V V' (F a b, F' a b))
 
@@ -70,7 +72,8 @@ end
 
 section
 
-variable {V V' : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+variable
+  {V V' : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
   [NormedAddCommGroup V'] [InnerProductSpace ℂ V'] [FiniteDimensional ℂ V']
 
 lemma uq_bij {P U : Type} [NormedAddCommGroup P] [InnerProductSpace ℂ P] [FiniteDimensional ℂ P]
@@ -212,17 +215,19 @@ lemma uq_bij {P U : Type} [NormedAddCommGroup P] [InnerProductSpace ℂ P] [Fini
     obtain ⟨z, hz, hzu⟩ := Submodule.mem_map.1 (hT' Submodule.mem_top)
     exact ⟨⟨z, hz⟩, by simpa using hzu⟩
 
-theorem uq_exists_equiv (ε : Fin n → Bool) (F : Fin n → Fin n → Module.End ℂ V)
-    (F' : Fin n → Fin n → Module.End ℂ V') (Λ : Fin n → ℝ) (w : V) (w' : V')
-    (hR : KRel ε F) (hR' : KRel ε F') (hU : KUnit ε F) (hU' : KUnit ε F')
-    (hw : KHighest ε F Λ w) (hw' : KHighest ε F' Λ w') (hw0 : w ≠ 0) (hw0' : w' ≠ 0)
-    (hT : kSpan ε F w = ⊤) (hT' : kSpan ε F' w' = ⊤) :
-    ∃ φ : V ≃ₗ[ℂ] V', (∀ a b, ε a = ε b → ∀ v, φ (F a b v) = F' a b (φ v)) ∧ φ w = w' := by
+theorem uq_exists_equiv
+    (ε : Fin n → Bool) (F : Fin n → Fin n → Module.End ℂ V) (F' : Fin n → Fin n → Module.End ℂ V')
+    (Λ : Fin n → ℝ) (w : V) (w' : V') (hR : KRel ε F) (hR' : KRel ε F') (hU : KUnit ε F)
+    (hU' : KUnit ε F') (hw : KHighest ε F Λ w) (hw' : KHighest ε F' Λ w') (hw0 : w ≠ 0)
+    (hw0' : w' ≠ 0) (hT : kSpan ε F w = ⊤) (hT' : kSpan ε F' w' = ⊤)
+    : ∃ φ : V ≃ₗ[ℂ] V', (∀ a b, ε a = ε b → ∀ v, φ (F a b v) = F' a b (φ v)) ∧ φ w = w' := by
   classical
   have hRG : KRel ε (uqG F F') :=
-    uq_kRel_map ε (fun a b => ((F a b, F' a b) : Module.End ℂ V × Module.End ℂ V'))
+    uq_kRel_map ε
+      (fun a b => ((F a b, F' a b) : Module.End ℂ V × Module.End ℂ V'))
       ((LinearEquiv.conjRingEquiv (WithLp.linearEquiv 2 ℂ (V × V')).symm).toRingHom.comp
-        (LinearMap.prodMapRingHom ℂ V V')) (uq_kRel_prod ε F F' hR hR')
+        (LinearMap.prodMapRingHom ℂ V V'))
+      (uq_kRel_prod ε F F' hR hR')
   have hUG : KUnit ε (uqG F F') := by
     intro a b hab y z
     simp only [WithLp.prod_inner_apply, uqG_apply]
@@ -239,20 +244,25 @@ theorem uq_exists_equiv (ε : Fin n → Bool) (F : Fin n → Fin n → Module.En
     LinearMap.snd ℂ V V' ∘ₗ (WithLp.linearEquiv 2 ℂ (V × V')).toLinearMap
   have hp₁ : ∀ y, p₁ y = (WithLp.ofLp y).1 := fun _ => rfl
   have hp₂ : ∀ y, p₂ y = (WithLp.ofLp y).2 := fun _ => rfl
-  have hb₁ := uq_bij ε (uqG F F') F Λ (WithLp.toLp 2 (w, w')) hRG hUG hxH p₁
-    (fun a b hab y => by rw [hp₁, hp₁, uqG_apply] <;> rfl) (by rw [hp₁]; simpa using hw0)
-    (by rw [hp₁]; simpa using hT)
-  have hb₂ := uq_bij ε (uqG F F') F' Λ (WithLp.toLp 2 (w, w')) hRG hUG hxH p₂
-    (fun a b hab y => by rw [hp₂, hp₂, uqG_apply] <;> rfl) (by rw [hp₂]; simpa using hw0')
-    (by rw [hp₂]; simpa using hT')
-  let e₁ := LinearEquiv.ofBijective (p₁.domRestrict (kSpan ε (uqG F F') (WithLp.toLp 2 (w, w')))) hb₁
-  let e₂ := LinearEquiv.ofBijective (p₂.domRestrict (kSpan ε (uqG F F') (WithLp.toLp 2 (w, w')))) hb₂
+  have hb₁ :=
+    uq_bij ε (uqG F F') F Λ (WithLp.toLp 2 (w, w')) hRG hUG hxH p₁
+      (fun a b hab y => by rw [hp₁, hp₁, uqG_apply] <;> rfl)
+      (by rw [hp₁]; simpa using hw0) (by rw [hp₁]; simpa using hT)
+  have hb₂ :=
+    uq_bij ε (uqG F F') F' Λ (WithLp.toLp 2 (w, w')) hRG hUG hxH p₂
+      (fun a b hab y => by rw [hp₂, hp₂, uqG_apply] <;> rfl)
+      (by rw [hp₂]; simpa using hw0') (by rw [hp₂]; simpa using hT')
+  let e₁ :=
+    LinearEquiv.ofBijective (p₁.domRestrict (kSpan ε (uqG F F') (WithLp.toLp 2 (w, w')))) hb₁
+  let e₂ :=
+    LinearEquiv.ofBijective (p₂.domRestrict (kSpan ε (uqG F F') (WithLp.toLp 2 (w, w')))) hb₂
   have he₁ : ∀ z, e₁ z = p₁ z := fun _ => rfl
   have he₂ : ∀ z, e₂ z = p₂ z := fun _ => rfl
   refine ⟨e₁.symm.trans e₂, ?_, ?_⟩
   · intro a b hab v
-    have hmem : uqG F F' a b ((e₁.symm v : _) : WithLp 2 (V × V')) ∈
-        kSpan ε (uqG F F') (WithLp.toLp 2 (w, w')) :=
+    have hmem
+        : uqG F F' a b ((e₁.symm v : _) : WithLp 2 (V × V'))
+          ∈ kSpan ε (uqG F F') (WithLp.toLp 2 (w, w')) :=
       uq_kSpan_stable ε (uqG F F') _ a b hab _ (e₁.symm v).2
     have hv1 : (WithLp.ofLp ((e₁.symm v : _) : WithLp 2 (V × V'))).1 = v := by
       rw [← hp₁, ← he₁, LinearEquiv.apply_symm_apply]
@@ -264,17 +274,22 @@ theorem uq_exists_equiv (ε : Fin n → Bool) (F : Fin n → Fin n → Module.En
     simp only [h1, he₂, hp₂, uqG_apply]
   · have hx : WithLp.toLp 2 (w, w') ∈ kSpan ε (uqG F F') (WithLp.toLp 2 (w, w')) :=
       uq_mem_kSpan ε _ _
-    have h2 : e₁.symm w = ⟨_, hx⟩ := by
-      rw [LinearEquiv.symm_apply_eq, he₁, hp₁] <;> simp
+    have h2 : e₁.symm w = ⟨_, hx⟩ := by rw [LinearEquiv.symm_apply_eq, he₁, hp₁] <;> simp
     show e₂ (e₁.symm w) = w'
     rw [h2, he₂, hp₂] <;> simp
 
-private theorem eq_bot_of_KStable_of_highest_not_mem (ε : Fin n → Bool) (F : Fin n → Fin n → Module.End ℂ V) (Λ : Fin n → ℝ)
-    (w : V) (hR : KRel ε F) (hU : KUnit ε F) (hw : KHighest ε F Λ w) (hT : kSpan ε F w = ⊤)
-    (S : Submodule ℂ V) (hS : KStable ε F S) (hwS : w ∉ S) : S = ⊥ := by
+private theorem eq_bot_of_KStable_of_highest_not_mem
+    (ε : Fin n → Bool) (F : Fin n → Fin n → Module.End ℂ V)
+    (Λ : Fin n → ℝ)
+    (w : V)
+    (hR : KRel ε F) (hU : KUnit ε F) (hw : KHighest ε F Λ w) (hT : kSpan ε F w = ⊤)
+    (S : Submodule ℂ V) (hS : KStable ε F S) (hwS : w ∉ S)
+    : S = ⊥ := by
   classical
-  obtain ⟨FU, hFUdef⟩ : ∃ FU : Fin n → Fin n → Module.End ℂ (V ⧸ S), FU = fun a b =>
-      if h : ε a = ε b then S.mapQ S (F a b) (fun y hy => hS a b h y hy) else 0 := ⟨_, rfl⟩
+  obtain ⟨FU, hFUdef⟩
+      : ∃ FU : Fin n → Fin n → Module.End ℂ (V ⧸ S),
+        FU = fun a b => if h : ε a = ε b then S.mapQ S (F a b) (fun y hy => hS a b h y hy) else 0 :=
+    ⟨_, rfl⟩
   have hFU : ∀ a b, ε a = ε b → ∀ y, S.mkQ (F a b y) = FU a b (S.mkQ y) := by
     intro a b h y
     rw [hFUdef]
@@ -290,30 +305,32 @@ private theorem eq_bot_of_KStable_of_highest_not_mem (ε : Fin n → Bool) (F : 
         exact uq_kSpan_stable ε FU (S.mkQ w) a b h _ hy)
     have hy : y ∈ kSpan ε F w := by rw [hT]; exact Submodule.mem_top
     exact hle hy
-  have hpw : S.mkQ w ≠ 0 := by
-    rwa [Ne, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
+  have hpw : S.mkQ w ≠ 0 := by rwa [Ne, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
   have hbij := uq_bij ε F FU Λ w hR hU hw S.mkQ (fun a b h y => hFU a b h y) hpw hTU
   rw [eq_bot_iff]
   intro y hy
   have hy' : y ∈ kSpan ε F w := by rw [hT]; exact Submodule.mem_top
   have h0 : (0 : V) ∈ kSpan ε F w := Submodule.zero_mem _
-  have key := hbij.1 (show (S.mkQ.domRestrict (kSpan ε F w)) ⟨y, hy'⟩ =
-      (S.mkQ.domRestrict (kSpan ε F w)) ⟨0, h0⟩ by simpa using hy)
+  have key :=
+    hbij.1 (show (S.mkQ.domRestrict (kSpan ε F w)) ⟨y, hy'⟩
+        = (S.mkQ.domRestrict (kSpan ε F w)) ⟨0, h0⟩ by
+      simpa using hy)
   rw [Submodule.mem_bot]
   exact congrArg Subtype.val key
 
-theorem uq_exists_isometry (ε : Fin n → Bool) (F : Fin n → Fin n → Module.End ℂ V)
-    (F' : Fin n → Fin n → Module.End ℂ V') (Λ : Fin n → ℝ) (w : V) (w' : V')
-    (hR : KRel ε F) (hR' : KRel ε F') (hU : KUnit ε F) (hU' : KUnit ε F')
-    (hw : KHighest ε F Λ w) (hw' : KHighest ε F' Λ w') (hw1 : ‖w‖ = 1) (hw1' : ‖w'‖ = 1)
-    (hT : kSpan ε F w = ⊤) (hT' : kSpan ε F' w' = ⊤) :
-    ∃ φ : V ≃ₗᵢ[ℂ] V', (∀ a b, ε a = ε b → ∀ v, φ (F a b v) = F' a b (φ v)) ∧ φ w = w' := by
+theorem uq_exists_isometry
+    (ε : Fin n → Bool) (F : Fin n → Fin n → Module.End ℂ V) (F' : Fin n → Fin n → Module.End ℂ V')
+    (Λ : Fin n → ℝ) (w : V) (w' : V') (hR : KRel ε F) (hR' : KRel ε F') (hU : KUnit ε F)
+    (hU' : KUnit ε F') (hw : KHighest ε F Λ w) (hw' : KHighest ε F' Λ w') (hw1 : ‖w‖ = 1)
+    (hw1' : ‖w'‖ = 1) (hT : kSpan ε F w = ⊤) (hT' : kSpan ε F' w' = ⊤)
+    : ∃ φ : V ≃ₗᵢ[ℂ] V', (∀ a b, ε a = ε b → ∀ v, φ (F a b v) = F' a b (φ v)) ∧ φ w = w' := by
   classical
   have hw0 : w ≠ 0 := by rintro rfl; simp at hw1
   have hw0' : w' ≠ 0 := by rintro rfl; simp at hw1'
   obtain ⟨φ, hφ, hφw⟩ := uq_exists_equiv ε F F' Λ w w' hR hR' hU hU' hw hw' hw0 hw0' hT hT'
-  obtain ⟨A, hA⟩ : ∃ A : Module.End ℂ V,
-      A = LinearMap.adjoint (φ : V →ₗ[ℂ] V') ∘ₗ (φ : V →ₗ[ℂ] V') := ⟨_, rfl⟩
+  obtain ⟨A, hA⟩
+      : ∃ A : Module.End ℂ V, A = LinearMap.adjoint (φ : V →ₗ[ℂ] V') ∘ₗ (φ : V →ₗ[ℂ] V') :=
+    ⟨_, rfl⟩
   have hAinner : ∀ u v, ⟪A u, v⟫_ℂ = ⟪φ u, φ v⟫_ℂ := by
     intro u v
     rw [hA, LinearMap.comp_apply, LinearMap.adjoint_inner_left] <;> rfl
@@ -329,7 +346,8 @@ theorem uq_exists_isometry (ε : Fin n → Bool) (F : Fin n → Fin n → Module
     rw [hAF a b hab, hv, map_smul]
   have hwE : w ∈ Module.End.eigenspace A c := by
     by_contra hwE
-    exact (Module.End.hasEigenvalue_iff.1 hc) (eq_bot_of_KStable_of_highest_not_mem ε F Λ w hR hU hw hT _ hEst hwE)
+    exact (Module.End.hasEigenvalue_iff.1 hc) (eq_bot_of_KStable_of_highest_not_mem ε F Λ w hR hU hw
+      hT _ hEst hwE)
   have hEtop : ∀ v, A v = c • v := by
     intro v
     have h := uq_kSpan_le ε F hwE hEst
@@ -338,7 +356,8 @@ theorem uq_exists_isometry (ε : Fin n → Bool) (F : Fin n → Fin n → Module
   have hc1 : (starRingEnd ℂ) c = 1 := by
     have h1 := hAinner w w
     rw [hEtop, inner_smul_left, hφw, inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, hw1,
-      hw1'] at h1
+        hw1']
+      at h1
     simpa using h1
   have hinner : ∀ u v, ⟪φ u, φ v⟫_ℂ = ⟪u, v⟫_ℂ := by
     intro u v

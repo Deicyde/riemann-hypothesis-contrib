@@ -13,13 +13,19 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllSi
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.Moduli
 
 theorem siegelFamilies_closed : N0 :=
-  GlobalTheory.T.exists_siegelFamily_localisation_prime_power_level GlobalTheory.T.all_six_abelian_scheme_laws_hold.1 GlobalTheory.T.all_six_abelian_scheme_laws_hold.2.1 GlobalTheory.T.theorem_of_cube_polAbelianScheme GlobalTheory.T.theta_uniformisation_complex_abelian_varieties
+  GlobalTheory.T.exists_siegelFamily_localisation_prime_power_level
+    GlobalTheory.T.all_six_abelian_scheme_laws_hold.1
+    GlobalTheory.T.all_six_abelian_scheme_laws_hold.2.1
+    GlobalTheory.T.theorem_of_cube_polAbelianScheme
+    GlobalTheory.T.theta_uniformisation_complex_abelian_varieties
 
 end GlobalTheory.Moduli

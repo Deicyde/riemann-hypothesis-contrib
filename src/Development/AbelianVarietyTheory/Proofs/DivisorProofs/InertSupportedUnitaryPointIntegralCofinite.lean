@@ -20,10 +20,12 @@ noncomputable section
 
 namespace GlobalTheory.InertCofinite
 
-open Matrix TensorProduct Formalism.UG Formalism.UG.P Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum.VacInt
+open Matrix TensorProduct Formalism.UG Formalism.UG.P Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum.VacInt
 
-theorem eps_dvd_nat (D : D7) (P : ℕ → Prop) (n : ℕ) (hn : n ≠ 0) (h : ∀ q : ℕ, q.Prime → q ∣ n → ¬ P q) :
-    ∃ t ∈ OhE D, eps D.host.E P = (n : AE D) * t := by
+theorem eps_dvd_nat
+    (D : D7) (P : ℕ → Prop) (n : ℕ) (hn : n ≠ 0) (h : ∀ q : ℕ, q.Prime → q ∣ n → ¬ P q)
+    : ∃ t ∈ OhE D, eps D.host.E P = (n : AE D) * t := by
   induction n using Nat.recOnMul with
   | zero => exact absurd rfl hn
   | one => exact ⟨_, eps_mem P, by simp⟩
@@ -42,8 +44,8 @@ theorem eps_dvd_nat (D : D7) (P : ℕ → Prop) (n : ℕ) (hn : n ≠ 0) (h : �
 
 theorem exists_denom (D : D7) (y : AE D) : ∃ n : ℕ, 0 < n ∧ (n : AE D) * y ∈ OhE D := by
   obtain ⟨d, hd0, hd⟩ := levelaf_denom (F := ℚ) y
-  obtain ⟨z, rfl⟩ : ∃ z : ℤ, d = z := ⟨Rat.ringOfIntegersEquiv d, by
-    apply Rat.ringOfIntegersEquiv.injective; simp⟩
+  obtain ⟨z, rfl⟩ : ∃ z : ℤ, d = z :=
+    ⟨Rat.ringOfIntegersEquiv d, by apply Rat.ringOfIntegersEquiv.injective; simp⟩
   have hz : z.natAbs ≠ 0 := by rintro h; apply hd0; simp [Int.natAbs_eq_zero.1 h]
   have hC : levelafC (F := ℚ) D.host.E (z : 𝓞 ℚ) = (z : AE D) := by
     rw [levelafC, map_intCast]
@@ -56,8 +58,8 @@ theorem exists_denom (D : D7) (y : AE D) : ∃ n : ℕ, 0 < n ∧ (n : AE D) * y
     have := neg_mem hd
     simpa [OhE] using this
 
-theorem exists_denom_zeroAt (D : D7) (y : AE D) :
-    ∃ n : ℕ, 0 < n ∧ (n : AE D) * y ∈ OhE D ∧ ∀ q : ℕ, q.Prime → q ∣ n → ¬ ZeroAt D q y := by
+theorem exists_denom_zeroAt (D : D7) (y : AE D)
+    : ∃ n : ℕ, 0 < n ∧ (n : AE D) * y ∈ OhE D ∧ ∀ q : ℕ, q.Prime → q ∣ n → ¬ ZeroAt D q y := by
   have hex := exists_denom D y
   obtain ⟨h0, h1⟩ := Nat.find_spec hex
   refine ⟨Nat.find hex, h0, h1, fun q hq hd hz => ?_⟩
@@ -76,32 +78,44 @@ theorem exists_denom_zeroAt (D : D7) (y : AE D) :
   have : q ∣ m := hd.trans (heq ▸ Nat.gcd_dvd_right _ _)
   exact (Nat.Prime.coprime_iff_not_dvd hq).1 hc.symm this
 
-theorem intG_of_entries (D : D7) {N : ℕ} (g : GA D N)
-    (h : ∀ i j, ((g : GL (Fin N) (AE D)) : Matrix (Fin N) (Fin N) (AE D)) i j ∈ OhE D) :
-    IntG D (g : GL (Fin N) (AE D)) := by
-  have hg : cT (sgA D) ((g : GL (Fin N) (AE D)) : Matrix (Fin N) (Fin N) (AE D)) *
-      (1 : Matrix (Fin N) (Fin N) D.host.E).map (inc D) * (g : GL (Fin N) (AE D)) =
-      (1 : Matrix (Fin N) (Fin N) D.host.E).map (inc D) := g.2
+theorem intG_of_entries
+    (D : D7)
+    {N : ℕ}
+    (g : GA D N) (h : ∀ i j, ((g : GL (Fin N) (AE D)) : Matrix (Fin N) (Fin N) (AE D)) i j ∈ OhE D)
+    : IntG D (g : GL (Fin N) (AE D)) := by
+  have hg
+      : cT (sgA D) ((g : GL (Fin N) (AE D)) : Matrix (Fin N) (Fin N) (AE D))
+          * (1 : Matrix (Fin N) (Fin N) D.host.E).map (inc D) * (g : GL (Fin N) (AE D))
+        = (1 : Matrix (Fin N) (Fin N) D.host.E).map (inc D) :=
+    g.2
   rw [Matrix.map_one _ (map_zero _) (map_one _), Matrix.mul_one] at hg
   intro i j
   refine ⟨h i j, ?_⟩
   rw [Units.inv_eq_of_mul_eq_one_left hg]
   exact csDual_sig_mem _ (h j i)
 
-theorem intG_part_cofinite {D : D7} {N : ℕ} (y : GA D N) (hy : SuppInert D (y : GL (Fin N) (AE D))) :
-    ∃ s : Finset ℕ, (∀ p ∈ s, p.Prime ∧ InertQ D p) ∧
-      IntG D (part D (fun p => p ∉ s) y : GL (Fin N) (AE D)) := by
+theorem intG_part_cofinite {D : D7} {N : ℕ} (y : GA D N) (hy : SuppInert D (y : GL (Fin N) (AE D)))
+    : ∃ s : Finset ℕ,
+      (∀ p ∈ s, p.Prime ∧ InertQ D p) ∧ IntG D (part D (fun p => p ∉ s) y : GL (Fin N) (AE D)) := by
   choose n h0 h1 h2 using fun ij : Fin N × Fin N => exists_denom_zeroAt D
     (((y : GL (Fin N) (AE D)) : Matrix (Fin N) (Fin N) (AE D)) ij.1 ij.2 - (1 : Matrix (Fin N) (Fin N) (AE D)) ij.1 ij.2)
-  refine ⟨Finset.univ.biUnion fun ij => (n ij).primeFactors, fun p hp => ?_, intG_of_entries D _ fun i j => ?_⟩
+  refine ⟨
+    Finset.univ.biUnion fun ij => (n ij).primeFactors,
+    fun p hp => ?_,
+    intG_of_entries D _ fun i j => ?_
+  ⟩
   · obtain ⟨ij, -, hp⟩ := Finset.mem_biUnion.1 hp
     have hq := Nat.prime_of_mem_primeFactors hp
     refine ⟨hq, ?_⟩
     by_contra hi
     exact h2 ij p hq (Nat.dvd_of_mem_primeFactors hp) (hy p hq hi ij.1 ij.2)
-  · obtain ⟨t, ht, e⟩ := eps_dvd_nat D (fun p => p ∉ Finset.univ.biUnion fun ij => (n ij).primeFactors) (n (i, j))
-      (h0 _).ne' fun q hq hd hn => hn (Finset.mem_biUnion.2 ⟨(i, j), Finset.mem_univ _,
-        Nat.mem_primeFactors.2 ⟨hq, hd, (h0 _).ne'⟩⟩)
+  · obtain ⟨t, ht, e⟩ :=
+      eps_dvd_nat D
+        (fun p => p ∉ Finset.univ.biUnion fun ij => (n ij).primeFactors)
+        (n (i, j)) (h0 _).ne'
+        fun q hq hd hn =>
+          hn (Finset.mem_biUnion.2
+            ⟨(i, j), Finset.mem_univ _, Nat.mem_primeFactors.2 ⟨hq, hd, (h0 _).ne'⟩⟩)
     have := add_mem (mul_mem ht (h1 (i, j))) (one_entry_mem (OhE D) i j)
     convert this using 1
     show cutM _ _ _ i j = _

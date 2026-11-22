@@ -6,10 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem teich_not_lt {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {l N : ℕ} (h : l.Coprime N)
-    (hl : A.valuation (l : Ω) < 1) : ¬ A.valuation (N : Ω) < 1 := by
+private theorem teich_not_lt
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {l N : ℕ} (h : l.Coprime N) (hl : A.valuation (l : Ω) < 1)
+    : ¬ A.valuation (N : Ω) < 1 := by
   intro hN
   obtain ⟨a, b, hab⟩ := Nat.isCoprime_iff_coprime.mpr h
   have ha : A.valuation (a : Ω) ≤ 1 := by simpa using A.valuation_le_one (a : A)
@@ -27,8 +32,10 @@ private theorem teich_not_lt {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {l
   rw [h1, map_one] at hv
   exact lt_irrefl _ hv
 
-theorem UpperTheory.V.Lev.teichDvd :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ N : ℕ, 1 ≤ N → Af.KillsMu N D.om → l ∣ N := by
+theorem UpperTheory.V.Lev.teichDvd
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good → ∀ N : ℕ, 1 ≤ N → Af.KillsMu N D.om → l ∣ N := by
   intro Ω _ _ _ l _ c D hD N hN hK
   by_contra hnd
   have hp : l.Prime := Fact.out
@@ -41,7 +48,8 @@ theorem UpperTheory.V.Lev.teichDvd :
   have hom : D.om σ = 1 := by
     apply hK σ
     intro ζ hζ
-    rw [Chr.cls_spec N σ ζ hζ, MonoidHom.mem_ker.mp (hIne hσ), Units.val_one, ZMod.val_one_eq_one_mod]
+    rw [Chr.cls_spec N σ ζ hζ, MonoidHom.mem_ker.mp (hIne hσ), Units.val_one,
+      ZMod.val_one_eq_one_mod]
     rcases Nat.lt_or_ge N 2 with h2 | h2
     · have h1 : N = 1 := by omega
       subst h1
@@ -51,8 +59,9 @@ theorem UpperTheory.V.Lev.teichDvd :
   have hbar := hD.om_bar σ
   simp only [Raw.bar, hom, chiO, MonoidHom.comp_apply, hcyc] at hbar
   simp [Units.coe_map] at hbar
-  have hch := (Ws.Gys.coefFacts c (ResidueField c.O) (residue c.O)
-    (fun x hx => (IsLocalRing.residue_eq_zero_iff x).mpr hx)).1
+  have hch :=
+    (Ws.Gys.coefFacts c (ResidueField c.O) (residue c.O)
+      (fun x hx => (IsLocalRing.residue_eq_zero_iff x).mpr hx)).1
   have h2 : ((2 : ℕ) : ResidueField c.O) = 0 := by
     have e : (1 : ResidueField c.O) + 1 = 0 := by
       nth_rewrite 1 [hbar]

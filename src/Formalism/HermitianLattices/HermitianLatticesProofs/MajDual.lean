@@ -14,19 +14,22 @@ noncomputable section
 namespace Formalism.HermitianLatticesTheory
 
 section
-variable {K V ι : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Fintype ι] [DecidableEq ι]
+variable
+  {K V ι : Type}
+  [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
 
 end
 
 section
-variable {K V ι : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Fintype ι] [DecidableEq ι]
+variable
+  {K V ι : Type}
+  [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
 
 end
 
 section
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [Module (RingOfIntegers K) V] [IsScalarTower (RingOfIntegers K) K V]
 
 lemma majDual_star_int (r : RingOfIntegers K) : IsIntegral ℤ (star (r : K)) := by
@@ -35,14 +38,16 @@ lemma majDual_star_int (r : RingOfIntegers K) : IsIntegral ℤ (star (r : K)) :=
 end
 
 section
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [Module (RingOfIntegers K) V] [IsScalarTower (RingOfIntegers K) K V]
 
 end
 
 section
-variable {K V ι : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Fintype ι] [DecidableEq ι]
+variable
+  {K V ι : Type}
+  [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
 
 variable [Module (RingOfIntegers K) V] [IsScalarTower (RingOfIntegers K) K V]
 

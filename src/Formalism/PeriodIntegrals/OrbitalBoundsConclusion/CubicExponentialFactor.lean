@@ -5,4 +5,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CubicExponential
 
 @[expose] public section
 
-theorem thetaCube_triple_relation : PI.CubicExponentialFactor.Lemma := PI.CubicExponentialFactor.Wk.main
+theorem thetaCube_triple_relation : PI.CubicExponentialFactor.Lemma :=
+  PI.CubicExponentialFactor.Wk.main

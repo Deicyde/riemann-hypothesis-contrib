@@ -14,7 +14,9 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Sca
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.DIV GlobalTheory.FlagBasis GlobalTheory.LevNorm
+open NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.DIV
+  GlobalTheory.FlagBasis GlobalTheory.LevNorm
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
@@ -56,15 +58,15 @@ theorem hA_eV_zV (a : Fin D.R.rS) : hA X.B.I (eV X a) (zV X u) = 0 := by
   rw [zV, eV, HidaSetting.zR, HidaSetting.eR, hA_crd, (X.zu_orth u a).1]
   simp
 
-theorem hA_fV_zV (a : Fin D.R.rS) : hA X.B.I (fV X a) (zV X u) = 0 := adelicHermitian_hyperbolicF_anisotropic_eq_zero X u a
+theorem hA_fV_zV (a : Fin D.R.rS) : hA X.B.I (fV X a) (zV X u) = 0 :=
+  adelicHermitian_hyperbolicF_anisotropic_eq_zero X u a
 
-theorem hA_zV_zV : hA X.B.I (zV X u) (zV X u) =
-    -(((D.mem u).A.T : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) := by
+theorem hA_zV_zV
+    : hA X.B.I (zV X u) (zV X u) = -(((D.mem u).A.T : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) := by
   rw [zV, HidaSetting.zR, hA_crd, X.zu_norm]
   simp
 
-theorem divN_zero' : divN X.B.I (D.mem u).A.T 0 = 0 := by
-  simp [divN]
+theorem divN_zero' : divN X.B.I (D.mem u).A.T 0 = 0 := by simp [divN]
 
 theorem prj_eV (b : Fin D.R.rS) : prj X u (eV X b) = eV X b := by
   simp only [prj, hA_fV_eV, hA_eV_eV, hA_zV_eV, divN_zero', ite_smul, one_smul, zero_smul,
@@ -76,9 +78,11 @@ theorem prj_fV (b : Fin D.R.rS) : prj X u (fV X b) = fV X b := by
 
 theorem prj_zV : prj X u (zV X u) = zV X u := by
   have hT : ((D.mem u).A.T : ℕ) ≠ 0 := (D.mem u).A.T_prime.ne_zero
-  have h : divN X.B.I (D.mem u).A.T (-(((D.mem u).A.T : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F)) = -1 := by
-    rw [show -(((D.mem u).A.T : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) =
-      (((D.mem u).A.T : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) * (-1) by ring]
+  have h
+      : divN X.B.I (D.mem u).A.T (-(((D.mem u).A.T : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F)) = -1 := by
+    rw [show -(((D.mem u).A.T : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F)
+        = (((D.mem u).A.T : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) * (-1) by
+      ring]
     exact Formalism.L2.SG.Pf.unitaryCongruence.divN_gmul X.B.I _ hT _
   simp only [prj, hA_fV_zV, hA_eV_zV, hA_zV_zV, h, zero_smul, Finset.sum_const_zero, zero_add,
     neg_smul, one_smul, sub_neg_eq_add]
@@ -92,11 +96,15 @@ theorem prj_prj (y : VA X.B.I) : prj X u (prj X u y) = prj X u y := by
   simp only [hL, prj_eV, prj_fV, prj_zV]
   rfl
 
-theorem prj_fix_idem : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word),
-    (∀ a, GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.eV X a) = GlobalTheory.ScalW.eV X a ∧
-      GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.fV X a) = GlobalTheory.ScalW.fV X a) ∧
-    GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.zV X u) = GlobalTheory.ScalW.zV X u ∧
-    ∀ y, GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.prj X u y) = GlobalTheory.ScalW.prj X u y :=
-  fun _ X u => ⟨fun a => ⟨prj_eV X u a, prj_fV X u a⟩, prj_zV X u, prj_prj X u⟩
+theorem prj_fix_idem
+    : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word),
+      (∀ a,
+          GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.eV X a) = GlobalTheory.ScalW.eV X a
+            ∧ GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.fV X a) = GlobalTheory.ScalW.fV X a)
+        ∧ GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.zV X u) = GlobalTheory.ScalW.zV X u
+        ∧ ∀ y,
+          GlobalTheory.ScalW.prj X u (GlobalTheory.ScalW.prj X u y)
+            = GlobalTheory.ScalW.prj X u y := fun _ X u =>
+  ⟨fun a => ⟨prj_eV X u a, prj_fV X u a⟩, prj_zV X u, prj_prj X u⟩
 
 end GlobalTheory.ScalW

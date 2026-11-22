@@ -8,7 +8,9 @@ public import Formalism.LocalToGlobal.GaloisLevelStructure.Checks
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
   NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.AutQuot
@@ -54,12 +56,15 @@ theorem WtQ.cls_rep (X : WtQ L n) : clsW X.rep = X := Subtype.ext X.2.choose_spe
 section
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-def LocAt (π : NG.AutRep L n) (w : HeightOneSpectrum (𝓞 L)) (x : GlobalTheory.LocGL.IrrGL (k := w.adicCompletion L)) : Prop :=
-  ∃ (s : SplitPlace L) (σ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (s.w.adicCompletion L))) (h : s.w = w),
+def LocAt
+    (π : NG.AutRep L n)
+    (w : HeightOneSpectrum (𝓞 L)) (x : GlobalTheory.LocGL.IrrGL (k := w.adicCompletion L))
+    : Prop :=
+  ∃ (s : SplitPlace L) (σ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (s.w.adicCompletion L)))
+      (h : s.w = w),
     IsLocS π.S s σ ∧ HEq (GlobalTheory.LocLanglands.cls σ) x
 
 end
-
 
 open Classical in
 def hwOf (a : NG.AlgWt L n) (τ : L →+* ℂ) : Fin n → ℤ :=
@@ -71,22 +76,25 @@ theorem hwOf_antitone (a : NG.AlgWt L n) (τ : L →+* ℂ) : Antitone (hwOf a �
   · exact h.choose_spec.2
   · exact fun _ _ _ => le_rfl
 
-
 open Classical in
 def satOf (π : NG.AutRep L n) (w : HeightOneSpectrum (𝓞 L)) : Multiset ℂ :=
-  if h : ∃ (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (Dv : InertDatum L n v w) (α : Fin (n / 2) → ℂ),
-      NG.OverPl w v ∧ NG.SatAt π Dv α
-  then Finset.univ.val.map h.choose_spec.choose_spec.choose else Multiset.replicate (n / 2) 1
+  if h
+      : ∃ (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (Dv : InertDatum L n v w)
+          (α : Fin (n / 2) → ℂ),
+        NG.OverPl w v ∧ NG.SatAt π Dv α then
+    Finset.univ.val.map h.choose_spec.choose_spec.choose
+  else
+    Multiset.replicate (n / 2) 1
 
-theorem satOf_card (π : NG.AutRep L n) (w : HeightOneSpectrum (𝓞 L)) : Multiset.card (satOf π w) = n / 2 := by
+theorem satOf_card (π : NG.AutRep L n) (w : HeightOneSpectrum (𝓞 L))
+    : Multiset.card (satOf π w) = n / 2 := by
   unfold satOf
   split_ifs <;> simp
 
-theorem infOf_card (lam : Fin n → ℤ) : Multiset.card (NG.infOf lam) = n := by
-  simp [NG.infOf]
+theorem infOf_card (lam : Fin n → ℤ) : Multiset.card (NG.infOf lam) = n := by simp [NG.infOf]
 
-theorem infOf_nodup_alg {lam : Fin n → ℤ} (hl : Antitone lam) : (NG.infOf lam).Nodup ∧
-    ∀ x ∈ NG.infOf lam, ∃ k : ℤ, x = (k : ℂ) + ((n : ℂ) - 1) / 2 := by
+theorem infOf_nodup_alg {lam : Fin n → ℤ} (hl : Antitone lam)
+    : (NG.infOf lam).Nodup ∧ ∀ x ∈ NG.infOf lam, ∃ k : ℤ, x = (k : ℂ) + ((n : ℂ) - 1) / 2 := by
   refine ⟨?_, ?_⟩
   · unfold NG.infOf
     refine Multiset.Nodup.map_on (fun i _ j _ hij => ?_) Finset.univ.nodup
@@ -108,7 +116,9 @@ end
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
   NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.AutQuot
@@ -117,14 +127,16 @@ open Classical in
 def wtOf (D : D7) (π : NG.AutRep D.host.E D.R.nV) : WtQ D.host.E D.R.nV :=
   if h : ∃ b, π.toAlgWt.IsDual b then clsW h.choose else clsW π.toAlgWt
 
-variable (hL : GlobalTheory.Published.LocalLanglandsGL) (D : D7) (T : GlobalTheory.RowTie.WDTie D.nd D.naut)
-
+variable
+  (hL : GlobalTheory.Published.LocalLanglandsGL)
+  (D : D7) (T : GlobalTheory.RowTie.WDTie D.nd D.naut)
 
 open Classical in
 def locOf (π : NG.AutRep D.host.E D.R.nV) (w : PlE D.host) : D.naut.LP w :=
-  if h : ∃ x, LocAt π w x then (T.e w).symm (GlobalTheory.CuspRep.ParLaws.locRec hL (D.nd.plOm.2 w) h.choose)
-  else D.naut.lpZero w
-
+  if h : ∃ x, LocAt π w x then
+    (T.e w).symm (GlobalTheory.CuspRep.ParLaws.locRec hL (D.nd.plOm.2 w) h.choose)
+  else
+    D.naut.lpZero w
 
 end GlobalTheory.AutQuot
 

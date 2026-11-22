@@ -15,9 +15,9 @@ noncomputable section
 
 def GenFibreHomog.Statement : Prop :=
   ∀ (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
-    (y : (Σ k, ι k) → Ω),
-    GroundTheory.Heights₂.Heights.NumbersDVR.IsMultiHomogIdeal
-      ((mCoordIdeal y).map (MvPolynomial.map (Int.castRingHom ℚ)))
+      (y : (Σ k, ι k) → Ω),
+    GroundTheory.Heights₂.Heights.NumbersDVR.IsMultiHomogIdeal ((mCoordIdeal y).map
+      (MvPolynomial.map (Int.castRingHom ℚ)))
 
 end
 

@@ -4,18 +4,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK UpperTheory.V.ZK.Cl
+open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK
+  UpperTheory.V.ZK.Cl
 
-private theorem red_apply_map {R k : Type} [CommRing R] [Field k] (r : R →+* k) (N : ℕ) (g : GL (Fin N) R)
-    (x : Fin N → R) : red r N g (r ∘ x) = r ∘ (g : Matrix (Fin N) (Fin N) R).mulVec x := by
+private theorem red_apply_map
+    {R k : Type} [CommRing R] [Field k] (r : R →+* k) (N : ℕ) (g : GL (Fin N) R) (x : Fin N → R)
+    : red r N g (r ∘ x) = r ∘ (g : Matrix (Fin N) (Fin N) R).mulVec x := by
   funext j
   simp [red, RingHom.map_mulVec]
 
-private theorem exists_ibar {R k M V : Type} [CommRing R] [Field k] [AddCommGroup M] [Module R M] [AddCommGroup V]
-    [Module k V] {N : ℕ} (r : R →+* k) (hr : Function.Surjective r) (i : M →ₗ[R] (Fin N → R)) (π : M →+ V)
-    (h1 : ∀ a x, π (a • x) = r a • π x) (h2 : Function.Surjective π)
-    (h3 : ∀ x, π x = 0 → x ∈ RingHom.ker r • (⊤ : Submodule R M)) :
-    ∃ ib : V →ₗ[k] (Fin N → k), ∀ x, ib (π x) = r ∘ i x := by
+private theorem exists_ibar
+    {R k M V : Type}
+    [CommRing R] [Field k] [AddCommGroup M] [Module R M] [AddCommGroup V] [Module k V]
+    {N : ℕ}
+    (r : R →+* k) (hr : Function.Surjective r)
+    (i : M →ₗ[R] (Fin N → R))
+    (π : M →+ V) (h1 : ∀ a x, π (a • x) = r a • π x) (h2 : Function.Surjective π)
+    (h3 : ∀ x, π x = 0 → x ∈ RingHom.ker r • (⊤ : Submodule R M))
+    : ∃ ib : V →ₗ[k] (Fin N → k), ∀ x, ib (π x) = r ∘ i x := by
   have key : ∀ z ∈ RingHom.ker r • (⊤ : Submodule R M), r ∘ i z = 0 := by
     intro z hz
     refine Submodule.smul_induction_on hz ?_ ?_
@@ -52,10 +58,14 @@ private theorem exists_ibar {R k M V : Type} [CommRing R] [Field k] [AddCommGrou
   · intro x
     exact wd _ _ (hpre _)
 
-private theorem exists_sbar {R k M V : Type} [CommRing R] [Field k] [AddCommGroup M] [Module R M] [AddCommGroup V]
-    [Module k V] {N : ℕ} (r : R →+* k) (s : (Fin N → R) →ₗ[R] M) (π : M →+ V)
-    (h1 : ∀ a x, π (a • x) = r a • π x) :
-    ∃ sb : (Fin N → k) →ₗ[k] V, ∀ x, sb (r ∘ x) = π (s x) := by
+private theorem exists_sbar
+    {R k M V : Type}
+    [CommRing R] [Field k] [AddCommGroup M] [Module R M] [AddCommGroup V] [Module k V]
+    {N : ℕ}
+    (r : R →+* k)
+    (s : (Fin N → R) →ₗ[R] M)
+    (π : M →+ V) (h1 : ∀ a x, π (a • x) = r a • π x)
+    : ∃ sb : (Fin N → k) →ₗ[k] V, ∀ x, sb (r ∘ x) = π (s x) := by
   refine ⟨(Pi.basisFun k (Fin N)).constr k (fun j => π (s (Pi.single j 1))), fun x => ?_⟩
   rw [Module.Basis.constr_apply_fintype]
   have hx : x = ∑ j, x j • (Pi.single j 1 : Fin N → R) := by
@@ -67,20 +77,20 @@ private theorem exists_sbar {R k M V : Type} [CommRing R] [Field k] [AddCommGrou
   rw [map_smul, h1]
   simp
 
-theorem UpperTheory.V.ZK.Cl.cFree :
-    UpperTheory.V.ZK.Cl.CFree := by
+theorem UpperTheory.V.ZK.Cl.cFree : UpperTheory.V.ZK.Cl.CFree := by
   intro R _ M _ _ _ _ H _ α
   obtain ⟨N, s, hs⟩ := Module.Finite.exists_fin' R M
   obtain ⟨i, hi⟩ := Module.projective_lifting_property s LinearMap.id hs
   have hsi : ∀ y, s (i y) = y := fun y => LinearMap.congr_fun hi y
-  let E : H →* Module.End R (Fin N → R) :=
-    { toFun := fun h => i ∘ₗ (α h).toLinearMap ∘ₗ s + (LinearMap.id - i ∘ₗ s)
-      map_one' := LinearMap.ext fun x => by simp
-      map_mul' := fun g h => LinearMap.ext fun x => by
-        simp [hsi, map_mul, Module.End.mul_apply] }
+  let E : H →* Module.End R (Fin N → R) := {
+    toFun := fun h => i ∘ₗ (α h).toLinearMap ∘ₗ s + (LinearMap.id - i ∘ₗ s)
+    map_one' := LinearMap.ext fun x => by simp
+    map_mul' := fun g h => LinearMap.ext fun x => by simp [hsi, map_mul, Module.End.mul_apply]
+  }
   let lam : H →* GL (Fin N) R :=
-    (Units.map (LinearMap.toMatrixAlgEquiv' :
-      Module.End R (Fin N → R) ≃ₐ[R] Matrix (Fin N) (Fin N) R).toMonoidHom).comp E.toHomUnits
+    (Units.map
+      (LinearMap.toMatrixAlgEquiv'
+        : Module.End R (Fin N → R) ≃ₐ[R] Matrix (Fin N) (Fin N) R).toMonoidHom).comp E.toHomUnits
   refine ⟨N, lam, ?_⟩
   intro k _ r hr V _ _ π μ h1 h2 h3 h4
   obtain ⟨ib, hib⟩ := exists_ibar r hr i π h1 h2 h3
@@ -98,7 +108,8 @@ theorem UpperTheory.V.ZK.Cl.cFree :
       have e1 : w.1 = w'.1 := by
         have := congrArg sb hww
         rwa [map_add, map_add, sbib, sbib, LinearMap.mem_ker.1 w.2.2, LinearMap.mem_ker.1 w'.2.2,
-          add_zero, add_zero] at this
+            add_zero, add_zero]
+          at this
       rw [e1] at hww
       exact Prod.ext e1 (Subtype.ext (add_left_cancel hww))
     · intro y
@@ -111,8 +122,8 @@ theorem UpperTheory.V.ZK.Cl.cFree :
   refine MonoidHom.ext fun h => LinearEquiv.ext fun y => ?_
   obtain ⟨x, rfl⟩ : ∃ x : Fin N → R, r ∘ x = y :=
     ⟨fun j => (hr (y j)).choose, funext fun j => (hr (y j)).choose_spec⟩
-  have rhs : (cj φ) ((sumRep μ 1) h) (r ∘ x) =
-      f ((μ h (φ.symm (r ∘ x)).1, (φ.symm (r ∘ x)).2)) := rfl
+  have rhs : (cj φ) ((sumRep μ 1) h) (r ∘ x) = f ((μ h (φ.symm (r ∘ x)).1, (φ.symm (r ∘ x)).2)) :=
+    rfl
   have hfw : f (φ.symm (r ∘ x)) = r ∘ x := φ.apply_symm_apply (r ∘ x)
   simp only [MonoidHom.comp_apply]
   rw [rhs]

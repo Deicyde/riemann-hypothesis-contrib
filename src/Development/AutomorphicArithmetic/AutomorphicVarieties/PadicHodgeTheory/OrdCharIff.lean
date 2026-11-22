@@ -9,11 +9,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Chevall
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.WeilDeligne GlobalTheory.GalOfCusp GlobalTheory.HeckeGal GlobalTheory.LocLanglands GlobalTheory.Published UpperTheory.V.W UpperTheory.V.Hi
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.WeilDeligne GlobalTheory.GalOfCusp
+  GlobalTheory.HeckeGal GlobalTheory.LocLanglands GlobalTheory.Published UpperTheory.V.W
+  UpperTheory.V.Hi
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem algPow_ne {F : Type} [Field F] [NumberField F] {l : ℕ} [Fact l.Prime] (w : Plc F)
-    (hh : (F →+* Qbar l) → ℤ) (x : (w.adicCompletion F)ˣ) : algPow w hh (x : w.adicCompletion F) ≠ 0 := by
+private theorem algPow_ne
+    {F : Type} [Field F] [NumberField F]
+    {l : ℕ} [Fact l.Prime]
+    (w : Plc F)
+    (hh : (F →+* Qbar l) → ℤ) (x : (w.adicCompletion F)ˣ)
+    : algPow w hh (x : w.adicCompletion F) ≠ 0 := by
   unfold algPow
   apply finprod_induction (fun z : Qbar l => z ≠ 0) one_ne_zero
   · intro a b ha hb
@@ -21,35 +28,54 @@ private theorem algPow_ne {F : Type} [Field F] [NumberField F] {l : ℕ} [Fact l
   · intro j
     exact zpow_ne_zero _ ((map_ne_zero _).mpr x.ne_zero)
 
-private theorem algPow_mul {F : Type} [Field F] [NumberField F] {l : ℕ} [Fact l.Prime] (w : Plc F)
-    (hh : (F →+* Qbar l) → ℤ) (x y : w.adicCompletion F) : algPow w hh (x * y) = algPow w hh x * algPow w hh y := by
+private theorem algPow_mul
+    {F : Type} [Field F] [NumberField F]
+    {l : ℕ} [Fact l.Prime]
+    (w : Plc F)
+    (hh : (F →+* Qbar l) → ℤ) (x y : w.adicCompletion F)
+    : algPow w hh (x * y) = algPow w hh x * algPow w hh y := by
   haveI := finite_contEmb (l := l) w
   unfold algPow
   rw [← finprod_mul_distrib (Set.toFinite _) (Set.toFinite _)]
   exact finprod_congr fun j => by rw [map_mul, mul_zpow]
 
-private noncomputable def algHom {F : Type} [Field F] [NumberField F] {l : ℕ} [Fact l.Prime] (w : Plc F)
-    (hh : (F →+* Qbar l) → ℤ) : (w.adicCompletion F)ˣ →* (Qbar l)ˣ :=
+private noncomputable def algHom
+    {F : Type} [Field F] [NumberField F]
+    {l : ℕ} [Fact l.Prime]
+    (w : Plc F) (hh : (F →+* Qbar l) → ℤ)
+    : (w.adicCompletion F)ˣ →* (Qbar l)ˣ :=
   MonoidHom.mk' (fun x => Units.mk0 _ (algPow_ne w hh x)) fun x y => Units.ext (algPow_mul w hh x y)
 
-private theorem artin_unique (H : GlobalArtinReciprocity) {F Ω : Type} [Field F] [NumberField F] [Field Ω]
-    [Algebra F Ω] [IsAlgClosure F Ω] {A : ValuationSubring Ω} {w : Plc F} {h : IsPlaceOver A w}
-    {a a' : Weil h →* (w.adicCompletion F)ˣ} (ha : IsLocalArtin h a) (ha' : IsLocalArtin h a') : a' = a := by
+private theorem artin_unique
+    (H : GlobalArtinReciprocity)
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {A : ValuationSubring Ω} {w : Plc F} {h : IsPlaceOver A w}
+    {a a' : Weil h →* (w.adicCompletion F)ˣ} (ha : IsLocalArtin h a) (ha' : IsLocalArtin h a')
+    : a' = a := by
   obtain ⟨art, hart⟩ := H F Ω
-  have hinj := GlobalTheory.ArtinLocalInj.artin_localIdele_injective GlobalTheory.Published.chevalleyUnits' F Ω art hart w
+  have hinj :=
+    GlobalTheory.ArtinLocalInj.artin_localIdele_injective GlobalTheory.Published.chevalleyUnits' F Ω
+      art hart w
   exact MonoidHom.ext fun σ => hinj ((ha'.glob art hart _).trans (ha.glob art hart _).symm)
 
-private theorem part_iff (H : GlobalArtinReciprocity) {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    [IsAlgClosure F Ω] {l : ℕ} [Fact l.Prime] {A : ValuationSubring Ω} {w : Plc F} (h : IsPlaceOver A w)
-    (ι : Qbar l ≃+* ℂ) (a : Weil h →* (w.adicCompletion F)ˣ) (ha : IsLocalArtin h a) (hh : (F →+* Qbar l) → ℤ)
-    (ψ : ↥(Dec (F := F) A) →* (Qbar l)ˣ) (ω : (w.adicCompletion F)ˣ →* ℂˣ) (ho : OrdChar ι a ω hh ψ)
-    (ph : ↥(Ine (F := F) A) →* (Qbar l)ˣ) :
-    IsWtPart h ψ (fun τ => hh (τ.1.comp (algebraMap F (w.adicCompletion F)))) ph ↔
-      ∀ σ : ↥(Ine (F := F) A), ι (ph σ : Qbar l) = ((ω (a (ineIncl h σ)))⁻¹ : ℂˣ) := by
-  have key : ∀ σ : Ine (F := F) A,
-      ((ψ (Subgroup.inclusion (Weil_le_Dec h) (ineIncl h σ)) : Qbar l)) =
-        ι.symm (ω (a (ineIncl h σ)) : ℂ) * algPow w (-hh) (a (ineIncl h σ) : w.adicCompletion F) :=
-    fun σ => ho.val _ _ rfl (Set.mem_univ _)
+private theorem part_iff
+    (H : GlobalArtinReciprocity)
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {l : ℕ} [Fact l.Prime]
+    {A : ValuationSubring Ω} {w : Plc F} (h : IsPlaceOver A w)
+    (ι : Qbar l ≃+* ℂ)
+    (a : Weil h →* (w.adicCompletion F)ˣ) (ha : IsLocalArtin h a)
+    (hh : (F →+* Qbar l) → ℤ) (ψ : ↥(Dec (F := F) A) →* (Qbar l)ˣ) (ω : (w.adicCompletion F)ˣ →* ℂˣ)
+    (ho : OrdChar ι a ω hh ψ)
+    (ph : ↥(Ine (F := F) A) →* (Qbar l)ˣ)
+    : IsWtPart h ψ (fun τ => hh (τ.1.comp (algebraMap F (w.adicCompletion F)))) ph
+      ↔ ∀ σ : ↥(Ine (F := F) A), ι (ph σ : Qbar l) = ((ω (a (ineIncl h σ)))⁻¹ : ℂˣ) := by
+  have key
+      : ∀ σ : Ine (F := F) A,
+        ((ψ (Subgroup.inclusion (Weil_le_Dec h) (ineIncl h σ)) : Qbar l))
+          = ι.symm (ω (a (ineIncl h σ)) : ℂ)
+            * algPow w (-hh) (a (ineIncl h σ) : w.adicCompletion F) := fun σ =>
+    ho.val _ _ rfl (Set.mem_univ _)
   constructor
   · rintro ⟨-, hw⟩ σ
     have e := hw a ha σ
@@ -67,7 +93,8 @@ private theorem part_iff (H : GlobalArtinReciprocity) {F Ω : Type} [Field F] [N
     exact eq_inv_of_mul_eq_one_right e2
   · intro hR
     refine ⟨?_, fun a' ha' σ => ?_⟩
-    · have hker : (ph.ker : Set (Ine (F := F) A)) = (fun σ => a (ineIncl h σ)) ⁻¹' (ω.ker : Set _) := by
+    · have hker
+          : (ph.ker : Set (Ine (F := F) A)) = (fun σ => a (ineIncl h σ)) ⁻¹' (ω.ker : Set _) := by
         ext σ
         simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_preimage]
         constructor
@@ -90,11 +117,27 @@ private theorem part_iff (H : GlobalArtinReciprocity) {F Ω : Type} [Field F] [N
       have hne : ι.symm (ω (a (ineIncl h σ)) : ℂ) ≠ 0 := by simp
       field_simp
 
-theorem UpperTheory.V.Loc.ordCharIff :
-    GlobalArtinReciprocity → ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ} [Fact l.Prime] {A : ValuationSubring Ω} {w : Plc F} (h : IsPlaceOver A w) (ι : Qbar l ≃+* ℂ) (a : Weil h →* (w.adicCompletion F)ˣ), IsLocalArtin h a → ∀ (hh : (F →+* Qbar l) → ℤ) (ψ : ↥(Dec (F := F) A) →* (Qbar l)ˣ), ((∃ ω, OrdChar ι a ω hh ψ) ↔ Continuous ψ ∧ IsLocAlg h ψ fun τ => hh (τ.1.comp (algebraMap F (w.adicCompletion F)))) ∧ ∀ ω, OrdChar ι a ω hh ψ → ∀ ph : ↥(Ine (F := F) A) →* (Qbar l)ˣ, (IsWtPart h ψ (fun τ => hh (τ.1.comp (algebraMap F (w.adicCompletion F)))) ph ↔ ∀ σ : ↥(Ine (F := F) A), ι (ph σ : Qbar l) = ((ω (a (ineIncl h σ)))⁻¹ : ℂˣ)) := by
+theorem UpperTheory.V.Loc.ordCharIff
+    : GlobalArtinReciprocity
+      → ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ}
+          [Fact l.Prime] {A : ValuationSubring Ω} {w : Plc F} (h : IsPlaceOver A w)
+          (ι : Qbar l ≃+* ℂ) (a : Weil h →* (w.adicCompletion F)ˣ),
+        IsLocalArtin h a
+          → ∀ (hh : (F →+* Qbar l) → ℤ) (ψ : ↥(Dec (F := F) A) →* (Qbar l)ˣ),
+            ((∃ ω, OrdChar ι a ω hh ψ)
+                ↔ Continuous ψ
+                  ∧ IsLocAlg h ψ fun τ => hh (τ.1.comp (algebraMap F (w.adicCompletion F))))
+              ∧ ∀ ω,
+                OrdChar ι a ω hh ψ
+                  → ∀ ph : ↥(Ine (F := F) A) →* (Qbar l)ˣ,
+                    (IsWtPart h ψ (fun τ => hh (τ.1.comp (algebraMap F (w.adicCompletion F)))) ph
+                      ↔ ∀ σ : ↥(Ine (F := F) A),
+                        ι (ph σ : Qbar l) = ((ω (a (ineIncl h σ)))⁻¹ : ℂˣ)) := by
   intro H F Ω _ _ _ _ _ l _ A w h ι a ha hh ψ
-  refine ⟨⟨fun ⟨ω, ho⟩ => ⟨ho.cont, ?_⟩, fun ⟨hc, ph, hph⟩ => ?_⟩,
-    fun ω ho ph => part_iff H h ι a ha hh ψ ω ho ph⟩
+  refine ⟨
+    ⟨fun ⟨ω, ho⟩ => ⟨ho.cont, ?_⟩, fun ⟨hc, ph, hph⟩ => ?_⟩,
+    fun ω ho ph => part_iff H h ι a ha hh ψ ω ho ph
+  ⟩
   · let ph : Ine (F := F) A →* (Qbar l)ˣ :=
       (Units.map (ι.symm : ℂ →+* Qbar l).toMonoidHom).comp ((ω.comp (a.comp (ineIncl h)))⁻¹)
     refine ⟨ph, (part_iff H h ι a ha hh ψ ω ho ph).mpr fun σ => ?_⟩
@@ -102,8 +145,10 @@ theorem UpperTheory.V.Loc.ordCharIff :
   · let incl : Weil h →* Dec (F := F) A := Subgroup.inclusion (Weil_le_Dec h)
     let ξ : Weil h →* ℂˣ :=
       (Units.map (ι : Qbar l →+* ℂ).toMonoidHom).comp (ψ.comp incl * ((algHom w (-hh)).comp a)⁻¹)
-    have hξ : ∀ s, ((ξ s : ℂˣ) : ℂ) =
-        ι ((ψ (incl s) : Qbar l) / algPow w (-hh) (a s : w.adicCompletion F)) := by
+    have hξ
+        : ∀ s,
+          ((ξ s : ℂˣ) : ℂ)
+            = ι ((ψ (incl s) : Qbar l) / algPow w (-hh) (a s : w.adicCompletion F)) := by
       intro s
       simp [ξ, algHom, div_eq_mul_inv]
     have hsm : IsSmooth ξ := by
@@ -111,12 +156,16 @@ theorem UpperTheory.V.Loc.ordCharIff :
         ext σ
         simp only [Set.mem_setOf_eq, SetLike.mem_coe, MonoidHom.mem_ker]
         have e := hph.2 a ha σ
-        change ((ψ (incl (ineIncl h σ)) * ph σ : (Qbar l)ˣ) : Qbar l) =
-          algPow w (-hh) (a (ineIncl h σ) : w.adicCompletion F) at e
+        change ((ψ (incl (ineIncl h σ)) * ph σ : (Qbar l)ˣ) : Qbar l)
+            = algPow w (-hh) (a (ineIncl h σ) : w.adicCompletion F)
+          at e
         have hP := algPow_ne w (-hh) (a (ineIncl h σ))
         constructor
         · intro h1
-          have h2 : (ψ (incl (ineIncl h σ)) : Qbar l) / algPow w (-hh) (a (ineIncl h σ) : w.adicCompletion F) = 1 := by
+          have h2
+              : (ψ (incl (ineIncl h σ)) : Qbar l)
+                  / algPow w (-hh) (a (ineIncl h σ) : w.adicCompletion F)
+                = 1 := by
             apply ι.injective
             rw [← hξ, h1, Units.val_one, map_one]
           rw [div_eq_one_iff_eq hP] at h2

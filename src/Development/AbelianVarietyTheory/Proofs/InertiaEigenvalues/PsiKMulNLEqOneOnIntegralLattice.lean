@@ -12,7 +12,9 @@ noncomputable section
 
 namespace GlobalTheory.JR.NormInt
 
-variable {F E : Type} [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
+variable
+  {F E : Type}
+  [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E]
 
 theorem traceE [U : Unram F E] (z : E) : algebraMap F E (Algebra.trace F E z) = z + star z := by
   have := U.charZero
@@ -20,7 +22,12 @@ theorem traceE [U : Unram F E] (z : E) : algebraMap F E (Algebra.trace F E z) = 
   have h2 := (IsUnit.mk0 (2 : F) two_ne_zero)
   exact (quadratic_star_structure b d hb0 hs hd U.star_fix (IsUnit.mk0 d hd0) h2).2.2.1 z
 
-theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ), IsStdChar ψ → ∀ (x : A.K) (r : ℕ) (j : A.L ≃ₗ[E] (Fin r → E)), A.IsIsom x j → ∀ y : A.L, (∀ i, ‖j y i‖ ≤ 1) → A.psiK ψ (x * A.NL y) = 1 := by
+theorem main
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ),
+      IsStdChar ψ
+        → ∀ (x : A.K) (r : ℕ) (j : A.L ≃ₗ[E] (Fin r → E)),
+          A.IsIsom x j → ∀ y : A.L, (∀ i, ‖j y i‖ ≤ 1) → A.psiK ψ (x * A.NL y) = 1 := by
   intro F E _ _ _ _ U A ψ hψ x r j hj y hy
   have := U.charZero
   have := U.ultraE
@@ -28,8 +35,10 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
   obtain ⟨⟨c⟩, hinj, hN, htr, -⟩ := GlobalTheory.JR.Et.quadratic_structure F E A
   have : Module.Free A.K A.L := Module.Free.of_basis c
   have : Module.Finite A.K A.L := Module.Finite.of_basis c
-  have : Module.Free E A.L := Module.Free.of_basis (A.push.out.basis (Module.Free.chooseBasis F A.K))
-  have : Module.Finite E A.L := Module.Finite.of_basis (A.push.out.basis (Module.Free.chooseBasis F A.K))
+  have : Module.Free E A.L :=
+    Module.Free.of_basis (A.push.out.basis (Module.Free.chooseBasis F A.K))
+  have : Module.Finite E A.L :=
+    Module.Finite.of_basis (A.push.out.basis (Module.Free.chooseBasis F A.K))
   set s : E := star (j y) ⬝ᵥ j y with hs_def
 
   have hs1 : ‖s‖ ≤ 1 := by

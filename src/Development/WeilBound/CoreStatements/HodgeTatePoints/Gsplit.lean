@@ -6,26 +6,34 @@ public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.Stat
 
 @[expose] public section
 
-open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.CompanionTheory.Ar.Num NumberField
+open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.CompanionTheory.Ar.Num
+  NumberField
 
 namespace PositivityTheory.HtPt.Gsplit
 
-theorem coprime_different (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p.Prime)
-    (hd : ¬ (p : ℤ) ∣ NumberField.discr E) :
-    IsCoprime (Ideal.span {(p : 𝓞 E)}) (differentIdeal ℤ (𝓞 E)) := by
+theorem coprime_different
+    (E : Type) [Field E] [NumberField E]
+    (p : ℕ) (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ NumberField.discr E)
+    : IsCoprime (Ideal.span {(p : 𝓞 E)}) (differentIdeal ℤ (𝓞 E)) := by
   have hpz : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
   obtain ⟨a, b, hab⟩ := (hpz.irreducible.coprime_iff_not_dvd).mpr hd
   rw [Ideal.isCoprime_iff_exists]
-  refine ⟨(a : 𝓞 E) * p, Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _),
+  refine ⟨
+    (a : 𝓞 E) * p,
+    Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _),
     (b : 𝓞 E) * (NumberField.discr E : 𝓞 E),
-    Ideal.mul_mem_left _ _ (NumberField.discr_mem_differentIdeal E (𝓞 E)), ?_⟩
+    Ideal.mul_mem_left _ _ (NumberField.discr_mem_differentIdeal E (𝓞 E)),
+    ?_
+  ⟩
   have := congrArg (Int.cast : ℤ → 𝓞 E) hab
   push_cast at this
   exact this
 
-theorem not_sq_dvd (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p.Prime)
-    (hd : ¬ (p : ℤ) ∣ NumberField.discr E) (w : Ideal (𝓞 E)) (hw : w ≠ ⊤) :
-    ¬ w ^ 2 ∣ Ideal.span {(p : 𝓞 E)} := by
+theorem not_sq_dvd
+    (E : Type) [Field E] [NumberField E]
+    (p : ℕ) (hp : p.Prime) (hd : ¬ (p : ℤ) ∣ NumberField.discr E)
+    (w : Ideal (𝓞 E)) (hw : w ≠ ⊤)
+    : ¬ w ^ 2 ∣ Ideal.span {(p : 𝓞 E)} := by
   intro h
   have hpz : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
   haveI : (Ideal.span {(p : ℤ)}).IsMaximal :=
@@ -42,7 +50,15 @@ theorem not_sq_dvd (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p.Prime)
   exact hw (Ideal.isUnit_iff.mp
     ((PositivityTheory.HtPt.Gsplit.coprime_different E p hp hd).isUnit_of_dvd' hspan hdiff))
 
-theorem glue_split : ∀ (E : Type) [Field E] [NumberField E] (p : ℕ), p.Prime → ¬ (p : ℤ) ∣ NumberField.discr E → ∀ (w : Ideal (𝓞 E)) [w.IsPrime], (p : 𝓞 E) ∈ w → ∃ ε : 𝓞 E, ε - 1 ∈ w ∧ (∀ w' : Ideal (𝓞 E), w'.IsPrime → (p : 𝓞 E) ∈ w' → w' ≠ w → ε ∈ w') ∧ (∀ a : 𝓞 E, (p : 𝓞 E) ∣ ε * a ↔ a ∈ w) ∧ (p : 𝓞 E) ∣ ε * ε - ε ∧ IsCoprime (Ideal.span {(p : 𝓞 E)}) (differentIdeal ℤ (𝓞 E)) := by
+theorem glue_split
+    : ∀ (E : Type) [Field E] [NumberField E] (p : ℕ),
+      p.Prime → ¬ (p : ℤ) ∣ NumberField.discr E
+        → ∀ (w : Ideal (𝓞 E)) [w.IsPrime],
+          (p : 𝓞 E) ∈ w
+            → ∃ ε : 𝓞 E,
+              ε - 1 ∈ w ∧ (∀ w' : Ideal (𝓞 E), w'.IsPrime → (p : 𝓞 E) ∈ w' → w' ≠ w → ε ∈ w')
+                ∧ (∀ a : 𝓞 E, (p : 𝓞 E) ∣ ε * a ↔ a ∈ w) ∧ (p : 𝓞 E) ∣ ε * ε - ε
+                ∧ IsCoprime (Ideal.span {(p : 𝓞 E)}) (differentIdeal ℤ (𝓞 E)) := by
   intro E hEf hEn p hp hd w hw hpw
   have hp0 : (p : 𝓞 E) ≠ 0 := Nat.cast_ne_zero.mpr hp.ne_zero
   have hwtop : w ≠ ⊤ := hw.ne_top
@@ -71,9 +87,10 @@ theorem glue_split : ∀ (E : Type) [Field E] [NumberField E] (p : ℕ), p.Prime
       ring
     rw [heq]
     exact w.neg_mem hx
-  have hεw : ε ∉ w := fun h => hwtop ((Ideal.eq_top_iff_one w).mpr (by
-    have h2 := w.sub_mem h hε1
-    simpa using h2))
+  have hεw : ε ∉ w := fun h =>
+    hwtop ((Ideal.eq_top_iff_one w).mpr (by
+      have h2 := w.sub_mem h hε1
+      simpa using h2))
   have hmemI : ∀ b, (p : 𝓞 E) ∣ b ↔ b ∈ w * J := by
     intro b
     rw [← Ideal.mem_span_singleton, hJ]

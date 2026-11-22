@@ -9,31 +9,41 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.SumRepresentations
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.AboveL
 
 namespace GlobalTheory.AboveL
 
-private theorem coe_le_one {L Ω : Type} [Field Ω] [Field L] [NumberField L] [Algebra L Ω]
-    (A : ValuationSubring Ω) (c : 𝓞 L) : A.valuation (algebraMap L Ω (c : L)) ≤ 1 :=
+private theorem coe_le_one
+    {L Ω : Type} [Field Ω] [Field L] [NumberField L] [Algebra L Ω]
+    (A : ValuationSubring Ω) (c : 𝓞 L)
+    : A.valuation (algebraMap L Ω (c : L)) ≤ 1 :=
   (A.valuation_le_one_iff _).mpr
-    (ReciprocityTheory.Gal.mem_of_isIntegral_int A (map_isIntegral_int (algebraMap L Ω) c.isIntegral_coe))
+    (ReciprocityTheory.Gal.mem_of_isIntegral_int A
+      (map_isIntegral_int (algebraMap L Ω) c.isIntegral_coe))
 
-theorem exists_isPlaceOver_of_tower : ∀ (K L Ω : Type) [Field Ω] [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω] [Field L] [NumberField L] [Algebra L Ω] [IsAlgClosure L Ω] [Algebra K L] [IsScalarTower K L Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)), IsPlaceOver A v → ∃ v' : HeightOneSpectrum (𝓞 L), IsPlaceOver A v' ∧ v'.under (𝓞 K) = v := by
+theorem exists_isPlaceOver_of_tower
+    : ∀ (K L Ω : Type) [Field Ω] [Field K] [NumberField K] [Algebra K Ω] [IsAlgClosure K Ω]
+        [Field L] [NumberField L] [Algebra L Ω] [IsAlgClosure L Ω] [Algebra K L]
+        [IsScalarTower K L Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 K)),
+      IsPlaceOver A v → ∃ v' : HeightOneSpectrum (𝓞 L), IsPlaceOver A v' ∧ v'.under (𝓞 K) = v := by
   intro K L Ω _ _ _ _ _ _ _ _ _ _ _ A v h
-  let m : Ideal (𝓞 L) :=
-    { carrier := {y | A.valuation (algebraMap L Ω (y : L)) < 1}
-      add_mem' := by
-        intro a b ha hb
-        simp only [Set.mem_setOf_eq, map_add (f := _)] at ha hb ⊢
-        exact Valuation.map_add_lt _ ha hb
-      zero_mem' := by simp
-      smul_mem' := by
-        intro c y hy
-        simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul] at hy ⊢
-        exact lt_of_le_of_lt (mul_le_of_le_one_left' (coe_le_one A c)) hy }
+  let m : Ideal (𝓞 L) := {
+    carrier := {y | A.valuation (algebraMap L Ω (y : L)) < 1}
+    add_mem' := by
+      intro a b ha hb
+      simp only [Set.mem_setOf_eq, map_add (f := _)] at ha hb ⊢
+      exact Valuation.map_add_lt _ ha hb
+    zero_mem' := by simp
+    smul_mem' := by
+      intro c y hy
+      simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul] at hy ⊢
+      exact lt_of_le_of_lt (mul_le_of_le_one_left' (coe_le_one A c)) hy
+  }
   have hmem : ∀ y : 𝓞 L, y ∈ m ↔ A.valuation (algebraMap L Ω (y : L)) < 1 := fun y => Iff.rfl
   have hprime : m.IsPrime := by
     refine ⟨?_, ?_⟩

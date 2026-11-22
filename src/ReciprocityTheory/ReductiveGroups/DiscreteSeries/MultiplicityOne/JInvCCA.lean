@@ -20,14 +20,15 @@ def tau (k r : ℕ) (i : Fin (2 * r + k + 1)) : Fin (2 * r + k + 1) :=
 
 def sgn (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℂ := if i.val = r + k then -1 else 1
 
-theorem hpk_row (i m : Fin (2 * r + k + 1)) :
-    Hpk k r i m = if m = tau k r i then sgn k r i else 0 := by
+theorem hpk_row (i m : Fin (2 * r + k + 1))
+    : Hpk k r i m = if m = tau k r i then sgn k r i else 0 := by
   unfold Hpk tau sgn
   simp only [Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
-theorem hpk_mul_apply (A : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-    (i j : Fin (2 * r + k + 1)) : (Hpk k r * A) i j = sgn k r i * A (tau k r i) j := by
+theorem hpk_mul_apply
+    (A : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (i j : Fin (2 * r + k + 1))
+    : (Hpk k r * A) i j = sgn k r i * A (tau k r i) j := by
   rw [Matrix.mul_apply, Finset.sum_eq_single (tau k r i)]
   · rw [hpk_row, if_pos rfl]
   · intro m _ hm
@@ -63,20 +64,23 @@ theorem hpk_conjT : (Hpk k r)ᴴ = Hpk k r := by
   by_cases h : j = tau k r i
   · have h' : i = tau k r j := by rw [h, tau_tau]
     rw [if_pos h', if_pos h, h, sgn_tau]
-    unfold sgn; split_ifs <;> simp
+    unfold sgn
+    split_ifs <;> simp
   · have h' : ¬ i = tau k r j := fun h' => h (by rw [h', tau_tau])
     rw [if_neg h', if_neg h, star_zero]
 
 theorem isUnit_of_uh {g : Mat k r} (hg : g ∈ GV k r) : IsUnit g.det := by
   apply Matrix.isUnit_det_of_left_inverse (B := Hpk k r * gᴴ * Hpk k r)
   have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
-  calc Hpk k r * gᴴ * Hpk k r * g = Hpk k r * (gᴴ * Hpk k r * g) := by
-        simp only [Matrix.mul_assoc]
+  calc
+    Hpk k r * gᴴ * Hpk k r * g
+      = Hpk k r * (gᴴ * Hpk k r * g) := by simp only [Matrix.mul_assoc]
     _ = 1 := by rw [hg', hpk_sq]
 
 abbrev mid (k r : ℕ) (i : Fin (2 * r + k + 1)) : Prop := r ≤ i.val ∧ i.val ≤ r + k
 
-def midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : Fin (k + 1) := ⟨i.val - r, by have := hi; omega⟩
+def midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : Fin (k + 1) :=
+  ⟨i.val - r, by have := hi; omega⟩
 
 lemma wI_midx {i : Fin (2 * r + k + 1)} (hi : mid k r i) : wI k r (midx hi) = i := by
   have := hi
@@ -115,7 +119,8 @@ lemma emb_mid (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (q j : Fin (2 * r + 
   rw [dite_eq_left ⟨hq, hj⟩]
   rfl
 
-def Em (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (k + 1)) ℂ := fun i m => if i = wI k r m then 1 else 0
+def Em (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (k + 1)) ℂ := fun i m =>
+  if i = wI k r m then 1 else 0
 
 lemma Em_mul_mid {X : Type*} (A : Matrix (Fin (k + 1)) X ℂ) (i : Fin (2 * r + k + 1)) (x : X) (hi : mid k r i) :
     (Em k r * A) i x = A (midx hi) x := by

@@ -10,10 +10,15 @@ open GlobalTheory.K5 GlobalTheory.KumDlog
 
 namespace GlobalTheory.KumExpo
 
-theorem exponents : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], ∀ (T : Tower p Ω) (n m : ℕ), 2 * n ≤ m → ∀ lz lq : Gal p Ω → ZMod (p ^ n),
-  IsKum T n (Gn T n) (T.ζ (2 * n)) lz → IsKum T n (Gn T n) (T.qq (2 * n)) lq → ∀ g ∈ Gn T n,
-  ∃ (i j : ℕ) (s t : ℤ), g (T.ζ m) = T.ζ m ^ i ∧ g (T.qq m) = T.ζ m ^ j * T.qq m ∧
-    (i : ℤ) = 1 + p ^ n * ((lz g).val : ℤ) + p ^ (2 * n) * s ∧ (j : ℤ) = p ^ n * ((lq g).val : ℤ) + p ^ (2 * n) * t := by
+theorem exponents
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], ∀ (T : Tower p Ω) (n m : ℕ),
+      2 * n ≤ m
+        → ∀ lz lq : Gal p Ω → ZMod (p ^ n),
+          IsKum T n (Gn T n) (T.ζ (2 * n)) lz → IsKum T n (Gn T n) (T.qq (2 * n)) lq
+            → ∀ g ∈ Gn T n, ∃ (i j : ℕ) (s t : ℤ),
+              g (T.ζ m) = T.ζ m ^ i ∧ g (T.qq m) = T.ζ m ^ j * T.qq m
+                ∧ (i : ℤ) = 1 + p ^ n * ((lz g).val : ℤ) + p ^ (2 * n) * s
+                ∧ (j : ℤ) = p ^ n * ((lq g).val : ℤ) + p ^ (2 * n) * t := by
   intro p _ Ω _ _ T n m hm lz lq hz hq g hg
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hm
 
@@ -22,8 +27,8 @@ theorem exponents : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra
   obtain ⟨i, -, hi⟩ := (T.prim _).eq_pow_of_pow_eq_one h1
   have hqne := qq_ne T (2 * n + k)
   have h2 : (g (T.qq (2 * n + k)) / T.qq (2 * n + k)) ^ (p ^ (2 * n + k)) = 1 := by
-    rw [div_pow, ← map_pow, kummerTower_qq_pow_level_eq_q, AlgEquiv.commutes, ← kummerTower_qq_pow_level_eq_q T (2 * n + k),
-      div_self (pow_ne_zero _ hqne)]
+    rw [div_pow, ← map_pow, kummerTower_qq_pow_level_eq_q, AlgEquiv.commutes,
+      ← kummerTower_qq_pow_level_eq_q T (2 * n + k), div_self (pow_ne_zero _ hqne)]
   obtain ⟨j, -, hj⟩ := (T.prim _).eq_pow_of_pow_eq_one h2
   have hj' : g (T.qq (2 * n + k)) = T.ζ (2 * n + k) ^ j * T.qq (2 * n + k) := by
     rw [hj, div_mul_cancel₀ _ hqne]

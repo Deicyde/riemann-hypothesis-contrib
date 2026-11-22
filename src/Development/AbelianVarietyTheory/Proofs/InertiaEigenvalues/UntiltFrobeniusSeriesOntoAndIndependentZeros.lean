@@ -15,9 +15,22 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
 open Formalism.Per GlobalTheory.PSer
 open scoped Formalism.Per
 
-theorem GlobalTheory.oneVarCount_onto_independentZeros : ∀ (l : ℕ) [Fact l.Prime] (h : ℕ) (μ : Fin h → ℂ_[l]), 1 ≤ h → μ ≠ 0 → ∃ τ : ℝ, (∀ t : ℂ_[l], ‖t‖ ≤ τ → ∃ y : Fl l, ‖sh y‖ ≤ ‖(l : ℂ_[l])‖ ∧ ‖∑ i : Fin h, μ i * lam h i y - t‖ ≤ ‖(l : ℂ_[l])‖ * τ) ∧ ∃ x : Fin h → Fl l, (∀ a, ‖sh (x a)‖ ≤ ‖(l : ℂ_[l])‖) ∧ (∀ a, ‖∑ i : Fin h, μ i * lam h i (x a)‖ ≤ ‖(l : ℂ_[l])‖ * τ) ∧ ∀ n : Fin h → ℕ, ‖sh (∑ a, n a • x a)‖ ≤ ‖(l : ℂ_[l])‖ ^ l ^ h → ∀ a, l ∣ n a := by
+theorem GlobalTheory.oneVarCount_onto_independentZeros
+    : ∀ (l : ℕ) [Fact l.Prime] (h : ℕ) (μ : Fin h → ℂ_[l]),
+      1 ≤ h → μ ≠ 0
+        → ∃ τ : ℝ,
+          (∀ t : ℂ_[l],
+              ‖t‖ ≤ τ
+                → ∃ y : Fl l,
+                  ‖sh y‖ ≤ ‖(l : ℂ_[l])‖ ∧ ‖∑ i : Fin h, μ i * lam h i y - t‖ ≤ ‖(l : ℂ_[l])‖ * τ)
+            ∧ ∃ x : Fin h → Fl l,
+              (∀ a, ‖sh (x a)‖ ≤ ‖(l : ℂ_[l])‖)
+                ∧ (∀ a, ‖∑ i : Fin h, μ i * lam h i (x a)‖ ≤ ‖(l : ℂ_[l])‖ * τ)
+                ∧ ∀ n : Fin h → ℕ,
+                  ‖sh (∑ a, n a • x a)‖ ≤ ‖(l : ℂ_[l])‖ ^ l ^ h → ∀ a, l ∣ n a := by
   intro l _ h μ hh hμ
-  obtain ⟨sh1, sh0, shmul, shpow, shle, shsurj, shadd, shneg⟩ := GlobalTheory.T.tiltUntiltToComplexPAdic_basic_laws l
+  obtain ⟨sh1, sh0, shmul, shpow, shle, shsurj, shadd, shneg⟩ :=
+    GlobalTheory.T.tiltUntiltToComplexPAdic_basic_laws l
   have hl0 : 0 < ‖(l : ℂ_[l])‖ := norm_pos_iff.2 GlobalTheory.RingBasics.p_ne_zero
   have hl1 : ‖(l : ℂ_[l])‖ < 1 := GlobalTheory.RingBasics.norm_p_lt
   have hlD : ∀ D : ℕ, l ^ D ≠ 0 := fun D => (pow_pos (Fact.out : l.Prime).pos D).ne'
@@ -27,14 +40,15 @@ theorem GlobalTheory.oneVarCount_onto_independentZeros : ∀ (l : ℕ) [Fact l.P
   have hshv : ∀ u : Fl l, ‖sh (σ * u ^ l ^ D)‖ ≤ ‖(l : ℂ_[l])‖ := by
     intro u
     rw [shmul, shpow, hσ, norm_mul, norm_pow]
-    calc ‖(l : ℂ_[l])‖ * ‖sh u‖ ^ l ^ D ≤ ‖(l : ℂ_[l])‖ * 1 := by
-          gcongr; exact pow_le_one₀ (norm_nonneg _) (shle u)
+    calc
+      ‖(l : ℂ_[l])‖ * ‖sh u‖ ^ l ^ D
+        ≤ ‖(l : ℂ_[l])‖ * 1 := by gcongr; exact pow_le_one₀ (norm_nonneg _) (shle u)
       _ = _ := mul_one _
   refine ⟨‖t‖, ?_, ?_⟩
   · intro t' ht'
-    have hb : ‖t' / t‖ ≤ 1 := by
-      rw [norm_div]; exact div_le_one_of_le₀ ht' (norm_nonneg _)
-    obtain ⟨W, hW, hPW⟩ := GlobalTheory.T.exists_root_additive_poly_eq_of_unit_coeff l E (M + h) a hME ha haN (t' / t) hb
+    have hb : ‖t' / t‖ ≤ 1 := by rw [norm_div]; exact div_le_one_of_le₀ ht' (norm_nonneg _)
+    obtain ⟨W, hW, hPW⟩ :=
+      GlobalTheory.T.exists_root_additive_poly_eq_of_unit_coeff l E (M + h) a hME ha haN (t' / t) hb
     obtain ⟨u, hu⟩ := shsurj W hW
     refine ⟨σ * u ^ l ^ D, hshv u, ?_⟩
     have key := hpoly u
@@ -42,21 +56,25 @@ theorem GlobalTheory.oneVarCount_onto_independentZeros : ∀ (l : ℕ) [Fact l.P
     rw [hu, hPW, e] at key
     exact key
   · have hρ0 : 0 < ρ := lt_of_lt_of_le hl0 hρl
-    obtain ⟨Z, hZc, hZ, hsep⟩ := GlobalTheory.T.exists_separated_roots_additive_poly l E M h a ρ hME ha haN hρ0 hρ1 haM hak
+    obtain ⟨Z, hZc, hZ, hsep⟩ :=
+      GlobalTheory.T.exists_separated_roots_additive_poly l E M h a ρ hME ha haN hρ0 hρ1 haM hak
     choose! u hu using fun (W : ℂ_[l]) (hW : ‖W‖ ≤ 1) => shsurj W hW
     let v : ℂ_[l] → Fl l := fun W => σ * u W ^ l ^ D
-    let K' : AddSubgroup (Fl l) :=
-      { carrier := {x | ‖sh x‖ ≤ ‖(l : ℂ_[l])‖ ^ l ^ h}
-        zero_mem' := by
-          show ‖sh (0 : Fl l)‖ ≤ _
-          rw [sh0, norm_zero]; positivity
-        add_mem' := by
-          intro x y hx hy
-          exact (GlobalTheory.T.tiltUntilt_add_estimate_le l _ x y hx hy).2
-        neg_mem' := by
-          intro x hx
-          show ‖sh (-x)‖ ≤ _
-          rw [shneg]; exact hx }
+    let K' : AddSubgroup (Fl l) := {
+      carrier := {x | ‖sh x‖ ≤ ‖(l : ℂ_[l])‖ ^ l ^ h}
+      zero_mem' := by
+        show ‖sh (0 : Fl l)‖ ≤ _
+        rw [sh0, norm_zero]
+        positivity
+      add_mem' := by
+        intro x y hx hy
+        exact (GlobalTheory.T.tiltUntilt_add_estimate_le l _ x y hx hy).2
+      neg_mem' := by
+        intro x hx
+        show ‖sh (-x)‖ ≤ _
+        rw [shneg]
+        exact hx
+    }
     have hchar : ∀ x : Fl l, l • x = 0 := fun x => by
       rw [nsmul_eq_mul, CharP.cast_eq_zero, zero_mul]
     have hsepv : ∀ W ∈ Z, ∀ W' ∈ Z, W ≠ W' → v W - v W' ∉ K' := by
@@ -79,7 +97,9 @@ theorem GlobalTheory.oneVarCount_onto_independentZeros : ∀ (l : ℕ) [Fact l.P
         rw [e3]; exact IsUltrametricDist.norm_add_le_max _ _
       have h4 : ‖W - W'‖ ≤ ρ := h3.trans (max_le (h2.trans hρl) hd)
       linarith
-    obtain ⟨x, hxZ, hx⟩ := GlobalTheory.T.exists_independent_mod_prime_of_pow_le_card l (Fl l) ℂ_[l] K' h Z v hchar hZc hsepv
+    obtain ⟨x, hxZ, hx⟩ :=
+      GlobalTheory.T.exists_independent_mod_prime_of_pow_le_card l (Fl l) ℂ_[l] K' h Z v hchar hZc
+        hsepv
     refine ⟨fun b => v (x b), fun b => hshv (u (x b)), ?_, fun n hn => hx n hn⟩
     intro b
     have key := hpoly (u (x b))

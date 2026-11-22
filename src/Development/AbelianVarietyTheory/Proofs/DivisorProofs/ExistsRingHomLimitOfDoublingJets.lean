@@ -11,16 +11,17 @@ namespace GlobalTheory.Nef.PathJet
 
 open PowerSeries
 
-theorem limit_of_jets (A B R : Type) [CommRing A] [CommRing B] [CommRing R] (π : B →+* A)
-    (ε : A →+* B) (m : A →+* A) (β : B →+* R) (δ : A →+ R) (φ : ℕ → A → PowerSeries R)
+theorem limit_of_jets
+    (A B R : Type) [CommRing A] [CommRing B] [CommRing R]
+    (π : B →+* A) (ε : A →+* B) (m : A →+* A) (β : B →+* R) (δ : A →+ R) (φ : ℕ → A → PowerSeries R)
     (hφ : ∀ n, IsJet π ε m β δ (n + 2) (φ n))
-    (hc : ∀ n f, (X : PowerSeries R) ^ (n + 2) ∣ φ (n + 1) f - φ n f) :
-    ∃ γ : A →+* PowerSeries R, γ.comp π = PowerSeries.C.comp β ∧
-      PowerSeries.constantCoeff.comp γ = β.comp ε ∧ (∀ f, PowerSeries.coeff 1 (γ f) = δ f) ∧
-      (PowerSeries.rescale 2).comp γ = γ.comp m := by
-
-  have hdv : ∀ (n : ℕ) (p q : PowerSeries R), (X : PowerSeries R) ^ n ∣ p - q →
-      ∀ k, k < n → coeff k p = coeff k q := by
+    (hc : ∀ n f, (X : PowerSeries R) ^ (n + 2) ∣ φ (n + 1) f - φ n f)
+    : ∃ γ : A →+* PowerSeries R,
+      γ.comp π = PowerSeries.C.comp β ∧ PowerSeries.constantCoeff.comp γ = β.comp ε
+        ∧ (∀ f, PowerSeries.coeff 1 (γ f) = δ f) ∧ (PowerSeries.rescale 2).comp γ = γ.comp m := by
+  have hdv
+      : ∀ (n : ℕ) (p q : PowerSeries R),
+        (X : PowerSeries R) ^ n ∣ p - q → ∀ k, k < n → coeff k p = coeff k q := by
     intro n p q h k hk
     have := (PowerSeries.X_pow_dvd_iff.mp h) k hk
     rwa [map_sub, sub_eq_zero] at this
@@ -42,15 +43,17 @@ theorem limit_of_jets (A B R : Type) [CommRing A] [CommRing B] [CommRing R] (π 
     simp only [g, PowerSeries.coeff_mk]
     exact (hstab f k j hkj).symm
   have gmul : ∀ f h, g (f * h) = g f * g h := by
-    intro f h; ext k
+    intro f h
+    ext k
     rw [hg _ k k (by omega), hdv _ _ _ ((hφ k).1.1 f h) k (by omega), coeff_mul, coeff_mul]
     refine Finset.sum_congr rfl fun x hx => ?_
     rw [Finset.HasAntidiagonal.mem_antidiagonal] at hx
     rw [hg f x.1 k (by omega), hg h x.2 k (by omega)]
   have gadd : ∀ f h, g (f + h) = g f + g h := by
-    intro f h; ext k
-    rw [hg _ k k (by omega), hdv _ _ _ ((hφ k).1.2.1 f h) k (by omega), map_add (f := _), map_add (f := _),
-      hg f k k (by omega), hg h k k (by omega)]
+    intro f h
+    ext k
+    rw [hg _ k k (by omega), hdv _ _ _ ((hφ k).1.2.1 f h) k (by omega), map_add (f := _),
+      map_add (f := _), hg f k k (by omega), hg h k k (by omega)]
   have gone : g 1 = 1 := by
     ext k
     rw [hg _ k k (by omega), hdv _ _ _ (hφ k).1.2.2.1 k (by omega)]
@@ -58,8 +61,13 @@ theorem limit_of_jets (A B R : Type) [CommRing A] [CommRing B] [CommRing R] (π 
     have := gadd 0 0
     rw [add_zero] at this
     linear_combination -this
-  let γ : A →+* PowerSeries R :=
-    { toFun := g, map_one' := gone, map_mul' := gmul, map_zero' := gzero, map_add' := gadd }
+  let γ : A →+* PowerSeries R := {
+    toFun := g
+    map_one' := gone
+    map_mul' := gmul
+    map_zero' := gzero
+    map_add' := gadd
+  }
   refine ⟨γ, ?_, ?_, ?_, ?_⟩
   · ext b k
     show coeff k (g (π b)) = coeff k (C (β b))

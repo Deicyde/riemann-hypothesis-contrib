@@ -9,8 +9,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open ValuativeRel UpperTheory.ConvolutionTheory.Loc
 
-theorem UpperTheory.Gal.InertialTypesAlt.L.normOpen :
-    UpperTheory.Gal.InertialTypesAlt.L.NormOpen := by
+theorem UpperTheory.Gal.InertialTypesAlt.L.normOpen
+    : UpperTheory.Gal.InertialTypesAlt.L.NormOpen := by
   intro k E _ _ _ _ _ _ _ _ _ _ _ _ _ σ _ r hr0 hr1
   have hc : Continuous (algebraMap k E) := (UpperTheory.V.Z.Tf.Orb.extCont_holds k E).1
   have hS : {z : E | valuation E (z - 1) < r} ∈ nhds (algebraMap k E 1) := by
@@ -39,13 +39,17 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.normOpen :
   set r₂ := μ * ε
   have hr₂0 : 0 < r₂ := mul_pos hμ0 hε0
   have hr₂μ : r₂ < μ := by
-    calc r₂ = μ * ε := rfl
+    calc
+      r₂
+        = μ * ε := rfl
       _ < μ * 1 := mul_lt_mul_of_pos_left ht1 hμ0
       _ = μ := mul_one μ
   have hr₂γ : r₂ < γ := hr₂μ.trans_le (min_le_left _ _)
   have hr₂δ : r₂ < δ := hr₂μ.trans_le (min_le_right _ _)
   have hr₀r₂ : r₂ * δ ≤ r₂ := by
-    calc r₂ * δ ≤ r₂ * 1 := mul_le_mul_of_nonneg_left hδ1 zero_le'
+    calc
+      r₂ * δ
+        ≤ r₂ * 1 := mul_le_mul_of_nonneg_left hδ1 zero_le'
       _ = r₂ := mul_one r₂
   refine ⟨r₂ * δ, mul_pos hr₂0 (zero_lt_iff.mpr hδ0), hr₀r₂.trans_lt (hr₂δ.trans_le hδ1), ?_⟩
   intro x hx
@@ -53,7 +57,9 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.normOpen :
     intro y hy
     exact le_of_lt (hγ (lt_of_le_of_lt hy hr₂γ))
   refine ⟨hmem x (hx.trans hr₀r₂), ?_⟩
-  have hg : Matrix.GeneralLinearGroup.scalar (Fin 1) x ∈ UpperTheory.ConvolutionTheory.Loc.ball 1 (r₂ * δ) := by
+  have hg
+      : Matrix.GeneralLinearGroup.scalar (Fin 1) x
+        ∈ UpperTheory.ConvolutionTheory.Loc.ball 1 (r₂ * δ) := by
     intro i j
     rw [Subsingleton.elim i 0, Subsingleton.elim j 0]
     simpa [Matrix.GeneralLinearGroup.scalar] using hx
@@ -68,12 +74,15 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.normOpen :
     simp only [Units.val_pow_eq_pow_val] at this
     rw [← hpow, this]
     simp [Matrix.GeneralLinearGroup.scalar]
-  have hw1 : valuation k ((u : Matrix (Fin 1) (Fin 1) k) 0 0 - 1) ≤ r₂ := by
-    simpa using hu 0 0
+  have hw1 : valuation k ((u : Matrix (Fin 1) (Fin 1) k) 0 0 - 1) ≤ r₂ := by simpa using hu 0 0
   have hw0 : (u : Matrix (Fin 1) (Fin 1) k) 0 0 ≠ 0 := by
     intro h
     rw [h, zero_pow hdpos.ne'] at hw
     exact x.ne_zero hw.symm
-  refine ⟨Units.mk0 (algebraMap k E ((u : Matrix (Fin 1) (Fin 1) k) 0 0))
-    ((map_ne_zero (algebraMap k E)).mpr hw0), hmem _ hw1, ?_⟩
+  refine ⟨
+    Units.mk0 (algebraMap k E ((u : Matrix (Fin 1) (Fin 1) k) 0 0))
+      ((map_ne_zero (algebraMap k E)).mpr hw0),
+    hmem _ hw1,
+    ?_
+  ⟩
   rw [Units.val_mk0, Algebra.norm_algebraMap, ← hd, hw]

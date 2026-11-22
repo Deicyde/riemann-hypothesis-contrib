@@ -12,16 +12,23 @@ namespace Formalism.MainNotions.G
 
 namespace Places
 
-variable {p : ℕ} {O Kf : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
+variable
+  {p : ℕ} {O Kf : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
   (P : Places p O Kf)
 
-def Tminus (v : Fin P.nV) (i : ℕ) (F : P.Tup → P.Xsp) : P.Tup → P.Xsp :=
-  fun L => ∑ᶠ (L'' : Submodule (P.W v) (Fin (P.m + 1) → P.Qq v)) (_ : IsEdge p (P.n' v) i ⟨L'', L v⟩),
+def Tminus (v : Fin P.nV) (i : ℕ) (F : P.Tup → P.Xsp) : P.Tup → P.Xsp := fun L =>
+  ∑ᶠ (L'' : Submodule (P.W v) (Fin (P.m + 1) → P.Qq v)) (_ : IsEdge p (P.n' v) i ⟨L'', L v⟩),
     F (Function.update L v L'')
 
-def withWt (m' : ℕ) (lam0' : ∀ v, Fin (P.n' v) → Fin (m' + 1) → ℤ) (dom' : ∀ v, IsDominant (lam0' v)) :
-    Places p O Kf :=
-  { P with m := m', lam0 := lam0', dom := dom' }
+def withWt
+    (m' : ℕ) (lam0' : ∀ v, Fin (P.n' v) → Fin (m' + 1) → ℤ) (dom' : ∀ v, IsDominant (lam0' v))
+    : Places p O Kf := {
+  P with
+  m := m'
+  lam0 := lam0'
+  dom := dom'
+}
 
 end Places
 
@@ -47,8 +54,10 @@ variable {p : ℕ} {G : GAtP p} (Fl : Fills G)
 
 def Pj : ℕ → Places p G.O G.Kf
   | 0 => G.P
-  | j + 1 => G.P.withWt (G.P.m + (j + 1) * (Fl.t + 1))
-      (fun v s => liftWt Fl.t G.P.m (G.P.lam0 v s) (fun i => Fl.w v i s) (j + 1)) (Fl.domJ (j + 1))
+  | j + 1 =>
+    G.P.withWt (G.P.m + (j + 1) * (Fl.t + 1))
+      (fun v s => liftWt Fl.t G.P.m (G.P.lam0 v s) (fun i => Fl.w v i s) (j + 1))
+      (Fl.domJ (j + 1))
 
 end Fills
 
@@ -75,7 +84,8 @@ abbrev Fm (j : ℕ) : Type := Lv.comp j → (Fl.Pj j).Tup → (Fl.Pj j).Xsp
 
 def Int (j : ℕ) : Submodule G.O (Lv.Fm j) := Submodule.pi Set.univ fun i => (Lv.lev j i).M
 
-def Tm (j : ℕ) (v : Fin (Fl.Pj j).nV) (i : ℕ) (F : Lv.Fm j) : Lv.Fm j := fun c => (Fl.Pj j).Tminus v i (F c)
+def Tm (j : ℕ) (v : Fin (Fl.Pj j).nV) (i : ℕ) (F : Lv.Fm j) : Lv.Fm j := fun c =>
+  (Fl.Pj j).Tminus v i (F c)
 
 end Levels
 

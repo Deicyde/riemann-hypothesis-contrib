@@ -13,9 +13,9 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology
 
-theorem IrreducibleGermRegularConnected.proof (hpar : LocalParametrisation.Statement)
-    (hsheets : ParametrisationSheetsConnected.Statement) :
-    IrreducibleGermRegularConnected.Statement := by
+theorem IrreducibleGermRegularConnected.proof
+    (hpar : LocalParametrisation.Statement) (hsheets : ParametrisationSheetsConnected.Statement)
+    : IrreducibleGermRegularConnected.Statement := by
   intro σ _ X w hX hirr U hU
   obtain ⟨d, A, B, D, δ, N, hBU, hP⟩ := hpar σ X w hX hirr U hU
   have hS := hsheets σ X w B d A D δ N hP hirr

@@ -14,7 +14,8 @@ namespace GroundTheory.Heights₂.Heights.Targets
 
 open MvPolynomial
 open ReciprocityTheory.ChartRestriction.G.Geo (MRing IsMultiHomogIdeal mcPts segre)
-open GroundTheory.Heights₂.Heights (segreChartIdeal segreChartSet chartLift segre_chartLift chartLift_segre_apply)
+open GroundTheory.Heights₂.Heights
+  (segreChartIdeal segreChartSet chartLift segre_chartLift chartLift_segre_apply)
 
 theorem ChartDehomIdeal.proof : ChartDehomIdeal.Statement := by
   intro K _ _ ι _ P m σ i hP
@@ -29,12 +30,17 @@ theorem ChartDehomIdeal.proof : ChartDehomIdeal.Statement := by
     rfl
 
   have hcomap : ((Q.map (dehom i)).radical).comap (dehom i) = J.radical := by
-    have hd : (dehom i : MvPolynomial (Σ k, ι k) ℂ →+* DehomRing i) = Ideal.Quotient.mk (dehomIdeal i) := rfl
+    have hd
+        : (dehom i : MvPolynomial (Σ k, ι k) ℂ →+* DehomRing i)
+          = Ideal.Quotient.mk (dehomIdeal i) :=
+      rfl
     rw [← Ideal.comap_coe (dehom i), ← Ideal.map_coe (dehom i), Ideal.comap_radical, hd,
-      Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot, Ideal.mk_ker]
+      Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot,
+      Ideal.mk_ker]
 
-  have hval : ∀ (y : (Σ k, ι k) → ℂ) (f : MvPolynomial (Fin m) ℂ),
-      aeval (R := ℂ) y (aeval G f) = aeval (R := ℂ) (fun a => segre y (σ a)) f := by
+  have hval
+      : ∀ (y : (Σ k, ι k) → ℂ) (f : MvPolynomial (Fin m) ℂ),
+        aeval (R := ℂ) y (aeval G f) = aeval (R := ℂ) (fun a => segre y (σ a)) f := by
     intro y f
     rw [← AlgHom.comp_apply, comp_aeval]
     congr 2
@@ -62,8 +68,9 @@ theorem ChartDehomIdeal.proof : ChartDehomIdeal.Statement := by
           simp [RingHom.mem_ker, h1 k]
       exact fun p hp => hle hp
   ext f
-  rw [Ideal.mem_comap, hseg, ← Ideal.mem_comap, hcomap, ← vanishingIdeal_zeroLocus_eq_radical (K := ℂ),
-    segreChartIdeal, mem_vanishingIdeal_iff, mem_vanishingIdeal_iff]
+  rw [Ideal.mem_comap, hseg, ← Ideal.mem_comap, hcomap,
+    ← vanishingIdeal_zeroLocus_eq_radical (K := ℂ), segreChartIdeal, mem_vanishingIdeal_iff,
+    mem_vanishingIdeal_iff]
   constructor
   · intro hf y hy
     rw [hval]
@@ -80,7 +87,10 @@ theorem ChartDehomIdeal.proof : ChartDehomIdeal.Statement := by
       rw [hy, chartLift_segre_apply σ i z hzi p.1 p.2, mul_comm]
     have hym : y ∈ mcPts P := by
       rw [hyz]
-      exact SegreChartZeroSet.scaleAll_mem P hP (fun k => (z ⟨k, i k⟩)⁻¹) (fun k => inv_ne_zero (hne k)) hz
+      exact SegreChartZeroSet.scaleAll_mem P hP
+        (fun k => (z ⟨k, i k⟩)⁻¹)
+        (fun k => inv_ne_zero (hne k))
+        hz
     have h1 : ∀ k, y ⟨k, i k⟩ = 1 := fun k => by
       rw [hyz]
       exact inv_mul_cancel₀ (hne k)

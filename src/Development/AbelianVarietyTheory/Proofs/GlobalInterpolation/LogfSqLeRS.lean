@@ -7,13 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.LogAdd
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions
+  Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
-theorem logf_sq_le_rS : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks), x0 ≤ s.x → RankVal s R →
-    Real.log R.f ^ 2 ≤ (R.rS : ℝ) := by
-  obtain ⟨x1, h1⟩ := GlobalTheory.log_add_rpow_mul_log_pow_le_rpow 0 (1 / 4) 0 36 (1 / 2) 2 le_rfl (by norm_num) (by norm_num)
+theorem logf_sq_le_rS
+    : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks),
+      x0 ≤ s.x → RankVal s R → Real.log R.f ^ 2 ≤ (R.rS : ℝ) := by
+  obtain ⟨x1, h1⟩ :=
+    GlobalTheory.log_add_rpow_mul_log_pow_le_rpow 0 (1 / 4) 0 36 (1 / 2) 2 le_rfl (by norm_num)
+      (by norm_num)
   refine ⟨max x1 (Real.exp 1), fun s R hx hR => ?_⟩
   have hn := hR.n_le'
   obtain ⟨-, ⟨hm, -⟩, -, -⟩ := hR
@@ -23,8 +27,7 @@ theorem logf_sq_le_rS : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks), x0 ≤ s.x �
   have hx0 : 0 < s.x := by linarith
   have he := s.eps_lt
   have he0 := s.eps_pos
-  have hl : 1 ≤ Real.log s.x := by
-    rw [Real.le_log_iff_exp_le hx0]; exact hxe
+  have hl : 1 ≤ Real.log s.x := by rw [Real.le_log_iff_exp_le hx0]; exact hxe
   rw [Real.rpow_zero] at hx1
   have hm' : s.x ^ (1 / 4 : ℝ) ≤ (R.m : ℝ) := by
     refine le_trans ?_ hm
@@ -39,7 +42,8 @@ theorem logf_sq_le_rS : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks), x0 ≤ s.x �
     linarith
   have hf1 : 1 ≤ R.f := by
     have : 0 < R.ord := R.ord_pos
-    unfold Ranks.f Ranks.n; omega
+    unfold Ranks.f Ranks.n
+    omega
   have hf1' : (1 : ℝ) ≤ R.f := by exact_mod_cast hf1
   have hf : (R.f : ℝ) ≤ 4 * s.x ^ (3 : ℝ) := by
     have : s.x ^ ((9 : ℝ) / 4) ≤ s.x ^ (3 : ℝ) :=
@@ -58,10 +62,11 @@ theorem logf_sq_le_rS : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks), x0 ≤ s.x �
   have hr' : (R.m : ℝ) ≤ 2 * R.rS + 3 := by exact_mod_cast hr
   nlinarith
 
-theorem szRow_logf : SzRow (fun C D L => (Real.log D.R.f ≤ Real.sqrt D.R.rS) ∧
-    (Real.log D.R.f ^ 2 ≤ (D.R.m : ℝ) ^ 2 * L.sc.L) ∧
-    (Real.log (Real.log L.sc.b) ≤ C.P.cLL * D.R.r * D.R.f * Real.log D.R.r) ∧
-    ((4 * (D.R.f : ℝ) + 10) * D.R.r ≤ nW L C.P.CnW)) := by
+theorem szRow_logf
+    : SzRow (fun C D L =>
+      (Real.log D.R.f ≤ Real.sqrt D.R.rS) ∧ (Real.log D.R.f ^ 2 ≤ (D.R.m : ℝ) ^ 2 * L.sc.L)
+        ∧ (Real.log (Real.log L.sc.b) ≤ C.P.cLL * D.R.r * D.R.f * Real.log D.R.r)
+        ∧ ((4 * (D.R.f : ℝ) + 10) * D.R.r ≤ nW L C.P.CnW)) := by
   intro eps _ _ C hC
   obtain ⟨x1, h1⟩ := logf_sq_le_rS
   refine ⟨0, fun cD _ => ⟨0, fun ch _ => ⟨max x1 C.P.cLL⁻¹, fun D L _ hx hV => ?_⟩⟩⟩
@@ -79,7 +84,8 @@ theorem szRow_logf : SzRow (fun C D L => (Real.log D.R.f ≤ Real.sqrt D.R.rS) �
   have hmk := D.R.m_add_three_le_k
   have hf2 : 2 ≤ D.R.f := by
     have : 0 < D.R.ord := D.R.ord_pos
-    unfold Ranks.f Ranks.n; omega
+    unfold Ranks.f Ranks.n
+    omega
   have hf2' : (2 : ℝ) ≤ D.R.f := by exact_mod_cast hf2
   have hL : 1 ≤ L.sc.L := Real.one_le_rpow h1x.le he0.le
   have hm2' : (2 : ℝ) ≤ D.R.m := by exact_mod_cast hm2
@@ -87,7 +93,8 @@ theorem szRow_logf : SzRow (fun C D L => (Real.log D.R.f ≤ Real.sqrt D.R.rS) �
   · have hr : D.R.rS ≤ D.R.m := by unfold Ranks.rS; omega
     have hr' : (D.R.rS : ℝ) ≤ D.R.m := by exact_mod_cast hr
     have h2 : (D.R.m : ℝ) ≤ (D.R.m : ℝ) ^ 2 := by nlinarith
-    have h3 : (D.R.m : ℝ) ^ 2 ≤ (D.R.m : ℝ) ^ 2 * L.sc.L := le_mul_of_one_le_right (by positivity) hL
+    have h3 : (D.R.m : ℝ) ^ 2 ≤ (D.R.m : ℝ) ^ 2 * L.sc.L :=
+      le_mul_of_one_le_right (by positivity) hL
     linarith
   · have hkr : D.R.k ≤ D.R.r := by unfold Ranks.r; omega
     have hkr' : (D.R.k : ℝ) ≤ D.R.r := by exact_mod_cast hkr

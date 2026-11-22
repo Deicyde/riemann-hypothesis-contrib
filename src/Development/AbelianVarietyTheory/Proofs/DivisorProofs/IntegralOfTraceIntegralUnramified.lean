@@ -7,14 +7,17 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.FinrankLeOfM
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UCls GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.LieDisc
+open NumberField Matrix GlobalTheory.UCls GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.LieDisc
 open scoped nonZeroDivisors
 
 namespace GlobalTheory.LieDisc
 
-theorem isIntegral_of_trace_integral :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ w : E,
-      (∀ a : E, IsIntegral ℤ a → IsIntegral ℤ (w * a + cc (w * a))) → IsIntegral ℤ w := by
+theorem isIntegral_of_trace_integral
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E
+        → ∀ w : E,
+          (∀ a : E, IsIntegral ℤ a → IsIntegral ℤ (w * a + cc (w * a))) → IsIntegral ℤ w := by
   intro E _ _ _ hu w hw
   set F := maximalRealSubfield E
   have hfu : Algebra.FormallyUnramified (𝓞 F) (𝓞 E) := by

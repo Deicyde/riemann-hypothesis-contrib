@@ -39,9 +39,10 @@ section Face
 
 variable [LinearOrder ι]
 
-def face {s : ℕ} (S : Idx ι (s + 1)) (j : Fin (s + 2)) : Idx ι s :=
-  ⟨S.1.erase (S.1.orderEmbOfFin S.2 j), by
-    rw [Finset.card_erase_of_mem (Finset.orderEmbOfFin_mem _ _ _), S.2]; rfl⟩
+def face {s : ℕ} (S : Idx ι (s + 1)) (j : Fin (s + 2)) : Idx ι s := ⟨
+  S.1.erase (S.1.orderEmbOfFin S.2 j),
+  by rw [Finset.card_erase_of_mem (Finset.orderEmbOfFin_mem _ _ _), S.2]; rfl
+⟩
 
 theorem face_subset {s : ℕ} (S : Idx ι (s + 1)) (j : Fin (s + 2)) : (face S j).1 ⊆ S.1 :=
   Finset.erase_subset _ _
@@ -69,12 +70,16 @@ variable {X' : Scheme.{0}} (f : X' ⟶ X)
 
 end BaseChange
 
-theorem nonempty_Ystr {s : ℕ} (S : Idx ι s) (y : Y I S.1) : Nonempty (Ystr I s) := ⟨(inj I S).base y⟩
+theorem nonempty_Ystr {s : ℕ} (S : Idx ι s) (y : Y I S.1) : Nonempty (Ystr I s) :=
+  ⟨(inj I S).base y⟩
 
 theorem isEmpty_Ystr {s : ℕ} (h : IsEmpty (Idx ι s)) : IsEmpty (Ystr I s) :=
-  ⟨fun x => IsEmpty.false ((Sigma.desc (fun S : Idx ι s => (isEmptyElim S : Y I S.1 ⟶ ∅)) : Ystr I s ⟶ ∅).base x)⟩
+  ⟨fun x =>
+    IsEmpty.false
+      ((Sigma.desc (fun S : Idx ι s => (isEmptyElim S : Y I S.1 ⟶ ∅)) : Ystr I s ⟶ ∅).base x)⟩
 
-theorem nonempty_Y_iff (S : Finset ι) : Nonempty (Y I S) ↔ ((ideal I S).support : Set X).Nonempty := by
+theorem nonempty_Y_iff (S : Finset ι)
+    : Nonempty (Y I S) ↔ ((ideal I S).support : Set X).Nonempty := by
   rw [← Set.range_nonempty_iff_nonempty (f := (Yι I S).base)]
   unfold Yι
   rw [← Scheme.IdealSheafData.range_subschemeι]
@@ -113,7 +118,8 @@ def T (k : Fin 2) : A O ϖ := Ideal.Quotient.mk _ (X k)
 abbrev XS : Scheme.{0} := Spec (CommRingCat.of (A O ϖ))
 
 def compIdeal (k : Fin 2) : (XS O ϖ).IdealSheafData :=
-  Scheme.IdealSheafData.ofIdealTop (Ideal.span {(Scheme.ΓSpecIso (CommRingCat.of (A O ϖ))).inv.hom (T O ϖ k)})
+  Scheme.IdealSheafData.ofIdealTop (Ideal.span
+    {(Scheme.ΓSpecIso (CommRingCat.of (A O ϖ))).inv.hom (T O ϖ k)})
 
 def red : A O ϖ →+* O ⧸ Ideal.span {ϖ} :=
   Ideal.Quotient.lift _ (eval₂Hom (Ideal.Quotient.mk _) (fun _ => 0)) (by
@@ -124,10 +130,10 @@ def red : A O ϖ →+* O ⧸ Ideal.span {ϖ} :=
 
 theorem reduction_uniformizerPoint (k : Fin 2) : red O ϖ (T O ϖ k) = 0 := by simp [red, T]
 
-theorem mem_support_compIdeal (x : XS O ϖ) (k : Fin 2) (hx : T O ϖ k ∈ x.asIdeal) :
-    x ∈ ((compIdeal O ϖ k).support : Set (XS O ϖ)) := by
-  rw [compIdeal, Scheme.IdealSheafData.coe_support_ofIdealTop, Scheme.zeroLocus_span, Scheme.zeroLocus_singleton,
-    basicOpen_eq_of_affine]
+theorem mem_support_compIdeal (x : XS O ϖ) (k : Fin 2) (hx : T O ϖ k ∈ x.asIdeal)
+    : x ∈ ((compIdeal O ϖ k).support : Set (XS O ϖ)) := by
+  rw [compIdeal, Scheme.IdealSheafData.coe_support_ofIdealTop, Scheme.zeroLocus_span,
+    Scheme.zeroLocus_singleton, basicOpen_eq_of_affine]
   exact fun h' => (PrimeSpectrum.mem_basicOpen (x := (x : PrimeSpectrum (A O ϖ))) _).1 h' hx
 
 theorem isEmpty_Ystr_two : IsEmpty (Ystr (compIdeal O ϖ) 2) :=
@@ -139,11 +145,13 @@ theorem nonempty_Ystr_one (h : ¬ IsUnit ϖ) : Nonempty (Ystr (compIdeal O ϖ) 1
   obtain ⟨M, hM⟩ := Ideal.exists_maximal (O ⧸ Ideal.span {ϖ})
   let x : XS O ϖ := ⟨M.comap (red O ϖ), Ideal.comap_isPrime _ _⟩
   have hx : x ∈ ((ideal (compIdeal O ϖ) Finset.univ).support : Set (XS O ϖ)) := by
-    simp only [ideal, Scheme.IdealSheafData.support_iSup, TopologicalSpace.Closeds.coe_iInf, Set.mem_iInter]
+    simp only [ideal, Scheme.IdealSheafData.support_iSup, TopologicalSpace.Closeds.coe_iInf,
+      Set.mem_iInter]
     intro k _
     refine mem_support_compIdeal O ϖ x k ?_
     show red O ϖ (T O ϖ k) ∈ M
-    rw [reduction_uniformizerPoint]; exact zero_mem _
+    rw [reduction_uniformizerPoint]
+    exact zero_mem _
   obtain ⟨y⟩ := (nonempty_Y_iff (compIdeal O ϖ) Finset.univ).2 ⟨x, hx⟩
   exact nonempty_Ystr (compIdeal O ϖ) (s := 1) ⟨Finset.univ, by simp⟩ y
 
@@ -151,8 +159,8 @@ end GlobalTheory.Strata.Example
 
 namespace GlobalTheory.Strata
 
-theorem orderEmbOfFin_univ_fin {n : ℕ} (h : (Finset.univ : Finset (Fin n)).card = n) :
-    ((Finset.univ : Finset (Fin n)).orderEmbOfFin h : Fin n → Fin n) = id :=
+theorem orderEmbOfFin_univ_fin {n : ℕ} (h : (Finset.univ : Finset (Fin n)).card = n)
+    : ((Finset.univ : Finset (Fin n)).orderEmbOfFin h : Fin n → Fin n) = id :=
   (Finset.orderEmbOfFin_unique h (f := id) (fun _ => Finset.mem_univ _) strictMono_id).symm
 
 end GlobalTheory.Strata

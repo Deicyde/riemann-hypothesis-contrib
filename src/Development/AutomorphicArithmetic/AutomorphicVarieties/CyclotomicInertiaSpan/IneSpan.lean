@@ -6,12 +6,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PlacesOfRat
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.B1
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.B1
 
-theorem UpperTheory.V.B1.ineSpan :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (N : Subgroup (G ℚ Ω)) (S : Finset ℕ) (B : ℕ → ValuationSubring Ω), IsOpen (N : Set (G ℚ Ω)) → commutator (G ℚ Ω) ≤ N →
-    (∀ p ∈ S, p.Prime ∧ (B p).valuation (p : Ω) < 1) →
-    (∀ B' : ValuationSubring Ω, (∀ p ∈ S, ¬ B'.valuation (p : Ω) < 1) → Ine (F := ℚ) B' ≤ N) → N ⊔ (⨆ p ∈ S, Ine (F := ℚ) (B p)) = ⊤ := by
+theorem UpperTheory.V.B1.ineSpan
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (N : Subgroup (G ℚ Ω)) (S : Finset ℕ)
+        (B : ℕ → ValuationSubring Ω),
+      IsOpen (N : Set (G ℚ Ω)) → commutator (G ℚ Ω) ≤ N
+        → (∀ p ∈ S, p.Prime ∧ (B p).valuation (p : Ω) < 1)
+        → (∀ B' : ValuationSubring Ω, (∀ p ∈ S, ¬ B'.valuation (p : Ω) < 1) → Ine (F := ℚ) B' ≤ N)
+        → N ⊔ (⨆ p ∈ S, Ine (F := ℚ) (B p)) = ⊤ := by
   intro Ω _ _ _ N S B ho hc hB hI
   have hle : ∀ p ∈ S, Ine (F := ℚ) (B p) ≤ N ⊔ (⨆ p ∈ S, Ine (F := ℚ) (B p)) := fun p hp =>
     (le_iSup₂ (f := fun p (_ : p ∈ S) => Ine (F := ℚ) (B p)) p hp).trans le_sup_right

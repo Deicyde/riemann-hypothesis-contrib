@@ -10,12 +10,13 @@ noncomputable section
 namespace GlobalTheory.AdelicU
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.UG
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.UG
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem exists_sub_mem_intLoc (v : HeightOneSpectrum (𝓞 F)) (y : Fv F v ⊗[F] E) :
-    ∃ x : E, y - (1 : Fv F v) ⊗ₜ[F] x ∈ intLoc F E v := by
+theorem exists_sub_mem_intLoc (v : HeightOneSpectrum (𝓞 F)) (y : Fv F v ⊗[F] E)
+    : ∃ x : E, y - (1 : Fv F v) ⊗ₜ[F] x ∈ intLoc F E v := by
   induction y using TensorProduct.induction_on with
   | zero => exact ⟨0, by simp⟩
   | add y z hy hz =>
@@ -30,25 +31,29 @@ theorem exists_sub_mem_intLoc (v : HeightOneSpectrum (𝓞 F)) (y : Fv F v ⊗[F
     have hmF : (m : F) ≠ 0 := by exact_mod_cast hm
     have hO : IsOpen (v.adicCompletionIntegers F : Set (Fv F v)) := Valued.isOpen_valuationSubring _
     have hcont : Continuous fun z : Fv F v => (m : F)⁻¹ • a - z := continuous_sub_left _
-    obtain ⟨k, hk⟩ := (HeightOneSpectrum.denseRange_algebraMap (R := 𝓞 F) F v).exists_mem_open
-      (hO.preimage hcont) ⟨(m : F)⁻¹ • a, by simp⟩
+    obtain ⟨k, hk⟩ :=
+      (HeightOneSpectrum.denseRange_algebraMap (R := 𝓞 F) F v).exists_mem_open (hO.preimage hcont)
+        ⟨(m : F)⁻¹ • a, by simp⟩
     refine ⟨k • (m • e), ?_⟩
     have hk' : (m : F)⁻¹ • a - algebraMap F (Fv F v) k ∈ v.adicCompletionIntegers F := hk
     have h := tmul_mem_intLoc (E := E) hk' ⟨m • e, he'⟩
     convert h using 1
     change _ = ((m : F)⁻¹ • a - algebraMap F (Fv F v) k) ⊗ₜ[F] (m • e)
-    rw [TensorProduct.sub_tmul, TensorProduct.smul_tmul, Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul,
-      ← Int.cast_smul_eq_zsmul F m e, inv_smul_smul₀ hmF]
+    rw [TensorProduct.sub_tmul, TensorProduct.smul_tmul, Algebra.algebraMap_eq_smul_one,
+      TensorProduct.smul_tmul, ← Int.cast_smul_eq_zsmul F m e, inv_smul_smul₀ hmF]
 
-theorem isIntegral_of_absBar_le_one (v : HeightOneSpectrum (𝓞 F)) (x : E)
-    (hx : ∀ τ : E →ₐ[F] FvBar F v, absBar F v (τ x) ≤ 1) :
-    ∃ p : Polynomial (v.valuationSubringAtPrime F), p.Monic ∧
-      p.eval₂ ((algebraMap F E).comp (v.valuationSubringAtPrime F).subtype) x = 0 := by
+theorem isIntegral_of_absBar_le_one
+    (v : HeightOneSpectrum (𝓞 F)) (x : E) (hx : ∀ τ : E →ₐ[F] FvBar F v, absBar F v (τ x) ≤ 1)
+    : ∃ p : Polynomial (v.valuationSubringAtPrime F),
+      p.Monic ∧ p.eval₂ ((algebraMap F E).comp (v.valuationSubringAtPrime F).subtype) x = 0 := by
   classical
   have hint : IsIntegral F x := Algebra.IsIntegral.isIntegral x
   have hmon := minpoly.monic hint
-  have h1 : (minpoly F x).map (algebraMap F (FvBar F v)) ∈ Polynomial.lifts (valBar F v).integer.subtype := by
-    refine Polynomial.Splits.mem_lift_of_roots_mem_range (IsAlgClosed.splits _) (hmon.map _) _ fun a ha => ?_
+  have h1
+      : (minpoly F x).map (algebraMap F (FvBar F v))
+        ∈ Polynomial.lifts (valBar F v).integer.subtype := by
+    refine Polynomial.Splits.mem_lift_of_roots_mem_range (IsAlgClosed.splits _) (hmon.map _) _
+      fun a ha => ?_
     have ha' : a ∈ (minpoly F x).rootSet (FvBar F v) := by
       rw [Polynomial.rootSet_def]; simpa [Polynomial.aroots_def] using ha
     rw [← Algebra.IsAlgebraic.range_eval_eq_rootSet_minpoly] at ha'
@@ -71,27 +76,30 @@ theorem isIntegral_of_absBar_le_one (v : HeightOneSpectrum (𝓞 F)) (x : E)
   rw [← Polynomial.eval₂_map, hq]
   exact minpoly.aeval F x
 
-theorem one_tmul_mem_intLoc (v : HeightOneSpectrum (𝓞 F)) (x : E)
-    (hx : absFin F v ((1 : Fv F v) ⊗ₜ[F] x) ≤ 1) : (1 : Fv F v) ⊗ₜ[F] x ∈ intLoc F E v := by
+theorem one_tmul_mem_intLoc
+    (v : HeightOneSpectrum (𝓞 F)) (x : E) (hx : absFin F v ((1 : Fv F v) ⊗ₜ[F] x) ≤ 1)
+    : (1 : Fv F v) ⊗ₜ[F] x ∈ intLoc F E v := by
   let : Algebra (v.valuationSubringAtPrime F) E :=
     ((algebraMap F E).comp (v.valuationSubringAtPrime F).subtype).toAlgebra
-  have : IsScalarTower (𝓞 F) (v.valuationSubringAtPrime F) E := IsScalarTower.of_algebraMap_eq fun _ => rfl
+  have : IsScalarTower (𝓞 F) (v.valuationSubringAtPrime F) E :=
+    IsScalarTower.of_algebraMap_eq fun _ => rfl
   have h1 : IsIntegral (v.valuationSubringAtPrime F) x :=
     isIntegral_of_absBar_le_one v x fun τ => by simpa using (absFin_le_iff F v).1 hx τ
-  obtain ⟨⟨s, hs⟩, h2⟩ := IsIntegral.exists_multiple_integral_of_isLocalization v.asIdeal.primeCompl x h1
+  obtain ⟨⟨s, hs⟩, h2⟩ :=
+    IsIntegral.exists_multiple_integral_of_isLocalization v.asIdeal.primeCompl x h1
   have h3 : IsIntegral ℤ ((s : F) • x) := isIntegral_trans _ h2
-  have hv : v.valuation F (s : F) = 1 :=
-    (HeightOneSpectrum.valuation_eq_one_iff_notMem v).2 hs
+  have hv : v.valuation F (s : F) = 1 := (HeightOneSpectrum.valuation_eq_one_iff_notMem v).2 hs
   have hs0 : (s : F) ≠ 0 := fun e => by simp [e] at hv
   have h4 : algebraMap F (Fv F v) (s : F)⁻¹ ∈ v.adicCompletionIntegers F :=
-    (HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v (s : F)⁻¹).trans_le (by rw [map_inv₀, hv, inv_one])
+    (HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v (s : F)⁻¹).trans_le
+      (by rw [map_inv₀, hv, inv_one])
   have h := tmul_mem_intLoc (E := E) h4 ⟨_, h3⟩
   convert h using 1
   change _ = (algebraMap F (Fv F v) (s : F)⁻¹) ⊗ₜ[F] ((s : F) • x)
   rw [Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul, inv_smul_smul₀ hs0]
 
-theorem mem_intLoc_iff_absFin_le_one {v : HeightOneSpectrum (𝓞 F)} {y : Fv F v ⊗[F] E} :
-    y ∈ intLoc F E v ↔ absFin F v y ≤ 1 := by
+theorem mem_intLoc_iff_absFin_le_one {v : HeightOneSpectrum (𝓞 F)} {y : Fv F v ⊗[F] E}
+    : y ∈ intLoc F E v ↔ absFin F v y ≤ 1 := by
   refine ⟨absFin_le_one_of_mem_intLoc, fun hy => ?_⟩
   obtain ⟨x, hx⟩ := exists_sub_mem_intLoc v y
   have h1 : absFin F v ((1 : Fv F v) ⊗ₜ[F] x) ≤ 1 := by
@@ -100,21 +108,27 @@ theorem mem_intLoc_iff_absFin_le_one {v : HeightOneSpectrum (𝓞 F)} {y : Fv F 
     exact this.trans (max_le hy (absFin_le_one_of_mem_intLoc hx))
   simpa using add_mem hx (one_tmul_mem_intLoc v x h1)
 
-theorem algebraMap_basis_repr {ι : Type} [Fintype ι] [DecidableEq ι] (b : Module.Basis ι F E)
-    (v : HeightOneSpectrum (𝓞 F)) (y : Fv F v ⊗[F] E) (i : ι) :
-    algebraMap (Fv F v) (FvBar F v) ((Algebra.TensorProduct.basis (Fv F v) b.traceDual).repr y i) =
-      ∑ τ : E →ₐ[F] FvBar F v, finEmb F v τ y * τ (b i) := by
+theorem algebraMap_basis_repr
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (b : Module.Basis ι F E)
+    (v : HeightOneSpectrum (𝓞 F)) (y : Fv F v ⊗[F] E)
+    (i : ι)
+    : algebraMap (Fv F v) (FvBar F v) ((Algebra.TensorProduct.basis (Fv F v) b.traceDual).repr y i)
+      = ∑ τ : E →ₐ[F] FvBar F v, finEmb F v τ y * τ (b i) := by
   induction y using TensorProduct.induction_on with
   | zero => simp
-  | add y z hy hz => simp only [map_add (f := _), Finsupp.add_apply, hy, hz, add_mul, Finset.sum_add_distrib]
+  | add y z hy hz =>
+    simp only [map_add (f := _), Finsupp.add_apply, hy, hz, add_mul, Finset.sum_add_distrib]
   | tmul a e =>
-    rw [Algebra.TensorProduct.basis_repr_tmul, Finsupp.smul_apply, Finsupp.mapRange_apply, smul_eq_mul, map_mul,
-      ← IsScalarTower.algebraMap_apply, Module.Basis.traceDual_repr_apply, Algebra.traceForm_apply,
-      trace_eq_sum_embeddings, Finset.mul_sum]
+    rw [Algebra.TensorProduct.basis_repr_tmul, Finsupp.smul_apply, Finsupp.mapRange_apply,
+      smul_eq_mul, map_mul, ← IsScalarTower.algebraMap_apply, Module.Basis.traceDual_repr_apply,
+      Algebra.traceForm_apply, trace_eq_sum_embeddings, Finset.mul_sum]
     refine Finset.sum_congr rfl fun τ _ => ?_
-    rw [finEmb_tmul, map_mul]; ring
+    rw [finEmb_tmul, map_mul]
+    ring
 
-theorem absFin_eq_zero_iff {v : HeightOneSpectrum (𝓞 F)} {y : Fv F v ⊗[F] E} : absFin F v y = 0 ↔ y = 0 := by
+theorem absFin_eq_zero_iff {v : HeightOneSpectrum (𝓞 F)} {y : Fv F v ⊗[F] E}
+    : absFin F v y = 0 ↔ y = 0 := by
   refine ⟨fun hy => ?_, fun h => by rw [h, absFin_zero]⟩
   have h0 : ∀ τ : E →ₐ[F] FvBar F v, finEmb F v τ y = 0 := fun τ =>
     (absBar_eq_zero F v).1 (le_antisymm ((absFin_le_iff F v).1 hy.le τ) zero_le)

@@ -15,15 +15,16 @@ open MvPowerSeries
 
 variable {C : Type} [Field C] {M : ℕ}
 
-def OrdBelow (v : AddValuation C (WithTop ℝ)) (ρ : ℝ) (D : ℕ) (g : MvPowerSeries (Fin M) C)
-    (r : ℝ) : Prop :=
-  ∀ α : Fin M →₀ ℕ, Finsupp.degree α < D →
-    (((r - ρ * (Finsupp.degree α : ℕ) : ℝ)) : WithTop ℝ) ≤ v (coeff α g)
+def OrdBelow (v : AddValuation C (WithTop ℝ)) (ρ : ℝ) (D : ℕ) (g : MvPowerSeries (Fin M) C) (r : ℝ)
+    : Prop :=
+  ∀ α : Fin M →₀ ℕ,
+    Finsupp.degree α < D → (((r - ρ * (Finsupp.degree α : ℕ) : ℝ)) : WithTop ℝ) ≤ v (coeff α g)
 
-theorem OrdBelow.mul {v : AddValuation C (WithTop ℝ)} {ρ : ℝ} {D : ℕ}
-    {g h : MvPowerSeries (Fin M) C} {r s : ℝ} (hg0 : constantCoeff g = 0)
-    (hh0 : constantCoeff h = 0) (hg : OrdBelow v ρ D g r) (hh : OrdBelow v ρ D h s) :
-    OrdBelow v ρ (D + 1) (g * h) (r + s) := by
+theorem OrdBelow.mul
+    {v : AddValuation C (WithTop ℝ)} {ρ : ℝ} {D : ℕ} {g h : MvPowerSeries (Fin M) C} {r s : ℝ}
+    (hg0 : constantCoeff g = 0) (hh0 : constantCoeff h = 0) (hg : OrdBelow v ρ D g r)
+    (hh : OrdBelow v ρ D h s)
+    : OrdBelow v ρ (D + 1) (g * h) (r + s) := by
   classical
   intro α hα
   rw [coeff_mul]
@@ -44,10 +45,11 @@ theorem OrdBelow.mul {v : AddValuation C (WithTop ℝ)} {ρ : ℝ} {D : ℕ}
   push_cast
   ring
 
-theorem OrdBelow.pow_succ {v : AddValuation C (WithTop ℝ)} {ρ : ℝ} {D : ℕ}
-    {g : MvPowerSeries (Fin M) C} {r : ℝ} (hg0 : constantCoeff g = 0)
-    (hg : OrdBelow v ρ D g r) (k : ℕ) :
-    OrdBelow v ρ D (g ^ (k + 1)) (((k + 1 : ℕ) : ℝ) * r) := by
+theorem OrdBelow.pow_succ
+    {v : AddValuation C (WithTop ℝ)} {ρ : ℝ} {D : ℕ} {g : MvPowerSeries (Fin M) C} {r : ℝ}
+    (hg0 : constantCoeff g = 0) (hg : OrdBelow v ρ D g r)
+    (k : ℕ)
+    : OrdBelow v ρ D (g ^ (k + 1)) (((k + 1 : ℕ) : ℝ) * r) := by
   induction k with
   | zero => simpa using hg
   | succ k ih =>
@@ -60,10 +62,11 @@ theorem OrdBelow.pow_succ {v : AddValuation C (WithTop ℝ)} {ρ : ℝ} {D : ℕ
     push_cast
     ring
 
-theorem OrdBelow.pow {v : AddValuation C (WithTop ℝ)} {ρ : ℝ} {D : ℕ}
-    {g : MvPowerSeries (Fin M) C} {r : ℝ} (hg0 : constantCoeff g = 0)
-    (hg : OrdBelow v ρ D g r) {N : ℕ} (hN : 2 ≤ N) :
-    OrdBelow v ρ (D + 1) (g ^ N) ((N : ℝ) * r) := by
+theorem OrdBelow.pow
+    {v : AddValuation C (WithTop ℝ)} {ρ : ℝ} {D : ℕ} {g : MvPowerSeries (Fin M) C} {r : ℝ}
+    (hg0 : constantCoeff g = 0) (hg : OrdBelow v ρ D g r)
+    {N : ℕ} (hN : 2 ≤ N)
+    : OrdBelow v ρ (D + 1) (g ^ N) ((N : ℝ) * r) := by
   obtain ⟨k, rfl⟩ : ∃ k, N = k + 1 + 1 := ⟨N - 2, by omega⟩
   have h := OrdBelow.mul (by simp [hg0]) hg0 (hg.pow_succ hg0 k) hg
   rw [_root_.pow_succ g (k + 1)]
@@ -71,17 +74,21 @@ theorem OrdBelow.pow {v : AddValuation C (WithTop ℝ)} {ρ : ℝ} {D : ℕ}
   push_cast
   ring
 
-theorem ordGe_of_lgSum_eq_linear :
-  (∀ (C : Type) [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (l : ℕ), l.Prime → v (l : C) = 1 → ∀ (d M : ℕ) (al : Fin d → ℕ → Fin d → C) (z : Fin d → Fin M → C) (t : Fin d → MvPowerSeries (Fin M) C),
-    (∀ c e, al c 0 e = if c = e then 1 else 0) → (∀ c (n : ℕ) e, ((-(n : ℝ) : ℝ) : WithTop ℝ) ≤ v (al c n e)) → (∀ c j, 0 ≤ v (z c j)) →
-    (∀ c, MvPowerSeries.constantCoeff (t c) = 0) → (∀ e, lgSum l al t e = ∑ j, MvPowerSeries.C (z e j) * MvPowerSeries.X j) →
-    ∀ c, OrdGe v (fun _ => 1 / ((l : ℝ) - 1)) (t c) (1 / ((l : ℝ) - 1))) := by
+theorem ordGe_of_lgSum_eq_linear
+    : (∀ (C : Type) [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ)) (l : ℕ),
+      l.Prime → v (l : C) = 1
+        → ∀ (d M : ℕ) (al : Fin d → ℕ → Fin d → C) (z : Fin d → Fin M → C)
+            (t : Fin d → MvPowerSeries (Fin M) C),
+          (∀ c e, al c 0 e = if c = e then 1 else 0)
+            → (∀ c (n : ℕ) e, ((-(n : ℝ) : ℝ) : WithTop ℝ) ≤ v (al c n e)) → (∀ c j, 0 ≤ v (z c j))
+            → (∀ c, MvPowerSeries.constantCoeff (t c) = 0)
+            → (∀ e, lgSum l al t e = ∑ j, MvPowerSeries.C (z e j) * MvPowerSeries.X j)
+            → ∀ c, OrdGe v (fun _ => 1 / ((l : ℝ) - 1)) (t c) (1 / ((l : ℝ) - 1))) := by
   intro C _ _ v l hl _ d M al z t h0 hal hz ht hlg
   classical
   set ρ : ℝ := 1 / ((l : ℝ) - 1) with hρ
   have hl2 : (2 : ℝ) ≤ l := by exact_mod_cast hl.two_le
-  have hρ1 : ρ * ((l : ℝ) - 1) = 1 := by
-    rw [hρ]; field_simp [show (l : ℝ) - 1 ≠ 0 by linarith]
+  have hρ1 : ρ * ((l : ℝ) - 1) = 1 := by rw [hρ]; field_simp [show (l : ℝ) - 1 ≠ 0 by linarith]
   have hρ0 : 0 < ρ := by rw [hρ]; apply one_div_pos.2; linarith
   have key : ∀ D : ℕ, ∀ c, OrdBelow v ρ D (t c) ρ := by
     intro D
@@ -89,13 +96,16 @@ theorem ordGe_of_lgSum_eq_linear :
     | zero => intro c α hα; omega
     | succ D ih =>
       intro e α hα
-      have h1 : coeff α (lgSum l al t e) = coeff α (∑ j, MvPowerSeries.C (z e j) * MvPowerSeries.X j) := by
+      have h1
+          : coeff α (lgSum l al t e)
+            = coeff α (∑ j, MvPowerSeries.C (z e j) * MvPowerSeries.X j) := by
         rw [hlg e]
-      have h2 : coeff α (lgSum l al t e) =
-          ∑ n ∈ Finset.range (Finsupp.degree α + 1), ∑ a, al a n e * coeff α (t a ^ (l ^ n)) := rfl
+      have h2
+          : coeff α (lgSum l al t e)
+            = ∑ n ∈ Finset.range (Finsupp.degree α + 1), ∑ a, al a n e * coeff α (t a ^ (l ^ n)) :=
+        rfl
       rw [h2, Finset.sum_range_succ'] at h1
-      have h3 : ∑ a, al a 0 e * coeff α (t a ^ (l ^ 0)) = coeff α (t e) := by
-        simp [h0]
+      have h3 : ∑ a, al a 0 e * coeff α (t a ^ (l ^ 0)) = coeff α (t e) := by simp [h0]
       rw [h3] at h1
       rw [eq_sub_of_add_eq' h1]
       refine v.map_le_sub ?_ ?_

@@ -14,8 +14,10 @@ namespace GlobalTheory.UnitLemma.Desc
 
 open GlobalTheory.UnitLemma Polynomial
 
-theorem span_adjoin_gen_eq_top {K : UQ} (B : InvAlg K) (hP : B.P.Separable) :
-    Submodule.span K.E ((Subalgebra.toSubmodule (Algebra.adjoin K.O {B.g}) : Submodule K.O B.A) : Set B.A) = ⊤ := by
+theorem span_adjoin_gen_eq_top {K : UQ} (B : InvAlg K) (hP : B.P.Separable)
+    : Submodule.span K.E
+        ((Subalgebra.toSubmodule (Algebra.adjoin K.O {B.g}) : Submodule K.O B.A) : Set B.A)
+      = ⊤ := by
   rw [eq_top_iff]
   intro x _
   obtain ⟨f, rfl⟩ := Sandwich.exists_aeval B hP x
@@ -24,8 +26,10 @@ theorem span_adjoin_gen_eq_top {K : UQ} (B : InvAlg K) (hP : B.P.Separable) :
   show B.g ^ i ∈ Algebra.adjoin K.O {B.g}
   exact Subalgebra.pow_mem _ (Algebra.subset_adjoin (Set.mem_singleton _)) i
 
-theorem pow_smul_mem_adjoin_gen : ∀ (K : UQ) (B : InvAlg K) (a : K.O), B.P.Separable → K.Small a →
-    ∃ N : ℕ, ∀ r : B.A, IsIntegral K.O r → (al K a ^ N) • r ∈ Algebra.adjoin K.O {B.g} := by
+theorem pow_smul_mem_adjoin_gen
+    : ∀ (K : UQ) (B : InvAlg K) (a : K.O),
+      B.P.Separable → K.Small a
+        → ∃ N : ℕ, ∀ r : B.A, IsIntegral K.O r → (al K a ^ N) • r ∈ Algebra.adjoin K.O {B.g} := by
   intro K B a hP ha
   obtain ⟨m, hm⟩ := Sandwich.integral_sub B hP a ha.2.1 _ (span_adjoin_gen_eq_top B hP)
   refine ⟨m, fun r hr => ?_⟩

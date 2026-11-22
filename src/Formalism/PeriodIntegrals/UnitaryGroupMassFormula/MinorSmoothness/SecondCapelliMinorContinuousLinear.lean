@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.Q.TPresMain
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.QuantumDeterminants.GBasic Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Q.TPresLie
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.QuantumDeterminants.GBasic
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Q.TPresLie
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -58,7 +59,8 @@ lemma yv_sg (z : Fin (2 * r + k + 1) → ℂ) (j : Fin (mdim k r i)) :
 
 section Ops
 
-variable {E E' : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup E'] [NormedSpace ℂ E']
+variable
+  {E E' : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAddCommGroup E'] [NormedSpace ℂ E']
 
 lemma chatL_smooth (hD : IsOpen D) (u : ℂ) (a β : Mx k r → Fin (mdim k r i) → ℂ)
     (ha : ∀ j, SmoothG k r i (fun g => a g j)) (hβ : ∀ j, SmoothG k r i (fun g => β g j))
@@ -183,34 +185,45 @@ theorem qnTPres_of (hT : TInvariant) : TPreservesFF := by
   have hD : IsOpen D := hDom.1
   refine ⟨tl_smooth hD z z' Y p q J hs, ?_, ?_, ?_⟩
   · intro g hg n hn
-    have e := hT (Wq →L[ℂ] Wp) k r z z' i D J Y p q hz hz' hDom hs (1 * n) (mul_mem_Slev_of_mem_UWset_of_mem_Nlev (one_mem_UW z) hn)
-      (1 * 1) (mul_mem_Slev_of_mem_UWset_of_mem_Nlev (one_mem_UW z') one_mem_Nlev) g hg
+    have e :=
+      hT (Wq →L[ℂ] Wp) k r z z' i D J Y p q hz hz' hDom hs (1 * n)
+        (mul_mem_Slev_of_mem_UWset_of_mem_Nlev (one_mem_UW z) hn) (1 * 1)
+        (mul_mem_Slev_of_mem_UWset_of_mem_Nlev (one_mem_UW z') one_mem_Nlev) g hg
     simp only [one_mul, mul_one] at e
-    have hloc : ∀ x ∈ Glev k r i ∩ D,
-        J (n * x) = (psi k r z cStd n • ContinuousLinearMap.id ℂ (Wq →L[ℂ] Wp)) (J x) := by
+    have hloc
+        : ∀ x ∈ Glev k r i ∩ D,
+          J (n * x) = (psi k r z cStd n • ContinuousLinearMap.id ℂ (Wq →L[ℂ] Wp)) (J x) := by
       intro x hx
       rw [ContinuousLinearMap.smul_apply, ContinuousLinearMap.id_apply]
       exact hL x hx n hn
     rw [← e, tl_local hD z z' Y p q _ _ hloc g hg, tl_clm hD z z' Y p q _ J hs g hg,
       ContinuousLinearMap.smul_apply, ContinuousLinearMap.id_apply]
   · intro g hg n hn
-    have e := hT (Wq →L[ℂ] Wp) k r z z' i D J Y p q hz hz' hDom hs (1 * 1) (mul_mem_Slev_of_mem_UWset_of_mem_Nlev (one_mem_UW z) one_mem_Nlev)
-      (1 * n) (mul_mem_Slev_of_mem_UWset_of_mem_Nlev (one_mem_UW z') hn) g hg
+    have e :=
+      hT (Wq →L[ℂ] Wp) k r z z' i D J Y p q hz hz' hDom hs (1 * 1)
+        (mul_mem_Slev_of_mem_UWset_of_mem_Nlev (one_mem_UW z) one_mem_Nlev) (1 * n)
+        (mul_mem_Slev_of_mem_UWset_of_mem_Nlev (one_mem_UW z') hn) g hg
     simp only [one_mul, mul_one] at e
-    have hloc : ∀ x ∈ Glev k r i ∩ D,
-        J (x * n) = (psi k r z' cStd n • ContinuousLinearMap.id ℂ (Wq →L[ℂ] Wp)) (J x) := by
+    have hloc
+        : ∀ x ∈ Glev k r i ∩ D,
+          J (x * n) = (psi k r z' cStd n • ContinuousLinearMap.id ℂ (Wq →L[ℂ] Wp)) (J x) := by
       intro x hx
       rw [ContinuousLinearMap.smul_apply, ContinuousLinearMap.id_apply]
       exact hR x hx n hn
     rw [← e, tl_local hD z z' Y p q _ _ hloc g hg, tl_clm hD z z' Y p q _ J hs g hg,
       ContinuousLinearMap.smul_apply, ContinuousLinearMap.id_apply]
   · intro g hg h hh h' hh'
-    have e := hT (Wq →L[ℂ] Wp) k r z z' i D J Y p q hz hz' hDom hs (h * 1) (mul_mem_Slev_of_mem_UWset_of_mem_Nlev hh one_mem_Nlev)
-      (h' * 1) (mul_mem_Slev_of_mem_UWset_of_mem_Nlev hh' one_mem_Nlev) g hg
+    have e :=
+      hT (Wq →L[ℂ] Wp) k r z z' i D J Y p q hz hz' hDom hs (h * 1)
+        (mul_mem_Slev_of_mem_UWset_of_mem_Nlev hh one_mem_Nlev) (h' * 1)
+        (mul_mem_Slev_of_mem_UWset_of_mem_Nlev hh' one_mem_Nlev) g hg
     simp only [mul_one] at e
-    obtain ⟨L, hLx⟩ : ∃ L : (Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp), ∀ A, L A = (π h).comp (A.comp (π' h')) :=
-      ⟨(ContinuousLinearMap.compL ℂ Wq Wp Wp (π h)).comp ((ContinuousLinearMap.compL ℂ Wq Wq Wp).flip (π' h')),
-        fun A => by simp⟩
+    obtain ⟨L, hLx⟩
+        : ∃ L : (Wq →L[ℂ] Wp) →L[ℂ] (Wq →L[ℂ] Wp), ∀ A, L A = (π h).comp (A.comp (π' h')) := ⟨
+      (ContinuousLinearMap.compL ℂ Wq Wp Wp (π h)).comp
+        ((ContinuousLinearMap.compL ℂ Wq Wq Wp).flip (π' h')),
+      fun A => by simp
+    ⟩
     have hloc : ∀ x ∈ Glev k r i ∩ D, J (h * x * h') = L (J x) := by
       intro x hx
       rw [hLx]

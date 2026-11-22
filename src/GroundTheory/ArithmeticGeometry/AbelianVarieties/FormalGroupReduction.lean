@@ -22,8 +22,8 @@ theorem isUnit_of_residue_ne_zero {a : 𝒪} (h : residue 𝒪 a ≠ 0) : IsUnit
 theorem residue_eq_zero_of_mem {a : 𝒪} (h : a ∈ maximalIdeal 𝒪) : residue 𝒪 a = 0 :=
   (residue_eq_zero_iff a).2 h
 
-theorem one_notMem_maximalIdeal : (1 : 𝒪) ∉ maximalIdeal 𝒪 :=
-  fun h => (maximalIdeal.isMaximal 𝒪).ne_top ((Ideal.eq_top_iff_one _).2 h)
+theorem one_notMem_maximalIdeal : (1 : 𝒪) ∉ maximalIdeal 𝒪 := fun h =>
+  (maximalIdeal.isMaximal 𝒪).ne_top ((Ideal.eq_top_iff_one _).2 h)
 
 end Residue
 
@@ -35,8 +35,8 @@ abbrev curveRed : WeierstrassCurve.Affine (ResidueField 𝒪) := (W.map (residue
 
 section Integral
 
-theorem exists_inv_mem_of_notMem_range {X : K} (hX : X ∉ Set.range (algebraMap 𝒪 K)) :
-    ∃ t ∈ maximalIdeal 𝒪, algebraMap 𝒪 K t = X⁻¹ := by
+theorem exists_inv_mem_of_notMem_range {X : K} (hX : X ∉ Set.range (algebraMap 𝒪 K))
+    : ∃ t ∈ maximalIdeal 𝒪, algebraMap 𝒪 K t = X⁻¹ := by
   obtain ⟨t, ht⟩ : ∃ t, algebraMap 𝒪 K t = X⁻¹ := by
     rcases ValuationRing.isInteger_or_isInteger 𝒪 X with h | h
     · exact absurd h hX
@@ -45,19 +45,22 @@ theorem exists_inv_mem_of_notMem_range {X : K} (hX : X ∉ Set.range (algebraMap
   rw [← inv_inv X, ← ht]
   exact eq_inv_of_mul_eq_one_left (by rw [← map_mul, hu.val_inv_mul, map_one])
 
-theorem exists_y_of_equation {x : 𝒪} {Y : K}
-    (h : (W.map (algebraMap 𝒪 K)).toAffine.Equation (algebraMap 𝒪 K x) Y) :
-    ∃ y, algebraMap 𝒪 K y = Y := by
+theorem exists_y_of_equation
+    {x : 𝒪} {Y : K} (h : (W.map (algebraMap 𝒪 K)).toAffine.Equation (algebraMap 𝒪 K x) Y)
+    : ∃ y, algebraMap 𝒪 K y = Y := by
   by_contra hY
   have hY' : Y ∉ Set.range (algebraMap 𝒪 K) := fun ⟨y, hy⟩ => hY ⟨y, hy⟩
   obtain ⟨t, ht, htY⟩ := exists_inv_mem_of_notMem_range K hY'
   have hY0 : Y ≠ 0 := fun h0 => hY ⟨0, by rw [h0, map_zero]⟩
   rw [WeierstrassCurve.Affine.equation_iff] at h
-  have key : algebraMap 𝒪 K (1 + (W.a₁ * x + W.a₃) * t - (x ^ 3 + W.a₂ * x ^ 2 + W.a₄ * x + W.a₆) *
-      t ^ 2) = 0 := by
+  have key
+      : algebraMap 𝒪 K
+          (1 + (W.a₁ * x + W.a₃) * t - (x ^ 3 + W.a₂ * x ^ 2 + W.a₄ * x + W.a₆) * t ^ 2)
+        = 0 := by
     simp only [map_sub, map_add (f := _), map_mul, map_pow, map_one, htY]
     simp only [WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂, WeierstrassCurve.map_a₃,
-      WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆] at h
+        WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆]
+      at h
     field_simp
     linear_combination h
   have k2 := (map_eq_zero_iff _ (IsFractionRing.injective 𝒪 K)).1 key
@@ -69,15 +72,15 @@ theorem exists_y_of_equation {x : 𝒪} {Y : K}
     (Ideal.mul_mem_left _ _ ht)
 
 omit [IsDomain 𝒪] [IsDiscreteValuationRing 𝒪] in
-theorem equation_of_map {x y : 𝒪}
-    (h : (W.map (algebraMap 𝒪 K)).toAffine.Equation (algebraMap 𝒪 K x) (algebraMap 𝒪 K y)) :
-    W.toAffine.Equation x y := by
+theorem equation_of_map
+    {x y : 𝒪} (h : (W.map (algebraMap 𝒪 K)).toAffine.Equation (algebraMap 𝒪 K x) (algebraMap 𝒪 K y))
+    : W.toAffine.Equation x y := by
   rw [WeierstrassCurve.Affine.equation_iff] at h ⊢
   apply IsFractionRing.injective 𝒪 K
   simpa using h
 
-theorem equation_residue {x y : 𝒪} (h : W.toAffine.Equation x y) :
-    (W.map (residue 𝒪)).toAffine.Equation (residue 𝒪 x) (residue 𝒪 y) := by
+theorem equation_residue {x y : 𝒪} (h : W.toAffine.Equation x y)
+    : (W.map (residue 𝒪)).toAffine.Equation (residue 𝒪 x) (residue 𝒪 y) := by
   rw [WeierstrassCurve.Affine.equation_iff] at h ⊢
   simpa using congrArg (residue 𝒪) h
 
@@ -91,33 +94,37 @@ local notation "ι" => algebraMap 𝒪 K
 local notation "ρ" => residue 𝒪
 
 omit [IsFractionRing 𝒪 K] in
-theorem add_some_integral {x₁ y₁ x₂ y₂ ℓ : 𝒪} (h₁ : (curveK K W).Nonsingular (ι x₁) (ι y₁))
-    (h₂ : (curveK K W).Nonsingular (ι x₂) (ι y₂)) (n₁ : (curveRed W).Nonsingular (ρ x₁) (ρ y₁))
-    (n₂ : (curveRed W).Nonsingular (ρ x₂) (ρ y₂))
+theorem add_some_integral
+    {x₁ y₁ x₂ y₂ ℓ : 𝒪}
+    (h₁ : (curveK K W).Nonsingular (ι x₁) (ι y₁)) (h₂ : (curveK K W).Nonsingular (ι x₂) (ι y₂))
+    (n₁ : (curveRed W).Nonsingular (ρ x₁) (ρ y₁)) (n₂ : (curveRed W).Nonsingular (ρ x₂) (ρ y₂))
     (hxy : ¬(ι x₁ = ι x₂ ∧ ι y₁ = (curveK K W).negY (ι x₂) (ι y₂)))
     (hxy' : ¬(ρ x₁ = ρ x₂ ∧ ρ y₁ = (curveRed W).negY (ρ x₂) (ρ y₂)))
     (hs : (curveK K W).slope (ι x₁) (ι x₂) (ι y₁) (ι y₂) = ι ℓ)
-    (hs' : (curveRed W).slope (ρ x₁) (ρ x₂) (ρ y₁) (ρ y₂) = ρ ℓ) :
-    ∃ (h₃ : (curveK K W).Nonsingular (ι (W.toAffine.addX x₁ x₂ ℓ)) (ι (W.toAffine.addY x₁ x₂ y₁ ℓ)))
-      (n₃ : (curveRed W).Nonsingular (ρ (W.toAffine.addX x₁ x₂ ℓ))
-        (ρ (W.toAffine.addY x₁ x₂ y₁ ℓ))),
-      WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂ =
-        WeierstrassCurve.Affine.Point.some _ _ h₃ ∧
-      WeierstrassCurve.Affine.Point.some _ _ n₁ + WeierstrassCurve.Affine.Point.some _ _ n₂ =
-        WeierstrassCurve.Affine.Point.some _ _ n₃ := by
-  have hX : (curveK K W).addX (ι x₁) (ι x₂) ((curveK K W).slope (ι x₁) (ι x₂) (ι y₁) (ι y₂)) =
-      ι (W.toAffine.addX x₁ x₂ ℓ) := by
+    (hs' : (curveRed W).slope (ρ x₁) (ρ x₂) (ρ y₁) (ρ y₂) = ρ ℓ)
+    : ∃ (h₃
+        : (curveK K W).Nonsingular (ι (W.toAffine.addX x₁ x₂ ℓ)) (ι (W.toAffine.addY x₁ x₂ y₁ ℓ)))
+        (n₃ : (curveRed W).Nonsingular (ρ (W.toAffine.addX x₁ x₂ ℓ))
+          (ρ (W.toAffine.addY x₁ x₂ y₁ ℓ))),
+      WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂
+          = WeierstrassCurve.Affine.Point.some _ _ h₃
+        ∧ WeierstrassCurve.Affine.Point.some _ _ n₁ + WeierstrassCurve.Affine.Point.some _ _ n₂
+          = WeierstrassCurve.Affine.Point.some _ _ n₃ := by
+  have hX
+      : (curveK K W).addX (ι x₁) (ι x₂) ((curveK K W).slope (ι x₁) (ι x₂) (ι y₁) (ι y₂))
+        = ι (W.toAffine.addX x₁ x₂ ℓ) := by
     rw [hs]; exact WeierstrassCurve.Affine.map_addX _ _ _ _
-  have hY : (curveK K W).addY (ι x₁) (ι x₂) (ι y₁)
-      ((curveK K W).slope (ι x₁) (ι x₂) (ι y₁) (ι y₂)) =
-      ι (W.toAffine.addY x₁ x₂ y₁ ℓ) := by
+  have hY
+      : (curveK K W).addY (ι x₁) (ι x₂) (ι y₁) ((curveK K W).slope (ι x₁) (ι x₂) (ι y₁) (ι y₂))
+        = ι (W.toAffine.addY x₁ x₂ y₁ ℓ) := by
     rw [hs]; exact WeierstrassCurve.Affine.map_addY _ _ _ _ _
-  have hX' : (curveRed W).addX (ρ x₁) (ρ x₂) ((curveRed W).slope (ρ x₁) (ρ x₂) (ρ y₁) (ρ y₂)) =
-      ρ (W.toAffine.addX x₁ x₂ ℓ) := by
+  have hX'
+      : (curveRed W).addX (ρ x₁) (ρ x₂) ((curveRed W).slope (ρ x₁) (ρ x₂) (ρ y₁) (ρ y₂))
+        = ρ (W.toAffine.addX x₁ x₂ ℓ) := by
     rw [hs']; exact WeierstrassCurve.Affine.map_addX _ _ _ _
-  have hY' : (curveRed W).addY (ρ x₁) (ρ x₂) (ρ y₁)
-      ((curveRed W).slope (ρ x₁) (ρ x₂) (ρ y₁) (ρ y₂)) =
-      ρ (W.toAffine.addY x₁ x₂ y₁ ℓ) := by
+  have hY'
+      : (curveRed W).addY (ρ x₁) (ρ x₂) (ρ y₁) ((curveRed W).slope (ρ x₁) (ρ x₂) (ρ y₁) (ρ y₂))
+        = ρ (W.toAffine.addY x₁ x₂ y₁ ℓ) := by
     rw [hs']; exact WeierstrassCurve.Affine.map_addY _ _ _ _ _
   have h₃ := WeierstrassCurve.Affine.nonsingular_add h₁ h₂ hxy
   rw [hX, hY] at h₃
@@ -129,45 +136,52 @@ theorem add_some_integral {x₁ y₁ x₂ y₂ ℓ : 𝒪} (h₁ : (curveK K W).
   · rw [WeierstrassCurve.Affine.Point.add_some hxy', WeierstrassCurve.Affine.Point.some.injEq]
     exact ⟨hX', hY'⟩
 
-theorem add_of_residue_X_ne {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Nonsingular (ι x₁) (ι y₁))
+theorem add_of_residue_X_ne
+    {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Nonsingular (ι x₁) (ι y₁))
     (h₂ : (curveK K W).Nonsingular (ι x₂) (ι y₂)) (n₁ : (curveRed W).Nonsingular (ρ x₁) (ρ y₁))
-    (n₂ : (curveRed W).Nonsingular (ρ x₂) (ρ y₂)) (hx : ρ x₁ ≠ ρ x₂) :
-    ∃ (x₃ y₃ : 𝒪) (h₃ : (curveK K W).Nonsingular (ι x₃) (ι y₃))
-      (n₃ : (curveRed W).Nonsingular (ρ x₃) (ρ y₃)),
-      WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂ =
-        WeierstrassCurve.Affine.Point.some _ _ h₃ ∧
-      WeierstrassCurve.Affine.Point.some _ _ n₁ + WeierstrassCurve.Affine.Point.some _ _ n₂ =
-        WeierstrassCurve.Affine.Point.some _ _ n₃ := by
+    (n₂ : (curveRed W).Nonsingular (ρ x₂) (ρ y₂)) (hx : ρ x₁ ≠ ρ x₂)
+    : ∃ (x₃ y₃ : 𝒪) (h₃ : (curveK K W).Nonsingular (ι x₃) (ι y₃))
+        (n₃ : (curveRed W).Nonsingular (ρ x₃) (ρ y₃)),
+      WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂
+          = WeierstrassCurve.Affine.Point.some _ _ h₃
+        ∧ WeierstrassCurve.Affine.Point.some _ _ n₁ + WeierstrassCurve.Affine.Point.some _ _ n₂
+          = WeierstrassCurve.Affine.Point.some _ _ n₃ := by
   have hu : IsUnit (x₁ - x₂) := isUnit_of_residue_ne_zero (by rw [map_sub]; exact sub_ne_zero.2 hx)
   set ℓ := (y₁ - y₂) * ↑hu.unit⁻¹ with hℓdef
   have hℓ : ℓ * (x₁ - x₂) = y₁ - y₂ := by rw [hℓdef, mul_assoc, hu.val_inv_mul, mul_one]
   have hxK : ι x₁ ≠ ι x₂ := fun h => hx (by rw [IsFractionRing.injective 𝒪 K h])
-  obtain ⟨h₃, n₃, e, e'⟩ := add_some_integral K W h₁ h₂ n₁ n₂ (fun h => hxK h.1) (fun h => hx h.1)
-    (by
-      rw [WeierstrassCurve.Affine.slope_of_X_ne hxK, div_eq_iff (sub_ne_zero.2 hxK), ← map_sub,
-        ← map_sub, ← map_mul, hℓ])
-    (by
-      rw [WeierstrassCurve.Affine.slope_of_X_ne hx, div_eq_iff (sub_ne_zero.2 hx), ← map_sub,
-        ← map_sub, ← map_mul, hℓ])
+  obtain ⟨h₃, n₃, e, e'⟩ :=
+    add_some_integral K W h₁ h₂ n₁ n₂
+      (fun h => hxK h.1)
+      (fun h => hx h.1)
+      (by
+        rw [WeierstrassCurve.Affine.slope_of_X_ne hxK, div_eq_iff (sub_ne_zero.2 hxK), ← map_sub,
+          ← map_sub, ← map_mul, hℓ])
+      (by
+        rw [WeierstrassCurve.Affine.slope_of_X_ne hx, div_eq_iff (sub_ne_zero.2 hx), ← map_sub,
+          ← map_sub, ← map_mul, hℓ])
   exact ⟨_, _, h₃, n₃, e, e'⟩
 
-theorem slope_identity {A : Type*} [CommRing A] (V : WeierstrassCurve A) {x₁ y₁ x₂ y₂ : A}
-    (e₁ : V.toAffine.Equation x₁ y₁) (e₂ : V.toAffine.Equation x₂ y₂) :
-    (y₁ - y₂) * (y₁ + y₂ + V.a₁ * x₁ + V.a₃) =
-      (x₁ - x₂) * (x₁ ^ 2 + x₁ * x₂ + x₂ ^ 2 + V.a₂ * (x₁ + x₂) + V.a₄ - V.a₁ * y₂) := by
+theorem slope_identity
+    {A : Type*} [CommRing A]
+    (V : WeierstrassCurve A)
+    {x₁ y₁ x₂ y₂ : A} (e₁ : V.toAffine.Equation x₁ y₁) (e₂ : V.toAffine.Equation x₂ y₂)
+    : (y₁ - y₂) * (y₁ + y₂ + V.a₁ * x₁ + V.a₃)
+      = (x₁ - x₂) * (x₁ ^ 2 + x₁ * x₂ + x₂ ^ 2 + V.a₂ * (x₁ + x₂) + V.a₄ - V.a₁ * y₂) := by
   rw [WeierstrassCurve.Affine.equation_iff] at e₁ e₂
   linear_combination e₁ - e₂
 
-theorem add_of_residue_eq {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Nonsingular (ι x₁) (ι y₁))
-    (h₂ : (curveK K W).Nonsingular (ι x₂) (ι y₂)) (n₁ : (curveRed W).Nonsingular (ρ x₁) (ρ y₁))
-    (n₂ : (curveRed W).Nonsingular (ρ x₂) (ρ y₂)) (hx : ρ x₁ = ρ x₂) (hy : ρ y₁ = ρ y₂)
-    (hD : ρ (y₁ + y₂ + W.a₁ * x₁ + W.a₃) ≠ 0) :
-    ∃ (x₃ y₃ : 𝒪) (h₃ : (curveK K W).Nonsingular (ι x₃) (ι y₃))
-      (n₃ : (curveRed W).Nonsingular (ρ x₃) (ρ y₃)),
-      WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂ =
-        WeierstrassCurve.Affine.Point.some _ _ h₃ ∧
-      WeierstrassCurve.Affine.Point.some _ _ n₁ + WeierstrassCurve.Affine.Point.some _ _ n₂ =
-        WeierstrassCurve.Affine.Point.some _ _ n₃ := by
+theorem add_of_residue_eq
+    {x₁ y₁ x₂ y₂ : 𝒪}
+    (h₁ : (curveK K W).Nonsingular (ι x₁) (ι y₁)) (h₂ : (curveK K W).Nonsingular (ι x₂) (ι y₂))
+    (n₁ : (curveRed W).Nonsingular (ρ x₁) (ρ y₁)) (n₂ : (curveRed W).Nonsingular (ρ x₂) (ρ y₂))
+    (hx : ρ x₁ = ρ x₂) (hy : ρ y₁ = ρ y₂) (hD : ρ (y₁ + y₂ + W.a₁ * x₁ + W.a₃) ≠ 0)
+    : ∃ (x₃ y₃ : 𝒪) (h₃ : (curveK K W).Nonsingular (ι x₃) (ι y₃))
+        (n₃ : (curveRed W).Nonsingular (ρ x₃) (ρ y₃)),
+      WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂
+          = WeierstrassCurve.Affine.Point.some _ _ h₃
+        ∧ WeierstrassCurve.Affine.Point.some _ _ n₁ + WeierstrassCurve.Affine.Point.some _ _ n₂
+          = WeierstrassCurve.Affine.Point.some _ _ n₃ := by
   have hι := IsFractionRing.injective 𝒪 K
   set D := y₁ + y₂ + W.a₁ * x₁ + W.a₃ with hDdef
   set N := x₁ ^ 2 + x₁ * x₂ + x₂ ^ 2 + W.a₂ * (x₁ + x₂) + W.a₄ - W.a₁ * y₂ with hNdef
@@ -182,8 +196,7 @@ theorem add_of_residue_eq {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Nons
     rintro ⟨h1, h2⟩
     apply hDK
     rw [WeierstrassCurve.Affine.map_negY] at h2
-    have hD0 : D = 0 := by
-      rw [hDdef, hι h2, hι h1]; simp only [WeierstrassCurve.Affine.negY]; ring
+    have hD0 : D = 0 := by rw [hDdef, hι h2, hι h1]; simp only [WeierstrassCurve.Affine.negY]; ring
     rw [hD0, map_zero]
   have hxy' : ¬(ρ x₁ = ρ x₂ ∧ ρ y₁ = (curveRed W).negY (ρ x₂) (ρ y₂)) := by
     rintro ⟨h1, h2⟩
@@ -218,8 +231,8 @@ theorem add_of_residue_eq {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Nons
     have hyk : ρ y₁ ≠ (curveRed W).negY (ρ x₂) (ρ y₂) := fun h => hxy' ⟨hx, h⟩
     rw [WeierstrassCurve.Affine.slope_of_Y_ne hx hyk]
     have hne : ρ y₁ - (curveRed W).negY (ρ x₁) (ρ y₁) = ρ D := by
-      simp only [WeierstrassCurve.Affine.negY, hDdef, map_add (f := _), map_mul, WeierstrassCurve.map_a₁,
-        WeierstrassCurve.map_a₃, hy]
+      simp only [WeierstrassCurve.Affine.negY, hDdef, map_add (f := _), map_mul,
+        WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₃, hy]
       ring
     rw [hne, eq_comm, eq_div_iff hD, ← map_mul, hℓ, hNdef]
     simp only [map_sub, map_add (f := _), map_mul, map_pow, WeierstrassCurve.map_a₁,
@@ -228,15 +241,14 @@ theorem add_of_residue_eq {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Nons
   obtain ⟨h₃, n₃, e, e'⟩ := add_some_integral K W h₁ h₂ n₁ n₂ hxy hxy' hs hs'
   exact ⟨_, _, h₃, n₃, e, e'⟩
 
-
 omit [DecidableEq K] [DecidableEq (ResidueField 𝒪)] in
-theorem addX_notMem_range {x₁ x₂ s : 𝒪} (hs : s ∈ maximalIdeal 𝒪) (hs0 : s ≠ 0) :
-    (curveK K W).addX (ι x₁) (ι x₂) (ι s)⁻¹ ∉ Set.range ι := by
+theorem addX_notMem_range {x₁ x₂ s : 𝒪} (hs : s ∈ maximalIdeal 𝒪) (hs0 : s ≠ 0)
+    : (curveK K W).addX (ι x₁) (ι x₂) (ι s)⁻¹ ∉ Set.range ι := by
   rintro ⟨r, hr⟩
   have hs0' : ι s ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective 𝒪 K)).2 hs0
   have key : ι (s ^ 2 * r - (1 + W.a₁ * s - (W.a₂ + x₁ + x₂) * s ^ 2)) = 0 := by
-    simp only [map_sub, map_add (f := _), map_mul, map_pow, map_one, hr, WeierstrassCurve.Affine.addX,
-      WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂]
+    simp only [map_sub, map_add (f := _), map_mul, map_pow, map_one, hr,
+      WeierstrassCurve.Affine.addX, WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂]
     field_simp
     ring
   have k2 := sub_eq_zero.1 ((map_eq_zero_iff _ (IsFractionRing.injective 𝒪 K)).1 key)
@@ -249,13 +261,14 @@ theorem addX_notMem_range {x₁ x₂ s : 𝒪} (hs : s ∈ maximalIdeal 𝒪) (h
   · exact Ideal.pow_mem_of_mem _ hs _ (by norm_num)
 
 omit [DecidableEq K] [DecidableEq (ResidueField 𝒪)] in
-theorem nonsingular_residue_iff {x y : 𝒪} (n : (curveRed W).Nonsingular (ρ x) (ρ y)) :
-    ρ (W.a₁ * y - (3 * x ^ 2 + 2 * W.a₂ * x + W.a₄)) ≠ 0 ∨ ρ (2 * y + W.a₁ * x + W.a₃) ≠ 0 := by
+theorem nonsingular_residue_iff {x y : 𝒪} (n : (curveRed W).Nonsingular (ρ x) (ρ y))
+    : ρ (W.a₁ * y - (3 * x ^ 2 + 2 * W.a₂ * x + W.a₄)) ≠ 0 ∨ ρ (2 * y + W.a₁ * x + W.a₃) ≠ 0 := by
   rw [WeierstrassCurve.Affine.nonsingular_iff'] at n
   have h3 : ρ (3 : 𝒪) = 3 := map_ofNat ρ 3
   have h2 : ρ (2 : 𝒪) = 2 := map_ofNat ρ 2
-  have e1 : ρ (W.a₁ * y - (3 * x ^ 2 + 2 * W.a₂ * x + W.a₄)) = (W.map ρ).a₁ * ρ y -
-      (3 * ρ x ^ 2 + 2 * (W.map ρ).a₂ * ρ x + (W.map ρ).a₄) := by
+  have e1
+      : ρ (W.a₁ * y - (3 * x ^ 2 + 2 * W.a₂ * x + W.a₄))
+        = (W.map ρ).a₁ * ρ y - (3 * ρ x ^ 2 + 2 * (W.map ρ).a₂ * ρ x + (W.map ρ).a₄) := by
     simp only [map_sub, map_add (f := _), map_mul, map_pow, h3, h2, WeierstrassCurve.map_a₁,
       WeierstrassCurve.map_a₂, WeierstrassCurve.map_a₄]
   have e2 : ρ (2 * y + W.a₁ * x + W.a₃) = 2 * ρ y + (W.map ρ).a₁ * ρ x + (W.map ρ).a₃ := by
@@ -263,28 +276,29 @@ theorem nonsingular_residue_iff {x y : 𝒪} (n : (curveRed W).Nonsingular (ρ x
   rw [e1, e2]
   exact n.2
 
-theorem add_of_residue_neg {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Nonsingular (ι x₁) (ι y₁))
-    (h₂ : (curveK K W).Nonsingular (ι x₂) (ι y₂)) (n₁ : (curveRed W).Nonsingular (ρ x₁) (ρ y₁))
-    (n₂ : (curveRed W).Nonsingular (ρ x₂) (ρ y₂)) (hx : ρ x₁ = ρ x₂)
-    (hy : ρ y₁ = (curveRed W).negY (ρ x₂) (ρ y₂)) :
-    WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂ = 0 ∨
-      ∃ (X Y : K) (h : (curveK K W).Nonsingular X Y),
-        WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂ =
-          WeierstrassCurve.Affine.Point.some _ _ h ∧ X ∉ Set.range ι := by
+theorem add_of_residue_neg
+    {x₁ y₁ x₂ y₂ : 𝒪}
+    (h₁ : (curveK K W).Nonsingular (ι x₁) (ι y₁)) (h₂ : (curveK K W).Nonsingular (ι x₂) (ι y₂))
+    (n₁ : (curveRed W).Nonsingular (ρ x₁) (ρ y₁)) (n₂ : (curveRed W).Nonsingular (ρ x₂) (ρ y₂))
+    (hx : ρ x₁ = ρ x₂) (hy : ρ y₁ = (curveRed W).negY (ρ x₂) (ρ y₂))
+    : WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂ = 0
+      ∨ ∃ (X Y : K) (h : (curveK K W).Nonsingular X Y),
+        WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂
+            = WeierstrassCurve.Affine.Point.some _ _ h
+          ∧ X ∉ Set.range ι := by
   have hι := IsFractionRing.injective 𝒪 K
   by_cases hxy : ι x₁ = ι x₂ ∧ ι y₁ = (curveK K W).negY (ι x₂) (ι y₂)
   · exact Or.inl (WeierstrassCurve.Affine.Point.add_of_Y_eq hxy.1 hxy.2)
   right
-  have hxm : x₁ - x₂ ∈ maximalIdeal 𝒪 := by
-    rw [← residue_eq_zero_iff, map_sub, hx, sub_self]
+  have hxm : x₁ - x₂ ∈ maximalIdeal 𝒪 := by rw [← residue_eq_zero_iff, map_sub, hx, sub_self]
   have e₁ := equation_of_map K W h₁.1
   have e₂ := equation_of_map K W h₂.1
   have hneg : ρ y₂ - (curveRed W).negY (ρ x₂) (ρ y₂) = ρ (2 * y₂ + W.a₁ * x₂ + W.a₃) := by
-    simp only [WeierstrassCurve.Affine.negY, map_add (f := _), map_mul, map_ofNat, WeierstrassCurve.map_a₁,
-      WeierstrassCurve.map_a₃]
+    simp only [WeierstrassCurve.Affine.negY, map_add (f := _), map_mul, map_ofNat,
+      WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₃]
     ring
-  obtain ⟨s, hs, hs0, hsl⟩ : ∃ s ∈ maximalIdeal 𝒪, s ≠ 0 ∧
-      (curveK K W).slope (ι x₁) (ι x₂) (ι y₁) (ι y₂) = (ι s)⁻¹ := by
+  obtain ⟨s, hs, hs0, hsl⟩
+      : ∃ s ∈ maximalIdeal 𝒪, s ≠ 0 ∧ (curveK K W).slope (ι x₁) (ι x₂) (ι y₁) (ι y₂) = (ι s)⁻¹ := by
     by_cases hxK : ι x₁ = ι x₂
     · have hx' := hι hxK
       have hyK : ι y₁ ≠ (curveK K W).negY (ι x₂) (ι y₂) := fun h => hxy ⟨hxK, h⟩
@@ -293,31 +307,32 @@ theorem add_of_residue_neg {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Non
         subst hx' hy''
         set D := 2 * y₁ + W.a₁ * x₁ + W.a₃ with hD
         set N := 3 * x₁ ^ 2 + 2 * W.a₂ * x₁ + W.a₄ - W.a₁ * y₁ with hN
-        have hDm : D ∈ maximalIdeal 𝒪 := by
-          rw [← residue_eq_zero_iff, ← hneg, ← hy, sub_self]
+        have hDm : D ∈ maximalIdeal 𝒪 := by rw [← residue_eq_zero_iff, ← hneg, ← hy, sub_self]
         have hNu : IsUnit N := by
           refine isUnit_of_residue_ne_zero ?_
           rcases nonsingular_residue_iff W n₁ with h | h
-          · intro h0; apply h
-            rw [show W.a₁ * y₁ - (3 * x₁ ^ 2 + 2 * W.a₂ * x₁ + W.a₄) = -N by rw [hN]; ring,
-              map_neg, h0, neg_zero]
+          · intro h0
+            apply h
+            rw [show W.a₁ * y₁ - (3 * x₁ ^ 2 + 2 * W.a₂ * x₁ + W.a₄) = -N by rw [hN]; ring, map_neg,
+              h0, neg_zero]
           · exact absurd ((residue_eq_zero_iff _).2 hDm) h
         have hDK : ι y₁ - (curveK K W).negY (ι x₁) (ι y₁) = ι D := by
           simp only [WeierstrassCurve.Affine.negY, hD, map_add (f := _), map_mul, map_ofNat,
             WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₃]
           ring
         have hD0 : D ≠ 0 := by
-          intro h0; apply hyK
+          intro h0
+          apply hyK
           rw [← sub_eq_zero, hDK, h0, map_zero]
-        refine ⟨D * ↑hNu.unit⁻¹, Ideal.mul_mem_right _ _ hDm,
-          mul_ne_zero hD0 (Units.ne_zero _), ?_⟩
+        refine ⟨D * ↑hNu.unit⁻¹, Ideal.mul_mem_right _ _ hDm, mul_ne_zero hD0 (Units.ne_zero _), ?_⟩
         rw [WeierstrassCurve.Affine.slope_of_Y_ne hxK hyK, hDK]
         have hN' : ι N * ι ↑hNu.unit⁻¹ = 1 := by rw [← map_mul, hNu.mul_val_inv, map_one]
-        have hnum : 3 * ι x₁ ^ 2 + 2 * (curveK K W).a₂ * ι x₁ + (curveK K W).a₄ -
-            (curveK K W).a₁ * ι y₁ = ι N := by
+        have hnum
+            : 3 * ι x₁ ^ 2 + 2 * (curveK K W).a₂ * ι x₁ + (curveK K W).a₄ - (curveK K W).a₁ * ι y₁
+              = ι N := by
           rw [hN]
-          simp only [map_sub, map_add (f := _), map_mul, map_pow, map_ofNat, WeierstrassCurve.map_a₁,
-            WeierstrassCurve.map_a₂, WeierstrassCurve.map_a₄]
+          simp only [map_sub, map_add (f := _), map_mul, map_pow, map_ofNat,
+            WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂, WeierstrassCurve.map_a₄]
         have hDK' : ι D ≠ 0 := (map_ne_zero_iff _ hι).2 hD0
         rw [hnum]
         refine eq_inv_of_mul_eq_one_left ?_
@@ -328,8 +343,7 @@ theorem add_of_residue_neg {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Non
     · have hx0 : x₁ - x₂ ≠ 0 := sub_ne_zero.2 (fun h => hxK (by rw [h]))
       have hsK : ι x₁ - ι x₂ ≠ 0 := sub_ne_zero.2 hxK
       by_cases hyr : ρ y₁ = ρ y₂
-      ·
-        set D := y₁ + y₂ + W.a₁ * x₁ + W.a₃ with hD
+      · set D := y₁ + y₂ + W.a₁ * x₁ + W.a₃ with hD
         set N := x₁ ^ 2 + x₁ * x₂ + x₂ ^ 2 + W.a₂ * (x₁ + x₂) + W.a₄ - W.a₁ * y₂ with hN
         have hid := slope_identity W e₁ e₂
         have hDm : D ∈ maximalIdeal 𝒪 := by
@@ -339,7 +353,7 @@ theorem add_of_residue_neg {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Non
           ring
         have hNu : IsUnit N := by
           refine isUnit_of_residue_ne_zero ?_
-          have hNr : ρ N = -ρ (W.a₁ * y₂ - (3 * x₂ ^ 2 + 2 * W.a₂ * x₂ + W.a₄)) := by
+          have hNr : ρ N = - ρ (W.a₁ * y₂ - (3 * x₂ ^ 2 + 2 * W.a₂ * x₂ + W.a₄)) := by
             rw [hN]
             simp only [map_sub, map_add (f := _), map_mul, map_pow, map_ofNat, hx]
             ring
@@ -353,8 +367,7 @@ theorem add_of_residue_neg {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Non
           intro h0
           rw [h0, mul_zero] at hid'
           exact hx0 ((mul_eq_zero.1 hid'.symm).resolve_right hNu.ne_zero)
-        refine ⟨D * ↑hNu.unit⁻¹, Ideal.mul_mem_right _ _ hDm,
-          mul_ne_zero hD0 (Units.ne_zero _), ?_⟩
+        refine ⟨D * ↑hNu.unit⁻¹, Ideal.mul_mem_right _ _ hDm, mul_ne_zero hD0 (Units.ne_zero _), ?_⟩
         rw [WeierstrassCurve.Affine.slope_of_X_ne hxK]
         have hN' : ι N * ι ↑hNu.unit⁻¹ = 1 := by rw [← map_mul, hNu.mul_val_inv, map_one]
         have hDK : ι D ≠ 0 := (map_ne_zero_iff _ hι).2 hD0
@@ -366,8 +379,12 @@ theorem add_of_residue_neg {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Non
         linear_combination (ι ↑hNu.unit⁻¹) * hidK + (ι x₁ - ι x₂) * hN'
       · have hyu : IsUnit (y₁ - y₂) :=
           isUnit_of_residue_ne_zero (by rw [map_sub]; exact sub_ne_zero.2 hyr)
-        refine ⟨(x₁ - x₂) * ↑hyu.unit⁻¹, Ideal.mul_mem_right _ _ hxm,
-          mul_ne_zero hx0 (Units.ne_zero _), ?_⟩
+        refine ⟨
+          (x₁ - x₂) * ↑hyu.unit⁻¹,
+          Ideal.mul_mem_right _ _ hxm,
+          mul_ne_zero hx0 (Units.ne_zero _),
+          ?_
+        ⟩
         rw [WeierstrassCurve.Affine.slope_of_X_ne hxK, ← map_sub, ← map_sub]
         have hy' : ι (y₁ - y₂) * ι ↑hyu.unit⁻¹ = 1 := by rw [← map_mul, hyu.mul_val_inv, map_one]
         have hxK' : ι (x₁ - x₂) ≠ 0 := by rw [map_sub]; exact hsK
@@ -375,58 +392,75 @@ theorem add_of_residue_neg {x₁ y₁ x₂ y₂ : 𝒪} (h₁ : (curveK K W).Non
         rw [map_mul]
         field_simp
         linear_combination hy'
-  refine ⟨_, _, WeierstrassCurve.Affine.nonsingular_add h₁ h₂ hxy,
-    WeierstrassCurve.Affine.Point.add_some hxy, ?_⟩
+  refine ⟨
+    _,
+    _,
+    WeierstrassCurve.Affine.nonsingular_add h₁ h₂ hxy,
+    WeierstrassCurve.Affine.Point.add_some hxy,
+    ?_
+  ⟩
   rw [hsl]
   exact addX_notMem_range K W hs hs0
 
 omit [DecidableEq (ResidueField 𝒪)] in
-theorem residue_vVal [IsAdicComplete (maximalIdeal 𝒪) 𝒪] {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪) :
-    ρ (vVal W z) = 1 := by
+theorem residue_vVal [IsAdicComplete (maximalIdeal 𝒪) 𝒪] {z : 𝒪} (hz : z ∈ maximalIdeal 𝒪)
+    : ρ (vVal W z) = 1 := by
   have h : vVal W z - 1 ∈ maximalIdeal 𝒪 := by
-    have := psEvalAt_mem (f := formalV W - 1) (by
-      rw [map_sub, map_one, show MvPowerSeries.constantCoeff (formalV W) = 1 from
-        constantCoeff_formalV W, sub_self]; exact zero_mem _) (a := fun _ : Unit => z) (fun _ => hz)
+    have :=
+      psEvalAt_mem (f := formalV W - 1)
+        (by
+          rw [map_sub, map_one,
+            show MvPowerSeries.constantCoeff (formalV W) = 1 from constantCoeff_formalV W, sub_self]
+          exact zero_mem _)
+        (a := fun _ : Unit => z)
+        (fun _ => hz)
     rwa [← evAlgHom_apply _ (fun _ => hz), map_sub, map_one, evAlgHom_apply] at this
   rw [← sub_eq_zero, ← map_one ρ, ← map_sub]
   exact (residue_eq_zero_iff _).2 h
 
-
 omit [DecidableEq (ResidueField 𝒪)] in
-theorem add_of_notMem_range [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map ι).IsElliptic]
-    {X₁ Y₁ : K} (h₁ : (curveK K W).Nonsingular X₁ Y₁) (hX : X₁ ∉ Set.range ι) {x₂ y₂ : 𝒪}
-    (h₂ : (curveK K W).Nonsingular (ι x₂) (ι y₂)) :
-    ∃ (x₃ y₃ : 𝒪) (h₃ : (curveK K W).Nonsingular (ι x₃) (ι y₃)),
-      WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂ =
-        WeierstrassCurve.Affine.Point.some _ _ h₃ ∧ ρ x₃ = ρ x₂ ∧ ρ y₃ = ρ y₂ := by
+theorem add_of_notMem_range
+    [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map ι).IsElliptic]
+    {X₁ Y₁ : K} (h₁ : (curveK K W).Nonsingular X₁ Y₁) (hX : X₁ ∉ Set.range ι)
+    {x₂ y₂ : 𝒪} (h₂ : (curveK K W).Nonsingular (ι x₂) (ι y₂))
+    : ∃ (x₃ y₃ : 𝒪) (h₃ : (curveK K W).Nonsingular (ι x₃) (ι y₃)),
+      WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂
+          = WeierstrassCurve.Affine.Point.some _ _ h₃
+        ∧ ρ x₃ = ρ x₂ ∧ ρ y₃ = ρ y₂ := by
   have hι := IsFractionRing.injective 𝒪 K
 
-  have hcoords : ∃ z ∈ maximalIdeal 𝒪, z ≠ 0 ∧
-      ι z / ι (wVal W z) = X₁ ∧ -1 / ι (wVal W z) = Y₁ := by
+  have hcoords
+      : ∃ z ∈ maximalIdeal 𝒪, z ≠ 0 ∧ ι z / ι (wVal W z) = X₁ ∧ -1 / ι (wVal W z) = Y₁ := by
     have hX0 : X₁ ≠ 0 := fun h => hX ⟨0, by rw [h, map_zero]⟩
     obtain ⟨t, htm, ht⟩ := exists_inv_mem_of_notMem_range K hX
     have hE := h₁.1
     rw [WeierstrassCurve.Affine.equation_iff] at hE
     have hU : Y₁ / X₁ ∉ Set.range ι := by
       rintro ⟨u, hu⟩
-      have key : ι (u ^ 2 * t + W.a₁ * u * t + W.a₃ * u * t ^ 2 -
-          (1 + W.a₂ * t + W.a₄ * t ^ 2 + W.a₆ * t ^ 3)) = 0 := by
+      have key
+          : ι
+              (u ^ 2 * t + W.a₁ * u * t + W.a₃ * u * t ^ 2
+                - (1 + W.a₂ * t + W.a₄ * t ^ 2 + W.a₆ * t ^ 3))
+            = 0 := by
         simp only [map_sub, map_add (f := _), map_mul, map_pow, map_one, hu, ht]
         simp only [WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂, WeierstrassCurve.map_a₃,
-          WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆] at hE
+            WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆]
+          at hE
         field_simp
         linear_combination hE
       have heq := hι (key.trans (map_zero ι).symm)
       apply one_notMem_maximalIdeal (𝒪 := 𝒪)
-      have h1 : (1 : 𝒪) = u ^ 2 * t + W.a₁ * u * t + W.a₃ * u * t ^ 2 -
-          (W.a₂ * t + W.a₄ * t ^ 2 + W.a₆ * t ^ 3) := by
+      have h1
+          : (1 : 𝒪)
+            = u ^ 2 * t + W.a₁ * u * t + W.a₃ * u * t ^ 2
+              - (W.a₂ * t + W.a₄ * t ^ 2 + W.a₆ * t ^ 3) := by
         linear_combination -heq
       rw [h1]
       refine Ideal.sub_mem _ (Ideal.add_mem _ (Ideal.add_mem _ ?_ ?_) ?_)
-        (Ideal.add_mem _ (Ideal.add_mem _ ?_ ?_) ?_) <;>
-        first
-        | exact Ideal.mul_mem_left _ _ htm
-        | exact Ideal.mul_mem_left _ _ (Ideal.pow_mem_of_mem _ htm _ (by norm_num))
+          (Ideal.add_mem _ (Ideal.add_mem _ ?_ ?_) ?_)
+        <;> first
+          | exact Ideal.mul_mem_left _ _ htm
+          | exact Ideal.mul_mem_left _ _ (Ideal.pow_mem_of_mem _ htm _ (by norm_num))
     have hY0 : Y₁ ≠ 0 := fun h => hU ⟨0, by rw [h, zero_div, map_zero]⟩
     obtain ⟨s, hsm, hs⟩ := exists_inv_mem_of_notMem_range K hU
     have hz : -s ∈ maximalIdeal 𝒪 := (Ideal.neg_mem_iff _).2 hsm
@@ -452,12 +486,14 @@ theorem add_of_notMem_range [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map ι
   have hvu : IsUnit v := isUnit_vVal W hzm
   have hwm : w ∈ maximalIdeal 𝒪 := wVal_mem W hzm
 
-  have heu : IsUnit (1 + y₂ * w) := isUnit_of_residue_ne_zero (by
-    rw [map_add (f := _), map_one, map_mul, residue_eq_zero_of_mem hwm, mul_zero, add_zero]
-    exact one_ne_zero)
-  have hdu : IsUnit (1 - x₂ * z' ^ 2 * v) := isUnit_of_residue_ne_zero (by
-    rw [map_sub, map_one, map_mul, map_mul, map_pow, residue_eq_zero_of_mem hzm]
-    simp)
+  have heu : IsUnit (1 + y₂ * w) :=
+    isUnit_of_residue_ne_zero (by
+      rw [map_add (f := _), map_one, map_mul, residue_eq_zero_of_mem hwm, mul_zero, add_zero]
+      exact one_ne_zero)
+  have hdu : IsUnit (1 - x₂ * z' ^ 2 * v) :=
+    isUnit_of_residue_ne_zero (by
+      rw [map_sub, map_one, map_mul, map_mul, map_pow, residue_eq_zero_of_mem hzm]
+      simp)
   set e := 1 + y₂ * w with he
   set d := 1 - x₂ * z' ^ 2 * v with hd
   set e' := (↑heu.unit⁻¹ : 𝒪) with he'
@@ -481,14 +517,14 @@ theorem add_of_notMem_range [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map ι
   have hX₂ : X₁ ≠ ι x₂ := fun h => hX ⟨x₂, h.symm⟩
   have hs0 : ι s ≠ 0 := by
     rw [hs, map_mul, map_neg, map_mul]
-    exact mul_ne_zero (neg_ne_zero.2 (mul_ne_zero hz0K hd0)) (fun h => by
-      rw [h, mul_zero] at heeK; exact zero_ne_one heeK)
+    exact mul_ne_zero (neg_ne_zero.2 (mul_ne_zero hz0K hd0))
+      (fun h => by rw [h, mul_zero] at heeK; exact zero_ne_one heeK)
   have hu₁ : X₁ - ι x₂ = ι (z' * d) / ι w := by
     rw [← hX₁, map_mul, hd, map_sub, map_one, map_mul, map_mul, map_pow, hwK]
     field_simp
   have hslope : (curveK K W).slope X₁ (ι x₂) Y₁ (ι y₂) = (ι s)⁻¹ := by
     rw [WeierstrassCurve.Affine.slope_of_X_ne hX₂, hu₁, ← hY₁]
-    have hnum : -1 / ι w - ι y₂ = -ι e / ι w := by
+    have hnum : -1 / ι w - ι y₂ = - ι e / ι w := by
       rw [he, map_add (f := _), map_one, map_mul]; field_simp; ring
     rw [hnum]
     refine eq_inv_of_mul_eq_one_left ?_
@@ -511,12 +547,13 @@ theorem add_of_notMem_range [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map ι
   have hFyK : ι Fy = 2 * ι y₂ + (curveK K W).a₁ * ι x₂ + (curveK K W).a₃ := by
     rw [hFy]
     simp only [map_add (f := _), map_mul, hι2, WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₃]
-  have hFxK : ι Fx = 3 * ι x₂ ^ 2 + 2 * (curveK K W).a₂ * ι x₂ + (curveK K W).a₄ -
-      (curveK K W).a₁ * ι y₂ := by
+  have hFxK
+      : ι Fx
+        = 3 * ι x₂ ^ 2 + 2 * (curveK K W).a₂ * ι x₂ + (curveK K W).a₄ - (curveK K W).a₁ * ι y₂ := by
     rw [hFx]
     simp only [map_add (f := _), map_sub, map_mul, map_pow, hι2, hι3, WeierstrassCurve.map_a₁,
       WeierstrassCurve.map_a₂, WeierstrassCurve.map_a₄]
-  have R : (X₁ - ι x₂) * (-(X₁ - ι x₂) ^ 2 + B * (X₁ - ι x₂) + C) = 0 := by
+  have R : (X₁ - ι x₂) * (- (X₁ - ι x₂) ^ 2 + B * (X₁ - ι x₂) + C) = 0 := by
     rw [hC, hFyK, hFxK, hB]
     linear_combination hE₁ - hE₂
   have R' := (mul_eq_zero.1 R).resolve_left (sub_ne_zero.2 hX₂)
@@ -540,11 +577,11 @@ theorem add_of_notMem_range [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map ι
     simp only [map_mul, map_sub, map_pow, map_neg, hd'K, hsK]
     rw [hsK] at hs0
     field_simp
-  have hy₃ : (curveK K W).addY X₁ (ι x₂) Y₁ ℓ =
-      ι (-(y₂ + t₃) - W.a₁ * (x₂ + u₃) - W.a₃) := by
+  have hy₃ : (curveK K W).addY X₁ (ι x₂) Y₁ ℓ = ι (-(y₂ + t₃) - W.a₁ * (x₂ + u₃) - W.a₃) := by
     rw [WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negAddY, hx₃,
       WeierstrassCurve.Affine.negY, hline]
-    simp only [map_sub, map_neg, map_add (f := _), map_mul, WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₃]
+    simp only [map_sub, map_neg, map_add (f := _), map_mul, WeierstrassCurve.map_a₁,
+      WeierstrassCurve.map_a₃]
     rw [← ht]
     ring
   have h₃ := WeierstrassCurve.Affine.nonsingular_add h₁ h₂ (fun h => hX₂ h.1)
@@ -555,13 +592,13 @@ theorem add_of_notMem_range [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map ι
     exact ⟨hx₃, hy₃⟩
   · have hu₃m : u₃ ∈ maximalIdeal 𝒪 := by
       rw [hu₃]
-      exact Ideal.mul_mem_right _ _ (Ideal.mul_mem_right _ _ (Ideal.mul_mem_right _ _
-        (Ideal.mul_mem_left _ _ hzm)))
+      exact Ideal.mul_mem_right _ _
+        (Ideal.mul_mem_right _ _ (Ideal.mul_mem_right _ _ (Ideal.mul_mem_left _ _ hzm)))
     rw [map_add (f := _), residue_eq_zero_of_mem hu₃m, add_zero]
   · have hu₃m : u₃ ∈ maximalIdeal 𝒪 := by
       rw [hu₃]
-      exact Ideal.mul_mem_right _ _ (Ideal.mul_mem_right _ _ (Ideal.mul_mem_right _ _
-        (Ideal.mul_mem_left _ _ hzm)))
+      exact Ideal.mul_mem_right _ _
+        (Ideal.mul_mem_right _ _ (Ideal.mul_mem_right _ _ (Ideal.mul_mem_left _ _ hzm)))
     have hsm : s ∈ maximalIdeal 𝒪 := by
       rw [hs]; exact Ideal.mul_mem_right _ _ ((Ideal.neg_mem_iff _).2 (Ideal.mul_mem_right _ _ hzm))
     have hρe : ρ e = 1 := by
@@ -573,7 +610,7 @@ theorem add_of_notMem_range [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map ι
       have := congrArg ρ hdd
       rwa [map_mul, hρd, one_mul, map_one] at this
     have hρv : ρ v = 1 := residue_vVal W hzm
-    have hρt : ρ t₃ = -ρ Fy := by
+    have hρt : ρ t₃ = - ρ Fy := by
       rw [ht₃]
       simp only [map_mul, map_neg, map_sub, map_pow, residue_eq_zero_of_mem hsm, hρv, hρe, hρd']
       ring
@@ -602,20 +639,22 @@ open Classical in
 def reducePoint : (curveK K W).Point → (curveRed W).Point
   | .zero => 0
   | @WeierstrassCurve.Affine.Point.some _ _ _ X Y _ =>
-    if h : X ∈ Set.range (algebraMap 𝒪 K) ∧
-        (curveRed W).Nonsingular (residue 𝒪 (intPart K X)) (residue 𝒪 (intPart K Y)) then
+    if h
+        : X ∈ Set.range (algebraMap 𝒪 K)
+          ∧ (curveRed W).Nonsingular (residue 𝒪 (intPart K X)) (residue 𝒪 (intPart K Y)) then
       .some _ _ h.2
-    else 0
+    else
+      0
 
 omit [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map (algebraMap 𝒪 K)).IsElliptic]
   [IsFractionRing 𝒪 K] in
 theorem reducePoint_zero : reducePoint K W 0 = 0 := rfl
 
 omit [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map (algebraMap 𝒪 K)).IsElliptic] in
-theorem reducePoint_some_integral {x y : 𝒪}
-    (h : (curveK K W).Nonsingular (algebraMap 𝒪 K x) (algebraMap 𝒪 K y))
-    (n : (curveRed W).Nonsingular (residue 𝒪 x) (residue 𝒪 y)) :
-    reducePoint K W (.some _ _ h) = .some _ _ n := by
+theorem reducePoint_some_integral
+    {x y : 𝒪} (h : (curveK K W).Nonsingular (algebraMap 𝒪 K x) (algebraMap 𝒪 K y))
+    (n : (curveRed W).Nonsingular (residue 𝒪 x) (residue 𝒪 y))
+    : reducePoint K W (.some _ _ h) = .some _ _ n := by
   have hn : (curveRed W).Nonsingular (residue 𝒪 (intPart K (algebraMap 𝒪 K x)))
       (residue 𝒪 (intPart K (algebraMap 𝒪 K y))) := by
     rwa [intPart_algebraMap, intPart_algebraMap]
@@ -625,17 +664,18 @@ theorem reducePoint_some_integral {x y : 𝒪}
 
 omit [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map (algebraMap 𝒪 K)).IsElliptic]
   [IsFractionRing 𝒪 K] in
-theorem reducePoint_some_notMem {X Y : K} (h : (curveK K W).Nonsingular X Y)
-    (hX : X ∉ Set.range (algebraMap 𝒪 K)) : reducePoint K W (.some _ _ h) = 0 := by
+theorem reducePoint_some_notMem
+    {X Y : K} (h : (curveK K W).Nonsingular X Y) (hX : X ∉ Set.range (algebraMap 𝒪 K))
+    : reducePoint K W (.some _ _ h) = 0 := by
   rw [reducePoint, dite_eq_right (fun h' => hX h'.1)]
 
-
 omit [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map (algebraMap 𝒪 K)).IsElliptic] in
-theorem point_cases (P : (curveK K W).Point) :
-    P = 0 ∨ (∃ (X Y : K) (h : (curveK K W).Nonsingular X Y), P = .some _ _ h ∧
-      X ∉ Set.range (algebraMap 𝒪 K)) ∨
-    ∃ (x y : 𝒪) (h : (curveK K W).Nonsingular (algebraMap 𝒪 K x) (algebraMap 𝒪 K y)),
-      P = .some _ _ h := by
+theorem point_cases (P : (curveK K W).Point)
+    : P = 0
+      ∨ (∃ (X Y : K) (h : (curveK K W).Nonsingular X Y),
+        P = .some _ _ h ∧ X ∉ Set.range (algebraMap 𝒪 K))
+      ∨ ∃ (x y : 𝒪) (h : (curveK K W).Nonsingular (algebraMap 𝒪 K x) (algebraMap 𝒪 K y)),
+        P = .some _ _ h := by
   cases P with
   | zero => exact Or.inl rfl
   | @some X Y h =>
@@ -650,10 +690,10 @@ def E0Set : Set (curveK K W).Point :=
     P = .some _ _ h → (curveRed W).Nonsingular (residue 𝒪 x) (residue 𝒪 y)}
 
 omit [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map (algebraMap 𝒪 K)).IsElliptic] in
-theorem mem_E0Set_some_integral {x y : 𝒪}
-    (h : (curveK K W).Nonsingular (algebraMap 𝒪 K x) (algebraMap 𝒪 K y))
-    (n : (curveRed W).Nonsingular (residue 𝒪 x) (residue 𝒪 y)) :
-    WeierstrassCurve.Affine.Point.some _ _ h ∈ E0Set K W := by
+theorem mem_E0Set_some_integral
+    {x y : 𝒪} (h : (curveK K W).Nonsingular (algebraMap 𝒪 K x) (algebraMap 𝒪 K y))
+    (n : (curveRed W).Nonsingular (residue 𝒪 x) (residue 𝒪 y))
+    : WeierstrassCurve.Affine.Point.some _ _ h ∈ E0Set K W := by
   intro x' y' h' hP
   rw [WeierstrassCurve.Affine.Point.some.injEq] at hP
   rw [← IsFractionRing.injective 𝒪 K hP.1, ← IsFractionRing.injective 𝒪 K hP.2]
@@ -661,9 +701,9 @@ theorem mem_E0Set_some_integral {x y : 𝒪}
 
 omit [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map (algebraMap 𝒪 K)).IsElliptic]
   [IsFractionRing 𝒪 K] in
-theorem mem_E0Set_some_notMem {X Y : K} (h : (curveK K W).Nonsingular X Y)
-    (hX : X ∉ Set.range (algebraMap 𝒪 K)) :
-    WeierstrassCurve.Affine.Point.some _ _ h ∈ E0Set K W := by
+theorem mem_E0Set_some_notMem
+    {X Y : K} (h : (curveK K W).Nonsingular X Y) (hX : X ∉ Set.range (algebraMap 𝒪 K))
+    : WeierstrassCurve.Affine.Point.some _ _ h ∈ E0Set K W := by
   intro x y h' hP
   rw [WeierstrassCurve.Affine.Point.some.injEq] at hP
   exact absurd ⟨x, hP.1.symm⟩ hX
@@ -676,34 +716,34 @@ theorem zero_mem_E0Set : (0 : (curveK K W).Point) ∈ E0Set K W := by
 
 variable [DecidableEq K] [DecidableEq (ResidueField 𝒪)]
 
-
 omit [IsAdicComplete (maximalIdeal 𝒪) 𝒪] [(W.map (algebraMap 𝒪 K)).IsElliptic] in
-theorem add_mem_and_reduce_of_exists {P Q : (curveK K W).Point}
+theorem add_mem_and_reduce_of_exists
+    {P Q : (curveK K W).Point}
     (H : ∃ (x₃ y₃ : 𝒪) (h₃ : (curveK K W).Nonsingular (algebraMap 𝒪 K x₃) (algebraMap 𝒪 K y₃))
-      (n₃ : (curveRed W).Nonsingular (residue 𝒪 x₃) (residue 𝒪 y₃)),
-      P + Q = .some _ _ h₃ ∧ reducePoint K W P + reducePoint K W Q = .some _ _ n₃) :
-    P + Q ∈ E0Set K W ∧ reducePoint K W (P + Q) = reducePoint K W P + reducePoint K W Q := by
+        (n₃ : (curveRed W).Nonsingular (residue 𝒪 x₃) (residue 𝒪 y₃)),
+      P + Q = .some _ _ h₃ ∧ reducePoint K W P + reducePoint K W Q = .some _ _ n₃)
+    : P + Q ∈ E0Set K W ∧ reducePoint K W (P + Q) = reducePoint K W P + reducePoint K W Q := by
   obtain ⟨x₃, y₃, h₃, n₃, e, e'⟩ := H
   rw [e, e', reducePoint_some_integral K W h₃ n₃]
   exact ⟨mem_E0Set_some_integral K W h₃ n₃, rfl⟩
 
-theorem add_mem_and_reduce {P Q : (curveK K W).Point} (hP : P ∈ E0Set K W)
-    (hQ : Q ∈ E0Set K W) :
-    P + Q ∈ E0Set K W ∧ reducePoint K W (P + Q) = reducePoint K W P + reducePoint K W Q := by
+theorem add_mem_and_reduce {P Q : (curveK K W).Point} (hP : P ∈ E0Set K W) (hQ : Q ∈ E0Set K W)
+    : P + Q ∈ E0Set K W ∧ reducePoint K W (P + Q) = reducePoint K W P + reducePoint K W Q := by
   rcases point_cases K W P with rfl | ⟨X₁, Y₁, h₁, rfl, hX₁⟩ | ⟨x₁, y₁, h₁, rfl⟩
   · rw [zero_add, reducePoint_zero, zero_add]; exact ⟨hQ, rfl⟩
-  ·
-    rcases point_cases K W Q with rfl | ⟨X₂, Y₂, h₂, rfl, hX₂⟩ | ⟨x₂, y₂, h₂, rfl⟩
+  · rcases point_cases K W Q with rfl | ⟨X₂, Y₂, h₂, rfl, hX₂⟩ | ⟨x₂, y₂, h₂, rfl⟩
     · rw [add_zero, reducePoint_zero, add_zero]; exact ⟨hP, rfl⟩
     · rw [reducePoint_some_notMem K W h₁ hX₁, reducePoint_some_notMem K W h₂ hX₂, add_zero]
-      rcases point_cases K W (WeierstrassCurve.Affine.Point.some _ _ h₁ +
-          WeierstrassCurve.Affine.Point.some _ _ h₂) with h0 | ⟨X, Y, h, hS, hX⟩ | ⟨x, y, h, hS⟩
+      rcases point_cases K W
+          (WeierstrassCurve.Affine.Point.some _ _ h₁ + WeierstrassCurve.Affine.Point.some _ _ h₂)
+        with h0 | ⟨X, Y, h, hS, hX⟩ | ⟨x, y, h, hS⟩
       · rw [h0]; exact ⟨zero_mem_E0Set K W, rfl⟩
       · rw [hS]; exact ⟨mem_E0Set_some_notMem K W h hX, reducePoint_some_notMem K W h hX⟩
       · have hneg := (WeierstrassCurve.Affine.nonsingular_neg _ _).2 h₁
         obtain ⟨x₃, y₃, h₃, e, _, _⟩ := add_of_notMem_range K W hneg hX₁ h
         rw [← hS, ← WeierstrassCurve.Affine.Point.neg_some h₁, ← add_assoc, neg_add_cancel,
-          zero_add, WeierstrassCurve.Affine.Point.some.injEq] at e
+            zero_add, WeierstrassCurve.Affine.Point.some.injEq]
+          at e
         exact False.elim (hX₂ ⟨x₃, e.1.symm⟩)
     · have n₂ := hQ x₂ y₂ h₂ rfl
       obtain ⟨x₃, y₃, h₃, e, hx, hy⟩ := add_of_notMem_range K W h₁ hX₁ h₂
@@ -733,7 +773,8 @@ theorem add_mem_and_reduce {P Q : (curveK K W).Point} (hP : P ∈ E0Set K W)
             · exact h
             · exact absurd h hy
           have hD : residue 𝒪 (y₁ + y₂ + W.a₁ * x₁ + W.a₃) ≠ 0 := by
-            intro h0; apply hy
+            intro h0
+            apply hy
             rw [map_add (f := _), map_add (f := _), map_add (f := _), map_mul] at h0
             simp only [WeierstrassCurve.Affine.negY, WeierstrassCurve.map_a₁,
               WeierstrassCurve.map_a₃, ← hx]
@@ -745,28 +786,29 @@ theorem add_mem_and_reduce {P Q : (curveK K W).Point} (hP : P ∈ E0Set K W)
         rw [e, e', reducePoint_some_integral K W h₃ n₃]
         exact ⟨mem_E0Set_some_integral K W h₃ n₃, rfl⟩
 
-
 omit [DecidableEq K] [DecidableEq (ResidueField 𝒪)] [IsAdicComplete (maximalIdeal 𝒪) 𝒪]
   [(W.map (algebraMap 𝒪 K)).IsElliptic] in
-theorem neg_mem_and_reduce {P : (curveK K W).Point} (hP : P ∈ E0Set K W) :
-    -P ∈ E0Set K W ∧ reducePoint K W (-P) = -reducePoint K W P := by
+theorem neg_mem_and_reduce {P : (curveK K W).Point} (hP : P ∈ E0Set K W)
+    : -P ∈ E0Set K W ∧ reducePoint K W (-P) = - reducePoint K W P := by
   rcases point_cases K W P with rfl | ⟨X, Y, h, rfl, hX⟩ | ⟨x, y, h, rfl⟩
   · exact ⟨zero_mem_E0Set K W, rfl⟩
   · rw [WeierstrassCurve.Affine.Point.neg_some, reducePoint_some_notMem K W h hX,
       reducePoint_some_notMem K W _ hX]
     exact ⟨mem_E0Set_some_notMem K W _ hX, rfl⟩
   · have n := hP x y h rfl
-    have hyK : (curveK K W).negY (algebraMap 𝒪 K x) (algebraMap 𝒪 K y) =
-        algebraMap 𝒪 K (W.toAffine.negY x y) := WeierstrassCurve.Affine.map_negY _ _ _
-    have hyk : (curveRed W).negY (residue 𝒪 x) (residue 𝒪 y) =
-        residue 𝒪 (W.toAffine.negY x y) := WeierstrassCurve.Affine.map_negY _ _ _
-    have h' : (curveK K W).Nonsingular (algebraMap 𝒪 K x)
-        (algebraMap 𝒪 K (W.toAffine.negY x y)) :=
+    have hyK
+        : (curveK K W).negY (algebraMap 𝒪 K x) (algebraMap 𝒪 K y)
+          = algebraMap 𝒪 K (W.toAffine.negY x y) :=
+      WeierstrassCurve.Affine.map_negY _ _ _
+    have hyk : (curveRed W).negY (residue 𝒪 x) (residue 𝒪 y) = residue 𝒪 (W.toAffine.negY x y) :=
+      WeierstrassCurve.Affine.map_negY _ _ _
+    have h' : (curveK K W).Nonsingular (algebraMap 𝒪 K x) (algebraMap 𝒪 K (W.toAffine.negY x y)) :=
       hyK ▸ (WeierstrassCurve.Affine.nonsingular_neg _ _).2 h
     have n' : (curveRed W).Nonsingular (residue 𝒪 x) (residue 𝒪 (W.toAffine.negY x y)) :=
       hyk ▸ (WeierstrassCurve.Affine.nonsingular_neg _ _).2 n
-    have e : -WeierstrassCurve.Affine.Point.some _ _ h =
-        WeierstrassCurve.Affine.Point.some _ _ h' := by
+    have e
+        : - WeierstrassCurve.Affine.Point.some _ _ h
+          = WeierstrassCurve.Affine.Point.some _ _ h' := by
       rw [WeierstrassCurve.Affine.Point.neg_some, WeierstrassCurve.Affine.Point.some.injEq]
       exact ⟨rfl, hyK⟩
     rw [e, reducePoint_some_integral K W h' n', reducePoint_some_integral K W h n,

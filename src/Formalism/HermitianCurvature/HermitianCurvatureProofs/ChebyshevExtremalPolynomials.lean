@@ -147,7 +147,8 @@ theorem coValue : Formalism.FourierDecayAlt.F7.ChebCoValue := by
   intro α β n hαβ hn j
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
   have hd : 0 < β - α := by linarith
-  have e : Formalism.SA.C.chebPt α β (m + 1) = fun i => (α + β) / 2 + (β - α) / 2 * nd (m + 1) i := by
+  have e
+      : Formalism.SA.C.chebPt α β (m + 1) = fun i => (α + β) / 2 + (β - α) / 2 * nd (m + 1) i := by
     funext i; exact chebPt_eq α β (m + 1) i
   rw [e, lagCo_affine, lagCo_nd]
   have : ((β - α) / 2)⁻¹ = 2 / (β - α) := by rw [inv_div]
@@ -180,20 +181,24 @@ theorem sharp : Formalism.FourierDecayAlt.F7.ChebSharp := by
       exact mul_left_cancel₀ (by positivity) this
     exact nd_injective n h2
   · obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
-    have hv : ∀ j : Fin (m + 2), |lagCo (Formalism.SA.C.chebPt α β (m + 1)) j| =
-        (if (j:ℕ) = 0 ∨ (j:ℕ) = m + 1 then (1 / 2 : ℝ) else 1) *
-          (((2 : ℝ) ^ m / ((m:ℝ) + 1)) * (2 / (β - α)) ^ (m + 1)) := by
+    have hv
+        : ∀ j : Fin (m + 2),
+          |lagCo (Formalism.SA.C.chebPt α β (m + 1)) j|
+            = (if (j : ℕ) = 0 ∨ (j : ℕ) = m + 1 then (1 / 2 : ℝ) else 1)
+              * (((2 : ℝ) ^ m / ((m : ℝ) + 1)) * (2 / (β - α)) ^ (m + 1)) := by
       intro j
-      rw [coValue α β (m + 1) hαβ hn j, abs_mul, abs_mul, abs_mul, abs_pow, abs_neg, abs_one, one_pow,
-        one_mul, Nat.add_sub_cancel]
-      have h1 : |(if (j:ℕ) = 0 ∨ (j:ℕ) = m + 1 then (1 / 2 : ℝ) else 1)| =
-          (if (j:ℕ) = 0 ∨ (j:ℕ) = m + 1 then (1 / 2 : ℝ) else 1) := by
+      rw [coValue α β (m + 1) hαβ hn j, abs_mul, abs_mul, abs_mul, abs_pow, abs_neg, abs_one,
+        one_pow, one_mul, Nat.add_sub_cancel]
+      have h1
+          : |(if (j:ℕ) = 0 ∨ (j:ℕ) = m + 1 then (1 / 2 : ℝ) else 1)|
+            = (if (j : ℕ) = 0 ∨ (j : ℕ) = m + 1 then (1 / 2 : ℝ) else 1) := by
         apply abs_of_nonneg; split_ifs <;> norm_num
       rw [h1, abs_of_nonneg (by positivity), abs_of_nonneg (by positivity)]
-      push_cast; ring
+      push_cast
+      ring
     rw [sum_congr rfl (fun j _ => hv j), ← sum_mul, sum_half]
-    have hm : (m:ℝ) + 1 ≠ 0 := by positivity
-    rw [show (4:ℝ) / (β - α) = 2 * (2 / (β - α)) by ring, mul_pow, pow_succ (2:ℝ) m]
+    have hm : (m : ℝ) + 1 ≠ 0 := by positivity
+    rw [show (4 : ℝ) / (β - α) = 2 * (2 / (β - α)) by ring, mul_pow, pow_succ (2 : ℝ) m]
     field_simp
 
 lemma sum_lagCo_mul_pow {d : ℕ} (y : Fin (d + 1) → ℝ) (hy : Function.Injective y) (k : ℕ)
@@ -235,6 +240,7 @@ end Formalism.FourierDecayAlt.P.ChebyshevExtremalPolynomials
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem chebyshev_bound_sharp : Formalism.FourierDecayAlt.F7.ChebSharp := ChebyshevExtremalPolynomials.sharp
+theorem chebyshev_bound_sharp : Formalism.FourierDecayAlt.F7.ChebSharp :=
+  ChebyshevExtremalPolynomials.sharp
 
 end Formalism.FourierDecayAlt.P

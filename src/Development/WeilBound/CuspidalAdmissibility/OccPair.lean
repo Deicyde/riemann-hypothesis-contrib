@@ -9,35 +9,42 @@ open GroundTheory.Automorphic
 
 namespace PositivityTheory.TfC.OccursIff.Pair
 
-theorem conjDual_finite (E : Type) [AddCommGroup E] [Module ℂ E] [FiniteDimensional ℂ E] :
-    FiniteDimensional ℂ (E →ₗ⋆[ℂ] ℂ) ∧ Module.finrank ℂ (E →ₗ⋆[ℂ] ℂ) ≤ Module.finrank ℂ E := by
+theorem conjDual_finite (E : Type) [AddCommGroup E] [Module ℂ E] [FiniteDimensional ℂ E]
+    : FiniteDimensional ℂ (E →ₗ⋆[ℂ] ℂ) ∧ Module.finrank ℂ (E →ₗ⋆[ℂ] ℂ) ≤ Module.finrank ℂ E := by
   let b := Module.finBasis ℂ E
-  let e : (E →ₗ⋆[ℂ] ℂ) →ₗ[ℂ] (Fin (Module.finrank ℂ E) → ℂ) :=
-    { toFun := fun l i => l (b i)
-      map_add' := fun l l' => by ext i; simp
-      map_smul' := fun c l => by ext i; simp }
+  let e : (E →ₗ⋆[ℂ] ℂ) →ₗ[ℂ] (Fin (Module.finrank ℂ E) → ℂ) := {
+    toFun := fun l i => l (b i)
+    map_add' := fun l l' => by ext i; simp
+    map_smul' := fun c l => by ext i; simp
+  }
   have he : Function.Injective e := fun l l' h => b.ext fun i => congrFun h i
   haveI : FiniteDimensional ℂ (E →ₗ⋆[ℂ] ℂ) := Module.Finite.of_injective e he
   refine ⟨this, ?_⟩
   have h := LinearMap.finrank_le_finrank_of_injective he
   simpa using h
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [LocallyCompactSpace G] [T2Space G] [TotallyDisconnectedSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+  [T2Space G] [TotallyDisconnectedSpace G]
   {X Y : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
 
-omit [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G] [TotallyDisconnectedSpace G] in
+omit [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
+  [TotallyDisconnectedSpace G] in
 theorem act_inv (π : Representation ℂ G Y) (g : G) (z : Y) : π g (π g⁻¹ z) = z := by
   rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
 
-theorem leftKer_eq_zero (π : Representation ℂ G Y) (hπi : π.IsIrreducible)
-    (C : Y →ₗ[ℂ] Y →ₗ⋆[ℂ] ℂ) (hC : ∀ g x y, C (π g x) (π g y) = C x y) (hC0 : C ≠ 0) :
-    ∀ a, C a = 0 → a = 0 := by
-  let S : Subrepresentation π := ⟨LinearMap.ker C, fun g a ha => by
-    rw [LinearMap.mem_ker] at ha ⊢
-    refine LinearMap.ext fun z => ?_
-    rw [← act_inv π g z, hC, ha]
-    rfl⟩
+theorem leftKer_eq_zero
+    (π : Representation ℂ G Y) (hπi : π.IsIrreducible)
+    (C : Y →ₗ[ℂ] Y →ₗ⋆[ℂ] ℂ) (hC : ∀ g x y, C (π g x) (π g y) = C x y) (hC0 : C ≠ 0)
+    : ∀ a, C a = 0 → a = 0 := by
+  let S : Subrepresentation π := ⟨
+    LinearMap.ker C,
+    fun g a ha => by
+      rw [LinearMap.mem_ker] at ha ⊢
+      refine LinearMap.ext fun z => ?_
+      rw [← act_inv π g z, hC, ha]
+      rfl
+  ⟩
   rcases hπi.eq_bot_or_eq_top S with h | h
   · intro a ha
     have h1 : a ∈ S.toSubmodule := LinearMap.mem_ker.2 ha
@@ -49,27 +56,33 @@ theorem leftKer_eq_zero (π : Representation ℂ G Y) (hπi : π.IsIrreducible)
     have h1 : a ∈ S.toSubmodule := by rw [h]; trivial
     exact LinearMap.mem_ker.1 h1
 
-theorem eq_of_fixed (π : Representation ℂ G Y) (hπ : IsSmooth π) {U : Subgroup G} (hUc : IsCompact (U : Set G))
-    (hUo : IsOpen (U : Set G)) (l l' : Y →ₗ⋆[ℂ] ℂ) (hl : ∀ u ∈ U, ∀ z, l (π u z) = l z)
-    (hl' : ∀ u ∈ U, ∀ z, l' (π u z) = l' z) (h : ∀ z ∈ fixedVectors π U, l z = l' z) : l = l' := by
-  have hk : ∀ m : Y →ₗ⋆[ℂ] ℂ, (∀ u ∈ U, ∀ z, m (π u z) = m z) → coinvariantsKer π U ≤ LinearMap.ker m := by
+theorem eq_of_fixed
+    (π : Representation ℂ G Y) (hπ : IsSmooth π)
+    {U : Subgroup G} (hUc : IsCompact (U : Set G)) (hUo : IsOpen (U : Set G))
+    (l l' : Y →ₗ⋆[ℂ] ℂ) (hl : ∀ u ∈ U, ∀ z, l (π u z) = l z) (hl' : ∀ u ∈ U, ∀ z, l' (π u z) = l' z)
+    (h : ∀ z ∈ fixedVectors π U, l z = l' z)
+    : l = l' := by
+  have hk
+      : ∀ m : Y →ₗ⋆[ℂ] ℂ,
+        (∀ u ∈ U, ∀ z, m (π u z) = m z) → coinvariantsKer π U ≤ LinearMap.ker m := by
     intro m hm
     refine Submodule.span_le.2 ?_
     rintro _ ⟨⟨k, v⟩, rfl⟩
     simp [hm k k.2 v]
   refine LinearMap.ext fun z => ?_
   have hs := sub_fixedProj_mem hπ hUc hUo z
-  have e1 : l z = l (fixedProj π hπ hUc hUo z) := by
-    rw [← sub_eq_zero, ← map_sub]; exact hk l hl hs
+  have e1 : l z = l (fixedProj π hπ hUc hUo z) := by rw [← sub_eq_zero, ← map_sub]; exact hk l hl hs
   have e2 : l' z = l' (fixedProj π hπ hUc hUo z) := by
     rw [← sub_eq_zero, ← map_sub]; exact hk l' hl' hs
   rw [e1, e2, h _ (fixedProj π hπ hUc hUo z).2]
 
-theorem admissible_and_equiv (σ : Representation ℂ G X) (π : Representation ℂ G Y)
+theorem admissible_and_equiv
+    (σ : Representation ℂ G X)
+    (π : Representation ℂ G Y)
     (hσ : IsSmooth σ) (hσi : σ.IsIrreducible) (hπ : IsAdmissible π) (hπi : π.IsIrreducible)
     (B : X →ₗ[ℂ] Y →ₗ⋆[ℂ] ℂ) (hB : ∀ g x y, B (σ g x) (π g y) = B x y) (hB0 : B ≠ 0)
-    (C : Y →ₗ[ℂ] Y →ₗ⋆[ℂ] ℂ) (hC : ∀ g x y, C (π g x) (π g y) = C x y) (hC0 : C ≠ 0) :
-    IsAdmissible σ ∧ Nonempty (σ.Equiv π) := by
+    (C : Y →ₗ[ℂ] Y →ₗ⋆[ℂ] ℂ) (hC : ∀ g x y, C (π g x) (π g y) = C x y) (hC0 : C ≠ 0)
+    : IsAdmissible σ ∧ Nonempty (σ.Equiv π) := by
   have hker := leftKer_eq_zero π hπi C hC hC0
   have huniq : ∀ a a', C a = C a' → a = a' := fun a a' h =>
     sub_eq_zero.1 (hker _ (by rw [map_sub, h, sub_self]))
@@ -84,31 +97,36 @@ theorem admissible_and_equiv (σ : Representation ℂ G X) (π : Representation 
     have hBinv : ∀ u ∈ U, ∀ z, B x (π u z) = B x z := by
       intro u hu z
       rw [← hB u x z, hxU u hu]
-    let L : E →ₗ[ℂ] (E →ₗ⋆[ℂ] ℂ) :=
-      { toFun := fun a => (C a).comp E.subtype
-        map_add' := fun a a' => by ext z; simp
-        map_smul' := fun c a => by ext z; simp }
+    let L : E →ₗ[ℂ] (E →ₗ⋆[ℂ] ℂ) := {
+      toFun := fun a => (C a).comp E.subtype
+      map_add' := fun a a' => by ext z; simp
+      map_smul' := fun c a => by ext z; simp
+    }
     have hL : Function.Injective L := by
       rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
       intro a ha
-      have h0 : C a = 0 := eq_of_fixed π hπ.1 hUc hUo (C a) 0 (hCinv a a.2) (fun _ _ _ => rfl)
-        (fun z hz => by
-          have := LinearMap.congr_fun ha ⟨z, hz⟩
-          simpa [L] using this)
+      have h0 : C a = 0 :=
+        eq_of_fixed π hπ.1 hUc hUo (C a) 0 (hCinv a a.2)
+          (fun _ _ _ => rfl)
+          (fun z hz => by
+            have := LinearMap.congr_fun ha ⟨z, hz⟩
+            simpa [L] using this)
       exact Subtype.ext (hker _ h0)
     obtain ⟨hfin, hle⟩ := conjDual_finite E
     have heq : Module.finrank ℂ E = Module.finrank ℂ (E →ₗ⋆[ℂ] ℂ) :=
       le_antisymm (LinearMap.finrank_le_finrank_of_injective hL) hle
-    have hsurj : Function.Surjective L := (LinearMap.injective_iff_surjective_of_finrank_eq_finrank heq).1 hL
+    have hsurj : Function.Surjective L :=
+      (LinearMap.injective_iff_surjective_of_finrank_eq_finrank heq).1 hL
     obtain ⟨a, ha⟩ := hsurj ((B x).comp E.subtype)
     refine ⟨a, eq_of_fixed π hπ.1 hUc hUo (C a) (B x) (hCinv a a.2) hBinv fun z hz => ?_⟩
     have := LinearMap.congr_fun ha ⟨z, hz⟩
     simpa [L] using this
   choose T0 hT0 using hex
-  let T : X →ₗ[ℂ] Y :=
-    { toFun := T0
-      map_add' := fun x x' => huniq _ _ (by rw [hT0, map_add (f := _), map_add (f := _), hT0, hT0])
-      map_smul' := fun c x => huniq _ _ (by rw [hT0, map_smul, map_smul, hT0, RingHom.id_apply]) }
+  let T : X →ₗ[ℂ] Y := {
+    toFun := T0
+    map_add' := fun x x' => huniq _ _ (by rw [hT0, map_add (f := _), map_add (f := _), hT0, hT0])
+    map_smul' := fun c x => huniq _ _ (by rw [hT0, map_smul, map_smul, hT0, RingHom.id_apply])
+  }
   have hTint : ∀ g x, T (σ g x) = π g (T x) := by
     intro g x
     refine huniq _ _ ?_

@@ -15,8 +15,7 @@ theorem nearestPlane_rounding : Ext.NearestPlane := by
   obtain ⟨w, hw, hle⟩ := exists_int_comb_norm_sub_sq_le n v hx
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).1 hw
   refine ⟨c, ?_⟩
-  have hsum : ∑ i, ((c i : ℤ) : ℝ) • v i = ∑ i, c i • v i := by
-    simp only [Int.cast_smul_eq_zsmul]
+  have hsum : ∑ i, ((c i : ℤ) : ℝ) • v i = ∑ i, c i • v i := by simp only [Int.cast_smul_eq_zsmul]
   rw [hsum]
   linarith
 

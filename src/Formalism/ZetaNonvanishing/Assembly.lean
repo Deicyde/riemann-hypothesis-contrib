@@ -127,14 +127,12 @@ variable {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N)
 
 def Hf (σ₀ C : ℝ) (x : ℝ) : ℝ := G χ x + C * x ^ σ₀
 
-def Imel (σ₀ C : ℝ) (s : ℂ) : ℂ :=
-  ∫ x in Ioi (1:ℝ), ((Hf χ σ₀ C x : ℝ) : ℂ) * (x : ℂ) ^ (-s - 1)
+def Imel (σ₀ C : ℝ) (s : ℂ) : ℂ := ∫ x in Ioi (1:ℝ), ((Hf χ σ₀ C x : ℝ) : ℂ) * (x : ℂ) ^ (-s - 1)
 
-def q0 (σ₀ C : ℝ) (s : ℂ) : ℂ :=
-  -1 + s * (1 + (gammaF χ : ℂ)) + C * s * (s - 1) / (s - σ₀)
+def q0 (σ₀ C : ℝ) (s : ℂ) : ℂ := -1 + s * (1 + (gammaF χ : ℂ)) + C * s * (s - 1) / (s - σ₀)
 
 def Afun (σ₀ C : ℝ) (s : ℂ) : ℂ :=
-  -deriv (Pfun χ) s - Pfun χ s + s * (1 + (gammaF χ : ℂ)) * Pfun χ s
+  - deriv (Pfun χ) s - Pfun χ s + s * (1 + (gammaF χ : ℂ)) * Pfun χ s
     + C * s * (s - 1) * Pfun χ s / (s - σ₀)
 
 def Phi (σ₀ C : ℝ) (s : ℂ) : ℂ := dslope (Afun χ σ₀ C) 1 s / (s * Pfun χ s)

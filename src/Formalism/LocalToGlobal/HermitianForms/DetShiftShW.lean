@@ -21,7 +21,8 @@ theorem shW_zero (l : DomWeight N) : shW l 0 = l := by
   cases l
   simp only [shW, sub_zero]
 
-theorem detShift_shW (l : DomWeight N) (c : ℤ) (hN : 0 < N) : (shW l c).detShift = l.detShift - c := by
+theorem detShift_shW (l : DomWeight N) (c : ℤ) (hN : 0 < N)
+    : (shW l c).detShift = l.detShift - c := by
   simp [DomWeight.detShift, hN, shW]
 
 theorem natW_shW (l : DomWeight N) (c : ℤ) : (shW l c).natW = l.natW := by
@@ -32,12 +33,13 @@ theorem natW_shW (l : DomWeight N) (c : ℤ) : (shW l c).natW = l.natW := by
   simp only [shW]
   ring
 
-theorem delSq_shW (R : Type) [CommRing R] (l : DomWeight N) (c : ℤ) : delSq R N (shW l c) = delSq R N l := by
+theorem delSq_shW (R : Type) [CommRing R] (l : DomWeight N) (c : ℤ)
+    : delSq R N (shW l c) = delSq R N l := by
   unfold delSq
   rw [natW_shW]
 
-theorem CSpan_shW {ι : Type} [Fintype ι] (lam : ι → DomWeight N) (c : ι → ℤ) :
-    CSpan (fun τ => shW (lam τ) (c τ)) = CSpan lam := by
+theorem CSpan_shW {ι : Type} [Fintype ι] (lam : ι → DomWeight N) (c : ι → ℤ)
+    : CSpan (fun τ => shW (lam τ) (c τ)) = CSpan lam := by
   simp only [CSpan, delSq_shW]
 
 end Formalism.L2.Forms

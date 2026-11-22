@@ -14,8 +14,9 @@ theorem PiQuotCokerFiniteLength.proof : PiQuotCokerFiniteLength.Statement := by
   have : Finite J.minimalPrimes := (J.finite_minimalPrimes_of_isNoetherianRing B).to_subtype
   let : Fintype J.minimalPrimes := Fintype.ofFinite _
   classical
-  have hfac : ∀ (P : J.minimalPrimes) (x : B),
-      quotToPiMinimalPrimes J (Submodule.Quotient.mk x) P = Ideal.Quotient.mk (P : Ideal B) x :=
+  have hfac
+      : ∀ (P : J.minimalPrimes) (x : B),
+        quotToPiMinimalPrimes J (Submodule.Quotient.mk x) P = Ideal.Quotient.mk (P : Ideal B) x :=
     fun _ _ => rfl
   refine ⟨(injective_iff_map_eq_zero _).mpr fun y hy => ?_, ?_⟩
   · obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ y
@@ -26,8 +27,11 @@ theorem PiQuotCokerFiniteLength.proof : PiQuotCokerFiniteLength.Statement := by
     rw [Ideal.sInf_minimalPrimes, hJ.radical] at hx
     exact (Submodule.Quotient.mk_eq_zero _).mpr hx
 
-  have hkey : ∀ Q : Ideal B, Q.IsPrime → ∀ P P' : J.minimalPrimes, P ≠ P' →
-      (P : Ideal B) ≤ Q → (P' : Ideal B) ≤ Q → Q = IsLocalRing.maximalIdeal B := by
+  have hkey
+      : ∀ Q : Ideal B,
+        Q.IsPrime
+          → ∀ P P' : J.minimalPrimes,
+            P ≠ P' → (P : Ideal B) ≤ Q → (P' : Ideal B) ≤ Q → Q = IsLocalRing.maximalIdeal B := by
     intro Q hQp P P' hne hPQ hP'Q
     rcases hQ Q hQp (P.2.1.2.trans hPQ) with hmin | hm
     · exfalso

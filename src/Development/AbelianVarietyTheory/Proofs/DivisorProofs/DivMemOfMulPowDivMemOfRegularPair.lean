@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem div_mem_of_mul_pow_div_mem_of_regularPair (K : Type) [Field K] (O : Subring K) (s t : K)
-    (ht : t ∈ O) (h : ∀ g ∈ O, g * t / s ∈ O → g / s ∈ O) (N : ℕ) :
-    ∀ g ∈ O, g * t ^ N / s ∈ O → g / s ∈ O := by
+theorem div_mem_of_mul_pow_div_mem_of_regularPair
+    (K : Type) [Field K]
+    (O : Subring K) (s t : K) (ht : t ∈ O) (h : ∀ g ∈ O, g * t / s ∈ O → g / s ∈ O)
+    (N : ℕ)
+    : ∀ g ∈ O, g * t ^ N / s ∈ O → g / s ∈ O := by
   induction N with
   | zero => intro g _ hg; simpa using hg
   | succ N ih =>
@@ -17,7 +19,10 @@ theorem div_mem_of_mul_pow_div_mem_of_regularPair (K : Type) [Field K] (O : Subr
     apply h _ (O.mul_mem hg (O.pow_mem ht N))
     rwa [mul_assoc, ← pow_succ]
 
-theorem regularPair_pow : ∀ (K : Type) [Field K] (O : Subring K) (s t : K), s ∈ O → t ∈ O → s ≠ 0 → (∀ g ∈ O, g * t / s ∈ O → g / s ∈ O) → ∀ (m N : ℕ), ∀ g ∈ O, g * t ^ N / s ^ m ∈ O → g / s ^ m ∈ O := by
+theorem regularPair_pow
+    : ∀ (K : Type) [Field K] (O : Subring K) (s t : K),
+      s ∈ O → t ∈ O → s ≠ 0 → (∀ g ∈ O, g * t / s ∈ O → g / s ∈ O)
+        → ∀ (m N : ℕ), ∀ g ∈ O, g * t ^ N / s ^ m ∈ O → g / s ^ m ∈ O := by
   intro K _ O s t hs ht hs0 h m N
   induction m with
   | zero => intro g hg _; simpa using hg

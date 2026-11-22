@@ -7,10 +7,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite TensorProduct
 
-private theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.exists_eigenvector_fixed_idempotent {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
-    (U f : Module.End K V) (hc : Commute U f) (μ : K) :
-    ∀ (k : ℕ) (y : V), y ≠ 0 → f y = y → ((U - μ • (1 : Module.End K V)) ^ k) y = 0 →
-      ∃ z : V, z ≠ 0 ∧ f z = z ∧ U z = μ • z := by
+private theorem
+    UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.exists_eigenvector_fixed_idempotent
+    {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
+    (U f : Module.End K V) (hc : Commute U f)
+    (μ : K)
+    : ∀ (k : ℕ) (y : V),
+      y ≠ 0 → f y = y → ((U - μ • (1 : Module.End K V)) ^ k) y = 0
+        → ∃ z : V, z ≠ 0 ∧ f z = z ∧ U z = μ • z := by
   intro k
   induction k with
   | zero =>
@@ -32,21 +36,28 @@ private theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.exists_eige
       · rw [← Module.End.mul_apply, ← pow_succ]
         exact hk
 
-private theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.idempotent_kills_generalized_eigenspace {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
-    (U f : Module.End K V) (hf : IsIdempotentElem f) (hc : Commute U f) (μ : K)
-    (h : ∀ z : V, z ≠ 0 → f z = z → U z = μ • z → False) (y : V)
-    (hy : y ∈ U.maxGenEigenspace μ) : f y = 0 := by
+private theorem
+    UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.idempotent_kills_generalized_eigenspace
+    {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
+    (U f : Module.End K V) (hf : IsIdempotentElem f) (hc : Commute U f)
+    (μ : K) (h : ∀ z : V, z ≠ 0 → f z = z → U z = μ • z → False)
+    (y : V) (hy : y ∈ U.maxGenEigenspace μ)
+    : f y = 0 := by
   by_contra hne
   obtain ⟨k, hk⟩ := (Module.End.mem_maxGenEigenspace U μ y).mp hy
   have hc' : Commute ((U - μ • (1 : Module.End K V)) ^ k) f :=
     (hc.sub_left (Commute.smul_left (Commute.one_left f) μ)).pow_left k
-  obtain ⟨z, hz, hfz, hUz⟩ := exists_eigenvector_fixed_idempotent U f hc μ k (f y) hne
-    (by rw [← Module.End.mul_apply, hf.eq])
-    (by rw [← Module.End.mul_apply, hc'.eq, Module.End.mul_apply, hk, map_zero])
+  obtain ⟨z, hz, hfz, hUz⟩ :=
+    exists_eigenvector_fixed_idempotent U f hc μ k (f y) hne (by rw [← Module.End.mul_apply, hf.eq])
+      (by rw [← Module.End.mul_apply, hc'.eq, Module.End.mul_apply, hk, map_zero])
   exact h z hz hfz hUz
 
-theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.eigSum :
-    ∀ {K V : Type*} [Field K] [IsAlgClosed K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] (U e : Module.End K V) (S : Set K), IsIdempotentElem e → Commute U e → (∀ μ y, y ≠ 0 → e y = y → U y = μ • y → μ ∈ S) → (∀ μ y, y ≠ 0 → e y = 0 → U y = μ • y → μ ∉ S) → LinearMap.range e = ⨆ μ ∈ S, U.maxGenEigenspace μ := by
+theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.eigSum
+    : ∀ {K V : Type*} [Field K] [IsAlgClosed K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] (U e : Module.End K V) (S : Set K),
+      IsIdempotentElem e → Commute U e → (∀ μ y, y ≠ 0 → e y = y → U y = μ • y → μ ∈ S)
+        → (∀ μ y, y ≠ 0 → e y = 0 → U y = μ • y → μ ∉ S)
+        → LinearMap.range e = ⨆ μ ∈ S, U.maxGenEigenspace μ := by
   intro K V _ _ _ _ _ U e S he hc h1 h2
   have hE : ∀ μ, Submodule.map e (U.maxGenEigenspace μ) ≤ U.maxGenEigenspace μ := by
     intro μ
@@ -64,15 +75,21 @@ theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.eigSum :
     · exact (hE μ).trans (le_iSup₂_of_le μ hμ le_rfl)
     · rintro _ ⟨y, hy, rfl⟩
       have h0 : e y = 0 :=
-        idempotent_kills_generalized_eigenspace U e he hc μ (fun z hz hez hUz => hμ (h1 μ z hz hez hUz)) y hy
+        idempotent_kills_generalized_eigenspace U e he hc μ
+          (fun z hz hez hUz => hμ (h1 μ z hz hez hUz))
+          y hy
       rw [h0]
       exact Submodule.zero_mem _
   · refine iSup₂_le fun μ hμ => ?_
     intro y hy
     have hf : IsIdempotentElem (1 - e) := he.one_sub
     have hc1 : Commute U (1 - e) := (Commute.one_right U).sub_right hc
-    have h0 := idempotent_kills_generalized_eigenspace U (1 - e) hf hc1 μ
-      (fun z hz hez hUz => h2 μ z hz
-        (by rw [LinearMap.sub_apply, Module.End.one_apply, sub_eq_self] at hez; exact hez) hUz hμ) y hy
+    have h0 :=
+      idempotent_kills_generalized_eigenspace U (1 - e) hf hc1 μ
+        (fun z hz hez hUz =>
+          h2 μ z hz
+            (by rw [LinearMap.sub_apply, Module.End.one_apply, sub_eq_self] at hez; exact hez) hUz
+            hμ)
+        y hy
     rw [LinearMap.sub_apply, Module.End.one_apply, sub_eq_zero] at h0
     exact ⟨y, h0.symm⟩

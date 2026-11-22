@@ -9,11 +9,17 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal
 
 namespace GlobalTheory.DesignUnconditional
 
-theorem main : ∀ D : D7, GlobalTheory.CoefDuty.TakenAll D → Formalism.MainNotions.N.K.Rows.AllDesignConditions D :=
-  GlobalTheory.T.designConditionAll_of_cheb_of_takenAll (GlobalTheory.Published.chebotarevDegreeOne_iff_cheb.mp GlobalTheory.Published.chebotarevDegreeOne')
+theorem main
+    : ∀ D : D7,
+      GlobalTheory.CoefDuty.TakenAll D → Formalism.MainNotions.N.K.Rows.AllDesignConditions D :=
+  GlobalTheory.T.designConditionAll_of_cheb_of_takenAll
+    (GlobalTheory.Published.chebotarevDegreeOne_iff_cheb.mp
+      GlobalTheory.Published.chebotarevDegreeOne')
 
 end GlobalTheory.DesignUnconditional

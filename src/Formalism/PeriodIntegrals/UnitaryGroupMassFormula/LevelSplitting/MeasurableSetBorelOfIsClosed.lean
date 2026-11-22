@@ -9,11 +9,12 @@ noncomputable section
 
 namespace PI.LevelKSplit.W.Meas
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.LevelKSplit
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.LevelKSplit
 open scoped TensorProduct
 
-theorem measurableSet_borel_of_isClosed {X : Type} [TopologicalSpace X] {s : Set X}
-    (h : IsClosed s) : MeasurableSet[borel X] s := by
+theorem measurableSet_borel_of_isClosed {X : Type} [TopologicalSpace X] {s : Set X} (h : IsClosed s)
+    : MeasurableSet[borel X] s := by
   have : MeasurableSet[borel X] sᶜ := MeasurableSpace.measurableSet_generateFrom h.isOpen_compl
   simpa using this.compl
 
@@ -24,23 +25,25 @@ theorem lattice_borel : LatBorel := by
   have hfd : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   let _ : MeasurableSpace (Fin n → Fv F v ⊗[F] E) := borel _
   have hT2 : T2Space (Fv F v ⊗[F] E) := by
-    obtain ⟨ι, _, ⟨h⟩⟩ := PI.AdicCompletionValuation.exists_homeomorph_tens (F := F) (E := E) (Fv F v)
+    obtain ⟨ι, _, ⟨h⟩⟩ :=
+      PI.AdicCompletionValuation.exists_homeomorph_tens (F := F) (E := E) (Fv F v)
     exact h.isEmbedding.t2Space
   have hO : CompactSpace (v.adicCompletionIntegers F) :=
     isCompact_iff_compactSpace.mp (PI.AdicCompletionValuation.isCompact_adicCompletionIntegers F v)
   set S : Set (Fin n → Fv F v ⊗[F] E) := ratV (F := F) (Fv F v) '' Λ with hS
   have hSc : Countable S := ((Set.to_countable Λ).image _).to_subtype
-  have hL : (latLoc (E := E) v Λ : Set (Fin n → Fv F v ⊗[F] E)) =
-      ⋃ T : Finset S, (Submodule.span (v.adicCompletionIntegers F)
-        (Set.range fun i : T => ((i : S) : Fin n → Fv F v ⊗[F] E)) : Set _) := by
+  have hL
+      : (latLoc (E := E) v Λ : Set (Fin n → Fv F v ⊗[F] E))
+        = ⋃ T : Finset S, (Submodule.span (v.adicCompletionIntegers F)
+            (Set.range fun i : T => ((i : S) : Fin n → Fv F v ⊗[F] E)) : Set _) := by
     ext x
     simp only [SetLike.mem_coe, Set.mem_iUnion]
     constructor
     · intro hx
       obtain ⟨T', hT'S, hxT'⟩ := Submodule.mem_span_finite_of_mem_span hx
       refine ⟨T'.subtype (· ∈ S), ?_⟩
-      have : (Set.range fun i : T'.subtype (· ∈ S) => ((i : S) : Fin n → Fv F v ⊗[F] E)) =
-          (T' : Set (Fin n → Fv F v ⊗[F] E)) := by
+      have : (Set.range fun i : T'.subtype (· ∈ S) => ((i : S) : Fin n → Fv F v ⊗[F] E))
+          = (T' : Set (Fin n → Fv F v ⊗[F] E)) := by
         ext y
         constructor
         · rintro ⟨i, rfl⟩
@@ -56,14 +59,16 @@ theorem lattice_borel : LatBorel := by
   rw [hL]
   refine MeasurableSet.iUnion fun T => measurableSet_borel_of_isClosed (IsCompact.isClosed ?_)
   rw [← Fintype.range_linearCombination]
-  have hc : Continuous (Fintype.linearCombination (v.adicCompletionIntegers F)
-      fun i : T => ((i : S) : Fin n → Fv F v ⊗[F] E)) := by
-    have : (Fintype.linearCombination (v.adicCompletionIntegers F)
-        fun i : T => ((i : S) : Fin n → Fv F v ⊗[F] E)) =
-        fun c : T → v.adicCompletionIntegers F => ∑ i : T, ((c i : v.adicCompletionIntegers F) : Fv F v) • ((i : S) : Fin n → Fv F v ⊗[F] E) := by
-      funext c
-      rw [Fintype.linearCombination_apply]
-      rfl
+  have hc : Continuous (Fintype.linearCombination (v.adicCompletionIntegers F) fun i : T =>
+      ((i : S) : Fin n → Fv F v ⊗[F] E)) := by
+    have : (Fintype.linearCombination (v.adicCompletionIntegers F) fun i : T =>
+          ((i : S) : Fin n → Fv F v ⊗[F] E))
+        = fun c : T → v.adicCompletionIntegers F =>
+          ∑ i : T, ((c i : v.adicCompletionIntegers F) : Fv F v) • ((i : S) : Fin n → Fv F v ⊗[F] E) :=
+      by
+        funext c
+        rw [Fintype.linearCombination_apply]
+        rfl
     rw [this]
     refine continuous_finsetSum _ fun i _ => ?_
     have h1 : Continuous fun c : T → v.adicCompletionIntegers F =>

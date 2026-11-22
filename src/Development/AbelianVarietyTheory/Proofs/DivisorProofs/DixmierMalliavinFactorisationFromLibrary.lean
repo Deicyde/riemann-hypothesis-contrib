@@ -8,7 +8,8 @@ public import CompanionTheory.AutomorphicTheory.PadicUnitaryWeights.DixmierMalli
 
 namespace GlobalTheory
 
-theorem dixmierMalliavinFactorisation_fromLibrary : GlobalTheory.Published.DixmierMalliavinFactorisation :=
+theorem dixmierMalliavinFactorisation_fromLibrary
+    : GlobalTheory.Published.DixmierMalliavinFactorisation :=
   CompanionTheory.DM.dixmierMalliavinFactorisation_holds
 
 end GlobalTheory

@@ -9,7 +9,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 noncomputable section
 
 open scoped Classical
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Matrix
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.HidaSetting Matrix
 
 namespace Formalism.L2.SG.Pf.NcReal.JX.NOf
 
@@ -23,13 +24,14 @@ variable {D : D7} (X : HidaSetting D)
 
 local notation "FI" => FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E
 
-theorem fi_smul_mem {I : FI} {x : D.host.E} (hx : x ∈ I) (o : 𝓞 D.host.E) : (o : D.host.E) * x ∈ I := by
+theorem fi_smul_mem {I : FI} {x : D.host.E} (hx : x ∈ I) (o : 𝓞 D.host.E)
+    : (o : D.host.E) * x ∈ I := by
   have h := (I : Submodule (𝓞 D.host.E) D.host.E).smul_mem o hx
   rw [Algebra.smul_def] at h
   exact h
 
-theorem coef_span_e (y : (VS D).V) (hy : y ∈ latSpanS (fun a => aaD D a) X.eX) :
-    (∀ a, (VS D).hT (X.fY a) y ∈ aaD D a) ∧ (∀ a, (VS D).hT (X.eX a) y = 0) ∧ pW X y = 0 := by
+theorem coef_span_e (y : (VS D).V) (hy : y ∈ latSpanS (fun a => aaD D a) X.eX)
+    : (∀ a, (VS D).hT (X.fY a) y ∈ aaD D a) ∧ (∀ a, (VS D).hT (X.eX a) y = 0) ∧ pW X y = 0 := by
   unfold latSpanS at hy
   induction hy using Submodule.span_induction with
   | mem z hz =>
@@ -43,7 +45,13 @@ theorem coef_span_e (y : (VS D).V) (hy : y ∈ latSpanS (fun a => aaD D a) X.eX)
         exact Submodule.zero_mem (aaD D a : Submodule (𝓞 D.host.E) D.host.E)
     · rw [map_smul, X.ee, smul_zero]
     · rw [pW_smul, pW_e, smul_zero]
-  | zero => exact ⟨fun a => by rw [map_zero]; exact Submodule.zero_mem (aaD D a : Submodule (𝓞 D.host.E) D.host.E), fun a => by simp, by simpa using pW_smul X 0 0⟩
+  | zero =>
+    exact ⟨
+      fun a => by
+        rw [map_zero]; exact Submodule.zero_mem (aaD D a : Submodule (𝓞 D.host.E) D.host.E),
+      fun a => by simp,
+      by simpa using pW_smul X 0 0
+    ⟩
   | add z w _ _ hz hw =>
     refine ⟨fun a => ?_, fun a => ?_, ?_⟩
     · rw [map_add (f := _)]
@@ -62,8 +70,8 @@ theorem pW_f (b : Fin D.R.rS) : pW X (X.fY b) = 0 := by
   unfold pW
   simp [X.ff, X.ef, ite_smul, Finset.sum_ite_eq']
 
-theorem coef_span_f (y : (VS D).V) (hy : y ∈ latSpanS (fun a => (aaD D a)⁻¹) X.fY) :
-    (∀ a, (VS D).hT (X.fY a) y = 0) ∧ (∀ a, (VS D).hT (X.eX a) y ∈ (aaD D a)⁻¹) ∧ pW X y = 0 := by
+theorem coef_span_f (y : (VS D).V) (hy : y ∈ latSpanS (fun a => (aaD D a)⁻¹) X.fY)
+    : (∀ a, (VS D).hT (X.fY a) y = 0) ∧ (∀ a, (VS D).hT (X.eX a) y ∈ (aaD D a)⁻¹) ∧ pW X y = 0 := by
   unfold latSpanS at hy
   induction hy using Submodule.span_induction with
   | mem z hz =>
@@ -77,12 +85,20 @@ theorem coef_span_f (y : (VS D).V) (hy : y ∈ latSpanS (fun a => (aaD D a)⁻¹
       · rw [mul_zero]
         exact Submodule.zero_mem (((aaD D a)⁻¹ : FI) : Submodule (𝓞 D.host.E) D.host.E)
     · rw [pW_smul, pW_f, smul_zero]
-  | zero => exact ⟨fun a => by simp, fun a => by rw [map_zero]; exact Submodule.zero_mem (((aaD D a)⁻¹ : FI) : Submodule (𝓞 D.host.E) D.host.E), by simpa using pW_smul X 0 0⟩
+  | zero =>
+    exact ⟨
+      fun a => by simp,
+      fun a => by
+        rw [map_zero]
+        exact Submodule.zero_mem (((aaD D a)⁻¹ : FI) : Submodule (𝓞 D.host.E) D.host.E),
+      by simpa using pW_smul X 0 0
+    ⟩
   | add z w _ _ hz hw =>
     refine ⟨fun a => ?_, fun a => ?_, ?_⟩
     · rw [map_add (f := _), hz.1 a, hw.1 a, add_zero]
     · rw [map_add (f := _)]
-      exact Submodule.add_mem (((aaD D a)⁻¹ : FI) : Submodule (𝓞 D.host.E) D.host.E) (hz.2.1 a) (hw.2.1 a)
+      exact Submodule.add_mem (((aaD D a)⁻¹ : FI) : Submodule (𝓞 D.host.E) D.host.E) (hz.2.1 a)
+        (hw.2.1 a)
     · rw [pW_add, hz.2.2, hw.2.2, add_zero]
   | smul o z _ hz =>
     rw [← algebraMap_smul D.host.E o z]
@@ -92,8 +108,10 @@ theorem coef_span_f (y : (VS D).V) (hy : y ∈ latSpanS (fun a => (aaD D a)⁻¹
       exact fi_smul_mem (hz.2.1 a) o
     · rw [pW_smul, hz.2.2, smul_zero]
 
-theorem mem_hermitianStandardLattice_iff_pairing_integral (x : (VS D).V) : x ∈ (VS D).L0 ↔
-    (∀ a, (VS D).hT (X.fY a) x ∈ aaD D a) ∧ (∀ a, (VS D).hT (X.eX a) x ∈ (aaD D a)⁻¹) ∧ pW X x ∈ X.Lb := by
+theorem mem_hermitianStandardLattice_iff_pairing_integral (x : (VS D).V)
+    : x ∈ (VS D).L0
+      ↔ (∀ a, (VS D).hT (X.fY a) x ∈ aaD D a) ∧ (∀ a, (VS D).hT (X.eX a) x ∈ (aaD D a)⁻¹)
+        ∧ pW X x ∈ X.Lb := by
   rw [X.Lam_split]
   constructor
   · intro hx

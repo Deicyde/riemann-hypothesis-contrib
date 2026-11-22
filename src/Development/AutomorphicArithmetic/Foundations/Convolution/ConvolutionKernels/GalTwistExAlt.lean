@@ -10,12 +10,13 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Convolut
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.CuspidalProjection PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory.K
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.CuspidalSpectrum
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.CuspidalProjection PositivityTheory.Rg.Tf.Core
+  UpperTheory.ConvolutionTheory.K
 open scoped InnerProductSpace
 
-theorem UpperTheory.ConvolutionTheory.K.galTwistEx :
-    GalTwistEx := by
+theorem UpperTheory.ConvolutionTheory.K.galTwistEx : GalTwistEx := by
   intro K _ _ n μ _ σ
   obtain ⟨e, he, he', hg, m, hm, hit⟩ := galEquiv K n σ
   have hp := presOfOrder μ e m hm hit
@@ -24,5 +25,6 @@ theorem UpperTheory.ConvolutionTheory.K.galTwistEx :
   obtain ⟨U, hU, hU'⟩ := twOpEx K n μ e hg hp
   refine ⟨⟨e, hg, hp, ⟨1, 1, fun g => ?_⟩, U, hU, ?_⟩, he⟩
   · rw [he, adHeight]; simp
-  · exact commProj (cuspidalL2 μ) U (fun v hv => galCusp K n μ σ.symm e.symm he' hg' hp' v _ hv (hU v))
+  · exact commProj (cuspidalL2 μ) U
+      (fun v hv => galCusp K n μ σ.symm e.symm he' hg' hp' v _ hv (hU v))
       (fun v hv => galCusp K n μ σ e he hg hp v _ hv (hU' v))

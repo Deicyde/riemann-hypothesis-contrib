@@ -10,10 +10,11 @@ namespace ReciprocityTheory.ChartRestriction.N2
 
 open NumberField IsDedekindDomain
 
-theorem ncard_places_eq_finrank_iff (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p.Prime) :
-    {w : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ w.asIdeal}.ncard = Module.finrank ℚ E ↔
-      ∀ W : HeightOneSpectrum (𝓞 E), ((p : ℕ) : 𝓞 E) ∈ W.asIdeal →
-        W.asIdeal.ramificationIdx ℤ = 1 ∧ W.asIdeal.inertiaDeg ℤ = 1 := by
+theorem ncard_places_eq_finrank_iff (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p.Prime)
+    : {w : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ w.asIdeal}.ncard = Module.finrank ℚ E
+      ↔ ∀ W : HeightOneSpectrum (𝓞 E),
+        ((p : ℕ) : 𝓞 E) ∈ W.asIdeal
+          → W.asIdeal.ramificationIdx ℤ = 1 ∧ W.asIdeal.inertiaDeg ℤ = 1 := by
   classical
   haveI := Fact.mk hp
   set P : Ideal ℤ := Ideal.span {(p : ℤ)} with hPdef
@@ -24,26 +25,36 @@ theorem ncard_places_eq_finrank_iff (E : Type) [Field E] [NumberField E] (p : �
   haveI : Fintype (P.primesOver (𝓞 E)) := by
     rw [← IsDedekindDomain.coe_primesOverFinset hP0 (𝓞 E)]
     infer_instance
-  have hsum : ∑ q : P.primesOver (𝓞 E), (q : Ideal (𝓞 E)).ramificationIdx ℤ * (q : Ideal (𝓞 E)).inertiaDeg ℤ =
-      Module.finrank ℚ E := by
+  have hsum
+      : ∑ q : P.primesOver (𝓞 E), (q : Ideal (𝓞 E)).ramificationIdx ℤ * (q : Ideal (𝓞 E)).inertiaDeg ℤ
+        = Module.finrank ℚ E := by
     rw [Ideal.sum_ramification_inertia_eq_finrank P (𝓞 E), NumberField.RingOfIntegers.rank]
-  have hiff : ∀ w : HeightOneSpectrum (𝓞 E),
-      ((p : ℕ) : 𝓞 E) ∈ w.asIdeal ↔ w.asIdeal ∣ Ideal.map (algebraMap ℤ (𝓞 E)) P := by
+  have hiff
+      : ∀ w : HeightOneSpectrum (𝓞 E),
+        ((p : ℕ) : 𝓞 E) ∈ w.asIdeal ↔ w.asIdeal ∣ Ideal.map (algebraMap ℤ (𝓞 E)) P := by
     intro w
-    rw [Ideal.dvd_iff_le, Ideal.map_le_iff_le_comap, hPdef, Ideal.span_singleton_le_iff_mem, Ideal.mem_comap]
+    rw [Ideal.dvd_iff_le, Ideal.map_le_iff_le_comap, hPdef, Ideal.span_singleton_le_iff_mem,
+      Ideal.mem_comap]
     simp
-  let eqv := (Equiv.subtypeEquivRight hiff).trans (IsDedekindDomain.HeightOneSpectrum.equivPrimesOver (𝓞 E) hP0)
-  have hS : {w : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ w.asIdeal}.ncard = Fintype.card (P.primesOver (𝓞 E)) := by
+  let eqv :=
+    (Equiv.subtypeEquivRight hiff).trans
+      (IsDedekindDomain.HeightOneSpectrum.equivPrimesOver (𝓞 E) hP0)
+  have hS
+      : {w : HeightOneSpectrum (𝓞 E) | ((p : ℕ) : 𝓞 E) ∈ w.asIdeal}.ncard
+        = Fintype.card (P.primesOver (𝓞 E)) := by
     rw [← Nat.card_coe_set_eq, ← Nat.card_eq_fintype_card]
     exact Nat.card_congr eqv
-  have hpos : ∀ q : P.primesOver (𝓞 E),
-      1 ≤ (q : Ideal (𝓞 E)).ramificationIdx ℤ * (q : Ideal (𝓞 E)).inertiaDeg ℤ := by
+  have hpos
+      : ∀ q : P.primesOver (𝓞 E),
+        1 ≤ (q : Ideal (𝓞 E)).ramificationIdx ℤ * (q : Ideal (𝓞 E)).inertiaDeg ℤ := by
     intro q
     haveI := Ideal.primesOver.isPrime P q
-    exact Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (Ideal.ramificationIdx_pos (R := ℤ) _).ne' (Ideal.inertiaDeg_pos _ ℤ).ne')
+    exact Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (Ideal.ramificationIdx_pos (R := ℤ) _).ne'
+      (Ideal.inertiaDeg_pos _ ℤ).ne')
   have hcard : Fintype.card (P.primesOver (𝓞 E)) = ∑ _q : P.primesOver (𝓞 E), 1 := by simp
-  have heqv : ∀ W : HeightOneSpectrum (𝓞 E), ∀ hW : ((p : ℕ) : 𝓞 E) ∈ W.asIdeal,
-      ((eqv ⟨W, hW⟩ : P.primesOver (𝓞 E)) : Ideal (𝓞 E)) = W.asIdeal := by
+  have heqv
+      : ∀ W : HeightOneSpectrum (𝓞 E), ∀ hW : ((p : ℕ) : 𝓞 E) ∈ W.asIdeal,
+        ((eqv ⟨W, hW⟩ : P.primesOver (𝓞 E)) : Ideal (𝓞 E)) = W.asIdeal := by
     intro W hW
     simp [eqv, IsDedekindDomain.HeightOneSpectrum.equivPrimesOver_apply]
   rw [hS, ← hsum, hcard]

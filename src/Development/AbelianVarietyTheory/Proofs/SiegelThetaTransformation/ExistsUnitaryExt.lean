@@ -11,11 +11,12 @@ open scoped ComplexConjugate ComplexOrder Real
 
 namespace GlobalTheory.SW.RowExt
 
-theorem exists_right_inv {E : Type} [Field E] [NumberField E] {κ ι : Type} [Fintype κ] [Fintype ι]
-    [DecidableEq κ] (c : E) (W : Matrix κ ι E) (hW : IntM W)
-    (hli : LinearIndependent E (fun i => W i))
-    (hprim : ∀ t : κ → E, (∀ j, IsIntegral ℤ ((t ᵥ* W) j)) → ∀ i, IsIntegral ℤ (c * t i)) :
-    ∃ X : Matrix ι κ E, IntM X ∧ W * X = c • (1 : Matrix κ κ E) := by
+theorem exists_right_inv
+    {E : Type} [Field E] [NumberField E]
+    {κ ι : Type} [Fintype κ] [Fintype ι] [DecidableEq κ]
+    (c : E) (W : Matrix κ ι E) (hW : IntM W) (hli : LinearIndependent E (fun i => W i))
+    (hprim : ∀ t : κ → E, (∀ j, IsIntegral ℤ ((t ᵥ* W) j)) → ∀ i, IsIntegral ℤ (c * t i))
+    : ∃ X : Matrix ι κ E, IntM X ∧ W * X = c • (1 : Matrix κ κ E) := by
   classical
   have hinj : LinearMap.ker W.vecMulLinear = ⊥ := by
     rw [LinearMap.ker_eq_bot]
@@ -31,8 +32,8 @@ theorem exists_right_inv {E : Type} [Field E] [NumberField E] {κ ι : Type} [Fi
   haveI : Module.Flat (𝓞 E) (LinearMap.range φ) := inferInstance
   haveI : Module.Projective (𝓞 E) (LinearMap.range φ) :=
     Module.Flat.projective_of_finitePresentation
-  obtain ⟨s, hs⟩ := Module.projective_lifting_property φ.rangeRestrict LinearMap.id
-    φ.surjective_rangeRestrict
+  obtain ⟨s, hs⟩ :=
+    Module.projective_lifting_property φ.rangeRestrict LinearMap.id φ.surjective_rangeRestrict
   let r : (ι → 𝓞 E) →ₗ[𝓞 E] (ι → 𝓞 E) := LinearMap.id - s ∘ₗ φ.rangeRestrict
   have hr : ∀ m, φ (r m) = 0 := by
     intro m
@@ -53,8 +54,7 @@ theorem exists_right_inv {E : Type} [Field E] [NumberField E] {κ ι : Type} [Fi
     exact RingOfIntegers.isIntegral_coe _
   · ext i k
     let w : ι → 𝓞 E := fun a => ⟨W i a, hW i a⟩
-    have hjw : j w = Pi.single i 1 ᵥ* W := by
-      rw [Matrix.single_one_vecMul]; rfl
+    have hjw : j w = Pi.single i 1 ᵥ* W := by rw [Matrix.single_one_vecMul]; rfl
     have hφw : φ.rangeRestrict w = 0 := by
       apply Subtype.ext
       show j w - g (j w) ᵥ* W = 0
@@ -81,8 +81,8 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {α β γ : Type}
 theorem ccT_eq (A : Matrix α β E) : ccT A = Aᴴ := rfl
 
 omit [NumberField E] [IsCMField E] in
-theorem intM_mul [Fintype β] {A : Matrix α β E} {B : Matrix β γ E} (hA : IntM A) (hB : IntM B) :
-    IntM (A * B) := fun a c => by
+theorem intM_mul [Fintype β] {A : Matrix α β E} {B : Matrix β γ E} (hA : IntM A) (hB : IntM B)
+    : IntM (A * B) := fun a c => by
   rw [Matrix.mul_apply]
   exact IsIntegral.sum _ fun b _ => (hA a b).mul (hB b c)
 
@@ -95,20 +95,24 @@ theorem intM_nat {A : Matrix α β E} (n : ℕ) (hA : IntM A) : IntM ((n : E) �
 
 omit [NumberField E] [IsCMField E] in
 theorem intM_J [DecidableEq α] : IntM (Matrix.J α E) := by
-  rintro (a | a) (b | b) <;> by_cases h : a = b <;>
-    simp [Matrix.J, Matrix.one_apply, h, isIntegral_zero, isIntegral_one, isIntegral_one.neg]
+  rintro (a | a) (b | b) <;> by_cases h : a = b
+    <;> simp [Matrix.J, Matrix.one_apply, h, isIntegral_zero, isIntegral_one, isIntegral_one.neg]
 
-theorem J_conj [DecidableEq α] : (Matrix.J α E)ᴴ = -Matrix.J α E := by
+theorem J_conj [DecidableEq α] : (Matrix.J α E)ᴴ = - Matrix.J α E := by
   simp [Matrix.J, Matrix.fromBlocks_conjTranspose, Matrix.fromBlocks_neg]
 
 end
 
-theorem exists_unitary_ext :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (N c : ℕ), 0 < c → ∃ c' : ℕ, 0 < c' ∧
-      ∀ W : Matrix (Fin N) (Fin N ⊕ Fin N) E, IntM W → LinearIndependent E (fun i => W i) →
-        W * Matrix.J (Fin N) E * ccT W = 0 →
-        (∀ t : Fin N → E, (∀ j, IsIntegral ℤ ((t ᵥ* W) j)) → ∀ i, IsIntegral ℤ ((c : E) * t i)) →
-        ∃ γ ∈ UU E N, Den c' γ ∧ ∀ a, γ (Sum.inr a) = W a := by
+theorem exists_unitary_ext
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (N c : ℕ),
+      0 < c
+        → ∃ c' : ℕ,
+          0 < c'
+            ∧ ∀ W : Matrix (Fin N) (Fin N ⊕ Fin N) E,
+              IntM W → LinearIndependent E (fun i => W i) → W * Matrix.J (Fin N) E * ccT W = 0
+                → (∀ t : Fin N → E,
+                  (∀ j, IsIntegral ℤ ((t ᵥ* W) j)) → ∀ i, IsIntegral ℤ ((c : E) * t i))
+                → ∃ γ ∈ UU E N, Den c' γ ∧ ∀ a, γ (Sum.inr a) = W a := by
   intro E _ _ _ N c hc
   refine ⟨2 * c * c, by positivity, fun W hW hli hiso hprim => ?_⟩
   obtain ⟨X, hX, hWX⟩ := exists_right_inv (c : E) W hW hli hprim
@@ -135,8 +139,7 @@ theorem exists_unitary_ext :
   obtain ⟨S, hS⟩ : ∃ S, S = V₀ * J * V₀ᴴ := ⟨_, rfl⟩
   have hSc : Sᴴ = -S := hS ▸ skew V₀ V₀
   obtain ⟨T, hT⟩ : ∃ T, T = (-(2 : E)⁻¹) • S := ⟨_, rfl⟩
-  have hTc : Tᴴ = -T := by
-    rw [hT, Matrix.conjTranspose_smul, hSc]; simp
+  have hTc : Tᴴ = -T := by rw [hT, Matrix.conjTranspose_smul, hSc]; simp
   obtain ⟨V, hV⟩ : ∃ V, V = V₀ + T * W := ⟨_, rfl⟩
   have k2 : W * J * Vᴴ = 1 := by
     rw [hV, Matrix.conjTranspose_add, Matrix.conjTranspose_mul, Matrix.mul_add, h2,
@@ -144,7 +147,8 @@ theorem exists_unitary_ext :
   have k1 : V * J * Wᴴ = -1 := by
     have := skew W V
     rw [k2] at this
-    rw [← neg_neg (V * J * Wᴴ), ← this]; simp
+    rw [← neg_neg (V * J * Wᴴ), ← this]
+    simp
   have k0 : V * J * Vᴴ = 0 := by
     have e : V * J * V₀ᴴ = S + T := by
       rw [hV, Matrix.add_mul, Matrix.add_mul, ← hS, Matrix.mul_assoc T, Matrix.mul_assoc T, h2,
@@ -168,8 +172,9 @@ theorem exists_unitary_ext :
     have e3 : J * (J * gᴴ * -J * g) = J := by rw [e2, Matrix.mul_one]
     rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, ← Matrix.mul_assoc, hJJ] at e3
     simpa using e3
-  · have hVV : ((2 * c * c : ℕ) : E) • V = ((2 * c : ℕ) : E) • ((c : E) • V₀) -
-        ((c : E) • V₀) * J * ((c : E) • V₀)ᴴ * W := by
+  · have hVV
+        : ((2 * c * c : ℕ) : E) • V
+          = ((2 * c : ℕ) : E) • ((c : E) • V₀) - ((c : E) • V₀) * J * ((c : E) • V₀)ᴴ * W := by
       rw [hV, hT, hS]
       simp only [Matrix.conjTranspose_smul, Matrix.smul_mul, Matrix.mul_smul, smul_add, smul_smul,
         star_natCast, sub_eq_add_neg, ← neg_smul]

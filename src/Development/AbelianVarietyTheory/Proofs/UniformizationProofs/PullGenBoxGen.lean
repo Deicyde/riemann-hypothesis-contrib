@@ -12,14 +12,17 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.BoxCubical
 
-open ReciprocityTheory.ChartRestriction.G.Pdiv.PullbackComparison (gU unit_ext gU_res gU_pullU gU_pullU_res)
+open ReciprocityTheory.ChartRestriction.G.Pdiv.PullbackComparison
+  (gU unit_ext gU_res gU_pullU gU_pullU_res)
 
 section Box
 
@@ -151,15 +154,17 @@ end Box
 
 section Cub
 
-variable {S : Scheme.{0}} {G' : Over S} [GrpObj G'] [IsCommMonObj G'] {X : Scheme.{0}}
-  {J : Type} [Fintype J]
+variable
+  {S : Scheme.{0}} {G' : Over S} [GrpObj G'] [IsCommMonObj G']
+  {X : Scheme.{0}} {J : Type} [Fintype J]
 
-def prodCubical (L : LB X) (F : J → (G'.left ⟶ X))
+def prodCubical
+    (L : LB X) (F : J → (G'.left ⟶ X))
     (r : ∀ i, LB.Gen ((L.pull (F i)).pull (eSec G'))) (hL : ∀ i, (L.pull (F i)).IsLB)
     (hr : ∀ i, (r i).IsGen) (c : ∀ i, CubicalStr G' ⟨L.pull (F i), r i, hL i, hr i⟩)
     (r' : LB.Gen ((LB.LinComb L F (fun _ => 1)).pull (eSec G')))
-    (hL' : (LB.LinComb L F (fun _ => 1)).IsLB) (hr' : r'.IsGen) :
-    CubicalStr G' ⟨LB.LinComb L F (fun _ => 1), r', hL', hr'⟩ where
+    (hL' : (LB.LinComb L F (fun _ => 1)).IsLB) (hr' : r'.IsGen)
+    : CubicalStr G' ⟨LB.LinComb L F (fun _ => 1), r', hL', hr'⟩ where
   t := GeneratorPullback.boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t)
   isGen := isGen_boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t) (fun i => (c i).isGen)
   face := fun n =>
@@ -167,19 +172,25 @@ def prodCubical (L : LB X) (F : J → (G'.left ⟶ X))
       (oneGen_boxGen L F) (corr_boxGen L F _ _ _ _ _ _ (fun i => (c i).face n))
   cubeSymmetric_swap_first :=
     LBxP.corr_of_eq rfl (pullGen_boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t) _)
-      (corr_boxGen L F (thφ G' (x3 G')) thε _ _ (fun i => (c i).t) _ (fun i => (c i).cubeSymmetric_swap_first))
+      (corr_boxGen L F (thφ G' (x3 G')) thε _ _
+        (fun i => (c i).t)
+        _
+        (fun i => (c i).cubeSymmetric_swap_first))
   cubeSymmetric_swap_last :=
     LBxP.corr_of_eq rfl (pullGen_boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t) _)
-      (corr_boxGen L F (thφ G' (x3 G')) thε _ _ (fun i => (c i).t) _ (fun i => (c i).cubeSymmetric_swap_last))
+      (corr_boxGen L F (thφ G' (x3 G')) thε _ _
+        (fun i => (c i).t)
+        _
+        (fun i => (c i).cubeSymmetric_swap_last))
   cocycle :=
     LBxP.corr_of_eq
       ((congrArg₂ (LB.mulGen (LB.LinComb L F (fun _ => 1)) _ _ _ _)
-        (pullGen_boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t) _)
-        (pullGen_boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t) _)).trans
+          (pullGen_boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t) _)
+          (pullGen_boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t) _)).trans
         (mulGen_boxGen L F _ _ _ _ _ _))
       ((congrArg₂ (LB.mulGen (LB.LinComb L F (fun _ => 1)) _ _ _ _)
-        (pullGen_boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t) _)
-        (pullGen_boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t) _)).trans
+          (pullGen_boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t) _)
+          (pullGen_boxGen L F (thφ G' (x3 G')) thε (fun i => (c i).t) _)).trans
         (mulGen_boxGen L F _ _ _ _ _ _))
       (corr_boxGen L F _ _ _ _ _ _ (fun i => (c i).cocycle))
 
@@ -194,9 +205,20 @@ theorem boxCubical : ∀ S : Scheme.{0}, BoxCubicalSt (S := S) := by
   let m : Fin j → CubeMap G' G := fun i => letI := p.hom i; CubeMap.ofHom (p.pr i)
   have hLi : ∀ i, (L.L.pull (m i).F).IsLB := fun i => LB.isLB_pull L.isLB (m i).F
   have hri : ∀ i, ((m i).rigPull L.L L.rig).IsGen := fun i =>
-    LBxP.isGen_pullAlong L.L (m i).F (m i).e (fun _ : PUnit => eSec G) (fun _ => 1)
-      (fun _ => eSec G') (fun _ => (m i).e_comm) L.rig L.rigGen
-  exact ⟨BoxCubical.prodCubical L.L (fun i => (p.pr i).left) (fun i => (m i).rigPull L.L L.rig)
-    hLi hri (fun i => CubePf.cubical (m i) L c (hLi i) (hri i)) _ hL hr, rfl⟩
+    LBxP.isGen_pullAlong L.L (m i).F (m i).e
+      (fun _ : PUnit => eSec G)
+      (fun _ => 1)
+      (fun _ => eSec G')
+      (fun _ => (m i).e_comm)
+      L.rig L.rigGen
+  exact ⟨
+    BoxCubical.prodCubical L.L
+      (fun i => (p.pr i).left)
+      (fun i => (m i).rigPull L.L L.rig)
+      hLi hri
+      (fun i => CubePf.cubical (m i) L c (hLi i) (hri i))
+      _ hL hr,
+    rfl
+  ⟩
 
 end GlobalTheory

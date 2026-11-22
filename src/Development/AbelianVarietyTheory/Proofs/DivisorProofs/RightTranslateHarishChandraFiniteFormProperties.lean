@@ -11,16 +11,33 @@ open NumberField MeasureTheory GlobalTheory.CuspRep
 
 namespace GlobalTheory.HCF
 
-theorem fold_replicate_cap {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
-    (c : Module.End ℂ (Sm E a)) (χ : Module.End ℂ (Sm E a) → ℂ) (φ : Sm E a) (n : ℕ) :
-    (List.replicate n c).foldr (fun z f => z f - χ z • f) φ = ((c - algebraMap ℂ _ (χ c)) ^ n) φ := by
+theorem fold_replicate_cap
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    {a : ℕ} (c : Module.End ℂ (Sm E a)) (χ : Module.End ℂ (Sm E a) → ℂ) (φ : Sm E a)
+    (n : ℕ)
+    : (List.replicate n c).foldr (fun z f => z f - χ z • f) φ
+      = ((c - algebraMap ℂ _ (χ c)) ^ n) φ := by
   induction n with
   | zero => simp
   | succ n ih =>
-    rw [List.replicate_succ, List.foldr_cons, ih, pow_succ', Module.End.mul_apply, LinearMap.sub_apply,
-      Module.algebraMap_end_apply]
+    rw [List.replicate_succ, List.foldr_cons, ih, pow_succ', Module.End.mul_apply,
+      LinearMap.sub_apply, Module.algebraMap_end_apply]
 
-theorem rt_translate_kill : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (L : Subgroup (GL (Fin a) (Af E))) (W : Submodule ℂ (Kinf E a → ℂ)) (X : Set (Module.End ℂ (Sm E a) → ℂ)) (S : Finset (Module.End ℂ (Sm E a) → ℂ)), X ⊆ ↑S → ∀ (N : ℕ), ∀ φ ∈ GlobalTheory.HCF.formsGL E a L W X N, ∀ (t : GL (Fin a) (Af E)) (κ : Kinf E a), (∀ γ g, (rt E a (finGL E a t * infGL E a (Unitary.toUnits κ)) φ).1 (ratGL E a γ * g) = (rt E a (finGL E a t * infGL E a (Unitary.toUnits κ)) φ).1 g) ∧ IsOpen {k | finRep E a k (rt E a (finGL E a t * infGL E a (Unitary.toUnits κ)) φ) = rt E a (finGL E a t * infGL E a (Unitary.toUnits κ)) φ} ∧ ∀ (τ : E →+* ℂ) (u : ℂ), Polynomial.aeval (cap τ u) (∏ χ ∈ S, (Polynomial.X - Polynomial.C (χ (cap τ u))) ^ N) (rt E a (finGL E a t * infGL E a (Unitary.toUnits κ)) φ) = 0 := by
+theorem rt_translate_kill
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+        (L : Subgroup (GL (Fin a) (Af E))) (W : Submodule ℂ (Kinf E a → ℂ))
+        (X : Set (Module.End ℂ (Sm E a) → ℂ)) (S : Finset (Module.End ℂ (Sm E a) → ℂ)),
+      X ⊆ ↑S
+        → ∀ (N : ℕ), ∀ φ ∈ GlobalTheory.HCF.formsGL E a L W X N, ∀ (t : GL (Fin a) (Af E)) (κ : Kinf E a),
+          (∀ γ g,
+              (rt E a (finGL E a t * infGL E a (Unitary.toUnits κ)) φ).1 (ratGL E a γ * g)
+                = (rt E a (finGL E a t * infGL E a (Unitary.toUnits κ)) φ).1 g)
+            ∧ IsOpen
+              {k | finRep E a k (rt E a (finGL E a t * infGL E a (Unitary.toUnits κ)) φ) = rt E a (finGL E a t * infGL E a (Unitary.toUnits κ)) φ}
+            ∧ ∀ (τ : E →+* ℂ) (u : ℂ),
+              Polynomial.aeval (cap τ u) (∏ χ ∈ S, (Polynomial.X - Polynomial.C (χ (cap τ u))) ^ N)
+                  (rt E a (finGL E a t * infGL E a (Unitary.toUnits κ)) φ)
+                = 0 := by
   intro E _ _ _ a L W X S hXS N φ hφ t κ
   obtain ⟨hA, -, -, χ₀, hχ₀, hnil⟩ := hφ
   set h := finGL E a t * infGL E a (Unitary.toUnits κ) with hh
@@ -52,11 +69,15 @@ theorem rt_translate_kill : ∀ (E : Type) [Field E] [NumberField E] [_root_.Num
         rw [SetLike.mem_coe, Subalgebra.mem_centralizer_iff]
         rintro g rfl
         exact hc.eq.symm
-      exact ((Subalgebra.mem_centralizer_iff ℂ).1 (hle (Polynomial.aeval_mem_adjoin_singleton ℂ _)) _ rfl).symm
+      exact ((Subalgebra.mem_centralizer_iff ℂ).1 (hle (Polynomial.aeval_mem_adjoin_singleton ℂ _))
+        _ rfl).symm
     rw [← Module.End.mul_apply, (hP _).eq, Module.End.mul_apply]
-    have h0 : Polynomial.aeval (cap (a := a) τ u) ((Polynomial.X - Polynomial.C (χ₀ (cap τ u))) ^ N) φ = 0 := by
-      have := hnil (List.replicate N (cap τ u)) (List.length_replicate ..) fun z hz => by
-        rw [List.eq_of_mem_replicate hz]; exact hcap
+    have h0
+        : Polynomial.aeval (cap (a := a) τ u) ((Polynomial.X - Polynomial.C (χ₀ (cap τ u))) ^ N) φ
+          = 0 := by
+      have :=
+        hnil (List.replicate N (cap τ u)) (List.length_replicate ..) fun z hz => by
+          rw [List.eq_of_mem_replicate hz]; exact hcap
       rw [fold_replicate_cap] at this
       simpa [map_pow, map_sub, Polynomial.aeval_X, Polynomial.aeval_C] using this
     rw [← Finset.prod_erase_mul S _ (hXS hχ₀), Polynomial.aeval_mul, Module.End.mul_apply, h0]

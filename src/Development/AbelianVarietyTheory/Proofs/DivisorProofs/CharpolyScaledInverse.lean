@@ -9,9 +9,11 @@ open IsDedekindDomain NumberField Formalism.UG Formalism.IndefR.Mult GlobalTheor
 
 namespace GlobalTheory
 
-theorem charpoly_smul_inv_of_charpoly_eq_prod (n : ℕ) (M : GL (Fin n) ℂ) (t : ℂ) (s : Multiset ℂ)
-    (h : (M : Matrix (Fin n) (Fin n) ℂ).charpoly = (s.map fun a => X - C a).prod) :
-    (t • ((M⁻¹ : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ)).charpoly
+theorem charpoly_smul_inv_of_charpoly_eq_prod
+    (n : ℕ) (M : GL (Fin n) ℂ)
+    (t : ℂ)
+    (s : Multiset ℂ) (h : (M : Matrix (Fin n) (Fin n) ℂ).charpoly = (s.map fun a => X - C a).prod)
+    : (t • ((M⁻¹ : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ)).charpoly
       = (s.map fun a => X - C (t * a⁻¹)).prod := by
   set A : Matrix (Fin n) (Fin n) ℂ := (M : Matrix (Fin n) (Fin n) ℂ) with hA
   set B : Matrix (Fin n) (Fin n) ℂ := ((M⁻¹ : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) with hB
@@ -41,11 +43,11 @@ theorem charpoly_smul_inv_of_charpoly_eq_prod (n : ℕ) (M : GL (Fin n) ℂ) (t 
   simp only [Set.mem_setOf_eq]
   rw [Matrix.eval_charpoly, Polynomial.eval_multiset_prod, Multiset.map_map]
   apply mul_left_cancel₀ hne
-  have key : (-A) * (Matrix.scalar (Fin n) x - t • B)
-      = x • (Matrix.scalar (Fin n) (t / x) - A) := by
+  have key
+      : (-A) * (Matrix.scalar (Fin n) x - t • B) = x • (Matrix.scalar (Fin n) (t / x) - A) := by
     rw [Matrix.scalar_apply, Matrix.scalar_apply, ← Matrix.smul_one_eq_diagonal,
-      ← Matrix.smul_one_eq_diagonal, mul_sub, Matrix.mul_smul, Matrix.mul_smul, neg_mul, neg_mul, hAB, mul_one,
-      smul_sub, smul_smul, mul_div_cancel₀ _ hx0, smul_neg, smul_neg]
+      ← Matrix.smul_one_eq_diagonal, mul_sub, Matrix.mul_smul, Matrix.mul_smul, neg_mul, neg_mul,
+      hAB, mul_one, smul_sub, smul_smul, mul_div_cancel₀ _ hx0, smul_neg, smul_neg]
     abel
   rw [← Matrix.det_mul, key, Matrix.det_smul, hev, hneg, ← Multiset.prod_map_mul, Fintype.card_fin,
     ← hcard, ← Multiset.prod_replicate, ← Multiset.map_const', ← Multiset.prod_map_mul]

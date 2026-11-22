@@ -11,11 +11,12 @@ open NumberField
 
 namespace Formalism.L2.SG.NGCut.TorsionTotientBound
 
-theorem card_mul_conj_eq_le_of_fractionalIdeal (E : Type) [Field E] [NumberField E] [IsCMField E]
+theorem card_mul_conj_eq_le_of_fractionalIdeal
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
     (J : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (m : E) (hJ : J ≠ 0) (hm : m ≠ 0)
-    (S : Finset E) (hS : ∀ x ∈ S, x ∈ J ∧ x * IsCMField.complexConj E x = m) :
-    (S.card : ℝ) * ((FractionalIdeal.absNorm J : ℚ) : ℝ) ^ 2 ≤
-      2 * (Module.finrank ℚ E : ℝ) ^ 2 * |((Algebra.norm ℚ m : ℚ) : ℝ)| := by
+    (S : Finset E) (hS : ∀ x ∈ S, x ∈ J ∧ x * IsCMField.complexConj E x = m)
+    : (S.card : ℝ) * ((FractionalIdeal.absNorm J : ℚ) : ℝ) ^ 2
+      ≤ 2 * (Module.finrank ℚ E : ℝ) ^ 2 * |((Algebra.norm ℚ m : ℚ) : ℝ)| := by
   classical
   rcases S.eq_empty_or_nonempty with rfl | ⟨x0, hx0⟩
   · simp only [Finset.card_empty, Nat.cast_zero, zero_mul]
@@ -40,8 +41,10 @@ theorem card_mul_conj_eq_le_of_fractionalIdeal (E : Type) [Field E] [NumberField
     have h := (hg x hx).symm.trans ((congrArg (algebraMap (𝓞 E) E) hxy).trans (hg y hy))
     exact mul_left_cancel₀ ha0 h
   have hTcard : (S.image g).card = S.card := Finset.card_image_of_injOn hginj
-  have hgm : ∀ x ∈ S, algebraMap (𝓞 E) E (g x * cO E (g x)) =
-      algebraMap (𝓞 E) E a * IsCMField.complexConj E (algebraMap (𝓞 E) E a) * m := by
+  have hgm
+      : ∀ x ∈ S,
+        algebraMap (𝓞 E) E (g x * cO E (g x))
+          = algebraMap (𝓞 E) E a * IsCMField.complexConj E (algebraMap (𝓞 E) E a) * m := by
     intro x hx
     rw [map_mul, hcoe (cO E (g x)), cO_coe, ← hcoe, hg x hx, map_mul, ← (hS x hx).2]
     ring
@@ -64,8 +67,10 @@ theorem card_mul_conj_eq_le_of_fractionalIdeal (E : Type) [Field E] [NumberField
     rw [h, map_zero] at h2
     exact (mul_ne_zero (mul_ne_zero ha0 hc0) hm) h2.symm
   have key := count_int J.num hnum (g x0 * cO E (g x0)) hm'0 (S.image g) hT
-  have key' : ((((S.image g).card * Ideal.absNorm J.num ^ 2 : ℕ)) : ℝ) ≤
-      ((2 * Module.finrank ℚ E ^ 2 * (Algebra.norm ℤ (g x0 * cO E (g x0))).natAbs : ℕ) : ℝ) := by
+  have key'
+      : ((((S.image g).card * Ideal.absNorm J.num ^ 2 : ℕ)) : ℝ)
+        ≤ ((2 * Module.finrank ℚ E ^ 2 * (Algebra.norm ℤ (g x0 * cO E (g x0))).natAbs : ℕ)
+          : ℝ) := by
     exact_mod_cast key
   push_cast [Nat.cast_natAbs, Int.cast_abs] at key'
   rw [hTcard] at key'
@@ -78,30 +83,36 @@ theorem card_mul_conj_eq_le_of_fractionalIdeal (E : Type) [Field E] [NumberField
     have h : Algebra.norm ℚ (algebraMap (𝓞 E) E a) ≠ 0 := Algebra.norm_ne_zero_iff.2 ha0
     rw [← hNaQ] at h
     exact_mod_cast h
-  have hNm' : ((Algebra.norm ℤ (g x0 * cO E (g x0)) : ℤ) : ℝ) =
-      ((Algebra.norm ℤ a : ℤ) : ℝ) ^ 2 * ((Algebra.norm ℚ m : ℚ) : ℝ) := by
-    have h : ((Algebra.norm ℤ (g x0 * cO E (g x0)) : ℤ) : ℚ) =
-        Algebra.norm ℚ (algebraMap (𝓞 E) E a) ^ 2 * Algebra.norm ℚ m := by
-      rw [Algebra.coe_norm_int, ← hcoe, hgm x0 hx0, map_mul (Algebra.norm ℚ), map_mul (Algebra.norm ℚ),
-        hconj]
+  have hNm'
+      : ((Algebra.norm ℤ (g x0 * cO E (g x0)) : ℤ) : ℝ)
+        = ((Algebra.norm ℤ a : ℤ) : ℝ) ^ 2 * ((Algebra.norm ℚ m : ℚ) : ℝ) := by
+    have h
+        : ((Algebra.norm ℤ (g x0 * cO E (g x0)) : ℤ) : ℚ)
+          = Algebra.norm ℚ (algebraMap (𝓞 E) E a) ^ 2 * Algebra.norm ℚ m := by
+      rw [Algebra.coe_norm_int, ← hcoe, hgm x0 hx0, map_mul (Algebra.norm ℚ),
+        map_mul (Algebra.norm ℚ), hconj]
       ring
-    have h3 : ((Algebra.norm ℤ (g x0 * cO E (g x0)) : ℤ) : ℝ) =
-        (((Algebra.norm ℤ (g x0 * cO E (g x0)) : ℤ) : ℚ) : ℝ) := by norm_cast
+    have h3
+        : ((Algebra.norm ℤ (g x0 * cO E (g x0)) : ℤ) : ℝ)
+          = (((Algebra.norm ℤ (g x0 * cO E (g x0)) : ℤ) : ℚ) : ℝ) := by
+      norm_cast
     rw [h3, h, ← hNaQ]
     push_cast
     ring
-  have hJn : ((FractionalIdeal.absNorm J : ℚ) : ℝ) =
-      ((Ideal.absNorm J.num : ℕ) : ℝ) / |((Algebra.norm ℤ a : ℤ) : ℝ)| := by
+  have hJn
+      : ((FractionalIdeal.absNorm J : ℚ) : ℝ)
+        = ((Ideal.absNorm J.num : ℕ) : ℝ) / |((Algebra.norm ℤ a : ℤ) : ℝ)| := by
     rw [FractionalIdeal.absNorm_eq, ha]
     push_cast
     rfl
   have hpos : (0 : ℝ) < ((Algebra.norm ℤ a : ℤ) : ℝ) ^ 2 :=
     lt_of_le_of_ne (sq_nonneg _) (Ne.symm (pow_ne_zero 2 hNa0))
   rw [hJn, div_pow, sq_abs, mul_div_assoc', div_le_iff₀ hpos]
-  calc (S.card : ℝ) * ((Ideal.absNorm J.num : ℕ) : ℝ) ^ 2
+  calc
+    (S.card : ℝ) * ((Ideal.absNorm J.num : ℕ) : ℝ) ^ 2
       ≤ 2 * (Module.finrank ℚ E : ℝ) ^ 2 * |((Algebra.norm ℤ (g x0 * cO E (g x0)) : ℤ) : ℝ)| := key'
-    _ = 2 * (Module.finrank ℚ E : ℝ) ^ 2 * |((Algebra.norm ℚ m : ℚ) : ℝ)| *
-        ((Algebra.norm ℤ a : ℤ) : ℝ) ^ 2 := by
+    _ = 2 * (Module.finrank ℚ E : ℝ) ^ 2 * |((Algebra.norm ℚ m : ℚ) : ℝ)|
+        * ((Algebra.norm ℤ a : ℤ) : ℝ) ^ 2 := by
       rw [hNm', abs_mul, abs_of_nonneg (sq_nonneg _)]
       ring
 

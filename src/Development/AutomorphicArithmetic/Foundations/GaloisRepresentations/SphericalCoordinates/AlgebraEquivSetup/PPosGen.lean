@@ -5,11 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.W2.Seed.pPosGen :
-    CodiffUnit → PosGen := by
+theorem UpperTheory.Gal.W2.Seed.pPosGen : CodiffUnit → PosGen := by
   intro hCU E _ _ _ M hM t htc hg
   obtain ⟨hin, e, he, hz⟩ := id hg
 
@@ -21,8 +21,12 @@ theorem UpperTheory.Gal.W2.Seed.pPosGen :
 
   obtain ⟨N, hN⟩ := exists_nat_gt (∑ τ : E →+* ℂ, |(τ t).re|)
   have hbound : ∀ τ : E →+* ℂ, |(τ t).re| < N := fun τ =>
-    lt_of_le_of_lt (Finset.single_le_sum (f := fun τ : E →+* ℂ => |(τ t).re|)
-      (fun _ _ => abs_nonneg _) (Finset.mem_univ τ)) hN
+    lt_of_le_of_lt
+      (Finset.single_le_sum
+        (f := fun τ : E →+* ℂ => |(τ t).re|)
+        (fun _ _ => abs_nonneg _)
+        (Finset.mem_univ τ))
+      hN
   have hin' : InCodiff (t + (M : E) * (N : E)) := by
     intro x
     obtain ⟨a, ha⟩ := hin x
@@ -41,11 +45,11 @@ theorem UpperTheory.Gal.W2.Seed.pPosGen :
       have hc : ((e.gcdA M : ℤ) : 𝓞 E) * (e : 𝓞 E) + ((e.gcdB M : ℤ) : 𝓞 E) * (M : 𝓞 E) = 1 := by
         have := Nat.gcd_eq_gcd_ab e M
         rw [he.gcd_eq_one] at this
-        have h2 : ((e : ℤ) * e.gcdA M + (M : ℤ) * e.gcdB M) = 1 := by
-          rw [← this]; simp
+        have h2 : ((e : ℤ) * e.gcdA M + (M : ℤ) * e.gcdB M) = 1 := by rw [← this]; simp
         have h3 := congrArg (Int.cast : ℤ → 𝓞 E) h2
         push_cast at h3
-        rw [← h3]; ring
+        rw [← h3]
+        ring
       apply hP.ne_top
       rw [Ideal.eq_top_iff_one, ← hc]
       exact P.add_mem (P.mul_mem_left _ h) (P.mul_mem_left _ hMP)
@@ -61,7 +65,6 @@ theorem UpperTheory.Gal.W2.Seed.pPosGen :
     have hb := abs_lt.mp (hbound τ)
     have hM1 : (1 : ℝ) ≤ M := by exact_mod_cast hM
     have hN0 : (0 : ℝ) ≤ N := Nat.cast_nonneg N
-    have hre : (τ (t + (M : E) * (N : E))).re = (τ t).re + (M : ℝ) * (N : ℝ) := by
-      simp
+    have hre : (τ (t + (M : E) * (N : E))).re = (τ t).re + (M : ℝ) * (N : ℝ) := by simp
     rw [hre]
     nlinarith [hb.1]

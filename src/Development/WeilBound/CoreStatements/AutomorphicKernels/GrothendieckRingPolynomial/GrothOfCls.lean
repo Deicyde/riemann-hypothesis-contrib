@@ -17,8 +17,11 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.Grothendie
 
 namespace PositivityTheory.Groth
 
-theorem groth_of_cls (H : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], Cls k) :
-    GlobalTheory.Published.GrothendieckRingPolynomial := by
+theorem groth_of_cls
+    (H
+      : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+        Cls k)
+    : GlobalTheory.Published.GrothendieckRingPolynomial := by
   refine groth_of_steps (fun k _ _ _ _ => ?_) triAut uniTri
   have hc := H k
   have hm := mulCls k

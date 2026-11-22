@@ -9,7 +9,9 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField Polynomial GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCx GlobalTheory.LKDef GlobalTheory.RootSumWeights GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open NumberField Polynomial GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCx GlobalTheory.LKDef GlobalTheory.RootSumWeights GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open UpperTheory.Gal.W2 (rts)
 
 namespace UpperTheory.Gal.LocalSmoothExtension

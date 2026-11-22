@@ -8,13 +8,21 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.OfDeriv
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem not_mem_div_uniformizer_pow : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [PerfectField (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω] [Algebra K Ω] [IsSepClosure K Ω] (V : ValuationSubring Ω), IsAbove R K V.toSubring → ∀ π : R, Irreducible π → ∀ x : Ω, x ≠ 0 → ∃ n : ℕ, x / algebraMap K Ω (algebraMap R K π) ^ n ∉ V := by
+theorem not_mem_div_uniformizer_pow
+    : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+        [PerfectField (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω]
+        [Algebra K Ω] [IsSepClosure K Ω] (V : ValuationSubring Ω),
+      IsAbove R K V.toSubring
+        → ∀ π : R,
+          Irreducible π
+            → ∀ x : Ω, x ≠ 0 → ∃ n : ℕ, x / algebraMap K Ω (algebraMap R K π) ^ n ∉ V := by
   intro R K Ω _ _ _ _ _ _ _ _ _ _ V hV π hπ x hx
   classical
   letI : Algebra R Ω := ((algebraMap K Ω).comp (algebraMap R K)).toAlgebra
@@ -23,8 +31,7 @@ theorem not_mem_div_uniformizer_pow : ∀ (R K Ω : Type) [CommRing R] [IsDomain
 
   have hRV : ∀ r : R, algebraMap R Ω r ∈ V := by
     intro r
-    have : algebraMap R K r ∈ V.toSubring.comap (algebraMap K Ω) := by
-      rw [hV]; exact ⟨r, rfl⟩
+    have : algebraMap R K r ∈ V.toSubring.comap (algebraMap K Ω) := by rw [hV]; exact ⟨r, rfl⟩
     exact this
 
   have hKV : ∀ c : K, algebraMap K Ω c ∈ V → ∃ r : R, algebraMap R K r = c := by
@@ -48,10 +55,10 @@ theorem not_mem_div_uniformizer_pow : ∀ (R K Ω : Type) [CommRing R] [IsDomain
     exact ⟨m + 1, hm⟩
   refine ⟨n, fun hmem => hn ?_⟩
   have hprod : d • x⁻¹ * (x / algebraMap K Ω (algebraMap R K π) ^ n) ∈ V := V.mul_mem _ _ hyV hmem
-  have hπ0 : algebraMap R K π ≠ 0 := by
-    rw [Ne, IsFractionRing.to_map_eq_zero_iff]; exact hπ.ne_zero
-  have heq : d • x⁻¹ * (x / algebraMap K Ω (algebraMap R K π) ^ n) =
-      algebraMap K Ω (algebraMap R K d / algebraMap R K π ^ n) := by
+  have hπ0 : algebraMap R K π ≠ 0 := by rw [Ne, IsFractionRing.to_map_eq_zero_iff]; exact hπ.ne_zero
+  have heq
+      : d • x⁻¹ * (x / algebraMap K Ω (algebraMap R K π) ^ n)
+        = algebraMap K Ω (algebraMap R K d / algebraMap R K π ^ n) := by
     rw [Algebra.smul_def, map_div₀, map_pow]
     change (algebraMap K Ω) (algebraMap R K d) * x⁻¹ * _ = _
     field_simp

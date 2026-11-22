@@ -6,17 +6,21 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsSelf
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx GlobalTheory.Chain
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx GlobalTheory.Chain
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.SDFrameLattice
 
 open NumberField GlobalTheory.PlaceModel
 
-theorem mem_dualL_iff {D : D7} (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E))
-    (y : Fin V.rank → D.host.E) :
-    y ∈ Formalism.L2.Herm.dualL D.sp.cm V Λ ↔
-      ∀ x ∈ Λ, ∃ b : 𝓞 D.host.E, (b : D.host.E) = ∑ i, ∑ j, star (x i) * V.gram i j * y j := by
+theorem mem_dualL_iff
+    {D : D7}
+    (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)) (y : Fin V.rank → D.host.E)
+    : y ∈ Formalism.L2.Herm.dualL D.sp.cm V Λ
+      ↔ ∀ x ∈ Λ, ∃ b : 𝓞 D.host.E, (b : D.host.E) = ∑ i, ∑ j, star (x i) * V.gram i j * y j := by
   unfold Formalism.L2.Herm.dualL
   constructor
   · intro hy x hx
@@ -24,7 +28,8 @@ theorem mem_dualL_iff {D : D7} (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin 
     | mem z hz =>
       obtain ⟨b, hb⟩ := RingHom.mem_range.mp (hz x hx)
       exact ⟨b, hb⟩
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add z w _ _ hz hw =>
       obtain ⟨b, hb⟩ := hz
       obtain ⟨a, ha⟩ := hw
@@ -38,7 +43,8 @@ theorem mem_dualL_iff {D : D7} (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin 
     | smul a z _ hz =>
       obtain ⟨b, hb⟩ := hz
       refine ⟨a * b, ?_⟩
-      have e1 : ((a * b : 𝓞 D.host.E) : D.host.E) = algebraMap (𝓞 D.host.E) D.host.E a * b := by first | (push_cast; ring) | push_cast | simp
+      have e1 : ((a * b : 𝓞 D.host.E) : D.host.E) = algebraMap (𝓞 D.host.E) D.host.E a * b := by
+        first | (push_cast; ring) | push_cast | simp
       rw [e1, hb, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [Finset.mul_sum]
@@ -51,7 +57,10 @@ theorem mem_dualL_iff {D : D7} (V : HSp D) (Λ : Submodule (𝓞 D.host.E) (Fin 
     obtain ⟨b, hb⟩ := hy x hx
     exact RingHom.mem_range.mpr ⟨b, hb⟩
 
-theorem isSelfDualC_of_isSDFrame : ∀ (D : D7) (V : HSp D) (β : GL (Fin V.rank) (Formalism.IndefR.Lev.EAf D)) (Λ : Submodule (NumberField.RingOfIntegers D.host.E) (Fin V.rank → D.host.E)) (N : ℕ), IsSDFrame V β Λ N → IsSelfDualC V Λ := by
+theorem isSelfDualC_of_isSDFrame
+    : ∀ (D : D7) (V : HSp D) (β : GL (Fin V.rank) (Formalism.IndefR.Lev.EAf D))
+        (Λ : Submodule (NumberField.RingOfIntegers D.host.E) (Fin V.rank → D.host.E)) (N : ℕ),
+      IsSDFrame V β Λ N → IsSelfDualC V Λ := by
   intro D V β Λ N h
   obtain ⟨c, hc⟩ := h
   obtain ⟨-, hdual, hN, hin, hout⟩ := hc
@@ -83,7 +92,8 @@ theorem isSelfDualC_of_isSDFrame : ∀ (D : D7) (V : HSp D) (β : GL (Fin V.rank
       rw [hf]
       exact h1
     have hfg : Λ.FG := by
-      refine Submodule.fg_of_fg_map_injective (f ∘ₗ s) (hfinj.comp hsinj) (Submodule.FG.of_le hL.fg ?_)
+      refine Submodule.fg_of_fg_map_injective (f ∘ₗ s) (hfinj.comp hsinj)
+        (Submodule.FG.of_le hL.fg ?_)
       rintro _ ⟨x, hx, rfl⟩
       rw [LinearMap.comp_apply, hs]
       exact hout' x hx

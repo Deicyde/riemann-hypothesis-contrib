@@ -14,8 +14,8 @@ namespace GlobalTheory.Dec.IwKC
 
 variable {n : ℕ}
 
-theorem diag_mul_lo {a b : Matrix (Fin n) (Fin n) ℂ} (ha : IsLo a) (hb : IsLo b) (i : Fin n) :
-    (a * b) i i = a i i * b i i := by
+theorem diag_mul_lo {a b : Matrix (Fin n) (Fin n) ℂ} (ha : IsLo a) (hb : IsLo b) (i : Fin n)
+    : (a * b) i i = a i i * b i i := by
   rw [Matrix.mul_apply, Finset.sum_eq_single i]
   · intro k _ hk
     rcases lt_or_gt_of_ne hk with h | h
@@ -49,8 +49,10 @@ theorem isUnit_iff_lo {a : Matrix (Fin n) (Fin n) ℂ} (ha : IsLo a) : IsUnit a 
     Matrix.det_of_isLowerTriangular a (lo_iff.mp ha), Finset.prod_ne_zero_iff]
   simp
 
-theorem chol_unique {b b' : Matrix (Fin n) (Fin n) ℂ} (hb : IsLo b) (hb' : IsLo b')
-    (hp : ∀ i, 0 < b i i) (hp' : ∀ i, 0 < b' i i) (h : bᴴ * b = b'ᴴ * b') : b = b' := by
+theorem chol_unique
+    {b b' : Matrix (Fin n) (Fin n) ℂ} (hb : IsLo b) (hb' : IsLo b') (hp : ∀ i, 0 < b i i)
+    (hp' : ∀ i, 0 < b' i i) (h : bᴴ * b = b'ᴴ * b')
+    : b = b' := by
   have hu : IsUnit b.det :=
     (Matrix.isUnit_iff_isUnit_det b).mp ((isUnit_iff_lo hb).2 fun i => (hp i).ne')
   have hu' : IsUnit b'.det :=
@@ -106,20 +108,22 @@ theorem chol_unique {b b' : Matrix (Fin n) (Fin n) ℂ} (hb : IsLo b) (hb' : IsL
       rw [e1, hrr, ← Complex.ofReal_mul, mul_inv_cancel₀ hr.ne', Complex.ofReal_one,
         Matrix.one_apply_eq]
     · rw [hCE, Matrix.conjTranspose_apply, hEl j i hij, star_zero, Matrix.one_apply_ne hij.ne']
-  calc b = 1 * b := (Matrix.one_mul b).symm
+  calc
+    b = 1 * b := (Matrix.one_mul b).symm
     _ = b' * b⁻¹ * b := by rw [hC1]
     _ = b' := by rw [Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hu, Matrix.mul_one]
 
-theorem exists_lo (g : Matrix (Fin n) (Fin n) ℂ) :
-    ∃ R : Matrix (Fin n) (Fin n) ℂ, IsLo R ∧ Rᴴ * R = gᴴ * g := by
+theorem exists_lo (g : Matrix (Fin n) (Fin n) ℂ)
+    : ∃ R : Matrix (Fin n) (Fin n) ℂ, IsLo R ∧ Rᴴ * R = gᴴ * g := by
   classical
-  let f : (Fin n)ᵒᵈ → EuclideanSpace ℂ (Fin n) :=
-    fun i => WithLp.toLp 2 (fun k => g k (OrderDual.ofDual i))
+  let f : (Fin n)ᵒᵈ → EuclideanSpace ℂ (Fin n) := fun i =>
+    WithLp.toLp 2 (fun k => g k (OrderDual.ofDual i))
   have hd : Module.finrank ℂ (EuclideanSpace ℂ (Fin n)) = Fintype.card (Fin n)ᵒᵈ := by simp
   let B := InnerProductSpace.gramSchmidtOrthonormalBasis hd f
   refine ⟨Matrix.of fun a c => inner ℂ (B (OrderDual.toDual a)) (f (OrderDual.toDual c)), ?_, ?_⟩
   · intro a c hac
-    exact InnerProductSpace.gramSchmidtOrthonormalBasis_inv_triangular hd f (OrderDual.toDual_lt_toDual.mpr hac)
+    exact InnerProductSpace.gramSchmidtOrthonormalBasis_inv_triangular hd f
+      (OrderDual.toDual_lt_toDual.mpr hac)
   · ext i j
     have hf : inner ℂ (f (OrderDual.toDual i)) (f (OrderDual.toDual j)) = (gᴴ * g) i j := by
       simp [f, PiLp.inner_apply, Matrix.mul_apply, Matrix.conjTranspose_apply]
@@ -130,8 +134,8 @@ theorem exists_lo (g : Matrix (Fin n) (Fin n) ℂ) :
     rw [← inner_conj_symm (B (OrderDual.toDual a)) (f (OrderDual.toDual i)), Complex.star_def,
       Complex.conj_conj]
 
-theorem exists_chol {g : Matrix (Fin n) (Fin n) ℂ} (hg : IsUnit g) :
-    ∃ b : Matrix (Fin n) (Fin n) ℂ, IsLo b ∧ (∀ i, 0 < b i i) ∧ bᴴ * b = gᴴ * g := by
+theorem exists_chol {g : Matrix (Fin n) (Fin n) ℂ} (hg : IsUnit g)
+    : ∃ b : Matrix (Fin n) (Fin n) ℂ, IsLo b ∧ (∀ i, 0 < b i i) ∧ bᴴ * b = gᴴ * g := by
   obtain ⟨R, hR, hRg⟩ := exists_lo g
   have hRu : IsUnit R := by
     rw [Matrix.isUnit_iff_isUnit_det, isUnit_iff_ne_zero]
@@ -167,27 +171,30 @@ theorem exists_chol {g : Matrix (Fin n) (Fin n) ℂ} (hg : IsUnit g) :
     rw [Matrix.conjTranspose_mul, Matrix.mul_assoc, ← Matrix.mul_assoc (Matrix.diagonal d)ᴴ, hDD,
       Matrix.one_mul, hRg]
 
-theorem gram_unitary_mul {k b : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ) :
-    (k * b)ᴴ * (k * b) = bᴴ * b := by
+theorem gram_unitary_mul {k b : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ)
+    : (k * b)ᴴ * (k * b) = bᴴ * b := by
   rw [Matrix.conjTranspose_mul, Matrix.mul_assoc, ← Matrix.mul_assoc kᴴ,
     ← Matrix.star_eq_conjTranspose k, Matrix.mem_unitaryGroup_iff'.mp hk, Matrix.one_mul]
 
-theorem decomp_unique {k k' b b' : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ)
-    (hk' : k' ∈ Matrix.unitaryGroup (Fin n) ℂ) (hb : IsLo b) (hb' : IsLo b')
-    (hp : ∀ i, 0 < b i i) (hp' : ∀ i, 0 < b' i i) (h : k * b = k' * b') : k = k' ∧ b = b' := by
-  have hg : bᴴ * b = b'ᴴ * b' := by
-    rw [← gram_unitary_mul hk, h, gram_unitary_mul hk']
+theorem decomp_unique
+    {k k' b b' : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ)
+    (hk' : k' ∈ Matrix.unitaryGroup (Fin n) ℂ) (hb : IsLo b) (hb' : IsLo b') (hp : ∀ i, 0 < b i i)
+    (hp' : ∀ i, 0 < b' i i) (h : k * b = k' * b')
+    : k = k' ∧ b = b' := by
+  have hg : bᴴ * b = b'ᴴ * b' := by rw [← gram_unitary_mul hk, h, gram_unitary_mul hk']
   have hbb : b = b' := chol_unique hb hb' hp hp' hg
   subst hbb
   refine ⟨?_, rfl⟩
   have hu : IsUnit b.det :=
     (Matrix.isUnit_iff_isUnit_det b).mp ((isUnit_iff_lo hb).2 fun i => (hp i).ne')
-  calc k = k * b * b⁻¹ := by rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hu, Matrix.mul_one]
+  calc
+    k = k * b * b⁻¹ := by rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hu, Matrix.mul_one]
     _ = k' * b * b⁻¹ := by rw [h]
     _ = k' := by rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hu, Matrix.mul_one]
 
-theorem exists_decomp (ε : Fin n → Bool) {y : Matrix (Fin n) (Fin n) ℂ} (hy : y ∈ KC ε) :
-    ∃ k b : Matrix (Fin n) (Fin n) ℂ, k ∈ Kset ε ∧ b ∈ KC ε ∧ IsLo b ∧ (∀ l, 0 < b l l) ∧ y = k * b := by
+theorem exists_decomp (ε : Fin n → Bool) {y : Matrix (Fin n) (Fin n) ℂ} (hy : y ∈ KC ε)
+    : ∃ k b : Matrix (Fin n) (Fin n) ℂ,
+      k ∈ Kset ε ∧ b ∈ KC ε ∧ IsLo b ∧ (∀ l, 0 < b l l) ∧ y = k * b := by
   obtain ⟨hyu, hyJ⟩ := hy
   obtain ⟨b, hb, hp, hbg⟩ := exists_chol hyu
   have hbd : IsUnit b.det :=
@@ -212,16 +219,17 @@ theorem exists_decomp (ε : Fin n → Bool) {y : Matrix (Fin n) (Fin n) ℂ} (hy
     rw [← Matrix.mul_assoc (Jm ε) (Jm ε), hJJ, Matrix.one_mul, ← Matrix.mul_assoc bᴴ b, hbg,
       Matrix.mul_assoc yᴴ, hyJ, ← Matrix.mul_assoc yᴴ, ← hyJh, Matrix.mul_assoc (Jm ε) yᴴ,
       ← Matrix.mul_assoc (Jm ε) (Jm ε), hJJ, Matrix.one_mul]
-  have hbc : b = Jm ε * b * Jm ε :=
-    chol_unique hb hc hp (fun l => by rw [hcd]; exact hp l) hcg.symm
+  have hbc : b = Jm ε * b * Jm ε := chol_unique hb hc hp (fun l => by rw [hcd]; exact hp l) hcg.symm
   have hbJ : b * Jm ε = Jm ε * b := by
-    calc b * Jm ε = Jm ε * b * Jm ε * Jm ε := by rw [← hbc]
+    calc
+      b * Jm ε
+        = Jm ε * b * Jm ε * Jm ε := by rw [← hbc]
       _ = Jm ε * b := by rw [Matrix.mul_assoc _ (Jm ε), hJJ, Matrix.mul_one]
   have hbiJ : b⁻¹ * Jm ε = Jm ε * b⁻¹ := by
     have e : b⁻¹ * (b * Jm ε) * b⁻¹ = b⁻¹ * (Jm ε * b) * b⁻¹ := by rw [hbJ]
     rw [← Matrix.mul_assoc b⁻¹ b, Matrix.nonsing_inv_mul _ hbd, Matrix.one_mul,
-      Matrix.mul_assoc b⁻¹, Matrix.mul_assoc (Jm ε), Matrix.mul_nonsing_inv _ hbd,
-      Matrix.mul_one] at e
+        Matrix.mul_assoc b⁻¹, Matrix.mul_assoc (Jm ε), Matrix.mul_nonsing_inv _ hbd, Matrix.mul_one]
+      at e
     exact e.symm
   refine ⟨y * b⁻¹, b, ⟨?_, ?_⟩, ⟨(Matrix.isUnit_iff_isUnit_det b).mpr hbd, hbJ⟩, hb, hp, ?_⟩
   · rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose, Matrix.conjTranspose_mul,
@@ -231,8 +239,10 @@ theorem exists_decomp (ε : Fin n → Bool) {y : Matrix (Fin n) (Fin n) ℂ} (hy
   · rw [Matrix.mul_assoc, hbiJ, ← Matrix.mul_assoc, hyJ, Matrix.mul_assoc]
   · rw [Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hbd, Matrix.mul_one]
 
-theorem continuous_of_closed_graph {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y] [CompactSpace Y]
-    {f : X → Y} (h : IsClosed {p : X × Y | p.2 = f p.1}) : Continuous f := by
+theorem continuous_of_closed_graph
+    {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y] [CompactSpace Y]
+    {f : X → Y} (h : IsClosed {p : X × Y | p.2 = f p.1})
+    : Continuous f := by
   refine continuous_iff_isClosed.mpr fun C hC => ?_
   have e : f ⁻¹' C = Prod.fst '' ({p : X × Y | p.2 = f p.1} ∩ Prod.snd ⁻¹' C) := by
     ext x
@@ -256,9 +266,10 @@ theorem iwasawaKC : IwasawaKC := by
   intro n ε
   classical
   have := Complex.orderClosedTopology
-  have key : ∀ y ∈ KC ε, ∃ k b : Matrix (Fin n) (Fin n) ℂ,
-      k ∈ Kset ε ∧ b ∈ KC ε ∧ IsLo b ∧ (∀ l, 0 < b l l) ∧ y = k * b :=
-    fun y hy => exists_decomp ε hy
+  have key
+      : ∀ y ∈ KC ε, ∃ k b : Matrix (Fin n) (Fin n) ℂ,
+        k ∈ Kset ε ∧ b ∈ KC ε ∧ IsLo b ∧ (∀ l, 0 < b l l) ∧ y = k * b := fun y hy =>
+    exists_decomp ε hy
   choose! κ β hκ using key
   have hβ : ∀ y ∈ KC ε, β y = (κ y)ᴴ * y := by
     intro y hy
@@ -267,19 +278,24 @@ theorem iwasawaKC : IwasawaKC := by
     rw [show (κ y)ᴴ * y = (κ y)ᴴ * (κ y * β y) by rw [← hy'], ← Matrix.mul_assoc,
       ← Matrix.star_eq_conjTranspose, hu, Matrix.one_mul]
   have unitK : ∀ k ∈ Kset ε, IsUnit k := fun k hk =>
-    (Matrix.isUnit_iff_isUnit_det k).2 (IsUnit.of_mul_eq_one (star k).det
-      (by rw [← Matrix.det_mul, Matrix.mem_unitaryGroup_iff.mp hk.1, Matrix.det_one]))
+    (Matrix.isUnit_iff_isUnit_det k).2
+      (IsUnit.of_mul_eq_one (star k).det
+        (by rw [← Matrix.det_mul, Matrix.mem_unitaryGroup_iff.mp hk.1, Matrix.det_one]))
   have unitKh : ∀ k ∈ Kset ε, IsUnit kᴴ := fun k hk =>
-    (Matrix.isUnit_iff_isUnit_det kᴴ).2 (IsUnit.of_mul_eq_one k.det
-      (by rw [← Matrix.det_mul, ← Matrix.star_eq_conjTranspose,
-        Matrix.mem_unitaryGroup_iff'.mp hk.1, Matrix.det_one]))
+    (Matrix.isUnit_iff_isUnit_det kᴴ).2
+      (IsUnit.of_mul_eq_one k.det (by
+        rw [← Matrix.det_mul, ← Matrix.star_eq_conjTranspose, Matrix.mem_unitaryGroup_iff'.mp hk.1,
+          Matrix.det_one]))
 
   have hKc : IsCompact (Kset ε) := by
-    have hB := isCompact_univ_pi fun _ : Fin n =>
-      isCompact_univ_pi fun _ : Fin n => isCompact_closedBall (0 : ℂ) 1
+    have hB :=
+      isCompact_univ_pi fun _ : Fin n =>
+        isCompact_univ_pi fun _ : Fin n => isCompact_closedBall (0 : ℂ) 1
     refine IsCompact.of_isClosed_subset hB ?_ ?_
-    · have e : Kset ε = {g : Matrix (Fin n) (Fin n) ℂ | star g * g = 1 ∧ g * star g = 1} ∩
-          {g | g * Jm ε = Jm ε * g} := by
+    · have e
+          : Kset ε
+            = {g : Matrix (Fin n) (Fin n) ℂ | star g * g = 1 ∧ g * star g = 1}
+              ∩ {g | g * Jm ε = Jm ε * g} := by
         ext g
         constructor
         · rintro ⟨h1, h2⟩
@@ -288,32 +304,38 @@ theorem iwasawaKC : IwasawaKC := by
           exact ⟨Matrix.mem_unitaryGroup_iff'.mpr h1, h2⟩
       rw [e, Set.ofPred_and]
       exact ((isClosed_eq (continuous_star.mul continuous_id) continuous_const).inter
-        (isClosed_eq (continuous_id.mul continuous_star) continuous_const)).inter
+          (isClosed_eq (continuous_id.mul continuous_star) continuous_const)).inter
         (isClosed_eq (continuous_id.mul continuous_const) (continuous_const.mul continuous_id))
     · intro g hg
-      exact Set.mem_univ_pi.mpr fun i => Set.mem_univ_pi.mpr fun j =>
-        mem_closedBall_zero_iff.mpr (entry_norm_bound_of_unitary hg.1 i j)
+      exact Set.mem_univ_pi.mpr fun i =>
+        Set.mem_univ_pi.mpr fun j =>
+          mem_closedBall_zero_iff.mpr (entry_norm_bound_of_unitary hg.1 i j)
   have : CompactSpace (Kset ε) := isCompact_iff_compactSpace.mp hKc
 
   let F : KC ε → Kset ε := fun y => ⟨κ y, (hκ y y.2).1⟩
   have hT : IsClosed {m : Matrix (Fin n) (Fin n) ℂ | IsLo m ∧ ∀ l, 0 ≤ m l l} := by
-    have e : {m : Matrix (Fin n) (Fin n) ℂ | IsLo m ∧ ∀ l, 0 ≤ m l l} =
-        (⋂ i : Fin n, ⋂ j : Fin n, ⋂ (_ : i < j), {m : Matrix (Fin n) (Fin n) ℂ | m i j = 0}) ∩
-          ⋂ l : Fin n, {m : Matrix (Fin n) (Fin n) ℂ | 0 ≤ m l l} := by
+    have e
+        : {m : Matrix (Fin n) (Fin n) ℂ | IsLo m ∧ ∀ l, 0 ≤ m l l}
+          = (⋂ i : Fin n, ⋂ j : Fin n, ⋂ (_ : i < j), {m : Matrix (Fin n) (Fin n) ℂ | m i j = 0})
+            ∩ ⋂ l : Fin n, {m : Matrix (Fin n) (Fin n) ℂ | 0 ≤ m l l} := by
       ext m
       simp [IsLo]
     rw [e]
-    exact (isClosed_iInter fun i => isClosed_iInter fun j => isClosed_iInter fun _ =>
-      isClosed_eq (continuous_id.matrix_elem i j) continuous_const).inter
+    exact (isClosed_iInter fun i =>
+        isClosed_iInter fun j =>
+          isClosed_iInter fun _ =>
+            isClosed_eq (continuous_id.matrix_elem i j) continuous_const).inter
       (isClosed_iInter fun l => isClosed_le continuous_const (continuous_id.matrix_elem l l))
   have hcm : Continuous fun p : KC ε × Kset ε =>
       ((p.2 : Matrix (Fin n) (Fin n) ℂ)ᴴ * (p.1 : Matrix (Fin n) (Fin n) ℂ)) :=
     ((continuous_subtype_val.comp continuous_snd).matrix_conjTranspose).matrix_mul
       (continuous_subtype_val.comp continuous_fst)
   have hgraph : IsClosed {p : KC ε × Kset ε | p.2 = F p.1} := by
-    have e : {p : KC ε × Kset ε | p.2 = F p.1} =
-        (fun p : KC ε × Kset ε => ((p.2 : Matrix (Fin n) (Fin n) ℂ)ᴴ * (p.1 : Matrix (Fin n) (Fin n) ℂ))) ⁻¹'
-          {m : Matrix (Fin n) (Fin n) ℂ | IsLo m ∧ ∀ l, 0 ≤ m l l} := by
+    have e
+        : {p : KC ε × Kset ε | p.2 = F p.1}
+          = (fun p : KC ε × Kset ε =>
+              ((p.2 : Matrix (Fin n) (Fin n) ℂ)ᴴ * (p.1 : Matrix (Fin n) (Fin n) ℂ)))
+            ⁻¹' {m : Matrix (Fin n) (Fin n) ℂ | IsLo m ∧ ∀ l, 0 ≤ m l l} := by
       ext ⟨⟨y, hy⟩, ⟨k, hk⟩⟩
       simp only [Set.mem_ofPred_eq, Set.mem_preimage]
       constructor
@@ -324,8 +346,8 @@ theorem iwasawaKC : IwasawaKC := by
         exact ⟨hb, fun l => (hpos l).le⟩
       · rintro ⟨hlo, hnn⟩
         have hyk : y = k * (kᴴ * y) := by
-          rw [← Matrix.mul_assoc, ← Matrix.star_eq_conjTranspose, Matrix.mem_unitaryGroup_iff.mp hk.1,
-            Matrix.one_mul]
+          rw [← Matrix.mul_assoc, ← Matrix.star_eq_conjTranspose,
+            Matrix.mem_unitaryGroup_iff.mp hk.1, Matrix.one_mul]
         have hub : IsUnit (kᴴ * y) := (unitKh k hk).mul hy.1
         have hne := (isUnit_iff_lo hlo).1 hub
         have hpos : ∀ l, 0 < (kᴴ * y) l l := fun l => lt_of_le_of_ne (hnn l) (hne l).symm

@@ -16,15 +16,19 @@ variable {K : Type} [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
 def triSol {K : Type} [Field K] (a : ℕ → ℕ → K) (b : ℕ → K) : ℕ → K
   | m => (b m - ∑ i : Fin m, triSol a b i.1 * a i.1 m) / a m m
 
-theorem triSol_eq {K : Type} [Field K] (a : ℕ → ℕ → K) (b : ℕ → K) (ha : ∀ m, a m m ≠ 0)
-    (m : ℕ) : ∑ i ∈ Finset.range (m + 1), triSol a b i * a i m = b m := by
-  have h : triSol a b m = (b m - ∑ i : Fin m, triSol a b i.1 * a i.1 m) / a m m := by
-    rw [triSol]
+theorem triSol_eq {K : Type} [Field K] (a : ℕ → ℕ → K) (b : ℕ → K) (ha : ∀ m, a m m ≠ 0) (m : ℕ)
+    : ∑ i ∈ Finset.range (m + 1), triSol a b i * a i m = b m := by
+  have h : triSol a b m = (b m - ∑ i : Fin m, triSol a b i.1 * a i.1 m) / a m m := by rw [triSol]
   rw [Finset.sum_range_succ, Finset.sum_range, h, div_mul_cancel₀ _ (ha m)]
   ring
 
-theorem triSol_norm (a : ℕ → ℕ → K) (b : ℕ → K) (ha1 : ∀ i m, ‖a i m‖ ≤ 1)
-    (ha : ∀ m, ‖a m m‖ = 1) (r : ℝ) (hb : ∀ m, ‖b m‖ ≤ r) (m : ℕ) : ‖triSol a b m‖ ≤ r := by
+theorem triSol_norm
+    (a : ℕ → ℕ → K)
+    (b : ℕ → K)
+    (ha1 : ∀ i m, ‖a i m‖ ≤ 1) (ha : ∀ m, ‖a m m‖ = 1)
+    (r : ℝ) (hb : ∀ m, ‖b m‖ ≤ r)
+    (m : ℕ)
+    : ‖triSol a b m‖ ≤ r := by
   have hr : 0 ≤ r := (norm_nonneg _).trans (hb 0)
   induction m using Nat.strong_induction_on with
   | _ m ih =>
@@ -33,12 +37,13 @@ theorem triSol_norm (a : ℕ → ℕ → K) (b : ℕ → K) (ha1 : ∀ i m, ‖a
     rw [norm_neg]
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg hr fun i _ => ?_
     rw [norm_mul]
-    calc ‖triSol a b i.1‖ * ‖a i.1 m‖ ≤ r * 1 :=
-          mul_le_mul (ih i.1 i.2) (ha1 _ _) (norm_nonneg _) hr
+    calc
+      ‖triSol a b i.1‖ * ‖a i.1 m‖
+        ≤ r * 1 := mul_le_mul (ih i.1 i.2) (ha1 _ _) (norm_nonneg _) hr
       _ = r := mul_one r
 
-theorem norm_pow_apply_of_isometric (τ : K →+* K) (hτ : ∀ x, ‖τ x‖ = ‖x‖) (i : ℕ) (x : K) :
-    ‖(τ ^ i) x‖ = ‖x‖ := by
+theorem norm_pow_apply_of_isometric (τ : K →+* K) (hτ : ∀ x, ‖τ x‖ = ‖x‖) (i : ℕ) (x : K)
+    : ‖(τ ^ i) x‖ = ‖x‖ := by
   induction i with
   | zero => simp
   | succ i ih => rw [pow_succ', RingHom.mul_def, RingHom.comp_apply, hτ, ih]
@@ -47,8 +52,9 @@ def triIter {K : Type} [Field K] (a : ℕ → ℕ → K) (π : K) : ℕ → ℕ 
   | 0 => triSol a (fun m => if m = 0 then a 0 0 else 0)
   | k + 1 => triSol a (fun m => if m = 0 then 0 else π * triIter a π k (m + 1))
 
-theorem triIter_norm (a : ℕ → ℕ → K) (π : K) (ha1 : ∀ i m, ‖a i m‖ ≤ 1)
-    (ha : ∀ m, ‖a m m‖ = 1) (k m : ℕ) : ‖triIter a π k m‖ ≤ ‖π‖ ^ k := by
+theorem triIter_norm
+    (a : ℕ → ℕ → K) (π : K) (ha1 : ∀ i m, ‖a i m‖ ≤ 1) (ha : ∀ m, ‖a m m‖ = 1) (k m : ℕ)
+    : ‖triIter a π k m‖ ≤ ‖π‖ ^ k := by
   induction k generalizing m with
   | zero =>
     rw [triIter, pow_zero]
@@ -64,10 +70,13 @@ theorem triIter_norm (a : ℕ → ℕ → K) (π : K) (ha1 : ∀ i m, ‖a i m�
     · rw [norm_mul, pow_succ']
       exact mul_le_mul_of_nonneg_left (ih _) (norm_nonneg _)
 
-theorem twisted_division (τ : K →+* K) (hτ : ∀ x, ‖τ x‖ = ‖x‖) (π : K) (hπ : ‖π‖ < 1)
-    (c : ℕ → K) (hc0 : ‖c 0‖ = 1) (hc : ∀ i, ‖c i‖ ≤ 1) :
-    ∃ t : ℕ → K, t 0 = 1 ∧ (∀ n, ‖t n‖ ≤ 1) ∧
-      ∀ n, 2 ≤ n → π * t n = ∑ i ∈ Finset.range n, t i * (τ ^ i) (c (n - 1 - i)) := by
+theorem twisted_division
+    (τ : K →+* K) (hτ : ∀ x, ‖τ x‖ = ‖x‖)
+    (π : K) (hπ : ‖π‖ < 1)
+    (c : ℕ → K) (hc0 : ‖c 0‖ = 1) (hc : ∀ i, ‖c i‖ ≤ 1)
+    : ∃ t : ℕ → K,
+      t 0 = 1 ∧ (∀ n, ‖t n‖ ≤ 1)
+        ∧ ∀ n, 2 ≤ n → π * t n = ∑ i ∈ Finset.range n, t i * (τ ^ i) (c (n - 1 - i)) := by
   set a : ℕ → ℕ → K := fun i m => (τ ^ i) (c (m - i)) with ha_def
   have ha1 : ∀ i m, ‖a i m‖ ≤ 1 := fun i m => by
     rw [ha_def]; simp only; rw [norm_pow_apply_of_isometric τ hτ]; exact hc _
@@ -95,8 +104,10 @@ theorem twisted_division (τ : K →+* K) (hτ : ∀ x, ‖τ x‖ = ‖x‖) (�
   · refine IsUltrametricDist.norm_tsum_le_of_forall_le_of_nonneg zero_le_one fun k => ?_
     exact (triIter_norm a π ha1 ha k n).trans (pow_le_one₀ (norm_nonneg _) hπ.le)
   · obtain ⟨m, rfl⟩ : ∃ m, n = m + 2 := ⟨n - 2, by omega⟩
-    have hterm : ∀ i, (∑' k, triIter a π k i) * (τ ^ i) (c (m + 2 - 1 - i))
-        = ∑' k, triIter a π k i * a i (m + 1) := fun i => by
+    have hterm
+        : ∀ i,
+          (∑' k, triIter a π k i) * (τ ^ i) (c (m + 2 - 1 - i))
+            = ∑' k, triIter a π k i * a i (m + 1) := fun i => by
       rw [tsum_mul_right]
       rfl
     simp only [hterm]

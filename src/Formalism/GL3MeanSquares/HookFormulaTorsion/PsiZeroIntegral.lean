@@ -318,47 +318,62 @@ private theorem logDerivSeries_main : Formalism.HermitianLattices.GL2a2.LogDeriv
     (Complex.continuous_ofReal.tendsto' (1 : ℝ) 1 Complex.ofReal_one).mono_left nhdsWithin_le_nhds
   have hdiff : Differentiable ℂ (DirichletCharacter.LFunction χ) :=
     DirichletCharacter.differentiable_LFunction hχ
-  have hcL : ContinuousAt (fun s : ℂ => -deriv (DirichletCharacter.LFunction χ) s /
-      DirichletCharacter.LFunction χ s) 1 :=
+  have hcL : ContinuousAt
+      (fun s : ℂ => - deriv (DirichletCharacter.LFunction χ) s / DirichletCharacter.LFunction χ s)
+      1 :=
     ((hdiff.analyticAt 1).deriv.continuousAt.neg).div hdiff.continuous.continuousAt
       (DirichletCharacter.LFunction_apply_one_ne_zero hχ)
-  have hA : Tendsto (fun σ : ℝ => -deriv (DirichletCharacter.LFunction χ) σ /
-      DirichletCharacter.LFunction χ σ) (𝓝[>] 1)
-      (𝓝 (-deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1)) :=
+  have hA : Tendsto
+      (fun σ : ℝ => - deriv (DirichletCharacter.LFunction χ) σ / DirichletCharacter.LFunction χ σ)
+      (𝓝[>] 1)
+      (𝓝 (- deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1)) :=
     hcL.tendsto.comp hs
-  have hid : ∀ σ : ℝ, 1 < σ → (σ : ℂ) * ∫ t in Set.Ioi (1 : ℝ),
-      rem (fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) 0 t * (t : ℂ) ^ (-((σ : ℂ) + 1))
-      = -deriv (DirichletCharacter.LFunction χ) σ / DirichletCharacter.LFunction χ σ := by
+  have hid
+      : ∀ σ : ℝ,
+        1 < σ
+          → (σ : ℂ)
+              * ∫ t in Set.Ioi (1 : ℝ),
+                rem (fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) 0 t * (t : ℂ) ^ (-((σ : ℂ) + 1))
+            = - deriv (DirichletCharacter.LFunction χ) σ / DirichletCharacter.LFunction χ σ := by
     intro σ hσ
     have hre : (1 : ℝ) < ((σ : ℂ)).re := by simpa using hσ
-    have hfun : (fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) =
-        (fun n : ℕ => χ (n : ZMod q)) * (fun n : ℕ => ((Λ n : ℝ) : ℂ)) := by
+    have hfun
+        : (fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q))
+          = (fun n : ℕ => χ (n : ZMod q)) * (fun n : ℕ => ((Λ n : ℝ) : ℂ)) := by
       funext n
       simp only [Pi.mul_apply]
       ring
     have hsum : LSeriesSummable (fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) σ := by
       rw [hfun]
       exact DirichletCharacter.LSeriesSummable_twist_vonMangoldt χ hre
-    have hL := LSeries_eq_mul_integral (fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) zero_le_one hre
-      hsum (rem_bigO h)
+    have hL :=
+      LSeries_eq_mul_integral
+        (fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q))
+        zero_le_one hre hsum (rem_bigO h)
     have key := DirichletCharacter.LSeries_twist_vonMangoldt_eq χ hre
     rw [← hfun] at key
-    rw [DirichletCharacter.LFunction_eq_LSeries χ hre, DirichletCharacter.deriv_LFunction_eq_deriv_LSeries χ hre,
-      ← key, hL]
+    rw [DirichletCharacter.LFunction_eq_LSeries χ hre,
+      DirichletCharacter.deriv_LFunction_eq_deriv_LSeries χ hre, ← key, hL]
     congr 1
     refine setIntegral_congr_fun measurableSet_Ioi (fun t _ => ?_)
     simp [rem]
-  have hF : Tendsto (fun σ : ℝ => (σ : ℂ) * ∫ t in Set.Ioi (1 : ℝ),
-      rem (fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) 0 t * (t : ℂ) ^ (-((σ : ℂ) + 1)))
-      (𝓝[>] 1) (𝓝 (-deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1)) := by
+  have hF : Tendsto
+      (fun σ : ℝ =>
+        (σ : ℂ)
+          * ∫ t in Set.Ioi (1 : ℝ),
+            rem (fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) 0 t * (t : ℂ) ^ (-((σ : ℂ) + 1)))
+      (𝓝[>] 1)
+      (𝓝 (- deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1)) := by
     refine hA.congr' ?_
     filter_upwards [self_mem_nhdsWithin] with σ hσ
     exact (hid σ hσ).symm
   have hI := tendsto_nhds_unique (core_tendsto h) hF
   have hdf : ∀ t : ℝ, t ≠ 0 → deriv (fun t : ℝ => ((t⁻¹ : ℝ) : ℂ)) t = ((-(t ^ 2)⁻¹ : ℝ) : ℂ) :=
     fun t ht => ((hasDerivAt_inv ht).ofReal_comp).deriv
-  have hf_diff : ∀ t ∈ Set.Ici (1 : ℝ), DifferentiableAt ℝ (fun t : ℝ => ((t⁻¹ : ℝ) : ℂ)) t :=
-    fun t ht => ((hasDerivAt_inv (show (0 : ℝ) < t from lt_of_lt_of_le one_pos ht).ne').ofReal_comp).differentiableAt
+  have hf_diff
+      : ∀ t ∈ Set.Ici (1 : ℝ), DifferentiableAt ℝ (fun t : ℝ => ((t⁻¹ : ℝ) : ℂ)) t := fun t ht =>
+    ((hasDerivAt_inv (show (0 : ℝ) < t from
+      lt_of_lt_of_le one_pos ht).ne').ofReal_comp).differentiableAt
   have hf_int : LocallyIntegrableOn (deriv (fun t : ℝ => ((t⁻¹ : ℝ) : ℂ))) (Set.Ici 1) := by
     have hc : ContinuousOn (fun t : ℝ => ((-(t ^ 2)⁻¹ : ℝ) : ℂ)) (Set.Ici 1) := by
       apply Complex.continuous_ofReal.comp_continuousOn
@@ -366,10 +381,12 @@ private theorem logDerivSeries_main : Formalism.HermitianLattices.GL2a2.LogDeriv
       apply ContinuousOn.fun_inv₀ (by fun_prop)
       intro t ht
       exact pow_ne_zero 2 (show (0 : ℝ) < t from lt_of_lt_of_le one_pos ht).ne'
-    exact (hc.congr (fun t ht => hdf t (show (0 : ℝ) < t from lt_of_lt_of_le one_pos ht).ne')).locallyIntegrableOn
+    exact (hc.congr (fun t ht =>
+        hdf t (show (0 : ℝ) < t from lt_of_lt_of_le one_pos ht).ne')).locallyIntegrableOn
       measurableSet_Ici
-  have hlim0 : Tendsto (fun n : ℕ => ((((n : ℝ))⁻¹ : ℝ) : ℂ) *
-      ∑ k ∈ Icc 0 n, ((Λ k : ℝ) : ℂ) * χ (k : ZMod q)) atTop (𝓝 0) := by
+  have hlim0 : Tendsto
+      (fun n : ℕ => ((((n : ℝ))⁻¹ : ℝ) : ℂ) * ∑ k ∈ Icc 0 n, ((Λ k : ℝ) : ℂ) * χ (k : ZMod q))
+      atTop (𝓝 0) := by
     obtain ⟨K, x₁, hx₁, hK⟩ := h
     have hlog2 : Tendsto (fun n : ℕ => Real.log n ^ 2) atTop atTop :=
       (tendsto_pow_atTop two_ne_zero).comp (Real.tendsto_log_atTop.comp tendsto_natCast_atTop_atTop)
@@ -381,11 +398,14 @@ private theorem logDerivSeries_main : Formalism.HermitianLattices.GL2a2.LogDeriv
     rw [sum_Icc_zero hc0, sum_eq_rem _ 0 n, zero_mul, add_zero, norm_mul, Complex.norm_real,
       Real.norm_of_nonneg (by positivity)]
     have hinv : ((n : ℝ))⁻¹ * n = 1 := inv_mul_cancel₀ hn1
-    calc ((n : ℝ))⁻¹ * ‖rem (fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) 0 n‖
-        ≤ ((n : ℝ))⁻¹ * (K * n / Real.log n ^ 2) := mul_le_mul_of_nonneg_left (hK n hn) (by positivity)
+    calc
+      ((n : ℝ))⁻¹ * ‖rem (fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) 0 n‖
+          ≤ ((n : ℝ))⁻¹ * (K * n / Real.log n ^ 2) :=
+        mul_le_mul_of_nonneg_left (hK n hn) (by positivity)
       _ = K / Real.log n ^ 2 := by linear_combination (K / Real.log n ^ 2) * hinv
-  have hdom : (fun t : ℝ => deriv (fun t : ℝ => ((t⁻¹ : ℝ) : ℂ)) t *
-      ∑ k ∈ Icc 0 ⌊t⌋₊, ((Λ k : ℝ) : ℂ) * χ (k : ZMod q)) =O[atTop] dom := by
+  have hdom
+      : (fun t : ℝ => deriv (fun t : ℝ => ((t⁻¹ : ℝ) : ℂ)) t *
+        ∑ k ∈ Icc 0 ⌊t⌋₊, ((Λ k : ℝ) : ℂ) * χ (k : ZMod q)) =O[atTop] dom := by
     refine (core_bigO h).neg_left.congr' ?_ EventuallyEq.rfl
     filter_upwards [eventually_ge_atTop (1 : ℝ)] with t ht
     have ht0 : t ≠ 0 := (show (0 : ℝ) < t by linarith).ne'
@@ -394,12 +414,18 @@ private theorem logDerivSeries_main : Formalism.HermitianLattices.GL2a2.LogDeriv
     simp only [rem, zero_mul, sub_zero]
     push_cast
     ring
-  have hg_int : IntegrableAtFilter dom atTop := ⟨Set.Ioi 2, Ioi_mem_atTop 2, dom_integrableOn one_lt_two⟩
-  have hT := tendsto_sum_mul_atTop_nhds_one_sub_integral₀ (f := fun t : ℝ => ((t⁻¹ : ℝ) : ℂ))
-    (c := fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q)) hc0 hf_diff hf_int hlim0 hdom hg_int
-  have hval : (0 : ℂ) - ∫ t in Set.Ioi (1 : ℝ), deriv (fun t : ℝ => ((t⁻¹ : ℝ) : ℂ)) t *
-      ∑ k ∈ Icc 0 ⌊t⌋₊, ((Λ k : ℝ) : ℂ) * χ (k : ZMod q)
-      = -(deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1) := by
+  have hg_int : IntegrableAtFilter dom atTop :=
+    ⟨Set.Ioi 2, Ioi_mem_atTop 2, dom_integrableOn one_lt_two⟩
+  have hT :=
+    tendsto_sum_mul_atTop_nhds_one_sub_integral₀
+      (f := fun t : ℝ => ((t⁻¹ : ℝ) : ℂ))
+      (c := fun n : ℕ => ((Λ n : ℝ) : ℂ) * χ (n : ZMod q))
+      hc0 hf_diff hf_int hlim0 hdom hg_int
+  have hval
+      : (0 : ℂ)
+          - ∫ t in Set.Ioi (1 : ℝ), deriv (fun t : ℝ => ((t⁻¹ : ℝ) : ℂ)) t *
+            ∑ k ∈ Icc 0 ⌊t⌋₊, ((Λ k : ℝ) : ℂ) * χ (k : ZMod q)
+        = -(deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1) := by
     rw [← neg_div, ← hI, zero_sub, ← integral_neg]
     refine setIntegral_congr_fun measurableSet_Ioi (fun t ht => ?_)
     have ht0 : t ≠ 0 := (show (0 : ℝ) < t from lt_trans one_pos ht).ne'
@@ -412,7 +438,8 @@ private theorem logDerivSeries_main : Formalism.HermitianLattices.GL2a2.LogDeriv
   rw [hval] at hT
   refine hT.congr (fun N => ?_)
   beta_reduce
-  rw [sum_Icc_zero (b := fun k : ℕ => ((((k : ℝ))⁻¹ : ℝ) : ℂ) * (((Λ k : ℝ) : ℂ) * χ (k : ZMod q)))
+  rw [sum_Icc_zero
+    (b := fun k : ℕ => ((((k : ℝ))⁻¹ : ℝ) : ℂ) * (((Λ k : ℝ) : ℂ) * χ (k : ZMod q)))
     (by simp) N]
   refine Finset.sum_congr rfl (fun k _ => ?_)
   push_cast
@@ -422,17 +449,18 @@ private theorem psiZeroConst_main : Formalism.HermitianLattices.GL2a2.PsiZeroCon
   unfold Formalism.HermitianLattices.GL2a2.PsiZeroConst
   have hsub : Subsingleton (ZMod 1) := ZMod.subsingleton_iff.2 rfl
   have hone : ∀ n : ℕ, (1 : DirichletCharacter ℂ 1) (n : ZMod 1) = 1 := fun n => by
-    first
-      | exact MulChar.one_apply (isUnit_of_subsingleton _)
-      | simp
+    first | exact MulChar.one_apply (isUnit_of_subsingleton _) | simp
   have h : RemBound (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 := by
     have h0 := sw_bound 1 (1 : DirichletCharacter ℂ 1)
     rw [if_pos rfl] at h0
     simp only [hone, mul_one] at h0
     exact h0
-  have hid : ∀ σ : ℝ, 1 < σ →
-      (σ : ℂ) * ∫ t in Set.Ioi (1 : ℝ), rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 t * (t : ℂ) ^ (-((σ : ℂ) + 1))
-        = -(deriv riemannZeta σ / riemannZeta σ + 1 / ((σ : ℂ) - 1)) - 1 := by
+  have hid
+      : ∀ σ : ℝ,
+        1 < σ
+          → (σ : ℂ)
+              * ∫ t in Set.Ioi (1 : ℝ), rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 t * (t : ℂ) ^ (-((σ : ℂ) + 1))
+            = -(deriv riemannZeta σ / riemannZeta σ + 1 / ((σ : ℂ) - 1)) - 1 := by
     intro σ hσ
     have hre : (1 : ℝ) < ((σ : ℂ)).re := by simpa using hσ
     have hne : (σ : ℂ) - 1 ≠ 0 := by
@@ -444,20 +472,21 @@ private theorem psiZeroConst_main : Formalism.HermitianLattices.GL2a2.PsiZeroCon
       linear_combination -h0
     have hsum : LSeriesSummable (fun n : ℕ => ((Λ n : ℝ) : ℂ)) σ := by
       first
-        | exact ArithmeticFunction.LSeriesSummable_vonMangoldt hre
-        | exact LSeriesSummable_vonMangoldt hre
-    have hL := LSeries_eq_mul_integral (fun n : ℕ => ((Λ n : ℝ) : ℂ)) zero_le_one hre hsum (rem_bigO h)
-    have key : LSeries (fun n : ℕ => ((Λ n : ℝ) : ℂ)) σ = -deriv riemannZeta σ / riemannZeta σ :=
+      | exact ArithmeticFunction.LSeriesSummable_vonMangoldt hre
+      | exact LSeriesSummable_vonMangoldt hre
+    have hL :=
+      LSeries_eq_mul_integral (fun n : ℕ => ((Λ n : ℝ) : ℂ)) zero_le_one hre hsum (rem_bigO h)
+    have key : LSeries (fun n : ℕ => ((Λ n : ℝ) : ℂ)) σ = - deriv riemannZeta σ / riemannZeta σ :=
       LSeries_vonMangoldt_eq_deriv_riemannZeta_div hre
     have hpint : IntegrableOn (fun t : ℝ => (t : ℂ) ^ (-(σ : ℂ))) (Set.Ioi 1) :=
       integrableOn_Ioi_cpow_of_lt (by simpa using hσ) one_pos
-    have hsplit : ∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 1 ⌊t⌋₊, ((Λ k : ℝ) : ℂ)) * (t : ℂ) ^ (-((σ : ℂ) + 1))
-        = (∫ t in Set.Ioi (1 : ℝ), rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 t * (t : ℂ) ^ (-((σ : ℂ) + 1)))
-          + ∫ t in Set.Ioi (1 : ℝ), (t : ℂ) ^ (-(σ : ℂ)) := by
+    have hsplit
+        : ∫ t in Set.Ioi (1 : ℝ), (∑ k ∈ Icc 1 ⌊t⌋₊, ((Λ k : ℝ) : ℂ)) * (t : ℂ) ^ (-((σ : ℂ) + 1))
+          = (∫ t in Set.Ioi (1 : ℝ), rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 t * (t : ℂ) ^ (-((σ : ℂ) + 1)))
+            + ∫ t in Set.Ioi (1 : ℝ), (t : ℂ) ^ (-(σ : ℂ)) := by
       rw [← integral_add (core_integrable' h hσ.le) hpint]
       refine setIntegral_congr_fun measurableSet_Ioi (fun t ht => ?_)
-      have ht0 : (t : ℂ) ≠ 0 := by
-        exact_mod_cast (show (0 : ℝ) < t from lt_trans one_pos ht).ne'
+      have ht0 : (t : ℂ) ≠ 0 := by exact_mod_cast (show (0 : ℝ) < t from lt_trans one_pos ht).ne'
       simp only [rem]
       rw [show -(σ : ℂ) = 1 + (-((σ : ℂ) + 1)) by ring, Complex.cpow_add _ _ ht0, Complex.cpow_one]
       ring
@@ -469,48 +498,61 @@ private theorem psiZeroConst_main : Formalism.HermitianLattices.GL2a2.PsiZeroCon
       rw [mul_one_div, div_add_one hne]
       congr 1
       ring
-    have hmain : (σ : ℂ) * ∫ t in Set.Ioi (1 : ℝ),
-        rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 t * (t : ℂ) ^ (-((σ : ℂ) + 1))
-        = LSeries (fun n : ℕ => ((Λ n : ℝ) : ℂ)) σ - (σ : ℂ) * (1 / ((σ : ℂ) - 1)) := by
+    have hmain
+        : (σ : ℂ)
+            * ∫ t in Set.Ioi (1 : ℝ),
+              rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 t * (t : ℂ) ^ (-((σ : ℂ) + 1))
+          = LSeries (fun n : ℕ => ((Λ n : ℝ) : ℂ)) σ - (σ : ℂ) * (1 / ((σ : ℂ) - 1)) := by
       rw [hL, hsplit, hpow]
       ring
     rw [hmain, key, hq]
     ring
-  have hG : Tendsto (fun σ : ℝ => -(deriv riemannZeta σ / riemannZeta σ + 1 / ((σ : ℂ) - 1)) - 1)
+  have hG : Tendsto
+      (fun σ : ℝ => -(deriv riemannZeta σ / riemannZeta σ + 1 / ((σ : ℂ) - 1)) - 1)
       (𝓝[>] 1) (𝓝 (-(Real.eulerMascheroniConstant : ℂ) - 1)) :=
     ((zeta_logderiv_limit.comp ofReal_tendsto_punctured).neg).sub_const 1
-  have hF : Tendsto (fun σ : ℝ => (σ : ℂ) * ∫ t in Set.Ioi (1 : ℝ),
-      rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 t * (t : ℂ) ^ (-((σ : ℂ) + 1)))
+  have hF : Tendsto
+      (fun σ : ℝ =>
+        (σ : ℂ)
+          * ∫ t in Set.Ioi (1 : ℝ),
+            rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 t * (t : ℂ) ^ (-((σ : ℂ) + 1)))
       (𝓝[>] 1) (𝓝 (-(Real.eulerMascheroniConstant : ℂ) - 1)) := by
     refine hG.congr' ?_
     filter_upwards [self_mem_nhdsWithin] with σ hσ
     exact (hid σ hσ).symm
   have hlim := tendsto_nhds_unique (core_tendsto h) hF
-  have hF1 : ∀ u ∈ Set.Ioi (1 : ℝ),
-      rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 u * (u : ℂ) ^ (-(((1 : ℝ) : ℂ) + 1))
-        = (((Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2 : ℝ) : ℂ) := by
+  have hF1
+      : ∀ u ∈ Set.Ioi (1 : ℝ),
+        rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 u * (u : ℂ) ^ (-(((1 : ℝ) : ℂ) + 1))
+          = (((Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2 : ℝ)
+            : ℂ) := by
     intro u hu
-    rw [show -(((1 : ℝ) : ℂ) + 1) = -((2 : ℕ) : ℂ) by norm_num, Complex.cpow_neg, Complex.cpow_natCast]
+    rw [show -(((1 : ℝ) : ℂ) + 1) = -((2 : ℕ) : ℂ) by norm_num, Complex.cpow_neg,
+      Complex.cpow_natCast]
     simp only [rem, Formalism.HermitianLattices.GL2PrimeSums.psumR]
     push_cast
     ring
-  have hint : IntegrableOn (fun u : ℝ => (Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2)
+  have hint : IntegrableOn
+      (fun u : ℝ => (Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2)
       (Set.Ioi 1) := by
     refine (MeasureTheory.Integrable.re (core_integrable h)).congr ?_
     filter_upwards [ae_restrict_mem measurableSet_Ioi] with u hu
     simp only [hF1 u hu, RCLike.re_to_complex, Complex.ofReal_re]
-  have e1 : ∫ u in Set.Ioi (1 : ℝ), (((Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2 : ℝ) : ℂ)
-      = ∫ u in Set.Ioi (1 : ℝ),
-        rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 u * (u : ℂ) ^ (-(((1 : ℝ) : ℂ) + 1)) :=
+  have e1
+      : ∫ u in Set.Ioi (1 : ℝ), (((Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2 : ℝ) : ℂ)
+        = ∫ u in Set.Ioi (1 : ℝ),
+          rem (fun n : ℕ => ((Λ n : ℝ) : ℂ)) 1 u * (u : ℂ) ^ (-(((1 : ℝ) : ℂ) + 1)) :=
     (setIntegral_congr_fun measurableSet_Ioi hF1).symm
-  have hval : ∫ u in Set.Ioi (1 : ℝ), (Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2
-      = -1 - Real.eulerMascheroniConstant := by
+  have hval
+      : ∫ u in Set.Ioi (1 : ℝ), (Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2
+        = -1 - Real.eulerMascheroniConstant := by
     apply Complex.ofReal_injective
-    have e0 : ∫ u in Set.Ioi (1 : ℝ), (((Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2 : ℝ) : ℂ)
-        = ((∫ u in Set.Ioi (1 : ℝ), (Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2 : ℝ) : ℂ) := by
-      first
-        | exact integral_complex_ofReal
-        | exact integral_ofReal
+    have e0
+        : ∫ u in Set.Ioi (1 : ℝ), (((Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2 : ℝ) : ℂ)
+          = ((∫ u in Set.Ioi (1 : ℝ), (Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => Λ n) u - u) / u ^ 2
+              : ℝ)
+            : ℂ) := by
+      first | exact integral_complex_ofReal | exact integral_ofReal
     rw [← e0, e1, hlim]
     push_cast
     ring

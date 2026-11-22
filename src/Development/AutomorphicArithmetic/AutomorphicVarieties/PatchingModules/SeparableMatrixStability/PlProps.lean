@@ -6,14 +6,16 @@ public import Mathlib
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem mem_PL {l : ℕ} {Γ : Type} [Group Γ] [TopologicalSpace Γ] {H : Subgroup Γ} {x : Γ} :
-    x ∈ PL (l := l) H ↔ ∀ U : OpenNormalSubgroup Γ, (∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U) → x ∈ U.toSubgroup := by
+private theorem mem_PL {l : ℕ} {Γ : Type} [Group Γ] [TopologicalSpace Γ] {H : Subgroup Γ} {x : Γ}
+    : x ∈ PL (l := l) H
+      ↔ ∀ U : OpenNormalSubgroup Γ, (∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U) → x ∈ U.toSubgroup := by
   simp only [PL, Subgroup.mem_iInf]
 
-private theorem pq_iff (l : ℕ) (G : Type) [Group G] (N : Subgroup G) [N.Normal] :
-    IsPGroup l (G ⧸ N) ↔ ∀ g : G, ∃ k : ℕ, g ^ l ^ k ∈ N := by
+private theorem pq_iff (l : ℕ) (G : Type) [Group G] (N : Subgroup G) [N.Normal]
+    : IsPGroup l (G ⧸ N) ↔ ∀ g : G, ∃ k : ℕ, g ^ l ^ k ∈ N := by
   refine ⟨fun h g => ?_, fun h x => ?_⟩
   · obtain ⟨k, hk⟩ := h (g : G ⧸ N)
     exact ⟨k, by rwa [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff] at hk⟩
@@ -21,31 +23,36 @@ private theorem pq_iff (l : ℕ) (G : Type) [Group G] (N : Subgroup G) [N.Normal
     obtain ⟨k, hk⟩ := h g
     exact ⟨k, by rwa [← QuotientGroup.mk_pow, QuotientGroup.eq_one_iff]⟩
 
-private theorem exists_core {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
-    (K P : Subgroup Γ) [P.Normal] (hK : IsOpen (K : Set Γ)) (hP : P ≤ K) :
-    ∃ U : OpenNormalSubgroup Γ, P ≤ U.toSubgroup ∧ U.toSubgroup ≤ K := by
+private theorem exists_core
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    (K P : Subgroup Γ) [P.Normal]
+    (hK : IsOpen (K : Set Γ)) (hP : P ≤ K)
+    : ∃ U : OpenNormalSubgroup Γ, P ≤ U.toSubgroup ∧ U.toSubgroup ≤ K := by
   have : Finite (Γ ⧸ K) := K.quotient_finite_of_isOpen hK
   have : K.FiniteIndex := K.finiteIndex_of_finite_quotient
   have hKc : IsClosed (K : Set Γ) := OpenSubgroup.isClosed ⟨K, hK⟩
   have hCo : IsOpen (K.normalCore : Set Γ) :=
     Subgroup.isOpen_of_isClosed_of_finiteIndex _ (K.normalCore_isClosed hKc)
-  let C : OpenNormalSubgroup Γ :=
-    { toOpenSubgroup := ⟨K.normalCore, hCo⟩
-      isNormal' := K.normalCore_normal }
+  let C : OpenNormalSubgroup Γ := {
+    toOpenSubgroup := ⟨K.normalCore, hCo⟩
+    isNormal' := K.normalCore_normal
+  }
   exact ⟨C, Subgroup.normal_le_normalCore.mpr hP, K.normalCore_le⟩
 
-theorem UpperTheory.V.Pa.pl_props :
-    ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ]
-      [IsTopologicalGroup Γ] [CompactSpace Γ] [TotallyDisconnectedSpace Γ]
-      (H : Subgroup Γ) [H.Normal], IsOpen (H : Set Γ) →
-      (PL (l := l) H).Normal ∧ IsClosed (PL (l := l) H : Set Γ) ∧ PL (l := l) H ≤ H ∧
-      (∀ U : OpenNormalSubgroup Γ, PL (l := l) H ≤ U.toSubgroup ↔ ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U) ∧
-      (PL (l := l) H = ⊥ ↔ IsProL l H) ∧ PL (l := l) H = proLResOf l H := by
+theorem UpperTheory.V.Pa.pl_props
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (H : Subgroup Γ) [H.Normal],
+      IsOpen (H : Set Γ)
+        → (PL (l := l) H).Normal ∧ IsClosed (PL (l := l) H : Set Γ) ∧ PL (l := l) H ≤ H
+          ∧ (∀ U : OpenNormalSubgroup Γ,
+            PL (l := l) H ≤ U.toSubgroup ↔ ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U)
+          ∧ (PL (l := l) H = ⊥ ↔ IsProL l H) ∧ PL (l := l) H = proLResOf l H := by
   intro l _ Γ _ _ _ _ _ H _ hHo
   have hHc : IsClosed (H : Set Γ) := OpenSubgroup.isClosed ⟨H, hHo⟩
-  have cond_le : ∀ U : OpenNormalSubgroup Γ, (∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U) →
-      PL (l := l) H ≤ U.toSubgroup :=
-    fun U hU x hx => mem_PL.mp hx U hU
+  have cond_le
+      : ∀ U : OpenNormalSubgroup Γ,
+        (∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U) → PL (l := l) H ≤ U.toSubgroup := fun U hU x hx =>
+    mem_PL.mp hx U hU
   have hnorm : (PL (l := l) H).Normal :=
     ⟨fun x hx g => mem_PL.mpr fun U hU => U.isNormal'.conj_mem _ (mem_PL.mp hx U hU) g⟩
   have hclosed : IsClosed (PL (l := l) H : Set Γ) := by
@@ -69,10 +76,11 @@ theorem UpperTheory.V.Pa.pl_props :
       exact (continuous_const.mul continuous_subtype_val).mul continuous_const
     refine Subgroup.mem_map.mpr ⟨c y, mem_proLRes.mpr ?_, ?_⟩
     · intro N hN
-      let M : OpenNormalSubgroup H :=
-        { toSubgroup := N.toSubgroup.comap c
-          isOpen' := N.isOpen.preimage hc
-          isNormal' := Subgroup.Normal.comap N.isNormal' c }
+      let M : OpenNormalSubgroup H := {
+        toSubgroup := N.toSubgroup.comap c
+        isOpen' := N.isOpen.preimage hc
+        isNormal' := Subgroup.Normal.comap N.isNormal' c
+      }
       have hM : IsPGroup l (H ⧸ M.toSubgroup) := by
         rw [pq_iff] at hN ⊢
         intro z
@@ -84,8 +92,8 @@ theorem UpperTheory.V.Pa.pl_props :
     unfold proLResOf
     rw [Subgroup.coe_map, Subgroup.coe_subtype]
     exact hHc.isClosedEmbedding_subtypeVal.isClosedMap _ (isClosed_proLRes l H)
-  have hPcond (U : OpenNormalSubgroup Γ) (hU : proLResOf l H ≤ U.toSubgroup)
-      (h : Γ) (hh : h ∈ H) : ∃ e : ℕ, h ^ l ^ e ∈ U.toSubgroup := by
+  have hPcond (U : OpenNormalSubgroup Γ) (hU : proLResOf l H ≤ U.toSubgroup) (h : Γ) (hh : h ∈ H)
+      : ∃ e : ℕ, h ^ l ^ e ∈ U.toSubgroup := by
     classical
     have : CompactSpace H := isCompact_iff_compactSpace.mp hHc.isCompact
     let K := U.toSubgroup.comap H.subtype
@@ -97,11 +105,12 @@ theorem UpperTheory.V.Pa.pl_props :
       simp only [Set.disjoint_left, Set.mem_compl_iff, Set.mem_iInter]
       intro y hy hall
       exact hy (hleK (mem_proLRes.mpr fun N hN => hall ⟨N, hN⟩))
-    obtain ⟨s, hs⟩ := hKo.isClosed_compl.isCompact.elim_finite_subfamily_closed t
-      (fun i => i.1.toOpenSubgroup.isClosed) hdisjoint
+    obtain ⟨s, hs⟩ :=
+      hKo.isClosed_compl.isCompact.elim_finite_subfamily_closed t
+        (fun i => i.1.toOpenSubgroup.isClosed)
+        hdisjoint
     let g : H := ⟨h, hh⟩
-    have hk (i : ι) : ∃ k : ℕ, g ^ l ^ k ∈ i.1.toSubgroup :=
-      (pq_iff l H _).mp i.2 g
+    have hk (i : ι) : ∃ k : ℕ, g ^ l ^ k ∈ i.1.toSubgroup := (pq_iff l H _).mp i.2 g
     choose k hk using hk
     refine ⟨∑ i ∈ s, k i, ?_⟩
     change g ^ l ^ (∑ i ∈ s, k i) ∈ K
@@ -120,8 +129,7 @@ theorem UpperTheory.V.Pa.pl_props :
     apply le_antisymm
     · intro x hx
       by_contra hxP
-      have hsI := ProfiniteGrp.closedSubgroup_eq_sInf_open
-        (⟨proLResOf l H, hPc⟩ : ClosedSubgroup Γ)
+      have hsI := ProfiniteGrp.closedSubgroup_eq_sInf_open (⟨proLResOf l H, hPc⟩ : ClosedSubgroup Γ)
       have h2 : x ∉ ((⟨proLResOf l H, hPc⟩ : ClosedSubgroup Γ) : Subgroup Γ) := hxP
       rw [hsI, Subgroup.mem_sInf] at h2
       push Not at h2
@@ -131,16 +139,17 @@ theorem UpperTheory.V.Pa.pl_props :
     · rintro _ ⟨y, hy, rfl⟩
       rw [mem_PL]
       intro U hU
-      let N : OpenNormalSubgroup H :=
-        { toOpenSubgroup := ⟨U.toSubgroup.comap H.subtype,
-            U.toOpenSubgroup.isOpen.preimage continuous_subtype_val⟩
-          isNormal' := Subgroup.Normal.comap U.isNormal' _ }
+      let N : OpenNormalSubgroup H := {
+        toOpenSubgroup :=
+          ⟨U.toSubgroup.comap H.subtype, U.toOpenSubgroup.isOpen.preimage continuous_subtype_val⟩
+        isNormal' := Subgroup.Normal.comap U.isNormal' _
+      }
       have : N.toSubgroup.Normal := N.isNormal'
-      have hpg : IsPGroup l (H ⧸ N.toSubgroup) :=
-        (pq_iff l H _).mpr fun g => hU g g.2
+      have hpg : IsPGroup l (H ⧸ N.toSubgroup) := (pq_iff l H _).mpr fun g => hU g g.2
       exact mem_proLRes.mp hy N hpg
-  have hiff : ∀ U : OpenNormalSubgroup Γ,
-      PL (l := l) H ≤ U.toSubgroup ↔ ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U := by
+  have hiff
+      : ∀ U : OpenNormalSubgroup Γ,
+        PL (l := l) H ≤ U.toSubgroup ↔ ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U := by
     intro U
     refine ⟨fun h => ?_, cond_le U⟩
     exact hPcond U (heq ▸ h)
@@ -167,14 +176,16 @@ theorem UpperTheory.V.Pa.pl_props :
         intro W
         apply cond_le W _ hx
         intro h hh
-        let N : OpenNormalSubgroup H :=
-          { toOpenSubgroup := ⟨W.toSubgroup.comap H.subtype,
-              W.toOpenSubgroup.isOpen.preimage continuous_subtype_val⟩
-            isNormal' := Subgroup.Normal.comap W.isNormal' _ }
+        let N : OpenNormalSubgroup H := {
+          toOpenSubgroup :=
+            ⟨W.toSubgroup.comap H.subtype, W.toOpenSubgroup.isOpen.preimage continuous_subtype_val⟩
+          isNormal' := Subgroup.Normal.comap W.isNormal' _
+        }
         obtain ⟨k, hk⟩ := hP N ⟨h, hh⟩
         exact ⟨k, hk⟩
       by_contra hne
-      obtain ⟨U, hU⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one
-        (isOpen_compl_singleton (x := x)) (by simpa [eq_comm] using hne)
+      obtain ⟨U, hU⟩ :=
+        ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one (isOpen_compl_singleton (x := x))
+          (by simpa [eq_comm] using hne)
       exact hU (key U) rfl
   exact ⟨hnorm, hclosed, hle, hiff, hbot, heq⟩

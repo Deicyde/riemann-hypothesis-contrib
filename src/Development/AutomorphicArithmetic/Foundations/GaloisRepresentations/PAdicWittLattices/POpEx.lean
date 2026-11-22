@@ -4,12 +4,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
-theorem UpperTheory.Gal.G3.pOpEx :
-    OpTr.{u} → OpEx.{u} := by
+theorem UpperTheory.Gal.G3.pOpEx : OpTr.{u} → OpEx.{u} := by
   intro hTr B R _ T hG Z Y Z' p p' s _ _ t hcomm
   obtain ⟨tr, htr⟩ := hG.tr p (s ≫ p) s rfl
   have key := fun A => hTr T hG p (s ≫ p) p' s t rfl hcomm tr htr A

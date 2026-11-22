@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FreeGenerato
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -21,11 +23,16 @@ namespace GlobalTheory.Residue
 
 open KaehlerDifferential IsLocalRing Module
 
-theorem exists_basis_D_cons (k V : Type) [Field k] [CharZero k] [CommRing V] [IsDomain V]
-    [IsDiscreteValuationRing V] [Algebra k V] [Algebra.EssFiniteType k V] (n : ℕ) {t : V}
-    (w : Fin n → V) (ht : Irreducible t) (hb₀ : Nonempty (Module.Basis (Fin (n + 1)) V Ω[V⁄k]))
-    (hw : ∀ P : MvPolynomial (Fin n) k, P ≠ 0 → IsUnit (MvPolynomial.eval₂ (algebraMap k V) w P)) :
-    ∃ b : Module.Basis (Fin (n + 1)) V Ω[V⁄k], ∀ i, b i = D k V ((Fin.cons t w : Fin (n + 1) → V) i) := by
+theorem exists_basis_D_cons
+    (k V : Type) [Field k] [CharZero k] [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    [Algebra k V] [Algebra.EssFiniteType k V]
+    (n : ℕ)
+    {t : V}
+    (w : Fin n → V)
+    (ht : Irreducible t) (hb₀ : Nonempty (Module.Basis (Fin (n + 1)) V Ω[V⁄k]))
+    (hw : ∀ P : MvPolynomial (Fin n) k, P ≠ 0 → IsUnit (MvPolynomial.eval₂ (algebraMap k V) w P))
+    : ∃ b : Module.Basis (Fin (n + 1)) V Ω[V⁄k], ∀ i,
+      b i = D k V ((Fin.cons t w : Fin (n + 1) → V) i) := by
   obtain ⟨b₀⟩ := hb₀
   haveI : Algebra.FormallySmooth k V := formallySmooth_of_isRegularLocalRing_of_perfectField k V
   let κ := ResidueField V
@@ -35,7 +42,8 @@ theorem exists_basis_D_cons (k V : Type) [Field k] [CharZero k] [CommRing V] [Is
     intro P hP
     by_contra hne
     have hu := hw P hne
-    have e : MvPolynomial.aeval wb P = algebraMap V κ (MvPolynomial.eval₂ (algebraMap k V) w P) := by
+    have e
+        : MvPolynomial.aeval wb P = algebraMap V κ (MvPolynomial.eval₂ (algebraMap k V) w P) := by
       rw [show wb = algebraMap V κ ∘ w from rfl, MvPolynomial.aeval_algebraMap_apply]
       rfl
     rw [e] at hP
@@ -54,9 +62,10 @@ theorem exists_basis_D_cons (k V : Type) [Field k] [CharZero k] [CommRing V] [Is
     convert this using 1
     funext i
     simp [ι, hb]
-  have ht₀ : algebraMap V κ t = 0 := (residue_eq_zero_iff t).mpr (by
-    rw [ht.maximalIdeal_eq]
-    exact Ideal.mem_span_singleton_self t)
+  have ht₀ : algebraMap V κ t = 0 :=
+    (residue_eq_zero_iff t).mpr (by
+      rw [ht.maximalIdeal_eq]
+      exact Ideal.mem_span_singleton_self t)
   let z : Fin (n + 1) → V := Fin.cons t w
   have hli : LinearIndependent κ (TensorProduct.mk V κ Ω[V⁄k] 1 ∘ fun i => D k V (z i)) := by
     rw [Fintype.linearIndependent_iff]
@@ -65,8 +74,9 @@ theorem exists_basis_D_cons (k V : Type) [Field k] [CharZero k] [CommRing V] [Is
     simp only [Function.comp_apply, TensorProduct.mk_apply, z, Fin.cons_zero, Fin.cons_succ] at hg
     have hφ := congrArg (mapBaseChange k V κ) hg
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, map_smul, map_zero, mapBaseChange_tmul, one_smul, map_D, ht₀,
-      Derivation.map_zero, smul_zero, zero_add] at hφ
+      simp only [map_add (f := _), map_sum, map_smul, map_zero, mapBaseChange_tmul, one_smul, map_D,
+          ht₀, Derivation.map_zero, smul_zero, zero_add]
+        at hφ
     have hs : ∀ i : Fin n, g i.succ = 0 :=
       Fintype.linearIndependent_iff.mp hdli (fun i => g i.succ) hφ
     simp only [hs, zero_smul, Finset.sum_const_zero, add_zero] at hg
@@ -76,22 +86,30 @@ theorem exists_basis_D_cons (k V : Type) [Field k] [CharZero k] [CommRing V] [Is
       · exact absurd h (one_tmul_D_ne_zero k ht)
     intro i
     exact Fin.cases h0 hs i
-  have hsp := hli.span_eq_top_of_card_eq_finrank' (by
-    rw [Fintype.card_fin, Module.finrank_eq_card_basis (b₀.baseChange κ), Fintype.card_fin])
+  have hsp :=
+    hli.span_eq_top_of_card_eq_finrank' (by
+      rw [Fintype.card_fin, Module.finrank_eq_card_basis (b₀.baseChange κ), Fintype.card_fin])
   haveI : Module.Free V Ω[V⁄k] := Module.Free.of_basis b₀
   haveI : Module.Finite V Ω[V⁄k] := Module.Finite.of_basis b₀
   haveI : Module.FinitePresentation V Ω[V⁄k] := Module.finitePresentation_of_finite V _
-  exact Module.exists_basis_of_basis_baseChange (R := V) (fun i => D k V (z i)) hli hsp
+  exact Module.exists_basis_of_basis_baseChange (R := V)
+    (fun i => D k V (z i))
+    hli hsp
     (Module.Flat.rTensor_preserves_injective_linearMap (maximalIdeal V).subtype
       Subtype.val_injective)
 
-theorem residue_dForm : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ →+* K) (n : ℕ) (S : Place cL) (ψ : S.ring →+* K),
-  Function.Surjective ψ → (∀ a, ψ (S.const a) = cK a) → ∀ (t f : S.ring) (v w : Fin n → S.ring) (H : L),
-  Irreducible t → Irreducible f → TrBasis cK (fun i => ψ (v i)) →
-  TrBasis cL (Fin.cons (t : L) (fun i => (v i : L)) : Fin (n + 1) → L) →
-  dForm cL (Fin.cons (f : L) (fun i => (w i : L)) : Fin (n + 1) → L) =
-    H • dForm cL (Fin.cons (t : L) (fun i => (v i : L)) : Fin (n + 1) → L) →
-  ∃ h : S.ring, (h : L) * f = H * t ∧ dForm cK (fun i => ψ (w i)) = ψ h • dForm cK (fun i => ψ (v i)) := by
+theorem residue_dForm
+    : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ →+* K) (n : ℕ) (S : Place cL)
+        (ψ : S.ring →+* K),
+      Function.Surjective ψ → (∀ a, ψ (S.const a) = cK a)
+        → ∀ (t f : S.ring) (v w : Fin n → S.ring) (H : L),
+          Irreducible t → Irreducible f → TrBasis cK (fun i => ψ (v i))
+            → TrBasis cL (Fin.cons (t : L) (fun i => (v i : L)) : Fin (n + 1) → L)
+            → dForm cL (Fin.cons (f : L) (fun i => (w i : L)) : Fin (n + 1) → L)
+              = H • dForm cL (Fin.cons (t : L) (fun i => (v i : L)) : Fin (n + 1) → L)
+            → ∃ h : S.ring,
+              (h : L) * f = H * t
+                ∧ dForm cK (fun i => ψ (w i)) = ψ h • dForm cK (fun i => ψ (v i)) := by
   intro L K _ _ cL cK n S ψ hψ hc t f v w H ht hf hvK hvL hH
   letI : Algebra ℂ S.ring := S.const.toAlgebra
   letI : Algebra ℂ L := cL.toAlgebra
@@ -116,8 +134,9 @@ theorem residue_dForm : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) 
     have h3 : n + 1 = m + 1 := by exact_mod_cast h2
     obtain rfl : n = m := by omega
     exact ⟨b⟩
-  have hvu : ∀ P : MvPolynomial (Fin n) ℂ, P ≠ 0 →
-      IsUnit (MvPolynomial.eval₂ (algebraMap ℂ S.ring) v P) := by
+  have hvu
+      : ∀ P : MvPolynomial (Fin n) ℂ,
+        P ≠ 0 → IsUnit (MvPolynomial.eval₂ (algebraMap ℂ S.ring) v P) := by
     intro P hP
     by_contra hu
     have hm : MvPolynomial.eval₂ (algebraMap ℂ S.ring) v P ∈ RingHom.ker ψ := by
@@ -138,19 +157,22 @@ theorem residue_dForm : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) 
     change D ℂ S.ring _ = ∑ j, M i j • D ℂ S.ring (z j)
     conv_lhs => rw [← b.sum_repr (D ℂ S.ring ((Fin.cons f w : Fin (n + 1) → S.ring) i))]
     simp only [hb, M, Matrix.of_apply, hz]
-  have hcons : ∀ (a : S.ring) (g : Fin n → S.ring),
-      (fun i => S.ring.subtype ((Fin.cons a g : Fin (n + 1) → S.ring) i)) =
-        (Fin.cons (a : L) (fun i => (g i : L)) : Fin (n + 1) → L) := by
+  have hcons
+      : ∀ (a : S.ring) (g : Fin n → S.ring),
+        (fun i => S.ring.subtype ((Fin.cons a g : Fin (n + 1) → S.ring) i))
+          = (Fin.cons (a : L) (fun i => (g i : L)) : Fin (n + 1) → L) := by
     intro a g
     funext i
     refine Fin.cases ?_ (fun j => ?_) i <;> simp
-  have htoRat : ∀ (a : S.ring) (g : Fin n → S.ring),
-      S.toRat (n + 1) (dForm S.const (Fin.cons a g : Fin (n + 1) → S.ring)) =
-        dForm cL (Fin.cons (a : L) (fun i => (g i : L)) : Fin (n + 1) → L) := by
+  have htoRat
+      : ∀ (a : S.ring) (g : Fin n → S.ring),
+        S.toRat (n + 1) (dForm S.const (Fin.cons a g : Fin (n + 1) → S.ring))
+          = dForm cL (Fin.cons (a : L) (fun i => (g i : L)) : Fin (n + 1) → L) := by
     intro a g
     exact (formMap_dForm (D := n + 1) S.ring.subtype rfl _).trans (congrArg _ (hcons a g))
-  have hML : dForm cL (Fin.cons (f : L) (fun i => (w i : L)) : Fin (n + 1) → L) =
-      (M.det : L) • dForm cL (Fin.cons (t : L) (fun i => (v i : L)) : Fin (n + 1) → L) := by
+  have hML
+      : dForm cL (Fin.cons (f : L) (fun i => (w i : L)) : Fin (n + 1) → L)
+        = (M.det : L) • dForm cL (Fin.cons (t : L) (fun i => (v i : L)) : Fin (n + 1) → L) := by
     have := congrArg (S.toRat (n + 1)) hM
     rw [map_smulₛₗ, hz, htoRat, htoRat] at this
     exact this
@@ -170,7 +192,8 @@ theorem residue_dForm : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) 
     change D ℂ K (ψ (w i)) = ∑ j, N i j • D ℂ K (ψ (v j))
     have := congrArg (KaehlerDifferential.map ℂ ℂ S.ring K) (b.sum_repr (D ℂ S.ring (w i)))
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, KaehlerDifferential.map_D, Fin.sum_univ_succ, RingHom.algebraMap_toAlgebra] at this
+      rw [map_sum, KaehlerDifferential.map_D, Fin.sum_univ_succ, RingHom.algebraMap_toAlgebra]
+        at this
     rw [← this]
     simp only [map_smul, hb, KaehlerDifferential.map_D, hz, Fin.cons_zero, Fin.cons_succ,
       RingHom.algebraMap_toAlgebra, hψt, map_zero, smul_zero, zero_add]
@@ -182,8 +205,8 @@ theorem residue_dForm : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) 
     intro j
     simp only [M, Matrix.of_apply, Fin.cons_zero]
     rw [← hu, Derivation.leibniz, hDt, map_add (f := _), map_smul, map_smul, b.repr_self]
-    rw [Finsupp.add_apply, Finsupp.smul_apply, Finsupp.smul_apply, smul_eq_mul, smul_eq_mul, map_add (f := _),
-      map_mul, hψt, zero_mul, zero_add]
+    rw [Finsupp.add_apply, Finsupp.smul_apply, Finsupp.smul_apply, smul_eq_mul, smul_eq_mul,
+      map_add (f := _), map_mul, hψt, zero_mul, zero_add]
   have hsub : (ψ.mapMatrix M).submatrix Fin.succ Fin.succ = N := Matrix.ext fun _ _ => rfl
   have h0 : ∀ j : Fin n, ψ.mapMatrix M 0 j.succ = 0 := fun j => by
     rw [RingHom.mapMatrix_apply, Matrix.map_apply, hrow]

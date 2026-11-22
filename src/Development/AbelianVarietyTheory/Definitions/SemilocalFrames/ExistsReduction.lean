@@ -19,54 +19,71 @@ structure Red (I : AutInst) (g : ℕ) (Q : Type) [Group Q] where
   ker : ∀ x ∈ I.Kset, toFun x = 1 ↔ x ∈ I.Kg g
   surj : ∀ q : Q, ∃ x ∈ I.Kset, toFun x = q
 
-def Red.lift {I : AutInst} {g : ℕ} {Q : Type} [Group Q] (ρ : Red I g Q) (μf : Measure I.Gf)
-    (a : MonoidAlgebra ℂ Q) : I.Gf → ℂ := by
+def Red.lift
+    {I : AutInst} {g : ℕ} {Q : Type} [Group Q]
+    (ρ : Red I g Q) (μf : Measure I.Gf) (a : MonoidAlgebra ℂ Q)
+    : I.Gf → ℂ := by
   classical
   exact fun x => if x ∈ I.Kset then a.coeff (ρ.toFun x) / ((μf (I.Kg g)).toReal : ℂ) else 0
 
-def IsSA {Q : Type} [Group Q] (a : MonoidAlgebra ℂ Q) : Prop := ∀ q : Q, a.coeff q⁻¹ = star (a.coeff q)
+def IsSA {Q : Type} [Group Q] (a : MonoidAlgebra ℂ Q) : Prop :=
+  ∀ q : Q, a.coeff q⁻¹ = star (a.coeff q)
 
-def tensAlg {ι : Type} [Fintype ι] {G : ι → Type} [∀ i, Group (G i)] [∀ i, Finite (G i)]
-    (a : ∀ i, MonoidAlgebra ℂ (G i)) : MonoidAlgebra ℂ (∀ i, G i) :=
+def tensAlg
+    {ι : Type} [Fintype ι]
+    {G : ι → Type} [∀ i, Group (G i)] [∀ i, Finite (G i)]
+    (a : ∀ i, MonoidAlgebra ℂ (G i))
+    : MonoidAlgebra ℂ (∀ i, G i) :=
   MonoidAlgebra.ofCoeff (Finsupp.equivFunOnFinite.symm fun h : ∀ i, G i => ∏ i, (a i).coeff (h i))
 
 def IsSeries {Q Lab : Type} [Group Q] (z : Lab → MonoidAlgebra ℂ Q) : Prop :=
-  (∀ f, z f * z f = z f) ∧ (∀ f a, z f * a = a * z f) ∧ (∀ f f', f ≠ f' → z f * z f' = 0) ∧
-    ∃ T : Finset Lab, (∀ f, f ∉ T → z f = 0) ∧ ∑ f ∈ T, z f = 1
+  (∀ f, z f * z f = z f) ∧ (∀ f a, z f * a = a * z f) ∧ (∀ f f', f ≠ f' → z f * z f' = 0)
+    ∧ ∃ T : Finset Lab, (∀ f, f ∉ T → z f = 0) ∧ ∑ f ∈ T, z f = 1
 
 def extId (I : AutInst) (𝔞 : Ideal (𝓞 I.E)) : Ideal (IntAf I.F I.E) :=
-  Ideal.span {z : IntAf I.F I.E | ∃ a ∈ 𝔞, (z : TensorProduct I.F I.E (Af I.F)) = Formalism.UG.inclE (F := I.F) (Af I.F) (a : I.E)}
+  Ideal.span
+    {z : IntAf I.F I.E | ∃ a ∈ 𝔞, (z : TensorProduct I.F I.E (Af I.F)) = Formalism.UG.inclE (F := I.F) (Af I.F) (a : I.E)}
 
-def hAf (I : AutInst) (x y : Fin I.n → TensorProduct I.F I.E (Af I.F)) : TensorProduct I.F I.E (Af I.F) :=
-  Formalism.UG.hform (Formalism.UG.sigR I.cm.sig (Af I.F)) (I.J.map (Formalism.UG.inclE (F := I.F) (Af I.F))) x y
+def hAf (I : AutInst) (x y : Fin I.n → TensorProduct I.F I.E (Af I.F))
+    : TensorProduct I.F I.E (Af I.F) :=
+  Formalism.UG.hform (Formalism.UG.sigR I.cm.sig (Af I.F))
+    (I.J.map (Formalism.UG.inclE (F := I.F) (Af I.F))) x y
 
 structure PlFrame (I : AutInst) (N p : ℕ) (w : HeightOneSpectrum (𝓞 I.E)) where
   r : IntAf I.F I.E →+* ZMod p
-  r_ker : ∀ (a : 𝓞 I.E) (h : Formalism.UG.inclE (F := I.F) (Af I.F) (a : I.E) ∈ IntAf I.F I.E),
-    r ⟨_, h⟩ = 0 ↔ a ∈ w.asIdeal
+  r_ker
+    : ∀ (a : 𝓞 I.E) (h : Formalism.UG.inclE (F := I.F) (Af I.F) (a : I.E) ∈ IntAf I.F I.E),
+      r ⟨_, h⟩ = 0 ↔ a ∈ w.asIdeal
   c : I.Lf →ₛₗ[r] (Fin N → ZMod p)
   c_surj : Function.Surjective c
-  c_ker : ∀ y : I.Lf, c y = 0 ↔
-    (y : Fin I.n → TensorProduct I.F I.E (Af I.F)) ∈ extId I w.asIdeal • I.Lf
+  c_ker
+    : ∀ y : I.Lf,
+      c y = 0 ↔ (y : Fin I.n → TensorProduct I.F I.E (Af I.F)) ∈ extId I w.asIdeal • I.Lf
 
 abbrev GProd (N : ℕ) (g : Fin 2 → ℕ) (Pl : Fin 2 → Type) : Type :=
   ∀ kv : (Σ k : Fin 2, Pl k), GL (Fin N) (ZMod (g kv.1))
 
-def ActsBy {I : AutInst} {N : ℕ} {g : Fin 2 → ℕ} {Pl : Fin 2 → Type}
-    {w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)} (fr : ∀ k v, PlFrame I N (g k) (w k v))
-    (ρ : I.Gf → GProd N g Pl) : Prop :=
+def ActsBy
+    {I : AutInst} {N : ℕ} {g : Fin 2 → ℕ} {Pl : Fin 2 → Type}
+    {w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)}
+    (fr : ∀ k v, PlFrame I N (g k) (w k v)) (ρ : I.Gf → GProd N g Pl)
+    : Prop :=
   ∀ x ∈ I.Kset, ∀ (k : Fin 2) (v : Pl k) (y : I.Lf) (h : I.fmat x *ᵥ (y : Fin I.n → _) ∈ I.Lf),
-    (fr k v).c ⟨_, h⟩ = ((ρ x ⟨k, v⟩ : GL (Fin N) (ZMod (g k))) : Matrix (Fin N) (Fin N) (ZMod (g k))) *ᵥ (fr k v).c y
+    (fr k v).c ⟨_, h⟩
+      = ((ρ x ⟨k, v⟩ : GL (Fin N) (ZMod (g k))) : Matrix (Fin N) (Fin N) (ZMod (g k)))
+        *ᵥ (fr k v).c y
 
 def IsConj (I : AutInst) (w w' : HeightOneSpectrum (𝓞 I.E)) : Prop :=
   ∀ a b : 𝓞 I.E, (b : I.E) = star (a : I.E) → (a ∈ w.asIdeal ↔ b ∈ w'.asIdeal)
 
-def IsChoice (I : AutInst) (g : Fin 2 → ℕ) (Pl : Fin 2 → Type)
-    (w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)) : Prop :=
-  (∀ k, (g k).Prime) ∧ g 0 ≠ g 1 ∧ (∀ k, (Ideal.span {((g k : ℕ) : 𝓞 I.E)}).IsRadical) ∧
-    (∀ k v, ((g k : ℕ) : 𝓞 I.E) ∈ (w k v).asIdeal ∧ Ideal.absNorm (w k v).asIdeal = g k) ∧
-    (∀ k, Function.Injective (w k)) ∧ (∀ k v v', ¬ IsConj I (w k v) (w k v')) ∧
-    ∀ k (u : HeightOneSpectrum (𝓞 I.E)), ((g k : ℕ) : 𝓞 I.E) ∈ u.asIdeal → ∃ v, u = w k v ∨ IsConj I (w k v) u
+def IsChoice
+    (I : AutInst) (g : Fin 2 → ℕ) (Pl : Fin 2 → Type) (w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E))
+    : Prop :=
+  (∀ k, (g k).Prime) ∧ g 0 ≠ g 1 ∧ (∀ k, (Ideal.span {((g k : ℕ) : 𝓞 I.E)}).IsRadical)
+    ∧ (∀ k v, ((g k : ℕ) : 𝓞 I.E) ∈ (w k v).asIdeal ∧ Ideal.absNorm (w k v).asIdeal = g k)
+    ∧ (∀ k, Function.Injective (w k)) ∧ (∀ k v v', ¬ IsConj I (w k v) (w k v'))
+    ∧ ∀ k (u : HeightOneSpectrum (𝓞 I.E)),
+      ((g k : ℕ) : 𝓞 I.E) ∈ u.asIdeal → ∃ v, u = w k v ∨ IsConj I (w k v) u
 
 open Formalism.UG Formalism.UG.P
 open scoped TensorProduct
@@ -78,13 +95,14 @@ def Ksub (I : AutInst) : Subgroup I.Gf :=
 
 theorem mem_Ksub (I : AutInst) (x : I.Gf) : x ∈ Ksub I ↔ x ∈ I.Kset := Iff.rfl
 
-theorem mulVec_mem {I : AutInst} {x : I.Gf} (hx : x ∈ I.Kset) {y : Fin I.n → I.E ⊗[I.F] Af I.F} (hy : y ∈ I.Lf) :
-    I.fmat x *ᵥ y ∈ I.Lf := (hx y).1 hy
+theorem mulVec_mem
+    {I : AutInst} {x : I.Gf} (hx : x ∈ I.Kset) {y : Fin I.n → I.E ⊗[I.F] Af I.F} (hy : y ∈ I.Lf)
+    : I.fmat x *ᵥ y ∈ I.Lf :=
+  (hx y).1 hy
 
 theorem fmat_mul (I : AutInst) (x y : I.Gf) : I.fmat (x * y) = I.fmat x * I.fmat y := rfl
 
 theorem fmat_one (I : AutInst) : I.fmat 1 = 1 := rfl
-
 
 end Inhab
 
@@ -98,22 +116,27 @@ def toHom : Ksub I →* Q := MonoidHom.mk' (fun x => ρ.toFun x) fun x y => ρ.m
 
 theorem map_one : ρ.toFun 1 = 1 := ρ.toHom.map_one
 
-theorem map_inv {x : I.Gf} (hx : x ∈ I.Kset) : ρ.toFun x⁻¹ = (ρ.toFun x)⁻¹ := ρ.toHom.map_inv ⟨x, hx⟩
+theorem map_inv {x : I.Gf} (hx : x ∈ I.Kset) : ρ.toFun x⁻¹ = (ρ.toFun x)⁻¹ :=
+  ρ.toHom.map_inv ⟨x, hx⟩
 
-theorem lift_of_mem (μf : Measure I.Gf) (a : MonoidAlgebra ℂ Q) {x : I.Gf} (hx : x ∈ I.Kset) :
-    ρ.lift μf a x = a.coeff (ρ.toFun x) / ((μf (I.Kg g)).toReal : ℂ) := by
+theorem lift_of_mem (μf : Measure I.Gf) (a : MonoidAlgebra ℂ Q) {x : I.Gf} (hx : x ∈ I.Kset)
+    : ρ.lift μf a x = a.coeff (ρ.toFun x) / ((μf (I.Kg g)).toReal : ℂ) := by
   unfold Red.lift
   simp [hx]
 
-theorem lift_of_notMem (μf : Measure I.Gf) (a : MonoidAlgebra ℂ Q) {x : I.Gf} (hx : x ∉ I.Kset) :
-    ρ.lift μf a x = 0 := by
+theorem lift_of_notMem (μf : Measure I.Gf) (a : MonoidAlgebra ℂ Q) {x : I.Gf} (hx : x ∉ I.Kset)
+    : ρ.lift μf a x = 0 := by
   unfold Red.lift
   simp [hx]
 
 end Red
 
-theorem tensAlg_coeff {ι : Type} [Fintype ι] {G : ι → Type} [∀ i, Group (G i)] [∀ i, Finite (G i)]
-    (a : ∀ i, MonoidAlgebra ℂ (G i)) (h : ∀ i, G i) : (tensAlg a).coeff h = ∏ i, (a i).coeff (h i) := rfl
+theorem tensAlg_coeff
+    {ι : Type} [Fintype ι]
+    {G : ι → Type} [∀ i, Group (G i)] [∀ i, Finite (G i)]
+    (a : ∀ i, MonoidAlgebra ℂ (G i)) (h : ∀ i, G i)
+    : (tensAlg a).coeff h = ∏ i, (a i).coeff (h i) :=
+  rfl
 
 namespace Inhab
 
@@ -123,11 +146,12 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algeb
 theorem levelafC_nat (N : ℕ) : levelafC (F := F) E (N : 𝓞 F) = (N : E ⊗[F] Af F) := by
   rw [← adelstab_incl_C, map_natCast, map_natCast]
 
-def psi (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] : 𝓞 E →+* IntAf F E :=
+def psi (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    : 𝓞 E →+* IntAf F E :=
   ((inclE (F := F) (Af F)).comp (algebraMap (𝓞 E) E)).codRestrict _ fun y => adelstab_incl_int y
 
-theorem exists_approx {p : ℕ} (hp : p ≠ 0) (s : IntAf F E) :
-    ∃ (b : 𝓞 E) (t : IntAf F E), s = psi F E b + (p : IntAf F E) * t := by
+theorem exists_approx {p : ℕ} (hp : p ≠ 0) (s : IntAf F E)
+    : ∃ (b : 𝓞 E) (t : IntAf F E), s = psi F E b + (p : IntAf F E) * t := by
   have hp0 : ((p : ℕ) : 𝓞 F) ≠ 0 := by exact_mod_cast hp
   obtain ⟨b, t, ht, hs⟩ := csGlob_approx integral_adele_approximation_holds (p : 𝓞 F) hp0 s.1 s.2
   rw [levelafC_nat] at hs
@@ -138,15 +162,18 @@ theorem exists_approx {p : ℕ} (hp : p ≠ 0) (s : IntAf F E) :
 
 end Reduction
 
-theorem ker_eq_extId {I : AutInst} {p : ℕ} (hp : p ≠ 0) {w : HeightOneSpectrum (𝓞 I.E)}
-    (r : IntAf I.F I.E →+* ZMod p) (hr : ∀ a, r (psi I.F I.E a) = 0 ↔ a ∈ w.asIdeal) :
-    RingHom.ker r = extId I w.asIdeal := by
+theorem ker_eq_extId
+    {I : AutInst} {p : ℕ} (hp : p ≠ 0)
+    {w : HeightOneSpectrum (𝓞 I.E)}
+    (r : IntAf I.F I.E →+* ZMod p) (hr : ∀ a, r (psi I.F I.E a) = 0 ↔ a ∈ w.asIdeal)
+    : RingHom.ker r = extId I w.asIdeal := by
   apply le_antisymm
   · intro s h
     rw [RingHom.mem_ker] at h
     obtain ⟨b, t, e⟩ := exists_approx hp s
     rw [← map_natCast (psi I.F I.E)] at e
-    have hpr : r (psi I.F I.E (p : 𝓞 I.E)) = 0 := by rw [map_natCast, map_natCast, ZMod.natCast_self]
+    have hpr : r (psi I.F I.E (p : 𝓞 I.E)) = 0 := by
+      rw [map_natCast, map_natCast, ZMod.natCast_self]
     have hb : r (psi I.F I.E b) = 0 := by
       rw [e, map_add (f := _), _root_.map_mul, hpr, zero_mul, add_zero] at h
       exact h
@@ -162,10 +189,13 @@ def latEnd {I : AutInst} {x : I.Gf} (hx : x ∈ I.Kset) : I.Lf →ₗ[IntAf I.F 
   map_add' y z := Subtype.ext (Matrix.mulVec_add (I.fmat x) y.1 z.1)
   map_smul' a y := Subtype.ext (Matrix.mulVec_smul (I.fmat x) (a : I.E ⊗[I.F] Af I.F) y.1)
 
-theorem exists_matrix {R k L : Type} [CommRing R] [CommRing k] [AddCommGroup L] [Module R L] {N : ℕ}
-    (r : R →+* k) (hr : Function.Surjective r) (c : L →ₛₗ[r] (Fin N → k)) (hc : Function.Surjective c)
-    (𝔞 : Ideal R) (hk : ∀ y, c y = 0 ↔ y ∈ 𝔞 • (⊤ : Submodule R L)) (T : L →ₗ[R] L) :
-    ∃ M : Matrix (Fin N) (Fin N) k, ∀ y, c (T y) = M *ᵥ c y := by
+theorem exists_matrix
+    {R k L : Type} [CommRing R] [CommRing k] [AddCommGroup L] [Module R L]
+    {N : ℕ} (r : R →+* k) (hr : Function.Surjective r) (c : L →ₛₗ[r] (Fin N → k))
+    (hc : Function.Surjective c)
+    (𝔞 : Ideal R) (hk : ∀ y, c y = 0 ↔ y ∈ 𝔞 • (⊤ : Submodule R L))
+    (T : L →ₗ[R] L)
+    : ∃ M : Matrix (Fin N) (Fin N) k, ∀ y, c (T y) = M *ᵥ c y := by
   classical
   have hT : ∀ y, c y = 0 → c (T y) = 0 := fun y hy => by
     rw [hk] at hy ⊢
@@ -185,8 +215,8 @@ theorem exists_matrix {R k L : Type} [CommRing R] [CommRing k] [AddCommGroup L] 
     rw [map_sub, map_sub, map_sum, map_sum, sub_eq_zero] at h1
   rw [h1]
   funext i
-  simp only [map_smul, map_smulₛₗ, hs, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Matrix.mulVec, dotProduct,
-    Matrix.of_apply, mul_comm]
+  simp only [map_smul, map_smulₛₗ, hs, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Matrix.mulVec,
+    dotProduct, Matrix.of_apply, mul_comm]
 
 end Inhab
 
@@ -198,13 +228,13 @@ theorem r_psi (a : 𝓞 I.E) : fr.r (psi I.F I.E a) = 0 ↔ a ∈ w.asIdeal := f
 
 def residueEquiv : (𝓞 I.E ⧸ w.asIdeal) ≃+* ZMod p :=
   (Ideal.quotEquivOfEq (Ideal.ext fun a => (fr.r_psi a).symm)).trans
-    (RingHom.quotientKerEquivOfSurjective (f := fr.r.comp (psi I.F I.E)) (ZMod.ringHom_surjective _))
-
+    (RingHom.quotientKerEquivOfSurjective (f := fr.r.comp (psi I.F I.E))
+      (ZMod.ringHom_surjective _))
 
 include fr in
 theorem absNorm_eq : Ideal.absNorm w.asIdeal = p := by
-  rw [Ideal.absNorm_apply, Submodule.cardQuot_apply, Nat.card_congr fr.residueEquiv.toEquiv, Nat.card_zmod]
-
+  rw [Ideal.absNorm_apply, Submodule.cardQuot_apply, Nat.card_congr fr.residueEquiv.toEquiv,
+    Nat.card_zmod]
 
 include fr in
 theorem prime : p.Prime := by
@@ -217,24 +247,26 @@ theorem prime : p.Prime := by
 
 theorem ker_r : RingHom.ker fr.r = extId I w.asIdeal := ker_eq_extId fr.prime.ne_zero fr.r fr.r_psi
 
-theorem c_eq_zero_iff (y : I.Lf) :
-    fr.c y = 0 ↔ y ∈ extId I w.asIdeal • (⊤ : Submodule (IntAf I.F I.E) I.Lf) :=
+theorem c_eq_zero_iff (y : I.Lf)
+    : fr.c y = 0 ↔ y ∈ extId I w.asIdeal • (⊤ : Submodule (IntAf I.F I.E) I.Lf) :=
   (fr.c_ker y).trans (Submodule.mem_smul_top_iff _ _ y).symm
-
-
 
 def ActsAs (x : I.Gf) (M : Matrix (Fin N) (Fin N) (ZMod p)) : Prop :=
   ∀ (y : I.Lf) (h : I.fmat x *ᵥ (y : Fin I.n → _) ∈ I.Lf), fr.c ⟨_, h⟩ = M *ᵥ fr.c y
 
-theorem ActsAs.unique {x : I.Gf} (hx : x ∈ I.Kset) {M M' : Matrix (Fin N) (Fin N) (ZMod p)}
-    (h : fr.ActsAs x M) (h' : fr.ActsAs x M') : M = M' := by
+theorem ActsAs.unique
+    {x : I.Gf} (hx : x ∈ I.Kset)
+    {M M' : Matrix (Fin N) (Fin N) (ZMod p)} (h : fr.ActsAs x M) (h' : fr.ActsAs x M')
+    : M = M' := by
   classical
   refine Matrix.toLin'.injective (LinearMap.ext fun t => ?_)
   obtain ⟨y, rfl⟩ := fr.c_surj t
   exact (h y (mulVec_mem hx y.2)).symm.trans (h' y _)
 
-theorem ActsAs.mul {x x' : I.Gf} (hx' : x' ∈ I.Kset) {M M' : Matrix (Fin N) (Fin N) (ZMod p)}
-    (h : fr.ActsAs x M) (h' : fr.ActsAs x' M') : fr.ActsAs (x * x') (M * M') := by
+theorem ActsAs.mul
+    {x x' : I.Gf} (hx' : x' ∈ I.Kset)
+    {M M' : Matrix (Fin N) (Fin N) (ZMod p)} (h : fr.ActsAs x M) (h' : fr.ActsAs x' M')
+    : fr.ActsAs (x * x') (M * M') := by
   intro y hy
   have e : I.fmat (x * x') *ᵥ (y : Fin I.n → _) = I.fmat x *ᵥ (I.fmat x' *ᵥ (y : Fin I.n → _)) := by
     rw [fmat_mul, Matrix.mulVec_mulVec]
@@ -244,23 +276,27 @@ theorem ActsAs.mul {x x' : I.Gf} (hx' : x' ∈ I.Kset) {M M' : Matrix (Fin N) (F
 theorem actsAs_one : fr.ActsAs 1 1 := by
   intro y hy
   rw [Matrix.one_mulVec]
-  exact congrArg fr.c (Subtype.ext (by
-    show I.fmat 1 *ᵥ (y : Fin I.n → _) = (y : Fin I.n → _)
-    rw [fmat_one, Matrix.one_mulVec]))
+  exact congrArg fr.c
+    (Subtype.ext (by
+      show I.fmat 1 *ᵥ (y : Fin I.n → _) = (y : Fin I.n → _)
+      rw [fmat_one, Matrix.one_mulVec]))
 
 theorem exists_actsAs {x : I.Gf} (hx : x ∈ I.Kset) : ∃ M, fr.ActsAs x M := by
-  obtain ⟨M, hM⟩ := exists_matrix fr.r (ZMod.ringHom_surjective _) fr.c fr.c_surj (extId I w.asIdeal)
-    fr.c_eq_zero_iff (latEnd hx)
+  obtain ⟨M, hM⟩ :=
+    exists_matrix fr.r (ZMod.ringHom_surjective _) fr.c fr.c_surj (extId I w.asIdeal)
+      fr.c_eq_zero_iff (latEnd hx)
   exact ⟨M, fun y _ => hM y⟩
 
-theorem exists_act : ∃ ρ : I.Gf → GL (Fin N) (ZMod p),
-    (∀ x ∈ I.Kset, fr.ActsAs x (ρ x : Matrix (Fin N) (Fin N) (ZMod p))) ∧
-      ∀ x ∈ I.Kset, ∀ x' ∈ I.Kset, ρ (x * x') = ρ x * ρ x' := by
+theorem exists_act
+    : ∃ ρ : I.Gf → GL (Fin N) (ZMod p),
+      (∀ x ∈ I.Kset, fr.ActsAs x (ρ x : Matrix (Fin N) (Fin N) (ZMod p)))
+        ∧ ∀ x ∈ I.Kset, ∀ x' ∈ I.Kset, ρ (x * x') = ρ x * ρ x' := by
   classical
   have h0 : ∀ x : Ksub I, ∃ M, fr.ActsAs x.1 M := fun x => fr.exists_actsAs (x := x.1) x.2
   choose M hM using h0
   have hmul : ∀ x y : Ksub I, M (x * y) = M x * M y := fun x y =>
-    ActsAs.unique fr (x := x.1 * y.1) (x * y).2 (hM (x * y)) (ActsAs.mul fr (x := x.1) (x' := y.1) y.2 (hM x) (hM y))
+    ActsAs.unique fr (x := x.1 * y.1) (x * y).2 (hM (x * y))
+      (ActsAs.mul fr (x := x.1) (x' := y.1) y.2 (hM x) (hM y))
   have hone : M 1 = 1 := ActsAs.unique fr (x := 1) (Ksub I).one_mem (hM 1) fr.actsAs_one
   obtain ⟨φ, hφ⟩ : ∃ φ : Ksub I →* GL (Fin N) (ZMod p), ∀ x, (φ x).val = M x :=
     ⟨(⟨⟨M, hone⟩, hmul⟩ : Ksub I →* Matrix (Fin N) (Fin N) (ZMod p)).toHomUnits, fun _ => rfl⟩
@@ -279,24 +315,31 @@ end PlFrame
 
 section Acts
 
-variable {I : AutInst} {N : ℕ} {g : Fin 2 → ℕ} {Pl : Fin 2 → Type}
+variable
+  {I : AutInst} {N : ℕ} {g : Fin 2 → ℕ} {Pl : Fin 2 → Type}
   {w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)} (fr : ∀ k v, PlFrame I N (g k) (w k v))
 
-theorem exists_actsBy : ∃ ρ : I.Gf → GProd N g Pl, ActsBy fr ρ ∧
-    ∀ x ∈ I.Kset, ∀ x' ∈ I.Kset, ρ (x * x') = ρ x * ρ x' := by
+theorem exists_actsBy
+    : ∃ ρ : I.Gf → GProd N g Pl,
+      ActsBy fr ρ ∧ ∀ x ∈ I.Kset, ∀ x' ∈ I.Kset, ρ (x * x') = ρ x * ρ x' := by
   choose ρ h1 h2 using fun k v => (fr k v).exists_act
-  exact ⟨fun x kv => ρ kv.1 kv.2 x, fun x hx k v => h1 k v x hx,
-    fun x hx x' hx' => funext fun kv => h2 kv.1 kv.2 x hx x' hx'⟩
+  exact ⟨
+    fun x kv => ρ kv.1 kv.2 x,
+    fun x hx k v => h1 k v x hx,
+    fun x hx x' hx' => funext fun kv => h2 kv.1 kv.2 x hx x' hx'
+  ⟩
 
 end Acts
 
 namespace Inhab
 
-theorem exists_choice (I : AutInst) (g : Fin 2 → ℕ) (hg : ∀ k, (g k).Prime) (hne : g 0 ≠ g 1)
-    (hsp : ∀ k (v : HeightOneSpectrum (𝓞 I.E)), ((g k : ℕ) : 𝓞 I.E) ∈ v.asIdeal →
-      Ideal.absNorm v.asIdeal = g k ∧ ((g k : ℕ) : 𝓞 I.E) ∉ v.asIdeal ^ 2 ∧ ¬ IsConj I v v) :
-    ∃ (Pl : Fin 2 → Type) (w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)), (∀ k, Nonempty (Pl k)) ∧
-      IsChoice I g Pl w := by
+theorem exists_choice
+    (I : AutInst) (g : Fin 2 → ℕ) (hg : ∀ k, (g k).Prime) (hne : g 0 ≠ g 1)
+    (hsp : ∀ k (v : HeightOneSpectrum (𝓞 I.E)),
+      ((g k : ℕ) : 𝓞 I.E) ∈ v.asIdeal
+        → Ideal.absNorm v.asIdeal = g k ∧ ((g k : ℕ) : 𝓞 I.E) ∉ v.asIdeal ^ 2 ∧ ¬ IsConj I v v)
+    : ∃ (Pl : Fin 2 → Type) (w : ∀ k, Pl k → HeightOneSpectrum (𝓞 I.E)),
+      (∀ k, Nonempty (Pl k)) ∧ IsChoice I g Pl w := by
   classical
   let st : 𝓞 I.E →+* 𝓞 I.E := RingOfIntegers.mapRingHom (starRingEnd I.E)
   have hst : ∀ a : 𝓞 I.E, (st a : I.E) = star (a : I.E) := fun a => rfl
@@ -304,7 +347,8 @@ theorem exists_choice (I : AutInst) (g : Fin 2 → ℕ) (hg : ∀ k, (g k).Prime
   have hsurj : Function.Surjective st := fun a => ⟨st a, hst2 a⟩
   let cj : HeightOneSpectrum (𝓞 I.E) → HeightOneSpectrum (𝓞 I.E) := fun v => v.comap st hsurj
   have hcj : ∀ v a, a ∈ (cj v).asIdeal ↔ st a ∈ v.asIdeal := fun v a => Iff.rfl
-  have hcc : ∀ v, cj (cj v) = v := fun v => HeightOneSpectrum.ext (Ideal.ext fun a => by rw [hcj, hcj, hst2])
+  have hcc : ∀ v, cj (cj v) = v := fun v =>
+    HeightOneSpectrum.ext (Ideal.ext fun a => by rw [hcj, hcj, hst2])
   have hconj : ∀ v v', IsConj I v v' ↔ v' = cj v := fun v v' => by
     constructor
     · intro h
@@ -317,11 +361,23 @@ theorem exists_choice (I : AutInst) (g : Fin 2 → ℕ) (hg : ∀ k, (g k).Prime
       rw [hcj, hst2]
   have hcne : ∀ k (v : HeightOneSpectrum (𝓞 I.E)), ((g k : ℕ) : 𝓞 I.E) ∈ v.asIdeal → cj v ≠ v :=
     fun k v hv h => (hsp k v hv).2.2 ((hconj v v).2 h.symm)
-  have hcm : ∀ k (v : HeightOneSpectrum (𝓞 I.E)), ((g k : ℕ) : 𝓞 I.E) ∈ v.asIdeal →
-      ((g k : ℕ) : 𝓞 I.E) ∈ (cj v).asIdeal := fun k v hv => by rw [hcj, map_natCast]; exact hv
+  have hcm
+      : ∀ k (v : HeightOneSpectrum (𝓞 I.E)),
+        ((g k : ℕ) : 𝓞 I.E) ∈ v.asIdeal → ((g k : ℕ) : 𝓞 I.E) ∈ (cj v).asIdeal := fun k v hv => by
+    rw [hcj, map_natCast]; exact hv
   letI : LinearOrder (HeightOneSpectrum (𝓞 I.E)) := linearOrderOfSTO WellOrderingRel
-  refine ⟨fun k => {v : HeightOneSpectrum (𝓞 I.E) // ((g k : ℕ) : 𝓞 I.E) ∈ v.asIdeal ∧ v < cj v},
-    fun k v => v.1, ?_, hg, hne, ?_, fun k v => ⟨v.2.1, (hsp k v.1 v.2.1).1⟩, fun k => Subtype.val_injective, ?_, ?_⟩
+  refine ⟨
+    fun k => {v : HeightOneSpectrum (𝓞 I.E) // ((g k : ℕ) : 𝓞 I.E) ∈ v.asIdeal ∧ v < cj v},
+    fun k v => v.1,
+    ?_,
+    hg,
+    hne,
+    ?_,
+    fun k v => ⟨v.2.1, (hsp k v.1 v.2.1).1⟩,
+    fun k => Subtype.val_injective,
+    ?_,
+    ?_
+  ⟩
   · intro k
     have hnu : Ideal.span {((g k : ℕ) : 𝓞 I.E)} ≠ ⊤ := by
       intro h
@@ -363,14 +419,18 @@ theorem exists_choice (I : AutInst) (g : Fin 2 → ℕ) (hg : ∀ k, (g k).Prime
     · exact ⟨⟨cj u, hcm k u hu, by rw [hcc]; exact h⟩, Or.inr ((hconj _ _).2 (hcc u).symm)⟩
     · exact ⟨⟨u, hu, h⟩, Or.inl rfl⟩
 
-def negOne (I : AutInst) : I.Gf := ⟨-1, by
-  show cT (sigR I.cm.sig (Af I.F)) (Units.val (-1 : GL (Fin I.n) (I.E ⊗[I.F] Af I.F))) * _ *
-    Units.val (-1 : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) = _
-  have : cT (sigR I.cm.sig (Af I.F)) (-1 : Matrix (Fin I.n) (Fin I.n) (I.E ⊗[I.F] Af I.F)) = -1 := by
-    rw [cT, Matrix.map_neg _ (map_neg _), Matrix.transpose_neg]
-    exact congrArg Neg.neg (cT_one _)
-  rw [Units.val_neg, Units.val_one, this]
-  simp⟩
+def negOne (I : AutInst) : I.Gf := ⟨
+  -1,
+  by
+    show cT (sigR I.cm.sig (Af I.F)) (Units.val (-1 : GL (Fin I.n) (I.E ⊗[I.F] Af I.F))) * _ *
+      Units.val (-1 : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) = _
+    have : cT (sigR I.cm.sig (Af I.F)) (-1 : Matrix (Fin I.n) (Fin I.n) (I.E ⊗[I.F] Af I.F))
+        = -1 := by
+      rw [cT, Matrix.map_neg _ (map_neg _), Matrix.transpose_neg]
+      exact congrArg Neg.neg (cT_one _)
+    rw [Units.val_neg, Units.val_one, this]
+    simp
+⟩
 
 theorem fmat_negOne (I : AutInst) : I.fmat (negOne I) = -1 := rfl
 
@@ -378,13 +438,14 @@ theorem negOne_mem (I : AutInst) : negOne I ∈ I.Kset := fun y => by
   show _ ↔ I.fmat (negOne I) *ᵥ y ∈ I.Lf
   rw [fmat_negOne, Matrix.neg_mulVec, Matrix.one_mulVec, neg_mem_iff]
 
-theorem actsAs_negOne {I : AutInst} {N p : ℕ} {w : HeightOneSpectrum (𝓞 I.E)} (fr : PlFrame I N p w) :
-    fr.ActsAs (negOne I) (-1) := by
+theorem actsAs_negOne {I : AutInst} {N p : ℕ} {w : HeightOneSpectrum (𝓞 I.E)} (fr : PlFrame I N p w)
+    : fr.ActsAs (negOne I) (-1) := by
   intro y hy
   rw [Matrix.neg_mulVec, Matrix.one_mulVec, ← map_neg]
-  exact congrArg fr.c (Subtype.ext (by
-    show I.fmat (negOne I) *ᵥ (y : Fin I.n → _) = -(y : Fin I.n → _)
-    rw [fmat_negOne, Matrix.neg_mulVec, Matrix.one_mulVec]))
+  exact congrArg fr.c
+    (Subtype.ext (by
+      show I.fmat (negOne I) *ᵥ (y : Fin I.n → _) = -(y : Fin I.n → _)
+      rw [fmat_negOne, Matrix.neg_mulVec, Matrix.one_mulVec]))
 
 end Inhab
 

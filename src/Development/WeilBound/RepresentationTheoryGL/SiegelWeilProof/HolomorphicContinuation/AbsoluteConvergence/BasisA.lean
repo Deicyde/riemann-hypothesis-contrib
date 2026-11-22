@@ -18,33 +18,40 @@ variable {n : ℕ}
 
 theorem mR_one : mR (1 : GR n) = 1 := rfl
 
-theorem continuous_mR : Continuous (fun g : GR n => mR g) := by
-  unfold mR; fun_prop
+theorem continuous_mR : Continuous (fun g : GR n => mR g) := by unfold mR; fun_prop
 
 theorem det_mR_ne (g : GR n) : (mR g).det ≠ 0 :=
   IsUnit.ne_zero ((Matrix.isUnit_iff_isUnit_det _).1 g.1.isUnit)
 
 theorem continuous_group_lower_left_block : Continuous (fun M : M2 n => M.toBlocks₂₁) := by
   have : (fun M : M2 n => M.toBlocks₂₁) = fun M => M.submatrix Sum.inr Sum.inl := by funext M; rfl
-  rw [this]; exact continuous_id.matrix_submatrix _ _
+  rw [this]
+  exact continuous_id.matrix_submatrix _ _
 
 theorem continuous_group_lower_right_block : Continuous (fun M : M2 n => M.toBlocks₂₂) := by
   have : (fun M : M2 n => M.toBlocks₂₂) = fun M => M.submatrix Sum.inr Sum.inr := by funext M; rfl
-  rw [this]; exact continuous_id.matrix_submatrix _ _
+  rw [this]
+  exact continuous_id.matrix_submatrix _ _
 
 theorem continuous_first_cayley_block_map : Continuous (fun M : M2 n => u1 M) := by
   unfold u1
-  exact ((continuous_const : Continuous fun _ : M2 n => Complex.I).smul continuous_group_lower_left_block).add continuous_group_lower_right_block
+  exact ((continuous_const : Continuous fun _ : M2 n => Complex.I).smul
+    continuous_group_lower_left_block).add continuous_group_lower_right_block
 
 theorem continuous_second_cayley_block_map : Continuous (fun M : M2 n => u2 M) := by
   unfold u2
-  exact ((continuous_const : Continuous fun _ : M2 n => Complex.I).smul continuous_group_lower_left_block).neg.add continuous_group_lower_right_block
+  exact ((continuous_const : Continuous fun _ : M2 n => Complex.I).smul
+    continuous_group_lower_left_block).neg.add continuous_group_lower_right_block
 
-theorem continuous_weight_factor (hD : CayleyBlocksInvertible) (p q : ℕ) (e : ℤ) : Continuous (F0 (n := n) p q e) := by
+theorem continuous_weight_factor (hD : CayleyBlocksInvertible) (p q : ℕ) (e : ℤ)
+    : Continuous (F0 (n := n) p q e) := by
   unfold F0 f0
-  refine Continuous.mul ((continuous_mR.matrix_det).zpow₀ e fun g => Or.inl (det_mR_ne g)) (Continuous.mul ?_ ?_)
-  · exact ((continuous_first_cayley_block_map.comp continuous_mR).matrix_det).zpow₀ _ fun g => Or.inl (hD n g).1
-  · exact ((continuous_second_cayley_block_map.comp continuous_mR).matrix_det).zpow₀ _ fun g => Or.inl (hD n g).2
+  refine Continuous.mul ((continuous_mR.matrix_det).zpow₀ e fun g => Or.inl (det_mR_ne g))
+    (Continuous.mul ?_ ?_)
+  · exact ((continuous_first_cayley_block_map.comp continuous_mR).matrix_det).zpow₀ _ fun g =>
+      Or.inl (hD n g).1
+  · exact ((continuous_second_cayley_block_map.comp continuous_mR).matrix_det).zpow₀ _ fun g =>
+      Or.inl (hD n g).2
 
 theorem hLoc_pos (hD : CayleyBlocksInvertible) (g : GR n) : 0 < hLoc g := by
   unfold hLoc
@@ -72,14 +79,19 @@ theorem hLoc_K (hM : Mult) (k : GR n) (hk : k ∈ KR n) : hLoc k = 1 := by
 def uSet (n : ℕ) : Set (M2 n) := {u | uᴴ * u = 1 ∧ InG u}
 
 theorem isCompact_uSet (n : ℕ) : IsCompact (uSet n) := by
-  have hbox : IsCompact (Set.pi univ fun _ : Fin n ⊕ Fin n => Set.pi univ fun _ : Fin n ⊕ Fin n =>
-      Metric.closedBall (0 : ℂ) 1) :=
+  have hbox : IsCompact (Set.pi univ fun _ : Fin n ⊕ Fin n =>
+      Set.pi univ fun _ : Fin n ⊕ Fin n => Metric.closedBall (0 : ℂ) 1) :=
     isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall _ _
   refine hbox.of_isClosed_subset ?_ ?_
   · change IsClosed ({u : M2 n | uᴴ * u = 1} ∩ {u : M2 n | InG u})
     refine IsClosed.inter ?_ ?_
-    · exact isClosed_eq ((continuous_id : Continuous (fun u : M2 n => u)).matrix_conjTranspose.matrix_mul continuous_id) continuous_const
-    · exact isClosed_eq (((continuous_id : Continuous (fun u : M2 n => u)).matrix_conjTranspose.matrix_mul continuous_const).matrix_mul continuous_id)
+    · exact isClosed_eq
+        ((continuous_id : Continuous (fun u : M2 n => u)).matrix_conjTranspose.matrix_mul
+          continuous_id)
+        continuous_const
+    · exact isClosed_eq
+        (((continuous_id : Continuous (fun u : M2 n => u)).matrix_conjTranspose.matrix_mul
+          continuous_const).matrix_mul continuous_id)
         continuous_const
   · intro u hu
     have hU : u ∈ Matrix.unitaryGroup (Fin n ⊕ Fin n) ℂ := Matrix.mem_unitaryGroup_iff'.2 hu.1
@@ -102,26 +114,35 @@ instance compactKR (n : ℕ) : CompactSpace (KR n) := by
     ext k
     simp only [mem_univ, mem_image, true_and, true_iff]
     refine ⟨⟨mR (k : GR n), ⟨k.2.2, k.2.1⟩⟩, ?_⟩
-    apply Subtype.ext; apply Subtype.ext; apply Units.ext; rfl
+    apply Subtype.ext
+    apply Subtype.ext
+    apply Units.ext
+    rfl
   rw [this]
   exact isCompact_univ.image continuous_toK
 
-theorem exists_pts {X : Type*} : ∀ (N : ℕ) (f : Fin N → X → ℂ), LinearIndependent ℂ f →
-    ∃ x : Fin N → X, (Matrix.of fun j l => f j (x l)).det ≠ 0 := by
+theorem exists_pts {X : Type*}
+    : ∀ (N : ℕ) (f : Fin N → X → ℂ),
+      LinearIndependent ℂ f → ∃ x : Fin N → X, (Matrix.of fun j l => f j (x l)).det ≠ 0 := by
   intro N
   induction N with
   | zero => intro f _; exact ⟨Fin.elim0, by simp⟩
   | succ N ih =>
     intro f hf
     obtain ⟨x', hx'⟩ := ih (fun j => f (Fin.castSucc j)) (hf.comp _ (Fin.castSucc_injective N))
-    let c : Fin (N + 1) → ℂ := fun i => (-1) ^ ((i : ℕ) + N) * (Matrix.of fun a b => f (i.succAbove a) (x' b)).det
-    have hdet : ∀ y : X, (Matrix.of fun j l => f j (Fin.lastCases (motive := fun _ => X) y x' l)).det =
-        ∑ i, c i * f i y := by
+    let c : Fin (N + 1) → ℂ := fun i =>
+      (-1) ^ ((i : ℕ) + N) * (Matrix.of fun a b => f (i.succAbove a) (x' b)).det
+    have hdet
+        : ∀ y : X,
+          (Matrix.of fun j l => f j (Fin.lastCases (motive := fun _ => X) y x' l)).det
+            = ∑ i, c i * f i y := by
       intro y
       rw [Matrix.det_succ_column _ (Fin.last N)]
       refine Finset.sum_congr rfl fun i _ => ?_
-      have hs : (Matrix.of fun j l => f j (Fin.lastCases (motive := fun _ => X) y x' l)).submatrix i.succAbove
-          (Fin.last N).succAbove = Matrix.of fun a b => f (i.succAbove a) (x' b) := by
+      have hs
+          : (Matrix.of fun j l => f j (Fin.lastCases (motive := fun _ => X) y x' l)).submatrix
+              i.succAbove (Fin.last N).succAbove
+            = Matrix.of fun a b => f (i.succAbove a) (x' b) := by
         ext a b
         simp [Fin.succAbove_last]
       rw [hs]

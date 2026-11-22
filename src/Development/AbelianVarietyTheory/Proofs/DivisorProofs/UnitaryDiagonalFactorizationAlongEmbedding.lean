@@ -10,12 +10,13 @@ open Formalism.UG GlobalTheory.SatakeWeyl
 
 namespace GlobalTheory.SatakeWeyl
 
-
 open Classical in
-theorem emb_mul_diagonal {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {σ : L →+* L} {n r : ℕ}
-    {e : Fin r → Fin n} {ι : GU σ r →* GU σ n} (he : Function.Injective e) (hι : IsEmb e ι)
-    (D : Fin n → L) (s : GU σ r) (hs : mat s = Matrix.diagonal (D ∘ e)) :
-    mat (ι s) * Matrix.diagonal (fun a => if a ∈ Set.range e then 1 else D a) = Matrix.diagonal D := by
+theorem emb_mul_diagonal
+    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+    {σ : L →+* L} {n r : ℕ} {e : Fin r → Fin n} {ι : GU σ r →* GU σ n} (he : Function.Injective e)
+    (hι : IsEmb e ι) (D : Fin n → L) (s : GU σ r) (hs : mat s = Matrix.diagonal (D ∘ e))
+    : mat (ι s) * Matrix.diagonal (fun a => if a ∈ Set.range e then 1 else D a)
+      = Matrix.diagonal D := by
   ext a b
   rw [Matrix.mul_diagonal]
   by_cases hb : b ∈ Set.range e
@@ -38,13 +39,16 @@ theorem embTorus : EmbTorus := by
   intro L _ _ σ n r e ι he hι D D' t t' s s' ht ht' hs hs' hD
   have h1 := emb_mul_diagonal he hι D s hs
   have h2 := emb_mul_diagonal he hι D' s' hs'
-  have hZ : (fun a => if a ∈ Set.range e then (1 : L) else D' a) =
-      fun a => if a ∈ Set.range e then (1 : L) else D a := by
+  have hZ
+      : (fun a => if a ∈ Set.range e then (1 : L) else D' a)
+        = fun a => if a ∈ Set.range e then (1 : L) else D a := by
     funext a
     by_cases ha : a ∈ Set.range e
     · rw [if_pos ha, if_pos ha]
     · rw [if_neg ha, if_neg ha, hD a ha]
-  have hz : mat ((ι s)⁻¹ * t) = Matrix.diagonal (fun a => if a ∈ Set.range e then (1 : L) else D a) := by
+  have hz
+      : mat ((ι s)⁻¹ * t)
+        = Matrix.diagonal (fun a => if a ∈ Set.range e then (1 : L) else D a) := by
     rw [mat_mul, ht, ← h1, ← Matrix.mul_assoc, mat_inv_mul, Matrix.one_mul]
   refine ⟨(ι s)⁻¹ * t, by group, ?_, fun g => ?_⟩
   · apply mat_injective

@@ -112,7 +112,8 @@ theorem vandLamLower : VandLamLower := by
   intro c h
   have hk := h.hk
   have hkm : c.k + c.m - 1 = (c.k - 1) + c.m := by omega
-  have vcongr : ∀ (p : ℕ) (x y : ℕ → ℝ), (∀ i, 1 ≤ i → i ≤ p → x i = y i) → Vand p x = Vand p y := by
+  have vcongr
+      : ∀ (p : ℕ) (x y : ℕ → ℝ), (∀ i, 1 ≤ i → i ≤ p → x i = y i) → Vand p x = Vand p y := by
     intro p x y hxy
     unfold Vand
     apply Finset.prod_congr rfl
@@ -126,20 +127,22 @@ theorem vandLamLower : VandLamLower := by
     intro i hi
     have hi' : i < c.k := by omega
     simp only [Cfg.lam, if_pos hi']
-  have hlam2 : ∀ j, 1 ≤ j → c.lam (j + (c.k - 1)) = -c.b j := by
+  have hlam2 : ∀ j, 1 ≤ j → c.lam (j + (c.k - 1)) = - c.b j := by
     intro j hj
-    have h1 : ¬ (j + (c.k - 1) < c.k) := by omega
+    have h1 : ¬(j + (c.k - 1) < c.k) := by omega
     have h2 : j + (c.k - 1) + 1 - c.k = j := by omega
     simp only [Cfg.lam, if_neg h1, h2]
-  have eqn : Vand (c.k + c.m - 1) c.lam = Vand (c.k - 1) c.v *
-      (∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j)) * Vand c.m (fun j => -c.b j) := by
+  have eqn
+      : Vand (c.k + c.m - 1) c.lam
+        = Vand (c.k - 1) c.v * (∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j))
+          * Vand c.m (fun j => - c.b j) := by
     rw [hkm, vand_split (c.k - 1) c.m c.lam]
-    have e1 : Vand (c.k - 1) c.lam = Vand (c.k - 1) c.v :=
-      vcongr _ _ _ (fun i _ hi2 => hlam1 i hi2)
-    have e2 : Vand c.m (fun j => c.lam (j + (c.k - 1))) = Vand c.m (fun j => -c.b j) :=
+    have e1 : Vand (c.k - 1) c.lam = Vand (c.k - 1) c.v := vcongr _ _ _ (fun i _ hi2 => hlam1 i hi2)
+    have e2 : Vand c.m (fun j => c.lam (j + (c.k - 1))) = Vand c.m (fun j => - c.b j) :=
       vcongr _ _ _ (fun j hj1 _ => hlam2 j hj1)
-    have e3 : ∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.lam i - c.lam (j + (c.k - 1)))
-        = ∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j) := by
+    have e3
+        : ∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.lam i - c.lam (j + (c.k - 1)))
+          = ∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j) := by
       apply Finset.prod_congr rfl
       intro i hi
       rw [Finset.mem_Icc] at hi
@@ -151,27 +154,28 @@ theorem vandLamLower : VandLamLower := by
     rw [e1, e2, e3]
   refine ⟨eqn, ?_⟩
   have hC : c.prodb ^ (c.k - 1) ≤ ∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j) := by
-    calc c.prodb ^ (c.k - 1) = ∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, c.b j := by
-          first
-          | (rw [Finset.prod_const, Nat.card_Icc, Nat.add_sub_cancel]; done)
-          | (rw [Finset.prod_const, Nat.card_Icc, Nat.add_sub_cancel]; rfl)
-          | (unfold Cfg.prodb; rw [Finset.prod_const, Nat.card_Icc, Nat.add_sub_cancel])
+    calc
+      c.prodb ^ (c.k - 1) = ∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, c.b j := by
+        first
+        | (rw [Finset.prod_const, Nat.card_Icc, Nat.add_sub_cancel]; done)
+        | (rw [Finset.prod_const, Nat.card_Icc, Nat.add_sub_cancel]; rfl)
+        | (unfold Cfg.prodb; rw [Finset.prod_const, Nat.card_Icc, Nat.add_sub_cancel])
       _ ≤ ∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j) := by
+        apply Finset.prod_le_prod₀
+        · intro i _
+          apply Finset.prod_nonneg
+          intro j hj
+          rw [Finset.mem_Icc] at hj
+          linarith [b_ge_one c h j hj.1 hj.2]
+        · intro i hi
+          rw [Finset.mem_Icc] at hi
           apply Finset.prod_le_prod₀
-          · intro i _
-            apply Finset.prod_nonneg
-            intro j hj
+          · intro j hj
             rw [Finset.mem_Icc] at hj
             linarith [b_ge_one c h j hj.1 hj.2]
-          · intro i hi
-            rw [Finset.mem_Icc] at hi
-            apply Finset.prod_le_prod₀
-            · intro j hj
-              rw [Finset.mem_Icc] at hj
-              linarith [b_ge_one c h j hj.1 hj.2]
-            · intro j _
-              linarith [v_nonneg c h i (by omega)]
-  have hV : 1 ≤ Vand c.m (fun j => -c.b j) := by
+          · intro j _
+            linarith [v_nonneg c h i (by omega)]
+  have hV : 1 ≤ Vand c.m (fun j => - c.b j) := by
     unfold Vand
     apply one_le_prod_real
     intro i hi
@@ -187,21 +191,22 @@ theorem vandLamLower : VandLamLower := by
   have hC0 : 0 ≤ ∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j) :=
     le_trans (pow_nonneg (by linarith) _) hC
   rw [eqn]
-  calc Vand (c.k - 1) c.v * c.prodb ^ (c.k - 1)
-      ≤ Vand (c.k - 1) c.v * ∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j) :=
-        mul_le_mul_of_nonneg_left hC hv.le
+  calc
+    Vand (c.k - 1) c.v * c.prodb ^ (c.k - 1)
+        ≤ Vand (c.k - 1) c.v * ∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j) :=
+      mul_le_mul_of_nonneg_left hC hv.le
     _ = Vand (c.k - 1) c.v * (∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j)) * 1 :=
-        (mul_one _).symm
-    _ ≤ Vand (c.k - 1) c.v * (∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j)) *
-          Vand c.m (fun j => -c.b j) :=
-        mul_le_mul_of_nonneg_left hV (mul_nonneg hv.le hC0)
+      (mul_one _).symm
+    _ ≤ Vand (c.k - 1) c.v * (∏ i ∈ Icc 1 (c.k - 1), ∏ j ∈ Icc 1 c.m, (c.v i + c.b j))
+        * Vand c.m (fun j => - c.b j) :=
+      mul_le_mul_of_nonneg_left hV (mul_nonneg hv.le hC0)
 
 theorem tcritWords_of (hVW : VandWords) : TcritWords := by
   intro c de de' ka rd g VV h hvth hw hw' hka hrd hg hVV
   obtain ⟨hV, hV', hL⟩ := hVW c de de' h hvth hw hw'
-  have hk4 : (4:ℝ) ≤ (c.k:ℝ) := by exact_mod_cast h.hk
-  have hk0 : (0:ℝ) < (c.k:ℝ) := by linarith
-  have hkne : (c.k:ℝ) ≠ 0 := hk0.ne'
+  have hk4 : (4 : ℝ) ≤ (c.k : ℝ) := by exact_mod_cast h.hk
+  have hk0 : (0 : ℝ) < (c.k : ℝ) := by linarith
+  have hkne : (c.k : ℝ) ≠ 0 := hk0.ne'
   have hP1 : 0 < TcritPow c.k c.m ka rd g VV (Vand c.k (c.u de)) := by
     unfold TcritPow
     positivity
@@ -213,30 +218,29 @@ theorem tcritWords_of (hVW : VandWords) : TcritWords := by
   · unfold Tcrit
     rw [← Real.div_rpow hP1.le hP2.le]
     congr 1
-    have key : ∀ P : ℝ, 0 < P →
-        (P / Vand c.k (c.u de)) / (P / Vand c.k (c.u de')) = Vand c.k (c.u de') / Vand c.k (c.u de) := by
+    have key
+        : ∀ P : ℝ,
+          0 < P
+            → (P / Vand c.k (c.u de)) / (P / Vand c.k (c.u de'))
+              = Vand c.k (c.u de') / Vand c.k (c.u de) := by
       intro P hP
       have h1 := hP.ne'
       have h2 := hV.ne'
       have h3 := hV'.ne'
-      first
-      | (field_simp; done)
-      | (field_simp; ring)
-      | (rw [div_div_div_cancel_left' _ _ h1])
+      first | (field_simp; done) | (field_simp; ring) | (rw [div_div_div_cancel_left' _ _ h1])
     unfold TcritPow
     exact key _ (by positivity)
-  · have hrw : (Vand c.k (c.u de') / Vand c.k (c.u de)) ^ ((1:ℝ) / (c.k:ℝ)) =
-        Real.exp (Real.log (Vand c.k (c.u de') / Vand c.k (c.u de)) * (1 / (c.k:ℝ))) :=
+  · have hrw
+        : (Vand c.k (c.u de') / Vand c.k (c.u de)) ^ ((1 : ℝ) / (c.k : ℝ))
+          = Real.exp (Real.log (Vand c.k (c.u de') / Vand c.k (c.u de)) * (1 / (c.k : ℝ))) :=
       Real.rpow_def_of_pos hR _
     rw [hrw]
     obtain ⟨hL1, hL2⟩ := abs_le.mp hL
-    have ht0 : (0:ℝ) < 1 / (c.k:ℝ) := by positivity
-    have ht : (c.k:ℝ) * (1 / (c.k:ℝ)) = 1 := by
-      first
-      | exact mul_one_div_cancel hkne
-      | field_simp
-    have ht4 : (1:ℝ) / (c.k:ℝ) ≤ 1 / 4 := one_div_le_one_div_of_le (by norm_num) hk4
-    have e3 : ((c.k:ℝ) / 2 + 1) * (1 / (c.k:ℝ)) = 1 / 2 + 1 / (c.k:ℝ) := by
+    have ht0 : (0 : ℝ) < 1 / (c.k : ℝ) := by positivity
+    have ht : (c.k : ℝ) * (1 / (c.k : ℝ)) = 1 := by
+      first | exact mul_one_div_cancel hkne | field_simp
+    have ht4 : (1 : ℝ) / (c.k : ℝ) ≤ 1 / 4 := one_div_le_one_div_of_le (by norm_num) hk4
+    have e3 : ((c.k : ℝ) / 2 + 1) * (1 / (c.k : ℝ)) = 1 / 2 + 1 / (c.k : ℝ) := by
       linear_combination (1/2:ℝ) * ht
     have u1 := mul_le_mul_of_nonneg_right hL2 ht0.le
     have u2 := mul_le_mul_of_nonneg_right hL1 ht0.le
@@ -758,14 +762,16 @@ lemma key_top (hTp : VandTop) (c : Cfg) (bb : ℝ) (de : ℕ → ℝ) (h : c.Ok)
   · exact top_final_inequality c.k hk4 _ c.prodb c.a c.bp c.Del _ (Vand (c.k - 2) c.v) (Vand c.k (c.u de))
       (Real.exp_pos _).le hB hW (mu_bound c h bb hs) hθ ha0 (by linarith) hD0 hq hVu
 
-theorem tcritLower_of (hBr : BracketBound) (hNT : VandNonTop) (hTp : VandTop) (hEF : EdgeFactors)
-    (hVW : VandWords) : TcritLower := by
+theorem tcritLower_of
+    (hBr : BracketBound) (hNT : VandNonTop) (hTp : VandTop) (hEF : EdgeFactors) (hVW : VandWords)
+    : TcritLower := by
   intro c r bb de ka rd g VV h hm hs hw hrd hka hg hFD
   have hk1 : 1 ≤ c.k := by have := h.hk; omega
   obtain ⟨hVu0, -, -⟩ := hVW c de de h hs.hvth hw hw
-  have hkey : 0 ≤ cOne c bb * c.prodb / c.aeff ∧
-      (cOne c bb * c.prodb / c.aeff) ^ c.k * Vand c.k (c.u de) ≤
-        Vand (c.k - 1) c.v * c.prodb ^ (c.k - 1) / 2 := by
+  have hkey
+      : 0 ≤ cOne c bb * c.prodb / c.aeff
+        ∧ (cOne c bb * c.prodb / c.aeff) ^ c.k * Vand c.k (c.u de)
+          ≤ Vand (c.k - 1) c.v * c.prodb ^ (c.k - 1) / 2 := by
     cases htop : c.top
     · exact key_nontop hNT hEF c bb de h hs hw htop
     · exact key_top hTp c bb de h hs hw htop
@@ -777,19 +783,18 @@ theorem tcritLower_of (hBr : BracketBound) (hNT : VandNonTop) (hTp : VandTop) (h
   have hpos : 0 < Vand (c.k - 1) c.v * c.prodb ^ (c.k - 1) := mul_pos hvp (pow_pos (by linarith) _)
   have hVV0 : 0 < VV := by linarith
   have hkV : (cOne c bb * c.prodb / c.aeff) ^ c.k ≤ VV / Vand c.k (c.u de) := by
-    first
-    | (rw [le_div_iff₀ hVu0]; linarith)
-    | (rw [le_div_iff hVu0]; linarith)
-  have hcPY : cOne c bb * c.prodb / c.aeff ≤ (VV / Vand c.k (c.u de)) ^ ((1:ℝ) / (c.k:ℝ)) := by
+    first | (rw [le_div_iff₀ hVu0]; linarith) | (rw [le_div_iff hVu0]; linarith)
+  have hcPY : cOne c bb * c.prodb / c.aeff ≤ (VV / Vand c.k (c.u de)) ^ ((1 : ℝ) / (c.k : ℝ)) := by
     have hk0 : c.k ≠ 0 := by omega
-    calc cOne c bb * c.prodb / c.aeff
-        = ((cOne c bb * c.prodb / c.aeff) ^ c.k) ^ ((1:ℝ) / (c.k:ℝ)) := by
-          rw [one_div]
-          first
-          | exact (Real.pow_rpow_inv_natCast hcP0 hk0).symm
-          | exact (Real.pow_nat_rpow_nat_inv hcP0 hk0).symm
-      _ ≤ (VV / Vand c.k (c.u de)) ^ ((1:ℝ) / (c.k:ℝ)) :=
-          Real.rpow_le_rpow (pow_nonneg hcP0 _) hkV (by positivity)
+    calc
+      cOne c bb * c.prodb / c.aeff
+          = ((cOne c bb * c.prodb / c.aeff) ^ c.k) ^ ((1 : ℝ) / (c.k : ℝ)) := by
+        rw [one_div]
+        first
+        | exact (Real.pow_rpow_inv_natCast hcP0 hk0).symm
+        | exact (Real.pow_nat_rpow_nat_inv hcP0 hk0).symm
+      _ ≤ (VV / Vand c.k (c.u de)) ^ ((1 : ℝ) / (c.k : ℝ)) :=
+        Real.rpow_le_rpow (pow_nonneg hcP0 _) hkV (by positivity)
   have hrd0 : 0 < rd := by linarith
   have hka0 : 0 < ka := by rw [hka]; positivity
   have hg0 : 0 < g := by linarith [Real.pi_pos]
@@ -801,20 +806,26 @@ theorem tcritLower_of (hBr : BracketBound) (hNT : VandNonTop) (hTp : VandTop) (h
     intro A om Y cP hA' hom hc hY
     have hY0 : 0 ≤ Y := le_trans hc hY
     have h1 : cP ≤ om * Y := by nlinarith
-    calc A * cP ≤ A * (om * Y) := mul_le_mul_of_nonneg_left h1 hA'.le
+    calc
+      A * cP
+        ≤ A * (om * Y) := mul_le_mul_of_nonneg_left h1 hA'.le
       _ = A * om * Y := by ring
-  rw [show cOne c bb * g ^ c.m * (ka ^ (c.m - 1))⁻¹ * c.prodb / c.aeff =
-      ((ka ^ (c.m - 1))⁻¹ * g ^ c.m) * (cOne c bb * c.prodb / c.aeff) by ring]
+  rw [show cOne c bb * g ^ c.m * (ka ^ (c.m - 1))⁻¹ * c.prodb / c.aeff
+      = ((ka ^ (c.m - 1))⁻¹ * g ^ c.m) * (cOne c bb * c.prodb / c.aeff) by
+    ring]
   exact fin _ _ _ _ hA hom1 hcP0 hcPY
 
 end Formalism.FourierDecayAlt.P.Sz5
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem critical_threshold_words : Formalism.FourierDecayAlt.Sz.TcritWords := Sz5.tcritWords_of vandermondeWords
+theorem critical_threshold_words : Formalism.FourierDecayAlt.Sz.TcritWords :=
+  Sz5.tcritWords_of vandermondeWords
 
-theorem vandermonde_lambda_lower_bound : Formalism.FourierDecayAlt.Sz.VandLamLower := Sz5.vandLamLower
+theorem vandermonde_lambda_lower_bound : Formalism.FourierDecayAlt.Sz.VandLamLower :=
+  Sz5.vandLamLower
 
-theorem critical_threshold_lower_bound : Formalism.FourierDecayAlt.Sz.TcritLower := Sz5.tcritLower_of bracket_bound_alt vandermondeNonTop vandermondeTop edgeFactors vandermondeWords
+theorem critical_threshold_lower_bound : Formalism.FourierDecayAlt.Sz.TcritLower :=
+  Sz5.tcritLower_of bracket_bound_alt vandermondeNonTop vandermondeTop edgeFactors vandermondeWords
 
 end Formalism.FourierDecayAlt.P

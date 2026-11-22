@@ -15,8 +15,8 @@ noncomputable section
 
 def LinearNoetherNormalization.Statement : Prop :=
   ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)),
-    ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d →
-      ∃ A : Matrix (Fin d) (Fin n) ℂ, IsFiniteProjection J A
+    ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d
+      → ∃ A : Matrix (Fin d) (Fin n) ℂ, IsFiniteProjection J A
 
 end
 

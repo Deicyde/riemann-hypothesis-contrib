@@ -16,8 +16,8 @@ theorem sum_fin_staircase (k : ℕ) : ∑ i : Fin k, (k - 1 - (i : ℕ)) = k * (
   have h := Finset.sum_range_reflect (fun i : ℕ => i) k
   rw [Fin.sum_univ_eq_sum_range (fun i => k - 1 - i) k, h, Finset.sum_range_id]
 
-theorem SchNonHookResidues.proof (h1 : SchResidueCount.Statement) :
-    SchNonHookResidues.Statement := by
+theorem SchNonHookResidues.proof (h1 : SchResidueCount.Statement)
+    : SchNonHookResidues.Statement := by
   intro k nu hk hanti hsum hnot
   push Not at hnot
   obtain ⟨j, hj0, hj2⟩ := hnot
@@ -49,8 +49,8 @@ theorem SchNonHookResidues.proof (h1 : SchResidueCount.Statement) :
     simp only [Finset.mem_insert, Finset.mem_singleton] at hx
     have hv0 : (i0 : ℕ) = 0 := rfl
     have hv1 : (i1 : ℕ) = 1 := rfl
-    rcases hx with rfl | rfl <;>
-      simp only [Finset.mem_filter, Finset.mem_univ, true_and, hl, hv0, hv1] <;> omega
+    rcases hx with rfl | rfl
+      <;> simp only [Finset.mem_filter, Finset.mem_univ, true_and, hl, hv0, hv1] <;> omega
   have hcard : 2 ≤ (univ.filter fun i => k ≤ l i).card := by
     have := Finset.card_le_card hsub
     rwa [Finset.card_pair (by simp [i0, i1, Fin.ext_iff])] at this

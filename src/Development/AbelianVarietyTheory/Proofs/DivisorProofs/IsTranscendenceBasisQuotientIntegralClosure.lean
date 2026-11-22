@@ -12,17 +12,17 @@ namespace GlobalTheory
 set_option synthInstance.maxHeartbeats 400000
 set_option maxHeartbeats 1600000
 
-
 open Polynomial in
 theorem isTranscendenceBasis_quotient_integralClosure
-    (k F K : Type) [Field k] [Field F] [Field K] [Algebra k F] [Algebra k K] [Algebra F K]
-    [IsScalarTower k F K] (A : Subalgebra k F) (B : Subalgebra k K)
-    (hB : B = (integralClosure A K).restrictScalars k) (Q : Ideal B) (hQ : Q.IsPrime) (t : A)
-    (htQ : ∀ (a : A) (b : B), (b : K) = algebraMap F K a → (b ∈ Q ↔ t ∣ a))
+    (k F K : Type)
+    [Field k] [Field F] [Field K] [Algebra k F] [Algebra k K] [Algebra F K] [IsScalarTower k F K]
+    (A : Subalgebra k F) (B : Subalgebra k K)
+    (hB : B = (integralClosure A K).restrictScalars k) (Q : Ideal B) (hQ : Q.IsPrime)
+    (t : A) (htQ : ∀ (a : A) (b : B), (b : K) = algebraMap F K a → (b ∈ Q ↔ t ∣ a))
     (m : ℕ) (y : Fin m → A)
     (hy : IsTranscendenceBasis k (fun j => Ideal.Quotient.mk (Ideal.span {t}) (y j)))
-    (y' : Fin m → B) (hy' : ∀ j, (y' j : K) = algebraMap F K (y j)) :
-    IsTranscendenceBasis k (fun j => Ideal.Quotient.mk Q (y' j)) := by
+    (y' : Fin m → B) (hy' : ∀ j, (y' j : K) = algebraMap F K (y j))
+    : IsTranscendenceBasis k (fun j => Ideal.Quotient.mk Q (y' j)) := by
   have := hQ
   have hBK : ∀ x : K, x ∈ B ↔ IsIntegral A x := by
     intro x; rw [hB, Subalgebra.mem_restrictScalars, mem_integralClosure_iff]
@@ -39,7 +39,8 @@ theorem isTranscendenceBasis_quotient_integralClosure
     Ideal.Quotient.lift (Ideal.span {t}) g (fun a ha => (hg a).2 ha)
   have hf : ∀ a : A, f (Ideal.Quotient.mk _ a) = Ideal.Quotient.mk Q (ι a) := fun a => rfl
   have hinj : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective x
     exact Ideal.Quotient.eq_zero_iff_mem.2 ((hg a).1 hx)
@@ -55,8 +56,7 @@ theorem isTranscendenceBasis_quotient_integralClosure
     exact IsScalarTower.algebraMap_apply k F K c
   have : FaithfulSMul (A ⧸ Ideal.span {t}) (B ⧸ Q) :=
     (faithfulSMul_iff_algebraMap_injective _ _).2 hinj
-  have : NoZeroDivisors (A ⧸ Ideal.span {t}) :=
-    hinj.noZeroDivisors f (map_zero f) (map_mul f)
+  have : NoZeroDivisors (A ⧸ Ideal.span {t}) := hinj.noZeroDivisors f (map_zero f) (map_mul f)
   have : Nontrivial (A ⧸ Ideal.span {t}) := f.domain_nontrivial
   have : Algebra.IsIntegral (A ⧸ Ideal.span {t}) (B ⧸ Q) := by
     constructor

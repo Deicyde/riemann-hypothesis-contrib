@@ -31,8 +31,9 @@ theorem wden_ne_zero {n : ℕ} {t : Fin n → ℂ} (ht : Function.Injective t) :
   · exact sub_ne_zero.2 fun e => h.ne (ht e)
   · exact one_ne_zero
 
-theorem alt_num {n : ℕ} (lam : Fin n → ℤ) (t : Fin n → ℂ) :
-    alt n (lam + delta n) t = (Matrix.of fun i j : Fin n => t i ^ (lam j + (n - 1 - (j : ℕ) : ℕ))).det := by
+theorem alt_num {n : ℕ} (lam : Fin n → ℤ) (t : Fin n → ℂ)
+    : alt n (lam + delta n) t
+      = (Matrix.of fun i j : Fin n => t i ^ (lam j + (n - 1 - (j : ℕ) : ℕ))).det := by
   unfold alt
   congr 1
   refine Matrix.ext fun i j => ?_
@@ -41,8 +42,9 @@ theorem alt_num {n : ℕ} (lam : Fin n → ℤ) (t : Fin n → ℂ) :
   congr 2
   omega
 
-theorem alt_den {n : ℕ} (t : Fin n → ℂ) :
-    alt n ((0 : Fin n → ℤ) + delta n) t = (Matrix.of fun i j : Fin n => t i ^ (n - 1 - (j : ℕ))).det := by
+theorem alt_den {n : ℕ} (t : Fin n → ℂ)
+    : alt n ((0 : Fin n → ℤ) + delta n) t
+      = (Matrix.of fun i j : Fin n => t i ^ (n - 1 - (j : ℕ))).det := by
   unfold alt
   congr 1
   refine Matrix.ext fun i j => ?_
@@ -52,8 +54,10 @@ theorem alt_den {n : ℕ} (t : Fin n → ℂ) :
   congr 1
   omega
 
-theorem weylChar_eq_gtChar {n : ℕ} (lam : Fin n → ℤ) (hlam : Antitone lam) (t : Fin n → ℂ) (h0 : ∀ a, t a ≠ 0)
-    (ht : Function.Injective t) : weylChar lam t = gtChar n lam t := by
+theorem weylChar_eq_gtChar
+    {n : ℕ} (lam : Fin n → ℤ) (hlam : Antitone lam) (t : Fin n → ℂ) (h0 : ∀ a, t a ≠ 0)
+    (ht : Function.Injective t)
+    : weylChar lam t = gtChar n lam t := by
   have hnum := weylGT ℂ n lam hlam t h0
   have hden := weylGT ℂ n (0 : Fin n → ℤ) (fun _ _ _ => le_rfl) t h0
   rw [gtChar_zero, mul_one, alt_den] at hden
@@ -65,8 +69,7 @@ theorem rmChar : RmChar := by
   have hu : IsUnit (diagonal t : Matrix (Fin n) (Fin n) ℂ).det := by
     rw [Matrix.det_diagonal]
     exact isUnit_iff_ne_zero.2 (Finset.prod_ne_zero_iff.2 fun a _ => h0 a)
-  have hw : (dw lam).w = lam := by
-    simp only [dw, dif_pos hlam]
+  have hw : (dw lam).w = lam := by simp only [dw, dif_pos hlam]
   rw [Rm, dif_pos hu, ← LinearMap.trace_eq_matrix_trace, weylChar_eq_gtChar lam hlam t h0 ht,
     GlobalTheory.ContraChar.trace_sqRep_diag (dw lam) _ t rfl, hw]
 

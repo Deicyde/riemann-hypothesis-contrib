@@ -7,7 +7,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.TopCore
 
 namespace Formalism.FourierDecayAlt.P.CutBP.GT
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P.GermRateSplit Finset Filter Topology MeasureTheory
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P.GermRateSplit Finset Filter Topology
+  MeasureTheory
 open scoped ComplexConjugate InnerProductSpace
 
 noncomputable section
@@ -16,15 +17,13 @@ def l1T (m : ℕ) : ℂ := (-1) ^ (m + 3) / Complex.I ^ (m + 2)
 
 def l2T (m : ℕ) : ℂ := Complex.I * l1T m
 
-theorem norm_l1T (m : ℕ) : ‖l1T m‖ = 1 := by
-  simp [l1T]
+theorem norm_l1T (m : ℕ) : ‖l1T m‖ = 1 := by simp [l1T]
 
 theorem top_base_ne_zero (m : ℕ) : l1T m ≠ 0 := by
   intro h
   simpa [h] using norm_l1T m
 
-theorem norm_l2T (m : ℕ) : ‖l2T m‖ = 1 := by
-  rw [l2T, norm_mul, Complex.norm_I, norm_l1T, one_mul]
+theorem norm_l2T (m : ℕ) : ‖l2T m‖ = 1 := by rw [l2T, norm_mul, Complex.norm_I, norm_l1T, one_mul]
 
 theorem top_root_ne_zero (m : ℕ) : l2T m ≠ 0 := by
   intro h
@@ -32,14 +31,15 @@ theorem top_root_ne_zero (m : ℕ) : l2T m ≠ 0 := by
 
 theorem top_root_pow_eq (m : ℕ) : l2T m ^ (m + 2) = (-1) ^ (m + 3) * l1T m ^ (m + 1) := by
   have hI : Complex.I ^ (m + 2) ≠ 0 := pow_ne_zero _ Complex.I_ne_zero
-  have h1 : Complex.I ^ (m + 2) * l1T m = (-1) ^ (m + 3) := by
-    rw [l1T, mul_div_cancel₀ _ hI]
-  calc l2T m ^ (m + 2) = (Complex.I ^ (m + 2) * l1T m) * l1T m ^ (m + 1) := by
-        rw [l2T]
-        ring
+  have h1 : Complex.I ^ (m + 2) * l1T m = (-1) ^ (m + 3) := by rw [l1T, mul_div_cancel₀ _ hI]
+  calc
+    l2T m ^ (m + 2) = (Complex.I ^ (m + 2) * l1T m) * l1T m ^ (m + 1) := by
+      rw [l2T]
+      ring
     _ = (-1) ^ (m + 3) * l1T m ^ (m + 1) := by rw [h1]
 
-theorem psi_l (m : ℕ) (w : ℂ) : G.psi U.betaU (l2T m / l1T m * w) = conj (G.psi ((2 : ℝ) : ℂ) w) := by
+theorem psi_l (m : ℕ) (w : ℂ)
+    : G.psi U.betaU (l2T m / l1T m * w) = conj (G.psi ((2 : ℝ) : ℂ) w) := by
   have hl : l2T m / l1T m = Complex.I := by
     rw [l2T, mul_div_assoc, div_self (top_base_ne_zero m), mul_one]
   have key : U.betaU * (Complex.I * w) = -(((2 : ℝ) : ℂ) * w) := by
@@ -50,27 +50,39 @@ theorem psi_l (m : ℕ) (w : ℂ) : G.psi U.betaU (l2T m / l1T m * w) = conj (G.
   congr 1
   apply Complex.ext <;> simp
 
-theorem const_match1 (k r : ℕ) (TT : ℝ) (b s : ℕ) (hb : 1 ≤ b) (hs : 2 ≤ s) (hbs : b + s = r + 2) (hk : 1 ≤ k)
-    (h : C.LPt) (hsz : D.ptSize h = b - 1) :
-    ∃ Kh : ℝ,
-      (∀ x D : ℂ, x ≠ 0 → D ≠ 0 →
-        ‖x‖ ^ (s - 1) * √(TBB.nPt k r TT (h ++ [(s - 1, x⁻¹), (1, x ^ (s - 1) * D)])) *
-            (qU ^ ((s - 1) + (Fintype.card (G.UT (s - 1)) + (s - 1))))⁻¹ =
-          Kh * ‖D‖ ^ (k - 1) * ‖x⁻¹‖ ^ ((s - 1) ^ 2) *
-            (√((Complex.normSq (x ^ (s - 1) * D) - TT) ^ (k - 1)) / ‖x ^ (s - 1) * D‖ ^ (k - 1))) ∧
-      (∀ u : ℂ, u ≠ 0 →
-        Real.pi ^ (s - 1) * ((s : ℝ) * ‖u‖ ^ (s - 1))⁻¹ * √(TBB.nPt k r TT (h ++ [(s, u)])) *
-            (qU ^ Fintype.card (G.UT s))⁻¹ =
-          Kh * ‖u ^ s‖ ^ (k - 1) * ((s : ℝ)⁻¹ * ‖u‖ ^ ((s - 1) ^ 2))) := by
+theorem const_match1
+    (k r : ℕ)
+    (TT : ℝ)
+    (b s : ℕ) (hb : 1 ≤ b) (hs : 2 ≤ s) (hbs : b + s = r + 2)
+    (hk : 1 ≤ k)
+    (h : C.LPt) (hsz : D.ptSize h = b - 1)
+    : ∃ Kh : ℝ,
+      (∀ x D : ℂ,
+          x ≠ 0 → D ≠ 0
+            → ‖x‖ ^ (s - 1) * √(TBB.nPt k r TT (h ++ [(s - 1, x⁻¹), (1, x ^ (s - 1) * D)]))
+                * (qU ^ ((s - 1) + (Fintype.card (G.UT (s - 1)) + (s - 1))))⁻¹
+              = Kh * ‖D‖ ^ (k - 1) * ‖x⁻¹‖ ^ ((s - 1) ^ 2)
+                * (√((Complex.normSq (x ^ (s - 1) * D) - TT) ^ (k - 1))
+                  / ‖x ^ (s - 1) * D‖ ^ (k - 1)))
+        ∧ (∀ u : ℂ,
+          u ≠ 0
+            → Real.pi ^ (s - 1) * ((s : ℝ) * ‖u‖ ^ (s - 1))⁻¹ * √(TBB.nPt k r TT (h ++ [(s, u)]))
+                * (qU ^ Fintype.card (G.UT s))⁻¹
+              = Kh * ‖u ^ s‖ ^ (k - 1) * ((s : ℝ)⁻¹ * ‖u‖ ^ ((s - 1) ^ 2))) := by
   obtain ⟨m, rfl⟩ : ∃ m, s = m + 2 := ⟨s - 2, by omega⟩
   obtain ⟨c, rfl⟩ : ∃ c, b = c + 1 := ⟨b - 1, by omega⟩
   obtain ⟨k', rfl⟩ : ∃ k', k = k' + 1 := ⟨k - 1, by omega⟩
   obtain rfl : r = c + m + 1 := by omega
   rw [show c + 1 - 1 = c by omega] at hsz
   rw [show m + 2 - 1 = m + 1 by omega, show k' + 1 - 1 = k' by omega]
-  have hsing : ∀ (GG : ℝ) (bb ss : ℕ) (t : ℂ), C.nAux (k' + 1) (c + m + 1) GG (fun _ _ => 1) bb [(ss, t)] =
-      (if bb + ss - 1 = c + m + 1 + 1 ∧ ss = 1 then GG ^ (k' + 1 - 1)
-        else ((1 : ℝ) * ‖t‖) ^ (2 * (ss : ℤ) * (C.Mlev (k' + 1) (c + m + 1) (bb + ss - 1) + ss - 3))) := by
+  have hsing
+      : ∀ (GG : ℝ) (bb ss : ℕ) (t : ℂ),
+        C.nAux (k' + 1) (c + m + 1) GG (fun _ _ => 1) bb [(ss, t)]
+          = (if bb + ss - 1 = c + m + 1 + 1 ∧ ss = 1 then
+               GG ^ (k' + 1 - 1)
+             else
+               ((1 : ℝ) * ‖t‖)
+                 ^ (2 * (ss : ℤ) * (C.Mlev (k' + 1) (c + m + 1) (bb + ss - 1) + ss - 3))) := by
     intro GG bb ss t
     simp only [C.nAux, mul_one]
   have hpos : ∀ (l : C.LPt) (bb : ℕ), 0 ≤ C.nAux (k' + 1) (c + m + 1) 0 (fun _ _ => 1) bb l := by
@@ -92,22 +104,31 @@ theorem const_match1 (k r : ℕ) (TT : ℝ) (b s : ℕ) (hb : 1 ≤ b) (hs : 2 �
   have hq : qU ≠ 0 := by rw [qU_eq]; positivity
   have hcard : Fintype.card (G.UT (m + 2)) = Fintype.card (G.UT (m + 1)) + (m + 1) := by
     rw [G5.card_UT, G5.card_UT, Finset.sum_range_succ]
-  refine ⟨√N * (qU ^ ((m + 1) + (Fintype.card (G.UT (m + 1)) + (m + 1))))⁻¹, fun x d0 hx hD => ?_,
-    fun u hu => ?_⟩
-  · have hL : h ++ [(m + 1, x⁻¹), (1, x ^ (m + 1) * d0)] =
-        (h ++ [(m + 1, x⁻¹)]) ++ [(1, x ^ (m + 1) * d0)] := by simp
-    have hGG : FourierDecayAlt.D.ptGG TT (h ++ [(m + 1, x⁻¹), (1, x ^ (m + 1) * d0)]) =
-        Complex.normSq (x ^ (m + 1) * d0) - TT := by
+  refine ⟨
+    √N * (qU ^ ((m + 1) + (Fintype.card (G.UT (m + 1)) + (m + 1))))⁻¹,
+    fun x d0 hx hD => ?_,
+    fun u hu => ?_
+  ⟩
+  · have hL
+        : h ++ [(m + 1, x⁻¹), (1, x ^ (m + 1) * d0)]
+          = (h ++ [(m + 1, x⁻¹)]) ++ [(1, x ^ (m + 1) * d0)] := by
+      simp
+    have hGG
+        : FourierDecayAlt.D.ptGG TT (h ++ [(m + 1, x⁻¹), (1, x ^ (m + 1) * d0)])
+          = Complex.normSq (x ^ (m + 1) * d0) - TT := by
       simp [FourierDecayAlt.D.ptGG, FourierDecayAlt.D.ptLast]
     have hsz2 : FourierDecayAlt.D.ptSize (h ++ [(m + 1, x⁻¹)]) = c + (m + 1) := by
       simp [FourierDecayAlt.D.ptSize] at hsz ⊢
       omega
-    have hn : TBB.nPt (k' + 1) (c + m + 1) TT (h ++ [(m + 1, x⁻¹), (1, x ^ (m + 1) * d0)]) =
-        N * ‖x‖⁻¹ ^ (((m + 1) * (k' + m + 2)) * 2) * (Complex.normSq (x ^ (m + 1) * d0) - TT) ^ k' := by
-      rw [TBB.nPt, hGG, hL, PBD.weight_product_append, PBD.weight_product_append, hind, hsz, hsz2, hsing, hsing]
+    have hn
+        : TBB.nPt (k' + 1) (c + m + 1) TT (h ++ [(m + 1, x⁻¹), (1, x ^ (m + 1) * d0)])
+          = N * ‖x‖⁻¹ ^ (((m + 1) * (k' + m + 2)) * 2)
+            * (Complex.normSq (x ^ (m + 1) * d0) - TT) ^ k' := by
+      rw [TBB.nPt, hGG, hL, PBD.weight_product_append, PBD.weight_product_append, hind, hsz, hsz2,
+        hsing, hsing]
       rw [if_neg (show ¬(1 + c + (m + 1) - 1 = c + m + 1 + 1 ∧ m + 1 = 1) by omega),
-        if_pos (show 1 + (c + (m + 1)) + 1 - 1 = c + m + 1 + 1 ∧ 1 = 1 by omega),
-        one_mul, norm_inv, show k' + 1 - 1 = k' by omega, ← zpow_natCast (‖x‖⁻¹)]
+        if_pos (show 1 + (c + (m + 1)) + 1 - 1 = c + m + 1 + 1 ∧ 1 = 1 by omega), one_mul, norm_inv,
+        show k' + 1 - 1 = k' by omega, ← zpow_natCast (‖x‖⁻¹)]
       congr 3
       simp only [C.Mlev]
       push_cast [Nat.cast_sub (show 1 ≤ 1 + c + (m + 1) by omega)]
@@ -120,11 +141,12 @@ theorem const_match1 (k r : ℕ) (TT : ℝ) (b s : ℕ) (hb : 1 ≤ b) (hs : 2 �
     field_simp
     ring
   · have hsz3 : FourierDecayAlt.D.ptSize h = c := hsz
-    have hn : TBB.nPt (k' + 1) (c + m + 1) TT (h ++ [(m + 2, u)]) =
-        N * ‖u‖ ^ (((m + 2) * (k' + m + 1)) * 2) := by
+    have hn
+        : TBB.nPt (k' + 1) (c + m + 1) TT (h ++ [(m + 2, u)])
+          = N * ‖u‖ ^ (((m + 2) * (k' + m + 1)) * 2) := by
       rw [TBB.nPt, PBD.weight_product_append, hind, hsz3, hsing,
-        if_neg (show ¬(1 + c + (m + 2) - 1 = c + m + 1 + 1 ∧ m + 2 = 1) by omega),
-        one_mul, ← zpow_natCast (‖u‖)]
+        if_neg (show ¬(1 + c + (m + 2) - 1 = c + m + 1 + 1 ∧ m + 2 = 1) by omega), one_mul,
+        ← zpow_natCast (‖u‖)]
       congr 2
       simp only [C.Mlev]
       push_cast [Nat.cast_sub (show 1 ≤ 1 + c + (m + 2) by omega)]

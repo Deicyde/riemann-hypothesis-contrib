@@ -8,11 +8,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
 
-theorem UpperTheory.V.Ws.Po.psFin :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (B : Type) [CommRing B] [Algebra O B] [IsCO O B] [IsDomain B], (∀ a ∈ maximalIdeal O, algebraMap O B a = 0) →
-      ∀ t ∈ maximalIdeal B, t ≠ 0 → ∀ n : ℕ, maximalIdeal B ^ n ≤ Ideal.span {t} →
-      ∃ φ : PowerSeries (ResidueField O) →+* B, Function.Injective φ ∧ φ.Finite ∧ φ PowerSeries.X = t ∧
-        ∀ a : O, φ (PowerSeries.C (residue O a)) = algebraMap O B a := by
+theorem UpperTheory.V.Ws.Po.psFin
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (B : Type) [CommRing B] [Algebra O B] [IsCO O B]
+        [IsDomain B],
+      (∀ a ∈ maximalIdeal O, algebraMap O B a = 0)
+        → ∀ t ∈ maximalIdeal B,
+          t ≠ 0
+            → ∀ n : ℕ,
+              maximalIdeal B ^ n ≤ Ideal.span {t}
+                → ∃ φ : PowerSeries (ResidueField O) →+* B,
+                  Function.Injective φ ∧ φ.Finite ∧ φ PowerSeries.X = t
+                    ∧ ∀ a : O, φ (PowerSeries.C (residue O a)) = algebraMap O B a := by
   intro O _ _ B _ _ _ _ h0 t ht ht0 n hn
   classical
   let ι : ResidueField O →+* B := Ideal.Quotient.lift (maximalIdeal O) (algebraMap O B) h0
@@ -48,8 +54,10 @@ theorem UpperTheory.V.Ws.Po.psFin :
     haveI : IsAdicComplete (maximalIdeal (PowerSeries (ResidueField O))) (PowerSeries (ResidueField O)) := by
       rw [PowerSeries.maximalIdeal_eq_span_X]
       infer_instance
-    have hmap : Ideal.map (algebraMap (PowerSeries (ResidueField O)) B)
-        (maximalIdeal (PowerSeries (ResidueField O))) = Ideal.span {t} := by
+    have hmap
+        : Ideal.map (algebraMap (PowerSeries (ResidueField O)) B)
+            (maximalIdeal (PowerSeries (ResidueField O)))
+          = Ideal.span {t} := by
       rw [PowerSeries.maximalIdeal_eq_span_X, Ideal.map_span, Set.image_singleton,
         RingHom.algebraMap_toAlgebra, hφX]
     show Module.Finite _ _

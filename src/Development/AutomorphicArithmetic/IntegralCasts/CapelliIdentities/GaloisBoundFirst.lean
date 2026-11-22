@@ -5,15 +5,15 @@ public import Mathlib
 @[expose] public section
 
 open Filter Topology in
-theorem UpperTheory.Reformulated.B.GaloisBoundFirst.main :
-    ∀ (B : ℂ → ℂ),
-      Differentiable ℂ B →
-        (∃ (z : ℂ), B z ≠ (0 : ℂ)) →
-          ∀ (a : ℂ), ∃ (k : ℕ) (v : ℂ → ℂ), Differentiable ℂ v ∧ v a ≠ (0 : ℂ) ∧ ∀ (z : ℂ), B z = (z - a) ^ k * v z := by
+theorem UpperTheory.Reformulated.B.GaloisBoundFirst.main
+    : ∀ (B : ℂ → ℂ),
+      Differentiable ℂ B → (∃ (z : ℂ), B z ≠ (0 : ℂ))
+        → ∀ (a : ℂ), ∃ (k : ℕ) (v : ℂ → ℂ),
+          Differentiable ℂ v ∧ v a ≠ (0 : ℂ) ∧ ∀ (z : ℂ), B z = (z - a) ^ k * v z := by
   rintro B hB ⟨z0, hz0⟩ a
   have han : AnalyticOnNhd ℂ B Set.univ := hB.differentiableOn.analyticOnNhd isOpen_univ
-  have hnot : ¬ ∀ᶠ z in 𝓝 a, B z = 0 := fun h => hz0
-    (han.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (Set.mem_univ a) h
+  have hnot : ¬ ∀ᶠ z in 𝓝 a, B z = 0 := fun h =>
+    hz0 (han.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (Set.mem_univ a) h
       (Set.mem_univ z0))
   obtain ⟨k, g, hg, hga, hev⟩ :=
     (AnalyticAt.exists_eventuallyEq_pow_smul_nonzero_iff (han a (Set.mem_univ a))).2 hnot
@@ -45,9 +45,9 @@ theorem UpperTheory.Reformulated.B.GaloisBoundFirst.main :
   · intro z
     by_cases hz : z = a
     · subst hz
-      have hB0 : B z = (z - z) ^ k * g z := by
-        simpa [smul_eq_mul] using hev.self_of_nhds
-      rw [hva]; exact hB0
+      have hB0 : B z = (z - z) ^ k * g z := by simpa [smul_eq_mul] using hev.self_of_nhds
+      rw [hva]
+      exact hB0
     · rw [hvne z hz]
       have h0 : (z - a) ^ k ≠ 0 := pow_ne_zero _ (sub_ne_zero.2 hz)
       field_simp

@@ -11,7 +11,9 @@ namespace GlobalTheory.CompanionTheory.RgEisTwist
 
 open PositivityTheory.RgEis
 
-variable {G : Type} [Group G] [TopologicalSpace G] {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W]
   {Γ K : Subgroup G} {c₀ : G → ℂ}
 
 lemma ch_mul (h : IsCh Γ ⊤ c₀) (a b : G) : c₀ (a * b) = c₀ a * c₀ b :=
@@ -127,15 +129,24 @@ theorem twist : SecLaw → Twist := by
   · obtain ⟨R, D, Op, H, hw, ⟨a, ha0, ha⟩, O, hO, hOp⟩ := hA W (twRep h K ρ) (twRep_cont h hρ)
     unfold HasFirst
     rw [secSp_twist h ρ S c]
-    refine ⟨R, D, _, _, wall_twist h hw, ⟨a, ha0, fun g w => ?_⟩,
-      fun z => (castL (secSp_twist h ρ P' c).symm).comp (O z), leftGood_cast _ hO, fun z hz => ?_⟩
+    refine ⟨
+      R,
+      D,
+      _,
+      _,
+      wall_twist h hw,
+      ⟨a, ha0, fun g w => ?_⟩,
+      fun z => (castL (secSp_twist h ρ P' c).symm).comp (O z),
+      leftGood_cast _ hO,
+      fun z hz => ?_
+    ⟩
     · rw [smul_apply, ha g w, sec_twist h, smul_apply, smul_comm]
     · rw [hOp z hz, ContinuousLinearMap.comp_smul]
   · obtain ⟨R, D, Op, H, hw, hd, T, hT⟩ := hA W (twRep h K ρ) (twRep_cont h hρ)
     unfold HasLast
     rw [secSp_twist h ρ P c]
-    refine ⟨R, D, _, _, wall_twist h hw, hd,
-      (castL (secSp_twist h ρ S c).symm).comp T, fun g w => ?_⟩
+    refine
+      ⟨R, D, _, _, wall_twist h hw, hd, (castL (secSp_twist h ρ S c).symm).comp T, fun g w => ?_⟩
     rw [smul_apply, hT g w, sec_twist h, smul_apply, smul_comm]
     rfl
 

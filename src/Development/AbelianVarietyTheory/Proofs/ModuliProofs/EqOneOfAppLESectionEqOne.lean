@@ -10,17 +10,22 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsReduce
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 
 namespace GlobalTheory
 namespace RigidFunction
 
-theorem not_mem_basicOpen_fibre {X P F : Scheme.{0}} {K : Type} [Field K] {p : P ⟶ X}
-    {t : Spec (CommRingCat.of K) ⟶ X} {φ : F ⟶ P} {q : F ⟶ Spec (CommRingCat.of K)} (w : φ ≫ p = q ≫ t)
-    [IsIntegral F] [UniversallyClosed q] (V : X.Opens) (hV : ∀ x, t x ∈ V) (s : Γ(P, p ⁻¹ᵁ V)) (a b : F)
-    (ha : φ a ∉ P.basicOpen s) : φ b ∉ P.basicOpen s := by
+theorem not_mem_basicOpen_fibre
+    {X P F : Scheme.{0}} {K : Type} [Field K]
+    {p : P ⟶ X} {t : Spec (CommRingCat.of K) ⟶ X} {φ : F ⟶ P} {q : F ⟶ Spec (CommRingCat.of K)}
+    (w : φ ≫ p = q ≫ t) [IsIntegral F] [UniversallyClosed q]
+    (V : X.Opens) (hV : ∀ x, t x ∈ V) (s : Γ(P, p ⁻¹ᵁ V))
+    (a b : F) (ha : φ a ∉ P.basicOpen s)
+    : φ b ∉ P.basicOpen s := by
   have hle : (⊤ : F.Opens) ≤ φ ⁻¹ᵁ (p ⁻¹ᵁ V) := by
     intro c _
     change p (φ c) ∈ V
@@ -43,8 +48,12 @@ theorem not_mem_basicOpen_fibre {X P F : Scheme.{0}} {K : Type} [Field K] {p : P
 
 end RigidFunction
 
-theorem eq_one_of_appLE_section_eq_one :
-    ∀ (X : Scheme.{0}) (P : Over X) (e : X ⟶ P.left), e ≫ P.hom = 𝟙 X → Smooth P.hom → GeometricallyIntegral P.hom → (IsReduced X ∧ genericPoints X ⊆ abLocus P) → (∀ (V : X.Opens) (u : Γ(P.left, P.hom ⁻¹ᵁ V)) (h : V ≤ e ⁻¹ᵁ (P.hom ⁻¹ᵁ V)), (e.appLE _ V h).hom u = 1 → u = 1) := by
+theorem eq_one_of_appLE_section_eq_one
+    : ∀ (X : Scheme.{0}) (P : Over X) (e : X ⟶ P.left),
+      e ≫ P.hom = 𝟙 X → Smooth P.hom → GeometricallyIntegral P.hom
+        → (IsReduced X ∧ genericPoints X ⊆ abLocus P)
+        → (∀ (V : X.Opens) (u : Γ(P.left, P.hom ⁻¹ᵁ V)) (h : V ≤ e ⁻¹ᵁ (P.hom ⁻¹ᵁ V)),
+          (e.appLE _ V h).hom u = 1 → u = 1) := by
   intro X P e he hsm hgi hXg V u h hu
   obtain ⟨hred, hgen⟩ := hXg
   have := hsm
@@ -80,14 +89,17 @@ theorem eq_one_of_appLE_section_eq_one :
   let pt : Spec (.of K) := IsLocalRing.closedPoint K
   have : IsProper (pullback.snd P.hom t) := hgen hxg K t ⟨pt, ht pt⟩
   have : IsIntegral (pullback P.hom t) :=
-    hgi.geometrically_isIntegral t (pullback.fst _ _) (pullback.snd _ _) (IsPullback.of_hasPullback _ _)
+    hgi.geometrically_isIntegral t (pullback.fst _ _) (pullback.snd _ _)
+      (IsPullback.of_hasPullback _ _)
   have hpt : P.hom (e x₀) = t pt := by
     rw [ht, ← Scheme.Hom.comp_apply, he]
     rfl
   obtain ⟨a, ha, -⟩ := Scheme.Pullback.exists_preimage_pullback (e x₀) pt hpt
   obtain ⟨b, hb, -⟩ := Scheme.Pullback.exists_preimage_pullback y pt (hyx₀.trans (ht pt).symm)
-  have hfib := RigidFunction.not_mem_basicOpen_fibre pullback.condition V
-    (fun z => by rw [ht z]; exact hxV) (u - 1) a b (by rw [ha]; exact hxnot)
+  have hfib :=
+    RigidFunction.not_mem_basicOpen_fibre pullback.condition V
+      (fun z => by rw [ht z]; exact hxV)
+      (u - 1) a b (by rw [ha]; exact hxnot)
   rw [hb] at hfib
   exact hfib hy
 

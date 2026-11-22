@@ -17,16 +17,19 @@ variable {X : Scheme.{u}}
 variable (X) in
 abbrev PMod (X : Scheme.{u}) := PresheafOfModulesOfCommRing.{u} X.sheaf.obj
 
-private theorem schemeModules_W_whiskerRight {M N : PMod X} {φ : M ⟶ N}
+private theorem schemeModules_W_whiskerRight
+    {M N : PMod X} {φ : M ⟶ N}
     (hφ : ModulesTensor.W (J := Opens.grothendieckTopology X) (R := X.sheaf.obj) φ)
-    (P : PMod X) :
-    ModulesTensor.W (J := Opens.grothendieckTopology X) (R := X.sheaf.obj) (φ ▷ P) := by
+    (P : PMod X)
+    : ModulesTensor.W (J := Opens.grothendieckTopology X) (R := X.sheaf.obj) (φ ▷ P) := by
   rw [ModulesTensor.W, MorphismProperty.inverseImage_iff, ModulesTensor.W_toPresheaf_iff] at hφ ⊢
-  exact ⟨ModulesTensor.whiskerRight_zeroSieve_mem P φ hφ.1 hφ.2,
-    ModulesTensor.whiskerRight_imSieve_mem P φ hφ.2⟩
+  exact ⟨
+    ModulesTensor.whiskerRight_zeroSieve_mem P φ hφ.1 hφ.2,
+    ModulesTensor.whiskerRight_imSieve_mem P φ hφ.2
+  ⟩
 
-local instance :
-    (ModulesTensor.W (J := Opens.grothendieckTopology X) (R := X.sheaf.obj)).IsMonoidal where
+local instance
+    : (ModulesTensor.W (J := Opens.grothendieckTopology X) (R := X.sheaf.obj)).IsMonoidal where
   whiskerLeft P _ _ φ hφ :=
     ((ModulesTensor.W (J := Opens.grothendieckTopology X) (R := X.sheaf.obj)).arrow_mk_iso_iff
       (Arrow.isoMk (β_ P _) (β_ P _) (by simp))).2 (schemeModules_W_whiskerRight hφ P)
@@ -47,16 +50,13 @@ noncomputable instance : SymmetricCategory X.Modules :=
 instance isIso_ringSheafId_scheme : IsIso (ringSheafId (Opens.grothendieckTopology X) X.sheaf) :=
   inferInstanceAs (IsIso (𝟙 (X.sheaf.obj ⋙ forget₂ CommRingCat RingCat)))
 
-
 variable (X) in
 noncomputable abbrev sheafifyMod (X : Scheme.{u}) : PMod X ⥤ X.Modules :=
   modulesSheafification (Opens.grothendieckTopology X) X.sheaf
 
-
 variable (X) in
 noncomputable abbrev preMod (X : Scheme.{u}) : X.Modules ⥤ PMod X :=
   SheafOfModules.forget _ ⋙ PresheafOfModules.restrictScalars (ringSheafId _ X.sheaf)
-
 
 variable (X) in
 noncomputable abbrev sheafifyModAdj (X : Scheme.{u}) : sheafifyMod X ⊣ preMod X :=
@@ -64,8 +64,8 @@ noncomputable abbrev sheafifyModAdj (X : Scheme.{u}) : sheafifyMod X ⊣ preMod 
     (R₀ := X.sheaf.obj ⋙ forget₂ CommRingCat RingCat) (R := X.ringCatSheaf) (ringSheafId _ X.sheaf)
 
 instance isIso_sheafifyModAdj_counit : IsIso (sheafifyModAdj X).counit :=
-  inferInstanceAs (IsIso (PresheafOfModules.sheafificationAdjunction (J := Opens.grothendieckTopology X)
-    (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).counit)
+  inferInstanceAs (IsIso (PresheafOfModules.sheafificationAdjunction
+    (J := Opens.grothendieckTopology X) (R := X.ringCatSheaf) (𝟙 X.ringCatSheaf.obj)).counit)
 
 noncomputable instance : (sheafifyMod X).Monoidal :=
   inferInstanceAs (Localization.Monoidal.toMonoidalCategory
@@ -73,17 +73,18 @@ noncomputable instance : (sheafifyMod X).Monoidal :=
     (ModulesTensor.W (J := Opens.grothendieckTopology X) (R := X.sheaf.obj))
     (sheafificationUnitIso (Opens.grothendieckTopology X) X.sheaf)).Monoidal
 
-noncomputable def tensorIso (M N : X.Modules) :
-    (sheafifyMod X).obj ((preMod X).obj M ⊗ (preMod X).obj N) ≅ M ⊗ N :=
-  (Functor.Monoidal.μIso (sheafifyMod X) _ _).symm ≪≫
-    (asIso ((sheafifyModAdj X).counit.app M) ⊗ᵢ asIso ((sheafifyModAdj X).counit.app N))
+noncomputable def tensorIso (M N : X.Modules)
+    : (sheafifyMod X).obj ((preMod X).obj M ⊗ (preMod X).obj N) ≅ M ⊗ N :=
+  (Functor.Monoidal.μIso (sheafifyMod X) _ _).symm
+    ≪≫ (asIso ((sheafifyModAdj X).counit.app M) ⊗ᵢ asIso ((sheafifyModAdj X).counit.app N))
 
-noncomputable def tensorToSheaf (M N : X.Modules) :
-    (preMod X).obj M ⊗ (preMod X).obj N ⟶ (preMod X).obj (M ⊗ N) :=
+noncomputable def tensorToSheaf (M N : X.Modules)
+    : (preMod X).obj M ⊗ (preMod X).obj N ⟶ (preMod X).obj (M ⊗ N) :=
   (sheafifyModAdj X).unit.app _ ≫ (preMod X).map (tensorIso M N).hom
 
-noncomputable def tensorLift {M N G : X.Modules}
-    (e : (preMod X).obj M ⊗ (preMod X).obj N ⟶ (preMod X).obj G) : M ⊗ N ⟶ G :=
+noncomputable def tensorLift
+    {M N G : X.Modules} (e : (preMod X).obj M ⊗ (preMod X).obj N ⟶ (preMod X).obj G)
+    : M ⊗ N ⟶ G :=
   (tensorIso M N).inv ≫ ((sheafifyModAdj X).homEquiv _ _).symm e
 
 lemma tensorToSheaf_tensorLift {M N G : X.Modules}
@@ -128,7 +129,8 @@ lemma sheaf_exists_glue {C : Type*} [Category.{u} C] {FC : C → C → Type*} {C
 noncomputable def resM (P : PMod X) {U V : X.Opens} (h : V ≤ U) (x : P.obj (op U)) : P.obj (op V) :=
   P.map (homOfLE h).op x
 
-abbrev ringOn (X : Scheme.{u}) (V : X.Opens) := (X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).obj (op V)
+abbrev ringOn (X : Scheme.{u}) (V : X.Opens) :=
+  (X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).obj (op V)
 
 noncomputable def resR {U V : X.Opens} (h : V ≤ U) : ringOn X U →+* ringOn X V :=
   ((X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).map (homOfLE h).op).hom
@@ -164,27 +166,34 @@ lemma resR_resR {U V W : X.Opens} (h : V ≤ U) (i : W ≤ V) (r : ringOn X U) :
   rfl
 
 def IsBasisOn (P : PMod X) (U : X.Opens) (s : P.obj (op U)) : Prop :=
-  ∀ (V : X.Opens) (h : V ≤ U), Function.Bijective
-    (fun r : (X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).obj (op V) => r • resM P h s)
+  ∀ (V : X.Opens) (h : V ≤ U),
+    Function.Bijective (fun r : (X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).obj (op V) =>
+      r • resM P h s)
 
-theorem IsBasisOn.map_of_alt {P : PMod X} {F : X.Modules} (φ : P ⟶ (preMod X).obj F)
+theorem IsBasisOn.map_of_alt
+    {P : PMod X} {F : X.Modules} (φ : P ⟶ (preMod X).obj F)
     (hφ : ModulesTensor.W (J := Opens.grothendieckTopology X) (R := X.sheaf.obj) φ)
-    {U : X.Opens} {s : P.obj (op U)} (hs : IsBasisOn P U s) :
-    IsBasisOn ((preMod X).obj F) U (φ.app _ s) := by
+    {U : X.Opens} {s : P.obj (op U)} (hs : IsBasisOn P U s)
+    : IsBasisOn ((preMod X).obj F) U (φ.app _ s) := by
   obtain ⟨hinj, hsurj⟩ := (ModulesTensor.W_toPresheaf_iff φ).1 hφ
-  have hres : ∀ (V : X.Opens) (h : V ≤ U), resM ((preMod X).obj F) h (φ.app _ s) =
-      φ.app _ (resM P h s) :=
+  have hres
+      : ∀ (V : X.Opens) (h : V ≤ U), resM ((preMod X).obj F) h (φ.app _ s) = φ.app _ (resM P h s) :=
     fun V h => (PresheafOfModules.naturality_apply φ _ s).symm
-  have hsm : ∀ (V : X.Opens) (r : ringOn X V) (x : P.obj (op V)),
-      φ.app (op V) (r • x) = r • φ.app (op V) x := fun V r x => (φ.app (op V)).hom.map_smul r x
-  have hPsm : ∀ (V W : X.Opens) (i : W ≤ V) (h : V ≤ U) (r : ringOn X V),
-      resM P i (r • resM P h s) =
-        (X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).map (homOfLE i).op r • resM P (i.trans h) s := by
+  have hsm
+      : ∀ (V : X.Opens) (r : ringOn X V) (x : P.obj (op V)),
+        φ.app (op V) (r • x) = r • φ.app (op V) x := fun V r x =>
+    (φ.app (op V)).hom.map_smul r x
+  have hPsm
+      : ∀ (V W : X.Opens) (i : W ≤ V) (h : V ≤ U) (r : ringOn X V),
+        resM P i (r • resM P h s)
+          = (X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).map (homOfLE i).op r
+            • resM P (i.trans h) s := by
     intro V W i h r
     rw [resM, PresheafOfModules.map_smul, resM, ← PresheafOfModules.map_comp_apply]
     rfl
-  have inj : ∀ (V : X.Opens) (h : V ≤ U) (r : ringOn X V),
-      r • resM ((preMod X).obj F) h (φ.app _ s) = 0 → r = 0 := by
+  have inj
+      : ∀ (V : X.Opens) (h : V ≤ U) (r : ringOn X V),
+        r • resM ((preMod X).obj F) h (φ.app _ s) = 0 → r = 0 := by
     intro V h r hr
     rw [hres, ← hsm] at hr
     have hz := hinj (op V) _ hr
@@ -194,8 +203,10 @@ theorem IsBasisOn.map_of_alt {P : PMod X} {F : X.Modules} (φ : P ⟶ (preMod X)
     refine ⟨W, f.le, hxW, ?_⟩
     have hf' : resM P f.le (r • resM P h s) = 0 := hf
     rw [hPsm] at hf'
-    have := (hs W (f.le.trans h)).1 (a₁ := (X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).map
-      (homOfLE f.le).op r) (a₂ := 0) (by simp only [zero_smul]; exact hf')
+    have :=
+      (hs W (f.le.trans h)).1
+        (a₁ := (X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).map (homOfLE f.le).op r) (a₂ := 0)
+        (by simp only [zero_smul]; exact hf')
     change ((X.sheaf.obj ⋙ forget₂ CommRingCat RingCat).map (homOfLE f.le).op) r = _
     rw [this]
     exact (map_zero _).symm
@@ -210,27 +221,35 @@ theorem IsBasisOn.map_of_alt {P : PMod X} {F : X.Modules} (φ : P ⟶ (preMod X)
     choose p hp using hf
     have hWU : ∀ x hx, W x hx ≤ U := fun x hx => (f x hx).le.trans h
     choose rr hrr using fun x hx => (hs (W x hx) (hWU x hx)).2 (p x hx)
-    have key : ∀ x hx, rr x hx • resM ((preMod X).obj F) (hWU x hx) (φ.app _ s) =
-        resM ((preMod X).obj F) (f x hx).le σ := by
+    have key
+        : ∀ x hx,
+          rr x hx • resM ((preMod X).obj F) (hWU x hx) (φ.app _ s)
+            = resM ((preMod X).obj F) (f x hx).le σ := by
       intro x hx
       have e := hrr x hx
       simp only at e
       rw [← app_resM, ← app_smul, e]
       exact hp x hx
-    obtain ⟨r, hr⟩ := sheaf_exists_glue X.sheaf (V := V) (ι := V) (fun a => W a.1 a.2)
-      (fun a => (f a.1 a.2).le) (fun x hx => ⟨⟨x, hx⟩, hxW x hx⟩) (fun a => rr a.1 a.2) (by
-        intro a b
-        have hab : W a.1 a.2 ⊓ W b.1 b.2 ≤ U := inf_le_left.trans (hWU _ _)
-        have := inj _ hab (resR inf_le_left (rr a.1 a.2) - resR inf_le_right (rr b.1 b.2)) (by
-          rw [sub_smul, sub_eq_zero, ← resM_smul_res _ (hWU a.1 a.2) inf_le_left,
-            ← resM_smul_res _ (hWU b.1 b.2) inf_le_right, key, key, resM_resM, resM_resM])
-        exact sub_eq_zero.mp this)
+    obtain ⟨r, hr⟩ :=
+      sheaf_exists_glue X.sheaf (V := V) (ι := V)
+        (fun a => W a.1 a.2)
+        (fun a => (f a.1 a.2).le)
+        (fun x hx => ⟨⟨x, hx⟩, hxW x hx⟩)
+        (fun a => rr a.1 a.2)
+        (by
+          intro a b
+          have hab : W a.1 a.2 ⊓ W b.1 b.2 ≤ U := inf_le_left.trans (hWU _ _)
+          have :=
+            inj _ hab (resR inf_le_left (rr a.1 a.2) - resR inf_le_right (rr b.1 b.2)) (by
+              rw [sub_smul, sub_eq_zero, ← resM_smul_res _ (hWU a.1 a.2) inf_le_left,
+                ← resM_smul_res _ (hWU b.1 b.2) inf_le_right, key, key, resM_resM, resM_resM])
+          exact sub_eq_zero.mp this)
     refine ⟨r, ?_⟩
     apply sheaf_eq_of_locally ⟨F.presheaf, F.isSheaf⟩ (V := V)
     intro x hx
     refine ⟨W x hx, (f x hx).le, hxW x hx, ?_⟩
-    change resM ((preMod X).obj F) (f x hx).le (r • resM ((preMod X).obj F) h (φ.app _ s)) =
-      resM ((preMod X).obj F) (f x hx).le σ
+    change resM ((preMod X).obj F) (f x hx).le (r • resM ((preMod X).obj F) h (φ.app _ s))
+      = resM ((preMod X).obj F) (f x hx).le σ
     rw [resM_smul, resM_resM, ← key x hx]
     congr 1
     exact hr ⟨x, hx⟩

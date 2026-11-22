@@ -20,15 +20,15 @@ universe u
 
 namespace FiniteBirationalLength
 
-theorem length_quot_maximal_eq_inertiaDeg {A B : Type*} [CommRing A] [IsLocalRing A] [CommRing B]
-    [Algebra A B] [Module.Finite A B] (𝔫 : Ideal B) [𝔫.IsMaximal] :
-    Module.length A (B ⧸ 𝔫) = (𝔫.inertiaDeg A : ℕ∞) := by
+theorem length_quot_maximal_eq_inertiaDeg
+    {A B : Type*} [CommRing A] [IsLocalRing A] [CommRing B] [Algebra A B] [Module.Finite A B]
+    (𝔫 : Ideal B) [𝔫.IsMaximal]
+    : Module.length A (B ⧸ 𝔫) = (𝔫.inertiaDeg A : ℕ∞) := by
   have hmax : (𝔫.under A).IsMaximal := Ideal.isMaximal_under_of_isIntegral_of_isMaximal 𝔫
   have hm : 𝔫.under A = maximalIdeal A := IsLocalRing.eq_maximalIdeal hmax
   have : 𝔫.LiesOver (maximalIdeal A) := ⟨hm.symm⟩
   let : Field (A ⧸ maximalIdeal A) := Ideal.Quotient.field _
-  have : Module.Finite (A ⧸ maximalIdeal A) (B ⧸ 𝔫) :=
-    Module.Finite.of_restrictScalars_finite A _ _
+  have : Module.Finite (A ⧸ maximalIdeal A) (B ⧸ 𝔫) := Module.Finite.of_restrictScalars_finite A _ _
   rw [Ideal.inertiaDeg_eq_of_isMaximal (maximalIdeal A) 𝔫,
     Module.length_eq_of_surjective (R := A ⧸ maximalIdeal A) (S := A) Ideal.Quotient.mk_surjective,
     Module.length_eq_finrank]
@@ -47,9 +47,15 @@ theorem full : FiniteBirationalLength.Statement.{u} := by
   have h1 := ReciprocityTheory.ChartRestriction.G.AI.dimOneTorsionFreeFormula A B z hdim hz
   rw [hrank, Nat.cast_one, one_mul, Ring.ord] at h1
   let hP : ∀ 𝔫 : {𝔫 : Ideal B // 𝔫.IsMaximal}, 𝔫.1.IsPrime := fun 𝔫 => 𝔫.2.isPrime
-  have h2 := FieldNumbers.FiniteAlgebraLengthSum.proof A B {𝔫 : Ideal B // 𝔫.IsMaximal}
-    (fun 𝔫 => 𝔫.1) (fun 𝔫 => 𝔫.2) Subtype.val_injective (fun M hM => ⟨⟨M, hM⟩, rfl⟩)
-    (fun 𝔫 => Localization.AtPrime 𝔫.1) (fun 𝔫 => inferInstance) z
+  have h2 :=
+    FieldNumbers.FiniteAlgebraLengthSum.proof A B {𝔫 : Ideal B // 𝔫.IsMaximal}
+      (fun 𝔫 => 𝔫.1)
+      (fun 𝔫 => 𝔫.2)
+      Subtype.val_injective
+      (fun M hM => ⟨⟨M, hM⟩, rfl⟩)
+      (fun 𝔫 => Localization.AtPrime 𝔫.1)
+      (fun 𝔫 => inferInstance)
+      z
   rw [← h1, h2, finsum_eq_sum_of_fintype]
   refine Finset.sum_congr rfl fun 𝔫 _ => ?_
   have := 𝔫.2

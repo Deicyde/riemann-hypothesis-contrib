@@ -20,16 +20,16 @@ variable (O : ValuationSubring C) [IsUnitBall O]
 
 namespace BdRPlus
 
-def thetaC : BdRPlus p O →+* C :=
-  (IsUnitBall.awayEquiv O p).toRingEquiv.toRingHom.comp (theta p O)
+def thetaC : BdRPlus p O →+* C := (IsUnitBall.awayEquiv O p).toRingEquiv.toRingHom.comp (theta p O)
 
 variable {p O}
 
-theorem thetaC_apply (x : BdRPlus p O) :
-    thetaC p O x = IsUnitBall.awayEquiv O p (theta p O x) := rfl
+theorem thetaC_apply (x : BdRPlus p O) : thetaC p O x = IsUnitBall.awayEquiv O p (theta p O x) :=
+  rfl
 
-@[simp] theorem thetaC_algebraMap (x : Ainf p O) :
-    thetaC p O (algebraMap _ _ x) = (Ainf.theta p O x : C) := by
+@[simp]
+theorem thetaC_algebraMap (x : Ainf p O)
+    : thetaC p O (algebraMap _ _ x) = (Ainf.theta p O x : C) := by
   rw [thetaC_apply, IsScalarTower.algebraMap_apply (Ainf p O) (AinfInv p O), theta_algebraMap,
     AinfInv.theta_algebraMap, IsUnitBall.awayEquiv_algebraMap]
 
@@ -42,8 +42,8 @@ variable [IsAlgClosed C]
 
 section General
 
-variable {F : Type v} {L : Type w} [Field F] [Field L] [Algebra F L] [CharZero F]
-  [Algebra.IsAlgebraic F L]
+variable
+  {F : Type v} {L : Type w} [Field F] [Field L] [Algebra F L] [CharZero F] [Algebra.IsAlgebraic F L]
 
 end General
 
@@ -52,8 +52,6 @@ end BdRPlus
 section Padic
 
 variable [NormedAlgebra ℚ_[p] C]
-
-
 
 variable [IsAlgClosed C] {L : Type w} [Field L] [Algebra ℚ_[p] L] [Algebra.IsAlgebraic ℚ_[p] L]
 
@@ -64,7 +62,8 @@ end Padic
 section Witt
 
 variable [IsAlgClosed C] {k : Type v} [Field k] [CharP k p] [PerfectRing k p]
-variable {L : Type w} [Field L] [Algebra (FractionRing (WittVector p k)) L]
+variable
+  {L : Type w} [Field L] [Algebra (FractionRing (WittVector p k)) L]
   [Algebra.IsAlgebraic (FractionRing (WittVector p k)) L]
 
 omit [CompleteSpace C] [CharZero C] [Fact (‖(p : C)‖ < 1)] [IsUnitBall O] [IsAlgClosed C] in

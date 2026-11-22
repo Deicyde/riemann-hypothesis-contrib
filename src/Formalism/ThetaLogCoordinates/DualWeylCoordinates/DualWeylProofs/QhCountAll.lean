@@ -52,8 +52,8 @@ lemma qh_initMinor [NeZero n] {s : ℕ} (I : Fin s → Fin n) (hs : s ≤ n) :
   ext p q
   simp [genMat, AlgHom.mapMatrix_apply, Matrix.transpose_apply]
 
-private theorem lt_colH_iff_le_of_dominant {mu : Fin n → ℤ} (hmu : Dominant mu) (t : Fin n) (c : ℤ) :
-    t.val < colH mu c ↔ c ≤ mu t := by
+private theorem lt_colH_iff_le_of_dominant {mu : Fin n → ℤ} (hmu : Dominant mu) (t : Fin n) (c : ℤ)
+    : t.val < colH mu c ↔ c ≤ mu t := by
   unfold colH
   constructor
   · intro h
@@ -147,16 +147,18 @@ lemma qh_count_all [NeZero n] {mu : Fin n → ℤ} (hmu : Dominant mu) (k : ℕ)
     rw [card_eq_zero.mpr (filter_false_of_mem fun κ _ => a κ),
       card_eq_zero.mpr (filter_false_of_mem fun x _ => b x)]
 
-private theorem mapCoord_mvPolynomial_int (x : MvPolynomial (Fin n × Fin n) ℤ) :
-    mapCoord (n := n) R (algebraMap _ (GLCoord ℤ n) x) =
-      algebraMap _ (GLCoord R n) (MvPolynomial.map (Int.castRingHom R) x) := by
+private theorem mapCoord_mvPolynomial_int (x : MvPolynomial (Fin n × Fin n) ℤ)
+    : mapCoord (n := n) R (algebraMap _ (GLCoord ℤ n) x)
+      = algebraMap _ (GLCoord R n) (MvPolynomial.map (Int.castRingHom R) x) := by
   unfold mapCoord
   simp [IsLocalization.Away.lift]
 
-private theorem exists_qhM_eq_smul_det {s : ℕ} (hs : s ≤ n) (J : ℕ → Fin n) :
-    ∃ (S : Finset (Fin n)) (hS : S.card = s) (ε : R), qhM R s J =
-      ε • algebraMap (MvPolynomial (Fin n × Fin n) R) (GLCoord R n)
-        (Matrix.of fun a b : Fin s => genMat R n (Fin.castLE hs a) (S.orderEmbOfFin hS b)).det := by
+private theorem exists_qhM_eq_smul_det {s : ℕ} (hs : s ≤ n) (J : ℕ → Fin n)
+    : ∃ (S : Finset (Fin n)) (hS : S.card = s) (ε : R),
+      qhM R s J
+        = ε • algebraMap (MvPolynomial (Fin n × Fin n) R) (GLCoord R n)
+          (Matrix.of fun a b : Fin s =>
+            genMat R n (Fin.castLE hs a) (S.orderEmbOfFin hS b)).det := by
   unfold qhM qhN
   rw [dite_eq_left hs]
   by_cases hJ : Function.Injective (fun q : Fin s => J q.val)
@@ -177,8 +179,10 @@ private theorem exists_qhM_eq_smul_det {s : ℕ} (hs : s ≤ n) (J : ℕ → Fin
       rw [← hg a, ← hg b, h]
     let σ : Equiv.Perm (Fin s) := Equiv.ofBijective g (Finite.injective_iff_bijective.mp ginj)
     refine ⟨S, hS, ((Equiv.Perm.sign σ : ℤ) : R), ?_⟩
-    have hM : (Matrix.of fun p q : Fin s => genMat R n (Fin.castLE hs p) (J q.val)) =
-        (Matrix.of fun a b : Fin s => genMat R n (Fin.castLE hs a) (S.orderEmbOfFin hS b)).submatrix id σ := by
+    have hM
+        : (Matrix.of fun p q : Fin s => genMat R n (Fin.castLE hs p) (J q.val))
+          = (Matrix.of fun a b : Fin s =>
+            genMat R n (Fin.castLE hs a) (S.orderEmbOfFin hS b)).submatrix id σ := by
       ext p q
       simp only [Matrix.of_apply, Matrix.submatrix_apply, id]
       rw [show σ q = g q from rfl, hg q]
@@ -190,13 +194,16 @@ private theorem exists_qhM_eq_smul_det {s : ℕ} (hs : s ≤ n) (J : ℕ → Fin
       Matrix.det_zero_of_column_eq hne (fun k => by simp only [Matrix.of_apply, hab])
     simp only [hz, map_zero, zero_smul]
 
-private theorem exists_equiv_comp_eq_of_card_filter_lt_eq {α β : Type} [Fintype α] [Fintype β] (f : α → ℕ) (g : β → ℕ)
-    (hf : ∀ x, 0 < f x) (hg : ∀ y, 0 < g y)
-    (h : ∀ t, (univ.filter fun x => t < f x).card = (univ.filter fun y => t < g y).card) :
-    ∃ e : α ≃ β, ∀ x, g (e x) = f x := by
-  have key : ∀ {γ : Type} [Fintype γ] (u : γ → ℕ) (v : ℕ), 0 < v →
-      (univ.filter fun x => v - 1 < u x).card =
-        (univ.filter fun x => u x = v).card + (univ.filter fun x => v < u x).card := by
+private theorem exists_equiv_comp_eq_of_card_filter_lt_eq
+    {α β : Type} [Fintype α] [Fintype β]
+    (f : α → ℕ) (g : β → ℕ) (hf : ∀ x, 0 < f x) (hg : ∀ y, 0 < g y)
+    (h : ∀ t, (univ.filter fun x => t < f x).card = (univ.filter fun y => t < g y).card)
+    : ∃ e : α ≃ β, ∀ x, g (e x) = f x := by
+  have key
+      : ∀ {γ : Type} [Fintype γ] (u : γ → ℕ) (v : ℕ),
+        0 < v
+          → (univ.filter fun x => v - 1 < u x).card
+            = (univ.filter fun x => u x = v).card + (univ.filter fun x => v < u x).card := by
     intro γ _ u v hv
     classical
     rw [← card_union_of_disjoint]
@@ -218,37 +225,46 @@ private theorem exists_equiv_comp_eq_of_card_filter_lt_eq {α β : Type} [Fintyp
       have b := key g v hv
       rw [h (v - 1), h v] at a
       omega
-  let e : α ≃ β := (Equiv.sigmaFiberEquiv f).symm.trans
-    ((Equiv.sigmaCongrRight fun v => Fintype.equivOfCardEq (hfib v)).trans (Equiv.sigmaFiberEquiv g))
+  let e : α ≃ β :=
+    (Equiv.sigmaFiberEquiv f).symm.trans
+      ((Equiv.sigmaCongrRight fun v => Fintype.equivOfCardEq (hfib v)).trans
+        (Equiv.sigmaFiberEquiv g))
   exact ⟨e, fun x => (Fintype.equivOfCardEq (hfib (f x)) ⟨x, rfl⟩).2⟩
 
-private theorem mapCoord_card_eq_finsets {h : ℕ} (J S : Finset (Fin n)) (hJ : J.card = h) (hS : S.card = h) :
-    mapCoord (n := n) R (minorC J S hJ hS) =
-      algebraMap _ (GLCoord R n)
-        (Matrix.of fun a b : Fin h => genMat R n (J.orderEmbOfFin hJ a) (S.orderEmbOfFin hS b)).det := by
+private theorem mapCoord_card_eq_finsets
+    {h : ℕ} (J S : Finset (Fin n)) (hJ : J.card = h) (hS : S.card = h)
+    : mapCoord (n := n) R (minorC J S hJ hS)
+      = algebraMap _ (GLCoord R n)
+        (Matrix.of fun a b : Fin h =>
+          genMat R n (J.orderEmbOfFin hJ a) (S.orderEmbOfFin hS b)).det := by
   unfold minorC
   rw [mapCoord_mvPolynomial_int, RingHom.map_det]
   refine congrArg _ (congrArg Matrix.det ?_)
   ext a b
   simp [genMat]
 
-private theorem orderEmbOfFin_canT_eq_castLE [NeZero n] (mu : Fin n → ℤ) (c : ↥(TCols mu)) (a : Fin (colH mu c)) :
-    (canT mu c).1.orderEmbOfFin (canT mu c).2 a = Fin.castLE (colH_le mu c) a := by
-  have := Finset.orderEmbOfFin_unique (canT mu c).2 (f := Fin.castLE (colH_le mu c))
-    (fun x => by simp [canT]) (fun a b h => by rw [Fin.lt_def] at h ⊢; simpa using h)
+private theorem orderEmbOfFin_canT_eq_castLE
+    [NeZero n] (mu : Fin n → ℤ) (c : ↥(TCols mu)) (a : Fin (colH mu c))
+    : (canT mu c).1.orderEmbOfFin (canT mu c).2 a = Fin.castLE (colH_le mu c) a := by
+  have :=
+    Finset.orderEmbOfFin_unique (canT mu c).2 (f := Fin.castLE (colH_le mu c))
+      (fun x => by simp [canT])
+      (fun a b h => by rw [Fin.lt_def] at h ⊢; simpa using h)
   rw [← this]
 
-private theorem mapCoord_intCast (m : ℤ) :
-    mapCoord (n := n) R ((detU n ^ m : (GLCoord ℤ n)ˣ) : GLCoord ℤ n) =
-      ((qhDet R n ^ m : (GLCoord R n)ˣ) : GLCoord R n) := by
+private theorem mapCoord_intCast (m : ℤ)
+    : mapCoord (n := n) R ((detU n ^ m : (GLCoord ℤ n)ˣ) : GLCoord ℤ n)
+      = ((qhDet R n ^ m : (GLCoord R n)ˣ) : GLCoord R n) := by
   have hu : Units.map (mapCoord (n := n) R).toMonoidHom (detU n) = qhDet R n := by
     ext
     rw [Units.coe_map, qhDet_val]
     show mapCoord (n := n) R (algebraMap _ _ (genMat ℤ n).det) = _
     rw [mapCoord_mvPolynomial_int, RingHom.map_det, genMat_map_coord]
-  calc mapCoord (n := n) R ((detU n ^ m : (GLCoord ℤ n)ˣ) : GLCoord ℤ n)
-      = ((Units.map (mapCoord (n := n) R).toMonoidHom (detU n ^ m) : (GLCoord R n)ˣ) : GLCoord R n) :=
-        (Units.coe_map _ _).symm
+  calc
+    mapCoord (n := n) R ((detU n ^ m : (GLCoord ℤ n)ˣ) : GLCoord ℤ n)
+        = ((Units.map (mapCoord (n := n) R).toMonoidHom (detU n ^ m) : (GLCoord R n)ˣ)
+          : GLCoord R n) :=
+      (Units.coe_map _ _).symm
     _ = ((qhDet R n ^ m : (GLCoord R n)ˣ) : GLCoord R n) := by rw [map_zpow, hu]
 
 lemma qh_bidet_mem [NeZero n] {mu : Fin n → ℤ} (hmu : Dominant mu) (k : ℕ) (hk : 0 ≤ mu (lastIdx n) + k)

@@ -15,7 +15,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LogAbsBa
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.E1 PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB
+  PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.E1 PositivityTheory.Rg.BcB.Desc
 open GroundTheory.Automorphic.Reduction (adelicBorel maxCompact posIdele diagUnits)
 open scoped ENNReal
 attribute [local instance] borelH

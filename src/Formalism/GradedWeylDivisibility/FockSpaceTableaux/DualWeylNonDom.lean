@@ -15,8 +15,8 @@ section NonDomMain
 
 variable {R : Type*} [CommRing R] {r n : ℕ}
 
-def ndEv (R : Type*) [CommRing R] (r n : ℕ) :
-    MvPolynomial (Option (Fin r × Fin n)) R →ₐ[R] MvPolynomial (Fin r × Fin n) R :=
+def ndEv (R : Type*) [CommRing R] (r n : ℕ)
+    : MvPolynomial (Option (Fin r × Fin n)) R →ₐ[R] MvPolynomial (Fin r × Fin n) R :=
   aeval fun o => o.elim 0 X
 
 lemma ndEv_colAddGen (l j : Fin n) (g : MvPolynomial (Fin r × Fin n) R) :
@@ -86,10 +86,13 @@ lemma nd_iter_E {l j : Fin n} (hlj : l ≠ j) {f : MvPolynomial (Fin r × Fin n)
     congr 1
     push_cast; ring
 
-theorem nd_main [IsDomain R] [CharZero R] (ν : Fin n → ℕ) {l j : Fin n} (hlj : l < j)
-    (hν : ν l < ν j) (f : MvPolynomial (Fin r × Fin n) R)
-    (hhom : IsWeightedHomogeneous (colW r n) f ν) (hinv : colAddGen R l j f = rename some f) :
-    f = 0 := by
+theorem nd_main
+    [IsDomain R] [CharZero R]
+    (ν : Fin n → ℕ)
+    {l j : Fin n} (hlj : l < j) (hν : ν l < ν j)
+    (f : MvPolynomial (Fin r × Fin n) R)
+    (hhom : IsWeightedHomogeneous (colW r n) f ν) (hinv : colAddGen R l j f = rename some f)
+    : f = 0 := by
   have hne : l ≠ j := ne_of_lt hlj
   have hl := ndEul_homog (R := R) hhom l
   have hj := ndEul_homog (R := R) hhom j
@@ -98,7 +101,8 @@ theorem nd_main [IsDomain R] [CharZero R] (ν : Fin n → ℕ) {l j : Fin n} (hl
 
   have hN : G (ν l + 1) = 0 := by
     apply ndEul_neg_eq_zero l
-    rw [hG]; dsimp only
+    rw [hG]
+    dsimp only
     rw [nd_iter_Eul_l hne hl, Nat.cast_succ, show (ν l : R) - ((ν l : R) + 1) = -1 by ring,
       neg_one_smul]
 
@@ -132,7 +136,8 @@ theorem dualWeylModuleNonDominant : DualWeylNonDom := by
   have h2 := Submodule.mem_iInf _ |>.1 h1 j
   have h3 := Submodule.mem_iInf _ |>.1 h2 hlj
   rw [LinearMap.mem_ker, LinearMap.sub_apply, sub_eq_zero, AlgHom.toLinearMap_apply,
-    AlgHom.toLinearMap_apply] at h3
+      AlgHom.toLinearMap_apply]
+    at h3
   exact nd_main ν hlj hν f hhom h3
 
 end NonDomMain

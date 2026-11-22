@@ -16,10 +16,11 @@ open MvPolynomial Filter Topology MeasureTheory
 
 noncomputable section
 
-theorem dim_component_linForm {n d : ℕ} {J W : Ideal (MvPolynomial (Fin n) ℂ)} {u : Fin n → ℂ}
+theorem dim_component_linForm
+    {n d : ℕ} {J W : Ideal (MvPolynomial (Fin n) ℂ)} {u : Fin n → ℂ}
     (hJ : J.IsPrime) (hdim : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (d + 1 : ℕ))
-    (hu : linForm u ∉ J) (hW : W ∈ (J ⊔ Ideal.span {linForm u}).minimalPrimes) :
-    ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) = (d : ℕ) := by
+    (hu : linForm u ∉ J) (hW : W ∈ (J ⊔ Ideal.span {linForm u}).minimalPrimes)
+    : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) = (d : ℕ) := by
   have := hJ
   have hIW : J ≤ W := le_sup_left.trans hW.1.2
   have huW : linForm u ∈ W := (le_sup_right.trans hW.1.2) (Ideal.mem_span_singleton_self _)
@@ -75,28 +76,33 @@ theorem hyperplaneEmb_apply (d : ℕ) (t : Fin d → ℂ) : hyperplaneEmb d t = 
   ext i
   refine Fin.cases ?_ (fun j => ?_) i <;> simp [hyperplaneEmb]
 
-theorem hyperplaneEmb_tail {d : ℕ} {s : Fin (d + 1) → ℂ} (hs : s 0 = 0) :
-    hyperplaneEmb d (Fin.tail s) = s := by
+theorem hyperplaneEmb_tail {d : ℕ} {s : Fin (d + 1) → ℂ} (hs : s 0 = 0)
+    : hyperplaneEmb d (Fin.tail s) = s := by
   rw [hyperplaneEmb_apply, ← hs]
   exact Fin.cons_self_tail s
 
-def sliceMap {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {p : Fin n → ℂ}
-    (γ : GroundTheory.Heights₂.Heights.VarBranch J (d + 1) p) : (Fin d → ℂ) → Fin n → ℂ :=
-  fun t => γ.toFun (hyperplaneEmb d t)
+def sliceMap
+    {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {p : Fin n → ℂ}
+    (γ : GroundTheory.Heights₂.Heights.VarBranch J (d + 1) p)
+    : (Fin d → ℂ) → Fin n → ℂ := fun t =>
+  γ.toFun (hyperplaneEmb d t)
 
-theorem SliceImmersiveGeneral.proof (hcrit : CriticalImageNull.Statement)
-    (hmass : ZeroSetOpenMass.Statement) : SliceImmersiveGeneral.Statement := by
+theorem SliceImmersiveGeneral.proof
+    (hcrit : CriticalImageNull.Statement) (hmass : ZeroSetOpenMass.Statement)
+    : SliceImmersiveGeneral.Statement := by
   intro n d J W u p m γ hJ hdim hu hW hp hN
   obtain ⟨N, hN, hsl⟩ := hN
   have hWd := dim_component_linForm hJ hdim hu hW
 
-  have hball : ∀ b, ∀ s ∈ Metric.ball (0 : Fin (d + 1) → ℂ) (γ b).radius,
-      Fin.tail s ∈ Metric.ball (0 : Fin d → ℂ) (γ b).radius := by
+  have hball
+      : ∀ b, ∀ s ∈ Metric.ball (0 : Fin (d + 1) → ℂ) (γ b).radius,
+        Fin.tail s ∈ Metric.ball (0 : Fin d → ℂ) (γ b).radius := by
     intro b s hs
     rw [ball_pi _ (γ b).radius_pos] at hs ⊢
     exact fun j _ => hs j.succ (Set.mem_univ _)
-  have hmaps : ∀ b, Set.MapsTo (hyperplaneEmb d) (Metric.ball 0 (γ b).radius)
-      (Metric.ball 0 (γ b).radius) := by
+  have hmaps
+      : ∀ b,
+        Set.MapsTo (hyperplaneEmb d) (Metric.ball 0 (γ b).radius) (Metric.ball 0 (γ b).radius) := by
     intro b t ht
     rw [ball_pi _ (γ b).radius_pos] at ht ⊢
     intro i _
@@ -104,8 +110,13 @@ theorem SliceImmersiveGeneral.proof (hcrit : CriticalImageNull.Statement)
     · simp [hyperplaneEmb_apply, (γ b).radius_pos]
     · simpa [hyperplaneEmb_apply] using ht j (Set.mem_univ _)
 
-  have hnull : ∀ b, μH[((2 * d : ℕ) : ℝ)] (sliceMap (γ b) '' {t | t ∈ Metric.ball 0 (γ b).radius ∧
-      ¬ Function.Injective (fderiv ℂ (sliceMap (γ b)) t)}) = 0 := fun b =>
+  have hnull
+      : ∀ b,
+        μH[((2 * d : ℕ) : ℝ)]
+            (sliceMap (γ b)
+              '' {t | t ∈ Metric.ball 0 (γ b).radius ∧
+                ¬ Function.Injective (fderiv ℂ (sliceMap (γ b)) t)})
+          = 0 := fun b =>
     hcrit d n _ _ Metric.isOpen_ball
       ((γ b).differentiableOn.comp (hyperplaneEmb d).differentiableOn (hmaps b))
   refine ⟨interior N, interior_mem_nhds.2 hN, ?_⟩
@@ -115,15 +126,19 @@ theorem SliceImmersiveGeneral.proof (hcrit : CriticalImageNull.Statement)
   by_contra hne
   rw [Set.not_nonempty_iff_eq_empty] at hne
 
-  have hsub : GroundTheory.Heights₂.Heights.ComplexSets.zeroSet W ∩ (o ∩ interior N) ⊆
-      ⋃ b, sliceMap (γ b) '' {t | t ∈ Metric.ball 0 (γ b).radius ∧
-        ¬ Function.Injective (fderiv ℂ (sliceMap (γ b)) t)} := by
+  have hsub
+      : GroundTheory.Heights₂.Heights.ComplexSets.zeroSet W ∩ (o ∩ interior N)
+        ⊆ ⋃ b, sliceMap (γ b) '' {t | t ∈ Metric.ball 0 (γ b).radius ∧
+            ¬ Function.Injective (fderiv ℂ (sliceMap (γ b)) t)} := by
     rintro y ⟨hyW, hyo, hyN⟩
     by_contra hy
     simp only [Set.mem_iUnion, not_exists] at hy
-    have hyG : y ∈ o ∩ {x | x ∈ GroundTheory.Heights₂.Heights.ComplexSets.zeroSet W ∧
-        ∀ b, ∃ s ∈ Metric.ball 0 (γ b).radius, s 0 = 0 ∧ (γ b).toFun s = x ∧
-          ∀ v : Fin (d + 1) → ℂ, v 0 = 0 → fderiv ℂ (γ b).toFun s v = 0 → v = 0} := by
+    have hyG
+        : y
+          ∈ o
+            ∩ {x | x ∈ GroundTheory.Heights₂.Heights.ComplexSets.zeroSet W ∧
+              ∀ b, ∃ s ∈ Metric.ball 0 (γ b).radius, s 0 = 0 ∧ (γ b).toFun s = x ∧
+                ∀ v : Fin (d + 1) → ℂ, v 0 = 0 → fderiv ℂ (γ b).toFun s v = 0 → v = 0} := by
       refine ⟨hyo, hyW, fun b => ?_⟩
       obtain ⟨s, ⟨hs, hs0⟩, hsy⟩ := hsl b ⟨hyW, interior_subset hyN⟩
       have hs0' : s 0 = 0 := hs0
@@ -135,15 +150,17 @@ theorem SliceImmersiveGeneral.proof (hcrit : CriticalImageNull.Statement)
       have hγd : DifferentiableAt ℂ (γ b).toFun (hyperplaneEmb d (Fin.tail s)) := by
         rw [hst]
         exact (γ b).differentiableOn.differentiableAt (Metric.isOpen_ball.mem_nhds hs)
-      have hchain : fderiv ℂ (sliceMap (γ b)) (Fin.tail s) =
-          (fderiv ℂ (γ b).toFun (hyperplaneEmb d (Fin.tail s))).comp (hyperplaneEmb d) := by
+      have hchain
+          : fderiv ℂ (sliceMap (γ b)) (Fin.tail s)
+            = (fderiv ℂ (γ b).toFun (hyperplaneEmb d (Fin.tail s))).comp (hyperplaneEmb d) := by
         have h := fderiv_comp (Fin.tail s) hγd (hyperplaneEmb d).differentiableAt
         rw [ContinuousLinearMap.fderiv] at h
         exact h
       have hvt := hyperplaneEmb_tail hv0
-      have : Fin.tail v = 0 := hinj (by
-        rw [hchain, ContinuousLinearMap.comp_apply, ContinuousLinearMap.comp_apply, hvt, hst, hv,
-          map_zero, map_zero])
+      have : Fin.tail v = 0 :=
+        hinj (by
+          rw [hchain, ContinuousLinearMap.comp_apply, ContinuousLinearMap.comp_apply, hvt, hst, hv,
+            map_zero, map_zero])
       rw [← hvt, this, map_zero]
     rw [hne] at hyG
     exact hyG

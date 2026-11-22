@@ -11,17 +11,22 @@ namespace PI.DefPosDefWork
 
 open Matrix ComplexOrder
 
-theorem conj_of_pos (w z : ℂ)
-    (h : ∀ q : ℚ, z + (q : ℂ) ≠ 0 → ∃ c : ℝ, 0 < c ∧ (w + (q : ℂ)) * (z + (q : ℂ)) = (c : ℂ)) :
-    w = (starRingEnd ℂ) z := by
-  have key : ∀ q : ℚ, z + (q : ℂ) ≠ 0 →
-      (w.re + q) * z.im + w.im * (z.re + q) = 0 ∧ 0 < (w.re + q) * (z.re + q) - w.im * z.im := by
+theorem conj_of_pos
+    (w z : ℂ)
+    (h : ∀ q : ℚ, z + (q : ℂ) ≠ 0 → ∃ c : ℝ, 0 < c ∧ (w + (q : ℂ)) * (z + (q : ℂ)) = (c : ℂ))
+    : w = (starRingEnd ℂ) z := by
+  have key
+      : ∀ q : ℚ,
+        z + (q : ℂ) ≠ 0
+          → (w.re + q) * z.im + w.im * (z.re + q) = 0
+            ∧ 0 < (w.re + q) * (z.re + q) - w.im * z.im := by
     intro q hq
     obtain ⟨c, hc, he⟩ := h q hq
     have him := congrArg Complex.im he
     have hre := congrArg Complex.re he
     simp only [Complex.mul_im, Complex.mul_re, Complex.add_re, Complex.add_im, Complex.ofReal_re,
-      Complex.ofReal_im, Complex.ratCast_re, Complex.ratCast_im, add_zero] at him hre
+        Complex.ofReal_im, Complex.ratCast_re, Complex.ratCast_im, add_zero]
+      at him hre
     constructor
     · linear_combination him
     · have hc' : (w.re + q) * (z.re + q) - w.im * z.im = c := by linear_combination hre
@@ -66,9 +71,12 @@ theorem conj_of_pos (w z : ℂ)
       · linarith
     exact ⟨e3, e1⟩
 
-theorem hform_single {E : Type} [CommRing E] (σ : E →+* E) {k : ℕ} (J : Matrix (Fin k) (Fin k) E)
-    (i0 : Fin k) (s : E) :
-    hform σ J (Pi.single i0 s) (Pi.single i0 s) = σ s * J i0 i0 * s := by
+theorem hform_single
+    {E : Type} [CommRing E]
+    (σ : E →+* E)
+    {k : ℕ} (J : Matrix (Fin k) (Fin k) E) (i0 : Fin k)
+    (s : E)
+    : hform σ J (Pi.single i0 s) (Pi.single i0 s) = σ s * J i0 i0 * s := by
   unfold PI.hform
   simp [Pi.single_apply, Finset.sum_ite_eq, Finset.sum_ite_eq', mul_assoc, mul_comm, mul_left_comm]
   rw [Finset.sum_eq_single i0]
@@ -78,21 +86,25 @@ theorem hform_single {E : Type} [CommRing E] (σ : E →+* E) {k : ℕ} (J : Mat
   · intro h
     exact absurd (Finset.mem_univ i0) h
 
-theorem pos_pair {F E : Type} [Field F] [Field E] [Algebra F E]
-    (σ : E →ₐ[F] E) {k : ℕ} (J : Matrix (Fin k) (Fin k) E) (hk : 0 < k) (hD : IsDef σ J)
+theorem pos_pair
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    {k : ℕ} (J : Matrix (Fin k) (Fin k) E) (hk : 0 < k) (hD : IsDef σ J)
     (φ : E →+* ℂ) (r : F →+* ℝ) (hr : ∀ a, φ (algebraMap F E a) = (r a : ℂ))
-    (s : E) (hs : s ≠ 0) : ∃ c : ℝ, 0 < c ∧ φ (σ s) * φ s = (c : ℂ) := by
+    (s : E) (hs : s ≠ 0)
+    : ∃ c : ℝ, 0 < c ∧ φ (σ s) * φ s = (c : ℂ) := by
   obtain ⟨i0⟩ : Nonempty (Fin k) := ⟨⟨0, hk⟩⟩
   have hx1 : (Pi.single i0 s : Fin k → E) ≠ 0 := fun h0 => hs (by simpa using congrFun h0 i0)
-  have hx2 : (Pi.single i0 (1 : E) : Fin k → E) ≠ 0 := fun h0 => by
-    simpa using congrFun h0 i0
+  have hx2 : (Pi.single i0 (1 : E) : Fin k → E) ≠ 0 := fun h0 => by simpa using congrFun h0 i0
   have hv1 : hform (σ : E →+* E) J (Pi.single i0 s) (Pi.single i0 s) = σ s * J i0 i0 * s :=
     hform_single (σ : E →+* E) J i0 s
   have hv2 : hform (σ : E →+* E) J (Pi.single i0 1) (Pi.single i0 1) = J i0 i0 := by
     rw [hform_single]
     simp
-  have key : ∀ a b : F, algebraMap F E a = σ s * J i0 i0 * s → algebraMap F E b = J i0 i0 →
-      0 < r a * r b → ∃ c : ℝ, 0 < c ∧ φ (σ s) * φ s = c := by
+  have key
+      : ∀ a b : F,
+        algebraMap F E a = σ s * J i0 i0 * s → algebraMap F E b = J i0 i0 → 0 < r a * r b
+          → ∃ c : ℝ, 0 < c ∧ φ (σ s) * φ s = c := by
     intro a b ha hb hab
     have hb0 : r b ≠ 0 := by
       intro h0

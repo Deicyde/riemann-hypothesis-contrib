@@ -9,8 +9,10 @@ open Polynomial
 
 namespace GlobalTheory.KummerCob
 
-theorem zeta_mem_range : ∀ (k K Ω : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field K] [Algebra k[X] K] [Field Ω] [Algebra K Ω]
-    (N : ℕ) (ζ : Ω), 0 < N → IsPrimitiveRoot ζ N → ζ ∈ Set.range (algebraMap K Ω) := by
+theorem zeta_mem_range
+    : ∀ (k K Ω : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field K] [Algebra k[X] K] [Field Ω]
+        [Algebra K Ω] (N : ℕ) (ζ : Ω),
+      0 < N → IsPrimitiveRoot ζ N → ζ ∈ Set.range (algebraMap K Ω) := by
   intro k K Ω _ _ _ _ _ _ _ N ζ hN hζ
   haveI : NeZero N := ⟨hN.ne'⟩
   haveI : NeZero (N : k) := ⟨by exact_mod_cast hN.ne'⟩

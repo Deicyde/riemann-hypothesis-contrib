@@ -17,11 +17,11 @@ noncomputable section
 
 namespace FunctorialResolution.EmbeddedResolution
 
-variable {X : Scheme.{u}} {k : Type u} [Field k] {p : X ⟶ Spec (CommRingCat.of k)}
-  {U : X.Opens} {m : ℕ}
+variable
+  {X : Scheme.{u}} {k : Type u} [Field k] {p : X ⟶ Spec (CommRingCat.of k)} {U : X.Opens} {m : ℕ}
 
-private theorem nontrivial_sections_of_mem (hU : IsAffineOpen U) (x : X) (hx : x ∈ U) :
-    Nontrivial Γ(X, U) := by
+private theorem nontrivial_sections_of_mem (hU : IsAffineOpen U) (x : X) (hx : x ∈ U)
+    : Nontrivial Γ(X, U) := by
   rw [← not_subsingleton_iff_nontrivial]
   intro hs
   have := hs
@@ -30,9 +30,9 @@ private theorem nontrivial_sections_of_mem (hU : IsAffineOpen U) (x : X) (hx : x
     exact Ideal.zero_mem _
   exact (hU.primeIdealOf ⟨x, hx⟩).isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr h1)
 
-private theorem ideal_le_primeIdealOf_of_mem_support (I : X.IdealSheafData)
-    (hU : IsAffineOpen U) {x : X} (hx : x ∈ U) (hxI : x ∈ I.support) :
-    I.ideal ⟨U, hU⟩ ≤ (hU.primeIdealOf ⟨x, hx⟩).asIdeal := by
+private theorem ideal_le_primeIdealOf_of_mem_support
+    (I : X.IdealSheafData) (hU : IsAffineOpen U) {x : X} (hx : x ∈ U) (hxI : x ∈ I.support)
+    : I.ideal ⟨U, hU⟩ ≤ (hU.primeIdealOf ⟨x, hx⟩).asIdeal := by
   have h1 := (Scheme.IdealSheafData.mem_support_iff_of_mem (I := I) (U := ⟨U, hU⟩) hx).mp hxI
   rw [Scheme.mem_zeroLocus_iff] at h1
   intro f hf
@@ -40,29 +40,30 @@ private theorem ideal_le_primeIdealOf_of_mem_support (I : X.IdealSheafData)
   intro hu
   exact h1 f hf ((X.mem_basicOpen f x hx).mpr hu)
 
-private theorem coord_injective (hU : IsAffineOpen U) (c : EtaleChart p U m)
-    (x : X) (hx : x ∈ U) : Function.Injective c.coord := by
+private theorem coord_injective (hU : IsAffineOpen U) (c : EtaleChart p U m) (x : X) (hx : x ∈ U)
+    : Function.Injective c.coord := by
   let inst : Algebra (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, U) := c.algebra
   have : Algebra.Etale (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, U) := c.algebra_etale hU
   have : Nontrivial Γ(X, U) := nontrivial_sections_of_mem hU x hx
   have : Module.Flat (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, U) := inferInstance
   have := Module.Flat.isTorsionFree (R := MvPolynomial (ULift.{u} (Fin m)) k) (M := Γ(X, U))
-  have hinj0 : Function.Injective
-      (algebraMap (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, U)) :=
+  have hinj0 : Function.Injective (algebraMap (MvPolynomial (ULift.{u} (Fin m)) k) Γ(X, U)) :=
     FaithfulSMul.algebraMap_injective _ _
   have hinj : Function.Injective ⇑c.coordRingHom := hinj0
   intro a b hab
-  have h1 : (MvPolynomial.X (ULift.up a) : MvPolynomial (ULift.{u} (Fin m)) k)
-      = MvPolynomial.X (ULift.up b) := by
+  have h1
+      : (MvPolynomial.X (ULift.up a) : MvPolynomial (ULift.{u} (Fin m)) k)
+        = MvPolynomial.X (ULift.up b) := by
     apply hinj
     rw [EtaleChart.coordRingHom_X, EtaleChart.coordRingHom_X, hab]
   have h2 : (ULift.up a : ULift.{u} (Fin m)) = ULift.up b := MvPolynomial.X_injective h1
   exact congrArg ULift.down h2
 
-theorem card_le_ringKrullDim_stalk (hU : IsAffineOpen U) (c : EtaleChart p U m)
-    (x : X) (hx : x ∈ U) (J : Finset (Fin m))
-    (hJ : ∀ j ∈ J, c.coord j ∈ (hU.primeIdealOf ⟨x, hx⟩).asIdeal) :
-    (J.card : WithBot ℕ∞) ≤ ringKrullDim (X.presheaf.stalk x) := by
+theorem card_le_ringKrullDim_stalk
+    (hU : IsAffineOpen U) (c : EtaleChart p U m)
+    (x : X) (hx : x ∈ U)
+    (J : Finset (Fin m)) (hJ : ∀ j ∈ J, c.coord j ∈ (hU.primeIdealOf ⟨x, hx⟩).asIdeal)
+    : (J.card : WithBot ℕ∞) ≤ ringKrullDim (X.presheaf.stalk x) := by
   classical
   obtain ⟨d, f, -, hf2, -, hd⟩ :=
     exists_sections_span_eq_maximalIdeal_with_coords hU c x hx J
@@ -92,10 +93,11 @@ theorem card_le_ringKrullDim_stalk (hU : IsAffineOpen U) (c : EtaleChart p U m)
     exact_mod_cast hcard
 
 theorem coord_mem_primeIdealOf_of_restrictIdeal_eq_coordIdeal_singleton
-    (hU : IsAffineOpen U) (c : EtaleChart p U m)
-    (j : Fin m) (D : X.IdealSheafData) (hD : restrictIdeal D U = c.coordIdeal {j})
-    (x : X) (hx : x ∈ U) (hxD : x ∈ D.support) :
-    c.coord j ∈ (hU.primeIdealOf ⟨x, hx⟩).asIdeal := by
+    (hU : IsAffineOpen U)
+    (c : EtaleChart p U m) (j : Fin m) (D : X.IdealSheafData)
+    (hD : restrictIdeal D U = c.coordIdeal {j})
+    (x : X) (hx : x ∈ U) (hxD : x ∈ D.support)
+    : c.coord j ∈ (hU.primeIdealOf ⟨x, hx⟩).asIdeal := by
   have h1 : D.ideal ⟨U, hU⟩ = Ideal.span (c.coord '' ((({j} : Finset (Fin m))) : Set (Fin m))) :=
     EtaleChart.ideal_eq_span_coord c hU D {j} hD
   have h2 : D.ideal ⟨U, hU⟩ ≤ (hU.primeIdealOf ⟨x, hx⟩).asIdeal :=

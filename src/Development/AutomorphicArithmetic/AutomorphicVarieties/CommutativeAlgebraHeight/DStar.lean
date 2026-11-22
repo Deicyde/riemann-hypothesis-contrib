@@ -10,8 +10,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-theorem UpperTheory.V.CA.d_star :
-    ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (σ : E →ₐ[A] Eᵐᵒᵖ) (M : Submonoid E), Submodule.span A (M : Set E) = ⊤ → (∀ x ∈ M, ∀ i, 1 ≤ i → i ≤ n → D.lam i (σ x).unop = D.lam i x) → D.op.pull σ = D ∧ (∀ x ∈ D.CH, (σ x).unop ∈ D.CH) ∧ (Function.Surjective σ → ∀ x ∈ D.ker, (σ x).unop ∈ D.ker) := by
+theorem UpperTheory.V.CA.d_star
+    : ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (σ : E →ₐ[A] Eᵐᵒᵖ)
+        (M : Submonoid E),
+      Submodule.span A (M : Set E) = ⊤
+        → (∀ x ∈ M, ∀ i, 1 ≤ i → i ≤ n → D.lam i (σ x).unop = D.lam i x)
+        → D.op.pull σ = D ∧ (∀ x ∈ D.CH, (σ x).unop ∈ D.CH)
+          ∧ (Function.Surjective σ → ∀ x ∈ D.ker, (σ x).unop ∈ D.ker) := by
   intro n A E _ _ _ D σ M hM h
   obtain ⟨o1, o2, o3⟩ := UpperTheory.V.CA.d_op D
   obtain ⟨p1, -, p3, p4⟩ := UpperTheory.V.CA.d_pull D.op σ

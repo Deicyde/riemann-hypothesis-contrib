@@ -11,8 +11,7 @@ open ModularForm EisensteinSeries ModularFormClass UpperHalfPlane Formalism.L2.T
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem latTau_snd_ne (L : PeriodPair) : L.ω₂ ≠ 0 := by
-  simpa using L.indep.ne_zero 1
+theorem latTau_snd_ne (L : PeriodPair) : L.ω₂ ≠ 0 := by simpa using L.indep.ne_zero 1
 
 theorem latTau_im_ne (L : PeriodPair) : (L.ω₁ / L.ω₂).im ≠ 0 := by
   intro h
@@ -20,8 +19,9 @@ theorem latTau_im_ne (L : PeriodPair) : (L.ω₁ / L.ω₂).im ≠ 0 := by
   obtain ⟨r, hr⟩ : ∃ r : ℝ, L.ω₁ / L.ω₂ = (r : ℂ) :=
     ⟨(L.ω₁ / L.ω₂).re, Complex.ext (by simp) (by simp [h])⟩
   have h1 : L.ω₁ = (r : ℂ) * L.ω₂ := by rw [← hr, div_mul_cancel₀ _ h2]
-  have h3 := (LinearIndependent.pair_iff.mp L.indep) 1 (-r)
-    (by rw [Complex.real_smul, Complex.real_smul, h1]; push_cast; ring)
+  have h3 :=
+    (LinearIndependent.pair_iff.mp L.indep) 1 (-r)
+      (by rw [Complex.real_smul, Complex.real_smul, h1]; push_cast; ring)
   norm_num at h3
 
 theorem latTau (L : PeriodPair) : ∃ (c : ℂ) (τ : ℍ), IsTauOf L c τ := by

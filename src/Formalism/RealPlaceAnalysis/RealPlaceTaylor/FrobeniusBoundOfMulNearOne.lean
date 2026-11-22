@@ -56,13 +56,15 @@ lemma normSq_det_indefinite_unitary {n : ℕ} {ε : Fin n → Bool} {g : Matrix 
 
 abbrev MatrixCoordinates (n : ℕ) := Fin n → Fin n → ℂ
 
-def matrixCoordinatesEquiv (n : ℕ) : MatrixCoordinates n ≃ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ := Matrix.ofLinearEquiv ℝ
+def matrixCoordinatesEquiv (n : ℕ) : MatrixCoordinates n ≃ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ :=
+  Matrix.ofLinearEquiv ℝ
 
-def leftMulReal {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ) : MatrixCoordinates n →ₗ[ℝ] MatrixCoordinates n :=
-  ((matrixCoordinatesEquiv n).symm : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] MatrixCoordinates n) ∘ₗ
-    ((LinearMap.mulLeft ℂ g).restrictScalars ℝ) ∘ₗ
-    ((matrixCoordinatesEquiv n : MatrixCoordinates n ≃ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ) :
-      MatrixCoordinates n →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ)
+def leftMulReal {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ)
+    : MatrixCoordinates n →ₗ[ℝ] MatrixCoordinates n :=
+  ((matrixCoordinatesEquiv n).symm : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] MatrixCoordinates n)
+    ∘ₗ ((LinearMap.mulLeft ℂ g).restrictScalars ℝ)
+    ∘ₗ ((matrixCoordinatesEquiv n : MatrixCoordinates n ≃ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ)
+      : MatrixCoordinates n →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ)
 
 lemma leftMulReal_apply {n : ℕ} (g : Matrix (Fin n) (Fin n) ℂ) (x : MatrixCoordinates n) :
     leftMulReal g x = Matrix.of.symm (g * Matrix.of x) := rfl
@@ -168,7 +170,6 @@ theorem ball_finite_measure_holds : BallFinite := by
     exact ⟨fun h => ⟨g.2, h⟩, fun h => h.2⟩
   exact hc.measure_lt_top
 
-theorem volume_growth : VolGrowth :=
-  _root_.UpperTheory.Reformulated.B.placeRankTwoOne.volume_growth
+theorem volume_growth : VolGrowth := _root_.UpperTheory.Reformulated.B.placeRankTwoOne.volume_growth
 
 end Formalism.REAL

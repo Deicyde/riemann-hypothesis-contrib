@@ -8,9 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsIs
 
 open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V UpperTheory.V.Base
 
-private theorem UpperTheory.exists_fixed_square_root_odd {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosed Ω] (g : Ω →+* Ω) (n : ℕ) :
-    Odd n → (∀ ζ : Ω, ζ ^ n = 1 → g ζ = ζ) →
-      ∃ m : ℤ, m.natAbs = n ∧ m % 4 = 1 ∧ ∃ s : Ω, s ^ 2 = m ∧ g s = s := by
+private theorem UpperTheory.exists_fixed_square_root_odd
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosed Ω] (g : Ω →+* Ω) (n : ℕ)
+    : Odd n → (∀ ζ : Ω, ζ ^ n = 1 → g ζ = ζ)
+      → ∃ m : ℤ, m.natAbs = n ∧ m % 4 = 1 ∧ ∃ s : Ω, s ^ 2 = m ∧ g s = s := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
     intro hn hg
@@ -49,8 +50,7 @@ private theorem UpperTheory.exists_fixed_square_root_odd {Ω : Type} [Field Ω] 
       have hgx : g x = x := by
         have := (hall x hx).2 g 1 hgz
         simpa [legendreSym.at_one] using this
-      have hps : (CF.pStar p).natAbs = p := by
-        simp [CF.pStar, Int.natAbs_mul, Int.natAbs_pow]
+      have hps : (CF.pStar p).natAbs = p := by simp [CF.pStar, Int.natAbs_mul, Int.natAbs_pow]
       have hp4 : CF.pStar p % 4 = 1 := by
         obtain ⟨a, ha⟩ := hp.odd_of_ne_two hp2
         clear_value p
@@ -72,12 +72,16 @@ private theorem UpperTheory.exists_fixed_square_root_odd {Ω : Type} [Field Ω] 
         ring
       · rw [map_mul, hgx, hgs']
 
-theorem UpperTheory.mem_galOf_quadratic_of_fixes_discr_roots_of_unity :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω], Module.finrank ℚ K = 2 → Odd (discr K).natAbs → ∀ g : G ℚ Ω, (∀ ζ : Ω, ζ ^ (discr K).natAbs = 1 → g ζ = ζ) → g ∈ galOf ℚ K Ω := by
+theorem UpperTheory.mem_galOf_quadratic_of_fixes_discr_roots_of_unity
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K]
+        [Algebra K Ω],
+      Module.finrank ℚ K = 2 → Odd (discr K).natAbs
+        → ∀ g : G ℚ Ω, (∀ ζ : Ω, ζ ^ (discr K).natAbs = 1 → g ζ = ζ) → g ∈ galOf ℚ K Ω := by
   intro Ω _ _ _ K _ _ _ hK hodd g hg
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   obtain ⟨m, hmabs, hm4, s, hs, hgs⟩ :=
-    UpperTheory.exists_fixed_square_root_odd (g : Ω →+* Ω) (discr K).natAbs hodd (fun ζ h => by simpa using hg ζ h)
+    UpperTheory.exists_fixed_square_root_odd (g : Ω →+* Ω) (discr K).natAbs hodd
+      (fun ζ h => by simpa using hg ζ h)
   have hd4 : discr K % 4 = 1 := by
     have h2 : Odd (discr K) := Int.natAbs_odd.mp hodd
     rcases GlobalTheory.QuadraticZeta.discr_mod_four hK with h | h
@@ -105,8 +109,7 @@ theorem UpperTheory.mem_galOf_quadratic_of_fixes_discr_roots_of_unity :
       rcases sq_eq_sq_iff_eq_or_eq_neg.mp hy with h | h
       · rw [h, hgs']
       · rw [h, map_neg, hgs']
-    have e : 2 * g θ - t = 2 * θ - t := by
-      rw [← hgy, map_sub, map_mul, map_ofNat, map_intCast]
+    have e : 2 * g θ - t = 2 * θ - t := by rw [← hgy, map_sub, map_mul, map_ofNat, map_intCast]
     linear_combination (1 / 2 : Ω) * e
   have hint : ∀ a : 𝓞 K, g (algebraMap K Ω (a : K)) = algebraMap K Ω (a : K) := by
     intro a

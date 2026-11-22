@@ -22,18 +22,19 @@ section General
 
 variable {A : Type*} [CommRing A]
 
-theorem localizedQuot_nontrivial_of_le (J W : Ideal A) [W.IsPrime] (h : J ≤ W) :
-    Nontrivial (LocalizedModule W.primeCompl (A ⧸ J)) := by
+theorem localizedQuot_nontrivial_of_le (J W : Ideal A) [W.IsPrime] (h : J ≤ W)
+    : Nontrivial (LocalizedModule W.primeCompl (A ⧸ J)) := by
   refine ⟨⟨LocalizedModule.mk 1 1, 0, fun e => ?_⟩⟩
   rw [← LocalizedModule.zero_mk (1 : W.primeCompl), LocalizedModule.mk_eq] at e
   obtain ⟨u, hu⟩ := e
   simp only [one_smul, smul_zero] at hu
   rw [Submonoid.smul_def, Algebra.smul_def, Ideal.Quotient.algebraMap_eq, mul_one,
-    Ideal.Quotient.eq_zero_iff_mem] at hu
+      Ideal.Quotient.eq_zero_iff_mem]
+    at hu
   exact u.2 (h hu)
 
-theorem withBot_lt_natCast_of_add_one_le (x : WithBot ℕ∞) (N : ℕ) (h : x + 1 ≤ (N : WithBot ℕ∞)) :
-    x < (N : WithBot ℕ∞) := by
+theorem withBot_lt_natCast_of_add_one_le (x : WithBot ℕ∞) (N : ℕ) (h : x + 1 ≤ (N : WithBot ℕ∞))
+    : x < (N : WithBot ℕ∞) := by
   induction x using WithBot.recBotCoe with
   | bot => exact WithBot.bot_lt_coe _
   | coe y =>
@@ -50,11 +51,16 @@ theorem LeftExpansion.proof (hcut : VNumCut.Statement.{u}) : LeftExpansion.State
   classical
   have : P.IsPrime := hP.multiProj.isPrime
 
-  have key : ∀ G, ratDiv P f g G ≠ 0 →
-      vNum G (Matrix.vecCons (fun k => (c k : ℤ)) L) = cycEval (fun U => vNum U L) (divCycle G s) := by
+  have key
+      : ∀ G,
+        ratDiv P f g G ≠ 0
+          → vNum G (Matrix.vecCons (fun k => (c k : ℤ)) L)
+            = cycEval (fun U => vNum U L) (divCycle G s) := by
     intro G hG
-    have hmin : ∃ h : MRing ι O, h ∉ P ∧ (∃ e : K → ℕ, IsMultiHomog h e) ∧
-        G ∈ (P ⊔ Ideal.span {h}).minimalPrimes ∧ IsRelevant G := by
+    have hmin
+        : ∃ h : MRing ι O,
+          h ∉ P ∧ (∃ e : K → ℕ, IsMultiHomog h e) ∧ G ∈ (P ⊔ Ideal.span {h}).minimalPrimes
+            ∧ IsRelevant G := by
       obtain ⟨bf, bg, hf, hg, -⟩ := hD.degrees
       by_cases hfG : divCycle P f G = 0
       · have hgG : divCycle P g G ≠ 0 := by
@@ -90,8 +96,13 @@ theorem LeftExpansion.proof (hcut : VNumCut.Statement.{u}) : LeftExpansion.State
       have hGs : G ∈ (P ⊔ Ideal.span {s}).minimalPrimes := by
         refine ⟨⟨hGp, sup_le hPG ((Ideal.span_singleton_le_iff_mem _).mpr hsG)⟩, fun Q hQ hQG => ?_⟩
         have hsQ : s ∈ Q := hQ.2 (Ideal.mem_sup_right (Ideal.subset_span rfl))
-        exact h1.2 ⟨hQ.1, sup_le (le_sup_left.trans hQ.2)
-          ((Ideal.span_singleton_le_iff_mem _).mpr (Q.mul_mem_left h hsQ))⟩ hQG
+        exact h1.2
+          ⟨
+            hQ.1,
+            sup_le (le_sup_left.trans hQ.2)
+              ((Ideal.span_singleton_le_iff_mem _).mpr (Q.mul_mem_left h hsQ))
+          ⟩
+          hQG
       have hne : divCycle P s G ≠ 0 := by
         unfold divCycle
         rw [dite_eq_left ⟨hGs, hGrel⟩]
@@ -115,23 +126,27 @@ theorem LeftExpansion.proof (hcut : VNumCut.Statement.{u}) : LeftExpansion.State
     A.finite_toSet.biUnion (fun G _ => DivCycleFiniteSupport.proof O K ι G s)
   set B := hfinB.toFinset with hBdef
   have hA : ∀ G, ratDiv P f g G ≠ 0 → G ∈ A := fun G hG => hfinR.mem_toFinset.mpr hG
-  have hB : ∀ G ∈ A, ∀ U, divCycle G s U ≠ 0 → U ∈ B :=
-    fun G hGA U hU => hfinB.mem_toFinset.mpr (Set.mem_biUnion hGA hU)
-  have eL : cycEval (fun G => vNum G (Matrix.vecCons (fun k => (c k : ℤ)) L)) (ratDiv P f g) =
-      ∑ G ∈ A, ∑ U ∈ B, ratDiv P f g G * divCycle G s U * vNum U L := by
+  have hB : ∀ G ∈ A, ∀ U, divCycle G s U ≠ 0 → U ∈ B := fun G hGA U hU =>
+    hfinB.mem_toFinset.mpr (Set.mem_biUnion hGA hU)
+  have eL
+      : cycEval (fun G => vNum G (Matrix.vecCons (fun k => (c k : ℤ)) L)) (ratDiv P f g)
+        = ∑ G ∈ A, ∑ U ∈ B, ratDiv P f g G * divCycle G s U * vNum U L := by
     unfold cycEval
     rw [finsum_eq_sum_of_support_subset _ (s := A) (fun G hG => hA G (left_ne_zero_of_mul hG))]
     refine Finset.sum_congr rfl fun G _ => ?_
     by_cases hr : ratDiv P f g G = 0
     · simp [hr]
-    · rw [key G hr, cycEval, finsum_eq_sum_of_support_subset _ (s := B)
-        (fun U hU => hB G (hA G hr) U (left_ne_zero_of_mul hU)), Finset.mul_sum]
+    · rw [key G hr, cycEval,
+        finsum_eq_sum_of_support_subset _ (s := B)
+          (fun U hU => hB G (hA G hr) U (left_ne_zero_of_mul hU)),
+        Finset.mul_sum]
       exact Finset.sum_congr rfl fun U _ => by ring
-  have eR : cycEval (fun U => vNum U L) (fun U => cycEval (fun G => divCycle G s U) (ratDiv P f g)) =
-      ∑ U ∈ B, ∑ G ∈ A, ratDiv P f g G * divCycle G s U * vNum U L := by
+  have eR
+      : cycEval (fun U => vNum U L) (fun U => cycEval (fun G => divCycle G s U) (ratDiv P f g))
+        = ∑ U ∈ B, ∑ G ∈ A, ratDiv P f g G * divCycle G s U * vNum U L := by
     unfold cycEval
-    have hsub : Function.support (fun U =>
-        (∑ᶠ G, ratDiv P f g G * divCycle G s U) * vNum U L) ⊆ ↑B := by
+    have hsub
+        : Function.support (fun U => (∑ᶠ G, ratDiv P f g G * divCycle G s U) * vNum U L) ⊆ ↑B := by
       intro U hU
       have h1 := left_ne_zero_of_mul hU
       obtain ⟨G, hG⟩ : ∃ G, ratDiv P f g G * divCycle G s U ≠ 0 := by

@@ -10,8 +10,9 @@ noncomputable section
 
 namespace PI.OpWords
 
-theorem wtLe_span (K : Type) [Field K] (k : ℕ) (c : ℤ) (s : Set (Pol K k))
-    (hs : ∀ f ∈ s, WtLe K k c f) : ∀ f ∈ Submodule.span K s, WtLe K k c f := by
+theorem wtLe_span
+    (K : Type) [Field K] (k : ℕ) (c : ℤ) (s : Set (Pol K k)) (hs : ∀ f ∈ s, WtLe K k c f)
+    : ∀ f ∈ Submodule.span K s, WtLe K k c f := by
   intro f hf
   induction hf using Submodule.span_induction with
   | mem x hx => exact hs x hx
@@ -27,17 +28,24 @@ theorem wtLe_span (K : Type) [Field K] (k : ℕ) (c : ℤ) (s : Set (Pol K k))
     intro m hm a
     exact hx m (support_smul hm) a
 
-theorem kappa_ad (hL : KappaLeft) (hR : KappaRight) (K : Type) [Field K] [CharZero K] (k d : ℕ)
-    (a b : Fin k) (A : Module.End K ↥(homogeneousSubmodule (Fin k) K d)) :
-    kappa K k d (Formalism.MainNotions.TestSideCounting.Ed K k d a b * A - A * Formalism.MainNotions.TestSideCounting.Ed K k d a b) =
-      Rop K k a b (kappa K k d A) := by
+theorem kappa_ad
+    (hL : KappaLeft) (hR : KappaRight)
+    (K : Type) [Field K] [CharZero K]
+    (k d : ℕ) (a b : Fin k) (A : Module.End K ↥(homogeneousSubmodule (Fin k) K d))
+    : kappa K k d
+        (Formalism.MainNotions.TestSideCounting.Ed K k d a b * A
+          - A * Formalism.MainNotions.TestSideCounting.Ed K k d a b)
+      = Rop K k a b (kappa K k d A) := by
   rw [map_sub, hL K k d a b A, hR K k d a b A]
   rfl
 
-theorem divide_all (hV : Vanish) (hD : DivT) (hRB : RBihom) (hRT : RTT) (hTW : TTWt)
-    (K : Type) [Field K] [CharZero K] (k c : ℕ) : ∀ n : ℕ, ∀ (W : Submodule K (Pol K k)),
-    W ≤ Bihom K k (c + n) → (∀ f ∈ W, ∀ a b, Rop K k a b f ∈ W) → (∀ f ∈ W, WtLe K k c f) →
-    ∀ f ∈ W, ∃ g ∈ Bihom K k c, f = tt K k ^ n * g := by
+theorem divide_all
+    (hV : Vanish) (hD : DivT) (hRB : RBihom) (hRT : RTT) (hTW : TTWt)
+    (K : Type) [Field K] [CharZero K]
+    (k c : ℕ)
+    : ∀ n : ℕ, ∀ (W : Submodule K (Pol K k)),
+      W ≤ Bihom K k (c + n) → (∀ f ∈ W, ∀ a b, Rop K k a b f ∈ W) → (∀ f ∈ W, WtLe K k c f)
+        → ∀ f ∈ W, ∃ g ∈ Bihom K k c, f = tt K k ^ n * g := by
   intro n
   induction n with
   | zero =>
@@ -48,8 +56,11 @@ theorem divide_all (hV : Vanish) (hD : DivT) (hRB : RBihom) (hRT : RTT) (hTW : T
     rcases Nat.eq_zero_or_pos k with hk | hk
     · subst hk
       refine ⟨0, Submodule.zero_mem _, ?_⟩
-      have hf' : f ∈ weightedHomogeneousSubmodule K (wx 0) (c + (n + 1)) ⊓
-          weightedHomogeneousSubmodule K (wxi 0) (c + (n + 1)) := hW hf
+      have hf'
+          : f
+            ∈ weightedHomogeneousSubmodule K (wx 0) (c + (n + 1))
+              ⊓ weightedHomogeneousSubmodule K (wxi 0) (c + (n + 1)) :=
+        hW hf
       have h1 := (Submodule.mem_inf.1 hf').1
       rw [mem_weightedHomogeneousSubmodule] at h1
       rw [mul_zero]
@@ -90,11 +101,13 @@ theorem divide_all (hV : Vanish) (hD : DivT) (hRB : RBihom) (hRT : RTT) (hTW : T
       obtain ⟨g'', hg'', rfl⟩ := ih W' hW' hst' hwt' g ((hmem g).2 hf)
       exact ⟨g'', hg'', by ring⟩
 
-theorem opWords_of (hI : KappaInj) (hL : KappaLeft) (hR : KappaRight) (hB : KappaBihom)
-    (hE : WtOfEig) (hRB : RBihom) (hRT : RTT) (hTW : TTWt) (hD : DivT) (hV : Vanish)
-    (hS : Surj) : Formalism.MainNotions.TestSideCounting.OpBound := by
+theorem opWords_of
+    (hI : KappaInj) (hL : KappaLeft) (hR : KappaRight) (hB : KappaBihom) (hE : WtOfEig)
+    (hRB : RBihom) (hRT : RTT) (hTW : TTWt) (hD : DivT) (hV : Vanish) (hS : Surj)
+    : Formalism.MainNotions.TestSideCounting.OpBound := by
   intro K _ _ k d c WW Sg hst hspan heig A hA
-  have key : ∃ c' : ℕ, c' ≤ c ∧ c' ≤ d ∧ ∃ g ∈ Bihom K k c', kappa K k d A = tt K k ^ (d - c') * g := by
+  have key
+      : ∃ c' : ℕ, c' ≤ c ∧ c' ≤ d ∧ ∃ g ∈ Bihom K k c', kappa K k d A = tt K k ^ (d - c') * g := by
     rcases Nat.lt_or_ge c d with hcd | hdc
     · let W : Submodule K (Pol K k) := WW.map (kappa K k d)
       have hW : W ≤ Bihom K k (c + (d - c)) := by
@@ -119,8 +132,8 @@ theorem opWords_of (hI : KappaInj) (hL : KappaLeft) (hR : KappaRight) (hB : Kapp
         have h2 := hE K k a (ω a) (kappa K k d A') h1 m hm
         rw [h2]
         exact_mod_cast hωc a
-      obtain ⟨g, hg, he⟩ := divide_all hV hD hRB hRT hTW K k c (d - c) W hW hWst hWwt _
-        (Submodule.mem_map_of_mem hA)
+      obtain ⟨g, hg, he⟩ :=
+        divide_all hV hD hRB hRT hTW K k c (d - c) W hW hWst hWwt _ (Submodule.mem_map_of_mem hA)
       exact ⟨c, le_rfl, hcd.le, g, hg, he⟩
     · exact ⟨d, hdc, le_rfl, kappa K k d A, hB K k d A, by simp⟩
   obtain ⟨c', hc'c, hc'd, g, hg, he⟩ := key

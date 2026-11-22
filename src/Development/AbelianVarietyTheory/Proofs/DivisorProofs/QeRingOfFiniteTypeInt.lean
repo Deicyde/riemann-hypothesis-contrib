@@ -14,7 +14,8 @@ open IsLocalRing TensorProduct ReciprocityTheory.AnForm.R
 
 namespace GlobalTheory
 
-theorem qeRing_of_finiteType_int : ∀ (A : Type) [CommRing A] [Algebra.FiniteType ℤ A], FinalTheorems.QERing A := by
+theorem qeRing_of_finiteType_int
+    : ∀ (A : Type) [CommRing A] [Algebra.FiniteType ℤ A], FinalTheorems.QERing A := by
   intro A _ _
   have hN : IsNoetherianRing A := Algebra.FiniteType.isNoetherianRing ℤ A
   refine ⟨hN, fun P _ => ⟨?_, ?_⟩, fun B _ _ _ => ?_⟩
@@ -28,9 +29,11 @@ theorem qeRing_of_finiteType_int : ∀ (A : Type) [CommRing A] [Algebra.FiniteTy
     have hZ : @Algebra.EssFiniteType ℤ (Localization.AtPrime P) _ _ (Ring.toIntAlgebra _) := by
       convert this
       exact Subsingleton.elim _ _
-    exact @GlobalTheory.T.formalFibre_isRegularRing_essFiniteType_int (Localization.AtPrime P) K _ _ hZ _ _ _
+    exact @GlobalTheory.T.formalFibre_isRegularRing_essFiniteType_int (Localization.AtPrime P) K _ _
+      hZ _ _ _
   · haveI : Algebra.FiniteType ℤ B := Algebra.FiniteType.trans (inferInstance : Algebra.FiniteType ℤ A) ‹_›
     haveI : IsNoetherianRing B := Algebra.FiniteType.isNoetherianRing ℤ B
-    exact GlobalTheory.T.isOpen_regularLocus_of_nagata' B (fun p _ => GlobalTheory.T.exists_regular_quotient_near_prime_finiteType_int B p)
+    exact GlobalTheory.T.isOpen_regularLocus_of_nagata' B
+      (fun p _ => GlobalTheory.T.exists_regular_quotient_near_prime_finiteType_int B p)
 
 end GlobalTheory

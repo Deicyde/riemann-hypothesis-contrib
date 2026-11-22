@@ -10,7 +10,8 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections.UH
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Complex ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Complex
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped ComplexConjugate
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {l : Level H}
@@ -22,8 +23,8 @@ theorem relab_injective (c : Coeff l) (σ : c.F →+* ℂ) : Function.Injective 
   have h2 := σ.injective h1
   exact congrArg Subtype.val h2
 
-theorem relab_rt (c : Coeff l) (σ : c.F →+* ℂ) (hσ : GoodEmb c σ) (τ : E →+* ℂ) :
-    relab c σ τ (H.rt : E) = H.rt0 ↔ τ (H.rt : E) = H.rt0 := by
+theorem relab_rt (c : Coeff l) (σ : c.F →+* ℂ) (hσ : GoodEmb c σ) (τ : E →+* ℂ)
+    : relab c σ τ (H.rt : E) = H.rt0 ↔ τ (H.rt : E) = H.rt0 := by
   have e1 : (H.rt : E) ^ 2 = -(H.d : E) := by
     have h := congrArg (fun x : 𝓞 E => (x : E)) H.rt_sq
     simpa using h
@@ -36,7 +37,8 @@ theorem relab_rt (c : Coeff l) (σ : c.F →+* ℂ) (hσ : GoodEmb c σ) (τ : E
   rcases hcases with h | h
   · have hy : embF c τ (H.rt : E) = (IntermediateField.inclusion c.le) (baseKA l).ρ := Subtype.ext h
     rw [hy, hg, h]
-  · have hy : embF c τ (H.rt : E) = -(IntermediateField.inclusion c.le) (baseKA l).ρ := Subtype.ext h
+  · have hy : embF c τ (H.rt : E) = - (IntermediateField.inclusion c.le) (baseKA l).ρ :=
+      Subtype.ext h
     rw [hy, map_neg, hg, h]
 
 end ReciprocityTheory.ChartRestriction.G.PullbackSections.UH

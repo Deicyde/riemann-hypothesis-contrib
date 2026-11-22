@@ -5,7 +5,8 @@ public import GroundTheory.AutomorphicForms.MultiplicityOne.NormOne
 
 @[expose] public section
 
-open NumberField NumberField.mixedEmbedding MeasureTheory Topology Set Filter IsDedekindDomain Matrix
+open NumberField NumberField.mixedEmbedding MeasureTheory Topology Set Filter IsDedekindDomain
+  Matrix
 open scoped NumberField.AdeleRing
 
 namespace GroundTheory.Automorphic
@@ -20,11 +21,11 @@ section Columns
 
 variable {n : ℕ} {R : Type*} [CommRing R]
 
-def colShift {k j : ℕ} (hkj : k < j) (x : Fin k → R) (y : Fin j → R) : Fin j → R :=
-  fun i => if h : i.val < k then y ⟨k, hkj⟩ * x ⟨i.val, h⟩ else 0
+def colShift {k j : ℕ} (hkj : k < j) (x : Fin k → R) (y : Fin j → R) : Fin j → R := fun i =>
+  if h : i.val < k then y ⟨k, hkj⟩ * x ⟨i.val, h⟩ else 0
 
-theorem uN_colX_mul_uN_colX_of_lt {k j : ℕ} (hkj : k < j) (x : Fin k → R) (y : Fin j → R) :
-    uN (colX (n := n) k x) * uN (colX j y) = uN (colX j (colShift hkj x y)) := by
+theorem uN_colX_mul_uN_colX_of_lt {k j : ℕ} (hkj : k < j) (x : Fin k → R) (y : Fin j → R)
+    : uN (colX (n := n) k x) * uN (colX j y) = uN (colX j (colShift hkj x y)) := by
   ext a b
   rw [Matrix.mul_apply]
   by_cases hb : b.val = j
@@ -71,8 +72,8 @@ theorem uN_colX_mul_uN_colX_of_lt {k j : ℕ} (hkj : k < j) (x : Fin k → R) (y
     · rw [colX_apply, dite_eq_right hb]
     · rfl
 
-theorem colGL_mul_colGL_of_lt {k j : ℕ} (hkj : k < j) (x : Fin k → R) (y : Fin j → R) :
-    (colGL k x : GL (Fin n) R) * colGL j y = colGL j (y + colShift hkj x y) * colGL k x := by
+theorem colGL_mul_colGL_of_lt {k j : ℕ} (hkj : k < j) (x : Fin k → R) (y : Fin j → R)
+    : (colGL k x : GL (Fin n) R) * colGL j y = colGL j (y + colShift hkj x y) * colGL k x := by
   refine Units.ext ?_
   have hz : ∀ w : Fin j → R, uN (colX (n := n) j w) * uN (colX k x) = 0 := by
     intro w
@@ -81,9 +82,10 @@ theorem colGL_mul_colGL_of_lt {k j : ℕ} (hkj : k < j) (x : Fin k → R) (y : F
     mul_one, hz, uN_colX_mul_uN_colX_of_lt hkj, add_zero]
   abel
 
-theorem pair_lastVec_colShift {K : Type*} [Field K] [NumberField K] {k j : ℕ} (hkj : k < j)
-    (x : Fin k → 𝔸[K]) (y : Fin j → 𝔸[K]) :
-    pair (lastVec (K := K) j) (colShift hkj x y) = 0 := by
+theorem pair_lastVec_colShift
+    {K : Type*} [Field K] [NumberField K]
+    {k j : ℕ} (hkj : k < j) (x : Fin k → 𝔸[K]) (y : Fin j → 𝔸[K])
+    : pair (lastVec (K := K) j) (colShift hkj x y) = 0 := by
   refine Finset.sum_eq_zero fun i _ => ?_
   by_cases hi : i.val + 1 = j
   · rw [colShift, dite_eq_right (by omega), mul_zero]
@@ -93,10 +95,15 @@ end Columns
 
 variable {K : Type*} [Field K] [NumberField K] {n : ℕ}
 
-theorem partialCoeff_colGL_mul {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hl : IsLeftInvariant ϕ) :
-    ∀ (m k : ℕ), n - k = m → ∀ j, k ≤ j → j < n → ∀ (y : Fin j → 𝔸[K]) (g : AdelicGLn.AdelicGL K n),
-      partialCoeff ϕ k (colGL j y * g) =
-        (GroundTheory.Global.adelicChar K (pair (lastVec j) y) : ℂ) * partialCoeff ϕ k g := by
+theorem partialCoeff_colGL_mul {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hl : IsLeftInvariant ϕ)
+    : ∀ (m k : ℕ),
+      n - k = m
+        → ∀ j,
+          k ≤ j → j < n
+            → ∀ (y : Fin j → 𝔸[K]) (g : AdelicGLn.AdelicGL K n),
+              partialCoeff ϕ k (colGL j y * g)
+                = (GroundTheory.Global.adelicChar K (pair (lastVec j) y) : ℂ)
+                  * partialCoeff ϕ k g := by
   intro m
   induction m with
   | zero => intro k hk j hkj hj; omega
@@ -104,57 +111,75 @@ theorem partialCoeff_colGL_mul {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hl : IsLef
     intro k hkm j hkj hj y g
     have hk : k < n := by omega
     rw [partialCoeff_of_lt ϕ hk, stepCoeff, stepCoeff]
-    have hper : ∀ g', ∀ ξ ∈ vecLattice K (Fin k), ∀ x,
-        partialCoeff ϕ (k + 1) (colGL k (ξ + x) * g') = partialCoeff ϕ (k + 1) (colGL k x * g') := by
+    have hper
+        : ∀ g', ∀ ξ ∈ vecLattice K (Fin k), ∀ x,
+          partialCoeff ϕ (k + 1) (colGL k (ξ + x) * g')
+            = partialCoeff ϕ (k + 1) (colGL k x * g') := by
       intro g' ξ hξ x
       obtain ⟨η, rfl⟩ := mem_vecLattice.1 hξ
       rw [colGL_add, mul_assoc, ← diagonal_colGL, partialCoeff_succ_diagonal_colGL hl hk]
     rcases eq_or_lt_of_le hkj with rfl | hlt
-    · have e : (fun x : Fin k → 𝔸[K] => partialCoeff ϕ (k + 1) (colGL k x * (colGL k y * g))) =
-          fun x => partialCoeff ϕ (k + 1) (colGL k (x + y) * g) := by
+    · have e
+          : (fun x : Fin k → 𝔸[K] => partialCoeff ϕ (k + 1) (colGL k x * (colGL k y * g)))
+            = fun x => partialCoeff ϕ (k + 1) (colGL k (x + y) * g) := by
         funext x
         rw [colGL_add, mul_assoc]
       rw [e]
-      exact vecCoeff_translate (f := fun x => partialCoeff ϕ (k + 1) (colGL k x * g)) (hper g) y
-        (lastVec k)
-    · have e : (fun x : Fin k → 𝔸[K] => partialCoeff ϕ (k + 1) (colGL k x * (colGL j y * g))) =
-          fun x => (GroundTheory.Global.adelicChar K (pair (lastVec j) y) : ℂ) *
-            partialCoeff ϕ (k + 1) (colGL k x * g) := by
+      exact vecCoeff_translate
+        (f := fun x => partialCoeff ϕ (k + 1) (colGL k x * g))
+        (hper g) y (lastVec k)
+    · have e
+          : (fun x : Fin k → 𝔸[K] => partialCoeff ϕ (k + 1) (colGL k x * (colGL j y * g)))
+            = fun x =>
+              (GroundTheory.Global.adelicChar K (pair (lastVec j) y) : ℂ)
+                * partialCoeff ϕ (k + 1) (colGL k x * g) := by
         funext x
-        rw [← mul_assoc, colGL_mul_colGL_of_lt hlt, mul_assoc,
-          ih (k + 1) (by omega) j hlt hj, FourierWhittaker.pair_add, pair_lastVec_colShift, add_zero]
+        rw [← mul_assoc, colGL_mul_colGL_of_lt hlt, mul_assoc, ih (k + 1) (by omega) j hlt hj,
+          FourierWhittaker.pair_add, pair_lastVec_colShift, add_zero]
       rw [e]
       unfold vecCoeff
       simp_rw [mul_assoc]
       rw [integral_const_mul]
 
-theorem whittaker_colGL_mul {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hc : Continuous ϕ)
-    (hl : IsLeftInvariant ϕ) {j : ℕ} (hj : j < n) (y : Fin j → 𝔸[K]) (g : AdelicGLn.AdelicGL K n) :
-    whittaker ϕ (colGL j y * g) =
-      (GroundTheory.Global.adelicChar K (pair (lastVec j) y) : ℂ) * whittaker ϕ g := by
+theorem whittaker_colGL_mul
+    {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hc : Continuous ϕ) (hl : IsLeftInvariant ϕ)
+    {j : ℕ} (hj : j < n) (y : Fin j → 𝔸[K])
+    (g : AdelicGLn.AdelicGL K n)
+    : whittaker ϕ (colGL j y * g)
+      = (GroundTheory.Global.adelicChar K (pair (lastVec j) y) : ℂ) * whittaker ϕ g := by
   rw [whittaker_eq_partialCoeff_zero hc, whittaker_eq_partialCoeff_zero hc]
   exact partialCoeff_colGL_mul hl _ 0 rfl j (Nat.zero_le j) hj y g
 
-theorem supSum_zero_eq_of_vanish {m : ℕ} {X : Pos n → 𝔸[K]}
-    (hX : ∀ p : Pos n, p.1.2.val < m → X p = 0) : supSum 0 X = supSum m X := by
+theorem supSum_zero_eq_of_vanish
+    {m : ℕ} {X : Pos n → 𝔸[K]} (hX : ∀ p : Pos n, p.1.2.val < m → X p = 0)
+    : supSum 0 X = supSum m X := by
   classical
   unfold supSum
   rw [← Finset.sum_filter_add_sum_filter_not
     (Finset.univ.filter (fun p : Pos n => p.1.2.val = p.1.1.val + 1 ∧ 0 ≤ p.1.2.val))
     (fun p : Pos n => m ≤ p.1.2.val)]
-  rw [Finset.sum_eq_zero (s := Finset.filter (fun p : Pos n => ¬ m ≤ p.1.2.val) _)
-    fun p hp => hX p (by simp only [Finset.mem_filter] at hp; omega), add_zero]
+  rw [Finset.sum_eq_zero (s := Finset.filter (fun p : Pos n => ¬ m ≤ p.1.2.val) _) fun p hp =>
+      hX p (by simp only [Finset.mem_filter] at hp; omega),
+    add_zero]
   congr 1
   ext p
   simp only [Finset.mem_filter, Finset.mem_univ, true_and]
   omega
 
-theorem whittaker_uGL_mul {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hc : Continuous ϕ)
-    (hl : IsLeftInvariant ϕ) (X : Pos n → 𝔸[K]) (g : AdelicGLn.AdelicGL K n) :
-    whittaker ϕ (uGL X * g) = (GroundTheory.Global.adelicChar K (supSum 0 X) : ℂ) * whittaker ϕ g := by
+theorem whittaker_uGL_mul
+    {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hc : Continuous ϕ) (hl : IsLeftInvariant ϕ)
+    (X : Pos n → 𝔸[K]) (g : AdelicGLn.AdelicGL K n)
+    : whittaker ϕ (uGL X * g)
+      = (GroundTheory.Global.adelicChar K (supSum 0 X) : ℂ) * whittaker ϕ g := by
   classical
-  suffices H : ∀ (d m : ℕ), n - m = d → ∀ X : Pos n → 𝔸[K], (∀ p : Pos n, p.1.2.val < m → X p = 0) →
-      ∀ g, whittaker ϕ (uGL X * g) = (GroundTheory.Global.adelicChar K (supSum 0 X) : ℂ) * whittaker ϕ g from
+  suffices H
+      : ∀ (d m : ℕ),
+        n - m = d
+          → ∀ X : Pos n → 𝔸[K],
+            (∀ p : Pos n, p.1.2.val < m → X p = 0)
+              → ∀ g,
+                whittaker ϕ (uGL X * g)
+                  = (GroundTheory.Global.adelicChar K (supSum 0 X) : ℂ) * whittaker ϕ g from
     H n 0 (Nat.sub_zero n) X (fun p hp => absurd hp (Nat.not_lt_zero _)) g
   intro d
   induction d with
@@ -195,7 +220,8 @@ theorem whittaker_uGL_mul {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hc : Continuous
         uMat_mul_uMat_colX (fun p hp => hX' p (by omega)) c, ← hsplit]
     have hs : supSum 0 X = supSum 0 X' + pair (lastVec m) c := by
       rw [hsplit, supSum_add, ← supSum_colX m hmn c,
-        ← supSum_zero_eq_of_vanish (m := m) (X := colX m c) fun p hp => colX_le m c p (Or.inl (by omega))]
+        ← supSum_zero_eq_of_vanish (m := m) (X := colX m c) fun p hp =>
+          colX_le m c p (Or.inl (by omega))]
     rw [hu, mul_assoc, ih (m + 1) (by omega) X' hX', whittaker_colGL_mul hc hl hmn, hs,
       AddChar.map_add_eq_mul, Circle.coe_mul, mul_assoc]
 

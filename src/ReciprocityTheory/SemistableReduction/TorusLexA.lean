@@ -6,8 +6,9 @@ public import ReciprocityTheory.SemistableReduction.SphereLogIntegrableStatement
 
 namespace ReciprocityTheory.MultiplicativeHeights.TorusLexOrder
 
-private theorem erase_eq_and_apply_eq_iff_eq_add_single {ι : Type} (i : ι) (k : ℕ) (s u : ι →₀ ℕ) (hu : u i = 0) :
-    (s.erase i = u ∧ s i = k) ↔ s = u + Finsupp.single i k := by
+private theorem erase_eq_and_apply_eq_iff_eq_add_single
+    {ι : Type} (i : ι) (k : ℕ) (s u : ι →₀ ℕ) (hu : u i = 0)
+    : (s.erase i = u ∧ s i = k) ↔ s = u + Finsupp.single i k := by
   classical
   constructor
   · rintro ⟨h1, h2⟩
@@ -26,8 +27,8 @@ private theorem erase_eq_and_apply_eq_iff_eq_add_single {ι : Type} (i : ι) (k 
       simp [hu]
     · simp [Finsupp.erase_ne hj]
 
-theorem coeff_coeffIn {ι : Type} (i : ι) (k : ℕ) (f : MvPolynomial ι ℂ) (u : ι →₀ ℕ) :
-    (coeffIn i k f).coeff u = if u i = 0 then f.coeff (u + Finsupp.single i k) else 0 := by
+theorem coeff_coeffIn {ι : Type} (i : ι) (k : ℕ) (f : MvPolynomial ι ℂ) (u : ι →₀ ℕ)
+    : (coeffIn i k f).coeff u = if u i = 0 then f.coeff (u + Finsupp.single i k) else 0 := by
   classical
   unfold coeffIn
   rw [MvPolynomial.coeff_sum]
@@ -39,7 +40,8 @@ theorem coeff_coeffIn {ι : Type} (i : ι) (k : ℕ) (f : MvPolynomial ι ℂ) (
     · intro t ht hne
       rw [if_neg]
       intro hte
-      exact hne ((erase_eq_and_apply_eq_iff_eq_add_single i k t u hu).mp ⟨hte, (Finset.mem_filter.mp ht).2⟩)
+      exact hne ((erase_eq_and_apply_eq_iff_eq_add_single i k t u hu).mp
+        ⟨hte, (Finset.mem_filter.mp ht).2⟩)
     · intro hnot
       rw [if_pos hsp.1]
       by_contra hc
@@ -50,9 +52,10 @@ theorem coeff_coeffIn {ι : Type} (i : ι) (k : ℕ) (f : MvPolynomial ι ℂ) (
     rintro rfl
     exact hu (by simp)
 
-private theorem apply_eq_zero_and_add_single_mem_support_of_coeffIn {ι : Type} (i : ι) (k : ℕ) (f : MvPolynomial ι ℂ)
-    (u : ι →₀ ℕ) (hu : u ∈ (coeffIn i k f).support) :
-    u i = 0 ∧ u + Finsupp.single i k ∈ f.support := by
+private theorem apply_eq_zero_and_add_single_mem_support_of_coeffIn
+    {ι : Type} (i : ι)
+    (k : ℕ) (f : MvPolynomial ι ℂ) (u : ι →₀ ℕ) (hu : u ∈ (coeffIn i k f).support)
+    : u i = 0 ∧ u + Finsupp.single i k ∈ f.support := by
   rw [MvPolynomial.mem_support_iff, coeff_coeffIn] at hu
   by_cases h : u i = 0
   · rw [if_pos h] at hu
@@ -60,9 +63,12 @@ private theorem apply_eq_zero_and_add_single_mem_support_of_coeffIn {ι : Type} 
   · rw [if_neg h] at hu
     exact absurd rfl hu
 
-private theorem eq_monomial_of_vars_eq_empty {ι : Type} [LinearOrder ι] (g : MvPolynomial ι ℂ)
-    (s : ι →₀ ℕ) (hmin : ∀ t ∈ g.support, t ≠ s → ∃ i, (∀ j < i, s j = t j) ∧ s i < t i)
-    (hv : g.vars = ∅) : g = MvPolynomial.monomial s (g.coeff s) := by
+private theorem eq_monomial_of_vars_eq_empty
+    {ι : Type} [LinearOrder ι]
+    (g : MvPolynomial ι ℂ) (s : ι →₀ ℕ)
+    (hmin : ∀ t ∈ g.support, t ≠ s → ∃ i, (∀ j < i, s j = t j) ∧ s i < t i)
+    (hv : g.vars = ∅)
+    : g = MvPolynomial.monomial s (g.coeff s) := by
   classical
   ext u
   rw [MvPolynomial.coeff_monomial]
@@ -70,27 +76,34 @@ private theorem eq_monomial_of_vars_eq_empty {ι : Type} [LinearOrder ι] (g : M
   · rw [h]
   · by_contra hc
     obtain ⟨i, -, hi⟩ := hmin u (MvPolynomial.mem_support_iff.mpr hc) (Ne.symm h)
-    have hmem : i ∈ g.vars := (MvPolynomial.mem_vars_iff_mem_support i).mpr
-      ⟨u, MvPolynomial.mem_support_iff.mpr hc,
-        Finsupp.mem_support_iff.mpr ((Nat.zero_le _).trans_lt hi).ne'⟩
+    have hmem : i ∈ g.vars :=
+      (MvPolynomial.mem_vars_iff_mem_support i).mpr ⟨
+        u,
+        MvPolynomial.mem_support_iff.mpr hc,
+        Finsupp.mem_support_iff.mpr ((Nat.zero_le _).trans_lt hi).ne'
+      ⟩
     rw [hv] at hmem
     simp at hmem
 
-theorem torusLex_of (hBasic : TorusMeanBasicStatement) (hCoeff : TorusCoeffStatement) :
-    TorusLexStatement := by
+theorem torusLex_of (hBasic : TorusMeanBasicStatement) (hCoeff : TorusCoeffStatement)
+    : TorusLexStatement := by
   unfold ReciprocityTheory.MultiplicativeHeights.TorusLexStatement
   intro ι _ _ f s hs hmin
-  have base : ∀ (g : MvPolynomial ι ℂ) (s : ι →₀ ℕ),
-      (∀ t ∈ g.support, t ≠ s → ∃ i, (∀ j < i, s j = t j) ∧ s i < t i) → g.vars = ∅ →
-      Real.log ‖g.coeff s‖ ≤ ReciprocityTheory.MultiplicativeHeights.torusMean g := by
+  have base
+      : ∀ (g : MvPolynomial ι ℂ) (s : ι →₀ ℕ),
+        (∀ t ∈ g.support, t ≠ s → ∃ i, (∀ j < i, s j = t j) ∧ s i < t i) → g.vars = ∅
+          → Real.log ‖g.coeff s‖ ≤ ReciprocityTheory.MultiplicativeHeights.torusMean g := by
     intro g s hmin hv
     have hg := eq_monomial_of_vars_eq_empty g s hmin hv
     have h1 : ReciprocityTheory.MultiplicativeHeights.torusMean g = Real.log ‖g.coeff s‖ :=
       (congrArg ReciprocityTheory.MultiplicativeHeights.torusMean hg).trans ((hBasic ι).2.2 s _)
     exact h1.ge
-  suffices key : ∀ n : ℕ, ∀ (g : MvPolynomial ι ℂ) (s : ι →₀ ℕ), g.vars.card ≤ n →
-      s ∈ g.support → (∀ t ∈ g.support, t ≠ s → ∃ i, (∀ j < i, s j = t j) ∧ s i < t i) →
-      Real.log ‖g.coeff s‖ ≤ ReciprocityTheory.MultiplicativeHeights.torusMean g from key _ f s le_rfl hs hmin
+  suffices key
+      : ∀ n : ℕ, ∀ (g : MvPolynomial ι ℂ) (s : ι →₀ ℕ),
+        g.vars.card ≤ n → s ∈ g.support
+          → (∀ t ∈ g.support, t ≠ s → ∃ i, (∀ j < i, s j = t j) ∧ s i < t i)
+          → Real.log ‖g.coeff s‖ ≤ ReciprocityTheory.MultiplicativeHeights.torusMean g from
+    key _ f s le_rfl hs hmin
   intro n
   induction n with
   | zero =>
@@ -108,8 +121,9 @@ theorem torusLex_of (hBasic : TorusMeanBasicStatement) (hCoeff : TorusCoeffState
       by_cases hts : t = s
       · rw [hts]
       · obtain ⟨i', hpre, hlt⟩ := hmin t ht hts
-        have hi'v : i' ∈ g.vars := (MvPolynomial.mem_vars_iff_mem_support i').mpr
-          ⟨t, ht, Finsupp.mem_support_iff.mpr ((Nat.zero_le _).trans_lt hlt).ne'⟩
+        have hi'v : i' ∈ g.vars :=
+          (MvPolynomial.mem_vars_iff_mem_support i').mpr
+            ⟨t, ht, Finsupp.mem_support_iff.mpr ((Nat.zero_le _).trans_lt hlt).ne'⟩
         rcases (himin i' hi'v).lt_or_eq with h | h
         · exact (hpre i h).le
         · rw [h]
@@ -134,11 +148,14 @@ theorem torusLex_of (hBasic : TorusMeanBasicStatement) (hCoeff : TorusCoeffState
       intro t ht
       obtain ⟨ht1, ht2⟩ := Finset.mem_filter.mp ht
       exact absurd (hlow t ht1) (by omega)
-    have hmin' : ∀ t' ∈ (coeffIn i (s i) g).support, t' ≠ s.erase i →
-        ∃ j, (∀ l < j, (s.erase i) l = t' l) ∧ (s.erase i) j < t' j := by
+    have hmin'
+        : ∀ t' ∈ (coeffIn i (s i) g).support,
+          t' ≠ s.erase i → ∃ j, (∀ l < j, (s.erase i) l = t' l) ∧ (s.erase i) j < t' j := by
       intro t' ht' hne2
       obtain ⟨ht0, ht⟩ := apply_eq_zero_and_add_single_mem_support_of_coeffIn i (s i) g t' ht'
-      have hsp := (erase_eq_and_apply_eq_iff_eq_add_single i (s i) (t' + Finsupp.single i (s i)) t' ht0).mpr rfl
+      have hsp :=
+        (erase_eq_and_apply_eq_iff_eq_add_single i (s i) (t' + Finsupp.single i (s i)) t' ht0).mpr
+          rfl
       have hts : t' + Finsupp.single i (s i) ≠ s := by
         intro h
         apply hne2
@@ -171,8 +188,12 @@ theorem torusLex_of (hBasic : TorusMeanBasicStatement) (hCoeff : TorusCoeffState
       have h1 := Finset.card_le_card hvars
       rw [Finset.card_erase_of_mem hiv] at h1
       omega
-    calc Real.log ‖g.coeff s‖ = Real.log ‖(coeffIn i (s i) g).coeff (s.erase i)‖ := by rw [hcoef]
-      _ ≤ ReciprocityTheory.MultiplicativeHeights.torusMean (coeffIn i (s i) g) := ih _ _ hcard' hs' hmin'
-      _ ≤ ReciprocityTheory.MultiplicativeHeights.torusMean g := hCoeff ι g i (s i) hne' (Or.inr hvan)
+    calc
+      Real.log ‖g.coeff s‖
+        = Real.log ‖(coeffIn i (s i) g).coeff (s.erase i)‖ := by rw [hcoef]
+      _ ≤ ReciprocityTheory.MultiplicativeHeights.torusMean (coeffIn i (s i) g) :=
+        ih _ _ hcard' hs' hmin'
+      _ ≤ ReciprocityTheory.MultiplicativeHeights.torusMean g :=
+        hCoeff ι g i (s i) hne' (Or.inr hvan)
 
 end ReciprocityTheory.MultiplicativeHeights.TorusLexOrder

@@ -11,6 +11,7 @@ public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.FormallyUnra
 namespace GlobalTheory
 
 theorem torusAlgebraic_holds : TorusAlgebraic :=
-  torusAlgebraic_of_sections_of_veryAmple ThetaBundleSec.sections_pow_eq_thetaLevelChar thetaBundle_veryAmpleAt
+  torusAlgebraic_of_sections_of_veryAmple ThetaBundleSec.sections_pow_eq_thetaLevelChar
+    thetaBundle_veryAmpleAt
 
 end GlobalTheory

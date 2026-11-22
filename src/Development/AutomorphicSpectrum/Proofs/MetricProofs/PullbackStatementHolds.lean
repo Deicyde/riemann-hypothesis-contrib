@@ -10,7 +10,8 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RegularFamilyC
 
 @[expose] public section
 
-open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
+open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
@@ -19,17 +20,19 @@ section PullTop
 
 variable {e : ℕ} {X : Type} [TopologicalSpace X]
 
-theorem isPsh_of_phi_eq {A : FinHolAtlas e X} {P Q : LocPot X} (hQ : IsPotential A Q)
-    (hφ : P.φ = Q.φ) (hP : IsPsh A P) : IsPsh A Q := by
+theorem isPsh_of_phi_eq
+    {A : FinHolAtlas e X} {P Q : LocPot X} (hQ : IsPotential A Q) (hφ : P.φ = Q.φ) (hP : IsPsh A P)
+    : IsPsh A Q := by
   intro x j y hy w
   obtain ⟨W, hW, hzW, G, hG, hGe⟩ :=
     hQ.2 x ((A.chart j).symm y) ((A.chart j).symm y) ⟨hy.2, Q.mem_U _⟩
   have hGa : AnalyticAt ℂ (G ∘ (A.chart j).symm) y := hG j y ⟨hy.1, hzW⟩
-  have ho : IsOpen ((A.chart j).target ∩
-      (A.chart j).symm ⁻¹' (W ∩ Q.U x ∩ Q.U ((A.chart j).symm y))) :=
+  have ho
+      : IsOpen ((A.chart j).target ∩ (A.chart j).symm ⁻¹' (W ∩ Q.U x ∩ Q.U ((A.chart j).symm y))) :=
     (A.chart j).isOpen_inter_preimage_symm ((hW.inter (Q.isOpen_U x)).inter (Q.isOpen_U _))
-  have hev : (Q.φ x ∘ (A.chart j).symm) =ᶠ[𝓝 y] fun v =>
-      (Q.φ ((A.chart j).symm y) ∘ (A.chart j).symm) v + 1 * ((G ∘ (A.chart j).symm) v).re := by
+  have hev
+      : (Q.φ x ∘ (A.chart j).symm) =ᶠ[𝓝 y] fun v =>
+        (Q.φ ((A.chart j).symm y) ∘ (A.chart j).symm) v + 1 * ((G ∘ (A.chart j).symm) v).re := by
     filter_upwards [ho.mem_nhds ⟨hy.1, ⟨hzW, hy.2⟩, Q.mem_U _⟩] with v hv
     have := hGe _ hv.2
     simp only [Function.comp_apply]
@@ -51,13 +54,14 @@ end GlobalTheory.CompanionTheory.Ar.Giv
 namespace GlobalTheory.CompanionTheory.Ar.Giv
 
 theorem pullbackStatement : PullbackStatement := by
-  intro e e' X X' _ _ _ _ _ _ A A' h hh Θ L Θ' s n n' m W m' W' hΘ hΘp hΘ' hΘ'p hL hs hsnc hs0
-    hsnc' th ph phT C₅ C t₀ hSW hF hC2
+  intro e e' X X' _ _ _ _ _ _ A A' h hh Θ L Θ' s n n' m W m' W' hΘ hΘp hΘ' hΘ'p hL hs hsnc hs0 hsnc'
+    th ph phT C₅ C t₀ hSW hF hC2
   obtain ⟨hth, hSm, hPshOn, hbd⟩ := hSW
   have hΘpsh : IsPsh A Θ := TailBoundAlt.isPsh_of_isPosPot A Θ hΘp
   have hΘ'psh : IsPsh A' Θ' := TailBoundAlt.isPsh_of_isPosPot A' Θ' hΘ'p
   have hΘpb : IsPotential A' (Θ.pullback h hh.1) := isPotentialPullback A A' h hh Θ hΘ
-  obtain ⟨K, hK0, -, hKpsh⟩ := TailBoundAlt.exists_psh_chern_bound A' Θ' (Θ.pullback h hh.1) hΘ' hΘ'p hΘpb
+  obtain ⟨K, hK0, -, hKpsh⟩ :=
+    TailBoundAlt.exists_psh_chern_bound A' Θ' (Θ.pullback h hh.1) hΘ' hΘ'p hΘpb
   have ht₀ : 0 < t₀ := hF.1
   have hU : IsOpen (bdry s)ᶜ := (LeviFormBoundaryTopology.isClosed_bdry hs).isOpen_compl
   set M : ℝ := max 1 K with hM
@@ -67,9 +71,10 @@ theorem pullbackStatement : PullbackStatement := by
   set t₁ : ℝ := min t₀ (Real.exp (-Real.exp 1)) with ht₁
   have ht₁0 : 0 < t₁ := lt_min ht₀ (Real.exp_pos _)
   have ht₁t₀ : t₁ ≤ t₀ := min_le_left _ _
-  have ht₁e : t₁ ≤ Real.exp (-Real.exp 1) := min_le_right _ _
+  have ht₁e : t₁ ≤ Real.exp (- Real.exp 1) := min_le_right _ _
   have hCC' : |C| ≤ C' := le_mul_of_one_le_right (abs_nonneg C) hM1
-  have F1 := isRegFamily_mono A Θ L s th ph phT C t₀ |C| t₁ hΘ hΘpsh hth hs0 hF le_rfl ht₁0 ht₁t₀ ht₁e
+  have F1 :=
+    isRegFamily_mono A Θ L s th ph phT C t₀ |C| t₁ hΘ hΘpsh hth hs0 hF le_rfl ht₁0 ht₁t₀ ht₁e
   have F2 := isRegFamily_mono A Θ L s th ph phT C t₀ C' t₁ hΘ hΘpsh hth hs0 hF hCC' ht₁0 ht₁t₀ ht₁e
   refine ⟨C', t₁, ⟨isPotentialPullback A A' h hh th hth, ?_, ?_, fun y hy => hbd (h y) hy⟩, ?_, ?_⟩
   · have := smoothOn_pull hh hU hSm
@@ -84,16 +89,21 @@ theorem pullbackStatement : PullbackStatement := by
     have hsm : A'.Smooth (phT t ∘ h) := by
       have := smoothOn_pull hh isOpen_univ a1
       rwa [Set.preimage_univ] at this
-    refine ⟨hsm, fun y => a2 (h y), fun y hy => a3 (h y) hy, fun y => a4 (h y), ?_,
-      fun y hy hyr => a6 (h y) hy hyr, fun y hy => a7 (h y) hy,
-      fun t' h1 h2 y => a8 t' h1 h2 (h y)⟩
+    refine ⟨
+      hsm,
+      fun y => a2 (h y),
+      fun y hy => a3 (h y) hy,
+      fun y => a4 (h y),
+      ?_,
+      fun y hy hyr => a6 (h y) hy hyr,
+      fun y hy => a7 (h y) hy,
+      fun t' h1 h2 y => a8 t' h1 h2 (h y)
+    ⟩
 
     set ε : ℝ := epsT |C| t with hε
     have hq := loglog_quot_nonneg ht (htt.trans ht₁e)
-    have hε0 : 0 ≤ ε := by
-      rw [hε, epsT_eq_mul]; exact mul_nonneg (abs_nonneg C) hq
-    have hε' : epsT C' t = M * ε := by
-      rw [hε, epsT, epsT, hC']; ring
+    have hε0 : 0 ≤ ε := by rw [hε, epsT_eq_mul]; exact mul_nonneg (abs_nonneg C) hq
+    have hε' : epsT C' t = M * ε := by rw [hε, epsT, epsT, hC']; ring
     have hεK : 0 ≤ M * ε - K * ε := by nlinarith
     have hP0 : IsPotential A (th + LocPot.ofFun (phT t) + Θ.rsmul ε) :=
       isPotentialAdd A _ _ (isPotentialAdd A _ _ hth (isPotential_ofFun A _ b1))
@@ -106,11 +116,13 @@ theorem pullbackStatement : PullbackStatement := by
     have hS2p := isPshRsmul A' ε _ hε0 hD hKpsh
     have hS3 := isPotentialRsmul A' (M * ε - K * ε) Θ' hΘ'
     have hS3p := isPshRsmul A' (M * ε - K * ε) Θ' hεK hΘ' hΘ'psh
-    have hS := isPshAdd A' _ _ (isPotentialAdd A' _ _ hS1 hS2) hS3
-      (isPshAdd A' _ _ hS1 hS2 hS1p hS2p) hS3p
-    have hT : IsPotential A' (th.pullback h hh.1 + LocPot.ofFun (phT t ∘ h) + Θ'.rsmul (epsT C' t)) :=
-      isPotentialAdd A' _ _ (isPotentialAdd A' _ _ (isPotentialPullback A A' h hh th hth)
-        (isPotential_ofFun A' _ hsm)) (isPotentialRsmul A' _ Θ' hΘ')
+    have hS :=
+      isPshAdd A' _ _ (isPotentialAdd A' _ _ hS1 hS2) hS3 (isPshAdd A' _ _ hS1 hS2 hS1p hS2p) hS3p
+    have hT
+        : IsPotential A' (th.pullback h hh.1 + LocPot.ofFun (phT t ∘ h) + Θ'.rsmul (epsT C' t)) :=
+      isPotentialAdd A' _ _
+        (isPotentialAdd A' _ _ (isPotentialPullback A A' h hh th hth) (isPotential_ofFun A' _ hsm))
+        (isPotentialRsmul A' _ Θ' hΘ')
     refine isPsh_of_phi_eq hT ?_ hS
     funext x y
     show th.φ (h x) (h y) + phT t (h y) + ε * Θ.φ (h x) (h y) +

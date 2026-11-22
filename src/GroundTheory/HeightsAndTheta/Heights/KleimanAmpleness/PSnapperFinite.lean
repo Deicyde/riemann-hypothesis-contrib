@@ -19,14 +19,16 @@ noncomputable section
 
 universe u v w
 
-theorem SnapperFinite.proof (hE : Extension.Statement.{u, v, w}) (hEL : Extension.Statement.{u, w, w})
+theorem SnapperFinite.proof
+    (hE : Extension.Statement.{u, v, w}) (hEL : Extension.Statement.{u, w, w})
     (hT : TwistTilde.Statement.{u, v, w}) (hTL : TwistTilde.Statement.{u, w, w})
-    (hS : TildeShift.Statement.{u, v, w}) (hF : TildeFiniteE.Statement.{u, v, w}) :
-    SnapperFinite.Statement.{u, v, w} := by
+    (hS : TildeShift.Statement.{u, v, w}) (hF : TildeFiniteE.Statement.{u, v, w})
+    : SnapperFinite.Statement.{u, v, w} := by
   intro k _ Ω _ _ N x E _ _ _ _ F hF0 t L n c i
 
-  have hpow : ∀ (Lb : LineBundle k x) (m : ℕ), ∃ Q : FinGradedSub (S := k) (x := x) Ω,
-      Lb.toSubSystem.pow m = Q.tildeSys 0 := by
+  have hpow
+      : ∀ (Lb : LineBundle k x) (m : ℕ), ∃ Q : FinGradedSub (S := k) (x := x) Ω,
+        Lb.toSubSystem.pow m = Q.tildeSys 0 := by
     intro Lb m
     induction m with
     | zero =>
@@ -43,9 +45,10 @@ theorem SnapperFinite.proof (hE : Extension.Statement.{u, v, w}) (hEL : Extensio
       rw [hQ, hL]
       exact SubSystem.ext_sub hP
 
-  have hpows : ∀ (t : ℕ) (L : Fin t → LineBundle k x) (n : Fin t → ℕ),
-      ∃ P : FinGradedSub (S := k) (x := x) E,
-        F.toSubSystem.twistPows t (fun j => (L j).toSubSystem) n = P.tildeSys 0 := by
+  have hpows
+      : ∀ (t : ℕ) (L : Fin t → LineBundle k x) (n : Fin t → ℕ),
+        ∃ P : FinGradedSub (S := k) (x := x) E,
+          F.toSubSystem.twistPows t (fun j => (L j).toSubSystem) n = P.tildeSys 0 := by
     intro t
     induction t with
     | zero =>
@@ -58,8 +61,10 @@ theorem SnapperFinite.proof (hE : Extension.Statement.{u, v, w}) (hEL : Extensio
       obtain ⟨Q, hQ⟩ := hpow (L (Fin.last t)) (n (Fin.last t))
       obtain ⟨P', -, hP'⟩ := hT k Ω N x E P Q
       refine ⟨P', ?_⟩
-      change (F.toSubSystem.twistPows t (fun j => (L j.castSucc).toSubSystem)
-        (fun j => n j.castSucc)).twist ((L (Fin.last t)).toSubSystem.pow (n (Fin.last t))) = _
+      change (F.toSubSystem.twistPows t
+          (fun j => (L j.castSucc).toSubSystem)
+          (fun j => n j.castSucc)).twist ((L (Fin.last t)).toSubSystem.pow (n (Fin.last t)))
+        = _
       rw [hP, hQ]
       exact SubSystem.ext_sub hP'
   obtain ⟨P, hP⟩ := hpows t L n

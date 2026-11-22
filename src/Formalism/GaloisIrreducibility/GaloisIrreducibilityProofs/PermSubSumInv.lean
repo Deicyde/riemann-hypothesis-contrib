@@ -121,8 +121,10 @@ lemma exists_le_map {β γ : Type*} (f : β → γ) (m : Multiset β) :
 end SubsetSumInvariance
 
 open SubsetSumInvariance in
-theorem exists_invariant_of_isSubSum {α : Type} [Fintype α] [DecidableEq α] (σ : Equiv.Perm α) (a : ℕ)
-    (h : IsSubSum σ.partition.parts a) : ∃ A : Finset α, (∀ x ∈ A, σ x ∈ A) ∧ A.card = a := by
+theorem exists_invariant_of_isSubSum
+    {α : Type} [Fintype α] [DecidableEq α]
+    (σ : Equiv.Perm α) (a : ℕ) (h : IsSubSum σ.partition.parts a)
+    : ∃ A : Finset α, (∀ x ∈ A, σ x ∈ A) ∧ A.card = a := by
   obtain ⟨s, hs, hsum⟩ := h
   rw [← orbs_parts] at hs
   obtain ⟨t, ht, htf⟩ := exists_le_map Finset.card _ s hs

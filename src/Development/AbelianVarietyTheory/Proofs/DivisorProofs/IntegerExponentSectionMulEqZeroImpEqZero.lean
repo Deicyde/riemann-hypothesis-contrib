@@ -10,9 +10,11 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.MemLevEigenI
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
+  GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
 open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW secZ ptF LiesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.CompHt (hodgeWt)
@@ -27,7 +29,12 @@ namespace GlobalTheory.SecRingNonZeroDiv
 
 open GlobalTheory.CompHt GlobalTheory.FlagTan
 
-theorem eq_zero_of_mul_eq_zero : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (e : Ix Dw → ℤ) (F : Rul Xo c), F ∈ secZ Xo c e → (∀ Z : Comp Xo c, ∃ y : FrPt Xo c ℂ, LiesOn Z y ∧ evR Xo c F y ≠ 0) → ∀ f ∈ secRing Xo c, F * f = 0 → f = 0 := by
+theorem eq_zero_of_mul_eq_zero
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (e : Ix Dw → ℤ) (F : Rul Xo c),
+      F ∈ secZ Xo c e → (∀ Z : Comp Xo c, ∃ y : FrPt Xo c ℂ, LiesOn Z y ∧ evR Xo c F y ≠ 0)
+        → ∀ f ∈ secRing Xo c, F * f = 0 → f = 0 := by
   intro E _ _ _ H Dw l Xo c e F hF hZ f hf hFf
   classical
   have hG : GenFrEx Xo c := (Reg.genFrEx_and_genFromTest E H Dw l Xo c).1
@@ -40,10 +47,11 @@ theorem eq_zero_of_mul_eq_zero : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
   have key : ∀ Z : Comp Xo c, ∀ d ∈ a.support, genVal Z (a d) = 0 := by
     intro Z
     haveI : CharZero (Om Z) := charZero_of_injective_algebraMap (algebraMap c.F (Om Z)).injective
-    let χ : (Ix Dw → ℤ) → ((Ix Dw → (Om Z)ˣ) →* Om Z) := fun d =>
-      { toFun := fun t => ((∏ i, t i ^ d i : (Om Z)ˣ) : Om Z)
-        map_one' := by simp
-        map_mul' := fun t s => by simp [mul_zpow, Finset.prod_mul_distrib] }
+    let χ : (Ix Dw → ℤ) → ((Ix Dw → (Om Z)ˣ) →* Om Z) := fun d => {
+      toFun := fun t => ((∏ i, t i ^ d i : (Om Z)ˣ) : Om Z)
+      map_one' := by simp
+      map_mul' := fun t s => by simp [mul_zpow, Finset.prod_mul_distrib]
+    }
     have hχ : Function.Injective χ := by
       intro d d' hdd
       funext i
@@ -56,8 +64,7 @@ theorem eq_zero_of_mul_eq_zero : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
         · intro j _ hj
           simp [Pi.mulSingle_eq_of_ne hj]
         · simp
-      have h1 : (2 : Om Z) ^ d i = (2 : Om Z) ^ d' i := by
-        rw [← hp, ← hp, hdd]
+      have h1 : (2 : Om Z) ^ d i = (2 : Om Z) ^ d' i := by rw [← hp, ← hp, hdd]
       have h2 : (((2 : ℚ) ^ d i : ℚ) : Om Z) = (((2 : ℚ) ^ d' i : ℚ) : Om Z) := by
         rw [Rat.cast_zpow, Rat.cast_zpow, Rat.cast_ofNat]; exact h1
       exact zpow_right_injective₀ (by norm_num : (0 : ℚ) < 2) (by norm_num) (Rat.cast_injective h2)
@@ -67,12 +74,15 @@ theorem eq_zero_of_mul_eq_zero : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
       funext t
       obtain ⟨y', hy'⟩ := SecSeparation.exists_frBor (genFr hG Z) t
       have h1 : evR Xo c (F * a.sum fun _ x => x) y' = 0 := by rw [hFf]; exact evalAt_zero _ _ y'
-      have h2 : evR Xo c (F * a.sum fun _ x => x) y' = evR Xo c F y' * evR Xo c (a.sum fun _ x => x) y' :=
+      have h2
+          : evR Xo c (F * a.sum fun _ x => x) y'
+            = evR Xo c F y' * evR Xo c (a.sum fun _ x => x) y' :=
         evalAt_mul _ _ _ _ y'
       have h3 : evR Xo c F y' ≠ 0 := by
         rw [evR_frBor hF hy']
         exact mul_ne_zero (Units.ne_zero _) (hFZ Z)
-      have h4 : evR Xo c (a.sum fun _ x => x) y' = 0 := (mul_eq_zero.1 (h2.symm.trans h1)).resolve_left h3
+      have h4 : evR Xo c (a.sum fun _ x => x) y' = 0 :=
+        (mul_eq_zero.1 (h2.symm.trans h1)).resolve_left h3
       have h5 : evR Xo c (a.sum fun _ x => x) y' = ∑ d ∈ a.support, evR Xo c (a d) y' :=
         map_sum (evalL (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) y') _ _
       rw [h5] at h4

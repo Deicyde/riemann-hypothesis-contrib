@@ -44,9 +44,11 @@ theorem gaugeF_ne {c : Fin r → ℂ} (hc : c ∈ OmX r) : gaugeF k r c ≠ 0 :=
   exact Finset.prod_ne_zero_iff.mpr fun a _ =>
     Complex.ofReal_ne_zero.mpr (pow_ne_zero _ (norm_ne_zero_iff.mpr (hc a)))
 
-theorem fderiv_zero_of_const {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F] {h : (Fin r → ℂ) → F}
-    {x v : Fin r → ℂ} (hd : DifferentiableAt ℝ h x) (hc : ∀ t : ℝ, h (x + t • v) = h x) :
-    fderiv ℝ h x v = 0 := by
+theorem fderiv_zero_of_const
+    {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F]
+    {h : (Fin r → ℂ) → F} {x v : Fin r → ℂ}
+    (hd : DifferentiableAt ℝ h x) (hc : ∀ t : ℝ, h (x + t • v) = h x)
+    : fderiv ℝ h x v = 0 := by
   have hf : HasDerivAt (fun t : ℝ => x + t • v) v 0 := by
     simpa using ((hasDerivAt_id (0 : ℝ)).smul_const v).const_add x
   have h1 : HasDerivAt (fun t : ℝ => h (x + t • v)) (fderiv ℝ h x v) 0 :=
@@ -62,8 +64,8 @@ theorem gamO_smooth (i : Fin r) : ContDiffOn ℝ ∞ (gamO k r i) (OmX r) := by
   unfold gamO
   exact contDiffOn_prod fun a _ => gam_smooth a
 
-theorem gamO_line (i : Fin r) (x : Fin r → ℂ) (w : ℂ) (t : ℝ) :
-    gamO k r i (x + t • (Pi.single i w : Fin r → ℂ)) = gamO k r i x := by
+theorem gamO_line (i : Fin r) (x : Fin r → ℂ) (w : ℂ) (t : ℝ)
+    : gamO k r i (x + t • (Pi.single i w : Fin r → ℂ)) = gamO k r i x := by
   unfold gamO
   refine Finset.prod_congr rfl fun a ha => ?_
   have hai : a ≠ i := Finset.ne_of_mem_erase ha
@@ -73,9 +75,10 @@ theorem gauge_split (i : Fin r) (x : Fin r → ℂ) : gaugeF k r x = gam k r i x
   rw [gaugeF_eq, gamO]
   exact (Finset.mul_prod_erase _ _ (Finset.mem_univ i)).symm
 
-private theorem wbar_smul_lemma {m : ℕ} (l : Fin m) (c : (Fin m → ℂ) → ℂ) (φ : (Fin m → ℂ) → X)
-    (x : Fin m → ℂ) (hc : DifferentiableAt ℝ c x) (hφ : DifferentiableAt ℝ φ x) :
-    wirtBar l (fun y => c y • φ y) x = c x • wirtBar l φ x + wirtBar l c x • φ x := by
+private theorem wbar_smul_lemma
+    {m : ℕ} (l : Fin m) (c : (Fin m → ℂ) → ℂ) (φ : (Fin m → ℂ) → X) (x : Fin m → ℂ)
+    (hc : DifferentiableAt ℝ c x) (hφ : DifferentiableAt ℝ φ x)
+    : wirtBar l (fun y => c y • φ y) x = c x • wirtBar l φ x + wirtBar l c x • φ x := by
   unfold Formalism.QuantumDeterminants.wirtBar
   have e : (fun y => c y • φ y) = c • φ := rfl
   rw [e, fderiv_smul hc hφ]
@@ -83,9 +86,10 @@ private theorem wbar_smul_lemma {m : ℕ} (l : Fin m) (c : (Fin m → ℂ) → �
     ContinuousLinearMap.smulRight_apply, smul_eq_mul]
   module
 
-theorem pbOp_gauge (i : Fin r) (f : (Fin r → ℂ) → X) (hf : f ∈ WSm r X) :
-    pbOp i (fun x => gaugeF k r x • f x) =
-      fun x => gaugeF k r x • pbOp i f x + (((Mdim k r i - 1 : ℕ) : ℂ) / 2) • (gaugeF k r x • f x) := by
+theorem pbOp_gauge (i : Fin r) (f : (Fin r → ℂ) → X) (hf : f ∈ WSm r X)
+    : pbOp i (fun x => gaugeF k r x • f x)
+      = fun x =>
+        gaugeF k r x • pbOp i f x + (((Mdim k r i - 1 : ℕ) : ℂ) / 2) • (gaugeF k r x • f x) := by
   funext x
   show pbOp i (fun x => gaugeF k r x • f x) x =
     gaugeF k r x • pbOp i f x + (((Mdim k r i - 1 : ℕ) : ℂ) / 2) • (gaugeF k r x • f x)
@@ -107,17 +111,19 @@ theorem pbOp_gauge (i : Fin r) (f : (Fin r → ℂ) → X) (hf : f ∈ WSm r X) 
 
     have hwO : wirtBar i (gamO k r i) x = 0 := by
       unfold Formalism.QuantumDeterminants.wirtBar
-      rw [fderiv_zero_of_const hgO (gamO_line i x 1), fderiv_zero_of_const hgO (gamO_line i x Complex.I)]
+      rw [fderiv_zero_of_const hgO (gamO_line i x 1),
+        fderiv_zero_of_const hgO (gamO_line i x Complex.I)]
       simp
     have hpg := Formalism.FourierDecayAlt.P.Qx6.pbOp_gamma i hx (Mdim k r i - 1)
     unfold pbOp at hpg
     rw [if_pos hx] at hpg
-    have key : star (x i) * wirtBar i (gam k r i) x =
-        ((Mdim k r i - 1 : ℕ) : ℂ) / 2 * gam k r i x := by
+    have key
+        : star (x i) * wirtBar i (gam k r i) x = ((Mdim k r i - 1 : ℕ) : ℂ) / 2 * gam k r i x := by
       rw [← smul_eq_mul]
       exact hpg
     unfold pbOp
-    rw [if_pos hx, if_pos hx, hsplit, wbar_smul_lemma i (gam k r i) (fun y => gamO k r i y • f y) x hgi (hgO.smul hfd),
+    rw [if_pos hx, if_pos hx, hsplit,
+      wbar_smul_lemma i (gam k r i) (fun y => gamO k r i y • f y) x hgi (hgO.smul hfd),
       wbar_smul_lemma i _ _ x hgO hfd, hwO, gauge_split]
     simp only [smul_add, zero_smul, add_zero, smul_smul]
     rw [← mul_assoc (star (x i)) (wirtBar i (gam k r i) x), key]
@@ -126,10 +132,12 @@ theorem pbOp_gauge (i : Fin r) (f : (Fin r → ℂ) → X) (hf : f ∈ WSm r X) 
     rw [if_neg hx, if_neg hx, hf.2 x hx]
     simp
 
-theorem loc (Φ : (Fin r → ℂ) → X) (U : Set (Fin r → ℂ)) (c : Fin r → ℂ) (hU : IsOpen U) (hUO : U ⊆ OmX r)
-    (hc : c ∈ U) (hΨ : ContDiffOn ℝ ∞ (fun c' => gaugeF k r c' • Φ c') U) :
-    ∃ φ : (Fin r → ℂ) → X, φ ∈ WSm r X ∧ Φ =ᶠ[𝓝 c] φ ∧
-      (fun c' => gaugeF k r c' • Φ c') =ᶠ[𝓝 c] (fun c' => gaugeF k r c' • φ c') := by
+theorem loc
+    (Φ : (Fin r → ℂ) → X) (U : Set (Fin r → ℂ)) (c : Fin r → ℂ) (hU : IsOpen U) (hUO : U ⊆ OmX r)
+    (hc : c ∈ U) (hΨ : ContDiffOn ℝ ∞ (fun c' => gaugeF k r c' • Φ c') U)
+    : ∃ φ : (Fin r → ℂ) → X,
+      φ ∈ WSm r X ∧ Φ =ᶠ[𝓝 c] φ
+        ∧ (fun c' => gaugeF k r c' • Φ c') =ᶠ[𝓝 c] (fun c' => gaugeF k r c' • φ c') := by
   have hO : IsOpen (OmX r) := by
     have e : OmX r = ⋂ l, {y : Fin r → ℂ | y l ≠ 0} := by
       ext y

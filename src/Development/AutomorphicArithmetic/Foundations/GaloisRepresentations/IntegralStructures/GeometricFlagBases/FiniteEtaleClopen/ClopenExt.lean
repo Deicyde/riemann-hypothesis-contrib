@@ -12,10 +12,12 @@ open CategoryTheory Limits AlgebraicGeometry NumberField IsDedekindDomain
 open GlobalTheory.GalV (HTower)
 open UpperTheory.Gal.Int.Geo UpperTheory.Gal.Int.Geo.Cut
 
-private theorem exists_isClopen_preimage {X P : Type*} [TopologicalSpace X] [TopologicalSpace P]
+private theorem exists_isClopen_preimage
+    {X P : Type*} [TopologicalSpace X] [TopologicalSpace P]
     (f : P → X) (hf : Topology.IsEmbedding f) (hd : Dense (Set.range f))
     (hl : ∀ x : X, ∃ W : Set X, IsOpen W ∧ x ∈ W ∧ IsPreirreducible W)
-    (U : Set P) (hU : IsClopen U) : ∃ V : Set X, IsClopen V ∧ f ⁻¹' V = U := by
+    (U : Set P) (hU : IsClopen U)
+    : ∃ V : Set X, IsClopen V ∧ f ⁻¹' V = U := by
   have key : ∀ W : Set X, IsOpen W → IsPreirreducible W → (f ⁻¹' W ⊆ U ∨ f ⁻¹' W ⊆ Uᶜ) := by
     intro W hW hWi
     obtain ⟨A, hA, hAU⟩ := hf.isInducing.isOpen_iff.mp hU.isOpen
@@ -32,7 +34,8 @@ private theorem exists_isClopen_preimage {X P : Type*} [TopologicalSpace X] [Top
       rw [← Set.mem_preimage, hBU]
       exact haU
     obtain ⟨x, hxW, hxA, hxB⟩ := hWi A B hA hB h1 h2
-    obtain ⟨_, ⟨q, rfl⟩, -, hqA, hqB⟩ := hd.exists_mem_open (hW.inter (hA.inter hB)) ⟨x, hxW, hxA, hxB⟩
+    obtain ⟨_, ⟨q, rfl⟩, -, hqA, hqB⟩ :=
+      hd.exists_mem_open (hW.inter (hA.inter hB)) ⟨x, hxW, hxA, hxB⟩
     have hq1 : q ∈ U := by rw [← hAU]; exact hqA
     have hq2 : q ∈ Uᶜ := by rw [← hBU]; exact hqB
     exact hq2 hq1
@@ -61,9 +64,9 @@ private theorem exists_isClopen_preimage {X P : Type*} [TopologicalSpace X] [Top
       · exact ⟨W, hW, hxW, hWi, h⟩
       · exact absurd hq (h hxW)
 
-private theorem exists_isPreirreducible_nhd (Y : Scheme.{0}) [IsLocallyNoetherian Y]
-    (hY : ∀ y : Y, IsDomain (Y.presheaf.stalk y)) (y : Y) :
-    ∃ W : Set Y, IsOpen W ∧ y ∈ W ∧ IsPreirreducible W := by
+private theorem exists_isPreirreducible_nhd
+    (Y : Scheme.{0}) [IsLocallyNoetherian Y] (hY : ∀ y : Y, IsDomain (Y.presheaf.stalk y)) (y : Y)
+    : ∃ W : Set Y, IsOpen W ∧ y ∈ W ∧ IsPreirreducible W := by
   obtain ⟨U, hU, hyU, -⟩ := exists_isAffineOpen_mem_and_subset (x := y) (U := ⊤) trivial
   haveI : IsNoetherianRing Γ(Y, U) := IsLocallyNoetherian.component_noetherian ⟨U, hU⟩
   haveI hN : TopologicalSpace.NoetherianSpace (U : Scheme) := noetherianSpace_of_isAffineOpen U hU
@@ -74,8 +77,9 @@ private theorem exists_isPreirreducible_nhd (Y : Scheme.{0}) [IsLocallyNoetheria
     exact Function.Injective.isDomain e.toRingHom e.injective
   let z : (U : Scheme) := ⟨y, hyU⟩
   have hC : IsOpen (irreducibleComponent z) := by
-    have h := FunctorialResolution.EmbeddedResolution.isOpen_sUnion_of_subset_irreducibleComponents
-      (X := (U : Scheme)) (𝒜 := {irreducibleComponent z}) ?_ ?_
+    have h :=
+      FunctorialResolution.EmbeddedResolution.isOpen_sUnion_of_subset_irreducibleComponents
+        (X := (U : Scheme)) (𝒜 := {irreducibleComponent z}) ?_ ?_
     · rwa [Set.sUnion_singleton] at h
     · rintro C₁ h1 C₂ h2 ⟨x, hx1, hx2⟩
       exact FunctorialResolution.EmbeddedResolution.irreducibleComponents_eq_of_stalk_isDomain
@@ -83,17 +87,20 @@ private theorem exists_isPreirreducible_nhd (Y : Scheme.{0}) [IsLocallyNoetheria
     · intro D hD
       rw [Set.mem_singleton_iff.mp hD]
       exact irreducibleComponent_mem_irreducibleComponents _
-  refine ⟨U.ι '' irreducibleComponent z, U.ι.isOpenEmbedding.isOpenMap _ hC,
-    ⟨z, mem_irreducibleComponent, rfl⟩, ?_⟩
+  refine ⟨
+    U.ι '' irreducibleComponent z,
+    U.ι.isOpenEmbedding.isOpenMap _ hC,
+    ⟨z, mem_irreducibleComponent, rfl⟩,
+    ?_
+  ⟩
   exact isIrreducible_irreducibleComponent.isPreirreducible.image _ U.ι.continuous.continuousOn
 
-theorem UpperTheory.Gal.Int.Geo.Cut.clopenExt :
-    UpperTheory.Gal.Int.Geo.Cut.ClopenExt := by
+theorem UpperTheory.Gal.Int.Geo.Cut.clopenExt : UpperTheory.Gal.Int.Geo.Cut.ClopenExt := by
   intro O k _ _ _ _ _ _ Y p hp U hU
   have hf : Flat p := inferInstance
   have : IsLocallyNoetherian Y := LocallyOfFiniteType.isLocallyNoetherian p
   obtain ⟨hr, he⟩ := genRange O k Y p
-  obtain ⟨V, hV, hVU⟩ := exists_isClopen_preimage (pullback.fst p (gen O k)) he
-    (by rw [hr]; exact genDense O Y p hf)
-    (exists_isPreirreducible_nhd Y (stalkDom O Y p hp)) U hU
+  obtain ⟨V, hV, hVU⟩ :=
+    exists_isClopen_preimage (pullback.fst p (gen O k)) he (by rw [hr]; exact genDense O Y p hf)
+      (exists_isPreirreducible_nhd Y (stalkDom O Y p hp)) U hU
   exact ⟨⟨V, hV.isOpen⟩, hV.isClosed, hVU⟩

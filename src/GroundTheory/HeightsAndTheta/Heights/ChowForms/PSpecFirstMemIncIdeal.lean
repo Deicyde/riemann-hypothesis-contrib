@@ -17,15 +17,18 @@ theorem SpecFirstMemIncIdeal.proof : SpecFirstMemIncIdeal.Statement := by
   rw [mem_incIdeal_iff]
   rintro v ⟨x, hx0, hxW, hv⟩
   let w : Fin (e + 1) × Fin n → AlgebraicClosure F := fun ij =>
-    Fin.cases (motive := fun _ => AlgebraicClosure F) (algebraMap F (AlgebraicClosure F) (t ij.2))
-      (fun i => v (i, ij.2)) ij.1
+    Fin.cases
+      (motive := fun _ => AlgebraicClosure F)
+      (algebraMap F (AlgebraicClosure F) (t ij.2))
+      (fun i => v (i, ij.2))
+      ij.1
   have hw : w ∈ incidence I (e + 1) := by
     refine ⟨x, hx0, fun g hg => hxW g (hIW hg), fun i => ?_⟩
     induction i using Fin.cases with
     | zero =>
       have h := hxW _ ht
       set_option synthInstance.maxHeartbeats 100000 in
-        simpa [w, linForm, map_sum, aeval_X, aeval_C] using h
+      simpa [w, linForm, map_sum, aeval_X, aeval_C] using h
     | succ i => simpa [w] using hv i
   have hfw : aeval w f = 0 := (hf.2 f).mpr dvd_rfl w hw
   have hev : aeval v (specFirst f t) = aeval w f := by

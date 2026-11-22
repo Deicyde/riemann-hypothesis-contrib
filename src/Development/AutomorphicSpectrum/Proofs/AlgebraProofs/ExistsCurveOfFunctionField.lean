@@ -12,9 +12,10 @@ open GroundTheory.FunctionField
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem isFunctionField_of_fg_trdeg {k κ : Type} [Field k] [Field κ] [Algebra k κ]
-    (hfg : (⊤ : IntermediateField k κ).FG) (htr : Algebra.trdeg k κ = 1) :
-    IsFunctionField k κ := by
+theorem isFunctionField_of_fg_trdeg
+    {k κ : Type} [Field k] [Field κ] [Algebra k κ]
+    (hfg : (⊤ : IntermediateField k κ).FG) (htr : Algebra.trdeg k κ = 1)
+    : IsFunctionField k κ := by
   classical
   obtain ⟨s, hs⟩ := exists_isTranscendenceBasis k κ
   have hcard : Cardinal.mk s = 1 := by rw [hs.cardinalMk_eq_trdeg, htr]
@@ -22,8 +23,7 @@ theorem isFunctionField_of_fg_trdeg {k κ : Type} [Field k] [Field κ] [Algebra 
     rw [← Cardinal.mk_ne_zero_iff, hcard]
     exact one_ne_zero
   have hsx : s = {x} := by
-    have hsub : Subsingleton s := by
-      rw [← Cardinal.le_one_iff_subsingleton, hcard]
+    have hsub : Subsingleton s := by rw [← Cardinal.le_one_iff_subsingleton, hcard]
     ext y
     constructor
     · intro hy
@@ -38,8 +38,9 @@ theorem isFunctionField_of_fg_trdeg {k κ : Type} [Field k] [Field κ] [Algebra 
   obtain ⟨t, ht⟩ := hfg
   have hfd : ∀ F : IntermediateField k κ, Algebra.IsAlgebraic F κ → FiniteDimensional F κ := by
     intro F hF
-    have hle : IntermediateField.adjoin k (↑t : Set κ) ≤
-        (IntermediateField.adjoin F (↑t : Set κ)).restrictScalars k :=
+    have hle
+        : IntermediateField.adjoin k (↑t : Set κ)
+          ≤ (IntermediateField.adjoin F (↑t : Set κ)).restrictScalars k :=
       IntermediateField.adjoin_le_iff.2 (IntermediateField.subset_adjoin F _)
     have htop : IntermediateField.adjoin F (↑t : Set κ) = ⊤ := by
       rw [eq_top_iff]
@@ -73,12 +74,13 @@ def placesCurve : GlobalTheory.CompanionTheory.Ar.Crv.ACurve κ where
     rw [Divisor.deg_eq_sum] at h
     rw [finsum_eq_sum_of_support_subset (s := (divisor x : Divisor k κ).support)]
     · have : ∑ i ∈ (divisor x : Divisor k κ).support,
-          ((i.deg : ℤ) * WithZero.log (i.valuation x)) =
-          - ∑ i ∈ (divisor x : Divisor k κ).support, (divisor x : Divisor k κ) i * (i.deg : ℤ) := by
-        rw [← Finset.sum_neg_distrib]
-        refine Finset.sum_congr rfl fun i _ => ?_
-        simp only [divisor_apply, Place.ord]
-        ring
+            ((i.deg : ℤ) * WithZero.log (i.valuation x))
+          = - ∑ i ∈ (divisor x : Divisor k κ).support, (divisor x : Divisor k κ) i * (i.deg : ℤ) :=
+        by
+          rw [← Finset.sum_neg_distrib]
+          refine Finset.sum_congr rfl fun i _ => ?_
+          simp only [divisor_apply, Place.ord]
+          ring
       rw [this, h, neg_zero]
     · intro i hi
       simp only [Function.mem_support] at hi
@@ -90,13 +92,14 @@ def placesCurve : GlobalTheory.CompanionTheory.Ar.Crv.ACurve κ where
 
 end
 
-theorem exists_curve_of_function_field :
-    ∀ (k κ : Type) [Field k] [Field κ] [Algebra k κ], (⊤ : IntermediateField k κ).FG →
-      Algebra.trdeg k κ = 1 → ∃ C : GlobalTheory.CompanionTheory.Ar.Crv.ACurve κ, (∀ i, 0 < C.w i) ∧
-        (∀ i (a : k), a ≠ 0 → C.v i (algebraMap k κ a) = 1) ∧
-        (∀ i, Function.Surjective (C.v i)) ∧
-        ∀ W : ValuationSubring κ, W ≠ ⊤ → (∀ a : k, algebraMap k κ a ∈ W) →
-          ∃! i, (C.v i).valuationSubring = W := by
+theorem exists_curve_of_function_field
+    : ∀ (k κ : Type) [Field k] [Field κ] [Algebra k κ],
+      (⊤ : IntermediateField k κ).FG → Algebra.trdeg k κ = 1
+        → ∃ C : GlobalTheory.CompanionTheory.Ar.Crv.ACurve κ,
+          (∀ i, 0 < C.w i) ∧ (∀ i (a : k), a ≠ 0 → C.v i (algebraMap k κ a) = 1)
+            ∧ (∀ i, Function.Surjective (C.v i))
+            ∧ ∀ W : ValuationSubring κ,
+              W ≠ ⊤ → (∀ a : k, algebraMap k κ a ∈ W) → ∃! i, (C.v i).valuationSubring = W := by
   intro k κ _ _ _ hfg htr
   haveI : IsFunctionField k κ := isFunctionField_of_fg_trdeg hfg htr
   have key : ∀ i : Place k κ, (i.valuation).valuationSubring = i.ring := fun i => by

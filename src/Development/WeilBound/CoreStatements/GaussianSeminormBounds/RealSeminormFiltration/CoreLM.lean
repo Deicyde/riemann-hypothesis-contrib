@@ -10,7 +10,8 @@ public import Development.WeilBound.CoreStatements.GaussianSeminormBounds.RealSe
 
 noncomputable section
 
-open ReciprocityTheory.ThetaSummability.Real ReciprocityTheory.ChartRestriction.G.ThK.Real FockH1Action MvPolynomial Matrix
+open ReciprocityTheory.ThetaSummability.Real ReciprocityTheory.ChartRestriction.G.ThK.Real
+  FockH1Action MvPolynomial Matrix
 open scoped InnerProductSpace
 
 namespace PositivityTheory.KReal
@@ -20,8 +21,7 @@ theorem coreLM : CoreLM := by
   obtain ⟨hn, hm, e1, e2, hP, hQ, hQ', hP'⟩ := nm_facts h
   have c1 : ((D.κ : ℂ) / 2) = (((D.κ : ℚ) / 2 : ℚ) : ℂ) := by push_cast; rfl
   have c2 : (-((D.κ : ℂ) / 2)) = ((-((D.κ : ℚ) / 2) : ℚ) : ℂ) := by push_cast; rfl
-  have n1 : Nontrivial (ThV D) :=
-    nontrivial_of_pair _ _ c1 (c1 ▸ pair_pos hP hQ hn hm _ e1 e2)
+  have n1 : Nontrivial (ThV D) := nontrivial_of_pair _ _ c1 (c1 ▸ pair_pos hP hQ hn hm _ e1 e2)
   have n2 : Nontrivial (ThV' D) :=
     nontrivial_of_pair _ _ c2 (c2 ▸ pair_neg hQ' hP' hn hm _ (by linarith) (by linarith))
   have s1 := side_of ((D.κ : ℂ) / 2) 0 _ 0 c1 (by simp) _ (combV h) n1

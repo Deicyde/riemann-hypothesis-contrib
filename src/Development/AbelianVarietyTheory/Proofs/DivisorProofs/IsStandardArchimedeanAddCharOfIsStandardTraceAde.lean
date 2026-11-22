@@ -13,8 +13,11 @@ open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 
 namespace GlobalTheory.WeilL2Words.StdArch
 
-theorem supportedAtArchimedean_adeleOfMixedSpaceComponent (F : Type) [Field F] [NumberField F] (z : mixedEmbedding.mixedSpace F) :
-    GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) (GlobalTheory.WeilL2Words.arch1 F z) := by
+theorem supportedAtArchimedean_adeleOfMixedSpaceComponent
+    (F : Type) [Field F] [NumberField F] (z : mixedEmbedding.mixedSpace F)
+    : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At
+      (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F)
+      (GlobalTheory.WeilL2Words.arch1 F z) := by
   intro u hu
   have h : u.1 = 0 := (InfiniteAdeleRing.ringEquiv_mixedSpace F).map_eq_zero_iff.1 hu
   refine Prod.ext ?_ ?_
@@ -22,12 +25,16 @@ theorem supportedAtArchimedean_adeleOfMixedSpaceComponent (F : Type) [Field F] [
     rw [h, zero_mul]
   · exact mul_zero u.2
 
-theorem evI_arch1 (F : Type) [Field F] [NumberField F] (z : mixedEmbedding.mixedSpace F) :
-    GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F (GlobalTheory.WeilL2Words.arch1 F z) = z :=
+theorem evI_arch1 (F : Type) [Field F] [NumberField F] (z : mixedEmbedding.mixedSpace F)
+    : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F
+        (GlobalTheory.WeilL2Words.arch1 F z)
+      = z :=
   (InfiniteAdeleRing.ringEquiv_mixedSpace F).apply_symm_apply z
 
-theorem isStdInf_of_isStd : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
-    GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsStd ψ → GlobalTheory.WeilL2Words.IsStdInf F ψ := by
+theorem isStdInf_of_isStd
+    : ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
+      GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsStd ψ
+        → GlobalTheory.WeilL2Words.IsStdInf F ψ := by
   intro F _ _ ψ hψ
   refine ⟨-(Algebra.trace ℝ (mixedEmbedding.mixedSpace F)), fun z hz => ?_, fun z => ?_⟩
   · by_contra h

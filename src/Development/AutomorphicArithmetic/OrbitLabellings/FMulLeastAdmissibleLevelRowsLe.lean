@@ -40,40 +40,44 @@ private lemma UpperTheory.least_level_le_log_bound (k l : ℕ) (hk : 1 ≤ k) (h
   push_cast at hc
   linarith
 
-theorem UpperTheory.f_mul_leastAdmissibleLevel_rows_le :
-    ∀ (r f n m nW l k : ℕ) (L : ℝ), 1 ≤ m → m ≤ n → n ≤ r → 2 ≤ f → n + 1 = k → 3 ≤ L → Real.log k ≤ L →
-    10 * (r : ℝ) * (f + (f : ℝ) ^ 2 * (n : ℝ) ^ 3 * L ^ 2 / m) ≤ nW → 5 ≤ l → f * ((RF.i0 k l + 1) * n + 4 * r) ≤ nW := by
+theorem UpperTheory.f_mul_leastAdmissibleLevel_rows_le
+    : ∀ (r f n m nW l k : ℕ) (L : ℝ),
+      1 ≤ m → m ≤ n → n ≤ r → 2 ≤ f → n + 1 = k → 3 ≤ L → Real.log k ≤ L
+        → 10 * (r : ℝ) * (f + (f : ℝ) ^ 2 * (n : ℝ) ^ 3 * L ^ 2 / m) ≤ nW → 5 ≤ l
+        → f * ((RF.i0 k l + 1) * n + 4 * r) ≤ nW := by
   intro r f n m nW l k L hm hmn hnr hf hk hL hlogL hW hl
   have hk1 : 1 ≤ k := by omega
   have hi := UpperTheory.least_level_le_log_bound k l hk1 hl
-  have hmR : (1:ℝ) ≤ m := by exact_mod_cast hm
-  have hmnR : (m:ℝ) ≤ n := by exact_mod_cast hmn
-  have hnrR : (n:ℝ) ≤ r := by exact_mod_cast hnr
-  have hfR : (2:ℝ) ≤ f := by exact_mod_cast hf
-  have hn1 : (1:ℝ) ≤ n := le_trans hmR hmnR
-  have hr1 : (1:ℝ) ≤ r := le_trans hn1 hnrR
+  have hmR : (1 : ℝ) ≤ m := by exact_mod_cast hm
+  have hmnR : (m : ℝ) ≤ n := by exact_mod_cast hmn
+  have hnrR : (n : ℝ) ≤ r := by exact_mod_cast hnr
+  have hfR : (2 : ℝ) ≤ f := by exact_mod_cast hf
+  have hn1 : (1 : ℝ) ≤ n := le_trans hmR hmnR
+  have hr1 : (1 : ℝ) ≤ r := le_trans hn1 hnrR
   have hiL : ((RF.i0 k l : ℕ) : ℝ) ≤ 3 + 2 * L := by linarith
-  have hX : (0:ℝ) ≤ (f:ℝ) ^ 2 * (n:ℝ) ^ 2 * L ^ 2 := by positivity
-  have hdiv : (f:ℝ) ^ 2 * (n:ℝ) ^ 2 * L ^ 2 ≤ (f:ℝ) ^ 2 * (n:ℝ) ^ 3 * L ^ 2 / m := by
+  have hX : (0 : ℝ) ≤ (f : ℝ) ^ 2 * (n : ℝ) ^ 2 * L ^ 2 := by positivity
+  have hdiv : (f : ℝ) ^ 2 * (n : ℝ) ^ 2 * L ^ 2 ≤ (f : ℝ) ^ 2 * (n : ℝ) ^ 3 * L ^ 2 / m := by
     rw [le_div_iff₀ (by linarith)]
     have := mul_le_mul_of_nonneg_left hmnR hX
     nlinarith
-  have h1 : (f:ℝ) * (((RF.i0 k l : ℕ) : ℝ) + 1) * n ≤ f * (4 + 2 * L) * n := by
+  have h1 : (f : ℝ) * (((RF.i0 k l : ℕ) : ℝ) + 1) * n ≤ f * (4 + 2 * L) * n := by
     apply mul_le_mul_of_nonneg_right _ (by linarith)
     apply mul_le_mul_of_nonneg_left _ (by linarith)
     linarith
-  have a1 : 4 + 2 * L ≤ 10 * (f:ℝ) * L ^ 2 := by
+  have a1 : 4 + 2 * L ≤ 10 * (f : ℝ) * L ^ 2 := by
     nlinarith [mul_nonneg (sub_nonneg.2 hfR) (sq_nonneg L)]
-  have hrn : (1:ℝ) ≤ r * n := by nlinarith
-  have a2 : (n:ℝ) ≤ r * (n:ℝ) ^ 2 := by
+  have hrn : (1 : ℝ) ≤ r * n := by nlinarith
+  have a2 : (n : ℝ) ≤ r * (n : ℝ) ^ 2 := by
     nlinarith [mul_le_mul_of_nonneg_left hrn (by linarith : (0:ℝ) ≤ n)]
-  have h2 : (f:ℝ) * (4 + 2 * L) * n ≤ 10 * r * ((f:ℝ) ^ 2 * (n:ℝ) ^ 2 * L ^ 2) := by
-    calc (f:ℝ) * (4 + 2 * L) * n ≤ f * (10 * f * L ^ 2) * n := by gcongr
-      _ = 10 * (f:ℝ) ^ 2 * L ^ 2 * n := by ring
-      _ ≤ 10 * (f:ℝ) ^ 2 * L ^ 2 * (r * (n:ℝ) ^ 2) := by gcongr
-      _ = 10 * r * ((f:ℝ) ^ 2 * (n:ℝ) ^ 2 * L ^ 2) := by ring
-  have h3 := mul_le_mul_of_nonneg_left hdiv (by linarith : (0:ℝ) ≤ 10 * r)
-  have h4 : 4 * (f:ℝ) * r ≤ 10 * r * f := by nlinarith
+  have h2 : (f : ℝ) * (4 + 2 * L) * n ≤ 10 * r * ((f : ℝ) ^ 2 * (n : ℝ) ^ 2 * L ^ 2) := by
+    calc
+      (f : ℝ) * (4 + 2 * L) * n
+        ≤ f * (10 * f * L ^ 2) * n := by gcongr
+      _ = 10 * (f : ℝ) ^ 2 * L ^ 2 * n := by ring
+      _ ≤ 10 * (f : ℝ) ^ 2 * L ^ 2 * (r * (n : ℝ) ^ 2) := by gcongr
+      _ = 10 * r * ((f : ℝ) ^ 2 * (n : ℝ) ^ 2 * L ^ 2) := by ring
+  have h3 := mul_le_mul_of_nonneg_left hdiv (by linarith : (0 : ℝ) ≤ 10 * r)
+  have h4 : 4 * (f : ℝ) * r ≤ 10 * r * f := by nlinarith
   have key : (((f * ((RF.i0 k l + 1) * n + 4 * r)) : ℕ) : ℝ) ≤ nW := by
     push_cast
     nlinarith

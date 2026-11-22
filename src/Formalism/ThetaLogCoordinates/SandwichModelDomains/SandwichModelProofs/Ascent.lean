@@ -13,16 +13,20 @@ namespace Formalism.InvariantFactorPaths.INST
 
 open Formalism.GradedWeylDivisibility
 
-theorem asc_map_weyl (O : Type) [CommRing O] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
-    (f : MvPolynomial (Fin r × Fin n) ℤ) (hf : f ∈ weyl ℤ r n hn ν) :
-    map (Int.castRingHom O) f ∈ weyl O r n hn ν := by
+theorem asc_map_weyl
+    (O : Type) [CommRing O]
+    {r n : ℕ}
+    (hn : n ≤ r) (ν : Fin n → ℕ) (f : MvPolynomial (Fin r × Fin n) ℤ) (hf : f ∈ weyl ℤ r n hn ν)
+    : map (Int.castRingHom O) f ∈ weyl O r n hn ν := by
   set φ : ℤ →+* O := Int.castRingHom O with hφ
-  have hrow : ∀ (a b : Fin r) (g : MvPolynomial (Fin r × Fin n) ℤ),
-      rowGen O a b (map φ g) = Polynomial.map (map φ) (rowGen ℤ a b g) := by
+  have hrow
+      : ∀ (a b : Fin r) (g : MvPolynomial (Fin r × Fin n) ℤ),
+        rowGen O a b (map φ g) = Polynomial.map (map φ) (rowGen ℤ a b g) := by
     intro a b g
-    have key : ((rowGen O a b).toRingHom.comp (map φ) :
-          MvPolynomial (Fin r × Fin n) ℤ →+* Polynomial (MvPolynomial (Fin r × Fin n) O)) =
-        (Polynomial.mapRingHom (map φ)).comp (rowGen ℤ a b).toRingHom := by
+    have key
+        : ((rowGen O a b).toRingHom.comp (map φ)
+            : MvPolynomial (Fin r × Fin n) ℤ →+* Polynomial (MvPolynomial (Fin r × Fin n) O))
+          = (Polynomial.mapRingHom (map φ)).comp (rowGen ℤ a b).toRingHom := by
       apply MvPolynomial.ringHom_ext
       · intro c
         rw [← RingHom.comp_apply, eq_intCast, ← RingHom.comp_apply, eq_intCast]
@@ -30,13 +34,15 @@ theorem asc_map_weyl (O : Type) [CommRing O] {r n : ℕ} (hn : n ≤ r) (ν : Fi
         simp only [RingHom.comp_apply]
         (simp [rowGen]) <;> (try split_ifs) <;> (try simp)
     exact RingHom.congr_fun key g
-  have hdiv : ∀ (a b : Fin r) (k : ℕ) (g : MvPolynomial (Fin r × Fin n) ℤ),
-      map φ (rowDiv ℤ a b k g) = rowDiv O a b k (map φ g) := by
+  have hdiv
+      : ∀ (a b : Fin r) (k : ℕ) (g : MvPolynomial (Fin r × Fin n) ℤ),
+        map φ (rowDiv ℤ a b k g) = rowDiv O a b k (map φ g) := by
     intro a b k g
     unfold rowDiv
     rw [hrow, Polynomial.coeff_map]
-  have hword : ∀ (w : List (Fin r × Fin r × ℕ)) (g : MvPolynomial (Fin r × Fin n) ℤ),
-      map φ (applyWord ℤ w g) = applyWord O w (map φ g) := by
+  have hword
+      : ∀ (w : List (Fin r × Fin r × ℕ)) (g : MvPolynomial (Fin r × Fin n) ℤ),
+        map φ (applyWord ℤ w g) = applyWord O w (map φ g) := by
     intro w g
     induction w with
     | nil => rfl
@@ -62,15 +68,14 @@ theorem asc_map_weyl (O : Type) [CommRing O] {r n : ℕ} (hn : n ≤ r) (ν : Fi
     refine Submodule.subset_span ⟨w, ?_⟩
     try dsimp only
     rw [hword, hhw]
-  | zero => simp
+  | zero =>
+    simp
   | add x y _ _ hx hy =>
     rw [map_add (f := _)]
     exact Submodule.add_mem _ hx hy
   | smul c x _ hx =>
     rw [map_zsmul]
-    first
-      | exact zsmul_mem hx c
-      | exact Submodule.smul_of_tower_mem _ c hx
+    first | exact zsmul_mem hx c | exact Submodule.smul_of_tower_mem _ c hx
 
 theorem ascent_domain_holds : AscentDomain := by
   intro p r n hn ν e h O _ _ hO x hx
@@ -82,8 +87,9 @@ theorem ascent_domain_holds : AscentDomain := by
       rw [← hsh]; exact bidetMem ℤ r n K sz hsz I
     obtain ⟨c, hc, hm⟩ := h _ hZ
     have h2 := asc_map_weyl O hn ν _ hm
-    have e2 : map (Int.castRingHom O) ((c * (p : ℤ) ^ e) • bideterminant ℤ sz hsz I) =
-        ((c : ℤ) : O) • (((p : O) ^ e) • bideterminant O sz hsz I) := by
+    have e2
+        : map (Int.castRingHom O) ((c * (p : ℤ) ^ e) • bideterminant ℤ sz hsz I)
+          = ((c : ℤ) : O) • (((p : O) ^ e) • bideterminant O sz hsz I) := by
       rw [smul_eq_C_mul, map_mul, map_C, ldlat_map_bidet, smul_smul, smul_eq_C_mul]
       simp
     rw [e2] at h2

@@ -16,19 +16,21 @@ variable {F : Type*} [Field F] [DecidableEq F] (E : WeierstrassCurve F)
 noncomputable def yPoly (x : F) : F[X] :=
   X ^ 2 + C (E.a₁ * x + E.a₃) * X - C (x ^ 3 + E.a₂ * x ^ 2 + E.a₄ * x + E.a₆)
 
-theorem natDegree_yPoly (x : F) : (yPoly E x).natDegree = 2 := by
-  unfold yPoly; compute_degree!
+theorem natDegree_yPoly (x : F) : (yPoly E x).natDegree = 2 := by unfold yPoly; compute_degree!
 
 theorem yPoly_ne_zero (x : F) : yPoly E x ≠ 0 := by
-  intro h; have := natDegree_yPoly E x; rw [h, natDegree_zero] at this; exact absurd this (by norm_num)
+  intro h
+  have := natDegree_yPoly E x
+  rw [h, natDegree_zero] at this
+  exact absurd this (by norm_num)
 
 theorem isRoot_yPoly {x y : F} (h : E.toAffine.Equation x y) : (yPoly E x).IsRoot y := by
   rw [equation_iff] at h
   simp only [yPoly, IsRoot, eval_sub, eval_add, eval_mul, eval_pow, eval_X, eval_C]
   linear_combination h
 
-theorem card_zsmul_eq_zero_le {n : ℤ} (hn : E.ΨSq n ≠ 0) :
-    Nat.card {P : E.toAffine.Point // n • P = 0} ≤ 1 + 2 * (E.ΨSq n).roots.toFinset.card := by
+theorem card_zsmul_eq_zero_le {n : ℤ} (hn : E.ΨSq n ≠ 0)
+    : Nat.card {P : E.toAffine.Point // n • P = 0} ≤ 1 + 2 * (E.ΨSq n).roots.toFinset.card := by
   classical
   set S := (E.ΨSq n).roots.toFinset
   set T : Finset (F × F) := S.biUnion fun x => ((yPoly E x).roots.toFinset).image fun y => (x, y)
@@ -71,10 +73,11 @@ theorem card_zsmul_eq_zero_le {n : ℤ} (hn : E.ΨSq n ≠ 0) :
       simp only [T, S, Finset.mem_biUnion, Finset.mem_image, Multiset.mem_toFinset]
       refine ⟨x, (mem_roots hn).mpr hx, y, ?_, rfl⟩
       exact (mem_roots (yPoly_ne_zero E x)).mpr (isRoot_yPoly E hxy.1)
-  calc Nat.card {P : E.toAffine.Point // n • P = 0}
+  calc
+    Nat.card {P : E.toAffine.Point // n • P = 0}
       = Nat.card (Set.range f) := (Nat.card_range_of_injective hf).symm
     _ ≤ Nat.card (T.insertNone : Set (Option (F × F))) :=
-        Nat.card_mono (Finset.finite_toSet _) hrange
+      Nat.card_mono (Finset.finite_toSet _) hrange
     _ = T.card + 1 := by rw [Nat.card_coe_set_eq, Set.ncard_coe_finset, Finset.card_insertNone]
     _ ≤ 1 + 2 * S.card := by omega
 
@@ -82,19 +85,20 @@ end Torsion
 
 section TorsionP
 
-variable {F : Type*} [Field F] [DecidableEq F] (E : WeierstrassCurve F) [E.IsElliptic]
+variable
+  {F : Type*} [Field F] [DecidableEq F]
+  (E : WeierstrassCurve F) [E.IsElliptic]
   (p : ℕ) [hp : Fact p.Prime] [CharP F p]
 
 theorem roots_toFinset_sq (q : F[X]) : (q ^ 2).roots.toFinset = q.roots.toFinset := by
   rw [roots_pow, Multiset.toFinset_nsmul _ _ two_ne_zero]
 
-theorem card_roots_ΨSq_le_of_odd (hodd : p ≠ 2) :
-    (E.ΨSq p).roots.toFinset.card ≤ (p ^ 2 - 1) / 2 - 1 := by
+theorem card_roots_ΨSq_le_of_odd (hodd : p ≠ 2)
+    : (E.ΨSq p).roots.toFinset.card ≤ (p ^ 2 - 1) / 2 - 1 := by
   have hpodd : ¬ Even (p : ℤ) := by
     rw [Int.even_coe_nat]
     exact fun h => hodd ((Nat.Prime.even_iff hp.out).mp h)
-  have hΨ : E.ΨSq p = E.preΨ p ^ 2 := by
-    rw [ΨSq, if_neg hpodd, mul_one]
+  have hΨ : E.ΨSq p = E.preΨ p ^ 2 := by rw [ΨSq, if_neg hpodd, mul_one]
   have hne : E.ΨSq p ≠ 0 := ΨSq_ne_zero_of_ne_zero E (by exact_mod_cast hp.out.ne_zero)
   have hpre : E.preΨ p ≠ 0 := fun h => hne (by rw [hΨ, h]; ring)
   rw [hΨ, roots_toFinset_sq]
@@ -114,8 +118,12 @@ theorem Ψ₂Sq_eq_sq_of_two (h2 : p = 2) : E.Ψ₂Sq = (C E.a₁ * X + C E.a₃
   subst h2
   have h2F : (2 : F) = 0 := CharTwo.two_eq_zero
   have h2X : (2 : F[X]) = 0 := by rw [← C_ofNat, h2F, C_0]
-  have e : E.Ψ₂Sq = (C E.a₁ * X + C E.a₃) ^ 2 + 2 * (2 * X ^ 3 + C (2 * E.a₂) * X ^ 2 +
-      C E.b₄ * X - C E.a₁ * C E.a₃ * X + C (2 * E.a₆)) := by
+  have e
+      : E.Ψ₂Sq
+        = (C E.a₁ * X + C E.a₃) ^ 2
+          + 2
+            * (2 * X ^ 3 + C (2 * E.a₂) * X ^ 2 + C E.b₄ * X - C E.a₁ * C E.a₃ * X
+              + C (2 * E.a₆)) := by
     simp only [Ψ₂Sq, b₂, b₆, map_add (f := _), map_mul, map_pow, map_ofNat]
     ring
   rw [e, h2X, zero_mul, add_zero]
@@ -160,23 +168,26 @@ noncomputable def powField : IntermediateField F E.toAffine.FunctionField :=
 
 variable [PerfectRing F p]
 
-noncomputable def frobImage (K : IntermediateField F E.toAffine.FunctionField) :
-    IntermediateField F E.toAffine.FunctionField :=
+noncomputable def frobImage (K : IntermediateField F E.toAffine.FunctionField)
+    : IntermediateField F E.toAffine.FunctionField :=
   (K.toSubfield.map (frobenius E.toAffine.FunctionField p)).toIntermediateField fun c => by
-    refine ⟨algebraMap F E.toAffine.FunctionField ((frobeniusEquiv F p).symm c),
-      IntermediateField.algebraMap_mem K _, ?_⟩
+    refine ⟨
+      algebraMap F E.toAffine.FunctionField ((frobeniusEquiv F p).symm c),
+      IntermediateField.algebraMap_mem K _,
+      ?_
+    ⟩
     rw [frobenius_def, ← map_pow]
     congr 1
     exact frobenius_apply_frobeniusEquiv_symm F p c
 
-theorem mem_frobImage {K : IntermediateField F E.toAffine.FunctionField}
-    {z : E.toAffine.FunctionField} : z ∈ frobImage E p K ↔ ∃ g ∈ K, g ^ p = z := by
+theorem mem_frobImage
+    {K : IntermediateField F E.toAffine.FunctionField} {z : E.toAffine.FunctionField}
+    : z ∈ frobImage E p K ↔ ∃ g ∈ K, g ^ p = z := by
   show z ∈ K.toSubfield.map (frobenius E.toAffine.FunctionField p) ↔ _
   rw [Subfield.mem_map]
   rfl
 
-theorem mem_powField_iff (z : E.toAffine.FunctionField) :
-    z ∈ powField E p ↔ ∃ g, g ^ p = z := by
+theorem mem_powField_iff (z : E.toAffine.FunctionField) : z ∈ powField E p ↔ ∃ g, g ^ p = z := by
   constructor
   · intro hz
     have hle : powField E p ≤ frobImage E p ⊤ := by
@@ -188,10 +199,11 @@ theorem mem_powField_iff (z : E.toAffine.FunctionField) :
     exact ⟨g, hg⟩
   · rintro ⟨g, rfl⟩
     let Q : IntermediateField F E.toAffine.FunctionField :=
-      ((powField E p).toSubfield.comap (frobenius E.toAffine.FunctionField p)).toIntermediateField
-        fun c => by
-          show (algebraMap F _ c) ^ p ∈ powField E p
-          rw [← map_pow]; exact IntermediateField.algebraMap_mem _ _
+      ((powField E p).toSubfield.comap
+          (frobenius E.toAffine.FunctionField p)).toIntermediateField fun c => by
+        show (algebraMap F _ c) ^ p ∈ powField E p
+        rw [← map_pow]
+        exact IntermediateField.algebraMap_mem _ _
     have htop : (⊤ : IntermediateField F E.toAffine.FunctionField) ≤ Q := by
       rw [← adjoin_genX_genY E, adjoin_le_iff]
       rintro w (rfl | rfl)
@@ -199,8 +211,7 @@ theorem mem_powField_iff (z : E.toAffine.FunctionField) :
       · exact (subset_adjoin F _ (by simp) : genY E ^ p ∈ powField E p)
     exact htop trivial
 
-theorem relfinrank_adjoin_genX_pow :
-    relfinrank F⟮genX E ^ p⟯ F⟮genX E⟯ = p := by
+theorem relfinrank_adjoin_genX_pow : relfinrank F⟮genX E ^ p⟯ F⟮genX E⟯ = p := by
   have hE0 : F⟮genX E ^ p⟯ = (F⟮(RatFunc.X : RatFunc F) ^ p⟯).map (ratEmb E) := by
     rw [adjoin_map, Set.image_singleton, map_pow, ratEmb_X]
   have hE1 : F⟮genX E⟯ = (⊤ : IntermediateField F (RatFunc F)).map (ratEmb E) := by
@@ -208,8 +219,8 @@ theorem relfinrank_adjoin_genX_pow :
   have hX : (RatFunc.X : RatFunc F) ^ p = algebraMap F[X] (RatFunc F) (X ^ p) := by
     rw [map_pow, RatFunc.algebraMap_X]
   rw [hE0, hE1, relfinrank_map_map, relfinrank_top_right, RatFunc.finrank_eq_max_natDegree, hX,
-    RatFunc.num_algebraMap, RatFunc.denom_algebraMap, natDegree_X_pow, natDegree_one, max_eq_left
-    (Nat.zero_le _)]
+    RatFunc.num_algebraMap, RatFunc.denom_algebraMap, natDegree_X_pow, natDegree_one,
+    max_eq_left (Nat.zero_le _)]
 
 theorem genY_pow_not_mem : genY E ^ p ∉ F⟮genX E ^ p⟯ := by
   intro h
@@ -230,18 +241,23 @@ theorem relfinrank_powField : relfinrank F⟮genX E ^ p⟯ (powField E p) = 2 :=
     apply restrictScalars_injective F
     rw [adjoin_simple_adjoin_simple, extendScalars_restrictScalars]
     rfl
-  have hcst : ∀ a : F, algebraMap F E.toAffine.FunctionField a ∈ K0 := fun a => IntermediateField.algebraMap_mem _ a
+  have hcst : ∀ a : F, algebraMap F E.toAffine.FunctionField a ∈ K0 := fun a =>
+    IntermediateField.algebraMap_mem _ a
   have hb : algebraMap F _ (E.a₁ ^ p) * genX E ^ p + algebraMap F _ (E.a₃ ^ p) ∈ K0 :=
     add_mem (mul_mem (hcst _) hx0) (hcst _)
-  have hc : (genX E ^ p) ^ 3 + algebraMap F _ (E.a₂ ^ p) * (genX E ^ p) ^ 2 +
-      algebraMap F _ (E.a₄ ^ p) * genX E ^ p + algebraMap F _ (E.a₆ ^ p) ∈ K0 :=
-    add_mem (add_mem (add_mem (pow_mem hx0 3) (mul_mem (hcst _) (pow_mem hx0 2)))
-      (mul_mem (hcst _) hx0)) (hcst _)
+  have hc
+      : (genX E ^ p) ^ 3 + algebraMap F _ (E.a₂ ^ p) * (genX E ^ p) ^ 2
+          + algebraMap F _ (E.a₄ ^ p) * genX E ^ p + algebraMap F _ (E.a₆ ^ p)
+        ∈ K0 :=
+    add_mem
+      (add_mem (add_mem (pow_mem hx0 3) (mul_mem (hcst _) (pow_mem hx0 2))) (mul_mem (hcst _) hx0))
+      (hcst _)
   set q : K0[X] := X ^ 2 + C ⟨_, hb⟩ * X - C ⟨_, hc⟩
   have hq : aeval w q = 0 := by
     have e := (equation_iff _ _).mp (equation_gen E)
     simp only [WeierstrassCurve.baseChange, WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₂,
-      WeierstrassCurve.map_a₃, WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆] at e
+        WeierstrassCurve.map_a₃, WeierstrassCurve.map_a₄, WeierstrassCurve.map_a₆]
+      at e
     have e' := congrArg (frobenius E.toAffine.FunctionField p) e
     simp only [map_add (f := _), map_mul, map_pow, frobenius_def] at e'
     simp only [q, map_sub, map_add (f := _), map_mul, map_pow, aeval_X, aeval_C, w,

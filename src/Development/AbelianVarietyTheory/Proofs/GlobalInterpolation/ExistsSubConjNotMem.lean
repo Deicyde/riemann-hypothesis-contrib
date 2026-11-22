@@ -6,18 +6,22 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Disjoi
 @[expose] public section
 
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.UnitaryLatticeOrthogonal GlobalTheory.SelfDualLatticeCompare
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.UnitaryLatticeOrthogonal
+  GlobalTheory.SelfDualLatticeCompare
 
 namespace GlobalTheory.UnramConjUnit
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 open scoped TensorProduct Matrix in
 open NumberField IsDedekindDomain in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} in
-theorem _root_.GlobalTheory.UnramConjUnit.conj_ne_id (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ) : ¬ ∀ e, σ e = e := by
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} in
+theorem _root_.GlobalTheory.UnramConjUnit.conj_ne_id
+    (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ)
+    : ¬ ∀ e, σ e = e := by
   intro hσ
   obtain ⟨-, hE, -, hconj⟩ := h
   obtain ⟨w⟩ : Nonempty (InfinitePlace E) := inferInstance
@@ -27,15 +31,16 @@ theorem _root_.GlobalTheory.UnramConjUnit.conj_ne_id (h : _root_.Formalism.MainN
   ext x
   simpa [hσ x] using (hconj w.embedding x).symm
 
-
 open scoped TensorProduct Matrix in
 open NumberField IsDedekindDomain in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} in
-theorem _root_.GlobalTheory.UnramConjUnit.exists_sub_conj_notMem (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ)
-    (v : HeightOneSpectrum (𝓞 F)) (hv : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryLatticeOrthogonal.UnramAt F E v) :
-    ∃ (t d : 𝓞 E) (s : 𝓞 F), (d : E) = (t : E) - σ t ∧
-      algebraMap F E (s : F) = (d : E) * d ∧ s ∉ v.asIdeal := by
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} in
+theorem _root_.GlobalTheory.UnramConjUnit.exists_sub_conj_notMem
+    (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ)
+    (v : HeightOneSpectrum (𝓞 F))
+    (hv : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryLatticeOrthogonal.UnramAt F E v)
+    : ∃ (t d : 𝓞 E) (s : 𝓞 F),
+      (d : E) = (t : E) - σ t ∧ algebraMap F E (s : F) = (d : E) * d ∧ s ∉ v.asIdeal := by
   classical
   have hne := _root_.GlobalTheory.UnramConjUnit.conj_ne_id h
   obtain ⟨-, -, hrank, -⟩ := h
@@ -65,8 +70,8 @@ theorem _root_.GlobalTheory.UnramConjUnit.exists_sub_conj_notMem (h : _root_.For
   have hPbot : P ≠ ⊥ := by
     rintro rfl
     apply v.ne_bot
-    rw [hPv.over, Ideal.under, Ideal.comap_bot_of_injective _
-      (FaithfulSMul.algebraMap_injective (𝓞 F) (𝓞 E))]
+    rw [hPv.over, Ideal.under,
+      Ideal.comap_bot_of_injective _ (FaithfulSMul.algebraMap_injective (𝓞 F) (𝓞 E))]
   have he := hv ⟨P, hP, hPbot⟩ hPv
   have hin : τ ∉ Ideal.inertia (E ≃ₐ[F] E) P := by
     intro hmem
@@ -86,16 +91,14 @@ theorem _root_.GlobalTheory.UnramConjUnit.exists_sub_conj_notMem (h : _root_.For
     intro g
     rcases hG g with rfl | rfl
     · rfl
-    · have : τ (d : E) = -(d : E) := by
-        rw [hdE, map_sub, ← hτ, hττ, neg_sub]
+    · have : τ (d : E) = -(d : E) := by rw [hdE, map_sub, ← hτ, hττ, neg_sub]
       rw [map_mul, this, neg_mul_neg]
   obtain ⟨c, hc⟩ := (IsGalois.mem_range_algebraMap_iff_fixed _).mpr hfix
   have hcint : IsIntegral ℤ c := by
     have hi : IsIntegral ℤ (algebraMap F E c) := by
       rw [hc]
       exact ((d * d : 𝓞 E)).isIntegral_coe
-    exact (isIntegral_algHom_iff (IsScalarTower.toAlgHom ℤ F E)
-      (algebraMap F E).injective).mp hi
+    exact (isIntegral_algHom_iff (IsScalarTower.toAlgHom ℤ F E) (algebraMap F E).injective).mp hi
   refine ⟨x, d, ⟨c, hcint⟩, hdE, hc, ?_⟩
   intro hs
   have hmem : algebraMap (𝓞 F) (𝓞 E) ⟨c, hcint⟩ ∈ P := by
@@ -109,16 +112,25 @@ theorem _root_.GlobalTheory.UnramConjUnit.exists_sub_conj_notMem (h : _root_.For
   rw [heq] at hmem
   exact hd ((hP.mem_or_mem hmem).elim id id)
 
-
 open scoped TensorProduct Matrix in
 open NumberField IsDedekindDomain in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} in
-theorem _root_.GlobalTheory.UnramConjUnit.exists_sub_conj_unit : ∀ (F E : Type) [Field F] [NumberField F] [Field E]
-    [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ →
-    ∀ v : HeightOneSpectrum (𝓞 F), _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryLatticeOrthogonal.UnramAt F E v →
-    ∃ θ ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryLatticeOrthogonal.OEv F E v, ∃ b ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryLatticeOrthogonal.OEv F E v,
-      (θ - _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sigR (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) σ θ) * b = 1 := by
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E} in
+theorem _root_.GlobalTheory.UnramConjUnit.exists_sub_conj_unit
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ
+        → ∀ v : HeightOneSpectrum (𝓞 F),
+          _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryLatticeOrthogonal.UnramAt F E v
+            → ∃ θ
+                ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryLatticeOrthogonal.OEv F E v,
+              ∃ b
+                  ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryLatticeOrthogonal.OEv F E
+                    v,
+                (θ - _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sigR
+                      (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) σ θ)
+                    * b
+                  = 1 := by
   intro F E _ _ _ _ _ σ h v hv
   obtain ⟨t, d, s, hd, hs, hsv⟩ := _root_.GlobalTheory.UnramConjUnit.exists_sub_conj_notMem h v hv
   have hu : Valued.v (algebraMap F (v.adicCompletion F) (s : F)) = 1 := by
@@ -131,26 +143,46 @@ theorem _root_.GlobalTheory.UnramConjUnit.exists_sub_conj_unit : ∀ (F E : Type
   have hu0 : u ≠ 0 := fun h0 => by simp [h0] at hu
   have huinv : u⁻¹ ∈ v.adicCompletionIntegers F := by
     rw [HeightOneSpectrum.mem_adicCompletionIntegers, map_inv₀, hu, inv_one]
-  have hintR : ∀ y : 𝓞 E, IsIntegral (v.adicCompletionIntegers F)
-      ((1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (y : E)) := by
-    intro y
-    exact y.isIntegral_coe.map_of_comp_eq (Int.castRingHom _)
-      (Algebra.TensorProduct.includeRight (R := F) (A := _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) (B := E)).toRingHom
-      (RingHom.ext_int _ _)
-  refine ⟨(1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (t : E), hintR t,
-    (u⁻¹ : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (d : E), ?_, ?_⟩
-  · have hb : (u⁻¹ : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (d : E) =
-        algebraMap (v.adicCompletionIntegers F) (TensorProduct F (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) E) ⟨u⁻¹, huinv⟩ *
-          ((1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (d : E)) := by
-      rw [Algebra.TensorProduct.algebraMap_apply, Algebra.TensorProduct.tmul_mul_tmul,
-        mul_one, one_mul]
-      rfl
+  have hintR
+      : ∀ y : 𝓞 E,
+        IsIntegral (v.adicCompletionIntegers F)
+          ((1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (y : E)) :=
+    by
+      intro y
+      exact y.isIntegral_coe.map_of_comp_eq (Int.castRingHom _)
+        (Algebra.TensorProduct.includeRight (R := F)
+          (A := _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)
+          (B := E)).toRingHom
+        (RingHom.ext_int _ _)
+  refine ⟨
+    (1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (t : E),
+    hintR t,
+    (u⁻¹ : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (d : E),
+    ?_,
+    ?_
+  ⟩
+  · have hb
+        : (u⁻¹ : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (d : E)
+          = algebraMap (v.adicCompletionIntegers F)
+              (TensorProduct F
+                (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) E)
+              ⟨u⁻¹, huinv⟩
+            * ((1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (d : E)) :=
+      by
+        rw [Algebra.TensorProduct.algebraMap_apply, Algebra.TensorProduct.tmul_mul_tmul, mul_one,
+          one_mul]
+        rfl
     rw [hb]
     exact isIntegral_algebraMap.mul (hintR d)
-  · have hsub : (1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (t : E) -
-        _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sigR (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) σ ((1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (t : E)) =
-        (1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (d : E) := by
-      simp [_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sigR, hd, TensorProduct.tmul_sub]
+  · have hsub
+        : (1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (t : E)
+            - _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sigR
+              (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) σ
+              ((1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (t : E))
+          = (1 : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) ⊗ₜ[F] (d : E) :=
+      by
+        simp [_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sigR, hd,
+          TensorProduct.tmul_sub]
     rw [hsub, Algebra.TensorProduct.tmul_mul_tmul, one_mul, ← hs, Algebra.algebraMap_eq_smul_one,
       TensorProduct.tmul_smul, TensorProduct.smul_tmul', Algebra.smul_def]
     change (u * u⁻¹) ⊗ₜ[F] (1 : E) = 1

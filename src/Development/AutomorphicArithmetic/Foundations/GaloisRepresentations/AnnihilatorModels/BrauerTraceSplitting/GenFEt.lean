@@ -12,8 +12,9 @@ open UpperTheory.Gal.Int.Geo (FEt gen)
 
 namespace UpperTheory.Gal.crystallineComparison.Br
 
-private theorem range_subset_basicOpen (l : ℕ) {k : Type} [Field k] (hl : (l : k) ≠ 0) {Y P : Scheme.{0}} (a : P ⟶ Y)
-    (c : P ⟶ sp k) : Set.range a ⊆ (Y.basicOpen (l : Γ(Y, ⊤)) : Set Y) := by
+private theorem range_subset_basicOpen
+    (l : ℕ) {k : Type} [Field k] (hl : (l : k) ≠ 0) {Y P : Scheme.{0}} (a : P ⟶ Y) (c : P ⟶ sp k)
+    : Set.range a ⊆ (Y.basicOpen (l : Γ(Y, ⊤)) : Set Y) := by
   rintro _ ⟨x, rfl⟩
   have h1 : IsUnit ((l : Γ(sp k, ⊤))) := by
     have := (IsUnit.mk0 _ hl).map (Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom
@@ -33,12 +34,13 @@ theorem genFEt : GenFEt := by
   intro l O k _ _ _ hl Y p T
   have sY := (IsPullback.of_hasPullback p (gen O k)).flip
   have sZ := (IsPullback.of_hasPullback (T.p ≫ p) (gen O k)).flip
-  have hsq : IsPullback (pullback.fst (T.p ≫ p) (gen O k)) (bcMap (gen O k) (p := p) T.p rfl)
-      T.p (pullback.fst p (gen O k)) := by
-    have h := IsPullback.of_right (h₁₁ := bcMap (gen O k) (p := p) T.p rfl)
-      (h₁₂ := pullback.snd p (gen O k)) (v₁₁ := pullback.fst (T.p ≫ p) (gen O k))
-      (v₁₂ := pullback.fst p (gen O k)) (h₂₁ := T.p) (h₂₂ := p)
-      (by rw [bcMap_snd]; exact sZ) (bcMap_fst _ _ _) sY
+  have hsq : IsPullback (pullback.fst (T.p ≫ p) (gen O k)) (bcMap (gen O k) (p := p) T.p rfl) T.p
+      (pullback.fst p (gen O k)) := by
+    have h :=
+      IsPullback.of_right (h₁₁ := bcMap (gen O k) (p := p) T.p rfl)
+        (h₁₂ := pullback.snd p (gen O k)) (v₁₁ := pullback.fst (T.p ≫ p) (gen O k))
+        (v₁₂ := pullback.fst p (gen O k)) (h₂₁ := T.p) (h₂₂ := p) (by rw [bcMap_snd]; exact sZ)
+        (bcMap_fst _ _ _) sY
     exact h.flip
   show FEt (bcMap (gen O k) (p := p) T.p rfl) T.d
   refine ⟨?_, ?_, ?_⟩
@@ -50,8 +52,9 @@ theorem genFEt : GenFEt := by
     have hφ : φ ≫ (Y.basicOpen (l : Γ(Y, ⊤))).ι = pullback.fst p (gen O k) :=
       IsOpenImmersion.lift_fac _ _ _
     have t := (isPullback_morphismRestrict T.p (Y.basicOpen (l : Γ(Y, ⊤)))).flip
-    have w : pullback.fst (T.p ≫ p) (gen O k) ≫ T.p =
-        (bcMap (gen O k) (p := p) T.p rfl ≫ φ) ≫ (Y.basicOpen (l : Γ(Y, ⊤))).ι := by
+    have w
+        : pullback.fst (T.p ≫ p) (gen O k) ≫ T.p
+          = (bcMap (gen O k) (p := p) T.p rfl ≫ φ) ≫ (Y.basicOpen (l : Γ(Y, ⊤))).ι := by
       rw [Category.assoc, hφ]
       exact hsq.w
     have sq2 : IsPullback (t.lift _ _ w) (bcMap (gen O k) (p := p) T.p rfl)
@@ -69,12 +72,15 @@ theorem genFEt : GenFEt := by
       rw [map_natCast, map_zero]
       exact h
     rw [← T.deg K hlK (x ≫ pullback.fst p (gen O k))]
-    exact Nat.card_congr
-      { toFun := fun y => ⟨y.1 ≫ pullback.fst (T.p ≫ p) (gen O k), by
-          rw [Category.assoc, hsq.w, ← Category.assoc, y.2]⟩
-        invFun := fun z => ⟨hsq.lift z.1 x z.2, hsq.lift_snd _ _ _⟩
-        left_inv := fun y => Subtype.ext (hsq.hom_ext (hsq.lift_fst _ _ _)
-          (by rw [hsq.lift_snd]; exact y.2.symm))
-        right_inv := fun z => Subtype.ext (hsq.lift_fst _ _ _) }
+    exact Nat.card_congr {
+      toFun := fun y => ⟨
+        y.1 ≫ pullback.fst (T.p ≫ p) (gen O k),
+        by rw [Category.assoc, hsq.w, ← Category.assoc, y.2]
+      ⟩
+      invFun := fun z => ⟨hsq.lift z.1 x z.2, hsq.lift_snd _ _ _⟩
+      left_inv := fun y =>
+        Subtype.ext (hsq.hom_ext (hsq.lift_fst _ _ _) (by rw [hsq.lift_snd]; exact y.2.symm))
+      right_inv := fun z => Subtype.ext (hsq.lift_fst _ _ _)
+    }
 
 end UpperTheory.Gal.crystallineComparison.Br

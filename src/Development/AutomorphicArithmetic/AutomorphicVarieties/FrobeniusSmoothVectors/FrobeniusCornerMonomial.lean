@@ -6,13 +6,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem idx_cases (a b : Fin 3) :
-    Odd (w 3 a - w 3 b) ∨ (a = 1 ∧ b = 1) ∨ ∃ i j, a = cor i ∧ b = cor j := by
+private theorem idx_cases (a b : Fin 3)
+    : Odd (w 3 a - w 3 b) ∨ (a = 1 ∧ b = 1) ∨ ∃ i j, a = cor i ∧ b = cor j := by
   revert a b
   decide
 
-theorem UpperTheory.V.Fr.frobenius_corner_monomial :
-    ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k} {K : Type} [CommRing K] (ρ : NRep F 3 K) (σ : NRep F 2 K), IsCorner ρ σ → ∀ (j : ℤ), ∀ x ∈ ρ.mon j, x = 0 ∨ ∃ T : List F.G0, ∃ y ∈ σ.mon j, x = (T.map fun g => ρ.r g 1 1).prod * y := by
+theorem UpperTheory.V.Fr.frobenius_corner_monomial
+    : ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k} {K : Type} [CommRing K]
+        (ρ : NRep F 3 K) (σ : NRep F 2 K),
+      IsCorner ρ σ
+        → ∀ (j : ℤ), ∀ x ∈ ρ.mon j,
+          x = 0 ∨ ∃ T : List F.G0, ∃ y ∈ σ.mon j, x = (T.map fun g => ρ.r g 1 1).prod * y := by
   intro l _ k _ F K _ ρ σ hc j x hx
   obtain ⟨L, hL, rfl⟩ := hx
   induction L generalizing j with

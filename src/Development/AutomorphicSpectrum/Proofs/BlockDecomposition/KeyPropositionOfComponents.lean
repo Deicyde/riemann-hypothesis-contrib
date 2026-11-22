@@ -14,7 +14,8 @@ open Finset MeasureTheory Matrix
 
 namespace GlobalTheory.CompanionTheory.KeyAsm
 
-open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7 PositivityTheory.RgDs PositivityTheory.RgDs.K
+open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7
+  PositivityTheory.RgDs PositivityTheory.RgDs.K
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -22,26 +23,31 @@ variable {n : ℕ}
 
 section Abstract
 
-theorem starProjection_comm {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (S : Submodule ℂ H) [S.HasOrthogonalProjection] (U U' : H →L[ℂ] H) (hU : ∀ v, ‖U v‖ = ‖v‖)
-    (hUU' : ∀ v, U (U' v) = v) (hS : ∀ v ∈ S, U v ∈ S) (hS' : ∀ v ∈ S, U' v ∈ S) (x : H) :
-    S.starProjection (U x) = U (S.starProjection x) := by
+theorem starProjection_comm
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (S : Submodule ℂ H) [S.HasOrthogonalProjection]
+    (U U' : H →L[ℂ] H) (hU : ∀ v, ‖U v‖ = ‖v‖) (hUU' : ∀ v, U (U' v) = v) (hS : ∀ v ∈ S, U v ∈ S)
+    (hS' : ∀ v ∈ S, U' v ∈ S)
+    (x : H)
+    : S.starProjection (U x) = U (S.starProjection x) := by
   refine Submodule.eq_starProjection_of_mem_of_inner_eq_zero
     (hS _ (Submodule.starProjection_apply_mem S x)) fun w hw => ?_
   let I : H →ₗᵢ[ℂ] H := ⟨U.toLinearMap, hU⟩
-  have e : inner ℂ (U x - U (S.starProjection x)) (U (U' w)) =
-      inner ℂ (x - S.starProjection x) (U' w) := by
+  have e
+      : inner ℂ (U x - U (S.starProjection x)) (U (U' w))
+        = inner ℂ (x - S.starProjection x) (U' w) := by
     rw [← map_sub]
     exact I.inner_map_map _ _
   rw [hUU'] at e
   rw [e]
   exact Submodule.starProjection_inner_eq_zero _ _ (hS' w hw)
 
-theorem exists_surjective {S : Type*} [AddCommGroup S] [Module ℂ S] [FiniteDimensional ℂ S]
-    {A : ℕ → Type*} [∀ m, AddCommGroup (A m)] [∀ m, Module ℂ (A m)] (f : ∀ m, A m →ₗ[ℂ] S)
-    (hall : ∀ y, ∃ (m : ℕ) (a : A m), f m a = y)
-    (hmono : ∀ m m', m ≤ m' → ∀ a : A m, ∃ a' : A m', f m' a' = f m a) :
-    ∃ m, Function.Surjective (f m) := by
+theorem exists_surjective
+    {S : Type*} [AddCommGroup S] [Module ℂ S] [FiniteDimensional ℂ S]
+    {A : ℕ → Type*} [∀ m, AddCommGroup (A m)] [∀ m, Module ℂ (A m)]
+    (f : ∀ m, A m →ₗ[ℂ] S) (hall : ∀ y, ∃ (m : ℕ) (a : A m), f m a = y)
+    (hmono : ∀ m m', m ≤ m' → ∀ a : A m, ∃ a' : A m', f m' a' = f m a)
+    : ∃ m, Function.Surjective (f m) := by
   let b := Module.finBasis ℂ S
   choose M a ha using fun i => hall (b i)
   refine ⟨Finset.univ.sup M, ?_⟩
@@ -69,12 +75,16 @@ theorem isOpen_OmegaSet (n : ℕ) : IsOpen (OmegaSet n) := by
   rw [e]
   exact isOpen_iInter_of_finite fun i => isOpen_ne_fun (continuous_lead _) continuous_const
 
-theorem differentiableAt_of_mem_OmF {F : Matrix (Fin n) (Fin n) ℂ → ℂ} (hF : F ∈ OmF n)
-    {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n) : DifferentiableAt ℂ F z :=
+theorem differentiableAt_of_mem_OmF
+    {F : Matrix (Fin n) (Fin n) ℂ → ℂ} (hF : F ∈ OmF n)
+    {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n)
+    : DifferentiableAt ℂ F z :=
   (hF.1.differentiableOn (by simp)).differentiableAt ((isOpen_OmegaSet n).mem_nhds hz)
 
-theorem lop_add (Y : Matrix (Fin n) (Fin n) ℂ) {F G : Matrix (Fin n) (Fin n) ℂ → ℂ} (hF : F ∈ OmF n)
-    (hG : G ∈ OmF n) : lop Y (F + G) = lop Y F + lop Y G := by
+theorem lop_add
+    (Y : Matrix (Fin n) (Fin n) ℂ)
+    {F G : Matrix (Fin n) (Fin n) ℂ → ℂ} (hF : F ∈ OmF n) (hG : G ∈ OmF n)
+    : lop Y (F + G) = lop Y F + lop Y G := by
   funext z
   by_cases hz : z ∈ OmegaSet n
   · simp only [lop, if_pos hz, Pi.add_apply]
@@ -86,8 +96,9 @@ theorem lop_add (Y : Matrix (Fin n) (Fin n) ℂ) {F G : Matrix (Fin n) (Fin n) �
     ring
   · simp [lop, if_neg hz]
 
-theorem lop_smul (Y : Matrix (Fin n) (Fin n) ℂ) (c : ℂ) {F : Matrix (Fin n) (Fin n) ℂ → ℂ} (hF : F ∈ OmF n) :
-    lop Y (c • F) = c • lop Y F := by
+theorem lop_smul
+    (Y : Matrix (Fin n) (Fin n) ℂ) (c : ℂ) {F : Matrix (Fin n) (Fin n) ℂ → ℂ} (hF : F ∈ OmF n)
+    : lop Y (c • F) = c • lop Y F := by
   funext z
   by_cases hz : z ∈ OmegaSet n
   · simp only [lop, if_pos hz, Pi.smul_apply]
@@ -97,31 +108,43 @@ theorem lop_smul (Y : Matrix (Fin n) (Fin n) ℂ) (c : ℂ) {F : Matrix (Fin n) 
     simp
   · simp [lop, if_neg hz]
 
-def lopL (h1 : ∀ (Y : Matrix (Fin n) (Fin n) ℂ) (F : Matrix (Fin n) (Fin n) ℂ → ℂ), F ∈ OmF n → lop Y F ∈ OmF n)
-    (Y : Matrix (Fin n) (Fin n) ℂ) : Module.End ℂ (OmF n) where
+def lopL
+    (h1 : ∀ (Y : Matrix (Fin n) (Fin n) ℂ) (F : Matrix (Fin n) (Fin n) ℂ → ℂ),
+      F ∈ OmF n → lop Y F ∈ OmF n)
+    (Y : Matrix (Fin n) (Fin n) ℂ)
+    : Module.End ℂ (OmF n) where
   toFun F := ⟨lop Y F, h1 Y F F.2⟩
   map_add' F G := Subtype.ext (lop_add Y F.2 G.2)
   map_smul' c F := Subtype.ext (lop_smul Y c F.2)
 
-theorem lword_coe (h1 : ∀ (Y : Matrix (Fin n) (Fin n) ℂ) (F : Matrix (Fin n) (Fin n) ℂ → ℂ), F ∈ OmF n → lop Y F ∈ OmF n)
-    (Φ : OmF n) : ∀ w : List (Fin n × Fin n),
-      ((lword (fun a b => lopL h1 (Matrix.single a b 1)) w Φ : OmF n) : Matrix (Fin n) (Fin n) ℂ → ℂ) =
-        lw w (Φ : Matrix (Fin n) (Fin n) ℂ → ℂ)
+theorem lword_coe
+    (h1 : ∀ (Y : Matrix (Fin n) (Fin n) ℂ) (F : Matrix (Fin n) (Fin n) ℂ → ℂ),
+      F ∈ OmF n → lop Y F ∈ OmF n)
+    (Φ : OmF n)
+    : ∀ w : List (Fin n × Fin n),
+      ((lword (fun a b => lopL h1 (Matrix.single a b 1)) w Φ : OmF n)
+          : Matrix (Fin n) (Fin n) ℂ → ℂ)
+        = lw w (Φ : Matrix (Fin n) (Fin n) ℂ → ℂ)
   | [] => rfl
   | p :: w => by
-      show lop (Matrix.single p.1 p.2 1) _ = lop (Matrix.single p.1 p.2 1) _
-      rw [lword_coe h1 Φ w]
+    show lop (Matrix.single p.1 p.2 1) _ = lop (Matrix.single p.1 p.2 1) _
+    rw [lword_coe h1 Φ w]
 
-theorem lowAlg_model (hL : LowAlg) (hH : HolFacts) (μ : Fin n → ℤ) (η : Fin n → ℝ)
+theorem lowAlg_model
+    (hL : LowAlg) (hH : HolFacts)
+    (μ : Fin n → ℤ) (η : Fin n → ℝ)
     {B : Matrix (Fin n) (Fin n) ℂ → ℂ}
     (hB : B ∈ Submodule.span ℂ (Set.range fun w : List (Fin n × Fin n) => lw w (PhiO μ)))
-    (hw : ∀ c, lop (Matrix.single c c 1) B = (η c : ℂ) • B) (h0 : B ≠ 0) :
-    InCone (fun a => ((μ a : ℤ) : ℝ)) η ∧ (η = (fun a => ((μ a : ℤ) : ℝ)) → ∃ c : ℂ, B = c • PhiO μ) := by
+    (hw : ∀ c, lop (Matrix.single c c 1) B = (η c : ℂ) • B) (h0 : B ≠ 0)
+    : InCone (fun a => ((μ a : ℤ) : ℝ)) η
+      ∧ (η = (fun a => ((μ a : ℤ) : ℝ)) → ∃ c : ℂ, B = c • PhiO μ) := by
   obtain ⟨h1, h2, h3, h4, h5⟩ := hH n μ
   let L : Fin n → Fin n → Module.End ℂ (OmF n) := fun a b => lopL h1 (Matrix.single a b 1)
   let Φ : OmF n := ⟨PhiO μ, h3⟩
-  have hmap : Submodule.span ℂ (Set.range fun w : List (Fin n × Fin n) => lw w (PhiO μ)) =
-      (Submodule.span ℂ (Set.range fun w : List (Fin n × Fin n) => lword L w Φ)).map (OmF n).subtype := by
+  have hmap
+      : Submodule.span ℂ (Set.range fun w : List (Fin n × Fin n) => lw w (PhiO μ))
+        = (Submodule.span ℂ (Set.range fun w : List (Fin n × Fin n) => lword L w Φ)).map
+          (OmF n).subtype := by
     rw [Submodule.map_span, ← Set.range_comp]
     congr 2
     funext w
@@ -158,20 +181,26 @@ end Hol
 
 section Act
 
-variable {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : KType ε (lowK ε lam)}
-  {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)}
+variable
+  {ε : Fin n → Bool} {lam : Fin n → ℝ}
+  {T : KType ε (lowK ε lam)} {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)}
 
-theorem actF_add_smul (hP : IsPsiFor ε lam T Ψ) {m : ℕ} (a a' : AS T m) (c : ℂ)
-    {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g) :
-    actF T Ψ (a + c • a') g = actF T Ψ a g + c * actF T Ψ a' g := by
+theorem actF_add_smul
+    (hP : IsPsiFor ε lam T Ψ)
+    {m : ℕ} (a a' : AS T m)
+    (c : ℂ)
+    {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g)
+    : actF T Ψ (a + c • a') g = actF T Ψ a g + c * actF T Ψ a' g := by
   simp only [actF, Finset.sum_apply, Finset.mul_sum, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun x _ => ?_
-  have e : (fun g => inner ℂ T.w (Ψ g ((a + c • a') x))) =
-      fun g => jfun Ψ T.w (a x) g + c * jfun Ψ T.w (a' x) g := by
+  have e
+      : (fun g => inner ℂ T.w (Ψ g ((a + c • a') x)))
+        = fun g => jfun Ψ T.w (a x) g + c * jfun Ψ T.w (a' x) g := by
     funext g
     simp [jfun, inner_add_right, inner_smul_right]
   rw [e]
-  exact icx_eword_add_smul (datumFunction_isSmoothL2 hP T.w (a x)).1 (datumFunction_isSmoothL2 hP T.w (a' x)).1 c _ g hg
+  exact icx_eword_add_smul (datumFunction_isSmoothL2 hP T.w (a x)).1
+    (datumFunction_isSmoothL2 hP T.w (a' x)).1 c _ g hg
 
 theorem actF_zero {m : ℕ} : actF T Ψ (0 : AS T m) = 0 := by
   funext g
@@ -182,8 +211,10 @@ theorem actF_zero {m : ℕ} : actF T Ψ (0 : AS T m) = 0 := by
     simp
   rw [e, icx_eword_zero]
 
-theorem actF_memLp (hP : IsPsiFor ε lam T Ψ) {m : ℕ} (a : AS T m) :
-    MemLp (fun g : Formalism.REAL.UJ ε => actF T Ψ a (Formalism.MainNotions.S.umat g)) 2 (Formalism.REAL.muG ε) := by
+theorem actF_memLp (hP : IsPsiFor ε lam T Ψ) {m : ℕ} (a : AS T m)
+    : MemLp
+      (fun g : Formalism.REAL.UJ ε => actF T Ψ a (Formalism.MainNotions.S.umat g))
+      2 (Formalism.REAL.muG ε) := by
   simp only [actF, Finset.sum_apply]
   exact memLp_finsetSum _ fun x _ => (datumFunction_isSmoothL2 hP T.w (a x)).2 (ofW x)
 
@@ -202,13 +233,12 @@ def actLin (hP : IsPsiFor ε lam T Ψ) (m : ℕ) : AS T m →ₗ[ℂ] L2 ε wher
         simpa [actF_zero] using h
     exact e.trans (toL2_smul_smooth ε c _)
 
-def betaLin {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ) (m : ℕ) :
-    AS T m →ₗ[ℂ] (Matrix (Fin n) (Fin n) ℂ → ℂ) where
+def betaLin {Λ : Fin n → ℝ} (T : KType ε Λ) (μ : Fin n → ℤ) (m : ℕ)
+    : AS T m →ₗ[ℂ] (Matrix (Fin n) (Fin n) ℂ → ℂ) where
   toFun := betaF T μ
   map_add' a a' := by
     simp only [betaF, Pi.add_apply, inner_add_right, add_smul, Finset.sum_add_distrib]
-  map_smul' c a := by
-    simp [betaF, inner_smul_right, Finset.smul_sum, mul_smul]
+  map_smul' c a := by simp [betaF, inner_smul_right, Finset.smul_sum, mul_smul]
 
 end Act
 
@@ -221,8 +251,8 @@ theorem toMK_mem (k : KG ε) : toMK k ∈ UJset ε := k.1.2
 theorem continuous_toMK : Continuous (fun k : KG ε => toMK k) :=
   (continuous_toM ε).comp continuous_subtype_val
 
-theorem rreg_toMK_mul (k k' : KG ε) :
-    rreg ε (toMK (k * k')) = (rreg ε (toMK k)).comp (rreg ε (toMK k')) :=
+theorem rreg_toMK_mul (k k' : KG ε)
+    : rreg ε (toMK (k * k')) = (rreg ε (toMK k)).comp (rreg ε (toMK k')) :=
   (rreg_isURepOn ε).1.2 _ (toMK_mem k) _ (toMK_mem k')
 
 theorem rreg_toMK_one : rreg ε (toMK (1 : KG ε)) = 1 := (rreg_isURepOn ε).1.1
@@ -232,16 +262,21 @@ theorem rreg_toMK_inv (k : KG ε) (v : L2 ε) : rreg ε (toMK k) (rreg ε (toMK 
   rw [mul_inv_cancel, rreg_toMK_one] at h
   exact (DFunLike.congr_fun h v).symm
 
-def sigS (S : Submodule ℂ (L2 ε)) (hK : Formalism.MainNotions.S.IsKStableOn ε (rreg ε) S) (k : KG ε) : S →L[ℂ] S :=
+def sigS (S : Submodule ℂ (L2 ε)) (hK : Formalism.MainNotions.S.IsKStableOn ε (rreg ε) S) (k : KG ε)
+    : S →L[ℂ] S :=
   ((rreg ε (toMK k)).comp S.subtypeL).codRestrict S fun x => hK _ k.2 x x.2
 
-variable {lam : Fin n → ℝ} {T : KType ε (lowK ε lam)} {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)}
+variable
+  {lam : Fin n → ℝ} {T : KType ε (lowK ε lam)} {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)}
 
-theorem exists_section (hSec : EquivSection) (hRho : RhoRep) (hAct : ActEquiv) (hEx : Exhaust)
-    (hP : IsPsiFor ε lam T Ψ) (S : Submodule ℂ (L2 ε)) [FiniteDimensional ℂ S] [S.HasOrthogonalProjection]
-    (hle : S ≤ Hlam ε Ψ T.w) (hK : Formalism.MainNotions.S.IsKStableOn ε (rreg ε) S) :
-    ∃ (m : ℕ) (s : S →ₗ[ℂ] AS T m), (∀ y, S.orthogonalProjectionOnto (actL T Ψ (s y)) = y) ∧
-      ∀ k y, s (sigS S hK k y) = rhoA T m k (s y) := by
+theorem exists_section
+    (hSec : EquivSection) (hRho : RhoRep) (hAct : ActEquiv) (hEx : Exhaust)
+    (hP : IsPsiFor ε lam T Ψ)
+    (S : Submodule ℂ (L2 ε)) [FiniteDimensional ℂ S] [S.HasOrthogonalProjection]
+    (hle : S ≤ Hlam ε Ψ T.w) (hK : Formalism.MainNotions.S.IsKStableOn ε (rreg ε) S)
+    : ∃ (m : ℕ) (s : S →ₗ[ℂ] AS T m),
+      (∀ y, S.orthogonalProjectionOnto (actL T Ψ (s y)) = y)
+        ∧ ∀ k y, s (sigS S hK k y) = rhoA T m k (s y) := by
   let f : ∀ m, AS T m →ₗ[ℂ] S := fun m => S.orthogonalProjectionOnto.toLinearMap ∘ₗ actLin hP m
   obtain ⟨h1, h2, -⟩ := hEx n ε lam T Ψ hP
   have hall : ∀ y : S, ∃ (m : ℕ) (a : AS T m), f m a = y := by
@@ -267,8 +302,11 @@ theorem exists_section (hSec : EquivSection) (hRho : RhoRep) (hAct : ActEquiv) (
   obtain ⟨m, hm⟩ := exists_surjective f hall hmono
   have := compactSpace_KG ε
   obtain ⟨r1, r2, r3, r4, r5⟩ := hRho n ε (lowK ε lam) T m
-  let ρl : KG ε → (AS T m →ₗ[ℂ] AS T m) := fun k =>
-    { toFun := rhoA T m k, map_add' := r3 k, map_smul' := r4 k }
+  let ρl : KG ε → (AS T m →ₗ[ℂ] AS T m) := fun k => {
+    toFun := rhoA T m k
+    map_add' := r3 k
+    map_smul' := r4 k
+  }
   let ρ : KG ε → (AS T m →L[ℂ] AS T m) := fun k => LinearMap.toContinuousLinearMap (ρl k)
   have hρ1 : ρ 1 = 1 := ContinuousLinearMap.ext r1
   have hρ2 : ∀ g h, ρ (g * h) = ρ g ∘L ρ h := fun g h => ContinuousLinearMap.ext (r2 g h)
@@ -304,17 +342,22 @@ end Sub
 theorem toL2_zero_eq_zero (ε : Fin n → Bool) : toL2 ε (0 : Matrix (Fin n) (Fin n) ℂ → ℂ) = 0 := by
   simpa using toL2_smul_smooth ε 0 (0 : Matrix (Fin n) (Fin n) ℂ → ℂ)
 
-theorem key_of_steps : LowAlg → HolFacts → EquivSection → RhoRep → ActEquiv → RhoTorus → TorW → Transfer →
-    Exhaust → BetaWeight → PositivityTheory.RgDs.Key := by
+theorem key_of_steps
+    : LowAlg → HolFacts → EquivSection → RhoRep → ActEquiv → RhoTorus → TorW → Transfer → Exhaust
+      → BetaWeight
+      → PositivityTheory.RgDs.Key := by
   intro hLow hHol hSec hRho hAct _ _ hTr hEx hBeta n ε lam T μ hHC hMu hP S hfd hle hK
   haveI := hfd
   haveI : CompleteSpace S := FiniteDimensional.complete ℂ S
   obtain ⟨m, s, hs1, hs2⟩ := exists_section hSec hRho hAct hEx hP S hle hK
-  have hwt : ∀ (η : Fin n → ℝ) (x : S),
-      Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) (rreg ε) η (x : L2 ε) →
-      betaF T μ (s x) ∈ Submodule.span ℂ (Set.range fun w : List (Fin n × Fin n) => lw w (PhiO μ)) ∧
-      ∀ c, lop (Matrix.single c c 1) (betaF T μ (s x)) =
-        ((((μ c : ℤ) : ℝ) + η c - lowK ε lam c : ℝ) : ℂ) • betaF T μ (s x) := by
+  have hwt
+      : ∀ (η : Fin n → ℝ) (x : S),
+        Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) (rreg ε) η (x : L2 ε)
+          → betaF T μ (s x)
+              ∈ Submodule.span ℂ (Set.range fun w : List (Fin n × Fin n) => lw w (PhiO μ))
+            ∧ ∀ c,
+              lop (Matrix.single c c 1) (betaF T μ (s x))
+                = ((((μ c : ℤ) : ℝ) + η c - lowK ε lam c : ℝ) : ℂ) • betaF T μ (s x) := by
     intro η x hx
     refine hBeta n ε (lowK ε lam) T μ m η (s x) fun θ k hk => ?_
     have hσ : sigS S hK k x = Complex.exp (((∑ c, η c * θ c : ℝ) : ℂ) * Complex.I) • x := by
@@ -324,7 +367,16 @@ theorem key_of_steps : LowAlg → HolFacts → EquivSection → RhoRep → ActEq
       rw [hk] at hm ⊢
       exact hx θ hm
     rw [← hs2, hσ, map_smul]
-  refine ⟨Matrix (Fin n) (Fin n) ℂ → ℂ, inferInstance, inferInstance, betaLin T μ m ∘ₗ s, PhiO μ, ?_, ?_, ?_⟩
+  refine ⟨
+    Matrix (Fin n) (Fin n) ℂ → ℂ,
+    inferInstance,
+    inferInstance,
+    betaLin T μ m ∘ₗ s,
+    PhiO μ,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro S' hS' hK' hne
     by_contra hcon
     push_neg at hcon
@@ -339,14 +391,15 @@ theorem key_of_steps : LowAlg → HolFacts → EquivSection → RhoRep → ActEq
       obtain ⟨W, hW, k₀, h⟩ := hTr n ε lam T μ m hHC hMu (s x) g₀ hg₀
       rw [h g₀ (mem_of_mem_nhds hW) hg₀]
       simp [hz]
-    have hL : actL T (PsiM T μ) (s x) = 0 := (toL2_congr_of_forall_inUJ_eq hF).trans (toL2_zero_eq_zero ε)
+    have hL : actL T (PsiM T μ) (s x) = 0 :=
+      (toL2_congr_of_forall_inUJ_eq hF).trans (toL2_zero_eq_zero ε)
     have h := hs1 x
     rw [hL, map_zero] at h
     exact congrArg Subtype.val h.symm
   · intro η x hx hne
     obtain ⟨hb, hl⟩ := hwt η x hx
-    obtain ⟨c, hc1, hc2⟩ := (lowAlg_model hLow hHol μ (fun c => ((μ c : ℤ) : ℝ) + η c - lowK ε lam c)
-      hb hl hne).1
+    obtain ⟨c, hc1, hc2⟩ :=
+      (lowAlg_model hLow hHol μ (fun c => ((μ c : ℤ) : ℝ) + η c - lowK ε lam c) hb hl hne).1
     refine ⟨c, hc1, ?_⟩
     funext a
     have h := congrFun hc2 a
@@ -356,7 +409,8 @@ theorem key_of_steps : LowAlg → HolFacts → EquivSection → RhoRep → ActEq
     by_cases h0 : betaF T μ (s x) = 0
     · exact ⟨0, by rw [zero_smul]; exact h0⟩
     · obtain ⟨hb, hl⟩ := hwt _ x hx
-      exact (lowAlg_model hLow hHol μ (fun c => ((μ c : ℤ) : ℝ) + lowK ε lam c - lowK ε lam c)
+      exact (lowAlg_model hLow hHol μ
+        (fun c => ((μ c : ℤ) : ℝ) + lowK ε lam c - lowK ε lam c)
         hb hl h0).2 (by funext a; simp)
 
 end GlobalTheory.CompanionTheory.KeyAsm

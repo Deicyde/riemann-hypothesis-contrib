@@ -5,17 +5,21 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta MeasureTheory GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.Chamber GlobalTheory.AdelicU GlobalTheory.TruncKer GlobalTheory.Orb
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta MeasureTheory
+  GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.Chamber GlobalTheory.AdelicU
+  GlobalTheory.TruncKer GlobalTheory.Orb
 open Finset
 open scoped InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.GramJacobi
 
-theorem det_eq_of_cols_unit {n R : Type*} [CommRing R] [Fintype n] [DecidableEq n]
-    (M : Matrix n n R) (p : n → Prop) [DecidablePred p]
-    (h : ∀ i j, ¬ p j → M i j = (1 : Matrix n n R) i j) :
-    M.det = (M.toSquareBlockProp p).det := by
+theorem det_eq_of_cols_unit
+    {n R : Type*} [CommRing R] [Fintype n] [DecidableEq n]
+    (M : Matrix n n R)
+    (p : n → Prop) [DecidablePred p]
+    (h : ∀ i j, ¬ p j → M i j = (1 : Matrix n n R) i j)
+    : M.det = (M.toSquareBlockProp p).det := by
   rw [← Matrix.det_transpose, Matrix.twoBlockTriangular_det (Matrix.transpose M) p]
   · have h1 : ((Matrix.transpose M).toSquareBlockProp fun i => ¬ p i) = 1 := by
       ext i j
@@ -32,9 +36,11 @@ theorem det_eq_of_cols_unit {n R : Type*} [CommRing R] [Fintype n] [DecidableEq 
     rintro rfl
     exact hi hj
 
-theorem jacobi_minor {n R : Type*} [CommRing R] [Fintype n] [DecidableEq n]
-    (G H : Matrix n n R) (hHG : H * G = 1) (p : n → Prop) [DecidablePred p] :
-    (H.toSquareBlockProp fun i => ¬ p i).det * G.det = (G.toSquareBlockProp p).det := by
+theorem jacobi_minor
+    {n R : Type*} [CommRing R] [Fintype n] [DecidableEq n]
+    (G H : Matrix n n R) (hHG : H * G = 1)
+    (p : n → Prop) [DecidablePred p]
+    : (H.toSquareBlockProp fun i => ¬ p i).det * G.det = (G.toSquareBlockProp p).det := by
   have hGH : G * H = 1 := mul_eq_one_comm.mp hHG
   let N : Matrix n n R := Matrix.of fun i j => if p j then (1 : Matrix n n R) i j else H i j
   have hN : N.det = (H.toSquareBlockProp fun i => ¬ p i).det := by

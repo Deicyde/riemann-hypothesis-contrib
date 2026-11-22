@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemStandardO
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -209,14 +210,15 @@ private lemma exists_phi {F : Type} [Field F] [Algebra ℂ F] {d : ℕ} (x : Fin
 
 end UpperTheory.Gal.productCup_of_system
 
-theorem UpperTheory.Gal.productCup_of_system.deRhamRegulator_trivial_case :
-    Reg0 := by
+theorem UpperTheory.Gal.productCup_of_system.deRhamRegulator_trivial_case : Reg0 := by
   intro F _ _ d x h I J j hjI hjJ
   obtain ⟨φ, hinj, hX, hC, hr⟩ := exists_phi x h j J
   have hmem : ∀ (a : rA ℂ (xv x) I) (b : rA ℂ (xv x) J), (a : F) ⊗ₜ[ℂ] (b : F) ∈ R0 x I J :=
     fun a b => ⟨a ⊗ₜ b, by simp⟩
-  have hgen : ∀ (I' : Finset (Fin (d + 1))) (i a : Fin (d + 1)), i ∈ I' → (x a : F) / x i ∈ rA ℂ (xv x) I' :=
-    fun I' i a hi => Algebra.subset_adjoin ⟨i, hi, a, rfl⟩
+  have hgen
+      : ∀ (I' : Finset (Fin (d + 1))) (i a : Fin (d + 1)),
+        i ∈ I' → (x a : F) / x i ∈ rA ℂ (xv x) I' := fun I' i a hi =>
+    Algebra.subset_adjoin ⟨i, hi, a, rfl⟩
   set σ : F := ∏ i ∈ I, (x i : F) / x j with hσ
   have hσ0 : σ ≠ 0 := Finset.prod_ne_zero_iff.2 fun i _ => div_ne_zero (x i).ne_zero (x j).ne_zero
   have hσj : σ ∈ rA ℂ (xv x) {j} := Subalgebra.prod_mem _ fun i _ => hgen _ j i (by simp)
@@ -225,8 +227,12 @@ theorem UpperTheory.Gal.productCup_of_system.deRhamRegulator_trivial_case :
     refine Subalgebra.prod_mem _ fun i hi => ?_
     rw [inv_div]
     exact hgen _ i j hi
-  let s : (F ⊗[ℂ] F)ˣ :=
-    ⟨σ ⊗ₜ 1, σ⁻¹ ⊗ₜ 1, by simp [Algebra.TensorProduct.one_def, hσ0], by simp [Algebra.TensorProduct.one_def, hσ0]⟩
+  let s : (F ⊗[ℂ] F)ˣ := ⟨
+    σ ⊗ₜ 1,
+    σ⁻¹ ⊗ₜ 1,
+    by simp [Algebra.TensorProduct.one_def, hσ0],
+    by simp [Algebra.TensorProduct.one_def, hσ0]
+  ⟩
   have hφR : ∀ p, φ p ∈ R0 x I J := by
     intro p
     induction p using MvPolynomial.induction_on with
@@ -237,14 +243,15 @@ theorem UpperTheory.Gal.productCup_of_system.deRhamRegulator_trivial_case :
       refine Subalgebra.mul_mem _ hp ?_
       simpa using hmem ⟨_, hgen I j _ hjI⟩ 1
   have hs : (s : F ⊗[ℂ] F) ∈ φ.range := by simpa [s] using hr ⟨σ, hσj⟩ 1
-  have hs' : ((s⁻¹ : (F ⊗[ℂ] F)ˣ) : F ⊗[ℂ] F) ∈ R0 x I J := by
-    simpa [s] using hmem ⟨_, hσi⟩ 1
+  have hs' : ((s⁻¹ : (F ⊗[ℂ] F)ˣ) : F ⊗[ℂ] F) ∈ R0 x I J := by simpa [s] using hmem ⟨_, hσi⟩ 1
   have hloc : ∀ m ∈ R0 x I J, ∃ N : ℕ, (s : F ⊗[ℂ] F) ^ N * m ∈ φ.range := by
     rintro _ ⟨w, rfl⟩
     induction w using TensorProduct.induction_on with
     | zero => exact ⟨0, by simpa using φ.range.zero_mem⟩
     | tmul a b =>
-      obtain ⟨N, hN⟩ := (GlobalTheory.T.mem_standardOpenCoordinateRing_iff_localization_chart ℂ F d (xv x) h I j hjI a).1 a.2
+      obtain ⟨N, hN⟩ :=
+        (GlobalTheory.T.mem_standardOpenCoordinateRing_iff_localization_chart ℂ F d (xv x) h I j hjI
+          a).1 a.2
       refine ⟨N, ?_⟩
       have h1 := hr ⟨_, hN⟩ b
       convert h1 using 1
@@ -253,16 +260,27 @@ theorem UpperTheory.Gal.productCup_of_system.deRhamRegulator_trivial_case :
       obtain ⟨N1, h1⟩ := hu
       obtain ⟨N2, h2⟩ := hv
       refine ⟨N1 + N2, ?_⟩
-      have e : (s : F ⊗[ℂ] F) ^ (N1 + N2) * (Algebra.TensorProduct.map (rA ℂ (xv x) I).val (rA ℂ (xv x) J).val (u + v)) =
-          (s : F ⊗[ℂ] F) ^ N2 * ((s : F ⊗[ℂ] F) ^ N1 * Algebra.TensorProduct.map (rA ℂ (xv x) I).val (rA ℂ (xv x) J).val u) +
-          (s : F ⊗[ℂ] F) ^ N1 * ((s : F ⊗[ℂ] F) ^ N2 * Algebra.TensorProduct.map (rA ℂ (xv x) I).val (rA ℂ (xv x) J).val v) := by
+      have e
+          : (s : F ⊗[ℂ] F) ^ (N1 + N2)
+              * (Algebra.TensorProduct.map (rA ℂ (xv x) I).val (rA ℂ (xv x) J).val (u + v))
+            = (s : F ⊗[ℂ] F) ^ N2
+                * ((s : F ⊗[ℂ] F) ^ N1
+                  * Algebra.TensorProduct.map (rA ℂ (xv x) I).val (rA ℂ (xv x) J).val u)
+              + (s : F ⊗[ℂ] F) ^ N1
+                * ((s : F ⊗[ℂ] F) ^ N2
+                  * Algebra.TensorProduct.map (rA ℂ (xv x) I).val (rA ℂ (xv x) J).val v) := by
         rw [map_add (f := _), pow_add]; ring
-      change (s : F ⊗[ℂ] F) ^ (N1 + N2) * (Algebra.TensorProduct.map (rA ℂ (xv x) I).val (rA ℂ (xv x) J).val (u + v)) ∈ φ.range
+      change (s : F ⊗[ℂ] F) ^ (N1 + N2)
+          * (Algebra.TensorProduct.map (rA ℂ (xv x) I).val (rA ℂ (xv x) J).val (u + v))
+        ∈ φ.range
       rw [e]
-      exact φ.range.add_mem (φ.range.mul_mem (φ.range.pow_mem hs _) h1) (φ.range.mul_mem (φ.range.pow_mem hs _) h2)
+      exact φ.range.add_mem (φ.range.mul_mem (φ.range.pow_mem hs _) h1)
+        (φ.range.mul_mem (φ.range.pow_mem hs _) h2)
   let y : Fin d → rA ℂ (xv x) J := fun l => ⟨_, hgen J j (j.succAbove l) hjJ⟩
-  have key := reg_abs (R0 x I J) φ hinj hφR s hs hs' hloc
-    (fun l => MvPolynomial.X l - MvPolynomial.C (y l)) (fun k p hp => poly_reg y k p hp)
+  have key :=
+    reg_abs (R0 x I J) φ hinj hφR s hs hs' hloc
+      (fun l => MvPolynomial.X l - MvPolynomial.C (y l))
+      (fun k p hp => poly_reg y k p hp)
   have hf : f0 x j = fun l => φ (MvPolynomial.X l - MvPolynomial.C (y l)) := by
     funext l
     simp [f0, hX, hC, y]

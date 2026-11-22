@@ -9,11 +9,11 @@ namespace ReciprocityTheory.ChartRestriction.G.SA
 
 open Matrix
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι] {K : Type*} [CommRing K] {σ : K →+* K}
-  {J : Matrix ι ι K}
+variable
+  {ι : Type*} [Fintype ι] [DecidableEq ι] {K : Type*} [CommRing K] {σ : K →+* K} {J : Matrix ι ι K}
 
-theorem hf_sum_left {α : Type*} (s : Finset α) (v : α → ι → K) (y : ι → K) :
-    hf σ J (∑ i ∈ s, v i) y = ∑ i ∈ s, hf σ J (v i) y := by
+theorem hf_sum_left {α : Type*} (s : Finset α) (v : α → ι → K) (y : ι → K)
+    : hf σ J (∑ i ∈ s, v i) y = ∑ i ∈ s, hf σ J (v i) y := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [hf]
@@ -21,8 +21,8 @@ theorem hf_sum_left {α : Type*} (s : Finset α) (v : α → ι → K) (y : ι �
     rw [Finset.sum_insert hi, Finset.sum_insert hi, ← ih]
     simp only [hf, Pi.add_apply, add_mul, Finset.sum_add_distrib]
 
-theorem hf_sum_right {α : Type*} (s : Finset α) (v : α → ι → K) (x : ι → K) :
-    hf σ J x (∑ i ∈ s, v i) = ∑ i ∈ s, hf σ J x (v i) := by
+theorem hf_sum_right {α : Type*} (s : Finset α) (v : α → ι → K) (x : ι → K)
+    : hf σ J x (∑ i ∈ s, v i) = ∑ i ∈ s, hf σ J x (v i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [hf]
@@ -41,11 +41,11 @@ theorem nondeg (hdet : IsUnit J.det) {x : ι → K} (h : ∀ z, hf σ J x z = 0)
         simp
       · simp [Pi.single_apply, hj]
     simp only [hf, hs, Pi.single_apply, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
-      Finset.mem_univ, if_true] at h1
+        Finset.mem_univ, if_true]
+      at h1
     simpa [Matrix.vecMul, dotProduct] using h1
   have h2 := congrArg (fun v => Matrix.vecMul v J⁻¹) hv
   simpa [Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv J hdet] using h2
-
 
 variable (σ J) in
 structure OFam (e f : ι → K) (r : ℕ) where
@@ -64,13 +64,14 @@ def OFam.proj {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (x : ι → K) : ι
 def OFam.Spans {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) : Prop := ∀ x, F.proj x = x
 
 section
-variable (hσ : ∀ x, σ (σ x) = x) (hJ : Jᵀ = J.map σ) (he : hf σ J e e = 0) (hff : hf σ J f f = 0)
+variable
+  (hσ : ∀ x, σ (σ x) = x) (hJ : Jᵀ = J.map σ) (he : hf σ J e e = 0) (hff : hf σ J f f = 0)
   (hef : hf σ J e f = 1)
 include hσ hJ he hff hef
 
-theorem OFam.sub_proj_orth {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (x : ι → K) :
-    hf σ J (x - F.proj x) e = 0 ∧ hf σ J (x - F.proj x) f = 0 ∧
-      ∀ k, hf σ J (x - F.proj x) (F.a k) = 0 := by
+theorem OFam.sub_proj_orth {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (x : ι → K)
+    : hf σ J (x - F.proj x) e = 0 ∧ hf σ J (x - F.proj x) f = 0
+      ∧ ∀ k, hf σ J (x - F.proj x) (F.a k) = 0 := by
   have hadd : ∀ x y z, hf σ J (x + y) z = hf σ J x z + hf σ J y z := by
     intro x y z
     simp only [hf, Pi.add_apply, add_mul, Finset.sum_add_distrib]
@@ -92,8 +93,11 @@ theorem OFam.sub_proj_orth {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (x : �
     rw [hJij]
     ring
   have hfe : hf σ J f e = 1 := by rw [hsym, hef, map_one]
-  have hproj : ∀ z, hf σ J (F.proj x) z = hf σ J x f * hf σ J e z + hf σ J x e * hf σ J f z +
-      ∑ j, hf σ J x (F.a j) * F.inv j * hf σ J (F.a j) z := by
+  have hproj
+      : ∀ z,
+        hf σ J (F.proj x) z
+          = hf σ J x f * hf σ J e z + hf σ J x e * hf σ J f z
+            + ∑ j, hf σ J x (F.a j) * F.inv j * hf σ J (F.a j) z := by
     intro z
     simp only [OFam.proj, hadd, hsmul, hf_sum_left]
   refine ⟨?_, ?_, fun k => ?_⟩
@@ -112,16 +116,16 @@ theorem OFam.sub_proj_orth {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (x : �
 
 end
 
-theorem OFam.proj_add {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (x y : ι → K) :
-    F.proj (x + y) = F.proj x + F.proj y := by
+theorem OFam.proj_add {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (x y : ι → K)
+    : F.proj (x + y) = F.proj x + F.proj y := by
   have hadd : ∀ z, hf σ J (x + y) z = hf σ J x z + hf σ J y z := by
     intro z
     simp only [hf, Pi.add_apply, add_mul, Finset.sum_add_distrib]
   simp only [OFam.proj, hadd, add_smul, add_mul, Finset.sum_add_distrib]
   abel
 
-theorem OFam.proj_smul {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (c : K) (x : ι → K) :
-    F.proj (c • x) = c • F.proj x := by
+theorem OFam.proj_smul {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (c : K) (x : ι → K)
+    : F.proj (c • x) = c • F.proj x := by
   have hsmul : ∀ z, hf σ J (c • x) z = c * hf σ J x z := by
     intro z
     simp only [hf, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
@@ -130,14 +134,17 @@ theorem OFam.proj_smul {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (c : K) (x
   simp only [OFam.proj, hsmul, smul_add, Finset.smul_sum, smul_smul, mul_assoc]
 
 section Ext
-variable (hσ : ∀ x, σ (σ x) = x) (hJ : Jᵀ = J.map σ) (he : hf σ J e e = 0) (hff : hf σ J f f = 0)
+variable
+  (hσ : ∀ x, σ (σ x) = x) (hJ : Jᵀ = J.map σ) (he : hf σ J e e = 0) (hff : hf σ J f f = 0)
   (hef : hf σ J e f = 1) (hdet : IsUnit J.det) (hfix : ∀ x, σ x = x → x ≠ 0 → IsUnit x)
-  (h2 : IsUnit (2 : K)) {δ : K} (hδ : IsUnit δ) (hσδ : σ δ = -δ)
+  (h2 : IsUnit (2 : K))
+  {δ : K} (hδ : IsUnit δ) (hσδ : σ δ = -δ)
 
 include h2 hδ hσδ in
-theorem polar {p p' : ι → K} (hp : hf σ J p p = 0) (hp' : hf σ J p' p' = 0)
-    (h1 : hf σ J (p + p') (p + p') = 0) (h3 : hf σ J (p + δ • p') (p + δ • p') = 0) :
-    hf σ J p p' = 0 := by
+theorem polar
+    {p p' : ι → K} (hp : hf σ J p p = 0) (hp' : hf σ J p' p' = 0)
+    (h1 : hf σ J (p + p') (p + p') = 0) (h3 : hf σ J (p + δ • p') (p + δ • p') = 0)
+    : hf σ J p p' = 0 := by
   have hadd1 : ∀ x y z, hf σ J (x + y) z = hf σ J x z + hf σ J y z := by
     intro x y z
     simp only [hf, Pi.add_apply, add_mul, Finset.sum_add_distrib]
@@ -162,8 +169,8 @@ theorem polar {p p' : ι → K} (hp : hf σ J p p = 0) (hp' : hf σ J p' p' = 0)
   exact h2.mul_right_eq_zero.mp e4
 
 include hσ hJ he hff hef hdet hfix h2 hδ hσδ in
-theorem OFam.extend {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (hns : ¬ F.Spans) :
-    Nonempty (OFam (σ := σ) (J := J) e f (r + 1)) := by
+theorem OFam.extend {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (hns : ¬F.Spans)
+    : Nonempty (OFam (σ := σ) (J := J) e f (r + 1)) := by
   classical
   have hadd1 : ∀ x y z, hf σ J (x + y) z = hf σ J x z + hf σ J y z := by
     intro x y z
@@ -250,8 +257,8 @@ theorem OFam.extend {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (hns : ¬ F.S
     · simp only [Fin.snoc_castSucc]
       exact F.ha_f i
   · intro i j
-    refine Fin.lastCases ?_ (fun i' => ?_) i <;> refine Fin.lastCases ?_ (fun j' => ?_) j <;>
-      intro hij
+    refine Fin.lastCases ?_ (fun i' => ?_) i <;> refine Fin.lastCases ?_ (fun j' => ?_) j
+      <;> intro hij
     · exact absurd rfl hij
     · simp only [Fin.snoc_last, Fin.snoc_castSucc]
       exact hwa j'
@@ -268,7 +275,8 @@ theorem OFam.extend {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) (hns : ¬ F.S
       exact F.hinv i
 
 include hσ hJ he hff hef in
-theorem OFam.card_le [Nontrivial K] {r : ℕ} (F : OFam (σ := σ) (J := J) e f r) : r + 2 ≤ Fintype.card ι := by
+theorem OFam.card_le [Nontrivial K] {r : ℕ} (F : OFam (σ := σ) (J := J) e f r)
+    : r + 2 ≤ Fintype.card ι := by
   classical
   have hadd1 : ∀ x y z, hf σ J (x + y) z = hf σ J x z + hf σ J y z := by
     intro x y z
@@ -325,8 +333,9 @@ theorem OFam.card_le [Nontrivial K] {r : ℕ} (F : OFam (σ := σ) (J := J) e f 
       have hfk : hf σ J f (F.a k) = 0 := by rw [hsym, F.ha_f, map_zero]
       rw [hek, hfk, Finset.sum_eq_single k] at h
       · have h2 : g k.succ.succ * hf σ J (F.a k) (F.a k) = 0 := by simpa using h
-        calc g k.succ.succ = g k.succ.succ * (F.inv k * hf σ J (F.a k) (F.a k)) := by
-              rw [F.hinv, mul_one]
+        calc
+          g k.succ.succ
+            = g k.succ.succ * (F.inv k * hf σ J (F.a k) (F.a k)) := by rw [F.hinv, mul_one]
           _ = 0 := by rw [mul_comm (F.inv k), ← mul_assoc, h2, zero_mul]
       · intro j _ hjk
         rw [F.ho j k hjk, mul_zero]
@@ -342,8 +351,8 @@ include hσ hJ he hff hef hdet hfix h2 hδ hσδ in
 theorem exists_spans [Nontrivial K] : ∃ r, ∃ F : OFam (σ := σ) (J := J) e f r, F.Spans := by
   classical
   let Pr : ℕ → Prop := fun r => Nonempty (OFam (σ := σ) (J := J) e f r)
-  have h0 : Pr 0 := ⟨⟨Fin.elim0, Fin.elim0, fun j => j.elim0, fun j => j.elim0,
-    fun i => i.elim0, fun j => j.elim0⟩⟩
+  have h0 : Pr 0 :=
+    ⟨⟨Fin.elim0, Fin.elim0, fun j => j.elim0, fun j => j.elim0, fun i => i.elim0, fun j => j.elim0⟩⟩
   have hr : Pr (Nat.findGreatest Pr (Fintype.card ι)) := Nat.findGreatest_spec (Nat.zero_le _) h0
   obtain ⟨F⟩ := hr
   refine ⟨_, F, ?_⟩

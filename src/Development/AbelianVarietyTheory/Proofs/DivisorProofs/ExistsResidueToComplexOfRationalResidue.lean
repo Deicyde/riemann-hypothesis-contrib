@@ -8,17 +8,22 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotDominates
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
 
 namespace GlobalTheory.FieldPair
 
-theorem exists_residue_complex : ∀ {K : Type} [Field K] [Algebra ℂ K] (R : Subring K) (h : IsLocModel (algebraMap ℂ K) R),
-  RatRes (algebraMap ℂ K) R →
-  ∃ ε : R →+* ℂ, (∀ a : ℂ, ε ⟨algebraMap ℂ K a, h.const_mem a⟩ = a) ∧ ∀ r : R, ε r = 0 ↔ NonUnit R (r : K) := by
+theorem exists_residue_complex
+    : ∀ {K : Type} [Field K] [Algebra ℂ K] (R : Subring K) (h : IsLocModel (algebraMap ℂ K) R),
+      RatRes (algebraMap ℂ K) R
+        → ∃ ε : R →+* ℂ,
+          (∀ a : ℂ, ε ⟨algebraMap ℂ K a, h.const_mem a⟩ = a)
+            ∧ ∀ r : R, ε r = 0 ↔ NonUnit R (r : K) := by
   intro K _ _ R h hr
   haveI := h.isLocalRing
   let c0 : ℂ →+* R := (algebraMap ℂ K).codRestrict R h.const_mem
@@ -38,8 +43,8 @@ theorem exists_residue_complex : ∀ {K : Type} [Field K] [Algebra ℂ K] (R : S
   refine ⟨e.symm.toRingHom.comp (IsLocalRing.residue R), fun a => ?_, fun r => ?_⟩
   · show e.symm (φ a) = a
     exact e.symm_apply_apply a
-  · rw [nonUnit_iff (R := R) r, RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom,
-      map_eq_zero_iff _ e.symm.injective, IsLocalRing.residue_eq_zero_iff, IsLocalRing.mem_maximalIdeal,
-      mem_nonunits_iff]
+  · rw [nonUnit_iff (R := R) r, RingHom.comp_apply, RingEquiv.toRingHom_eq_coe,
+      RingEquiv.coe_toRingHom, map_eq_zero_iff _ e.symm.injective, IsLocalRing.residue_eq_zero_iff,
+      IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
 
 end GlobalTheory.FieldPair

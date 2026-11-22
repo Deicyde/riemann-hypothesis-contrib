@@ -5,7 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Polynomi
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain MvPolynomial Filter Topology GroundTheory.Automorphic GroundTheory.Automorphic.Reduction UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Ci PositivityTheory.Rg.Fx PositivityTheory.Rg.Tf.Core
+open MeasureTheory NumberField IsDedekindDomain MvPolynomial Filter Topology
+  GroundTheory.Automorphic GroundTheory.Automorphic.Reduction UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Ci PositivityTheory.Rg.Fx
+  PositivityTheory.Rg.Tf.Core
 
 private lemma abs_d_atTop (d : ℕ → ℕ)
     (hfac : ∀ B : ℝ, ∀ᶠ j : ℕ in atTop, Real.exp (B * j) ≤ (d j).factorial) :
@@ -34,21 +37,38 @@ private lemma abs_sum_eq {T : Type} [DecidableEq ℝ] (s : Finset T) (a : T → 
   refine Finset.sum_congr rfl fun ζ _ => ?_
   ring
 
-theorem UpperTheory.ConvolutionTheory.Ci.abs :
-    ∀ (T : Type) (a : T → ℝ) (τ : T → ℕ → ℂ) (act good : T → Prop) (x : ℝ), 0 < x → x ≤ 1 → ∀ (p : ℕ), 0 < p → ∀ (c₁ : ℝ) (d : ℕ → ℕ),
-      Tendsto (fun j : ℕ => (d j : ℝ) / j) atTop (𝓝 0) → (∀ B : ℝ, ∀ᶠ j : ℕ in atTop, Real.exp (B * j) ≤ (d j).factorial) →
-      (∀ i, act i → 0 < a i → ∃ (s : Finset ℂ) (c : ℂ → ℂ), 0 ∉ s ∧ ∀ᶠ j : ℕ in atTop, τ i j = ∑ ζ ∈ s, c ζ * ζ ^ j) →
-      (∀ η : ℝ, 0 < η → η < x → ∃ (s : Finset T) (u : T → ℕ → ℂ) (u' : T → ℂ) (k : ℂ), k ≠ 0 ∧ (∀ i, i ∈ s ↔ η < a i ∧ act i) ∧
-        (∀ i ∈ s, Tendsto (u i) atTop (𝓝 (u' i))) ∧ (∀ i ∈ s, good i → a i = x → u' i = k) ∧ (∀ i ∈ s, ¬ good i → u' i = 0) ∧
-        ∀ (N : ℝ) (s₀ : ℕ), ∃ K : ℝ, ∀ᶠ j : ℕ in atTop, ∀ m ≤ s₀, ∀ m' ≤ s₀,
-          ‖∑ i ∈ s, u i (d j) * (a i : ℂ) ^ d j * (cheb η (j / p + m) (a i) : ℂ) * τ i (j + m')‖ ≤
-            K ^ (d j + 1) * (Real.exp (c₁ * j) * (1 + (4 / η) ^ (j / p) / (d j).factorial) + (4 / η) ^ (j / p) * Real.exp (-N * j))) →
-      {i | act i ∧ good i ∧ a i = x}.Finite ∧ ∀ᶠ j : ℕ in atTop, ∑ᶠ i ∈ {i | act i ∧ good i ∧ a i = x}, τ i j = 0 := by
+theorem UpperTheory.ConvolutionTheory.Ci.abs
+    : ∀ (T : Type) (a : T → ℝ) (τ : T → ℕ → ℂ) (act good : T → Prop) (x : ℝ),
+      0 < x → x ≤ 1
+        → ∀ (p : ℕ),
+          0 < p
+            → ∀ (c₁ : ℝ) (d : ℕ → ℕ),
+              Tendsto (fun j : ℕ => (d j : ℝ) / j) atTop (𝓝 0)
+                → (∀ B : ℝ, ∀ᶠ j : ℕ in atTop, Real.exp (B * j) ≤ (d j).factorial)
+                → (∀ i,
+                  act i → 0 < a i
+                    → ∃ (s : Finset ℂ) (c : ℂ → ℂ),
+                      0 ∉ s ∧ ∀ᶠ j : ℕ in atTop, τ i j = ∑ ζ ∈ s, c ζ * ζ ^ j)
+                → (∀ η : ℝ,
+                  0 < η → η < x
+                    → ∃ (s : Finset T) (u : T → ℕ → ℂ) (u' : T → ℂ) (k : ℂ),
+                      k ≠ 0 ∧ (∀ i, i ∈ s ↔ η < a i ∧ act i)
+                        ∧ (∀ i ∈ s, Tendsto (u i) atTop (𝓝 (u' i)))
+                        ∧ (∀ i ∈ s, good i → a i = x → u' i = k) ∧ (∀ i ∈ s, ¬ good i → u' i = 0)
+                        ∧ ∀ (N : ℝ) (s₀ : ℕ), ∃ K : ℝ,
+                          ∀ᶠ j : ℕ in atTop, ∀ m ≤ s₀, ∀ m' ≤ s₀,
+                            ‖∑ i ∈ s, u i (d j) * (a i : ℂ) ^ d j * (cheb η (j / p + m) (a i) : ℂ) * τ i (j + m')‖ ≤
+                              K ^ (d j + 1) * (Real.exp (c₁ * j) * (1 + (4 / η) ^ (j / p) / (d j).factorial) + (4 / η) ^ (j / p) * Real.exp (-N * j)))
+                → {i | act i ∧ good i ∧ a i = x}.Finite
+                  ∧ ∀ᶠ j : ℕ in atTop, ∑ᶠ i ∈ {i | act i ∧ good i ∧ a i = x}, τ i j = 0 := by
   intro T a τ act good x hx hx1 p hp c₁ d hd hfac hτ H
   classical
   have hdt := abs_d_atTop d hfac
-  have hτ' : ∀ i, ∃ (s : Finset ℂ) (c : ℂ → ℂ), 0 ∉ s ∧ (act i → 0 < a i →
-      ∀ᶠ j : ℕ in atTop, ∀ Z : Finset ℂ, s ⊆ Z → τ i j = ∑ ζ ∈ Z, c ζ * ζ ^ j) := by
+  have hτ'
+      : ∀ i, ∃ (s : Finset ℂ) (c : ℂ → ℂ),
+        0 ∉ s
+          ∧ (act i → 0 < a i
+            → ∀ᶠ j : ℕ in atTop, ∀ Z : Finset ℂ, s ⊆ Z → τ i j = ∑ ζ ∈ Z, c ζ * ζ ^ j) := by
     intro i
     by_cases h : act i ∧ 0 < a i
     · obtain ⟨s, c, h0, hc⟩ := hτ i h.1 h.2
@@ -67,7 +87,7 @@ theorem UpperTheory.ConvolutionTheory.Ci.abs :
   have key : ∀ ζ₀ : ℂ, ζ₀ ≠ 0 → ∑ i ∈ hF.toFinset, C i ζ₀ = 0 := by
     intro ζ₀ hζ₀
     obtain ⟨η, hη, hηx, hE⟩ :=
-      UpperTheory.ConvolutionTheory.FX.exponents2 d hd hfac p hp c₁ (-Real.log ‖ζ₀‖) x hx hx1
+      UpperTheory.ConvolutionTheory.FX.exponents2 d hd hfac p hp c₁ (- Real.log ‖ζ₀‖) x hx hx1
     obtain ⟨N, hE⟩ := hE η hη le_rfl
     obtain ⟨s, u, u', k, hk, hs, hu, hg, hng, hb⟩ := H η hη hηx
     set A : Finset ℝ := insert x (s.image a) with hA
@@ -92,25 +112,33 @@ theorem UpperTheory.ConvolutionTheory.Ci.abs :
     obtain ⟨J, hJ⟩ := eventually_atTop.1 hev
     have hmem : (x, ζ₀) ∈ A ×ˢ Z :=
       Finset.mem_product.2 ⟨Finset.mem_insert_self _ _, Finset.mem_insert_self _ _⟩
-    have main := hE (A ×ˢ Z : Finset (ℝ × ℂ)) (fun q => q.1.1) (fun q => q.1.2)
-      (fun q => hAη _ (Finset.mem_product.1 q.2).1) (fun q => hZ0 _ (Finset.mem_product.1 q.2).2)
-      (fun q q' h => Subtype.ext h)
-      (fun j q => ∑ i ∈ s with a i = q.1.1, u i (d j) * C i q.1.2)
-      (fun q => ∑ i ∈ s with a i = q.1.1, u' i * C i q.1.2)
-      (fun q => tendsto_finsetSum _ fun i hi =>
-        ((hu i (Finset.mem_filter.1 hi).1).comp hdt).mul_const _)
-      (fun s₀ => by
-        obtain ⟨K, hK⟩ := hb N s₀
-        refine ⟨K, ?_⟩
-        filter_upwards [hK, eventually_ge_atTop J] with j hj hjJ m hm m' hm'
-        have e := abs_sum_eq s a A Z
-          (fun i hi => Finset.mem_insert_of_mem (Finset.mem_image_of_mem a hi))
-          (fun i => u i (d j)) C (fun i => τ i (j + m')) (fun α => (α : ℂ) ^ d j)
-          (fun α => (cheb η (j / p + m) α : ℂ)) (j + m') (hJ (j + m') (by omega))
-        rw [← Finset.sum_coe_sort] at e
-        exact (congrArg norm e).trans_le (hj m hm m' hm'))
-      ⟨(x, ζ₀), hmem⟩ le_rfl
-      (by simp only [neg_neg]; rw [Real.exp_log (norm_pos_iff.2 hζ₀)])
+    have main :=
+      hE (A ×ˢ Z : Finset (ℝ × ℂ))
+        (fun q => q.1.1)
+        (fun q => q.1.2)
+        (fun q => hAη _ (Finset.mem_product.1 q.2).1)
+        (fun q => hZ0 _ (Finset.mem_product.1 q.2).2)
+        (fun q q' h => Subtype.ext h)
+        (fun j q => ∑ i ∈ s with a i = q.1.1, u i (d j) * C i q.1.2)
+        (fun q => ∑ i ∈ s with a i = q.1.1, u' i * C i q.1.2)
+        (fun q =>
+          tendsto_finsetSum _ fun i hi => ((hu i (Finset.mem_filter.1 hi).1).comp hdt).mul_const _)
+        (fun s₀ => by
+          obtain ⟨K, hK⟩ := hb N s₀
+          refine ⟨K, ?_⟩
+          filter_upwards [hK, eventually_ge_atTop J] with j hj hjJ m hm m' hm'
+          have e :=
+            abs_sum_eq s a A Z
+              (fun i hi => Finset.mem_insert_of_mem (Finset.mem_image_of_mem a hi))
+              (fun i => u i (d j))
+              C
+              (fun i => τ i (j + m'))
+              (fun α => (α : ℂ) ^ d j)
+              (fun α => (cheb η (j / p + m) α : ℂ))
+              (j + m') (hJ (j + m') (by omega))
+          rw [← Finset.sum_coe_sort] at e
+          exact (congrArg norm e).trans_le (hj m hm m' hm'))
+        ⟨(x, ζ₀), hmem⟩ le_rfl (by simp only [neg_neg]; rw [Real.exp_log (norm_pos_iff.2 hζ₀)])
     have e : ∑ i ∈ s with a i = x, u' i * C i ζ₀ = k * ∑ i ∈ hF.toFinset, C i ζ₀ := by
       rw [Finset.mul_sum]
       symm
@@ -126,8 +154,9 @@ theorem UpperTheory.ConvolutionTheory.Ci.abs :
         have hi := hF.mem_toFinset.1 hi
         rw [hg i ((hs i).2 ⟨by rw [hi.2.2]; exact hηx, hi.1⟩) hi.2.1 hi.2.2]
     exact (mul_eq_zero.1 (e.symm.trans main)).resolve_left hk
-  have hev : ∀ᶠ j : ℕ in atTop, ∀ i ∈ hF.toFinset,
-      τ i j = ∑ ζ ∈ hF.toFinset.biUnion S, C i ζ * ζ ^ j := by
+  have hev
+      : ∀ᶠ j : ℕ in atTop, ∀ i ∈ hF.toFinset,
+        τ i j = ∑ ζ ∈ hF.toFinset.biUnion S, C i ζ * ζ ^ j := by
     refine (Filter.eventually_all_finset _).2 fun i hi => ?_
     have hi' := hF.mem_toFinset.1 hi
     filter_upwards [hSC i hi'.1 (by rw [hi'.2.2]; exact hx)] with j hj

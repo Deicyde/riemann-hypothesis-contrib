@@ -57,13 +57,16 @@ private lemma UpperTheory.exists_nat_point_avoiding_polynomials {W : Type} [Fini
   rw [map_prod, map_zero]
   exact Finset.prod_eq_zero (Finset.mem_univ w) (hQ' w a hw)
 
-theorem UpperTheory.exists_nat_combination_isUnit_of_isUnit_combination :
-    ∀ (W : Type) [Finite W] (K : W → Type) [∀ w, Field (K w)] [∀ w, CharZero (K w)] (n m : ℕ) (z : Fin m → Matrix (Fin n) (Fin n) (∀ w, K w)) (x : Fin m → ∀ w, K w), IsUnit (∑ i, x i • z i) → ∃ a : Fin m → ℕ, IsUnit (∑ i, ((a i : ℕ) : ∀ w, K w) • z i) := by
+theorem UpperTheory.exists_nat_combination_isUnit_of_isUnit_combination
+    : ∀ (W : Type) [Finite W] (K : W → Type) [∀ w, Field (K w)] [∀ w, CharZero (K w)] (n m : ℕ)
+        (z : Fin m → Matrix (Fin n) (Fin n) (∀ w, K w)) (x : Fin m → ∀ w, K w),
+      IsUnit (∑ i, x i • z i) → ∃ a : Fin m → ℕ, IsUnit (∑ i, ((a i : ℕ) : ∀ w, K w) • z i) := by
   intro W _ K _ _ n m z x hx
   let P : ∀ w, MvPolynomial (Fin m) (K w) := fun w =>
     (Matrix.of fun j k => ∑ i, MvPolynomial.X i * MvPolynomial.C (z i j k w)).det
-  have key : ∀ (y : Fin m → ∀ w, K w) (w : W),
-      (∑ i, y i • z i).det w = MvPolynomial.eval (fun i => y i w) (P w) := by
+  have key
+      : ∀ (y : Fin m → ∀ w, K w) (w : W),
+        (∑ i, y i • z i).det w = MvPolynomial.eval (fun i => y i w) (P w) := by
     intro y w
     have h1 := RingHom.map_det (Pi.evalRingHom K w) (∑ i, y i • z i)
     simp only [Pi.evalRingHom_apply] at h1
@@ -71,10 +74,12 @@ theorem UpperTheory.exists_nat_combination_isUnit_of_isUnit_combination :
     congr 1
     ext j k
     simp [Matrix.sum_apply, Finset.sum_apply]
-  have hiff : ∀ y : Fin m → ∀ w, K w, IsUnit (∑ i, y i • z i) ↔
-      ∀ w, MvPolynomial.eval (fun i => y i w) (P w) ≠ 0 := by
+  have hiff
+      : ∀ y : Fin m → ∀ w, K w,
+        IsUnit (∑ i, y i • z i) ↔ ∀ w, MvPolynomial.eval (fun i => y i w) (P w) ≠ 0 := by
     intro y
     rw [Matrix.isUnit_iff_isUnit_det, Pi.isUnit_iff]
     simp only [key, isUnit_iff_ne_zero]
-  obtain ⟨a, ha⟩ := UpperTheory.exists_nat_point_avoiding_polynomials P (fun w h => (hiff x).mp hx w (by simp [h]))
+  obtain ⟨a, ha⟩ :=
+    UpperTheory.exists_nat_point_avoiding_polynomials P (fun w h => (hiff x).mp hx w (by simp [h]))
   exact ⟨a, (hiff fun i => (a i : ∀ w, K w)).mpr (by simpa using ha)⟩

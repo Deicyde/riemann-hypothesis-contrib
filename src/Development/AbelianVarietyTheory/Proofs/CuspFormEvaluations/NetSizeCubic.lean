@@ -48,7 +48,21 @@ lemma neg_log_eps_le {M f w k L : ℝ} (hM : 1 ≤ M) (hf : 1 ≤ f) (hw : 0 < w
       Real.log_mul (by positivity) hk.ne', Real.log_mul hM0.ne' (by positivity)]
     linarith
 
-theorem net_size_cubic : ∀ (f r L M w k0 dE s NA NC g : ℝ), 1 ≤ f → 1 ≤ r → 1 ≤ L → 1 ≤ M → 0 < w → 0 < k0 → 1 ≤ dE → 0 ≤ s → 1 ≤ NA → 1 ≤ NC → 1 ≤ g → Real.log f ≤ 2 * L → Real.log r ≤ L → Real.log M ≤ 30 * L → Real.log w ≤ 3 * L → Real.log k0 ≤ 4 * L → Real.log dE ≤ 4 * f * L → Real.log (1 + s) ≤ 3 * L → Real.log NA ≤ 30 * f * L → Real.log NC ≤ 30 * f * L → Real.log g ≤ 30 * f * L → 2 * f * r ^ 2 * Real.log (3 * NA * NC * g * r * (max 1 ((2 * f * r) ^ 4 * dE ^ 2 / (4 * epStar M f w k0))) ^ 2) + (2 * f * r ^ 2 * Real.log (6 * r ^ 2 / (1 / (1000 * r ^ 2 * (1 + s)))) + 2 * f * r ^ 3 * Real.log (r * max 1 ((2 * f * r) ^ 4 * dE ^ 2 / (4 * epStar M f w k0)))) + Real.log 16 ≤ 1000 * (f * r * L) ^ 3 := by
+theorem net_size_cubic
+    : ∀ (f r L M w k0 dE s NA NC g : ℝ),
+      1 ≤ f → 1 ≤ r → 1 ≤ L → 1 ≤ M → 0 < w → 0 < k0 → 1 ≤ dE → 0 ≤ s → 1 ≤ NA → 1 ≤ NC → 1 ≤ g
+        → Real.log f ≤ 2 * L → Real.log r ≤ L → Real.log M ≤ 30 * L → Real.log w ≤ 3 * L
+        → Real.log k0 ≤ 4 * L → Real.log dE ≤ 4 * f * L → Real.log (1 + s) ≤ 3 * L
+        → Real.log NA ≤ 30 * f * L → Real.log NC ≤ 30 * f * L → Real.log g ≤ 30 * f * L
+        → 2 * f * r ^ 2
+              * Real.log
+                (3 * NA * NC * g * r
+                  * (max 1 ((2 * f * r) ^ 4 * dE ^ 2 / (4 * epStar M f w k0))) ^ 2)
+            + (2 * f * r ^ 2 * Real.log (6 * r ^ 2 / (1 / (1000 * r ^ 2 * (1 + s))))
+              + 2 * f * r ^ 3
+                * Real.log (r * max 1 ((2 * f * r) ^ 4 * dE ^ 2 / (4 * epStar M f w k0))))
+            + Real.log 16
+          ≤ 1000 * (f * r * L) ^ 3 := by
   intro f r L M w k0 dE s NA NC g hf hr hL hM hw hk hd hs hNA hNC hg lf lr lM lw lk ld ls lA lC lg
   have he := eps_pos hM hf hw hk
   have hle := neg_log_eps_le hM hf hw hk hL lf lM lw lk
@@ -77,7 +91,7 @@ theorem net_size_cubic : ∀ (f r L M w k0 dE s NA NC g : ℝ), 1 ≤ f → 1 �
       linarith
     · rw [hBdef, max_eq_left h, Real.log_one]; positivity
   have h3 : Real.log 3 ≤ 2 := by
-    have := Real.log_le_sub_one_of_pos (show (0:ℝ) < 3 by norm_num); linarith
+    have := Real.log_le_sub_one_of_pos (show (0 : ℝ) < 3 by norm_num); linarith
   have T1 : Real.log (3 * NA * NC * g * r * B ^ 2) ≤ 223 * (f * L) := by
     rw [Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) (by positivity),
       Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) (by positivity),
@@ -85,7 +99,8 @@ theorem net_size_cubic : ∀ (f r L M w k0 dE s NA NC g : ℝ), 1 ≤ f → 1 �
     push_cast
     linarith
   have h6 : Real.log 6000 ≤ 13 := by
-    have h := Real.log_le_log (show (0:ℝ) < 6000 by norm_num) (show (6000:ℝ) ≤ 2 ^ 13 by norm_num)
+    have h :=
+      Real.log_le_log (show (0 : ℝ) < 6000 by norm_num) (show (6000 : ℝ) ≤ 2 ^ 13 by norm_num)
     rw [Real.log_pow] at h
     push_cast at h
     linarith
@@ -100,13 +115,16 @@ theorem net_size_cubic : ∀ (f r L M w k0 dE s NA NC g : ℝ), 1 ≤ f → 1 �
     rw [Real.log_mul (by positivity) (by positivity)]
     linarith
   have T4 : Real.log 16 ≤ 4 := by
-    have : (16:ℝ) = 2 ^ 4 := by norm_num
-    rw [this, Real.log_pow]; push_cast; linarith
+    have : (16 : ℝ) = 2 ^ 4 := by norm_num
+    rw [this, Real.log_pow]
+    push_cast
+    linarith
   have hr23 : r ^ 2 ≤ r ^ 3 := pow_le_pow_right₀ hr (by norm_num)
   have hP : f * r ^ 3 * (f * L) ≤ (f * r * L) ^ 3 := by
     have h1 : 1 ≤ f * L ^ 2 := one_le_mul_of_one_le_of_one_le hf (one_le_pow₀ hL)
-    calc f * r ^ 3 * (f * L) ≤ f * r ^ 3 * (f * L) * (f * L ^ 2) :=
-          le_mul_of_one_le_right (by positivity) h1
+    calc
+      f * r ^ 3 * (f * L)
+        ≤ f * r ^ 3 * (f * L) * (f * L ^ 2) := le_mul_of_one_le_right (by positivity) h1
       _ = (f * r * L) ^ 3 := by ring
   have hQ : f * r ^ 2 * (f * L) ≤ f * r ^ 3 * (f * L) := by gcongr
   have hone : 1 ≤ (f * r * L) ^ 3 :=

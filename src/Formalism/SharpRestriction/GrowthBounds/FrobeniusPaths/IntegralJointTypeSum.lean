@@ -15,7 +15,8 @@ namespace Formalism.MainNotions.LemmaBAlt
 
 section Ops
 
-variable {F : Type*} [Field F] {N m k : ℕ} (LL : Letters (Fin N)) (S : Set (Fin N)) (e : Fin m → Fin k)
+variable
+  {F : Type*} [Field F] {N m k : ℕ} (LL : Letters (Fin N)) (S : Set (Fin N)) (e : Fin m → Fin k)
 
 lemma glOpsE_mul (a b : Fin m) (f g : MvPolynomial (Fin N × Fin k) F) :
     glOpsE F LL S e a b (f * g) = f * glOpsE F LL S e a b g + g * glOpsE F LL S e a b f := by
@@ -51,7 +52,8 @@ end Ops
 
 section Inter
 
-variable {n : ℕ} {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+variable
+  {n : ℕ} {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
 
 lemma inter_umon (E : GLOps n K V) (E' : GLOps n K W) (T : V →ₗ[K] W) (hT : ∀ a b x, T (E a b x) = E' a b (T x))
     (u : Module.End K V) (hu : u ∈ Umon E) : ∃ u' ∈ Umon E', ∀ x, T (u x) = u' (T x) := by
@@ -93,7 +95,8 @@ end Inter
 
 section Deg
 
-variable {F : Type*} [Field F] {N m k : ℕ} (LL : Letters (Fin N)) (S : Set (Fin N)) (e : Fin m → Fin k)
+variable
+  {F : Type*} [Field F] {N m k : ℕ} (LL : Letters (Fin N)) (S : Set (Fin N)) (e : Fin m → Fin k)
 
 lemma coeff_XD {σ : Type*} (i j : σ) (f : MvPolynomial σ F) (mm : σ →₀ ℕ) :
     AddMonoidAlgebra.coeff (X i * pderiv j f) mm =
@@ -119,7 +122,6 @@ lemma coeff_XDii {σ : Type*} (i : σ) (f : MvPolynomial σ F) (mm : σ →₀ �
     have h3 : (((mm - Finsupp.single i 1 : σ →₀ ℕ) i : ℕ) + 1 : F) = (mm i : F) := by
       rw [← h2, Nat.cast_add, Nat.cast_one]
     rw [h3, mul_comm]
-
 
 open Classical in
 def wtA (mm : Fin N × Fin k →₀ ℕ) (a : Fin m) : ℤ :=
@@ -168,8 +170,11 @@ lemma tot_single (he : Function.Injective e) (l : Fin N) (c : Fin m) :
     rw [this]; simp
   · intro h; exact absurd (Finset.mem_univ _) h
 
-def TotSub (F : Type*) [Field F] {N m k : ℕ} (LL : Letters (Fin N)) (S : Set (Fin N)) (e : Fin m → Fin k) (s : ℤ) :
-    Submodule F (MvPolynomial (Fin N × Fin k) F) :=
+def TotSub
+    (F : Type*) [Field F]
+    {N m k : ℕ} (LL : Letters (Fin N)) (S : Set (Fin N)) (e : Fin m → Fin k)
+    (s : ℤ)
+    : Submodule F (MvPolynomial (Fin N × Fin k) F) :=
   MvPolynomial.restrictSupport F {mm | tot LL S e mm = s}
 
 lemma XD_mem (he : Function.Injective e) (s : ℤ) (l : Fin N) (c d : Fin m) (f : MvPolynomial (Fin N × Fin k) F)
@@ -294,16 +299,25 @@ theorem hjb_pf (D : Formalism.BasicNotions.D7) : HJb D := by
   unfold Pol
   rw [MvPolynomial.mem_restrictSupport_iff]
   intro mm hmm l
-  have h1 := deg_of_iso_path LL (Fin.castAdd K) (Fin.castAdd_injective r K) b' P1 x (fun i => (hx i).1) mm hmm l
-  have h2 := deg_of_iso_path LL (Fin.natAdd r) (Fin.natAdd_injective K r) b'' P2 x (fun i => (hx i).2) mm hmm l
+  have h1 :=
+    deg_of_iso_path LL (Fin.castAdd K) (Fin.castAdd_injective r K) b' P1 x
+      (fun i => (hx i).1)
+      mm hmm l
+  have h2 :=
+    deg_of_iso_path LL (Fin.natAdd r) (Fin.natAdd_injective K r) b'' P2 x
+      (fun i => (hx i).2)
+      mm hmm l
   unfold multideg
   rw [Fin.sum_univ_add, h1, h2, hb]
 
 section Ev
 
-variable {F : Type*} [Field F] {N m k : ℕ} (LL : Letters (Fin N)) (e : Fin m → Fin k) (dcd : Fin k → Option (Fin m))
+variable
+  {F : Type*} [Field F]
+  {N m k : ℕ} (LL : Letters (Fin N)) (e : Fin m → Fin k) (dcd : Fin k → Option (Fin m))
 
-def Tev (y : Fin N × Fin k → F) : MvPolynomial (Fin N × Fin k) F →ₐ[F] MvPolynomial (Fin N × Fin m) F :=
+def Tev (y : Fin N × Fin k → F)
+    : MvPolynomial (Fin N × Fin k) F →ₐ[F] MvPolynomial (Fin N × Fin m) F :=
   aeval fun v => (dcd v.2).elim (C (y v)) (fun a => X (v.1, a))
 
 lemma Tev_X (y : Fin N × Fin k → F) (v : Fin N × Fin k) :
@@ -370,30 +384,45 @@ lemma exists_Tev_ne [Infinite F] (hd2 : ∀ c a, dcd c = some a → c = e a) (x 
 end Ev
 
 def dOf {N m : ℕ} (LL : Letters (Fin N)) (lam : Fin (N + 1) → Fin m → ℤ) : Fin N → ℕ := fun l =>
-  (if LL.vec l then ∑ a, lam l.succ a - ∑ a, lam l.castSucc a else ∑ a, lam l.castSucc a - ∑ a, lam l.succ a).toNat
+  (if LL.vec l then
+     ∑ a, lam l.succ a - ∑ a, lam l.castSucc a
+   else
+     ∑ a, lam l.castSucc a - ∑ a, lam l.succ a).toNat
 
-theorem path_of_iso (D : Formalism.BasicNotions.D7) (h14 : JointComponentsPaths D) {F : Type} [Field F] [CharZero F] {N m k : ℕ}
-    (LL : Letters (Fin N)) (e : Fin m → Fin k) (dcd : Fin k → Option (Fin m))
+theorem path_of_iso
+    (D : Formalism.BasicNotions.D7) (h14 : JointComponentsPaths D)
+    {F : Type} [Field F] [CharZero F]
+    {N m k : ℕ} (LL : Letters (Fin N)) (e : Fin m → Fin k) (dcd : Fin k → Option (Fin m))
     (hd1 : ∀ a, dcd (e a) = some a) (hd2 : ∀ c a, dcd c = some a → c = e a)
     (lam : Fin (N + 1) → Fin m → ℤ) (x : MvPolynomial (Fin N × Fin k) F) (hx0 : x ≠ 0)
-    (hx : ∀ i : Fin (N + 1), x ∈ isoSub (glOpsE F LL {j | j.val < i.val} e) (lam i)) :
-    ∃ d : Fin N → ℕ, ∃ P : PPath m N LL d, P.mu = lam := by
+    (hx : ∀ i : Fin (N + 1), x ∈ isoSub (glOpsE F LL {j | j.val < i.val} e) (lam i))
+    : ∃ d : Fin N → ℕ, ∃ P : PPath m N LL d, P.mu = lam := by
   obtain ⟨y, hy⟩ := exists_Tev_ne e dcd hd2 x hx0
-  have h1 : ∀ i : Fin (N + 1),
-      Tev dcd y x ∈ isoSub (glOpsE F LL {j | j.val < i.val} (id : Fin m → Fin m)) (lam i) := fun i =>
-    inter_iso _ _ (Tev dcd y).toLinearMap (fun a b f => Tev_inter LL e dcd hd1 hd2 _ y a b f) (lam i) x (hx i)
+  have h1
+      : ∀ i : Fin (N + 1),
+        Tev dcd y x
+          ∈ isoSub (glOpsE F LL {j | j.val < i.val} (id : Fin m → Fin m)) (lam i) := fun i =>
+    inter_iso _ _ (Tev dcd y).toLinearMap
+      (fun a b f => Tev_inter LL e dcd hd1 hd2 _ y a b f)
+      (lam i) x (hx i)
   refine ⟨dOf LL lam, ?_⟩
   by_contra hno
   have h2 := (h14 F N m LL (dOf LL lam) lam).2 hno
-  have h3 : Tev dcd y x ∈ Pol F m (dOf LL lam) ⊓
-      ⨅ i : Fin (N + 1), isoSub (glOps F m LL {l | l.val < i.val}) (lam i) := by
+  have h3
+      : Tev dcd y x
+        ∈ Pol F m (dOf LL lam)
+          ⊓ ⨅ i : Fin (N + 1), isoSub (glOps F m LL {l | l.val < i.val}) (lam i) := by
     refine ⟨?_, ?_⟩
     · unfold Pol
       rw [SetLike.mem_coe, MvPolynomial.mem_restrictSupport_iff]
       intro mm hmm l
       have h5 := deg_of_iso LL (id : Fin m → Fin m) Function.injective_id lam _ h1 mm hmm l
-      have h4 : ((multideg mm l : ℕ) : ℤ) = (if LL.vec l then ∑ a, lam l.succ a - ∑ a, lam l.castSucc a
-          else ∑ a, lam l.castSucc a - ∑ a, lam l.succ a) := by
+      have h4
+          : ((multideg mm l : ℕ) : ℤ)
+            = (if LL.vec l then
+                 ∑ a, lam l.succ a - ∑ a, lam l.castSucc a
+               else
+                 ∑ a, lam l.castSucc a - ∑ a, lam l.succ a) := by
         unfold multideg
         push_cast
         by_cases hv : LL.vec l
@@ -408,7 +437,8 @@ theorem path_of_iso (D : Formalism.BasicNotions.D7) (h14 : JointComponentsPaths 
   rw [h2] at h3
   exact hy ((Submodule.mem_bot F).1 h3)
 
-def dcdPl (r K : ℕ) : Fin (r + K) → Option (Fin r) := fun c => if h : c.val < r then some ⟨c.val, h⟩ else none
+def dcdPl (r K : ℕ) : Fin (r + K) → Option (Fin r) := fun c =>
+  if h : c.val < r then some ⟨c.val, h⟩ else none
 
 def dcdTan (r K : ℕ) : Fin (r + K) → Option (Fin K) := fun c =>
   if h : r ≤ c.val then some ⟨c.val - r, by have := c.isLt; omega⟩ else none
@@ -446,13 +476,17 @@ theorem hjc_pf (D : Formalism.BasicNotions.D7) (h14 : JointComponentsPaths D) : 
   intro F _ _ N r K _ _ LL nu ka hne
   obtain ⟨x, hx, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
   simp only [jointType, Submodule.mem_iInf, Submodule.mem_inf] at hx
-  obtain ⟨b', hb'⟩ := path_of_iso D h14 LL (Fin.castAdd K) (dcdPl r K) (dcdPl_1 r K) (dcdPl_2 r K) nu x hx0
-    (fun i => (hx i).1)
-  obtain ⟨b'', hb''⟩ := path_of_iso D h14 LL (Fin.natAdd r) (dcdTan r K) (dcdTan_1 r K) (dcdTan_2 r K) ka x hx0
-    (fun i => (hx i).2)
+  obtain ⟨b', hb'⟩ :=
+    path_of_iso D h14 LL (Fin.castAdd K) (dcdPl r K) (dcdPl_1 r K) (dcdPl_2 r K) nu x hx0
+      (fun i => (hx i).1)
+  obtain ⟨b'', hb''⟩ :=
+    path_of_iso D h14 LL (Fin.natAdd r) (dcdTan r K) (dcdTan_1 r K) (dcdTan_2 r K) ka x hx0
+      (fun i => (hx i).2)
   exact ⟨b', b'', hb', hb''⟩
 
-theorem integral_joint_type_sum (D : Formalism.BasicNotions.D7) (h14 : JointComponentsPaths D) (h16 : PairedPathIndependence D) : IntegralJointTypeSum D :=
+theorem integral_joint_type_sum
+    (D : Formalism.BasicNotions.D7) (h14 : JointComponentsPaths D) (h16 : PairedPathIndependence D)
+    : IntegralJointTypeSum D :=
   integral_joint_type_sum_of_parts D h16 (hjb_pf D) (hjc_pf D h14)
 
 end Formalism.MainNotions.LemmaBAlt

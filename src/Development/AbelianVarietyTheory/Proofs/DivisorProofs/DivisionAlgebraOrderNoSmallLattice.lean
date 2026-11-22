@@ -8,14 +8,17 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem divAlg_clear_denominators {B : Type} [Ring B] [Algebra ℚ B] {O : Type} [Ring O]
-    (ι : O →+* B) (v : B) (hv : v ∈ Submodule.span ℚ (Set.range ι)) :
-    ∃ n : ℕ, 0 < n ∧ ∃ c : O, ι c = (n : ℚ) • v := by
+theorem divAlg_clear_denominators
+    {B : Type} [Ring B] [Algebra ℚ B]
+    {O : Type} [Ring O]
+    (ι : O →+* B) (v : B) (hv : v ∈ Submodule.span ℚ (Set.range ι))
+    : ∃ n : ℕ, 0 < n ∧ ∃ c : O, ι c = (n : ℚ) • v := by
   induction hv using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨o, rfl⟩ := hx
     exact ⟨1, one_pos, o, by simp⟩
-  | zero => exact ⟨1, one_pos, 0, by simp⟩
+  | zero =>
+    exact ⟨1, one_pos, 0, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨n₁, hn₁, c₁, hc₁⟩ := hx
     obtain ⟨n₂, hn₂, c₂, hc₂⟩ := hy
@@ -35,19 +38,25 @@ theorem divAlg_clear_denominators {B : Type} [Ring B] [Algebra ℚ B] {O : Type}
     rw [← Rat.mul_den_eq_num]
     ring
 
-theorem divAlg_smul_injective {B : Type} [Ring B] [Algebra ℚ B] {O : Type} [Ring O]
-    (ι : O →+* B) (hunit : ∀ x : B, x ≠ 0 → IsUnit x) (hinj : Function.Injective ι)
+theorem divAlg_smul_injective
+    {B : Type} [Ring B] [Algebra ℚ B]
+    {O : Type} [Ring O]
+    (ι : O →+* B)
+    (hunit : ∀ x : B, x ≠ 0 → IsUnit x) (hinj : Function.Injective ι)
     (hspan : Submodule.span ℚ (Set.range ι) = ⊤)
-    {X : Type} [AddCommGroup X] [Module.Free ℤ X] (ρ : O →+* Module.End ℤ X)
-    (x : X) (hx : x ≠ 0) (a : O) (ha : ρ a x = 0) : a = 0 := by
+    {X : Type} [AddCommGroup X] [Module.Free ℤ X]
+    (ρ : O →+* Module.End ℤ X)
+    (x : X) (hx : x ≠ 0)
+    (a : O) (ha : ρ a x = 0)
+    : a = 0 := by
   by_contra h0
   have hιa : ι a ≠ 0 := fun h => h0 (hinj (by simpa using h))
   obtain ⟨u, hu⟩ := hunit _ hιa
   obtain ⟨n, hn, c, hc⟩ := divAlg_clear_denominators ι (↑u⁻¹ : B) (by rw [hspan]; trivial)
   have hca : c * a = (n : O) := by
     apply hinj
-    rw [map_mul, hc, map_natCast, ← hu, Algebra.smul_mul_assoc, Units.inv_mul,
-      Algebra.smul_def, mul_one]
+    rw [map_mul, hc, map_natCast, ← hu, Algebra.smul_mul_assoc, Units.inv_mul, Algebra.smul_def,
+      mul_one]
     simp
   have h1 : ρ (c * a) x = 0 := by rw [map_mul, Module.End.mul_apply, ha, map_zero]
   rw [hca, map_natCast] at h1
@@ -62,11 +71,12 @@ end GlobalTheory
 
 namespace GlobalTheory
 
-theorem divAlg_order_no_small_lattice : ∀ (B : Type) [Ring B] [Algebra ℚ B] [Module.Finite ℚ B]
-    (O : Type) [Ring O] (ι : O →+* B), (∀ x : B, x ≠ 0 → IsUnit x) → Function.Injective ι →
-    Submodule.span ℚ (Set.range ι) = ⊤ → ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X]
-    [Module.Finite ℤ X] (ρ : O →+* Module.End ℤ X), Module.finrank ℤ X < Module.finrank ℚ B →
-    Module.finrank ℤ X = 0 := by
+theorem divAlg_order_no_small_lattice
+    : ∀ (B : Type) [Ring B] [Algebra ℚ B] [Module.Finite ℚ B] (O : Type) [Ring O] (ι : O →+* B),
+      (∀ x : B, x ≠ 0 → IsUnit x) → Function.Injective ι → Submodule.span ℚ (Set.range ι) = ⊤
+        → ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+            (ρ : O →+* Module.End ℤ X),
+          Module.finrank ℤ X < Module.finrank ℚ B → Module.finrank ℤ X = 0 := by
   intro B _ _ _ O _ ι hunit hinj hspan X _ _ _ ρ hlt
   by_contra hne
   have hnt : Nontrivial X := Module.nontrivial_of_finrank_pos (R := ℤ) (Nat.pos_of_ne_zero hne)

@@ -11,8 +11,11 @@ section
 
 variable {O A : Type} [CommRing O] [IsDomain O] [CommRing A] [Algebra O A]
 
-private theorem rk_fin [IsNoetherianRing O] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] (x : A →ₐ[O] O) (j : ℤ)
-    (hx : ∀ f ∈ 𝒜 j, x f = 0) (hfg : (oz 𝒜 j).FG) : Module.Finite O (cotLat x 𝒜 j) := by
+private theorem rk_fin
+    [IsNoetherianRing O]
+    (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜]
+    (x : A →ₐ[O] O) (j : ℤ) (hx : ∀ f ∈ 𝒜 j, x f = 0) (hfg : (oz 𝒜 j).FG)
+    : Module.Finite O (cotLat x 𝒜 j) := by
   classical
   obtain ⟨S, hS⟩ := hfg
   rw [Module.Finite.iff_fg]
@@ -59,16 +62,19 @@ private theorem rk_fin [IsNoetherianRing O] (𝒜 : ℤ → Submodule O A) [Grad
       rw [e, map_smul]
       exact Submodule.smul_mem _ _ ih
 
-private noncomputable def linPart {τ : Type} (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (i : τ) :
-    A →ₗ[O] FractionRing O :=
+private noncomputable def linPart {τ : Type} (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (i : τ)
+    : A →ₗ[O] FractionRing O :=
   ((MvPowerSeries.coeff (Finsupp.single i 1)).restrictScalars O) ∘ₗ φ.toLinearMap
 
-private theorem linPart_apply {τ : Type} (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (i : τ) (f : A) :
-    linPart φ i f = MvPowerSeries.coeff (Finsupp.single i 1) (φ f) := rfl
+private theorem linPart_apply
+    {τ : Type} (φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)) (i : τ) (f : A)
+    : linPart φ i f = MvPowerSeries.coeff (Finsupp.single i 1) (φ f) :=
+  rfl
 
-private theorem linPart_sat {τ : Type} {𝒜 : ℤ → Submodule O A} {x : A →ₐ[O] O} {wt : τ → ℤ}
-    {φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)} (h : IsChart 𝒜 x wt φ) (i : τ) :
-    ∀ f ∈ satSq x, linPart φ i f = 0 := by
+private theorem linPart_sat
+    {τ : Type} {𝒜 : ℤ → Submodule O A} {x : A →ₐ[O] O} {wt : τ → ℤ}
+    {φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)} (h : IsChart 𝒜 x wt φ) (i : τ)
+    : ∀ f ∈ satSq x, linPart φ i f = 0 := by
   intro f hf
   obtain ⟨c, hc, hcf⟩ := hf
   have hker : ∀ g ∈ RingHom.ker x ^ 2, linPart φ i g = 0 := by
@@ -84,7 +90,9 @@ private theorem linPart_sat {τ : Type} {𝒜 : ℤ → Submodule O A} {x : A �
         rw [h.const, RingHom.mem_ker.mp hb, map_zero]
       have hA := (MvPowerSeries.one_le_order_iff_constCoeff_eq_zero).mpr ha0
       have hB := (MvPowerSeries.one_le_order_iff_constCoeff_eq_zero).mpr hb0
-      calc (((Finsupp.single i 1).degree : ℕ) : ℕ∞) = 1 := by simp
+      calc
+        (((Finsupp.single i 1).degree : ℕ) : ℕ∞)
+          = 1 := by simp
         _ < 1 + 1 := by norm_num
         _ ≤ (φ a).order + (φ b).order := add_le_add hA hB
         _ ≤ ((φ a) * (φ b)).order := MvPowerSeries.le_order_mul
@@ -96,16 +104,24 @@ private theorem linPart_sat {τ : Type} {𝒜 : ℤ → Submodule O A} {x : A �
   · exact absurd ((IsFractionRing.injective O (FractionRing O)) (h0.trans (map_zero _).symm)) hc
   · exact h0
 
-private theorem linPart_wt {τ : Type} {𝒜 : ℤ → Submodule O A} {x : A →ₐ[O] O} {wt : τ → ℤ}
-    {φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)} (h : IsChart 𝒜 x wt φ) (i : τ) {j : ℤ} (hij : wt i ≠ j)
-    {f : A} (hf : f ∈ 𝒜 j) : linPart φ i f = 0 := by
+private theorem linPart_wt
+    {τ : Type} {𝒜 : ℤ → Submodule O A} {x : A →ₐ[O] O} {wt : τ → ℤ}
+    {φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)} (h : IsChart 𝒜 x wt φ) (i : τ)
+    {j : ℤ} (hij : wt i ≠ j)
+    {f : A} (hf : f ∈ 𝒜 j)
+    : linPart φ i f = 0 := by
   rw [linPart_apply]
   apply h.graded j f hf
   simpa [Finsupp.weight_apply, Finsupp.sum_single_index] using hij
 
-private theorem linPart_proj {τ : Type} {𝒜 : ℤ → Submodule O A} [GradedAlgebra 𝒜] {x : A →ₐ[O] O} {wt : τ → ℤ}
-    {φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)} (h : IsChart 𝒜 x wt φ) (i : τ) {j : ℤ} (hij : wt i = j) (f : A) :
-    linPart φ i (DirectSum.decompose 𝒜 f j) = linPart φ i f := by
+private theorem linPart_proj
+    {τ : Type} {𝒜 : ℤ → Submodule O A} [GradedAlgebra 𝒜]
+    {x : A →ₐ[O] O} {wt : τ → ℤ} {φ : A →ₐ[O] MvPowerSeries τ (FractionRing O)}
+    (h : IsChart 𝒜 x wt φ)
+    (i : τ)
+    {j : ℤ} (hij : wt i = j)
+    (f : A)
+    : linPart φ i (DirectSum.decompose 𝒜 f j) = linPart φ i f := by
   classical
   conv_rhs => rw [← DirectSum.sum_support_decompose 𝒜 f]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -129,10 +145,14 @@ private theorem linPart_proj {τ : Type} {𝒜 : ℤ → Submodule O A} [GradedA
 
 end
 
-theorem UpperTheory.V.Alg.M.rk_holds :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O]
-      (A : Type) [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O), IsWRing 𝒜 x →
-    ∀ n : ℤ → ℕ, SmoothPt 𝒜 x n → Module.Finite O (cotLat x 𝒜 (-1)) ∧ Module.finrank O (cotLat x 𝒜 (-1)) = n (-1) := by
+theorem UpperTheory.V.Alg.M.rk_holds
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CharZero O] (A : Type) [CommRing A] [Algebra O A]
+        (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [IsCO O (𝒜 0)] (x : A →ₐ[O] O),
+      IsWRing 𝒜 x
+        → ∀ n : ℤ → ℕ,
+          SmoothPt 𝒜 x n
+            → Module.Finite O (cotLat x 𝒜 (-1)) ∧ Module.finrank O (cotLat x 𝒜 (-1)) = n (-1) := by
   intro O _ _ _ _ _ A _ _ 𝒜 _ _ x hW n hS
   obtain ⟨τ, _, wt, φ, hc, hn⟩ := hS
   classical
@@ -145,7 +165,8 @@ theorem UpperTheory.V.Alg.M.rk_holds :
       rw [LinearMap.mem_ker]
       funext i
       exact linPart_sat hc i.1 f hf)
-  let L : cotLat x 𝒜 (-1) →ₗ[O] ({i // wt i = -1} → FractionRing O) := Lq ∘ₗ (cotLat x 𝒜 (-1)).subtype
+  let L : cotLat x 𝒜 (-1) →ₗ[O] ({i // wt i = -1} → FractionRing O) :=
+    Lq ∘ₗ (cotLat x 𝒜 (-1)).subtype
   have hinj : Function.Injective L := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     rintro ⟨q, hq⟩ hLq
@@ -168,17 +189,24 @@ theorem UpperTheory.V.Alg.M.rk_holds :
     Function.Injective.moduleIsTorsionFree (⇑L) hinj (fun r m => L.map_smul r m)
   have hup : Module.finrank O (cotLat x 𝒜 (-1)) ≤ Fintype.card {i // wt i = -1} := by
     let B := Module.Free.chooseBasis O (cotLat x 𝒜 (-1))
-    have hli : LinearIndependent O (L ∘ B) := B.linearIndependent.map' L (LinearMap.ker_eq_bot.mpr hinj)
+    have hli : LinearIndependent O (L ∘ B) :=
+      B.linearIndependent.map' L (LinearMap.ker_eq_bot.mpr hinj)
     have hli' := (LinearIndependent.iff_fractionRing O (FractionRing O)).mp hli
     have h1 := hli'.fintype_card_le_finrank
     rw [Module.finrank_fintype_fun_eq_card] at h1
     rw [Module.finrank_eq_card_chooseBasisIndex]
     exact h1
   choose F hF0 hF1 using fun i : {i // wt i = -1} => hc.onto i.1
-  have hmem : ∀ k : {i // wt i = -1},
-      (satSq x).mkQ (DirectSum.decompose 𝒜 (F k) (-1) : A) ∈ cotLat x 𝒜 (-1) := fun k =>
-    ⟨_, ⟨(DirectSum.decompose 𝒜 (F k) (-1)).2,
-      RingHom.mem_ker.mpr (hW.fixed (-1) (by norm_num) _ (DirectSum.decompose 𝒜 (F k) (-1)).2)⟩, rfl⟩
+  have hmem
+      : ∀ k : {i // wt i = -1},
+        (satSq x).mkQ (DirectSum.decompose 𝒜 (F k) (-1) : A) ∈ cotLat x 𝒜 (-1) := fun k => ⟨
+    _,
+    ⟨
+      (DirectSum.decompose 𝒜 (F k) (-1)).2,
+      RingHom.mem_ker.mpr (hW.fixed (-1) (by norm_num) _ (DirectSum.decompose 𝒜 (F k) (-1)).2)
+    ⟩,
+    rfl
+  ⟩
   let g : {i // wt i = -1} → cotLat x 𝒜 (-1) := fun k => ⟨_, hmem k⟩
   have hgv : ∀ k i : {i // wt i = -1}, L (g k) i = linPart φ i.1 (F k) := by
     intro k i

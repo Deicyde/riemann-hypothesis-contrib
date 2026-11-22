@@ -12,8 +12,8 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology Metric Filter
 
-theorem IsolatedFibreNear.proof (hFin : CompactHolomorphicFibreFinite.Statement) :
-    IsolatedFibreNear.Statement := by
+theorem IsolatedFibreNear.proof (hFin : CompactHolomorphicFibreFinite.Statement)
+    : IsolatedFibreNear.Statement := by
   intro σ _ X w d A hX hiso
   obtain ⟨N, k, f, hN, hwN, hf, hXN⟩ := hX
   obtain ⟨W, hW, hWiso⟩ := hiso
@@ -24,7 +24,8 @@ theorem IsolatedFibreNear.proof (hFin : CompactHolomorphicFibreFinite.Statement)
     have : z ∈ X ∩ N := ⟨hzX, hzN⟩
     rw [hXN] at this
     exact this.2
-  obtain ⟨r, hr, hrsub⟩ := (nhds_basis_closedBall (x := w)).mem_iff.1 (inter_mem (hN.mem_nhds hwN) hW)
+  obtain ⟨r, hr, hrsub⟩ :=
+    (nhds_basis_closedBall (x := w)).mem_iff.1 (inter_mem (hN.mem_nhds hwN) hW)
   have hBN : closedBall w r ⊆ N := fun z hz => (hrsub hz).1
   have hBW : closedBall w r ⊆ W := fun z hz => (hrsub hz).2
 
@@ -34,7 +35,8 @@ theorem IsolatedFibreNear.proof (hFin : CompactHolomorphicFibreFinite.Statement)
   set K := sphere w r ∩ g ⁻¹' {0} with hK
   have hKc : IsCompact K := by
     refine (isCompact_sphere w r).of_isClosed_subset ?_ Set.inter_subset_left
-    exact (hgc.mono sphere_subset_closedBall).preimage_isClosed_of_isClosed isClosed_sphere isClosed_singleton
+    exact (hgc.mono sphere_subset_closedBall).preimage_isClosed_of_isClosed isClosed_sphere
+      isClosed_singleton
   have hAK : A w ∉ A '' K := by
     rintro ⟨z, ⟨hzs, hz0⟩, hzA⟩
     have hzB : z ∈ closedBall w r := sphere_subset_closedBall hzs
@@ -45,7 +47,8 @@ theorem IsolatedFibreNear.proof (hFin : CompactHolomorphicFibreFinite.Statement)
   obtain ⟨ε, hε, hεsub⟩ :=
     Metric.isOpen_iff.1 ((hKc.image A.continuous).isClosed.isOpen_compl) (A w) hAK
   refine ⟨ball w r ∩ A ⁻¹' ball (A w) ε, ?_, ?_⟩
-  · exact inter_mem (ball_mem_nhds w hr) (A.continuous.continuousAt.preimage_mem_nhds (ball_mem_nhds _ hε))
+  · exact inter_mem (ball_mem_nhds w hr)
+      (A.continuous.continuousAt.preimage_mem_nhds (ball_mem_nhds _ hε))
   rintro x ⟨hxX, hxB, hxD⟩
 
   set F := {z | z ∈ ball w r ∧ (∀ i, f i z = 0) ∧ A z = A x} with hF

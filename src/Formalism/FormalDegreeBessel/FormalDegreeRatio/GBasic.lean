@@ -20,8 +20,9 @@ theorem unitary_group_holds : UHGroup := by
     have hh' : h'ᴴ * H * h' = H := hh
     show (g * h')ᴴ * H * (g * h') = H
     rw [Matrix.conjTranspose_mul]
-    calc h'ᴴ * gᴴ * H * (g * h') = h'ᴴ * (gᴴ * H * g) * h' := by
-          simp only [Matrix.mul_assoc]
+    calc
+      h'ᴴ * gᴴ * H * (g * h')
+        = h'ᴴ * (gᴴ * H * g) * h' := by simp only [Matrix.mul_assoc]
       _ = H := by rw [hg', hh']
   · intro g hg
     have hg' : gᴴ * H * g = H := hg
@@ -35,9 +36,11 @@ theorem unitary_group_holds : UHGroup := by
     refine ⟨hdet, ?_⟩
     show (g⁻¹)ᴴ * H * g⁻¹ = H
     have h1 : g * g⁻¹ = 1 := Matrix.mul_nonsing_inv g hdet
-    calc (g⁻¹)ᴴ * H * g⁻¹ = (g⁻¹)ᴴ * (gᴴ * H * g) * g⁻¹ := by rw [hg']
+    calc
+      (g⁻¹)ᴴ * H * g⁻¹
+        = (g⁻¹)ᴴ * (gᴴ * H * g) * g⁻¹ := by rw [hg']
       _ = (g * g⁻¹)ᴴ * H * (g * g⁻¹) := by
-          rw [Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
+        rw [Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
       _ = H := by rw [h1]; simp
 
 theorem unitary_conjugation_holds : UHConj := by
@@ -47,24 +50,24 @@ theorem unitary_conjugation_holds : UHConj := by
     (P * g * P⁻¹)ᴴ * Formalism.REAL.Jm ε * (P * g * P⁻¹) = Formalism.REAL.Jm ε
   have h1 : P * P⁻¹ = 1 := Matrix.mul_nonsing_inv P hP
   have h2 : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul P hP
-  have h3 : (P⁻¹)ᴴ * Pᴴ = 1 := by
-    rw [← Matrix.conjTranspose_mul, h1, Matrix.conjTranspose_one]
-  have h4 : Pᴴ * (P⁻¹)ᴴ = 1 := by
-    rw [← Matrix.conjTranspose_mul, h2, Matrix.conjTranspose_one]
+  have h3 : (P⁻¹)ᴴ * Pᴴ = 1 := by rw [← Matrix.conjTranspose_mul, h1, Matrix.conjTranspose_one]
+  have h4 : Pᴴ * (P⁻¹)ᴴ = 1 := by rw [← Matrix.conjTranspose_mul, h2, Matrix.conjTranspose_one]
   constructor
   · intro h
-    calc (P * g * P⁻¹)ᴴ * Formalism.REAL.Jm ε * (P * g * P⁻¹)
-        = (P⁻¹)ᴴ * (gᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * g) * P⁻¹ := by
-          simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+    calc
+      (P * g * P⁻¹)ᴴ * Formalism.REAL.Jm ε * (P * g * P⁻¹)
+          = (P⁻¹)ᴴ * (gᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * g) * P⁻¹ := by
+        simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
       _ = (P⁻¹)ᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * P⁻¹ := by rw [h]
       _ = ((P⁻¹)ᴴ * Pᴴ) * Formalism.REAL.Jm ε * (P * P⁻¹) := by simp only [Matrix.mul_assoc]
       _ = Formalism.REAL.Jm ε := by rw [h3, h1, Matrix.one_mul, Matrix.mul_one]
   · intro h
-    calc gᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * g
-        = (Pᴴ * (P⁻¹)ᴴ) * (gᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * g) * (P⁻¹ * P) := by
-          rw [h4, h2, Matrix.one_mul, Matrix.mul_one]
+    calc
+      gᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * g
+          = (Pᴴ * (P⁻¹)ᴴ) * (gᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * g) * (P⁻¹ * P) := by
+        rw [h4, h2, Matrix.one_mul, Matrix.mul_one]
       _ = Pᴴ * ((P * g * P⁻¹)ᴴ * Formalism.REAL.Jm ε * (P * g * P⁻¹)) * P := by
-          simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+        simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
       _ = Pᴴ * Formalism.REAL.Jm ε * P := by rw [h]
 
 namespace GBasic
@@ -131,10 +134,20 @@ def epsK (k r : ℕ) (i : Fin (2 * r + k + 1)) : Bool := decide (i.val < r + k)
 def dK (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℂ := if epsK k r i then 1 else -1
 
 def c1 (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℂ :=
-  if i.val < r then 1 else if r + k < i.val then -1 / 2 else 1
+  if i.val < r then
+    1
+  else if r + k < i.val then
+    -1 / 2
+  else
+    1
 
 def c2 (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℂ :=
-  if i.val < r then 1 / 2 else if r + k < i.val then 1 else 0
+  if i.val < r then
+    1 / 2
+  else if r + k < i.val then
+    1
+  else
+    0
 
 def Pk (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ := fun i j =>
   (if j = i then c1 k r i else 0) + (if i = sig k r j then c2 k r i else 0)
@@ -266,13 +279,15 @@ theorem hermitian_pos_facts_hold : HpkFacts := by
       apply h
       have e2 := congrArg Fin.val e
       exact Fin.ext e2
-  · have e0 : (Finset.univ.filter fun i : Fin (2 * r + k + 1) => epsK k r i = true)
-        = Finset.univ.filter (fun i : Fin (2 * r + k + 1) => i.val < r + k) := by
+  · have e0
+        : (Finset.univ.filter fun i : Fin (2 * r + k + 1) => epsK k r i = true)
+          = Finset.univ.filter (fun i : Fin (2 * r + k + 1) => i.val < r + k) := by
       ext i
       simp [epsK]
     rw [e0, ← Finset.card_map Fin.valEmbedding]
-    have e : (Finset.univ.filter fun i : Fin (2 * r + k + 1) => i.val < r + k).map Fin.valEmbedding
-        = Finset.range (r + k) := by
+    have e
+        : (Finset.univ.filter fun i : Fin (2 * r + k + 1) => i.val < r + k).map Fin.valEmbedding
+          = Finset.range (r + k) := by
       ext x
       simp only [Finset.mem_map, Finset.mem_filter, Finset.mem_univ, true_and,
         Fin.valEmbedding_apply, Finset.mem_range]

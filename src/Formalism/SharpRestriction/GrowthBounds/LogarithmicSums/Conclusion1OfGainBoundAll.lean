@@ -46,14 +46,15 @@ theorem X'_le_X'' (s : Scale) (n : ℕ) (hn : 1 ≤ n) : s.X' ≤ s.X'' n := by
   rw [h]
   exact le_mul_of_one_le_left hX'.le (one_le_mul_of_one_le_of_one_le s.one_lt_alt.le hn')
 
-theorem cand_of_VV_ne (X : Inst D L) (K : Consts) (a b : HH D → ℤ) (p : ℕ) (h : VV X K a b p ≠ ∅) :
-    Cand D L K p := by
+theorem cand_of_VV_ne (X : Inst D L) (K : Consts) (a b : HH D → ℤ) (p : ℕ) (h : VV X K a b p ≠ ∅)
+    : Cand D L K p := by
   unfold VV at h
   split_ifs at h with hc
   · exact hc.1
   · exact absurd rfl h
 
-theorem Nm_le_Sc (P : ParameterChoice' D L) : (5 : ℝ) ≤ (D.R.k : ℝ) ∧ (D.R.N D.R.m : ℝ) ≤ L.Sc ∧ 100 ≤ L.Sc := by
+theorem Nm_le_Sc (P : ParameterChoice' D L)
+    : (5 : ℝ) ≤ (D.R.k : ℝ) ∧ (D.R.N D.R.m : ℝ) ≤ L.Sc ∧ 100 ≤ L.Sc := by
   have hm : (2 : ℝ) ≤ (D.R.m : ℝ) := by exact_mod_cast D.R.two_le_m
   have hk : (5 : ℝ) ≤ (D.R.k : ℝ) := by
     have := D.R.m_add_three_le_k
@@ -69,10 +70,12 @@ theorem Nm_le_Sc (P : ParameterChoice' D L) : (5 : ℝ) ≤ (D.R.k : ℝ) ∧ (D
     have := mul_le_mul_of_nonneg_left hm10 hN0
     linarith
   have hD : (5 : ℝ) ≤ (D.s.Del : ℝ) := by linarith
-  have hkD : 5 * (D.s.Del : ℝ) ≤ (D.R.k : ℝ) * (D.s.Del : ℝ) := mul_le_mul_of_nonneg_right hk (by linarith)
+  have hkD : 5 * (D.s.Del : ℝ) ≤ (D.R.k : ℝ) * (D.s.Del : ℝ) :=
+    mul_le_mul_of_nonneg_right hk (by linarith)
   refine ⟨hk, ?_, ?_⟩ <;> rw [L.Sc_eq] <;> nlinarith
 
-theorem kaJ_le (P : ParameterChoice' D L) (j : ℕ) (hj : j ∈ SizeData₂.lifts D) : kaJ D j ≤ L.Sc := by
+theorem kaJ_le (P : ParameterChoice' D L) (j : ℕ) (hj : j ∈ SizeData₂.lifts D)
+    : kaJ D j ≤ L.Sc := by
   obtain ⟨hk, hN, _⟩ := Nm_le_Sc P
   have hj2 : (j : ℝ) ≤ (D.R.m : ℝ) := by exact_mod_cast (Finset.mem_Icc.1 hj).2
   have hNe : (D.R.N D.R.m : ℝ) = (D.R.k : ℝ) + (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) := by
@@ -101,47 +104,58 @@ theorem two_b'_le_a (s : Scale) : 2 * s.b' ≤ s.a := by
   nlinarith
 
 def InWin (L : SizeData₂ D) (a b : HH D → ℤ) : Prop :=
-  ∀ t ∈ D.host.TT, L.sc.a ≤ (a t : ℝ) ∧
-    (a t : ℝ) ≤ L.sc.a + L.sc.a / ((D.R.k : ℝ) * L.sc.x ^ (Scale.A / 2)) ∧ L.sc.b' ≤ (b t : ℝ)
+  ∀ t ∈ D.host.TT,
+    L.sc.a ≤ (a t : ℝ) ∧ (a t : ℝ) ≤ L.sc.a + L.sc.a / ((D.R.k : ℝ) * L.sc.x ^ (Scale.A / 2))
+      ∧ L.sc.b' ≤ (b t : ℝ)
 
 def GainBoundAtPairUniform (X : Inst D L) (K : Consts) (C bo : ℝ) (a b : HH D → ℤ) : Prop :=
-  ∀ p : ℕ, p.Prime → (IsResidueClassZero D p ∨ IsSg D p) → (p : ℝ) ≤ L.sc.X'' D.R.n →
-    (∀ j ∈ SizeData₂.lifts D, 0 ≤ gainP X K a b p j ∧
-      gainP X K a b p j ≤ 4 * (D.host.TT.card : ℝ) * L.sc.a / (p : ℝ)) ∧
-    (∑ j ∈ SizeData₂.lifts D, ∑ s ∈ TTP X K a b p,
-        (askP X a b p j s - lo K L C bo p)) - (D.R.m : ℝ) * fl D L.sc C p ≤
-      (∑ j ∈ SizeData₂.lifts D, gainP X K a b p j) - tauP X K a b p
+  ∀ p : ℕ,
+    p.Prime → (IsResidueClassZero D p ∨ IsSg D p) → (p : ℝ) ≤ L.sc.X'' D.R.n
+      → (∀ j ∈ SizeData₂.lifts D,
+          0 ≤ gainP X K a b p j ∧ gainP X K a b p j ≤ 4 * (D.host.TT.card : ℝ) * L.sc.a / (p : ℝ))
+        ∧ (∑ j ∈ SizeData₂.lifts D, ∑ s ∈ TTP X K a b p,
+              (askP X a b p j s - lo K L C bo p))
+            - (D.R.m : ℝ) * fl D L.sc C p
+          ≤ (∑ j ∈ SizeData₂.lifts D, gainP X K a b p j) - tauP X K a b p
 
-def GainBoundAllUniform (X : Inst D L) (K : Consts) (C bo : ℝ) : Prop := ∀ a b, InWin L a b → GainBoundAtPairUniform X K C bo a b
+def GainBoundAllUniform (X : Inst D L) (K : Consts) (C bo : ℝ) : Prop :=
+  ∀ a b, InWin L a b → GainBoundAtPairUniform X K C bo a b
 
 def GainBoundAt (X : Inst D L) (K : Consts) (C bo : ℝ) (a b : HH D → ℤ) : Prop :=
-  ∀ p : ℕ, p.Prime → (IsResidueClassZero D p ∨ IsSg D p) → (p : ℝ) ≤ L.sc.X'' D.R.n →
-    (∀ j ∈ SizeData₂.lifts D, 0 ≤ gainP X K a b p j ∧
-      gainP X K a b p j ≤ 4 * (D.host.TT.card : ℝ) * L.sc.a / (p : ℝ)) ∧
-    (∑ j ∈ SizeData₂.lifts D, ∑ s ∈ TTP X K a b p,
-        (askG X a b p j s - lo K L C bo p)) - (D.R.m : ℝ) * fl D L.sc C p ≤
-      (∑ j ∈ SizeData₂.lifts D, gainP X K a b p j) - tauP X K a b p
+  ∀ p : ℕ,
+    p.Prime → (IsResidueClassZero D p ∨ IsSg D p) → (p : ℝ) ≤ L.sc.X'' D.R.n
+      → (∀ j ∈ SizeData₂.lifts D,
+          0 ≤ gainP X K a b p j ∧ gainP X K a b p j ≤ 4 * (D.host.TT.card : ℝ) * L.sc.a / (p : ℝ))
+        ∧ (∑ j ∈ SizeData₂.lifts D, ∑ s ∈ TTP X K a b p,
+              (askG X a b p j s - lo K L C bo p))
+            - (D.R.m : ℝ) * fl D L.sc C p
+          ≤ (∑ j ∈ SizeData₂.lifts D, gainP X K a b p j) - tauP X K a b p
 
-def GainBoundAll (X : Inst D L) (K : Consts) (C bo : ℝ) : Prop := ∀ a b, InWin L a b → GainBoundAt X K C bo a b
+def GainBoundAll (X : Inst D L) (K : Consts) (C bo : ℝ) : Prop :=
+  ∀ a b, InWin L a b → GainBoundAt X K C bo a b
 
 def RequiresAll (X : Inst D L) : Prop :=
-  ∀ a b : HH D → ℤ, (∀ s ∈ D.host.TT, (a s : ℝ) ≤ 2 * L.sc.a) → (∀ s ∈ D.host.TT, (0 : ℝ) ≤ (b s : ℝ)) →
-    ∀ p : ℕ, p.Prime → ∀ j ∈ SizeData₂.lifts D, ∀ s ∈ D.host.TT,
-    askP X a b p j s ≤ askG X a b p j s ∧
-    askG X a b p j s ≤ askP X a b p j s + Nm D * Real.logb p (2 * L.sc.a)
+  ∀ a b : HH D → ℤ,
+    (∀ s ∈ D.host.TT, (a s : ℝ) ≤ 2 * L.sc.a) → (∀ s ∈ D.host.TT, (0 : ℝ) ≤ (b s : ℝ))
+      → ∀ p : ℕ,
+        p.Prime
+          → ∀ j ∈ SizeData₂.lifts D, ∀ s ∈ D.host.TT,
+            askP X a b p j s ≤ askG X a b p j s
+              ∧ askG X a b p j s ≤ askP X a b p j s + Nm D * Real.logb p (2 * L.sc.a)
 
 def StarAt (X : Inst D L) (K : Consts) (C bo : ℝ) (a b : HH D → ℤ) (p j : ℕ) (t0 : HH D) : Prop :=
-  ∑ s ∈ topsOn X p t0, (askP X a b p j s - lo K L C bo p) ≤
-    gU X K a b p j t0 + dl X K p t0 - Pr X K b p j t0 - (⌈tv X K a b p t0⌉₊ : ℝ) - (Dp K L p : ℝ) - 1
+  ∑ s ∈ topsOn X p t0, (askP X a b p j s - lo K L C bo p)
+    ≤ gU X K a b p j t0 + dl X K p t0 - Pr X K b p j t0 - (⌈tv X K a b p t0⌉₊ : ℝ) - (Dp K L p : ℝ)
+      - 1
 
 def StarAll (X : Inst D L) (K : Consts) (C bo : ℝ) : Prop :=
-  ∀ a b, InWin L a b → ∀ p, Cand D L K p → ∀ t0 ∈ goodReps X p, ∀ j ∈ SizeData₂.lifts D, StarAt X K C bo a b p j t0
-
+  ∀ a b,
+    InWin L a b
+      → ∀ p, Cand D L K p → ∀ t0 ∈ goodReps X p, ∀ j ∈ SizeData₂.lifts D, StarAt X K C bo a b p j t0
 
 open Classical in
 def candF (D : D7) (L : SizeData₂ D) (K : Consts) : Finset ℕ :=
   (Finset.range ⌈L.sc.X'⌉₊).filter (fun p => Cand D L K p)
-
 
 open Classical in
 def ZZ (X : Inst D L) (K : Consts) (a b : HH D → ℤ) : ℝ :=
@@ -149,18 +163,22 @@ def ZZ (X : Inst D L) (K : Consts) (a b : HH D → ℤ) : ℝ :=
     ((if L.sc.x ^ (-L.sc.eps) < Sig X K a b p then 1 else 0) + Sig X K a b p)
 
 def MeanEx (X : Inst D L) (K : Consts) : Prop :=
-  (∀ a b p, Cand D L K p → 0 ≤ Sig X K a b p) ∧
-  ∃ a ∈ box D (winA D L.sc), ∃ b ∈ box D (winB D K L.sc), ZZ X K a b ≤ L.sc.x ^ (-9 : ℝ) / 4
+  (∀ a b p, Cand D L K p → 0 ≤ Sig X K a b p)
+    ∧ ∃ a ∈ box D (winA D L.sc), ∃ b ∈ box D (winB D K L.sc), ZZ X K a b ≤ L.sc.x ^ (-9 : ℝ) / 4
 
 theorem inWin_sizeData (L : SizeData₂ D) : InWin L (aL L) (bL L) := by
   intro t ht
   simp only [aL, bL, dif_pos ht]
   exact ⟨(L.aT_win _).1, (L.aT_win _).2, L.bT_ge _⟩
 
-def AdmFam {eps : ℝ} (Fm : FamP eps) (K : Consts) (X : ∀ x (i : Fm.Ix x), Inst (Fm.D x i) (Fm.L x i))
-    (Y : ∀ x (i : Fm.Ix x), LatInst (Fm.D x i)) (C31 Ce Cm : ℝ) : Prop :=
-  ∀ δ > 0, ∃ x0 : ℝ, 1 < x0 ∧ ∀ x ≥ x0, ∀ i : Fm.Ix x,
-    admitted (Fm.D x i) (Fm.L x i) (X x i) (Y x i) K ⟨C31, Ce, Cm, δ⟩
+def AdmFam
+    {eps : ℝ} (Fm : FamP eps)
+    (K : Consts) (X : ∀ x (i : Fm.Ix x), Inst (Fm.D x i) (Fm.L x i))
+    (Y : ∀ x (i : Fm.Ix x), LatInst (Fm.D x i)) (C31 Ce Cm : ℝ)
+    : Prop :=
+  ∀ δ > 0, ∃ x0 : ℝ,
+    1 < x0
+      ∧ ∀ x ≥ x0, ∀ i : Fm.Ix x, admitted (Fm.D x i) (Fm.L x i) (X x i) (Y x i) K ⟨C31, Ce, Cm, δ⟩
 
 end Formalism.MainNotions.AuxBlock8.Pf
 

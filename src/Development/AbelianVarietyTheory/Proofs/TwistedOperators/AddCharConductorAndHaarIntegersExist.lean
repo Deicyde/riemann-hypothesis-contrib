@@ -14,8 +14,8 @@ namespace GlobalTheory.SplitWeil
 
 variable {k : Type*} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem exists_cball_addChar_eq_one (ψ : AddChar k Circle) (hψ : Continuous ψ) :
-    ∃ s : kˣ, ∀ y ∈ cball s, ψ y = 1 := by
+theorem exists_cball_addChar_eq_one (ψ : AddChar k Circle) (hψ : Continuous ψ)
+    : ∃ s : kˣ, ∀ y ∈ cball s, ψ y = 1 := by
   have hU : ψ ⁻¹' Circle.centeredArc (Real.pi / 2) ∈ 𝓝 (0 : k) := by
     refine ((Circle.isOpen_centeredArc _).preimage hψ).mem_nhds ?_
     rw [Set.mem_preimage, AddChar.map_zero_eq_one]
@@ -29,8 +29,8 @@ theorem exists_cball_addChar_eq_one (ψ : AddChar k Circle) (hψ : Continuous ψ
   | zero => simp [cball]
   | succ n ih => rw [succ_nsmul]; exact add_mem_cball ih hy
 
-theorem exists_hasConductor_of_continuous (ψ : AddChar k Circle) (hψ : Continuous ψ) (h1 : ψ ≠ 1) :
-    ∃ c : kˣ, HasConductor ψ c := by
+theorem exists_hasConductor_of_continuous (ψ : AddChar k Circle) (hψ : Continuous ψ) (h1 : ψ ≠ 1)
+    : ∃ c : kˣ, HasConductor ψ c := by
   classical
   obtain ⟨s, hs⟩ := exists_cball_addChar_eq_one ψ hψ
   obtain ⟨y₀, hy₀⟩ : ∃ y, ψ y ≠ 1 := by
@@ -47,8 +47,7 @@ theorem exists_hasConductor_of_continuous (ψ : AddChar k Circle) (hψ : Continu
     exact Valuation.Integer.not_isUnit_iff_valuation_lt_one
   have hϖ1 : valuation k (ϖ : k) < 1 := (hlt ϖ).mp hϖ.not_isUnit
   have hex : ∃ n : ℕ, ∀ y, valuation k y ≤ valuation k (y₀ * (ϖ : k) ^ n) → ψ y = 1 := by
-    obtain ⟨n, hn⟩ := exists_pow_lt₀ hϖ1
-      (Units.mk0 (valuation k (y₀⁻¹ * s)) (by simp [hy0]))
+    obtain ⟨n, hn⟩ := exists_pow_lt₀ hϖ1 (Units.mk0 (valuation k (y₀⁻¹ * s)) (by simp [hy0]))
     refine ⟨n, fun y hy => hs y (show valuation k y ≤ valuation k (s : k) from hy.trans ?_)⟩
     rw [Units.val_mk0, map_mul, map_inv₀, lt_inv_mul_iff₀ (by simp [zero_lt_iff, hy0])] at hn
     rw [map_mul, map_pow]
@@ -61,8 +60,10 @@ theorem exists_hasConductor_of_continuous (ψ : AddChar k Circle) (hψ : Continu
   obtain ⟨m, hm⟩ := Nat.exists_eq_succ_of_ne_zero hne
   have hmin := Nat.find_min hex (m := m) (by omega)
   rw [hm] at hspec
-  refine ⟨Units.mk0 (y₀ * (ϖ : k) ^ (m + 1)) (mul_ne_zero hy0 (pow_ne_zero _ h0)), fun x => ⟨fun h => ?_,
-    fun h y hy => hspec y (hy.trans h)⟩⟩
+  refine ⟨
+    Units.mk0 (y₀ * (ϖ : k) ^ (m + 1)) (mul_ne_zero hy0 (pow_ne_zero _ h0)),
+    fun x => ⟨fun h => ?_, fun h y hy => hspec y (hy.trans h)⟩
+  ⟩
   by_contra hx
   rw [Units.val_mk0, not_le] at hx
   have hx0 : x ≠ 0 := by
@@ -76,15 +77,16 @@ theorem exists_hasConductor_of_continuous (ψ : AddChar k Circle) (hψ : Continu
     (mem_cball_uniformiser hϖ (x := Units.mk0 _ h0) rfl
       ⟨_, (Valuation.mem_integer_iff _ _).mpr hxi.le⟩).mpr ((hlt _).mpr hxi)
   rw [map_mul, map_inv₀, inv_mul_le_iff₀ hxp, pow_succ, ← mul_assoc, map_mul,
-    mul_le_mul_iff_left₀ (by simp [zero_lt_iff, h0])] at h2
+      mul_le_mul_iff_left₀ (by simp [zero_lt_iff, h0])]
+    at h2
   exact hmin fun y hy => h y (hy.trans h2)
 
-theorem conductor_exists :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-      [MeasurableSpace k] [BorelSpace k],
-      (∀ ψ : AddChar k Circle, Continuous ψ → ψ ≠ 1 → ∃ c : kˣ, HasConductor ψ c) ∧
-      (∃ ψ : AddChar k Circle, Continuous ψ ∧ ψ ≠ 1 ∧ HasConductor ψ 1) ∧
-      ∃ ν : Measure k, IsUnitVol ν := by
+theorem conductor_exists
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k],
+      (∀ ψ : AddChar k Circle, Continuous ψ → ψ ≠ 1 → ∃ c : kˣ, HasConductor ψ c)
+        ∧ (∃ ψ : AddChar k Circle, Continuous ψ ∧ ψ ≠ 1 ∧ HasConductor ψ 1)
+        ∧ ∃ ν : Measure k, IsUnitVol ν := by
   intro k _ _ _ _ _ _
   obtain ⟨ψ, hψ⟩ : ∃ ψ : AddChar k Circle, HasConductor ψ 1 := exists_hasConductor_one k
   exact ⟨exists_hasConductor_of_continuous, ⟨ψ, hψ.continuous, hψ.ne_one, hψ⟩, exists_isUnitVol k⟩

@@ -9,7 +9,14 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem finite_of_surjective_tensor_semilinear : ∀ (Λ : Type) [CommRing Λ] (k : Type) [Field k] (π : Λ →+* k) (O : Type) [CommRing O] (M : Type 1) [AddCommGroup M] [Module Λ M] [Module (Λ ⊗[ℤ] O) M] [IsScalarTower Λ (Λ ⊗[ℤ] O) M], Module.Finite Λ M → ∀ (N : Type 1) [AddCommGroup N] [Module (k ⊗[ℤ] O) N] (f : M →ₛₗ[(Algebra.TensorProduct.map π.toIntAlgHom (AlgHom.id ℤ O)).toRingHom] N), Function.Surjective f → Module.Finite (k ⊗[ℤ] O) N := by
+theorem finite_of_surjective_tensor_semilinear
+    : ∀ (Λ : Type) [CommRing Λ] (k : Type) [Field k] (π : Λ →+* k) (O : Type) [CommRing O]
+        (M : Type 1) [AddCommGroup M] [Module Λ M] [Module (Λ ⊗[ℤ] O) M]
+        [IsScalarTower Λ (Λ ⊗[ℤ] O) M],
+      Module.Finite Λ M
+        → ∀ (N : Type 1) [AddCommGroup N] [Module (k ⊗[ℤ] O) N]
+            (f : M →ₛₗ[(Algebra.TensorProduct.map π.toIntAlgHom (AlgHom.id ℤ O)).toRingHom] N),
+          Function.Surjective f → Module.Finite (k ⊗[ℤ] O) N := by
   intro Λ _ k _ π O _ M _ _ _ _ hM N _ _ f hf
   classical
   obtain ⟨s, hs⟩ := hM.fg_top

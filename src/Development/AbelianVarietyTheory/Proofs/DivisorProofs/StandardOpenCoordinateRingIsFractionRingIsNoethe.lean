@@ -9,27 +9,33 @@ open GlobalTheory.PD GlobalTheory.CechDR KaehlerDifferential
 
 namespace GlobalTheory.PD
 
-
 open KaehlerDifferential in
-theorem _root_.GlobalTheory.PD.rA_isFractionRing_isNoetherianRing : ∀ (k : Type) [Field k]
-    (F : Type) [Field F] [Algebra k F] (d : ℕ)
-    (x : Fin (d + 1) → F), _root_.GlobalTheory.PD.IsPd k x → ∀ I : Finset (Fin (d + 1)),
-      I.Nonempty →
-      IsFractionRing (_root_.GlobalTheory.PD.rA k x I) F ∧
-        IsNoetherianRing (_root_.GlobalTheory.PD.rA k x I) := by
+theorem _root_.GlobalTheory.PD.rA_isFractionRing_isNoetherianRing
+    : ∀ (k : Type) [Field k] (F : Type) [Field F] [Algebra k F] (d : ℕ) (x : Fin (d + 1) → F),
+      _root_.GlobalTheory.PD.IsPd k x
+        → ∀ I : Finset (Fin (d + 1)),
+          I.Nonempty
+            → IsFractionRing (_root_.GlobalTheory.PD.rA k x I) F
+              ∧ IsNoetherianRing (_root_.GlobalTheory.PD.rA k x I) := by
   intro k _ F _ _ d x hx I hI
   set S : Set F := {y | ∃ i ∈ I, ∃ j, y = x j / x i} with hS
   have hA : _root_.GlobalTheory.PD.rA k x I = Algebra.adjoin k S := rfl
   refine ⟨?_, ?_⟩
   · refine IsFractionRing.of_field _ F fun z => ?_
     obtain ⟨i, hi⟩ := hI
-    have hle : IntermediateField.adjoin k (Set.range fun j : Fin d => x j.succ / x 0) ≤
-        IntermediateField.adjoin k S := by
+    have hle
+        : IntermediateField.adjoin k (Set.range fun j : Fin d => x j.succ / x 0)
+          ≤ IntermediateField.adjoin k S := by
       rw [IntermediateField.adjoin_le_iff]
       rintro _ ⟨j, rfl⟩
       rw [SetLike.mem_coe, IntermediateField.mem_adjoin_iff_div]
-      refine ⟨x j.succ / x i, Algebra.subset_adjoin ⟨i, hi, j.succ, rfl⟩,
-        x 0 / x i, Algebra.subset_adjoin ⟨i, hi, 0, rfl⟩, ?_⟩
+      refine ⟨
+        x j.succ / x i,
+        Algebra.subset_adjoin ⟨i, hi, j.succ, rfl⟩,
+        x 0 / x i,
+        Algebra.subset_adjoin ⟨i, hi, 0, rfl⟩,
+        ?_
+      ⟩
       have h0 := hx.ne 0
       have hi0 := hx.ne i
       field_simp

@@ -32,18 +32,24 @@ theorem psiDatum : PsiDatumStatement := by
     have h1 := T.w_norm
     rw [h0, norm_zero] at h1
     exact zero_ne_one h1
-  have hN0 : ‖uniformisationL2 ε Ψ T.w T.w‖ ≠ 0 := norm_ne_zero_iff.mpr (datumEmbedding_highest_ne_zero hstd hP hv₀)
+  have hN0 : ‖uniformisationL2 ε Ψ T.w T.w‖ ≠ 0 :=
+    norm_ne_zero_iff.mpr (datumEmbedding_highest_ne_zero hstd hP hv₀)
   set c : ℂ := ((‖uniformisationL2 ε Ψ T.w T.w‖⁻¹ : ℝ) : ℂ) with hc
   have hc0 : c ≠ 0 := by rw [hc]; exact_mod_cast inv_ne_zero hN0
-  let j : T.V →ₗ[ℂ] datumV ε Ψ T.w :=
-    { toFun := fun v => ⟨⟨uniformisationL2 ε Ψ T.w (c • v), datumEmbedding_mem_smooth hP T.w _⟩,
-        (mem_datumV_iff hP T.w _).2 ⟨c • v, rfl⟩⟩
-      map_add' := fun v v' => Subtype.ext (Subtype.ext (by
+  let j : T.V →ₗ[ℂ] datumV ε Ψ T.w := {
+    toFun := fun v => ⟨
+      ⟨uniformisationL2 ε Ψ T.w (c • v), datumEmbedding_mem_smooth hP T.w _⟩,
+      (mem_datumV_iff hP T.w _).2 ⟨c • v, rfl⟩
+    ⟩
+    map_add' := fun v v' =>
+      Subtype.ext (Subtype.ext (by
         show uniformisationL2 ε Ψ T.w (c • (v + v')) = uniformisationL2 ε Ψ T.w (c • v) + uniformisationL2 ε Ψ T.w (c • v')
         rw [smul_add, datumEmbedding_add hP]))
-      map_smul' := fun a v => Subtype.ext (Subtype.ext (by
+    map_smul' := fun a v =>
+      Subtype.ext (Subtype.ext (by
         show uniformisationL2 ε Ψ T.w (c • (a • v)) = a • uniformisationL2 ε Ψ T.w (c • v)
-        rw [smul_comm, datumEmbedding_smul hP])) }
+        rw [smul_comm, datumEmbedding_smul hP]))
+  }
   have hj : Function.Bijective j := by
     refine ⟨fun v v' hv => ?_, fun x => ?_⟩
     · have : uniformisationL2 ε Ψ T.w (c • v) = uniformisationL2 ε Ψ T.w (c • v') :=
@@ -54,9 +60,23 @@ theorem psiDatum : PsiDatumStatement := by
       show uniformisationL2 ε Ψ T.w (c • c⁻¹ • v) = _
       rw [smul_smul, mul_inv_cancel₀ hc0, one_smul, hv]
   let e := LinearEquiv.ofBijective j hj
-  refine ⟨L2 ε, inferInstance, inferInstance, inferInstance, rreg ε, smD ε (rreg ε), smE ε (rreg ε),
-    datumV ε Ψ T.w, e.symm, rreg_isURepOn ε, isDerivedOn_smE (rreg_isURepOn ε),
-    datumV_isKIrrHW hP hv₀, datumV_casimir hP T.w, datumV_kStable hP T.w, fun g hgm v v' => ?_⟩
+  refine ⟨
+    L2 ε,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    rreg ε,
+    smD ε (rreg ε),
+    smE ε (rreg ε),
+    datumV ε Ψ T.w,
+    e.symm,
+    rreg_isURepOn ε,
+    isDerivedOn_smE (rreg_isURepOn ε),
+    datumV_isKIrrHW hP hv₀,
+    datumV_casimir hP T.w,
+    datumV_kStable hP T.w,
+    fun g hgm v v' => ?_
+  ⟩
   obtain ⟨x, rfl⟩ := e.surjective v
   obtain ⟨x', rfl⟩ := e.surjective v'
   rw [e.symm_apply_apply, e.symm_apply_apply]

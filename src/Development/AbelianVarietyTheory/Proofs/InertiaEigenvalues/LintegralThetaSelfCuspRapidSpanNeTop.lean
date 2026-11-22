@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsN
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW GroundTheory.Global.IdeleGroup Formalism.L2.Host
+open NumberField IsDedekindDomain Matrix MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW
+  GroundTheory.Global.IdeleGroup Formalism.L2.Host
 open scoped ENNReal nonZeroDivisors ComplexConjugate
 open GlobalTheory.ThetaPoisson GlobalTheory.RSTheta
 
@@ -24,11 +25,15 @@ namespace GlobalTheory.RSThetaSelf
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem rsPsi_self_eq_norm (ℓ : Fin a) (F : GA E a → ℂ) {Φ : (Fin a → Cinf E) → ℂ}
-    (hΦ : ∀ u, 0 ≤ (Φ u).re ∧ (Φ u).im = 0) (J : (FractionalIdeal (𝓞 E)⁰ E)ˣ) (η : Fin a → Af E) (g : GA E a)
-    (y : Fin a → Ad E) : rsPsi ℓ F F Φ J η g y = ((‖rsPsi ℓ F F Φ J η g y‖ : ℝ) : ℂ) := by
-  have key : ∀ z w t : ℂ, 0 ≤ w.re → w.im = 0 → (t = 0 ∨ t = 1) →
-      z * conj z * w * t = ((‖z * conj z * w * t‖ : ℝ) : ℂ) := by
+theorem rsPsi_self_eq_norm
+    (ℓ : Fin a) (F : GA E a → ℂ)
+    {Φ : (Fin a → Cinf E) → ℂ} (hΦ : ∀ u, 0 ≤ (Φ u).re ∧ (Φ u).im = 0)
+    (J : (FractionalIdeal (𝓞 E)⁰ E)ˣ) (η : Fin a → Af E) (g : GA E a) (y : Fin a → Ad E)
+    : rsPsi ℓ F F Φ J η g y = ((‖rsPsi ℓ F F Φ J η g y‖ : ℝ) : ℂ) := by
+  have key
+      : ∀ z w t : ℂ,
+        0 ≤ w.re → w.im = 0 → (t = 0 ∨ t = 1)
+          → z * conj z * w * t = ((‖z * conj z * w * t‖ : ℝ) : ℂ) := by
     intro z w t h1 h2 ht
     have hw : w = ((w.re : ℝ) : ℂ) := Complex.ext (by simp) (by simp [h2])
     rcases ht with rfl | rfl

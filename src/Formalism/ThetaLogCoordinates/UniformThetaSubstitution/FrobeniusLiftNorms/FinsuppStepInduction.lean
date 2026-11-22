@@ -22,8 +22,8 @@ section Shift
 variable {K ι κ : Type} [Field K] [Fintype κ]
 
 def shiftGen (b : κ → ι → K) (x : ι) : MvPolynomial κ (MvPolynomial ι K) :=
-  MvPolynomial.C (MvPolynomial.X x) +
-    ∑ k, MvPolynomial.C (MvPolynomial.C (b k x)) * MvPolynomial.X k
+  MvPolynomial.C (MvPolynomial.X x)
+    + ∑ k, MvPolynomial.C (MvPolynomial.C (b k x)) * MvPolynomial.X k
 
 lemma shiftPoly_eq (b : κ → ι → K) (Q : MvPolynomial ι K) :
     shiftPoly b Q = MvPolynomial.aeval (shiftGen b) Q := rfl
@@ -201,8 +201,9 @@ theorem e_one_identity_of : JetPairingHasseIdentity := by
     simp [hasseDir_zero_left]
   | hs β k ih =>
     intro Q G
-    have h1 : (∏ k', linS (b k') ^ (β + Finsupp.single k 1 : κ →₀ ℕ) k') =
-        linS (b k) * ∏ k', linS (b k') ^ β k' := by
+    have h1
+        : (∏ k', linS (b k') ^ (β + Finsupp.single k 1 : κ →₀ ℕ) k')
+          = linS (b k) * ∏ k', linS (b k') ^ β k' := by
       simp only [Finsupp.add_apply, pow_add, Finset.prod_mul_distrib]
       rw [mul_comm]
       congr 1
@@ -212,18 +213,19 @@ theorem e_one_identity_of : JetPairingHasseIdentity := by
         simp [hk'.symm]
       · intro h
         exact absurd (Finset.mem_univ k) h
-    have h2 : (∏ k', ((β + Finsupp.single k 1 : κ →₀ ℕ) k').factorial) =
-        (β k + 1) * ∏ k', (β k').factorial := by
+    have h2
+        : (∏ k', ((β + Finsupp.single k 1 : κ →₀ ℕ) k').factorial)
+          = (β k + 1) * ∏ k', (β k').factorial := by
       rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ k),
         ← Finset.mul_prod_erase _ (fun k' => (β k').factorial) (Finset.mem_univ k)]
-      have : ∏ k' ∈ Finset.univ.erase k, ((β + Finsupp.single k 1 : κ →₀ ℕ) k').factorial =
-          ∏ k' ∈ Finset.univ.erase k, (β k').factorial :=
-        Finset.prod_congr rfl fun j hj => by
-          simp [(Finset.ne_of_mem_erase hj).symm]
+      have : ∏ k' ∈ Finset.univ.erase k, ((β + Finsupp.single k 1 : κ →₀ ℕ) k').factorial
+          = ∏ k' ∈ Finset.univ.erase k, (β k').factorial :=
+        Finset.prod_congr rfl fun j hj => by simp [(Finset.ne_of_mem_erase hj).symm]
       rw [this]
       simp only [Finsupp.add_apply, Finsupp.single_eq_same, Nat.factorial_succ]
       ring
-    rw [h1, mul_assoc, jetPair_linS_mul, ih, hasseDir_dirD, Formalism.DworkPowerSeriesWeights.jetPair_C_mul_left, h2]
+    rw [h1, mul_assoc, jetPair_linS_mul, ih, hasseDir_dirD,
+      Formalism.DworkPowerSeriesWeights.jetPair_C_mul_left, h2]
     push_cast
     ring
 
@@ -638,8 +640,10 @@ lemma shiftPoly_minorAt {r0 r1 l : ℕ} (b : κ → σ × Fin r0 × Fin r1 → K
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [shiftPoly_mul, shiftPoly_C, shiftPoly_X]
 
-variable {r0 r1 l : ℕ} (s : σ) (T : Fin l → Fin r0 → K) (I : Fin l → Fin r1) (pos : κ → σ)
-  (ξ : κ → Fin r0 → K) (col : κ → Fin r1)
+variable
+  {r0 r1 l : ℕ}
+  (s : σ) (T : Fin l → Fin r0 → K) (I : Fin l → Fin r1) (pos : κ → σ) (ξ : κ → Fin r0 → K)
+  (col : κ → Fin r1)
 
 lemma degLE_minor_col (hI : Function.Injective I) (S : Finset κ) (J : Finset (Fin r1))
     (hS : ∀ k ∈ S, pos k = s → col k ∈ J) :
@@ -754,7 +758,8 @@ theorem minor_hits : MinorHits := by
   classical
   intro K σ κ _ _ _ r0 r1 l s T I pos ξ col β h
   rcases h with ⟨k, hk⟩ | ⟨k, k', hne, hk, hk', -, h | h⟩ | ⟨k, hk, h | h⟩
-  · refine hits_row s T I pos ξ col {k} (ξ k) (fun k' hk' => by rw [Finset.mem_singleton.mp hk']) β ?_
+  · refine
+      hits_row s T I pos ξ col {k} (ξ k) (fun k' hk' => by rw [Finset.mem_singleton.mp hk']) β ?_
     rw [Finset.sum_singleton]
     omega
   · refine hits_row s T I pos ξ col {k, k'} (ξ k) (fun j hj => ?_) β ?_

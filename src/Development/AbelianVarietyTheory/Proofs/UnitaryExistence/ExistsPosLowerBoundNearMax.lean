@@ -22,16 +22,19 @@ theorem c_pos' (X : Data E r) (τ : X.Ψ) : 0 < X.c τ := by
   simp only [Data.c]
   positivity
 
-theorem exists_herm_eq_zero (X : Data E r) :
-    ∃ δ : ℝ, 0 < δ ∧ ∀ z ∈ X.dom, ∀ v ∈ X.Λ,
-      (∀ τ : X.Ψ, X.c τ * X.maj z τ (Data.emb τ.1 v) < δ) → herm X.Gm v v = 0 := by
+theorem exists_herm_eq_zero (X : Data E r)
+    : ∃ δ : ℝ,
+      0 < δ
+        ∧ ∀ z ∈ X.dom, ∀ v ∈ X.Λ,
+          (∀ τ : X.Ψ, X.c τ * X.maj z τ (Data.emb τ.1 v) < δ) → herm X.Gm v v = 0 := by
   set S : ℝ := ∑ τ : X.Ψ, ‖τ.1 (X.den : E)‖ / X.c τ with hS
   have hterm : ∀ τ : X.Ψ, 0 ≤ ‖τ.1 (X.den : E)‖ / X.c τ := fun τ =>
     div_nonneg (norm_nonneg _) (c_pos' X τ).le
   have hS0 : 0 ≤ S := Finset.sum_nonneg fun τ _ => hterm τ
   refine ⟨1 / (1 + S), by positivity, fun z hz v hv hsmall => ?_⟩
   have hden : (X.den : E) ≠ 0 := by exact_mod_cast X.den_ne
-  refine (mul_eq_zero.1 (UnipotentCoefficientShift.eq_zero_of_conj_lt_one (X.Λ_int v hv v hv) ?_)).resolve_left hden
+  refine (mul_eq_zero.1 (UnipotentCoefficientShift.eq_zero_of_conj_lt_one (X.Λ_int v hv v hv)
+    ?_)).resolve_left hden
   intro σ
   have key : ∀ τ : X.Ψ, ‖τ.1 ((X.den : E) * herm X.Gm v v)‖ < 1 := fun τ => by
     have hc := c_pos' X τ
@@ -39,13 +42,16 @@ theorem exists_herm_eq_zero (X : Data E r) :
       rw [← EmbeddingHermitianPairs.hermC_emb]
       exact UnipotentCoefficientShift.norm_hermC_le_maj hz τ (Data.emb τ.1 v)
     have h2 : ‖τ.1 (X.den : E)‖ / X.c τ ≤ S :=
-      Finset.single_le_sum (f := fun τ : X.Ψ => ‖τ.1 (X.den : E)‖ / X.c τ)
-        (fun σ _ => hterm σ) (Finset.mem_univ τ)
+      Finset.single_le_sum
+        (f := fun τ : X.Ψ => ‖τ.1 (X.den : E)‖ / X.c τ)
+        (fun σ _ => hterm σ)
+        (Finset.mem_univ τ)
     have h3 := hsmall τ
     have h4 : X.c τ * ‖τ.1 (herm X.Gm v v)‖ ≤ 1 / (1 + S) :=
       (mul_le_mul_of_nonneg_left h1 hc.le).trans h3.le
     rw [map_mul, norm_mul]
-    calc ‖τ.1 (X.den : E)‖ * ‖τ.1 (herm X.Gm v v)‖
+    calc
+      ‖τ.1 (X.den : E)‖ * ‖τ.1 (herm X.Gm v v)‖
         = (‖τ.1 (X.den : E)‖ / X.c τ) * (X.c τ * ‖τ.1 (herm X.Gm v v)‖) := by field_simp
       _ ≤ S * (1 / (1 + S)) := mul_le_mul h2 h4 (by positivity) hS0
       _ < 1 := by
@@ -59,23 +65,30 @@ theorem exists_herm_eq_zero (X : Data E r) :
     have := key ⟨_, hc⟩
     simpa [NumberField.ComplexEmbedding.conjugate_coe_eq] using this
 
-theorem term_norm_one {ι : Type*} [Fintype ι] (c : ℂ) (ν : ι → ℝ) (ζ : ℂ) :
-    ‖c * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * ζ)‖ = ‖c‖ * Real.exp (-(4 * π * (∑ τ, ν τ) * ζ.im)) := by
+theorem term_norm_one {ι : Type*} [Fintype ι] (c : ℂ) (ν : ι → ℝ) (ζ : ℂ)
+    : ‖c * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * ζ)‖
+      = ‖c‖ * Real.exp (-(4 * π * (∑ τ, ν τ) * ζ.im)) := by
   have h := flowTermNormDecay.term_norm c ν ζ 1
   simpa only [Nat.cast_one, one_pow, div_one] using h
 
-theorem tendsto_zero (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : P ∈ X.SS la)
-    {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.dom) {v : Fin r → E} (hξ : X.IsIso v)
-    (hdom : ∀ ζ : ℂ, 0 ≤ ζ.im → X.flow v (fun _ => ζ) z0 ∈ X.dom) (G : ℂ → ℂ)
-    (hG : ∀ ζ : ℂ, 0 < ζ.im → G ζ = P (X.flow v (fun _ => ζ) z0)) :
-    Tendsto G (comap im atTop) (𝓝 0) := by
+theorem tendsto_zero
+    (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : P ∈ X.SS la)
+    {z0 : Frame X.Ψ r} (hz0 : z0 ∈ X.dom)
+    {v : Fin r → E} (hξ : X.IsIso v) (hdom : ∀ ζ : ℂ, 0 ≤ ζ.im → X.flow v (fun _ => ζ) z0 ∈ X.dom)
+    (G : ℂ → ℂ) (hG : ∀ ζ : ℂ, 0 < ζ.im → G ζ = P (X.flow v (fun _ => ζ) z0))
+    : Tendsto G (comap im atTop) (𝓝 0) := by
   classical
   set a : (X.Ψ → ℝ) → ℂ := fun ν => X.fj la v ν P z0 with ha
-  have hexp : ∀ ζ : ℂ, 0 ≤ ζ.im → HasSum (fun ν : X.Ψ → ℝ =>
-      a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * ζ)) (P (X.flow v (fun _ => ζ) z0)) :=
-    fun ζ hζ => m3bExp_holds r X la P hP.1.1 v hξ z0 hz0 (fun _ => ζ) (hdom ζ hζ)
+  have hexp
+      : ∀ ζ : ℂ,
+        0 ≤ ζ.im
+          → HasSum
+            (fun ν : X.Ψ → ℝ => a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * ζ))
+            (P (X.flow v (fun _ => ζ) z0)) := fun ζ hζ =>
+    m3bExp_holds r X la P hP.1.1 v hξ z0 hz0 (fun _ => ζ) (hdom ζ hζ)
   obtain ⟨C, hC⟩ := hP.1.2
-  have hpos := (moderateCoefficientPositivity_holds r X la P C 0 hP.1.1 (fun x hx => by simpa using hC x hx)).1
+  have hpos :=
+    (moderateCoefficientPositivity_holds r X la P C 0 hP.1.1 (fun x hx => by simpa using hC x hx)).1
   have ha0 : a 0 = 0 := hP.2 v hξ z0 hz0
   have hS : ∀ ν, a ν ≠ 0 → 0 < ∑ τ, ν τ := by
     intro ν hν
@@ -87,14 +100,17 @@ theorem tendsto_zero (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) 
       by_contra h
       push Not at h
       exact hne (funext h)
-    exact Finset.sum_pos' (fun τ _ => hnn τ)
-      ⟨τ, Finset.mem_univ _, lt_of_le_of_ne (hnn τ) (Ne.symm hτ)⟩
+    exact
+      Finset.sum_pos' (fun τ _ => hnn τ) ⟨τ, Finset.mem_univ _, lt_of_le_of_ne (hnn τ) (Ne.symm hτ)⟩
   have hsum : Summable fun ν => ‖a ν‖ := by
     have h0 := (hexp 0 (le_refl _)).summable
     simp only [mul_zero, Finset.sum_const_zero, Complex.exp_zero, mul_one] at h0
     exact summable_norm_iff.2 h0
-  have hab : ∀ ν : X.Ψ → ℝ, Tendsto (fun ζ : ℂ =>
-      a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * ζ)) (comap im atTop) (𝓝 0) := by
+  have hab
+      : ∀ ν : X.Ψ → ℝ,
+        Tendsto
+          (fun ζ : ℂ => a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * ζ))
+          (comap im atTop) (𝓝 0) := by
     intro ν
     by_cases hν : a ν = 0
     · simp only [hν, zero_mul]
@@ -108,8 +124,9 @@ theorem tendsto_zero (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) 
     have h2 := Real.tendsto_exp_atBot.comp (tendsto_neg_atTop_atBot.comp (h1.const_mul_atTop hk))
     have h3 := h2.const_mul ‖a ν‖
     simpa using h3
-  have hbound : ∀ᶠ ζ in comap im atTop, ∀ ν : X.Ψ → ℝ,
-      ‖a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * ζ)‖ ≤ ‖a ν‖ := by
+  have hbound
+      : ∀ᶠ ζ in comap im atTop, ∀ ν : X.Ψ → ℝ,
+        ‖a ν * cexp (4 * π * I * ∑ τ, (ν τ : ℂ) * ζ)‖ ≤ ‖a ν‖ := by
     have hev : ∀ᶠ ζ in comap im atTop, (0 : ℝ) ≤ ζ.im :=
       tendsto_comap.eventually (eventually_ge_atTop 0)
     filter_upwards [hev] with ζ hζ ν
@@ -131,10 +148,14 @@ theorem tendsto_zero (X : Data E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) 
   rw [hG ζ hζ]
   exact (hexp ζ hζ.le).tsum_eq
 
-theorem exists_period (X : Data E r) (la : Wt X.Ψ r) :
-    ∃ M : ℝ, 0 < M ∧ ∀ v ∈ X.Λ, herm X.Gm v v = 0 →
-      ∃ γ ∈ X.Γ, X.χ la γ = 1 ∧
-        ∀ τ : X.Ψ, (γ : Matrix (Fin r) (Fin r) E).map τ.1 = X.flowMat v τ (M : ℂ) := by
+theorem exists_period (X : Data E r) (la : Wt X.Ψ r)
+    : ∃ M : ℝ,
+      0 < M
+        ∧ ∀ v ∈ X.Λ,
+          herm X.Gm v v = 0
+            → ∃ γ ∈ X.Γ,
+              X.χ la γ = 1
+                ∧ ∀ τ : X.Ψ, (γ : Matrix (Fin r) (Fin r) E).map τ.1 = X.flowMat v τ (M : ℂ) := by
   obtain ⟨n, hn, hχ⟩ := X.χ_fin la
   have h1 := X.m_pos
   refine ⟨((X.m * n : ℕ) : ℝ), by positivity, fun v hv hvv => ?_⟩
@@ -147,10 +168,12 @@ theorem exists_period (X : Data E r) (la : Wt X.Ψ r) :
     push_cast
     ring
 
-theorem exists_le_maj_of_iso (X : Data E r) (la : Wt X.Ψ r) :
-    ∃ ε : ℝ, 0 < ε ∧ ∀ P ∈ X.SS la, ∀ z0 ∈ X.dom,
-      (∀ x ∈ X.dom, X.pnorm la P x ≤ 2 * X.pnorm la P z0) → 0 < X.pnorm la P z0 →
-      ∀ v, X.IsIso v → ∃ τ : X.Ψ, ε ≤ X.c τ * X.maj z0 τ (Data.emb τ.1 v) := by
+theorem exists_le_maj_of_iso (X : Data E r) (la : Wt X.Ψ r)
+    : ∃ ε : ℝ,
+      0 < ε
+        ∧ ∀ P ∈ X.SS la, ∀ z0 ∈ X.dom,
+          (∀ x ∈ X.dom, X.pnorm la P x ≤ 2 * X.pnorm la P z0) → 0 < X.pnorm la P z0
+            → ∀ v, X.IsIso v → ∃ τ : X.Ψ, ε ≤ X.c τ * X.maj z0 τ (Data.emb τ.1 v) := by
   obtain ⟨M, hM, htrans⟩ := exists_period X la
   set w : ℝ := ∑ τ, X.spread la τ with hw
   have hw0 : 0 ≤ w := Finset.sum_nonneg fun τ _ => flowTermNormDecay.spread_nonneg' X la τ
@@ -169,9 +192,12 @@ theorem exists_le_maj_of_iso (X : Data E r) (la : Wt X.Ψ r) :
     funext a
     have := congr_fun h a
     simpa [e, Data.emb] using this
-  have heIso : X.IsIsoV e := fun τ => ⟨by
-    show hermC τ.1 X.Gm (fun a => τ.1 (v a)) (fun a => τ.1 (v a)) = 0
-    rw [EmbeddingHermitianPairs.hermC_emb, hvv, map_zero], he0 τ⟩
+  have heIso : X.IsIsoV e := fun τ => ⟨
+    by
+      show hermC τ.1 X.Gm (fun a => τ.1 (v a)) (fun a => τ.1 (v a)) = 0
+      rw [EmbeddingHermitianPairs.hermC_emb, hvv, map_zero],
+    he0 τ
+  ⟩
   have hmaj : ∀ τ, 0 < X.maj z0 τ (e τ) := fun τ => X.maj_pos hz0 τ (he0 τ)
   set t : ℝ := 1 / (2 * ε) with ht
   have ht0 : 0 < t := by positivity
@@ -216,11 +242,13 @@ theorem exists_le_maj_of_iso (X : Data E r) (la : Wt X.Ψ r) :
     refine DifferentiableAt.congr_of_eventuallyEq ?_ hev
     have hF : DifferentiableAt ℂ (fun ζ : ℂ => X.flow v (fun _ => ζ) z0) ζ :=
       ((FlowMeanContinuity.flow_differentiable X v z0).comp
-        (differentiable_pi.2 fun _ => differentiable_id)) ζ
+          (differentiable_pi.2 fun _ => differentiable_id))
+        ζ
     exact (hP.1.1.1.differentiableAt (hopen.mem_nhds (hdom ζ hζ))).comp ζ hF
   have hzero : Tendsto g (comap im atTop) (𝓝 0) :=
     tendsto_zero X la P hP hz0 hξ
-      (fun ζ hζ => hdom ζ (by linarith)) g
+      (fun ζ hζ => hdom ζ (by linarith))
+      g
       (fun ζ hζ => by simp only [hg, if_pos (show -(2 * t) < ζ.im by linarith)])
   set B : ℝ := 2 * ‖P z0‖ * 2 ^ (w / 2) with hB
   have hBd : ∀ ζ : ℂ, ζ.im = -t → ‖g ζ‖ ≤ B := by
@@ -230,14 +258,19 @@ theorem exists_le_maj_of_iso (X : Data E r) (la : Wt X.Ψ r) :
     set y := X.flow v (fun _ => ζ) z0 with hy
     have hyd := hdom ζ hlt
     have hnf : 0 < X.nfac la y := flowTermNormDecay.nfac_pos X la hyd
-    have hratio : X.nfac la z0 / X.nfac la y ≤
-        ∏ τ : X.Ψ, (max (1 + ζ.im / X.ttV e z0 τ) (1 + ζ.im / X.ttV e z0 τ)⁻¹) ^
-          (X.spread la τ / 2) :=
+    have hratio
+        : X.nfac la z0 / X.nfac la y
+          ≤ ∏ τ : X.Ψ, (max (1 + ζ.im / X.ttV e z0 τ) (1 + ζ.im / X.ttV e z0 τ)⁻¹) ^
+              (X.spread la τ / 2) :=
       (m3bNorm_holds r X e heIso la z0 hz0 (fun _ => ζ) (by rw [hfl]; exact hyd)).2
-    have hprod : ∏ τ : X.Ψ, (max (1 + ζ.im / X.ttV e z0 τ) (1 + ζ.im / X.ttV e z0 τ)⁻¹) ^
-        (X.spread la τ / 2) ≤ (2 : ℝ) ^ (w / 2) := by
-      have hterm : ∀ τ : X.Ψ, (max (1 + ζ.im / X.ttV e z0 τ) (1 + ζ.im / X.ttV e z0 τ)⁻¹) ^
-          (X.spread la τ / 2) ≤ (2 : ℝ) ^ (X.spread la τ / 2) := by
+    have hprod
+        : ∏ τ : X.Ψ, (max (1 + ζ.im / X.ttV e z0 τ) (1 + ζ.im / X.ttV e z0 τ)⁻¹) ^
+            (X.spread la τ / 2)
+          ≤ (2 : ℝ) ^ (w / 2) := by
+      have hterm
+          : ∀ τ : X.Ψ,
+            (max (1 + ζ.im / X.ttV e z0 τ) (1 + ζ.im / X.ttV e z0 τ)⁻¹) ^ (X.spread la τ / 2)
+              ≤ (2 : ℝ) ^ (X.spread la τ / 2) := by
         intro τ
         have h := htt τ
         have hT : 0 < X.ttV e z0 τ := by linarith
@@ -254,15 +287,23 @@ theorem exists_le_maj_of_iso (X : Data E r) (la : Wt X.Ψ r) :
           rw [inv_le_comm₀ hqpos two_pos]
           linarith
         have hsp := flowTermNormDecay.spread_nonneg' X la τ
-        exact Real.rpow_le_rpow (le_trans hqpos.le (le_max_left _ _))
-          (max_le (by linarith) hinv) (by linarith)
-      calc _ ≤ ∏ τ : X.Ψ, (2 : ℝ) ^ (X.spread la τ / 2) :=
-            Finset.prod_le_prod₀ (fun τ _ => Real.rpow_nonneg (le_trans (by
-              have h := htt τ
-              have hT : 0 < X.ttV e z0 τ := by linarith
-              have : t / X.ttV e z0 τ ≤ 1 / 2 := by rw [div_le_iff₀ hT]; linarith
-              rw [hζ, neg_div]
-              linarith) (le_max_left _ _)) _) (fun τ _ => hterm τ)
+        exact Real.rpow_le_rpow (le_trans hqpos.le (le_max_left _ _)) (max_le (by linarith) hinv)
+          (by linarith)
+      calc
+        _ ≤ ∏ τ : X.Ψ, (2 : ℝ) ^ (X.spread la τ / 2) :=
+          Finset.prod_le_prod₀
+            (fun τ _ =>
+              Real.rpow_nonneg
+                (le_trans
+                  (by
+                    have h := htt τ
+                    have hT : 0 < X.ttV e z0 τ := by linarith
+                    have : t / X.ttV e z0 τ ≤ 1 / 2 := by rw [div_le_iff₀ hT]; linarith
+                    rw [hζ, neg_div]
+                    linarith)
+                  (le_max_left _ _))
+                _)
+            (fun τ _ => hterm τ)
         _ = (2 : ℝ) ^ (∑ τ : X.Ψ, X.spread la τ / 2) := (Real.rpow_sum_of_pos two_pos _ _).symm
         _ = (2 : ℝ) ^ (w / 2) := by rw [← Finset.sum_div]
     have h1 : ‖P y‖ * X.nfac la y ≤ 2 * (‖P z0‖ * X.nfac la z0) := hhalf y hyd
@@ -270,11 +311,14 @@ theorem exists_le_maj_of_iso (X : Data E r) (la : Wt X.Ψ r) :
       rw [div_le_iff₀ hnf] at hratio
       exact hratio.trans (mul_le_mul_of_nonneg_right hprod hnf.le)
     have h3 : ‖P y‖ * X.nfac la y ≤ B * X.nfac la y := by
-      calc ‖P y‖ * X.nfac la y ≤ 2 * (‖P z0‖ * X.nfac la z0) := h1
+      calc
+        ‖P y‖ * X.nfac la y
+          ≤ 2 * (‖P z0‖ * X.nfac la z0) := h1
         _ ≤ 2 * (‖P z0‖ * (2 ^ (w / 2) * X.nfac la y)) := by gcongr
         _ = B * X.nfac la y := by rw [hB]; ring
     exact le_of_mul_le_mul_right h3 hnf
-  have hsch := PeriodicSchwarzLemma.periodic_schwarz hM ht0 (show t < 2 * t by linarith) hper hdiff hzero hBd
+  have hsch :=
+    PeriodicSchwarzLemma.periodic_schwarz hM ht0 (show t < 2 * t by linarith) hper hdiff hzero hBd
   have hg0 : g 0 = P z0 := by
     simp only [hg, Complex.zero_im, if_pos (show -(2 * t) < (0 : ℝ) by linarith)]
     congr 1
@@ -287,8 +331,10 @@ theorem exists_le_maj_of_iso (X : Data E r) (la : Wt X.Ψ r) :
       exact absurd hpos (lt_irrefl 0)
     · exact h
   have h1 : 1 ≤ Real.exp (-2 * π * t / M) * (2 * 2 ^ (w / 2)) := by
-    have e1 : Real.exp (-2 * π * t / M) * B =
-        ‖P z0‖ * (Real.exp (-2 * π * t / M) * (2 * 2 ^ (w / 2))) := by rw [hB]; ring
+    have e1
+        : Real.exp (-2 * π * t / M) * B
+          = ‖P z0‖ * (Real.exp (-2 * π * t / M) * (2 * 2 ^ (w / 2))) := by
+      rw [hB]; ring
     rw [e1] at hsch
     exact le_of_mul_le_mul_left (by rw [mul_one]; exact hsch) hP0
   have e3 : Real.exp ((1 + w / 2) * Real.log 2) = 2 * 2 ^ (w / 2) := by
@@ -305,10 +351,14 @@ theorem exists_le_maj_of_iso (X : Data E r) (la : Wt X.Ψ r) :
 
 end HalfMax
 
-theorem exists_lower_bound_half_max_norm (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
-    (X : Data E r) (la : Wt X.Ψ r) (hr : 0 < r) :
-    ∃ ε : ℝ, 0 < ε ∧ ∀ P ∈ X.SS la, ∀ z ∈ X.dom,
-      (∀ x ∈ X.dom, X.pnorm la P x ≤ 2 * X.pnorm la P z) → 0 < X.pnorm la P z → ε ≤ X.la1 z := by
+theorem exists_lower_bound_half_max_norm
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (r : ℕ) (X : Data E r) (la : Wt X.Ψ r) (hr : 0 < r)
+    : ∃ ε : ℝ,
+      0 < ε
+        ∧ ∀ P ∈ X.SS la, ∀ z ∈ X.dom,
+          (∀ x ∈ X.dom, X.pnorm la P x ≤ 2 * X.pnorm la P z) → 0 < X.pnorm la P z
+            → ε ≤ X.la1 z := by
   obtain ⟨δ, hδ, hiso⟩ := HalfMax.exists_herm_eq_zero X
   obtain ⟨ε, hε, hmax⟩ := HalfMax.exists_le_maj_of_iso X la
   have hm : 0 < min δ ε := lt_min hδ hε
@@ -337,6 +387,7 @@ theorem exists_lower_bound_half_max_norm (E : Type) [Field E] [NumberField E] [I
       exact absurd ((min_le_right δ ε).trans hτ) (not_le.2 (hcon τ))
     exact hτ.trans (Finset.single_le_sum
       (f := fun τ : X.Ψ => X.c τ * X.maj z τ (Data.emb τ.1 v))
-      (fun σ _ => (mul_pos (HalfMax.c_pos' X σ) (hp σ)).le) (Finset.mem_univ τ))
+      (fun σ _ => (mul_pos (HalfMax.c_pos' X σ) (hp σ)).le)
+      (Finset.mem_univ τ))
 
 end GlobalTheory

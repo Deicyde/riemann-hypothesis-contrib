@@ -9,8 +9,10 @@ public import ReciprocityTheory.CommutativeAlgebra.CohenMacaulay.LocDim
 
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.CA ReciprocityTheory.CA
 
-theorem UpperTheory.V.CA.cpl_cm :
-    ∀ (S R : Type) [CommRing S] [IsLocalRing S] [CommRing R] [IsLocalRing R] [Algebra S R], IsCplAt (maximalIdeal S) R → IsCM S → IsCM R ∧ DimFormula R ∧ DimFormula S ∧ ringKrullDim R = ringKrullDim S := by
+theorem UpperTheory.V.CA.cpl_cm
+    : ∀ (S R : Type) [CommRing S] [IsLocalRing S] [CommRing R] [IsLocalRing R] [Algebra S R],
+      IsCplAt (maximalIdeal S) R → IsCM S
+        → IsCM R ∧ DimFormula R ∧ DimFormula S ∧ ringKrullDim R = ringKrullDim S := by
   intro S R _ _ _ _ _ hR hS
   haveI : IsNoetherianRing S := hS.1
   haveI : IsNoetherianRing R := hR.noeth
@@ -40,5 +42,9 @@ theorem UpperTheory.V.CA.cpl_cm :
     refine ⟨inferInstance, n, hdim.trans hn, rs.map (algebraMap S R), by simp [hlen], hmem', ?_⟩
     exact (IsLocalRing.isRegular_iff_isWeaklyRegular_of_subset_maximalIdeal hmem').mpr
       hreg.toIsWeaklyRegular.of_flat
-  exact ⟨hRCM, fun p _ => hRCM.height_add_ringKrullDim_quotient p,
-    fun p _ => hS.height_add_ringKrullDim_quotient p, hdim⟩
+  exact ⟨
+    hRCM,
+    fun p _ => hRCM.height_add_ringKrullDim_quotient p,
+    fun p _ => hS.height_add_ringKrullDim_quotient p,
+    hdim
+  ⟩

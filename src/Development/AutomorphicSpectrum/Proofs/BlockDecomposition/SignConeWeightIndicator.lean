@@ -13,8 +13,10 @@ section Abstract
 
 variable {V : Type} [Fintype V] [DecidableEq V]
 
-theorem exists_least (R : V → V → Prop) (hr : ∀ x, R x x) (ht : ∀ x y z, R x y → R y z → R x z)
-    (B : Finset V) (hne : B.Nonempty) (hc : IsChain R (↑B : Set V)) : ∃ e ∈ B, ∀ x ∈ B, R e x := by
+theorem exists_least
+    (R : V → V → Prop) (hr : ∀ x, R x x) (ht : ∀ x y z, R x y → R y z → R x z)
+    (B : Finset V) (hne : B.Nonempty) (hc : IsChain R (↑B : Set V))
+    : ∃ e ∈ B, ∀ x ∈ B, R e x := by
   revert hne hc
   refine Finset.induction_on B ?_ ?_
   · intro hne _
@@ -25,7 +27,8 @@ theorem exists_least (R : V → V → Prop) (hr : ∀ x, R x x) (ht : ∀ x y z,
     · obtain ⟨e, he, hle⟩ := ih hs hcs
       have hae : a ≠ e := fun h => ha (h ▸ he)
       rcases hc (Finset.mem_coe.2 (Finset.mem_insert_self a s))
-          (Finset.mem_coe.2 (Finset.mem_insert_of_mem he)) hae with h | h
+          (Finset.mem_coe.2 (Finset.mem_insert_of_mem he)) hae
+        with h | h
       · refine ⟨a, Finset.mem_insert_self a s, fun x hx => ?_⟩
         rcases Finset.mem_insert.1 hx with rfl | hx
         · exact hr _
@@ -39,27 +42,36 @@ theorem exists_least (R : V → V → Prop) (hr : ∀ x, R x x) (ht : ∀ x y z,
       · exact hr _
       · exact absurd ⟨x, hx⟩ hs
 
-theorem sum_chains_eq_zero (R : V → V → Prop) (hr : ∀ x, R x x) (ht : ∀ x y z, R x y → R y z → R x z)
-    (A : V → Prop) (es : V) (hes : A es) (mt : V → V) (h1 : ∀ e, R (mt e) e) (h2 : ∀ e, R (mt e) es)
+theorem sum_chains_eq_zero
+    (R : V → V → Prop) (hr : ∀ x, R x x) (ht : ∀ x y z, R x y → R y z → R x z)
+    (A : V → Prop) (es : V) (hes : A es)
+    (mt : V → V) (h1 : ∀ e, R (mt e) e) (h2 : ∀ e, R (mt e) es)
     (h3 : ∀ x e, R x e → R x es → R x (mt e)) (h4 : ∀ e, A e → A (mt e))
-    [DecidablePred fun s : Finset V => IsChain R (↑s : Set V) ∧ ∀ e ∈ s, A e] :
-    ∑ s ∈ (Finset.univ : Finset (Finset V)).filter
-      (fun s : Finset V => IsChain R (↑s : Set V) ∧ ∀ e ∈ s, A e), (-1 : ℝ) ^ s.card = 0 := by
+    [DecidablePred fun s : Finset V => IsChain R (↑s : Set V) ∧ ∀ e ∈ s, A e]
+    : ∑ s ∈ (Finset.univ : Finset (Finset V)).filter
+        (fun s : Finset V => IsChain R (↑s : Set V) ∧ ∀ e ∈ s, A e), (-1 : ℝ) ^ s.card
+      = 0 := by
   classical
-  obtain ⟨least, hleast⟩ : ∃ least : Finset V → V, ∀ U : Finset V, U.Nonempty → IsChain R (↑U : Set V) →
-      least U ∈ U ∧ ∀ x ∈ U, R (least U) x :=
-    ⟨fun U => if h : U.Nonempty ∧ IsChain R (↑U : Set V) then
-        Classical.choose (exists_least R hr ht U h.1 h.2) else es,
-      fun U hU hcU => by
-        beta_reduce
-        rw [dite_eq_left ⟨hU, hcU⟩]
-        exact Classical.choose_spec (exists_least R hr ht U hU hcU)⟩
+  obtain ⟨least, hleast⟩
+      : ∃ least : Finset V → V, ∀ U : Finset V,
+        U.Nonempty → IsChain R (↑U : Set V) → least U ∈ U ∧ ∀ x ∈ U, R (least U) x := ⟨
+    fun U =>
+      if h : U.Nonempty ∧ IsChain R (↑U : Set V) then
+        Classical.choose (exists_least R hr ht U h.1 h.2)
+      else
+        es,
+    fun U hU hcU => by
+      beta_reduce
+      rw [dite_eq_left ⟨hU, hcU⟩]
+      exact Classical.choose_spec (exists_least R hr ht U hU hcU)
+  ⟩
   obtain ⟨U, hU⟩ : ∃ U : Finset V → Finset V, ∀ s, U s = s.filter (fun x => ¬ R x es) :=
     ⟨_, fun _ => rfl⟩
   have hmem : ∀ s x, x ∈ U s ↔ x ∈ s ∧ ¬ R x es := fun s x => by rw [hU, Finset.mem_filter]
   obtain ⟨c, hc⟩ : ∃ c : Finset V → V, ∀ s, c s = if (U s).Nonempty then mt (least (U s)) else es :=
     ⟨_, fun _ => rfl⟩
-  obtain ⟨g, hg⟩ : ∃ g : Finset V → Finset V, ∀ s, g s = if c s ∈ s then s.erase (c s) else insert (c s) s :=
+  obtain ⟨g, hg⟩
+      : ∃ g : Finset V → Finset V, ∀ s, g s = if c s ∈ s then s.erase (c s) else insert (c s) s :=
     ⟨_, fun _ => rfl⟩
   have hcD : ∀ s, R (c s) es := by
     intro s
@@ -126,11 +138,15 @@ theorem sum_chains_eq_zero (R : V → V → Prop) (hr : ∀ x, R x x) (ht : ∀ 
     by_cases h : c s ∈ s
     · have e1 : g s = s.erase (c s) := by rw [hg, if_pos h]
       rw [e1]
-      exact ⟨hcs.mono (Finset.coe_subset.2 (Finset.erase_subset _ _)),
-        fun e he => hA e (Finset.mem_of_mem_erase he)⟩
+      exact ⟨
+        hcs.mono (Finset.coe_subset.2 (Finset.erase_subset _ _)),
+        fun e he => hA e (Finset.mem_of_mem_erase he)
+      ⟩
     · have e1 : g s = insert (c s) s := by rw [hg, if_neg h]
-      have hUc : ∀ hne : (U s).Nonempty, least (U s) ∈ U s ∧ ∀ x ∈ U s, R (least (U s)) x := fun hne =>
-        hleast (U s) hne (hcs.mono (by rw [hU]; exact Finset.coe_subset.2 (Finset.filter_subset _ _)))
+      have hUc
+          : ∀ hne : (U s).Nonempty, least (U s) ∈ U s ∧ ∀ x ∈ U s, R (least (U s)) x := fun hne =>
+        hleast (U s) hne
+          (hcs.mono (by rw [hU]; exact Finset.coe_subset.2 (Finset.filter_subset _ _)))
       rw [e1]
       refine ⟨?_, ?_⟩
       · rw [Finset.coe_insert]
@@ -194,7 +210,8 @@ theorem sMeet_le_right (e e' : Fin m → SignType) : SLe (sMeet e e') e' := by
   · rw [if_neg h] at hi
     exact absurd rfl hi
 
-theorem le_sMeet (x e e' : Fin m → SignType) (h : SLe x e) (h' : SLe x e') : SLe x (sMeet e e') := by
+theorem le_sMeet (x e e' : Fin m → SignType) (h : SLe x e) (h' : SLe x e')
+    : SLe x (sMeet e e') := by
   intro i hi
   simp only [sMeet]
   have h1 : e i = x i := h i hi
@@ -203,32 +220,34 @@ theorem le_sMeet (x e e' : Fin m → SignType) (h : SLe x e) (h' : SLe x e') : S
 
 theorem sdot_zero (a : Fin m → ℝ) : sdot (0 : Fin m → SignType) a = 0 := by simp [sdot]
 
-theorem sdot_meet_join (e e' : Fin m → SignType) (a : Fin m → ℝ) :
-    sdot e a + sdot e' a = sdot (sMeet e e') a + sdot (sJoin e e') a := by
+theorem sdot_meet_join (e e' : Fin m → SignType) (a : Fin m → ℝ)
+    : sdot e a + sdot e' a = sdot (sMeet e e') a + sdot (sJoin e e') a := by
   simp only [sdot, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp only [sMeet, sJoin]
   cases h1 : e i <;> cases h2 : e' i <;> simp <;> ring
 
-
 open Classical in
-theorem gam_eq_sum (y : (Fin m → SignType) → ℝ) (a : Fin m → ℝ) (h0 : ¬ y 0 < sdot 0 a) :
-    gam y a = ∑ s ∈ (Finset.univ : Finset (Finset (Fin m → SignType))).filter
-      (fun s : Finset (Fin m → SignType) =>
-        IsChain SLe (↑s : Set (Fin m → SignType)) ∧ ∀ e ∈ s, y e < sdot e a), (-1 : ℝ) ^ s.card := by
-  simp only [gam, gamOn]
-  rw [Finset.sum_filter, Finset.sum_filter]
-  refine Finset.sum_congr rfl fun s _ => ?_
-  rw [Finset.prod_boole]
-  by_cases hA : ∀ e ∈ s, y e < sdot e a
-  · by_cases hc : IsChain SLe (↑s : Set (Fin m → SignType))
-    · have h0s : (0 : Fin m → SignType) ∉ s := fun h => h0 (hA 0 h)
-      simp [hA, hc, h0s]
-    · simp [hA, hc]
-  · simp [hA]
+theorem gam_eq_sum (y : (Fin m → SignType) → ℝ) (a : Fin m → ℝ) (h0 : ¬ y 0 < sdot 0 a)
+    : gam y a
+      = ∑ s ∈ (Finset.univ : Finset (Finset (Fin m → SignType))).filter
+        (fun s : Finset (Fin m → SignType) =>
+          IsChain SLe (↑s : Set (Fin m → SignType)) ∧ ∀ e ∈ s, y e < sdot e a), (-1 : ℝ) ^ s.card :=
+  by
+    simp only [gam, gamOn]
+    rw [Finset.sum_filter, Finset.sum_filter]
+    refine Finset.sum_congr rfl fun s _ => ?_
+    rw [Finset.prod_boole]
+    by_cases hA : ∀ e ∈ s, y e < sdot e a
+    · by_cases hc : IsChain SLe (↑s : Set (Fin m → SignType))
+      · have h0s : (0 : Fin m → SignType) ∉ s := fun h => h0 (hA 0 h)
+        simp [hA, hc, h0s]
+      · simp [hA, hc]
+    · simp [hA]
 
-theorem gam_eq_indicator : ∀ m : ℕ, ∀ (y : (Fin m → SignType) → ℝ) a, PosFam y →
-    gam y a = Set.indicator {a | ∀ e, sdot e a ≤ y e} 1 a := by
+theorem gam_eq_indicator
+    : ∀ m : ℕ, ∀ (y : (Fin m → SignType) → ℝ) a,
+      PosFam y → gam y a = Set.indicator {a | ∀ e, sdot e a ≤ y e} 1 a := by
   intro m y a hy
   classical
   have hy' : y 0 = 0 ∧ ∀ e e', y (sMeet e e') + y (sJoin e e') ≤ y e + y e' := hy
@@ -254,23 +273,28 @@ theorem gam_eq_indicator : ∀ m : ℕ, ∀ (y : (Fin m → SignType) → ℝ) a
     · simp
   · rw [Set.indicator_apply, if_neg (show a ∉ {a | ∀ e, sdot e a ≤ y e} from hall)]
     push_neg at hall
-    obtain ⟨es, -, hesmax⟩ := Finset.exists_max_image Finset.univ (fun e => sdot e a - y e)
-      Finset.univ_nonempty
+    obtain ⟨es, -, hesmax⟩ :=
+      Finset.exists_max_image Finset.univ (fun e => sdot e a - y e) Finset.univ_nonempty
     obtain ⟨e1, he1⟩ := hall
     have hes : y es < sdot es a := by
       have h5 : sdot e1 a - y e1 ≤ sdot es a - y es := hesmax e1 (Finset.mem_univ _)
       linarith
-    have key := sum_chains_eq_zero SLe sLe_refl sLe_trans (fun e => y e < sdot e a) es hes
-      (fun e => sMeet e es) (fun e => sMeet_le_left e es) (fun e => sMeet_le_right e es)
-      (fun x e h h' => le_sMeet x e es h h')
-      (fun e he => by
-        have hPos := hy'.2 e es
-        have hdot := sdot_meet_join e es a
-        have hjoin : sdot (sJoin e es) a - y (sJoin e es) ≤ sdot es a - y es :=
-          hesmax (sJoin e es) (Finset.mem_univ _)
-        show y (sMeet e es) < sdot (sMeet e es) a
-        have he' : y e < sdot e a := he
-        linarith)
+    have key :=
+      sum_chains_eq_zero SLe sLe_refl sLe_trans
+        (fun e => y e < sdot e a)
+        es hes
+        (fun e => sMeet e es)
+        (fun e => sMeet_le_left e es)
+        (fun e => sMeet_le_right e es)
+        (fun x e h h' => le_sMeet x e es h h')
+        (fun e he => by
+          have hPos := hy'.2 e es
+          have hdot := sdot_meet_join e es a
+          have hjoin : sdot (sJoin e es) a - y (sJoin e es) ≤ sdot es a - y es :=
+            hesmax (sJoin e es) (Finset.mem_univ _)
+          show y (sMeet e es) < sdot (sMeet e es) a
+          have he' : y e < sdot e a := he
+          linarith)
     convert key
 
 end Signs

@@ -7,9 +7,10 @@ public import Mathlib
 open Matrix
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.grampsd :
-    ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (G : Matrix ι ι ℝ), G.IsHermitian →
-    (∀ c : ι → ℤ, 0 ≤ (fun i => (c i : ℝ)) ⬝ᵥ (G *ᵥ fun i => (c i : ℝ))) → G.PosSemidef := by
+theorem UpperTheory.V.KT.grampsd
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (G : Matrix ι ι ℝ),
+      G.IsHermitian → (∀ c : ι → ℤ, 0 ≤ (fun i => (c i : ℝ)) ⬝ᵥ (G *ᵥ fun i => (c i : ℝ)))
+        → G.PosSemidef := by
   intro ι _ _ G hG hc
   rw [Matrix.posSemidef_iff_dotProduct_mulVec]
   refine ⟨hG, fun x => ?_⟩

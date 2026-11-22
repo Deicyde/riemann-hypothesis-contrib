@@ -11,9 +11,12 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -34,8 +37,11 @@ theorem trivLocus_pf : CompanionTheory.ObstructionTrivialLocus.TrivLocus := by
     have e' : y ≫ lift (1 : Y ⟶ A) (𝟙 Y) = lift (1 : T ⟶ A) (𝟙 T) ≫ A ◁ y := by ext <;> simp
     have hsec : Triv ((N.pull (A ◁ y).left).pull (lift (1 : T ⟶ A) (𝟙 T)).left) :=
       CubeOpen.triv_pull_pull _ _ (CubeOpen.triv_comp y.left (congrArg (·.left) e') h0)
-    exact GlobalTheory.exists_gen_of_local_of_section (A ⊗ T).left T.left (snd A T).left (lift (1 : T ⟶ A) (𝟙 T)).left
-      (N.pull (A ◁ y).left) (pull_isLB hN _) (congrArg (·.left) (lift_snd (1 : T ⟶ A) (𝟙 T)))
-      (GlobalTheory.BaseChangeFns.app_surjective GlobalTheory.globalFns_holds S A hA _ _ T.hom _ _ hpb) hloc hsec
+    exact GlobalTheory.exists_gen_of_local_of_section (A ⊗ T).left T.left (snd A T).left
+      (lift (1 : T ⟶ A) (𝟙 T)).left (N.pull (A ◁ y).left) (pull_isLB hN _)
+      (congrArg (·.left) (lift_snd (1 : T ⟶ A) (𝟙 T)))
+      (GlobalTheory.BaseChangeFns.app_surjective GlobalTheory.globalFns_holds S A hA _ _ T.hom _ _
+        hpb)
+      hloc hsec
 
 end CompanionTheory.PfDual

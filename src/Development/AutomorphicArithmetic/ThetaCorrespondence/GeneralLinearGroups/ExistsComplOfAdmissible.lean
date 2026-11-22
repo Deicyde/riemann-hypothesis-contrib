@@ -12,14 +12,19 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SocleOfM
 
 @[expose] public section
 
-open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult UpperTheory.Lit.Cas
+open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult UpperTheory.Lit.Cas
 
-private theorem exists_compl_of_admissible {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V)
-    (hbasis : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
-    (hs : IsSmooth ρ) (hun : IsUnitarisable ρ) (W : Subrepresentation ρ) (hW : IsAdmissible W.toRepresentation) :
-    ∃ W' : Subrepresentation ρ, (∀ v, v ∈ W.toSubmodule → v ∈ W'.toSubmodule → v = 0) ∧
-      ∀ v, ∃ w ∈ W.toSubmodule, v - w ∈ W'.toSubmodule := by
+private theorem exists_compl_of_admissible
+    {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V)
+    (hbasis : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G,
+      IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
+    (hs : IsSmooth ρ) (hun : IsUnitarisable ρ)
+    (W : Subrepresentation ρ) (hW : IsAdmissible W.toRepresentation)
+    : ∃ W' : Subrepresentation ρ,
+      (∀ v, v ∈ W.toSubmodule → v ∈ W'.toSubmodule → v = 0)
+        ∧ ∀ v, ∃ w ∈ W.toSubmodule, v - w ∈ W'.toSubmodule := by
   obtain ⟨B, hsym, hpos, hinv⟩ := hun
   refine ⟨GlobalTheory.CompanionTheory.UnitSemisimple.orth ρ B hinv W, ?_, ?_⟩
   · intro v hv hv'
@@ -30,7 +35,8 @@ private theorem exists_compl_of_admissible {G V : Type} [Group G] [TopologicalSp
     simp at this
   · intro v
     obtain ⟨K, hKo, hKc, hKU⟩ := hbasis {g | ρ g v = v} ((hs v).mem_nhds (by simp))
-    have hmap : (fixed W.toRepresentation K).map W.toSubmodule.subtype = W.toSubmodule ⊓ fixed ρ K := by
+    have hmap
+        : (fixed W.toRepresentation K).map W.toSubmodule.subtype = W.toSubmodule ⊓ fixed ρ K := by
       ext x
       constructor
       · rintro ⟨y, hy, rfl⟩
@@ -54,26 +60,33 @@ private theorem exists_compl_of_admissible {G V : Type} [Group G] [TopologicalSp
       rw [← hmap]
       infer_instance
     obtain ⟨t, ht⟩ := (Submodule.fg_iff_finiteDimensional _).mpr hfd
-    obtain ⟨w, hw, hperp⟩ := GlobalTheory.CompanionTheory.UnitSemisimple.exists_proj_finset B hpos t v
+    obtain ⟨w, hw, hperp⟩ :=
+      GlobalTheory.CompanionTheory.UnitSemisimple.exists_proj_finset B hpos t v
     rw [ht] at hw hperp
     refine ⟨w, hw.1, ?_⟩
     show ∀ x ∈ W.toSubmodule, B (v - w) x = 0
     intro x hx
-    refine GlobalTheory.CompanionTheory.UnitSemisimple.orthogonal_of_fixed ρ B hinv K hKc W (v - w) ?_ hperp x hx (hs x)
+    refine GlobalTheory.CompanionTheory.UnitSemisimple.orthogonal_of_fixed ρ B hinv K hKc W (v - w)
+      ?_ hperp x hx (hs x)
     intro k hk
     have hv : ρ k v = v := hKU hk
-    have hw' : ρ k w = w := (GlobalTheory.CompanionTheory.UnitSemisimple.mem_fixed_iff ρ K w).mp hw.2 k hk
+    have hw' : ρ k w = w :=
+      (GlobalTheory.CompanionTheory.UnitSemisimple.mem_fixed_iff ρ K w).mp hw.2 k hk
     simp [map_sub, hv, hw']
 
-private theorem isIrreducible_of_occurs (hBZ : GlobalTheory.Published.BernsteinZelevinskyFiniteness) {k : Type} [Field k]
-    [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {s N : ℕ} {d : Fin s → ℕ}
-    (e : (Σ a, Fin (d a)) ≃ Fin N) {X V : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup V] [Module ℂ V]
+private theorem isIrreducible_of_occurs
+    (hBZ : GlobalTheory.Published.BernsteinZelevinskyFiniteness)
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {s N : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) ≃ Fin N)
+    {X V : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup V] [Module ℂ V]
     {ρ : Representation ℂ (Levi k fun a => Fin (d a)) X} (hρ : ρ.IsIrreducible)
-    (π : Representation ℂ (GL (Fin N) k) V) [Nontrivial V] (hs : IsSmooth π) (hfl : HasFiniteLength π)
-    (hun : IsUnitarisable π)
-    (hone : ∀ (T : Subrepresentation π) (v : V), v ∈ T.toSubmodule → v ≠ 0 →
-      1 ≤ jhMult ρ (jac e T.toRepresentation))
-    (hjm : jhMult ρ (jac e π) ≤ 1) : π.IsIrreducible := by
+    (π : Representation ℂ (GL (Fin N) k) V)
+    [Nontrivial V]
+    (hs : IsSmooth π) (hfl : HasFiniteLength π) (hun : IsUnitarisable π)
+    (hone : ∀ (T : Subrepresentation π) (v : V),
+      v ∈ T.toSubmodule → v ≠ 0 → 1 ≤ jhMult ρ (jac e T.toRepresentation))
+    (hjm : jhMult ρ (jac e π) ≤ 1)
+    : π.IsIrreducible := by
   have hGL := hBZ k
   have hnz : ∀ A : Subrepresentation π, A ≠ ⊥ → ∃ v, v ∈ A.toSubmodule ∧ v ≠ 0 := by
     intro A hA
@@ -98,8 +111,9 @@ private theorem isIrreducible_of_occurs (hBZ : GlobalTheory.Published.BernsteinZ
       rw [hset]
       exact hs v
     have hAad : IsAdmissible A.toRepresentation := hGL.1 (Fin N) _ A.toRepresentation hAs hAirr
-    obtain ⟨A', hdis, hcod⟩ := exists_compl_of_admissible π
-      (GlobalTheory.CompanionTheory.SmGL.exists_compact_open_subgroup_subset k N) hs hun A hAad
+    obtain ⟨A', hdis, hcod⟩ :=
+      exists_compl_of_admissible π
+        (GlobalTheory.CompanionTheory.SmGL.exists_compact_open_subgroup_subset k N) hs hun A hAad
     have hc : IsCompl A'.toSubmodule A.toSubmodule := by
       constructor
       · rw [Submodule.disjoint_def]
@@ -128,7 +142,8 @@ private theorem isIrreducible_of_occurs (hBZ : GlobalTheory.Published.BernsteinZ
       show π g v - π g w = π g (v - w)
       rw [map_sub]
     let p : π.IntertwiningMap A'.toRepresentation := ⟨P, fun g => LinearMap.ext fun v => hPeq g v⟩
-    let ι : A.toRepresentation.IntertwiningMap π := ⟨A.toSubmodule.subtype, fun g => LinearMap.ext fun v => rfl⟩
+    let ι : A.toRepresentation.IntertwiningMap π :=
+      ⟨A.toSubmodule.subtype, fun g => LinearMap.ext fun v => rfl⟩
     have hsurj : Function.Surjective p := by
       intro y
       exact ⟨y, Submodule.linearProjOfIsCompl_apply_left hc y⟩
@@ -140,7 +155,9 @@ private theorem isIrreducible_of_occurs (hBZ : GlobalTheory.Published.BernsteinZ
         exact ⟨⟨y, hy'⟩, rfl⟩
       · rintro ⟨z, rfl⟩
         exact Submodule.linearProjOfIsCompl_apply_right hc z
-    have hex := GlobalTheory.CompanionTheory.SocleJm.jhMult_jac_exact e hρ ι p hs Subtype.val_injective hsurj hexact
+    have hex :=
+      GlobalTheory.CompanionTheory.SocleJm.jhMult_jac_exact e hρ ι p hs Subtype.val_injective hsurj
+        hexact
     obtain ⟨a, haA, ha0⟩ := hnz A hA.1
     have hA1 := hone A a haA ha0
     have hnt : ∃ v, v ∉ A.toSubmodule := by
@@ -182,26 +199,38 @@ private theorem isIrreducible_of_occurs (hBZ : GlobalTheory.Published.BernsteinZ
     rw [key A hA] at hAT
     exact top_le_iff.mp hAT
 
-private theorem isIrreducible_parInd (hBZ : GlobalTheory.Published.BernsteinZelevinskyFiniteness) {k : Type} [Field k]
-    [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {s N : ℕ} {d : Fin s → ℕ}
-    (e : (Σ a, Fin (d a)) ≃ Fin N) {X : Type} [AddCommGroup X] [Module ℂ X]
+private theorem isIrreducible_parInd
+    (hBZ : GlobalTheory.Published.BernsteinZelevinskyFiniteness)
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {s N : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) ≃ Fin N)
+    {X : Type} [AddCommGroup X] [Module ℂ X]
     {ρ : Representation ℂ (Levi k fun a => Fin (d a)) X} (hρ : ρ.IsIrreducible) (hsρ : IsSmooth ρ)
-    (hun : IsUnitarisable (parInd e ρ)) (hjm : jhMult ρ (jac e (parInd e ρ)) ≤ 1) :
-    (parInd e ρ).IsIrreducible := by
+    (hun : IsUnitarisable (parInd e ρ)) (hjm : jhMult ρ (jac e (parInd e ρ)) ≤ 1)
+    : (parInd e ρ).IsIrreducible := by
   haveI := GlobalTheory.CompanionTheory.SocleJm.nontrivial_indSp e hρ hsρ
   refine isIrreducible_of_occurs hBZ e hρ (parInd e ρ) (isSmooth_parInd _ _)
-    ((hBZ k).2.2.1 _ _ _ e _ ρ hsρ (hasFiniteLength_of_isIrreducible hρ)) hun (fun T v hv hv0 => ?_) hjm
+    ((hBZ k).2.2.1 _ _ _ e _ ρ hsρ (hasFiniteLength_of_isIrreducible hρ)) hun
+    (fun T v hv hv0 => ?_)
+    hjm
   let ιT : T.toRepresentation.IntertwiningMap (parInd e ρ) := ⟨T.toSubmodule.subtype, fun _ => rfl⟩
   exact GlobalTheory.CompanionTheory.SocleJm.one_le_jhMult_jac e hρ ιT ⟨⟨v, hv⟩, hv0⟩
 
-theorem UpperTheory.Lit.Mix.ss :
-    GlobalTheory.Published.BernsteinZelevinskyFiniteness → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (x y : IrrGL (k := k)) (N : ℕ) (hd : ∑ a, (![x, y] a).1 = N), IsUnitarisable x.rep → IsUnitarisable y.rep → jm ![x, y] hd (prodIrr ![x, y] hd) ≤ 1 → (prodIrr ![x, y] hd).IsIrreducible := by
+theorem UpperTheory.Lit.Mix.ss
+    : GlobalTheory.Published.BernsteinZelevinskyFiniteness
+      → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+          (x y : IrrGL (k := k)) (N : ℕ) (hd : ∑ a, (![x, y] a).1 = N),
+        IsUnitarisable x.rep → IsUnitarisable y.rep → jm ![x, y] hd (prodIrr ![x, y] hd) ≤ 1
+          → (prodIrr ![x, y] hd).IsIrreducible := by
   intro hBZ k _ _ _ _ x y N hd hx hy hjm
   have hρ : (piTensor fun a => (![x, y] a).rep).IsIrreducible :=
-    GlobalTheory.CompanionTheory.SocleJm.isIrreducible_piTensor (fun k _ _ _ _ n V _ _ π => (hBZ k).1 (Fin n) V π) ![x, y]
-  have hsρ : IsSmooth (piTensor fun a => (![x, y] a).rep) := isSmooth_piTensor fun a => (![x, y] a).2.rep.smooth
+    GlobalTheory.CompanionTheory.SocleJm.isIrreducible_piTensor
+      (fun k _ _ _ _ n V _ _ π => (hBZ k).1 (Fin n) V π)
+      ![x, y]
+  have hsρ : IsSmooth (piTensor fun a => (![x, y] a).rep) :=
+    isSmooth_piTensor fun a => (![x, y] a).2.rep.smooth
   have hu : ∀ a, IsUnitarisable (![x, y] a).rep := fun a => by
     fin_cases a
     · exact hx
     · exact hy
-  exact isIrreducible_parInd hBZ _ hρ hsρ (GlobalTheory.SmGL.UnitInd.isUnitarisable_multiProd _ hu) hjm
+  exact isIrreducible_parInd hBZ _ hρ hsρ (GlobalTheory.SmGL.UnitInd.isUnitarisable_multiProd _ hu)
+    hjm

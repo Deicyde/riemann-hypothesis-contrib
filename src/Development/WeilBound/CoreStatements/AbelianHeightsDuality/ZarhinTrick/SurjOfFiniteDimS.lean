@@ -13,7 +13,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 open GlobalTheory.CechPic GlobalTheory.AbDual
 open GlobalTheory.IndefiniteRowSideFullHecke.ZeroSectionBase (IsPrincipalPol sqToBase toBase)
@@ -24,11 +25,14 @@ open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 
 namespace PositivityTheory.PrwZar.Z2
 
-theorem surj_of_finite_dimS {X Y : Scheme.{0}} [IrreducibleSpace X] [IrreducibleSpace Y]
-    [IsLocallyNoetherian X] [IsLocallyNoetherian Y] (f : X ⟶ Y) [IsFinite f] (g : ℕ)
-    (hX : ∀ x : X, IsClosed ({x} : Set X) → ringKrullDim (X.presheaf.stalk x) = g)
+theorem surj_of_finite_dimS
+    {X Y : Scheme.{0}}
+    [IrreducibleSpace X] [IrreducibleSpace Y] [IsLocallyNoetherian X] [IsLocallyNoetherian Y]
+    (f : X ⟶ Y) [IsFinite f]
+    (g : ℕ) (hX : ∀ x : X, IsClosed ({x} : Set X) → ringKrullDim (X.presheaf.stalk x) = g)
     (hY : ∀ y : Y, IsClosed ({y} : Set Y) → ringKrullDim (Y.presheaf.stalk y) = g)
-    (o : X) (ho : IsClosed ({o} : Set X)) : Surjective f := by
+    (o : X) (ho : IsClosed ({o} : Set X))
+    : Surjective f := by
   refine ⟨fun y => ?_⟩
   have hcl : IsClosed (Set.range f) := f.isClosedMap.isClosed_range
   suffices hη : genericPoint Y ∈ Set.range f by
@@ -66,17 +70,21 @@ theorem surj_of_finite_dimS {X Y : Scheme.{0}} [IrreducibleSpace X] [Irreducible
   rw [e1', e2'] at h1
   exact absurd h1 (by norm_cast; omega)
 
-theorem isClosed_originS {Ω : Type} [Field Ω] {G : Over (Sp Ω)} [GrpObj G] [IsProper G.hom] :
-    IsClosed ({η[G].left (IsLocalRing.closedPoint Ω)} : Set G.left) := by
+theorem isClosed_originS {Ω : Type} [Field Ω] {G : Over (Sp Ω)} [GrpObj G] [IsProper G.hom]
+    : IsClosed ({η[G].left (IsLocalRing.closedPoint Ω)} : Set G.left) := by
   have hc : IsClosed ({IsLocalRing.closedPoint Ω} : Set (Sp Ω)) := isClosed_singleton
   have h1 := (η[G].left).isClosedEmbedding.isClosedMap _ hc
   convert h1 using 1
   exact (Set.image_singleton).symm
 
-theorem flat_surj_of_finite {Ω : Type} [Field Ω] [IsAlgClosed Ω] {G G' : Over (Sp Ω)} [GrpObj G] [GrpObj G']
-    (hG : IsAbelianScheme G) (hG' : IsAbelianScheme G') (g : ℕ) (hgG : SmoothOfRelativeDimension g G.hom)
-    (hgG' : SmoothOfRelativeDimension g G'.hom) (f : G ⟶ G') [IsMonHom f] (hf : IsFinite f.left) :
-    Flat f.left ∧ Surjective f.left := by
+theorem flat_surj_of_finite
+    {Ω : Type} [Field Ω] [IsAlgClosed Ω]
+    {G G' : Over (Sp Ω)} [GrpObj G] [GrpObj G']
+    (hG : IsAbelianScheme G) (hG' : IsAbelianScheme G')
+    (g : ℕ) (hgG : SmoothOfRelativeDimension g G.hom) (hgG' : SmoothOfRelativeDimension g G'.hom)
+    (f : G ⟶ G') [IsMonHom f]
+    (hf : IsFinite f.left)
+    : Flat f.left ∧ Surjective f.left := by
   haveI := hG.smooth
   haveI := hG'.smooth
   haveI := hG.proper

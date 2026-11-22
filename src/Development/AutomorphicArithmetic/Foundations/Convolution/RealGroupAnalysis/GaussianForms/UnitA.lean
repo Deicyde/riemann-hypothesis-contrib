@@ -5,13 +5,18 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.C
 
-theorem UpperTheory.ConvolutionTheory.R2.C.unitA :
-    ∀ (F : Type) [Field F] [NumberField F] (x : A F), IsUnit x ↔ (∀ w, x.1 w ≠ 0) ∧ (∀ v, x.2 v ≠ 0) ∧ ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite, Valued.v (x.2 v) = 1 := by
+theorem UpperTheory.ConvolutionTheory.R2.C.unitA
+    : ∀ (F : Type) [Field F] [NumberField F] (x : A F),
+      IsUnit x
+        ↔ (∀ w, x.1 w ≠ 0) ∧ (∀ v, x.2 v ≠ 0)
+          ∧ ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite, Valued.v (x.2 v) = 1 := by
   intro F _ _ x
   constructor
   · rintro ⟨a, rfl⟩
@@ -33,8 +38,9 @@ theorem UpperTheory.ConvolutionTheory.R2.C.unitA :
       rw [← hm]
       exact mul_le_of_le_one_right' h4
   · rintro ⟨h1, h2, h3⟩
-    have hmem : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite,
-        (x.2 v)⁻¹ ∈ v.adicCompletionIntegers F := by
+    have hmem
+        : ∀ᶠ v : HeightOneSpectrum (𝓞 F) in cofinite,
+          (x.2 v)⁻¹ ∈ v.adicCompletionIntegers F := by
       filter_upwards [h3] with v hv
       change Valued.v (x.2 v)⁻¹ ≤ 1
       rw [map_inv₀, hv, inv_one]

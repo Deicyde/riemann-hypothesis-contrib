@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobeniusOfP
 
 noncomputable section
 
-open GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps GlobalTheory.DetInv Matrix TensorProduct
+open GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps GlobalTheory.DetInv
+  Matrix TensorProduct
 
 namespace GlobalTheory.DetInv.Intertwine
 
@@ -21,9 +22,11 @@ end GlobalTheory.DetInv.Intertwine
 namespace GlobalTheory.DetInv
 
 open Matrix TensorProduct in
-private theorem matrix_eq_zero_of_mul_right_cancel_lemma {R : Type} [CommRing R] [IsDomain R] {n : ℕ}
-    {A B X : Matrix (Fin n) (Fin n) R} {c : R} (hAB : A * B = c • (1 : Matrix (Fin n) (Fin n) R))
-    (hc : c ≠ 0) (hX : X * B = 0) : X = 0 := by
+private theorem matrix_eq_zero_of_mul_right_cancel_lemma
+    {R : Type} [CommRing R] [IsDomain R]
+    {n : ℕ} {A B X : Matrix (Fin n) (Fin n) R} {c : R}
+    (hAB : A * B = c • (1 : Matrix (Fin n) (Fin n) R)) (hc : c ≠ 0) (hX : X * B = 0)
+    : X = 0 := by
   have hdet : A.det * B.det = c ^ n := by
     rw [← Matrix.det_mul, hAB, Matrix.det_smul, Matrix.det_one, mul_one, Fintype.card_fin]
   have hB : B.det ≠ 0 := by
@@ -36,9 +39,11 @@ private theorem matrix_eq_zero_of_mul_right_cancel_lemma {R : Type} [CommRing R]
   exact (smul_eq_zero.mp h1.symm).resolve_left hB
 
 open Matrix TensorProduct in
-private theorem matrix_eq_zero_of_mul_left_cancel_lemma_2 {R : Type} [CommRing R] [IsDomain R] {n : ℕ}
-    {A B Y : Matrix (Fin n) (Fin n) R} {c : R} (hAB : A * B = c • (1 : Matrix (Fin n) (Fin n) R))
-    (hc : c ≠ 0) (hY : A * Y = 0) : Y = 0 := by
+private theorem matrix_eq_zero_of_mul_left_cancel_lemma_2
+    {R : Type} [CommRing R] [IsDomain R]
+    {n : ℕ} {A B Y : Matrix (Fin n) (Fin n) R} {c : R}
+    (hAB : A * B = c • (1 : Matrix (Fin n) (Fin n) R)) (hc : c ≠ 0) (hY : A * Y = 0)
+    : Y = 0 := by
   have hdet : A.det * B.det = c ^ n := by
     rw [← Matrix.det_mul, hAB, Matrix.det_smul, Matrix.det_one, mul_one, Fintype.card_fin]
   have hA : A.det ≠ 0 := by
@@ -50,9 +55,28 @@ private theorem matrix_eq_zero_of_mul_left_cancel_lemma_2 {R : Type} [CommRing R
   rw [hY, Matrix.mul_zero] at h1
   exact (smul_eq_zero.mp h1.symm).resolve_left hA
 
-
 open Matrix TensorProduct in
-theorem _root_.GlobalTheory.DetInv.datum_scalar_intertwine : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O], v.Integers O → ∀ (ε : PreTilt O p), IsPrimitiveRoot (_root_.GlobalTheory.Sandwich.root ε).untilt p → ∀ (Λ : Type) [CommRing Λ] [Algebra ℤ_[p] Λ] (h : ℕ) (D : _root_.GlobalTheory.Sandwich.Datum ε h Λ), (∀ c : ℤ_[p], D.ρM (algebraMap ℤ_[p] Λ c) = _root_.GlobalTheory.Sandwich.ofPadic p O c • (1 : Matrix (Fin h) (Fin h) (_root_.GlobalTheory.Sandwich.Ainf p O))) ∧ D.F * D.G = _root_.GlobalTheory.Sandwich.mu ε • (1 : Matrix (Fin h) (Fin h) (_root_.GlobalTheory.Sandwich.Ainf p O)) ∧ (∀ l, D.G * D.ρM l = _root_.GlobalTheory.DetInv.rhoTA D l * D.G) ∧ (∀ l, D.Ψ * (D.ρM l).map (_root_.GlobalTheory.Sandwich.phiInv p O) = D.ρM l * D.Ψ) ∧ ∀ l, D.Ψ' * D.ρM l = (D.ρM l).map (_root_.GlobalTheory.Sandwich.phiInv p O) * D.Ψ' := by
+theorem _root_.GlobalTheory.DetInv.datum_scalar_intertwine
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O],
+      v.Integers O
+        → ∀ (ε : PreTilt O p),
+          IsPrimitiveRoot (_root_.GlobalTheory.Sandwich.root ε).untilt p
+            → ∀ (Λ : Type) [CommRing Λ] [Algebra ℤ_[p] Λ] (h : ℕ)
+                (D : _root_.GlobalTheory.Sandwich.Datum ε h Λ),
+              (∀ c : ℤ_[p],
+                  D.ρM (algebraMap ℤ_[p] Λ c)
+                    = _root_.GlobalTheory.Sandwich.ofPadic p O c
+                      • (1 : Matrix (Fin h) (Fin h) (_root_.GlobalTheory.Sandwich.Ainf p O)))
+                ∧ D.F * D.G
+                  = _root_.GlobalTheory.Sandwich.mu ε
+                    • (1 : Matrix (Fin h) (Fin h) (_root_.GlobalTheory.Sandwich.Ainf p O))
+                ∧ (∀ l, D.G * D.ρM l = _root_.GlobalTheory.DetInv.rhoTA D l * D.G)
+                ∧ (∀ l, D.Ψ * (D.ρM l).map (_root_.GlobalTheory.Sandwich.phiInv p O) = D.ρM l * D.Ψ)
+                ∧ ∀ l,
+                  D.Ψ' * D.ρM l
+                    = (D.ρM l).map (_root_.GlobalTheory.Sandwich.phiInv p O) * D.Ψ' := by
   intro p _ C _ _ _ v O _ _ _ _ hv ε hε Λ _ _ h D
   haveI : IsDomain (_root_.GlobalTheory.Sandwich.Ainf p O) := _root_.GlobalTheory.AinfXi.isDomain_ainf hv
   set F := D.F with hF
@@ -73,16 +97,17 @@ theorem _root_.GlobalTheory.DetInv.datum_scalar_intertwine : ∀ (p : ℕ) [Fact
   have hGF : G * F = _root_.GlobalTheory.Sandwich.mu ε • 1 := D.G_mul_F
   have hFΨ : F = Ψ * F.map φ := D.F_eq
   have hΨΨ' : Ψ * Ψ' = _root_.GlobalTheory.Sandwich.xi ε • 1 := D.Ψ_mul
-  have hFT : ∀ l, F * _root_.GlobalTheory.DetInv.rhoTA D l = M l * F := fun l =>
-    D.F_act l
+  have hFT : ∀ l, F * _root_.GlobalTheory.DetInv.rhoTA D l = M l * F := fun l => D.F_act l
 
   have hFG : F * G = _root_.GlobalTheory.Sandwich.mu ε • 1 := by
     have h0 : (F * G - _root_.GlobalTheory.Sandwich.mu ε • 1) * F = 0 := by
-      rw [Matrix.sub_mul, Matrix.mul_assoc, hGF, Matrix.mul_smul, Matrix.mul_one,
-        Matrix.smul_mul, Matrix.one_mul, sub_self]
+      rw [Matrix.sub_mul, Matrix.mul_assoc, hGF, Matrix.mul_smul, Matrix.mul_one, Matrix.smul_mul,
+        Matrix.one_mul, sub_self]
     exact sub_eq_zero.mp (matrix_eq_zero_of_mul_right_cancel_lemma hGF hμ h0)
 
-  have hTφ : ∀ l, (_root_.GlobalTheory.DetInv.rhoTA D l).map φ = _root_.GlobalTheory.DetInv.rhoTA D l := by
+  have hTφ
+      : ∀ l,
+        (_root_.GlobalTheory.DetInv.rhoTA D l).map φ = _root_.GlobalTheory.DetInv.rhoTA D l := by
     intro l
     unfold _root_.GlobalTheory.DetInv.rhoTA
     rw [Matrix.map_map]
@@ -109,8 +134,10 @@ theorem _root_.GlobalTheory.DetInv.datum_scalar_intertwine : ∀ (p : ℕ) [Fact
     exact sub_eq_zero.mp (matrix_eq_zero_of_mul_right_cancel_lemma hGFφ hμ' h0)
   refine ⟨?_, hFG, ?_, hΨM, ?_⟩
   · intro c
-    have hT : _root_.GlobalTheory.DetInv.rhoTA D (algebraMap ℤ_[p] Λ c) =
-        _root_.GlobalTheory.Sandwich.ofPadic p O c • (1 : Matrix (Fin h) (Fin h) (_root_.GlobalTheory.Sandwich.Ainf p O)) := by
+    have hT
+        : _root_.GlobalTheory.DetInv.rhoTA D (algebraMap ℤ_[p] Λ c)
+          = _root_.GlobalTheory.Sandwich.ofPadic p O c
+            • (1 : Matrix (Fin h) (Fin h) (_root_.GlobalTheory.Sandwich.Ainf p O)) := by
       unfold _root_.GlobalTheory.DetInv.rhoTA
       rw [AlgHom.commutes]
       ext i j
@@ -118,19 +145,20 @@ theorem _root_.GlobalTheory.DetInv.datum_scalar_intertwine : ∀ (p : ℕ) [Fact
       split_ifs <;> simp
     have h1 := hFT (algebraMap ℤ_[p] Λ c)
     rw [hT] at h1
-    have h0 : (M (algebraMap ℤ_[p] Λ c) - _root_.GlobalTheory.Sandwich.ofPadic p O c • 1) * F = 0 := by
-      rw [Matrix.sub_mul, ← h1, Matrix.mul_smul, Matrix.mul_one, Matrix.smul_mul,
-        Matrix.one_mul, sub_self]
+    have h0
+        : (M (algebraMap ℤ_[p] Λ c) - _root_.GlobalTheory.Sandwich.ofPadic p O c • 1) * F = 0 := by
+      rw [Matrix.sub_mul, ← h1, Matrix.mul_smul, Matrix.mul_one, Matrix.smul_mul, Matrix.one_mul,
+        sub_self]
     exact sub_eq_zero.mp (matrix_eq_zero_of_mul_right_cancel_lemma hGF hμ h0)
   · intro l
     have h0 : (G * M l - _root_.GlobalTheory.DetInv.rhoTA D l * G) * F = 0 := by
-      rw [Matrix.sub_mul, Matrix.mul_assoc, ← hFT, ← Matrix.mul_assoc, hGF, Matrix.mul_assoc,
-        hGF, Matrix.smul_mul, Matrix.one_mul, Matrix.mul_smul, Matrix.mul_one, sub_self]
+      rw [Matrix.sub_mul, Matrix.mul_assoc, ← hFT, ← Matrix.mul_assoc, hGF, Matrix.mul_assoc, hGF,
+        Matrix.smul_mul, Matrix.one_mul, Matrix.mul_smul, Matrix.mul_one, sub_self]
     exact sub_eq_zero.mp (matrix_eq_zero_of_mul_right_cancel_lemma hGF hμ h0)
   · intro l
     have h0 : Ψ * (Ψ' * M l - (M l).map φ * Ψ') = 0 := by
-      rw [Matrix.mul_sub, ← Matrix.mul_assoc, hΨΨ', ← Matrix.mul_assoc, hΨM, Matrix.mul_assoc,
-        hΨΨ', Matrix.smul_mul, Matrix.one_mul, Matrix.mul_smul, Matrix.mul_one, sub_self]
+      rw [Matrix.mul_sub, ← Matrix.mul_assoc, hΨΨ', ← Matrix.mul_assoc, hΨM, Matrix.mul_assoc, hΨΨ',
+        Matrix.smul_mul, Matrix.one_mul, Matrix.mul_smul, Matrix.mul_one, sub_self]
     exact sub_eq_zero.mp (matrix_eq_zero_of_mul_left_cancel_lemma_2 hΨΨ' hξ h0)
 
 end GlobalTheory.DetInv

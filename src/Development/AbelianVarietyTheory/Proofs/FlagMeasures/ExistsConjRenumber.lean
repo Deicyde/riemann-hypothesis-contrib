@@ -35,31 +35,37 @@ private lemma traceOnCharacter_averagedSingles_eq (g N : ℕ) [Fact g.Prime]
   simp only [mul_ite, ite_mul, mul_zero, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
   ring
 
-
 open Polynomial in
 open scoped Classical in
 variable {g : ℕ} [Fact g.Prime] {N : ℕ} in
-theorem _root_.GlobalTheory.GLm.tr_ePat_renumber : ∀ (g : ℕ) [Fact g.Prime]
-    (ψ : AddChar (ZMod g) ℂ) (N : ℕ) (Φ E : Fin N → Fin N → Prop)
-    (σ : Equiv.Perm (Fin N)) (χ : _root_.GlobalTheory.GLq.Gn g N → ℂ), _root_.GlobalTheory.GLq.IsClass χ →
-    _root_.GlobalTheory.GLq.tr (_root_.GlobalTheory.GLm.ePat g N (fun a b => Φ (σ a) (σ b))
-      (fun a b => E (σ a) (σ b)) ψ) χ =
-      _root_.GlobalTheory.GLq.tr (_root_.GlobalTheory.GLm.ePat g N Φ E ψ) χ := by
+theorem _root_.GlobalTheory.GLm.tr_ePat_renumber
+    : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ) (N : ℕ) (Φ E : Fin N → Fin N → Prop)
+        (σ : Equiv.Perm (Fin N)) (χ : _root_.GlobalTheory.GLq.Gn g N → ℂ),
+      _root_.GlobalTheory.GLq.IsClass χ
+        → _root_.GlobalTheory.GLq.tr
+            (_root_.GlobalTheory.GLm.ePat g N
+              (fun a b => Φ (σ a) (σ b))
+              (fun a b => E (σ a) (σ b))
+              ψ)
+            χ
+          = _root_.GlobalTheory.GLq.tr (_root_.GlobalTheory.GLm.ePat g N Φ E ψ) χ := by
   intro g _ ψ N Φ E σ χ hχ
   unfold _root_.GlobalTheory.GLm.ePat
   rw [traceOnCharacter_averagedSingles_eq, traceOnCharacter_averagedSingles_eq]
   set Q : GL (Fin N) (ZMod g) := (Matrix.permMatrixHom (R := ZMod g)).toHomUnits σ⁻¹ with hQdef
-  have hQ : ∀ (u : GL (Fin N) (ZMod g)) (x y : Fin N),
-      ((Q⁻¹ * u * Q : GL (Fin N) (ZMod g)) : Matrix (Fin N) (Fin N) (ZMod g)) x y =
-        (u : Matrix (Fin N) (Fin N) (ZMod g)) (σ.symm x) (σ.symm y) := by
+  have hQ
+      : ∀ (u : GL (Fin N) (ZMod g)) (x y : Fin N),
+        ((Q⁻¹ * u * Q : GL (Fin N) (ZMod g)) : Matrix (Fin N) (Fin N) (ZMod g)) x y
+          = (u : Matrix (Fin N) (Fin N) (ZMod g)) (σ.symm x) (σ.symm y) := by
     intro u x y
-    have hinv : ((Q⁻¹ : GL (Fin N) (ZMod g)) : Matrix (Fin N) (Fin N) (ZMod g)) =
-        (σ⁻¹ : Equiv.Perm (Fin N)).toPEquiv.toMatrix := by
+    have hinv
+        : ((Q⁻¹ : GL (Fin N) (ZMod g)) : Matrix (Fin N) (Fin N) (ZMod g))
+          = (σ⁻¹ : Equiv.Perm (Fin N)).toPEquiv.toMatrix := by
       rw [hQdef]
       show (((σ⁻¹)⁻¹)⁻¹ : Equiv.Perm (Fin N)).toPEquiv.toMatrix = _
       rw [inv_inv]
-    have hval : ((Q : GL (Fin N) (ZMod g)) : Matrix (Fin N) (Fin N) (ZMod g)) =
-        σ.toPEquiv.toMatrix := by
+    have hval
+        : ((Q : GL (Fin N) (ZMod g)) : Matrix (Fin N) (Fin N) (ZMod g)) = σ.toPEquiv.toMatrix := by
       rw [hQdef]
       show ((σ⁻¹)⁻¹ : Equiv.Perm (Fin N)).toPEquiv.toMatrix = _
       rw [inv_inv]
@@ -70,9 +76,12 @@ theorem _root_.GlobalTheory.GLm.tr_ePat_renumber : ∀ (g : ℕ) [Fact g.Prime]
   have he : ∀ u, e u = Q⁻¹ * u * Q := by
     intro u
     simp [e, MulAut.conj_apply]
-  have hmem : ∀ u : GL (Fin N) (ZMod g),
-      _root_.GlobalTheory.GLm.InPat (fun a b => Φ (σ a) (σ b)) (u : Matrix (Fin N) (Fin N) (ZMod g)) ↔
-        _root_.GlobalTheory.GLm.InPat Φ (e u : Matrix (Fin N) (Fin N) (ZMod g)) := by
+  have hmem
+      : ∀ u : GL (Fin N) (ZMod g),
+        _root_.GlobalTheory.GLm.InPat
+            (fun a b => Φ (σ a) (σ b))
+            (u : Matrix (Fin N) (Fin N) (ZMod g))
+          ↔ _root_.GlobalTheory.GLm.InPat Φ (e u : Matrix (Fin N) (Fin N) (ZMod g)) := by
     intro u
     unfold _root_.GlobalTheory.GLm.InPat
     simp only [he, hQ]
@@ -86,9 +95,12 @@ theorem _root_.GlobalTheory.GLm.tr_ePat_renumber : ∀ (g : ℕ) [Fact g.Prime]
       simp only [Equiv.symm_apply_apply] at hab'
       rw [hab', Matrix.one_apply, Matrix.one_apply]
       simp
-  have hsum : ∀ u : GL (Fin N) (ZMod g),
-      _root_.GlobalTheory.GLm.sumAt (fun a b => E (σ a) (σ b)) (u : Matrix (Fin N) (Fin N) (ZMod g)) =
-        _root_.GlobalTheory.GLm.sumAt E (e u : Matrix (Fin N) (Fin N) (ZMod g)) := by
+  have hsum
+      : ∀ u : GL (Fin N) (ZMod g),
+        _root_.GlobalTheory.GLm.sumAt
+            (fun a b => E (σ a) (σ b))
+            (u : Matrix (Fin N) (Fin N) (ZMod g))
+          = _root_.GlobalTheory.GLm.sumAt E (e u : Matrix (Fin N) (Fin N) (ZMod g)) := by
     intro u
     unfold _root_.GlobalTheory.GLm.sumAt
     simp only [he, hQ]

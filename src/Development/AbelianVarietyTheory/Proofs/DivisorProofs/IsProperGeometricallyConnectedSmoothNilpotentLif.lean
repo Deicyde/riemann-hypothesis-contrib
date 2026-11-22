@@ -6,15 +6,20 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.IsPro
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj DividedPowers
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.SqLift GlobalTheory.Published GlobalTheory.Published.GrothendieckMessing
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  DividedPowers
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.SqLift
+  GlobalTheory.Published GlobalTheory.Published.GrothendieckMessing
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.NilLift
 
-theorem surjective_spMap_of_isNilpotent_ker {R R₀ : Type} [CommRing R] [CommRing R₀] (π : R →+* R₀)
-    (hπ : Function.Surjective π) (hn : IsNilpotent (RingHom.ker π)) : Surjective (spMap π) := by
+theorem surjective_spMap_of_isNilpotent_ker
+    {R R₀ : Type} [CommRing R] [CommRing R₀]
+    (π : R →+* R₀) (hπ : Function.Surjective π) (hn : IsNilpotent (RingHom.ker π))
+    : Surjective (spMap π) := by
   refine ⟨fun (x : PrimeSpectrum R) ↦ ?_⟩
   have : x ∈ Set.range (PrimeSpectrum.comap π) := by
     rw [range_comap_of_surjective _ _ hπ]
@@ -27,10 +32,13 @@ theorem surjective_spMap_of_isNilpotent_ker {R R₀ : Type} [CommRing R] [CommRi
     exact zero_mem _
   exact this
 
-theorem isProper_and_geometricallyConnected_of_smooth_lift :
-    ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (π : R →+* R₀), Function.Surjective π → IsNilpotent (RingHom.ker π) →
-    ∀ (X : Over (Sp R)) (X₀ : Over (Sp R₀)) (i : X₀.left ⟶ X.left), IsPullback i X₀.hom X.hom (spMap π) → Smooth X.hom →
-    IsProper X₀.hom → GeometricallyConnected X₀.hom → IsProper X.hom ∧ GeometricallyConnected X.hom := by
+theorem isProper_and_geometricallyConnected_of_smooth_lift
+    : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (π : R →+* R₀),
+      Function.Surjective π → IsNilpotent (RingHom.ker π)
+        → ∀ (X : Over (Sp R)) (X₀ : Over (Sp R₀)) (i : X₀.left ⟶ X.left),
+          IsPullback i X₀.hom X.hom (spMap π) → Smooth X.hom → IsProper X₀.hom
+            → GeometricallyConnected X₀.hom
+            → IsProper X.hom ∧ GeometricallyConnected X.hom := by
   intro R R₀ _ _ π hπ hn X X₀ i hsq hsm hp hgc
   have hs : Surjective (spMap π) := surjective_spMap_of_isNilpotent_ker π hπ hn
   have hc : IsClosedImmersion (spMap π) := .spec_of_surjective _ hπ

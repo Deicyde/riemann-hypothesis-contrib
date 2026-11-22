@@ -28,17 +28,21 @@ def Jk : ℕ → Submodule ℂ (Module.End ℂ V)
   | 0 => ⊥
   | 1 => U E 0
   | k + 2 => {
-      carrier := {x | ∃ u ∈ U E (k + 1), ∃ w : Fin n → Fin n → Module.End ℂ V,
+    carrier :=
+      {x | ∃ u ∈ U E (k + 1), ∃ w : Fin n → Fin n → Module.End ℂ V,
         (∀ c d, w c d ∈ U E k) ∧ x = u + ∑ c, ∑ d, w c d * Z ε E c d}
-      add_mem' := by
-        rintro _ _ ⟨u, hu, w, hw, rfl⟩ ⟨u', hu', w', hw', rfl⟩
-        refine ⟨u + u', add_mem hu hu', w + w', fun c d => add_mem (hw c d) (hw' c d), ?_⟩
-        simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib]; abel
-      zero_mem' := ⟨0, zero_mem _, 0, fun _ _ => zero_mem _, by simp⟩
-      smul_mem' := by
-        rintro r _ ⟨u, hu, w, hw, rfl⟩
-        refine ⟨r • u, Submodule.smul_mem _ r hu, r • w, fun c d => Submodule.smul_mem _ r (hw c d), ?_⟩
-        simp [smul_add, Finset.smul_sum] }
+    add_mem' := by
+      rintro _ _ ⟨u, hu, w, hw, rfl⟩ ⟨u', hu', w', hw', rfl⟩
+      refine ⟨u + u', add_mem hu hu', w + w', fun c d => add_mem (hw c d) (hw' c d), ?_⟩
+      simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib]
+      abel
+    zero_mem' := ⟨0, zero_mem _, 0, fun _ _ => zero_mem _, by simp⟩
+    smul_mem' := by
+      rintro r _ ⟨u, hu, w, hw, rfl⟩
+      refine
+        ⟨r • u, Submodule.smul_mem _ r hu, r • w, fun c d => Submodule.smul_mem _ r (hw c d), ?_⟩
+      simp [smul_add, Finset.smul_sum]
+  }
 
 lemma mem_Jk_succ_succ (k : ℕ) (x : Module.End ℂ V) : x ∈ Jk ε E (k + 2) ↔ ∃ u ∈ U E (k + 1),
     ∃ w : Fin n → Fin n → Module.End ℂ V, (∀ c d, w c d ∈ U E k) ∧ x = u + ∑ c, ∑ d, w c d * Z ε E c d :=
@@ -90,21 +94,20 @@ lemma memJ_right (h : Hyp ε E) (i j : ℕ) {x y : Module.End ℂ V} (hy : y ∈
         rwa [show j + (2 + i - 1) = j + i + 1 by omega] at this
     · simp only [add_mul, Finset.sum_mul, mul_sub, mul_assoc, Finset.sum_sub_distrib]; abel
 
-
 variable (ε E) in
 def Rr (h : Hyp ε E) : Subalgebra ℂ (Module.End ℂ V)[X] where
   carrier := {f | ∀ k, f.coeff k ∈ U E k}
   mul_mem' {f g} hf hg k := by
     rw [coeff_mul]
     exact Submodule.sum_mem _ fun x hx => by
-      have := h.mul _ _ _ (hf x.1) _ (hg x.2); rwa [Finset.HasAntidiagonal.mem_antidiagonal.mp hx] at this
+      have := h.mul _ _ _ (hf x.1) _ (hg x.2)
+      rwa [Finset.HasAntidiagonal.mem_antidiagonal.mp hx] at this
   add_mem' {f g} hf hg k := by rw [coeff_add]; exact add_mem (hf k) (hg k)
   algebraMap_mem' r k := by
     rw [Polynomial.algebraMap_apply, coeff_C]
     split_ifs with hk
     · subst hk; rw [Algebra.algebraMap_eq_smul_one]; exact Submodule.smul_mem _ r h.one
     · exact zero_mem _
-
 
 variable (ε E) in
 def inJ (f : (Module.End ℂ V)[X]) : Prop := ∀ k, f.coeff k ∈ Jk ε E k
@@ -134,55 +137,63 @@ lemma inJ_comm (h : Hyp ε E) {f g : (Module.End ℂ V)[X]} (hf : f ∈ Rr ε E 
     have := h.comm _ _ _ (hf x.1) _ (hg x.2)
     rwa [Finset.HasAntidiagonal.mem_antidiagonal.mp hx, Nat.add_sub_cancel] at this
 
-
 variable (ε E) in
 def con (h : Hyp ε E) : RingCon (Rr ε E h) where
   r f g := inJ ε E ((f : (Module.End ℂ V)[X]) - g)
-  iseqv := ⟨fun f k => by simp,
+  iseqv := ⟨
+    fun f k => by simp,
     fun {f g} hfg k => by rw [← neg_sub, coeff_neg]; exact neg_mem (hfg k),
     fun {f g l} h1 h2 k => by
-      have := add_mem (h1 k) (h2 k); rwa [← coeff_add, sub_add_sub_cancel] at this⟩
+      have := add_mem (h1 k) (h2 k); rwa [← coeff_add, sub_add_sub_cancel] at this
+  ⟩
   add' {a b c d} h1 h2 k := by
     have := add_mem (h1 k) (h2 k)
     simp only [Subalgebra.coe_add, coeff_sub, coeff_add] at *
-    convert this using 1; abel
+    convert this using 1
+    abel
   mul' {a b c d} h1 h2 k := by
-    have e : ((a * c : Rr ε E h) : (Module.End ℂ V)[X]) - (b * d : Rr ε E h) =
-        ((a : (Module.End ℂ V)[X]) - b) * c + (b : (Module.End ℂ V)[X]) * ((c : (Module.End ℂ V)[X]) - d) := by
+    have e
+        : ((a * c : Rr ε E h) : (Module.End ℂ V)[X]) - (b * d : Rr ε E h)
+          = ((a : (Module.End ℂ V)[X]) - b) * c
+            + (b : (Module.End ℂ V)[X]) * ((c : (Module.End ℂ V)[X]) - d) := by
       simp only [Subalgebra.coe_mul, sub_mul, mul_sub]; abel
     rw [e, coeff_add]
     exact add_mem (inJ_mul_right h h1 c.2 k) (inJ_mul_left h h2 b.2 k)
 
-
 variable (ε E) in
 abbrev Q (h : Hyp ε E) := (con ε E h).Quotient
 
-instance instCR (h : Hyp ε E) : CommRing (Q ε E h) :=
-  { (inferInstance : Ring (Q ε E h)) with
-    mul_comm := by
-      intro x y
-      refine Quotient.inductionOn₂' x y fun f g => ?_
-      change ((f : Q ε E h) * g) = g * f
-      rw [← RingCon.coe_mul, ← RingCon.coe_mul, RingCon.eq]
-      show inJ ε E (((f * g : Rr ε E h) : (Module.End ℂ V)[X]) - (g * f : Rr ε E h))
-      simp only [Subalgebra.coe_mul]
-      exact inJ_comm h f.2 g.2 }
+instance instCR (h : Hyp ε E) : CommRing (Q ε E h) := {
+  (inferInstance : Ring (Q ε E h)) with
+  mul_comm := by
+    intro x y
+    refine Quotient.inductionOn₂' x y fun f g => ?_
+    change ((f : Q ε E h) * g) = g * f
+    rw [← RingCon.coe_mul, ← RingCon.coe_mul, RingCon.eq]
+    show inJ ε E (((f * g : Rr ε E h) : (Module.End ℂ V)[X]) - (g * f : Rr ε E h))
+    simp only [Subalgebra.coe_mul]
+    exact inJ_comm h f.2 g.2
+}
 
 instance instQA (h : Hyp ε E) : Algebra ℚ (Q ε E h) := Algebra.compHom _ (algebraMap ℚ ℂ)
 
 variable (h : Hyp ε E)
 
-def L (j : ℕ) (x : Module.End ℂ V) (hx : x ∈ U E j) : Rr ε E h :=
-  ⟨C x * X ^ j, fun k => by
-    rw [coeff_C_mul_X_pow]; split_ifs with hk
+def L (j : ℕ) (x : Module.End ℂ V) (hx : x ∈ U E j) : Rr ε E h := ⟨
+  C x * X ^ j,
+  fun k => by
+    rw [coeff_C_mul_X_pow]
+    split_ifs with hk
     · subst hk; exact hx
-    · exact zero_mem _⟩
+    · exact zero_mem _
+⟩
 
 @[simp] lemma coe_L (j : ℕ) (x : Module.End ℂ V) (hx : x ∈ U E j) :
     ((L h j x hx : Rr ε E h) : (Module.End ℂ V)[X]) = C x * X ^ j := rfl
 
-def MR (M : Matrix (Fin n) (Fin n) (Module.End ℂ V)) (j : ℕ) (hM : ∀ a b, M a b ∈ U E j) :
-    Matrix (Fin n) (Fin n) (Rr ε E h) := fun a b => L h j (M a b) (hM a b)
+def MR (M : Matrix (Fin n) (Fin n) (Module.End ℂ V)) (j : ℕ) (hM : ∀ a b, M a b ∈ U E j)
+    : Matrix (Fin n) (Fin n) (Rr ε E h) := fun a b =>
+  L h j (M a b) (hM a b)
 
 lemma CX_mul (x y : Module.End ℂ V) (i j : ℕ) :
     (C x * X ^ i) * (C y * X ^ j) = C (x * y) * X ^ (i + j) := by
@@ -244,11 +255,15 @@ lemma trace_MR (M : Matrix (Fin n) (Fin n) (Module.End ℂ V)) (j : ℕ) (hM : �
   rfl
 
 include h in
-theorem main (h2 : ∀ (k : ℕ) c d, E c d * (Mm E ^ k).trace = (Mm E ^ k).trace * E c d)
+theorem main
+    (h2 : ∀ (k : ℕ) c d, E c d * (Mm E ^ k).trace = (Mm E ^ k).trace * E c d)
     (h3 : ∀ T : Module.End ℂ V, (∀ a b, E a b * T = T * E a b) → ∃ c : ℂ, ∀ v, T v = c • v)
-    (h4 : A4) (h5 : ∀ a b, (Mm E * Md ε E - Md ε E * Mm E) a b + Z ε E a b ∈ U E 1) :
-    ∀ m : ℕ, 1 ≤ m → n ≤ m → ∀ a b, ∃ u ∈ U E (2 * m - 1), ∃ w : Fin n → Fin n → Module.End ℂ V,
-      (∀ c d, w c d ∈ U E (2 * m - 2)) ∧ ((Md ε E * Mm E) ^ m) a b = u + ∑ c, ∑ d, w c d * Z ε E c d := by
+    (h4 : A4) (h5 : ∀ a b, (Mm E * Md ε E - Md ε E * Mm E) a b + Z ε E a b ∈ U E 1)
+    : ∀ m : ℕ,
+      1 ≤ m → n ≤ m
+        → ∀ a b, ∃ u ∈ U E (2 * m - 1), ∃ w : Fin n → Fin n → Module.End ℂ V,
+          (∀ c d, w c d ∈ U E (2 * m - 2))
+            ∧ ((Md ε E * Mm E) ^ m) a b = u + ∑ c, ∑ d, w c d * Z ε E c d := by
   intro m hm hnm a b
   have hM : ∀ a b, Mm E a b ∈ U E 1 := fun a b => h.e1 a b
   have hD : ∀ a b, Md ε E a b ∈ U E 1 := fun a b => Submodule.smul_mem _ _ (h.e1 a b)
@@ -275,8 +290,13 @@ theorem main (h2 : ∀ (k : ℕ) c d, E c d * (Mm E ^ k).trace = (Mm E ^ k).trac
     rw [← map_sub, L_sub, psiL_iff]
     show _ ∈ Jk ε E (0 + 2)
     rw [mem_Jk_succ_succ]
-    refine ⟨(Mm E * Md ε E - Md ε E * Mm E) a b + Z ε E a b, h5 a b,
-      fun c d => if c = a then (if d = b then -1 else 0) else 0, fun c d => ?_, ?_⟩
+    refine ⟨
+      (Mm E * Md ε E - Md ε E * Mm E) a b + Z ε E a b,
+      h5 a b,
+      fun c d => if c = a then (if d = b then -1 else 0) else 0,
+      fun c d => ?_,
+      ?_
+    ⟩
     · dsimp only
       split_ifs
       · exact neg_mem h.one
@@ -301,7 +321,8 @@ end GradedNormalNilpotent
 theorem normal_nilpotent_of_commutator : A1 → A2 → A3 → A4 → CommutatorAdjointModLower → A5 := by
   intro h1 h2 h3 h4 h5 n ε V _ _ E hE
   obtain ⟨hm, ho, he, hmu, hc, -, hz⟩ := h1 n ε V E hE
-  exact GradedNormalNilpotent.main ⟨hm, ho, he, hmu, hc, hz⟩ (h2 n ε V E hE) (h3 n ε V E hE) h4 (h5 n ε V E hE)
+  exact GradedNormalNilpotent.main ⟨hm, ho, he, hmu, hc, hz⟩ (h2 n ε V E hE) (h3 n ε V E hE) h4
+    (h5 n ε V E hE)
 
 end PositivityTheory.CW
 

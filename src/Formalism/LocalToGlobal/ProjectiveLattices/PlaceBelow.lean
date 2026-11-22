@@ -13,7 +13,8 @@ noncomputable section
 namespace Formalism.L2.Pj
 
 open MvPowerSeries NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 section Copies
 
@@ -23,17 +24,29 @@ def DofN (F : Fin d → PS R 2 d) {n : ℕ} (b : Fin n) (u : Fin d → R) (f : P
   ∑ j : Fin d, (∑ i : Fin d, C (u i) * ev (n := n) ![pt R d b, 0] (pderiv (R := R) ((1 : Fin 2), i) (F j))) *
     pderiv (R := R) (b, j) f
 
-def DmonN (F : Fin d → PS R 2 d) {n : ℕ} {ι : Type} [Fintype ι] (cp : ι → Fin n) (u : ι → Fin d → R)
-    (m : ι →₀ ℕ) (f : PS R n d) : PS R n d :=
+def DmonN
+    (F : Fin d → PS R 2 d)
+    {n : ℕ} {ι : Type} [Fintype ι]
+    (cp : ι → Fin n) (u : ι → Fin d → R) (m : ι →₀ ℕ) (f : PS R n d)
+    : PS R n d :=
   (Finset.univ : Finset ι).toList.foldr (fun l g => (DofN F (cp l) (u l))^[m l] g) f
 
-def DpolyN (F : Fin d → PS R 2 d) {n : ℕ} {ι : Type} [Fintype ι] (cp : ι → Fin n) (u : ι → Fin d → R)
-    (P : MvPolynomial ι R) (f : PS R n d) : PS R n d :=
+def DpolyN
+    (F : Fin d → PS R 2 d)
+    {n : ℕ} {ι : Type} [Fintype ι]
+    (cp : ι → Fin n) (u : ι → Fin d → R) (P : MvPolynomial ι R) (f : PS R n d)
+    : PS R n d :=
   ∑ m ∈ P.support, C (P.coeff m) * DmonN F cp u m f
 
-def nabValN {O : Type} [CommRing O] [StarRing O] (B : FB R d O) (k : Type) [CommRing k] [Algebra ℚ k]
-    [Algebra R k] (h : PS k 2 d) (w0 : O) (m : ℕ) {n : ℕ} (f : PS k n d) {ι : Type} [Fintype ι]
-    (cp : ι → Fin n) (u : ι → Fin d → k) (P : MvPolynomial ι k) : k :=
+def nabValN
+    {O : Type} [CommRing O] [StarRing O]
+    (B : FB R d O)
+    (k : Type) [CommRing k] [Algebra ℚ k] [Algebra R k]
+    (h : PS k 2 d) (w0 : O) (m : ℕ)
+    {n : ℕ} (f : PS k n d)
+    {ι : Type} [Fintype ι]
+    (cp : ι → Fin n) (u : ι → Fin d → k) (P : MvPolynomial ι k)
+    : k :=
   constantCoeff (DpolyN (B.FK k) cp u P
     (f * FB.expS k ((m : k) • ∑ b : Fin n, ev (n := n) ![pt k d b] (B.hL k h w0))))
 
@@ -41,7 +54,8 @@ end Copies
 
 section Loc
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable {Xo : Moduli Dw l} {c : Coeff l}
 
 variable [StarRing (𝓞 E)]
@@ -49,17 +63,21 @@ variable [StarRing (𝓞 E)]
 abbrev IntChart (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) := IntegralChartA3 Xo c T io y
 
 def FFV (T : CDVR) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) : Set (MvPolynomial (LtN Dw n) T.Fr) :=
-  HaO Dw.mult n T.Fr (algebraMap T.V T.Fr).range ComplexEmbedding.conjugate (InPsi H) fun τ i => a (τ, i)
+  HaO Dw.mult n T.Fr (algebraMap T.V T.Fr).range ComplexEmbedding.conjugate (InPsi H) fun τ i =>
+    a (τ, i)
 
-def nuLocC {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io} (C : IntChart T io y) (e k : ℕ)
-    (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) : EReal :=
+def nuLocC
+    {T : CDVR} {io : c.F →+* T.Fr} {y : IntFr Xo c T io} (C : IntChart T io y)
+    (e k : ℕ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ)
+    : EReal :=
   letI := io.toAlgebra
   ⨅ (P : MvPolynomial (LtN Dw n) T.Fr) (_ : P ∈ FFV (Dw := Dw) T a n) (f : PS T.Fr n C.ch.d) (_ : IsIntPS T f),
     letI := io.toAlgebra
     nval T.V e (nabValN C.ch.B T.Fr C.ch.h H.w0 k f (fun ℓ => ℓ.2.2) (fun ℓ => C.ch.uvec ⟨ℓ.1, ℓ.2.1⟩) P)
 
-def nuLoc {T : CDVR} {io : c.F →+* T.Fr} (y : IntFr Xo c T io) (e k : ℕ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) :
-    EReal :=
+def nuLoc
+    {T : CDVR} {io : c.F →+* T.Fr} (y : IntFr Xo c T io) (e k : ℕ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ)
+    : EReal :=
   ⨅ C : IntChart T io y, nuLocC C e k a n
 
 variable (Xo c)
@@ -98,25 +116,25 @@ def IsRam (p : ℕ) : Prop := p ∈ Q.sm ∨ p = Q.q1 ∨ p = Q.dd
 
 def IsBad (p : ℕ) : Prop := Q.IsRam p ∨ p = Q.g1 ∨ p = Q.g2
 
-
 open Classical in
 def cP (DF : ℕ) (p : ℕ) : ℕ := if Q.IsRam p then ⌈Q.vd p * (DF : ℝ)⌉.toNat else 0
 
-
 open Classical in
 def nuN (DFL : ℕ) (nu : ℝ) (p : ℕ) : ℝ :=
-  if p = Q.g1 then (DFL : ℝ) / ((Q.g1 : ℝ) - 1)
-  else if p = Q.g2 then (DFL : ℝ) / ((Q.g2 : ℝ) - 1)
-  else nu + (Q.cP DFL p : ℝ)
-
+  if p = Q.g1 then
+    (DFL : ℝ) / ((Q.g1 : ℝ) - 1)
+  else if p = Q.g2 then
+    (DFL : ℝ) / ((Q.g2 : ℝ) - 1)
+  else
+    nu + (Q.cP DFL p : ℝ)
 
 open Classical in
 def eLam (eL : ℕ) (nuStar : ℝ) (p : ℕ) : ℕ :=
   ⌈(eL : ℝ) * (Q.T : ℝ) * (nuStar + if Q.IsBad p then 1 else 0)⌉.toNat
 
 def Z1 (DFL DFF : ℕ) : ℕ :=
-  (∏ p ∈ Q.sm.filter Nat.Prime, p ^ (Q.T * Q.cP DFL p + Q.cP DFF p)) * Q.q1 ^ (Q.T * Q.cP DFL Q.q1 + Q.cP DFF Q.q1) *
-    Q.dd ^ (Q.T * Q.cP DFL Q.dd + Q.cP DFF Q.dd)
+  (∏ p ∈ Q.sm.filter Nat.Prime, p ^ (Q.T * Q.cP DFL p + Q.cP DFF p))
+    * Q.q1 ^ (Q.T * Q.cP DFL Q.q1 + Q.cP DFF Q.q1) * Q.dd ^ (Q.T * Q.cP DFL Q.dd + Q.cP DFF Q.dd)
 
 end DepPage
 
@@ -136,8 +154,9 @@ def resCharOf {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞
 def ramOverZ {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K)) : ℕ :=
   Ideal.ramificationIdx' (Ideal.span {((resCharOf la : ℕ) : ℤ)}) la.asIdeal
 
-variable {K : Type} [Field K] [NumberField K] {L : Type} [Field L] [NumberField L]
-  [Algebra (𝓞 K) (𝓞 L)] [Algebra.IsIntegral (𝓞 K) (𝓞 L)]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {L : Type} [Field L] [NumberField L] [Algebra (𝓞 K) (𝓞 L)] [Algebra.IsIntegral (𝓞 K) (𝓞 L)]
 
 def placeBelow (v : HeightOneSpectrum (𝓞 L)) : HeightOneSpectrum (𝓞 K) where
   asIdeal := v.asIdeal.under (𝓞 K)
@@ -161,15 +180,16 @@ private lemma le_ceil_toNat_lemma (a x b : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) :
     exact_mod_cast Int.self_le_toNat _
   linarith
 
-theorem DepPage.le_eLam (Q : DepPage) (eL : ℕ) (nu : ℝ) (p : ℕ) :
-    (eL : ℝ) * (Q.T : ℝ) * nu ≤ (Q.eLam eL nu p : ℝ) := by
+theorem DepPage.le_eLam (Q : DepPage) (eL : ℕ) (nu : ℝ) (p : ℕ)
+    : (eL : ℝ) * (Q.T : ℝ) * nu ≤ (Q.eLam eL nu p : ℝ) := by
   unfold DepPage.eLam
   refine le_ceil_toNat_lemma _ _ _ (by positivity) ?_
   split_ifs <;> norm_num
 
 section Inst
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)]
 
 structure DepData (E : Type) [Field E] [NumberField E] where
@@ -189,7 +209,9 @@ def nuWAt (D : DepData E) (la : HeightOneSpectrum (𝓞 c.F)) (j : ℕ) : EReal 
 def nuStarAt (D : DepData E) (la : HeightOneSpectrum (𝓞 c.F)) (j : ℕ) : ℝ :=
   D.Q.nuN (DF Dw (D.aL j)) ((nuWAt (Xo := Xo) D la j).toReal / (ramOverZ la : ℝ)) (resCharOf la)
 
-variable {LL : Type} [Field LL] [NumberField LL] [Algebra (𝓞 c.F) (𝓞 LL)] [Algebra.IsIntegral (𝓞 c.F) (𝓞 LL)]
+variable
+  {LL : Type}
+  [Field LL] [NumberField LL] [Algebra (𝓞 c.F) (𝓞 LL)] [Algebra.IsIntegral (𝓞 c.F) (𝓞 LL)]
 
 def EAt (D : DepData E) (v : HeightOneSpectrum (𝓞 LL)) (j : ℕ) : ℕ :=
   expE (K := c.F) D.Q (fun la => nuStarAt (Xo := Xo) D la j) v
@@ -197,17 +219,23 @@ def EAt (D : DepData E) (v : HeightOneSpectrum (𝓞 LL)) (j : ℕ) : ℕ :=
 variable [Algebra (𝓞 E) LL]
 
 def nnKAt (D : DepData E) (j : ℕ) : LL :=
-  nnOf (fun i => algebraMap (𝓞 E) LL (D.pi i)) (fun i => algebraMap (𝓞 E) LL (H.bar (D.pi i))) (D.Dp j) (D.Dm j)
+  nnOf
+    (fun i => algebraMap (𝓞 E) LL (D.pi i))
+    (fun i => algebraMap (𝓞 E) LL (H.bar (D.pi i)))
+    (D.Dp j) (D.Dm j)
 
 def sigAt (D : DepData E) (j : ℕ) : LL :=
-  sigOf D.Q (fun i => algebraMap (𝓞 E) LL (D.pi i)) (fun i => algebraMap (𝓞 E) LL (H.bar (D.pi i))) (D.Dp j) (D.Dm j)
-    (DF Dw (D.aL j)) (DF Dw (D.aF j))
+  sigOf D.Q
+    (fun i => algebraMap (𝓞 E) LL (D.pi i))
+    (fun i => algebraMap (𝓞 E) LL (H.bar (D.pi i)))
+    (D.Dp j) (D.Dm j) (DF Dw (D.aL j)) (DF Dw (D.aF j))
 
 end Inst
 
 section Props
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)]
 
 def IntChartEx : Prop :=
@@ -215,7 +243,8 @@ def IntChartEx : Prop :=
 
 def ChartIndep : Prop :=
   ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io) (C C' : IntChart T io y) (e k : ℕ)
-    (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ), nuLocC C e k a n = nuLocC C' e k a n
+      (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ),
+    nuLocC C e k a n = nuLocC C' e k a n
 
 variable {Xo c}
 

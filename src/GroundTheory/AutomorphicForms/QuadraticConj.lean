@@ -15,8 +15,8 @@ noncomputable def conjLinear : E →ₗ[F] E :=
 
 variable {F E}
 
-theorem conjLinear_apply (x : E) :
-    conjLinear F E x = algebraMap F E (Algebra.trace F E x) - x := rfl
+theorem conjLinear_apply (x : E) : conjLinear F E x = algebraMap F E (Algebra.trace F E x) - x :=
+  rfl
 
 variable [Algebra.IsQuadraticExtension F E]
 
@@ -31,10 +31,10 @@ theorem conjLinear_algebraMap (c : F) : conjLinear F E (algebraMap F E c) = alge
 theorem conjLinear_one : conjLinear F E 1 = 1 := by
   simpa using conjLinear_algebraMap (F := F) (E := E) 1
 
-
 omit [Algebra.IsQuadraticExtension F E] in
-theorem linearIndependent_one_of_not_mem [Nontrivial E] {x : E}
-    (hx : x ∉ Set.range (algebraMap F E)) : LinearIndependent F ![1, x] := by
+theorem linearIndependent_one_of_not_mem
+    [Nontrivial E] {x : E} (hx : x ∉ Set.range (algebraMap F E))
+    : LinearIndependent F ![1, x] := by
   rw [LinearIndependent.pair_iff]
   intro s t hst
   by_cases ht : t = 0
@@ -51,10 +51,11 @@ theorem linearIndependent_one_of_not_mem [Nontrivial E] {x : E}
     have h2 : x = t⁻¹ • (t • x) := by rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
     rw [h2, this, smul_neg, smul_smul, neg_smul, div_eq_inv_mul]
 
-theorem nontrivial_quadratic (K A : Type*) [Field K] [CommRing A] [Algebra K A]
-    [Algebra.IsQuadraticExtension K A] : Nontrivial A :=
-  Module.nontrivial_of_finrank_pos (R := K) (by
-    rw [Algebra.IsQuadraticExtension.finrank_eq_two]; norm_num)
+theorem nontrivial_quadratic
+    (K A : Type*) [Field K] [CommRing A] [Algebra K A] [Algebra.IsQuadraticExtension K A]
+    : Nontrivial A :=
+  Module.nontrivial_of_finrank_pos (R := K)
+    (by rw [Algebra.IsQuadraticExtension.finrank_eq_two]; norm_num)
 
 noncomputable def basisOneOf {x : E} (hx : x ∉ Set.range (algebraMap F E)) : Basis (Fin 2) F E :=
   haveI := nontrivial_quadratic F E
@@ -67,61 +68,68 @@ theorem basisOneOf_zero {x : E} (hx : x ∉ Set.range (algebraMap F E)) : basisO
 theorem basisOneOf_one {x : E} (hx : x ∉ Set.range (algebraMap F E)) : basisOneOf hx 1 = x := by
   simp [basisOneOf]
 
-theorem sq_eq_of_not_mem {x : E} (hx : x ∉ Set.range (algebraMap F E)) :
-    x * x = algebraMap F E ((basisOneOf hx).repr (x * x) 0) +
-      algebraMap F E ((basisOneOf hx).repr (x * x) 1) * x := by
+theorem sq_eq_of_not_mem {x : E} (hx : x ∉ Set.range (algebraMap F E))
+    : x * x
+      = algebraMap F E ((basisOneOf hx).repr (x * x) 0)
+        + algebraMap F E ((basisOneOf hx).repr (x * x) 1) * x := by
   conv_lhs => rw [← (basisOneOf hx).sum_repr (x * x)]
   rw [Fin.sum_univ_two, basisOneOf_zero, basisOneOf_one, Algebra.smul_def, Algebra.smul_def,
     mul_one]
 
-theorem repr_self_zero {x : E} (hx : x ∉ Set.range (algebraMap F E)) :
-    (basisOneOf hx).repr x 0 = 0 := by
+theorem repr_self_zero {x : E} (hx : x ∉ Set.range (algebraMap F E))
+    : (basisOneOf hx).repr x 0 = 0 := by
   have h := (basisOneOf hx).repr_self 1
   rw [basisOneOf_one] at h
-  rw [h]; simp
+  rw [h]
+  simp
 
-theorem repr_self_one {x : E} (hx : x ∉ Set.range (algebraMap F E)) :
-    (basisOneOf hx).repr x 1 = 1 := by
+theorem repr_self_one {x : E} (hx : x ∉ Set.range (algebraMap F E))
+    : (basisOneOf hx).repr x 1 = 1 := by
   have h := (basisOneOf hx).repr_self 1
   rw [basisOneOf_one] at h
-  rw [h]; simp
+  rw [h]
+  simp
 
-theorem trace_eq_of_not_mem {x : E} (hx : x ∉ Set.range (algebraMap F E)) :
-    Algebra.trace F E x = (basisOneOf hx).repr (x * x) 1 := by
+theorem trace_eq_of_not_mem {x : E} (hx : x ∉ Set.range (algebraMap F E))
+    : Algebra.trace F E x = (basisOneOf hx).repr (x * x) 1 := by
   rw [Algebra.trace_eq_matrix_trace (basisOneOf hx), Matrix.trace_fin_two,
     Algebra.leftMulMatrix_eq_repr_mul, Algebra.leftMulMatrix_eq_repr_mul, basisOneOf_zero,
     basisOneOf_one, mul_one, repr_self_zero, zero_add]
 
-theorem norm_eq_of_not_mem {x : E} (hx : x ∉ Set.range (algebraMap F E)) :
-    Algebra.norm F x = -(basisOneOf hx).repr (x * x) 0 := by
+theorem norm_eq_of_not_mem {x : E} (hx : x ∉ Set.range (algebraMap F E))
+    : Algebra.norm F x = - (basisOneOf hx).repr (x * x) 0 := by
   rw [Algebra.norm_eq_matrix_det (basisOneOf hx), Matrix.det_fin_two,
     Algebra.leftMulMatrix_eq_repr_mul, Algebra.leftMulMatrix_eq_repr_mul,
     Algebra.leftMulMatrix_eq_repr_mul, Algebra.leftMulMatrix_eq_repr_mul, basisOneOf_zero,
     basisOneOf_one, mul_one, repr_self_zero, repr_self_one]
   ring
 
-theorem conjLinear_mul_self (x : E) :
-    conjLinear F E (x * x) = conjLinear F E x * conjLinear F E x := by
+theorem conjLinear_mul_self (x : E)
+    : conjLinear F E (x * x) = conjLinear F E x * conjLinear F E x := by
   by_cases hx : x ∈ Set.range (algebraMap F E)
   · obtain ⟨c, rfl⟩ := hx
     rw [← map_mul, conjLinear_algebraMap, conjLinear_algebraMap, map_mul]
   · have hsq := sq_eq_of_not_mem hx
     have htr : Algebra.trace F E x = (basisOneOf hx).repr (x * x) 1 := trace_eq_of_not_mem hx
-    have htr2 : Algebra.trace F E (x * x) = 2 * (basisOneOf hx).repr (x * x) 0 +
-        (basisOneOf hx).repr (x * x) 1 * (basisOneOf hx).repr (x * x) 1 := by
+    have htr2
+        : Algebra.trace F E (x * x)
+          = 2 * (basisOneOf hx).repr (x * x) 0
+            + (basisOneOf hx).repr (x * x) 1 * (basisOneOf hx).repr (x * x) 1 := by
       conv_lhs => rw [hsq]
-      rw [map_add (f := _), trace_algebraMap_quadratic, ← Algebra.smul_def, map_smul, htr, smul_eq_mul]
+      rw [map_add (f := _), trace_algebraMap_quadratic, ← Algebra.smul_def, map_smul, htr,
+        smul_eq_mul]
     rw [conjLinear_apply, conjLinear_apply, htr2, htr]
     simp only [map_add (f := _), map_mul, map_ofNat]
     linear_combination (-2 : E) * hsq
 
-theorem conjLinear_mul (x y : E) :
-    conjLinear F E (x * y) = conjLinear F E x * conjLinear F E y := by
+theorem conjLinear_mul (x y : E)
+    : conjLinear F E (x * y) = conjLinear F E x * conjLinear F E y := by
   by_cases hx : x ∈ Set.range (algebraMap F E)
   · obtain ⟨c, rfl⟩ := hx
     rw [conjLinear_algebraMap, ← Algebra.smul_def, ← Algebra.smul_def, map_smul]
-  · have key : (conjLinear F E).comp (LinearMap.mulLeft F x) =
-        (LinearMap.mulLeft F (conjLinear F E x)).comp (conjLinear F E) := by
+  · have key
+        : (conjLinear F E).comp (LinearMap.mulLeft F x)
+          = (LinearMap.mulLeft F (conjLinear F E x)).comp (conjLinear F E) := by
       refine (basisOneOf hx).ext fun i => ?_
       fin_cases i
       · simp [basisOneOf_zero, conjLinear_one]
@@ -131,15 +139,15 @@ theorem conjLinear_mul (x y : E) :
     exact LinearMap.congr_fun key y
 
 theorem conjLinear_conjLinear (x : E) : conjLinear F E (conjLinear F E x) = x := by
-  rw [conjLinear_apply, conjLinear_apply x, map_sub, trace_algebraMap_quadratic, map_sub,
-    map_mul, map_ofNat]
+  rw [conjLinear_apply, conjLinear_apply x, map_sub, trace_algebraMap_quadratic, map_sub, map_mul,
+    map_ofNat]
   ring
 
 variable (F E) in
 noncomputable def conj : E ≃ₐ[F] E :=
   AlgEquiv.ofLinearEquiv
-    (LinearEquiv.ofInvolutive (conjLinear F E) (fun x => conjLinear_conjLinear x))
-    conjLinear_one conjLinear_mul
+    (LinearEquiv.ofInvolutive (conjLinear F E) (fun x => conjLinear_conjLinear x)) conjLinear_one
+    conjLinear_mul
 
 theorem conj_apply (x : E) : conj F E x = algebraMap F E (Algebra.trace F E x) - x := rfl
 

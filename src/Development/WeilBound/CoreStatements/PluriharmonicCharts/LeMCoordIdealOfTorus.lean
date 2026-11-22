@@ -9,7 +9,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.OmHeightslockG
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory NumberField Matrix ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top GlobalTheory.CompanionTheory.Ar.PB GlobalTheory.CompanionTheory.Ar.PB.BMx ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P
+open AlgebraicGeometry CategoryTheory NumberField Matrix ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+  GlobalTheory.CompanionTheory.Ar.PB GlobalTheory.CompanionTheory.Ar.PB.BMx
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P
 open ReciprocityTheory.ChartRestriction.G.Semi
 open scoped ComplexOrder
 
@@ -19,35 +23,42 @@ section HomogIdeal
 
 variable {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintype (J k)]
 
-theorem eval_mConeMap {Ω : Type} [Field Ω] (y : (Σ k, J k) → Ω) (c : K → Ω) (f : MRing J) :
-    MvPolynomial.eval c (mConeMap y f) = MvPolynomial.aeval (fun p : Σ k, J k => y p * c p.1) f := by
-  have h : (MvPolynomial.eval c).comp (mConeMap y).toRingHom =
-      (MvPolynomial.aeval (fun p : Σ k, J k => y p * c p.1) : MRing J →ₐ[ℤ] Ω).toRingHom := by
+theorem eval_mConeMap {Ω : Type} [Field Ω] (y : (Σ k, J k) → Ω) (c : K → Ω) (f : MRing J)
+    : MvPolynomial.eval c (mConeMap y f)
+      = MvPolynomial.aeval (fun p : Σ k, J k => y p * c p.1) f := by
+  have h
+      : (MvPolynomial.eval c).comp (mConeMap y).toRingHom
+        = (MvPolynomial.aeval (fun p : Σ k, J k => y p * c p.1) : MRing J →ₐ[ℤ] Ω).toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro r; simp
     · intro p; simp [mConeMap]
   exact congrArg (fun φ : MRing J →+* Ω => φ f) h
 
-theorem aeval_eq_eval_map (w : (Σ k, J k) → ℂ) (f : MRing J) :
-    MvPolynomial.aeval w f = MvPolynomial.eval w (MvPolynomial.map (Int.castRingHom ℂ) f) := by
+theorem aeval_eq_eval_map (w : (Σ k, J k) → ℂ) (f : MRing J)
+    : MvPolynomial.aeval w f = MvPolynomial.eval w (MvPolynomial.map (Int.castRingHom ℂ) f) := by
   rw [MvPolynomial.eval_map, MvPolynomial.aeval_def, algebraMap_int_eq]
 
-theorem aeval_eq_zero_of_mem {w : (Σ k, J k) → ℂ} {f : MRing J} (hf : f ∈ mCoordIdeal w) :
-    MvPolynomial.aeval w f = 0 := by
+theorem aeval_eq_zero_of_mem {w : (Σ k, J k) → ℂ} {f : MRing J} (hf : f ∈ mCoordIdeal w)
+    : MvPolynomial.aeval w f = 0 := by
   have hf' : mConeMap w f = 0 := hf
   have h := eval_mConeMap w (fun _ => 1) f
   rw [hf', map_zero] at h
   simpa using h.symm
 
-theorem aeval_ratio_eq_zero {Ω : Type} [Field Ω] {x : (Σ k, J k) → Ω} (c : (k : K) → J k) {f : MRing J}
-    (hf : f ∈ mCoordIdeal x) : MvPolynomial.aeval (fun p : Σ k, J k => x p / x ⟨p.1, c p.1⟩) f = 0 := by
+theorem aeval_ratio_eq_zero
+    {Ω : Type} [Field Ω]
+    {x : (Σ k, J k) → Ω}
+    (c : (k : K) → J k)
+    {f : MRing J} (hf : f ∈ mCoordIdeal x)
+    : MvPolynomial.aeval (fun p : Σ k, J k => x p / x ⟨p.1, c p.1⟩) f = 0 := by
   have hf' : mConeMap x f = 0 := hf
   have h := eval_mConeMap x (fun k => (x ⟨k, c k⟩)⁻¹) f
   rw [hf', map_zero] at h
   simpa [div_eq_mul_inv] using h.symm
 
-theorem eq_zero_of_eval_torus {F : MvPolynomial K ℂ}
-    (h : ∀ c : K → ℂ, (∀ k, c k ≠ 0) → MvPolynomial.eval c F = 0) : F = 0 := by
+theorem eq_zero_of_eval_torus
+    {F : MvPolynomial K ℂ} (h : ∀ c : K → ℂ, (∀ k, c k ≠ 0) → MvPolynomial.eval c F = 0)
+    : F = 0 := by
   have h2 : F * ∏ k, (MvPolynomial.X k : MvPolynomial K ℂ) = 0 := by
     apply MvPolynomial.funext
     intro c
@@ -61,17 +72,20 @@ theorem eq_zero_of_eval_torus {F : MvPolynomial K ℂ}
   · exact h3
   · exact absurd h3 (Finset.prod_ne_zero_iff.2 fun k _ => MvPolynomial.X_ne_zero k)
 
-theorem le_mCoordIdeal_of_torus {bd : Ideal (MRing J)} {z : (Σ k, J k) → ℂ}
-    (h : ∀ c : K → ℂ, (∀ k, c k ≠ 0) → ∀ f ∈ bd, MvPolynomial.aeval (fun p : Σ k, J k => z p * c p.1) f = 0) :
-    bd ≤ mCoordIdeal z := by
+theorem le_mCoordIdeal_of_torus
+    {bd : Ideal (MRing J)} {z : (Σ k, J k) → ℂ}
+    (h : ∀ c : K → ℂ,
+      (∀ k, c k ≠ 0) → ∀ f ∈ bd, MvPolynomial.aeval (fun p : Σ k, J k => z p * c p.1) f = 0)
+    : bd ≤ mCoordIdeal z := by
   intro f hf
   show mConeMap z f = 0
   refine eq_zero_of_eval_torus fun c hc => ?_
   rw [eval_mConeMap]
   exact h c hc f hf
 
-theorem exists_algHom_ker_eq {S : Type} [CommRing S] [Algebra ℚ S] [Algebra.FiniteType ℚ S] (m : Ideal S)
-    [m.IsMaximal] : ∃ ev : S →ₐ[ℚ] ℂ, RingHom.ker ev = m := by
+theorem exists_algHom_ker_eq
+    {S : Type} [CommRing S] [Algebra ℚ S] [Algebra.FiniteType ℚ S] (m : Ideal S) [m.IsMaximal]
+    : ∃ ev : S →ₐ[ℚ] ℂ, RingHom.ker ev = m := by
   let _ : Field (S ⧸ m) := Ideal.Quotient.field m
   haveI : Algebra.FiniteType ℚ (S ⧸ m) :=
     Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ ℚ m) (Ideal.Quotient.mkₐ_surjective ℚ m)
@@ -79,19 +93,22 @@ theorem exists_algHom_ker_eq {S : Type} [CommRing S] [Algebra ℚ S] [Algebra.Fi
   haveI : Algebra.IsAlgebraic ℚ (S ⧸ m) := Algebra.IsAlgebraic.of_finite ℚ _
   let φ : (S ⧸ m) →ₐ[ℚ] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨φ.comp (Ideal.Quotient.mkₐ ℚ m), ?_⟩
   ext s
-  rw [RingHom.mem_ker, AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk, map_eq_zero_iff φ φ.toRingHom.injective,
-    Ideal.Quotient.eq_zero_iff_mem]
+  rw [RingHom.mem_ker, AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk,
+    map_eq_zero_iff φ φ.toRingHom.injective, Ideal.Quotient.eq_zero_iff_mem]
 
-theorem cond_of_bd {Ω : Type} [Field Ω] [CharZero Ω] {x : (Σ k, J k) → Ω} {bd : Ideal (MRing J)}
-    {c : (k : K) → J k} (hc : ∀ k, x ⟨k, c k⟩ ≠ 0) {S : Subalgebra ℚ Ω} [Algebra.FiniteType ℚ S]
-    (hρ : ∀ p : Σ k, J k, x p / x ⟨p.1, c p.1⟩ ∈ S) (q : Ideal S) (hq : q.IsPrime)
-    (hbd : ∀ g ∈ bd, ∀ s : S, (s : Ω) = MvPolynomial.aeval (fun p : Σ k, J k => x p / x ⟨p.1, c p.1⟩) g → s ∈ q) :
-    ∀ g ∈ (⨅ z ∈ mcPts (mCoordIdeal x) ∩ mcPts bd, mCoordIdeal z), ∀ s : S,
+theorem cond_of_bd
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    {x : (Σ k, J k) → Ω} {bd : Ideal (MRing J)} {c : (k : K) → J k} (hc : ∀ k, x ⟨k, c k⟩ ≠ 0)
+    {S : Subalgebra ℚ Ω} [Algebra.FiniteType ℚ S]
+    (hρ : ∀ p : Σ k, J k, x p / x ⟨p.1, c p.1⟩ ∈ S)
+    (q : Ideal S) (hq : q.IsPrime)
+    (hbd : ∀ g ∈ bd, ∀ s : S,
+      (s : Ω) = MvPolynomial.aeval (fun p : Σ k, J k => x p / x ⟨p.1, c p.1⟩) g → s ∈ q)
+    : ∀ g ∈ (⨅ z ∈ mcPts (mCoordIdeal x) ∩ mcPts bd, mCoordIdeal z), ∀ s : S,
       (s : Ω) = MvPolynomial.aeval (fun p : Σ k, J k => x p / x ⟨p.1, c p.1⟩) g → s ∈ q := by
   intro g hg s hs
   haveI : IsJacobsonRing S := isJacobsonRing_of_finiteType (A := ℚ)
@@ -103,10 +120,13 @@ theorem cond_of_bd {Ω : Type} [Field Ω] [CharZero Ω] {x : (Σ k, J k) → Ω}
   let ρS : (Σ k, J k) → S := fun p => ⟨_, hρ p⟩
   let w : (Σ k, J k) → ℂ := fun p => ev (ρS p)
   have hval : ∀ f : MRing J, ev (MvPolynomial.aeval ρS f) = MvPolynomial.aeval w f := fun f => by
-    rw [MvPolynomial.aeval_def, MvPolynomial.aeval_def, ← AlgHom.coe_toRingHom, MvPolynomial.eval₂_comp_left]
+    rw [MvPolynomial.aeval_def, MvPolynomial.aeval_def, ← AlgHom.coe_toRingHom,
+      MvPolynomial.eval₂_comp_left]
     congr 1 <;> first | rfl | exact RingHom.ext_int _ _
-  have hsub : ∀ f : MRing J, ((MvPolynomial.aeval ρS f : S) : Ω) =
-      MvPolynomial.aeval (fun p : Σ k, J k => x p / x ⟨p.1, c p.1⟩) f := fun f => by
+  have hsub
+      : ∀ f : MRing J,
+        ((MvPolynomial.aeval ρS f : S) : Ω)
+          = MvPolynomial.aeval (fun p : Σ k, J k => x p / x ⟨p.1, c p.1⟩) f := fun f => by
     show S.val.toRingHom (MvPolynomial.aeval ρS f) = _
     rw [MvPolynomial.aeval_def, MvPolynomial.aeval_def, MvPolynomial.eval₂_comp_left]
     congr 1 <;> first | rfl | exact RingHom.ext_int _ _
@@ -116,33 +136,43 @@ theorem cond_of_bd {Ω : Type} [Field Ω] [CharZero Ω] {x : (Σ k, J k) → Ω}
       simp only [w, h1, map_one]
       exact one_ne_zero
     · rw [← aeval_eq_eval_map, ← hval]
-      have h1 : MvPolynomial.aeval ρS f = 0 := Subtype.ext (by rw [hsub]; exact aeval_ratio_eq_zero c hf)
+      have h1 : MvPolynomial.aeval ρS f = 0 :=
+        Subtype.ext (by rw [hsub]; exact aeval_ratio_eq_zero c hf)
       rw [h1, map_zero]
   have hwbd : w ∈ mcPts bd := by
     refine ⟨hwP.1, fun f hf => ?_⟩
     rw [← aeval_eq_eval_map, ← hval, ← RingHom.mem_ker, hev]
     exact hqm (hbd f hf _ (hsub f))
-  have hg' : g ∈ mCoordIdeal w := (Submodule.mem_iInf _).1 ((Submodule.mem_iInf _).1 hg w) ⟨hwP, hwbd⟩
+  have hg' : g ∈ mCoordIdeal w :=
+    (Submodule.mem_iInf _).1 ((Submodule.mem_iInf _).1 hg w) ⟨hwP, hwbd⟩
   have hs' : s = MvPolynomial.aeval ρS g := Subtype.ext (hs.trans (hsub g).symm)
   rw [← hev, RingHom.mem_ker, hs', hval]
   exact aeval_eq_zero_of_mem hg'
 
 end HomogIdeal
 
-theorem exists_homogIdeal {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintype (J k)] {Ω : Type} [Field Ω]
-    [CharZero Ω] (x : (Σ k, J k) → Ω) (n : ℕ) (bd : Ideal (MRing J)) (hs : Cmp.IsSncModel x n bd)
+theorem exists_homogIdeal
+    {K : Type} [Fintype K]
+    {J : K → Type} [∀ k, Fintype (J k)]
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (x : (Σ k, J k) → Ω) (n : ℕ) (bd : Ideal (MRing J)) (hs : Cmp.IsSncModel x n bd)
     (ha : IsArithVar (mCoordIdeal x) (n + 1))
-    (ht : ∀ z ∈ mcPts (mCoordIdeal x) ∩ mcPts bd, ∀ c : K → ℂ, (∀ k, c k ≠ 0) →
-      GroundTheory.Heights₂.Heights.LowerBoundFree.torusSmul c z ∈ mcPts (mCoordIdeal x) ∩ mcPts bd) :
-    ∃ I : Ideal (MRing J), IsMultiHomogIdeal I ∧ ¬ I ≤ mCoordIdeal x ∧ Cmp.IsSncModel x n I ∧
-      mcPts (mCoordIdeal x) ∩ mcPts I = mcPts (mCoordIdeal x) ∩ mcPts bd := by
+    (ht : ∀ z ∈ mcPts (mCoordIdeal x) ∩ mcPts bd, ∀ c : K → ℂ,
+      (∀ k, c k ≠ 0)
+        → GroundTheory.Heights₂.Heights.LowerBoundFree.torusSmul c z
+          ∈ mcPts (mCoordIdeal x) ∩ mcPts bd)
+    : ∃ I : Ideal (MRing J),
+      IsMultiHomogIdeal I ∧ ¬ I ≤ mCoordIdeal x ∧ Cmp.IsSncModel x n I
+        ∧ mcPts (mCoordIdeal x) ∩ mcPts I = mcPts (mCoordIdeal x) ∩ mcPts bd := by
   classical
   set I : Ideal (MRing J) := ⨅ z ∈ mcPts (mCoordIdeal x) ∩ mcPts bd, mCoordIdeal z with hIdef
   have hle : bd ≤ I := by
     intro f hf
     refine (Submodule.mem_iInf _).2 fun z => (Submodule.mem_iInf _).2 fun hz => ?_
     refine le_mCoordIdeal_of_torus (fun c hc g hg => ?_) hf
-    have e : (fun p : Σ k, J k => z p * c p.1) = GroundTheory.Heights₂.Heights.LowerBoundFree.torusSmul c z :=
+    have e
+        : (fun p : Σ k, J k => z p * c p.1)
+          = GroundTheory.Heights₂.Heights.LowerBoundFree.torusSmul c z :=
       funext fun p => mul_comm _ _
     rw [e, aeval_eq_eval_map]
     exact (ht z hz c hc).2.2 g hg
@@ -206,6 +236,7 @@ theorem exists_homogIdeal {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintyp
     · rintro ⟨hzP, hzb⟩
       refine ⟨hzP, hzP.1, fun f hf => ?_⟩
       rw [← aeval_eq_eval_map]
-      exact aeval_eq_zero_of_mem ((Submodule.mem_iInf _).1 ((Submodule.mem_iInf _).1 hf z) ⟨hzP, hzb⟩)
+      exact aeval_eq_zero_of_mem ((Submodule.mem_iInf _).1 ((Submodule.mem_iInf _).1 hf z)
+        ⟨hzP, hzb⟩)
 
 end PositivityTheory.Xgp.c_bm_exists_boundary

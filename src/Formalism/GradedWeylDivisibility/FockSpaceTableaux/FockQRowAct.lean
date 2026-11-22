@@ -152,7 +152,6 @@ private lemma coeff_zero_rowAct_eq {r n : ℕ} (h : Matrix (Fin r) (Fin r) ℚ) 
     change constantCoeff (rowAct ℚ h (p * X v)) = constantCoeff (p * X v)
     rw [map_mul, map_mul, hx, map_mul, MvPolynomial.constantCoeff_X, mul_zero, mul_zero]
 
-
 set_option maxHeartbeats 800000 in
 private lemma pderiv_rowAct_eq_sum_C_mul_rowAct_pderiv {r n : ℕ} (h : Matrix (Fin r) (Fin r) ℚ) (w : Fin r × Fin n)
     (Q : MvPolynomial (Fin r × Fin n) ℚ) :
@@ -204,19 +203,24 @@ theorem fock_space_row_action : FockQRowAct := by
   | C a =>
     have hC : rowAct ℚ g (C a : MvPolynomial (Fin r × Fin n) ℚ) = C a := by simp [rowAct]
     rw [hC, fockQ_C_left_eq_mul_coeff_zero, fockQ_C_left_eq_mul_coeff_zero, coeff_zero_rowAct_eq]
-  | add p q hp hq => rw [map_add (f := _), fockQ_add_left, fockQ_add_left, hp, hq]
+  | add p q hp hq =>
+    rw [map_add (f := _), fockQ_add_left, fockQ_add_left, hp, hq]
   | mul_X p v hp =>
     rw [map_mul, rowAct_X_eq_sum_C_mul_X]
-    have e5 : rowAct ℚ g p * ∑ b : Fin r, C (g v.1 b) * X (b, v.2) =
-        ∑ b : Fin r, C (g v.1 b) * (X (b, v.2) * rowAct ℚ g p) := by
+    have e5
+        : rowAct ℚ g p * ∑ b : Fin r, C (g v.1 b) * X (b, v.2)
+          = ∑ b : Fin r, C (g v.1 b) * (X (b, v.2) * rowAct ℚ g p) := by
       rw [Finset.mul_sum]
       exact Finset.sum_congr rfl (fun b _ => by ring)
     rw [e5, fockQ_comm', fockQ_finset_sum_right]
-    have e6 : ∀ b : Fin r, fockQ Q (C (g v.1 b) * (X (b, v.2) * rowAct ℚ g p)) =
-        g v.1 b * fockQ p (rowAct ℚ g.transpose (pderiv (b, v.2) Q)) := by
+    have e6
+        : ∀ b : Fin r,
+          fockQ Q (C (g v.1 b) * (X (b, v.2) * rowAct ℚ g p))
+            = g v.1 b * fockQ p (rowAct ℚ g.transpose (pderiv (b, v.2) Q)) := by
       intro b
       rw [fockQ_C_mul_right, fockQ_comm', fockQ_X_mul_left_eq_pderiv_right, hp]
-    rw [Finset.sum_congr rfl (fun b _ => e6 b), mul_comm p (X v), fockQ_X_mul_left_eq_pderiv_right, pderiv_rowAct_eq_sum_C_mul_rowAct_pderiv, fockQ_finset_sum_right]
+    rw [Finset.sum_congr rfl (fun b _ => e6 b), mul_comm p (X v), fockQ_X_mul_left_eq_pderiv_right,
+      pderiv_rowAct_eq_sum_C_mul_rowAct_pderiv, fockQ_finset_sum_right]
     refine Finset.sum_congr rfl (fun c _ => ?_)
     rw [fockQ_C_mul_right, Matrix.transpose_apply]
 

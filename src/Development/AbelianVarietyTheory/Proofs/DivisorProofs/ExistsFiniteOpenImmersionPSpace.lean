@@ -13,8 +13,10 @@ namespace GlobalTheory.ZMain
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
 
-theorem finite_integralClosure_field (R L : Type*) [CommRing R] [Algebra.FiniteType ℤ R] [Field L]
-    [Algebra R L] [Algebra.EssFiniteType R L] : Module.Finite R (integralClosure R L) := by
+theorem finite_integralClosure_field
+    (R L : Type*)
+    [CommRing R] [Algebra.FiniteType ℤ R] [Field L] [Algebra R L] [Algebra.EssFiniteType R L]
+    : Module.Finite R (integralClosure R L) := by
   rcases CharP.char_is_prime_or_zero L (ringChar L) with hp | h0
   · let p := ringChar L
     haveI : Fact p.Prime := ⟨hp⟩
@@ -24,7 +26,8 @@ theorem finite_integralClosure_field (R L : Type*) [CommRing R] [Algebra.FiniteT
     letI : Algebra R' L := (Ideal.Quotient.lift I (algebraMap R L) fun _ h => h).toAlgebra
     haveI : IsScalarTower R R' L := .of_algebraMap_eq fun _ => rfl
     have hinj : Function.Injective (algebraMap R' L) := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro a ha
       obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective a
       exact Ideal.Quotient.eq_zero_iff_mem.mpr ha
@@ -51,11 +54,15 @@ theorem finite_integralClosure_field (R L : Type*) [CommRing R] [Algebra.FiniteT
         ← IsScalarTower.algebraMap_apply F E L]
     have hmem : ∀ z : integralClosure R' L, (z : L) ∈ E := fun z =>
       mem_algebraicClosure_iff.mpr (z.2.tower_top (A := F)).isAlgebraic
-    let ψ : integralClosure R' L →ₗ[R'] integralClosure R' E :=
-      { toFun := fun z => ⟨⟨z, hmem z⟩, (isIntegral_algHom_iff (IsScalarTower.toAlgHom R' E L)
-            (IsScalarTower.toAlgHom R' E L).toRingHom.injective).mp z.2⟩
-        map_add' := fun _ _ => rfl
-        map_smul' := fun _ _ => rfl }
+    let ψ : integralClosure R' L →ₗ[R'] integralClosure R' E := {
+      toFun := fun z => ⟨
+        ⟨z, hmem z⟩,
+        (isIntegral_algHom_iff (IsScalarTower.toAlgHom R' E L)
+          (IsScalarTower.toAlgHom R' E L).toRingHom.injective).mp z.2
+      ⟩
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl
+    }
     haveI : Module.Finite R' (integralClosure R' L) := Module.Finite.of_injective ψ
       fun a b h => Subtype.ext (congrArg (fun w : integralClosure R' E => ((w : E) : L)) h)
     exact finite_integralClosure_of_finite_tower R R' L
@@ -64,11 +71,12 @@ theorem finite_integralClosure_field (R L : Type*) [CommRing R] [Algebra.FiniteT
 
 universe u
 
-theorem isFinite_fromNormalization_int {X Y : Scheme.{u}} {o : CommRingCat.{u}}
-    [Algebra.FiniteType ℤ o] (f : X ⟶ Y) [QuasiCompact f] [QuasiSeparated f] (g : Y ⟶ Spec o)
-    [LocallyOfFiniteType g] [IsIntegral X]
-    (hess : (f.residueFieldMap (genericPoint X)).hom.EssFiniteType) :
-    IsFinite f.fromNormalization := by
+theorem isFinite_fromNormalization_int
+    {X Y : Scheme.{u}} {o : CommRingCat.{u}} [Algebra.FiniteType ℤ o]
+    (f : X ⟶ Y) [QuasiCompact f] [QuasiSeparated f]
+    (g : Y ⟶ Spec o) [LocallyOfFiniteType g] [IsIntegral X]
+    (hess : (f.residueFieldMap (genericPoint X)).hom.EssFiniteType)
+    : IsFinite f.fromNormalization := by
   refine ⟨fun U hU => ?_⟩
   letI := (f.app U).hom.toAlgebra
   letI : Algebra o Γ(Y, U) := ((Scheme.ΓSpecIso o).inv ≫ g.appLE ⊤ U le_top).hom.toAlgebra
@@ -105,23 +113,30 @@ theorem isFinite_fromNormalization_int {X Y : Scheme.{u}} {o : CommRingCat.{u}}
     (.of_surjective _ (ConcreteCategory.bijective_of_isIso (f.normalizationObjIso hU).inv).2)
     (RingHom.finite_algebraMap.mpr this)
 
-
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor in
-theorem exists_finite_openImmersion_pSpace : ∀ (o : Type) [CommRing o] [IsNoetherianRing o]
-    [Algebra.FiniteType ℤ o] (m : ℕ) (X : Scheme.{0}) (f : X ⟶ PSpace o m), IsIntegral X →
-    Geo.Tor.IsNormalScheme X → LocallyOfFiniteType f → QuasiCompact f → IsSeparated f →
-    LocallyQuasiFinite f → ∃ (Z : Scheme.{0}) (z : Z ⟶ PSpace o m) (i : X ⟶ Z), IsFinite z ∧
-      IsOpenImmersion i ∧ i ≫ z = f ∧ Geo.Tor.IsNormalScheme Z ∧ IsIntegral Z ∧
-      Dense (Set.range i) := by
+theorem exists_finite_openImmersion_pSpace
+    : ∀ (o : Type) [CommRing o] [IsNoetherianRing o] [Algebra.FiniteType ℤ o] (m : ℕ)
+        (X : Scheme.{0}) (f : X ⟶ PSpace o m),
+      IsIntegral X → Geo.Tor.IsNormalScheme X → LocallyOfFiniteType f → QuasiCompact f
+        → IsSeparated f → LocallyQuasiFinite f
+        → ∃ (Z : Scheme.{0}) (z : Z ⟶ PSpace o m) (i : X ⟶ Z),
+          IsFinite z ∧ IsOpenImmersion i ∧ i ≫ z = f ∧ Geo.Tor.IsNormalScheme Z ∧ IsIntegral Z
+            ∧ Dense (Set.range i) := by
   intro o _ _ _ m X f hX hN _ _ _ _
   haveI : Algebra.FiniteType ℤ (CommRingCat.of o) := ‹Algebra.FiniteType ℤ o›
   haveI := isProper_str o m
   haveI : GlobalTheory.IsNormalScheme X := GlobalTheory.IsNormalScheme.of_pred hN
-  refine ⟨f.normalization, f.fromNormalization, f.toNormalization,
+  refine ⟨
+    f.normalization,
+    f.fromNormalization,
+    f.toNormalization,
     isFinite_fromNormalization_int f (PSpace.str o m)
       (LocallyOfFiniteType.stalkMap f _).residueFieldMap,
-    inferInstance, f.toNormalization_fromNormalization,
-    (GlobalTheory.IsNormalScheme.normalization_of_isIntegral f).pred _, inferInstance,
-    (inferInstance : IsDominant f.toNormalization).denseRange⟩
+    inferInstance,
+    f.toNormalization_fromNormalization,
+    (GlobalTheory.IsNormalScheme.normalization_of_isIntegral f).pred _,
+    inferInstance,
+    (inferInstance : IsDominant f.toNormalization).denseRange
+  ⟩
 
 end GlobalTheory.ZMain

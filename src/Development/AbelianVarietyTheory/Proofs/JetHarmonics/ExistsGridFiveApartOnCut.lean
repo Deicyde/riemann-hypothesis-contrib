@@ -10,11 +10,13 @@ open Formalism.FourierDecayAlt Finset
 
 namespace GlobalTheory
 
-theorem exists_grid_five_apart_on_cut :
-    (∀ (u u' : ℕ → ℝ) (l M₀ : ℕ), 5 * (M₀ : ℝ) ≤ |u l - u' l| → ∃ Y : Finset ℝ, M₀ ≤ Y.card ∧
-      (∀ y ∈ Y, ∀ y' ∈ Y, y ≠ y' → 5 ≤ |y - y'|) ∧
-      ∀ y ∈ Y, I.OnCut u u' l y ∧ I.OnCut u u' l (y + 1)) ∧
-    ∀ r : ℕ, 5 * (3 * (r + 1) * (2 * r + 1)) ≤ 30 * (r + 1) ^ 2 + 6 := by
+theorem exists_grid_five_apart_on_cut
+    : (∀ (u u' : ℕ → ℝ) (l M₀ : ℕ),
+        5 * (M₀ : ℝ) ≤ |u l - u' l|
+          → ∃ Y : Finset ℝ,
+            M₀ ≤ Y.card ∧ (∀ y ∈ Y, ∀ y' ∈ Y, y ≠ y' → 5 ≤ |y - y'|)
+              ∧ ∀ y ∈ Y, I.OnCut u u' l y ∧ I.OnCut u u' l (y + 1))
+      ∧ ∀ r : ℕ, 5 * (3 * (r + 1) * (2 * r + 1)) ≤ 30 * (r + 1) ^ 2 + 6 := by
   refine ⟨fun u u' l M₀ h => ?_, fun r => by nlinarith [Nat.zero_le r]⟩
   have hmax : min (u l) (u' l) + 5 * (M₀ : ℝ) ≤ max (u l) (u' l) := by
     have := max_sub_min_eq_abs (u l) (u' l)

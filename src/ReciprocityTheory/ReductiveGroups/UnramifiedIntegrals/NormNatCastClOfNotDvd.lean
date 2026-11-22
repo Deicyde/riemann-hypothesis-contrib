@@ -19,11 +19,10 @@ theorem norm_natCast_Cl (n : ℕ) : ‖(n : ℂ_[l])‖ = ‖(n : ℚ_[l])‖ :=
   congr 1
   simp
 
-theorem norm_sub_le_max_Cl (a b : ℂ_[l]) : ‖a - b‖ ≤ max ‖a‖ ‖b‖ :=
-  by simpa [sub_eq_add_neg, norm_neg] using IsUltrametricDist.norm_add_le_max a (-b)
+theorem norm_sub_le_max_Cl (a b : ℂ_[l]) : ‖a - b‖ ≤ max ‖a‖ ‖b‖ := by
+  simpa [sub_eq_add_neg, norm_neg] using IsUltrametricDist.norm_add_le_max a (-b)
 
-theorem norm_l_Cl : ‖(l : ℂ_[l])‖ = (l : ℝ)⁻¹ := by
-  rw [norm_natCast_Cl, Padic.norm_p]
+theorem norm_l_Cl : ‖(l : ℂ_[l])‖ = (l : ℝ)⁻¹ := by rw [norm_natCast_Cl, Padic.norm_p]
 
 theorem norm_natCast_Cl_of_not_dvd {n : ℕ} (hn : ¬ l ∣ n) : ‖(n : ℂ_[l])‖ = 1 := by
   rw [norm_natCast_Cl, Padic.norm_natCast_eq_one_iff]
@@ -56,8 +55,9 @@ theorem tch_inv {ξ : ℂ_[l]} (h : ξ ∈ Tch l) : ξ⁻¹ ∈ Tch l := by
   · rw [inv_zero]; exact Set.mem_insert _ _
   · exact Set.mem_insert_of_mem _ ⟨n, hn, hln, by rw [inv_pow, hζ, inv_one]⟩
 
-theorem tch_near (x : ℂ_[l]) (hx : ‖x‖ ≤ 1) (f : ℕ) (hf : 0 < f) (r : ℝ) (hr : r < 1)
-    (h : ‖x ^ (l ^ f) - x‖ ≤ r) : ∃ ξ ∈ Tch l, ‖x - ξ‖ ≤ r := by
+theorem tch_near
+    (x : ℂ_[l]) (hx : ‖x‖ ≤ 1) (f : ℕ) (hf : 0 < f) (r : ℝ) (hr : r < 1) (h : ‖x ^ (l ^ f) - x‖ ≤ r)
+    : ∃ ξ ∈ Tch l, ‖x - ξ‖ ≤ r := by
   have hl : 2 ≤ l := (Fact.out : l.Prime).two_le
   have hq : 2 ≤ l ^ f := le_trans hl (Nat.le_self_pow hf.ne' l)
   obtain ⟨m, hm⟩ : ∃ m, l ^ f = m + 1 := ⟨l ^ f - 1, by omega⟩
@@ -73,7 +73,9 @@ theorem tch_near (x : ℂ_[l]) (hx : ‖x‖ ≤ 1) (f : ℕ) (hf : 0 < f) (r : 
   have hr0 : 0 ≤ r := le_trans (norm_nonneg _) h
   have hx1 : ‖x‖ = 1 := by
     have h1 : ‖x‖ ≤ max ‖x ^ (l ^ f)‖ ‖x ^ (l ^ f) - x‖ := by
-      calc ‖x‖ = ‖x ^ (l ^ f) - (x ^ (l ^ f) - x)‖ := by rw [sub_sub_cancel]
+      calc
+        ‖x‖
+          = ‖x ^ (l ^ f) - (x ^ (l ^ f) - x)‖ := by rw [sub_sub_cancel]
         _ ≤ _ := norm_sub_le_max_Cl l _ _
     have h2 : ‖x‖ ≤ ‖x‖ ^ (l ^ f) := by
       rw [← norm_pow]
@@ -88,9 +90,10 @@ theorem tch_near (x : ℂ_[l]) (hx : ‖x‖ ≤ 1) (f : ℕ) (hf : 0 < f) (r : 
   have hxm : ‖x ^ m - 1‖ ≤ r := by
     have e : x ^ (l ^ f) - x = x * (x ^ m - 1) := by rw [hm]; ring
     rwa [e, norm_mul, hx1, one_mul] at h
-  obtain ⟨ζ, hζroot, hζ⟩ := ReciprocityTheory.ChartRestriction.PadicPolynomialApproximation.exists_root_near l (X ^ m - C 1)
-    (monic_X_pow_sub_C 1 hm0.ne') x
-    (by simp only [eval_sub, eval_pow, eval_X, eval_C]; exact lt_of_le_of_lt hxm hr)
+  obtain ⟨ζ, hζroot, hζ⟩ :=
+    ReciprocityTheory.ChartRestriction.PadicPolynomialApproximation.exists_root_near l (X ^ m - C 1)
+      (monic_X_pow_sub_C 1 hm0.ne') x
+      (by simp only [eval_sub, eval_pow, eval_X, eval_C]; exact lt_of_le_of_lt hxm hr)
   have hζm : ζ ^ m = 1 := by
     have : ζ ^ m - 1 = 0 := by simpa using hζroot
     exact sub_eq_zero.1 this
@@ -103,8 +106,11 @@ theorem tch_near (x : ℂ_[l]) (hx : ‖x‖ ≤ 1) (f : ℕ) (hf : 0 < f) (r : 
   have e2 : x ^ m - 1 = (∑ i ∈ Finset.range m, (x * ζ⁻¹) ^ i) * (x * ζ⁻¹ - 1) := by
     rw [geom_sum_mul, mul_pow, inv_pow, hζm, inv_one, mul_one]
   have hy : ‖x * ζ⁻¹ - 1‖ = ‖x - ζ‖ := by rw [e1, norm_mul, hζ1, one_mul]
-  rw [e2, norm_mul, ReciprocityTheory.ChartRestriction.PadicPolynomialApproximation.norm_geom_sum_eq_one l (hy ▸ hζ)
-    (norm_natCast_Cl_of_not_dvd l hlm), one_mul, hy] at hxm
+  rw [e2, norm_mul,
+      ReciprocityTheory.ChartRestriction.PadicPolynomialApproximation.norm_geom_sum_eq_one l
+        (hy ▸ hζ) (norm_natCast_Cl_of_not_dvd l hlm),
+      one_mul, hy]
+    at hxm
   exact hxm
 
 end ReciprocityTheory.ChartRestriction.L1

@@ -9,28 +9,37 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagVarietyBou
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
 
 namespace GlobalTheory.CompanionTheory.Ar.Top
 
-theorem flag_gap_eq_sub {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N : ℕ} (lam : Wt Ψ N) (τ : Ψ) (a : Fin N)
-    (h : (a : ℕ) + 1 < N) :
-    PB.gap (fun x : Ψ × Fin N => lam x.1 x.2) (τ, a) = lam τ a - lam τ ⟨(a : ℕ) + 1, h⟩ := by
+theorem flag_gap_eq_sub
+    {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ]
+    {N : ℕ} (lam : Wt Ψ N)
+    (τ : Ψ)
+    (a : Fin N) (h : (a : ℕ) + 1 < N)
+    : PB.gap (fun x : Ψ × Fin N => lam x.1 x.2) (τ, a) = lam τ a - lam τ ⟨(a : ℕ) + 1, h⟩ := by
   simp [PB.gap, PB.gapX, h]
 
-theorem flag_dim_eq_antisymmetric_degree (Ψ : Type) [Fintype Ψ] (N : ℕ) :
-    dimFl Ψ N = GroundTheory.Heights₂.Heights.antisymDegree Ψ N := by
+theorem flag_dim_eq_antisymmetric_degree (Ψ : Type) [Fintype Ψ] (N : ℕ)
+    : dimFl Ψ N = GroundTheory.Heights₂.Heights.antisymDegree Ψ N := by
   simp [dimFl, GroundTheory.Heights₂.Heights.antisymDegree, Nat.choose_two_right]
 
-theorem flag_height_I9 : PB.FlagHeight → PB.Inputs → ∀ II : IntersectionSystem, IsFullIntersectionSystem II →
-    ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) [Nonempty Ψ], 2 ≤ N →
-      I9 (Ψ := Ψ) (N := N) (hhFl Ψ N II) := by
+theorem flag_height_I9
+    : PB.FlagHeight → PB.Inputs
+      → ∀ II : IntersectionSystem,
+        IsFullIntersectionSystem II
+          → ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) [Nonempty Ψ],
+            2 ≤ N → I9 (Ψ := Ψ) (N := N) (hhFl Ψ N II) := by
   intro hFH hIn II hII Ψ _ _ N _ hN
   have hA : IsArithVar (GroundTheory.Heights₂.Heights.LowerBoundFree.PFl Ψ N) (dimFl Ψ N + 1) := by
     rw [flag_dim_eq_antisymmetric_degree]
     exact (GlobalTheory.T.flag_variety_boundary_dimension_drop Ψ N hN).1
-  have hev : ∀ lam : Wt Ψ N, hhFl Ψ N II (linRoot lam ^ (dimFl Ψ N + 1)) =
-      eval (fun x => lam x.1 x.2) (PB.hFlPoly Ψ N II) := fun lam =>
+  have hev
+      : ∀ lam : Wt Ψ N,
+        hhFl Ψ N II (linRoot lam ^ (dimFl Ψ N + 1))
+          = eval (fun x => lam x.1 x.2) (PB.hFlPoly Ψ N II) := fun lam =>
     GlobalTheory.T.flag_height_polynomial_eval II hII Ψ N lam hN hA
   obtain ⟨-, hgap, hdom⟩ := hFH hIn II hII Ψ N hN
   refine ⟨?_, ?_, ?_⟩

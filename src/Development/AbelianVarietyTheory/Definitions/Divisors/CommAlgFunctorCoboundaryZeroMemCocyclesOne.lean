@@ -20,12 +20,11 @@ variable {R : Type} [CommRing R] {C : Type u} [Category.{v} C] (F : C ⥤ CommAl
 
 abbrev mp {T T' : C} (φ : T ⟶ T') : F.obj T →ₐ[R] F.obj T' := (F.map φ).hom
 
-theorem mp_comp {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') (b : F.obj T) :
-    mp F (φ ≫ ψ) b = mp F ψ (mp F φ b) := by
+theorem mp_comp {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') (b : F.obj T)
+    : mp F (φ ≫ ψ) b = mp F ψ (mp F φ b) := by
   simp [mp]
 
-theorem mp_id (T : C) (b : F.obj T) : mp F (𝟙 T) b = b := by
-  simp [mp]
+theorem mp_id (T : C) (b : F.obj T) : mp F (𝟙 T) b = b := by simp [mp]
 
 abbrev C0 := ∀ T : C, F.obj T
 
@@ -44,23 +43,26 @@ def d1 : C1 F →ₗ[R] C2 F where
   map_smul' r g := by
     funext T T' T'' φ ψ; simp only [Pi.smul_apply, map_smul, smul_sub, smul_add, RingHom.id_apply]
 
-theorem amitsur_d0_apply (g : C0 F) {T T' : C} (φ : T ⟶ T') : d0 F g T T' φ = g T' - mp F φ (g T) := rfl
+theorem amitsur_d0_apply (g : C0 F) {T T' : C} (φ : T ⟶ T') : d0 F g T T' φ = g T' - mp F φ (g T) :=
+  rfl
 
-theorem d1_apply (f : C1 F) {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') :
-    d1 F f T T' T'' φ ψ = mp F ψ (f T T' φ) - f T T'' (φ ≫ ψ) + f T' T'' ψ := rfl
+theorem d1_apply (f : C1 F) {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'')
+    : d1 F f T T' T'' φ ψ = mp F ψ (f T T' φ) - f T T'' (φ ≫ ψ) + f T' T'' ψ :=
+  rfl
 
 def Z1 : Submodule R (C1 F) where
-  carrier := {f | ∀ ⦃T T' T'' : C⦄ (φ : T ⟶ T') (ψ : T' ⟶ T''),
-    f T T'' (φ ≫ ψ) = mp F ψ (f T T' φ) + f T' T'' ψ}
+  carrier :=
+    {f | ∀ ⦃T T' T'' : C⦄ (φ : T ⟶ T') (ψ : T' ⟶ T''),
+      f T T'' (φ ≫ ψ) = mp F ψ (f T T' φ) + f T' T'' ψ}
   add_mem' {f g} hf hg T T' T'' φ ψ := by
     simp only [Pi.add_apply, map_add (f := _), hf φ ψ, hg φ ψ]; ring
   zero_mem' T T' T'' φ ψ := by simp
-  smul_mem' r f hf T T' T'' φ ψ := by
-    simp only [Pi.smul_apply, map_smul, hf φ ψ, smul_add]
+  smul_mem' r f hf T T' T'' φ ψ := by simp only [Pi.smul_apply, map_smul, hf φ ψ, smul_add]
 
 def Z2 : Submodule R (C2 F) where
-  carrier := {z | ∀ ⦃T T' T'' T''' : C⦄ (φ : T ⟶ T') (ψ : T' ⟶ T'') (χ : T'' ⟶ T'''),
-    mp F χ (z T T' T'' φ ψ) + z T T'' T''' (φ ≫ ψ) χ = z T T' T''' φ (ψ ≫ χ) + z T' T'' T''' ψ χ}
+  carrier :=
+    {z | ∀ ⦃T T' T'' T''' : C⦄ (φ : T ⟶ T') (ψ : T' ⟶ T'') (χ : T'' ⟶ T'''),
+      mp F χ (z T T' T'' φ ψ) + z T T'' T''' (φ ≫ ψ) χ = z T T' T''' φ (ψ ≫ χ) + z T' T'' T''' ψ χ}
   add_mem' {f g} hf hg T T' T'' T''' φ ψ χ := by
     simp only [Pi.add_apply, map_add (f := _)]; linear_combination hf φ ψ χ + hg φ ψ χ
   zero_mem' T T' T'' T''' φ ψ χ := by simp
@@ -69,8 +71,9 @@ def Z2 : Submodule R (C2 F) where
 
 variable {F}
 
-theorem Z1.comp (f : Z1 F) {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') :
-    f.1 T T'' (φ ≫ ψ) = mp F ψ (f.1 T T' φ) + f.1 T' T'' ψ := f.2 φ ψ
+theorem Z1.comp (f : Z1 F) {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'')
+    : f.1 T T'' (φ ≫ ψ) = mp F ψ (f.1 T T' φ) + f.1 T' T'' ψ :=
+  f.2 φ ψ
 
 theorem Z1.id (f : Z1 F) (T : C) : f.1 T T (𝟙 T) = 0 := by
   have h := Z1.comp f (𝟙 T) (𝟙 T)
@@ -104,9 +107,11 @@ theorem differential_one_mem_scaled_lattice (f : C1 F) : d1 F f ∈ Z2 F := by
   simp only [d1_apply, map_add (f := _), map_sub, mp_comp, Category.assoc]
   ring
 
-def H1 : Type _ := Z1 F ⧸ LinearMap.range ((d0 F).codRestrict (Z1 F) (commAlgFunctorCoboundaryZero_mem_cocyclesOne F))
+def H1 : Type _ :=
+  Z1 F ⧸ LinearMap.range ((d0 F).codRestrict (Z1 F) (commAlgFunctorCoboundaryZero_mem_cocyclesOne F))
 
-def H2 : Type _ := Z2 F ⧸ LinearMap.range ((d1 F).codRestrict (Z2 F) (differential_one_mem_scaled_lattice F))
+def H2 : Type _ :=
+  Z2 F ⧸ LinearMap.range ((d1 F).codRestrict (Z2 F) (differential_one_mem_scaled_lattice F))
 
 instance : AddCommGroup (H1 F) := inferInstanceAs (AddCommGroup (_ ⧸ LinearMap.range _))
 
@@ -162,15 +167,19 @@ variable (F)
 
 def cupZ : Z1 F →ₗ[R] Z1 F →ₗ[R] Z2 F :=
   LinearMap.mk₂ R
-    (fun a b ↦ ⟨fun T T' T'' φ ψ ↦ mp F ψ (a.1 T T' φ) * b.1 T' T'' ψ, fun T T' T'' T''' φ ψ χ ↦ by
-      simp only [Z1.comp a, Z1.comp b, map_mul, map_add (f := _), mp_comp]; ring⟩)
+    (fun a b ↦ ⟨
+      fun T T' T'' φ ψ ↦ mp F ψ (a.1 T T' φ) * b.1 T' T'' ψ,
+      fun T T' T'' T''' φ ψ χ ↦ by
+        simp only [Z1.comp a, Z1.comp b, map_mul, map_add (f := _), mp_comp]; ring
+    ⟩)
     (fun a a' b ↦ Subtype.ext (by funext T T' T'' φ ψ; simp [add_mul]))
     (fun r a b ↦ Subtype.ext (by funext T T' T'' φ ψ; simp))
     (fun a b b' ↦ Subtype.ext (by funext T T' T'' φ ψ; simp [mul_add]))
     (fun r a b ↦ Subtype.ext (by funext T T' T'' φ ψ; simp))
 
-theorem cupZ_apply (a b : Z1 F) {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'') :
-    (cupZ F a b).1 T T' T'' φ ψ = mp F ψ (a.1 T T' φ) * b.1 T' T'' ψ := rfl
+theorem cupZ_apply (a b : Z1 F) {T T' T'' : C} (φ : T ⟶ T') (ψ : T' ⟶ T'')
+    : (cupZ F a b).1 T T' T'' φ ψ = mp F ψ (a.1 T T' φ) * b.1 T' T'' ψ :=
+  rfl
 
 def cup : H1 F →ₗ[R] H1 F →ₗ[R] H2 F :=
   LinearMap.liftQ₂ _ _ ((cupZ F).compr₂ (H2.mk F))
@@ -179,16 +188,16 @@ def cup : H1 F →ₗ[R] H1 F →ₗ[R] H2 F :=
       ext b
       refine H2.mk_eq_zero.2 ⟨fun T T' φ ↦ mp F φ (g T) * b.1 T T' φ, ?_⟩
       funext T T' T'' φ ψ
-      simp only [d1_apply, cupZ_apply, LinearMap.codRestrict_apply, amitsur_d0_apply, Z1.comp b, map_mul,
-        map_sub, mp_comp]
+      simp only [d1_apply, cupZ_apply, LinearMap.codRestrict_apply, amitsur_d0_apply, Z1.comp b,
+        map_mul, map_sub, mp_comp]
       ring)
     (by
       rintro _ ⟨g, rfl⟩
       ext a
       refine H2.mk_eq_zero.2 ⟨fun T T' φ ↦ -(a.1 T T' φ * g T'), ?_⟩
       funext T T' T'' φ ψ
-      simp only [d1_apply, cupZ_apply, LinearMap.codRestrict_apply, amitsur_d0_apply, Z1.comp a, map_mul,
-        map_neg]
+      simp only [d1_apply, cupZ_apply, LinearMap.codRestrict_apply, amitsur_d0_apply, Z1.comp a,
+        map_mul, map_neg]
       ring)
 
 theorem cup_mk (a b : Z1 F) : cup F (H1.mk F a) (H1.mk F b) = H2.mk F (cupZ F a b) := rfl
@@ -206,21 +215,23 @@ end Complex
 
 section Pull
 
-variable {R R' R'' : Type} [CommRing R] [CommRing R'] [CommRing R'']
-  {C : Type u} [Category.{v} C] {C' : Type u'} [Category.{v'} C'] {C'' : Type u''} [Category.{v''} C'']
+variable
+  {R R' R'' : Type} [CommRing R] [CommRing R'] [CommRing R'']
+  {C : Type u} [Category.{v} C]
+  {C' : Type u'} [Category.{v'} C']
+  {C'' : Type u''} [Category.{v''} C'']
 
 structure CoefMap (σ : R →+* R') (F : C ⥤ CommAlgCat.{0} R) (F' : C' ⥤ CommAlgCat.{0} R') where
-
   G : C' ⥤ C
-
   α : ∀ T : C', F.obj (G.obj T) →+* F'.obj T
-  naturality : ∀ {T T' : C'} (φ : T ⟶ T') (b : F.obj (G.obj T)),
-    α T' (mp F (G.map φ) b) = mp F' φ (α T b)
+  naturality
+    : ∀ {T T' : C'} (φ : T ⟶ T') (b : F.obj (G.obj T)), α T' (mp F (G.map φ) b) = mp F' φ (α T b)
   smul : ∀ (T : C') (r : R) (b : F.obj (G.obj T)), α T (r • b) = σ r • α T b
 
 namespace CoefMap
 
-variable {σ : R →+* R'} {τ : R' →+* R''} {F : C ⥤ CommAlgCat.{0} R} {F' : C' ⥤ CommAlgCat.{0} R'}
+variable
+  {σ : R →+* R'} {τ : R' →+* R''} {F : C ⥤ CommAlgCat.{0} R} {F' : C' ⥤ CommAlgCat.{0} R'}
   {F'' : C'' ⥤ CommAlgCat.{0} R''}
 
 def id (F : C ⥤ CommAlgCat.{0} R) : CoefMap (RingHom.id R) F F where
@@ -244,44 +255,57 @@ def restrict (F : C ⥤ CommAlgCat.{0} R) (G : C' ⥤ C) : CoefMap (RingHom.id R
 variable (m : CoefMap σ F F')
 
 def pullbackOneCocycle : Z1 F →ₛₗ[σ] Z1 F' where
-  toFun f := ⟨fun T T' φ ↦ m.α T' (f.1 _ _ (m.G.map φ)), fun T T' T'' φ ψ ↦ by
-    simp only [Functor.map_comp, Z1.comp f, map_add (f := _), m.naturality]⟩
+  toFun f := ⟨
+    fun T T' φ ↦ m.α T' (f.1 _ _ (m.G.map φ)),
+    fun T T' T'' φ ψ ↦ by simp only [Functor.map_comp, Z1.comp f, map_add (f := _), m.naturality]
+  ⟩
   map_add' f g := Subtype.ext (by funext T T' φ; simp)
   map_smul' r f := Subtype.ext (by funext T T' φ; simp [m.smul])
 
 def pullbackTwoCocycle : Z2 F →ₛₗ[σ] Z2 F' where
-  toFun z := ⟨fun T T' T'' φ ψ ↦ m.α T'' (z.1 _ _ _ (m.G.map φ) (m.G.map ψ)),
+  toFun z := ⟨
+    fun T T' T'' φ ψ ↦ m.α T'' (z.1 _ _ _ (m.G.map φ) (m.G.map ψ)),
     fun T T' T'' T''' φ ψ χ ↦ by
-      simp only [Functor.map_comp, ← map_add (f := _), ← m.naturality, z.2 (m.G.map φ) (m.G.map ψ) (m.G.map χ)]⟩
+      simp only [Functor.map_comp, ← map_add (f := _), ← m.naturality,
+        z.2 (m.G.map φ) (m.G.map ψ) (m.G.map χ)]
+  ⟩
   map_add' f g := Subtype.ext (by funext T T' T'' φ ψ; simp)
   map_smul' r f := Subtype.ext (by funext T T' T'' φ ψ; simp [m.smul])
 
-theorem pullCocycleOne_apply (f : Z1 F) {T T' : C'} (φ : T ⟶ T') :
-    (m.pullbackOneCocycle f).1 T T' φ = m.α T' (f.1 _ _ (m.G.map φ)) := rfl
+theorem pullCocycleOne_apply (f : Z1 F) {T T' : C'} (φ : T ⟶ T')
+    : (m.pullbackOneCocycle f).1 T T' φ = m.α T' (f.1 _ _ (m.G.map φ)) :=
+  rfl
 
-theorem pullCocycleTwo_apply (z : Z2 F) {T T' T'' : C'} (φ : T ⟶ T') (ψ : T' ⟶ T'') :
-    (m.pullbackTwoCocycle z).1 T T' T'' φ ψ = m.α T'' (z.1 _ _ _ (m.G.map φ) (m.G.map ψ)) := rfl
+theorem pullCocycleTwo_apply (z : Z2 F) {T T' T'' : C'} (φ : T ⟶ T') (ψ : T' ⟶ T'')
+    : (m.pullbackTwoCocycle z).1 T T' T'' φ ψ = m.α T'' (z.1 _ _ _ (m.G.map φ) (m.G.map ψ)) :=
+  rfl
 
 def pull1 : H1 F →ₛₗ[σ] H1 F' :=
   Submodule.mapQ _ _ m.pullbackOneCocycle (by
     rintro _ ⟨g, rfl⟩
     refine ⟨fun T ↦ m.α T (g _), Subtype.ext ?_⟩
     funext T T' φ
-    simp only [LinearMap.codRestrict_apply, pullCocycleOne_apply, amitsur_d0_apply, map_sub, m.naturality])
+    simp only [LinearMap.codRestrict_apply, pullCocycleOne_apply, amitsur_d0_apply, map_sub,
+      m.naturality])
 
 def pull2 : H2 F →ₛₗ[σ] H2 F' :=
   Submodule.mapQ _ _ m.pullbackTwoCocycle (by
     rintro _ ⟨g, rfl⟩
     refine ⟨fun T T' φ ↦ m.α T' (g _ _ (m.G.map φ)), Subtype.ext ?_⟩
     funext T T' T'' φ ψ
-    simp only [LinearMap.codRestrict_apply, pullCocycleTwo_apply, d1_apply, map_sub, map_add (f := _), m.naturality,
-      Functor.map_comp])
+    simp only [LinearMap.codRestrict_apply, pullCocycleTwo_apply, d1_apply, map_sub,
+      map_add (f := _), m.naturality, Functor.map_comp])
 
-theorem pullCohomologyOne_class (f : Z1 F) : m.pull1 (H1.mk F f) = H1.mk F' (m.pullbackOneCocycle f) := rfl
+theorem pullCohomologyOne_class (f : Z1 F)
+    : m.pull1 (H1.mk F f) = H1.mk F' (m.pullbackOneCocycle f) :=
+  rfl
 
-theorem pullCohomologyTwo_class (z : Z2 F) : m.pull2 (H2.mk F z) = H2.mk F' (m.pullbackTwoCocycle z) := rfl
+theorem pullCohomologyTwo_class (z : Z2 F)
+    : m.pull2 (H2.mk F z) = H2.mk F' (m.pullbackTwoCocycle z) :=
+  rfl
 
-theorem pullCohomologyTwo_cup (a b : H1 F) : m.pull2 (cup F a b) = cup F' (m.pull1 a) (m.pull1 b) := by
+theorem pullCohomologyTwo_cup (a b : H1 F)
+    : m.pull2 (cup F a b) = cup F' (m.pull1 a) (m.pull1 b) := by
   obtain ⟨a, rfl⟩ := H1.mk_surjective F a
   obtain ⟨b, rfl⟩ := H1.mk_surjective F b
   rw [cup_mk, pullCohomologyTwo_class, pullCohomologyOne_class, pullCohomologyOne_class, cup_mk]
@@ -298,18 +322,21 @@ theorem pullCohomologyTwo_id (c : H2 F) : (id F).pull2 c = c := by
   obtain ⟨z, rfl⟩ := H2.mk_surjective F c
   rfl
 
-theorem pullCohomologyOne_comp (n : CoefMap τ F' F'') (c : H1 F) :
-    (m.comp n).pull1 c = n.pull1 (m.pull1 c) := by
+theorem pullCohomologyOne_comp (n : CoefMap τ F' F'') (c : H1 F)
+    : (m.comp n).pull1 c = n.pull1 (m.pull1 c) := by
   obtain ⟨f, rfl⟩ := H1.mk_surjective F c
   rfl
 
-theorem pullCohomologyTwo_comp (n : CoefMap τ F' F'') (c : H2 F) :
-    (m.comp n).pull2 c = n.pull2 (m.pull2 c) := by
+theorem pullCohomologyTwo_comp (n : CoefMap τ F' F'') (c : H2 F)
+    : (m.comp n).pull2 c = n.pull2 (m.pull2 c) := by
   obtain ⟨z, rfl⟩ := H2.mk_surjective F c
   rfl
 
-theorem pullCohomologyOne_eq_of_natTrans {σ' : R →+* R'} (m' : CoefMap σ' F F') (θ : m.G ⟶ m'.G)
-    (h : ∀ T b, m'.α T (mp F (θ.app T) b) = m.α T b) (c : H1 F) : m.pull1 c = m'.pull1 c := by
+theorem pullCohomologyOne_eq_of_natTrans
+    {σ' : R →+* R'}
+    (m' : CoefMap σ' F F') (θ : m.G ⟶ m'.G) (h : ∀ T b, m'.α T (mp F (θ.app T) b) = m.α T b)
+    (c : H1 F)
+    : m.pull1 c = m'.pull1 c := by
   obtain ⟨f, rfl⟩ := H1.mk_surjective F c
   rw [pullCohomologyOne_class, pullCohomologyOne_class, H1.mk_eq_mk]
   refine ⟨fun T => -(m'.α T (f.1 _ _ (θ.app T))), ?_⟩
@@ -322,21 +349,29 @@ theorem pullCohomologyOne_eq_of_natTrans {σ' : R →+* R'} (m' : CoefMap σ' F 
   simp only [amitsur_d0_apply, map_neg, Pi.sub_apply, pullCocycleOne_apply]
   linear_combination -h3
 
-theorem pullCohomologyTwo_eq_of_natTrans {σ' : R →+* R'} (m' : CoefMap σ' F F') (θ : m.G ⟶ m'.G)
-    (h : ∀ T b, m'.α T (mp F (θ.app T) b) = m.α T b) (c : H2 F) : m.pull2 c = m'.pull2 c := by
+theorem pullCohomologyTwo_eq_of_natTrans
+    {σ' : R →+* R'}
+    (m' : CoefMap σ' F F') (θ : m.G ⟶ m'.G) (h : ∀ T b, m'.α T (mp F (θ.app T) b) = m.α T b)
+    (c : H2 F)
+    : m.pull2 c = m'.pull2 c := by
   obtain ⟨z, rfl⟩ := H2.mk_surjective F c
   rw [pullCohomologyTwo_class, pullCohomologyTwo_class, H2.mk_eq_mk]
-  refine ⟨fun T T' φ => m'.α T' (z.1 _ _ _ (m.G.map φ) (θ.app T') - z.1 _ _ _ (θ.app T) (m'.G.map φ)), ?_⟩
+  refine ⟨
+    fun T T' φ => m'.α T' (z.1 _ _ _ (m.G.map φ) (θ.app T') - z.1 _ _ _ (θ.app T) (m'.G.map φ)),
+    ?_
+  ⟩
   funext T T' T'' φ ψ
   have e1 := z.2 (m.G.map φ) (m.G.map ψ) (θ.app T'')
   have e2 := z.2 (m.G.map φ) (θ.app T') (m'.G.map ψ)
   have e3 := z.2 (θ.app T) (m'.G.map φ) (m'.G.map ψ)
   rw [θ.naturality ψ] at e1
   rw [θ.naturality φ] at e2
-  have key : mp F (θ.app T'') (z.1 _ _ _ (m.G.map φ) (m.G.map ψ)) - z.1 _ _ _ (m'.G.map φ) (m'.G.map ψ) =
-      mp F (m'.G.map ψ) (z.1 _ _ _ (m.G.map φ) (θ.app T') - z.1 _ _ _ (θ.app T) (m'.G.map φ))
-      - (z.1 _ _ _ (m.G.map φ ≫ m.G.map ψ) (θ.app T'') - z.1 _ _ _ (θ.app T) (m'.G.map φ ≫ m'.G.map ψ))
-      + (z.1 _ _ _ (m.G.map ψ) (θ.app T'') - z.1 _ _ _ (θ.app T') (m'.G.map ψ)) := by
+  have key
+      : mp F (θ.app T'') (z.1 _ _ _ (m.G.map φ) (m.G.map ψ)) - z.1 _ _ _ (m'.G.map φ) (m'.G.map ψ)
+        = mp F (m'.G.map ψ) (z.1 _ _ _ (m.G.map φ) (θ.app T') - z.1 _ _ _ (θ.app T) (m'.G.map φ))
+          - (z.1 _ _ _ (m.G.map φ ≫ m.G.map ψ) (θ.app T'')
+            - z.1 _ _ _ (θ.app T) (m'.G.map φ ≫ m'.G.map ψ))
+          + (z.1 _ _ _ (m.G.map ψ) (θ.app T'') - z.1 _ _ _ (θ.app T') (m'.G.map ψ)) := by
     rw [map_sub]
     linear_combination e1 - e2 + e3
   have e := congrArg (m'.α T'') key

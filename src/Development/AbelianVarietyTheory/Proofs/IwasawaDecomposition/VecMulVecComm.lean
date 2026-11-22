@@ -25,20 +25,20 @@ theorem vec_mul_vec_comm (a b : Fin n) : vec n a * vec n b = -(vec n b * vec n a
 
 theorem gen_comm : ∀ u ∈ Set.range (gen n), ∀ v ∈ Set.range (gen n), u * v = v * u := by
   rintro _ ⟨x, rfl⟩ _ ⟨y, rfl⟩
-  simp only [gen, Algebra.TensorProduct.tmul_mul_tmul, vec_mul_vec_comm n x.1, vec_mul_vec_comm n x.2,
-    TensorProduct.neg_tmul, TensorProduct.tmul_neg, neg_neg]
+  simp only [gen, Algebra.TensorProduct.tmul_mul_tmul, vec_mul_vec_comm n x.1,
+    vec_mul_vec_comm n x.2, TensorProduct.neg_tmul, TensorProduct.tmul_neg, neg_neg]
 
 abbrev EvenPart : Subalgebra ℂ (Big n) := Algebra.adjoin ℂ (Set.range (gen n))
 
 open scoped IsMulCommutative in
 instance : CommRing (EvenPart n) :=
-  have := Algebra.isMulCommutative_adjoin ℂ (s := Set.range (gen n))
-    (fun u hu v hv _ => gen_comm n u hu v hv)
+  have :=
+    Algebra.isMulCommutative_adjoin ℂ (s := Set.range (gen n))
+      (fun u hu v hv _ => gen_comm n u hu v hv)
   inferInstance
 
 def toEven : MvPolynomial (Fin n × Fin n) ℂ →ₐ[ℂ] EvenPart n :=
   aeval fun x => ⟨gen n x, Algebra.subset_adjoin ⟨x, rfl⟩⟩
-
 
 open Classical in
 def topForm (i : ℕ) : (Fin n → ℂ) [⋀^Fin i]→ₗ[ℂ] ℂ :=
@@ -52,10 +52,12 @@ theorem topBig_tmul (x y : Ext n) : topBig n (x ⊗ₜ y) = topExt n x * topExt 
 
 variable {n} {p q : ℕ}
 
-def blockPoly (e : Fin p × Fin q → Fin n) : Matrix (Fin p) (Fin p) (MvPolynomial (Fin n × Fin n) ℂ) :=
+def blockPoly (e : Fin p × Fin q → Fin n)
+    : Matrix (Fin p) (Fin p) (MvPolynomial (Fin n × Fin n) ℂ) :=
   Matrix.of fun i j => ∑ b, X (e (i, b), e (j, b))
 
-def blockPolyBar (e : Fin p × Fin q → Fin n) : Matrix (Fin q) (Fin q) (MvPolynomial (Fin n × Fin n) ℂ) :=
+def blockPolyBar (e : Fin p × Fin q → Fin n)
+    : Matrix (Fin q) (Fin q) (MvPolynomial (Fin n × Fin n) ℂ) :=
   Matrix.of fun b b' => ∑ i, X (e (i, b), e (i, b'))
 
 end GlobalTheory.GrassModel

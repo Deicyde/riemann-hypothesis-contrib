@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 
 noncomputable section
 
-open MeasureTheory Matrix Formalism.MainNotions.S Formalism.MainNotions.CayleySignature Formalism.L2.SG.SplitPrimeNormLemmas
+open MeasureTheory Matrix Formalism.MainNotions.S Formalism.MainNotions.CayleySignature
+  Formalism.L2.SG.SplitPrimeNormLemmas
 open scoped ENNReal
 
 namespace WlocSk
@@ -127,36 +128,44 @@ lemma continuous_rmul (x : Formalism.QuantumDeterminants.Mt k r) :
   have h1 : Continuous fun s : Formalism.QuantumDeterminants.Mt k r => (Matrix.of s : Mat k r) := continuous_id
   exact h1.matrix_mul continuous_const
 
-theorem unfold_weil {μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)} {cS : ℝ≥0∞} (hcS : cS ≠ ⊤)
-    (hP : (μW.prod μN).map mulP = cS • μS) (hQ : IsQuotMeas μG μS ν)
-    (f : Formalism.QuantumDeterminants.Mt k r → ℝ≥0∞) (hf : Measurable f) :
-    ∫⁻ x, ∫⁻ p, f (fun i j => (Matrix.of (mulP p) * Matrix.of x) i j) ∂(μW.prod μN) ∂ν =
-      cS * ∫⁻ y, f y ∂μG := by
-  have hin : ∀ x : Formalism.QuantumDeterminants.Mt k r,
-      ∫⁻ p, f (fun i j => (Matrix.of (mulP p) * Matrix.of x) i j) ∂(μW.prod μN) =
-        cS * ∫⁻ s, f (fun i j => (Matrix.of s * Matrix.of x) i j) ∂μS := by
+theorem unfold_weil
+    {μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)} {cS : ℝ≥0∞}
+    (hcS : cS ≠ ⊤) (hP : (μW.prod μN).map mulP = cS • μS) (hQ : IsQuotMeas μG μS ν)
+    (f : Formalism.QuantumDeterminants.Mt k r → ℝ≥0∞) (hf : Measurable f)
+    : ∫⁻ x, ∫⁻ p, f (fun i j => (Matrix.of (mulP p) * Matrix.of x) i j) ∂(μW.prod μN) ∂ν
+      = cS * ∫⁻ y, f y ∂μG := by
+  have hin
+      : ∀ x : Formalism.QuantumDeterminants.Mt k r,
+        ∫⁻ p, f (fun i j => (Matrix.of (mulP p) * Matrix.of x) i j) ∂(μW.prod μN)
+          = cS * ∫⁻ s, f (fun i j => (Matrix.of s * Matrix.of x) i j) ∂μS := by
     intro x
-    have hm : Measurable (fun s : Formalism.QuantumDeterminants.Mt k r => f (fun i j => (Matrix.of s * Matrix.of x) i j)) :=
+    have hm : Measurable (fun s : Formalism.QuantumDeterminants.Mt k r =>
+        f (fun i j => (Matrix.of s * Matrix.of x) i j)) :=
       hf.comp (continuous_rmul x).measurable
     have h := lintegral_map (μ := μW.prod μN) hm measurable_mulP
     rw [hP, lintegral_smul_measure, smul_eq_mul] at h
     exact h.symm
   rw [lintegral_congr hin, lintegral_const_mul' _ _ hcS, hQ f hf]
 
-theorem nu_conc {μG μS ν : Measure (Formalism.QuantumDeterminants.Mt k r)} {T : Set (Mat k r)} (hQ : IsQuotMeas μG μS ν)
-    (hG : μG {x | Matrix.of x ∉ Gr k r} = 0) (hS0 : μS ≠ 0) (hSc : μS {x | Matrix.of x ∉ T} = 0)
-    (hTG : T ⊆ Gr k r) : ν {x | Matrix.of x ∉ Gr k r} = 0 := by
+theorem nu_conc
+    {μG μS ν : Measure (Formalism.QuantumDeterminants.Mt k r)} {T : Set (Mat k r)}
+    (hQ : IsQuotMeas μG μS ν) (hG : μG {x | Matrix.of x ∉ Gr k r} = 0) (hS0 : μS ≠ 0)
+    (hSc : μS {x | Matrix.of x ∉ T} = 0) (hTG : T ⊆ Gr k r)
+    : ν {x | Matrix.of x ∉ Gr k r} = 0 := by
   set E : Set (Formalism.QuantumDeterminants.Mt k r) := {x | Matrix.of x ∉ Gr k r} with hEdef
   have hE : MeasurableSet E := Grp.measurableSet_Gr.compl
   have hw := hQ (E.indicator 1) (measurable_one.indicator hE)
   rw [lintegral_indicator_one hE, hG] at hw
-  have hlow : ∀ x, E.indicator (fun _ => μS Set.univ) x ≤
-      ∫⁻ s, E.indicator 1 (fun i j => (Matrix.of s * Matrix.of x) i j) ∂μS := by
+  have hlow
+      : ∀ x,
+        E.indicator (fun _ => μS Set.univ) x
+          ≤ ∫⁻ s, E.indicator 1 (fun i j => (Matrix.of s * Matrix.of x) i j) ∂μS := by
     intro x
     by_cases hx : x ∈ E
     · rw [Set.indicator_of_mem hx]
       have hae : ∀ᵐ s ∂μS, Matrix.of s ∈ T := ae_iff.mpr hSc
-      have h1 : ∀ᵐ s ∂μS, E.indicator 1 (fun i j => (Matrix.of s * Matrix.of x) i j) = (1 : ℝ≥0∞) := by
+      have h1
+          : ∀ᵐ s ∂μS, E.indicator 1 (fun i j => (Matrix.of s * Matrix.of x) i j) = (1 : ℝ≥0∞) := by
         filter_upwards [hae] with s hs
         apply Set.indicator_of_mem
         intro hsx
@@ -165,18 +174,20 @@ theorem nu_conc {μG μS ν : Measure (Formalism.QuantumDeterminants.Mt k r)} {T
     · rw [Set.indicator_of_notMem hx]; exact zero_le
   have h2 := lintegral_mono (μ := ν) hlow
   rw [lintegral_indicator_const hE, ← hw] at h2
-  have hpos : μS Set.univ ≠ 0 := by
-    intro h0; exact hS0 (Measure.measure_univ_eq_zero.mp h0)
+  have hpos : μS Set.univ ≠ 0 := by intro h0; exact hS0 (Measure.measure_univ_eq_zero.mp h0)
   exact (mul_eq_zero.mp (le_zero_iff.mp h2)).resolve_left hpos
 
 end Unfold
 
 section FromSteps
 
-variable {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} {c : Fin r → ℂ} {u : Fin k → ℝ} {v : Fin (k - 1) → ℝ}
-  {b : Fin (2 * r + 2) → ℝ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-  {σ : Mat k r → (H →L[ℂ] H)} {Vp : Type} [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
-  [FiniteDimensional ℂ Vp] {π : Mat k r → (Vp →L[ℂ] Vp)} {w : H}
+variable
+  {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} {c : Fin r → ℂ} {u : Fin k → ℝ} {v : Fin (k - 1) → ℝ}
+  {b : Fin (2 * r + 2) → ℝ} {H : Type}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+  {σ : Mat k r → (H →L[ℂ] H)} {Vp : Type}
+  [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp] [FiniteDimensional ℂ Vp]
+  {π : Mat k r → (Vp →L[ℂ] Vp)} {w : H}
   {μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)}
 
 lemma S_sub_G (hSG : SGrp) (hyp : Hyp k r z c u v b σ π w μG μS ν μW μN) :
@@ -187,15 +198,18 @@ lemma S_sub_G (hSG : SGrp) (hyp : Hyp k r z c u v b σ π w μG μS ν μW μN) 
   rintro s ⟨h, hh, m, hm, rfl⟩
   exact Grp.mul_mem (hW hh) (hN hm)
 
-theorem unfold_of (hSP : SProd) (hyp : Hyp k r z c u v b σ π w μG μS ν μW μN) :
-    ∃ cS : ℝ≥0∞, cS ≠ 0 ∧ cS ≠ ⊤ ∧ ∀ f : Formalism.QuantumDeterminants.Mt k r → ℝ≥0∞, Measurable f →
-      ∫⁻ x, ∫⁻ p, f (fun i j => (Matrix.of (mulP p) * Matrix.of x) i j) ∂(μW.prod μN) ∂ν =
-        cS * ∫⁻ y, f y ∂μG := by
+theorem unfold_of (hSP : SProd) (hyp : Hyp k r z c u v b σ π w μG μS ν μW μN)
+    : ∃ cS : ℝ≥0∞,
+      cS ≠ 0 ∧ cS ≠ ⊤
+        ∧ ∀ f : Formalism.QuantumDeterminants.Mt k r → ℝ≥0∞,
+          Measurable f
+            → ∫⁻ x, ∫⁻ p, f (fun i j => (Matrix.of (mulP p) * Matrix.of x) i j) ∂(μW.prod μN) ∂ν
+              = cS * ∫⁻ y, f y ∂μG := by
   obtain ⟨cS, h0, htop, hP⟩ := hSP k r z c u v b H σ Vp π w μG μS ν μW μN hyp
   exact ⟨cS, h0, htop, fun f hf => unfold_weil htop hP hyp.2.2.2.2.2.2.1 f hf⟩
 
-theorem nu_conc_of (hSG : SGrp) (hyp : Hyp k r z c u v b σ π w μG μS ν μW μN) :
-    ν {x | Matrix.of x ∉ Gr k r} = 0 := by
+theorem nu_conc_of (hSG : SGrp) (hyp : Hyp k r z c u v b σ π w μG μS ν μW μN)
+    : ν {x | Matrix.of x ∉ Gr k r} = 0 := by
   have hS := S_sub_G hSG hyp
   obtain ⟨-, -, -, -, hG, hSm, hQ, -⟩ := hyp
   exact nu_conc hQ hG.2.2.1 hSm.2.1 hSm.2.2.1 hS

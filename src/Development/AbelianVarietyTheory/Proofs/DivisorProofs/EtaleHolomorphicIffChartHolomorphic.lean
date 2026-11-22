@@ -10,12 +10,27 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleLocalIn
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
 namespace GlobalTheory.OTY
 
-theorem holo_etale_iff_holo_chart : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La] (A : WeightedAtlas n Y ι La), ∀ (U : Set Y) (z : Y → V n), Etale A U z → ∀ (Ω : Set Y) (u : Y → ℂ), IsOpen Ω → ((∀ e : OpenPartialHomeomorph U (V n), IsChart n (fun y : U => z y) e → DifferentiableOn ℂ ((fun y : U => u y) ∘ e.symm) (e.target ∩ e.symm ⁻¹' (Subtype.val ⁻¹' Ω))) ↔ ∀ i, DifferentiableOn ℂ (u ∘ (A.chart i).symm) ((A.chart i).target ∩ (A.chart i).symm ⁻¹' (U ∩ Ω))) := by
+theorem holo_etale_iff_holo_chart
+    : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
+        [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La]
+        (A : WeightedAtlas n Y ι La),
+      ∀ (U : Set Y) (z : Y → V n),
+        Etale A U z
+          → ∀ (Ω : Set Y) (u : Y → ℂ),
+            IsOpen Ω
+              → ((∀ e : OpenPartialHomeomorph U (V n),
+                  IsChart n (fun y : U => z y) e
+                    → DifferentiableOn ℂ ((fun y : U => u y) ∘ e.symm)
+                      (e.target ∩ e.symm ⁻¹' (Subtype.val ⁻¹' Ω)))
+                ↔ ∀ i,
+                  DifferentiableOn ℂ (u ∘ (A.chart i).symm)
+                    ((A.chart i).target ∩ (A.chart i).symm ⁻¹' (U ∩ Ω))) := by
   intro n Y _ _ _ _ _ ι La _ A U z hE Ω u hΩ
   have hloc := GlobalTheory.T.etale_isLocalHomeomorph' n Y ι La A U z hE
   constructor
@@ -40,8 +55,8 @@ theorem holo_etale_iff_holo_chart : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y
     have h2 : DifferentiableAt ℂ (z ∘ (A.chart i).symm) v :=
       (hE.holo i v ⟨hvt, hvU⟩).differentiableAt
         (((A.chart i).isOpen_inter_preimage_symm hE.isOpen).mem_nhds ⟨hvt, hvU⟩)
-    have h3 := DifferentiableAt.comp v (g := (fun y : U => u y) ∘ e.symm)
-      (f := z ∘ (A.chart i).symm) h1 h2
+    have h3 :=
+      DifferentiableAt.comp v (g := (fun y : U => u y) ∘ e.symm) (f := z ∘ (A.chart i).symm) h1 h2
     refine (h3.congr_of_eventuallyEq ?_).differentiableWithinAt
     have hvW : (A.chart i).symm v ∈ W := by
       rw [← hWe] at hes
@@ -59,7 +74,8 @@ theorem holo_etale_iff_holo_chart : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y
     obtain ⟨hvt, hvΩ⟩ := hv
     have hs := A.mem_pick (e.symm v : U)
     set i := A.pick (e.symm v : U)
-    obtain ⟨hc, hev, -⟩ := GlobalTheory.T.contDiffAt_chart_inverse_of_etale n Y ι La A U z hE e he v hvt i hs
+    obtain ⟨hc, hev, -⟩ :=
+      GlobalTheory.T.contDiffAt_chart_inverse_of_etale n Y ι La A U z hE e he v hvt i hs
     have hmem : A.chart i (e.symm v : U) ∈ (A.chart i).target ∩ (A.chart i).symm ⁻¹' (U ∩ Ω) := by
       refine ⟨(A.chart i).map_source hs, ?_⟩
       simp only [Set.mem_preimage]
@@ -68,8 +84,10 @@ theorem holo_etale_iff_holo_chart : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y
     have h1 : DifferentiableAt ℂ (u ∘ (A.chart i).symm) (A.chart i (e.symm v : U)) :=
       (h i _ hmem).differentiableAt
         (((A.chart i).isOpen_inter_preimage_symm (hE.isOpen.inter hΩ)).mem_nhds hmem)
-    have h3 := DifferentiableAt.comp v (g := u ∘ (A.chart i).symm)
-      (f := fun v' => A.chart i (e.symm v' : U)) h1 (hc.differentiableAt (by simp))
+    have h3 :=
+      DifferentiableAt.comp v (g := u ∘ (A.chart i).symm)
+        (f := fun v' => A.chart i (e.symm v' : U))
+        h1 (hc.differentiableAt (by simp))
     refine (h3.congr_of_eventuallyEq ?_).differentiableWithinAt
     filter_upwards [hev] with v' hv'
     simp only [Function.comp]

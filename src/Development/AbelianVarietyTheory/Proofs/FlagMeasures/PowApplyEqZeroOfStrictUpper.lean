@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.StrictUpperNilpotentFlagMeasures
 
-theorem pow_apply_eq_zero_of_strictUpper {m : ℕ} {X : Matrix (Fin m) (Fin m) ℂ}
-    (hX : ∀ i j : Fin m, (j : ℕ) ≤ (i : ℕ) → X i j = 0) (n : ℕ) :
-    ∀ i j : Fin m, (j : ℕ) < (i : ℕ) + n → (X ^ n) i j = 0 := by
+theorem pow_apply_eq_zero_of_strictUpper
+    {m : ℕ} {X : Matrix (Fin m) (Fin m) ℂ} (hX : ∀ i j : Fin m, (j : ℕ) ≤ (i : ℕ) → X i j = 0)
+    (n : ℕ)
+    : ∀ i j : Fin m, (j : ℕ) < (i : ℕ) + n → (X ^ n) i j = 0 := by
   induction n with
   | zero =>
     intro i j h

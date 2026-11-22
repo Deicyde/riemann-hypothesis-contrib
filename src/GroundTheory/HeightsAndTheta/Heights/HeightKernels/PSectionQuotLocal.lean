@@ -26,10 +26,11 @@ theorem coord_mem_sectionMod (t : T) : y ⟨(), t⟩ ∈ sectionMod y := by
     exact Algebra.subset_adjoin ⟨⟨(), t⟩, rfl⟩
   simpa [div_eq_mul_inv] using hg
 
-theorem exists_mul_mem_of_mem_chartRingZ (m : Ideal (curveRing y)) (hm : m.IsPrime) (t : T)
-    (h : ∀ u : T, ∃ a b : curveRing y, b ∉ m ∧ (b : K') * (y ⟨(), u⟩ / y ⟨(), t⟩) = a)
-    {z : K'} (hz : z ∈ chartRingZ y (fun _ => t)) :
-    ∃ a b : curveRing y, b ∉ m ∧ (b : K') * z = a := by
+theorem exists_mul_mem_of_mem_chartRingZ
+    (m : Ideal (curveRing y)) (hm : m.IsPrime)
+    (t : T) (h : ∀ u : T, ∃ a b : curveRing y, b ∉ m ∧ (b : K') * (y ⟨(), u⟩ / y ⟨(), t⟩) = a)
+    {z : K'} (hz : z ∈ chartRingZ y (fun _ => t))
+    : ∃ a b : curveRing y, b ∉ m ∧ (b : K') * z = a := by
   induction hz using Algebra.adjoin_induction with
   | mem x hx =>
     obtain ⟨⟨⟨⟩, u⟩, rfl⟩ := hx
@@ -53,7 +54,6 @@ theorem exists_mul_mem_of_mem_chartRingZ (m : Ideal (curveRing y)) (hm : m.IsPri
     ring
 
 end SectionQuotientLocal
-
 
 open SectionQuotientLocal in
 theorem SectionQuotLocal.proof : SectionQuotLocal.Statement := by
@@ -80,7 +80,8 @@ theorem SectionQuotLocal.proof : SectionQuotLocal.Statement := by
   have hle : Ideal.span {a} ≤ LinearMap.ker φ := by
     rw [Ideal.span_singleton_le_iff_mem, LinearMap.mem_ker, hφ0]
     exact ⟨b, hba⟩
-  let ψ : (curveRing y ⧸ Ideal.span {a}) →ₗ[curveRing y] sectionQuot y x := (Ideal.span {a}).liftQ φ hle
+  let ψ : (curveRing y ⧸ Ideal.span {a}) →ₗ[curveRing y] sectionQuot y x :=
+    (Ideal.span {a}).liftQ φ hle
 
   have hker : ∀ q, ψ q = 0 → b • q = 0 := by
     intro q hq
@@ -94,7 +95,8 @@ theorem SectionQuotLocal.proof : SectionQuotLocal.Statement := by
     rw [mul_assoc, ← hba, mul_assoc, ← hγ]
     ring
 
-  have hsurj0 : ∀ n : sectionMod y, ∃ r : curveRing y, r ∉ m ∧ ∃ β : curveRing y, r • n = β • e := by
+  have hsurj0
+      : ∀ n : sectionMod y, ∃ r : curveRing y, r ∉ m ∧ ∃ β : curveRing y, r • n = β • e := by
     intro n
     have hn : (n : K') ∈ chartLat y (fun _ => 1) 1 := n.2
     have hnt : (n : K') * (y ⟨(), t⟩)⁻¹ ∈ chartRingZ y (fun _ => t) := by
@@ -106,12 +108,14 @@ theorem SectionQuotLocal.proof : SectionQuotLocal.Statement := by
     field_simp
 
   let S := m.primeCompl
-  let Φ := IsLocalizedModule.map S (LocalizedModule.mkLinearMap S (curveRing y ⧸ Ideal.span {a}))
-    (LocalizedModule.mkLinearMap S (sectionQuot y x)) ψ
-  have hΦ : ∀ q (r : S), Φ (LocalizedModule.mk q r) = LocalizedModule.mk (ψ q) r :=
-    fun q r => IsLocalizedModule.map_LocalizedModules S _ q r
+  let Φ :=
+    IsLocalizedModule.map S (LocalizedModule.mkLinearMap S (curveRing y ⧸ Ideal.span {a}))
+      (LocalizedModule.mkLinearMap S (sectionQuot y x)) ψ
+  have hΦ : ∀ q (r : S), Φ (LocalizedModule.mk q r) = LocalizedModule.mk (ψ q) r := fun q r =>
+    IsLocalizedModule.map_LocalizedModules S _ q r
   have hinj : Function.Injective Φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro z
     refine LocalizedModule.induction_on (β := fun z => Φ z = 0 → z = 0) (fun q r hz => ?_) z
     rw [hΦ, ← LocalizedModule.zero_mk r, LocalizedModule.mk_eq] at hz
@@ -136,8 +140,9 @@ theorem SectionQuotLocal.proof : SectionQuotLocal.Statement := by
     rw [hψ, ← hβ, Submodule.Quotient.mk_smul]
     exact LocalizedModule.mk_cancel_common_left ⟨r', hr'⟩ r _
   have := hm
-  let E := (LinearEquiv.ofBijective Φ ⟨hinj, hsurj⟩).extendScalarsOfIsLocalization S
-    (Localization.AtPrime m)
+  let E :=
+    (LinearEquiv.ofBijective Φ ⟨hinj, hsurj⟩).extendScalarsOfIsLocalization S
+      (Localization.AtPrime m)
   unfold locLen
   rw [dite_eq_left hm, dite_eq_left hm, E.length_eq]
 

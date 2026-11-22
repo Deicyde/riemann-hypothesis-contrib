@@ -16,8 +16,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ProdSur
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models
 
@@ -25,11 +27,13 @@ namespace GlobalTheory
 
 namespace SemiAbTorsionCount
 
-theorem card_pow_eq_one_of_extension {T G B : Type} [Group T] [CommGroup G] [Group B]
-    (i : T →* G) (q : G →* B) (hi : Function.Injective i) (hk : ∀ x, q x = 1 ↔ ∃ t, i t = x)
-    (hq : Function.Surjective q) (n : ℕ) (hT : ∀ t : T, ∃ s : T, s ^ n = t) :
-    Nat.card {x : G // x ^ n = 1} =
-      Nat.card {b : B // b ^ n = 1} * Nat.card {t : T // t ^ n = 1} := by
+theorem card_pow_eq_one_of_extension
+    {T G B : Type} [Group T] [CommGroup G] [Group B]
+    (i : T →* G) (q : G →* B)
+    (hi : Function.Injective i) (hk : ∀ x, q x = 1 ↔ ∃ t, i t = x) (hq : Function.Surjective q)
+    (n : ℕ) (hT : ∀ t : T, ∃ s : T, s ^ n = t)
+    : Nat.card {x : G // x ^ n = 1}
+      = Nat.card {b : B // b ^ n = 1} * Nat.card {t : T // t ^ n = 1} := by
   let K : Subgroup G := (powMonoidHom n : G →* G).ker
   let f : K →* B := q.comp K.subtype
   have h0 : Nat.card {x : G // x ^ n = 1} = Nat.card K := rfl
@@ -60,35 +64,42 @@ theorem card_pow_eq_one_of_extension {T G B : Type} [Group T] [CommGroup G] [Gro
   rw [h0, h1, h2, Subgroup.card_eq_card_quotient_mul_card_subgroup f.ker,
     Nat.card_congr (QuotientGroup.quotientKerEquivRange f).toEquiv]
 
-theorem nonempty_hom_mulEquiv_pi (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
-    (M : Type) [CommGroup M] :
-    Nonempty ((Multiplicative X →* M) ≃* (Fin (Module.finrank ℤ X) → M)) := by
+theorem nonempty_hom_mulEquiv_pi
+    (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (M : Type) [CommGroup M]
+    : Nonempty ((Multiplicative X →* M) ≃* (Fin (Module.finrank ℤ X) → M)) := by
   let b := Module.finBasis ℤ X
-  let ev : (Multiplicative X →* M) →* (Fin (Module.finrank ℤ X) → M) :=
-    { toFun := fun t j => t (Multiplicative.ofAdd (b j))
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl }
+  let ev : (Multiplicative X →* M) →* (Fin (Module.finrank ℤ X) → M) := {
+    toFun := fun t j => t (Multiplicative.ofAdd (b j))
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+  }
   refine ⟨MulEquiv.ofBijective ev ⟨fun s t h => ?_, fun v => ?_⟩⟩
-  · have : (MonoidHom.toAdditiveRight s).toIntLinearMap = (MonoidHom.toAdditiveRight t).toIntLinearMap :=
+  · have : (MonoidHom.toAdditiveRight s).toIntLinearMap
+        = (MonoidHom.toAdditiveRight t).toIntLinearMap :=
       b.ext fun j => congrArg Additive.ofMul (congrFun h j)
     ext x
     exact congrArg Additive.toMul (DFunLike.congr_fun this x)
-  · refine ⟨AddMonoidHom.toMultiplicativeLeft
-      (b.constr ℤ (fun j => Additive.ofMul (v j))).toAddMonoidHom, funext fun j => ?_⟩
+  · refine ⟨
+      AddMonoidHom.toMultiplicativeLeft (b.constr ℤ (fun j => Additive.ofMul (v j))).toAddMonoidHom,
+      funext fun j => ?_
+    ⟩
     exact congrArg Additive.toMul (b.constr_basis ℤ (fun j => Additive.ofMul (v j)) j)
 
-theorem nonempty_torus_points_mulEquiv (k : Type) [Field k] (X : Type) [AddCommGroup X]
-    [Module.Free ℤ X] [Module.Finite ℤ X] :
-    Nonempty ((𝟙_ (Over (Sp k)) ⟶ splitTorus (Sp k) X) ≃* (Fin (Module.finrank ℤ X) → kˣ)) := by
+theorem nonempty_torus_points_mulEquiv
+    (k : Type) [Field k] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    : Nonempty ((𝟙_ (Over (Sp k)) ⟶ splitTorus (Sp k) X) ≃* (Fin (Module.finrank ℤ X) → kˣ)) := by
   obtain ⟨e₂⟩ := nonempty_hom_mulEquiv_pi X Γ((𝟙_ (Over (Sp k))).left, ⊤)ˣ
   let e₃ : Γ((𝟙_ (Over (Sp k))).left, ⊤) ≃+* k :=
     (Scheme.ΓSpecIso (CommRingCat.of k)).commRingCatIsoToRingEquiv
   exact ⟨((splitTorusPointsEquiv (Sp k) X (𝟙_ (Over (Sp k)))).trans e₂).trans
     (MulEquiv.piCongrRight fun _ => Units.mapEquiv e₃.toMulEquiv)⟩
 
-theorem divisible_and_card {k : Type} [Field k] [IsAlgClosed k] {T : Type} [Group T] {t : ℕ}
-    (e : T ≃* (Fin t → kˣ)) (N : ℕ) (hN : (N : k) ≠ 0) :
-    (∀ x : T, ∃ s : T, s ^ N = x) ∧ Nat.card {x : T // x ^ N = 1} = N ^ t := by
+theorem divisible_and_card
+    {k : Type} [Field k] [IsAlgClosed k]
+    {T : Type} [Group T]
+    {t : ℕ} (e : T ≃* (Fin t → kˣ))
+    (N : ℕ) (hN : (N : k) ≠ 0)
+    : (∀ x : T, ∃ s : T, s ^ N = x) ∧ Nat.card {x : T // x ^ N = 1} = N ^ t := by
   have hN0 : N ≠ 0 := by rintro rfl; exact hN Nat.cast_zero
   haveI : NeZero N := ⟨hN0⟩
   haveI : NeZero (N : k) := ⟨hN⟩
@@ -106,16 +117,20 @@ theorem divisible_and_card {k : Type} [Field k] [IsAlgClosed k] {T : Type} [Grou
     rw [map_pow, e.apply_symm_apply]
     exact funext fun j => hr _
   · have h1 : Nat.card {x : T // x ^ N = 1} = Nat.card (Fin t → rootsOfUnity N k) := by
-      refine Nat.card_congr ((e.toEquiv.subtypeEquiv (q := fun v => ∀ j, v j ∈ rootsOfUnity N k)
-        fun x => ?_).trans Equiv.subtypePiEquivPi)
+      refine Nat.card_congr
+        ((e.toEquiv.subtypeEquiv (q := fun v => ∀ j, v j ∈ rootsOfUnity N k) fun x => ?_).trans
+          Equiv.subtypePiEquivPi)
       rw [← e.map_eq_one_iff, map_pow, funext_iff]
       rfl
     rw [h1, Nat.card_fun, HasEnoughRootsOfUnity.natCard_rootsOfUnity, Nat.card_eq_fintype_card,
       Fintype.card_fin]
 
-theorem dim_eq {k : Type} [Field k] (G : Over (Sp k)) [GrpObj G] (E : TorusExtension G) (g g' : ℕ)
-    (dG : SmoothOfRelativeDimension g G.hom) (dB : SmoothOfRelativeDimension g' E.B.hom) :
-    g = g' + @Module.finrank ℤ E.X _ E.addCommGroup.toAddCommMonoid _ := by
+theorem dim_eq
+    {k : Type} [Field k]
+    (G : Over (Sp k)) [GrpObj G]
+    (E : TorusExtension G) (g g' : ℕ)
+    (dG : SmoothOfRelativeDimension g G.hom) (dB : SmoothOfRelativeDimension g' E.B.hom)
+    : g = g' + @Module.finrank ℤ E.X _ E.addCommGroup.toAddCommMonoid _ := by
   letI := E.addCommGroup
   letI := E.grpB
   have := E.free
@@ -137,7 +152,13 @@ end SemiAbTorsionCount
 
 open SemiAbTorsionCount
 
-theorem card_torsion_mul_card_toric_torsion : ∀ (k : Type) [Field k] [IsAlgClosed k] (G : Over (Sp k)) [GrpObj G] (T : TorusExtension G) (g N : ℕ), IsSemiAbelian G → SmoothOfRelativeDimension g G.hom → (N : k) ≠ 0 → Nat.card {x : 𝟙_ (Over (Sp k)) ⟶ G // x ^ N = 1} * Nat.card {x : 𝟙_ (Over (Sp k)) ⟶ G // x ^ N = 1 ∧ ∃ y, x = y ≫ T.i} = N ^ (2 * g) := by
+theorem card_torsion_mul_card_toric_torsion
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (G : Over (Sp k)) [GrpObj G] (T : TorusExtension G)
+        (g N : ℕ),
+      IsSemiAbelian G → SmoothOfRelativeDimension g G.hom → (N : k) ≠ 0
+        → Nat.card {x : 𝟙_ (Over (Sp k)) ⟶ G // x ^ N = 1}
+            * Nat.card {x : 𝟙_ (Over (Sp k)) ⟶ G // x ^ N = 1 ∧ ∃ y, x = y ≫ T.i}
+          = N ^ (2 * g) := by
   intro k _ _ G _ E g N hG dG hN
   letI := E.addCommGroup
   letI := E.grpB
@@ -156,13 +177,18 @@ theorem card_torsion_mul_card_toric_torsion : ∀ (k : Type) [Field k] [IsAlgClo
   have hB := GlobalTheory.T.card_torsion_eq_pow_two_mul_dim k E.B g' N E.isAbelian dB hN
   let i := IsMonHom.monoidHom E.i (𝟙_ (Over (Sp k)))
   have hi : Function.Injective i := fun a b h => hk.hom_ext h (toUnit_unique _ _)
-  have h1 := card_pow_eq_one_of_extension i (IsMonHom.monoidHom E.q (𝟙_ (Over (Sp k)))) hi
-    (fun x => ⟨fun hx => ?_, ?_⟩) (fun x => ?_) N hdiv
-  · have h2 : Nat.card {x : 𝟙_ (Over (Sp k)) ⟶ G // x ^ N = 1 ∧ ∃ y, x = y ≫ E.i} =
-        N ^ Module.finrank ℤ E.X := by
+  have h1 :=
+    card_pow_eq_one_of_extension i (IsMonHom.monoidHom E.q (𝟙_ (Over (Sp k)))) hi
+      (fun x => ⟨fun hx => ?_, ?_⟩)
+      (fun x => ?_)
+      N hdiv
+  · have h2
+        : Nat.card {x : 𝟙_ (Over (Sp k)) ⟶ G // x ^ N = 1 ∧ ∃ y, x = y ≫ E.i}
+          = N ^ Module.finrank ℤ E.X := by
       rw [← hcard]
       refine (Nat.card_eq_of_bijective
-        (fun t => ⟨i t.1, by rw [← map_pow, t.2, map_one], t.1, rfl⟩) ⟨?_, ?_⟩).symm
+        (fun t => ⟨i t.1, by rw [← map_pow, t.2, map_one], t.1, rfl⟩)
+        ⟨?_, ?_⟩).symm
       · intro a b h
         exact Subtype.ext (hi (congrArg Subtype.val h))
       · rintro ⟨x, hx, t, rfl⟩

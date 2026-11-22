@@ -8,20 +8,22 @@ open GlobalTheory GlobalTheory.DI
 
 namespace GlobalTheory.DI
 
-theorem _root_.GlobalTheory.DI.inTot_delta_Dtot : ∀ {ι : Type} [LinearOrder ι] {E : Type}
-    [AddCommGroup E] (d : E →+ E)
-    (T : ℕ → Finset ι → AddSubgroup E), (∀ q s t, s.Nonempty → s ⊆ t → T q s ≤ T q t) →
-    ∀ m c, _root_.GlobalTheory.DI.InTot T m c → _root_.GlobalTheory.DI.InTot T (m + 1)
-        (_root_.GlobalTheory.DI.delta c) ∧
-      ((∀ q s x, x ∈ T q s → d x ∈ T (q + 1) s) →
-        _root_.GlobalTheory.DI.InTot T (m + 1) (_root_.GlobalTheory.DI.Dtot d c)) := by
+theorem _root_.GlobalTheory.DI.inTot_delta_Dtot
+    : ∀ {ι : Type} [LinearOrder ι] {E : Type} [AddCommGroup E] (d : E →+ E)
+        (T : ℕ → Finset ι → AddSubgroup E),
+      (∀ q s t, s.Nonempty → s ⊆ t → T q s ≤ T q t)
+        → ∀ m c,
+          _root_.GlobalTheory.DI.InTot T m c
+            → _root_.GlobalTheory.DI.InTot T (m + 1) (_root_.GlobalTheory.DI.delta c)
+              ∧ ((∀ q s x, x ∈ T q s → d x ∈ T (q + 1) s)
+                → _root_.GlobalTheory.DI.InTot T (m + 1) (_root_.GlobalTheory.DI.Dtot d c)) := by
   intro ι _ E _ d T hmono m c hc
   unfold _root_.GlobalTheory.DI.InTot at hc
   obtain ⟨h0, hmem, hzero⟩ := hc
-  have hδ0 : _root_.GlobalTheory.DI.delta c ∅ = 0 := by
-    unfold _root_.GlobalTheory.DI.delta; simp
-  have hδmem : ∀ (q : ℕ) (t : Finset ι), q + t.card = m + 1 →
-      _root_.GlobalTheory.DI.delta c t ∈ T q t := by
+  have hδ0 : _root_.GlobalTheory.DI.delta c ∅ = 0 := by unfold _root_.GlobalTheory.DI.delta; simp
+  have hδmem
+      : ∀ (q : ℕ) (t : Finset ι),
+        q + t.card = m + 1 → _root_.GlobalTheory.DI.delta c t ∈ T q t := by
     intro q t hqt
     unfold _root_.GlobalTheory.DI.delta
     refine AddSubgroup.sum_mem _ fun i hi => AddSubgroup.zsmul_mem _ ?_ _

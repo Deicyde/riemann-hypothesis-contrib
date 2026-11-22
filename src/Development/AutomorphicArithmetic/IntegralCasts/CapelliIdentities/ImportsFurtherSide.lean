@@ -4,11 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Rc5.exists_reps :
-    ∀ {α : Type} (r : α → α → Prop),
-    (∀ (a b : α), r a b → r b a) →
-      (∀ (a b c : α), r a b → r b c → r a c) →
-        ∀ (t : Finset α), ∃ C ⊆ t, (∀ a ∈ C, ∀ b ∈ C, r a b → a = b) ∧ ∀ x ∈ t, x ∈ C ∨ ∃ c ∈ C, r x c := by
+theorem UpperTheory.Reformulated.B.Rc5.exists_reps
+    : ∀ {α : Type} (r : α → α → Prop),
+      (∀ (a b : α), r a b → r b a) → (∀ (a b c : α), r a b → r b c → r a c)
+        → ∀ (t : Finset α), ∃ C ⊆ t,
+          (∀ a ∈ C, ∀ b ∈ C, r a b → a = b) ∧ ∀ x ∈ t, x ∈ C ∨ ∃ c ∈ C, r x c := by
   intro α r hs _ t
   classical
   induction t using Finset.induction_on with

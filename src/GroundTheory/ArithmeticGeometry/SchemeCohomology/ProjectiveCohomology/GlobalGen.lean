@@ -10,8 +10,7 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Arith.SchemeCoh
 
-open AlgebraicGeometry CategoryTheory Opposite TopologicalSpace Limits MonoidalCategory
-  MvPolynomial
+open AlgebraicGeometry CategoryTheory Opposite TopologicalSpace Limits MonoidalCategory MvPolynomial
 
 universe w' u
 
@@ -42,8 +41,9 @@ variable {A : Type u} [CommRing A] {n : ℕ}
 private abbrev yR (k j : Fin (n + 1)) : Γ(projectiveSpace A n, stdOpen A n k) :=
   ProjTwist.ratio (grading A n) (X_mem k) (X_mem j)
 
-def upowS (k : Fin (n + 1)) (m : ℤ) :
-    ((preMod (projectiveSpace A n)).obj (twistingSheaf (grading A n) m)).obj (op (stdOpen A n k)) :=
+def upowS (k : Fin (n + 1)) (m : ℤ)
+    : ((preMod (projectiveSpace A n)).obj (twistingSheaf (grading A n) m)).obj
+      (op (stdOpen A n k)) :=
   ProjTwist.upow (grading A n) (X_mem k) m
 
 private lemma upowS_res (k l : Fin (n + 1)) (m : ℕ) :
@@ -151,11 +151,15 @@ private lemma exists_kill (G : (projectiveSpace A n).Modules) [G.IsQuasicoherent
     Finset.le_sup (f := fun p : Fin (n + 1) × Fin (n + 1) => b p.1 p.2) (Finset.mem_univ (k, l))
   rw [← Nat.sub_add_cancel hle, pow_add, mul_smul, hb k l, smul_zero]
 
-theorem exists_extend (G : (projectiveSpace A n).Modules) [G.IsQuasicoherent] (j : Fin (n + 1))
-    (s : Γ(G, stdOpen A n j)) : ∃ m₀ : ℕ, ∀ m : ℕ, m₀ ≤ m → ∃ t : Γ(twist G m, ⊤),
-      resF (twist G m) le_top t =
-        tensorBasisMap G (twistingSheaf (grading A n) m) (ProjTwist.upow (grading A n) (X_mem j) m)
-          le_rfl s := by
+theorem exists_extend
+    (G : (projectiveSpace A n).Modules) [G.IsQuasicoherent]
+    (j : Fin (n + 1)) (s : Γ(G, stdOpen A n j))
+    : ∃ m₀ : ℕ, ∀ m : ℕ,
+      m₀ ≤ m
+        → ∃ t : Γ(twist G m, ⊤),
+          resF (twist G m) le_top t
+            = tensorBasisMap G (twistingSheaf (grading A n) m)
+              (ProjTwist.upow (grading A n) (X_mem j) m) le_rfl s := by
   obtain ⟨a, g, hg⟩ := exists_local_uniform G j s
   obtain ⟨b, hb⟩ := exists_kill G j s a g hg
   refine ⟨a + b, fun m hm => ?_⟩
@@ -163,49 +167,55 @@ theorem exists_extend (G : (projectiveSpace A n).Modules) [G.IsQuasicoherent] (j
   have hdb : b ≤ d := by omega
 
   let ρ : ∀ k : ULift.{u} (Fin (n + 1)), Γ(twist G (a + d : ℕ), stdOpen A n k.down) := fun k =>
-    tensorBasisMap G (twistingSheaf (grading A n) (a + d : ℕ))
-      (upowS k.down (a + d : ℕ))
+    tensorBasisMap G (twistingSheaf (grading A n) (a + d : ℕ)) (upowS k.down (a + d : ℕ))
       (le_rfl : stdOpen A n k.down ≤ stdOpen A n k.down) (yR (A := A) k.down j ^ d • g k.down)
-  have hcov : ∀ x ∈ (⊤ : (projectiveSpace A n).Opens),
-      ∃ k : ULift.{u} (Fin (n + 1)), x ∈ stdOpen A n k.down := by
+  have hcov
+      : ∀ x ∈ (⊤ : (projectiveSpace A n).Opens), ∃ k : ULift.{u} (Fin (n + 1)),
+        x ∈ stdOpen A n k.down := by
     intro x _
     have hx : x ∈ ⨆ i, stdOpen A n i := by rw [iSup_stdOpen]; trivial
     obtain ⟨k, hk⟩ := Opens.mem_iSup.1 hx
     exact ⟨⟨k⟩, hk⟩
-  have hcompat : ∀ k l : ULift.{u} (Fin (n + 1)),
-      resF (twist G (a + d : ℕ))
-          (inf_le_left : stdOpen A n k.down ⊓ stdOpen A n l.down ≤ stdOpen A n k.down) (ρ k) =
+  have hcompat
+      : ∀ k l : ULift.{u} (Fin (n + 1)),
         resF (twist G (a + d : ℕ))
-          (inf_le_right : stdOpen A n k.down ⊓ stdOpen A n l.down ≤ stdOpen A n l.down) (ρ l) := by
+            (inf_le_left : stdOpen A n k.down ⊓ stdOpen A n l.down ≤ stdOpen A n k.down) (ρ k)
+          = resF (twist G (a + d : ℕ))
+            (inf_le_right : stdOpen A n k.down ⊓ stdOpen A n l.down ≤ stdOpen A n l.down)
+            (ρ l) := by
     rintro ⟨k⟩ ⟨l⟩
     simp only [ρ]
     unfold twist
     rw [tensorBasisMap_res, tensorBasisMap_res,
-      tensorBasisMap_change (s := upowS k (a + d : ℕ))
-        (upowS l (a + d : ℕ)) (inf_le_left.trans le_rfl)
-        (inf_le_right.trans le_rfl) _ (upowS_res k l (a + d))]
+      tensorBasisMap_change (s := upowS k (a + d : ℕ)) (upowS l (a + d : ℕ))
+        (inf_le_left.trans le_rfl) (inf_le_right.trans le_rfl) _ (upowS_res k l (a + d))]
     congr 1
     set W := stdOpen A n k ⊓ stdOpen A n l
-    have hr0 : resO (inf_le_right : W ≤ stdOpen A n l) (yR (A := A) l j) *
-        resO (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k l) =
-        resO (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k j) :=
+    have hr0
+        : resO (inf_le_right : W ≤ stdOpen A n l) (yR (A := A) l j)
+            * resO (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k l)
+          = resO (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k j) :=
       ProjTwist.ratio_mul_ratio (𝒜 := grading A n) (X_mem k) (X_mem l) (X_mem j)
     have e1 := hb k l
-    have e2 : resO (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k j) ^ d •
-        (resF G (inf_le_left : W ≤ stdOpen A n k) (g k) -
-          resO (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k l) ^ a •
-            resF G (inf_le_right : W ≤ stdOpen A n l) (g l)) = 0 := by
+    have e2
+        : resO (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k j) ^ d
+            • (resF G (inf_le_left : W ≤ stdOpen A n k) (g k)
+              - resO (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k l) ^ a
+                • resF G (inf_le_right : W ≤ stdOpen A n l) (g l))
+          = 0 := by
       rw [← Nat.sub_add_cancel hdb, pow_add, mul_smul, e1, smul_zero]
     rw [smul_sub, sub_eq_zero] at e2
-    change resF G (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k j ^ d • g k) =
-      (resO (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k l) ^ (a + d)) •
-        resF G (inf_le_right : W ≤ stdOpen A n l) (yR (A := A) l j ^ d • g l)
+    change resF G (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k j ^ d • g k)
+      = (resO (inf_le_left : W ≤ stdOpen A n k) (yR (A := A) k l) ^ (a + d))
+        • resF G (inf_le_right : W ≤ stdOpen A n l) (yR (A := A) l j ^ d • g l)
     rw [resF_smul, resF_smul, map_pow, map_pow, e2, smul_smul, smul_smul, ← hr0]
     congr 1
     ring
-  obtain ⟨t, ht⟩ := sheaf_exists_glue ⟨(twist G (a + d : ℕ)).presheaf, (twist G (a + d : ℕ)).isSheaf⟩
-    (V := ⊤) (fun k : ULift.{u} (Fin (n + 1)) => stdOpen A n k.down) (fun _ => le_top) hcov ρ
-    hcompat
+  obtain ⟨t, ht⟩ :=
+    sheaf_exists_glue ⟨(twist G (a + d : ℕ)).presheaf, (twist G (a + d : ℕ)).isSheaf⟩ (V := ⊤)
+      (fun k : ULift.{u} (Fin (n + 1)) => stdOpen A n k.down)
+      (fun _ => le_top)
+      hcov ρ hcompat
   refine ⟨t, ?_⟩
   have htj : resF (twist G (a + d : ℕ)) le_top t = ρ ⟨j⟩ := ht ⟨j⟩
   refine htj.trans ?_
@@ -215,13 +225,16 @@ theorem exists_extend (G : (projectiveSpace A n).Modules) [G.IsQuasicoherent] (j
       (le_inf le_rfl le_rfl)
     rw [hg j, hjj, map_one, one_pow, one_smul]
   have hx : yR (A := A) j j ^ d • g j = s := by rw [hjj, one_pow, one_smul, hgj]
-  exact congrArg (tensorBasisMap G (twistingSheaf (grading A n) (a + d : ℕ))
-    (upowS j (a + d : ℕ)) (le_rfl : stdOpen A n j ≤ stdOpen A n j)) hx
+  exact congrArg
+    (tensorBasisMap G (twistingSheaf (grading A n) (a + d : ℕ)) (upowS j (a + d : ℕ))
+      (le_rfl : stdOpen A n j ≤ stdOpen A n j))
+    hx
 
-def twistLinear (G : (projectiveSpace A n).Modules) (j : Fin (n + 1)) (q : ℤ) :
-    Γ(G, stdOpen A n j) →ₗ[Γ(projectiveSpace A n, stdOpen A n j)] Γ(twist G q, stdOpen A n j) where
-  toFun := tensorBasisMap G (twistingSheaf (grading A n) q) (upowS j q)
-    (le_rfl : stdOpen A n j ≤ stdOpen A n j)
+def twistLinear (G : (projectiveSpace A n).Modules) (j : Fin (n + 1)) (q : ℤ)
+    : Γ(G, stdOpen A n j) →ₗ[Γ(projectiveSpace A n, stdOpen A n j)] Γ(twist G q, stdOpen A n j) where
+  toFun :=
+    tensorBasisMap G (twistingSheaf (grading A n) q) (upowS j q)
+      (le_rfl : stdOpen A n j ≤ stdOpen A n j)
   map_add' := map_add _
   map_smul' r m := tensorBasisMap_smul _ r m
 
@@ -229,16 +242,20 @@ lemma twistLinear_surjective (G : (projectiveSpace A n).Modules) (j : Fin (n + 1
     Function.Surjective (twistLinear G j q) :=
   (tensorBasisMap_bijective (ProjTwist.isBasisOn_upow (grading A n) (X_mem j) q) le_rfl).2
 
-theorem exists_generatingSections_twist (G : (projectiveSpace A n).Modules) (hG : IsCoherent G) :
-    ∃ q₀ : ℕ, ∀ q : ℕ, q₀ ≤ q → ∃ σ : (twist G q).GeneratingSections, σ.IsFiniteType := by
+theorem exists_generatingSections_twist (G : (projectiveSpace A n).Modules) (hG : IsCoherent G)
+    : ∃ q₀ : ℕ, ∀ q : ℕ, q₀ ≤ q → ∃ σ : (twist G q).GeneratingSections, σ.IsFiniteType := by
   obtain ⟨hqc, hfin⟩ := hG
-  have hfg : ∀ j : Fin (n + 1), ∃ S : Finset Γ(G, stdOpen A n j),
-      Submodule.span Γ(projectiveSpace A n, stdOpen A n j) (S : Set Γ(G, stdOpen A n j)) = ⊤ :=
+  have hfg
+      : ∀ j : Fin (n + 1), ∃ S : Finset Γ(G, stdOpen A n j),
+        Submodule.span Γ(projectiveSpace A n, stdOpen A n j) (S : Set Γ(G, stdOpen A n j)) = ⊤ :=
     fun j => (hfin _ (isAffineOpen_stdOpen j)).fg_top
   choose S hS using hfg
-  have hext : ∀ p : (j : Fin (n + 1)) × S j, ∃ m₀ : ℕ, ∀ m : ℕ, m₀ ≤ m →
-      ∃ t : Γ(twist G m, ⊤), resF (twist G m) (le_top : stdOpen A n p.1 ≤ ⊤) t =
-        twistLinear G p.1 m p.2.1 := fun p => exists_extend G p.1 p.2.1
+  have hext
+      : ∀ p : (j : Fin (n + 1)) × S j, ∃ m₀ : ℕ, ∀ m : ℕ,
+        m₀ ≤ m
+          → ∃ t : Γ(twist G m, ⊤),
+            resF (twist G m) (le_top : stdOpen A n p.1 ≤ ⊤) t = twistLinear G p.1 m p.2.1 :=
+    fun p => exists_extend G p.1 p.2.1
   choose m₀ hm₀ using hext
   refine ⟨Finset.univ.sup m₀, fun q hq => ?_⟩
   have hq' : ∀ p, m₀ p ≤ q := fun p => (Finset.le_sup (f := m₀) (Finset.mem_univ p)).trans hq
@@ -247,12 +264,16 @@ theorem exists_generatingSections_twist (G : (projectiveSpace A n).Modules) (hG 
     refine le_antisymm le_top ?_
     rw [← iSup_stdOpen (A := A) (n := n)]
     exact iSup_le fun j => le_iSup_of_le (⟨j⟩ : ULift.{u} (Fin (n + 1))) le_rfl
-  refine exists_generatingSections (twist G q) (fun i : ULift.{u} (Fin (n + 1)) => stdOpen A n i.down)
-    (fun i => isAffineOpen_stdOpen _) hcov t fun ⟨j⟩ => ?_
+  refine exists_generatingSections (twist G q)
+    (fun i : ULift.{u} (Fin (n + 1)) => stdOpen A n i.down)
+    (fun i => isAffineOpen_stdOpen _)
+    hcov t
+    fun ⟨j⟩ => ?_
   rw [eq_top_iff]
   rintro z -
   obtain ⟨w, rfl⟩ := twistLinear_surjective G j q z
-  have hw : w ∈ Submodule.span Γ(projectiveSpace A n, stdOpen A n j) (S j : Set Γ(G, stdOpen A n j)) :=
+  have hw
+      : w ∈ Submodule.span Γ(projectiveSpace A n, stdOpen A n j) (S j : Set Γ(G, stdOpen A n j)) :=
     (hS j).symm ▸ Submodule.mem_top
   have hmap := Submodule.mem_map_of_mem (f := twistLinear G j q) hw
   rw [Submodule.map_span] at hmap

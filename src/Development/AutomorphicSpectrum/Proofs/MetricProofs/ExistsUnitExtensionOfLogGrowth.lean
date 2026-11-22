@@ -9,24 +9,31 @@ open Complex Metric
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem exists_unit_extension_of_log_growth :
-    ∀ (n : ℕ) (S : Finset (Fin n)) (φ : (Fin n → ℂ) → ℂ) (ρ C : ℝ) (N : ℕ), 0 < ρ →
-      DifferentiableOn ℂ φ {z ∈ ball (0 : Fin n → ℂ) ρ | ∀ i ∈ S, z i ≠ 0} →
-      (∀ z ∈ ball (0 : Fin n → ℂ) ρ, (∀ i ∈ S, z i ≠ 0) → φ z ≠ 0 ∧
-        ‖φ z‖ ≤ C * (1 + ∑ i ∈ S, |Real.log ‖z i‖|) ^ N ∧
-        ‖(φ z)⁻¹‖ ≤ C * (1 + ∑ i ∈ S, |Real.log ‖z i‖|) ^ N) →
-      ∃ ψ : (Fin n → ℂ) → ℂ, DifferentiableOn ℂ ψ (ball 0 ρ) ∧
-        (∀ z ∈ ball (0 : Fin n → ℂ) ρ, ψ z ≠ 0) ∧
-        ∀ z ∈ ball (0 : Fin n → ℂ) ρ, (∀ i ∈ S, z i ≠ 0) → ψ z = φ z := by
+theorem exists_unit_extension_of_log_growth
+    : ∀ (n : ℕ) (S : Finset (Fin n)) (φ : (Fin n → ℂ) → ℂ) (ρ C : ℝ) (N : ℕ),
+      0 < ρ → DifferentiableOn ℂ φ {z ∈ ball (0 : Fin n → ℂ) ρ | ∀ i ∈ S, z i ≠ 0}
+        → (∀ z ∈ ball (0 : Fin n → ℂ) ρ,
+          (∀ i ∈ S, z i ≠ 0)
+            → φ z ≠ 0 ∧ ‖φ z‖ ≤ C * (1 + ∑ i ∈ S, |Real.log ‖z i‖|) ^ N
+              ∧ ‖(φ z)⁻¹‖ ≤ C * (1 + ∑ i ∈ S, |Real.log ‖z i‖|) ^ N)
+        → ∃ ψ : (Fin n → ℂ) → ℂ,
+          DifferentiableOn ℂ ψ (ball 0 ρ) ∧ (∀ z ∈ ball (0 : Fin n → ℂ) ρ, ψ z ≠ 0)
+            ∧ ∀ z ∈ ball (0 : Fin n → ℂ) ρ, (∀ i ∈ S, z i ≠ 0) → ψ z = φ z := by
   intro n S φ ρ C N hρ hφ hb
-  obtain ⟨ψ, hψ, hψe⟩ := GlobalTheory.T.removable_log_growth_singularity n S φ ρ C N hρ hφ (fun z hz hS => (hb z hz hS).2.1)
-  obtain ⟨χ, hχ, hχe⟩ := GlobalTheory.T.removable_log_growth_singularity n S (fun z => (φ z)⁻¹) ρ C N hρ
-    (hφ.inv fun z hz => (hb z hz.1 hz.2).1) (fun z hz hS => (hb z hz hS).2.2)
+  obtain ⟨ψ, hψ, hψe⟩ :=
+    GlobalTheory.T.removable_log_growth_singularity n S φ ρ C N hρ hφ
+      (fun z hz hS => (hb z hz hS).2.1)
+  obtain ⟨χ, hχ, hχe⟩ :=
+    GlobalTheory.T.removable_log_growth_singularity n S
+      (fun z => (φ z)⁻¹)
+      ρ C N hρ (hφ.inv fun z hz => (hb z hz.1 hz.2).1)
+      (fun z hz hS => (hb z hz hS).2.2)
   refine ⟨ψ, hψ, fun z hz => ?_, hψe⟩
   have hF : ContinuousAt (fun w => ψ w * χ w) z :=
     ((hψ.mul hχ).differentiableAt (isOpen_ball.mem_nhds hz)).continuousAt
-  obtain ⟨w, hw_def⟩ : ∃ w : ℝ → (Fin n → ℂ),
-      w = fun (ε : ℝ) i => if z i = 0 then (ε : ℂ) else z i := ⟨_, rfl⟩
+  obtain ⟨w, hw_def⟩
+      : ∃ w : ℝ → (Fin n → ℂ), w = fun (ε : ℝ) i => if z i = 0 then (ε : ℂ) else z i :=
+    ⟨_, rfl⟩
   have hwc : Continuous w := by
     rw [hw_def]
     refine continuous_pi fun i => ?_

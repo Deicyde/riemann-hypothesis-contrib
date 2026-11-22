@@ -6,11 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.DecayOfMemSpan
 
-theorem decay_of_mem_span {G H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+theorem decay_of_mem_span
+    {G H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
     {ρ : G → H →L[ℂ] H} {D : G → ℝ} {c : ℝ} {S : Set H} {u : H}
-    (h : ∀ v ∈ S, ∃ C : ℝ, ∀ g : G,
-      ‖Inner.inner ℂ v ((ρ g : H → H) u)‖ ≤ C * Real.exp (-(c * D g))) :
-    ∀ v ∈ Submodule.span ℂ S, ∃ C : ℝ, ∀ g : G,
+    (h : ∀ v ∈ S, ∃ C : ℝ, ∀ g : G, ‖Inner.inner ℂ v ((ρ g : H → H) u)‖ ≤ C * Real.exp (-(c * D g)))
+    : ∀ v ∈ Submodule.span ℂ S, ∃ C : ℝ, ∀ g : G,
       ‖Inner.inner ℂ v ((ρ g : H → H) u)‖ ≤ C * Real.exp (-(c * D g)) := by
   intro v hv
   induction hv using Submodule.span_induction with

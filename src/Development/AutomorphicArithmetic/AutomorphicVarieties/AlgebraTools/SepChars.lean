@@ -6,8 +6,12 @@ public import Mathlib
 
 open Polynomial Matrix IsLocalRing TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.sep_chars :
-    ∀ {R Γ : Type} [CommRing R] [IsLocalRing R] [Monoid Γ] {n : ℕ} (ψ : Fin n → Γ →* R), (n : Cardinal) ≤ Cardinal.mk (ResidueField R) → Function.Injective (fun i => (residue R : R →* ResidueField R).comp (ψ i)) → ∃ z : MonoidAlgebra R Γ, ∀ i j, i ≠ j → IsUnit (MonoidAlgebra.lift R R Γ (ψ i) z - MonoidAlgebra.lift R R Γ (ψ j) z) := by
+theorem UpperTheory.V.AlgebraTools.sep_chars
+    : ∀ {R Γ : Type} [CommRing R] [IsLocalRing R] [Monoid Γ] {n : ℕ} (ψ : Fin n → Γ →* R),
+      (n : Cardinal) ≤ Cardinal.mk (ResidueField R)
+        → Function.Injective (fun i => (residue R : R →* ResidueField R).comp (ψ i))
+        → ∃ z : MonoidAlgebra R Γ, ∀ i j,
+          i ≠ j → IsUnit (MonoidAlgebra.lift R R Γ (ψ i) z - MonoidAlgebra.lift R R Γ (ψ j) z) := by
   intro R Γ _ _ _ n ψ hcard hinj
   let χ : Fin n → Γ →* ResidueField R := fun i => (residue R : R →* ResidueField R).comp (ψ i)
   have hχ : ∀ i g, χ i g = residue R (ψ i g) := fun i g => rfl
@@ -25,12 +29,11 @@ theorem UpperTheory.V.AlgebraTools.sep_chars :
       intro v
       conv_lhs => rw [pi_eq_sum_univ v]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [c, map_sum, map_smul]
+      simp [c, map_sum, map_smul]
     have hc : ∀ i, c i = 0 := by
       apply hli c
       funext g
-      have hg : (fun i => χ i g) ∈ LinearMap.range L :=
-        ⟨Finsupp.single g 1, by simp [L]⟩
+      have hg : (fun i => χ i g) ∈ LinearMap.range L := ⟨Finsupp.single g 1, by simp [L]⟩
       have h0 := hle hg
       rw [LinearMap.mem_ker, hf] at h0
       simp only [Finset.sum_apply, Pi.smul_apply, Function.comp_apply, smul_eq_mul, Pi.zero_apply]
@@ -48,7 +51,7 @@ theorem UpperTheory.V.AlgebraTools.sep_chars :
     rw [← hwi]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [z, L, map_sum, MonoidAlgebra.lift_single, Finsupp.linearCombination_apply,
-      Finsupp.sum, Finset.sum_apply, smul_eq_mul, map_mul, hχ]
+        Finsupp.sum, Finset.sum_apply, smul_eq_mul, map_mul, hχ]
     refine Finset.sum_congr rfl (fun g _ => ?_)
     rw [Function.surjInv_eq (IsLocalRing.residue_surjective (R := R))]
     rfl

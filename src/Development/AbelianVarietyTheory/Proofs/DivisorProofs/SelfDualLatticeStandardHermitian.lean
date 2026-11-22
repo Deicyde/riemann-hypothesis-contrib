@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsUnitLe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.UnitLemma GlobalTheory.InertUnitOrb
@@ -21,18 +22,25 @@ namespace GlobalTheory.InertUnitOrb.LatOnto
 
 open GlobalTheory.InertUnitOrb.ModelOfN
 
-theorem exists_orthonormal_mem {K : UQ} (n : ℕ) : ∀ (V : Type) [AddCommGroup V] [Module K.E V] [Module K.O V]
-    [IsScalarTower K.O K.E V] [FiniteDimensional K.E V] (h : V → V → K.E),
-    (∀ y y' z, h (y + y') z = h y z + h y' z) → (∀ (a : K.E) y z, h (a • y) z = a * h y z) →
-    (∀ y z, h z y = K.c (h y z)) → Module.finrank K.E V = n → ∀ L : Submodule K.O V, L.FG →
-    Submodule.span K.E (L : Set V) = ⊤ → (∀ y, y ∈ L ↔ ∀ z ∈ L, h y z ∈ (algebraMap K.O K.E).range) →
-    ∃ v : Fin n → V, (∀ i, v i ∈ L) ∧ ∀ i j, h (v i) (v j) = if i = j then 1 else 0 := by
+theorem exists_orthonormal_mem {K : UQ} (n : ℕ)
+    : ∀ (V : Type) [AddCommGroup V] [Module K.E V] [Module K.O V] [IsScalarTower K.O K.E V]
+        [FiniteDimensional K.E V] (h : V → V → K.E),
+      (∀ y y' z, h (y + y') z = h y z + h y' z) → (∀ (a : K.E) y z, h (a • y) z = a * h y z)
+        → (∀ y z, h z y = K.c (h y z)) → Module.finrank K.E V = n
+        → ∀ L : Submodule K.O V,
+          L.FG → Submodule.span K.E (L : Set V) = ⊤
+            → (∀ y, y ∈ L ↔ ∀ z ∈ L, h y z ∈ (algebraMap K.O K.E).range)
+            → ∃ v : Fin n → V, (∀ i, v i ∈ L) ∧ ∀ i j, h (v i) (v j) = if i = j then 1 else 0 := by
   first
   | exact @_root_.GlobalTheory.InvolutionTraceUnit.exists_orthonormal
   | exact _root_.GlobalTheory.InvolutionTraceUnit.exists_orthonormal
   | (apply _root_.GlobalTheory.InvolutionTraceUnit.exists_orthonormal <;> assumption)
   | (intros; apply _root_.GlobalTheory.InvolutionTraceUnit.exists_orthonormal <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.InvolutionTraceUnit.exists_orthonormal <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.InvolutionTraceUnit.exists_orthonormal
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.InvolutionTraceUnit.exists_orthonormal ..)
 
 end GlobalTheory.InertUnitOrb.LatOnto
@@ -41,7 +49,20 @@ namespace GlobalTheory.InertUnitOrb.LatOnto
 
 open GlobalTheory.InertUnitOrb.ModelOfN
 
-theorem exists_unitLat_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ (w : Pl E), ¬ IsSplitAt w → ∀ (K : UQ) (e : K.E ≃+* w.adicCompletion E), (∀ x, e (K.c x) = cj w (e x)) → (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1) → ∀ (n : ℕ) (B : InvAlg K) (ψ : B.A ≃ₗ[K.E] (Fin n → K.E)), ∀ (x : B.Aˣ), B.σ (x : B.A) = x → (∀ y z, stdH K n (ψ y) (ψ z) = B.herm x y z) → ∀ L : Submodule K.O B.A, IsLat K.O K.E L → (∀ y, y ∈ L ↔ ∀ z ∈ L, B.herm x y z ∈ (algebraMap K.O K.E).range) → ∃ q : UL n w, unitLat e B ψ q = L := by
+theorem exists_unitLat_eq
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E
+        → ∀ (w : Pl E),
+          ¬ IsSplitAt w
+            → ∀ (K : UQ) (e : K.E ≃+* w.adicCompletion E),
+              (∀ x, e (K.c x) = cj w (e x))
+                → (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1)
+                → ∀ (n : ℕ) (B : InvAlg K) (ψ : B.A ≃ₗ[K.E] (Fin n → K.E)), ∀ (x : B.Aˣ),
+                  B.σ (x : B.A) = x → (∀ y z, stdH K n (ψ y) (ψ z) = B.herm x y z)
+                    → ∀ L : Submodule K.O B.A,
+                      IsLat K.O K.E L
+                        → (∀ y, y ∈ L ↔ ∀ z ∈ L, B.herm x y z ∈ (algebraMap K.O K.E).range)
+                        → ∃ q : UL n w, unitLat e B ψ q = L := by
   intro E _ _ _ _ w hns K e he hint n B ψ x hσx hH L hLat hdual
   have hadd : ∀ y y' z, B.herm x (y + y') z = B.herm x y z + B.herm x y' z := by
     intro y y' z
@@ -56,7 +77,8 @@ theorem exists_unitLat_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     congr 1
     ring
   have hn : Module.finrank K.E B.A = n := by rw [ψ.finrank_eq, Module.finrank_fin_fun]
-  obtain ⟨v, hvL, hv⟩ := exists_orthonormal_mem n B.A (B.herm x) hadd hsmul hsym hn L hLat.1 hLat.2 hdual
+  obtain ⟨v, hvL, hv⟩ :=
+    exists_orthonormal_mem n B.A (B.herm x) hadd hsmul hsym hn L hLat.1 hLat.2 hdual
   obtain ⟨b, hb⟩ := exists_basis_of_orthonormal (B.herm x) hadd hsmul hn v hv
   let P : Matrix (Fin n) (Fin n) K.E := Matrix.of fun i j => ψ (v j) i
   let Pc : Matrix (Fin n) (Fin n) K.E := Formalism.UG.cT (K.c : K.E →+* K.E) P
@@ -68,7 +90,8 @@ theorem exists_unitLat_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     simp only [stdH] at h1
     simp only [hPc, P, Matrix.of_apply]
     rw [show (∑ k, K.c (ψ (v i) k) * ψ (v j) k) = ∑ k, ψ (v j) k * K.c (ψ (v i) k) from
-      Finset.sum_congr rfl fun k _ => mul_comm _ _, h1, hv]
+        Finset.sum_congr rfl fun k _ => mul_comm _ _,
+      h1, hv]
     by_cases hij : i = j
     · subst hij; simp
     · simp [hij, Ne.symm hij]
@@ -89,8 +112,10 @@ theorem exists_unitLat_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     show Formalism.UG.cT (cj w) (P.map eh) * 1 * P.map eh = 1
     rw [hcT, Matrix.mul_one, hmul2]
   refine ⟨⟨qG, hqU⟩, ?_⟩
-  have hinv : ((((⟨qG, hqU⟩ : UL n w)⁻¹ : UL n w) : GLw n w) : Matrix (Fin n) (Fin n) (w.adicCompletion E)).map
-      e.symm = Pc := by
+  have hinv
+      : ((((⟨qG, hqU⟩ : UL n w)⁻¹ : UL n w) : GLw n w)
+          : Matrix (Fin n) (Fin n) (w.adicCompletion E)).map e.symm
+        = Pc := by
     refine Matrix.ext fun i j => ?_
     show e.symm (e (Pc i j)) = Pc i j
     exact e.symm_apply_apply _
@@ -102,15 +127,15 @@ theorem exists_unitLat_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
   have hexp : ∀ y j, B.herm x y (v j) = b.repr y j := by
     intro y j
     conv_lhs => rw [← b.sum_repr y]
-    rw [show B.herm x (∑ i, b.repr y i • b i) (v j) = ∑ i, b.repr y i * B.herm x (b i) (v j) from ?_]
+    rw [show B.herm x (∑ i, b.repr y i • b i) (v j) = ∑ i, b.repr y i * B.herm x (b i) (v j) from
+      ?_]
     · simp only [hb, hv, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     · induction (Finset.univ : Finset (Fin n)) using Finset.induction_on with
       | empty =>
         simp only [Finset.sum_empty]
         have := hsmul 0 0 (v j)
         simpa using this
-      | insert a s ha ih' =>
-        rw [Finset.sum_insert ha, Finset.sum_insert ha, hadd, hsmul, ih']
+      | insert a s ha ih' => rw [Finset.sum_insert ha, Finset.sum_insert ha, hadd, hsmul, ih']
   unfold unitLat
   rw [hinv]
   ext y

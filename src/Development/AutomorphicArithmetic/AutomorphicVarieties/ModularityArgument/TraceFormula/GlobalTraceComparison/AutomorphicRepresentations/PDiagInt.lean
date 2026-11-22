@@ -10,8 +10,7 @@ public import Development.DiscreteGroups.PiInvariants.CompactSupportTwists.PiSee
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi DiscreteGroups.T1.G
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.diagInt_pf :
-    GFac → HalfTerm → DiagInt := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.diagInt_pf : GFac → HalfTerm → DiagInt := by
   intro hF hH
   unfold DiagInt ForSu
   intro E _ _ _ n ι _ s m

@@ -23,14 +23,17 @@ theorem X_add_C_mem {c : O} (hc : c ∈ maximalIdeal O) : (X + C c : O⟦X⟧) �
 
 variable [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O]
 
-theorem exists_shift {c : O} (hc : c ∈ maximalIdeal O) :
-    ∃ s : O⟦X⟧ →ₐ[O] O⟦X⟧, s X = X + C c := by
+theorem exists_shift {c : O} (hc : c ∈ maximalIdeal O) : ∃ s : O⟦X⟧ →ₐ[O] O⟦X⟧, s X = X + C c := by
   have : IsAdicComplete (maximalIdeal O⟦X⟧) O⟦X⟧ := ReciprocityTheory.P1.isAdicComplete_ps
-  exact ⟨GlobalTheory.mvEvalAdic (σ := Unit) O (maximalIdeal O⟦X⟧) (fun _ => X + C c)
-    (fun _ => X_add_C_mem hc), GlobalTheory.mvEvalAdic_X (σ := Unit) _ _ _ ()⟩
+  exact ⟨
+    GlobalTheory.mvEvalAdic (σ := Unit) O (maximalIdeal O⟦X⟧)
+      (fun _ => X + C c)
+      (fun _ => X_add_C_mem hc),
+    GlobalTheory.mvEvalAdic_X (σ := Unit) _ _ _ ()
+  ⟩
 
-theorem exists_div {c : O} (hc : c ∈ maximalIdeal O) (b : O⟦X⟧) :
-    ∃ (r : O) (q : O⟦X⟧), b = C r + (X - C c) * q := by
+theorem exists_div {c : O} (hc : c ∈ maximalIdeal O) (b : O⟦X⟧)
+    : ∃ (r : O) (q : O⟦X⟧), b = C r + (X - C c) * q := by
   have : IsAdicComplete (maximalIdeal O⟦X⟧) O⟦X⟧ := ReciprocityTheory.P1.isAdicComplete_ps
   obtain ⟨s, hs⟩ := exists_shift hc
   obtain ⟨s', hs'⟩ := exists_shift (neg_mem hc)
@@ -41,7 +44,8 @@ theorem exists_div {c : O} (hc : c ∈ maximalIdeal O) (b : O⟦X⟧) :
     GlobalTheory.mvPowerSeries_algHom_ext_of_isHausdorff (σ := Unit) (maximalIdeal O⟦X⟧)
       (fun _ => by
         change (s'.comp s) X ∈ _
-        rw [hX]; simpa using X_add_C_mem (zero_mem (maximalIdeal O)))
+        rw [hX]
+        simpa using X_add_C_mem (zero_mem (maximalIdeal O)))
       (fun _ => hX)
   refine ⟨constantCoeff (s b), s' (mk fun p => coeff (p + 1) (s b)), ?_⟩
   have h1 : s' (s b) = b := DFunLike.congr_fun h b
@@ -51,21 +55,21 @@ theorem exists_div {c : O} (hc : c ∈ maximalIdeal O) (b : O⟦X⟧) :
 
 variable {L : Type*} [CommRing L] [Algebra O L]
 
-theorem exists_ev {c : O} (hc : c ∈ maximalIdeal O) (x : L⟦X⟧)
-    (hx : constantCoeff x = algebraMap O L c) : ∃ ev : O⟦X⟧ →ₐ[O] L⟦X⟧, ev X = x := by
+theorem exists_ev
+    {c : O} (hc : c ∈ maximalIdeal O) (x : L⟦X⟧) (hx : constantCoeff x = algebraMap O L c)
+    : ∃ ev : O⟦X⟧ →ₐ[O] L⟦X⟧, ev X = x := by
   obtain ⟨s, hs⟩ := exists_shift hc
-  have hy : HasSubst (x - C (algebraMap O L c)) :=
-    HasSubst.of_constantCoeff_zero' (by simp [hx])
+  have hy : HasSubst (x - C (algebraMap O L c)) := HasSubst.of_constantCoeff_zero' (by simp [hx])
   refine ⟨(substAlgHom hy).comp s, ?_⟩
   have hC : (substAlgHom hy : O⟦X⟧ →ₐ[O] L⟦X⟧) (C c) = C (algebraMap O L c) :=
     ((substAlgHom hy : O⟦X⟧ →ₐ[O] L⟦X⟧).commutes c).trans (PowerSeries.algebraMap_apply (r := c))
   rw [AlgHom.comp_apply, hs, map_add (f := _), substAlgHom_X, hC]
   ring
 
-theorem ev_div {c : O} (hc : c ∈ maximalIdeal O) (x : L⟦X⟧)
-    (hx : constantCoeff x = algebraMap O L c) :
-    ∃ z : L⟦X⟧, ∀ b : O⟦X⟧, ∃ (r : O) (q : O⟦X⟧), ∀ ev : O⟦X⟧ →ₐ[O] L⟦X⟧, ev X = x →
-      ev b = C (algebraMap O L r) + X * (z * ev q) := by
+theorem ev_div
+    {c : O} (hc : c ∈ maximalIdeal O) (x : L⟦X⟧) (hx : constantCoeff x = algebraMap O L c)
+    : ∃ z : L⟦X⟧, ∀ b : O⟦X⟧, ∃ (r : O) (q : O⟦X⟧), ∀ ev : O⟦X⟧ →ₐ[O] L⟦X⟧,
+      ev X = x → ev b = C (algebraMap O L r) + X * (z * ev q) := by
   refine ⟨mk fun p => coeff (p + 1) x, fun b => ?_⟩
   obtain ⟨r, q, rfl⟩ := exists_div hc b
   refine ⟨r, q, fun ev hev => ?_⟩
@@ -76,9 +80,11 @@ theorem ev_div {c : O} (hc : c ∈ maximalIdeal O) (x : L⟦X⟧)
   rw [sub_eq_iff_eq_add]
   exact eq_X_mul_shift_add_const x
 
-theorem ev_unique {c : O} (hc : c ∈ maximalIdeal O) (x : L⟦X⟧)
-    (hx : constantCoeff x = algebraMap O L c) (ev ev' : O⟦X⟧ →ₐ[O] L⟦X⟧) (h : ev X = x)
-    (h' : ev' X = x) : ev = ev' := by
+theorem ev_unique
+    {c : O} (hc : c ∈ maximalIdeal O)
+    (x : L⟦X⟧) (hx : constantCoeff x = algebraMap O L c)
+    (ev ev' : O⟦X⟧ →ₐ[O] L⟦X⟧) (h : ev X = x) (h' : ev' X = x)
+    : ev = ev' := by
   obtain ⟨z, hz⟩ := ev_div hc x hx
   have key : ∀ (k : ℕ) (b : O⟦X⟧), X ^ k ∣ ev b - ev' b := by
     intro k
@@ -96,9 +102,13 @@ theorem ev_unique {c : O} (hc : c ∈ maximalIdeal O) (x : L⟦X⟧)
 
 variable {K : Type*} [NormedField K] (i : L →+* K)
 
-theorem ev_bounded (hi : ∀ r : O, ‖i (algebraMap O L r)‖ ≤ 1) {c : O} (hc : c ∈ maximalIdeal O)
-    (x : L⟦X⟧) (hx : constantCoeff x = algebraMap O L c) (ev : O⟦X⟧ →ₐ[O] L⟦X⟧) (h : ev X = x)
-    (k : ℕ) : ∃ B : ℝ, ∀ b, ‖i (coeff k (ev b))‖ ≤ B := by
+theorem ev_bounded
+    (hi : ∀ r : O, ‖i (algebraMap O L r)‖ ≤ 1)
+    {c : O} (hc : c ∈ maximalIdeal O)
+    (x : L⟦X⟧) (hx : constantCoeff x = algebraMap O L c)
+    (ev : O⟦X⟧ →ₐ[O] L⟦X⟧) (h : ev X = x)
+    (k : ℕ)
+    : ∃ B : ℝ, ∀ b, ‖i (coeff k (ev b))‖ ≤ B := by
   obtain ⟨z, hz⟩ := ev_div hc x hx
   induction k using Nat.strong_induction_on with
   | _ k ih =>
@@ -110,38 +120,45 @@ theorem ev_bounded (hi : ∀ r : O, ‖i (algebraMap O L r)‖ ≤ 1) {c : O} (h
       refine ⟨∑ p ∈ Finset.HasAntidiagonal.antidiagonal k, ‖i (coeff p.1 z)‖ * B p.2, fun b => ?_⟩
       obtain ⟨r, q, hq⟩ := hz b
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [hq ev h, map_add (f := _), coeff_succ_X_mul, coeff_C, if_neg k.succ_ne_zero, zero_add, coeff_mul,
-        map_sum]
+        rw [hq ev h, map_add (f := _), coeff_succ_X_mul, coeff_C, if_neg k.succ_ne_zero, zero_add,
+          coeff_mul, map_sum]
       refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun p hp => ?_)
       rw [map_mul, norm_mul]
       have := Finset.HasAntidiagonal.mem_antidiagonal.1 hp
       exact mul_le_mul_of_nonneg_left (hB _ (by omega) _) (norm_nonneg _)
 
-theorem ev_tendsto (hi : ∀ r : O, ‖i (algebraMap O L r)‖ ≤ 1) {c : O} (hc : c ∈ maximalIdeal O)
-    (hc1 : ‖i (algebraMap O L c)‖ < 1)
-    (x : L⟦X⟧) (hx : constantCoeff x = algebraMap O L c) (ev : O⟦X⟧ →ₐ[O] L⟦X⟧) (h : ev X = x)
-    (a : O⟦X⟧) (k : ℕ) :
-    Tendsto (fun m : ℕ => i (coeff k (ev ((trunc m a : Polynomial O) : O⟦X⟧)))) atTop
-      (𝓝 (i (coeff k (ev a)))) := by
+theorem ev_tendsto
+    (hi : ∀ r : O, ‖i (algebraMap O L r)‖ ≤ 1)
+    {c : O} (hc : c ∈ maximalIdeal O) (hc1 : ‖i (algebraMap O L c)‖ < 1)
+    (x : L⟦X⟧) (hx : constantCoeff x = algebraMap O L c)
+    (ev : O⟦X⟧ →ₐ[O] L⟦X⟧) (h : ev X = x)
+    (a : O⟦X⟧) (k : ℕ)
+    : Tendsto
+      (fun m : ℕ => i (coeff k (ev ((trunc m a : Polynomial O) : O⟦X⟧))))
+      atTop (𝓝 (i (coeff k (ev a)))) := by
   obtain ⟨B, hB⟩ := ev_bounded i hi hc x hx ev h k
   have hC : ev (C c) = C (algebraMap O L c) := (ev.commutes c).trans PowerSeries.algebraMap_apply
   rw [← tendsto_add_atTop_iff_nat k, tendsto_iff_norm_sub_tendsto_zero]
-  refine squeeze_zero (fun _ => norm_nonneg _) (g := fun n => ‖i (algebraMap O L c)‖ ^ n * B)
-    (fun n => ?_) (by
-      simpa using (tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) hc1).mul_const B)
+  refine squeeze_zero
+    (fun _ => norm_nonneg _)
+    (g := fun n => ‖i (algebraMap O L c)‖ ^ n * B)
+    (fun n => ?_)
+    (by simpa using (tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) hc1).mul_const B)
   obtain ⟨b, hb⟩ : X ^ (n + k) ∣ ((trunc (n + k) a : Polynomial O) : O⟦X⟧) - a :=
     X_pow_dvd_iff.2 fun m hm => by simp [coeff_trunc, hm]
-  have hmem : (C c + (X - C c) : O⟦X⟧) ^ (n + (k + 1) - 1) ∈
-      Ideal.span {C c ^ n, (X - C c) ^ (k + 1)} :=
-    Ideal.add_pow_add_pred_mem_of_pow_mem_of_commute _
-      (Ideal.subset_span (by simp)) (Ideal.subset_span (by simp)) (Commute.all _ _)
+  have hmem
+      : (C c + (X - C c) : O⟦X⟧) ^ (n + (k + 1) - 1) ∈ Ideal.span {C c ^ n, (X - C c) ^ (k + 1)} :=
+    Ideal.add_pow_add_pred_mem_of_pow_mem_of_commute _ (Ideal.subset_span (by simp))
+      (Ideal.subset_span (by simp)) (Commute.all _ _)
   rw [add_sub_cancel, show n + (k + 1) - 1 = n + k by omega, Ideal.mem_span_pair] at hmem
   obtain ⟨u, v, huv⟩ := hmem
   have hy : X ∣ x - C (algebraMap O L c) := X_dvd_iff.2 (by simp [hx])
   have h0 : coeff k ((x - C (algebraMap O L c)) ^ (k + 1) * ev (v * b)) = 0 :=
     X_pow_dvd_iff.1 ((pow_dvd_pow_of_dvd hy _).mul_right _) k k.lt_succ_self
-  have he : ev (X ^ (n + k) * b) = C (algebraMap O L c ^ n) * ev (u * b) +
-      (x - C (algebraMap O L c)) ^ (k + 1) * ev (v * b) := by
+  have he
+      : ev (X ^ (n + k) * b)
+        = C (algebraMap O L c ^ n) * ev (u * b)
+          + (x - C (algebraMap O L c)) ^ (k + 1) * ev (v * b) := by
     rw [← huv]
     simp only [map_mul, map_add (f := _), map_pow, map_sub, hC, h]
     ring
@@ -151,25 +168,35 @@ theorem ev_tendsto (hi : ∀ r : O, ‖i (algebraMap O L r)‖ ≤ 1) {c : O} (h
 
 end Shift
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct GlobalTheory.HWL
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct GlobalTheory.HWL
 
-theorem existsUnique_ev : ∀ (l : ℕ) [Fact l.Prime] (LL : FinExt l) (x : PowerSeries ↥LL.1),
-    ‖((PowerSeries.constantCoeff x : ↥LL.1) : Om l)‖ < 1 →
-    (∃! ev : PowerSeries ↥(OL LL) →ₐ[↥(OL LL)] PowerSeries ↥LL.1, ev PowerSeries.X = x) ∧
-    ∀ ev : PowerSeries ↥(OL LL) →ₐ[↥(OL LL)] PowerSeries ↥LL.1, ev PowerSeries.X = x →
-      ∀ (a : PowerSeries ↥(OL LL)) (k : ℕ), Filter.Tendsto (fun m : ℕ =>
-        ((PowerSeries.coeff k (ev ((PowerSeries.trunc m a : Polynomial ↥(OL LL)) :
-          PowerSeries ↥(OL LL))) : ↥LL.1) : Om l)) Filter.atTop
-        (nhds ((PowerSeries.coeff k (ev a) : ↥LL.1) : Om l)) := by
+theorem existsUnique_ev
+    : ∀ (l : ℕ) [Fact l.Prime] (LL : FinExt l) (x : PowerSeries ↥LL.1),
+      ‖((PowerSeries.constantCoeff x : ↥LL.1) : Om l)‖ < 1
+        → (∃! ev : PowerSeries ↥(OL LL) →ₐ[↥(OL LL)] PowerSeries ↥LL.1, ev PowerSeries.X = x)
+          ∧ ∀ ev : PowerSeries ↥(OL LL) →ₐ[↥(OL LL)] PowerSeries ↥LL.1,
+            ev PowerSeries.X = x
+              → ∀ (a : PowerSeries ↥(OL LL)) (k : ℕ),
+                Filter.Tendsto
+                  (fun m : ℕ =>
+                    ((PowerSeries.coeff k
+                          (ev
+                            ((PowerSeries.trunc m a : Polynomial ↥(OL LL)) : PowerSeries ↥(OL LL)))
+                        : ↥LL.1)
+                      : Om l))
+                  Filter.atTop (nhds ((PowerSeries.coeff k (ev a) : ↥LL.1) : Om l)) := by
   intro l _ LL x hx
   obtain ⟨_, hcomp, -⟩ := GlobalTheory.Per.integers_completeDVR l LL
   have hfin := LL.2
   have hn : ∀ y : ↥LL.1, ‖GlobalTheory.DiscEval.fieldEmb LL.1 y‖ = ‖(y : Om l)‖ := fun y => by
     rw [GlobalTheory.DiscEval.fieldEmb_apply, PadicComplex.norm_extends]
-  have hi : ∀ r : ↥(OL LL), ‖algebraMap ↥LL.1 (Om l) (algebraMap ↥(OL LL) ↥LL.1 r)‖ ≤ 1 :=
-    fun r => (hn r).ge.trans ((GlobalTheory.DiscEval.mem_integralClosure_iff_norm LL.1 r).1 r.2)
-  let c : ↥(OL LL) := ⟨constantCoeff x,
-    (GlobalTheory.DiscEval.mem_integralClosure_iff_norm LL.1 _).2 ((hn _).trans_le hx.le)⟩
+  have hi : ∀ r : ↥(OL LL), ‖algebraMap ↥LL.1 (Om l) (algebraMap ↥(OL LL) ↥LL.1 r)‖ ≤ 1 := fun r =>
+    (hn r).ge.trans ((GlobalTheory.DiscEval.mem_integralClosure_iff_norm LL.1 r).1 r.2)
+  let c : ↥(OL LL) := ⟨
+    constantCoeff x,
+    (GlobalTheory.DiscEval.mem_integralClosure_iff_norm LL.1 _).2 ((hn _).trans_le hx.le)
+  ⟩
   have hxc : constantCoeff x = algebraMap ↥(OL LL) ↥LL.1 c := rfl
   have hc : c ∈ maximalIdeal ↥(OL LL) := fun hu =>
     ((hn _).trans_lt hx).ne ((GlobalTheory.DiscEval.isUnit_iff_norm LL.1 c).1 hu)
@@ -178,8 +205,7 @@ theorem existsUnique_ev : ∀ (l : ℕ) [Fact l.Prime] (LL : FinExt l) (x : Powe
       (PowerSeries.algebraMap_apply (R := ↥(OL LL)) (A := ↥LL.1) (r := r)).symm
   generalize ((OL LL).toAlgebra : Algebra ↥(OL LL) (↥LL.1)⟦X⟧) = inst at hinst ⊢
   subst hinst
-  refine ⟨?_, fun ev hev a k =>
-    ev_tendsto (algebraMap ↥LL.1 (Om l)) hi hc hx x hxc ev hev a k⟩
+  refine ⟨?_, fun ev hev a k => ev_tendsto (algebraMap ↥LL.1 (Om l)) hi hc hx x hxc ev hev a k⟩
   obtain ⟨ev, hev⟩ := exists_ev hc x hxc
   exact ⟨ev, hev, fun ev' hev' => ev_unique hc x hxc ev' ev hev' hev⟩
 

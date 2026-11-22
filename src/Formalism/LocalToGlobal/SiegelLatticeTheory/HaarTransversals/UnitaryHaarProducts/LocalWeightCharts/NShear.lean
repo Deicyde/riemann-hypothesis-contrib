@@ -28,8 +28,8 @@ def shG (m₀ : Mx k r) (x : CI k r → ℂ) : CI k r → ℂ
 
 def shH (m₀ : Mx k r) (x : CI k r → ℂ) : Fin r → ℝ := fun a => (dlt m₀ x a a).im
 
-theorem split_low {A : Matrix (Fin r) (Fin r) ℂ} (hA : LowId A) (v : Fin r → ℂ) (a : Fin r) :
-    ∑ c, A a c * v c = v a + ∑ c, if a < c then A a c * v c else 0 := by
+theorem split_low {A : Matrix (Fin r) (Fin r) ℂ} (hA : LowId A) (v : Fin r → ℂ) (a : Fin r)
+    : ∑ c, A a c * v c = v a + ∑ c, if a < c then A a c * v c else 0 := by
   have : ∀ c, A a c * v c = (if a = c then v c else 0) + (if a < c then A a c * v c else 0) := by
     intro c
     rcases lt_trichotomy a c with h | rfl | h
@@ -42,8 +42,8 @@ theorem split_low {A : Matrix (Fin r) (Fin r) ℂ} (hA : LowId A) (v : Fin r →
 
 theorem lowId_bA {g : Mx k r} (hc : ColB g) : LowId (bA g) := fun a b h => hc.aa a b h
 
-theorem mof_mul {m₀ g : Mx k r} (h0 : m₀ ∈ Nset k r) (hg : g ∈ Nset k r) :
-    mof (m₀ * g) = mof g + (bF g)ᴴ * ((bF m₀)ᴴ * (bB m₀ * bE g + bC m₀ * bF g)) := by
+theorem mof_mul {m₀ g : Mx k r} (h0 : m₀ ∈ Nset k r) (hg : g ∈ Nset k r)
+    : mof (m₀ * g) = mof g + (bF g)ᴴ * ((bF m₀)ᴴ * (bB m₀ * bE g + bC m₀ * bF g)) := by
   have hc0 := colB_of_mem h0
   have hF0 := rel_F hc0 h0.1
   rw [mof, mof, bF_mul hc0, bC_mul, conjTranspose_mul]
@@ -53,8 +53,8 @@ theorem mof_mul {m₀ g : Mx k r} (h0 : m₀ ∈ Nset k r) (hg : g ∈ Nset k r)
   rw [this]
   simp only [Matrix.mul_assoc, Matrix.mul_add]
 
-theorem lmul_coord {m₀ : Mx k r} (h0 : m₀ ∈ Nset k r) (x : CI k r → ℂ) (s : Fin r → ℝ) :
-    psiC (m₀ * phi0 x s) = x + shG m₀ x ∧ psiR (m₀ * phi0 x s) = s + shH m₀ x := by
+theorem lmul_coord {m₀ : Mx k r} (h0 : m₀ ∈ Nset k r) (x : CI k r → ℂ) (s : Fin r → ℝ)
+    : psiC (m₀ * phi0 x s) = x + shG m₀ x ∧ psiR (m₀ * phi0 x s) = s + shH m₀ x := by
   have hg := test_vector_mem_schwartz_bruhat x s
   have hcg := colB_of_mem hg
   have hc0 := colB_of_mem h0
@@ -83,12 +83,14 @@ theorem lmul_coord {m₀ : Mx k r} (h0 : m₀ ∈ Nset k r) (x : CI k r → ℂ)
     rw [hM, Matrix.add_apply, Complex.add_im, e1]
     rfl
 
-theorem shG_dep (m₀ : Mx k r) (i : CI k r) (x y : CI k r → ℂ)
-    (hxy : ∀ j, rk j < rk i → x j = y j) : shG m₀ x i = shG m₀ y i := by
+theorem shG_dep (m₀ : Mx k r) (i : CI k r) (x y : CI k r → ℂ) (hxy : ∀ j, rk j < rk i → x j = y j)
+    : shG m₀ x i = shG m₀ y i := by
   have hAB : (∀ j, rk j ≤ r → x j = y j) → cA x = cA y ∧ cB x = cB y := by
     intro h
     refine ⟨?_, ?_⟩
-    · ext a b; unfold cA; split_ifs with h1
+    · ext a b
+      unfold cA
+      split_ifs with h1
       · exact h _ (by simp only [rk]; omega)
       · rfl
       · rfl
@@ -131,21 +133,28 @@ theorem continuous_shG (m₀ : Mx k r) (i : CI k r) : Continuous fun x => shG m�
     · exact continuous_const.mul (continuous_cB.matrix_elem _ _)
     · exact continuous_const
   · simp only [shG]
-    exact (((continuous_dlt m₀).matrix_elem _ _).sub ((continuous_dlt m₀).matrix_elem _ _).star).div_const _
+    exact (((continuous_dlt m₀).matrix_elem _ _).sub
+      ((continuous_dlt m₀).matrix_elem _ _).star).div_const _
 
 theorem continuous_shH (m₀ : Mx k r) : Continuous (shH m₀) :=
   continuous_pi fun a => Complex.continuous_im.comp ((continuous_dlt m₀).matrix_elem a a)
 
-theorem shear_mp {ι : Type} [Fintype ι] [DecidableEq ι] {d : ℕ} (rkf : ι → ℕ) (G : (ι → ℂ) → ι → ℂ)
-    (H : (ι → ℂ) → Fin d → ℝ) (hG : ∀ i, Measurable fun x => G x i)
-    (hdep : ∀ i (x y : ι → ℂ), (∀ j, rkf j < rkf i → x j = y j) → G x i = G y i)
-    (hH : Measurable H) :
-    MeasurePreserving (fun t : (ι → ℂ) × (Fin d → ℝ) => (t.1 + G t.1, t.2 + H t.1)) volume volume := by
+theorem shear_mp
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {d : ℕ}
+    (rkf : ι → ℕ) (G : (ι → ℂ) → ι → ℂ) (H : (ι → ℂ) → Fin d → ℝ)
+    (hG : ∀ i, Measurable fun x => G x i)
+    (hdep : ∀ i (x y : ι → ℂ), (∀ j, rkf j < rkf i → x j = y j) → G x i = G y i) (hH : Measurable H)
+    : MeasurePreserving
+      (fun t : (ι → ℂ) × (Fin d → ℝ) => (t.1 + G t.1, t.2 + H t.1))
+      volume volume := by
   have h1 : MeasurePreserving (fun x : ι → ℂ => fun i => x i + G x i) volume volume :=
     PI.LowSplitHaarW.triShear ι rkf (fun i x => G x i) hG hdep
-  have h2 := h1.skew_product (μc := (volume : Measure (Fin d → ℝ))) (μd := volume)
-    (g := fun x s => s + H x) (measurable_snd.add (hH.comp measurable_fst))
-    (Filter.Eventually.of_forall fun x => map_add_right_eq_self volume (H x))
+  have h2 :=
+    h1.skew_product (μc := (volume : Measure (Fin d → ℝ))) (μd := volume)
+      (g := fun x s => s + H x)
+      (measurable_snd.add (hH.comp measurable_fst))
+      (Filter.Eventually.of_forall fun x => map_add_right_eq_self volume (H x))
   exact h2
 
 end WlocSk.NB

@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsBar
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 noncomputable section
 
@@ -15,12 +16,16 @@ section ConeFacts
 
 variable {X : Type} [AddCommGroup X]
 
-theorem apply_eq_of_toReal_eq {m : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} {c : Fin m → ℝ}
-    {β : LinearMap.BilinForm ℤ X} (h : toReal β = ∑ i, c i • toReal (γ i)) (ℓ : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ) :
-    (ℓ β : ℝ) = ∑ i, c i * ℓ (γ i) := by
-  have h0 : ∑ i : Fin (m + 1), (Fin.cons (-1) c : Fin (m + 1) → ℝ) i •
-      toReal ((LinearMap.id : LinearMap.BilinForm ℤ X →ₗ[ℤ] LinearMap.BilinForm ℤ X)
-        ((Fin.cons β γ : Fin (m + 1) → LinearMap.BilinForm ℤ X) i)) = 0 := by
+theorem apply_eq_of_toReal_eq
+    {m : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} {c : Fin m → ℝ} {β : LinearMap.BilinForm ℤ X}
+    (h : toReal β = ∑ i, c i • toReal (γ i))
+    (ℓ : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ)
+    : (ℓ β : ℝ) = ∑ i, c i * ℓ (γ i) := by
+  have h0
+      : ∑ i : Fin (m + 1), (Fin.cons (-1) c : Fin (m + 1) → ℝ) i •
+          toReal ((LinearMap.id : LinearMap.BilinForm ℤ X →ₗ[ℤ] LinearMap.BilinForm ℤ X)
+            ((Fin.cons β γ : Fin (m + 1) → LinearMap.BilinForm ℤ X) i))
+        = 0 := by
     rw [Fin.sum_univ_succ]
     simp only [Fin.cons_zero, Fin.cons_succ, LinearMap.id_apply, neg_one_smul, ← h, neg_add_cancel]
   have key := sum_mul_eq_zero_of_sum_toReal (fun _ _ hab => hab) ℓ h0
@@ -28,8 +33,10 @@ theorem apply_eq_of_toReal_eq {m : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ 
   simp only [Fin.cons_zero, Fin.cons_succ] at key
   linarith
 
-theorem InRCone.apply_nonneg {m : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} {β : LinearMap.BilinForm ℤ X}
-    (h : InRCone γ β) (ℓ : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ) (hℓ : ∀ i, 0 ≤ ℓ (γ i)) : 0 ≤ ℓ β := by
+theorem InRCone.apply_nonneg
+    {m : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} {β : LinearMap.BilinForm ℤ X} (h : InRCone γ β)
+    (ℓ : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ) (hℓ : ∀ i, 0 ≤ ℓ (γ i))
+    : 0 ≤ ℓ β := by
   obtain ⟨c, hc, hβ⟩ := h
   have e := apply_eq_of_toReal_eq hβ ℓ
   have hr : (0 : ℝ) ≤ ℓ β := by
@@ -37,19 +44,27 @@ theorem InRCone.apply_nonneg {m : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X
     exact Finset.sum_nonneg fun i _ => mul_nonneg (hc i) (by exact_mod_cast hℓ i)
   exact_mod_cast hr
 
-theorem inRCone_trans {m n : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} {δ : Fin n → LinearMap.BilinForm ℤ X}
-    (hδ : ∀ j, InRCone γ (δ j)) {β : LinearMap.BilinForm ℤ X} (hβ : InRCone δ β) : InRCone γ β := by
+theorem inRCone_trans
+    {m n : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} {δ : Fin n → LinearMap.BilinForm ℤ X}
+    (hδ : ∀ j, InRCone γ (δ j))
+    {β : LinearMap.BilinForm ℤ X} (hβ : InRCone δ β)
+    : InRCone γ β := by
   choose a ha hδe using hδ
   obtain ⟨b, hb, hβe⟩ := hβ
-  refine ⟨fun i => ∑ j, b j * a j i, fun i => Finset.sum_nonneg fun j _ => mul_nonneg (hb j) (ha j i), ?_⟩
+  refine ⟨
+    fun i => ∑ j, b j * a j i,
+    fun i => Finset.sum_nonneg fun j _ => mul_nonneg (hb j) (ha j i),
+    ?_
+  ⟩
   rw [hβe]
   simp only [hδe, Finset.smul_sum, smul_smul, Finset.sum_smul]
   exact Finset.sum_comm
 
-theorem eq_zero_of_toReal_rel {a b : ℕ} {u : Fin a → LinearMap.BilinForm ℤ X} {v : Fin b → LinearMap.BilinForm ℤ X}
+theorem eq_zero_of_toReal_rel
+    {a b : ℕ} {u : Fin a → LinearMap.BilinForm ℤ X} {v : Fin b → LinearMap.BilinForm ℤ X}
     (hind : ∀ (d : Fin b → ℤ) (c : Fin a → ℤ), ∑ j, c j • u j = ∑ k, d k • v k → c = 0)
-    {r : Fin a → ℝ} {s : Fin b → ℝ} (h : ∑ j, r j • toReal (u j) = ∑ k, s k • toReal (v k)) : r = 0 := by
-
+    {r : Fin a → ℝ} {s : Fin b → ℝ} (h : ∑ j, r j • toReal (u j) = ∑ k, s k • toReal (v k))
+    : r = 0 := by
   have hpt : ∀ x y : X, ∑ j, r j * (u j x y : ℝ) = ∑ k, s k * (v k x y : ℝ) := by
     intro x y
     have hxy := congrArg (fun B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ => B x y) h
@@ -71,8 +86,9 @@ theorem eq_zero_of_toReal_rel {a b : ℕ} {u : Fin a → LinearMap.BilinForm ℤ
 
   let N : ℕ := (∏ j, (f (r j)).den) * ∏ k, (f (s k)).den
   have hN : (N : ℚ) ≠ 0 := by
-    have : N ≠ 0 := mul_ne_zero (Finset.prod_ne_zero_iff.mpr fun j _ => (f (r j)).den_nz)
-      (Finset.prod_ne_zero_iff.mpr fun k _ => (f (s k)).den_nz)
+    have : N ≠ 0 :=
+      mul_ne_zero (Finset.prod_ne_zero_iff.mpr fun j _ => (f (r j)).den_nz)
+        (Finset.prod_ne_zero_iff.mpr fun k _ => (f (s k)).den_nz)
     exact_mod_cast this
   have key : ∀ q : ℚ, q.den ∣ N → ((((N / q.den : ℕ) : ℤ) * q.num : ℤ) : ℚ) = N * q := by
     intro q hq'
@@ -94,11 +110,12 @@ theorem eq_zero_of_toReal_rel {a b : ℕ} {u : Fin a → LinearMap.BilinForm ℤ
     push_cast
     simp only [hc, hd]
     have := hq x y
-    calc ∑ j, (N : ℚ) * f (r j) * (u j x y : ℚ) = N * ∑ j, ((u j x y : ℤ) : ℚ) * f (r j) := by
-          rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun j _ => by ring
+    calc
+      ∑ j, (N : ℚ) * f (r j) * (u j x y : ℚ) = N * ∑ j, ((u j x y : ℤ) : ℚ) * f (r j) := by
+        rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun j _ => by ring
       _ = N * ∑ k, ((v k x y : ℤ) : ℚ) * f (s k) := by rw [this]
       _ = ∑ k, (N : ℚ) * f (s k) * (v k x y : ℚ) := by
-          rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun k _ => by ring
+        rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun k _ => by ring
   have h0 := hind d c hrel
   intro j
   have hcj : (c j : ℚ) = 0 := by rw [h0]; simp
@@ -110,11 +127,13 @@ end ConeFacts
 
 section CellFacts
 
-variable {O : Type} [CommRing O] {bar : O → O} {φ : InvFun O} {X : Type} [AddCommGroup X] [Module O X]
-  [Module.Finite O X]
+variable
+  {O : Type} [CommRing O]
+  {bar : O → O} {φ : InvFun O} {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
 
-theorem IsCell.reindex {m m' : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} (h : IsCell bar φ γ) (e : Fin m' ≃ Fin m) :
-    IsCell bar φ fun i => γ (e i) := by
+theorem IsCell.reindex
+    {m m' : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} (h : IsCell bar φ γ) (e : Fin m' ≃ Fin m)
+    : IsCell bar φ fun i => γ (e i) := by
   obtain ⟨hmem, hnn, hlin, hstr⟩ := h
   refine ⟨fun i => hmem (e i), fun i y => hnn (e i) y, ?_, ?_⟩
   · intro c hc

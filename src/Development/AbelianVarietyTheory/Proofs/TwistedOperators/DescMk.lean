@@ -8,22 +8,43 @@ namespace GlobalTheory.QuotientDescentTwistedOperators
 
 open Topology
 
-noncomputable def desc {G : Type} [AddCommGroup G] [TopologicalSpace G] (Γ : AddSubgroup G)
-    (f : G → ℂ) (hf : Continuous f) (hΓ : ∀ γ ∈ Γ, ∀ x, f (γ + x) = f x) : C(G ⧸ Γ, ℂ) where
-  toFun := fun q => Quotient.liftOn' q f (by
-    intro a b hab
-    rw [QuotientAddGroup.leftRel_apply] at hab
-    have := hΓ _ hab a
-    rw [← this]
-    congr 1
-    abel)
+noncomputable def desc
+    {G : Type} [AddCommGroup G] [TopologicalSpace G]
+    (Γ : AddSubgroup G) (f : G → ℂ) (hf : Continuous f) (hΓ : ∀ γ ∈ Γ, ∀ x, f (γ + x) = f x)
+    : C(G ⧸ Γ, ℂ) where
+  toFun := fun q =>
+    Quotient.liftOn' q f (by
+      intro a b hab
+      rw [QuotientAddGroup.leftRel_apply] at hab
+      have := hΓ _ hab a
+      rw [← this]
+      congr 1
+      abel)
   continuous_toFun := hf.quotient_liftOn' _
 
-theorem desc_mk {G : Type} [AddCommGroup G] [TopologicalSpace G] (Γ : AddSubgroup G)
-    (f : G → ℂ) (hf : Continuous f) (hΓ : ∀ γ ∈ Γ, ∀ x, f (γ + x) = f x) (x : G) :
-    desc Γ f hf hΓ (QuotientAddGroup.mk x) = f x := rfl
+theorem desc_mk
+    {G : Type} [AddCommGroup G] [TopologicalSpace G]
+    (Γ : AddSubgroup G) (f : G → ℂ) (hf : Continuous f) (hΓ : ∀ γ ∈ Γ, ∀ x, f (γ + x) = f x)
+    (x : G)
+    : desc Γ f hf hΓ (QuotientAddGroup.mk x) = f x :=
+  rfl
 
-theorem approx : ∀ (G : Type) [inst : AddCommGroup G] [inst_1 : TopologicalSpace G] [IsTopologicalAddGroup G] [T2Space G] [LocallyCompactSpace G] [SecondCountableTopology G] [inst_6 : MeasurableSpace G] [BorelSpace G] (Γ : AddSubgroup G) [DiscreteTopology ↥Γ] (K : Set G), IsCompact K → (∀ (x : G), ∃ γ ∈ Γ, γ + x ∈ K) → ∀ (A : Type) [inst_9 : AddCommGroup A] (χ : A → G → ℂ), (∀ (a : A), Continuous (χ a)) → (∀ (a : A) (x y : G), χ a (x + y) = χ a x * χ a y) → (∀ (a b : A) (x : G), χ (a + b) x = χ a x * χ b x) → (∀ (x : G), χ (0 : A) x = (1 : ℂ)) → (∀ (a : A) (x : G), ‖χ a x‖ = (1 : ℝ)) → (∀ (x : G), (∀ (a : A), χ a x = (1 : ℂ)) ↔ x ∈ Γ) → ∀ (Φ : G → ℂ), Continuous Φ → (∀ γ ∈ Γ, ∀ (x : G), Φ (γ + x) = Φ x) → ∀ (ε : ℝ), (0 : ℝ) < ε → ∃ (s : Finset A) (c : A → ℂ), ∀ (x : G), ‖Φ x - ∑ a ∈ s, c a * χ a x‖ ≤ ε := by
+theorem approx
+    : ∀ (G : Type) [inst : AddCommGroup G] [inst_1 : TopologicalSpace G] [IsTopologicalAddGroup G]
+        [T2Space G] [LocallyCompactSpace G] [SecondCountableTopology G] [inst_6 : MeasurableSpace G]
+        [BorelSpace G] (Γ : AddSubgroup G) [DiscreteTopology ↥Γ] (K : Set G),
+      IsCompact K → (∀ (x : G), ∃ γ ∈ Γ, γ + x ∈ K)
+        → ∀ (A : Type) [inst_9 : AddCommGroup A] (χ : A → G → ℂ),
+          (∀ (a : A), Continuous (χ a)) → (∀ (a : A) (x y : G), χ a (x + y) = χ a x * χ a y)
+            → (∀ (a b : A) (x : G), χ (a + b) x = χ a x * χ b x)
+            → (∀ (x : G), χ (0 : A) x = (1 : ℂ)) → (∀ (a : A) (x : G), ‖χ a x‖ = (1 : ℝ))
+            → (∀ (x : G), (∀ (a : A), χ a x = (1 : ℂ)) ↔ x ∈ Γ)
+            → ∀ (Φ : G → ℂ),
+              Continuous Φ → (∀ γ ∈ Γ, ∀ (x : G), Φ (γ + x) = Φ x)
+                → ∀ (ε : ℝ),
+                  (0 : ℝ) < ε
+                    → ∃ (s : Finset A) (c : A → ℂ), ∀ (x : G),
+                      ‖Φ x - ∑ a ∈ s, c a * χ a x‖ ≤ ε := by
   intro G _ _ _ _ _ _ _ _ Γ _ K hK hcov A _ χ hc hmulx hadd hzero hnorm hker Φ hΦ hΦinv ε hε
 
   have : CompactSpace (G ⧸ Γ) := by
@@ -85,16 +106,17 @@ theorem approx : ∀ (G : Type) [inst : AddCommGroup G] [inst_1 : TopologicalSpa
     | zero => rw [star_zero]; exact S.zero_mem
     | add x y _ _ hx hy => rw [star_add]; exact S.add_mem hx hy
     | smul c x _ hx => rw [star_smul]; exact S.smul_mem _ hx
-  let B : StarSubalgebra ℂ C(G ⧸ Γ, ℂ) :=
-    { carrier := S
-      mul_mem' := fun {f g} hf hg => hmul f g hf hg
-      one_mem' := hone
-      add_mem' := fun hf hg => S.add_mem hf hg
-      zero_mem' := S.zero_mem
-      algebraMap_mem' := fun c => by
-        rw [Algebra.algebraMap_eq_smul_one]
-        exact S.smul_mem c hone
-      star_mem' := fun {f} hf => hstar f hf }
+  let B : StarSubalgebra ℂ C(G ⧸ Γ, ℂ) := {
+    carrier := S
+    mul_mem' := fun {f g} hf hg => hmul f g hf hg
+    one_mem' := hone
+    add_mem' := fun hf hg => S.add_mem hf hg
+    zero_mem' := S.zero_mem
+    algebraMap_mem' := fun c => by
+      rw [Algebra.algebraMap_eq_smul_one]
+      exact S.smul_mem c hone
+    star_mem' := fun {f} hf => hstar f hf
+  }
 
   have hsep : B.SeparatesPoints := by
     intro q₁ q₂
@@ -124,7 +146,8 @@ theorem approx : ∀ (G : Type) [inst : AddCommGroup G] [inst_1 : TopologicalSpa
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [ContinuousMap.smul_apply, he_apply, smul_eq_mul]
   rw [hval, ← desc_mk Γ Φ hΦ hΦinv x]
-  calc ‖Φq (QuotientAddGroup.mk x) - g (QuotientAddGroup.mk x)‖
+  calc
+    ‖Φq (QuotientAddGroup.mk x) - g (QuotientAddGroup.mk x)‖
       = ‖(Φq - g) (QuotientAddGroup.mk x)‖ := rfl
     _ ≤ ‖Φq - g‖ := ContinuousMap.norm_coe_le_norm _ _
     _ = dist Φq g := (dist_eq_norm _ _).symm

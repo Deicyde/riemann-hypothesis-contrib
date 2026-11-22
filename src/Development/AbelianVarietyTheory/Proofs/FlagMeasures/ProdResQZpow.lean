@@ -17,13 +17,17 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.ResProd
 
-theorem vE_eq_neg_log {F : Type} [Field F] [NumberField F] (p : HeightOneSpectrum (𝓞 F))
+theorem vE_eq_neg_log
+    {F : Type} [Field F] [NumberField F]
+    (p : HeightOneSpectrum (𝓞 F))
     {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-    {E : Type} [CommRing E] [Algebra K E] [TopologicalSpace E] (L : LocE K E)
+    {E : Type} [CommRing E] [Algebra K E] [TopologicalSpace E]
+    (L : LocE K E)
     (ι : F →+* K) (hd : DenseRange ι)
     (hv : ∀ x y : F, valuation K (ι x) ≤ valuation K (ι y) ↔ p.valuation F x ≤ p.valuation F y)
-    {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ) {x : F} (hx : x ≠ 0) :
-    vE L ϖ (algebraMap K E (ι x)) = -WithZero.log (p.valuation F x) := by
+    {ϖ : 𝒪[K]} (hϖ : Irreducible ϖ)
+    {x : F} (hx : x ≠ 0)
+    : vE L ϖ (algebraMap K E (ι x)) = - WithZero.log (p.valuation F x) := by
   have hιx : ι x ≠ 0 := (map_ne_zero ι).mpr hx
   obtain ⟨k, u, hku⟩ := GlobalTheory.UnramVal.exists_eq_zpow_mul_unit hϖ hιx
   rw [hku, GlobalTheory.UnramVal.vE_zpow_mul_unit L hϖ k u]
@@ -55,36 +59,51 @@ theorem vE_eq_neg_log {F : Type} [Field F] [NumberField F] (p : HeightOneSpectru
   simp only [map_mul, map_zpow₀, hku, hunit, mul_one, hvq] at hvz
   rw [← zpow_add₀ hϖ0] at hvz
 
-  have hle := (GlobalTheory.UnramVal.zpow_mul_unit_mem_iff hϖ (k + n) 1).mp (by
-    rw [Valuation.mem_integer_iff]
-    simp only [Units.val_one, OneMemClass.coe_one, mul_one, map_zpow₀, hvz, le_refl])
-  have hge := (GlobalTheory.UnramVal.zpow_mul_unit_mem_iff hϖ (-(k + n)) 1).mp (by
-    rw [Valuation.mem_integer_iff]
-    simp only [Units.val_one, OneMemClass.coe_one, mul_one, map_zpow₀, zpow_neg, map_inv₀, hvz, inv_one,
-      le_refl])
+  have hle :=
+    (GlobalTheory.UnramVal.zpow_mul_unit_mem_iff hϖ (k + n) 1).mp (by
+      rw [Valuation.mem_integer_iff]
+      simp only [Units.val_one, OneMemClass.coe_one, mul_one, map_zpow₀, hvz, le_refl])
+  have hge :=
+    (GlobalTheory.UnramVal.zpow_mul_unit_mem_iff hϖ (-(k + n)) 1).mp (by
+      rw [Valuation.mem_integer_iff]
+      simp only [Units.val_one, OneMemClass.coe_one, mul_one, map_zpow₀, zpow_neg, map_inv₀, hvz,
+        inv_one, le_refl])
   omega
 
-theorem place_eq_zpow {F : Type} [Field F] [NumberField F] (p : HeightOneSpectrum (𝓞 F))
-    {x : F} (hx : x ≠ 0) :
-    FinitePlace.equivHeightOneSpectrum.symm p x =
-      (Ideal.absNorm p.asIdeal : ℝ) ^ WithZero.log (p.valuation F x) := by
+theorem place_eq_zpow
+    {F : Type} [Field F] [NumberField F] (p : HeightOneSpectrum (𝓞 F)) {x : F} (hx : x ≠ 0)
+    : FinitePlace.equivHeightOneSpectrum.symm p x
+      = (Ideal.absNorm p.asIdeal : ℝ) ^ WithZero.log (p.valuation F x) := by
   have h0 : p.valuation F x ≠ 0 := (Valuation.ne_zero_iff _).mpr hx
   rw [NumberField.FinitePlace.equivHeightOneSpectrum_symm_apply,
     NumberField.FinitePlace.norm_embedding', WithZeroMulInt.toNNReal_neg_apply _ h0,
     NNReal.coe_zpow, NNReal.coe_natCast]
 
-theorem prod_resQ_zpow : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E} (A : Places F E sig), ∀ ϖ : ∀ p, 𝒪[(A.loc p).Fp], (∀ p, Irreducible (ϖ p)) → ∀ x : F, x ≠ 0 → {p | vE (A.L p) (ϖ p) (algebraMap (A.loc p).Fp (A.loc p).Ep ((A.loc p).ιF x)) ≠ 0}.Finite ∧ ∏ᶠ p, (resQ (ϖ p) : ℝ) ^ vE (A.L p) (ϖ p) (algebraMap (A.loc p).Fp (A.loc p).Ep ((A.loc p).ιF x)) = |((Algebra.norm ℚ x : ℚ) : ℝ)| := by
+theorem prod_resQ_zpow
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        {sig : E →ₐ[F] E} (A : Places F E sig),
+      ∀ ϖ : ∀ p, 𝒪[(A.loc p).Fp],
+        (∀ p, Irreducible (ϖ p))
+          → ∀ x : F,
+            x ≠ 0
+              → {p | vE (A.L p) (ϖ p) (algebraMap (A.loc p).Fp (A.loc p).Ep ((A.loc p).ιF x)) ≠ 0}.Finite
+                ∧ ∏ᶠ p, (resQ (ϖ p) : ℝ) ^ vE (A.L p) (ϖ p) (algebraMap (A.loc p).Fp (A.loc p).Ep ((A.loc p).ιF x))
+                  = |((Algebra.norm ℚ x : ℚ) : ℝ)| := by
   intro F E _ _ _ _ _ sig A ϖ hϖ x hx
 
-  have key : ∀ p, vE (A.L p) (ϖ p) (algebraMap (A.loc p).Fp (A.loc p).Ep ((A.loc p).ιF x)) =
-      -WithZero.log (p.valuation F x) := fun p => by
+  have key
+      : ∀ p,
+        vE (A.L p) (ϖ p) (algebraMap (A.loc p).Fp (A.loc p).Ep ((A.loc p).ιF x))
+          = - WithZero.log (p.valuation F x) := fun p => by
     haveI := (A.loc p).lf
     exact vE_eq_neg_log p (A.L p) (A.loc p).ιF (A.loc p).dense
       (GlobalTheory.HL.PlacesInt.val_le_iff (A.loc p)) (hϖ p) hx
-  have hterm : ∀ p, (resQ (ϖ p) : ℝ) ^ vE (A.L p) (ϖ p)
-      (algebraMap (A.loc p).Fp (A.loc p).Ep ((A.loc p).ιF x)) =
-      (NumberField.FinitePlace.equivHeightOneSpectrum.symm p x)⁻¹ := fun p => by
-    rw [key, GlobalTheory.HL.PlacesInt.resQ_eq_absNorm (A.loc p) (ϖ p) (hϖ p), place_eq_zpow p hx, zpow_neg]
+  have hterm
+      : ∀ p,
+        (resQ (ϖ p) : ℝ) ^ vE (A.L p) (ϖ p) (algebraMap (A.loc p).Fp (A.loc p).Ep ((A.loc p).ιF x))
+          = (NumberField.FinitePlace.equivHeightOneSpectrum.symm p x)⁻¹ := fun p => by
+    rw [key, GlobalTheory.HL.PlacesInt.resQ_eq_absNorm (A.loc p) (ϖ p) (hϖ p), place_eq_zpow p hx,
+      zpow_neg]
   have hfin : (Function.mulSupport fun w : NumberField.FinitePlace F => w x).Finite :=
     NumberField.FinitePlace.hasFiniteMulSupport hx
   constructor

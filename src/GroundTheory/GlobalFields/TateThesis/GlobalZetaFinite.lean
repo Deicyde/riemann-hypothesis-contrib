@@ -18,9 +18,11 @@ section Invariant
 
 variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-theorem continuous_of_forall_mul_eq {X : Type*} [TopologicalSpace X] {W : Subgroup G}
-    (hW : IsOpen (W : Set G)) {F : G → X} (hF : ∀ x, ∀ w ∈ W, F (x * w) = F x) :
-    Continuous F := by
+theorem continuous_of_forall_mul_eq
+    {X : Type*} [TopologicalSpace X]
+    {W : Subgroup G} (hW : IsOpen (W : Set G))
+    {F : G → X} (hF : ∀ x, ∀ w ∈ W, F (x * w) = F x)
+    : Continuous F := by
   refine continuous_iff_continuousAt.2 fun x ↦ ?_
   have hU : (fun y ↦ x⁻¹ * y) ⁻¹' (W : Set G) ∈ 𝓝 x :=
     (hW.preimage (continuous_const.mul continuous_id)).mem_nhds (by simp [W.one_mem])
@@ -33,10 +35,11 @@ theorem continuous_of_forall_mul_eq {X : Type*} [TopologicalSpace X] {W : Subgro
 
 variable [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
 
-theorem lintegral_eq_tsum_of_forall_mul_eq (μ : Measure G) [μ.IsMulLeftInvariant]
-    {W : Subgroup G} (hW : IsOpen (W : Set G)) {F : G → ℝ≥0∞}
-    (hF : ∀ x, ∀ w ∈ W, F (x * w) = F x) :
-    ∫⁻ x, F x ∂μ = ∑' c : G ⧸ W, F c.out * μ W := by
+theorem lintegral_eq_tsum_of_forall_mul_eq
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    {W : Subgroup G} (hW : IsOpen (W : Set G))
+    {F : G → ℝ≥0∞} (hF : ∀ x, ∀ w ∈ W, F (x * w) = F x)
+    : ∫⁻ x, F x ∂μ = ∑' c : G ⧸ W, F c.out * μ W := by
   have hc : Countable (G ⧸ W) := countable_quotient_of_isOpen hW
   have : DiscreteTopology (G ⧸ W) := QuotientGroup.discreteTopology hW
   set S : G ⧸ W → Set G := fun c ↦ QuotientGroup.mk ⁻¹' {c}
@@ -52,8 +55,7 @@ theorem lintegral_eq_tsum_of_forall_mul_eq (μ : Measure G) [μ.IsMulLeftInvaria
     intro c d hcd
     refine Set.disjoint_left.2 fun p hp hq ↦ hcd ?_
     exact hp.symm.trans hq
-  have hu : ⋃ c, S c = Set.univ :=
-    Set.eq_univ_of_forall fun p ↦ Set.mem_iUnion.2 ⟨(p : G ⧸ W), rfl⟩
+  have hu : ⋃ c, S c = Set.univ := Set.eq_univ_of_forall fun p ↦ Set.mem_iUnion.2 ⟨(p : G ⧸ W), rfl⟩
   rw [← setLIntegral_univ, ← hu, lintegral_iUnion hSm hd]
   refine tsum_congr fun c ↦ ?_
   have hconst : ∀ b ∈ S c, F b = F c.out := by
@@ -73,8 +75,8 @@ open IdeleGroup WithZero
 theorem absNorm_asIdeal_pos (v : HeightOneSpectrum (𝓞 K)) : (0 : ℝ) < Ideal.absNorm v.asIdeal :=
   Nat.cast_pos.2 (lt_trans Nat.zero_lt_one (HeightOneSpectrum.one_lt_absNorm v))
 
-theorem norm_finite_eq_rpow (x : IdeleGroup K) (v : HeightOneSpectrum (𝓞 K)) :
-    ‖(x : 𝔸[K]).2 v‖ = (Ideal.absNorm v.asIdeal : ℝ) ^ (-(ord v x : ℝ)) := by
+theorem norm_finite_eq_rpow (x : IdeleGroup K) (v : HeightOneSpectrum (𝓞 K))
+    : ‖(x : 𝔸[K]).2 v‖ = (Ideal.absNorm v.asIdeal : ℝ) ^ (-(ord v x : ℝ)) := by
   obtain ⟨n, hn⟩ : ∃ n, Valued.v ((x : 𝔸[K]).2 v) = exp n :=
     ⟨_, (exp_log (valued_ne_zero v x)).symm⟩
   rw [FinitePlace.norm_def, ord, hn, log_exp, Int.cast_neg, neg_neg,
@@ -88,16 +90,17 @@ def zetaWeight (σ : ℝ) (n : HeightOneSpectrum (𝓞 K) →₀ ℤ) : ℝ :=
 theorem zetaWeight_nonneg (σ : ℝ) (n : HeightOneSpectrum (𝓞 K) →₀ ℤ) : 0 ≤ zetaWeight σ n :=
   Finset.prod_nonneg fun v _ ↦ (Real.rpow_pos_of_pos (absNorm_asIdeal_pos v) _).le
 
-theorem zetaWeight_add (σ : ℝ) (n m : HeightOneSpectrum (𝓞 K) →₀ ℤ) :
-    zetaWeight σ (n + m) = zetaWeight σ n * zetaWeight σ m := by
+theorem zetaWeight_add (σ : ℝ) (n m : HeightOneSpectrum (𝓞 K) →₀ ℤ)
+    : zetaWeight σ (n + m) = zetaWeight σ n * zetaWeight σ m := by
   refine Finsupp.prod_add_index' (fun v ↦ by simp) fun v a b ↦ ?_
   rw [Int.cast_add, mul_add, neg_add, Real.rpow_add (absNorm_asIdeal_pos v)]
 
-theorem finiteModule_rpow_eq (x : IdeleGroup K) (σ : ℝ) :
-    finiteModule x ^ σ = zetaWeight σ (ordFinsupp K x) := by
+theorem finiteModule_rpow_eq (x : IdeleGroup K) (σ : ℝ)
+    : finiteModule x ^ σ = zetaWeight σ (ordFinsupp K x) := by
   classical
-  have hsub : Function.mulSupport (fun v : HeightOneSpectrum (𝓞 K) ↦ ‖(x : 𝔸[K]).2 v‖) ⊆
-      ((ordFinsupp K x).support : Set _) := by
+  have hsub
+      : Function.mulSupport (fun v : HeightOneSpectrum (𝓞 K) ↦ ‖(x : 𝔸[K]).2 v‖)
+        ⊆ ((ordFinsupp K x).support : Set _) := by
     intro v hv
     rw [Finset.mem_coe, Finsupp.mem_support_iff]
     intro h
@@ -113,13 +116,15 @@ theorem finiteModule_rpow_eq (x : IdeleGroup K) (σ : ℝ) :
   congr 1
   ring
 
-theorem ofFinite_val_snd (b : (FiniteAdeleRing (𝓞 K) K)ˣ) :
-    ((ofFinite b : IdeleGroup K) : 𝔸[K]).2 = b := rfl
+theorem ofFinite_val_snd (b : (FiniteAdeleRing (𝓞 K) K)ˣ)
+    : ((ofFinite b : IdeleGroup K) : 𝔸[K]).2 = b :=
+  rfl
 
-theorem mem_idealFiniteAdeles_iff_ord (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
-    (b : (FiniteAdeleRing (𝓞 K) K)ˣ) :
-    (b : FiniteAdeleRing (𝓞 K) K) ∈ idealFiniteAdeles L ↔ ∀ v : HeightOneSpectrum (𝓞 K),
-      FractionalIdeal.count K v (L : FractionalIdeal (𝓞 K)⁰ K) ≤ ord v (ofFinite b) := by
+theorem mem_idealFiniteAdeles_iff_ord
+    (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (b : (FiniteAdeleRing (𝓞 K) K)ˣ)
+    : (b : FiniteAdeleRing (𝓞 K) K) ∈ idealFiniteAdeles L
+      ↔ ∀ v : HeightOneSpectrum (𝓞 K),
+        FractionalIdeal.count K v (L : FractionalIdeal (𝓞 K)⁰ K) ≤ ord v (ofFinite b) := by
   rw [mem_idealFiniteAdeles]
   refine forall_congr' fun v ↦ ?_
   have h := valued_ne_zero v (ofFinite b)
@@ -127,17 +132,18 @@ theorem mem_idealFiniteAdeles_iff_ord (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
   rw [ord, ofFinite_val_snd, ← log_le_iff_le_exp h]
   omega
 
-theorem ordFinsupp_ofFinite_mul (b : (FiniteAdeleRing (𝓞 K) K)ˣ)
-    {w : (FiniteAdeleRing (𝓞 K) K)ˣ} (hw : w ∈ finiteIntegralUnits K) :
-    ordFinsupp K (ofFinite (b * w)) = ordFinsupp K (ofFinite b) := by
+theorem ordFinsupp_ofFinite_mul
+    (b : (FiniteAdeleRing (𝓞 K) K)ˣ)
+    {w : (FiniteAdeleRing (𝓞 K) K)ˣ} (hw : w ∈ finiteIntegralUnits K)
+    : ordFinsupp K (ofFinite (b * w)) = ordFinsupp K (ofFinite b) := by
   have hw' : ofFinite w ∈ standardOpenSubgroup K := hw
   rw [mem_standardOpenSubgroup_iff_ord] at hw'
   ext v
   change ord v (ofFinite (b * w)) = ord v (ofFinite b)
   rw [map_mul, ord_mul, hw' v, add_zero]
 
-theorem ordFinsupp_ofFinite_out_injective :
-    Function.Injective fun c : (FiniteAdeleRing (𝓞 K) K)ˣ ⧸ finiteIntegralUnits K ↦
+theorem ordFinsupp_ofFinite_out_injective
+    : Function.Injective fun c : (FiniteAdeleRing (𝓞 K) K)ˣ ⧸ finiteIntegralUnits K ↦
       ordFinsupp K (ofFinite c.out) := by
   intro c d h
   rw [← QuotientGroup.out_eq' c, ← QuotientGroup.out_eq' d, QuotientGroup.eq]
@@ -149,44 +155,46 @@ theorem ordFinsupp_ofFinite_out_injective :
   rw [map_mul, map_inv, ord_mul, ord_inv, this]
   omega
 
-
 open Classical in
 def zetaTerm (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ) (n : HeightOneSpectrum (𝓞 K) →₀ ℤ) : ℝ :=
-  if ∀ v, FractionalIdeal.count K v (L : FractionalIdeal (𝓞 K)⁰ K) ≤ n v then zetaWeight σ n
-  else 0
+  if ∀ v, FractionalIdeal.count K v (L : FractionalIdeal (𝓞 K)⁰ K) ≤ n v then
+    zetaWeight σ n
+  else
+    0
 
-theorem zetaTerm_nonneg (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ)
-    (n : HeightOneSpectrum (𝓞 K) →₀ ℤ) : 0 ≤ zetaTerm L σ n := by
+theorem zetaTerm_nonneg (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ) (n : HeightOneSpectrum (𝓞 K) →₀ ℤ)
+    : 0 ≤ zetaTerm L σ n := by
   unfold zetaTerm
   split_ifs
   exacts [zetaWeight_nonneg _ _, le_rfl]
 
 def countFinsupp (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) : HeightOneSpectrum (𝓞 K) →₀ ℤ :=
-  Finsupp.ofSupportFinite (fun v ↦ FractionalIdeal.count K v (L : FractionalIdeal (𝓞 K)⁰ K))
+  Finsupp.ofSupportFinite
+    (fun v ↦ FractionalIdeal.count K v (L : FractionalIdeal (𝓞 K)⁰ K))
     (Filter.eventually_cofinite.1 (FractionalIdeal.finite_factors _))
 
 def idealOfExponents (k : HeightOneSpectrum (𝓞 K) →₀ ℤ) : Ideal (𝓞 K) :=
   k.prod fun v n ↦ v.asIdeal ^ n.toNat
 
-theorem coeIdeal_idealOfExponents {k : HeightOneSpectrum (𝓞 K) →₀ ℤ} (hk : ∀ v, 0 ≤ k v) :
-    ((idealOfExponents k : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K) =
-      k.prod fun v n ↦ (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K) ^ n := by
+theorem coeIdeal_idealOfExponents {k : HeightOneSpectrum (𝓞 K) →₀ ℤ} (hk : ∀ v, 0 ≤ k v)
+    : ((idealOfExponents k : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K)
+      = k.prod fun v n ↦ (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K) ^ n := by
   rw [idealOfExponents, Finsupp.prod, Finsupp.prod, ← FractionalIdeal.coeIdealHom_apply, map_prod]
   refine Finset.prod_congr rfl fun v _ ↦ ?_
   rw [map_pow, FractionalIdeal.coeIdealHom_apply, ← zpow_natCast, Int.toNat_of_nonneg (hk v)]
 
-theorem idealOfExponents_injOn :
-    Set.InjOn (idealOfExponents (K := K)) {k | ∀ v, 0 ≤ k v} := by
+theorem idealOfExponents_injOn : Set.InjOn (idealOfExponents (K := K)) {k | ∀ v, 0 ≤ k v} := by
   intro k hk l hl h
   ext v
-  have := congrArg (fun I : Ideal (𝓞 K) ↦
-    FractionalIdeal.count K v (I : FractionalIdeal (𝓞 K)⁰ K)) h
+  have :=
+    congrArg (fun I : Ideal (𝓞 K) ↦ FractionalIdeal.count K v (I : FractionalIdeal (𝓞 K)⁰ K)) h
   simp only [coeIdeal_idealOfExponents hk, coeIdeal_idealOfExponents hl,
-    FractionalIdeal.count_finsuppProd] at this
+      FractionalIdeal.count_finsuppProd]
+    at this
   exact this
 
-theorem zetaWeight_eq_absNorm {σ : ℝ} {k : HeightOneSpectrum (𝓞 K) →₀ ℤ} (hk : ∀ v, 0 ≤ k v) :
-    zetaWeight σ k = ((Ideal.absNorm (idealOfExponents k) : ℝ) ^ σ)⁻¹ := by
+theorem zetaWeight_eq_absNorm {σ : ℝ} {k : HeightOneSpectrum (𝓞 K) →₀ ℤ} (hk : ∀ v, 0 ≤ k v)
+    : zetaWeight σ k = ((Ideal.absNorm (idealOfExponents k) : ℝ) ^ σ)⁻¹ := by
   rw [idealOfExponents, Finsupp.prod, map_prod, Nat.cast_prod, zetaWeight, Finsupp.prod,
     ← Real.finsetProd_rpow _ _ (fun v _ ↦ Nat.cast_nonneg _), ← Finset.prod_inv_distrib]
   refine Finset.prod_congr rfl fun v _ ↦ ?_
@@ -196,15 +204,15 @@ theorem zetaWeight_eq_absNorm {σ : ℝ} {k : HeightOneSpectrum (𝓞 K) →₀ 
   congr 1
   ring
 
-theorem tsum_ofReal_zetaTerm_lt_top (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {σ : ℝ} (hσ : 1 < σ) :
-    ∑' n, ENNReal.ofReal (zetaTerm L σ n) < ∞ := by
+theorem tsum_ofReal_zetaTerm_lt_top (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {σ : ℝ} (hσ : 1 < σ)
+    : ∑' n, ENNReal.ofReal (zetaTerm L σ n) < ∞ := by
   classical
   set m := countFinsupp L
   set S : Set (HeightOneSpectrum (𝓞 K) →₀ ℤ) := {k | ∀ v, 0 ≤ k v}
   have key : ∀ k, zetaTerm L σ (k + m) = zetaWeight σ m * S.indicator (zetaWeight σ) k := by
     intro k
-    have hiff : (∀ v, FractionalIdeal.count K v (L : FractionalIdeal (𝓞 K)⁰ K) ≤ (k + m) v) ↔
-        k ∈ S := by
+    have hiff
+        : (∀ v, FractionalIdeal.count K v (L : FractionalIdeal (𝓞 K)⁰ K) ≤ (k + m) v) ↔ k ∈ S := by
       refine forall_congr' fun v ↦ ?_
       have : (k + m) v = k v + FractionalIdeal.count K v (L : FractionalIdeal (𝓞 K)⁰ K) := rfl
       rw [this]
@@ -216,9 +224,10 @@ theorem tsum_ofReal_zetaTerm_lt_top (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {σ 
     · exact absurd (hiff.1 h1) h2
     · exact absurd (hiff.2 h2) h1
     · rw [mul_zero]
-  have h1 : ∑' n, ENNReal.ofReal (zetaTerm L σ n) =
-      ENNReal.ofReal (zetaWeight σ m) *
-        ∑' k, S.indicator (fun k ↦ ENNReal.ofReal (zetaWeight σ k)) k := by
+  have h1
+      : ∑' n, ENNReal.ofReal (zetaTerm L σ n)
+        = ENNReal.ofReal (zetaWeight σ m)
+          * ∑' k, S.indicator (fun k ↦ ENNReal.ofReal (zetaWeight σ k)) k := by
     rw [← (Equiv.addRight m).tsum_eq, ← ENNReal.tsum_mul_left]
     refine tsum_congr fun k ↦ ?_
     show ENNReal.ofReal (zetaTerm L σ (k + m)) = _
@@ -231,8 +240,9 @@ theorem tsum_ofReal_zetaTerm_lt_top (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {σ 
   rw [← tsum_subtype S]
   have hinj : Function.Injective fun k : S ↦ idealOfExponents (k : HeightOneSpectrum (𝓞 K) →₀ ℤ) :=
     fun k l h ↦ Subtype.ext (idealOfExponents_injOn k.2 l.2 h)
-  have hle : ∑' k : S, ENNReal.ofReal (zetaWeight σ (k : HeightOneSpectrum (𝓞 K) →₀ ℤ)) ≤
-      ∑' I : Ideal (𝓞 K), ENNReal.ofReal (((Ideal.absNorm I : ℝ) ^ σ)⁻¹) := by
+  have hle
+      : ∑' k : S, ENNReal.ofReal (zetaWeight σ (k : HeightOneSpectrum (𝓞 K) →₀ ℤ))
+        ≤ ∑' I : Ideal (𝓞 K), ENNReal.ofReal (((Ideal.absNorm I : ℝ) ^ σ)⁻¹) := by
     refine le_trans (le_of_eq (tsum_congr fun k ↦ ?_))
       (ENNReal.tsum_comp_le_tsum_of_injective hinj
         (fun I ↦ ENNReal.ofReal (((Ideal.absNorm I : ℝ) ^ σ)⁻¹)))
@@ -241,15 +251,14 @@ theorem tsum_ofReal_zetaTerm_lt_top (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {σ 
   rw [← ENNReal.ofReal_tsum_of_nonneg (fun I ↦ by positivity) (summable_absNorm_rpow_inv hσ)]
   exact ENNReal.ofReal_lt_top
 
-
 open Classical in
-def finiteZetaBound (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ) (b : (FiniteAdeleRing (𝓞 K) K)ˣ) :
-    ℝ :=
+def finiteZetaBound (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ) (b : (FiniteAdeleRing (𝓞 K) K)ˣ)
+    : ℝ :=
   if (b : FiniteAdeleRing (𝓞 K) K) ∈ idealFiniteAdeles L then finiteModule (ofFinite b) ^ σ else 0
 
-theorem finiteZetaBound_eq (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ)
-    (b : (FiniteAdeleRing (𝓞 K) K)ˣ) :
-    finiteZetaBound L σ b = zetaTerm L σ (ordFinsupp K (ofFinite b)) := by
+theorem finiteZetaBound_eq
+    (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ) (b : (FiniteAdeleRing (𝓞 K) K)ˣ)
+    : finiteZetaBound L σ b = zetaTerm L σ (ordFinsupp K (ofFinite b)) := by
   unfold finiteZetaBound zetaTerm
   have hiff := mem_idealFiniteAdeles_iff_ord L b
   split_ifs with h1 h2 h2
@@ -258,23 +267,25 @@ theorem finiteZetaBound_eq (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ)
   · exact absurd (hiff.2 h2) h1
   · rfl
 
-theorem finiteZetaBound_nonneg (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ)
-    (b : (FiniteAdeleRing (𝓞 K) K)ˣ) : 0 ≤ finiteZetaBound L σ b := by
+theorem finiteZetaBound_nonneg
+    (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ) (b : (FiniteAdeleRing (𝓞 K) K)ˣ)
+    : 0 ≤ finiteZetaBound L σ b := by
   rw [finiteZetaBound_eq]
   exact zetaTerm_nonneg _ _ _
 
-theorem finiteZetaBound_mul (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ)
-    (b : (FiniteAdeleRing (𝓞 K) K)ˣ) {w : (FiniteAdeleRing (𝓞 K) K)ˣ}
-    (hw : w ∈ finiteIntegralUnits K) : finiteZetaBound L σ (b * w) = finiteZetaBound L σ b := by
+theorem finiteZetaBound_mul
+    (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ) (b : (FiniteAdeleRing (𝓞 K) K)ˣ)
+    {w : (FiniteAdeleRing (𝓞 K) K)ˣ} (hw : w ∈ finiteIntegralUnits K)
+    : finiteZetaBound L σ (b * w) = finiteZetaBound L σ b := by
   rw [finiteZetaBound_eq, finiteZetaBound_eq, ordFinsupp_ofFinite_mul b hw]
 
-theorem continuous_finiteZetaBound (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ) :
-    Continuous (finiteZetaBound L σ) :=
+theorem continuous_finiteZetaBound (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (σ : ℝ)
+    : Continuous (finiteZetaBound L σ) :=
   continuous_of_forall_mul_eq (isOpen_finiteIntegralUnits K) fun b _ hw ↦
     finiteZetaBound_mul L σ b hw
 
-theorem integrable_finiteZetaBound (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {σ : ℝ} (hσ : 1 < σ) :
-    Integrable (finiteZetaBound L σ) (finiteIdeleMeasure K) := by
+theorem integrable_finiteZetaBound (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {σ : ℝ} (hσ : 1 < σ)
+    : Integrable (finiteZetaBound L σ) (finiteIdeleMeasure K) := by
   refine ⟨(continuous_finiteZetaBound L σ).aestronglyMeasurable, ?_⟩
   rw [hasFiniteIntegral_iff_ofReal (Eventually.of_forall (finiteZetaBound_nonneg L σ)),
     lintegral_eq_tsum_of_forall_mul_eq (finiteIdeleMeasure K) (isOpen_finiteIntegralUnits K)
@@ -285,15 +296,15 @@ theorem integrable_finiteZetaBound (L : (FractionalIdeal (𝓞 K)⁰ K)ˣ) {σ :
   exact (ENNReal.tsum_comp_le_tsum_of_injective ordFinsupp_ofFinite_out_injective
     (fun n ↦ ENNReal.ofReal (zetaTerm L σ n))).trans_lt (tsum_ofReal_zetaTerm_lt_top L hσ)
 
-theorem idealFiniteAdeles_subset {I J : (FractionalIdeal (𝓞 K)⁰ K)ˣ}
-    (h : (I : FractionalIdeal (𝓞 K)⁰ K) ≤ J) :
-    (idealFiniteAdeles I : Set (FiniteAdeleRing (𝓞 K) K)) ⊆ idealFiniteAdeles J := by
+theorem idealFiniteAdeles_subset
+    {I J : (FractionalIdeal (𝓞 K)⁰ K)ˣ} (h : (I : FractionalIdeal (𝓞 K)⁰ K) ≤ J)
+    : (idealFiniteAdeles I : Set (FiniteAdeleRing (𝓞 K) K)) ⊆ idealFiniteAdeles J := by
   intro x hx v
   refine (hx v).trans ?_
   exact exp_le_exp.2 (neg_le_neg (FractionalIdeal.count_mono K v I.ne_zero h))
 
-theorem exists_mem_idealFiniteAdeles (a : FiniteAdeleRing (𝓞 K) K) :
-    ∃ J : (FractionalIdeal (𝓞 K)⁰ K)ˣ, a ∈ idealFiniteAdeles J := by
+theorem exists_mem_idealFiniteAdeles (a : FiniteAdeleRing (𝓞 K) K)
+    : ∃ J : (FractionalIdeal (𝓞 K)⁰ K)ˣ, a ∈ idealFiniteAdeles J := by
   set e : HeightOneSpectrum (𝓞 K) → ℤ := fun v ↦ -max 0 (log (Valued.v (a v)))
   have he : ∀ᶠ v in Filter.cofinite, e v = 0 := by
     filter_upwards [a.2] with v hv
@@ -317,14 +328,19 @@ def fractionalIdealSupUnit (I J : (FractionalIdeal (𝓞 K)⁰ K)ˣ) : (Fraction
   Units.mk0 ((I : FractionalIdeal (𝓞 K)⁰ K) ⊔ J) fun h ↦
     I.ne_zero (FractionalIdeal.le_zero_iff.1 (h ▸ le_sup_left))
 
-theorem exists_subset_idealFiniteAdeles {C : Set (FiniteAdeleRing (𝓞 K) K)} (hC : IsCompact C) :
-    ∃ L : (FractionalIdeal (𝓞 K)⁰ K)ˣ, C ⊆ idealFiniteAdeles L := by
-  have hcov : C ⊆ ⋃ J : (FractionalIdeal (𝓞 K)⁰ K)ˣ,
-      (idealFiniteAdeles J : Set (FiniteAdeleRing (𝓞 K) K)) :=
-    fun a _ ↦ Set.mem_iUnion.2 (exists_mem_idealFiniteAdeles a)
+theorem exists_subset_idealFiniteAdeles {C : Set (FiniteAdeleRing (𝓞 K) K)} (hC : IsCompact C)
+    : ∃ L : (FractionalIdeal (𝓞 K)⁰ K)ˣ, C ⊆ idealFiniteAdeles L := by
+  have hcov
+      : C
+        ⊆ ⋃ J : (FractionalIdeal (𝓞 K)⁰ K)ˣ,
+          (idealFiniteAdeles J : Set (FiniteAdeleRing (𝓞 K) K)) := fun a _ ↦
+    Set.mem_iUnion.2 (exists_mem_idealFiniteAdeles a)
   have hdir : Directed (· ⊆ ·) fun J : (FractionalIdeal (𝓞 K)⁰ K)ˣ ↦
-      (idealFiniteAdeles J : Set (FiniteAdeleRing (𝓞 K) K)) := fun I J ↦
-    ⟨fractionalIdealSupUnit I J, idealFiniteAdeles_subset le_sup_left, idealFiniteAdeles_subset le_sup_right⟩
+      (idealFiniteAdeles J : Set (FiniteAdeleRing (𝓞 K) K)) := fun I J ↦ ⟨
+    fractionalIdealSupUnit I J,
+    idealFiniteAdeles_subset le_sup_left,
+    idealFiniteAdeles_subset le_sup_right
+  ⟩
   exact hC.elim_directed_cover _ (fun J ↦ isOpen_idealFiniteAdeles J) hcov hdir
 
 end

@@ -6,13 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
 namespace UpperTheory.V.Ws.WeightCharacterKernel
 
-private theorem open_ker {Ω K : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] [Field K] [TopologicalSpace K] [T2Space K]
-    [ContinuousMul K] (δ : G ℚ Ω →* Kˣ) (hc : Continuous fun g => (δ g : K)) (N : ℕ) (hN : N ≠ 0)
-    (h : ∀ A : ValuationSubring Ω, ∀ g ∈ Ine (F := ℚ) A, δ g ^ N = 1) : IsOpen (δ.ker : Set (G ℚ Ω)) := by
+private theorem open_ker
+    {Ω K : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] [Field K] [TopologicalSpace K]
+    [T2Space K] [ContinuousMul K]
+    (δ : G ℚ Ω →* Kˣ) (hc : Continuous fun g => (δ g : K))
+    (N : ℕ) (hN : N ≠ 0) (h : ∀ A : ValuationSubring Ω, ∀ g ∈ Ine (F := ℚ) A, δ g ^ N = 1)
+    : IsOpen (δ.ker : Set (G ℚ Ω)) := by
   classical
   have hpow : ∀ g, δ g ^ N = 1 := by
     intro g
@@ -56,11 +61,17 @@ private theorem open_ker {Ω K : Type} [Field Ω] [CharZero Ω] [IsAlgClosure �
 end UpperTheory.V.Ws.WeightCharacterKernel
 
 open UpperTheory.V.Ws.WeightCharacterKernel in
-theorem UpperTheory.V.Ws.wtChar :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good →
-          ∀ (κ : G ℚ Ω →* PadicAlgCl l) (n : ℕ), Continuous κ → D.UnrT κ 1 → (∀ p ∈ D.Sb, ∀ g ∈ D.Ip p ⊓ D.ψ.ker, κ g = 1) →
-          (∀ s ∈ D.Ip l ⊓ D.ψ.ker ⊓ D.om.ker, κ s = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l s : ℤ_[l]) ^ n) →
-          ∃ U : Subgroup (G ℚ Ω), IsOpen (U : Set (G ℚ Ω)) ∧ ∀ g ∈ U, κ g = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l g : ℤ_[l]) ^ n := by
+theorem UpperTheory.V.Ws.wtChar
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ (κ : G ℚ Ω →* PadicAlgCl l) (n : ℕ),
+          Continuous κ → D.UnrT κ 1 → (∀ p ∈ D.Sb, ∀ g ∈ D.Ip p ⊓ D.ψ.ker, κ g = 1)
+            → (∀ s ∈ D.Ip l ⊓ D.ψ.ker ⊓ D.om.ker,
+              κ s = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l s : ℤ_[l]) ^ n)
+            → ∃ U : Subgroup (G ℚ Ω),
+              IsOpen (U : Set (G ℚ Ω))
+                ∧ ∀ g ∈ U, κ g = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l g : ℤ_[l]) ^ n := by
   intro Ω _ _ _ l _ c D hD κ n hκc hU hSb hl
   classical
   have hF := facts D hD
@@ -72,8 +83,9 @@ theorem UpperTheory.V.Ws.wtChar :
       simpa only [Subgroup.coe_inf] using (hrb.inter hps).inter hom
     have := Subgroup.quotient_finite_of_isOpen _ ho
     exact ⟨_, Subgroup.index_ne_zero_of_finite, fun g => Subgroup.pow_index_mem _ g⟩
-  have two : ∀ (B : ValuationSubring Ω) (p q : ℕ), p.Prime → q.Prime → p ≠ q →
-      B.valuation (p : Ω) < 1 → ¬ B.valuation (q : Ω) < 1 := by
+  have two
+      : ∀ (B : ValuationSubring Ω) (p q : ℕ),
+        p.Prime → q.Prime → p ≠ q → B.valuation (p : Ω) < 1 → ¬ B.valuation (q : Ω) < 1 := by
     intro B p q hp hq hpq h1 h2
     obtain ⟨a, b, hab⟩ := Nat.isCoprime_iff_coprime.mpr ((Nat.coprime_primes hp hq).mpr hpq)
     have hab' : (a : Ω) * p + (b : Ω) * q = 1 := by
@@ -92,13 +104,18 @@ theorem UpperTheory.V.Ws.wtChar :
     rw [hab', map_one] at this
     exact absurd this (not_le.mpr (max_lt e1 e2))
   have halg : Continuous fun x : ℤ_[l] => algebraMap ℤ_[l] (PadicAlgCl l) x := by
-    have e : ∀ x : ℤ_[l], algebraMap ℤ_[l] (PadicAlgCl l) x = algebraMap ℚ_[l] (PadicAlgCl l) (x : ℚ_[l]) :=
+    have e
+        : ∀ x : ℤ_[l],
+          algebraMap ℤ_[l] (PadicAlgCl l) x = algebraMap ℚ_[l] (PadicAlgCl l) (x : ℚ_[l]) :=
       fun x => IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] _ x
     simp_rw [e]
     exact (continuous_algebraMap ℚ_[l] _).comp continuous_subtype_val
   let cU : G ℚ Ω →* (PadicAlgCl l)ˣ :=
     (Units.map (algebraMap ℤ_[l] (PadicAlgCl l)).toMonoidHom).comp (cycZ ℚ Ω l)
-  have hcU : ∀ g, ((cU g : (PadicAlgCl l)ˣ) : PadicAlgCl l) = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l g : ℤ_[l]) := by
+  have hcU
+      : ∀ g,
+        ((cU g : (PadicAlgCl l)ˣ) : PadicAlgCl l)
+          = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l g : ℤ_[l]) := by
     intro g
     rfl
   let δ : G ℚ Ω →* (PadicAlgCl l)ˣ := κ.toHomUnits * (cU ^ n)⁻¹
@@ -106,12 +123,16 @@ theorem UpperTheory.V.Ws.wtChar :
   have hker : ∀ g, δ g = 1 ↔ κ g = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l g : ℤ_[l]) ^ n := by
     intro g
     rw [hδ, mul_inv_eq_one, Units.ext_iff, Units.val_pow_eq_pow_val, hcU, MonoidHom.coe_toHomUnits]
-  have hval : ∀ g, ((δ g : (PadicAlgCl l)ˣ) : PadicAlgCl l) = κ g * ((cU g⁻¹ : (PadicAlgCl l)ˣ) : PadicAlgCl l) ^ n := by
+  have hval
+      : ∀ g,
+        ((δ g : (PadicAlgCl l)ˣ) : PadicAlgCl l)
+          = κ g * ((cU g⁻¹ : (PadicAlgCl l)ˣ) : PadicAlgCl l) ^ n := by
     intro g
     rw [hδ, map_inv, ← inv_pow, Units.val_mul, Units.val_pow_eq_pow_val, MonoidHom.coe_toHomUnits]
   have hcont : Continuous fun g => ((δ g : (PadicAlgCl l)ˣ) : PadicAlgCl l) := by
     simp_rw [hval, hcU]
-    exact hκc.mul (((halg.comp (Units.continuous_val.comp (continuous_cycZ ℚ Ω l))).comp continuous_inv).pow n)
+    exact hκc.mul
+      (((halg.comp (Units.continuous_val.comp (continuous_cycZ ℚ Ω l))).comp continuous_inv).pow n)
   have hδ1 : ∀ h, κ h = 1 → cycZ ℚ Ω l h = 1 → δ h = 1 := by
     intro h h1 h2
     rw [hker, h1, h2]
@@ -151,6 +172,7 @@ theorem UpperTheory.V.Ws.wtChar :
       · exact (hker _).mpr (hl _ (Subgroup.mem_inf.mpr ⟨Subgroup.mem_inf.mpr ⟨hI, hψ⟩, ho⟩))
       · refine hδ1 _ (hSb p hpS _ (Subgroup.mem_inf.mpr ⟨hI, hψ⟩)) ?_
         have hne : p ≠ l := (hF.1 p hpS).2.1
-        have hnl : ¬ (D.pl p).valuation (l : Ω) < 1 := two (D.pl p) p l hp Fact.out hne (hD.pl_over p hp)
+        have hnl : ¬ (D.pl p).valuation (l : Ω) < 1 :=
+          two (D.pl p) p l hp Fact.out hne (hD.pl_over p hp)
         exact (places ℚ Ω l (D.pl p)).2.2.2 hnl hI
   refine ⟨δ.ker, open_ker δ hcont M hM0 hN, fun g hg => (hker g).mp hg⟩

@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Place
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 
 noncomputable section
 
@@ -51,12 +53,16 @@ private lemma mem_RInt_of_valued_le_one {F E : Type} [Field F] [NumberField F] [
     (h : ∀ P : HeightOneSpectrum (𝓞 E), Valued.v (adAt F P y) ≤ 1) : y ∈ RInt F E :=
   (GlobalTheory.Mem.Col2.mem_rInt_iff F E y).2 h
 
-theorem exists_unit (hc : Formalism.BasicNotions.CMData F E) {π : 𝓞 E} (h0 : π ≠ 0) (h1 : cO E π ≠ 0) (hcp : IsCoprime π (cO E π)) :
-    ∃ a a' : AfE F E, a' * a = 1 ∧ sigR hc.sig (FiniteAdeleRing (𝓞 F) F) a = a' ∧ a ∈ RInt F E ∧ a' ∈ RInt F E ∧
-      (∀ P ∈ divs π, adAt F P a' = algebraMap E _ (algebraMap (𝓞 E) E (cO E π))) ∧
-      ∀ w : HeightOneSpectrum (𝓞 E), π * cO E π ∉ w.asIdeal → adAt F w a = 1 := by
+theorem exists_unit
+    (hc : Formalism.BasicNotions.CMData F E)
+    {π : 𝓞 E} (h0 : π ≠ 0) (h1 : cO E π ≠ 0) (hcp : IsCoprime π (cO E π))
+    : ∃ a a' : AfE F E,
+      a' * a = 1 ∧ sigR hc.sig (FiniteAdeleRing (𝓞 F) F) a = a' ∧ a ∈ RInt F E ∧ a' ∈ RInt F E
+        ∧ (∀ P ∈ divs π, adAt F P a' = algebraMap E _ (algebraMap (𝓞 E) E (cO E π)))
+        ∧ ∀ w : HeightOneSpectrum (𝓞 E), π * cO E π ∉ w.asIdeal → adAt F w a = 1 := by
   classical
-  have hmem : ∀ {P : HeightOneSpectrum (𝓞 E)}, P ∈ divs π → π ∈ P.asIdeal := fun h => mem_divs_iff' h
+  have hmem : ∀ {P : HeightOneSpectrum (𝓞 E)}, P ∈ divs π → π ∈ P.asIdeal := fun h =>
+    mem_divs_iff' h
   have hQ : ∀ P ∈ divs π, conjPrime₂ P ∉ divs π := by
     intro P hP hP'
     exact false_of_mem_of_conj_mem_of_isCoprime hcp P (hmem hP) ((mem_conjP P π).1 (hmem hP'))
@@ -69,11 +75,25 @@ theorem exists_unit (hc : Formalism.BasicNotions.CMData F E) {π : 𝓞 E} (h0 :
   let α : HeightOneSpectrum (𝓞 E) → E := fun _ => (algebraMap (𝓞 E) E (cO E π))⁻¹
   let β : HeightOneSpectrum (𝓞 E) → E := fun _ => algebraMap (𝓞 E) E (cO E π)
   let a := GlobalTheory.Mem.Col2.PtExist.glue hc (divs π) 1 α β
-  have ha : ∀ w, adAt F w a = if w ∈ divs π then algebraMap E _ (α w)
-      else if conjPrime₂ w ∈ divs π then algebraMap E _ (star (β (conjPrime₂ w))) else 1 := fun w => by
+  have ha
+      : ∀ w,
+        adAt F w a
+          = if w ∈ divs π then
+              algebraMap E _ (α w)
+            else if conjPrime₂ w ∈ divs π then
+              algebraMap E _ (star (β (conjPrime₂ w)))
+            else
+              1 := fun w => by
     rw [GlobalTheory.Mem.Col2.PtExist.adAt_glue hc (divs π) hQ 1 α β w, map_one]
-  have ha' : ∀ w, adAt F w (sigR hc.sig (FiniteAdeleRing (𝓞 F) F) a) = if w ∈ divs π then algebraMap E _ (β w)
-      else if conjPrime₂ w ∈ divs π then algebraMap E _ (star (α (conjPrime₂ w))) else 1 := fun w => by
+  have ha'
+      : ∀ w,
+        adAt F w (sigR hc.sig (FiniteAdeleRing (𝓞 F) F) a)
+          = if w ∈ divs π then
+              algebraMap E _ (β w)
+            else if conjPrime₂ w ∈ divs π then
+              algebraMap E _ (star (α (conjPrime₂ w)))
+            else
+              1 := fun w => by
     rw [GlobalTheory.Mem.Col2.PtExist.sig_glue hc (divs π) 1 α β, map_one,
       GlobalTheory.Mem.Col2.PtExist.adAt_glue hc (divs π) hQ 1 β α w, map_one]
   refine ⟨a, sigR hc.sig (FiniteAdeleRing (𝓞 F) F) a, ?_, rfl, ?_, ?_, ?_, ?_⟩
@@ -88,7 +108,8 @@ theorem exists_unit (hc : Formalism.BasicNotions.CMData F E) {π : 𝓞 E} (h0 :
     intro P
     rw [ha]
     split_ifs with hw hw'
-    · exact valued_inv_algebraMap_le_one_of_not_mem P _ (fun h => false_of_mem_of_conj_mem_of_isCoprime hcp P (hmem hw) h)
+    · exact valued_inv_algebraMap_le_one_of_not_mem P _
+        (fun h => false_of_mem_of_conj_mem_of_isCoprime hcp P (hmem hw) h)
     · rw [hst]
       exact valued_algebraMap_int_le_one' P π
     · rw [map_one]
@@ -98,7 +119,8 @@ theorem exists_unit (hc : Formalism.BasicNotions.CMData F E) {π : 𝓞 E} (h0 :
     split_ifs with hw hw'
     · exact valued_algebraMap_int_le_one' P _
     · rw [star_inv₀, hst]
-      exact valued_inv_algebraMap_le_one_of_not_mem P π (fun h => false_of_mem_of_conj_mem_of_isCoprime hcp P h ((mem_conjP P π).1 (hmem hw')))
+      exact valued_inv_algebraMap_le_one_of_not_mem P π
+        (fun h => false_of_mem_of_conj_mem_of_isCoprime hcp P h ((mem_conjP P π).1 (hmem hw')))
     · rw [map_one]
   · intro P hP
     rw [ha', if_pos hP]
@@ -109,20 +131,38 @@ theorem exists_unit (hc : Formalism.BasicNotions.CMData F E) {π : 𝓞 E} (h0 :
     · exact absurd (Ideal.mul_mem_left _ _ ((mem_conjP w π).1 (hmem h3))) hw
     · rfl
 
-def stdPt (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ) : DecoF E n ∅ ∅ ∅ :=
-  ⟨(⟨⟨stdLat E n, fun _ _ => 0, fun _ _ _ => 0⟩, stdLat_lattice, stdLat_unimodular,
-      fun P => (Finset.notMem_empty _ P.2).elim, fun P => (Finset.notMem_empty _ P.2).elim,
-      fun P => (Finset.notMem_empty _ P.2).elim, fun P => (Finset.notMem_empty _ P.2).elim,
-      fun P => (Finset.notMem_empty _ P.2).elim, fun P => (Finset.notMem_empty _ P.2).elim,
-      fun P => (Finset.notMem_empty _ P.2).elim, fun P => (Finset.notMem_empty _ P.2).elim,
-      fun P => (Finset.notMem_empty _ P.2).elim⟩, fun _ => 1), fun P => (Finset.notMem_empty _ P.2).elim⟩
+def stdPt (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ) : DecoF E n ∅ ∅ ∅ := ⟨
+  (
+    ⟨
+      ⟨stdLat E n, fun _ _ => 0, fun _ _ _ => 0⟩,
+      stdLat_lattice,
+      stdLat_unimodular,
+      fun P => (Finset.notMem_empty _ P.2).elim,
+      fun P => (Finset.notMem_empty _ P.2).elim,
+      fun P => (Finset.notMem_empty _ P.2).elim,
+      fun P => (Finset.notMem_empty _ P.2).elim,
+      fun P => (Finset.notMem_empty _ P.2).elim,
+      fun P => (Finset.notMem_empty _ P.2).elim,
+      fun P => (Finset.notMem_empty _ P.2).elim,
+      fun P => (Finset.notMem_empty _ P.2).elim,
+      fun P => (Finset.notMem_empty _ P.2).elim
+    ⟩,
+    fun _ => 1
+  ),
+  fun P => (Finset.notMem_empty _ P.2).elim
+⟩
 
-theorem exists_base (hc : Formalism.BasicNotions.CMData F E) {π : 𝓞 E} {T : ℕ} (hT : T ≠ 0) (hπ : π * cO E π = T)
-    (hcp : IsCoprime π (cO E π)) (n : ℕ) :
-    ∃ k : GL (Fin n) (AfE F E), (∃ p : DecoF E n ∅ ∅ ∅, IsPtOf hc k p ∧ p.deco.1.N = stdLat E n) ∧
-      (∀ v : HeightOneSpectrum (𝓞 F), (T : 𝓞 F) ∉ v.asIdeal → bc (prV (E := E) v) k = 1) ∧
-      ∀ (P : divs π) (r j : Fin n), r.1 + 1 = n → HasRes P.1 (adAt F P.1 ((k⁻¹).1 r j))
-        (if j = r then Ideal.Quotient.mk P.1.asIdeal (cO E π) else 0) := by
+theorem exists_base
+    (hc : Formalism.BasicNotions.CMData F E)
+    {π : 𝓞 E} {T : ℕ} (hT : T ≠ 0) (hπ : π * cO E π = T) (hcp : IsCoprime π (cO E π))
+    (n : ℕ)
+    : ∃ k : GL (Fin n) (AfE F E),
+      (∃ p : DecoF E n ∅ ∅ ∅, IsPtOf hc k p ∧ p.deco.1.N = stdLat E n)
+        ∧ (∀ v : HeightOneSpectrum (𝓞 F), (T : 𝓞 F) ∉ v.asIdeal → bc (prV (E := E) v) k = 1)
+        ∧ ∀ (P : divs π) (r j : Fin n),
+          r.1 + 1 = n
+            → HasRes P.1 (adAt F P.1 ((k⁻¹).1 r j))
+              (if j = r then Ideal.Quotient.mk P.1.asIdeal (cO E π) else 0) := by
   classical
   have hT0 : ((T : ℕ) : 𝓞 E) ≠ 0 := Nat.cast_ne_zero.2 hT
   have h0 : π ≠ 0 := fun h => hT0 (by rw [← hπ, h, zero_mul])
@@ -146,17 +186,23 @@ theorem exists_base (hc : Formalism.BasicNotions.CMData F E) {π : 𝓞 E} {T : 
     split_ifs
     · exact hai'
     · exact one_mem _
-  let k : GL (Fin n) (AfE F E) := ⟨Matrix.diagonal d, Matrix.diagonal d',
+  let k : GL (Fin n) (AfE F E) := ⟨
+    Matrix.diagonal d,
+    Matrix.diagonal d',
     by rw [Matrix.diagonal_mul_diagonal]; simp only [hd']; exact Matrix.diagonal_one,
-    by rw [Matrix.diagonal_mul_diagonal]; simp only [hd]; exact Matrix.diagonal_one⟩
-  have hk : ((k : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) = Matrix.diagonal d := rfl
-  have hk' : ((k⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) = Matrix.diagonal d' := rfl
+    by rw [Matrix.diagonal_mul_diagonal]; simp only [hd]; exact Matrix.diagonal_one
+  ⟩
+  have hk : ((k : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) = Matrix.diagonal d :=
+    rfl
+  have hk'
+      : ((k⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) = Matrix.diagonal d' :=
+    rfl
   refine ⟨k, ⟨stdPt E n, ?_, rfl⟩, ?_, ?_⟩
   · constructor
     · apply (GlobalTheory.Mem.Col2.PtExist.mem_uad_iff k).2
       unfold Formalism.UG.cT
-      rw [hk, Matrix.diagonal_map (map_zero _), Matrix.diagonal_transpose, Matrix.diagonal_mul_diagonal,
-        ← Matrix.diagonal_one]
+      rw [hk, Matrix.diagonal_map (map_zero _), Matrix.diagonal_transpose,
+        Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
       congr 1
       funext i
       dsimp [d]
@@ -165,7 +211,9 @@ theorem exists_base (hc : Formalism.BasicNotions.CMData F E) {π : 𝓞 E} {T : 
       · rw [map_one, one_mul]
     · intro x
       unfold Formalism.L2.Herm.hatL
-      change x ∈ Formalism.UG.latS (F := F) (Formalism.L2.Herm.Af F) (Formalism.L2.Herm.intAf F E) (Formalism.L2.Col.stdLat E n) ↔ _
+      change x ∈ Formalism.UG.latS (F := F) (Formalism.L2.Herm.Af F) (Formalism.L2.Herm.intAf F E)
+          (Formalism.L2.Col.stdLat E n)
+        ↔ _
       rw [Formalism.L2.Col.mem_latS_std, Formalism.L2.Col.mem_latS_std, hk']
       constructor
       · intro h i
@@ -177,15 +225,16 @@ theorem exists_base (hc : Formalism.BasicNotions.CMData F E) {π : 𝓞 E} {T : 
     all_goals intro P; exact (Finset.notMem_empty _ P.2).elim
   · intro v hv
     have hpa : prV (E := E) v a = 1 := by
-      have h := ((GlobalTheory.Mem.Col2.AdComp.prV_zero_int_iff F E v (a - 1)).1).2 (fun w hwv => by
-        have hnot : π * cO E π ∉ w.asIdeal := by
-          intro hmw
-          apply hv
-          rw [← hwv]
-          change algebraMap (𝓞 F) (𝓞 E) (T : 𝓞 F) ∈ w.asIdeal
-          rw [map_natCast, ← hπ]
-          exact hmw
-        rw [map_sub, hw w hnot, map_one, sub_self])
+      have h :=
+        ((GlobalTheory.Mem.Col2.AdComp.prV_zero_int_iff F E v (a - 1)).1).2 (fun w hwv => by
+          have hnot : π * cO E π ∉ w.asIdeal := by
+            intro hmw
+            apply hv
+            rw [← hwv]
+            change algebraMap (𝓞 F) (𝓞 E) (T : 𝓞 F) ∈ w.asIdeal
+            rw [map_natCast, ← hπ]
+            exact hmw
+          rw [map_sub, hw w hnot, map_one, sub_self])
       rwa [map_sub, map_one, sub_eq_zero] at h
     apply Units.ext
     rw [Units.val_one]
@@ -213,8 +262,22 @@ end General
 
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
-theorem exists_kStd : ∀ {B : Base} (X : PreX B.toPre), (B.primes X).Ok → ∀ (u : B.Word) (n : ℕ), ∃ k : GA B n, (∃ p : DecoF B.fields.E n ∅ ∅ ∅, PtOf k p ∧ p.deco.1.N = stdLat B.fields.E n) ∧ (∀ v : HeightOneSpectrum (𝓞 B.host.F), (B.T u : 𝓞 B.host.F) ∉ v.asIdeal → bc (prV (E := B.host.E) v) k = 1) ∧ ∀ (P : (B.primes X).vT u) (r j : Fin n), r.1 + 1 = n → HasRes P.1 (adAt B.host.F P.1 ((k⁻¹ : GA B n).1 r j)) (if j = r then Ideal.Quotient.mk P.1.asIdeal (B.fields.conjO (X.piT u)) else 0) := by
+theorem exists_kStd
+    : ∀ {B : Base} (X : PreX B.toPre),
+      (B.primes X).Ok
+        → ∀ (u : B.Word) (n : ℕ), ∃ k : GA B n,
+          (∃ p : DecoF B.fields.E n ∅ ∅ ∅, PtOf k p ∧ p.deco.1.N = stdLat B.fields.E n)
+            ∧ (∀ v : HeightOneSpectrum (𝓞 B.host.F),
+              (B.T u : 𝓞 B.host.F) ∉ v.asIdeal → bc (prV (E := B.host.E) v) k = 1)
+            ∧ ∀ (P : (B.primes X).vT u) (r j : Fin n),
+              r.1 + 1 = n
+                → HasRes P.1 (adAt B.host.F P.1 ((k⁻¹ : GA B n).1 r j))
+                  (if j = r then
+                     Ideal.Quotient.mk P.1.asIdeal (B.fields.conjO (X.piT u))
+                   else
+                     0) := by
   intro B X hX u n
-  exact exists_base B.sp.cm (π := X.piT u) (T := B.T u) (hX.T_prime u).ne_zero (hX.piT_norm u) (hX.piT_cop u) n
+  exact exists_base B.sp.cm (π := X.piT u) (T := B.T u) (hX.T_prime u).ne_zero (hX.piT_norm u)
+    (hX.piT_cop u) n
 
 end GlobalTheory.Mem.Col2.BasePoint

@@ -13,30 +13,40 @@ set_option synthInstance.maxHeartbeats 400000
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
 
 namespace GlobalTheory.CovTop.WtShape
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Y0 : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y0 : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
 
-theorem laOf_real (τ : Psi p.T.Q.H) (t : D.what₂.Tau) (ht : τ.1 = DV.tauEmb D t) (n : Fin ((dat p i).p + (dat p i).q)) :
-    (laOf (dat p i) (wtA (p.κ i)) (p.κ i).n τ n : ℝ) = entR D i t n := by
+theorem laOf_real
+    (τ : Psi p.T.Q.H) (t : D.what₂.Tau) (ht : τ.1 = DV.tauEmb D t)
+    (n : Fin ((dat p i).p + (dat p i).q))
+    : (laOf (dat p i) (wtA (p.κ i)) (p.κ i).n τ n : ℝ) = entR D i t n := by
   rw [← ent_cast, ← laOf_read p i τ t ht n, Rat.cast_intCast]
 
-theorem anchor_real (τ : Psi p.T.Q.H) (t : D.what₂.Tau) (ht : τ.1 = DV.tauEmb D t) :
-    (anchor (dat p i) (wtA (p.κ i)) (p.κ i).n (D.R.k - 1) τ : ℝ) = entR D i t (D.R.k - 1 - 1) := by
+theorem anchor_real (τ : Psi p.T.Q.H) (t : D.what₂.Tau) (ht : τ.1 = DV.tauEmb D t)
+    : (anchor (dat p i) (wtA (p.κ i)) (p.κ i).n (D.R.k - 1) τ : ℝ)
+      = entR D i t (D.R.k - 1 - 1) := by
   have h : D.R.k - 1 - 1 < (dat p i).p + (dat p i).q := by
     have := D.R.m_add_three_le_k
-    rw [dat_p]; omega
+    rw [dat_p]
+    omega
   unfold anchor
   rw [dite_eq_left h, laOf_real p i τ t ht]
 
-theorem uW_real (τ : Psi p.T.Q.H) (t : D.what₂.Tau) (ht : τ.1 = DV.tauEmb D t) (n : Fin ((dat p i).p + (dat p i).q)) :
-    (uW p i τ n : ℝ) = entR D i t n - entR D i t (D.R.k - 1 - 1) := by
+theorem uW_real
+    (τ : Psi p.T.Q.H) (t : D.what₂.Tau) (ht : τ.1 = DV.tauEmb D t)
+    (n : Fin ((dat p i).p + (dat p i).q))
+    : (uW p i τ n : ℝ) = entR D i t n - entR D i t (D.R.k - 1 - 1) := by
   rw [← laOf_real p i τ t ht n, ← anchor_real p i τ t ht, ← Int.cast_sub]
   rfl
 
@@ -46,8 +56,10 @@ theorem h0_eq : LevelStarExponents.h0 L = (p.h0 : ℝ) := by
   rw [p.hh0]
   field_simp
 
-theorem wtNum_at (P : ParameterChoice' D L) (T : ParamsT D L P) (hS : SizesAt L) (hx8 : 8 ≤ L.sc.x)
-    (hy : 3 ≤ L.sc.x ^ (L.sc.eps / 4)) : WtNum p i T.PP := by
+theorem wtNum_at
+    (P : ParameterChoice' D L) (T : ParamsT D L P)
+    (hS : SizesAt L) (hx8 : 8 ≤ L.sc.x) (hy : 3 ≤ L.sc.x ^ (L.sc.eps / 4))
+    : WtNum p i T.PP := by
   have hk := D.R.m_add_three_le_k
   have hm := D.R.two_le_m
   have hi := i.2
@@ -70,23 +82,29 @@ theorem wtNum_at (P : ParameterChoice' D L) (T : ParamsT D L P) (hS : SizesAt L)
   have hwid := mul_widths_le D L T.PP (by linarith) hS (by linarith) hy
   have hS0 := L.Sc_pos
   have hη0 := L.etaSz_pos
-  have h40 : 40 * (L.Sc + L.etaSz) ≤ L.sc.w'' D.R.n := le_trans (mul_le_mul_of_nonneg_right hP (by linarith)) hwid
+  have h40 : 40 * (L.Sc + L.etaSz) ≤ L.sc.w'' D.R.n :=
+    le_trans (mul_le_mul_of_nonneg_right hP (by linarith)) hwid
   have hrη : (D.R.r : ℝ) ≤ L.etaSz := by
     refine le_trans ?_ P.t_le_eta
     exact_mod_cast (by have := D.R.rank_add_five_le; omega : D.R.r ≤ D.R.t)
   have hr0 : (0 : ℝ) ≤ D.R.r := Nat.cast_nonneg _
-  have hlen : lenT p i T.PP ≤ T.TO := by
-    unfold lenT; rw [hD]; exact Nat.ceil_le.2 (len_le D L P T)
-  have hlen' : 4 * T.Dp + 4 ≤ lenT p i T.PP := by
-    unfold lenT; rw [hD]; exact len_ge T
+  have hlen : lenT p i T.PP ≤ T.TO := by unfold lenT; rw [hD]; exact Nat.ceil_le.2 (len_le D L P T)
+  have hlen' : 4 * T.Dp + 4 ≤ lenT p i T.PP := by unfold lenT; rw [hD]; exact len_ge T
   obtain ⟨s1, s2, s3⟩ := spacing_ge T ((i : ℕ) + 1) _ hlen
   obtain ⟨q1, q2, q3⟩ := prod_bounds T _ hlen
   obtain ⟨g1, g2⟩ := gap_le D L P T (lenT p i T.PP) (Nat.cast_nonneg _) (by exact_mod_cast hlen)
-  have hh : LevelStarExponents.h0 L ≤ L.etaSz := div_le_self hη0.le (by exact_mod_cast (by omega : 1 ≤ D.R.m))
-  have hstep : ∀ t a, a + 1 < D.R.r → ((lenT p i T.PP : ℝ) + T.Dp + 2) * (lenT p i T.PP + T.Dp + 2 + 2 * (D.R.r : ℝ)) + 1 ≤
-      sgR D t a - sgR D t (a + 1) := fun t a ha =>
+  have hh : LevelStarExponents.h0 L ≤ L.etaSz :=
+    div_le_self hη0.le (by exact_mod_cast (by omega : 1 ≤ D.R.m))
+  have hstep
+      : ∀ t a,
+        a + 1 < D.R.r
+          → ((lenT p i T.PP : ℝ) + T.Dp + 2) * (lenT p i T.PP + T.Dp + 2 + 2 * (D.R.r : ℝ)) + 1
+            ≤ sgR D t a - sgR D t (a + 1) := fun t a ha =>
     sgR_step D L P t _ g1 g2
-      (fun hm => le_trans g2 (minimalGap_le_first_lowerRowParameter D L P _ (Nat.le_add_left _ _) i.2 t (hwin t).1 hm)) a ha
+      (fun hm =>
+        le_trans g2
+          (minimalGap_le_first_lowerRowParameter D L P _ (Nat.le_add_left _ _) i.2 t (hwin t).1 hm))
+      a ha
   have hstep1 : ∀ t a, a + 1 < D.R.r → 1 ≤ sgR D t a - sgR D t (a + 1) := fun t a ha =>
     le_trans (le_add_of_nonneg_left (by positivity)) (hstep t a ha)
   have hent : ∀ t n, n < D.R.r → |entR D i t n| ≤ 3 * L.sc.b := by
@@ -94,7 +112,8 @@ theorem wtNum_at (P : ParameterChoice' D L) (T : ParamsT D L P) (hS : SizesAt L)
     obtain ⟨w1, w2⟩ := hwin t
     by_cases h : n < D.R.k - 1
     · obtain ⟨a1, a2⟩ := entR_cloud L i t n h
-      rw [abs_le]; constructor <;> linarith
+      rw [abs_le]
+      constructor <;> linarith
     · have := entR_node L i t n (by omega) hn
       linarith
   have hanc : ∀ t, L.sc.w'' D.R.n - D.R.r ≤ entR D i t (D.R.k - 1 - 1) := fun t => by
@@ -105,7 +124,19 @@ theorem wtNum_at (P : ParameterChoice' D L) (T : ParamsT D L P) (hS : SizesAt L)
   have hD0 : (0 : ℝ) ≤ T.Dp := Nat.cast_nonneg _
   have eN : ((((dat p i).p + (dat p i).q : ℕ)) : ℝ) = D.R.r := by rw [e3]
   have eZ : ((((dat p i).p + (dat p i).q : ℕ)) : ℤ) = D.R.r := by rw [e3]
-  refine ⟨⟨e1, e2, e3⟩, card_psi p, dim_eq p i, cols_eq p i, dom_wtA _, unit_eq p, ?_, ?_, ?_, ?_, fun him => ?_⟩
+  refine ⟨
+    ⟨e1, e2, e3⟩,
+    card_psi p,
+    dim_eq p i,
+    cols_eq p i,
+    dom_wtA _,
+    unit_eq p,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    fun him => ?_
+  ⟩
   · rw [ofRecord_logOm]; exact abs_logOm_le hS hL3
   · intro τ n
     obtain ⟨t, ht⟩ := exists_tau p τ
@@ -119,10 +150,32 @@ theorem wtNum_at (P : ParameterChoice' D L) (T : ParamsT D L P) (hS : SizesAt L)
     linarith [hanc t]
   · rw [hD]; exact ⟨q2, q3⟩
   rw [h0_eq p] at s1 s2 s3 q1 hh
-  refine ⟨p.h0, L.Sc, L.etaSz, hS0.le, hη0.le, by linarith, by exact_mod_cast s3, by rw [hD]; exact_mod_cast q1, fun u1 => ?_⟩
-  refine ⟨show 1 ≤ D.R.k - 1 by omega, show D.R.k - 1 < (dat p i).p by omega, show (dat p i).p < _ by omega,
-    show _ - (dat p i).p < (dat p i).p by omega, Int.natCast_nonneg _, fun τ a ha => uWt_anchor _ _ _ _ τ a ha,
-    show 4 * dimFlag (dat p i) + 4 ≤ lenT p i T.PP by omega, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    p.h0,
+    L.Sc,
+    L.etaSz,
+    hS0.le,
+    hη0.le,
+    by linarith,
+    by exact_mod_cast s3,
+    by rw [hD]; exact_mod_cast q1,
+    fun u1 => ?_
+  ⟩
+  refine ⟨
+    show 1 ≤ D.R.k - 1 by omega,
+    show D.R.k - 1 < (dat p i).p by omega,
+    show (dat p i).p < _ by omega,
+    show _ - (dat p i).p < (dat p i).p by omega,
+    Int.natCast_nonneg _,
+    fun τ a ha => uWt_anchor _ _ _ _ τ a ha,
+    show 4 * dimFlag (dat p i) + 4 ≤ lenT p i T.PP by omega,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · show 4 * ((cZeroN D ((i : ℕ) + 1) : ℤ) + 2 * ((dat p i).p + (dat p i).q : ℕ) + lenT p i T.PP + dimFlag (dat p i) + 1) ≤ p.h0 ∧
       24 * (((dat p i).p + (dat p i).q : ℕ) : ℤ) * lenT p i T.PP ≤ p.h0
     rw [hD, eZ]
@@ -152,8 +205,10 @@ theorem wtNum_at (P : ParameterChoice' D L) (T : ParamsT D L P) (hS : SizesAt L)
   · intro τ a b hab
     obtain ⟨t, ht⟩ := exists_tau p τ
     have hb := b.2
-    have hd : ((uW p i τ a - uW p i τ b : ℤ) : ℝ) =
-        sgR D t a - sgR D t (a + 1) - 1 + if (a : ℕ) + 1 = D.R.k + i then (D.R.r : ℝ) else 0 := by
+    have hd
+        : ((uW p i τ a - uW p i τ b : ℤ) : ℝ)
+          = sgR D t a - sgR D t (a + 1) - 1
+            + if (a : ℕ) + 1 = D.R.k + i then (D.R.r : ℝ) else 0 := by
       rw [Int.cast_sub, uW_real p i τ t ht, uW_real p i τ t ht, hab, ← entR_step]; ring
     have hge : sgR D t a - sgR D t (a + 1) - 1 ≤ ((uW p i τ a - uW p i τ b : ℤ) : ℝ) := by
       rw [hd]; split_ifs <;> linarith
@@ -162,8 +217,10 @@ theorem wtNum_at (P : ParameterChoice' D L) (T : ParamsT D L P) (hS : SizesAt L)
         ((lenT p i T.PP : ℤ) + dimFlag (dat p i) + 2 + 2 * ((dat p i).p + (dat p i).q : ℕ)) ≤ uW p i τ a - uW p i τ b + 2
       rw [hD, eZ]
       have := hstep t a (by omega)
-      have h2 : ((lenT p i T.PP : ℝ) + T.Dp + 2) * (lenT p i T.PP + T.Dp + 2 + 2 * (D.R.r : ℝ)) ≤
-        ((uW p i τ a - uW p i τ b : ℤ) : ℝ) + 2 := by linarith
+      have h2
+          : ((lenT p i T.PP : ℝ) + T.Dp + 2) * (lenT p i T.PP + T.Dp + 2 + 2 * (D.R.r : ℝ))
+            ≤ ((uW p i τ a - uW p i τ b : ℤ) : ℝ) + 2 := by
+        linarith
       exact_mod_cast h2
     · show (p.h0 : ℤ) - 1 ≤ uW p i τ a - uW p i τ b
       have := sgR_step_low D L P t a ha (by omega)
@@ -189,8 +246,14 @@ theorem wtNum_at (P : ParameterChoice' D L) (T : ParamsT D L P) (hS : SizesAt L)
     linarith
 
 theorem wtN : WtN := by
-  refine ⟨1, one_pos, fun eps he _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm _ _ _ =>
-    ⟨0, le_rfl, max 8 ((3 : ℝ) ^ (4 / eps)), fun x hx hle ι p _ i => ?_⟩⟩⟩
+  refine ⟨
+    1,
+    one_pos,
+    fun eps he _ => ⟨
+      ⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩,
+      fun Fm _ _ _ => ⟨0, le_rfl, max 8 ((3 : ℝ) ^ (4 / eps)), fun x hx hle ι p _ i => ?_⟩
+    ⟩
+  ⟩
   refine wtNum_at p i (Fm.params x hx ι) (Fm.parT x hx ι) (Fm.sizes x hx ι) ?_ ?_
   · rw [Fm.L_x x ι hx]; exact (le_max_left _ _).trans hle
   · rw [Fm.L_x x ι hx, Fm.L_eps x ι]
@@ -198,8 +261,11 @@ theorem wtN : WtN := by
       rw [← Real.rpow_mul (by norm_num)]
       have : 4 / eps * (eps / 4) = 1 := by field_simp
       rw [this, Real.rpow_one]
-    calc (3 : ℝ) = ((3 : ℝ) ^ (4 / eps)) ^ (eps / 4) := h3.symm
-      _ ≤ x ^ (eps / 4) := Real.rpow_le_rpow (by positivity) ((le_max_right _ _).trans hle) (by positivity)
+    calc
+      (3 : ℝ)
+        = ((3 : ℝ) ^ (4 / eps)) ^ (eps / 4) := h3.symm
+      _ ≤ x ^ (eps / 4) :=
+        Real.rpow_le_rpow (by positivity) ((le_max_right _ _).trans hle) (by positivity)
 
 end GlobalTheory.CovTop.WtShape
 

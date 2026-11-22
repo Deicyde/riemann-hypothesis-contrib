@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.FormalCoboun
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Katz
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Katz
 
 set_option autoImplicit false
 
@@ -16,17 +17,20 @@ namespace GlobalTheory
 
 namespace Katz
 
-theorem red_subst : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p]
-    (σ τ : Type) [Finite σ] (u : σ → MvPowerSeries (τ) (Fr p k)) (u' : σ → MvPowerSeries τ k),
-    (∀ i, constantCoeff (u i) = 0) → (∀ i, Red p (u i) (u' i)) →
-    (∀ (f : MvPowerSeries (σ) (Fr p k)) f', Red p f f' → Red p (subst u f) (subst u' f')) ∧
-    ∀ (c : WittVector p k) (f : MvPowerSeries (σ) (Fr p k)), f ∈ intBy p k σ c →
-      subst u f ∈ intBy p k τ c := by
+theorem red_subst
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (σ τ : Type)
+        [Finite σ] (u : σ → MvPowerSeries (τ) (Fr p k)) (u' : σ → MvPowerSeries τ k),
+      (∀ i, constantCoeff (u i) = 0) → (∀ i, Red p (u i) (u' i))
+        → (∀ (f : MvPowerSeries (σ) (Fr p k)) f', Red p f f' → Red p (subst u f) (subst u' f'))
+          ∧ ∀ (c : WittVector p k) (f : MvPowerSeries (σ) (Fr p k)),
+            f ∈ intBy p k σ c → subst u f ∈ intBy p k τ c := by
   intro p _ k _ _ _ σ τ _ u u' hu0 hu
   have hinj : Function.Injective (algebraMap (WittVector p k) (Fr p k)) :=
     IsFractionRing.injective _ _
-  have hu1 : ∀ i (α : τ →₀ ℕ), ∃ w : WittVector p k, coeff α (u i) = algebraMap _ (Fr p k) w ∧
-      WittVector.constantCoeff w = coeff α (u' i) := hu
+  have hu1
+      : ∀ i (α : τ →₀ ℕ), ∃ w : WittVector p k,
+        coeff α (u i) = algebraMap _ (Fr p k) w ∧ WittVector.constantCoeff w = coeff α (u' i) :=
+    hu
   choose U hU using hu1
   let V : σ → MvPowerSeries τ (WittVector p k) := U
   have hV : ∀ i α, coeff α (V i) = U i α := fun _ _ => rfl
@@ -42,8 +46,10 @@ theorem red_subst : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p
   have hVs : HasSubst V := hasSubst_of_constantCoeff_zero hV0
   refine ⟨?_, ?_⟩
   · intro f f' hf
-    have hf1 : ∀ α, ∃ w : WittVector p k, coeff α f = algebraMap _ (Fr p k) w ∧
-        WittVector.constantCoeff w = coeff α f' := hf
+    have hf1
+        : ∀ α, ∃ w : WittVector p k,
+          coeff α f = algebraMap _ (Fr p k) w ∧ WittVector.constantCoeff w = coeff α f' :=
+      hf
     choose F hF using hf1
     let G : MvPowerSeries σ (WittVector p k) := F
     have e1 : f = map (algebraMap (WittVector p k) (Fr p k)) G := by
@@ -57,8 +63,10 @@ theorem red_subst : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p
     have hf1 : ∀ α, ∃ w : WittVector p k, coeff α f = algebraMap _ (Fr p k) (c * w) := hf
     choose F hF using hf1
     let G : MvPowerSeries σ (WittVector p k) := F
-    have e1 : f = algebraMap (WittVector p k) (Fr p k) c •
-        map (algebraMap (WittVector p k) (Fr p k)) G := by
+    have e1
+        : f
+          = algebraMap (WittVector p k) (Fr p k) c
+            • map (algebraMap (WittVector p k) (Fr p k)) G := by
       ext α; rw [coeff_smul, coeff_map, hF α, map_mul]; rfl
     rw [e1, hmap, subst_smul (hVs.map _), ← map_subst hVs]
     intro α

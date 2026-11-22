@@ -4,7 +4,8 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Twis
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon
 open scoped Formalism.Per
 
 namespace GlobalTheory.OpenFiniteIndex
@@ -15,8 +16,9 @@ theorem compactSpace_fixing (l : ℕ) [Fact l.Prime] (K : FinExt l) : CompactSpa
     IntermediateField.fixingSubgroup_isClosed K.1
   exact isCompact_iff_compactSpace.mp hc.isCompact
 
-theorem finiteIndex_of_isOpen : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (H : Subgroup ↥(GK K)),
-    IsOpen (H : Set ↥(GK K)) → H.FiniteIndex := by
+theorem finiteIndex_of_isOpen
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (H : Subgroup ↥(GK K)),
+      IsOpen (H : Set ↥(GK K)) → H.FiniteIndex := by
   intro l _ K H hH
   haveI := compactSpace_fixing l K
   haveI : Finite (↥(GK K) ⧸ H) := Subgroup.quotient_finite_of_isOpen H hH

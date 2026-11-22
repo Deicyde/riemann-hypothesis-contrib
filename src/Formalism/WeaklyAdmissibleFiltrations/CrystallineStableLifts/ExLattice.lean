@@ -25,8 +25,10 @@ theorem existsStableLattice_holds : ExLattice := by
     intro x _
     have h1 : (1 : LL) ∈ (Submodule.span O (Set.range fun _ : Unit => (1 : LL)) : Set LL) :=
       Submodule.subset_span ⟨(), rfl⟩
-    have h2 := Submodule.smul_mem (Submodule.span LL (Submodule.span O (Set.range fun _ : Unit => (1 : LL)) : Set LL)) x
-      (Submodule.subset_span h1)
+    have h2 :=
+      Submodule.smul_mem
+        (Submodule.span LL (Submodule.span O (Set.range fun _ : Unit => (1 : LL)) : Set LL)) x
+        (Submodule.subset_span h1)
     simpa using h2
 
 end Formalism.WeaklyAdmissibleFiltrations

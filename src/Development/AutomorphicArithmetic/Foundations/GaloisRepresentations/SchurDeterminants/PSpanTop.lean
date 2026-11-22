@@ -11,12 +11,15 @@ open Finset MvPolynomial
 
 namespace UpperTheory.Gal.Schur
 
-private theorem span_embeddings_mul_eq_univ_of_injective {O K ι : Type} [CommRing O] [Field K] [Fintype ι] (τ : ι → O →+* K)
-    (hτ : Function.Injective τ) (N : O) (hN : ∀ t, τ t N ≠ 0) :
-    Submodule.span K {v : ι → K | ∃ x : O, v = fun t => τ t (N * x)} = ⊤ := by
+private theorem span_embeddings_mul_eq_univ_of_injective
+    {O K ι : Type} [CommRing O] [Field K] [Fintype ι]
+    (τ : ι → O →+* K) (hτ : Function.Injective τ)
+    (N : O) (hN : ∀ t, τ t N ≠ 0)
+    : Submodule.span K {v : ι → K | ∃ x : O, v = fun t => τ t (N * x)} = ⊤ := by
   classical
   by_contra hne
-  obtain ⟨φ, hφ, hmap⟩ := Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.2 hne) inferInstance
+  obtain ⟨φ, hφ, hmap⟩ :=
+    Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.2 hne) inferInstance
   have hφv : ∀ v : ι → K, φ v = ∑ t, v t * φ (Pi.single t 1) := by
     intro v
     rw [LinearMap.pi_apply_eq_sum_univ φ v]
@@ -27,7 +30,9 @@ private theorem span_embeddings_mul_eq_univ_of_injective {O K ι : Type} [CommRi
     simp [Pi.single_apply, eq_comm]
   have hzero : ∀ x : O, ∑ t, (φ (Pi.single t 1) * τ t N) * τ t x = 0 := by
     intro x
-    have hx : (fun t => τ t (N * x)) ∈ Submodule.span K {v : ι → K | ∃ x : O, v = fun t => τ t (N * x)} :=
+    have hx
+        : (fun t => τ t (N * x))
+          ∈ Submodule.span K {v : ι → K | ∃ x : O, v = fun t => τ t (N * x)} :=
       Submodule.subset_span ⟨x, rfl⟩
     have : φ (fun t => τ t (N * x)) = 0 := by
       have h2 := Submodule.mem_map_of_mem (f := φ) hx
@@ -64,8 +69,10 @@ theorem spanTop : SpanTop := by
     intro j w p
     simp only [L, LinearMap.pi_apply]
     split_ifs <;> simp
-  have hsub : ∀ j, Submodule.map (L j) (Submodule.span K {v : ι → K | ∃ x : O, v = fun t => τ t (N * x)}) ≤
-      Submodule.span K {x | ∃ β : Fin k → O, x = pt τ fun s ↦ N * β s} := by
+  have hsub
+      : ∀ j,
+        Submodule.map (L j) (Submodule.span K {v : ι → K | ∃ x : O, v = fun t => τ t (N * x)})
+          ≤ Submodule.span K {x | ∃ β : Fin k → O, x = pt τ fun s ↦ N * β s} := by
     intro j
     rw [Submodule.map_span]
     refine Submodule.span_mono ?_

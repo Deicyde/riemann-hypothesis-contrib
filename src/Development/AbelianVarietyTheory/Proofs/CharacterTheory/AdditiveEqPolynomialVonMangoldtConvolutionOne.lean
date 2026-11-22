@@ -11,12 +11,15 @@ namespace GlobalTheory.CuspGL
 
 variable {F : Type} [Field F]
 
-theorem mangoldtConv_eq_of_dvd_pow {f g : F[X]} (hf : f.Monic) (hf' : Irreducible f) (hg : g.Monic)
-    (hg' : Irreducible g) {n : ℕ} (h : g ∣ f ^ n) : g = f :=
+theorem mangoldtConv_eq_of_dvd_pow
+    {f g : F[X]} (hf : f.Monic) (hf' : Irreducible f) (hg : g.Monic) (hg' : Irreducible g)
+    {n : ℕ} (h : g ∣ f ^ n)
+    : g = f :=
   eq_of_monic_of_associated hg hf (hg'.associated_of_dvd hf' (hg'.prime.dvd_of_dvd_pow h))
 
-theorem mangoldt_pow (s : F[X] → ℂ) (f : F[X]) (m : ℕ) (hf : f.Monic) (hf' : Irreducible f) (hm : 0 < m) :
-    mangoldt s (f ^ m) = s f := by
+theorem mangoldt_pow
+    (s : F[X] → ℂ) (f : F[X]) (m : ℕ) (hf : f.Monic) (hf' : Irreducible f) (hm : 0 < m)
+    : mangoldt s (f ^ m) = s f := by
   have : {g : F[X] | g.Monic ∧ Irreducible g ∧ ∃ k : ℕ, 0 < k ∧ f ^ m = g ^ k} = {f} := by
     ext g
     simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
@@ -27,8 +30,10 @@ theorem mangoldt_pow (s : F[X] → ℂ) (f : F[X]) (m : ℕ) (hf : f.Monic) (hf'
       exact ⟨hf, hf', m, hm, rfl⟩
   rw [mangoldt, this, finsum_mem_singleton]
 
-theorem mangoldt_eq_zero (s : F[X] → ℂ) (P : F[X])
-    (h : ¬ ∃ (f : F[X]) (m : ℕ), f.Monic ∧ Irreducible f ∧ 0 < m ∧ P = f ^ m) : mangoldt s P = 0 := by
+theorem mangoldt_eq_zero
+    (s : F[X] → ℂ)
+    (P : F[X]) (h : ¬ ∃ (f : F[X]) (m : ℕ), f.Monic ∧ Irreducible f ∧ 0 < m ∧ P = f ^ m)
+    : mangoldt s P = 0 := by
   have : {g : F[X] | g.Monic ∧ Irreducible g ∧ ∃ k : ℕ, 0 < k ∧ P = g ^ k} = ∅ := by
     ext g
     simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
@@ -36,8 +41,8 @@ theorem mangoldt_eq_zero (s : F[X] → ℂ) (P : F[X])
     exact h ⟨g, k, hg, hg', hk, h'⟩
   rw [mangoldt, this, finsum_mem_empty]
 
-theorem conv_const_one_eq_divisorSum (a : F[X] → ℂ) (P : F[X]) (hP : P.Monic) :
-    conv a (fun _ => 1) P = ∑ᶠ D ∈ {D : F[X] | D.Monic ∧ D ∣ P}, a D := by
+theorem conv_const_one_eq_divisorSum (a : F[X] → ℂ) (P : F[X]) (hP : P.Monic)
+    : conv a (fun _ => 1) P = ∑ᶠ D ∈ {D : F[X] | D.Monic ∧ D ∣ P}, a D := by
   unfold conv
   refine finsum_mem_eq_of_bijOn (fun x => x.1) ⟨?_, ?_, ?_⟩ ?_
   · rintro ⟨D, E⟩ ⟨hD, _, h⟩
@@ -51,15 +56,15 @@ theorem conv_const_one_eq_divisorSum (a : F[X] → ℂ) (P : F[X]) (hP : P.Monic
   · intro x _
     simp
 
-theorem mangoldtConv_finite_monicDivisors (P : F[X]) (hP : P.Monic) :
-    {D : F[X] | D.Monic ∧ D ∣ P}.Finite := by
+theorem mangoldtConv_finite_monicDivisors (P : F[X]) (hP : P.Monic)
+    : {D : F[X] | D.Monic ∧ D ∣ P}.Finite := by
   have := Polynomial.fintypeSubtypeMonicDvd P hP.ne_zero
   exact Set.finite_coe_iff.mp (Finite.of_fintype {g : F[X] // g.Monic ∧ g ∣ P})
 
-theorem mangoldt_divisorSum_mul (s : F[X] → ℂ) (f Q : F[X]) (hf : f.Monic) (hf' : Irreducible f)
-    (hQ : Q.Monic) :
-    ∑ᶠ D ∈ {D : F[X] | D.Monic ∧ D ∣ f * Q}, mangoldt s D =
-      s f + ∑ᶠ D ∈ {D : F[X] | D.Monic ∧ D ∣ Q}, mangoldt s D := by
+theorem mangoldt_divisorSum_mul
+    (s : F[X] → ℂ) (f Q : F[X]) (hf : f.Monic) (hf' : Irreducible f) (hQ : Q.Monic)
+    : ∑ᶠ D ∈ {D : F[X] | D.Monic ∧ D ∣ f * Q}, mangoldt s D
+      = s f + ∑ᶠ D ∈ {D : F[X] | D.Monic ∧ D ∣ Q}, mangoldt s D := by
   obtain ⟨n, R, hR, hQR⟩ := WfDvdMonoid.max_power_factor hQ.ne_zero hf'
   have hnot : f ^ (n + 1) ∉ {D : F[X] | D.Monic ∧ D ∣ Q} := by
     rintro ⟨_, h⟩
@@ -97,8 +102,9 @@ theorem mangoldt_divisorSum_mul (s : F[X] → ℂ) (f Q : F[X]) (hf : f.Monic) (
       exact dvd_mul_right _ _
     · exact ⟨hDm, hd.mul_left f⟩
 
-theorem IsAdditive.eq_divisorSum_mangoldt {s : F[X] → ℂ} (hs : IsAdditive s) (P : F[X]) (hP : P.Monic) :
-    s P = ∑ᶠ D ∈ {D : F[X] | D.Monic ∧ D ∣ P}, mangoldt s D := by
+theorem IsAdditive.eq_divisorSum_mangoldt
+    {s : F[X] → ℂ} (hs : IsAdditive s) (P : F[X]) (hP : P.Monic)
+    : s P = ∑ᶠ D ∈ {D : F[X] | D.Monic ∧ D ∣ P}, mangoldt s D := by
   induction hn : P.natDegree using Nat.strong_induction_on generalizing P with
   | _ n ih =>
     by_cases hu : IsUnit P
@@ -122,11 +128,14 @@ theorem IsAdditive.eq_divisorSum_mangoldt {s : F[X] → ℂ} (hs : IsAdditive s)
         omega
       rw [mangoldt_divisorSum_mul s f Q hf hf' hQ, hs f Q hf hQ, ih _ hlt Q hQ rfl]
 
-theorem mangoldt_conv_spec : ∀ (F : Type) [Field F] (s : F[X] → ℂ), IsAdditive s →
-    (∀ P : F[X], P.Monic → s P = conv (mangoldt s) (fun _ => 1) P) ∧
-    (∀ (f : F[X]) (m : ℕ), f.Monic → Irreducible f → 0 < m → mangoldt s (f ^ m) = s f) ∧
-    ∀ P : F[X], (¬ ∃ (f : F[X]) (m : ℕ), f.Monic ∧ Irreducible f ∧ 0 < m ∧ P = f ^ m) →
-      mangoldt s P = 0 := by
+theorem mangoldt_conv_spec
+    : ∀ (F : Type) [Field F] (s : F[X] → ℂ),
+      IsAdditive s
+        → (∀ P : F[X], P.Monic → s P = conv (mangoldt s) (fun _ => 1) P)
+          ∧ (∀ (f : F[X]) (m : ℕ), f.Monic → Irreducible f → 0 < m → mangoldt s (f ^ m) = s f)
+          ∧ ∀ P : F[X],
+            (¬ ∃ (f : F[X]) (m : ℕ), f.Monic ∧ Irreducible f ∧ 0 < m ∧ P = f ^ m)
+              → mangoldt s P = 0 := by
   intro F _ s hs
   refine ⟨fun P hP => ?_, mangoldt_pow s, mangoldt_eq_zero s⟩
   rw [conv_const_one_eq_divisorSum _ P hP]

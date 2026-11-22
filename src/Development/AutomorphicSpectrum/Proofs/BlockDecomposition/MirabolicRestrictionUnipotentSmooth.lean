@@ -7,14 +7,15 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsUn
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.BZMir GroundTheory.LocalField Matrix GlobalTheory.CompanionTheory.MirFourier
+open GlobalTheory.PRep GlobalTheory.BZMir GroundTheory.LocalField Matrix
+  GlobalTheory.CompanionTheory.MirFourier
 
 namespace GlobalTheory.CompanionTheory.MirFourier
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem continuous_colMat_toAdd (n : ℕ) :
-    Continuous fun x : Multiplicative (Fin n → k) => colMat k n x.toAdd := by
+theorem continuous_colMat_toAdd (n : ℕ)
+    : Continuous fun x : Multiplicative (Fin n → k) => colMat k n x.toAdd := by
   refine continuous_pi fun i => continuous_pi fun j => ?_
   by_cases hj : j = Fin.last n
   · subst hj
@@ -29,11 +30,15 @@ theorem continuous_colMat_toAdd (n : ℕ) :
 theorem continuous_unipMir (n : ℕ) : Continuous (unipMir k n) := by
   refine Continuous.subtype_mk (Units.continuous_iff.2 ⟨?_, ?_⟩) _
   · exact continuous_const.add (continuous_colMat_toAdd n)
-  · have h : Continuous fun x : Multiplicative (Fin n → k) => (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) k) - colMat k n x.toAdd :=
+  · have h : Continuous fun x : Multiplicative (Fin n → k) =>
+        (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) k) - colMat k n x.toAdd :=
       continuous_const.sub (continuous_colMat_toAdd n)
     exact h
 
-theorem isSmooth_comp_unipMir : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (τ : Representation ℂ (Mir k n) V), IsSmooth τ → IsSmooth (τ.comp (unipMir k n)) := by
+theorem isSmooth_comp_unipMir
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (τ : Representation ℂ (Mir k n) V),
+      IsSmooth τ → IsSmooth (τ.comp (unipMir k n)) := by
   intro k _ _ _ _ n V _ _ τ h w
   exact (h w).preimage (continuous_unipMir n)
 

@@ -9,19 +9,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem const_bij {R X : Type} [CommRing R] [AddCommGroup X] [Module R X] (U : Ultrafilter ℕ)
-    (m : Ideal R) (I : ℕ → Ideal R) (hc : IsAdicComplete m X)
-    (hf : ∀ j : ℕ, Finite (X ⧸ (m ^ j • ⊤ : Submodule R X)))
-    (hI : ∀ j, (I j • ⊤ : Submodule R X) = m ^ j • ⊤) :
-    Function.Bijective
-      (ULim.mk (U : Filter ℕ) I (fun _ => X) ∘ₗ LinearMap.pi fun _ : ℕ => (LinearMap.id : X →ₗ[R] X)) := by
+private theorem const_bij
+    {R X : Type} [CommRing R] [AddCommGroup X] [Module R X]
+    (U : Ultrafilter ℕ)
+    (m : Ideal R) (I : ℕ → Ideal R)
+    (hc : IsAdicComplete m X) (hf : ∀ j : ℕ, Finite (X ⧸ (m ^ j • ⊤ : Submodule R X)))
+    (hI : ∀ j, (I j • ⊤ : Submodule R X) = m ^ j • ⊤)
+    : Function.Bijective
+      (ULim.mk (U : Filter ℕ) I (fun _ => X)
+        ∘ₗ LinearMap.pi fun _ : ℕ => (LinearMap.id : X →ₗ[R] X)) := by
   have hb := ULim.const_bijective R ℕ U m X hc hf
-  have key : ∀ p q : ℕ → X, ULim.mk (U : Filter ℕ) I (fun _ => X) p = ULim.mk (U : Filter ℕ) I (fun _ => X) q ↔
-      ULim.mk (U : Filter ℕ) (fun j => m ^ j) (fun _ => X) p =
-        ULim.mk (U : Filter ℕ) (fun j => m ^ j) (fun _ => X) q := by
+  have key
+      : ∀ p q : ℕ → X,
+        ULim.mk (U : Filter ℕ) I (fun _ => X) p = ULim.mk (U : Filter ℕ) I (fun _ => X) q
+          ↔ ULim.mk (U : Filter ℕ) (fun j => m ^ j) (fun _ => X) p
+            = ULim.mk (U : Filter ℕ) (fun j => m ^ j) (fun _ => X) q := by
     intro p q
     rw [← sub_eq_zero, ← map_sub, ULim.mk_eq_zero, ← sub_eq_zero (a := ULim.mk _ _ _ p), ← map_sub,
       ULim.mk_eq_zero]
@@ -31,18 +37,31 @@ private theorem const_bij {R X : Type} [CommRing R] [AddCommGroup X] [Module R X
   obtain ⟨z, hz⟩ := hb.2 (ULim.mk _ _ _ p)
   exact ⟨z, (key (fun _ => z) p).2 hz⟩
 
-private theorem comp_smul {R : Type} [CommRing R] (F : Filter ℕ) (I : ℕ → Ideal R) (M M' : ℕ → Type)
-    [∀ N, AddCommGroup (M N)] [∀ N, Module R (M N)] [∀ N, AddCommGroup (M' N)] [∀ N, Module R (M' N)]
-    (ν : ℕ → ℕ) (hν : Tendsto ν F atTop) (hI : Antitone I) (f : R)
-    (φ : ∀ N, (M N ⧸ (I (ν N) • ⊤ : Submodule R (M N))) →ₗ[R] (M' N ⧸ (I (ν N) • ⊤ : Submodule R (M' N))))
-    (ψ : ∀ N, (M' N ⧸ (I (ν N) • ⊤ : Submodule R (M' N))) →ₗ[R] (M N ⧸ (I (ν N) • ⊤ : Submodule R (M N))))
+private theorem comp_smul
+    {R : Type} [CommRing R]
+    (F : Filter ℕ)
+    (I : ℕ → Ideal R)
+    (M M' : ℕ → Type) [∀ N, AddCommGroup (M N)] [∀ N, Module R (M N)] [∀ N, AddCommGroup (M' N)]
+    [∀ N, Module R (M' N)]
+    (ν : ℕ → ℕ) (hν : Tendsto ν F atTop)
+    (hI : Antitone I)
+    (f : R)
+    (φ : ∀ N,
+      (M N ⧸ (I (ν N) • ⊤ : Submodule R (M N))) →ₗ[R] (M' N ⧸ (I (ν N) • ⊤ : Submodule R (M' N))))
+    (ψ : ∀ N,
+      (M' N ⧸ (I (ν N) • ⊤ : Submodule R (M' N))) →ₗ[R] (M N ⧸ (I (ν N) • ⊤ : Submodule R (M N))))
     (h : ∀ᶠ N in F, ∀ z, ψ N (φ N z) = f • z)
     (Φ : ULim F I M →ₗ[R] ULim F I M') (Ψ : ULim F I M' →ₗ[R] ULim F I M)
-    (hΦ : ∀ (p : ∀ N, M N) (p' : ∀ N, M' N), (∀ᶠ N in F, Submodule.Quotient.mk (p' N) =
-      φ N (Submodule.Quotient.mk (p N))) → Φ (ULim.mk F I M p) = ULim.mk F I M' p')
-    (hΨ : ∀ (p : ∀ N, M' N) (p' : ∀ N, M N), (∀ᶠ N in F, Submodule.Quotient.mk (p' N) =
-      ψ N (Submodule.Quotient.mk (p N))) → Ψ (ULim.mk F I M' p) = ULim.mk F I M p') (z : ULim F I M) :
-    Ψ (Φ z) = f • z := by
+    (hΦ : ∀ (p : ∀ N, M N) (p' : ∀ N, M' N),
+      (∀ᶠ N in F, Submodule.Quotient.mk (p' N) =
+        φ N (Submodule.Quotient.mk (p N)))
+        → Φ (ULim.mk F I M p) = ULim.mk F I M' p')
+    (hΨ : ∀ (p : ∀ N, M' N) (p' : ∀ N, M N),
+      (∀ᶠ N in F, Submodule.Quotient.mk (p' N) =
+        ψ N (Submodule.Quotient.mk (p N)))
+        → Ψ (ULim.mk F I M' p) = ULim.mk F I M p')
+    (z : ULim F I M)
+    : Ψ (Φ z) = f • z := by
   obtain ⟨p, rfl⟩ := ULim.mk_surjective _ _ _ z
   choose q hq using fun N => Submodule.Quotient.mk_surjective _ (φ N (Submodule.Quotient.mk (p N)))
   rw [hΦ p q (Eventually.of_forall hq), ← map_smul]

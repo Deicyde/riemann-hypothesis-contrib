@@ -11,16 +11,20 @@ noncomputable section
 namespace Formalism.MainNotions.ModuliIntegralCharts.H1
 
 open AlgebraicGeometry CategoryTheory MonoidalCategory CartesianMonoidalCategory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GermFun
 
-theorem sec_eq_of_cover {X : Scheme.{0}} {U : X.Opens} {ι : Type} (V : ι → X.Opens)
-    (hle : ∀ i, V i ≤ U) (hcov : U ≤ iSup V) (s t : Γ(X, U))
-    (h : ∀ i, (X.presheaf.map (homOfLE (hle i)).op).hom s = (X.presheaf.map (homOfLE (hle i)).op).hom t) :
-    s = t := by
+theorem sec_eq_of_cover
+    {X : Scheme.{0}} {U : X.Opens} {ι : Type}
+    (V : ι → X.Opens) (hle : ∀ i, V i ≤ U) (hcov : U ≤ iSup V) (s t : Γ(X, U))
+    (h : ∀ i,
+      (X.presheaf.map (homOfLE (hle i)).op).hom s = (X.presheaf.map (homOfLE (hle i)).op).hom t)
+    : s = t := by
   exact X.sheaf.eq_of_locally_eq' V U (fun i => homOfLE (hle i)) hcov s t h
 
 theorem exists_chart {X : Scheme.{0}} (L : LB X) (hL : L.IsLB) (q : X) : ∃ i, q ∈ L.U i := by
@@ -29,11 +33,15 @@ theorem exists_chart {X : Scheme.{0}} (L : LB X) (hL : L.IsLB) (q : X) : ∃ i, 
     trivial
   exact (TopologicalSpace.Opens.mem_iSup).1 hq
 
-theorem gen_eq_of_corr {X Y : Scheme.{0}} (L : LB X) (hL : L.IsLB) (ψ : Y ⟶ X) (a : ℤ) {K' : Type}
-    [Fintype K'] (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ)
+theorem gen_eq_of_corr
+    {X Y : Scheme.{0}} (L : LB X) (hL : L.IsLB) (ψ : Y ⟶ X)
+    (a : ℤ)
+    {K' : Type} [Fintype K']
+    (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ)
     (t₁ t₂ : LB.Gen (LB.LinComb L (K := Fin 1) (fun _ => ψ) fun _ => a))
-    (g : LB.Gen (LB.LinComb L φ' ε')) (h₁ : LB.Gen.Corr L _ _ _ _ t₁ g)
-    (h₂ : LB.Gen.Corr L _ _ _ _ t₂ g) : t₁ = t₂ := by
+    (g : LB.Gen (LB.LinComb L φ' ε'))
+    (h₁ : LB.Gen.Corr L _ _ _ _ t₁ g) (h₂ : LB.Gen.Corr L _ _ _ _ t₂ g)
+    : t₁ = t₂ := by
   classical
   unfold LB.Gen.Corr at h₁ h₂
   obtain ⟨s₁⟩ := t₁
@@ -45,7 +53,9 @@ theorem gen_eq_of_corr {X Y : Scheme.{0}} (L : LB X) (hL : L.IsLB) (ψ : Y ⟶ X
   refine sec_eq_of_cover (X := Y)
     (fun j' : {j' : K' → L.ι // L.Coh φ' j' ∧ ∀ (k : Fin 1) (k' : K'), ψ = φ' k' → j k = j' k'} =>
       (LB.LinComb L (K := Fin 1) (fun _ => ψ) fun _ => a).U j ⊓ (LB.LinComb L φ' ε').U j'.1)
-    (fun _ => inf_le_left) ?_ _ _ (fun j' => ?_)
+    (fun _ => inf_le_left)
+    ?_ _ _
+    (fun j' => ?_)
   · intro p hp
     have hp' : p ∈ L.wchart (fun _ : Fin 1 => ψ) j := hp
     unfold LB.wchart at hp'
@@ -77,10 +87,13 @@ theorem gen_eq_of_corr {X Y : Scheme.{0}} (L : LB X) (hL : L.IsLB) (ψ : Y ⟶ X
     have e2 := congrArg Units.val e
     exact e2
 
-theorem pull_unique {S : Scheme.{0}} (A : Over S) [GrpObj A] (L : LB A.left) (a : ℤ) {T T' : Over S}
-    (h : T' ⊗ A ⟶ T ⊗ A) (hh : h ≫ snd T A = snd T' A) (s : LB.Sec (LPow A L a T))
-    (s₁ s₂ : LB.Sec (LPow A L a T')) (h₁ : IsPullSec A L a h hh s s₁) (h₂ : IsPullSec A L a h hh s s₂) :
-    s₁ = s₂ := by
+theorem pull_unique
+    {S : Scheme.{0}} (A : Over S) [GrpObj A]
+    (L : LB A.left) (a : ℤ)
+    {T T' : Over S} (h : T' ⊗ A ⟶ T ⊗ A) (hh : h ≫ snd T A = snd T' A) (s : LB.Sec (LPow A L a T))
+    (s₁ s₂ : LB.Sec (LPow A L a T')) (h₁ : IsPullSec A L a h hh s s₁)
+    (h₂ : IsPullSec A L a h hh s s₂)
+    : s₁ = s₂ := by
   have hf : s₁.f = s₂.f := funext fun j => (h₁ j).trans (h₂ j).symm
   cases s₁
   cases s₂
@@ -88,12 +101,19 @@ theorem pull_unique {S : Scheme.{0}} (A : Over S) [GrpObj A] (L : LB A.left) (a 
   subst hf
   rfl
 
-theorem value_unique {S : Scheme.{0}} (A : Over S) [GrpObj A] (L : LB A.left) (hL : L.IsLB) (a : ℤ)
+theorem value_unique
+    {S : Scheme.{0}} (A : Over S) [GrpObj A]
+    (L : LB A.left) (hL : L.IsLB)
+    (a : ℤ)
     {T : Over S} (s : LB.Sec (LPow A L a T)) (z : T ⟶ A)
     (τ : LB.Gen (LB.LinComb L (Y := T.left) (K := Fin 1) (fun _ => z.left) (fun _ => a)))
-    (v₁ v₂ : Γ(T.left, ⊤)) (h₁ : IsValueAt A L a s z τ v₁) (h₂ : IsValueAt A L a s z τ v₂) : v₁ = v₂ := by
-  refine sec_eq_of_cover (V := fun j => (L.LinComb (Y := T.left) (K := Fin 1) (fun _ => z.left) (fun _ => a)).U j)
-    (fun j => le_top) ?_ v₁ v₂ (fun j => ?_)
+    (v₁ v₂ : Γ(T.left, ⊤)) (h₁ : IsValueAt A L a s z τ v₁) (h₂ : IsValueAt A L a s z τ v₂)
+    : v₁ = v₂ := by
+  refine sec_eq_of_cover
+    (V := fun j => (L.LinComb (Y := T.left) (K := Fin 1) (fun _ => z.left) (fun _ => a)).U j)
+    (fun j => le_top)
+    ?_ v₁ v₂
+    (fun j => ?_)
   · intro p _
     obtain ⟨i, hi⟩ := exists_chart L hL (z.left p)
     rw [TopologicalSpace.Opens.mem_iSup]
@@ -127,8 +147,9 @@ def ordGE (R ι : Type) [CommRing R] (n : ℕ) : Ideal (MvPolynomial ι R) where
     rw [map_add (f := _)]
     exact le_add_left (hp b hb)
 
-theorem mem_ordGE {R ι : Type} [CommRing R] {n : ℕ} {p : MvPolynomial ι R} :
-    p ∈ ordGE R ι n ↔ ∀ e ∈ p.support, n ≤ e.degree := Iff.rfl
+theorem mem_ordGE {R ι : Type} [CommRing R] {n : ℕ} {p : MvPolynomial ι R}
+    : p ∈ ordGE R ι n ↔ ∀ e ∈ p.support, n ≤ e.degree :=
+  Iff.rfl
 
 theorem orig_pow_le (R ι : Type) [CommRing R] (n : ℕ) : orig R ι ^ n ≤ ordGE R ι n := by
   induction n with
@@ -151,11 +172,11 @@ theorem orig_pow_le (R ι : Type) [CommRing R] (n : ℕ) : orig R ι ^ n ≤ ord
       rw [MvPolynomial.support_mul_X, Finset.mem_map] at he
       obtain ⟨d, hd, rfl⟩ := he
       have h1 := hp d hd
-      have h2 : (d + Finsupp.single i 1).degree = d.degree + 1 := by
-        simp [map_add (f := _)]
+      have h2 : (d + Finsupp.single i 1).degree = d.degree + 1 := by simp [map_add (f := _)]
       simp only [addRightEmbedding_apply, h2]
       omega
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       rw [mul_add]
       exact Ideal.add_mem _ hx hy
@@ -163,15 +184,21 @@ theorem orig_pow_le (R ι : Type) [CommRing R] (n : ℕ) : orig R ι ^ n ≤ ord
       rw [smul_eq_mul, mul_left_comm]
       exact Ideal.mul_mem_left _ a hx
 
-theorem coeff_eq_zero_of_mem {R ι : Type} [CommRing R] {n : ℕ} {p : MvPolynomial ι R}
-    (hp : p ∈ orig R ι ^ n) {e : ι →₀ ℕ} (he : e.degree < n) : AddMonoidAlgebra.coeff p e = 0 := by
+theorem coeff_eq_zero_of_mem
+    {R ι : Type} [CommRing R]
+    {n : ℕ} {p : MvPolynomial ι R} (hp : p ∈ orig R ι ^ n)
+    {e : ι →₀ ℕ} (he : e.degree < n)
+    : AddMonoidAlgebra.coeff p e = 0 := by
   by_contra hne
   have h1 := (mem_ordGE.1 (orig_pow_le R ι n hp)) e (MvPolynomial.mem_support_iff.2 hne)
   omega
 
-theorem coeff_psTrunc {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι] (m : ℕ)
-    (f : MvPowerSeries ι R) (e : ι →₀ ℕ) (he : e.degree ≤ m) :
-    AddMonoidAlgebra.coeff (psTrunc m f) e = MvPowerSeries.coeff e f := by
+theorem coeff_psTrunc
+    {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι]
+    (m : ℕ)
+    (f : MvPowerSeries ι R)
+    (e : ι →₀ ℕ) (he : e.degree ≤ m)
+    : AddMonoidAlgebra.coeff (psTrunc m f) e = MvPowerSeries.coeff e f := by
   unfold psTrunc
   rw [MvPolynomial.coeff_sum, Finset.sum_eq_single e]
   · rw [MvPolynomial.coeff_monomial, if_pos rfl]
@@ -180,8 +207,7 @@ theorem coeff_psTrunc {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι] (
   · intro he'
     exfalso
     apply he'
-    have hdeg : e.sum (fun _ k => k) = e.degree := by
-      rfl
+    have hdeg : e.sum (fun _ k => k) = e.degree := by rfl
     unfold degLE
     rw [Finset.mem_filter, Finset.mem_image]
     refine ⟨⟨fun i => ⟨e i, ?_⟩, Finset.mem_univ _, ?_⟩, ?_⟩
@@ -196,15 +222,17 @@ theorem coeff_psTrunc {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι] (
       simp
     · omega
 
-theorem psJet_inj {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι] {f f' : MvPowerSeries ι R}
-    (h : ∀ m, psJet m f = psJet m f') : f = f' := by
+theorem psJet_inj
+    {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι]
+    {f f' : MvPowerSeries ι R} (h : ∀ m, psJet m f = psJet m f')
+    : f = f' := by
   ext e
   have h0 := h e.degree
   unfold psJet at h0
   have h1 := Ideal.Quotient.eq.1 h0
   have h2 := coeff_eq_zero_of_mem h1 (e := e) (Nat.lt_succ_self _)
-  rw [MvPolynomial.coeff_sub, coeff_psTrunc e.degree f e le_rfl,
-    coeff_psTrunc e.degree f' e le_rfl] at h2
+  rw [MvPolynomial.coeff_sub, coeff_psTrunc e.degree f e le_rfl, coeff_psTrunc e.degree f' e le_rfl]
+    at h2
   exact sub_eq_zero.1 h2
 
 end GermFun
@@ -213,8 +241,7 @@ open GermFun in
 theorem isGermFun_holds : IsGermFunStatement := by
   unfold IsGermFunStatement
   intro E _ _ _ H Dw l Xo c S _ _ y d x act e wP k F f f' h₁ h₂
-  have hL : Xo.univ.t.PP.L.IsLB := by
-    exact Xo.univ.t.PP.isLB
+  have hL : Xo.univ.t.PP.L.IsLB := by exact Xo.univ.t.PP.isLB
   apply psJet_inj
   intro m
   obtain ⟨F₁, τ₁, hP₁, hC₁, hV₁⟩ := h₁ m

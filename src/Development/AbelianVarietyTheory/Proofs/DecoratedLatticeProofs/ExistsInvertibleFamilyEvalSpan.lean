@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Wey
 
 @[expose] public section
 
-open MvPolynomial Formalism.BasicNotions Formalism.L2.Forms Formalism.L2.Ker GlobalTheory.KJInf MeasureTheory
+open MvPolynomial Formalism.BasicNotions Formalism.L2.Forms Formalism.L2.Ker GlobalTheory.KJInf
+  MeasureTheory
 open scoped TensorProduct
 
 noncomputable section
@@ -19,12 +20,17 @@ def evalLin {ι : Type} {a : ℕ} (y : ι → Matrix (Fin a) (Fin a) ℂ) : PY �
   map_add' F G := by simp [evalAt]
   map_smul' c F := by simp [evalAt, MvPolynomial.smul_eval]
 
-theorem evalLin_apply {ι : Type} {a : ℕ} (y : ι → Matrix (Fin a) (Fin a) ℂ) (F : PY ι a) :
-    evalLin y F = evalAt y F := rfl
+theorem evalLin_apply {ι : Type} {a : ℕ} (y : ι → Matrix (Fin a) (Fin a) ℂ) (F : PY ι a)
+    : evalLin y F = evalAt y F :=
+  rfl
 
-theorem exists_evalAt_span (ι : Type) [Fintype ι] (a : ℕ) (lam : ι → DomWeight a) (n : ι → ℕ)
-    (W : Type) [AddCommGroup W] [Module ℂ W] (T : PY ι a →ₗ[ℂ] W) :
-    ∃ (m : ℕ) (y : Fin m → ι → Matrix (Fin a) (Fin a) ℂ) (P : Fin m → W),
+theorem exists_evalAt_span
+    (ι : Type) [Fintype ι]
+    (a : ℕ) (lam : ι → DomWeight a)
+    (n : ι → ℕ)
+    (W : Type) [AddCommGroup W] [Module ℂ W]
+    (T : PY ι a →ₗ[ℂ] W)
+    : ∃ (m : ℕ) (y : Fin m → ι → Matrix (Fin a) (Fin a) ℂ) (P : Fin m → W),
       (∀ j, IsInv (y j)) ∧ ∀ F ∈ Vn lam n, T F = ∑ j, evalAt (y j) F • P j := by
   classical
   set V := Vn lam n with hV
@@ -64,9 +70,10 @@ theorem exists_evalAt_span (ι : Type) [Fintype ι] (a : ℕ) (lam : ι → DomW
       mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
     rw [hfy i]
     rfl
-  have key : (⟨F, hF⟩ : V) = L (Φ ⟨F, hF⟩) := by
-    rw [← LinearMap.comp_apply, hL]; rfl
-  calc T F = T ((⟨F, hF⟩ : V) : PY ι a) := rfl
+  have key : (⟨F, hF⟩ : V) = L (Φ ⟨F, hF⟩) := by rw [← LinearMap.comp_apply, hL]; rfl
+  calc
+    T F
+      = T ((⟨F, hF⟩ : V) : PY ι a) := rfl
     _ = T ((L (Φ ⟨F, hF⟩) : V) : PY ι a) := by rw [← key]
     _ = ∑ j, evalAt (y j) F • T (L (Pi.single j 1) : PY ι a) := by
       set_option synthInstance.maxHeartbeats 100000 in

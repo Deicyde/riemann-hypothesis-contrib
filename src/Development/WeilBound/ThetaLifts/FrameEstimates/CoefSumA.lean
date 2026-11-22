@@ -11,7 +11,8 @@ open scoped ENNReal ComplexConjugate Pointwise
 
 namespace PositivityTheory.ThKEst.CS
 
-variable {G Γ : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [AddCommGroup Γ]
+variable
+  {G Γ : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [AddCommGroup Γ]
 
 structure Dual (r : Γ →+ G) (e : Γ → G → ℂ) : Prop where
   inj : Function.Injective r
@@ -39,8 +40,7 @@ theorem Dual.zero (h : Dual r e) (u) : e 0 u = 1 := by
   exact (mul_eq_left₀ (h.ne 0 u)).1 this.symm
 
 omit [IsTopologicalAddGroup G] in
-theorem Dual.zero' (h : Dual r e) (ξ) : e ξ 0 = 1 := by
-  simpa using h.triv ξ 0
+theorem Dual.zero' (h : Dual r e) (ξ) : e ξ 0 = 1 := by simpa using h.triv ξ 0
 
 omit [IsTopologicalAddGroup G] in
 theorem Dual.conj (h : Dual r e) (ξ u) : conj (e ξ u) = e (-ξ) u := by
@@ -50,16 +50,17 @@ theorem Dual.conj (h : Dual r e) (ξ u) : conj (e ξ u) = e (-ξ) u := by
   exact mul_left_cancel₀ (h.ne ξ u) (h2.trans h1.symm)
 
 omit [IsTopologicalAddGroup G] in
-theorem Dual.per (h : Dual r e) (ξ η u) : e ξ (r η + u) = e ξ u := by
-  rw [h.addr, h.triv, one_mul]
+theorem Dual.per (h : Dual r e) (ξ η u) : e ξ (r η + u) = e ξ u := by rw [h.addr, h.triv, one_mul]
 
-def liftC (f : G → ℂ) (hf : ∀ ξ u, f (r ξ + u) = f u) (hc : Continuous f) : C(G ⧸ r.range, ℂ) :=
-  ⟨Quotient.lift f (by
+def liftC (f : G → ℂ) (hf : ∀ ξ u, f (r ξ + u) = f u) (hc : Continuous f) : C(G ⧸ r.range, ℂ) := ⟨
+  Quotient.lift f (by
     intro x y hxy
     obtain ⟨ξ, hξ⟩ : -x + y ∈ r.range := QuotientAddGroup.leftRel_apply.1 hxy
     have := hf ξ x
     rw [hξ, show -x + y + x = y by abel] at this
-    exact this.symm), hc.quotient_lift _⟩
+    exact this.symm),
+  hc.quotient_lift _
+⟩
 
 def chiC (h : Dual r e) (ξ : Γ) : C(G ⧸ r.range, ℂ) := liftC (e ξ) (h.per ξ) (h.cont ξ)
 
@@ -105,8 +106,7 @@ def Achar (h : Dual r e) : StarSubalgebra ℂ C(G ⧸ r.range, ℂ) where
     | zero => rw [zero_mul]; exact Submodule.zero_mem _
     | add x x' _ _ h1 h2 => rw [add_mul]; exact Submodule.add_mem _ h1 h2
     | smul c x _ h => rw [smul_mul_assoc]; exact Submodule.smul_mem _ c h
-  one_mem' := by
-    rw [← chiC_zero h]; exact Submodule.subset_span ⟨0, rfl⟩
+  one_mem' := by rw [← chiC_zero h]; exact Submodule.subset_span ⟨0, rfl⟩
   algebraMap_mem' := by
     intro c
     rw [Algebra.algebraMap_eq_smul_one, ← chiC_zero h]
@@ -116,7 +116,8 @@ def Achar (h : Dual r e) : StarSubalgebra ℂ C(G ⧸ r.range, ℂ) where
     induction hf using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨ξ, rfl⟩ := hx
-      rw [chiC_star]; exact Submodule.subset_span ⟨-ξ, rfl⟩
+      rw [chiC_star]
+      exact Submodule.subset_span ⟨-ξ, rfl⟩
     | zero => rw [star_zero]; exact Submodule.zero_mem _
     | add x x' _ _ h1 h2 => rw [star_add]; exact Submodule.add_mem _ h1 h2
     | smul c x _ h => rw [star_smul]; exact Submodule.smul_mem _ _ h
@@ -152,8 +153,8 @@ theorem Dual.separates (h : Dual r e) : (Achar h).SeparatesPoints := by
   exact (mul_eq_left₀ (h.ne ξ x)).1 h2.symm
 
 omit [IsTopologicalAddGroup G] in
-theorem Dual.bdd (h : Dual r e) {g : G → ℂ} (hg : Continuous g) (hp : ∀ ξ u, g (r ξ + u) = g u) :
-    ∃ C, ∀ u, ‖g u‖ ≤ C := by
+theorem Dual.bdd (h : Dual r e) {g : G → ℂ} (hg : Continuous g) (hp : ∀ ξ u, g (r ξ + u) = g u)
+    : ∃ C, ∀ u, ‖g u‖ ≤ C := by
   obtain ⟨K, hK, hKc⟩ := h.cpt
   obtain ⟨C, hC⟩ := hK.exists_bound_of_continuousOn hg.continuousOn
   refine ⟨C, fun u => ?_⟩
@@ -162,7 +163,8 @@ theorem Dual.bdd (h : Dual r e) {g : G → ℂ} (hg : Continuous g) (hp : ∀ ξ
   rw [e]
   exact hC _ hξ
 
-variable [MeasurableSpace G] [BorelSpace G] [Countable Γ] {μ : Measure G} [μ.IsAddHaarMeasure] {D : Set G}
+variable
+  [MeasurableSpace G] [BorelSpace G] [Countable Γ] {μ : Measure G} [μ.IsAddHaarMeasure] {D : Set G}
 
 instance countable_range (r : Γ →+ G) : Countable r.range := r.rangeRestrict_surjective.countable
 
@@ -172,8 +174,8 @@ instance mcv (Λ : AddSubgroup G) : MeasurableConstVAdd Λ G :=
 instance viv (Λ : AddSubgroup G) : VAddInvariantMeasure Λ G μ :=
   ⟨fun c s _ => measure_preimage_add μ (c : G) s⟩
 
-theorem Dual.lint (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) (f : G → ℝ≥0∞) :
-    ∫⁻ u, f u ∂μ = ∑' ξ, ∫⁻ u in D, f (r ξ + u) ∂μ := by
+theorem Dual.lint (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) (f : G → ℝ≥0∞)
+    : ∫⁻ u, f u ∂μ = ∑' ξ, ∫⁻ u in D, f (r ξ + u) ∂μ := by
   rw [hD.lintegral_eq_tsum'' f, ← (AddMonoidHom.ofInjective h.inj).toEquiv.tsum_eq]
   rfl
 
@@ -182,8 +184,10 @@ theorem Dual.fin (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) : μ 
   have hK' := hK.closure
   have hm : MeasurableSet (closure K) := isClosed_closure.measurableSet
   have h1 := h.lint hD ((closure K).indicator 1)
-  have hmeas : ∀ ξ, AEMeasurable (fun u => (closure K).indicator (1 : G → ℝ≥0∞) (r ξ + u)) (μ.restrict D) := fun ξ =>
-    ((measurable_one.indicator hm).comp (measurable_const_add _)).aemeasurable
+  have hmeas
+      : ∀ ξ,
+        AEMeasurable (fun u => (closure K).indicator (1 : G → ℝ≥0∞) (r ξ + u)) (μ.restrict D) :=
+    fun ξ => ((measurable_one.indicator hm).comp (measurable_const_add _)).aemeasurable
   rw [lintegral_indicator_one hm, ← lintegral_tsum hmeas] at h1
   refine ne_top_of_le_ne_top (hK'.measure_lt_top (μ := μ)).ne ?_
   rw [h1, ← setLIntegral_one]
@@ -193,42 +197,54 @@ theorem Dual.fin (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) : μ 
   have : r (-ξ) + u ∈ closure K := subset_closure (by rwa [map_neg, neg_add_eq_sub])
   simp [Set.indicator_of_mem this, ← map_neg, -map_neg]
 
-theorem Dual.intOn (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) {g : G → ℂ} (hg : Continuous g)
-    (hp : ∀ ξ u, g (r ξ + u) = g u) : IntegrableOn g D μ := by
+theorem Dual.intOn
+    (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ)
+    {g : G → ℂ} (hg : Continuous g) (hp : ∀ ξ u, g (r ξ + u) = g u)
+    : IntegrableOn g D μ := by
   obtain ⟨C, hC⟩ := h.bdd hg hp
-  exact Measure.integrableOn_of_bounded (h.fin hD) hg.aestronglyMeasurable (M := C) (Eventually.of_forall hC)
+  exact Measure.integrableOn_of_bounded (h.fin hD) hg.aestronglyMeasurable (M := C)
+    (Eventually.of_forall hC)
 
-theorem Dual.eq_zero (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) {P : G → ℂ} (hPc : Continuous P)
-    (hPp : ∀ ξ u, P (r ξ + u) = P u) (hcoef : ∀ ξ, ∫ u in D, e ξ u * P u ∂μ = 0) : P = 0 := by
+theorem Dual.eq_zero
+    (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ)
+    {P : G → ℂ} (hPc : Continuous P) (hPp : ∀ ξ u, P (r ξ + u) = P u)
+    (hcoef : ∀ ξ, ∫ u in D, e ξ u * P u ∂μ = 0)
+    : P = 0 := by
   have := h.compactQ
   have hDf := h.fin hD
   obtain ⟨C, hC⟩ := h.bdd hPc hPp
-  have hint : ∀ g : C(G ⧸ r.range, ℂ), IntegrableOn (fun u : G => g (u : G ⧸ r.range) * P u) D μ := fun g =>
-    h.intOn hD ((g.continuous.comp continuous_quotient_mk').mul hPc) fun ξ u => by
-      rw [hPp]
-      congr 2
-      rw [QuotientAddGroup.eq, show -(r ξ + u) + u = -r ξ by abel]
-      exact neg_mem ⟨ξ, rfl⟩
-  let L₀ : C(G ⧸ r.range, ℂ) →ₗ[ℂ] ℂ :=
-    { toFun := fun g => ∫ u in D, g (u : G ⧸ r.range) * P u ∂μ
-      map_add' := fun x y => by
-        simp only [ContinuousMap.add_apply, add_mul]
-        exact integral_add (hint x) (hint y)
-      map_smul' := fun c x => by
-        simp only [ContinuousMap.smul_apply, smul_eq_mul, mul_assoc, RingHom.id_apply]
-        exact integral_const_mul _ _ }
+  have hint : ∀ g : C(G ⧸ r.range, ℂ), IntegrableOn (fun u : G => g (u : G ⧸ r.range) * P u) D μ :=
+    fun g =>
+      h.intOn hD ((g.continuous.comp continuous_quotient_mk').mul hPc) fun ξ u => by
+        rw [hPp]
+        congr 2
+        rw [QuotientAddGroup.eq, show -(r ξ + u) + u = - r ξ by abel]
+        exact neg_mem ⟨ξ, rfl⟩
+  let L₀ : C(G ⧸ r.range, ℂ) →ₗ[ℂ] ℂ := {
+    toFun := fun g => ∫ u in D, g (u : G ⧸ r.range) * P u ∂μ
+    map_add' := fun x y => by
+      simp only [ContinuousMap.add_apply, add_mul]
+      exact integral_add (hint x) (hint y)
+    map_smul' := fun c x => by
+      simp only [ContinuousMap.smul_apply, smul_eq_mul, mul_assoc, RingHom.id_apply]
+      exact integral_const_mul _ _
+  }
   have hC0 : 0 ≤ C := (norm_nonneg _).trans (hC 0)
-  let L : C(G ⧸ r.range, ℂ) →L[ℂ] ℂ := L₀.mkContinuous (C * μ.real D) fun g => by
-    refine (norm_setIntegral_le_of_norm_le_const (C := ‖g‖ * C) hDf.lt_top fun u _ => ?_).trans (le_of_eq (by ring))
-    rw [norm_mul]
-    exact mul_le_mul (g.norm_coe_le_norm _) (hC u) (norm_nonneg _) (norm_nonneg _)
+  let L : C(G ⧸ r.range, ℂ) →L[ℂ] ℂ :=
+    L₀.mkContinuous (C * μ.real D) fun g => by
+      refine (norm_setIntegral_le_of_norm_le_const (C := ‖g‖ * C) hDf.lt_top fun u _ => ?_).trans
+        (le_of_eq (by ring))
+      rw [norm_mul]
+      exact mul_le_mul (g.norm_coe_le_norm _) (hC u) (norm_nonneg _) (norm_nonneg _)
   have hvan : (Achar h : Set C(G ⧸ r.range, ℂ)) ⊆ {g | L g = 0} := by
     intro g hg
     have : Submodule.span ℂ (Set.range (chiC h)) ≤ LinearMap.ker L₀ :=
       Submodule.span_le.2 (by rintro _ ⟨ξ, rfl⟩; exact hcoef ξ)
     exact this hg
-  have hclos := ContinuousMap.starSubalgebra_topologicalClosure_eq_top_of_separatesPoints (Achar h) h.separates
-  let Pb : C(G ⧸ r.range, ℂ) := liftC (fun u => conj (P u)) (fun ξ u => by rw [hPp]) (Complex.continuous_conj.comp hPc)
+  have hclos :=
+    ContinuousMap.starSubalgebra_topologicalClosure_eq_top_of_separatesPoints (Achar h) h.separates
+  let Pb : C(G ⧸ r.range, ℂ) :=
+    liftC (fun u => conj (P u)) (fun ξ u => by rw [hPp]) (Complex.continuous_conj.comp hPc)
   have hmem : Pb ∈ closure ((Achar h : Set C(G ⧸ r.range, ℂ))) := by
     have : Pb ∈ (Achar h).topologicalClosure := by rw [hclos]; exact StarSubalgebra.mem_top
     exact this
@@ -257,14 +273,16 @@ theorem Dual.eq_zero (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) {
   refine (hPc.ae_eq_iff_eq μ continuous_zero).1 (h0.mono fun u hu => ?_)
   simpa using hu
 
-theorem Dual.orth (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) {ξ : Γ} (hξ : ξ ≠ 0) :
-    ∫ u in D, e ξ u ∂μ = 0 := by
+theorem Dual.orth (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) {ξ : Γ} (hξ : ξ ≠ 0)
+    : ∫ u in D, e ξ u ∂μ = 0 := by
   obtain ⟨u₀, hu₀⟩ := h.nondeg ξ hξ
   have hD' := hD.vadd_of_comm u₀
-  have h1 := hD.setIntegral_eq hD' (f := e ξ) (fun g s => by
-    obtain ⟨_, η, rfl⟩ := g
-    exact h.per ξ η s)
-  have h2 := (measurePreserving_add_left μ u₀).setIntegral_image_emb (measurableEmbedding_addLeft u₀) (e ξ) D
+  have h1 :=
+    hD.setIntegral_eq hD' (f := e ξ) (fun g s => by
+      obtain ⟨_, η, rfl⟩ := g
+      exact h.per ξ η s)
+  have h2 :=
+    (measurePreserving_add_left μ u₀).setIntegral_image_emb (measurableEmbedding_addLeft u₀) (e ξ) D
   have e' : u₀ +ᵥ D = (fun s => u₀ + s) '' D := rfl
   rw [e', h2] at h1
   simp only [h.addr] at h1
@@ -272,13 +290,15 @@ theorem Dual.orth (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) {ξ 
   by_contra hne
   exact hu₀ ((mul_eq_right₀ hne).1 h1.symm)
 
-theorem Dual.series (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) {P : G → ℂ} (hP : Continuous P)
-    (hper : ∀ ξ u, P (r ξ + u) = P u) {c : Γ → ℂ} (hc : ∀ ξ, ∫ u in D, e ξ u * P u ∂μ = c ξ)
-    (hsum : Summable fun ξ => ‖c ξ‖) : (μ.real D : ℂ) * P 0 = ∑' ξ, c ξ := by
+theorem Dual.series
+    (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ)
+    {P : G → ℂ} (hP : Continuous P) (hper : ∀ ξ u, P (r ξ + u) = P u)
+    {c : Γ → ℂ} (hc : ∀ ξ, ∫ u in D, e ξ u * P u ∂μ = c ξ) (hsum : Summable fun ξ => ‖c ξ‖)
+    : (μ.real D : ℂ) * P 0 = ∑' ξ, c ξ := by
   classical
   set S : G → ℂ := fun u => ∑' ξ, c ξ * e (-ξ) u with hSdef
-  have hS : Continuous S := continuous_tsum (fun ξ => continuous_const.mul (h.cont _)) hsum
-    (fun ξ u => by simp [h.norm])
+  have hS : Continuous S :=
+    continuous_tsum (fun ξ => continuous_const.mul (h.cont _)) hsum (fun ξ u => by simp [h.norm])
   have hSper : ∀ η u, S (r η + u) = S u := fun η u => by simp only [hSdef, h.per]
   have hcoefS : ∀ ξ, ∫ u in D, e ξ u * S u ∂μ = μ.real D * c ξ := by
     intro ξ
@@ -287,8 +307,8 @@ theorem Dual.series (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) {P
       simp only [hSdef, ← tsum_mul_left, sub_eq_add_neg, h.addl]
       exact tsum_congr fun _ => by ring
     simp_rw [hsw]
-    have hInt : ∀ ξ', Integrable (fun u => c ξ' * e (ξ - ξ') u) (μ.restrict D) :=
-      fun ξ' => h.intOn hD (continuous_const.mul (h.cont _)) fun η u => by rw [h.per]
+    have hInt : ∀ ξ', Integrable (fun u => c ξ' * e (ξ - ξ') u) (μ.restrict D) := fun ξ' =>
+      h.intOn hD (continuous_const.mul (h.cont _)) fun η u => by rw [h.per]
     have hnorm : ∀ ξ', ∫ u in D, ‖c ξ' * e (ξ - ξ') u‖ ∂μ = μ.real D * ‖c ξ'‖ := by
       intro ξ'
       simp [h.norm]
@@ -297,25 +317,37 @@ theorem Dual.series (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) {P
     · simp [h.zero]
     · intro ξ' hne
       rw [integral_const_mul, h.orth hD (sub_ne_zero.2 hne.symm), mul_zero]
-  have hQ := h.eq_zero hD (P := fun u => (μ.real D : ℂ) * P u - S u) ((continuous_const.mul hP).sub hS)
-    (fun ξ u => by simp only [hper, hSper]) fun ξ => by
-      have h1 : IntegrableOn (fun u => (μ.real D : ℂ) * (e ξ u * P u)) D μ :=
-        h.intOn hD (continuous_const.mul ((h.cont ξ).mul hP)) fun η u => by rw [h.per, hper]
-      have h2 : IntegrableOn (fun u => e ξ u * S u) D μ :=
-        h.intOn hD ((h.cont ξ).mul hS) fun η u => by rw [h.per, hSper]
-      have e1 : ∀ u, e ξ u * ((μ.real D : ℂ) * P u - S u) = (μ.real D : ℂ) * (e ξ u * P u) - e ξ u * S u :=
-        fun u => by ring
-      simp only [e1]
-      rw [integral_sub h1 h2, integral_const_mul, hc, hcoefS, sub_self]
+  have hQ :=
+    h.eq_zero hD
+      (P := fun u => (μ.real D : ℂ) * P u - S u)
+      ((continuous_const.mul hP).sub hS)
+      (fun ξ u => by simp only [hper, hSper])
+      fun ξ => by
+        have h1 : IntegrableOn (fun u => (μ.real D : ℂ) * (e ξ u * P u)) D μ :=
+          h.intOn hD (continuous_const.mul ((h.cont ξ).mul hP)) fun η u => by rw [h.per, hper]
+        have h2 : IntegrableOn (fun u => e ξ u * S u) D μ :=
+          h.intOn hD ((h.cont ξ).mul hS) fun η u => by rw [h.per, hSper]
+        have e1
+            : ∀ u,
+              e ξ u * ((μ.real D : ℂ) * P u - S u)
+                = (μ.real D : ℂ) * (e ξ u * P u) - e ξ u * S u := fun u => by
+          ring
+        simp only [e1]
+        rw [integral_sub h1 h2, integral_const_mul, hc, hcoefS, sub_self]
   have := congrFun hQ 0
   simp only [Pi.zero_apply, sub_eq_zero] at this
   rw [this]
   simp [hSdef, h.zero']
 
-theorem Dual.poisson_le [LocallyCompactSpace G] (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ) :
-    ∃ c : ℝ, 0 < c ∧ ∀ H : G → ℂ, Continuous H →
-      (∀ K : Set G, IsCompact K → ∃ b : Γ → ℝ, Summable b ∧ ∀ ξ, ∀ a ∈ K, ‖H (r ξ + a)‖ ≤ b ξ) →
-      ‖∑' ξ, H (r ξ)‖ₑ ≤ ENNReal.ofReal c * ∑' ξ, ‖∫ u, e ξ u * H u ∂μ‖ₑ := by
+theorem Dual.poisson_le
+    [LocallyCompactSpace G] (h : Dual r e) (hD : IsAddFundamentalDomain r.range D μ)
+    : ∃ c : ℝ,
+      0 < c
+        ∧ ∀ H : G → ℂ,
+          Continuous H
+            → (∀ K : Set G,
+              IsCompact K → ∃ b : Γ → ℝ, Summable b ∧ ∀ ξ, ∀ a ∈ K, ‖H (r ξ + a)‖ ≤ b ξ)
+            → ‖∑' ξ, H (r ξ)‖ₑ ≤ ENNReal.ofReal c * ∑' ξ, ‖∫ u, e ξ u * H u ∂μ‖ₑ := by
   have hDf := h.fin hD
   have hm : 0 < μ.real D := ENNReal.toReal_pos (hD.measure_ne_zero (NeZero.ne μ)) hDf
   refine ⟨(μ.real D)⁻¹, inv_pos.2 hm, fun H hH hb => ?_⟩
@@ -332,7 +364,8 @@ theorem Dual.poisson_le [LocallyCompactSpace G] (h : Dual r e) (hD : IsAddFundam
     simp only [hP]
     refine Eq.trans (tsum_congr fun η => ?_) ((Equiv.addRight ξ).tsum_eq (fun η => H (r η + u)))
     simp [add_assoc]
-  have hT : ∀ ξ, Continuous fun u => H (r ξ + u) := fun ξ => hH.comp (continuous_const.add continuous_id)
+  have hT : ∀ ξ, Continuous fun u => H (r ξ + u) := fun ξ =>
+    hH.comp (continuous_const.add continuous_id)
   have hPc : Continuous P := by
     rw [continuous_iff_continuousAt]
     intro w
@@ -345,11 +378,13 @@ theorem Dual.poisson_le [LocallyCompactSpace G] (h : Dual r e) (hD : IsAddFundam
     obtain ⟨ξ₀, hξ₀⟩ := hKc 0
     have hb0 : ∀ ξ, 0 ≤ b ξ := fun ξ => (norm_nonneg _).trans (hb2 ξ _ hξ₀)
     rw [← lintegral_tsum fun ξ => (hT ξ).enorm.measurable.aemeasurable]
-    refine ne_top_of_le_ne_top (b := ∫⁻ _ in D, ENNReal.ofReal (∑' ξ, b ξ) ∂μ) ?_ (lintegral_mono fun u => ?_)
+    refine ne_top_of_le_ne_top (b := ∫⁻ _ in D, ENNReal.ofReal (∑' ξ, b ξ) ∂μ) ?_
+      (lintegral_mono fun u => ?_)
     · rw [setLIntegral_const]
       exact ENNReal.mul_ne_top ENNReal.ofReal_ne_top hDf
     · obtain ⟨η, hη⟩ := hKc u
-      rw [ENNReal.ofReal_tsum_of_nonneg hb0 hb1, ← (Equiv.addRight η).tsum_eq (fun ξ => ENNReal.ofReal (b ξ))]
+      rw [ENNReal.ofReal_tsum_of_nonneg hb0 hb1,
+        ← (Equiv.addRight η).tsum_eq (fun ξ => ENNReal.ofReal (b ξ))]
       refine ENNReal.tsum_le_tsum fun ξ => ?_
       rw [← ofReal_norm]
       refine ENNReal.ofReal_le_ofReal ?_
@@ -367,7 +402,8 @@ theorem Dual.poisson_le [LocallyCompactSpace G] (h : Dual r e) (hD : IsAddFundam
       exact hfin.lt_top
     simp only [hcdef]
     rw [hD.integral_eq_tsum'' _ hgi, ← (AddMonoidHom.ofInjective h.inj).toEquiv.tsum_eq]
-    have hv : ∀ η u, ((AddMonoidHom.ofInjective h.inj).toEquiv η +ᵥ u : G) = r η + u := fun η u => rfl
+    have hv : ∀ η u, ((AddMonoidHom.ofInjective h.inj).toEquiv η +ᵥ u : G) = r η + u := fun η u =>
+      rfl
     simp only [hv, h.per, hP, ← tsum_mul_left]
     refine integral_tsum (fun η => ((h.cont ξ).mul (hT η)).aestronglyMeasurable) ?_
     simpa only [hgn] using hfin

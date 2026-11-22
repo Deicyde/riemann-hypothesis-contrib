@@ -13,8 +13,8 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-theorem IntClosureLocFinite.proof (h : RelAlgClosureFinite.Statement) :
-    IntClosureLocFinite.Statement := by
+theorem IntClosureLocFinite.proof (h : RelAlgClosureFinite.Statement)
+    : IntClosureLocFinite.Statement := by
   classical
   intro F L _ _ φ S hS A T hDA hloc
   let : Algebra A L := (φ.comp A.subtype).toAlgebra
@@ -69,7 +69,8 @@ theorem IntClosureLocFinite.proof (h : RelAlgClosureFinite.Statement) :
     hs ▸ Submodule.mem_top
   let f : integralClosure D M →ₗ[D] L :=
     (IsScalarTower.toAlgHom D M L).toLinearMap ∘ₗ (integralClosure D M).val.toLinearMap
-  have hyD : y ∈ Submodule.span D ((s.image fun g : integralClosure D M => ((g : M) : L)) : Set L) := by
+  have hyD
+      : y ∈ Submodule.span D ((s.image fun g : integralClosure D M => ((g : M) : L)) : Set L) := by
     have hmap := Submodule.mem_map_of_mem (f := f) hyspan
     rw [Submodule.map_span] at hmap
     rw [Finset.coe_image]
@@ -79,8 +80,7 @@ theorem IntClosureLocFinite.proof (h : RelAlgClosureFinite.Statement) :
   have hu : IsUnit (algebraMap D A m) := hm
   have hyu : y = (hu.unit : A) • x := by
     rw [hy, Submonoid.smul_def, IsUnit.unit_spec, algebraMap_smul]
-  have hx' : x = ((hu.unit⁻¹ : Aˣ) : A) • y := by
-    rw [hyu, smul_smul, Units.inv_mul, one_smul]
+  have hx' : x = ((hu.unit⁻¹ : Aˣ) : A) • y := by rw [hyu, smul_smul, Units.inv_mul, one_smul]
   rw [hx']
   exact Submodule.smul_mem _ _ hyA
 

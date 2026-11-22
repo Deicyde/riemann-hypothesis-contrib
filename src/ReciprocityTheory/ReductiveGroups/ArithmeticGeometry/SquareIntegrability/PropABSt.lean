@@ -17,13 +17,10 @@ variable {ι : Type} [Fintype ι]
 
 open Classical
 
-def paTh (Y : GT ι) (q : ℕ) (F : EuclideanSpace ℂ ι → ℂ) : EuclideanSpace ℂ ι → ℂ :=
-  fun v => ∑' γ : lat Y.b, Y.ka γ * paU q γ F v
+def paTh (Y : GT ι) (q : ℕ) (F : EuclideanSpace ℂ ι → ℂ) : EuclideanSpace ℂ ι → ℂ := fun v =>
+  ∑' γ : lat Y.b, Y.ka γ * paU q γ F v
 
 end
-
-
-
 
 end
 

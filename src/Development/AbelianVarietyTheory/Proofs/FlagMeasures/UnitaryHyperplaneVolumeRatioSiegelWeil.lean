@@ -11,10 +11,12 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SiegelOneVect
 
 namespace GlobalTheory.VolRatioFromSiegelWeil
 
-theorem volumeRatio :
-    HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryConvergent → ∀ D : Formalism.BasicNotions.D7, Formalism.MainNotions.RT.MassRatioUnderVolume D :=
-  fun hP =>
-    GlobalTheory.VolRatioFromSecondClause.volumeRatio
-      (GlobalTheory.T.siegel_one_vector_measurable_of_compactSupport (GlobalTheory.GaussMean.oneVectorCc_of_siegelWeil hP))
+theorem volumeRatio
+    : HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryConvergent
+      → ∀ D : Formalism.BasicNotions.D7,
+        Formalism.MainNotions.RT.MassRatioUnderVolume D := fun hP =>
+  GlobalTheory.VolRatioFromSecondClause.volumeRatio
+    (GlobalTheory.T.siegel_one_vector_measurable_of_compactSupport
+      (GlobalTheory.GaussMean.oneVectorCc_of_siegelWeil hP))
 
 end GlobalTheory.VolRatioFromSiegelWeil

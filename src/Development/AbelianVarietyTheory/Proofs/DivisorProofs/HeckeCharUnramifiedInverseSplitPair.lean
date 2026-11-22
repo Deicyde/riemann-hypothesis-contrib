@@ -16,16 +16,22 @@ namespace GlobalTheory.CMVal.Euler.SplitPair
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem eq_exp_of_le {x : WithZero (Multiplicative ℤ)} {m : ℤ} (h : x ≤ WithZero.exp m) (h' : ¬ x ≤ WithZero.exp (m - 1)) :
-    x = WithZero.exp m := by
+theorem eq_exp_of_le
+    {x : WithZero (Multiplicative ℤ)} {m : ℤ}
+    (h : x ≤ WithZero.exp m) (h' : ¬ x ≤ WithZero.exp (m - 1))
+    : x = WithZero.exp m := by
   refine le_antisymm h (not_lt.1 fun h1 => h' ?_)
   rw [← WithZero.lt_mul_exp_iff_le WithZero.exp_ne_zero, ← WithZero.exp_add, sub_add_cancel]
   exact h1
 
-theorem exists_int_cong (P : HeightOneSpectrum (𝓞 E)) (z : P.adicCompletion E) (hz : Valued.v z ≤ 1) :
-    ∃ b : 𝓞 E, Valued.v (algebraMap E (Af E) (algebraMap (𝓞 E) E b) P - z) ≤ WithZero.exp (-((1 : ℕ) : ℤ)) := by
-  obtain ⟨k, hk⟩ := (HeightOneSpectrum.denseRange_algebraMap E P).mem_nhds (OrderUnits.ball_mem_nhds P 1 z)
-  have hk' : Valued.v (algebraMap E (P.adicCompletion E) k - z) ≤ WithZero.exp (-((1 : ℕ) : ℤ)) := hk
+theorem exists_int_cong (P : HeightOneSpectrum (𝓞 E)) (z : P.adicCompletion E) (hz : Valued.v z ≤ 1)
+    : ∃ b : 𝓞 E,
+      Valued.v (algebraMap E (Af E) (algebraMap (𝓞 E) E b) P - z)
+        ≤ WithZero.exp (-((1 : ℕ) : ℤ)) := by
+  obtain ⟨k, hk⟩ :=
+    (HeightOneSpectrum.denseRange_algebraMap E P).mem_nhds (OrderUnits.ball_mem_nhds P 1 z)
+  have hk' : Valued.v (algebraMap E (P.adicCompletion E) k - z) ≤ WithZero.exp (-((1 : ℕ) : ℤ)) :=
+    hk
   have hval : ∀ x : E, Valued.v (algebraMap E (P.adicCompletion E) x) = P.valuation E x := fun x =>
     HeightOneSpectrum.valuedAdicCompletion_eq_valuation' P x
   have h1 : P.valuation E k ≤ 1 := by
@@ -33,7 +39,9 @@ theorem exists_int_cong (P : HeightOneSpectrum (𝓞 E)) (z : P.adicCompletion E
       rw [← WithZero.exp_zero, WithZero.exp_le_exp]; omega
     have := Valuation.map_add_le _ (hk'.trans h2) hz
     rwa [sub_add_cancel, hval] at this
-  obtain ⟨b, hb⟩ := P.exists_valuation_sub_lt_of_integer h1 (Units.mk0 (WithZero.exp (-((1 : ℕ) : ℤ))) WithZero.exp_ne_zero)
+  obtain ⟨b, hb⟩ :=
+    P.exists_valuation_sub_lt_of_integer h1
+      (Units.mk0 (WithZero.exp (-((1 : ℕ) : ℤ))) WithZero.exp_ne_zero)
   refine ⟨b, ?_⟩
   rw [← hval, map_sub] at hb
   have := Valuation.map_add_le _ hb.le hk'
@@ -46,11 +54,16 @@ def unitF (a : OF E) (ha : a ≠ 0) : (maximalRealSubfield E)ˣ :=
 def locF (P : HeightOneSpectrum (𝓞 E)) (a : OF E) (ha : a ≠ 0) : (P.adicCompletion E)ˣ :=
   Formalism.L2.Host.atFin P (Formalism.L2.Host.upF (maximalRealSubfield E) (unitF a ha))
 
-theorem coe_locF (P : HeightOneSpectrum (𝓞 E)) (a : OF E) (ha : a ≠ 0) : (locF P a ha : P.adicCompletion E) = iota a P := rfl
+theorem coe_locF (P : HeightOneSpectrum (𝓞 E)) (a : OF E) (ha : a ≠ 0)
+    : (locF P a ha : P.adicCompletion E) = iota a P :=
+  rfl
 
-theorem loc_mul_loc {χ : HChar E} (hF : TrivOnF χ) {v : HeightOneSpectrum (OF E)} {P P' : HeightOneSpectrum (𝓞 E)}
-    (hP : Over P v) (hP' : Over P' v) (hne : P ≠ P') (h2 : ∀ R, Over R v → R = P ∨ R = P') (a : OF E) (ha : a ≠ 0) :
-    χ.loc P (locF P a ha) * χ.loc P' (locF P' a ha) = 1 := by
+theorem loc_mul_loc
+    {χ : HChar E} (hF : TrivOnF χ)
+    {v : HeightOneSpectrum (OF E)} {P P' : HeightOneSpectrum (𝓞 E)}
+    (hP : Over P v) (hP' : Over P' v) (hne : P ≠ P') (h2 : ∀ R, Over R v → R = P ∨ R = P')
+    (a : OF E) (ha : a ≠ 0)
+    : χ.loc P (locF P a ha) * χ.loc P' (locF P' a ha) = 1 := by
   classical
   have hS : Formalism.L2.Host.aboveF (L := E) (maximalRealSubfield E) v = {P, P'} := by
     ext R
@@ -64,18 +77,25 @@ theorem loc_mul_loc {χ : HChar E} (hF : TrivOnF χ) {v : HeightOneSpectrum (OF 
   rw [MonoidHom.finsetProd_apply, hS, Finset.prod_pair hne] at h
   exact h
 
-theorem unrAt_and_val : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (χ : HChar E) (v : HeightOneSpectrum (OF E))
-    (P P' : HeightOneSpectrum (𝓞 E)), TrivOnF χ → Splits v → Over P v → Over P' v → P ≠ P' → LevelLe χ P' 1 → UnrAt χ P →
-    UnrAt χ P' ∧ val χ P' = (val χ P)⁻¹ := by
+theorem unrAt_and_val
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (χ : HChar E)
+        (v : HeightOneSpectrum (OF E)) (P P' : HeightOneSpectrum (𝓞 E)),
+      TrivOnF χ → Splits v → Over P v → Over P' v → P ≠ P' → LevelLe χ P' 1 → UnrAt χ P
+        → UnrAt χ P' ∧ val χ P' = (val χ P)⁻¹ := by
   intro E _ _ _ χ v P P' hF hs hP hP' hne hlev hun
   obtain ⟨h2, hef⟩ := GlobalTheory.CMVal.Euler.SplitPlace.split_place E v hs
   have hmul := loc_mul_loc hF hP hP' hne (h2 P P' hP hP' hne)
-  have hval : ∀ R, Over R v → ∀ (n : ℕ) (a : OF E), a ∈ v.asIdeal ^ n → a ∉ v.asIdeal ^ (n + 1) →
-      Valued.v (iota a R) = WithZero.exp (-(n : ℤ)) := fun R hR n a h h' => by
+  have hval
+      : ∀ R,
+        Over R v
+          → ∀ (n : ℕ) (a : OF E),
+            a ∈ v.asIdeal ^ n → a ∉ v.asIdeal ^ (n + 1)
+              → Valued.v (iota a R) = WithZero.exp (-(n : ℤ)) := fun R hR n a h h' => by
     refine eq_exp_of_le (val_iota_le_of_mem hR n h) fun h3 => h' ?_
     rw [← (hef R hR).2.1, ← val_iota_le_iff]
     convert h3 using 2
-    push_cast; ring
+    push_cast
+    ring
   have hun' : UnrAt χ P' := by
     intro u hu
     have hu1 : Valued.v (u : P'.adicCompletion E) = 1 := hu
@@ -93,9 +113,10 @@ theorem unrAt_and_val : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (
       rw [Valuation.map_eq_of_sub_lt _ (hu1 ▸ h4.trans_lt hlt), hu1]
     have hav : a ∉ v.asIdeal ^ (0 + 1) := fun h => (h5 ▸ val_iota_le_of_mem hP' 1 h).not_gt hlt
     have ha0 : a ≠ 0 := fun h => hav (h ▸ zero_mem _)
-    have h6 : χ.loc P (locF P a ha0) = 1 := hun _ (by
-      show Valued.v (iota a P) = 1
-      simpa using hval P hP 0 a (by simp) hav)
+    have h6 : χ.loc P (locF P a ha0) = 1 :=
+      hun _ (by
+        show Valued.v (iota a P) = 1
+        simpa using hval P hP 0 a (by simp) hav)
     have h7 := hmul a ha0
     rw [h6, one_mul] at h7
     have h8 : χ.loc P' (locF P' a ha0 / u) = 1 := by

@@ -4,15 +4,19 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.dvr_of_norm_integral :
-    ∀ {l : ℕ} [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K], (∀ x : PadicAlgCl l, ‖x‖ ≤ 1 → IsIntegral ℤ_[l] x) → IsDiscreteValuationRing (integralClosure ℤ_[l] K) := by
+theorem UpperTheory.dvr_of_norm_integral
+    : ∀ {l : ℕ} [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l))
+        [FiniteDimensional ℚ_[l] K],
+      (∀ x : PadicAlgCl l, ‖x‖ ≤ 1 → IsIntegral ℤ_[l] x)
+        → IsDiscreteValuationRing (integralClosure ℤ_[l] K) := by
   intro l _ K _ h
   have hded : IsDedekindDomain (integralClosure ℤ_[l] K) :=
     IsIntegralClosure.isDedekindDomain ℤ_[l] ℚ_[l] K _
   have hfr : IsFractionRing (integralClosure ℤ_[l] K) K :=
     IsIntegralClosure.isFractionRing_of_finite_extension ℤ_[l] ℚ_[l] K _
-  have key : ∀ x : K, ‖(x : PadicAlgCl l)‖ ≤ 1 →
-      IsLocalization.IsInteger (integralClosure ℤ_[l] K) x := by
+  have key
+      : ∀ x : K,
+        ‖(x : PadicAlgCl l)‖ ≤ 1 → IsLocalization.IsInteger (integralClosure ℤ_[l] K) x := by
     intro x hx
     have hi : IsIntegral ℤ_[l] x :=
       (isIntegral_algHom_iff (K.val.restrictScalars ℤ_[l]) Subtype.val_injective).mp (h _ hx)
@@ -32,6 +36,5 @@ theorem UpperTheory.dvr_of_norm_integral :
     intro a b hab
     exact hinjK (congrArg Subtype.val hab)
   have hnf : ¬ IsField (integralClosure ℤ_[l] K) := fun hf =>
-    IsDiscreteValuationRing.not_isField ℤ_[l]
-      ((Algebra.IsIntegral.isField_iff_isField hinj).mpr hf)
+    IsDiscreteValuationRing.not_isField ℤ_[l] ((Algebra.IsIntegral.isField_iff_isField hinj).mpr hf)
   exact ((IsDiscreteValuationRing.TFAE (integralClosure ℤ_[l] K) hnf).out 1 2).mpr hval

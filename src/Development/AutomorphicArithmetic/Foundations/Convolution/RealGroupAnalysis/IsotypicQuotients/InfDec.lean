@@ -5,20 +5,24 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Pp
 
-private theorem real_dec {ι : Type} (X : GL (Fin 2) (ι → ℝ)) :
-    ∃ (s : (ι → ℝ)ˣ) (g : GL (Fin 2) (ι → ℝ)) (k : Matrix.unitaryGroup (Fin 2) (ι → ℝ)),
-      Matrix.GeneralLinearGroup.det g = 1 ∧
-        X = Matrix.GeneralLinearGroup.scalar (Fin 2) s * (g * Unitary.toUnits k) := by
+private theorem real_dec {ι : Type} (X : GL (Fin 2) (ι → ℝ))
+    : ∃ (s : (ι → ℝ)ˣ) (g : GL (Fin 2) (ι → ℝ)) (k : Matrix.unitaryGroup (Fin 2) (ι → ℝ)),
+      Matrix.GeneralLinearGroup.det g = 1
+        ∧ X = Matrix.GeneralLinearGroup.scalar (Fin 2) s * (g * Unitary.toUnits k) := by
   classical
   set D : (ι → ℝ)ˣ := Matrix.GeneralLinearGroup.det X with hD
   have hw : ∀ w, (D : ι → ℝ) w ≠ 0 := fun w => ((Pi.isUnit_iff.1 D.isUnit) w).ne_zero
   have hpos : ∀ w, 0 < Real.sqrt |(D : ι → ℝ) w| := fun w => Real.sqrt_pos.2 (abs_pos.2 (hw w))
-  let s : (ι → ℝ)ˣ :=
-    ⟨fun w => Real.sqrt |(D : ι → ℝ) w|, fun w => (Real.sqrt |(D : ι → ℝ) w|)⁻¹,
-      funext fun w => mul_inv_cancel₀ (hpos w).ne', funext fun w => inv_mul_cancel₀ (hpos w).ne'⟩
+  let s : (ι → ℝ)ˣ := ⟨
+    fun w => Real.sqrt |(D : ι → ℝ) w|,
+    fun w => (Real.sqrt |(D : ι → ℝ) w|)⁻¹,
+    funext fun w => mul_inv_cancel₀ (hpos w).ne',
+    funext fun w => inv_mul_cancel₀ (hpos w).ne'
+  ⟩
   let e : ι → ℝ := fun w => if 0 < (D : ι → ℝ) w then 1 else -1
   have hee : e * e = 1 := by
     funext w
@@ -51,8 +55,10 @@ private theorem real_dec {ι : Type} (X : GL (Fin 2) (ι → ℝ)) :
   have hdetk : (Matrix.GeneralLinearGroup.det (Unitary.toUnits k) : ι → ℝ) = e := by
     change K.det = e
     simp [K, Matrix.det_fin_two]
-  have hdets : ∀ t : (ι → ℝ)ˣ,
-      (Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.scalar (Fin 2) t) : ι → ℝ) = t * t := by
+  have hdets
+      : ∀ t : (ι → ℝ)ˣ,
+        (Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.scalar (Fin 2) t) : ι → ℝ)
+          = t * t := by
     intro t
     change (Matrix.GeneralLinearGroup.scalar (Fin 2) t).val.det = _
     simp [Matrix.det_fin_two, sq]
@@ -65,23 +71,27 @@ private theorem real_dec {ι : Type} (X : GL (Fin 2) (ι → ℝ)) :
     have h1 := congrFun hee w
     have h2 : (s : ι → ℝ) w * ((s⁻¹ : (ι → ℝ)ˣ) : ι → ℝ) w = 1 := congrFun s.mul_inv w
     simp only [Pi.mul_apply, Pi.one_apply] at h1 ⊢
-    calc _ = (((s : ι → ℝ) w * ((s⁻¹ : (ι → ℝ)ˣ) : ι → ℝ) w) ^ 2) * (e w * e w) := by ring
+    calc
+      _ = (((s : ι → ℝ) w * ((s⁻¹ : (ι → ℝ)ˣ) : ι → ℝ) w) ^ 2) * (e w * e w) := by ring
       _ = 1 := by rw [h2, h1]; simp
-  · have hsc : Matrix.GeneralLinearGroup.scalar (Fin 2) s * Matrix.GeneralLinearGroup.scalar (Fin 2) s⁻¹ = 1 := by
+  · have hsc
+        : Matrix.GeneralLinearGroup.scalar (Fin 2) s * Matrix.GeneralLinearGroup.scalar (Fin 2) s⁻¹
+          = 1 := by
       rw [← map_mul]; simp
     rw [mul_assoc _ _ (Unitary.toUnits k), hk, mul_one, ← mul_assoc, hsc, one_mul]
 
-theorem UpperTheory.ConvolutionTheory.R2.Pp.infDec :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F], UpperTheory.ConvolutionTheory.R2.Pp.InfDec F := by
+theorem UpperTheory.ConvolutionTheory.R2.Pp.infDec
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F],
+      UpperTheory.ConvolutionTheory.R2.Pp.InfDec F := by
   intro F _ _ _ x
   obtain ⟨s, g, k, hg, hx⟩ := real_dec (GeneralLinearGroup.map (TR.pInf F) x)
-  have hdet : GeneralLinearGroup.det (TR.infGL F 2 g) = 1 := by
-    rw [TR.det_infGL, hg, map_one]
+  have hdet : GeneralLinearGroup.det (TR.infGL F 2 g) = 1 := by rw [TR.det_infGL, hg, map_one]
   have hdet' : (TR.infGL F 2 g).val.det = 1 := congrArg Units.val hdet
   let G : G1 F := ⟨(TR.infGL F 2 g).val, hdet'⟩
   have hG : gl G = TR.infGL F 2 g := Units.ext rfl
-  have hsc : Matrix.GeneralLinearGroup.scalar (Fin 2) (TR.infId F s) =
-      TR.infGL F 2 (Matrix.GeneralLinearGroup.scalar (Fin 2) s) := by
+  have hsc
+      : Matrix.GeneralLinearGroup.scalar (Fin 2) (TR.infId F s)
+        = TR.infGL F 2 (Matrix.GeneralLinearGroup.scalar (Fin 2) s) := by
     have hs : ∀ y, TR.pInf F (TR.sInf F y) = y := fun y => (TR.infEq F).symm_apply_apply y
     have hi : TR.pInf F (TR.infId F s).val = s.val := by
       change TR.pInf F (1 - TR.sInf F 1 + TR.sInf F _) = _

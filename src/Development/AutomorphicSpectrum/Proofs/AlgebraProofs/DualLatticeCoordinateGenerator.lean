@@ -9,23 +9,26 @@ namespace GlobalTheory.CompanionTheory.Ar.Num.HhGraded
 
 open GlobalTheory.CompanionTheory.Ar.Num
 
-theorem mem_dotDual_iff {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R : Subalgebra o Ω) {n : ℕ}
-    (L : AddSubgroup (Fin n → Ω)) (v : Fin n → Ω) : v ∈ dotDual R L ↔ ∀ l ∈ L, l ⬝ᵥ v ∈ R := by
+theorem mem_dotDual_iff
+    {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
+    (R : Subalgebra o Ω)
+    {n : ℕ} (L : AddSubgroup (Fin n → Ω)) (v : Fin n → Ω)
+    : v ∈ dotDual R L ↔ ∀ l ∈ L, l ⬝ᵥ v ∈ R := by
   simp [dotDual, AddSubgroup.mem_iInf]
 
-theorem mem_annSub_iff {Ω : Type} [Field Ω] {n k : ℕ} (l : Fin n → Ω) :
-    l ∈ annSub Ω n k ↔ ∀ j : Fin n, (j : ℕ) < k → l j = 0 := by
+theorem mem_annSub_iff {Ω : Type} [Field Ω] {n k : ℕ} (l : Fin n → Ω)
+    : l ∈ annSub Ω n k ↔ ∀ j : Fin n, (j : ℕ) < k → l j = 0 := by
   simp [annSub, Submodule.mem_pi]
 
-theorem single_mem_annSub {Ω : Type} [Field Ω] {n k : ℕ} (j : Fin n) (hj : k ≤ (j : ℕ)) :
-    (Pi.single j 1 : Fin n → Ω) ∈ annSub Ω n k := by
+theorem single_mem_annSub {Ω : Type} [Field Ω] {n k : ℕ} (j : Fin n) (hj : k ≤ (j : ℕ))
+    : (Pi.single j 1 : Fin n → Ω) ∈ annSub Ω n k := by
   rw [mem_annSub_iff]
   intro m hm
   have : m ≠ j := fun h => by subst h; omega
   simp [Pi.single_apply, this]
 
-theorem map_eq_sum {Ω : Type} [Field Ω] {n : ℕ} (ρ : (Fin n → Ω) →ₗ[Ω] (Fin n → Ω)) (l : Fin n → Ω) :
-    ρ l = ∑ j, l j • ρ (Pi.single j 1) := by
+theorem map_eq_sum {Ω : Type} [Field Ω] {n : ℕ} (ρ : (Fin n → Ω) →ₗ[Ω] (Fin n → Ω)) (l : Fin n → Ω)
+    : ρ l = ∑ j, l j • ρ (Pi.single j 1) := by
   have h : l = ∑ j, l j • (Pi.single j 1 : Fin n → Ω) := by
     ext k
     simp [Finset.sum_apply, Pi.single_apply]
@@ -33,12 +36,17 @@ theorem map_eq_sum {Ω : Type} [Field Ω] {n : ℕ} (ρ : (Fin n → Ω) →ₗ[
     conv_lhs => rw [h, map_sum]
   simp only [map_smul]
 
-theorem main : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R : Subalgebra o Ω) (n : ℕ)
-    (L : AddSubgroup (Fin n → Ω)), LocFree R n L → (∀ i, Summand L (annSub Ω n i)) →
-    ∀ (i : Fin n) (u : Ω), u ≠ 0 →
-    (∀ c, c ∈ (L ⊓ (annSub Ω n i).toAddSubgroup).map (Pi.evalAddMonoidHom (fun _ => Ω) i) ↔
-      ∃ a ∈ R, c = a * u) →
-    ∀ t : Ω, (∃ v ∈ dotDual R L, (∀ j, i < j → v j = 0) ∧ v i = t) ↔ ∃ a ∈ R, t = a * u⁻¹ := by
+theorem main
+    : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R : Subalgebra o Ω) (n : ℕ)
+        (L : AddSubgroup (Fin n → Ω)),
+      LocFree R n L → (∀ i, Summand L (annSub Ω n i))
+        → ∀ (i : Fin n) (u : Ω),
+          u ≠ 0
+            → (∀ c,
+              c ∈ (L ⊓ (annSub Ω n i).toAddSubgroup).map (Pi.evalAddMonoidHom (fun _ => Ω) i)
+                ↔ ∃ a ∈ R, c = a * u)
+            → ∀ t : Ω,
+              (∃ v ∈ dotDual R L, (∀ j, i < j → v j = 0) ∧ v i = t) ↔ ∃ a ∈ R, t = a * u⁻¹ := by
   intro o Ω _ _ _ R n L _ hS i u hu hc t
   constructor
   · rintro ⟨v, hv, hz, rfl⟩
@@ -69,8 +77,8 @@ theorem main : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (R : Sub
         refine Finset.sum_congr rfl fun j _ => ?_
         simp only [Pi.smul_apply, smul_eq_mul]
         ring
-      have hl' : ρ l i ∈ (L ⊓ (annSub Ω n i).toAddSubgroup).map
-          (Pi.evalAddMonoidHom (fun _ => Ω) i) :=
+      have hl'
+          : ρ l i ∈ (L ⊓ (annSub Ω n i).toAddSubgroup).map (Pi.evalAddMonoidHom (fun _ => Ω) i) :=
         ⟨ρ l, AddSubgroup.mem_inf.2 ⟨hρL l hl, hρU l⟩, rfl⟩
       obtain ⟨b, hb, hbe⟩ := (hc _).1 hl'
       have h3 : a * u⁻¹ * (b * u) = a * b := by field_simp

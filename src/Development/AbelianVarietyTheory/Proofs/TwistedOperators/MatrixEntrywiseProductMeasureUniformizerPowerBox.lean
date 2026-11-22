@@ -6,32 +6,38 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicIsNo
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Doubling GlobalTheory.GLDoubling GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition GlobalTheory.SatakeBound
+open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.Doubling GlobalTheory.GLDoubling
+  GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition
+  GlobalTheory.SatakeBound
 open scoped NNReal ENNReal
 
 noncomputable section
 
 namespace GlobalTheory.BoxVolume
 
-theorem prod_zpow_nnreal {ι : Type} (d : ℝ≥0) (hd : d ≠ 0) (f : ι → ℤ) (s : Finset ι) :
-    ∏ i ∈ s, d ^ f i = d ^ (∑ i ∈ s, f i) := by
+theorem prod_zpow_nnreal {ι : Type} (d : ℝ≥0) (hd : d ≠ 0) (f : ι → ℤ) (s : Finset ι)
+    : ∏ i ∈ s, d ^ f i = d ^ (∑ i ∈ s, f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert a s ha ih => rw [Finset.prod_insert ha, Finset.sum_insert ha, ih, zpow_add₀ hd]
 
-theorem volM_box : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    [MeasurableSpace k] [BorelSpace k] (ν : Measure k) [ν.IsAddHaarMeasure] (ϖ : kˣ),
-    valuation k (ϖ : k) = uniformizer k →
-    ∀ (A D : Type) [Fintype A] [Fintype D] (c : A → D → ℤ),
-    volM ν A D {y | ∀ i j, valuation k (y i j) ≤ valuation k ((ϖ : k) ^ c i j)} =
-      ν (𝒪[k] : Set k) ^ (Fintype.card A * Fintype.card D) *
-        ENNReal.ofReal ((resCard k : ℝ) ^ (-∑ i, ∑ j, c i j)) := by
+theorem volM_box
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (ν : Measure k) [ν.IsAddHaarMeasure] (ϖ : kˣ),
+      valuation k (ϖ : k) = uniformizer k
+        → ∀ (A D : Type) [Fintype A] [Fintype D] (c : A → D → ℤ),
+          volM ν A D {y | ∀ i j, valuation k (y i j) ≤ valuation k ((ϖ : k) ^ c i j)}
+            = ν (𝒪[k] : Set k) ^ (Fintype.card A * Fintype.card D)
+              * ENNReal.ofReal ((resCard k : ℝ) ^ (- ∑ i, ∑ j, c i j)) := by
   intro k _ _ _ _ _ _ ν _ ϖ hϖ A D _ _ c
   haveI := secondCountable k
   haveI := t2Space k
-  have hset : ({y : Matrix A D k | ∀ i j, valuation k (y i j) ≤ valuation k ((ϖ : k) ^ c i j)} :
-      Set (A → D → k)) = Set.univ.pi fun i => Set.univ.pi fun j => cball (ϖ ^ c i j) := by
+  have hset
+      : ({y : Matrix A D k | ∀ i j, valuation k (y i j) ≤ valuation k ((ϖ : k) ^ c i j)}
+          : Set (A → D → k))
+        = Set.univ.pi fun i => Set.univ.pi fun j => cball (ϖ ^ c i j) := by
     ext y
     simp only [Set.mem_univ_pi, cball, Set.mem_setOf_eq, Units.val_zpow_eq_zpow_val]
     rfl
@@ -47,10 +53,8 @@ theorem volM_box : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k
   rw [← pow_mul, mul_comm (ν _ ^ _)]
   rw [Nat.mul_comm (Fintype.card D)]
   congr 1
-  have hz : ∏ i, ∏ j, d ^ c i j = d ^ (∑ i, ∑ j, c i j) := by
-    simp_rw [prod_zpow_nnreal d hd0]
-  have hz' : (∏ i, ∏ j, ((d ^ c i j : ℝ≥0) : ℝ≥0∞)) =
-      ((d ^ (∑ i, ∑ j, c i j) : ℝ≥0) : ℝ≥0∞) := by
+  have hz : ∏ i, ∏ j, d ^ c i j = d ^ (∑ i, ∑ j, c i j) := by simp_rw [prod_zpow_nnreal d hd0]
+  have hz' : (∏ i, ∏ j, ((d ^ c i j : ℝ≥0) : ℝ≥0∞)) = ((d ^ (∑ i, ∑ j, c i j) : ℝ≥0) : ℝ≥0∞) := by
     exact_mod_cast hz
   rw [hz', ← ENNReal.ofReal_coe_nnreal]
   congr 1

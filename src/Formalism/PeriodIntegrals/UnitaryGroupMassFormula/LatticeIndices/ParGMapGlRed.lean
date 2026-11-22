@@ -16,15 +16,18 @@ section Lift
 
 variable {R S : Type} [CommRing R] [CommRing S] (π : R →+* S) (hπ : Function.Surjective π)
 
-
 open Classical in
-def lift (s : S) : R := if s = 0 then 0 else if s = 1 then 1 else Function.surjInv hπ s
+def lift (s : S) : R :=
+  if s = 0 then
+    0
+  else if s = 1 then
+    1
+  else
+    Function.surjInv hπ s
 
-theorem lift_zero : lift π hπ 0 = 0 := by
-  simp [lift]
+theorem lift_zero : lift π hπ 0 = 0 := by simp [lift]
 
-theorem lift_one [Nontrivial S] : lift π hπ 1 = 1 := by
-  simp [lift]
+theorem lift_one [Nontrivial S] : lift π hπ 1 = 1 := by simp [lift]
 
 theorem π_lift (s : S) : π (lift π hπ s) = s := by
   unfold lift
@@ -43,20 +46,25 @@ section Par
 
 variable {A B : Type} [CommRing A] [CommRing B] {r k : ℕ}
 
-theorem isUpUni_map (f : A → B) (h0 : f 0 = 0) (h1 : f 1 = 1) {n : ℕ} {h : Matrix (Fin n) (Fin n) A}
-    (hh : IsUpUni h) : IsUpUni (h.map f) := by
+theorem isUpUni_map
+    (f : A → B) (h0 : f 0 = 0) (h1 : f 1 = 1)
+    {n : ℕ} {h : Matrix (Fin n) (Fin n) A} (hh : IsUpUni h)
+    : IsUpUni (h.map f) := by
   obtain ⟨hu, hd⟩ := hh
   refine ⟨?_, fun a => by simp [Matrix.map_apply, hd a, h1]⟩
   intro i j hij
   simp [Matrix.map_apply, hu hij, h0]
 
-theorem midEmb_map (f : A → B) (h0 : f 0 = 0) (h1 : f 1 = 1) (h : Matrix (Fin k) (Fin k) A) :
-    (midEmb h).map f = midEmb (h.map f) := by
+theorem midEmb_map (f : A → B) (h0 : f 0 = 0) (h1 : f 1 = 1) (h : Matrix (Fin k) (Fin k) A)
+    : (midEmb h).map f = midEmb (h.map f) := by
   simp only [midEmb, Matrix.fromBlocks_map, Matrix.map_zero f h0, Matrix.map_one f h0 h1]
 
-theorem par_map (f : A → B) (h0 : f 0 = 0) (h1 : f 1 = 1) {P : Matrix (Fin k) (Fin k) A → Prop}
-    {P' : Matrix (Fin k) (Fin k) B → Prop} (hPP : ∀ h, P h → P' (h.map f))
-    {x : Matrix (Idx r k) (Idx r k) A} (hx : Par P x) : Par P' (x.map f) := by
+theorem par_map
+    (f : A → B) (h0 : f 0 = 0) (h1 : f 1 = 1)
+    {P : Matrix (Fin k) (Fin k) A → Prop} {P' : Matrix (Fin k) (Fin k) B → Prop}
+    (hPP : ∀ h, P h → P' (h.map f))
+    {x : Matrix (Idx r k) (Idx r k) A} (hx : Par P x)
+    : Par P' (x.map f) := by
   obtain ⟨h11, h33, h21, h31, h32, h, hP, h22⟩ := hx
   refine ⟨isUpUni_map f h0 h1 h11, isUpUni_map f h0 h1 h33, ?_, ?_, ?_, h.map f, hPP h hP, ?_⟩
   · show (b21 x).map f = 0
@@ -70,10 +78,10 @@ theorem par_map (f : A → B) (h0 : f 0 = 0) (h1 : f 1 = 1) {P : Matrix (Fin k) 
 
 variable [Nontrivial B] (π : A →+* B) (hπ : Function.Surjective π)
 
-theorem parG_map_glRed {P : Matrix (Fin k) (Fin k) A → Prop} {P' : Matrix (Fin k) (Fin k) B → Prop}
-    (hP : GP P) (hP' : GP P') (hPP : ∀ h, P h → P' (h.map π))
-    (hlift : ∀ h, P' h → P (h.map (lift π hπ))) :
-    (parG (r := r) hP).map (glRed π) = parG (r := r) hP' := by
+theorem parG_map_glRed
+    {P : Matrix (Fin k) (Fin k) A → Prop} {P' : Matrix (Fin k) (Fin k) B → Prop} (hP : GP P)
+    (hP' : GP P') (hPP : ∀ h, P h → P' (h.map π)) (hlift : ∀ h, P' h → P (h.map (lift π hπ)))
+    : (parG (r := r) hP).map (glRed π) = parG (r := r) hP' := by
   ext y
   constructor
   · rintro ⟨x, hx, rfl⟩
@@ -89,11 +97,13 @@ theorem parG_map_glRed {P : Matrix (Fin k) (Fin k) A → Prop} {P' : Matrix (Fin
     rw [glRed_coe]
     exact map_lift π hπ _
 
-
 end Par
 
-theorem sG_map_glRed {A B : Type} [CommRing A] [IsLocalRing A] [Field B] {r k : ℕ} (π : A →+* B)
-    (hπ : Function.Surjective π) : (sG A r k).map (glRed π) = sG B r k := by
+theorem sG_map_glRed
+    {A B : Type} [CommRing A] [IsLocalRing A] [Field B]
+    {r k : ℕ}
+    (π : A →+* B) (hπ : Function.Surjective π)
+    : (sG A r k).map (glRed π) = sG B r k := by
   refine parG_map_glRed π hπ _ _ (fun h hh => ?_) (fun h hh => ?_)
   · rw [← RingHom.mapMatrix_apply, ← RingHom.map_det]; exact hh.map π
   · refine isUnit_of_map π hπ _ ?_
@@ -102,8 +112,9 @@ theorem sG_map_glRed {A B : Type} [CommRing A] [IsLocalRing A] [Field B] {r k : 
 
 section Grp
 
-theorem map_conj {G Q : Type} [Group G] [Group Q] (f : G →* Q) (H : Subgroup G) (c : G) :
-    (H.map (MulAut.conj c).toMonoidHom).map f = (H.map f).map (MulAut.conj (f c)).toMonoidHom := by
+theorem map_conj {G Q : Type} [Group G] [Group Q] (f : G →* Q) (H : Subgroup G) (c : G)
+    : (H.map (MulAut.conj c).toMonoidHom).map f
+      = (H.map f).map (MulAut.conj (f c)).toMonoidHom := by
   rw [Subgroup.map_map, Subgroup.map_map]
   congr 1
   ext x
@@ -116,11 +127,13 @@ theorem map_sup_ker : (S' ⊔ ρ.ker).map ρ = S'.map ρ := by
 
 theorem mem_sup_ker {x : K} : x ∈ S' ⊔ ρ.ker ↔ ∃ s ∈ S', ∃ κ ∈ ρ.ker, s * κ = x := by
   first
-    | exact Subgroup.mem_sup_of_normal_right
-    | exact Subgroup.mem_sup_of_normal_right (s := S') (t := ρ.ker)
+  | exact Subgroup.mem_sup_of_normal_right
+  | exact Subgroup.mem_sup_of_normal_right (s := S') (t := ρ.ker)
 
-theorem map_eq_conj (ψ : K →* Q) (hψ : Function.Surjective ψ) (S' : Subgroup K) (H : Subgroup Q) (c : Q)
-    (h : ∀ x, x ∈ S' ↔ c⁻¹ * ψ x * c ∈ H) : S'.map ψ = H.map (MulAut.conj c).toMonoidHom := by
+theorem map_eq_conj
+    (ψ : K →* Q) (hψ : Function.Surjective ψ)
+    (S' : Subgroup K) (H : Subgroup Q) (c : Q) (h : ∀ x, x ∈ S' ↔ c⁻¹ * ψ x * c ∈ H)
+    : S'.map ψ = H.map (MulAut.conj c).toMonoidHom := by
   ext y
   simp only [Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
   constructor

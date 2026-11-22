@@ -7,22 +7,29 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ScaledBas
 
 open MeasureTheory ValuativeRel Matrix
 open scoped Pointwise
-open GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms GlobalTheory.RootEx.UnfoldShape
+open GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms GlobalTheory.RootEx.UnfoldShape
 
 namespace GlobalTheory.RootEx.UnfoldShape
 
-theorem stabiliser_finite_cosets_mod (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ι : Type) [Fintype ι] [DecidableEq ι] (ϖ : 𝒪[k])
-    (M : Submodule 𝒪[k] (ι → k)) (S : Finset (ι → k)) (hM : M.FG) (hS : IsReps ϖ M S) :
-    ∃ T : Finset (GL ι k), (∀ t ∈ T, act t M = M) ∧ ∀ t : GL ι k, act t M = M →
-      ∃ t₀ ∈ T, ∃ j : GL ι k, act j M = M ∧ MapsInto (j.val - 1) M (ϖ • M) ∧ t = t₀ * j := by
+theorem stabiliser_finite_cosets_mod
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (ϖ : 𝒪[k]) (M : Submodule 𝒪[k] (ι → k)) (S : Finset (ι → k)) (hM : M.FG) (hS : IsReps ϖ M S)
+    : ∃ T : Finset (GL ι k),
+      (∀ t ∈ T, act t M = M)
+        ∧ ∀ t : GL ι k,
+          act t M = M
+            → ∃ t₀ ∈ T, ∃ j : GL ι k,
+              act j M = M ∧ MapsInto (j.val - 1) M (ϖ • M) ∧ t = t₀ * j := by
   classical
   obtain ⟨s, hs⟩ := hM
   have hmem : ∀ t : GL ι k, act t M = M → ∀ x ∈ M, t.val *ᵥ x ∈ M := fun t ht x hx => by
     have h : t.val *ᵥ x ∈ act t M := mem_act.2 ⟨x, hx, rfl⟩
     rwa [ht] at h
   have hsM : ∀ x : s, x.1 ∈ M := fun x => hs ▸ Submodule.subset_span x.2
-  have hex : ∀ (t : {t : GL ι k // act t M = M}) (x : s), ∃ r : S, t.1.val *ᵥ x.1 - r.1 ∈ ϖ • M := by
+  have hex
+      : ∀ (t : {t : GL ι k // act t M = M}) (x : s), ∃ r : S, t.1.val *ᵥ x.1 - r.1 ∈ ϖ • M := by
     intro t x
     obtain ⟨r, hr, -⟩ := hS.2 _ (hmem t.1 t.2 x.1 (hsM x))
     exact ⟨⟨r, hr.1⟩, hr.2⟩
@@ -55,8 +62,10 @@ theorem stabiliser_finite_cosets_mod (k : Type) [Field k] [ValuativeRel k] [Topo
         refine mem_smul_iff.2 ⟨_, hmem _ hinv w hw, ?_⟩
         rw [← Matrix.mulVec_smul, hw', Matrix.mulVec_sub, Matrix.sub_mulVec, Matrix.mulVec_mulVec,
           Matrix.mulVec_mulVec, Units.inv_mul, Units.val_mul]
-      | zero => rw [Matrix.mulVec_zero]; exact zero_mem _
-      | add x y _ _ hx hy => rw [Matrix.mulVec_add]; exact add_mem hx hy
+      | zero =>
+        rw [Matrix.mulVec_zero]; exact zero_mem _
+      | add x y _ _ hx hy =>
+        rw [Matrix.mulVec_add]; exact add_mem hx hy
       | smul a x _ hx =>
         rw [Matrix.mulVec_smul]
         exact Submodule.smul_mem _ a hx

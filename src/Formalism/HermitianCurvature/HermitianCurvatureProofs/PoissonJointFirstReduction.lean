@@ -16,9 +16,7 @@ theorem rd_pos (E : Type) [Field E] [NumberField E] [IsCMField E] : 0 < S6.rd E 
   have h : (0 : ℝ) < ((|NumberField.discr E| : ℤ) : ℝ) := by
     exact_mod_cast abs_pos.mpr (NumberField.discr_ne_zero E)
   unfold S6.rd
-  first
-    | exact Real.rpow_pos_of_pos h _
-    | exact Real.rpow_pos h _
+  first | exact Real.rpow_pos_of_pos h _ | exact Real.rpow_pos h _
 
 end Jx4
 
@@ -27,8 +25,9 @@ theorem poisson_level_joint : Formalism.FourierDecayAlt.J.PoissonStepJoint := by
   intro ε hε i hi1 hi2 w Y hY κ hκ t₀ B hB S hS
   obtain ⟨φ, Cφ, hc, hb, hnn, hdiag, hhat⟩ := hW ε hε i hi1 hi2 w Y hY κ hκ
   obtain ⟨hinj, hmem, hd0, hdual⟩ := hFr i hi1 hi2
-  have key := hJ hF V ι π hπ (Λ i) E (emb i) (dmap i) (D.La i 1) (D.Lad i) φ Cφ
-    (D.Nhat ε i w Y κ) hinj hmem hd0 hdual hc hb hnn hhat t₀ B hB S (fun t ht => (hS t ht).2)
+  have key :=
+    hJ hF V ι π hπ (Λ i) E (emb i) (dmap i) (D.La i 1) (D.Lad i) φ Cφ (D.Nhat ε i w Y κ) hinj hmem
+      hd0 hdual hc hb hnn hhat t₀ B hB S (fun t ht => (hS t ht).2)
   refine Eq.trans_le ?_ key
   exact Finset.sum_congr rfl fun t ht => hdiag t (hS t ht).1
 
@@ -50,8 +49,9 @@ theorem frame_product_identities : Formalism.FourierDecayAlt.J.FrameProducts := 
   have hpi : (2 * Real.pi) ≠ 0 := by positivity
   have e1 : 2 * r + 2 - 1 = 2 * r + 1 := by omega
   constructor
-  · have hz : rd ^ (S6.nuBlock (r : ℤ) ((n + 1 : ℕ) : ℤ) ((t + 1 : ℕ) : ℤ) + 1) =
-        rd ^ (2 * r + 1) / rd ^ (2 * n + t) := by
+  · have hz
+        : rd ^ (S6.nuBlock (r : ℤ) ((n + 1 : ℕ) : ℤ) ((t + 1 : ℕ) : ℤ) + 1)
+          = rd ^ (2 * r + 1) / rd ^ (2 * n + t) := by
       rw [← zpow_natCast, ← zpow_natCast, ← zpow_sub₀ hrd0]
       congr 1
       unfold S6.nuBlock
@@ -61,13 +61,15 @@ theorem frame_product_identities : Formalism.FourierDecayAlt.J.FrameProducts := 
     unfold Sz.lamThreshold Sz.lamHat
     rw [hz, e1, e2]
     have b1 : C * (2 * Real.pi / g) * N / I = (2 * Real.pi / g) * (C * N / I) := by ring
-    have b2 : C * (2 * Real.pi / rd) * N / (g * I) = (2 * Real.pi / (rd * g)) * (C * N / I) := by ring
+    have b2 : C * (2 * Real.pi / rd) * N / (g * I) = (2 * Real.pi / (rd * g)) * (C * N / I) := by
+      ring
     rw [b1, b2, mul_pow, mul_pow]
     generalize C * N / I = X
     simp only [div_eq_mul_inv, mul_pow, inv_pow, mul_inv, inv_inv]
     ring
-  · have hz : rd ^ (S6.nuBlock (r : ℤ) ((n + 1 : ℕ) : ℤ) ((r : ℤ) + 2 - ((n + 1 : ℕ) : ℤ))) =
-        rd ^ r / rd ^ n := by
+  · have hz
+        : rd ^ (S6.nuBlock (r : ℤ) ((n + 1 : ℕ) : ℤ) ((r : ℤ) + 2 - ((n + 1 : ℕ) : ℤ)))
+          = rd ^ r / rd ^ n := by
       rw [← zpow_natCast, ← zpow_natCast, ← zpow_sub₀ hrd0]
       congr 1
       unfold S6.nuBlock

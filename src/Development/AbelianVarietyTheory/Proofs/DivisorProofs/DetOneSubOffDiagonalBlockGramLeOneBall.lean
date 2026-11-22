@@ -7,24 +7,31 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory GlobalTheory.IndefiniteRowSideFullHecke.ExhaustionFrames GlobalTheory.IntBall
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory
+  GlobalTheory.IndefiniteRowSideFullHecke.ExhaustionFrames GlobalTheory.IntBall
 open scoped ENNReal Matrix
 
 namespace GlobalTheory.IntBall.DetLe
 
-theorem re_det_one_sub_le_of_unique {κ ι : Type} [Fintype κ] [Fintype ι] [DecidableEq ι] [Unique ι]
-    (Z : Matrix κ ι ℂ) : ((1 - Zᴴ * Z).det).re ≤ 1 := by
+theorem re_det_one_sub_le_of_unique
+    {κ ι : Type} [Fintype κ] [Fintype ι] [DecidableEq ι] [Unique ι] (Z : Matrix κ ι ℂ)
+    : ((1 - Zᴴ * Z).det).re ≤ 1 := by
   rw [Matrix.det_unique]
   simp only [Matrix.sub_apply, Matrix.one_apply_eq, Matrix.mul_apply, Matrix.conjTranspose_apply,
     Complex.sub_re, Complex.one_re, Complex.re_sum]
   have : ∀ a : κ, 0 ≤ (star (Z a default) * Z a default).re := by
     intro a
-    rw [show star (Z a default) = (starRingEnd ℂ) (Z a default) from rfl, mul_comm, Complex.mul_conj]
+    rw [show star (Z a default) = (starRingEnd ℂ) (Z a default) from rfl, mul_comm,
+      Complex.mul_conj]
     simp [Complex.normSq_nonneg]
   linarith [Finset.sum_nonneg fun a (_ : a ∈ Finset.univ) => this a]
 
-theorem re_det_one_sub_le_of_unique' {κ ι : Type} [Fintype κ] [Fintype ι] [DecidableEq ι]
-    [DecidableEq κ] [Unique κ] (Z : Matrix κ ι ℂ) : ((1 - Zᴴ * Z).det).re ≤ 1 := by
+theorem re_det_one_sub_le_of_unique'
+    {κ ι : Type} [Fintype κ] [Fintype ι] [DecidableEq ι] [DecidableEq κ] [Unique κ]
+    (Z : Matrix κ ι ℂ)
+    : ((1 - Zᴴ * Z).det).re ≤ 1 := by
   rw [Matrix.det_one_sub_mul_comm]
   have := re_det_one_sub_le_of_unique (Zᴴ)
   rwa [Matrix.conjTranspose_conjTranspose] at this
@@ -35,8 +42,9 @@ namespace GlobalTheory.IntBall
 
 open GlobalTheory.IntBall.DetLe
 
-theorem zDet_le_one : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
-    (X.p0 = 1 ∨ X.p0 + 1 = r) → ∀ z : V (nd X), z ∈ Om X → ∀ τ : X.Ψ, zDet X z τ ≤ 1 := by
+theorem zDet_le_one
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
+      (X.p0 = 1 ∨ X.p0 + 1 = r) → ∀ z : V (nd X), z ∈ Om X → ∀ τ : X.Ψ, zDet X z τ ≤ 1 := by
   intro E _ _ _ r X h z _ τ
   have hle := X.p0_le
   unfold zDet

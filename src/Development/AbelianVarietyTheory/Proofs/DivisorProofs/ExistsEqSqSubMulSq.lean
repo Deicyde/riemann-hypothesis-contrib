@@ -10,23 +10,35 @@ open IsLocalRing IsDedekindDomain IsDedekindDomain.HeightOneSpectrum
 
 namespace GlobalTheory.OddLocalNormEtale
 
-theorem exists_eq_sq_sub_mul_sq : ∀ (L : Type) [CommRing L] [IsReduced L] [Algebra ℚ L] [FiniteDimensional ℚ L] (v : IsDedekindDomain.HeightOneSpectrum ℤ), v.asIdeal ≠ Ideal.span {2} →
-    ∀ m m' d d' : v.adicCompletion ℚ ⊗[ℚ] L, m * m' = 1 → d * d' = 1 →
-    (∃ f : Polynomial (v.adicCompletion ℚ), f.Monic ∧ (∀ i, f.coeff i ∈ v.adicCompletionIntegers ℚ) ∧ Polynomial.aeval m f = 0) → (∃ f : Polynomial (v.adicCompletion ℚ), f.Monic ∧ (∀ i, f.coeff i ∈ v.adicCompletionIntegers ℚ) ∧ Polynomial.aeval m' f = 0) → (∃ f : Polynomial (v.adicCompletion ℚ), f.Monic ∧ (∀ i, f.coeff i ∈ v.adicCompletionIntegers ℚ) ∧ Polynomial.aeval d f = 0) → (∃ f : Polynomial (v.adicCompletion ℚ), f.Monic ∧ (∀ i, f.coeff i ∈ v.adicCompletionIntegers ℚ) ∧ Polynomial.aeval d' f = 0) →
-    ∃ a b : v.adicCompletion ℚ ⊗[ℚ] L, m = a * a - d * (b * b) := by
+theorem exists_eq_sq_sub_mul_sq
+    : ∀ (L : Type) [CommRing L] [IsReduced L] [Algebra ℚ L] [FiniteDimensional ℚ L]
+        (v : IsDedekindDomain.HeightOneSpectrum ℤ),
+      v.asIdeal ≠ Ideal.span {2}
+        → ∀ m m' d d' : v.adicCompletion ℚ ⊗[ℚ] L,
+          m * m' = 1 → d * d' = 1
+            → (∃ f : Polynomial (v.adicCompletion ℚ),
+              f.Monic ∧ (∀ i, f.coeff i ∈ v.adicCompletionIntegers ℚ) ∧ Polynomial.aeval m f = 0)
+            → (∃ f : Polynomial (v.adicCompletion ℚ),
+              f.Monic ∧ (∀ i, f.coeff i ∈ v.adicCompletionIntegers ℚ) ∧ Polynomial.aeval m' f = 0)
+            → (∃ f : Polynomial (v.adicCompletion ℚ),
+              f.Monic ∧ (∀ i, f.coeff i ∈ v.adicCompletionIntegers ℚ) ∧ Polynomial.aeval d f = 0)
+            → (∃ f : Polynomial (v.adicCompletion ℚ),
+              f.Monic ∧ (∀ i, f.coeff i ∈ v.adicCompletionIntegers ℚ) ∧ Polynomial.aeval d' f = 0)
+            → ∃ a b : v.adicCompletion ℚ ⊗[ℚ] L, m = a * a - d * (b * b) := by
   intro L _ _ _ _ v hv m m' d d' hm hd im im' id id'
   obtain ⟨hH, hF⟩ := GlobalTheory.IntAdicHensel.henselianLocalRing_and_finite_residueField v
   letI : Algebra (v.adicCompletionIntegers ℚ) (v.adicCompletion ℚ ⊗[ℚ] L) :=
     ((algebraMap (v.adicCompletion ℚ) (v.adicCompletion ℚ ⊗[ℚ] L)).comp
       (v.adicCompletionIntegers ℚ).subtype).toAlgebra
-  have key : ∀ x : v.adicCompletion ℚ ⊗[ℚ] L,
-      (∃ f : Polynomial (v.adicCompletion ℚ), f.Monic ∧
-        (∀ i, f.coeff i ∈ v.adicCompletionIntegers ℚ) ∧ Polynomial.aeval x f = 0) →
-      IsIntegral (v.adicCompletionIntegers ℚ) x := by
+  have key
+      : ∀ x : v.adicCompletion ℚ ⊗[ℚ] L,
+        (∃ f : Polynomial (v.adicCompletion ℚ),
+            f.Monic ∧ (∀ i, f.coeff i ∈ v.adicCompletionIntegers ℚ) ∧ Polynomial.aeval x f = 0)
+          → IsIntegral (v.adicCompletionIntegers ℚ) x := by
     rintro x ⟨f, hf, hc, hx⟩
-    obtain ⟨g, hg, -, hgm⟩ := Polynomial.lifts_and_natDegree_eq_and_monic
-      (f := (v.adicCompletionIntegers ℚ).subtype)
-      ((Polynomial.lifts_iff_coeff_lifts f).2 fun n => ⟨⟨_, hc n⟩, rfl⟩) hf
+    obtain ⟨g, hg, -, hgm⟩ :=
+      Polynomial.lifts_and_natDegree_eq_and_monic (f := (v.adicCompletionIntegers ℚ).subtype)
+        ((Polynomial.lifts_iff_coeff_lifts f).2 fun n => ⟨⟨_, hc n⟩, rfl⟩) hf
     refine ⟨g, hgm, ?_⟩
     rw [← hg, Polynomial.aeval_def, Polynomial.eval₂_map] at hx
     exact hx

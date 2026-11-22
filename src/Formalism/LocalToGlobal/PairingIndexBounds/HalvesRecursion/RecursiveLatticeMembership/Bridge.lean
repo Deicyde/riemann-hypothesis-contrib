@@ -9,9 +9,13 @@ open scoped BigOperators
 
 namespace Formalism.L2.PairingIndexBounds.Rec
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.GL3Theta Formalism.L2.PairingIndexBounds.Mv Formalism.L2.Th1.H Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity
+open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.GL3Theta Formalism.L2.PairingIndexBounds.Mv Formalism.L2.Th1.H
+  Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity
 
-theorem HfS_apply (D : D7) (T : Tor D) (N N' : ℕ) (z w : VC D N N') : HfS D T N N' z w = Hf D T z w := rfl
+theorem HfS_apply (D : D7) (T : Tor D) (N N' : ℕ) (z w : VC D N N')
+    : HfS D T N N' z w = Hf D T z w :=
+  rfl
 
 theorem al_pm (D : D7) (T : Tor D) {N N' : ℕ} (x : VC D N N') : al D T x = 1 ∨ al D T x = -1 := by
   unfold al
@@ -19,8 +23,9 @@ theorem al_pm (D : D7) (T : Tor D) {N N' : ℕ} (x : VC D N N') : al D T x = 1 �
   · left; exact h.neg_one_zpow
   · right; exact h.neg_one_zpow
 
-theorem exp_int_sign (b : ℤ) :
-    Complex.exp (-((Real.pi : ℂ) * Complex.I * (b : ℂ))) = Complex.exp ((Real.pi : ℂ) * Complex.I * (b : ℂ)) := by
+theorem exp_int_sign (b : ℤ)
+    : Complex.exp (-((Real.pi : ℂ) * Complex.I * (b : ℂ)))
+      = Complex.exp ((Real.pi : ℂ) * Complex.I * (b : ℂ)) := by
   rw [Complex.exp_eq_exp_iff_exists_int]
   exact ⟨-b, by push_cast; ring⟩
 
@@ -35,7 +40,8 @@ theorem local_global_comparison_holds : Bridge := by
   · intro x hx z
     exact hG.2 x hx z
   · refine ⟨fun x _ => al_pm D T x, fun x hx y hy => ?_⟩
-    have h := Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.IO.semiChar_of_HfInt T hI x hx y hy
+    have h :=
+      Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.IO.semiChar_of_HfInt T hI x hx y hy
     rw [h]
     obtain ⟨a, b, -, hab⟩ := hI x hx y hy
     have him : (Hf D T x y).im = b := by rw [hab]; simp

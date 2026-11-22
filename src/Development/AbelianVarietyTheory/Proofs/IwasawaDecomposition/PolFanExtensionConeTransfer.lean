@@ -7,11 +7,13 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.NonemptyF
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 namespace GlobalTheory.PolFan.OffDom
 
@@ -21,8 +23,9 @@ open scoped Pointwise
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem isTorsionFree_int (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.IsTorsionFree (𝓞 E) X] :
-    Module.IsTorsionFree ℤ X := by
+theorem isTorsionFree_int
+    (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.IsTorsionFree (𝓞 E) X]
+    : Module.IsTorsionFree ℤ X := by
   refine ⟨fun r hr x y hxy => ?_⟩
   have h0 : r ≠ 0 := hr.ne_zero
   have h1 : IsRegular (r : 𝓞 E) := IsRegular.of_ne_zero (by exact_mod_cast h0)
@@ -31,8 +34,11 @@ theorem isTorsionFree_int (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Modul
   simp only [Int.cast_smul_eq_zsmul]
   exact hxy'
 
-theorem eq_zero_of_posDef {X : Type} [AddCommGroup X] [Module.IsTorsionFree ℤ X] {B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ}
-    (h : IsPosDef B) {y : X} (hy : B y y = 0) : y = 0 := by
+theorem eq_zero_of_posDef
+    {X : Type} [AddCommGroup X] [Module.IsTorsionFree ℤ X]
+    {B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ} (h : IsPosDef B)
+    {y : X} (hy : B y y = 0)
+    : y = 0 := by
   by_contra hne
   have hl : LinearIndependent ℤ ![y] := linearIndependent_unique_iff.2 (by simpa using hne)
   have := h 1 ![y] hl ![1] (by simp)
@@ -53,27 +59,33 @@ theorem tw_smul (σ : 𝓞 E ≃+* 𝓞 E) (c : 𝓞 E) (a : Fin n → 𝓞 E) :
 
 theorem tw_zero (σ : 𝓞 E ≃+* 𝓞 E) : tw σ (0 : Fin n → 𝓞 E) = 0 := funext fun i => by simp [tw]
 
-theorem tw_symm (σ : 𝓞 E ≃+* 𝓞 E) (a : Fin n → 𝓞 E) : tw σ (tw σ.symm a) = a := funext fun i => by simp [tw]
+theorem tw_symm (σ : 𝓞 E ≃+* 𝓞 E) (a : Fin n → 𝓞 E) : tw σ (tw σ.symm a) = a :=
+  funext fun i => by simp [tw]
 
-theorem tw_symm' (σ : 𝓞 E ≃+* 𝓞 E) (a : Fin n → 𝓞 E) : tw σ.symm (tw σ a) = a := funext fun i => by simp [tw]
+theorem tw_symm' (σ : 𝓞 E ≃+* 𝓞 E) (a : Fin n → 𝓞 E) : tw σ.symm (tw σ a) = a :=
+  funext fun i => by simp [tw]
 
-def conj (σ : 𝓞 E ≃+* 𝓞 E) (r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E)) : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E) where
+def conj (σ : 𝓞 E ≃+* 𝓞 E) (r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E))
+    : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E) where
   toFun a := tw σ.symm (r (tw σ a))
   map_add' a b := by simp only [tw_add, map_add (f := _)]
   map_smul' c a := by
     simp only [tw_smul, map_smul, RingHom.id_apply]
     rw [σ.symm_apply_apply]
 
-theorem tw_conj (σ : 𝓞 E ≃+* 𝓞 E) (r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E)) (a : Fin n → 𝓞 E) :
-    tw σ (conj σ r a) = r (tw σ a) := tw_symm σ _
+theorem tw_conj (σ : 𝓞 E ≃+* 𝓞 E) (r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E)) (a : Fin n → 𝓞 E)
+    : tw σ (conj σ r a) = r (tw σ a) :=
+  tw_symm σ _
 
-theorem conj_surjective (σ : 𝓞 E ≃+* 𝓞 E) {r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E)} (hr : Function.Surjective r) :
-    Function.Surjective (conj σ r) := fun b => by
+theorem conj_surjective
+    (σ : 𝓞 E ≃+* 𝓞 E) {r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E)} (hr : Function.Surjective r)
+    : Function.Surjective (conj σ r) := fun b => by
   obtain ⟨a, ha⟩ := hr (tw σ b)
   exact ⟨tw σ.symm a, by simp only [conj, LinearMap.coe_mk, AddHom.coe_mk, tw_symm, ha, tw_symm']⟩
 
-theorem minVal_twist (σ : 𝓞 E ≃+* 𝓞 E) (n : ℕ) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ) :
-    (InvFun.minVal (𝓞 E)).toFun n (fun a b => B (tw σ a) (tw σ b)) = (InvFun.minVal (𝓞 E)).toFun n B := by
+theorem minVal_twist (σ : 𝓞 E ≃+* 𝓞 E) (n : ℕ) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ)
+    : (InvFun.minVal (𝓞 E)).toFun n (fun a b => B (tw σ a) (tw σ b))
+      = (InvFun.minVal (𝓞 E)).toFun n B := by
   simp only [InvFun.minVal]
   congr 1
   ext x
@@ -84,8 +96,9 @@ theorem minVal_twist (σ : 𝓞 E ≃+* 𝓞 E) (n : ℕ) (B : (Fin n → 𝓞 E
   · rintro ⟨⟨y, h⟩, h'⟩
     exact ⟨⟨tw σ.symm y, by rw [tw_symm]; exact h⟩, h'⟩
 
-theorem minVal_smul {t : ℝ} (ht : 0 < t) (n : ℕ) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ) :
-    (InvFun.minVal (𝓞 E)).toFun n (fun a b => t * B a b) = t * (InvFun.minVal (𝓞 E)).toFun n B := by
+theorem minVal_smul {t : ℝ} (ht : 0 < t) (n : ℕ) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ)
+    : (InvFun.minVal (𝓞 E)).toFun n (fun a b => t * B a b)
+      = t * (InvFun.minVal (𝓞 E)).toFun n B := by
   simp only [InvFun.minVal]
   have : {x | (∃ y, t * B y y = x) ∧ x ≠ t * B 0 0} = t • {x | (∃ y, B y y = x) ∧ x ≠ B 0 0} := by
     ext x
@@ -110,17 +123,19 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) (q : �
 
 def IsDom (n : ℕ) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ) : Prop :=
   ∃ (X₁ : Type) (_ : AddCommGroup X₁) (_ : Module (𝓞 E) X₁) (_ : Module.Projective (𝓞 E) X₁)
-    (r : (Fin n → 𝓞 E) →ₗ[𝓞 E] X₁) (B₁ : X₁ →ₗ[ℤ] X₁ →ₗ[ℤ] ℝ), Function.Surjective r ∧
-    Module.finrank (𝓞 E) X₁ ≤ q ∧ B₁ ∈ realForms H.bar X₁ ∧ IsPosDef B₁ ∧ ∀ a b, B a b = B₁ (r a) (r b)
+      (r : (Fin n → 𝓞 E) →ₗ[𝓞 E] X₁) (B₁ : X₁ →ₗ[ℤ] X₁ →ₗ[ℤ] ℝ),
+    Function.Surjective r ∧ Module.finrank (𝓞 E) X₁ ≤ q ∧ B₁ ∈ realForms H.bar X₁ ∧ IsPosDef B₁
+      ∧ ∀ a b, B a b = B₁ (r a) (r b)
 
 def IsDomT (n : ℕ) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ) : Prop :=
   ∃ σ : 𝓞 E ≃+* 𝓞 E, σ H.w0 = H.w0 ∧ IsDom H q n fun a b => B (tw σ a) (tw σ b)
 
 variable {H q}
 
-theorem isDom_comp_iff {r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E)} (hr : Function.Surjective r)
-    (B : (Fin m → 𝓞 E) → (Fin m → 𝓞 E) → ℝ) :
-    IsDom H q n (fun a b => B (r a) (r b)) ↔ IsDom H q m B := by
+theorem isDom_comp_iff
+    {r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E)} (hr : Function.Surjective r)
+    (B : (Fin m → 𝓞 E) → (Fin m → 𝓞 E) → ℝ)
+    : IsDom H q n (fun a b => B (r a) (r b)) ↔ IsDom H q m B := by
   constructor
   · rintro ⟨X₁, _, _, _, s, B₁, hs, hq, hB, hd, he⟩
     have he' : ∀ a b, B (r a) (r b) = B₁ (s a) (s b) := he
@@ -128,7 +143,9 @@ theorem isDom_comp_iff {r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E)
     have hk : LinearMap.ker r ≤ LinearMap.ker s := fun a ha => by
       rw [LinearMap.mem_ker] at ha ⊢
       refine eq_zero_of_posDef hd ?_
-      calc B₁ (s a) (s a) = B (r a) (r a) := (he' a a).symm
+      calc
+        B₁ (s a) (s a)
+          = B (r a) (r a) := (he' a a).symm
         _ = B (r 0) (r 0) := by rw [ha, map_zero]
         _ = B₁ (s 0) (s 0) := he' 0 0
         _ = 0 := by simp
@@ -148,36 +165,52 @@ theorem isDom_comp_iff {r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E)
   · rintro ⟨X₁, _, _, _, s, B₁, hs, hq, hB, hd, he⟩
     exact ⟨X₁, _, _, inferInstance, s ∘ₗ r, B₁, hs.comp hr, hq, hB, hd, fun a b => he _ _⟩
 
-theorem isDomT_comp_iff {r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E)} (hr : Function.Surjective r)
-    (B : (Fin m → 𝓞 E) → (Fin m → 𝓞 E) → ℝ) :
-    IsDomT H q n (fun a b => B (r a) (r b)) ↔ IsDomT H q m B :=
-  exists_congr fun σ => and_congr_right fun _ => by
-    have := isDom_comp_iff (H := H) (q := q) (conj_surjective σ hr) (fun a b => B (tw σ a) (tw σ b))
-    simpa only [tw_conj] using this
+theorem isDomT_comp_iff
+    {r : (Fin n → 𝓞 E) →ₗ[𝓞 E] (Fin m → 𝓞 E)} (hr : Function.Surjective r)
+    (B : (Fin m → 𝓞 E) → (Fin m → 𝓞 E) → ℝ)
+    : IsDomT H q n (fun a b => B (r a) (r b)) ↔ IsDomT H q m B :=
+  exists_congr fun σ =>
+    and_congr_right fun _ => by
+      have :=
+        isDom_comp_iff (H := H) (q := q) (conj_surjective σ hr) (fun a b => B (tw σ a) (tw σ b))
+      simpa only [tw_conj] using this
 
-theorem isDomT_twist_iff {σ : 𝓞 E ≃+* 𝓞 E} (hσ : σ H.w0 = H.w0) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ) :
-    IsDomT H q n (fun a b => B (tw σ a) (tw σ b)) ↔ IsDomT H q n B := by
+theorem isDomT_twist_iff
+    {σ : 𝓞 E ≃+* 𝓞 E} (hσ : σ H.w0 = H.w0) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ)
+    : IsDomT H q n (fun a b => B (tw σ a) (tw σ b)) ↔ IsDomT H q n B := by
   constructor
   · rintro ⟨ρ, hρ, h⟩
     exact ⟨ρ.trans σ, by simp [hρ, hσ], h⟩
   · rintro ⟨ρ, hρ, h⟩
     have hσ' : σ.symm H.w0 = H.w0 := (RingEquiv.symm_apply_eq σ).2 hσ.symm
     refine ⟨ρ.trans σ.symm, by simp [hρ, hσ'], ?_⟩
-    have e1 : ∀ c : Fin n → 𝓞 E, tw σ (tw (ρ.trans σ.symm) c) = tw ρ c := fun c => funext fun i => by simp [tw]
+    have e1 : ∀ c : Fin n → 𝓞 E, tw σ (tw (ρ.trans σ.symm) c) = tw ρ c := fun c =>
+      funext fun i => by simp [tw]
     simp only [e1]
     exact h
 
-theorem isDom_smul {t : ℝ} (ht : 0 < t) {B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ} (h : IsDom H q n B) :
-    IsDom H q n (fun a b => t * B a b) := by
+theorem isDom_smul {t : ℝ} (ht : 0 < t) {B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ} (h : IsDom H q n B)
+    : IsDom H q n (fun a b => t * B a b) := by
   obtain ⟨X₁, _, _, _, s, B₁, hs, hq, hB, hd, he⟩ := h
-  refine ⟨X₁, _, _, inferInstance, s, t • B₁, hs, hq, Submodule.smul_mem _ _ hB, fun k x hx c hc => ?_,
-    fun a b => by simp [he a b]⟩
+  refine ⟨
+    X₁,
+    _,
+    _,
+    inferInstance,
+    s,
+    t • B₁,
+    hs,
+    hq,
+    Submodule.smul_mem _ _ hB,
+    fun k x hx c hc => ?_,
+    fun a b => by simp [he a b]
+  ⟩
   refine (mul_pos ht (hd k x hx c hc)).trans_eq ?_
   simp only [Finset.mul_sum, LinearMap.smul_apply, smul_eq_mul]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem isDomT_smul_iff {t : ℝ} (ht : 0 < t) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ) :
-    IsDomT H q n (fun a b => t * B a b) ↔ IsDomT H q n B := by
+theorem isDomT_smul_iff {t : ℝ} (ht : 0 < t) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ)
+    : IsDomT H q n (fun a b => t * B a b) ↔ IsDomT H q n B := by
   constructor
   · rintro ⟨σ, hσ, h⟩
     refine ⟨σ, hσ, ?_⟩
@@ -187,9 +220,21 @@ theorem isDomT_smul_iff {t : ℝ} (ht : 0 < t) (B : (Fin n → 𝓞 E) → (Fin 
     exact ⟨σ, hσ, isDom_smul ht h⟩
 
 theorem isDomT_zero : IsDomT H q n (fun _ _ => 0) := by
-  refine ⟨RingEquiv.refl _, rfl, PUnit, _, _, inferInstance, 0, 0, fun _ => ⟨0, rfl⟩,
-    Module.finrank_zero_of_subsingleton.trans_le (Nat.zero_le _), zero_mem _,
-    fun k x hx c hc => ?_, fun _ _ => by simp⟩
+  refine ⟨
+    RingEquiv.refl _,
+    rfl,
+    PUnit,
+    _,
+    _,
+    inferInstance,
+    0,
+    0,
+    fun _ => ⟨0, rfl⟩,
+    Module.finrank_zero_of_subsingleton.trans_le (Nat.zero_le _),
+    zero_mem _,
+    fun k x hx c hc => ?_,
+    fun _ _ => by simp
+  ⟩
   obtain ⟨i, -⟩ := Function.ne_iff.1 hc
   exact (hx.ne_zero i (Subsingleton.elim _ _)).elim
 
@@ -209,11 +254,13 @@ def extFun (H : Host E) (q : ℕ) (φ : InvFun (𝓞 E)) : InvFun (𝓞 E) where
 
 variable {φ : InvFun (𝓞 E)}
 
-theorem extFun_of {B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ} (h : IsDomT H q n B) :
-    (extFun H q φ).toFun n B = φ.toFun n B := if_pos h
+theorem extFun_of {B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ} (h : IsDomT H q n B)
+    : (extFun H q φ).toFun n B = φ.toFun n B :=
+  if_pos h
 
-theorem extFun_of_not {B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ} (h : ¬ IsDomT H q n B) :
-    (extFun H q φ).toFun n B = (InvFun.minVal (𝓞 E)).toFun n B := if_neg h
+theorem extFun_of_not {B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ} (h : ¬ IsDomT H q n B)
+    : (extFun H q φ).toFun n B = (InvFun.minVal (𝓞 E)).toFun n B :=
+  if_neg h
 
 end Dom
 
@@ -231,9 +278,10 @@ theorem isTwInv_extFun (htw : IsTwInv H φ) : IsTwInv H (extFun H q φ) := by
   · rw [extFun_of_not (mt hiff.1 h), extFun_of_not h]
     exact minVal_twist σ n B
 
-theorem extFun_homog (hpol : IsPolFan H.bar q φ) (htw : IsTwInv H φ) (n k : ℕ)
-    (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ) :
-    (extFun H q φ).toFun n (fun a b => k * B a b) = k * (extFun H q φ).toFun n B := by
+theorem extFun_homog
+    (hpol : IsPolFan H.bar q φ) (htw : IsTwInv H φ)
+    (n k : ℕ) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ)
+    : (extFun H q φ).toFun n (fun a b => k * B a b) = k * (extFun H q φ).toFun n B := by
   rcases Nat.eq_zero_or_pos k with rfl | hk
   · simp only [Nat.cast_zero, zero_mul]
     rw [extFun_of isDomT_zero, toFun_zeroForm]
@@ -243,8 +291,10 @@ theorem extFun_homog (hpol : IsPolFan H.bar q φ) (htw : IsTwInv H φ) (n k : �
     obtain ⟨σ, hσ, X₁, _, _, _, s, B₁, hs, hq, hB, hd, he⟩ := h
     have he' : ∀ a b, B (tw σ a) (tw σ b) = B₁ (s a) (s b) := he
     have : Module.Finite (𝓞 E) X₁ := Module.Finite.of_surjective s hs
-    have htw' : ∀ B' : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ,
-        φ.toFun n (fun a b => B' (tw σ a) (tw σ b)) = φ.toFun n B' := htw σ hσ n
+    have htw'
+        : ∀ B' : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ,
+          φ.toFun n (fun a b => B' (tw σ a) (tw σ b)) = φ.toFun n B' :=
+      htw σ hσ n
     rw [← htw' B, ← htw' (fun a b => k * B a b)]
     simp only [he']
     have e1 := φ.eval_eq hs (fun x y => (k : ℝ) * B₁ x y)
@@ -255,11 +305,12 @@ theorem extFun_homog (hpol : IsPolFan H.bar q φ) (htw : IsTwInv H φ) (n k : �
   · rw [extFun_of_not (mt (isDomT_smul_iff ht B).1 h), extFun_of_not h]
     exact minVal_smul ht n B
 
-
 variable (H q φ) in
-theorem evalR_extFun {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
-    (hX : Module.finrank (𝓞 E) X ≤ q) {B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ} (hB : B ∈ psdCone (bar := H.bar) (X := X)) :
-    evalR (extFun H q φ) B = evalR φ B := by
+theorem evalR_extFun
+    {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
+    (hX : Module.finrank (𝓞 E) X ≤ q)
+    {B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ} (hB : B ∈ psdCone (bar := H.bar) (X := X))
+    : evalR (extFun H q φ) B = evalR φ B := by
   obtain ⟨n, r, hr⟩ := Module.Finite.exists_fin' (𝓞 E) X
   unfold evalR
   rw [(extFun H q φ).eval_eq hr, φ.eval_eq hr]
@@ -272,48 +323,79 @@ theorem evalR_extFun {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Fin
     exact this.trans hX
   exact ⟨X₁, _, _, inferInstance, s ∘ₗ r, B₁, hs.comp hr, hrk, hB₁, hd, fun a b => he _ _⟩
 
-theorem toReal_mem_psdCone {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
-    {β : LinearMap.BilinForm ℤ X} (hβ : β ∈ balForms H.bar X) (hp : ∀ y, 0 ≤ β y y) : toReal β ∈ psdCone (bar := H.bar) (X := X) := by
-  have := GlobalTheory.T.nonneg_sum_smul_intBilinFormToReal_mem_psdCone (𝓞 E) H.bar X 1 ![β] ![1] (by simp [hβ]) (by simp [hp]) (by simp)
+theorem toReal_mem_psdCone
+    {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
+    {β : LinearMap.BilinForm ℤ X} (hβ : β ∈ balForms H.bar X) (hp : ∀ y, 0 ≤ β y y)
+    : toReal β ∈ psdCone (bar := H.bar) (X := X) := by
+  have :=
+    GlobalTheory.T.nonneg_sum_smul_intBilinFormToReal_mem_psdCone (𝓞 E) H.bar X 1 ![β] ![1]
+      (by simp [hβ]) (by simp [hp]) (by simp)
   simpa using this
 
-theorem isCone_of_agree {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X] {φ₁ φ₂ : InvFun (𝓞 E)}
-    (h : ∀ B ∈ psdCone (bar := H.bar) (X := X), evalR φ₁ B = evalR φ₂ B) {m : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X}
-    (hc : IsCone H.bar φ₁ γ) : IsCone H.bar φ₂ γ := by
+theorem isCone_of_agree
+    {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
+    {φ₁ φ₂ : InvFun (𝓞 E)} (h : ∀ B ∈ psdCone (bar := H.bar) (X := X), evalR φ₁ B = evalR φ₂ B)
+    {m : ℕ} {γ : Fin m → LinearMap.BilinForm ℤ X} (hc : IsCone H.bar φ₁ γ)
+    : IsCone H.bar φ₂ γ := by
   have hz : ∀ β ∈ balForms H.bar X, (∀ y, 0 ≤ β y y) → φ₁.evalZ β = φ₂.evalZ β := fun β hβ hp => by
     rw [← evalR_toReal, ← evalR_toReal]
     exact h _ (toReal_mem_psdCone hβ hp)
   refine ⟨hc.mem, hc.nonneg, hc.basis, (linearOn_iff φ₂ γ).2 fun c hcn => ?_, ?_⟩
-  · rw [← h _ (GlobalTheory.T.nonneg_sum_smul_intBilinFormToReal_mem_psdCone (𝓞 E) H.bar X m γ c hc.mem hc.nonneg hcn), (linearOn_iff φ₁ γ).1 hc.linear c hcn]
+  · rw [← h _
+        (GlobalTheory.T.nonneg_sum_smul_intBilinFormToReal_mem_psdCone (𝓞 E) H.bar X m γ c hc.mem
+          hc.nonneg hcn),
+      (linearOn_iff φ₁ γ).1 hc.linear c hcn]
     exact Finset.sum_congr rfl fun i _ => by rw [hz _ (hc.mem i) (hc.nonneg i)]
   · obtain ⟨N, ℓ, hN, h1, h2, h3⟩ := hc.strict
-    exact ⟨N, ℓ, hN, fun i => by rw [← hz _ (hc.mem i) (hc.nonneg i)]; exact h1 i,
+    exact ⟨
+      N,
+      ℓ,
+      hN,
+      fun i => by rw [← hz _ (hc.mem i) (hc.nonneg i)]; exact h1 i,
       fun β hβ hp => by rw [← hz β hβ hp]; exact h2 β hβ hp,
-      fun β hβ hp he => h3 β hβ hp (by rw [hz β hβ hp]; exact he)⟩
+      fun β hβ hp he => h3 β hβ hp (by rw [hz β hβ hp]; exact he)
+    ⟩
 
-theorem isCone_extFun_iff {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
-    (hX : Module.finrank (𝓞 E) X ≤ q) {m : ℕ} (γ : Fin m → LinearMap.BilinForm ℤ X) :
-    IsCone H.bar (extFun H q φ) γ ↔ IsCone H.bar φ γ :=
-  ⟨isCone_of_agree fun B hB => evalR_extFun H q φ hX hB,
-    isCone_of_agree fun B hB => (evalR_extFun H q φ hX hB).symm⟩
+theorem isCone_extFun_iff
+    {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
+    (hX : Module.finrank (𝓞 E) X ≤ q)
+    {m : ℕ} (γ : Fin m → LinearMap.BilinForm ℤ X)
+    : IsCone H.bar (extFun H q φ) γ ↔ IsCone H.bar φ γ := ⟨
+  isCone_of_agree fun B hB => evalR_extFun H q φ hX hB,
+  isCone_of_agree fun B hB => (evalR_extFun H q φ hX hB).symm
+⟩
 
-theorem isPolFanOn_extFun {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
-    (hX : Module.finrank (𝓞 E) X ≤ q) (h : IsPolFanOn H.bar φ X) : IsPolFanOn H.bar (extFun H q φ) X := by
+theorem isPolFanOn_extFun
+    {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
+    (hX : Module.finrank (𝓞 E) X ≤ q) (h : IsPolFanOn H.bar φ X)
+    : IsPolFanOn H.bar (extFun H q φ) X := by
   have agree := fun B (hB : B ∈ psdCone (bar := H.bar) (X := X)) => evalR_extFun H q φ hX hB
-  have hz : ∀ β ∈ balForms H.bar X, (∀ y, 0 ≤ β y y) → (extFun H q φ).evalZ β = φ.evalZ β := fun β hβ hp => by
+  have hz
+      : ∀ β ∈ balForms H.bar X,
+        (∀ y, 0 ≤ β y y) → (extFun H q φ).evalZ β = φ.evalZ β := fun β hβ hp => by
     rw [← evalR_toReal, ← evalR_toReal]
     exact agree _ (toReal_mem_psdCone hβ hp)
-  refine ⟨fun B hB t ht => ?_, fun B hB B' hB' => ?_, fun β hβ hp => ?_, fun β hβ hp h0 => ?_,
-    fun m m' γ s hγ => ?_, fun B hB => ?_, ?_⟩
+  refine ⟨
+    fun B hB t ht => ?_,
+    fun B hB B' hB' => ?_,
+    fun β hβ hp => ?_,
+    fun β hβ hp h0 => ?_,
+    fun m m' γ s hγ => ?_,
+    fun B hB => ?_,
+    ?_
+  ⟩
   · rw [agree _ (smul_mem_psdCone hB ht), agree _ hB]
     exact h.homog B hB t ht
   · have hsum : B + B' ∈ psdCone (bar := H.bar) (X := X) := by
       obtain ⟨m, γ, c, hγ, hc, rfl⟩ := h.cover B hB
       obtain ⟨m', γ', c', hγ', hc', rfl⟩ := h.cover B' hB'
-      have := GlobalTheory.T.nonneg_sum_smul_intBilinFormToReal_mem_psdCone (𝓞 E) H.bar X (m + m') (Fin.append γ γ') (Fin.append c c')
-        (fun i => by refine Fin.addCases (fun j => ?_) (fun j => ?_) i <;> simp [hγ.mem, hγ'.mem])
-        (fun i => by refine Fin.addCases (fun j => ?_) (fun j => ?_) i <;> simp [hγ.nonneg, hγ'.nonneg])
-        (fun i => by refine Fin.addCases (fun j => ?_) (fun j => ?_) i <;> simp [hc, hc'])
+      have :=
+        GlobalTheory.T.nonneg_sum_smul_intBilinFormToReal_mem_psdCone (𝓞 E) H.bar X (m + m')
+          (Fin.append γ γ') (Fin.append c c')
+          (fun i => by refine Fin.addCases (fun j => ?_) (fun j => ?_) i <;> simp [hγ.mem, hγ'.mem])
+          (fun i => by
+            refine Fin.addCases (fun j => ?_) (fun j => ?_) i <;> simp [hγ.nonneg, hγ'.nonneg])
+          (fun i => by refine Fin.addCases (fun j => ?_) (fun j => ?_) i <;> simp [hc, hc'])
       simpa [Fin.sum_univ_add] using this
     rw [agree _ hB, agree _ hB', agree _ hsum]
     exact h.superadd B hB B' hB'
@@ -333,8 +415,9 @@ section Pos
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {q : ℕ} {φ : InvFun (𝓞 E)}
 
-theorem isTorsionFree_of_pos {X : Type} [AddCommGroup X] {be : LinearMap.BilinForm ℤ X}
-    (hpos : ∀ y, y ≠ 0 → 0 < be y y) : Module.IsTorsionFree ℤ X := by
+theorem isTorsionFree_of_pos
+    {X : Type} [AddCommGroup X] {be : LinearMap.BilinForm ℤ X} (hpos : ∀ y, y ≠ 0 → 0 < be y y)
+    : Module.IsTorsionFree ℤ X := by
   refine ⟨fun r hr x y hxy => ?_⟩
   have hxy' : r • x = r • y := hxy
   have hr0 : r ≠ 0 := hr.ne_zero
@@ -350,9 +433,12 @@ theorem isTorsionFree_of_pos {X : Type} [AddCommGroup X] {be : LinearMap.BilinFo
   · exact hr0 (mul_self_eq_zero.1 h)
   · exact (hpos _ hd).ne' h
 
-theorem finrank_le_of_isDomT {X : Type} [AddCommGroup X] [Module (𝓞 E) X] {be : LinearMap.BilinForm ℤ X}
-    (hpos : ∀ y, y ≠ 0 → 0 < be y y) {n : ℕ} {r : (Fin n → 𝓞 E) →ₗ[𝓞 E] X} (hr : Function.Surjective r)
-    (h : IsDomT H q n fun a b => (be (r a) (r b) : ℝ)) : Module.finrank (𝓞 E) X ≤ q := by
+theorem finrank_le_of_isDomT
+    {X : Type} [AddCommGroup X] [Module (𝓞 E) X]
+    {be : LinearMap.BilinForm ℤ X} (hpos : ∀ y, y ≠ 0 → 0 < be y y)
+    {n : ℕ} {r : (Fin n → 𝓞 E) →ₗ[𝓞 E] X}
+    (hr : Function.Surjective r) (h : IsDomT H q n fun a b => (be (r a) (r b) : ℝ))
+    : Module.finrank (𝓞 E) X ≤ q := by
   obtain ⟨σ, -, X₁, _, _, _, s, B₁, hs, hq, -, hd, he⟩ := h
   have he' : ∀ a b, (be (r (tw σ a)) (r (tw σ b)) : ℝ) = B₁ (s a) (s b) := he
   have : Module.IsTorsionFree ℤ X₁ := isTorsionFree_int (E := E) X₁
@@ -375,16 +461,20 @@ theorem finrank_le_of_isDomT {X : Type} [AddCommGroup X] [Module (𝓞 E) X] {be
     obtain ⟨a, rfl⟩ := hs y
     obtain ⟨b, rfl⟩ := hs y'
     rw [← map_add (f := _), hg, hg, hg, tw_add, map_add (f := _)]
-  let j : X₁ ≃+ X := AddEquiv.ofBijective (AddMonoidHom.mk' g hadd) ⟨fun y y' e => by
-      obtain ⟨a, rfl⟩ := hs y
-      obtain ⟨b, rfl⟩ := hs y'
-      have e' : g (s a) = g (s b) := e
-      rw [hg, hg] at e'
-      exact (key2 a b).2 e', fun x => by
-      obtain ⟨a, rfl⟩ := hr x
-      refine ⟨s (tw σ.symm a), ?_⟩
-      show g _ = _
-      rw [hg, tw_symm]⟩
+  let j : X₁ ≃+ X :=
+    AddEquiv.ofBijective (AddMonoidHom.mk' g hadd) ⟨
+      fun y y' e => by
+        obtain ⟨a, rfl⟩ := hs y
+        obtain ⟨b, rfl⟩ := hs y'
+        have e' : g (s a) = g (s b) := e
+        rw [hg, hg] at e'
+        exact (key2 a b).2 e',
+      fun x => by
+        obtain ⟨a, rfl⟩ := hr x
+        refine ⟨s (tw σ.symm a), ?_⟩
+        show g _ = _
+        rw [hg, tw_symm]
+    ⟩
   have hj : ∀ (c : 𝓞 E) (y : X₁), j (c • y) = σ c • j y := fun c y => by
     obtain ⟨a, rfl⟩ := hs y
     show g (c • s a) = σ c • g (s a)
@@ -425,16 +515,28 @@ theorem isPosFn_extFun (hpol : IsPolFan H.bar q φ) : IsPosFn H (extFun H q φ) 
 
 end Pos
 
-theorem exists_extension : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (q : ℕ)
-    (φ' : InvFun (𝓞 E)), IsPolFan H.bar q φ' → NoSelfInt H.bar q φ' → IsTwInv H φ' →
-    ∃ φ'' : InvFun (𝓞 E), IsPolFan H.bar q φ'' ∧ NoSelfInt H.bar q φ'' ∧ IsTwInv H φ'' ∧ IsPosFn H φ'' ∧
-      (∀ (n k : ℕ) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ), φ''.toFun n (fun a b => k * B a b) = k * φ''.toFun n B) ∧
-      ∀ (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X] [Module.Projective (𝓞 E) X],
-        Module.finrank (𝓞 E) X ≤ q → ∀ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X),
-          IsCone H.bar φ'' γ → IsCone H.bar φ' γ := by
+theorem exists_extension
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (q : ℕ) (φ' : InvFun (𝓞 E)),
+      IsPolFan H.bar q φ' → NoSelfInt H.bar q φ' → IsTwInv H φ'
+        → ∃ φ'' : InvFun (𝓞 E),
+          IsPolFan H.bar q φ'' ∧ NoSelfInt H.bar q φ'' ∧ IsTwInv H φ'' ∧ IsPosFn H φ''
+            ∧ (∀ (n k : ℕ) (B : (Fin n → 𝓞 E) → (Fin n → 𝓞 E) → ℝ),
+              φ''.toFun n (fun a b => k * B a b) = k * φ''.toFun n B)
+            ∧ ∀ (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X]
+                [Module.Projective (𝓞 E) X],
+              Module.finrank (𝓞 E) X ≤ q
+                → ∀ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X),
+                  IsCone H.bar φ'' γ → IsCone H.bar φ' γ := by
   intro E _ _ _ H q φ hpol hns htw
-  refine ⟨extFun H q φ, fun X _ _ _ _ hX => isPolFanOn_extFun hX (hpol X hX), fun X _ _ _ _ hX m γ hγ => ?_,
-    isTwInv_extFun htw, isPosFn_extFun hpol, extFun_homog hpol htw, fun X _ _ _ _ hX m γ hγ => ?_⟩
+  refine ⟨
+    extFun H q φ,
+    fun X _ _ _ _ hX => isPolFanOn_extFun hX (hpol X hX),
+    fun X _ _ _ _ hX m γ hγ => ?_,
+    isTwInv_extFun htw,
+    isPosFn_extFun hpol,
+    extFun_homog hpol htw,
+    fun X _ _ _ _ hX m γ hγ => ?_
+  ⟩
   · exact hns X hX m γ ((isCone_extFun_iff hX γ).1 hγ)
   · exact (isCone_extFun_iff hX γ).1 hγ
 

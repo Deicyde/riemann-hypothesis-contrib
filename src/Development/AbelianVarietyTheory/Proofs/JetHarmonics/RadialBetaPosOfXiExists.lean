@@ -7,10 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.BetaIntegrand
 @[expose] public section
 
 open MeasureTheory
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P Formalism.REAL Formalism.QuantumDeterminants
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.P Formalism.REAL
+  Formalism.QuantumDeterminants
 
 namespace GlobalTheory.WeightedFormPos
-
 
 open Formalism.FourierDecayAlt.P.JCx2 in
 theorem radialBetaPos_of_xiExists (hXi : B.XiExists) : JC.RadialBetaPos := by
@@ -20,14 +20,17 @@ theorem radialBetaPos_of_xiExists (hXi : B.XiExists) : JC.RadialBetaPos := by
   have h : P5.form μ 0 Φ Φ' 0 = (C1 : ℂ) * ∑ a, B.beta (T.bs j) (x a) (x' a) := by
     refine (rb_form_eq (k := P0.k) (r := P0.r - j) μ Φ Φ').trans ?_
     let f : Wd.Ix (Fin n) → (Fin (P0.r - j) → ℂ) × ℂ → ℂ := fun a q =>
-      (bcWeight P0.k (P0.r - j) (Tz P0.k (P0.r - j) (T.bs j).z) (Tz P0.k (P0.r - j) (T.bs j).z') q : ℂ) *
-        inner ℂ (B.hsVec (B.JF (T.bs j) (x' a) (B.gq (T.bs j) q))) (B.hsVec (B.JF (T.bs j) (x a) (B.gq (T.bs j) q)))
+      (bcWeight P0.k (P0.r - j) (Tz P0.k (P0.r - j) (T.bs j).z) (Tz P0.k (P0.r - j) (T.bs j).z') q
+          : ℂ)
+        * inner ℂ (B.hsVec (B.JF (T.bs j) (x' a) (B.gq (T.bs j) q)))
+          (B.hsVec (B.JF (T.bs j) (x a) (B.gq (T.bs j) q)))
     have hint : ∀ a, Integrable (f a) := fun a =>
       betaIntegrand_integrable_of_xiExists hXi P0.k (P0.r - j) Wp Wq (T.bs j) _ (x a) (x' a) le_rfl
         ((hx a).2.1 _ 5) ((hx' a).2.1 _ 5)
-    have hae : (fun c : Fin (P0.r - j) → ℂ => ((∏ a : Fin (P0.r - j), ‖c a‖ ^ (-2 : ℤ) : ℝ) : ℂ) *
-        ∑ b, P5.pairAt (k := P0.k) (r := P0.r - j) μ (Φ b) (Φ' b) c)
-        =ᵐ[volume] fun c => ∑ b, (C1 : ℂ) * ∫ ζ, f b (c, ζ) := by
+    have hae
+        : (fun c : Fin (P0.r - j) → ℂ => ((∏ a : Fin (P0.r - j), ‖c a‖ ^ (-2 : ℤ) : ℝ) : ℂ) *
+          ∑ b, P5.pairAt (k := P0.k) (r := P0.r - j) μ (Φ b) (Φ' b) c)
+          =ᵐ[volume] fun c => ∑ b, (C1 : ℂ) * ∫ ζ, f b (c, ζ) := by
       filter_upwards [rb_ae_OmX] with c hc
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun b _ => ?_
@@ -48,7 +51,7 @@ theorem radialBetaPos_of_xiExists (hXi : B.XiExists) : JC.RadialBetaPos := by
   field_simp
 
 theorem radialModuleForm_of_xiExists (hXi : B.XiExists) : JC.RadialModuleForm :=
-  radial_module_form_of_parts (radialBetaPos_of_xiExists hXi) radial_module_action bessel_function_finite_class
-    bessel_module module_regularity
+  radial_module_form_of_parts (radialBetaPos_of_xiExists hXi) radial_module_action
+    bessel_function_finite_class bessel_module module_regularity
 
 end GlobalTheory.WeightedFormPos

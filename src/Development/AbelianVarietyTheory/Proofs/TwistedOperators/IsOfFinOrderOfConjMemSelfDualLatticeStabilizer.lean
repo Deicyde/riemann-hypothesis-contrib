@@ -6,7 +6,9 @@ public import Formalism.LocalToGlobal.Divisibility.DefGroupLemmas
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S IsDedekindDomain NumberField
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Cx Formalism.IndefR.Links
 open Formalism.IndefR.Datum (InfFam)
@@ -16,8 +18,14 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.DefFree
 
-theorem isOfFinOrder_of_conjIn_mem_St :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] (hc : CMData F E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (Λ : Submodule (𝓞 E) (Fin n → E)) (β : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)), IsDefUnimod hc J Λ → IsFrame β Λ → ∀ (u : UR hc J) (x : UA hc J), conjIn hc J (x : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) u ∈ St β → IsOfFinOrder u := by
+theorem isOfFinOrder_of_conjIn_mem_St
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+        (hc : CMData F E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (Λ : Submodule (𝓞 E) (Fin n → E))
+        (β : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)),
+      IsDefUnimod hc J Λ → IsFrame β Λ
+        → ∀ (u : UR hc J) (x : UA hc J),
+          conjIn hc J (x : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) u ∈ St β
+            → IsOfFinOrder u := by
   intro F E _ _ _ _ _ _ hc n J L β hU hβ u x hu
   open Matrix in
   have hspan : Submodule.span E (L : Set (Fin n → E)) = ⊤ := by
@@ -28,8 +36,10 @@ theorem isOfFinOrder_of_conjIn_mem_St :
     let σ : E →+* E := hc.sig
     let z : Fin n → E := J⁻¹ *ᵥ (fun i => σ (f (Pi.single i 1)))
     have hpair (x : Fin n → E) : Formalism.UG.hform σ J x z = σ (f x) := by
-      rw [Formalism.UG.P.hform_eq_dot, show J *ᵥ z = (fun i => σ (f (Pi.single i 1))) by
-        simp only [z, mulVec_mulVec, J.mul_nonsing_inv hU.unit, one_mulVec], dotProduct]
+      rw [Formalism.UG.P.hform_eq_dot,
+        show J *ᵥ z = (fun i => σ (f (Pi.single i 1))) by
+          simp only [z, mulVec_mulVec, J.mul_nonsing_inv hU.unit, one_mulVec],
+        dotProduct]
       have hx : ∑ i, x i • Pi.single i (1 : E) = x := by
         simpa only [← Pi.single_smul', smul_eq_mul, mul_one] using
           LinearMap.sum_single_apply (fun _ : Fin n => E) x
@@ -62,14 +72,19 @@ theorem isOfFinOrder_of_conjIn_mem_St :
     · obtain ⟨a, ha, hsign⟩ := hneg z hz
       rw [hann z hzL, ← map_zero (algebraMap F E)] at ha
       exact (lt_irrefl (0 : ℝ)) (by simpa [(algebraMap F E).injective ha] using hsign)
-  have hfin := Formalism.UG.Final.AdelicStabFiniteL F E (Fin n) hc.sig J (cm_comp hc) hU.herm hU.unit hU.tdef L
-    (Module.Finite.iff_fg.2 hU.lat.fg) hspan x
+  have hfin :=
+    Formalism.UG.Final.AdelicStabFiniteL F E (Fin n) hc.sig J (cm_comp hc) hU.herm hU.unit hU.tdef L
+      (Module.Finite.iff_fg.2 hU.lat.fg) hspan x
   have hb := base_level_eq_adelic_level F E hc n J L β hβ
   let H : Subgroup (UR hc J) :=
-    (Formalism.UG.levelAfL hc.sig J L).comap (conjIn hc J (x : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)))
+    (Formalism.UG.levelAfL hc.sig J L).comap
+      (conjIn hc J (x : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)))
   have hH : Finite H := by
-    let f : H → Formalism.UG.stabAt (UQ hc J) ((Formalism.UG.levelAfL hc.sig J L).subgroupOf (UA hc J)) x :=
-      fun γ => ⟨ratEl γ.1, (ratEl_mem_stabAt x γ.1).2 γ.2⟩
+    let f
+        : H
+          → Formalism.UG.stabAt (UQ hc J) ((Formalism.UG.levelAfL hc.sig J L).subgroupOf (UA hc J))
+            x := fun γ =>
+      ⟨ratEl γ.1, (ratEl_mem_stabAt x γ.1).2 γ.2⟩
     refine Finite.of_injective f ?_
     intro a b hab
     exact Subtype.ext (ratEl_injective (congrArg Subtype.val hab))

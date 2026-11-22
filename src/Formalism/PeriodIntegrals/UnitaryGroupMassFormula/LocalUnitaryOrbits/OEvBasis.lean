@@ -9,35 +9,41 @@ noncomputable section
 
 namespace PI.OmLocU.SdB
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain PI.OmLocU PI.VolStabSW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain PI.OmLocU PI.VolStabSW
 open scoped TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F))
 
-theorem genIdx {W : Type} [AddCommGroup W] [Module (Fv F v) W] {ι : Type} [Fintype ι] (M : AddSubgroup W)
-    (b : ι → W) (hb : LinearIndependent (Fv F v) b)
+theorem genIdx
+    {W : Type} [AddCommGroup W] [Module (Fv F v) W]
+    {ι : Type} [Fintype ι]
+    (M : AddSubgroup W) (b : ι → W) (hb : LinearIndependent (Fv F v) b)
     (hmem : ∀ x, x ∈ M ↔ ∃ c : ι → v.adicCompletionIntegers F, x = ∑ i, (c i : Fv F v) • b i)
-    (ϖ : Fv F v) (hϖ : IsUnif v ϖ) :
-    (smulSub ϖ M).relIndex M = (Ideal.absNorm v.asIdeal) ^ (Fintype.card ι) := by
+    (ϖ : Fv F v) (hϖ : IsUnif v ϖ)
+    : (smulSub ϖ M).relIndex M = (Ideal.absNorm v.asIdeal) ^ (Fintype.card ι) := by
   classical
-  let φ : (ι → v.adicCompletionIntegers F) →+ M :=
-    { toFun := fun c => ⟨∑ i, (c i : Fv F v) • b i, (hmem _).2 ⟨c, rfl⟩⟩
-      map_zero' := by ext1; simp
-      map_add' := fun c d => by
-        ext1
-        simp [add_smul, Finset.sum_add_distrib] }
+  let φ : (ι → v.adicCompletionIntegers F) →+ M := {
+    toFun := fun c => ⟨∑ i, (c i : Fv F v) • b i, (hmem _).2 ⟨c, rfl⟩⟩
+    map_zero' := by ext1; simp
+    map_add' := fun c d => by
+      ext1
+      simp [add_smul, Finset.sum_add_distrib]
+  }
   have hφs : Function.Surjective φ := by
     rintro ⟨x, hx⟩
     obtain ⟨c, rfl⟩ := (hmem x).1 hx
     exact ⟨c, rfl⟩
-  have hsm : ∀ d : ι → v.adicCompletionIntegers F,
-      ϖ • ∑ i, (d i : Fv F v) • b i = ∑ i, (ϖ * d i) • b i := by
+  have hsm
+      : ∀ d : ι → v.adicCompletionIntegers F,
+        ϖ • ∑ i, (d i : Fv F v) • b i = ∑ i, (ϖ * d i) • b i := by
     intro d
     rw [Finset.smul_sum]
     exact Finset.sum_congr rfl fun i _ => smul_smul _ _ _
-  have key : ((smulSub ϖ M).addSubgroupOf M).comap φ =
-      AddSubgroup.pi Set.univ (fun _ => unifO v ϖ) := by
+  have key
+      : ((smulSub ϖ M).addSubgroupOf M).comap φ = AddSubgroup.pi Set.univ (fun _ => unifO v ϖ) := by
     ext c
     rw [AddSubgroup.mem_comap, AddSubgroup.mem_addSubgroupOf, AddSubgroup.mem_pi]
     constructor
@@ -48,8 +54,9 @@ theorem genIdx {W : Type} [AddCommGroup W] [Module (Fv F v) W] {ι : Type} [Fint
       have e : ∑ i, (c i : Fv F v) • b i = ∑ i, (ϖ * d i) • b i := by
         rw [← hsm, hze]
         rfl
-      have h0 := Fintype.linearIndependent_iff.1 hb (fun i => (c i : Fv F v) - ϖ * d i)
-        (by simp only [sub_smul, Finset.sum_sub_distrib, e, sub_self])
+      have h0 :=
+        Fintype.linearIndependent_iff.1 hb (fun i => (c i : Fv F v) - ϖ * d i) (by
+          simp only [sub_smul, Finset.sum_sub_distrib, e, sub_self])
       exact sub_eq_zero.1 (h0 i)
     · intro h
       choose d hd using fun i => h i (Set.mem_univ i)
@@ -58,12 +65,17 @@ theorem genIdx {W : Type} [AddCommGroup W] [Module (Fv F v) W] {ι : Type} [Fint
       show ∑ i, (ϖ * d i) • b i = ∑ i, (c i : Fv F v) • b i
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hd i]
-  rw [AddSubgroup.relIndex, ← AddSubgroup.index_comap_of_surjective _ hφs, key, AddSubgroup.index_pi]
+  rw [AddSubgroup.relIndex, ← AddSubgroup.index_comap_of_surjective _ hφs, key,
+    AddSubgroup.index_pi]
   simp only [resIdx_holds v ϖ hϖ, Finset.prod_const, Finset.card_univ]
 
-theorem oEv_basis : ∃ β : Fin (Module.finrank F E) → Fv F v ⊗[F] E, LinearIndependent (Fv F v) β ∧
-    ∀ x, x ∈ OEv (E := E) v ↔ ∃ c : Fin (Module.finrank F E) → v.adicCompletionIntegers F,
-      x = ∑ i, (c i : Fv F v) • β i := by
+theorem oEv_basis
+    : ∃ β : Fin (Module.finrank F E) → Fv F v ⊗[F] E,
+      LinearIndependent (Fv F v) β
+        ∧ ∀ x,
+          x ∈ OEv (E := E) v
+            ↔ ∃ c : Fin (Module.finrank F E) → v.adicCompletionIntegers F,
+              x = ∑ i, (c i : Fv F v) • β i := by
   classical
   have : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   set M := Submodule.span (v.adicCompletionIntegers F)
@@ -77,13 +89,17 @@ theorem oEv_basis : ∃ β : Fin (Module.finrank F E) → Fv F v ⊗[F] E, Linea
       · exact Or.inr h0
   have : Module.Free (v.adicCompletionIntegers F) M := Module.free_of_finite_type_torsion_free'
   let bM := Module.finBasis (v.adicCompletionIntegers F) M
-  let b0 : Fin (Module.finrank (v.adicCompletionIntegers F) M) → Fv F v ⊗[F] E := fun i => (bM i : _)
+  let b0 : Fin (Module.finrank (v.adicCompletionIntegers F) M) → Fv F v ⊗[F] E := fun i =>
+    (bM i : _)
   have hli0 : LinearIndependent (v.adicCompletionIntegers F) b0 :=
     bM.linearIndependent.map' M.subtype (Submodule.ker_subtype M)
   have hli : LinearIndependent (Fv F v) b0 :=
     (LinearIndependent.iff_fractionRing (v.adicCompletionIntegers F) (Fv F v)).1 hli0
-  have hmem : ∀ x, x ∈ M ↔ ∃ c : Fin (Module.finrank (v.adicCompletionIntegers F) M) → v.adicCompletionIntegers F,
-      x = ∑ i, (c i : Fv F v) • b0 i := by
+  have hmem
+      : ∀ x,
+        x ∈ M
+          ↔ ∃ c : Fin (Module.finrank (v.adicCompletionIntegers F) M) → v.adicCompletionIntegers F,
+            x = ∑ i, (c i : Fv F v) • b0 i := by
     intro x
     constructor
     · intro hx
@@ -111,7 +127,9 @@ theorem oEv_basis : ∃ β : Fin (Module.finrank F E) → Fv F v ⊗[F] E, Linea
         rw [map_zsmul, Int.cast_smul_eq_zsmul]
       have e3 : c ⊗ₜ[F] e = c • inclR (F := F) (Fv F v) e := by
         simp [inclR, TensorProduct.smul_tmul']
-      have e1 : c ⊗ₜ[F] e = (c * (m : Fv F v)⁻¹) • inclR (F := F) (Fv F v) ((⟨m • e, hI⟩ : 𝓞 E) : E) := by
+      have e1
+          : c ⊗ₜ[F] e
+            = (c * (m : Fv F v)⁻¹) • inclR (F := F) (Fv F v) ((⟨m • e, hI⟩ : 𝓞 E) : E) := by
         show _ = (c * (m : Fv F v)⁻¹) • inclR (F := F) (Fv F v) (m • e)
         rw [e2, smul_smul, mul_assoc, inv_mul_cancel₀ hmF, mul_one, e3]
       rw [e1]

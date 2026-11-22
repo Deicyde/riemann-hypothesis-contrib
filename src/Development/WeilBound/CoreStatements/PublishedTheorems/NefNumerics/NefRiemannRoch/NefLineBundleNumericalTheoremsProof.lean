@@ -13,6 +13,7 @@ set_option autoImplicit false
 namespace GlobalTheory
 
 theorem nefNumerics_outright : GlobalTheory.Published.NefNumerics :=
-  GlobalTheory.Published.nefNumerics_of_product_of_riemannRoch GlobalTheory.T.nef_product_nonneg GlobalTheory.T.nef_riemann_roch
+  GlobalTheory.Published.nefNumerics_of_product_of_riemannRoch GlobalTheory.T.nef_product_nonneg
+    GlobalTheory.T.nef_riemann_roch
 
 end GlobalTheory

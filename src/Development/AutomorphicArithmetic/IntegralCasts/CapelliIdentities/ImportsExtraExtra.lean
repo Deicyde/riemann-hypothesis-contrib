@@ -6,20 +6,18 @@ public import Mathlib
 
 open Filter Topology
 
-theorem UpperTheory.Reformulated.B.Ydb1.main :
-    ∀ {G : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G] [T2Space G] {K S : Set G},
-      IsCompact K →
-        S ⊆ K →
-          (1 : G) ∈ S →
-            ∀ {Ψ φ : G → G},
-              Continuous Ψ →
-                (∀ x ∈ S, Ψ x ∈ S) →
-                  (∀ x ∈ S, φ x ∈ S) →
-                    (∀ (x y : G), (Ψ x)⁻¹ * Ψ y = φ (x⁻¹ * y)) →
-                      ∀ {l : ℕ},
-                        (0 : ℕ) < l →
-                          (∀ (U : Set G), IsOpen U → (1 : G) ∈ U → ∃ (m₀ : ℕ), ∀ m ≥ m₀, ∀ x ∈ S, φ^[l * m] x ∈ U) →
-                            ∃ v ∈ K, Ψ v = v := by
+theorem UpperTheory.Reformulated.B.Ydb1.main
+    : ∀ {G : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+        {K S : Set G},
+      IsCompact K → S ⊆ K → (1 : G) ∈ S
+        → ∀ {Ψ φ : G → G},
+          Continuous Ψ → (∀ x ∈ S, Ψ x ∈ S) → (∀ x ∈ S, φ x ∈ S)
+            → (∀ (x y : G), (Ψ x)⁻¹ * Ψ y = φ (x⁻¹ * y))
+            → ∀ {l : ℕ},
+              (0 : ℕ) < l
+                → (∀ (U : Set G),
+                  IsOpen U → (1 : G) ∈ U → ∃ (m₀ : ℕ), ∀ m ≥ m₀, ∀ x ∈ S, φ^[l * m] x ∈ U)
+                → ∃ v ∈ K, Ψ v = v := by
   intro G _ _ _ _ K S hK hSK h1 Ψ φ hΨ hΨS hφS hrel l _ hconv
   have hφ1 : φ 1 = 1 := by
     have := hrel 1 1
@@ -58,9 +56,8 @@ theorem UpperTheory.Reformulated.B.Ydb1.main :
     rintro U ⟨h1U, hU⟩
     obtain ⟨m₀, hm₀⟩ := hconv U hU h1U
     exact eventually_atTop.2 ⟨m₀, fun m hm => hm₀ m hm _ ha⟩
-  obtain ⟨v, hvK, hv⟩ := hK.exists_mapClusterPt (f := (atTop : Filter ℕ))
-    (u := fun m : ℕ => Ψ^[l * m] 1)
-    (by
+  obtain ⟨v, hvK, hv⟩ :=
+    hK.exists_mapClusterPt (f := (atTop : Filter ℕ)) (u := fun m : ℕ => Ψ^[l * m] 1) (by
       rw [le_principal_iff, mem_map]
       exact univ_mem' fun m => hSK (hPS (l * m)))
   obtain ⟨𝒰, h𝒰, hu⟩ := mapClusterPt_iff_ultrafilter.1 hv

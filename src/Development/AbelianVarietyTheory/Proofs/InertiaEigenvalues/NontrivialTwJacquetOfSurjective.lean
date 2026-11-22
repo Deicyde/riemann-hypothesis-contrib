@@ -17,18 +17,20 @@ section Chars
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-
 variable (k) in
 theorem exists_continuous_addChar_ne_one : ∃ ψ : AddChar k Circle, Continuous ψ ∧ ψ ≠ 1 := by
   obtain ⟨ψ, hψ⟩ := exists_hasConductor_one k
   exact ⟨ψ, hψ.continuous, hψ.ne_one⟩
 
-private theorem cball_subset_cball_of_valuation_le {s t : kˣ} (h : valuation k (t : k) ≤ valuation k (s : k)) :
-    cball t ⊆ cball s := fun x (hx : valuation k x ≤ valuation k (t : k)) => le_trans hx h
+private theorem cball_subset_cball_of_valuation_le
+    {s t : kˣ} (h : valuation k (t : k) ≤ valuation k (s : k))
+    : cball t ⊆ cball s := fun x (hx : valuation k x ≤ valuation k (t : k)) =>
+  le_trans hx h
 
-private theorem exists_shift_of_conductor_of_trivial_on_cball {ψ ψ' : AddChar k Circle} {c t s : kˣ} (h : HasConductor ψ c)
-    (ht : ∀ z ∈ cball t, ψ' z = 1) (hts : cball t ⊆ cball s) :
-    ∃ y ∈ cball (c * t⁻¹), ∀ x ∈ cball s, ψ (x * y) = ψ' x := by
+private theorem exists_shift_of_conductor_of_trivial_on_cball
+    {ψ ψ' : AddChar k Circle} {c t s : kˣ}
+    (h : HasConductor ψ c) (ht : ∀ z ∈ cball t, ψ' z = 1) (hts : cball t ⊆ cball s)
+    : ∃ y ∈ cball (c * t⁻¹), ∀ x ∈ cball s, ψ (x * y) = ψ' x := by
   let _ : MeasurableSpace k := borel k
   have _ : BorelSpace k := ⟨rfl⟩
   obtain ⟨ν, hν, hν1⟩ := exists_isUnitVol k
@@ -42,14 +44,19 @@ private theorem exists_shift_of_conductor_of_trivial_on_cball {ψ ψ' : AddChar 
     · have hxz : x + z ∈ cball s := add_mem_cball hx hzs
       simp only [hf, Set.indicator_of_mem hx, Set.indicator_of_mem hxz, AddChar.map_add_eq_mul,
         ht z hz, mul_one]
-    · have hxz : x + z ∉ cball s := fun hxz => hx (by simpa using add_mem_cball hxz (neg_mem_cball hzs))
+    · have hxz : x + z ∉ cball s := fun hxz =>
+        hx (by simpa using add_mem_cball hxz (neg_mem_cball hzs))
       simp only [hf, Set.indicator_of_notMem hx, Set.indicator_of_notMem hxz]
   have hSB : f ∈ SB k := by
     refine ⟨?_, ?_⟩
     · rw [IsLocallyConstant.iff_exists_open]
       intro x
-      refine ⟨(· - x) ⁻¹' cball t, (isOpen_cball t).preimage (continuous_id.sub continuous_const),
-        ?_, fun x' hx' => ?_⟩
+      refine ⟨
+        (· - x) ⁻¹' cball t,
+        (isOpen_cball t).preimage (continuous_id.sub continuous_const),
+        ?_,
+        fun x' hx' => ?_
+      ⟩
       · simp [cball]
       · have e := hfinv (x' - x) hx' x
         rwa [add_sub_cancel] at e
@@ -82,19 +89,24 @@ private theorem exists_shift_of_conductor_of_trivial_on_cball {ψ ψ' : AddChar 
         ring
       · have hxx : x0 + x ∉ cball s := fun hxx =>
           hx (by simpa using add_mem_cball (neg_mem_cball hx0) hxx)
-        simp only [g, hf, Set.indicator_of_notMem hx, Set.indicator_of_notMem hxx, zero_mul, mul_zero]
+        simp only [g, hf, Set.indicator_of_notMem hx, Set.indicator_of_notMem hxx, zero_mul,
+          mul_zero]
     have hI : ∫ x, g x ∂ν = ((ψ' x0 : ℂ) * (ψ (x0 * y) : ℂ)) * ∫ x, g x ∂ν := by
-      calc ∫ x, g x ∂ν = ∫ x, g (x0 + x) ∂ν := (integral_add_left_eq_self g x0).symm
+      calc
+        ∫ x, g x ∂ν
+          = ∫ x, g (x0 + x) ∂ν := (integral_add_left_eq_self g x0).symm
         _ = ∫ x, ((ψ' x0 : ℂ) * (ψ (x0 * y) : ℂ)) * g x ∂ν := by simp_rw [hshift]
         _ = _ := integral_const_mul _ _
     exact mul_right_cancel₀ hy (hI.symm.trans (one_mul _).symm)
   refine ⟨-y, neg_mem_cball hyc, fun x hx => ?_⟩
-  have e : ψ' x * ψ (x * y) = 1 := Circle.ext (by rw [Circle.coe_mul, Circle.coe_one]; exact key x hx)
+  have e : ψ' x * ψ (x * y) = 1 :=
+    Circle.ext (by rw [Circle.coe_mul, Circle.coe_one]; exact key x hx)
   rw [mul_neg, AddChar.map_neg_eq_inv]
   exact (eq_inv_of_mul_eq_one_left e).symm
 
-theorem exists_eq_mulShift {ψ ψ' : AddChar k Circle} (hψ : Continuous ψ) (h1 : ψ ≠ 1) (h' : Continuous ψ') :
-    ∃ a : k, ψ' = ψ.mulShift a := by
+theorem exists_eq_mulShift
+    {ψ ψ' : AddChar k Circle} (hψ : Continuous ψ) (h1 : ψ ≠ 1) (h' : Continuous ψ')
+    : ∃ a : k, ψ' = ψ.mulShift a := by
   have _ : T2Space k := t2Space k
   obtain ⟨c, hc⟩ := exists_hasConductor_of_continuous ψ hψ h1
   obtain ⟨t, ht⟩ := exists_cball_addChar_eq_one ψ' h'
@@ -114,16 +126,26 @@ theorem exists_eq_mulShift {ψ ψ' : AddChar k Circle} (hψ : Continuous ψ) (h1
   have hYn : ∀ s, (Y s).Nonempty := by
     intro s
     rcases le_total (valuation k (t : k)) (valuation k (s : k)) with hle | hle
-    · obtain ⟨y, hy, hy'⟩ := exists_shift_of_conductor_of_trivial_on_cball hc ht (cball_subset_cball_of_valuation_le hle)
+    · obtain ⟨y, hy, hy'⟩ :=
+        exists_shift_of_conductor_of_trivial_on_cball hc ht (cball_subset_cball_of_valuation_le hle)
       exact ⟨y, hy, hy'⟩
     · obtain ⟨y, hy, hy'⟩ := exists_shift_of_conductor_of_trivial_on_cball (s := t) hc ht subset_rfl
       exact ⟨y, hy, fun x hx => hy' x (cball_subset_cball_of_valuation_le hle hx)⟩
   have hYd : Directed (· ⊇ ·) Y := by
     intro s₁ s₂
     rcases le_total (valuation k (s₁ : k)) (valuation k (s₂ : k)) with hle | hle
-    · exact ⟨s₂, fun y hy => ⟨hy.1, fun x hx => hy.2 x (cball_subset_cball_of_valuation_le hle hx)⟩, subset_rfl⟩
-    · exact ⟨s₁, subset_rfl, fun y hy => ⟨hy.1, fun x hx => hy.2 x (cball_subset_cball_of_valuation_le hle hx)⟩⟩
-  obtain ⟨y, hy⟩ := IsCompact.nonempty_iInter_of_directed_nonempty_isCompact_isClosed Y hYd hYn hYk hYc
+    · exact ⟨
+        s₂,
+        fun y hy => ⟨hy.1, fun x hx => hy.2 x (cball_subset_cball_of_valuation_le hle hx)⟩,
+        subset_rfl
+      ⟩
+    · exact ⟨
+        s₁,
+        subset_rfl,
+        fun y hy => ⟨hy.1, fun x hx => hy.2 x (cball_subset_cball_of_valuation_le hle hx)⟩
+      ⟩
+  obtain ⟨y, hy⟩ :=
+    IsCompact.nonempty_iInter_of_directed_nonempty_isCompact_isClosed Y hYd hYn hYk hYc
   rw [Set.mem_iInter] at hy
   refine ⟨y, ?_⟩
   ext x
@@ -133,8 +155,9 @@ theorem exists_eq_mulShift {ψ ψ' : AddChar k Circle} (hψ : Continuous ψ) (h1
   · have hxx : x ∈ cball (Units.mk0 x hx) := by simp [cball]
     rw [(hy (Units.mk0 x hx)).2 x hxx]
 
-theorem exists_unit_eq_mulShift {ψ ψ' : AddChar k Circle} (hψ : Continuous ψ) (h1 : ψ ≠ 1) (h' : Continuous ψ')
-    (h1' : ψ' ≠ 1) : ∃ a : kˣ, ψ' = ψ.mulShift (a : k) := by
+theorem exists_unit_eq_mulShift
+    {ψ ψ' : AddChar k Circle} (hψ : Continuous ψ) (h1 : ψ ≠ 1) (h' : Continuous ψ') (h1' : ψ' ≠ 1)
+    : ∃ a : kˣ, ψ' = ψ.mulShift (a : k) := by
   obtain ⟨a, ha⟩ := exists_eq_mulShift hψ h1 h'
   have ha0 : a ≠ 0 := by
     rintro rfl
@@ -145,12 +168,18 @@ end Chars
 
 section Generic
 
-variable {k : Type} [Field k] {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] {N : ℕ}
+variable
+  {k : Type} [Field k]
+  {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+  {N : ℕ}
 
-theorem nontrivial_twJacquet_of_surjective {G : Type} [Group G] {ρ : Representation ℂ G V} {σ : Representation ℂ G W}
-    {U : Subgroup G} {θ θ' : U →* ℂˣ} (T : V →ₗ[ℂ] W) (hT : Function.Surjective T)
-    (h : ∀ (u : U) v, T (ρ u v - (θ u : ℂ) • v) ∈ twKer σ U θ') (H : Nontrivial (TwJacquet σ U θ')) :
-    Nontrivial (TwJacquet ρ U θ) := by
+theorem nontrivial_twJacquet_of_surjective
+    {G : Type} [Group G]
+    {ρ : Representation ℂ G V} {σ : Representation ℂ G W} {U : Subgroup G} {θ θ' : U →* ℂˣ}
+    (T : V →ₗ[ℂ] W)
+    (hT : Function.Surjective T) (h : ∀ (u : U) v, T (ρ u v - (θ u : ℂ) • v) ∈ twKer σ U θ')
+    (H : Nontrivial (TwJacquet σ U θ'))
+    : Nontrivial (TwJacquet ρ U θ) := by
   have hle : twKer ρ U θ ≤ (twKer σ U θ').comap T := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨u, v, rfl⟩
@@ -162,21 +191,30 @@ theorem nontrivial_twJacquet_of_surjective {G : Type} [Group G] {ρ : Representa
     exact ⟨Submodule.Quotient.mk v, Submodule.mapQ_apply _ _ _ _⟩
   exact hs.nontrivial
 
-def powTorus (N : ℕ) (a : kˣ) : GL (Fin N) k :=
-  ⟨diagonal fun i => (a : k) ^ (i : ℕ), diagonal fun i => ((a⁻¹ : kˣ) : k) ^ (i : ℕ),
-    by simp [diagonal_mul_diagonal], by simp [diagonal_mul_diagonal]⟩
+def powTorus (N : ℕ) (a : kˣ) : GL (Fin N) k := ⟨
+  diagonal fun i => (a : k) ^ (i : ℕ),
+  diagonal fun i => ((a⁻¹ : kˣ) : k) ^ (i : ℕ),
+  by simp [diagonal_mul_diagonal],
+  by simp [diagonal_mul_diagonal]
+⟩
 
-theorem powTorus_conj_apply (a : kˣ) (g : GL (Fin N) k) (i j : Fin N) :
-    ((powTorus N a)⁻¹ * g * powTorus N a).val i j = ((a⁻¹ : kˣ) : k) ^ (i : ℕ) * g.val i j * (a : k) ^ (j : ℕ) := by
+theorem powTorus_conj_apply (a : kˣ) (g : GL (Fin N) k) (i j : Fin N)
+    : ((powTorus N a)⁻¹ * g * powTorus N a).val i j
+      = ((a⁻¹ : kˣ) : k) ^ (i : ℕ) * g.val i j * (a : k) ^ (j : ℕ) := by
   simp [powTorus, Matrix.diagonal_mul, Matrix.mul_diagonal]
 
-private theorem sub_smul_mem_twKer' {G X : Type} [Group G] [AddCommGroup X] [Module ℂ X] (ρ : Representation ℂ G X)
-    (U : Subgroup G) (θ : U →* ℂˣ) (g : G) (hg : g ∈ U) (v : X) :
-    ρ g v - (θ ⟨g, hg⟩ : ℂ) • v ∈ twKer ρ U θ :=
+private theorem sub_smul_mem_twKer'
+    {G X : Type} [Group G] [AddCommGroup X] [Module ℂ X]
+    (ρ : Representation ℂ G X)
+    (U : Subgroup G) (θ : U →* ℂˣ)
+    (g : G) (hg : g ∈ U)
+    (v : X)
+    : ρ g v - (θ ⟨g, hg⟩ : ℂ) • v ∈ twKer ρ U θ :=
   Submodule.subset_span ⟨⟨g, hg⟩, v, rfl⟩
 
-theorem IsGenericFor.mulShift {ψ : AddChar k Circle} {π : Representation ℂ (GL (Fin N) k) V} (h : IsGenericFor ψ π)
-    (a : kˣ) : IsGenericFor (ψ.mulShift (a : k)) π := by
+theorem IsGenericFor.mulShift
+    {ψ : AddChar k Circle} {π : Representation ℂ (GL (Fin N) k) V} (h : IsGenericFor ψ π) (a : kˣ)
+    : IsGenericFor (ψ.mulShift (a : k)) π := by
   unfold IsGenericFor at h ⊢
   set t := powTorus N a with ht
   have hmem : ∀ u : unipB k (Fin N), t⁻¹ * (u : GL (Fin N) k) * t ∈ unipB k (Fin N) := by
@@ -185,8 +223,8 @@ theorem IsGenericFor.mulShift {ψ : AddChar k Circle} {π : Representation ℂ (
     refine (mem_unipB (R := k)).2 ⟨fun i j hji => ?_, fun i => ?_⟩
     · rw [ht, powTorus_conj_apply, hl i j hji, mul_zero, zero_mul]
     · rw [ht, powTorus_conj_apply, hd i, mul_one, ← mul_pow, Units.inv_mul, one_pow]
-  have hchar : ∀ u : unipB k (Fin N),
-      whitChar ψ N ⟨_, hmem u⟩ = whitChar (ψ.mulShift (a : k)) N u := by
+  have hchar
+      : ∀ u : unipB k (Fin N), whitChar ψ N ⟨_, hmem u⟩ = whitChar (ψ.mulShift (a : k)) N u := by
     intro u
     simp only [whitChar, MonoidHom.coe_mk, OneHom.coe_mk, AddChar.mulShift_apply]
     congr 2
@@ -206,30 +244,40 @@ theorem IsGenericFor.mulShift {ψ : AddChar k Circle} {π : Representation ℂ (
     rw [map_sub, LinearMap.map_smul, e, ← hchar u]
     exact sub_smul_mem_twKer' π _ _ _ (hmem u) _
 
-theorem isGenericFor_mulShift_iff {ψ : AddChar k Circle} {π : Representation ℂ (GL (Fin N) k) V} (a : kˣ) :
-    IsGenericFor (ψ.mulShift (a : k)) π ↔ IsGenericFor ψ π := by
+theorem isGenericFor_mulShift_iff
+    {ψ : AddChar k Circle} {π : Representation ℂ (GL (Fin N) k) V} (a : kˣ)
+    : IsGenericFor (ψ.mulShift (a : k)) π ↔ IsGenericFor ψ π := by
   refine ⟨fun h => ?_, fun h => h.mulShift a⟩
   have h' := h.mulShift a⁻¹
   rwa [AddChar.mulShift_mulShift, ← Units.val_mul, mul_inv_cancel, Units.val_one,
-    AddChar.mulShift_one] at h'
+      AddChar.mulShift_one]
+    at h'
 
-theorem IsGenericFor.of_equiv {ψ : AddChar k Circle} {π : Representation ℂ (GL (Fin N) k) V}
-    {σ : Representation ℂ (GL (Fin N) k) W} (h : IsGenericFor ψ π) (φ : π.Equiv σ) : IsGenericFor ψ σ := by
+theorem IsGenericFor.of_equiv
+    {ψ : AddChar k Circle} {π : Representation ℂ (GL (Fin N) k) V}
+    {σ : Representation ℂ (GL (Fin N) k) W} (h : IsGenericFor ψ π) (φ : π.Equiv σ)
+    : IsGenericFor ψ σ := by
   unfold IsGenericFor at h ⊢
   refine nontrivial_twJacquet_of_surjective (ρ := σ) (σ := π) φ.symm.toLinearEquiv.toLinearMap
-    φ.symm.toLinearEquiv.surjective (fun u w => ?_) h
-  have e : φ.symm.toLinearEquiv.toLinearMap (σ (u : GL (Fin N) k) w) =
-      π u (φ.symm.toLinearEquiv.toLinearMap w) :=
+    φ.symm.toLinearEquiv.surjective
+    (fun u w => ?_)
+    h
+  have e
+      : φ.symm.toLinearEquiv.toLinearMap (σ (u : GL (Fin N) k) w)
+        = π u (φ.symm.toLinearEquiv.toLinearMap w) :=
     Representation.IntertwiningMap.isIntertwining σ π φ.symm.toIntertwiningMap (u : GL (Fin N) k) w
   rw [map_sub, LinearMap.map_smul, e]
   exact sub_smul_mem_twKer' π _ _ _ u.2 _
 
-theorem isGenericFor_congr {ψ : AddChar k Circle} {π : Representation ℂ (GL (Fin N) k) V}
-    {σ : Representation ℂ (GL (Fin N) k) W} (φ : π.Equiv σ) : IsGenericFor ψ π ↔ IsGenericFor ψ σ := by
+theorem isGenericFor_congr
+    {ψ : AddChar k Circle} {π : Representation ℂ (GL (Fin N) k) V}
+    {σ : Representation ℂ (GL (Fin N) k) W} (φ : π.Equiv σ)
+    : IsGenericFor ψ π ↔ IsGenericFor ψ σ := by
   exact ⟨fun h => h.of_equiv φ, fun h => h.of_equiv φ.symm⟩
 
-theorem isGenericFor_twist_iff {ψ : AddChar k Circle} {π : Representation ℂ (GL (Fin N) k) V} (χ : kˣ →* ℂˣ) :
-    IsGenericFor ψ (twist π (detChar (Fin N) χ)) ↔ IsGenericFor ψ π := by
+theorem isGenericFor_twist_iff
+    {ψ : AddChar k Circle} {π : Representation ℂ (GL (Fin N) k) V} (χ : kˣ →* ℂˣ)
+    : IsGenericFor ψ (twist π (detChar (Fin N) χ)) ↔ IsGenericFor ψ π := by
   have hdet : ∀ u : unipB k (Fin N), ((detChar (Fin N) χ (u : GL (Fin N) k) : ℂˣ) : ℂ) = 1 := by
     intro u
     rw [detChar_apply, det_eq_one_of_mem_unipRad k u.2, map_one, Units.val_one]
@@ -237,38 +285,45 @@ theorem isGenericFor_twist_iff {ψ : AddChar k Circle} {π : Representation ℂ 
   constructor
   · intro h
     refine nontrivial_twJacquet_of_surjective (ρ := π) LinearMap.id Function.surjective_id
-      (fun u v => ?_) h
+      (fun u v => ?_)
+      h
     have e : π u v = twist π (detChar (Fin N) χ) u v := by rw [twist_apply, hdet u, one_smul]
     rw [LinearMap.id_apply, e]
     exact sub_smul_mem_twKer' _ _ _ _ u.2 _
   · intro h
     refine nontrivial_twJacquet_of_surjective (σ := π) LinearMap.id Function.surjective_id
-      (fun u v => ?_) h
+      (fun u v => ?_)
+      h
     have e : twist π (detChar (Fin N) χ) u v = π u v := by rw [twist_apply, hdet u, one_smul]
     rw [LinearMap.id_apply, e]
     exact sub_smul_mem_twKer' _ _ _ _ u.2 _
 
 variable [TopologicalSpace k]
 
-theorem isGeneric_congr {π : Representation ℂ (GL (Fin N) k) V} {σ : Representation ℂ (GL (Fin N) k) W}
-    (φ : π.Equiv σ) : IsGeneric π ↔ IsGeneric σ := by
+theorem isGeneric_congr
+    {π : Representation ℂ (GL (Fin N) k) V} {σ : Representation ℂ (GL (Fin N) k) W} (φ : π.Equiv σ)
+    : IsGeneric π ↔ IsGeneric σ := by
   unfold IsGeneric
   exact exists_congr fun ψ => and_congr_right fun _ => and_congr_right fun _ => isGenericFor_congr φ
 
-theorem isGeneric_twist_iff {π : Representation ℂ (GL (Fin N) k) V} (χ : kˣ →* ℂˣ) :
-    IsGeneric (twist π (detChar (Fin N) χ)) ↔ IsGeneric π := by
+theorem isGeneric_twist_iff {π : Representation ℂ (GL (Fin N) k) V} (χ : kˣ →* ℂˣ)
+    : IsGeneric (twist π (detChar (Fin N) χ)) ↔ IsGeneric π := by
   unfold IsGeneric
-  exact exists_congr fun ψ => and_congr_right fun _ => and_congr_right fun _ => isGenericFor_twist_iff χ
+  exact exists_congr fun ψ =>
+    and_congr_right fun _ => and_congr_right fun _ => isGenericFor_twist_iff χ
 
 variable [ValuativeRel k] [IsNonarchimedeanLocalField k]
 
-theorem isGenericFor_iff_of_continuous {ψ ψ' : AddChar k Circle} (hψ : Continuous ψ) (h1 : ψ ≠ 1) (h' : Continuous ψ')
-    (h1' : ψ' ≠ 1) (π : Representation ℂ (GL (Fin N) k) V) : IsGenericFor ψ π ↔ IsGenericFor ψ' π := by
+theorem isGenericFor_iff_of_continuous
+    {ψ ψ' : AddChar k Circle} (hψ : Continuous ψ) (h1 : ψ ≠ 1) (h' : Continuous ψ') (h1' : ψ' ≠ 1)
+    (π : Representation ℂ (GL (Fin N) k) V)
+    : IsGenericFor ψ π ↔ IsGenericFor ψ' π := by
   obtain ⟨a, rfl⟩ := exists_unit_eq_mulShift hψ h1 h' h1'
   exact (isGenericFor_mulShift_iff a).symm
 
-theorem isGeneric_iff_isGenericFor {ψ : AddChar k Circle} (hψ : Continuous ψ) (h1 : ψ ≠ 1)
-    (π : Representation ℂ (GL (Fin N) k) V) : IsGeneric π ↔ IsGenericFor ψ π := by
+theorem isGeneric_iff_isGenericFor
+    {ψ : AddChar k Circle} (hψ : Continuous ψ) (h1 : ψ ≠ 1) (π : Representation ℂ (GL (Fin N) k) V)
+    : IsGeneric π ↔ IsGenericFor ψ π := by
   unfold IsGeneric
   constructor
   · rintro ⟨ψ', h', h1', hg⟩

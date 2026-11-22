@@ -58,8 +58,10 @@ theorem SecAlgFinite.full : SecAlgFinite.Statement := SecAlgFinite.proof Inciden
 theorem ChartDomain.full : ChartDomain.Statement := ChartDomain.proof
 theorem GenSecDomain.full : GenSecDomain.Statement :=
   GenSecDomain.proof ChartDomain.full GroundTheory.Heights₂.Heights.IncidenceGeneric.full
-    (GroundTheory.Heights₂.Heights.IncIdealBelow.proof GroundTheory.Heights₂.Heights.ChowFormMultiHomog.full)
-theorem SecAlgField.full : SecAlgField.Statement := SecAlgField.proof SecAlgFinite.full GenSecDomain.full
+    (GroundTheory.Heights₂.Heights.IncIdealBelow.proof
+      GroundTheory.Heights₂.Heights.ChowFormMultiHomog.full)
+theorem SecAlgField.full : SecAlgField.Statement :=
+  SecAlgField.proof SecAlgFinite.full GenSecDomain.full
 theorem ChowSecDvd.full : ChowSecDvd.Statement := ChowSecDvd.proof IncidenceNull.full
 theorem NormFormIrreducible.full : NormFormIrreducible.Statement := NormFormIrreducible.proof
 theorem NormFormDvd.full : NormFormDvd.Statement := NormFormDvd.proof
@@ -70,12 +72,16 @@ theorem GenChowIrreducible.full : GenChowIrreducible.Statement :=
 
 theorem SpecFirstNeField.full : SpecFirstNeField.Statement :=
   have hDim : GroundTheory.Heights₂.Heights.IncIdealDim.Statement :=
-    GroundTheory.Heights₂.Heights.IncIdealDim.proof GroundTheory.Heights₂.Heights.IncidenceGeneric.full
-      GroundTheory.Heights₂.Heights.GenericLinearTrdeg.full GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof
+    GroundTheory.Heights₂.Heights.IncIdealDim.proof
+      GroundTheory.Heights₂.Heights.IncidenceGeneric.full
+      GroundTheory.Heights₂.Heights.GenericLinearTrdeg.full
+      GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof
   SpecFirstNeField.proof
-    (GroundTheory.Heights₂.Heights.ConeDimOfChowForm.proof hDim GroundTheory.Heights₂.Heights.IncIdealPrime.full)
+    (GroundTheory.Heights₂.Heights.ConeDimOfChowForm.proof hDim
+      GroundTheory.Heights₂.Heights.IncIdealPrime.full)
     GroundTheory.Heights₂.Heights.ConeDimComponent.full
-    (GroundTheory.Heights₂.Heights.ChowFormExists.proof hDim GroundTheory.Heights₂.Heights.IncIdealPrime.full)
+    (GroundTheory.Heights₂.Heights.ChowFormExists.proof hDim
+      GroundTheory.Heights₂.Heights.IncIdealPrime.full)
     GroundTheory.Heights₂.Heights.IncidenceZeroLocus.proof
 
 theorem SecBTorsionFree.full : SecBTorsionFree.Statement := SecBTorsionFree.proof ParDVRIsDVR.full
@@ -89,15 +95,19 @@ theorem GenericFibreDrop.full : GenericFibreDrop.Statement := GenericFibreDrop.p
 
 theorem ChowFormSectionVertical.of_remaining
     (hGenSep : GenSecSeparable.Statement) (hFibre : FibreClosedComponent.Statement)
-    (hKer : GenSecKer.Statement) (hChart : SpecChart.Statement) (hOrd : FiniteOrd.Statement) :
-    ChowFormSectionVertical.Statement := by
+    (hKer : GenSecKer.Statement) (hChart : SpecChart.Statement) (hOrd : FiniteOrd.Statement)
+    : ChowFormSectionVertical.Statement := by
   have hDim : GroundTheory.Heights₂.Heights.IncIdealDim.Statement :=
-    GroundTheory.Heights₂.Heights.IncIdealDim.proof GroundTheory.Heights₂.Heights.IncidenceGeneric.full
-      GroundTheory.Heights₂.Heights.GenericLinearTrdeg.full GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof
+    GroundTheory.Heights₂.Heights.IncIdealDim.proof
+      GroundTheory.Heights₂.Heights.IncidenceGeneric.full
+      GroundTheory.Heights₂.Heights.GenericLinearTrdeg.full
+      GroundTheory.Heights₂.Heights.AffineChartTrdeg.proof
   have hCone : GroundTheory.Heights₂.Heights.ConeDimOfChowForm.Statement :=
-    GroundTheory.Heights₂.Heights.ConeDimOfChowForm.proof hDim GroundTheory.Heights₂.Heights.IncIdealPrime.full
+    GroundTheory.Heights₂.Heights.ConeDimOfChowForm.proof hDim
+      GroundTheory.Heights₂.Heights.IncIdealPrime.full
   have hExist : GroundTheory.Heights₂.Heights.ChowFormExists.Statement :=
-    GroundTheory.Heights₂.Heights.ChowFormExists.proof hDim GroundTheory.Heights₂.Heights.IncIdealPrime.full
+    GroundTheory.Heights₂.Heights.ChowFormExists.proof hDim
+      GroundTheory.Heights₂.Heights.IncIdealPrime.full
   have cnf : ChowNormForm.Statement :=
     ChowNormForm.proof
       (ChowNormFormGeneric.proof SecAlgFinite.full GenSecDomain.full hGenSep ChowSecDvd.full
@@ -116,8 +126,9 @@ theorem ChowFormSectionVertical.of_remaining
   have slen : SpecLength.Statement :=
     SpecLength.proof hChart hOrd ParDVRIsDVR.full SecBFinite.full lininj
   have nid : NormIdentity.Statement :=
-    NormIdentity.proof cnf SecBFinite.full SecBTorsionFree.full SecBGeneric.full NormFormLocalization.full
-      NormFormEval.full ParAlgIndep.full ParFracIsFractionRing.full ParDVRIsDVR.full
+    NormIdentity.proof cnf SecBFinite.full SecBTorsionFree.full SecBGeneric.full
+      NormFormLocalization.full NormFormEval.full ParAlgIndep.full ParFracIsFractionRing.full
+      ParDVRIsDVR.full
   have oeq : OrdEq.Statement :=
     OrdEq.proof nid NormLength.full LengthDecomp.full smax slen sres VertSpec.full lininj
       SecBFinite.full SecBTorsionFree.full ParDVRIsDVR.full

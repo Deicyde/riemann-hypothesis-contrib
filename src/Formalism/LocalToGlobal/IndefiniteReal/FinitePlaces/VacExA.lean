@@ -8,7 +8,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FockTheta.ConjPurelyImagina
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 
 set_option synthInstance.maxHeartbeats 160000
@@ -21,14 +23,13 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7}
 
 def IsDyIdem (v : HeightOneSpectrum (𝓞 D.host.F)) (e : AE D) : Prop :=
-  IsSplitIdem D e ∧ finPart D e ∈ intAE D ∧
-    ∃ ε : AF D.host.F, IsPlaceIdem D v ε ∧ e + cA D e = algebraMap (AF D.host.F) (AE D) ε
+  IsSplitIdem D e ∧ finPart D e ∈ intAE D
+    ∧ ∃ ε : AF D.host.F, IsPlaceIdem D v ε ∧ e + cA D e = algebraMap (AF D.host.F) (AE D) ε
 
-
-theorem fstA_pairA (x : Ainf D.host.F) (y : Af D.host.F) : fstA D.host.F (pairA D.host.F x y) = x := rfl
-theorem sndA_pairA (x : Ainf D.host.F) (y : Af D.host.F) : sndA D.host.F (pairA D.host.F x y) = y := rfl
-
-
+theorem fstA_pairA (x : Ainf D.host.F) (y : Af D.host.F) : fstA D.host.F (pairA D.host.F x y) = x :=
+  rfl
+theorem sndA_pairA (x : Ainf D.host.F) (y : Af D.host.F) : sndA D.host.F (pairA D.host.F x y) = y :=
+  rfl
 
 section Sym
 
@@ -55,19 +56,20 @@ def U0 (Λ : AddSubgroup (WO S T)) : AddSubgroup (WO S T) where
     have : (-a - -u) i j = -((a - u) i j) := by simp only [Matrix.sub_apply, Matrix.neg_apply]; abel
     rw [this, map_neg, ha, neg_zero]
 
-theorem mem_U0 {Λ : AddSubgroup (WO S T)} {w : WO S T} :
-    w ∈ U0 S T Λ ↔ ∃ u ∈ Λ, ∀ i j, finPart D ((w - u) i j) = 0 := Iff.rfl
+theorem mem_U0 {Λ : AddSubgroup (WO S T)} {w : WO S T}
+    : w ∈ U0 S T Λ ↔ ∃ u ∈ Λ, ∀ i j, finPart D ((w - u) i j) = 0 :=
+  Iff.rfl
 
-theorem le_open_neighbourhood {Λ : AddSubgroup (WO S T)} : Λ ≤ U0 S T Λ := fun u hu => ⟨u, hu, fun i j => by simp⟩
+theorem le_open_neighbourhood {Λ : AddSubgroup (WO S T)} : Λ ≤ U0 S T Λ := fun u hu =>
+  ⟨u, hu, fun i j => by simp⟩
 
-theorem open_neighbourhood_set_eq (Λ : AddSubgroup (WO S T)) :
-    (U0 S T Λ : Set (WO S T)) = {w | ∃ u ∈ Λ, (w - u).map (finPart D) = 0} := by
+theorem open_neighbourhood_set_eq (Λ : AddSubgroup (WO S T))
+    : (U0 S T Λ : Set (WO S T)) = {w | ∃ u ∈ Λ, (w - u).map (finPart D) = 0} := by
   ext w
   simp only [SetLike.mem_coe, mem_U0, Set.mem_setOf_eq]
   refine exists_congr fun u => and_congr_right fun _ => ⟨fun h => ?_, fun h i j => ?_⟩
   · ext i j; exact h i j
   · have := congrFun (congrFun h i) j; simpa using this
-
 
 end Phi
 

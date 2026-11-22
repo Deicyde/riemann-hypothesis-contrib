@@ -22,7 +22,6 @@ def formR (p : ℕ) (ι : Type) [Fintype ι] : (ι → R) →ₗ[R] ((ι → ZMo
   map_add' l l' := by ext x; simp [add_mul, Finset.sum_add_distrib]
   map_smul' c l := by ext x; simp [Finset.mul_sum, mul_assoc]
 
-
 variable (C) in
 def toC (X : Type) : (X → R) →ₗ[R] (X → C) := (Algebra.linearMap R C).compLeft X
 
@@ -32,12 +31,15 @@ theorem mem_pInt {p : ℕ} {z : C} : z ∈ pInt (C := C) R p ↔ ∃ r : R, z = 
   simp only [pInt, Submodule.mem_span_singleton, Algebra.smul_def]
   exact ⟨fun ⟨r, h⟩ => ⟨r, h.symm⟩, fun ⟨r, h⟩ => ⟨r, h.symm⟩⟩
 
-theorem afLat_eq (p : ℕ) {ι : Type} [Fintype ι] (M : Submodule R ((ι → ZMod p) → C)) :
-    afLat p M = (M ⊔ pFun R p _).comap (toC (C := C) R _ ∘ₗ formR R p ι) := by
+theorem afLat_eq (p : ℕ) {ι : Type} [Fintype ι] (M : Submodule R ((ι → ZMod p) → C))
+    : afLat p M = (M ⊔ pFun R p _).comap (toC (C := C) R _ ∘ₗ formR R p ι) := by
   ext l
   rw [Submodule.mem_comap, Submodule.mem_sup]
   change (∃ g ∈ M, ∀ x, g x - algebraMap R C (∑ i, l i * ((x i).val : R)) ∈ pInt R p) ↔ _
-  have hf : (toC (C := C) R _ ∘ₗ formR R p ι) l = fun x => algebraMap R C (∑ i, l i * ((x i).val : R)) := rfl
+  have hf
+      : (toC (C := C) R _ ∘ₗ formR R p ι) l
+        = fun x => algebraMap R C (∑ i, l i * ((x i).val : R)) :=
+    rfl
   rw [hf]
   constructor
   · rintro ⟨g, hg, h⟩
@@ -57,39 +59,51 @@ theorem afLat_eq (p : ℕ) {ι : Type} [Fintype ι] (M : Submodule R ((ι → ZM
     rw [e]
     exact neg_mem hx
 
-theorem form_mem_lin (p : ℕ) [NeZero p] {ι : Type} [Fintype ι] (l : ι → R) :
-    (toC (C := C) R _ ∘ₗ formR R p ι) l ∈ linFun (C := C) R p (ι → ZMod p) := by
+theorem form_mem_lin (p : ℕ) [NeZero p] {ι : Type} [Fintype ι] (l : ι → R)
+    : (toC (C := C) R _ ∘ₗ formR R p ι) l ∈ linFun (C := C) R p (ι → ZMod p) := by
   rw [linFun, Submodule.mem_inf]
-  have hf : (toC (C := C) R _ ∘ₗ formR R p ι) l = fun x => algebraMap R C (∑ i, l i * ((x i).val : R)) := rfl
+  have hf
+      : (toC (C := C) R _ ∘ₗ formR R p ι) l
+        = fun x => algebraMap R C (∑ i, l i * ((x i).val : R)) :=
+    rfl
   rw [hf]
   refine ⟨fun x => ⟨∑ i, l i * ((x i).val : R), rfl⟩, ?_⟩
   intro x y
   rw [mem_pInt]
-  refine ⟨-∑ i, l i * ((((x i).val + (y i).val) / p : ℕ) : R), ?_⟩
-  have key : ∀ i, (((x i + y i).val : ℕ) : R) = ((x i).val : R) + (y i).val - p * ((((x i).val + (y i).val) / p : ℕ) : R) := by
+  refine ⟨- ∑ i, l i * ((((x i).val + (y i).val) / p : ℕ) : R), ?_⟩
+  have key
+      : ∀ i,
+        (((x i + y i).val : ℕ) : R)
+          = ((x i).val : R) + (y i).val - p * ((((x i).val + (y i).val) / p : ℕ) : R) := by
     intro i
-    rw [ZMod.val_add, eq_sub_iff_add_eq, ← Nat.cast_mul, ← Nat.cast_add, Nat.mod_add_div, Nat.cast_add]
+    rw [ZMod.val_add, eq_sub_iff_add_eq, ← Nat.cast_mul, ← Nat.cast_add, Nat.mod_add_div,
+      Nat.cast_add]
   simp only [Pi.add_apply, key]
   simp only [← map_sub, ← map_neg, ← map_natCast (algebraMap R C), ← map_mul]
   congr 1
-  rw [neg_mul, Finset.sum_mul, ← Finset.sum_neg_distrib, ← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib]
+  rw [neg_mul, Finset.sum_mul, ← Finset.sum_neg_distrib, ← Finset.sum_sub_distrib,
+    ← Finset.sum_sub_distrib]
   exact Finset.sum_congr rfl fun i _ => by ring
 
-theorem add_mem_pFun {p : ℕ} [Fact p.Prime] {ι : Type} [Fintype ι] [DecidableEq ι]
-    {h : (ι → ZMod p) → C} (hh : h ∈ addFun R p (ι → ZMod p))
-    (h1 : ∀ i, h (Pi.single i 1) ∈ pInt (C := C) R p) : h ∈ pFun R p (ι → ZMod p) := by
+theorem add_mem_pFun
+    {p : ℕ} [Fact p.Prime]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {h : (ι → ZMod p) → C}
+    (hh : h ∈ addFun R p (ι → ZMod p)) (h1 : ∀ i, h (Pi.single i 1) ∈ pInt (C := C) R p)
+    : h ∈ pFun R p (ι → ZMod p) := by
   have h0 : h 0 ∈ pInt (C := C) R p := by
     have := neg_mem (hh 0 0)
     simpa using this
-  let S : AddSubmonoid (ι → ZMod p) :=
-    { carrier := {x | h x ∈ pInt (C := C) R p}
-      add_mem' := by
-        intro a b ha hb
-        have e : h (a + b) = (h (a + b) - h a - h b) + h a + h b := by ring
-        show h (a + b) ∈ pInt (C := C) R p
-        rw [e]
-        exact add_mem (add_mem (hh a b) ha) hb
-      zero_mem' := h0 }
+  let S : AddSubmonoid (ι → ZMod p) := {
+    carrier := {x | h x ∈ pInt (C := C) R p}
+    add_mem' := by
+      intro a b ha hb
+      have e : h (a + b) = (h (a + b) - h a - h b) + h a + h b := by ring
+      show h (a + b) ∈ pInt (C := C) R p
+      rw [e]
+      exact add_mem (add_mem (hh a b) ha) hb
+    zero_mem' := h0
+  }
   have hall : ∀ x, x ∈ S := by
     intro x
     rw [← Finset.univ_sum_single x]
@@ -108,7 +122,12 @@ theorem add_mem_pFun {p : ℕ} [Fact p.Prime] {ι : Type} [Fintype ι] [Decidabl
 
 end
 
-theorem aflat_fg : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (AA : HopfOrder (C := C) R (ι → ZMod p)), (afLat p AA.carrier).FG := by
+theorem aflat_fg
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (AA : HopfOrder (C := C) R (ι → ZMod p)),
+          (afLat p AA.carrier).FG := by
   intro p _ C _ _ _ v R _ _ hv hp ι _ _ AA
   haveI : IsDomain R := Function.Injective.isDomain (algebraMap R C) hv.hom_inj
   haveI : ValuationRing R :=
@@ -125,7 +144,8 @@ theorem aflat_fg : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClose
     funext x
     exact hv.hom_inj (congrFun h x)
   apply Submodule.fg_of_fg_map_injective (toC (C := C) R (ι → ZMod p)) hinj
-  have hle : AA.carrier ⊔ pFun R p (ι → ZMod p) ≤ LinearMap.range (toC (C := C) R (ι → ZMod p)) := by
+  have hle
+      : AA.carrier ⊔ pFun R p (ι → ZMod p) ≤ LinearMap.range (toC (C := C) R (ι → ZMod p)) := by
     apply sup_le
     · intro f hf
       have hi := AA.le_int hf
@@ -158,12 +178,20 @@ theorem aflat_fg : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClose
     rw [hP]
     exact Submodule.FG.map _ Module.Finite.fg_top
 
-theorem afquot : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (AA : HopfOrder (C := C) R (ι → ZMod p)), Nonempty (AFQuot p AA.carrier ≃ₗ[R] ((ι → R) ⧸ afLat p AA.carrier)) := by
+theorem afquot
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (AA : HopfOrder (C := C) R (ι → ZMod p)),
+          Nonempty (AFQuot p AA.carrier ≃ₗ[R] ((ι → R) ⧸ afLat p AA.carrier)) := by
   intro p _ C _ _ _ v R _ _ hv hp ι _ _ AA
   haveI : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
   let φ := toC (C := C) R (ι → ZMod p) ∘ₗ formR R p ι
-  let K := Submodule.comap (linFun (C := C) R p (ι → ZMod p)).subtype (afFun p AA.carrier ⊔ pFun (C := C) R p (ι → ZMod p))
-  let ψ : (ι → R) →ₗ[R] linFun (C := C) R p (ι → ZMod p) := LinearMap.codRestrict _ φ (fun l => form_mem_lin p l)
+  let K :=
+    Submodule.comap (linFun (C := C) R p (ι → ZMod p)).subtype
+      (afFun p AA.carrier ⊔ pFun (C := C) R p (ι → ZMod p))
+  let ψ : (ι → R) →ₗ[R] linFun (C := C) R p (ι → ZMod p) :=
+    LinearMap.codRestrict _ φ (fun l => form_mem_lin p l)
   let f := K.mkQ ∘ₗ ψ
   have hpf : pFun (C := C) R p (ι → ZMod p) ≤ addFun (C := C) R p (ι → ZMod p) := by
     intro z hz x y
@@ -178,14 +206,17 @@ theorem afquot : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
     constructor
     · intro h
       obtain ⟨g, hg, z, hz, he⟩ := Submodule.mem_sup.mp h
-      have hadd : φ l ∈ addFun (C := C) R p (ι → ZMod p) := (Submodule.mem_inf.mp (form_mem_lin p l)).2
+      have hadd : φ l ∈ addFun (C := C) R p (ι → ZMod p) :=
+        (Submodule.mem_inf.mp (form_mem_lin p l)).2
       have hg' : g ∈ addFun (C := C) R p (ι → ZMod p) := by
         have : g = φ l - z := by rw [← he]; abel
         rw [this]
         exact sub_mem hadd (hpf hz)
       exact Submodule.mem_sup.mpr ⟨g, Submodule.mem_inf.mpr ⟨hg, hg'⟩, z, hz, he⟩
     · intro h
-      exact (sup_le_sup_right inf_le_left _ : afFun p AA.carrier ⊔ pFun (C := C) R p _ ≤ AA.carrier ⊔ pFun (C := C) R p _) h
+      exact (sup_le_sup_right inf_le_left _
+          : afFun p AA.carrier ⊔ pFun (C := C) R p _ ≤ AA.carrier ⊔ pFun (C := C) R p _)
+        h
   have hsurj : Function.Surjective f := by
     intro q
     obtain ⟨⟨h, hh⟩, rfl⟩ := Submodule.mkQ_surjective K q
@@ -204,6 +235,7 @@ theorem afquot : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
         simp [Pi.single_apply, apply_ite, ZMod.val_one]
       rw [Pi.sub_apply, e, hl i, sub_self]
       exact zero_mem _
-  exact ⟨((Submodule.quotEquivOfEq _ _ hker).trans (LinearMap.quotKerEquivOfSurjective f hsurj)).symm⟩
+  exact ⟨((Submodule.quotEquivOfEq _ _ hker).trans
+    (LinearMap.quotKerEquivOfSurjective f hsurj)).symm⟩
 
 end PositivityTheory.HtPt.Rh

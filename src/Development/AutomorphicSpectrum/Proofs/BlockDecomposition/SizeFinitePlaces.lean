@@ -10,21 +10,23 @@ open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.UnitaryBC
 
 namespace GlobalTheory.CompanionTheory.Dblock.SzFinProof
 
-theorem finite_one_lt_norm_cW {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : Ad E) :
-    {w : HeightOneSpectrum (𝓞 E) | 1 < ‖cW w a‖}.Finite := by
+theorem finite_one_lt_norm_cW
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : Ad E)
+    : {w : HeightOneSpectrum (𝓞 E) | 1 < ‖cW w a‖}.Finite := by
   delta PositivityTheory.Rg.BcB.cW GlobalTheory.CuspRep.pLoc GlobalTheory.CuspRep.pFin
   have h := RestrictedProduct.eventually _ _ (RingHom.snd (InfiniteAdeleRing E) (Af E) a)
   refine (Filter.eventually_cofinite.mp h).subset ?_
   intro w hw
   simp only [Set.mem_ofPred_eq, RingHom.comp_apply, RestrictedProduct.evalRingHom_apply] at hw ⊢
   intro hmem
-  exact absurd hw (not_lt.mpr (Valued.toNormedField.norm_le_one_iff.mpr
-    ((IsDedekindDomain.HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).mp hmem)))
+  exact absurd hw
+    (not_lt.mpr (Valued.toNormedField.norm_le_one_iff.mpr
+      ((IsDedekindDomain.HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).mp hmem)))
 
 theorem szFin : SzFin := by
   intro E _ _ _ ι κ _ _ A
-  refine (Set.Finite.biUnion (s := (Set.univ : Set (ι × κ))) Set.finite_univ
-    fun p _ => finite_one_lt_norm_cW (A p.1 p.2)).subset ?_
+  refine (Set.Finite.biUnion (s := (Set.univ : Set (ι × κ))) Set.finite_univ fun p _ =>
+    finite_one_lt_norm_cW (A p.1 p.2)).subset ?_
   intro w hw
   change 1 < ⨆ p : ι × κ, ‖(A.map (PositivityTheory.Rg.BcB.cW w)) p.1 p.2‖ at hw
   rcases isEmpty_or_nonempty (ι × κ) with hι | hι

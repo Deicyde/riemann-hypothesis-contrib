@@ -17,38 +17,53 @@ theorem natCast_isUnit (M : ℕ) (hM : M ≠ 0) : IsUnit (M : FiniteAdeleRing (�
   rw [this]
   exact (IsUnit.mk0 _ (by exact_mod_cast hM)).map _
 
-theorem inM_iff (M : ℕ) (hM : M ≠ 0) (x : FiniteAdeleRing (𝓞 k) k) :
-    InM M x ↔ (((natCast_isUnit (k := k) M hM).unit⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) :
-      FiniteAdeleRing (𝓞 k) k) * x ∈ OH k := by
+theorem inM_iff (M : ℕ) (hM : M ≠ 0) (x : FiniteAdeleRing (𝓞 k) k)
+    : InM M x
+      ↔ (((natCast_isUnit (k := k) M hM).unit⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ)
+            : FiniteAdeleRing (𝓞 k) k)
+          * x
+        ∈ OH k := by
   set u := (natCast_isUnit (k := k) M hM).unit
   have hu : (u : FiniteAdeleRing (𝓞 k) k) = M := rfl
   constructor
   · rintro ⟨y, hy, rfl⟩
-    rw [← hu, ← mul_assoc, Units.inv_mul, one_mul]; exact hy
+    rw [← hu, ← mul_assoc, Units.inv_mul, one_mul]
+    exact hy
   · intro h
     refine ⟨_, h, ?_⟩
     rw [← hu, ← mul_assoc, Units.mul_inv, one_mul]
 
-theorem isOpen_isClosed (M : ℕ) (hM : M ≠ 0) :
-    IsOpen {x : FiniteAdeleRing (𝓞 k) k | InM M x} ∧ IsClosed {x : FiniteAdeleRing (𝓞 k) k | InM M x} := by
-  have hS : {x : FiniteAdeleRing (𝓞 k) k | InM M x} =
-      (fun x => (((natCast_isUnit (k := k) M hM).unit⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) :
-        FiniteAdeleRing (𝓞 k) k) * x) ⁻¹' (OH k : Set (FiniteAdeleRing (𝓞 k) k)) := by
+theorem isOpen_isClosed (M : ℕ) (hM : M ≠ 0)
+    : IsOpen {x : FiniteAdeleRing (𝓞 k) k | InM M x}
+      ∧ IsClosed {x : FiniteAdeleRing (𝓞 k) k | InM M x} := by
+  have hS
+      : {x : FiniteAdeleRing (𝓞 k) k | InM M x}
+        = (fun x =>
+            (((natCast_isUnit (k := k) M hM).unit⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ)
+                : FiniteAdeleRing (𝓞 k) k)
+              * x)
+          ⁻¹' (OH k : Set (FiniteAdeleRing (𝓞 k) k)) := by
     ext x; exact inM_iff M hM x
   have hc : Continuous (fun x : FiniteAdeleRing (𝓞 k) k =>
-      (((natCast_isUnit (k := k) M hM).unit⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) * x) :=
+      (((natCast_isUnit (k := k) M hM).unit⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ)
+          : FiniteAdeleRing (𝓞 k) k)
+        * x) :=
     continuous_const.mul continuous_id
-  have ho : IsOpen (OH k : Set (FiniteAdeleRing (𝓞 k) k)) := GroundTheory.Global.isOpen_integralFiniteAdeles
+  have ho : IsOpen (OH k : Set (FiniteAdeleRing (𝓞 k) k)) :=
+    GroundTheory.Global.isOpen_integralFiniteAdeles
   rw [hS]
   exact ⟨ho.preimage hc, (AddSubgroup.isClosed_of_isOpen (OH k).toAddSubgroup ho).preimage hc⟩
 
-theorem exists_pow_lt' {c a : WithZero (Multiplicative ℤ)} (ha : a ≠ 0) (hc : c < 1) : ∃ n : ℕ, c ^ n < a := by
+theorem exists_pow_lt' {c a : WithZero (Multiplicative ℤ)} (ha : a ≠ 0) (hc : c < 1)
+    : ∃ n : ℕ, c ^ n < a := by
   rcases eq_or_ne c 0 with rfl | hc0
   · exact ⟨1, by simpa using (zero_lt_iff.mpr ha)⟩
   obtain ⟨α, rfl⟩ := WithZero.ne_zero_iff_exists.mp hc0
   obtain ⟨β, rfl⟩ := WithZero.ne_zero_iff_exists.mp ha
   have hα : Multiplicative.toAdd α < 0 := by
-    have h1 : ((α : WithZero (Multiplicative ℤ))) < ((1 : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+    have h1
+        : ((α : WithZero (Multiplicative ℤ)))
+          < ((1 : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
       simpa using hc
     rw [WithZero.coe_lt_coe] at h1
     exact h1
@@ -66,26 +81,26 @@ theorem exists_pow_lt' {c a : WithZero (Multiplicative ℤ)} (ha : a ≠ 0) (hc 
   have h4 := neg_abs_le b
   linarith
 
-theorem natCast_apply' (v : HeightOneSpectrum (𝓞 k)) (M : ℕ) :
-    (M : FiniteAdeleRing (𝓞 k) k) v = (M : v.adicCompletion k) := by
+theorem natCast_apply' (v : HeightOneSpectrum (𝓞 k)) (M : ℕ)
+    : (M : FiniteAdeleRing (𝓞 k) k) v = (M : v.adicCompletion k) := by
   rw [← map_natCast (algebraMap k (FiniteAdeleRing (𝓞 k) k)) M, FiniteAdeleRing.algebraMap_apply]
   exact map_natCast (algebraMap k (v.adicCompletion k)) M
 
-theorem valued_natCast (v : HeightOneSpectrum (𝓞 k)) (n : ℕ) :
-    Valued.v (n : v.adicCompletion k) = v.intValuation (n : 𝓞 k) := by
+theorem valued_natCast (v : HeightOneSpectrum (𝓞 k)) (n : ℕ)
+    : Valued.v (n : v.adicCompletion k) = v.intValuation (n : 𝓞 k) := by
   have := HeightOneSpectrum.valuedAdicCompletion_eq_valuation (K := k) v (n : 𝓞 k)
   rw [HeightOneSpectrum.valuation_of_algebraMap] at this
   rw [← this]
   congr 1
   simp
 
-theorem eq_zero_of_forall_inM (x : FiniteAdeleRing (𝓞 k) k) (hx : ∀ M : ℕ, M ≠ 0 → InM M x) : x = 0 := by
+theorem eq_zero_of_forall_inM (x : FiniteAdeleRing (𝓞 k) k) (hx : ∀ M : ℕ, M ≠ 0 → InM M x)
+    : x = 0 := by
   refine Subtype.ext (funext fun v => ?_)
   change x v = 0
   by_contra hxv
   set N : ℕ := Ideal.absNorm v.asIdeal with hN
-  have hN0 : N ≠ 0 := by
-    rw [hN, Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
+  have hN0 : N ≠ 0 := by rw [hN, Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
   have hNmem : (N : 𝓞 k) ∈ v.asIdeal := Ideal.absNorm_mem v.asIdeal
   have hlt : v.intValuation (N : 𝓞 k) < 1 := (v.intValuation_lt_one_iff_mem _).mpr hNmem
   have hxv0 : Valued.v (x v) ≠ 0 := by simpa using hxv

@@ -11,8 +11,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-theorem UpperTheory.V.Bern.b_nzC :
-    ∀ {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (k : ℕ), 1 ≤ k → χ (-1) = (-1) ^ k → Bprim k χ ≠ 0 ∧ (2 ≤ k → genB k χ ≠ 0) := by
+theorem UpperTheory.V.Bern.b_nzC
+    : ∀ {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (k : ℕ),
+      1 ≤ k → χ (-1) = (-1) ^ k → Bprim k χ ≠ 0 ∧ (2 ≤ k → genB k χ ≠ 0) := by
   intro N _ χ k hk hpar
   haveI : NeZero χ.conductor := ⟨χ.conductor_ne_zero⟩
   have hprim := χ.primitiveCharacter_isPrimitive
@@ -38,8 +39,10 @@ theorem UpperTheory.V.Bern.b_nzC :
     rw [hl, norm_zero] at hL
     have hc : (0 : ℝ) < (χ.conductor : ℝ) := by
       exact_mod_cast Nat.pos_of_ne_zero χ.conductor_ne_zero
-    have hpos : (0 : ℝ) < 2 * ((k - 1).factorial : ℝ) * (χ.conductor : ℝ) ^ ((k : ℝ) - 1 / 2)
-        / (2 * Real.pi) ^ k * ‖DirichletCharacter.LFunction χ.primitiveCharacter⁻¹ (k : ℂ)‖ := by
+    have hpos
+        : (0 : ℝ)
+          < 2 * ((k - 1).factorial : ℝ) * (χ.conductor : ℝ) ^ ((k : ℝ) - 1 / 2) / (2 * Real.pi) ^ k
+            * ‖DirichletCharacter.LFunction χ.primitiveCharacter⁻¹ (k : ℂ)‖ := by
       apply mul_pos
       · apply div_pos
         · apply mul_pos

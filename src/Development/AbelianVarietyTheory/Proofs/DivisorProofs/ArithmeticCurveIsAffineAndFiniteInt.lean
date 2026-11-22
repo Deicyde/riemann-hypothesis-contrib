@@ -11,14 +11,17 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.MixHt
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt
+  GlobalTheory.MixHt
 
 namespace GlobalTheory.ArithCurve
 
-theorem isProper_of_projOver {R : Type} [CommRing R] {X : Scheme.{0}} {f : X ⟶ Sp R}
-    (h : IsProjOver f) : IsProper f := by
+theorem isProper_of_projOver
+    {R : Type} [CommRing R] {X : Scheme.{0}} {f : X ⟶ Sp R} (h : IsProjOver f)
+    : IsProper f := by
   obtain ⟨m, i, hi, rfl⟩ := h
   have := isProper_str R m
   infer_instance
@@ -30,15 +33,16 @@ theorem not_isClosed_genericPoint_int : ¬ IsClosed ({genericPoint (Sp ℤ)} : S
       (genericPoint_spec (Sp ℤ)).def ▸ Set.mem_univ x
     rwa [hc.closure_eq] at hx
   let a : PrimeSpectrum ℤ := ⟨⊥, Ideal.isPrime_bot⟩
-  let b : PrimeSpectrum ℤ := ⟨Ideal.span {(2 : ℤ)},
-    (Ideal.span_singleton_prime (by norm_num)).2 Int.prime_two⟩
+  let b : PrimeSpectrum ℤ :=
+    ⟨Ideal.span {(2 : ℤ)}, (Ideal.span_singleton_prime (by norm_num)).2 Int.prime_two⟩
   have hab : a = b := (hu (show Sp ℤ from a)).trans (hu (show Sp ℤ from b)).symm
   have h2 : (2 : ℤ) ∈ b.asIdeal := Ideal.subset_span rfl
   rw [← hab] at h2
   exact absurd ((Submodule.mem_bot ℤ).1 h2) (by norm_num)
 
-theorem isAffine_and_finite : ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) (q : Y ⟶ Sp k),
-    IsArithVar q 0 → IsAffine Y ∧ Module.Finite ℤ Γ(Y, ⊤) := by
+theorem isAffine_and_finite
+    : ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) (q : Y ⟶ Sp k),
+      IsArithVar q 0 → IsAffine Y ∧ Module.Finite ℤ Γ(Y, ⊤) := by
   intro k _ Y q h
   have := h.isIntegral
   have := h.isNoetherian
@@ -76,8 +80,8 @@ theorem isAffine_and_finite : ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) (q : 
   have h1 := IsFinite.finite_app f ⊤ (isAffineOpen_top _)
   have h2 : (Scheme.ΓSpecIso (CommRingCat.of ℤ)).inv.hom.Finite :=
     RingHom.Finite.of_surjective _ fun x => ⟨(Scheme.ΓSpecIso (CommRingCat.of ℤ)).hom x, by simp⟩
-  have e : (f.app ⊤).hom.comp (Scheme.ΓSpecIso (CommRingCat.of ℤ)).inv.hom =
-      algebraMap ℤ Γ(Y, ⊤) := RingHom.ext_int _ _
+  have e : (f.app ⊤).hom.comp (Scheme.ΓSpecIso (CommRingCat.of ℤ)).inv.hom = algebraMap ℤ Γ(Y, ⊤) :=
+    RingHom.ext_int _ _
   exact RingHom.finite_algebraMap.1 (e ▸ h1.comp h2)
 
 end GlobalTheory.ArithCurve

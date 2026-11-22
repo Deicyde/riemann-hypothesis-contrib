@@ -18,28 +18,31 @@ namespace PositivityTheory.HtPt.Rb
 
 section general
 
-variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
-  {F : Type} [Field F] {N : Type} [AddCommGroup N] [Module F N]
-
+variable
+  {C : Type} [Field C]
+  {R : Type} [CommRing R] [Algebra R C]
+  {F : Type} [Field F]
+  {N : Type} [AddCommGroup N] [Module F N]
 
 variable (C) in
-noncomputable def Phi (p f : ℕ) {n : ℕ} (b : Module.Basis (Fin n) F N) (σ : MulChar F R) :
-    (Fin n × Fin f → R) →ₗ[R] (N → C) :=
-  Fintype.linearCombination R
-    fun (j : Fin n × Fin f) (x : N) => algebraMap R C ((σ ^ p ^ (j.2 : ℕ)) (b.repr x j.1))
+noncomputable def Phi (p f : ℕ) {n : ℕ} (b : Module.Basis (Fin n) F N) (σ : MulChar F R)
+    : (Fin n × Fin f → R) →ₗ[R] (N → C) :=
+  Fintype.linearCombination R fun (j : Fin n × Fin f) (x : N) =>
+    algebraMap R C ((σ ^ p ^ (j.2 : ℕ)) (b.repr x j.1))
 
 variable {p f n : ℕ} {b : Module.Basis (Fin n) F N} {σ : MulChar F R}
 
-theorem mem_afLatT {M : Submodule R (N → C)} {l : Fin n × Fin f → R} :
-    l ∈ afLatT p f b σ M ↔ Phi C p f b σ l ∈ M ⊔ pFun R p N := Iff.rfl
+theorem mem_afLatT {M : Submodule R (N → C)} {l : Fin n × Fin f → R}
+    : l ∈ afLatT p f b σ M ↔ Phi C p f b σ l ∈ M ⊔ pFun R p N :=
+  Iff.rfl
 
-theorem Phi_apply (l : Fin n × Fin f → R) (x : N) :
-    Phi C p f b σ l x =
-      algebraMap R C (∑ j : Fin n × Fin f, l j * (σ ^ p ^ (j.2 : ℕ)) (b.repr x j.1)) := by
+theorem Phi_apply (l : Fin n × Fin f → R) (x : N)
+    : Phi C p f b σ l x
+      = algebraMap R C (∑ j : Fin n × Fin f, l j * (σ ^ p ^ (j.2 : ℕ)) (b.repr x j.1)) := by
   simp [Phi, Fintype.linearCombination_apply, Finset.sum_apply, Algebra.smul_def]
 
-theorem Phi_basis (l : Fin n × Fin f → R) (s : Fin f) (hl : ∀ j, j.2 ≠ s → l j = 0) (i : Fin n) :
-    Phi C p f b σ l (b i) = algebraMap R C (l (i, s)) := by
+theorem Phi_basis (l : Fin n × Fin f → R) (s : Fin f) (hl : ∀ j, j.2 ≠ s → l j = 0) (i : Fin n)
+    : Phi C p f b σ l (b i) = algebraMap R C (l (i, s)) := by
   classical
   rw [Phi_apply, Finset.sum_eq_single (i, s)]
   · simp
@@ -51,9 +54,8 @@ theorem Phi_basis (l : Fin n × Fin f → R) (s : Fin f) (hl : ∀ j, j.2 ≠ s 
     · rw [hl (j, t) ht, zero_mul]
   · simp
 
-theorem Phi_eigen (l : Fin n × Fin f → R) (s : Fin f) (hl : ∀ j, j.2 ≠ s → l j = 0) (a : F)
-    (x : N) : Phi C p f b σ l (a • x) =
-      algebraMap R C ((σ ^ p ^ (s : ℕ)) a) * Phi C p f b σ l x := by
+theorem Phi_eigen (l : Fin n × Fin f → R) (s : Fin f) (hl : ∀ j, j.2 ≠ s → l j = 0) (a : F) (x : N)
+    : Phi C p f b σ l (a • x) = algebraMap R C ((σ ^ p ^ (s : ℕ)) a) * Phi C p f b σ l x := by
   rw [Phi_apply, Phi_apply, ← map_mul, Finset.mul_sum]
   congr 1
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -63,8 +65,9 @@ theorem Phi_eigen (l : Fin n × Fin f → R) (s : Fin f) (hl : ∀ j, j.2 ≠ s 
   · rw [hl j h]
     simp
 
-theorem Phi_flag (l : Fin n × Fin f → R) (i : Fin n) (hl : ∀ j, j.1 < i → l j = 0) (x : N)
-    (hx : x ∈ flagSub b i) : Phi C p f b σ l x = 0 := by
+theorem Phi_flag
+    (l : Fin n × Fin f → R) (i : Fin n) (hl : ∀ j, j.1 < i → l j = 0) (x : N) (hx : x ∈ flagSub b i)
+    : Phi C p f b σ l x = 0 := by
   rw [Phi_apply, Finset.sum_eq_zero, map_zero]
   intro j _
   by_cases h : j.1 < i
@@ -74,19 +77,25 @@ theorem Phi_flag (l : Fin n × Fin f → R) (i : Fin n) (hl : ∀ j, j.1 < i →
       exact h (b.repr_support_subset_of_mem_span _ hx (Finsupp.mem_support_iff.2 h0))
     rw [this, MulChar.map_zero, mul_zero]
 
-theorem Phi_mem_pFun (hinj : Function.Injective (algebraMap R C)) (l : Fin n × Fin f → R)
-    (hl : ∀ j, l j ∈ Ideal.span {(p : R)}) : Phi C p f b σ l ∈ pFun R p N := by
+theorem Phi_mem_pFun
+    (hinj : Function.Injective (algebraMap R C))
+    (l : Fin n × Fin f → R) (hl : ∀ j, l j ∈ Ideal.span {(p : R)})
+    : Phi C p f b σ l ∈ pFun R p N := by
   rw [mem_pFun]
   intro x
   rw [Phi_apply, mem_pInt_iff hinj]
   exact Ideal.sum_mem _ fun j _ => Ideal.mul_mem_right _ _ (hl j)
 
-theorem mem_afLatT_of_p (hinj : Function.Injective (algebraMap R C)) (M : Submodule R (N → C))
-    (l : Fin n × Fin f → R) (hl : ∀ j, l j ∈ Ideal.span {(p : R)}) : l ∈ afLatT p f b σ M :=
+theorem mem_afLatT_of_p
+    (hinj : Function.Injective (algebraMap R C)) (M : Submodule R (N → C))
+    (l : Fin n × Fin f → R) (hl : ∀ j, l j ∈ Ideal.span {(p : R)})
+    : l ∈ afLatT p f b σ M :=
   mem_afLatT.2 (Submodule.mem_sup_right (Phi_mem_pFun hinj l hl))
 
-theorem Phi_mem_linFun [Fact p.Prime] [CharP F p] (hinj : Function.Injective (algebraMap R C))
-    (hσ : IsFund p σ) (l : Fin n × Fin f → R) : Phi C p f b σ l ∈ linFun R p N := by
+theorem Phi_mem_linFun
+    [Fact p.Prime] [CharP F p]
+    (hinj : Function.Injective (algebraMap R C)) (hσ : IsFund p σ) (l : Fin n × Fin f → R)
+    : Phi C p f b σ l ∈ linFun R p N := by
   refine ⟨fun x => ⟨_, (Phi_apply l x).symm⟩, fun x y => ?_⟩
   rw [Phi_apply, Phi_apply, Phi_apply, ← map_sub, ← map_sub, mem_pInt_iff hinj,
     ← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib]
@@ -97,8 +106,8 @@ theorem Phi_mem_linFun [Fact p.Prime] [CharP F p] (hinj : Function.Injective (al
 theorem pFun_le_addFun : pFun (C := C) R p N ≤ addFun R p N := fun g hg x y =>
   Submodule.sub_mem _ (Submodule.sub_mem _ (mem_pFun.1 hg _) (mem_pFun.1 hg _)) (mem_pFun.1 hg _)
 
-theorem addFun_sum {g : N → C} (hg : g ∈ addFun R p N) {ι : Type} (s : Finset ι) (y : ι → N) :
-    g (∑ i ∈ s, y i) - ∑ i ∈ s, g (y i) ∈ pInt (C := C) R p := by
+theorem addFun_sum {g : N → C} (hg : g ∈ addFun R p N) {ι : Type} (s : Finset ι) (y : ι → N)
+    : g (∑ i ∈ s, y i) - ∑ i ∈ s, g (y i) ∈ pInt (C := C) R p := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -109,25 +118,28 @@ theorem addFun_sum {g : N → C} (hg : g ∈ addFun R p N) {ι : Type} (s : Fins
     convert Submodule.add_mem _ (hg (y a) (∑ i ∈ s, y i)) ih using 1
     ring
 
-theorem sup_stable {M : Submodule R (N → C)} (hst : FStable F M) {g : N → C}
-    (hg : g ∈ M ⊔ pFun R p N) (a : F) : (fun x => g (a • x)) ∈ M ⊔ pFun R p N := by
+theorem sup_stable
+    {M : Submodule R (N → C)} (hst : FStable F M) {g : N → C} (hg : g ∈ M ⊔ pFun R p N) (a : F)
+    : (fun x => g (a • x)) ∈ M ⊔ pFun R p N := by
   obtain ⟨g1, h1, g2, h2, rfl⟩ := Submodule.mem_sup.1 hg
   exact Submodule.add_mem_sup (hst a g1 h1) (mem_pFun.2 fun x => mem_pFun.1 h2 _)
 
-def cut (s : Fin f) (l : Fin n × Fin f → R) : Fin n × Fin f → R :=
-  fun j => if j.2 = s then l j else 0
+def cut (s : Fin f) (l : Fin n × Fin f → R) : Fin n × Fin f → R := fun j =>
+  if j.2 = s then l j else 0
 
 theorem sum_cut (l : Fin n × Fin f → R) : ∑ s, cut s l = l := by
   funext j
   simp [cut, Finset.sum_apply]
 
-theorem cut_supp (s : Fin f) (l : Fin n × Fin f → R) : ∀ j, j.2 ≠ s → cut s l j = 0 :=
-  fun _ h => if_neg h
+theorem cut_supp (s : Fin f) (l : Fin n × Fin f → R) : ∀ j, j.2 ≠ s → cut s l j = 0 := fun _ h =>
+  if_neg h
 
-theorem proj_Phi [Fintype F] [DecidableEq F] [IsDomain R] (h0 : (Fintype.card Fˣ : C) ≠ 0)
-    (hinj : ∀ s t : Fin f, σ ^ p ^ (s : ℕ) = σ ^ p ^ (t : ℕ) → s = t)
-    (l : Fin n × Fin f → R) (s : Fin f) :
-    proj (σ ^ p ^ (s : ℕ)) (Phi C p f b σ l) = Phi C p f b σ (cut s l) := by
+theorem proj_Phi
+    [Fintype F] [DecidableEq F] [IsDomain R]
+    (h0 : (Fintype.card Fˣ : C) ≠ 0)
+    (hinj : ∀ s t : Fin f, σ ^ p ^ (s : ℕ) = σ ^ p ^ (t : ℕ) → s = t) (l : Fin n × Fin f → R)
+    (s : Fin f)
+    : proj (σ ^ p ^ (s : ℕ)) (Phi C p f b σ l) = Phi C p f b σ (cut s l) := by
   set_option synthInstance.maxHeartbeats 100000 in
     conv_lhs => rw [← sum_cut l, map_sum, ← projL_apply, map_sum]
   rw [Finset.sum_eq_single s]
@@ -138,12 +150,18 @@ theorem proj_Phi [Fintype F] [DecidableEq F] [IsDomain R] (h0 : (Fintype.card F�
 
 end general
 
-theorem exists_Phi (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
-    {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] (hv : v.Integers R)
-    (hp : v (p : C) < 1) {F : Type} [Field F] [Fintype F] [DecidableEq F] [CharP F p] {f : ℕ}
-    (hc : Fintype.card F = p ^ f) {N : Type} [AddCommGroup N] [Module F N] {σ : MulChar F R}
-    (hσ : IsFund p σ) {n : ℕ} (b : Module.Basis (Fin n) F N) {g : N → C}
-    (hg : g ∈ linFun R p N) : ∃ l, g - Phi C p f b σ l ∈ pFun R p N := by
+theorem exists_Phi
+    (p : ℕ) [Fact p.Prime]
+    {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+    {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
+    (hv : v.Integers R) (hp : v (p : C) < 1)
+    {F : Type} [Field F] [Fintype F] [DecidableEq F] [CharP F p]
+    {f : ℕ} (hc : Fintype.card F = p ^ f)
+    {N : Type} [AddCommGroup N] [Module F N]
+    {σ : MulChar F R} (hσ : IsFund p σ)
+    {n : ℕ} (b : Module.Basis (Fin n) F N)
+    {g : N → C} (hg : g ∈ linFun R p N)
+    : ∃ l, g - Phi C p f b σ l ∈ pFun R p N := by
   choose r hr using hg.1
   choose β hβ _ using fun i : Fin n =>
     moore p C v R hv hp F f hc σ hσ (fun a => r (a • b i)) fun a a' => by
@@ -152,28 +170,51 @@ theorem exists_Phi (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C]
   refine ⟨fun j => β j.1 j.2, mem_pFun.2 fun x => ?_⟩
   have h1 := addFun_sum hg.2 Finset.univ fun i => b.repr x i • b i
   rw [b.sum_repr] at h1
-  have h2 := (mem_pInt_iff hv.hom_inj p _).2
-    (Ideal.sum_mem _ (t := Finset.univ) fun i _ => hβ i (b.repr x i))
+  have h2 :=
+    (mem_pInt_iff hv.hom_inj p _).2
+      (Ideal.sum_mem _ (t := Finset.univ) fun i _ => hβ i (b.repr x i))
   convert Submodule.add_mem _ h1 h2 using 1
   rw [Pi.sub_apply, Phi_apply, Fintype.sum_prod_type, Finset.sum_sub_distrib, map_sub]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, hr]
   ring
 
-theorem aflatT : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N] (AA : HopfOrder (C := C) R N), FStable F AA.carrier → ∀ σ : MulChar F R, IsFund p σ → ∀ (n : ℕ) (b : Module.Basis (Fin n) F N), (afLatT p f b σ AA.carrier).FG ∧ Nonempty (AFQuot p AA.carrier ≃ₗ[R] ((Fin n × Fin f → R) ⧸ afLatT p f b σ AA.carrier)) ∧ (∀ l ∈ afLatT p f b σ AA.carrier, ∀ s : Fin f, (fun j => if j.2 = s then l j else 0) ∈ afLatT p f b σ AA.carrier) ∧ ∀ (i : Fin n) (s : Fin f) (c : R), c ∈ idealD p AA.carrier (flagSub b i) (b i) (σ ^ p ^ (s : ℕ)) ↔ ∃ l ∈ afLatT p f b σ AA.carrier, (∀ j, j.2 ≠ s → l j = 0) ∧ (∀ j, j < i → l (j, s) = 0) ∧ l (i, s) = c := by
+theorem aflatT
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N]
+                (AA : HopfOrder (C := C) R N),
+              FStable F AA.carrier
+                → ∀ σ : MulChar F R,
+                  IsFund p σ
+                    → ∀ (n : ℕ) (b : Module.Basis (Fin n) F N),
+                      (afLatT p f b σ AA.carrier).FG
+                        ∧ Nonempty
+                          (AFQuot p AA.carrier ≃ₗ[R] ((Fin n × Fin f → R) ⧸ afLatT p f b σ AA.carrier))
+                        ∧ (∀ l ∈ afLatT p f b σ AA.carrier, ∀ s : Fin f,
+                          (fun j => if j.2 = s then l j else 0) ∈ afLatT p f b σ AA.carrier)
+                        ∧ ∀ (i : Fin n) (s : Fin f) (c : R),
+                          c ∈ idealD p AA.carrier (flagSub b i) (b i) (σ ^ p ^ (s : ℕ))
+                            ↔ ∃ l ∈ afLatT p f b σ AA.carrier,
+                              (∀ j, j.2 ≠ s → l j = 0) ∧ (∀ j, j < i → l (j, s) = 0)
+                                ∧ l (i, s) = c := by
   intro p _ C _ _ _ v R _ _ hv hp F _ _ _ _ f hc N _ _ _ _ AA hst σ hσ n b
   haveI : IsDomain R := hv.hom_inj.isDomain
   haveI : ValuationRing R := ValuationRing.of_integers v hv
   obtain ⟨h0, w, hw⟩ := exists_inv_card hv hp hc
   have hinj := hv.hom_inj
   have hdist := fund_pow_inj p v R hv hp F f hc σ hσ
-  have hgrade : ∀ l ∈ afLatT p f b σ AA.carrier, ∀ s : Fin f,
-      cut s l ∈ afLatT p f b σ AA.carrier := by
+  have hgrade
+      : ∀ l ∈ afLatT p f b σ AA.carrier, ∀ s : Fin f, cut s l ∈ afLatT p f b σ AA.carrier := by
     intro l hl s
     rw [mem_afLatT, ← proj_Phi h0 hdist]
     exact proj_mem hw _ _ _ (sup_stable hst (mem_afLatT.1 hl))
-  have haf : ∀ l ∈ afLatT p f b σ AA.carrier,
-      ∃ g ∈ afFun p AA.carrier, g - Phi C p f b σ l ∈ pFun R p N := by
+  have haf
+      : ∀ l ∈ afLatT p f b σ AA.carrier, ∃ g ∈ afFun p AA.carrier,
+        g - Phi C p f b σ l ∈ pFun R p N := by
     intro l hl
     obtain ⟨g, hg, h, hh, e⟩ := Submodule.mem_sup.1 (mem_afLatT.1 hl)
     refine ⟨g, ⟨hg, ?_⟩, ?_⟩
@@ -184,8 +225,9 @@ theorem aflatT : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
   refine ⟨?_, ?_, hgrade, fun i s c => ⟨?_, ?_⟩⟩
   · let ι : (N → R) →ₗ[R] (N → C) := (Algebra.linearMap R C).compLeft N
     have hι : Function.Injective ι := fun x y h => funext fun k => hinj (congrFun h k)
-    let Φ : (Fin n × Fin f → R) →ₗ[R] (N → R) := Fintype.linearCombination R
-      fun (j : Fin n × Fin f) (x : N) => (σ ^ p ^ (j.2 : ℕ)) (b.repr x j.1)
+    let Φ : (Fin n × Fin f → R) →ₗ[R] (N → R) :=
+      Fintype.linearCombination R fun (j : Fin n × Fin f) (x : N) =>
+        (σ ^ p ^ (j.2 : ℕ)) (b.repr x j.1)
     have hΦ : Phi C p f b σ = ι ∘ₗ Φ := by
       refine LinearMap.ext fun l => funext fun x => ?_
       rw [Phi_apply]
@@ -229,15 +271,17 @@ theorem aflatT : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
         exact mem_afLatT.2 (hle h)
       · intro h
         obtain ⟨g, hg, hh⟩ := haf l h
-        have := Submodule.sub_mem _ (Submodule.mem_sup_left (T := pFun R p N) hg)
-          (Submodule.mem_sup_right hh)
+        have :=
+          Submodule.sub_mem _ (Submodule.mem_sup_left (T := pFun R p N) hg)
+            (Submodule.mem_sup_right hh)
         simpa using this
     exact ⟨(θ.quotKerEquivOfSurjective hsurj).symm.trans (Submodule.quotEquivOfEq _ _ hker)⟩
   · rintro ⟨g, hg, h1, h2, h3⟩
     obtain ⟨l, hl⟩ := exists_Phi p hv hp hc hσ b (g := g) ⟨AA.le_int hg.1, hg.2⟩
     have hlL : l ∈ afLatT p f b σ AA.carrier := by
-      have := Submodule.sub_mem _ (Submodule.mem_sup_left (T := pFun R p N) hg.1)
-        (Submodule.mem_sup_right hl)
+      have :=
+        Submodule.sub_mem _ (Submodule.mem_sup_left (T := pFun R p N) hg.1)
+          (Submodule.mem_sup_right hl)
       rw [mem_afLatT]
       simpa using this
     have e1 : proj (σ ^ p ^ (s : ℕ)) g - Phi C p f b σ (cut s l) ∈ pFun R p N := by
@@ -246,8 +290,10 @@ theorem aflatT : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
     have e2 : proj (σ ^ p ^ (s : ℕ)) g - g ∈ pFun R p N := by
       rw [mem_pFun]
       intro x
-      have := Submodule.smul_mem _ w (Submodule.sum_mem _ (t := Finset.univ) fun (a : Fˣ) _ =>
-        Submodule.smul_mem _ ((σ ^ p ^ (s : ℕ))⁻¹ (a : F)) (h1 a x))
+      have :=
+        Submodule.smul_mem _ w
+          (Submodule.sum_mem _ (t := Finset.univ) fun (a : Fˣ) _ =>
+            Submodule.smul_mem _ ((σ ^ p ^ (s : ℕ))⁻¹ (a : F)) (h1 a x))
       convert this using 1
       simp only [Algebra.smul_def, mul_sub, Finset.sum_sub_distrib, ← mul_assoc, ← map_mul,
         inv_mul_apply, hw, Pi.sub_apply, proj]
@@ -258,7 +304,15 @@ theorem aflatT : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
       simp only [Pi.sub_apply, Phi_basis _ s (cut_supp s l)] at this
       simpa [cut] using this
     let l2 : Fin n × Fin f → R := fun j =>
-      if j.2 = s then (if j.1 < i then 0 else if j.1 = i then c else l j) else 0
+      if j.2 = s then
+        (if j.1 < i then
+           0
+         else if j.1 = i then
+           c
+         else
+           l j)
+      else
+        0
     refine ⟨l2, ?_, fun j hj => if_neg hj, fun j hj => by simp [l2, hj], by simp [l2]⟩
     have e4 : cut s l - l2 ∈ afLatT p f b σ AA.carrier := by
       refine mem_afLatT_of_p hinj _ _ ?_
@@ -266,8 +320,7 @@ theorem aflatT : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
       by_cases ht : t = s
       · subst ht
         by_cases hj : j < i
-        · have := Submodule.sub_mem _
-            (h2 (b j) (Submodule.subset_span ⟨j, hj, rfl⟩)) (e3 j)
+        · have := Submodule.sub_mem _ (h2 (b j) (Submodule.subset_span ⟨j, hj, rfl⟩)) (e3 j)
           rw [← mem_pInt_iff hinj]
           simpa [cut, l2, hj] using this
         · by_cases hji : j = i
@@ -282,8 +335,7 @@ theorem aflatT : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
     obtain ⟨g, hg, hh⟩ := haf l hl
     rw [mem_pFun] at hh
     refine ⟨g, hg, fun a x => ?_, fun k hk => ?_, ?_⟩
-    · have := Submodule.sub_mem _ (hh (a • x))
-        (Submodule.smul_mem _ ((σ ^ p ^ (s : ℕ)) a) (hh x))
+    · have := Submodule.sub_mem _ (hh (a • x)) (Submodule.smul_mem _ ((σ ^ p ^ (s : ℕ)) a) (hh x))
       convert this using 1
       simp only [Pi.sub_apply, Phi_eigen l s hs, Algebra.smul_def]
       ring
@@ -298,7 +350,23 @@ theorem aflatT : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
     · have := hh (b i)
       rwa [Pi.sub_apply, Phi_basis l s hs] at this
 
-theorem flag_D : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N] (AA : HopfOrder (C := C) R N), FStable F AA.carrier → ∀ σ : MulChar F R, IsFund p σ → ∀ (n : ℕ) (b : Module.Basis (Fin n) F N), ∃ d : Fin n → Fin f → R, (∀ (i : Fin n) (s : Fin f), idealD p AA.carrier (flagSub b i) (b i) (σ ^ p ^ (s : ℕ)) = Ideal.span {d i s}) ∧ HasLen v R (AFQuot p AA.carrier) (∏ i, ∏ s, v (algebraMap R C (d i s))) := by
+theorem flag_D
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N]
+                (AA : HopfOrder (C := C) R N),
+              FStable F AA.carrier
+                → ∀ σ : MulChar F R,
+                  IsFund p σ
+                    → ∀ (n : ℕ) (b : Module.Basis (Fin n) F N), ∃ d : Fin n → Fin f → R,
+                      (∀ (i : Fin n) (s : Fin f),
+                          idealD p AA.carrier (flagSub b i) (b i) (σ ^ p ^ (s : ℕ))
+                            = Ideal.span {d i s})
+                        ∧ HasLen v R (AFQuot p AA.carrier)
+                          (∏ i, ∏ s, v (algebraMap R C (d i s))) := by
   intro p _ C _ _ _ v R _ _ hv hp F _ _ _ _ f hc N _ _ _ _ AA hst σ hσ n b
   obtain ⟨hfg, ⟨e⟩, hgr, hD⟩ := aflatT p C v R hv hp F f hc N AA hst σ hσ n b
   set L := afLatT p f b σ AA.carrier with hL
@@ -312,8 +380,13 @@ theorem flag_D : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed 
     · rintro ⟨l, hl, -, h2, h3⟩
       exact ⟨ρ s l, Submodule.mem_map_of_mem hl, h2, h3⟩
     · rintro ⟨_, ⟨l, hl, rfl⟩, h2, h3⟩
-      exact ⟨_, hgr l hl s, fun j hj => if_neg hj, fun j hj => (if_pos rfl).trans (h2 j hj),
-        (if_pos rfl).trans h3⟩
+      exact ⟨
+        _,
+        hgr l hl s,
+        fun j hj => if_neg hj,
+        fun j hj => (if_pos rfl).trans (h2 j hj),
+        (if_pos rfl).trans h3
+      ⟩
   · let θ : (Fin n × Fin f → R) →ₗ[R] ((s : Fin f) → (Fin n → R) ⧸ L.map (ρ s)) :=
       LinearMap.pi fun s => Submodule.mkQ _ ∘ₗ ρ s
     have hsurj : Function.Surjective θ := by

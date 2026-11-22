@@ -8,11 +8,11 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem smul_mem_of_maximalIdeal_pow_of_locally_eq :
-    ∀ (R B : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [AddCommGroup B] [Module R B]
-      [Module.Finite R B] (N : Submodule R B),
-      (∀ (p : Ideal R), p.IsPrime → p ≠ maximalIdeal R → ∀ b : B, ∃ t ∉ p, t • b ∈ N) →
-      ∃ k : ℕ, ∀ x ∈ maximalIdeal R ^ k, ∀ b : B, x • b ∈ N := by
+theorem smul_mem_of_maximalIdeal_pow_of_locally_eq
+    : ∀ (R B : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [AddCommGroup B] [Module R B]
+        [Module.Finite R B] (N : Submodule R B),
+      (∀ (p : Ideal R), p.IsPrime → p ≠ maximalIdeal R → ∀ b : B, ∃ t ∉ p, t • b ∈ N)
+        → ∃ k : ℕ, ∀ x ∈ maximalIdeal R ^ k, ∀ b : B, x • b ∈ N := by
   intro R B _ _ _ _ _ _ N h
   classical
   set J : Ideal R := N.colon (Set.univ : Set B) with hJ
@@ -48,8 +48,8 @@ theorem smul_mem_of_maximalIdeal_pow_of_locally_eq :
       exact N.smul_mem _ (ht2 g)
     have := hle hb
     simpa using this
-  obtain ⟨k, hk⟩ := Ideal.exists_pow_le_of_le_radical_of_fg hrad
-    (IsNoetherian.noetherian (maximalIdeal R))
+  obtain ⟨k, hk⟩ :=
+    Ideal.exists_pow_le_of_le_radical_of_fg hrad (IsNoetherian.noetherian (maximalIdeal R))
   exact ⟨k, fun x hx b => (hmem x).1 (hk hx) b⟩
 
 end GlobalTheory

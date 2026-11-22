@@ -9,7 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.InclTprod
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.S Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.S
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -19,22 +22,33 @@ namespace GlobalTheory.Chain.IoLift.ItNe
 open GlobalTheory.Chain.RealIt
 open scoped TensorProduct InnerProductSpace
 
-theorem exists_ne_zero_inclK : GlobalTheory.Published.HarishChandraModules → ∀ (D : D7) (V W : HSp D) (S S' : D.what₂.Tau → SPar) (M : DSModel V S) (M' : DSModel W S') (θ : InfFam D) (ω : GA D V × GA D W →* Module.End ℂ (WO V W → ℂ)) (pt : PolF D W.rank V.rank → (WO V W → ℂ)) (It : PolF D W.rank V.rank →ₗ[ℂ] SmT M' →ₗ[ℂ] SmT M), IsItW θ M M' ω pt It → ∀ h' : GlobalTheory.Chain.IoLift.KSm M', ∃ φ y, It φ (GlobalTheory.Chain.IoLift.inclK h' y) ≠ 0 := by
+theorem exists_ne_zero_inclK
+    : GlobalTheory.Published.HarishChandraModules
+      → ∀ (D : D7) (V W : HSp D) (S S' : D.what₂.Tau → SPar) (M : DSModel V S) (M' : DSModel W S')
+          (θ : InfFam D) (ω : GA D V × GA D W →* Module.End ℂ (WO V W → ℂ))
+          (pt : PolF D W.rank V.rank → (WO V W → ℂ))
+          (It : PolF D W.rank V.rank →ₗ[ℂ] SmT M' →ₗ[ℂ] SmT M),
+        IsItW θ M M' ω pt It
+          → ∀ h' : GlobalTheory.Chain.IoLift.KSm M', ∃ φ y,
+            It φ (GlobalTheory.Chain.IoLift.inclK h' y) ≠ 0 := by
   classical
   intro hHC D V W S S' M M' θ ω pt It hIt h'
   apply Classical.byContradiction
   intro hcon
   push_neg at hcon
   apply hIt.ne
-  have key : ∀ φ (w : ∀ τ, M.H τ) (s : Finset D.what₂.Tau) (v : M'.Vec),
-      (∀ τ ∉ s, (v τ : M'.H τ) ∈ GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.kFin M' τ) →
-      ellT M w (inclT M (It φ (PiTensorProduct.tprod ℂ v))) = 0 := by
+  have key
+      : ∀ φ (w : ∀ τ, M.H τ) (s : Finset D.what₂.Tau) (v : M'.Vec),
+        (∀ τ ∉ s, (v τ : M'.H τ) ∈ GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.kFin M' τ)
+          → ellT M w (inclT M (It φ (PiTensorProduct.tprod ℂ v))) = 0 := by
     intro φ w s
     induction s using Finset.induction_on with
     | empty =>
       intro v hv
-      have e : PiTensorProduct.tprod ℂ v =
-          GlobalTheory.Chain.IoLift.inclK h' (PiTensorProduct.tprod ℂ fun τ => ⟨v τ, hv τ (by simp)⟩) := by
+      have e
+          : PiTensorProduct.tprod ℂ v
+            = GlobalTheory.Chain.IoLift.inclK h'
+              (PiTensorProduct.tprod ℂ fun τ => ⟨v τ, hv τ (by simp)⟩) := by
         rw [GlobalTheory.Chain.IoLift.inclK, PiTensorProduct.map_tprod]; rfl
       rw [e, hcon, map_zero, map_zero]
     | insert τ s hτ ih =>
@@ -43,8 +57,11 @@ theorem exists_ne_zero_inclK : GlobalTheory.Published.HarishChandraModules → �
       let ℓ₀ : M'.sm τ →ₗ[ℂ] ℂ :=
         (ellT M w ∘ₗ inclT M ∘ₗ It φ) ∘ₗ (PiTensorProduct.tprod ℂ).toLinearMap v τ
       obtain ⟨ℓ, hℓ⟩ := LinearMap.exists_extend ℓ₀
-      have hℓv : ∀ y : M'.sm τ, ℓ (y : M'.H τ) =
-          ellT M w (inclT M (It φ (PiTensorProduct.tprod ℂ (Function.update v τ y)))) := fun y => by
+      have hℓv
+          : ∀ y : M'.sm τ,
+            ℓ (y : M'.H τ)
+              = ellT M w
+                (inclT M (It φ (PiTensorProduct.tprod ℂ (Function.update v τ y)))) := fun y => by
         have := LinearMap.congr_fun hℓ y
         simpa [ℓ₀, MultilinearMap.toLinearMap_apply] using this
       have hsob : Formalism.L2.Theta.Sobolev₂ (lieAt W τ) (M'.rep τ) ℓ := by
@@ -52,17 +69,22 @@ theorem exists_ne_zero_inclK : GlobalTheory.Published.HarishChandraModules → �
         have hy : u ∈ M'.sm τ := Submodule.subset_span hu
         have h1 := hc (Function.update v τ ⟨u, hy⟩)
         rw [← hℓv ⟨u, hy⟩] at h1
-        have h2 : ∏ ρ, ‖((Function.update v τ ⟨u, hy⟩ ρ : M'.sm ρ) : M'.H ρ)‖ =
-            ‖u‖ * ∏ ρ ∈ Finset.univ.erase τ, ‖(v ρ : M'.H ρ)‖ := by
+        have h2
+            : ∏ ρ, ‖((Function.update v τ ⟨u, hy⟩ ρ : M'.sm ρ) : M'.H ρ)‖
+              = ‖u‖ * ∏ ρ ∈ Finset.univ.erase τ, ‖(v ρ : M'.H ρ)‖ := by
           rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ τ), Function.update_self]
           congr 1
           refine Finset.prod_congr rfl fun ρ hρ => ?_
           rw [Function.update_of_ne (Finset.ne_of_mem_erase hρ)]
         rw [h2] at h1
-        simp only [List.map_cons, List.map_nil, List.foldr_nil, List.sum_cons, List.sum_nil, add_zero]
-        calc ‖ℓ u‖ ≤ c * (‖u‖ * ∏ ρ ∈ Finset.univ.erase τ, ‖(v ρ : M'.H ρ)‖) := h1
+        simp only [List.map_cons, List.map_nil, List.foldr_nil, List.sum_cons, List.sum_nil,
+          add_zero]
+        calc
+          ‖ℓ u‖
+            ≤ c * (‖u‖ * ∏ ρ ∈ Finset.univ.erase τ, ‖(v ρ : M'.H ρ)‖) := h1
           _ = c * (∏ ρ ∈ Finset.univ.erase τ, ‖(v ρ : M'.H ρ)‖) * ‖u‖ := by ring
-      have hk : ∀ u ∈ GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.kFin M' τ, ℓ u = 0 := by
+      have hk
+          : ∀ u ∈ GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.kFin M' τ, ℓ u = 0 := by
         intro u hu
         have hy : u ∈ M'.sm τ := h' τ hu
         rw [show u = ((⟨u, hy⟩ : M'.sm τ) : M'.H τ) from rfl, hℓv]

@@ -8,10 +8,12 @@ namespace GlobalTheory
 
 open WeierstrassCurve WeierstrassCurve.Affine
 
-theorem map_add_of_triples {A B : Type*} [AddCommGroup A] [AddCommGroup B] (f : A → B)
-    (h0 : f 0 = 0) (hneg : ∀ P, f (-P) = -f P)
-    (h3 : ∀ P Q R, P ≠ 0 → Q ≠ 0 → R ≠ 0 → P + Q + R = 0 → f P + f Q + f R = 0) (P Q : A) :
-    f (P + Q) = f P + f Q := by
+theorem map_add_of_triples
+    {A B : Type*} [AddCommGroup A] [AddCommGroup B]
+    (f : A → B) (h0 : f 0 = 0) (hneg : ∀ P, f (-P) = - f P)
+    (h3 : ∀ P Q R, P ≠ 0 → Q ≠ 0 → R ≠ 0 → P + Q + R = 0 → f P + f Q + f R = 0)
+    (P Q : A)
+    : f (P + Q) = f P + f Q := by
   by_cases hP : P = 0
   · simp [hP, h0]
   by_cases hQ : Q = 0
@@ -25,12 +27,13 @@ theorem map_add_of_triples {A B : Type*} [AddCommGroup A] [AddCommGroup B] (f : 
 
 variable {k : Type*} [Field k] [DecidableEq k] {W : Affine k}
 
-theorem add_add_eq_zero_of_line {x₁ y₁ x₂ y₂ x₃ y₃ : k} (h₁ : W.Nonsingular x₁ y₁)
-    (h₂ : W.Nonsingular x₂ y₂) (h₃ : W.Nonsingular x₃ y₃) (l n : k)
-    (e₁ : y₁ = l * x₁ + n) (e₂ : y₂ = l * x₂ + n) (e₃ : y₃ = l * x₃ + n)
+theorem add_add_eq_zero_of_line
+    {x₁ y₁ x₂ y₂ x₃ y₃ : k}
+    (h₁ : W.Nonsingular x₁ y₁) (h₂ : W.Nonsingular x₂ y₂) (h₃ : W.Nonsingular x₃ y₃)
+    (l n : k) (e₁ : y₁ = l * x₁ + n) (e₂ : y₂ = l * x₂ + n) (e₃ : y₃ = l * x₃ + n)
     (s₁ : x₁ + x₂ + x₃ = l ^ 2 + W.a₁ * l - W.a₂)
-    (s₂ : x₁ * x₂ + x₁ * x₃ + x₂ * x₃ = W.a₄ - 2 * l * n - W.a₁ * n - W.a₃ * l) :
-    Point.some x₁ y₁ h₁ + Point.some x₂ y₂ h₂ + Point.some x₃ y₃ h₃ = 0 := by
+    (s₂ : x₁ * x₂ + x₁ * x₃ + x₂ * x₃ = W.a₄ - 2 * l * n - W.a₁ * n - W.a₃ * l)
+    : Point.some x₁ y₁ h₁ + Point.some x₂ y₂ h₂ + Point.some x₃ y₃ h₃ = 0 := by
   have key : ¬(x₁ = x₂ ∧ y₁ = W.negY x₂ y₂) ∧ W.slope x₁ x₂ y₁ y₂ = l := by
     by_cases hx : x₁ = x₂
     · subst hx
@@ -63,13 +66,14 @@ theorem add_add_eq_zero_of_line {x₁ y₁ x₂ y₂ x₃ y₃ : k} (h₁ : W.No
     congr 1
     linear_combination e₁ - e₃
 
-theorem exists_line_of_add_add_eq_zero {x₁ y₁ x₂ y₂ x₃ y₃ : k} {h₁ : W.Nonsingular x₁ y₁}
-    {h₂ : W.Nonsingular x₂ y₂} {h₃ : W.Nonsingular x₃ y₃}
-    (h : Point.some x₁ y₁ h₁ + Point.some x₂ y₂ h₂ + Point.some x₃ y₃ h₃ = 0) :
-    ∃ l n : k, y₁ = l * x₁ + n ∧ y₂ = l * x₂ + n ∧ y₃ = l * x₃ + n ∧
-      x₁ + x₂ + x₃ = l ^ 2 + W.a₁ * l - W.a₂ ∧
-      x₁ * x₂ + x₁ * x₃ + x₂ * x₃ = W.a₄ - 2 * l * n - W.a₁ * n - W.a₃ * l ∧
-      x₁ * x₂ * x₃ = n ^ 2 + W.a₃ * n - W.a₆ := by
+theorem exists_line_of_add_add_eq_zero
+    {x₁ y₁ x₂ y₂ x₃ y₃ : k} {h₁ : W.Nonsingular x₁ y₁} {h₂ : W.Nonsingular x₂ y₂}
+    {h₃ : W.Nonsingular x₃ y₃}
+    (h : Point.some x₁ y₁ h₁ + Point.some x₂ y₂ h₂ + Point.some x₃ y₃ h₃ = 0)
+    : ∃ l n : k,
+      y₁ = l * x₁ + n ∧ y₂ = l * x₂ + n ∧ y₃ = l * x₃ + n ∧ x₁ + x₂ + x₃ = l ^ 2 + W.a₁ * l - W.a₂
+        ∧ x₁ * x₂ + x₁ * x₃ + x₂ * x₃ = W.a₄ - 2 * l * n - W.a₁ * n - W.a₃ * l
+        ∧ x₁ * x₂ * x₃ = n ^ 2 + W.a₃ * n - W.a₆ := by
   have hxy : ¬(x₁ = x₂ ∧ y₁ = W.negY x₂ y₂) := by
     rintro ⟨hx, hy⟩
     rw [Point.add_of_Y_eq hx hy, zero_add] at h
@@ -87,16 +91,24 @@ theorem exists_line_of_add_add_eq_zero {x₁ y₁ x₂ y₂ x₃ y₃ : k} {h₁
   set l := W.slope x₁ x₂ y₁ y₂
   simp only [Cubic.mk.injEq, true_and] at hp
   obtain ⟨p₁, p₂, p₃⟩ := hp
-  refine ⟨l, y₁ - l * x₁, by ring, by linear_combination hl, by linear_combination hy,
-    by linear_combination p₁, by linear_combination -p₂, by linear_combination p₃⟩
+  refine ⟨
+    l,
+    y₁ - l * x₁,
+    by ring,
+    by linear_combination hl,
+    by linear_combination hy,
+    by linear_combination p₁,
+    by linear_combination -p₂,
+    by linear_combination p₃
+  ⟩
 
 section VariableChange
 
-
 omit [DecidableEq k] in
-theorem nonsingular_variableChange_iff (W : WeierstrassCurve k) (C : VariableChange k) (x y : k) :
-    W.toAffine.Nonsingular ((C.u : k) ^ 2 * x + C.r)
-      ((C.u : k) ^ 3 * y + (C.u : k) ^ 2 * C.s * x + C.t) ↔ (C • W).toAffine.Nonsingular x y := by
+theorem nonsingular_variableChange_iff (W : WeierstrassCurve k) (C : VariableChange k) (x y : k)
+    : W.toAffine.Nonsingular ((C.u : k) ^ 2 * x + C.r)
+        ((C.u : k) ^ 3 * y + (C.u : k) ^ 2 * C.s * x + C.t)
+      ↔ (C • W).toAffine.Nonsingular x y := by
   have hu : (C.u : k) ≠ 0 := C.u.ne_zero
   simp only [nonsingular_iff', equation_iff', variableChange_a₁, variableChange_a₂,
     variableChange_a₃, variableChange_a₄, variableChange_a₆, Units.val_inv_eq_inv_val]
@@ -120,15 +132,15 @@ theorem nonsingular_variableChange_iff (W : WeierstrassCurve k) (C : VariableCha
     · field_simp at h h'
       exact ⟨by linear_combination h - s * h', by linear_combination h'⟩
 
-def variableChangePointFun {W W' : WeierstrassCurve k} (C : VariableChange k) (h : C • W = W') :
-    W'.toAffine.Point → W.toAffine.Point
+def variableChangePointFun {W W' : WeierstrassCurve k} (C : VariableChange k) (h : C • W = W')
+    : W'.toAffine.Point → W.toAffine.Point
   | .zero => 0
-  | .some x y hP => .some ((C.u : k) ^ 2 * x + C.r)
-      ((C.u : k) ^ 3 * y + (C.u : k) ^ 2 * C.s * x + C.t)
+  | .some x y hP =>
+    .some ((C.u : k) ^ 2 * x + C.r) ((C.u : k) ^ 3 * y + (C.u : k) ^ 2 * C.s * x + C.t)
       ((nonsingular_variableChange_iff W C x y).mpr (h ▸ hP))
 
-def variableChangePoint {W W' : WeierstrassCurve k} (C : VariableChange k) (h : C • W = W') :
-    W'.toAffine.Point →+ W.toAffine.Point :=
+def variableChangePoint {W W' : WeierstrassCurve k} (C : VariableChange k) (h : C • W = W')
+    : W'.toAffine.Point →+ W.toAffine.Point :=
   AddMonoidHom.mk' (variableChangePointFun C h) <| by
     subst h
     have hu : (C.u : k) ≠ 0 := C.u.ne_zero
@@ -142,8 +154,9 @@ def variableChangePoint {W W' : WeierstrassCurve k} (C : VariableChange k) (h : 
     · rintro (_ | ⟨x₁, y₁, h₁⟩) (_ | ⟨x₂, y₂, h₂⟩) (_ | ⟨x₃, y₃, h₃⟩) hP hQ hR h
       any_goals first | exact absurd rfl hP | exact absurd rfl hQ | exact absurd rfl hR
       obtain ⟨l, n, e₁, e₂, e₃, s₁, s₂, -⟩ := exists_line_of_add_add_eq_zero h
-      simp only [variableChange_a₁, variableChange_a₂,
-        variableChange_a₃, variableChange_a₄, Units.val_inv_eq_inv_val] at s₁ s₂
+      simp only [variableChange_a₁, variableChange_a₂, variableChange_a₃, variableChange_a₄,
+          Units.val_inv_eq_inv_val]
+        at s₁ s₂
       field_simp at s₁ s₂
       refine add_add_eq_zero_of_line _ _ _ ((C.u : k) * l + C.s)
         ((C.u : k) ^ 3 * n + C.t - C.r * ((C.u : k) * l + C.s)) ?_ ?_ ?_ ?_ ?_
@@ -154,15 +167,17 @@ def variableChangePoint {W W' : WeierstrassCurve k} (C : VariableChange k) (h : 
       · linear_combination s₂ + 2 * C.r * s₁
 
 @[simp]
-theorem variableChangePoint_some {W W' : WeierstrassCurve k} (C : VariableChange k)
-    (h : C • W = W') {x y : k} (hP : W'.toAffine.Nonsingular x y) :
-    variableChangePoint C h (.some x y hP) = .some ((C.u : k) ^ 2 * x + C.r)
-      ((C.u : k) ^ 3 * y + (C.u : k) ^ 2 * C.s * x + C.t)
-      ((nonsingular_variableChange_iff W C x y).mpr (h ▸ hP)) :=
+theorem variableChangePoint_some
+    {W W' : WeierstrassCurve k} (C : VariableChange k) (h : C • W = W')
+    {x y : k} (hP : W'.toAffine.Nonsingular x y)
+    : variableChangePoint C h (.some x y hP)
+      = .some ((C.u : k) ^ 2 * x + C.r) ((C.u : k) ^ 3 * y + (C.u : k) ^ 2 * C.s * x + C.t)
+        ((nonsingular_variableChange_iff W C x y).mpr (h ▸ hP)) :=
   rfl
 
-theorem variableChangePoint_bijective {W W' : WeierstrassCurve k} (C : VariableChange k)
-    (h : C • W = W') : Function.Bijective (variableChangePoint C h) := by
+theorem variableChangePoint_bijective
+    {W W' : WeierstrassCurve k} (C : VariableChange k) (h : C • W = W')
+    : Function.Bijective (variableChangePoint C h) := by
   have hu : (C.u : k) ≠ 0 := C.u.ne_zero
   constructor
   · rw [injective_iff_map_eq_zero]
@@ -172,8 +187,11 @@ theorem variableChangePoint_bijective {W W' : WeierstrassCurve k} (C : VariableC
   · rintro (_ | ⟨x, y, hP⟩)
     · exact ⟨0, map_zero _⟩
     · have hx : x = (C.u : k) ^ 2 * ((x - C.r) / (C.u : k) ^ 2) + C.r := by field_simp; ring
-      have hy : y = (C.u : k) ^ 3 * ((y - C.s * (x - C.r) - C.t) / (C.u : k) ^ 3)
-          + (C.u : k) ^ 2 * C.s * ((x - C.r) / (C.u : k) ^ 2) + C.t := by field_simp; ring
+      have hy
+          : y
+            = (C.u : k) ^ 3 * ((y - C.s * (x - C.r) - C.t) / (C.u : k) ^ 3)
+              + (C.u : k) ^ 2 * C.s * ((x - C.r) / (C.u : k) ^ 2) + C.t := by
+        field_simp; ring
       have hP' := hP
       rw [hx, hy, ← hx] at hP'
       nth_rw 1 [hx] at hP'
@@ -182,8 +200,9 @@ theorem variableChangePoint_bijective {W W' : WeierstrassCurve k} (C : VariableC
       rw [variableChangePoint_some, Point.some.injEq]
       exact ⟨hx.symm, hy.symm⟩
 
-noncomputable def variableChangePointEquiv {W W' : WeierstrassCurve k} (C : VariableChange k)
-    (h : C • W = W') : W'.toAffine.Point ≃+ W.toAffine.Point :=
+noncomputable def variableChangePointEquiv
+    {W W' : WeierstrassCurve k} (C : VariableChange k) (h : C • W = W')
+    : W'.toAffine.Point ≃+ W.toAffine.Point :=
   AddEquiv.ofBijective (variableChangePoint C h) (variableChangePoint_bijective C h)
 
 end VariableChange

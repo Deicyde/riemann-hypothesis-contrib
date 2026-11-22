@@ -6,16 +6,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Stickelberg
 
 open Finset UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5
 
-private theorem single_mul_rel {A : Type} [CommRing A] {Γ : Type} [CommGroup Γ] (c : Γ) (ε : ℤ) (g : Γ) (b : A) :
-    MonoidAlgebra.single g b * rel A c ε =
-      MonoidAlgebra.single g (-((ε : A) * b)) + MonoidAlgebra.single (c * g) b := by
+private theorem single_mul_rel
+    {A : Type} [CommRing A] {Γ : Type} [CommGroup Γ] (c : Γ) (ε : ℤ) (g : Γ) (b : A)
+    : MonoidAlgebra.single g b * rel A c ε
+      = MonoidAlgebra.single g (-((ε : A) * b)) + MonoidAlgebra.single (c * g) b := by
   rw [rel, MonoidAlgebra.intCast_def, mul_sub, MonoidAlgebra.single_mul_single,
     MonoidAlgebra.single_mul_single, mul_one, mul_one, mul_comm g c, mul_comm b,
     MonoidAlgebra.single_neg, sub_eq_add_neg, add_comm]
 
-private theorem coeff_mul_rel {A : Type} [CommRing A] {Γ : Type} [CommGroup Γ] {c : Γ} (h2 : c * c = 1) (ε : ℤ)
-    (u : MonoidAlgebra A Γ) (g : Γ) :
-    (u * rel A c ε).coeff g = u.coeff (c * g) - (ε : A) * u.coeff g := by
+private theorem coeff_mul_rel
+    {A : Type} [CommRing A]
+    {Γ : Type} [CommGroup Γ]
+    {c : Γ} (h2 : c * c = 1)
+    (ε : ℤ) (u : MonoidAlgebra A Γ) (g : Γ)
+    : (u * rel A c ε).coeff g = u.coeff (c * g) - (ε : A) * u.coeff g := by
   classical
   induction u using MonoidAlgebra.induction_linear with
   | zero => simp
@@ -29,11 +33,14 @@ private theorem coeff_mul_rel {A : Type} [CommRing A] {Γ : Type} [CommGroup Γ]
       constructor
       · rintro rfl; rw [← mul_assoc, h2, one_mul]
       · rintro rfl; rw [← mul_assoc, h2, one_mul]
-    simp only [MonoidAlgebra.coeff_add, Finsupp.add_apply, MonoidAlgebra.coeff_single, Finsupp.single_apply, h]
+    simp only [MonoidAlgebra.coeff_add, Finsupp.add_apply, MonoidAlgebra.coeff_single,
+      Finsupp.single_apply, h]
     split_ifs <;> ring
 
-theorem UpperTheory.V.B5.mem_span_orderTwoRelation_iff_coords_eq_zero :
-    ∀ {A : Type} [CommRing A] {Γ : Type} [CommGroup Γ] [Finite Γ] (c : Γ) (ε : ℤ), c * c = 1 → c ≠ 1 → ε * ε = 1 → ∀ w : MonoidAlgebra A Γ, w ∈ Ideal.span {rel A c ε} ↔ coord c ε w = 0 := by
+theorem UpperTheory.V.B5.mem_span_orderTwoRelation_iff_coords_eq_zero
+    : ∀ {A : Type} [CommRing A] {Γ : Type} [CommGroup Γ] [Finite Γ] (c : Γ) (ε : ℤ),
+      c * c = 1 → c ≠ 1 → ε * ε = 1
+        → ∀ w : MonoidAlgebra A Γ, w ∈ Ideal.span {rel A c ε} ↔ coord c ε w = 0 := by
   intro A _ Γ _ _ c ε h2 hc hε w
   classical
   letI := Fintype.ofFinite Γ

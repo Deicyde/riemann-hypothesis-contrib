@@ -62,7 +62,6 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
-
 open GroundTheory.Heights₂.Heights.FieldNumbers in
 theorem DivPushForwardLocalZero : FieldNumbers.DivPushForwardLocal.Statement.{0} := by
   have hq := DegZeroLocQuot.proof.{0}
@@ -71,27 +70,33 @@ theorem DivPushForwardLocalZero : FieldNumbers.DivPushForwardLocal.Statement.{0}
   have hmh := MChartHomog.proof.{0}
   have hmd := MChartDehomog.proof.{0}
   have hmt := MChartTrdeg.proof hmh
-  have hdzr := DegZeroLocalRing.proof hdzl hdzn
-    (DegZeroLocDim.proof hmh hmt (MChartLocDim.proof hq hmd hmh))
+  have hdzr :=
+    DegZeroLocalRing.proof hdzl hdzn (DegZeroLocDim.proof hmh hmt (MChartLocDim.proof hq hmd hmh))
   have hnum := ConeVarNumerator.proof hq
-  have hcone := ConeLocalLength.proof LocalizedQuotientLength.proof
-    (ConeLocalFlat.proof (ConePolyLocalization.proof hdzl (ConeVarUnit.proof hq hnum)
-      ConeVarSurj.proof (ConeVarInj.proof hnum)))
+  have hcone :=
+    ConeLocalLength.proof LocalizedQuotientLength.proof
+      (ConeLocalFlat.proof (ConePolyLocalization.proof hdzl (ConeVarUnit.proof hq hnum)
+        ConeVarSurj.proof (ConeVarInj.proof hnum)))
   have hfr := DegZeroLocFrac.proof.{0}
   have hff := FibreFinite.proof.{0}
   have hint := SemilocalIntegral.proof ValuativeCentre.proof.{0}
-  have hrank := SemilocalFiniteRank.proof hff
-    (SemilocalFinite.proof hint
-      (LocalIntegralClosureFinite.proof NoetherIntegralClosureFinite.proof
-        (FunctionFieldFinite.proof hmd hmt) hq hmd hfr) hdzn) hfr
+  have hrank :=
+    SemilocalFiniteRank.proof hff
+      (SemilocalFinite.proof hint
+        (LocalIntegralClosureFinite.proof NoetherIntegralClosureFinite.proof
+          (FunctionFieldFinite.proof hmd hmt) hq hmd hfr)
+        hdzn)
+      hfr
   have hfrd := FibreRelDim.proof.{0}
   have hlz := DegZeroLocLocalize.proof.{0}
   have hres := DegZeroLocResidue.proof.{0}
-  have hmaxi := SemilocalMaxIdeals.proof hff hfrd (FibreNonempty.proof hrank hdzr)
-    DegZeroLocUnits.proof DegZeroLocSeparate.proof hlz (SemilocalResidueLength.proof hres hrank hlz)
-  have hlen := SemilocalLength.proof
-    (SemilocalLengthSum.proof hff hrank hdzr FiniteAlgebraLengthSum.proof hmaxi) hfrd
-    DivCycleMinimal.proof hcone
+  have hmaxi :=
+    SemilocalMaxIdeals.proof hff hfrd (FibreNonempty.proof hrank hdzr) DegZeroLocUnits.proof
+      DegZeroLocSeparate.proof hlz (SemilocalResidueLength.proof hres hrank hlz)
+  have hlen :=
+    SemilocalLength.proof
+      (SemilocalLengthSum.proof hff hrank hdzr FiniteAlgebraLengthSum.proof hmaxi) hfrd
+      DivCycleMinimal.proof hcone
   exact DivPushForwardLocal.proof DivCycleMinimal.proof hcone hdzr hrank hlen
 
 theorem FlagBundleDim.full : FlagBundleDim.Statement :=

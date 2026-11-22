@@ -9,14 +9,16 @@ open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.Adelic
 
-theorem compact_part_closed_orbit :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
-      [LocallyCompactSpace G] [SecondCountableTopology G] (V : Type) [TopologicalSpace V]
-      [T2Space V] [LocallyCompactSpace V] (a : G → V → V),
-      (Continuous fun p : G × V => a p.1 p.2) → (∀ y, a 1 y = y) →
-      (∀ g h y, a (g * h) y = a g (a h y)) →
-      ∀ (Z : Set V) (x : V), IsClosed Z → (∀ y, y ∈ Z ↔ ∃ g, a g x = y) →
-      ∀ Ω : Set V, IsCompact Ω → ∃ C : Set G, IsCompact C ∧ ∀ y ∈ Ω, y ∈ Z → ∃ c ∈ C, a c x = y := by
+theorem compact_part_closed_orbit
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [T2Space G]
+        [LocallyCompactSpace G] [SecondCountableTopology G] (V : Type) [TopologicalSpace V]
+        [T2Space V] [LocallyCompactSpace V] (a : G → V → V),
+      (Continuous fun p : G × V => a p.1 p.2) → (∀ y, a 1 y = y)
+        → (∀ g h y, a (g * h) y = a g (a h y))
+        → ∀ (Z : Set V) (x : V),
+          IsClosed Z → (∀ y, y ∈ Z ↔ ∃ g, a g x = y)
+            → ∀ Ω : Set V,
+              IsCompact Ω → ∃ C : Set G, IsCompact C ∧ ∀ y ∈ Ω, y ∈ Z → ∃ c ∈ C, a c x = y := by
   intro G _ _ _ _ _ _ V _ _ _ a ha h1 hmul Z x hZ hZx Ω hΩ
   have hmem : ∀ (g : G) (z : Z), a g z ∈ Z := by
     intro g z
@@ -44,12 +46,14 @@ theorem compact_part_closed_orbit :
   choose K hK hKn using fun g : G => exists_compact_mem_nhds g
   have hS : IsCompact ((Subtype.val : Z → V) ⁻¹' Ω) :=
     hZ.isClosedEmbedding_subtypeVal.isCompact_preimage hΩ
-  obtain ⟨t, ht⟩ := hS.elim_finite_subcover
-    (fun g => (fun h : G => h • (⟨x, hx⟩ : Z)) '' interior (K g))
-    (fun g => hopen _ isOpen_interior) (by
-      intro z _
-      obtain ⟨g, hg⟩ := (hZx z).1 z.2
-      exact Set.mem_iUnion.2 ⟨g, g, mem_interior_iff_mem_nhds.2 (hKn g), Subtype.ext hg⟩)
+  obtain ⟨t, ht⟩ :=
+    hS.elim_finite_subcover
+      (fun g => (fun h : G => h • (⟨x, hx⟩ : Z)) '' interior (K g))
+      (fun g => hopen _ isOpen_interior)
+      (by
+        intro z _
+        obtain ⟨g, hg⟩ := (hZx z).1 z.2
+        exact Set.mem_iUnion.2 ⟨g, g, mem_interior_iff_mem_nhds.2 (hKn g), Subtype.ext hg⟩)
   refine ⟨⋃ g ∈ t, K g, t.isCompact_biUnion fun g _ => hK g, ?_⟩
   intro y hyΩ hyZ
   have hy := ht (show (⟨y, hyZ⟩ : Z) ∈ (Subtype.val : Z → V) ⁻¹' Ω from hyΩ)

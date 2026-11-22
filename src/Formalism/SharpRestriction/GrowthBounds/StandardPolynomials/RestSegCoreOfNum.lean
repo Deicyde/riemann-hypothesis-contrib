@@ -12,18 +12,20 @@ namespace Formalism.MainNotions.ColumnSystems.Pf
 
 open Formalism.MainNotions.G MvPolynomial Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
-theorem jE_mono {s : ℕ} (S : SegData s) {f g : Fin S.t → ℕ} (h : ∀ l, f l ≤ g l) (i : ℕ) : jE S f i ≤ jE S g i := by
+theorem jE_mono {s : ℕ} (S : SegData s) {f g : Fin S.t → ℕ} (h : ∀ l, f l ≤ g l) (i : ℕ)
+    : jE S f i ≤ jE S g i := by
   unfold jE
   split_ifs
   · exact h _
   · exact le_rfl
 
-theorem jE_add {s : ℕ} (S : SegData s) (f g : Fin S.t → ℕ) (i : ℕ) : jE S (fun l => f l + g l) i = jE S f i + jE S g i := by
+theorem jE_add {s : ℕ} (S : SegData s) (f g : Fin S.t → ℕ) (i : ℕ)
+    : jE S (fun l => f l + g l) i = jE S f i + jE S g i := by
   unfold jE
   split_ifs <;> rfl
 
-theorem jE_uTop {s : ℕ} (S : SegData s) (g : Fin s → ℕ) (i : Fin s) (h : S.sigma ≤ i.val) :
-    jE S (fun l => g (uTop S l)) i.val = g i := by
+theorem jE_uTop {s : ℕ} (S : SegData s) (g : Fin s → ℕ) (i : Fin s) (h : S.sigma ≤ i.val)
+    : jE S (fun l => g (uTop S l)) i.val = g i := by
   unfold jE
   rw [dite_eq_left ⟨h, i.2⟩]
   have e : uTop S ⟨i.val - S.sigma, by unfold SegData.t; have := i.2; omega⟩ = i := by
@@ -33,13 +35,16 @@ theorem jE_uTop {s : ℕ} (S : SegData s) (g : Fin s → ℕ) (i : Fin s) (h : S
   show g (uTop S ⟨i.val - S.sigma, _⟩) = g i
   rw [e]
 
-theorem ch_cases {s : ℕ} (a : Fin (2 * s + 1)) : a = chU s ∨ (∃ i : Fin s, a = chW i) ∨ ∃ i : Fin s, a = chE i := by
+theorem ch_cases {s : ℕ} (a : Fin (2 * s + 1))
+    : a = chU s ∨ (∃ i : Fin s, a = chW i) ∨ ∃ i : Fin s, a = chE i := by
   have ha := a.2
   by_cases h : a.val = 2 * s
   · exact Or.inl (Fin.ext h)
   · by_cases h2 : a.val % 2 = 0
-    · exact Or.inr (Or.inl ⟨⟨a.val / 2, by omega⟩, Fin.ext (by show a.val = 2 * (a.val / 2); omega)⟩)
-    · exact Or.inr (Or.inr ⟨⟨a.val / 2, by omega⟩, Fin.ext (by show a.val = 2 * (a.val / 2) + 1; omega)⟩)
+    · exact Or.inr (Or.inl
+        ⟨⟨a.val / 2, by omega⟩, Fin.ext (by show a.val = 2 * (a.val / 2); omega)⟩)
+    · exact Or.inr (Or.inr
+        ⟨⟨a.val / 2, by omega⟩, Fin.ext (by show a.val = 2 * (a.val / 2) + 1; omega)⟩)
 
 set_option maxHeartbeats 1600000 in
 theorem segCoreAt_of_num {C0 CYb Cde Ck CD Cb CE1 CE2 Cc : ℝ} (hN : NumCoreAt C0 CYb Cde Ck CD Cb CE1 CE2 Cc) :

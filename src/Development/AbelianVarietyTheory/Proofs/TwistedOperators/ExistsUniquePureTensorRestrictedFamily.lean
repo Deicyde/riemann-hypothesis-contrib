@@ -12,21 +12,34 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.HasDer
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting GlobalTheory.PlaceTensor
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting GlobalTheory.PlaceTensor
 open scoped TensorProduct ComplexOrder
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.PureTensorExists
 
-theorem existsUnique_isPure : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D) (sS : D.what₂.Tau → Matrix (Fin S.rank) (Fin S.rank) ℂ) (sT : D.what₂.Tau → Matrix (Fin T.rank) (Fin T.rank) ℂ) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (f₀ : WO S T → ℂ) (μ : Measure (WO S T)) (𝓕 : Set (WO S T)), IsBase ψ θ S T sS sT ΛS ΛT f₀ → IsCovolOne (ratL T S) μ 𝓕 → ∀ (x : Place D → WO S T → ℂ), IsRestricted ψ θ S T sS sT ΛS ΛT f₀ x → ∃! f, IsPure ψ θ S T sS sT ΛS ΛT μ 𝓕 f₀ x f := by
+theorem existsUnique_isPure
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D)
+        (sS : D.what₂.Tau → Matrix (Fin S.rank) (Fin S.rank) ℂ)
+        (sT : D.what₂.Tau → Matrix (Fin T.rank) (Fin T.rank) ℂ)
+        (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+        (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (f₀ : WO S T → ℂ)
+        (μ : Measure (WO S T)) (𝓕 : Set (WO S T)),
+      IsBase ψ θ S T sS sT ΛS ΛT f₀ → IsCovolOne (ratL T S) μ 𝓕
+        → ∀ (x : Place D → WO S T → ℂ),
+          IsRestricted ψ θ S T sS sT ΛS ΛT f₀ x → ∃! f, IsPure ψ θ S T sS sT ΛS ΛT μ 𝓕 f₀ x f := by
   intro D ψ θ S T sS sT ΛS ΛT f₀ μ 𝓕 hB hC x hx
   classical
   have hstd : IsStdChar D ψ (-1) := GlobalTheory.PlaceTensor.base_std hB
   have hf0 : IsThetaFunO ψ S T f₀ := GlobalTheory.PlaceTensor.base_theta hB
 
-  have build : ∀ (s : Finset (Place D)) (y : Place D → WO S T → ℂ),
-      IsRestricted ψ θ S T sS sT ΛS ΛT f₀ y → (∀ p, y p ≠ f₀ → p ∈ s) →
-        ∃ f, IsPure ψ θ S T sS sT ΛS ΛT μ 𝓕 f₀ y f := by
+  have build
+      : ∀ (s : Finset (Place D)) (y : Place D → WO S T → ℂ),
+        IsRestricted ψ θ S T sS sT ΛS ΛT f₀ y → (∀ p, y p ≠ f₀ → p ∈ s)
+          → ∃ f, IsPure ψ θ S T sS sT ΛS ΛT μ 𝓕 f₀ y f := by
     intro s
     refine Finset.induction_on s ?_ ?_
     · intro y _ hy
@@ -35,7 +48,11 @@ theorem existsUnique_isPure : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ 
         by_contra hne
         exact absurd (hy p hne) (by simp)
       subst hconst
-      exact ⟨f₀, (GlobalTheory.T.isPureTensor_base_vector_and_local_factor D ψ θ S T sS sT ΛS ΛT f₀ μ 𝓕 hB hC).1⟩
+      exact ⟨
+        f₀,
+        (GlobalTheory.T.isPureTensor_base_vector_and_local_factor D ψ θ S T sS sT ΛS ΛT f₀ μ 𝓕 hB
+          hC).1
+      ⟩
     · intro q s _ ih y hyR hy
 
       have hres : IsRestricted ψ θ S T sS sT ΛS ΛT f₀ (Function.update y q f₀) := by
@@ -59,9 +76,11 @@ theorem existsUnique_isPure : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ 
           · exact absurd h hpq
           · exact h
       obtain ⟨f, hf⟩ := ih (Function.update y q f₀) hres hsub
-      obtain ⟨f', hf', -⟩ := GlobalTheory.T.pureTensor_update_factor_from_base_vector D ψ θ S T sS sT ΛS ΛT f₀ μ 𝓕 hB hC
-        (Function.update y q f₀) y f q hf (by simp)
-        (fun p hp => (Function.update_of_ne hp f₀ y).symm) (hyR.1 q)
+      obtain ⟨f', hf', -⟩ :=
+        GlobalTheory.T.pureTensor_update_factor_from_base_vector D ψ θ S T sS sT ΛS ΛT f₀ μ 𝓕 hB hC
+          (Function.update y q f₀) y f q hf (by simp)
+          (fun p hp => (Function.update_of_ne hp f₀ y).symm)
+          (hyR.1 q)
       exact ⟨f', hf'⟩
   obtain ⟨f, hf⟩ := build hx.2.toFinset x hx (fun p hp => by simpa using hp)
   refine ⟨f, hf, fun g hg => ?_⟩
@@ -82,8 +101,7 @@ theorem existsUnique_isPure : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ 
       rw [(hIP g _ hgT hw).2.1, (hIP f _ hfT hw).2.1, e1]
     have e3 := ((hIP (g - f) _ hd hw).2.2.2.1 f hfT).2
     rw [sub_add_cancel] at e3
-    have e4 : ipO μ 𝓕 (heisO ψ S T w f₀) (g - f) = 0 := by
-      linear_combination e2 - e3
+    have e4 : ipO μ 𝓕 (heisO ψ S T w f₀) (g - f) = 0 := by linear_combination e2 - e3
     exact e4
   exact sub_eq_zero.1 hz
 

@@ -11,11 +11,13 @@ namespace PI.CoefExt
 
 section
 
-variable {K L : Type} [Field K] [Field L] [Algebra K L] {W W₂ : Type} [AddCommGroup W] [Module K W]
-  [AddCommGroup W₂] [Module K W₂]
+variable
+  {K L : Type} [Field K] [Field L] [Algebra K L]
+  {W W₂ : Type} [AddCommGroup W] [Module K W] [AddCommGroup W₂] [Module K W₂]
 
-theorem coord_baseChange {ι : Type} [DecidableEq ι] (b : Module.Basis ι K L) (f : W →ₗ[K] W₂) (x : L ⊗[K] W) :
-    equivFinsuppOfBasisLeft b (f.baseChange L x)
+theorem coord_baseChange
+    {ι : Type} [DecidableEq ι] (b : Module.Basis ι K L) (f : W →ₗ[K] W₂) (x : L ⊗[K] W)
+    : equivFinsuppOfBasisLeft b (f.baseChange L x)
       = Finsupp.mapRange f f.map_zero (equivFinsuppOfBasisLeft b x) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
@@ -41,14 +43,14 @@ theorem invBaseChange : InvBaseChange := by
   have hinj : Function.Injective (V.subtype.baseChange LL') := by
     intro z₁ z₂ h
     have h' := congrArg (equivFinsuppOfBasisLeft b) h
-    rw [coord_baseChange b V.subtype z₁,
-      coord_baseChange b V.subtype z₂] at h'
+    rw [coord_baseChange b V.subtype z₁, coord_baseChange b V.subtype z₂] at h'
     apply (equivFinsuppOfBasisLeft b).injective
     ext i
     have := congrArg (fun c => c i) h'
     simpa using this
-  have hrange : (⨅ g, LinearMap.ker ((T g).baseChange LL' - LinearMap.id) :
-      Submodule LL' (LL' ⊗[LL] W)) = LinearMap.range (V.subtype.baseChange LL') := by
+  have hrange
+      : (⨅ g, LinearMap.ker ((T g).baseChange LL' - LinearMap.id) : Submodule LL' (LL' ⊗[LL] W))
+        = LinearMap.range (V.subtype.baseChange LL') := by
     apply le_antisymm
     · intro x hx
       have hfix : ∀ g, (T g).baseChange LL' x = x := by

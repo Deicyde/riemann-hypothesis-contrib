@@ -6,15 +6,23 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 open UpperTheory.Gal.crystallineComparison.Mod (Std TjD KerAt)
 open scoped TensorProduct
 open UpperTheory.Gal.FiniteEtaleModels
 
-theorem UpperTheory.Gal.FiniteEtaleModels.tjExG_of :
-    UpperTheory.Gal.crystallineComparison.Mod.EsNorm → UpperTheory.Gal.crystallineComparison.Mod.EsGen → UpperTheory.Gal.crystallineComparison.Mod.ObjTri → UpperTheory.Gal.crystallineComparison.Mod.PullIsog → UpperTheory.Gal.crystallineComparison.Mod.PullKer → TjExG := by
+theorem UpperTheory.Gal.FiniteEtaleModels.tjExG_of
+    : UpperTheory.Gal.crystallineComparison.Mod.EsNorm
+      → UpperTheory.Gal.crystallineComparison.Mod.EsGen
+      → UpperTheory.Gal.crystallineComparison.Mod.ObjTri
+      → UpperTheory.Gal.crystallineComparison.Mod.PullIsog
+      → UpperTheory.Gal.crystallineComparison.Mod.PullKer
+      → TjExG := by
   intro hN hG hT hPI hPK p _ D R _ _ _ _ b N h3 hcp hpm hm1 r w j e hw hle hj he M
   obtain ⟨Y, s, t, o, o', ms, mt, ψ, hst, hfs, -, -, -, hiso, htj, hu⟩ :=
     hN p D R b N h3 hcp hpm r w j (p ^ e) hw hle hj ⟨e, rfl, he⟩ hm1 M
@@ -31,12 +39,13 @@ theorem UpperTheory.Gal.FiniteEtaleModels.tjExG_of :
     have hpV : IsUnit ((p : ℕ) : Γ(V.toScheme, ⊤)) := by
       simpa only [map_natCast] using hpU.map (s ∣_ U).appTop.hom
     have hPB := isPullback_morphismRestrict s U
-    obtain ⟨oV, ⟨mV⟩⟩ := GlobalTheory.T.exists_harrisTaylorObject_pullback p D R b N
-      M.X V.toScheme M.s (V.ι ≫ s) M.univ
-    obtain ⟨mVo, -⟩ := (hT p D R b N h3 hcp _ Y M.X _ (s ≫ M.s) M.s oV o M.univ V.ι s).2
-      _ rfl mV ms
-    obtain ⟨oV', mV', ψV, isoV, sqV⟩ := hPI p D R b N Y V.toScheme (s ≫ M.s) _ V.ι
-      (Category.assoc _ _ _).symm (p ^ e) o o' ψ hiso oV mVo
+    obtain ⟨oV, ⟨mV⟩⟩ :=
+      GlobalTheory.T.exists_harrisTaylorObject_pullback p D R b N M.X V.toScheme M.s (V.ι ≫ s)
+        M.univ
+    obtain ⟨mVo, -⟩ := (hT p D R b N h3 hcp _ Y M.X _ (s ≫ M.s) M.s oV o M.univ V.ι s).2 _ rfl mV ms
+    obtain ⟨oV', mV', ψV, isoV, sqV⟩ :=
+      hPI p D R b N Y V.toScheme (s ≫ M.s) _ V.ι (Category.assoc _ _ _).symm (p ^ e) o o' ψ hiso oV
+        mVo
     have tjV := (hPK p D R b N Y _ (s ≫ M.s) _ V.ι o o' oV oV' mVo mV' ψ ψV sqV).2 r w j htj
     obtain ⟨y₀, ⟨hy₀, m₀y, m₁y, hsq₀⟩, -⟩ := hu Y₀ s₀ o₀ o₀' ms₀ ψ₀ hp₀ hiso0 htj0
     obtain ⟨v, ⟨hv, m₀v, m₁v, hsqv⟩, -⟩ := hu0 _ (V.ι ≫ s) oV oV' mV ψV hpV isoV tjV
@@ -63,26 +72,29 @@ theorem UpperTheory.Gal.FiniteEtaleModels.tjExG_of :
       · refine ⟨by rw [Category.assoc, hv, ← Category.assoc, hu₂, hy₀], ?_⟩
         have hc : (u ≫ v) ≫ y₀ = y₀ := by rw [Category.assoc, hvy, hu₂]
         obtain ⟨a, ha⟩ := (hT p D R b N h3 hcp Y₀ Y₀ Y _ _ _ o₀ o₀ o (u ≫ v) y₀).2 y₀ hc m₀y m₀y
-        obtain ⟨a', ha'⟩ := (hT p D R b N h3 hcp Y₀ Y₀ Y _ _ _ o₀' o₀' o' (u ≫ v) y₀).2
-          y₀ hc m₁y m₁y
+        obtain ⟨a', ha'⟩ :=
+          (hT p D R b N h3 hcp Y₀ Y₀ Y _ _ _ o₀' o₀' o' (u ≫ v) y₀).2 y₀ hc m₁y m₁y
         refine ⟨a, a', ?_⟩
         apply m₁y.cart.1.hom_ext
         · rw [Category.assoc a.φ, ← hsq₀, ← Category.assoc a.φ, ha, hsq₀,
             Category.assoc (Over.Hom.left ψ₀) a'.φ, ha']
         · have e1 := a.cart.1.w
           have e2 := a'.cart.1.w
-          calc (a.φ ≫ Over.Hom.left ψ₀) ≫ o₀'.A.hom = a.φ ≫ o₀.A.hom := by rw [Category.assoc a.φ, Over.w]
+          calc
+            (a.φ ≫ Over.Hom.left ψ₀) ≫ o₀'.A.hom
+              = a.φ ≫ o₀.A.hom := by rw [Category.assoc a.φ, Over.w]
             _ = o₀.A.hom ≫ (u ≫ v) := e1
             _ = (Over.Hom.left ψ₀ ≫ o₀'.A.hom) ≫ (u ≫ v) := by rw [Over.w]
             _ = (Over.Hom.left ψ₀ ≫ a'.φ) ≫ o₀'.A.hom := by
               rw [Category.assoc (Over.Hom.left ψ₀) o₀'.A.hom, ← e2,
                 Category.assoc (Over.Hom.left ψ₀) a'.φ]
       · refine ⟨Category.id_comp _, ?_⟩
-        have existsId {S S₃ : Scheme.{0}} {s : S ⟶ Sp R} {s₃ : S₃ ⟶ Sp R}
-            {o : Obj b N s} {o₃ : Obj b N s₃} {g : S ⟶ S₃} (m : ObjMap o o₃ g) :
-            ∃ i : ObjMap o o (𝟙 S), i.φ = 𝟙 _ := by
-          obtain ⟨i, hi⟩ := (hT p D R b N h3 hcp _ _ _ _ _ _ o o o₃ (𝟙 S) g).2 g
-            (Category.id_comp g) m m
+        have existsId
+            {S S₃ : Scheme.{0}} {s : S ⟶ Sp R} {s₃ : S₃ ⟶ Sp R} {o : Obj b N s} {o₃ : Obj b N s₃}
+            {g : S ⟶ S₃} (m : ObjMap o o₃ g)
+            : ∃ i : ObjMap o o (𝟙 S), i.φ = 𝟙 _ := by
+          obtain ⟨i, hi⟩ :=
+            (hT p D R b N h3 hcp _ _ _ _ _ _ o o o₃ (𝟙 S) g).2 g (Category.id_comp g) m m
           refine ⟨i, m.cart.1.hom_ext ?_ ?_⟩
           · rw [hi, Category.id_comp]
           · rw [i.cart.1.w, Category.comp_id, Category.id_comp]

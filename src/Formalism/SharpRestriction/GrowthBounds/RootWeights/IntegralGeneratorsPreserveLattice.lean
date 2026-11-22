@@ -13,21 +13,30 @@ namespace Formalism.MainNotions.G.GLWeightTheory
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
-structure MonomialGradedLattice (p : ℕ) {K : Type} [Field K] {σ : Type} (Q : MvPolynomial σ K → Prop) : Prop where
+structure MonomialGradedLattice
+    (p : ℕ) {K : Type} [Field K] {σ : Type} (Q : MvPolynomial σ K → Prop)
+    : Prop where
   zero : Q 0
   add : ∀ F G, Q F → Q G → Q (F + G)
-  lin : ∀ u : MvPolynomial σ K →ₗ[K] MvPolynomial σ K,
-    (∀ m c, Q (monomial m c) → Q (u (monomial m c))) → ∀ F, Q F → Q (u F)
-  step : ∀ (m m' : σ →₀ ℕ) (c : K) (z : ℤ), Q (monomial m c) →
-    (z = 0 ∨ padicValNat p (expFact m) ≤ 2 * padicValInt p z + padicValNat p (expFact m')) →
-    Q (monomial m' (c * (z : K)))
+  lin
+    : ∀ u : MvPolynomial σ K →ₗ[K] MvPolynomial σ K,
+      (∀ m c, Q (monomial m c) → Q (u (monomial m c))) → ∀ F, Q F → Q (u F)
+  step
+    : ∀ (m m' : σ →₀ ℕ) (c : K) (z : ℤ),
+      Q (monomial m c)
+        → (z = 0 ∨ padicValNat p (expFact m) ≤ 2 * padicValInt p z + padicValNat p (expFact m'))
+        → Q (monomial m' (c * (z : K)))
 
 section
 
 variable {K : Type} [Field K] [CharZero K] {σ : Type}
 
-theorem divided_powers_preserve_polarization (p : ℕ) [Fact p.Prime] (Q : MvPolynomial σ K → Prop) (hQ : MonomialGradedLattice p Q) (ε : ℤ)
-    (hε : ε.natAbs = 1) (v w : σ) (hvw : v ≠ w) : DividedPowersPreserve Q ((ε : K) • polarizationOperator K v w) := by
+theorem divided_powers_preserve_polarization
+    (p : ℕ) [Fact p.Prime]
+    (Q : MvPolynomial σ K → Prop) (hQ : MonomialGradedLattice p Q)
+    (ε : ℤ) (hε : ε.natAbs = 1)
+    (v w : σ) (hvw : v ≠ w)
+    : DividedPowersPreserve Q ((ε : K) • polarizationOperator K v w) := by
   classical
   intro k x hx
   show Q (((k.factorial : K)⁻¹ • ((ε : K) • polarizationOperator K v w) ^ k) x)
@@ -35,14 +44,14 @@ theorem divided_powers_preserve_polarization (p : ℕ) [Fact p.Prime] (Q : MvPol
   intro m c hmc
 
   set mj : ℕ → (σ →₀ ℕ) := fun j => (m.update w (m w - j)).update v (m v + j) with hmj
-  have hmjw : ∀ j, mj j w = m w - j := fun j => by
-    simp [hmj, Finsupp.update_apply, Ne.symm hvw]
-  have hmjv : ∀ j, mj j v = m v + j := fun j => by
-    simp [hmj, Finsupp.update_apply]
+  have hmjw : ∀ j, mj j w = m w - j := fun j => by simp [hmj, Finsupp.update_apply, Ne.symm hvw]
+  have hmjv : ∀ j, mj j v = m v + j := fun j => by simp [hmj, Finsupp.update_apply]
   have hmjo : ∀ j i, i ≠ v → i ≠ w → mj j i = m i := fun j i hiv hiw => by
     simp [hmj, Finsupp.update_apply, hiv, hiw]
-  have hT : ∀ j, (polarizationOperator K v w ^ j) (monomial m c) =
-      monomial (mj j) (c * ((m w).descFactorial j : K)) := by
+  have hT
+      : ∀ j,
+        (polarizationOperator K v w ^ j) (monomial m c)
+          = monomial (mj j) (c * ((m w).descFactorial j : K)) := by
     intro j
     induction j with
     | zero =>
@@ -82,8 +91,9 @@ theorem divided_powers_preserve_polarization (p : ℕ) [Fact p.Prime] (Q : MvPol
         rw [h1, h2]
         simp
   have hk : (k.factorial : K) ≠ 0 := by exact_mod_cast Nat.factorial_ne_zero k
-  have hval : ((k.factorial : K)⁻¹ • ((ε : K) • polarizationOperator K v w) ^ k) (monomial m c) =
-      monomial (mj k) (c * (((ε ^ k * ((m w).choose k : ℤ) : ℤ)) : K)) := by
+  have hval
+      : ((k.factorial : K)⁻¹ • ((ε : K) • polarizationOperator K v w) ^ k) (monomial m c)
+        = monomial (mj k) (c * (((ε ^ k * ((m w).choose k : ℤ) : ℤ)) : K)) := by
     rw [smul_pow, LinearMap.smul_apply, LinearMap.smul_apply, hT k, MvPolynomial.smul_monomial,
       MvPolynomial.smul_monomial, Nat.descFactorial_eq_factorial_mul_choose]
     congr 1
@@ -113,13 +123,16 @@ theorem divided_powers_preserve_polarization (p : ℕ) [Fact p.Prime] (Q : MvPol
           simp [hs]
         · rw [hmjo k i hiv hiw] at hi
           exact Finset.mem_union_left _ (Finsupp.mem_support_iff.mpr hi)
-    have hE : expFact m = (m v).factorial * ((m w).factorial *
-        ∏ i ∈ (s.erase v).erase w, (m i).factorial) := by
+    have hE
+        : expFact m
+          = (m v).factorial * ((m w).factorial * ∏ i ∈ (s.erase v).erase w, (m i).factorial) := by
       unfold expFact
       rw [Finsupp.prod_of_support_subset m hsub1 (fun _ k => k.factorial) (fun _ _ => rfl),
         ← Finset.mul_prod_erase s _ hvs, ← Finset.mul_prod_erase (s.erase v) _ hws]
-    have hE' : expFact (mj k) = (m v + k).factorial * ((m w - k).factorial *
-        ∏ i ∈ (s.erase v).erase w, (m i).factorial) := by
+    have hE'
+        : expFact (mj k)
+          = (m v + k).factorial
+            * ((m w - k).factorial * ∏ i ∈ (s.erase v).erase w, (m i).factorial) := by
       unfold expFact
       rw [Finsupp.prod_of_support_subset (mj k) hsub2 (fun _ k => k.factorial) (fun _ _ => rfl),
         ← Finset.mul_prod_erase s _ hvs, ← Finset.mul_prod_erase (s.erase v) _ hws, hmjv, hmjw]
@@ -143,35 +156,44 @@ theorem divided_powers_preserve_polarization (p : ℕ) [Fact p.Prime] (Q : MvPol
     have hC1 : (m v + k).choose k ≠ 0 := (Nat.choose_pos (by omega)).ne'
     have hC2 : (m w).choose k ≠ 0 := (Nat.choose_pos hkw).ne'
     have hv := congrArg (padicValNat p) hid
-    rw [(show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) hEpos hC1, (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) hE'pos hC2] at hv
+    rw [(show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+              a ≠ 0 → b ≠ 0
+                → _root_.padicValNat p (a * b)
+                  = _root_.padicValNat p a + _root_.padicValNat p b from by
+            simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+          hEpos hC1,
+        (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+              a ≠ 0 → b ≠ 0
+                → _root_.padicValNat p (a * b)
+                  = _root_.padicValNat p a + _root_.padicValNat p b from by
+            simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+          hE'pos hC2]
+      at hv
     omega
   · left
     have : (m w).choose k = 0 := Nat.choose_eq_zero_of_lt (by omega)
     simp [this]
 
-theorem list_prod_eigen_shift {V : Type*} [AddCommGroup V] [Module K V] (E : Module.End K V) (x : V) (w : K)
-    (hx : E x = w • x) (k : ℕ) :
-    ((List.range k).map fun j : ℕ => E - (j : K) • (1 : Module.End K V)).prod x =
-      (∏ j ∈ Finset.range k, (w - (j : K))) • x := by
+theorem list_prod_eigen_shift
+    {V : Type*} [AddCommGroup V] [Module K V]
+    (E : Module.End K V) (x : V) (w : K) (hx : E x = w • x)
+    (k : ℕ)
+    : ((List.range k).map fun j : ℕ => E - (j : K) • (1 : Module.End K V)).prod x
+      = (∏ j ∈ Finset.range k, (w - (j : K))) • x := by
   induction k with
   | zero => simp
   | succ k ih =>
     rw [List.range_succ, List.map_append, List.prod_append, Finset.prod_range_succ]
     simp [hx, ih]
-    first
-      | done
-      | module
-      | (rw [mul_comm, mul_smul]; module)
+    first | done | module | (rw [mul_comm, mul_smul]; module)
 
-theorem prod_range_sub_eq_factorial_choose (w : ℤ) (k : ℕ) :
-    (∏ j ∈ Finset.range k, ((w : K) - (j : K))) = (k.factorial : K) * ((Ring.choose w k : ℤ) : K) := by
+theorem prod_range_sub_eq_factorial_choose (w : ℤ) (k : ℕ)
+    : (∏ j ∈ Finset.range k, ((w : K) - (j : K)))
+      = (k.factorial : K) * ((Ring.choose w k : ℤ) : K) := by
   have h1 : (∏ j ∈ Finset.range k, (w - (j : ℤ))) = (k.factorial : ℤ) * Ring.choose w k := by
     rw [← descPochhammer_eval_eq_prod_range, Polynomial.eval_eq_smeval,
       Ring.descPochhammer_eq_factorial_smul_choose]
-    first
-      | rw [nsmul_eq_mul]
-      | rw [smul_eq_mul]
-      | simp
+    first | rw [nsmul_eq_mul] | rw [smul_eq_mul] | simp
   have h2 := congrArg (Int.cast (R := K)) h1
   push_cast at h2
   exact h2
@@ -182,19 +204,30 @@ section
 
 variable {K : Type} [Field K] [CharZero K] {ι : Type} [Fintype ι] {n : ℕ}
 
-
 open Classical in
-def letterPolarization (K : Type) [Field K] {ι : Type} {n : ℕ} (LL : Letters ι) (S : Set ι) (a b : Fin n) (l : ι) :
-    Module.End K (MvPolynomial (ι × Fin n) K) :=
-  if l ∈ S then (if LL.vec l then polarizationOperator K (l, a) (l, b) else -(polarizationOperator K (l, b) (l, a))) else 0
+def letterPolarization
+    (K : Type) [Field K] {ι : Type} {n : ℕ} (LL : Letters ι) (S : Set ι) (a b : Fin n) (l : ι)
+    : Module.End K (MvPolynomial (ι × Fin n) K) :=
+  if l ∈ S then
+    (if LL.vec l then
+       polarizationOperator K (l, a) (l, b)
+     else
+       -(polarizationOperator K (l, b) (l, a)))
+  else
+    0
 
-theorem gl_operator_eq_sum_letters (LL : Letters ι) (S : Set ι) (a b : Fin n) :
-    glOps K n LL S a b = ∑ l : ι, letterPolarization K LL S a b l := rfl
+theorem gl_operator_eq_sum_letters (LL : Letters ι) (S : Set ι) (a b : Fin n)
+    : glOps K n LL S a b = ∑ l : ι, letterPolarization K LL S a b l :=
+  rfl
 
-theorem letter_polarization_commute (LL : Letters ι) (S : Set ι) (a b : Fin n) (l l' : ι) (h : l ≠ l') :
-    Commute (letterPolarization K LL S a b l) (letterPolarization K LL S a b l') := by
-  have hne : ∀ x y : Fin n, ((l, x) : ι × Fin n) ≠ (l', y) := fun x y hxy => h (congrArg Prod.fst hxy)
-  have hc : ∀ x y x' y' : Fin n, Commute (polarizationOperator K (l, x) (l, y)) (polarizationOperator K (l', x') (l', y')) :=
+theorem letter_polarization_commute
+    (LL : Letters ι) (S : Set ι) (a b : Fin n) (l l' : ι) (h : l ≠ l')
+    : Commute (letterPolarization K LL S a b l) (letterPolarization K LL S a b l') := by
+  have hne : ∀ x y : Fin n, ((l, x) : ι × Fin n) ≠ (l', y) := fun x y hxy =>
+    h (congrArg Prod.fst hxy)
+  have hc
+      : ∀ x y x' y' : Fin n,
+        Commute (polarizationOperator K (l, x) (l, y)) (polarizationOperator K (l', x') (l', y')) :=
     fun x y x' y' => polarization_commute _ _ _ _ (hne _ _) (hne _ _) (hne _ _).symm
   unfold letterPolarization
   by_cases h1 : l ∈ S
@@ -214,13 +247,19 @@ theorem letter_polarization_commute (LL : Letters ι) (S : Set ι) (a b : Fin n)
   · rw [if_neg h1]
     exact Commute.zero_left _
 
-theorem divided_powers_preserve_letter (p : ℕ) [Fact p.Prime] (Q : MvPolynomial (ι × Fin n) K → Prop) (hQ : MonomialGradedLattice p Q)
-    (LL : Letters ι) (S : Set ι) (a b : Fin n) (hab : a ≠ b) (l : ι) : DividedPowersPreserve Q (letterPolarization K LL S a b l) := by
+theorem divided_powers_preserve_letter
+    (p : ℕ) [Fact p.Prime]
+    (Q : MvPolynomial (ι × Fin n) K → Prop) (hQ : MonomialGradedLattice p Q)
+    (LL : Letters ι) (S : Set ι)
+    (a b : Fin n) (hab : a ≠ b)
+    (l : ι)
+    : DividedPowersPreserve Q (letterPolarization K LL S a b l) := by
   unfold letterPolarization
   split_ifs with h1 h2
   · have := divided_powers_preserve_polarization p Q hQ 1 rfl (l, a) (l, b) (by simp [hab])
     simpa using this
-  · have := divided_powers_preserve_polarization p Q hQ (-1) rfl (l, b) (l, a) (by simp [Ne.symm hab])
+  · have :=
+      divided_powers_preserve_polarization p Q hQ (-1) rfl (l, b) (l, a) (by simp [Ne.symm hab])
     simpa using this
   · unfold DividedPowersPreserve
     intro k x hx
@@ -228,11 +267,16 @@ theorem divided_powers_preserve_letter (p : ℕ) [Fact p.Prime] (Q : MvPolynomia
     · simpa using hx
     · simpa using hQ.zero
 
-theorem divided_powers_preserve_gl_operator (p : ℕ) [Fact p.Prime] (Q : MvPolynomial (ι × Fin n) K → Prop) (hQ : MonomialGradedLattice p Q)
-    (LL : Letters ι) (S : Set ι) (a b : Fin n) (hab : a ≠ b) : DividedPowersPreserve Q (glOps K n LL S a b) := by
+theorem divided_powers_preserve_gl_operator
+    (p : ℕ) [Fact p.Prime]
+    (Q : MvPolynomial (ι × Fin n) K → Prop) (hQ : MonomialGradedLattice p Q)
+    (LL : Letters ι) (S : Set ι)
+    (a b : Fin n) (hab : a ≠ b)
+    : DividedPowersPreserve Q (glOps K n LL S a b) := by
   classical
   rw [gl_operator_eq_sum_letters]
-  have key : ∀ s : Finset ι, DividedPowersPreserve Q (∑ l ∈ s, letterPolarization K LL S a b l) := by
+  have key
+      : ∀ s : Finset ι, DividedPowersPreserve Q (∑ l ∈ s, letterPolarization K LL S a b l) := by
     intro s
     refine Finset.induction_on s ?_ ?_
     · rw [Finset.sum_empty]
@@ -243,13 +287,19 @@ theorem divided_powers_preserve_gl_operator (p : ℕ) [Fact p.Prime] (Q : MvPoly
       · simpa using hQ.zero
     · intro l s hl ih
       rw [Finset.sum_insert hl]
-      refine divided_powers_preserve_add Q hQ.zero hQ.add _ _ ?_ (divided_powers_preserve_letter p Q hQ LL S a b hab l) ih
-      exact Commute.sum_right _ _ _ fun l' hl' => letter_polarization_commute LL S a b l l' (by rintro rfl; exact hl hl')
+      refine divided_powers_preserve_add Q hQ.zero hQ.add _ _ ?_
+        (divided_powers_preserve_letter p Q hQ LL S a b hab l) ih
+      exact Commute.sum_right _ _ _ fun l' hl' =>
+        letter_polarization_commute LL S a b l l' (by rintro rfl; exact hl hl')
   exact key Finset.univ
 
-theorem integral_generators_preserve_lattice (p : ℕ) [Fact p.Prime] (Q : MvPolynomial (ι × Fin n) K → Prop) (hQ : MonomialGradedLattice p Q)
+theorem integral_generators_preserve_lattice
+    (p : ℕ) [Fact p.Prime]
+    (Q : MvPolynomial (ι × Fin n) K → Prop) (hQ : MonomialGradedLattice p Q)
     (LL : Letters ι) (S : Set ι) (u : Module.End K (MvPolynomial (ι × Fin n) K))
-    (hu : u ∈ UZgens (glOps K n LL S)) (F : MvPolynomial (ι × Fin n) K) (hF : Q F) : Q (u F) := by
+    (hu : u ∈ UZgens (glOps K n LL S))
+    (F : MvPolynomial (ι × Fin n) K) (hF : Q F)
+    : Q (u F) := by
   classical
   rcases hu with ⟨a, b, k, hab, rfl⟩ | ⟨a, k, rfl⟩
   · exact divided_powers_preserve_gl_operator p Q hQ LL S a b hab k F hF
@@ -275,7 +325,9 @@ theorem integral_generators_preserve_lattice (p : ℕ) [Fact p.Prime] (Q : MvPol
     have hprod := list_prod_eigen_shift (glOps K n LL S a a) (monomial m c) (w : K) heig k
     rw [prod_range_sub_eq_factorial_choose w k] at hprod
     have hk : (k.factorial : K) ≠ 0 := by exact_mod_cast Nat.factorial_ne_zero k
-    have key : binomE (glOps K n LL S) a k (monomial m c) = monomial m (c * ((Ring.choose w k : ℤ) : K)) := by
+    have key
+        : binomE (glOps K n LL S) a k (monomial m c)
+          = monomial m (c * ((Ring.choose w k : ℤ) : K)) := by
       unfold binomE
       rw [LinearMap.smul_apply, hprod, smul_smul, ← mul_assoc, inv_mul_cancel₀ hk, one_mul,
         MvPolynomial.smul_monomial]
@@ -286,16 +338,19 @@ theorem integral_generators_preserve_lattice (p : ℕ) [Fact p.Prime] (Q : MvPol
 
 end
 
-theorem char_zero_stability_of_closure {p : ℕ} (hp : p.Prime) {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    (hchar : CharZero (KK O)) (h : FockLatticeClosure p O) : IntegralFormGeneratorsPreserveLattices p O := by
+theorem char_zero_stability_of_closure
+    {p : ℕ} (hp : p.Prime)
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (hchar : CharZero (KK O)) (h : FockLatticeClosure p O)
+    : IntegralFormGeneratorsPreserveLattices p O := by
   classical
   haveI := hchar
   haveI : Fact p.Prime := ⟨hp⟩
   intro n ι _ LL S u hu
   obtain ⟨h0, hadd, _, _, _, hlin, hstep, hint, hmono, hiff⟩ := h (ι × Fin n)
   refine ⟨fun F hF => ?_, fun F hF => ?_⟩
-  ·
-    have hQ : MonomialGradedLattice p (fun F : MvPolynomial (ι × Fin n) (KK O) => F ∈ IntPol O (ι × Fin n)) := by
+  · have hQ : MonomialGradedLattice p
+        (fun F : MvPolynomial (ι × Fin n) (KK O) => F ∈ IntPol O (ι × Fin n)) := by
       refine ⟨?_, ?_, ?_, ?_⟩
       · rw [hiff]
         intro m
@@ -321,7 +376,8 @@ theorem char_zero_stability_of_closure {p : ℕ} (hp : p.Prime) {O : Type} [Comm
         · exact ⟨o * z, by rw [ho, map_mul, map_intCast]⟩
         · exact ⟨0, by simp⟩
     exact integral_generators_preserve_lattice p _ hQ LL S u hu F hF
-  · have hQ : MonomialGradedLattice p (fun F : MvPolynomial (ι × Fin n) (KK O) => InBB (O := O) p F) :=
+  · have hQ
+        : MonomialGradedLattice p (fun F : MvPolynomial (ι × Fin n) (KK O) => InBB (O := O) p F) :=
       ⟨h0, hadd, hlin, hstep⟩
     exact integral_generators_preserve_lattice p _ hQ LL S u hu F hF
 

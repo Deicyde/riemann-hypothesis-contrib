@@ -10,10 +10,13 @@ noncomputable section
 
 namespace GlobalTheory.StableLatCount
 
-theorem exists_smul_mem_of_span_eq_top (O : Type) [CommRing O] [IsDomain O] (E : Type) [Field E] [Algebra O E]
-    [IsFractionRing O E] {A : Type} [AddCommGroup A] [Module E A] [Module O A] [IsScalarTower O E A]
-    (M : Submodule O A) (hM : Submodule.span E (M : Set A) = ⊤) (a : A) :
-    ∃ d ∈ nonZeroDivisors O, d • a ∈ M := by
+theorem exists_smul_mem_of_span_eq_top
+    (O : Type) [CommRing O] [IsDomain O]
+    (E : Type) [Field E] [Algebra O E] [IsFractionRing O E]
+    {A : Type} [AddCommGroup A] [Module E A] [Module O A] [IsScalarTower O E A]
+    (M : Submodule O A) (hM : Submodule.span E (M : Set A) = ⊤)
+    (a : A)
+    : ∃ d ∈ nonZeroDivisors O, d • a ∈ M := by
   have ha : a ∈ Submodule.span E (M : Set A) := hM ▸ Submodule.mem_top
   induction ha using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_mem _, by simpa using hx⟩
@@ -33,10 +36,13 @@ theorem exists_smul_mem_of_span_eq_top (O : Type) [CommRing O] [IsDomain O] (E :
     rw [mul_comm, mul_smul, h1, smul_comm d o x]
     exact M.smul_mem o h
 
-theorem exists_smul_mem_finset_of_span_eq_top (O : Type) [CommRing O] [IsDomain O] (E : Type) [Field E]
-    [Algebra O E] [IsFractionRing O E] {A : Type} [AddCommGroup A] [Module E A] [Module O A]
-    [IsScalarTower O E A] (M : Submodule O A) (hM : Submodule.span E (M : Set A) = ⊤) (t : Finset A) :
-    ∃ d ∈ nonZeroDivisors O, ∀ a ∈ t, d • a ∈ M := by
+theorem exists_smul_mem_finset_of_span_eq_top
+    (O : Type) [CommRing O] [IsDomain O]
+    (E : Type) [Field E] [Algebra O E] [IsFractionRing O E]
+    {A : Type} [AddCommGroup A] [Module E A] [Module O A] [IsScalarTower O E A]
+    (M : Submodule O A) (hM : Submodule.span E (M : Set A) = ⊤)
+    (t : Finset A)
+    : ∃ d ∈ nonZeroDivisors O, ∀ a ∈ t, d • a ∈ M := by
   classical
   refine Finset.induction_on t ⟨1, one_mem _, by simp⟩ ?_
   intro a t _ ih
@@ -48,12 +54,15 @@ theorem exists_smul_mem_finset_of_span_eq_top (O : Type) [CommRing O] [IsDomain 
   · rw [mul_smul]; exact M.smul_mem _ h₂
   · rw [mul_comm, mul_smul]; exact M.smul_mem _ (h₁ b hb)
 
-theorem homLat_fg_and_span_eq_top (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (E : Type)
-    [Field E] [Algebra O E] [IsFractionRing O E] (A₁ A₂ : Type) [CommRing A₁] [CommRing A₂] [Algebra E A₁]
-    [Algebra E A₂] [Algebra O A₁] [Algebra O A₂] [IsScalarTower O E A₁] [IsScalarTower O E A₂]
-    [Module.Finite E A₁] [Module.Finite E A₂] (M₁ : Submodule O A₁) (M₂ : Submodule O A₂) :
-    IsLat O E M₁ → IsLat O E M₂ →
-      (homLat E M₁ M₂).FG ∧ Submodule.span E (homLat E M₁ M₂ : Set (A₂ →ₗ[E] A₁)) = ⊤ := by
+theorem homLat_fg_and_span_eq_top
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (E : Type) [Field E] [Algebra O E] [IsFractionRing O E]
+    (A₁ A₂ : Type)
+    [CommRing A₁] [CommRing A₂] [Algebra E A₁] [Algebra E A₂] [Algebra O A₁] [Algebra O A₂]
+    [IsScalarTower O E A₁] [IsScalarTower O E A₂] [Module.Finite E A₁] [Module.Finite E A₂]
+    (M₁ : Submodule O A₁) (M₂ : Submodule O A₂)
+    : IsLat O E M₁ → IsLat O E M₂
+      → (homLat E M₁ M₂).FG ∧ Submodule.span E (homLat E M₁ M₂ : Set (A₂ →ₗ[E] A₁)) = ⊤ := by
   classical
   intro h₁ h₂
   obtain ⟨h₁fg, h₁sp⟩ := h₁
@@ -65,10 +74,11 @@ theorem homLat_fg_and_span_eq_top (O : Type) [CommRing O] [IsDomain O] [IsDiscre
   have memH : ∀ ψ ∈ homLat E M₁ M₂, ∀ x ∈ M₂, ψ x ∈ M₁ := fun ψ hψ => hψ
   refine ⟨?_, ?_⟩
   · haveI : Module.Finite O M₁ := Module.Finite.iff_fg.mpr h₁fg
-    let f : homLat E M₁ M₂ →ₗ[O] (s → M₁) :=
-      { toFun := fun ψ x => ⟨ψ.1 x, memH ψ.1 ψ.2 x (hs ▸ Submodule.subset_span x.2)⟩
-        map_add' := fun _ _ => rfl
-        map_smul' := fun _ _ => rfl }
+    let f : homLat E M₁ M₂ →ₗ[O] (s → M₁) := {
+      toFun := fun ψ x => ⟨ψ.1 x, memH ψ.1 ψ.2 x (hs ▸ Submodule.subset_span x.2)⟩
+      map_add' := fun _ _ => rfl
+      map_smul' := fun _ _ => rfl
+    }
     have hf : Function.Injective f := by
       intro ψ φ h
       apply Subtype.ext

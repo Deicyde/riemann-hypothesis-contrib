@@ -11,7 +11,9 @@ noncomputable section
 namespace GlobalTheory.CompanionTheory.RgEisFix
 
 open scoped TensorProduct
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM
+  GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.ThK.Dbl
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
@@ -33,8 +35,8 @@ theorem exists_moved (σ : E →ₐ[F] E) (h : IsCMExt F E σ) : ∃ y, σ y ≠
   exact (InfinitePlace.not_isReal_iff_isComplex.2 (hC.isComplex (InfinitePlace.mk τ)))
     (InfinitePlace.isReal_mk_iff.2 hR)
 
-theorem add_conj_mem (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (e : E) :
-    ∃ c : F, e + σ e = algebraMap F E c := by
+theorem add_conj_mem (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (e : E)
+    : ∃ c : F, e + σ e = algebraMap F E c := by
   let S : Submodule F E := LinearMap.eqLocus σ.toLinearMap LinearMap.id
   have hS : S ≠ ⊤ := by
     obtain ⟨y, hy⟩ := exists_moved σ h
@@ -47,8 +49,7 @@ theorem add_conj_mem (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (e : E) :
   have hlt : Module.finrank F S < 2 := h.2.2.1 ▸ Submodule.finrank_lt hS
   have hone : Module.finrank F (Submodule.span F {(1 : E)}) = 1 :=
     finrank_span_singleton one_ne_zero
-  have heq : Submodule.span F {(1 : E)} = S :=
-    Submodule.eq_of_le_of_finrank_le h1 (by omega)
+  have heq : Submodule.span F {(1 : E)} = S := Submodule.eq_of_le_of_finrank_le h1 (by omega)
   have hmem : e + σ e ∈ S := by
     change σ (e + σ e) = e + σ e
     rw [map_add (f := _), conj_conj σ h, add_comm]
@@ -59,8 +60,8 @@ theorem add_conj_mem (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (e : E) :
 def halfTr (σ : E →ₐ[F] E) : E →ₗ[F] F :=
   (4⁻¹ : F) • (Algebra.trace F E ∘ₗ (LinearMap.id + σ.toLinearMap))
 
-theorem algebraMap_halfTr (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (e : E) :
-    algebraMap F E (halfTr σ e) = (2⁻¹ : F) • (e + σ e) := by
+theorem algebraMap_halfTr (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (e : E)
+    : algebraMap F E (halfTr σ e) = (2⁻¹ : F) • (e + σ e) := by
   obtain ⟨c, hc⟩ := add_conj_mem σ h e
   have hval : halfTr σ e = 2⁻¹ * c := by
     simp only [halfTr, LinearMap.smul_apply, LinearMap.comp_apply, LinearMap.add_apply,
@@ -78,8 +79,8 @@ theorem halfTr_one (σ : E →ₐ[F] E) (h : IsCMExt F E σ) : halfTr σ (1 : E)
   norm_num
 
 def rr (σ : E →ₐ[F] E) : AE F E →ₗ[AF F] AF F :=
-  (TensorProduct.AlgebraTensorModule.rid F (AF F) (AF F)).toLinearMap ∘ₗ
-    TensorProduct.AlgebraTensorModule.lTensor (AF F) (AF F) (halfTr σ)
+  (TensorProduct.AlgebraTensorModule.rid F (AF F) (AF F)).toLinearMap
+    ∘ₗ TensorProduct.AlgebraTensorModule.lTensor (AF F) (AF F) (halfTr σ)
 
 theorem rr_tmul (σ : E →ₐ[F] E) (a : AF F) (e : E) : rr σ (a ⊗ₜ[F] e) = halfTr σ e • a := by
   simp [rr]
@@ -89,11 +90,10 @@ theorem nu_apply (x : AF F) : nuCM F E x = x ⊗ₜ[F] (1 : E) := rfl
 theorem rr_nu (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (x : AF F) : rr σ (nuCM F E x) = x := by
   rw [nu_apply, rr_tmul, halfTr_one σ h, one_smul]
 
-theorem cA_nu (σ : E →ₐ[F] E) (x : AF F) : cA σ (nuCM F E x) = nuCM F E x := by
-  simp [nu_apply, cA]
+theorem cA_nu (σ : E →ₐ[F] E) (x : AF F) : cA σ (nuCM F E x) = nuCM F E x := by simp [nu_apply, cA]
 
-theorem nu_rr (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (z : AE F E) :
-    nuCM F E (rr σ z) = (2⁻¹ : F) • (z + cA σ z) := by
+theorem nu_rr (σ : E →ₐ[F] E) (h : IsCMExt F E σ) (z : AE F E)
+    : nuCM F E (rr σ z) = (2⁻¹ : F) • (z + cA σ z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | add x y hx hy =>
@@ -111,12 +111,21 @@ theorem continuous_nu : Continuous (nuCM F E) := by
     funext x
     rw [nu_apply, Algebra.TensorProduct.one_def, TensorProduct.smul_tmul', smul_eq_mul, mul_one]
   rw [h]
-  exact Continuous.smul (f := fun x : AF F => x) (g := fun _ => (1 : AE F E)) continuous_id continuous_const
+  exact Continuous.smul
+    (f := fun x : AF F => x)
+    (g := fun _ => (1 : AE F E))
+    continuous_id continuous_const
 
 theorem bFix : BFix := by
   intro F E _ _ _ _ _ σ χ c hCM _ _ _
-  refine ⟨continuous_nu, Function.LeftInverse.injective (rr_nu σ hCM), cA_nu σ, rr σ,
-    IsModuleTopology.continuous_of_linearMap (rr σ), fun x hx => ?_⟩
+  refine ⟨
+    continuous_nu,
+    Function.LeftInverse.injective (rr_nu σ hCM),
+    cA_nu σ,
+    rr σ,
+    IsModuleTopology.continuous_of_linearMap (rr σ),
+    fun x hx => ?_
+  ⟩
   have hx' : cA σ x = x := hx
   rw [nu_rr σ hCM, hx', ← two_smul F x, smul_smul, inv_mul_cancel₀ two_ne_zero, one_smul]
 

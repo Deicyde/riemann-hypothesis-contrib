@@ -9,30 +9,35 @@ open Matrix Polynomial
 namespace GlobalTheory
 
 open Matrix Polynomial in
-private theorem exists_eigenvector_of_isRoot_charpoly {L : Type} [Field L] {n : ℕ}
-    (y : Matrix (Fin n) (Fin n) L) (r : L) (h : y.charpoly.IsRoot r) :
-    ∃ v : Fin n → L, v ≠ 0 ∧ y *ᵥ v = r • v := by
+private theorem exists_eigenvector_of_isRoot_charpoly
+    {L : Type} [Field L] {n : ℕ} (y : Matrix (Fin n) (Fin n) L) (r : L) (h : y.charpoly.IsRoot r)
+    : ∃ v : Fin n → L, v ≠ 0 ∧ y *ᵥ v = r • v := by
   rw [← Matrix.mem_spectrum_iff_isRoot_charpoly, spectrum.mem_iff, Matrix.isUnit_iff_isUnit_det,
-    isUnit_iff_ne_zero, not_not, ← Matrix.exists_mulVec_eq_zero_iff] at h
+      isUnit_iff_ne_zero, not_not, ← Matrix.exists_mulVec_eq_zero_iff]
+    at h
   obtain ⟨v, hv0, hv⟩ := h
   refine ⟨v, hv0, ?_⟩
   rw [Matrix.sub_mulVec, Algebra.algebraMap_eq_smul_one, Matrix.smul_mulVec, Matrix.one_mulVec,
-    sub_eq_zero] at hv
+      sub_eq_zero]
+    at hv
   exact hv.symm
 
 open Matrix Polynomial in
-private theorem isUnit_of_eigenvector_columns_of_injective {L : Type} [Field L] {n : ℕ}
-    (y : Matrix (Fin n) (Fin n) L) (μ : Fin n → L) (hμ : Function.Injective μ)
-    (v : Fin n → Fin n → L) (hv0 : ∀ j, v j ≠ 0) (hv : ∀ j, y *ᵥ v j = μ j • v j) :
-    IsUnit (Matrix.of fun i j => v j i) := by
+private theorem isUnit_of_eigenvector_columns_of_injective
+    {L : Type} [Field L]
+    {n : ℕ} (y : Matrix (Fin n) (Fin n) L) (μ : Fin n → L) (hμ : Function.Injective μ)
+    (v : Fin n → Fin n → L) (hv0 : ∀ j, v j ≠ 0) (hv : ∀ j, y *ᵥ v j = μ j • v j)
+    : IsUnit (Matrix.of fun i j => v j i) := by
   rw [← Matrix.linearIndependent_cols_iff_isUnit]
   exact Module.End.eigenvectors_linearIndependent' (Matrix.toLin' y) μ hμ v
     (fun j => ⟨Module.End.mem_eigenspace_iff.mpr (by simpa using hv j), hv0 j⟩)
 
 open Matrix Polynomial in
-private theorem eq_diagonal_of_commute_diagonal_injective {L : Type} [Field L] {n : ℕ}
-    (μ : Fin n → L) (hμ : Function.Injective μ) (m : Matrix (Fin n) (Fin n) L)
-    (hm : m * diagonal μ = diagonal μ * m) : m = diagonal fun i => m i i := by
+private theorem eq_diagonal_of_commute_diagonal_injective
+    {L : Type} [Field L]
+    {n : ℕ} (μ : Fin n → L) (hμ : Function.Injective μ) (m : Matrix (Fin n) (Fin n) L)
+    (hm : m * diagonal μ = diagonal μ * m)
+    : m = diagonal fun i => m i i := by
   ext i j
   have hij := congrFun (congrFun hm i) j
   rw [Matrix.mul_diagonal, Matrix.diagonal_mul] at hij
@@ -45,9 +50,11 @@ private theorem eq_diagonal_of_commute_diagonal_injective {L : Type} [Field L] {
     exact (mul_eq_zero.mp this).resolve_right hne
 
 open Matrix Polynomial in
-private theorem commute_of_commute_of_charpoly_separable_of_isAlgClosed {L : Type} [Field L]
-    [IsAlgClosed L] {n : ℕ} (y a b : Matrix (Fin n) (Fin n) L) (hy : y.charpoly.Separable)
-    (ha : a * y = y * a) (hb : b * y = y * b) : a * b = b * a := by
+private theorem commute_of_commute_of_charpoly_separable_of_isAlgClosed
+    {L : Type} [Field L] [IsAlgClosed L]
+    {n : ℕ} (y a b : Matrix (Fin n) (Fin n) L) (hy : y.charpoly.Separable) (ha : a * y = y * a)
+    (hb : b * y = y * b)
+    : a * b = b * a := by
   classical
   set s := y.charpoly.roots.toFinset with hs_def
   have hs : s.card = n := by
@@ -76,10 +83,10 @@ private theorem commute_of_commute_of_charpoly_separable_of_isAlgClosed {L : Typ
     rw [Matrix.mul_diagonal]
     have := congrFun (hv j) i
     simpa [hP, Matrix.mul_apply, Matrix.mulVec, dotProduct, mul_comm] using this
-  have hD : Q * y * P = diagonal μ := by
-    rw [Matrix.mul_assoc, hyP, hQP']
-  have hcomm : ∀ m : Matrix (Fin n) (Fin n) L, m * y = y * m →
-      (Q * m * P) * diagonal μ = diagonal μ * (Q * m * P) := fun m hm => by
+  have hD : Q * y * P = diagonal μ := by rw [Matrix.mul_assoc, hyP, hQP']
+  have hcomm
+      : ∀ m : Matrix (Fin n) (Fin n) L,
+        m * y = y * m → (Q * m * P) * diagonal μ = diagonal μ * (Q * m * P) := fun m hm => by
     rw [← hD]
     simp only [Matrix.mul_assoc, hPQ']
     rw [← Matrix.mul_assoc m y P, hm, Matrix.mul_assoc]
@@ -90,25 +97,23 @@ private theorem commute_of_commute_of_charpoly_separable_of_isAlgClosed {L : Typ
     congr 1
     funext i
     exact mul_comm _ _
-  have key : ∀ c d : Matrix (Fin n) (Fin n) L, c * d = P * ((Q * c * P) * (Q * d * P)) * Q :=
-    fun c d => by
-      simp only [Matrix.mul_assoc, hPQ', hPQ, Matrix.mul_one]
+  have key
+      : ∀ c d : Matrix (Fin n) (Fin n) L,
+        c * d = P * ((Q * c * P) * (Q * d * P)) * Q := fun c d => by
+    simp only [Matrix.mul_assoc, hPQ', hPQ, Matrix.mul_one]
   rw [key a b, key b a, hAB]
 
-
 open Matrix Polynomial in
-theorem _root_.GlobalTheory.commute_of_commute_separable_charpoly :
-    ∀ (K : Type) [Field K] (n : ℕ) (y a b : Matrix (Fin n) (Fin n) K), y.charpoly.Separable →
-      a * y = y * a → b * y = y * b → a * b = b * a := by
+theorem _root_.GlobalTheory.commute_of_commute_separable_charpoly
+    : ∀ (K : Type) [Field K] (n : ℕ) (y a b : Matrix (Fin n) (Fin n) K),
+      y.charpoly.Separable → a * y = y * a → b * y = y * b → a * b = b * a := by
   intro K _ n y a b hy ha hb
   let f : K →+* AlgebraicClosure K := algebraMap K (AlgebraicClosure K)
   have hyL : (y.map f).charpoly.Separable := by
     rw [Matrix.charpoly_map]
     exact hy.map
-  have haL : a.map f * y.map f = y.map f * a.map f := by
-    rw [← Matrix.map_mul, ← Matrix.map_mul, ha]
-  have hbL : b.map f * y.map f = y.map f * b.map f := by
-    rw [← Matrix.map_mul, ← Matrix.map_mul, hb]
+  have haL : a.map f * y.map f = y.map f * a.map f := by rw [← Matrix.map_mul, ← Matrix.map_mul, ha]
+  have hbL : b.map f * y.map f = y.map f * b.map f := by rw [← Matrix.map_mul, ← Matrix.map_mul, hb]
   have h := commute_of_commute_of_charpoly_separable_of_isAlgClosed _ _ _ hyL haL hbL
   rw [← Matrix.map_mul, ← Matrix.map_mul] at h
   exact Matrix.map_injective f.injective h

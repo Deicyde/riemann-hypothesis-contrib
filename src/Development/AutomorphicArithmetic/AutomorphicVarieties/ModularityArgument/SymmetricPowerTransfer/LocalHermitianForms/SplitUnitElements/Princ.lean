@@ -7,10 +7,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra Matrix UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-theorem UpperTheory.V.Z.Sym.Loc.One.princ :
-    ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] (Δ τ : K), IsLoc O Δ →
-        (∃ u : Oˣ, algebraMap O K u = τ ^ 2 - 4) → ∀ S : Set (Etau K τ), IsLat O τ S → (∀ x ∈ S, ω * x ∈ S) →
-        ∃ u : (Etau K τ)ˣ, ∀ x, x ∈ S ↔ IsIntegral O (((u⁻¹ : (Etau K τ)ˣ) : Etau K τ) * x) := by
+theorem UpperTheory.V.Z.Sym.Loc.One.princ
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+        (Δ τ : K),
+      IsLoc O Δ → (∃ u : Oˣ, algebraMap O K u = τ ^ 2 - 4)
+        → ∀ S : Set (Etau K τ),
+          IsLat O τ S → (∀ x ∈ S, ω * x ∈ S)
+            → ∃ u : (Etau K τ)ˣ, ∀ x,
+              x ∈ S ↔ IsIntegral O (((u⁻¹ : (Etau K τ)ˣ) : Etau K τ) * x) := by
   intro O K _ _ _ _ _ Δ τ hl hu S hS hω
   obtain ⟨hτ, -, -, -⟩ := One.intE O K Δ τ hl hu
   have hne : τ ^ 2 - 4 ≠ 0 := by

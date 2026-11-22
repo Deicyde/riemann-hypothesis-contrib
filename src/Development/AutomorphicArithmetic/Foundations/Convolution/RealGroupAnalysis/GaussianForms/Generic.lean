@@ -8,7 +8,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.C
@@ -88,10 +90,12 @@ private lemma goodPlace {F : Type} [Field F] [NumberField F] (s : Finset (G1 F))
   push_cast at h
   rwa [hto _ (hint g hg 1 0), hto _ (hint g hg 1 1)] at h
 
-theorem UpperTheory.ConvolutionTheory.R2.C.generic :
-    ∀ (F : Type) [Field F] [NumberField F] (s : Finset (G1 F)), ∃ u : G1 F, ∀ g ∈ s, IsUnit ((g * u) 1 0) := by
+theorem UpperTheory.ConvolutionTheory.R2.C.generic
+    : ∀ (F : Type) [Field F] [NumberField F] (s : Finset (G1 F)), ∃ u : G1 F, ∀ g ∈ s,
+      IsUnit ((g * u) 1 0) := by
   intro F _ _ s
-  have hI : ∀ w : InfinitePlace F, ∃ t : w.Completion, ∀ g ∈ s, (g 1 0).1 w + (g 1 1).1 w * t ≠ 0 := by
+  have hI
+      : ∀ w : InfinitePlace F, ∃ t : w.Completion, ∀ g ∈ s, (g 1 0).1 w + (g 1 1).1 w * t ≠ 0 := by
     intro w
     haveI : CharZero w.Completion :=
       charZero_of_injective_algebraMap (algebraMap F w.Completion).injective
@@ -103,17 +107,19 @@ theorem UpperTheory.ConvolutionTheory.R2.C.generic :
     simp only [hn.1, hn.2, mul_zero, sub_zero] at hdet
     exact zero_ne_one hdet
   let G : HeightOneSpectrum (𝓞 F) → Prop := fun v =>
-    (∀ g ∈ s, ∀ i j, (g i j).2 v ∈ v.adicCompletionIntegers F) ∧
-      (s.card : ℕ∞) < ENat.card (IsLocalRing.ResidueField (v.adicCompletionIntegers F))
+    (∀ g ∈ s, ∀ i j, (g i j).2 v ∈ v.adicCompletionIntegers F)
+      ∧ (s.card : ℕ∞) < ENat.card (IsLocalRing.ResidueField (v.adicCompletionIntegers F))
   have hG : ∀ᶠ v in cofinite, G v := by
     refine Filter.Eventually.and ?_ (UpperTheory.ConvolutionTheory.R2.C.resBig F s.card)
     refine (Filter.eventually_all_finset s).2 fun g _ => ?_
     refine Filter.eventually_all.2 fun i => Filter.eventually_all.2 fun j => ?_
     exact (g i j).2.2
-  have hF : ∀ v : HeightOneSpectrum (𝓞 F), ∃ t : v.adicCompletion F,
-      (G v → t ∈ v.adicCompletionIntegers F) ∧
-      ∀ g ∈ s, (g 1 0).2 v + (g 1 1).2 v * t ≠ 0 ∧
-        (G v → Valued.v ((g 1 0).2 v + (g 1 1).2 v * t) = 1) := by
+  have hF
+      : ∀ v : HeightOneSpectrum (𝓞 F), ∃ t : v.adicCompletion F,
+        (G v → t ∈ v.adicCompletionIntegers F)
+          ∧ ∀ g ∈ s,
+            (g 1 0).2 v + (g 1 1).2 v * t ≠ 0
+              ∧ (G v → Valued.v ((g 1 0).2 v + (g 1 1).2 v * t) = 1) := by
     intro v
     by_cases hv : G v
     · obtain ⟨t, ht, hu⟩ := goodPlace s v hv.1 hv.2
@@ -121,14 +127,17 @@ theorem UpperTheory.ConvolutionTheory.R2.C.generic :
       have := hu g hg
       rw [h0, map_zero] at this
       exact zero_ne_one this
-    · obtain ⟨t, ht⟩ := fieldCase (v.adicCompletion F) s (fun g => (g 1 0).2 v)
-        (fun g => (g 1 1).2 v) (fun g _ => by
-          have hdet : (g 0 0).2 v * (g 1 1).2 v - (g 0 1).2 v * (g 1 0).2 v = 1 :=
-            congrArg (fun x : A F => x.2 v) (row g)
-          by_contra hn
-          push_neg at hn
-          simp only [hn.1, hn.2, mul_zero, sub_zero] at hdet
-          exact zero_ne_one hdet)
+    · obtain ⟨t, ht⟩ :=
+        fieldCase (v.adicCompletion F) s
+          (fun g => (g 1 0).2 v)
+          (fun g => (g 1 1).2 v)
+          (fun g _ => by
+            have hdet : (g 0 0).2 v * (g 1 1).2 v - (g 0 1).2 v * (g 1 0).2 v = 1 :=
+              congrArg (fun x : A F => x.2 v) (row g)
+            by_contra hn
+            push_neg at hn
+            simp only [hn.1, hn.2, mul_zero, sub_zero] at hdet
+            exact zero_ne_one hdet)
       exact ⟨t, fun h => absurd h hv, fun g hg => ⟨ht g hg, fun h => absurd h hv⟩⟩
   choose tI htI using hI
   choose tF htF using hF
@@ -142,5 +151,6 @@ theorem UpperTheory.ConvolutionTheory.R2.C.generic :
     rw [Matrix.mul_apply, Fin.sum_univ_two]
     simp
   rw [hu]
-  refine (UpperTheory.ConvolutionTheory.R2.C.unitA F _).2 ⟨fun w => htI w g hg, fun v => ((htF v).2 g hg).1, ?_⟩
+  refine (UpperTheory.ConvolutionTheory.R2.C.unitA F _).2
+    ⟨fun w => htI w g hg, fun v => ((htF v).2 g hg).1, ?_⟩
   exact hG.mono fun v hv => ((htF v).2 g hg).2 hv

@@ -15,13 +15,17 @@ theorem elliptic_entire_const : EllipticEntire := by
     intro x
     have hx := L.basis.sum_repr x
     rw [Fin.sum_univ_two, L.basis_zero, L.basis_one] at hx
-    refine ⟨(⌊L.basis.repr x 0⌋ : ℂ) * L.ω₁ + (⌊L.basis.repr x 1⌋ : ℂ) * L.ω₂,
-      PeriodPair.mem_lattice.2 ⟨_, _, rfl⟩, ?_⟩
+    refine ⟨
+      (⌊L.basis.repr x 0⌋ : ℂ) * L.ω₁ + (⌊L.basis.repr x 1⌋ : ℂ) * L.ω₂,
+      PeriodPair.mem_lattice.2 ⟨_, _, rfl⟩,
+      ?_
+    ⟩
     generalize L.basis.repr x 0 = a at hx ⊢
     generalize L.basis.repr x 1 = b at hx ⊢
     subst hx
-    have e : a • L.ω₁ + b • L.ω₂ - ((⌊a⌋ : ℂ) * L.ω₁ + (⌊b⌋ : ℂ) * L.ω₂)
-        = ((Int.fract a : ℝ) : ℂ) * L.ω₁ + ((Int.fract b : ℝ) : ℂ) * L.ω₂ := by
+    have e
+        : a • L.ω₁ + b • L.ω₂ - ((⌊a⌋ : ℂ) * L.ω₁ + (⌊b⌋ : ℂ) * L.ω₂)
+          = ((Int.fract a : ℝ) : ℂ) * L.ω₁ + ((Int.fract b : ℝ) : ℂ) * L.ω₂ := by
       simp only [Complex.real_smul, Int.fract]; push_cast; ring
     rw [e]
     have hfr : ∀ (r : ℝ) (v : ℂ), ‖((Int.fract r : ℝ) : ℂ) * v‖ ≤ ‖v‖ := by
@@ -29,8 +33,9 @@ theorem elliptic_entire_const : EllipticEntire := by
       rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg (Int.fract_nonneg _)]
       exact mul_le_of_le_one_left (norm_nonneg _) (Int.fract_lt_one _).le
     exact (norm_add_le _ _).trans (add_le_add (hfr a _) (hfr b _))
-  obtain ⟨C, hC⟩ := (isCompact_closedBall (0 : ℂ) (‖L.ω₁‖ + ‖L.ω₂‖)).exists_bound_of_continuousOn
-    hf.continuous.continuousOn
+  obtain ⟨C, hC⟩ :=
+    (isCompact_closedBall (0 : ℂ) (‖L.ω₁‖ + ‖L.ω₂‖)).exists_bound_of_continuousOn
+      hf.continuous.continuousOn
   have hb : Bornology.IsBounded (Set.range f) := by
     rw [isBounded_iff_forall_norm_le]
     refine ⟨C, ?_⟩
@@ -62,8 +67,7 @@ theorem elliptic_no_pole_const : EllipticNoPole := by
   intro L f hmer hper hord
   have hM : MeromorphicOn f Set.univ := fun z _ => hmer z
   set g := toMeromorphicNFOn f Set.univ with hg_def
-  have heq : ∀ z, g =ᶠ[𝓝[≠] z] f := fun z =>
-    hM.toMeromorphicNFOn_eq_self_on_nhdsNE (Set.mem_univ z)
+  have heq : ∀ z, g =ᶠ[𝓝[≠] z] f := fun z => hM.toMeromorphicNFOn_eq_self_on_nhdsNE (Set.mem_univ z)
   have han : ∀ z, AnalyticAt ℂ g z := fun z => by
     have hnf := meromorphicNFOn_toMeromorphicNFOn f Set.univ (Set.mem_univ z)
     rw [← hnf.meromorphicOrderAt_nonneg_iff_analyticAt, meromorphicOrderAt_congr (heq z)]

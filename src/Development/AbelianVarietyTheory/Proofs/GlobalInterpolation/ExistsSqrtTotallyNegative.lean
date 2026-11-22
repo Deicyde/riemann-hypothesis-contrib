@@ -10,8 +10,8 @@ open scoped ComplexConjugate
 
 namespace GlobalTheory.CMGen
 
-theorem exists_integer_not_mem (K : Type) [Field K] [NumberField K] [IsCMField K] :
-    ∃ x : 𝓞 K, (x : K) ∉ maximalRealSubfield K := by
+theorem exists_integer_not_mem (K : Type) [Field K] [NumberField K] [IsCMField K]
+    : ∃ x : 𝓞 K, (x : K) ∉ maximalRealSubfield K := by
   by_contra h
   push_neg at h
   apply NumberField.IsCMField.complexConj_ne_one K
@@ -23,22 +23,22 @@ theorem exists_integer_not_mem (K : Type) [Field K] [NumberField K] [IsCMField K
     (NumberField.IsCMField.complexConj_eq_self_iff K _).mpr (h b)
   rw [map_div₀, ha, hb, AlgEquiv.one_apply]
 
-theorem exists_extension (K : Type) [Field K] [NumberField K] (φ : maximalRealSubfield K →+* ℝ) :
-    ∃ ψ : K →+* ℂ, ∀ x : maximalRealSubfield K,
+theorem exists_extension (K : Type) [Field K] [NumberField K] (φ : maximalRealSubfield K →+* ℝ)
+    : ∃ ψ : K →+* ℂ, ∀ x : maximalRealSubfield K,
       ψ (algebraMap (maximalRealSubfield K) K x) = (φ x : ℂ) := by
   letI : Algebra (maximalRealSubfield K) ℂ := (Complex.ofRealHom.comp φ).toAlgebra
   haveI : Algebra.IsAlgebraic (maximalRealSubfield K) K := Algebra.IsAlgebraic.tower_top (K := ℚ) _
   let f : K →ₐ[maximalRealSubfield K] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   exact ⟨f.toRingHom, fun x => f.commutes x⟩
 
-theorem exists_sqrt_totallyNegative : ∀ (K : Type) [Field K] [NumberField K] [IsCMField K],
-    ∃ (d : 𝓞 (maximalRealSubfield K)) (δ : K), δ ^ 2 = algebraMap (maximalRealSubfield K) K d ∧
-      δ ∉ maximalRealSubfield K ∧
-      ∀ φ : maximalRealSubfield K →+* ℝ, φ (d : maximalRealSubfield K) < 0 := by
+theorem exists_sqrt_totallyNegative
+    : ∀ (K : Type) [Field K] [NumberField K] [IsCMField K],
+      ∃ (d : 𝓞 (maximalRealSubfield K)) (δ : K),
+        δ ^ 2 = algebraMap (maximalRealSubfield K) K d ∧ δ ∉ maximalRealSubfield K
+          ∧ ∀ φ : maximalRealSubfield K →+* ℝ, φ (d : maximalRealSubfield K) < 0 := by
   intro K _ _ _
   obtain ⟨x, hx⟩ := exists_integer_not_mem K
   let y : 𝓞 K := x - NumberField.IsCMField.ringOfIntegersComplexConj K x
@@ -72,14 +72,13 @@ theorem exists_sqrt_totallyNegative : ∀ (K : Type) [Field K] [NumberField K] [
     have hval := hψ ⟨(y : K) ^ 2, hsq⟩
     have hψy : ψ (y : K) = ψ (x : K) - conj (ψ (x : K)) := by
       rw [hy, map_sub, NumberField.IsCMField.complexEmbedding_complexConj]
-    have hne : ψ (y : K) ≠ 0 := by
-      rw [map_ne_zero]; exact hy0
+    have hne : ψ (y : K) ≠ 0 := by rw [map_ne_zero]; exact hy0
     have him : (ψ (x : K)).im ≠ 0 := by
       intro h0
       apply hne
       rw [hψy, Complex.sub_conj, h0]
       simp
-    have key : ((φ ⟨(y : K) ^ 2, hsq⟩ : ℝ) : ℂ) = ((-(2 * (ψ (x : K)).im) ^ 2 : ℝ) : ℂ) := by
+    have key : ((φ ⟨(y : K) ^ 2, hsq⟩ : ℝ) : ℂ) = ((- (2 * (ψ (x : K)).im) ^ 2 : ℝ) : ℂ) := by
       rw [← hval]
       change ψ ((y : K) ^ 2) = _
       rw [map_pow, hψy, Complex.sub_conj]
@@ -87,7 +86,7 @@ theorem exists_sqrt_totallyNegative : ∀ (K : Type) [Field K] [NumberField K] [
       ring_nf
       rw [Complex.I_sq]
       ring
-    have key' : φ ⟨(y : K) ^ 2, hsq⟩ = -(2 * (ψ (x : K)).im) ^ 2 := by exact_mod_cast key
+    have key' : φ ⟨(y : K) ^ 2, hsq⟩ = - (2 * (ψ (x : K)).im) ^ 2 := by exact_mod_cast key
     show φ ⟨(y : K) ^ 2, hsq⟩ < 0
     rw [key']
     have : 0 < (2 * (ψ (x : K)).im) ^ 2 := by positivity

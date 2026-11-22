@@ -6,16 +6,20 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section LocFormsAux
 
-private def Hs {L V ι : Type} [Field L] [Algebra ℂ L] [AddCommGroup V] [Module L V]
-    (B : Subalgebra ℂ L) (P : Finset ι) (g : ι → V) (w : V) : Prop :=
+private def Hs
+    {L V ι : Type} [Field L] [Algebra ℂ L] [AddCommGroup V] [Module L V]
+    (B : Subalgebra ℂ L) (P : Finset ι) (g : ι → V) (w : V)
+    : Prop :=
   ∃ c : ι → L, (∀ S, c S ∈ B) ∧ w = ∑ S ∈ P, c S • g S
 
-variable {L V ι : Type} [Field L] [Algebra ℂ L] [AddCommGroup V] [Module L V]
+variable
+  {L V ι : Type} [Field L] [Algebra ℂ L] [AddCommGroup V] [Module L V]
   {B : Subalgebra ℂ L} {P : Finset ι} {g : ι → V}
 
 private lemma Hs_zero : Hs B P g 0 := ⟨fun _ => 0, fun _ => B.zero_mem, by simp⟩
@@ -70,8 +74,7 @@ private lemma alt_expand {V : Type} [AddCommGroup V] [Module L V] {q d : ℕ} (t
 
 end LocFormsAux
 
-theorem UpperTheory.Gal.productCup_of_system.locForms_of :
-    LocOne → LocForms := by
+theorem UpperTheory.Gal.productCup_of_system.locForms_of : LocOne → LocForms := by
   intro hone F L _ _ _ _ _ _ d x hfc hr e q w
   have ht : ∀ j, tt L x j ∈ loc (rB ℂ L (xv x) {0}) e.1 := fun j =>
     ⟨1, by simp, by simpa [tt] using tco_mem ℂ L (xv x) j⟩
@@ -87,11 +90,10 @@ theorem UpperTheory.Gal.productCup_of_system.locForms_of :
       refine Hs_sum _ _ fun f _ => Hs_smul (Subalgebra.prod_mem _ fun j _ => hcB j _) ?_
       by_cases hf : Function.Injective f
       · obtain ⟨S, hS⟩ : ∃ S, S = Finset.univ.image f := ⟨_, rfl⟩
-        have hcard : S.card = q := by
-          rw [hS, Finset.card_image_of_injective _ hf]; simp
+        have hcard : S.card = q := by rw [hS, Finset.card_image_of_injective _ hf]; simp
         subst hcard
-        obtain ⟨n, hn⟩ := alt_sorted (L := L) (fun l => D ℂ L (tt L x l)) S f hf
-          (fun a => by simp [hS])
+        obtain ⟨n, hn⟩ :=
+          alt_sorted (L := L) (fun l => D ℂ L (tt L x l)) S f hf (fun a => by simp [hS])
         rw [hn]
         exact Hs_smul (intCast_mem _ n) (Hs_single (g := dtS L x) (by simp))
       · have : ¬ Function.Injective (fun j => D ℂ L (tt L x (f j))) := fun h =>
@@ -105,5 +107,5 @@ theorem UpperTheory.Gal.productCup_of_system.locForms_of :
     refine Submodule.sum_mem _ fun S hS => ?_
     have hcard := (Finset.mem_powersetCard.1 hS).2
     subst hcard
-    exact Submodule.subset_span ⟨c S, hc S, fun a => tt L x (S.orderEmbOfFin rfl a),
-      fun j => ht _, rfl⟩
+    exact Submodule.subset_span
+      ⟨c S, hc S, fun a => tt L x (S.orderEmbOfFin rfl a), fun j => ht _, rfl⟩

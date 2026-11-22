@@ -48,16 +48,20 @@ def mulMemIdeal (A : Subalgebra S Ω) (r : Ω) : Ideal A where
     intro c a ha
     simpa [smul_eq_mul, mul_assoc] using A.mul_mem c.2 ha
 
-theorem mem_span_of_div_mem (A : Subalgebra S Ω) (Q' : Submodule A Ω) {m : ℕ} (g : Fin m → Ω)
-    (hQQ : Submodule.span A (Set.range g) * Q' = 1) (R : Fin m → Subalgebra S Ω)
+theorem mem_span_of_div_mem
+    (A : Subalgebra S Ω) (Q' : Submodule A Ω)
+    {m : ℕ}
+    (g : Fin m → Ω) (hQQ : Submodule.span A (Set.range g) * Q' = 1) (R : Fin m → Subalgebra S Ω)
     (hR : ∀ j, g j ≠ 0 → R j ≤ Algebra.adjoin S ((A : Set Ω) ∪ Set.range fun b => g b / g j))
-    (t : Ω) (ht : ∀ j, g j ≠ 0 → t / g j ∈ R j) : t ∈ Submodule.span A (Set.range g) := by
+    (t : Ω) (ht : ∀ j, g j ≠ 0 → t / g j ∈ R j)
+    : t ∈ Submodule.span A (Set.range g) := by
   classical
   have hone : (1 : Ω) ∈ Submodule.span A (Set.range g) * Q' := by
     rw [hQQ]; exact Submodule.mem_one.mpr ⟨1, map_one _⟩
   obtain ⟨w, hwQ, hsum⟩ : ∃ w : Fin m → Ω, (∀ b, w b ∈ Q') ∧ ∑ b, g b * w b = 1 := by
     refine Submodule.mul_induction_on
-      (C := fun z => ∃ w : Fin m → Ω, (∀ b, w b ∈ Q') ∧ ∑ b, g b * w b = z) hone ?_ ?_
+      (C := fun z => ∃ w : Fin m → Ω, (∀ b, w b ∈ Q') ∧ ∑ b, g b * w b = z)
+      hone ?_ ?_
     · intro q hq q' hq'
       obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun A).mp hq
       refine ⟨fun b => (a b : Ω) * q', fun b => Q'.smul_mem (a b) hq', ?_⟩
@@ -71,8 +75,9 @@ theorem mem_span_of_div_mem (A : Subalgebra S Ω) (Q' : Submodule A Ω) {m : ℕ
       exact Finset.sum_congr rfl fun b _ => by simp [mul_add]
   have hgA : ∀ a b, g a * w b ∈ A := by
     intro a b
-    have h := Submodule.mul_mem_mul (Submodule.subset_span ⟨a, rfl⟩ : g a ∈ Submodule.span A (Set.range g))
-      (hwQ b)
+    have h :=
+      Submodule.mul_mem_mul (Submodule.subset_span ⟨a, rfl⟩ : g a ∈ Submodule.span A (Set.range g))
+        (hwQ b)
     rw [hQQ, Submodule.mem_one] at h
     obtain ⟨y, hy⟩ := h
     rw [← hy]
@@ -89,8 +94,7 @@ theorem mem_span_of_div_mem (A : Subalgebra S Ω) (Q' : Submodule A Ω) {m : ℕ
           rintro _ (ha | ⟨c, rfl⟩)
           · exact ⟨0, by simpa using ha⟩
           · refine ⟨1, ?_⟩
-            have : (g j * w j) ^ 1 * (g c / g j) = g c * w j := by
-              field_simp
+            have : (g j * w j) ^ 1 * (g c / g j) = g c * w j := by field_simp
             rw [this]
             exact hgA c j
         obtain ⟨M, hM⟩ := h1
@@ -121,8 +125,9 @@ theorem mem_span_of_div_mem (A : Subalgebra S Ω) (Q' : Submodule A Ω) {m : ℕ
   rw [Submodule.mem_span_range_iff_exists_fun]
   refine ⟨fun b => ⟨t * w b, htw b⟩, ?_⟩
   simp only [Subalgebra.smul_def, smul_eq_mul]
-  calc ∑ b, t * w b * g b = t * ∑ b, g b * w b := by
-        rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun b _ => by ring
+  calc
+    ∑ b, t * w b * g b
+      = t * ∑ b, g b * w b := by rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun b _ => by ring
     _ = t := by rw [hsum, mul_one]
 
 end Core
@@ -135,7 +140,8 @@ abbrev graphIdx (N m : ℕ) : Unit ⊕ Unit → Type :=
   Sum.elim (fun _ : Unit => Fin (N + 1)) (fun _ : Unit => Fin m)
 
 def graphVec (x : Fin (N + 1) → Ω) (s : Fin m → Ω) : (Σ k, graphIdx N m k) → Ω :=
-  IndefiniteRowSideFullHecke.Kleiman2.joinVec (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x) (IndefiniteRowSideFullHecke.Kleiman2.oneBlock s)
+  IndefiniteRowSideFullHecke.Kleiman2.joinVec (IndefiniteRowSideFullHecke.Kleiman2.oneBlock x)
+    (IndefiniteRowSideFullHecke.Kleiman2.oneBlock s)
 
 abbrev baseBlock : Unit ⊕ Unit := Sum.inl ()
 
@@ -144,56 +150,71 @@ def graphDeg (n : ℤ) : Unit ⊕ Unit → ℤ := Sum.elim (fun _ => -n) (fun _ 
 def graphChart (i : Fin (N + 1)) (j : Fin m) : ∀ k, graphIdx N m k :=
   IndefiniteRowSideFullHecke.Kleiman2.joinChart (fun _ : Unit => i) (fun _ : Unit => j)
 
-@[simp] theorem graphVec_inr (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (b : Fin m) :
-    graphVec x s ⟨Sum.inr (), b⟩ = s b := rfl
+@[simp]
+theorem graphVec_inr (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (b : Fin m)
+    : graphVec x s ⟨Sum.inr (), b⟩ = s b :=
+  rfl
 
-@[simp] theorem graphDeg_inl (n : ℤ) : graphDeg n (Sum.inl ()) = -n := rfl
+@[simp]
+theorem graphDeg_inl (n : ℤ) : graphDeg n (Sum.inl ()) = -n := rfl
 
-@[simp] theorem graphDeg_inr (n : ℤ) : graphDeg n (Sum.inr ()) = 1 := rfl
+@[simp]
+theorem graphDeg_inr (n : ℤ) : graphDeg n (Sum.inr ()) = 1 := rfl
 
-theorem graphChart_eta (c : ∀ k, graphIdx N m k) : c = graphChart (c (Sum.inl ())) (c (Sum.inr ())) := by
+theorem graphChart_eta (c : ∀ k, graphIdx N m k)
+    : c = graphChart (c (Sum.inl ())) (c (Sum.inr ())) := by
   funext k
   rcases k with ⟨⟩ | ⟨⟩ <;> rfl
 
 variable (S : Type) [CommRing S] [Field Ω] [Algebra S Ω]
 
-abbrev graphRing (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (i : Fin (N + 1)) (j : Fin m) : Subalgebra S Ω :=
+abbrev graphRing (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (i : Fin (N + 1)) (j : Fin m)
+    : Subalgebra S Ω :=
   chartRingOver S (graphVec x s) (graphChart i j)
 
 variable {S}
 
-theorem div_mem_graphRing_inl (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (i a : Fin (N + 1)) (j : Fin m) :
-    x a / x i ∈ graphRing S x s i j :=
+theorem div_mem_graphRing_inl (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (i a : Fin (N + 1)) (j : Fin m)
+    : x a / x i ∈ graphRing S x s i j :=
   Algebra.subset_adjoin ⟨⟨Sum.inl (), a⟩, rfl⟩
 
-theorem div_mem_graphRing_inr (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (i : Fin (N + 1)) (j b : Fin m) :
-    s b / s j ∈ graphRing S x s i j :=
+theorem div_mem_graphRing_inr (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (i : Fin (N + 1)) (j b : Fin m)
+    : s b / s j ∈ graphRing S x s i j :=
   Algebra.subset_adjoin ⟨⟨Sum.inr (), b⟩, rfl⟩
 
-theorem chartRing_le_graphRing (x : Fin (N + 1) → Ω) (s : Fin m → Ω) {i : Fin (N + 1)} (hi : x i ≠ 0)
-    (j : Fin m) : Kleiman.chartRing S x (Kleiman.singleChart hi) ≤ graphRing S x s i j := by
+theorem chartRing_le_graphRing
+    (x : Fin (N + 1) → Ω) (s : Fin m → Ω) {i : Fin (N + 1)} (hi : x i ≠ 0) (j : Fin m)
+    : Kleiman.chartRing S x (Kleiman.singleChart hi) ≤ graphRing S x s i j := by
   have hle : Kleiman.ampleBase (S := S) x i ≤ graphRing S x s i j := by
     refine Algebra.adjoin_le ?_
     rintro _ ⟨a, rfl⟩
     exact div_mem_graphRing_inl x s i a j
   exact fun _ ha => hle (Kleiman.mem_ampleBase_of_mem_chartRing hi ha)
 
-theorem graphRing_le (x : Fin (N + 1) → Ω) (s : Fin m → Ω) {i : Fin (N + 1)} (hi : x i ≠ 0) (j : Fin m)
-    (T : Subalgebra S Ω) (hA : Kleiman.chartRing S x (Kleiman.singleChart hi) ≤ T)
-    (hs : ∀ b, s b / s j ∈ T) : graphRing S x s i j ≤ T := by
+theorem graphRing_le
+    (x : Fin (N + 1) → Ω)
+    (s : Fin m → Ω)
+    {i : Fin (N + 1)} (hi : x i ≠ 0)
+    (j : Fin m) (T : Subalgebra S Ω)
+    (hA : Kleiman.chartRing S x (Kleiman.singleChart hi) ≤ T) (hs : ∀ b, s b / s j ∈ T)
+    : graphRing S x s i j ≤ T := by
   refine Algebra.adjoin_le ?_
   rintro _ ⟨⟨⟨⟩ | ⟨⟩, a⟩, rfl⟩
   · exact hA (Kleiman.ratio hi a).2
   · exact hs a
 
-theorem prod_graph (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (β : Unit ⊕ Unit → ℤ) (i : Fin (N + 1)) (j : Fin m) :
-    ∏ k, graphVec x s ⟨k, graphChart i j k⟩ ^ (-β k) = x i ^ (-β (Sum.inl ())) * s j ^ (-β (Sum.inr ())) := by
+theorem prod_graph
+    (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (β : Unit ⊕ Unit → ℤ) (i : Fin (N + 1)) (j : Fin m)
+    : ∏ k, graphVec x s ⟨k, graphChart i j k⟩ ^ (-β k)
+      = x i ^ (- β (Sum.inl ())) * s j ^ (- β (Sum.inr ())) := by
   simp only [Fintype.prod_sum_type, Fintype.univ_unit, Finset.prod_singleton]
   rfl
 
-theorem mem_secOver_graph_iff (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (β : Unit ⊕ Unit → ℤ) (t : Ω) :
-    t ∈ secOver S (graphVec x s) β ↔ ∀ i j, x i ≠ 0 → s j ≠ 0 →
-      t * (x i ^ (-β (Sum.inl ())) * s j ^ (-β (Sum.inr ()))) ∈ graphRing S x s i j := by
+theorem mem_secOver_graph_iff (x : Fin (N + 1) → Ω) (s : Fin m → Ω) (β : Unit ⊕ Unit → ℤ) (t : Ω)
+    : t ∈ secOver S (graphVec x s) β
+      ↔ ∀ i j,
+        x i ≠ 0 → s j ≠ 0
+          → t * (x i ^ (- β (Sum.inl ())) * s j ^ (- β (Sum.inr ()))) ∈ graphRing S x s i j := by
   simp only [secOver, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.mulRight_apply,
     Subalgebra.mem_toSubmodule]
   constructor
@@ -215,10 +236,12 @@ open scoped Pointwise
 variable {S : Type} [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] {N m : ℕ} {x : Fin (N + 1) → Ω}
 
 def IsGraphGen (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω) : Prop :=
-  ∀ I, Submodule.span (Kleiman.chartRing S x I) (Set.range s) = (Q.twist (Kleiman.twistSys S x n)).sub I
+  ∀ I,
+    Submodule.span (Kleiman.chartRing S x I) (Set.range s)
+      = (Q.twist (Kleiman.twistSys S x n)).sub I
 
-theorem mem_secs_iff (F : Kleiman.SubSystem S x Ω) (t : Ω) :
-    t ∈ F.secs ↔ ∀ i (hi : x i ≠ 0), t ∈ F.sub (Kleiman.singleChart hi) := by
+theorem mem_secs_iff (F : Kleiman.SubSystem S x Ω) (t : Ω)
+    : t ∈ F.secs ↔ ∀ i (hi : x i ≠ 0), t ∈ F.sub (Kleiman.singleChart hi) := by
   rw [Kleiman.SubSystem.secs, Submodule.mem_iInf]
   constructor
   · intro h i hi
@@ -228,11 +251,12 @@ theorem mem_secs_iff (F : Kleiman.SubSystem S x Ω) (t : Ω) :
     have hxi : x i ≠ 0 := (Kleiman.mem_support x).mp (I.2.2 hi)
     exact F.mono _ I (Finset.singleton_subset_iff.mpr hi) t (h i hxi)
 
-theorem mem_sub_iff_graph (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω)
-    (hgen : IsGraphGen Q n s)
-    {i : Fin (N + 1)} (hi : x i ≠ 0) (t : Ω) :
-    t ∈ Q.sub (Kleiman.singleChart hi) ↔
-      ∀ j, s j ≠ 0 → t * (x i ^ n * (s j)⁻¹) ∈ graphRing S x s i j := by
+theorem mem_sub_iff_graph
+    (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω) (hgen : IsGraphGen Q n s)
+    {i : Fin (N + 1)} (hi : x i ≠ 0)
+    (t : Ω)
+    : t ∈ Q.sub (Kleiman.singleChart hi)
+      ↔ ∀ j, s j ≠ 0 → t * (x i ^ n * (s j)⁻¹) ∈ graphRing S x s i j := by
   set I := Kleiman.singleChart hi with hIdef
   have hiI : i ∈ I.1 := Finset.mem_singleton_self i
   have hxn : x i ^ n ≠ 0 := zpow_ne_zero n hi
@@ -242,8 +266,8 @@ theorem mem_sub_iff_graph (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → 
     apply congrArg (Submodule.span (Kleiman.chartRing S x I))
     ext z
     simp only [Set.mem_ofPred_eq, Set.mem_mul, SetLike.mem_coe, smul_eq_mul]
-    exact exists_congr fun q => and_congr_right fun _ =>
-      exists_congr fun y => and_congr_right fun _ => eq_comm
+    exact exists_congr fun q =>
+      and_congr_right fun _ => exists_congr fun y => and_congr_right fun _ => eq_comm
   let g : Fin m → Ω := fun b => x i ^ (-n) * s b
   have hgQ : Submodule.span (Kleiman.chartRing S x I) (Set.range g) = Q.sub I := by
     apply le_antisymm
@@ -280,7 +304,8 @@ theorem mem_sub_iff_graph (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → 
     rw [← hgt, Finset.sum_div]
     refine Subalgebra.sum_mem _ fun b _ => ?_
     rw [Subalgebra.smul_def, smul_eq_mul, mul_div_assoc, hgdiv]
-    exact Subalgebra.mul_mem _ (chartRing_le_graphRing x s hi j (a b).2) (div_mem_graphRing_inr x s i j b)
+    exact Subalgebra.mul_mem _ (chartRing_le_graphRing x s hi j (a b).2)
+      (div_mem_graphRing_inr x s i j b)
   · intro ht
     obtain ⟨Q', hQ'⟩ := Q.invertible I
     rw [← hgQ] at hQ'
@@ -290,14 +315,13 @@ theorem mem_sub_iff_graph (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → 
       rw [← hgdiv]
       exact Algebra.subset_adjoin (Or.inr ⟨b, rfl⟩)
     · intro j hj
-      have hsj : s j ≠ 0 := by
-        intro h0; apply hj; simp [g, h0]
+      have hsj : s j ≠ 0 := by intro h0; apply hj; simp [g, h0]
       rw [hgt]
       exact ht j hsj
 
-theorem secs_eq_secOver (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω)
-    (hgen : IsGraphGen Q n s) :
-    Q.secs = secOver S (graphVec x s) (graphDeg n) := by
+theorem secs_eq_secOver
+    (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω) (hgen : IsGraphGen Q n s)
+    : Q.secs = secOver S (graphVec x s) (graphDeg n) := by
   ext t
   rw [mem_secs_iff, mem_secOver_graph_iff]
   simp only [graphDeg_inl, graphDeg_inr, neg_neg, zpow_neg, zpow_one]
@@ -307,19 +331,26 @@ theorem secs_eq_secOver (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω
   · intro h i hi
     exact (mem_sub_iff_graph Q n s hgen hi t).mpr fun j hj => h i j hi hj
 
-theorem twist_secs_eq_secOver (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω)
-    (hgen : IsGraphGen Q n s) (c : ℤ) :
-    (Q.twist (Kleiman.twistSys S x c)).secs =
-      secOver S (graphVec x s) (graphDeg n + c • IndefiniteRowSideFullHecke.Kleiman2.baseDeg baseBlock) := by
+theorem twist_secs_eq_secOver
+    (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m → Ω) (hgen : IsGraphGen Q n s) (c : ℤ)
+    : (Q.twist (Kleiman.twistSys S x c)).secs
+      = secOver S (graphVec x s)
+        (graphDeg n + c • IndefiniteRowSideFullHecke.Kleiman2.baseDeg baseBlock) := by
   ext t
   rw [mem_secs_iff, mem_secOver_graph_iff]
-  have hb1 : (graphDeg n + c • IndefiniteRowSideFullHecke.Kleiman2.baseDeg baseBlock) (Sum.inl ()) = -n + c := by
+  have hb1
+      : (graphDeg n + c • IndefiniteRowSideFullHecke.Kleiman2.baseDeg baseBlock) (Sum.inl ())
+        = -n + c := by
     simp [IndefiniteRowSideFullHecke.Kleiman2.baseDeg]
-  have hb2 : (graphDeg n + c • IndefiniteRowSideFullHecke.Kleiman2.baseDeg baseBlock) (Sum.inr ()) = 1 := by
+  have hb2
+      : (graphDeg n + c • IndefiniteRowSideFullHecke.Kleiman2.baseDeg baseBlock) (Sum.inr ())
+        = 1 := by
     simp [IndefiniteRowSideFullHecke.Kleiman2.baseDeg]
   rw [hb1, hb2]
-  have key : ∀ i (hi : x i ≠ 0), t ∈ (Q.twist (Kleiman.twistSys S x c)).sub (Kleiman.singleChart hi) ↔
-      x i ^ (-c) * t ∈ Q.sub (Kleiman.singleChart hi) := by
+  have key
+      : ∀ i (hi : x i ≠ 0),
+        t ∈ (Q.twist (Kleiman.twistSys S x c)).sub (Kleiman.singleChart hi)
+          ↔ x i ^ (-c) * t ∈ Q.sub (Kleiman.singleChart hi) := by
     intro i hi
     let I := Kleiman.singleChart hi
     have htwist : (Q.twist (Kleiman.twistSys S x c)).sub I = x i ^ c • Q.sub I := by
@@ -329,12 +360,14 @@ theorem twist_secs_eq_secOver (Q : Kleiman.LineBundle S x) (n : ℤ) (s : Fin m 
       apply congrArg (Submodule.span (Kleiman.chartRing S x I))
       ext z
       simp only [Set.mem_ofPred_eq, Set.mem_mul, SetLike.mem_coe, smul_eq_mul]
-      exact exists_congr fun q => and_congr_right fun _ =>
-        exists_congr fun y => and_congr_right fun _ => eq_comm
+      exact exists_congr fun q =>
+        and_congr_right fun _ => exists_congr fun y => and_congr_right fun _ => eq_comm
     change t ∈ (Q.twist (Kleiman.twistSys S x c)).sub I ↔ _
     rw [htwist, Submodule.mem_smul_iff_inv_mul_mem (zpow_ne_zero c hi), zpow_neg]
-  have hmul : ∀ i j, x i ≠ 0 → x i ^ (-c) * t * (x i ^ n * (s j)⁻¹) =
-      t * (x i ^ (-(-n + c)) * s j ^ (-(1 : ℤ))) := by
+  have hmul
+      : ∀ i j,
+        x i ≠ 0
+          → x i ^ (-c) * t * (x i ^ n * (s j)⁻¹) = t * (x i ^ (-(-n + c)) * s j ^ (-(1 : ℤ))) := by
     intro i j hi
     rw [zpow_neg_one, show -(-n + c) = n + -c by ring, zpow_add₀ hi]
     ring

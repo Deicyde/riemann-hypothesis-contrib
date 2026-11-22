@@ -26,15 +26,16 @@ theorem exists_moved {σ : E →ₐ[F] E} (h : IsCMExt F E σ) : ∃ β : E, σ 
   rw [hne y] at this
   simpa using this.symm
 
-theorem im_ne_zero {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {β : E} (hβ : σ β ≠ β) (τ : E →+* ℂ) : (τ β).im ≠ 0 := by
+theorem im_ne_zero {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {β : E} (hβ : σ β ≠ β) (τ : E →+* ℂ)
+    : (τ β).im ≠ 0 := by
   intro h0
   apply hβ
   apply τ.injective
   rw [h.2.2.2 τ β]
   exact Complex.conj_eq_iff_im.2 h0
 
-theorem exists_basis {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {β : E} (hβ : σ β ≠ β) :
-    ∃ B : Module.Basis (Fin 2) F E, B 0 = 1 ∧ B 1 = β := by
+theorem exists_basis {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {β : E} (hβ : σ β ≠ β)
+    : ∃ B : Module.Basis (Fin 2) F E, B 0 = 1 ∧ B 1 = β := by
   have hfin : FiniteDimensional F E := Module.finite_of_finrank_pos (by rw [h.2.2.1]; omega)
   have hli : LinearIndependent F ![(1 : E), β] := by
     rw [LinearIndependent.pair_iff]
@@ -53,22 +54,33 @@ theorem exists_basis {σ : E →ₐ[F] E} (h : IsCMExt F E σ) {β : E} (hβ : �
     simpa using hst
   refine ⟨basisOfLinearIndependentOfCardEqFinrank hli (by simp [h.2.2.1]), ?_, ?_⟩ <;> simp
 
-theorem eq_add_tmul (B : Module.Basis (Fin 2) F E) (x : AF F ⊗[F] E) :
-    x = (Algebra.TensorProduct.basis (AF F) B).repr x 0 ⊗ₜ[F] B 0 +
-      (Algebra.TensorProduct.basis (AF F) B).repr x 1 ⊗ₜ[F] B 1 := by
+theorem eq_add_tmul (B : Module.Basis (Fin 2) F E) (x : AF F ⊗[F] E)
+    : x
+      = (Algebra.TensorProduct.basis (AF F) B).repr x 0 ⊗ₜ[F] B 0
+        + (Algebra.TensorProduct.basis (AF F) B).repr x 1 ⊗ₜ[F] B 1 := by
   conv_lhs => rw [← (Algebra.TensorProduct.basis (AF F) B).sum_repr x]
   simp [Fin.sum_univ_two, Algebra.TensorProduct.basis_apply, TensorProduct.smul_tmul']
 
-theorem piInf_tmul {w : InfinitePlace F} (τ : GlobalTheory.AdelicU.EmbOver E w) (a : AF F) (y : E) :
-    GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.piInf τ (a ⊗ₜ[F] y) =
-      InfinitePlace.Completion.extensionEmbedding w (a.1 w) * τ.1 y := rfl
+theorem piInf_tmul {w : InfinitePlace F} (τ : GlobalTheory.AdelicU.EmbOver E w) (a : AF F) (y : E)
+    : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.piInf τ (a ⊗ₜ[F] y)
+      = InfinitePlace.Completion.extensionEmbedding w (a.1 w) * τ.1 y :=
+  rfl
 
-theorem im_extension (hF : IsTotallyReal F) (w : InfinitePlace F) (z : w.Completion) :
-    (InfinitePlace.Completion.extensionEmbedding w z).im = 0 := by
+theorem im_extension (hF : IsTotallyReal F) (w : InfinitePlace F) (z : w.Completion)
+    : (InfinitePlace.Completion.extensionEmbedding w z).im = 0 := by
   rw [← InfinitePlace.Completion.extensionEmbeddingOfIsReal_apply (IsTotallyReal.isReal w) z]
   exact Complex.ofReal_im _
 
-theorem eq_zero_of_piInf : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (emb : ∀ w : InfinitePlace F, GlobalTheory.AdelicU.EmbOver E w) (x : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)), GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) x → (∀ w, GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.piInf (emb w) x = 0) → x = 0 := by
+theorem eq_zero_of_piInf
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (emb : ∀ w : InfinitePlace F, GlobalTheory.AdelicU.EmbOver E w)
+            (x : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)),
+          GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At
+              (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) x
+            → (∀ w, GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.piInf (emb w) x = 0)
+            → x = 0 := by
   intro F E _ _ _ _ _ σ h emb x hx hinf
   obtain ⟨β, hβ⟩ := exists_moved h
   obtain ⟨B, hB0, hB1⟩ := exists_basis h hβ
@@ -91,7 +103,9 @@ theorem eq_zero_of_piInf : ∀ {F E : Type} [Field F] [NumberField F] [Field E] 
     set q := InfinitePlace.Completion.extensionEmbedding w ((C.repr x 1).1 w) with hq
     have hpi : p.im = 0 := im_extension h.1 w _
     have hqi : q.im = 0 := im_extension h.1 w _
-    simp only [Complex.add_im, Complex.mul_im, Complex.zero_im, hpi, hqi, zero_mul, add_zero, zero_add] at hi
+    simp only [Complex.add_im, Complex.mul_im, Complex.zero_im, hpi, hqi, zero_mul, add_zero,
+        zero_add]
+      at hi
     have hq0 : q.re = 0 := (mul_eq_zero.1 hi).resolve_right him
     have hq1 : q = 0 := Complex.ext hq0 hqi
     rw [hq1, zero_mul, add_zero] at e

@@ -7,14 +7,18 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.EeProd
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ
 open scoped Matrix
 
 namespace GlobalTheory.KZ
 
-theorem htPresNu7_mono_loss : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω) (c : Coef l)
-  (Z : ∀ r : ℕ, G ℚ Ω → (ZMod (l ^ r))ˣ → Qbar l) (m c₂ c' : ℕ) (ζ : Ω) (ι : Type) [Fintype ι] (P : ι → Polynomial Ω) (o : ι → Qbar l),
-  HTPresNuOfPolys A c m c₂ Z ζ P o → c₂ ≤ c' → HTPresNuOfPolys A c m c' Z ζ P o := by
+theorem htPresNu7_mono_loss
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+        (A : ValuationSubring Ω) (c : Coef l) (Z : ∀ r : ℕ, G ℚ Ω → (ZMod (l ^ r))ˣ → Qbar l)
+        (m c₂ c' : ℕ) (ζ : Ω) (ι : Type) [Fintype ι] (P : ι → Polynomial Ω) (o : ι → Qbar l),
+      HTPresNuOfPolys A c m c₂ Z ζ P o → c₂ ≤ c' → HTPresNuOfPolys A c m c' Z ζ P o := by
   intro l _ Ω _ _ _ A c Z m c₂ c' ζ ι _ P o h hc
   obtain ⟨hζ, hco, hoO, hne, hK⟩ := h
   obtain ⟨hζ₂, -, hu, ho, hs⟩ := hK
@@ -33,7 +37,8 @@ theorem htPresNu7_mono_loss : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω
     swap
     · congr 2; omega
     · have e1 : m ≤ c₂ + d := by omega
-      rw [(hζ.pow_eq_one_iff_dvd _).2 (pow_dvd_pow l e1), (hζ.pow_eq_one_iff_dvd _).2 (pow_dvd_pow l h.le)]
+      rw [(hζ.pow_eq_one_iff_dvd _).2 (pow_dvd_pow l e1),
+        (hζ.pow_eq_one_iff_dvd _).2 (pow_dvd_pow l h.le)]
   have hζ' : IsPrimitiveRoot (ζ ^ l ^ c') (l ^ n') := by
     rw [← hpow]
     exact hζ₂.pow (pow_pos hl.pos _) (by rw [← pow_add, hdn])
@@ -49,14 +54,20 @@ theorem htPresNu7_mono_loss : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω
     rw [ZMod.val_natCast, map_pow, hsv, mul_pow, ← pow_mul, mul_comm (k i).val, pow_mul, hpow,
       ← pow_eq_pow_mod _ hζ'.pow_eq_one]
   · have hN : ∀ a : ℕ, ‖(a : Qbar l)‖ ≤ 1 := fun a => IsUltrametricDist.norm_natCast_le_one _ a
-    have key : ∀ i, ‖o i * ((k i).val : Qbar l) -
-        o i * ((((k i).val : ZMod (l ^ n')).val : ℕ) : Qbar l)‖ ≤ ‖((l : ℕ) : Qbar l) ^ n'‖ := by
+    have key
+        : ∀ i,
+          ‖o i * ((k i).val : Qbar l) -
+              o i * ((((k i).val : ZMod (l ^ n')).val : ℕ) : Qbar l)‖
+            ≤ ‖((l : ℕ) : Qbar l) ^ n'‖ := by
       intro i
-      have e : (((k i).val : ℕ) : Qbar l) =
-          ((l : ℕ) : Qbar l) ^ n' * (((k i).val / l ^ n' : ℕ) : Qbar l) + (((k i).val % l ^ n' : ℕ) : Qbar l) := by
+      have e
+          : (((k i).val : ℕ) : Qbar l)
+            = ((l : ℕ) : Qbar l) ^ n' * (((k i).val / l ^ n' : ℕ) : Qbar l)
+              + (((k i).val % l ^ n' : ℕ) : Qbar l) := by
         exact_mod_cast (Nat.div_add_mod (k i).val (l ^ n')).symm
-      have e2 : o i * ((k i).val : Qbar l) - o i * ((((k i).val : ZMod (l ^ n')).val : ℕ) : Qbar l) =
-          ((l : ℕ) : Qbar l) ^ n' * (o i * (((k i).val / l ^ n' : ℕ) : Qbar l)) := by
+      have e2
+          : o i * ((k i).val : Qbar l) - o i * ((((k i).val : ZMod (l ^ n')).val : ℕ) : Qbar l)
+            = ((l : ℕ) : Qbar l) ^ n' * (o i * (((k i).val / l ^ n' : ℕ) : Qbar l)) := by
         rw [ZMod.val_natCast]
         linear_combination (o i) * e
       rw [e2, norm_mul, norm_mul]
@@ -65,8 +76,10 @@ theorem htPresNu7_mono_loss : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω
       refine le_trans hcg ?_
       rw [norm_pow, norm_pow]
       exact pow_le_pow_of_le_one (norm_nonneg _) (hN l) (by omega)
-    have h2 : ‖∑ i, (o i * ((k i).val : Qbar l) -
-        o i * ((((k i).val : ZMod (l ^ n')).val : ℕ) : Qbar l))‖ ≤ ‖((l : ℕ) : Qbar l) ^ n'‖ :=
+    have h2
+        : ‖∑ i, (o i * ((k i).val : Qbar l) -
+            o i * ((((k i).val : ZMod (l ^ n')).val : ℕ) : Qbar l))‖
+          ≤ ‖((l : ℕ) : Qbar l) ^ n'‖ :=
       IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (norm_nonneg _) (fun i _ => key i)
     have h3 := (IsUltrametricDist.norm_add_le_max _ _).trans (max_le h1 h2)
     rw [Finset.sum_sub_distrib, sub_add_sub_cancel] at h3

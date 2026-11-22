@@ -14,23 +14,26 @@ section Core
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem Hf_norm_le_two {dim : (E →+* ℂ) → ℕ} (e y : Vsp dim) (he : ‖e‖ = 1) (hy : ‖y‖ ≤ 2) :
-    ‖Hf e y‖ ≤ 2 := by
+theorem Hf_norm_le_two {dim : (E →+* ℂ) → ℕ} (e y : Vsp dim) (he : ‖e‖ = 1) (hy : ‖y‖ ≤ 2)
+    : ‖Hf e y‖ ≤ 2 := by
   rw [Hf_eq_inner']
-  calc ‖inner ℂ y e‖ ≤ ‖y‖ * ‖e‖ := norm_inner_le_norm y e
+  calc
+    ‖inner ℂ y e‖
+      ≤ ‖y‖ * ‖e‖ := norm_inner_le_norm y e
     _ ≤ 2 := by rw [he, mul_one]; exact hy
 
 open Classical in
-theorem eU_props {dim : (E →+* ℂ) → ℕ} {n nb : ℕ} (bs : Fin nb → Block E n dim) (j : Fin nb)
-    (a : Fin (bs j).i) : InPart (bs j).τ (eU bs j a) ∧ ‖eU bs j a‖ = 1 := by
+theorem eU_props
+    {dim : (E →+* ℂ) → ℕ} {n nb : ℕ} (bs : Fin nb → Block E n dim) (j : Fin nb) (a : Fin (bs j).i)
+    : InPart (bs j).τ (eU bs j a) ∧ ‖eU bs j a‖ = 1 := by
   refine ⟨fun k hk => ?_, by simp [eU]⟩
   simp only [eU, PiLp.single_apply]
   rw [if_neg]
   rintro rfl
   exact hk rfl
 
-theorem norm_sgnT {dim : (E →+* ℂ) → ℕ} {n nb : ℕ} (bs : Fin nb → Block E n dim) (T : Choice bs) :
-    ‖sgnT bs T‖ ≤ 1 := by
+theorem norm_sgnT {dim : (E →+* ℂ) → ℕ} {n nb : ℕ} (bs : Fin nb → Block E n dim) (T : Choice bs)
+    : ‖sgnT bs T‖ ≤ 1 := by
   unfold sgnT
   rw [norm_prod]
   refine Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) fun j _ => ?_
@@ -40,10 +43,13 @@ theorem norm_sgnT {dim : (E →+* ℂ) → ℕ} {n nb : ℕ} (bs : Fin nb → Bl
 
 set_option maxHeartbeats 1000000 in
 open Classical in
-theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht : ColTorusStatement)
-    (ha : ColAbelStatement) (he : ColEmptyStatement) [IsCMField E] (X : PT E) {n nb : ℕ}
-    (bs : Fin nb → Block E n X.dim) (hD : Disj bs) (P : Par X (DF bs)) :
-    ∃ F ∈ X.Sec P.q n, X.l2 P.q F = 1 ∧ P.Jbound n ≤ ‖polyDeriv (P1 bs) dir F 0‖ ^ 2 := by
+theorem jof_core
+    (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht : ColTorusStatement)
+    (ha : ColAbelStatement) (he : ColEmptyStatement)
+    [IsCMField E]
+    (X : PT E)
+    {n nb : ℕ} (bs : Fin nb → Block E n X.dim) (hD : Disj bs) (P : Par X (DF bs))
+    : ∃ F ∈ X.Sec P.q n, X.l2 P.q F = 1 ∧ P.Jbound n ≤ ‖polyDeriv (P1 bs) dir F 0‖ ^ 2 := by
   obtain ⟨I, hI⟩ := hs E X (DF bs) P
   choose yB sB μB hsB hbd hl2 hyB hdet hμ using block_data_all X bs hx hc ht ha P I hI
   obtain ⟨se, hse, hse0, hsel⟩ := he E X (DF bs) P I hI
@@ -53,10 +59,8 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
     match owner bs k with
     | some p => sB p.1 p.2
     | none => se with hscdef
-  have hsc_col : ∀ p, sc (colB bs p) = sB p.1 p.2 := fun p => by
-    simp only [hscdef, owner_colB hD p]
-  have hsc_none : ∀ k, owner bs k = none → sc k = se := fun k hk => by
-    simp only [hscdef, hk]
+  have hsc_col : ∀ p, sc (colB bs p) = sB p.1 p.2 := fun p => by simp only [hscdef, owner_colB hD p]
+  have hsc_none : ∀ k, owner bs k = none → sc k = se := fun k hk => by simp only [hscdef, hk]
   have hsc : ∀ k, sc k ∈ X.Sec P.q 1 := by
     intro k
     rcases hk : owner bs k with _ | p
@@ -80,8 +84,7 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
     match owner bs k with
     | some p => ε * ‖μ p‖
     | none => 0 with hδdef
-  have hε0 : 0 ≤ ε := by
-    rw [hεdef, Par.eps1]; positivity
+  have hε0 : 0 ≤ ε := by rw [hεdef, Par.eps1]; positivity
 
   have hAb : ∀ T k, ‖A T k‖ ≤ α k := by
     intro T k
@@ -90,9 +93,11 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
     · simp only [hAdef, idealA, hk, hαdef]
       rw [norm_mul, norm_prod]
       gcongr
-      calc ∏ r, ‖Hf (eU bs p.1 (T p.1 r p.2)) (y p)‖ ≤ ∏ _r : Fin (bs p.1).c, (2 : ℝ) :=
-            Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) fun r _ =>
-              Hf_norm_le_two _ _ (eU_props bs p.1 _).2 (hyB p.1 p.2)
+      calc
+        ∏ r, ‖Hf (eU bs p.1 (T p.1 r p.2)) (y p)‖ ≤ ∏ _r : Fin (bs p.1).c, (2 : ℝ) :=
+          Finset.prod_le_prod₀
+            (fun _ _ => norm_nonneg _)
+            fun r _ => Hf_norm_le_two _ _ (eU_props bs p.1 _).2 (hyB p.1 p.2)
         _ = 2 ^ (bs p.1).c := by simp
   have hDb : ∀ T k, ‖D T k - A T k‖ ≤ δ k := by
     intro T k
@@ -105,7 +110,9 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
       simp only [hAdef, idealA, hk, hδdef, hDdef]
       rw [hsc_col]
       exact iteratedDeriv_list_bound (sB p.1 p.2) (bs p.1).c (μ p) (y p) (ε * ‖μ p‖) (bs p.1).τ
-        (hbd p.1 p.2) _ (fun r => eU bs p.1 (T p.1 r p.2)) (colL_block X hD T p)
+        (hbd p.1 p.2) _
+        (fun r => eU bs p.1 (T p.1 r p.2))
+        (colL_block X hD T p)
         (fun r => eU_props bs p.1 _)
   have herr := norm_sum_prod_sub_le (sgnT bs) (norm_sgnT bs) D A α δ hAb hDb
   rw [main_term bs hD μ y ee] at herr
@@ -119,8 +126,10 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
   set A1 : ℝ := ∏ p : (Σ j : Fin nb, Fin (bs j).i), ((2 : ℝ) ^ (bs p.1).c + ε) with hA1def
   have hCe0 : 0 ≤ Ce := Finset.prod_nonneg fun _ _ => norm_nonneg _
   have hMμ0 : 0 ≤ Mμ := Finset.prod_nonneg fun _ _ => norm_nonneg _
-  have hCm : ‖(∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), ee k) * (∏ p, μ p) *
-      ∏ j, (blockM bs y j).det ^ (bs j).c‖ = Ce * Mμ * Dt := by
+  have hCm
+      : ‖(∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), ee k) * (∏ p, μ p) *
+          ∏ j, (blockM bs y j).det ^ (bs j).c‖
+        = Ce * Mμ * Dt := by
     simp only [norm_mul, norm_prod, norm_pow, hCedef, hMμdef, hDtdef, heedef]
   have hα : ∏ k, α k = Ce * (Mμ * 2 ^ DF bs) := by
     rw [prod_cols hD]
@@ -156,7 +165,8 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
   have hK : ε ≤ Real.exp (-(((DF bs : ℝ) + 1) * ((X.r : ℝ) * Real.log X.r + 3 * X.r + 3))) := by
     have h6 := P.C6
     rw [hεdef, Par.eps1]
-    exact eps_bound X.gA (dstar (E := E) P.m) (t0 (E := E) P.q P.R0) _ (by push_cast at h6 ⊢; linarith)
+    exact eps_bound X.gA (dstar (E := E) P.m) (t0 (E := E) P.q P.R0) _
+      (by push_cast at h6 ⊢; linarith)
   have hε1 : ε ≤ 1 := by
     have hlog := Real.log_nonneg (show (1 : ℝ) ≤ X.r by exact_mod_cast hr1)
     have hr0 : (0 : ℝ) ≤ X.r := Nat.cast_nonneg _
@@ -177,16 +187,19 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
       (pow_le_pow_left₀ (by linarith) (by linarith) m).trans (pow_le_pow_right₀ (by norm_num) hm)
     have h4 : (0 : ℝ) ≤ 2 ^ DF bs := by positivity
     have h5 : (0 : ℝ) ≤ m * ε := by positivity
-    calc A1 - 2 ^ DF bs ≤ 2 ^ DF bs * ((1 + ε) ^ m - 1) := by nlinarith
+    calc
+      A1 - 2 ^ DF bs
+        ≤ 2 ^ DF bs * ((1 + ε) ^ m - 1) := by nlinarith
       _ ≤ 2 ^ DF bs * (m * ε * (1 + ε) ^ m) := mul_le_mul_of_nonneg_left h2 h4
       _ ≤ 2 ^ DF bs * (m * ε * 2 ^ DF bs) := by gcongr
   set δ0 : ℝ := (2 : ℝ) ^ (-(X.r : ℝ) / 2) / 2 with hδ0def
   have hδ0pos : 0 < δ0 := by positivity
   have hδ01 : δ0 ≤ 1 := by
     have : (2 : ℝ) ^ (-(X.r : ℝ) / 2) ≤ 1 :=
-      Real.rpow_le_one_of_one_le_of_nonpos (by norm_num) (by
-        have := Nat.cast_nonneg (α := ℝ) X.r; linarith)
-    rw [hδ0def]; linarith
+      Real.rpow_le_one_of_one_le_of_nonpos (by norm_num)
+        (by have := Nat.cast_nonneg (α := ℝ) X.r; linarith)
+    rw [hδ0def]
+    linarith
   have hDt : δ0 ^ DF bs ≤ Dt := by
     rw [hDtdef]
     refine prod_det_ge bs _ δ0 hδ0pos.le hδ01 (fun j hj => hdet j) (fun j hj => ?_)
@@ -202,11 +215,12 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
       have := Real.add_one_le_exp (1 : ℝ)
       exact inv_anti₀ (by norm_num) (by linarith)
     have hr0 : (0 : ℝ) ≤ X.r := Nat.cast_nonneg _
-    calc Real.exp (-((X.r : ℝ) / 2 + 1)) = Real.exp (-((X.r : ℝ) / 2)) * Real.exp (-1) := by
-          rw [← Real.exp_add]; ring_nf
+    calc
+      Real.exp (-((X.r : ℝ) / 2 + 1))
+        = Real.exp (-((X.r : ℝ) / 2)) * Real.exp (-1) := by rw [← Real.exp_add]; ring_nf
       _ ≤ Real.exp (Real.log 2 * (-(X.r : ℝ) / 2)) * (1 / 2) := by
-          gcongr
-          nlinarith
+        gcongr
+        nlinarith
       _ = Real.exp (Real.log 2 * (-(X.r : ℝ) / 2)) / 2 := by ring
   have hnum2 : (N : ℝ) * (A1 - 2 ^ DF bs) ≤ Dt / 2 := by
     have hc : (N : ℝ) ≤ (X.r : ℝ) ^ DF bs := by exact_mod_cast hcard
@@ -214,14 +228,17 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
     have hA0 : 0 ≤ A1 - 2 ^ DF bs := by
       rw [hA1def, ← prod_two_pow bs, sub_nonneg]
       exact Finset.prod_le_prod₀ (fun _ _ => by positivity) fun p _ => le_add_of_nonneg_right hε0
-    have hexp : Real.exp (-((X.r : ℝ) / 2 + 1)) ^ DF bs = Real.exp (-(((X.r : ℝ) / 2 + 1) * DF bs)) := by
+    have hexp
+        : Real.exp (-((X.r : ℝ) / 2 + 1)) ^ DF bs = Real.exp (-(((X.r : ℝ) / 2 + 1) * DF bs)) := by
       rw [← Real.exp_nat_mul]
       congr 1
       ring
     have hE : 0 < Real.exp ((X.r / 2 + 1) * DF bs) := Real.exp_pos _
-    have hfin : (DF bs : ℝ) * ε * (4 * X.r) ^ DF bs ≤ Real.exp (-(((X.r : ℝ) / 2 + 1) * DF bs)) / 2 := by
+    have hfin
+        : (DF bs : ℝ) * ε * (4 * X.r) ^ DF bs ≤ Real.exp (-(((X.r : ℝ) / 2 + 1) * DF bs)) / 2 := by
       rw [Real.exp_neg, ← one_div, div_div, le_div_iff₀ (by positivity)]
-      calc (DF bs : ℝ) * ε * (4 * X.r) ^ DF bs * (Real.exp ((X.r / 2 + 1) * DF bs) * 2)
+      calc
+        (DF bs : ℝ) * ε * (4 * X.r) ^ DF bs * (Real.exp ((X.r / 2 + 1) * DF bs) * 2)
           = 2 * (DF bs : ℝ) * (4 * X.r) ^ DF bs * Real.exp ((X.r / 2 + 1) * DF bs) * ε := by ring
         _ ≤ 1 := hnum
     have h4r : ((4 : ℝ) * X.r) ^ DF bs = 2 ^ DF bs * 2 ^ DF bs * (X.r : ℝ) ^ DF bs := by
@@ -230,33 +247,38 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
       mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hm' hε0) (by positivity)
     have hr0 : (0 : ℝ) ≤ (X.r : ℝ) ^ DF bs := by positivity
     have h20 : (0 : ℝ) ≤ 2 ^ DF bs := by positivity
-    calc (N : ℝ) * (A1 - 2 ^ DF bs)
-        ≤ (X.r : ℝ) ^ DF bs * (2 ^ DF bs * (m * ε * 2 ^ DF bs)) :=
-          mul_le_mul hc hA1le hA0 hr0
+    calc
+      (N : ℝ) * (A1 - 2 ^ DF bs)
+        ≤ (X.r : ℝ) ^ DF bs * (2 ^ DF bs * (m * ε * 2 ^ DF bs)) := mul_le_mul hc hA1le hA0 hr0
       _ ≤ (X.r : ℝ) ^ DF bs * (2 ^ DF bs * (DF bs * ε * 2 ^ DF bs)) :=
-          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hmε h20) hr0
+        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hmε h20) hr0
       _ = (DF bs : ℝ) * ε * (4 * X.r) ^ DF bs := by rw [h4r]; ring
       _ ≤ Real.exp (-(((X.r : ℝ) / 2 + 1) * DF bs)) / 2 := hfin
       _ ≤ Dt / 2 := by
-          rw [← hexp]
-          have := pow_le_pow_left₀ (Real.exp_pos _).le hδ0exp (DF bs)
-          linarith
-  have herr2 : ‖V0 - (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), ee k) * (∏ p, μ p) *
-      ∏ j, (blockM bs y j).det ^ (bs j).c‖ ≤ Ce * Mμ * Dt / 2 := by
+        rw [← hexp]
+        have := pow_le_pow_left₀ (Real.exp_pos _).le hδ0exp (DF bs)
+        linarith
+  have herr2
+      : ‖V0 - (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), ee k) * (∏ p, μ p) *
+          ∏ j, (blockM bs y j).det ^ (bs j).c‖
+        ≤ Ce * Mμ * Dt / 2 := by
     refine herr.trans ?_
     rw [hαδ, hα]
-    calc (N : ℝ) * (Ce * (Mμ * A1) - Ce * (Mμ * 2 ^ DF bs))
+    calc
+      (N : ℝ) * (Ce * (Mμ * A1) - Ce * (Mμ * 2 ^ DF bs))
         = Ce * Mμ * ((N : ℝ) * (A1 - 2 ^ DF bs)) := by ring
       _ ≤ Ce * Mμ * (Dt / 2) := mul_le_mul_of_nonneg_left hnum2 (mul_nonneg hCe0 hMμ0)
       _ = Ce * Mμ * Dt / 2 := by ring
   have hV0ge : Ce * Mμ * Dt / 2 ≤ ‖V0‖ := by
-    have := norm_sub_norm_le ((∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), ee k) *
-      (∏ p, μ p) * ∏ j, (blockM bs y j).det ^ (bs j).c) V0
+    have :=
+      norm_sub_norm_le
+        ((∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), ee k) * (∏ p, μ p)
+          * ∏ j, (blockM bs y j).det ^ (bs j).c)
+        V0
     rw [hCm, norm_sub_rev] at this
     linarith
 
-  have hCepos : 0 < Ce := Finset.prod_pos fun _ _ => by
-    have := hse0; linarith
+  have hCepos : 0 < Ce := Finset.prod_pos fun _ _ => by have := hse0; linarith
   have hMμpos : 0 < Mμ := Finset.prod_pos fun p _ => norm_pos_iff.2 (hμ p.1 p.2)
   have hDtpos : 0 < Dt := lt_of_lt_of_le (pow_pos hδ0pos _) hDt
   have hV0pos : 0 < ‖V0‖ := lt_of_lt_of_le (by positivity) hV0ge
@@ -278,13 +300,18 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
 
   set a : ℝ := 2 * Real.pi * Cchi (E := E) P.m * P.ph / P.q with hadef
   have ha0 : 0 ≤ a := by
-    have := Cchi_nonneg (E := E) P.m; have := ph_nonneg P; have := Real.pi_pos
-    rw [hadef]; positivity
+    have := Cchi_nonneg (E := E) P.m
+    have := ph_nonneg P
+    have := Real.pi_pos
+    rw [hadef]
+    positivity
   set w : ℝ := 4⁻¹ * P.K6⁻¹ * Real.exp (-a) with hwdef
   have hK6 := inv_constant_nonneg P
   have hJ : P.Jbound n = (∏ _k : Fin n, w) * (2 : ℝ)⁻¹ ^ ((X.r + 2) * DF bs) := by
-    have hwn : w ^ n = (4 : ℝ)⁻¹ ^ n * P.K6⁻¹ ^ n *
-        Real.exp (-(2 * Real.pi * n * Cchi (E := E) P.m * P.ph / P.q)) := by
+    have hwn
+        : w ^ n
+          = (4 : ℝ)⁻¹ ^ n * P.K6⁻¹ ^ n
+            * Real.exp (-(2 * Real.pi * n * Cchi (E := E) P.m * P.ph / P.q)) := by
       rw [hwdef, mul_pow, mul_pow, ← Real.exp_nat_mul]
       congr 2
       rw [hadef]
@@ -295,10 +322,13 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
     have hsq : (Ce * Mμ * Dt / 2) ^ 2 ≤ ‖V0‖ ^ 2 := pow_le_pow_left₀ (by positivity) hV0ge 2
     refine le_trans ?_ hsq
     rw [hJ, hl2F, prod_cols hD (fun _ => w), prod_cols hD (fun k => X.l2 P.q (sc k))]
-    have he1 : (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), w) *
-        (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), X.l2 P.q (sc k)) ≤ Ce ^ 2 := by
+    have he1
+        : (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), w)
+            * (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), X.l2 P.q (sc k))
+          ≤ Ce ^ 2 := by
       rw [← Finset.prod_mul_distrib, hCedef, ← Finset.prod_pow]
-      refine Finset.prod_le_prod₀ (fun k _ => mul_nonneg (by positivity) (l2NormSq_nonneg_gaussianTorus X P.q _))
+      refine Finset.prod_le_prod₀
+        (fun k _ => mul_nonneg (by positivity) (l2NormSq_nonneg_gaussianTorus X P.q _))
         fun k hk => ?_
       rw [Finset.mem_filter] at hk
       rw [hsc_none k hk.2, hwdef]
@@ -308,24 +338,30 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
       have h4 := l2NormSq_nonneg_gaussianTorus X P.q se
       have h5 : 0 ≤ Real.exp (-a) := (Real.exp_pos _).le
       nlinarith [mul_nonneg hK6 h4, mul_le_mul_of_nonneg_left h1 (mul_nonneg hK6 h4)]
-    have he2 : (∏ p : (Σ j : Fin nb, Fin (bs j).i), w) *
-        (∏ p : (Σ j : Fin nb, Fin (bs j).i), X.l2 P.q (sc (colB bs p))) ≤ 4⁻¹ * Mμ ^ 2 := by
+    have he2
+        : (∏ p : (Σ j : Fin nb, Fin (bs j).i), w)
+            * (∏ p : (Σ j : Fin nb, Fin (bs j).i), X.l2 P.q (sc (colB bs p)))
+          ≤ 4⁻¹ * Mμ ^ 2 := by
       rw [← Finset.prod_mul_distrib]
-      calc ∏ p : (Σ j : Fin nb, Fin (bs j).i), (w * X.l2 P.q (sc (colB bs p)))
-          ≤ ∏ p : (Σ j : Fin nb, Fin (bs j).i), (4⁻¹ * ‖μ p‖ ^ 2) := by
-            refine Finset.prod_le_prod₀ (fun p _ => mul_nonneg (by positivity) (l2NormSq_nonneg_gaussianTorus X P.q _))
-              fun p _ => ?_
-            rw [hsc_col, hwdef]
-            have := hl2 p.1 p.2
-            nlinarith
+      calc
+        ∏ p : (Σ j : Fin nb, Fin (bs j).i), (w * X.l2 P.q (sc (colB bs p)))
+            ≤ ∏ p : (Σ j : Fin nb, Fin (bs j).i), (4⁻¹ * ‖μ p‖ ^ 2) := by
+          refine Finset.prod_le_prod₀
+            (fun p _ => mul_nonneg (by positivity) (l2NormSq_nonneg_gaussianTorus X P.q _))
+            fun p _ => ?_
+          rw [hsc_col, hwdef]
+          have := hl2 p.1 p.2
+          nlinarith
         _ = (4⁻¹) ^ m * Mμ ^ 2 := by
-            rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, hMμdef, Finset.prod_pow]
+          rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, hMμdef, Finset.prod_pow]
         _ ≤ 4⁻¹ * Mμ ^ 2 := by
-            have hm1 : 1 ≤ m := card_pos_pos bs P.hDF
-            have : ((4 : ℝ)⁻¹) ^ m ≤ 4⁻¹ := by
-              calc ((4 : ℝ)⁻¹) ^ m ≤ (4⁻¹) ^ 1 := pow_le_pow_of_le_one (by norm_num) (by norm_num) hm1
-                _ = 4⁻¹ := pow_one _
-            gcongr
+          have hm1 : 1 ≤ m := card_pos_pos bs P.hDF
+          have : ((4 : ℝ)⁻¹) ^ m ≤ 4⁻¹ := by
+            calc
+              ((4 : ℝ)⁻¹) ^ m
+                ≤ (4⁻¹) ^ 1 := pow_le_pow_of_le_one (by norm_num) (by norm_num) hm1
+              _ = 4⁻¹ := pow_one _
+          gcongr
     have he3 : (2 : ℝ)⁻¹ ^ ((X.r + 2) * DF bs) ≤ Dt ^ 2 := by
       have hδsq : δ0 ^ 2 = (2 : ℝ)⁻¹ ^ (X.r + 2) := by
         rw [hδ0def, div_pow, ← Real.rpow_natCast ((2 : ℝ) ^ (-(X.r : ℝ) / 2)) 2,
@@ -337,25 +373,30 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
         rw [pow_mul, ← hδsq, ← pow_mul, ← pow_mul, mul_comm]
       rw [h1]
       exact pow_le_pow_left₀ (by positivity) hDt 2
-    have hA : 0 ≤ (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), w) *
-        (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), X.l2 P.q (sc k)) :=
+    have hA
+        : 0
+          ≤ (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), w)
+            * (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), X.l2 P.q (sc k)) :=
       mul_nonneg (Finset.prod_nonneg fun _ _ => by positivity)
         (Finset.prod_nonneg fun _ _ => l2NormSq_nonneg_gaussianTorus X P.q _)
-    have hB : 0 ≤ (∏ p : (Σ j : Fin nb, Fin (bs j).i), w) *
-        (∏ p : (Σ j : Fin nb, Fin (bs j).i), X.l2 P.q (sc (colB bs p))) :=
+    have hB
+        : 0
+          ≤ (∏ p : (Σ j : Fin nb, Fin (bs j).i), w)
+            * (∏ p : (Σ j : Fin nb, Fin (bs j).i), X.l2 P.q (sc (colB bs p))) :=
       mul_nonneg (Finset.prod_nonneg fun _ _ => by positivity)
         (Finset.prod_nonneg fun _ _ => l2NormSq_nonneg_gaussianTorus X P.q _)
-    calc (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), w) *
-          (∏ p : (Σ j : Fin nb, Fin (bs j).i), w) * (2 : ℝ)⁻¹ ^ ((X.r + 2) * DF bs) *
-          ((∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), X.l2 P.q (sc k)) *
-            ∏ p : (Σ j : Fin nb, Fin (bs j).i), X.l2 P.q (sc (colB bs p)))
-        = ((∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), w) *
-            (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), X.l2 P.q (sc k))) *
-          ((∏ p : (Σ j : Fin nb, Fin (bs j).i), w) *
-            (∏ p : (Σ j : Fin nb, Fin (bs j).i), X.l2 P.q (sc (colB bs p)))) *
-          (2 : ℝ)⁻¹ ^ ((X.r + 2) * DF bs) := by ring
-      _ ≤ Ce ^ 2 * (4⁻¹ * Mμ ^ 2) * Dt ^ 2 := by
-          gcongr
+    calc
+      (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), w)
+            * (∏ p : (Σ j : Fin nb, Fin (bs j).i), w) * (2 : ℝ)⁻¹ ^ ((X.r + 2) * DF bs)
+            * ((∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), X.l2 P.q (sc k))
+              * ∏ p : (Σ j : Fin nb, Fin (bs j).i), X.l2 P.q (sc (colB bs p)))
+          = ((∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), w)
+              * (∏ k ∈ Finset.univ.filter (fun k => owner bs k = none), X.l2 P.q (sc k)))
+            * ((∏ p : (Σ j : Fin nb, Fin (bs j).i), w)
+              * (∏ p : (Σ j : Fin nb, Fin (bs j).i), X.l2 P.q (sc (colB bs p))))
+            * (2 : ℝ)⁻¹ ^ ((X.r + 2) * DF bs) := by
+        ring
+      _ ≤ Ce ^ 2 * (4⁻¹ * Mμ ^ 2) * Dt ^ 2 := by gcongr
       _ = (Ce * Mμ * Dt / 2) ^ 2 := by ring
 
   set c : ℂ := (((Real.sqrt (X.l2 P.q F₀))⁻¹ : ℝ) : ℂ) with hcdef
@@ -370,8 +411,10 @@ theorem jof_core (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht :
 
 end Core
 
-theorem jOf (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht : ColTorusStatement)
-    (ha : ColAbelStatement) (he : ColEmptyStatement) : JStatement := by
+theorem jOf
+    (hx : Ext.All) (hs : SplitStatement) (hc : CharStatement) (ht : ColTorusStatement)
+    (ha : ColAbelStatement) (he : ColEmptyStatement)
+    : JStatement := by
   intro E _ _ _ X n nb bs hD P
   exact jof_core hx hs hc ht ha he X bs hD P
 

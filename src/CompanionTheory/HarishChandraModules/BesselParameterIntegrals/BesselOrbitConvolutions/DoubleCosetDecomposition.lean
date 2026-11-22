@@ -21,7 +21,9 @@ theorem double_coset_decomposition : CompanionTheory.D.Upq.BesselFunctionalConst
   have hσ' : Formalism.MainNotions.S.IsDSHpk k r ε lam σ := hσ
   obtain ⟨P, hP, hw⟩ := hw0
   obtain ⟨C, hC⟩ := hIn.1 k r hOK.1 ε lam h H σ hHC hσ hgap hOK.2.1 P hP w0 w0 hw.2 hw.2
-  have hD : Formalism.MainNotions.InverseNormDecayBounds.DiagonalMatrixCoefficientPowerDecay σ w0 (Formalism.FourierDecayAlt.ThreeDimData.aOf r h) := ⟨C, fun g hg => hC g hg⟩
+  have hD : Formalism.MainNotions.InverseNormDecayBounds.DiagonalMatrixCoefficientPowerDecay σ w0
+      (Formalism.FourierDecayAlt.ThreeDimData.aOf r h) :=
+    ⟨C, fun g hg => hC g hg⟩
   have hh : 0 ≤ h := le_trans (by positivity) hOK.2.1
   have ha : 0 ≤ Formalism.FourierDecayAlt.ThreeDimData.aOf r h := div_nonneg hh (by positivity)
   exact Formalism.MainNotions.InverseNormDecayBounds.decDD hσ' ha hD x hx y hy

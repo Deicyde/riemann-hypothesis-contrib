@@ -5,10 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.normSpec_of :
-    SplitCover → CountEx → CountWt → MultPt → PtEx → PtLift → GenBasic → NormSpec := by
+theorem UpperTheory.Gal.TranscendenceTraces.normSpec_of
+    : SplitCover → CountEx → CountWt → MultPt → PtEx → PtLift → GenBasic → NormSpec := by
   intro hS hCE hCW hMP hPE hPL _
   unfold NormSpec
   intro A B _ _ _ _ _ _
@@ -20,13 +21,18 @@ theorem UpperTheory.Gal.TranscendenceTraces.normSpec_of :
   haveI := hπi
   haveI := hπs
   haveI := hι
-  have hk : ∀ s : ↥(Spec (CommRingCat.of B)), ∃ (Ω : Type) (_ : Field Ω) (_ : IsAlgClosed Ω)
-      (y : gp Ω ⟶ Spec (CommRingCat.of B)), pt y = s := fun s => hPE _ s
+  have hk
+      : ∀ s : ↥(Spec (CommRingCat.of B)),
+        ∃ (Ω : Type) (_ : Field Ω) (_ : IsAlgClosed Ω) (y : gp Ω ⟶ Spec (CommRingCat.of B)),
+          pt y = s := fun s =>
+    hPE _ s
   choose Ωk fk ak yk hyk using hk
-  let key : ↥(Spec (CommRingCat.of B)) → ℤ := fun s => letI := fk s; letI := ak s; mult p (Ωk s) (yk s)
+  let key : ↥(Spec (CommRingCat.of B)) → ℤ := fun s =>
+    letI := fk s; letI := ak s; mult p (Ωk s) (yk s)
   let m : ι → ℤ := fun j => key (c j)
-  have hm : ∀ j (Ω : Type) [Field Ω] [IsAlgClosed Ω] (z : gp Ω ⟶ Spec (CommRingCat.of B)),
-      c j = pt z → m j = mult p Ω z := by
+  have hm
+      : ∀ j (Ω : Type) [Field Ω] [IsAlgClosed Ω] (z : gp Ω ⟶ Spec (CommRingCat.of B)),
+        c j = pt z → m j = mult p Ω z := by
     intro j Ω _ _ z hz
     letI := fk (c j)
     letI := ak (c j)
@@ -45,7 +51,9 @@ theorem UpperTheory.Gal.TranscendenceTraces.normSpec_of :
   have hbot : (pt (x ≫ π)).asIdeal = ⊥ := by
     rw [hx]
     unfold GenPt at hz
-    have h0 := hz (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum A) ((PrimeSpectrum.le_iff_specializes _ _).mp bot_le)
+    have h0 :=
+      hz (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum A)
+        ((PrimeSpectrum.le_iff_specializes _ _).mp bot_le)
     rw [← h0]
   obtain ⟨⟨j0, hj0, huniq⟩, hcj⟩ := hgen Ω x z hx.symm hbot
   have hset : {j | x ≫ σ j = z} = {j0} := by

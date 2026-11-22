@@ -8,11 +8,19 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SqrtNegPr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.FrobeniusOrbits GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.FrobeniusOrbits
+  GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
 
 namespace GlobalTheory.HubLoc
 
-theorem localField_unramified : ∀ (D : D7) (i : D.nd.Loc), D.nd.l i ∉ D.host.small → D.nd.l i ≠ D.host.q → D.nd.l i ≠ D.host.d → ∀ (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i)), Loc.K0 (D.nbr i w hw).Kw = (D.nbr i w hw).Kw.1 ∧ (D.nbr i w hw).Kw.1 ≤ Loc.Ks (D.nbr i w hw).Kw 1 ∧ Loc.Good (D.nbr i w hw).Kw 1 (D.nbr i w hw).LL := by
+theorem localField_unramified
+    : ∀ (D : D7) (i : D.nd.Loc),
+      D.nd.l i ∉ D.host.small → D.nd.l i ≠ D.host.q → D.nd.l i ≠ D.host.d
+        → ∀ (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i)),
+          Loc.K0 (D.nbr i w hw).Kw = (D.nbr i w hw).Kw.1
+            ∧ (D.nbr i w hw).Kw.1 ≤ Loc.Ks (D.nbr i w hw).Kw 1
+            ∧ Loc.Good (D.nbr i w hw).Kw 1 (D.nbr i w hw).LL := by
   intro D i hs hq hd w hw
   have h2 : D.nd.l i ≠ 2 := fun e => hs (e ▸ D.host.toHostRaw.two_mem_small)
   have hN : ¬ D.nd.l i ∣ D.host.condN := fun h => by

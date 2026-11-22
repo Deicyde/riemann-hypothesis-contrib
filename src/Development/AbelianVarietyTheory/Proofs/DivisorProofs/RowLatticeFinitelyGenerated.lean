@@ -8,29 +8,43 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSmulNo
 @[expose] public section
 
 set_option synthInstance.maxHeartbeats 400000
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV
+  Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.BigTop GlobalTheory.CovTop
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CovTop.LatAllFG
 
-theorem fg_latOf_congr {K : Type} [Field K] [NumberField K] {R : Type} [CommRing R] [Algebra K R] [Algebra (𝓞 K) R]
-    [IsScalarTower (𝓞 K) K R] {C C' : Submodule K R} (hC : C = C')
-    (Vs : IsDedekindDomain.HeightOneSpectrum (𝓞 K) → Set (R → EReal)) (hV : ∀ la, ∀ v ∈ Vs la, IsVal la v)
-    (h : (latOf C Vs hV).FG) : (latOf C' Vs hV).FG := by
+theorem fg_latOf_congr
+    {K : Type} [Field K] [NumberField K]
+    {R : Type} [CommRing R] [Algebra K R] [Algebra (𝓞 K) R] [IsScalarTower (𝓞 K) K R]
+    {C C' : Submodule K R} (hC : C = C')
+    (Vs : IsDedekindDomain.HeightOneSpectrum (𝓞 K) → Set (R → EReal))
+    (hV : ∀ la, ∀ v ∈ Vs la, IsVal la v) (h : (latOf C Vs hV).FG)
+    : (latOf C' Vs hV).FG := by
   subst hC; exact h
 
-theorem latW_fg {D : D7} (T : CoreJ D) (hT : LawsJ T) (j : ℕ) (hj : InR D j) (w : WeightFamilies.Wt D j) (hn : 0 < w.n) :
-    (latW (T.U j) (wtZ (wtA w) w.n)).FG := by
-  have h := (GlobalTheory.SupFull.fullAt_of_pins D T.toCore hT.pins j hj (hT.unf j hj _ T.good_σ₀) w hn).1
-  unfold GlobalTheory.IndefiniteRowSideFullHecke.KappaLatticeEvaluation.supLat GlobalTheory.IndefiniteRowSideFullHecke.KappaLatticeEvaluation.latIn at h
+theorem latW_fg
+    {D : D7} (T : CoreJ D) (hT : LawsJ T)
+    (j : ℕ) (hj : InR D j) (w : WeightFamilies.Wt D j) (hn : 0 < w.n)
+    : (latW (T.U j) (wtZ (wtA w) w.n)).FG := by
+  have h :=
+    (GlobalTheory.SupFull.fullAt_of_pins D T.toCore hT.pins j hj (hT.unf j hj _ T.good_σ₀) w hn).1
+  unfold GlobalTheory.IndefiniteRowSideFullHecke.KappaLatticeEvaluation.supLat
+      GlobalTheory.IndefiniteRowSideFullHecke.KappaLatticeEvaluation.latIn
+    at h
   have h2 := Submodule.fg_of_fg_map_injective _ Subtype.val_injective h
-  exact fg_latOf_congr (cuspW_wtZ (Xo := T.Q.Xo j) (c := T.Q.c) (U := T.U j) (wtA w) w.n).symm _ _ h2
+  exact fg_latOf_congr (cuspW_wtZ (Xo := T.Q.Xo j) (c := T.Q.c) (U := T.U j) (wtA w) w.n).symm _ _
+    h2
 
-theorem fg_span_image {K L V W : Type} [Field K] [Field L] [Algebra K L] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-    [IsScalarTower (𝓞 K) K V] [AddCommGroup W] [Module L W] [Module (𝓞 L) W] [IsScalarTower (𝓞 L) L W]
-    (ι : V →ₛₗ[algebraMap K L] W) (M : Submodule (𝓞 K) V) (hM : M.FG) :
-    (Submodule.span (𝓞 L) (ι '' (M : Set V))).FG := by
+theorem fg_span_image
+    {K L V W : Type} [Field K] [Field L] [Algebra K L] [AddCommGroup V] [Module K V]
+    [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [AddCommGroup W] [Module L W] [Module (𝓞 L) W]
+    [IsScalarTower (𝓞 L) L W]
+    (ι : V →ₛₗ[algebraMap K L] W)
+    (M : Submodule (𝓞 K) V) (hM : M.FG)
+    : (Submodule.span (𝓞 L) (ι '' (M : Set V))).FG := by
   classical
   obtain ⟨s, hs⟩ := hM
   refine ⟨s.image ι, le_antisymm ?_ ?_⟩
@@ -45,10 +59,10 @@ theorem fg_span_image {K L V W : Type} [Field K] [Field L] [Algebra K L] [AddCom
     | add y z _ _ hy hz => rw [map_add]; exact add_mem hy hz
     | smul c y _ hy =>
       have e : ι (c • y) = (RingOfIntegers.mapRingHom (algebraMap K L) c) • ι y := by
-        rw [← algebraMap_smul K c y, ι.map_smulₛₗ, ← algebraMap_smul L (RingOfIntegers.mapRingHom (algebraMap K L) c) (ι y)]
+        rw [← algebraMap_smul K c y, ι.map_smulₛₗ,
+          ← algebraMap_smul L (RingOfIntegers.mapRingHom (algebraMap K L) c) (ι y)]
         rfl
       rw [e]
       exact Submodule.smul_mem _ _ hy
 
 end GlobalTheory.CovTop.LatAllFG
-

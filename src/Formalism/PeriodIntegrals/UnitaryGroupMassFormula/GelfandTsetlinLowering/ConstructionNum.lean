@@ -13,8 +13,11 @@ open Formalism.BasicNotions MvPolynomial
 
 theorem numbers_dominant_large : Numbers := by
   intro n N h lam sg hI
-  exact ⟨PI.GTNum.cBr_ne_zero h lam sg hI, PI.GTNum.abs_cBr_le_cBd h lam sg hI,
-    PI.GTNum.degZ_eq h lam sg⟩
+  exact ⟨
+    PI.GTNum.cBr_ne_zero h lam sg hI,
+    PI.GTNum.abs_cBr_le_cBd h lam sg hI,
+    PI.GTNum.degZ_eq h lam sg
+  ⟩
 
 theorem scalar_vanishing_criterion : ZScalarVanish := by
   intro n N h lam sg mu hsg hmu hne hw

@@ -32,7 +32,8 @@ theorem sq_le_two_pow (k : ℕ) (hk : 4 ≤ k) : k ^ 2 ≤ 2 ^ k := by
   | base => norm_num
   | succ k hk ih => rw [pow_succ 2 k]; nlinarith
 
-theorem sizes_low {D : D7} (L : SizeData₂ D) (h : SizesAt L) : L.sc.x ≤ D.R.k ∧ Real.sqrt L.sc.b ≤ L.sc.b' := by
+theorem sizes_low {D : D7} (L : SizeData₂ D) (h : SizesAt L)
+    : L.sc.x ≤ D.R.k ∧ Real.sqrt L.sc.b ≤ L.sc.b' := by
   obtain ⟨-, -, hK, -, -, -, -, -, -, -, -, -, -, -, -, -, -, hW, -⟩ := h
   have hx := L.sc.one_lt_alt
   have he := L.sc.eps_pos
@@ -47,8 +48,8 @@ theorem sizes_low {D : D7} (L : SizeData₂ D) (h : SizesAt L) : L.sc.x ≤ D.R.
     unfold Scale.b' Scale.a Scale.b Scale.X'
     positivity
 
-theorem err_le (D : D7) {δ : ℝ} (hδ : 0 < δ) (h : 8 / Real.log (1 + δ) ≤ D.R.k) :
-    Real.exp ((D.R.f : ℝ) * (2 : ℝ) ^ ((3 : ℝ) - D.R.k)) - 1 ≤ δ := by
+theorem err_le (D : D7) {δ : ℝ} (hδ : 0 < δ) (h : 8 / Real.log (1 + δ) ≤ D.R.k)
+    : Real.exp ((D.R.f : ℝ) * (2 : ℝ) ^ ((3 : ℝ) - D.R.k)) - 1 ≤ δ := by
   have hk := D.R.m_add_three_le_k
   have hm := D.R.two_le_m
   have hkR : (5 : ℝ) ≤ D.R.k := by exact_mod_cast (by omega : 5 ≤ D.R.k)
@@ -59,12 +60,17 @@ theorem err_le (D : D7) {δ : ℝ} (hδ : 0 < δ) (h : 8 / Real.log (1 + δ) ≤
     rw [Real.rpow_sub two_pos, Real.rpow_natCast]; norm_num
   rw [sub_le_iff_le_add', ← Real.le_log_iff_exp_le (by linarith), e2]
   rw [div_le_iff₀ hl] at h
-  calc (D.R.f : ℝ) * (8 / 2 ^ D.R.k) ≤ D.R.k * (8 / (D.R.k : ℝ) ^ 2) := by gcongr
+  calc
+    (D.R.f : ℝ) * (8 / 2 ^ D.R.k)
+      ≤ D.R.k * (8 / (D.R.k : ℝ) ^ 2) := by gcongr
     _ = 8 / D.R.k := by field_simp
     _ ≤ _ := by rw [div_le_iff₀ (by linarith)]; linarith
 
-theorem form_of_ranks (D : D7) (hR : LocalBesselAndTopKernel.FamilyMidVolume D) (u : D.what₂.Word) (h3 : UnitaryVolumeMass.stLem3L0 D u) {C0 : ℝ}
-    (hD : StandingNumericalData D C0) : UnitaryVolumeMass.FormAt D u := by
+theorem form_of_ranks
+    (D : D7) (hR : LocalBesselAndTopKernel.FamilyMidVolume D) (u : D.what₂.Word)
+    (h3 : UnitaryVolumeMass.stLem3L0 D u)
+    {C0 : ℝ} (hD : StandingNumericalData D C0)
+    : UnitaryVolumeMass.FormAt D u := by
   intro F0 he hz what₂ hrows
   obtain ⟨-, -, -, -, -, -, -, -, hT, -⟩ := hD
   have hp := (D.mem u).A.T_prime
@@ -72,7 +78,8 @@ theorem form_of_ranks (D : D7) (hR : LocalBesselAndTopKernel.FamilyMidVolume D) 
     have h1 := (hT u).2
     have h2 : 2 * 2 ≤ D.host.g 0 * D.host.g 1 :=
       Nat.mul_le_mul (D.host.g_prime 0).two_le (D.host.g_prime 1).two_le
-    have h4 : D.host.g 0 * D.host.g 1 ≤ (D.host.g 0 * D.host.g 1) ^ 2 := Nat.le_self_pow (by norm_num) _
+    have h4 : D.host.g 0 * D.host.g 1 ≤ (D.host.g 0 * D.host.g 1) ^ 2 :=
+      Nat.le_self_pow (by norm_num) _
     have h5 := hp.two_le
     by_contra h
     rw [Nat.mod_eq_of_lt (by omega), Nat.mod_eq_of_lt (by omega)] at h1
@@ -83,13 +90,16 @@ theorem form_of_ranks (D : D7) (hR : LocalBesselAndTopKernel.FamilyMidVolume D) 
   have h4 : dimPi (hc := D.hcW) u = ∏ τ, vand (uS D u τ) / ∏ i ∈ range D.R.k, (i.factorial : ℝ) :=
     prod_congr rfl fun τ _ => (GlobalTheory.WeylDimU.weyl_dimension _ _ (isHCParam_uS D u τ)).2
   rw [h1, h2, h4]
-  change _ * (Cnt.massU D.host.E D.R.k * (Tr D u ^ D.R.k - 1) ^ D.R.f) * _ =
-    Cnt.massU D.host.E D.R.k * _ * _ * _
+  change _ * (Cnt.massU D.host.E D.R.k * (Tr D u ^ D.R.k - 1) ^ D.R.f) * _
+    = Cnt.massU D.host.E D.R.k * _ * _ * _
   ring
 
-theorem tcrit_low_of_dsig (hDs : Formalism.L2.SG.Pf.SzHypFD.DsigHC) (D : D7) (large₂ : SizeData₂ D)
-    (C' Cl Cg cb Cu cT CT C0 : ℝ) (hCl : 40 ≤ Cl) (hT : Ties D) (hb' : Real.sqrt large₂.sc.b ≤ large₂.sc.b')
-    (hx : large₂.sc.x ≤ D.R.k) : UnitaryVolumeMass.stTcritLow D large₂ C' Cl Cg cb Cu cT CT C0 := by
+theorem tcrit_low_of_dsig
+    (hDs : Formalism.L2.SG.Pf.SzHypFD.DsigHC)
+    (D : D7) (large₂ : SizeData₂ D)
+    (C' Cl Cg cb Cu cT CT C0 : ℝ) (hCl : 40 ≤ Cl)
+    (hT : Ties D) (hb' : Real.sqrt large₂.sc.b ≤ large₂.sc.b') (hx : large₂.sc.x ≤ D.R.k)
+    : UnitaryVolumeMass.stTcritLow D large₂ C' Cl Cg cb Cu cT CT C0 := by
   intro hH
   haveI : Fact Formalism.L2.SG.Pf.SzHypFD.DsigHC := ⟨hDs⟩
   have hL : 1 ≤ large₂.sc.L := Real.one_le_rpow large₂.sc.one_lt_alt.le large₂.sc.eps_pos.le
@@ -98,21 +108,42 @@ theorem tcrit_low_of_dsig (hDs : Formalism.L2.SG.Pf.SzHypFD.DsigHC) (D : D7) (la
     Formalism.L2.SG.Pf.SzHypFD.vv_eq_vand hT hH.1 hCL τ
   exact tcrit_low D large₂ C' Cl Cg cb Cu cT CT C0 hCl hVV hb' hx hH
 
-theorem along_family :
-    Formalism.L2.SG.Pf.SzHypFD.DsigHC → ∀ (eps : ℝ) (Fm : FamP eps) (Cg cb Cu cT CT C0 A : ℝ), 40 ≤ sCl Fm → PX.RanksF Fm C0 Cg cb Cu cT CT → VanishingOnXAndXPlusMass.Conclusion3Family Fm → VanishingOnXAndXPlus.FamilyRowsExist Fm ∧ VanishingOnXAndXPlus.admF6 Fm Cg cb Cu cT CT C0 ∧ VanishingOnXAndXPlus.admF7 Fm Cg cb Cu cT CT C0 ∧ VanishingOnXAndXPlus.admF8 Fm Cg cb Cu cT CT C0 A ∧ VanishingOnXAndXPlus.FamilyWeylDimensionVandermondeQuotient Fm Cg cb Cu cT CT C0 ∧ (OwnEv Fm fun C' Cl x i => Cnt.Hyp0 (Fm.D x i) (Fm.L x i) C' Cl Cg cb Cu cT CT C0 → ∀ u, UnitaryVolumeMass.FormAt (Fm.D x i) u) := by
+theorem along_family
+    : Formalism.L2.SG.Pf.SzHypFD.DsigHC
+      → ∀ (eps : ℝ) (Fm : FamP eps) (Cg cb Cu cT CT C0 A : ℝ),
+        40 ≤ sCl Fm → PX.RanksF Fm C0 Cg cb Cu cT CT → VanishingOnXAndXPlusMass.Conclusion3Family Fm
+          → VanishingOnXAndXPlus.FamilyRowsExist Fm
+            ∧ VanishingOnXAndXPlus.admF6 Fm Cg cb Cu cT CT C0
+            ∧ VanishingOnXAndXPlus.admF7 Fm Cg cb Cu cT CT C0
+            ∧ VanishingOnXAndXPlus.admF8 Fm Cg cb Cu cT CT C0 A
+            ∧ VanishingOnXAndXPlus.FamilyWeylDimensionVandermondeQuotient Fm Cg cb Cu cT CT C0
+            ∧ (OwnEv Fm fun C' Cl x i =>
+              Cnt.Hyp0 (Fm.D x i) (Fm.L x i) C' Cl Cg cb Cu cT CT C0
+                → ∀ u, UnitaryVolumeMass.FormAt (Fm.D x i) u) := by
   intro hDs eps Fm Cg cb Cu cT CT C0 A hCl hR h3
-  have hM : ∀ D : D7, UnitaryVolumeMass.stMassRatio D := GlobalTheory.MassAtRecord.massRatio_at_record
-  have hform : OwnEv Fm fun C' Cl x i => Cnt.Hyp0 (Fm.D x i) (Fm.L x i) C' Cl Cg cb Cu cT CT C0 →
-      ∀ u, UnitaryVolumeMass.FormAt (Fm.D x i) u := by
+  have hM : ∀ D : D7, UnitaryVolumeMass.stMassRatio D :=
+    GlobalTheory.MassAtRecord.massRatio_at_record
+  have hform : OwnEv Fm fun C' Cl x i =>
+      Cnt.Hyp0 (Fm.D x i) (Fm.L x i) C' Cl Cg cb Cu cT CT C0
+        → ∀ u, UnitaryVolumeMass.FormAt (Fm.D x i) u := by
     obtain ⟨x0, h⟩ := hR
     refine ⟨max x0 (Fm.x1 + 1), fun x hx i hH u => ?_⟩
     have hx1 : Fm.x1 < x := lt_of_lt_of_le (lt_add_one _) ((le_max_right _ _).trans hx)
-    exact form_of_ranks _ (h x ((le_max_left _ _).trans hx) i ⟨hH.2.1, hH.1, hH.2.2⟩) u (h3 x hx1 i u) hH.2.1
-  refine ⟨fun x i => ?_, ?_, ?_, hform.mono fun _ _ _ _ h u u' hH => h hH.1 u, ⟨0, fun x _ i _ w τ => ?_⟩, hform⟩
+    exact form_of_ranks _ (h x ((le_max_left _ _).trans hx) i ⟨hH.2.1, hH.1, hH.2.2⟩) u
+      (h3 x hx1 i u) hH.2.1
+  refine ⟨
+    fun x i => ?_,
+    ?_,
+    ?_,
+    hform.mono fun _ _ _ _ h u u' hH => h hH.1 u,
+    ⟨0, fun x _ i _ w τ => ?_⟩,
+    hform
+  ⟩
   · intro τ w H _ _ z π hπ
     obtain ⟨g, -, hg⟩ := hπ
     exact (GlobalTheory.WeylDimU.weyl_dimension _ _ (isHCParam_uS (Fm.D x i) w τ)).1 H _ hg
-  · refine AuxiliaryNormPrimes.family_temperature_product_asymptotic_of_bessel_bound Fm Cg cb Cu cT CT C0 ?_ fun δ hδ => ?_
+  · refine AuxiliaryNormPrimes.family_temperature_product_asymptotic_of_bessel_bound Fm Cg cb Cu cT
+      CT C0 ?_ fun δ hδ => ?_
     · obtain ⟨x0, h0⟩ := hR
       refine ⟨x0, fun x hx i hH => ?_⟩
       have h := h0 x hx i

@@ -15,9 +15,12 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LocalOrbitChar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
-open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Filter Topology
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp
 open ReciprocityTheory.AnForm (levi)
 
 noncomputable section
@@ -26,14 +29,22 @@ namespace GlobalTheory.CompanionTheory.Ar.Cusp
 
 section Metric
 
-variable {K : Type} [Fintype K] {J : K → Type} [∀ k, Fintype (J k)] {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ]
-  {Ω : Type} [Field Ω] [Algebra ℚ Ω] {W : Ψ → Type} [∀ τ, AddCommGroup (W τ)] [∀ τ, Module Ω (W τ)]
+variable
+  {K : Type} [Fintype K]
+  {J : K → Type} [∀ k, Fintype (J k)]
+  {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ]
+  {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+  {W : Ψ → Type} [∀ τ, AddCommGroup (W τ)] [∀ τ, Module Ω (W τ)]
   {D : ComponentData II Ψ K J Ω W} {w : ((Σ k, J k) → ℂ) → ℝ}
 
-theorem MUc_h_of_mem (Hd : HodgeData D) {M : XModel D} (S : BoundedRegularisationSetting M D.Xo Hd.aMu w) (B p q : ℕ) (t : ℝ)
-    {z : (Σ k, J k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal D.y)) :
-    (MUc Hd S B p q t).h z = (S.ref.h z * Real.exp (S.bregWeight t (M.proj z))) ^ q *
-      (∏ p' ∈ D.SB B, D.vertFactor p' z) ^ q * D.A'.h z ^ p := by
+theorem MUc_h_of_mem
+    (Hd : HodgeData D)
+    {M : XModel D} (S : BoundedRegularisationSetting M D.Xo Hd.aMu w)
+    (B p q : ℕ) (t : ℝ)
+    {z : (Σ k, J k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal D.y))
+    : (MUc Hd S B p q t).h z
+      = (S.ref.h z * Real.exp (S.bregWeight t (M.proj z))) ^ q
+        * (∏ p' ∈ D.SB B, D.vertFactor p' z) ^ q * D.A'.h z ^ p := by
   set P := mCoordIdeal D.y with hPdef
   set a : K → ℤ := (q : ℤ) • muTwDeg Hd B + (p : ℤ) • D.a' with ha
   set F : ((Σ k, J k) → ℂ) → ℝ := fun z => (S.ref.h z * Real.exp (S.bregWeight t (M.proj z))) ^ q *
@@ -43,12 +54,13 @@ theorem MUc_h_of_mem (Hd : HodgeData D) {M : XModel D} (S : BoundedRegularisatio
   have hMH : IsMultiHomogIdeal P := D.arith.2.1.2.1
   have hpos : ∀ z ∈ mcPts P, 0 < F z := by
     intro z hz
-    have h2 : 0 < ∏ p' ∈ D.SB B, D.vertFactor p' z := Finset.prod_pos fun p' hp' =>
-      VertFactorPos.proof II Ψ K J Ω W D p' (hSB p' hp') z hz
+    have h2 : 0 < ∏ p' ∈ D.SB B, D.vertFactor p' z :=
+      Finset.prod_pos fun p' hp' => VertFactorPos.proof II Ψ K J Ω W D p' (hSB p' hp') z hz
     exact mul_pos (mul_pos (pow_pos (mul_pos (S.ref.pos z hz.1) (Real.exp_pos _)) q) (pow_pos h2 q))
       (pow_pos (D.A'.pos z hz.1) p)
-  have hhom : ∀ z ∈ mcPts P, ∀ c : K → ℂ, (∀ k, c k ≠ 0) →
-      F (torusSmul c z) = (∏ k, ‖c k‖ ^ a k) * F z := by
+  have hhom
+      : ∀ z ∈ mcPts P, ∀ c : K → ℂ,
+        (∀ k, c k ≠ 0) → F (torusSmul c z) = (∏ k, ‖c k‖ ^ a k) * F z := by
     intro z hz c hc
     have hcz : torusSmul c z ∈ mcPts P := mcPts_smul hMH c hc hz
     have hproj : M.proj (torusSmul c z) = M.proj z := ((M.fibre z hz _ hcz).2 ⟨c, hc, rfl⟩).symm
@@ -60,8 +72,9 @@ theorem MUc_h_of_mem (Hd : HodgeData D) {M : XModel D} (S : BoundedRegularisatio
       have := D.A'.smul c z hc
       rw [D.A'_deg] at this
       exact this
-    have hV : ∀ p' ∈ D.SB B, D.vertFactor p' (torusSmul c z) =
-        (∏ k, ‖c k‖ ^ D.vdeg p' k) * D.vertFactor p' z :=
+    have hV
+        : ∀ p' ∈ D.SB B,
+          D.vertFactor p' (torusSmul c z) = (∏ k, ‖c k‖ ^ D.vdeg p' k) * D.vertFactor p' z :=
       fun p' hp' => (hVS II Ψ K J Ω W D p' (hSB p' hp')).1 z hz c hc
     have hk : ∀ k, ‖c k‖ ^ a k = (‖c k‖ ^ (muTwDeg Hd B) k) ^ q * (‖c k‖ ^ D.a' k) ^ p := by
       intro k
@@ -69,10 +82,12 @@ theorem MUc_h_of_mem (Hd : HodgeData D) {M : XModel D} (S : BoundedRegularisatio
       have hak : a k = (q : ℤ) * (muTwDeg Hd B) k + (p : ℤ) * D.a' k := by
         simp only [ha, Pi.add_apply, Pi.smul_apply, smul_eq_mul]
       rw [hak, zpow_add₀ hx, _root_.zpow_mul', zpow_natCast, _root_.zpow_mul', zpow_natCast]
-    have hprod : (∏ k, ‖c k‖ ^ a k) = ((∏ k, ‖c k‖ ^ Hd.aMu k) *
-        ∏ p' ∈ D.SB B, ∏ k, ‖c k‖ ^ D.vdeg p' k) ^ q * (∏ k, ‖c k‖ ^ D.a' k) ^ p := by
-      rw [Finset.prod_congr rfl fun k _ => hk k, Finset.prod_mul_distrib, Finset.prod_pow, Finset.prod_pow,
-        muTwDeg, MuRegSmooth.prod_norm_zpow_add_sum hc]
+    have hprod
+        : (∏ k, ‖c k‖ ^ a k)
+          = ((∏ k, ‖c k‖ ^ Hd.aMu k) * ∏ p' ∈ D.SB B, ∏ k, ‖c k‖ ^ D.vdeg p' k) ^ q
+            * (∏ k, ‖c k‖ ^ D.a' k) ^ p := by
+      rw [Finset.prod_congr rfl fun k _ => hk k, Finset.prod_mul_distrib, Finset.prod_pow,
+        Finset.prod_pow, muTwDeg, MuRegSmooth.prod_norm_zpow_add_sum hc]
     simp only [hFdef]
     rw [hproj, href, hA, Finset.prod_congr rfl hV, Finset.prod_mul_distrib, hprod]
     ring
@@ -80,17 +95,24 @@ theorem MUc_h_of_mem (Hd : HodgeData D) {M : XModel D} (S : BoundedRegularisatio
   rw [smoothRepConj_h _ hz]
   exact NbarSmooth.hermOfFun_h_of_mem hMH hhom hz (hpos z hz)
 
-theorem log_MUc_h_of_mem (Hd : HodgeData D) {M : XModel D} (S : BoundedRegularisationSetting M D.Xo Hd.aMu w) (B p q : ℕ) (t : ℝ)
-    {z : (Σ k, J k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal D.y)) :
-    Real.log ((MUc Hd S B p q t).h z) = q * (Real.log (S.ref.h z) + S.bregWeight t (M.proj z) +
-      ∑ r ∈ D.SB B, Real.log (D.vertFactor r z)) + p * Real.log (D.A'.h z) := by
+theorem log_MUc_h_of_mem
+    (Hd : HodgeData D)
+    {M : XModel D} (S : BoundedRegularisationSetting M D.Xo Hd.aMu w)
+    (B p q : ℕ) (t : ℝ)
+    {z : (Σ k, J k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal D.y))
+    : Real.log ((MUc Hd S B p q t).h z)
+      = q * (Real.log (S.ref.h z) + S.bregWeight t (M.proj z)
+          + ∑ r ∈ D.SB B, Real.log (D.vertFactor r z))
+        + p * Real.log (D.A'.h z) := by
   have hSB : ∀ p' ∈ D.SB B, 0 < D.vertFactor p' z := fun p' hp' =>
     VertFactorPos.proof II Ψ K J Ω W D p' (Finset.mem_filter.1 hp').1 z hz
   have h1 : S.ref.h z ≠ 0 := (S.ref.pos z hz.1).ne'
   have h2 : D.A'.h z ≠ 0 := (D.A'.pos z hz.1).ne'
   have h3 : ∏ p' ∈ D.SB B, D.vertFactor p' z ≠ 0 := (Finset.prod_pos hSB).ne'
-  have h4 : S.ref.h z * Real.exp (S.bregWeight t (M.proj z)) ≠ 0 := mul_ne_zero h1 (Real.exp_pos _).ne'
-  rw [MUc_h_of_mem Hd S B p q t hz, Real.log_mul (mul_ne_zero (pow_ne_zero _ h4) (pow_ne_zero _ h3)) (pow_ne_zero _ h2),
+  have h4 : S.ref.h z * Real.exp (S.bregWeight t (M.proj z)) ≠ 0 :=
+    mul_ne_zero h1 (Real.exp_pos _).ne'
+  rw [MUc_h_of_mem Hd S B p q t hz,
+    Real.log_mul (mul_ne_zero (pow_ne_zero _ h4) (pow_ne_zero _ h3)) (pow_ne_zero _ h2),
     Real.log_mul (pow_ne_zero _ h4) (pow_ne_zero _ h3), Real.log_pow, Real.log_pow, Real.log_pow,
     Real.log_mul h1 (Real.exp_pos _).ne', Real.log_exp, Real.log_prod fun r hr => (hSB r hr).ne']
   ring
@@ -123,13 +145,13 @@ theorem bregWeight_ge_and_MUc_smooth : ∀ (K : Type) [Fintype K] (J : K → Typ
       have hu₀t : u₀ ∈ e.target := e.map_source hj
       have hsymm₀ : e.symm u₀ = x₀ := e.left_inv hj
       have hu₀T : u₀ ∈ T := ⟨hu₀t, by simp only [Set.mem_preimage, hsymm₀]; exact hxW⟩
-    
+
       have hσ₀ : σ u₀ = s x₀ := by simp only [hσ, hsymm₀]
       obtain ⟨hsx₀S, hsx₀p⟩ := hs x₀ hxW
       obtain ⟨c₀, hc₀, hc₀e⟩ := (M.fibre z₀ hz₀ (s x₀) hsx₀S).1 hsx₀p.symm
       have hsx₀N : s x₀ ∈ N := hc₀e ▸ (hκt z₀ hzN c₀ hc₀).1
       have hκs₀ : κ (s x₀) = κ z₀ := hc₀e ▸ (hκt z₀ hzN c₀ hc₀).2
-    
+
       set T' := T ∩ σ ⁻¹' N with hT'
       have hT'o : IsOpen T' := hσa.continuousOn.isOpen_inter_preimage hTo hNo
       have hu₀T' : u₀ ∈ T' := ⟨hu₀T, by simp only [Set.mem_preimage, hσ₀]; exact hsx₀N⟩
@@ -144,7 +166,7 @@ theorem bregWeight_ge_and_MUc_smooth : ∀ (K : Type) [Fintype K] (J : K → Typ
           simp only [hσ] at hpe
           rw [← hmp, ← hmp', hpe]
         rw [← e.right_inv hu.1.1, ← e.right_inv hu'.1.1, h2]
-    
+
       have hDinj : Function.Injective (fderiv ℂ f u₀) := HoloInjDerivInj.proof D.n f T' hT'o hfa hinj u₀ hu₀T'
       set Lc : (Fin D.n → ℂ) ≃L[ℂ] (Fin D.n → ℂ) :=
         (LinearEquiv.ofInjectiveEndo (fderiv ℂ f u₀ : (Fin D.n → ℂ) →ₗ[ℂ] (Fin D.n → ℂ)) hDinj).toContinuousLinearEquiv
@@ -161,7 +183,7 @@ theorem bregWeight_ge_and_MUc_smooth : ∀ (K : Type) [Fintype K] (J : K → Typ
       have hlinv₀ : linv (f u₀) = u₀ := hcd.localInverse_apply_image hFD hn
       have hleft : ∀ᶠ u in 𝓝 u₀, linv (f u) = u := (hcd.hasStrictFDerivAt' hFD hn).eventually_left_inverse
       have hfu₀ : f u₀ = κ z₀ := by simp only [hf, hσ₀, hκs₀]
-    
+
       set Φ : ((Σ k, JJ k) → ℂ) → (Fin D.n → ℂ) := fun z => linv (κ z) with hΦ
       have hΦcd : ContDiffAt ℂ ω Φ z₀ := by
         have h1 : ContDiffAt ℂ ω linv (κ z₀) := hfu₀ ▸ hlinv_cd
@@ -177,7 +199,7 @@ theorem bregWeight_ge_and_MUc_smooth : ∀ (K : Type) [Fintype K] (J : K → Typ
         simpa [ReciprocityTheory.AnForm.M.FinHolAtlas.Smooth, ReciprocityTheory.AnForm.M.FinHolAtlas.SmoothOn] using this
       have hGV₂ : ContDiffOn ℝ ∞ (fun z => g (e.symm (Φ z))) V₂ :=
         hgs.comp (hΦV₁R.mono Set.inter_subset_left) (fun z hz => hz.2)
-    
+
       have hcont : ContinuousWithinAt M.proj S z₀ := M.cont z₀ hz₀
       have htend : Tendsto (fun w => e (M.proj w)) (𝓝[S] z₀) (𝓝 u₀) :=
         (e.continuousAt hj).tendsto.comp hcont.tendsto

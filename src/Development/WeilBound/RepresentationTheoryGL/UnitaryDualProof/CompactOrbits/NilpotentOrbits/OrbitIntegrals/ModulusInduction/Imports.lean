@@ -8,10 +8,13 @@ namespace PositivityTheory.RgUd.T.Nil.Orb.BStep
 
 open scoped Pointwise
 
-theorem count {G X : Type*} [Group G] [MulAction G X] (J A : Subgroup G) (hAJ : A ≤ J)
-    (hn : ∀ j ∈ J, ∀ a ∈ A, j * a * j⁻¹ ∈ A) (y : X) :
-    Nat.card ((fun j : G => j • ((fun a : G => a • y) '' (A : Set G))) '' (J : Set G)) *
-      (A ⊓ MulAction.stabilizer G y).relIndex (J ⊓ MulAction.stabilizer G y) = A.relIndex J := by
+theorem count
+    {G X : Type*} [Group G] [MulAction G X]
+    (J A : Subgroup G) (hAJ : A ≤ J) (hn : ∀ j ∈ J, ∀ a ∈ A, j * a * j⁻¹ ∈ A)
+    (y : X)
+    : Nat.card ((fun j : G => j • ((fun a : G => a • y) '' (A : Set G))) '' (J : Set G))
+        * (A ⊓ MulAction.stabilizer G y).relIndex (J ⊓ MulAction.stabilizer G y)
+      = A.relIndex J := by
   classical
   set P : Set X := (fun a : G => a • y) '' (A : Set G) with hP
   set S := MulAction.stabilizer G y with hS
@@ -76,10 +79,13 @@ theorem count {G X : Type*} [Group G] [MulAction G X] (J A : Subgroup G) (hAJ : 
         show u • P = P
         rw [hsmul]
         exact hSP u u.2 hu
-  have hnorm : (A.subgroupOf J).Normal := ⟨fun a ha g => by
-    show ((g * a * g⁻¹ : J) : G) ∈ A
-    simpa using hn g g.2 a ha⟩
-  have hcard : Nat.card ((fun j : G => j • P) '' (J : Set G)) = (A.subgroupOf J ⊔ S.subgroupOf J).index := by
+  have hnorm : (A.subgroupOf J).Normal :=
+    ⟨fun a ha g => by
+      show ((g * a * g⁻¹ : J) : G) ∈ A
+      simpa using hn g g.2 a ha⟩
+  have hcard
+      : Nat.card ((fun j : G => j • P) '' (J : Set G))
+        = (A.subgroupOf J ⊔ S.subgroupOf J).index := by
     rw [himg, ← hstab, MulAction.index_stabilizer]
     rfl
   have hb : (A ⊓ S).relIndex (J ⊓ S) = (A.subgroupOf J).relIndex (S.subgroupOf J) := by
@@ -87,7 +93,8 @@ theorem count {G X : Type*} [Group G] [MulAction G X] (J A : Subgroup G) (hAJ : 
     have h1 := Subgroup.relIndex_inf_mul_relIndex A S (J ⊓ S)
     rw [(Subgroup.relIndex_eq_one).2 inf_le_right, mul_one] at h1
     rw [← h1, show S ⊓ (J ⊓ S) = J ⊓ S from inf_of_le_right inf_le_right, inf_comm J S]
-  have hm := Subgroup.relIndex_mul_index (le_sup_left : A.subgroupOf J ≤ A.subgroupOf J ⊔ S.subgroupOf J)
+  have hm :=
+    Subgroup.relIndex_mul_index (le_sup_left : A.subgroupOf J ≤ A.subgroupOf J ⊔ S.subgroupOf J)
   rw [Subgroup.relIndex_sup_left] at hm
   rw [hcard, hb, mul_comm, hm]
   rfl

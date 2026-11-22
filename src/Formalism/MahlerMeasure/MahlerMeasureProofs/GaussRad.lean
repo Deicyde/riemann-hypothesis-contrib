@@ -130,6 +130,7 @@ lemma le_gaussR_mul (ρ : NNReal) (hρ : 0 < ρ) (P Q : K[X]) :
 
 end
 
-theorem gauss_norm_multiplicative : GaussMulRad := fun K _ _ ρ P Q hρ => le_antisymm (gaussR_mul_le ρ P Q) (le_gaussR_mul ρ hρ P Q)
+theorem gauss_norm_multiplicative : GaussMulRad := fun K _ _ ρ P Q hρ =>
+  le_antisymm (gaussR_mul_le ρ P Q) (le_gaussR_mul ρ hρ P Q)
 
 end Formalism.GM

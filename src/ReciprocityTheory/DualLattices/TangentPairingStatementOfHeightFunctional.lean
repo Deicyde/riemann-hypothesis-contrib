@@ -18,7 +18,8 @@ namespace BX
 
 variable (B : BX R₀)
 
-theorem tangentPairingStatement_of_heightFunctional (hB2 : HighestWeightVectorUniformBounds B) : TangentPairingStatement B := by
+theorem tangentPairingStatement_of_heightFunctional (hB2 : HighestWeightVectorUniformBounds B)
+    : TangentPairingStatement B := by
   intro R' R π ξ Dp N hsurj hker hsq _ hN sh th Vs Vt hs ht zh z hsV htV hhs hht hpair hz
   have hπ : π.SqZero := π.sqZero_of_span ξ hsurj hker hsq
   obtain ⟨O, hOsw, hO⟩ := B.step1 π Dp ξ hsurj hker hsq hB2 N hN
@@ -36,8 +37,7 @@ theorem tangentPairingStatement_of_heightFunctional (hB2 : HighestWeightVectorUn
   have hinv2 : Units.map (π.1 : (R' : Type u) →* (R : Type u)) a2⁻¹ * l2 = 1 := by
     rw [map_inv, ha2, inv_mul_cancel]
 
-  have hu : HEq (B.pmap π (B.smul a1⁻¹ (B.tr1 hsV (B.nsmul1 l' N))))
-      (B.zero1 (B.map π th)) := by
+  have hu : HEq (B.pmap π (B.smul a1⁻¹ (B.tr1 hsV (B.nsmul1 l' N)))) (B.zero1 (B.map π th)) := by
     rw [B.pmap_smul]
     have e : HEq (B.pmap π (B.tr1 hsV (B.nsmul1 l' N))) (B.smul l1 (B.zero1 (B.map π th))) := by
       refine (B.pmap_hcongr π hsV.symm rfl (B.castFst_heq hsV _)).trans ?_
@@ -46,8 +46,7 @@ theorem tangentPairingStatement_of_heightFunctional (hB2 : HighestWeightVectorUn
       exact (B.castFst_heq hsN _).symm
     refine (B.smul_hcongr (htg0 Vs) rfl _ e).trans ?_
     rw [← B.mul_smul, hinv1, B.one_smul]
-  have hu'0 : HEq (B.pmap π (B.smul a2⁻¹ (B.tr2 htV (B.nsmul2 l' N))))
-      (B.zero2 (B.map π sh)) := by
+  have hu'0 : HEq (B.pmap π (B.smul a2⁻¹ (B.tr2 htV (B.nsmul2 l' N)))) (B.zero2 (B.map π sh)) := by
     rw [B.pmap_smul]
     have e : HEq (B.pmap π (B.tr2 htV (B.nsmul2 l' N))) (B.smul l2 (B.zero2 (B.map π sh))) := by
       refine (B.pmap_hcongr π rfl htV.symm (B.castSnd_heq htV _)).trans ?_
@@ -56,8 +55,8 @@ theorem tangentPairingStatement_of_heightFunctional (hB2 : HighestWeightVectorUn
       exact (B.castSnd_heq htN _).symm
     refine (B.smul_hcongr rfl (htg0 Vt) _ e).trans ?_
     rw [← B.mul_smul, hinv2, B.one_smul]
-  have hu' : HEq (B.pmap π (B.sw (B.smul a2⁻¹ (B.tr2 htV (B.nsmul2 l' N)))))
-      (B.zero1 (B.map π sh)) := by
+  have hu'
+      : HEq (B.pmap π (B.sw (B.smul a2⁻¹ (B.tr2 htV (B.nsmul2 l' N))))) (B.zero1 (B.map π sh)) := by
     rw [← B.sw_nat]
     refine (B.sw_hcongr rfl (htg0 Vt) hu'0).trans ?_
     rw [B.sw_zero2]
@@ -90,14 +89,13 @@ theorem tangentPairingStatement_of_heightFunctional (hB2 : HighestWeightVectorUn
 
   have hν : Units.map (π.1 : (R' : Type u) →* (R : Type u)) (zh * a2 * a1⁻¹) = 1 := by
     rw [map_mul, map_mul, map_inv, hz, ha1, ha2, hz', div_mul_cancel, mul_inv_cancel]
-  have hνN := LHom.pow_eq_one hπ hN (zh * a2 * a1⁻¹)
-    (by have := congrArg Units.val hν; simpa using this)
+  have hνN :=
+    LHom.pow_eq_one hπ hN (zh * a2 * a1⁻¹) (by have := congrArg Units.val hν; simpa using this)
   have hz1 : zh ^ N * a2 ^ N = a1 ^ N := by
     rw [mul_pow, mul_pow, inv_pow] at hνN
     exact mul_inv_eq_one.1 hνN
   have hz2 : zh ^ N * ct = cs := by
-    have h3 : a2 ^ N * (zh ^ N * ct) = a2 ^ N * cs := by
-      rw [← key, ← hz1]; ac_rfl
+    have h3 : a2 ^ N * (zh ^ N * ct) = a2 ^ N * cs := by rw [← key, ← hz1]; ac_rfl
     exact mul_left_cancel h3
   have hA : π.1 (B.evK π ht Vs) = 0 := (RingHom.mem_ker).1 (evalT_mem ht (RingHom.ker π.1) Vs)
   have hB : π.1 (B.evK π hs Vt) = 0 := (RingHom.mem_ker).1 (evalT_mem hs (RingHom.ker π.1) Vt)

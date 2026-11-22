@@ -9,10 +9,12 @@ noncomputable section
 
 namespace UpperTheory.V.Af
 
-theorem finite_image_of_card_le {P Y : Type} (Sig : Set P) (Iso : P → P → Prop) (f : P → Y)
-    (hiso : ∀ a ∈ Sig, ∀ b ∈ Sig, Iso a b → f a = f b) (N : ℕ)
-    (hcard : ∀ S : Finset P, (∀ a ∈ S, a ∈ Sig) → (∀ a ∈ S, ∀ b ∈ S, Iso a b → a = b) → S.card ≤ N) :
-    Finite ↥(f '' Sig) ∧ Nat.card ↥(f '' Sig) ≤ N := by
+theorem finite_image_of_card_le
+    {P Y : Type} (Sig : Set P) (Iso : P → P → Prop) (f : P → Y)
+    (hiso : ∀ a ∈ Sig, ∀ b ∈ Sig, Iso a b → f a = f b)
+    (N : ℕ)
+    (hcard : ∀ S : Finset P, (∀ a ∈ S, a ∈ Sig) → (∀ a ∈ S, ∀ b ∈ S, Iso a b → a = b) → S.card ≤ N)
+    : Finite ↥(f '' Sig) ∧ Nat.card ↥(f '' Sig) ≤ N := by
   classical
   have key : ∀ T : Finset Y, (↑T : Set Y) ⊆ f '' Sig → T.card ≤ N := by
     intro T hT
@@ -42,18 +44,28 @@ theorem finite_image_of_card_le {P Y : Type} (Sig : Set P) (Iso : P → P → Pr
   rw [Nat.card_coe_set_eq, Set.ncard_eq_toFinset_card _ hfin]
   exact key _ (by simp)
 
-theorem exists_eigData {P W : Type} (Sig : Set P) (Iso : P → P → Prop) (sys : P → W → Multiset ℂ)
-    (hiso : ∀ a ∈ Sig, ∀ b ∈ Sig, Iso a b → sys a = sys b) (N : ℕ)
+theorem exists_eigData
+    {P W : Type} (Sig : Set P) (Iso : P → P → Prop) (sys : P → W → Multiset ℂ)
+    (hiso : ∀ a ∈ Sig, ∀ b ∈ Sig, Iso a b → sys a = sys b)
+    (N : ℕ)
     (hcard : ∀ S : Finset P, (∀ a ∈ S, a ∈ Sig) → (∀ a ∈ S, ∀ b ∈ S, Iso a b → a = b) → S.card ≤ N)
     (hconj : ∀ σ : ℂ ≃+* ℂ, ∀ a ∈ Sig, ∃ b ∈ Sig, ∀ v, sys b v = (sys a v).map σ)
-    (w : W) {n q : ℕ} {m : Fin n → ℤ} {wt : ℤ} (hn : ∀ a ∈ Sig, (sys a w).card = n)
+    (w : W)
+    {n q : ℕ} {m : Fin n → ℤ} {wt : ℤ} (hn : ∀ a ∈ Sig, (sys a w).card = n)
     (hpure : ∀ a ∈ Sig, ∀ b ∈ sys a w, ‖b‖ = (q : ℝ) ^ (-(wt : ℝ) / 2))
-    (hint : ∀ a ∈ Sig, SlopesIn q m (sys a w)) :
-    ∃ D : EigData n q m wt, Nat.card D.S ≤ N ∧ ∃ cl : ↥Sig → D.S, (∀ a b, cl a = cl b → sys a = sys b) ∧
-      ∀ a, (D.β (cl a)).map (·⁻¹) = sys a w := by
+    (hint : ∀ a ∈ Sig, SlopesIn q m (sys a w))
+    : ∃ D : EigData n q m wt,
+      Nat.card D.S ≤ N
+        ∧ ∃ cl : ↥Sig → D.S,
+          (∀ a b, cl a = cl b → sys a = sys b) ∧ ∀ a, (D.β (cl a)).map (·⁻¹) = sys a w := by
   obtain ⟨hfin, hN⟩ := finite_image_of_card_le Sig Iso sys hiso N hcard
-  refine ⟨⟨↥(sys '' Sig), hfin, fun s => (s.1 w).map (·⁻¹), ?_, ?_, ?_, ?_, ?_⟩, hN,
-    fun a => ⟨sys a, a, a.2, rfl⟩, fun a b h => congrArg Subtype.val h, fun a => ?_⟩
+  refine ⟨
+    ⟨↥(sys '' Sig), hfin, fun s => (s.1 w).map (·⁻¹), ?_, ?_, ?_, ?_, ?_⟩,
+    hN,
+    fun a => ⟨sys a, a, a.2, rfl⟩,
+    fun a b h => congrArg Subtype.val h,
+    fun a => ?_
+  ⟩
   · rintro ⟨_, a, ha, rfl⟩
     simpa using hn a ha
   · intro σ
@@ -82,10 +94,13 @@ theorem exists_eigData {P W : Type} (Sig : Set P) (Iso : P → P → Prop) (sys 
     exact (hint a ha c hc).2 k hk
   · simp [Multiset.map_map]
 
-
 open NumberField IsDedekindDomain in
-theorem natCast_notMem_of_not_dvd {F : Type} [Field F] [NumberField F] {p M : ℕ} (hp : p.Prime)
-    {w : HeightOneSpectrum (𝓞 F)} (hw : (p : 𝓞 F) ∈ w.asIdeal) (hM : ¬ p ∣ M) : (M : 𝓞 F) ∉ w.asIdeal := by
+theorem natCast_notMem_of_not_dvd
+    {F : Type} [Field F] [NumberField F]
+    {p M : ℕ} (hp : p.Prime)
+    {w : HeightOneSpectrum (𝓞 F)} (hw : (p : 𝓞 F) ∈ w.asIdeal)
+    (hM : ¬ p ∣ M)
+    : (M : 𝓞 F) ∉ w.asIdeal := by
   intro hMw
   have hcop : Nat.Coprime p M := (Nat.Prime.coprime_iff_not_dvd hp).mpr hM
   have h := Nat.gcd_eq_gcd_ab p M
@@ -99,10 +114,9 @@ theorem natCast_notMem_of_not_dvd {F : Type} [Field F] [NumberField F] {p M : �
     exact w.asIdeal.add_mem (Ideal.mul_mem_right _ _ hw) (Ideal.mul_mem_right _ _ hMw)
   exact w.isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr hone)
 
-
 open NumberField IsDedekindDomain in
-theorem eventually_natCast_notMem {F : Type} [Field F] [NumberField F] {M : ℕ} (hM : M ≠ 0) :
-    ∀ᶠ w : HeightOneSpectrum (𝓞 F) in Filter.cofinite, (M : 𝓞 F) ∉ w.asIdeal := by
+theorem eventually_natCast_notMem {F : Type} [Field F] [NumberField F] {M : ℕ} (hM : M ≠ 0)
+    : ∀ᶠ w : HeightOneSpectrum (𝓞 F) in Filter.cofinite, (M : 𝓞 F) ∉ w.asIdeal := by
   rw [Filter.eventually_cofinite]
   have hM' : (M : 𝓞 F) ≠ 0 := Nat.cast_ne_zero.mpr hM
   have hI : Ideal.span {(M : 𝓞 F)} ≠ 0 := by

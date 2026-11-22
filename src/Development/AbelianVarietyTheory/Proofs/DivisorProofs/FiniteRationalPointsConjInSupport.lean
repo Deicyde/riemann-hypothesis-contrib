@@ -5,18 +5,28 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinPtHomAppl
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.BCT.TraceBlocks
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  GlobalTheory.BCT.TraceBlocks
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory
 
-theorem finite_support_conj_points : ∀ (G H : Type) [Group G] [Group H] (ι : H →* G), Function.Injective ι → ∀ (K' : Subgroup G) (F : G → ℂ), (∀ k ∈ K', ∀ x, F (x * k) = F x) → {q : G ⧸ K' | F q.out ≠ 0}.Finite → ∀ x : G, Finite (ι.range ⊓ K'.map (MulAut.conj x).toMonoidHom : Subgroup G) → {h : H | F (x⁻¹ * ι h * x) ≠ 0}.Finite := by
+theorem finite_support_conj_points
+    : ∀ (G H : Type) [Group G] [Group H] (ι : H →* G),
+      Function.Injective ι
+        → ∀ (K' : Subgroup G) (F : G → ℂ),
+          (∀ k ∈ K', ∀ x, F (x * k) = F x) → {q : G ⧸ K' | F q.out ≠ 0}.Finite
+            → ∀ x : G,
+              Finite (ι.range ⊓ K'.map (MulAut.conj x).toMonoidHom : Subgroup G)
+                → {h : H | F (x⁻¹ * ι h * x) ≠ 0}.Finite := by
   intro G H _ _ ι hι K' F hF hT x hfin
   have key : ∀ g : G, F ((g : G ⧸ K').out) = F g := by
     intro g
     obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul K' g
-    rw [hk]; exact hF _ k.2 g
+    rw [hk]
+    exact hF _ k.2 g
   have hL : (ι ⁻¹' ((ι.range ⊓ K'.map (MulAut.conj x).toMonoidHom : Subgroup G) : Set G)).Finite :=
     (Set.finite_coe_iff.mp hfin).preimage hι.injOn
   refine Set.Finite.of_finite_fibers (fun h : H => ((x⁻¹ * ι h * x : G) : G ⧸ K')) (hT.subset ?_) ?_

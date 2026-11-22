@@ -4,18 +4,28 @@ public import Mathlib
 
 @[expose] public section
 
-@[reducible] noncomputable def UpperTheory.Reformulated.B.NormIndexQuadratic.Pl :
-    (F : Type) → [Field F] → Type :=
-    fun (F : Type) [Field F] ↦ IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)
+@[reducible]
+noncomputable def UpperTheory.Reformulated.B.NormIndexQuadratic.Pl
+    : (F : Type) → [Field F] → Type := fun (F : Type) [Field F] ↦
+  IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)
 
-@[reducible] noncomputable def UpperTheory.Reformulated.B.NormIndexQuadratic.Kv :
-    {F : Type} → [inst : Field F] → [NumberField F] → UpperTheory.Reformulated.B.NormIndexQuadratic.Pl F → Type :=
-    fun {F : Type} [Field F] [NumberField F] (v : UpperTheory.Reformulated.B.NormIndexQuadratic.Pl F) ↦
-      IsDedekindDomain.HeightOneSpectrum.adicCompletion F v
+@[reducible]
+noncomputable def UpperTheory.Reformulated.B.NormIndexQuadratic.Kv
+    : {F : Type} → [inst : Field F] → [NumberField F]
+      → UpperTheory.Reformulated.B.NormIndexQuadratic.Pl F
+      → Type :=
+  fun {F : Type} [Field F] [NumberField F]
+      (v : UpperTheory.Reformulated.B.NormIndexQuadratic.Pl F) ↦
+    IsDedekindDomain.HeightOneSpectrum.adicCompletion F v
 
-@[reducible] noncomputable def UpperTheory.Reformulated.B.NormIndexQuadratic.cv :
-    {F : Type} → [inst : Field F] → [inst_1 : NumberField F] → (v : UpperTheory.Reformulated.B.NormIndexQuadratic.Pl F) → F →+* UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v :=
-    fun {F : Type} [Field F] [NumberField F] (v : UpperTheory.Reformulated.B.NormIndexQuadratic.Pl F) ↦ Algebra.algebraMap F (UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v)
+@[reducible]
+noncomputable def UpperTheory.Reformulated.B.NormIndexQuadratic.cv
+    : {F : Type} → [inst : Field F] → [inst_1 : NumberField F]
+      → (v : UpperTheory.Reformulated.B.NormIndexQuadratic.Pl F)
+      → F →+* UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v :=
+  fun {F : Type} [Field F] [NumberField F]
+      (v : UpperTheory.Reformulated.B.NormIndexQuadratic.Pl F) ↦
+    Algebra.algebraMap F (UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v)
 
 section aux
 
@@ -206,7 +216,7 @@ private def near (c : K) (h0 : c ≠ 0) (h1 : v c ≤ 1) : Subgroup Kˣ where
     rwa [map_mul, v_eq_one v (ha.trans_le h1), one_mul]
   inv_mem' := by
     intro a ha
-    have h : ((a⁻¹ : Kˣ) : K) - 1 = - ((a : K)⁻¹ * (a - 1)) := by push_cast; field_simp; ring
+    have h : ((a⁻¹ : Kˣ) : K) - 1 = -((a : K)⁻¹ * (a - 1)) := by push_cast; field_simp; ring
     simp only [Set.mem_setOf_eq] at *
     rwa [h, v.map_neg, map_mul, map_inv₀, v_eq_one v (ha.trans_le h1), inv_one, one_mul]
 
@@ -927,8 +937,12 @@ private lemma index_sq_US [_root_.NumberField.IsTotallyComplex K] (S : Finset (H
   omega
 
 private def Good (S : Finset (HeightOneSpectrum (𝓞 K))) : Prop :=
-  (∀ v ∉ S, v.valuation K 2 = 1) ∧ ∀ I : Ideal (𝓞 K), I ≠ ⊥ → ∃ c ∈ I, c ≠ 0 ∧
-    ∀ v ∉ S, ∀ a ∈ I, v.valuation K (algebraMap _ K a) ≤ v.valuation K (algebraMap _ K c)
+  (∀ v ∉ S, v.valuation K 2 = 1)
+    ∧ ∀ I : Ideal (𝓞 K),
+      I ≠ ⊥
+        → ∃ c ∈ I,
+          c ≠ 0
+            ∧ ∀ v ∉ S, ∀ a ∈ I, v.valuation K (algebraMap _ K a) ≤ v.valuation K (algebraMap _ K c)
 
 private lemma Good.mono {S T : Finset (HeightOneSpectrum (𝓞 K))} (hS : Good S) (h : S ⊆ T) :
     Good T := by
@@ -1737,17 +1751,23 @@ end UpperTheory.Reformulated.B.NormIndexQuadratic
 
 end aux
 
-theorem UpperTheory.Reformulated.B.NormIndexQuadratic.glob_neg_one :
-    ∀ {F : Type} [inst : Field F] [inst_1 : NumberField F] {Δ d : F},
-      Δ ≠ (0 : F) →
-        (∀ (v : UpperTheory.Reformulated.B.NormIndexQuadratic.Pl F),
-            ∃ (a : UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v) (b : UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v),
-              (-1 : UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v) =
-                a ^ (2 : ℕ) - (UpperTheory.Reformulated.B.NormIndexQuadratic.cv v : F → UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v) Δ * b ^ (2 : ℕ)) →
-          ∀ (σ₀ : F →+* ℝ),
-            (∀ (σ : F →+* ℝ), (σ : F → ℝ) d < (0 : ℝ)) →
-              ∃ (p₀ : F) (p₁ : F) (q₀ : F) (q₁ : F),
-                p₀ ^ (2 : ℕ) + d * p₁ ^ (2 : ℕ) - Δ * (q₀ ^ (2 : ℕ) + d * q₁ ^ (2 : ℕ)) = (-1 : F) ∧ p₀ * p₁ = Δ * q₀ * q₁ := by
+theorem UpperTheory.Reformulated.B.NormIndexQuadratic.glob_neg_one
+    : ∀ {F : Type} [inst : Field F] [inst_1 : NumberField F] {Δ d : F},
+      Δ ≠ (0 : F)
+        → (∀ (v : UpperTheory.Reformulated.B.NormIndexQuadratic.Pl F),
+          ∃ (a : UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v)
+              (b : UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v),
+            (-1 : UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v)
+              = a ^ (2 : ℕ)
+                - (UpperTheory.Reformulated.B.NormIndexQuadratic.cv v
+                      : F → UpperTheory.Reformulated.B.NormIndexQuadratic.Kv v)
+                    Δ
+                  * b ^ (2 : ℕ))
+        → ∀ (σ₀ : F →+* ℝ),
+          (∀ (σ : F →+* ℝ), (σ : F → ℝ) d < (0 : ℝ))
+            → ∃ (p₀ : F) (p₁ : F) (q₀ : F) (q₁ : F),
+              p₀ ^ (2 : ℕ) + d * p₁ ^ (2 : ℕ) - Δ * (q₀ ^ (2 : ℕ) + d * q₁ ^ (2 : ℕ)) = (-1 : F)
+                ∧ p₀ * p₁ = Δ * q₀ * q₁ := by
   intro F _ _ Δ d hΔ h σ₀ hd
   refine UpperTheory.Reformulated.B.NormIndexQuadratic.main hΔ (fun v => ?_) σ₀ hd
   obtain ⟨a, b, hab⟩ := h v

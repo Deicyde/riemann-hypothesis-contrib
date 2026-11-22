@@ -12,17 +12,21 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsReduce
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory
 
 open CechPic
 
-theorem CechPic.lam_pull_of_isGrpPullback {S S' : Scheme.{0}} {G : Over S} {G' T' : Over S'} [GrpObj G] [GrpObj G']
-    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) (c : Pic G.left) (x y : T' ⟶ G') :
-    lam (pull φ c) x y = lam c (pushHom h T' x) (pushHom h T' y) := by
+theorem CechPic.lam_pull_of_isGrpPullback
+    {S S' : Scheme.{0}} {G : Over S} {G' T' : Over S'} [GrpObj G] [GrpObj G']
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    (c : Pic G.left) (x y : T' ⟶ G')
+    : lam (pull φ c) x y = lam c (pushHom h T' x) (pushHom h T' y) := by
   rw [lam, lam, ← map_mul, ← map_one (pushHom h T')]
   simp only [← pull_comp]
   rfl

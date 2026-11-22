@@ -12,26 +12,76 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LagrangianCo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.UPel.Sm GlobalTheory.Cris GlobalTheory.DeRham
 open scoped TensorProduct
 
 namespace GlobalTheory.HTSummand
 
-theorem exists_lagrangian_lift_lie : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R] (b : GlobalTheory.UPel.HT.Base D R) (C : Type) [CommRing C] [IsLocalRing C] [IsArtinianRing C] (I : Ideal C), I ^ 2 = ⊥ → ∀ (tR : R →+* C) (H : Type 1) [AddCommGroup H] [Module C H] [Module.Finite C H] [Module.Projective C H] (ρ : D.O →+* Module.End C H), (letI := GlobalTheory.HTSummand.tensorModOf (ρ.comp (algebraMap (𝓞 D.F) D.O)); Module.Projective (C ⊗[ℤ] 𝓞 D.F) H) → ∀ (φ : LinearMap.BilinForm C H), (∀ x y, φ x y = -φ y x) → Function.Bijective φ → (∀ (c : D.O) x y, φ (ρ c x) y = φ x (ρ (D.star c).unop y)) → ∀ (F : Submodule C H), I • ⊤ ≤ F → (∀ (c : D.O), ∀ x ∈ F, ρ c x ∈ F) → (∀ x ∈ F, ∀ y ∈ F, φ x y ∈ I) → (∀ x, (∀ y ∈ F, φ x y ∈ I) → x ∈ F) → (∃ E' M : Submodule C H, IsCompl E' M ∧ E' ⊔ I • ⊤ = F) → (∀ d, ρ (algebraMap (𝓞 D.F) D.O D.ω) d - tR b.ρ • d ∈ F → ∃ w : Fin D.a → H, (∀ i (c : 𝓞 D.F), ρ (algebraMap (𝓞 D.F) D.O c) (w i) - tR (b.t i c) • w i ∈ F) ∧ d - ∑ i, w i ∈ F) → ∃ E : Submodule C H, (∃ M : Submodule C H, IsCompl E M) ∧ E ⊔ I • ⊤ = F ∧ (∀ (c : D.O), ∀ x ∈ E, ρ c x ∈ E) ∧ (∀ x ∈ E, ∀ y ∈ E, φ x y = 0) ∧ ∀ d, ρ (algebraMap (𝓞 D.F) D.O D.ω) d - tR b.ρ • d ∈ E → ∃ w : Fin D.a → H, (∀ i (c : 𝓞 D.F), ρ (algebraMap (𝓞 D.F) D.O c) (w i) - tR (b.t i c) • w i ∈ E) ∧ d - ∑ i, w i ∈ E := by
-  intro p _ D R _ b C _ _ _ I hI tR H _ _ _ _ ρ hproj φ hskew hbij hadj F hIF hFO hFiso hFlag hE' hLie
-  obtain ⟨e, he, hρe, hφe, hωe, ⟨v, hv, hωk⟩, hestab⟩ := GlobalTheory.T.exists_idempotent_imaginaryQuadratic_eigen_crystal p D R b C tR H ρ φ hadj
+theorem exists_lagrangian_lift_lie
+    : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R]
+        (b : GlobalTheory.UPel.HT.Base D R) (C : Type) [CommRing C] [IsLocalRing C]
+        [IsArtinianRing C] (I : Ideal C),
+      I ^ 2 = ⊥
+        → ∀ (tR : R →+* C) (H : Type 1) [AddCommGroup H] [Module C H] [Module.Finite C H]
+            [Module.Projective C H] (ρ : D.O →+* Module.End C H),
+          (letI := GlobalTheory.HTSummand.tensorModOf (ρ.comp (algebraMap (𝓞 D.F) D.O))
+           Module.Projective (C ⊗[ℤ] 𝓞 D.F) H)
+            → ∀ (φ : LinearMap.BilinForm C H),
+              (∀ x y, φ x y = - φ y x) → Function.Bijective φ
+                → (∀ (c : D.O) x y, φ (ρ c x) y = φ x (ρ (D.star c).unop y))
+                → ∀ (F : Submodule C H),
+                  I • ⊤ ≤ F → (∀ (c : D.O), ∀ x ∈ F, ρ c x ∈ F) → (∀ x ∈ F, ∀ y ∈ F, φ x y ∈ I)
+                    → (∀ x, (∀ y ∈ F, φ x y ∈ I) → x ∈ F)
+                    → (∃ E' M : Submodule C H, IsCompl E' M ∧ E' ⊔ I • ⊤ = F)
+                    → (∀ d,
+                      ρ (algebraMap (𝓞 D.F) D.O D.ω) d - tR b.ρ • d ∈ F
+                        → ∃ w : Fin D.a → H,
+                          (∀ i (c : 𝓞 D.F),
+                              ρ (algebraMap (𝓞 D.F) D.O c) (w i) - tR (b.t i c) • w i ∈ F)
+                            ∧ d - ∑ i, w i ∈ F)
+                    → ∃ E : Submodule C H,
+                      (∃ M : Submodule C H, IsCompl E M) ∧ E ⊔ I • ⊤ = F
+                        ∧ (∀ (c : D.O), ∀ x ∈ E, ρ c x ∈ E) ∧ (∀ x ∈ E, ∀ y ∈ E, φ x y = 0)
+                        ∧ ∀ d,
+                          ρ (algebraMap (𝓞 D.F) D.O D.ω) d - tR b.ρ • d ∈ E
+                            → ∃ w : Fin D.a → H,
+                              (∀ i (c : 𝓞 D.F),
+                                  ρ (algebraMap (𝓞 D.F) D.O c) (w i) - tR (b.t i c) • w i ∈ E)
+                                ∧ d - ∑ i, w i ∈ E := by
+  intro p _ D R _ b C _ _ _ I hI tR H _ _ _ _ ρ hproj φ hskew hbij hadj F hIF hFO hFiso hFlag hE'
+    hLie
+  obtain ⟨e, he, hρe, hφe, hωe, ⟨v, hv, hωk⟩, hestab⟩ :=
+    GlobalTheory.T.exists_idempotent_imaginaryQuadratic_eigen_crystal p D R b C tR H ρ φ hadj
   have hFe := hestab F hFO
-  have hLie' : ∀ d ∈ LinearMap.range e, ∃ w : Fin D.a → H, (∀ i (c : 𝓞 D.F), ρ (algebraMap (𝓞 D.F) D.O c) (w i) - tR (b.t i c) • w i ∈ F) ∧ d - ∑ i, w i ∈ F := by
+  have hLie'
+      : ∀ d ∈ LinearMap.range e, ∃ w : Fin D.a → H,
+        (∀ i (c : 𝓞 D.F), ρ (algebraMap (𝓞 D.F) D.O c) (w i) - tR (b.t i c) • w i ∈ F)
+          ∧ d - ∑ i, w i ∈ F := by
     rintro d ⟨y, rfl⟩
     exact hLie _ (by rw [hωe, sub_self]; exact F.zero_mem)
-  have hcore : ∃ G M : Submodule C H, G ⊓ M = ⊥ ∧ G ⊔ M = LinearMap.range e ∧ (∀ (c : D.O), ∀ x ∈ G, ρ c x ∈ G) ∧ G ⊔ (I • ⊤ ⊓ LinearMap.range e) = F ⊓ LinearMap.range e ∧ ∀ d ∈ LinearMap.range e, ∃ w : Fin D.a → H, (∀ i (c : 𝓞 D.F), ρ (algebraMap (𝓞 D.F) D.O c) (w i) - tR (b.t i c) • w i ∈ G) ∧ d - ∑ i, w i ∈ G := by
+  have hcore
+      : ∃ G M : Submodule C H,
+        G ⊓ M = ⊥ ∧ G ⊔ M = LinearMap.range e ∧ (∀ (c : D.O), ∀ x ∈ G, ρ c x ∈ G)
+          ∧ G ⊔ (I • ⊤ ⊓ LinearMap.range e) = F ⊓ LinearMap.range e
+          ∧ ∀ d ∈ LinearMap.range e, ∃ w : Fin D.a → H,
+            (∀ i (c : 𝓞 D.F), ρ (algebraMap (𝓞 D.F) D.O c) (w i) - tR (b.t i c) • w i ∈ G)
+              ∧ d - ∑ i, w i ∈ G := by
     by_cases hp : IsUnit (p : C)
-    · exact GlobalTheory.T.exists_liftSummand_lie_residueCharZero p D R b C I hI hp tR H ρ hproj e he hρe hωe F hIF hFO hFe hE' hLie'
-    · exact GlobalTheory.T.exists_lieCondition_summand_residueCharP p D R b C I hI ((IsLocalRing.mem_maximalIdeal _).2 hp) tR H ρ hproj e he hρe hωe F hIF hFO hFe hE' hLie'
+    · exact GlobalTheory.T.exists_liftSummand_lie_residueCharZero p D R b C I hI hp tR H ρ hproj e
+        he hρe hωe F hIF hFO hFe hE' hLie'
+    · exact GlobalTheory.T.exists_lieCondition_summand_residueCharP p D R b C I hI
+        ((IsLocalRing.mem_maximalIdeal _).2 hp) tR H ρ hproj e he hρe hωe F hIF hFO hFe hE' hLie'
   obtain ⟨G, M, hGM, hGMr, hGO, hGF, hGLie⟩ := hcore
-  obtain ⟨E, hEc, hEe, hEF, hEiso, hEO, hEst⟩ := GlobalTheory.T.lagrangianCompletion_sup_ideal_smul_eq C I H D.O ρ (fun a => (D.star a).unop) φ e he hρe hskew (fun a => D.star_star a) hadj hφe hbij F hIF hFiso hFlag hFe G M hGM hGMr hGO hGF
+  obtain ⟨E, hEc, hEe, hEF, hEiso, hEO, hEst⟩ :=
+    GlobalTheory.T.lagrangianCompletion_sup_ideal_smul_eq C I H D.O ρ
+      (fun a => (D.star a).unop)
+      φ e he hρe hskew
+      (fun a => D.star_star a)
+      hadj hφe hbij F hIF hFiso hFlag hFe G M hGM hGMr hGO hGF
   refine ⟨E, hEc, hEF, hEO, hEiso, ?_⟩
   intro d hd
   have hGE : G ≤ E := hEe ▸ inf_le_left

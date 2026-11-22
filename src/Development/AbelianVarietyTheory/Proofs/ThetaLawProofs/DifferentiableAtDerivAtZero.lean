@@ -16,20 +16,22 @@ def derivAtZero (τ : ℂ) : ℂ := jacobiTheta₂' ((τ + 1) / 2) τ
 
 open Complex Filter in
 open scoped UpperHalfPlane MatrixGroups ModularForm Manifold Topology Real in
-theorem _root_.GlobalTheory.JacobiDeriv.jacobiTheta₂_half_period (τ : ℂ) : jacobiTheta₂ ((τ + 1) / 2) τ = 0 := by
+theorem _root_.GlobalTheory.JacobiDeriv.jacobiTheta₂_half_period (τ : ℂ)
+    : jacobiTheta₂ ((τ + 1) / 2) τ = 0 := by
   have h1 := jacobiTheta₂_add_left' (-((τ + 1) / 2)) τ
   have h2 := jacobiTheta₂_add_left (-((τ + 1) / 2) + τ) τ
   rw [jacobiTheta₂_neg_left] at h1
   have e1 : -((τ + 1) / 2) + τ + 1 = (τ + 1) / 2 := by ring
-  have e2 : -↑π * I * (τ + 2 * -((τ + 1) / 2)) = ↑π * I := by ring
+  have e2 : - ↑π * I * (τ + 2 * -((τ + 1) / 2)) = ↑π * I := by ring
   rw [e1, h1, e2, exp_pi_mul_I] at h2
   linear_combination h2 / 2
 
 open Complex Filter in
 open scoped UpperHalfPlane MatrixGroups ModularForm Manifold Topology Real in
-theorem _root_.GlobalTheory.JacobiDeriv.thetaChar_half_half (τ z : ℂ) :
-    _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.thetaChar (g := 1) !![τ] ![1 / 2] ![1 / 2] ![z] =
-      cexp (π * I * (τ / 4 + z + 1 / 2)) * jacobiTheta₂ (z + (τ + 1) / 2) τ := by
+theorem _root_.GlobalTheory.JacobiDeriv.thetaChar_half_half (τ z : ℂ)
+    : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.thetaChar (g := 1) !![τ] ![1 / 2] ![1 / 2]
+        ![z]
+      = cexp (π * I * (τ / 4 + z + 1 / 2)) * jacobiTheta₂ (z + (τ + 1) / 2) τ := by
   unfold _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.thetaChar jacobiTheta₂
   rw [← tsum_mul_left]
   rw [← (Equiv.funUnique (Fin 1) ℤ).symm.tsum_eq]
@@ -86,15 +88,18 @@ private lemma derivAtZero_eq_tsum_jacobiTheta₂'_term {w : ℂ} (hw : 0 < w.im)
 
 open Complex Filter in
 open scoped UpperHalfPlane MatrixGroups ModularForm Manifold Topology Real in
-theorem _root_.GlobalTheory.JacobiDeriv.differentiableAt_derivAtZero {τ : ℂ} (hτ : 0 < τ.im) :
-    DifferentiableAt ℂ _root_.GlobalTheory.JacobiDeriv.derivAtZero τ := by
+theorem _root_.GlobalTheory.JacobiDeriv.differentiableAt_derivAtZero {τ : ℂ} (hτ : 0 < τ.im)
+    : DifferentiableAt ℂ _root_.GlobalTheory.JacobiDeriv.derivAtZero τ := by
   have hy : 0 < τ.im / 2 := by linarith
   have hU : IsOpen {w : ℂ | τ.im / 2 < w.im} := isOpen_lt continuous_const continuous_im
-  have hd : DifferentiableOn ℂ (fun w => ∑' n : ℤ, jacobiTheta₂'_term n ((w + 1) / 2) w)
+  have hd : DifferentiableOn ℂ
+      (fun w => ∑' n : ℤ, jacobiTheta₂'_term n ((w + 1) / 2) w)
       {w : ℂ | τ.im / 2 < w.im} := by
     refine differentiableOn_tsum_of_summable_norm
       ((summable_pow_mul_jacobiTheta₂_term_bound (τ.im / 2 / 2) hy 1).mul_left (2 * π))
-      (fun n => ?_) hU (fun n w hw => norm_jacobiTheta₂'_term_half_period_le n hy.le (le_of_lt hw))
+      (fun n => ?_)
+      hU
+      (fun n w hw => norm_jacobiTheta₂'_term_half_period_le n hy.le (le_of_lt hw))
     unfold jacobiTheta₂'_term jacobiTheta₂_term
     fun_prop
   have hτU : τ ∈ {w : ℂ | τ.im / 2 < w.im} := by
@@ -107,22 +112,25 @@ theorem _root_.GlobalTheory.JacobiDeriv.differentiableAt_derivAtZero {τ : ℂ} 
 
 open Complex Filter in
 open scoped UpperHalfPlane MatrixGroups ModularForm Manifold Topology Real in
-theorem _root_.GlobalTheory.JacobiDeriv.tendsto_derivAtZero :
-    Tendsto (fun τ : ℍ => _root_.GlobalTheory.JacobiDeriv.derivAtZero τ) UpperHalfPlane.atImInfty
-      (𝓝 (2 * π * I)) := by
-  have hg : (2 * π * I : ℂ) = ∑' n : ℤ, if n = -1 then 2 * π * I else 0 := by
-    rw [tsum_ite_eq]
+theorem _root_.GlobalTheory.JacobiDeriv.tendsto_derivAtZero
+    : Tendsto
+      (fun τ : ℍ => _root_.GlobalTheory.JacobiDeriv.derivAtZero τ)
+      UpperHalfPlane.atImInfty (𝓝 (2 * π * I)) := by
+  have hg : (2 * π * I : ℂ) = ∑' n : ℤ, if n = -1 then 2 * π * I else 0 := by rw [tsum_ite_eq]
   rw [hg]
   refine Tendsto.congr (fun τ : ℍ => (derivAtZero_eq_tsum_jacobiTheta₂'_term τ.im_pos).symm) ?_
   have him : Tendsto (fun τ : ℍ => τ.im) UpperHalfPlane.atImInfty atTop := tendsto_comap
   refine tendsto_tsum_of_dominated_convergence
     ((summable_pow_mul_jacobiTheta₂_term_bound (1 / 2) one_pos 1).mul_left (2 * π))
-    (fun n => ?_) ?_
+    (fun n => ?_)
+    ?_
   · split_ifs with hn
     · subst hn
       refine tendsto_const_nhds.congr fun τ => ?_
-      have e : 2 * π * I * ((-1 : ℤ) : ℂ) * (((τ : ℂ) + 1) / 2) + π * I * ((-1 : ℤ) : ℂ) ^ 2 * τ
-          = -(π * I) := by push_cast; ring
+      have e
+          : 2 * π * I * ((-1 : ℤ) : ℂ) * (((τ : ℂ) + 1) / 2) + π * I * ((-1 : ℤ) : ℂ) ^ 2 * τ
+            = -(π * I) := by
+        push_cast; ring
       simp only [jacobiTheta₂'_term, jacobiTheta₂_term, e, exp_neg, exp_pi_mul_I]
       push_cast
       ring
@@ -138,10 +146,12 @@ theorem _root_.GlobalTheory.JacobiDeriv.tendsto_derivAtZero :
           · nlinarith
         have : (1 : ℝ) ≤ (n : ℝ) ^ 2 + n := by exact_mod_cast h1
         positivity
-      have ht : Tendsto (fun τ : ℍ => 2 * π * |(n : ℝ)| *
-          Real.exp (-(π * ((n : ℝ) ^ 2 + n) * τ.im))) UpperHalfPlane.atImInfty (𝓝 0) := by
-        have := (Real.tendsto_exp_atBot.comp
-          (tendsto_neg_atTop_atBot.comp (him.const_mul_atTop hpos))).const_mul (2 * π * |(n : ℝ)|)
+      have ht : Tendsto
+          (fun τ : ℍ => 2 * π * |(n : ℝ)| * Real.exp (-(π * ((n : ℝ) ^ 2 + n) * τ.im)))
+          UpperHalfPlane.atImInfty (𝓝 0) := by
+        have :=
+          (Real.tendsto_exp_atBot.comp (tendsto_neg_atTop_atBot.comp (him.const_mul_atTop
+            hpos))).const_mul (2 * π * |(n : ℝ)|)
         rw [mul_zero] at this
         exact this.congr fun τ => by simp [Function.comp_def, mul_assoc]
       refine ht.congr fun τ => ?_
@@ -231,8 +241,9 @@ private lemma eighthPower_slash_T :
 
 open Complex Filter in
 open scoped UpperHalfPlane MatrixGroups ModularForm Manifold Topology Real in
-theorem _root_.GlobalTheory.JacobiDeriv.eighthPower_slash (γ : SL(2, ℤ)) :
-    _root_.GlobalTheory.JacobiDeriv.eighthPower ∣[(12 : ℤ)] γ = _root_.GlobalTheory.JacobiDeriv.eighthPower := by
+theorem _root_.GlobalTheory.JacobiDeriv.eighthPower_slash (γ : SL(2, ℤ))
+    : _root_.GlobalTheory.JacobiDeriv.eighthPower ∣[(12 : ℤ)] γ
+      = _root_.GlobalTheory.JacobiDeriv.eighthPower := by
   have hγ : γ ∈ Subgroup.closure {ModularGroup.S, ModularGroup.T} := by
     rw [SpecialLinearGroup.SL2Z_generators]; trivial
   induction hγ using Subgroup.closure_induction with
@@ -240,15 +251,18 @@ theorem _root_.GlobalTheory.JacobiDeriv.eighthPower_slash (γ : SL(2, ℤ)) :
     rcases hx with rfl | rfl
     · exact eighthPower_slash_S
     · exact eighthPower_slash_T
-  | one => exact SlashAction.slash_one _ _
-  | mul x y _ _ hx hy => rw [SlashAction.slash_mul, hx, hy]
+  | one =>
+    exact SlashAction.slash_one _ _
+  | mul x y _ _ hx hy =>
+    rw [SlashAction.slash_mul, hx, hy]
   | inv x _ hx =>
     conv_lhs => rw [← hx]
     rw [← SlashAction.slash_mul, mul_inv_cancel, SlashAction.slash_one]
 
 open Complex Filter in
 open scoped UpperHalfPlane MatrixGroups ModularForm Manifold Topology Real in
-theorem _root_.GlobalTheory.JacobiDeriv.qParam_one (τ : ℂ) : Function.Periodic.qParam 1 τ = cexp (2 * π * I * τ) := by
+theorem _root_.GlobalTheory.JacobiDeriv.qParam_one (τ : ℂ)
+    : Function.Periodic.qParam 1 τ = cexp (2 * π * I * τ) := by
   simp [Function.Periodic.qParam]
 
 def eighthPowerForm : CuspForm 𝒮ℒ 12 where
@@ -258,8 +272,10 @@ def eighthPowerForm : CuspForm 𝒮ℒ 12 where
     exact eighthPower_slash A
   holo' := by
     rw [UpperHalfPlane.mdifferentiable_iff]
-    refine DifferentiableOn.congr (f := fun z => cexp (2 * π * I * z) * derivAtZero z ^ 8)
-      (fun z hz => ?_) fun z hz => ?_
+    refine DifferentiableOn.congr
+      (f := fun z => cexp (2 * π * I * z) * derivAtZero z ^ 8)
+      (fun z hz => ?_)
+      fun z hz => ?_
     · exact (DifferentiableAt.mul (by fun_prop)
         ((differentiableAt_derivAtZero hz).pow 8)).differentiableWithinAt
     · simp [eighthPower, UpperHalfPlane.ofComplex_apply_of_im_pos hz]
@@ -303,44 +319,54 @@ private lemma deriv_thetaChar_pow_eight_eq (τ : ℍ) :
   push_cast
   ring
 
-
 open Complex Filter in
 open scoped UpperHalfPlane MatrixGroups ModularForm Manifold Topology Real in
-theorem _root_.GlobalTheory.JacobiDeriv.deriv_thetaChar_pow_eight : ∀ τ : UpperHalfPlane,
-    (deriv (fun z : ℂ => _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.thetaChar (g := 1) !![(τ : ℂ)] ![1 / 2] ![1 / 2] ![z]) 0) ^ 8 =
-      (2 * Real.pi : ℂ) ^ 8 * ModularForm.discriminant τ := by
+theorem _root_.GlobalTheory.JacobiDeriv.deriv_thetaChar_pow_eight
+    : ∀ τ : UpperHalfPlane,
+      (deriv
+            (fun z : ℂ =>
+              _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.thetaChar (g := 1) !![(τ : ℂ)]
+                ![1 / 2] ![1 / 2] ![z])
+            0)
+          ^ 8
+        = (2 * Real.pi : ℂ) ^ 8 * ModularForm.discriminant τ := by
   have hΔ : CuspForm.discriminant ≠ 0 := by
     intro h
     have := congrArg (fun f : CuspForm 𝒮ℒ 12 => f UpperHalfPlane.I) h
     exact ModularForm.discriminant_ne_zero UpperHalfPlane.I (by simpa using this)
   have hrank : Module.finrank ℂ (CuspForm 𝒮ℒ 12) = 1 :=
     Module.finrank_eq_of_rank_eq CuspForm.rank_eq_one_of_weight_eq_twelve
-  obtain ⟨c, hc⟩ := (finrank_eq_one_iff_of_nonzero' _ hΔ).mp hrank
-    _root_.GlobalTheory.JacobiDeriv.eighthPowerForm
-  have hpt : ∀ τ : ℍ, _root_.GlobalTheory.JacobiDeriv.eighthPower τ = c * ModularForm.discriminant τ := by
+  obtain ⟨c, hc⟩ :=
+    (finrank_eq_one_iff_of_nonzero' _ hΔ).mp hrank _root_.GlobalTheory.JacobiDeriv.eighthPowerForm
+  have hpt
+      : ∀ τ : ℍ,
+        _root_.GlobalTheory.JacobiDeriv.eighthPower τ = c * ModularForm.discriminant τ := by
     intro τ
     have := congrArg (fun f : CuspForm 𝒮ℒ 12 => f τ) hc
-    have h2 : _root_.GlobalTheory.JacobiDeriv.eighthPowerForm τ = c * ModularForm.discriminant τ := by
+    have h2
+        : _root_.GlobalTheory.JacobiDeriv.eighthPowerForm τ = c * ModularForm.discriminant τ := by
       simpa using this.symm
     exact h2
-  have hD : ∀ τ : ℍ, _root_.GlobalTheory.JacobiDeriv.derivAtZero τ ^ 8 =
-      c * ∏' n : ℕ, (1 - ModularForm.eta_q n τ) ^ 24 := by
+  have hD
+      : ∀ τ : ℍ,
+        _root_.GlobalTheory.JacobiDeriv.derivAtZero τ ^ 8
+          = c * ∏' n : ℕ, (1 - ModularForm.eta_q n τ) ^ 24 := by
     intro τ
     have h := hpt τ
     rw [ModularForm.discriminant_eq_q_prod, _root_.GlobalTheory.JacobiDeriv.qParam_one,
-      _root_.GlobalTheory.JacobiDeriv.eighthPower] at h
+        _root_.GlobalTheory.JacobiDeriv.eighthPower]
+      at h
     have hq : cexp (2 * π * I * τ) ≠ 0 := Complex.exp_ne_zero _
     apply mul_left_cancel₀ hq
-    rw [h]; ring
+    rw [h]
+    ring
   have hlim1 := _root_.GlobalTheory.JacobiDeriv.tendsto_derivAtZero.pow 8
   have hlim2 := ModularForm.tendsto_atImInfty_tprod_one_sub_eta_q_pow.const_mul c
-  have hc' : (2 * π * I) ^ 8 = c * 1 :=
-    tendsto_nhds_unique hlim1 (hlim2.congr fun τ => (hD τ).symm)
+  have hc' : (2 * π * I) ^ 8 = c * 1 := tendsto_nhds_unique hlim1 (hlim2.congr fun τ => (hD τ).symm)
   intro τ
   rw [deriv_thetaChar_pow_eight_eq, hpt, mul_one] at *
   rw [← hc']
-  have hI : I ^ 8 = 1 := by
-    rw [show (8 : ℕ) = 4 * 2 from rfl, pow_mul, I_pow_four, one_pow]
+  have hI : I ^ 8 = 1 := by rw [show (8 : ℕ) = 4 * 2 from rfl, pow_mul, I_pow_four, one_pow]
   rw [mul_pow, mul_pow, hI, mul_one]
 
 end GlobalTheory.JacobiDeriv

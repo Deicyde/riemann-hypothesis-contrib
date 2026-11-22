@@ -41,21 +41,25 @@ private lemma tails_of_isAdicComplete_span {A : Type*} [CommRing A] (y : A)
   have h0 := _root_.GlobalTheory.Per.AinfComplete.eq_zero_of_haus y _ fun m => Ideal.mem_span_singleton.2 (key m)
   exact (sub_eq_zero.1 h0).symm
 
-
 open scoped NNReal in
 open Ideal Finset in
-theorem _root_.GlobalTheory.WittTeichComplete.main : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [CharP O l]
-    [PerfectRing O l] (x : O), x ≠ 0 → IsAdicComplete (Ideal.span {x}) O →
-    IsAdicComplete (Ideal.span {WittVector.teichmuller l x}) (WittVector l O) ∧
-      IsAdicComplete (Ideal.span {((l : ℕ) : WittVector l O)} ⊔
-        Ideal.span {WittVector.teichmuller l x}) (WittVector l O) := by
+theorem _root_.GlobalTheory.WittTeichComplete.main
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [CharP O l] [PerfectRing O l]
+        (x : O),
+      x ≠ 0 → IsAdicComplete (Ideal.span {x}) O
+        → IsAdicComplete (Ideal.span {WittVector.teichmuller l x}) (WittVector l O) ∧ IsAdicComplete
+          (Ideal.span {((l : ℕ) : WittVector l O)} ⊔ Ideal.span {WittVector.teichmuller l x})
+          (WittVector l O) := by
   intro l _ O _ _ _ _ x _ hc
   haveI := hc
   have hcc : WittVector.constantCoeff (WittVector.teichmuller l x) = x := by
     simp [WittVector.constantCoeff]
-  obtain ⟨h₁, h₂⟩ := _root_.GlobalTheory.Per.AinfComplete.witt_complete (WittVector.teichmuller l x)
-    (hcc ▸ tails_of_isAdicComplete_span x) (fun r hr => _root_.GlobalTheory.Per.AinfComplete.eq_zero_of_haus x r
-      fun n => Ideal.mem_span_singleton.2 (hcc ▸ hr n))
+  obtain ⟨h₁, h₂⟩ :=
+    _root_.GlobalTheory.Per.AinfComplete.witt_complete (WittVector.teichmuller l x)
+      (hcc ▸ tails_of_isAdicComplete_span x)
+      (fun r hr =>
+        _root_.GlobalTheory.Per.AinfComplete.eq_zero_of_haus x r fun n =>
+          Ideal.mem_span_singleton.2 (hcc ▸ hr n))
   refine ⟨h₂, ?_⟩
   rwa [Ideal.span_insert] at h₁
 

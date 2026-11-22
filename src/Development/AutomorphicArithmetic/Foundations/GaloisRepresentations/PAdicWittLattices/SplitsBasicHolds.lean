@@ -53,7 +53,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct
 
 universe u v
 
@@ -93,7 +94,15 @@ theorem algSplit_holds : AlgSplit := @pAlgSplit @algIsoPts_holds
 
 theorem algTr_holds : AlgTr := @pAlgTr
 
-theorem hodgeFun_holds : ∀ (k : Type) [Field k] {Z Y W : Scheme.{0}} (p : Z ⟶ sp k) (q : Y ⟶ sp k) (r : W ⟶ sp k) (s : Y ⟶ Z) [IsFinite s] [Etale s] (c : W ⟶ Z) (J : Type) [Fintype J] (σ : J → (W ⟶ Y)) (hσ : ∀ j, σ j ≫ s = c), Splits s c σ → ∀ (U : Z.Opens) (hU : IsAffineOpen U) (b : GlobalTheory.CechDR.Sec q (s ⁻¹ᵁ U)), GlobalTheory.HodgeCoh.appSec p r c U (secTrace p q hU b) = ∑ j, GlobalTheory.CechDR.Sec.res r (GlobalTheory.GalTrace.preimage_le (hσ j) U) (GlobalTheory.HodgeCoh.appSec q r (σ j) (s ⁻¹ᵁ U) b) := pHodgeFun ptsOfSplits_holds algSplit_holds algTr_holds
+theorem hodgeFun_holds
+    : ∀ (k : Type) [Field k] {Z Y W : Scheme.{0}} (p : Z ⟶ sp k) (q : Y ⟶ sp k) (r : W ⟶ sp k)
+        (s : Y ⟶ Z) [IsFinite s] [Etale s] (c : W ⟶ Z) (J : Type) [Fintype J] (σ : J → (W ⟶ Y))
+        (hσ : ∀ j, σ j ≫ s = c),
+      Splits s c σ
+        → ∀ (U : Z.Opens) (hU : IsAffineOpen U) (b : GlobalTheory.CechDR.Sec q (s ⁻¹ᵁ U)),
+          GlobalTheory.HodgeCoh.appSec p r c U (secTrace p q hU b)
+            = ∑ j, GlobalTheory.CechDR.Sec.res r (GlobalTheory.GalTrace.preimage_le (hσ j) U) (GlobalTheory.HodgeCoh.appSec q r (σ j) (s ⁻¹ᵁ U) b) :=
+  pHodgeFun ptsOfSplits_holds algSplit_holds algTr_holds
 
 theorem hodgeTr_holds : HodgeTr := @pHodgeTr @hodgeFun_holds
 
@@ -109,7 +118,10 @@ theorem etGood_holds : EtGood := @pEtGood @etnGood_holds
 
 theorem bcGood_holds : BcGood.{u} := pBcGood bcSplits_holds bcGal_holds
 
-theorem extTr_holds : ∀ {B : Scheme.{0}} {R : Type} [Field R] (T : Th.{u} B R) (L : Type) [Field L] [Algebra R L] {Z Y : Scheme.{0}} (p : Z ⟶ B) (q : Y ⟶ B) (s : Y ⟶ Z) (tr : T.H q →ₗ[R] T.H p), T.IsTr p q s tr → (T.ext L).IsTr p q s (tr.baseChange L) :=
+theorem extTr_holds
+    : ∀ {B : Scheme.{0}} {R : Type} [Field R] (T : Th.{u} B R) (L : Type) [Field L] [Algebra R L]
+        {Z Y : Scheme.{0}} (p : Z ⟶ B) (q : Y ⟶ B) (s : Y ⟶ Z) (tr : T.H q →ₗ[R] T.H p),
+      T.IsTr p q s tr → (T.ext L).IsTr p q s (tr.baseChange L) :=
   @pExtTr.{u}
 
 theorem extGood_holds : ExtGood.{u} := pExtGood extTr_holds
@@ -128,11 +140,14 @@ theorem fEtInj_holds : FEtInj.{u} := pFEtInj galClosD_holds
 
 theorem trBase_holds : TrBase.{u} := pTrBase fEtBasic_holds splitsBasic_holds galClosD_holds
 
-theorem trPushM_holds : TrPushM.{u} := pTrPushM fEtBasic_holds splitsBasic_holds splitsComp_holds multiSplit_holds fEtInj_holds
+theorem trPushM_holds : TrPushM.{u} :=
+  pTrPushM fEtBasic_holds splitsBasic_holds splitsComp_holds multiSplit_holds fEtInj_holds
 
 theorem liesAbs_holds : LiesAbs.{u} := pLiesAbs fEtBasic_holds trBase_holds trPushM_holds
 
-theorem hopSpec_holds : HopSpec := pHopSpec etGood_holds bcGood_holds galClos_holds opEx_holds opTr_holds opEt_holds opBc_holds bcSplits_holds
+theorem hopSpec_holds : HopSpec :=
+  pHopSpec etGood_holds bcGood_holds galClos_holds opEx_holds opTr_holds opEt_holds opBc_holds
+    bcSplits_holds
 
 theorem liesGen_holds : LiesGen := @pLiesGen
 
@@ -140,7 +155,8 @@ theorem liesOp_holds : LiesOp.{u} := pLiesOp liesGen_holds liesAbs_holds
 
 theorem coverInv_holds : CoverInv.{u} := pCoverInv galInv_holds splitsPts_holds
 
-theorem pieceLe_holds : PieceLe := pPieceLe etGood_holds bcGood_holds extGood_holds extTr_holds hopSpec_holds coverInv_holds
+theorem pieceLe_holds : PieceLe :=
+  pPieceLe etGood_holds bcGood_holds extGood_holds extTr_holds hopSpec_holds coverInv_holds
 
 theorem twSplit_holds : TwSplit := pTwSplit splitsPts_holds
 

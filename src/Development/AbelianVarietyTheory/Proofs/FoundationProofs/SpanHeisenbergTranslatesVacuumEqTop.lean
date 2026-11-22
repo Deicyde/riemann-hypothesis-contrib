@@ -12,37 +12,52 @@ open scoped BigOperators
 
 namespace GlobalTheory.FinWeil
 
-theorem span_translates_vacuum : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M] {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M}, IsHeis σ w γ W → ∀ A : Submodule R X, SelfDual γ A → ∀ e : M, (∀ v, Fixes W A v → ∃ c : ℂ, v = c • e) → (∀ v : M, ∃ T : Submodule R X, idx A T ≠ 0 ∧ ∀ a ∈ A, (∀ t ∈ T, γ a t = 1) → W a v = v) → Submodule.span ℂ (Set.range fun x => W x e) = ⊤ := by
+theorem span_translates_vacuum
+    : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+        {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M},
+      IsHeis σ w γ W
+        → ∀ A : Submodule R X,
+          SelfDual γ A
+            → ∀ e : M,
+              (∀ v, Fixes W A v → ∃ c : ℂ, v = c • e)
+                → (∀ v : M, ∃ T : Submodule R X,
+                  idx A T ≠ 0 ∧ ∀ a ∈ A, (∀ t ∈ T, γ a t = 1) → W a v = v)
+                → Submodule.span ℂ (Set.range fun x => W x e) = ⊤ := by
   intro R X M _ _ _ _ _ σ w γ W h A hA e he hsm
   rw [eq_top_iff]
   intro v _
   obtain ⟨T, hT, hv⟩ := hsm v
-  let S : Submodule R X :=
-    { carrier := {a | a ∈ A ∧ ∀ t ∈ T, γ a t = 1}
-      add_mem' := fun {a b} ha hb => ⟨A.add_mem ha.1 hb.1, fun t ht => by
-        rw [h.add_left, ha.2 t ht, hb.2 t ht, mul_one]⟩
-      zero_mem' := ⟨A.zero_mem, fun t _ => h.zero_left t⟩
-      smul_mem' := fun r a ha => ⟨A.smul_mem r ha.1, fun t ht => by
-        rw [h.adj]; exact ha.2 _ (T.smul_mem _ ht)⟩ }
+  let S : Submodule R X := {
+    carrier := {a | a ∈ A ∧ ∀ t ∈ T, γ a t = 1}
+    add_mem' := fun {a b} ha hb =>
+      ⟨A.add_mem ha.1 hb.1, fun t ht => by rw [h.add_left, ha.2 t ht, hb.2 t ht, mul_one]⟩
+    zero_mem' := ⟨A.zero_mem, fun t _ => h.zero_left t⟩
+    smul_mem' := fun r a ha =>
+      ⟨A.smul_mem r ha.1, fun t ht => by rw [h.adj]; exact ha.2 _ (T.smul_mem _ ht)⟩
+  }
   have hSm : ∀ a, a ∈ S ↔ a ∈ A ∧ ∀ t ∈ T, γ a t = 1 := fun a => Iff.rfl
   have hSv : Fixes W S v := fun a ha => hv a ha.1 ha.2
   have hSt : ∀ t ∈ T, Fixes W S (W (-t) v) := by
     intro t ht a ha
     rw [h.comm, ha.2 _ (T.neg_mem ht), one_smul, hSv a ha]
-  obtain ⟨h1, -, -⟩ := perfect_pairing_quotients h S.toAddSubgroup A.toAddSubgroup
-    A.toAddSubgroup T.toAddSubgroup
-    (fun a ha => ⟨fun hs => hs.2, fun hs => ⟨ha, hs⟩⟩)
-    (fun t _ => ⟨fun ht a ha => h.iso hA ha ht,
-      fun ht => (hA t).2 fun a ha => h.swap_eq_one (ht a ha)⟩) hT
+  obtain ⟨h1, -, -⟩ :=
+    perfect_pairing_quotients h S.toAddSubgroup A.toAddSubgroup A.toAddSubgroup T.toAddSubgroup
+      (fun a ha => ⟨fun hs => hs.2, fun hs => ⟨ha, hs⟩⟩)
+      (fun t _ =>
+        ⟨fun ht a ha => h.iso hA ha ht, fun ht => (hA t).2 fun a ha => h.swap_eq_one (ht a ha)⟩)
+      hT
   have hn : idx S A ≠ 0 := by
     unfold idx
     rw [h1]
     exact hT
-  obtain ⟨-, -, h2⟩ := perfect_pairing_quotients h A.toAddSubgroup T.toAddSubgroup
-    S.toAddSubgroup A.toAddSubgroup
-    (fun t _ => hA t)
-    (fun a ha => ⟨fun hs t ht => h.swap_eq_one (hs.2 t ht),
-      fun hs => ⟨ha, fun t ht => h.swap_eq_one (hs t ht)⟩⟩) hn
+  obtain ⟨-, -, h2⟩ :=
+    perfect_pairing_quotients h A.toAddSubgroup T.toAddSubgroup S.toAddSubgroup A.toAddSubgroup
+      (fun t _ => hA t)
+      (fun a ha => ⟨
+        fun hs t ht => h.swap_eq_one (hs.2 t ht),
+        fun hs => ⟨ha, fun t ht => h.swap_eq_one (hs t ht)⟩
+      ⟩)
+      hn
   obtain ⟨t1, t2, -⟩ := sumOp_transversal h S A hA
   obtain ⟨⟨m, f, hf, hu⟩, hfix, -⟩ := t2 hn
   have hg : ∀ t ∈ T, ∑ i, γ t (f i) • W (f i) v ∈ Submodule.span ℂ (Set.range fun x => W x e) := by
@@ -61,16 +76,19 @@ theorem span_translates_vacuum : ∀ {R X M : Type} [CommRing R] [AddCommGroup X
   haveI : Finite (T.toAddSubgroup ⧸ A.toAddSubgroup.addSubgroupOf T.toAddSubgroup) :=
     Nat.finite_of_card_ne_zero hT
   letI := Fintype.ofFinite (T.toAddSubgroup ⧸ A.toAddSubgroup.addSubgroupOf T.toAddSubgroup)
-  have h5 := Submodule.sum_mem (Submodule.span ℂ (Set.range fun x => W x e))
-    (t := (Finset.univ : Finset
-      (T.toAddSubgroup ⧸ A.toAddSubgroup.addSubgroupOf T.toAddSubgroup)))
-    (fun q _ => hg _ (Quotient.out q : T.toAddSubgroup).2)
+  have h5 :=
+    Submodule.sum_mem (Submodule.span ℂ (Set.range fun x => W x e))
+      (t :=
+        (Finset.univ : Finset (T.toAddSubgroup ⧸ A.toAddSubgroup.addSubgroupOf T.toAddSubgroup)))
+      (fun q _ => hg _ (Quotient.out q : T.toAddSubgroup).2)
   rw [Finset.sum_comm] at h5
   obtain ⟨i₀, hi₀, hi⟩ := hu 0 A.zero_mem
   simp only [zero_sub, neg_mem_iff] at hi₀ hi
-  have h6 : ∀ i, ∑ q : T.toAddSubgroup ⧸ A.toAddSubgroup.addSubgroupOf T.toAddSubgroup,
-      γ ((Quotient.out q : T.toAddSubgroup) : X) (f i) • W (f i) v
-      = if i = i₀ then (idx A T : ℂ) • v else 0 := by
+  have h6
+      : ∀ i,
+        ∑ q : T.toAddSubgroup ⧸ A.toAddSubgroup.addSubgroupOf T.toAddSubgroup,
+            γ ((Quotient.out q : T.toAddSubgroup) : X) (f i) • W (f i) v
+          = if i = i₀ then (idx A T : ℂ) • v else 0 := by
     intro i
     rw [← Finset.sum_smul, ← finsum_eq_sum_of_fintype, h2 _ (hf i)]
     by_cases hii : i = i₀

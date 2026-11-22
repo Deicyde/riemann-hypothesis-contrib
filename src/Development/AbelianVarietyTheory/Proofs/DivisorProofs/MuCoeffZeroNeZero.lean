@@ -5,18 +5,21 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IotaScalarOn
 
 @[expose] public section
 
-open GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps GlobalTheory.DetInv Matrix TensorProduct
+open GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.SandwichMaps GlobalTheory.DetInv
+  Matrix TensorProduct
 
 namespace GlobalTheory.DetInv
 
-
 open Matrix TensorProduct in
-theorem _root_.GlobalTheory.DetInv.mu_coeff_zero_ne_zero : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C]
-    [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C]
-    [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O], v.Integers O →
-    ∀ (ε : PreTilt O p), IsPrimitiveRoot (_root_.GlobalTheory.Sandwich.root ε).untilt p →
-      (_root_.GlobalTheory.Sandwich.mu ε).coeff 0 ≠ 0 ∧ _root_.GlobalTheory.Sandwich.mu ε ≠ 0 ∧
-        _root_.GlobalTheory.Sandwich.nu ε ≠ 0 := by
+theorem _root_.GlobalTheory.DetInv.mu_coeff_zero_ne_zero
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O],
+      v.Integers O
+        → ∀ (ε : PreTilt O p),
+          IsPrimitiveRoot (_root_.GlobalTheory.Sandwich.root ε).untilt p
+            → (_root_.GlobalTheory.Sandwich.mu ε).coeff 0 ≠ 0
+              ∧ _root_.GlobalTheory.Sandwich.mu ε ≠ 0 ∧ _root_.GlobalTheory.Sandwich.nu ε ≠ 0 := by
   intro p _ C _ _ _ v O _ _ _ _ _ ε hζ
   have hε : ε ≠ 1 := by
     rintro rfl

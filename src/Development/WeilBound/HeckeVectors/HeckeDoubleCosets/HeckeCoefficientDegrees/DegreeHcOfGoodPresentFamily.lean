@@ -39,12 +39,16 @@ section UJ
 
 open ReciprocityTheory.ChartRestriction.DS
 
-theorem fdeg_gap (n : ℕ) (ε : Fin n → Bool) : ∃ c : ℝ, 0 < c ∧
-    ∀ (lam : Fin n → ℝ) (h : ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-      [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (v : H),
-      Formalism.QuantumDeterminants.IsHCParam lam → Formalism.MainNotions.S.IsDS ε lam σ → Formalism.QuantumDeterminants.GapAtLeast ε lam h →
-      120 * (n : ℝ) ^ 3 ≤ h → 1 ≤ pOf ε → 1 ≤ qOf ε → v ≠ 0 →
-      Formalism.MainNotions.S.fdegOf (Formalism.REAL.muG ε) σ v = c * Formalism.QuantumDeterminants.fdegHC lam := by
+theorem fdeg_gap (n : ℕ) (ε : Fin n → Bool)
+    : ∃ c : ℝ,
+      0 < c
+        ∧ ∀ (lam : Fin n → ℝ) (h : ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+            [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (v : H),
+          Formalism.QuantumDeterminants.IsHCParam lam → Formalism.MainNotions.S.IsDS ε lam σ
+            → Formalism.QuantumDeterminants.GapAtLeast ε lam h → 120 * (n : ℝ) ^ 3 ≤ h → 1 ≤ pOf ε
+            → 1 ≤ qOf ε → v ≠ 0
+            → Formalism.MainNotions.S.fdegOf (Formalism.REAL.muG ε) σ v
+              = c * Formalism.QuantumDeterminants.fdegHC lam := by
   obtain ⟨c, hc, hH⟩ := fdCons_muG n ε
   refine ⟨c, hc, fun lam h H _ _ _ σ v hl hσ hgap hh hp hq hv => ?_⟩
   have hn : 1 ≤ n := hp.trans ((Finset.card_le_univ _).trans_eq (Fintype.card_fin n))
@@ -58,8 +62,7 @@ theorem fdeg_gap (n : ℕ) (ε : Fin n → Bool) : ∃ c : ℝ, 0 < c ∧
     have hq0_real : (S7.q0 ε : ℝ) ≤ n := by exact_mod_cast hq0_le
     have hn_real : (1 : ℝ) ≤ n := by exact_mod_cast hn
     have hn_le_cube : (n : ℝ) ≤ (n : ℝ) ^ 3 := le_self_pow₀ hn_real (by norm_num)
-    have hsq_le_cube : (n : ℝ) ^ 2 ≤ (n : ℝ) ^ 3 :=
-      pow_le_pow_right₀ hn_real (by norm_num)
+    have hsq_le_cube : (n : ℝ) ^ 2 ≤ (n : ℝ) ^ 3 := pow_le_pow_right₀ hn_real (by norm_num)
     unfold thrStar
     apply max_le
     · have hprod : (n : ℝ) * pOf ε * qOf ε ≤ n * n * n := by gcongr
@@ -82,12 +85,13 @@ theorem fdeg_gap (n : ℕ) (ε : Fin n → Bool) : ∃ c : ℝ, 0 < c ∧
 
 end UJ
 
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData
+  Formalism.FourierDecayAlt.P.CutBP
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Formalism.FourierDecayAlt.P.CutBP
-
-variable {P : M.Par} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp]
-  [FiniteDimensional ℂ Wq] [CompleteSpace Wp] [CompleteSpace Wq]
+variable
+  {P : M.Par} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+  [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] [CompleteSpace Wp] [CompleteSpace Wq]
 
 end CompanionTheory.D.Upq.Coef
 

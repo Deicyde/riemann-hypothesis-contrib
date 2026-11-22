@@ -12,8 +12,10 @@ open NumberField MeasureTheory
 
 namespace GlobalTheory.CMTypeNorm
 
-theorem place_bijective {K : Type} [Field K] [NumberField K] {I : Type} {φ : I → K →+* ℂ} (h : GlobalTheory.CMVal.IsCMType φ) :
-    Function.Bijective fun i => InfinitePlace.mk (φ i) := by
+theorem place_bijective
+    {K : Type} [Field K] [NumberField K]
+    {I : Type} {φ : I → K →+* ℂ} (h : GlobalTheory.CMVal.IsCMType φ)
+    : Function.Bijective fun i => InfinitePlace.mk (φ i) := by
   constructor
   · intro i j hij
     obtain ⟨k, -, hk⟩ := h (φ j)
@@ -33,15 +35,17 @@ theorem place_bijective {K : Type} [Field K] [NumberField K] {I : Type} {φ : I 
     · exact Or.inl h1.symm
     · exact Or.inr h1.symm
 
-theorem prod_norm_sq_eq_absNorm :
-    ∀ (K : Type) [Field K] [NumberField K] [NumberField.IsTotallyComplex K] (I : Type) [Fintype I] (φ : I → K →+* ℂ),
-      GlobalTheory.CMVal.IsCMType φ → ∀ α : 𝓞 K,
-        ∏ i, ‖φ i (α : K)‖ ^ 2 = ((Ideal.absNorm (Ideal.span {α}) : ℕ) : ℝ) := by
+theorem prod_norm_sq_eq_absNorm
+    : ∀ (K : Type) [Field K] [NumberField K] [NumberField.IsTotallyComplex K] (I : Type) [Fintype I]
+        (φ : I → K →+* ℂ),
+      GlobalTheory.CMVal.IsCMType φ
+        → ∀ α : 𝓞 K, ∏ i, ‖φ i (α : K)‖ ^ 2 = ((Ideal.absNorm (Ideal.span {α}) : ℕ) : ℝ) := by
   intro K _ _ _ I _ φ h α
   have h1 : ∏ i, ‖φ i (α : K)‖ ^ 2 = ∏ w : InfinitePlace K, w (α : K) ^ w.mult := by
     refine Fintype.prod_bijective _ (place_bijective h) _ _ fun i => ?_
     rw [InfinitePlace.apply, IsTotallyComplex.mult_eq]
-  rw [h1, InfinitePlace.prod_eq_abs_norm, Ideal.absNorm_span_singleton, ← Algebra.coe_norm_int, Nat.cast_natAbs]
+  rw [h1, InfinitePlace.prod_eq_abs_norm, Ideal.absNorm_span_singleton, ← Algebra.coe_norm_int,
+    Nat.cast_natAbs]
   push_cast
   rfl
 

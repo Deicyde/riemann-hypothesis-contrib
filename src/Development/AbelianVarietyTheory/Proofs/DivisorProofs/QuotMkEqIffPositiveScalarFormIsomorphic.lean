@@ -5,12 +5,14 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.PointsNonemp
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.LKCx.Form
 
-theorem rel_equivalence {p : ℕ} [Fact p.Prime] (G : HTGroup p) : Equivalence (Form.Rel (G := G)) := by
+theorem rel_equivalence {p : ℕ} [Fact p.Prime] (G : HTGroup p)
+    : Equivalence (Form.Rel (G := G)) := by
   have sh_mul : ∀ a b : G.C, sh G (a * b) = sh G b * sh G a := by
     intro a b; simp only [sh, map_mul, MulOpposite.unop_mul]
   have sh_one : sh G (1 : G.C) = 1 := by simp only [sh, map_one, MulOpposite.unop_one]
@@ -29,8 +31,9 @@ theorem rel_equivalence {p : ℕ} [Fact p.Prime] (G : HTGroup p) : Equivalence (
     rw [hβ', hβ, Units.val_mul, sh_mul]
     simp only [← Algebra.smul_def, mul_smul_comm, smul_mul_assoc, smul_smul, mul_assoc, mul_comm s]
 
-theorem mk_eq_iff_rel : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (P Q : Form G),
-    Quot.mk Form.Rel P = Quot.mk Form.Rel Q ↔ Form.Rel P Q := by
+theorem mk_eq_iff_rel
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (P Q : Form G),
+      Quot.mk Form.Rel P = Quot.mk Form.Rel Q ↔ Form.Rel P Q := by
   intro p _ G P Q
   rw [← (rel_equivalence G).eqvGen_iff]
   exact ⟨Quot.eqvGen_exact, Quot.eqvGen_sound⟩

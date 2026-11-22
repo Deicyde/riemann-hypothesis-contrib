@@ -31,9 +31,9 @@ theorem local_neighbourhood_small : LocSmall := by
   set x₀ : L.Fp := r * r' with hx₀
   have hx₀v : valuation L.Fp x₀ < γ := by
     rw [hx₀, map_mul, hr]
-    calc (γ : ValueGroupWithZero L.Fp) * valuation L.Fp r'
-        < (γ : ValueGroupWithZero L.Fp) * 1 := by
-          exact mul_lt_mul_of_pos_left hr'1 (by simp [pos_iff_ne_zero])
+    calc
+      (γ : ValueGroupWithZero L.Fp) * valuation L.Fp r' < (γ : ValueGroupWithZero L.Fp) * 1 := by
+        exact mul_lt_mul_of_pos_left hr'1 (by simp [pos_iff_ne_zero])
       _ = γ := mul_one _
   have hx₀0 : valuation L.Fp x₀ ≠ 0 := by
     rw [hx₀, map_mul, hr]

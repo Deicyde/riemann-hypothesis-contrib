@@ -18,8 +18,8 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FN
 
-theorem gamma_le_of_dvd {N N' : ℕ} (hd : N ∣ N') :
-    CongruenceSubgroup.Gamma N' ≤ CongruenceSubgroup.Gamma N := by
+theorem gamma_le_of_dvd {N N' : ℕ} (hd : N ∣ N')
+    : CongruenceSubgroup.Gamma N' ≤ CongruenceSubgroup.Gamma N := by
   intro γ hγ
   rw [CongruenceSubgroup.Gamma_mem] at hγ ⊢
   have key : ∀ x : ℤ, (x : ZMod N) = ZMod.castHom hd (ZMod N) (x : ZMod N') := fun x => by
@@ -31,12 +31,12 @@ theorem gamma_le_of_dvd {N N' : ℕ} (hd : N ∣ N') :
   · rw [key, h3, map_zero]
   · rw [key, h4, map_one]
 
-theorem lv_mono : ∀ (E : Subring ℂ) (N N' w w' : ℕ) (f : ℍ → ℂ), 0 < N' → N ∣ N' → w ≤ w' →
-    Lv E N w f → Lv E N' w' f := by
+theorem lv_mono
+    : ∀ (E : Subring ℂ) (N N' w w' : ℕ) (f : ℍ → ℂ),
+      0 < N' → N ∣ N' → w ≤ w' → Lv E N w f → Lv E N' w' f := by
   intro E N N' w w' f hN' hd hw hf
   refine ⟨fun γ hγ τ => hf.1 γ (gamma_le_of_dvd hd hγ) τ, fun γ => ?_⟩
-  have h1 : QAll (· ∈ E) N' fun τ => DD τ ^ w * f (γ • τ) :=
-    QAll.of_dvd hN' hd E.zero_mem (hf.2 γ)
+  have h1 : QAll (· ∈ E) N' fun τ => DD τ ^ w * f (γ • τ) := QAll.of_dvd hN' hd E.zero_mem (hf.2 γ)
   have h2 : QAll (· ∈ E) N' fun τ => DD τ ^ (w' - w) :=
     QAllSubring.pow (w' - w) (eis_qAll N' hN' DD (Or.inr (Or.inr rfl)) E)
   have h3 := QAllSubring.mul h2 h1

@@ -6,7 +6,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EqZeroOf
 
 @[expose] public section
 
-open Matrix MeasureTheory PositivityTheory.Rg.BcB PositivityTheory.Rg.Tf.Loc GlobalTheory.CompanionTheory.NilChangeVar
+open Matrix MeasureTheory PositivityTheory.Rg.BcB PositivityTheory.Rg.Tf.Loc
+  GlobalTheory.CompanionTheory.NilChangeVar
 
 namespace GlobalTheory.CompanionTheory.LocVan
 
@@ -16,10 +17,14 @@ theorem nilChange_of_flag : NilChange := by
     LinearEquiv.ofInjectiveEndo (slinN d h1 h2 - LinearMap.id) (slinN_injective d h1 h2 hreg)
   have hLval (X : nilrad W₁ W₂) : (L X).1 = slin d X.1 - X.1 := by
     simp only [L, LinearEquiv.coe_ofInjectiveEndo, LinearMap.sub_apply, LinearMap.id_apply,
-      Submodule.coe_sub] <;> rfl
+        Submodule.coe_sub]
+      <;> rfl
   have hLc : Continuous L := L.toContinuousLinearEquiv.continuous
-  let Q : nilrad W₁ W₂ → nilrad W₁ W₂ := fun X =>
-    ⟨quad d X.1, two_mem hle (quadratic_term_nilradical_mem d h1 h2 X.2).1 (quadratic_term_nilradical_mem d h1 h2 X.2).2⟩
+  let Q : nilrad W₁ W₂ → nilrad W₁ W₂ := fun X => ⟨
+    quad d X.1,
+    two_mem hle (quadratic_term_nilradical_mem d h1 h2 X.2).1
+      (quadratic_term_nilradical_mem d h1 h2 X.2).2
+  ⟩
   have hQc : Continuous Q :=
     Continuous.subtype_mk ((continuous_quad d).comp continuous_subtype_val) _
   have hLF : ∀ y ∈ nilrad2 W₁ W₂, L y ∈ nilrad2 W₁ W₂ := fun y hy => by

@@ -24,8 +24,9 @@ theorem dg_posOf_val (x : ℤ) : ((posOf n' x).val : ℤ) = x % n' := by
   rw [Nat.mod_eq_of_lt (by omega)]
   omega
 
-theorem dg_posOf_inj {y a b : ℤ} (ha : y ≤ a ∧ a < y + n') (hb : y ≤ b ∧ b < y + n') (h : posOf n' a = posOf n' b) :
-    a = b := by
+theorem dg_posOf_inj
+    {y a b : ℤ} (ha : y ≤ a ∧ a < y + n') (hb : y ≤ b ∧ b < y + n') (h : posOf n' a = posOf n' b)
+    : a = b := by
   have hn : (0 : ℤ) < n' := by exact_mod_cast NeZero.pos n'
   have hv := congrArg (fun t : Fin n' => (t.val : ℤ)) h
   simp only [dg_posOf_val] at hv
@@ -51,7 +52,8 @@ theorem dg_posOf_inj {y a b : ℤ} (ha : y ≤ a ∧ a < y + n') (hb : y ≤ b �
 
 variable {Fr}
 
-theorem dg_fr_lt (hV : Fr.Valid L₁ N₁) (j : ℤ) (i : ℕ) : ∀ i', i < i' → i' < r → Fr.fr j i < Fr.fr j i' := by
+theorem dg_fr_lt (hV : Fr.Valid L₁ N₁) (j : ℤ) (i : ℕ)
+    : ∀ i', i < i' → i' < r → Fr.fr j i < Fr.fr j i' := by
   intro i' hii' hi'
   induction i' with
   | zero => omega
@@ -61,7 +63,8 @@ theorem dg_fr_lt (hV : Fr.Valid L₁ N₁) (j : ℤ) (i : ℕ) : ∀ i', i < i' 
     · subst h
       exact hV.2.2.1 j i (by omega)
 
-theorem dg_fr_le (hV : Fr.Valid L₁ N₁) (j : ℤ) {i i' : ℕ} (h : i ≤ i') (h' : i' < r) : Fr.fr j i ≤ Fr.fr j i' := by
+theorem dg_fr_le (hV : Fr.Valid L₁ N₁) (j : ℤ) {i i' : ℕ} (h : i ≤ i') (h' : i' < r)
+    : Fr.fr j i ≤ Fr.fr j i' := by
   rcases h.lt_or_eq with h | h
   · exact (dg_fr_lt hV j i i' h h').le
   · subst h
@@ -72,32 +75,36 @@ theorem dg_z_mono (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) : StrictMono fun j : 
   intro j
   exact lt_of_lt_of_le (hV.2.2.2.1 j) (dg_fr_le hV (j + 1) (Nat.zero_le _) (by omega))
 
-theorem frame_end_lt_next_start (hV : Fr.Valid L₁ N₁) (j : ℤ) : Fr.fr (j - 1) (r - 1) < Fr.fr j 0 := by
+theorem frame_end_lt_next_start (hV : Fr.Valid L₁ N₁) (j : ℤ)
+    : Fr.fr (j - 1) (r - 1) < Fr.fr j 0 := by
   have h := hV.2.2.2.1 (j - 1)
   rwa [sub_add_cancel] at h
 
-theorem dg_llPos_eq (j : ℤ) (l : ℕ) (hl : l < (Fr.LLset j).card) :
-    llPos Fr j l = (Fr.LLset j).orderEmbOfFin rfl ⟨l, hl⟩ := by
+theorem dg_llPos_eq (j : ℤ) (l : ℕ) (hl : l < (Fr.LLset j).card)
+    : llPos Fr j l = (Fr.LLset j).orderEmbOfFin rfl ⟨l, hl⟩ := by
   simp [llPos, Finset.orderEmbOfFin_apply, hl]
 
 theorem dg_llPos_mem (j : ℤ) (l : ℕ) (hl : l < (Fr.LLset j).card) : llPos Fr j l ∈ Fr.LLset j := by
   rw [dg_llPos_eq j l hl]
   exact Finset.orderEmbOfFin_mem _ _ _
 
-theorem dg_mem_LL {j t : ℤ} : t ∈ Fr.LLset j ↔ (Fr.fr (j - 1) (r - 1) < t ∧ t < Fr.fr j 0) ∧ posOf n' t ∈ Fr.TT := by
+theorem dg_mem_LL {j t : ℤ}
+    : t ∈ Fr.LLset j ↔ (Fr.fr (j - 1) (r - 1) < t ∧ t < Fr.fr j 0) ∧ posOf n' t ∈ Fr.TT := by
   simp [Frames.LLset, Finset.mem_filter, Finset.mem_Ioo]
 
 variable {J : ℕ} [NeZero J] {nL : ZMod J → ℕ}
 
-theorem dg_posTL_mem (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card) (x : TL J nL r) :
-    Fr.fr (segZ x.1 - 1) (r - 1) < posTL Fr x ∧ posTL Fr x ≤ Fr.fr (segZ x.1) (r - 1) := by
+theorem dg_posTL_mem
+    (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card) (x : TL J nL r)
+    : Fr.fr (segZ x.1 - 1) (r - 1) < posTL Fr x ∧ posTL Fr x ≤ Fr.fr (segZ x.1) (r - 1) := by
   obtain ⟨j, l | m⟩ := x
   · have hl : l.val < (Fr.LLset (segZ j)).card := by rw [← hnL j]; exact l.2
     have hmem := dg_mem_LL.mp (dg_llPos_mem (segZ j) l.val hl)
     refine ⟨hmem.1.1, ?_⟩
     exact le_trans hmem.1.2.le (dg_fr_le hV _ (Nat.zero_le _) (by omega))
   · refine ⟨?_, ?_⟩
-    · exact lt_of_lt_of_le (frame_end_lt_next_start hV (segZ j)) (dg_fr_le hV _ (Nat.zero_le _) (by omega))
+    · exact lt_of_lt_of_le (frame_end_lt_next_start hV (segZ j))
+        (dg_fr_le hV _ (Nat.zero_le _) (by omega))
     · exact dg_fr_le hV _ (by omega) (by omega)
 
 theorem dg_segZ_range (j : ZMod J) : 0 ≤ segZ j ∧ segZ j < J := by
@@ -108,8 +115,8 @@ theorem dg_segZ_inj {j j' : ZMod J} (h : segZ j = segZ j') : j = j' := by
   have h' : (j.val : ℤ) = j'.val := h
   exact ZMod.val_injective J (by exact_mod_cast h')
 
-theorem dg_posTL_inj (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card) :
-    Function.Injective (posTL Fr : TL J nL r → ℤ) := by
+theorem dg_posTL_inj (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card)
+    : Function.Injective (posTL Fr : TL J nL r → ℤ) := by
   intro x y hxy
   have hx := dg_posTL_mem hV hr hnL x
   have hy := dg_posTL_mem hV hr hnL y
@@ -165,9 +172,10 @@ theorem dg_posTL_inj (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j
       rw [Fin.ext e3]
   rw [hab]
 
-theorem dg_window (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hJ : J = Fr.J) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card)
-    (x : TL J nL r) :
-    Fr.fr (-1) (r - 1) + 1 ≤ posTL Fr x ∧ posTL Fr x < Fr.fr (-1) (r - 1) + 1 + n' := by
+theorem dg_window
+    (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hJ : J = Fr.J) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card)
+    (x : TL J nL r)
+    : Fr.fr (-1) (r - 1) + 1 ≤ posTL Fr x ∧ posTL Fr x < Fr.fr (-1) (r - 1) + 1 + n' := by
   have hm := dg_posTL_mem hV hr hnL x
   have hs := dg_segZ_range x.1
   have hmono := (dg_z_mono hV hr).monotone
@@ -177,15 +185,16 @@ theorem dg_window (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hJ : J = Fr.J) (hnL 
   have h3 := hV.2.1 (-1) (r - 1)
   constructor <;> omega
 
-theorem dg_inj (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hJ : J = Fr.J) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card) :
-    Function.Injective fun x : TL J nL r => posOf n' (posTL Fr x) := by
+theorem dg_inj
+    (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hJ : J = Fr.J) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card)
+    : Function.Injective fun x : TL J nL r => posOf n' (posTL Fr x) := by
   intro x y hxy
   have hx := dg_window hV hr hJ hnL x
   have hy := dg_window hV hr hJ hnL y
   exact dg_posTL_inj hV hr hnL (dg_posOf_inj hx hy hxy)
 
-theorem dg_frame (hV : Fr.Valid L₁ N₁) (j t : ℤ) (ht : posOf n' t ∈ Fr.TT) (h0 : Fr.fr j 0 ≤ t) :
-    ∀ i, i < r → t ≤ Fr.fr j i → ∃ i' ≤ i, t = Fr.fr j i' := by
+theorem dg_frame (hV : Fr.Valid L₁ N₁) (j t : ℤ) (ht : posOf n' t ∈ Fr.TT) (h0 : Fr.fr j 0 ≤ t)
+    : ∀ i, i < r → t ≤ Fr.fr j i → ∃ i' ≤ i, t = Fr.fr j i' := by
   intro i
   induction i with
   | zero =>
@@ -201,27 +210,34 @@ theorem dg_frame (hV : Fr.Valid L₁ N₁) (j t : ℤ) (ht : posOf n' t ∈ Fr.T
       · exact absurd ht (hV.2.2.2.2.2.1 j k t (by omega) hle hlt)
       · exact ⟨k + 1, le_rfl, heq⟩
 
-theorem dg_surj (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hJ : J = Fr.J) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card) :
-    ∀ s ∈ Fr.TT, ∃ x : TL J nL r, posOf n' (posTL Fr x) = s := by
+theorem dg_surj
+    (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hJ : J = Fr.J) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card)
+    : ∀ s ∈ Fr.TT, ∃ x : TL J nL r, posOf n' (posTL Fr x) = s := by
   intro s hs
   have hn : (0 : ℤ) < n' := by exact_mod_cast NeZero.pos n'
-  obtain ⟨t, ht1, ht2, hpos⟩ : ∃ t : ℤ, Fr.fr (-1) (r - 1) < t ∧ t ≤ Fr.fr (-1) (r - 1) + n' ∧
-      posOf n' t = s := by
+  obtain ⟨t, ht1, ht2, hpos⟩
+      : ∃ t : ℤ, Fr.fr (-1) (r - 1) < t ∧ t ≤ Fr.fr (-1) (r - 1) + n' ∧ posOf n' t = s := by
     refine ⟨Fr.fr (-1) (r - 1) + 1 + ((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) % n', ?_, ?_, ?_⟩
     · have := Int.emod_nonneg ((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) hn.ne'
       omega
     · have := Int.emod_lt_of_pos ((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) hn
       omega
     · apply Fin.ext
-      have h1 := dg_posOf_val (n' := n')
-        (Fr.fr (-1) (r - 1) + 1 + ((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) % n')
-      have h2 : (Fr.fr (-1) (r - 1) + 1 + ((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) % n') % n' =
-          s.val := by
+      have h1 :=
+        dg_posOf_val (n' := n')
+          (Fr.fr (-1) (r - 1) + 1 + ((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) % n')
+      have h2
+          : (Fr.fr (-1) (r - 1) + 1 + ((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) % n') % n'
+            = s.val := by
         rw [Int.emod_def ((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) n']
-        have e : Fr.fr (-1) (r - 1) + 1 + ((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1) -
-            n' * (((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) / n')) =
-            (s.val : ℤ) + n' * (-(((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) / n')) := by ring
-        rw [e, Int.add_mul_emod_self_left, Int.emod_eq_of_lt (by positivity) (by exact_mod_cast s.2)]
+        have e
+            : Fr.fr (-1) (r - 1) + 1
+                + ((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)
+                  - n' * (((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) / n'))
+              = (s.val : ℤ) + n' * (-(((s.val : ℤ) - (Fr.fr (-1) (r - 1) + 1)) / n')) := by
+          ring
+        rw [e, Int.add_mul_emod_self_left,
+          Int.emod_eq_of_lt (by positivity) (by exact_mod_cast s.2)]
       rw [h2] at h1
       exact_mod_cast h1
   have hJ1 : 1 ≤ J := Nat.one_le_iff_ne_zero.mpr (NeZero.ne J)
@@ -270,10 +286,18 @@ theorem dg_surj (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hJ : J = Fr.J) (hnL : 
 
 end Bij
 
-theorem digFacts {n' r K m : ℕ} [NeZero n'] (Fr : Frames n' r) (p : ℕ) (hp : p.Prime) (O : Type) [CommRing O]
-    [IsDomain O] [CharZero (KK O)] (hk : m + 1 = r + K) {J : ℕ} [NeZero J] (nL : ZMod J → ℕ) (L₁ N₁ : ℕ)
-    (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hJ : J = Fr.J) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card)
-    (d : Fin n' → ℕ) (hd : ∀ s, s ∉ Fr.TT → d s = 0) : DigFacts Fr p O hk nL d :=
+theorem digFacts
+    {n' r K m : ℕ} [NeZero n']
+    (Fr : Frames n' r)
+    (p : ℕ) (hp : p.Prime)
+    (O : Type) [CommRing O] [IsDomain O] [CharZero (KK O)]
+    (hk : m + 1 = r + K)
+    {J : ℕ} [NeZero J]
+    (nL : ZMod J → ℕ)
+    (L₁ N₁ : ℕ) (hV : Fr.Valid L₁ N₁)
+    (hr : 1 ≤ r) (hJ : J = Fr.J) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card)
+    (d : Fin n' → ℕ) (hd : ∀ s, s ∉ Fr.TT → d s = 0)
+    : DigFacts Fr p O hk nL d :=
   digFacts_of Fr p O hk nL hp.pos (dg_inj hV hr hJ hnL) (dg_surj hV hr hJ hnL) d hd
 
 end Formalism.MainNotions.Proposition5Numerics

@@ -12,16 +12,24 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsMonHo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory
 
-
 open LatticeHom in
-theorem existsUnique_isMonHom_of_map_lattice :
-    Out.Laws → Out.Laws2 → (∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : LB P.A.left), M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen) → ThetaUnifAV → ∀ (P P' : Out.PolAV (Sp ℂ)) (L : LB P.A.left) (L' : LB P'.A.left) (u : HolUnif P.A L P.g) (u' : HolUnif P'.A L' P'.g) (F : (Fin P.g → ℂ) →ₗ[ℂ] (Fin P'.g → ℂ)), (∀ z ∈ u.Λ, F z ∈ u'.Λ) → ∃! f : P.A ⟶ P'.A, IsMonHom f ∧ ∀ z, u'.ex (F z) = u.ex z ≫ f := by
+theorem existsUnique_isMonHom_of_map_lattice
+    : Out.Laws → Out.Laws2
+      → (∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : LB P.A.left),
+        M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen)
+      → ThetaUnifAV
+      → ∀ (P P' : Out.PolAV (Sp ℂ)) (L : LB P.A.left) (L' : LB P'.A.left) (u : HolUnif P.A L P.g)
+          (u' : HolUnif P'.A L' P'.g) (F : (Fin P.g → ℂ) →ₗ[ℂ] (Fin P'.g → ℂ)),
+        (∀ z ∈ u.Λ, F z ∈ u'.Λ)
+          → ∃! f : P.A ⟶ P'.A, IsMonHom f ∧ ∀ z, u'.ex (F z) = u.ex z ≫ f := by
   intro hlaws _ _ hT P P' L L' u u' F hF
   obtain ⟨rig, hrig⟩ := P.8
   obtain ⟨rig', hrig'⟩ := P'.8
@@ -42,10 +50,13 @@ theorem existsUnique_isMonHom_of_map_lattice :
     have h3 : F₀ l = T' (F (T.symm l)) := by simp [F₀]
     rw [h3, hTu']
     exact h2
-  obtain ⟨d, hd⟩ := exists_complementary_theta ThetaLarge.exists_theta_apply_ne_zero v v' P.7 P'.7
-    hAH hAH' F₀ hF₀ 4
-  obtain ⟨f, hf, hfF⟩ := exists_isMonHom_of_complementary hlaws.3 P P' v v'
-    (fun k θ hθ => ((hth k).2 θ hθ).exists) (fun k s => ((hth' k).1 s).exists) F₀ hF₀ d hd
+  obtain ⟨d, hd⟩ :=
+    exists_complementary_theta ThetaLarge.exists_theta_apply_ne_zero v v' P.7 P'.7 hAH hAH' F₀ hF₀ 4
+  obtain ⟨f, hf, hfF⟩ :=
+    exists_isMonHom_of_complementary hlaws.3 P P' v v'
+      (fun k θ hθ => ((hth k).2 θ hθ).exists)
+      (fun k s => ((hth' k).1 s).exists)
+      F₀ hF₀ d hd
   have hfu : ∀ z, u'.ex (F z) = u.ex z ≫ f := by
     intro z
     rw [← hTu' (F z), ← hTu z, ← hfF, hF₀T]

@@ -15,10 +15,12 @@ open Formalism.ConjugateSelfDual ReciprocityTheory.Hyp
 
 section res
 
-variable {F L Ω : Type*} [Field F] [Field L] [Field Ω] [Algebra F L] [Algebra F Ω] [Algebra L Ω]
-  [IsScalarTower F L Ω]
+variable
+  {F L Ω : Type*}
+  [Field F] [Field L] [Field Ω] [Algebra F L] [Algebra F Ω] [Algebra L Ω] [IsScalarTower F L Ω]
 
-@[simp] theorem resGal_apply (σ : G L Ω) (x : Ω) : resGal F L Ω σ x = σ x := rfl
+@[simp]
+theorem resGal_apply (σ : G L Ω) (x : Ω) : resGal F L Ω σ x = σ x := rfl
 
 theorem resGal_injective : Function.Injective (resGal F L Ω) := fun σ τ h =>
   AlgEquiv.ext fun x => by simpa using DFunLike.congr_fun h x
@@ -37,8 +39,7 @@ theorem continuous_resGal [Algebra.IsAlgebraic F Ω] : Continuous (resGal F L Ω
   rw [Filter.mem_map, krullTopology_mem_nhds_one_iff]
   refine ⟨IntermediateField.adjoin L S, this, fun σ hσ => hEs ?_⟩
   rw [SetLike.mem_coe, IntermediateField.mem_fixingSubgroup_iff] at hσ ⊢
-  have hb : ∀ i, σ (b i : Ω) = b i := fun i =>
-    hσ _ (IntermediateField.subset_adjoin L S ⟨i, rfl⟩)
+  have hb : ∀ i, σ (b i : Ω) = b i := fun i => hσ _ (IntermediateField.subset_adjoin L S ⟨i, rfl⟩)
   intro x hx
   have hx' : x = ((⟨x, hx⟩ : E) : Ω) := rfl
   rw [hx', ← b.sum_repr ⟨x, hx⟩]
@@ -53,8 +54,8 @@ theorem continuous_resGal [Algebra.IsAlgebraic F Ω] : Continuous (resGal F L Ω
 theorem isAlgClosure_top [IsAlgClosure F Ω] : IsAlgClosure L Ω :=
   ⟨IsAlgClosure.isAlgClosed F, Algebra.IsAlgebraic.tower_top (K := F) L⟩
 
-theorem isClosedEmbedding_resGal [IsAlgClosure F Ω] [CharZero L] :
-    Topology.IsClosedEmbedding (resGal F L Ω) := by
+theorem isClosedEmbedding_resGal [IsAlgClosure F Ω] [CharZero L]
+    : Topology.IsClosedEmbedding (resGal F L Ω) := by
   have := isAlgClosure_top (F := F) (L := L) (Ω := Ω)
   have : T2Space (G F Ω) := krullTopology_t2
   exact continuous_resGal.isClosedEmbedding resGal_injective
@@ -63,9 +64,9 @@ end res
 
 section places
 
-variable {F L Ω : Type*} [Field F] [NumberField F] [Field L] [NumberField L] [Field Ω] [Algebra F L]
+variable
+  {F L Ω : Type*} [Field F] [NumberField F] [Field L] [NumberField L] [Field Ω] [Algebra F L]
   [Algebra F Ω] [Algebra L Ω] [IsScalarTower F L Ω]
-
 
 end places
 

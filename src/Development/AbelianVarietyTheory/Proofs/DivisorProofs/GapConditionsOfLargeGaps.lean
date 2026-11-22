@@ -13,10 +13,13 @@ open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS
 namespace GlobalTheory.PsCo.PcEG
 
 def GapNum : Prop :=
-  ∀ (r : ℕ), Odd r → ∀ (ε : Fin r → Bool) (lam : Fin r → ℤ),
-    (∀ i j : Fin r, (j : ℕ) = i + 1 → 100 * (r : ℤ) ^ 4 ≤ lam i - lam j) →
-    Formalism.QuantumDeterminants.IsHCParam (fun a => (lam a : ℝ)) ∧ StdGap ε (fun a => (lam a : ℝ)) ∧ Gap3 ε (fun a => (lam a : ℝ)) ∧
-      ∃ h : ℝ, GapAtLeast ε (fun a => (lam a : ℝ)) h ∧ thrStar ε < h
+  ∀ (r : ℕ),
+    Odd r
+      → ∀ (ε : Fin r → Bool) (lam : Fin r → ℤ),
+        (∀ i j : Fin r, (j : ℕ) = i + 1 → 100 * (r : ℤ) ^ 4 ≤ lam i - lam j)
+          → Formalism.QuantumDeterminants.IsHCParam (fun a => (lam a : ℝ))
+            ∧ StdGap ε (fun a => (lam a : ℝ)) ∧ Gap3 ε (fun a => (lam a : ℝ))
+            ∧ ∃ h : ℝ, GapAtLeast ε (fun a => (lam a : ℝ)) h ∧ thrStar ε < h
 
 end GlobalTheory.PsCo.PcEG
 
@@ -26,9 +29,10 @@ open GlobalTheory.PsCo.PcEG (GapNum)
 
 namespace GapNumber
 
-theorem chain {r : ℕ} {lam : Fin r → ℤ} {H : ℤ} (hH : 0 ≤ H)
-    (hg : ∀ i j : Fin r, (j : ℕ) = i + 1 → H ≤ lam i - lam j) :
-    ∀ i j : Fin r, i < j → H ≤ lam i - lam j := by
+theorem chain
+    {r : ℕ} {lam : Fin r → ℤ} {H : ℤ}
+    (hH : 0 ≤ H) (hg : ∀ i j : Fin r, (j : ℕ) = i + 1 → H ≤ lam i - lam j)
+    : ∀ i j : Fin r, i < j → H ≤ lam i - lam j := by
   suffices h : ∀ (k : ℕ) (i j : Fin r), (j : ℕ) = i + k + 1 → H ≤ lam i - lam j by
     intro i j hij
     have : (i : ℕ) < j := hij
@@ -79,10 +83,19 @@ theorem gapConditions_of_largeGaps : GapNum := by
   have hbig : (r : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < 100 * (r : ℝ) ^ 4 := by
     have : (r : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) ≤ r * r * r := by gcongr
     nlinarith
-  refine ⟨⟨hanti, fun a => ⟨lam a - k, ?_⟩⟩, ⟨hanti, _, hgap, hbig⟩, ⟨hanti, _, hgap, by linarith⟩, _, hgap, ?_⟩
+  refine ⟨
+    ⟨hanti, fun a => ⟨lam a - k, ?_⟩⟩,
+    ⟨hanti, _, hgap, hbig⟩,
+    ⟨hanti, _, hgap, by linarith⟩,
+    _,
+    hgap,
+    ?_
+  ⟩
   · have hkR : (r : ℝ) = 2 * k + 1 := by exact_mod_cast hk
     show (lam a : ℝ) - ((r : ℝ) - 1) / 2 = ((lam a - k : ℤ) : ℝ)
-    rw [hkR]; push_cast; ring
+    rw [hkR]
+    push_cast
+    ring
   · unfold thrStar
     refine max_lt hbig ?_
     have hs : Real.sqrt (2 * (S7.q0 ε : ℝ)) ≤ 2 * r := by

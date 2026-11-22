@@ -16,8 +16,9 @@ universe w w' u
 
 section Transport
 
-variable {Y X : TopCat.{u}} {κ : Type w} {P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}}
-  {P' : (Opens Y)ᵒᵖ ⥤ AddCommGrpCat.{u}}
+variable
+  {Y X : TopCat.{u}} {κ : Type w}
+  {P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} {P' : (Opens Y)ᵒᵖ ⥤ AddCommGrpCat.{u}}
 
 lemma cechAcyclic_of_transport (φ : Opens Y → Opens X) (hφ : Monotone φ)
     (e : ∀ W, P'.obj (op W) ≃+ P.obj (op (φ W)))
@@ -50,8 +51,8 @@ section Scheme
 
 variable {X : Scheme.{u}}
 
-noncomputable abbrev modulesAb (F : X.Modules) :
-    Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u} :=
+noncomputable abbrev modulesAb (F : X.Modules)
+    : Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u} :=
   (SheafOfModules.toSheaf X.ringCatSheaf).obj F
 
 def IsBasicCover (V : X.Opens) {κ : Type u} (U : κ → X.Opens) : Prop :=
@@ -115,9 +116,11 @@ lemma image_inter {Y : Scheme.{u}} (g : Y ⟶ X) [IsOpenImmersion g] {κ : Type 
     rw [← this]
     exact hy a
 
-theorem cechAcyclic_of_isBasicCover (F : X.Modules) [F.IsQuasicoherent] {V : X.Opens}
-    {κ : Type u} [Finite κ] {U : κ → X.Opens} (hU : IsBasicCover V U) :
-    CechAcyclic (modulesAb F).obj U := by
+theorem cechAcyclic_of_isBasicCover
+    (F : X.Modules) [F.IsQuasicoherent]
+    {V : X.Opens} {κ : Type u} [Finite κ]
+    {U : κ → X.Opens} (hU : IsBasicCover V U)
+    : CechAcyclic (modulesAb F).obj U := by
   obtain ⟨hV, h, hUh, hsup⟩ := hU
   have hUeq : U = fun a => X.basicOpen (h a) := funext hUh
   subst hUeq
@@ -131,18 +134,22 @@ theorem cechAcyclic_of_isBasicCover (F : X.Modules) [F.IsQuasicoherent] {V : X.O
     rw [Scheme.Hom.preimage_iSup] at h1
     simpa only [hV.fromSpec_preimage_basicOpen] using h1
   have hM : CechAcyclic (tildeAb M).obj U' :=
-    cechCondition_tilde M ⊤ ⟨1, PrimeSpectrum.basicOpen_one.symm⟩ κ U' (fun a => ⟨h a, rfl⟩)
-      hsup'
+    cechCondition_tilde M ⊤ ⟨1, PrimeSpectrum.basicOpen_one.symm⟩ κ U' (fun a => ⟨h a, rfl⟩) hsup'
   have : F'.IsQuasicoherent := Scheme.Modules.isQuasicoherent_restrictFunctor hV.fromSpec F
   have hiso : IsIso F'.fromTildeΓ := Scheme.Modules.isIso_fromTildeΓ_of_isQuasicoherent F'
   let e : tildeAb M ≅ modulesAb F' :=
     (SheafOfModules.toSheaf _).mapIso (@asIso _ _ _ _ F'.fromTildeΓ hiso)
   have hF' : CechAcyclic (modulesAb F').obj U' :=
-    CechAcyclic.of_retract U' e.inv.hom e.hom.hom
-      (congrArg (fun f => f.hom) e.inv_hom_id) hM
-  have key := cechAcyclic_of_transport (P := (modulesAb F).obj) (P' := (modulesAb F').obj)
-    (fun W => hV.fromSpec ''ᵁ W) (fun _ _ hle => hV.fromSpec.image_mono hle)
-    (fun W => AddEquiv.refl _) (fun _ _ => rfl) U' (fun i => image_inter hV.fromSpec U' i) hF'
+    CechAcyclic.of_retract U' e.inv.hom e.hom.hom (congrArg (fun f => f.hom) e.inv_hom_id) hM
+  have key :=
+    cechAcyclic_of_transport (P := (modulesAb F).obj) (P' := (modulesAb F').obj)
+      (fun W => hV.fromSpec ''ᵁ W)
+      (fun _ _ hle => hV.fromSpec.image_mono hle)
+      (fun W => AddEquiv.refl _)
+      (fun _ _ => rfl)
+      U'
+      (fun i => image_inter hV.fromSpec U' i)
+      hF'
   convert key using 1
   funext a
   exact (hV.fromSpec_image_basicOpen (h a)).symm
@@ -160,12 +167,15 @@ lemma inter_eq_iInf {ι : Type w} (U : ι → X.Opens) {n : ℕ} (i : Fin n → 
 
 variable [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
 
-theorem nonempty_cechH_equiv_H (F : X.Modules) [F.IsQuasicoherent] {ι : Type w}
-    (U : ι → X.Opens) (hU : iSup U = ⊤)
-    (hUaff : ∀ (n : ℕ) (i : Fin (n + 1) → ι), IsAffineOpen (⨅ a, U (i a))) (n : ℕ) :
-    Nonempty (cechH (modulesAb F).obj U n ≃+ Sheaf.H.{w'} (modulesAb F) n) :=
+theorem nonempty_cechH_equiv_H
+    (F : X.Modules) [F.IsQuasicoherent]
+    {ι : Type w} (U : ι → X.Opens) (hU : iSup U = ⊤)
+    (hUaff : ∀ (n : ℕ) (i : Fin (n + 1) → ι), IsAffineOpen (⨅ a, U (i a)))
+    (n : ℕ)
+    : Nonempty (cechH (modulesAb F).obj U n ≃+ Sheaf.H.{w'} (modulesAb F) n) :=
   nonempty_cechH_equiv isCoverSystem_isBasicCover U hU
-    (fun i => by rw [inter_eq_iInf]; exact hUaff _ i) n (modulesAb F) (goodAcyclic_modulesAb F)
+    (fun i => by rw [inter_eq_iInf]; exact hUaff _ i)
+    n (modulesAb F) (goodAcyclic_modulesAb F)
 
 end Scheme
 

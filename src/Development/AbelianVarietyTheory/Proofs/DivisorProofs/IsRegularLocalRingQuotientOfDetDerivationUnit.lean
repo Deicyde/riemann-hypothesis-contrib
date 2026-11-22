@@ -10,11 +10,13 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory.JacobianDerivation
 
-theorem isRegularLocalRing_quotient : ∀ (T : Type) [CommRing T] [IsRegularRing T] (h : ℕ) (f : Fin h → T)
-    (D : Fin h → Derivation ℤ T T) (n : Ideal T) [n.IsPrime], (∀ j, f j ∈ n) →
-    (Matrix.of fun i j => D i (f j)).det ∉ n →
-    IsRegularLocalRing (Localization.AtPrime n ⧸
-      (Ideal.span (Set.range f)).map (algebraMap T (Localization.AtPrime n))) := by
+theorem isRegularLocalRing_quotient
+    : ∀ (T : Type) [CommRing T] [IsRegularRing T] (h : ℕ) (f : Fin h → T)
+        (D : Fin h → Derivation ℤ T T) (n : Ideal T) [n.IsPrime],
+      (∀ j, f j ∈ n) → (Matrix.of fun i j => D i (f j)).det ∉ n
+        → IsRegularLocalRing
+          (Localization.AtPrime n ⧸
+            (Ideal.span (Set.range f)).map (algebraMap T (Localization.AtPrime n))) := by
   intro T _ _ h f D n _ hf hdet
   classical
   let A := Localization.AtPrime n
@@ -23,17 +25,24 @@ theorem isRegularLocalRing_quotient : ∀ (T : Type) [CommRing T] [IsRegularRing
   have hx : ∀ j, x j ∈ maximalIdeal A := fun j =>
     (IsLocalization.AtPrime.to_map_mem_maximal_iff A n (f j)).mpr (hf j)
 
-  have hrow0 : ∀ a : Fin h → A, ∑ j, a j * x j ∈ maximalIdeal A ^ 2 →
-      ∀ i, ∑ j, a j * algebraMap T A (D i (f j)) ∈ maximalIdeal A := by
+  have hrow0
+      : ∀ a : Fin h → A,
+        ∑ j, a j * x j ∈ maximalIdeal A ^ 2
+          → ∀ i, ∑ j, a j * algebraMap T A (D i (f j)) ∈ maximalIdeal A := by
     intro a ha i
-    obtain ⟨D', hD'⟩ := @GlobalTheory.derivation_extend_localization_atPrime ℤ T A _ _ _ (Ring.toIntAlgebra T) _ (Ring.toIntAlgebra A)
-      (@IsScalarTower.of_algebraMap_eq' ℤ T A _ _ _ (Ring.toIntAlgebra T) _ (Ring.toIntAlgebra A)
-        (Subsingleton.elim _ _)) n _ _
-      { toFun := fun t => algebraMap T A (D i t)
-        map_add' := fun s t => by simp
-        map_smul' := fun m t => by simp [Algebra.smul_def]
-        map_one_eq_zero' := by simp
-        leibniz' := fun s t => by simp [Algebra.smul_def] }
+    obtain ⟨D', hD'⟩ :=
+      @GlobalTheory.derivation_extend_localization_atPrime ℤ T A _ _ _ (Ring.toIntAlgebra T) _
+        (Ring.toIntAlgebra A)
+        (@IsScalarTower.of_algebraMap_eq' ℤ T A _ _ _ (Ring.toIntAlgebra T) _ (Ring.toIntAlgebra A)
+          (Subsingleton.elim _ _))
+        n _ _
+        {
+          toFun := fun t => algebraMap T A (D i t)
+          map_add' := fun s t => by simp
+          map_smul' := fun m t => by simp [Algebra.smul_def]
+          map_one_eq_zero' := by simp
+          leibniz' := fun s t => by simp [Algebra.smul_def]
+        }
     letI : Algebra ℤ A := Ring.toIntAlgebra A
     have hsq : ∀ y ∈ maximalIdeal A ^ 2, D' y ∈ maximalIdeal A := by
       intro y hy
@@ -90,8 +99,7 @@ theorem isRegularLocalRing_quotient : ∀ (T : Type) [CommRing T] [IsRegularRing
       rw [map_smul, ← ha j]
       rfl
     rw [Ideal.toCotangent_eq_zero] at h1
-    have h2 : ∑ j, a j * x j ∈ maximalIdeal A ^ 2 := by
-      simpa [τ] using h1
+    have h2 : ∑ j, a j * x j ∈ maximalIdeal A ^ 2 := by simpa [τ] using h1
     rw [← ha i]
     exact (residue_eq_zero_iff _).mpr (hind a h2 i)
   obtain ⟨J, _, t, hs, hd⟩ := GlobalTheory.RegularQuotient.exists_extend A τ hτ

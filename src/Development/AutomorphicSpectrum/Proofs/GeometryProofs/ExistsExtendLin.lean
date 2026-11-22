@@ -10,15 +10,19 @@ namespace GlobalTheory.CompanionTheory.Ar.Flat.HTL
 open Module NumberField GlobalTheory.CompanionTheory.Ar.HT
 
 section
-variable {A K : Type} [CommRing A] [Field K] [Algebra A K] {E : Type} [Field E] [NumberField E]
+variable
+  {A K : Type} [CommRing A] [Field K] [Algebra A K]
+  {E : Type} [Field E] [NumberField E]
   {c : E ≃+* E} {p R N : ℕ} {Li : Type} [AddCommGroup Li] [Module K Li]
 
-def latOn (D : HTChart A K c p R N (Module.Dual K Li)) (V : Submodule K Li) (t : K) (B : Subring K) : Set Li :=
+def latOn (D : HTChart A K c p R N (Module.Dual K Li)) (V : Submodule K Li) (t : K) (B : Subring K)
+    : Set Li :=
   {e | e ∈ V ∧ ∀ w ∈ D.om', t * w e ∈ B}
 
 def IsLocIn (A : Type) {K : Type} [CommRing A] [Field K] [Algebra A K] (B : Subring K) : Prop :=
-  (∀ a : A, algebraMap A K a ∈ B) ∧
-    ∀ b ∈ B, ∃ u a : A, algebraMap A K u ≠ 0 ∧ (algebraMap A K u)⁻¹ ∈ B ∧ algebraMap A K u * b = algebraMap A K a
+  (∀ a : A, algebraMap A K a ∈ B)
+    ∧ ∀ b ∈ B, ∃ u a : A,
+      algebraMap A K u ≠ 0 ∧ (algebraMap A K u)⁻¹ ∈ B ∧ algebraMap A K u * b = algebraMap A K a
 
 end
 end GlobalTheory.CompanionTheory.Ar.Flat.HTL
@@ -27,12 +31,15 @@ namespace GlobalTheory.CompanionTheory.Ar.Flat.HTL
 
 open Module NumberField GlobalTheory.CompanionTheory.Ar.HT
 
-theorem exists_extend_lin {A K V W : Type} [CommRing A] [IsDomain A] [Field K] [Algebra A K] [IsFractionRing A K]
-    [AddCommGroup V] [Module K V] [Module A V] [IsScalarTower A K V]
-    [AddCommGroup W] [Module K W] [Module A W] [IsScalarTower A K W]
-    (M : Submodule A V) (g : M →ₗ[A] W) : ∃ G : V →ₗ[K] W, ∀ z : M, G z = g z := by
+theorem exists_extend_lin
+    {A K V W : Type} [CommRing A] [IsDomain A] [Field K] [Algebra A K] [IsFractionRing A K]
+    [AddCommGroup V] [Module K V] [Module A V] [IsScalarTower A K V] [AddCommGroup W] [Module K W]
+    [Module A W] [IsScalarTower A K W]
+    (M : Submodule A V) (g : M →ₗ[A] W)
+    : ∃ G : V →ₗ[K] W, ∀ z : M, G z = g z := by
   classical
-  obtain ⟨b, hbM, -, hsp, hli⟩ := exists_linearIndepOn_id_extension (K := K) (s := ∅) (t := (M : Set V)) (by simp) (by simp)
+  obtain ⟨b, hbM, -, hsp, hli⟩ :=
+    exists_linearIndepOn_id_extension (K := K) (s := ∅) (t := (M : Set V)) (by simp) (by simp)
   let bb := Basis.extend hli
   let f : V → W := fun x => if h : x ∈ M then g ⟨x, h⟩ else 0
   let G : V →ₗ[K] W := bb.constr K fun i => f i.1
@@ -62,7 +69,8 @@ theorem exists_extend_lin {A K V W : Type} [CommRing A] [IsDomain A] [Field K] [
       have h1 : x ∈ M := Submodule.span_le.2 hbM hx
       have : (⟨a • x, h⟩ : M) = a • ⟨x, h1⟩ := rfl
       rw [this, g.map_smul, ← ih h1, LinearMap.map_smul_of_tower]
-  have hden : ∀ v ∈ Submodule.span K b, ∃ a : A, algebraMap A K a ≠ 0 ∧ a • v ∈ Submodule.span A b := by
+  have hden
+      : ∀ v ∈ Submodule.span K b, ∃ a : A, algebraMap A K a ≠ 0 ∧ a • v ∈ Submodule.span A b := by
     intro v hv
     have hinj := IsFractionRing.injective A K
     induction hv using Submodule.span_induction with
@@ -82,7 +90,8 @@ theorem exists_extend_lin {A K V W : Type} [CommRing A] [IsDomain A] [Field K] [
       have hv0 : algebraMap A K v ≠ 0 := (map_ne_zero_iff _ hinj).2 (nonZeroDivisors.ne_zero hv)
       refine ⟨v * a, by rw [map_mul]; exact mul_ne_zero hv0 ha, ?_⟩
       have : (v * a) • (algebraMap A K u / algebraMap A K v) • x = u • a • x := by
-        rw [← algebraMap_smul K (v * a), ← algebraMap_smul K u, ← algebraMap_smul K a, smul_smul, smul_smul, map_mul]
+        rw [← algebraMap_smul K (v * a), ← algebraMap_smul K u, ← algebraMap_smul K a, smul_smul,
+          smul_smul, map_mul]
         congr 1
         field_simp
       rw [this]
@@ -91,25 +100,33 @@ theorem exists_extend_lin {A K V W : Type} [CommRing A] [IsDomain A] [Field K] [
   obtain ⟨a, ha, haz⟩ := hden z (hsp z.2)
   have h1 := hG _ haz (M.smul_mem a z.2)
   have h2 : (⟨a • (z : V), M.smul_mem a z.2⟩ : M) = a • z := rfl
-  rw [h2, g.map_smul, LinearMap.map_smul_of_tower, ← algebraMap_smul K a (G (z : V)), ← algebraMap_smul K a (g z)] at h1
+  rw [h2, g.map_smul, LinearMap.map_smul_of_tower, ← algebraMap_smul K a (G (z : V)),
+      ← algebraMap_smul K a (g z)]
+    at h1
   exact smul_right_injective W ha h1
 
 section Chart
 
-variable {A K : Type} [CommRing A] [Field K] [Algebra A K] {E : Type} [Field E] [NumberField E]
+variable
+  {A K : Type} [CommRing A] [Field K] [Algebra A K]
+  {E : Type} [Field E] [NumberField E]
   {c : E ≃+* E} {p R N : ℕ} {Li : Type} [AddCommGroup Li] [Module K Li]
   (D : HTChart A K c p R N (Module.Dual K Li)) (ρ : 𝓞 E →+* Module.End K Li)
 
-theorem eigProj_dual (hact : ∀ (a : 𝓞 E) (w : Module.Dual K Li), D.ρΩ a w = w ∘ₗ ρ (RingOfIntegers.mapRingEquiv c a))
-    (σ : E →+* K) (w : Module.Dual K Li) :
-    eigProj D.ρΩ σ w = w ∘ₗ eigProj (ρ.comp (RingOfIntegers.mapRingEquiv c : 𝓞 E →+* 𝓞 E)) σ := by
+theorem eigProj_dual
+    (hact : ∀ (a : 𝓞 E) (w : Module.Dual K Li), D.ρΩ a w = w ∘ₗ ρ (RingOfIntegers.mapRingEquiv c a))
+    (σ : E →+* K) (w : Module.Dual K Li)
+    : eigProj D.ρΩ σ w = w ∘ₗ eigProj (ρ.comp (RingOfIntegers.mapRingEquiv c : 𝓞 E →+* 𝓞 E)) σ := by
   ext v
   simp [eigProj, LinearMap.sum_apply, hact]
 
-theorem eigProj_apply (hc : ∀ x, c (c x) = x)
+theorem eigProj_apply
+    (hc : ∀ x, c (c x) = x)
     (hact : ∀ (a : 𝓞 E) (w : Module.Dual K Li), D.ρΩ a w = w ∘ₗ ρ (RingOfIntegers.mapRingEquiv c a))
-    (σ : E →+* K) {e : Li} (he : e ∈ GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom)) (w : Module.Dual K Li) :
-    eigProj D.ρΩ σ w e = w e := by
+    (σ : E →+* K)
+    {e : Li} (he : e ∈ GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom))
+    (w : Module.Dual K Li)
+    : eigProj D.ρΩ σ w e = w e := by
   rw [eigProj_dual D ρ hact, LinearMap.comp_apply]
   congr 1
   have h1 : ∀ a : 𝓞 E, ρ (RingOfIntegers.mapRingEquiv c a) e = σ (a : E) • e := fun a => by
@@ -121,10 +138,12 @@ theorem eigProj_apply (hc : ∀ x, c (c x) = x)
     exact fun a => h1 a
   exact h2
 
-theorem exists_vec [IsDomain A] [IsFractionRing A K] (hc : ∀ x, c (c x) = x)
+theorem exists_vec
+    [IsDomain A] [IsFractionRing A K]
+    (hc : ∀ x, c (c x) = x)
     (hact : ∀ (a : 𝓞 E) (w : Module.Dual K Li), D.ρΩ a w = w ∘ₗ ρ (RingOfIntegers.mapRingEquiv c a))
-    (σ : E →+* K) (g : Module.Dual A (D.omHT σ)) :
-    ∃ e ∈ GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom), ∀ z : D.omHT σ,
+    (σ : E →+* K) (g : Module.Dual A (D.omHT σ))
+    : ∃ e ∈ GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom), ∀ z : D.omHT σ,
       (z : Module.Dual K Li) e = algebraMap A K (g z) := by
   let U : Submodule K (Module.Dual K Li) := Submodule.span K (D.om : Set _)
   haveI : Module.Finite K U := by
@@ -165,7 +184,9 @@ theorem exists_vec [IsDomain A] [IsFractionRing A K] (hc : ∀ x, c (c x) = x)
   · intro z
     obtain ⟨w, hw, hz⟩ := z.2
     have hz' : eigProj D.ρΩ σ w = (z : Module.Dual K Li) := hz
-    have he : eigProj (ρ.comp (RingOfIntegers.mapRingEquiv c : 𝓞 E →+* 𝓞 E)) σ v ∈ GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom) := by
+    have he
+        : eigProj (ρ.comp (RingOfIntegers.mapRingEquiv c : 𝓞 E →+* 𝓞 E)) σ v
+          ∈ GlobalTheory.CompanionTheory.Ar.HT.eigSp ρ (σ.comp c.toRingHom) := by
       have h := LatBasic.eigProj_mem (ρ.comp (RingOfIntegers.mapRingEquiv c : 𝓞 E →+* 𝓞 E)) σ v
       rw [LatBasic.mem_eigSp] at h ⊢
       intro a
@@ -175,7 +196,9 @@ theorem exists_vec [IsDomain A] [IsFractionRing A K] (hc : ∀ x, c (c x) = x)
       have := h (RingOfIntegers.mapRingEquiv c a)
       simpa [hinv] using this
     rw [← hz', eigProj_apply D ρ hc hact σ he w]
-    have h2 : w (eigProj (ρ.comp (RingOfIntegers.mapRingEquiv c : 𝓞 E →+* 𝓞 E)) σ v) = (eigProj D.ρΩ σ w) v := by
+    have h2
+        : w (eigProj (ρ.comp (RingOfIntegers.mapRingEquiv c : 𝓞 E →+* 𝓞 E)) σ v)
+          = (eigProj D.ρΩ σ w) v := by
       rw [eigProj_dual D ρ hact, LinearMap.comp_apply]
     have hzT : (z : Module.Dual K Li) ∈ T := by
       rw [← hz']

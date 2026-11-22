@@ -8,6 +8,7 @@ public import CompanionTheory.AutomorphicTheory.LocalBesselUniqueness.BesselMode
 
 namespace GlobalTheory
 
-theorem wuDecayOfGap : Formalism.L2.SG.Pf.WuDecayOfGap := CompanionTheory.Lime.BM.wuDecayOfGap_holds'
+theorem wuDecayOfGap : Formalism.L2.SG.Pf.WuDecayOfGap :=
+  CompanionTheory.Lime.BM.wuDecayOfGap_holds'
 
 end GlobalTheory

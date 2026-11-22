@@ -10,10 +10,12 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.RealBands.Fo
 open MeasureTheory Filter UpperTheory.Lit.Cusp
 open scoped Topology
 
-theorem UpperTheory.Lit.Cusp.conv_band :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-      [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] (N : Set G) (a : ℝ → G) (H : G → ℝ) (f h : G → ℂ),
-      IsRay N a H → Continuous f → Integrable f μ → Kills μ N a f → IsBand N H h → ∀ x, conv μ f h x = 0 := by
+theorem UpperTheory.Lit.Cusp.conv_band
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G)
+        [μ.IsHaarMeasure] (N : Set G) (a : ℝ → G) (H : G → ℝ) (f h : G → ℂ),
+      IsRay N a H → Continuous f → Integrable f μ → Kills μ N a f → IsBand N H h
+        → ∀ x, conv μ f h x = 0 := by
   intro G _ _ _ _ _ _ _ _ μ _ N a H f h hR hf hfi hK hB x
   have ha := hR.cont
   have hh : Continuous h := hB.1
@@ -34,7 +36,10 @@ theorem UpperTheory.Lit.Cusp.conv_band :
     rw [integral_const_mul]
     exact mul_le_mul_of_nonneg_left (hC (g⁻¹ * x)).2 (norm_nonneg _)
   have huc : Continuous (fun t : ℝ => ∫ g, f g * h (g⁻¹ * x * a t) ∂μ) := by
-    refine continuous_of_dominated (bound := fun g => ‖f g‖ * B) (fun t => ?_) (fun t => ?_)
+    refine continuous_of_dominated
+      (bound := fun g => ‖f g‖ * B)
+      (fun t => ?_)
+      (fun t => ?_)
       (hfi.norm.mul_const B) (Eventually.of_forall fun g => by fun_prop)
     · exact Continuous.aestronglyMeasurable (by fun_prop)
     · refine Eventually.of_forall fun g => ?_
@@ -45,13 +50,17 @@ theorem UpperTheory.Lit.Cusp.conv_band :
   · simpa [a0, conv] using key
   obtain ⟨D, hE, -⟩ := isEig_of_isBand G N a H h hR hB s
   have h0 := hK s D _ hE x
-  have hF' : Integrable (fun p : G × ℝ =>
-      Complex.exp (-((s * p.2 : ℝ) * Complex.I)) * (f p.1 * h (p.1⁻¹ * x * a p.2))) (μ.prod volume) := by
+  have hF' : Integrable
+      (fun p : G × ℝ =>
+        Complex.exp (-((s * p.2 : ℝ) * Complex.I)) * (f p.1 * h (p.1⁻¹ * x * a p.2)))
+      (μ.prod volume) := by
     refine hF.bdd_mul (c := 1) (Continuous.aestronglyMeasurable (by fun_prop))
       (Eventually.of_forall fun p => ?_)
     rw [← neg_mul, ← Complex.ofReal_neg, Complex.norm_exp_ofReal_mul_I]
-  have hsw := integral_integral_swap (μ := μ) (ν := (volume : Measure ℝ))
-    (f := fun g t => Complex.exp (-((s * t : ℝ) * Complex.I)) * (f g * h (g⁻¹ * x * a t))) hF'
+  have hsw :=
+    integral_integral_swap (μ := μ) (ν := (volume : Measure ℝ))
+      (f := fun g t => Complex.exp (-((s * t : ℝ) * Complex.I)) * (f g * h (g⁻¹ * x * a t)))
+      hF'
   simp only [← integral_const_mul]
   rw [← hsw, ← h0, conv]
   refine integral_congr_ae (Eventually.of_forall fun g => ?_)

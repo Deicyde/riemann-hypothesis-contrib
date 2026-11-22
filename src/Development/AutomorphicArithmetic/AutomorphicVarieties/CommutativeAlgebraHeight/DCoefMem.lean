@@ -9,19 +9,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-private theorem aeval_cons_monomial {A : Type} [CommRing A] {k : ℕ} (c : MvPolynomial (Fin k) A)
-    (β : Fin (k + 1) →₀ ℕ) (a : A) :
-    MvPolynomial.aeval (Fin.cons c MvPolynomial.X : Fin (k + 1) → MvPolynomial (Fin k) A)
-      (MvPolynomial.monomial β a) = c ^ β 0 * MvPolynomial.monomial β.tail a := by
+private theorem aeval_cons_monomial
+    {A : Type} [CommRing A] {k : ℕ} (c : MvPolynomial (Fin k) A) (β : Fin (k + 1) →₀ ℕ) (a : A)
+    : MvPolynomial.aeval (Fin.cons c MvPolynomial.X : Fin (k + 1) → MvPolynomial (Fin k) A)
+        (MvPolynomial.monomial β a)
+      = c ^ β 0 * MvPolynomial.monomial β.tail a := by
   rw [MvPolynomial.aeval_monomial, Finsupp.prod_fintype _ _ (by simp), Fin.prod_univ_succ,
     MvPolynomial.monomial_eq, Finsupp.prod_fintype _ _ (by simp)]
   simp only [Fin.cons_zero, Fin.cons_succ, Finsupp.tail_apply, MvPolynomial.algebraMap_eq]
   ring
 
-private theorem coeff_cons_eq {A : Type} [CommRing A] {k n : ℕ} (P : MvPolynomial (Fin (k + 1)) A)
-    (hP : P.IsHomogeneous n) (α : Fin k →₀ ℕ) (hα : α.degree = n) :
-    AddMonoidAlgebra.coeff (MvPolynomial.aeval (Fin.cons 0 MvPolynomial.X : Fin (k + 1) → MvPolynomial (Fin k) A) P) α =
-    AddMonoidAlgebra.coeff (MvPolynomial.aeval (Fin.cons 1 MvPolynomial.X : Fin (k + 1) → MvPolynomial (Fin k) A) P) α := by
+private theorem coeff_cons_eq
+    {A : Type} [CommRing A]
+    {k n : ℕ}
+    (P : MvPolynomial (Fin (k + 1)) A) (hP : P.IsHomogeneous n) (α : Fin k →₀ ℕ) (hα : α.degree = n)
+    : AddMonoidAlgebra.coeff
+        (MvPolynomial.aeval (Fin.cons 0 MvPolynomial.X : Fin (k + 1) → MvPolynomial (Fin k) A) P) α
+      = AddMonoidAlgebra.coeff
+        (MvPolynomial.aeval (Fin.cons 1 MvPolynomial.X : Fin (k + 1) → MvPolynomial (Fin k) A) P)
+        α := by
   classical
   rw [P.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -40,9 +46,12 @@ private theorem coeff_cons_eq {A : Type} [CommRing A] {k n : ℕ} (P : MvPolynom
       omega
     simp [h0, MvPolynomial.coeff_monomial, hne]
 
-private theorem coef_mem_fin {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E)
-    (M : Submonoid E) (A₀ : Subring A) (h : ∀ x ∈ M, ∀ i, 1 ≤ i → i ≤ n → D.lam i x ∈ A₀) {k : ℕ}
-    (x : Fin k → E) (hx : ∀ a, x a ∈ M) (α : Fin k →₀ ℕ) : AddMonoidAlgebra.coeff (D.poly x) α ∈ A₀ := by
+private theorem coef_mem_fin
+    {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E]
+    (D : Det n A E) (M : Submonoid E) (A₀ : Subring A)
+    (h : ∀ x ∈ M, ∀ i, 1 ≤ i → i ≤ n → D.lam i x ∈ A₀)
+    {k : ℕ} (x : Fin k → E) (hx : ∀ a, x a ∈ M) (α : Fin k →₀ ℕ)
+    : AddMonoidAlgebra.coeff (D.poly x) α ∈ A₀ := by
   classical
   by_cases hα : α.degree = n
   swap
@@ -53,8 +62,9 @@ private theorem coef_mem_fin {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algeb
   rw [Fin.sum_univ_succ] at h0 h1
   simp only [Fin.cons_zero, Fin.cons_succ, zero_tmul, zero_add] at h0 h1
   obtain ⟨P, hv, -, hP⟩ := d_amitsur n k α
-  have e : AddMonoidAlgebra.coeff (D.poly x) α =
-      AddMonoidAlgebra.coeff (D.D (MvPolynomial (Fin k) A) (1 + Det.gen x)) α := by
+  have e
+      : AddMonoidAlgebra.coeff (D.poly x) α
+        = AddMonoidAlgebra.coeff (D.D (MvPolynomial (Fin k) A) (1 + Det.gen x)) α := by
     unfold Det.poly Det.gen
     rw [Algebra.TensorProduct.one_def, h0, h1]
     exact coeff_cons_eq _ hh α hα
@@ -67,8 +77,12 @@ private theorem coef_mem_fin {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algeb
   obtain ⟨a, -, rfl⟩ := List.mem_map.1 hy
   exact hx a
 
-theorem UpperTheory.V.CA.d_coef_mem :
-    ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (M : Submonoid E) (A₀ : Subring A), (∀ x ∈ M, ∀ i, 1 ≤ i → i ≤ n → D.lam i x ∈ A₀) → ∀ {ι : Type} [Fintype ι] (x : ι → E), (∀ a, x a ∈ M) → ∀ α, AddMonoidAlgebra.coeff (D.poly x) α ∈ A₀ := by
+theorem UpperTheory.V.CA.d_coef_mem
+    : ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E) (M : Submonoid E)
+        (A₀ : Subring A),
+      (∀ x ∈ M, ∀ i, 1 ≤ i → i ≤ n → D.lam i x ∈ A₀)
+        → ∀ {ι : Type} [Fintype ι] (x : ι → E),
+          (∀ a, x a ∈ M) → ∀ α, AddMonoidAlgebra.coeff (D.poly x) α ∈ A₀ := by
   intro n A E _ _ _ D M A₀ h ι _ x hx α
   let e := (Fintype.equivFin ι).symm
   have h1 := (d_poly D (x ∘ e)).2 (MvPolynomial ι A) (MvPolynomial.X ∘ e)
@@ -77,7 +91,6 @@ theorem UpperTheory.V.CA.d_coef_mem :
     unfold Det.poly Det.gen
     congr 1
     exact (Equiv.sum_comp e fun a => (MvPolynomial.X a : MvPolynomial ι A) ⊗ₜ[A] x a).symm
-  have h3 : α = (α.mapDomain e.symm).mapDomain e := by
-    rw [← Finsupp.mapDomain_comp]; simp
+  have h3 : α = (α.mapDomain e.symm).mapDomain e := by rw [← Finsupp.mapDomain_comp]; simp
   rw [h2, h3, MvPolynomial.coeff_rename_mapDomain _ e.injective]
   exact coef_mem_fin D M A₀ h _ (fun a => hx _) _

@@ -7,7 +7,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 
 noncomputable section
 
-open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting
+open Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting
 open scoped Classical
 
 namespace Formalism.L2.SG.Pf.UnipB
@@ -16,8 +17,8 @@ open Formalism.L2.SG Formalism.L2.SG.PoincareInHH Formalism.L2.SG.Pf.Unip
 
 variable {D : D7} (X : HidaSetting D) (u : D.what₂.Word) (v : InfinitePlace X.B.I.F)
 
-theorem mulVec_eq_sum_cols {m p : Type*} [Fintype p] [DecidableEq p] (M : Matrix m p ℂ) (c : p → ℂ) :
-    M *ᵥ c = ∑ k, c k • (M *ᵥ Pi.single k 1) := by
+theorem mulVec_eq_sum_cols {m p : Type*} [Fintype p] [DecidableEq p] (M : Matrix m p ℂ) (c : p → ℂ)
+    : M *ᵥ c = ∑ k, c k • (M *ᵥ Pi.single k 1) := by
   ext i
   rw [Finset.sum_apply]
   simp [Matrix.mulVec, dotProduct, Pi.single_apply, mul_comm]
@@ -26,8 +27,8 @@ theorem Bv_mulVec (c : Kap X → ℂ) : Bv X v *ᵥ c = ∑ k, c k • rv X.B.I 
   rw [mulVec_eq_sum_cols]
   simp only [Bv_col]
 
-theorem Bv_mulVec_mem (S : Set (Fin D.R.rS)) (c : Kap X → ℂ) (hc : ∀ k, k ∉ Sum.inl '' S → c k = 0) :
-    Bv X v *ᵥ c ∈ Submodule.span ℂ ((fun b => rv X.B.I v (X.eR b)) '' S) := by
+theorem Bv_mulVec_mem (S : Set (Fin D.R.rS)) (c : Kap X → ℂ) (hc : ∀ k, k ∉ Sum.inl '' S → c k = 0)
+    : Bv X v *ᵥ c ∈ Submodule.span ℂ ((fun b => rv X.B.I v (X.eR b)) '' S) := by
   rw [Bv_mulVec]
   refine Submodule.sum_mem _ fun k _ => ?_
   by_cases hk : k ∈ Sum.inl '' S
@@ -36,9 +37,10 @@ theorem Bv_mulVec_mem (S : Set (Fin D.R.rS)) (c : Kap X → ℂ) (hc : ∀ k, k 
   · rw [hc k hk, zero_smul]
     exact Submodule.zero_mem _
 
-theorem Bv'_mulVec_supp (S : Set (Fin D.R.rS)) {y : Fin X.B.I.n → ℂ}
-    (hy : y ∈ Submodule.span ℂ ((fun b => rv X.B.I v (X.eR b)) '' S)) :
-    ∀ k, k ∉ Sum.inl '' S → (Bv' X v *ᵥ y) k = 0 := by
+theorem Bv'_mulVec_supp
+    (S : Set (Fin D.R.rS))
+    {y : Fin X.B.I.n → ℂ} (hy : y ∈ Submodule.span ℂ ((fun b => rv X.B.I v (X.eR b)) '' S))
+    : ∀ k, k ∉ Sum.inl '' S → (Bv' X v *ᵥ y) k = 0 := by
   induction hy using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨b, hb, rfl⟩ := hx
@@ -47,38 +49,46 @@ theorem Bv'_mulVec_supp (S : Set (Fin D.R.rS)) {y : Fin X.B.I.n → ℂ}
     rw [Bv'_rv, Pi.single_apply, if_neg]
     rintro rfl
     exact hk ⟨b, hb, rfl⟩
-  | zero => intro k _; simp
-  | add x y _ _ hx hy => intro k hk; rw [Matrix.mulVec_add, Pi.add_apply, hx k hk, hy k hk, add_zero]
+  | zero =>
+    intro k _; simp
+  | add x y _ _ hx hy =>
+    intro k hk; rw [Matrix.mulVec_add, Pi.add_apply, hx k hk, hy k hk, add_zero]
   | smul c x _ hx => intro k hk; rw [Matrix.mulVec_smul, Pi.smul_apply, hx k hk, smul_zero]
 
-theorem hJ_e_Bv (a : Fin D.R.rS) (c : Kap X → ℂ) :
-    hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) (Bv X v *ᵥ c) = c (Sum.inr (Sum.inr a)) := by
+theorem hJ_e_Bv (a : Fin D.R.rS) (c : Kap X → ℂ)
+    : hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) (Bv X v *ᵥ c) = c (Sum.inr (Sum.inr a)) := by
   rw [Bv_mulVec, hJ_sum_right']
-  have e : ∀ k, hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) (rv X.B.I v (bv X k)) =
-      X.B.I.φ v (JB X (Sum.inl a) k) := by
+  have e
+      : ∀ k,
+        hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) (rv X.B.I v (bv X k))
+          = X.B.I.φ v (JB X (Sum.inl a) k) := by
     intro k
     rw [hJ_rv_sc]
     rfl
   simp only [e, JB_e_row]
   simp
 
-theorem hermitian_basis_e_z_orthogonal (a : Fin D.R.rS) : hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) (rv X.B.I v (X.zR u)) = 0 := by
+theorem hermitian_basis_e_z_orthogonal (a : Fin D.R.rS)
+    : hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) (rv X.B.I v (X.zR u)) = 0 := by
   rw [hJ_rv_sc]
   have := hE_ez X u a
   simp only [hE] at this
   rw [this, map_zero]
 
-theorem hJ_rv_e_w (a : Fin D.R.rS) (i : Fin (mW X)) :
-    hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) (rv X.B.I v (bv X (Sum.inr (Sum.inl i)))) = 0 := by
+theorem hJ_rv_e_w (a : Fin D.R.rS) (i : Fin (mW X))
+    : hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) (rv X.B.I v (bv X (Sum.inr (Sum.inl i)))) = 0 := by
   rw [hJ_rv_sc]
   have := (wb_mem X i a).1
   simp only [hE] at this
   simp only [bv, Sum.elim_inr, Sum.elim_inl]
   rw [this, map_zero]
 
-@[simp] theorem lvk_inl (a : Fin D.R.rS) : lvk X (Sum.inl a) = a.1 + 1 := rfl
-@[simp] theorem lvk_w (i : Fin (mW X)) : lvk X (Sum.inr (Sum.inl i)) = D.R.rS + 1 := rfl
-@[simp] theorem lvk_f (a : Fin D.R.rS) : lvk X (Sum.inr (Sum.inr a)) = 2 * D.R.rS + 1 - a.1 := rfl
+@[simp]
+theorem lvk_inl (a : Fin D.R.rS) : lvk X (Sum.inl a) = a.1 + 1 := rfl
+@[simp]
+theorem lvk_w (i : Fin (mW X)) : lvk X (Sum.inr (Sum.inl i)) = D.R.rS + 1 := rfl
+@[simp]
+theorem lvk_f (a : Fin D.R.rS) : lvk X (Sum.inr (Sum.inr a)) = 2 * D.R.rS + 1 - a.1 := rfl
 
 theorem lvk_notinl (k : Kap X) (hk : ∀ b, k ≠ Sum.inl b) : D.R.rS + 1 ≤ lvk X k := by
   rcases k with a | i | a
@@ -88,9 +98,9 @@ theorem lvk_notinl (k : Kap X) (hk : ∀ b, k ≠ Sum.inl b) : D.R.rS + 1 ≤ lv
     have := a.2
     omega
 
-theorem inN_of_pat (g : Matrix (Fin X.B.I.n) (Fin X.B.I.n) ℂ)
-    (hpat : InPat (lvk X) 1 (Bv' X v * g * Bv X v - 1)) :
-    InN (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (rv X.B.I v (X.zR u)) g := by
+theorem inN_of_pat
+    (g : Matrix (Fin X.B.I.n) (Fin X.B.I.n) ℂ) (hpat : InPat (lvk X) 1 (Bv' X v * g * Bv X v - 1))
+    : InN (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (rv X.B.I v (X.zR u)) g := by
   set M := Bv' X v * g * Bv X v with hM
   have hg : g - 1 = Bv X v * (M - 1) * Bv' X v := by
     rw [hM, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, Bv_mul_Bv']
@@ -100,8 +110,10 @@ theorem inN_of_pat (g : Matrix (Fin X.B.I.n) (Fin X.B.I.n) ℂ)
     intro y
     rw [hg, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
 
-  have hperp : ∀ y, (∀ a, hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) y = 0) →
-      (g - 1) *ᵥ y ∈ spanLt (fun a => rv X.B.I v (X.eR a)) D.R.rS := by
+  have hperp
+      : ∀ y,
+        (∀ a, hJ (X.B.I.ε v) (rv X.B.I v (X.eR a)) y = 0)
+          → (g - 1) *ᵥ y ∈ spanLt (fun a => rv X.B.I v (X.eR a)) D.R.rS := by
     intro y hy
     set c := Bv' X v *ᵥ y with hc
     have hyc : y = Bv X v *ᵥ c := by rw [hc, Matrix.mulVec_mulVec, Bv_mul_Bv', Matrix.one_mulVec]
@@ -131,19 +143,23 @@ theorem inN_of_pat (g : Matrix (Fin X.B.I.n) (Fin X.B.I.n) ℂ)
   refine hpat k _ ?_
   rcases k with b | i | b
   · have : ¬ b.1 < a.1 := fun h => hk ⟨b, h, rfl⟩
-    simp only [lvk, Sum.elim_inl]; omega
+    simp only [lvk, Sum.elim_inl]
+    omega
   · simp only [lvk, Sum.elim_inl, Sum.elim_inr]; have := a.2; omega
   · simp only [lvk, Sum.elim_inl, Sum.elim_inr]; have := a.2; have := b.2; omega
 
-theorem half_of_inN {g : Matrix (Fin X.B.I.n) (Fin X.B.I.n) ℂ}
-    (hg : InN (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (rv X.B.I v (X.zR u)) g) :
-    ∀ i j, lvk X j ≤ D.R.rS + 1 → lvk X j < lvk X i + 1 →
-      ((Bv' X v * g * Bv X v - 1 : Matrix (Kap X) (Kap X) ℂ)) i j = 0 := by
+theorem half_of_inN
+    {g : Matrix (Fin X.B.I.n) (Fin X.B.I.n) ℂ}
+    (hg : InN (X.B.I.ε v) (fun a => rv X.B.I v (X.eR a)) (rv X.B.I v (X.zR u)) g)
+    : ∀ i j,
+      lvk X j ≤ D.R.rS + 1 → lvk X j < lvk X i + 1
+        → ((Bv' X v * g * Bv X v - 1 : Matrix (Kap X) (Kap X) ℂ)) i j = 0 := by
   intro i j hj hij
   have hM : Bv' X v * g * Bv X v - 1 = Bv' X v * (g - 1) * Bv X v := by
     rw [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, Bv'_mul_Bv]
-  have hcol : ((Bv' X v * g * Bv X v - 1 : Matrix (Kap X) (Kap X) ℂ)) i j =
-      (Bv' X v *ᵥ ((g - 1) *ᵥ rv X.B.I v (bv X j))) i := by
+  have hcol
+      : ((Bv' X v * g * Bv X v - 1 : Matrix (Kap X) (Kap X) ℂ)) i j
+        = (Bv' X v *ᵥ ((g - 1) *ᵥ rv X.B.I v (bv X j))) i := by
     rw [hM, ← Bv_col, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, mulVec_single_one]
     rfl
   rw [hcol]
@@ -167,7 +183,7 @@ theorem pat_of_mem {s : X.B.I.Ginf} (hs : s ∈ X.NinfU u) : InPat (lvk X) 1 (Mv
   have hMN : Mv X v s = sharp (JBv X v) (JBv' X v) (Mv X v s⁻¹) := by
     have := Mv_inv X v s⁻¹
     rwa [inv_inv] at this
-  exact half_to_full (JBv_graded X v) (JBv'_graded X v) (JBv'_mul X v) (h₀ := D.R.rS + 1) (by omega) hMN
-    (half_of_inN X u v (hs' v)) (half_of_inN X u v (hs v))
+  exact half_to_full (JBv_graded X v) (JBv'_graded X v) (JBv'_mul X v) (h₀ := D.R.rS + 1) (by omega)
+    hMN (half_of_inN X u v (hs' v)) (half_of_inN X u v (hs v))
 
 end Formalism.L2.SG.Pf.UnipB

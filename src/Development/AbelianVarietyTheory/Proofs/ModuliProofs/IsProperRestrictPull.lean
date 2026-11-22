@@ -14,25 +14,28 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 
 namespace GlobalTheory.AbLocusPull
 
 variable {X Y Z : Scheme.{0}}
 
-theorem isUnit_gs_iff (r : Z ⟶ X) (z : Z) (U : X.Opens) (h : r z ∈ U) (a : Γ(X, U)) :
-    IsUnit (gs r z U a) ↔ r z ∈ X.basicOpen a := by
+theorem isUnit_gs_iff (r : Z ⟶ X) (z : Z) (U : X.Opens) (h : r z ∈ U) (a : Γ(X, U))
+    : IsUnit (gs r z U a) ↔ r z ∈ X.basicOpen a := by
   rw [gs_eq r z U h a]
   show _ ↔ z ∈ r ⁻¹ᵁ X.basicOpen a
   rw [Scheme.preimage_basicOpen]
   exact (Scheme.mem_basicOpen Z ((r.app U) a) z h).symm
 
-theorem glue_fn {κ : Type} (V : X.Opens) (O : κ → X.Opens) (hO : ∀ k, O k ≤ V)
-    (hc : ∀ x ∈ V, ∃ k, x ∈ O k) (a : ∀ k, Γ(X, O k))
-    (h : ∀ k l x, x ∈ O k → x ∈ O l → gs (𝟙 X) x (O k) (a k) = gs (𝟙 X) x (O l) (a l)) :
-    ∃ b : Γ(X, V), ∀ x k, x ∈ O k → gs (𝟙 X) x V b = gs (𝟙 X) x (O k) (a k) := by
+theorem glue_fn
+    {κ : Type} (V : X.Opens) (O : κ → X.Opens) (hO : ∀ k, O k ≤ V) (hc : ∀ x ∈ V, ∃ k, x ∈ O k)
+    (a : ∀ k, Γ(X, O k))
+    (h : ∀ k l x, x ∈ O k → x ∈ O l → gs (𝟙 X) x (O k) (a k) = gs (𝟙 X) x (O l) (a l))
+    : ∃ b : Γ(X, V), ∀ x k, x ∈ O k → gs (𝟙 X) x V b = gs (𝟙 X) x (O k) (a k) := by
   have hcomp : TopCat.Presheaf.IsCompatible X.presheaf O a := by
     intro k l
     apply fn_ext
@@ -48,13 +51,16 @@ theorem glue_fn {κ : Type} (V : X.Opens) (O : κ → X.Opens) (hO : ∀ k, O k 
   rw [← gs_res (𝟙 X) x (hO k) hx b]
   exact congrArg (gs (𝟙 X) x (O k)) (hb k)
 
-theorem gs_secOn {M : LB X} {V : X.Opens} {t : ∀ i, Γ(X, V ⊓ M.U i)} (ht : t ∈ secOn M V) (r : Z ⟶ X) (z : Z)
-    (i j : M.ι) (hV : r z ∈ V) (hi : r z ∈ M.U i) (hj : r z ∈ M.U j) :
-    gs r z _ (t i) = (gm r z (M.U i ⊓ M.U j) (M.g i j)).val * gs r z _ (t j) := by
+theorem gs_secOn
+    {M : LB X} {V : X.Opens} {t : ∀ i, Γ(X, V ⊓ M.U i)} (ht : t ∈ secOn M V)
+    (r : Z ⟶ X) (z : Z) (i j : M.ι) (hV : r z ∈ V) (hi : r z ∈ M.U i) (hj : r z ∈ M.U j)
+    : gs r z _ (t i) = (gm r z (M.U i ⊓ M.U j) (M.g i j)).val * gs r z _ (t j) := by
   have hz : r z ∈ V ⊓ M.U i ⊓ M.U j := ⟨⟨hV, hi⟩, hj⟩
   have e := congrArg (gs r z (V ⊓ M.U i ⊓ M.U j)) (ht i j)
   dsimp only [resG] at e
-  rw [gs_mul r z _ hz, gs_res r z _ hz, gs_res r z _ hz, gs_res r z _ hz, gs_unit r z _ (show r z ∈ M.U i ⊓ M.U j from ⟨hi, hj⟩)] at e
+  rw [gs_mul r z _ hz, gs_res r z _ hz, gs_res r z _ hz, gs_res r z _ hz,
+      gs_unit r z _ (show r z ∈ M.U i ⊓ M.U j from ⟨hi, hj⟩)]
+    at e
   exact e
 
 private lemma toFld_gm_res {T : Scheme.{0}} {U V : T.Opens} (h : V ≤ U) (y : T) (hy : y ∈ V) (u : Γ(T, U)ˣ) :
@@ -78,10 +84,13 @@ private lemma gm_id_div_g_eq_mul_inv {T : Scheme.{0}} (M N : LB T) (y : T) (p q 
   exact (map_mul _ _ _).trans (congrArg₂ (· * ·) (toFld_gm_res _ y hy _)
     ((map_inv _ _).trans (congrArg (·⁻¹) (toFld_gm_res _ y hy _))))
 
-theorem exists_secOn_pull {X' : Scheme.{0}} {F : X' ⟶ X} {L : LB X} {L' : LB X'} (hL : L.IsLB) (hL' : L'.IsLB)
-    (hw : LBIso L' (L.pull F)) {W : X.Opens} {W' : X'.Opens} (hW : W' ≤ F ⁻¹ᵁ W) {θ : ∀ i, Γ(X, W ⊓ L.U i)}
-    (hθ : θ ∈ secOn L W) :
-    ∃ θ' ∈ secOn L' W', ∀ x ∈ W', ∀ j k, x ∈ L'.U k → F x ∈ X.basicOpen (θ j) → x ∈ X'.basicOpen (θ' k) := by
+theorem exists_secOn_pull
+    {X' : Scheme.{0}} {F : X' ⟶ X} {L : LB X} {L' : LB X'}
+    (hL : L.IsLB) (hL' : L'.IsLB) (hw : LBIso L' (L.pull F))
+    {W : X.Opens} {W' : X'.Opens} (hW : W' ≤ F ⁻¹ᵁ W)
+    {θ : ∀ i, Γ(X, W ⊓ L.U i)} (hθ : θ ∈ secOn L W)
+    : ∃ θ' ∈ secOn L' W', ∀ x ∈ W', ∀ j k,
+      x ∈ L'.U k → F x ∈ X.basicOpen (θ j) → x ∈ X'.basicOpen (θ' k) := by
   obtain ⟨w, hwg⟩ := hw
   obtain ⟨hcovL, -, -⟩ := hL
   obtain ⟨-, hself', -⟩ := hL'
@@ -91,30 +100,38 @@ theorem exists_secOn_pull {X' : Scheme.{0}} {F : X' ⟶ X} {L : LB X} {L' : LB X
   have hchart : ∀ y : X, ∃ i, y ∈ L.U i := fun y => by
     have hy : y ∈ (⨆ i, L.U i) := by rw [hcovL]; trivial
     exact TopologicalSpace.Opens.mem_iSup.1 hy
-  have hwrel : ∀ (x : X') (J J' : (L.pull F).ι) (k k' : L'.ι), x ∈ (L.pull F).U J ⊓ L'.U k →
-      x ∈ (L.pull F).U J' ⊓ L'.U k' →
-      gm (𝟙 X') x ((L.pull F).U J ⊓ L'.U k) (w.s (J, k)) =
-        gm F x (L.U (J ⟨⟩) ⊓ L.U (J' ⟨⟩)) (L.g (J ⟨⟩) (J' ⟨⟩)) *
-          (gm (𝟙 X') x (L'.U k ⊓ L'.U k') (L'.g k k'))⁻¹ * gm (𝟙 X') x ((L.pull F).U J' ⊓ L'.U k') (w.s (J', k')) := by
+  have hwrel
+      : ∀ (x : X') (J J' : (L.pull F).ι) (k k' : L'.ι),
+        x ∈ (L.pull F).U J ⊓ L'.U k → x ∈ (L.pull F).U J' ⊓ L'.U k'
+          → gm (𝟙 X') x ((L.pull F).U J ⊓ L'.U k) (w.s (J, k))
+            = gm F x (L.U (J ⟨⟩) ⊓ L.U (J' ⟨⟩)) (L.g (J ⟨⟩) (J' ⟨⟩))
+              * (gm (𝟙 X') x (L'.U k ⊓ L'.U k') (L'.g k k'))⁻¹
+              * gm (𝟙 X') x ((L.pull F).U J' ⊓ L'.U k') (w.s (J', k')) := by
     intro x J J' k k' h1 h2
     have h12 : x ∈ ((L.pull F).div L').U (J, k) ⊓ ((L.pull F).div L').U (J', k') := ⟨h1, h2⟩
-    have e := congrArg (gm (𝟙 X') x (((L.pull F).div L').U (J, k) ⊓ ((L.pull F).div L').U (J', k')))
-      (hwg (J, k) (J', k'))
-    rw [map_mul, toFld_gm_res _ x h12, toFld_gm_res _ x h12, gm_id_div_g_eq_mul_inv (L.pull F) L' x (J, k) (J', k') h12,
-      gm_id_pull_g_eq_gm_comp L F x J J' h1.1 h2.1] at e
+    have e :=
+      congrArg (gm (𝟙 X') x (((L.pull F).div L').U (J, k) ⊓ ((L.pull F).div L').U (J', k')))
+        (hwg (J, k) (J', k'))
+    rw [map_mul, toFld_gm_res _ x h12, toFld_gm_res _ x h12,
+        gm_id_div_g_eq_mul_inv (L.pull F) L' x (J, k) (J', k') h12,
+        gm_id_pull_g_eq_gm_comp L F x J J' h1.1 h2.1]
+      at e
     exact e
   have hone : ∀ k x, x ∈ L'.U k → gm (𝟙 X') x (L'.U k ⊓ L'.U k) (L'.g k k) = 1 := by
     intro k x hx
     have e := congrArg (gm (𝟙 X') x (L'.U k)) (hself' k)
     rwa [map_one, toFld_gm_res _ x hx] at e
-  have hind : ∀ (x : X') (J J' : (L.pull F).ι) (k k' : L'.ι), x ∈ (L.pull F).U J ⊓ L'.U k →
-      x ∈ (L.pull F).U J' ⊓ L'.U k' → F x ∈ W →
-      gs F x (W ⊓ L.U (J ⟨⟩)) (θ (J ⟨⟩)) * ((gm (𝟙 X') x ((L.pull F).U J ⊓ L'.U k) (w.s (J, k)))⁻¹).val =
-        (gm (𝟙 X') x (L'.U k ⊓ L'.U k') (L'.g k k')).val *
-          (gs F x (W ⊓ L.U (J' ⟨⟩)) (θ (J' ⟨⟩)) *
-            ((gm (𝟙 X') x ((L.pull F).U J' ⊓ L'.U k') (w.s (J', k')))⁻¹).val) := by
+  have hind
+      : ∀ (x : X') (J J' : (L.pull F).ι) (k k' : L'.ι),
+        x ∈ (L.pull F).U J ⊓ L'.U k → x ∈ (L.pull F).U J' ⊓ L'.U k' → F x ∈ W
+          → gs F x (W ⊓ L.U (J ⟨⟩)) (θ (J ⟨⟩))
+              * ((gm (𝟙 X') x ((L.pull F).U J ⊓ L'.U k) (w.s (J, k)))⁻¹).val
+            = (gm (𝟙 X') x (L'.U k ⊓ L'.U k') (L'.g k k')).val
+              * (gs F x (W ⊓ L.U (J' ⟨⟩)) (θ (J' ⟨⟩))
+                * ((gm (𝟙 X') x ((L.pull F).U J' ⊓ L'.U k') (w.s (J', k')))⁻¹).val) := by
     intro x J J' k k' h1 h2 hxW
-    rw [gs_secOn hθ F x (J ⟨⟩) (J' ⟨⟩) hxW ((m1 J x).1 h1.1) ((m1 J' x).1 h2.1), hwrel x J J' k k' h1 h2]
+    rw [gs_secOn hθ F x (J ⟨⟩) (J' ⟨⟩) hxW ((m1 J x).1 h1.1) ((m1 J' x).1 h2.1),
+      hwrel x J J' k k' h1 h2]
     simp only [mul_inv_rev, inv_inv, Units.val_mul]
     linear_combination (gs F x (W ⊓ L.U (J' ⟨⟩)) (θ (J' ⟨⟩)) *
       ((gm (𝟙 X') x ((L.pull F).U J' ⊓ L'.U k') (w.s (J', k')))⁻¹).val *
@@ -124,25 +141,39 @@ theorem exists_secOn_pull {X' : Scheme.{0}} {F : X' ⟶ X} {L : LB X} {L' : LB X
     (show F x ∈ W ⊓ L.U (J ⟨⟩) from ⟨hW hx.1.1, (m1 J x).1 hx.2⟩)
   have hOb : ∀ k J, W' ⊓ L'.U k ⊓ (L.pull F).U J ≤ (L.pull F).U J ⊓ L'.U k := fun k J x hx =>
     (show x ∈ (L.pull F).U J ⊓ L'.U k from ⟨hx.2, hx.1.2⟩)
-  obtain ⟨a, ha⟩ : ∃ a : ∀ k J, Γ(X', W' ⊓ L'.U k ⊓ (L.pull F).U J), ∀ k J, a k J =
-      (X'.presheaf.map (homOfLE (hOa k J)).op).hom ((F.app (W ⊓ L.U (J ⟨⟩))).hom (θ (J ⟨⟩))) *
-        ((res (hOb k J) (w.s (J, k)))⁻¹).val := ⟨_, fun _ _ => rfl⟩
-  have hE : ∀ k J x (hx : x ∈ W' ⊓ L'.U k ⊓ (L.pull F).U J),
-      gs (𝟙 X') x _ (a k J) = gs F x (W ⊓ L.U (J ⟨⟩)) (θ (J ⟨⟩)) *
-        ((gm (𝟙 X') x ((L.pull F).U J ⊓ L'.U k) (w.s (J, k)))⁻¹).val := by
+  obtain ⟨a, ha⟩
+      : ∃ a : ∀ k J, Γ(X', W' ⊓ L'.U k ⊓ (L.pull F).U J), ∀ k J,
+        a k J
+          = (X'.presheaf.map (homOfLE (hOa k J)).op).hom ((F.app (W ⊓ L.U (J ⟨⟩))).hom (θ (J ⟨⟩)))
+            * ((res (hOb k J) (w.s (J, k)))⁻¹).val :=
+    ⟨_, fun _ _ => rfl⟩
+  have hE
+      : ∀ k J x (hx : x ∈ W' ⊓ L'.U k ⊓ (L.pull F).U J),
+        gs (𝟙 X') x _ (a k J)
+          = gs F x (W ⊓ L.U (J ⟨⟩)) (θ (J ⟨⟩))
+            * ((gm (𝟙 X') x ((L.pull F).U J ⊓ L'.U k) (w.s (J, k)))⁻¹).val := by
     intro k J x hx
-    rw [ha, gs_mul (𝟙 X') x _ hx, gs_res (𝟙 X') x _ hx, gs_pull (𝟙 X') F x _ (hOa k J hx), Category.id_comp,
-      gs_unit (𝟙 X') x _ hx, map_inv, toFld_gm_res (hOb k J) x hx (w.s (J, k))]
-  have hglue : ∀ k, ∃ b : Γ(X', W' ⊓ L'.U k), ∀ x J, x ∈ W' ⊓ L'.U k ⊓ (L.pull F).U J →
-      gs (𝟙 X') x (W' ⊓ L'.U k) b = gs (𝟙 X') x _ (a k J) := by
+    rw [ha, gs_mul (𝟙 X') x _ hx, gs_res (𝟙 X') x _ hx, gs_pull (𝟙 X') F x _ (hOa k J hx),
+      Category.id_comp, gs_unit (𝟙 X') x _ hx, map_inv, toFld_gm_res (hOb k J) x hx (w.s (J, k))]
+  have hglue
+      : ∀ k, ∃ b : Γ(X', W' ⊓ L'.U k), ∀ x J,
+        x ∈ W' ⊓ L'.U k ⊓ (L.pull F).U J → gs (𝟙 X') x (W' ⊓ L'.U k) b = gs (𝟙 X') x _ (a k J) := by
     intro k
-    obtain ⟨b, hb⟩ := glue_fn (W' ⊓ L'.U k) (fun J => W' ⊓ L'.U k ⊓ (L.pull F).U J) (fun J => inf_le_left)
-      (fun x hx => by
-        obtain ⟨i, hi⟩ := hchart (F x)
-        exact ⟨fun _ => i, (show x ∈ W' ⊓ L'.U k ⊓ (L.pull F).U (fun _ => i) from ⟨hx, (m1 _ x).2 hi⟩)⟩)
-      (a k) (fun J J' x hx hx' => by
-        rw [hE k J x hx, hE k J' x hx', hind x J J' k k ⟨hx.2, hx.1.2⟩ ⟨hx'.2, hx'.1.2⟩ (hW hx.1.1),
-          hone k x hx.1.2, Units.val_one, _root_.one_mul])
+    obtain ⟨b, hb⟩ :=
+      glue_fn (W' ⊓ L'.U k)
+        (fun J => W' ⊓ L'.U k ⊓ (L.pull F).U J)
+        (fun J => inf_le_left)
+        (fun x hx => by
+          obtain ⟨i, hi⟩ := hchart (F x)
+          exact ⟨
+            fun _ => i,
+            (show x ∈ W' ⊓ L'.U k ⊓ (L.pull F).U (fun _ => i) from ⟨hx, (m1 _ x).2 hi⟩)
+          ⟩)
+        (a k)
+        (fun J J' x hx hx' => by
+          rw [hE k J x hx, hE k J' x hx',
+            hind x J J' k k ⟨hx.2, hx.1.2⟩ ⟨hx'.2, hx'.1.2⟩ (hW hx.1.1), hone k x hx.1.2,
+            Units.val_one, _root_.one_mul])
     exact ⟨b, fun x J hx => hb x J hx⟩
   choose θ' hθ' using hglue
   refine ⟨θ', ?_, ?_⟩
@@ -165,8 +196,10 @@ theorem exists_secOn_pull {X' : Scheme.{0}} {F : X' ⟶ X} {L : LB X} {L' : LB X
       exact ((isUnit_gs_iff F x _ hFj (θ j)).2 hj).mul (Units.isUnit _)
     exact (isUnit_gs_iff (𝟙 X') x (W' ⊓ L'.U k) ⟨hxW, hk⟩ (θ' k)).1 hu
 
-theorem isProper_restrict_pull {S S' X' : Scheme.{0}} {p : X ⟶ S} {p' : X' ⟶ S'} {t : S' ⟶ S} {F : X' ⟶ X}
-    (h : IsPullback F p' p t) (U : S.Opens) [IsProper (p ∣_ U)] : IsProper (p' ∣_ (t ⁻¹ᵁ U)) := by
+theorem isProper_restrict_pull
+    {S S' X' : Scheme.{0}} {p : X ⟶ S} {p' : X' ⟶ S'} {t : S' ⟶ S} {F : X' ⟶ X}
+    (h : IsPullback F p' p t) (U : S.Opens) [IsProper (p ∣_ U)]
+    : IsProper (p' ∣_ (t ⁻¹ᵁ U)) := by
   have e0 : F ⁻¹ᵁ (p ⁻¹ᵁ U) = p' ⁻¹ᵁ (t ⁻¹ᵁ U) := by
     rw [← Scheme.Hom.comp_preimage, h.w, Scheme.Hom.comp_preimage]
   have hUY : p' ⁻¹ᵁ (t ⁻¹ᵁ U) = F ⁻¹ᵁ (p ⁻¹ᵁ U) ⊓ p' ⁻¹ᵁ (t ⁻¹ᵁ U) := by rw [e0, inf_idem]
@@ -176,7 +209,22 @@ theorem isProper_restrict_pull {S S' X' : Scheme.{0}} {p : X ⟶ S} {p' : X' ⟶
   have hq := MorphismProperty.IsStableUnderBaseChange.of_isPullback (P := @IsProper) sq hp
   rwa [Scheme.Hom.resLE_eq_morphismRestrict] at hq
 
-theorem abLocus_sections_pull : ∀ (X X' : Scheme.{0}) (f : X' ⟶ X) (G : Over X) [GrpObj G] (G' : Over X') [GrpObj G'] (φ : G'.left ⟶ G.left), IsSemiAbelian G → IsGrpPullback G' G f φ → ((∃ U : X.Opens, (U : Set X) = abLocus G ∧ IsProper (G.hom ∣_ U)) → (∃ U : X'.Opens, (U : Set X') = abLocus G' ∧ IsProper (G'.hom ∣_ U))) ∧ ∀ (L : LB G.left) (L' : LB G'.left), L.IsLB → L'.IsLB → LBIso L' (L.pull φ) → (∀ x : X, ∃ V : X.Opens, x ∈ V ∧ ∃ θ ∈ secOn L (G.hom ⁻¹ᵁ V), ∀ y ∈ V, ∃ (g : G.left) (i : L.ι), G.hom g = y ∧ g ∈ G.left.basicOpen (θ i)) → (∀ x : X', ∃ V : X'.Opens, x ∈ V ∧ ∃ θ ∈ secOn L' (G'.hom ⁻¹ᵁ V), ∀ y ∈ V, ∃ (g : G'.left) (i : L'.ι), G'.hom g = y ∧ g ∈ G'.left.basicOpen (θ i)) := by
+theorem abLocus_sections_pull
+    : ∀ (X X' : Scheme.{0}) (f : X' ⟶ X) (G : Over X) [GrpObj G] (G' : Over X') [GrpObj G']
+        (φ : G'.left ⟶ G.left),
+      IsSemiAbelian G → IsGrpPullback G' G f φ
+        → ((∃ U : X.Opens, (U : Set X) = abLocus G ∧ IsProper (G.hom ∣_ U))
+            → (∃ U : X'.Opens, (U : Set X') = abLocus G' ∧ IsProper (G'.hom ∣_ U)))
+          ∧ ∀ (L : LB G.left) (L' : LB G'.left),
+            L.IsLB → L'.IsLB → LBIso L' (L.pull φ)
+              → (∀ x : X, ∃ V : X.Opens,
+                x ∈ V
+                  ∧ ∃ θ ∈ secOn L (G.hom ⁻¹ᵁ V), ∀ y ∈ V, ∃ (g : G.left) (i : L.ι),
+                    G.hom g = y ∧ g ∈ G.left.basicOpen (θ i))
+              → (∀ x : X', ∃ V : X'.Opens,
+                x ∈ V
+                  ∧ ∃ θ ∈ secOn L' (G'.hom ⁻¹ᵁ V), ∀ y ∈ V, ∃ (g : G'.left) (i : L'.ι),
+                    G'.hom g = y ∧ g ∈ G'.left.basicOpen (θ i)) := by
   intro X X' f G _ G' _ φ hG hp
   refine ⟨?_, ?_⟩
   · rintro ⟨U, hU, hUp⟩
@@ -208,7 +256,8 @@ theorem abLocus_sections_pull : ∀ (X X' : Scheme.{0}) (f : X' ⟶ X) (G : Over
       exact TopologicalSpace.Opens.mem_iSup.1 hm
     refine ⟨hp.1.isoPullback.inv z, k, e2, hnz _ ?_ i k hk ?_⟩
     · show G'.hom (hp.1.isoPullback.inv z) ∈ f ⁻¹ᵁ V
-      rw [e2]; exact hy
+      rw [e2]
+      exact hy
     · rw [e1]; exact hgi
 
 end GlobalTheory.AbLocusPull

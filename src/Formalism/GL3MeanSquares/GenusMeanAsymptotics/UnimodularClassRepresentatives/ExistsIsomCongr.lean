@@ -11,19 +11,25 @@ noncomputable section
 namespace Formalism.HermitianLattices.Ext.L3
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem exists_isom_congr (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {A₀ : Submodule (𝓞 K) V}
-    (hA₀ : Submodule.IsLattice K A₀) (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) {n : 𝓞 F} (hn : n ≠ 0) {x y : V} (hxL : x ∈ (locF 𝔭 A₀))
-    (hyL : y ∈ (locF 𝔭 A₀)) (hx : h x x = algebraMap F K (n : F)) (hy : h y y = algebraMap F K (n : F))
+theorem exists_isom_congr
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {A₀ : Submodule (𝓞 K) V}
+    (hA₀ : Submodule.IsLattice K A₀) (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {n : 𝓞 F} (hn : n ≠ 0)
+    {x y : V} (hxL : x ∈ (locF 𝔭 A₀)) (hyL : y ∈ (locF 𝔭 A₀)) (hx : h x x = algebraMap F K (n : F))
+    (hy : h y y = algebraMap F K (n : F))
     {j : ℕ} (hj : 4 * vF 𝔭 n + eA h (locF 𝔭 A₀) 𝔭 + 1 ≤ j)
-    (hxy : y - x ∈ ((extP K 𝔭) ^ j • (locF 𝔭 A₀) : Submodule (𝓞 K) V)) :
-    ∃ g ∈ autSub h (locF 𝔭 A₀),
-      (∀ z ∈ (locF 𝔭 A₀), g z - z ∈ ((extP K 𝔭) ^ (j - 2 * vF 𝔭 n) • (locF 𝔭 A₀) : Submodule (𝓞 K) V)) ∧
-      g x = y := by
+    (hxy : y - x ∈ ((extP K 𝔭) ^ j • (locF 𝔭 A₀) : Submodule (𝓞 K) V))
+    : ∃ g ∈ autSub h (locF 𝔭 A₀),
+      (∀ z ∈ (locF 𝔭 A₀),
+          g z - z ∈ ((extP K 𝔭) ^ (j - 2 * vF 𝔭 n) • (locF 𝔭 A₀) : Submodule (𝓞 K) V))
+        ∧ g x = y := by
   classical
   have hp : 𝔭.IsPrime := h𝔭.isPrime
   have han : ∀ z, h z z = 0 → z = 0 := by
@@ -44,14 +50,13 @@ theorem exists_isom_congr (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (
   have hnMap : algebraMap F K (n : F) = algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) n) :=
     (IsScalarTower.algebraMap_apply (𝓞 F) F K n).symm.trans
       (IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 K) K n)
-  obtain ⟨g, hgI, hgJ, hgS, hgxy⟩ :
-      ∃ g ∈ Formalism.HermitianLatticesTheory.isom h,
-        (∀ z, WCA.InL 𝔭 A₀ 0 z → WCA.InL 𝔭 A₀ (j - 2 * v) (g z - z)) ∧
-        (∀ z, WCA.InL 𝔭 A₀ 0 z → WCA.InL 𝔭 A₀ 0 (g.symm z)) ∧ g x = y :=
-    _root_.Formalism.HermitianLattices.Ext.L3.WCC.core
-      (K := K) (F := F) (V := V) (A := A₀) (x := x) (y := y)
-      (v := v) (J := j - 2 * v) hK hF hs han hA₀i h𝔭 hn hv hx0
-      (hx.trans hnMap) (hy.trans hnMap) hJ hw
+  obtain ⟨g, hgI, hgJ, hgS, hgxy⟩
+      : ∃ g ∈ Formalism.HermitianLatticesTheory.isom h,
+        (∀ z, WCA.InL 𝔭 A₀ 0 z → WCA.InL 𝔭 A₀ (j - 2 * v) (g z - z))
+          ∧ (∀ z, WCA.InL 𝔭 A₀ 0 z → WCA.InL 𝔭 A₀ 0 (g.symm z)) ∧ g x = y :=
+    _root_.Formalism.HermitianLattices.Ext.L3.WCC.core (K := K) (F := F) (V := V) (A := A₀) (x := x)
+      (y := y) (v := v) (J := j - 2 * v) hK hF hs han hA₀i h𝔭 hn hv hx0 (hx.trans hnMap)
+      (hy.trans hnMap) hJ hw
   have hL : ∀ z, z ∈ locF 𝔭 A₀ → g z ∈ locF 𝔭 A₀ := by
     intro z hz
     have hz0 : WCA.InL 𝔭 A₀ 0 z := (WCA.inL_zero_iff hp).2 hz

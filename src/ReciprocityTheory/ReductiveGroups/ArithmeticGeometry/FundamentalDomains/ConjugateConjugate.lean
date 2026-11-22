@@ -11,8 +11,8 @@ open scoped ComplexConjugate
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem d4l2_dual_int (t : E) (h : ∀ γ : 𝓞 E, ∃ k : ℤ, Algebra.trace ℚ E (t * γ) = k) :
-    IsIntegral ℤ ((NumberField.discr E : E) * t) := by
+theorem d4l2_dual_int (t : E) (h : ∀ γ : 𝓞 E, ∃ k : ℤ, Algebra.trace ℚ E (t * γ) = k)
+    : IsIntegral ℤ ((NumberField.discr E : E) * t) := by
   classical
   have ht : t ∈ Submodule.traceDual ℤ ℚ (1 : Submodule (𝓞 E) E) := by
     rw [Submodule.mem_traceDual]
@@ -26,16 +26,17 @@ theorem d4l2_dual_int (t : E) (h : ∀ γ : 𝓞 E, ∃ k : ℤ, Algebra.trace �
   have hb : ∀ i, IsIntegral ℤ (NumberField.integralBasis E i) := fun i => by
     rw [NumberField.integralBasis_apply]
     exact NumberField.RingOfIntegers.isIntegral_coe _
-  have key := isIntegral_discr_mul_of_mem_traceDual (A := ℤ) (K := ℚ)
-    (1 : Submodule (𝓞 E) E) hb h1 ht
-  have e : Algebra.discr ℚ (NumberField.integralBasis E) • (1 : E) * t =
-      (NumberField.discr E : E) * t := by
+  have key :=
+    isIntegral_discr_mul_of_mem_traceDual (A := ℤ) (K := ℚ) (1 : Submodule (𝓞 E) E) hb h1 ht
+  have e
+      : Algebra.discr ℚ (NumberField.integralBasis E) • (1 : E) * t
+        = (NumberField.discr E : E) * t := by
     rw [← NumberField.coe_discr, Algebra.smul_def, mul_one]
     simp
   rwa [e] at key
 
-theorem d4l2_dual_int' (t : E) (h : ∀ γ : 𝓞 E, ∃ k : ℤ, Algebra.trace ℚ E (t * γ) = k) :
-    IsIntegral ℤ (((NumberField.discr E).natAbs : E) * t) := by
+theorem d4l2_dual_int' (t : E) (h : ∀ γ : 𝓞 E, ∃ k : ℤ, Algebra.trace ℚ E (t * γ) = k)
+    : IsIntegral ℤ (((NumberField.discr E).natAbs : E) * t) := by
   have key := d4l2_dual_int t h
   rcases Int.natAbs_eq (NumberField.discr E) with hd | hd
   · have e : ((NumberField.discr E).natAbs : E) = (NumberField.discr E : E) := by
@@ -53,29 +54,31 @@ namespace Data
 
 variable {r : ℕ} (X : Data E r)
 
-theorem conjugate_conjugate' (φ : E →+* ℂ) :
-    ComplexEmbedding.conjugate (ComplexEmbedding.conjugate φ) = φ := by
+theorem conjugate_conjugate' (φ : E →+* ℂ)
+    : ComplexEmbedding.conjugate (ComplexEmbedding.conjugate φ) = φ := by
   ext x
   simp only [ComplexEmbedding.conjugate_coe_eq, Complex.conj_conj]
 
 theorem conj_mem_iff (φ : E →+* ℂ) : ComplexEmbedding.conjugate φ ∈ X.Ψ ↔ φ ∉ X.Ψ := by
   rw [X.cmType (ComplexEmbedding.conjugate φ), conjugate_conjugate']
 
-theorem sum_emb_split (f : (E →+* ℂ) → ℂ) :
-    ∑ φ : E →+* ℂ, f φ = ∑ τ : X.Ψ, (f τ.1 + f (ComplexEmbedding.conjugate τ.1)) := by
+theorem sum_emb_split (f : (E →+* ℂ) → ℂ)
+    : ∑ φ : E →+* ℂ, f φ = ∑ τ : X.Ψ, (f τ.1 + f (ComplexEmbedding.conjugate τ.1)) := by
   classical
   have h2 : ∑ φ ∈ X.Ψ, f (ComplexEmbedding.conjugate φ) = ∑ φ ∈ X.Ψᶜ, f φ :=
     Finset.sum_nbij' ComplexEmbedding.conjugate ComplexEmbedding.conjugate
       (fun a ha => Finset.mem_compl.2 fun hc => (X.conj_mem_iff a).1 hc ha)
       (fun a ha => (X.conj_mem_iff a).2 (Finset.mem_compl.1 ha))
-      (fun a _ => conjugate_conjugate' a) (fun a _ => conjugate_conjugate' a) (fun a _ => rfl)
+      (fun a _ => conjugate_conjugate' a)
+      (fun a _ => conjugate_conjugate' a)
+      (fun a _ => rfl)
   have h2' : ∑ x : X.Ψ, f (ComplexEmbedding.conjugate x.1) = ∑ φ ∈ X.Ψᶜ, f φ := by
     rw [← h2]
     exact Finset.sum_coe_sort X.Ψ (fun φ => f (ComplexEmbedding.conjugate φ))
   rw [Finset.sum_add_distrib, h2', Finset.sum_coe_sort X.Ψ f, Finset.sum_add_sum_compl]
 
-theorem trace_eq_Psi (y : E) :
-    ((Algebra.trace ℚ E y : ℚ) : ℂ) = ∑ τ : X.Ψ, (τ.1 y + conj (τ.1 y)) := by
+theorem trace_eq_Psi (y : E)
+    : ((Algebra.trace ℚ E y : ℚ) : ℂ) = ∑ τ : X.Ψ, (τ.1 y + conj (τ.1 y)) := by
   have h1 : ((Algebra.trace ℚ E y : ℚ) : ℂ) = ∑ φ : E →+* ℂ, φ y := by
     have h := trace_eq_sum_embeddings (K := ℚ) (L := E) (E := ℂ) (x := y)
     rw [eq_ratCast] at h
@@ -99,19 +102,19 @@ theorem card_Psi : 2 * Fintype.card X.Ψ = finrank ℚ E := by
     linear_combination h
   exact (Nat.cast_injective h').symm
 
-theorem exists_emb_eq (z : X.Ψ → ℂ)
-    (hz : ∀ γ : 𝓞 E, ∃ q : ℚ, (∑ τ : X.Ψ, z τ * τ.1 (γ : E)).re = q) :
-    ∃ ω : E, ∀ τ : X.Ψ, z τ = τ.1 ω := by
+theorem exists_emb_eq (z : X.Ψ → ℂ) (hz : ∀ γ : 𝓞 E, ∃ q : ℚ, (∑ τ : X.Ψ, z τ * τ.1 (γ : E)).re = q)
+    : ∃ ω : E, ∀ τ : X.Ψ, z τ = τ.1 ω := by
   classical
-  let P : (X.Ψ → ℂ) → E →ₗ[ℚ] ℝ := fun w =>
-    { toFun := fun x => (∑ τ : X.Ψ, w τ * τ.1 x).re
-      map_add' := fun x y => by simp [mul_add, Finset.sum_add_distrib]
-      map_smul' := fun q x => by
-        simp only [Rat.smul_def, map_mul, map_ratCast, RingHom.id_apply]
-        rw [show ∑ τ : X.Ψ, w τ * ((q : ℂ) * τ.1 x) = (q : ℂ) * ∑ τ : X.Ψ, w τ * τ.1 x by
-          rw [Finset.mul_sum]
-          exact Finset.sum_congr rfl fun τ _ => by ring]
-        rw [← Complex.ofReal_ratCast, Complex.re_ofReal_mul] }
+  let P : (X.Ψ → ℂ) → E →ₗ[ℚ] ℝ := fun w => {
+    toFun := fun x => (∑ τ : X.Ψ, w τ * τ.1 x).re
+    map_add' := fun x y => by simp [mul_add, Finset.sum_add_distrib]
+    map_smul' := fun q x => by
+      simp only [Rat.smul_def, map_mul, map_ratCast, RingHom.id_apply]
+      rw [show ∑ τ : X.Ψ, w τ * ((q : ℂ) * τ.1 x) = (q : ℂ) * ∑ τ : X.Ψ, w τ * τ.1 x by
+        rw [Finset.mul_sum]
+        exact Finset.sum_congr rfl fun τ _ => by ring]
+      rw [← Complex.ofReal_ratCast, Complex.re_ofReal_mul]
+  }
   set b := NumberField.integralBasis E with hbdef
   have hnd := traceForm_nondegenerate ℚ E
   set d := (Algebra.traceForm ℚ E).dualBasis hnd b with hddef
@@ -121,7 +124,7 @@ theorem exists_emb_eq (z : X.Ψ → ℂ)
     intro j
     have h : Algebra.traceForm ℚ E ω (b j) = 2 * q j := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hωdef, map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, hddef,
+      simp only [hωdef, map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, hddef,
         LinearMap.BilinForm.apply_dualBasis_left, smul_eq_mul, mul_ite, mul_one, mul_zero,
         Finset.sum_ite_eq, Finset.mem_univ, if_true]
     simpa [Algebra.traceForm_apply] using h
@@ -145,9 +148,11 @@ theorem exists_emb_eq (z : X.Ψ → ℂ)
   have hP0 : P w = 0 := b.ext fun j => by rw [hPb j, LinearMap.zero_apply]
   have hPw : ∀ x : E, (∑ τ : X.Ψ, w τ * τ.1 x).re = 0 := fun x => LinearMap.congr_fun hP0 x
   let W : (E →+* ℂ) → ℂ := fun φ =>
-    if h : φ ∈ X.Ψ then w ⟨φ, h⟩ else conj (w ⟨ComplexEmbedding.conjugate φ, (X.conj_mem_iff φ).2 h⟩)
-  have hW1 : ∀ τ : X.Ψ, W τ.1 = w τ := fun τ => by
-    simp only [W, dif_pos τ.2]
+    if h : φ ∈ X.Ψ then
+      w ⟨φ, h⟩
+    else
+      conj (w ⟨ComplexEmbedding.conjugate φ, (X.conj_mem_iff φ).2 h⟩)
+  have hW1 : ∀ τ : X.Ψ, W τ.1 = w τ := fun τ => by simp only [W, dif_pos τ.2]
   have hW2 : ∀ τ : X.Ψ, W (ComplexEmbedding.conjugate τ.1) = conj (w τ) := fun τ => by
     have hn : ComplexEmbedding.conjugate τ.1 ∉ X.Ψ := fun hc => (X.conj_mem_iff τ.1).1 hc τ.2
     simp only [W, dif_neg hn]
@@ -160,7 +165,8 @@ theorem exists_emb_eq (z : X.Ψ → ℂ)
     rw [← Complex.ofReal_sum, ← Finset.mul_sum, ← Complex.re_sum, hPw x, mul_zero,
       Complex.ofReal_zero]
   have hli : LinearIndependent ℂ (fun φ : E →+* ℂ => (φ : E → ℂ)) :=
-    (linearIndependent_monoidHom E ℂ).comp (fun φ : E →+* ℂ => (φ : E →* ℂ))
+    (linearIndependent_monoidHom E ℂ).comp
+      (fun φ : E →+* ℂ => (φ : E →* ℂ))
       (fun a a' h => RingHom.ext fun x => congrArg (fun f : E →* ℂ => f x) h)
   have hsumfun : ∑ φ : E →+* ℂ, W φ • (φ : E → ℂ) = 0 := by
     funext x
@@ -177,11 +183,13 @@ theorem nonempty_Psi : Nonempty X.Ψ := by
   rw [← Fintype.card_pos_iff]
   omega
 
-theorem exists_emb_int (z : X.Ψ → ℂ) (g : ℕ) (hg : 0 < g)
-    (hz : ∀ γ : 𝓞 E, ∃ k : ℤ, ((2 * g * (NumberField.discr E).natAbs : ℕ) : ℝ) *
-      (∑ τ : X.Ψ, z τ * τ.1 (γ : E)).re = k) :
-    ∃ ω : E, (∀ τ : X.Ψ, z τ = τ.1 ω) ∧
-      IsIntegral ℤ (((g * (NumberField.discr E).natAbs ^ 2 : ℕ) : E) * ω) := by
+theorem exists_emb_int
+    (z : X.Ψ → ℂ) (g : ℕ) (hg : 0 < g)
+    (hz : ∀ γ : 𝓞 E, ∃ k : ℤ,
+      ((2 * g * (NumberField.discr E).natAbs : ℕ) : ℝ) * (∑ τ : X.Ψ, z τ * τ.1 (γ : E)).re = k)
+    : ∃ ω : E,
+      (∀ τ : X.Ψ, z τ = τ.1 ω)
+        ∧ IsIntegral ℤ (((g * (NumberField.discr E).natAbs ^ 2 : ℕ) : E) * ω) := by
   have hN : ∀ γ : 𝓞 E, ∃ q : ℚ, (∑ τ : X.Ψ, z τ * τ.1 (γ : E)).re = q := by
     intro γ
     obtain ⟨k, hk⟩ := hz γ
@@ -193,26 +201,31 @@ theorem exists_emb_int (z : X.Ψ → ℂ) (g : ℕ) (hg : 0 < g)
     exact hk
   obtain ⟨ω, hω⟩ := X.exists_emb_eq z hN
   refine ⟨ω, hω, ?_⟩
-  have key : ∀ γ : 𝓞 E, ∃ k : ℤ,
-      Algebra.trace ℚ E (((g * (NumberField.discr E).natAbs : ℕ) : E) * ω * γ) = k := by
+  have key
+      : ∀ γ : 𝓞 E, ∃ k : ℤ,
+        Algebra.trace ℚ E (((g * (NumberField.discr E).natAbs : ℕ) : E) * ω * γ) = k := by
     intro γ
     obtain ⟨k, hk⟩ := hz γ
     refine ⟨k, ?_⟩
     have hs : ∑ τ : X.Ψ, z τ * τ.1 (γ : E) = ∑ τ : X.Ψ, τ.1 (ω * γ) :=
       Finset.sum_congr rfl fun τ _ => by rw [hω τ, map_mul]
     rw [hs, X.re_sum_Psi] at hk
-    have htr : Algebra.trace ℚ E (((g * (NumberField.discr E).natAbs : ℕ) : E) * ω * γ) =
-        ((g * (NumberField.discr E).natAbs : ℕ) : ℚ) * Algebra.trace ℚ E (ω * γ) := by
+    have htr
+        : Algebra.trace ℚ E (((g * (NumberField.discr E).natAbs : ℕ) : E) * ω * γ)
+          = ((g * (NumberField.discr E).natAbs : ℕ) : ℚ) * Algebra.trace ℚ E (ω * γ) := by
       rw [mul_assoc, ← nsmul_eq_mul, map_nsmul, nsmul_eq_mul]
     rw [htr]
-    have h2 : ((((g * (NumberField.discr E).natAbs : ℕ) : ℚ) * Algebra.trace ℚ E (ω * γ) : ℚ) : ℝ) =
-        ((k : ℚ) : ℝ) := by
+    have h2
+        : ((((g * (NumberField.discr E).natAbs : ℕ) : ℚ) * Algebra.trace ℚ E (ω * γ) : ℚ) : ℝ)
+          = ((k : ℚ) : ℝ) := by
       push_cast at hk ⊢
       linear_combination hk
     exact_mod_cast h2
   have hint := d4l2_dual_int' (((g * (NumberField.discr E).natAbs : ℕ) : E) * ω) key
-  have e : (((g * (NumberField.discr E).natAbs ^ 2 : ℕ)) : E) * ω =
-      ((NumberField.discr E).natAbs : E) * (((g * (NumberField.discr E).natAbs : ℕ) : E) * ω) := by
+  have e
+      : (((g * (NumberField.discr E).natAbs ^ 2 : ℕ)) : E) * ω
+        = ((NumberField.discr E).natAbs : E)
+          * (((g * (NumberField.discr E).natAbs : ℕ) : E) * ω) := by
     push_cast
     ring
   rw [e]

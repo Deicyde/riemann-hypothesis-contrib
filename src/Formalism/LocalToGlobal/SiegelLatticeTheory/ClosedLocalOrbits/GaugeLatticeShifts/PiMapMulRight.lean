@@ -16,9 +16,11 @@ section Dens
 
 variable {ι : Type} [Fintype ι] {α : ι → Type} [∀ i, MeasurableSpace (α i)]
 
-theorem pi_withDensity (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (f : ∀ i, α i → ℝ≥0∞)
-    (hf : ∀ i, Measurable (f i)) (hfin : ∀ i x, f i x ≠ ∞) :
-    Measure.pi (fun i => (μ i).withDensity (f i)) = (Measure.pi μ).withDensity (fun x => ∏ i, f i (x i)) := by
+theorem pi_withDensity
+    (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)]
+    (f : ∀ i, α i → ℝ≥0∞) (hf : ∀ i, Measurable (f i)) (hfin : ∀ i x, f i x ≠ ∞)
+    : Measure.pi (fun i => (μ i).withDensity (f i))
+      = (Measure.pi μ).withDensity (fun x => ∏ i, f i (x i)) := by
   haveI : ∀ i, SigmaFinite ((μ i).withDensity (f i)) := fun i =>
     SigmaFinite.withDensity_of_ne_top (ae_of_all _ (hfin i))
   refine Measure.pi_eq fun s hs => ?_
@@ -27,16 +29,19 @@ theorem pi_withDensity (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] 
   refine Finset.prod_congr rfl fun i _ => ?_
   rw [withDensity_apply _ (hs i)]
 
-theorem pi_conc (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (S : ∀ i, Set (α i))
-    (h : ∀ i, μ i (S i)ᶜ = 0) : Measure.pi μ (Set.univ.pi S)ᶜ = 0 := by
+theorem pi_conc
+    (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (S : ∀ i, Set (α i)) (h : ∀ i, μ i (S i)ᶜ = 0)
+    : Measure.pi μ (Set.univ.pi S)ᶜ = 0 := by
   have hsub : (Set.univ.pi S)ᶜ ⊆ ⋃ i, Function.eval i ⁻¹' (S i)ᶜ := by
     intro x hx
     simp only [Set.mem_compl_iff, Set.mem_univ_pi, not_forall] at hx
     obtain ⟨i, hi⟩ := hx
     exact Set.mem_iUnion.2 ⟨i, hi⟩
-  exact measure_mono_null hsub (measure_iUnion_null fun i => Measure.pi_eval_preimage_null (μ := μ) (h i))
+  exact measure_mono_null hsub
+    (measure_iUnion_null fun i => Measure.pi_eval_preimage_null (μ := μ) (h i))
 
-theorem pi_ne_zero (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (h : ∀ i, μ i ≠ 0) : Measure.pi μ ≠ 0 := by
+theorem pi_ne_zero (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (h : ∀ i, μ i ≠ 0)
+    : Measure.pi μ ≠ 0 := by
   intro h0
   have h1 := congrArg (fun ν : Measure (∀ i, α i) => ν Set.univ) h0
   simp only [Measure.pi_univ, Measure.coe_zero, Pi.zero_apply] at h1
@@ -47,32 +52,39 @@ end Dens
 
 section Grp
 
-variable {ι : Type} [Fintype ι] {G : ι → Type} [∀ i, Group (G i)] [∀ i, MeasurableSpace (G i)]
-  [∀ i, MeasurableMul (G i)]
+variable
+  {ι : Type} [Fintype ι]
+  {G : ι → Type} [∀ i, Group (G i)] [∀ i, MeasurableSpace (G i)] [∀ i, MeasurableMul (G i)]
 
-theorem pi_map_mul_left (μ : ∀ i, Measure (G i)) [∀ i, SigmaFinite (μ i)] (g : ∀ i, G i)
-    (h : ∀ i, (μ i).map (fun x => g i * x) = μ i) : (Measure.pi μ).map (fun x => g * x) = Measure.pi μ := by
+theorem pi_map_mul_left
+    (μ : ∀ i, Measure (G i)) [∀ i, SigmaFinite (μ i)]
+    (g : ∀ i, G i) (h : ∀ i, (μ i).map (fun x => g i * x) = μ i)
+    : (Measure.pi μ).map (fun x => g * x) = Measure.pi μ := by
   symm
   refine Measure.pi_eq fun s hs => ?_
   have hm : Measurable (fun x : ∀ i, G i => g * x) :=
     Measurable.of_eval fun i => (measurable_const_mul (g i)).comp (measurable_pi_apply i)
   rw [Measure.map_apply hm (MeasurableSet.univ_pi hs)]
-  have hpre : (fun x : ∀ i, G i => g * x) ⁻¹' Set.univ.pi s =
-      Set.univ.pi fun i => (fun y => g i * y) ⁻¹' s i := by
+  have hpre
+      : (fun x : ∀ i, G i => g * x) ⁻¹' Set.univ.pi s
+        = Set.univ.pi fun i => (fun y => g i * y) ⁻¹' s i := by
     ext x; simp [Set.mem_univ_pi]
   rw [hpre, Measure.pi_pi]
   refine Finset.prod_congr rfl fun i _ => ?_
   rw [← Measure.map_apply (measurable_const_mul (g i)) (hs i), h i]
 
-theorem pi_map_mul_right (μ : ∀ i, Measure (G i)) [∀ i, SigmaFinite (μ i)] (g : ∀ i, G i)
-    (h : ∀ i, (μ i).map (fun x => x * g i) = μ i) : (Measure.pi μ).map (fun x => x * g) = Measure.pi μ := by
+theorem pi_map_mul_right
+    (μ : ∀ i, Measure (G i)) [∀ i, SigmaFinite (μ i)]
+    (g : ∀ i, G i) (h : ∀ i, (μ i).map (fun x => x * g i) = μ i)
+    : (Measure.pi μ).map (fun x => x * g) = Measure.pi μ := by
   symm
   refine Measure.pi_eq fun s hs => ?_
   have hm : Measurable (fun x : ∀ i, G i => x * g) :=
     Measurable.of_eval fun i => (measurable_mul_const (g i)).comp (measurable_pi_apply i)
   rw [Measure.map_apply hm (MeasurableSet.univ_pi hs)]
-  have hpre : (fun x : ∀ i, G i => x * g) ⁻¹' Set.univ.pi s =
-      Set.univ.pi fun i => (fun y => y * g i) ⁻¹' s i := by
+  have hpre
+      : (fun x : ∀ i, G i => x * g) ⁻¹' Set.univ.pi s
+        = Set.univ.pi fun i => (fun y => y * g i) ⁻¹' s i := by
     ext x; simp [Set.mem_univ_pi]
   rw [hpre, Measure.pi_pi]
   refine Finset.prod_congr rfl fun i _ => ?_
@@ -82,8 +94,8 @@ end Grp
 
 section Uniq
 
-theorem exists_pos_fin {β : Type*} [MeasurableSpace β] (ν : Measure β) [SigmaFinite ν] (h : ν ≠ 0) :
-    ∃ t, MeasurableSet t ∧ ν t ≠ 0 ∧ ν t ≠ ∞ := by
+theorem exists_pos_fin {β : Type*} [MeasurableSpace β] (ν : Measure β) [SigmaFinite ν] (h : ν ≠ 0)
+    : ∃ t, MeasurableSet t ∧ ν t ≠ 0 ∧ ν t ≠ ∞ := by
   by_contra hne
   push_neg at hne
   apply h
@@ -92,16 +104,21 @@ theorem exists_pos_fin {β : Type*} [MeasurableSpace β] (ν : Measure β) [Sigm
   by_contra hn
   exact (measure_spanningSets_lt_top ν n).ne (hne _ (measurableSet_spanningSets ν n) hn)
 
-theorem uniq_on_closed {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
-    [MeasurableSpace G] [BorelSpace G] (H : Subgroup G) (hH : IsClosed (H : Set G)) (μ ν : Measure G)
-    [SigmaFinite μ] [SigmaFinite ν] (hμc : μ (H : Set G)ᶜ = 0) (hνc : ν (H : Set G)ᶜ = 0)
-    (hμi : ∀ h ∈ H, μ.map (fun x => h * x) = μ) (hνi : ∀ h ∈ H, ν.map (fun x => h * x) = ν) (hμ0 : μ ≠ 0)
-    (hν0 : ν ≠ 0) : ∃ κ : ℝ≥0∞, κ ≠ 0 ∧ κ ≠ ∞ ∧ μ = κ • ν := by
+theorem uniq_on_closed
+    {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
+    [MeasurableSpace G] [BorelSpace G]
+    (H : Subgroup G) (hH : IsClosed (H : Set G))
+    (μ ν : Measure G) [SigmaFinite μ] [SigmaFinite ν]
+    (hμc : μ (H : Set G)ᶜ = 0) (hνc : ν (H : Set G)ᶜ = 0)
+    (hμi : ∀ h ∈ H, μ.map (fun x => h * x) = μ) (hνi : ∀ h ∈ H, ν.map (fun x => h * x) = ν)
+    (hμ0 : μ ≠ 0) (hν0 : ν ≠ 0)
+    : ∃ κ : ℝ≥0∞, κ ≠ 0 ∧ κ ≠ ∞ ∧ μ = κ • ν := by
   classical
   have hHm : MeasurableSet (H : Set G) := hH.measurableSet
   have he : MeasurableEmbedding (Subtype.val : H → G) := MeasurableEmbedding.subtype_coe hHm
-  have hback : ∀ (m : Measure G), m (H : Set G)ᶜ = 0 →
-      (m.comap (Subtype.val : H → G)).map Subtype.val = m := by
+  have hback
+      : ∀ (m : Measure G),
+        m (H : Set G)ᶜ = 0 → (m.comap (Subtype.val : H → G)).map Subtype.val = m := by
     intro m hm
     rw [he.map_comap]
     refine Measure.restrict_eq_self_of_ae_mem ?_
@@ -109,14 +126,17 @@ theorem uniq_on_closed {G : Type*} [Group G] [TopologicalSpace G] [IsTopological
     convert hm using 2
     ext x
     simp
-  have hinv : ∀ (m : Measure G), (∀ h ∈ H, m.map (fun x => h * x) = m) →
-      (m.comap (Subtype.val : H → G)).IsMulLeftInvariant := by
+  have hinv
+      : ∀ (m : Measure G),
+        (∀ h ∈ H, m.map (fun x => h * x) = m)
+          → (m.comap (Subtype.val : H → G)).IsMulLeftInvariant := by
     intro m hm
     refine ⟨fun g => ?_⟩
     ext s hs
     rw [Measure.map_apply (measurable_const_mul g) hs, he.comap_apply, he.comap_apply]
-    have himg : Subtype.val '' ((fun x : H => g * x) ⁻¹' s) =
-        (fun x : G => (g : G) * x) ⁻¹' (Subtype.val '' s) := by
+    have himg
+        : Subtype.val '' ((fun x : H => g * x) ⁻¹' s)
+          = (fun x : G => (g : G) * x) ⁻¹' (Subtype.val '' s) := by
       ext x
       simp only [Set.mem_image, Set.mem_preimage]
       constructor
@@ -133,8 +153,9 @@ theorem uniq_on_closed {G : Type*} [Group G] [TopologicalSpace G] [IsTopological
         exact hy
     rw [himg, ← Measure.map_apply (measurable_const_mul (g : G)) (he.measurableSet_image.2 hs),
       hm g g.2]
-  have hsf : ∀ (m : Measure G) [SigmaFinite m], m (H : Set G)ᶜ = 0 →
-      SigmaFinite (m.comap (Subtype.val : H → G)) := by
+  have hsf
+      : ∀ (m : Measure G) [SigmaFinite m],
+        m (H : Set G)ᶜ = 0 → SigmaFinite (m.comap (Subtype.val : H → G)) := by
     intro m _ hm
     refine SigmaFinite.of_map _ he.measurable.aemeasurable ?_
     rw [hback m hm]
@@ -153,7 +174,8 @@ theorem uniq_on_closed {G : Type*} [Group G] [TopologicalSpace G] [IsTopological
   haveI : SecondCountableTopology H := TopologicalSpace.Subtype.secondCountableTopology (H : Set G)
   haveI : MeasurableMul₂ H := ContinuousMul.measurableMul₂
   haveI : MeasurableInv H := ContinuousInv.measurableInv
-  have key := measure_eq_div_smul (μ.comap (Subtype.val : H → G)) (ν.comap (Subtype.val : H → G)) htν0 htνi
+  have key :=
+    measure_eq_div_smul (μ.comap (Subtype.val : H → G)) (ν.comap (Subtype.val : H → G)) htν0 htνi
   set κ := μ.comap (Subtype.val : H → G) t / ν.comap (Subtype.val : H → G) t with hκ
   have hval := congrArg (fun m : Measure H => m t') key
   simp only [Measure.smul_apply, smul_eq_mul] at hval

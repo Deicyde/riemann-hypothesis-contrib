@@ -22,7 +22,9 @@ def adjSub : Subalgebra ℂ (DQ P).Pr where
   mul_mem' {a b} ha hb := ((Formalism.FourierDecayAlt.P.adjoint_closed P.r P.TT).2.1 a b ha hb).2
   add_mem' {a b} ha hb := ((Formalism.FourierDecayAlt.P.adjoint_closed P.r P.TT).2.1 a b ha hb).1
   algebraMap_mem' z := by
-    have h := (Formalism.FourierDecayAlt.P.adjoint_closed P.r P.TT).2.2.1 z 1 (Formalism.FourierDecayAlt.P.adjoint_closed P.r P.TT).1
+    have h :=
+      (Formalism.FourierDecayAlt.P.adjoint_closed P.r P.TT).2.2.1 z 1
+        (Formalism.FourierDecayAlt.P.adjoint_closed P.r P.TT).1
     rw [Algebra.algebraMap_eq_smul_one]
     exact h
 
@@ -32,9 +34,11 @@ theorem adjSub_star {a : (DQ P).Pr} (ha : a ∈ adjSub P) : star a ∈ adjSub P 
 theorem gen_adj (hτ : 0 ≤ P.TT) {w : (DQ P).Pr} (hw : w ∈ (DQ P).gens P.TT) : w ∈ adjSub P :=
   Formalism.FourierDecayAlt.P.adjoint_generators P.r P.TT hτ w hw
 
-abbrev MSa : Subalgebra ℂ (A P (DQ P)) := Formalism.FourierDecayAlt.P.MAx2.Jet.matSub (adjSub P) (M.Ty P)
+abbrev MSa : Subalgebra ℂ (A P (DQ P)) :=
+  Formalism.FourierDecayAlt.P.MAx2.Jet.matSub (adjSub P) (M.Ty P)
 
-theorem sc_memMS (hτ : 0 ≤ P.TT) {w : (DQ P).Pr} (hw : w ∈ (DQ P).gens P.TT) : sc P (DQ P) w ∈ MSa P :=
+theorem sc_memMS (hτ : 0 ≤ P.TT) {w : (DQ P).Pr} (hw : w ∈ (DQ P).gens P.TT)
+    : sc P (DQ P) w ∈ MSa P :=
   Formalism.FourierDecayAlt.P.MAx2.Jet.scalar_mem _ _ (gen_adj P hτ hw)
 
 theorem star_memMS {a : A P (DQ P)} (ha : a ∈ MSa P) : star a ∈ MSa P := fun i j => by
@@ -73,51 +77,69 @@ theorem lv_ggi : L.GGi ∈ MSa P := by
   rw [hL.2.2.2.2.2.2.2.2.2.2.2.1]; exact sc_memMS P hτ (by simp [DAlg.gens])
 theorem lv_nab : L.nab ∈ MSa P := by
   rw [hL.2.2.2.2.2.2.2.2.2.2.2.2.1]
-  refine Formalism.FourierDecayAlt.P.MAx2.Jet.diag_mem _ _ fun π => add_mem (gen_adj P hτ (by simp [DAlg.gens]))
-    (Subalgebra.smul_mem _ (mul_mem (gen_adj P hτ (by simp [DAlg.gens])) (gen_adj P hτ (by simp [DAlg.gens]))) _)
+  refine Formalism.FourierDecayAlt.P.MAx2.Jet.diag_mem _ _ fun π =>
+    add_mem (gen_adj P hτ (by simp [DAlg.gens]))
+      (Subalgebra.smul_mem _
+        (mul_mem (gen_adj P hτ (by simp [DAlg.gens])) (gen_adj P hτ (by simp [DAlg.gens]))) _)
 theorem lv_nabs : L.nabs ∈ MSa P := by
   rw [hL.2.2.2.2.2.2.2.2.2.2.2.2.2.1]
-  refine Formalism.FourierDecayAlt.P.MAx2.Jet.diag_mem _ _ fun π => add_mem (neg_mem (gen_adj P hτ (by simp [DAlg.gens])))
-    (Subalgebra.smul_mem _ (mul_mem (gen_adj P hτ (by simp [DAlg.gens])) (gen_adj P hτ (by simp [DAlg.gens]))) _)
+  refine Formalism.FourierDecayAlt.P.MAx2.Jet.diag_mem _ _ fun π =>
+    add_mem (neg_mem (gen_adj P hτ (by simp [DAlg.gens])))
+      (Subalgebra.smul_mem _
+        (mul_mem (gen_adj P hτ (by simp [DAlg.gens])) (gen_adj P hτ (by simp [DAlg.gens]))) _)
 
 theorem lv_Dr : L.Dr ∈ MSa P := by
   unfold LevelData.Dr
   refine Subalgebra.list_prod_mem _ fun x hx => ?_
-  rw [List.mem_ofFn] at hx; obtain ⟨l, rfl⟩ := hx; exact lv_c hτ hL l
+  rw [List.mem_ofFn] at hx
+  obtain ⟨l, rfl⟩ := hx
+  exact lv_c hτ hL l
 theorem lv_Drb : L.Drb ∈ MSa P := by
   unfold LevelData.Drb
   refine Subalgebra.list_prod_mem _ fun x hx => ?_
-  rw [List.mem_ofFn] at hx; obtain ⟨l, rfl⟩ := hx; exact lv_cb hτ hL l
+  rw [List.mem_ofFn] at hx
+  obtain ⟨l, rfl⟩ := hx
+  exact lv_cb hτ hL l
 theorem lv_Dri : L.Dri ∈ MSa P := by
   unfold LevelData.Dri
   refine Subalgebra.list_prod_mem _ fun x hx => ?_
-  rw [List.mem_ofFn] at hx; obtain ⟨l, rfl⟩ := hx; exact lv_ci hτ hL l
+  rw [List.mem_ofFn] at hx
+  obtain ⟨l, rfl⟩ := hx
+  exact lv_ci hτ hL l
 theorem lv_Drbi : L.Drbi ∈ MSa P := by
   unfold LevelData.Drbi
   refine Subalgebra.list_prod_mem _ fun x hx => ?_
-  rw [List.mem_ofFn] at hx; obtain ⟨l, rfl⟩ := hx; exact lv_cbi hτ hL l
+  rw [List.mem_ofFn] at hx
+  obtain ⟨l, rfl⟩ := hx
+  exact lv_cbi hτ hL l
 
-theorem lv_Tprod (Y : ℂ) : L.Tprod Y ∈ Formalism.FourierDecayAlt.P.MAx2.Jet.matSub (MSa P) (Fin 2) := by
+theorem lv_Tprod (Y : ℂ)
+    : L.Tprod Y ∈ Formalism.FourierDecayAlt.P.MAx2.Jet.matSub (MSa P) (Fin 2) := by
   unfold LevelData.Tprod
   refine Subalgebra.list_prod_mem _ fun M hM => ?_
   rw [List.mem_reverse, List.mem_ofFn] at hM
   obtain ⟨l, rfl⟩ := hM
   intro i j
-  fin_cases i <;> fin_cases j <;> simp only [LevelData.Tl, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
-    Matrix.cons_val_one, Matrix.head_cons, Matrix.empty_val', Matrix.cons_val_fin_one, Matrix.head_fin_const]
+  fin_cases i <;> fin_cases j
+    <;> simp only [LevelData.Tl, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
+      Matrix.cons_val_one, Matrix.head_cons, Matrix.empty_val', Matrix.cons_val_fin_one,
+      Matrix.head_fin_const]
   · exact add_mem (Subalgebra.algebraMap_mem _ _) (lv_p hτ hL l)
   · exact neg_mem (lv_c hτ hL l)
   · exact lv_ci hτ hL l
   · exact zero_mem _
 
-theorem lv_Tvprod (Y : ℂ) : L.Tvprod Y ∈ Formalism.FourierDecayAlt.P.MAx2.Jet.matSub (MSa P) (Fin 2) := by
+theorem lv_Tvprod (Y : ℂ)
+    : L.Tvprod Y ∈ Formalism.FourierDecayAlt.P.MAx2.Jet.matSub (MSa P) (Fin 2) := by
   unfold LevelData.Tvprod
   refine Subalgebra.list_prod_mem _ fun M hM => ?_
   rw [List.mem_reverse, List.mem_ofFn] at hM
   obtain ⟨l, rfl⟩ := hM
   intro i j
-  fin_cases i <;> fin_cases j <;> simp only [LevelData.Tvl, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
-    Matrix.cons_val_one, Matrix.head_cons, Matrix.empty_val', Matrix.cons_val_fin_one, Matrix.head_fin_const]
+  fin_cases i <;> fin_cases j
+    <;> simp only [LevelData.Tvl, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
+      Matrix.cons_val_one, Matrix.head_cons, Matrix.empty_val', Matrix.cons_val_fin_one,
+      Matrix.head_fin_const]
   · exact sub_mem (Subalgebra.algebraMap_mem _ _) (lv_pb hτ hL l)
   · exact neg_mem (lv_cb hτ hL l)
   · exact lv_cbi hτ hL l
@@ -126,10 +148,13 @@ theorem lv_Tvprod (Y : ℂ) : L.Tvprod Y ∈ Formalism.FourierDecayAlt.P.MAx2.Je
 theorem lv_hat {X : A P (DQ P)} (hX : X ∈ hatSet P L) : X ∈ MSa P := by
   have hl0 : ∀ Y, L.l0 Y ∈ MSa P := fun Y => by
     unfold LevelData.l0
-    exact sub_mem (neg_mem (lv_nab hτ hL)) (mul_mem (Subalgebra.algebraMap_mem _ _) (mul_mem (lv_zb hτ hL) (lv_ggi hτ hL)))
+    exact sub_mem (neg_mem (lv_nab hτ hL))
+      (mul_mem (Subalgebra.algebraMap_mem _ _) (mul_mem (lv_zb hτ hL) (lv_ggi hτ hL)))
   have hm0 : ∀ Y, L.m0 Y ∈ MSa P := fun Y => by
     unfold LevelData.m0
-    exact sub_mem (neg_mem (lv_nabs hτ hL)) (mul_mem (Subalgebra.algebraMap_mem _ _) (mul_mem (zeta_mem_self_adjoint hτ hL) (lv_ggi hτ hL)))
+    exact sub_mem (neg_mem (lv_nabs hτ hL))
+      (mul_mem (Subalgebra.algebraMap_mem _ _)
+        (mul_mem (zeta_mem_self_adjoint hτ hL) (lv_ggi hτ hL)))
   rcases hX with ((⟨Y, rfl⟩ | ⟨Y, rfl⟩) | ⟨Y, rfl⟩) | ⟨Y, rfl⟩
   · exact mul_mem (lv_Dr hτ hL) (lv_Tprod hτ hL Y 0 0)
   · exact mul_mem (mul_mem (lv_Drb hτ hL) (lv_gg hτ hL))

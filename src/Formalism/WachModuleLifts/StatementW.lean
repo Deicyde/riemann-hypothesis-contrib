@@ -19,8 +19,9 @@ structure Base (p : ℕ) [Fact p.Prime] (A : Type) [CommRing A] [Algebra ℤ_[p]
 
 variable {p : ℕ} [Fact p.Prime] {A : Type} [CommRing A] [Algebra ℤ_[p] A]
 
-structure WachMod (B : Base p A) (η : ℕ) (D : Type) [AddCommGroup D] [Module A D]
-    [Module ℤ_[p] D] [IsScalarTower ℤ_[p] A D] where
+structure WachMod
+    (B : Base p A) (η : ℕ)
+    (D : Type) [AddCommGroup D] [Module A D] [Module ℤ_[p] D] [IsScalarTower ℤ_[p] A D] where
   N : Submodule A D
   φ : D →ₗ[ℤ_[p]] D
   γ : D →ₗ[ℤ_[p]] D
@@ -35,8 +36,10 @@ structure WachMod (B : Base p A) (η : ℕ) (D : Type) [AddCommGroup D] [Module 
 
 namespace WachMod
 
-variable {B : Base p A} {η : ℕ} {D : Type} [AddCommGroup D] [Module A D] [Module ℤ_[p] D]
-  [IsScalarTower ℤ_[p] A D] (W : WachMod B η D)
+variable
+  {B : Base p A} {η : ℕ} {D : Type}
+  [AddCommGroup D] [Module A D] [Module ℤ_[p] D] [IsScalarTower ℤ_[p] A D]
+  (W : WachMod B η D)
 
 end WachMod
 
@@ -44,11 +47,11 @@ variable {B : Base p A} {η : ℕ}
 
 section Hyp
 
-variable {D₀ D₁ D₂ : Type}
-    [AddCommGroup D₀] [Module A D₀] [Module ℤ_[p] D₀] [IsScalarTower ℤ_[p] A D₀]
-    [AddCommGroup D₁] [Module A D₁] [Module ℤ_[p] D₁] [IsScalarTower ℤ_[p] A D₁]
-    [AddCommGroup D₂] [Module A D₂] [Module ℤ_[p] D₂] [IsScalarTower ℤ_[p] A D₂]
-    {W₀ : WachMod B η D₀} {W₁ : WachMod B η D₁} {W₂ : WachMod B η D₂}
+variable
+  {D₀ D₁ D₂ : Type} [AddCommGroup D₀] [Module A D₀] [Module ℤ_[p] D₀] [IsScalarTower ℤ_[p] A D₀]
+  [AddCommGroup D₁] [Module A D₁] [Module ℤ_[p] D₁] [IsScalarTower ℤ_[p] A D₁] [AddCommGroup D₂]
+  [Module A D₂] [Module ℤ_[p] D₂] [IsScalarTower ℤ_[p] A D₂]
+  {W₀ : WachMod B η D₀} {W₁ : WachMod B η D₁} {W₂ : WachMod B η D₂}
 
 end Hyp
 

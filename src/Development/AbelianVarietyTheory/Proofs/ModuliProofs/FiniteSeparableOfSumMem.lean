@@ -9,22 +9,26 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 
 namespace GlobalTheory.TameResidue
 
-theorem exists_sum_ne_zero {D k K : Type} [Group D] [Fintype D] [Field k] [Field K] [Algebra k K]
-    (φ : D →* (K ≃ₐ[k] K)) (h : (Nat.card φ.ker : K) ≠ 0) : ∃ w : K, ∑ g, φ g w ≠ 0 := by
+theorem exists_sum_ne_zero
+    {D k K : Type} [Group D] [Fintype D] [Field k] [Field K] [Algebra k K]
+    (φ : D →* (K ≃ₐ[k] K)) (h : (Nat.card φ.ker : K) ≠ 0)
+    : ∃ w : K, ∑ g, φ g w ≠ 0 := by
   classical
   by_contra hcon
   push_neg at hcon
-  have hf : Function.Injective (fun σ : K ≃ₐ[k] K => (σ : K →* K)) :=
-    fun σ τ hστ => AlgEquiv.ext fun x => DFunLike.congr_fun hστ x
+  have hf : Function.Injective (fun σ : K ≃ₐ[k] K => (σ : K →* K)) := fun σ τ hστ =>
+    AlgEquiv.ext fun x => DFunLike.congr_fun hστ x
   have hli := (linearIndependent_monoidHom K K).comp _ hf
-  have hfib : ∀ σ ∈ Finset.univ.image φ,
-      (Finset.univ.filter fun g => φ g = σ).card = Nat.card φ.ker := by
+  have hfib
+      : ∀ σ ∈ Finset.univ.image φ, (Finset.univ.filter fun g => φ g = σ).card = Nat.card φ.ker := by
     intro σ hσ
     obtain ⟨g0, -, rfl⟩ := Finset.mem_image.1 hσ
     rw [MonoidHom.card_fiber_eq_of_mem_range φ ⟨g0, rfl⟩ ⟨1, rfl⟩, map_one,
@@ -37,17 +41,19 @@ theorem exists_sum_ne_zero {D k K : Type} [Group D] [Fintype D] [Field k] [Field
     refine Finset.sum_congr rfl fun σ hσ => ?_
     rw [Finset.sum_congr rfl (fun g hg => by rw [(Finset.mem_filter.1 hg).2]), Finset.sum_const,
       hfib σ hσ, nsmul_eq_mul]
-  refine h (linearIndependent_iff'.1 hli (Finset.univ.image φ) (fun _ => (Nat.card φ.ker : K)) ?_ (φ 1)
-    (Finset.mem_image_of_mem _ (Finset.mem_univ 1)))
+  refine h (linearIndependent_iff'.1 hli (Finset.univ.image φ)
+    (fun _ => (Nat.card φ.ker : K))
+    ?_ (φ 1) (Finset.mem_image_of_mem _ (Finset.mem_univ 1)))
   funext w
   have hw := hcon w
   rw [hsum w] at hw
   simpa [Finset.sum_apply] using hw
 
-theorem finite_separable_of_sum_mem {D k K : Type} [Group D] [Fintype D] [Field k] [Field K]
-    [Algebra k K] (φ : D →* (K ≃ₐ[k] K)) (h : (Nat.card φ.ker : K) ≠ 0)
-    (hT : ∀ x : K, ∃ c : k, algebraMap k K c = ∑ g, φ g x) :
-    FiniteDimensional k K ∧ Algebra.IsSeparable k K := by
+theorem finite_separable_of_sum_mem
+    {D k K : Type} [Group D] [Fintype D] [Field k] [Field K] [Algebra k K]
+    (φ : D →* (K ≃ₐ[k] K))
+    (h : (Nat.card φ.ker : K) ≠ 0) (hT : ∀ x : K, ∃ c : k, algebraMap k K c = ∑ g, φ g x)
+    : FiniteDimensional k K ∧ Algebra.IsSeparable k K := by
   classical
   obtain ⟨w, hw⟩ := exists_sum_ne_zero φ h
   obtain ⟨c, hc⟩ := hT w
@@ -59,8 +65,8 @@ theorem finite_separable_of_sum_mem {D k K : Type} [Group D] [Fintype D] [Field 
     rw [map_div₀, hc', div_eq_iff hcw, hc]
     simp only [map_mul, hy, Finset.mul_sum]
   letI : MulSemiringAction D K := MulSemiringAction.compHom K φ
-  have hF : ∀ x : FixedPoints.subfield D K, ∃ c' : k, algebraMap k K c' = x :=
-    fun x => hfix x fun g => x.2 g
+  have hF : ∀ x : FixedPoints.subfield D K, ∃ c' : k, algebraMap k K c' = x := fun x =>
+    hfix x fun g => x.2 g
   refine ⟨?_, ?_⟩
   · let b := Module.finBasis (FixedPoints.subfield D K) K
     refine ⟨⟨Finset.univ.image b, eq_top_iff.2 fun x _ => ?_⟩⟩
@@ -71,13 +77,14 @@ theorem finite_separable_of_sum_mem {D k K : Type} [Group D] [Fintype D] [Field 
       rw [Algebra.smul_def, Algebra.smul_def, hc']
       rfl
     rw [he]
-    exact Submodule.smul_mem _ c' (Submodule.subset_span
-      (Finset.mem_coe.2 (Finset.mem_image_of_mem b (Finset.mem_univ i))))
+    exact Submodule.smul_mem _ c'
+      (Submodule.subset_span (Finset.mem_coe.2 (Finset.mem_image_of_mem b (Finset.mem_univ i))))
   · refine ⟨fun x => ?_⟩
     have hsF : (minpoly (FixedPoints.subfield D K) x).Separable :=
       Algebra.IsSeparable.isSeparable (FixedPoints.subfield D K) x
-    have hl : (minpoly (FixedPoints.subfield D K) x).map
-        (algebraMap (FixedPoints.subfield D K) K) ∈ Polynomial.lifts (algebraMap k K) := by
+    have hl
+        : (minpoly (FixedPoints.subfield D K) x).map (algebraMap (FixedPoints.subfield D K) K)
+          ∈ Polynomial.lifts (algebraMap k K) := by
       rw [Polynomial.lifts_iff_coeff_lifts]
       intro n
       rw [Polynomial.coeff_map]
@@ -92,17 +99,18 @@ theorem finite_separable_of_sum_mem {D k K : Type} [Group D] [Fintype D] [Field 
         ← Polynomial.aeval_def, minpoly.aeval]
     exact hsep.of_dvd (minpoly.dvd k x hx)
 
-theorem exists_not_mem_smul_mem {Γ B : Type} [Group Γ] [Finite Γ] [CommRing B]
-    [MulSemiringAction Γ B] (q : Ideal B) [q.IsPrime] :
-    ∃ y : B, y ∉ q ∧ ∀ g : Γ, g • q ≠ q → g • y ∈ q := by
+theorem exists_not_mem_smul_mem
+    {Γ B : Type} [Group Γ] [Finite Γ] [CommRing B] [MulSemiringAction Γ B] (q : Ideal B) [q.IsPrime]
+    : ∃ y : B, y ∉ q ∧ ∀ g : Γ, g • q ≠ q → g • y ∈ q := by
   classical
   have hpow : ∀ h : Γ, h ^ (Nat.card Γ - 1) = h⁻¹ := fun h =>
-    eq_inv_of_mul_eq_one_left (by rw [← pow_succ, Nat.sub_add_cancel Nat.card_pos, pow_card_eq_one'])
+    eq_inv_of_mul_eq_one_left (by
+      rw [← pow_succ, Nat.sub_add_cancel Nat.card_pos, pow_card_eq_one'])
   have hex : ∀ g : Γ, ∃ a : B, a ∉ q ∧ (g • q ≠ q → g • a ∈ q) := by
     intro g
     by_cases hg : g • q = q
-    · exact ⟨1, (Ideal.ne_top_iff_one q).1 (Ideal.IsPrime.ne_top inferInstance),
-        fun h => absurd hg h⟩
+    · exact
+        ⟨1, (Ideal.ne_top_iff_one q).1 (Ideal.IsPrime.ne_top inferInstance), fun h => absurd hg h⟩
     · by_contra hcon
       apply hg
       have h1 : ∀ a : B, g • a ∈ q → a ∈ q := fun a ha =>
@@ -127,7 +135,17 @@ theorem exists_not_mem_smul_mem {Γ B : Type} [Group Γ] [Finite Γ] [CommRing B
   · rw [Finset.smul_prod']
     exact q.mem_of_dvd (Finset.dvd_prod_of_mem (fun i => g • a i) (Finset.mem_univ g)) ((ha g).2 hg)
 
-theorem residue_finite_separable : ∀ (Γ : Type) [Group Γ] [Finite Γ] (A B : Type) [CommRing A] [CommRing B] [Algebra A B] [MulSemiringAction Γ B] [SMulCommClass Γ A B] [Algebra.IsInvariant A B Γ] (q : Ideal B) [q.IsPrime] (k K : Type) [Field k] [Field K] [Algebra (A ⧸ q.under A) k] [IsFractionRing (A ⧸ q.under A) k] [Algebra (B ⧸ q) K] [IsFractionRing (B ⧸ q) K] [Algebra k K], (∀ a : A, algebraMap k K (algebraMap (A ⧸ q.under A) k (Ideal.Quotient.mk _ a)) = algebraMap (B ⧸ q) K (Ideal.Quotient.mk q (algebraMap A B a))) → (Nat.card (q.inertia Γ) : B) ∉ q → FiniteDimensional k K ∧ Algebra.IsSeparable k K := by
+theorem residue_finite_separable
+    : ∀ (Γ : Type) [Group Γ] [Finite Γ] (A B : Type) [CommRing A] [CommRing B] [Algebra A B]
+        [MulSemiringAction Γ B] [SMulCommClass Γ A B] [Algebra.IsInvariant A B Γ] (q : Ideal B)
+        [q.IsPrime] (k K : Type) [Field k] [Field K] [Algebra (A ⧸ q.under A) k]
+        [IsFractionRing (A ⧸ q.under A) k] [Algebra (B ⧸ q) K] [IsFractionRing (B ⧸ q) K]
+        [Algebra k K],
+      (∀ a : A,
+          algebraMap k K (algebraMap (A ⧸ q.under A) k (Ideal.Quotient.mk _ a))
+            = algebraMap (B ⧸ q) K (Ideal.Quotient.mk q (algebraMap A B a)))
+        → (Nat.card (q.inertia Γ) : B) ∉ q
+        → FiniteDimensional k K ∧ Algebra.IsSeparable k K := by
   intro Γ _ _ A B _ _ _ _ _ _ q _ k K _ _ _ _ _ _ _ hcomp hin
   classical
   haveI := Fintype.ofFinite Γ
@@ -140,22 +158,27 @@ theorem residue_finite_separable : ∀ (Γ : Type) [Group Γ] [Finite Γ] (A B :
   let ψ := Ideal.Quotient.stabilizerHom q (q.under A) Γ
   let φ : MulAction.stabilizer Γ q →* (K ≃ₐ[k] K) :=
     (IsFractionRing.fieldEquivOfAlgEquivHom k K).comp ψ
-  have hφ : ∀ (g : MulAction.stabilizer Γ q) (u : B ⧸ q),
-      φ g (algebraMap (B ⧸ q) K u) = algebraMap (B ⧸ q) K (ψ g u) := fun g u => by
+  have hφ
+      : ∀ (g : MulAction.stabilizer Γ q) (u : B ⧸ q),
+        φ g (algebraMap (B ⧸ q) K u) = algebraMap (B ⧸ q) K (ψ g u) := fun g u => by
     simp [φ, IsFractionRing.fieldEquivOfAlgEquivHom, IsFractionRing.fieldEquivOfAlgEquiv_algebraMap]
-  have hψ : ∀ (g : MulAction.stabilizer Γ q) (b : B),
-      ψ g (Ideal.Quotient.mk q b) = Ideal.Quotient.mk q ((g : Γ) • b) := fun g b => by
-    first
-      | rfl
-      | simp [ψ, Ideal.Quotient.stabilizerHom]
+  have hψ
+      : ∀ (g : MulAction.stabilizer Γ q) (b : B),
+        ψ g (Ideal.Quotient.mk q b) = Ideal.Quotient.mk q ((g : Γ) • b) := fun g b => by
+    first | rfl | simp [ψ, Ideal.Quotient.stabilizerHom]
   have hι : ∀ u : B ⧸ q, u ≠ 0 → algebraMap (B ⧸ q) K u ≠ 0 := fun u hu h0 =>
     hu (IsFractionRing.injective (B ⧸ q) K (h0.trans (map_zero _).symm))
-  have hsplit : ∀ F : Γ → K, (∀ g : Γ, g ∉ MulAction.stabilizer Γ q → F g = 0) →
-      ∑ g, F g = ∑ g : MulAction.stabilizer Γ q, F g := by
+  have hsplit
+      : ∀ F : Γ → K,
+        (∀ g : Γ, g ∉ MulAction.stabilizer Γ q → F g = 0)
+          → ∑ g, F g = ∑ g : MulAction.stabilizer Γ q, F g := by
     intro F hF
-    have hs := Finset.sum_subset (Finset.subset_univ
-      (Finset.univ.map (Function.Embedding.subtype (· ∈ MulAction.stabilizer Γ q)))) (f := F)
-      (fun g _ hg => hF g fun hs => hg (Finset.mem_map.2 ⟨⟨g, hs⟩, Finset.mem_univ _, rfl⟩))
+    have hs :=
+      Finset.sum_subset
+        (Finset.subset_univ (Finset.univ.map (Function.Embedding.subtype
+          (· ∈ MulAction.stabilizer Γ q))))
+        (f := F)
+        (fun g _ hg => hF g fun hs => hg (Finset.mem_map.2 ⟨⟨g, hs⟩, Finset.mem_univ _, rfl⟩))
     rw [← hs, Finset.sum_map]
     rfl
   have hle : q.inertia Γ ≤ MulAction.stabilizer Γ q := by
@@ -185,11 +208,12 @@ theorem residue_finite_separable : ∀ (Γ : Type) [Group Γ] [Finite Γ] (A B :
       simp only [map_div₀, hφ, hψ, AlgEquiv.one_apply]
       rw [Ideal.Quotient.eq.2 (h u), Ideal.Quotient.eq.2 (h v)]
   have hcardeq : Nat.card φ.ker = Nat.card (q.inertia Γ) :=
-    Nat.card_congr
-      { toFun := fun g => ⟨((g.1 : MulAction.stabilizer Γ q) : Γ), (hmem g.1).1 g.2⟩
-        invFun := fun h => ⟨⟨h.1, hle h.2⟩, (hmem ⟨h.1, hle h.2⟩).2 h.2⟩
-        left_inv := fun g => rfl
-        right_inv := fun h => rfl }
+    Nat.card_congr {
+      toFun := fun g => ⟨((g.1 : MulAction.stabilizer Γ q) : Γ), (hmem g.1).1 g.2⟩
+      invFun := fun h => ⟨⟨h.1, hle h.2⟩, (hmem ⟨h.1, hle h.2⟩).2 h.2⟩
+      left_inv := fun g => rfl
+      right_inv := fun h => rfl
+    }
   have hkerK : ((Nat.card φ.ker : ℕ) : K) ≠ 0 := by
     rw [hcardeq]
     intro h0
@@ -198,19 +222,22 @@ theorem residue_finite_separable : ∀ (Γ : Type) [Group Γ] [Finite Γ] (A B :
     apply IsFractionRing.injective (B ⧸ q) K
     simpa using h0
   obtain ⟨y, hyq, hy⟩ := exists_not_mem_smul_mem (Γ := Γ) q
-  have hB : ∀ u : B ⧸ q, ∃ c : k, algebraMap k K c =
-      ∑ g, φ g (algebraMap (B ⧸ q) K u * algebraMap (B ⧸ q) K (Ideal.Quotient.mk q y)) := by
+  have hB
+      : ∀ u : B ⧸ q, ∃ c : k,
+        algebraMap k K c
+          = ∑ g, φ g (algebraMap (B ⧸ q) K u * algebraMap (B ⧸ q) K (Ideal.Quotient.mk q y)) := by
     intro u
     obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective u
-    obtain ⟨a, ha⟩ := Algebra.IsInvariant.isInvariant (A := A) (G := Γ) (∑ g : Γ, g • (b * y))
-      (fun h => by
+    obtain ⟨a, ha⟩ :=
+      Algebra.IsInvariant.isInvariant (A := A) (G := Γ) (∑ g : Γ, g • (b * y)) (fun h => by
         rw [Finset.smul_sum]
         exact Fintype.sum_equiv (Equiv.mulLeft h) _ _ (fun g => by simp [mul_smul]))
     refine ⟨algebraMap (A ⧸ q.under A) k (Ideal.Quotient.mk _ a), ?_⟩
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hcomp, ha, map_sum, map_sum]
     simp only [← map_mul, hφ, hψ]
-    refine hsplit (fun g => algebraMap (B ⧸ q) K (Ideal.Quotient.mk q (g • (b * y)))) (fun g hg => ?_)
+    refine
+      hsplit (fun g => algebraMap (B ⧸ q) K (Ideal.Quotient.mk q (g • (b * y)))) (fun g hg => ?_)
     have hne : g • q ≠ q := fun h => hg (MulAction.mem_stabilizer_iff.2 h)
     show algebraMap (B ⧸ q) K (Ideal.Quotient.mk q (g • (b * y))) = 0
     rw [smul_mul', Ideal.Quotient.eq_zero_iff_mem.2 (q.mul_mem_left _ (hy g hne)), map_zero]
@@ -241,14 +268,15 @@ theorem residue_finite_separable : ∀ (Γ : Type) [Group Γ] [Finite Γ] (A B :
       have hM : ∏ g, ψ g t2 = t2 * M' := by
         rw [← Finset.mul_prod_erase Finset.univ (fun g => ψ g t2) (Finset.mem_univ 1), map_one]
         rfl
-      have hMinv : ∀ h, φ h (algebraMap (B ⧸ q) K (∏ g, ψ g t2)) =
-          algebraMap (B ⧸ q) K (∏ g, ψ g t2) := by
+      have hMinv
+          : ∀ h, φ h (algebraMap (B ⧸ q) K (∏ g, ψ g t2)) = algebraMap (B ⧸ q) K (∏ g, ψ g t2) := by
         intro h
         rw [hφ, map_prod]
         congr 1
-        exact Fintype.prod_equiv (Equiv.mulLeft h) _ _ (fun g => by simp [map_mul, AlgEquiv.mul_apply])
-      have hM0 : ∏ g, ψ g t2 ≠ 0 := Finset.prod_ne_zero_iff.2 fun g _ h0 =>
-        ht20 ((ψ g).injective (h0.trans (map_zero _).symm))
+        exact Fintype.prod_equiv (Equiv.mulLeft h) _ _
+          (fun g => by simp [map_mul, AlgEquiv.mul_apply])
+      have hM0 : ∏ g, ψ g t2 ≠ 0 :=
+        Finset.prod_ne_zero_iff.2 fun g _ h0 => ht20 ((ψ g).injective (h0.trans (map_zero _).symm))
       have hdiv' : algebraMap (B ⧸ q) K t1 * c0 = w0 * algebraMap (B ⧸ q) K t2 := by
         rw [div_eq_div_iff (hι _ ht20) hc0] at hdiv
         exact hdiv

@@ -8,20 +8,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ZariskiConne
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem connectedSpace_pullback_of_finitelyGenerated_residue :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (S : Scheme.{0}) (π : S ⟶ Sp R),
-      IsProper π → Surjective π → Function.Bijective π.appTop.hom →
-      ∀ (K : Type) [Field K] (κ : ResidueField R →+* K) (L : Subfield K) (hL : ∀ x, κ x ∈ L) (n : ℕ) (c : Fin n → K),
-        L = Subfield.closure (Set.range κ ∪ Set.range c) →
-        ConnectedSpace (pullback π (spMap ((κ.codRestrict L hL).comp (residue R))) : Scheme.{0}) := by
+theorem connectedSpace_pullback_of_finitelyGenerated_residue
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (S : Scheme.{0})
+        (π : S ⟶ Sp R),
+      IsProper π → Surjective π → Function.Bijective π.appTop.hom
+        → ∀ (K : Type) [Field K] (κ : ResidueField R →+* K) (L : Subfield K) (hL : ∀ x, κ x ∈ L)
+            (n : ℕ) (c : Fin n → K),
+          L = Subfield.closure (Set.range κ ∪ Set.range c)
+            → ConnectedSpace
+              (pullback π (spMap ((κ.codRestrict L hL).comp (residue R))) : Scheme.{0}) := by
   intro R _ _ _ S π hprop hsurj hbij K _ κ L hL n c hLc
   haveI := hprop
   haveI := hsurj
@@ -37,7 +42,8 @@ theorem connectedSpace_pullback_of_finitelyGenerated_residue :
   have hx : spMap β = spMap φ ≫ spMap ιC := by
     rw [← hφC]
     show Spec.map (CommRingCat.ofHom (φ.comp ιC)) = Spec.map (CommRingCat.ofHom φ) ≫ Spec.map (CommRingCat.ofHom ιC)
-    rw [← Spec.map_comp]; rfl
+    rw [← Spec.map_comp]
+    rfl
 
   have hdiv : ∀ x : L, ∃ a b : A, φ b ≠ 0 ∧ φ b * x = φ a := by
     have hsub : Subring.closure (Set.range κ ∪ Set.range c) ≤ (φ.range).map L.subtype := by
@@ -60,7 +66,8 @@ theorem connectedSpace_pullback_of_finitelyGenerated_residue :
       apply Subtype.ext
       have hb' : ((φ b : L) : K) ≠ 0 := fun h => hb (Subtype.ext h)
       simp only [Subfield.coe_mul, L.subtype_apply] at hyz ⊢
-      rw [← hyz]; field_simp
+      rw [← hyz]
+      field_simp
   have hstalk : φ.SurjectiveOnStalks := by
     refine RingHom.surjectiveOnStalks_of_exists_div fun x => ?_
     obtain ⟨a, b, hb, e⟩ := hdiv x
@@ -77,10 +84,12 @@ theorem connectedSpace_pullback_of_finitelyGenerated_residue :
     show (algebraMap R A).Flat
     exact RingHom.flat_algebraMap_iff.2 inferInstance
   have hbij' : ∀ V : (Sp A).Opens, Function.Bijective (π'.app V).hom :=
-    GlobalTheory.Mum.app_bijective_of_flat_baseChange R S (Sp A) _ π (spMap ιC) _ _ inferInstance inferInstance
-      hbij hflat (IsPullback.of_hasPullback π (spMap ιC)).flip
+    GlobalTheory.Mum.app_bijective_of_flat_baseChange R S (Sp A) _ π (spMap ιC) _ _ inferInstance
+      inferInstance hbij hflat (IsPullback.of_hasPullback π (spMap ιC)).flip
   obtain ⟨q⟩ : Nonempty (PrimeSpectrum L) := inferInstance
-  have hconn := GlobalTheory.T.zariski_connectedness_isPreconnected_fibre _ _ π' inferInstance inferInstance hbij' (spMap φ q)
+  have hconn :=
+    GlobalTheory.T.zariski_connectedness_isPreconnected_fibre _ _ π' inferInstance inferInstance
+      hbij' (spMap φ q)
   have hrange : Set.range (spMap φ) = {spMap φ q} := by
     ext y
     constructor

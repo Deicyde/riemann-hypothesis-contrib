@@ -17,7 +17,8 @@ public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsNormEm
 
 noncomputable section
 
-open MeasureTheory Matrix Finset Formalism.REAL Formalism.MainNotions.S PI.DSInfCharCap GlobalTheory.CompanionTheory.UnitaryFramesMetricPeriods
+open MeasureTheory Matrix Finset Formalism.REAL Formalism.MainNotions.S PI.DSInfCharCap
+  GlobalTheory.CompanionTheory.UnitaryFramesMetricPeriods
 open scoped InnerProductSpace ComplexConjugate
 
 namespace PositivityTheory.RgHe.A

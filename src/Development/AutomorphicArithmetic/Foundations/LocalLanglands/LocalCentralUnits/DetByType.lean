@@ -15,7 +15,8 @@ noncomputable section
 
 open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.GLq
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.GLq
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -23,8 +24,10 @@ namespace UpperTheory.Zero.LLC.DetT
 
 open PositivityTheory.Rg.DzCount PositivityTheory.Rg.DzCount.B.TorusConjugationFixed
 
-private theorem top_of_stable {G : Type} [Group G] [TopologicalSpace G] (π : IrrRep G) (U : Submodule ℂ π.V)
-    (hU : ∀ g, ∀ v ∈ U, π.ρ g v ∈ U) (h0 : ∃ v ∈ U, v ≠ 0) : U = ⊤ := by
+private theorem top_of_stable
+    {G : Type} [Group G] [TopologicalSpace G]
+    (π : IrrRep G) (U : Submodule ℂ π.V) (hU : ∀ g, ∀ v ∈ U, π.ρ g v ∈ U) (h0 : ∃ v ∈ U, v ≠ 0)
+    : U = ⊤ := by
   obtain ⟨v, hv, hne⟩ := h0
   have := π.irr
   rcases this.eq_bot_or_eq_top (⟨U, fun g v hv => hU g v hv⟩ : Subrepresentation π.ρ) with h | h
@@ -35,13 +38,17 @@ private theorem top_of_stable {G : Type} [Group G] [TopologicalSpace G] (π : Ir
     exact (Submodule.mem_bot ℂ).mp hv'
   · exact congrArg Subrepresentation.toSubmodule h
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
 
-private theorem equiv_of_typeMaps [Nontrivial W] {T : Representation ℂ (GL (Fin n) 𝓀[k]) W} (hT : FinCusp T)
-    (π π' : IrrRep (GL (Fin n) k)) {ω : kˣ →* ℂˣ} (hω : HasCentralChar π.ρ ω) (hω' : HasCentralChar π'.ρ ω)
-    {j : W →ₗ[ℂ] π.V} {j' : W →ₗ[ℂ] π'.V} (hj : IsTypeMap T π.ρ j) (hj' : IsTypeMap T π'.ρ j') :
-    Nonempty (π.ρ.Equiv π'.ρ) := by
+private theorem equiv_of_typeMaps
+    [Nontrivial W]
+    {T : Representation ℂ (GL (Fin n) 𝓀[k]) W} (hT : FinCusp T)
+    (π π' : IrrRep (GL (Fin n) k))
+    {ω : kˣ →* ℂˣ} (hω : HasCentralChar π.ρ ω) (hω' : HasCentralChar π'.ρ ω)
+    {j : W →ₗ[ℂ] π.V} {j' : W →ₗ[ℂ] π'.V} (hj : IsTypeMap T π.ρ j) (hj' : IsTypeMap T π'.ρ j')
+    : Nonempty (π.ρ.Equiv π'.ρ) := by
   classical
   set P := π.ρ.prod π'.ρ with hPdef
   let J : W →ₗ[ℂ] π.V × π'.V := j.prod j'
@@ -67,7 +74,8 @@ private theorem equiv_of_typeMaps [Nontrivial W] {T : Representation ℂ (GL (Fi
       obtain ⟨γ', w, rfl⟩ := hx
       apply Submodule.subset_span
       exact ⟨γ * γ', w, by rw [map_mul]; rfl⟩
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       rw [map_add (f := _)]
       exact U.add_mem hx hy
@@ -85,7 +93,8 @@ private theorem equiv_of_typeMaps [Nontrivial W] {T : Representation ℂ (GL (Fi
     have htf : t ∈ fixed P (KOne k (Fin n)) := by
       have := (fixed P (KOne k (Fin n))).sub_mem hfx hrf
       simpa using this
-    have ht0 : t = 0 := GlobalTheory.IwahoriInj.eq_zero_of_fixed hPs GlobalTheory.DepthZeroJac.isCompact_KOne htf ht
+    have ht0 : t = 0 :=
+      GlobalTheory.IwahoriInj.eq_zero_of_fixed hPs GlobalTheory.DepthZeroJac.isCompact_KOne htf ht
     rw [ht0, add_zero]
     exact hr
   have hJU : ∀ w, J w ∈ U := fun w => Submodule.subset_span ⟨1, w, by rw [map_one]; rfl⟩
@@ -94,11 +103,14 @@ private theorem equiv_of_typeMaps [Nontrivial W] {T : Representation ℂ (GL (Fi
     by_contra hcon
     push_neg at hcon
     obtain ⟨v', hv'U, hv'0⟩ := hcon
-    have hB : U.comap (LinearMap.inr ℂ π.V π'.V) = ⊤ := top_of_stable π' _ (by
-        intro γ y hy
-        have := hUst γ _ hy
-        rw [LinearMap.inr_apply, Representation.prod_apply_apply, map_zero] at this
-        exact this) ⟨v', hv'U, hv'0⟩
+    have hB : U.comap (LinearMap.inr ℂ π.V π'.V) = ⊤ :=
+      top_of_stable π' _
+        (by
+          intro γ y hy
+          have := hUst γ _ hy
+          rw [LinearMap.inr_apply, Representation.prod_apply_apply, map_zero] at this
+          exact this)
+        ⟨v', hv'U, hv'0⟩
     have hmem : ((0 : π.V), j' w0) ∈ U := by
       have : j' w0 ∈ U.comap (LinearMap.inr ℂ π.V π'.V) := hB ▸ Submodule.mem_top
       exact this
@@ -117,11 +129,14 @@ private theorem equiv_of_typeMaps [Nontrivial W] {T : Representation ℂ (GL (Fi
     by_contra hcon
     push_neg at hcon
     obtain ⟨v, hvU, hv0⟩ := hcon
-    have hB : U.comap (LinearMap.inl ℂ π.V π'.V) = ⊤ := top_of_stable π _ (by
-        intro γ y hy
-        have := hUst γ _ hy
-        rw [LinearMap.inl_apply, Representation.prod_apply_apply, map_zero] at this
-        exact this) ⟨v, hvU, hv0⟩
+    have hB : U.comap (LinearMap.inl ℂ π.V π'.V) = ⊤ :=
+      top_of_stable π _
+        (by
+          intro γ y hy
+          have := hUst γ _ hy
+          rw [LinearMap.inl_apply, Representation.prod_apply_apply, map_zero] at this
+          exact this)
+        ⟨v, hvU, hv0⟩
     have hmem : (j w0, (0 : π'.V)) ∈ U := by
       have : j w0 ∈ U.comap (LinearMap.inl ℂ π.V π'.V) := hB ▸ Submodule.mem_top
       exact this
@@ -136,23 +151,30 @@ private theorem equiv_of_typeMaps [Nontrivial W] {T : Representation ℂ (GL (Fi
     have : w1 = 0 := hj'.1 (by rw [h1, map_zero])
     rw [this, map_zero] at h2
     exact hw0 (hj.1 (by rw [← h2, map_zero]))
-  have hfst : U.map (LinearMap.fst ℂ π.V π'.V) = ⊤ := top_of_stable π _ (by
-      rintro γ _ ⟨x, hx, rfl⟩
-      refine ⟨P γ x, hUst γ x hx, ?_⟩
-      rw [LinearMap.fst_apply, LinearMap.fst_apply, Representation.prod_apply_apply]) ⟨j w0, ⟨J w0, hJU w0, rfl⟩, fun h => hw0 (hj.1 (by rw [h, map_zero]))⟩
-  have hsnd : U.map (LinearMap.snd ℂ π.V π'.V) = ⊤ := top_of_stable π' _ (by
-      rintro γ _ ⟨x, hx, rfl⟩
-      refine ⟨P γ x, hUst γ x hx, ?_⟩
-      rw [LinearMap.snd_apply, LinearMap.snd_apply, Representation.prod_apply_apply]) ⟨j' w0, ⟨J w0, hJU w0, rfl⟩, fun h => hw0 (hj'.1 (by rw [h, map_zero]))⟩
+  have hfst : U.map (LinearMap.fst ℂ π.V π'.V) = ⊤ :=
+    top_of_stable π _
+      (by
+        rintro γ _ ⟨x, hx, rfl⟩
+        refine ⟨P γ x, hUst γ x hx, ?_⟩
+        rw [LinearMap.fst_apply, LinearMap.fst_apply, Representation.prod_apply_apply])
+      ⟨j w0, ⟨J w0, hJU w0, rfl⟩, fun h => hw0 (hj.1 (by rw [h, map_zero]))⟩
+  have hsnd : U.map (LinearMap.snd ℂ π.V π'.V) = ⊤ :=
+    top_of_stable π' _
+      (by
+        rintro γ _ ⟨x, hx, rfl⟩
+        refine ⟨P γ x, hUst γ x hx, ?_⟩
+        rw [LinearMap.snd_apply, LinearMap.snd_apply, Representation.prod_apply_apply])
+      ⟨j' w0, ⟨J w0, hJU w0, rfl⟩, fun h => hw0 (hj'.1 (by rw [h, map_zero]))⟩
   let Fst : U →ₗ[ℂ] π.V := (LinearMap.fst ℂ π.V π'.V).comp U.subtype
   let Snd : U →ₗ[ℂ] π'.V := (LinearMap.snd ℂ π.V π'.V).comp U.subtype
   have hFb : Function.Bijective Fst := by
     refine ⟨(injective_iff_map_eq_zero Fst).mpr fun x hx => ?_, fun v => ?_⟩
     · have h1 : (x : π.V × π'.V).1 = 0 := hx
-      have h2 : (x : π.V × π'.V).2 = 0 := hinr _ (by
-        have := x.2
-        rw [← Prod.mk.eta (p := (x : π.V × π'.V)), h1] at this
-        exact this)
+      have h2 : (x : π.V × π'.V).2 = 0 :=
+        hinr _ (by
+          have := x.2
+          rw [← Prod.mk.eta (p := (x : π.V × π'.V)), h1] at this
+          exact this)
       exact Subtype.ext (Prod.ext h1 h2)
     · have hv : v ∈ U.map (LinearMap.fst ℂ π.V π'.V) := hfst ▸ Submodule.mem_top
       obtain ⟨x, hx, rfl⟩ := hv
@@ -160,15 +182,17 @@ private theorem equiv_of_typeMaps [Nontrivial W] {T : Representation ℂ (GL (Fi
   have hSb : Function.Bijective Snd := by
     refine ⟨(injective_iff_map_eq_zero Snd).mpr fun x hx => ?_, fun v => ?_⟩
     · have h2 : (x : π.V × π'.V).2 = 0 := hx
-      have h1 : (x : π.V × π'.V).1 = 0 := hinl _ (by
-        have := x.2
-        rw [← Prod.mk.eta (p := (x : π.V × π'.V)), h2] at this
-        exact this)
+      have h1 : (x : π.V × π'.V).1 = 0 :=
+        hinl _ (by
+          have := x.2
+          rw [← Prod.mk.eta (p := (x : π.V × π'.V)), h2] at this
+          exact this)
       exact Subtype.ext (Prod.ext h1 h2)
     · have hv : v ∈ U.map (LinearMap.snd ℂ π.V π'.V) := hsnd ▸ Submodule.mem_top
       obtain ⟨x, hx, rfl⟩ := hv
       exact ⟨⟨x, hx⟩, rfl⟩
-  let e : π.V ≃ₗ[ℂ] π'.V := (LinearEquiv.ofBijective Fst hFb).symm.trans (LinearEquiv.ofBijective Snd hSb)
+  let e : π.V ≃ₗ[ℂ] π'.V :=
+    (LinearEquiv.ofBijective Fst hFb).symm.trans (LinearEquiv.ofBijective Snd hSb)
   refine ⟨Representation.Equiv.mk e (fun γ => ?_)⟩
   ext v
   set u := (LinearEquiv.ofBijective Fst hFb).symm v with hu
@@ -188,24 +212,36 @@ private theorem equiv_of_typeMaps [Nontrivial W] {T : Representation ℂ (GL (Fi
 
 section Bridge
 
-variable {E : Type} [Field E] [NumberField E] {w : HeightOneSpectrum (𝓞 E)} {g : ℕ} [Fact g.Prime]
+variable
+  {E : Type} [Field E] [NumberField E]
+  {w : HeightOneSpectrum (𝓞 E)} {g : ℕ} [Fact g.Prime]
   (i : ℚ_[g] ≃+* w.adicCompletion E) (hi : Continuous i)
 
 private def resEquiv : 𝓀[w.adicCompletion E] ≃+* ZMod g :=
   (Ideal.quotEquivOfEq (DiscreteGroups.sglob.DzIso.ker_redO i hi).symm).trans
     (RingHom.quotientKerEquivOfSurjective (DiscreteGroups.sglob.DzIso.redO_surjective i hi))
 
-private theorem resEquiv_residue (y : 𝒪[w.adicCompletion E]) :
-    resEquiv i hi (IsLocalRing.residue _ y) = DiscreteGroups.sglob.DzIso.redO i hi y := rfl
+private theorem resEquiv_residue (y : 𝒪[w.adicCompletion E])
+    : resEquiv i hi (IsLocalRing.residue _ y) = DiscreteGroups.sglob.DzIso.redO i hi y :=
+  rfl
 
 private def glMap (n : ℕ) : GL (Fin n) 𝓀[w.adicCompletion E] →* Gn g n :=
   GeneralLinearGroup.map (resEquiv i hi).toRingHom
 
-private theorem glMap_redK {n : ℕ} (κ : GL (Fin n) ℤ_[g]) :
-    glMap i hi n (redK (w.adicCompletion E) (Fin n) (DiscreteGroups.sglob.DzIso.toKO i hi n κ)) = GlobalTheory.GLp.red g n κ := by
+private theorem glMap_redK {n : ℕ} (κ : GL (Fin n) ℤ_[g])
+    : glMap i hi n (redK (w.adicCompletion E) (Fin n) (DiscreteGroups.sglob.DzIso.toKO i hi n κ))
+      = GlobalTheory.GLp.red g n κ := by
   ext a b
-  have h1 : ((glMap i hi n) (redK (w.adicCompletion E) (Fin n) (DiscreteGroups.sglob.DzIso.toKO i hi n κ)) : Matrix (Fin n) (Fin n) (ZMod g)) a b
-      = resEquiv i hi ((redK (w.adicCompletion E) (Fin n) (DiscreteGroups.sglob.DzIso.toKO i hi n κ) : Matrix (Fin n) (Fin n) _) a b) := rfl
+  have h1
+      : ((glMap i hi n) (redK (w.adicCompletion E) (Fin n)
+              (DiscreteGroups.sglob.DzIso.toKO i hi n κ))
+            : Matrix (Fin n) (Fin n) (ZMod g))
+          a b
+        = resEquiv i hi
+          ((redK (w.adicCompletion E) (Fin n) (DiscreteGroups.sglob.DzIso.toKO i hi n κ)
+              : Matrix (Fin n) (Fin n) _)
+            a b) :=
+    rfl
   rw [h1, redK_apply, resEquiv_residue]
   show PadicInt.toZMod (DiscreteGroups.sglob.DzIso.toInt i hi _) = PadicInt.toZMod ((κ : Matrix (Fin n) (Fin n) ℤ_[g]) a b)
   congr 1
@@ -215,8 +251,8 @@ private theorem glMap_redK {n : ℕ} (κ : GL (Fin n) ℤ_[g]) :
   simp only [RingEquiv.symm_apply_apply]
   rfl
 
-private theorem finCusp_comp {n : ℕ} (τ : FDRep ℂ (Gn g n)) (hτ : IsCusp τ.character) :
-    FinCusp (τ.ρ.comp (glMap i hi n)) := by
+private theorem finCusp_comp {n : ℕ} (τ : FDRep ℂ (Gn g n)) (hτ : IsCusp τ.character)
+    : FinCusp (τ.ρ.comp (glMap i hi n)) := by
   classical
   intro s d e hne v hv
   obtain ⟨Q, a, ha, han, hQ⟩ := DiscreteGroups.sglob.DzLc.exists_perm_conj e hne
@@ -225,14 +261,20 @@ private theorem finCusp_comp {n : ℕ} (τ : FDRep ℂ (Gn g n)) (hτ : IsCusp �
     rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one]
     rfl
   set v' := τ.ρ (glMap i hi n Q)⁻¹ v with hv'
-  have hfix : ∀ u ∈ GlobalTheory.FiniteGL.unipRadical (ZMod g) (GlobalTheory.FiniteGL.twoBlocks n a), τ.ρ u v' = v' := by
+  have hfix
+      : ∀ u ∈ GlobalTheory.FiniteGL.unipRadical (ZMod g) (GlobalTheory.FiniteGL.twoBlocks n a),
+        τ.ρ u v' = v' := by
     intro u hu
-    let x : GL (Fin n) 𝓀[w.adicCompletion E] := GeneralLinearGroup.map (resEquiv i hi).symm.toRingHom u
-    have hx : x ∈ GlobalTheory.FiniteGL.unipRadical 𝓀[w.adicCompletion E] (GlobalTheory.FiniteGL.twoBlocks n a) := by
+    let x : GL (Fin n) 𝓀[w.adicCompletion E] :=
+      GeneralLinearGroup.map (resEquiv i hi).symm.toRingHom u
+    have hx
+        : x ∈ GlobalTheory.FiniteGL.unipRadical 𝓀[w.adicCompletion E]
+          (GlobalTheory.FiniteGL.twoBlocks n a) := by
       intro p q hpq
       have h0 : ((u : Matrix (Fin n) (Fin n) (ZMod g)) - 1) p q = 0 := hu p q hpq
-      have hc : ((x : Matrix (Fin n) (Fin n) 𝓀[w.adicCompletion E]) - 1) p q
-          = (resEquiv i hi).symm (((u : Matrix (Fin n) (Fin n) (ZMod g)) - 1) p q) := by
+      have hc
+          : ((x : Matrix (Fin n) (Fin n) 𝓀[w.adicCompletion E]) - 1) p q
+            = (resEquiv i hi).symm (((u : Matrix (Fin n) (Fin n) (ZMod g)) - 1) p q) := by
         simp only [Matrix.sub_apply, Matrix.one_apply, map_sub]
         split_ifs <;> simp [x]
       rw [hc, h0, map_zero]
@@ -242,15 +284,23 @@ private theorem finCusp_comp {n : ℕ} (τ : FDRep ℂ (Gn g n)) (hτ : IsCusp �
     have h1 := hv _ (hQ x hx)
     simp only [MonoidHom.coe_comp, Function.comp_apply, map_mul, Module.End.mul_apply, hux] at h1
     rw [map_inv] at h1
-    calc τ.ρ u v' = τ.ρ (glMap i hi n Q)⁻¹ (τ.ρ (glMap i hi n Q) (τ.ρ u v')) := (key _ _).symm
+    calc
+      τ.ρ u v'
+        = τ.ρ (glMap i hi n Q)⁻¹ (τ.ρ (glMap i hi n Q) (τ.ρ u v')) := (key _ _).symm
       _ = v' := by rw [hv', h1]
   have hsum := DiscreteGroups.sglob.DzLc.sum_unip_eq_zero τ hτ ha han
-  have hs : (∑ u : GlobalTheory.FiniteGL.unipRadical (ZMod g) (GlobalTheory.FiniteGL.twoBlocks n a), τ.ρ u) v' = 0 := by
+  have hs
+      : (∑ u : GlobalTheory.FiniteGL.unipRadical (ZMod g) (GlobalTheory.FiniteGL.twoBlocks n a), τ.ρ u)
+          v'
+        = 0 := by
     rw [hsum]
     rfl
   rw [LinearMap.sum_apply] at hs
-  simp only [fun u : GlobalTheory.FiniteGL.unipRadical (ZMod g) (GlobalTheory.FiniteGL.twoBlocks n a) => hfix u u.2,
-    Finset.sum_const, Finset.card_univ] at hs
+  simp only [fun u
+          : GlobalTheory.FiniteGL.unipRadical (ZMod g) (GlobalTheory.FiniteGL.twoBlocks n a) =>
+        hfix u u.2,
+      Finset.sum_const, Finset.card_univ]
+    at hs
   have hv0 : v' = 0 := by
     rw [← Nat.cast_smul_eq_nsmul ℂ] at hs
     exact (smul_eq_zero.mp hs).resolve_left (by exact_mod_cast Fintype.card_ne_zero)
@@ -259,11 +309,14 @@ private theorem finCusp_comp {n : ℕ} (τ : FDRep ℂ (Gn g n)) (hτ : IsCusp �
     rfl
   rw [this, hv0, map_zero]
 
-private theorem isTypeMap_of {n : ℕ} (τ : FDRep ℂ (Gn g n)) (hτ : IsCusp τ.character) {V : Type} [AddCommGroup V]
-    [Module ℂ V] (π : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V) (φ : τ →ₗ[ℂ] V) (h0 : φ ≠ 0)
-    (hφ : ∀ (κ : GL (Fin n) ℤ_[g]) (v : τ), φ (τ.ρ (GlobalTheory.GLp.red g n κ) v) =
-      (π.comp (GeneralLinearGroup.map i.toRingHom)) (GlobalTheory.GLp.inc g n κ) (φ v)) :
-    IsTypeMap (τ.ρ.comp (glMap i hi n)) π φ := by
+private theorem isTypeMap_of
+    {n : ℕ} (τ : FDRep ℂ (Gn g n)) (hτ : IsCusp τ.character)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V) (φ : τ →ₗ[ℂ] V) (h0 : φ ≠ 0)
+    (hφ : ∀ (κ : GL (Fin n) ℤ_[g]) (v : τ),
+      φ (τ.ρ (GlobalTheory.GLp.red g n κ) v)
+        = (π.comp (GeneralLinearGroup.map i.toRingHom)) (GlobalTheory.GLp.inc g n κ) (φ v))
+    : IsTypeMap (τ.ρ.comp (glMap i hi n)) π φ := by
   constructor
   · have hsimp := DiscreteGroups.sglob.DzType.Kon.simple_of_isIrr τ hτ.2.1
     have hirr := (GlobalTheory.T.simple_iff_irreducible.1 _ τ).mp hsimp
@@ -271,7 +324,8 @@ private theorem isTypeMap_of {n : ℕ} (τ : FDRep ℂ (Gn g n)) (hτ : IsCusp �
         intro γ v hv
         obtain ⟨κ, rfl⟩ := GlobalTheory.GLp.Model.red_surjective n γ
         rw [LinearMap.mem_ker] at hv ⊢
-        rw [hφ, hv, map_zero]) with h | h
+        rw [hφ, hv, map_zero])
+      with h | h
     · exact LinearMap.ker_eq_bot.mp h
     · exact absurd (LinearMap.ker_eq_top.mp h) h0
   · intro γ v
@@ -285,8 +339,7 @@ end Bridge
 end UpperTheory.Zero.LLC.DetT
 
 open UpperTheory.Zero.LLC.DetT in
-theorem UpperTheory.Zero.LLC.detByType :
-    UpperTheory.Zero.LLC.DetByType := by
+theorem UpperTheory.Zero.LLC.detByType : UpperTheory.Zero.LLC.DetByType := by
   intro E Ω _ _ _ _ _ A w _ g _ i hi n hn σ σ' τ τ' ω hτ hττ' hinf hinf' hω hω'
   obtain ⟨φ, hφ0, hφ⟩ := hinf
   obtain ⟨φ', hφ'0, hφ'⟩ := hinf'
@@ -304,8 +357,11 @@ theorem UpperTheory.Zero.LLC.detByType :
     ext x
     have := LinearMap.congr_fun h (e.symm x)
     simpa [ψ] using this
-  have hψ : ∀ (κ : GL (Fin n) ℤ_[g]) (v : τ), ψ (τ.ρ (GlobalTheory.GLp.red g n κ) v) =
-      (σ'.ρ.comp (GeneralLinearGroup.map i.toRingHom)) (GlobalTheory.GLp.inc g n κ) (ψ v) := by
+  have hψ
+      : ∀ (κ : GL (Fin n) ℤ_[g]) (v : τ),
+        ψ (τ.ρ (GlobalTheory.GLp.red g n κ) v)
+          = (σ'.ρ.comp (GeneralLinearGroup.map i.toRingHom)) (GlobalTheory.GLp.inc g n κ)
+            (ψ v) := by
     intro κ v
     show φ' (e (τ.ρ (GlobalTheory.GLp.red g n κ) v)) = _
     rw [he, hφ']

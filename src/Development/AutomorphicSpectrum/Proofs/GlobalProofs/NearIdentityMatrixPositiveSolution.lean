@@ -6,27 +6,34 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.DiagDom
 
-theorem perturb_bound {κ : Type} [Fintype κ] [DecidableEq κ] (W : κ → κ → ℝ) (ε C : ℝ)
-    (hW : ∀ σ i, |W σ i - if σ = i then 1 else 0| < ε) (c : κ → ℝ)
-    (hC : ∀ i, |c i| ≤ C) (σ : κ) :
-    |∑ i, W σ i * c i - c σ| ≤ (Fintype.card κ : ℝ) * ε * C := by
+theorem perturb_bound
+    {κ : Type} [Fintype κ] [DecidableEq κ]
+    (W : κ → κ → ℝ) (ε C : ℝ) (hW : ∀ σ i, |W σ i - if σ = i then 1 else 0| < ε)
+    (c : κ → ℝ) (hC : ∀ i, |c i| ≤ C)
+    (σ : κ)
+    : |∑ i, W σ i * c i - c σ| ≤ (Fintype.card κ : ℝ) * ε * C := by
   have hrw : ∑ i, W σ i * c i - c σ = ∑ i, (W σ i - if σ = i then 1 else 0) * c i := by
     simp [sub_mul, Finset.sum_sub_distrib, ite_mul]
   rw [hrw]
-  calc |∑ i, (W σ i - if σ = i then 1 else 0) * c i|
+  calc
+    |∑ i, (W σ i - if σ = i then 1 else 0) * c i|
       ≤ ∑ i, |(W σ i - if σ = i then 1 else 0) * c i| := Finset.abs_sum_le_sum_abs _ _
-    _ ≤ ∑ _i : κ, ε * C := Finset.sum_le_sum fun i _ => by
+    _ ≤ ∑ _i : κ, ε * C :=
+      Finset.sum_le_sum fun i _ => by
         rw [abs_mul]
         exact mul_le_mul (hW σ i).le (hC i) (abs_nonneg _) ((abs_nonneg _).trans (hW σ i).le)
     _ = (Fintype.card κ : ℝ) * ε * C := by
-        rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, mul_assoc]
+      rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, mul_assoc]
 
-theorem small_perturbation_injective_pos :
-    ∀ {κ : Type} [Fintype κ] [DecidableEq κ] (M : ℝ), ∃ ε : ℝ, 0 < ε ∧ ∀ W : κ → κ → ℝ,
-      (∀ σ i, |W σ i - if σ = i then 1 else 0| < ε) →
-      (∀ c : κ → ℝ, (∀ σ, ∑ i, W σ i * c i = 0) → c = 0) ∧
-      ∀ c : κ → ℝ, (∀ σ, 0 < ∑ i, W σ i * c i) →
-        (∀ σ τ, ∑ i, W σ i * c i ≤ M * ∑ i, W τ i * c i) → ∀ i, 0 < c i := by
+theorem small_perturbation_injective_pos
+    : ∀ {κ : Type} [Fintype κ] [DecidableEq κ] (M : ℝ), ∃ ε : ℝ,
+      0 < ε
+        ∧ ∀ W : κ → κ → ℝ,
+          (∀ σ i, |W σ i - if σ = i then 1 else 0| < ε)
+            → (∀ c : κ → ℝ, (∀ σ, ∑ i, W σ i * c i = 0) → c = 0)
+              ∧ ∀ c : κ → ℝ,
+                (∀ σ, 0 < ∑ i, W σ i * c i) → (∀ σ τ, ∑ i, W σ i * c i ≤ M * ∑ i, W τ i * c i)
+                  → ∀ i, 0 < c i := by
   intro κ _ _ M
   have hn0 : (0 : ℝ) ≤ (Fintype.card κ : ℝ) := Nat.cast_nonneg _
   have hM1 : 0 < |M| + 1 := by positivity
@@ -44,12 +51,16 @@ theorem small_perturbation_injective_pos :
   have hδh : n * ε ≤ 1 / 2 := by nlinarith [abs_nonneg M]
   rcases isEmpty_or_nonempty κ with hκ | hκ
   · exact ⟨fun c _ => funext fun i => (IsEmpty.false i).elim, fun c _ _ i => (IsEmpty.false i).elim⟩
-  have bound : ∀ c : κ → ℝ, ∃ j, ∀ σ,
-      |∑ i, W σ i * c i - c σ| ≤ n * ε * |c j| ∧ |c σ| ≤ |c j| := by
+  have bound : ∀ c : κ → ℝ, ∃ j, ∀ σ, |∑ i, W σ i * c i - c σ| ≤ n * ε * |c j| ∧ |c σ| ≤ |c j| := by
     intro c
     obtain ⟨j, -, hj⟩ := Finset.exists_max_image Finset.univ (fun i => |c i|) Finset.univ_nonempty
-    exact ⟨j, fun σ => ⟨perturb_bound W ε |c j| hW c (fun i => hj i (Finset.mem_univ i)) σ,
-      hj σ (Finset.mem_univ σ)⟩⟩
+    exact ⟨
+      j,
+      fun σ => ⟨
+        perturb_bound W ε |c j| hW c (fun i => hj i (Finset.mem_univ i)) σ,
+        hj σ (Finset.mem_univ σ)
+      ⟩
+    ⟩
   constructor
   · intro c hc
     obtain ⟨j, hj⟩ := bound c
@@ -67,8 +78,7 @@ theorem small_perturbation_injective_pos :
       have e := abs_sub_abs_le_abs_sub (c j) (∑ k, W j k * c k)
       rw [abs_sub_comm (c j), abs_of_pos (hpos j)] at e
       linarith [(hj j).1]
-    have h2 : ∑ k, W i k * c k - n * ε * |c j| ≤ c i := by
-      linarith [(abs_le.mp (hj i).1).2]
+    have h2 : ∑ k, W i k * c k - n * ε * |c j| ≤ c i := by linarith [(abs_le.mp (hj i).1).2]
     have h3 := hratio j i
     have hyi := hpos i
     have hMy : M * ∑ k, W i k * c k ≤ |M| * ∑ k, W i k * c k :=

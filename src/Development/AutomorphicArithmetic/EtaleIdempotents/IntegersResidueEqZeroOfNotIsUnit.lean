@@ -6,10 +6,13 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory Limits AlgebraicGeometry GroundTheory.PAdicHodge CrystallineSemistableComparison TensorProduct GlobalTheory.LogCris DividedPowers UpperTheory.Ru.crystallineComparison
+open CategoryTheory Limits AlgebraicGeometry GroundTheory.PAdicHodge CrystallineSemistableComparison
+  TensorProduct GlobalTheory.LogCris DividedPowers UpperTheory.Ru.crystallineComparison
 
-theorem UpperTheory.integersResidue_eq_zero_of_not_isUnit :
-    ∀ {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (r : Res l K) (ϖ : OK l K), ¬ IsUnit ϖ → gRes r ϖ = 0 := by
+theorem UpperTheory.integersResidue_eq_zero_of_not_isUnit
+    : ∀ {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (r : Res l K)
+        (ϖ : OK l K),
+      ¬ IsUnit ϖ → gRes r ϖ = 0 := by
   intro l _ K r ϖ hϖ
   have hu0 : (PreTilt.untilt (0 : Ob l) : OC l) = 0 := by
     rw [← WittVector.fontaineTheta_teichmuller, WittVector.teichmuller_zero, map_zero]
@@ -27,14 +30,21 @@ theorem UpperTheory.integersResidue_eq_zero_of_not_isUnit :
     have hz : r.ρ (1 - ϖ * y) = 0 := by
       rw [map_sub, map_one, map_mul, hy, mul_inv_cancel₀ hne, sub_self]
     have h1 := hker _ hz
-    have hsum : ((ϖ * y : OK l K) : K) = 1 - ((1 - ϖ * y : OK l K) : K) := by
-      push_cast; ring
+    have hsum : ((ϖ * y : OK l K) : K) = 1 - ((1 - ϖ * y : OK l K) : K) := by push_cast; ring
     have hlt : ‖(((ϖ * y : OK l K) : K) : PadicAlgCl l)‖ = 1 := by
-      have e : (((ϖ * y : OK l K) : K) : PadicAlgCl l) = 1 - (((1 - ϖ * y : OK l K) : K) : PadicAlgCl l) := by
+      have e
+          : (((ϖ * y : OK l K) : K) : PadicAlgCl l)
+            = 1 - (((1 - ϖ * y : OK l K) : K) : PadicAlgCl l) := by
         rw [hsum]; push_cast; rfl
       refine le_antisymm (by simpa using norm_OK_le (ϖ * y)) ?_
-      have h4 : ‖(1 : PadicAlgCl l)‖ ≤ max ‖(((ϖ * y : OK l K) : K) : PadicAlgCl l)‖ ‖(((1 - ϖ * y : OK l K) : K) : PadicAlgCl l)‖ := by
-        have e' : (1 : PadicAlgCl l) = (((ϖ * y : OK l K) : K) : PadicAlgCl l) + (((1 - ϖ * y : OK l K) : K) : PadicAlgCl l) := by
+      have h4
+          : ‖(1 : PadicAlgCl l)‖
+            ≤ max ‖(((ϖ * y : OK l K) : K) : PadicAlgCl l)‖
+              ‖(((1 - ϖ * y : OK l K) : K) : PadicAlgCl l)‖ := by
+        have e'
+            : (1 : PadicAlgCl l)
+              = (((ϖ * y : OK l K) : K) : PadicAlgCl l)
+                + (((1 - ϖ * y : OK l K) : K) : PadicAlgCl l) := by
           rw [e]; ring
         conv_lhs => rw [e']
         exact IsUltrametricDist.norm_add_le_max _ _

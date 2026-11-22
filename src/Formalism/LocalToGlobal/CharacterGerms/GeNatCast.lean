@@ -26,14 +26,16 @@ def Ge (w : ℝ) (a : C) : Prop := (w : WithTop ℝ) ≤ V.v a
 
 variable {V}
 
-theorem Ge.mono {w w' : ℝ} {a : C} (h : V.Ge w a) (hw : w' ≤ w) : V.Ge w' a := le_trans (WithTop.coe_le_coe.mpr hw) h
+theorem Ge.mono {w w' : ℝ} {a : C} (h : V.Ge w a) (hw : w' ≤ w) : V.Ge w' a :=
+  le_trans (WithTop.coe_le_coe.mpr hw) h
 
 theorem Ge.zero (w : ℝ) : V.Ge w (0 : C) := by
   show ((w : ℝ) : WithTop ℝ) ≤ V.v 0
   rw [AddValuation.map_zero]
   exact le_top
 
-theorem Ge.add {w : ℝ} {a b : C} (ha : V.Ge w a) (hb : V.Ge w b) : V.Ge w (a + b) := le_trans (le_min ha hb) (V.v.map_add a b)
+theorem Ge.add {w : ℝ} {a b : C} (ha : V.Ge w a) (hb : V.Ge w b) : V.Ge w (a + b) :=
+  le_trans (le_min ha hb) (V.v.map_add a b)
 
 theorem Ge.neg {w : ℝ} {a : C} (ha : V.Ge w a) : V.Ge w (-a) := by
   show ((w : ℝ) : WithTop ℝ) ≤ V.v (-a)
@@ -44,8 +46,9 @@ theorem Ge.sub {w : ℝ} {a b : C} (ha : V.Ge w a) (hb : V.Ge w b) : V.Ge w (a -
   rw [sub_eq_add_neg]
   exact Ge.add ha (Ge.neg hb)
 
-theorem Ge.sum {ι : Type*} {s : Finset ι} {f : ι → C} {w : ℝ} (h : ∀ i ∈ s, V.Ge w (f i)) :
-    V.Ge w (∑ i ∈ s, f i) := Finset.sum_induction f (fun x => V.Ge w x) (fun _ _ ha hb => Ge.add ha hb) (Ge.zero w) h
+theorem Ge.sum {ι : Type*} {s : Finset ι} {f : ι → C} {w : ℝ} (h : ∀ i ∈ s, V.Ge w (f i))
+    : V.Ge w (∑ i ∈ s, f i) :=
+  Finset.sum_induction f (fun x => V.Ge w x) (fun _ _ ha hb => Ge.add ha hb) (Ge.zero w) h
 
 theorem Ge.mul {w w' : ℝ} {a b : C} (ha : V.Ge w a) (hb : V.Ge w' b) : V.Ge (w + w') (a * b) := by
   show ((w + w' : ℝ) : WithTop ℝ) ≤ V.v (a * b)
@@ -120,20 +123,18 @@ def const0 (h : N → C) : ℕ → N → C := fun i n => if i = 0 then h n else 
 end Ops
 
 structure Cart (V : VF C) (d : ℕ) (I J : Type*) where
-
   ty : I ⊕ J → ZMod d
   Ty : AddSubgroup (ℕ → I ⊕ J → C)
   teich_mem : ∀ c, V.Ge 0 c → ∀ x ∈ Ty, teich V.l c x ∈ Ty
   V_mem : ∀ x ∈ Ty, Vpow 1 x ∈ Ty
   F_mem : ∀ x ∈ Ty, Fs V.l x ∈ Ty
   sumV_mem : ∀ y : ℕ → ℕ → I ⊕ J → C, (∀ s, y s ∈ Ty) → sumV y ∈ Ty
-
   t2 : ∀ x ∈ Ty, ∀ s, (∀ i < s, x i = 0) → ∀ n, V.Ge 0 (x s n)
-
   t3 : ∀ ζ : J → C, (∀ j, V.Ge 0 (ζ j)) → const0 (Sum.elim 0 ζ) ∈ Ty
-
-  t4 : ∀ (a : ZMod d) (u : I → C), (∀ c, V.Ge 0 (u c)) → (∀ c, ty (Sum.inl c) ≠ a → u c = 0) →
-    ∃ x ∈ Ty, x 0 = Sum.elim u 0 ∧ ∀ (i : ℕ) n, ty n ≠ a + i → x i n = 0
+  t4
+    : ∀ (a : ZMod d) (u : I → C),
+      (∀ c, V.Ge 0 (u c)) → (∀ c, ty (Sum.inl c) ≠ a → u c = 0)
+        → ∃ x ∈ Ty, x 0 = Sum.elim u 0 ∧ ∀ (i : ℕ) n, ty n ≠ a + i → x i n = 0
 
 end
 

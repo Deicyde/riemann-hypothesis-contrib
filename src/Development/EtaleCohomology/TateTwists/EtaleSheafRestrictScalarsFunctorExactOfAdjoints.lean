@@ -33,7 +33,8 @@ lemma restr_isLeftAdjoint (R S : Type) [CommRing R] [CommRing S] (φ : R →+* S
           ((sheafCompose Scheme.etaleTopology.{0} (ModuleCat.restrictScalars.{1} f)).map g))
   exact ⟨_, ⟨adj.ofNatIsoLeft e⟩⟩
 
-theorem etaleSheaf_restrictScalars_functor_exact_of_adjoints : EtaleSheafRestrictScalarsFunctorExact := by
+theorem etaleSheaf_restrictScalars_functor_exact_of_adjoints
+    : EtaleSheafRestrictScalarsFunctorExact := by
   intro R S _ _ φ
   have := restr_isRightAdjoint R S φ
   have := restr_isLeftAdjoint R S φ

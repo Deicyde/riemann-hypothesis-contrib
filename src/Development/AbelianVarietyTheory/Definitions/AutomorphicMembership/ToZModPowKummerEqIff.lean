@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial Module
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+  Module
 
 namespace GlobalTheory.WeilDeligne
 
@@ -28,8 +29,8 @@ theorem rootSeq_pow (a : Ω) (n : ℕ) : rootSeq l a n ^ l ^ n = a := by
 
 variable (Ω) [CharZero Ω]
 
-theorem exists_unitySeq : ∃ z : ℕ → Ω, (∀ n, IsPrimitiveRoot (z n) (l ^ n)) ∧
-    ∀ n, z (n + 1) ^ l = z n := by
+theorem exists_unitySeq
+    : ∃ z : ℕ → Ω, (∀ n, IsPrimitiveRoot (z n) (l ^ n)) ∧ ∀ n, z (n + 1) ^ l = z n := by
   have hl : l.Prime := Fact.out
   have : NeZero ((l : ℕ) : Ω) := ⟨Nat.cast_ne_zero.mpr hl.ne_zero⟩
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_isPrimitiveRoot Ω l
@@ -37,9 +38,10 @@ theorem exists_unitySeq : ∃ z : ℕ → Ω, (∀ n, IsPrimitiveRoot (z n) (l ^
   · cases n with
     | zero => simp
     | succ n =>
-      have h := orderOf_eq_prime_pow (x := rootSeq l ζ n) (p := l) (n := n)
-        (by rw [rootSeq_pow]; exact hζ.ne_one hl.one_lt)
-        (by rw [pow_succ, pow_mul, rootSeq_pow, hζ.pow_eq_one])
+      have h :=
+        orderOf_eq_prime_pow (x := rootSeq l ζ n) (p := l) (n := n)
+          (by rw [rootSeq_pow]; exact hζ.ne_one hl.one_lt)
+          (by rw [pow_succ, pow_mul, rootSeq_pow, hζ.pow_eq_one])
       rw [← h]
       exact IsPrimitiveRoot.orderOf _
   · cases n with
@@ -54,8 +56,8 @@ theorem unitySeq_primitive (n : ℕ) : IsPrimitiveRoot (unitySeq Ω l n) (l ^ n)
 theorem unitySeq_succ_pow (n : ℕ) : unitySeq Ω l (n + 1) ^ l = unitySeq Ω l n :=
   (exists_unitySeq Ω l).choose_spec.2 n
 
-theorem unitySeq_pow_eq_iff (n a b : ℕ) :
-    unitySeq Ω l n ^ a = unitySeq Ω l n ^ b ↔ (a : ZMod (l ^ n)) = b := by
+theorem unitySeq_pow_eq_iff (n a b : ℕ)
+    : unitySeq Ω l n ^ a = unitySeq Ω l n ^ b ↔ (a : ZMod (l ^ n)) = b := by
   have hN0 : l ^ n ≠ 0 := pow_ne_zero _ (Fact.out : l.Prime).ne_zero
   have hζ := unitySeq_primitive Ω l n
   have hu : IsPrimitiveRoot (hζ.isUnit hN0).unit (l ^ n) :=
@@ -65,40 +67,45 @@ theorem unitySeq_pow_eq_iff (n a b : ℕ) :
 
 def unityPow (n : ℕ) (c : ℤ_[l]) : Ω := unitySeq Ω l n ^ (PadicInt.toZModPow n c).val
 
-theorem unityPow_eq_pow_iff {n k : ℕ} {c : ℤ_[l]} :
-    unityPow Ω l n c = unitySeq Ω l n ^ k ↔ PadicInt.toZModPow n c = k := by
+theorem unityPow_eq_pow_iff {n k : ℕ} {c : ℤ_[l]}
+    : unityPow Ω l n c = unitySeq Ω l n ^ k ↔ PadicInt.toZModPow n c = k := by
   rw [unityPow, unitySeq_pow_eq_iff, ZMod.natCast_zmod_val]
 
-theorem unityPow_eq_iff {n : ℕ} {c d : ℤ_[l]} :
-    unityPow Ω l n c = unityPow Ω l n d ↔ PadicInt.toZModPow n c = PadicInt.toZModPow n d := by
+theorem unityPow_eq_iff {n : ℕ} {c d : ℤ_[l]}
+    : unityPow Ω l n c = unityPow Ω l n d ↔ PadicInt.toZModPow n c = PadicInt.toZModPow n d := by
   conv_lhs => rw [unityPow.eq_def Ω l n d]
   rw [unityPow_eq_pow_iff, ZMod.natCast_zmod_val]
 
-theorem unityPow_add (n : ℕ) (c d : ℤ_[l]) :
-    unityPow Ω l n (c + d) = unityPow Ω l n c * unityPow Ω l n d := by
+theorem unityPow_add (n : ℕ) (c d : ℤ_[l])
+    : unityPow Ω l n (c + d) = unityPow Ω l n c * unityPow Ω l n d := by
   conv_rhs => rw [unityPow, unityPow, ← pow_add]
-  rw [unityPow_eq_pow_iff]; simp
+  rw [unityPow_eq_pow_iff]
+  simp
 
-theorem unityPow_mul (n : ℕ) (c d : ℤ_[l]) :
-    unityPow Ω l n (c * d) = unityPow Ω l n d ^ (PadicInt.toZModPow n c).val := by
+theorem unityPow_mul (n : ℕ) (c d : ℤ_[l])
+    : unityPow Ω l n (c * d) = unityPow Ω l n d ^ (PadicInt.toZModPow n c).val := by
   conv_rhs => rw [unityPow, ← pow_mul]
-  rw [unityPow_eq_pow_iff]; simp [mul_comm]
+  rw [unityPow_eq_pow_iff]
+  simp [mul_comm]
 
 theorem unityPow_pow (n : ℕ) (c : ℤ_[l]) : unityPow Ω l n c ^ l ^ n = 1 := by
   rw [unityPow, ← pow_mul, mul_comm, pow_mul, (unitySeq_primitive Ω l n).pow_eq_one, one_pow]
 
 variable {Ω} in
-theorem existsUnique_unityPow {y : ℕ → Ω} (h0 : ∀ n, y n ^ l ^ n = 1)
-    (hy : ∀ n, y (n + 1) ^ l = y n) : ∃! c : ℤ_[l], ∀ n, y n = unityPow Ω l n c := by
+theorem existsUnique_unityPow
+    {y : ℕ → Ω} (h0 : ∀ n, y n ^ l ^ n = 1) (hy : ∀ n, y (n + 1) ^ l = y n)
+    : ∃! c : ℤ_[l], ∀ n, y n = unityPow Ω l n c := by
   have : ∀ n, NeZero (l ^ n) := fun n => ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
   choose k _ hk using fun n => (unitySeq_primitive Ω l n).eq_pow_of_pow_eq_one (h0 n)
   have h3 : ∀ n, (l : ℤ) ^ n ∣ (k (n + 1) : ℤ) - k n := fun n => by
     rw [← Nat.cast_pow, ← ZMod.intCast_zmod_eq_zero_iff_dvd, Int.cast_sub, Int.cast_natCast,
       Int.cast_natCast, sub_eq_zero, ← unitySeq_pow_eq_iff Ω, hk, ← hy, ← hk, ← pow_mul, mul_comm,
       pow_mul, unitySeq_succ_pow]
-  refine ⟨PadicInt.ofIntSeq _
-    (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub (fun n => (k n : ℤ)) l h3), fun n => ?_,
-    fun c hc => PadicInt.ext_of_toZModPow.mp fun n => ?_⟩
+  refine ⟨
+    PadicInt.ofIntSeq _ (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub (fun n => (k n : ℤ)) l h3),
+    fun n => ?_,
+    fun c hc => PadicInt.ext_of_toZModPow.mp fun n => ?_
+  ⟩
   · rw [← hk, eq_comm, unityPow_eq_pow_iff,
       PadicInt.toZModPow_ofIntSeq_of_pow_dvd_sub (fun n => (k n : ℤ)) l h3 n, Int.cast_natCast]
   · rw [PadicInt.toZModPow_ofIntSeq_of_pow_dvd_sub (fun n => (k n : ℤ)) l h3 n, Int.cast_natCast,
@@ -135,37 +142,37 @@ theorem rootOf_ne_zero {a : E} (ha : a ≠ 0) (n : ℕ) : rootOf Ω l a n ≠ 0 
   rw [h0, zero_pow (pow_ne_zero _ (Fact.out : l.Prime).ne_zero)] at this
   exact ha ((map_eq_zero _).mp this.symm)
 
-theorem existsUnique_kummer (a : Eˣ) (σ : G E Ω) :
-    ∃! c : ℤ_[l], ∀ n, σ (rootOf Ω l (a : E) n) = zetaPow E Ω l n c * rootOf Ω l (a : E) n := by
+theorem existsUnique_kummer (a : Eˣ) (σ : G E Ω)
+    : ∃! c : ℤ_[l], ∀ n, σ (rootOf Ω l (a : E) n) = zetaPow E Ω l n c * rootOf Ω l (a : E) n := by
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
-  have h := existsUnique_unityPow l (y := fun n => σ (rootOf Ω l (a : E) n) / rootOf Ω l (a : E) n)
-    (fun n => by
-      rw [div_pow, ← map_pow, rootOf_pow, AlgEquiv.commutes, div_self (by simp)])
-    (fun n => by
-      rw [div_pow, ← map_pow]
-      exact congrArg (fun x => σ x / x) (rootSeq_succ_pow l _ n))
+  have h :=
+    existsUnique_unityPow l
+      (y := fun n => σ (rootOf Ω l (a : E) n) / rootOf Ω l (a : E) n)
+      (fun n => by rw [div_pow, ← map_pow, rootOf_pow, AlgEquiv.commutes, div_self (by simp)])
+      (fun n => by
+        rw [div_pow, ← map_pow]
+        exact congrArg (fun x => σ x / x) (rootSeq_succ_pow l _ n))
   have e : ∀ n y z : Ω, z ≠ 0 → (y / z = n ↔ y = n * z) := fun _ _ _ hz => div_eq_iff hz
   simp only [e _ _ _ (rootOf_ne_zero l a.ne_zero _)] at h
   exact h
 
 def kummer (a : Eˣ) (σ : G E Ω) : ℤ_[l] := (existsUnique_kummer l a σ).exists.choose
 
-theorem kummer_spec (a : Eˣ) (σ : G E Ω) (n : ℕ) :
-    σ (rootOf Ω l (a : E) n) = zetaPow E Ω l n (kummer l a σ) * rootOf Ω l (a : E) n :=
+theorem kummer_spec (a : Eˣ) (σ : G E Ω) (n : ℕ)
+    : σ (rootOf Ω l (a : E) n) = zetaPow E Ω l n (kummer l a σ) * rootOf Ω l (a : E) n :=
   (existsUnique_kummer l a σ).exists.choose_spec n
 
-theorem apply_zetaPow (σ : G E Ω) (n : ℕ) (c : ℤ_[l]) :
-    σ (zetaPow E Ω l n c) =
-      zetaPow E Ω l n ((cycZ (F := E) (Ω := Ω) l σ : ℤ_[l]ˣ) * c) := by
+theorem apply_zetaPow (σ : G E Ω) (n : ℕ) (c : ℤ_[l])
+    : σ (zetaPow E Ω l n c) = zetaPow E Ω l n ((cycZ (F := E) (Ω := Ω) l σ : ℤ_[l]ˣ) * c) := by
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
   have : NeZero ((l : ℕ) : Ω) := ⟨Nat.cast_ne_zero.mpr (Fact.out : l.Prime).ne_zero⟩
   exact (cyclotomicCharacter.spec (L := Ω) l (MulSemiringAction.toRingAut (G E Ω) Ω σ) _
     (unityPow_pow Ω l n c)).trans (unityPow_mul Ω l n _ c).symm
 
-theorem kummer_mul (a : Eˣ) (σ τ : G E Ω) :
-    kummer l a (σ * τ) = kummer l a σ + (cycZ (F := E) (Ω := Ω) l σ : ℤ_[l]ˣ) * kummer l a τ := by
+theorem kummer_mul (a : Eˣ) (σ τ : G E Ω)
+    : kummer l a (σ * τ) = kummer l a σ + (cycZ (F := E) (Ω := Ω) l σ : ℤ_[l]ˣ) * kummer l a τ := by
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
   refine (existsUnique_kummer l a (σ * τ)).unique (kummer_spec l a _) fun n => ?_
@@ -173,12 +180,13 @@ theorem kummer_mul (a : Eˣ) (σ τ : G E Ω) :
   congr 1
   exact (unityPow_add Ω l n _ _).symm
 
-@[simp] theorem kummer_one (a : Eˣ) : kummer l a (1 : G E Ω) = 0 := by
+@[simp]
+theorem kummer_one (a : Eˣ) : kummer l a (1 : G E Ω) = 0 := by
   simpa using kummer_mul l a (1 : G E Ω) 1
 
-theorem toZModPow_kummer_eq_iff (a : Eˣ) (σ τ : G E Ω) (n : ℕ) :
-    PadicInt.toZModPow n (kummer l a σ) = PadicInt.toZModPow n (kummer l a τ) ↔
-      σ (rootOf Ω l (a : E) n) = τ (rootOf Ω l (a : E) n) := by
+theorem toZModPow_kummer_eq_iff (a : Eˣ) (σ τ : G E Ω) (n : ℕ)
+    : PadicInt.toZModPow n (kummer l a σ) = PadicInt.toZModPow n (kummer l a τ)
+      ↔ σ (rootOf Ω l (a : E) n) = τ (rootOf Ω l (a : E) n) := by
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
   rw [kummer_spec, kummer_spec, mul_left_inj' (rootOf_ne_zero l a.ne_zero n)]
@@ -198,22 +206,24 @@ end Kummer
 
 variable {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {l : ℕ} [Fact l.Prime]
 
-theorem cycZ_of_mem_Ine (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) {σ : G E Ω}
-    (hσ : σ ∈ Ine (F := E) A) : cycZ (F := E) (Ω := Ω) l σ = 1 := by
+theorem cycZ_of_mem_Ine
+    (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) {σ : G E Ω} (hσ : σ ∈ Ine (F := E) A)
+    : cycZ (F := E) (Ω := Ω) l σ = 1 := by
   refine Units.ext (PadicInt.ext_of_toZModPow.mp fun n => ?_)
   rw [cycZ_toZModPow_eq hl h (q := 1) (fun x hx => by simpa using hσ.2 x hx) n]
   simp
 
-theorem cycZ_weil {h : IsPlaceOver A w} (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (g : Weil h) :
-    (((cycZ (F := E) (Ω := Ω) l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l]) = ((normV w : ℕ) : ℚ_[l]) ^ deg g := by
+theorem cycZ_weil {h : IsPlaceOver A w} (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (g : Weil h)
+    : (((cycZ (F := E) (Ω := Ω) l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l])
+      = ((normV w : ℕ) : ℚ_[l]) ^ deg g := by
   obtain ⟨τ, hτ⟩ := exists_eq_zpow_mul (deg_frob (h := h)) g
   have h1 : cycZ (F := E) (Ω := Ω) l g = cycZ (F := E) (Ω := Ω) l (frob h) ^ deg g := by
     conv_lhs => rw [hτ]
     rw [Subgroup.coe_mul, map_mul, coe_ineIncl, cycZ_of_mem_Ine h hl τ.2, mul_one,
       Subgroup.coe_zpow, map_zpow]
-  have h2 := map_zpow
-    ((PadicInt.Coe.ringHom (p := l) : ℤ_[l] →* ℚ_[l]).comp (Units.coeHom _)).toHomUnits
-    (cycZ (F := E) (Ω := Ω) l (frob h)) (deg g)
+  have h2 :=
+    map_zpow ((PadicInt.Coe.ringHom (p := l) : ℤ_[l] →* ℚ_[l]).comp (Units.coeHom _)).toHomUnits
+      (cycZ (F := E) (Ω := Ω) l (frob h)) (deg g)
   have h3 := congrArg Units.val h2
   rw [Units.val_zpow_eq_zpow_val] at h3
   rw [h1]
@@ -227,39 +237,50 @@ def ineConj {h : IsPlaceOver A w} (g : Weil h) (σ : Ine (F := E) A) : Ine (F :=
   ⟨(g : G E Ω) * σ * (g : G E Ω)⁻¹, conj_mem_Ine (Weil_le_Dec h g.2) σ.2⟩
 
 omit [IsAlgClosure E Ω] in
-@[simp] theorem ineIncl_ineConj {h : IsPlaceOver A w} (g : Weil h) (σ : Ine (F := E) A) :
-    ineIncl h (ineConj g σ) = g * ineIncl h σ * g⁻¹ := rfl
+@[simp]
+theorem ineIncl_ineConj {h : IsPlaceOver A w} (g : Weil h) (σ : Ine (F := E) A)
+    : ineIncl h (ineConj g σ) = g * ineIncl h σ * g⁻¹ :=
+  rfl
 
 omit [IsAlgClosure E Ω] in
-@[simp] theorem coe_ineConj {h : IsPlaceOver A w} (g : Weil h) (σ : Ine (F := E) A) :
-    (ineConj g σ : G E Ω) = (g : G E Ω) * σ * (g : G E Ω)⁻¹ := rfl
+@[simp]
+theorem coe_ineConj {h : IsPlaceOver A w} (g : Weil h) (σ : Ine (F := E) A)
+    : (ineConj g σ : G E Ω) = (g : G E Ω) * σ * (g : G E Ω)⁻¹ :=
+  rfl
 
 omit [IsAlgClosure E Ω] in
 theorem continuous_ineConj {h : IsPlaceOver A w} (g : Weil h) : Continuous (ineConj g) :=
   Continuous.subtype_mk (by fun_prop) _
 
-def kummerChar (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (a : Eˣ) :
-    Ine (F := E) A →* Multiplicative ℤ_[l] :=
-  MonoidHom.mk' (fun σ => Multiplicative.ofAdd (kummer l a (σ : G E Ω))) fun σ τ => by
-    rw [Subgroup.coe_mul, kummer_mul, cycZ_of_mem_Ine h hl σ.2, Units.val_one, one_mul, ofAdd_add]
+def kummerChar (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (a : Eˣ)
+    : Ine (F := E) A →* Multiplicative ℤ_[l] :=
+  MonoidHom.mk'
+    (fun σ => Multiplicative.ofAdd (kummer l a (σ : G E Ω)))
+    fun σ τ => by
+      rw [Subgroup.coe_mul, kummer_mul, cycZ_of_mem_Ine h hl σ.2, Units.val_one, one_mul, ofAdd_add]
 
-@[simp] theorem toAdd_kummerChar (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (a : Eˣ)
-    (σ : Ine (F := E) A) : (kummerChar h hl a σ).toAdd = kummer l a (σ : G E Ω) := rfl
+@[simp]
+theorem toAdd_kummerChar
+    (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (a : Eˣ) (σ : Ine (F := E) A)
+    : (kummerChar h hl a σ).toAdd = kummer l a (σ : G E Ω) :=
+  rfl
 
-theorem continuous_kummerChar (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (a : Eˣ) :
-    Continuous (kummerChar h hl a) :=
+theorem continuous_kummerChar (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (a : Eˣ)
+    : Continuous (kummerChar h hl a) :=
   continuous_ofAdd.comp ((continuous_kummer l a).comp continuous_subtype_val)
 
-theorem kummerChar_ineConj {h : IsPlaceOver A w} (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (a : Eˣ)
-    (g : Weil h) (σ : Ine (F := E) A) :
-    ((kummerChar h hl a (ineConj g σ)).toAdd : ℚ_[l]) =
-      ((normV w : ℕ) : ℚ_[l]) ^ deg g * ((kummerChar h hl a σ).toAdd : ℚ_[l]) := by
+theorem kummerChar_ineConj
+    {h : IsPlaceOver A w}
+    (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (a : Eˣ) (g : Weil h) (σ : Ine (F := E) A)
+    : ((kummerChar h hl a (ineConj g σ)).toAdd : ℚ_[l])
+      = ((normV w : ℕ) : ℚ_[l]) ^ deg g * ((kummerChar h hl a σ).toAdd : ℚ_[l]) := by
   have h0 := kummer_mul l a (g : G E Ω) (g : G E Ω)⁻¹
   rw [mul_inv_cancel, kummer_one] at h0
   rw [toAdd_kummerChar, toAdd_kummerChar, coe_ineConj, mul_assoc, kummer_mul, kummer_mul,
     cycZ_of_mem_Ine h hl σ.2, Units.val_one, one_mul, mul_add, add_left_comm, ← h0, add_zero,
     ← cycZ_weil hl g]
-  push_cast; rfl
+  push_cast
+  rfl
 
 omit [IsAlgClosure E Ω] in
 variable (w) in
@@ -274,15 +295,19 @@ theorem unif_mem : unif w ∈ w.asIdeal := (exists_uniformiser w).choose_spec.1
 theorem unif_notMem : unif w ∉ w.asIdeal ^ 2 := (exists_uniformiser w).choose_spec.2
 
 variable (w) in
-def unifUnit : Eˣ := Units.mk0 ((unif w : 𝓞 E) : E) fun h0 =>
-  unif_notMem (w := w) (by rw [RingOfIntegers.coe_eq_zero_iff.mp h0]; exact zero_mem _)
+def unifUnit : Eˣ :=
+  Units.mk0 ((unif w : 𝓞 E) : E) fun h0 =>
+    unif_notMem (w := w) (by rw [RingOfIntegers.coe_eq_zero_iff.mp h0]; exact zero_mem _)
 
-def tameL (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) :
-    Ine (F := E) A →* Multiplicative ℤ_[l] := kummerChar h hl (unifUnit w)
+def tameL (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal)
+    : Ine (F := E) A →* Multiplicative ℤ_[l] :=
+  kummerChar h hl (unifUnit w)
 
-theorem surjective_of_isUnit {H : Type*} [Group H] [TopologicalSpace H] [CompactSpace H]
-    {t : H →* Multiplicative ℤ_[l]} (ht : Continuous t) {σ : H} (hσ : IsUnit (t σ).toAdd) :
-    Function.Surjective t := by
+theorem surjective_of_isUnit
+    {H : Type*} [Group H] [TopologicalSpace H] [CompactSpace H]
+    {t : H →* Multiplicative ℤ_[l]} (ht : Continuous t)
+    {σ : H} (hσ : IsUnit (t σ).toAdd)
+    : Function.Surjective t := by
   obtain ⟨u, hu⟩ := hσ
   have hc : IsClosed (Set.range fun τ => (↑u⁻¹ : ℤ_[l]) * (t τ).toAdd) :=
     (isCompact_range (continuous_const.mul (continuous_toAdd.comp ht))).isClosed
@@ -293,9 +318,11 @@ theorem surjective_of_isUnit {H : Type*} [Group H] [TopologicalSpace H] [Compact
   obtain ⟨τ, hτ⟩ := hall (↑u⁻¹ * y.toAdd)
   exact ⟨τ, Multiplicative.toAdd.injective (by simpa using hτ)⟩
 
-theorem surjective_kummerChar (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (a : Eˣ)
-    {σ : G E Ω} (hσ : σ ∈ Ine (F := E) A) (hx : σ (rootOf Ω l (a : E) 1) ≠ rootOf Ω l (a : E) 1) :
-    Function.Surjective (kummerChar h hl a) := by
+theorem surjective_kummerChar
+    (h : IsPlaceOver A w) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal)
+    (a : Eˣ)
+    {σ : G E Ω} (hσ : σ ∈ Ine (F := E) A) (hx : σ (rootOf Ω l (a : E) 1) ≠ rootOf Ω l (a : E) 1)
+    : Function.Surjective (kummerChar h hl a) := by
   have := compactSpace_Ine (E := E) A
   refine surjective_of_isUnit (continuous_kummerChar h hl a) (σ := ⟨σ, hσ⟩) ?_
   rw [toAdd_kummerChar, ← IsLocalRing.notMem_maximalIdeal, PadicInt.maximalIdeal_eq_span_p,

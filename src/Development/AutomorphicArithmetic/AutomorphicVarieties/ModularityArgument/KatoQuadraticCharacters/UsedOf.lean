@@ -10,11 +10,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp
+  Matrix IsLocalRing
 open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
 
-private theorem cls_eq_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (N : ℕ) [NeZero N] (g : G ℚ Ω)
-    (hg : ∀ ζ : Ω, ζ ^ N = 1 → g ζ = ζ) : Chr.cls ℚ Ω N g = 1 := by
+private theorem cls_eq_one
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (N : ℕ) [NeZero N]
+    (g : G ℚ Ω) (hg : ∀ ζ : Ω, ζ ^ N = 1 → g ζ = ζ)
+    : Chr.cls ℚ Ω N g = 1 := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : NeZero ((N : ℕ) : Ω) := ⟨Nat.cast_ne_zero.mpr (NeZero.ne N)⟩
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω N
@@ -26,16 +31,28 @@ private theorem cls_eq_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure �
   apply ZMod.val_injective
   exact hζ.pow_inj (ZMod.val_lt _) (ZMod.val_lt _) (h1.symm.trans h2.symm)
 
-theorem UpperTheory.V.Z.Kato.used_of :
-    CohInp → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
-      {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ) {U : (_root_.UpperTheory.V.U3.Univ (_root_.UpperTheory.V.U3.GCond.noCondition _ (D.η.comp D.ι) (D.Ψ.comp D.ι)))}
-      {g₁ : G ℚ Ω}, D.Marked g₁ → ∀ {r : G ℚ Ω →* GG (m := 3) (R := PadicAlgCl l)} (_ : D.IsPt U g₁ r),
-      TypeII D.η r → ∀ W : G ℚ Ω →* GL (Fin 2) (PadicAlgCl l), D.IsExt r W → Continuous W →
-      (∀ g, (W g : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)) = Wfun r g) →
-      (∀ g, (W g : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)).det = ((D.η g : ℤˣ) : ℤ)) →
-      ∀ ι : Qbar l ≃+* ℂ, D.IsModular ι W →
-      UpperTheory.V.Z.Kato.Used l Ω K e N ((Units.map (Int.castRingHom (PadicAlgCl l)).toMonoidHom).comp D.η)
-        ((Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom).comp (Chr.dirG ℚ Ω ψ)) W := by
+theorem UpperTheory.V.Z.Kato.used_of
+    : CohInp
+      → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K]
+          [Algebra K Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ}
+          {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ)
+          {U : (_root_.UpperTheory.V.U3.Univ (_root_.UpperTheory.V.U3.GCond.noCondition _
+            (D.η.comp D.ι) (D.Ψ.comp D.ι)))}
+          {g₁ : G ℚ Ω},
+        D.Marked g₁
+          → ∀ {r : G ℚ Ω →* GG (m := 3) (R := PadicAlgCl l)} (_ : D.IsPt U g₁ r),
+            TypeII D.η r
+              → ∀ W : G ℚ Ω →* GL (Fin 2) (PadicAlgCl l),
+                D.IsExt r W → Continuous W
+                  → (∀ g, (W g : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)) = Wfun r g)
+                  → (∀ g, (W g : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)).det = ((D.η g : ℤˣ) : ℤ))
+                  → ∀ ι : Qbar l ≃+* ℂ,
+                    D.IsModular ι W
+                      → UpperTheory.V.Z.Kato.Used l Ω K e N
+                        ((Units.map (Int.castRingHom (PadicAlgCl l)).toMonoidHom).comp D.η)
+                        ((Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom).comp
+                          (Chr.dirG ℚ Ω ψ))
+                        W := by
   intro hC Ω _ _ _ K _ _ _ l hl c N _ e ψ D U g₁ hM r h hII W hext hcont hW hdet ι hmod
   obtain ⟨h11, -, -⟩ := typeII_facts hC D hM h hII
   obtain ⟨-, hηc, hΨc, -, -, -, -, -, -, -, hl1⟩ := dat_facts D
@@ -52,12 +69,20 @@ theorem UpperTheory.V.Z.Kato.used_of :
   have w1 : wt1 1 = 0 := by decide
   have w2 : wt1 2 = -1 := by decide
   have h00 : ∀ g, (r0 D.η D.ΨQ g).mat 0 0 = (D.ΨQ g : PadicAlgCl l) := fun g => by
-    simp only [GG.mat, unitaryThreeReflection_left, tor_val, Matrix.diagonal_apply_eq, w0, _root_.zpow_one]
-  have h22 : ∀ g, (r0 D.η D.ΨQ g).mat 2 2 = (((D.ΨQ g)⁻¹ : (PadicAlgCl l)ˣ) : PadicAlgCl l) := fun g => by
-    simp only [GG.mat, unitaryThreeReflection_left, tor_val, Matrix.diagonal_apply_eq, w2, _root_.zpow_neg, _root_.zpow_one]
+    simp only [GG.mat, unitaryThreeReflection_left, tor_val, Matrix.diagonal_apply_eq, w0,
+      _root_.zpow_one]
+  have h22
+      : ∀ g,
+        (r0 D.η D.ΨQ g).mat 2 2 = (((D.ΨQ g)⁻¹ : (PadicAlgCl l)ˣ) : PadicAlgCl l) := fun g => by
+    simp only [GG.mat, unitaryThreeReflection_left, tor_val, Matrix.diagonal_apply_eq, w2,
+      _root_.zpow_neg, _root_.zpow_one]
   have h11' : ∀ g, (r0 D.η D.ΨQ g).mat 1 1 = 1 := fun g => by
-    simp only [GG.mat, unitaryThreeReflection_left, tor_val, Matrix.diagonal_apply_eq, w1, _root_.zpow_zero, Units.val_one]
-  have htrW : ∀ g, (W g : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)).trace = (θ g : PadicAlgCl l) * (r g).mat 0 0 + (r g).mat 2 2 := by
+    simp only [GG.mat, unitaryThreeReflection_left, tor_val, Matrix.diagonal_apply_eq, w1,
+      _root_.zpow_zero, Units.val_one]
+  have htrW
+      : ∀ g,
+        (W g : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)).trace
+          = (θ g : PadicAlgCl l) * (r g).mat 0 0 + (r g).mat 2 2 := by
     intro g
     rw [hW, Wfun, hθ0, h.mult g]
     rcases Int.units_eq_one_or (D.η g) with hg | hg
@@ -67,12 +92,30 @@ theorem UpperTheory.V.Z.Kato.used_of :
     · rw [hg, if_neg (by decide), Matrix.trace_fin_two, Matrix.mul_diagonal, Matrix.mul_diagonal]
       show (r g).mat 0 0 * (-1) + (r g).mat 2 2 * 1 = _
       simp
-  refine
-    { l_odd := D.gd.l_odd, e_pos := D.gd.e_pos, gen := D.gd.gen, quad := D.gd.quad, imag := D.gd.imag, l_cop := D.gd.l_cop,
-      N_pos := NeZero.pos N, N_even := D.gd.N_even, cop := D.gd.cop, θ_ker := ?_, θ_sq := fun g => ?_, ψ_mu := fun s hs => ?_,
-      ψ_ord := ⟨orderOf ψ, D.gd.ord, fun g => ?_⟩, ψ_ine := fun A hA s hs => ?_, even := ⟨D.cc, D.conj, ?_⟩,
-      level := hord.1, ord := ⟨A₀, N, hA₀, NeZero.pos N, hord.2 A₀ hA₀⟩, det := fun g => by rw [hdet, hθ0],
-      tr_ine := fun A hA s hs => ?_, red := fun g => ?_, flag := ?_, irr := typeII_irr_cyc hC D hM h hII W hext }
+  refine {
+    l_odd := D.gd.l_odd
+    e_pos := D.gd.e_pos
+    gen := D.gd.gen
+    quad := D.gd.quad
+    imag := D.gd.imag
+    l_cop := D.gd.l_cop
+    N_pos := NeZero.pos N
+    N_even := D.gd.N_even
+    cop := D.gd.cop
+    θ_ker := ?_
+    θ_sq := fun g => ?_
+    ψ_mu := fun s hs => ?_
+    ψ_ord := ⟨orderOf ψ, D.gd.ord, fun g => ?_⟩
+    ψ_ine := fun A hA s hs => ?_
+    even := ⟨D.cc, D.conj, ?_⟩
+    level := hord.1
+    ord := ⟨A₀, N, hA₀, NeZero.pos N, hord.2 A₀ hA₀⟩
+    det := fun g => by rw [hdet, hθ0]
+    tr_ine := fun A hA s hs => ?_
+    red := fun g => ?_
+    flag := ?_
+    irr := typeII_irr_cyc hC D hM h hII W hext
+  }
   · rw [← D.η_ker]
     ext g
     simp only [MonoidHom.mem_ker, Units.ext_iff, hθ0, Units.val_one]
@@ -85,8 +128,8 @@ theorem UpperTheory.V.Z.Kato.used_of :
     rw [← map_pow]
     have : ψ.toUnitHom (Chr.cls ℚ Ω N g) ^ orderOf ψ = 1 := by
       apply Units.ext
-      rw [Units.val_pow_eq_pow_val, MulChar.coe_toUnitHom, ← MulChar.pow_apply_coe, pow_orderOf_eq_one, MulChar.one_apply_coe,
-        Units.val_one]
+      rw [Units.val_pow_eq_pow_val, MulChar.coe_toUnitHom, ← MulChar.pow_apply_coe,
+        pow_orderOf_eq_one, MulChar.one_apply_coe, Units.val_one]
     rw [this, map_one]
   · obtain ⟨x, -, hxI⟩ := hconj A hA
     have h1 := (hxI s).1 hs
@@ -107,8 +150,8 @@ theorem UpperTheory.V.Z.Kato.used_of :
     have h6 : Chr.dirG ℚ Ω (comp l ψ) (D.ι σ) ^ 2 = 1 := by
       apply Units.ext
       show (((comp l ψ).toUnitHom (Chr.cls ℚ Ω N (D.ι σ)) ^ 2 : c.Oˣ) : c.O) = _
-      rw [Units.val_pow_eq_pow_val, MulChar.coe_toUnitHom, ← MulChar.pow_apply_coe, D.gd.ine, MulChar.one_apply_coe,
-        Units.val_one]
+      rw [Units.val_pow_eq_pow_val, MulChar.coe_toUnitHom, ← MulChar.pow_apply_coe, D.gd.ine,
+        MulChar.one_apply_coe, Units.val_one]
     rw [← map_pow, h5, h4, h6, map_one]
   · rw [← hΨ]
     show Units.map _ (D.Ψ D.cc) = 1
@@ -129,14 +172,19 @@ theorem UpperTheory.V.Z.Kato.used_of :
     have hn : ‖(θ g : PadicAlgCl l)‖ = 1 := by
       rw [hθ0]
       rcases Int.units_eq_one_or (D.η g) with hg | hg <;> simp [hg]
-    have e1 : (θ g : PadicAlgCl l) * (r g).mat 0 0 + (r g).mat 2 2 -
-        ((θ g : PadicAlgCl l) * (D.ΨQ g : PadicAlgCl l) + (((D.ΨQ g)⁻¹ : (PadicAlgCl l)ˣ) : PadicAlgCl l)) =
-        (θ g : PadicAlgCl l) * ((r g).mat 0 0 - D.ΨQ g) + ((r g).mat 2 2 - (((D.ΨQ g)⁻¹ : (PadicAlgCl l)ˣ) : PadicAlgCl l)) := by
+    have e1
+        : (θ g : PadicAlgCl l) * (r g).mat 0 0 + (r g).mat 2 2
+            - ((θ g : PadicAlgCl l) * (D.ΨQ g : PadicAlgCl l)
+              + (((D.ΨQ g)⁻¹ : (PadicAlgCl l)ˣ) : PadicAlgCl l))
+          = (θ g : PadicAlgCl l) * ((r g).mat 0 0 - D.ΨQ g)
+            + ((r g).mat 2 2 - (((D.ΨQ g)⁻¹ : (PadicAlgCl l)ˣ) : PadicAlgCl l)) := by
       ring
     rw [e1]
     refine lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt ?_ a2)
     rw [norm_mul, hn, one_mul]
     exact a0
-  · have hdt : GlobalTheory.Ord2.dt W = θ := MonoidHom.ext fun g => Units.ext ((hdet g).trans (hθ0 g).symm)
+  · have hdt : GlobalTheory.Ord2.dt W = θ :=
+      MonoidHom.ext fun g => Units.ext ((hdet g).trans (hθ0 g).symm)
     rw [← hdt]
-    exact (GlobalTheory.Ord2.admissible_of_type_two_block hC D hM h ι hII W hext hcont hdet hmod).flag
+    exact (GlobalTheory.Ord2.admissible_of_type_two_block hC D hM h ι hII W hext hcont hdet
+      hmod).flag

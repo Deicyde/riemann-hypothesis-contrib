@@ -11,27 +11,39 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.MinorPolynomials
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryGroupMassFormula.UsCompose
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  PI.UnitaryGroupMassFormula.UsCompose
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-def TermClause (D : RealPlaceData k r Wp Wq) {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq)
-    (L : Finset (Fin (r + 2))) (o κ : ℕ) (Θ : DiffOp k r Wp Wq) : Prop :=
-  ∀ T ∈ Θ, ∃ (P : Mat k r → ℂ) (a b : Fin (r + 2) → ℕ) (c : ℕ)
-      (es : List (Fin nf × List (Mat k r))), U.IsPolyDeg κ P ∧
-      (∀ l, l ∉ L → l ≠ Fin.last (r + 1) → a l = 0 ∧ b l = 0) ∧
-      T.word.length + (es.map fun e => e.2.length).sum ≤ o ∧ (∀ e ∈ es, ∀ X ∈ e.2, inLie k r X) ∧
-      ∀ g ∈ C6.domL D L, T.coef g = (P g * C6.monoM D a b c g) • C6.Epart fib es g
+def TermClause
+    (D : RealPlaceData k r Wp Wq)
+    {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq)
+    (L : Finset (Fin (r + 2))) (o κ : ℕ) (Θ : DiffOp k r Wp Wq)
+    : Prop :=
+  ∀ T ∈ Θ,
+    ∃ (P : Mat k r → ℂ) (a b : Fin (r + 2) → ℕ) (c : ℕ) (es : List (Fin nf × List (Mat k r))),
+      U.IsPolyDeg κ P ∧ (∀ l, l ∉ L → l ≠ Fin.last (r + 1) → a l = 0 ∧ b l = 0)
+        ∧ T.word.length + (es.map fun e => e.2.length).sum ≤ o ∧ (∀ e ∈ es, ∀ X ∈ e.2, inLie k r X)
+        ∧ ∀ g ∈ C6.domL D L, T.coef g = (P g * C6.monoM D a b c g) • C6.Epart fib es g
 
-theorem toFS (D : RealPlaceData k r Wp Wq) {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq)
-    (L : Finset (Fin (r + 2))) {o κ : ℕ} :
-    ∀ Θ : DiffOp k r Wp Wq, TermClause D fib L o κ Θ →
-      ∃ Lf : FS k r nf, (∀ e ∈ Lf, Good L e ∧ e.1.q.totalDegree ≤ κ ∧ e.2.length + fo e.1.es ≤ o) ∧
-        (∀ T ∈ Θ, ∃ e ∈ Lf, e.2 = T.word) ∧
-        ∀ (H : Mat k r → (Wq →L[ℂ] Wp)), ∀ g ∈ C6.domL D L, opApply Θ H g = shape D fib H Lf g := by
+theorem toFS
+    (D : RealPlaceData k r Wp Wq)
+    {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq)
+    (L : Finset (Fin (r + 2)))
+    {o κ : ℕ}
+    : ∀ Θ : DiffOp k r Wp Wq,
+      TermClause D fib L o κ Θ
+        → ∃ Lf : FS k r nf,
+          (∀ e ∈ Lf, Good L e ∧ e.1.q.totalDegree ≤ κ ∧ e.2.length + fo e.1.es ≤ o)
+            ∧ (∀ T ∈ Θ, ∃ e ∈ Lf, e.2 = T.word)
+            ∧ ∀ (H : Mat k r → (Wq →L[ℂ] Wp)), ∀ g ∈ C6.domL D L,
+              opApply Θ H g = shape D fib H Lf g := by
   intro Θ hΘ
   induction Θ with
   | nil => exact ⟨[], by simp, by simp, fun H g _ => by simp [opApply, shape]⟩
@@ -70,10 +82,11 @@ section mk
 
 variable [FiniteDimensional ℂ Wp]
 
-
 open Classical in
-def mkTerm (D : RealPlaceData k r Wp Wq) {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq)
-    (e : CT k r nf × List (Mat k r)) : DTerm k r Wp Wq where
+def mkTerm
+    (D : RealPlaceData k r Wp Wq)
+    {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq) (e : CT k r nf × List (Mat k r))
+    : DTerm k r Wp Wq where
   coef := cv D fib e.1
   coefAdj := fun x => Formalism.FourierDecayAlt.P.HilbertSchmidtVectorization.adjH (cv D fib e.1 x)
   word := if ∀ X ∈ e.2, inLie k r X then e.2 else []
@@ -172,12 +185,16 @@ private lemma rw_congr_on_domL (D : RealPlaceData k r Wp Wq) (L : Finset (Fin (r
     rw [mem_domL]
     exact ⟨crv_mem (x := (false, X)) (hw X (by simp)) hGV t, ht⟩
 
-theorem comp_identity (D : RealPlaceData k r Wp Wq) {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq)
-    (hfib : ∀ j, CkOn ⊤ (GPos D) (fib j)) (L : Finset (Fin (r + 2))) {L₁ L₂ : FS k r nf}
-    (hg₁ : ∀ e ∈ L₁, Good L e) (hg₂ : ∀ e ∈ L₂, Good L e) {m : ℕ} (hm : ∀ e₁ ∈ L₁, ∀ e ∈ L₂, e.2.length + e₁.2.length ≤ m)
-    {F : Mat k r → (Wq →L[ℂ] Wp)} (hF : CkOn (m : ℕ∞) (GV k r) F) {H : Mat k r → (Wq →L[ℂ] Wp)}
-    (hH : ∀ g ∈ C6.domL D L, H g = shape D fib F L₂ g) {g : Mat k r} (hg : g ∈ C6.domL D L) :
-    shape D fib H L₁ g = shape D fib F (compFS D L₁ L₂) g := by
+theorem comp_identity
+    (D : RealPlaceData k r Wp Wq)
+    {nf : ℕ} (fib : Fin nf → Mat k r → C6.EndH Wp Wq) (hfib : ∀ j, CkOn ⊤ (GPos D) (fib j))
+    (L : Finset (Fin (r + 2)))
+    {L₁ L₂ : FS k r nf} (hg₁ : ∀ e ∈ L₁, Good L e) (hg₂ : ∀ e ∈ L₂, Good L e)
+    {m : ℕ} (hm : ∀ e₁ ∈ L₁, ∀ e ∈ L₂, e.2.length + e₁.2.length ≤ m)
+    {F : Mat k r → (Wq →L[ℂ] Wp)} (hF : CkOn (m : ℕ∞) (GV k r) F)
+    {H : Mat k r → (Wq →L[ℂ] Wp)} (hH : ∀ g ∈ C6.domL D L, H g = shape D fib F L₂ g)
+    {g : Mat k r} (hg : g ∈ C6.domL D L)
+    : shape D fib H L₁ g = shape D fib F (compFS D L₁ L₂) g := by
   show (L₁.map fun e => cv D fib e.1 g (Rw e.2 H g)).sum = _
   unfold compFS
   rw [shape_flatMap']

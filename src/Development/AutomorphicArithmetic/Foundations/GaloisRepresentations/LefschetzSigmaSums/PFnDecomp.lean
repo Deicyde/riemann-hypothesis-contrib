@@ -107,32 +107,39 @@ private lemma decomp (hb : ∀ k ∈ K, ∀ g, f (k * g) = f g ∧ f (g * k) = f
 end UpperTheory.Gal.LocalSmoothExtension.FunctionDecomposition
 
 open UpperTheory.Gal.LocalSmoothExtension.FunctionDecomposition in
-private theorem UpperTheory.Gal.LocalSmoothExtension.FunctionDecomposition.fwd {B : AlgebraicGeometry.Scheme.{0}} {Γ : Type} [Group Γ]
-    (X : UpperTheory.Gal.G3.Tower B Γ) (j : X.ι) (f : Γ → ℂ) (hf : X.IsFn j f) :
-    f ∈ Formalism.UG.Hecke ℂ (X.K j) ∧ ∃ (m : ℕ) (h : Fin m → Γ) (c : Fin m → ℂ), (∀ i, h i ∈ X.Δ) ∧
-      f = ∑ i, c i • UpperTheory.Gal.G3.ind ℂ (X.K j) (h i)⁻¹ ∧
-      ∀ i g, UpperTheory.Gal.G3.ind ℂ (X.K j) (h i)⁻¹ g ≠ 0 → f g ≠ 0 := by
+private theorem UpperTheory.Gal.LocalSmoothExtension.FunctionDecomposition.fwd
+    {B : AlgebraicGeometry.Scheme.{0}} {Γ : Type} [Group Γ]
+    (X : UpperTheory.Gal.G3.Tower B Γ) (j : X.ι)
+    (f : Γ → ℂ) (hf : X.IsFn j f)
+    : f ∈ Formalism.UG.Hecke ℂ (X.K j)
+      ∧ ∃ (m : ℕ) (h : Fin m → Γ) (c : Fin m → ℂ),
+        (∀ i, h i ∈ X.Δ) ∧ f = ∑ i, c i • UpperTheory.Gal.G3.ind ℂ (X.K j) (h i)⁻¹
+          ∧ ∀ i g, UpperTheory.Gal.G3.ind ℂ (X.K j) (h i)⁻¹ g ≠ 0 → f g ≠ 0 := by
   obtain ⟨hb, hΔ, hfin⟩ := hf
   obtain ⟨m, q, c, hq, e, hs⟩ := decomp hb hfin
   refine ⟨mem_hecke hb hfin, m, fun i => (q i)⁻¹, c, fun i => hΔ _ (hq i), ?_, ?_⟩
   · simpa only [inv_inv] using e
   · simpa only [inv_inv] using hs
 
-private theorem UpperTheory.Gal.LocalSmoothExtension.FunctionDecomposition.bwd {B : AlgebraicGeometry.Scheme.{0}} {Γ : Type} [Group Γ]
-    (X : UpperTheory.Gal.G3.Tower B Γ) (j : X.ι) (f : Γ → ℂ) (hf : f ∈ Formalism.UG.Hecke ℂ (X.K j))
-    (hΔ : ∀ g, f g ≠ 0 → g⁻¹ ∈ X.Δ) : X.IsFn j f := by
+private theorem UpperTheory.Gal.LocalSmoothExtension.FunctionDecomposition.bwd
+    {B : AlgebraicGeometry.Scheme.{0}} {Γ : Type} [Group Γ]
+    (X : UpperTheory.Gal.G3.Tower B Γ) (j : X.ι)
+    (f : Γ → ℂ) (hf : f ∈ Formalism.UG.Hecke ℂ (X.K j)) (hΔ : ∀ g, f g ≠ 0 → g⁻¹ ∈ X.Δ)
+    : X.IsFn j f := by
   classical
   obtain ⟨hb, S, hS⟩ : Formalism.UG.IsBiInv (X.K j) f ∧ Formalism.UG.FinDosetSupp (X.K j) f := hf
   have hbi : ∀ k ∈ X.K j, ∀ g, f (k * g) = f g ∧ f (g * k) = f g := fun k hk g =>
     ⟨by simpa using hb ⟨k, hk⟩ 1 g, by simpa using hb 1 ⟨k, hk⟩ g⟩
   refine ⟨hbi, hΔ, ?_⟩
-  have hone : ∀ s : Γ, s⁻¹ ∈ X.Δ →
-      {y : Γ ⧸ X.K j | UpperTheory.Gal.G3.ind ℂ (X.K j) s y.out ≠ 0}.Finite := by
+  have hone
+      : ∀ s : Γ,
+        s⁻¹ ∈ X.Δ → {y : Γ ⧸ X.K j | UpperTheory.Gal.G3.ind ℂ (X.K j) s y.out ≠ 0}.Finite := by
     intro s hs
     have := ((UpperTheory.Gal.G3.pFnRing X ℂ j).1 s⁻¹ hs).2.2
     simpa only [inv_inv] using this
   refine ((S.filter fun s => s⁻¹ ∈ X.Δ).finite_toSet.biUnion
-    (t := fun s => {y : Γ ⧸ X.K j | UpperTheory.Gal.G3.ind ℂ (X.K j) s y.out ≠ 0}) ?_).subset ?_
+    (t := fun s => {y : Γ ⧸ X.K j | UpperTheory.Gal.G3.ind ℂ (X.K j) s y.out ≠ 0})
+    ?_).subset ?_
   · intro s hs
     exact hone s (Finset.mem_filter.1 hs).2
   · intro y hy
@@ -148,7 +155,9 @@ private theorem UpperTheory.Gal.LocalSmoothExtension.FunctionDecomposition.bwd {
     exact one_ne_zero
 
 open UpperTheory.Gal.LocalSmoothExtension in
-theorem UpperTheory.Gal.LocalSmoothExtension.fnDecomp_of :
-    FnDecomp := by
+theorem UpperTheory.Gal.LocalSmoothExtension.fnDecomp_of : FnDecomp := by
   intro B Γ _ X j f
-  exact ⟨UpperTheory.Gal.LocalSmoothExtension.FunctionDecomposition.fwd X j f, UpperTheory.Gal.LocalSmoothExtension.FunctionDecomposition.bwd X j f⟩
+  exact ⟨
+    UpperTheory.Gal.LocalSmoothExtension.FunctionDecomposition.fwd X j f,
+    UpperTheory.Gal.LocalSmoothExtension.FunctionDecomposition.bwd X j f
+  ⟩

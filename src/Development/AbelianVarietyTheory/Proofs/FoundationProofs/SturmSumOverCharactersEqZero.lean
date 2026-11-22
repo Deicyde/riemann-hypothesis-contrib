@@ -12,13 +12,17 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CoefQExpa
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM
 
-theorem sturm_sum_coef_zero : ∀ (k L N : ℕ), 0 < L → N ∣ L → ∃ B : ℕ, ∀ a : DirichletCharacter ℂ N → ℕ → ℂ,
-    (∀ ε, MF k L (ch ε) (a ε)) → (∀ n < B, (∑ ε, a ε) n = 0) → ∑ ε, a ε = 0 := by
+theorem sturm_sum_coef_zero
+    : ∀ (k L N : ℕ),
+      0 < L → N ∣ L
+        → ∃ B : ℕ, ∀ a : DirichletCharacter ℂ N → ℕ → ℂ,
+          (∀ ε, MF k L (ch ε) (a ε)) → (∀ n < B, (∑ ε, a ε) n = 0) → ∑ ε, a ε = 0 := by
   classical
   intro k L N hL hN
   have hΓ : (1 : ℝ) ∈ (Gamma1 L : Subgroup (GL (Fin 2) ℝ)).strictPeriods := by
@@ -32,16 +36,20 @@ theorem sturm_sum_coef_zero : ∀ (k L N : ℕ), 0 < L → N ∣ L → ∃ B : �
     have := coef_qs (a ε) (ha ε).1 n
     unfold coef at this
     rw [← this, hf]
-  have hsum : ∀ (s : Finset (DirichletCharacter ℂ N)) (n : ℕ),
-      (qExpansion 1 ⇑(∑ ε ∈ s, f ε)).coeff n = ∑ ε ∈ s, a ε n := by
+  have hsum
+      : ∀ (s : Finset (DirichletCharacter ℂ N)) (n : ℕ),
+        (qExpansion 1 ⇑(∑ ε ∈ s, f ε)).coeff n = ∑ ε ∈ s, a ε n := by
     intro s n
     induction s using Finset.induction_on with
-    | empty => rw [Finset.sum_empty, Finset.sum_empty, ModularForm.coe_zero, qExpansion_zero, map_zero]
+    | empty =>
+      rw [Finset.sum_empty, Finset.sum_empty, ModularForm.coe_zero, qExpansion_zero, map_zero]
     | insert e s he ih =>
-      rw [Finset.sum_insert he, ModularForm.coe_add, ModularForm.qExpansion_add one_pos hΓ, map_add (f := _), ih, hc, Finset.sum_insert he]
-  have h0 : ∑ ε, f ε = 0 := hm _ fun n hn => by
-    rw [hsum]
-    simpa [Finset.sum_apply] using hz n hn
+      rw [Finset.sum_insert he, ModularForm.coe_add, ModularForm.qExpansion_add one_pos hΓ,
+        map_add (f := _), ih, hc, Finset.sum_insert he]
+  have h0 : ∑ ε, f ε = 0 :=
+    hm _ fun n hn => by
+      rw [hsum]
+      simpa [Finset.sum_apply] using hz n hn
   funext n
   have := hsum Finset.univ n
   rw [h0] at this

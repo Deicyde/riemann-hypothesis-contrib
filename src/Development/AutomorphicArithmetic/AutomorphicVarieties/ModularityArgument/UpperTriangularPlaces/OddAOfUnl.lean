@@ -31,19 +31,24 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.LocGL GlobalTheory.GalOfCusp
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Lev UpperTheory.V.Z.Win
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace UpperTheory.V.Keep
 
-theorem sphV {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {n : ℕ}
-    {w : HeightOneSpectrum (𝓞 F)} {A : ValuationSubring Ω} {h : IsPlaceOver A w}
-    {rc : IrrGL (k := w.adicCompletion F) → WD h} (hrc : IsRecV h rc) (σ : SmIrr (GL (Fin n) (w.adicCompletion F)))
-    (h0 : (rc (algNorm σ)).mono0) (d : ℕ)
-    (hI : ∀ s : ↥(Ine (F := F) A), (rc (algNorm σ)).charPol (ineIncl h s) = (X - 1) ^ d) : GlobalTheory.SmGL.IsSpherical σ.ρ := by
+theorem sphV
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {n : ℕ} {w : HeightOneSpectrum (𝓞 F)} {A : ValuationSubring Ω} {h : IsPlaceOver A w}
+    {rc : IrrGL (k := w.adicCompletion F) → WD h}
+    (hrc : IsRecV h rc) (σ : SmIrr (GL (Fin n) (w.adicCompletion F))) (h0 : (rc (algNorm σ)).mono0)
+    (d : ℕ) (hI : ∀ s : ↥(Ine (F := F) A), (rc (algNorm σ)).charPol (ineIncl h s) = (X - 1) ^ d)
+    : GlobalTheory.SmGL.IsSpherical σ.ρ := by
   obtain ⟨a, ha, ε, H⟩ := hrc
   have hu : (rc (algNorm σ)).unr := by
     obtain ⟨k, b, e⟩ := WD.exists_rep (rc (algNorm σ))
@@ -54,11 +59,13 @@ theorem sphV {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [
     have h2 := hI s
     rw [WD.charPol_mk] at h2
     rw [h2, map_pow, map_sub, aeval_X, map_one] at h1
-    have hs : Module.End.IsSemisimple (b.ρ (ineIncl h s) - algebraMap ℂ (Module.End ℂ (Fin k → ℂ)) 1) :=
+    have hs
+        : Module.End.IsSemisimple (b.ρ (ineIncl h s) - algebraMap ℂ (Module.End ℂ (Fin k → ℂ)) 1) :=
       Module.End.isSemisimple_sub_algebraMap_iff.2 (b.semisimple _)
     rw [map_one] at hs
     exact sub_eq_zero.1 (Module.End.eq_zero_of_isNilpotent_isSemisimple ⟨_, h1⟩ hs)
-  obtain ⟨v, hv0, hv⟩ := UpperTheory.hasFixed_of_algNorm_fixed_ne_bot F w n σ _ le_rfl ((H.sph _).2 hu)
+  obtain ⟨v, hv0, hv⟩ :=
+    UpperTheory.hasFixed_of_algNorm_fixed_ne_bot F w n σ _ le_rfl ((H.sph _).2 hu)
   exact (Submodule.ne_bot_iff _).2 ⟨v, fun g => by simpa using hv g.1 g.2, hv0⟩
 
 section
@@ -78,11 +85,21 @@ theorem oddA_of_unl {M : ℕ} {m : Fin n → ℤ} (h : Th.Unl l M m r) : OddA l 
 end
 
 def LevelKA : Prop :=
-  ∀ (K : Type) [Field K] [NumberField K] [IsCMField K] (n : ℕ), 2 ≤ n → ∀ (m : Fin n → ℤ), StrictAnti m → ∀ M : ℕ, 1 ≤ M →
-    ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] (ι : Qbar l ≃+* ℂ)
-      (r : G K Ω →* GL (Fin n) (Qbar l)) (π : CuspSub K n), Level l M m r → OddA l r → WitA ι r → (CG.mk π).IsRegAlg →
-      GlobalTheory.ContraPair.DualIsConj π → AttC ι r π →
-      π ∈ SigK K m M ∧ ∀ w : HeightOneSpectrum (𝓞 K), (l : 𝓞 K) ∉ w.asIdeal → ∀ B, (CG.mk π).HasSat w B →
-        FrobEig ι r w (algSat n (normV w) B)
+  ∀ (K : Type) [Field K] [NumberField K] [IsCMField K] (n : ℕ),
+    2 ≤ n
+      → ∀ (m : Fin n → ℤ),
+        StrictAnti m
+          → ∀ M : ℕ,
+            1 ≤ M
+              → ∀ (l : ℕ) [Fact l.Prime],
+                l ≠ 2
+                  → ∀ (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] (ι : Qbar l ≃+* ℂ)
+                      (r : G K Ω →* GL (Fin n) (Qbar l)) (π : CuspSub K n),
+                    Level l M m r → OddA l r → WitA ι r → (CG.mk π).IsRegAlg
+                      → GlobalTheory.ContraPair.DualIsConj π → AttC ι r π
+                      → π ∈ SigK K m M
+                        ∧ ∀ w : HeightOneSpectrum (𝓞 K),
+                          (l : 𝓞 K) ∉ w.asIdeal
+                            → ∀ B, (CG.mk π).HasSat w B → FrobEig ι r w (algSat n (normV w) B)
 
 end UpperTheory.V.Keep

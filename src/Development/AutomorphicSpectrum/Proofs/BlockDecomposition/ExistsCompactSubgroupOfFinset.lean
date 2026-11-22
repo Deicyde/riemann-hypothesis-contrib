@@ -11,11 +11,13 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.UnipExhaust
 
-theorem exists_compact_subgroup_of_finset :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (N : ℕ)
-      (s : Finset (GL (Fin N) k)), (↑s : Set (GL (Fin N) k)) ⊆ unipB k (Fin N) →
-      ∃ L : Subgroup (GL (Fin N) k), L ≤ unipB k (Fin N) ∧ (↑s : Set (GL (Fin N) k)) ⊆ L ∧
-        IsCompact (L : Set (GL (Fin N) k)) := by
+theorem exists_compact_subgroup_of_finset
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (N : ℕ) (s : Finset (GL (Fin N) k)),
+      (↑s : Set (GL (Fin N) k)) ⊆ unipB k (Fin N)
+        → ∃ L : Subgroup (GL (Fin N) k),
+          L ≤ unipB k (Fin N) ∧ (↑s : Set (GL (Fin N) k)) ⊆ L
+            ∧ IsCompact (L : Set (GL (Fin N) k)) := by
   intro k _ _ _ _ N s hs
   let c : Fin N → ℤ := fun i => ((i : ℕ) : ℤ)
   have heq : unipB k (Fin N) = GlobalTheory.InertSupp.unipOf k c := by
@@ -40,17 +42,21 @@ theorem exists_compact_subgroup_of_finset :
   have hQU : (↑s : Set (GL (Fin N) k)) ⊆ GlobalTheory.InertSupp.unipOf k c := by
     simpa [← heq] using hs
   let V : ℕ → Set (GL (Fin N) k) := fun m =>
-    (GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c m) : Set (GL (Fin N) k)) ∪ (GlobalTheory.InertSupp.unipOf k c : Set _)ᶜ
+    (GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c m) : Set (GL (Fin N) k))
+      ∪ (GlobalTheory.InertSupp.unipOf k c : Set _)ᶜ
   have hVo : ∀ m, IsOpen (V m) := fun m =>
-    (GlobalTheory.UnipCptSub.isOpen_grp c m).union (GlobalTheory.UnipCompact.isClosed_unipOf c).isOpen_compl
+    (GlobalTheory.UnipCptSub.isOpen_grp c m).union
+      (GlobalTheory.UnipCompact.isClosed_unipOf c).isOpen_compl
   have hVmono : Monotone V := by
     intro m M hmM g hg
     rcases hg with hg | hg
     · by_cases hu : g ∈ GlobalTheory.InertSupp.unipOf k c
       · left
-        have key : ∀ x : GL (Fin N) k, x ∈ GlobalTheory.InertSupp.unipOf k c →
-            (∀ i j, GlobalTheory.IwahoriInj.Deep ((m : ℤ) * (c i - c j)) (x.val i j)) →
-            ∀ i j, GlobalTheory.IwahoriInj.Deep ((M : ℤ) * (c i - c j)) (x.val i j) := by
+        have key
+            : ∀ x : GL (Fin N) k,
+              x ∈ GlobalTheory.InertSupp.unipOf k c
+                → (∀ i j, GlobalTheory.IwahoriInj.Deep ((m : ℤ) * (c i - c j)) (x.val i j))
+                → ∀ i j, GlobalTheory.IwahoriInj.Deep ((M : ℤ) * (c i - c j)) (x.val i j) := by
           intro x hx hd i j
           by_cases hij : c i < c j
           · refine (hd i j).mono ?_
@@ -65,9 +71,15 @@ theorem exists_compact_subgroup_of_finset :
       · exact Or.inr hu
     · exact Or.inr hg
   have hcov : (↑s : Set (GL (Fin N) k)) ⊆ ⋃ m, V m := fun g hg =>
-    Set.mem_iUnion.2 (((GlobalTheory.UnipCompact.eventually_mem_grp (hQU hg)).exists).imp fun _ h => Or.inl h)
+    Set.mem_iUnion.2 (((GlobalTheory.UnipCompact.eventually_mem_grp (hQU hg)).exists).imp fun _ h =>
+      Or.inl h)
   obtain ⟨M, hM⟩ := s.finite_toSet.isCompact.elim_directed_cover V hVo hcov hVmono.directed_le
-  refine ⟨GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c M) ⊓ unipB k (Fin N), inf_le_right, ?_, ?_⟩
+  refine ⟨
+    GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c M) ⊓ unipB k (Fin N),
+    inf_le_right,
+    ?_,
+    ?_
+  ⟩
   · intro g hg
     refine ⟨?_, hs hg⟩
     rcases hM hg with h | h

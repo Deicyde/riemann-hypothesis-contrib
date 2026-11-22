@@ -8,11 +8,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.LocalFinite
 
-theorem map_maximalIdeal_le_jacobson_and_pow_le :
-    ∀ (O R : Type) [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [Module.Finite O R],
-      Ideal.map (algebraMap O R) (IsLocalRing.maximalIdeal O) ≤ (⊥ : Ideal R).jacobson ∧
-        ∃ N : ℕ, (⊥ : Ideal R).jacobson ^ N ≤
-          Ideal.map (algebraMap O R) (IsLocalRing.maximalIdeal O) := by
+theorem map_maximalIdeal_le_jacobson_and_pow_le
+    : ∀ (O R : Type) [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [Module.Finite O R],
+      Ideal.map (algebraMap O R) (IsLocalRing.maximalIdeal O) ≤ (⊥ : Ideal R).jacobson
+        ∧ ∃ N : ℕ,
+          (⊥ : Ideal R).jacobson ^ N ≤ Ideal.map (algebraMap O R) (IsLocalRing.maximalIdeal O) := by
   intro O R _ _ _ _ _
   haveI : Algebra.IsIntegral O R := Algebra.IsIntegral.of_finite O R
   set m := IsLocalRing.maximalIdeal O with hm
@@ -41,8 +41,9 @@ theorem map_maximalIdeal_le_jacobson_and_pow_le :
     haveI : IsArtinianRing (R ⧸ I) := IsArtinianRing.of_finite (O ⧸ m) (R ⧸ I)
     obtain ⟨N, hN⟩ := IsArtinianRing.isNilpotent_jacobson_bot (R := R ⧸ I)
     refine ⟨N, ?_⟩
-    have hmap : Ideal.map (Ideal.Quotient.mk I) (⊥ : Ideal R).jacobson ≤
-        (⊥ : Ideal (R ⧸ I)).jacobson := by
+    have hmap
+        : Ideal.map (Ideal.Quotient.mk I) (⊥ : Ideal R).jacobson
+          ≤ (⊥ : Ideal (R ⧸ I)).jacobson := by
       refine le_sInf ?_
       rintro P ⟨-, hP⟩
       refine Ideal.map_le_iff_le_comap.mpr ?_

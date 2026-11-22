@@ -44,63 +44,70 @@ namespace FunctorialResolution.EmbeddedResolution
 
 section
 
-variable (k : Type u) [Field k] {P₁ : Scheme.{u}} (q : P₁ ⟶ Spec (CommRingCat.of k))
-  [LocallyOfFiniteType q]
+variable
+  (k : Type u) [Field k]
+  {P₁ : Scheme.{u}} (q : P₁ ⟶ Spec (CommRingCat.of k)) [LocallyOfFiniteType q]
 
-def IsMaxContactHypersurfaceAt (A₁ : P₁.IdealSheafData) (m : ℕ) (H₁ : P₁.IdealSheafData) (x : P₁) : Prop :=
-  ∃ U : P₁.Opens, IsAffineOpen U ∧ x ∈ U ∧
-    ((Disjoint (orderAtLeastLocus A₁ m) (U : Set ↥P₁) ∧ restrictIdeal H₁ U = ⊤) ∨
-      (∃ (n : ℕ) (c : EtaleChart q U n) (j : Fin n),
-        restrictIdeal H₁ U = c.coordIdeal {j} ∧ IsMaxContactCoord k q A₁ m c j))
+def IsMaxContactHypersurfaceAt (A₁ : P₁.IdealSheafData) (m : ℕ) (H₁ : P₁.IdealSheafData) (x : P₁)
+    : Prop :=
+  ∃ U : P₁.Opens,
+    IsAffineOpen U ∧ x ∈ U
+      ∧ ((Disjoint (orderAtLeastLocus A₁ m) (U : Set ↥P₁) ∧ restrictIdeal H₁ U = ⊤)
+        ∨ (∃ (n : ℕ) (c : EtaleChart q U n) (j : Fin n),
+          restrictIdeal H₁ U = c.coordIdeal {j} ∧ IsMaxContactCoord k q A₁ m c j))
 
 end
 
 section
 
-private theorem idealSheafData_eq_of_forall_ideal_eq {Y : Scheme.{u}} {A B : Y.IdealSheafData}
-    (h : ∀ V : Y.affineOpens, A.ideal V = B.ideal V) : A = B :=
+private theorem idealSheafData_eq_of_forall_ideal_eq
+    {Y : Scheme.{u}} {A B : Y.IdealSheafData} (h : ∀ V : Y.affineOpens, A.ideal V = B.ideal V)
+    : A = B :=
   Scheme.IdealSheafData.ext (funext h)
 
-private theorem mul_le_right_idealSheafData {X : Scheme.{u}} (I J : X.IdealSheafData) :
-    I * J ≤ J := by
+private theorem mul_le_right_idealSheafData {X : Scheme.{u}} (I J : X.IdealSheafData)
+    : I * J ≤ J := by
   rw [le_iff_forall_stalkIdeal_le]
   intro x
   rw [stalkIdeal_mul]
   exact Ideal.mul_le.2 fun r _ s hs => Ideal.mul_mem_left _ _ hs
 
-private theorem mul_le_left_idealSheafData {X : Scheme.{u}} (I J : X.IdealSheafData) :
-    I * J ≤ I := by
+private theorem mul_le_left_idealSheafData {X : Scheme.{u}} (I J : X.IdealSheafData)
+    : I * J ≤ I := by
   rw [le_iff_forall_stalkIdeal_le]
   intro x
   rw [stalkIdeal_mul]
   exact Ideal.mul_le.2 fun r hr s _ => Ideal.mul_mem_right _ _ hr
 
-private theorem restrictIdeal_le_of_le_opens {X : Scheme.{u}} {I J : X.IdealSheafData}
-    {U V : X.Opens} (hVU : V ≤ U) (h : restrictIdeal I U ≤ restrictIdeal J U) :
-    restrictIdeal I V ≤ restrictIdeal J V := by
-  have hI : ∀ K : X.IdealSheafData,
-      restrictIdeal K V = (restrictIdeal K U).comap (X.homOfLE hVU) := by
+private theorem restrictIdeal_le_of_le_opens
+    {X : Scheme.{u}} {I J : X.IdealSheafData} {U V : X.Opens}
+    (hVU : V ≤ U) (h : restrictIdeal I U ≤ restrictIdeal J U)
+    : restrictIdeal I V ≤ restrictIdeal J V := by
+  have hI
+      : ∀ K : X.IdealSheafData, restrictIdeal K V = (restrictIdeal K U).comap (X.homOfLE hVU) := by
     intro K
     rw [restrictIdeal_eq_comap_ι, restrictIdeal_eq_comap_ι, ← Scheme.IdealSheafData.comap_comp,
       Scheme.homOfLE_ι]
   rw [hI I, hI J]
   exact Scheme.IdealSheafData.comap_mono _ h
 
-private theorem saturation_of_eq_top {Y : Scheme.{u}} (F T : Y.IdealSheafData)
-    (hqc : QuasiCompact (saturationι F T)) (hF : F = ⊤) :
-    saturation F T = T := by
+private theorem saturation_of_eq_top
+    {Y : Scheme.{u}} (F T : Y.IdealSheafData) (hqc : QuasiCompact (saturationι F T)) (hF : F = ⊤)
+    : saturation F T = T := by
   have := hqc
   refine idealSheafData_eq_of_forall_ideal_eq (fun V => ?_)
   refine saturation_ideal_eq_of_isUnit F T V 1 ?_ isUnit_one
   rw [hF]
   simp
 
-private theorem restrictIdeal_strictTransform_eq_of_comap_eq_top {P P₁ : Scheme.{u}} (π : P₁ ⟶ P)
-    (Z H : P.IdealSheafData) [QuasiCompact (strictTransformι π Z H)] (V : P.Opens)
-    (hZtop : Z.comap ((π ⁻¹ᵁ V).ι ≫ π) = ⊤) :
-    restrictIdeal (Blowup.strictTransform π Z H) (π ⁻¹ᵁ V) = restrictIdeal (H.comap π) (π ⁻¹ᵁ V) := by
-  have hqc : QuasiCompact (saturationι (Z.comap ((π ⁻¹ᵁ V).ι ≫ π))
-      (H.comap ((π ⁻¹ᵁ V).ι ≫ π))) := by
+private theorem restrictIdeal_strictTransform_eq_of_comap_eq_top
+    {P P₁ : Scheme.{u}} (π : P₁ ⟶ P) (Z H : P.IdealSheafData)
+    [QuasiCompact (strictTransformι π Z H)]
+    (V : P.Opens) (hZtop : Z.comap ((π ⁻¹ᵁ V).ι ≫ π) = ⊤)
+    : restrictIdeal (Blowup.strictTransform π Z H) (π ⁻¹ᵁ V)
+      = restrictIdeal (H.comap π) (π ⁻¹ᵁ V) := by
+  have hqc
+      : QuasiCompact (saturationι (Z.comap ((π ⁻¹ᵁ V).ι ≫ π)) (H.comap ((π ⁻¹ᵁ V).ι ≫ π))) := by
     rw [← strictTransformι_eq_saturationι]
     exact quasiCompact_strictTransformι_comp_ι π Z H (π ⁻¹ᵁ V)
   have hsat : Blowup.strictTransform ((π ⁻¹ᵁ V).ι ≫ π) Z H = H.comap ((π ⁻¹ᵁ V).ι ≫ π) := by
@@ -109,9 +116,12 @@ private theorem restrictIdeal_strictTransform_eq_of_comap_eq_top {P P₁ : Schem
   rw [restrictIdeal_strictTransform π Z H (π ⁻¹ᵁ V), hsat, restrictIdeal_eq_comap_ι,
     Scheme.IdealSheafData.comap_comp]
 
-private noncomputable def etaleChartPullbackOfIsIso {P P₁ : Scheme.{u}} {k : Type u} [Field k]
-    {p : P ⟶ Spec (CommRingCat.of k)} (π : P₁ ⟶ P) {V : P.Opens} {n : ℕ}
-    (c : EtaleChart p V n) [IsIso (π ∣_ V)] : EtaleChart (π ≫ p) (π ⁻¹ᵁ V) n where
+private noncomputable def etaleChartPullbackOfIsIso
+    {P P₁ : Scheme.{u}} {k : Type u} [Field k]
+    {p : P ⟶ Spec (CommRingCat.of k)}
+    (π : P₁ ⟶ P)
+    {V : P.Opens} {n : ℕ} (c : EtaleChart p V n) [IsIso (π ∣_ V)]
+    : EtaleChart (π ≫ p) (π ⁻¹ᵁ V) n where
   map := (π ∣_ V) ≫ c.map
   comp_struct := by
     rw [Category.assoc, c.comp_struct, ← Category.assoc, morphismRestrict_ι, Category.assoc]
@@ -119,19 +129,25 @@ private noncomputable def etaleChartPullbackOfIsIso {P P₁ : Scheme.{u}} {k : T
     have := c.isEtale
     infer_instance
 
-private theorem pullbackChartIso_coordIdeal {P P₁ : Scheme.{u}} {k : Type u} [Field k]
-    {p : P ⟶ Spec (CommRingCat.of k)} (π : P₁ ⟶ P) {V : P.Opens} {n : ℕ}
-    (c : EtaleChart p V n) [IsIso (π ∣_ V)] (T : Finset (Fin n)) :
-    (etaleChartPullbackOfIsIso π c).coordIdeal T = (c.coordIdeal T).comap (π ∣_ V) := by
-  rw [EtaleChart.coordIdeal_eq_comap_coordSubspaceIdeal, EtaleChart.coordIdeal_eq_comap_coordSubspaceIdeal]
+private theorem pullbackChartIso_coordIdeal
+    {P P₁ : Scheme.{u}} {k : Type u} [Field k]
+    {p : P ⟶ Spec (CommRingCat.of k)}
+    (π : P₁ ⟶ P)
+    {V : P.Opens} {n : ℕ} (c : EtaleChart p V n) [IsIso (π ∣_ V)]
+    (T : Finset (Fin n))
+    : (etaleChartPullbackOfIsIso π c).coordIdeal T = (c.coordIdeal T).comap (π ∣_ V) := by
+  rw [EtaleChart.coordIdeal_eq_comap_coordSubspaceIdeal,
+    EtaleChart.coordIdeal_eq_comap_coordSubspaceIdeal]
   show (coordSubspaceIdeal k n T).comap ((π ∣_ V) ≫ c.map) = _
   rw [Scheme.IdealSheafData.comap_comp]
 
-private theorem exists_etaleChart_of_isMaxContactHypersurface {k : Type u} [Field k]
-    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k)) [LocallyOfFiniteType p]
-    [AlgebraicGeometry.Smooth p] (A : X.IdealSheafData) (μ : ℕ) (H : X.IdealSheafData)
-    (hH : IsMaxContactHypersurface k p A μ H) (x : X) :
-    ∃ (U : X.Opens) (_ : x ∈ U) (n : ℕ) (c : EtaleChart p U n),
+private theorem exists_etaleChart_of_isMaxContactHypersurface
+    {k : Type u} [Field k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k))
+    [LocallyOfFiniteType p] [AlgebraicGeometry.Smooth p]
+    (A : X.IdealSheafData) (μ : ℕ) (H : X.IdealSheafData) (hH : IsMaxContactHypersurface k p A μ H)
+    (x : X)
+    : ∃ (U : X.Opens) (_ : x ∈ U) (n : ℕ) (c : EtaleChart p U n),
       restrictIdeal H U = ⊤ ∨ ∃ j, restrictIdeal H U = c.coordIdeal {j} := by
   obtain ⟨U, hU, hxU, hcase⟩ := hH x
   rcases hcase with ⟨-, htop⟩ | ⟨n, c, j, hHU, -⟩
@@ -139,11 +155,12 @@ private theorem exists_etaleChart_of_isMaxContactHypersurface {k : Type u} [Fiel
     exact ⟨V, hxV, nV, cV, Or.inl (restrictIdeal_eq_top_of_le H hVU htop)⟩
   · exact ⟨U, hxU, n, c, Or.inr ⟨j, hHU⟩⟩
 
-private theorem inStrictNormalCrossingPosition_singleton_of_isMaxContactHypersurface {k : Type u} [Field k] {X : Scheme.{u}}
-    (p : X ⟶ Spec (CommRingCat.of k)) [LocallyOfFiniteType p] [AlgebraicGeometry.Smooth p]
-    (A : X.IdealSheafData) (μ : ℕ) (H : X.IdealSheafData)
-    (hH : IsMaxContactHypersurface k p A μ H) :
-    InStrictNormalCrossingPosition p [H] := by
+private theorem inStrictNormalCrossingPosition_singleton_of_isMaxContactHypersurface
+    {k : Type u} [Field k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k))
+    [LocallyOfFiniteType p] [AlgebraicGeometry.Smooth p]
+    (A : X.IdealSheafData) (μ : ℕ) (H : X.IdealSheafData) (hH : IsMaxContactHypersurface k p A μ H)
+    : InStrictNormalCrossingPosition p [H] := by
   rw [inStrictNormalCrossingPosition_iff]
   constructor
   · intro D hD
@@ -164,7 +181,19 @@ private theorem inStrictNormalCrossingPosition_singleton_of_isMaxContactHypersur
         simpa using htop
       · intro i _ t h
         simp at h
-    · refine ⟨U, hxU, n, c, (fun i => match i with | 0 => some j | _ => none), ?_, ?_, ?_⟩
+    · refine ⟨
+        U,
+        hxU,
+        n,
+        c,
+        (fun i =>
+          match i with
+          | 0 => some j
+          | _ => none),
+        ?_,
+        ?_,
+        ?_
+      ⟩
       · intro i hi i' hi' t _ _
         have e1 : i = 0 := Nat.lt_one_iff.mp hi
         have e2 : i' = 0 := Nat.lt_one_iff.mp hi'
@@ -180,20 +209,24 @@ private theorem inStrictNormalCrossingPosition_singleton_of_isMaxContactHypersur
         subst hjt
         simpa using hj
 
-theorem comap_maxContactIdeal_le_exceptionalIdeal_mul (k : Type u) [Field k] [CharZero k] {P P₁ : Scheme.{u}}
-    (p : P ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p] [LocallyOfFiniteType p]
-    (π : P₁ ⟶ P) [IsLocallyNoetherian P₁] [AlgebraicGeometry.Smooth (π ≫ p)]
-    [LocallyOfFiniteType (π ≫ p)] (Z : P.IdealSheafData) (E : List P.IdealSheafData)
-    (hZ : HasStrictNormalCrossingsWith p Z E) (hπ : Blowup.IsBlowupAlongIdealSheaf π Z) (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData)
-    (μ : ℕ) (hμ : 1 ≤ μ) (hA : A ≤ Z ^ μ)
-    (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π) :
-    (maxContactIdeal k p A μ).comap π ≤
-      Blowup.exceptionalIdeal π Z * maxContactIdeal k (π ≫ p) A₁ μ := by
+theorem comap_maxContactIdeal_le_exceptionalIdeal_mul
+    (k : Type u) [Field k] [CharZero k]
+    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.Smooth p] [LocallyOfFiniteType p]
+    (π : P₁ ⟶ P)
+    [IsLocallyNoetherian P₁] [AlgebraicGeometry.Smooth (π ≫ p)] [LocallyOfFiniteType (π ≫ p)]
+    (Z : P.IdealSheafData) (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E)
+    (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
+    (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ)
+    (hμ : 1 ≤ μ) (hA : A ≤ Z ^ μ) (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π)
+    : (maxContactIdeal k p A μ).comap π
+      ≤ Blowup.exceptionalIdeal π Z * maxContactIdeal k (π ≫ p) A₁ μ := by
   have hA1 : controlledTransform π Z A μ hπ hA = A₁ :=
     (eq_controlledTransform_of_mul_eq_comap π Z A μ hπ hA A₁ htr).symm
-  have h : (derivIdealSheafIterate k p (μ - 1) A).comap π ≤
-      Blowup.exceptionalIdeal π Z ^ (μ - (μ - 1)) *
-        derivIdealSheafIterate k (π ≫ p) (μ - 1) (controlledTransform π Z A μ hπ hA) :=
+  have h
+      : (derivIdealSheafIterate k p (μ - 1) A).comap π
+        ≤ Blowup.exceptionalIdeal π Z ^ (μ - (μ - 1))
+          * derivIdealSheafIterate k (π ≫ p) (μ - 1) (controlledTransform π Z A μ hπ hA) :=
     comap_derivIdealSheafIterate_le_exceptionalIdeal_pow_mul k p π Z E hZ hπ A μ hA (μ - 1)
       (Nat.sub_le μ 1)
   rw [hA1] at h
@@ -202,14 +235,18 @@ theorem comap_maxContactIdeal_le_exceptionalIdeal_mul (k : Type u) [Field k] [Ch
   rw [maxContactIdeal_eq_derivIdealSheafIterate, maxContactIdeal_eq_derivIdealSheafIterate]
   exact h
 
-theorem mem_orderAtLeastLocus_base_of_mem_orderAtLeastLocus_transform (k : Type u) [Field k] [CharZero k]
-    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    [LocallyOfFiniteType p] (π : P₁ ⟶ P) [IsLocallyNoetherian P₁]
-    [AlgebraicGeometry.Smooth (π ≫ p)] [LocallyOfFiniteType (π ≫ p)] (Z : P.IdealSheafData)
-    (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E) (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
-    (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ) (hμ : 1 ≤ μ) (hA : A ≤ Z ^ μ)
-    (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π) (y : P₁) (hy : y ∈ orderAtLeastLocus A₁ μ) :
-    π.base y ∈ orderAtLeastLocus A μ := by
+theorem mem_orderAtLeastLocus_base_of_mem_orderAtLeastLocus_transform
+    (k : Type u) [Field k] [CharZero k]
+    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.Smooth p] [LocallyOfFiniteType p]
+    (π : P₁ ⟶ P)
+    [IsLocallyNoetherian P₁] [AlgebraicGeometry.Smooth (π ≫ p)] [LocallyOfFiniteType (π ≫ p)]
+    (Z : P.IdealSheafData) (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E)
+    (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
+    (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ)
+    (hμ : 1 ≤ μ) (hA : A ≤ Z ^ μ) (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π)
+    (y : P₁) (hy : y ∈ orderAtLeastLocus A₁ μ)
+    : π.base y ∈ orderAtLeastLocus A μ := by
   by_contra hcon
   have hsucc : μ - 1 + 1 = μ := by omega
   have hz : orderAt A (π.base y) ≤ ((μ - 1 : ℕ) : ℕ∞) := by
@@ -225,7 +262,8 @@ theorem mem_orderAtLeastLocus_base_of_mem_orderAtLeastLocus_transform (k : Type 
     exact mul_le_left_idealSheafData _ _
   have hEA : Blowup.exceptionalIdeal π Z * A₁ = controlledTransform π Z A (μ - 1) hπ hA' := by
     refine eq_controlledTransform_of_mul_eq_comap π Z A (μ - 1) hπ hA' _ ?_
-    calc Blowup.exceptionalIdeal π Z ^ (μ - 1) * (Blowup.exceptionalIdeal π Z * A₁)
+    calc
+      Blowup.exceptionalIdeal π Z ^ (μ - 1) * (Blowup.exceptionalIdeal π Z * A₁)
         = Blowup.exceptionalIdeal π Z ^ (μ - 1 + 1) * A₁ := by rw [pow_succ, mul_assoc]
       _ = A.comap π := by rw [hsucc]; exact htr
   have h1 := orderAt_controlledTransform_le k p π Z E hZ hπ A (μ - 1) hA' (π.base y) hz y rfl
@@ -235,13 +273,15 @@ theorem mem_orderAtLeastLocus_base_of_mem_orderAtLeastLocus_transform (k : Type 
   rw [orderAt_le_iff_notMem_orderAtLeastLocus, hsucc] at h2
   exact h2 hy
 
-theorem le_center_of_isMaxContactHypersurface (k : Type u) [Field k] [CharZero k]
-    {P : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    [LocallyOfFiniteType p] (Z : P.IdealSheafData) (E : List P.IdealSheafData)
-    (hZ : HasStrictNormalCrossingsWith p Z E) (A : P.IdealSheafData) (μ : ℕ) (hμ : 1 ≤ μ)
-    (hsupp : (Z.support : Set ↥P) ⊆ orderAtLeastLocus A μ) (H : P.IdealSheafData)
-    (hH : IsMaxContactHypersurface k p A μ H) :
-    H ≤ Z := by
+theorem le_center_of_isMaxContactHypersurface
+    (k : Type u) [Field k] [CharZero k]
+    {P : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.Smooth p] [LocallyOfFiniteType p]
+    (Z : P.IdealSheafData) (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E)
+    (A : P.IdealSheafData) (μ : ℕ)
+    (hμ : 1 ≤ μ) (hsupp : (Z.support : Set ↥P) ⊆ orderAtLeastLocus A μ)
+    (H : P.IdealSheafData) (hH : IsMaxContactHypersurface k p A μ H)
+    : H ≤ Z := by
   have h1 : (Z.support : Set ↥P) ⊆ (H.support : Set ↥P) :=
     hsupp.trans (hH.orderAtLeastLocus_subset_support hμ)
   have h2 : (Z.support : Set ↥P) ⊆ orderAtLeastLocus H 1 := by
@@ -251,47 +291,55 @@ theorem le_center_of_isMaxContactHypersurface (k : Type u) [Field k] [CharZero k
   have h3 := le_pow_of_hasStrictNormalCrossingsWith p Z H E hZ 1 h2
   rwa [pow_one] at h3
 
-theorem isMaxContactHypersurfaceAt_strictTransform_of_etaleChart (k : Type u) [Field k] [CharZero k]
-    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    [LocallyOfFiniteType p] (π : P₁ ⟶ P) [IsLocallyNoetherian P₁]
-    [AlgebraicGeometry.Smooth (π ≫ p)] [LocallyOfFiniteType (π ≫ p)] (Z : P.IdealSheafData)
-    (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E) (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
-    (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ) (hμ : 1 ≤ μ) (hA : A ≤ Z ^ μ)
-    (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π) (H : P.IdealSheafData)
-    [QuasiCompact (strictTransformι π Z H)] {U' : P.Opens} (hU' : IsAffineOpen U')
+theorem isMaxContactHypersurfaceAt_strictTransform_of_etaleChart
+    (k : Type u) [Field k] [CharZero k]
+    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.Smooth p] [LocallyOfFiniteType p]
+    (π : P₁ ⟶ P)
+    [IsLocallyNoetherian P₁] [AlgebraicGeometry.Smooth (π ≫ p)] [LocallyOfFiniteType (π ≫ p)]
+    (Z : P.IdealSheafData) (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E)
+    (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
+    (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ)
+    (hμ : 1 ≤ μ) (hA : A ≤ Z ^ μ) (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π)
+    (H : P.IdealSheafData) [QuasiCompact (strictTransformι π Z H)]
+    {U' : P.Opens} (hU' : IsAffineOpen U')
     {m : ℕ} (c : EtaleChart p U' m) (S : Finset (Fin m)) (j₀ : Fin m) (hj₀ : j₀ ∈ S)
-    (hZU : restrictIdeal Z U' = c.coordIdeal S)
-    (hHU : restrictIdeal H U' = c.coordIdeal {j₀})
+    (hZU : restrictIdeal Z U' = c.coordIdeal S) (hHU : restrictIdeal H U' = c.coordIdeal {j₀})
     (hcoord : c.coord j₀ ∈ (maxContactIdeal k p A μ).ideal ⟨U', hU'⟩)
-    (x₁ : P₁) (hx₁ : x₁ ∈ π ⁻¹ᵁ U') :
-    IsMaxContactHypersurfaceAt k (π ≫ p) A₁ μ (Blowup.strictTransform π Z H) x₁ := by
+    (x₁ : P₁) (hx₁ : x₁ ∈ π ⁻¹ᵁ U')
+    : IsMaxContactHypersurfaceAt k (π ≫ p) A₁ μ (Blowup.strictTransform π Z H) x₁ := by
   classical
-  obtain ⟨s, hs, hx₁D⟩ := exists_mem_domain_blowupChart_of_isBlowupAlongIdealSheaf π c S hπ hZU x₁ hx₁
+  obtain ⟨s, hs, hx₁D⟩ :=
+    exists_mem_domain_blowupChart_of_isBlowupAlongIdealSheaf π c S hπ hZU x₁ hx₁
   set B := blowupChartOfIsBlowup π c S hπ hZU s hs with hBdef
-  obtain ⟨V, _, hxV, hVD, hVaff, -⟩ :=
-    exists_etaleChart_le (π ≫ p) x₁ B.domain hx₁D
+  obtain ⟨V, _, hxV, hVD, hVaff, -⟩ := exists_etaleChart_le (π ≫ p) x₁ B.domain hx₁D
   have hE : restrictIdeal (Blowup.exceptionalIdeal π Z) B.domain = B.chart.coordIdeal {s} :=
     B.restrictIdeal_exceptionalIdeal Z hs hZU
   have hcart : Blowup.IsLocallyGeneratedByNonZeroDivisor (B.chart.coordIdeal {s}) := by
-    refine isLocallyGeneratedByNonZeroDivisor_of_locally_coordIdeal (p := B.domain.ι ≫ (π ≫ p)) _ (fun x => ?_)
-    exact ⟨⊤, trivial, m, B.chart.restrictOpens ⊤,
-      Or.inr ⟨s, B.chart.restrictIdeal_coordIdeal ⊤ {s}⟩⟩
-  have key : restrictIdeal (H.comap π) B.domain ≤
-      B.chart.coordIdeal {s} * restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) B.domain := by
-    have h1 : restrictIdeal (H.comap π) B.domain
-        ≤ restrictIdeal ((maxContactIdeal k p A μ).comap π) B.domain := by
+    refine isLocallyGeneratedByNonZeroDivisor_of_locally_coordIdeal (p := B.domain.ι ≫ (π ≫ p)) _
+      (fun x => ?_)
+    exact
+      ⟨⊤, trivial, m, B.chart.restrictOpens ⊤, Or.inr ⟨s, B.chart.restrictIdeal_coordIdeal ⊤ {s}⟩⟩
+  have key
+      : restrictIdeal (H.comap π) B.domain
+        ≤ B.chart.coordIdeal {s} * restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) B.domain := by
+    have h1
+        : restrictIdeal (H.comap π) B.domain
+          ≤ restrictIdeal ((maxContactIdeal k p A μ).comap π) B.domain := by
       rw [B.restrictIdeal_comap H, B.restrictIdeal_comap (maxContactIdeal k p A μ)]
       refine Scheme.IdealSheafData.comap_mono _ ?_
       rw [hHU]
-      exact (coordIdeal_singleton_le_restrictIdeal_iff k p hU' c j₀
-        (maxContactIdeal k p A μ)).2 hcoord
-    have h2 : restrictIdeal ((maxContactIdeal k p A μ).comap π) B.domain ≤
-        restrictIdeal (Blowup.exceptionalIdeal π Z * maxContactIdeal k (π ≫ p) A₁ μ) B.domain :=
+      exact (coordIdeal_singleton_le_restrictIdeal_iff k p hU' c j₀ (maxContactIdeal k p A μ)).2
+        hcoord
+    have h2
+        : restrictIdeal ((maxContactIdeal k p A μ).comap π) B.domain
+          ≤ restrictIdeal (Blowup.exceptionalIdeal π Z * maxContactIdeal k (π ≫ p) A₁ μ) B.domain :=
       Scheme.IdealSheafData.comap_mono _
         (comap_maxContactIdeal_le_exceptionalIdeal_mul k p π Z E hZ hπ A A₁ μ hμ hA htr)
-    have hmul : restrictIdeal (Blowup.exceptionalIdeal π Z * maxContactIdeal k (π ≫ p) A₁ μ) B.domain =
-        restrictIdeal (Blowup.exceptionalIdeal π Z) B.domain *
-          restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) B.domain :=
+    have hmul
+        : restrictIdeal (Blowup.exceptionalIdeal π Z * maxContactIdeal k (π ≫ p) A₁ μ) B.domain
+          = restrictIdeal (Blowup.exceptionalIdeal π Z) B.domain
+            * restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) B.domain :=
       Scheme.IdealSheafData.comap_mul _ _ _
     rw [hmul, hE] at h2
     exact h1.trans h2
@@ -312,50 +360,57 @@ theorem isMaxContactHypersurfaceAt_strictTransform_of_etaleChart (k : Type u) [F
         mem_support_maxContactIdeal_of_mem_orderAtLeastLocus k (π ≫ p) A₁ hμ hxc
       exact notMem_support_of_mem_opens_of_restrictIdeal_eq_top _ B.domain htop x (hVD hxV) hx1
     exact ⟨V, hVaff, hxV, Or.inl ⟨hdisj, restrictIdeal_eq_top_of_le _ hVD hST⟩⟩
-  · have hcomap : restrictIdeal (H.comap π) B.domain =
-        B.chart.coordIdeal {j₀} * B.chart.coordIdeal {s} :=
+  · have hcomap
+        : restrictIdeal (H.comap π) B.domain = B.chart.coordIdeal {j₀} * B.chart.coordIdeal {s} :=
       B.restrictIdeal_comap_coordIdeal_of_mem H j₀ hj₀ hj hHU
     have hST : restrictIdeal (Blowup.strictTransform π Z H) B.domain = B.chart.coordIdeal {j₀} :=
       B.restrictIdeal_strictTransform_of_mem_of_ne Z H hs hZU j₀ hj₀ hj hHU
-    have hmc : B.chart.coordIdeal {j₀} ≤
-        restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) B.domain := by
+    have hmc
+        : B.chart.coordIdeal {j₀} ≤ restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) B.domain := by
       refine hcart.le_of_mul_le_mul ?_
       rw [mul_comm (B.chart.coordIdeal {s}) (B.chart.coordIdeal {j₀})]
       exact le_trans (le_of_eq hcomap.symm) key
-    have hSTV : restrictIdeal (Blowup.strictTransform π Z H) V =
-        (B.chart.restrict hVD).coordIdeal {j₀} :=
+    have hSTV
+        : restrictIdeal (Blowup.strictTransform π Z H) V = (B.chart.restrict hVD).coordIdeal {j₀} :=
       restrictIdeal_eq_restrict_coordIdeal_of_le hVD B.chart (Blowup.strictTransform π Z H) {j₀} hST
     refine ⟨V, hVaff, hxV, Or.inr ⟨m, B.chart.restrict hVD, j₀, hSTV, ?_⟩⟩
     show (B.chart.restrict hVD).coordIdeal {j₀} ≤
       restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) V
-    have h4 : restrictIdeal (Blowup.strictTransform π Z H) B.domain ≤
-        restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) B.domain := by
+    have h4
+        : restrictIdeal (Blowup.strictTransform π Z H) B.domain
+          ≤ restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) B.domain := by
       rw [hST]; exact hmc
     have h5 := restrictIdeal_le_of_le_opens hVD h4
     rw [← hSTV]
     exact h5
 
-theorem isMaxContactHypersurfaceAt_strictTransform_of_mem_support (k : Type u) [Field k] [CharZero k]
-    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    [LocallyOfFiniteType p] (π : P₁ ⟶ P) [IsLocallyNoetherian P₁]
-    [AlgebraicGeometry.Smooth (π ≫ p)] [LocallyOfFiniteType (π ≫ p)] (Z : P.IdealSheafData)
-    (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E) (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
-    (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ) (hμ : 1 ≤ μ)
-    (hsupp : (Z.support : Set ↥P) ⊆ orderAtLeastLocus A μ) (hA : A ≤ Z ^ μ)
-    (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π) (H : P.IdealSheafData)
-    [QuasiCompact (strictTransformι π Z H)]
-    (hH : IsMaxContactHypersurface k p A μ H) (x₁ : P₁) (hx₁ : π.base x₁ ∈ Z.support) :
-    IsMaxContactHypersurfaceAt k (π ≫ p) A₁ μ (Blowup.strictTransform π Z H) x₁ := by
+theorem isMaxContactHypersurfaceAt_strictTransform_of_mem_support
+    (k : Type u) [Field k] [CharZero k]
+    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.Smooth p] [LocallyOfFiniteType p]
+    (π : P₁ ⟶ P)
+    [IsLocallyNoetherian P₁] [AlgebraicGeometry.Smooth (π ≫ p)] [LocallyOfFiniteType (π ≫ p)]
+    (Z : P.IdealSheafData) (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E)
+    (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
+    (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ)
+    (hμ : 1 ≤ μ) (hsupp : (Z.support : Set ↥P) ⊆ orderAtLeastLocus A μ) (hA : A ≤ Z ^ μ)
+    (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π)
+    (H : P.IdealSheafData) [QuasiCompact (strictTransformι π Z H)]
+    (hH : IsMaxContactHypersurface k p A μ H)
+    (x₁ : P₁) (hx₁ : π.base x₁ ∈ Z.support)
+    : IsMaxContactHypersurfaceAt k (π ≫ p) A₁ μ (Blowup.strictTransform π Z H) x₁ := by
   classical
   have hzA : π.base x₁ ∈ orderAtLeastLocus A μ := hsupp hx₁
   have hsm : AlgebraicGeometry.Smooth (Z.subschemeι ≫ p) :=
     smooth_subschemeι_comp_of_hasStrictNormalCrossingsWith Z E hZ
-  have hZnil : HasStrictNormalCrossingsWith p Z ([] : List P.IdealSheafData) := hasStrictNormalCrossingsWith_nil_of_smooth p Z
+  have hZnil : HasStrictNormalCrossingsWith p Z ([] : List P.IdealSheafData) :=
+    hasStrictNormalCrossingsWith_nil_of_smooth p Z
   have hHZ : H ≤ Z := le_center_of_isMaxContactHypersurface k p Z E hZ A μ hμ hsupp H hH
   have hsnc : InStrictNormalCrossingPosition p (H :: ([] : List P.IdealSheafData)) :=
     inStrictNormalCrossingPosition_singleton_of_isMaxContactHypersurface p A μ H hH
   obtain ⟨U, hU, hzU, m, c, lab, S, m', c', j0, lab', hZU, hHU, hlab, _, hlab', hj0⟩ :=
-    exists_etaleCharts_of_inStrictNormalCrossingPosition_cons p Z H [] hsnc hZnil hHZ (π.base x₁) hx₁
+    exists_etaleCharts_of_inStrictNormalCrossingPosition_cons p Z H [] hsnc hZnil hHZ (π.base x₁)
+      hx₁
   have hSprime : ∀ i ∈ S, c.coord i ∈ (hU.primeIdealOf ⟨π.base x₁, hzU⟩).asIdeal := by
     intro i hi
     have h1 : Z.ideal ⟨U, hU⟩ = Ideal.span (c.coord '' (S : Set (Fin m))) :=
@@ -365,8 +420,8 @@ theorem isMaxContactHypersurfaceAt_strictTransform_of_mem_support (k : Type u) [
       exact Ideal.subset_span ⟨i, hi, rfl⟩
     exact ideal_le_primeIdealOf Z hU hzU hx₁ h2
   obtain ⟨a, hcoeff, j, hjS, haj, -⟩ :=
-    exists_coord_eq_sum_coeff_not_mem_of_le p hU hzU c lab S c' j0 lab' Z H [] hx₁ hlab hZU hHU hlab'
-      hj0 hHZ
+    exists_coord_eq_sum_coeff_not_mem_of_le p hU hzU c lab S c' j0 lab' Z H [] hx₁ hlab hZU hHU
+      hlab' hj0 hHZ
   obtain ⟨V, hV, hVU, hzV, cV, hcne, hcj, huj⟩ :=
     exists_etaleChart_update_coord p hU c hzU S a j hjS hSprime haj
   have hZV : restrictIdeal Z V = cV.coordIdeal S := by
@@ -376,8 +431,10 @@ theorem isMaxContactHypersurfaceAt_strictTransform_of_mem_support (k : Type u) [
     have h2 := ideal_eq_span_image_map_of_le Z hU hV hVU (c.coord '' (S : Set (Fin m))) h1
     rw [h2, Set.image_image]
     rw [← span_image_update_sum_eq
-      (fun i => (P.presheaf.map (homOfLE hVU).op).hom (c.coord i)) S
-      (fun i => (P.presheaf.map (homOfLE hVU).op).hom (a i)) j hjS huj]
+      (fun i => (P.presheaf.map (homOfLE hVU).op).hom (c.coord i))
+      S
+      (fun i => (P.presheaf.map (homOfLE hVU).op).hom (a i))
+      j hjS huj]
     congr 1
     refine Set.image_congr ?_
     intro i hi
@@ -389,8 +446,8 @@ theorem isMaxContactHypersurfaceAt_strictTransform_of_mem_support (k : Type u) [
     · rw [Function.update_of_ne hij, hcne i hij]
   have hHV : restrictIdeal H V = cV.coordIdeal {j} := by
     refine restrictIdeal_eq_coordIdeal_of_ideal_eq_span hV cV H {j} ?_
-    have h1 : H.ideal ⟨U, hU⟩ =
-        Ideal.span (c'.coord '' ((({j0} : Finset (Fin m')) : Set (Fin m')))) :=
+    have h1
+        : H.ideal ⟨U, hU⟩ = Ideal.span (c'.coord '' ((({j0} : Finset (Fin m')) : Set (Fin m')))) :=
       c'.ideal_eq_span_coord hU H {j0} hHU
     have h2 := ideal_eq_span_image_map_of_le H hU hV hVU _ h1
     have hone : (P.presheaf.map (homOfLE hVU).op).hom (c'.coord j0) = cV.coord j := by
@@ -403,8 +460,7 @@ theorem isMaxContactHypersurfaceAt_strictTransform_of_mem_support (k : Type u) [
     · exact absurd hzW (Set.disjoint_left.mp hdisj hzA)
     · rw [hHW]
       exact hmcW
-  obtain ⟨V', _, hzV', hV'le, hV'aff, -⟩ :=
-    exists_etaleChart_le p (π.base x₁) (V ⊓ W) ⟨hzV, hzW⟩
+  obtain ⟨V', _, hzV', hV'le, hV'aff, -⟩ := exists_etaleChart_le p (π.base x₁) (V ⊓ W) ⟨hzV, hzW⟩
   have hV'V : V' ≤ V := fun y hy => (hV'le hy).1
   have hV'W : V' ≤ W := fun y hy => (hV'le hy).2
   have hZV' : restrictIdeal Z V' = (cV.restrict hV'V).coordIdeal S :=
@@ -419,16 +475,20 @@ theorem isMaxContactHypersurfaceAt_strictTransform_of_mem_support (k : Type u) [
   exact isMaxContactHypersurfaceAt_strictTransform_of_etaleChart k p π Z E hZ hπ A A₁ μ hμ hA htr H
     hV'aff (cV.restrict hV'V) S j hjS hZV' hHV' hcoordmem x₁ hzV'
 
-theorem isMaxContactHypersurfaceAt_strictTransform_of_notMem_support (k : Type u) [Field k] [CharZero k]
-    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    [LocallyOfFiniteType p] (π : P₁ ⟶ P) [IsLocallyNoetherian P₁]
-    [AlgebraicGeometry.Smooth (π ≫ p)] [LocallyOfFiniteType (π ≫ p)] (Z : P.IdealSheafData)
-    (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E) (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
-    (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ) (hμ : 1 ≤ μ) (hA : A ≤ Z ^ μ)
-    (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π) (H : P.IdealSheafData)
-    [QuasiCompact (strictTransformι π Z H)]
-    (hH : IsMaxContactHypersurface k p A μ H) (x₁ : P₁) (hx₁ : π.base x₁ ∉ Z.support) :
-    IsMaxContactHypersurfaceAt k (π ≫ p) A₁ μ (Blowup.strictTransform π Z H) x₁ := by
+theorem isMaxContactHypersurfaceAt_strictTransform_of_notMem_support
+    (k : Type u) [Field k] [CharZero k]
+    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.Smooth p] [LocallyOfFiniteType p]
+    (π : P₁ ⟶ P)
+    [IsLocallyNoetherian P₁] [AlgebraicGeometry.Smooth (π ≫ p)] [LocallyOfFiniteType (π ≫ p)]
+    (Z : P.IdealSheafData) (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E)
+    (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
+    (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ)
+    (hμ : 1 ≤ μ) (hA : A ≤ Z ^ μ) (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π)
+    (H : P.IdealSheafData) [QuasiCompact (strictTransformι π Z H)]
+    (hH : IsMaxContactHypersurface k p A μ H)
+    (x₁ : P₁) (hx₁ : π.base x₁ ∉ Z.support)
+    : IsMaxContactHypersurfaceAt k (π ≫ p) A₁ μ (Blowup.strictTransform π Z H) x₁ := by
   classical
   obtain ⟨U, hU, hxU, hcase⟩ := hH (π.base x₁)
   have hxc : π.base x₁ ∈ Z.support.compl := hx₁
@@ -436,8 +496,9 @@ theorem isMaxContactHypersurfaceAt_strictTransform_of_notMem_support (k : Type u
     exists_etaleChart_le p (π.base x₁) (U ⊓ Z.support.compl) ⟨hxU, hxc⟩
   have hVU : V ≤ U := fun y hy => (hVle hy).1
   have hx₁V : x₁ ∈ π ⁻¹ᵁ V := hxV
-  have hrestrict : ∀ K : P.IdealSheafData,
-      restrictIdeal (K.comap π) (π ⁻¹ᵁ V) = (restrictIdeal K V).comap (π ∣_ V) := by
+  have hrestrict
+      : ∀ K : P.IdealSheafData,
+        restrictIdeal (K.comap π) (π ⁻¹ᵁ V) = (restrictIdeal K V).comap (π ∣_ V) := by
     intro K
     rw [restrictIdeal_eq_comap_ι, restrictIdeal_eq_comap_ι, ← Scheme.IdealSheafData.comap_comp,
       ← Scheme.IdealSheafData.comap_comp, morphismRestrict_ι]
@@ -448,17 +509,18 @@ theorem isMaxContactHypersurfaceAt_strictTransform_of_notMem_support (k : Type u
     have hy : π.base y.1 ∈ V := y.2
     rw [Scheme.IdealSheafData.support_comap]
     exact (hVle hy).2
-  have hST : restrictIdeal (Blowup.strictTransform π Z H) (π ⁻¹ᵁ V) =
-      restrictIdeal (H.comap π) (π ⁻¹ᵁ V) :=
+  have hST
+      : restrictIdeal (Blowup.strictTransform π Z H) (π ⁻¹ᵁ V)
+        = restrictIdeal (H.comap π) (π ⁻¹ᵁ V) :=
     restrictIdeal_strictTransform_eq_of_comap_eq_top π Z H V hZtop
   rcases hcase with ⟨hdisj, hHtop⟩ | ⟨n, c, j₀, hHU, hmc⟩
-  · obtain ⟨V₁, _, hx₁V₁, hV₁le, hV₁aff, -⟩ :=
-      exists_etaleChart_le (π ≫ p) x₁ (π ⁻¹ᵁ V) hx₁V
+  · obtain ⟨V₁, _, hx₁V₁, hV₁le, hV₁aff, -⟩ := exists_etaleChart_le (π ≫ p) x₁ (π ⁻¹ᵁ V) hx₁V
     refine ⟨V₁, hV₁aff, hx₁V₁, Or.inl ⟨?_, ?_⟩⟩
     · rw [Set.disjoint_left]
       intro y hy hyV
       have h1 : π.base y ∈ orderAtLeastLocus A μ :=
-        mem_orderAtLeastLocus_base_of_mem_orderAtLeastLocus_transform k p π Z E hZ hπ A A₁ μ hμ hA htr y hy
+        mem_orderAtLeastLocus_base_of_mem_orderAtLeastLocus_transform k p π Z E hZ hπ A A₁ μ hμ hA
+          htr y hy
       have h2 : π.base y ∈ V := hV₁le hyV
       exact (Set.disjoint_left.mp hdisj h1) (hVU h2)
     · have h3 : restrictIdeal (H.comap π) (π ⁻¹ᵁ V) = ⊤ :=
@@ -475,74 +537,88 @@ theorem isMaxContactHypersurfaceAt_strictTransform_of_notMem_support (k : Type u
       have hb := hπ.restrict V
       rw [hZV] at hb
       exact hb.isIso_of_top
-    have hSTV : restrictIdeal (Blowup.strictTransform π Z H) (π ⁻¹ᵁ V) =
-        (etaleChartPullbackOfIsIso π (c.restrict hVU)).coordIdeal {j₀} := by
+    have hSTV
+        : restrictIdeal (Blowup.strictTransform π Z H) (π ⁻¹ᵁ V)
+          = (etaleChartPullbackOfIsIso π (c.restrict hVU)).coordIdeal {j₀} := by
       rw [hST, hrestrict H, hHV, pullbackChartIso_coordIdeal]
-    have hmcV : (etaleChartPullbackOfIsIso π (c.restrict hVU)).coordIdeal {j₀} ≤
-        restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) (π ⁻¹ᵁ V) := by
+    have hmcV
+        : (etaleChartPullbackOfIsIso π (c.restrict hVU)).coordIdeal {j₀}
+          ≤ restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) (π ⁻¹ᵁ V) := by
       have h1 : restrictIdeal H V ≤ restrictIdeal (maxContactIdeal k p A μ) V := by
         refine restrictIdeal_le_of_le_opens hVU ?_
         rw [hHU]
         exact hmc
-      have h2 : (etaleChartPullbackOfIsIso π (c.restrict hVU)).coordIdeal {j₀} ≤
-          restrictIdeal ((maxContactIdeal k p A μ).comap π) (π ⁻¹ᵁ V) := by
+      have h2
+          : (etaleChartPullbackOfIsIso π (c.restrict hVU)).coordIdeal {j₀}
+            ≤ restrictIdeal ((maxContactIdeal k p A μ).comap π) (π ⁻¹ᵁ V) := by
         rw [pullbackChartIso_coordIdeal, hrestrict (maxContactIdeal k p A μ), ← hHV]
         exact Scheme.IdealSheafData.comap_mono _ h1
       refine h2.trans ?_
       refine Scheme.IdealSheafData.comap_mono _ ?_
-      refine le_trans (comap_maxContactIdeal_le_exceptionalIdeal_mul k p π Z E hZ hπ A A₁ μ hμ hA htr) ?_
+      refine le_trans
+        (comap_maxContactIdeal_le_exceptionalIdeal_mul k p π Z E hZ hπ A A₁ μ hμ hA htr) ?_
       exact mul_le_right_idealSheafData _ _
-    obtain ⟨V₁, _, hx₁V₁, hV₁le, hV₁aff, -⟩ :=
-      exists_etaleChart_le (π ≫ p) x₁ (π ⁻¹ᵁ V) hx₁V
-    have hSTV₁ : restrictIdeal (Blowup.strictTransform π Z H) V₁ =
-        ((etaleChartPullbackOfIsIso π (c.restrict hVU)).restrict hV₁le).coordIdeal {j₀} :=
-      restrictIdeal_eq_restrict_coordIdeal_of_le hV₁le (etaleChartPullbackOfIsIso π (c.restrict hVU))
-        (Blowup.strictTransform π Z H) {j₀} hSTV
-    refine ⟨V₁, hV₁aff, hx₁V₁,
-      Or.inr ⟨n, (etaleChartPullbackOfIsIso π (c.restrict hVU)).restrict hV₁le, j₀, hSTV₁, ?_⟩⟩
+    obtain ⟨V₁, _, hx₁V₁, hV₁le, hV₁aff, -⟩ := exists_etaleChart_le (π ≫ p) x₁ (π ⁻¹ᵁ V) hx₁V
+    have hSTV₁
+        : restrictIdeal (Blowup.strictTransform π Z H) V₁
+          = ((etaleChartPullbackOfIsIso π (c.restrict hVU)).restrict hV₁le).coordIdeal {j₀} :=
+      restrictIdeal_eq_restrict_coordIdeal_of_le hV₁le
+        (etaleChartPullbackOfIsIso π (c.restrict hVU)) (Blowup.strictTransform π Z H) {j₀} hSTV
+    refine ⟨
+      V₁,
+      hV₁aff,
+      hx₁V₁,
+      Or.inr ⟨n, (etaleChartPullbackOfIsIso π (c.restrict hVU)).restrict hV₁le, j₀, hSTV₁, ?_⟩
+    ⟩
     show ((etaleChartPullbackOfIsIso π (c.restrict hVU)).restrict hV₁le).coordIdeal {j₀} ≤
       restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) V₁
-    have h4 : restrictIdeal (Blowup.strictTransform π Z H) (π ⁻¹ᵁ V) ≤
-        restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) (π ⁻¹ᵁ V) := by
+    have h4
+        : restrictIdeal (Blowup.strictTransform π Z H) (π ⁻¹ᵁ V)
+          ≤ restrictIdeal (maxContactIdeal k (π ≫ p) A₁ μ) (π ⁻¹ᵁ V) := by
       rw [hSTV]
       exact hmcV
     have h5 := restrictIdeal_le_of_le_opens hV₁le h4
     rw [← hSTV₁]
     exact h5
 
-theorem isMaxContactHypersurface_strictTransform_of_quasiCompact (k : Type u) [Field k]
-    [CharZero k] {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k))
-    [AlgebraicGeometry.Smooth p] [LocallyOfFiniteType p] (π : P₁ ⟶ P) [IsLocallyNoetherian P₁]
-    [LocallyOfFiniteType (π ≫ p)] (Z : P.IdealSheafData) (E : List P.IdealSheafData)
-    (hZ : HasStrictNormalCrossingsWith p Z E) (hπ : Blowup.IsBlowupAlongIdealSheaf π Z) (A : P.IdealSheafData)
-    (A₁ : P₁.IdealSheafData) (μ : ℕ) (hμ : 1 ≤ μ)
-    (hsupp : (Z.support : Set ↥P) ⊆ orderAtLeastLocus A μ)
-    (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π) (H : P.IdealSheafData)
-    [QuasiCompact (strictTransformι π Z H)]
-    (hH : IsMaxContactHypersurface k p A μ H) :
-    IsMaxContactHypersurface k (π ≫ p) A₁ μ (Blowup.strictTransform π Z H) := by
+theorem isMaxContactHypersurface_strictTransform_of_quasiCompact
+    (k : Type u) [Field k] [CharZero k]
+    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.Smooth p] [LocallyOfFiniteType p]
+    (π : P₁ ⟶ P) [IsLocallyNoetherian P₁] [LocallyOfFiniteType (π ≫ p)]
+    (Z : P.IdealSheafData) (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E)
+    (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
+    (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ)
+    (hμ : 1 ≤ μ) (hsupp : (Z.support : Set ↥P) ⊆ orderAtLeastLocus A μ)
+    (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π)
+    (H : P.IdealSheafData) [QuasiCompact (strictTransformι π Z H)]
+    (hH : IsMaxContactHypersurface k p A μ H)
+    : IsMaxContactHypersurface k (π ≫ p) A₁ μ (Blowup.strictTransform π Z H) := by
   have : AlgebraicGeometry.Smooth (π ≫ p) := smooth_comp_of_isBlowupAlongIdealSheaf hZ hπ
   have hA : A ≤ Z ^ μ := le_pow_of_hasStrictNormalCrossingsWith p Z A E hZ μ hsupp
   intro x₁
   by_cases hx : π.base x₁ ∈ Z.support
-  · exact isMaxContactHypersurfaceAt_strictTransform_of_mem_support k p π Z E hZ hπ A A₁ μ hμ hsupp hA
-      htr H hH x₁ hx
+  · exact isMaxContactHypersurfaceAt_strictTransform_of_mem_support k p π Z E hZ hπ A A₁ μ hμ hsupp
+      hA htr H hH x₁ hx
   · exact isMaxContactHypersurfaceAt_strictTransform_of_notMem_support k p π Z E hZ hπ A A₁ μ hμ hA
       htr H hH x₁ hx
 
-theorem isMaxContactHypersurface_strictTransform_of_orderAt_le (k : Type u) [Field k] [CharZero k]
-    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.Smooth p]
-    [LocallyOfFiniteType p] (π : P₁ ⟶ P) [IsLocallyNoetherian P₁] [LocallyOfFiniteType (π ≫ p)]
+theorem isMaxContactHypersurface_strictTransform_of_orderAt_le
+    (k : Type u) [Field k] [CharZero k]
+    {P P₁ : Scheme.{u}} (p : P ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.Smooth p] [LocallyOfFiniteType p]
+    (π : P₁ ⟶ P) [IsLocallyNoetherian P₁] [LocallyOfFiniteType (π ≫ p)]
     (Z : P.IdealSheafData) (E : List P.IdealSheafData) (hZ : HasStrictNormalCrossingsWith p Z E)
-    (hπ : Blowup.IsBlowupAlongIdealSheaf π Z) (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ) (hμ : 1 ≤ μ)
-    (_hord : ∀ x : P, orderAt A x ≤ (μ : ℕ∞))
-    (hsupp : (Z.support : Set ↥P) ⊆ orderAtLeastLocus A μ)
-    (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π) (H : P.IdealSheafData) :
-    IsMaxContactHypersurface k p A μ H →
-      IsMaxContactHypersurface k (π ≫ p) A₁ μ (Blowup.strictTransform π Z H) := by
+    (hπ : Blowup.IsBlowupAlongIdealSheaf π Z)
+    (A : P.IdealSheafData) (A₁ : P₁.IdealSheafData) (μ : ℕ) (hμ : 1 ≤ μ)
+    (_hord : ∀ x : P, orderAt A x ≤ (μ : ℕ∞)) (hsupp : (Z.support : Set ↥P) ⊆ orderAtLeastLocus A μ)
+    (htr : Blowup.exceptionalIdeal π Z ^ μ * A₁ = A.comap π)
+    (H : P.IdealSheafData)
+    : IsMaxContactHypersurface k p A μ H
+      → IsMaxContactHypersurface k (π ≫ p) A₁ μ (Blowup.strictTransform π Z H) := by
   intro hH
-  exact isMaxContactHypersurface_strictTransform_of_quasiCompact k p π Z E hZ hπ A A₁ μ hμ
-    hsupp htr H hH
+  exact isMaxContactHypersurface_strictTransform_of_quasiCompact k p π Z E hZ hπ A A₁ μ hμ hsupp htr
+    H hH
 
 end
 

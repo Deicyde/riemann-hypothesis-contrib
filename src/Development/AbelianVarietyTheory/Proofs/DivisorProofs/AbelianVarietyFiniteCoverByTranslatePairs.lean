@@ -10,20 +10,31 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsA
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.EndOnTorsion
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.EndOnTorsion
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AbCover
 
-theorem cover : ∀ (K : Type) [Field K] [IsAlgClosed K] (A : Over (Sp K)) [GrpObj A], IsAbelianScheme A → ∀ V : A.left.Opens, (V : Set A.left).Nonempty → ∃ (n : ℕ) (a : Fin n → (𝟙_ (Over (Sp K)) ⟶ A)), ⨆ i, ((𝟙 A * (toUnit A ≫ a i)).left ⁻¹ᵁ V ⊓ (𝟙 A * (toUnit A ≫ a i)⁻¹).left ⁻¹ᵁ V) = ⊤ := by
+theorem cover
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] (A : Over (Sp K)) [GrpObj A],
+      IsAbelianScheme A
+        → ∀ V : A.left.Opens,
+          (V : Set A.left).Nonempty
+            → ∃ (n : ℕ) (a : Fin n → (𝟙_ (Over (Sp K)) ⟶ A)),
+              ⨆ i, ((𝟙 A * (toUnit A ≫ a i)).left ⁻¹ᵁ V ⊓ (𝟙 A * (toUnit A ≫ a i)⁻¹).left ⁻¹ᵁ V)
+                = ⊤ := by
   classical
   intro K _ _ A _ hA V hV
   have := hA.smooth
   have := hA.proper
   have : GeometricallyIntegral A.hom :=
-    forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ _ hA.smooth hA.geomConnected
+    forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ _ hA.smooth
+      hA.geomConnected
   have : IsIntegral A.left := GeometricallyIntegral.isIntegral_of_isLocallyNoetherian A.hom
   have : CompactSpace A.left := QuasiCompact.compactSpace_of_compactSpace A.hom
   let O : (𝟙_ (Over (Sp K)) ⟶ A) → A.left.Opens := fun a =>
@@ -39,10 +50,14 @@ theorem cover : ∀ (K : Type) [Field K] [IsAlgClosed K] (A : Over (Sp K)) [GrpO
       GlobalTheory.SS.AmpCub.nonempty_preimage _ hV
     have h2 : (((ι[A] ≫ ((toUnit A ≫ y) * 𝟙 A)).left ⁻¹ᵁ V : A.left.Opens) : Set A.left).Nonempty :=
       GlobalTheory.SS.AmpCub.nonempty_preimage _ hV
-    have h3 := nonempty_preirreducible_inter (TopologicalSpace.Opens.isOpen _)
-      (TopologicalSpace.Opens.isOpen _) h1 h2
-    obtain ⟨a, ha⟩ := GlobalTheory.AbelianProjective.exists_point A
-      ((((toUnit A ≫ y) * 𝟙 A).left ⁻¹ᵁ V ⊓ (ι[A] ≫ ((toUnit A ≫ y) * 𝟙 A)).left ⁻¹ᵁ V).isOpen).isLocallyClosed h3
+    have h3 :=
+      nonempty_preirreducible_inter (TopologicalSpace.Opens.isOpen _)
+        (TopologicalSpace.Opens.isOpen _) h1 h2
+    obtain ⟨a, ha⟩ :=
+      GlobalTheory.AbelianProjective.exists_point A
+        ((((toUnit A ≫ y) * 𝟙 A).left ⁻¹ᵁ V
+          ⊓ (ι[A] ≫ ((toUnit A ≫ y) * 𝟙 A)).left ⁻¹ᵁ V).isOpen).isLocallyClosed
+        h3
     refine ⟨a, fun p => ?_⟩
     have e : y ≫ (𝟙 A * (toUnit A ≫ a)) = a ≫ ((toUnit A ≫ y) * 𝟙 A) := by
       simp [MonObj.comp_mul, ← Category.assoc]
@@ -61,16 +76,21 @@ theorem cover : ∀ (K : Type) [Field K] [IsAlgClosed K] (A : Over (Sp K)) [GrpO
     by_contra hne
     have hc : ((⨆ a, O a : A.left.Opens) : Set A.left)ᶜ.Nonempty :=
       Set.nonempty_compl.2 fun h => hne (TopologicalSpace.Opens.ext h)
-    obtain ⟨y, hy⟩ := GlobalTheory.AbelianProjective.exists_point A
-      (TopologicalSpace.Opens.isOpen _).isClosed_compl.isLocallyClosed hc
+    obtain ⟨y, hy⟩ :=
+      GlobalTheory.AbelianProjective.exists_point A
+        (TopologicalSpace.Opens.isOpen _).isClosed_compl.isLocallyClosed hc
     obtain ⟨a, ha⟩ := key y
     exact hy (IsLocalRing.closedPoint K) (TopologicalSpace.Opens.mem_iSup.2 ⟨a, ha _⟩)
-  obtain ⟨F, hF⟩ := isCompact_univ.elim_finite_subcover (fun a => (O a : Set A.left))
-    (fun a => (O a).isOpen) fun x _ => by
-      have hx : x ∈ ⨆ a, O a := by rw [htop]; trivial
-      exact Set.mem_iUnion.2 (TopologicalSpace.Opens.mem_iSup.1 hx)
+  obtain ⟨F, hF⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun a => (O a : Set A.left))
+      (fun a => (O a).isOpen)
+      fun x _ => by
+        have hx : x ∈ ⨆ a, O a := by rw [htop]; trivial
+        exact Set.mem_iUnion.2 (TopologicalSpace.Opens.mem_iSup.1 hx)
   refine ⟨F.card, fun i => (F.equivFin.symm i).1, top_unique fun x _ => ?_⟩
   obtain ⟨a, ha, hx⟩ := Set.mem_iUnion₂.1 (hF (Set.mem_univ x))
-  exact TopologicalSpace.Opens.mem_iSup.2 ⟨F.equivFin ⟨a, ha⟩, by simp only [Equiv.symm_apply_apply]; exact hx⟩
+  exact TopologicalSpace.Opens.mem_iSup.2
+    ⟨F.equivFin ⟨a, ha⟩, by simp only [Equiv.symm_apply_apply]; exact hx⟩
 
 end GlobalTheory.AbCover

@@ -7,13 +7,18 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscrim
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
+open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
+  Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.HolDict.FrameDom
 
-open ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.TB.WickVanishing ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC
+open ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.TB.WickVanishing
+  ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC
 open scoped ComplexOrder
 
 variable {n : ℕ} {Hm x₀ : Mt n} {q : ℕ}
@@ -38,7 +43,8 @@ theorem neg_gram_mul (Hm x b : Mt n) : -((x * b)ᴴ * Hm * (x * b)) = bᴴ * (-(
   simp only [conjTranspose_mul, Matrix.mul_neg, Matrix.neg_mul, Matrix.mul_assoc]
 
 theorem neg_gram_orth (h : OrthFr Hm q x₀) : -(x₀ᴴ * Hm * x₀) = diagonal (sv q) := by
-  rw [h.2, ← ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.sgn_cast_eq q n, ← Matrix.diagonal_neg, neg_neg]
+  rw [h.2, ← ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.sgn_cast_eq q n,
+    ← Matrix.diagonal_neg, neg_neg]
 
 theorem sv_mul_self (a : Fin n) : sv q a * sv q a = 1 := by
   simp only [ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC.sv]
@@ -79,22 +85,25 @@ theorem mul_upT_mem {x b : Mt n} (hx : x ∈ frDom Hm q) (hb : UpT b) : x * b �
   obtain ⟨hdet, hmin⟩ := hx
   refine ⟨by rw [det_mul]; exact mul_ne_zero hdet hb.1, fun i => ?_⟩
   have hbT : b.BlockTriangular id := fun a c hca => hb.2 a c hca
-  have hN : (b.map (starRingEnd ℂ)).BlockTriangular id := fun a c hca => by
-    simp [hb.2 a c hca]
+  have hN : (b.map (starRingEnd ℂ)).BlockTriangular id := fun a c hca => by simp [hb.2 a c hca]
   have hdiag : ∀ k, b k k ≠ 0 := by
     have := hb.1
     rw [Matrix.det_of_upperTriangular hbT] at this
     exact fun k => Finset.prod_ne_zero_iff.mp this k (Finset.mem_univ k)
-  have e : -((x * b)ᴴ * Hm * (x * b)) =
-      (b.map (starRingEnd ℂ))ᵀ * (-(xᴴ * Hm * x)) * (b.map (starRingEnd ℂ)).map (starRingEnd ℂ) := by
+  have e
+      : -((x * b)ᴴ * Hm * (x * b))
+        = (b.map (starRingEnd ℂ))ᵀ * (-(xᴴ * Hm * x))
+          * (b.map (starRingEnd ℂ)).map (starRingEnd ℂ) := by
     rw [neg_gram_mul, ← conjTranspose_map_conj (b.map (starRingEnd ℂ)), map_conj_conj]
   rw [e, ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData.lminor_conj hN i]
   refine ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.pos_conj_mul ?_ (hmin i)
   refine Finset.prod_ne_zero_iff.mpr fun j _ => ?_
   simpa using hdiag _
 
-theorem unitary_mul_mem (hH : Hm.det ≠ 0) {u x : Mt n} (hu : u ∈ Formalism.QuantumDeterminants.UH Hm) (hx : x ∈ frDom Hm q) :
-    u * x ∈ frDom Hm q := by
+theorem unitary_mul_mem
+    (hH : Hm.det ≠ 0)
+    {u x : Mt n} (hu : u ∈ Formalism.QuantumDeterminants.UH Hm) (hx : x ∈ frDom Hm q)
+    : u * x ∈ frDom Hm q := by
   have hu' : uᴴ * Hm * u = Hm := hu
   have hg : (u * x)ᴴ * Hm * (u * x) = xᴴ * Hm * x := by
     have : (u * x)ᴴ * Hm * (u * x) = xᴴ * (uᴴ * Hm * u) * x := by
@@ -109,17 +118,20 @@ theorem unitary_mul_mem (hH : Hm.det ≠ 0) {u x : Mt n} (hu : u ∈ Formalism.Q
   rw [hg]
   exact hx.2 i
 
-theorem neg_gram_conj (h : OrthFr Hm q x₀) (y : Mt n) :
-    -((x₀ * y.map (starRingEnd ℂ))ᴴ * Hm * (x₀ * y.map (starRingEnd ℂ))) = Gy q y := by
+theorem neg_gram_conj (h : OrthFr Hm q x₀) (y : Mt n)
+    : -((x₀ * y.map (starRingEnd ℂ))ᴴ * Hm * (x₀ * y.map (starRingEnd ℂ))) = Gy q y := by
   rw [neg_gram_mul Hm x₀ (y.map (starRingEnd ℂ)), neg_gram_orth h, conjTranspose_map_conj]
   rfl
 
-theorem mem_of_ok (h : OrthFr Hm q x₀) {y : Mt n} (hy : Ok q y) : x₀ * y.map (starRingEnd ℂ) ∈ frDom Hm q := by
+theorem mem_of_ok (h : OrthFr Hm q x₀) {y : Mt n} (hy : Ok q y)
+    : x₀ * y.map (starRingEnd ℂ) ∈ frDom Hm q := by
   refine ⟨?_, fun i => ?_⟩
   · rw [det_mul]
-    exact mul_ne_zero (det_ne_of_orth h).1 (det_map_conj_ne (ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC.det_ne_of_ok hy))
+    exact mul_ne_zero (det_ne_of_orth h).1
+      (det_map_conj_ne (ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC.det_ne_of_ok hy))
   · rw [neg_gram_conj h]
-    exact ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC.lead_pos hy i (Nat.le_of_lt_succ i.isLt)
+    exact ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC.lead_pos hy i
+      (Nat.le_of_lt_succ i.isLt)
 
 theorem ok_of_gy {y : Mt n} (h : Gy q y = diagonal (sv q)) : Ok q y := by
   show (diagonal (sv q) * Gy q y).PosDef
@@ -138,8 +150,10 @@ theorem base_mem (h : OrthFr Hm q x₀) : x₀ ∈ frDom Hm q := by
   rwa [Matrix.map_one _ (map_zero _) (map_one _), Matrix.mul_one] at this
 
 theorem isOpen_frDom (Hm : Mt n) (q : ℕ) : IsOpen (frDom Hm q) := by
-  have e : frDom Hm q = {x : Mt n | x.det ≠ 0} ∩
-      ⋂ i : Fin (n + 1), {x : Mt n | 0 < psgn q i * (lminor (-(xᴴ * Hm * x)) i).re} := by
+  have e
+      : frDom Hm q
+        = {x : Mt n | x.det ≠ 0}
+          ∩ ⋂ i : Fin (n + 1), {x : Mt n | 0 < psgn q i * (lminor (-(xᴴ * Hm * x)) i).re} := by
     ext x
     simp only [frDom, Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_iInter]
   rw [e]
@@ -151,8 +165,9 @@ theorem isOpen_frDom (Hm : Mt n) (q : ℕ) : IsOpen (frDom Hm q) := by
 
 theorem isPreconnected_frDom (h : OrthFr Hm q x₀) : IsPreconnected (frDom Hm q) := by
   have hOk : IsPreconnected {y : Mt n | Ok q y} := by
-    have e : {y : Mt n | Ok q y} =
-        (fun y : Unit → Mt n => y ()) '' {y : Unit → Mt n | ∀ i, Ok q (y i)} := by
+    have e
+        : {y : Mt n | Ok q y}
+          = (fun y : Unit → Mt n => y ()) '' {y : Unit → Mt n | ∀ i, Ok q (y i)} := by
       ext y
       constructor
       · intro hy
@@ -160,12 +175,14 @@ theorem isPreconnected_frDom (h : OrthFr Hm q x₀) : IsPreconnected (frDom Hm q
       · rintro ⟨z, hz, rfl⟩
         exact hz ()
     rw [e]
-    exact (ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC.isPreconnected_ok (p0 := q) (r := n) (ι := Unit)).image _
-      (continuous_apply _).continuousOn
+    exact (ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC.isPreconnected_ok (p0 := q)
+      (r := n) (ι := Unit)).image _ (continuous_apply _).continuousOn
   have hUp : IsPreconnected {b : Mt n | UpT b} := by
-    have e : {b : Mt n | UpT b} =
-        (fun b : Unit → Mt n => b ()) '' {b : Unit → Mt n |
-          ∀ i, (b i).det ≠ 0 ∧ ∀ a c : Fin n, c < a → b i a c = 0} := by
+    have e
+        : {b : Mt n | UpT b}
+          = (fun b : Unit → Mt n => b ())
+            '' {b : Unit → Mt n |
+              ∀ i, (b i).det ≠ 0 ∧ ∀ a c : Fin n, c < a → b i a c = 0} := by
       ext b
       constructor
       · intro hb
@@ -173,12 +190,13 @@ theorem isPreconnected_frDom (h : OrthFr Hm q x₀) : IsPreconnected (frDom Hm q
       · rintro ⟨z, hz, rfl⟩
         exact hz ()
     rw [e]
-    exact (ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC.isPreconnected_upper (r := n) (ι := Unit)).image _
-      (continuous_apply _).continuousOn
+    exact (ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.GGC.isPreconnected_upper (r := n)
+      (ι := Unit)).image _ (continuous_apply _).continuousOn
   have hT : IsPreconnected ((fun y : Mt n => x₀ * y.map (starRingEnd ℂ)) '' {y : Mt n | Ok q y}) :=
-    hOk.image _ (continuous_const.matrix_mul
-      (continuous_id.matrix_map Complex.continuous_conj)).continuousOn
-  have hTsub : (fun y : Mt n => x₀ * y.map (starRingEnd ℂ)) '' {y : Mt n | Ok q y} ⊆ frDom Hm q := by
+    hOk.image _
+      (continuous_const.matrix_mul (continuous_id.matrix_map Complex.continuous_conj)).continuousOn
+  have hTsub
+      : (fun y : Mt n => x₀ * y.map (starRingEnd ℂ)) '' {y : Mt n | Ok q y} ⊆ frDom Hm q := by
     rintro _ ⟨y, hy, rfl⟩
     exact mem_of_ok h hy
   refine isPreconnected_of_forall x₀ fun x hx => ?_
@@ -188,14 +206,16 @@ theorem isPreconnected_frDom (h : OrthFr Hm q x₀) : IsPreconnected (frDom Hm q
     rintro _ ⟨b, hb, rfl⟩
     exact mul_upT_mem hx hb
 
-  obtain ⟨b, hbdet, hbT, hbeq⟩ := GlobalTheory.UnitFrames.exists_upper_conj_eq_signature q (-(xᴴ * Hm * x))
-    (neg_gram_isHermitian h x) hx.2
+  obtain ⟨b, hbdet, hbT, hbeq⟩ :=
+    GlobalTheory.UnitFrames.exists_upper_conj_eq_signature q (-(xᴴ * Hm * x))
+      (neg_gram_isHermitian h x) hx.2
   set c : Mt n := b.map (starRingEnd ℂ) with hc
   have hcU : UpT c := by
     refine ⟨det_map_conj_ne hbdet, fun a d hda => ?_⟩
     simp [hc, hbT hda]
   have hgc : -((x * c)ᴴ * Hm * (x * c)) = diagonal (sv q) := by
-    rw [neg_gram_mul, hc, conjTranspose_map_conj, hbeq, ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.sgn_cast_eq]
+    rw [neg_gram_mul, hc, conjTranspose_map_conj, hbeq,
+      ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.sgn_cast_eq]
   have hx0 := (det_ne_of_orth h).1
   set y : Mt n := (x₀⁻¹ * (x * c)).map (starRingEnd ℂ) with hy
   have hxy : x₀ * y.map (starRingEnd ℂ) = x * c := by
@@ -203,17 +223,31 @@ theorem isPreconnected_frDom (h : OrthFr Hm q x₀) : IsPreconnected (frDom Hm q
   have hyOk : Ok q y := by
     refine ok_of_gy ?_
     rw [← neg_gram_conj h y, hxy, hgc]
-  refine ⟨_ ∪ _, Set.union_subset hTsub hxBsub, Or.inl ⟨1, ok_one, ?_⟩,
-    Or.inr ⟨1, ⟨by simp, fun a c hca => by simp [Matrix.one_apply_ne (ne_of_lt hca).symm]⟩, Matrix.mul_one x⟩,
-    hT.union (x * c) ⟨y, hyOk, hxy⟩ ⟨c, hcU, rfl⟩ hxB⟩
+  refine ⟨
+    _ ∪ _,
+    Set.union_subset hTsub hxBsub,
+    Or.inl ⟨1, ok_one, ?_⟩,
+    Or.inr ⟨
+      1,
+      ⟨by simp, fun a c hca => by simp [Matrix.one_apply_ne (ne_of_lt hca).symm]⟩,
+      Matrix.mul_one x
+    ⟩,
+    hT.union (x * c) ⟨y, hyOk, hxy⟩ ⟨c, hcU, rfl⟩ hxB
+  ⟩
   show x₀ * (1 : Mt n).map (starRingEnd ℂ) = x₀
   rw [Matrix.map_one _ (map_zero _) (map_one _), Matrix.mul_one]
 
 end GlobalTheory.HolDict.FrameDom
 
-
 open GlobalTheory.HolDict.FrameDom in
-theorem GlobalTheory.HolDict.frDoms_open_preconnected_stable : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (Hm : ι → Mt n) (q : ι → ℕ) (x₀ : ι → Mt n), (∀ τ, OrthFr (Hm τ) (q τ) (x₀ τ)) → IsOpen (frDoms Hm q) ∧ IsPreconnected (frDoms Hm q) ∧ (∀ u ∈ UG Hm, ∀ b : ι → Mt n, (∀ τ, UpT (b τ)) → ∀ x ∈ frDoms Hm q, (fun τ => (u τ * Matrix.of (x τ) * b τ : Mt n)) ∈ frDoms Hm q) ∧ (fun τ => (x₀ τ : Mt n)) ∈ frDoms Hm q := by
+theorem GlobalTheory.HolDict.frDoms_open_preconnected_stable
+    : ∀ (n : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (Hm : ι → Mt n) (q : ι → ℕ) (x₀ : ι → Mt n),
+      (∀ τ, OrthFr (Hm τ) (q τ) (x₀ τ))
+        → IsOpen (frDoms Hm q) ∧ IsPreconnected (frDoms Hm q)
+          ∧ (∀ u ∈ UG Hm, ∀ b : ι → Mt n,
+            (∀ τ, UpT (b τ))
+              → ∀ x ∈ frDoms Hm q, (fun τ => (u τ * Matrix.of (x τ) * b τ : Mt n)) ∈ frDoms Hm q)
+          ∧ (fun τ => (x₀ τ : Mt n)) ∈ frDoms Hm q := by
   intro n ι _ _ Hm q x₀ h
   have e : frDoms Hm q = Set.univ.pi fun τ => frDom (Hm τ) (q τ) := by
     ext x

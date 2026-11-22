@@ -11,9 +11,10 @@ namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
 namespace DegLTEventuallyConst
 
-theorem eq_of_unitSteps_eq_zero {K : Type} [Fintype K] [DecidableEq K] (g : (K → ℤ) → ℤ)
-    (N : K → ℤ) (h : ∀ m, N ≤ m → ∀ k, g m - g (m - Pi.single k 1) = 0) :
-    ∀ d : ℕ, ∀ m, N ≤ m → ∑ k, (m k - N k).toNat = d → g m = g N := by
+theorem eq_of_unitSteps_eq_zero
+    {K : Type} [Fintype K] [DecidableEq K]
+    (g : (K → ℤ) → ℤ) (N : K → ℤ) (h : ∀ m, N ≤ m → ∀ k, g m - g (m - Pi.single k 1) = 0)
+    : ∀ d : ℕ, ∀ m, N ≤ m → ∑ k, (m k - N k).toNat = d → g m = g N := by
   intro d
   induction d with
   | zero =>
@@ -47,10 +48,10 @@ theorem eq_of_unitSteps_eq_zero {K : Type} [Fintype K] [DecidableEq K] (g : (K �
         exact hm j
     have hs' : ∑ j, (m' j - N j).toNat = d := by
       have e1 := Finset.add_sum_erase Finset.univ (fun j => (m j - N j).toNat) (Finset.mem_univ k)
-      have e2 := Finset.add_sum_erase Finset.univ
-        (fun j => (m' j - N j).toNat) (Finset.mem_univ k)
-      have e3 : ∑ j ∈ Finset.univ.erase k, (m' j - N j).toNat =
-          ∑ j ∈ Finset.univ.erase k, (m j - N j).toNat :=
+      have e2 := Finset.add_sum_erase Finset.univ (fun j => (m' j - N j).toNat) (Finset.mem_univ k)
+      have e3
+          : ∑ j ∈ Finset.univ.erase k, (m' j - N j).toNat
+            = ∑ j ∈ Finset.univ.erase k, (m j - N j).toNat :=
         Finset.sum_congr rfl fun j hj => by rw [hm'j j (Finset.ne_of_mem_erase hj)]
       simp only [hm'k] at e2
       omega
@@ -60,15 +61,20 @@ theorem eq_of_unitSteps_eq_zero {K : Type} [Fintype K] [DecidableEq K] (g : (K �
 
 theorem proof (h1 : MixedDiffLinear.Statement) : DegLTEventuallyConst.Statement := by
   intro K _ _ n f hf bs
-  have hev : ∀ k : K, ∀ᶠ m in Filter.atTop,
-      mixedDiff bs f m - mixedDiff bs f (m - Pi.single k 1) = 0 := by
+  have hev
+      : ∀ k : K,
+        ∀ᶠ m in Filter.atTop,
+          mixedDiff bs f m - mixedDiff bs f (m - Pi.single k 1) = 0 := by
     intro k
     have hk := hf (Matrix.vecCons (Pi.single k 1) bs)
     rw [(h1 K n bs f 0 0 0 (Pi.single k 1)).2.2.2.2] at hk
     exact hk
   obtain ⟨N, hN⟩ := Filter.eventually_atTop.mp (Filter.eventually_all.mpr hev)
-  exact ⟨mixedDiff bs f N, Filter.eventually_atTop.mpr ⟨N, fun m hm =>
-    eq_of_unitSteps_eq_zero (mixedDiff bs f) N (fun m hm => hN m hm) _ m hm rfl⟩⟩
+  exact ⟨
+    mixedDiff bs f N,
+    Filter.eventually_atTop.mpr
+      ⟨N, fun m hm => eq_of_unitSteps_eq_zero (mixedDiff bs f) N (fun m hm => hN m hm) _ m hm rfl⟩
+  ⟩
 
 end DegLTEventuallyConst
 

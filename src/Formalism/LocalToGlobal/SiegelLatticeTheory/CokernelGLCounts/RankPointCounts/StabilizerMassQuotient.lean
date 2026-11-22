@@ -14,84 +14,112 @@ variable (Γ : Type*) [Group Γ]
 
 variable {Γ}
 
-theorem card_stab_smul {A : Type*} [MulAction Γ A] (g : Γ) (a : A) :
-    Nat.card (MulAction.stabilizer Γ (g • a)) = Nat.card (MulAction.stabilizer Γ a) := by
-  refine Nat.card_congr
-    { toFun := fun s => ⟨g⁻¹ * (s : Γ) * g, by
+theorem card_stab_smul {A : Type*} [MulAction Γ A] (g : Γ) (a : A)
+    : Nat.card (MulAction.stabilizer Γ (g • a)) = Nat.card (MulAction.stabilizer Γ a) := by
+  refine Nat.card_congr {
+    toFun := fun s => ⟨
+      g⁻¹ * (s : Γ) * g,
+      by
         rw [MulAction.mem_stabilizer_iff, mul_smul, mul_smul, MulAction.mem_stabilizer_iff.1 s.2,
-          inv_smul_smul]⟩
-      invFun := fun t => ⟨g * (t : Γ) * g⁻¹, by
+          inv_smul_smul]
+    ⟩
+    invFun := fun t => ⟨
+      g * (t : Γ) * g⁻¹,
+      by
         rw [MulAction.mem_stabilizer_iff, mul_smul, mul_smul, inv_smul_smul,
-          MulAction.mem_stabilizer_iff.1 t.2]⟩
-      left_inv := fun s => Subtype.ext (by first | simp [mul_assoc] | group)
-      right_inv := fun t => Subtype.ext (by first | simp [mul_assoc] | group) }
+          MulAction.mem_stabilizer_iff.1 t.2]
+    ⟩
+    left_inv := fun s => Subtype.ext (by first | simp [mul_assoc] | group)
+    right_inv := fun t => Subtype.ext (by first | simp [mul_assoc] | group)
+  }
 
-theorem card_stab_of_orbitRel {A : Type*} [MulAction Γ A] {a a' : A} (h : MulAction.orbitRel Γ A a' a) :
-    Nat.card (MulAction.stabilizer Γ a') = Nat.card (MulAction.stabilizer Γ a) := by
+theorem card_stab_of_orbitRel
+    {A : Type*} [MulAction Γ A] {a a' : A} (h : MulAction.orbitRel Γ A a' a)
+    : Nat.card (MulAction.stabilizer Γ a') = Nat.card (MulAction.stabilizer Γ a) := by
   first
   | (obtain ⟨g, rfl⟩ := h; exact card_stab_smul g a)
-  | (obtain ⟨g, rfl⟩ := MulAction.mem_orbit_iff.1 (MulAction.orbitRel_apply.1 h);
-      exact card_stab_smul g a)
+  | (
+      obtain ⟨g, rfl⟩ := MulAction.mem_orbit_iff.1 (MulAction.orbitRel_apply.1 h)
+      exact card_stab_smul g a
+    )
 
 section Fibre
 
-variable {A B : Type*} [MulAction Γ A] [MulAction Γ B] (f : A → B)
-  (hf : ∀ (g : Γ) (a : A), f (g • a) = g • f a)
-
+variable
+  {A B : Type*} [MulAction Γ A] [MulAction Γ B]
+  (f : A → B) (hf : ∀ (g : Γ) (a : A), f (g • a) = g • f a)
 
 include hf in
-@[reducible] def fibAct (b : B) : MulAction (MulAction.stabilizer Γ b) {a : A // f a = b} where
+@[reducible]
+def fibAct (b : B) : MulAction (MulAction.stabilizer Γ b) {a : A // f a = b} where
   smul s a := ⟨(s : Γ) • a.1, by rw [hf, a.2]; exact s.2⟩
   one_smul a := Subtype.ext (one_smul Γ a.1)
   mul_smul s t a := Subtype.ext (mul_smul (s : Γ) (t : Γ) a.1)
 
-
 include hf in
 def qmap : Quotient (MulAction.orbitRel Γ A) → Quotient (MulAction.orbitRel Γ B) :=
-  Quotient.map' f fun a a' ⟨g, hg⟩ => ⟨g, by
-    have hg' : g • a' = a := hg
-    show g • f a' = f a
-    rw [← hf, hg']⟩
+  Quotient.map' f fun a a' ⟨g, hg⟩ => ⟨
+    g,
+    by
+      have hg' : g • a' = a := hg
+      show g • f a' = f a
+      rw [← hf, hg']
+  ⟩
 
-theorem qmap_mk (a : A) : qmap f hf (Quotient.mk _ a) = Quotient.mk (MulAction.orbitRel Γ B) (f a) := rfl
-
+theorem qmap_mk (a : A)
+    : qmap f hf (Quotient.mk _ a) = Quotient.mk (MulAction.orbitRel Γ B) (f a) :=
+  rfl
 
 include hf in
-def stabEquiv (b : B) (x : {a : A // f a = b}) :
-    (letI := fibAct f hf b; MulAction.stabilizer (MulAction.stabilizer Γ b) x) ≃ MulAction.stabilizer Γ x.1 := by
+def stabEquiv (b : B) (x : {a : A // f a = b})
+    : (letI := fibAct f hf b; MulAction.stabilizer (MulAction.stabilizer Γ b) x)
+      ≃ MulAction.stabilizer Γ x.1 := by
   letI := fibAct f hf b
-  exact
-    { toFun := fun s => ⟨(s.1 : Γ), by
+  exact {
+    toFun := fun s => ⟨
+      (s.1 : Γ),
+      by
         have h := s.2
         rw [MulAction.mem_stabilizer_iff] at h ⊢
-        exact congrArg Subtype.val h⟩
-      invFun := fun g => ⟨⟨g.1, by
-        rw [MulAction.mem_stabilizer_iff]
-        have h := MulAction.mem_stabilizer_iff.1 g.2
-        have h2 := congrArg f h
-        rw [hf, x.2] at h2
-        exact h2⟩, by
+        exact congrArg Subtype.val h
+    ⟩
+    invFun := fun g => ⟨
+      ⟨
+        g.1,
+        by
           rw [MulAction.mem_stabilizer_iff]
-          apply Subtype.ext
-          exact (MulAction.mem_stabilizer_iff.1 g.2)⟩
-      left_inv := fun s => rfl
-      right_inv := fun g => rfl }
-
+          have h := MulAction.mem_stabilizer_iff.1 g.2
+          have h2 := congrArg f h
+          rw [hf, x.2] at h2
+          exact h2
+      ⟩,
+      by
+        rw [MulAction.mem_stabilizer_iff]
+        apply Subtype.ext
+        exact (MulAction.mem_stabilizer_iff.1 g.2)
+    ⟩
+    left_inv := fun s => rfl
+    right_inv := fun g => rfl
+  }
 
 include hf in
-def orbEquiv (oB : Quotient (MulAction.orbitRel Γ B)) :
-    (letI := fibAct f hf oB.out; Quotient (MulAction.orbitRel (MulAction.stabilizer Γ oB.out) {a : A // f a = oB.out})) ≃
-      ↥(qmap f hf ⁻¹' {oB}) := by
+def orbEquiv (oB : Quotient (MulAction.orbitRel Γ B))
+    : (letI := fibAct f hf oB.out
+       Quotient (MulAction.orbitRel (MulAction.stabilizer Γ oB.out) {a : A // f a = oB.out}))
+      ≃ ↥(qmap f hf ⁻¹' {oB}) := by
   letI := fibAct f hf oB.out
   refine Equiv.ofBijective (Quotient.lift (fun x => ⟨Quotient.mk _ x.1, ?_⟩) ?_) ⟨?_, ?_⟩
   · show Quotient.mk _ (f x.1) = oB
-    rw [x.2]; exact Quotient.out_eq oB
+    rw [x.2]
+    exact Quotient.out_eq oB
   · rintro x y ⟨s, hs⟩
     apply Subtype.ext
     exact Quotient.sound ⟨(s : Γ), congrArg Subtype.val hs⟩
   · intro X Y hXY
-    induction X using Quotient.inductionOn with | h x => ?_
-    induction Y using Quotient.inductionOn with | h y => ?_
+    induction X using Quotient.inductionOn with
+    | h x => ?_
+    induction Y using Quotient.inductionOn with
+    | h y => ?_
     have h := congrArg Subtype.val hXY
     obtain ⟨g, hg⟩ := Quotient.exact h
     have hg' : g • y.1 = x.1 := hg
@@ -109,8 +137,9 @@ def orbEquiv (oB : Quotient (MulAction.orbitRel Γ B)) :
     refine ⟨Quotient.mk _ ⟨g⁻¹ • oA.out, by rw [hf, ← hg', inv_smul_smul]⟩, ?_⟩
     apply Subtype.ext
     show Quotient.mk _ (g⁻¹ • oA.out) = oA
-    exact (Quotient.sound ⟨g⁻¹, rfl⟩ : Quotient.mk (MulAction.orbitRel Γ A) (g⁻¹ • oA.out) =
-      Quotient.mk _ oA.out).trans (Quotient.out_eq oA)
+    exact (Quotient.sound ⟨g⁻¹, rfl⟩
+        : Quotient.mk (MulAction.orbitRel Γ A) (g⁻¹ • oA.out) = Quotient.mk _ oA.out).trans
+      (Quotient.out_eq oA)
 
 end Fibre
 

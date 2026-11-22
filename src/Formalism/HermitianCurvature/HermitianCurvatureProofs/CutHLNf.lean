@@ -12,13 +12,15 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutHL
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.LevelPointCoordinates
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.LevelPointCoordinates
 
-theorem zfull_zb {j : ℕ} (Z : Matrix (Fin j) (Fin j) ℂ) (τ : ℂ) (a b : Fin (j + 1)) :
-    zfull Z τ a b = C3.Zb j 1 Z τ a.val b.val := by
+theorem zfull_zb {j : ℕ} (Z : Matrix (Fin j) (Fin j) ℂ) (τ : ℂ) (a b : Fin (j + 1))
+    : zfull Z τ a b = C3.Zb j 1 Z τ a.val b.val := by
   rw [zfull_apply]
   unfold C3.Zb
-  have := a.isLt; have := b.isLt
+  have := a.isLt
+  have := b.isLt
   by_cases h1 : a.val < j ∧ b.val < j
   · rw [dite_eq_left h1, dite_eq_left h1.1, dite_eq_left h1.2]
   · rw [dite_eq_right h1]
@@ -58,21 +60,34 @@ theorem first_component_of_parts : Comp1OfParts := by
   obtain ⟨hz, hz', hD, hDs, hR, hZ, hτ, hγ, hx⟩ := hH
   obtain ⟨hnf, hnfy⟩ := hNf k r j hj Z τ γ hZ hτ hγ
   have hxG : x0 k r j hj Z τ γ ∈ B.GV k r := x0_GV hj hZ hτ hγ
-  have hx1 : x0 k r j hj Z τ γ ∈ Q.Glev k r 0 ∩ Dm := ⟨⟨hxG, fun a ha => absurd ha (Nat.not_lt_zero _)⟩, hx⟩
+  have hx1 : x0 k r j hj Z τ γ ∈ Q.Glev k r 0 ∩ Dm :=
+    ⟨⟨hxG, fun a ha => absurd ha (Nat.not_lt_zero _)⟩, hx⟩
   have hK : Q.SmoothLev k r 0 Dm Φ := hR.1
-  have hRule : ∀ g ∈ Q.Glev k r 0 ∩ Dm, ∀ p q, C3.InNp k r p q → Q.EH k r p q Φ g = C3.dpsiP k r z' p q • Φ g :=
-    fun g hg p q hpq => Formalism.FourierDecayAlt.P.rule_of_eq E k r z' Φ g hz' (fun n hn => (hR.2.1 g hg n hn).2) p q hpq
+  have hRule
+      : ∀ g ∈ Q.Glev k r 0 ∩ Dm, ∀ p q,
+        C3.InNp k r p q → Q.EH k r p q Φ g = C3.dpsiP k r z' p q • Φ g := fun g hg p q hpq =>
+    Formalism.FourierDecayAlt.P.rule_of_eq E k r z' Φ g hz'
+      (fun n hn => (hR.2.1 g hg n hn).2)
+      p q hpq
   refine ⟨?_, ?_⟩
-  · have h := PBG.letter_plus_component_one_eq_smul_component_zero hD z z' j 1 le_rfl hj Z τ hZ hτ _ hx1 hnf Φ hK hRule Y
+  · have h :=
+      PBG.letter_plus_component_one_eq_smul_component_zero hD z z' j 1 le_rfl hj Z τ hZ hτ _ hx1 hnf
+        Φ hK hRule Y
     rw [show ((-1 : ℂ) ^ (1 - 1) * τ⁻¹) = τ⁻¹ by simp] at h
     exact h
-  · have h := PBG.letter_minus_component_one_eq_smul_component_zero hD z z' j 1 le_rfl hj Z τ hZ hτ _ hx1 hxG hnf hnfy Φ hK hRule Y
+  · have h :=
+      PBG.letter_minus_component_one_eq_smul_component_zero hD z z' j 1 le_rfl hj Z τ hZ hτ _ hx1
+        hxG hnf hnfy Φ hK hRule Y
     rw [show ((-1 : ℂ) ^ (1 - 1) * (conj τ)⁻¹) = (conj τ)⁻¹ by simp] at h
     exact h
 
-theorem headLetter_of_open (hL : LeftActionRuleAtBasePoint) (hT : TorusDirectionAtBasePoint) (hSL : ConjugateActionRuleAtBasePoint) (hST : ConjugateTorusDirectionAtBasePoint)
-    (hFX : FrozenX) (hFV : FrozenV) (hPP : PlusPosOfParts) (hPZ : PlusZeroOfParts) (hMP : MinusPosOfParts)
-    (hMZ : MinusZeroOfParts) : LevelPointCoordinates.HeadLetter :=
-  headLetter_of_leaves normal_form_x0 leading_minors_at_base_point hL hT hSL hST hFX hFV first_component_of_parts hPP hPZ hMP hMZ
+theorem headLetter_of_open
+    (hL : LeftActionRuleAtBasePoint) (hT : TorusDirectionAtBasePoint)
+    (hSL : ConjugateActionRuleAtBasePoint) (hST : ConjugateTorusDirectionAtBasePoint)
+    (hFX : FrozenX) (hFV : FrozenV) (hPP : PlusPosOfParts) (hPZ : PlusZeroOfParts)
+    (hMP : MinusPosOfParts) (hMZ : MinusZeroOfParts)
+    : LevelPointCoordinates.HeadLetter :=
+  headLetter_of_leaves normal_form_x0 leading_minors_at_base_point hL hT hSL hST hFX hFV
+    first_component_of_parts hPP hPZ hMP hMZ
 
 end Formalism.FourierDecayAlt.P.CutHL

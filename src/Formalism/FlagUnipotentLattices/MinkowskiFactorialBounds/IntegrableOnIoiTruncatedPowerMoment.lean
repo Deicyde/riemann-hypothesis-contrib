@@ -35,7 +35,9 @@ lemma gl_fourier_eq (φ : ℂ → ℂ) (w : ℂ) :
   push_cast
   ring
 
-theorem lemSSupBound_of (hE : Formalism.HermitianLatticeCounting.ExpansionTerms.CutoffIntegralFormula) : Formalism.HermitianLatticeCounting.ExpansionTerms.LemSSupBound := by
+theorem lemSSupBound_of
+    (hE : Formalism.HermitianLatticeCounting.ExpansionTerms.CutoffIntegralFormula)
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.LemSSupBound := by
   intro φ x M hc hi hx hb c
   obtain ⟨hI, hV⟩ := hE 3 (x / π) (by norm_num) (div_pos hx pi_pos)
   have hbd : ∀ w : ℂ, ‖𝓕 φ w‖ ≤ M * TruncationCutoff 3 (x / π) ‖w‖ := by
@@ -43,8 +45,8 @@ theorem lemSSupBound_of (hE : Formalism.HermitianLatticeCounting.ExpansionTerms.
     rw [gl_fourier_eq, ← gl_cut_scale]
     have := hb (-(Complex.I * (π : ℂ) * (starRingEnd ℂ) w))
     have hn : ‖(-(Complex.I * (π : ℂ) * (starRingEnd ℂ) w))‖ = π * ‖w‖ := by
-      rw [norm_neg, norm_mul, norm_mul, Complex.norm_I, one_mul, Complex.norm_real, RCLike.norm_conj,
-        Real.norm_of_nonneg pi_pos.le]
+      rw [norm_neg, norm_mul, norm_mul, Complex.norm_I, one_mul, Complex.norm_real,
+        RCLike.norm_conj, Real.norm_of_nonneg pi_pos.le]
     rwa [hn] at this
   have hcont : Continuous (𝓕 φ) :=
     VectorFourier.fourierIntegral_continuous Real.continuous_fourierChar (innerSL ℝ).continuous₂ hi
@@ -52,7 +54,9 @@ theorem lemSSupBound_of (hE : Formalism.HermitianLatticeCounting.ExpansionTerms.
     (hI.const_mul M).mono' hcont.aestronglyMeasurable (Filter.Eventually.of_forall hbd)
   have hinv : 𝓕⁻ (𝓕 φ) c = φ c := hi.fourierInv_fourier_eq hFi hc.continuousAt
   rw [← hinv, Real.fourierInv_eq]
-  calc ‖∫ v, 𝐞 ⟪v, c⟫ • 𝓕 φ v‖ ≤ ∫ v, ‖𝐞 ⟪v, c⟫ • 𝓕 φ v‖ := norm_integral_le_integral_norm _
+  calc
+    ‖∫ v, 𝐞 ⟪v, c⟫ • 𝓕 φ v‖
+      ≤ ∫ v, ‖𝐞 ⟪v, c⟫ • 𝓕 φ v‖ := norm_integral_le_integral_norm _
     _ = ∫ v, ‖𝓕 φ v‖ := by simp_rw [Circle.norm_smul]
     _ ≤ ∫ v : ℂ, M * TruncationCutoff 3 (x / π) ‖v‖ := integral_mono hFi.norm (hI.const_mul M) hbd
     _ = M * (π * (x / π) ^ 2 * (3 / (3 - 2))) := by rw [integral_const_mul, hV]
@@ -134,7 +138,9 @@ lemma gl_e3Integral : Formalism.HermitianLatticeCounting.ExpansionTerms.CutoffIn
     field_simp
     ring
 
-theorem sup_bound_of_truncated_integral : Formalism.HermitianLatticeCounting.ExpansionTerms.LemSSupBound := lemSSupBound_of gl_e3Integral
+theorem sup_bound_of_truncated_integral
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.LemSSupBound :=
+  lemSSupBound_of gl_e3Integral
 
 end GrpL
 end Formalism.HermitianLatticeCounting.P
@@ -145,7 +151,8 @@ open Formalism.HermitianLatticeCounting.ExpansionTerms
 open Finset Matrix
 open scoped ComplexConjugate fwdDiff
 
-theorem rank_two_operator_skew_hermitian : Formalism.HermitianLatticeCounting.ExpansionTerms.RankTwoOperatorSkewHermitian := by
+theorem rank_two_operator_skew_hermitian
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.RankTwoOperatorSkewHermitian := by
   intro V _ _ h hs e v x y
   simp only [map_sub, LinearMap.sub_apply, map_smul, LinearMap.smul_apply, map_smulₛₗ, smul_eq_mul,
     RingHom.id_apply]
@@ -237,7 +244,8 @@ lemma gg_step {d : ℕ} {R : Type*} [CommRing R] (Z : Matrix (Fin d) (Fin d) R) 
   · intro i hi j hj
     exact h0 i.1 j.1 (not_lt.mp hi) i.2 hj
 
-theorem leading_minor_vanishes_off_block_ends : Formalism.HermitianLatticeCounting.ExpansionTerms.LeadingMinorVanishesOffBlockEnds := by
+theorem leading_minor_vanishes_off_block_ends
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.LeadingMinorVanishesOffBlockEnds := by
   intro R _ d c t q hq hne
   have hqd : q < d := lt_of_le_of_ne hq (by rw [← c.sizeUpTo_length]; exact hne _)
   set a : ℕ := (c.index ⟨q, hqd⟩ : ℕ) with ha
@@ -245,7 +253,8 @@ theorem leading_minor_vanishes_off_block_ends : Formalism.HermitianLatticeCounti
   have h2 : q < c.sizeUpTo (a + 1) := c.lt_sizeUpTo_index_succ ⟨q, hqd⟩
   have h1' : c.sizeUpTo a < q := lt_of_le_of_ne h1 (fun h => hne a h.symm)
   unfold leadingPrincipalMinor
-  apply Matrix.det_eq_zero_of_row_eq_zero (⟨⟨c.sizeUpTo a, by omega⟩, h1'⟩ : {i : Fin d // (i : ℕ) < q})
+  apply Matrix.det_eq_zero_of_row_eq_zero
+    (⟨⟨c.sizeUpTo a, by omega⟩, h1'⟩ : {i : Fin d // (i : ℕ) < q})
   intro j
   have hj := j.2
   have hidx : (c.index ⟨c.sizeUpTo a, by omega⟩ : ℕ) = a :=
@@ -256,7 +265,8 @@ theorem leading_minor_vanishes_off_block_ends : Formalism.HermitianLatticeCounti
   rw [hidx] at h
   omega
 
-theorem leading_minor_at_block_end : Formalism.HermitianLatticeCounting.ExpansionTerms.LeadingMinorAtBlockEnd := by
+theorem leading_minor_at_block_end
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.LeadingMinorAtBlockEnd := by
   intro R _ d c t p
   induction p with
   | zero =>
@@ -266,8 +276,9 @@ theorem leading_minor_at_block_end : Formalism.HermitianLatticeCounting.Expansio
     by_cases hp : p < c.length
     · have hs : c.sizeUpTo (p + 1) = c.sizeUpTo p + c.blocksFun ⟨p, hp⟩ := c.sizeUpTo_succ' ⟨p, hp⟩
       have hle : c.sizeUpTo p + c.blocksFun ⟨p, hp⟩ ≤ d := hs ▸ c.sizeUpTo_le _
-      have hf : univ.filter (fun a : Fin c.length => (a : ℕ) < p + 1) =
-          insert ⟨p, hp⟩ (univ.filter (fun a : Fin c.length => (a : ℕ) < p)) := by
+      have hf
+          : univ.filter (fun a : Fin c.length => (a : ℕ) < p + 1)
+            = insert ⟨p, hp⟩ (univ.filter (fun a : Fin c.length => (a : ℕ) < p)) := by
         ext a
         simp only [mem_filter, mem_univ, true_and, mem_insert, Fin.ext_iff]
         omega
@@ -356,13 +367,16 @@ lemma gf_upper_det {R : Type*} [CommRing R] {d : ℕ} {α : Type*} [Fintype α] 
   rw [Matrix.det_of_upperTriangular (M := u.submatrix ρ ρ) (fun a b hab => hu.2 _ _ (hmono hab))]
   simp [Matrix.submatrix_apply, hu.1]
 
-theorem invariant_value_holds : Formalism.HermitianLatticeCounting.ExpansionTerms.LeadingMinorUnipotentInvariant := by
+theorem invariant_value_holds
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.LeadingMinorUnipotentInvariant := by
   intro R _ d Z l u q hl hu
   unfold leadingPrincipalMinor
-  have hinj : Function.Injective (fun i : {i : Fin d // (i : ℕ) < q} => i.1) := Subtype.val_injective
-  have hdown : ∀ (a : {i : Fin d // (i : ℕ) < q}) (x : Fin d), x ≤ a.1 →
-      ∃ b : {i : Fin d // (i : ℕ) < q}, b.1 = x :=
-    fun a x hx => ⟨⟨x, Nat.lt_of_le_of_lt hx a.2⟩, rfl⟩
+  have hinj : Function.Injective (fun i : {i : Fin d // (i : ℕ) < q} => i.1) :=
+    Subtype.val_injective
+  have hdown
+      : ∀ (a : {i : Fin d // (i : ℕ) < q}) (x : Fin d),
+        x ≤ a.1 → ∃ b : {i : Fin d // (i : ℕ) < q}, b.1 = x := fun a x hx =>
+    ⟨⟨x, Nat.lt_of_le_of_lt hx a.2⟩, rfl⟩
   have hmono : StrictMono (fun i : {i : Fin d // (i : ℕ) < q} => i.1) := fun a b h => h
   rw [gf_upper_sub _ hinj hdown u hu (l * Z) _, gf_lower_sub _ hinj hdown l hl Z _, Matrix.det_mul,
     Matrix.det_mul, gf_lower_det _ hmono l hl, gf_upper_det _ hmono u hu, one_mul, mul_one]
@@ -381,46 +395,57 @@ lemma gf_one_lower {R : Type*} [CommRing R] {d : ℕ} : IsLowerUnitriangular (1 
   unfold IsLowerUnitriangular
   exact ⟨fun i => Matrix.one_apply_eq i, fun i j h => Matrix.one_apply_ne (ne_of_lt h)⟩
 
-theorem mixed_minor_vanishing : Formalism.HermitianLatticeCounting.ExpansionTerms.MixedMinorVanishing := by
+theorem mixed_minor_vanishing
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.MixedMinorVanishing := by
   intro R _ d c t l u hl hu i j' hi hj'
   have hid : (i : ℕ) + 1 ≤ d := Nat.succ_le_of_lt i.isLt
   obtain ⟨ρ, hρ⟩ : ∃ ρ : Fin ((i : ℕ) + 1) → Fin d, ρ = fun a => Fin.castLE hid a := ⟨_, rfl⟩
-  obtain ⟨κ, hκ⟩ : ∃ κ : Fin ((i : ℕ) + 1) → Fin d,
-      κ = fun b : Fin ((i : ℕ) + 1) => if (b : ℕ) < (i : ℕ) then Fin.castLE hid b else j' := ⟨_, rfl⟩
+  obtain ⟨κ, hκ⟩
+      : ∃ κ : Fin ((i : ℕ) + 1) → Fin d,
+        κ = fun b : Fin ((i : ℕ) + 1) => if (b : ℕ) < (i : ℕ) then Fin.castLE hid b else j' :=
+    ⟨_, rfl⟩
   have hmono : StrictMono ρ := by subst hρ; exact fun a b h => h
   have hdown : ∀ a x, x ≤ ρ a → ∃ b, ρ b = x := by
     subst hρ
     exact fun a x hx => ⟨⟨x.1, lt_of_le_of_lt hx a.2⟩, rfl⟩
-  have key : mixedMinor (l * blockAntidiagonalMatrix c t * u) i j' = ((blockAntidiagonalMatrix c t * u).submatrix ρ κ).det := by
-    have h0 : mixedMinor (l * blockAntidiagonalMatrix c t * u) i j' = ((l * (blockAntidiagonalMatrix c t * u)).submatrix ρ κ).det := by
+  have key
+      : mixedMinor (l * blockAntidiagonalMatrix c t * u) i j'
+        = ((blockAntidiagonalMatrix c t * u).submatrix ρ κ).det := by
+    have h0
+        : mixedMinor (l * blockAntidiagonalMatrix c t * u) i j'
+          = ((l * (blockAntidiagonalMatrix c t * u)).submatrix ρ κ).det := by
       subst hρ hκ
       rw [← Matrix.mul_assoc]
       rfl
     rw [h0, gf_lower_sub ρ hmono.injective hdown l hl, Matrix.det_mul, gf_lower_det ρ hmono l hl,
       one_mul]
   have hend : (i : ℕ) < c.sizeUpTo ((c.index i : ℕ) + 1) := c.lt_sizeUpTo_index_succ i
-  have hrow : ∀ y : Fin d, (y : ℕ) + 1 < c.sizeUpTo ((c.index i : ℕ) + 1) →
-      (blockAntidiagonalMatrix c t * u) i y = 0 := by
+  have hrow
+      : ∀ y : Fin d,
+        (y : ℕ) + 1 < c.sizeUpTo ((c.index i : ℕ) + 1)
+          → (blockAntidiagonalMatrix c t * u) i y = 0 := by
     intro y hy
     rw [Matrix.mul_apply]
     refine Finset.sum_eq_zero (fun x _ => ?_)
     unfold blockAntidiagonalMatrix
     split_ifs with h
-    · have h1 : y < x := by
-        rw [Fin.lt_def]; omega
+    · have h1 : y < x := by rw [Fin.lt_def]; omega
       rw [hu.2 _ _ h1, mul_zero]
     · rw [zero_mul]
   have hlast : ρ (Fin.last (i : ℕ)) = i := by subst hρ; exact Fin.ext rfl
   have hκlt : ∀ b : Fin ((i : ℕ) + 1), (b : ℕ) < (i : ℕ) → ((κ b : Fin d) : ℕ) = (b : ℕ) := by
     intro b hb; subst hκ; simp [hb]
   have hκlast : κ (Fin.last (i : ℕ)) = j' := by subst hκ; simp
-  have hrow0 : ∀ b : Fin ((i : ℕ) + 1), b ≠ Fin.last (i : ℕ) →
-      ((blockAntidiagonalMatrix c t * u).submatrix ρ κ) (Fin.last (i : ℕ)) b = 0 := by
+  have hrow0
+      : ∀ b : Fin ((i : ℕ) + 1),
+        b ≠ Fin.last (i : ℕ)
+          → ((blockAntidiagonalMatrix c t * u).submatrix ρ κ) (Fin.last (i : ℕ)) b = 0 := by
     intro b hb
     have hb' : (b : ℕ) < (i : ℕ) := Fin.val_lt_last hb
     rw [Matrix.submatrix_apply, hlast]
     apply hrow
-    rw [hκlt b hb']; omega
+    rw [hκlt b hb']
+    omega
   constructor
   · intro hj
     rw [key]
@@ -432,8 +457,9 @@ theorem mixed_minor_vanishing : Formalism.HermitianLatticeCounting.ExpansionTerm
     · exact hrow0 b hb
   · intro hj
     rw [key, Matrix.det_succ_row _ (Fin.last (i : ℕ)), Finset.sum_eq_single (Fin.last (i : ℕ))]
-    · have h1 : ((blockAntidiagonalMatrix c t * u).submatrix ρ κ) (Fin.last (i : ℕ)) (Fin.last (i : ℕ)) =
-          t (c.index i) := by
+    · have h1
+          : ((blockAntidiagonalMatrix c t * u).submatrix ρ κ) (Fin.last (i : ℕ)) (Fin.last (i : ℕ))
+            = t (c.index i) := by
         rw [Matrix.submatrix_apply, hlast, hκlast, Matrix.mul_apply, Finset.sum_eq_single j']
         · rw [hu.1, mul_one]
           unfold blockAntidiagonalMatrix
@@ -447,9 +473,11 @@ theorem mixed_minor_vanishing : Formalism.HermitianLatticeCounting.ExpansionTerm
           apply Fin.ext
           omega
         · intro h; exact absurd (Finset.mem_univ _) h
-      have h2 : ((blockAntidiagonalMatrix c t * u).submatrix ρ κ).submatrix (Fin.last (i : ℕ)).succAbove
-          (Fin.last (i : ℕ)).succAbove =
-          (blockAntidiagonalMatrix c t * u).submatrix (Fin.castLE (le_of_lt i.isLt)) (Fin.castLE (le_of_lt i.isLt)) := by
+      have h2
+          : ((blockAntidiagonalMatrix c t * u).submatrix ρ κ).submatrix (Fin.last (i : ℕ)).succAbove
+              (Fin.last (i : ℕ)).succAbove
+            = (blockAntidiagonalMatrix c t * u).submatrix (Fin.castLE (le_of_lt i.isLt))
+              (Fin.castLE (le_of_lt i.isLt)) := by
         ext a b
         simp only [Matrix.submatrix_apply, Fin.succAbove_last]
         have ha : ρ a.castSucc = Fin.castLE (le_of_lt i.isLt) a := by subst hρ; exact Fin.ext rfl
@@ -458,12 +486,18 @@ theorem mixed_minor_vanishing : Formalism.HermitianLatticeCounting.ExpansionTerm
           rw [hκlt _ (by simp)]
           rfl
         rw [ha, hb]
-      have h3 : leadingPrincipalMinor (blockAntidiagonalMatrix c t * u) (i : ℕ) = leadingPrincipalMinor (blockAntidiagonalMatrix c t) (i : ℕ) := by
+      have h3
+          : leadingPrincipalMinor (blockAntidiagonalMatrix c t * u) (i : ℕ)
+            = leadingPrincipalMinor (blockAntidiagonalMatrix c t) (i : ℕ) := by
         have := invariant_value_holds R d (blockAntidiagonalMatrix c t) 1 u (i : ℕ) gf_one_lower hu
         rwa [Matrix.one_mul] at this
       rw [h1, h2, ← gf_lead_eq, h3]
-      have h4 : ((-1 : R)) ^ (((Fin.last (i : ℕ) : Fin ((i : ℕ) + 1)) : ℕ) +
-          ((Fin.last (i : ℕ) : Fin ((i : ℕ) + 1)) : ℕ)) = 1 := Even.neg_one_pow ⟨_, rfl⟩
+      have h4
+          : ((-1 : R))
+              ^ (((Fin.last (i : ℕ) : Fin ((i : ℕ) + 1)) : ℕ)
+                + ((Fin.last (i : ℕ) : Fin ((i : ℕ) + 1)) : ℕ))
+            = 1 :=
+        Even.neg_one_pow ⟨_, rfl⟩
       rw [h4, one_mul, mul_comm]
     · intro b _ hb
       rw [hrow0 b hb, mul_zero, zero_mul]
@@ -478,7 +512,9 @@ lemma gf_det_mem {K : Type*} [Field K] (O : Subring K) {n : Type*} [Fintype n] [
   rw [hB, ← e]
   exact (B.det).2
 
-theorem orbit_integral_entries_of_leading_minor_at_block_end (hV : Formalism.HermitianLatticeCounting.ExpansionTerms.LeadingMinorAtBlockEnd) : Formalism.HermitianLatticeCounting.ExpansionTerms.OrbitIntegralEntries := by
+theorem orbit_integral_entries_of_leading_minor_at_block_end
+    (hV : Formalism.HermitianLatticeCounting.ExpansionTerms.LeadingMinorAtBlockEnd)
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.OrbitIntegralEntries := by
   intro K _ O d c t ht l u hl hu hO
   have hmem : ∀ q, leadingPrincipalMinor (blockAntidiagonalMatrix c t) q ∈ O := by
     intro q
@@ -496,15 +532,19 @@ theorem orbit_integral_entries_of_leading_minor_at_block_end (hV : Formalism.Her
   let i : Fin d := ⟨c.sizeUpTo (a : ℕ), by omega⟩
   let j' : Fin d := ⟨c.sizeUpTo ((a : ℕ) + 1) - 1, by omega⟩
   have hi : (c.index i : ℕ) = a := gg_index_eq c i a le_rfl hlt
-  have hj : (c.index j' : ℕ) = a := gg_index_eq c j' a
-    (show c.sizeUpTo (a : ℕ) ≤ c.sizeUpTo ((a : ℕ) + 1) - 1 by omega)
-    (show c.sizeUpTo ((a : ℕ) + 1) - 1 < c.sizeUpTo ((a : ℕ) + 1) by omega)
+  have hj : (c.index j' : ℕ) = a :=
+    gg_index_eq c j' a (show c.sizeUpTo (a : ℕ) ≤ c.sizeUpTo ((a : ℕ) + 1) - 1 by omega)
+      (show c.sizeUpTo ((a : ℕ) + 1) - 1 < c.sizeUpTo ((a : ℕ) + 1) by omega)
   have hia : c.index i = a := Fin.ext hi
   have hja : c.index j' = c.index i := Fin.ext (hj.trans hi.symm)
-  have hmix := (mixed_minor_vanishing K d c t l u hl hu i j' (by rw [hi]) hja).2
-    (show c.sizeUpTo ((a : ℕ) + 1) - 1 + 1 = c.sizeUpTo ((c.index i : ℕ) + 1) by rw [hi]; omega)
+  have hmix :=
+    (mixed_minor_vanishing K d c t l u hl hu i j' (by rw [hi]) hja).2
+      (show c.sizeUpTo ((a : ℕ) + 1) - 1 + 1 = c.sizeUpTo ((c.index i : ℕ) + 1) by rw [hi]; omega)
   rw [hia] at hmix
-  have e : leadingPrincipalMinor (blockAntidiagonalMatrix c t) (c.sizeUpTo (a : ℕ)) * t a = mixedMinor (l * blockAntidiagonalMatrix c t * u) i j' := hmix.symm
+  have e
+      : leadingPrincipalMinor (blockAntidiagonalMatrix c t) (c.sizeUpTo (a : ℕ)) * t a
+        = mixedMinor (l * blockAntidiagonalMatrix c t * u) i j' :=
+    hmix.symm
   rw [e]
   unfold mixedMinor
   exact gf_det_mem O _ fun x y => hO _ _
@@ -517,7 +557,8 @@ section GH
 open Formalism.HermitianLatticeCounting.ExpansionTerms Finset Matrix
 
 section abs
-variable {n β K : Type*} [Fintype n] [DecidableEq n] [LinearOrder n] [LinearOrder β] [Field K]
+variable
+  {n β K : Type*} [Fintype n] [DecidableEq n] [LinearOrder n] [LinearOrder β] [Field K]
   {b : n → β} {σ : n → n}
 
 omit [LinearOrder β] in
@@ -565,7 +606,8 @@ lemma gi_sesq_sum {V ι : Type*} [AddCommGroup V] [Module ℂ V] [Fintype ι] (h
   simp only [smul_eq_mul]
   ring
 
-theorem dual_vector_norm_sq : Formalism.HermitianLatticeCounting.ExpansionTerms.DualVectorNormSq := by
+theorem dual_vector_norm_sq
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.DualVectorNormSq := by
   intro V _ _ h hh r y f' T T' hT' hy hf x0 om al hx0 hom hx
   set M : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ := Matrix.of fun a b => h (y a) (f' b) with hM
   set L := Fin.last r with hL
@@ -579,7 +621,8 @@ theorem dual_vector_norm_sq : Formalism.HermitianLatticeCounting.ExpansionTerms.
     | zero => simp
     | add x y _ _ hx hy => simp [hx, hy]
     | smul a x _ hx => simp [hx]
-  have hB : ∀ u : V, (∀ b, h u (f' b) = 0) → ∀ x ∈ Submodule.span ℂ (f' '' {b | b ≠ L}), h u x = 0 := by
+  have hB
+      : ∀ u : V, (∀ b, h u (f' b) = 0) → ∀ x ∈ Submodule.span ℂ (f' '' {b | b ≠ L}), h u x = 0 := by
     intro u hu x hx
     induction hx using Submodule.span_induction with
     | mem x hx =>
@@ -623,17 +666,20 @@ theorem dual_vector_norm_sq : Formalism.HermitianLatticeCounting.ExpansionTerms.
     · simp
   have n2 : h x' x' = al * conj al * -(T' : ℂ) + h om om := by
     rw [hx]
-    simp only [map_add (f := _), LinearMap.add_apply, map_smul, LinearMap.smul_apply, map_smulₛₗ, e00, e0f, ef0,
-      eo0, e0o, eof, efo, eff, smul_eq_mul]
+    simp only [map_add (f := _), LinearMap.add_apply, map_smul, LinearMap.smul_apply, map_smulₛₗ,
+      e00, e0f, ef0, eo0, e0o, eof, efo, eff, smul_eq_mul]
     ring
   have hT'c : (T' : ℂ) ≠ 0 := by exact_mod_cast hT'
-  have hal : al = - M.det / (T' : ℂ) := by
+  have hal : al = -M.det / (T' : ℂ) := by
     field_simp
     linear_combination p2 - p1
   rw [gi_adj_last] at n1
   have hcT : conj (T' : ℂ) = (T' : ℂ) := Complex.conj_ofReal T'
   rw [Complex.normSq_eq_conj_mul_self, Complex.normSq_eq_conj_mul_self]
-  have key : h om om = leadingPrincipalMinor M r * conj (leadingPrincipalMinor M r) * -(T : ℂ) - al * conj al * -(T' : ℂ) := by
+  have key
+      : h om om
+        = leadingPrincipalMinor M r * conj (leadingPrincipalMinor M r) * -(T : ℂ)
+          - al * conj al * -(T' : ℂ) := by
     linear_combination n1 - n2
   rw [key, hal]
   simp only [map_div₀, map_neg, hcT]
@@ -646,7 +692,8 @@ end Formalism.HermitianLatticeCounting.P
 
 namespace Formalism.HermitianLatticeCounting.P
 section GJ
-open Formalism.HermitianLatticeCounting.ExpansionTerms Formalism.QuantumDeterminants Formalism.QuantumDeterminants.WeylGroupFacts Matrix Finset
+open Formalism.HermitianLatticeCounting.ExpansionTerms Formalism.QuantumDeterminants
+  Formalism.QuantumDeterminants.WeylGroupFacts Matrix Finset
 
 lemma gj_cols {m n : ℕ} (s : Matrix (Fin m) (Fin m) ℂ) (F : Matrix (Fin m) (Fin n) ℂ)
     (U : Matrix (Fin n) (Fin n) ℂ) :
@@ -768,45 +815,55 @@ lemma gb_norm_theta {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] 
   have h2 := norm_nonneg x
   nlinarith [e]
 
-theorem majorant_phase_estimate_holds : Formalism.HermitianLatticeCounting.ExpansionTerms.MajorantPhaseChoice := by
+theorem majorant_phase_estimate_holds
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.MajorantPhaseChoice := by
   intro V _ _ θ hθ u y1 S hu hS hy1
   have hu0 : ‖u‖ ≠ 0 := norm_ne_zero_iff.mpr hu
   have hn : (‖u‖ : ℂ) ≠ 0 := by exact_mod_cast hu0
   have hθv : θ ((Complex.I / (‖u‖ : ℂ)) • θ u) = (Complex.I / (‖u‖ : ℂ)) • u := by
     rw [map_smul, hθ.1]
   refine ⟨?_, ?_, ?_⟩
-  · rw [norm_smul, gb_norm_theta hθ, norm_div, Complex.norm_I, Complex.norm_of_nonneg (norm_nonneg u),
-      one_div, inv_mul_cancel₀ hu0]
+  · rw [norm_smul, gb_norm_theta hθ, norm_div, Complex.norm_I,
+      Complex.norm_of_nonneg (norm_nonneg u), one_div, inv_mul_cancel₀ hu0]
   · intro w hw
     unfold majorantHermitianForm
     rw [hθv, inner_smul_left, hS w hw, mul_zero]
   · unfold majorantHermitianForm
-    rw [hθv, inner_smul_left, hy1, map_div₀, Complex.conj_I, Complex.conj_ofReal, Complex.ofReal_pow]
+    rw [hθv, inner_smul_left, hy1, map_div₀, Complex.conj_I, Complex.conj_ofReal,
+      Complex.ofReal_pow]
     field_simp <;> ring
 
-theorem gram_hilbert_schmidt_bound : Formalism.HermitianLatticeCounting.ExpansionTerms.SkewOperatorFrobeniusBound := by
+theorem gram_hilbert_schmidt_bound
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.SkewOperatorFrobeniusBound := by
   intro V _ _ θ h n bs e v
   rw [Finset.sum_comm]
-  have p1 : ∀ b, ∑ a, ‖inner ℂ (bs a) (majorantHermitianForm θ (bs b) v • e - majorantHermitianForm θ (bs b) e • v)‖ ^ 2 ≤
-      2 * (‖inner ℂ (θ v) (bs b)‖ ^ 2 * ‖e‖ ^ 2 + ‖inner ℂ (θ e) (bs b)‖ ^ 2 * ‖v‖ ^ 2) := by
+  have p1
+      : ∀ b,
+        ∑ a, ‖inner ℂ (bs a) (majorantHermitianForm θ (bs b) v • e - majorantHermitianForm θ (bs b) e • v)‖ ^ 2
+          ≤ 2 * (‖inner ℂ (θ v) (bs b)‖ ^ 2 * ‖e‖ ^ 2 + ‖inner ℂ (θ e) (bs b)‖ ^ 2 * ‖v‖ ^ 2) := by
     intro b
     rw [bs.sum_sq_norm_inner_right]
     unfold majorantHermitianForm
-    have t : ‖inner ℂ (θ v) (bs b) • e - inner ℂ (θ e) (bs b) • v‖ ≤
-        ‖inner ℂ (θ v) (bs b)‖ * ‖e‖ + ‖inner ℂ (θ e) (bs b)‖ * ‖v‖ := by
+    have t
+        : ‖inner ℂ (θ v) (bs b) • e - inner ℂ (θ e) (bs b) • v‖
+          ≤ ‖inner ℂ (θ v) (bs b)‖ * ‖e‖ + ‖inner ℂ (θ e) (bs b)‖ * ‖v‖ := by
       refine (norm_sub_le _ _).trans ?_
       rw [norm_smul, norm_smul]
-    calc ‖inner ℂ (θ v) (bs b) • e - inner ℂ (θ e) (bs b) • v‖ ^ 2
+    calc
+      ‖inner ℂ (θ v) (bs b) • e - inner ℂ (θ e) (bs b) • v‖ ^ 2
         ≤ (‖inner ℂ (θ v) (bs b)‖ * ‖e‖ + ‖inner ℂ (θ e) (bs b)‖ * ‖v‖) ^ 2 := by gcongr
       _ ≤ _ := by
         nlinarith [sq_nonneg (‖inner ℂ (θ v) (bs b)‖ * ‖e‖ - ‖inner ℂ (θ e) (bs b)‖ * ‖v‖)]
-  calc _ ≤ ∑ b, 2 * (‖inner ℂ (θ v) (bs b)‖ ^ 2 * ‖e‖ ^ 2 + ‖inner ℂ (θ e) (bs b)‖ ^ 2 * ‖v‖ ^ 2) :=
-        Finset.sum_le_sum fun b _ => p1 b
-    _ = 2 * ((∑ b, ‖inner ℂ (θ v) (bs b)‖ ^ 2) * ‖e‖ ^ 2 + (∑ b, ‖inner ℂ (θ e) (bs b)‖ ^ 2) * ‖v‖ ^ 2) := by
-        rw [← Finset.mul_sum, Finset.sum_add_distrib, Finset.sum_mul, Finset.sum_mul]
+  calc
+    _ ≤ ∑ b, 2 * (‖inner ℂ (θ v) (bs b)‖ ^ 2 * ‖e‖ ^ 2 + ‖inner ℂ (θ e) (bs b)‖ ^ 2 * ‖v‖ ^ 2) :=
+      Finset.sum_le_sum fun b _ => p1 b
+    _ = 2
+        * ((∑ b, ‖inner ℂ (θ v) (bs b)‖ ^ 2) * ‖e‖ ^ 2
+          + (∑ b, ‖inner ℂ (θ e) (bs b)‖ ^ 2) * ‖v‖ ^ 2) := by
+      rw [← Finset.mul_sum, Finset.sum_add_distrib, Finset.sum_mul, Finset.sum_mul]
     _ = 4 * ‖e‖ ^ 2 * ‖v‖ ^ 2 := by
-        rw [bs.sum_sq_norm_inner_left, bs.sum_sq_norm_inner_left, gb_norm_theta h, gb_norm_theta h]
-        ring
+      rw [bs.sum_sq_norm_inner_left, bs.sum_sq_norm_inner_left, gb_norm_theta h, gb_norm_theta h]
+      ring
 
 end GB
 end Formalism.HermitianLatticeCounting.P
@@ -818,9 +875,14 @@ open scoped ComplexConjugate
 
 variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
 
-noncomputable def gramSchmidtUnitriangularMatrix {l : ℕ} (y : Fin l → V) : Matrix (Fin l) (Fin l) ℂ := fun a b =>
-  if b = a then 1 else if b < a then
-    inner ℂ (gramSchmidt ℂ y b) (y a) / ((‖gramSchmidt ℂ y b‖ : ℂ)) ^ 2 else 0
+noncomputable def gramSchmidtUnitriangularMatrix {l : ℕ} (y : Fin l → V)
+    : Matrix (Fin l) (Fin l) ℂ := fun a b =>
+  if b = a then
+    1
+  else if b < a then
+    inner ℂ (gramSchmidt ℂ y b) (y a) / ((‖gramSchmidt ℂ y b‖ : ℂ)) ^ 2
+  else
+    0
 
 lemma gc_expand {l : ℕ} (y : Fin l → V) (a : Fin l) :
     y a = ∑ b, gramSchmidtUnitriangularMatrix y a b • gramSchmidt ℂ y b := by
@@ -911,7 +973,8 @@ lemma gc_len {l : ℕ} (y : Fin l → V) (a : Fin l) :
   simp only [dist_eq_norm]
   rfl
 
-theorem gram_matrix_product_formula : Formalism.HermitianLatticeCounting.ExpansionTerms.GramDetEqProdDistances := by
+theorem gram_matrix_product_formula
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.GramDetEqProdDistances := by
   intro V _ _ l y
   rw [gc_det]
   push_cast
@@ -923,6 +986,8 @@ end Formalism.HermitianLatticeCounting.P
 
 namespace Formalism.HermitianLatticeCounting.P
 
-theorem orbit_integral_entries : Formalism.HermitianLatticeCounting.ExpansionTerms.OrbitIntegralEntries := orbit_integral_entries_of_leading_minor_at_block_end leading_minor_at_block_end
+theorem orbit_integral_entries
+    : Formalism.HermitianLatticeCounting.ExpansionTerms.OrbitIntegralEntries :=
+  orbit_integral_entries_of_leading_minor_at_block_end leading_minor_at_block_end
 
 end Formalism.HermitianLatticeCounting.P

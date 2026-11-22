@@ -8,10 +8,14 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem symm_congr_local_continuous : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E]
-    [NormedAlgebra F E] [StarRing E] [Unram F E] (r : ℕ) (H₀ : Matrix (Fin r) (Fin r) F), H₀.IsSymm → H₀.det ≠ 0 →
-    ∃ (Ω : Set (Matrix (Fin r) (Fin r) F)) (k : Matrix (Fin r) (Fin r) F → Matrix (Fin r) (Fin r) F),
-      IsOpen Ω ∧ H₀ ∈ Ω ∧ ContinuousOn k Ω ∧ k H₀ = 1 ∧ ∀ H ∈ Ω, H.IsSymm → (k H)ᵀ * H₀ * k H = H := by
+theorem symm_congr_local_continuous
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (r : ℕ) (H₀ : Matrix (Fin r) (Fin r) F),
+      H₀.IsSymm → H₀.det ≠ 0
+        → ∃ (Ω : Set (Matrix (Fin r) (Fin r) F))
+            (k : Matrix (Fin r) (Fin r) F → Matrix (Fin r) (Fin r) F),
+          IsOpen Ω ∧ H₀ ∈ Ω ∧ ContinuousOn k Ω ∧ k H₀ = 1
+            ∧ ∀ H ∈ Ω, H.IsSymm → (k H)ᵀ * H₀ * k H = H := by
   intro F E _ _ _ _ hU r H₀ hsym hdet
   haveI : CharZero F := hU.charZero
   haveI : LocallyCompactSpace F := hU.lcF
@@ -22,21 +26,24 @@ theorem symm_congr_local_continuous : ∀ (F E : Type) [NontriviallyNormedField 
   have h2 : (2 : F) ≠ 0 := two_ne_zero
   let L : Matrix (Fin r) (Fin r) F ≃L[F] Matrix (Fin r) (Fin r) F :=
     ContinuousLinearEquiv.equivOfInverse ((2 : F) • ContinuousLinearMap.id F _)
-      ((2 : F)⁻¹ • ContinuousLinearMap.id F _)
-      (by intro x; simp [smul_smul, inv_mul_cancel₀ h2]) (by intro x; simp [smul_smul, mul_inv_cancel₀ h2])
-  have hf : HasStrictFDerivAt (fun Y : Matrix (Fin r) (Fin r) F => Y * Y)
+      ((2 : F)⁻¹ • ContinuousLinearMap.id F _) (by intro x; simp [smul_smul, inv_mul_cancel₀ h2])
+      (by intro x; simp [smul_smul, mul_inv_cancel₀ h2])
+  have hf : HasStrictFDerivAt
+      (fun Y : Matrix (Fin r) (Fin r) F => Y * Y)
       (L : Matrix (Fin r) (Fin r) F →L[F] Matrix (Fin r) (Fin r) F) 1 := by
-    have h := (hasStrictFDerivAt_id (𝕜 := F) (1 : Matrix (Fin r) (Fin r) F)).mul' (hasStrictFDerivAt_id 1)
-    have e : (L : Matrix (Fin r) (Fin r) F →L[F] Matrix (Fin r) (Fin r) F) =
-        (id 1 : Matrix (Fin r) (Fin r) F) • ContinuousLinearMap.id F (Matrix (Fin r) (Fin r) F) +
-          MulOpposite.op (id 1 : Matrix (Fin r) (Fin r) F) • ContinuousLinearMap.id F (Matrix (Fin r) (Fin r) F) := by
+    have h :=
+      (hasStrictFDerivAt_id (𝕜 := F) (1 : Matrix (Fin r) (Fin r) F)).mul' (hasStrictFDerivAt_id 1)
+    have e
+        : (L : Matrix (Fin r) (Fin r) F →L[F] Matrix (Fin r) (Fin r) F)
+          = (id 1 : Matrix (Fin r) (Fin r) F) • ContinuousLinearMap.id F (Matrix (Fin r) (Fin r) F)
+            + MulOpposite.op (id 1 : Matrix (Fin r) (Fin r) F)
+              • ContinuousLinearMap.id F (Matrix (Fin r) (Fin r) F) := by
       ext1 D
       simp [L, two_smul]
     rw [e]
     exact h
   set P := hf.toOpenPartialHomeomorph _ with hPdef
-  have hPc : ∀ Y, P Y = Y * Y := fun Y => by
-    rw [hPdef, hf.toOpenPartialHomeomorph_coe]
+  have hPc : ∀ Y, P Y = Y * Y := fun Y => by rw [hPdef, hf.toOpenPartialHomeomorph_coe]
   have h1s : (1 : Matrix (Fin r) (Fin r) F) ∈ P.source := hf.mem_toOpenPartialHomeomorph_source
   have h1t : (1 : Matrix (Fin r) (Fin r) F) ∈ P.target := by
     have := hf.image_mem_toOpenPartialHomeomorph_target
@@ -48,8 +55,7 @@ theorem symm_congr_local_continuous : ∀ (F E : Type) [NontriviallyNormedField 
   set A := H₀⁻¹ with hA
   have hAH : A * H₀ = 1 := Matrix.nonsing_inv_mul H₀ hu
   have hHA : H₀ * A = 1 := Matrix.mul_nonsing_inv H₀ hu
-  have hAT : Aᵀ = A := by
-    rw [hA, Matrix.transpose_nonsing_inv, hsym.eq]
+  have hAT : Aᵀ = A := by rw [hA, Matrix.transpose_nonsing_inv, hsym.eq]
   let φ : Matrix (Fin r) (Fin r) F → Matrix (Fin r) (Fin r) F := fun Y => A * Yᵀ * H₀
   have hφc : Continuous φ := by
     exact (continuous_const.matrix_mul (continuous_id.matrix_transpose)).matrix_mul continuous_const
@@ -57,7 +63,15 @@ theorem symm_congr_local_continuous : ∀ (F E : Type) [NontriviallyNormedField 
   have hψc : Continuous ψ := continuous_const.matrix_mul continuous_id
   have hT : IsOpen (P.target ∩ P.symm ⁻¹' (φ ⁻¹' P.source)) :=
     P.continuousOn_symm.isOpen_inter_preimage P.open_target (P.open_source.preimage hφc)
-  refine ⟨ψ ⁻¹' (P.target ∩ P.symm ⁻¹' (φ ⁻¹' P.source)), fun H => P.symm (A * H), hT.preimage hψc, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    ψ ⁻¹' (P.target ∩ P.symm ⁻¹' (φ ⁻¹' P.source)),
+    fun H => P.symm (A * H),
+    hT.preimage hψc,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · show A * H₀ ∈ P.target ∩ P.symm ⁻¹' (φ ⁻¹' P.source)
     rw [hAH]
     refine ⟨h1t, ?_⟩
@@ -78,7 +92,8 @@ theorem symm_congr_local_continuous : ∀ (F E : Type) [NontriviallyNormedField 
         rw [Matrix.transpose_mul]
         simp only [Matrix.mul_assoc]
         rw [← Matrix.mul_assoc H₀ A, hHA, Matrix.one_mul]
-      rw [e1, hSS, Matrix.transpose_mul, hAT, hHs.eq, Matrix.mul_assoc, Matrix.mul_assoc, hAH, Matrix.mul_one]
+      rw [e1, hSS, Matrix.transpose_mul, hAT, hHs.eq, Matrix.mul_assoc, Matrix.mul_assoc, hAH,
+        Matrix.mul_one]
     have heq : φ S = S := P.injOn hφS hSs (by rw [hPc, hPc]; exact hφφ)
     have hcomm : Sᵀ * H₀ = H₀ * S := by
       have : H₀ * (A * Sᵀ * H₀) = H₀ * S := by rw [show A * Sᵀ * H₀ = φ S from rfl, heq]

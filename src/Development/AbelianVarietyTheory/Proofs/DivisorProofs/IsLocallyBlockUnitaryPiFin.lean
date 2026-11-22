@@ -9,7 +9,14 @@ open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.RealLift Global
 
 namespace GlobalTheory.HoweR
 
-theorem locU_pi_fin : ∀ (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M] (s : ι → Bool) (F : ι → ι → Module.End ℂ M), LocU s F → ∀ n : ℕ, LocU s (fun a b => (LinearMap.pi fun i : Fin n => F a b ∘ₗ LinearMap.proj i : Module.End ℂ (Fin n → M))) := by
+theorem locU_pi_fin
+    : ∀ (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M] (s : ι → Bool)
+        (F : ι → ι → Module.End ℂ M),
+      LocU s F
+        → ∀ n : ℕ,
+          LocU s (fun a b =>
+            (LinearMap.pi fun i : Fin n => F a b ∘ₗ LinearMap.proj i
+              : Module.End ℂ (Fin n → M))) := by
   intro ι M _ _ _ _ s F hF n t
   classical
   obtain ⟨U, htU, hfd, hst, ip, hsym, hpos, hadj⟩ := hF (t.biUnion fun x => Finset.univ.image x)
@@ -46,6 +53,7 @@ theorem locU_pi_fin : ∀ (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGr
     exact Finset.sum_pos' hnn ⟨j, Finset.mem_univ _, hpos _ (hx j (Set.mem_univ _)) hj⟩
   · intro a b hab x hx y hy
     rw [hip', hip']
-    exact Finset.sum_congr rfl fun i _ => hadj a b hab _ (hx i (Set.mem_univ _)) _ (hy i (Set.mem_univ _))
+    exact Finset.sum_congr rfl fun i _ =>
+      hadj a b hab _ (hx i (Set.mem_univ _)) _ (hy i (Set.mem_univ _))
 
 end GlobalTheory.HoweR

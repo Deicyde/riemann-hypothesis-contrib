@@ -11,8 +11,9 @@ open scoped ComplexConjugate Real
 
 namespace GlobalTheory.SW
 
-theorem isUnit_det_im_of_mem_siegel {ι : Type} [Fintype ι] [DecidableEq ι] {τ : Matrix ι ι ℂ}
-    (hτ : τ ∈ Siegel ι) : IsUnit (τ.map fun z => (z.im : ℂ)).det := by
+theorem isUnit_det_im_of_mem_siegel
+    {ι : Type} [Fintype ι] [DecidableEq ι] {τ : Matrix ι ι ℂ} (hτ : τ ∈ Siegel ι)
+    : IsUnit (τ.map fun z => (z.im : ℂ)).det := by
   have h : (τ.map fun z => (z.im : ℂ)) = Complex.ofRealHom.mapMatrix (τ.map Complex.im) := by
     ext i j; simp
   rw [h, ← RingHom.map_det]
@@ -102,10 +103,20 @@ private lemma dotProduct_transpose_mulVec_self (N : Matrix ι ι ℂ) (ζ : ι �
     ζ ⬝ᵥ (Nᵀ *ᵥ ζ) = ζ ⬝ᵥ (N *ᵥ ζ) := by
   rw [mulVec_transpose, dotProduct_comm, dotProduct_mulVec]
 
-
 open Matrix Complex in
 open scoped ComplexConjugate Real in
-theorem _root_.GlobalTheory.SW.canon_exponent_invariant : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (σ : Matrix (ι ⊕ ι) (ι ⊕ ι) ℚ), σ ∈ Matrix.symplecticGroup ι ℚ → ∀ τ ∈ _root_.GlobalTheory.SW.Siegel ι, ∀ ζ : ι → ℂ, (ζ ᵥ* (_root_.GlobalTheory.SW.spDen σ τ)⁻¹) ⬝ᵥ ((_root_.GlobalTheory.SW.spAct σ τ).map fun z => (z.im : ℂ))⁻¹ *ᵥ (ζ ᵥ* (_root_.GlobalTheory.SW.spDen σ τ)⁻¹) + 2 * I * (ζ ⬝ᵥ ((_root_.GlobalTheory.SW.spDen σ τ)⁻¹ * _root_.GlobalTheory.SW.qm σ.toBlocks₂₁) *ᵥ ζ) = ζ ⬝ᵥ (τ.map fun z => (z.im : ℂ))⁻¹ *ᵥ ζ := by
+theorem _root_.GlobalTheory.SW.canon_exponent_invariant
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (σ : Matrix (ι ⊕ ι) (ι ⊕ ι) ℚ),
+      σ ∈ Matrix.symplecticGroup ι ℚ
+        → ∀ τ ∈ _root_.GlobalTheory.SW.Siegel ι, ∀ ζ : ι → ℂ,
+          (ζ ᵥ* (_root_.GlobalTheory.SW.spDen σ τ)⁻¹)
+                ⬝ᵥ ((_root_.GlobalTheory.SW.spAct σ τ).map fun z => (z.im : ℂ))⁻¹
+                  *ᵥ (ζ ᵥ* (_root_.GlobalTheory.SW.spDen σ τ)⁻¹)
+              + 2 * I
+                * (ζ
+                  ⬝ᵥ ((_root_.GlobalTheory.SW.spDen σ τ)⁻¹ * _root_.GlobalTheory.SW.qm σ.toBlocks₂₁)
+                    *ᵥ ζ)
+            = ζ ⬝ᵥ (τ.map fun z => (z.im : ℂ))⁻¹ *ᵥ ζ := by
   intro ι _ _ σ hσ τ hτ ζ
   obtain ⟨hsym, hpos⟩ := hτ
   have h2 := SymplecticGroup.mem_iff'.mp hσ
@@ -116,8 +127,8 @@ theorem _root_.GlobalTheory.SW.canon_exponent_invariant : ∀ (ι : Type) [Finty
   replace r2 := congrArg _root_.GlobalTheory.SW.qm r2
   replace r3 := congrArg _root_.GlobalTheory.SW.qm r3
   replace r4 := congrArg _root_.GlobalTheory.SW.qm r4
-  simp only [qm_add', qm_neg', qm_mul_siegel_theta_transformation, qm_transpose',
-    qm_zero', qm_one'] at r1 r2 r3 r4
+  simp only [qm_add', qm_neg', qm_mul_siegel_theta_transformation, qm_transpose', qm_zero', qm_one']
+    at r1 r2 r3 r4
   set A := _root_.GlobalTheory.SW.qm σ.toBlocks₁₁ with hA
   set B := _root_.GlobalTheory.SW.qm σ.toBlocks₁₂ with hB
   set C := _root_.GlobalTheory.SW.qm σ.toBlocks₂₁ with hC
@@ -134,17 +145,22 @@ theorem _root_.GlobalTheory.SW.canon_exponent_invariant : ∀ (ι : Type) [Finty
   have hAh : Aᴴ = Aᵀ := qm_conjTranspose_eq_transpose _
   have hBh : Bᴴ = Bᵀ := qm_conjTranspose_eq_transpose _
   have hI1 : Jᴴ * M - Mᴴ * J = τ - τᴴ := by
-    rw [hJ, hM, conjTranspose_add, conjTranspose_add, conjTranspose_mul, conjTranspose_mul, hCh, hDh, hAh, hBh]
-    have hE : (τᴴ * Cᵀ + Dᵀ) * (A * τ + B) - (τᴴ * Aᵀ + Bᵀ) * (C * τ + D) =
-        τᴴ * (Cᵀ * A + -(Aᵀ * C)) * τ + τᴴ * (Cᵀ * B + -(Aᵀ * D)) + (Dᵀ * A + -(Bᵀ * C)) * τ +
-          (Dᵀ * B + -(Bᵀ * D)) := by noncomm_ring
+    rw [hJ, hM, conjTranspose_add, conjTranspose_add, conjTranspose_mul, conjTranspose_mul, hCh,
+      hDh, hAh, hBh]
+    have hE
+        : (τᴴ * Cᵀ + Dᵀ) * (A * τ + B) - (τᴴ * Aᵀ + Bᵀ) * (C * τ + D)
+          = τᴴ * (Cᵀ * A + -(Aᵀ * C)) * τ + τᴴ * (Cᵀ * B + -(Aᵀ * D)) + (Dᵀ * A + -(Bᵀ * C)) * τ
+            + (Dᵀ * B + -(Bᵀ * D)) := by
+      noncomm_ring
     rw [hE, r1, r2, r3, r4]
     noncomm_ring
   have hI2 : Mᵀ * J = Jᵀ * M := by
     rw [hJ, hM, transpose_add, transpose_add, transpose_mul, transpose_mul, hτt]
-    have hE : (τ * Aᵀ + Bᵀ) * (C * τ + D) - (τ * Cᵀ + Dᵀ) * (A * τ + B) =
-        -(τ * (Cᵀ * A + -(Aᵀ * C)) * τ) - τ * (Cᵀ * B + -(Aᵀ * D)) - (Dᵀ * A + -(Bᵀ * C)) * τ -
-          (Dᵀ * B + -(Bᵀ * D)) := by noncomm_ring
+    have hE
+        : (τ * Aᵀ + Bᵀ) * (C * τ + D) - (τ * Cᵀ + Dᵀ) * (A * τ + B)
+          = -(τ * (Cᵀ * A + -(Aᵀ * C)) * τ) - τ * (Cᵀ * B + -(Aᵀ * D)) - (Dᵀ * A + -(Bᵀ * C)) * τ
+            - (Dᵀ * B + -(Bᵀ * D)) := by
+      noncomm_ring
     rw [r1, r2, r3, r4] at hE
     rw [← sub_eq_zero, hE]
     noncomm_ring
@@ -161,7 +177,8 @@ theorem _root_.GlobalTheory.SW.canon_exponent_invariant : ∀ (ι : Type) [Finty
     obtain ⟨v, hv, hJv⟩ := Matrix.exists_mulVec_eq_zero_iff.mpr hdet
     have h0 : star v ⬝ᵥ ((Jᴴ * M - Mᴴ * J) *ᵥ v) = 0 := by
       rw [sub_mulVec, dotProduct_sub, ← mulVec_mulVec, ← mulVec_mulVec, hJv, mulVec_zero,
-        dotProduct_zero, dotProduct_mulVec, ← star_mulVec, hJv, star_zero, zero_dotProduct, sub_zero]
+        dotProduct_zero, dotProduct_mulVec, ← star_mulVec, hJv, star_zero, zero_dotProduct,
+        sub_zero]
     rw [hI1, hY, smul_mulVec, dotProduct_smul, smul_eq_mul, mul_eq_zero] at h0
     have h1 := congrArg Complex.re (h0.resolve_left h2I)
     rw [hYr, re_star_dotProduct_ofReal_mulVec, Complex.zero_re] at h1
@@ -192,7 +209,9 @@ theorem _root_.GlobalTheory.SW.canon_exponent_invariant : ∀ (ι : Type) [Finty
     have hJtu : IsUnit Jᵀ.det := by rwa [det_transpose]
     unfold Matrix.IsSymm
     rw [transpose_mul, transpose_nonsing_inv]
-    calc (Jᵀ)⁻¹ * Mᵀ = (Jᵀ)⁻¹ * (Mᵀ * J) * J⁻¹ := by simp only [Matrix.mul_assoc, hJJ, Matrix.mul_one]
+    calc
+      (Jᵀ)⁻¹ * Mᵀ
+        = (Jᵀ)⁻¹ * (Mᵀ * J) * J⁻¹ := by simp only [Matrix.mul_assoc, hJJ, Matrix.mul_one]
       _ = M * J⁻¹ := by rw [hI2, ← Matrix.mul_assoc (Jᵀ)⁻¹, nonsing_inv_mul _ hJtu, Matrix.one_mul]
   set Y' := (_root_.GlobalTheory.SW.spAct σ τ).map fun z => (z.im : ℂ) with hY'def
   have hY' : (2 * I) • Y' = M * J⁻¹ - (M * J⁻¹)ᴴ := by
@@ -200,7 +219,9 @@ theorem _root_.GlobalTheory.SW.canon_exponent_invariant : ∀ (ι : Type) [Finty
     exact (sub_conjTranspose_of_isSymm _ hτ'sym).symm
   have hkey : Jᴴ * Y' * J = Y := by
     apply smul_right_injective _ h2I
-    calc (2 * I) • (Jᴴ * Y' * J) = Jᴴ * ((2 * I) • Y') * J := by rw [Matrix.mul_smul, Matrix.smul_mul]
+    calc
+      (2 * I) • (Jᴴ * Y' * J)
+        = Jᴴ * ((2 * I) • Y') * J := by rw [Matrix.mul_smul, Matrix.smul_mul]
       _ = Jᴴ * (M * J⁻¹ - (M * J⁻¹)ᴴ) * J := by rw [hY']
       _ = Jᴴ * M - Mᴴ * J := by
         rw [conjTranspose_mul, Matrix.mul_sub, Matrix.sub_mul]
@@ -210,8 +231,9 @@ theorem _root_.GlobalTheory.SW.canon_exponent_invariant : ∀ (ι : Type) [Finty
       _ = (2 * I) • Y := by rw [hI1, hY]
   have hY'inv : Y'⁻¹ = J * Y⁻¹ * Jᴴ := by
     apply Matrix.inv_eq_left_inv
-    calc J * Y⁻¹ * Jᴴ * Y' = J * Y⁻¹ * (Jᴴ * Y' * J) * J⁻¹ := by
-          simp only [Matrix.mul_assoc, hJJ, Matrix.mul_one]
+    calc
+      J * Y⁻¹ * Jᴴ * Y'
+        = J * Y⁻¹ * (Jᴴ * Y' * J) * J⁻¹ := by simp only [Matrix.mul_assoc, hJJ, Matrix.mul_one]
       _ = 1 := by rw [hkey, Matrix.mul_assoc J, hYY, Matrix.mul_one, hJJ]
   have hJh : Jᴴ = Jᵀ - (2 * I) • (Y * Cᵀ) := by
     have hτh : τᴴ = τ - (2 * I) • Y := by rw [← hY]; abel
@@ -221,11 +243,12 @@ theorem _root_.GlobalTheory.SW.canon_exponent_invariant : ∀ (ι : Type) [Finty
   have hJt : Jᵀ * (J⁻¹)ᵀ = 1 := by rw [← transpose_mul, hJJ', transpose_one]
   have hmat : J⁻¹ * (J * Y⁻¹ * Jᴴ) * (J⁻¹)ᵀ = Y⁻¹ - (2 * I) • (J⁻¹ * C)ᵀ := by
     rw [hJh, transpose_mul]
-    simp only [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_smul, Matrix.smul_mul, ← Matrix.mul_assoc, hJJ',
-      Matrix.one_mul]
+    simp only [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_smul, Matrix.smul_mul, ← Matrix.mul_assoc,
+      hJJ', Matrix.one_mul]
     rw [Matrix.mul_assoc Y⁻¹ Jᵀ, hJt, Matrix.mul_one, hYY, Matrix.one_mul]
-  rw [hY'inv, ← dotProduct_mulVec, ← mulVec_transpose, mulVec_mulVec, mulVec_mulVec, hmat, sub_mulVec,
-    dotProduct_sub, smul_mulVec, dotProduct_smul, dotProduct_transpose_mulVec_self, smul_eq_mul]
+  rw [hY'inv, ← dotProduct_mulVec, ← mulVec_transpose, mulVec_mulVec, mulVec_mulVec, hmat,
+    sub_mulVec, dotProduct_sub, smul_mulVec, dotProduct_smul, dotProduct_transpose_mulVec_self,
+    smul_eq_mul]
   ring
 
 end GlobalTheory.SW

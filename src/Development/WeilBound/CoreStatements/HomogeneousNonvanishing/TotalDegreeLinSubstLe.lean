@@ -9,9 +9,10 @@ set_option autoImplicit false
 
 open MvPolynomial GlobalTheory.ChowHt GlobalTheory.CompHt
 
-private theorem totalDegree_aeval_le_of_totalDegree_le_one {K : Type} [Field K] {σ τ : Type} (L : σ → MvPolynomial τ K)
-    (hL : ∀ i, (L i).totalDegree ≤ 1) (f : MvPolynomial σ K) :
-    (aeval L f).totalDegree ≤ f.totalDegree := by
+private theorem totalDegree_aeval_le_of_totalDegree_le_one
+    {K : Type} [Field K]
+    {σ τ : Type} (L : σ → MvPolynomial τ K) (hL : ∀ i, (L i).totalDegree ≤ 1) (f : MvPolynomial σ K)
+    : (aeval L f).totalDegree ≤ f.totalDegree := by
   conv_lhs => rw [f.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -22,11 +23,15 @@ private theorem totalDegree_aeval_le_of_totalDegree_le_one {K : Type} [Field K] 
   refine (totalDegree_finsetProd _ _).trans (le_trans ?_ (le_totalDegree hs))
   rw [Finsupp.sum]
   refine Finset.sum_le_sum fun i _ => (totalDegree_pow _ _).trans ?_
-  calc s i * (L i).totalDegree ≤ s i * 1 := Nat.mul_le_mul_left _ (hL i)
+  calc
+    s i * (L i).totalDegree
+      ≤ s i * 1 := Nat.mul_le_mul_left _ (hL i)
     _ = s i := mul_one _
 
-theorem PositivityTheory.UnitarySelfGeneration.UnitProductCombination.totalDegree_linSubst_le {K : Type} [Field K] {B N n : ℕ} (M : Matrix (Fin N) (Fin n) K)
-    (f : MvPolynomial (Fin B × Fin N) K) : (linSubst M f).totalDegree ≤ f.totalDegree := by
+theorem PositivityTheory.UnitarySelfGeneration.UnitProductCombination.totalDegree_linSubst_le
+    {K : Type} [Field K]
+    {B N n : ℕ} (M : Matrix (Fin N) (Fin n) K) (f : MvPolynomial (Fin B × Fin N) K)
+    : (linSubst M f).totalDegree ≤ f.totalDegree := by
   unfold linSubst
   refine totalDegree_aeval_le_of_totalDegree_le_one _ (fun p => ?_) f
   refine (totalDegree_finsetSum _ _).trans (Finset.sup_le fun k _ => ?_)
@@ -34,9 +39,11 @@ theorem PositivityTheory.UnitarySelfGeneration.UnitProductCombination.totalDegre
   rw [totalDegree_C, zero_add]
   exact (totalDegree_X _).le
 
-private theorem linSubst_linSubst' {K : Type} [Field K] {B N n m : ℕ} (M : Matrix (Fin N) (Fin n) K)
-    (P : Matrix (Fin n) (Fin m) K) (f : MvPolynomial (Fin B × Fin N) K) :
-    linSubst P (linSubst M f) = linSubst (M * P) f := by
+private theorem linSubst_linSubst'
+    {K : Type} [Field K]
+    {B N n m : ℕ} (M : Matrix (Fin N) (Fin n) K) (P : Matrix (Fin n) (Fin m) K)
+    (f : MvPolynomial (Fin B × Fin N) K)
+    : linSubst P (linSubst M f) = linSubst (M * P) f := by
   unfold linSubst
   rw [← AlgHom.comp_apply, comp_aeval]
   apply congrArg (fun g : Fin B × Fin N → MvPolynomial (Fin B × Fin m) K => aeval g f)
@@ -47,10 +54,12 @@ private theorem linSubst_linSubst' {K : Type} [Field K] {B N n m : ℕ} (M : Mat
   refine Finset.sum_congr rfl fun l _ => Finset.sum_congr rfl fun k _ => ?_
   ring
 
-private theorem linSubst_one' {K : Type} [Field K] {B N : ℕ} (f : MvPolynomial (Fin B × Fin N) K) :
-    linSubst (1 : Matrix (Fin N) (Fin N) K) f = f := by
+private theorem linSubst_one' {K : Type} [Field K] {B N : ℕ} (f : MvPolynomial (Fin B × Fin N) K)
+    : linSubst (1 : Matrix (Fin N) (Fin N) K) f = f := by
   unfold linSubst
-  have e : (fun p : Fin B × Fin N => ∑ k, C ((1 : Matrix (Fin N) (Fin N) K) p.2 k) * X (p.1, k)) = X := by
+  have e
+      : (fun p : Fin B × Fin N => ∑ k, C ((1 : Matrix (Fin N) (Fin N) K) p.2 k) * X (p.1, k))
+        = X := by
     funext p
     rw [Finset.sum_eq_single p.2]
     · simp
@@ -59,25 +68,34 @@ private theorem linSubst_one' {K : Type} [Field K] {B N : ℕ} (f : MvPolynomial
     · simp
   rw [e, aeval_X_left_apply]
 
-private theorem linSubst_mul' {K : Type} [Field K] {B N n : ℕ} (M : Matrix (Fin N) (Fin n) K)
-    (a b : MvPolynomial (Fin B × Fin N) K) : linSubst M (a * b) = linSubst M a * linSubst M b := by
+private theorem linSubst_mul'
+    {K : Type} [Field K]
+    {B N n : ℕ} (M : Matrix (Fin N) (Fin n) K) (a b : MvPolynomial (Fin B × Fin N) K)
+    : linSubst M (a * b) = linSubst M a * linSubst M b := by
   unfold linSubst
   exact map_mul _ _ _
 
-private theorem linSubst_zero {K : Type} [Field K] {B N n : ℕ} (M : Matrix (Fin N) (Fin n) K) :
-    linSubst M (0 : MvPolynomial (Fin B × Fin N) K) = 0 := by
+private theorem linSubst_zero {K : Type} [Field K] {B N n : ℕ} (M : Matrix (Fin N) (Fin n) K)
+    : linSubst M (0 : MvPolynomial (Fin B × Fin N) K) = 0 := by
   unfold linSubst
   exact map_zero _
 
-theorem PositivityTheory.UnitarySelfGeneration.UnitProductCombination.irreducible_linSubst {K : Type} [Field K] {B N n : ℕ} {M : Matrix (Fin N) (Fin n) K}
-    {P : Matrix (Fin n) (Fin N) K} (h : M * P = 1) {f : MvPolynomial (Fin B × Fin N) K} (hf : Irreducible f) :
-    Irreducible (linSubst M f) := by
+theorem PositivityTheory.UnitarySelfGeneration.UnitProductCombination.irreducible_linSubst
+    {K : Type} [Field K]
+    {B N n : ℕ} {M : Matrix (Fin N) (Fin n) K} {P : Matrix (Fin n) (Fin N) K} (h : M * P = 1)
+    {f : MvPolynomial (Fin B × Fin N) K} (hf : Irreducible f)
+    : Irreducible (linSubst M f) := by
   have key : ∀ q : MvPolynomial (Fin B × Fin N) K, linSubst P (linSubst M q) = q := fun q => by
     rw [linSubst_linSubst', h, linSubst_one']
-  have hdeg : ∀ q : MvPolynomial (Fin B × Fin N) K, (linSubst M q).totalDegree = q.totalDegree := fun q =>
-    le_antisymm (PositivityTheory.UnitarySelfGeneration.UnitProductCombination.totalDegree_linSubst_le M q)
-      (calc q.totalDegree = (linSubst P (linSubst M q)).totalDegree := by rw [key q]
-        _ ≤ _ := PositivityTheory.UnitarySelfGeneration.UnitProductCombination.totalDegree_linSubst_le P _)
+  have hdeg
+      : ∀ q : MvPolynomial (Fin B × Fin N) K, (linSubst M q).totalDegree = q.totalDegree := fun q =>
+    le_antisymm
+      (PositivityTheory.UnitarySelfGeneration.UnitProductCombination.totalDegree_linSubst_le M q)
+      (calc
+        q.totalDegree
+          = (linSubst P (linSubst M q)).totalDegree := by rw [key q]
+        _ ≤ _ :=
+          PositivityTheory.UnitarySelfGeneration.UnitProductCombination.totalDegree_linSubst_le P _)
   have hu0 : ∀ {σ : Type} (u : MvPolynomial σ K), IsUnit u → u.totalDegree = 0 := by
     intro σ u hu
     obtain ⟨r, -, rfl⟩ := isUnit_iff_eq_C_of_isReduced.mp hu
@@ -85,7 +103,8 @@ theorem PositivityTheory.UnitarySelfGeneration.UnitProductCombination.irreducibl
   have hunit : ∀ {σ : Type} (q : MvPolynomial σ K), q ≠ 0 → q.totalDegree = 0 → IsUnit q := by
     intro σ q hq hd
     rw [totalDegree_eq_zero_iff_eq_C] at hd
-    refine isUnit_iff_eq_C_of_isReduced.mpr ⟨AddMonoidAlgebra.coeff q 0, isUnit_iff_ne_zero.mpr ?_, hd⟩
+    refine isUnit_iff_eq_C_of_isReduced.mpr
+      ⟨AddMonoidAlgebra.coeff q 0, isUnit_iff_ne_zero.mpr ?_, hd⟩
     intro h0
     apply hq
     rw [hd, h0, C_0]
@@ -124,8 +143,10 @@ theorem PositivityTheory.UnitarySelfGeneration.UnitProductCombination.irreducibl
     have e2 : f.totalDegree = a.totalDegree + b.totalDegree := by
       rw [← hdeg f, hab]
       exact totalDegree_mul_of_isDomain ha0 hb0
-    have la := PositivityTheory.UnitarySelfGeneration.UnitProductCombination.totalDegree_linSubst_le P a
-    have lb := PositivityTheory.UnitarySelfGeneration.UnitProductCombination.totalDegree_linSubst_le P b
+    have la :=
+      PositivityTheory.UnitarySelfGeneration.UnitProductCombination.totalDegree_linSubst_le P a
+    have lb :=
+      PositivityTheory.UnitarySelfGeneration.UnitProductCombination.totalDegree_linSubst_le P b
     rcases hf.isUnit_or_isUnit hfab with hPa | hPb
     · left
       apply hunit a ha0

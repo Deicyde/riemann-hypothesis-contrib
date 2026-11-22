@@ -24,17 +24,19 @@ theorem phi_inj (N n : ℕ) : Function.Injective (phi N n) := by
   · exact congrArg Fin.val h.2
   · exact h.1
 
-theorem rename_initMinor (R : Type) [CommRing R] (N n s : ℕ) (hs : s ≤ n) (I : Fin s ↪o Fin N) :
-    rename (phi N n) (initMinor R (r := N) (n := n) (fun p => I p) hs) = PI.minorX R N s I := by
+theorem rename_initMinor (R : Type) [CommRing R] (N n s : ℕ) (hs : s ≤ n) (I : Fin s ↪o Fin N)
+    : rename (phi N n) (initMinor R (r := N) (n := n) (fun p => I p) hs) = PI.minorX R N s I := by
   unfold initMinor PI.minorX
   rw [AlgHom.map_det, ← Matrix.det_transpose]
   congr 1
   ext i k
   simp [phi, Matrix.transpose_apply, rename_X]
 
-theorem map_bidet (R : Type) [CommRing R] {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n)
-    (I : ∀ k, Fin (sz k) → Fin r) :
-    MvPolynomial.map (Int.castRingHom R) (bideterminant ℤ sz hsz I) = bideterminant R sz hsz I := by
+theorem map_bidet
+    (R : Type) [CommRing R]
+    {r n K : ℕ} (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (I : ∀ k, Fin (sz k) → Fin r)
+    : MvPolynomial.map (Int.castRingHom R) (bideterminant ℤ sz hsz I)
+      = bideterminant R sz hsz I := by
   unfold bideterminant initMinor
   rw [map_prod]
   refine Finset.prod_congr rfl fun k _ => ?_
@@ -43,14 +45,16 @@ theorem map_bidet (R : Type) [CommRing R] {r n K : ℕ} (sz : Fin K → ℕ) (hs
   ext p q
   simp [RingHom.mapMatrix_apply]
 
-def gen (R : Type) [CommRing R] (N : ℕ) (ν : YoungDiagram)
-    (I : ∀ c : Fin (ν.rowLen 0), Fin (ν.colLen c) ↪o Fin N) :
-    MvPolynomial (Fin N × Fin (ν.colLen 0)) R :=
+def gen
+    (R : Type) [CommRing R]
+    (N : ℕ) (ν : YoungDiagram) (I : ∀ c : Fin (ν.rowLen 0), Fin (ν.colLen c) ↪o Fin N)
+    : MvPolynomial (Fin N × Fin (ν.colLen 0)) R :=
   bideterminant R (sz0 ν) (hsz0 ν) fun c => I c
 
-theorem nablaSpan_eq (R : Type) [CommRing R] (N : ℕ) (ν : YoungDiagram) :
-    PI.nablaSpan R N ν = Submodule.map (rename (phi N (ν.colLen 0))).toLinearMap
-      (Submodule.span R (Set.range (gen R N ν))) := by
+theorem nablaSpan_eq (R : Type) [CommRing R] (N : ℕ) (ν : YoungDiagram)
+    : PI.nablaSpan R N ν
+      = Submodule.map (rename (phi N (ν.colLen 0))).toLinearMap
+        (Submodule.span R (Set.range (gen R N ν))) := by
   rw [Submodule.map_span, ← Set.range_comp]
   unfold PI.nablaSpan
   congr 1
@@ -60,10 +64,10 @@ theorem nablaSpan_eq (R : Type) [CommRing R] (N : ℕ) (ν : YoungDiagram) :
   refine Finset.prod_congr rfl fun c _ => ?_
   exact (rename_initMinor R N (ν.colLen 0) (sz0 ν c) (hsz0 ν c) (I c)).symm
 
-theorem span_map_le {σ : Type*} (R : Type) [CommRing R] {A B : Set (MvPolynomial σ ℤ)}
-    (h : A ⊆ Submodule.span ℤ B) :
-    Submodule.span R (MvPolynomial.map (Int.castRingHom R) '' A) ≤
-      Submodule.span R (MvPolynomial.map (Int.castRingHom R) '' B) := by
+theorem span_map_le
+    {σ : Type*} (R : Type) [CommRing R] {A B : Set (MvPolynomial σ ℤ)} (h : A ⊆ Submodule.span ℤ B)
+    : Submodule.span R (MvPolynomial.map (Int.castRingHom R) '' A)
+      ≤ Submodule.span R (MvPolynomial.map (Int.castRingHom R) '' B) := by
   rw [Submodule.span_le]
   rintro _ ⟨a, ha, rfl⟩
   have := h ha
@@ -106,7 +110,9 @@ theorem minorSpanCompl : PI.MinorSpanCompl := by
   set c : ssIdx N n (nuR ν) → MvPolynomial (Fin N × Fin n) R :=
     fun m => MvPolynomial.map (Int.castRingHom R) (b m) with hcdef
   have hT : Submodule.span R (Set.range (gen R N ν)) = Submodule.span R (Set.range c) := by
-    have e1 : Set.range (gen R N ν) = MvPolynomial.map (Int.castRingHom R) '' Set.range (gen ℤ N ν) := by
+    have e1
+        : Set.range (gen R N ν)
+          = MvPolynomial.map (Int.castRingHom R) '' Set.range (gen ℤ N ν) := by
       rw [← Set.range_comp]
       congr 1
       funext I

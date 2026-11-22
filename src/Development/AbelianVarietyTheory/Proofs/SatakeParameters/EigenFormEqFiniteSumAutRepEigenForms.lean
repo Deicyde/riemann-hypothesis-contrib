@@ -12,10 +12,13 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Nontr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU GlobalTheory.CuspRep GlobalTheory.PRep
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
+  GlobalTheory.CuspRep GlobalTheory.PRep
 
 noncomputable section
 
@@ -25,17 +28,17 @@ open GlobalTheory.FrameAut.VecProj
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem values_mem_sSup (W : Wt E n) [Nontrivial W.Sp] (f : W.Sp →ₗ[ℂ] (UA E n → ℂ))
-    (hf : f ∈ forms W.rep) (v : W.Sp) :
-    f v ∈ sSup {U : Submodule ℂ (UA E n → ℂ) | IsAutRepU U} := by
+theorem values_mem_sSup
+    (W : Wt E n) [Nontrivial W.Sp] (f : W.Sp →ₗ[ℂ] (UA E n → ℂ)) (hf : f ∈ forms W.rep) (v : W.Sp)
+    : f v ∈ sSup {U : Submodule ℂ (UA E n → ℂ) | IsAutRepU U} := by
   classical
   obtain ⟨B, hh, hp, hd, hi⟩ := GlobalTheory.DefU.Petersson.exists_invariant_pos_form E n
   set C := forms W.rep with hC
   let Bf := form B W.rep
-  let B2 : (W.Sp →ₗ[ℂ] (UA E n → ℂ)) → (W.Sp →ₗ[ℂ] (UA E n → ℂ)) → ℂ :=
-    fun x y => if h : x ∈ C ∧ y ∈ C then Bf ⟨x, h.1⟩ ⟨y, h.2⟩ else 0
-  have hB2 : ∀ x (hx : x ∈ C) y (hy : y ∈ C), B2 x y = Bf ⟨x, hx⟩ ⟨y, hy⟩ :=
-    fun x hx y hy => dif_pos ⟨hx, hy⟩
+  let B2 : (W.Sp →ₗ[ℂ] (UA E n → ℂ)) → (W.Sp →ₗ[ℂ] (UA E n → ℂ)) → ℂ := fun x y =>
+    if h : x ∈ C ∧ y ∈ C then Bf ⟨x, h.1⟩ ⟨y, h.2⟩ else 0
+  have hB2 : ∀ x (hx : x ∈ C) y (hy : y ∈ C), B2 x y = Bf ⟨x, hx⟩ ⟨y, hy⟩ := fun x hx y hy =>
+    dif_pos ⟨hx, hy⟩
   have h1 : ∀ x ∈ C, ∀ y ∈ C, ∀ z ∈ C, ∀ c : ℂ, B2 x (y + c • z) = B2 x y + c * B2 x z := by
     intro x hx y hy z hz c
     rw [hB2 x hx _ (C.add_mem hy (C.smul_mem c hz)), hB2 x hx y hy, hB2 x hx z hz]
@@ -65,16 +68,19 @@ theorem values_mem_sSup (W : Wt E n) [Nontrivial W.Sp] (f : W.Sp →ₗ[ℂ] (UA
     rw [hB2 _ (ρC g x).2 _ (ρC g y).2, hB2 _ x.2 _ y.2]
     exact form_inv B hi W.rep g x y
   obtain ⟨K0, hK0o, hK0c⟩ := GlobalTheory.DefU.Petersson.exists_isOpen_isCompact_finU E n
-  have hsm : ∀ x : C, IsOpen {k : finU (E := E) (n := n) | ρC k x = x} := fun x => rep_smooth W.rep x
-  let K : Subgroup (finU (E := E) (n := n)) := K0 ⊓ GlobalTheory.AdmissibleProjection.stab ρC ⟨f, hf⟩
+  have hsm : ∀ x : C, IsOpen {k : finU (E := E) (n := n) | ρC k x = x} := fun x =>
+    rep_smooth W.rep x
+  let K : Subgroup (finU (E := E) (n := n)) :=
+    K0 ⊓ GlobalTheory.AdmissibleProjection.stab ρC ⟨f, hf⟩
   have hKo : IsOpen (K : Set (finU (E := E) (n := n))) := by
     rw [Subgroup.coe_inf]
     exact hK0o.inter (hsm _)
-  let F : Submodule ℂ C :=
-    { carrier := {w | ∀ k ∈ K, ρC k w = w}
-      zero_mem' := fun k _ => map_zero _
-      add_mem' := fun ha hb k hk => by rw [map_add (f := _), ha k hk, hb k hk]
-      smul_mem' := fun c w hw k hk => by rw [map_smul, hw k hk] }
+  let F : Submodule ℂ C := {
+    carrier := {w | ∀ k ∈ K, ρC k w = w}
+    zero_mem' := fun k _ => map_zero _
+    add_mem' := fun ha hb k hk => by rw [map_add (f := _), ha k hk, hb k hk]
+    smul_mem' := fun c w hw k hk => by rw [map_smul, hw k hk]
+  }
   have hF : ∀ w, w ∈ F ↔ ∀ k ∈ K, ρC k w = w := fun w => Iff.rfl
   haveI := rep_fd W.rep K hKo
   haveI : FiniteDimensional ℂ F := by
@@ -98,7 +104,9 @@ theorem values_mem_sSup (W : Wt E n) [Nontrivial W.Sp] (f : W.Sp →ₗ[ℂ] (UA
     refine sSup_le fun M hM => ?_
     obtain ⟨hM0, hMs, hMi⟩ := hM
     let M' : Submodule ℂ (W.Sp →ₗ[ℂ] (UA E n → ℂ)) := M.map C.subtype
-    have hπ := GlobalTheory.FrameAut.VecForms.isAutRepU_span_values E n W.Sp W.rep (GlobalTheory.DefU.Pairs.span_rep W) M' ?_ ?_ ?_ ?_
+    have hπ :=
+      GlobalTheory.FrameAut.VecForms.isAutRepU_span_values E n W.Sp W.rep
+        (GlobalTheory.DefU.Pairs.span_rep W) M' ?_ ?_ ?_ ?_
     · intro x hx
       rw [hT]
       intro v
@@ -139,26 +147,29 @@ namespace GlobalTheory.EigenDecomp
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem sSup_stable {s : Set (Submodule ℂ (UA E n → ℂ))} (hs : ∀ U ∈ s, IsAutRepU U) (x : UA E n) :
-    ∀ φ ∈ sSup s, RU E n x φ ∈ sSup s := by
+theorem sSup_stable {s : Set (Submodule ℂ (UA E n → ℂ))} (hs : ∀ U ∈ s, IsAutRepU U) (x : UA E n)
+    : ∀ φ ∈ sSup s, RU E n x φ ∈ sSup s := by
   have h : sSup s ≤ (sSup s).comap (RU E n x) :=
     sSup_le fun U hU φ hφ => le_sSup hU ((hs U hU).stable x φ hφ)
   exact fun φ hφ => h hφ
 
-theorem exists_indep (s : Finset (Submodule ℂ (UA E n → ℂ))) (hs : ∀ U ∈ s, IsAutRepU U) :
-    ∃ t ⊆ s, sSupIndep (t : Set (Submodule ℂ (UA E n → ℂ))) ∧
-      sSup (t : Set (Submodule ℂ (UA E n → ℂ))) = sSup (s : Set (Submodule ℂ (UA E n → ℂ))) := by
+theorem exists_indep (s : Finset (Submodule ℂ (UA E n → ℂ))) (hs : ∀ U ∈ s, IsAutRepU U)
+    : ∃ t ⊆ s,
+      sSupIndep (t : Set (Submodule ℂ (UA E n → ℂ)))
+        ∧ sSup (t : Set (Submodule ℂ (UA E n → ℂ)))
+          = sSup (s : Set (Submodule ℂ (UA E n → ℂ))) := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨∅, subset_rfl, by simp, rfl⟩
   | insert a s ha ih =>
     obtain ⟨t, hts, hti, htS⟩ := ih (fun U hU => hs U (Finset.mem_insert_of_mem hU))
     have haU := hs a (Finset.mem_insert_self a s)
-    have htA : ∀ U ∈ (t : Set (Submodule ℂ (UA E n → ℂ))), IsAutRepU U :=
-      fun U hU => hs U (Finset.mem_insert_of_mem (hts hU))
-    have hst : ∀ x, ∀ φ ∈ a ⊓ sSup (t : Set (Submodule ℂ (UA E n → ℂ))),
-        RU E n x φ ∈ a ⊓ sSup (t : Set (Submodule ℂ (UA E n → ℂ))) :=
-      fun x φ hφ => ⟨haU.stable x φ hφ.1, sSup_stable htA x φ hφ.2⟩
+    have htA : ∀ U ∈ (t : Set (Submodule ℂ (UA E n → ℂ))), IsAutRepU U := fun U hU =>
+      hs U (Finset.mem_insert_of_mem (hts hU))
+    have hst
+        : ∀ x, ∀ φ ∈ a ⊓ sSup (t : Set (Submodule ℂ (UA E n → ℂ))),
+          RU E n x φ ∈ a ⊓ sSup (t : Set (Submodule ℂ (UA E n → ℂ))) := fun x φ hφ =>
+      ⟨haU.stable x φ hφ.1, sSup_stable htA x φ hφ.2⟩
     rcases haU.irred _ inf_le_left hst with h | h
     · have hat : a ∉ (t : Set (Submodule ℂ (UA E n → ℂ))) := fun hat =>
         haU.ne_bot ((inf_eq_left.2 (le_sSup hat)).symm.trans h)
@@ -172,8 +183,9 @@ theorem exists_indep (s : Finset (Submodule ℂ (UA E n → ℂ))) (hs : ∀ U �
           · exact absurd rfl hy2
           · exact hy1
         · have hxa : x ≠ a := fun e => hat (e ▸ hx)
-          have e : insert a (t : Set (Submodule ℂ (UA E n → ℂ))) \ {x} =
-              insert a ((t : Set (Submodule ℂ (UA E n → ℂ))) \ {x}) := by
+          have e
+              : insert a (t : Set (Submodule ℂ (UA E n → ℂ))) \ {x}
+                = insert a ((t : Set (Submodule ℂ (UA E n → ℂ))) \ {x}) := by
             ext y
             simp only [Set.mem_sdiff, Set.mem_insert_iff, Set.mem_singleton_iff]
             constructor
@@ -195,7 +207,14 @@ theorem exists_indep (s : Finset (Submodule ℂ (UA E n → ℂ))) (hs : ∀ U �
       rw [Finset.coe_insert, sSup_insert, ← htS]
       exact (sup_eq_right.2 hle).symm
 
-theorem eigen_decomp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (W : Wt E n) (C : Subgroup (UA E n)) (χ : C →* ℂˣ) (f : algForms W), (∀ (c : C) v g, f.1 v (g * c) = (χ c : ℂ) * f.1 v g) → ∃ (I : Finset (AutSub E n)) (F : AutSub E n → algForms W), (∀ π ∈ I, F π ∈ π.finPart W) ∧ (∀ π ∈ I, ∀ (c : C) v g, (F π).1 v (g * c) = (χ c : ℂ) * (F π).1 v g) ∧ f = ∑ π ∈ I, F π := by
+theorem eigen_decomp
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (W : Wt E n)
+        (C : Subgroup (UA E n)) (χ : C →* ℂˣ) (f : algForms W),
+      (∀ (c : C) v g, f.1 v (g * c) = (χ c : ℂ) * f.1 v g)
+        → ∃ (I : Finset (AutSub E n)) (F : AutSub E n → algForms W),
+          (∀ π ∈ I, F π ∈ π.finPart W)
+            ∧ (∀ π ∈ I, ∀ (c : C) v g, (F π).1 v (g * c) = (χ c : ℂ) * (F π).1 v g)
+            ∧ f = ∑ π ∈ I, F π := by
   intro E _ _ _ n W C χ f hf
   classical
   by_cases hW : Nontrivial W.Sp
@@ -210,9 +229,10 @@ theorem eigen_decomp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n
     rfl
 
   let b := Module.finBasis ℂ W.Sp
-  have hex : ∀ i, ∃ s : Finset (Submodule ℂ (UA E n → ℂ)), (↑s ⊆ {U : Submodule ℂ (UA E n → ℂ) | IsAutRepU U}) ∧
-      f.1 (b i) ∈ ⨆ U ∈ s, U :=
-    fun i => Submodule.mem_sSup_iff_exists_finset.1 (values_mem_sSup W f.1 f.2 (b i))
+  have hex
+      : ∀ i, ∃ s : Finset (Submodule ℂ (UA E n → ℂ)),
+        (↑s ⊆ {U : Submodule ℂ (UA E n → ℂ) | IsAutRepU U}) ∧ f.1 (b i) ∈ ⨆ U ∈ s, U := fun i =>
+    Submodule.mem_sSup_iff_exists_finset.1 (values_mem_sSup W f.1 f.2 (b i))
   choose s hsA hsm using hex
   let s0 := Finset.univ.biUnion s
   have hs0A : ∀ U ∈ s0, IsAutRepU U := by
@@ -231,13 +251,16 @@ theorem eigen_decomp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [map_smul]
     refine Submodule.smul_mem _ _ ?_
-    refine (iSup₂_le fun U hU => le_sSup ?_ : (⨆ U ∈ s i, U) ≤ sSup (s0 : Set (Submodule ℂ (UA E n → ℂ)))) (hsm i)
+    refine (iSup₂_le fun U hU => le_sSup ?_
+        : (⨆ U ∈ s i, U) ≤ sSup (s0 : Set (Submodule ℂ (UA E n → ℂ))))
+      (hsm i)
     exact Finset.mem_coe.2 (Finset.mem_biUnion.2 ⟨i, Finset.mem_univ _, hU⟩)
   have hdec : ∀ v, ∃ μ : ∀ U : Submodule ℂ (UA E n → ℂ), U, ∑ U ∈ t, (μ U : UA E n → ℂ) = f.1 v :=
     fun v => (Submodule.mem_iSup_finset_iff_exists_sum (fun U => U) (f.1 v)).1 (hval v)
   choose μ hμ using hdec
 
-  let c : W.Sp → Submodule ℂ (UA E n → ℂ) → (UA E n → ℂ) := fun v U => if U ∈ t then (μ v U : UA E n → ℂ) else 0
+  let c : W.Sp → Submodule ℂ (UA E n → ℂ) → (UA E n → ℂ) := fun v U =>
+    if U ∈ t then (μ v U : UA E n → ℂ) else 0
   have hcm : ∀ v U, c v U ∈ U := fun v U => by
     by_cases hU : U ∈ t
     · simp only [c, if_pos hU]
@@ -249,8 +272,11 @@ theorem eigen_decomp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n
     rw [← hμ v]
     exact Finset.sum_congr rfl fun U hU => if_pos hU
 
-  have huniq : ∀ a a' : Submodule ℂ (UA E n → ℂ) → (UA E n → ℂ), (∀ U, a U ∈ U) → (∀ U, a' U ∈ U) →
-      (∀ U, U ∉ t → a U = 0) → (∀ U, U ∉ t → a' U = 0) → ∑ U ∈ t, a U = ∑ U ∈ t, a' U → a = a' := by
+  have huniq
+      : ∀ a a' : Submodule ℂ (UA E n → ℂ) → (UA E n → ℂ),
+        (∀ U, a U ∈ U) → (∀ U, a' U ∈ U) → (∀ U, U ∉ t → a U = 0) → (∀ U, U ∉ t → a' U = 0)
+          → ∑ U ∈ t, a U = ∑ U ∈ t, a' U
+          → a = a' := by
     intro a a' ha ha' h0 h0' he
     funext U
     by_cases hU : U ∈ t
@@ -259,7 +285,7 @@ theorem eigen_decomp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n
       rw [hz] at hsplit
       have h1 : a U - a' U ∈ U := U.sub_mem (ha U) (ha' U)
       have h2 : a U - a' U ∈ sSup ((t : Set (Submodule ℂ (UA E n → ℂ))) \ {U}) := by
-        have e : a U - a' U = -∑ V ∈ t.erase U, (a V - a' V) := eq_neg_of_add_eq_zero_left hsplit
+        have e : a U - a' U = - ∑ V ∈ t.erase U, (a V - a' V) := eq_neg_of_add_eq_zero_left hsplit
         rw [e]
         refine Submodule.neg_mem _ (Submodule.sum_mem _ fun V hV => ?_)
         have hVm : V ∈ (t : Set (Submodule ℂ (UA E n → ℂ))) \ {U} :=
@@ -267,22 +293,37 @@ theorem eigen_decomp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n
         exact le_sSup hVm (V.sub_mem (ha V) (ha' V))
       exact sub_eq_zero.1 (Submodule.disjoint_def.1 (hti (Finset.mem_coe.2 hU)) _ h1 h2)
     · rw [h0 U hU, h0' U hU]
-  have hkey : ∀ v (a : Submodule ℂ (UA E n → ℂ) → (UA E n → ℂ)), (∀ U, a U ∈ U) → (∀ U, U ∉ t → a U = 0) →
-      ∑ U ∈ t, a U = f.1 v → a = c v :=
+  have hkey
+      : ∀ v (a : Submodule ℂ (UA E n → ℂ) → (UA E n → ℂ)),
+        (∀ U, a U ∈ U) → (∀ U, U ∉ t → a U = 0) → ∑ U ∈ t, a U = f.1 v → a = c v :=
     fun v a ha h0 he => huniq a (c v) ha (hcm v) h0 (hc0 v) (he.trans (hcs v).symm)
 
-  let Fl : Submodule ℂ (UA E n → ℂ) → W.Sp →ₗ[ℂ] (UA E n → ℂ) := fun U =>
-    { toFun := fun v => c v U
-      map_add' := fun v w => congrFun (hkey (v + w) (fun U => c v U + c w U) (fun U => U.add_mem (hcm v U) (hcm w U))
-        (fun U hU => by rw [hc0 v U hU, hc0 w U hU, add_zero])
-        (by rw [Finset.sum_add_distrib, hcs, hcs, map_add (f := _)])).symm U
-      map_smul' := fun r v => congrFun (hkey (r • v) (fun U => r • c v U) (fun U => U.smul_mem r (hcm v U))
-        (fun U hU => by rw [hc0 v U hU, smul_zero])
-        (by rw [← Finset.smul_sum, hcs, map_smul])).symm U }
+  let Fl : Submodule ℂ (UA E n → ℂ) → W.Sp →ₗ[ℂ] (UA E n → ℂ) := fun U => {
+    toFun := fun v => c v U
+    map_add' := fun v w =>
+      congrFun
+        (hkey (v + w)
+          (fun U => c v U + c w U)
+          (fun U => U.add_mem (hcm v U) (hcm w U))
+          (fun U hU => by rw [hc0 v U hU, hc0 w U hU, add_zero])
+          (by rw [Finset.sum_add_distrib, hcs, hcs, map_add (f := _)])).symm
+        U
+    map_smul' := fun r v =>
+      congrFun
+        (hkey (r • v)
+          (fun U => r • c v U)
+          (fun U => U.smul_mem r (hcm v U))
+          (fun U hU => by rw [hc0 v U hU, smul_zero])
+          (by rw [← Finset.smul_sum, hcs, map_smul])).symm
+        U
+  }
   have hFl : ∀ U v, Fl U v = c v U := fun _ _ => rfl
   have hinf : ∀ (x : infU E n) v, c (W.rep x v) = fun U => RU E n x (c v U) := by
     intro x v
-    refine (hkey (W.rep x v) (fun U => RU E n x (c v U)) (fun U => ?_) (fun U hU => by rw [hc0 v U hU, map_zero])
+    refine (hkey (W.rep x v)
+      (fun U => RU E n x (c v U))
+      (fun U => ?_)
+      (fun U hU => by rw [hc0 v U hU, map_zero])
       (by rw [← map_sum, hcs]; exact (f.2.2 x v).symm)).symm
     by_cases hU : U ∈ t
     · exact (htA U hU).stable _ _ (hcm v U)
@@ -290,20 +331,24 @@ theorem eigen_decomp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n
       exact U.zero_mem
   have heig : ∀ (c0 : C) v, (fun U => RU E n c0 (c v U)) = fun U => ((χ c0 : ℂˣ) : ℂ) • c v U := by
     intro c0 v
-    refine huniq _ _ (fun U => ?_) (fun U => U.smul_mem _ (hcm v U)) (fun U hU => by rw [hc0 v U hU, map_zero])
-      (fun U hU => by rw [hc0 v U hU, smul_zero]) ?_
+    refine huniq _ _
+      (fun U => ?_)
+      (fun U => U.smul_mem _ (hcm v U))
+      (fun U hU => by rw [hc0 v U hU, map_zero])
+      (fun U hU => by rw [hc0 v U hU, smul_zero])
+      ?_
     · by_cases hU : U ∈ t
       · exact (htA U hU).stable _ _ (hcm v U)
       · rw [hc0 v U hU, map_zero]
         exact U.zero_mem
     set_option synthInstance.maxHeartbeats 100000 in
-      · rw [← map_sum, ← Finset.smul_sum, hcs]
-        funext g
-        rw [RU_apply, hf c0 v g]
-        rfl
+    · rw [← map_sum, ← Finset.smul_sum, hcs]
+      funext g
+      rw [RU_apply, hf c0 v g]
+      rfl
   have hmemA : ∀ U ∈ t, Fl U ∈ algForms W := fun U hU =>
-    (⟨fun v => (htA U hU).aut _ (hcm v U), fun x v => by rw [hFl, hFl, hinf x v]⟩ :
-      (∀ v, Fl U v ∈ autU E n) ∧ ∀ (x : infU E n) v, Fl U (W.rep x v) = RU E n x (Fl U v))
+    (⟨fun v => (htA U hU).aut _ (hcm v U), fun x v => by rw [hFl, hFl, hinf x v]⟩
+      : (∀ v, Fl U v ∈ autU E n) ∧ ∀ (x : infU E n) v, Fl U (W.rep x v) = RU E n x (Fl U v))
 
   let P : t → AutSub E n := fun U => ⟨U.1, htA U.1 U.2⟩
   have hPinj : Function.Injective P := fun U U' h => Subtype.ext (congrArg AutSub.V h)
@@ -315,10 +360,16 @@ theorem eigen_decomp : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n
       rfl
     · simp only [F, dif_neg h]
       exact (hc0 v π.V h).symm
-  refine ⟨Finset.univ.image P, F, fun π _ => AutSub.mem_finPart.2 fun v => by rw [hFv]; exact hcm v π.V,
-    fun π _ c0 v g => ?_, ?_⟩
-  · exact (congrFun (hFv π v) _).trans ((congrFun (congrFun (heig c0 v) π.V) g).trans
-      (congrArg (fun z => ((χ c0 : ℂˣ) : ℂ) * z) (congrFun (hFv π v) g).symm))
+  refine ⟨
+    Finset.univ.image P,
+    F,
+    fun π _ => AutSub.mem_finPart.2 fun v => by rw [hFv]; exact hcm v π.V,
+    fun π _ c0 v g => ?_,
+    ?_
+  ⟩
+  · exact (congrFun (hFv π v) _).trans
+      ((congrFun (congrFun (heig c0 v) π.V) g).trans
+        (congrArg (fun z => ((χ c0 : ℂˣ) : ℂ) * z) (congrFun (hFv π v) g).symm))
   · rw [Finset.sum_image fun U _ U' _ h => hPinj h]
     apply Subtype.ext
     apply LinearMap.ext

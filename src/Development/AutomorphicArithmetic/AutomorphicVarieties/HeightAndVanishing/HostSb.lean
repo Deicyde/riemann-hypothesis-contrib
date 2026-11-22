@@ -9,17 +9,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem kap_pow {O : Type} [CommRing O] {N : ℕ} (ψ : DirichletCharacter O N) (hψ : 0 < orderOf ψ)
-    (l : ℕ) (hl : l.Prime) : ∃ s, kap l ψ ^ l ^ s = 1 := by
+private theorem kap_pow
+    {O : Type} [CommRing O]
+    {N : ℕ} (ψ : DirichletCharacter O N) (hψ : 0 < orderOf ψ)
+    (l : ℕ) (hl : l.Prime)
+    : ∃ s, kap l ψ ^ l ^ s = 1 := by
   refine ⟨(orderOf ψ).factorization l, ?_⟩
   rw [← (partOrd _ l hl ψ hψ).1]
   exact pow_orderOf_eq_one _
 
-private theorem comp_kap_iff {O : Type} [CommRing O] [IsDomain O] {N : ℕ} [NeZero N] (ψ : DirichletCharacter O N)
-    (hψ : 0 < orderOf ψ) (l : ℕ) (hl : l.Prime) (p : ℕ) (hp : p.Prime) :
-    comp p (kap l ψ) = 1 ↔ ¬ l ∣ orderOf (comp p ψ) := by
+private theorem comp_kap_iff
+    {O : Type} [CommRing O] [IsDomain O]
+    {N : ℕ} [NeZero N]
+    (ψ : DirichletCharacter O N) (hψ : 0 < orderOf ψ)
+    (l : ℕ) (hl : l.Prime)
+    (p : ℕ) (hp : p.Prime)
+    : comp p (kap l ψ) = 1 ↔ ¬ l ∣ orderOf (comp p ψ) := by
   obtain ⟨h1, -, h3, -⟩ := partOrd _ l hl ψ hψ
   obtain ⟨-, hmul, -, -, -, hsub, -⟩ := compAlg O N p hp
   have hsplit : comp p ψ = comp p (th0 l ψ) * comp p (kap l ψ) := by
@@ -46,8 +54,8 @@ private theorem comp_kap_iff {O : Type} [CommRing O] [IsDomain O] {N : ℕ} [NeZ
       rw [hi]
       exact dvd_pow_self l (Nat.succ_ne_zero i)
 
-private theorem ordProj_N (h : Host) (p : ℕ) (hp : p.Prime) (h2 : p ≠ 2) (hq : p ∣ h.q) :
-    h.N.factorization p = h.q.factorization p := by
+private theorem ordProj_N (h : Host) (p : ℕ) (hp : p.Prime) (h2 : p ≠ 2) (hq : p ∣ h.q)
+    : h.N.factorization p = h.q.factorization p := by
   obtain ⟨hq1, -, hd, -, hcop⟩ := h.pair
   have hq0 : h.q ≠ 0 := h.chi.ne.out
   have hqd0 : h.q1 * h.d ≠ 0 := mul_ne_zero hq1.ne_zero hd.ne_zero
@@ -59,13 +67,19 @@ private theorem ordProj_N (h : Host) (p : ℕ) (hp : p.Prime) (h2 : p ≠ 2) (hq
     h2 ((Nat.prime_dvd_prime_iff_eq hp Nat.prime_two).1 (hp.dvd_of_dvd_pow h'))
   show ((2 ^ (h.ex + 2)).lcm h.q * (h.q1 * h.d)).factorization p = _
   rw [Nat.factorization_mul hl0 hqd0, Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hnd,
-    add_zero, Nat.factorization_lcm h20 hq0, Finsupp.sup_apply, Nat.factorization_eq_zero_of_not_dvd h2nd]
+    add_zero, Nat.factorization_lcm h20 hq0, Finsupp.sup_apply,
+    Nat.factorization_eq_zero_of_not_dvd h2nd]
   simp
 
-theorem UpperTheory.V.HV.hostSb :
-    ∀ (h : Host) (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N), h.IsChar ψ → ∀ l, l.Prime → l ≠ 2 →
-      (∀ p ∈ Sb l ψ, p.Prime ∧ p ≠ 2 ∧ p ≠ l ∧ p ∣ h.q ∧ p ≡ 1 [MOD l]) ∧ (kap l ψ).conductor ∣ h.q ∧ comp 2 (kap l ψ) = 1 ∧
-      (∀ p, p.Prime → p ≠ l → (p ∈ Sb l ψ ↔ l ∣ orderOf (comp p ψ))) ∧ ∀ v ∈ Tb l ψ, v ∣ l * h.q := by
+theorem UpperTheory.V.HV.hostSb
+    : ∀ (h : Host) (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N),
+      h.IsChar ψ
+        → ∀ l,
+          l.Prime → l ≠ 2
+            → (∀ p ∈ Sb l ψ, p.Prime ∧ p ≠ 2 ∧ p ≠ l ∧ p ∣ h.q ∧ p ≡ 1 [MOD l])
+              ∧ (kap l ψ).conductor ∣ h.q ∧ comp 2 (kap l ψ) = 1
+              ∧ (∀ p, p.Prime → p ≠ l → (p ∈ Sb l ψ ↔ l ∣ orderOf (comp p ψ)))
+              ∧ ∀ v ∈ Tb l ψ, v ∣ l * h.q := by
   intro h O _ _ ψ hc l hl hl2
   haveI : NeZero h.N := ⟨h.N_pos.ne'⟩
   obtain ⟨-, hψ, hcomp⟩ := hostComp h O ψ hc
@@ -81,7 +95,8 @@ theorem UpperTheory.V.HV.hostSb :
     · exact pow_zero 2
     · exfalso
       rw [hk] at hdv
-      have h2 : 2 ∣ l := Nat.prime_two.dvd_of_dvd_pow ((dvd_pow_self 2 (Nat.succ_ne_zero k)).trans hdv)
+      have h2 : 2 ∣ l :=
+        Nat.prime_two.dvd_of_dvd_pow ((dvd_pow_self 2 (Nat.succ_ne_zero k)).trans hdv)
       exact hl2 ((Nat.prime_dvd_prime_iff_eq Nat.prime_two hl).1 h2).symm
   have key : ∀ p, p.Prime → comp p (kap l ψ) ≠ 1 → p ≠ 2 ∧ p ∣ h.q := by
     intro p hp hne
@@ -105,7 +120,8 @@ theorem UpperTheory.V.HV.hostSb :
   · intro p hp
     obtain ⟨hpp, -, hpl, hne⟩ := (hSb p).1 hp
     obtain ⟨hp2, hpq⟩ := key p hpp hne
-    exact ⟨hpp, hp2, hpl, hpq, ((compOrd O h.N (kap l ψ) p hpp).2.2.2 l s hl (Ne.symm hpl) hs hne).1⟩
+    exact
+      ⟨hpp, hp2, hpl, hpq, ((compOrd O h.N (kap l ψ) p hpp).2.2.2 l s hl (Ne.symm hpl) hs hne).1⟩
   · obtain ⟨-, -, -, -, -, hall⟩ := compCond O h.N (kap l ψ) 2 Nat.prime_two
     rw [hall h.q h.q_dvd]
     intro p hp
@@ -117,7 +133,8 @@ theorem UpperTheory.V.HV.hostSb :
       exact one_dvd _
     · obtain ⟨hp2, hpq⟩ := key p hpp hne
       have hcl := DirichletCharacter.conductor_dvd_level (kap l ψ)
-      have hc0 : (kap l ψ).conductor ≠ 0 := fun h0 => h.N_pos.ne' (Nat.eq_zero_of_zero_dvd (h0 ▸ hcl))
+      have hc0 : (kap l ψ).conductor ≠ 0 := fun h0 =>
+        h.N_pos.ne' (Nat.eq_zero_of_zero_dvd (h0 ▸ hcl))
       have hle : (kap l ψ).conductor.factorization p ≤ h.q.factorization p := by
         rw [← ordProj_N h p hpp hp2 hpq]
         exact (Nat.factorization_le_iff_dvd hc0 h.N_pos.ne').2 hcl p

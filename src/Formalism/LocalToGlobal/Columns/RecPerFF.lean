@@ -15,11 +15,13 @@ open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV F
 
 section Gen
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R)
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R)
   {SG' : Finset (HeightOneSpectrum (𝓞 X.E))} (ΛM : LevFam X.E X.K (R.N R.m - 1) SG')
 
-def zOfRow0 (σ₀ : X.K →+* ℂ) (hM : (rowGSD W ΛM).Ok) (F : (rowGSD W ΛM).EqFun) : Fin ((rowGSD W ΛM).hDim hM) → ℂ :=
-  fun a => σ₀ (((rowGSD W ΛM).hB hM).repr F a)
+def zOfRow0 (σ₀ : X.K →+* ℂ) (hM : (rowGSD W ΛM).Ok) (F : (rowGSD W ΛM).EqFun)
+    : Fin ((rowGSD W ΛM).hDim hM) → ℂ := fun a =>
+  σ₀ (((rowGSD W ΛM).hB hM).repr F a)
 
 end Gen
 
@@ -27,14 +29,18 @@ section Cast
 
 variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R)
 
-theorem levFam_eq_cast {E K : Type} [Field E] [NumberField E] [Field K] {n : ℕ} {SG SG' : Finset (HeightOneSpectrum (𝓞 E))} (e : SG = SG')
-    (A : LevFam E K n SG) (B : LevFam E K n SG') (h : ∀ (w : SG') (hw : w.1 ∈ SG), B w = A ⟨w.1, hw⟩) : B = e ▸ A := by
+theorem levFam_eq_cast
+    {E K : Type} [Field E] [NumberField E] [Field K]
+    {n : ℕ} {SG SG' : Finset (HeightOneSpectrum (𝓞 E))} (e : SG = SG') (A : LevFam E K n SG)
+    (B : LevFam E K n SG') (h : ∀ (w : SG') (hw : w.1 ∈ SG), B w = A ⟨w.1, hw⟩)
+    : B = e ▸ A := by
   subst e
   funext w
   exact h w w.2
 
-variable {SG' : Finset (HeightOneSpectrum (𝓞 X.E))} (e : Pr.vGs = SG') (A : LevFam X.E X.K (R.N R.m - 1) Pr.vGs)
-  (Λ' : LevFam X.E X.K (R.N R.m - 1) SG')
+variable
+  {SG' : Finset (HeightOneSpectrum (𝓞 X.E))} (e : Pr.vGs = SG')
+  (A : LevFam X.E X.K (R.N R.m - 1) Pr.vGs) (Λ' : LevFam X.E X.K (R.N R.m - 1) SG')
 
 def rowCast (hΛ : Λ' = e ▸ A) (F : (formGSD (rowVal W SG') Λ').EqFun) : (rowGSD W A).EqFun := by
   subst hΛ
@@ -45,9 +51,11 @@ end Cast
 
 section Main
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m)
-  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ} (mu : Tup X.F X.E X.K S)
-  (hQ : QE sel (mu : Chr X.F X.E X.K) = ∅) (P : LevFam X.E X.K R.r Pr.vGs)
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m)
+  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
+  {S : Set ℕ} (mu : Tup X.F X.E X.K S) (hQ : QE sel (mu : Chr X.F X.E X.K) = ∅)
+  (P : LevFam X.E X.K R.r Pr.vGs)
 
 theorem rowTy_inv_cast : (rowTy Ch sel mu P).inv = rcol_rowSG_eq sel mu hQ ▸ (rowTyG Ch P).inv := by
   refine levFam_eq_cast (rcol_rowSG_eq sel mu hQ) _ _ fun w hw => ?_
@@ -56,8 +64,10 @@ theorem rowTy_inv_cast : (rowTy Ch sel mu P).inv = rcol_rowSG_eq sel mu hQ ▸ (
   | (unfold LevFam.inv rowTy LevFam.glue; rw [dif_pos hw])
   | (simp [LevFam.inv, rowTy, LevFam.glue, hw])
 
-def zOfRow (σ₀ : X.K →+* ℂ) (hM : (rowGSD W (rowTyG Ch P).inv).Ok) (F : MtildeV W Ch sel mu P) : Fin ((rowGSD W (rowTyG Ch P).inv).hDim hM) → ℂ :=
-  zOfRow0 W (rowTyG Ch P).inv σ₀ hM (rowCast W (rcol_rowSG_eq sel mu hQ) (rowTyG Ch P).inv _ (rowTy_inv_cast Ch sel mu hQ P) F)
+def zOfRow (σ₀ : X.K →+* ℂ) (hM : (rowGSD W (rowTyG Ch P).inv).Ok) (F : MtildeV W Ch sel mu P)
+    : Fin ((rowGSD W (rowTyG Ch P).inv).hDim hM) → ℂ :=
+  zOfRow0 W (rowTyG Ch P).inv σ₀ hM
+    (rowCast W (rcol_rowSG_eq sel mu hQ) (rowTyG Ch P).inv _ (rowTy_inv_cast Ch sel mu hQ P) F)
 
 end Main
 

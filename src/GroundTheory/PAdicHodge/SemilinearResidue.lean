@@ -16,11 +16,11 @@ section Poly
 
 variable {k : Type*} [Field k] {p : ℕ} [hp : Fact p.Prime] [CharP k p]
 
-
 omit [CharP k p] in
 include hp in
 theorem two_le_pow {e : ℕ} (he : 0 < e) : 2 ≤ p ^ e :=
-  calc 2 ≤ p := hp.out.two_le
+  calc
+    2 ≤ p := hp.out.two_le
     _ = p ^ 1 := (pow_one p).symm
     _ ≤ p ^ e := Nat.pow_le_pow_right hp.out.pos he
 
@@ -32,9 +32,10 @@ section Vec
 
 variable {k : Type*} [Field k] {V : Type*} [AddCommGroup V] [Module k V]
 
-theorem linearIndependent_of_notMem_span (v : ℕ → V) : ∀ m : ℕ,
-    (∀ j < m, v j ∉ Submodule.span k (Set.range (fun i : Fin j => v i))) →
-      LinearIndependent k (fun i : Fin m => v i) := by
+theorem linearIndependent_of_notMem_span (v : ℕ → V)
+    : ∀ m : ℕ,
+      (∀ j < m, v j ∉ Submodule.span k (Set.range (fun i : Fin j => v i)))
+        → LinearIndependent k (fun i : Fin m => v i) := by
   intro m
   induction m with
   | zero => exact fun _ => linearIndependent_empty_type
@@ -43,11 +44,11 @@ theorem linearIndependent_of_notMem_span (v : ℕ → V) : ∀ m : ℕ,
     exact linearIndependent_finSucc'.mpr
       ⟨ih (fun j hj => h j (Nat.lt_succ_of_lt hj)), h m (Nat.lt_succ_self m)⟩
 
-
 variable (k) in
-theorem exists_rel [FiniteDimensional k V] (v : ℕ → V) :
-    ∃ m, (∃ c : ℕ → k, v m = ∑ i ∈ range m, c i • v i) ∧
-      LinearIndependent k (fun i : Fin m => v i) := by
+theorem exists_rel [FiniteDimensional k V] (v : ℕ → V)
+    : ∃ m,
+      (∃ c : ℕ → k, v m = ∑ i ∈ range m, c i • v i)
+        ∧ LinearIndependent k (fun i : Fin m => v i) := by
   classical
   let P : ℕ → Prop := fun j => v j ∈ Submodule.span k (Set.range (fun i : Fin j => v i))
   have hex : ∃ j, P j := by
@@ -64,7 +65,6 @@ theorem exists_rel [FiniteDimensional k V] (v : ℕ → V) :
   simp [i.2]
 
 variable {p : ℕ} [hp : Fact p.Prime] [CharP k p] {e : ℕ} {φ : V →+ V}
-
 
 end Vec
 

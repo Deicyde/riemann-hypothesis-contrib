@@ -7,25 +7,30 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverC
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.EtaleTrace CrystallineSemistableComparison CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz UpperTheory.Gal.KunnethLefschetz.Di
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.EtaleTrace
+  CrystallineSemistableComparison CrystallineSemistableComparison.Onto
+  UpperTheory.Gal.KunnethLefschetz UpperTheory.Gal.KunnethLefschetz.Di
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (IsProjOver PSpace Sp)
 
-private theorem proper_of_projOver {R : Type} [CommRing R] {X : Scheme.{0}} {p : X ⟶ Sp R} (h : IsProjOver p) :
-    IsProper p := by
+private theorem proper_of_projOver
+    {R : Type} [CommRing R] {X : Scheme.{0}} {p : X ⟶ Sp R} (h : IsProjOver p)
+    : IsProper p := by
   obtain ⟨N, i, hi, rfl⟩ := h
   haveI := ReciprocityTheory.ChartRestriction.G.Geo.Tor.isProper_str R N
   infer_instance
 
-private theorem gen_proj {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (M : Model l K)
-    (h : M.Sm) : IsProjOver M.q :=
+private theorem gen_proj
+    {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (M : Model l K) (h : M.Sm)
+    : IsProjOver M.q :=
   GlobalTheory.ProjSpace.isProjOver_pullback_snd (OK l K).subtype h.1.1
 
-private theorem gen_proper {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (M : Model l K)
-    (h : M.Sm) : IsProper M.q :=
+private theorem gen_proper
+    {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (M : Model l K) (h : M.Sm)
+    : IsProper M.q :=
   proper_of_projOver (gen_proj M h)
 
-theorem UpperTheory.Gal.KunnethLefschetz.Di.geoM_holds :
-    UpperTheory.Gal.KunnethLefschetz.Di.GeoM := by
+theorem UpperTheory.Gal.KunnethLefschetz.Di.geoM_holds
+    : UpperTheory.Gal.KunnethLefschetz.Di.GeoM := by
   intro l _ K
   refine ⟨?_, ?_, ?_⟩
   · intro M d hM hd
@@ -34,7 +39,8 @@ theorem UpperTheory.Gal.KunnethLefschetz.Di.geoM_holds :
     have hq : SmoothOfRelativeDimension d M.q :=
       stab.of_isPullback (IsPullback.of_hasPullback _ _) hd
     refine ⟨⟨inferInstance, stab.of_isPullback (IsPullback.of_hasPullback _ _) hq⟩, ?_⟩
-    exact GlobalTheory.ProjSpace.isProjOver_pullback_snd (algebraMap (↥K) (PadicAlgCl l)) (gen_proj M hM)
+    exact GlobalTheory.ProjSpace.isProjOver_pullback_snd (algebraMap (↥K) (PadicAlgCl l))
+      (gen_proj M hM)
   · intro M N u hu hM hN
     haveI := gen_proper M hM
     haveI := gen_proper N hN
@@ -46,13 +52,15 @@ theorem UpperTheory.Gal.KunnethLefschetz.Di.geoM_holds :
     set j := Spec.map (CommRingCat.ofHom (OK l K).subtype)
     have sqM : IsPullback (pullback.fst M.p j) M.q M.p j := IsPullback.of_hasPullback _ _
     have sqP : IsPullback (pullback.fst P.p j) P.q P.p j := IsPullback.of_hasPullback _ _
-    have hfst : ∀ (u : P.X ⟶ M.X) (hu : u ≫ M.p = P.p),
-        Model.genMap u hu ≫ pullback.fst M.p j = pullback.fst P.p j ≫ u := by
+    have hfst
+        : ∀ (u : P.X ⟶ M.X) (hu : u ≫ M.p = P.p),
+          Model.genMap u hu ≫ pullback.fst M.p j = pullback.fst P.p j ≫ u := by
       intro u hu
       unfold Model.genMap
       exact pullback.lift_fst _ _ _
-    have side : ∀ (u : P.X ⟶ M.X) (hu : u ≫ M.p = P.p),
-        IsPullback (Model.genMap u hu) (pullback.fst P.p j) (pullback.fst M.p j) u := by
+    have side
+        : ∀ (u : P.X ⟶ M.X) (hu : u ≫ M.p = P.p),
+          IsPullback (Model.genMap u hu) (pullback.fst P.p j) (pullback.fst M.p j) u := by
       intro u hu
       refine IsPullback.of_right ?_ (hfst u hu) sqM.flip
       rw [Model.genMap_q u hu, hu]

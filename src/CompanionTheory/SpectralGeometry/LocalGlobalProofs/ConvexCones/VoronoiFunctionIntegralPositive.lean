@@ -11,19 +11,25 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
+  GlobalTheory.CompanionTheory.Ar.Fan
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan
 
-theorem exists_least_points {X : Type} [AddCommGroup X] {n : ℕ} (r : (Fin n → ℤ) →ₗ[ℤ] X)
-    (hr : Function.Surjective r) (β : LinearMap.BilinForm ℤ X) (hβ : ∀ y, 0 ≤ β y y) :
-    ∃ a : (Fin n → ZMod (1 + 1)) → Fin n → ℤ, (∀ y, redV 1 (a y) = y) ∧ ∀ y, IsMin2 (toReal β) (r (a y)) := by
-  have hmin : ∀ y : Fin n → ZMod (1 + 1), ∃ c : Fin n → ℤ, redV 1 c = y ∧
-      ∀ c', redV 1 c' = y → β (r c) (r c) ≤ β (r c') (r c') := fun y => by
+theorem exists_least_points
+    {X : Type} [AddCommGroup X]
+    {n : ℕ} (r : (Fin n → ℤ) →ₗ[ℤ] X) (hr : Function.Surjective r)
+    (β : LinearMap.BilinForm ℤ X) (hβ : ∀ y, 0 ≤ β y y)
+    : ∃ a : (Fin n → ZMod (1 + 1)) → Fin n → ℤ,
+      (∀ y, redV 1 (a y) = y) ∧ ∀ y, IsMin2 (toReal β) (r (a y)) := by
+  have hmin
+      : ∀ y : Fin n → ZMod (1 + 1), ∃ c : Fin n → ℤ,
+        redV 1 c = y ∧ ∀ c', redV 1 c' = y → β (r c) (r c) ≤ β (r c') (r c') := fun y => by
     obtain ⟨c0, h0⟩ := redV_surjective 1 n y
-    obtain ⟨c, hc, hm⟩ := WellFounded.has_min
-      (InvImage.wf (fun c : Fin n → ℤ => (β (r c) (r c)).toNat) Nat.lt_wfRel.wf)
-      {c | redV 1 c = y} ⟨c0, h0⟩
+    obtain ⟨c, hc, hm⟩ :=
+      WellFounded.has_min (InvImage.wf (fun c : Fin n → ℤ => (β (r c) (r c)).toNat) Nat.lt_wfRel.wf)
+        {c | redV 1 c = y} ⟨c0, h0⟩
     refine ⟨c, hc, fun c' hc' => ?_⟩
     have h1 : ¬ (β (r c') (r c')).toNat < (β (r c) (r c)).toNat := hm c' hc'
     have h2 := hβ (r c)
@@ -39,17 +45,26 @@ theorem exists_least_points {X : Type} [AddCommGroup X] {n : ℕ} (r : (Fin n �
   simp only [toReal, LinearMap.compr₂_apply, Algebra.linearMap_apply, eq_intCast]
   exact_mod_cast h
 
-theorem apply_eq_zero_of_self {X : Type} [AddCommGroup X] (β : LinearMap.BilinForm ℤ X) (hs : ∀ y z, β y z = β z y)
-    (hβ : ∀ y, 0 ≤ β y y) {z : X} (hz : β z z = 0) (w : X) : β z w = 0 := by
+theorem apply_eq_zero_of_self
+    {X : Type} [AddCommGroup X]
+    (β : LinearMap.BilinForm ℤ X) (hs : ∀ y z, β y z = β z y) (hβ : ∀ y, 0 ≤ β y y)
+    {z : X} (hz : β z z = 0)
+    (w : X)
+    : β z w = 0 := by
   by_contra ht
   have h := hβ (w + (-(β w w + 1) * β z w) • z)
-  simp only [map_add (f := _), LinearMap.add_apply, map_smul, LinearMap.smul_apply, smul_eq_mul, hz, hs w z] at h
+  simp only [map_add (f := _), LinearMap.add_apply, map_smul, LinearMap.smul_apply, smul_eq_mul, hz,
+      hs w z]
+    at h
   have h1 : 1 ≤ β z w * β z w := mul_self_pos.2 ht
   have h2 := hβ w
   nlinarith
 
-theorem eq_zero_of_covers {X : Type} [AddCommGroup X] (β : LinearMap.BilinForm ℤ X) (hs : ∀ y z, β y z = β z y)
-    (hβ : ∀ y, 0 ≤ β y y) {ι : Type} {a : ι → X} (hc : Covers2 a) (h0 : ∀ i, β (a i) (a i) = 0) : β = 0 := by
+theorem eq_zero_of_covers
+    {X : Type} [AddCommGroup X]
+    (β : LinearMap.BilinForm ℤ X) (hs : ∀ y z, β y z = β z y) (hβ : ∀ y, 0 ≤ β y y)
+    {ι : Type} {a : ι → X} (hc : Covers2 a) (h0 : ∀ i, β (a i) (a i) = 0)
+    : β = 0 := by
   have hdiv : ∀ (k : ℕ) (z w : X), (2 : ℤ) ^ k ∣ β z w := by
     intro k
     induction k with
@@ -66,11 +81,14 @@ theorem eq_zero_of_covers {X : Type} [AddCommGroup X] (β : LinearMap.BilinForm 
   rw [Int.abs_eq_natAbs]
   exact_mod_cast Nat.lt_two_pow_self
 
-theorem vorFun_int_pos : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O) (g q : ℕ)
-    (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X],
-    Module.finrank ℤ O * q ≤ g → Module.finrank O X ≤ q →
-    (∀ β : LinearMap.BilinForm ℤ X, (∀ y, 0 ≤ β y y) → ∃ n : ℤ, (vorFun O g).evalZ β = n) ∧
-    ∀ β : LinearMap.BilinForm ℤ X, (∀ y z, β y z = β z y) → (∀ y, 0 ≤ β y y) → β ≠ 0 → 0 < (vorFun O g).evalZ β := by
+theorem vorFun_int_pos
+    : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] [Module.Finite ℤ O] (bar : O → O)
+        (g q : ℕ) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X]
+        [Module.Projective O X],
+      Module.finrank ℤ O * q ≤ g → Module.finrank O X ≤ q
+        → (∀ β : LinearMap.BilinForm ℤ X, (∀ y, 0 ≤ β y y) → ∃ n : ℤ, (vorFun O g).evalZ β = n)
+          ∧ ∀ β : LinearMap.BilinForm ℤ X,
+            (∀ y z, β y z = β z y) → (∀ y, 0 ≤ β y y) → β ≠ 0 → 0 < (vorFun O g).evalZ β := by
   intro O _ _ _ _ bar g q X _ _ _ _ hg hq
   have hfin : Module.Finite ℤ X := Module.Finite.trans O X
   have hO : Module.Free ℤ O := Module.free_of_finite_type_torsion_free'
@@ -82,9 +100,13 @@ theorem vorFun_int_pos : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZ
   let b : Module.Basis (Fin (Module.finrank ℤ X)) ℤ X := Module.finBasis ℤ X
   let r : (Fin (Module.finrank ℤ X) → ℤ) →ₗ[ℤ] X := b.equivFun.symm.toLinearMap
   have hr : Function.Surjective r := b.equivFun.symm.surjective
-  have key : ∀ β : LinearMap.BilinForm ℤ X, (∀ y, 0 ≤ β y y) →
-      ∃ a : (Fin (Module.finrank ℤ X) → ZMod (1 + 1)) → Fin (Module.finrank ℤ X) → ℤ, Covers2 (fun y => r (a y)) ∧
-        (vorFun O g).evalZ β = 2 ^ (g - Module.finrank ℤ X) * ∑ y, (β (r (a y)) (r (a y)) : ℝ) := by
+  have key
+      : ∀ β : LinearMap.BilinForm ℤ X,
+        (∀ y, 0 ≤ β y y)
+          → ∃ a : (Fin (Module.finrank ℤ X) → ZMod (1 + 1)) → Fin (Module.finrank ℤ X) → ℤ,
+            Covers2 (fun y => r (a y))
+              ∧ (vorFun O g).evalZ β
+                = 2 ^ (g - Module.finrank ℤ X) * ∑ y, (β (r (a y)) (r (a y)) : ℝ) := by
     intro β hβ
     obtain ⟨a, ha, hm⟩ := exists_least_points r hr β hβ
     obtain ⟨hc, h⟩ := vorFun_value_le O bar g X _ r a hr ha
@@ -107,7 +129,8 @@ theorem vorFun_int_pos : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZ
   · obtain ⟨a, hc, h⟩ := key β hβ
     have hnn : ∀ y, (0 : ℝ) ≤ (β (r (a y)) (r (a y)) : ℝ) := fun y => by exact_mod_cast hβ _
     rw [h]
-    refine mul_pos (by positivity) (lt_of_le_of_ne (Finset.sum_nonneg fun y _ => hnn y) fun h0 => hne ?_)
+    refine mul_pos (by positivity)
+      (lt_of_le_of_ne (Finset.sum_nonneg fun y _ => hnn y) fun h0 => hne ?_)
     have h1 := (Finset.sum_eq_zero_iff_of_nonneg fun y _ => hnn y).1 h0.symm
     exact eq_zero_of_covers β hs hβ hc fun y => by exact_mod_cast h1 y (Finset.mem_univ y)
 

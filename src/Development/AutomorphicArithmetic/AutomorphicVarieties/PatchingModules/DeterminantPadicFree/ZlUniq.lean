@@ -6,17 +6,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem zlUniq_val (l : ℕ) [Fact l.Prime] {R : Type} [CommRing R] (f : ℤ_[l] →+* R)
-    (hl : (l : R) = 0) (a : ℤ_[l]) : f a = ((PadicInt.toZMod a).val : R) := by
-  obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.mp
-    (PadicInt.maximalIdeal_eq_span_p (p := l) ▸ PadicInt.sub_zmodRepr_mem a)
+private theorem zlUniq_val
+    (l : ℕ) [Fact l.Prime] {R : Type} [CommRing R] (f : ℤ_[l] →+* R) (hl : (l : R) = 0) (a : ℤ_[l])
+    : f a = ((PadicInt.toZMod a).val : R) := by
+  obtain ⟨c, hc⟩ :=
+    Ideal.mem_span_singleton'.mp
+      (PadicInt.maximalIdeal_eq_span_p (p := l) ▸ PadicInt.sub_zmodRepr_mem a)
   rw [PadicInt.val_toZMod_eq_zmodRepr]
   have h := congrArg f hc
   rw [map_mul, map_natCast, hl, mul_zero, map_sub, map_natCast, eq_comm, sub_eq_zero] at h
   exact h
 
-theorem UpperTheory.V.Pa.Det.zlUniq :
-    ∀ (l : ℕ) [Fact l.Prime], (∀ {K : Type} [Field K] [Finite K] (_ : ℤ_[l] →+* K), CharP K l) ∧ ∀ {R : Type} [CommRing R] (f f' : ℤ_[l] →+* R), (l : R) = 0 → f = f' ∧ ∀ a, f a = ((PadicInt.toZMod a).val : R) := by
+theorem UpperTheory.V.Pa.Det.zlUniq
+    : ∀ (l : ℕ) [Fact l.Prime],
+      (∀ {K : Type} [Field K] [Finite K] (_ : ℤ_[l] →+* K), CharP K l)
+        ∧ ∀ {R : Type} [CommRing R] (f f' : ℤ_[l] →+* R),
+          (l : R) = 0 → f = f' ∧ ∀ a, f a = ((PadicInt.toZMod a).val : R) := by
   intro l _
   refine ⟨fun {K} _ _ f => ?_, fun {R} _ f f' hl => ⟨?_, zlUniq_val l f hl⟩⟩
   · obtain ⟨p, hchar⟩ := CharP.exists K

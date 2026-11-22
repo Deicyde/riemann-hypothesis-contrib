@@ -9,14 +9,16 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeome
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar.Top
 
 namespace RootFieldNumerics
 
 namespace Ii
 
-theorem exists_perm_of_map_eq {α J : Type} [Fintype α] (f g : α → J)
-    (h : Finset.univ.val.map f = Finset.univ.val.map g) : ∃ σ : Equiv.Perm α, ∀ a, g (σ a) = f a := by
+theorem exists_perm_of_map_eq
+    {α J : Type} [Fintype α] (f g : α → J) (h : Finset.univ.val.map f = Finset.univ.val.map g)
+    : ∃ σ : Equiv.Perm α, ∀ a, g (σ a) = f a := by
   classical
   have hc : ∀ j, Fintype.card {a // f a = j} = Fintype.card {a // g a = j} := by
     intro j
@@ -30,8 +32,8 @@ theorem exists_perm_of_map_eq {α J : Type} [Fintype α] (f g : α → J)
   refine ⟨σ, fun a => ?_⟩
   exact (e (f a) ⟨a, rfl⟩).2
 
-theorem toMultiset_sum_single {d : ℕ} {J : Type} (w : Fin d → J) :
-    Finsupp.toMultiset (∑ k, Finsupp.single (w k) 1 : J →₀ ℕ) = Finset.univ.val.map w := by
+theorem toMultiset_sum_single {d : ℕ} {J : Type} (w : Fin d → J)
+    : Finsupp.toMultiset (∑ k, Finsupp.single (w k) 1 : J →₀ ℕ) = Finset.univ.val.map w := by
   rw [Finsupp.toMultiset_sum]
   simp only [Finsupp.toMultiset_single, one_smul]
   rw [← Multiset.sum_map_singleton (Finset.univ.val.map w), Multiset.map_map]
@@ -40,12 +42,22 @@ theorem toMultiset_sum_single {d : ℕ} {J : Type} (w : Fin d → J) :
 end Ii
 
 open Ii in
-theorem intersection_monomial_lines : ∀ II : IntersectionSystem, IsIntersectionSystem II → ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (d : ℕ) (J : Type) (ℓ : J → HermLine ι) (w : Fin d → J), IsArithVar P d → (∀ j, IsSmoothHerm (ℓ j)) → (∑ k, Finsupp.single (w k) 1 : J →₀ ℕ).degree = d ∧ ∃ σ : Equiv.Perm (Fin d), monoLines ℓ (∑ k, Finsupp.single (w k) 1) d = (fun k => ℓ (w k)) ∘ σ ∧ II K ι P d (monoLines ℓ (∑ k, Finsupp.single (w k) 1) d) = II K ι P d (fun k => ℓ (w k)) := by
+theorem intersection_monomial_lines
+    : ∀ II : IntersectionSystem,
+      IsIntersectionSystem II
+        → ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (d : ℕ)
+            (J : Type) (ℓ : J → HermLine ι) (w : Fin d → J),
+          IsArithVar P d → (∀ j, IsSmoothHerm (ℓ j))
+            → (∑ k, Finsupp.single (w k) 1 : J →₀ ℕ).degree = d
+              ∧ ∃ σ : Equiv.Perm (Fin d),
+                monoLines ℓ (∑ k, Finsupp.single (w k) 1) d = (fun k => ℓ (w k)) ∘ σ
+                  ∧ II K ι P d (monoLines ℓ (∑ k, Finsupp.single (w k) 1) d)
+                    = II K ι P d (fun k => ℓ (w k)) := by
   intro II hII K _ ι _ P d J ℓ w hP hℓ
   set m : J →₀ ℕ := ∑ k, Finsupp.single (w k) 1 with hm
   have hdeg : m.degree = d := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [hm, map_sum, Finsupp.degree_single]
+    simp [hm, map_sum, Finsupp.degree_single]
   set L : List J := (Finsupp.toMultiset m).toList with hL
   have hML : (L : Multiset J) = Finset.univ.val.map w := by
     rw [hL, Multiset.coe_toList, hm, toMultiset_sum_single]
@@ -53,10 +65,8 @@ theorem intersection_monomial_lines : ∀ II : IntersectionSystem, IsIntersectio
     have := congrArg Multiset.card hML
     simpa using this
   let f : Fin d → J := fun k => L.get (Fin.cast hlen.symm k)
-  have hf : List.ofFn f = L :=
-    List.ext_get (by simp [hlen]) (fun i h1 h2 => by simp [f])
-  have hmap : Finset.univ.val.map f = Finset.univ.val.map w := by
-    rw [Fin.univ_val_map, hf, hML]
+  have hf : List.ofFn f = L := List.ext_get (by simp [hlen]) (fun i h1 h2 => by simp [f])
+  have hmap : Finset.univ.val.map f = Finset.univ.val.map w := by rw [Fin.univ_val_map, hf, hML]
   obtain ⟨σ, hσ⟩ := exists_perm_of_map_eq f w hmap
   have hmono : monoLines ℓ m d = (fun k => ℓ (w k)) ∘ σ := by
     funext k

@@ -16,18 +16,15 @@ namespace Formalism.L2.Pj.FJ
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r ρ : ℕ}
 
 def trBE (n : ℕ) : LinearMap.BilinForm ℚ (Fin n → E) :=
-  LinearMap.mk₂ ℚ (fun l x => Algebra.trace ℚ E (∑ i, l i * x i))
-    (fun l₁ l₂ x => by
-      rw [← map_add (f := _)]; congr 1; simp [add_mul, Finset.sum_add_distrib])
-    (fun c l x => by
-      rw [← map_smul]; congr 1; simp [Finset.smul_sum])
-    (fun l x₁ x₂ => by
-      rw [← map_add (f := _)]; congr 1; simp [mul_add, Finset.sum_add_distrib])
-    (fun c l x => by
-      rw [← map_smul]; congr 1; simp [Finset.smul_sum])
+  LinearMap.mk₂ ℚ
+    (fun l x => Algebra.trace ℚ E (∑ i, l i * x i))
+    (fun l₁ l₂ x => by rw [← map_add (f := _)]; congr 1; simp [add_mul, Finset.sum_add_distrib])
+    (fun c l x => by rw [← map_smul]; congr 1; simp [Finset.smul_sum])
+    (fun l x₁ x₂ => by rw [← map_add (f := _)]; congr 1; simp [mul_add, Finset.sum_add_distrib])
+    (fun c l x => by rw [← map_smul]; congr 1; simp [Finset.smul_sum])
 
-theorem trBE_apply {n : ℕ} (l x : Fin n → E) :
-    trBE n l x = Algebra.trace ℚ E (∑ i, l i * x i) := rfl
+theorem trBE_apply {n : ℕ} (l x : Fin n → E) : trBE n l x = Algebra.trace ℚ E (∑ i, l i * x i) :=
+  rfl
 
 theorem trBE_symm (n : ℕ) : (trBE (E := E) n).IsSymm :=
   ⟨fun l x => by rw [trBE_apply, trBE_apply]; simp only [mul_comm]⟩
@@ -43,12 +40,12 @@ theorem trBE_sepLeft (n : ℕ) : LinearMap.SeparatingLeft (trBE (E := E) n) := b
 theorem trBE_nondeg (n : ℕ) : (trBE (E := E) n).Nondegenerate :=
   ⟨trBE_sepLeft n, fun x hx => trBE_sepLeft n x fun l => by rw [(trBE_symm n).eq]; exact hx l⟩
 
-theorem dualZE_eq {n : ℕ} (Xs : Submodule (𝓞 E) (Fin n → E)) :
-    dualZE Xs = ((trBE n).dualSubmodule (Xs.restrictScalars ℤ) : Set (Fin n → E)) := by
+theorem dualZE_eq {n : ℕ} (Xs : Submodule (𝓞 E) (Fin n → E))
+    : dualZE Xs = ((trBE n).dualSubmodule (Xs.restrictScalars ℤ) : Set (Fin n → E)) := by
   ext l
-  simp only [dualZE, Set.mem_ofPred_eq, SetLike.mem_coe,
-    LinearMap.BilinForm.mem_dualSubmodule, Submodule.restrictScalars_mem, Submodule.mem_one, trBE_apply,
-    Set.mem_range, algebraMap_int_eq, eq_intCast]
+  simp only [dualZE, Set.mem_ofPred_eq, SetLike.mem_coe, LinearMap.BilinForm.mem_dualSubmodule,
+    Submodule.restrictScalars_mem, Submodule.mem_one, trBE_apply, Set.mem_range, algebraMap_int_eq,
+    eq_intCast]
 
 def dualZSubE {n : ℕ} (Xs : Submodule (𝓞 E) (Fin n → E)) : Submodule (𝓞 E) (Fin n → E) where
   carrier := dualZE Xs
@@ -66,19 +63,22 @@ def dualZSubE {n : ℕ} (Xs : Submodule (𝓞 E) (Fin n → E)) : Submodule (�
     have h : ∑ i, (c • a) i * x i = ∑ i, a i * (c • x) i := by
       simp only [Pi.smul_apply]
       refine Finset.sum_congr rfl fun i _ => ?_
-      rw [Algebra.smul_def, Algebra.smul_def]; ring
+      rw [Algebra.smul_def, Algebra.smul_def]
+      ring
     exact ⟨u, by rw [h]; exact hu⟩
 
-theorem xcFD_coe (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) {X : Data E r} (cu : CuspFD X ρ) :
-    (XcFD 𝔄 cu : Set (Fin ρ → E)) = dualZE (crdI 𝔄 cu) := by
+theorem xcFD_coe (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) {X : Data E r} (cu : CuspFD X ρ)
+    : (XcFD 𝔄 cu : Set (Fin ρ → E)) = dualZE (crdI 𝔄 cu) := by
   have h : XcFD 𝔄 cu = dualZSubE (crdI 𝔄 cu) := Submodule.span_eq (dualZSubE (crdI 𝔄 cu))
-  rw [h]; rfl
+  rw [h]
+  rfl
 
-theorem exists_crdMap {X : Data E r} (cu : CuspFD X ρ) :
-    ∃ Ψ : (Fin r → E) →ₗ[E] (Fin ρ → E), ∀ v : Fin ρ → E, Ψ (∑ i, v i • cu.e i) = v := by
+theorem exists_crdMap {X : Data E r} (cu : CuspFD X ρ)
+    : ∃ Ψ : (Fin r → E) →ₗ[E] (Fin ρ → E), ∀ v : Fin ρ → E, Ψ (∑ i, v i • cu.e i) = v := by
   let b := Module.Basis.span cu.ind
-  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective
-    (Submodule.span E (Set.range cu.e)).subtype (Submodule.ker_subtype _)
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Submodule.span E (Set.range cu.e)).subtype
+      (Submodule.ker_subtype _)
   refine ⟨b.equivFun.toLinearMap.comp g, fun v => ?_⟩
   have hmem : ∑ i, v i • cu.e i ∈ Submodule.span E (Set.range cu.e) :=
     sum_mem fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
@@ -91,15 +91,14 @@ theorem exists_crdMap {X : Data E r} (cu : CuspFD X ρ) :
     simp [b, Module.Basis.span_apply]
   simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, hgv, hb, LinearEquiv.apply_symm_apply]
 
-theorem crdI_fg (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) {X : Data E r} (cu : CuspFD X ρ) :
-    (crdI 𝔄 cu).FG := by
+theorem crdI_fg (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) {X : Data E r} (cu : CuspFD X ρ)
+    : (crdI 𝔄 cu).FG := by
   obtain ⟨Ψ, hΨ⟩ := exists_crdMap cu
   obtain ⟨d, hd, hdA⟩ := 𝔄.isFractional
   have hI : cu.I.FG := Submodule.FG.of_le X.Λ_fg inf_le_left
   have hd0 : algebraMap (𝓞 E) E d ≠ 0 := by
     intro h
-    exact nonZeroDivisors.ne_zero hd
-      (IsFractionRing.injective (𝓞 E) E (by rw [h, map_zero]))
+    exact nonZeroDivisors.ne_zero hd (IsFractionRing.injective (𝓞 E) E (by rw [h, map_zero]))
   set Ψ' : (Fin r → E) →ₗ[E] (Fin ρ → E) := (algebraMap (𝓞 E) E d)⁻¹ • Ψ
   refine Submodule.FG.of_le (hI.map (Ψ'.restrictScalars (𝓞 E))) ?_
   rw [crdI, Submodule.span_le]
@@ -113,9 +112,11 @@ theorem crdI_fg (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) {X : Data 
   show ((algebraMap (𝓞 E) E d)⁻¹ • Ψ) (o • x) = Ψ (a • x)
   rw [LinearMap.smul_apply, ← algebraMap_smul E o x, map_smul, smul_smul, hcoef, map_smul]
 
-theorem span_rat_smul_mem {n : ℕ} (Xs : Submodule (𝓞 E) (Fin n → E)) (e : E)
-    {w : Fin n → E} (hw : w ∈ Submodule.span ℚ (Xs : Set (Fin n → E))) :
-    e • w ∈ Submodule.span ℚ (Xs : Set (Fin n → E)) := by
+theorem span_rat_smul_mem
+    {n : ℕ} (Xs : Submodule (𝓞 E) (Fin n → E))
+    (e : E)
+    {w : Fin n → E} (hw : w ∈ Submodule.span ℚ (Xs : Set (Fin n → E)))
+    : e • w ∈ Submodule.span ℚ (Xs : Set (Fin n → E)) := by
   have halg : IsAlgebraic ℤ e := (IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr (.of_finite ℚ e)
   obtain ⟨m, hm, hint⟩ := halg.exists_integral_multiple
   set o : 𝓞 E := ⟨m • e, hint⟩
@@ -141,10 +142,27 @@ theorem span_rat_smul_mem {n : ℕ} (Xs : Submodule (𝓞 E) (Fin n → E)) (e :
   | smul q x _ hx => rw [smul_comm]; exact Submodule.smul_mem _ _ hx
 
 theorem exists_smul_mem (X : Data E r) (w : Fin r → E) : ∃ c : 𝓞 E, c ≠ 0 ∧ c • w ∈ X.Λ := by
-  first | exact UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem .. | (apply UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem <;> assumption) | (intros; apply UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem <;> assumption) | (apply @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem <;> assumption) | (intros; apply @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem <;> assumption) | (apply @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem <;> first | assumption | infer_instance) | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_› ‹_› ‹_› r X w | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_› ‹_› ‹_› r X | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_› ‹_› ‹_› r | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_› ‹_› ‹_› | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_› ‹_› | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_› | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E
+  first
+  | exact UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem ..
+  | (apply UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem <;> assumption)
+  | (intros; apply UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem <;> assumption)
+  | (apply @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem <;> assumption)
+  | (intros; apply @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem <;> assumption)
+  | (
+      apply @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem
+        <;> first | assumption | infer_instance
+    )
+  | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_› ‹_› ‹_› r X w
+  | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_› ‹_› ‹_› r X
+  | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_› ‹_› ‹_› r
+  | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_› ‹_› ‹_›
+  | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_› ‹_›
+  | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E ‹_›
+  | exact @UpperTheory.Reformulated.B.LocalSituation.exists_smul_mem E
 
-theorem crdI_span (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h𝔄 : 𝔄 ≠ 0) {X : Data E r}
-    (cu : CuspFD X ρ) : Submodule.span ℚ (crdI 𝔄 cu : Set (Fin ρ → E)) = ⊤ := by
+theorem crdI_span
+    (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h𝔄 : 𝔄 ≠ 0) {X : Data E r} (cu : CuspFD X ρ)
+    : Submodule.span ℚ (crdI 𝔄 cu : Set (Fin ρ → E)) = ⊤ := by
   obtain ⟨a, ha, ha0⟩ : ∃ a ∈ (𝔄 : Submodule (𝓞 E) E), a ≠ 0 := by
     by_contra hne
     push Not at hne
@@ -162,9 +180,12 @@ theorem crdI_span (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h𝔄 :
   have hcE : cE ≠ 0 := by
     intro h
     exact hc (IsFractionRing.injective (𝓞 E) E (by rw [map_zero]; exact h))
-  have hx : c • cu.e i ∈ cu.I :=
-    ⟨hcI, Submodule.smul_mem _ c (Submodule.subset_span ⟨i, rfl⟩ :
-      cu.e i ∈ (Submodule.span E (Set.range cu.e)).restrictScalars (𝓞 E))⟩
+  have hx : c • cu.e i ∈ cu.I := ⟨
+    hcI,
+    Submodule.smul_mem _ c
+      (Submodule.subset_span ⟨i, rfl⟩
+        : cu.e i ∈ (Submodule.span E (Set.range cu.e)).restrictScalars (𝓞 E))
+  ⟩
   have hv : (Pi.single i (a * cE) : Fin ρ → E) ∈ crdI 𝔄 cu := by
     refine Submodule.subset_span ⟨a, ha, c • cu.e i, hx, ?_⟩
     rw [Finset.sum_eq_single i (fun j _ hj => by simp [hj]) (by simp)]
@@ -177,12 +198,14 @@ theorem crdI_span (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h𝔄 :
   · subst h; simp; field_simp
   · simp [h, Ne.symm h]
 
-theorem crdI_lat (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h𝔄 : 𝔄 ≠ 0) {X : Data E r}
-    (cu : CuspFD X ρ) : Submodule.IsLattice ℚ ((crdI 𝔄 cu).restrictScalars ℤ) :=
+theorem crdI_lat
+    (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h𝔄 : 𝔄 ≠ 0) {X : Data E r} (cu : CuspFD X ρ)
+    : Submodule.IsLattice ℚ ((crdI 𝔄 cu).restrictScalars ℤ) :=
   Submodule.IsLattice.of_fg ℚ ((crdI_fg 𝔄 cu).restrictScalars)
 
-theorem exists_basis (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h𝔄 : 𝔄 ≠ 0) {X : Data E r}
-    (cu : CuspFD X ρ) : ∃ (ι : Type) (_ : Fintype ι) (b : Module.Basis ι ℚ (Fin ρ → E)),
+theorem exists_basis
+    (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h𝔄 : 𝔄 ≠ 0) {X : Data E r} (cu : CuspFD X ρ)
+    : ∃ (ι : Type) (_ : Fintype ι) (b : Module.Basis ι ℚ (Fin ρ → E)),
       Submodule.span ℤ (Set.range b) = (crdI 𝔄 cu).restrictScalars ℤ := by
   classical
   set X0 := (crdI 𝔄 cu).restrictScalars ℤ
@@ -198,25 +221,29 @@ theorem exists_basis (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h�
     simp [Module.Basis.extendOfIsFullLattice_apply]
   rw [hr, Submodule.span_image, b.span_eq, Submodule.map_subtype_top]
 
-theorem xcFD_restrict (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) {X : Data E r} (cu : CuspFD X ρ) :
-    (XcFD 𝔄 cu).restrictScalars ℤ = (trBE ρ).dualSubmodule ((crdI 𝔄 cu).restrictScalars ℤ) := by
+theorem xcFD_restrict
+    (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) {X : Data E r} (cu : CuspFD X ρ)
+    : (XcFD 𝔄 cu).restrictScalars ℤ = (trBE ρ).dualSubmodule ((crdI 𝔄 cu).restrictScalars ℤ) := by
   apply SetLike.coe_injective
   rw [Submodule.coe_restrictScalars, xcFD_coe, dualZE_eq]
 
-theorem xcFD_lat (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h𝔄 : 𝔄 ≠ 0) {X : Data E r}
-    (cu : CuspFD X ρ) : Submodule.IsLattice E (XcFD 𝔄 cu) := by
+theorem xcFD_lat
+    (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h𝔄 : 𝔄 ≠ 0) {X : Data E r} (cu : CuspFD X ρ)
+    : Submodule.IsLattice E (XcFD 𝔄 cu) := by
   classical
   obtain ⟨ι, _, b, hb⟩ := exists_basis 𝔄 h𝔄 cu
-  have hX : (XcFD 𝔄 cu).restrictScalars ℤ =
-      Submodule.span ℤ (Set.range ((trBE ρ).dualBasis (trBE_nondeg ρ) b)) := by
+  have hX
+      : (XcFD 𝔄 cu).restrictScalars ℤ
+        = Submodule.span ℤ (Set.range ((trBE ρ).dualBasis (trBE_nondeg ρ) b)) := by
     rw [xcFD_restrict, ← hb, LinearMap.BilinForm.dualSubmodule_span_of_basis _ (trBE_nondeg ρ) b]
   refine ⟨?_, ?_⟩
   · rw [← Submodule.FG.restrictScalars_iff (R := ℤ), hX]
     exact Submodule.fg_span (Set.finite_range _)
   · intro s hs hli
     exact (LinearIndependent.iff_fractionRing _ _).mp hli
-theorem xcLatF {Comp : Type} (X : Comp → Data E r) (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
-    (h𝔄 : 𝔄 ≠ 0) : XcLatF X 𝔄 ρ :=
-  fun cu => xcFD_lat 𝔄 h𝔄 cu.2
+theorem xcLatF
+    {Comp : Type} (X : Comp → Data E r) (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (h𝔄 : 𝔄 ≠ 0)
+    : XcLatF X 𝔄 ρ := fun cu =>
+  xcFD_lat 𝔄 h𝔄 cu.2
 
 end Formalism.L2.Pj.FJ

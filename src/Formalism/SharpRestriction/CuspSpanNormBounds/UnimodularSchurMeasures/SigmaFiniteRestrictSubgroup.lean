@@ -15,20 +15,26 @@ noncomputable section
 
 namespace Formalism.MainNotions.LeviCoordinates
 
-open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.B2x1
+open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+  Formalism.FourierDecayAlt.P.B2x1
 
 variable {k r : ℕ}
 
-theorem sigmaFinite_restrict_subgroup {U : Set (Mat k r)} (hU : IsClosedSubgroup U) (μ : Measure (Mt k r)) [SigmaFinite μ] :
-    SigmaFinite (pull hU μ) := by
+theorem sigmaFinite_restrict_subgroup
+    {U : Set (Mat k r)} (hU : IsClosedSubgroup U) (μ : Measure (Mt k r)) [SigmaFinite μ]
+    : SigmaFinite (pull hU μ) := by
   refine (Measure.FiniteSpanningSetsIn.sigmaFinite (C := Set.univ)
     ⟨fun n => (inc : Gp U hU → Mt k r) ⁻¹' spanningSets μ n, fun _ => trivial, fun n => ?_, ?_⟩)
   · rw [pull, inc_memb.comap_apply]
-    exact lt_of_le_of_lt (measure_mono (Set.image_preimage_subset _ _)) (measure_spanningSets_lt_top μ n)
+    exact lt_of_le_of_lt (measure_mono (Set.image_preimage_subset _ _))
+      (measure_spanningSets_lt_top μ n)
   · rw [← Set.preimage_iUnion, iUnion_spanningSets, Set.preimage_univ]
 
-theorem left_haar_eq_smul_biinvariant {U : Set (Mat k r)} (hU : IsClosedSubgroup U) {ν μ : Measure (Mt k r)}
-    (hν : Formalism.FourierDecayAlt.B.IsHaarOn U ν) (hμ : Formalism.MainNotions.S.IsHaarOn U μ) : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ μ = c • ν := by
+theorem left_haar_eq_smul_biinvariant
+    {U : Set (Mat k r)} (hU : IsClosedSubgroup U)
+    {ν μ : Measure (Mt k r)}
+    (hν : Formalism.FourierDecayAlt.B.IsHaarOn U ν) (hμ : Formalism.MainNotions.S.IsHaarOn U μ)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ μ = c • ν := by
   obtain ⟨hσ, h0, hc, hl⟩ := hμ
   have hc' : μ Uᶜ = 0 := hc
   have : SigmaFinite ν := Formalism.FourierDecayAlt.P.B5.haar_sigmaFinite hν
@@ -68,7 +74,8 @@ theorem left_haar_eq_smul_biinvariant {U : Set (Mat k r)} (hU : IsClosedSubgroup
     · rw [e, ENNReal.top_mul hz] at hfin
       exact lt_irrefl _ hfin
   refine ⟨c, hc0, hc1, ?_⟩
-  calc μ = (pull hU μ).map inc := (map_pull μ hc').symm
+  calc
+    μ = (pull hU μ).map inc := (map_pull μ hc').symm
     _ = (c • pull hU ν).map inc := by rw [← key]
     _ = c • ν := by rw [Measure.map_smul _ inc_memb.measurable.aemeasurable, map_pull ν hν.conc]
 

@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConjOfCharpo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -15,9 +16,13 @@ noncomputable section
 
 namespace GlobalTheory.BCT.IntUnitConj
 
-theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ (n : ℕ) (P : E[X]), P.Separable →
-    ∀ᶠ w in (cofinite : Filter (Pl E)), ∀ y y' : UL n w, y ∈ KL n w → y' ∈ KL n w → y.1.val.charpoly = atPl w P →
-      y'.1.val.charpoly = atPl w P → ∃ g ∈ KL n w, y' = g⁻¹ * y * g := by
+theorem main
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E
+        → ∀ (n : ℕ) (P : E[X]),
+          P.Separable
+            → ∀ᶠ w in (cofinite : Filter (Pl E)), ∀ y y' : UL n w, y ∈ KL n w → y' ∈ KL n w → y.1.val.charpoly = atPl w P →
+                y'.1.val.charpoly = atPl w P → ∃ g ∈ KL n w, y' = g⁻¹ * y * g := by
   intro E _ _ _ hU n P hP
   filter_upwards [UnitInert.eventually_separable P hP] with w hsep γ γ' hγK hγ'K hγ hγ'
   let O := w.adicCompletionIntegers E
@@ -27,12 +32,13 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E →
   change γ'.1 ∈ (GeneralLinearGroup.map ι).range at hγ'K
   obtain ⟨y', hy'⟩ := hγK
   obtain ⟨z', hz'⟩ := hγ'K
-  have hch : ∀ x : GL (Fin n) O, x.val.charpoly.map ι = (GeneralLinearGroup.map ι x).val.charpoly := fun x =>
-    (Matrix.charpoly_map _ _).symm
+  have hch : ∀ x : GL (Fin n) O, x.val.charpoly.map ι = (GeneralLinearGroup.map ι x).val.charpoly :=
+    fun x => (Matrix.charpoly_map _ _).symm
   have e1 : y'.val.charpoly.map ι = atPl w P := by rw [hch, hy', hγ]
   have e2 : z'.val.charpoly.map ι = atPl w P := by rw [hch, hz', hγ']
   have e12 : z'.val.charpoly = y'.val.charpoly := Polynomial.map_injective ι hι (e2.trans e1.symm)
-  suffices H : ∃ u : GL (Fin n) O, GeneralLinearGroup.map ι u ∈ UL n w ∧ y'.val * u.val = u.val * z'.val by
+  suffices H
+      : ∃ u : GL (Fin n) O, GeneralLinearGroup.map ι u ∈ UL n w ∧ y'.val * u.val = u.val * z'.val by
     obtain ⟨u, hu, hcu⟩ := H
     let g : GLw n w := GeneralLinearGroup.map ι u
     have key : γ.1 * g = g * γ'.1 := by
@@ -43,7 +49,8 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E →
     change γ'.1 = g⁻¹ * γ.1 * g
     rw [mul_assoc, key, inv_mul_cancel_left]
   by_cases hw : IsSplitAt w
-  · obtain ⟨u, hu⟩ := GlobalTheory.ConjLocal.conj_of_charpoly_local O n y'.val z'.val e12.symm (hsep _ e1)
+  · obtain ⟨u, hu⟩ :=
+      GlobalTheory.ConjLocal.conj_of_charpoly_local O n y'.val z'.val e12.symm (hsep _ e1)
     refine ⟨u, by rw [UL, if_pos hw]; exact Subgroup.mem_top _, ?_⟩
     rw [hu, ← mul_assoc, ← mul_assoc, Units.mul_inv, one_mul]
   · obtain ⟨-, hcc, hv, h4, -⟩ := GlobalTheory.ConjAtPlace.main E hU w
@@ -62,21 +69,27 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E →
       rw [mul_one]
     have hmv : ∀ x : GL (Fin n) O, (GeneralLinearGroup.map ι x).val = x.val.map ι := fun x => by
       ext i j; rfl
-    have hunit : ∀ (x : GL (Fin n) O), GeneralLinearGroup.map ι x ∈ UL n w → cT c x.val * x.val = 1 := fun x hx => by
+    have hunit
+        : ∀ (x : GL (Fin n) O),
+          GeneralLinearGroup.map ι x ∈ UL n w → cT c x.val * x.val = 1 := fun x hx => by
       refine Matrix.map_injective hι ?_
       show (cT c x.val * x.val).map ι = (1 : Matrix (Fin n) (Fin n) O).map ι
       rw [Matrix.map_mul, hmapc, Matrix.map_one _ (map_zero ι) (map_one ι), ← hmv]
       exact (hUL _).1 hx
-    obtain ⟨u, hu, hcu⟩ := UnitInert.exists_unitary_conj (IsLocalRing.maximalIdeal O) (σ := c) hc
-      (fun x hx => by
-        rw [GlobalTheory.InertUQ.mem_max_iff] at hx ⊢
-        exact (hv _).trans_lt hx)
-      ⟨⟨x₀, hx₀⟩, by
-        rw [← IsLocalRing.notMem_maximalIdeal, GlobalTheory.InertUQ.mem_max_iff]
-        change ¬ Valued.v (x₀ - cj w x₀) < 1
-        rw [Valuation.map_sub_swap, hx₁]
-        exact lt_irrefl _⟩
-      (hunit y' (hy' ▸ γ.2)) (hunit z' (hz' ▸ γ'.2)) (hsep _ e1) e12
+    obtain ⟨u, hu, hcu⟩ :=
+      UnitInert.exists_unitary_conj (IsLocalRing.maximalIdeal O) (σ := c) hc
+        (fun x hx => by
+          rw [GlobalTheory.InertUQ.mem_max_iff] at hx ⊢
+          exact (hv _).trans_lt hx)
+        ⟨
+          ⟨x₀, hx₀⟩,
+          by
+            rw [← IsLocalRing.notMem_maximalIdeal, GlobalTheory.InertUQ.mem_max_iff]
+            change ¬ Valued.v (x₀ - cj w x₀) < 1
+            rw [Valuation.map_sub_swap, hx₁]
+            exact lt_irrefl _
+        ⟩
+        (hunit y' (hy' ▸ γ.2)) (hunit z' (hz' ▸ γ'.2)) (hsep _ e1) e12
     refine ⟨u, ?_, hcu⟩
     rw [hUL]
     have := congrArg (fun M => M.map ι) hu

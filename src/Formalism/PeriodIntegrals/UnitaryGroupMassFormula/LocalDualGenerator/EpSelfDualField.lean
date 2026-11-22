@@ -20,10 +20,12 @@ local notation "C" => integralClosure 𝒪[K] L
 
 theorem tf : Module.IsTorsionFree 𝒪[K] L := by
   first
-    | exact Module.IsTorsionFree.trans_faithfulSMul 𝒪[K] K L
-    | (rw [Module.isTorsionFree_iff_faithfulSMul, faithfulSMul_iff_algebraMap_injective,
+  | exact Module.IsTorsionFree.trans_faithfulSMul 𝒪[K] K L
+  | (
+      rw [Module.isTorsionFree_iff_faithfulSMul, faithfulSMul_iff_algebraMap_injective,
         IsScalarTower.algebraMap_eq 𝒪[K] K L]
-       exact (algebraMap K L).injective.comp Subtype.val_injective)
+      exact (algebraMap K L).injective.comp Subtype.val_injective
+    )
 
 theorem dd : IsDedekindDomain C := integralClosure.isDedekindDomain 𝒪[K] K L
 theorem fr : IsFractionRing C L := integralClosure.isFractionRing_of_finite_extension K L
@@ -39,16 +41,14 @@ theorem tfC : Module.IsTorsionFree 𝒪[K] C := by
 attribute [local instance] dd fr mf tfC
 
 theorem sepFR : Algebra.IsSeparable (FractionRing 𝒪[K]) (FractionRing C) := by
-  first
-    | infer_instance
-    | exact Algebra.IsAlgebraic.isSeparable_of_perfectField
+  first | infer_instance | exact Algebra.IsAlgebraic.isSeparable_of_perfectField
 
 attribute [local instance] sepFR
 
 theorem differentIdeal_eq_top
-    (hU : ∀ x : C, x * x ∈ Ideal.map (algebraMap 𝒪[K] C) 𝓂[K] →
-      x ∈ Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) :
-    differentIdeal 𝒪[K] C = ⊤ := by
+    (hU : ∀ x : C,
+      x * x ∈ Ideal.map (algebraMap 𝒪[K] C) 𝓂[K] → x ∈ Ideal.map (algebraMap 𝒪[K] C) 𝓂[K])
+    : differentIdeal 𝒪[K] C = ⊤ := by
   by_contra hne
   obtain ⟨P, hPmax, hle⟩ := Ideal.exists_le_maximal _ hne
   haveI := hPmax.isPrime
@@ -67,8 +67,7 @@ theorem differentIdeal_eq_top
     haveI : PerfectField 𝓂[K].ResidueField := inferInstance
     haveI : Algebra.IsAlgebraic 𝓂[K].ResidueField P.ResidueField := inferInstance
     exact Algebra.IsAlgebraic.isSeparable_of_perfectField
-  · have hP0 : P ≠ ⊥ := fun h =>
-      differentIdeal_ne_bot (A := 𝒪[K]) (B := C) (le_bot_iff.1 (h ▸ hle))
+  · have hP0 : P ≠ ⊥ := fun h => differentIdeal_ne_bot (A := 𝒪[K]) (B := C) (le_bot_iff.1 (h ▸ hle))
     haveI : IsDiscreteValuationRing (Localization.AtPrime P) :=
       IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain C hP0 (Localization.AtPrime P)
     haveI : FaithfulSMul 𝒪[K] C := Module.isTorsionFree_iff_faithfulSMul.1 (tfC K L)
@@ -77,29 +76,43 @@ theorem differentIdeal_eq_top
     have hinjO : Function.Injective (algebraMap 𝒪[K] (Localization.AtPrime P)) := by
       rw [IsScalarTower.algebraMap_eq 𝒪[K] C (Localization.AtPrime P)]
       exact hinj.comp (FaithfulSMul.algebraMap_injective 𝒪[K] C)
-    have hmap : Ideal.map (algebraMap 𝒪[K] (Localization.AtPrime P)) 𝓂[K] =
-        Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
+    have hmap
+        : Ideal.map (algebraMap 𝒪[K] (Localization.AtPrime P)) 𝓂[K]
+          = Ideal.map (algebraMap C (Localization.AtPrime P))
+            (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
       rw [Ideal.map_map, ← IsScalarTower.algebraMap_eq]
     have hJP : Ideal.map (algebraMap 𝒪[K] C) 𝓂[K] ≤ P := Ideal.map_le_iff_le_comap.2 hpeq.ge
-    have hIle : Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) ≤
-        IsLocalRing.maximalIdeal (Localization.AtPrime P) := by
+    have hIle
+        : Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K])
+          ≤ IsLocalRing.maximalIdeal (Localization.AtPrime P) := by
       rw [← Localization.AtPrime.map_eq_maximalIdeal]
       exact Ideal.map_mono hJP
-    have hI0 : Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) ≠ ⊥ := by
+    have hI0
+        : Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K])
+          ≠ ⊥ := by
       rw [← hmap, Ne, Ideal.map_eq_bot_iff_of_injective hinjO]
       exact IsDiscreteValuationRing.not_a_field _
-    have hrad : ∀ x : (Localization.AtPrime P), x * x ∈ Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) →
-        x ∈ Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
+    have hrad
+        : ∀ x : (Localization.AtPrime P),
+          x * x ∈ Ideal.map (algebraMap C (Localization.AtPrime P))
+              (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K])
+            → x ∈ Ideal.map (algebraMap C (Localization.AtPrime P))
+              (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
       intro x hx
       obtain ⟨⟨c, s⟩, rfl⟩ := IsLocalization.mk'_surjective P.primeCompl x
-      have h1 : algebraMap C (Localization.AtPrime P) (c * c) ∈
-          Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
-        have he : algebraMap C (Localization.AtPrime P) (c * c) = (IsLocalization.mk' (Localization.AtPrime P) c s * IsLocalization.mk' (Localization.AtPrime P) c s) *
-            algebraMap C (Localization.AtPrime P) ((s * s : P.primeCompl) : C) := by
+      have h1
+          : algebraMap C (Localization.AtPrime P) (c * c) ∈ Ideal.map
+            (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
+        have he
+            : algebraMap C (Localization.AtPrime P) (c * c)
+              = (IsLocalization.mk' (Localization.AtPrime P) c s
+                  * IsLocalization.mk' (Localization.AtPrime P) c s)
+                * algebraMap C (Localization.AtPrime P) ((s * s : P.primeCompl) : C) := by
           rw [← IsLocalization.mk'_mul, IsLocalization.mk'_spec]
         rw [he]
         exact Ideal.mul_mem_right _ _ hx
-      obtain ⟨⟨⟨a, ha⟩, ⟨m, hm⟩⟩, he⟩ := (IsLocalization.mem_map_algebraMap_iff P.primeCompl (Localization.AtPrime P)).1 h1
+      obtain ⟨⟨⟨a, ha⟩, ⟨m, hm⟩⟩, he⟩ :=
+        (IsLocalization.mem_map_algebraMap_iff P.primeCompl (Localization.AtPrime P)).1 h1
       have h2 : c * c * m = a := hinj (by rw [map_mul]; exact he)
       have h3 : (m * c) * (m * c) ∈ Ideal.map (algebraMap 𝒪[K] C) 𝓂[K] := by
         have hr : (m * c) * (m * c) = m * (c * c * m) := by ring
@@ -109,7 +122,10 @@ theorem differentIdeal_eq_top
       have hv : IsUnit (algebraMap C (Localization.AtPrime P) (m * s)) :=
         IsLocalization.map_units (Localization.AtPrime P) (⟨m, hm⟩ * s : P.primeCompl)
       refine (Ideal.unit_mul_mem_iff_mem _ hv).1 ?_
-      have h6 : algebraMap C (Localization.AtPrime P) (m * s) * IsLocalization.mk' (Localization.AtPrime P) c s = algebraMap C (Localization.AtPrime P) (m * c) := by
+      have h6
+          : algebraMap C (Localization.AtPrime P) (m * s)
+              * IsLocalization.mk' (Localization.AtPrime P) c s
+            = algebraMap C (Localization.AtPrime P) (m * c) := by
         rw [map_mul, mul_assoc, IsLocalization.mk'_spec', ← map_mul]
       rw [h6]
       exact Ideal.mem_map_of_mem _ h4
@@ -118,18 +134,24 @@ theorem differentIdeal_eq_top
     rw [hmap]
     apply le_antisymm hIle
     rw [hϖ.maximalIdeal_eq, Ideal.span_le, Set.singleton_subset_iff]
-    have key : ∀ j : ℕ, ϖ ^ (j + 1) ∈ Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) →
-        ϖ ∈ Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
+    have key
+        : ∀ j : ℕ,
+          ϖ ^ (j + 1) ∈ Ideal.map (algebraMap C (Localization.AtPrime P))
+              (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K])
+            → ϖ ∈ Ideal.map (algebraMap C (Localization.AtPrime P))
+              (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
       intro j
       induction j using Nat.strong_induction_on with
       | _ j ih =>
         intro hj
         rcases Nat.eq_zero_or_pos j with rfl | hpos
         · simpa using hj
-        · have hh : ϖ ^ ((j + 2) / 2) * ϖ ^ ((j + 2) / 2) ∈
-              Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
+        · have hh
+              : ϖ ^ ((j + 2) / 2) * ϖ ^ ((j + 2) / 2) ∈ Ideal.map
+                (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
             rw [← pow_add]
-            have hs : (j + 2) / 2 + (j + 2) / 2 = (j + 1) + ((j + 2) / 2 + (j + 2) / 2 - (j + 1)) := by
+            have hs
+                : (j + 2) / 2 + (j + 2) / 2 = (j + 1) + ((j + 2) / 2 + (j + 2) / 2 - (j + 1)) := by
               omega
             rw [hs, pow_add]
             exact Ideal.mul_mem_right _ _ hj
@@ -140,12 +162,14 @@ theorem differentIdeal_eq_top
     cases n with
     | zero =>
       exfalso
-      have h1 : (1 : (Localization.AtPrime P)) ∈ Ideal.map (algebraMap C (Localization.AtPrime P)) (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
+      have h1
+          : (1 : (Localization.AtPrime P)) ∈ Ideal.map (algebraMap C (Localization.AtPrime P))
+            (Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) := by
         rw [hn]
         simp
-      exact (IsLocalRing.maximalIdeal.isMaximal (Localization.AtPrime P)).ne_top ((Ideal.eq_top_iff_one _).2 (hIle h1))
-    | succ k =>
-      exact key k (by rw [hn]; exact Ideal.mem_span_singleton_self _)
+      exact (IsLocalRing.maximalIdeal.isMaximal (Localization.AtPrime P)).ne_top
+        ((Ideal.eq_top_iff_one _).2 (hIle h1))
+    | succ k => exact key k (by rw [hn]; exact Ideal.mem_span_singleton_self _)
 
 theorem mem_C_iff (x : L) : x ∈ (1 : FractionalIdeal (nonZeroDivisors C) L) ↔ x ∈ C := by
   rw [FractionalIdeal.mem_one_iff]
@@ -156,15 +180,16 @@ theorem mem_C_iff (x : L) : x ∈ (1 : FractionalIdeal (nonZeroDivisors C) L) �
     exact ⟨⟨x, hx⟩, rfl⟩
 
 theorem selfDual_field
-    (hU : ∀ x : C, x * x ∈ Ideal.map (algebraMap 𝒪[K] C) 𝓂[K] →
-      x ∈ Ideal.map (algebraMap 𝒪[K] C) 𝓂[K]) (x : L) :
-    (∀ y ∈ C, Algebra.trace K L (x * y) ∈ 𝒪[K]) ↔ x ∈ C := by
+    (hU : ∀ x : C,
+      x * x ∈ Ideal.map (algebraMap 𝒪[K] C) 𝓂[K] → x ∈ Ideal.map (algebraMap 𝒪[K] C) 𝓂[K])
+    (x : L)
+    : (∀ y ∈ C, Algebra.trace K L (x * y) ∈ 𝒪[K]) ↔ x ∈ C := by
   have hdual : FractionalIdeal.dual 𝒪[K] K (1 : FractionalIdeal (nonZeroDivisors C) L) = 1 := by
     have h := coeIdeal_differentIdeal 𝒪[K] K L C
     rw [differentIdeal_eq_top K L hU, FractionalIdeal.coeIdeal_top] at h
     exact inv_eq_one.1 h.symm
-  have hr : ∀ z : K, z ∈ (algebraMap 𝒪[K] K).range ↔ z ∈ 𝒪[K] :=
-    fun z => ⟨fun ⟨y, hy⟩ => hy ▸ y.2, fun hz => ⟨⟨z, hz⟩, rfl⟩⟩
+  have hr : ∀ z : K, z ∈ (algebraMap 𝒪[K] K).range ↔ z ∈ 𝒪[K] := fun z =>
+    ⟨fun ⟨y, hy⟩ => hy ▸ y.2, fun hz => ⟨⟨z, hz⟩, rfl⟩⟩
   have h10 : (1 : FractionalIdeal (nonZeroDivisors C) L) ≠ 0 := by
     rw [Ne, ← FractionalIdeal.coeIdeal_top, FractionalIdeal.coeIdeal_eq_zero]
     exact top_ne_bot

@@ -9,24 +9,32 @@ open scoped BigOperators ComplexOrder
 
 namespace GlobalTheory.CompanionTheory.PeriodLimit
 
-theorem sq_mul_sum_sq_le {g : ℕ} (Y : Matrix (Fin g) (Fin g) ℝ) {c : ℝ} (hc : 0 < c)
-    (h : (Y - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef) (v : Fin g → ℝ) :
-    c ^ 2 * ∑ k, v k ^ 2 ≤ ∑ k, (Y *ᵥ v) k ^ 2 := by
+theorem sq_mul_sum_sq_le
+    {g : ℕ} (Y : Matrix (Fin g) (Fin g) ℝ)
+    {c : ℝ} (hc : 0 < c) (h : (Y - c • (1 : Matrix (Fin g) (Fin g) ℝ)).PosSemidef)
+    (v : Fin g → ℝ)
+    : c ^ 2 * ∑ k, v k ^ 2 ≤ ∑ k, (Y *ᵥ v) k ^ 2 := by
   have h1 := h.dotProduct_mulVec_nonneg v
   rw [star_trivial, sub_mulVec, smul_mulVec, one_mulVec, dotProduct_sub, dotProduct_smul] at h1
   have h2 : 0 ≤ ∑ k, (c * v k - (Y *ᵥ v) k) ^ 2 := Finset.sum_nonneg fun k _ => sq_nonneg _
-  have h3 : ∑ k, (c * v k - (Y *ᵥ v) k) ^ 2
-      = c ^ 2 * ∑ k, v k ^ 2 - 2 * c * (v ⬝ᵥ (Y *ᵥ v)) + ∑ k, (Y *ᵥ v) k ^ 2 := by
+  have h3
+      : ∑ k, (c * v k - (Y *ᵥ v) k) ^ 2
+        = c ^ 2 * ∑ k, v k ^ 2 - 2 * c * (v ⬝ᵥ (Y *ᵥ v)) + ∑ k, (Y *ᵥ v) k ^ 2 := by
     simp only [dotProduct, Finset.mul_sum, ← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun k _ => by ring
   have h4 : v ⬝ᵥ v = ∑ k, v k ^ 2 := by simp [dotProduct, sq]
   rw [h4, smul_eq_mul] at h1
   nlinarith [mul_nonneg hc.le h1]
 
-theorem coord_eq {a g : ℕ} (T : Matrix (Fin g) (Fin g) ℂ) (B : Fin a → Matrix (Fin g) (Fin g) ℤ)
-    (l : Fin a → ℂ) (v : Fin g → ℤ) (k : Fin g) :
-    2 * Real.pi * Complex.I * (((T + ∑ j, (l j / (2 * Real.pi * Complex.I)) •
-        (B j).map (fun x : ℤ => (x : ℂ))) *ᵥ (fun k => (v k : ℂ))) k)
+theorem coord_eq
+    {a g : ℕ} (T : Matrix (Fin g) (Fin g) ℂ) (B : Fin a → Matrix (Fin g) (Fin g) ℤ) (l : Fin a → ℂ)
+    (v : Fin g → ℤ) (k : Fin g)
+    : 2 * Real.pi * Complex.I
+        * (((T
+              + ∑ j, (l j / (2 * Real.pi * Complex.I)) •
+                (B j).map (fun x : ℤ => (x : ℂ)))
+            *ᵥ (fun k => (v k : ℂ)))
+          k)
       = 2 * Real.pi * Complex.I * (T *ᵥ (fun k => (v k : ℂ))) k
         + ∑ j, (((B j *ᵥ v) k : ℤ) : ℂ) * l j := by
   have h : (2 * Real.pi * Complex.I : ℂ) ≠ 0 := Complex.two_pi_I_ne_zero
@@ -40,27 +48,35 @@ theorem coord_eq {a g : ℕ} (T : Matrix (Fin g) (Fin g) ℂ) (B : Fin a → Mat
   rw [this]
   field_simp
 
-theorem exp_coord_eq {a g : ℕ} (T : Matrix (Fin g) (Fin g) ℂ)
-    (B : Fin a → Matrix (Fin g) (Fin g) ℤ) (l : Fin a → ℂ) (u v : Fin g → ℤ) (k : Fin g) :
-    Complex.exp (2 * Real.pi * Complex.I * (((fun k => (u k : ℂ)) +
-        (T + ∑ j, (l j / (2 * Real.pi * Complex.I)) •
-        (B j).map (fun x : ℤ => (x : ℂ))) *ᵥ (fun k => (v k : ℂ))) k))
+theorem exp_coord_eq
+    {a g : ℕ} (T : Matrix (Fin g) (Fin g) ℂ) (B : Fin a → Matrix (Fin g) (Fin g) ℤ) (l : Fin a → ℂ)
+    (u v : Fin g → ℤ) (k : Fin g)
+    : Complex.exp
+        (2 * Real.pi * Complex.I
+          * (((fun k => (u k : ℂ))
+              + (T
+                  + ∑ j, (l j / (2 * Real.pi * Complex.I)) •
+                    (B j).map (fun x : ℤ => (x : ℂ)))
+                *ᵥ (fun k => (v k : ℂ)))
+            k))
       = Complex.exp (2 * Real.pi * Complex.I * (T *ᵥ (fun k => (v k : ℂ))) k)
         * ∏ j, Complex.exp (l j) ^ ((B j *ᵥ v) k) := by
   rw [Pi.add_apply, mul_add, coord_eq, Complex.exp_add, Complex.exp_add, mul_comm _ (u k : ℂ),
     Complex.exp_int_mul_two_pi_mul_I, one_mul, Complex.exp_sum]
   simp only [Complex.exp_int_mul]
 
-theorem exp_pair_eq {a g : ℕ} (T : Matrix (Fin g) (Fin g) ℂ)
-    (B : Fin a → Matrix (Fin g) (Fin g) ℤ) (l : Fin a → ℂ) (u v : Fin g → ℤ) :
-    Complex.exp (∑ k, (v k : ℂ) * (2 * Real.pi * Complex.I * (((fun k => (u k : ℂ)) +
-        (T + ∑ j, (l j / (2 * Real.pi * Complex.I)) •
-        (B j).map (fun x : ℤ => (x : ℂ))) *ᵥ (fun k => (v k : ℂ))) k)))
-      = Complex.exp (∑ k, (v k : ℂ) *
-          (2 * Real.pi * Complex.I * (T *ᵥ (fun k => (v k : ℂ))) k))
+theorem exp_pair_eq
+    {a g : ℕ} (T : Matrix (Fin g) (Fin g) ℂ) (B : Fin a → Matrix (Fin g) (Fin g) ℤ) (l : Fin a → ℂ)
+    (u v : Fin g → ℤ)
+    : Complex.exp
+        (∑ k, (v k : ℂ) * (2 * Real.pi * Complex.I * (((fun k => (u k : ℂ)) +
+          (T + ∑ j, (l j / (2 * Real.pi * Complex.I)) •
+          (B j).map (fun x : ℤ => (x : ℂ))) *ᵥ (fun k => (v k : ℂ))) k)))
+      = Complex.exp
+          (∑ k, (v k : ℂ) *
+            (2 * Real.pi * Complex.I * (T *ᵥ (fun k => (v k : ℂ))) k))
         * ∏ j, Complex.exp (l j) ^ (v ⬝ᵥ (B j *ᵥ v)) := by
-  simp only [Complex.exp_sum, Complex.exp_int_mul, exp_coord_eq, mul_zpow,
-    Finset.prod_mul_distrib]
+  simp only [Complex.exp_sum, Complex.exp_int_mul, exp_coord_eq, mul_zpow, Finset.prod_mul_distrib]
   congr 1
   simp only [← Finset.prod_zpow, ← _root_.zpow_mul, ← Complex.exp_int_mul]
   rw [Finset.prod_comm]
@@ -70,44 +86,48 @@ theorem exp_pair_eq {a g : ℕ} (T : Matrix (Fin g) (Fin g) ℂ)
   simp only [dotProduct, Int.cast_sum, Int.cast_mul, Finset.sum_mul]
   exact Finset.sum_congr rfl fun k _ => by ring
 
-theorem cast_pair {g : ℕ} (B : Matrix (Fin g) (Fin g) ℤ) (v : Fin g → ℤ) :
-    star (fun k => (v k : ℝ)) ⬝ᵥ ((B.map (fun x : ℤ => (x : ℝ))) *ᵥ (fun k => (v k : ℝ)))
+theorem cast_pair {g : ℕ} (B : Matrix (Fin g) (Fin g) ℤ) (v : Fin g → ℤ)
+    : star (fun k => (v k : ℝ)) ⬝ᵥ ((B.map (fun x : ℤ => (x : ℝ))) *ᵥ (fun k => (v k : ℝ)))
       = ((v ⬝ᵥ (B *ᵥ v) : ℤ) : ℝ) := by
   simp [mulVec, dotProduct]
 
-theorem pair_nonneg {g : ℕ} {B : Matrix (Fin g) (Fin g) ℤ}
-    (h : (B.map (fun x : ℤ => (x : ℝ))).PosSemidef) (v : Fin g → ℤ) : 0 ≤ v ⬝ᵥ (B *ᵥ v) := by
+theorem pair_nonneg
+    {g : ℕ} {B : Matrix (Fin g) (Fin g) ℤ}
+    (h : (B.map (fun x : ℤ => (x : ℝ))).PosSemidef) (v : Fin g → ℤ)
+    : 0 ≤ v ⬝ᵥ (B *ᵥ v) := by
   have := h.dotProduct_mulVec_nonneg (fun k => (v k : ℝ))
   rw [cast_pair] at this
   exact_mod_cast this
 
-theorem mulVec_eq_zero_of_pair {g : ℕ} {B : Matrix (Fin g) (Fin g) ℤ}
-    (h : (B.map (fun x : ℤ => (x : ℝ))).PosSemidef) (v : Fin g → ℤ) (h0 : v ⬝ᵥ (B *ᵥ v) = 0) :
-    B *ᵥ v = 0 := by
-  have := (h.dotProduct_mulVec_zero_iff (x := fun k => (v k : ℝ))).1
-    (by rw [cast_pair, h0]; simp)
+theorem mulVec_eq_zero_of_pair
+    {g : ℕ} {B : Matrix (Fin g) (Fin g) ℤ}
+    (h : (B.map (fun x : ℤ => (x : ℝ))).PosSemidef) (v : Fin g → ℤ) (h0 : v ⬝ᵥ (B *ᵥ v) = 0)
+    : B *ᵥ v = 0 := by
+  have := (h.dotProduct_mulVec_zero_iff (x := fun k => (v k : ℝ))).1 (by rw [cast_pair, h0]; simp)
   ext k
   have h1 := congrFun this k
-  have h2 : ((B.map (fun x : ℤ => (x : ℝ))) *ᵥ (fun k => (v k : ℝ))) k
-      = (((B *ᵥ v) k : ℤ) : ℝ) := by
+  have h2
+      : ((B.map (fun x : ℤ => (x : ℝ))) *ᵥ (fun k => (v k : ℝ))) k = (((B *ᵥ v) k : ℤ) : ℝ) := by
     simp [mulVec, dotProduct]
   rw [h2, Pi.zero_apply] at h1
   exact_mod_cast h1
 
-theorem finite_sum_sq_le {g : ℕ} (M : ℝ) :
-    {v : Fin g → ℤ | ∑ k, (v k : ℝ) ^ 2 ≤ M}.Finite := by
-  refine (Set.Finite.pi' (fun _ : Fin g => Set.finite_Icc (-⌈M⌉) ⌈M⌉)).subset ?_
+theorem finite_sum_sq_le {g : ℕ} (M : ℝ) : {v : Fin g → ℤ | ∑ k, (v k : ℝ) ^ 2 ≤ M}.Finite := by
+  refine (Set.Finite.pi' (fun _ : Fin g => Set.finite_Icc (- ⌈M⌉) ⌈M⌉)).subset ?_
   intro v hv k
   have h1 : (v k : ℝ) ^ 2 ≤ M :=
-    (Finset.single_le_sum (f := fun k => (v k : ℝ) ^ 2) (fun k _ => sq_nonneg _)
+    (Finset.single_le_sum
+      (f := fun k => (v k : ℝ) ^ 2)
+      (fun k _ => sq_nonneg _)
       (Finset.mem_univ k)).trans hv
   have h2 : v k ^ 2 ≤ ⌈M⌉ := by
     have := h1.trans (Int.le_ceil M)
     exact_mod_cast this
-  constructor <;> nlinarith [sq_nonneg (v k), sq_nonneg (2 * v k - 1), sq_nonneg (2 * v k + 1), Int.le_self_sq (v k), Int.le_self_sq (-v k)]
+  constructor
+    <;> nlinarith [sq_nonneg (v k), sq_nonneg (2 * v k - 1), sq_nonneg (2 * v k + 1), Int.le_self_sq (v k), Int.le_self_sq (-v k)]
 
-theorem im_period {g : ℕ} (A : Matrix (Fin g) (Fin g) ℂ) (u v : Fin g → ℤ) (k : Fin g) :
-    ((A.map Complex.im) *ᵥ (fun k => (v k : ℝ))) k
+theorem im_period {g : ℕ} (A : Matrix (Fin g) (Fin g) ℂ) (u v : Fin g → ℤ) (k : Fin g)
+    : ((A.map Complex.im) *ᵥ (fun k => (v k : ℝ))) k
       = ((((fun k => (u k : ℂ)) + A *ᵥ (fun k => (v k : ℂ)) : Fin g → ℂ)) k).im := by
   simp [mulVec, dotProduct]
 

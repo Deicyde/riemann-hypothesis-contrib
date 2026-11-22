@@ -20,17 +20,26 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP.BK
 
-theorem exists_truncLog_gal_mod_fil : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (C : Core l) (c : ↥(GK K) → ℤ_[l]),
-    (∀ (g : ↥(GK K)) (m : ℕ), rootT (Per.σF (g : GQ l) bk.flat) m =
-      rootT C.ε m ^ (PadicInt.toZModPow m (c g)).val * rootT bk.flat m) →
-    ∀ m : ℕ, ∃ (k : ℕ) (s : bk.S), bk.E ∣ s ∧ ∀ g : ↥(GK K),
-      aDp l (Per.σA (g : GQ l) (bk.ev s) - bk.ev s) -
-        (l : Per.BdRp l) ^ k * (aDp l (Per.zA l ((bk.Ep.natDegree : ℤ_[l]) * c g)) * C.j C.t) ∈ Per.FilP l m := by
+theorem exists_truncLog_gal_mod_fil
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (C : Core l) (c : ↥(GK K) → ℤ_[l]),
+      (∀ (g : ↥(GK K)) (m : ℕ),
+          rootT (Per.σF (g : GQ l) bk.flat) m
+            = rootT C.ε m ^ (PadicInt.toZModPow m (c g)).val * rootT bk.flat m)
+        → ∀ m : ℕ, ∃ (k : ℕ) (s : bk.S),
+          bk.E ∣ s
+            ∧ ∀ g : ↥(GK K),
+              aDp l (Per.σA (g : GQ l) (bk.ev s) - bk.ev s)
+                  - (l : Per.BdRp l) ^ k
+                    * (aDp l (Per.zA l ((bk.Ep.natDegree : ℤ_[l]) * c g)) * C.j C.t)
+                ∈ Per.FilP l m := by
   intro l _ K bk C c hc m
   obtain ⟨M, q, hq1, hq2⟩ := GlobalTheory.T.exists_approx_root_eisenstein_away_prime l K bk m
   obtain ⟨N, r, hr⟩ := GlobalTheory.T.exists_mul_sub_prime_pow_dvd_E_pow l K bk M m q hq1
@@ -74,7 +83,9 @@ theorem exists_truncLog_gal_mod_fil : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l
     have h0 : Per.θ l (bk.ev bk.E) = 0 := by
       have : bk.ev bk.E ∈ RingHom.ker (Per.θ l) := bk.span_ev ▸ Ideal.mem_span_singleton_self _
       exact this
-    first | exact GlobalTheory.RingIface.alg_mem_kerP _ h0 | exact GlobalTheory.RingIface.alg_mem_kerP h0
+    first
+    | exact GlobalTheory.RingIface.alg_mem_kerP _ h0
+    | exact GlobalTheory.RingIface.alg_mem_kerP h0
   have hfE : f bk.E ∈ I := Ideal.mem_map_of_mem _ hEm
   have hfσE : fσ bk.E ∈ I := by
     refine Ideal.mem_map_of_mem _ ?_
@@ -97,10 +108,12 @@ theorem exists_truncLog_gal_mod_fil : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l
     exact sub_eq_zero.1 h
   have hlamN : (l : R) ^ N * lam ^ N = 1 := by rw [← mul_pow, hlam, one_pow]
   have hσr : fσ r = f r := by
-    have hu : IsUnit (f q) := isUnit_iff_exists_inv.2 ⟨f r * lam ^ N, by rw [← mul_assoc, hfr, hlamN]⟩
+    have hu : IsUnit (f q) :=
+      isUnit_iff_exists_inv.2 ⟨f r * lam ^ N, by rw [← mul_assoc, hfr, hlamN]⟩
     apply hu.mul_left_cancel
     rw [← hσq, hfσr, hσq, hfr]
-  obtain ⟨e, hxe, he1, hlog⟩ := GlobalTheory.T.galois_factor_tilt_log_bdRPlus l C bk.flat (g : GQ l) (c g) (hc g)
+  obtain ⟨e, hxe, he1, hlog⟩ :=
+    GlobalTheory.T.galois_factor_tilt_log_bdRPlus l C bk.flat (g : GQ l) (c g) (hc g)
   set τ : R := qm (ι (Per.tm e)) with hτ
   have hσX : fσ X = f X * τ := by
     change qm (ι (Per.σA (g : GQ l) (bk.ev X))) = qm (ι (bk.ev X)) * qm (ι (Per.tm e))
@@ -111,11 +124,14 @@ theorem exists_truncLog_gal_mod_fil : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l
   have hσC : ∀ w, fσ (PowerSeries.C w) = f (PowerSeries.C w) := fun w => by
     change qm (ι (Per.σA (g : GQ l) (bk.ev (PowerSeries.C w)))) = qm (ι (bk.ev (PowerSeries.C w)))
     rw [bk.ev_C, bk.gal_w]
-  let T : R → R := fun a => ∑ j ∈ Finset.range m, (-1) ^ j * ((m.factorial / (j + 1) : ℕ) : R) * a ^ (j + 1)
-  have hT : ∀ (φ : bk.S →+* R) (a : R), φ w₀ = a * (l : R) ^ N → φ s' = (l : R) ^ (N * m) * T a := by
+  let T : R → R := fun a =>
+    ∑ j ∈ Finset.range m, (-1) ^ j * ((m.factorial / (j + 1) : ℕ) : R) * a ^ (j + 1)
+  have hT
+      : ∀ (φ : bk.S →+* R) (a : R), φ w₀ = a * (l : R) ^ N → φ s' = (l : R) ^ (N * m) * T a := by
     intro φ a ha
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hs', map_sum, map_mul, map_pow, map_neg, map_one, map_natCast, ha, T, Finset.mul_sum]
+      simp only [hs', map_sum, map_mul, map_pow, map_neg, map_one, map_natCast, ha, T,
+        Finset.mul_sum]
     refine Finset.sum_congr rfl fun j hj => ?_
     have hjm : N * m = N * (j + 1) + N * (m - (j + 1)) := by
       rw [← mul_add]; congr 1; have := Finset.mem_range.1 hj; omega
@@ -145,7 +161,8 @@ theorem exists_truncLog_gal_mod_fil : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [T, map_sum, map_mul, map_pow, map_sub, map_one, map_natCast, map_neg, hτ]
     rfl
-  have hfC : (m.factorial : R) * f (PowerSeries.C (algebraMap ℤ_[l] (Wq l bk.a) d)) = (l : R) ^ m := by
+  have hfC
+      : (m.factorial : R) * f (PowerSeries.C (algebraMap ℤ_[l] (Wq l bk.a) d)) = (l : R) ^ m := by
     have := congrArg (f.comp (PowerSeries.C.comp (algebraMap ℤ_[l] (Wq l bk.a)))) hd
     simpa only [map_mul, map_natCast, map_pow, RingHom.comp_apply] using this
   have hfs' := hT f A hA
@@ -153,14 +170,21 @@ theorem exists_truncLog_gal_mod_fil : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l
   rw [GlobalTheory.RingIface.mem_filtration_iff_mem_kerTheta_pow]
   have e1 : Per.ev l m (aDp l (Per.σA (g : GQ l) (bk.ev s) - bk.ev s)) = fσ s - f s := by
     rw [hev, map_sub, map_sub]; rfl
-  have e2 : Per.ev l m ((l : Per.BdRp l) ^ (m + N * m) *
-      (aDp l (Per.zA l ((bk.Ep.natDegree : ℤ_[l]) * c g)) * C.j C.t)) =
-      (l : R) ^ (m + N * m) * ((bk.Ep.natDegree : R) * Per.ev l m (aDp l (Per.zA l (c g)) * C.j C.t)) := by
+  have e2
+      : Per.ev l m
+          ((l : Per.BdRp l) ^ (m + N * m)
+            * (aDp l (Per.zA l ((bk.Ep.natDegree : ℤ_[l]) * c g)) * C.j C.t))
+        = (l : R) ^ (m + N * m)
+          * ((bk.Ep.natDegree : R) * Per.ev l m (aDp l (Per.zA l (c g)) * C.j C.t)) := by
     simp only [map_mul, map_pow, map_natCast]; ring
   rw [map_sub, e1, e2]
-  have e3 : fσ s = (bk.Ep.natDegree : R) * f (PowerSeries.C (algebraMap ℤ_[l] (Wq l bk.a) d)) * fσ s' := by
+  have e3
+      : fσ s
+        = (bk.Ep.natDegree : R) * f (PowerSeries.C (algebraMap ℤ_[l] (Wq l bk.a) d)) * fσ s' := by
     rw [hsdef, map_mul, map_mul, map_natCast, hσC]
-  have e4 : f s = (bk.Ep.natDegree : R) * f (PowerSeries.C (algebraMap ℤ_[l] (Wq l bk.a) d)) * f s' := by
+  have e4
+      : f s
+        = (bk.Ep.natDegree : R) * f (PowerSeries.C (algebraMap ℤ_[l] (Wq l bk.a) d)) * f s' := by
     rw [hsdef, map_mul, map_mul, map_natCast]
   rw [e3, e4, hfs', hfσs']
   apply (hR _ m.factorial_ne_zero).mul_left_cancel

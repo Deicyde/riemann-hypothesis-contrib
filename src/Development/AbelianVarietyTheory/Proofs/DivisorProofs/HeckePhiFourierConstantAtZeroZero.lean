@@ -64,7 +64,8 @@ lemma integral_inv_ofReal_add_I_sq : ∫ t : ℝ, ((t : ℂ) + I)⁻¹ ^ 2 = 0 :
 
 theorem cConst_zero : cConst 0 = 0 := by
   unfold cConst hTrans phi
-  simp only [mul_zero, neg_zero, Complex.cpow_zero, mul_one, Complex.ofReal_zero, zero_mul, Complex.exp_zero, Complex.ofReal_one, one_mul]
+  simp only [mul_zero, neg_zero, Complex.cpow_zero, mul_one, Complex.ofReal_zero, zero_mul,
+    Complex.exp_zero, Complex.ofReal_one, one_mul]
   exact integral_inv_ofReal_add_I_sq
 
 end GlobalTheory.HeckeTwo

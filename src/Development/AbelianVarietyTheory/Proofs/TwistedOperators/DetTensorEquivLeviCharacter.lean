@@ -7,13 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.InstAddCo
 
 noncomputable section
 
-open GlobalTheory GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.SmGL.Exponents ValuativeRel
+open GlobalTheory GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.SmGL.Exponents ValuativeRel
 
 namespace GlobalTheory.SmGL.Exponents
 
-theorem nonempty_piTensor_detRep_equiv (R β : Type) [CommRing R] [Fintype β] (c : β → Type)
-    [∀ j, Fintype (c j)] [∀ j, DecidableEq (c j)] (χ : β → Rˣ →* ℂˣ) :
-    Nonempty ((piTensor fun j => detRep (c j) (χ j)).Equiv (ofChar (leviChar c χ))) := by
+theorem nonempty_piTensor_detRep_equiv
+    (R β : Type) [CommRing R] [Fintype β]
+    (c : β → Type) [∀ j, Fintype (c j)] [∀ j, DecidableEq (c j)]
+    (χ : β → Rˣ →* ℂˣ)
+    : Nonempty ((piTensor fun j => detRep (c j) (χ j)).Equiv (ofChar (leviChar c χ))) := by
   classical
   refine ⟨LocGL.equivOfBijective
     ⟨(PiTensorProduct.constantBaseRingEquiv β ℂ).toLinearMap, fun g => ?_⟩

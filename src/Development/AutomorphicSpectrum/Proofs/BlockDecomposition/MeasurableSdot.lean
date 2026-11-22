@@ -9,7 +9,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FiniteTw
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D4
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.BcB
+  PositivityTheory.Rg.BcB.D4
 
 namespace GlobalTheory.CompanionTheory.RatDisc
 
@@ -33,7 +34,8 @@ theorem discrete_ratIn (d : GL (Fin n) E) : DiscreteTopology (ratIn d) := by
     obtain ⟨g, -, hg⟩ := (Subgroup.mem_subgroupOf.1 x.2)
     exact ⟨g, hg⟩
   refine DiscreteTopology.of_continuous_injective
-    (f := fun x : ratIn d => (⟨x.1.1, hmem x⟩ : (ratGL E n).range)) ?_ ?_
+    (f := fun x : ratIn d => (⟨x.1.1, hmem x⟩ : (ratGL E n).range))
+    ?_ ?_
   · exact (continuous_subtype_val.comp continuous_subtype_val).subtype_mk _
   · intro x y h
     have h' : (x.1.1 : GA E n) = y.1.1 := congrArg (fun z : (ratGL E n).range => (z : GA E n)) h
@@ -45,16 +47,17 @@ theorem isClosed_adCent (d : GL (Fin n) E) : IsClosed (adCent d : Set (GA E n)) 
     exact Units.isEmbedding_embedProduct.t2Space
   have hc : Continuous fun g : GA E n => twConj (thetaA E n) g (ratGL E n d) := by
     unfold twConj
-    exact (continuous_inv.mul continuous_const).mul GlobalTheory.CompanionTheory.KerTwFin.continuous_thetaA
+    exact (continuous_inv.mul continuous_const).mul
+      GlobalTheory.CompanionTheory.KerTwFin.continuous_thetaA
   exact isClosed_eq hc continuous_const
 
-theorem measurable_sdot {m : ℕ} (e : Fin m → SignType) :
-    Measurable fun p : ((Fin m → SignType) → ℝ) × (Fin m → ℝ) => sdot e p.2 := by
+theorem measurable_sdot {m : ℕ} (e : Fin m → SignType)
+    : Measurable fun p : ((Fin m → SignType) → ℝ) × (Fin m → ℝ) => sdot e p.2 := by
   unfold sdot
   exact Finset.measurable_sum _ fun i _ => ((measurable_pi_apply i).comp measurable_snd).const_mul _
 
-theorem measurable_gam (m : ℕ) :
-    Measurable fun p : ((Fin m → SignType) → ℝ) × (Fin m → ℝ) => gam p.1 p.2 := by
+theorem measurable_gam (m : ℕ)
+    : Measurable fun p : ((Fin m → SignType) → ℝ) × (Fin m → ℝ) => gam p.1 p.2 := by
   classical
   unfold gam gamOn
   refine Finset.measurable_sum _ fun s _ => ?_

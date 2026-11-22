@@ -10,8 +10,11 @@ universe u_1
 
 namespace GlobalTheory.UpperUnipotentProductInertiaEigenvalues
 
-theorem isUpUni_mul {K : Type u_1} [inst : CommRing K] {N : ℕ} {U B : Matrix (Fin N) (Fin N) K}
-    (hU : Formalism.MainNotions.S.IsUpUni U) (hB : Formalism.MainNotions.S.IsUpUni B) : Formalism.MainNotions.S.IsUpUni (U * B) := by
+theorem isUpUni_mul
+    {K : Type u_1} [inst : CommRing K]
+    {N : ℕ} {U B : Matrix (Fin N) (Fin N) K}
+    (hU : Formalism.MainNotions.S.IsUpUni U) (hB : Formalism.MainNotions.S.IsUpUni B)
+    : Formalism.MainNotions.S.IsUpUni (U * B) := by
   intro i j
   refine ⟨fun hji => ?_, fun hij => ?_⟩
   · rw [Matrix.mul_apply]

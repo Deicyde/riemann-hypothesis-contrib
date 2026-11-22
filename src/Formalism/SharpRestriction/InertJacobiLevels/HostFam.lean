@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.Inhab
 
-open Formalism.BasicNotions Formalism.FrobeniusOrbits Formalism.TwoAdicCyclotomicDecomposition NumberField
+open Formalism.BasicNotions Formalism.FrobeniusOrbits Formalism.TwoAdicCyclotomicDecomposition
+  NumberField
 open scoped Pointwise
 
 def Rt (s : ℕ) : Ranks where

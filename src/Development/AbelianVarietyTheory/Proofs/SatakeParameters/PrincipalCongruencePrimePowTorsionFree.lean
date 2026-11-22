@@ -87,12 +87,12 @@ end GlobalTheory.CongTorsion
 
 namespace GlobalTheory
 
-
 open GlobalTheory.CongTorsion in
-theorem principalCongruence_torsionFree :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CharZero R] (l m a : ℕ),
-      l.Prime → ¬ IsUnit (l : R) → 2 ≤ m → ∀ (x : Matrix (Fin a) (Fin a) R) (n : ℕ), 0 < n →
-        (1 + ((l : R) ^ m) • x) ^ n = 1 → x = 0 := by
+theorem principalCongruence_torsionFree
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CharZero R] (l m a : ℕ),
+      l.Prime → ¬ IsUnit (l : R) → 2 ≤ m
+        → ∀ (x : Matrix (Fin a) (Fin a) R) (n : ℕ),
+          0 < n → (1 + ((l : R) ^ m) • x) ^ n = 1 → x = 0 := by
   intro R _ _ _ _ l m a hl hlu hm x n hn hx
   have hl0 : (l : R) ≠ 0 := Nat.cast_ne_zero.mpr hl.ne_zero
   have hc0 : (l : R) ^ m ≠ 0 := pow_ne_zero _ hl0
@@ -110,8 +110,7 @@ theorem principalCongruence_torsionFree :
         rcases Nat.eq_zero_or_pos k with h | h
         · rw [h, mul_zero] at hk; omega
         · exact h
-      have hklt : k < n := by
-        rw [hk]; exact lt_mul_left hkpos hp.one_lt
+      have hklt : k < n := by rw [hk]; exact lt_mul_left hkpos hp.one_lt
       have he := one_add_smul_pow ((l : R) ^ m) x p
       rw [hk, pow_mul, he] at hx
       have hx' := ih k hklt _ hkpos hx

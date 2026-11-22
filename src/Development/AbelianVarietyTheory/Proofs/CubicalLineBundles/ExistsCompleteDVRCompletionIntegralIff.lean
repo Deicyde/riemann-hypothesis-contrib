@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.NumberFie
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.LamCM Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.LamCM Formalism.L2.Pj
 open scoped ComplexOrder
 open GlobalTheory GlobalTheory.CM GlobalTheory.Frames GlobalTheory.LamT
 
@@ -37,10 +39,10 @@ private lemma withZero_le_one_iff_log_nonpos {x : WithZero (Multiplicative ℤ)}
   conv_lhs => rw [← WithZero.exp_log hx, ← WithZero.exp_zero]
   exact WithZero.exp_le_exp
 
-theorem exists_cdvr_completion_integral_iff :
-    ∀ (K : Type) [Field K] [NumberField K] (p : HeightOneSpectrum (𝓞 K)),
-      ∃ (T : CDVR) (iK : K →+* T.Fr), T.FinRes ∧
-        ∀ y : K, iK y ∈ Set.range (algebraMap T.V T.Fr) ↔ p.valuation K y ≤ 1 := by
+theorem exists_cdvr_completion_integral_iff
+    : ∀ (K : Type) [Field K] [NumberField K] (p : HeightOneSpectrum (𝓞 K)),
+      ∃ (T : CDVR) (iK : K →+* T.Fr),
+        T.FinRes ∧ ∀ y : K, iK y ∈ Set.range (algebraMap T.V T.Fr) ↔ p.valuation K y ≤ 1 := by
   intro K _ _ p
 
   obtain ⟨T, k, e, hO, hfin⟩ := locFld K K (RingHom.id K) p
@@ -58,7 +60,8 @@ theorem exists_cdvr_completion_integral_iff :
       exact (Valuation.ne_zero_iff _).2 hky
     have hb : p.valuation K y ≠ 0 := (Valuation.ne_zero_iff _).2 hy
 
-    rw [mem_range_algebraMap_iff_valV_le_one, withZero_le_one_iff_log_nonpos ha, withZero_le_one_iff_log_nonpos hb]
+    rw [mem_range_algebraMap_iff_valV_le_one, withZero_le_one_iff_log_nonpos ha,
+      withZero_le_one_iff_log_nonpos hb]
     have h := hv y
     have he' : (0 : ℤ) < e := by exact_mod_cast he
     constructor <;> intro h' <;> nlinarith

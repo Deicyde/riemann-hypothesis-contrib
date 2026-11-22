@@ -12,13 +12,18 @@ noncomputable section
 namespace GlobalTheory.KStableLie
 
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.RealLift
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem mem_of_isExp {V : Type} [AddCommGroup V] [Module ℂ V] {L U : Module.End ℂ V} (hU : IsExp L U)
-    (N : Submodule ℂ V) (hL : ∀ y ∈ N, L y ∈ N) {v : V} (hv : v ∈ N) : U v ∈ N := by
+theorem mem_of_isExp
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {L U : Module.End ℂ V} (hU : IsExp L U)
+    (N : Submodule ℂ V) (hL : ∀ y ∈ N, L y ∈ N)
+    {v : V} (hv : v ∈ N)
+    : U v ∈ N := by
   have hpow : ∀ m : ℕ, (L ^ m) v ∈ N := by
     intro m
     induction m with
@@ -35,7 +40,6 @@ theorem mem_of_isExp {V : Type} [AddCommGroup V] [Module ℂ V] {L U : Module.En
   have hs := hU v l
   rw [h0] at hs
   exact hl (hs.unique hasSum_zero)
-
 
 end GlobalTheory.KStableLie
 

@@ -14,8 +14,10 @@ open CategoryTheory Limits Opposite Abelian
 
 universe w' v u
 
-variable {C : Type u} [Category.{v} C] (J : GrothendieckTopology C)
-  [HasSheafify J AddCommGrpCat.{v}] (U : C)
+variable
+  {C : Type u} [Category.{v} C]
+  (J : GrothendieckTopology C) [HasSheafify J AddCommGrpCat.{v}]
+  (U : C)
 
 section Exact
 
@@ -23,56 +25,63 @@ instance overPullback_additive : (J.overPullback AddCommGrpCat.{v} U).Additive w
   map_add := rfl
 
 attribute [local instance] Classical.decEq in
-instance overPullback_isRightAdjoint : (J.overPullback AddCommGrpCat.{v} U).IsRightAdjoint :=
-  ⟨_, ⟨((Adjunction.mkOfHomEquiv
-    { homEquiv := fun P Q =>
-        { toFun := shriekHomToRestrict
-          invFun := shriekHomOfRestrict
-          left_inv := fun α => by
+instance overPullback_isRightAdjoint : (J.overPullback AddCommGrpCat.{v} U).IsRightAdjoint := ⟨
+  _,
+  ⟨((Adjunction.mkOfHomEquiv {
+          homEquiv := fun P Q => {
+            toFun := shriekHomToRestrict
+            invFun := shriekHomOfRestrict
+            left_inv := fun α => by
+              ext X : 2
+              apply AddCommGrpCat.hom_ext
+              apply DirectSum.addHom_ext
+              intro s x
+              exact (shriekHomOfRestrictApp_of (shriekHomToRestrict α) X s x).trans rfl
+            right_inv := fun β => by
+              ext V x
+              exact shriekHomOfRestrictApp_of β (op V.unop.left) V.unop.hom x
+          }
+          homEquiv_naturality_left_symm := fun {P P' Q} f g => by
             ext X : 2
             apply AddCommGrpCat.hom_ext
             apply DirectSum.addHom_ext
             intro s x
-            exact (shriekHomOfRestrictApp_of (shriekHomToRestrict α) X s x).trans rfl
-          right_inv := fun β => by
-            ext V x
-            exact shriekHomOfRestrictApp_of β (op V.unop.left) V.unop.hom x }
-      homEquiv_naturality_left_symm := fun {P P' Q} f g => by
-        ext X : 2
-        apply AddCommGrpCat.hom_ext
-        apply DirectSum.addHom_ext
-        intro s x
-        refine (shriekHomOfRestrictApp_of (f ≫ g) X s x).trans ?_
-        refine Eq.trans ?_ (congrArg (shriekHomOfRestrictApp g X)
-          (shriekPresheafMap_app_of f X s x).symm)
-        exact (shriekHomOfRestrictApp_of g X s _).symm
-      homEquiv_naturality_right := fun {P Q Q'} f g => rfl } :
-        shriekFunctor U ⊣
-          (Functor.whiskeringLeft _ _ AddCommGrpCat.{v}).obj (Over.forget U).op).comp
-    (sheafificationAdjunction J AddCommGrpCat.{v})).restrictFullyFaithful
+            refine (shriekHomOfRestrictApp_of (f ≫ g) X s x).trans ?_
+            refine Eq.trans ?_
+              (congrArg (shriekHomOfRestrictApp g X) (shriekPresheafMap_app_of f X s x).symm)
+            exact (shriekHomOfRestrictApp_of g X s _).symm
+          homEquiv_naturality_right := fun {P Q Q'} f g => rfl
+        }
+        : shriekFunctor U
+          ⊣ (Functor.whiskeringLeft _ _ AddCommGrpCat.{v}).obj (Over.forget U).op).comp
+      (sheafificationAdjunction J AddCommGrpCat.{v})).restrictFullyFaithful
     (iC := sheafToPresheaf (J.over U) AddCommGrpCat.{v}) (iD := 𝟭 _)
-    (fullyFaithfulSheafToPresheaf _ _) (Functor.FullyFaithful.id _)
-    (Functor.rightUnitor _).symm
+    (fullyFaithfulSheafToPresheaf _ _) (Functor.FullyFaithful.id _) (Functor.rightUnitor _).symm
     (Functor.leftUnitor _ ≪≫ ((Over.forget U).sheafPushforwardContinuousCompSheafToPresheafIso
-      AddCommGrpCat.{v} (J.over U) J).symm)⟩⟩
+      AddCommGrpCat.{v} (J.over U) J).symm)⟩
+⟩
 
-instance overPullback_preservesFiniteLimits :
-    PreservesFiniteLimits (J.overPullback AddCommGrpCat.{v} U) := inferInstance
+instance overPullback_preservesFiniteLimits
+    : PreservesFiniteLimits (J.overPullback AddCommGrpCat.{v} U) :=
+  inferInstance
 
-variable [HasSheafify (J.over U) AddCommGrpCat.{v}] [J.WEqualsLocallyBijective AddCommGrpCat.{v}]
+variable
+  [HasSheafify (J.over U) AddCommGrpCat.{v}] [J.WEqualsLocallyBijective AddCommGrpCat.{v}]
   [(J.over U).WEqualsLocallyBijective AddCommGrpCat.{v}]
-  [J.HasSheafCompose (forget AddCommGrpCat.{v})] [(J.over U).HasSheafCompose (forget AddCommGrpCat.{v})]
+  [J.HasSheafCompose (forget AddCommGrpCat.{v})]
+  [(J.over U).HasSheafCompose (forget AddCommGrpCat.{v})]
 
-instance overPullback_preservesEpimorphisms :
-    (J.overPullback AddCommGrpCat.{v} U).PreservesEpimorphisms where
+instance overPullback_preservesEpimorphisms
+    : (J.overPullback AddCommGrpCat.{v} U).PreservesEpimorphisms where
   preserves {F G} φ _ := by
-    have : Sheaf.IsLocallySurjective φ := (Sheaf.isLocallySurjective_iff_epi' (A := AddCommGrpCat.{v}) φ).2 inferInstance
+    have : Sheaf.IsLocallySurjective φ :=
+      (Sheaf.isLocallySurjective_iff_epi' (A := AddCommGrpCat.{v}) φ).2 inferInstance
     have : Sheaf.IsLocallySurjective ((J.overPullback AddCommGrpCat.{v} U).map φ) :=
       Presheaf.isLocallySurjective_whisker (J.over U) J (Over.forget U) φ.hom
     exact (Sheaf.isLocallySurjective_iff_epi' (A := AddCommGrpCat.{v}) _).1 this
 
-instance overPullback_preservesFiniteColimits :
-    PreservesFiniteColimits (J.overPullback AddCommGrpCat.{v} U) := by
+instance overPullback_preservesFiniteColimits
+    : PreservesFiniteColimits (J.overPullback AddCommGrpCat.{v} U) := by
   have h := (Functor.preservesFiniteLimits_tfae (J.overPullback AddCommGrpCat.{v} U)).out 4 1
   refine ((Functor.preservesFiniteColimits_tfae (J.overPullback AddCommGrpCat.{v} U)).out 1 4).1 ?_
   intro S hS
@@ -85,13 +94,12 @@ section Const
 
 variable [HasSheafify (J.over U) AddCommGrpCat.{v}]
 
-
 omit [HasSheafify J AddCommGrpCat.{v}] in
-noncomputable def overConstHomAddEquiv (G : Sheaf (J.over U) AddCommGrpCat.{v}) :
-    ((constantSheaf (J.over U) AddCommGrpCat.{v}).obj (AddCommGrpCat.of (ULift.{v} ℤ)) ⟶ G) ≃+
-      G.obj.obj (op (Over.mk (𝟙 U))) :=
-  ((constantSheafAdj (J.over U) AddCommGrpCat.{v} (Over.mkIdTerminal (X := U))).homAddEquiv _ G).trans
-    (AddCommGrpCat.uliftZMultiplesAddEquiv _)
+noncomputable def overConstHomAddEquiv (G : Sheaf (J.over U) AddCommGrpCat.{v})
+    : ((constantSheaf (J.over U) AddCommGrpCat.{v}).obj (AddCommGrpCat.of (ULift.{v} ℤ)) ⟶ G)
+      ≃+ G.obj.obj (op (Over.mk (𝟙 U))) :=
+  ((constantSheafAdj (J.over U) AddCommGrpCat.{v} (Over.mkIdTerminal (X := U))).homAddEquiv _
+    G).trans (AddCommGrpCat.uliftZMultiplesAddEquiv _)
 
 omit [HasSheafify J AddCommGrpCat.{v}] in
 lemma overConstHomAddEquiv_naturality {G G' : Sheaf (J.over U) AddCommGrpCat.{v}}
@@ -102,22 +110,24 @@ lemma overConstHomAddEquiv_naturality {G G' : Sheaf (J.over U) AddCommGrpCat.{v}
     Adjunction.homEquiv_naturality_right]
   rfl
 
-noncomputable def overUnitMap :
-    (constantSheaf (J.over U) AddCommGrpCat.{v}).obj (AddCommGrpCat.of (ULift.{v} ℤ)) ⟶
-      (freeSheaf J U).over U :=
+noncomputable def overUnitMap
+    : (constantSheaf (J.over U) AddCommGrpCat.{v}).obj (AddCommGrpCat.of (ULift.{v} ℤ))
+      ⟶ (freeSheaf J U).over U :=
   (overConstHomAddEquiv J U _).symm (freeSheafHomAddEquiv U (freeSheaf J U) (𝟙 _))
 
 end Const
 
 section Main
 
-variable [HasSheafify (J.over U) AddCommGrpCat.{v}] [J.WEqualsLocallyBijective AddCommGrpCat.{v}]
+variable
+  [HasSheafify (J.over U) AddCommGrpCat.{v}] [J.WEqualsLocallyBijective AddCommGrpCat.{v}]
   [(J.over U).WEqualsLocallyBijective AddCommGrpCat.{v}]
-  [J.HasSheafCompose (forget AddCommGrpCat.{v})] [(J.over U).HasSheafCompose (forget AddCommGrpCat.{v})]
-  [HasExt.{w'} (Sheaf J AddCommGrpCat.{v})] [HasExt.{w'} (Sheaf (J.over U) AddCommGrpCat.{v})]
+  [J.HasSheafCompose (forget AddCommGrpCat.{v})]
+  [(J.over U).HasSheafCompose (forget AddCommGrpCat.{v})] [HasExt.{w'} (Sheaf J AddCommGrpCat.{v})]
+  [HasExt.{w'} (Sheaf (J.over U) AddCommGrpCat.{v})]
 
-noncomputable def overCohomologyMap (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) :
-    Ext (freeSheaf J U) F n →+ Sheaf.H (F.over U) n :=
+noncomputable def overCohomologyMap (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ)
+    : Ext (freeSheaf J U) F n →+ Sheaf.H (F.over U) n :=
   ((Ext.mk₀ (overUnitMap J U)).precomp _ (zero_add n)).comp
     ((J.overPullback AddCommGrpCat.{v} U).mapExtAddHom (freeSheaf J U) F n)
 
@@ -169,10 +179,9 @@ lemma overCohomologyMap_zero_bijective (F : Sheaf J AddCommGrpCat.{v}) :
   rw [this]
   exact (AddEquiv.bijective _).comp (hΘ.comp (AddEquiv.bijective _))
 
-
 attribute [local instance] Ext.subsingleton_of_injective in
-theorem overCohomologyMap_bijective [EnoughInjectives (Sheaf J AddCommGrpCat.{v})] (n : ℕ) :
-    ∀ F : Sheaf J AddCommGrpCat.{v}, Function.Bijective (overCohomologyMap J U F n) := by
+theorem overCohomologyMap_bijective [EnoughInjectives (Sheaf J AddCommGrpCat.{v})] (n : ℕ)
+    : ∀ F : Sheaf J AddCommGrpCat.{v}, Function.Bijective (overCohomologyMap J U F n) := by
   induction n with
   | zero => exact overCohomologyMap_zero_bijective J U
   | succ n hn =>
@@ -194,26 +203,31 @@ theorem overCohomologyMap_bijective [EnoughInjectives (Sheaf J AddCommGrpCat.{v}
       ((ShortComplex.ab_exact_iff_function_exact _).mp
         (Ext.covariant_sequence_exact₃' _ hS' n (n + 1) rfl))
       (hn _).surjective (hn _)
-      (fun x₁ ↦ Ext.covariant_sequence_exact₁ _ hS x₁
-        (Ext.eq_zero_of_injective (x₁.comp (Ext.mk₀ S.f) (add_zero (n + 1)))) rfl)
-      (fun y₁ ↦ Ext.covariant_sequence_exact₁ _ hS' y₁
-        (Ext.eq_zero_of_injective (y₁.comp (Ext.mk₀ ((J.overPullback AddCommGrpCat.{v} U).map S.f))
-          (add_zero (n + 1)))) rfl)
+      (fun x₁ ↦
+        Ext.covariant_sequence_exact₁ _ hS x₁
+          (Ext.eq_zero_of_injective (x₁.comp (Ext.mk₀ S.f) (add_zero (n + 1)))) rfl)
+      (fun y₁ ↦
+        Ext.covariant_sequence_exact₁ _ hS' y₁
+          (Ext.eq_zero_of_injective (y₁.comp
+            (Ext.mk₀ ((J.overPullback AddCommGrpCat.{v} U).map S.f)) (add_zero (n + 1))))
+          rfl)
 
-noncomputable def cohomologyPresheafOverAddEquiv [EnoughInjectives (Sheaf J AddCommGrpCat.{v})]
-    (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) :
-    (F.cohomologyPresheaf n).obj (op U) ≃+ Sheaf.H (F.over U) n :=
+noncomputable def cohomologyPresheafOverAddEquiv
+    [EnoughInjectives (Sheaf J AddCommGrpCat.{v})] (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ)
+    : (F.cohomologyPresheaf n).obj (op U) ≃+ Sheaf.H (F.over U) n :=
   AddEquiv.ofBijective (overCohomologyMap J U F n) (overCohomologyMap_bijective J U n F)
 
 end Main
 
 section Small
 
-variable {C : Type v} [SmallCategory C] (J : GrothendieckTopology C) (U : C)
+variable
+  {C : Type v} [SmallCategory C]
+  (J : GrothendieckTopology C) (U : C)
   [HasExt.{w'} (Sheaf J AddCommGrpCat.{v})] [HasExt.{w'} (Sheaf (J.over U) AddCommGrpCat.{v})]
 
-noncomputable def cohomologyPresheafOverAddEquivOfSmall (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) :
-    (F.cohomologyPresheaf n).obj (op U) ≃+ Sheaf.H (F.over U) n :=
+noncomputable def cohomologyPresheafOverAddEquivOfSmall (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ)
+    : (F.cohomologyPresheaf n).obj (op U) ≃+ Sheaf.H (F.over U) n :=
   cohomologyPresheafOverAddEquiv J U F n
 
 end Small

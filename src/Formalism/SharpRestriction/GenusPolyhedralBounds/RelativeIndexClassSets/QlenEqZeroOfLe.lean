@@ -19,18 +19,22 @@ open Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField IsDe
 
 namespace Formalism.MainNotions.Gaps.T0
 
-theorem finDim_of_isLat {O K V : Type} [CommRing O] [Field K] [Algebra O K] [AddCommGroup V] [Module K V]
-    [Module O V] [IsScalarTower O K V] (M : Submodule O V) (h : Formalism.LatticeIndexTer.IsLat O K V M) :
-    FiniteDimensional K V := by
+theorem finDim_of_isLat
+    {O K V : Type} [CommRing O] [Field K] [Algebra O K] [AddCommGroup V] [Module K V] [Module O V]
+    [IsScalarTower O K V]
+    (M : Submodule O V) (h : Formalism.LatticeIndexTer.IsLat O K V M)
+    : FiniteDimensional K V := by
   obtain ⟨S, hS⟩ := h.1
   refine ⟨⟨S, ?_⟩⟩
   rw [← h.2, ← hS, Submodule.span_span_of_tower]
 
-theorem qlen_inf_ne_top (O K V : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K]
-    [Algebra O K] [IsFractionRing O K] [AddCommGroup V] [Module K V] [Module O V]
-    [IsScalarTower O K V] (M Θ : Submodule O V) (hM : Formalism.LatticeIndexTer.IsLat O K V M)
-    (hΘ : Formalism.LatticeIndexTer.IsLat O K V Θ) (W : Submodule O V) :
-    Formalism.LatticeIndexTer.qlen O V (M ⊓ W) (Θ ⊓ W) ≠ ⊤ := by
+theorem qlen_inf_ne_top
+    (O K V : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+    [IsFractionRing O K] [AddCommGroup V] [Module K V] [Module O V] [IsScalarTower O K V]
+    (M Θ : Submodule O V)
+    (hM : Formalism.LatticeIndexTer.IsLat O K V M) (hΘ : Formalism.LatticeIndexTer.IsLat O K V Θ)
+    (W : Submodule O V)
+    : Formalism.LatticeIndexTer.qlen O V (M ⊓ W) (Θ ⊓ W) ≠ ⊤ := by
   have hfin := Formalism.LatticeIndexTer.latFinite O K V M Θ hM hΘ
   unfold Formalism.LatticeIndexTer.qlen at hfin ⊢
   let g : ↥(M ⊓ W) →ₗ[O] (↥M ⧸ Θ.comap M.subtype) :=
@@ -41,16 +45,18 @@ theorem qlen_inf_ne_top (O K V : Type) [CommRing O] [IsDomain O] [IsDiscreteValu
       Submodule.Quotient.mk_eq_zero, Submodule.mem_comap, Submodule.subtype_apply,
       Submodule.coe_inclusion, Submodule.mem_inf]
     exact ⟨fun h => ⟨h, hy.2⟩, fun h => h.1⟩
-  have hle := Module.length_le_of_injective (g.ker.liftQ g le_rfl)
-    (LinearMap.ker_eq_bot.1 (Submodule.ker_liftQ_eq_bot _ _ _ le_rfl))
+  have hle :=
+    Module.length_le_of_injective (g.ker.liftQ g le_rfl)
+      (LinearMap.ker_eq_bot.1 (Submodule.ker_liftQ_eq_bot _ _ _ le_rfl))
   rw [hker] at hle
   exact ne_top_of_le_ne_top hfin hle
 
-theorem length_comap_eq {O V W : Type} [CommRing O] [AddCommGroup V] [Module O V] [AddCommGroup W]
-    [Module O W] (f : W →ₗ[O] V) (hf : Function.Injective f) (A B : Submodule O V)
-    (hA : A ≤ LinearMap.range f) :
-    Module.length O (↥(A.comap f) ⧸ (B.comap f).comap (A.comap f).subtype) =
-      Module.length O (↥A ⧸ B.comap A.subtype) := by
+theorem length_comap_eq
+    {O V W : Type} [CommRing O] [AddCommGroup V] [Module O V] [AddCommGroup W] [Module O W]
+    (f : W →ₗ[O] V) (hf : Function.Injective f)
+    (A B : Submodule O V) (hA : A ≤ LinearMap.range f)
+    : Module.length O (↥(A.comap f) ⧸ (B.comap f).comap (A.comap f).subtype)
+      = Module.length O (↥A ⧸ B.comap A.subtype) := by
   let g0 : ↥(A.comap f) →ₗ[O] ↥A := f.restrict (fun x hx => hx)
   have hg : Function.Bijective g0 := by
     constructor
@@ -72,8 +78,9 @@ theorem length_comap_eq {O V W : Type} [CommRing O] [AddCommGroup V] [Module O V
     obtain ⟨x, rfl⟩ := hA hy
     exact ⟨⟨x, hy⟩, hyB, rfl⟩
 
-theorem qlen_eq_zero_of_le {O V : Type} [CommRing O] [AddCommGroup V] [Module O V] (A B : Submodule O V)
-    (h : B ≤ A) : Formalism.LatticeIndexTer.qlen O V B A = 0 := by
+theorem qlen_eq_zero_of_le
+    {O V : Type} [CommRing O] [AddCommGroup V] [Module O V] (A B : Submodule O V) (h : B ≤ A)
+    : Formalism.LatticeIndexTer.qlen O V B A = 0 := by
   unfold Formalism.LatticeIndexTer.qlen
   rw [Module.length_eq_zero_iff]
   refine ⟨fun a b => ?_⟩
@@ -84,13 +91,14 @@ theorem qlen_eq_zero_of_le {O V : Type} [CommRing O] [AddCommGroup V] [Module O 
 
 variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
 
-theorem qlen_eq_inW (X : PJ D B P j) (ka : WeightFamilies.Wt D j) (la : HeightOneSpectrum (𝓞 B.KO))
+theorem qlen_eq_inW
+    (X : PJ D B P j) (ka : WeightFamilies.Wt D j) (la : HeightOneSpectrum (𝓞 B.KO))
     (N N' : Submodule (X.Ol la) (X.Vl la)) (V' : Submodule (X.Kl la) (X.Vl la))
-    (hV' : V' ≤ WL X ka la) :
-    Formalism.LatticeIndexTer.qlen (X.Ol la) ↥(WL X ka la)
-              (inW X ka la N ⊓ (V'.comap (WL X ka la).subtype).restrictScalars (X.Ol la))
-              (inW X ka la N' ⊓ (V'.comap (WL X ka la).subtype).restrictScalars (X.Ol la)) =
-      X.qlen la (N ⊓ X.ofK la V') (N' ⊓ X.ofK la V') := by
+    (hV' : V' ≤ WL X ka la)
+    : Formalism.LatticeIndexTer.qlen (X.Ol la) ↥(WL X ka la)
+        (inW X ka la N ⊓ (V'.comap (WL X ka la).subtype).restrictScalars (X.Ol la))
+        (inW X ka la N' ⊓ (V'.comap (WL X ka la).subtype).restrictScalars (X.Ol la))
+      = X.qlen la (N ⊓ X.ofK la V') (N' ⊓ X.ofK la V') := by
   refine length_comap_eq ((WL X ka la).subtype.restrictScalars (X.Ol la)) ?_ (N ⊓ X.ofK la V')
     (N' ⊓ X.ofK la V') ?_
   · exact Subtype.val_injective

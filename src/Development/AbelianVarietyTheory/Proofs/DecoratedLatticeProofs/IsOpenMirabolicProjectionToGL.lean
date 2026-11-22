@@ -6,21 +6,33 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RootExcha
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.L2.Col GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.VolBridge
+open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.L2.Col
+  GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.VolBridge
 
 namespace GlobalTheory.OpenPr
 
-theorem continuous_embX {k : Type} [Field k] [TopologicalSpace k] [IsTopologicalRing k]
-    {A : Type} [Fintype A] [DecidableEq A] (c : ℕ) :
-    Continuous (embX c : GL A k → GL (A ⊕ Fin c) k) := by
+theorem continuous_embX
+    {k : Type} [Field k] [TopologicalSpace k] [IsTopologicalRing k]
+    {A : Type} [Fintype A] [DecidableEq A]
+    (c : ℕ)
+    : Continuous (embX c : GL A k → GL (A ⊕ Fin c) k) := by
   rw [Units.continuous_iff]
   constructor
-  · change Continuous fun x : GL A k => (fromBlocks (x : Matrix A A k) 0 0 1 : Matrix (A ⊕ Fin c) (A ⊕ Fin c) k)
-    exact (Units.continuous_val).matrix_fromBlocks continuous_const continuous_const continuous_const
-  · change Continuous fun x : GL A k => (fromBlocks ((x⁻¹ : GL A k) : Matrix A A k) 0 0 1 : Matrix (A ⊕ Fin c) (A ⊕ Fin c) k)
-    exact (Units.continuous_coe_inv).matrix_fromBlocks continuous_const continuous_const continuous_const
+  · change Continuous fun x : GL A k =>
+      (fromBlocks (x : Matrix A A k) 0 0 1 : Matrix (A ⊕ Fin c) (A ⊕ Fin c) k)
+    exact (Units.continuous_val).matrix_fromBlocks continuous_const continuous_const
+      continuous_const
+  · change Continuous fun x : GL A k =>
+      (fromBlocks ((x⁻¹ : GL A k) : Matrix A A k) 0 0 1 : Matrix (A ⊕ Fin c) (A ⊕ Fin c) k)
+    exact (Units.continuous_coe_inv).matrix_fromBlocks continuous_const continuous_const
+      continuous_const
 
-theorem isOpen_prX : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {A : Type} [Fintype A] [DecidableEq A] {c : ℕ} (Ck : Subgroup (GL (A ⊕ Fin c) k)) (O : Set (GL (A ⊕ Fin c) k)), IsOpen O → (1 : GL (A ⊕ Fin c) k) ∈ O → (∀ z ∈ R k A c 1, z ∈ O → z ∈ Ck) → IsOpen (prX Ck : Set (GL A k)) := by
+theorem isOpen_prX
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        {A : Type} [Fintype A] [DecidableEq A] {c : ℕ} (Ck : Subgroup (GL (A ⊕ Fin c) k))
+        (O : Set (GL (A ⊕ Fin c) k)),
+      IsOpen O → (1 : GL (A ⊕ Fin c) k) ∈ O → (∀ z ∈ R k A c 1, z ∈ O → z ∈ Ck)
+        → IsOpen (prX Ck : Set (GL A k)) := by
   intro k _ _ _ _ A _ _ c Ck O hO h1 hCk
   have hc : Continuous (embX c : GL A k → GL (A ⊕ Fin c) k) := continuous_embX c
   have hU : IsOpen ((embX c : GL A k → GL (A ⊕ Fin c) k) ⁻¹' O) := hO.preimage hc

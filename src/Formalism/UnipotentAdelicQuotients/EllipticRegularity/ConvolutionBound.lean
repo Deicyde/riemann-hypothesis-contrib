@@ -45,10 +45,12 @@ theorem convolution_bound : ConvBound := by
   have hKm : Measurable K := hK.measurable
   have hFm : Measurable F := hF.measurable
   obtain ⟨k1, hk1e⟩ : ∃ k1 : E d → ℝ≥0∞, k1 = fun ζ => ‖K ζ‖ₑ := ⟨_, rfl⟩
-  obtain ⟨k3, hk3e⟩ : ∃ k3 : E d → ℝ≥0∞, k3 = fun ζ => ENNReal.ofReal (‖ζ‖ * (1 + ‖ζ‖) ^ N) * ‖K ζ‖ₑ :=
+  obtain ⟨k3, hk3e⟩
+      : ∃ k3 : E d → ℝ≥0∞, k3 = fun ζ => ENNReal.ofReal (‖ζ‖ * (1 + ‖ζ‖) ^ N) * ‖K ζ‖ₑ :=
     ⟨_, rfl⟩
   obtain ⟨k2, hk2e⟩ : ∃ k2 : E d → ℝ≥0∞, k2 = fun ζ => ENNReal.ofReal C * k3 ζ := ⟨_, rfl⟩
-  obtain ⟨g1, hg1e⟩ : ∃ g1 : E d → ℝ≥0∞, g1 = fun η => ENNReal.ofReal (om s M ε η) * ‖F η‖ₑ := ⟨_, rfl⟩
+  obtain ⟨g1, hg1e⟩ : ∃ g1 : E d → ℝ≥0∞, g1 = fun η => ENNReal.ofReal (om s M ε η) * ‖F η‖ₑ :=
+    ⟨_, rfl⟩
   obtain ⟨g2, hg2e⟩ : ∃ g2 : E d → ℝ≥0∞, g2 = fun η => ENNReal.ofReal (om (s - 1) M ε η) * ‖F η‖ₑ :=
     ⟨_, rfl⟩
   have hk1 : Measurable k1 := by rw [hk1e]; exact hKm.enorm
@@ -60,14 +62,20 @@ theorem convolution_bound : ConvBound := by
     rw [hg1e]; exact (ENNReal.measurable_ofReal.comp (om_measurable s M ε)).mul hFm.enorm
   have hg2 : Measurable g2 := by
     rw [hg2e]; exact (ENNReal.measurable_ofReal.comp (om_measurable (s - 1) M ε)).mul hFm.enorm
-  have hprod : ∀ k g : E d → ℝ≥0∞, Measurable k → Measurable g →
-      Measurable (Function.uncurry fun ξ η : E d => k (ξ - η) * g η) := fun k g hk hg =>
+  have hprod
+      : ∀ k g : E d → ℝ≥0∞,
+        Measurable k → Measurable g
+          → Measurable (Function.uncurry fun ξ η : E d => k (ξ - η) * g η) := fun k g hk hg =>
     (hk.comp (measurable_fst.sub measurable_snd)).mul (hg.comp measurable_snd)
-  have hT1 : Measurable fun ξ => ∫⁻ η, k1 (ξ - η) * g1 η := (hprod k1 g1 hk1 hg1).lintegral_prod_right'
-  have hT2 : Measurable fun ξ => ∫⁻ η, k2 (ξ - η) * g2 η := (hprod k2 g2 hk2 hg2).lintegral_prod_right'
+  have hT1 : Measurable fun ξ => ∫⁻ η, k1 (ξ - η) * g1 η :=
+    (hprod k1 g1 hk1 hg1).lintegral_prod_right'
+  have hT2 : Measurable fun ξ => ∫⁻ η, k2 (ξ - η) * g2 η :=
+    (hprod k2 g2 hk2 hg2).lintegral_prod_right'
 
-  have hpt : ∀ ξ, ENNReal.ofReal (om s M ε ξ) * ‖conv K F ξ‖ₑ ≤
-      (∫⁻ η, k1 (ξ - η) * g1 η) + ∫⁻ η, k2 (ξ - η) * g2 η := by
+  have hpt
+      : ∀ ξ,
+        ENNReal.ofReal (om s M ε ξ) * ‖conv K F ξ‖ₑ
+          ≤ (∫⁻ η, k1 (ξ - η) * g1 η) + ∫⁻ η, k2 (ξ - η) * g2 η := by
     intro ξ
     have h1 : ‖conv K F ξ‖ₑ ≤ ∫⁻ η, ‖K (ξ - η)‖ₑ * ‖F η‖ₑ := by
       unfold conv
@@ -76,7 +84,8 @@ theorem convolution_bound : ConvBound := by
       rw [enorm_mul]
     have hmeas : Measurable fun η => k1 (ξ - η) * g1 η :=
       (hk1.comp (measurable_const.sub measurable_id)).mul hg1
-    calc ENNReal.ofReal (om s M ε ξ) * ‖conv K F ξ‖ₑ
+    calc
+      ENNReal.ofReal (om s M ε ξ) * ‖conv K F ξ‖ₑ
         ≤ ENNReal.ofReal (om s M ε ξ) * ∫⁻ η, ‖K (ξ - η)‖ₑ * ‖F η‖ₑ := by gcongr
       _ = ∫⁻ η, ENNReal.ofReal (om s M ε ξ) * (‖K (ξ - η)‖ₑ * ‖F η‖ₑ) :=
         (lintegral_const_mul' _ _ ENNReal.ofReal_ne_top).symm
@@ -88,53 +97,67 @@ theorem convolution_bound : ConvBound := by
           linarith
         have hX : 0 ≤ ‖ξ - η‖ * (1 + ‖ξ - η‖) ^ N := by positivity
         have hY := om_nonneg (s - 1) M ε η
-        have he : ENNReal.ofReal (om s M ε ξ) ≤ ENNReal.ofReal (om s M ε η) +
-            ENNReal.ofReal C * (ENNReal.ofReal (‖ξ - η‖ * (1 + ‖ξ - η‖) ^ N) *
-              ENNReal.ofReal (om (s - 1) M ε η)) := by
+        have he
+            : ENNReal.ofReal (om s M ε ξ)
+              ≤ ENNReal.ofReal (om s M ε η)
+                + ENNReal.ofReal C
+                  * (ENNReal.ofReal (‖ξ - η‖ * (1 + ‖ξ - η‖) ^ N)
+                    * ENNReal.ofReal (om (s - 1) M ε η)) := by
           rw [← ENNReal.ofReal_mul hX, ← ENNReal.ofReal_mul hC,
             ← ENNReal.ofReal_add (om_nonneg s M ε η) (by positivity)]
           exact ENNReal.ofReal_le_ofReal (le_of_le_of_eq hr (by ring))
-        calc ENNReal.ofReal (om s M ε ξ) * (‖K (ξ - η)‖ₑ * ‖F η‖ₑ)
-            ≤ (ENNReal.ofReal (om s M ε η) + ENNReal.ofReal C * (ENNReal.ofReal (‖ξ - η‖ * (1 + ‖ξ - η‖) ^ N) *
-              ENNReal.ofReal (om (s - 1) M ε η))) * (‖K (ξ - η)‖ₑ * ‖F η‖ₑ) := by gcongr
-          _ = k1 (ξ - η) * g1 η + k2 (ξ - η) * g2 η := by
-            rw [hk1e, hk2e, hk3e, hg1e, hg2e]; ring
+        calc
+          ENNReal.ofReal (om s M ε ξ) * (‖K (ξ - η)‖ₑ * ‖F η‖ₑ)
+              ≤ (ENNReal.ofReal (om s M ε η)
+                  + ENNReal.ofReal C
+                    * (ENNReal.ofReal (‖ξ - η‖ * (1 + ‖ξ - η‖) ^ N)
+                      * ENNReal.ofReal (om (s - 1) M ε η)))
+                * (‖K (ξ - η)‖ₑ * ‖F η‖ₑ) := by
+            gcongr
+          _ = k1 (ξ - η) * g1 η + k2 (ξ - η) * g2 η := by rw [hk1e, hk2e, hk3e, hg1e, hg2e]; ring
       _ = (∫⁻ η, k1 (ξ - η) * g1 η) + ∫⁻ η, k2 (ξ - η) * g2 η := lintegral_add_left hmeas _
-  have hn : nrm s M ε (conv K F) ≤
-      ∫⁻ ξ, ((∫⁻ η, k1 (ξ - η) * g1 η) + ∫⁻ η, k2 (ξ - η) * g2 η) ^ (2 : ℝ) := by
+  have hn
+      : nrm s M ε (conv K F)
+        ≤ ∫⁻ ξ, ((∫⁻ η, k1 (ξ - η) * g1 η) + ∫⁻ η, k2 (ξ - η) * g2 η) ^ (2 : ℝ) := by
     unfold nrm
     refine lintegral_mono fun ξ => ?_
     rw [ENNReal.rpow_two, ← mul_pow]
     gcongr
     exact hpt ξ
-  have hY : ∀ (k g : E d → ℝ≥0∞), Measurable k → Measurable g →
-      (∫⁻ ξ, (∫⁻ η, k (ξ - η) * g η) ^ (2 : ℝ)) ^ (1 / 2 : ℝ) ≤
-        (∫⁻ ζ, k ζ) * (∫⁻ η, g η ^ 2) ^ (1 / 2 : ℝ) := by
+  have hY
+      : ∀ (k g : E d → ℝ≥0∞),
+        Measurable k → Measurable g
+          → (∫⁻ ξ, (∫⁻ η, k (ξ - η) * g η) ^ (2 : ℝ)) ^ (1 / 2 : ℝ)
+            ≤ (∫⁻ ζ, k ζ) * (∫⁻ η, g η ^ 2) ^ (1 / 2 : ℝ) := by
     intro k g hk hg
     have h := conv_young k g hk hg
     simp only [← ENNReal.rpow_two] at h ⊢
-    calc (∫⁻ ξ, (∫⁻ η, k (ξ - η) * g η) ^ (2 : ℝ)) ^ (1 / 2 : ℝ)
-        ≤ ((∫⁻ ζ, k ζ) ^ (2 : ℝ) * ∫⁻ η, g η ^ (2 : ℝ)) ^ (1 / 2 : ℝ) :=
-          ENNReal.rpow_le_rpow h (by norm_num)
+    calc
+      (∫⁻ ξ, (∫⁻ η, k (ξ - η) * g η) ^ (2 : ℝ)) ^ (1 / 2 : ℝ)
+          ≤ ((∫⁻ ζ, k ζ) ^ (2 : ℝ) * ∫⁻ η, g η ^ (2 : ℝ)) ^ (1 / 2 : ℝ) :=
+        ENNReal.rpow_le_rpow h (by norm_num)
       _ = (∫⁻ ζ, k ζ) * (∫⁻ η, g η ^ (2 : ℝ)) ^ (1 / 2 : ℝ) := by
         rw [ENNReal.mul_rpow_of_nonneg _ _ (by norm_num), ← ENNReal.rpow_mul]; norm_num
-  have e1 : ∫⁻ η, g1 η ^ 2 = nrm s M ε F := by
-    unfold nrm; rw [hg1e]; simp only [mul_pow]
-  have e2 : ∫⁻ η, g2 η ^ 2 = nrm (s - 1) M ε F := by
-    unfold nrm; rw [hg2e]; simp only [mul_pow]
-  have e3 : ∫⁻ ζ, k2 ζ = ENNReal.ofReal C * ∫⁻ ζ, ENNReal.ofReal (‖ζ‖ * (1 + ‖ζ‖) ^ N) * ‖K ζ‖ₑ := by
+  have e1 : ∫⁻ η, g1 η ^ 2 = nrm s M ε F := by unfold nrm; rw [hg1e]; simp only [mul_pow]
+  have e2 : ∫⁻ η, g2 η ^ 2 = nrm (s - 1) M ε F := by unfold nrm; rw [hg2e]; simp only [mul_pow]
+  have e3
+      : ∫⁻ ζ, k2 ζ = ENNReal.ofReal C * ∫⁻ ζ, ENNReal.ofReal (‖ζ‖ * (1 + ‖ζ‖) ^ N) * ‖K ζ‖ₑ := by
     rw [hk2e, lintegral_const_mul _ hk3, hk3e]
   have e4 : ∫⁻ ζ, k1 ζ = ∫⁻ ζ, ‖K ζ‖ₑ := by rw [hk1e]
-  have hMk := ENNReal.lintegral_Lp_add_le (μ := volume) (p := 2) hT1.aemeasurable hT2.aemeasurable
-    (by norm_num)
+  have hMk :=
+    ENNReal.lintegral_Lp_add_le (μ := volume) (p := 2) hT1.aemeasurable hT2.aemeasurable
+      (by norm_num)
   simp only [Pi.add_apply] at hMk
-  calc nrm s M ε (conv K F) ^ (1 / 2 : ℝ)
-      ≤ (∫⁻ ξ, ((∫⁻ η, k1 (ξ - η) * g1 η) + ∫⁻ η, k2 (ξ - η) * g2 η) ^ (2 : ℝ)) ^ (1 / 2 : ℝ) :=
-        ENNReal.rpow_le_rpow hn (by norm_num)
-    _ ≤ (∫⁻ ξ, (∫⁻ η, k1 (ξ - η) * g1 η) ^ (2 : ℝ)) ^ (1 / 2 : ℝ) +
-        (∫⁻ ξ, (∫⁻ η, k2 (ξ - η) * g2 η) ^ (2 : ℝ)) ^ (1 / 2 : ℝ) := hMk
-    _ ≤ (∫⁻ ζ, k1 ζ) * (∫⁻ η, g1 η ^ 2) ^ (1 / 2 : ℝ) + (∫⁻ ζ, k2 ζ) * (∫⁻ η, g2 η ^ 2) ^ (1 / 2 : ℝ) :=
-        add_le_add (hY k1 g1 hk1 hg1) (hY k2 g2 hk2 hg2)
+  calc
+    nrm s M ε (conv K F) ^ (1 / 2 : ℝ)
+        ≤ (∫⁻ ξ, ((∫⁻ η, k1 (ξ - η) * g1 η) + ∫⁻ η, k2 (ξ - η) * g2 η) ^ (2 : ℝ)) ^ (1 / 2 : ℝ) :=
+      ENNReal.rpow_le_rpow hn (by norm_num)
+    _ ≤ (∫⁻ ξ, (∫⁻ η, k1 (ξ - η) * g1 η) ^ (2 : ℝ)) ^ (1 / 2 : ℝ)
+        + (∫⁻ ξ, (∫⁻ η, k2 (ξ - η) * g2 η) ^ (2 : ℝ)) ^ (1 / 2 : ℝ) :=
+      hMk
+    _ ≤ (∫⁻ ζ, k1 ζ) * (∫⁻ η, g1 η ^ 2) ^ (1 / 2 : ℝ)
+        + (∫⁻ ζ, k2 ζ) * (∫⁻ η, g2 η ^ 2) ^ (1 / 2 : ℝ) :=
+      add_le_add (hY k1 g1 hk1 hg1) (hY k2 g2 hk2 hg2)
     _ = _ := by rw [e1, e2, e3, e4]
 
 end ZetaZeros.D.EllReg

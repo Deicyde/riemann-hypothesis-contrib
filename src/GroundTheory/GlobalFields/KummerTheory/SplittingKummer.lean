@@ -16,23 +16,26 @@ open scoped TensorProduct
 
 section Local
 
-variable {K : Type*} [Field K] {n : ℕ} [NeZero n] [HasEnoughRootsOfUnity K n]
-  {Ω : Type*} [Field Ω] [Algebra K Ω] {Δ : Subgroup Kˣ}
-  {F E : Type*} [Field F] [Field E] [Algebra K F] [Algebra F E] [Algebra K E]
-  [IsScalarTower K F E]
-
+variable
+  {K : Type*} [Field K]
+  {n : ℕ} [NeZero n] [HasEnoughRootsOfUnity K n]
+  {Ω : Type*} [Field Ω] [Algebra K Ω]
+  {Δ : Subgroup Kˣ} {F E : Type*}
+  [Field F] [Field E] [Algebra K F] [Algebra F E] [Algebra K E] [IsScalarTower K F E]
 
 omit [NeZero n] [HasEnoughRootsOfUnity K n] [IsScalarTower K F E] in
-theorem kummerExtension_pow_eq {y : kummerExtension K n Ω Δ} {a : K}
-    (hy : (y : Ω) ^ n = algebraMap K Ω a) :
-    y ^ n = algebraMap K (kummerExtension K n Ω Δ) a :=
+theorem kummerExtension_pow_eq
+    {y : kummerExtension K n Ω Δ} {a : K} (hy : (y : Ω) ^ n = algebraMap K Ω a)
+    : y ^ n = algebraMap K (kummerExtension K n Ω Δ) a :=
   Subtype.ext (by rw [IntermediateField.coe_pow, hy]; rfl)
 
-theorem algHom_kummerExtension_mem_fieldRange (ι : kummerExtension K n Ω Δ →ₐ[K] E)
-    (h : ∀ a ∈ Δ, ∃ x : F, x ^ n = algebraMap K F (a : K)) (m : kummerExtension K n Ω Δ) :
-    ι m ∈ (algebraMap F E).fieldRange := by
-  have key : ∀ (y : kummerExtension K n Ω Δ), ∀ a ∈ Δ, (y : Ω) ^ n = algebraMap K Ω (a : K) →
-      ι y ∈ (algebraMap F E).fieldRange := by
+theorem algHom_kummerExtension_mem_fieldRange
+    (ι : kummerExtension K n Ω Δ →ₐ[K] E) (h : ∀ a ∈ Δ, ∃ x : F, x ^ n = algebraMap K F (a : K))
+    (m : kummerExtension K n Ω Δ)
+    : ι m ∈ (algebraMap F E).fieldRange := by
+  have key
+      : ∀ (y : kummerExtension K n Ω Δ), ∀ a ∈ Δ,
+        (y : Ω) ^ n = algebraMap K Ω (a : K) → ι y ∈ (algebraMap F E).fieldRange := by
     intro y a ha hy
     obtain ⟨x, hx⟩ := h a ha
     obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_isPrimitiveRoot K n
@@ -72,11 +75,12 @@ theorem algHom_kummerExtension_mem_fieldRange (ι : kummerExtension K n Ω Δ �
     rw [map_mul]
     exact mul_mem ihx ihy
 
-
 omit [Algebra K E] [IsScalarTower K F E] in
-theorem finrank_eq_one_of_tensor_surjective {A : Type*} [CommRing A] [Algebra K A]
-    (g : F ⊗[K] A →ₐ[F] E) (hg : Function.Surjective g)
-    (hA : ∀ m : A, g (1 ⊗ₜ m) ∈ (algebraMap F E).fieldRange) : finrank F E = 1 := by
+theorem finrank_eq_one_of_tensor_surjective
+    {A : Type*} [CommRing A] [Algebra K A]
+    (g : F ⊗[K] A →ₐ[F] E)
+    (hg : Function.Surjective g) (hA : ∀ m : A, g (1 ⊗ₜ m) ∈ (algebraMap F E).fieldRange)
+    : finrank F E = 1 := by
   rw [← Subalgebra.bot_eq_top_iff_finrank_eq_one]
   refine eq_top_iff.2 fun e he ↦ ?_
   clear he
@@ -89,9 +93,9 @@ theorem finrank_eq_one_of_tensor_surjective {A : Type*} [CommRing A] [Algebra K 
     exact Subalgebra.smul_mem _ (Algebra.mem_bot.2 (hA m)) c
   | add x y hx hy => rw [map_add]; exact add_mem hx hy
 
-theorem finrank_eq_one_iff_of_kummerExtension [IsSepClosed Ω]
-    (g : F ⊗[K] kummerExtension K n Ω Δ →ₐ[F] E) (hg : Function.Surjective g) :
-    finrank F E = 1 ↔ ∀ a ∈ Δ, ∃ x : F, x ^ n = algebraMap K F (a : K) := by
+theorem finrank_eq_one_iff_of_kummerExtension
+    [IsSepClosed Ω] (g : F ⊗[K] kummerExtension K n Ω Δ →ₐ[F] E) (hg : Function.Surjective g)
+    : finrank F E = 1 ↔ ∀ a ∈ Δ, ∃ x : F, x ^ n = algebraMap K F (a : K) := by
   let ι : kummerExtension K n Ω Δ →ₐ[K] E :=
     (g.restrictScalars K).comp Algebra.TensorProduct.includeRight
   constructor
@@ -116,18 +120,19 @@ end Local
 
 section Global
 
-variable {K : Type*} [Field K] [NumberField K] {n : ℕ} [NeZero n] [HasEnoughRootsOfUnity K n]
-  {Ω : Type*} [Field Ω] [Algebra K Ω] [IsSepClosed Ω] {Δ : Subgroup Kˣ}
-  [Finite (Δ ⧸ (unitsPow K n).subgroupOf Δ)]
+variable
+  {K : Type*} [Field K] [NumberField K]
+  {n : ℕ} [NeZero n] [HasEnoughRootsOfUnity K n]
+  {Ω : Type*} [Field Ω] [Algebra K Ω] [IsSepClosed Ω]
+  {Δ : Subgroup Kˣ} [Finite (Δ ⧸ (unitsPow K n).subgroupOf Δ)]
 
 instance numberField_kummerExtension : NumberField (kummerExtension K n Ω Δ) :=
   NumberField.of_module_finite K _
 
-
 open SemiLocal in
-theorem splitsCompletely_kummerExtension_iff (v : HeightOneSpectrum (𝓞 K)) :
-    SplitsCompletely (kummerExtension K n Ω Δ) v ↔
-      ∀ a ∈ Δ, ∃ x : v.adicCompletion K, x ^ n = algebraMap K (v.adicCompletion K) (a : K) := by
+theorem splitsCompletely_kummerExtension_iff (v : HeightOneSpectrum (𝓞 K))
+    : SplitsCompletely (kummerExtension K n Ω Δ) v
+      ↔ ∀ a ∈ Δ, ∃ x : v.adicCompletion K, x ^ n = algebraMap K (v.adicCompletion K) (a : K) := by
   have key (w : PlacesOver (kummerExtension K n Ω Δ) v) :=
     finrank_eq_one_iff_of_kummerExtension
       ((Pi.evalAlgHom (v.adicCompletion K) _ w).comp
@@ -138,11 +143,10 @@ theorem splitsCompletely_kummerExtension_iff (v : HeightOneSpectrum (𝓞 K)) :
   obtain ⟨w⟩ := nonempty_placesOver (kummerExtension K n Ω Δ) v
   exact (key w).1 (h w)
 
-
 open scoped NumberField.LiesOver in
-theorem InfinitePlace.splitsCompletely_kummerExtension_iff (v : NumberField.InfinitePlace K) :
-    InfinitePlace.SplitsCompletely (kummerExtension K n Ω Δ) v ↔
-      ∀ a ∈ Δ, ∃ x : v.Completion, x ^ n = algebraMap K v.Completion (a : K) := by
+theorem InfinitePlace.splitsCompletely_kummerExtension_iff (v : NumberField.InfinitePlace K)
+    : InfinitePlace.SplitsCompletely (kummerExtension K n Ω Δ) v
+      ↔ ∀ a ∈ Δ, ∃ x : v.Completion, x ^ n = algebraMap K v.Completion (a : K) := by
   have key (w : v.placesOver (kummerExtension K n Ω Δ)) :=
     finrank_eq_one_iff_of_kummerExtension
       ((Pi.evalAlgHom v.Completion _ w).comp

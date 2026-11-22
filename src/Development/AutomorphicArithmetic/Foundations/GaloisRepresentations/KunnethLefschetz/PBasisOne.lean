@@ -18,8 +18,7 @@ theorem basisOne_holds : BasisOne := by
     push_neg at hc
     exact h0 (LinearMap.ext hc)
   set v : M := (lam x)⁻¹ • x with hvdef
-  have hv : lam v = 1 := by
-    rw [hvdef, map_smul, smul_eq_mul, inv_mul_cancel₀ hx]
+  have hv : lam v = 1 := by rw [hvdef, map_smul, smul_eq_mul, inv_mul_cancel₀ hx]
   set N := LinearMap.ker lam
   let e := Module.finBasis F N
   let f : Fin (Module.finrank F N + 1) → M := Fin.cons v (fun i => v + (e i : M))
@@ -30,8 +29,7 @@ theorem basisOne_holds : BasisOne := by
   have hcard : Fintype.card (Fin (Module.finrank F N + 1)) = Module.finrank F M := by
     rw [Fintype.card_fin, ← LinearMap.finrank_range_add_finrank_ker lam, hrange, finrank_top,
       Module.finrank_self, add_comm]
-  have hvmem : v ∈ Submodule.span F (Set.range f) :=
-    Submodule.subset_span ⟨0, by simp [f]⟩
+  have hvmem : v ∈ Submodule.span F (Set.range f) := Submodule.subset_span ⟨0, by simp [f]⟩
   have hemem : ∀ i, (e i : M) ∈ Submodule.span F (Set.range f) := by
     intro i
     have h1 : v + (e i : M) ∈ Submodule.span F (Set.range f) :=

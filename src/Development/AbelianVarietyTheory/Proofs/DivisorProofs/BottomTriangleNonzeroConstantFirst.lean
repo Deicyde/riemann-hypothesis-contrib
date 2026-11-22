@@ -24,8 +24,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardLatt
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset MeasureTheory
-open Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset MeasureTheory
+open Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
 open Formalism.DivisionValues (vw)
 open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
@@ -39,12 +43,16 @@ namespace GlobalTheory.BotClassSumSmall
 
 open scoped ComplexOrder
 
-
 open GlobalTheory.DefiniteClassAvg in
-theorem openCompact {D : D7} {T : Type} {A A' WW : HSp D} (X : Tri T A A' WW) (hstd : X.rA'.IsStd) :
-    IsOpen (((Formalism.L2.DIV.St X.rA'.β).comap (Lev.finE A') : Subgroup (GA D A')) : Set (GA D A')) ∧
-    IsCompact (((Formalism.L2.DIV.St X.rA'.β).comap (Lev.finE A') : Subgroup (GA D A')) : Set (GA D A')) := by
-  have hJo : IsOpen (((Formalism.L2.DIV.St X.rA'.β).comap (Lev.finE A') : Subgroup (GA D A')) : Set (GA D A')) := by
+theorem openCompact {D : D7} {T : Type} {A A' WW : HSp D} (X : Tri T A A' WW) (hstd : X.rA'.IsStd)
+    : IsOpen
+        (((Formalism.L2.DIV.St X.rA'.β).comap (Lev.finE A') : Subgroup (GA D A')) : Set (GA D A'))
+      ∧ IsCompact
+        (((Formalism.L2.DIV.St X.rA'.β).comap (Lev.finE A') : Subgroup (GA D A'))
+          : Set (GA D A')) := by
+  have hJo : IsOpen
+      (((Formalism.L2.DIV.St X.rA'.β).comap (Lev.finE A') : Subgroup (GA D A'))
+        : Set (GA D A')) := by
     refine Subgroup.isOpen_of_mem_nhds _ (g := 1) ?_
     filter_upwards [GlobalTheory.ThetaIntegrand.eventually_princ A' X.rA'.β ∅] with κ h1
     exact h1.2.1
@@ -52,18 +60,27 @@ theorem openCompact {D : D7} {T : Type} {A A' WW : HSp D} (X : Tri T A A' WW) (h
     rw [hstd.1, Matrix.map_one φ (map_zero φ) (map_one φ)]
     exact Matrix.PosDef.one
   let V' : HSp D := { A' with sig := fun _ => (A'.rank, 0) }
-  have hS' : V'.SigOK := fun τ => GlobalTheory.Proof.GenusMassSignature.hasSignature_of_posDef (hV τ)
+  have hS' : V'.SigOK := fun τ =>
+    GlobalTheory.Proof.GenusMassSignature.hasSignature_of_posDef (hV τ)
   have hD' : V'.IsDefinite := fun τ => Or.inl rfl
-  have hGc : IsCompact (GinfC A' : Set (GA D A')) := Formalism.IndefR.Eqv.isCompact_GinfC (V := V') hS' hD'
-  have hLc : IsCompact ((Lev.levA A' (Formalism.L2.DIV.St X.rA'.β) : Subgroup (GA D A')) : Set (GA D A')) := by
+  have hGc : IsCompact (GinfC A' : Set (GA D A')) :=
+    Formalism.IndefR.Eqv.isCompact_GinfC (V := V') hS' hD'
+  have hLc : IsCompact
+      ((Lev.levA A' (Formalism.L2.DIV.St X.rA'.β) : Subgroup (GA D A')) : Set (GA D A')) := by
     obtain ⟨C, hC, hCm⟩ := GlobalTheory.ParahoricCompact.exists_compact A' X.rA'.β
-    refine hC.of_isClosed_subset ((GlobalTheory.Ker.CongTop.isClosed_GfC A').inter
-      (Subgroup.isClosed_of_isOpen _ hJo)) fun k hk => ?_
+    refine hC.of_isClosed_subset
+      ((GlobalTheory.Ker.CongTop.isClosed_GfC A').inter (Subgroup.isClosed_of_isOpen _ hJo))
+      fun k hk => ?_
     obtain ⟨hk1, hk2⟩ := Lev.mem_levA.1 hk
     exact hCm k hk1 hk2
   refine ⟨hJo, (hLc.mul hGc).of_isClosed_subset (Subgroup.isClosed_of_isOpen _ hJo) ?_⟩
   intro k hk
-  exact ⟨finPart A' k, finPart_mem_levA A' hk, realPart A' k, realPart_mem A' k, finPart_mul_realPart A' k⟩
-
+  exact ⟨
+    finPart A' k,
+    finPart_mem_levA A' hk,
+    realPart A' k,
+    realPart_mem A' k,
+    finPart_mul_realPart A' k
+  ⟩
 
 end GlobalTheory.BotClassSumSmall

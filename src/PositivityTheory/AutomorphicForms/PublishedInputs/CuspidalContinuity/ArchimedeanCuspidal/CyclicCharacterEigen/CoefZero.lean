@@ -11,11 +11,12 @@ open scoped MatrixGroups ModularForm
 
 namespace Ad3P.EigenformCoefficientExpansion
 
-theorem exp_of {k N : ℕ} [NeZero N] (f : CuspForm (Gamma1 N) (k : ℤ)) (τ : ℍ) :
-    HasSum (fun n : ℕ => coef f n * Complex.exp (2 * Real.pi * Complex.I * n * τ)) (f τ) := by
+theorem exp_of {k N : ℕ} [NeZero N] (f : CuspForm (Gamma1 N) (k : ℤ)) (τ : ℍ)
+    : HasSum (fun n : ℕ => coef f n * Complex.exp (2 * Real.pi * Complex.I * n * τ)) (f τ) := by
   have hp : (1 : ℝ) ∈ (Gamma1 N : Subgroup (GL (Fin 2) ℝ)).strictPeriods := by simp
-  have h := hasSum_qExpansion one_pos (SlashInvariantFormClass.periodic_comp_ofComplex f hp)
-    f.holo' (ModularFormClass.bdd_at_infty f) τ
+  have h :=
+    hasSum_qExpansion one_pos (SlashInvariantFormClass.periodic_comp_ofComplex f hp) f.holo'
+      (ModularFormClass.bdd_at_infty f) τ
   refine cast (congrArg (HasSum · (f τ)) (funext fun n => ?_)) h
   rw [smul_eq_mul, Function.Periodic.qParam, ← Complex.exp_nat_mul, coef]
   congr 2

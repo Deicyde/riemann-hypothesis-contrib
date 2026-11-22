@@ -9,13 +9,18 @@ open scoped NNReal ENNReal
 
 namespace GlobalTheory.CompanionTheory.ModChar
 
-theorem modularCharacterFun_eq_of_map_left_mul :
-    ∀ (Q : Type) [Group Q] [TopologicalSpace Q] [IsTopologicalGroup Q] [LocallyCompactSpace Q] [T2Space Q] [SecondCountableTopology Q] [MeasurableSpace Q] [BorelSpace Q] (ρ : Measure Q) [IsFiniteMeasureOnCompacts ρ] [ρ.IsOpenPosMeasure] [ρ.IsMulRightInvariant] (δ : Q →* ℝ≥0), (∀ q : Q, ρ.map (fun x => q * x) = (δ q)⁻¹ • ρ) → ∀ q : Q, Measure.modularCharacterFun q = δ q := by
+theorem modularCharacterFun_eq_of_map_left_mul
+    : ∀ (Q : Type) [Group Q] [TopologicalSpace Q] [IsTopologicalGroup Q] [LocallyCompactSpace Q]
+        [T2Space Q] [SecondCountableTopology Q] [MeasurableSpace Q] [BorelSpace Q] (ρ : Measure Q)
+        [IsFiniteMeasureOnCompacts ρ] [ρ.IsOpenPosMeasure] [ρ.IsMulRightInvariant] (δ : Q →* ℝ≥0),
+      (∀ q : Q, ρ.map (fun x => q * x) = (δ q)⁻¹ • ρ)
+        → ∀ q : Q, Measure.modularCharacterFun q = δ q := by
   intro Q _ _ _ _ _ _ _ _ ρ _ _ _ δ h q
-  have : ρ.inv.IsHaarMeasure :=
-    { toIsFiniteMeasureOnCompacts := inferInstance
-      toIsMulLeftInvariant := inferInstance
-      toIsOpenPosMeasure := inferInstance }
+  have : ρ.inv.IsHaarMeasure := {
+    toIsFiniteMeasureOnCompacts := inferInstance
+    toIsMulLeftInvariant := inferInstance
+    toIsOpenPosMeasure := inferInstance
+  }
   have hδ : (δ q⁻¹)⁻¹ = δ q := by
     rw [inv_eq_iff_eq_inv]
     refine eq_inv_of_mul_eq_one_left ?_
@@ -28,6 +33,7 @@ theorem modularCharacterFun_eq_of_map_left_mul :
       ← Measure.map_map measurable_inv (measurable_const_mul q⁻¹), h q⁻¹, Measure.map_smul, hδ]
     exact measurable_inv.aemeasurable
   rw [Measure.modularCharacterFun_eq_haarScalarFactor ρ.inv q]
-  simp only [hmap, Measure.haarScalarFactor_smul, Measure.haarScalarFactor_self, smul_eq_mul, mul_one]
+  simp only [hmap, Measure.haarScalarFactor_smul, Measure.haarScalarFactor_self, smul_eq_mul,
+    mul_one]
 
 end GlobalTheory.CompanionTheory.ModChar

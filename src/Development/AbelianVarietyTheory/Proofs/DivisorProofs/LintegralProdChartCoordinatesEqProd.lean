@@ -9,21 +9,26 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Lintegral
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory GlobalTheory.IndefiniteRowSideFullHecke.ExhaustionFrames GlobalTheory.IntBall
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory
+  GlobalTheory.IndefiniteRowSideFullHecke.ExhaustionFrames GlobalTheory.IntBall
 open scoped ENNReal Matrix
 
 namespace GlobalTheory.IntBall
 
 noncomputable section
 
-theorem measurePreserving_curry_lowCoord (ι κ : Type) [Fintype ι] [Fintype κ] :
-    MeasurePreserving (MeasurableEquiv.curry ι κ ℂ) volume volume := by
-  have h : (volume : Measure (ι × κ → ℂ)) =
-      (volume : Measure (ι → κ → ℂ)).map (MeasurableEquiv.curry ι κ ℂ).symm := by
+theorem measurePreserving_curry_lowCoord (ι κ : Type) [Fintype ι] [Fintype κ]
+    : MeasurePreserving (MeasurableEquiv.curry ι κ ℂ) volume volume := by
+  have h
+      : (volume : Measure (ι × κ → ℂ))
+        = (volume : Measure (ι → κ → ℂ)).map (MeasurableEquiv.curry ι κ ℂ).symm := by
     refine Measure.pi_eq fun s hs => ?_
     rw [Measure.map_apply (MeasurableEquiv.measurable _) (MeasurableSet.univ_pi hs)]
-    have e : (MeasurableEquiv.curry ι κ ℂ).symm ⁻¹' Set.univ.pi s =
-        Set.univ.pi (fun i => Set.univ.pi (fun j => s (i, j))) := by
+    have e
+        : (MeasurableEquiv.curry ι κ ℂ).symm ⁻¹' Set.univ.pi s
+          = Set.univ.pi (fun i => Set.univ.pi (fun j => s (i, j))) := by
       ext f; simp [MeasurableEquiv.coe_curry_symm, Function.uncurry]
     rw [e, volume_pi, Measure.pi_pi]
     simp_rw [volume_pi, Measure.pi_pi]
@@ -32,8 +37,10 @@ theorem measurePreserving_curry_lowCoord (ι κ : Type) [Fintype ι] [Fintype κ
   rw [h, Measure.map_map (MeasurableEquiv.measurable _) (MeasurableEquiv.measurable _)]
   simp
 
-theorem lintegral_prod_zOf : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r)
-    (h : (Low r → ℂ) → ℝ≥0∞), Measurable h → ∫⁻ z, ∏ τ, h (zOf X z τ) = ∏ _τ : X.Ψ, ∫⁻ w, h w := by
+theorem lintegral_prod_zOf
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r)
+        (h : (Low r → ℂ) → ℝ≥0∞),
+      Measurable h → ∫⁻ z, ∏ τ, h (zOf X z τ) = ∏ _τ : X.Ψ, ∫⁻ w, h w := by
   intro E _ _ _ r X h hh
   set e := Fintype.equivFin (Ent X) with he
   set G : (Fin (nd X) → ℂ) → ℝ≥0∞ := fun y => ∏ τ, h (fun p => y (e ⟨τ, p⟩)) with hG

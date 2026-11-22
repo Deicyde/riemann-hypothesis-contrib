@@ -4,11 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
-theorem UpperTheory.V.Ws.P1.trNe :
-    ∀ {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (H : Subgroup Γ) (χ : Fin (n + 1) → Γ →* kˣ), (Function.Injective fun i => (χ i).comp H.subtype) →
-          H = ⊤ ∨ ∃ g, g ∉ H ∧ ∑ i, (χ i g : k) ≠ 0 := by
+theorem UpperTheory.V.Ws.P1.trNe
+    : ∀ {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (H : Subgroup Γ) (χ : Fin (n + 1) → Γ →* kˣ),
+      (Function.Injective fun i => (χ i).comp H.subtype)
+        → H = ⊤ ∨ ∃ g, g ∉ H ∧ ∑ i, (χ i g : k) ≠ 0 := by
   intro Γ k _ _ n H χ hinj
   by_contra hcon
   rw [not_or] at hcon
@@ -32,10 +35,14 @@ theorem UpperTheory.V.Ws.P1.trNe :
     exact DFunLike.congr_fun hij x
   have hli := (linearIndependent_monoidHom H k).comp ψ hψ
   rw [Fintype.linearIndependent_iff] at hli
-  have h0 := hli (fun i => (χ i g0 : k)) (by
-    funext h
-    have hm : g0 * (h : Γ) ∉ H := fun hm => hg0 ((H.mul_mem_cancel_right h.2).1 hm)
-    have := hz' _ hm
-    simp only [map_mul, Units.val_mul] at this
-    simpa [ψ, Finset.sum_apply] using this) 0
+  have h0 :=
+    hli
+      (fun i => (χ i g0 : k))
+      (by
+        funext h
+        have hm : g0 * (h : Γ) ∉ H := fun hm => hg0 ((H.mul_mem_cancel_right h.2).1 hm)
+        have := hz' _ hm
+        simp only [map_mul, Units.val_mul] at this
+        simpa [ψ, Finset.sum_apply] using this)
+      0
   exact (χ 0 g0).ne_zero h0

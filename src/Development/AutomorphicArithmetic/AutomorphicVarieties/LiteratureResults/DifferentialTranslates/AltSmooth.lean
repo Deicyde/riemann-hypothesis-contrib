@@ -13,10 +13,11 @@ namespace UpperTheory.V.Lit.Dr
 theorem altSmooth : AltSmooth := by
   intro X _ _ V F _ _ _ _ _ _ q f x hf
   let b := Module.finBasis ℝ V
-  let E : (V [⋀^Fin q]→L[ℝ] F) →ₗ[ℝ] ((Fin q → Fin (Module.finrank ℝ V)) → F) :=
-    { toFun := fun a k => a fun i => b (k i)
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let E : (V [⋀^Fin q]→L[ℝ] F) →ₗ[ℝ] ((Fin q → Fin (Module.finrank ℝ V)) → F) := {
+    toFun := fun a k => a fun i => b (k i)
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hE : Function.Injective E := by
     intro a a' h
     apply ContinuousAlternatingMap.toAlternatingMap_injective

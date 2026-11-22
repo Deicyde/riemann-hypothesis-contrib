@@ -7,16 +7,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open Polynomial UpperTheory.V.W
 
-theorem UpperTheory.V.AlgebraTools.Det.chiApi :
-    ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G) (y : MonoidAlgebra A G),
-    D.lam 0 y = 1 ∧ D.lam n y = D.D A y ∧ (D.chi y).Monic ∧ (D.chi y).natDegree ≤ n ∧
-    D.chi y = ∑ i ∈ Finset.range (n + 1), C ((-1) ^ i * D.lam i y) * X ^ (n - i) := by
+theorem UpperTheory.V.AlgebraTools.Det.chiApi
+    : ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G) (y : MonoidAlgebra A G),
+      D.lam 0 y = 1 ∧ D.lam n y = D.D A y ∧ (D.chi y).Monic ∧ (D.chi y).natDegree ≤ n
+        ∧ D.chi y = ∑ i ∈ Finset.range (n + 1), C ((-1) ^ i * D.lam i y) * X ^ (n - i) := by
   intro n A G _ _ D y
   have hsum : D.chi y = ∑ i ∈ Finset.range (n + 1), C ((-1) ^ i * D.lam i y) * X ^ (n - i) := by
     have key := UpperTheory.V.AlgebraTools.Det.expand D y (Polynomial A) X (-1)
-    have h1 : MonoidAlgebra.single 1 (X : Polynomial A) +
-        (-1 : Polynomial A) • (MonoidAlgebra.mapRingHom G (algebraMap A (Polynomial A))) y =
-        MonoidAlgebra.single 1 X - (MonoidAlgebra.mapRingHom G C) y := by
+    have h1
+        : MonoidAlgebra.single 1 (X : Polynomial A)
+            + (-1 : Polynomial A) • (MonoidAlgebra.mapRingHom G (algebraMap A (Polynomial A))) y
+          = MonoidAlgebra.single 1 X - (MonoidAlgebra.mapRingHom G C) y := by
       rw [neg_one_smul, ← sub_eq_add_neg, Polynomial.algebraMap_eq]
     rw [h1] at key
     unfold UpperTheory.V.W.GDet.chi
@@ -37,7 +38,8 @@ theorem UpperTheory.V.AlgebraTools.Det.chiApi :
     have key := UpperTheory.V.AlgebraTools.Det.expand D y A 0 1
     rw [Finset.sum_eq_single n] at key
     · simp only [MonoidAlgebra.single_zero, zero_add, one_smul, Nat.sub_self, pow_zero, one_pow,
-        mul_one, Algebra.algebraMap_self, RingHom.id_apply] at key
+          mul_one, Algebra.algebraMap_self, RingHom.id_apply]
+        at key
       rw [← key]
       congr 1
       ext g

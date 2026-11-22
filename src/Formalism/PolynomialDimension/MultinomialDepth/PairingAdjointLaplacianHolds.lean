@@ -23,8 +23,8 @@ def eulY (f : PolXY K k) : PolXY K k := ∑ i : Fin k, X (Sum.inr i) * pderiv (S
 
 variable {K k}
 
-theorem ctrF_apply (f : PolXY K k) :
-    ctrF K k f = ∑ i : Fin k, pderiv (Sum.inl i) (pderiv (Sum.inr i) f) := by
+theorem ctrF_apply (f : PolXY K k)
+    : ctrF K k f = ∑ i : Fin k, pderiv (Sum.inl i) (pderiv (Sum.inr i) f) := by
   simp [ctrF, LinearMap.sum_apply]
 
 theorem pderiv_inl_h (i : Fin k) : pderiv (Sum.inl i) (hXY K k) = X (Sum.inr i) := by
@@ -35,22 +35,26 @@ theorem pderiv_inr_h (i : Fin k) : pderiv (Sum.inr i) (hXY K k) = X (Sum.inl i) 
   classical
   simp [hXY, pderiv_X, Pi.single_apply, Finset.sum_ite_eq']
 
-theorem ctrF_h_mul (f : PolXY K k) :
-    ctrF K k (hXY K k * f) = hXY K k * ctrF K k f + (k : K) • f + eulX_har K k f + eulY K k f := by
+theorem ctrF_h_mul (f : PolXY K k)
+    : ctrF K k (hXY K k * f)
+      = hXY K k * ctrF K k f + (k : K) • f + eulX_har K k f + eulY K k f := by
   classical
-  have key : ∀ i : Fin k, pderiv (Sum.inl i) (pderiv (Sum.inr i) (hXY K k * f)) =
-      hXY K k * pderiv (Sum.inl i) (pderiv (Sum.inr i) f) + f +
-        X (Sum.inl i) * pderiv (Sum.inl i) f + X (Sum.inr i) * pderiv (Sum.inr i) f := by
+  have key
+      : ∀ i : Fin k,
+        pderiv (Sum.inl i) (pderiv (Sum.inr i) (hXY K k * f))
+          = hXY K k * pderiv (Sum.inl i) (pderiv (Sum.inr i) f) + f
+            + X (Sum.inl i) * pderiv (Sum.inl i) f + X (Sum.inr i) * pderiv (Sum.inr i) f := by
     intro i
-    rw [pderiv_mul, pderiv_inr_h, map_add (f := _), pderiv_mul, pderiv_mul, pderiv_inl_h, pderiv_X_self]
+    rw [pderiv_mul, pderiv_inr_h, map_add (f := _), pderiv_mul, pderiv_mul, pderiv_inl_h,
+      pderiv_X_self]
     ring
   rw [ctrF_apply, ctrF_apply, eulX_har, eulY, Finset.sum_congr rfl (fun i _ => key i)]
   simp only [Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_const, Finset.card_univ,
     Fintype.card_fin]
   rw [← Nat.cast_smul_eq_nsmul K]
 
-theorem coeff_X_mul_pderiv (v : XY k) (f : PolXY K k) (m : XY k →₀ ℕ) :
-    AddMonoidAlgebra.coeff (X v * pderiv v f) m = (m v : K) * AddMonoidAlgebra.coeff f m := by
+theorem coeff_X_mul_pderiv (v : XY k) (f : PolXY K k) (m : XY k →₀ ℕ)
+    : AddMonoidAlgebra.coeff (X v * pderiv v f) m = (m v : K) * AddMonoidAlgebra.coeff f m := by
   classical
   induction f using MvPolynomial.induction_on' with
   | add p q hp hq => simp [mul_add, hp, hq]
@@ -60,24 +64,24 @@ theorem coeff_X_mul_pderiv (v : XY k) (f : PolXY K k) (m : XY k →₀ ℕ) :
     · subst h; simp
     · simp [h]
 
-theorem coeff_eulX (f : PolXY K k) (m : XY k →₀ ℕ) :
-    AddMonoidAlgebra.coeff (eulX_har K k f) m = (xDeg m : K) * AddMonoidAlgebra.coeff f m := by
+theorem coeff_eulX (f : PolXY K k) (m : XY k →₀ ℕ)
+    : AddMonoidAlgebra.coeff (eulX_har K k f) m = (xDeg m : K) * AddMonoidAlgebra.coeff f m := by
   simp [eulX_har, coeff_sum, coeff_X_mul_pderiv, xDeg, Finset.sum_mul]
 
-theorem coeff_eulY (f : PolXY K k) (m : XY k →₀ ℕ) :
-    AddMonoidAlgebra.coeff (eulY K k f) m = (yDeg m : K) * AddMonoidAlgebra.coeff f m := by
+theorem coeff_eulY (f : PolXY K k) (m : XY k →₀ ℕ)
+    : AddMonoidAlgebra.coeff (eulY K k f) m = (yDeg m : K) * AddMonoidAlgebra.coeff f m := by
   simp [eulY, coeff_sum, coeff_X_mul_pderiv, yDeg, Finset.sum_mul]
 
-theorem eulX_of_mem {A B : ℕ} {f : PolXY K k} (hf : f ∈ PolAB K k A B) :
-    eulX_har K k f = (A : K) • f := by
+theorem eulX_of_mem {A B : ℕ} {f : PolXY K k} (hf : f ∈ PolAB K k A B)
+    : eulX_har K k f = (A : K) • f := by
   ext m
   rw [coeff_eulX, coeff_smul, smul_eq_mul]
   by_cases hm : m ∈ f.support
   · rw [(hf m hm).1]
   · rw [notMem_support_iff.1 hm]; simp
 
-theorem eulY_of_mem {A B : ℕ} {f : PolXY K k} (hf : f ∈ PolAB K k A B) :
-    eulY K k f = (B : K) • f := by
+theorem eulY_of_mem {A B : ℕ} {f : PolXY K k} (hf : f ∈ PolAB K k A B)
+    : eulY K k f = (B : K) • f := by
   ext m
   rw [coeff_eulY, coeff_smul, smul_eq_mul]
   by_cases hm : m ∈ f.support
@@ -89,8 +93,8 @@ end Gen
 theorem slTwoCommutator_holds : SlTwo := by
   intro K _ _ k A B f hf
   rw [ctrF_h_mul, eulX_of_mem hf, eulY_of_mem hf]
-  simp only [Algebra.smul_def, Nat.cast_add, Nat.cast_mul, Nat.cast_one, Nat.cast_zero, map_add (f := _), map_mul,
-      map_one, map_zero, map_natCast]
+  simp only [Algebra.smul_def, Nat.cast_add, Nat.cast_mul, Nat.cast_one, Nat.cast_zero,
+    map_add (f := _), map_mul, map_one, map_zero, map_natCast]
   ring
 
 section Gen2

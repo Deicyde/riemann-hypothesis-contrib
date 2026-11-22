@@ -40,7 +40,8 @@ theorem LeafIrred_of : LeafIrred := by
   have : UniversallyOpen q := UniversallyOpen.of_flat q
   have : IrreducibleSpace C0 := irreducibleSpace_of_isIntegral C0
   have hirr : IsIrreducible (Set.range v0) := by
-    simpa [Set.image_univ] using (IrreducibleSpace.isIrreducible_univ C0).image v0 v0.continuous.continuousOn
+    simpa [Set.image_univ] using
+      (IrreducibleSpace.isIrreducible_univ C0).image v0 v0.continuous.continuousOn
   have hdense : Dense (Set.range v0) := by
     rw [dense_iff_inter_open]
     rintro U hU ⟨x, hx⟩
@@ -49,8 +50,7 @@ theorem LeafIrred_of : LeafIrred := by
     have hmem : toR R (c0 c) ∈ q '' U := (spec_gen R (c0 c) (q x)).mem_open hopen ⟨x, hx, rfl⟩
     obtain ⟨x', hx'U, hx'⟩ := hmem
     exact ⟨x', hx'U, mem_range h x' (c0 c) hx'⟩
-  have : IsIrreducible (Set.univ : Set D0) := by
-    rw [← hdense.closure_eq]; exact hirr.closure
+  have : IsIrreducible (Set.univ : Set D0) := by rw [← hdense.closure_eq]; exact hirr.closure
   exact { isPreirreducible_univ := this.2, toNonempty := ⟨this.1.some⟩ }
 
 end LateralTheory.E.LeafIrredPf

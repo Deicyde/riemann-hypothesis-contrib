@@ -16,14 +16,18 @@ variable {l : ℕ} [Fact l.Prime]
 
 theorem Ks_le_Kinf (K : FinExt l) (i : ℕ) : Ks K i ≤ Kinf K := by
   unfold Ks Kinf
-  exact sup_le_sup_left (IntermediateField.adjoin.mono ℚ_[l] {x : Om l | x ^ l ^ i = 1}
-    {x : Om l | ∃ j : ℕ, x ^ l ^ j = 1} fun x hx => (⟨i, hx⟩ : ∃ j : ℕ, x ^ l ^ j = 1)) _
+  exact sup_le_sup_left
+    (IntermediateField.adjoin.mono ℚ_[l] {x : Om l | x ^ l ^ i = 1}
+      {x : Om l | ∃ j : ℕ, x ^ l ^ j = 1} fun x hx => (⟨i, hx⟩ : ∃ j : ℕ, x ^ l ^ j = 1))
+    _
 
 theorem Ks_mono (K : FinExt l) : Monotone (Ks K) := by
   intro i j hij
   unfold Ks
-  refine sup_le_sup_left (IntermediateField.adjoin.mono ℚ_[l] {x : Om l | x ^ l ^ i = 1}
-    {x : Om l | x ^ l ^ j = 1} fun x hx => ?_) _
+  refine sup_le_sup_left
+    (IntermediateField.adjoin.mono ℚ_[l] {x : Om l | x ^ l ^ i = 1} {x : Om l | x ^ l ^ j = 1}
+      fun x hx => ?_)
+    _
   obtain ⟨c, hc⟩ := pow_dvd_pow l hij
   have hx' : x ^ l ^ i = 1 := hx
   show x ^ l ^ j = 1
@@ -54,8 +58,9 @@ theorem Hinf_le_Gj (K : FinExt l) (i : ℕ) : Hinf K ≤ Gj K i := by
   unfold Hinf Gj
   exact IntermediateField.fixingSubgroup_antitone (Ks_le_Kinf K i)
 
-theorem exists_Gj_subset (K : FinExt l) {U : Set (GQ l)} (hU : IsOpen U)
-    (hH : (Hinf K : Set (GQ l)) ⊆ U) : ∃ i₀, ∀ i ≥ i₀, (Gj K i : Set (GQ l)) ⊆ U := by
+theorem exists_Gj_subset
+    (K : FinExt l) {U : Set (GQ l)} (hU : IsOpen U) (hH : (Hinf K : Set (GQ l)) ⊆ U)
+    : ∃ i₀, ∀ i ≥ i₀, (Gj K i : Set (GQ l)) ⊆ U := by
   have hcl : ∀ i, IsClosed ((Gj K i : Set (GQ l))) := fun i =>
     InfiniteGalois.fixingSubgroup_isClosed (Ks K i)
   have hanti : Antitone fun i => ((Gj K i : Set (GQ l))) := fun i j hij =>
@@ -71,17 +76,20 @@ theorem exists_Gj_subset (K : FinExt l) {U : Set (GQ l)} (hU : IsOpen U)
     intro x hx
     obtain ⟨i, hi⟩ := exists_mem_Ks K hx
     exact (IntermediateField.mem_fixingSubgroup_iff _ _).1 (Set.mem_iInter.1 hσ i) x hi
-  obtain ⟨i₀, hi₀⟩ := hU.isClosed_compl.isCompact.elim_directed_family_closed
-    (fun i => (Gj K i : Set (GQ l))) hcl (Set.disjoint_iff_inter_eq_empty.mpr hinter) hanti.directed_ge
+  obtain ⟨i₀, hi₀⟩ :=
+    hU.isClosed_compl.isCompact.elim_directed_family_closed
+      (fun i => (Gj K i : Set (GQ l)))
+      hcl (Set.disjoint_iff_inter_eq_empty.mpr hinter) hanti.directed_ge
   refine ⟨i₀, fun i hi σ hσ => ?_⟩
   by_contra hσU
   have hmem : σ ∈ Uᶜ ∩ (Gj K i₀ : Set (GQ l)) := ⟨hσU, hanti hi hσ⟩
   exact Set.disjoint_left.1 hi₀ hmem.1 hmem.2
 
-theorem sum_mem_Kinf (K : FinExt l) (L : IntermediateField ℚ_[l] (Om l)) (S : Finset (GQ l))
-    (hS : ∀ s ∈ S, s ∈ Hinf K)
-    (hrep : ∀ h ∈ Hinf K, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ L.fixingSubgroup) {b : Om l} (hb : b ∈ L) :
-    ∑ s ∈ S, s b ∈ Kinf K := by
+theorem sum_mem_Kinf
+    (K : FinExt l) (L : IntermediateField ℚ_[l] (Om l)) (S : Finset (GQ l))
+    (hS : ∀ s ∈ S, s ∈ Hinf K) (hrep : ∀ h ∈ Hinf K, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ L.fixingSubgroup)
+    {b : Om l} (hb : b ∈ L)
+    : ∑ s ∈ S, s b ∈ Kinf K := by
   classical
   rw [← InfiniteGalois.fixedField_fixingSubgroup (Kinf K), IntermediateField.mem_fixedField_iff]
   intro h hh
@@ -113,11 +121,12 @@ theorem sum_mem_Kinf (K : FinExt l) (L : IntermediateField ℚ_[l] (Om l)) (S : 
     rw [hfix] at key
     exact key.symm
 
-theorem exists_finite_level (K : FinExt l) (L : IntermediateField ℚ_[l] (Om l)) (S : Finset (GQ l))
-    (hS : ∀ s ∈ S, s ∈ Hinf K)
-    (hrep : ∀ h ∈ Hinf K, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ L.fixingSubgroup) :
-    ∃ L' : FinExt l, L'.1 ≤ L ∧ ∃ i₀, ∀ i ≥ i₀, ∀ h ∈ Gj K i,
-      ∃! s, s ∈ S ∧ s⁻¹ * h ∈ (L'.1 ⊔ Ks K i).fixingSubgroup := by
+theorem exists_finite_level
+    (K : FinExt l) (L : IntermediateField ℚ_[l] (Om l)) (S : Finset (GQ l))
+    (hS : ∀ s ∈ S, s ∈ Hinf K) (hrep : ∀ h ∈ Hinf K, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ L.fixingSubgroup)
+    : ∃ L' : FinExt l,
+      L'.1 ≤ L
+        ∧ ∃ i₀, ∀ i ≥ i₀, ∀ h ∈ Gj K i, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ (L'.1 ⊔ Ks K i).fixingSubgroup := by
   classical
   have hsep : ∀ s ∈ S, ∀ t ∈ S, s ≠ t → ∃ x ∈ L, (s⁻¹ * t) x ≠ x := by
     intro s hs t ht hst
@@ -132,8 +141,10 @@ theorem exists_finite_level (K : FinExt l) (L : IntermediateField ℚ_[l] (Om l)
     intro s hs t ht hst
     simp only [T, Finset.coe_image, Finset.coe_filter]
     exact ⟨(s, t), ⟨Finset.mem_product.2 ⟨hs, ht⟩, hst⟩, rfl⟩
-  let L' : FinExt l := ⟨IntermediateField.adjoin ℚ_[l] (T : Set (Om l)),
-    IntermediateField.finiteDimensional_adjoin fun x _ => Algebra.IsIntegral.isIntegral x⟩
+  let L' : FinExt l := ⟨
+    IntermediateField.adjoin ℚ_[l] (T : Set (Om l)),
+    IntermediateField.finiteDimensional_adjoin fun x _ => Algebra.IsIntegral.isIntegral x
+  ⟩
   have hL'L : L'.1 ≤ L := by
     show IntermediateField.adjoin ℚ_[l] (T : Set (Om l)) ≤ L
     rw [IntermediateField.adjoin_le_iff]
@@ -144,8 +155,9 @@ theorem exists_finite_level (K : FinExt l) (L : IntermediateField ℚ_[l] (Om l)
     exact hxL p.1 hp1 p.2 hp2 hpne
   have : FiniteDimensional ℚ_[l] L'.1 := L'.2
   let U : Set (GQ l) := ⋃ s ∈ S, {σ | s⁻¹ * σ ∈ L'.1.fixingSubgroup}
-  have hUo : IsOpen U := isOpen_biUnion fun s _ =>
-    (IntermediateField.fixingSubgroup_isOpen L'.1).preimage (continuous_const.mul continuous_id)
+  have hUo : IsOpen U :=
+    isOpen_biUnion fun s _ =>
+      (IntermediateField.fixingSubgroup_isOpen L'.1).preimage (continuous_const.mul continuous_id)
   have hHU : (Hinf K : Set (GQ l)) ⊆ U := by
     intro σ hσ
     obtain ⟨s, ⟨hs, hsm⟩, -⟩ := hrep σ hσ
@@ -168,23 +180,27 @@ theorem exists_finite_level (K : FinExt l) (L : IntermediateField ℚ_[l] (Om l)
     exact hxne t ht s hs hts ((IntermediateField.mem_fixingSubgroup_iff _ _).1 hm _ hxT)
 
 theorem trace_almost_onto_of_levels
-    (hd : ∀ (K L' : FinExt l) (ε : ℝ), 0 < ε → ∃ i₀ : ℕ, ∀ i ≥ i₀, ∀ S : Finset (GQ l),
-      (∀ s ∈ S, s ∈ Gj K i) →
-      (∀ h ∈ Gj K i, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ (L'.1 ⊔ Ks K i).fixingSubgroup) →
-      ∃ b : Om l, b ∈ L'.1 ⊔ Ks K i ∧ ‖b‖ ≤ 1 ∧ 1 - ε ≤ ‖∑ s ∈ S, s b‖)
-    (K : FinExt l) (L : IntermediateField ℚ_[l] (Om l)) (S : Finset (GQ l)) (hKL : Kinf K ≤ L)
-    (hS : ∀ s ∈ S, s ∈ Hinf K)
-    (hrep : ∀ h ∈ Hinf K, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ L.fixingSubgroup)
-    (a : Om l) (ha : a ∈ Kinf K) (ha1 : ‖a‖ < 1) :
-    ∃ b : Om l, b ∈ L ∧ ‖b‖ ≤ 1 ∧ ∑ s ∈ S, s b = a := by
+    (hd : ∀ (K L' : FinExt l) (ε : ℝ),
+      0 < ε
+        → ∃ i₀ : ℕ, ∀ i ≥ i₀, ∀ S : Finset (GQ l),
+          (∀ s ∈ S, s ∈ Gj K i)
+            → (∀ h ∈ Gj K i, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ (L'.1 ⊔ Ks K i).fixingSubgroup)
+            → ∃ b : Om l, b ∈ L'.1 ⊔ Ks K i ∧ ‖b‖ ≤ 1 ∧ 1 - ε ≤ ‖∑ s ∈ S, s b‖)
+    (K : FinExt l)
+    (L : IntermediateField ℚ_[l] (Om l)) (S : Finset (GQ l)) (hKL : Kinf K ≤ L)
+    (hS : ∀ s ∈ S, s ∈ Hinf K) (hrep : ∀ h ∈ Hinf K, ∃! s, s ∈ S ∧ s⁻¹ * h ∈ L.fixingSubgroup)
+    (a : Om l) (ha : a ∈ Kinf K) (ha1 : ‖a‖ < 1)
+    : ∃ b : Om l, b ∈ L ∧ ‖b‖ ≤ 1 ∧ ∑ s ∈ S, s b = a := by
   classical
   by_cases ha0 : a = 0
   · exact ⟨0, zero_mem _, by simp, by simp [ha0]⟩
   obtain ⟨L', hL'L, i₀, hi₀⟩ := exists_finite_level K L S hS hrep
   have hε : 0 < 1 - ‖a‖ := by linarith
   obtain ⟨i₁, hi₁⟩ := hd K L' (1 - ‖a‖) hε
-  obtain ⟨b₀, hb₀, hb₀1, htr⟩ := hi₁ (max i₀ i₁) (le_max_right _ _) S
-    (fun s hs => Hinf_le_Gj K _ (hS s hs)) (hi₀ (max i₀ i₁) (le_max_left _ _))
+  obtain ⟨b₀, hb₀, hb₀1, htr⟩ :=
+    hi₁ (max i₀ i₁) (le_max_right _ _) S
+      (fun s hs => Hinf_le_Gj K _ (hS s hs))
+      (hi₀ (max i₀ i₁) (le_max_left _ _))
   have hb₀L : b₀ ∈ L := (sup_le hL'L ((Ks_le_Kinf K _).trans hKL)) hb₀
   have htK : ∑ s ∈ S, s b₀ ∈ Kinf K := sum_mem_Kinf K L S hS hrep hb₀L
   set t := ∑ s ∈ S, s b₀ with ht
@@ -197,11 +213,13 @@ theorem trace_almost_onto_of_levels
   refine ⟨a / t * b₀, mul_mem (hKL hc) hb₀L, ?_, ?_⟩
   · rw [norm_mul, norm_div]
     have h1 : ‖a‖ / ‖t‖ ≤ 1 := (div_le_one (norm_pos_iff.2 ht0)).2 hta
-    calc ‖a‖ / ‖t‖ * ‖b₀‖ ≤ 1 * 1 := mul_le_mul h1 hb₀1 (norm_nonneg _) zero_le_one
+    calc
+      ‖a‖ / ‖t‖ * ‖b₀‖
+        ≤ 1 * 1 := mul_le_mul h1 hb₀1 (norm_nonneg _) zero_le_one
       _ = 1 := one_mul 1
   · have hfix : ∀ s ∈ S, s (a / t) = a / t := fun s hs =>
       (IntermediateField.mem_fixingSubgroup_iff _ _).1 (hS s hs) _ hc
-    rw [Finset.sum_congr rfl fun s hs => by rw [map_mul, hfix s hs], ← Finset.mul_sum,
-      ← ht, div_mul_cancel₀ a ht0]
+    rw [Finset.sum_congr rfl fun s hs => by rw [map_mul, hfix s hs], ← Finset.mul_sum, ← ht,
+      div_mul_cancel₀ a ht0]
 
 end GlobalTheory.Cyc.AlmostTrace

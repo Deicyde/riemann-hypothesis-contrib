@@ -5,12 +5,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-private theorem intValuation_mapRingEquiv {K K' : Type} [Field K] [NumberField K] [Field K'] [NumberField K']
-    (τ : K ≃+* K') (v : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K) :
-    (HeightOneSpectrum.equivOfRingEquiv (RingOfIntegers.mapRingEquiv τ) v).intValuation
-      (RingOfIntegers.mapRingEquiv τ x) = v.intValuation x := by
+private theorem intValuation_mapRingEquiv
+    {K K' : Type} [Field K] [NumberField K] [Field K'] [NumberField K']
+    (τ : K ≃+* K') (v : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K)
+    : (HeightOneSpectrum.equivOfRingEquiv (RingOfIntegers.mapRingEquiv τ) v).intValuation
+        (RingOfIntegers.mapRingEquiv τ x)
+      = v.intValuation x := by
   set ρ := RingOfIntegers.mapRingEquiv τ
   have hw : (HeightOneSpectrum.equivOfRingEquiv ρ v).asIdeal = Ideal.map ρ v.asIdeal := by
     ext y
@@ -27,8 +31,9 @@ private theorem intValuation_mapRingEquiv {K K' : Type} [Field K] [NumberField K
   have hx' : ρ x ≠ 0 := (map_ne_zero_iff ρ ρ.injective).mpr hx
   rw [HeightOneSpectrum.intValuation_eq_exp_neg_multiplicity _ hx,
     HeightOneSpectrum.intValuation_eq_exp_neg_multiplicity _ hx']
-  have hm : multiplicity (HeightOneSpectrum.equivOfRingEquiv ρ v).asIdeal (Ideal.span {ρ x}) =
-      multiplicity v.asIdeal (Ideal.span {x}) := by
+  have hm
+      : multiplicity (HeightOneSpectrum.equivOfRingEquiv ρ v).asIdeal (Ideal.span {ρ x})
+        = multiplicity v.asIdeal (Ideal.span {x}) := by
     apply multiplicity_eq_of_emultiplicity_eq
     rw [emultiplicity_eq_emultiplicity_iff]
     intro k
@@ -38,31 +43,40 @@ private theorem intValuation_mapRingEquiv {K K' : Type} [Field K] [NumberField K
     constructor
     · intro h
       have h2 := Ideal.comap_mono (f := ρ) h
-      rwa [Ideal.comap_map_of_bijective _ ρ.bijective, Ideal.comap_map_of_bijective _ ρ.bijective] at h2
+      rwa [Ideal.comap_map_of_bijective _ ρ.bijective, Ideal.comap_map_of_bijective _ ρ.bijective]
+        at h2
     · exact Ideal.map_mono
   rw [hm]
 
-private theorem ordv_units_map_ringEquiv {K K' : Type} [Field K] [NumberField K] [Field K'] [NumberField K']
-    (τ : K ≃+* K') (v : HeightOneSpectrum (𝓞 K)) (a : Kˣ) :
-    ordv (HeightOneSpectrum.equivOfRingEquiv (RingOfIntegers.mapRingEquiv τ) v)
-      (Units.map τ.toMonoidHom a) = ordv v a := by
-  have hτ : ∀ z : 𝓞 K, τ (algebraMap (𝓞 K) K z) =
-      algebraMap (𝓞 K') K' (RingOfIntegers.mapRingEquiv τ z) := fun z =>
-    (RingOfIntegers.mapRingEquiv_apply τ z).symm
-  have hval : (HeightOneSpectrum.equivOfRingEquiv (RingOfIntegers.mapRingEquiv τ) v).valuationOfNeZero
-      (Units.map τ.toMonoidHom a) = v.valuationOfNeZero a := by
+private theorem ordv_units_map_ringEquiv
+    {K K' : Type} [Field K] [NumberField K] [Field K'] [NumberField K']
+    (τ : K ≃+* K') (v : HeightOneSpectrum (𝓞 K)) (a : Kˣ)
+    : ordv (HeightOneSpectrum.equivOfRingEquiv (RingOfIntegers.mapRingEquiv τ) v)
+        (Units.map τ.toMonoidHom a)
+      = ordv v a := by
+  have hτ
+      : ∀ z : 𝓞 K,
+        τ (algebraMap (𝓞 K) K z) = algebraMap (𝓞 K') K' (RingOfIntegers.mapRingEquiv τ z) :=
+    fun z => (RingOfIntegers.mapRingEquiv_apply τ z).symm
+  have hval
+      : (HeightOneSpectrum.equivOfRingEquiv (RingOfIntegers.mapRingEquiv τ) v).valuationOfNeZero
+          (Units.map τ.toMonoidHom a)
+        = v.valuationOfNeZero a := by
     rw [← WithZero.coe_inj, HeightOneSpectrum.valuationOfNeZero_eq,
       HeightOneSpectrum.valuationOfNeZero_eq]
     obtain ⟨x, y, -, hxy⟩ := IsFractionRing.div_surjective (𝓞 K) (a : K)
     show HeightOneSpectrum.valuation K' _ (τ (a : K)) = HeightOneSpectrum.valuation K v (a : K)
     rw [← hxy, map_div₀, map_div₀, map_div₀, hτ, hτ, HeightOneSpectrum.valuation_of_algebraMap,
       HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.valuation_of_algebraMap,
-      HeightOneSpectrum.valuation_of_algebraMap, intValuation_mapRingEquiv, intValuation_mapRingEquiv]
+      HeightOneSpectrum.valuation_of_algebraMap, intValuation_mapRingEquiv,
+      intValuation_mapRingEquiv]
   unfold ordv
   rw [hval]
 
-theorem UpperTheory.V.Kum.radClMap :
-    ∀ (K K' : Type) [Field K] [NumberField K] [Field K'] [NumberField K'] (τ : K ≃+* K') (n : ℕ) (a : Kˣ), clMap τ (radCl n a) = radCl n (Units.map τ.toMonoidHom a) := by
+theorem UpperTheory.V.Kum.radClMap
+    : ∀ (K K' : Type) [Field K] [NumberField K] [Field K'] [NumberField K'] (τ : K ≃+* K') (n : ℕ)
+        (a : Kˣ),
+      clMap τ (radCl n a) = radCl n (Units.map τ.toMonoidHom a) := by
   intro K K' _ _ _ _ τ n a
   have hinv : ∀ w : 𝓞 K, RingOfIntegers.mapRingEquiv τ.symm (RingOfIntegers.mapRingEquiv τ w) = w :=
     fun w => RingOfIntegers.ext (by simp [RingOfIntegers.mapRingEquiv_apply])

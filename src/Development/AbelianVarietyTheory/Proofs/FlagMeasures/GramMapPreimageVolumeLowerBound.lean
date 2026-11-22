@@ -15,40 +15,55 @@ noncomputable section
 
 namespace GlobalTheory.GramPreimageLB
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolStabS Topology Filter
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolStabS Topology Filter
 open scoped TensorProduct ENNReal
 
 def DiffOpenOnLattice : Prop :=
-  ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
-    (hJ : ∀ i j, σ (J j i) = J i j), J.det ≠ 0 →
-    ∀ (a : ℕ), 1 ≤ a → ∀ (v : HeightOneSpectrum (𝓞 F)) (d : ℕ)
-      (b : Module.Basis (Fin d) F E) (x : Fin a → Fin M → Fv F v ⊗[F] E),
-      LinearIndependent (Fv F v ⊗[F] E) x →
-      IsOpen ((fun W => gramH (Fv F v) σ hσ J hJ (x + W) - gramH (Fv F v) σ hσ J hJ x -
-        gramH (Fv F v) σ hσ J hJ W) '' (latSub b v a M : Set (Fin a → Fin M → Fv F v ⊗[F] E)))
+  ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
+      (hσ : ∀ x, σ (σ x) = x) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
+      (hJ : ∀ i j, σ (J j i) = J i j),
+    J.det ≠ 0
+      → ∀ (a : ℕ),
+        1 ≤ a
+          → ∀ (v : HeightOneSpectrum (𝓞 F)) (d : ℕ) (b : Module.Basis (Fin d) F E)
+              (x : Fin a → Fin M → Fv F v ⊗[F] E),
+            LinearIndependent (Fv F v ⊗[F] E) x
+              → IsOpen
+                ((fun W =>
+                    gramH (Fv F v) σ hσ J hJ (x + W) - gramH (Fv F v) σ hσ J hJ x
+                      - gramH (Fv F v) σ hσ J hJ W)
+                  '' (latSub b v a M : Set (Fin a → Fin M → Fv F v ⊗[F] E)))
 
 def GramFiltration : Prop :=
   ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] (σ : E →ₐ[F] E)
-    (hσ : ∀ x, σ (σ x) = x) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
-    (hJ : ∀ i j, σ (J j i) = J i j), J.det ≠ 0 →
-    ∀ (a : ℕ), 1 ≤ a → ∀ (v : HeightOneSpectrum (𝓞 F)) (d : ℕ) (b : Module.Basis (Fin d) F E)
-      (x : Fin a → Fin M → Fv F v ⊗[F] E), LinearIndependent (Fv F v ⊗[F] E) x →
-      ∃ N ∈ 𝓝 (0 : Fin a → Fin M → Fv F v ⊗[F] E), ∀ y, y - x ∈ N →
-        ∀ Λ0, scaledB (Fv F v) (latSub b v a M) Λ0 →
-          (Λ0 : Set (Fin a → Fin M → Fv F v ⊗[F] E)) ⊆ N →
-        ∃ (Λ : ℕ → AddSubgroup (Fin a → Fin M → Fv F v ⊗[F] E))
-          (H : ℕ → AddSubgroup (HermR (Fv F v) σ a))
-          (D : (Fin a → Fin M → Fv F v ⊗[F] E) →+ HermR (Fv F v) σ a),
-          Λ 0 = Λ0 ∧ (∀ n, IsOpen (Λ n : Set (Fin a → Fin M → Fv F v ⊗[F] E))) ∧
-          (∀ n, IsCompact (Λ n : Set (Fin a → Fin M → Fv F v ⊗[F] E))) ∧ Antitone Λ ∧
-          (∀ n, IsOpen (H n : Set (HermR (Fv F v) σ a))) ∧
-          (∀ n, IsCompact (H n : Set (HermR (Fv F v) σ a))) ∧
-          (∀ N' ∈ 𝓝 (0 : HermR (Fv F v) σ a), ∃ n, (H n : Set (HermR (Fv F v) σ a)) ⊆ N') ∧
-          (∀ n, (Λ n).map D = H n) ∧
-          ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n,
-            gramH (Fv F v) σ hσ J hJ (y + Z + W) - gramH (Fv F v) σ hσ J hJ (y + Z) - D W ∈
-              H (n + 1)
+      (hσ : ∀ x, σ (σ x) = x) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
+      (hJ : ∀ i j, σ (J j i) = J i j),
+    J.det ≠ 0
+      → ∀ (a : ℕ),
+        1 ≤ a
+          → ∀ (v : HeightOneSpectrum (𝓞 F)) (d : ℕ) (b : Module.Basis (Fin d) F E)
+              (x : Fin a → Fin M → Fv F v ⊗[F] E),
+            LinearIndependent (Fv F v ⊗[F] E) x
+              → ∃ N ∈ 𝓝 (0 : Fin a → Fin M → Fv F v ⊗[F] E), ∀ y,
+                y - x ∈ N
+                  → ∀ Λ0,
+                    scaledB (Fv F v) (latSub b v a M) Λ0
+                      → (Λ0 : Set (Fin a → Fin M → Fv F v ⊗[F] E)) ⊆ N
+                      → ∃ (Λ : ℕ → AddSubgroup (Fin a → Fin M → Fv F v ⊗[F] E))
+                          (H : ℕ → AddSubgroup (HermR (Fv F v) σ a))
+                          (D : (Fin a → Fin M → Fv F v ⊗[F] E) →+ HermR (Fv F v) σ a),
+                        Λ 0 = Λ0 ∧ (∀ n, IsOpen (Λ n : Set (Fin a → Fin M → Fv F v ⊗[F] E)))
+                          ∧ (∀ n, IsCompact (Λ n : Set (Fin a → Fin M → Fv F v ⊗[F] E)))
+                          ∧ Antitone Λ ∧ (∀ n, IsOpen (H n : Set (HermR (Fv F v) σ a)))
+                          ∧ (∀ n, IsCompact (H n : Set (HermR (Fv F v) σ a)))
+                          ∧ (∀ N' ∈ 𝓝 (0 : HermR (Fv F v) σ a), ∃ n,
+                            (H n : Set (HermR (Fv F v) σ a)) ⊆ N')
+                          ∧ (∀ n, (Λ n).map D = H n)
+                          ∧ ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n,
+                            gramH (Fv F v) σ hσ J hJ (y + Z + W) - gramH (Fv F v) σ hσ J hJ (y + Z)
+                                - D W
+                              ∈ H (n + 1)
 
 theorem diffOpenOnLattice_of (h : SecGram) : DiffOpenOnLattice := by
   intro F E _ _ _ _ _ σ hσ M J hJ hdet a _h1 v d b x hx
@@ -89,16 +104,20 @@ theorem diffOpenOnLattice_of (h : SecGram) : DiffOpenOnLattice := by
   show IsOpen (Dx '' (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)))
   rw [isOpen_iff_mem_nhds]
   rintro _ ⟨l, hl, rfl⟩
-  have hU : IsOpen {S : HermR (Fv F v) σ a | T ((S - Dx l : HermR (Fv F v) σ a) :
-      Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) ∈ L} :=
+  have hU : IsOpen
+      {S : HermR (Fv F v) σ a | T ((S - Dx l : HermR (Fv F v) σ a) :
+        Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) ∈ L} :=
     hLo.preimage (hTc.comp (continuous_subtype_val.comp (continuous_id.sub continuous_const)))
   refine Filter.mem_of_superset (hU.mem_nhds ?_) ?_
   · show T ((Dx l - Dx l : HermR (Fv F v) σ a) : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) ∈ L
     rw [sub_self, AddSubgroup.coe_zero, hT0]
     exact L.zero_mem
   · intro S hS
-    refine ⟨l + T ((S - Dx l : HermR (Fv F v) σ a) : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)),
-      L.add_mem hl hS, ?_⟩
+    refine ⟨
+      l + T ((S - Dx l : HermR (Fv F v) σ a) : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)),
+      L.add_mem hl hS,
+      ?_
+    ⟩
     rw [hDadd, hDT]
     abel
 
@@ -106,15 +125,17 @@ theorem gramFiltration_of (hDx : DiffOpenOnLattice) : GramFiltration := by
   intro F E _ _ _ _ σ hσ M J hJ hdet a ha1 v d b x hx
   have : FiniteDimensional F E := Module.Finite.of_basis b
   have : CharZero E := charZero_of_injective_algebraMap (algebraMap F E).injective
-  have hNE : NumberField E :=
-    { to_charZero := inferInstance
-      to_finiteDimensional := Module.Finite.trans F E }
+  have hNE : NumberField E := {
+    to_charZero := inferInstance
+    to_finiteDimensional := Module.Finite.trans F E
+  }
   have := locallyCompact_Fv F v
   have : IsModuleTopology (Fv F v) (Fv F v ⊗[F] E) := ⟨rfl⟩
   have : IsTopologicalAddGroup (Fv F v ⊗[F] E) :=
     IsModuleTopology.topologicalAddGroup (Fv F v) (Fv F v ⊗[F] E)
   have : T2Space (Fv F v ⊗[F] E) := by
-    obtain ⟨ι, _, ⟨h⟩⟩ := PI.AdicCompletionValuation.exists_homeomorph_tens (F := F) (E := E) (Fv F v)
+    obtain ⟨ι, _, ⟨h⟩⟩ :=
+      PI.AdicCompletionValuation.exists_homeomorph_tens (F := F) (E := E) (Fv F v)
     exact h.isEmbedding.t2Space
   have : ContinuousSMul (Fv F v) (Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) :=
     inferInstanceAs (ContinuousSMul (Fv F v) (Fin a → Fin a → Fv F v ⊗[F] E))
@@ -137,10 +158,11 @@ theorem gramFiltration_of (hDx : DiffOpenOnLattice) : GramFiltration := by
     show (Algebra.TensorProduct.basis (Fv F v) b).repr (π • w i j) k ∈ v.adicCompletionIntegers F
     rw [map_smul, Finsupp.smul_apply, smul_eq_mul]
     exact mul_mem hπO h
-  let β : (Fin a → Fin M → Fv F v ⊗[F] E) → (Fin a → Fin M → Fv F v ⊗[F] E) →
-      HermR (Fv F v) σ a := fun u w => ⟨gramB (Fv F v) σ J u w, gramB_mem (Fv F v) σ hσ J hJ u w⟩
+  let β : (Fin a → Fin M → Fv F v ⊗[F] E) → (Fin a → Fin M → Fv F v ⊗[F] E) → HermR (Fv F v) σ a :=
+    fun u w => ⟨gramB (Fv F v) σ J u w, gramB_mem (Fv F v) σ hσ J hJ u w⟩
   have hβc : Continuous fun q : (Fin a → Fin M → Fv F v ⊗[F] E) × (Fin a → Fin M → Fv F v ⊗[F] E) =>
-      β q.1 q.2 := (continuous_gramB (Fv F v) σ J).subtype_mk _
+      β q.1 q.2 :=
+    (continuous_gramB (Fv F v) σ J).subtype_mk _
   have hβ1 : ∀ u u' w, β (u + u') w = β u w + β u' w := by
     intro u u' w
     apply Subtype.ext
@@ -179,8 +201,11 @@ theorem gramFiltration_of (hDx : DiffOpenOnLattice) : GramFiltration := by
   have hGc : Continuous G := continuous_gramH (Fv F v) σ hσ J hJ
   have hxo : IsOpen (β x '' (L : Set (Fin a → Fin M → Fv F v ⊗[F] E))) := by
     have h := hDx F E σ hσ M J hJ hdet a ha1 v d b x hx
-    have e : (fun W => gramH (Fv F v) σ hσ J hJ (x + W) - gramH (Fv F v) σ hσ J hJ x -
-        gramH (Fv F v) σ hσ J hJ W) = β x := by
+    have e
+        : (fun W =>
+            gramH (Fv F v) σ hσ J hJ (x + W) - gramH (Fv F v) σ hσ J hJ x
+              - gramH (Fv F v) σ hσ J hJ W)
+          = β x := by
       funext W
       rw [← hGdef, hG]
       abel
@@ -206,9 +231,11 @@ theorem gramFiltration_of (hDx : DiffOpenOnLattice) : GramFiltration := by
   let i0 : Fin a := ⟨0, ha1⟩
   let j0 : Fin M := ⟨0, hM⟩
   let k0 : Fin d := ⟨0, hd⟩
-  let φ : (Fin a → Fin M → Fv F v ⊗[F] E) → Fv F v := fun Y => PositiveNearLattice.crd b (Fv F v) (Y i0 j0) k0
+  let φ : (Fin a → Fin M → Fv F v ⊗[F] E) → Fv F v := fun Y =>
+    PositiveNearLattice.crd b (Fv F v) (Y i0 j0) k0
   have hφc : Continuous φ :=
-    (PositiveNearLattice.continuous_crd b (Fv F v) k0).comp ((continuous_apply j0).comp (continuous_apply i0))
+    (PositiveNearLattice.continuous_crd b (Fv F v) k0).comp
+      ((continuous_apply j0).comp (continuous_apply i0))
   have hφs : ∀ (t : Fv F v) Y, φ (t • Y) = t * φ Y := by
     intro t Y
     show (Algebra.TensorProduct.basis (Fv F v) b).repr (t • Y i0 j0) k0 =
@@ -229,23 +256,31 @@ theorem gramFiltration_of (hDx : DiffOpenOnLattice) : GramFiltration := by
   have hφe : φ e0 = 1 := by
     show PositiveNearLattice.crd b (Fv F v) (e0 i0 j0) k0 = 1
     simp [e0, PositiveNearLattice.crd_incl, b.repr_self]
-  have hsmall : ∀ U ∈ 𝓝 (0 : HermR (Fv F v) σ a), ∃ N2 ∈ 𝓝 (0 : Fin a → Fin M → Fv F v ⊗[F] E),
-      ∀ c : Fv F v, (∀ w ∈ L, c • w ∈ N2) → ∀ w ∈ L, c • G w ∈ U := by
+  have hsmall
+      : ∀ U ∈ 𝓝 (0 : HermR (Fv F v) σ a), ∃ N2 ∈ 𝓝 (0 : Fin a → Fin M → Fv F v ⊗[F] E),
+        ∀ c : Fv F v,
+          (∀ w ∈ L, c • w ∈ N2) → ∀ w ∈ L, c • G w ∈ U := by
     intro U hU
-    have hT : ∀ᶠ t in 𝓝 (0 : Fv F v), ∀ w ∈ (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)),
-        t • G w ∈ U := by
-      have hP : ∀ w ∈ (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)),
-          ∀ᶠ q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) in 𝓝 ((0 : Fv F v), w), q.1 • G q.2 ∈ U := by
-        intro w _
-        have h : Tendsto (fun q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) => q.1 • G q.2)
-            (𝓝 ((0 : Fv F v), w)) (𝓝 (0 : HermR (Fv F v) σ a)) := by
-          have hc : Continuous (fun q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) => q.1 • G q.2) :=
-            continuous_fst.smul (hGc.comp continuous_snd)
-          have := hc.tendsto ((0 : Fv F v), w)
-          simpa using this
-        exact h hU
+    have hT
+        : ∀ᶠ t in 𝓝 (0 : Fv F v), ∀ w ∈ (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)),
+          t • G w ∈ U := by
+      have hP
+          : ∀ w ∈ (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)),
+            ∀ᶠ q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) in 𝓝 ((0 : Fv F v), w), q.1 • G q.2 ∈ U :=
+        by
+          intro w _
+          have h : Tendsto
+              (fun q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) => q.1 • G q.2)
+              (𝓝 ((0 : Fv F v), w)) (𝓝 (0 : HermR (Fv F v) σ a)) := by
+            have hc
+                : Continuous (fun q : Fv F v × (Fin a → Fin M → Fv F v ⊗[F] E) => q.1 • G q.2) :=
+              continuous_fst.smul (hGc.comp continuous_snd)
+            have := hc.tendsto ((0 : Fv F v), w)
+            simpa using this
+          exact h hU
       exact hLc.eventually_forall_of_forall_eventually
-        (P := fun (t : Fv F v) (w : Fin a → Fin M → Fv F v ⊗[F] E) => t • G w ∈ U) hP
+        (P := fun (t : Fv F v) (w : Fin a → Fin M → Fv F v ⊗[F] E) => t • G w ∈ U)
+        hP
     refine ⟨φ ⁻¹' {t | ∀ w ∈ (L : Set (Fin a → Fin M → Fv F v ⊗[F] E)), t • G w ∈ U}, ?_, ?_⟩
     · have h0 : φ 0 = 0 := by
         have := hφs 0 0
@@ -257,16 +292,27 @@ theorem gramFiltration_of (hDx : DiffOpenOnLattice) : GramFiltration := by
       exact h w hw
   exact filt_abstract π hπ0 hπ L hLo hLc hπL β hβc hβ1 hβ2 hβs G hG hGs x hxo hsmall
 
-theorem lb_gram_preimage : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
-    IsHermND σ J → ∀ (v : HeightOneSpectrum (𝓞 F)), ∀ (a : ℕ)
-    (μ : Measure (Fin a → Fin n → Fv F v ⊗[F] E)) (ν : Measure (HermR (Fv F v) σ a)),
-    μ.IsAddHaarMeasure → ν.IsAddHaarMeasure → ∀ (x : Fin a → Fin n → Fv F v ⊗[F] E)
-    (S0 : HermR (Fv F v) σ a), LinearIndependent (Fv F v ⊗[F] E) x →
-    gramR (Fv F v) σ J x = (S0 : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) →
-    ∀ W : Set (Fin a → Fin n → Fv F v ⊗[F] E), IsOpen W → x ∈ W →
-    ∃ c : ℝ≥0∞, 0 < c ∧ c ≠ ⊤ ∧ ∃ N ∈ nhds S0, ∀ S ⊆ N, MeasurableSet S →
-      c * ν S ≤ μ ((gramR (Fv F v) σ J) ⁻¹' (Subtype.val '' S) ∩ W) := by
+theorem lb_gram_preimage
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
+          IsHermND σ J
+            → ∀ (v : HeightOneSpectrum (𝓞 F)),
+              ∀ (a : ℕ) (μ : Measure (Fin a → Fin n → Fv F v ⊗[F] E))
+                  (ν : Measure (HermR (Fv F v) σ a)),
+                μ.IsAddHaarMeasure → ν.IsAddHaarMeasure
+                  → ∀ (x : Fin a → Fin n → Fv F v ⊗[F] E) (S0 : HermR (Fv F v) σ a),
+                    LinearIndependent (Fv F v ⊗[F] E) x
+                      → gramR (Fv F v) σ J x = (S0 : Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E))
+                      → ∀ W : Set (Fin a → Fin n → Fv F v ⊗[F] E),
+                        IsOpen W → x ∈ W
+                          → ∃ c : ℝ≥0∞,
+                            0 < c ∧ c ≠ ⊤
+                              ∧ ∃ N ∈ nhds S0, ∀ S ⊆ N,
+                                MeasurableSet S
+                                  → c * ν S
+                                    ≤ μ ((gramR (Fv F v) σ J) ⁻¹' (Subtype.val '' S) ∩ W) := by
   intro F E _ _ _ _ _ σ hCM n J hJ v a μ ν hμ hν x S0 hx hxS0 W hW hxW
   obtain ⟨t1, t2, t3, t4, -⟩ := GlobalTheory.LocalUnitaryTop.top_facts F E σ hCM n J hJ v
   haveI := t1
@@ -280,8 +326,9 @@ theorem lb_gram_preimage : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
     inferInstanceAs (T2Space (Fin a → Fin a → Fv F v ⊗[F] E))
   have : FiniteDimensional F E := Module.finite_of_finrank_pos (by rw [hCM.2.2.1]; norm_num)
   have hσ : ∀ y, σ (σ y) = y := sigma_invol σ hCM.2.2.2
-  have hpre : ∀ S : Set (HermR (Fv F v) σ a), (gramR (Fv F v) σ J) ⁻¹' (Subtype.val '' S) =
-      (gramH (Fv F v) σ hσ J hJ.1) ⁻¹' S := by
+  have hpre
+      : ∀ S : Set (HermR (Fv F v) σ a),
+        (gramR (Fv F v) σ J) ⁻¹' (Subtype.val '' S) = (gramH (Fv F v) σ hσ J hJ.1) ⁻¹' S := by
     intro S
     ext y
     simp only [Set.mem_preimage, Set.mem_image]
@@ -300,8 +347,14 @@ theorem lb_gram_preimage : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
     have hμfin : μ Set.univ ≠ ⊤ := isCompact_univ.measure_lt_top.ne
     have hνpos : ν Set.univ ≠ 0 := (isOpen_univ.measure_pos ν ⟨S0, trivial⟩).ne'
     have hνfin : ν Set.univ ≠ ⊤ := isCompact_univ.measure_lt_top.ne
-    refine ⟨μ Set.univ / ν Set.univ, ENNReal.div_pos hμpos hνfin, ENNReal.div_ne_top hμfin hνpos,
-      Set.univ, Filter.univ_mem, ?_⟩
+    refine ⟨
+      μ Set.univ / ν Set.univ,
+      ENNReal.div_pos hμpos hνfin,
+      ENNReal.div_ne_top hμfin hνpos,
+      Set.univ,
+      Filter.univ_mem,
+      ?_
+    ⟩
     intro S _ _
     rcases S.eq_empty_or_nonempty with rfl | ⟨s, hs⟩
     · simp
@@ -348,8 +401,7 @@ theorem lb_gram_preimage : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
       (hHc 0).locallyCompactSpace_of_mem_nhds_of_addGroup ((hHo 0).mem_nhds (H 0).zero_mem)
     have hΛ0pos : μ (Λ 0 : Set (Fin a → Fin n → Fv F v ⊗[F] E)) ≠ 0 :=
       ((hΛo 0).measure_pos μ ⟨0, zero_mem _⟩).ne'
-    have hΛ0fin : μ (Λ 0 : Set (Fin a → Fin n → Fv F v ⊗[F] E)) ≠ ⊤ :=
-      ((hΛc 0).measure_lt_top).ne
+    have hΛ0fin : μ (Λ 0 : Set (Fin a → Fin n → Fv F v ⊗[F] E)) ≠ ⊤ := ((hΛc 0).measure_lt_top).ne
     have hH0pos : ν (H 0 : Set (HermR (Fv F v) σ a)) ≠ 0 :=
       ((hHo 0).measure_pos ν ⟨0, zero_mem _⟩).ne'
     have hH0fin : ν (H 0 : Set (HermR (Fv F v) σ a)) ≠ ⊤ := ((hHc 0).measure_lt_top).ne
@@ -364,8 +416,7 @@ theorem lb_gram_preimage : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
       exact hQc.measure_lt_top
     have hmC : m Cᶜ = 0 := by
       rw [hm _ hCo.measurableSet.compl]
-      have : G ⁻¹' Cᶜ ∩ Q = ∅ :=
-        Set.eq_empty_iff_forall_notMem.2 fun z hz => hz.1 (hQC z hz.2)
+      have : G ⁻¹' Cᶜ ∩ Q = ∅ := Set.eq_empty_iff_forall_notMem.2 fun z hz => hz.1 (hQC z hz.2)
       rw [this, measure_empty]
     have hcos : ∀ k h, h - S0 ∈ H 0 → m {z | z - h ∈ H k} = κ * ν {z | z - h ∈ H k} := by
       intro k h hh
@@ -382,14 +433,17 @@ theorem lb_gram_preimage : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
         rwa [neg_sub] at this
       have e := cos_ratio μ ν Λ H hΛo hΛa hHo hHc D hD G x hyp h hyT k
       rw [hm _ hmeas, hνt, Set.inter_comm]
-      calc μ (Q ∩ G ⁻¹' {z | z - h ∈ H k})
-          = μ (Q ∩ G ⁻¹' {z | z - h ∈ H k}) * ν (H 0 : Set (HermR (Fv F v) σ a)) /
-              ν (H 0 : Set (HermR (Fv F v) σ a)) :=
-            (ENNReal.mul_div_cancel_right hH0pos hH0fin).symm
-        _ = μ (Λ 0 : Set (Fin a → Fin n → Fv F v ⊗[F] E)) * ν (H k : Set (HermR (Fv F v) σ a)) /
-              ν (H 0 : Set (HermR (Fv F v) σ a)) := by rw [e]
+      calc
+        μ (Q ∩ G ⁻¹' {z | z - h ∈ H k})
+            = μ (Q ∩ G ⁻¹' {z | z - h ∈ H k}) * ν (H 0 : Set (HermR (Fv F v) σ a))
+              / ν (H 0 : Set (HermR (Fv F v) σ a)) :=
+          (ENNReal.mul_div_cancel_right hH0pos hH0fin).symm
+        _ = μ (Λ 0 : Set (Fin a → Fin n → Fv F v ⊗[F] E)) * ν (H k : Set (HermR (Fv F v) σ a))
+            / ν (H 0 : Set (HermR (Fv F v) σ a)) := by
+          rw [e]
         _ = κ * ν (H k : Set (HermR (Fv F v) σ a)) := ENNReal.mul_div_right_comm
-    have hcmp := cosDens_holds (HermR (Fv F v) σ a) ν m inferInstance H hHo hHc hHa hHb S0 κ hmC hcos
+    have hcmp :=
+      cosDens_holds (HermR (Fv F v) σ a) ν m inferInstance H hHo hHc hHa hHb S0 κ hmC hcos
     have hκpos : 0 < κ := ENNReal.div_pos_iff.2 ⟨hΛ0pos, hH0fin⟩
     have hκfin : κ ≠ ⊤ := ENNReal.div_ne_top hΛ0fin hH0pos
     refine ⟨κ, hκpos, hκfin, C, hCo.mem_nhds (by simp [hC, (H 0).zero_mem]), ?_⟩
@@ -411,7 +465,9 @@ theorem lb_gram_preimage : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
     have e := hcmp K hKc
     rw [Set.inter_eq_left.2 (hKS.trans hSC)] at e
     rw [← e]
-    calc m K ≤ m S := measure_mono hKS
+    calc
+      m K
+        ≤ m S := measure_mono hKS
       _ = μ (G ⁻¹' S ∩ Q) := hm S hSm
       _ ≤ μ (G ⁻¹' S ∩ W) := measure_mono (Set.inter_subset_inter_right _ fun z hz => hΛW z hz)
 

@@ -9,8 +9,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -23,8 +25,7 @@ private lemma mul_of_genEig {P M : Type} [CommSemigroup P] [AddCommGroup M] [Mod
   rw [mul_comm (ψ p)]
   exact (smul_left_injective ℂ hv0 h1).symm
 
-theorem UpperTheory.V.Z.Sym.So.posSpec :
-    UpperTheory.V.Z.Sym.So.PosSpec := by
+theorem UpperTheory.V.Z.Sym.So.posSpec : UpperTheory.V.Z.Sym.So.PosSpec := by
   unfold UpperTheory.V.Z.Sym.So.PosSpec
   intro P N I J _ _ _ _ _ Mi _ _ _ u w hu hw X b β hβ a c ha htr χ hχ hex
   have hcu : ∀ j p q, Commute (u j p) (u j q) := fun j p q => by
@@ -39,8 +40,7 @@ theorem UpperTheory.V.Z.Sym.So.posSpec :
   choose XX dd hXX hdd htrj using fun j => Tf.trPos P (Mi j) (u j) (hcu j)
   obtain ⟨XN, dN, hXN, hdN, htrN⟩ := Tf.trPos P N w hcw
   obtain ⟨j0, v0, hv0, hv0'⟩ := hex
-  have hχj0 : χ ∈ XX j0 :=
-    (hXX j0 χ).2 ((Tf.eigVec P (Mi j0) (u j0) (hcu j0) χ).2 ⟨v0, hv0, hv0'⟩)
+  have hχj0 : χ ∈ XX j0 := (hXX j0 χ).2 ((Tf.eigVec P (Mi j0) (u j0) (hcu j0) χ).2 ⟨v0, hv0, hv0'⟩)
   have hχN : χ ∉ XN := fun h => hN ((Tf.eigVec P N w hcw χ).1 ((hXN χ).1 h))
   let T : Option J → Finset (P → ℂ) := fun o => Option.elim o XN XX
   let S' : Finset (Σ _ : Option J, P → ℂ) := Finset.univ.sigma T

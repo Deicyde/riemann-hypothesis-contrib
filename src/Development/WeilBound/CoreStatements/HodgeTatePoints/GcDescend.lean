@@ -10,7 +10,15 @@ open Module NumberField GlobalTheory.CompanionTheory.Ar.HT TensorProduct
 
 namespace PositivityTheory.HtPt.Gc
 
-theorem test_descend : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A] [Field K] [Algebra A K] [IsFractionRing A K] (C : Type) [Field C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] (hv : v.Integers O) [Algebra A O] (𝔮 : Ideal A) (M : Type) [AddCommGroup M] [Module A M] (L : Submodule A M) (x : M), 𝔮.IsPrime → 𝔮.height = 1 → Function.Injective (algebraMap A O) → (∀ a, a ∈ 𝔮 ↔ v (algebraMap O C (algebraMap A O a)) < 1) → (1 : O) ⊗ₜ[A] x ∈ Submodule.span O ((fun y : M => (1 : O) ⊗ₜ[A] y) '' (L : Set M)) → ∃ s : A, s ∉ 𝔮 ∧ s • x ∈ L := by
+theorem test_descend
+    : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A] [Field K]
+        [Algebra A K] [IsFractionRing A K] (C : Type) [Field C] (v : Valuation C NNReal) (O : Type)
+        [CommRing O] [Algebra O C] (hv : v.Integers O) [Algebra A O] (𝔮 : Ideal A) (M : Type)
+        [AddCommGroup M] [Module A M] (L : Submodule A M) (x : M),
+      𝔮.IsPrime → 𝔮.height = 1 → Function.Injective (algebraMap A O)
+        → (∀ a, a ∈ 𝔮 ↔ v (algebraMap O C (algebraMap A O a)) < 1)
+        → (1 : O) ⊗ₜ[A] x ∈ Submodule.span O ((fun y : M => (1 : O) ⊗ₜ[A] y) '' (L : Set M))
+        → ∃ s : A, s ∉ 𝔮 ∧ s • x ∈ L := by
   intro A K _ _ _ _ _ _ _ C _ v O _ _ hv _ q M _ _ L x hq h1 hinj hcen hx
   haveI : IsDomain O := hv.hom_inj.isDomain
   haveI : ValuationRing O := ValuationRing.of_integers _ hv
@@ -24,7 +32,8 @@ theorem test_descend : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNoetherianR
     IsLocalization.lift_eq hu a
   haveI : IsScalarTower A R O := IsScalarTower.of_algebraMap_eq fun a => (hcomp a).symm
   have hinjR : Function.Injective (algebraMap R O) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro r hr
     obtain ⟨⟨a, s⟩, rfl⟩ := IsLocalization.mk'_surjective q.primeCompl r
     have h2 : algebraMap A O a = 0 := by
@@ -49,8 +58,8 @@ theorem test_descend : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNoetherianR
     infer_instance
   haveI : Module.FaithfullyFlat R O := Module.FaithfullyFlat.of_flat_of_isLocalHom
   have h0 : (1 : O) ⊗ₜ[A] (L.mkQ x) = 0 := by
-    have : Submodule.span O ((fun y : M => (1 : O) ⊗ₜ[A] y) '' (L : Set M)) ≤
-        LinearMap.ker (L.mkQ.baseChange O) := by
+    have : Submodule.span O ((fun y : M => (1 : O) ⊗ₜ[A] y) '' (L : Set M))
+        ≤ LinearMap.ker (L.mkQ.baseChange O) := by
       rw [Submodule.span_le]
       rintro _ ⟨y, hy, rfl⟩
       simp [(Submodule.Quotient.mk_eq_zero L).2 hy]
@@ -59,8 +68,8 @@ theorem test_descend : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNoetherianR
     apply (AlgebraTensorModule.cancelBaseChange A R O O (M ⧸ L)).injective
     simpa using h0
   rw [Module.FaithfullyFlat.one_tmul_eq_zero_iff] at h2
-  obtain ⟨s, hs⟩ := (IsLocalizedModule.eq_zero_iff q.primeCompl
-    (TensorProduct.mk A R (M ⧸ L) 1)).1 h2
+  obtain ⟨s, hs⟩ :=
+    (IsLocalizedModule.eq_zero_iff q.primeCompl (TensorProduct.mk A R (M ⧸ L) 1)).1 h2
   refine ⟨s, s.2, ?_⟩
   rw [← Submodule.Quotient.mk_eq_zero, Submodule.Quotient.mk_smul]
   exact hs

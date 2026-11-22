@@ -14,7 +14,8 @@ open Topology Filter
 
 noncomputable section
 
-theorem HolGermsIntegrallyClosed.proof (hU : HolGermsUFD.Statement) : HolGermsIntegrallyClosed.Statement := by
+theorem HolGermsIntegrallyClosed.proof (hU : HolGermsUFD.Statement)
+    : HolGermsIntegrallyClosed.Statement := by
   intro d y
   have := hU (Fin d) y
   exact ⟨HolGermsDomain.proof (Fin d) y, inferInstance⟩

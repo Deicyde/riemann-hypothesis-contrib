@@ -12,8 +12,9 @@ open scoped ENNReal InnerProductSpace ComplexConjugate ContDiff
 
 noncomputable section
 
-theorem ti_le_of_forall_pos (x c Y : ℝ≥0∞)
-    (h : ∀ ε : ℝ, 0 < ε → x ≤ c * (ENNReal.ofReal (1 + ε) * Y)) : x ≤ c * Y := by
+theorem ti_le_of_forall_pos
+    (x c Y : ℝ≥0∞) (h : ∀ ε : ℝ, 0 < ε → x ≤ c * (ENNReal.ofReal (1 + ε) * Y))
+    : x ≤ c * Y := by
   have hc : Continuous fun ε : ℝ => ENNReal.ofReal (1 + ε) :=
     ENNReal.continuous_ofReal.comp (continuous_const.add continuous_id)
   have ht0 : Tendsto (fun ε : ℝ => ENNReal.ofReal (1 + ε)) (𝓝[>] 0) (𝓝 1) := by
@@ -22,12 +23,15 @@ theorem ti_le_of_forall_pos (x c Y : ℝ≥0∞)
   have ht : Tendsto (fun ε : ℝ => ENNReal.ofReal (1 + ε) * (c * Y)) (𝓝[>] 0) (𝓝 (c * Y)) := by
     have h1 := ENNReal.Tendsto.mul_const (b := c * Y) ht0 (Or.inl one_ne_zero)
     simpa using h1
-  exact ge_of_tendsto ht (eventually_nhdsWithin_of_forall fun ε hε => by
-    calc x ≤ c * (ENNReal.ofReal (1 + ε) * Y) := h ε hε
-      _ = ENNReal.ofReal (1 + ε) * (c * Y) := by ring)
+  exact ge_of_tendsto ht
+    (eventually_nhdsWithin_of_forall fun ε hε => by
+      calc
+        x ≤ c * (ENNReal.ofReal (1 + ε) * Y) := h ε hε
+        _ = ENNReal.ofReal (1 + ε) * (c * Y) := by ring)
 
-theorem ti_hasCompactSupport {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n)
-    (f : M → V n) (hf : IsTestForm n z f) : HasCompactSupport f := by
+theorem ti_hasCompactSupport
+    {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) (f : M → V n) (hf : IsTestForm n z f)
+    : HasCompactSupport f := by
   have h : ∀ j, HasCompactSupport (fun x => f x j) := fun j => (hf j).2
   have hsub : Function.support f ⊆ ⋃ j, Function.support (fun x => f x j) := by
     intro x hx
@@ -43,9 +47,13 @@ theorem ti_hasCompactSupport {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M �
     exact closure_mono hsub
   exact IsCompact.of_isClosed_subset (isCompact_iUnion fun j => h j) (isClosed_tsupport f) hts
 
-private theorem db_eq_wdb_comp_symm_of_isChart {M : Type*} [TopologicalSpace M] {n : ℕ} {z : M → V n}
-    (j : Fin n) (f : M → ℂ) (e : OpenPartialHomeomorph M (V n)) (he : IsChart n z e) {x : M}
-    (hx : x ∈ e.source) : db n z j f x = wdb n j (f ∘ e.symm) (z x) := by
+private theorem db_eq_wdb_comp_symm_of_isChart
+    {M : Type*} [TopologicalSpace M]
+    {n : ℕ} {z : M → V n} (j : Fin n)
+    (f : M → ℂ)
+    (e : OpenPartialHomeomorph M (V n)) (he : IsChart n z e)
+    {x : M} (hx : x ∈ e.source)
+    : db n z j f x = wdb n j (f ∘ e.symm) (z x) := by
   have hex : ∃ c : OpenPartialHomeomorph M (V n), IsChart n z c ∧ x ∈ c.source := ⟨e, he, hx⟩
   rw [db, dite_eq_left hex]
   obtain ⟨hc, hxc⟩ := Classical.choose_spec hex
@@ -71,10 +79,14 @@ private theorem db_eq_wdb_comp_symm_of_isChart {M : Type*} [TopologicalSpace M] 
   apply (Classical.choose hex).injOn ((Classical.choose hex).map_target hy2) hy3
   rw [(Classical.choose hex).right_inv hy2, ← hc hy3, he (e.map_target hy1), e.right_inv hy1]
 
-private theorem ck_one_db_of_smooth {M : Type*} [TopologicalSpace M] {n : ℕ} {z : M → V n} {F : M → ℂ}
-    (hF : Smooth n z F) (j : Fin n) : Ck n z 1 (fun x => db n z j F x) := by
+private theorem ck_one_db_of_smooth
+    {M : Type*} [TopologicalSpace M]
+    {n : ℕ} {z : M → V n} {F : M → ℂ} (hF : Smooth n z F) (j : Fin n)
+    : Ck n z 1 (fun x => db n z j F x) := by
   intro e he
-  have hG : ContDiffOn ℝ 2 (F ∘ e.symm) e.target := (hF e he).of_le (by first
+  have hG : ContDiffOn ℝ 2 (F ∘ e.symm) e.target :=
+    (hF e he).of_le (by
+      first
       | exact_mod_cast (le_top : ((2 : ℕ) : ℕ∞) ≤ ⊤)
       | exact WithTop.coe_le_coe.mpr le_top
       | simp)
@@ -86,25 +98,33 @@ private theorem ck_one_db_of_smooth {M : Type*} [TopologicalSpace M] {n : ℕ} {
       (contDiffOn_const.mul (hD.clm_apply contDiffOn_const))).div_const _
   refine hW.congr fun y hy => ?_
   show db n z j F (e.symm y) = wdb n j (F ∘ e.symm) y
-  rw [db_eq_wdb_comp_symm_of_isChart j F e he (e.map_target hy), he (e.map_target hy), e.right_inv hy]
+  rw [db_eq_wdb_comp_symm_of_isChart j F e he (e.map_target hy), he (e.map_target hy),
+    e.right_inv hy]
 
-private theorem smoothR_sub_const_mul {M : Type*} [TopologicalSpace M] {n : ℕ} {z : M → V n}
-    {a b : M → ℝ} (ha : SmoothR n z a) (hb : SmoothR n z b) (c : ℝ) :
-    SmoothR n z (fun x => a x - c * b x) := by
+private theorem smoothR_sub_const_mul
+    {M : Type*} [TopologicalSpace M]
+    {n : ℕ} {z : M → V n} {a b : M → ℝ} (ha : SmoothR n z a) (hb : SmoothR n z b)
+    (c : ℝ)
+    : SmoothR n z (fun x => a x - c * b x) := by
   intro e he
-  refine ((ha e he).sub ((contDiffOn_const (c := ((c : ℝ) : ℂ))).mul (hb e he))).congr
-    fun y _ => ?_
+  refine ((ha e he).sub ((contDiffOn_const (c := ((c : ℝ) : ℂ))).mul (hb e he))).congr fun y _ => ?_
   simp [Function.comp]
 
-theorem testIneq (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
-    [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] (hCh : ChoiceStatement n M) (hP : PrimedIneqStatement n M)
-    (hC : ClosureIneqStatement n M) (hS : SplitTestStatement n M) (hL : LocalityStatement n M)
-    (hWS : WeakSSmoothStatement n M) (hSD : SbarDbarStatement n M) : TestIneqStatement n M := by
+theorem testIneq
+    (n : ℕ)
+    (M : Type*)
+    [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M]
+    (hCh : ChoiceStatement n M) (hP : PrimedIneqStatement n M) (hC : ClosureIneqStatement n M)
+    (hS : SplitTestStatement n M) (hL : LocalityStatement n M) (hWS : WeakSSmoothStatement n M)
+    (hSD : SbarDbarStatement n M)
+    : TestIneqStatement n M := by
   intro X ph F0 h hph hlev hF0 hh hdom hI f hf
   have hz := X.isLocalHomeomorph
   apply ti_le_of_forall_pos
   intro ε hε
-  have hck2 : Ck n X.z 2 F0 := fun e he => (hF0 e he).of_le (by first
+  have hck2 : Ck n X.z 2 F0 := fun e he =>
+    (hF0 e he).of_le (by
+      first
       | exact_mod_cast (le_top : ((2 : ℕ) : ℕ∞) ≤ ⊤)
       | exact WithTop.coe_le_coe.mpr le_top
       | simp)
@@ -123,9 +143,9 @@ theorem testIneq (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
   have hcont : Continuous (dbarF n X.z F0) := by
     show Continuous fun x => WithLp.toLp 2 (fun j => db n X.z j F0 x)
     first
-      | exact (PiLp.continuous_toLp 2 (fun _ : Fin n => ℂ)).comp (continuous_pi hcj)
-      | exact (PiLp.continuous_toLp (p := 2) (β := fun _ : Fin n => ℂ)).comp (continuous_pi hcj)
-      | fun_prop
+    | exact (PiLp.continuous_toLp 2 (fun _ : Fin n => ℂ)).comp (continuous_pi hcj)
+    | exact (PiLp.continuous_toLp (p := 2) (β := fun _ : Fin n => ℂ)).comp (continuous_pi hcj)
+    | fun_prop
   obtain ⟨ph', ψ, e', U, hph', hψ, he', hcut, hU, hCU, hUeq, hle, hlevi, hL2⟩ :=
     hCh X ph (dbarF n X.z F0) (tsupport f) ε hph hcont (ti_hasCompactSupport n X.z f hf) hε
   have hprim := hP X.z hz ph ph' ψ F0 h ε hph hlev hph' hψ hF0 hh hdom hε hle hlevi hI

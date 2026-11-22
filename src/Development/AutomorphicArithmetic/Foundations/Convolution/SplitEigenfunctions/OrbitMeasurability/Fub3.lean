@@ -8,14 +8,19 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff UpperTheory.ConvolutionTheory.RankTwoDescent UpperTheory.ConvolutionTheory.RankTwoDescent.Cp
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
+  UpperTheory.ConvolutionTheory.RankTwoDescent UpperTheory.ConvolutionTheory.RankTwoDescent.Cp
 open scoped Classical
 
-private theorem fub3 {X Y Z : Type} [MeasurableSpace X] [MeasurableSpace Y] [MeasurableSpace Z] [Countable Z]
-    [MeasurableSingletonClass Z] (μ : Measure X) (ν : Measure Y) [SFinite μ] [SFinite ν] (f : X × Y × Z → ℂ)
-    (hf : Integrable f (μ.prod (ν.prod Measure.count))) :
-    ∫ p, f p ∂(μ.prod (ν.prod Measure.count)) = ∫ x, ∫ y, ∑' z, f (x, y, z) ∂ν ∂μ := by
+private theorem fub3
+    {X Y Z : Type} [MeasurableSpace X] [MeasurableSpace Y] [MeasurableSpace Z] [Countable Z]
+    [MeasurableSingletonClass Z]
+    (μ : Measure X) (ν : Measure Y) [SFinite μ] [SFinite ν]
+    (f : X × Y × Z → ℂ) (hf : Integrable f (μ.prod (ν.prod Measure.count)))
+    : ∫ p, f p ∂(μ.prod (ν.prod Measure.count)) = ∫ x, ∫ y, ∑' z, f (x, y, z) ∂ν ∂μ := by
   rw [integral_prod _ hf]
   refine integral_congr_ae ?_
   filter_upwards [hf.prod_right_ae] with x hx
@@ -25,8 +30,8 @@ private theorem fub3 {X Y Z : Type} [MeasurableSpace X] [MeasurableSpace Y] [Mea
   rw [integral_countable hy]
   simp
 
-theorem UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.yEq :
-    UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.YEq := by
+theorem UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.yEq
+    : UpperTheory.ConvolutionTheory.RankTwoDescent.Cp.YEq := by
   intro E _ _ _ D W M N P φ hφ ph hph
   haveI := N.haar
   haveI : SigmaFinite N.μ := inferInstance

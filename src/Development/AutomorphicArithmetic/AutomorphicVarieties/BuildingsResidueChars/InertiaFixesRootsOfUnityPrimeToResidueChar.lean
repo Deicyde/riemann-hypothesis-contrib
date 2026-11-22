@@ -6,14 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N ValuativeRel
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N ValuativeRel
 open GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.inertia_fixes_roots_of_unity_prime_to_residue_char :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω),
-    IsPlaceOver A w → ∀ M : ℕ, (M : 𝓞 F) ∉ w.asIdeal → ∀ s ∈ Ine (F := F) A, ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ := by
+theorem UpperTheory.inertia_fixes_roots_of_unity_prime_to_residue_char
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (w : HeightOneSpectrum (𝓞 F)) (A : ValuationSubring Ω),
+      IsPlaceOver A w
+        → ∀ M : ℕ, (M : 𝓞 F) ∉ w.asIdeal → ∀ s ∈ Ine (F := F) A, ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ := by
   intro F Ω _ _ _ _ _ w A hA M hM s hs ζ hζ
   have hM0 : M ≠ 0 := by
     rintro rfl
@@ -39,8 +42,7 @@ theorem UpperTheory.inertia_fixes_roots_of_unity_prime_to_residue_char :
     simp at hvz
   set η := s ζ / ζ with hηdef
   have hsz : s ζ = η * ζ := (div_mul_cancel₀ _ hζ0).symm
-  have hη : η ^ M = 1 := by
-    rw [hηdef, div_pow, ← map_pow, hζ, map_one, div_one]
+  have hη : η ^ M = 1 := by rw [hηdef, div_pow, ← map_pow, hζ, map_one, div_one]
   have hη1 : A.valuation (η - 1) < 1 := by
     have e : s ζ - ζ = (η - 1) * ζ := by rw [hsz]; ring
     rw [e, map_mul, hvz, mul_one] at hd
@@ -71,7 +73,8 @@ theorem UpperTheory.inertia_fixes_roots_of_unity_prime_to_residue_char :
       intro j _
       rw [map_pow, hvη, one_pow]
     rw [Valuation.map_sub_swap, ← e, map_mul]
-    calc A.valuation (η - 1) * A.valuation (∑ j ∈ Finset.range i, η ^ j)
+    calc
+      A.valuation (η - 1) * A.valuation (∑ j ∈ Finset.range i, η ^ j)
         ≤ A.valuation (η - 1) * 1 := by gcongr
       _ = A.valuation (η - 1) := mul_one _
       _ < 1 := hη1

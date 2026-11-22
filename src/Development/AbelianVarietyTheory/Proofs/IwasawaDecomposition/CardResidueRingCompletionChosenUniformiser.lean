@@ -8,13 +8,19 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HaarM
 
 @[expose] public section
 
-open MeasureTheory Matrix NumberField IsDedekindDomain Formalism.BasicNotions Formalism.DoubleCosetMeasures Formalism.L2.Host Formalism.L2.DIV Formalism.L2.DIV.QLoc GlobalTheory.Mem.HD
+open MeasureTheory Matrix NumberField IsDedekindDomain Formalism.BasicNotions
+  Formalism.DoubleCosetMeasures Formalism.L2.Host Formalism.L2.DIV Formalism.L2.DIV.QLoc
+  GlobalTheory.Mem.HD
 
 namespace GlobalTheory.ResidueCardUnif
 
-theorem card_kF_piP : ∀ (L : Type) [Field L] [NumberField L] (P : HeightOneSpectrum (𝓞 L)) (h : ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) ∈ OP P), Nat.card (kF (OP P) ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) h) = qP P := by
+theorem card_kF_piP
+    : ∀ (L : Type) [Field L] [NumberField L] (P : HeightOneSpectrum (𝓞 L))
+        (h : ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) ∈ OP P),
+      Nat.card (kF (OP P) ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) h) = qP P := by
   intro L _ _ P h
-  have ha : Valued.v ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) = WithZero.exp (-1 : ℤ) :=
+  have ha
+      : Valued.v ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) = WithZero.exp (-1 : ℤ) :=
     unif_spec P
   have h1 : ((piP P : (P.adicCompletion L)ˣ) : P.adicCompletion L) ∈ P.adicCompletionIntegers L := h
   have e : IsLocalRing.maximalIdeal (P.adicCompletionIntegers L) = Ideal.span {⟨_, h1⟩} := by

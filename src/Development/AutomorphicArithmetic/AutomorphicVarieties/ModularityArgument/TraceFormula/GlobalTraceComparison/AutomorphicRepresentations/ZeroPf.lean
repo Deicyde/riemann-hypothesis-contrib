@@ -9,12 +9,12 @@ public import Development.DiscreteGroups.PiInvariants.CompactSupportTwists.PiSee
 @[expose] public section
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi DiscreteGroups.T1.G
-open MeasureTheory Filter GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.Desc
+open MeasureTheory Filter GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB
+  PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.Desc
 
 attribute [local instance] PositivityTheory.Rg.BcB.E.borelH
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.zero_pf :
-    AeEq → Zero := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.zero_pf : AeEq → Zero := by
   intro hAe E _ _ _ n D f I hf hinv hI h
   classical
   haveI := CuspidalL2GL.t2Space_GA E n
@@ -43,9 +43,11 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.zero_pf :
         ((ae_restrict_iff' hSm).2 (Eventually.of_forall fun x hx => ?_))
       simpa using hB x hx.1
     have hv : (hw.toLp w : H E n 0 → ℂ) =ᵐ[D.ν] w := hw.coeFn_toLp
-    have h0 := h (hw.toLp w) (hv.mono fun y hy hl => by
-      rw [hy]
-      exact Set.indicator_of_notMem (by exact fun hs => hl hs.2) _)
+    have h0 :=
+      h (hw.toLp w)
+        (hv.mono fun y hy hl => by
+          rw [hy]
+          exact Set.indicator_of_notMem (by exact fun hs => hl hs.2) _)
     have hpt : ∀ y, w y * f y = ((‖w y‖ ^ 2 : ℝ) : ℂ) := by
       intro y
       by_cases hy : y ∈ S
@@ -68,6 +70,10 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.zero_pf :
     simpa using hx0
   have all : ∀ᵐ x ∂D.ν, ∀ m : ℕ, x ∈ compactCovering (H E n 0) m → ldet x ∈ I → f x = 0 :=
     ae_all_iff.2 fun m => key _ (isCompact_compactCovering _ m)
-  refine hAe E n D f (fun _ => 0) I hf continuous_const hinv (fun _ _ => rfl) hI (all.mono fun x hx hl => ?_)
+  refine hAe E n D f
+    (fun _ => 0)
+    I hf continuous_const hinv
+    (fun _ _ => rfl)
+    hI (all.mono fun x hx hl => ?_)
   obtain ⟨m, hm⟩ := exists_mem_compactCovering x
   exact hx m hm hl

@@ -6,10 +6,15 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Cycloto
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.CuspRep GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp
 
-theorem UpperTheory.V.Ws.Pt.cycIne :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (A : ValuationSubring Ω), A.valuation (l : Ω) < 1 → ∀ n : ℤ, n ≠ 0 → ∃ g ∈ Ine (F := F) A, cycBar F Ω l g ^ n ≠ 1 := by
+theorem UpperTheory.V.Ws.Pt.cycIne
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (A : ValuationSubring Ω),
+      A.valuation (l : Ω) < 1 → ∀ n : ℤ, n ≠ 0 → ∃ g ∈ Ine (F := F) A, cycBar F Ω l g ^ n ≠ 1 := by
   intro F Ω _ _ _ _ _ l _ A hA n hn
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
   haveI : IsAlgClosure ℚ Ω := IsAlgClosure.ofAlgebraic ℚ F Ω
@@ -19,17 +24,19 @@ theorem UpperTheory.V.Ws.Pt.cycIne :
   let f : ℕ → (F →ₐ[ℚ] Ω) := fun k => ((σ ^ k : Ω ≃ₐ[ℚ] Ω) : Ω →ₐ[ℚ] Ω).comp ι
   haveI : Finite (F →ₐ[ℚ] Ω) := inferInstance
   obtain ⟨a, b, hab, he⟩ := Finite.exists_ne_map_eq_of_infinite f
-  have key : ∀ a b : ℕ, a < b → f a = f b →
-      ∃ N : ℕ, 0 < N ∧ ∀ x : F, (σ ^ N) (algebraMap F Ω x) = algebraMap F Ω x := by
+  have key
+      : ∀ a b : ℕ,
+        a < b → f a = f b
+          → ∃ N : ℕ, 0 < N ∧ ∀ x : F, (σ ^ N) (algebraMap F Ω x) = algebraMap F Ω x := by
     intro a b hlt hfe
     refine ⟨b - a, Nat.sub_pos_of_lt hlt, fun x => ?_⟩
     have h1 : (σ ^ a) (algebraMap F Ω x) = (σ ^ b) (algebraMap F Ω x) :=
       congrArg (fun φ : F →ₐ[ℚ] Ω => φ x) hfe
-    have h2 : σ ^ b = σ ^ a * σ ^ (b - a) := by
-      rw [← pow_add, Nat.add_sub_cancel' hlt.le]
+    have h2 : σ ^ b = σ ^ a * σ ^ (b - a) := by rw [← pow_add, Nat.add_sub_cancel' hlt.le]
     rw [h2, AlgEquiv.mul_apply] at h1
     exact ((σ ^ a).injective h1).symm
-  obtain ⟨N, hN, hfix⟩ : ∃ N : ℕ, 0 < N ∧ ∀ x : F, (σ ^ N) (algebraMap F Ω x) = algebraMap F Ω x := by
+  obtain ⟨N, hN, hfix⟩
+      : ∃ N : ℕ, 0 < N ∧ ∀ x : F, (σ ^ N) (algebraMap F Ω x) = algebraMap F Ω x := by
     rcases lt_or_gt_of_ne hab with h | h
     · exact key a b h he
     · exact key b a h he.symm
@@ -45,8 +52,10 @@ theorem UpperTheory.V.Ws.Pt.cycIne :
   · show (g.restrictScalars ℚ : G ℚ Ω) ∈ Ine (F := ℚ) A
     rw [hg]
     exact Subgroup.pow_mem _ hσI N
-  · have hc : cycBar F Ω l g =
-        Units.map (algebraMap ℤ_[l] (Qbar l)).toMonoidHom (cycZ ℚ Ω l (g.restrictScalars ℚ)) := rfl
+  · have hc
+        : cycBar F Ω l g
+          = Units.map (algebraMap ℤ_[l] (Qbar l)).toMonoidHom (cycZ ℚ Ω l (g.restrictScalars ℚ)) :=
+      rfl
     rw [hc, hg, map_pow, hσu]
     intro h
     apply hu ((N : ℤ) * n) (mul_ne_zero (by exact_mod_cast hN.ne') hn)

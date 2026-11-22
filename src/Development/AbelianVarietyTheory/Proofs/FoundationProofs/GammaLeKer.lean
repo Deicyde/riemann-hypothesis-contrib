@@ -38,8 +38,8 @@ def act (T : Tower Ω ε) : SL(2, ℤ) →* (T.K ≃ₐ[Ω] T.K) where
 
 theorem act_apply (T : Tower Ω ε) (γ : SL(2, ℤ)) (f : T.K) : act T γ f = T.sl (ofSL γ⁻¹) f := rfl
 
-theorem sl_fix (T : Tower Ω ε) (γ : SL(2, ℤ)) :
-    ∀ x ∈ IntermediateField.adjoin Ω {T.jK}, T.sl (ofSL γ) x = x := by
+theorem sl_fix (T : Tower Ω ε) (γ : SL(2, ℤ))
+    : ∀ x ∈ IntermediateField.adjoin Ω {T.jK}, T.sl (ofSL γ) x = x := by
   have hle : IntermediateField.adjoin Ω {T.jK} ≤ IntermediateField.fixedField (act T).range := by
     rw [IntermediateField.adjoin_le_iff]
     intro x hx
@@ -63,40 +63,49 @@ def lvl (T : Tower Ω ε) (M : ℕ) : IntermediateField (IntermediateField.adjoi
     exact sl_fix T γ _ c.2
   inv_mem' x hx γ hγ := by rw [map_inv₀, hx γ hγ]
 
-theorem act_mem_lvl (T : Tower Ω ε) (M : ℕ) (γ : SL(2, ℤ)) {f : T.K} (hf : f ∈ lvl T M) :
-    act T γ f ∈ lvl T M := by
+theorem act_mem_lvl (T : Tower Ω ε) (M : ℕ) (γ : SL(2, ℤ)) {f : T.K} (hf : f ∈ lvl T M)
+    : act T γ f ∈ lvl T M := by
   intro δ hδ
   have hc : γ⁻¹ * δ * γ⁻¹⁻¹ ∈ CongruenceSubgroup.Gamma M :=
     (CongruenceSubgroup.Gamma_normal M).conj_mem δ hδ γ⁻¹
   have e : γ⁻¹ * δ = (γ⁻¹ * δ * γ⁻¹⁻¹) * γ⁻¹ := by group
   rw [act_apply, ← T.sl_mul, ← map_mul, e, map_mul, T.sl_mul, hf _ hc]
 
-def rho (T : Tower Ω ε) (M : ℕ) :
-    SL(2, ℤ) →* (lvl T M ≃ₐ[IntermediateField.adjoin Ω {T.jK}] lvl T M) where
-  toFun γ :=
-    { toFun := fun x => ⟨act T γ x, act_mem_lvl T M γ x.2⟩
-      invFun := fun x => ⟨act T γ⁻¹ x, act_mem_lvl T M γ⁻¹ x.2⟩
-      left_inv := fun x => Subtype.ext (by
+def rho (T : Tower Ω ε) (M : ℕ)
+    : SL(2, ℤ) →* (lvl T M ≃ₐ[IntermediateField.adjoin Ω {T.jK}] lvl T M) where
+  toFun γ := {
+    toFun := fun x => ⟨act T γ x, act_mem_lvl T M γ x.2⟩
+    invFun := fun x => ⟨act T γ⁻¹ x, act_mem_lvl T M γ⁻¹ x.2⟩
+    left_inv := fun x =>
+      Subtype.ext (by
         show act T γ⁻¹ (act T γ x) = x
         rw [← AlgEquiv.mul_apply, ← map_mul, inv_mul_cancel, map_one, AlgEquiv.one_apply])
-      right_inv := fun x => Subtype.ext (by
+    right_inv := fun x =>
+      Subtype.ext (by
         show act T γ (act T γ⁻¹ x) = x
         rw [← AlgEquiv.mul_apply, ← map_mul, mul_inv_cancel, map_one, AlgEquiv.one_apply])
-      map_mul' := fun x y => Subtype.ext (map_mul (act T γ) (x : T.K) y)
-      map_add' := fun x y => Subtype.ext (map_add (act T γ) (x : T.K) y)
-      commutes' := fun c => Subtype.ext (by
+    map_mul' := fun x y => Subtype.ext (map_mul (act T γ) (x : T.K) y)
+    map_add' := fun x y => Subtype.ext (map_add (act T γ) (x : T.K) y)
+    commutes' := fun c =>
+      Subtype.ext (by
         show act T γ (c : T.K) = (c : T.K)
         rw [act_apply]
-        exact sl_fix T _ _ c.2) }
-  map_one' := AlgEquiv.ext fun x => Subtype.ext (by
-    show act T 1 x = x
-    rw [map_one, AlgEquiv.one_apply])
-  map_mul' γ δ := AlgEquiv.ext fun x => Subtype.ext (by
-    show act T (γ * δ) x = act T γ (act T δ x)
-    rw [map_mul, AlgEquiv.mul_apply])
+        exact sl_fix T _ _ c.2)
+  }
+  map_one' :=
+    AlgEquiv.ext fun x =>
+      Subtype.ext (by
+        show act T 1 x = x
+        rw [map_one, AlgEquiv.one_apply])
+  map_mul' γ δ :=
+    AlgEquiv.ext fun x =>
+      Subtype.ext (by
+        show act T (γ * δ) x = act T γ (act T δ x)
+        rw [map_mul, AlgEquiv.mul_apply])
 
-theorem rho_val (T : Tower Ω ε) (M : ℕ) (γ : SL(2, ℤ)) (x : lvl T M) :
-    ((rho T M γ x : lvl T M) : T.K) = T.sl (ofSL γ⁻¹) x := rfl
+theorem rho_val (T : Tower Ω ε) (M : ℕ) (γ : SL(2, ℤ)) (x : lvl T M)
+    : ((rho T M γ x : lvl T M) : T.K) = T.sl (ofSL γ⁻¹) x :=
+  rfl
 
 theorem gamma_le_ker (T : Tower Ω ε) (M : ℕ) : CongruenceSubgroup.Gamma M ≤ (rho T M).ker := by
   intro γ hγ

@@ -17,14 +17,18 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section Defs
 
-variable {D : D7} {k0 : ℕ} (G : GramWordSpace.GramMap k0 D.R.rS) (X : GramWordSpace.Dat D k0)
-  (a : ℕ → ℕ → D.what₂.Tau → ℂ) (cb : ℕ → ℕ → ℝ) (c0 : ℝ) (χ : ℝ → ℝ)
+variable
+  {D : D7} {k0 : ℕ}
+  (G : GramWordSpace.GramMap k0 D.R.rS) (X : GramWordSpace.Dat D k0) (a : ℕ → ℕ → D.what₂.Tau → ℂ)
+  (cb : ℕ → ℕ → ℝ) (c0 : ℝ) (χ : ℝ → ℝ)
 
 end Defs
 
@@ -43,14 +47,18 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section Iface
 
-variable {D : D7} {k0 : ℕ} (G : GramWordSpace.GramMap k0 D.R.rS) (X : GramWordSpace.Dat D k0)
-  (a : ℕ → ℕ → D.what₂.Tau → ℂ) (cb : ℕ → ℕ → ℝ) (c0 : ℝ) (χ : ℝ → ℝ)
+variable
+  {D : D7} {k0 : ℕ}
+  (G : GramWordSpace.GramMap k0 D.R.rS) (X : GramWordSpace.Dat D k0) (a : ℕ → ℕ → D.what₂.Tau → ℂ)
+  (cb : ℕ → ℕ → ℝ) (c0 : ℝ) (χ : ℝ → ℝ)
 
 end Iface
 
@@ -69,21 +77,26 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section Append
 
-variable {D : D7} {k0 : ℕ} (X : GramWordSpace.Dat D k0) (a : ℕ → ℕ → D.what₂.Tau → ℂ) (cb : ℕ → ℕ → ℝ)
+variable
+  {D : D7} {k0 : ℕ} (X : GramWordSpace.Dat D k0) (a : ℕ → ℕ → D.what₂.Tau → ℂ) (cb : ℕ → ℕ → ℝ)
 
 end Append
 
 section E0
 
-variable {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0}
-  {a : ℕ → ℕ → D.what₂.Tau → ℂ} {cb : ℕ → ℕ → ℝ} {c0 : ℝ} {χ : ℝ → ℝ} {ha : ∀ i s v, a i s v ≠ 0} {Ks : ℕ}
-  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {Φ : ℝ → GramWordSpace.GWord D → TA.Pt D.host.E → H}
+variable
+  {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0}
+  {a : ℕ → ℕ → D.what₂.Tau → ℂ} {cb : ℕ → ℕ → ℝ} {c0 : ℝ} {χ : ℝ → ℝ} {ha : ∀ i s v, a i s v ≠ 0}
+  {Ks : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {Φ : ℝ → GramWordSpace.GWord D → TA.Pt D.host.E → H}
 
 end E0
 
@@ -102,7 +115,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -114,10 +129,13 @@ end Small
 
 section P72
 
-variable {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0}
+variable
+  {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0}
   {a : ℕ → ℕ → D.what₂.Tau → ℂ} {cb : ℕ → ℕ → ℝ} {c0 : ℝ} {χ : ℝ → ℝ} {Ks : ℕ}
-  {E₀ Eg E₁ E₂ E₃ C C4 T T' : ℝ} {δ : D.host.E} {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {κL : ℕ → ℕ → ℝ}
-  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {Φ : ℝ → GramWordSpace.GWord D → TA.Pt D.host.E → H}
+  {E₀ Eg E₁ E₂ E₃ C C4 T T' : ℝ} {δ : D.host.E} {x : D.what₂.Tau → LocalDataRealPlace D}
+  {L : LatticeDataWithDual D} {κL : ℕ → ℕ → ℝ} {H : Type}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {Φ : ℝ → GramWordSpace.GWord D → TA.Pt D.host.E → H}
 
 end P72
 
@@ -136,16 +154,21 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section P74
 
-variable {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0}
+variable
+  {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0}
   {a : ℕ → ℕ → D.what₂.Tau → ℂ} {cb : ℕ → ℕ → ℝ} {c0 : ℝ} {χ : ℝ → ℝ} {Ks : ℕ}
-  {E₀ Eg E₁ E₂ E₃ C C4 T T' : ℝ} {δ : D.host.E} {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {κL : ℕ → ℕ → ℝ}
-  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {Φ : ℝ → GramWordSpace.GWord D → TA.Pt D.host.E → H}
+  {E₀ Eg E₁ E₂ E₃ C C4 T T' : ℝ} {δ : D.host.E} {x : D.what₂.Tau → LocalDataRealPlace D}
+  {L : LatticeDataWithDual D} {κL : ℕ → ℕ → ℝ} {H : Type}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {Φ : ℝ → GramWordSpace.GWord D → TA.Pt D.host.E → H}
 
 end P74
 
@@ -164,7 +187,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -174,10 +199,13 @@ end Psd
 
 section Lift
 
-variable {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0}
+variable
+  {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0}
   {a : ℕ → ℕ → D.what₂.Tau → ℂ} {cb : ℕ → ℕ → ℝ} {c0 : ℝ} {χ : ℝ → ℝ} {Ks : ℕ}
-  {E₀ Eg E₁ E₂ E₃ C C4 T T' : ℝ} {δ : D.host.E} {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {κL : ℕ → ℕ → ℝ}
-  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {Φ : ℝ → GramWordSpace.GWord D → TA.Pt D.host.E → H}
+  {E₀ Eg E₁ E₂ E₃ C C4 T T' : ℝ} {δ : D.host.E} {x : D.what₂.Tau → LocalDataRealPlace D}
+  {L : LatticeDataWithDual D} {κL : ℕ → ℕ → ℝ} {H : Type}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {Φ : ℝ → GramWordSpace.GWord D → TA.Pt D.host.E → H}
 
 end Lift
 
@@ -196,13 +224,17 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section Pos
 
-variable {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0} {χ : ℝ → ℝ} {Ks : ℕ} {E₀ Eg : ℝ}
+variable
+  {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0} {χ : ℝ → ℝ}
+  {Ks : ℕ} {E₀ Eg : ℝ}
 
 end Pos
 
@@ -221,16 +253,21 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section Main
 
-variable {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0}
+variable
+  {D : D7} {k0 : ℕ} {G : GramWordSpace.GramMap k0 D.R.rS} {X : GramWordSpace.Dat D k0}
   {a : ℕ → ℕ → D.what₂.Tau → ℂ} {cb : ℕ → ℕ → ℝ} {c0 : ℝ} {χ : ℝ → ℝ} {Ks : ℕ}
-  {E₀ Eg E₁ E₂ E₃ C C4 T T' : ℝ} {δ : D.host.E} {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {κL : ℕ → ℕ → ℝ}
-  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {Φ : ℝ → GramWordSpace.GWord D → TA.Pt D.host.E → H}
+  {E₀ Eg E₁ E₂ E₃ C C4 T T' : ℝ} {δ : D.host.E} {x : D.what₂.Tau → LocalDataRealPlace D}
+  {L : LatticeDataWithDual D} {κL : ℕ → ℕ → ℝ} {H : Type}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {Φ : ℝ → GramWordSpace.GWord D → TA.Pt D.host.E → H}
 
 end Main
 
@@ -249,14 +286,18 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section Vec
 
-variable {D : D7} {k0 : ℕ} (G : GramWordSpace.GramMap k0 D.R.rS) (X : GramWordSpace.Dat D k0)
-  (a : ℕ → ℕ → D.what₂.Tau → ℂ) (cb : ℕ → ℕ → ℝ) (c0 : ℝ) (χ : ℝ → ℝ)
+variable
+  {D : D7} {k0 : ℕ}
+  (G : GramWordSpace.GramMap k0 D.R.rS) (X : GramWordSpace.Dat D k0) (a : ℕ → ℕ → D.what₂.Tau → ℂ)
+  (cb : ℕ → ℕ → ℝ) (c0 : ℝ) (χ : ℝ → ℝ)
 
 end Vec
 
@@ -275,7 +316,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -294,7 +337,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -325,7 +370,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -356,7 +403,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -375,7 +424,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -394,13 +445,17 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section Span
 
-variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
+variable
+  {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+  [MeasurableSpace V] [BorelSpace V]
 
 end Span
 
@@ -435,29 +490,34 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 open NumberField
 
-theorem trace_places {K : Type} [Field K] [NumberField K] [IsTotallyComplex K] (a : K) :
-    ((Algebra.trace ℚ K a : ℚ) : ℝ) = ∑ v : InfinitePlace K, 2 * (v.embedding a).re := by
+theorem trace_places {K : Type} [Field K] [NumberField K] [IsTotallyComplex K] (a : K)
+    : ((Algebra.trace ℚ K a : ℚ) : ℝ) = ∑ v : InfinitePlace K, 2 * (v.embedding a).re := by
   classical
   have h := trace_eq_sum_embeddings (K := ℚ) (L := K) ℂ (x := a)
-  rw [← Fintype.sum_equiv (RingHom.equivRatAlgHom K ℂ) (fun φ => φ a)
-      (fun σ => σ a) (fun _ => by simp [RingHom.equivRatAlgHom_apply])] at h
+  rw [← Fintype.sum_equiv (RingHom.equivRatAlgHom K ℂ)
+      (fun φ => φ a)
+      (fun σ => σ a)
+      (fun _ => by simp [RingHom.equivRatAlgHom_apply])]
+    at h
   rw [← Finset.sum_fiberwise Finset.univ InfinitePlace.mk (fun φ => φ a)] at h
   have h2 := congrArg Complex.re h
   rw [Complex.re_sum] at h2
-  have hq : (algebraMap ℚ ℂ (Algebra.trace ℚ K a)).re = ((Algebra.trace ℚ K a : ℚ) : ℝ) := by
-    simp
+  have hq : (algebraMap ℚ ℂ (Algebra.trace ℚ K a)).re = ((Algebra.trace ℚ K a : ℚ) : ℝ) := by simp
   rw [hq] at h2
   rw [h2]
   refine Finset.sum_congr rfl fun w _ => ?_
   rw [Complex.re_sum]
-  have hfib : ∀ φ ∈ (Finset.univ.filter fun φ : K →+* ℂ => InfinitePlace.mk φ = w),
-      (φ a).re = (w.embedding a).re := by
+  have hfib
+      : ∀ φ ∈ (Finset.univ.filter fun φ : K →+* ℂ => InfinitePlace.mk φ = w),
+        (φ a).re = (w.embedding a).re := by
     intro φ hφ
     have hm := (Finset.mem_filter.mp hφ).2
     rw [← InfinitePlace.mk_embedding w, InfinitePlace.mk_eq_iff] at hm
@@ -468,8 +528,8 @@ theorem trace_places {K : Type} [Field K] [NumberField K] [IsTotallyComplex K] (
     (IsTotallyComplex.isComplex w).mult_eq_two]
   simp
 
-theorem trace_tau (D : D7) (x : D.host.E) :
-    ((Algebra.trace ℚ D.host.E x : ℚ) : ℝ) = ∑ v, 2 * (plEmb D v x).re := by
+theorem trace_tau (D : D7) (x : D.host.E)
+    : ((Algebra.trace ℚ D.host.E x : ℚ) : ℝ) = ∑ v, 2 * (plEmb D v x).re := by
   have := host_totallyComplex D
   rw [trace_places x]
   refine (Fintype.sum_bijective (plOf D) (plOf_bijective D) _ _ fun v => ?_).symm
@@ -500,7 +560,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -525,7 +587,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -537,7 +601,8 @@ variable (D : D7)
 
 instance hostFieldTotallyComplex : NumberField.IsTotallyComplex D.host.E := host_totallyComplex D
 
-theorem place_is_complex (v : D.what₂.Tau) : (plOf D v).IsComplex := NumberField.IsTotallyComplex.isComplex _
+theorem place_is_complex (v : D.what₂.Tau) : (plOf D v).IsComplex :=
+  NumberField.IsTotallyComplex.isComplex _
 
 def l2Pl : D.what₂.Tau ≃ {w : InfinitePlace D.host.E // w.IsComplex} :=
   Equiv.ofBijective (fun v => ⟨plOf D v, place_is_complex D v⟩) (by
@@ -549,7 +614,8 @@ def l2Pl : D.what₂.Tau ≃ {w : InfinitePlace D.host.E // w.IsComplex} :=
       exact ⟨v, Subtype.ext hv⟩)
 
 instance no_real_places : IsEmpty {w : InfinitePlace D.host.E // w.IsReal} :=
-  ⟨fun w => (InfinitePlace.not_isReal_iff_isComplex.2 (NumberField.IsTotallyComplex.isComplex w.1)) w.2⟩
+  ⟨fun w =>
+    (InfinitePlace.not_isReal_iff_isComplex.2 (NumberField.IsTotallyComplex.isComplex w.1)) w.2⟩
 
 end Geo
 
@@ -568,7 +634,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -596,7 +664,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -621,7 +691,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -629,20 +701,26 @@ def sclL (av : ℕ → ℕ → ℂ) : ℕ → List (ℂ × ℕ) → List (ℂ ×
   | _, [] => []
   | o, (t, s) :: bs => (av (o + 1) s * t, s) :: sclL av (o + s) bs
 
-def okL (r : ℕ) (T T' : ℝ) (o s : ℕ) (t : ℂ) : Prop := t ≠ 0 ∧ (s = 1 → o = r → T * T' < Complex.normSq t)
+def okL (r : ℕ) (T T' : ℝ) (o s : ℕ) (t : ℂ) : Prop :=
+  t ≠ 0 ∧ (s = 1 → o = r → T * T' < Complex.normSq t)
 
 def wLoc (k r : ℕ) (T T' : ℝ) : ℕ → List (ℂ × ℕ) → ℝ
   | _, [] => 1
   | o, (t, s) :: bs =>
-    (if okL r T T' o s t then Real.sqrt (ptWeightFrom k r T T' o [(t, s)]) else 0) * wLoc k r T T' (o + s) bs
+    (if okL r T T' o s t then Real.sqrt (ptWeightFrom k r T T' o [(t, s)]) else 0)
+      * wLoc k r T T' (o + s) bs
 
-def cblk (κ : ℝ) (i s : ℕ) : ℝ := (κ ^ (s * (s - 1)))⁻¹ * ∏ l ∈ Finset.Ico i (i + s), κ ^ (4 * (l - 1))
+def cblk (κ : ℝ) (i s : ℕ) : ℝ :=
+  (κ ^ (s * (s - 1)))⁻¹ * ∏ l ∈ Finset.Ico i (i + s), κ ^ (4 * (l - 1))
 
 def ccL (κ : ℝ) : ℕ → List (ℂ × ℕ) → ℝ
   | _, [] => 1
   | o, (_, s) :: bs => Real.sqrt (cblk κ (o + 1) s) * ccL κ (o + s) bs
 
-structure LocFrame (D : D7) {k0 : ℕ} (hk : k0 + 1 = D.R.k) (G : GramWordSpace.GramMap k0 D.R.rS) (B : LocBessel D.R.k D.R.rS)
+structure LocFrame
+    (D : D7)
+    {k0 : ℕ} (hk : k0 + 1 = D.R.k) (G : GramWordSpace.GramMap k0 D.R.rS)
+    (B : LocBessel D.R.k D.R.rS)
     (f : Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ → (B.Wq →L[ℂ] B.Wp))
     (μsec : ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ) where
   B' : LocBessel (k0 + 1) D.R.rS
@@ -661,25 +739,40 @@ structure LocFrame (D : D7) {k0 : ℕ} (hk : k0 + 1 = D.R.k) (G : GramWordSpace.
   hf : UnitaryLevelOperators.IsKFinCoefT B'.σ f'
   hav : ∀ i s, ‖av i s‖ = (‖B.c‖ / 2) ^ (2 * i + s - 3)
   hA : 0 < A
-  val : ∀ γ γ' : Point ℂ (D.R.rS + 1),
-    ((Real.sqrt (ptWeightFrom D.R.k D.R.rS (Tz D.R.k D.R.rS B.z) (Tz D.R.k D.R.rS B.z') 0 γ.1) *
-        Real.sqrt (ptWeightFrom D.R.k D.R.rS (Tz D.R.k D.R.rS B.z) (Tz D.R.k D.R.rS B.z') 0 γ'.1) : ℝ) : ℂ) *
-      hsInner ((BlockEstimateTheorem.vmOf D hk G).V B f γ.1) ((BlockEstimateTheorem.vmOf D hk G).V B f γ'.1) =
-    ((A * (ccL (‖B.c‖ / 2) 0 γ.1 * ccL (‖B.c‖ / 2) 0 γ'.1) *
-        (wLoc (k0 + 1) D.R.rS (Tz (k0 + 1) D.R.rS B'.z) (Tz (k0 + 1) D.R.rS B'.z') 0 (sclL av 0 γ.1) *
-          wLoc (k0 + 1) D.R.rS (Tz (k0 + 1) D.R.rS B'.z) (Tz (k0 + 1) D.R.rS B'.z') 0 (sclL av 0 γ'.1)) : ℝ) : ℂ) *
-      hsInner (G.V B' f' (sclL av 0 γ.1)) (G.V B' f' (sclL av 0 γ'.1))
-  energy : ENNReal.ofReal (A * (B'.beta μ' f' f').re) ≤
-    ∫⁻ p : (Fin D.R.rS → ℂ) × ℂ, ENNReal.ofReal (bcWeight D.R.k D.R.rS (Tz D.R.k D.R.rS B.z) (Tz D.R.k D.R.rS B.z') p *
-      hsNormSq (B.J f (bigCell D.R.k D.R.rS p.1 (μsec p.2))))
+  val
+    : ∀ γ γ' : Point ℂ (D.R.rS + 1),
+      ((Real.sqrt (ptWeightFrom D.R.k D.R.rS (Tz D.R.k D.R.rS B.z) (Tz D.R.k D.R.rS B.z') 0 γ.1)
+                * Real.sqrt (ptWeightFrom D.R.k D.R.rS (Tz D.R.k D.R.rS B.z) (Tz D.R.k D.R.rS B.z')
+                  0 γ'.1)
+              : ℝ)
+            : ℂ)
+          * hsInner ((BlockEstimateTheorem.vmOf D hk G).V B f γ.1)
+            ((BlockEstimateTheorem.vmOf D hk G).V B f γ'.1)
+        = ((A * (ccL (‖B.c‖ / 2) 0 γ.1 * ccL (‖B.c‖ / 2) 0 γ'.1)
+                * (wLoc (k0 + 1) D.R.rS (Tz (k0 + 1) D.R.rS B'.z) (Tz (k0 + 1) D.R.rS B'.z') 0
+                    (sclL av 0 γ.1)
+                  * wLoc (k0 + 1) D.R.rS (Tz (k0 + 1) D.R.rS B'.z) (Tz (k0 + 1) D.R.rS B'.z') 0
+                    (sclL av 0 γ'.1))
+              : ℝ)
+            : ℂ)
+          * hsInner (G.V B' f' (sclL av 0 γ.1)) (G.V B' f' (sclL av 0 γ'.1))
+  energy
+    : ENNReal.ofReal (A * (B'.beta μ' f' f').re)
+      ≤ ∫⁻ p : (Fin D.R.rS → ℂ) × ℂ, ENNReal.ofReal (bcWeight D.R.k D.R.rS (Tz D.R.k D.R.rS B.z) (Tz D.R.k D.R.rS B.z') p *
+          hsNormSq (B.J f (bigCell D.R.k D.R.rS p.1 (μsec p.2))))
 
 section Glob
 
-variable {D : D7} (L : LatticeDataWithDual D) (kap : D.what₂.Tau → ℝ) (av : D.what₂.Tau → ℕ → ℕ → ℂ) (Aa : D.what₂.Tau → ℝ)
+variable
+  {D : D7} (L : LatticeDataWithDual D) (kap : D.what₂.Tau → ℝ) (av : D.what₂.Tau → ℕ → ℕ → ℂ)
+  (Aa : D.what₂.Tau → ℝ)
 
 end Glob
 
-structure XTie {D : D7} {k0 : ℕ} (X : GramWordSpace.Dat D k0) (x : D.what₂.Tau → LocalDataRealPlace D) (T T' : ℝ) (kap : D.what₂.Tau → ℝ) : Prop where
+structure XTie
+    {D : D7} {k0 : ℕ} (X : GramWordSpace.Dat D k0) (x : D.what₂.Tau → LocalDataRealPlace D)
+    (T T' : ℝ) (kap : D.what₂.Tau → ℝ)
+    : Prop where
   hT : ∀ v, X.T v = kap v ^ (2 * D.R.rS) * T
   hT' : ∀ v, X.T' v = kap v ^ (2 * D.R.rS) * T'
   lam : ∀ v, (X.loc v).lam = (x v).lam
@@ -705,18 +798,28 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section Fr
 
-variable {D : D7} {k0 : ℕ} (hk : k0 + 1 = D.R.k) {G : GramWordSpace.GramMap k0 D.R.rS} {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
-    {f : ∀ v, Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ → ((B v).Wq →L[ℂ] (B v).Wp)}
-    {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
-    (Fr : ∀ v, LocFrame D hk G (B v) (f v) (μsec v)) (x : D.what₂.Tau → LocalDataRealPlace D) (l : D.what₂.Tau → Fin (k0 + 1))
-    (R : ∀ v (j : ℕ) (hj : j ≤ D.R.rS), ℂ → Matrix (Fin 2) (Fin 2) (GramWordSpace.lev (Fr v).B' (Fr v).μ' j hj).POp)
-    (Th : ∀ v (j : ℕ) (_ : j ≤ D.R.rS) (w : TopsChoicePartA.Word), TopsChoicePartA.AuxiliarySlotStates w.length → GramWordSpace.GFn (Fr v).B' → GramWordSpace.GFn (Fr v).B')
+variable
+  {D : D7} {k0 : ℕ} (hk : k0 + 1 = D.R.k)
+  {G : GramWordSpace.GramMap k0 D.R.rS} {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
+  {f : ∀ v,
+    Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ
+      → ((B v).Wq →L[ℂ] (B v).Wp)}
+  {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
+  (Fr : ∀ v, LocFrame D hk G (B v) (f v) (μsec v))
+  (x : D.what₂.Tau → LocalDataRealPlace D) (l : D.what₂.Tau → Fin (k0 + 1))
+  (R : ∀ v (j : ℕ) (hj : j ≤ D.R.rS),
+    ℂ → Matrix (Fin 2) (Fin 2) (GramWordSpace.lev (Fr v).B' (Fr v).μ' j hj).POp)
+  (Th : ∀ v (j : ℕ) (_ : j ≤ D.R.rS) (w : TopsChoicePartA.Word),
+    TopsChoicePartA.AuxiliarySlotStates w.length → GramWordSpace.GFn (Fr v).B'
+      → GramWordSpace.GFn (Fr v).B')
 
 end Fr
 
@@ -735,7 +838,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -754,23 +859,28 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
-
 section Num
 
-variable {D : D7} {k0 : ℕ} {X : GramWordSpace.Dat D k0} {Ks : ℕ} {E₀ Eg E₁ E₂ C T T' ϱ : ℝ} {δ : D.host.E}
-    {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {Kd : KernelData D} {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
-    {f : ∀ v, Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ → ((B v).Wq →L[ℂ] (B v).Wp)}
-    {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
-    {kap : D.what₂.Tau → ℝ} {av : D.what₂.Tau → ℕ → ℕ → ℂ}
+variable
+  {D : D7} {k0 : ℕ} {X : GramWordSpace.Dat D k0} {Ks : ℕ} {E₀ Eg E₁ E₂ C T T' ϱ : ℝ} {δ : D.host.E}
+  {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {Kd : KernelData D}
+  {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
+  {f : ∀ v,
+    Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ
+      → ((B v).Wq →L[ℂ] (B v).Wp)}
+  {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ} {kap : D.what₂.Tau → ℝ}
+  {av : D.what₂.Tau → ℕ → ℕ → ℂ}
 
-variable (hH : ThmAHyp D C Ks δ T T' x L Kd B f μsec) (hX : XTie X x T T' kap)
-    (hϱ : IsFrameScale D L ϱ) (hkap : ∀ v, kap v = kaV D δ v / ϱ)
-    (hav : ∀ v i s, ‖av v i s‖ = kap v ^ (2 * i + s - 3))
-    (hE₁ : 0 < E₁) (hE₁C : E₁ ≤ C) (hE₂ : 0 < E₂) (hE₂C : E₂ ≤ C)
+variable
+  (hH : ThmAHyp D C Ks δ T T' x L Kd B f μsec) (hX : XTie X x T T' kap) (hϱ : IsFrameScale D L ϱ)
+  (hkap : ∀ v, kap v = kaV D δ v / ϱ) (hav : ∀ v i s, ‖av v i s‖ = kap v ^ (2 * i + s - 3))
+  (hE₁ : 0 < E₁) (hE₁C : E₁ ≤ C) (hE₂ : 0 < E₂) (hE₂C : E₂ ≤ C)
 
 include hH hX hϱ hkap hav hE₁ hE₁C hE₂ hE₂C
 
@@ -791,21 +901,26 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section Num1
 
-variable {D : D7} {k0 : ℕ} {X : GramWordSpace.Dat D k0} {Ks : ℕ} {E₀ Eg E₁ E₂ C T T' ϱ : ℝ} {δ : D.host.E}
-    {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {Kd : KernelData D} {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
-    {f : ∀ v, Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ → ((B v).Wq →L[ℂ] (B v).Wp)}
-    {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
-    {kap : D.what₂.Tau → ℝ} {av : D.what₂.Tau → ℕ → ℕ → ℂ}
-    (hH : ThmAHyp D C Ks δ T T' x L Kd B f μsec) (hX : XTie X x T T' kap)
-    (hϱ : IsFrameScale D L ϱ) (hkap : ∀ v, kap v = kaV D δ v / ϱ)
-    (hav : ∀ v i s, ‖av v i s‖ = kap v ^ (2 * i + s - 3))
-    (hE₁ : 0 < E₁) (hE₁C : E₁ ≤ C) (hE₂ : 0 < E₂) (hE₂C : E₂ ≤ C)
+variable
+  {D : D7} {k0 : ℕ} {X : GramWordSpace.Dat D k0} {Ks : ℕ} {E₀ Eg E₁ E₂ C T T' ϱ : ℝ} {δ : D.host.E}
+  {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {Kd : KernelData D}
+  {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
+  {f : ∀ v,
+    Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ
+      → ((B v).Wq →L[ℂ] (B v).Wp)}
+  {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ} {kap : D.what₂.Tau → ℝ}
+  {av : D.what₂.Tau → ℕ → ℕ → ℂ}
+  (hH : ThmAHyp D C Ks δ T T' x L Kd B f μsec) (hX : XTie X x T T' kap) (hϱ : IsFrameScale D L ϱ)
+  (hkap : ∀ v, kap v = kaV D δ v / ϱ) (hav : ∀ v i s, ‖av v i s‖ = kap v ^ (2 * i + s - 3))
+  (hE₁ : 0 < E₁) (hE₁C : E₁ ≤ C) (hE₂ : 0 < E₂) (hE₂C : E₂ ≤ C)
 
 include hH hX hϱ hkap hav hE₁ hE₁C hE₂ hE₂C
 
@@ -826,21 +941,26 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section Num2
 
-variable {D : D7} {k0 : ℕ} {X : GramWordSpace.Dat D k0} {Ks : ℕ} {E₀ Eg E₁ E₂ C T T' ϱ : ℝ} {δ : D.host.E}
-    {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {Kd : KernelData D} {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
-    {f : ∀ v, Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ → ((B v).Wq →L[ℂ] (B v).Wp)}
-    {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
-    {kap : D.what₂.Tau → ℝ} {av : D.what₂.Tau → ℕ → ℕ → ℂ}
-    (hH : ThmAHyp D C Ks δ T T' x L Kd B f μsec) (hX : XTie X x T T' kap)
-    (hϱ : IsFrameScale D L ϱ) (hkap : ∀ v, kap v = kaV D δ v / ϱ)
-    (hav : ∀ v i s, ‖av v i s‖ = kap v ^ (2 * i + s - 3))
-    (hE₁ : 0 < E₁) (hE₁C : E₁ ≤ C) (hE₂ : 0 < E₂) (hE₂C : E₂ ≤ C)
+variable
+  {D : D7} {k0 : ℕ} {X : GramWordSpace.Dat D k0} {Ks : ℕ} {E₀ Eg E₁ E₂ C T T' ϱ : ℝ} {δ : D.host.E}
+  {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {Kd : KernelData D}
+  {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
+  {f : ∀ v,
+    Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ
+      → ((B v).Wq →L[ℂ] (B v).Wp)}
+  {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ} {kap : D.what₂.Tau → ℝ}
+  {av : D.what₂.Tau → ℕ → ℕ → ℂ}
+  (hH : ThmAHyp D C Ks δ T T' x L Kd B f μsec) (hX : XTie X x T T' kap) (hϱ : IsFrameScale D L ϱ)
+  (hkap : ∀ v, kap v = kaV D δ v / ϱ) (hav : ∀ v i s, ‖av v i s‖ = kap v ^ (2 * i + s - 3))
+  (hE₁ : 0 < E₁) (hE₁C : E₁ ≤ C) (hE₂ : 0 < E₂) (hE₂C : E₂ ≤ C)
 
 include hH hX hϱ hkap hav hE₁ hE₁C hE₂ hE₂C
 
@@ -861,22 +981,28 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section Num3
 
-variable {D : D7} {k0 : ℕ} {X : GramWordSpace.Dat D k0} {Ks : ℕ} {E₀ Eg E₁ E₂ C T T' ϱ : ℝ} {δ : D.host.E}
-    {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {Kd : KernelData D} {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
-    {f : ∀ v, Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ → ((B v).Wq →L[ℂ] (B v).Wp)}
-    {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
-    {kap : D.what₂.Tau → ℝ} {av : D.what₂.Tau → ℕ → ℕ → ℂ}
+variable
+  {D : D7} {k0 : ℕ} {X : GramWordSpace.Dat D k0} {Ks : ℕ} {E₀ Eg E₁ E₂ C T T' ϱ : ℝ} {δ : D.host.E}
+  {x : D.what₂.Tau → LocalDataRealPlace D} {L : LatticeDataWithDual D} {Kd : KernelData D}
+  {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
+  {f : ∀ v,
+    Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ
+      → ((B v).Wq →L[ℂ] (B v).Wp)}
+  {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ} {kap : D.what₂.Tau → ℝ}
+  {av : D.what₂.Tau → ℕ → ℕ → ℂ}
 
-variable (hH : ThmAHyp D C Ks δ T T' x L Kd B f μsec) (hX : XTie X x T T' kap)
-    (hϱ : IsFrameScale D L ϱ) (hkap : ∀ v, kap v = kaV D δ v / ϱ)
-    (hav : ∀ v i s, ‖av v i s‖ = kap v ^ (2 * i + s - 3))
-    (hE₁ : 0 < E₁) (hE₁C : E₁ ≤ C) (hE₂ : 0 < E₂) (hE₂C : E₂ ≤ C)
+variable
+  (hH : ThmAHyp D C Ks δ T T' x L Kd B f μsec) (hX : XTie X x T T' kap) (hϱ : IsFrameScale D L ϱ)
+  (hkap : ∀ v, kap v = kaV D δ v / ϱ) (hav : ∀ v i s, ‖av v i s‖ = kap v ^ (2 * i + s - 3))
+  (hE₁ : 0 < E₁) (hE₁C : E₁ ≤ C) (hE₂ : 0 < E₂) (hE₂C : E₂ ≤ C)
 
 include hH hX hϱ hkap hav hE₁ hE₁C hE₂ hE₂C
 
@@ -897,7 +1023,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -922,18 +1050,28 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
 section ValM
 
-variable {D : D7} {k0 : ℕ} (hk : k0 + 1 = D.R.k) {G : GramWordSpace.GramMap k0 D.R.rS} {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
-    {f : ∀ v, Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ → ((B v).Wq →L[ℂ] (B v).Wp)}
-    {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
-    (Fr : ∀ v, LocFrame D hk G (B v) (f v) (μsec v)) (x : D.what₂.Tau → LocalDataRealPlace D) (l : D.what₂.Tau → Fin (k0 + 1))
-    (R : ∀ v (j : ℕ) (hj : j ≤ D.R.rS), ℂ → Matrix (Fin 2) (Fin 2) (GramWordSpace.lev (Fr v).B' (Fr v).μ' j hj).POp)
-    (Th : ∀ v (j : ℕ) (_ : j ≤ D.R.rS) (w : TopsChoicePartA.Word), TopsChoicePartA.AuxiliarySlotStates w.length → GramWordSpace.GFn (Fr v).B' → GramWordSpace.GFn (Fr v).B')
+variable
+  {D : D7} {k0 : ℕ} (hk : k0 + 1 = D.R.k)
+  {G : GramWordSpace.GramMap k0 D.R.rS} {B : D.what₂.Tau → LocBessel D.R.k D.R.rS}
+  {f : ∀ v,
+    Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ
+      → ((B v).Wq →L[ℂ] (B v).Wp)}
+  {μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ}
+  (Fr : ∀ v, LocFrame D hk G (B v) (f v) (μsec v))
+  (x : D.what₂.Tau → LocalDataRealPlace D) (l : D.what₂.Tau → Fin (k0 + 1))
+  (R : ∀ v (j : ℕ) (hj : j ≤ D.R.rS),
+    ℂ → Matrix (Fin 2) (Fin 2) (GramWordSpace.lev (Fr v).B' (Fr v).μ' j hj).POp)
+  (Th : ∀ v (j : ℕ) (_ : j ≤ D.R.rS) (w : TopsChoicePartA.Word),
+    TopsChoicePartA.AuxiliarySlotStates w.length → GramWordSpace.GFn (Fr v).B'
+      → GramWordSpace.GFn (Fr v).B')
 
 end ValM
 
@@ -952,7 +1090,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 
@@ -971,7 +1111,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.BlockEstimateWords
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt
+  Formalism.MainNotions.InterlacingSignCuts Formalism.MainNotions.BridgeLemma₅
 
 attribute [local instance] Classical.propDecidable
 

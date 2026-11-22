@@ -4,7 +4,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.MainNotions.N GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.GalOfCusp UpperTheory.V.Af
+open NumberField IsDedekindDomain Matrix Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  Formalism.BasicNotions Formalism.MainNotions.N GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.GalOfCusp UpperTheory.V.Af
 open scoped Classical
 
 namespace UpperTheory.V.Z.Int
@@ -39,8 +41,7 @@ private lemma nu_mulVec_le {I : Type} [Fintype I] (A : Matrix I I ℂ) (v : I �
 
 end SlopeTestRemainingChoices
 
-theorem absBound :
-    UpperTheory.V.Z.Int.AbsBound := by
+theorem absBound : UpperTheory.V.Z.Int.AbsBound := by
   intro l _ ι G _ Γ K I _ R F s a c C hc hfin hF hΓ hK heig hRK hRL
   set Nf : G → I → ℂ := fun g => R g⁻¹ *ᵥ F g with hN
   have Rinv : ∀ g, R g⁻¹ * R g = 1 := fun g => by rw [← map_mul, inv_mul_cancel, map_one]
@@ -67,8 +68,7 @@ theorem absBound :
     push_neg at hcon
     apply hF
     funext g
-    have : F g = R g *ᵥ Nf g := by
-      simp only [hN, mulVec_mulVec, Rinv', one_mulVec]
+    have : F g = R g *ᵥ Nf g := by simp only [hN, mulVec_mulVec, Rinv', one_mulVec]
     rw [this, show Nf g = 0 from funext (hcon g)]
     simp
   have hC : 0 ≤ C := (nu_nonneg' ι _).trans (hRK 1 K.one_mem i0 i0)
@@ -80,61 +80,79 @@ theorem absBound :
     have hB0n : 0 ≤ B0 := Finset.sum_nonneg fun q _ => Finset.sum_nonneg fun i _ => nu_nonneg' ι _
     have hle : ∀ (q : DoubleCoset.Quotient (Γ : Set G) (K : Set G)) j, nu ι (Nf q.out j) ≤ B0 := by
       intro q j
-      calc nu ι (Nf q.out j) ≤ ∑ i, nu ι (Nf q.out i) :=
-            Finset.single_le_sum (f := fun i => nu ι (Nf q.out i)) (fun i _ => nu_nonneg' ι _) (Finset.mem_univ j)
-        _ ≤ B0 := Finset.single_le_sum (f := fun q : DoubleCoset.Quotient (Γ : Set G) (K : Set G) => ∑ i, nu ι (Nf q.out i))
-            (fun q _ => Finset.sum_nonneg fun i _ => nu_nonneg' ι _) (Finset.mem_univ q)
+      calc
+        nu ι (Nf q.out j) ≤ ∑ i, nu ι (Nf q.out i) :=
+          Finset.single_le_sum
+            (f := fun i => nu ι (Nf q.out i))
+            (fun i _ => nu_nonneg' ι _)
+            (Finset.mem_univ j)
+        _ ≤ B0 :=
+          Finset.single_le_sum
+            (f := fun q : DoubleCoset.Quotient (Γ : Set G) (K : Set G) => ∑ i, nu ι (Nf q.out i))
+            (fun q _ => Finset.sum_nonneg fun i _ => nu_nonneg' ι _)
+            (Finset.mem_univ q)
     refine ⟨C * B0, mul_nonneg hC hB0n, fun g i => ?_⟩
     obtain ⟨h, hh, k, hk, e⟩ := DoubleCoset.mk_out_eq_mul Γ K g
-    have hg : g = h⁻¹ * ((DoubleCoset.mk Γ K g).out * k⁻¹) := by
-      rw [e]; group
+    have hg : g = h⁻¹ * ((DoubleCoset.mk Γ K g).out * k⁻¹) := by rw [e]; group
     have hNg : Nf g = R (k⁻¹)⁻¹ *ᵥ Nf (DoubleCoset.mk Γ K g).out := by
       conv_lhs => rw [hg]
       rw [hNΓ _ (Γ.inv_mem hh), hNK _ (K.inv_mem hk)]
     rw [hNg]
     exact nu_mulVec_le ι _ _ C B0 hC hB0n (hRK _ (K.inv_mem (K.inv_mem hk))) (hle _) i
 
-  have hstep : ∀ (L : List G), a • (R L.prod *ᵥ Nf (g0 * L.prod)) =
-      ∑ x ∈ s, R (L ++ [x]).prod *ᵥ Nf (g0 * (L ++ [x]).prod) := by
+  have hstep
+      : ∀ (L : List G),
+        a • (R L.prod *ᵥ Nf (g0 * L.prod))
+          = ∑ x ∈ s, R (L ++ [x]).prod *ᵥ Nf (g0 * (L ++ [x]).prod) := by
     intro L
     rw [← Matrix.mulVec_smul, hNeig, Matrix.mulVec_sum]
     refine Finset.sum_congr rfl fun x _ => ?_
     simp only [List.prod_append, List.prod_singleton, map_mul, mulVec_mulVec, mul_assoc]
-  have hit : ∀ (n : ℕ) (L : List G), (∀ x ∈ L, x ∈ s) → ∀ i,
-      nu ι a ^ n * nu ι ((R L.prod *ᵥ Nf (g0 * L.prod)) i) ≤ C * B * c ^ (L.length + n) := by
+  have hit
+      : ∀ (n : ℕ) (L : List G),
+        (∀ x ∈ L, x ∈ s)
+          → ∀ i,
+            nu ι a ^ n * nu ι ((R L.prod *ᵥ Nf (g0 * L.prod)) i) ≤ C * B * c ^ (L.length + n) := by
     intro n
     induction n with
     | zero =>
       intro L hL i
-      have := nu_mulVec_le ι (R L.prod) (Nf (g0 * L.prod)) (C * c ^ L.length) B
-        (mul_nonneg hC (pow_nonneg hc _)) hB0 (hRL L hL) (hB _) i
+      have :=
+        nu_mulVec_le ι (R L.prod) (Nf (g0 * L.prod)) (C * c ^ L.length) B
+          (mul_nonneg hC (pow_nonneg hc _)) hB0 (hRL L hL) (hB _) i
       simp only [pow_zero, one_mul, add_zero]
-      calc _ ≤ _ := this
+      calc
+        _ ≤ _ := this
         _ = _ := by ring
     | succ n ih =>
       intro L hL i
-      have e : a * (R L.prod *ᵥ Nf (g0 * L.prod)) i =
-          ∑ x ∈ s, (R (L ++ [x]).prod *ᵥ Nf (g0 * (L ++ [x]).prod)) i := by
+      have e
+          : a * (R L.prod *ᵥ Nf (g0 * L.prod)) i
+            = ∑ x ∈ s, (R (L ++ [x]).prod *ᵥ Nf (g0 * (L ++ [x]).prod)) i := by
         have := congrFun (hstep L) i
         simpa [Finset.sum_apply] using this
       have hD : 0 ≤ C * B * c ^ (L.length + (n + 1)) :=
         mul_nonneg (mul_nonneg hC hB0) (pow_nonneg hc _)
-      calc nu ι a ^ (n + 1) * nu ι ((R L.prod *ᵥ Nf (g0 * L.prod)) i)
-          = nu ι a ^ n * nu ι (a * (R L.prod *ᵥ Nf (g0 * L.prod)) i) := by
-            rw [nu_mul']; ring
-        _ = nu ι a ^ n * nu ι (∑ x ∈ s, (R (L ++ [x]).prod *ᵥ Nf (g0 * (L ++ [x]).prod)) i) := by rw [e]
+      calc
+        nu ι a ^ (n + 1) * nu ι ((R L.prod *ᵥ Nf (g0 * L.prod)) i)
+          = nu ι a ^ n * nu ι (a * (R L.prod *ᵥ Nf (g0 * L.prod)) i) := by rw [nu_mul']; ring
+        _ = nu ι a ^ n * nu ι (∑ x ∈ s, (R (L ++ [x]).prod *ᵥ Nf (g0 * (L ++ [x]).prod)) i) := by
+          rw [e]
         _ ≤ C * B * c ^ (L.length + (n + 1)) := by
-            by_cases hz : nu ι a ^ n = 0
-            · rw [hz, zero_mul]; exact hD
-            have hp : 0 < nu ι a ^ n := lt_of_le_of_ne (pow_nonneg (nu_nonneg' ι _) _) (Ne.symm hz)
-            rw [← le_div_iff₀' hp]
-            refine nu_sum_le' ι _ _ _ (div_nonneg hD hp.le) fun x hx => ?_
-            rw [le_div_iff₀' hp]
-            have := ih (L ++ [x]) (fun y hy => by
-              rcases List.mem_append.mp hy with h | h
-              · exact hL y h
-              · simp at h; exact h ▸ hx) i
-            simpa [List.length_append, add_assoc, add_comm 1 n] using this
+          by_cases hz : nu ι a ^ n = 0
+          · rw [hz, zero_mul]; exact hD
+          have hp : 0 < nu ι a ^ n := lt_of_le_of_ne (pow_nonneg (nu_nonneg' ι _) _) (Ne.symm hz)
+          rw [← le_div_iff₀' hp]
+          refine nu_sum_le' ι _ _ _ (div_nonneg hD hp.le) fun x hx => ?_
+          rw [le_div_iff₀' hp]
+          have :=
+            ih (L ++ [x])
+              (fun y hy => by
+                rcases List.mem_append.mp hy with h | h
+                · exact hL y h
+                · simp at h; exact h ▸ hx)
+              i
+          simpa [List.length_append, add_assoc, add_comm 1 n] using this
   have hfinal : ∀ n : ℕ, nu ι a ^ n * nu ι (Nf g0 i0) ≤ C * B * c ^ n := by
     intro n
     have := hit n [] (by simp) i0

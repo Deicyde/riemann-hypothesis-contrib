@@ -16,10 +16,10 @@ variable {V : Type*} [AddCommGroup V] [Module ℂ V]
 def psiT (H : Sesq V) (α : V → ℂ) (z y : V) : ℂ :=
   α z * α y * α (z + y) * Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H z y : ℂ))
 
-
 open Classical in
-def tripleSum (H : Sesq V) (α : V → ℂ) (Λ₁ : AddSubgroup V) (S₂ S₃ : Finset V) : ℂ :=
-  by classical exact ∑ z ∈ S₃, ∑ y ∈ S₂, if z + y ∈ Λ₁ then psiT H α z y else 0
+def tripleSum (H : Sesq V) (α : V → ℂ) (Λ₁ : AddSubgroup V) (S₂ S₃ : Finset V) : ℂ := by
+  classical
+  exact ∑ z ∈ S₃, ∑ y ∈ S₂, if z + y ∈ Λ₁ then psiT H α z y else 0
 
 def tripleMu (H : Sesq V) (α : V → ℂ) (Λ₁ Λ₂ Λ₃ : AddSubgroup V) (S₂ S₃ : Finset V) : ℂ :=
   ((Real.sqrt (relIdx Λ₁ Λ₃) / (Real.sqrt (relIdx Λ₁ Λ₂) * Real.sqrt (relIdx Λ₂ Λ₃)) : ℝ) : ℂ)
@@ -44,20 +44,30 @@ end Objects
 
 def TripleFormula : Prop :=
   ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Sesq V) (α : V → ℂ) (Λ₁ Λ₂ Λ₃ : AddSubgroup V),
-    TripleData H α Λ₁ Λ₂ Λ₃ → ∀ S₂ S₃ : Finset V, IsReps Λ₁ Λ₂ S₂ → IsReps Λ₂ Λ₃ S₃ →
-    ∀ F ∈ fixedBy H α Λ₁, ∀ v,
-      inter H α Λ₂ Λ₃ (inter H α Λ₁ Λ₂ F) v = tripleMu H α Λ₁ Λ₂ Λ₃ S₂ S₃ * inter H α Λ₁ Λ₃ F v
+    TripleData H α Λ₁ Λ₂ Λ₃
+      → ∀ S₂ S₃ : Finset V,
+        IsReps Λ₁ Λ₂ S₂ → IsReps Λ₂ Λ₃ S₃
+          → ∀ F ∈ fixedBy H α Λ₁, ∀ v,
+            inter H α Λ₂ Λ₃ (inter H α Λ₁ Λ₂ F) v
+              = tripleMu H α Λ₁ Λ₂ Λ₃ S₂ S₃ * inter H α Λ₁ Λ₃ F v
 
 def PsiQuadratic : Prop :=
   ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Sesq V) (α : V → ℂ) (Λ₁ Λ₂ Λ₃ : AddSubgroup V),
-    TripleData H α Λ₁ Λ₂ Λ₃ →
-    (∀ z ∈ Λ₃, ∀ y ∈ Λ₂, z + y ∈ Λ₁ → ∀ z' ∈ Λ₃, ∀ y' ∈ Λ₂, z' + y' ∈ Λ₁ →
-      psiT H α (z + z') (y + y') = psiT H α z y * psiT H α z' y'
-        * Complex.exp (2 * (Real.pi : ℂ) * Complex.I * (altE H y z' : ℂ))) ∧
-    (∀ z ∈ Λ₃, ∀ y ∈ Λ₂, z + y ∈ Λ₁ → ∀ k : ℕ, psiT H α (k • z) (k • y) = psiT H α z y ^ (k ^ 2)) ∧
-    (∀ z ∈ Λ₃, ∀ y ∈ Λ₂, z + y ∈ Λ₁ → ‖psiT H α z y‖ = 1) ∧
-    (∀ z ∈ Λ₃, ∀ y ∈ Λ₂, z + y ∈ Λ₁ → ∀ u' ∈ Λ₁ ⊓ Λ₃, ∀ u ∈ Λ₁ ⊓ Λ₂, ∀ t ∈ Λ₂ ⊓ Λ₃,
-      psiT H α (z + u' + t) (y + u - t) = psiT H α z y)
+    TripleData H α Λ₁ Λ₂ Λ₃
+      → (∀ z ∈ Λ₃, ∀ y ∈ Λ₂,
+          z + y ∈ Λ₁
+            → ∀ z' ∈ Λ₃, ∀ y' ∈ Λ₂,
+              z' + y' ∈ Λ₁
+                → psiT H α (z + z') (y + y')
+                  = psiT H α z y * psiT H α z' y'
+                    * Complex.exp (2 * (Real.pi : ℂ) * Complex.I * (altE H y z' : ℂ)))
+        ∧ (∀ z ∈ Λ₃, ∀ y ∈ Λ₂,
+          z + y ∈ Λ₁ → ∀ k : ℕ, psiT H α (k • z) (k • y) = psiT H α z y ^ (k ^ 2))
+        ∧ (∀ z ∈ Λ₃, ∀ y ∈ Λ₂, z + y ∈ Λ₁ → ‖psiT H α z y‖ = 1)
+        ∧ (∀ z ∈ Λ₃, ∀ y ∈ Λ₂,
+          z + y ∈ Λ₁
+            → ∀ u' ∈ Λ₁ ⊓ Λ₃, ∀ u ∈ Λ₁ ⊓ Λ₂, ∀ t ∈ Λ₂ ⊓ Λ₃,
+              psiT H α (z + u' + t) (y + u - t) = psiT H α z y)
 
 structure IsQuadFn0 {M : Type*} [AddCommGroup M] (φ : M → ℂ) (b : M → M → ℂ) : Prop where
   add : ∀ x y, φ (x + y) = φ x * φ y * b x y
@@ -66,23 +76,26 @@ structure IsQuadFn0 {M : Type*} [AddCommGroup M] (φ : M → ℂ) (b : M → M �
   ne : ∀ x, φ x ≠ 0
 
 def GaussDegenerate : Prop :=
-  ∀ (M : Type) [AddCommGroup M] [Fintype M] (φ : M → ℂ) (b : M → M → ℂ), IsQuadFn0 φ b →
-    ∑ x, φ x ≠ 0 → ∃ r : ℝ, 0 < r ∧ (∑ x, φ x) ^ 8 = (r : ℂ)
+  ∀ (M : Type) [AddCommGroup M] [Fintype M] (φ : M → ℂ) (b : M → M → ℂ),
+    IsQuadFn0 φ b → ∑ x, φ x ≠ 0 → ∃ r : ℝ, 0 < r ∧ (∑ x, φ x) ^ 8 = (r : ℂ)
 
 def TripleSumEighth : Prop :=
   ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Sesq V) (α : V → ℂ) (Λ₁ Λ₂ Λ₃ : AddSubgroup V),
-    TripleData H α Λ₁ Λ₂ Λ₃ → ∀ S₂ S₃ : Finset V, IsReps Λ₁ Λ₂ S₂ → IsReps Λ₂ Λ₃ S₃ →
-    tripleSum H α Λ₁ S₂ S₃ ≠ 0 → ∃ r : ℝ, 0 < r ∧ tripleSum H α Λ₁ S₂ S₃ ^ 8 = (r : ℂ)
+    TripleData H α Λ₁ Λ₂ Λ₃
+      → ∀ S₂ S₃ : Finset V,
+        IsReps Λ₁ Λ₂ S₂ → IsReps Λ₂ Λ₃ S₃ → tripleSum H α Λ₁ S₂ S₃ ≠ 0
+          → ∃ r : ℝ, 0 < r ∧ tripleSum H α Λ₁ S₂ S₃ ^ 8 = (r : ℂ)
 
 def TripleConj : Prop :=
   ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Sesq V) (α : V → ℂ) (Λ₁ Λ₂ Λ₃ : AddSubgroup V),
-    TripleData H α Λ₁ Λ₂ Λ₃ → ∀ S₂ S₃ S₂' S₃' : Finset V, IsReps Λ₁ Λ₂ S₂ → IsReps Λ₂ Λ₃ S₃ →
-    IsReps Λ₁ Λ₃ S₃' → IsReps Λ₃ Λ₂ S₂' →
-    tripleMu H α Λ₁ Λ₃ Λ₂ S₃' S₂' = conj (tripleMu H α Λ₁ Λ₂ Λ₃ S₂ S₃)
+    TripleData H α Λ₁ Λ₂ Λ₃
+      → ∀ S₂ S₃ S₂' S₃' : Finset V,
+        IsReps Λ₁ Λ₂ S₂ → IsReps Λ₂ Λ₃ S₃ → IsReps Λ₁ Λ₃ S₃' → IsReps Λ₃ Λ₂ S₂'
+          → tripleMu H α Λ₁ Λ₃ Λ₂ S₃' S₂' = conj (tripleMu H α Λ₁ Λ₂ Λ₃ S₂ S₃)
 
 def TripleEighth : Prop :=
   ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Sesq V) (α : V → ℂ) (Λ₁ Λ₂ Λ₃ : AddSubgroup V),
-    TripleData H α Λ₁ Λ₂ Λ₃ → (∃ F ∈ fixedBy H α Λ₁, F ≠ 0) →
-    ∀ S₂ S₃ : Finset V, IsReps Λ₁ Λ₂ S₂ → IsReps Λ₂ Λ₃ S₃ → tripleMu H α Λ₁ Λ₂ Λ₃ S₂ S₃ ^ 8 = 1
+    TripleData H α Λ₁ Λ₂ Λ₃ → (∃ F ∈ fixedBy H α Λ₁, F ≠ 0)
+      → ∀ S₂ S₃ : Finset V, IsReps Λ₁ Λ₂ S₂ → IsReps Λ₂ Λ₃ S₃ → tripleMu H α Λ₁ Λ₂ Λ₃ S₂ S₃ ^ 8 = 1
 
 end Formalism.L2.Th1.H

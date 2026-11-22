@@ -51,30 +51,39 @@ private lemma aux {O A I : Type} [CommRing O] [CommRing A] [Algebra O A]
     rw [k]
     exact hmem
 
-theorem goal1 :
-  ∀ {O A I : Type} [inst : CommRing.{0} O] [inst_1 : CommRing.{0} A] [inst_2 : Algebra.{0, 0} O A]
-  [inst_3 : Fintype.{0} I] [DecidableEq.{1} I] {B : I → Type} [inst_5 : (i : I) → AddCommGroup.{0} (B i)]
-  [inst_6 : (i : I) → Module.{0, 0} O (B i)] (ε : (i : I) → LinearMap.{0, 0, 0, 0} (RingHom.id.{0} O) (B i) A)
-  (T : (i : I) → Set.{0} (B i)),
-  Eq.{1}
-    (Submodule.span.{0, 0} O
-      (Set.ofPred.{0} fun (X : A) ↦
-        Exists.{1} fun (F : (i : I) → B i) ↦
-          And (∀ (i : I), Membership.mem.{0, 0} (Submodule.span.{0, 0} O (T i)) (F i))
-            (Eq.{1} X (Finset.prod.{0, 0} Finset.univ.{0} fun (i : I) ↦ DFunLike.coe.{1, 1, 1} (ε i) (F i)))))
-    (Submodule.span.{0, 0} O
-      (Set.ofPred.{0} fun (X : A) ↦
-        Exists.{1} fun (F : (i : I) → B i) ↦
-          And (∀ (i : I), Membership.mem.{0, 0} (T i) (F i))
-            (Eq.{1} X (Finset.prod.{0, 0} Finset.univ.{0} fun (i : I) ↦ DFunLike.coe.{1, 1, 1} (ε i) (F i))))) := by
+theorem goal1
+    : ∀ {O A I : Type} [inst : CommRing.{0} O] [inst_1 : CommRing.{0} A]
+        [inst_2 : Algebra.{0, 0} O A] [inst_3 : Fintype.{0} I] [DecidableEq.{1} I] {B : I → Type}
+        [inst_5 : (i : I) → AddCommGroup.{0} (B i)] [inst_6 : (i : I) → Module.{0, 0} O (B i)]
+        (ε : (i : I) → LinearMap.{0, 0, 0, 0} (RingHom.id.{0} O) (B i) A)
+        (T : (i : I) → Set.{0} (B i)),
+      Eq.{1}
+        (Submodule.span.{0, 0} O
+          (Set.ofPred.{0} fun (X : A) ↦
+            Exists.{1} fun (F : (i : I) → B i) ↦
+              And (∀ (i : I), Membership.mem.{0, 0} (Submodule.span.{0, 0} O (T i)) (F i))
+                (Eq.{1} X
+                  (Finset.prod.{0, 0} Finset.univ.{0} fun (i : I) ↦
+                    DFunLike.coe.{1, 1, 1} (ε i) (F i)))))
+        (Submodule.span.{0, 0} O
+          (Set.ofPred.{0} fun (X : A) ↦
+            Exists.{1} fun (F : (i : I) → B i) ↦
+              And (∀ (i : I), Membership.mem.{0, 0} (T i) (F i))
+                (Eq.{1} X
+                  (Finset.prod.{0, 0} Finset.univ.{0} fun (i : I) ↦
+                    DFunLike.coe.{1, 1, 1} (ε i) (F i))))) := by
   intro O A I _ _ _ _ _ B _ _ ε T
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro X ⟨F, hF, rfl⟩
-    exact aux ε T _ (fun G hG => Submodule.subset_span
-      (show ∃ H : (i : I) → B i, (∀ i, H i ∈ T i) ∧ ∏ i, ε i (G i) = ∏ i, ε i (H i) from
-        ⟨G, hG, rfl⟩)) Finset.univ F
-      (fun i _ => hF i) (fun i hi => absurd (Finset.mem_univ i) hi)
+    exact aux ε T _
+      (fun G hG =>
+        Submodule.subset_span (show ∃ H : (i : I) → B i,
+            (∀ i, H i ∈ T i) ∧ ∏ i, ε i (G i) = ∏ i, ε i (H i) from
+          ⟨G, hG, rfl⟩))
+      Finset.univ F
+      (fun i _ => hF i)
+      (fun i hi => absurd (Finset.mem_univ i) hi)
   · apply Submodule.span_mono
     rintro X ⟨F, hF, rfl⟩
     exact (show ∃ G : (i : I) → B i, (∀ i, G i ∈ Submodule.span O (T i)) ∧ _ from

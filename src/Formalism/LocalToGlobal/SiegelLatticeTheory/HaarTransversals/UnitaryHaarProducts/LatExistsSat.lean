@@ -14,8 +14,9 @@ namespace Formalism.L2.SG.Pf.LatEx
 
 section Sat
 
-variable {E V : Type} [Field E] [NumberField E] [AddCommGroup V] [Module E V] [Module (𝓞 E) V]
-  [IsScalarTower (𝓞 E) E V]
+variable
+  {E V : Type}
+  [Field E] [NumberField E] [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
 
 local notation "𝓕" => FractionalIdeal (nonZeroDivisors (𝓞 E)) E
 
@@ -226,13 +227,16 @@ private lemma fg_of_le_lemma {M N : Submodule (𝓞 E) V} (hM : M.FG) (h : N ≤
   have h2 := h1.map M.subtype
   rwa [Submodule.map_comap_subtype, inf_eq_right.2 h] at h2
 
-theorem adapted_basis (n : ℕ) : ∀ (w : Fin (n + 1) → V), LinearIndependent E w →
-    ∀ (M : Submodule (𝓞 E) V), M.FG →
-    M ≤ (Submodule.span E (Set.range w)).restrictScalars (𝓞 E) →
-    (∀ i, ∃ d : 𝓞 E, d ≠ 0 ∧ d • w i ∈ M) →
-    ∀ a : Fin n → 𝓕, (∀ i, a i ≠ 0) →
-    ∃ (e : Fin (n + 1) → V) (c : 𝓕), c ≠ 0 ∧
-      M = latSpanV (Fin.snoc (α := fun _ => 𝓕) a c) e := by
+theorem adapted_basis (n : ℕ)
+    : ∀ (w : Fin (n + 1) → V),
+      LinearIndependent E w
+        → ∀ (M : Submodule (𝓞 E) V),
+          M.FG → M ≤ (Submodule.span E (Set.range w)).restrictScalars (𝓞 E)
+            → (∀ i, ∃ d : 𝓞 E, d ≠ 0 ∧ d • w i ∈ M)
+            → ∀ a : Fin n → 𝓕,
+              (∀ i, a i ≠ 0)
+                → ∃ (e : Fin (n + 1) → V) (c : 𝓕),
+                  c ≠ 0 ∧ M = latSpanV (Fin.snoc (α := fun _ => 𝓕) a c) e := by
   induction n with
   | zero =>
     intro w hw M hM hMX hd a ha
@@ -251,16 +255,23 @@ theorem adapted_basis (n : ℕ) : ∀ (w : Fin (n + 1) → V), LinearIndependent
     have hM'fg : (M ⊓ (Submodule.span E (Set.range (Fin.init w))).restrictScalars (𝓞 E)).FG :=
       fg_of_le_lemma hM inf_le_left
     have hind : LinearIndependent E (Fin.init w) := hw.comp _ (Fin.castSucc_injective _)
-    have hd' : ∀ i, ∃ d : 𝓞 E, d ≠ 0 ∧ d • Fin.init w i ∈
-        M ⊓ (Submodule.span E (Set.range (Fin.init w))).restrictScalars (𝓞 E) := by
+    have hd'
+        : ∀ i, ∃ d : 𝓞 E,
+          d ≠ 0
+            ∧ d • Fin.init w i
+              ∈ M ⊓ (Submodule.span E (Set.range (Fin.init w))).restrictScalars (𝓞 E) := by
       intro i
       obtain ⟨d, hd0, hdw⟩ := hd i.castSucc
       exact ⟨d, hd0, hdw, Submodule.smul_of_tower_mem _ d (Submodule.subset_span ⟨i, rfl⟩)⟩
-    obtain ⟨e', c', hc', hM'⟩ := ih (Fin.init w) hind _ hM'fg inf_le_right hd' (Fin.init a)
-      (fun i => ha _)
+    obtain ⟨e', c', hc', hM'⟩ :=
+      ih (Fin.init w) hind _ hM'fg inf_le_right hd' (Fin.init a) (fun i => ha _)
     obtain ⟨u1, u2, hre⟩ := rebase c' b (a (Fin.last n)) hc' hb (ha _) (e' (Fin.last n)) u
-    refine ⟨Fin.snoc (Fin.snoc (Fin.init e') u1) u2, c' * b * (a (Fin.last n))⁻¹,
-      mul_ne_zero (mul_ne_zero hc' hb) (inv_ne_zero (ha _)), ?_⟩
+    refine ⟨
+      Fin.snoc (Fin.snoc (Fin.init e') u1) u2,
+      c' * b * (a (Fin.last n))⁻¹,
+      mul_ne_zero (mul_ne_zero hc' hb) (inv_ne_zero (ha _)),
+      ?_
+    ⟩
     rw [latSpanV_succ, Fin.init_snoc, Fin.init_snoc, Fin.snoc_last, Fin.snoc_last, latSpanV_succ,
       Fin.init_snoc, Fin.snoc_last]
     rw [hMe, hM', latSpanV_succ, Fin.init_snoc, Fin.snoc_last, sup_assoc, hre, ← sup_assoc]
@@ -291,36 +302,48 @@ private lemma fi_exists_ne_lemma {R K : Type} [CommRing R] [Field K] [Algebra R 
   rw [FractionalIdeal.mem_zero_iff]
   exact ⟨h x, fun hx => hx ▸ FractionalIdeal.mem_coe.1 (Submodule.zero_mem _)⟩
 
-theorem satBasisV_holds :
-  ∀ (E V : Type) [Field E] [NumberField E] [AddCommGroup V] [Module E V] [Module (𝓞 E) V]
-    [IsScalarTower (𝓞 E) E V] [FiniteDimensional E V] (Λ : Submodule (𝓞 E) V),
-    Submodule.IsFullLattice E Λ →
-    ∀ (n : ℕ) (w : Fin (n + 1) → V), LinearIndependent E w →
-    ∀ a : Fin n → FractionalIdeal (nonZeroDivisors (𝓞 E)) E, (∀ i, a i ≠ 0) →
-    ∃ (e : Fin (n + 1) → V) (c : FractionalIdeal (nonZeroDivisors (𝓞 E)) E),
-      LinearIndependent E e ∧ Submodule.span E (Set.range e) = Submodule.span E (Set.range w) ∧ c ≠ 0 ∧
-      Λ ⊓ (Submodule.span E (Set.range w)).restrictScalars (𝓞 E) =
-        latSpanV (Fin.snoc (α := fun _ => FractionalIdeal (nonZeroDivisors (𝓞 E)) E) a c) e := by
+theorem satBasisV_holds
+    : ∀ (E V : Type) [Field E] [NumberField E] [AddCommGroup V] [Module E V] [Module (𝓞 E) V]
+        [IsScalarTower (𝓞 E) E V] [FiniteDimensional E V] (Λ : Submodule (𝓞 E) V),
+      Submodule.IsFullLattice E Λ
+        → ∀ (n : ℕ) (w : Fin (n + 1) → V),
+          LinearIndependent E w
+            → ∀ a : Fin n → FractionalIdeal (nonZeroDivisors (𝓞 E)) E,
+              (∀ i, a i ≠ 0)
+                → ∃ (e : Fin (n + 1) → V) (c : FractionalIdeal (nonZeroDivisors (𝓞 E)) E),
+                  LinearIndependent E e
+                    ∧ Submodule.span E (Set.range e) = Submodule.span E (Set.range w) ∧ c ≠ 0
+                    ∧ Λ ⊓ (Submodule.span E (Set.range w)).restrictScalars (𝓞 E)
+                      = latSpanV
+                        (Fin.snoc (α := fun _ => FractionalIdeal (nonZeroDivisors (𝓞 E)) E) a c)
+                        e := by
   intro E V _ _ _ _ _ _ _ Λ hΛ n w hw a ha
   have hMfg : (Λ ⊓ (Submodule.span E (Set.range w)).restrictScalars (𝓞 E)).FG :=
     fg_of_le_lemma hΛ.fg inf_le_left
-  have hd : ∀ i, ∃ d : 𝓞 E, d ≠ 0 ∧
-      d • w i ∈ Λ ⊓ (Submodule.span E (Set.range w)).restrictScalars (𝓞 E) := by
+  have hd
+      : ∀ i, ∃ d : 𝓞 E,
+        d ≠ 0 ∧ d • w i ∈ Λ ⊓ (Submodule.span E (Set.range w)).restrictScalars (𝓞 E) := by
     intro i
-    have hwi : w i ∈ Submodule.span E (Λ : Set V) := by
-      rw [hΛ.span_eq_top]; exact Submodule.mem_top
+    have hwi : w i ∈ Submodule.span E (Λ : Set V) := by rw [hΛ.span_eq_top]; exact Submodule.mem_top
     obtain ⟨d, hd0, hdΛ⟩ := exists_smul_mem_of_mem_span hwi
     exact ⟨d, hd0, hdΛ, Submodule.smul_of_tower_mem _ d (Submodule.subset_span ⟨i, rfl⟩)⟩
   obtain ⟨e, c, hc, hMe⟩ := adapted_basis n w hw _ hMfg inf_le_right hd a ha
   have hinj := IsFractionRing.injective (𝓞 E) E
-  have hspw : Submodule.span E ((Λ ⊓ (Submodule.span E (Set.range w)).restrictScalars (𝓞 E) :
-      Submodule (𝓞 E) V) : Set V) = Submodule.span E (Set.range w) := by
+  have hspw
+      : Submodule.span E
+          ((Λ ⊓ (Submodule.span E (Set.range w)).restrictScalars (𝓞 E) : Submodule (𝓞 E) V) : Set V)
+        = Submodule.span E (Set.range w) := by
     refine spanE_of_lat _ w _ inf_le_right le_rfl fun i => ?_
     obtain ⟨d, hd0, hdM⟩ := hd i
-    exact ⟨algebraMap (𝓞 E) E d, fun h => hd0 (hinj (by rw [h, map_zero])),
-      by rw [algebraMap_smul]; exact hdM⟩
-  have hspe : Submodule.span E ((Λ ⊓ (Submodule.span E (Set.range w)).restrictScalars (𝓞 E) :
-      Submodule (𝓞 E) V) : Set V) = Submodule.span E (Set.range e) := by
+    exact ⟨
+      algebraMap (𝓞 E) E d,
+      fun h => hd0 (hinj (by rw [h, map_zero])),
+      by rw [algebraMap_smul]; exact hdM
+    ⟩
+  have hspe
+      : Submodule.span E
+          ((Λ ⊓ (Submodule.span E (Set.range w)).restrictScalars (𝓞 E) : Submodule (𝓞 E) V) : Set V)
+        = Submodule.span E (Set.range e) := by
     refine spanE_of_lat _ e _ ?_ le_rfl fun i => ?_
     · rw [hMe]
       refine Submodule.span_le.2 ?_

@@ -18,7 +18,8 @@ open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.SplitPrimeNo
 
 namespace Formalism.L2.SG.Closed.BM
 
-theorem CoefWeightedLoc_holds : CoefWeightedLoc := ReciprocityTheory.ChartRestriction.DS.coefWeightedLoc
+theorem CoefWeightedLoc_holds : CoefWeightedLoc :=
+  ReciprocityTheory.ChartRestriction.DS.coefWeightedLoc
 
 theorem BesselNVGap_holds : BesselNVGap := Formalism.L2.SG.BesselDiscreteSeries.besselNVGap
 

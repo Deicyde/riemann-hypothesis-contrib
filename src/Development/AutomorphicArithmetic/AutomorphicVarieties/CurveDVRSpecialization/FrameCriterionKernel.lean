@@ -7,12 +7,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PartsConj
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Alg UpperTheory.V.Pr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Alg UpperTheory.V.Pr UpperTheory.V
 
 open scoped Pointwise in
-private theorem conj_ine {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω]
-    {A B : ValuationSubring Ω} {v : W.Plc k} (hA : IsPlaceOver A v) (hB : IsPlaceOver B v) :
-    ∃ g : G k Ω, ∀ τ ∈ Ine (F := k) B, g⁻¹ * τ * g ∈ Ine (F := k) A := by
+private theorem conj_ine
+    {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω]
+    {A B : ValuationSubring Ω} {v : W.Plc k} (hA : IsPlaceOver A v) (hB : IsPlaceOver B v)
+    : ∃ g : G k Ω, ∀ τ ∈ Ine (F := k) B, g⁻¹ * τ * g ∈ Ine (F := k) A := by
   obtain ⟨σ, hσ⟩ := exists_smul_eq_of_isPlaceOver hA hB
   have hlift : IsLift (RingEquiv.refl k) σ.toRingEquiv := fun x => σ.commutes x
   have hmem : ∀ x : Ω, σ.toRingEquiv x ∈ B ↔ x ∈ A := by
@@ -25,15 +28,20 @@ private theorem conj_ine {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Alg
   rw [← heq]
   exact h1
 
-private theorem ine_NS {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Algebra k Ω]
-    {S : Set (W.Plc k)} {A : ValuationSubring Ω} {v : W.Plc k} (hv : v ∉ S)
-    (hA : IsPlaceOver A v) {t : G k Ω} (ht : t ∈ Ine (F := k) A) : toGS Ω S t = 1 := by
-  refine (QuotientGroup.eq_one_iff t).2 (Subgroup.le_topologicalClosure _ (Subgroup.subset_normalClosure ?_))
+private theorem ine_NS
+    {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Algebra k Ω]
+    {S : Set (W.Plc k)} {A : ValuationSubring Ω} {v : W.Plc k} (hv : v ∉ S) (hA : IsPlaceOver A v)
+    {t : G k Ω} (ht : t ∈ Ine (F := k) A)
+    : toGS Ω S t = 1 := by
+  refine (QuotientGroup.eq_one_iff t).2
+    (Subgroup.le_topologicalClosure _ (Subgroup.subset_normalClosure ?_))
   simp only [Set.mem_iUnion]
   exact ⟨v, hv, A, hA, ht⟩
 
-private theorem normal_map {l : ℕ} [Fact l.Prime] (F : W.GFrame l) (N : Subgroup F.G₀) (hN : N.Normal)
-    (hc : ∀ g ∈ N, F.conj g ∈ N) : (N.map F.η.ker.subtype).Normal := by
+private theorem normal_map
+    {l : ℕ} [Fact l.Prime]
+    (F : W.GFrame l) (N : Subgroup F.G₀) (hN : N.Normal) (hc : ∀ g ∈ N, F.conj g ∈ N)
+    : (N.map F.η.ker.subtype).Normal := by
   constructor
   rintro _ ⟨m, hm, rfl⟩ γ
   by_cases hγ : F.η γ = 1
@@ -47,8 +55,7 @@ private theorem normal_map {l : ℕ} [Fact l.Prime] (F : W.GFrame l) (N : Subgro
     show F.c * (F.c⁻¹ * γ * (m : F.Γ) * (F.c⁻¹ * γ)⁻¹) * F.c⁻¹ = γ * (m : F.Γ) * γ⁻¹
     group
 
-theorem UpperTheory.frame_criterion_kernel :
-    UpperTheory.V.Pr.CrKer := by
+theorem UpperTheory.frame_criterion_kernel : UpperTheory.V.Pr.CrKer := by
   unfold UpperTheory.V.Pr.CrKer
   intro Ω _ _ _ l _ O _ _ η Ψ σ g₁ B M L _ _ _ _ _ Φ k s x V hS π hπ N hN hNc hNconj hIu hI0
   let N' : Subgroup V.frame.Γ := N.map V.frame.η.ker.subtype
@@ -69,8 +76,10 @@ theorem UpperTheory.frame_criterion_kernel :
     obtain ⟨t, ht, hpre⟩ := hind.isClosed_iff.1 hKc
     rw [Subgroup.coe_map, ← hpre, Set.image_preimage_eq t toUpl_surj]
     exact ht
-  have hgen : ∀ u : upl Ω L, ∀ B' : ValuationSubring Ω, ¬B'.valuation (l : Ω) < 1 →
-      (u : G ℚ Ω) ∈ Ine B' → barChar O Ψ (u : G ℚ Ω) = 1 → u ∈ Kup := by
+  have hgen
+      : ∀ u : upl Ω L, ∀ B' : ValuationSubring Ω,
+        ¬ B'.valuation (l : Ω) < 1 → (u : G ℚ Ω) ∈ Ine B' → barChar O Ψ (u : G ℚ Ω) = 1
+          → u ∈ Kup := by
     intro u B' hl hIne hbar
     obtain ⟨τ, hτ⟩ := toUpl_surj (Ω := Ω) (L := L) u
     refine ⟨τ, ?_, hτ⟩

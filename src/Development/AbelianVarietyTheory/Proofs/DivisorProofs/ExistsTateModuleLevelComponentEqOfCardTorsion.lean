@@ -11,9 +11,12 @@ open GlobalTheory.HTLat
 
 namespace GlobalTheory
 
-theorem exists_pow_prime_root_of_card_torsion {M : Type} [CommGroup M] {l : ℕ} [Fact l.Prime]
-    {c : ℕ} (hcard : ∀ k : ℕ, Nat.card {x : M // x ^ (l ^ k) = 1} = l ^ (c * k)) (k : ℕ) (y : M)
-    (hy : y ^ (l ^ k) = 1) : ∃ z : M, z ^ (l ^ (k + 1)) = 1 ∧ z ^ l = y := by
+theorem exists_pow_prime_root_of_card_torsion
+    {M : Type} [CommGroup M]
+    {l : ℕ} [Fact l.Prime]
+    {c : ℕ} (hcard : ∀ k : ℕ, Nat.card {x : M // x ^ (l ^ k) = 1} = l ^ (c * k))
+    (k : ℕ) (y : M) (hy : y ^ (l ^ k) = 1)
+    : ∃ z : M, z ^ (l ^ (k + 1)) = 1 ∧ z ^ l = y := by
   have hl : 0 < l := (Fact.out : l.Prime).pos
   let T : ℕ → Subgroup M := fun n => (powMonoidHom (l ^ n)).ker
   have hT : ∀ n, Nat.card (T n) = l ^ (c * n) := fun n => by
@@ -22,14 +25,16 @@ theorem exists_pow_prime_root_of_card_torsion {M : Type} [CommGroup M] {l : ℕ}
   let φ : T (k + 1) →* M := (powMonoidHom l).comp (T (k + 1)).subtype
   have hker : Nat.card φ.ker = l ^ c := by
     rw [← mul_one c, ← hT 1]
-    refine Nat.card_congr
-      { toFun := fun y => ⟨y.1.1, ?_⟩
-        invFun := fun z => ⟨⟨z.1, ?_⟩, ?_⟩
-        left_inv := fun _ => rfl
-        right_inv := fun _ => rfl }
+    refine Nat.card_congr {
+      toFun := fun y => ⟨y.1.1, ?_⟩
+      invFun := fun z => ⟨⟨z.1, ?_⟩, ?_⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl
+    }
     · have := y.2
       simp only [T, φ, MonoidHom.mem_ker, MonoidHom.coe_comp, Function.comp_apply,
-        powMonoidHom_apply, Subgroup.coe_subtype] at this
+          powMonoidHom_apply, Subgroup.coe_subtype]
+        at this
       simpa [T, MonoidHom.mem_ker] using this
     · have hz : (z : M) ^ l = 1 := by simpa [T] using MonoidHom.mem_ker.1 z.2
       simp only [T, MonoidHom.mem_ker, powMonoidHom_apply]
@@ -45,8 +50,7 @@ theorem exists_pow_prime_root_of_card_torsion {M : Type} [CommGroup M] {l : ℕ}
     rintro _ ⟨z, rfl⟩
     have := z.2
     simp only [T, MonoidHom.mem_ker, powMonoidHom_apply] at this ⊢
-    simp only [φ, MonoidHom.coe_comp, Function.comp_apply, powMonoidHom_apply,
-      Subgroup.coe_subtype]
+    simp only [φ, MonoidHom.coe_comp, Function.comp_apply, powMonoidHom_apply, Subgroup.coe_subtype]
     rw [← pow_mul, ← pow_succ', this]
   have heq : φ.range = T k := Subgroup.eq_of_le_of_card_ge hle (by rw [hrange, hT k])
   have hyT : y ∈ T k := by simpa [T, MonoidHom.mem_ker] using hy
@@ -54,10 +58,10 @@ theorem exists_pow_prime_root_of_card_torsion {M : Type} [CommGroup M] {l : ℕ}
   obtain ⟨z, hz⟩ := hyT
   exact ⟨z.1, MonoidHom.mem_ker.1 z.2, hz⟩
 
-theorem exists_tate_lev_eq_of_card_torsion :
-    ∀ (M : Type) [CommGroup M] (l : ℕ) [Fact l.Prime] (c : ℕ),
-      (∀ k : ℕ, Nat.card {x : M // x ^ (l ^ k) = 1} = l ^ (c * k)) →
-      ∀ (N : ℕ) (x : M), x ^ (l ^ N) = 1 → ∃ t : Tate l M, t.lev N = x := by
+theorem exists_tate_lev_eq_of_card_torsion
+    : ∀ (M : Type) [CommGroup M] (l : ℕ) [Fact l.Prime] (c : ℕ),
+      (∀ k : ℕ, Nat.card {x : M // x ^ (l ^ k) = 1} = l ^ (c * k))
+        → ∀ (N : ℕ) (x : M), x ^ (l ^ N) = 1 → ∃ t : Tate l M, t.lev N = x := by
   intro M _ l _ c hcard N x hx
   have h := exists_pow_prime_root_of_card_torsion hcard
   choose r hr1 hr2 using h

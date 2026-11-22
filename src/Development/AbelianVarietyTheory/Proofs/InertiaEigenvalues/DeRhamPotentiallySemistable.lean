@@ -8,12 +8,14 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PAdicMo
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 
 namespace GlobalTheory
 
 theorem deRham_potentiallySemistable : GlobalTheory.Published.DeRhamPotSemistable :=
-  GlobalTheory.T.deRham_potSemistable_of_matrix_monodromy GlobalTheory.T.pAdicMonodromyTheorem_matrixForm
+  GlobalTheory.T.deRham_potSemistable_of_matrix_monodromy
+    GlobalTheory.T.pAdicMonodromyTheorem_matrixForm
 
 end GlobalTheory

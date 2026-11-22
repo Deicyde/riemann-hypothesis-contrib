@@ -5,11 +5,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RingCocone
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  Simplicial TensorProduct GlobalTheory.EtC
 namespace GlobalTheory
 
-theorem spec_map_smooth_surjective_of_isSeparable (K L : Type) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra.IsSeparable K L] : Smooth (Spec.map (CommRingCat.ofHom (algebraMap K L))) ∧ Surjective (Spec.map (CommRingCat.ofHom (algebraMap K L))) := by
-  have hfp : Algebra.FinitePresentation K L := Algebra.FinitePresentation.of_finiteType.mp inferInstance
+theorem spec_map_smooth_surjective_of_isSeparable
+    (K L : Type) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra.IsSeparable K L]
+    : Smooth (Spec.map (CommRingCat.ofHom (algebraMap K L)))
+      ∧ Surjective (Spec.map (CommRingCat.ofHom (algebraMap K L))) := by
+  have hfp : Algebra.FinitePresentation K L :=
+    Algebra.FinitePresentation.of_finiteType.mp inferInstance
   have : Algebra.FormallyEtale K L := Algebra.FormallyEtale.of_isSeparable K L
   have : Algebra.Etale K L := ⟨inferInstance, inferInstance⟩
   have hs : Algebra.Smooth K L := inferInstance

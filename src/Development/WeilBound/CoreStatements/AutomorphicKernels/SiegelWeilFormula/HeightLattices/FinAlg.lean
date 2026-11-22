@@ -13,32 +13,42 @@ namespace PositivityTheory.SiegelWeilFormula.HeightDict
 
 open PositivityTheory.SiegelWeilFormula.KWhit.Ht
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem sig_sig (hcm : HeckeCharacterZeroLocus.SiegelWeilU.IsCMExt F E σ) (x : E) : σ (σ x) = x := by
+theorem sig_sig (hcm : HeckeCharacterZeroLocus.SiegelWeilU.IsCMExt F E σ) (x : E)
+    : σ (σ x) = x := by
   obtain ⟨-, hE, -, h⟩ := hcm
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
   apply τ.injective
   rw [h, h, star_star]
 
-theorem sgv_sgv (hcm : HeckeCharacterZeroLocus.SiegelWeilU.IsCMExt F E σ) (v : HeightOneSpectrum (𝓞 F)) (z : v.adicCompletion F ⊗[F] E) :
-    HeckeCharacterZeroLocus.SiegelWeilU.sigR (v.adicCompletion F) σ (HeckeCharacterZeroLocus.SiegelWeilU.sigR (v.adicCompletion F) σ z) = z := by
+theorem sgv_sgv
+    (hcm : HeckeCharacterZeroLocus.SiegelWeilU.IsCMExt F E σ)
+    (v : HeightOneSpectrum (𝓞 F)) (z : v.adicCompletion F ⊗[F] E)
+    : HeckeCharacterZeroLocus.SiegelWeilU.sigR (v.adicCompletion F) σ
+        (HeckeCharacterZeroLocus.SiegelWeilU.sigR (v.adicCompletion F) σ z)
+      = z := by
   induction z using TensorProduct.inductionOn with
   | tmul a b => simp [HeckeCharacterZeroLocus.SiegelWeilU.sigR, sig_sig hcm]
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
 omit [NumberField E] in
-theorem OE_gen_mul (v : HeightOneSpectrum (𝓞 F)) {a b : v.adicCompletion F ⊗[F] E}
+theorem OE_gen_mul
+    (v : HeightOneSpectrum (𝓞 F))
+    {a b : v.adicCompletion F ⊗[F] E}
     (ha : ∃ a₀ ∈ v.adicCompletionIntegers F, ∃ o : 𝓞 E, a = a₀ ⊗ₜ[F] (o : E))
-    (hb : ∃ b₀ ∈ v.adicCompletionIntegers F, ∃ o : 𝓞 E, b = b₀ ⊗ₜ[F] (o : E)) :
-    ∃ c₀ ∈ v.adicCompletionIntegers F, ∃ o : 𝓞 E, a * b = c₀ ⊗ₜ[F] (o : E) := by
+    (hb : ∃ b₀ ∈ v.adicCompletionIntegers F, ∃ o : 𝓞 E, b = b₀ ⊗ₜ[F] (o : E))
+    : ∃ c₀ ∈ v.adicCompletionIntegers F, ∃ o : 𝓞 E, a * b = c₀ ⊗ₜ[F] (o : E) := by
   obtain ⟨a₀, ha₀, o, rfl⟩ := ha
   obtain ⟨b₀, hb₀, o', rfl⟩ := hb
   exact ⟨a₀ * b₀, mul_mem ha₀ hb₀, o * o', by simp [Algebra.TensorProduct.tmul_mul_tmul]⟩
 
 omit [NumberField E] in
-theorem OE_mul (v : HeightOneSpectrum (𝓞 F)) {a b : v.adicCompletion F ⊗[F] E} (ha : a ∈ OE E v) (hb : b ∈ OE E v) :
-    a * b ∈ OE E v := by
+theorem OE_mul
+    (v : HeightOneSpectrum (𝓞 F))
+    {a b : v.adicCompletion F ⊗[F] E} (ha : a ∈ OE E v) (hb : b ∈ OE E v)
+    : a * b ∈ OE E v := by
   induction ha using AddSubgroup.closure_induction with
   | mem x hx =>
     induction hb using AddSubgroup.closure_induction with
@@ -54,16 +64,16 @@ omit [NumberField E] in
 theorem OE_one (v : HeightOneSpectrum (𝓞 F)) : (1 : v.adicCompletion F ⊗[F] E) ∈ OE E v :=
   AddSubgroup.subset_closure ⟨1, one_mem _, 1, by simp [Algebra.TensorProduct.one_def]⟩
 
-
 variable (E) in
-def OEsub (v : HeightOneSpectrum (𝓞 F)) : Subring (v.adicCompletion F ⊗[F] E) :=
-  { OE E v with
-    one_mem' := OE_one v
-    mul_mem' := fun ha hb => OE_mul v ha hb }
+def OEsub (v : HeightOneSpectrum (𝓞 F)) : Subring (v.adicCompletion F ⊗[F] E) := {
+  OE E v with
+  one_mem' := OE_one v
+  mul_mem' := fun ha hb => OE_mul v ha hb
+}
 
 omit [NumberField E] in
-theorem OE_sig (v : HeightOneSpectrum (𝓞 F)) {z : v.adicCompletion F ⊗[F] E} (hz : z ∈ OE E v) :
-    HeckeCharacterZeroLocus.SiegelWeilU.sigR (v.adicCompletion F) σ z ∈ OE E v := by
+theorem OE_sig (v : HeightOneSpectrum (𝓞 F)) {z : v.adicCompletion F ⊗[F] E} (hz : z ∈ OE E v)
+    : HeckeCharacterZeroLocus.SiegelWeilU.sigR (v.adicCompletion F) σ z ∈ OE E v := by
   induction hz using AddSubgroup.closure_induction with
   | mem x hx =>
     obtain ⟨a, ha, o, rfl⟩ := hx
@@ -76,8 +86,8 @@ theorem OE_sig (v : HeightOneSpectrum (𝓞 F)) {z : v.adicCompletion F ⊗[F] E
   | neg x _ h => rw [map_neg]; exact neg_mem h
 
 omit [NumberField E] in
-theorem mem_lat (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (y : Fin n → v.adicCompletion F ⊗[F] E) :
-    y ∈ lat E v n ↔ ∀ i, y i ∈ OE E v := by
+theorem mem_lat (v : HeightOneSpectrum (𝓞 F)) {n : ℕ} (y : Fin n → v.adicCompletion F ⊗[F] E)
+    : y ∈ lat E v n ↔ ∀ i, y i ∈ OE E v := by
   simp [lat, AddSubgroup.mem_pi]
 
 end PositivityTheory.SiegelWeilFormula.HeightDict

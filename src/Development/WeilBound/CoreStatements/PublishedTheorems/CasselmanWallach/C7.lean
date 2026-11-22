@@ -4,7 +4,8 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.CasselmanWa
 
 @[expose] public section
 
-open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.TypeSum
+open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob
+  GlobalTheory.TypeSum
 
 namespace PositivityTheory.CW
 
@@ -19,16 +20,22 @@ theorem c7 : C7 := by
     exact x.2
   · intro F hcont hder hgrow B hB hI0 v hv
     let F' : kfin ε σ →ₗ[ℂ] Matrix (Fin n) (Fin n) ℂ → ℂ := F ∘ₗ (kfin ε σ).subtype
-    have key := hmax F' (fun w => hcont w w.2)
-      (fun X hX w g hg => by
-        have h1 := hder X hX.1 w w.2 g hg
-        show HasDerivAt (fun t : ℝ => F (w : H) (g * NormedSpace.exp (t • X)))
-          (F ((ReciprocityTheory.ChartRestriction.DS.actM E X w : kfin ε σ) : H) g) 0
-        rw [hKD X hX.1 w]
-        exact h1)
-      (fun w => hgrow w w.2) B hB
-      (fun e he g hg => hI0 e.1 (Finset.mem_image_of_mem _ he) g hg) ⟨v, hv⟩
-    calc ‖F v 1‖ = ‖F' ⟨v, hv⟩ 1‖ := rfl
+    have key :=
+      hmax F'
+        (fun w => hcont w w.2)
+        (fun X hX w g hg => by
+          have h1 := hder X hX.1 w w.2 g hg
+          show HasDerivAt (fun t : ℝ => F (w : H) (g * NormedSpace.exp (t • X)))
+            (F ((ReciprocityTheory.ChartRestriction.DS.actM E X w : kfin ε σ) : H) g) 0
+          rw [hKD X hX.1 w]
+          exact h1)
+        (fun w => hgrow w w.2)
+        B hB
+        (fun e he g hg => hI0 e.1 (Finset.mem_image_of_mem _ he) g hg)
+        ⟨v, hv⟩
+    calc
+      ‖F v 1‖
+        = ‖F' ⟨v, hv⟩ 1‖ := rfl
       _ ≤ K * B * ‖((1 + ReciprocityTheory.ChartRestriction.DS.casimirK ε E) ^ m) ⟨v, hv⟩‖ := key
       _ ≤ K * B * (C' * sobNorm σ S v) :=
         mul_le_mul_of_nonneg_left (hbd ⟨v, hv⟩) (mul_nonneg hK0 hB)

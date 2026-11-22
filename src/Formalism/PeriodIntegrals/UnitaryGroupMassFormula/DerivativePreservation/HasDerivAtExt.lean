@@ -14,7 +14,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.Q.EabLie
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.QuantumDeterminants.GBasic Formalism.FourierDecayAlt.Q
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.QuantumDeterminants.GBasic
+  Formalism.FourierDecayAlt.Q
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -201,44 +202,44 @@ lemma hpart_cols (i : Fin (r + 1)) (p q : Fin (mdim k r i)) :
       | rw [Matrix.smul_apply, Matrix.add_apply]
       simp only [e1, e2, e3, e4, sub_zero, add_zero, smul_zero]
 
-theorem exp_hpart1_mem (i : Fin (r + 1)) (p q : Fin (mdim k r i)) (t : ℝ) :
-    NormedSpace.exp ((t : ℂ) • hpart1 (Hpk k r) (Matrix.single (posL k r i p) (posL k r i q) 1))
+theorem exp_hpart1_mem (i : Fin (r + 1)) (p q : Fin (mdim k r i)) (t : ℝ)
+    : NormedSpace.exp ((t : ℂ) • hpart1 (Hpk k r) (Matrix.single (posL k r i p) (posL k r i q) 1))
       ∈ Glev k r i :=
   exp_mem_glev i _ (hpart1_skew _) (hpart_cols i p q).1 t
 
-theorem exp_hpart2_mem (i : Fin (r + 1)) (p q : Fin (mdim k r i)) (t : ℝ) :
-    NormedSpace.exp ((t : ℂ) • hpart2 (Hpk k r) (Matrix.single (posL k r i p) (posL k r i q) 1))
+theorem exp_hpart2_mem (i : Fin (r + 1)) (p q : Fin (mdim k r i)) (t : ℝ)
+    : NormedSpace.exp ((t : ℂ) • hpart2 (Hpk k r) (Matrix.single (posL k r i p) (posL k r i q) 1))
       ∈ Glev k r i :=
   exp_mem_glev i _ (hpart2_skew _) (hpart_cols i p q).2 t
 
-theorem hasDerivAt_ext {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+theorem hasDerivAt_ext
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
     (i : Fin (r + 1)) (X : Mx k r) (hX : ∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) ∈ Glev k r i)
     (f F : Mx k r → E) (U : Set (Mx k r)) (g : Mx k r) (hU : IsOpen U) (hg : g ∈ U)
-    (hgG : g ∈ Glev k r i) (hF : ContDiffOn ℝ ∞ F U)
-    (hfF : ∀ x ∈ U, x ∈ Glev k r i → f x = F x) :
-    HasDerivAt (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) (fderiv ℝ F g (g * X)) 0 := by
+    (hgG : g ∈ Glev k r i) (hF : ContDiffOn ℝ ∞ F U) (hfF : ∀ x ∈ U, x ∈ Glev k r i → f x = F x)
+    : HasDerivAt (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) (fderiv ℝ F g (g * X)) 0 := by
   have hγ := hasDerivAt_mul_exp_smul_zero g X
-  have hγ0 : g * NormedSpace.exp (((0 : ℝ) : ℂ) • X) = g := by
-    simp [NormedSpace.exp_zero]
+  have hγ0 : g * NormedSpace.exp (((0 : ℝ) : ℂ) • X) = g := by simp [NormedSpace.exp_zero]
   have hFd : DifferentiableAt ℝ F g :=
     (hF.differentiableOn (by simp)).differentiableAt (hU.mem_nhds hg)
-  have hcomp : HasDerivAt (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X)))
-      (fderiv ℝ F g (g * X)) 0 :=
+  have hcomp
+      : HasDerivAt (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) (fderiv ℝ F g (g * X)) 0 :=
     hFd.hasFDerivAt.comp_hasDerivAt_of_eq (0 : ℝ) hγ hγ0.symm
-  have hev : (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) =ᶠ[𝓝 0]
-      (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) := by
+  have hev
+      : (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) =ᶠ[𝓝 0]
+        (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) := by
     have hmem : ∀ᶠ t : ℝ in 𝓝 0, g * NormedSpace.exp ((t : ℂ) • X) ∈ U :=
       hγ.continuousAt.preimage_mem_nhds (by rw [hγ0]; exact hU.mem_nhds hg)
     filter_upwards [hmem] with t ht
     exact hfF _ ht (glev_mul hgG (hX t))
   exact hcomp.congr_of_eventuallyEq hev
 
-theorem rdV_ext {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+theorem rdV_ext
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
     (i : Fin (r + 1)) (X : Mx k r) (hX : ∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) ∈ Glev k r i)
     (f F : Mx k r → E) (U : Set (Mx k r)) (g : Mx k r) (hU : IsOpen U) (hg : g ∈ U)
-    (hgG : g ∈ Glev k r i) (hF : ContDiffOn ℝ ∞ F U)
-    (hfF : ∀ x ∈ U, x ∈ Glev k r i → f x = F x) :
-    RdV X f g = fderiv ℝ F g (g * X) :=
+    (hgG : g ∈ Glev k r i) (hF : ContDiffOn ℝ ∞ F U) (hfF : ∀ x ∈ U, x ∈ Glev k r i → f x = F x)
+    : RdV X f g = fderiv ℝ F g (g * X) :=
   (hasDerivAt_ext i X hX f F U g hU hg hgG hF hfF).deriv
 
 end Formalism.FourierDecayAlt.Q.EabLie

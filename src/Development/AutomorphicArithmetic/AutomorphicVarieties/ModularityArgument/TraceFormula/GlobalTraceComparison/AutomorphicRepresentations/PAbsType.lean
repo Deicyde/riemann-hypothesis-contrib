@@ -57,32 +57,35 @@ private lemma self_mem_orbit {Γ F : Type} [Group Γ] [AddCommGroup F] [Module �
     (R : Representation ℂ Γ F) (x : F) : x ∈ Submodule.span ℂ (Set.range fun k => R k x) :=
   Submodule.subset_span ⟨1, by simp⟩
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absType_pf :
-    AbsType := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absType_pf : AbsType := by
   intro Γ F _ _ _ R B W V Y z hsym hpos hinv hW hV hVf hY hYV hzf hzt
-  have hRR : ∀ k a, R k (R k⁻¹ a) = a := fun k a => by
-    rw [← Module.End.mul_apply, ← map_mul]; simp
+  have hRR : ∀ k a, R k (R k⁻¹ a) = a := fun k a => by rw [← Module.End.mul_apply, ← map_mul]; simp
   have hadj : ∀ k a b, B a (R k b) = B (R k⁻¹ a) b := fun k a b => by
     have h := hinv k (R k⁻¹ a) b
     rwa [hRR] at h
-  let T : Submodule ℂ F :=
-    { carrier := {x | ∀ l : F →ₗ[ℂ] ℂ, (fun k => l (R k x)) ∈ W}
-      add_mem' := fun {a b} ha hb l => by
-        have h := W.add_mem (ha l) (hb l)
-        convert h using 1
-        ext k; simp
-      zero_mem' := fun l => by
-        have h := W.zero_mem
-        convert h using 1
-        ext k; simp
-      smul_mem' := fun c x hx l => by
-        have h := W.smul_mem c (hx l)
-        convert h using 1
-        ext k; simp }
+  let T : Submodule ℂ F := {
+    carrier := {x | ∀ l : F →ₗ[ℂ] ℂ, (fun k => l (R k x)) ∈ W}
+    add_mem' := fun {a b} ha hb l => by
+      have h := W.add_mem (ha l) (hb l)
+      convert h using 1
+      ext k
+      simp
+    zero_mem' := fun l => by
+      have h := W.zero_mem
+      convert h using 1
+      ext k
+      simp
+    smul_mem' := fun c x hx l => by
+      have h := W.smul_mem c (hx l)
+      convert h using 1
+      ext k
+      simp
+  }
   have hTR : ∀ g, ∀ x ∈ T, R g x ∈ T := fun g x hx l => by
     have h := hW _ (hx l) g
     convert h using 1
-    ext k; simp [map_mul, Module.End.mul_apply]
+    ext k
+    simp [map_mul, Module.End.mul_apply]
   haveI : FiniteDimensional ℂ Y := hY
   haveI : FiniteDimensional ℂ (V ⊓ T : Submodule ℂ F) :=
     Submodule.finiteDimensional_of_le (S₂ := Y) fun x hx => hYV x hx.1 hx.2
@@ -93,7 +96,8 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absType_pf :
     refine Submodule.span_le.2 ?_
     rintro _ ⟨k, rfl⟩
     exact hTR k _ hz1T
-  have hZperp : ∀ a ∈ V ⊓ T, ∀ w ∈ Submodule.span ℂ (Set.range fun k => R k (z - P z)), B a w = 0 := by
+  have hZperp
+      : ∀ a ∈ V ⊓ T, ∀ w ∈ Submodule.span ℂ (Set.range fun k => R k (z - P z)), B a w = 0 := by
     intro a ha w hw
     induction hw using Submodule.span_induction with
     | mem w h =>
@@ -123,9 +127,10 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absType_pf :
       rw [← map_sub, hadj]
       exact hQo x _ (orbit_stable R v g⁻¹ _ hd)
     have h3 : B (Q (R g x) - R g (Q x)) (Q (R g x) - R g (Q x)) = 0 := by
-      have h4 : B (Q (R g x) - R g (Q x)) (Q (R g x) - R g (Q x)) =
-          B (Q (R g x) - R g (Q x)) (R g x - R g (Q x)) -
-            B (Q (R g x) - R g (Q x)) (R g x - Q (R g x)) := by
+      have h4
+          : B (Q (R g x) - R g (Q x)) (Q (R g x) - R g (Q x))
+            = B (Q (R g x) - R g (Q x)) (R g x - R g (Q x))
+              - B (Q (R g x) - R g (Q x)) (R g x - Q (R g x)) := by
         rw [← map_sub]
         congr 1
         abel
@@ -134,7 +139,8 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.absType_pf :
   have hQT : ∀ w ∈ Submodule.span ℂ (Set.range fun k => R k (z - P z)), Q w ∈ T := fun w hw l => by
     have h := hZT hw (l ∘ₗ Q)
     convert h using 1
-    ext k; simp [hQR]
+    ext k
+    simp [hQR]
   have hQ0 : Q (z - P z) = 0 := by
     have hw := self_mem_orbit R (z - P z)
     have h1 := hZperp (Q (z - P z)) ⟨hV0V (hQm _), hQT _ hw⟩ _ hw

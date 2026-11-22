@@ -10,9 +10,10 @@ open MvPolynomial AlgebraicGeometry CategoryTheory
 
 noncomputable section
 
-theorem norm_eval_le_of_vars_subset {n : ℕ} (F : MvPolynomial (Fin n) ℂ) (S : Finset (Fin n))
-    (hS : F.vars ⊆ S) (y : Fin n → ℂ) (hy : ∀ i ∈ S, ‖y i‖ ≤ 1) :
-    ‖eval y F‖ ≤ ∑ m ∈ F.support, ‖F.coeff m‖ := by
+theorem norm_eval_le_of_vars_subset
+    {n : ℕ} (F : MvPolynomial (Fin n) ℂ) (S : Finset (Fin n)) (hS : F.vars ⊆ S) (y : Fin n → ℂ)
+    (hy : ∀ i ∈ S, ‖y i‖ ≤ 1)
+    : ‖eval y F‖ ≤ ∑ m ∈ F.support, ‖F.coeff m‖ := by
   rw [MvPolynomial.eval_eq']
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun m hm => ?_)
   rw [norm_mul]
@@ -25,8 +26,9 @@ theorem norm_eval_le_of_vars_subset {n : ℕ} (F : MvPolynomial (Fin n) ℂ) (S 
     · refine pow_le_one₀ (norm_nonneg _) (hy i (hS ?_))
       rw [MvPolynomial.mem_vars_iff_mem_support]
       exact ⟨m, hm, Finsupp.mem_support_iff.mpr h⟩
-  calc ‖F.coeff m‖ * ‖∏ i, y i ^ m i‖ ≤ ‖F.coeff m‖ * 1 :=
-        mul_le_mul_of_nonneg_left h1 (norm_nonneg _)
+  calc
+    ‖F.coeff m‖ * ‖∏ i, y i ^ m i‖
+      ≤ ‖F.coeff m‖ * 1 := mul_le_mul_of_nonneg_left h1 (norm_nonneg _)
     _ = ‖F.coeff m‖ := mul_one _
 
 variable {K : Type} [Fintype K] [Nonempty K] {ι : K → Type} [∀ k, Fintype (ι k)]
@@ -45,16 +47,20 @@ theorem isCompact_cptPiece (c : w.Idx) : IsCompact (w.cptPiece c) := by
     Finset.univ.image (w.yq c.1 c.2) ∪ Finset.univ.image (w.yt c.1 c.2)
   choose F hFv hFK using w.gen c.1 c.2
   let B : Set (Fin (w.pres c.1 c.2).n → ℂ) :=
-    (⋂ h ∈ ((w.pres c.1 c.2).K : Set (MvPolynomial (Fin (w.pres c.1 c.2).n) ℂ)), {y | eval y h = 0}) ∩
-      ((⋂ q, {y | ‖y (w.yq c.1 c.2 q)‖ ≤ 1}) ∩ ⋂ k, {y | ‖y (w.yt c.1 c.2 k)‖ ≤ 1})
+    (⋂ h ∈ ((w.pres c.1 c.2).K : Set (MvPolynomial (Fin (w.pres c.1 c.2).n) ℂ)), {y | eval y h = 0})
+      ∩ ((⋂ q, {y | ‖y (w.yq c.1 c.2 q)‖ ≤ 1}) ∩ ⋂ k, {y | ‖y (w.yt c.1 c.2 k)‖ ≤ 1})
   have hBc : IsClosed B :=
-    (isClosed_biInter fun h _ => isClosed_eq (MvPolynomial.continuous_eval h) continuous_const).inter
+    (isClosed_biInter fun h _ =>
+        isClosed_eq (MvPolynomial.continuous_eval h) continuous_const).inter
       ((isClosed_iInter fun q =>
-        isClosed_le (continuous_norm.comp (continuous_apply _)) continuous_const).inter
-      (isClosed_iInter fun k =>
-        isClosed_le (continuous_norm.comp (continuous_apply _)) continuous_const))
-  have hmemB : ∀ y, y ∈ B ↔ (∀ h ∈ (w.pres c.1 c.2).K, eval y h = 0) ∧
-      (∀ q, ‖y (w.yq c.1 c.2 q)‖ ≤ 1) ∧ ∀ k, ‖y (w.yt c.1 c.2 k)‖ ≤ 1 := by
+          isClosed_le (continuous_norm.comp (continuous_apply _)) continuous_const).inter
+        (isClosed_iInter fun k =>
+          isClosed_le (continuous_norm.comp (continuous_apply _)) continuous_const))
+  have hmemB
+      : ∀ y,
+        y ∈ B
+          ↔ (∀ h ∈ (w.pres c.1 c.2).K, eval y h = 0) ∧ (∀ q, ‖y (w.yq c.1 c.2 q)‖ ≤ 1)
+            ∧ ∀ k, ‖y (w.yt c.1 c.2 k)‖ ≤ 1 := by
     intro y
     simp only [B, Set.mem_inter_iff, Set.mem_iInter, Set.mem_setOf_eq, SetLike.mem_coe]
   have hS : ∀ y ∈ B, ∀ i ∈ S, ‖y i‖ ≤ 1 := by
@@ -65,8 +71,10 @@ theorem isCompact_cptPiece (c : w.Idx) : IsCompact (w.cptPiece c) := by
       exact hy.2.1 a
     · obtain ⟨a, -, rfl⟩ := Finset.mem_image.mp h
       exact hy.2.2 a
-  have hBsub : B ⊆ Set.univ.pi fun l =>
-      Metric.closedBall (0 : ℂ) (∑ m ∈ (F l).support, ‖(F l).coeff m‖) := by
+  have hBsub
+      : B
+        ⊆ Set.univ.pi fun l =>
+          Metric.closedBall (0 : ℂ) (∑ m ∈ (F l).support, ‖(F l).coeff m‖) := by
     intro y hy
     have hy' := (hmemB y).mp hy
     refine Set.mem_univ_pi.mpr fun l => ?_
@@ -135,12 +143,13 @@ theorem exists_cptPiece (x : w.M) : ∃ c, x ∈ w.cptPiece c := by
     rw [hτ, hτ]
     exact h6
   refine ⟨⟨p, j⟩, hjV, fun q => ?_, fun k => ?_⟩
-  · have e1 : w.coord ⟨p, j⟩ x (w.yq p j q) =
-        val (w.π ≫ toSpecC hP) ((w.pres p j).secHom (X (w.yq p j q))) x.1 hjV := by
+  · have e1
+        : w.coord ⟨p, j⟩ x (w.yq p j q)
+          = val (w.π ≫ toSpecC hP) ((w.pres p j).secHom (X (w.yq p j q))) x.1 hjV := by
       rw [(w.pres p j).val_secHom x.1 hjV hcl, eval_X, w.coord_of_mem ⟨p, j⟩ x hjV]
     rw [e1, w.sec_yq,
-      (val_comp (w.π ≫ toSpecC hP) (toSpecC hP) w.π rfl (w.le_pres p j) (chartCoord hP p q)
-        x.1 hjV hcl).2]
+      (val_comp (w.π ≫ toSpecC hP) (toSpecC hP) w.π rfl (w.le_pres p j) (chartCoord hP p q) x.1 hjV
+        hcl).2]
     refine (congrArg (fun v => ‖v‖) (w.val_chartCoord c0 x h0 p _ q)).trans_le ?_
     simp only [affCoord, norm_div]
     exact div_le_one_of_le₀ (hpmax q.1 q.2) (norm_nonneg _)
@@ -150,8 +159,9 @@ theorem exists_cptPiece (x : w.M) : ∃ c, x ∈ w.cptPiece c := by
     rw [e1]
     have h7 : ‖val (w.π ≫ toSpecC hP) (w.t p j k) x.1 hjV‖ * ‖τ j‖ = ‖τ k‖ := by
       rw [← norm_mul, hcoc k]
-    calc ‖val (w.π ≫ toSpecC hP) (w.t p j k) x.1 hjV‖ = ‖τ k‖ / ‖τ j‖ := by
-          rw [← h7, mul_div_cancel_right₀ _ hpos.ne']
+    calc
+      ‖val (w.π ≫ toSpecC hP) (w.t p j k) x.1 hjV‖
+        = ‖τ k‖ / ‖τ j‖ := by rw [← h7, mul_div_cancel_right₀ _ hpos.ne']
       _ ≤ 1 := div_le_one_of_le₀ (hj k) hpos.le
 
 end WData

@@ -20,8 +20,8 @@ open Paths
 
 namespace Paths
 
-theorem le_iff_lt_colHeight {n : ℕ} {μ : Fin n → ℤ} (h : Antitone μ) (c : ℤ) (m : Fin n) :
-    c ≤ μ m ↔ m.val < colHeight μ c := by
+theorem le_iff_lt_colHeight {n : ℕ} {μ : Fin n → ℤ} (h : Antitone μ) (c : ℤ) (m : Fin n)
+    : c ≤ μ m ↔ m.val < colHeight μ c := by
   unfold colHeight
   constructor
   · intro hm
@@ -59,9 +59,10 @@ theorem colHeight_zero (n : ℕ) (c : ℤ) : colHeight (0 : Fin n → ℤ) c = i
     simp only [Pi.zero_apply]
     omega
 
-theorem strip_height {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (hν : Antitone ν) (hμ : Antitone μ)
-    (hs : HStrip ν μ b) (c : ℤ) :
-    colHeight ν c = colHeight μ c ∨ colHeight ν c = colHeight μ c + 1 := by
+theorem strip_height
+    {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (hν : Antitone ν) (hμ : Antitone μ) (hs : HStrip ν μ b)
+    (c : ℤ)
+    : colHeight ν c = colHeight μ c ∨ colHeight ν c = colHeight μ c + 1 := by
   obtain ⟨h1, h2, -⟩ := hs
   have l1 : colHeight μ c ≤ colHeight ν c := by
     by_contra hlt
@@ -77,15 +78,16 @@ theorem strip_height {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (hν : Antitone
     have hm : (⟨colHeight μ c + 1, by omega⟩ : Fin n).val < colHeight ν c := by
       show colHeight μ c + 1 < colHeight ν c
       omega
-    have := (le_iff_lt_colHeight hμ c _).1 (((le_iff_lt_colHeight hν c _).2 hm).trans
-      (h2 ⟨colHeight μ c, by omega⟩ _ rfl))
+    have :=
+      (le_iff_lt_colHeight hμ c _).1
+        (((le_iff_lt_colHeight hν c _).2 hm).trans (h2 ⟨colHeight μ c, by omega⟩ _ rfl))
     exact absurd this (lt_irrefl _)
   omega
 
-theorem changed_eq {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (hν : Antitone ν) (hμ : Antitone μ)
-    (hs : HStrip ν μ b) :
-    {c : ℤ | colHeight ν c ≠ colHeight μ c} =
-      ↑(univ.biUnion fun m : Fin n => Finset.Ioc (μ m) (ν m)) := by
+theorem changed_eq
+    {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (hν : Antitone ν) (hμ : Antitone μ) (hs : HStrip ν μ b)
+    : {c : ℤ | colHeight ν c ≠ colHeight μ c}
+      = ↑(univ.biUnion fun m : Fin n => Finset.Ioc (μ m) (ν m)) := by
   ext c
   simp only [Set.mem_ofPred_eq, Finset.mem_coe, Finset.mem_biUnion, Finset.mem_univ, true_and,
     Finset.mem_Ioc]
@@ -105,8 +107,9 @@ theorem changed_eq {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (hν : Antitone �
       absurd ((le_iff_lt_colHeight hμ c m).2 hlt) (not_le.2 m1)
     omega
 
-theorem changed_ncard {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (hν : Antitone ν) (hμ : Antitone μ)
-    (hs : HStrip ν μ b) : {c : ℤ | colHeight ν c ≠ colHeight μ c}.ncard = b := by
+theorem changed_ncard
+    {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (hν : Antitone ν) (hμ : Antitone μ) (hs : HStrip ν μ b)
+    : {c : ℤ | colHeight ν c ≠ colHeight μ c}.ncard = b := by
   rw [changed_eq hν hμ hs, Set.ncard_coe_finset, Finset.card_biUnion]
   · simp only [Int.card_Ioc]
     obtain ⟨h1, -, h3⟩ := hs
@@ -130,17 +133,22 @@ theorem changed_ncard {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (hν : Antiton
       absurd ((le_iff_lt_colHeight hμ c y).2 hlt) (not_le.2 hy.1)
     exact Fin.ext (by omega)
 
-theorem changed_finite {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (hν : Antitone ν) (hμ : Antitone μ)
-    (hs : HStrip ν μ b) : {c : ℤ | colHeight ν c ≠ colHeight μ c}.Finite := by
+theorem changed_finite
+    {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (hν : Antitone ν) (hμ : Antitone μ) (hs : HStrip ν μ b)
+    : {c : ℤ | colHeight ν c ≠ colHeight μ c}.Finite := by
   rw [changed_eq hν hμ hs]
   exact Finset.finite_toSet _
 
-theorem path_height {n N : ℕ} {isVec : ℕ → Bool} {B : ℕ → ℕ} {μ : ℕ → Fin n → ℤ}
-    (hp : IsPath n isVec B μ N) {i : ℕ} (hi : i < N) (c : ℤ) :
-    if isVec i then
-      colHeight (μ (i + 1)) c = colHeight (μ i) c ∨ colHeight (μ (i + 1)) c = colHeight (μ i) c + 1
-    else
-      colHeight (μ (i + 1)) c = colHeight (μ i) c ∨ colHeight (μ (i + 1)) c + 1 = colHeight (μ i) c := by
+theorem path_height
+    {n N : ℕ} {isVec : ℕ → Bool} {B : ℕ → ℕ} {μ : ℕ → Fin n → ℤ} (hp : IsPath n isVec B μ N)
+    {i : ℕ} (hi : i < N)
+    (c : ℤ)
+    : if isVec i then
+        colHeight (μ (i + 1)) c = colHeight (μ i) c
+          ∨ colHeight (μ (i + 1)) c = colHeight (μ i) c + 1
+      else
+        colHeight (μ (i + 1)) c = colHeight (μ i) c
+          ∨ colHeight (μ (i + 1)) c + 1 = colHeight (μ i) c := by
   obtain ⟨-, ha, hs⟩ := hp
   have h := hs i hi
   by_cases hv : isVec i = true
@@ -151,9 +159,10 @@ theorem path_height {n N : ℕ} {isVec : ℕ → Bool} {B : ℕ → ℕ} {μ : �
     · exact Or.inl e.symm
     · exact Or.inr e.symm
 
-theorem path_ncard {n N : ℕ} {isVec : ℕ → Bool} {B : ℕ → ℕ} {μ : ℕ → Fin n → ℤ}
-    (hp : IsPath n isVec B μ N) {i : ℕ} (hi : i < N) :
-    {c : ℤ | colHeight (μ (i + 1)) c ≠ colHeight (μ i) c}.ncard = B i := by
+theorem path_ncard
+    {n N : ℕ} {isVec : ℕ → Bool} {B : ℕ → ℕ} {μ : ℕ → Fin n → ℤ} (hp : IsPath n isVec B μ N)
+    {i : ℕ} (hi : i < N)
+    : {c : ℤ | colHeight (μ (i + 1)) c ≠ colHeight (μ i) c}.ncard = B i := by
   obtain ⟨-, ha, hs⟩ := hp
   have h := hs i hi
   by_cases hv : isVec i = true
@@ -164,9 +173,10 @@ theorem path_ncard {n N : ℕ} {isVec : ℕ → Bool} {B : ℕ → ℕ} {μ : �
     simp only [ne_comm] at this ⊢
     exact this
 
-theorem path_finite {n N : ℕ} {isVec : ℕ → Bool} {B : ℕ → ℕ} {μ : ℕ → Fin n → ℤ}
-    (hp : IsPath n isVec B μ N) {i : ℕ} (hi : i < N) :
-    {c : ℤ | colHeight (μ (i + 1)) c ≠ colHeight (μ i) c}.Finite := by
+theorem path_finite
+    {n N : ℕ} {isVec : ℕ → Bool} {B : ℕ → ℕ} {μ : ℕ → Fin n → ℤ} (hp : IsPath n isVec B μ N)
+    {i : ℕ} (hi : i < N)
+    : {c : ℤ | colHeight (μ (i + 1)) c ≠ colHeight (μ i) c}.Finite := by
   obtain ⟨-, ha, hs⟩ := hp
   have h := hs i hi
   by_cases hv : isVec i = true
@@ -185,10 +195,13 @@ end Paths
 
 namespace Paths
 
-theorem pathWord_unchanged {R : Type*} [CommRing R] {n : ℕ} (isVec : ℕ → Bool) (μ : ℕ → Fin n → ℤ)
-    (c : ℤ) (Xr : ℕ → Fin n → R) : ∀ j : ℕ,
-    (∀ i < j, colHeight (μ (i + 1)) c = colHeight (μ i) c) →
-      pathWord isVec μ c Xr j = oneF ∧ colHeight (μ j) c = colHeight (μ 0) c := by
+theorem pathWord_unchanged
+    {R : Type*} [CommRing R]
+    {n : ℕ}
+    (isVec : ℕ → Bool) (μ : ℕ → Fin n → ℤ) (c : ℤ) (Xr : ℕ → Fin n → R)
+    : ∀ j : ℕ,
+      (∀ i < j, colHeight (μ (i + 1)) c = colHeight (μ i) c)
+        → pathWord isVec μ c Xr j = oneF ∧ colHeight (μ j) c = colHeight (μ 0) c := by
   intro j
   induction j with
   | zero => intro _; exact ⟨rfl, rfl⟩
@@ -199,15 +212,20 @@ theorem pathWord_unchanged {R : Type*} [CommRing R] {n : ℕ} (isVec : ℕ → B
     rw [pathWord, if_pos (h j (by omega))]
     exact a
 
-theorem hom_intCast {σ R : Type*} [CommRing R] (w : σ → ℕ) (z : ℤ) :
-    IsWeightedHomogeneous w ((z : ℤ) : MvPolynomial σ R) 0 := by
+theorem hom_intCast {σ R : Type*} [CommRing R] (w : σ → ℕ) (z : ℤ)
+    : IsWeightedHomogeneous w ((z : ℤ) : MvPolynomial σ R) 0 := by
   rw [← map_intCast (C : R →+* MvPolynomial σ R)]
   exact isWeightedHomogeneous_C w _
 
-theorem hom_step {σ R : Type*} [CommRing R] {n : ℕ} (w : σ → ℕ) (up : Bool)
+theorem hom_step
+    {σ R : Type*} [CommRing R]
+    {n : ℕ}
+    (w : σ → ℕ)
+    (up : Bool)
     (Kf : Form (MvPolynomial σ R) n) (Xv : Fin n → MvPolynomial σ R) (d e : ℕ)
     (hK : ∀ J, IsWeightedHomogeneous w (Kf J) d) (hX : ∀ m, IsWeightedHomogeneous w (Xv m) e)
-    (J : Finset (Fin n)) : IsWeightedHomogeneous w (stepF up Kf Xv J) (d + e) := by
+    (J : Finset (Fin n))
+    : IsWeightedHomogeneous w (stepF up Kf Xv J) (d + e) := by
   unfold stepF
   split
   · unfold wedgeF
@@ -219,11 +237,13 @@ theorem hom_step {σ R : Type*} [CommRing R] {n : ℕ} (w : σ → ℕ) (up : Bo
     have := ((hom_intCast (R := R) w (sg J m)).mul (hX m)).mul (hK (insert m J))
     rwa [zero_add, add_comm] at this
 
-theorem pathWord_hom (R : Type*) [CommRing R] {n : ℕ} (isVec : ℕ → Bool) (μ : ℕ → Fin n → ℤ)
-    (c : ℤ) (i : ℕ) : ∀ (j : ℕ) (J : Finset (Fin n)),
-    IsWeightedHomogeneous (fun x : ℕ × Fin n => if x.1 = i then 1 else 0)
-      (pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) j J)
-      (if i < j ∧ colHeight (μ (i + 1)) c ≠ colHeight (μ i) c then 1 else 0) := by
+theorem pathWord_hom
+    (R : Type*) [CommRing R] {n : ℕ} (isVec : ℕ → Bool) (μ : ℕ → Fin n → ℤ) (c : ℤ) (i : ℕ)
+    : ∀ (j : ℕ) (J : Finset (Fin n)),
+      IsWeightedHomogeneous
+        (fun x : ℕ × Fin n => if x.1 = i then 1 else 0)
+        (pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) j J)
+        (if i < j ∧ colHeight (μ (i + 1)) c ≠ colHeight (μ i) c then 1 else 0) := by
   intro j
   induction j with
   | zero =>
@@ -248,10 +268,15 @@ theorem pathWord_hom (R : Type*) [CommRing R] {n : ℕ} (isVec : ℕ → Bool) (
       · rintro ⟨h1, h2⟩
         exact ⟨by omega, h2⟩
     · rw [pathWord, if_neg hch]
-      have := hom_step (fun x : ℕ × Fin n => if x.1 = i then 1 else 0) (isVec j == decide (1 ≤ c))
-        (pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) j)
-        (fun a => (X (j, a) : MvPolynomial (ℕ × Fin n) R)) _ (if j = i then 1 else 0) ih
-        (fun m => isWeightedHomogeneous_X R _ (j, m)) J
+      have :=
+        hom_step
+          (fun x : ℕ × Fin n => if x.1 = i then 1 else 0)
+          (isVec j == decide (1 ≤ c))
+          (pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) j)
+          (fun a => (X (j, a) : MvPolynomial (ℕ × Fin n) R))
+          _ (if j = i then 1 else 0) ih
+          (fun m => isWeightedHomogeneous_X R _ (j, m))
+          J
       convert this using 1
       by_cases hji : j = i
       · subst hji
@@ -265,9 +290,10 @@ theorem pathProductDegrees : PsiDegrees := by
   intro R _ n N isVec B μ I hp hI
   have hfin : (⋃ i ∈ Set.Iio N, {c : ℤ | colHeight (μ (i + 1)) c ≠ colHeight (μ i) c}).Finite :=
     Set.Finite.biUnion (Set.finite_Iio N) fun i hi => path_finite hp hi
-  have hsub : (Function.mulSupport fun c : ℤ =>
-      pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) N (I c)) ⊆
-      ⋃ i ∈ Set.Iio N, {c : ℤ | colHeight (μ (i + 1)) c ≠ colHeight (μ i) c} := by
+  have hsub
+      : (Function.mulSupport fun c : ℤ =>
+          pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) N (I c))
+        ⊆ ⋃ i ∈ Set.Iio N, {c : ℤ | colHeight (μ (i + 1)) c ≠ colHeight (μ i) c} := by
     intro c hc
     by_contra hn
     apply hc
@@ -275,23 +301,24 @@ theorem pathProductDegrees : PsiDegrees := by
       intro i hi
       by_contra hne
       exact hn (Set.mem_biUnion (show i ∈ Set.Iio N from hi) hne)
-    obtain ⟨a, b⟩ := pathWord_unchanged isVec μ c
-      (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) N hun
+    obtain ⟨a, b⟩ :=
+      pathWord_unchanged isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) N hun
     have hcard := hI c
     rw [b, hp.1, colHeight_zero] at hcard
-    have h0 : (I c).card = 0 := by
-      rw [hcard]; split_ifs <;> simp
+    have h0 : (I c).card = 0 := by rw [hcard]; split_ifs <;> simp
     show pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) N (I c) = 1
     rw [a, Finset.card_eq_zero.1 h0]
     simp [oneF]
   refine ⟨hfin.subset hsub, fun i => ?_⟩
   unfold psiPath
-  rw [finprod_eq_prod_of_mulSupport_subset _ (s := hfin.toFinset) (by rwa [Set.Finite.coe_toFinset])]
-  have key := IsWeightedHomogeneous.prod hfin.toFinset
-    (fun c : ℤ => pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) N (I c))
-    (fun c : ℤ => if i < N ∧ colHeight (μ (i + 1)) c ≠ colHeight (μ i) c then 1 else 0)
-    (w := fun x : ℕ × Fin n => if x.1 = i then 1 else 0)
-    (fun c _ => pathWord_hom R isVec μ c i N (I c))
+  rw [finprod_eq_prod_of_mulSupport_subset _ (s := hfin.toFinset)
+    (by rwa [Set.Finite.coe_toFinset])]
+  have key :=
+    IsWeightedHomogeneous.prod hfin.toFinset
+      (fun c : ℤ => pathWord isVec μ c (fun i a => (X (i, a) : MvPolynomial (ℕ × Fin n) R)) N (I c))
+      (fun c : ℤ => if i < N ∧ colHeight (μ (i + 1)) c ≠ colHeight (μ i) c then 1 else 0)
+      (w := fun x : ℕ × Fin n => if x.1 = i then 1 else 0)
+      (fun c _ => pathWord_hom R isVec μ c i N (I c))
   convert key using 1
   by_cases hi : i < N
   · rw [if_pos hi, ← path_ncard hp hi, ← Finset.card_filter, ← Set.ncard_coe_finset]

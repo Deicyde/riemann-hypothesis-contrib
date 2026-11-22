@@ -4,15 +4,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 
 @[expose] public section
 
-open Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S2
+open Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Af UpperTheory.V.Base
+  UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Sd
+  UpperTheory.V.Sd.S2
 open scoped Matrix
 
-private theorem col_eq {k : Type} [Field k] (g r : GL (Fin 2) k) (a b : kˣ) (h10 : (g * r * g⁻¹ : GL (Fin 2) k) 1 0 = 0)
-    (h00 : (g * r * g⁻¹ : GL (Fin 2) k) 0 0 = a) (h11 : (g * r * g⁻¹ : GL (Fin 2) k) 1 1 = b) :
-    r 0 0 * g⁻¹ 0 0 + r 0 1 * g⁻¹ 1 0 = a * g⁻¹ 0 0 ∧ r 1 0 * g⁻¹ 0 0 + r 1 1 * g⁻¹ 1 0 = a * g⁻¹ 1 0 ∧
-      Matrix.GeneralLinearGroup.det r = a * b := by
-  have e : ((r : Matrix (Fin 2) (Fin 2) k) * (g⁻¹ : GL (Fin 2) k)) =
-      ((g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) * (g * r * g⁻¹ : GL (Fin 2) k) := by
+private theorem col_eq
+    {k : Type} [Field k]
+    (g r : GL (Fin 2) k) (a b : kˣ) (h10 : (g * r * g⁻¹ : GL (Fin 2) k) 1 0 = 0)
+    (h00 : (g * r * g⁻¹ : GL (Fin 2) k) 0 0 = a) (h11 : (g * r * g⁻¹ : GL (Fin 2) k) 1 1 = b)
+    : r 0 0 * g⁻¹ 0 0 + r 0 1 * g⁻¹ 1 0 = a * g⁻¹ 0 0
+      ∧ r 1 0 * g⁻¹ 0 0 + r 1 1 * g⁻¹ 1 0 = a * g⁻¹ 1 0
+      ∧ Matrix.GeneralLinearGroup.det r = a * b := by
+  have e
+      : ((r : Matrix (Fin 2) (Fin 2) k) * (g⁻¹ : GL (Fin 2) k))
+        = ((g⁻¹ : GL (Fin 2) k) : Matrix (Fin 2) (Fin 2) k) * (g * r * g⁻¹ : GL (Fin 2) k) := by
     rw [← Units.val_mul, ← Units.val_mul]
     congr 1
     group
@@ -27,11 +33,14 @@ private theorem col_eq {k : Type} [Field k] (g r : GL (Fin 2) k) (a b : kˣ) (h1
   · rw [e1]; ring
   · rw [← t]
     apply Units.ext
-    rw [Matrix.GeneralLinearGroup.val_det_apply, Matrix.det_fin_two, h10, h00, h11, mul_zero, sub_zero]
+    rw [Matrix.GeneralLinearGroup.val_det_apply, Matrix.det_fin_two, h10, h00, h11, mul_zero,
+      sub_zero]
     rfl
 
-private theorem one_le_norm {K : Type} [NormedField K] [IsUltrametricDist K] {x y a b : K} (h : ¬ ‖x - y‖ < 1)
-    (ha : ‖a - x‖ < 1) (hb : ‖b - y‖ < 1) : 1 ≤ ‖a - b‖ ∧ 1 ≤ ‖b - a‖ := by
+private theorem one_le_norm
+    {K : Type} [NormedField K] [IsUltrametricDist K]
+    {x y a b : K} (h : ¬ ‖x - y‖ < 1) (ha : ‖a - x‖ < 1) (hb : ‖b - y‖ < 1)
+    : 1 ≤ ‖a - b‖ ∧ 1 ≤ ‖b - a‖ := by
   have : 1 ≤ ‖a - b‖ := by
     by_contra hlt
     apply h
@@ -42,17 +51,21 @@ private theorem one_le_norm {K : Type} [NormedField K] [IsUltrametricDist K] {x 
     exact (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt (not_le.mp hlt) hb)
   exact ⟨this, by rwa [norm_sub_rev]⟩
 
-private theorem norm_le_of {K : Type} [NormedField K] {c d p q : K} (hc : 1 ≤ ‖c‖) (e : c * q = d * p) :
-    ‖q‖ ≤ ‖d‖ * ‖p‖ :=
-  calc ‖q‖ ≤ ‖c‖ * ‖q‖ := le_mul_of_one_le_left (norm_nonneg _) hc
+private theorem norm_le_of
+    {K : Type} [NormedField K] {c d p q : K} (hc : 1 ≤ ‖c‖) (e : c * q = d * p)
+    : ‖q‖ ≤ ‖d‖ * ‖p‖ :=
+  calc
+    ‖q‖
+      ≤ ‖c‖ * ‖q‖ := le_mul_of_one_le_left (norm_nonneg _) hc
     _ = ‖d‖ * ‖p‖ := by rw [← norm_mul, e, norm_mul]
 
-theorem UpperTheory.mix_stable_line_local :
-    UpperTheory.V.Sd.S2.LocLine := by
+theorem UpperTheory.mix_stable_line_local : UpperTheory.V.Sd.S2.LocLine := by
   intro l _ S A x κ ⟨s₀, hne⟩ hA ⟨g, hg⟩
   have key := fun s => col_eq g (A s) _ _ (hg s).1 ((hg s).2 0) ((hg s).2 1)
-  have hdet : (g⁻¹ : GL (Fin 2) (Qbar l)) 0 0 * (g⁻¹ : GL (Fin 2) (Qbar l)) 1 1 -
-      (g⁻¹ : GL (Fin 2) (Qbar l)) 0 1 * (g⁻¹ : GL (Fin 2) (Qbar l)) 1 0 ≠ 0 := by
+  have hdet
+      : (g⁻¹ : GL (Fin 2) (Qbar l)) 0 0 * (g⁻¹ : GL (Fin 2) (Qbar l)) 1 1
+          - (g⁻¹ : GL (Fin 2) (Qbar l)) 0 1 * (g⁻¹ : GL (Fin 2) (Qbar l)) 1 0
+        ≠ 0 := by
     have := (g⁻¹).det_ne_zero
     rwa [Matrix.det_fin_two] at this
   generalize (g⁻¹ : GL (Fin 2) (Qbar l)) 0 0 = p at key hdet

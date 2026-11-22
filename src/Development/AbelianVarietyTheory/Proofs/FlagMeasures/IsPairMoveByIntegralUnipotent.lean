@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.EncardBiUnion
 
 noncomputable section
 
-open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
+open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
 open scoped ENNReal Classical
 
 namespace GlobalTheory.LoopC.PairMove
@@ -18,10 +19,12 @@ open GlobalTheory.LoopC.FrEqv
 
 section Gen
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
-  {Λ : Submodule (𝓞 E) S.V}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {S : HSpace E} {r : ℕ} {T T' : E} {Λ : Submodule (𝓞 E) S.V}
 
-theorem aut_mul {n m : S.V ≃ₗ[E] S.V} (hm : IsAutLam S Λ m) (hn : IsAutLam S Λ n) : IsAutLam S Λ (m * n) := by
+theorem aut_mul {n m : S.V ≃ₗ[E] S.V} (hm : IsAutLam S Λ m) (hn : IsAutLam S Λ n)
+    : IsAutLam S Λ (m * n) := by
   refine ⟨Subgroup.mul_mem _ hm.1 hn.1, ?_⟩
   have key : ∀ y, (m * n) y ∈ Λ ↔ y ∈ Λ := fun y => by
     show m (n y) ∈ Λ ↔ y ∈ Λ
@@ -34,23 +37,27 @@ theorem aut_symm {n : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n) : IsAutLam S Λ 
   ext x
   rw [mem_gmap, LinearEquiv.symm_symm, aut_mem_iff hn]
 
-theorem mem_iff_of_map {n : S.V ≃ₗ[E] S.V} {U W : Submodule E S.V}
-    (h : U.map (n : S.V →ₗ[E] S.V) = W) (x : S.V) : n x ∈ W ↔ x ∈ U := by
+theorem mem_iff_of_map
+    {n : S.V ≃ₗ[E] S.V} {U W : Submodule E S.V} (h : U.map (n : S.V →ₗ[E] S.V) = W) (x : S.V)
+    : n x ∈ W ↔ x ∈ U := by
   rw [← h, Submodule.mem_map_equiv, LinearEquiv.symm_apply_apply]
 
-theorem map_of_mem_iff {n : S.V ≃ₗ[E] S.V} {U W : Submodule E S.V}
-    (h : ∀ x, n x ∈ W ↔ x ∈ U) : U.map (n : S.V →ₗ[E] S.V) = W := by
+theorem map_of_mem_iff {n : S.V ≃ₗ[E] S.V} {U W : Submodule E S.V} (h : ∀ x, n x ∈ W ↔ x ∈ U)
+    : U.map (n : S.V →ₗ[E] S.V) = W := by
   ext y
   rw [Submodule.mem_map_equiv, ← h (n.symm y), LinearEquiv.apply_symm_apply]
 
-theorem map_symm {n : S.V ≃ₗ[E] S.V} {U W : Submodule E S.V}
-    (h : U.map (n : S.V →ₗ[E] S.V) = W) : W.map (n.symm : S.V →ₗ[E] S.V) = U := by
+theorem map_symm {n : S.V ≃ₗ[E] S.V} {U W : Submodule E S.V} (h : U.map (n : S.V →ₗ[E] S.V) = W)
+    : W.map (n.symm : S.V →ₗ[E] S.V) = U := by
   ext y
   rw [Submodule.mem_map_equiv, LinearEquiv.symm_symm]
   exact mem_iff_of_map h y
 
-theorem orth_mem {n : S.V ≃ₗ[E] S.V} (hn : n ∈ Formalism.HermitianLatticesTheory.isom S.hT) {U W : Submodule E S.V}
-    (h : U.map (n : S.V →ₗ[E] S.V) = W) {x : S.V} (hx : x ∈ orth S U) : n x ∈ orth S W := by
+theorem orth_mem
+    {n : S.V ≃ₗ[E] S.V} (hn : n ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    {U W : Submodule E S.V} (h : U.map (n : S.V →ₗ[E] S.V) = W)
+    {x : S.V} (hx : x ∈ orth S U)
+    : n x ∈ orth S W := by
   have hn' : ∀ a b, S.hT (n a) (n b) = S.hT a b := hn
   simp only [orth, Submodule.mem_iInf, LinearMap.mem_ker] at hx ⊢
   intro w hw
@@ -60,19 +67,29 @@ theorem orth_mem {n : S.V ≃ₗ[E] S.V} (hn : n ∈ Formalism.HermitianLattices
   rw [hn']
   exact hx u hu
 
-theorem lrep_mem {n : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n) {F : LFlag S r T} {G : LFlag S r T'}
-    (h : (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp G) {x : S.V} (hx : x ∈ Lrep Λ F) : n x ∈ Lrep Λ G := by
+theorem lrep_mem
+    {n : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n)
+    {F : LFlag S r T} {G : LFlag S r T'} (h : (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp G)
+    {x : S.V} (hx : x ∈ Lrep Λ F)
+    : n x ∈ Lrep Λ G := by
   simp only [Lrep, Submodule.mem_inf, Submodule.restrictScalars_mem] at hx ⊢
   exact ⟨(aut_mem_iff hn x).2 hx.1, orth_mem hn.1 h hx.2⟩
 
-theorem xlam_mem {n : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n) {F : LFlag S r T} {G : LFlag S r T'}
-    (h : (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp G) {x : S.V} (hx : x ∈ XLam Λ F) : n x ∈ XLam Λ G := by
+theorem xlam_mem
+    {n : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n)
+    {F : LFlag S r T} {G : LFlag S r T'} (h : (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp G)
+    {x : S.V} (hx : x ∈ XLam Λ F)
+    : n x ∈ XLam Λ G := by
   simp only [XLam, Submodule.mem_inf, Submodule.restrictScalars_mem] at hx ⊢
   exact ⟨(aut_mem_iff hn x).2 hx.1, (mem_iff_of_map h x).2 hx.2⟩
 
-theorem ngx_mem {n : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n) {F G : LFlag S r T} {F' G' : LFlag S r T'}
-    (h : (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp G) (h' : (Xsp F').map (n : S.V →ₗ[E] S.V) = Xsp G') (g : ℕ)
-    {x : S.V} (hx : x ∈ NgX Λ g F F') : n x ∈ NgX Λ g G G' := by
+theorem ngx_mem
+    {n : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n)
+    {F G : LFlag S r T} {F' G' : LFlag S r T'}
+    (h : (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp G) (h' : (Xsp F').map (n : S.V →ₗ[E] S.V) = Xsp G')
+    (g : ℕ)
+    {x : S.V} (hx : x ∈ NgX Λ g F F')
+    : n x ∈ NgX Λ g G G' := by
   have hΛ : Λ.map ((n : S.V →ₗ[E] S.V).restrictScalars (𝓞 E)) = Λ := hn.2
   have hle : (NgX Λ g F F').map ((n : S.V →ₗ[E] S.V).restrictScalars (𝓞 E)) ≤ NgX Λ g G G' := by
     rw [NgX, NgX, Submodule.map_sup, Submodule.map_sup, Submodule.map_smul'', hΛ]
@@ -83,17 +100,20 @@ theorem ngx_mem {n : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n) {F G : LFlag S r 
       exact xlam_mem hn h' hy
   exact hle (Submodule.mem_map_of_mem hx)
 
-theorem ngx_iff {n : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n) {F G : LFlag S r T} {F' G' : LFlag S r T'}
-    (h : (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp G) (h' : (Xsp F').map (n : S.V →ₗ[E] S.V) = Xsp G') (g : ℕ)
-    (x : S.V) : n x ∈ NgX Λ g G G' ↔ x ∈ NgX Λ g F F' := by
+theorem ngx_iff
+    {n : S.V ≃ₗ[E] S.V} (hn : IsAutLam S Λ n)
+    {F G : LFlag S r T} {F' G' : LFlag S r T'}
+    (h : (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp G) (h' : (Xsp F').map (n : S.V →ₗ[E] S.V) = Xsp G')
+    (g : ℕ) (x : S.V)
+    : n x ∈ NgX Λ g G G' ↔ x ∈ NgX Λ g F F' := by
   constructor
   · intro hx
     have := ngx_mem (aut_symm hn) (map_symm h) (map_symm h') g hx
     rwa [LinearEquiv.symm_apply_apply] at this
   · exact ngx_mem hn h h' g
 
-theorem nlam_map {n : S.V ≃ₗ[E] S.V} {F : LFlag S r T} (hn : n ∈ NLam Λ F) :
-    (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp F := by
+theorem nlam_map {n : S.V ≃ₗ[E] S.V} {F : LFlag S r T} (hn : n ∈ NLam Λ F)
+    : (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp F := by
   have key : ∀ m ∈ NLam Λ F, ∀ x ∈ Xsp F, m x ∈ Xsp F := by
     intro m hm x hx
     rw [← sub_add_cancel (m x) x]
@@ -112,10 +132,11 @@ theorem finrank_X (F : LFlag S r T) : finrank E (Xsp F) = r := by
   show finrank E (Submodule.span E (Set.range F.fl.e)) = r
   rw [finrank_span_eq_card F.fl.e_indep, Fintype.card_fin]
 
-theorem frame_move {n : S.V ≃ₗ[E] S.V} {F A : LFlag S r T} {ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) (𝓞 E)}
+theorem frame_move
+    {n : S.V ≃ₗ[E] S.V} {F A : LFlag S r T} {ξ : Matrix (Fin (r + 1)) (Fin (r + 1)) (𝓞 E)}
     (h1 : ∀ a b, b < a → ξ a b = 0) (h2 : ∀ a, ξ a a = 1)
-    (h3 : frame A = frameAct (fun a => n (frame F a)) ξ) :
-    (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp A ∧ n F.fl.z - A.fl.z ∈ Xsp A := by
+    (h3 : frame A = frameAct (fun a => n (frame F a)) ξ)
+    : (Xsp F).map (n : S.V →ₗ[E] S.V) = Xsp A ∧ n F.fl.z - A.fl.z ∈ Xsp A := by
   have hFe : ∀ i : Fin r, frame F i.castSucc = F.fl.e i := fun i => by
     show Fin.snoc (α := fun _ => S.V) F.fl.e F.fl.z i.castSucc = F.fl.e i
     simp
@@ -154,20 +175,22 @@ theorem frame_move {n : S.V ≃ₗ[E] S.V} {F A : LFlag S r T} {ξ : Matrix (Fin
   rw [← hAz, h3]
   simp only [frameAct]
   rw [Fin.sum_univ_castSucc, h2 (Fin.last r), hFz]
-  have hs : ∑ i : Fin r, ((ξ i.castSucc (Fin.last r) : 𝓞 E) : E) • n (frame F i.castSucc) ∈ Xsp A := by
+  have hs
+      : ∑ i : Fin r, ((ξ i.castSucc (Fin.last r) : 𝓞 E) : E) • n (frame F i.castSucc) ∈ Xsp A := by
     rw [← hF]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hmem i)
   have e : ((1 : 𝓞 E) : E) • n F.fl.z = n F.fl.z := by simp
   rw [e, sub_add_eq_sub_sub_swap, sub_self, zero_sub]
   exact neg_mem hs
 
-theorem move {g : ℕ} {F : LFlag S r T} {F' F'' A B : LFlag S r T'} {β n' n'' : S.V ≃ₗ[E] S.V}
+theorem move
+    {g : ℕ} {F : LFlag S r T} {F' F'' A B : LFlag S r T'} {β n' n'' : S.V ≃ₗ[E] S.V}
     (hp : IsPair Λ F F' F'' β g) (hn' : n' ∈ NLam Λ F) (hn'' : n'' ∈ NLam Λ F)
     (hA : (Xsp F').map (n' : S.V →ₗ[E] S.V) = Xsp A) (zA : n' F'.fl.z - A.fl.z ∈ Xsp A)
-    (hB : (Xsp F'').map (n'' : S.V →ₗ[E] S.V) = Xsp B) (zB : n'' F''.fl.z - B.fl.z ∈ Xsp B) :
-    IsAutLam S Λ (n'' * β * n'⁻¹) ∧
-      (Xsp A).map ((n'' * β * n'⁻¹ : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) = Xsp B ∧
-      (n'' * β * n'⁻¹) A.fl.z - B.fl.z ∈ Xsp B ∧ IotaCompat Λ F A B (n'' * β * n'⁻¹) g := by
+    (hB : (Xsp F'').map (n'' : S.V →ₗ[E] S.V) = Xsp B) (zB : n'' F''.fl.z - B.fl.z ∈ Xsp B)
+    : IsAutLam S Λ (n'' * β * n'⁻¹)
+      ∧ (Xsp A).map ((n'' * β * n'⁻¹ : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) = Xsp B
+      ∧ (n'' * β * n'⁻¹) A.fl.z - B.fl.z ∈ Xsp B ∧ IotaCompat Λ F A B (n'' * β * n'⁻¹) g := by
   have hn'A : IsAutLam S Λ n' := hn'.1
   have hn''A : IsAutLam S Λ n'' := hn''.1
   obtain ⟨hβ, hβF, hβz, hι⟩ := hp
@@ -182,8 +205,9 @@ theorem move {g : ℕ} {F : LFlag S r T} {F' F'' A B : LFlag S r T'} {β n' n'' 
   have hFn' : (Xsp F).map (n' : S.V →ₗ[E] S.V) = Xsp F := nlam_map hn'
   have hFn'' : (Xsp F).map (n'' : S.V →ₗ[E] S.V) = Xsp F := nlam_map hn''
   refine ⟨aut_mul (aut_mul hn''A hβ) (aut_symm hn'A), hAB, ?_, ?_⟩
-  · have e : (n'' * β * n'⁻¹) A.fl.z - B.fl.z =
-        (n'' F''.fl.z - B.fl.z) - (n'' * β * n'⁻¹) (n' F'.fl.z - A.fl.z) := by
+  · have e
+        : (n'' * β * n'⁻¹) A.fl.z - B.fl.z
+          = (n'' F''.fl.z - B.fl.z) - (n'' * β * n'⁻¹) (n' F'.fl.z - A.fl.z) := by
       simp only [hγ, map_sub, LinearEquiv.symm_apply_apply, hβz]
       abel
     rw [e]
@@ -193,9 +217,11 @@ theorem move {g : ℕ} {F : LFlag S r T} {F' F'' A B : LFlag S r T'} {β n' n'' 
     have hm : n'.symm l ∈ Lrep Λ F := lrep_mem (aut_symm hn'A) (map_symm hFn') hl
     simp only [Lrep, Submodule.mem_inf, Submodule.restrictScalars_mem] at hl
     have h1 : l - x' ∈ NgX Λ g F A ↔ n'.symm l - n'.symm x' ∈ NgX Λ g F F' := by
-      rw [← ngx_iff hn'A hFn' hA g, map_sub, LinearEquiv.apply_symm_apply, LinearEquiv.apply_symm_apply]
-    have h3 : n'.symm l - β (n'.symm x') ∈ NgX Λ g F F'' ↔
-        n'' (n'.symm l) - (n'' * β * n'⁻¹) x' ∈ NgX Λ g F B := by
+      rw [← ngx_iff hn'A hFn' hA g, map_sub, LinearEquiv.apply_symm_apply,
+        LinearEquiv.apply_symm_apply]
+    have h3
+        : n'.symm l - β (n'.symm x') ∈ NgX Λ g F F''
+          ↔ n'' (n'.symm l) - (n'' * β * n'⁻¹) x' ∈ NgX Λ g F B := by
       rw [hγ x', ← ngx_iff hn''A hFn'' hB g, map_sub]
     have hd : l - n'' (n'.symm l) ∈ NgX Λ g F B := by
       obtain ⟨hνA, -, hνo⟩ := mul_mem_NLam (symm_mem_NLam hn') hn''
@@ -207,9 +233,12 @@ theorem move {g : ℕ} {F : LFlag S r T} {F' F'' A B : LFlag S r T'} {β n' n'' 
         exact Submodule.mem_sup_left (Submodule.mem_sup_right e1)
       rw [← neg_sub]
       exact neg_mem e2
-    have h4 : n'' (n'.symm l) - (n'' * β * n'⁻¹) x' ∈ NgX Λ g F B ↔
-        l - (n'' * β * n'⁻¹) x' ∈ NgX Λ g F B := by
-      rw [show l - (n'' * β * n'⁻¹) x' = (n'' (n'.symm l) - (n'' * β * n'⁻¹) x') + (l - n'' (n'.symm l)) by abel]
+    have h4
+        : n'' (n'.symm l) - (n'' * β * n'⁻¹) x' ∈ NgX Λ g F B
+          ↔ l - (n'' * β * n'⁻¹) x' ∈ NgX Λ g F B := by
+      rw [show l - (n'' * β * n'⁻¹) x'
+          = (n'' (n'.symm l) - (n'' * β * n'⁻¹) x') + (l - n'' (n'.symm l)) by
+        abel]
       exact (add_mem_cancel_right hd).symm
     exact h1.trans ((hι _ hy _ hm).trans (h3.trans h4))
 
@@ -217,7 +246,16 @@ end Gen
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem pair_move : ∀ (D : D7) (T T' : D.host.E) (Λ : LatV D) (g : ℕ) (F : Fg D T) (F' F'' A B : Fg D T') (β n' n'' : (hS D).V ≃ₗ[D.host.E] (hS D).V), IsPair Λ F F' F'' β g → n' ∈ NLam Λ F → n'' ∈ NLam Λ F → FrameEqv D n' F' A → FrameEqv D n'' F'' B → IsAutLam (hS D) Λ (n'' * β * n'⁻¹) ∧ (Xsp A).map ((n'' * β * n'⁻¹ : (hS D).V ≃ₗ[D.host.E] (hS D).V) : (hS D).V →ₗ[D.host.E] (hS D).V) = Xsp B ∧ (n'' * β * n'⁻¹) A.fl.z - B.fl.z ∈ Xsp B ∧ IotaCompat Λ F A B (n'' * β * n'⁻¹) g := by
+theorem pair_move
+    : ∀ (D : D7) (T T' : D.host.E) (Λ : LatV D) (g : ℕ) (F : Fg D T) (F' F'' A B : Fg D T')
+        (β n' n'' : (hS D).V ≃ₗ[D.host.E] (hS D).V),
+      IsPair Λ F F' F'' β g → n' ∈ NLam Λ F → n'' ∈ NLam Λ F → FrameEqv D n' F' A
+        → FrameEqv D n'' F'' B
+        → IsAutLam (hS D) Λ (n'' * β * n'⁻¹)
+          ∧ (Xsp A).map
+              ((n'' * β * n'⁻¹ : (hS D).V ≃ₗ[D.host.E] (hS D).V) : (hS D).V →ₗ[D.host.E] (hS D).V)
+            = Xsp B
+          ∧ (n'' * β * n'⁻¹) A.fl.z - B.fl.z ∈ Xsp B ∧ IotaCompat Λ F A B (n'' * β * n'⁻¹) g := by
   intro D T T' Λ g F F' F'' A B β n' n'' hp hn' hn'' hA hB
   obtain ⟨ξ, h1, h2, h3⟩ := hA
   obtain ⟨η, k1, k2, k3⟩ := hB

@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoC
 @[expose] public section
 
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.UnipDom
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.ThK.UnipDom
 
 noncomputable section
 
@@ -36,16 +38,19 @@ theorem sig_ne_id {σ : E →ₐ[F] E} (h : IsCMExt F E σ) : ∃ x : E, σ x �
 def sigE {σ : E →ₐ[F] E} (h : IsCMExt F E σ) : Gal(E/F) :=
   AlgEquiv.ofAlgHom σ σ (AlgHom.ext fun x => sig_sig h x) (AlgHom.ext fun x => sig_sig h x)
 
-theorem trace_eq {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (e : E) :
-    algebraMap F E (Algebra.trace F E e) = e + σ e := by
+theorem trace_eq {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (e : E)
+    : algebraMap F E (Algebra.trace F E e) = e + σ e := by
   haveI : FiniteDimensional F E := Module.finite_of_finrank_eq_succ h.2.2.1
   have hne : (1 : Gal(E/F)) ≠ sigE h := by
     intro h1
     obtain ⟨x, hx⟩ := sig_ne_id h
     exact hx (congrArg (fun g : Gal(E/F) => g x) h1).symm
   have hle : Nat.card Gal(E/F) ≤ 2 := by
-    calc Nat.card Gal(E/F) ≤ Nat.card (E →ₐ[F] E) :=
-          Nat.card_le_card_of_injective (fun g => (g : E →ₐ[F] E)) (fun a b hab => AlgEquiv.coe_algHom_injective hab)
+    calc
+      Nat.card Gal(E/F) ≤ Nat.card (E →ₐ[F] E) :=
+        Nat.card_le_card_of_injective
+          (fun g => (g : E →ₐ[F] E))
+          (fun a b hab => AlgEquiv.coe_algHom_injective hab)
       _ ≤ Module.finrank F E := card_algHom_le_finrank F E E
       _ = 2 := h.2.2.1
   have hall : ∀ g : Gal(E/F), g = 1 ∨ g = sigE h := by
@@ -78,14 +83,22 @@ end GlobalTheory.CMTrace
 
 namespace GlobalTheory.CMTrace
 
-theorem adele_trace : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → (∀ x : AF F, Algebra.trace (AF F) (AE F E) (algebraMap (AF F) (AE F E) x) = 2 * x) ∧ ∀ c : AE F E, algebraMap (AF F) (AE F E) (Algebra.trace (AF F) (AE F E) c) = c + cA σ c := by
+theorem adele_trace
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → (∀ x : AF F, Algebra.trace (AF F) (AE F E) (algebraMap (AF F) (AE F E) x) = 2 * x)
+          ∧ ∀ c : AE F E,
+            algebraMap (AF F) (AE F E) (Algebra.trace (AF F) (AE F E) c) = c + cA σ c := by
   intro F E _ _ _ _ _ σ h
   haveI : FiniteDimensional F E := Module.finite_of_finrank_eq_succ h.2.2.1
   haveI : Nontrivial (AF F) := (AdeleRing.algebraMap_injective (𝓞 F) F).nontrivial
   refine ⟨fun x => ?_, fun c => ?_⟩
   · rw [Algebra.trace_algebraMap, Module.finrank_baseChange, h.2.2.1, nsmul_eq_mul, Nat.cast_ofNat]
-  · have htm : ∀ (a : AF F) (e : E), Algebra.trace (AF F) (AE F E) (a ⊗ₜ[F] e) =
-        a * algebraMap F (AF F) (Algebra.trace F E e) := by
+  · have htm
+        : ∀ (a : AF F) (e : E),
+          Algebra.trace (AF F) (AE F E) (a ⊗ₜ[F] e)
+            = a * algebraMap F (AF F) (Algebra.trace F E e) := by
       intro a e
       have h1 : a ⊗ₜ[F] e = a • ((1 : AF F) ⊗ₜ[F] e) := by
         rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
@@ -95,8 +108,9 @@ theorem adele_trace : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Numb
     | zero => simp
     | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy, map_add (f := _)]; abel
     | tmul a e =>
-      rw [htm, Algebra.TensorProduct.algebraMap_apply, cA, Algebra.TensorProduct.map_tmul, AlgHom.id_apply,
-        ← TensorProduct.tmul_add, ← trace_eq h, mul_comm, ← Algebra.smul_def, Algebra.algebraMap_self,
-        RingHom.id_apply, TensorProduct.smul_tmul, ← Algebra.algebraMap_eq_smul_one]
+      rw [htm, Algebra.TensorProduct.algebraMap_apply, cA, Algebra.TensorProduct.map_tmul,
+        AlgHom.id_apply, ← TensorProduct.tmul_add, ← trace_eq h, mul_comm, ← Algebra.smul_def,
+        Algebra.algebraMap_self, RingHom.id_apply, TensorProduct.smul_tmul,
+        ← Algebra.algebraMap_eq_smul_one]
 
 end GlobalTheory.CMTrace

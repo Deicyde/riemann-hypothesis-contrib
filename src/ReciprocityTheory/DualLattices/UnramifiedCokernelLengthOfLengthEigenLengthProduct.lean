@@ -17,8 +17,11 @@ open ReciprocityTheory.PGsh.L2
 
 section Unram
 
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {C : Type} [Field C] {v : Valuation C NNReal} {R : Type}
-  [CommRing R] [Algebra R C] [Algebra ℤ_[p] R] {O : Type} [CommRing O] [Algebra ℤ_[p] O]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
+  {O : Type} [CommRing O] [Algebra ℤ_[p] O]
   {σ : O ≃ₐ[ℤ_[p]] O} {cp : R}
 
 private lemma cj_cj_dual_lattices (hS : HodgeTateSetting p v R O σ cp) {H : HodgeTateDatum p g v R O σ cp}
@@ -211,8 +214,10 @@ private lemma hasSum_rpow_mul_of_frobenius_recursion {m : ℕ} (q : ℝ) (hq : 1
   simpa using
     (tendsto_const_nhds : Filter.Tendsto (fun _ : ℕ => y j) Filter.atTop (nhds (y j))).sub h0
 
-theorem unramifiedCokernelLength_of_length_eigenLengthProduct (hLen : LenIdStatement) (hEx : LenExStatement) (hTot : EigenLengthProductStatement)
-    (hCore : EigenLengthFrobeniusStatement) : UnramifiedCokernelLengthStatement := by
+theorem unramifiedCokernelLength_of_length_eigenLengthProduct
+    (hLen : LenIdStatement) (hEx : LenExStatement) (hTot : EigenLengthProductStatement)
+    (hCore : EigenLengthFrobeniusStatement)
+    : UnramifiedCokernelLengthStatement := by
   intro p _ g C _ _ _ v R _ _ _ O _ _ σ cp hp2 hS H U i V1 V2 hV1 hV2
   have hR := hS.integers
   have hpp : p.Prime := Fact.out
@@ -232,11 +237,13 @@ theorem unramifiedCokernelLength_of_length_eigenLengthProduct (hLen : LenIdState
     intro h0
     apply hcv
     rw [h0, map_zero, map_zero]
-  obtain ⟨hform, hcomm, hdet⟩ := u1 R g U.m H.Ht H.Bt (H.E.map (algebraMap ℤ_[p] R)) cp U.εT U.εL
-    U.cj hcj U.εT_orth U.εT_sum U.εL_orth U.εL_sum hHt hE H.form_eq_alt
+  obtain ⟨hform, hcomm, hdet⟩ :=
+    u1 R g U.m H.Ht H.Bt (H.E.map (algebraMap ℤ_[p] R)) cp U.εT U.εL U.cj hcj U.εT_orth U.εT_sum
+      U.εL_orth U.εL_sum hHt hE H.form_eq_alt
   have hform' : (bt2 H U)ᵀ * H.Ht - H.Htᵀ * bt2 H U = cp • H.E.map (algebraMap ℤ_[p] R) := hform
   have hcomm' : ∀ j, bt2 H U * U.εT j = U.εL j * bt2 H U := hcomm
-  have hdv : v (algebraMap R C (Matrix.fromRows H.Ht (bt2 H U)).det) = v (algebraMap R C cp) ^ g := by
+  have hdv
+      : v (algebraMap R C (Matrix.fromRows H.Ht (bt2 H U)).det) = v (algebraMap R C cp) ^ g := by
     have h1 := congrArg (fun x => v (algebraMap R C x)) hdet
     simp only [map_pow, map_mul, hR.one_of_isUnit hEu, mul_one] at h1
     rw [pow_mul'] at h1
@@ -244,14 +251,19 @@ theorem unramifiedCokernelLength_of_length_eigenLengthProduct (hLen : LenIdState
   have hEx1 : ∀ j k, ∃ x, HasLen v R (cokE H.Ht U.εT U.εL j k) x := fun j k =>
     hEx C v R hR g H.Ht (U.εL j) (U.εT k)
   choose cc hcc using hEx1
-  have hL : ∀ j c₁ c₂, HasLen v R (cokE H.Ht U.εT U.εL j (U.cj j)) c₁ →
-      HasLen v R (cokE H.Ht U.εT U.εL (U.cj j) j) c₂ →
-      ∃ X : NNReal, HasLen v R (xModE H.Ht (bt2 H U) U.εT U.εL U.cj j) X ∧
-        X * c₁ = v (algebraMap R C cp) ^ U.r j * c₂ := fun j c₁ c₂ h1 h2 =>
+  have hL
+      : ∀ j c₁ c₂,
+        HasLen v R (cokE H.Ht U.εT U.εL j (U.cj j)) c₁
+          → HasLen v R (cokE H.Ht U.εT U.εL (U.cj j) j) c₂
+          → ∃ X : NNReal,
+            HasLen v R (xModE H.Ht (bt2 H U) U.εT U.εL U.cj j) X
+              ∧ X * c₁ = v (algebraMap R C cp) ^ U.r j * c₂ := fun j c₁ c₂ h1 h2 =>
     hLen C v R hR g U.m H.Ht (bt2 H U) (H.E.map (algebraMap ℤ_[p] R)) cp hcp hEu hform' U.εT U.εL
       U.cj hcj U.εT_orth U.εT_sum U.εL_orth U.εL_sum hHt hcomm' hE j (U.r j) (U.rank j) c₁ c₂ h1 h2
-  have hX : ∀ j, ∃ X : NNReal, HasLen v R (xModE H.Ht (bt2 H U) U.εT U.εL U.cj j) X ∧
-      (j = i → X * V1 = v (algebraMap R C cp) ^ U.r j * V2) := by
+  have hX
+      : ∀ j, ∃ X : NNReal,
+        HasLen v R (xModE H.Ht (bt2 H U) U.εT U.εL U.cj j) X
+          ∧ (j = i → X * V1 = v (algebraMap R C cp) ^ U.r j * V2) := by
     intro j
     by_cases hj : j = i
     · subst hj
@@ -261,8 +273,8 @@ theorem unramifiedCokernelLength_of_length_eigenLengthProduct (hLen : LenIdState
       exact ⟨X, h1, fun h => absurd h hj⟩
   choose X hXl hXe using hX
   have hprod : ∏ j, X j = v (algebraMap R C cp) ^ g :=
-    (hTot C v R hR g U.m H.Ht (bt2 H U) U.εT U.εL U.cj hcj U.εT_orth U.εT_sum U.εL_orth U.εL_sum
-      hHt hcomm' X hXl).trans hdv
+    (hTot C v R hR g U.m H.Ht (bt2 H U) U.εT U.εL U.cj hcj U.εT_orth U.εT_sum U.εL_orth U.εL_sum hHt
+      hcomm' X hXl).trans hdv
   have hineq := hCore p g C v R O σ cp hp2 hS H U X hXl hprod
   obtain ⟨a, ha_def⟩ : ∃ a : ℝ, a = (v (algebraMap R C (p : R)) : ℝ) := ⟨_, rfl⟩
   obtain ⟨c, hc_def⟩ : ∃ c : ℝ, c = (v (algebraMap R C cp) : ℝ) := ⟨_, rfl⟩
@@ -274,8 +286,8 @@ theorem unramifiedCokernelLength_of_length_eigenLengthProduct (hLen : LenIdState
   have hXpos : ∀ j, 0 < (X j : ℝ) := by
     intro j
     have h1 : ∏ j, X j ≠ 0 := by rw [hprod]; exact pow_ne_zero _ hcv
-    exact NNReal.coe_pos.mpr (pos_iff_ne_zero.mpr
-      (Finset.prod_ne_zero_iff.mp h1 j (Finset.mem_univ j)))
+    exact NNReal.coe_pos.mpr (pos_iff_ne_zero.mpr (Finset.prod_ne_zero_iff.mp h1 j
+      (Finset.mem_univ j)))
   have hlogcv : ((p : ℝ) - 1) * Real.log c = Real.log a := by
     have h := congrArg (fun x : NNReal => Real.log (x : ℝ)) hS.cp_val
     simp only [NNReal.coe_pow, Real.log_pow] at h
@@ -295,8 +307,9 @@ theorem unramifiedCokernelLength_of_length_eigenLengthProduct (hLen : LenIdState
     exact_mod_cast hprod
   have hS2 : (∑ j, y j) * ((p : ℝ) - 1) = g := by
     have h1 : (∑ j, y j) * ((p : ℝ) - 1) * Real.log a = g * Real.log a := by
-      calc (∑ j, y j) * ((p : ℝ) - 1) * Real.log a = ((∑ j, y j) * Real.log a) * ((p : ℝ) - 1) := by
-            ring
+      calc
+        (∑ j, y j) * ((p : ℝ) - 1) * Real.log a
+          = ((∑ j, y j) * Real.log a) * ((p : ℝ) - 1) := by ring
         _ = g * (((p : ℝ) - 1) * Real.log c) := by rw [hS1]; ring
         _ = g * Real.log a := by rw [hlogcv]
     exact mul_right_cancel₀ hL0.ne h1
@@ -306,8 +319,8 @@ theorem unramifiedCokernelLength_of_length_eigenLengthProduct (hLen : LenIdState
       rw [ha_def]
       exact_mod_cast hineq j
     have h3 := Real.log_le_log (pow_pos (hXpos j) p) h2
-    rw [Real.log_pow, Real.log_mul (hXpos _).ne' (pow_pos ha0 _).ne', Real.log_pow, hlogX,
-      hlogX] at h3
+    rw [Real.log_pow, Real.log_mul (hXpos _).ne' (pow_pos ha0 _).ne', Real.log_pow, hlogX, hlogX]
+      at h3
     by_contra hc
     push_neg at hc
     have h4 := mul_lt_mul_of_neg_right hc hL0
@@ -320,8 +333,8 @@ theorem unramifiedCokernelLength_of_length_eigenLengthProduct (hLen : LenIdState
     linarith [hS2]
   have hEq : ∀ j, y j = (y (U.φ j) + U.r (U.φ j)) / p := by
     intro j
-    have hnn : ∀ k ∈ Finset.univ, 0 ≤ (p : ℝ) * y k - (y (U.φ k) + U.r (U.φ k)) :=
-      fun k _ => by linarith [hI k]
+    have hnn : ∀ k ∈ Finset.univ, 0 ≤ (p : ℝ) * y k - (y (U.φ k) + U.r (U.φ k)) := fun k _ => by
+      linarith [hI k]
     have h1 := (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hsumdiff j (Finset.mem_univ j)
     have hp0 : (p : ℝ) ≠ 0 := by positivity
     rw [eq_div_iff hp0]

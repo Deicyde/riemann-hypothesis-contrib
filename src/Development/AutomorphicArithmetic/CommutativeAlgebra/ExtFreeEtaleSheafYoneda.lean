@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.EtaleCohomolo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC CochainComplex CochainComplex.HomComplex
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC CochainComplex
+  CochainComplex.HomComplex
 open LateralTheory.E.EtaleTopologySheaves LateralTheory.E.LeafGhostCut UpperTheory.Et.Loc
 
 namespace UpperTheory.YonedaTruncation
@@ -25,9 +26,10 @@ private lemma Q_map_eq {K L : CochainComplex C ℤ} (u : K ⟶ L) :
       rw [Category.assoc, ← h]
       rfl
 
-private noncomputable def tr {K T : CochainComplex C ℤ} {n : ℤ} (x : Cocycle K T n) :
-    DerivedCategory.Q.obj K ⟶ (CategoryTheory.shiftFunctor _ n).obj (DerivedCategory.Q.obj T) :=
-  DerivedCategory.Q.map (Cocycle.equivHomShift.symm x) ≫ (DerivedCategory.Q.commShiftIso n).hom.app T
+private noncomputable def tr {K T : CochainComplex C ℤ} {n : ℤ} (x : Cocycle K T n)
+    : DerivedCategory.Q.obj K ⟶ (CategoryTheory.shiftFunctor _ n).obj (DerivedCategory.Q.obj T) :=
+  DerivedCategory.Q.map (Cocycle.equivHomShift.symm x)
+    ≫ (DerivedCategory.Q.commShiftIso n).hom.app T
 
 private lemma tr_eq {K T : CochainComplex C ℤ} {n : ℤ} (x : Cocycle K T n) :
     tr x = (DerivedCategory.quotientCompQhIso C).inv.app K ≫
@@ -59,9 +61,12 @@ private lemma tr_surj {K T : CochainComplex C ℤ} [T.IsKInjective] {n : ℤ}
   rw [tr_eq, hg]
   simp
 
-private noncomputable def dm (A : C) (T : CochainComplex C ℤ) (n : ℤ) (f : A ⟶ T.X n) (hf : f ≫ T.d n (n + 1) = 0) :
-    (DerivedCategory.singleFunctor C 0).obj A ⟶ (CategoryTheory.shiftFunctor _ n).obj (DerivedCategory.Q.obj T) :=
-  (DerivedCategory.singleFunctorIsoCompQ C 0).hom.app A ≫ tr (Cocycle.fromSingleMk f (zero_add n) (n + 1) rfl hf)
+private noncomputable def dm
+    (A : C) (T : CochainComplex C ℤ) (n : ℤ) (f : A ⟶ T.X n) (hf : f ≫ T.d n (n + 1) = 0)
+    : (DerivedCategory.singleFunctor C 0).obj A
+      ⟶ (CategoryTheory.shiftFunctor _ n).obj (DerivedCategory.Q.obj T) :=
+  (DerivedCategory.singleFunctorIsoCompQ C 0).hom.app A
+    ≫ tr (Cocycle.fromSingleMk f (zero_add n) (n + 1) rfl hf)
 
 private lemma mk_eq_iff {A : C} {T : CochainComplex C ℤ} {n : ℤ} {f f' : A ⟶ T.X n}
     (hf : f ≫ T.d n (n + 1) = 0) (hf' : f' ≫ T.d n (n + 1) = 0) :
@@ -121,7 +126,8 @@ end Abs
 section Site
 variable {B : Scheme.{0}} {q : ℕ}
 
-private noncomputable abbrev Z0 (B : Scheme.{0}) (q : ℕ) : B.Etale ⥤ (B.Etaleᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} (ZMod q))) :=
+private noncomputable abbrev Z0 (B : Scheme.{0}) (q : ℕ)
+    : B.Etale ⥤ (B.Etaleᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} (ZMod q))) :=
   yoneda ⋙ (Functor.whiskeringRight B.Etaleᵒᵖ (Type 0) (ModuleCat.{1} (ULift.{1} (ZMod q)))).obj
     (uliftFunctor.{1, 0} ⋙ ModuleCat.free (ULift.{1} (ZMod q)))
 
@@ -155,8 +161,10 @@ private lemma pre_inj {U : B.Etale} {N : B.Etaleᵒᵖ ⥤ ModuleCat.{1} (ULift.
   rw [e] at h2
   exact h1.trans h2.symm
 
-private noncomputable def pD {U : B.Etale} {N : B.Etaleᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} (ZMod q))} (s : N.obj (op U))
-    (V : B.Etaleᵒᵖ) : ((Z0 B q).obj U).obj V ⟶ N.obj V :=
+private noncomputable def pD
+    {U : B.Etale} {N : B.Etaleᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} (ZMod q))} (s : N.obj (op U))
+    (V : B.Etaleᵒᵖ)
+    : ((Z0 B q).obj U).obj V ⟶ N.obj V :=
   ModuleCat.freeDesc (↾fun k : ULift.{1} (V.unop ⟶ U) => (N.map k.down.op).hom s)
 
 private lemma pD_mk {U : B.Etale} {N : B.Etaleᵒᵖ ⥤ ModuleCat.{1} (ULift.{1} (ZMod q))} (s : N.obj (op U))
@@ -278,8 +286,7 @@ end Site
 end UpperTheory.YonedaTruncation
 
 open UpperTheory.YonedaTruncation in
-theorem UpperTheory.ext_free_etale_sheaf_yoneda :
-    ∀ (B : Scheme.{0}) (q : ℕ), Yon B q := by
+theorem UpperTheory.ext_free_etale_sheaf_yoneda : ∀ (B : Scheme.{0}) (q : ℕ), Yon B q := by
   intro B q
   refine ⟨fun T U n s hs => dm ((ZS B q).obj U) T n (ee (T.X n) U s) (ee_closed hs), ?_, ?_, ?_, ?_⟩
   · rintro T U n s hs s' hs' ⟨b, hb⟩

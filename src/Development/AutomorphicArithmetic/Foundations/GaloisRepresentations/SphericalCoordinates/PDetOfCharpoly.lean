@@ -4,8 +4,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
@@ -27,8 +29,7 @@ private lemma det_one_sub_smul_linear {V : Type} [AddCommGroup V] [Module ℂ V]
   rw [← LinearMap.det_toMatrix b, map_sub, map_smul, LinearMap.toMatrix_one,
     det_one_sub_smul_matrix, LinearMap.charpoly_toMatrix]
 
-theorem UpperTheory.Gal.W2.detOfCharpoly_of :
-    UpperTheory.Gal.W2.DetOfCharpoly := by
+theorem UpperTheory.Gal.W2.detOfCharpoly_of : UpperTheory.Gal.W2.DetOfCharpoly := by
   intro V W _ _ _ _ _ _ T Θ d A h y
   rw [det_one_sub_smul_linear, det_one_sub_smul_linear, ← Polynomial.eval_mul,
     ← Polynomial.reverse_mul_of_domain, ← h, det_one_sub_smul_matrix]

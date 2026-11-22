@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ParP
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -13,16 +14,19 @@ noncomputable section
 namespace GlobalTheory.HaarSum
 open MeasureTheory
 
-theorem vol_mul_relIndex {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
-    [BorelSpace G] (μ : Measure G) [μ.IsMulLeftInvariant] (H H' : Subgroup G) (hle : H' ≤ H)
-    (hc : IsCompact (H : Set G)) (ho : IsOpen (H' : Set G)) :
-    μ.real H' * (H'.relIndex H : ℝ) = μ.real H ∧ H'.relIndex H ≠ 0 := by
+theorem vol_mul_relIndex
+    {G : Type}
+    [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (H H' : Subgroup G) (hle : H' ≤ H) (hc : IsCompact (H : Set G)) (ho : IsOpen (H' : Set G))
+    : μ.real H' * (H'.relIndex H : ℝ) = μ.real H ∧ H'.relIndex H ≠ 0 := by
   haveI : CompactSpace H := isCompact_iff_compactSpace.1 hc
   have hHo : IsOpen (H : Set G) := Subgroup.isOpen_mono hle ho
   have ho' : IsOpen ((H'.subgroupOf H : Subgroup H) : Set H) := ho.preimage continuous_subtype_val
   haveI : Finite (H ⧸ H'.subgroupOf H) := (H'.subgroupOf H).quotient_finite_of_isOpen ho'
   haveI : (H'.subgroupOf H).FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
-  have hemb : MeasurableEmbedding (H.subtype : H → G) := MeasurableEmbedding.subtype_coe hHo.measurableSet
+  have hemb : MeasurableEmbedding (H.subtype : H → G) :=
+    MeasurableEmbedding.subtype_coe hHo.measurableSet
   have : (μ.comap (H.subtype : H → G)).IsMulLeftInvariant := Measure.IsMulLeftInvariant.comap μ hemb
   have key := (H'.subgroupOf H).index_mul_measure ho'.measurableSet (μ.comap (H.subtype : H → G))
   rw [hemb.comap_apply, hemb.comap_apply] at key
@@ -39,11 +43,14 @@ theorem vol_mul_relIndex {G : Type} [Group G] [TopologicalSpace G] [IsTopologica
   rw [Subgroup.relIndex, Measure.real, Measure.real, ← key, ENNReal.toReal_mul, mul_comm]
   simp
 
-theorem integral_eq_sum_cosets {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
-    [BorelSpace G] (μ : Measure G) [μ.IsMulLeftInvariant] (S : Subgroup G) (hS : IsOpen (S : Set G))
-    (hfin : μ (S : Set G) ≠ ⊤) (u : G → ℂ) (hu : ∀ x, ∀ s ∈ S, u (x * s) = u x) (F : Finset (G ⧸ S))
-    (hF : ∀ q : G ⧸ S, q ∉ F → u q.out = 0) :
-    ∫ x, u x ∂μ = (μ.real (S : Set G) : ℂ) * ∑ q ∈ F, u q.out := by
+theorem integral_eq_sum_cosets
+    {G : Type}
+    [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (S : Subgroup G) (hS : IsOpen (S : Set G)) (hfin : μ (S : Set G) ≠ ⊤)
+    (u : G → ℂ) (hu : ∀ x, ∀ s ∈ S, u (x * s) = u x)
+    (F : Finset (G ⧸ S)) (hF : ∀ q : G ⧸ S, q ∉ F → u q.out = 0)
+    : ∫ x, u x ∂μ = (μ.real (S : Set G) : ℂ) * ∑ q ∈ F, u q.out := by
   have key : ∀ x : G, u ((x : G ⧸ S).out) = u x := fun x => by
     obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul S x
     rw [hh]
@@ -79,17 +86,27 @@ theorem integral_eq_sum_cosets {G : Type} [Group G] [TopologicalSpace G] [IsTopo
   · intro q _
     exact (integrableOn_const (hμ q ▸ hfin)).integrable_indicator (hmeas q)
 
-theorem finite_cosets {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (S : Subgroup G)
-    (hS : IsOpen (S : Set G)) {C : Set G} (hC : IsCompact C) : ((fun x : G => (x : G ⧸ S)) '' C).Finite := by
+theorem finite_cosets
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (S : Subgroup G) (hS : IsOpen (S : Set G))
+    {C : Set G} (hC : IsCompact C)
+    : ((fun x : G => (x : G ⧸ S)) '' C).Finite := by
   haveI : DiscreteTopology (G ⧸ S) := QuotientGroup.discreteTopology hS
-  exact (hC.image (continuous_coinduced_rng : Continuous fun x : G => (x : G ⧸ S))).finite_of_discrete
+  exact (hC.image
+    (continuous_coinduced_rng : Continuous fun x : G => (x : G ⧸ S))).finite_of_discrete
 
-theorem hint_eq_integral : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-    (μ : @MeasureTheory.Measure V (borel V)), @MeasureTheory.Measure.IsAddHaarMeasure V _ _ (borel V) μ →
-    ∀ (Λ : AddSubgroup V), IsOpen (Λ : Set V) → IsCompact (Λ : Set V) → ∀ u : V → ℂ,
-    (∃ U : AddSubgroup V, IsOpen (U : Set V) ∧ ∀ x, ∀ y ∈ U, u (x + y) = u x) → HasCompactSupport u →
-    GlobalTheory.BCT.hint (AddSubgroup.toSubgroup Λ) (fun X : Multiplicative V => u (Multiplicative.toAdd X)) =
-      ((μ (Λ : Set V)).toReal : ℂ)⁻¹ * ∫ x, u x ∂μ := by
+theorem hint_eq_integral
+    : ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+        (μ : @MeasureTheory.Measure V (borel V)),
+      @MeasureTheory.Measure.IsAddHaarMeasure V _ _ (borel V) μ
+        → ∀ (Λ : AddSubgroup V),
+          IsOpen (Λ : Set V) → IsCompact (Λ : Set V)
+            → ∀ u : V → ℂ,
+              (∃ U : AddSubgroup V, IsOpen (U : Set V) ∧ ∀ x, ∀ y ∈ U, u (x + y) = u x)
+                → HasCompactSupport u
+                → GlobalTheory.BCT.hint (AddSubgroup.toSubgroup Λ)
+                    (fun X : Multiplicative V => u (Multiplicative.toAdd X))
+                  = ((μ (Λ : Set V)).toReal : ℂ)⁻¹ * ∫ x, u x ∂μ := by
   intro V _ _ _ μ hμ Λ hΛo hΛc u ⟨U, hUo, hU⟩ hsupp
   letI : MeasurableSpace V := borel V
   haveI : BorelSpace V := ⟨rfl⟩

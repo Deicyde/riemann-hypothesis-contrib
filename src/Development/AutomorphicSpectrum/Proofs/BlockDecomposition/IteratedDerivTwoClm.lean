@@ -19,25 +19,31 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-theorem contDiffOn_clm_apply {M V : Type*} [NormedAddCommGroup M] [NormedSpace ℝ M]
-    [NormedAddCommGroup V] [NormedSpace ℂ V] {s : Set M} {B : M → (V →L[ℂ] V)} {f : M → V}
-    (hB : ContDiffOn ℝ ∞ B s) (hf : ContDiffOn ℝ ∞ f s) :
-    ContDiffOn ℝ ∞ (fun x => B x (f x)) s := by
+theorem contDiffOn_clm_apply
+    {M V : Type*} [NormedAddCommGroup M] [NormedSpace ℝ M] [NormedAddCommGroup V] [NormedSpace ℂ V]
+    {s : Set M} {B : M → (V →L[ℂ] V)} {f : M → V}
+    (hB : ContDiffOn ℝ ∞ B s) (hf : ContDiffOn ℝ ∞ f s)
+    : ContDiffOn ℝ ∞ (fun x => B x (f x)) s := by
   have hL : ContDiffOn ℝ ∞ (fun x => (B x).restrictScalars ℝ) s :=
     (ContinuousLinearMap.restrictScalarsL ℂ V V ℝ ℝ).contDiff.comp_contDiffOn hB
   exact hL.clm_apply hf
 
-theorem deriv_clm {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
-    (B : V →L[ℂ] V) {h : ℝ → V} (hh : Differentiable ℝ h) (s : ℝ) :
-    deriv (fun r => B (h r)) s = B (deriv h s) :=
+theorem deriv_clm
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    (B : V →L[ℂ] V)
+    {h : ℝ → V} (hh : Differentiable ℝ h)
+    (s : ℝ)
+    : deriv (fun r => B (h r)) s = B (deriv h s) :=
   ((B.restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt s (hh s).hasDerivAt).deriv
 
-theorem iteratedDeriv_two_clm {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
-    (B : V →L[ℂ] V) {f : ℝ → V} (hf : ContDiff ℝ ∞ f) (t : ℝ) :
-    iteratedDeriv 2 (fun s => B (f s)) t = B (iteratedDeriv 2 f t) := by
+theorem iteratedDeriv_two_clm
+    {V : Type*} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    (B : V →L[ℂ] V)
+    {f : ℝ → V} (hf : ContDiff ℝ ∞ f)
+    (t : ℝ)
+    : iteratedDeriv 2 (fun s => B (f s)) t = B (iteratedDeriv 2 f t) := by
   have h1 : Differentiable ℝ f := hf.differentiable (by simp)
-  have h2 : Differentiable ℝ (deriv f) :=
-    (contDiff_infty_iff_deriv.1 hf).2.differentiable (by simp)
+  have h2 : Differentiable ℝ (deriv f) := (contDiff_infty_iff_deriv.1 hf).2.differentiable (by simp)
   rw [iteratedDeriv_succ, iteratedDeriv_one]
   have : deriv (fun s => B (f s)) = fun s => B (deriv f s) := funext (deriv_clm B h1)
   rw [this, deriv_clm B h2, iteratedDeriv_succ, iteratedDeriv_one]

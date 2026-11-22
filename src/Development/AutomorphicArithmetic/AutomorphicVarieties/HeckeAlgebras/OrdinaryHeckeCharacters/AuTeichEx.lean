@@ -10,22 +10,29 @@ public import Mathlib.RingTheory.Teichmuller
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Polynomial ValuativeRel IsLocalRing GlobalTheory.CuspRep
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
+  GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Hi
+  UpperTheory.V.Hi.CaseU
 open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterminantRing Pair)
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 set_option synthInstance.maxHeartbeats 200000
 
-private theorem card_residueField_sub_one_eq_neg_one {O : Type} [CommRing O] [IsLocalRing O] [Fintype (ResidueField O)] :
-    ((Fintype.card (ResidueField O) - 1 : ℕ) : ResidueField O) = -1 := by
+private theorem card_residueField_sub_one_eq_neg_one
+    {O : Type} [CommRing O] [IsLocalRing O] [Fintype (ResidueField O)]
+    : ((Fintype.card (ResidueField O) - 1 : ℕ) : ResidueField O) = -1 := by
   have h1 : 1 ≤ Fintype.card (ResidueField O) := Fintype.card_pos
   rw [Nat.cast_sub h1, FiniteField.cast_card_eq_zero]
   simp
 
-private theorem teichmuller_eq_of_residue_eq {O : Type} [CommRing O] [IsLocalRing O] [Fintype (ResidueField O)] (a b : O)
-    (ha : a ^ (Fintype.card (ResidueField O) - 1) = 1) (hb : b ^ (Fintype.card (ResidueField O) - 1) = 1)
-    (hab : residue O a = residue O b) : a = b := by
+private theorem teichmuller_eq_of_residue_eq
+    {O : Type} [CommRing O] [IsLocalRing O] [Fintype (ResidueField O)]
+    (a b : O) (ha : a ^ (Fintype.card (ResidueField O) - 1) = 1)
+    (hb : b ^ (Fintype.card (ResidueField O) - 1) = 1) (hab : residue O a = residue O b)
+    : a = b := by
   obtain ⟨N, hN⟩ : ∃ N, N = Fintype.card (ResidueField O) - 1 := ⟨_, rfl⟩
   rw [← hN] at ha hb
   have hN0 : N ≠ 0 := by
@@ -42,20 +49,24 @@ private theorem teichmuller_eq_of_residue_eq {O : Type} [CommRing O] [IsLocalRin
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← IsLocalRing.residue_ne_zero_iff_isUnit, map_sum]
     simp only [map_mul, map_pow, ← hab]
-    have hterm : ∀ i ∈ Finset.range N,
-        residue O a ^ i * residue O a ^ (N - 1 - i) = residue O a ^ (N - 1) := by
+    have hterm
+        : ∀ i ∈ Finset.range N,
+          residue O a ^ i * residue O a ^ (N - 1 - i) = residue O a ^ (N - 1) := by
       intro i hi
       rw [← pow_add]
       congr 1
       have := Finset.mem_range.mp hi
       omega
-    rw [Finset.sum_congr rfl hterm, Finset.sum_const, Finset.card_range, nsmul_eq_mul, hN, card_residueField_sub_one_eq_neg_one]
+    rw [Finset.sum_congr rfl hterm, Finset.sum_const, Finset.card_range, nsmul_eq_mul, hN,
+      card_residueField_sub_one_eq_neg_one]
     exact mul_ne_zero (neg_ne_zero.mpr one_ne_zero) (pow_ne_zero _ hra)
   exact sub_eq_zero.mp ((hu.mul_right_eq_zero).mp key)
 
-private theorem exists_teichmuller_lift' {O : Type} [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O]
-    [Fintype (ResidueField O)] (u : ResidueField O) (hu : u ≠ 0) :
-    ∃ a : O, a ^ (Fintype.card (ResidueField O) - 1) = 1 ∧ residue O a = u := by
+private theorem exists_teichmuller_lift'
+    {O : Type}
+    [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O] [Fintype (ResidueField O)]
+    (u : ResidueField O) (hu : u ≠ 0)
+    : ∃ a : O, a ^ (Fintype.card (ResidueField O) - 1) = 1 ∧ residue O a = u := by
   obtain ⟨N, hN⟩ : ∃ N, N = Fintype.card (ResidueField O) - 1 := ⟨_, rfl⟩
   rw [← hN]
   have hN0 : N ≠ 0 := by
@@ -70,21 +81,24 @@ private theorem exists_teichmuller_lift' {O : Type} [CommRing O] [IsLocalRing O]
   have h2 : IsUnit (Ideal.Quotient.mk (maximalIdeal O) (eval a₀ (derivative (X ^ N - C 1)))) := by
     change IsUnit (residue O _)
     rw [isUnit_iff_ne_zero]
-    simp only [derivative_sub, derivative_X_pow, derivative_C, sub_zero, eval_mul, eval_C, eval_pow, eval_X,
-      eval_natCast, map_mul, map_pow, map_natCast]
+    simp only [derivative_sub, derivative_X_pow, derivative_C, sub_zero, eval_mul, eval_C, eval_pow,
+      eval_X, eval_natCast, map_mul, map_pow, map_natCast]
     rw [hN, card_residueField_sub_one_eq_neg_one]
     exact mul_ne_zero (neg_ne_zero.mpr one_ne_zero) (pow_ne_zero _ hu)
-  obtain ⟨a, hroot, hmem⟩ := HenselianRing.is_henselian (I := maximalIdeal O) (X ^ N - C 1)
-    (monic_X_pow_sub_C 1 hN0) a₀ h1 h2
+  obtain ⟨a, hroot, hmem⟩ :=
+    HenselianRing.is_henselian (I := maximalIdeal O) (X ^ N - C 1) (monic_X_pow_sub_C 1 hN0) a₀ h1
+      h2
   refine ⟨a, ?_, ?_⟩
   · have h : eval a (X ^ N - C 1) = 0 := hroot
     simp only [eval_sub, eval_pow, eval_X, eval_C, eval_one] at h
     exact sub_eq_zero.mp h
   · exact Ideal.Quotient.eq.mpr hmem
 
-private theorem au_teich_ex (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O]
-    [IsAdicComplete (maximalIdeal O) O] [Finite (ResidueField O)] [CharP (ResidueField O) l] :
-    ∃ τ : ResidueField O →* O, ∀ x, residue O (τ x) = x := by
+private theorem au_teich_ex
+    (l : ℕ) [Fact l.Prime]
+    (O : Type) [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O]
+    [Finite (ResidueField O)] [CharP (ResidueField O) l]
+    : ∃ τ : ResidueField O →* O, ∀ x, residue O (τ x) = x := by
   letI := Fintype.ofFinite (ResidueField O)
   classical
   have ex := fun (x : ResidueField O) (hx : x ≠ 0) => exists_teichmuller_lift' (O := O) x hx
@@ -114,8 +128,9 @@ private theorem au_teich_ex (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [Is
     · rw [mul_pow, (hf x hx).1, (hf y hy).1, one_mul]
     · rw [(hf _ (mul_ne_zero hx hy)).2, map_mul, (hf x hx).2, (hf y hy).2]
 
-private theorem au_isTeich {l : ℕ} [hl : Fact l.Prime] {F : W.GFrame l} (c : Coef l) {n : ℕ} (r : Resid F c.O n) :
-    ∃ t, r.IsTeich t := by
+private theorem au_isTeich
+    {l : ℕ} [hl : Fact l.Prime] {F : W.GFrame l} (c : Coef l) {n : ℕ} (r : Resid F c.O n)
+    : ∃ t, r.IsTeich t := by
   haveI := c.dvr
   haveI := c.fin
   obtain ⟨hc, hfin, hlm, -⟩ := abelian₂.dvr_finite l c.O
@@ -136,9 +151,14 @@ private theorem au_isTeich {l : ℕ} [hl : Fact l.Prime] {F : W.GFrame l} (c : C
       exact FiniteField.pow_card_sub_one_eq_one _ (r.chib i g).ne_zero
     rw [hp, map_one]
 
-private theorem au_open {G O : Type} [Group G] [TopologicalSpace G] [CommRing O] {m : ℕ} (f : O →+* ℂ) (hf : Function.Injective f)
-    (τ : G →* GL (Fin m) O) (h : IsOpen (((Matrix.GeneralLinearGroup.map f).comp τ).ker : Set G)) : IsOpen (τ.ker : Set G) := by
-  have hinj : Function.Injective (Matrix.GeneralLinearGroup.map f : GL (Fin m) O →* GL (Fin m) ℂ) := by
+private theorem au_open
+    {G O : Type} [Group G] [TopologicalSpace G] [CommRing O]
+    {m : ℕ}
+    (f : O →+* ℂ) (hf : Function.Injective f)
+    (τ : G →* GL (Fin m) O) (h : IsOpen (((Matrix.GeneralLinearGroup.map f).comp τ).ker : Set G))
+    : IsOpen (τ.ker : Set G) := by
+  have hinj
+      : Function.Injective (Matrix.GeneralLinearGroup.map f : GL (Fin m) O →* GL (Fin m) ℂ) := by
     intro A B hAB
     ext i j
     have h := congrArg (fun M : GL (Fin m) ℂ => (M : Matrix (Fin m) (Fin m) ℂ) i j) hAB
@@ -154,10 +174,15 @@ private theorem au_open {G O : Type} [Group G] [TopologicalSpace G] [CommRing O]
       rw [h, map_one]
   rwa [hk] at h
 
-theorem UpperTheory.V.Hi.autU :
-    Af.HypothesesH → ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (n : ℕ), 1 ≤ n →
-    ∀ (V : s.Lev) (Q : QData V) (c : Coef l), ∀ (r : Resid V.frame c.O n) (ι : Qbar l ≃+* ℂ), ∀ (m : ℕ) (τ₀ : KT n (wt s) →* GL (Fin m) c.O), TypeFor r ι τ₀ →
-    (hset Q τ₀).Aut ι (PU r ι) := by
+theorem UpperTheory.V.Hi.autU
+    : Af.HypothesesH
+      → ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω]
+          [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (n : ℕ),
+        1 ≤ n
+          → ∀ (V : s.Lev) (Q : QData V) (c : Coef l),
+            ∀ (r : Resid V.frame c.O n) (ι : Qbar l ≃+* ℂ),
+              ∀ (m : ℕ) (τ₀ : KT n (wt s) →* GL (Fin m) c.O),
+                TypeFor r ι τ₀ → (hset Q τ₀).Aut ι (PU r ι) := by
   intro hP l _ L Ω _ _ _ _ _ _ s n hn V Q c r ι m τ₀ hτ lam _ d ξ hξ F hF hK hI
   obtain ⟨e, he⟩ := hξ
   obtain ⟨t, ht⟩ := au_isTeich c r

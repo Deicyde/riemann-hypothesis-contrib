@@ -8,21 +8,25 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem isRegularRing_tensor_of_fibre_localRings :
-    ∀ (S T K : Type) [CommRing S] [CommRing T] [Algebra S T] [IsNoetherianRing T] [Field K]
-      [Algebra S K] (Q : Ideal S), RingHom.ker (algebraMap S K) = Q →
-      (∀ y : K, ∃ a b : S, b ∉ Q ∧ y * algebraMap S K b = algebraMap S K a) →
-      (∀ (n : Ideal T) [n.IsPrime], n.comap (algebraMap S T) = Q →
-        IsRegularLocalRing (Localization.AtPrime n ⧸
-          (Q.map (algebraMap S T)).map (algebraMap T (Localization.AtPrime n)))) →
-      IsRegularRing (T ⊗[S] K) := by
+theorem isRegularRing_tensor_of_fibre_localRings
+    : ∀ (S T K : Type) [CommRing S] [CommRing T] [Algebra S T] [IsNoetherianRing T] [Field K]
+        [Algebra S K] (Q : Ideal S),
+      RingHom.ker (algebraMap S K) = Q
+        → (∀ y : K, ∃ a b : S, b ∉ Q ∧ y * algebraMap S K b = algebraMap S K a)
+        → (∀ (n : Ideal T) [n.IsPrime],
+          n.comap (algebraMap S T) = Q
+            → IsRegularLocalRing
+              (Localization.AtPrime n ⧸
+                (Q.map (algebraMap S T)).map (algebraMap T (Localization.AtPrime n))))
+        → IsRegularRing (T ⊗[S] K) := by
   intro S T K _ _ _ _ _ _ Q hQ hfrac hreg
   haveI : Q.IsPrime := hQ ▸ RingHom.ker_isPrime (algebraMap S K)
-  let φ : Q.ResidueField →ₐ[S] K := Ideal.ResidueField.liftₐ Q (Algebra.ofId S K) hQ.ge (by
-    intro x hx
-    simp only [Submonoid.mem_comap, IsUnit.mem_submonoid_iff, isUnit_iff_ne_zero]
-    intro h0
-    exact hx (hQ ▸ h0))
+  let φ : Q.ResidueField →ₐ[S] K :=
+    Ideal.ResidueField.liftₐ Q (Algebra.ofId S K) hQ.ge (by
+      intro x hx
+      simp only [Submonoid.mem_comap, IsUnit.mem_submonoid_iff, isUnit_iff_ne_zero]
+      intro h0
+      exact hx (hQ ▸ h0))
   have hsurj : Function.Surjective φ := by
     intro y
     obtain ⟨a, b, hb, hy⟩ := hfrac y

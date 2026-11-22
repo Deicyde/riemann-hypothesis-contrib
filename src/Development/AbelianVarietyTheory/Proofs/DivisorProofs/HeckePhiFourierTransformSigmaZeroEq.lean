@@ -40,14 +40,22 @@ lemma ofReal_add_ofReal_mul_I_ne_zero (x : ℝ) {y : ℝ} (hy : 0 < y) : (x : �
   simp at this
   exact hy.ne' this
 
-theorem hTrans_sigma_zero_eq : ∀ (ν y : ℝ), 0 < y → GlobalTheory.HeckeTwo.hTrans 0 ν y =
-    if 0 < ν then -4 * (Real.pi : ℂ) ^ 2 * (ν : ℂ) * ((Real.exp (-(2 * Real.pi * ν * y)) : ℝ) : ℂ) else 0 := by
+theorem hTrans_sigma_zero_eq
+    : ∀ (ν y : ℝ),
+      0 < y
+        → GlobalTheory.HeckeTwo.hTrans 0 ν y
+          = if 0 < ν then
+              -4 * (Real.pi : ℂ) ^ 2 * (ν : ℂ) * ((Real.exp (-(2 * Real.pi * ν * y)) : ℝ) : ℂ)
+            else
+              0 := by
   intro ν y hy
   set g := GlobalTheory.LipschitzTR.phi1 2 ((y : ℂ) * I) with hg
   have hw : ((y : ℂ) * I).im ≠ 0 := by simp [hy.ne']
-  have hgc : Continuous g := GlobalTheory.LipschitzTR.continuous_lipschitzOneVariableKernel le_rfl hw
+  have hgc : Continuous g :=
+    GlobalTheory.LipschitzTR.continuous_lipschitzOneVariableKernel le_rfl hw
   have hgi : Integrable g := by
-    rw [hg, lipschitzOneVariableKernel_two_eq_indicator hy, integrable_indicator_iff measurableSet_Ioi]
+    rw [hg, lipschitzOneVariableKernel_two_eq_indicator hy,
+      integrable_indicator_iff measurableSet_Ioi]
     exact GlobalTheory.LipschitzTR.integrableOn_pow_mul_cexp_neg 1 (by simp; positivity)
   have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
   have hF : ∀ x : ℝ, 𝓕 g x = -(4 * (Real.pi : ℂ) ^ 2)⁻¹ * (((-x : ℝ) : ℂ) + (y : ℂ) * I)⁻¹ ^ 2 := by
@@ -66,12 +74,15 @@ theorem hTrans_sigma_zero_eq : ∀ (ν y : ℝ), 0 < y → GlobalTheory.HeckeTwo
     have hb : Integrable (fun x : ℝ => ((4 * Real.pi ^ 2 * y ^ 2)⁻¹ : ℝ) * (1 + (x / y) ^ 2)⁻¹) :=
       (integrable_inv_one_add_sq.comp_div hy.ne').const_mul _
     refine hb.mono' ?_ (Filter.Eventually.of_forall fun x => le_of_eq ?_)
-    · rw [show (𝓕 g) = fun x : ℝ => -(4 * (Real.pi : ℂ) ^ 2)⁻¹ * (((-x : ℝ) : ℂ) + (y : ℂ) * I)⁻¹ ^ 2 from funext hF]
-      exact Continuous.aestronglyMeasurable
-        (continuous_const.mul ((((continuous_ofReal.comp continuous_neg).add continuous_const).inv₀
+    · rw [show (𝓕 g)
+          = fun x : ℝ => -(4 * (Real.pi : ℂ) ^ 2)⁻¹ * (((-x : ℝ) : ℂ) + (y : ℂ) * I)⁻¹ ^ 2 from
+        funext hF]
+      exact Continuous.aestronglyMeasurable (continuous_const.mul
+        ((((continuous_ofReal.comp continuous_neg).add continuous_const).inv₀
           (fun x => ofReal_add_ofReal_mul_I_ne_zero (-x) hy)).pow 2))
     · rw [hF, norm_mul, norm_neg, norm_inv, norm_mul, norm_pow, norm_inv_ofReal_add_mul_I_sq]
-      simp only [RCLike.norm_ofNat, Complex.norm_real, Real.norm_eq_abs, abs_of_pos Real.pi_pos, neg_sq]
+      simp only [RCLike.norm_ofNat, Complex.norm_real, Real.norm_eq_abs, abs_of_pos Real.pi_pos,
+        neg_sq]
       have : y ≠ 0 := hy.ne'
       field_simp <;> ring
   have hinv : 𝓕 (𝓕⁻ g) = g := hgc.fourier_fourierInv_eq hgi hFi

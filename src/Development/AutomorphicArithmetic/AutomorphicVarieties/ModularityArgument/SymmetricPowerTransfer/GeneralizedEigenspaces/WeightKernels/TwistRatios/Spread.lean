@@ -11,16 +11,36 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
+open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL
+  GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 open UpperTheory.V.W (Plc Lp)
 open scoped Matrix
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.V.Z.Sym.Ga.spread :
-    ∀ (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω], Unr L → ∀ E B : Set (G L Ω), IsClosed E → IsClosed B → (∀ c : G (maximalRealSubfield L) Ω, IsConjEl c → ∀ s s' : G L Ω, s'.restrictScalars (maximalRealSubfield L) = c * s.restrictScalars (maximalRealSubfield L) * c⁻¹ → s' ∈ E → s ∈ E) → ∀ (P : Set (Plc L)) (M : ℕ), M ≠ 0 → (∀ w, IsSplitAt w → (M : 𝓞 L) ∉ w.asIdeal → (∃ s, Ga.FrobAt w s ∧ s ∉ B) → ∃ w' ∈ P, w'.under (𝓞 (Lp L)) = w.under (𝓞 (Lp L))) → (∀ᶠ w in Filter.cofinite, w ∈ P → ∀ s, Ga.FrobAt w s → s ∈ E) → Bᶜ ⊆ E := by
+theorem UpperTheory.V.Z.Sym.Ga.spread
+    : ∀ (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω]
+        [IsAlgClosure L Ω],
+      Unr L
+        → ∀ E B : Set (G L Ω),
+          IsClosed E → IsClosed B
+            → (∀ c : G (maximalRealSubfield L) Ω,
+              IsConjEl c
+                → ∀ s s' : G L Ω,
+                  s'.restrictScalars (maximalRealSubfield L)
+                      = c * s.restrictScalars (maximalRealSubfield L) * c⁻¹
+                    → s' ∈ E
+                    → s ∈ E)
+            → ∀ (P : Set (Plc L)) (M : ℕ),
+              M ≠ 0
+                → (∀ w,
+                  IsSplitAt w → (M : 𝓞 L) ∉ w.asIdeal → (∃ s, Ga.FrobAt w s ∧ s ∉ B)
+                    → ∃ w' ∈ P, w'.under (𝓞 (Lp L)) = w.under (𝓞 (Lp L)))
+                → (∀ᶠ w in Filter.cofinite, w ∈ P → ∀ s, Ga.FrobAt w s → s ∈ E)
+                → Bᶜ ⊆ E := by
   intro L Ω _ _ _ _ _ _ hU E B hE hB hconj P M hM hsplit hev
   classical
   obtain ⟨c, hc⟩ := Ga.conjEx L Ω
@@ -31,8 +51,8 @@ theorem UpperTheory.V.Z.Sym.Ga.spread :
       {v | HeightOneSpectrum.under (𝓞 (Lp L)) w = HeightOneSpectrum.under (𝓞 (Lp L)) v}
   have hT : T.Finite := by
     refine hbad.biUnion fun w _ => ?_
-    have hfin := IsDedekindDomain.primesOver_finite
-      (HeightOneSpectrum.under (𝓞 (Lp L)) w).asIdeal (𝓞 L)
+    have hfin :=
+      IsDedekindDomain.primesOver_finite (HeightOneSpectrum.under (𝓞 (Lp L)) w).asIdeal (𝓞 L)
     refine (hfin.preimage (fun a _ b _ h => HeightOneSpectrum.ext h)).subset ?_
     intro v hv
     refine ⟨v.isPrime, ⟨?_⟩⟩
@@ -46,15 +66,17 @@ theorem UpperTheory.V.Z.Sym.Ga.spread :
     · intro v hv
       exact Ideal.dvd_iff_le.mpr ((Ideal.span_singleton_le_iff_mem _).mpr hv)
   have hS : ({v : HeightOneSpectrum (𝓞 L) | (M : 𝓞 L) ∈ v.asIdeal} ∪ T).Finite := hMfin.union hT
-  have hD := GlobalTheory.Published.ChebotarevDegreeOne.dense (F := L) (Ω := Ω)
-    GlobalTheory.Published.chebotarevDegreeOne' hS
+  have hD :=
+    GlobalTheory.Published.ChebotarevDegreeOne.dense (F := L) (Ω := Ω)
+      GlobalTheory.Published.chebotarevDegreeOne' hS
   intro σ hσB
   have hcl := hD.open_subset_closure_inter hB.isOpen_compl hσB
   refine closure_minimal ?_ hE hcl
   rintro τ ⟨hτB, v, hvS, hdeg, A, hA, hfr⟩
   have hFrob : Ga.FrobAt v τ := ⟨A, hA, hfr⟩
   have hMv : (M : 𝓞 L) ∉ v.asIdeal := fun h => hvS (Or.inl h)
-  have hspl : IsSplitAt v := UpperTheory.isSplitAt_of_unramified_of_inertiaDeg_eq_one L v (hU v) hdeg
+  have hspl : IsSplitAt v :=
+    UpperTheory.isSplitAt_of_unramified_of_inertiaDeg_eq_one L v (hU v) hdeg
   obtain ⟨w', hw'P, hw'⟩ := hsplit v hspl hMv ⟨τ, hFrob, hτB⟩
   have hgood : ∀ s, Ga.FrobAt w' s → s ∈ E := by
     by_contra hcon

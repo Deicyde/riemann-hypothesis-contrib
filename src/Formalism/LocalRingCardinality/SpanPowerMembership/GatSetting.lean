@@ -27,11 +27,13 @@ abbrev Kn : Type := FractionRing (On p n)
 def sigN : Qn p n ≃+* Qn p n :=
   IsFractionRing.ringEquivOfRingEquiv (WittVector.frobeniusEquiv p (GaloisField p n))
 
-theorem sigN_alg (x : Wn p n) :
-    sigN p n (algebraMap (Wn p n) (Qn p n) x) = algebraMap (Wn p n) (Qn p n) (WittVector.frobenius x) :=
+theorem sigN_alg (x : Wn p n)
+    : sigN p n (algebraMap (Wn p n) (Qn p n) x)
+      = algebraMap (Wn p n) (Qn p n) (WittVector.frobenius x) :=
   IsFractionRing.ringEquivOfRingEquiv_algebraMap _ x
 
-theorem inj_WK : Function.Injective ((algebraMap (On p n) (Kn p n)).comp (algebraMap (Wn p n) (On p n))) :=
+theorem inj_WK
+    : Function.Injective ((algebraMap (On p n) (Kn p n)).comp (algebraMap (Wn p n) (On p n))) :=
   (IsFractionRing.injective (On p n) (Kn p n)).comp algebraMap_injective
 
 def iotaN : Qn p n →+* Kn p n := IsFractionRing.lift (inj_WK p n)
@@ -43,9 +45,9 @@ theorem frob_iter (hn : n ≠ 0) (x : Wn p n) : (WittVector.frobenius^[n]) x = x
   have h := FiniteField.pow_card (x.coeff i)
   rwa [← Nat.card_eq_fintype_card, GaloisField.card p n hn] at h
 
-theorem sigN_pow_alg (k : ℕ) (x : Wn p n) :
-    (sigN p n ^ k) (algebraMap (Wn p n) (Qn p n) x) =
-      algebraMap (Wn p n) (Qn p n) ((WittVector.frobenius^[k]) x) := by
+theorem sigN_pow_alg (k : ℕ) (x : Wn p n)
+    : (sigN p n ^ k) (algebraMap (Wn p n) (Qn p n) x)
+      = algebraMap (Wn p n) (Qn p n) ((WittVector.frobenius^[k]) x) := by
   induction k with
   | zero => rfl
   | succ k ih =>
@@ -60,8 +62,8 @@ theorem sigN_period (hn : n ≠ 0) : sigN p n ^ n = 1 := by
   show (sigN p n ^ n) (algebraMap (Wn p n) (Qn p n) x) = algebraMap (Wn p n) (Qn p n) x
   rw [sigN_pow_alg, frob_iter p n hn]
 
-theorem hidaSettingOfEven (h5 : 5 ≤ p) (h2 : 2 ≤ n) (he : Even n) :
-    HidaSetting p n (Wn p n) (Qn p n) (On p n) (Kn p n) (iotaN p n) (sigN p n)
+theorem hidaSettingOfEven (h5 : 5 ≤ p) (h2 : 2 ≤ n) (he : Even n)
+    : HidaSetting p n (Wn p n) (Qn p n) (On p n) (Kn p n) (iotaN p n) (sigN p n)
       (algebraMap (Wn p n) (On p n)) ω := by
   exact {
     prime := hp.out

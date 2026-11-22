@@ -7,37 +7,49 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EGPgTrue
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.BZRes Topology
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.BZRes Topology
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.BZRes
 
-theorem locSec_parab_mir_one (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {i t : ℕ} (h : (i + 1) + t = i + t + 1) (ht : 0 < t) :
-    LocSec (parab k (two (stdSum h))) (Mir k (i + t)) 1 := by
+theorem locSec_parab_mir_one
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {i t : ℕ} (h : (i + 1) + t = i + t + 1) (ht : 0 < t)
+    : LocSec (parab k (two (stdSum h))) (Mir k (i + t)) 1 := by
   set e := GlobalTheory.SmGL.two (GlobalTheory.SmGL.stdSum h) with he
-  obtain ⟨b, hbc, hb1, hbw⟩ := GlobalTheory.CompanionTheory.BZRes.exists_rowSec (k := k) (Fin.last (i + t))
-  obtain ⟨W, hW⟩ : ∃ W : GL (Fin (i + t + 1)) k → Fin (i + t + 1) → k,
-      ∀ u, W u = (↑u⁻¹ : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t)) :=
-    ⟨fun u : GL (Fin (i + t + 1)) k => (↑u⁻¹ : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t)),
-      fun _ => rfl⟩
+  obtain ⟨b, hbc, hb1, hbw⟩ :=
+    GlobalTheory.CompanionTheory.BZRes.exists_rowSec (k := k) (Fin.last (i + t))
+  obtain ⟨W, hW⟩
+      : ∃ W : GL (Fin (i + t + 1)) k → Fin (i + t + 1) → k, ∀ u,
+        W u = (↑u⁻¹ : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t)) := ⟨
+    fun u : GL (Fin (i + t + 1)) k =>
+      (↑u⁻¹ : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t)),
+    fun _ => rfl
+  ⟩
   have hWc : Continuous W := by
-    have hWeq : W = fun u : GL (Fin (i + t + 1)) k => (↑u⁻¹ : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t)) :=
+    have hWeq
+        : W
+          = fun u : GL (Fin (i + t + 1)) k =>
+            (↑u⁻¹ : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t)) :=
       funext hW
     rw [hWeq]
     exact continuous_pi fun j =>
       (Units.continuous_coe_inv (M := Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k)).matrix_elem
         (Fin.last (i + t)) j
-  have hone : (1 : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t)) =
-      GlobalTheory.BZMir.eLast k (i + t) := by
+  have hone
+      : (1 : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t))
+        = GlobalTheory.BZMir.eLast k (i + t) := by
     funext j
     by_cases hj : j = Fin.last (i + t)
     · subst hj
       simp [GlobalTheory.BZMir.eLast]
     · simp [GlobalTheory.BZMir.eLast, Matrix.one_apply, Pi.single_apply, hj, Ne.symm hj]
-  have hrow : ∀ q p : GL (Fin (i + t + 1)) k, p ∈ GlobalTheory.BZMir.Mir k (i + t) →
-      (↑(q * p)⁻¹ : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t)) =
-        (↑q⁻¹ : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t)) := by
+  have hrow
+      : ∀ q p : GL (Fin (i + t + 1)) k,
+        p ∈ GlobalTheory.BZMir.Mir k (i + t)
+          → (↑(q * p)⁻¹ : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t))
+            = (↑q⁻¹ : Matrix (Fin (i + t + 1)) (Fin (i + t + 1)) k) (Fin.last (i + t)) := by
     intro q p hp
     have hp' := (GlobalTheory.BZMir.mem_Mir_iff k p⁻¹).1 (Subgroup.inv_mem _ hp)
     rw [_root_.mul_inv_rev, Units.val_mul, Matrix.mul_apply_eq_vecMul, hp']
@@ -87,8 +99,8 @@ theorem locSec_parab_mir_one (k : Type) [Field k] [ValuativeRel k] [TopologicalS
       intro hrc
       exact absurd (e.injective hrc) (by simp)
   have hpP : b (W u) * u ∈ GlobalTheory.BZMir.Mir k (i + t) := by
-    rw [GlobalTheory.BZMir.mem_Mir_iff, Units.val_mul, Matrix.mul_apply_eq_vecMul, hbw', Matrix.updateRow_self, hW,
-      ← Matrix.mul_apply_eq_vecMul, Units.inv_mul, hone]
+    rw [GlobalTheory.BZMir.mem_Mir_iff, Units.val_mul, Matrix.mul_apply_eq_vecMul, hbw',
+      Matrix.updateRow_self, hW, ← Matrix.mul_apply_eq_vecMul, Units.inv_mul, hone]
   refine ⟨(b (W u))⁻¹, Subgroup.inv_mem _ hbQ, hu1, b (W u) * u, hpP, hu2, ?_⟩
   simp
 

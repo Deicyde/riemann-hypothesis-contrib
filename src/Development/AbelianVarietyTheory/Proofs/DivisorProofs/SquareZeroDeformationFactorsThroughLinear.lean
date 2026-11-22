@@ -10,18 +10,23 @@ namespace FirstOrderPoints
 
 open TrivSqZeroExt
 
-variable {R₀ B K : Type} [CommRing R₀] [CommRing B] [Field K] [Algebra R₀ B]
-  [Algebra B K] [Algebra R₀ K] [IsScalarTower R₀ B K]
+variable
+  {R₀ B K : Type} [CommRing R₀] [CommRing B] [Field K] [Algebra R₀ B] [Algebra B K] [Algebra R₀ K]
+  [IsScalarTower R₀ B K]
 
-def derOf (h : B →+* DualNumber K) (hfst : ∀ b, (h b).fst = algebraMap B K b)
-    (hc : ∀ a : R₀, (h (algebraMap R₀ B a)).snd = 0) : Derivation R₀ B K :=
+def derOf
+    (h : B →+* DualNumber K)
+    (hfst : ∀ b, (h b).fst = algebraMap B K b) (hc : ∀ a : R₀, (h (algebraMap R₀ B a)).snd = 0)
+    : Derivation R₀ B K :=
   Derivation.mk'
-    { toFun := fun b => (h b).snd
+    {
+      toFun := fun b => (h b).snd
       map_add' := fun x y => by simp
       map_smul' := fun a b => by
         simp only [RingHom.id_apply]
         rw [Algebra.smul_def, map_mul, snd_mul, hc, hfst, smul_zero, add_zero, smul_eq_mul,
-          ← IsScalarTower.algebraMap_apply, ← Algebra.smul_def] }
+          ← IsScalarTower.algebraMap_apply, ← Algebra.smul_def]
+    }
     (fun a b => by
       simp only [LinearMap.coe_mk, AddHom.coe_mk, map_mul, snd_mul, hfst, Algebra.smul_def,
         MulOpposite.smul_eq_mul_unop, MulOpposite.unop_op, smul_eq_mul, Algebra.algebraMap_self,
@@ -68,15 +73,23 @@ namespace FirstOrderPoints
 
 open TrivSqZeroExt
 
-theorem exists_linearCombination_eq :
-    ∀ (R₀ B K : Type) [CommRing R₀] [CommRing B] [Algebra R₀ B] [Field K] (n : ℕ),
-    Algebra.IsStandardSmoothOfRelativeDimension n R₀ B → ∀ (ι : Type) [Fintype ι], Fintype.card ι = n →
-    ∀ R : B →+* TrivSqZeroExt K (ι → K), (∀ a : R₀, R (algebraMap R₀ B a) = TrivSqZeroExt.inl (R (algebraMap R₀ B a)).fst) →
-    (∀ M M' : ι → K, (TrivSqZeroExt.map (Fintype.linearCombination K M)).toRingHom.comp R =
-      (TrivSqZeroExt.map (Fintype.linearCombination K M')).toRingHom.comp R → M = M') →
-    ∀ g : B →+* DualNumber K, (∀ b, (g b).fst = (R b).fst) →
-    (∀ a : R₀, g (algebraMap R₀ B a) = TrivSqZeroExt.inl (g (algebraMap R₀ B a)).fst) →
-    ∃ M : ι → K, g = (TrivSqZeroExt.map (Fintype.linearCombination K M)).toRingHom.comp R := by
+theorem exists_linearCombination_eq
+    : ∀ (R₀ B K : Type) [CommRing R₀] [CommRing B] [Algebra R₀ B] [Field K] (n : ℕ),
+      Algebra.IsStandardSmoothOfRelativeDimension n R₀ B
+        → ∀ (ι : Type) [Fintype ι],
+          Fintype.card ι = n
+            → ∀ R : B →+* TrivSqZeroExt K (ι → K),
+              (∀ a : R₀, R (algebraMap R₀ B a) = TrivSqZeroExt.inl (R (algebraMap R₀ B a)).fst)
+                → (∀ M M' : ι → K,
+                  (TrivSqZeroExt.map (Fintype.linearCombination K M)).toRingHom.comp R
+                      = (TrivSqZeroExt.map (Fintype.linearCombination K M')).toRingHom.comp R
+                    → M = M')
+                → ∀ g : B →+* DualNumber K,
+                  (∀ b, (g b).fst = (R b).fst)
+                    → (∀ a : R₀,
+                      g (algebraMap R₀ B a) = TrivSqZeroExt.inl (g (algebraMap R₀ B a)).fst)
+                    → ∃ M : ι → K,
+                      g = (TrivSqZeroExt.map (Fintype.linearCombination K M)).toRingHom.comp R := by
   intro R₀ B K _ _ _ _ n hsm ι _ hcard R hR hinj g hgfst hg
   classical
   haveI : Algebra.IsStandardSmooth R₀ B := Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth n
@@ -86,7 +99,8 @@ theorem exists_linearCombination_eq :
   haveI : IsScalarTower R₀ B K := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   haveI : Nontrivial B := ρ.domain_nontrivial
   have hfin : Module.finrank B Ω[B⁄R₀] = n := by
-    have := Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential (R := R₀) (S := B) n
+    have :=
+      Algebra.IsStandardSmoothOfRelativeDimension.rank_kaehlerDifferential (R := R₀) (S := B) n
     rw [← Module.finrank_eq_rank] at this
     exact_mod_cast this
   let e := Module.finBasisOfFinrankEq B Ω[B⁄R₀] hfin
@@ -97,8 +111,7 @@ theorem exists_linearCombination_eq :
   have hR0 : ∀ a : R₀, (R (algebraMap R₀ B a)).snd = 0 := fun a => by
     have := congrArg TrivSqZeroExt.snd (hR a)
     simpa using this
-  have hMc : ∀ M (a : R₀), (hM M (algebraMap R₀ B a)).snd = 0 := fun M a => by
-    simp [hM, hR0 a]
+  have hMc : ∀ M (a : R₀), (hM M (algebraMap R₀ B a)).snd = 0 := fun M a => by simp [hM, hR0 a]
   let D : (ι → K) → Derivation R₀ B K := fun M => derOf (hM M) (hMfst M) (hMc M)
   have hD : ∀ M x, D M x = ∑ i, M i * D (Pi.single i 1) x := by
     intro M x

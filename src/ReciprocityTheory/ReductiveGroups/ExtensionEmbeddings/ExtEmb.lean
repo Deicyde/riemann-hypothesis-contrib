@@ -10,9 +10,10 @@ open scoped nonZeroDivisors
 
 namespace ReciprocityTheory.ChartRestriction.B3
 
-theorem iop_extEmb {R K L : Type} [Field R] [Field K] [Field L] [IsAlgClosed K]
-    [IsAlgClosed L] (f : R →+* K) (g : R →+* L) (hR : #R ≤ ℵ₀) (hK : ℵ₀ < #K) (hKL : #K = #L) :
-    ∃ σ : K ≃+* L, ∀ r : R, σ (f r) = g r := by
+theorem iop_extEmb
+    {R K L : Type} [Field R] [Field K] [Field L] [IsAlgClosed K] [IsAlgClosed L]
+    (f : R →+* K) (g : R →+* L) (hR : #R ≤ ℵ₀) (hK : ℵ₀ < #K) (hKL : #K = #L)
+    : ∃ σ : K ≃+* L, ∀ r : R, σ (f r) = g r := by
   let : Algebra R K := f.toAlgebra
   let : Algebra R L := g.toAlgebra
   obtain ⟨ι, v, hv⟩ := exists_isTranscendenceBasis' R K

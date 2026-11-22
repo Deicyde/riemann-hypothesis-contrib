@@ -11,8 +11,9 @@ namespace GroundTheory.Heights₂.Heights
 
 open Module
 
-theorem LengthQuotientDet.ord_prod {O : Type} [CommRing O] [IsDomain O] {ι : Type*} (s : Finset ι)
-    (a : ι → O) (ha : ∀ i, a i ≠ 0) : Ring.ord O (∏ i ∈ s, a i) = ∑ i ∈ s, Ring.ord O (a i) := by
+theorem LengthQuotientDet.ord_prod
+    {O : Type} [CommRing O] [IsDomain O] {ι : Type*} (s : Finset ι) (a : ι → O) (ha : ∀ i, a i ≠ 0)
+    : Ring.ord O (∏ i ∈ s, a i) = ∑ i ∈ s, Ring.ord O (a i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp

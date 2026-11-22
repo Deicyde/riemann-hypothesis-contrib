@@ -10,8 +10,8 @@ namespace UpperTheory.V.Lit.Dr
 
 theorem shiftZero : ShiftZero := by
   intro Γ M _ _ _ ρ n w hw hlin
-  let v : Fin n → (Rep.of ρ).ρ.invariants :=
-    fun i => ⟨w i, (Representation.mem_invariants _ _).2 (hw i)⟩
+  let v : Fin n → (Rep.of ρ).ρ.invariants := fun i =>
+    ⟨w i, (Representation.mem_invariants _ _).2 (hw i)⟩
   have hli : LinearIndependent ℂ v := by
     rw [Fintype.linearIndependent_iff]
     intro g hg

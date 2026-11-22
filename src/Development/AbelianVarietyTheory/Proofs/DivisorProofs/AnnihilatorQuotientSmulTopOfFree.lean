@@ -11,26 +11,32 @@ open IsLocalRing RingTheory.Sequence Pointwise
 
 namespace GlobalTheory.AnnRegSeq
 
-theorem free_of_maximalIdeal_eq_bot {B M : Type} [CommRing B] [IsLocalRing B] [AddCommGroup M]
-    [Module B M] (hm : maximalIdeal B = ⊥) : Module.Free B M := by
+theorem free_of_maximalIdeal_eq_bot
+    {B M : Type} [CommRing B] [IsLocalRing B] [AddCommGroup M] [Module B M]
+    (hm : maximalIdeal B = ⊥)
+    : Module.Free B M := by
   have hF : IsField B := IsLocalRing.isField_iff_maximalIdeal_eq.mpr hm
   letI := hF.toField
   exact Module.Free.of_divisionRing B M
 
-theorem maximalIdeal_eq_bot_of_le_sq {B : Type} [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
-    (h : maximalIdeal B ≤ maximalIdeal B ^ 2) : maximalIdeal B = ⊥ :=
+theorem maximalIdeal_eq_bot_of_le_sq
+    {B : Type} [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
+    (h : maximalIdeal B ≤ maximalIdeal B ^ 2)
+    : maximalIdeal B = ⊥ :=
   Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal B) (maximalIdeal B)
     (maximalIdeal B).fg_of_isNoetherianRing (by rwa [smul_eq_mul, ← pow_two])
     (maximalIdeal_le_jacobson ⊥)
 
-theorem exists_isSMulRegular_notMem_sq {B M : Type} [CommRing B] [IsLocalRing B]
-    [IsNoetherianRing B] [AddCommGroup M] [Module B M] [Module.Finite B M]
-    (hass : maximalIdeal B ∉ associatedPrimes B M) (hsq : ¬ maximalIdeal B ≤ maximalIdeal B ^ 2) :
-    ∃ x ∈ maximalIdeal B, x ∉ maximalIdeal B ^ 2 ∧ IsSMulRegular M x := by
+theorem exists_isSMulRegular_notMem_sq
+    {B M : Type} [CommRing B] [IsLocalRing B] [IsNoetherianRing B] [AddCommGroup M] [Module B M]
+    [Module.Finite B M]
+    (hass : maximalIdeal B ∉ associatedPrimes B M) (hsq : ¬ maximalIdeal B ≤ maximalIdeal B ^ 2)
+    : ∃ x ∈ maximalIdeal B, x ∉ maximalIdeal B ^ 2 ∧ IsSMulRegular M x := by
   by_contra hcon
   push_neg at hcon
-  have hsub : ((maximalIdeal B : Ideal B) : Set B) ⊆
-      ⋃ p ∈ insert (maximalIdeal B ^ 2) (associatedPrimes B M), (id p : Set B) := by
+  have hsub
+      : ((maximalIdeal B : Ideal B) : Set B)
+        ⊆ ⋃ p ∈ insert (maximalIdeal B ^ 2) (associatedPrimes B M), (id p : Set B) := by
     intro z hz
     rw [Set.biUnion_insert]
     by_cases h2 : z ∈ maximalIdeal B ^ 2
@@ -38,21 +44,24 @@ theorem exists_isSMulRegular_notMem_sq {B M : Type} [CommRing B] [IsLocalRing B]
     · right
       have : z ∈ ({r : B | IsSMulRegular M r}ᶜ) := hcon z hz h2
       rwa [← biUnion_associatedPrimes_eq_compl_regular B M] at this
-  obtain ⟨p, hp, hle⟩ := (Ideal.subset_union_prime_finite ((associatedPrimes.finite B M).insert _)
-    (f := id) (maximalIdeal B ^ 2) (maximalIdeal B ^ 2) (fun i hi h1 _ => by
-      rcases hi with rfl | hi
-      · exact absurd rfl h1
-      · exact hi.isPrime)).mp hsub
+  obtain ⟨p, hp, hle⟩ :=
+    (Ideal.subset_union_prime_finite ((associatedPrimes.finite B M).insert _) (f := id)
+      (maximalIdeal B ^ 2) (maximalIdeal B ^ 2)
+      (fun i hi h1 _ => by
+        rcases hi with rfl | hi
+        · exact absurd rfl h1
+        · exact hi.isPrime)).mp hsub
   rcases hp with rfl | hp
   · exact hsq hle
   · have : p = maximalIdeal B := le_antisymm (le_maximalIdeal hp.isPrime.ne_top) hle
     exact hass (this ▸ hp)
 
-theorem free_of_free_quotient {B M : Type} [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
-    [AddCommGroup M] [Module B M] [Module.Finite B M] {x : B} (hx : x ∈ maximalIdeal B)
-    (reg : IsSMulRegular M x)
-    [Module.Free (B ⧸ Ideal.span {x}) (M ⧸ Ideal.span {x} • (⊤ : Submodule B M))] :
-    Module.Free B M := by
+theorem free_of_free_quotient
+    {B M : Type} [CommRing B] [IsLocalRing B] [IsNoetherianRing B] [AddCommGroup M] [Module B M]
+    [Module.Finite B M]
+    {x : B} (hx : x ∈ maximalIdeal B) (reg : IsSMulRegular M x)
+    [Module.Free (B ⧸ Ideal.span {x}) (M ⧸ Ideal.span {x} • (⊤ : Submodule B M))]
+    : Module.Free B M := by
   set I : Ideal B := Ideal.span {x} with hI
   set P : Submodule B M := I • ⊤ with hP
   have hIj : I ≤ (⊥ : Ideal B).jacobson := by
@@ -66,15 +75,17 @@ theorem free_of_free_quotient {B M : Type} [CommRing B] [IsLocalRing B] [IsNoeth
   choose v hv using fun i => Submodule.Quotient.mk_surjective P (b i)
   let φ : (Fin r → B) →ₗ[B] M := Fintype.linearCombination B v
   have hφ : ∀ c, φ c = ∑ i, c i • v i := fun c => by simp [φ, Fintype.linearCombination_apply]
-  have hmk : ∀ c : Fin r → B, (Submodule.Quotient.mk (φ c) : M ⧸ P) =
-      ∑ i, Ideal.Quotient.mk I (c i) • b i := by
+  have hmk
+      : ∀ c : Fin r → B,
+        (Submodule.Quotient.mk (φ c) : M ⧸ P) = ∑ i, Ideal.Quotient.mk I (c i) • b i := by
     intro c
     rw [hφ]
     change Submodule.mkQ P (∑ i, c i • v i) = _
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    rw [Submodule.mkQ_apply, Submodule.Quotient.mk_smul, hv i, ← Ideal.Quotient.algebraMap_eq, algebraMap_smul]
+    rw [Submodule.mkQ_apply, Submodule.Quotient.mk_smul, hv i, ← Ideal.Quotient.algebraMap_eq,
+      algebraMap_smul]
   have hsurj : LinearMap.range φ = ⊤ := by
     refine top_le_iff.mp (Submodule.le_of_le_smul_of_le_jacobson_bot Module.Finite.fg_top hIj ?_)
     intro m _
@@ -95,7 +106,8 @@ theorem free_of_free_quotient {B M : Type} [CommRing B] [IsLocalRing B] [IsNoeth
       rw [← hmk, hk]
       rfl
     have hki : ∀ i, k i ∈ I := fun i =>
-      Ideal.Quotient.eq_zero_iff_mem.mp ((Fintype.linearIndependent_iff.mp b.linearIndependent) _ h0 i)
+      Ideal.Quotient.eq_zero_iff_mem.mp ((Fintype.linearIndependent_iff.mp b.linearIndependent) _ h0
+        i)
     choose k' hk' using fun i => Ideal.mem_span_singleton'.mp (hki i)
     have hkx : k = x • k' := by
       ext i
@@ -110,14 +122,17 @@ theorem free_of_free_quotient {B M : Type} [CommRing B] [IsLocalRing B] [IsNoeth
   exact Module.Free.of_equiv (LinearEquiv.ofBijective φ
     ⟨LinearMap.ker_eq_bot.mp hker, LinearMap.range_eq_top.mp hsurj⟩)
 
-theorem free_of_modDepthGE (n : ℕ) : ∀ (B : Type) [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
-    (M : Type) [AddCommGroup M] [Module B M] [Module.Finite B M],
-    ReciprocityTheory.CA.ModDepthGE B M n → (maximalIdeal B).spanFinrank ≤ n → Module.Free B M := by
+theorem free_of_modDepthGE (n : ℕ)
+    : ∀ (B : Type) [CommRing B] [IsLocalRing B] [IsNoetherianRing B] (M : Type) [AddCommGroup M]
+        [Module B M] [Module.Finite B M],
+      ReciprocityTheory.CA.ModDepthGE B M n → (maximalIdeal B).spanFinrank ≤ n
+        → Module.Free B M := by
   induction n with
   | zero =>
     intro B _ _ _ M _ _ _ _ hsp
-    exact free_of_maximalIdeal_eq_bot ((Submodule.spanFinrank_eq_zero_iff_eq_bot
-      (maximalIdeal B).fg_of_isNoetherianRing).mp (by omega))
+    exact free_of_maximalIdeal_eq_bot
+      ((Submodule.spanFinrank_eq_zero_iff_eq_bot (maximalIdeal B).fg_of_isNoetherianRing).mp
+        (by omega))
   | succ n ih =>
     intro B _ _ _ M _ _ _ hd hsp
     by_cases hsq : maximalIdeal B ≤ maximalIdeal B ^ 2
@@ -125,7 +140,8 @@ theorem free_of_modDepthGE (n : ℕ) : ∀ (B : Type) [CommRing B] [IsLocalRing 
     obtain ⟨rs, hlen, hmem, hreg⟩ := hd
     obtain ⟨y, ys, rfl⟩ := List.exists_cons_of_length_eq_add_one hlen
     have hy : y ∈ maximalIdeal B := hmem y (by simp)
-    have hass := ReciprocityTheory.CA.max_not_mem_ass_of_reg hy ((isRegular_cons_iff M y ys).mp hreg).1
+    have hass :=
+      ReciprocityTheory.CA.max_not_mem_ass_of_reg hy ((isRegular_cons_iff M y ys).mp hreg).1
     obtain ⟨x, hx, hx2, hxreg⟩ := exists_isSMulRegular_notMem_sq hass hsq
     have hd' := ReciprocityTheory.CA.ModDepthGE.quotSMulTop hx hxreg ⟨y :: ys, hlen, hmem, hreg⟩
     haveI : IsLocalRing (B ⧸ Ideal.span {x}) :=
@@ -134,7 +150,8 @@ theorem free_of_modDepthGE (n : ℕ) : ∀ (B : Type) [CommRing B] [IsLocalRing 
       Module.Finite.of_restrictScalars_finite B _ _
     have hsp' : (maximalIdeal (B ⧸ Ideal.span {x})).spanFinrank ≤ n := by
       have h1 :=
-        ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.spanFinrank_maximalIdeal_quotient_succ_le B hx hx2
+        ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.spanFinrank_maximalIdeal_quotient_succ_le B
+          hx hx2
       rw [← spanFinrank_maximalIdeal_eq_finrank_cotangentSpace] at h1
       omega
     have hd'' : ReciprocityTheory.CA.ModDepthGE (B ⧸ Ideal.span {x})
@@ -147,7 +164,8 @@ theorem free_of_modDepthGE (n : ℕ) : ∀ (B : Type) [CommRing B] [IsLocalRing 
         obtain ⟨z, hz, rfl⟩ := List.mem_map.mp hr
         exact ReciprocityTheory.CA.mk_mem_maximalIdeal_quot _ (hzm z hz)
       · rw [← Ideal.Quotient.algebraMap_eq]
-        exact (ReciprocityTheory.CA.isRegular_map_algebraMap_iff' zs).mpr ((e.isRegular_congr zs).mp hzr)
+        exact (ReciprocityTheory.CA.isRegular_map_algebraMap_iff' zs).mpr
+          ((e.isRegular_congr zs).mp hzr)
     haveI := ih (B ⧸ Ideal.span {x}) (M ⧸ Ideal.span {x} • (⊤ : Submodule B M)) hd'' hsp'
     exact free_of_free_quotient hx hxreg
 

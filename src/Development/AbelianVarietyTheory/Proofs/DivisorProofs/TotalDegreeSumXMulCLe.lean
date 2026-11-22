@@ -9,9 +9,11 @@ namespace GlobalTheory.TotalDegreeBounds
 
 open MvPolynomial
 
-theorem totalDegree_aeval_le {σ τ R A : Type*} [CommSemiring R] [CommSemiring A] [Algebra R A]
-    (f : σ → MvPolynomial τ A) (hf : ∀ i, (f i).totalDegree ≤ 1) (P : MvPolynomial σ R) :
-    (MvPolynomial.aeval f P).totalDegree ≤ P.totalDegree := by
+theorem totalDegree_aeval_le
+    {σ τ R A : Type*} [CommSemiring R] [CommSemiring A] [Algebra R A]
+    (f : σ → MvPolynomial τ A) (hf : ∀ i, (f i).totalDegree ≤ 1)
+    (P : MvPolynomial σ R)
+    : (MvPolynomial.aeval f P).totalDegree ≤ P.totalDegree := by
   classical
   rw [MvPolynomial.aeval_def, MvPolynomial.eval₂_eq]
   refine (MvPolynomial.totalDegree_finsetSum _ _).trans (Finset.sup_le fun d hd => ?_)
@@ -26,9 +28,9 @@ theorem totalDegree_aeval_le {σ τ R A : Type*} [CommSemiring R] [CommSemiring 
   refine (MvPolynomial.totalDegree_pow _ _).trans ?_
   simpa using Nat.mul_le_mul_left (d i) (hf i)
 
-theorem totalDegree_sum_X_mul_C_le {ι τ A : Type*} [Fintype ι] [CommSemiring A]
-    (g : ι → τ) (a : ι → A) :
-    (∑ l : ι, (X (g l) * C (a l) : MvPolynomial τ A)).totalDegree ≤ 1 := by
+theorem totalDegree_sum_X_mul_C_le
+    {ι τ A : Type*} [Fintype ι] [CommSemiring A] (g : ι → τ) (a : ι → A)
+    : (∑ l : ι, (X (g l) * C (a l) : MvPolynomial τ A)).totalDegree ≤ 1 := by
   classical
   refine (MvPolynomial.totalDegree_finsetSum _ _).trans (Finset.sup_le fun l _ => ?_)
   refine (MvPolynomial.totalDegree_mul _ _).trans ?_

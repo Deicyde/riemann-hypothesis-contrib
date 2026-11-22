@@ -18,51 +18,62 @@ variable {O : Type} [CommRing O]
 theorem algHom_C (φ : PowerSeries O →ₐ[O] PowerSeries O) (a : O) : φ (C a) = C a := by
   simpa [PowerSeries.algebraMap_apply] using φ.commutes a
 
-theorem algHom_eq_const_add (φ : PowerSeries O →ₐ[O] PowerSeries O) (h : PowerSeries O) :
-    φ h = C (constantCoeff h) + φ X * φ (mk fun p => coeff (p + 1) h) := by
+theorem algHom_eq_const_add (φ : PowerSeries O →ₐ[O] PowerSeries O) (h : PowerSeries O)
+    : φ h = C (constantCoeff h) + φ X * φ (mk fun p => coeff (p + 1) h) := by
   conv_lhs => rw [PowerSeries.eq_shift_mul_X_add_const h]
   rw [map_add (f := _), map_mul, algHom_C]
   ring
 
-theorem order_map_toNat_of_isDistinguishedAt {I : Ideal O} (hI : I ≠ ⊤) {E : Polynomial O}
-    (hE : E.IsDistinguishedAt I) :
-    ((E : PowerSeries O).map (Ideal.Quotient.mk I)).order.toNat = E.natDegree := by
-  have h := hE.coe_natDegree_eq_order_map (E : PowerSeries O) 1
-    (by rw [map_one]; exact (Ideal.ne_top_iff_one I).mp hI) (by rw [mul_one])
+theorem order_map_toNat_of_isDistinguishedAt
+    {I : Ideal O} (hI : I ≠ ⊤) {E : Polynomial O} (hE : E.IsDistinguishedAt I)
+    : ((E : PowerSeries O).map (Ideal.Quotient.mk I)).order.toNat = E.natDegree := by
+  have h :=
+    hE.coe_natDegree_eq_order_map (E : PowerSeries O) 1
+      (by rw [map_one]; exact (Ideal.ne_top_iff_one I).mp hI) (by rw [mul_one])
   rw [← h, ENat.toNat_coe]
 
-theorem exists_div_of_isDistinguishedAt {I : Ideal O} [IsAdicComplete I O] (hI : I ≠ ⊤)
-    {E : Polynomial O} (hE : E.IsDistinguishedAt I) (F : PowerSeries O) :
-    ∃ (q : PowerSeries O) (r : Polynomial O), r.degree < E.natDegree ∧
-      F = (E : PowerSeries O) * q + r := by
+theorem exists_div_of_isDistinguishedAt
+    {I : Ideal O} [IsAdicComplete I O]
+    (hI : I ≠ ⊤)
+    {E : Polynomial O} (hE : E.IsDistinguishedAt I)
+    (F : PowerSeries O)
+    : ∃ (q : PowerSeries O) (r : Polynomial O),
+      r.degree < E.natDegree ∧ F = (E : PowerSeries O) * q + r := by
   have H := hE.isWeierstrassDivisorAt hI
   have hd := H.isWeierstrassDivisionAt_div_mod F
   refine ⟨H.div F, H.mod F, ?_, hd.eq_mul_add⟩
   have h1 := hd.degree_lt
   rwa [order_map_toNat_of_isDistinguishedAt hI hE] at h1
 
-theorem eq_zero_of_isDistinguishedAt_mul {I : Ideal O} [IsAdicComplete I O] (hI : I ≠ ⊤)
-    {E : Polynomial O} (hE : E.IsDistinguishedAt I) {q : PowerSeries O} {r : Polynomial O}
-    (hr : r.degree < E.natDegree) (h : (E : PowerSeries O) * q = r) : r = 0 := by
+theorem eq_zero_of_isDistinguishedAt_mul
+    {I : Ideal O} [IsAdicComplete I O]
+    (hI : I ≠ ⊤)
+    {E : Polynomial O} (hE : E.IsDistinguishedAt I)
+    {q : PowerSeries O} {r : Polynomial O}
+    (hr : r.degree < E.natDegree) (h : (E : PowerSeries O) * q = r)
+    : r = 0 := by
   have H := hE.isWeierstrassDivisorAt hI
   refine (H.eq_zero_of_mul_eq ?_ h).2
   rwa [order_map_toNat_of_isDistinguishedAt hI hE]
 
-theorem coe_sum_fin {d : ℕ} (a : Fin d → O) :
-    ((∑ i : Fin d, Polynomial.C (a i) * Polynomial.X ^ (i : ℕ) : Polynomial O) :
-      PowerSeries O) = ∑ i : Fin d, C (a i) * X ^ (i : ℕ) := by
-  have h := map_sum (Polynomial.coeToPowerSeries.ringHom (R := O))
-    (fun i : Fin d => Polynomial.C (a i) * Polynomial.X ^ (i : ℕ)) Finset.univ
+theorem coe_sum_fin {d : ℕ} (a : Fin d → O)
+    : ((∑ i : Fin d, Polynomial.C (a i) * Polynomial.X ^ (i : ℕ) : Polynomial O) : PowerSeries O)
+      = ∑ i : Fin d, C (a i) * X ^ (i : ℕ) := by
+  have h :=
+    map_sum (Polynomial.coeToPowerSeries.ringHom (R := O))
+      (fun i : Fin d => Polynomial.C (a i) * Polynomial.X ^ (i : ℕ))
+      Finset.univ
   simp only [Polynomial.coeToPowerSeries.ringHom_apply, Polynomial.coe_mul, Polynomial.coe_C,
-    Polynomial.coe_pow, Polynomial.coe_X] at h
+      Polynomial.coe_pow, Polynomial.coe_X]
+    at h
   exact h
 
-theorem coeff_sum_fin {d : ℕ} (a : Fin d → O) (j : Fin d) :
-    (∑ i : Fin d, Polynomial.C (a i) * Polynomial.X ^ (i : ℕ) : Polynomial O).coeff j = a j := by
+theorem coeff_sum_fin {d : ℕ} (a : Fin d → O) (j : Fin d)
+    : (∑ i : Fin d, Polynomial.C (a i) * Polynomial.X ^ (i : ℕ) : Polynomial O).coeff j = a j := by
   simp [Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul_X_pow, Fin.val_inj]
 
-theorem coe_eq_sum_fin {d : ℕ} {r : Polynomial O} (hr : r.degree < d) :
-    (r : PowerSeries O) = ∑ i : Fin d, C (r.coeff i) * X ^ (i : ℕ) := by
+theorem coe_eq_sum_fin {d : ℕ} {r : Polynomial O} (hr : r.degree < d)
+    : (r : PowerSeries O) = ∑ i : Fin d, C (r.coeff i) * X ^ (i : ℕ) := by
   have h : r = ∑ i : Fin d, Polynomial.C (r.coeff i) * Polynomial.X ^ (i : ℕ) := by
     ext j
     rw [Polynomial.finsetSum_coeff]
@@ -76,8 +87,8 @@ theorem coe_eq_sum_fin {d : ℕ} {r : Polynomial O} (hr : r.degree < d) :
         exact hb (Fin.ext h.symm)
       · intro h
         exact absurd (Finset.mem_univ _) h
-    · rw [Polynomial.coeff_eq_zero_of_degree_lt
-        (lt_of_lt_of_le hr (by exact_mod_cast not_lt.mp hj))]
+    · rw [Polynomial.coeff_eq_zero_of_degree_lt (lt_of_lt_of_le hr
+        (by exact_mod_cast not_lt.mp hj))]
       symm
       refine Finset.sum_eq_zero fun i _ => ?_
       rw [if_neg]
@@ -86,21 +97,26 @@ theorem coe_eq_sum_fin {d : ℕ} {r : Polynomial O} (hr : r.degree < d) :
   rw [← coe_sum_fin]
   exact congrArg _ h
 
-theorem eq_zero_of_forall_pow_dvd {R : Type} [CommRing R] [IsNoetherianRing R] [IsDomain R]
-    {P : R} (hP : ¬ IsUnit P) {x : R} (h : ∀ N : ℕ, P ^ N ∣ x) : x = 0 := by
+theorem eq_zero_of_forall_pow_dvd
+    {R : Type} [CommRing R] [IsNoetherianRing R] [IsDomain R]
+    {P : R} (hP : ¬ IsUnit P)
+    {x : R} (h : ∀ N : ℕ, P ^ N ∣ x)
+    : x = 0 := by
   have hI : Ideal.span {P} ≠ ⊤ := by rwa [Ne, Ideal.span_singleton_eq_top]
   have h0 := Ideal.iInf_pow_eq_bot_of_isDomain _ hI
-  have hx : x ∈ ⨅ i, Ideal.span {P} ^ i := Ideal.mem_iInf.mpr fun N => by
-    rw [Ideal.span_singleton_pow, Ideal.mem_span_singleton]
-    exact h N
+  have hx : x ∈ ⨅ i, Ideal.span {P} ^ i :=
+    Ideal.mem_iInf.mpr fun N => by
+      rw [Ideal.span_singleton_pow, Ideal.mem_span_singleton]
+      exact h N
   rw [h0, Ideal.mem_bot] at hx
   exact hx
 
-theorem exists_sum_algHom_mul_X_pow (φ : PowerSeries O →ₐ[O] PowerSeries O) (d : ℕ)
+theorem exists_sum_algHom_mul_X_pow
+    (φ : PowerSeries O →ₐ[O] PowerSeries O) (d : ℕ)
     (hdiv : ∀ F : PowerSeries O, ∃ (q : PowerSeries O) (r : Polynomial O),
       r.degree < d ∧ F = φ X * q + r)
-    (hkrull : ∀ x : PowerSeries O, (∀ N : ℕ, φ X ^ N ∣ x) → x = 0)
-    (F : PowerSeries O) : ∃ h : Fin d → PowerSeries O, F = ∑ i, φ (h i) * X ^ (i : ℕ) := by
+    (hkrull : ∀ x : PowerSeries O, (∀ N : ℕ, φ X ^ N ∣ x) → x = 0) (F : PowerSeries O)
+    : ∃ h : Fin d → PowerSeries O, F = ∑ i, φ (h i) * X ^ (i : ℕ) := by
   choose qf rf hrf hF using hdiv
   let H : PowerSeries O → Fin d → PowerSeries O := fun F i => mk fun k => (rf (qf^[k] F)).coeff i
   have hT : ∀ G i, (mk fun p => coeff (p + 1) (H G i)) = H (qf G) i := by
@@ -130,26 +146,33 @@ theorem exists_sum_algHom_mul_X_pow (φ : PowerSeries O →ₐ[O] PowerSeries O)
   refine ⟨H F, ?_⟩
   exact (sub_eq_zero.mp (hkrull _ fun N => hdvd N F))
 
-theorem eq_zero_of_sum_algHom_mul_X_pow [IsDomain O] (φ : PowerSeries O →ₐ[O] PowerSeries O)
-    (d : ℕ)
-    (huniq : ∀ (a : Fin d → O) (q : PowerSeries O),
-      ∑ i, C (a i) * X ^ (i : ℕ) = φ X * q → ∀ i, a i = 0)
-    (hP0 : φ X ≠ 0) :
-    ∀ (n : ℕ) (h : Fin d → PowerSeries O), ∑ i, φ (h i) * X ^ (i : ℕ) = 0 →
-      ∀ i, coeff n (h i) = 0 := by
-  have step : ∀ h : Fin d → PowerSeries O, ∑ i, φ (h i) * X ^ (i : ℕ) = 0 →
-      (∀ i, constantCoeff (h i) = 0) ∧
-        ∑ i, φ (mk fun p => coeff (p + 1) (h i)) * X ^ (i : ℕ) = 0 := by
+theorem eq_zero_of_sum_algHom_mul_X_pow
+    [IsDomain O]
+    (φ : PowerSeries O →ₐ[O] PowerSeries O) (d : ℕ)
+    (huniq
+      : ∀ (a : Fin d → O) (q : PowerSeries O), ∑ i, C (a i) * X ^ (i : ℕ) = φ X * q → ∀ i, a i = 0)
+    (hP0 : φ X ≠ 0)
+    : ∀ (n : ℕ) (h : Fin d → PowerSeries O),
+      ∑ i, φ (h i) * X ^ (i : ℕ) = 0 → ∀ i, coeff n (h i) = 0 := by
+  have step
+      : ∀ h : Fin d → PowerSeries O,
+        ∑ i, φ (h i) * X ^ (i : ℕ) = 0
+          → (∀ i, constantCoeff (h i) = 0)
+            ∧ ∑ i, φ (mk fun p => coeff (p + 1) (h i)) * X ^ (i : ℕ) = 0 := by
     intro h hs
-    have e : ∑ i, φ (h i) * X ^ (i : ℕ) = ∑ i, C (constantCoeff (h i)) * X ^ (i : ℕ) +
-        φ X * ∑ i, φ (mk fun p => coeff (p + 1) (h i)) * X ^ (i : ℕ) := by
+    have e
+        : ∑ i, φ (h i) * X ^ (i : ℕ)
+          = ∑ i, C (constantCoeff (h i)) * X ^ (i : ℕ)
+            + φ X * ∑ i, φ (mk fun p => coeff (p + 1) (h i)) * X ^ (i : ℕ) := by
       rw [Finset.mul_sum, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [algHom_eq_const_add φ (h i)]
       ring
     rw [hs] at e
-    have h0 := huniq (fun i => constantCoeff (h i))
-      (-(∑ i, φ (mk fun p => coeff (p + 1) (h i)) * X ^ (i : ℕ))) (by linear_combination -e)
+    have h0 :=
+      huniq
+        (fun i => constantCoeff (h i))
+        (-(∑ i, φ (mk fun p => coeff (p + 1) (h i)) * X ^ (i : ℕ))) (by linear_combination -e)
     refine ⟨h0, ?_⟩
     have hsum0 : ∑ i, C (constantCoeff (h i)) * X ^ (i : ℕ) = 0 :=
       Finset.sum_eq_zero fun i _ => by

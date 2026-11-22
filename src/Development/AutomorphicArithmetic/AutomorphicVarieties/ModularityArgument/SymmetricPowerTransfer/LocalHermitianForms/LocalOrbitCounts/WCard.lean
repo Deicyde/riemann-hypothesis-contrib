@@ -6,10 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-theorem UpperTheory.V.Z.Sym.Loc.wCard :
-    ∀ (T Y : Type) [CommGroup T] [MulAction T Y] (C : Subgroup T) (P F : Set Y), (∀ (t : T) y, y ∈ P → t • y ∈ P) → F ⊆ P → F.Finite →
-    (∀ c ∈ C, ∀ y ∈ F, c • y ∈ F) → (∀ y ∈ P, ∃ t : T, t • y ∈ F) → (∀ (t : T), ∀ y ∈ F, t • y ∈ F → ∃ c ∈ C, c • y = t • y) →
-    wcount C (P.indicator fun _ => (1 : ℂ)) = (F.ncard : ℂ) := by
+theorem UpperTheory.V.Z.Sym.Loc.wCard
+    : ∀ (T Y : Type) [CommGroup T] [MulAction T Y] (C : Subgroup T) (P F : Set Y),
+      (∀ (t : T) y, y ∈ P → t • y ∈ P) → F ⊆ P → F.Finite → (∀ c ∈ C, ∀ y ∈ F, c • y ∈ F)
+        → (∀ y ∈ P, ∃ t : T, t • y ∈ F) → (∀ (t : T), ∀ y ∈ F, t • y ∈ F → ∃ c ∈ C, c • y = t • y)
+        → wcount C (P.indicator fun _ => (1 : ℂ)) = (F.ncard : ℂ) := by
   intro T Y _ _ C P F hP hFP hF hCF hPF hU
   classical
   let q : Y → MulAction.orbitRel.Quotient T Y := fun y => Quotient.mk _ y
@@ -23,8 +24,9 @@ theorem UpperTheory.V.Z.Sym.Loc.wCard :
     simp only [MulAction.mem_stabilizer_iff]
     rw [smul_smul, mul_comm, ← smul_smul]
     exact (MulAction.injective t).eq_iff
-  have hstab' : ∀ a b : Y, a ∈ MulAction.orbit T b →
-      MulAction.stabilizer T a = MulAction.stabilizer T b := by
+  have hstab'
+      : ∀ a b : Y,
+        a ∈ MulAction.orbit T b → MulAction.stabilizer T a = MulAction.stabilizer T b := by
     rintro a b ⟨s, rfl⟩
     exact hstab s b
   have hrel : ∀ z : Y, (MulAction.stabilizer T z).relIndex C = (MulAction.orbit C z).ncard := by
@@ -42,9 +44,11 @@ theorem UpperTheory.V.Z.Sym.Loc.wCard :
     · rintro ⟨c, rfl⟩
       refine ⟨hCF c c.2 z hz, ?_⟩
       exact (hq _ _).2 ⟨(c : T), rfl⟩
-  have hsupp : (Function.support fun o : MulAction.orbitRel.Quotient T Y =>
-      ((MulAction.stabilizer T (Quotient.out o)).relIndex C : ℂ) *
-        P.indicator (fun _ => (1 : ℂ)) (Quotient.out o)) ⊆ ↑(hF.toFinset.image q) := by
+  have hsupp
+      : (Function.support fun o : MulAction.orbitRel.Quotient T Y =>
+          ((MulAction.stabilizer T (Quotient.out o)).relIndex C : ℂ)
+            * P.indicator (fun _ => (1 : ℂ)) (Quotient.out o))
+        ⊆ ↑(hF.toFinset.image q) := by
     intro o ho
     have hmem : Quotient.out o ∈ P := by
       by_contra h

@@ -16,23 +16,29 @@ open PositivityTheory.RgUd.T
 
 section Surj
 
-variable {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-  [AddCommGroup W] [Module K W] [FiniteDimensional K W]
+variable
+  {K V W : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [AddCommGroup W]
+  [Module K W] [FiniteDimensional K W]
 
-theorem det_surj (f : V →ₗ[K] V) (F : W →ₗ[K] W) (L : V →ₗ[K] W)
-    (hL : Function.Surjective L) (h : ∀ v, L (f v) = F (L v)) (P : Submodule K V) (hP : P = LinearMap.ker L)
-    (hf : ∀ y ∈ P, f y ∈ P) : LinearMap.det f = LinearMap.det (f.restrict hf) * LinearMap.det F := by
+theorem det_surj
+    (f : V →ₗ[K] V) (F : W →ₗ[K] W) (L : V →ₗ[K] W)
+    (hL : Function.Surjective L) (h : ∀ v, L (f v) = F (L v))
+    (P : Submodule K V) (hP : P = LinearMap.ker L) (hf : ∀ y ∈ P, f y ∈ P)
+    : LinearMap.det f = LinearMap.det (f.restrict hf) * LinearMap.det F := by
   subst hP
   rw [LinearMap.det_eq_det_mul_det (LinearMap.ker L) f hf]
   congr 1
   set e := L.quotKerEquivOfSurjective hL
-  have key : (e : (V ⧸ LinearMap.ker L) →ₗ[K] W) ∘ₗ (LinearMap.ker L).mapQ (LinearMap.ker L) f hf =
-      F ∘ₗ (e : (V ⧸ LinearMap.ker L) →ₗ[K] W) := by
+  have key
+      : (e : (V ⧸ LinearMap.ker L) →ₗ[K] W) ∘ₗ (LinearMap.ker L).mapQ (LinearMap.ker L) f hf
+        = F ∘ₗ (e : (V ⧸ LinearMap.ker L) →ₗ[K] W) := by
     apply Submodule.linearMap_qext
     ext v
     simp [e, h]
-  have hF : F = (e : (V ⧸ LinearMap.ker L) →ₗ[K] W) ∘ₗ (LinearMap.ker L).mapQ (LinearMap.ker L) f hf ∘ₗ
-      (e.symm : W →ₗ[K] (V ⧸ LinearMap.ker L)) := by
+  have hF
+      : F
+        = (e : (V ⧸ LinearMap.ker L) →ₗ[K] W) ∘ₗ (LinearMap.ker L).mapQ (LinearMap.ker L) f hf
+          ∘ₗ (e.symm : W →ₗ[K] (V ⧸ LinearMap.ker L)) := by
     rw [← LinearMap.comp_assoc, key, LinearMap.comp_assoc]
     ext w
     simp
@@ -40,14 +46,18 @@ theorem det_surj (f : V →ₗ[K] V) (F : W →ₗ[K] W) (L : V →ₗ[K] W)
 
 end Surj
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-private theorem det_sq_lemma {K W : Type*} [Field K] [AddCommGroup W] [Module K W]
-    [FiniteDimensional K W] (F D : W →ₗ[K] W) (B : W →ₗ[K] W →ₗ[K] K) (t : K) (ht : t ≠ 0)
-    (hFD : ∀ w, F (D w) = t • D (F w)) (hB : ∀ a b, B (F a) (F b) = B a b)
-    (hBD : ∀ a b, D b = 0 → B (D a) b = 0) (hnd : ∀ b, (∀ a, B a b = 0) → b = 0)
-    (hdet : LinearMap.det F = 1) (hK : ∀ y ∈ LinearMap.ker D, F y ∈ LinearMap.ker D) :
-    LinearMap.det (F.restrict hK) ^ 2 = t ^ (finrank K W - finrank K (LinearMap.ker D)) := by
+private theorem det_sq_lemma
+    {K W : Type*} [Field K] [AddCommGroup W] [Module K W] [FiniteDimensional K W]
+    (F D : W →ₗ[K] W)
+    (B : W →ₗ[K] W →ₗ[K] K)
+    (t : K) (ht : t ≠ 0) (hFD : ∀ w, F (D w) = t • D (F w))
+    (hB : ∀ a b, B (F a) (F b) = B a b) (hBD : ∀ a b, D b = 0 → B (D a) b = 0)
+    (hnd : ∀ b, (∀ a, B a b = 0) → b = 0) (hdet : LinearMap.det F = 1)
+    (hK : ∀ y ∈ LinearMap.ker D, F y ∈ LinearMap.ker D)
+    : LinearMap.det (F.restrict hK) ^ 2 = t ^ (finrank K W - finrank K (LinearMap.ker D)) := by
   have hu : IsUnit F := (LinearMap.isUnit_iff_isUnit_det F).mpr (by rw [hdet]; exact isUnit_one)
   have hFinj : Function.Injective F := ((Module.End.isUnit_iff F).mp hu).1
   have hFKinj : Function.Injective (F.restrict hK) := by
@@ -59,11 +69,13 @@ private theorem det_sq_lemma {K W : Type*} [Field K] [AddCommGroup W] [Module K 
     exact ⟨t • F w, by rw [map_smul, hFD]⟩
   have htK : ∀ y ∈ LinearMap.ker D, (t • F) y ∈ LinearMap.ker D := fun y hy =>
     Submodule.smul_mem _ t (hK y hy)
-  have h3 := det_surj (t • F) (F.restrict hI) D.rangeRestrict D.surjective_rangeRestrict
-    (fun v => Subtype.ext (by
-      show D ((t • F) v) = F (D v)
-      rw [LinearMap.smul_apply, map_smul, hFD])) (LinearMap.ker D)
-    (LinearMap.ker_rangeRestrict D).symm htK
+  have h3 :=
+    det_surj (t • F) (F.restrict hI) D.rangeRestrict D.surjective_rangeRestrict
+      (fun v =>
+        Subtype.ext (by
+          show D ((t • F) v) = F (D v)
+          rw [LinearMap.smul_apply, map_smul, hFD]))
+      (LinearMap.ker D) (LinearMap.ker_rangeRestrict D).symm htK
   have hres : (t • F).restrict htK = t • F.restrict hK := LinearMap.ext fun y => rfl
   rw [hres, LinearMap.det_smul, LinearMap.det_smul, hdet] at h3
   let ψ' : ↥(LinearMap.ker D) →ₗ[K] Module.Dual K W := B.flip ∘ₗ (LinearMap.ker D).subtype
@@ -76,7 +88,8 @@ private theorem det_sq_lemma {K W : Type*} [Field K] [AddCommGroup W] [Module K 
   have hψ : ∀ w b, ψ w b = B w b := fun w b => rfl
   have hψsurj : Function.Surjective ψ :=
     (LinearMap.dualMap_surjective_of_injective hψ'inj).comp (Module.evalEquiv K W).surjective
-  have hfψ : ∀ w, ψ (F w) = (eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D)).dualMap (ψ w) := by
+  have hfψ
+      : ∀ w, ψ (F w) = (eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D)).dualMap (ψ w) := by
     intro w
     ext b
     rw [LinearMap.dualMap_apply, hψ, hψ]
@@ -96,29 +109,42 @@ private theorem det_sq_lemma {K W : Type*} [Field K] [AddCommGroup W] [Module K 
       have e2 := LinearMap.finrank_range_add_finrank_ker D
       rw [LinearMap.range_eq_top.mpr hψsurj, finrank_top, Subspace.dual_finrank_eq] at e1
       omega
-  have h4 := det_surj F ((eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D)).dualMap) ψ hψsurj hfψ
-    (LinearMap.range D) hker.symm hI
+  have h4 :=
+    det_surj F ((eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D)).dualMap) ψ hψsurj hfψ
+      (LinearMap.range D) hker.symm hI
   rw [LinearMap.det_dualMap, hdet] at h4
-  have hs : LinearMap.det (eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D)) *
-      LinearMap.det (F.restrict hK) = 1 := by
+  have hs
+      : LinearMap.det (eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D))
+          * LinearMap.det (F.restrict hK)
+        = 1 := by
     rw [← LinearMap.det_comp]
-    have hid : (eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D)) ∘ₗ F.restrict hK = LinearMap.id :=
+    have hid
+        : (eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D)) ∘ₗ F.restrict hK = LinearMap.id :=
       LinearMap.ext fun y => eK.symm_apply_apply y
     rw [hid, LinearMap.det_id]
   have hdI : LinearMap.det (F.restrict hI) = LinearMap.det (F.restrict hK) := by
-    calc LinearMap.det (F.restrict hI)
-        = LinearMap.det (F.restrict hI) * (LinearMap.det (eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D)) *
-          LinearMap.det (F.restrict hK)) := by rw [hs, mul_one]
-      _ = (LinearMap.det (F.restrict hI) * LinearMap.det (eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D))) *
-          LinearMap.det (F.restrict hK) := by ring
+    calc
+      LinearMap.det (F.restrict hI)
+          = LinearMap.det (F.restrict hI)
+            * (LinearMap.det (eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D))
+              * LinearMap.det (F.restrict hK)) := by
+        rw [hs, mul_one]
+      _ = (LinearMap.det (F.restrict hI)
+            * LinearMap.det (eK.symm : ↥(LinearMap.ker D) →ₗ[K] ↥(LinearMap.ker D)))
+          * LinearMap.det (F.restrict hK) := by
+        ring
       _ = LinearMap.det (F.restrict hK) := by rw [← h4, one_mul]
   rw [hdI] at h3
   rw [pow_sub₀ t ht (Submodule.finrank_le _), eq_mul_inv_iff_mul_eq₀ (pow_ne_zero _ ht)]
   linear_combination -h3
 
-private theorem det_sq_lemma_3 (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : CR Z) :
-    IsSemisimpleModule ↥(Z.map (Matrix.toLinAlgEquiv' : Matrix (Fin n) (Fin n) k ≃ₐ[k]
-      Module.End k (Fin n → k)).toAlgHom) (Fin n → k) := by
+private theorem det_sq_lemma_3 (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : CR Z)
+    : IsSemisimpleModule
+      ↥(Z.map
+        (Matrix.toLinAlgEquiv'
+          : Matrix (Fin n) (Fin n) k ≃ₐ[k]
+            Module.End k (Fin n → k)).toAlgHom)
+      (Fin n → k) := by
   let φ : Matrix (Fin n) (Fin n) k →ₐ[k] Module.End k (Fin n → k) :=
     (Matrix.toLinAlgEquiv' : Matrix (Fin n) (Fin n) k ≃ₐ[k] Module.End k (Fin n → k)).toAlgHom
   let Z' := Z.map φ
@@ -144,10 +170,14 @@ private theorem det_sq_lemma_3 (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ
   haveI : IsSemisimpleRing Z' := IsArtinianRing.isSemisimpleRing_of_isReduced Z'
   exact inferInstance
 
-private theorem det_sq_lemma_2 [CharZero k] (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : CR Z)
-    (b : Matrix (Fin n) (Fin n) k) (hb : b ∈ Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)))
-    (h : ∀ a ∈ Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)), Matrix.trace (a * b) = 0) :
-    b = 0 := by
+private theorem det_sq_lemma_2
+    [CharZero k]
+    (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : CR Z)
+    (b : Matrix (Fin n) (Fin n) k)
+    (hb : b ∈ Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)))
+    (h : ∀ a ∈ Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)),
+      Matrix.trace (a * b) = 0)
+    : b = 0 := by
   classical
   by_contra hb0
   let φ : Matrix (Fin n) (Fin n) k →ₐ[k] Module.End k (Fin n → k) :=
@@ -156,13 +186,14 @@ private theorem det_sq_lemma_2 [CharZero k] (Z : Subalgebra k (Matrix (Fin n) (F
   let Z' := Z.map φ
   haveI : IsSemisimpleModule Z' (Fin n → k) := det_sq_lemma_3 Z hZ
   have hzb : ∀ z ∈ Z, z * b = b * z := fun z hz => (Subalgebra.mem_centralizer_iff k).mp hb z hz
-  let β : (Fin n → k) →ₗ[Z'] (Fin n → k) :=
-    { toFun := fun v => b *ᵥ v
-      map_add' := fun u v => Matrix.mulVec_add b u v
-      map_smul' := by
-        rintro ⟨_, z, hz, rfl⟩ v
-        show b *ᵥ (φ z v) = φ z (b *ᵥ v)
-        rw [hφ, hφ, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hzb z hz] }
+  let β : (Fin n → k) →ₗ[Z'] (Fin n → k) := {
+    toFun := fun v => b *ᵥ v
+    map_add' := fun u v => Matrix.mulVec_add b u v
+    map_smul' := by
+      rintro ⟨_, z, hz, rfl⟩ v
+      show b *ᵥ (φ z v) = φ z (b *ᵥ v)
+      rw [hφ, hφ, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hzb z hz]
+  }
   have hβ : ∀ v, β v = b *ᵥ v := fun v => rfl
   have hβ0 : β ≠ 0 := by
     intro h0
@@ -192,7 +223,8 @@ private theorem det_sq_lemma_2 [CharZero k] (Z : Subalgebra k (Matrix (Fin n) (F
     rw [LinearEquiv.symm_apply_eq]
     apply Subtype.ext
     have h1 : ((π (β v) : ↥(LinearMap.range β)) : Fin n → k) = β v :=
-      congrArg Subtype.val (Submodule.projectionOnto_apply_left hU ⟨β v, LinearMap.mem_range_self β v⟩)
+      congrArg Subtype.val
+        (Submodule.projectionOnto_apply_left hU ⟨β v, LinearMap.mem_range_self β v⟩)
     rw [h1, hσ]
     have hsplit := Submodule.projection_add_projection_eq_self hWc.symm v
     have hk : β ((LinearMap.ker β).projection Wc hWc.symm.symm v) = 0 :=
@@ -221,8 +253,8 @@ private theorem det_sq_lemma_2 [CharZero k] (Z : Subalgebra k (Matrix (Fin n) (F
       congrArg Subtype.val (Submodule.projectionOnto_apply_left hWc.symm ⟨w, hw⟩)
     rw [← h2]
     exact h1
-  have htrP : LinearMap.trace k (Fin n → k) Pk ≠ 0 :=
-    fun ht0 => hP0 ((LinearMap.IsIdempotentElem.trace_eq_zero_iff hPidem).mp ht0)
+  have htrP : LinearMap.trace k (Fin n → k) Pk ≠ 0 := fun ht0 =>
+    hP0 ((LinearMap.IsIdempotentElem.trace_eq_zero_iff hPidem).mp ht0)
   let Ak : (Fin n → k) →ₗ[k] (Fin n → k) := A.restrictScalars k
   let a := LinearMap.toMatrix' Ak
   have ha : a ∈ Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)) := by
@@ -248,10 +280,16 @@ private theorem det_sq_lemma_2 [CharZero k] (Z : Subalgebra k (Matrix (Fin n) (F
     rfl
   exact htrP (htr ▸ h a ha)
 
-theorem det_sq [CharZero k] (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : CR Z) (x : Matrix (Fin n) (Fin n) k)
-    (hx : x ∈ Bz Z) (g : GL (Fin n) k) (hg : g ∈ Gz Z) (t : k) (ht : t ≠ 0) (hgx : g.val * x * g⁻¹.val = t • x) :
-    (LinearMap.det ((adL g).restrict (cA_inv Z x g hg t ht hgx))) ^ 2 =
-      t ^ (finrank k (Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k))) - finrank k (cA Z x)) := by
+theorem det_sq
+    [CharZero k]
+    (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : CR Z)
+    (x : Matrix (Fin n) (Fin n) k) (hx : x ∈ Bz Z)
+    (g : GL (Fin n) k) (hg : g ∈ Gz Z)
+    (t : k) (ht : t ≠ 0) (hgx : g.val * x * g⁻¹.val = t • x)
+    : (LinearMap.det ((adL g).restrict (cA_inv Z x g hg t ht hgx))) ^ 2
+      = t
+        ^ (finrank k (Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)))
+          - finrank k (cA Z x)) := by
   have hxC : x ∈ Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)) :=
     (Subalgebra.mem_centralizer_iff k).mpr (fun a ha => hx a ha)
   set S := Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)) with hS
@@ -265,9 +303,12 @@ theorem det_sq [CharZero k] (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : 
   let F := (adL g).restrict (cC_inv Z g hg)
   let D := Dx.restrict hDC
   let B : ↥C →ₗ[k] ↥C →ₗ[k] k :=
-    ((LinearMap.mul k (Matrix (Fin n) (Fin n) k)).compr₂ (Matrix.traceLinearMap (Fin n) k k)).compl₁₂
-      C.subtype C.subtype
-  have hBapp : ∀ a b : ↥C, B a b = Matrix.trace ((a : Matrix (Fin n) (Fin n) k) * (b : Matrix (Fin n) (Fin n) k)) := fun a b => rfl
+    ((LinearMap.mul k (Matrix (Fin n) (Fin n) k)).compr₂
+      (Matrix.traceLinearMap (Fin n) k k)).compl₁₂ C.subtype C.subtype
+  have hBapp
+      : ∀ a b : ↥C,
+        B a b = Matrix.trace ((a : Matrix (Fin n) (Fin n) k) * (b : Matrix (Fin n) (Fin n) k)) :=
+    fun a b => rfl
   have hFD : ∀ w, F (D w) = t • D (F w) := by
     intro w
     apply Subtype.ext
@@ -288,8 +329,10 @@ theorem det_sq [CharZero k] (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : 
     simp only [mul_assoc, Units.inv_mul, mul_one]
   have hBD : ∀ a b, D b = 0 → B (D a) b = 0 := by
     intro a b hb
-    have h0 : (b : Matrix (Fin n) (Fin n) k) * x - x * (b : Matrix (Fin n) (Fin n) k) = 0 := congrArg Subtype.val hb
-    have hb' : (b : Matrix (Fin n) (Fin n) k) * x = x * (b : Matrix (Fin n) (Fin n) k) := sub_eq_zero.mp h0
+    have h0 : (b : Matrix (Fin n) (Fin n) k) * x - x * (b : Matrix (Fin n) (Fin n) k) = 0 :=
+      congrArg Subtype.val hb
+    have hb' : (b : Matrix (Fin n) (Fin n) k) * x = x * (b : Matrix (Fin n) (Fin n) k) :=
+      sub_eq_zero.mp h0
     rw [hBapp]
     show Matrix.trace (((a : Matrix (Fin n) (Fin n) k) * x - x * (a : Matrix (Fin n) (Fin n) k)) * (b : Matrix (Fin n) (Fin n) k)) = 0
     rw [sub_mul, Matrix.trace_sub, sub_eq_zero, mul_assoc x, Matrix.trace_mul_comm x,
@@ -310,7 +353,8 @@ theorem det_sq [CharZero k] (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : 
     simp only [Submodule.mem_map, LinearMap.mem_ker]
     constructor
     · rintro ⟨z, hz, rfl⟩
-      have h0 : (z : Matrix (Fin n) (Fin n) k) * x - x * (z : Matrix (Fin n) (Fin n) k) = 0 := congrArg Subtype.val hz
+      have h0 : (z : Matrix (Fin n) (Fin n) k) * x - x * (z : Matrix (Fin n) (Fin n) k) = 0 :=
+        congrArg Subtype.val hz
       exact ⟨fun a ha => (Subalgebra.mem_centralizer_iff k).mp z.2 a ha, sub_eq_zero.mp h0⟩
     · rintro ⟨hyB, hyx⟩
       have hyC : y ∈ C := (Subalgebra.mem_centralizer_iff k).mpr (fun a ha => hyB a ha)
@@ -318,9 +362,10 @@ theorem det_sq [CharZero k] (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : 
   let e : ↥(LinearMap.ker D) ≃ₗ[k] ↥(cA Z x) :=
     (Submodule.equivMapOfInjective C.subtype C.injective_subtype (LinearMap.ker D)).trans
       (LinearEquiv.ofEq _ _ hmap)
-  have hG : (adL g).restrict (cA_inv Z x g hg t ht hgx) =
-      (e : ↥(LinearMap.ker D) →ₗ[k] ↥(cA Z x)) ∘ₗ F.restrict hK ∘ₗ
-        (e.symm : ↥(cA Z x) →ₗ[k] ↥(LinearMap.ker D)) := by
+  have hG
+      : (adL g).restrict (cA_inv Z x g hg t ht hgx)
+        = (e : ↥(LinearMap.ker D) →ₗ[k] ↥(cA Z x)) ∘ₗ F.restrict hK
+          ∘ₗ (e.symm : ↥(cA Z x) →ₗ[k] ↥(LinearMap.ker D)) := by
     apply LinearMap.ext
     intro y
     obtain ⟨z, rfl⟩ := e.surjective y

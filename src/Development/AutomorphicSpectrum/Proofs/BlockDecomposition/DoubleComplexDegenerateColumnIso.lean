@@ -14,13 +14,19 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.DoubleCo
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.CechDR GlobalTheory.HodgeCoh CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Om CrystallineSemistableComparison.Om.Glob GlobalTheory.CompanionTheory.CechSerre
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.CechDR
+  GlobalTheory.HodgeCoh CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+  CrystallineSemistableComparison.Om CrystallineSemistableComparison.Om.Glob
+  GlobalTheory.CompanionTheory.CechSerre
 universe w
 
 namespace GlobalTheory.CompanionTheory.CechSerre
 
-theorem row_iso_of_columns : ∀ {R : Type} [CommRing R] (K : DCx.{w} R) (a : ℕ), (∀ p q, q ≠ a → Subsingleton ((K.col p).H q)) →
-    ∀ j, ∃ e : K.tot.H (a + j) ≃ₗ[R] (colH K a).H j, ∀ z : Zf K (a + j) j, e (clsZ K (a + j) j z) = leadE K j a z := by
+theorem row_iso_of_columns
+    : ∀ {R : Type} [CommRing R] (K : DCx.{w} R) (a : ℕ),
+      (∀ p q, q ≠ a → Subsingleton ((K.col p).H q))
+        → ∀ j, ∃ e : K.tot.H (a + j) ≃ₗ[R] (colH K a).H j, ∀ z : Zf K (a + j) j,
+          e (clsZ K (a + j) j z) = leadE K j a z := by
   intro R _ K a hK j
   have hab : ∀ p q, a < q → Subsingleton ((K.col p).H q) := fun p q h => hK p q (ne_of_gt h)
   have hbe : ∀ p q, q < a → Subsingleton ((K.col p).H q) := fun p q h => hK p q (ne_of_lt h)

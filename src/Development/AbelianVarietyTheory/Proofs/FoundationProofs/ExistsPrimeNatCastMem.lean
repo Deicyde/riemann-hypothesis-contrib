@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.PrimeNatCastMembership
 
-theorem exists_prime_natCast_mem {A : Type} [inst : CommRing A] (P : Ideal A) (hP : Ideal.IsPrime P)
-    (n : ℕ) (hn : n ≠ (0 : ℕ)) (hmem : (↑n : A) ∈ P) :
-    ∃ (q : ℕ), Nat.Prime q ∧ (↑q : A) ∈ P := by
+theorem exists_prime_natCast_mem
+    {A : Type} [inst : CommRing A]
+    (P : Ideal A) (hP : Ideal.IsPrime P)
+    (n : ℕ) (hn : n ≠ (0 : ℕ)) (hmem : (↑n : A) ∈ P)
+    : ∃ (q : ℕ), Nat.Prime q ∧ (↑q : A) ∈ P := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
     by_cases h1 : n = 1

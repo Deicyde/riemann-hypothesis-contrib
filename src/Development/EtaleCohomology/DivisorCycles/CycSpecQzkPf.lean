@@ -110,13 +110,16 @@ theorem CycSpec_of : LateralTheory.DivDb.CycleCountPf.CycSpec := by
   have kpos : ∀ r, 0 < k r := fun r => by
     apply Function.IsPeriodicPt.minimalPeriod_pos (orderOf_pos π)
     show (⇑π)^[orderOf π] r = r
-    rw [← Equiv.Perm.coe_pow, pow_orderOf_eq_one]; rfl
-  have hE : ∀ r, ∃ (β : C) (v : Fin N → C), v ≠ 0 ∧ p r *ᵥ v = v ∧ y ^ k r *ᵥ v = β • v := fun r => by
+    rw [← Equiv.Perm.coe_pow, pow_orderOf_eq_one]
+    rfl
+  have hE
+      : ∀ r, ∃ (β : C) (v : Fin N → C), v ≠ 0 ∧ p r *ᵥ v = v ∧ y ^ k r *ᵥ v = β • v := fun r => by
     refine eig _ _ (hp.1.idem r).eq (hp.2 r) ?_
     rw [iter hyp]
     congr 2
     show (⇑(π ^ k r)) r = r
-    rw [Equiv.Perm.coe_pow]; exact Function.iterate_minimalPeriod
+    rw [Equiv.Perm.coe_pow]
+    exact Function.iterate_minimalPeriod
   choose β v hv0 hvp hvb using hE
   have β0 : ∀ r, β r ≠ 0 := fun r h0 => by
     obtain ⟨u, hu⟩ := hy.pow (k r)
@@ -141,9 +144,14 @@ theorem CycSpec_of : LateralTheory.DivDb.CycleCountPf.CycSpec := by
     rw [← pow_mul, mul_comm (m j), pow_mul, (hω _).pow_eq_one, one_pow, mul_one]
   have hl0 : ∀ j, l j ≠ 0 := fun j => by
     refine mul_ne_zero ?_ (pow_ne_zero _ ((hω _).ne_zero (kpos _).ne'))
-    intro h0; apply β0 (R j); rw [← hζ, h0, zero_pow (kpos _).ne']
-  have hW : ∀ j, ∃ w : Fin N → C, w ≠ 0 ∧ y *ᵥ w = l j • w ∧ ∀ q, ¬ π.SameCycle j q → p q *ᵥ w = 0 := fun j => by
-    obtain ⟨w, hw0, hwy, hwq⟩ := key hp hyp (R j) (v (R j)) (β (R j)) (l j) (hvp _) (hv0 _) (hvb _) (hlk j) (hl0 j)
+    intro h0
+    apply β0 (R j)
+    rw [← hζ, h0, zero_pow (kpos _).ne']
+  have hW
+      : ∀ j, ∃ w : Fin N → C,
+        w ≠ 0 ∧ y *ᵥ w = l j • w ∧ ∀ q, ¬ π.SameCycle j q → p q *ᵥ w = 0 := fun j => by
+    obtain ⟨w, hw0, hwy, hwq⟩ :=
+      key hp hyp (R j) (v (R j)) (β (R j)) (l j) (hvp _) (hv0 _) (hvb _) (hlk j) (hl0 j)
     refine ⟨w, hw0, hwy, fun q hq => hwq q fun i hi => hq ?_⟩
     rw [hi]
     exact ((hR j).symm.trans (Equiv.Perm.SameCycle.refl π (R j))).trans
@@ -155,8 +163,8 @@ theorem CycSpec_of : LateralTheory.DivDb.CycleCountPf.CycSpec := by
       have h1 : ω (R j) ^ m i = ω (R j) ^ m j := by
         have h2 : ζ (R i) * ω (R i) ^ m i = ζ (R j) * ω (R j) ^ m j := hij
         rw [e] at h2
-        exact mul_left_cancel₀ (fun h0 => by
-          apply β0 (R j); rw [← hζ, h0, zero_pow (kpos _).ne']) h2
+        exact
+          mul_left_cancel₀ (fun h0 => by apply β0 (R j); rw [← hζ, h0, zero_pow (kpos _).ne']) h2
       have h3 : m i = m j := (hω (R j)).pow_inj (e ▸ hmk i) (hmk j) h1
       rw [← hm i, ← hm j, h3, e]
     · exfalso

@@ -8,8 +8,9 @@ public import Formalism.LocalRingCardinality.DataHost
 
 @[expose] public section
 
-private theorem UpperTheory.Reformulated.B.ExistsNatSmulMem.exists_den {K : Type*} [Field K] [NumberField K] (c : K) :
-    ∃ (M : ℕ) (a : NumberField.RingOfIntegers K), 0 < M ∧ (M : K) * c = a := by
+private theorem UpperTheory.Reformulated.B.ExistsNatSmulMem.exists_den
+    {K : Type*} [Field K] [NumberField K] (c : K)
+    : ∃ (M : ℕ) (a : NumberField.RingOfIntegers K), 0 < M ∧ (M : K) * c = a := by
   have hc : IsAlgebraic ℤ c :=
     (IsFractionRing.isAlgebraic_iff ℤ ℚ K).2 (Algebra.IsAlgebraic.isAlgebraic c)
   obtain ⟨y, hy, hi⟩ := hc.exists_integral_multiple
@@ -21,12 +22,12 @@ private theorem UpperTheory.Reformulated.B.ExistsNatSmulMem.exists_den {K : Type
   change _ = y • y • c
   simp [mul_assoc]
 
-private theorem UpperTheory.Reformulated.B.ExistsNatSmulMem.core {K V : Type*} [Field K] [NumberField K]
-    [AddCommGroup V] [Module K V] [Module (NumberField.RingOfIntegers K) V]
-    [IsScalarTower (NumberField.RingOfIntegers K) K V]
-    {Λ : Submodule (NumberField.RingOfIntegers K) V}
-    (h : Submodule.span K (Λ : Set V) = ⊤) (x : V) :
-    ∃ N : ℕ, 0 < N ∧ (N : K) • x ∈ Λ := by
+private theorem UpperTheory.Reformulated.B.ExistsNatSmulMem.core
+    {K V : Type*} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
+    [Module (NumberField.RingOfIntegers K) V] [IsScalarTower (NumberField.RingOfIntegers K) K V]
+    {Λ : Submodule (NumberField.RingOfIntegers K) V} (h : Submodule.span K (Λ : Set V) = ⊤)
+    (x : V)
+    : ∃ N : ℕ, 0 < N ∧ (N : K) • x ∈ Λ := by
   have hn : ∀ (M : ℕ) (v : V), v ∈ Λ → (M : K) • v ∈ Λ := fun M v hv => by
     rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hv M
   have hx : x ∈ Submodule.span K (Λ : Set V) := h ▸ Submodule.mem_top
@@ -50,14 +51,10 @@ private theorem UpperTheory.Reformulated.B.ExistsNatSmulMem.core {K V : Type*} [
     rw [this]
     exact Λ.smul_mem a hv
 
-theorem UpperTheory.Reformulated.B.ExistsNatSmulMem.exists_nat_smul_mem :
-    ∀ {D : Formalism.BasicNotions.D7} {n : ℕ}
-    {Λ : Submodule (NumberField.RingOfIntegers D.host.E) (Fin n → D.host.E)},
-    Submodule.IsFullLattice D.host.E Λ →
-      ∀ (x : Fin n → D.host.E),
-        ∃ (N : ℕ),
-          (0 : ℕ) < N ∧
-            (↑N : D.host.E) • x ∈
-              Λ := by
+theorem UpperTheory.Reformulated.B.ExistsNatSmulMem.exists_nat_smul_mem
+    : ∀ {D : Formalism.BasicNotions.D7} {n : ℕ}
+        {Λ : Submodule (NumberField.RingOfIntegers D.host.E) (Fin n → D.host.E)},
+      Submodule.IsFullLattice D.host.E Λ
+        → ∀ (x : Fin n → D.host.E), ∃ (N : ℕ), (0 : ℕ) < N ∧ (↑N : D.host.E) • x ∈ Λ := by
   intro D n Λ h x
   exact UpperTheory.Reformulated.B.ExistsNatSmulMem.core h.span_eq_top x

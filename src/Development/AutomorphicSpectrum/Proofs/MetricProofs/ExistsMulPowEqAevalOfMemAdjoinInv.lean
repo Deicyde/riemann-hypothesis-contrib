@@ -10,11 +10,11 @@ open MvPolynomial ReciprocityTheory.AnForm.R GlobalTheory.CompanionTheory.Ar.Cmp
 
 namespace GlobalTheory.CompanionTheory.Ar.Cmp
 
-theorem exists_mul_pow_eq_aeval_of_mem_adjoin_inv :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (σ : Type) (τ : σ → Ω) (F : MvPolynomial σ ℚ)
-      (S : Subalgebra ℚ Ω), aeval τ F ≠ 0 →
-      S = Algebra.adjoin ℚ (insert (aeval τ F)⁻¹ (Set.range τ)) →
-      ∀ s : S, ∃ (N : ℕ) (G : MvPolynomial σ ℚ), (s : Ω) * aeval τ F ^ N = aeval τ G := by
+theorem exists_mul_pow_eq_aeval_of_mem_adjoin_inv
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (σ : Type) (τ : σ → Ω) (F : MvPolynomial σ ℚ)
+        (S : Subalgebra ℚ Ω),
+      aeval τ F ≠ 0 → S = Algebra.adjoin ℚ (insert (aeval τ F)⁻¹ (Set.range τ))
+        → ∀ s : S, ∃ (N : ℕ) (G : MvPolynomial σ ℚ), (s : Ω) * aeval τ F ^ N = aeval τ G := by
   intro Ω _ _ σ τ F S hf hS s
   obtain ⟨x, hx⟩ := s
   subst hS

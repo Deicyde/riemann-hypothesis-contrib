@@ -13,14 +13,14 @@ universe w w' w'' t t' v u v' u' v'' u''
 namespace CrystallineSemistableComparison.CechClassBoundaries
 variable {R : Type} [CommRing R]
 
-theorem cls_eq {K : Cx.{w} R} {n : ℕ} (a b : K.X n) (ha : K.d n a = 0) (hb : K.d n b = 0) :
-    K.cls a ha = K.cls b hb ↔ a - b ∈ K.B n := by
+theorem cls_eq {K : Cx.{w} R} {n : ℕ} (a b : K.X n) (ha : K.d n a = 0) (hb : K.d n b = 0)
+    : K.cls a ha = K.cls b hb ↔ a - b ∈ K.B n := by
   unfold Cx.cls
   rw [Submodule.Quotient.eq]
   exact Iff.rfl
 
-theorem cls_eq_zero {K : Cx.{w} R} {n : ℕ} (a : K.X n) (ha : K.d n a = 0) :
-    K.cls a ha = 0 ↔ a ∈ K.B n := by
+theorem cls_eq_zero {K : Cx.{w} R} {n : ℕ} (a : K.X n) (ha : K.d n a = 0)
+    : K.cls a ha = 0 ↔ a ∈ K.B n := by
   unfold Cx.cls
   rw [Submodule.Quotient.mk_eq_zero]
   exact Iff.rfl
@@ -29,11 +29,13 @@ theorem clsSurj {K : Cx.{w} R} {n : ℕ} (z : K.H n) : ∃ a ha, z = K.cls a ha 
   obtain ⟨⟨a, ha⟩, rfl⟩ := Submodule.Quotient.mk_surjective _ z
   exact ⟨a, ha, rfl⟩
 
-theorem cls_add {K : Cx.{w} R} {n : ℕ} (a b : K.X n) (ha : K.d n a = 0) (hb : K.d n b = 0) (h) :
-    K.cls (a + b) h = K.cls a ha + K.cls b hb := rfl
+theorem cls_add {K : Cx.{w} R} {n : ℕ} (a b : K.X n) (ha : K.d n a = 0) (hb : K.d n b = 0) (h)
+    : K.cls (a + b) h = K.cls a ha + K.cls b hb :=
+  rfl
 
-theorem cls_smul {K : Cx.{w} R} {n : ℕ} (r : R) (a : K.X n) (ha : K.d n a = 0) (h) :
-    K.cls (r • a) h = r • K.cls a ha := rfl
+theorem cls_smul {K : Cx.{w} R} {n : ℕ} (r : R) (a : K.X n) (ha : K.d n a = 0) (h)
+    : K.cls (r • a) h = r • K.cls a ha :=
+  rfl
 
 theorem cls_zero' {K : Cx.{w} R} {n : ℕ} (h) : K.cls (n := n) 0 h = 0 := rfl
 
@@ -41,17 +43,25 @@ theorem mem_boundaries_zero_iff {K : Cx.{w} R} (a : K.X 0) : a ∈ K.B 0 ↔ a =
   show a ∈ (⊥ : Submodule R (K.X 0)) ↔ _
   exact Submodule.mem_bot R
 
-theorem mem_Bs {K : Cx.{w} R} {n : ℕ} (a : K.X (n + 1)) : a ∈ K.B (n + 1) ↔ ∃ b, K.d n b = a := Iff.rfl
+theorem mem_Bs {K : Cx.{w} R} {n : ℕ} (a : K.X (n + 1)) : a ∈ K.B (n + 1) ↔ ∃ b, K.d n b = a :=
+  Iff.rfl
 
-theorem class_zero_eq_zero_iff {K : Cx.{w} R} (a : K.X 0) (ha : K.d 0 a = 0) : K.cls a ha = 0 ↔ a = 0 := by
+theorem class_zero_eq_zero_iff {K : Cx.{w} R} (a : K.X 0) (ha : K.d 0 a = 0)
+    : K.cls a ha = 0 ↔ a = 0 := by
   rw [cls_eq_zero, mem_boundaries_zero_iff]
 
-theorem mapH_cls' {R' : Type} [CommRing R'] {σ : R →+* R'} {K : Cx.{w} R} {L : Cx.{w'} R'}
-    (φ : Cx.Hom K L σ) {n : ℕ} (a : K.X n) (ha : K.d n a = 0) (hb : L.d n (φ.f n a) = 0) :
-    φ.mapH n (K.cls a ha) = L.cls (φ.f n a) hb := rfl
+theorem mapH_cls'
+    {R' : Type} [CommRing R']
+    {σ : R →+* R'} {K : Cx.{w} R} {L : Cx.{w'} R'} (φ : Cx.Hom K L σ)
+    {n : ℕ} (a : K.X n) (ha : K.d n a = 0) (hb : L.d n (φ.f n a) = 0)
+    : φ.mapH n (K.cls a ha) = L.cls (φ.f n a) hb :=
+  rfl
 
-theorem cyc {R' : Type} [CommRing R'] {σ : R →+* R'} {K : Cx.{w} R} {L : Cx.{w'} R'}
-    (φ : Cx.Hom K L σ) {n : ℕ} (a : K.X n) (ha : K.d n a = 0) : L.d n (φ.f n a) = 0 := by
+theorem cyc
+    {R' : Type} [CommRing R']
+    {σ : R →+* R'} {K : Cx.{w} R} {L : Cx.{w'} R'} (φ : Cx.Hom K L σ)
+    {n : ℕ} (a : K.X n) (ha : K.d n a = 0)
+    : L.d n (φ.f n a) = 0 := by
   rw [φ.comm, ha, map_zero]
 
 end CrystallineSemistableComparison.CechClassBoundaries
@@ -63,53 +73,70 @@ variable {R : Type} [CommRing R]
 section LES
 variable {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R}
 
-theorem gf (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
-    (hfg : ∀ n, Function.Exact (f.f n) (g.f n)) {n : ℕ} (x : K.X n) : g.f n (f.f n x) = 0 :=
+theorem gf
+    (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+    (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
+    {n : ℕ} (x : K.X n)
+    : g.f n (f.f n x) = 0 :=
   (hfg n _).2 ⟨x, rfl⟩
 
-theorem conn_ex (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
-    (hfg : ∀ n, Function.Exact (f.f n) (g.f n)) {n : ℕ} (y : L.X n) (hz : M.d n (g.f n y) = 0) :
-    ∃ x : K.X (n + 1), f.f (n + 1) x = L.d n y :=
+theorem conn_ex
+    (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+    (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
+    {n : ℕ} (y : L.X n) (hz : M.d n (g.f n y) = 0)
+    : ∃ x : K.X (n + 1), f.f (n + 1) x = L.d n y :=
   (hfg (n + 1) _).1 (by rw [← g.comm, hz])
 
-theorem conn_cyc (f : Cx.Hom K L (RingHom.id R)) (hf : ∀ n, Function.Injective (f.f n)) {n : ℕ}
-    (y : L.X n) (x : K.X (n + 1)) (hx : f.f (n + 1) x = L.d n y) : K.d (n + 1) x = 0 := by
+theorem conn_cyc
+    (f : Cx.Hom K L (RingHom.id R)) (hf : ∀ n, Function.Injective (f.f n))
+    {n : ℕ} (y : L.X n) (x : K.X (n + 1)) (hx : f.f (n + 1) x = L.d n y)
+    : K.d (n + 1) x = 0 := by
   apply hf (n + 2); rw [← f.comm, hx, L.dd, map_zero]
 
-theorem conn_wd (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
-    (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n)) {n : ℕ}
-    (y y' : L.X n) (x x' : K.X (n + 1)) (hx : K.d (n + 1) x = 0) (hx' : K.d (n + 1) x' = 0)
-    (e : g.f n y = g.f n y') (h : f.f (n + 1) x = L.d n y) (h' : f.f (n + 1) x' = L.d n y') :
-    K.cls x hx = K.cls x' hx' := by
+theorem conn_wd
+    (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+    (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
+    {n : ℕ} (y y' : L.X n) (x x' : K.X (n + 1)) (hx : K.d (n + 1) x = 0) (hx' : K.d (n + 1) x' = 0)
+    (e : g.f n y = g.f n y') (h : f.f (n + 1) x = L.d n y) (h' : f.f (n + 1) x' = L.d n y')
+    : K.cls x hx = K.cls x' hx' := by
   rw [cls_eq, mem_Bs]
   obtain ⟨u, hu⟩ := (hfg n (y - y')).1 (by rw [map_sub, e, sub_self])
   refine ⟨u, hf (n + 1) ?_⟩
   rw [← f.comm, hu, map_sub, map_sub, h, h']
 
-theorem lift_ex (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
-    (hfg : ∀ n, Function.Exact (f.f n) (g.f n)) (hg : ∀ n, Function.Surjective (g.f n)) {n : ℕ}
-    (m : M.X n) (hm : M.d n m = 0) : ∃ y : L.X n, ∃ x : K.X (n + 1), g.f n y = m ∧ f.f (n + 1) x = L.d n y := by
+theorem lift_ex
+    (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+    (hfg : ∀ n, Function.Exact (f.f n) (g.f n)) (hg : ∀ n, Function.Surjective (g.f n))
+    {n : ℕ} (m : M.X n) (hm : M.d n m = 0)
+    : ∃ y : L.X n, ∃ x : K.X (n + 1), g.f n y = m ∧ f.f (n + 1) x = L.d n y := by
   obtain ⟨y, rfl⟩ := hg n m
   obtain ⟨x, hx⟩ := conn_ex f g hfg y hm
   exact ⟨y, x, rfl, hx⟩
 
-noncomputable def dfun (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+noncomputable def dfun
+    (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
     (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
-    (hg : ∀ n, Function.Surjective (g.f n)) {n : ℕ} (m : M.X n) (hm : M.d n m = 0) : K.H (n + 1) :=
+    (hg : ∀ n, Function.Surjective (g.f n))
+    {n : ℕ} (m : M.X n) (hm : M.d n m = 0)
+    : K.H (n + 1) :=
   K.cls (lift_ex f g hfg hg m hm).choose_spec.choose
     (conn_cyc f hf _ _ (lift_ex f g hfg hg m hm).choose_spec.choose_spec.2)
 
-theorem dfun_spec (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+theorem dfun_spec
+    (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
     (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
-    (hg : ∀ n, Function.Surjective (g.f n)) {n : ℕ} (m : M.X n) (hm : M.d n m = 0)
-    (y : L.X n) (x : K.X (n + 1)) (hx : K.d (n + 1) x = 0) (hy : g.f n y = m) (h : f.f (n + 1) x = L.d n y) :
-    dfun f g hf hfg hg m hm = K.cls x hx :=
+    (hg : ∀ n, Function.Surjective (g.f n))
+    {n : ℕ} (m : M.X n) (hm : M.d n m = 0) (y : L.X n) (x : K.X (n + 1)) (hx : K.d (n + 1) x = 0)
+    (hy : g.f n y = m) (h : f.f (n + 1) x = L.d n y)
+    : dfun f g hf hfg hg m hm = K.cls x hx :=
   conn_wd f g hf hfg _ _ _ _ _ _ (by rw [(lift_ex f g hfg hg m hm).choose_spec.choose_spec.1, hy])
     (lift_ex f g hfg hg m hm).choose_spec.choose_spec.2 h
 
-noncomputable def dZ (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+noncomputable def dZ
+    (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
     (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
-    (hg : ∀ n, Function.Surjective (g.f n)) (n : ℕ) : M.Z n →ₗ[R] K.H (n + 1) where
+    (hg : ∀ n, Function.Surjective (g.f n)) (n : ℕ)
+    : M.Z n →ₗ[R] K.H (n + 1) where
   toFun m := dfun f g hf hfg hg m.1 m.2
   map_add' m₁ m₂ := by
     obtain ⟨y₁, x₁, e₁, h₁⟩ := lift_ex f g hfg hg m₁.1 m₁.2
@@ -118,7 +145,8 @@ noncomputable def dZ (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id
     have c₂ := conn_cyc f hf _ _ h₂
     rw [dfun_spec f g hf hfg hg _ _ y₁ x₁ c₁ e₁ h₁, dfun_spec f g hf hfg hg _ _ y₂ x₂ c₂ e₂ h₂,
       dfun_spec f g hf hfg hg _ _ (y₁ + y₂) (x₁ + x₂) (by rw [map_add (f := _), c₁, c₂, add_zero])
-        (by rw [map_add (f := _), e₁, e₂]; rfl) (by rw [map_add (f := _), map_add (f := _), h₁, h₂])]
+        (by rw [map_add (f := _), e₁, e₂]; rfl)
+        (by rw [map_add (f := _), map_add (f := _), h₁, h₂])]
     rfl
   map_smul' r m := by
     obtain ⟨y, x, e, h⟩ := lift_ex f g hfg hg m.1 m.2
@@ -128,62 +156,77 @@ noncomputable def dZ (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id
         (by rw [map_smul, e]; rfl) (by rw [map_smul, map_smul, h])]
     rfl
 
-theorem dZ_B (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+theorem dZ_B
+    (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
     (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
-    (hg : ∀ n, Function.Surjective (g.f n)) (n : ℕ) (m : M.Z n) (hm : m.1 ∈ M.B n) :
-    dZ f g hf hfg hg n m = 0 := by
+    (hg : ∀ n, Function.Surjective (g.f n))
+    (n : ℕ) (m : M.Z n) (hm : m.1 ∈ M.B n)
+    : dZ f g hf hfg hg n m = 0 := by
   show dfun f g hf hfg hg m.1 m.2 = 0
   cases n with
   | zero =>
     rw [mem_boundaries_zero_iff] at hm
-    rw [dfun_spec f g hf hfg hg _ _ 0 0 (map_zero _) (by rw [map_zero, hm]) (by rw [map_zero, map_zero])]
+    rw [dfun_spec f g hf hfg hg _ _ 0 0 (map_zero _) (by rw [map_zero, hm])
+      (by rw [map_zero, map_zero])]
     rfl
   | succ k =>
     obtain ⟨m₀, hm₀⟩ := (mem_Bs _).1 hm
     obtain ⟨y₀, rfl⟩ := hg k m₀
-    rw [dfun_spec f g hf hfg hg _ _ (L.d k y₀) 0 (map_zero _) (by rw [← g.comm, hm₀]) (by rw [map_zero, L.dd])]
+    rw [dfun_spec f g hf hfg hg _ _ (L.d k y₀) 0 (map_zero _) (by rw [← g.comm, hm₀])
+      (by rw [map_zero, L.dd])]
     rfl
 
-noncomputable def dH (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+noncomputable def dH
+    (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
     (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
-    (hg : ∀ n, Function.Surjective (g.f n)) (n : ℕ) : M.H n →ₗ[R] K.H (n + 1) :=
-  Submodule.liftQ _ (dZ f g hf hfg hg n) (fun m hm => by
-    rw [LinearMap.mem_ker]; exact dZ_B f g hf hfg hg n m hm)
+    (hg : ∀ n, Function.Surjective (g.f n)) (n : ℕ)
+    : M.H n →ₗ[R] K.H (n + 1) :=
+  Submodule.liftQ _ (dZ f g hf hfg hg n)
+    (fun m hm => by rw [LinearMap.mem_ker]; exact dZ_B f g hf hfg hg n m hm)
 
-theorem dH_char (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+theorem dH_char
+    (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
     (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
-    (hg : ∀ n, Function.Surjective (g.f n)) (n : ℕ) (y : L.X n) (x : K.X (n + 1)) (hz : M.d n (g.f n y) = 0)
-    (hx : K.d (n + 1) x = 0) (h : f.f (n + 1) x = L.d n y) :
-    dH f g hf hfg hg n (M.cls (g.f n y) hz) = K.cls x hx :=
+    (hg : ∀ n, Function.Surjective (g.f n))
+    (n : ℕ) (y : L.X n) (x : K.X (n + 1))
+    (hz : M.d n (g.f n y) = 0) (hx : K.d (n + 1) x = 0) (h : f.f (n + 1) x = L.d n y)
+    : dH f g hf hfg hg n (M.cls (g.f n y) hz) = K.cls x hx :=
   dfun_spec f g hf hfg hg _ hz y x hx rfl h
 
 end LES
 
-theorem pow3 {M : Type w} [AddCommGroup M] [Module R M] (s : R) (x : M) : s ^ 3 • x = s • s • s • x := by
+theorem pow3 {M : Type w} [AddCommGroup M] [Module R M] (s : R) (x : M)
+    : s ^ 3 • x = s • s • s • x := by
   simp only [smul_smul, pow_succ, pow_zero, one_mul, mul_assoc]
 
-theorem sqH {A : Cx.{w} R} {B : Cx.{w'} R} {C : Cx.{w''} R} {D : Cx.{t} R}
+theorem sqH
+    {A : Cx.{w} R} {B : Cx.{w'} R} {C : Cx.{w''} R} {D : Cx.{t} R}
     (φ : Cx.Hom A B (RingHom.id R)) (ψ : Cx.Hom B D (RingHom.id R)) (φ' : Cx.Hom A C (RingHom.id R))
-    (ψ' : Cx.Hom C D (RingHom.id R)) (h : ∀ n x, ψ.f n (φ.f n x) = ψ'.f n (φ'.f n x)) (n : ℕ) (z : A.H n) :
-    ψ.mapH n (φ.mapH n z) = ψ'.mapH n (φ'.mapH n z) := by
+    (ψ' : Cx.Hom C D (RingHom.id R)) (h : ∀ n x, ψ.f n (φ.f n x) = ψ'.f n (φ'.f n x))
+    (n : ℕ) (z : A.H n)
+    : ψ.mapH n (φ.mapH n z) = ψ'.mapH n (φ'.mapH n z) := by
   obtain ⟨x, hx, rfl⟩ := clsSurj z
   rw [mapH_cls' φ _ hx (cyc φ _ hx), mapH_cls' ψ _ _ (cyc ψ _ (cyc φ _ hx)),
     mapH_cls' φ' _ hx (cyc φ' _ hx), mapH_cls' ψ' _ _ (cyc ψ' _ (cyc φ' _ hx)), cls_eq, h, sub_self]
   exact zero_mem _
 
-theorem dnat {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R} {K' : Cx.{t} R} {L' : Cx.{t'} R} {M' : Cx.{u} R}
+theorem dnat
+    {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R} {K' : Cx.{t} R} {L' : Cx.{t'} R} {M' : Cx.{u} R}
     (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
     (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
-    (hg : ∀ n, Function.Surjective (g.f n))
-    (f' : Cx.Hom K' L' (RingHom.id R)) (g' : Cx.Hom L' M' (RingHom.id R))
-    (a : Cx.Hom K K' (RingHom.id R)) (b : Cx.Hom L L' (RingHom.id R)) (c : Cx.Hom M M' (RingHom.id R))
-    (hab : ∀ n x, b.f n (f.f n x) = f'.f n (a.f n x)) (hbc : ∀ n x, c.f n (g.f n x) = g'.f n (b.f n x))
-    (δ : ∀ n, M.H n →ₗ[R] K.H (n + 1)) (δ' : ∀ n, M'.H n →ₗ[R] K'.H (n + 1))
+    (hg : ∀ n, Function.Surjective (g.f n)) (f' : Cx.Hom K' L' (RingHom.id R))
+    (g' : Cx.Hom L' M' (RingHom.id R)) (a : Cx.Hom K K' (RingHom.id R))
+    (b : Cx.Hom L L' (RingHom.id R)) (c : Cx.Hom M M' (RingHom.id R))
+    (hab : ∀ n x, b.f n (f.f n x) = f'.f n (a.f n x))
+    (hbc : ∀ n x, c.f n (g.f n x) = g'.f n (b.f n x)) (δ : ∀ n, M.H n →ₗ[R] K.H (n + 1))
+    (δ' : ∀ n, M'.H n →ₗ[R] K'.H (n + 1))
     (hδ : ∀ n (y : L.X n) (x : K.X (n + 1)) (hz : M.d n (g.f n y) = 0) (hx : K.d (n + 1) x = 0),
       f.f (n + 1) x = L.d n y → δ n (M.cls (g.f n y) hz) = K.cls x hx)
-    (hδ' : ∀ n (y : L'.X n) (x : K'.X (n + 1)) (hz : M'.d n (g'.f n y) = 0) (hx : K'.d (n + 1) x = 0),
-      f'.f (n + 1) x = L'.d n y → δ' n (M'.cls (g'.f n y) hz) = K'.cls x hx)
-    (n : ℕ) (w : M.H n) : δ' n (c.mapH n w) = a.mapH (n + 1) (δ n w) := by
+    (hδ'
+      : ∀ n (y : L'.X n) (x : K'.X (n + 1)) (hz : M'.d n (g'.f n y) = 0) (hx : K'.d (n + 1) x = 0),
+        f'.f (n + 1) x = L'.d n y → δ' n (M'.cls (g'.f n y) hz) = K'.cls x hx)
+    (n : ℕ) (w : M.H n)
+    : δ' n (c.mapH n w) = a.mapH (n + 1) (δ n w) := by
   obtain ⟨m, hm, rfl⟩ := clsSurj w
   obtain ⟨y, rfl⟩ := hg n m
   obtain ⟨x, hx⟩ := conn_ex f g hfg y hm
@@ -196,8 +239,8 @@ theorem dnat {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R} {K' : Cx.{t} R} {L'
   rw [e1]
   exact hδ' n (b.f n y) (a.f (n + 1) x) h2 _ (by rw [← hab, hx, b.comm])
 
-theorem kill_iff {K : Cx.{w} R} (s : R) (n : ℕ) :
-    ExactUpTo s (K.d n) (K.d (n + 1)) ↔ ∀ z : K.H (n + 1), s • z = 0 := by
+theorem kill_iff {K : Cx.{w} R} (s : R) (n : ℕ)
+    : ExactUpTo s (K.d n) (K.d (n + 1)) ↔ ∀ z : K.H (n + 1), s • z = 0 := by
   constructor
   · intro h z
     obtain ⟨y, hy, rfl⟩ := clsSurj z
@@ -211,7 +254,17 @@ theorem kill_iff {K : Cx.{w} R} (s : R) (n : ℕ) :
 
 end CrystallineSemistableComparison.CechClassBoundaries
 
-theorem CrystallineSemistableComparison.P.les : ∀ {R : Type} [CommRing R] {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R} (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R)) (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n)) (hg : ∀ n, Function.Surjective (g.f n)), ∃ δ : ∀ n, M.H n →ₗ[R] K.H (n + 1), (∀ n (y : L.X n) (x : K.X (n + 1)) hz hx, f.f (n + 1) x = L.d n y → δ n (M.cls (g.f n y) hz) = K.cls x hx) ∧ Function.Injective (f.mapH 0) ∧ (∀ n, Function.Exact (f.mapH n) (g.mapH n)) ∧ (∀ n, Function.Exact (g.mapH n) (δ n)) ∧ ∀ n, Function.Exact (δ n) (f.mapH (n + 1)) := by
+theorem CrystallineSemistableComparison.P.les
+    : ∀ {R : Type} [CommRing R] {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R}
+        (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+        (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
+        (hg : ∀ n, Function.Surjective (g.f n)),
+      ∃ δ : ∀ n, M.H n →ₗ[R] K.H (n + 1),
+        (∀ n (y : L.X n) (x : K.X (n + 1)) hz hx,
+            f.f (n + 1) x = L.d n y → δ n (M.cls (g.f n y) hz) = K.cls x hx)
+          ∧ Function.Injective (f.mapH 0) ∧ (∀ n, Function.Exact (f.mapH n) (g.mapH n))
+          ∧ (∀ n, Function.Exact (g.mapH n) (δ n))
+          ∧ ∀ n, Function.Exact (δ n) (f.mapH (n + 1)) := by
   intro R _ K L M f g hf hfg hg
   have char := dH_char f g hf hfg hg
   refine ⟨dH f g hf hfg hg, char, ?_, fun n => ?_, fun n => ?_, fun n => ?_⟩
@@ -236,14 +289,15 @@ theorem CrystallineSemistableComparison.P.les : ∀ {R : Type} [CommRing R] {K :
         obtain ⟨y₀, rfl⟩ := hg k m₀
         have e : g.f (k + 1) (y - L.d k y₀) = 0 := by rw [map_sub, ← g.comm, hm₀, sub_self]
         obtain ⟨x, hx⟩ := (hfg _ _).1 e
-        have hxc : K.d (k + 1) x = 0 := hf _ (by rw [← f.comm, hx, map_sub, hy, L.dd, sub_self, map_zero])
+        have hxc : K.d (k + 1) x = 0 :=
+          hf _ (by rw [← f.comm, hx, map_sub, hy, L.dd, sub_self, map_zero])
         refine ⟨K.cls x hxc, ?_⟩
         rw [mapH_cls' f _ hxc (cyc f _ hxc), cls_eq, mem_Bs]
         exact ⟨-y₀, by rw [hx, map_neg]; abel⟩
     · rintro ⟨z', rfl⟩
       obtain ⟨x, hx, rfl⟩ := clsSurj z'
-      rw [mapH_cls' f _ hx (cyc f _ hx), mapH_cls' g _ (cyc f _ hx) (cyc g _ (cyc f _ hx)), cls_eq_zero,
-        gf f g hfg]
+      rw [mapH_cls' f _ hx (cyc f _ hx), mapH_cls' g _ (cyc f _ hx) (cyc g _ (cyc f _ hx)),
+        cls_eq_zero, gf f g hfg]
       exact zero_mem _
   · intro w
     constructor
@@ -277,7 +331,20 @@ theorem CrystallineSemistableComparison.P.les : ∀ {R : Type} [CommRing R] {K :
       rw [char n y x hm hxc hx, mapH_cls' f _ hxc (cyc f _ hxc), cls_eq_zero, mem_Bs]
       exact ⟨y, hx.symm⟩
 
-theorem CrystallineSemistableComparison.P.five : ∀ {R : Type} [CommRing R] {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R} (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R)) (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n)) (hg : ∀ n, Function.Surjective (g.f n)) {K' : Cx.{t} R} {L' : Cx.{t'} R} {M' : Cx.{u} R} (f' : Cx.Hom K' L' (RingHom.id R)) (g' : Cx.Hom L' M' (RingHom.id R)) (hf' : ∀ n, Function.Injective (f'.f n)) (hfg' : ∀ n, Function.Exact (f'.f n) (g'.f n)) (hg' : ∀ n, Function.Surjective (g'.f n)) (a : Cx.Hom K K' (RingHom.id R)) (b : Cx.Hom L L' (RingHom.id R)) (c : Cx.Hom M M' (RingHom.id R)) (hab : ∀ n x, b.f n (f.f n x) = f'.f n (a.f n x)) (hbc : ∀ n x, c.f n (g.f n x) = g'.f n (b.f n x)) (s : R), ((∀ n, UpTo s (a.mapH n)) → (∀ n, UpTo s (c.mapH n)) → ∀ n, UpTo (s ^ 3) (b.mapH n)) ∧ ((∀ n, UpTo s (b.mapH n)) → (∀ n, UpTo s (c.mapH n)) → ∀ n, UpTo (s ^ 3) (a.mapH n)) ∧ ((∀ n, UpTo s (a.mapH n)) → (∀ n, UpTo s (b.mapH n)) → ∀ n, UpTo (s ^ 3) (c.mapH n)) := by
+theorem CrystallineSemistableComparison.P.five
+    : ∀ {R : Type} [CommRing R] {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R}
+        (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+        (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
+        (hg : ∀ n, Function.Surjective (g.f n)) {K' : Cx.{t} R} {L' : Cx.{t'} R} {M' : Cx.{u} R}
+        (f' : Cx.Hom K' L' (RingHom.id R)) (g' : Cx.Hom L' M' (RingHom.id R))
+        (hf' : ∀ n, Function.Injective (f'.f n)) (hfg' : ∀ n, Function.Exact (f'.f n) (g'.f n))
+        (hg' : ∀ n, Function.Surjective (g'.f n)) (a : Cx.Hom K K' (RingHom.id R))
+        (b : Cx.Hom L L' (RingHom.id R)) (c : Cx.Hom M M' (RingHom.id R))
+        (hab : ∀ n x, b.f n (f.f n x) = f'.f n (a.f n x))
+        (hbc : ∀ n x, c.f n (g.f n x) = g'.f n (b.f n x)) (s : R),
+      ((∀ n, UpTo s (a.mapH n)) → (∀ n, UpTo s (c.mapH n)) → ∀ n, UpTo (s ^ 3) (b.mapH n))
+        ∧ ((∀ n, UpTo s (b.mapH n)) → (∀ n, UpTo s (c.mapH n)) → ∀ n, UpTo (s ^ 3) (a.mapH n))
+        ∧ ((∀ n, UpTo s (a.mapH n)) → (∀ n, UpTo s (b.mapH n)) → ∀ n, UpTo (s ^ 3) (c.mapH n)) := by
   intro R _ K L M f g hf hfg hg K' L' M' f' g' hf' hfg' hg' a b c hab hbc s
   obtain ⟨δ, hδ, i0, e1, e2, e3⟩ := CrystallineSemistableComparison.P.les f g hf hfg hg
   obtain ⟨δ', hδ', i0', e1', e2', e3'⟩ := CrystallineSemistableComparison.P.les f' g' hf' hfg' hg'
@@ -285,10 +352,12 @@ theorem CrystallineSemistableComparison.P.five : ∀ {R : Type} [CommRing R] {K 
   have sq2 : ∀ n z, c.mapH n (g.mapH n z) = g'.mapH n (b.mapH n z) := sqH g c b g' hbc
   have sq3 : ∀ n w, δ' n (c.mapH n w) = a.mapH (n + 1) (δ n w) :=
     dnat f g hf hfg hg f' g' a b c hab hbc δ δ' hδ hδ'
-  refine ⟨fun ha hc n => ⟨fun z hz => ?_, fun z' => ?_⟩, fun hb hc n => ⟨fun k hk => ?_, fun k' => ?_⟩,
-    fun ha hb n => ⟨fun w hw => ?_, fun w' => ?_⟩⟩
-  ·
-    have h1 : c.mapH n (g.mapH n z) = 0 := by rw [sq2, hz, map_zero]
+  refine ⟨
+    fun ha hc n => ⟨fun z hz => ?_, fun z' => ?_⟩,
+    fun hb hc n => ⟨fun k hk => ?_, fun k' => ?_⟩,
+    fun ha hb n => ⟨fun w hw => ?_, fun w' => ?_⟩
+  ⟩
+  · have h1 : c.mapH n (g.mapH n z) = 0 := by rw [sq2, hz, map_zero]
     have h2 := (hc n).1 _ h1
     rw [← map_smul (g.mapH n)] at h2
     obtain ⟨k, hk⟩ := (e1 n _).1 h2
@@ -306,10 +375,11 @@ theorem CrystallineSemistableComparison.P.five : ∀ {R : Type} [CommRing R] {K 
       have h7 := (ha (j + 1)).1 _ h6
       rw [smul_sub, sub_eq_zero] at h7
       have h8 : f.mapH (j + 1) (δ j w) = 0 := (e3 j _).2 ⟨w, rfl⟩
-      rw [pow3, ← hk, ← map_smul (f.mapH (j + 1)), ← map_smul (f.mapH (j + 1)), h7, map_smul, h8, smul_zero]
-  ·
-    obtain ⟨w, hw⟩ := (hc n).2 (g'.mapH n z')
-    have h1 : a.mapH (n + 1) (δ n w) = 0 := by rw [← sq3, hw, map_smul, (e2' n _).2 ⟨z', rfl⟩, smul_zero]
+      rw [pow3, ← hk, ← map_smul (f.mapH (j + 1)), ← map_smul (f.mapH (j + 1)), h7, map_smul, h8,
+        smul_zero]
+  · obtain ⟨w, hw⟩ := (hc n).2 (g'.mapH n z')
+    have h1 : a.mapH (n + 1) (δ n w) = 0 := by
+      rw [← sq3, hw, map_smul, (e2' n _).2 ⟨z', rfl⟩, smul_zero]
     have h2 := (ha (n + 1)).1 _ h1
     rw [← map_smul (δ n)] at h2
     obtain ⟨z, hz⟩ := (e2 n _).1 h2
@@ -319,8 +389,7 @@ theorem CrystallineSemistableComparison.P.five : ∀ {R : Type} [CommRing R] {K 
     obtain ⟨k, hk⟩ := (ha n).2 k'
     refine ⟨s • z - f.mapH n k, ?_⟩
     rw [map_sub, map_smul, sq1, hk, map_smul, hk', smul_sub, sub_sub_cancel, smul_smul, ← pow_succ']
-  ·
-    have h1 : b.mapH n (f.mapH n k) = 0 := by rw [sq1, hk, map_zero]
+  · have h1 : b.mapH n (f.mapH n k) = 0 := by rw [sq1, hk, map_zero]
     have h2 := (hb n).1 _ h1
     rw [← map_smul (f.mapH n)] at h2
     cases n with
@@ -336,9 +405,9 @@ theorem CrystallineSemistableComparison.P.five : ∀ {R : Type} [CommRing R] {K 
         rw [map_sub, sq2, hz, map_smul, hz', map_smul, sub_self]
       have h5 := (hc j).1 _ h4
       rw [smul_sub, sub_eq_zero] at h5
-      rw [pow3, ← hw, ← map_smul (δ j), ← map_smul (δ j), ← h5, ← map_smul (g.mapH j), (e2 j _).2 ⟨_, rfl⟩]
-  ·
-    obtain ⟨z, hz⟩ := (hb n).2 (f'.mapH n k')
+      rw [pow3, ← hw, ← map_smul (δ j), ← map_smul (δ j), ← h5, ← map_smul (g.mapH j),
+        (e2 j _).2 ⟨_, rfl⟩]
+  · obtain ⟨z, hz⟩ := (hb n).2 (f'.mapH n k')
     have h1 : c.mapH n (g.mapH n z) = 0 := by
       rw [sq2, hz, map_smul, (e1' n _).2 ⟨k', rfl⟩, smul_zero]
     have h2 := (hc n).1 _ h1
@@ -356,9 +425,9 @@ theorem CrystallineSemistableComparison.P.five : ∀ {R : Type} [CommRing R] {K 
       obtain ⟨w', hw'⟩ := (e3' j _).1 h3
       obtain ⟨w, hw⟩ := (hc j).2 w'
       refine ⟨s • k - δ j w, ?_⟩
-      rw [map_sub, map_smul, ← sq3, hw, map_smul, hw', smul_sub, sub_sub_cancel, smul_smul, ← pow_succ']
-  ·
-    have h1 : a.mapH (n + 1) (δ n w) = 0 := by rw [← sq3, hw, map_zero]
+      rw [map_sub, map_smul, ← sq3, hw, map_smul, hw', smul_sub, sub_sub_cancel, smul_smul,
+        ← pow_succ']
+  · have h1 : a.mapH (n + 1) (δ n w) = 0 := by rw [← sq3, hw, map_zero]
     have h2 := (ha (n + 1)).1 _ h1
     rw [← map_smul (δ n)] at h2
     obtain ⟨z, hz⟩ := (e2 n _).1 h2
@@ -369,9 +438,9 @@ theorem CrystallineSemistableComparison.P.five : ∀ {R : Type} [CommRing R] {K 
       rw [map_sub, map_smul, sq1, hk, map_smul, hk', sub_self]
     have h5 := (hb n).1 _ h4
     rw [smul_sub, sub_eq_zero] at h5
-    rw [pow3, ← hz, ← map_smul (g.mapH n), ← map_smul (g.mapH n), h5, map_smul, (e1 n _).2 ⟨k, rfl⟩, smul_zero]
-  ·
-    obtain ⟨k, hk⟩ := (ha (n + 1)).2 (δ' n w')
+    rw [pow3, ← hz, ← map_smul (g.mapH n), ← map_smul (g.mapH n), h5, map_smul, (e1 n _).2 ⟨k, rfl⟩,
+      smul_zero]
+  · obtain ⟨k, hk⟩ := (ha (n + 1)).2 (δ' n w')
     have h1 : b.mapH (n + 1) (f.mapH (n + 1) k) = 0 := by
       rw [sq1, hk, map_smul, (e3' n _).2 ⟨w', rfl⟩, smul_zero]
     have h2 := (hb (n + 1)).1 _ h1
@@ -384,7 +453,19 @@ theorem CrystallineSemistableComparison.P.five : ∀ {R : Type} [CommRing R] {K 
     refine ⟨s • w - g.mapH n z, ?_⟩
     rw [map_sub, map_smul, sq2, hz, map_smul, hz', smul_sub, sub_sub_cancel, smul_smul, ← pow_succ']
 
-theorem CrystallineSemistableComparison.P.res_2of3 : ∀ {R : Type} [CommRing R] {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R} (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R)) (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n)) (hg : ∀ n, Function.Surjective (g.f n)) {A : Type t} {B : Type t'} {D : Type u} [AddCommGroup A] [AddCommGroup B] [AddCommGroup D] [Module R A] [Module R B] [Module R D] (i : A →ₗ[R] B) (p : B →ₗ[R] D) (hi : Function.Injective i) (hip : Function.Exact i p) (hp : Function.Surjective p) (a : A →ₗ[R] K.X 0) (b : B →ₗ[R] L.X 0) (c : D →ₗ[R] M.X 0) (hab : ∀ x, b (i x) = f.f 0 (a x)) (hbc : ∀ x, c (p x) = g.f 0 (b x)) (hb : ∀ x, L.d 0 (b x) = 0) (s : R), (K.ResUpTo s a → M.ResUpTo s c → L.ResUpTo (s ^ 3) b) ∧ (L.ResUpTo s b → M.ResUpTo s c → K.ResUpTo (s ^ 3) a) ∧ (K.ResUpTo s a → L.ResUpTo s b → M.ResUpTo (s ^ 3) c) := by
+theorem CrystallineSemistableComparison.P.res_2of3
+    : ∀ {R : Type} [CommRing R] {K : Cx.{w} R} {L : Cx.{w'} R} {M : Cx.{w''} R}
+        (f : Cx.Hom K L (RingHom.id R)) (g : Cx.Hom L M (RingHom.id R))
+        (hf : ∀ n, Function.Injective (f.f n)) (hfg : ∀ n, Function.Exact (f.f n) (g.f n))
+        (hg : ∀ n, Function.Surjective (g.f n)) {A : Type t} {B : Type t'} {D : Type u}
+        [AddCommGroup A] [AddCommGroup B] [AddCommGroup D] [Module R A] [Module R B] [Module R D]
+        (i : A →ₗ[R] B) (p : B →ₗ[R] D) (hi : Function.Injective i) (hip : Function.Exact i p)
+        (hp : Function.Surjective p) (a : A →ₗ[R] K.X 0) (b : B →ₗ[R] L.X 0) (c : D →ₗ[R] M.X 0)
+        (hab : ∀ x, b (i x) = f.f 0 (a x)) (hbc : ∀ x, c (p x) = g.f 0 (b x))
+        (hb : ∀ x, L.d 0 (b x) = 0) (s : R),
+      (K.ResUpTo s a → M.ResUpTo s c → L.ResUpTo (s ^ 3) b)
+        ∧ (L.ResUpTo s b → M.ResUpTo s c → K.ResUpTo (s ^ 3) a)
+        ∧ (K.ResUpTo s a → L.ResUpTo s b → M.ResUpTo (s ^ 3) c) := by
   intro R _ K L M f g hf hfg hg A B D _ _ _ _ _ _ i p hi hip hp a b c hab hbc hb s
   obtain ⟨δ, hδ, i0, e1, e2, e3⟩ := CrystallineSemistableComparison.P.les f g hf hfg hg
   have ha0 : ∀ x, K.d 0 (a x) = 0 := fun x => hf 1 (by rw [map_zero, ← f.comm, ← hab, hb])
@@ -392,9 +473,14 @@ theorem CrystallineSemistableComparison.P.res_2of3 : ∀ {R : Type} [CommRing R]
     intro x
     obtain ⟨x', rfl⟩ := hp x
     rw [hbc, g.comm, hb, map_zero]
-  refine ⟨fun ⟨_, ka1, ka2, ka3⟩ ⟨_, mc1, mc2, mc3⟩ => ⟨hb, fun x hx => ?_, fun y hy => ?_, fun n => (kill_iff _ _).2 fun z => ?_⟩,
-    fun ⟨_, lb1, lb2, lb3⟩ ⟨_, mc1, mc2, mc3⟩ => ⟨ha0, fun x hx => ?_, fun k hk => ?_, fun n => (kill_iff _ _).2 fun z => ?_⟩,
-    fun ⟨_, ka1, ka2, ka3⟩ ⟨_, lb1, lb2, lb3⟩ => ⟨hc0, fun e he => ?_, fun m hm => ?_, fun n => (kill_iff _ _).2 fun w => ?_⟩⟩
+  refine ⟨
+    fun ⟨_, ka1, ka2, ka3⟩ ⟨_, mc1, mc2, mc3⟩ =>
+      ⟨hb, fun x hx => ?_, fun y hy => ?_, fun n => (kill_iff _ _).2 fun z => ?_⟩,
+    fun ⟨_, lb1, lb2, lb3⟩ ⟨_, mc1, mc2, mc3⟩ =>
+      ⟨ha0, fun x hx => ?_, fun k hk => ?_, fun n => (kill_iff _ _).2 fun z => ?_⟩,
+    fun ⟨_, ka1, ka2, ka3⟩ ⟨_, lb1, lb2, lb3⟩ =>
+      ⟨hc0, fun e he => ?_, fun m hm => ?_, fun n => (kill_iff _ _).2 fun w => ?_⟩
+  ⟩
   · have h1 : c (p x) = 0 := by rw [hbc, hx, map_zero]
     have h2 := mc1 _ h1
     rw [← map_smul p] at h2
@@ -407,7 +493,8 @@ theorem CrystallineSemistableComparison.P.res_2of3 : ∀ {R : Type} [CommRing R]
     obtain ⟨x', rfl⟩ := hp e
     rw [hbc] at he
     obtain ⟨k, hk⟩ := (hfg 0 (s • y - b x')).1 (by rw [map_sub, map_smul, he, sub_self])
-    have hkc : K.d 0 k = 0 := hf 1 (by rw [map_zero, ← f.comm, hk, map_sub, map_smul, hy, hb, smul_zero, sub_zero])
+    have hkc : K.d 0 k = 0 :=
+      hf 1 (by rw [map_zero, ← f.comm, hk, map_sub, map_smul, hy, hb, smul_zero, sub_zero])
     obtain ⟨a0, ha0'⟩ := ka2 k hkc
     have e1 : b (i a0) = s • (s • y - b x') := by rw [hab, ha0', map_smul, hk]
     refine ⟨s • i a0 + s • s • x', ?_⟩
@@ -448,8 +535,7 @@ theorem CrystallineSemistableComparison.P.res_2of3 : ∀ {R : Type} [CommRing R]
           (cls_eq _ _ _ _).2 (by rw [← hbc, he, sub_self]; exact zero_mem _)
         rw [e', hδ 0 (b x) 0 _ (map_zero _) (by rw [map_zero, hb])]
         rfl
-      | succ j =>
-        rw [(kill_iff _ _).1 (mc3 j) w, map_zero]
+      | succ j => rw [(kill_iff _ _).1 (mc3 j) w, map_zero]
     rw [pow3, ← hw, ← map_smul (δ n), h2, smul_zero]
   · obtain ⟨x, rfl⟩ := hp e
     rw [hbc] at he
@@ -464,8 +550,9 @@ theorem CrystallineSemistableComparison.P.res_2of3 : ∀ {R : Type} [CommRing R]
     rw [← map_smul (δ 0)] at h1
     obtain ⟨z, hz⟩ := (e2 0 _).1 h1
     obtain ⟨y, hy, rfl⟩ := clsSurj z
-    rw [mapH_cls' g _ hy (cyc g _ hy), ← cls_smul (h := by rw [map_smul, hm, smul_zero]), cls_eq, mem_boundaries_zero_iff,
-      sub_eq_zero] at hz
+    rw [mapH_cls' g _ hy (cyc g _ hy), ← cls_smul (h := by rw [map_smul, hm, smul_zero]), cls_eq,
+        mem_boundaries_zero_iff, sub_eq_zero]
+      at hz
     obtain ⟨x, hx⟩ := lb2 y hy
     refine ⟨s • p x, ?_⟩
     rw [map_smul, hbc, hx, map_smul, hz, pow3]
@@ -475,7 +562,12 @@ theorem CrystallineSemistableComparison.P.res_2of3 : ∀ {R : Type} [CommRing R]
     have h2 := (kill_iff _ _).1 (lb3 n) z
     rw [pow3, ← hz, ← map_smul (g.mapH (n + 1)), h2, map_zero, smul_zero]
 
-theorem CrystallineSemistableComparison.P.res_transfer : ∀ {R : Type} [CommRing R] {K : Cx.{w} R} {L : Cx.{w'} R} (φ : Cx.Hom K L (RingHom.id R)) {M : Type w''} [AddCommGroup M] [Module R M] (ε : M →ₗ[R] K.X 0) (s s' : R), (∀ n, UpTo s' (φ.mapH n)) → (K.ResUpTo s ε → L.ResUpTo (s * s') (φ.f 0 ∘ₗ ε)) ∧ ((∀ x, K.d 0 (ε x) = 0) → L.ResUpTo s (φ.f 0 ∘ₗ ε) → K.ResUpTo (s * s') ε) := by
+theorem CrystallineSemistableComparison.P.res_transfer
+    : ∀ {R : Type} [CommRing R] {K : Cx.{w} R} {L : Cx.{w'} R} (φ : Cx.Hom K L (RingHom.id R))
+        {M : Type w''} [AddCommGroup M] [Module R M] (ε : M →ₗ[R] K.X 0) (s s' : R),
+      (∀ n, UpTo s' (φ.mapH n))
+        → (K.ResUpTo s ε → L.ResUpTo (s * s') (φ.f 0 ∘ₗ ε))
+          ∧ ((∀ x, K.d 0 (ε x) = 0) → L.ResUpTo s (φ.f 0 ∘ₗ ε) → K.ResUpTo (s * s') ε) := by
   intro R _ K L φ M _ _ ε s s' hφ
   constructor
   · rintro ⟨h0, h1, h2, h3⟩
@@ -485,8 +577,10 @@ theorem CrystallineSemistableComparison.P.res_transfer : ∀ {R : Type} [CommRin
       have e1 : φ.mapH 0 (K.cls (ε x) (h0 x)) = 0 := by
         rw [mapH_cls' φ _ _ (cyc φ _ (h0 x)), class_zero_eq_zero_iff]; exact hx
       have e2 := (hφ 0).1 _ e1
-      rw [← cls_smul (h := by rw [map_smul, h0, smul_zero]), class_zero_eq_zero_iff, ← map_smul] at e2
-      rw [mul_smul]; exact h1 _ e2
+      rw [← cls_smul (h := by rw [map_smul, h0, smul_zero]), class_zero_eq_zero_iff, ← map_smul]
+        at e2
+      rw [mul_smul]
+      exact h1 _ e2
     · obtain ⟨z, hz⟩ := (hφ 0).2 (L.cls y hy)
       obtain ⟨a, ha, rfl⟩ := clsSurj z
       rw [mapH_cls' φ _ _ (cyc φ _ ha), ← cls_smul (h := by rw [map_smul, hy, smul_zero])] at hz
@@ -514,20 +608,31 @@ theorem CrystallineSemistableComparison.P.res_transfer : ∀ {R : Type} [CommRin
       have e1 : φ.mapH 0 (K.cls (ε x - s • y) hc) = 0 := by
         rw [mapH_cls' φ _ hc (cyc φ _ hc), class_zero_eq_zero_iff, map_sub, map_smul, hx, sub_self]
       have e2 := (hφ 0).1 _ e1
-      rw [← cls_smul (h := by rw [map_smul, hc, smul_zero]), class_zero_eq_zero_iff, smul_sub, sub_eq_zero] at e2
+      rw [← cls_smul (h := by rw [map_smul, hc, smul_zero]), class_zero_eq_zero_iff, smul_sub,
+          sub_eq_zero]
+        at e2
       refine ⟨s' • x, ?_⟩
       rw [map_smul, e2, mul_comm, mul_smul]
     · obtain ⟨u, hu⟩ := h3 n (φ.f (n + 1) y) (cyc φ _ hy)
       have e1 : φ.mapH (n + 1) (K.cls (s • y) (by rw [map_smul, hy, smul_zero])) = 0 := by
-        rw [mapH_cls' φ _ _ (cyc φ _ (by rw [map_smul, hy, smul_zero])), cls_eq_zero, mem_Bs, map_smul]
+        rw [mapH_cls' φ _ _ (cyc φ _ (by rw [map_smul, hy, smul_zero])), cls_eq_zero, mem_Bs,
+          map_smul]
         exact ⟨u, hu⟩
       have e2 := (hφ (n + 1)).1 _ e1
-      rw [← cls_smul (h := by rw [map_smul, map_smul, hy, smul_zero, smul_zero]), cls_eq_zero, mem_Bs] at e2
+      rw [← cls_smul (h := by rw [map_smul, map_smul, hy, smul_zero, smul_zero]), cls_eq_zero,
+          mem_Bs]
+        at e2
       obtain ⟨x, hx⟩ := e2
       refine ⟨x, ?_⟩
       rw [hx, mul_comm, mul_smul]
 
-theorem CrystallineSemistableComparison.P.res_semilinear : ∀ {R R' : Type} [CommRing R] [CommRing R'] {σ : R →+* R'} {K : Cx.{w} R} {L : Cx.{w'} R'} (φ : Cx.Hom K L σ) {M : Type w''} [AddCommGroup M] [Module R M] {M' : Type t} [AddCommGroup M'] [Module R' M'] (ε : M →ₗ[R] K.X 0) (ε' : M' →ₗ[R'] L.X 0) (a : M →ₛₗ[σ] M') (s : R), Function.Bijective a → (∀ n, Function.Bijective (φ.f n)) → (∀ x, φ.f 0 (ε x) = ε' (a x)) → (K.ResUpTo s ε ↔ L.ResUpTo (σ s) ε') := by
+theorem CrystallineSemistableComparison.P.res_semilinear
+    : ∀ {R R' : Type} [CommRing R] [CommRing R'] {σ : R →+* R'} {K : Cx.{w} R} {L : Cx.{w'} R'}
+        (φ : Cx.Hom K L σ) {M : Type w''} [AddCommGroup M] [Module R M] {M' : Type t}
+        [AddCommGroup M'] [Module R' M'] (ε : M →ₗ[R] K.X 0) (ε' : M' →ₗ[R'] L.X 0)
+        (a : M →ₛₗ[σ] M') (s : R),
+      Function.Bijective a → (∀ n, Function.Bijective (φ.f n)) → (∀ x, φ.f 0 (ε x) = ε' (a x))
+        → (K.ResUpTo s ε ↔ L.ResUpTo (σ s) ε') := by
   intro R R' _ _ σ K L φ M _ _ M' _ _ ε ε' a s ha hφ hc
   have inj : ∀ n (x : K.X n), φ.f n x = 0 ↔ x = 0 := fun n x => map_eq_zero_iff _ (hφ n).1
   constructor
@@ -564,7 +669,14 @@ theorem CrystallineSemistableComparison.P.res_semilinear : ∀ {R R' : Type} [Co
       refine ⟨u, (hφ (n + 1)).1 ?_⟩
       rw [← φ.comm, hu', map_smulₛₗ]
 
-theorem CrystallineSemistableComparison.P.ses_cochains : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {F₁ F₂ F₃ : C ⥤ ModuleCat.{w} R} (α : F₁ ⟶ F₂) (β : F₂ ⟶ F₃), (∀ T, Function.Injective (α.app T).hom) → (∀ T, Function.Exact (α.app T).hom (β.app T).hom) → (∀ T, Function.Surjective (β.app T).hom) → (∀ n, Function.Injective ((Mor.ofNatTrans α).hom.f n)) ∧ (∀ n, Function.Exact ((Mor.ofNatTrans α).hom.f n) ((Mor.ofNatTrans β).hom.f n)) ∧ ∀ n, Function.Surjective ((Mor.ofNatTrans β).hom.f n) := by
+theorem CrystallineSemistableComparison.P.ses_cochains
+    : ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {F₁ F₂ F₃ : C ⥤ ModuleCat.{w} R}
+        (α : F₁ ⟶ F₂) (β : F₂ ⟶ F₃),
+      (∀ T, Function.Injective (α.app T).hom) → (∀ T, Function.Exact (α.app T).hom (β.app T).hom)
+        → (∀ T, Function.Surjective (β.app T).hom)
+        → (∀ n, Function.Injective ((Mor.ofNatTrans α).hom.f n))
+          ∧ (∀ n, Function.Exact ((Mor.ofNatTrans α).hom.f n) ((Mor.ofNatTrans β).hom.f n))
+          ∧ ∀ n, Function.Surjective ((Mor.ofNatTrans β).hom.f n) := by
   intro R _ C _ F₁ F₂ F₃ α β hi he hs
   refine ⟨fun n x y hxy => ?_, fun n y => ⟨fun hy => ?_, ?_⟩, fun n y => ?_⟩
   · funext s

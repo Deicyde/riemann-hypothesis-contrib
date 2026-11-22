@@ -11,20 +11,24 @@ namespace ReciprocityTheory.ChartRestriction.G.Geo
 
 open MvPolynomial
 
-variable {K : Type*} [Fintype K] [DecidableEq K] {ι : K → Type*} [∀ k, Fintype (ι k)]
-  [∀ k, DecidableEq (ι k)]
+variable
+  {K : Type*} [Fintype K] [DecidableEq K]
+  {ι : K → Type*} [∀ k, Fintype (ι k)] [∀ k, DecidableEq (ι k)]
 
 variable (ι) in
 def segMono (i : (k : K) → ι k) : MvPolynomial (Σ k, ι k) ℂ := ∏ k, X ⟨k, i k⟩
 
-theorem eval_segMono (i : (k : K) → ι k) (z : (Σ k, ι k) → ℂ) : eval z (segMono ι i) = segre z i := by
+theorem eval_segMono (i : (k : K) → ι k) (z : (Σ k, ι k) → ℂ)
+    : eval z (segMono ι i) = segre z i := by
   simp [segMono, segre, map_prod]
 
-theorem segMono_homog (i : (k : K) → ι k) :
-    IsWeightedHomogeneous (blkW ι) (segMono ι i) (fun _ => 1) := by
-  have := IsWeightedHomogeneous.prod (w := blkW ι) Finset.univ
-    (fun k => (X ⟨k, i k⟩ : MvPolynomial (Σ k, ι k) ℂ))
-    (fun k => blkW ι ⟨k, i k⟩) (fun k _ => isWeightedHomogeneous_X ℂ _ _)
+theorem segMono_homog (i : (k : K) → ι k)
+    : IsWeightedHomogeneous (blkW ι) (segMono ι i) (fun _ => 1) := by
+  have :=
+    IsWeightedHomogeneous.prod (w := blkW ι) Finset.univ
+      (fun k => (X ⟨k, i k⟩ : MvPolynomial (Σ k, ι k) ℂ))
+      (fun k => blkW ι ⟨k, i k⟩)
+      (fun k _ => isWeightedHomogeneous_X ℂ _ _)
   unfold segMono
   convert this using 1
   funext k'
@@ -32,12 +36,13 @@ theorem segMono_homog (i : (k : K) → ι k) :
 
 variable {e : ℕ}
 
-def psiPoly (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (j : Fin (e + 1)) :
-    MvPolynomial (Σ k, ι k) ℂ :=
+def psiPoly (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (j : Fin (e + 1))
+    : MvPolynomial (Σ k, ι k) ℂ :=
   ∑ i, C (Ψ (fun i' => if i = i' then 1 else 0) j) * segMono ι i
 
-theorem eval_psiPoly (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (j : Fin (e + 1))
-    (z : (Σ k, ι k) → ℂ) : eval z (psiPoly Ψ j) = Ψ (segre z) j := by
+theorem eval_psiPoly
+    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (j : Fin (e + 1)) (z : (Σ k, ι k) → ℂ)
+    : eval z (psiPoly Ψ j) = Ψ (segre z) j := by
   have hs : segre z = ∑ i, segre z i • (fun i' => if i = i' then (1 : ℂ) else 0) := by
     funext i'
     simp [Finset.sum_apply]
@@ -49,8 +54,8 @@ theorem eval_psiPoly (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1)
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [map_smul, Pi.smul_apply, smul_eq_mul, mul_comm]
 
-theorem psiPoly_homog (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (j : Fin (e + 1)) :
-    IsWeightedHomogeneous (blkW ι) (psiPoly Ψ j) (fun _ => 1) := by
+theorem psiPoly_homog (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (j : Fin (e + 1))
+    : IsWeightedHomogeneous (blkW ι) (psiPoly Ψ j) (fun _ => 1) := by
   have hmem : psiPoly Ψ j ∈ weightedHomogeneousSubmodule ℂ (blkW ι) (fun _ => 1) := by
     unfold psiPoly
     refine Submodule.sum_mem _ (fun i _ => ?_)
@@ -62,8 +67,9 @@ variable (ι) in
 def idealC (P : Ideal (MRing ι)) : Ideal (MvPolynomial (Σ k, ι k) ℂ) :=
   Ideal.map (map (Int.castRingHom ℂ)) P
 
-theorem eval_idealC {P : Ideal (MRing ι)} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P) {f}
-    (hf : f ∈ idealC ι P) : eval z f = 0 := by
+theorem eval_idealC
+    {P : Ideal (MRing ι)} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P) {f} (hf : f ∈ idealC ι P)
+    : eval z f = 0 := by
   have hle : idealC ι P ≤ RingHom.ker (eval z) := by
     rw [idealC, Ideal.map_le_iff_le_comap]
     intro g hg
@@ -73,20 +79,27 @@ theorem eval_idealC {P : Ideal (MRing ι)} {z : (Σ k, ι k) → ℂ} (hz : z �
 
 attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
-theorem idealC_homog {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P) :
-    (idealC ι P).IsHomogeneous (weightedHomogeneousSubmodule ℂ (blkW ι)) := by
+theorem idealC_homog {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P)
+    : (idealC ι P).IsHomogeneous (weightedHomogeneousSubmodule ℂ (blkW ι)) := by
   obtain ⟨S, hS, rfl⟩ := hP
   rw [idealC, Ideal.map_span]
   apply Ideal.homogeneous_span
   rintro _ ⟨g, hg, rfl⟩
   obtain ⟨a, ha⟩ := hS g hg
-  exact ⟨a, (mem_weightedHomogeneousSubmodule _ _ _ _).mpr (isWeightedHomogeneous_map_of_isMultiHomog ha)⟩
+  exact ⟨
+    a,
+    (mem_weightedHomogeneousSubmodule _ _ _ _).mpr (isWeightedHomogeneous_map_of_isMultiHomog ha)
+  ⟩
 
-theorem segre_rel {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P)
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (hΨ : IsGoodProj P Ψ) (i : (k : K) → ι k) :
-    ∃ r : ℕ, 0 < r ∧ ∃ G : Fin (e + 1) → MvPolynomial ((k : K) → ι k) ℂ,
-      (∀ j, (G j).totalDegree ≤ r - 1) ∧
-      ∀ z ∈ mcPts P, segre z i ^ r = ∑ j, Ψ (segre z) j * eval (segre z) (G j) := by
+theorem segre_rel
+    {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P)
+    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (hΨ : IsGoodProj P Ψ)
+    (i : (k : K) → ι k)
+    : ∃ r : ℕ,
+      0 < r
+        ∧ ∃ G : Fin (e + 1) → MvPolynomial ((k : K) → ι k) ℂ,
+          (∀ j, (G j).totalDegree ≤ r - 1)
+            ∧ ∀ z ∈ mcPts P, segre z i ^ r = ∑ j, Ψ (segre z) j * eval (segre z) (G j) := by
   classical
   set J : Ideal (MvPolynomial (Σ k, ι k) ℂ) := idealC ι P ⊔ Ideal.span (Set.range (psiPoly Ψ)) with hJ
   have hvan : segMono ι i ∈ MvPolynomial.vanishingIdeal ℂ (MvPolynomial.zeroLocus ℂ J) := by
@@ -115,16 +128,19 @@ theorem segre_rel {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P)
     exact J.mul_mem_right _ hn
   obtain ⟨g, hg, a, ha, hga⟩ := Submodule.mem_sup.mp hn1
   obtain ⟨c, hc⟩ := Ideal.mem_span_range_iff_exists_fun.mp ha
-  have hcomp : ∀ j, ∃ G : MvPolynomial ((k : K) → ι k) ℂ, G.totalDegree ≤ n ∧ ∀ z : (Σ k, ι k) → ℂ,
-      eval z (weightedHomogeneousComponent (blkW ι) (fun _ => n) (c j)) = eval (segre z) G :=
+  have hcomp
+      : ∀ j, ∃ G : MvPolynomial ((k : K) → ι k) ℂ,
+        G.totalDegree ≤ n
+          ∧ ∀ z : (Σ k, ι k) → ℂ,
+            eval z (weightedHomogeneousComponent (blkW ι) (fun _ => n) (c j)) = eval (segre z) G :=
     fun j => diag_of_homog n (weightedHomogeneousComponent_isWeightedHomogeneous _ _)
   choose G hG1 hG2 using hcomp
   refine ⟨n + 1, Nat.succ_pos n, G, fun j => by simpa using hG1 j, ?_⟩
   intro z hz
-  have hD : (fun _ : K => n + 1) = (fun _ : K => n) + (fun _ : K => 1) := by
-    funext k; simp
-  have hseg : weightedHomogeneousComponent (blkW ι) (fun _ : K => n + 1) (segMono ι i ^ (n + 1)) =
-      segMono ι i ^ (n + 1) := by
+  have hD : (fun _ : K => n + 1) = (fun _ : K => n) + (fun _ : K => 1) := by funext k; simp
+  have hseg
+      : weightedHomogeneousComponent (blkW ι) (fun _ : K => n + 1) (segMono ι i ^ (n + 1))
+        = segMono ι i ^ (n + 1) := by
     have hh := (segMono_homog (ι := ι) i).pow (n + 1)
     have hh' : (n + 1) • (fun _ : K => (1 : ℕ)) = fun _ : K => n + 1 := by funext k; simp
     rw [hh'] at hh
@@ -133,8 +149,10 @@ theorem segre_rel {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P)
     have h := (idealC_homog hP) (fun _ : K => n + 1) hg
     rw [← weightedDecomposition.decompose'_apply ℂ (blkW ι) g (fun _ : K => n + 1)]
     exact h
-  have hterm : ∀ j, weightedHomogeneousComponent (blkW ι) (fun _ : K => n + 1) (c j * psiPoly Ψ j) =
-      weightedHomogeneousComponent (blkW ι) (fun _ : K => n) (c j) * psiPoly Ψ j := by
+  have hterm
+      : ∀ j,
+        weightedHomogeneousComponent (blkW ι) (fun _ : K => n + 1) (c j * psiPoly Ψ j)
+          = weightedHomogeneousComponent (blkW ι) (fun _ : K => n) (c j) * psiPoly Ψ j := by
     intro j
     rw [hD]
     exact comp_mul_homog (psiPoly_homog Ψ j) (c j) _

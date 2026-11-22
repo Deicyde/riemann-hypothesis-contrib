@@ -27,10 +27,12 @@ private lemma div_norm_sq_eq_div_conj_of_ne_zero (x : ℂ) (hx : x ≠ 0) :
   rw [div_pow, ← h]
   field_simp
 
-
 open scoped Topology BigOperators in
-theorem _root_.GlobalTheory.unitaryChar_pi_complexUnits_eq_prod_zpow :
-    ∀ (ι : Type) [Fintype ι] (f : (ι → ℂˣ) →* Circle), Continuous f → (∀ z : ι → ℂˣ, (∀ i, ((z i : ℂ)).im = 0) → f z = 1) → ∃ k : ι → ℤ, ∀ z, ((f z : Circle) : ℂ) = ∏ i, ((z i : ℂ) / starRingEnd ℂ (z i : ℂ)) ^ k i := by
+theorem _root_.GlobalTheory.unitaryChar_pi_complexUnits_eq_prod_zpow
+    : ∀ (ι : Type) [Fintype ι] (f : (ι → ℂˣ) →* Circle),
+      Continuous f → (∀ z : ι → ℂˣ, (∀ i, ((z i : ℂ)).im = 0) → f z = 1)
+        → ∃ k : ι → ℤ, ∀ z,
+          ((f z : Circle) : ℂ) = ∏ i, ((z i : ℂ) / starRingEnd ℂ (z i : ℂ)) ^ k i := by
   intro ι _ f hf hreal
   classical
   let g : ι → Circle →* Circle := fun i =>
@@ -62,14 +64,14 @@ theorem _root_.GlobalTheory.unitaryChar_pi_complexUnits_eq_prod_zpow :
     intro i
     rw [eq_div_iff (hne i), mul_comm]
     simpa [u, Circle.coe_exp] using Complex.norm_mul_exp_arg_mul_I (z i : ℂ)
-  have hz : z = (fun i => Units.mk0 ((‖(z i : ℂ)‖ : ℝ) : ℂ) (hne i)) *
-      fun i => Circle.toUnits (u i) := by
+  have hz
+      : z
+        = (fun i => Units.mk0 ((‖(z i : ℂ)‖ : ℝ) : ℂ) (hne i)) * fun i => Circle.toUnits (u i) := by
     funext i
     ext
     simp only [Pi.mul_apply, Units.val_mul, Units.val_mk0]
     simp [hu, mul_div_cancel₀ _ (hne i)]
-  have hr : f (fun i => Units.mk0 ((‖(z i : ℂ)‖ : ℝ) : ℂ) (hne i)) = 1 :=
-    hreal _ fun i => by simp
+  have hr : f (fun i => Units.mk0 ((‖(z i : ℂ)‖ : ℝ) : ℂ) (hne i)) = 1 := hreal _ fun i => by simp
   have hv : f (fun i => Circle.toUnits (u i)) = ∏ i, g i (u i) := by
     conv_lhs => rw [← Finset.univ_prod_mulSingle (fun i => Circle.toUnits (u i))]
     rw [map_prod]

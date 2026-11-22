@@ -15,7 +15,18 @@ open scoped ContDiff
 
 namespace GlobalTheory.HCA
 
-theorem SmFn.continuous_leftTranslate : ∀ (𝔸 : Type) [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] [FiniteDimensional ℝ 𝔸] (G : Subgroup 𝔸ˣ) (𝔤 : Submodule ℝ 𝔸) (h : IsExpLieAlgebra G 𝔤) (d : ℕ) (b : Module.Basis (Fin d) ℝ 𝔤) [MeasurableSpace G] [BorelSpace G] (μ : Measure G), μ.IsHaarMeasure → ∀ (S : Submodule ℂ (G → ℂ)), (∀ f ∈ S, Continuous f) → (∀ f ∈ S, ∀ g, (fun y => f (g * y)) ∈ S) → ∀ K : Set G, IsCompact K → ∀ Λ : List (Fin d) → (G → ℂ) → ℂ, SmFn h b μ S K Λ → ∀ l, ∀ f ∈ S, Continuous fun x : G => Λ l fun y => f (x * y) := by
+theorem SmFn.continuous_leftTranslate
+    : ∀ (𝔸 : Type) [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] [FiniteDimensional ℝ 𝔸]
+        (G : Subgroup 𝔸ˣ) (𝔤 : Submodule ℝ 𝔸) (h : IsExpLieAlgebra G 𝔤) (d : ℕ)
+        (b : Module.Basis (Fin d) ℝ 𝔤) [MeasurableSpace G] [BorelSpace G] (μ : Measure G),
+      μ.IsHaarMeasure
+        → ∀ (S : Submodule ℂ (G → ℂ)),
+          (∀ f ∈ S, Continuous f) → (∀ f ∈ S, ∀ g, (fun y => f (g * y)) ∈ S)
+            → ∀ K : Set G,
+              IsCompact K
+                → ∀ Λ : List (Fin d) → (G → ℂ) → ℂ,
+                  SmFn h b μ S K Λ
+                    → ∀ l, ∀ f ∈ S, Continuous fun x : G => Λ l fun y => f (x * y) := by
   intro 𝔸 _ _ _ _ G 𝔤 h d b _ _ μ hμ S hS hL K hK Λ hΛ l f hf
   letI := h.chartedSpace
   haveI : LocallyCompactSpace G := ChartedSpace.locallyCompactSpace 𝔤 G
@@ -29,8 +40,11 @@ theorem SmFn.continuous_leftTranslate : ∀ (𝔸 : Type) [NormedRing 𝔸] [Nor
     continuous_parametric_integral_of_continuous
       (f := fun x y : G => ‖f (x * y) - f (x₀ * y)‖)
       (((hfc.comp (continuous_fst.mul continuous_snd)).sub
-        (hfc.comp (continuous_const.mul continuous_snd))).norm) hK
-  have h0 : Filter.Tendsto (fun x : G => C * ∫ y in K, ‖f (x * y) - f (x₀ * y)‖ ∂μ) (nhds x₀) (nhds 0) := by
+        (hfc.comp (continuous_const.mul continuous_snd))).norm)
+      hK
+  have h0 : Filter.Tendsto
+      (fun x : G => C * ∫ y in K, ‖f (x * y) - f (x₀ * y)‖ ∂μ)
+      (nhds x₀) (nhds 0) := by
     have := (hcont.const_mul C).tendsto x₀
     simpa using this
   rw [ContinuousAt, tendsto_iff_norm_sub_tendsto_zero]

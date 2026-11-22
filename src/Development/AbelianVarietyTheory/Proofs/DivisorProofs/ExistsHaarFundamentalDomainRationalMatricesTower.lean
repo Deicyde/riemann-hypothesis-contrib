@@ -13,15 +13,17 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ExistsNhdsZer
 @[expose] public section
 
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  MeasureTheory
 open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open Formalism.IndefR.DatumF
 
 namespace GlobalTheory.TowerFD
 
-theorem exists_fd_any : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (nS nT : ℕ),
-    ∃ (ν : Measure (WOF F E nS nT)) (𝓕 : Set (WOF F E nS nT)), ν.IsAddHaarMeasure ∧
-      IsAddFundamentalDomain (ratLF F E nS nT) 𝓕 ν := by
+theorem exists_fd_any
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (nS nT : ℕ),
+      ∃ (ν : Measure (WOF F E nS nT)) (𝓕 : Set (WOF F E nS nT)),
+        ν.IsAddHaarMeasure ∧ IsAddFundamentalDomain (ratLF F E nS nT) 𝓕 ν := by
   intro F E _ _ _ _ _ nS nT
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   have : LocallyCompactSpace (AF F) := GlobalTheory.AdelicUnitaryTop.locallyCompact_adele F
@@ -40,10 +42,12 @@ theorem exists_fd_any : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Nu
   have : T2Space (WOF F E nS nT) := inferInstanceAs (T2Space (Fin nT → Fin nS → AF F ⊗[F] E))
   haveI : BorelSpace (WOF F E nS nT) := ⟨rfl⟩
   have hdisc : DiscreteTopology (ratLF F E nS nT) := by
-    obtain ⟨U, hU, hx⟩ := GlobalTheory.AdelicMatrixLattice.discrete_tensor (F := F) (E := E) (AF F)
-      (GlobalTheory.AdeleDiscrete.exists_nhds_zero_principal_eq_zero F)
-    have hN : (Set.univ.pi fun _ : Fin nT => Set.univ.pi fun _ : Fin nS => U) ∈
-        nhds (0 : WOF F E nS nT) :=
+    obtain ⟨U, hU, hx⟩ :=
+      GlobalTheory.AdelicMatrixLattice.discrete_tensor (F := F) (E := E) (AF F)
+        (GlobalTheory.AdeleDiscrete.exists_nhds_zero_principal_eq_zero F)
+    have hN
+        : (Set.univ.pi fun _ : Fin nT => Set.univ.pi fun _ : Fin nS => U)
+          ∈ nhds (0 : WOF F E nS nT) :=
       set_pi_mem_nhds Set.finite_univ fun _ _ => set_pi_mem_nhds Set.finite_univ fun _ _ => hU
     refine discreteTopology_of_isOpen_singleton_zero ?_
     rw [isOpen_singleton_iff_nhds_eq_pure]
@@ -57,19 +61,21 @@ theorem exists_fd_any : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Nu
       exact hx _ (hy i (Set.mem_univ i) j (Set.mem_univ j))
     subst hy0
     exact Subtype.ext (map_zero _)
-  obtain ⟨K, hK, hx⟩ := GlobalTheory.AdelicMatrixLattice.cocompact_tensor (F := F) (E := E) (AF F)
-    (GlobalTheory.AdeleCocompact.exists_compact_adele F)
+  obtain ⟨K, hK, hx⟩ :=
+    GlobalTheory.AdelicMatrixLattice.cocompact_tensor (F := F) (E := E) (AF F)
+      (GlobalTheory.AdeleCocompact.exists_compact_adele F)
   choose c hc using hx
-  have hcov : ∀ x : WOF F E nS nT, ∃ γ ∈ ratLF F E nS nT, γ + x ∈
-      (Set.univ.pi fun _ : Fin nT => Set.univ.pi fun _ : Fin nS => K) :=
-    fun x => ⟨_, ⟨Matrix.of fun i j => c (x i j), rfl⟩, fun i _ j _ => hc (x i j)⟩
-  have hKc : IsCompact (Set.univ.pi (fun _ : Fin nT => Set.univ.pi fun _ : Fin nS => K) :
-      Set (WOF F E nS nT)) :=
+  have hcov
+      : ∀ x : WOF F E nS nT, ∃ γ ∈ ratLF F E nS nT,
+        γ + x ∈ (Set.univ.pi fun _ : Fin nT => Set.univ.pi fun _ : Fin nS => K) := fun x =>
+    ⟨_, ⟨Matrix.of fun i j => c (x i j), rfl⟩, fun i _ j _ => hc (x i j)⟩
+  have hKc : IsCompact
+      (Set.univ.pi (fun _ : Fin nT => Set.univ.pi fun _ : Fin nS => K) : Set (WOF F E nS nT)) :=
     isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => hK
   have tZ : IsTopologicalAddGroup (WOF F E nS nT) := inferInstance
   obtain ⟨μ, 𝓕, hμ, h𝓕, -⟩ :=
-    (@GlobalTheory.meanSquare_addFundamentalDomain_of_cocompact (WOF F E nS nT) _ _ tZ _ _ _ _ _ (ratLF F E nS nT) hdisc _
-      hKc hcov).1
+    (@GlobalTheory.meanSquare_addFundamentalDomain_of_cocompact (WOF F E nS nT) _ _ tZ _ _ _ _ _
+      (ratLF F E nS nT) hdisc _ hKc hcov).1
   exact ⟨μ, 𝓕, hμ, h𝓕⟩
 
 end GlobalTheory.TowerFD

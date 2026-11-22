@@ -24,18 +24,20 @@ section Alg
 
 variable {K : Type} [Field K]
 
-theorem inBlock_mul {ι B : Type} (k : B) (f g : MvPowerSeries ι K) :
-    inBlock k (f * g) = inBlock k f * inBlock k g := by
+theorem inBlock_mul {ι B : Type} (k : B) (f g : MvPowerSeries ι K)
+    : inBlock k (f * g) = inBlock k f * inBlock k g := by
   simp only [HurwitzJetIntegrality.inBlock_eq_rename, map_mul]
 
-theorem tensor_four_mul {ι : Type} (f g : MvPowerSeries ι K) : tens4 (f * g) = tens4 f * tens4 g := by
+theorem tensor_four_mul {ι : Type} (f g : MvPowerSeries ι K)
+    : tens4 (f * g) = tens4 f * tens4 g := by
   unfold tens4
   simp only [inBlock_mul, Finset.prod_mul_distrib]
 
 variable [CharZero K]
 
-theorem inBlock_mvExp {ι B : Type} [Finite ι] (k : B) {f : MvPowerSeries ι K}
-    (hf : MvPowerSeries.constantCoeff f = 0) : inBlock k (mvExp f) = mvExp (inBlock k f) := by
+theorem inBlock_mvExp
+    {ι B : Type} [Finite ι] (k : B) {f : MvPowerSeries ι K} (hf : MvPowerSeries.constantCoeff f = 0)
+    : inBlock k (mvExp f) = mvExp (inBlock k f) := by
   unfold inBlock
   exact mvSubst_mvExp hf
     (MvPowerSeries.hasSubst_of_constantCoeff_zero fun i => MvPowerSeries.constantCoeff_X _)

@@ -8,13 +8,17 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates
 
 namespace GlobalTheory.ProperFromMinimum
 
-theorem bound_of_ineqs {K K' c i δ S n p : ℝ} {a : ℕ} (hδ : 0 < δ) (hac : (a : ℝ) * c < i)
-    (hS : 0 ≤ S) (h1 : Real.exp (-(2 * c * p)) ≤ K * S) (h2 : n ≤ K' * Real.exp (-(2 * i * p)))
-    (h3 : δ * S ^ a ≤ n) : p ≤ K ^ a * K' / δ / (2 * (i - a * c)) := by
+theorem bound_of_ineqs
+    {K K' c i δ S n p : ℝ} {a : ℕ}
+    (hδ : 0 < δ) (hac : (a : ℝ) * c < i) (hS : 0 ≤ S) (h1 : Real.exp (-(2 * c * p)) ≤ K * S)
+    (h2 : n ≤ K' * Real.exp (-(2 * i * p))) (h3 : δ * S ^ a ≤ n)
+    : p ≤ K ^ a * K' / δ / (2 * (i - a * c)) := by
   have hK : 0 ≤ K := by
     by_contra hK
     have : K * S ≤ 0 := mul_nonpos_of_nonpos_of_nonneg (le_of_lt (not_le.1 hK)) hS
@@ -24,13 +28,14 @@ theorem bound_of_ineqs {K K' c i δ S n p : ℝ} {a : ℕ} (hδ : 0 < δ) (hac :
     rw [← mul_pow]
     exact pow_le_pow_left₀ (Real.exp_pos _).le h1 a
   have e2 : δ * Real.exp (-(2 * c * p)) ^ a ≤ K ^ a * K' * Real.exp (-(2 * i * p)) := by
-    calc δ * Real.exp (-(2 * c * p)) ^ a ≤ δ * (K ^ a * S ^ a) :=
-          mul_le_mul_of_nonneg_left e1 hδ.le
+    calc
+      δ * Real.exp (-(2 * c * p)) ^ a
+        ≤ δ * (K ^ a * S ^ a) := mul_le_mul_of_nonneg_left e1 hδ.le
       _ = K ^ a * (δ * S ^ a) := by ring
       _ ≤ K ^ a * (K' * Real.exp (-(2 * i * p))) := mul_le_mul_of_nonneg_left (h3.trans h2) hKa
       _ = _ := by ring
-  have e3 : Real.exp (-(2 * c * p)) ^ a =
-      Real.exp (2 * (i - a * c) * p) * Real.exp (-(2 * i * p)) := by
+  have e3
+      : Real.exp (-(2 * c * p)) ^ a = Real.exp (2 * (i - a * c) * p) * Real.exp (-(2 * i * p)) := by
     rw [← Real.exp_nat_mul, ← Real.exp_add]
     congr 1
     ring
@@ -43,7 +48,19 @@ theorem bound_of_ineqs {K K' c i δ S n p : ℝ} {a : ℕ} (hδ : 0 < δ) (hac :
   rw [le_div_iff₀ hd, le_div_iff₀ hδ]
   nlinarith [mul_le_mul_of_nonneg_left e5 hδ.le]
 
-theorem exists_compact : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (L eW : Wt X.Ψ r) (N a : ℕ) (w : Fin N → Frame X.Ψ r → ℂ) (et : Frame X.Ψ r → ℂ) (c i : ℝ) (ph : Frame X.Ψ r → ℝ), (∃ ca ε0 : ℝ, 0 < ca ∧ 0 < ε0 ∧ ∀ x ∈ X.dom, X.la1 x < ε0 → ca / X.la1 x ^ 2 ≤ ph x) → InterpolationModelInequalities X L eW w et c i ph → (a : ℝ) * c < i → ∀ δ : ℝ, 0 < δ → ∃ C : Set (Frame X.Ψ r), IsCompact C ∧ C ⊆ X.dom ∧ ∀ x ∈ X.dom, δ * (∑ k, X.pnorm L (w k) x ^ 2) ^ a ≤ X.pnorm eW et x ^ 2 → ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, lact γ (rmul x b) ∈ C := by
+theorem exists_compact
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (L eW : Wt X.Ψ r)
+        (N a : ℕ) (w : Fin N → Frame X.Ψ r → ℂ) (et : Frame X.Ψ r → ℂ) (c i : ℝ)
+        (ph : Frame X.Ψ r → ℝ),
+      (∃ ca ε0 : ℝ, 0 < ca ∧ 0 < ε0 ∧ ∀ x ∈ X.dom, X.la1 x < ε0 → ca / X.la1 x ^ 2 ≤ ph x)
+        → InterpolationModelInequalities X L eW w et c i ph → (a : ℝ) * c < i
+        → ∀ δ : ℝ,
+          0 < δ
+            → ∃ C : Set (Frame X.Ψ r),
+              IsCompact C ∧ C ⊆ X.dom
+                ∧ ∀ x ∈ X.dom,
+                  δ * (∑ k, X.pnorm L (w k) x ^ 2) ^ a ≤ X.pnorm eW et x ^ 2
+                    → ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, lact γ (rmul x b) ∈ C := by
   intro E _ _ _ r X L eW N a w et c i ph hph hI hac δ hδ
   rcases Nat.eq_zero_or_pos r with rfl | hr
   · have hsub : Subsingleton (Frame X.Ψ 0) := inferInstance

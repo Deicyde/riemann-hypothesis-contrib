@@ -4,17 +4,20 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsSie
 
 @[expose] public section
 
-open Matrix GlobalTheory.RedTh NumberField GlobalTheory.PolFan ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Matrix GlobalTheory.RedTh NumberField GlobalTheory.PolFan
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 noncomputable section
 
 namespace GlobalTheory.RedTh
 
-def siegelGlueMat {s m : ℕ} (a : Matrix (Fin s) (Fin s) ℝ) (b : Matrix (Fin m) (Fin m) ℝ) :
-    Matrix (Fin (s + m)) (Fin (s + m)) ℝ := fun i j =>
-  Fin.addCases (motive := fun _ => ℝ)
+def siegelGlueMat {s m : ℕ} (a : Matrix (Fin s) (Fin s) ℝ) (b : Matrix (Fin m) (Fin m) ℝ)
+    : Matrix (Fin (s + m)) (Fin (s + m)) ℝ := fun i j =>
+  Fin.addCases
+    (motive := fun _ => ℝ)
     (fun x => Fin.addCases (motive := fun _ => ℝ) (fun y => a x y) (fun _ => 0) j)
-    (fun x => Fin.addCases (motive := fun _ => ℝ) (fun _ => 0) (fun y => b x y) j) i
+    (fun x => Fin.addCases (motive := fun _ => ℝ) (fun _ => 0) (fun y => b x y) j)
+    i
 
 @[simp] lemma siegelGlueMat_ll {s m : ℕ} (a : Matrix (Fin s) (Fin s) ℝ) (b : Matrix (Fin m) (Fin m) ℝ)
     (x y : Fin s) : siegelGlueMat a b (Fin.castAdd m x) (Fin.castAdd m y) = a x y := by
@@ -128,12 +131,38 @@ lemma isSiegel_smul_of {n : ℕ} {d : Fin n → ℝ} {u : Matrix (Fin n) (Fin n)
   have := h.step p q hpq
   nlinarith
 
-theorem siegelData_glue_scaled : ∀ (s m : ℕ) (d₁ : Fin s → ℝ) (u₁ : Matrix (Fin s) (Fin s) ℝ) (d₂ : Fin m → ℝ) (u₂ : Matrix (Fin m) (Fin m) ℝ), IsSiegel d₁ u₁ → IsSiegel d₂ u₂ → (∀ i, 0 < d₁ i) → (∀ i, 0 < d₂ i) → ∃ (t : ℝ) (d d' : Fin (s + m) → ℝ) (u : Matrix (Fin (s + m)) (Fin (s + m)) ℝ), 0 < t ∧ IsSiegel d u ∧ IsSiegel d' u ∧ (∀ i, 0 < d' i) ∧ (∀ i j : Fin s, gram d u (Fin.castAdd m i) (Fin.castAdd m j) = 0 ∧ gram d' u (Fin.castAdd m i) (Fin.castAdd m j) = t * gram d₁ u₁ i j) ∧ (∀ (i : Fin s) (j : Fin m), gram d u (Fin.castAdd m i) (Fin.natAdd s j) = 0 ∧ gram d u (Fin.natAdd s j) (Fin.castAdd m i) = 0 ∧ gram d' u (Fin.castAdd m i) (Fin.natAdd s j) = 0 ∧ gram d' u (Fin.natAdd s j) (Fin.castAdd m i) = 0) ∧ ∀ i j : Fin m, gram d u (Fin.natAdd s i) (Fin.natAdd s j) = gram d₂ u₂ i j ∧ gram d' u (Fin.natAdd s i) (Fin.natAdd s j) = gram d₂ u₂ i j := by
+theorem siegelData_glue_scaled
+    : ∀ (s m : ℕ) (d₁ : Fin s → ℝ) (u₁ : Matrix (Fin s) (Fin s) ℝ) (d₂ : Fin m → ℝ)
+        (u₂ : Matrix (Fin m) (Fin m) ℝ),
+      IsSiegel d₁ u₁ → IsSiegel d₂ u₂ → (∀ i, 0 < d₁ i) → (∀ i, 0 < d₂ i)
+        → ∃ (t : ℝ) (d d' : Fin (s + m) → ℝ) (u : Matrix (Fin (s + m)) (Fin (s + m)) ℝ),
+          0 < t ∧ IsSiegel d u ∧ IsSiegel d' u ∧ (∀ i, 0 < d' i)
+            ∧ (∀ i j : Fin s,
+              gram d u (Fin.castAdd m i) (Fin.castAdd m j) = 0
+                ∧ gram d' u (Fin.castAdd m i) (Fin.castAdd m j) = t * gram d₁ u₁ i j)
+            ∧ (∀ (i : Fin s) (j : Fin m),
+              gram d u (Fin.castAdd m i) (Fin.natAdd s j) = 0
+                ∧ gram d u (Fin.natAdd s j) (Fin.castAdd m i) = 0
+                ∧ gram d' u (Fin.castAdd m i) (Fin.natAdd s j) = 0
+                ∧ gram d' u (Fin.natAdd s j) (Fin.castAdd m i) = 0)
+            ∧ ∀ i j : Fin m,
+              gram d u (Fin.natAdd s i) (Fin.natAdd s j) = gram d₂ u₂ i j
+                ∧ gram d' u (Fin.natAdd s i) (Fin.natAdd s j) = gram d₂ u₂ i j := by
   intro s m d₁ u₁ d₂ u₂ h₁ h₂ p₁ p₂
   obtain ⟨t, ht, hj⟩ := siegelGlue_scale d₁ d₂ p₁ p₂
-  refine ⟨t, Fin.append (0 : Fin s → ℝ) d₂, Fin.append (fun i => t * d₁ i) d₂, siegelGlueMat u₁ u₂, ht,
+  refine ⟨
+    t,
+    Fin.append (0 : Fin s → ℝ) d₂,
+    Fin.append (fun i => t * d₁ i) d₂,
+    siegelGlueMat u₁ u₂,
+    ht,
     isSiegel_glue (isSiegel_zero_of h₁) h₂ (fun i j _ => by simpa using (h₂.nonneg j)),
-    isSiegel_glue (isSiegel_smul_of h₁ ht.le) h₂ hj, ?_, ?_, ?_, ?_⟩
+    isSiegel_glue (isSiegel_smul_of h₁ ht.le) h₂ hj,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro i
     induction i using Fin.addCases with
     | left a => simpa using mul_pos ht (p₁ a)
@@ -148,12 +177,12 @@ theorem siegelData_glue_scaled : ∀ (s m : ℕ) (d₁ : Fin s → ℝ) (u₁ : 
       refine Finset.sum_congr rfl (fun k _ => ?_)
       ring
   · intro i j
-    refine ⟨?_, ?_, ?_, ?_⟩ <;>
-    · rw [gram_apply_glue, Fin.sum_univ_add]
-      simp
+    refine ⟨?_, ?_, ?_, ?_⟩
+      <;> · rw [gram_apply_glue, Fin.sum_univ_add]
+            simp
   · intro i j
-    refine ⟨?_, ?_⟩ <;>
-    · rw [gram_apply_glue, Fin.sum_univ_add, gram_apply_glue]
-      simp
+    refine ⟨?_, ?_⟩
+      <;> · rw [gram_apply_glue, Fin.sum_univ_add, gram_apply_glue]
+            simp
 
 end GlobalTheory.RedTh

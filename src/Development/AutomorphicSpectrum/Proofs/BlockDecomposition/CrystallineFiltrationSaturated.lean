@@ -11,15 +11,17 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Perfecto
 
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.PAlg
+open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison
+  CrystallineSemistableComparison.PAlg
 
 namespace GlobalTheory.CompanionTheory.PerfFil
 
 theorem Fil0_succ_le {l : ℕ} [Fact l.Prime] (A : PAlg l) (r : ℕ) : A.Fil0 (r + 1) ≤ A.Fil0 r :=
   Ideal.span_mono fun _ ⟨k, hk, e⟩ => ⟨k, by omega, e⟩
 
-theorem crystalline_filtration_l_saturated : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l) (r : ℕ) (z : A.Acr0),
-    (l : A.Acr0) * z ∈ A.Fil0 r → z ∈ A.Fil0 r := by
+theorem crystalline_filtration_l_saturated
+    : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l) (r : ℕ) (z : A.Acr0),
+      (l : A.Acr0) * z ∈ A.Fil0 r → z ∈ A.Fil0 r := by
   intro l _ A r
   induction r with
   | zero =>
@@ -32,8 +34,9 @@ theorem crystalline_filtration_l_saturated : ∀ {l : ℕ} [Fact l.Prime] (A : P
     obtain ⟨h1, h2, -⟩ := GlobalTheory.T.crystalline_graded_pieces_description A r
     obtain ⟨w, hw⟩ := h1 z hzr
     have hlw : algebraMap A.W A.Acr0 ((l : A.W) * w) * A.dxi0 r ∈ A.Fil0 (r + 1) := by
-      have e : algebraMap A.W A.Acr0 ((l : A.W) * w) * A.dxi0 r =
-          (l : A.Acr0) * z - (l : A.Acr0) * (z - algebraMap A.W A.Acr0 w * A.dxi0 r) := by
+      have e
+          : algebraMap A.W A.Acr0 ((l : A.W) * w) * A.dxi0 r
+            = (l : A.Acr0) * z - (l : A.Acr0) * (z - algebraMap A.W A.Acr0 w * A.dxi0 r) := by
         rw [map_mul, map_natCast]; ring
       rw [e]
       exact sub_mem hz (Ideal.mul_mem_left _ _ hw)

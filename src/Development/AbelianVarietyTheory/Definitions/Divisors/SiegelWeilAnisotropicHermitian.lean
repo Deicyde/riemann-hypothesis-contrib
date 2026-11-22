@@ -30,51 +30,28 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Ral
 namespace GlobalTheory.ThK
 
 structure KP : Prop where
-
   base : GlobalTheory.FunPr.Hypotheses₂
-
   howeDualityUnitary : GlobalTheory.Published.HoweDualityUnitary
-
   howeDualityReal : GlobalTheory.Published.HoweDualityReal
-
   automorphicFormsUnitary : GlobalTheory.Published.AutomorphicFormsUnitary
-
   eisensteinIsotropicLine : GlobalTheory.Published.EisensteinIsotropicLine
-
   genericityGL : GlobalTheory.Published.GenericityGL
-
   complementaryThetaInert : GlobalTheory.Published.ComplementaryThetaInert
-
   siegelSetUnitary : GlobalTheory.Published.SiegelSetUnitary
-
   minguezThetaGL : GlobalTheory.Published.MinguezThetaGL
-
   jacquetShalika : GlobalTheory.Published.JacquetShalika
-
   discreteSpectrumGL : GlobalTheory.Published.DiscreteSpectrumGL
-
   heckeTateFunctionalEquation : GlobalTheory.Published.HeckeTateFunctionalEquation
-
   automorphicFormsFiniteUnitary : GlobalTheory.Published.AutomorphicFormsFiniteUnitary
-
   geometricLemmaFiltration : GlobalTheory.Published.GeometricLemmaFiltration
-
   cuspidalSpectrumGL : GlobalTheory.Published.CuspidalSpectrumGL
-
   siegelWeilAnisotropicCM : GlobalTheory.Published.SiegelWeilAnisotropicCM
-
   siegelWeilAnisotropicHermitian : GlobalTheory.Published.SiegelWeilAnisotropicHermitian
-
   siegelEisensteinDoubled : GlobalTheory.Published.SiegelEisensteinDoubled
-
   leviCentreFiniteUnitary : GlobalTheory.Published.LeviCentreFiniteUnitary
-
   leviBlockCentreFinite : GlobalTheory.Published.LeviBlockCentreFinite
-
   leviCentreInducedUnitary : GlobalTheory.Published.LeviCentreInducedUnitary
-
   eisensteinResidueLine : GlobalTheory.Published.EisensteinResidueLine
-
   rallisTowerUnitary : GlobalTheory.Published.RallisTowerUnitary
 
 end GlobalTheory.ThK

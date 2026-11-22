@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.WithZe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.Mem.Chr
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1
+  ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.Mem.Chr
 
 namespace GlobalTheory.Mem.Chr
 
@@ -16,20 +17,22 @@ section General
 
 variable {L : Type} [Field L] [NumberField L]
 
-theorem conjPl_iff_comap (c : L ≃+* L) (v v' : HeightOneSpectrum (𝓞 L)) :
-    ConjPl c v v' ↔ v.asIdeal = v'.asIdeal.comap (RingOfIntegers.mapRingEquiv c) := by
+theorem conjPl_iff_comap (c : L ≃+* L) (v v' : HeightOneSpectrum (𝓞 L))
+    : ConjPl c v v' ↔ v.asIdeal = v'.asIdeal.comap (RingOfIntegers.mapRingEquiv c) := by
   constructor
   · intro h
     ext x
-    have h1 : v'.valuation L (algebraMap (𝓞 L) L (RingOfIntegers.mapRingEquiv c x)) =
-        v.valuation L (algebraMap (𝓞 L) L x) := h (algebraMap (𝓞 L) L x)
+    have h1
+        : v'.valuation L (algebraMap (𝓞 L) L (RingOfIntegers.mapRingEquiv c x))
+          = v.valuation L (algebraMap (𝓞 L) L x) :=
+      h (algebraMap (𝓞 L) L x)
     rw [Ideal.mem_comap, ← HeightOneSpectrum.valuation_lt_one_iff_mem (K := L),
       ← HeightOneSpectrum.valuation_lt_one_iff_mem (K := L), h1]
   · intro h x
     exact (GlobalTheory.QNorm.valuation_of_eq_comap c v' v h x).symm
 
-theorem conjPl_iff_mem (c : L ≃+* L) (v v' : HeightOneSpectrum (𝓞 L)) :
-    ConjPl c v v' ↔ ∀ x y : 𝓞 L, (y : L) = c (x : L) → (x ∈ v.asIdeal ↔ y ∈ v'.asIdeal) := by
+theorem conjPl_iff_mem (c : L ≃+* L) (v v' : HeightOneSpectrum (𝓞 L))
+    : ConjPl c v v' ↔ ∀ x y : 𝓞 L, (y : L) = c (x : L) → (x ∈ v.asIdeal ↔ y ∈ v'.asIdeal) := by
   rw [conjPl_iff_comap]
   constructor
   · intro h x y hxy
@@ -53,9 +56,11 @@ theorem existsUnique_conjPl (c : L ≃+* L) (v : HeightOneSpectrum (𝓞 L)) : �
     change x ∈ v'.asIdeal ↔ e.symm x ∈ v.asIdeal
     rw [h, Ideal.mem_comap, e.apply_symm_apply]
 
-theorem under_eq_iff_conjPl {F : Type} [Field F] [NumberField F] [Algebra F L] (c : L ≃ₐ[F] L)
-    (hr : Module.finrank F L = 2) (hc : c ≠ 1) (w w' : HeightOneSpectrum (𝓞 L)) :
-    w'.under (𝓞 F) = w.under (𝓞 F) ↔ (w' = w ∨ ConjPl c.toRingEquiv w w') := by
+theorem under_eq_iff_conjPl
+    {F : Type} [Field F] [NumberField F] [Algebra F L]
+    (c : L ≃ₐ[F] L)
+    (hr : Module.finrank F L = 2) (hc : c ≠ 1) (w w' : HeightOneSpectrum (𝓞 L))
+    : w'.under (𝓞 F) = w.under (𝓞 F) ↔ (w' = w ∨ ConjPl c.toRingEquiv w w') := by
   have : Algebra.IsQuadraticExtension F L := { finrank_eq_two' := hr }
   have : IsGalois F L := inferInstance
   have hall : ∀ σ : L ≃ₐ[F] L, σ = 1 ∨ σ = c := by
@@ -69,9 +74,11 @@ theorem under_eq_iff_conjPl {F : Type} [Field F] [NumberField F] [Algebra F L] (
   · intro hu
     have := w.isPrime
     have := w'.isPrime
-    have hu' : w'.asIdeal.under (𝓞 F) = w.asIdeal.under (𝓞 F) := congrArg HeightOneSpectrum.asIdeal hu
-    obtain ⟨σ, hσ⟩ := Ideal.exists_comap_galRestrict_eq (𝓞 F) F L (𝓞 L) (p := w.asIdeal.under (𝓞 F))
-      (P₁ := w'.asIdeal) (P₂ := w.asIdeal) ⟨inferInstance, ⟨hu'.symm⟩⟩ ⟨inferInstance, ⟨rfl⟩⟩
+    have hu' : w'.asIdeal.under (𝓞 F) = w.asIdeal.under (𝓞 F) :=
+      congrArg HeightOneSpectrum.asIdeal hu
+    obtain ⟨σ, hσ⟩ :=
+      Ideal.exists_comap_galRestrict_eq (𝓞 F) F L (𝓞 L) (p := w.asIdeal.under (𝓞 F))
+        (P₁ := w'.asIdeal) (P₂ := w.asIdeal) ⟨inferInstance, ⟨hu'.symm⟩⟩ ⟨inferInstance, ⟨rfl⟩⟩
     rcases hall σ with rfl | rfl
     · left
       ext x
@@ -93,11 +100,20 @@ theorem under_eq_iff_conjPl {F : Type} [Field F] [NumberField F] [Algebra F L] (
 
 end General
 
-
 open Classical in
-theorem conjPl_main : (∀ (L : Type) [Field L] [NumberField L] (c : L ≃+* L) (v : HeightOneSpectrum (𝓞 L)), ∃! v', ConjPl c v v') ∧ (∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (w w' : HeightOneSpectrum (𝓞 H.E)), IsConjPl H w w' ↔ ConjPl H.conj.toRingEquiv w w') ∧ ∀ (F L : Type) [Field F] [NumberField F] [Field L] [NumberField L] [Algebra F L] (c : L ≃ₐ[F] L), Module.finrank F L = 2 → c ≠ 1 → ∀ (w w' : HeightOneSpectrum (𝓞 L)), w'.under (𝓞 F) = w.under (𝓞 F) ↔ (w' = w ∨ ConjPl c.toRingEquiv w w') :=
-  ⟨fun _ _ _ c v => existsUnique_conjPl c v,
-    fun _ H w w' => (conjPl_iff_mem H.conj.toRingEquiv w w').symm,
-    fun _ _ _ _ _ _ _ c hr hc w w' => under_eq_iff_conjPl c hr hc w w'⟩
+theorem conjPl_main
+    : (∀ (L : Type) [Field L] [NumberField L] (c : L ≃+* L) (v : HeightOneSpectrum (𝓞 L)),
+        ∃! v', ConjPl c v v')
+      ∧ (∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (w w' : HeightOneSpectrum (𝓞 H.E)),
+        IsConjPl H w w' ↔ ConjPl H.conj.toRingEquiv w w')
+      ∧ ∀ (F L : Type) [Field F] [NumberField F] [Field L] [NumberField L] [Algebra F L]
+          (c : L ≃ₐ[F] L),
+        Module.finrank F L = 2 → c ≠ 1
+          → ∀ (w w' : HeightOneSpectrum (𝓞 L)),
+            w'.under (𝓞 F) = w.under (𝓞 F) ↔ (w' = w ∨ ConjPl c.toRingEquiv w w') := ⟨
+  fun _ _ _ c v => existsUnique_conjPl c v,
+  fun _ H w w' => (conjPl_iff_mem H.conj.toRingEquiv w w').symm,
+  fun _ _ _ _ _ _ _ c hr hc w w' => under_eq_iff_conjPl c hr hc w w'
+⟩
 
 end GlobalTheory.Mem.Chr

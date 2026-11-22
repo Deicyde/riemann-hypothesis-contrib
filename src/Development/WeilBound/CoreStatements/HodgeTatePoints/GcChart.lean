@@ -14,9 +14,11 @@ namespace PositivityTheory.HtPt.Gc
 
 section
 
-variable {A K : Type} [CommRing A] [Field K] [Algebra A K] {E : Type} [Field E] [NumberField E]
-  {c : E ≃+* E} {p R N : ℕ}
-  {Ω : Type} [AddCommGroup Ω] [Module K Ω] [Module A Ω] [IsScalarTower A K Ω]
+variable
+  {A K : Type} [CommRing A] [Field K] [Algebra A K]
+  {E : Type} [Field E] [NumberField E]
+  {c : E ≃+* E} {p R N : ℕ} {Ω : Type}
+  [AddCommGroup Ω] [Module K Ω] [Module A Ω] [IsScalarTower A K Ω]
   (D : HTChart A K c p R N Ω)
 
 theorem om'_le : D.om' ≤ D.om := by
@@ -32,12 +34,13 @@ theorem pow_smul_mem {x : Ω} (hx : x ∈ D.om) : ((p : A) ^ R) • x ∈ D.om' 
 theorem h_mem_om' (x : Fin N → 𝓞 E) : D.h x ∈ D.om' :=
   Submodule.mem_sup_left (Submodule.subset_span ⟨x, rfl⟩)
 
-theorem ht_mem_span {C O : Type} [Field C] [CommRing O] [Algebra O C] {κ' : O}
-    {V Ω' : Type} [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V]
+theorem ht_mem_span
+    {C O : Type} [Field C] [CommRing O] [Algebra O C]
+    {κ' : O} {V Ω' : Type} [AddCommGroup V] [Module C V] [Module O V] [IsScalarTower O C V]
     [AddCommGroup Ω'] [Module C Ω'] [Module O Ω'] [IsScalarTower O C Ω']
     (φ : A →+* O) (P : HTPoint C O c κ' N V Ω') (ι : D.om →ₛₗ[φ] Ω') (hred : D.ReducesTo φ P ι)
-    {t : V} (ht : t ∈ P.T) :
-    P.ht t ∈ Submodule.span O (ι '' {x : D.om | (x : Ω) ∈ D.om'}) := by
+    {t : V} (ht : t ∈ P.T)
+    : P.ht t ∈ Submodule.span O (ι '' {x : D.om | (x : Ω) ∈ D.om'}) := by
   classical
   set S := Submodule.span O (ι '' {x : D.om | (x : Ω) ∈ D.om'})
   have hp : ∀ y ∈ P.om, (p ^ R) • y ∈ S := by
@@ -57,8 +60,9 @@ theorem ht_mem_span {C O : Type} [Field C] [CommRing O] [Algebra O C] {κ' : O}
     rw [P.free.2.2, Submodule.span_le]
     rintro _ ⟨⟨i, k⟩, rfl⟩
     obtain ⟨y, hy, he⟩ := hred.ht_eq (Pi.single i (RingOfIntegers.basis E k))
-    have h1 : P.tate (Pi.single i (RingOfIntegers.basis E k)) =
-        P.ρ (RingOfIntegers.basis E k) (P.t i) := by
+    have h1
+        : P.tate (Pi.single i (RingOfIntegers.basis E k))
+          = P.ρ (RingOfIntegers.basis E k) (P.t i) := by
       rw [HTPoint.tate, Finset.sum_eq_single i]
       · simp
       · intro j _ hj
@@ -72,7 +76,13 @@ theorem ht_mem_span {C O : Type} [Field C] [CommRing O] [Algebra O C] {κ' : O}
 
 end
 
-theorem chart_ii : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A] [Field K] [Algebra A K] [IsFractionRing A K] [CharZero K] (E : Type) [Field E] [NumberField E] (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (p R N : ℕ) [Fact p.Prime] (Ω : Type) [AddCommGroup Ω] [Module K Ω] [Module A Ω] [IsScalarTower A K Ω] (D : HTChart A K c p R N Ω) (κ : A), κ ∣ (p : A) ^ R → Module.Projective A D.om' → D.HasTestPoints κ → D.om' ≤ D.om ∧ (∀ x ∈ D.om, κ • x ∈ D.om') := by
+theorem chart_ii
+    : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A] [Field K]
+        [Algebra A K] [IsFractionRing A K] [CharZero K] (E : Type) [Field E] [NumberField E]
+        (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (p R N : ℕ) [Fact p.Prime] (Ω : Type) [AddCommGroup Ω]
+        [Module K Ω] [Module A Ω] [IsScalarTower A K Ω] (D : HTChart A K c p R N Ω) (κ : A),
+      κ ∣ (p : A) ^ R → Module.Projective A D.om' → D.HasTestPoints κ
+        → D.om' ≤ D.om ∧ (∀ x ∈ D.om, κ • x ∈ D.om') := by
   intro A K _ _ _ _ _ _ _ _ E _ _ c hc p R N hp Ω _ _ _ _ D κ hκ hP hT
   refine ⟨om'_le D, fun x hx => ?_⟩
   have hp0 : algebraMap A K ((p : A) ^ R) ≠ 0 := by
@@ -88,8 +98,7 @@ theorem chart_ii : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNoetherianRing 
     intro x hx
     have hh := Submodule.subset_span (R := K) (pow_smul_mem D hx)
     rw [← IsScalarTower.algebraMap_smul K] at hh
-    have hh' := (Submodule.span K (D.om' : Set Ω)).smul_mem
-      (algebraMap A K ((p : A) ^ R))⁻¹ hh
+    have hh' := (Submodule.span K (D.om' : Set Ω)).smul_mem (algebraMap A K ((p : A) ^ R))⁻¹ hh
     simpa [smul_smul, hp0] using hh'
   refine test_incl A K Ω D.om' _ hlat hP fun q hq h1 => ?_
   by_cases hpq : (p : A) ∈ q
@@ -99,17 +108,18 @@ theorem chart_ii : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsNoetherianRing 
   obtain ⟨C, O, _, _, _, _, _, v, φ, V, Ω', _, _, _, _, _, _, _, _, P, ι, hv, hφ, hcen, hred⟩ :=
     hT q hq h1 hpq
   letI : Algebra A O := φ.toAlgebra
-  obtain ⟨j, hj, -, hj1⟩ := bc_iso A K Ω D.om C v O hv Ω' P.om ι D.om_lat D.om_proj P.om_lat
-    hred.span_eq hred.rank_eq
-  obtain ⟨s, hs, hsx⟩ := test_descend A K C v O hv q D.om (D.om'.comap D.om.subtype)
-    (κ • ⟨x, hx⟩) hq h1 hφ hcen (by
-      obtain ⟨t, ht, hte⟩ := P.κ_mem (ι ⟨x, hx⟩)
-        (hred.span_eq ▸ Submodule.subset_span ⟨_, rfl⟩)
+  obtain ⟨j, hj, -, hj1⟩ :=
+    bc_iso A K Ω D.om C v O hv Ω' P.om ι D.om_lat D.om_proj P.om_lat hred.span_eq hred.rank_eq
+  obtain ⟨s, hs, hsx⟩ :=
+    test_descend A K C v O hv q D.om (D.om'.comap D.om.subtype) (κ • ⟨x, hx⟩) hq h1 hφ hcen (by
+      obtain ⟨t, ht, hte⟩ := P.κ_mem (ι ⟨x, hx⟩) (hred.span_eq ▸ Submodule.subset_span ⟨_, rfl⟩)
       have h2 := ht_mem_span D φ P ι hred ht
       rw [hte, ← ι.map_smulₛₗ, ← hj1] at h2
-      have h3 : Submodule.span O (ι '' {x : D.om | (x : Ω) ∈ D.om'}) =
-          (Submodule.span O ((fun y : D.om => (1 : O) ⊗ₜ[A] y) ''
-            (D.om'.comap D.om.subtype : Set D.om))).map j := by
+      have h3
+          : Submodule.span O (ι '' {x : D.om | (x : Ω) ∈ D.om'})
+            = (Submodule.span O
+                ((fun y : D.om => (1 : O) ⊗ₜ[A] y) '' (D.om'.comap D.om.subtype : Set D.om))).map
+              j := by
         rw [Submodule.map_span, Set.image_image]
         simp only [hj1]
         rfl

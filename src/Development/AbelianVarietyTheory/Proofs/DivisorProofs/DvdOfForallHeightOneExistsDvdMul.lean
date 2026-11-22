@@ -9,22 +9,26 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem dvd_of_forall_height_one_exists_dvd_mul {A : Type} [CommRing A] [IsDomain A] [IsNoetherianRing A]
-    [IsIntegrallyClosed A] {h z : A} (hh : h ≠ 0)
-    (H : ∀ P : Ideal A, P.IsPrime → P.height = 1 → ∃ s ∉ P, h ∣ s * z) : h ∣ z := by
+theorem dvd_of_forall_height_one_exists_dvd_mul
+    {A : Type} [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
+    {h z : A} (hh : h ≠ 0) (H : ∀ P : Ideal A, P.IsPrime → P.height = 1 → ∃ s ∉ P, h ∣ s * z)
+    : h ∣ z := by
   let K := FractionRing A
   have hhK : algebraMap A K h ≠ 0 := fun h0 =>
     hh (IsFractionRing.injective A K (by rw [h0, map_zero]))
   have hmem : algebraMap A K z / algebraMap A K h ∈ (algebraMap A K).range := by
-    refine ReciprocityTheory.ChartRestriction.G.Out.KrullAlg.mem_range_of_forall_height_one (A := A) _ ?_
+    refine ReciprocityTheory.ChartRestriction.G.Out.KrullAlg.mem_range_of_forall_height_one (A := A)
+      _ ?_
     intro P hP h1
     obtain ⟨s, hs, t, ht⟩ := H P hP h1
     refine ⟨s, hs, t, ?_⟩
@@ -38,8 +42,7 @@ section SquareIdeal
 variable {A : Type} [CommRing A] [IsDomain A] [IsIntegrallyClosed A]
 
 theorem dvd_mul_of_dvd_sq_of_dvd_sq {h x y : A} (hx : h ∣ x ^ 2) (hy : h ∣ y ^ 2) : h ∣ x * y := by
-  have : h ^ 2 ∣ (x * y) ^ 2 := by
-    rw [mul_pow, sq h]; exact mul_dvd_mul hx hy
+  have : h ^ 2 ∣ (x * y) ^ 2 := by rw [mul_pow, sq h]; exact mul_dvd_mul hx hy
   exact (IsIntegrallyClosed.pow_dvd_pow_iff two_ne_zero).1 this
 
 def sqDvdIdeal (h : A) : Ideal A where
@@ -55,13 +58,20 @@ def sqDvdIdeal (h : A) : Ideal A where
   smul_mem' := by
     intro c x hx
     show h ∣ (c * x) ^ 2
-    rw [mul_pow]; exact dvd_mul_of_dvd_right hx _
+    rw [mul_pow]
+    exact dvd_mul_of_dvd_right hx _
 
 theorem mem_sqDvdIdeal {h x : A} : x ∈ sqDvdIdeal h ↔ h ∣ x ^ 2 := Iff.rfl
 
 end SquareIdeal
 
-theorem isUnit_mul_sq_of_faithfullyFlat : ∀ (C C' : Type) [CommRing C] [IsDomain C] [IsLocalRing C] [IsNoetherianRing C] [IsIntegrallyClosed C] [CommRing C'] [IsDomain C'] [IsNoetherianRing C'] [IsIntegrallyClosed C'] [Algebra C C'] [Module.FaithfullyFlat C C'] (h : C), h ≠ 0 → (∃ (u : C'ˣ) (f : C'), algebraMap C C' h = u * f ^ 2) → (∀ p : Ideal C, p.IsPrime → p.height = 1 → ∃ a b c : C, b ∉ p ∧ c ∉ p ∧ b * h = c * a ^ 2) → ∃ (u : Cˣ) (a : C), h = u * a ^ 2 := by
+theorem isUnit_mul_sq_of_faithfullyFlat
+    : ∀ (C C' : Type) [CommRing C] [IsDomain C] [IsLocalRing C] [IsNoetherianRing C]
+        [IsIntegrallyClosed C] [CommRing C'] [IsDomain C'] [IsNoetherianRing C']
+        [IsIntegrallyClosed C'] [Algebra C C'] [Module.FaithfullyFlat C C'] (h : C),
+      h ≠ 0 → (∃ (u : C'ˣ) (f : C'), algebraMap C C' h = u * f ^ 2)
+        → (∀ p : Ideal C, p.IsPrime → p.height = 1 → ∃ a b c : C, b ∉ p ∧ c ∉ p ∧ b * h = c * a ^ 2)
+        → ∃ (u : Cˣ) (a : C), h = u * a ^ 2 := by
   intro C C' _ _ _ _ _ _ _ _ _ _ _ h hh hsq Hp
   obtain ⟨u, f, hf⟩ := hsq
   have hflat : (algebraMap C C').Flat := RingHom.flat_algebraMap_iff.2 inferInstance
@@ -74,7 +84,8 @@ theorem isUnit_mul_sq_of_faithfullyFlat : ∀ (C C' : Type) [CommRing C] [IsDoma
     rw [Ideal.mem_comap, Ideal.mem_span_singleton]
     apply (IsIntegrallyClosed.pow_dvd_pow_iff two_ne_zero).1
     refine ⟨(u : C') * algebraMap C C' z, ?_⟩
-    rw [← map_pow, hz, map_mul, hf]; ring
+    rw [← map_pow, hz, map_mul, hf]
+    ring
 
   have hcol : (Ideal.span {h}).colon (J : Set C) ≤ J := by
     intro y hy
@@ -113,8 +124,8 @@ theorem isUnit_mul_sq_of_faithfullyFlat : ∀ (C C' : Type) [CommRing C] [IsDoma
     rw [smul_eq_mul, _root_.one_mul, Ideal.mem_span_singleton, hf]
     exact ⟨(u : C') * w, by ring⟩
   have hhJJ : h ∈ J * J := by
-    have e := Ideal.comap_map_eq_self_of_faithfullyFlat (B := C')
-      ((J * J).colon (Ideal.span {h} : Set C))
+    have e :=
+      Ideal.comap_map_eq_self_of_faithfullyFlat (B := C') ((J * J).colon (Ideal.span {h} : Set C))
     rw [hY, Ideal.comap_top] at e
     have h1 : (1 : C) ∈ (J * J).colon (Ideal.span {h} : Set C) := e ▸ Submodule.mem_top
     rw [Submodule.mem_colon] at h1
@@ -127,8 +138,7 @@ theorem isUnit_mul_sq_of_faithfullyFlat : ∀ (C C' : Type) [CommRing C] [IsDoma
     by_cases hem : e ∈ maximalIdeal C
     · rw [he]; exact Ideal.mul_mem_mul (Ideal.mem_span_singleton_self h) hem
     · exfalso
-      have heu : IsUnit e := by
-        rw [mem_maximalIdeal, mem_nonunits_iff, not_not] at hem; exact hem
+      have heu : IsUnit e := by rw [mem_maximalIdeal, mem_nonunits_iff, not_not] at hem; exact hem
       obtain ⟨a, ha⟩ := mem_sqDvdIdeal.1 hx
       obtain ⟨b, hb⟩ := mem_sqDvdIdeal.1 hy
       have hab : a * b = e ^ 2 := by

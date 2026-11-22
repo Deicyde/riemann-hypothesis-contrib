@@ -9,7 +9,8 @@ public import ReciprocityTheory.L2DbarEstimates.LeviForms.OfRealNormSqSumMul
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
 namespace GlobalTheory.BallStein
@@ -27,16 +28,18 @@ theorem sqd_lt {c y : V n} {r : ℝ} (hy : y ∈ ball c r) : sqd c y < r ^ 2 := 
   unfold sqd
   nlinarith
 
-theorem hasDerivAt_k (r t : ℝ) (ht : t < r ^ 2) :
-    HasDerivAt (fun t : ℝ => (r ^ 2 - t)⁻¹) (((r ^ 2 - t) ^ 2)⁻¹) t := by
+theorem hasDerivAt_k (r t : ℝ) (ht : t < r ^ 2)
+    : HasDerivAt (fun t : ℝ => (r ^ 2 - t)⁻¹) (((r ^ 2 - t) ^ 2)⁻¹) t := by
   have hne : r ^ 2 - t ≠ 0 := by linarith
   have := ((hasDerivAt_id t).const_sub (r ^ 2)).inv hne
   refine this.congr_deriv ?_
   simp only [id]
   ring
 
-theorem hasDerivAt_k' (r t : ℝ) (ht : t < r ^ 2) :
-    HasDerivAt (fun t : ℝ => ((r ^ 2 - t) ^ 2)⁻¹) (2 * (r ^ 2 - t) / ((r ^ 2 - t) ^ 2) ^ 2) t := by
+theorem hasDerivAt_k' (r t : ℝ) (ht : t < r ^ 2)
+    : HasDerivAt
+      (fun t : ℝ => ((r ^ 2 - t) ^ 2)⁻¹)
+      (2 * (r ^ 2 - t) / ((r ^ 2 - t) ^ 2) ^ 2) t := by
   have hne : (r ^ 2 - t) ^ 2 ≠ 0 := by
     have : r ^ 2 - t ≠ 0 := by linarith
     positivity
@@ -45,20 +48,20 @@ theorem hasDerivAt_k' (r t : ℝ) (ht : t < r ^ 2) :
   simp only [id, Pi.pow_apply]
   norm_num
 
-theorem deriv_k (r t : ℝ) (ht : t < r ^ 2) :
-    deriv (fun t : ℝ => (r ^ 2 - t)⁻¹) t = ((r ^ 2 - t) ^ 2)⁻¹ :=
+theorem deriv_k (r t : ℝ) (ht : t < r ^ 2)
+    : deriv (fun t : ℝ => (r ^ 2 - t)⁻¹) t = ((r ^ 2 - t) ^ 2)⁻¹ :=
   (hasDerivAt_k r t ht).deriv
 
-theorem deriv_deriv_k (r t : ℝ) (ht : t < r ^ 2) :
-    deriv (deriv (fun t : ℝ => (r ^ 2 - t)⁻¹)) t = 2 * (r ^ 2 - t) / ((r ^ 2 - t) ^ 2) ^ 2 := by
+theorem deriv_deriv_k (r t : ℝ) (ht : t < r ^ 2)
+    : deriv (deriv (fun t : ℝ => (r ^ 2 - t)⁻¹)) t = 2 * (r ^ 2 - t) / ((r ^ 2 - t) ^ 2) ^ 2 := by
   have hev : deriv (fun t : ℝ => (r ^ 2 - t)⁻¹) =ᶠ[𝓝 t] fun t : ℝ => ((r ^ 2 - t) ^ 2)⁻¹ := by
     filter_upwards [Iio_mem_nhds ht] with u hu
     exact deriv_k r u hu
   rw [hev.deriv_eq]
   exact (hasDerivAt_k' r t ht).deriv
 
-theorem leviV_sqd_nonneg (c x : V n) (ξ : Fin n → ℂ) :
-    0 ≤ (leviV n (fun y => ((sqd c y : ℝ) : ℂ)) x ξ).re := by
+theorem leviV_sqd_nonneg (c x : V n) (ξ : Fin n → ℂ)
+    : 0 ≤ (leviV n (fun y => ((sqd c y : ℝ) : ℂ)) x ξ).re := by
   let u : Fin n → V n → ℝ := fun j y => Complex.normSq (EuclideanSpace.proj j (y - c))
   have hfun : (fun y => ((sqd c y : ℝ) : ℂ)) = fun y => ((∑ j, u j y : ℝ) : ℂ) := by
     funext y
@@ -66,7 +69,8 @@ theorem leviV_sqd_nonneg (c x : V n) (ξ : Fin n → ℂ) :
     simp only [sqd, u, EuclideanSpace.norm_sq_eq, Complex.normSq_eq_norm_sq]
     rfl
   have hg : ∀ j : Fin n, ContDiffAt ℂ 2 (fun y : V n => EuclideanSpace.proj j (y - c)) x := fun j =>
-    ((EuclideanSpace.proj j : V n →L[ℂ] ℂ).contDiff.comp (contDiff_id.sub contDiff_const)).contDiffAt
+    ((EuclideanSpace.proj j : V n →L[ℂ] ℂ).contDiff.comp
+      (contDiff_id.sub contDiff_const)).contDiffAt
   have hu : ∀ j, ContDiffAt ℝ 2 (u j) x := fun j => by
     have hu' : u j = fun y => ‖EuclideanSpace.proj j (y - c)‖ ^ 2 := by
       funext y; simp only [u, Complex.normSq_eq_norm_sq]
@@ -86,16 +90,23 @@ noncomputable def exh (c : V n) (r : ℝ) (y : V n) : ℝ := (r ^ 2 - sqd c y)�
 theorem contDiffOn_exh (c : V n) (r : ℝ) : ContDiffOn ℝ ∞ (exh c r) (ball c r) :=
   (contDiffOn_const.sub (contDiff_sqd c).contDiffOn).inv fun _ hy => (sub_pos.2 (sqd_lt hy)).ne'
 
-theorem leviV_exh_nonneg {c y : V n} {r : ℝ} (hy : y ∈ ball c r) (ξ : Fin n → ℂ) :
-    0 ≤ (leviV n (fun w => ((exh c r w : ℝ) : ℂ)) y ξ).re := by
+theorem leviV_exh_nonneg {c y : V n} {r : ℝ} (hy : y ∈ ball c r) (ξ : Fin n → ℂ)
+    : 0 ≤ (leviV n (fun w => ((exh c r w : ℝ) : ℂ)) y ξ).re := by
   have hlt := sqd_lt hy
   have hp : 0 < r ^ 2 - sqd c y := sub_pos.2 hlt
   have hk : ContDiffAt ℝ 2 (fun t : ℝ => (r ^ 2 - t)⁻¹) (sqd c y) :=
     (contDiffAt_const.sub contDiffAt_id).inv hp.ne'
-  have hc := leviChain n (fun t : ℝ => (r ^ 2 - t)⁻¹) (sqd c) y ξ
-    (((contDiff_norm_sq ℂ).comp (contDiff_id.sub contDiff_const) : ContDiff ℝ 2 (sqd c)).contDiffAt) hk
-  have he : (fun w => ((exh c r w : ℝ) : ℂ)) =
-      fun w => (((fun t : ℝ => (r ^ 2 - t)⁻¹) (sqd c w) : ℝ) : ℂ) := rfl
+  have hc :=
+    leviChain n
+      (fun t : ℝ => (r ^ 2 - t)⁻¹)
+      (sqd c) y ξ
+      (((contDiff_norm_sq ℂ).comp (contDiff_id.sub contDiff_const)
+        : ContDiff ℝ 2 (sqd c)).contDiffAt)
+      hk
+  have he
+      : (fun w => ((exh c r w : ℝ) : ℂ))
+        = fun w => (((fun t : ℝ => (r ^ 2 - t)⁻¹) (sqd c w) : ℝ) : ℂ) :=
+    rfl
   rw [he, hc, deriv_k r _ hlt, deriv_deriv_k r _ hlt]
   simp only [Complex.add_re, Complex.re_ofReal_mul, Complex.ofReal_re]
   have h1 := leviV_sqd_nonneg c y ξ
@@ -104,9 +115,9 @@ theorem leviV_exh_nonneg {c y : V n} {r : ℝ} (hy : y ∈ ball c r) (ξ : Fin n
 
 theorem isCompact_exh (c : V n) (r a : ℝ) : IsCompact {y | y ∈ ball c r ∧ exh c r y ≤ a} := by
   by_cases hr : r ≤ 0
-  · have : {y | y ∈ ball c r ∧ exh c r y ≤ a} = ∅ := by
-      ext y; simp [Metric.ball_eq_empty.2 hr]
-    rw [this]; exact isCompact_empty
+  · have : {y | y ∈ ball c r ∧ exh c r y ≤ a} = ∅ := by ext y; simp [Metric.ball_eq_empty.2 hr]
+    rw [this]
+    exact isCompact_empty
   push_neg at hr
   by_cases ha : a ≤ 0
   · have : {y | y ∈ ball c r ∧ exh c r y ≤ a} = ∅ := by
@@ -115,7 +126,8 @@ theorem isCompact_exh (c : V n) (r a : ℝ) : IsCompact {y | y ∈ ball c r ∧ 
       intro hy
       have hp : 0 < r ^ 2 - sqd c y := sub_pos.2 (sqd_lt hy)
       exact lt_of_le_of_lt ha (inv_pos.2 hp)
-    rw [this]; exact isCompact_empty
+    rw [this]
+    exact isCompact_empty
   push_neg at ha
   have heq : {y | y ∈ ball c r ∧ exh c r y ≤ a} = {y | sqd c y ≤ r ^ 2 - a⁻¹} := by
     ext y
@@ -144,24 +156,30 @@ theorem isCompact_exh (c : V n) (r a : ℝ) : IsCompact {y | y ∈ ball c r ∧ 
   unfold sqd at h1
   nlinarith [norm_nonneg (y - c)]
 
-theorem ball_etaleStein : ∀ (n : ℕ) (c : V n) (r : ℝ), ∃ X : EtaleStein n (ball c r), X.z = Subtype.val := by
+theorem ball_etaleStein
+    : ∀ (n : ℕ) (c : V n) (r : ℝ), ∃ X : EtaleStein n (ball c r), X.z = Subtype.val := by
   intro n c r
   have hU : IsOpen (ball c r) := isOpen_ball
-  refine ⟨{ z := Subtype.val
-            isLocalHomeomorph := ReciprocityTheory.ChartRestriction.G.AR.Up.HE.val_lh hU
-            e := fun x => exh c r x.1
-            smooth_e := ReciprocityTheory.ChartRestriction.G.AR.Up.HE.smoothR_val (contDiffOn_exh c r)
-            levi_e := fun x ξ => by
-              rw [ReciprocityTheory.ChartRestriction.G.AR.Up.HE.levi_val hU]
-              exact leviV_exh_nonneg x.2 ξ
-            isCompact_le := fun a => by
-              rw [Subtype.isCompact_iff]
-              convert isCompact_exh c r a using 1
-              ext y
-              constructor
-              · rintro ⟨x, hx, rfl⟩
-                exact ⟨x.2, hx⟩
-              · rintro ⟨hy, hy'⟩
-                exact ⟨⟨y, hy⟩, hy', rfl⟩ }, rfl⟩
+  refine ⟨
+    {
+      z := Subtype.val
+      isLocalHomeomorph := ReciprocityTheory.ChartRestriction.G.AR.Up.HE.val_lh hU
+      e := fun x => exh c r x.1
+      smooth_e := ReciprocityTheory.ChartRestriction.G.AR.Up.HE.smoothR_val (contDiffOn_exh c r)
+      levi_e := fun x ξ => by
+        rw [ReciprocityTheory.ChartRestriction.G.AR.Up.HE.levi_val hU]
+        exact leviV_exh_nonneg x.2 ξ
+      isCompact_le := fun a => by
+        rw [Subtype.isCompact_iff]
+        convert isCompact_exh c r a using 1
+        ext y
+        constructor
+        · rintro ⟨x, hx, rfl⟩
+          exact ⟨x.2, hx⟩
+        · rintro ⟨hy, hy'⟩
+          exact ⟨⟨y, hy⟩, hy', rfl⟩
+    },
+    rfl
+  ⟩
 
 end GlobalTheory.BallStein

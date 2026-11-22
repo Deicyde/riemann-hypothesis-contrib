@@ -8,7 +8,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RankPosO
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
 open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
 open GlobalTheory.CompanionTheory.EGlue
 
@@ -20,8 +21,8 @@ def nodeRank : {N : ℕ} → Tr E N → Option ℕ
   | _, .leaf _ _ => none
   | _, @Tr.node _ _ _ _ r _ _ _ => some r
 
-theorem nodeRank_heq {N M : ℕ} (u : Tr E N) (v : Tr E M) (h : N = M) (hh : HEq u v) :
-    nodeRank u = nodeRank v := by
+theorem nodeRank_heq {N M : ℕ} (u : Tr E N) (v : Tr E M) (h : N = M) (hh : HEq u v)
+    : nodeRank u = nodeRank v := by
   subst h
   rw [eq_of_heq hh]
 
@@ -31,12 +32,13 @@ theorem twists_length_strip : ∀ {N : ℕ} (u : Tr E N), u.strip.twists.length 
   | leaf V z => rfl
   | node t₁ t₂ i₁ i₂ => simp [Tr.strip, Tr.twists, i₁, i₂]
 
-theorem twists_length_eq {N : ℕ} {u v : Tr E N} (h : u.strip = v.strip) :
-    u.twists.length = v.twists.length := by
+theorem twists_length_eq {N : ℕ} {u v : Tr E N} (h : u.strip = v.strip)
+    : u.twists.length = v.twists.length := by
   rw [← twists_length_strip u, h, twists_length_strip]
 
-theorem leaf_of_strip {N : ℕ} (u : Tr E N) (V : Submodule ℂ (Sm E N)) (w : ℂ)
-    (h : u.strip = .leaf V w) : ∃ z, u = .leaf V z := by
+theorem leaf_of_strip
+    {N : ℕ} (u : Tr E N) (V : Submodule ℂ (Sm E N)) (w : ℂ) (h : u.strip = .leaf V w)
+    : ∃ z, u = .leaf V z := by
   revert V w h
   cases u with
   | leaf V' z =>
@@ -49,9 +51,10 @@ theorem leaf_of_strip {N : ℕ} (u : Tr E N) (V : Submodule ℂ (Sm E N)) (w : �
     have := congrArg nodeRank h
     simp [Tr.strip, nodeRank] at this
 
-theorem node_of_strip_eq : ∀ {N : ℕ} (u : Tr E N) {r s : ℕ} (_ : N = r + s) (x : Tr E r) (y : Tr E s),
-    HEq u.strip (Tr.node x y) →
-    ∃ (a : Tr E r) (b : Tr E s), HEq u (Tr.node a b) ∧ a.strip = x ∧ b.strip = y := by
+theorem node_of_strip_eq
+    : ∀ {N : ℕ} (u : Tr E N) {r s : ℕ} (_ : N = r + s) (x : Tr E r) (y : Tr E s),
+      HEq u.strip (Tr.node x y)
+        → ∃ (a : Tr E r) (b : Tr E s), HEq u (Tr.node a b) ∧ a.strip = x ∧ b.strip = y := by
   intro N u
   cases u with
   | leaf V z =>
@@ -72,27 +75,26 @@ theorem node_of_strip_eq : ∀ {N : ℕ} (u : Tr E N) {r s : ℕ} (_ : N = r + s
     injection h₃ with _ _ e₁ e₂
     exact ⟨a, b, HEq.rfl, e₁, e₂⟩
 
-theorem node_of_strip {r s : ℕ} (u : Tr E (r + s)) (x : Tr E r) (y : Tr E s)
-    (h : u.strip = Tr.node x y) :
-    ∃ (a : Tr E r) (b : Tr E s), u = Tr.node a b ∧ a.strip = x ∧ b.strip = y := by
+theorem node_of_strip
+    {r s : ℕ} (u : Tr E (r + s)) (x : Tr E r) (y : Tr E s) (h : u.strip = Tr.node x y)
+    : ∃ (a : Tr E r) (b : Tr E s), u = Tr.node a b ∧ a.strip = x ∧ b.strip = y := by
   obtain ⟨a, b, e, h₁, h₂⟩ := node_of_strip_eq u rfl x y (heq_of_eq h)
   exact ⟨a, b, eq_of_heq e, h₁, h₂⟩
 
-theorem getD_append_left (A B : List ℂ) {i : ℕ} (h : i < A.length) :
-    (A ++ B).getD i 0 = A.getD i 0 := by
+theorem getD_append_left (A B : List ℂ) {i : ℕ} (h : i < A.length)
+    : (A ++ B).getD i 0 = A.getD i 0 := by
   simp [List.getD_eq_getElem?_getD, List.getElem?_append_left h]
 
-theorem getD_append_right (A B : List ℂ) (i : ℕ) :
-    (A ++ B).getD (A.length + i) 0 = B.getD i 0 := by
+theorem getD_append_right (A B : List ℂ) (i : ℕ) : (A ++ B).getD (A.length + i) 0 = B.getD i 0 := by
   rw [List.getD_eq_getElem?_getD, List.getD_eq_getElem?_getD,
     List.getElem?_append_right (Nat.le_add_right _ _), Nat.add_sub_cancel_left]
 
 theorem getD_of_le (A : List ℂ) {i : ℕ} (h : A.length ≤ i) : A.getD i 0 = 0 := by
   simp [List.getD_eq_getElem?_getD, List.getElem?_eq_none h]
 
-theorem conv_forward {N : ℕ} {t : ℕ → Tr E N} {s : Tr E N} (h : Conv t s) :
-    (∀ k, (t k).strip = s.strip) ∧
-      ∀ i, Tendsto (fun k => ((t k).twists.getD i 0)) atTop (𝓝 (s.twists.getD i 0)) := by
+theorem conv_forward {N : ℕ} {t : ℕ → Tr E N} {s : Tr E N} (h : Conv t s)
+    : (∀ k, (t k).strip = s.strip)
+      ∧ ∀ i, Tendsto (fun k => ((t k).twists.getD i 0)) atTop (𝓝 (s.twists.getD i 0)) := by
   induction h with
   | leaf V z z₀ h =>
     refine ⟨fun k => rfl, fun i => ?_⟩
@@ -106,20 +108,24 @@ theorem conv_forward {N : ℕ} {t : ℕ → Tr E N} {s : Tr E N} (h : Conv t s) 
       simp only [Tr.twists]
       by_cases hi : i < s₁.twists.length
       · rw [getD_append_left _ _ hi]
-        have : (fun k => ((t₁ k).twists ++ (t₂ k).twists).getD i 0) = fun k => (t₁ k).twists.getD i 0 :=
+        have : (fun k => ((t₁ k).twists ++ (t₂ k).twists).getD i 0)
+            = fun k => (t₁ k).twists.getD i 0 :=
           funext fun k => getD_append_left _ _ (by rw [hl k]; exact hi)
         rw [this]
         exact i₁.2 i
       · obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le (not_lt.mp hi)
         rw [getD_append_right]
-        have : (fun k => ((t₁ k).twists ++ (t₂ k).twists).getD (s₁.twists.length + j) 0) =
-            fun k => (t₂ k).twists.getD j 0 :=
+        have : (fun k => ((t₁ k).twists ++ (t₂ k).twists).getD (s₁.twists.length + j) 0)
+            = fun k => (t₂ k).twists.getD j 0 :=
           funext fun k => by rw [← hl k, getD_append_right]
         rw [this]
         exact i₂.2 j
 
-theorem conv_backward : ∀ {N : ℕ} (s : Tr E N) (t : ℕ → Tr E N), (∀ k, (t k).strip = s.strip) →
-    (∀ i, Tendsto (fun k => ((t k).twists.getD i 0)) atTop (𝓝 (s.twists.getD i 0))) → Conv t s := by
+theorem conv_backward
+    : ∀ {N : ℕ} (s : Tr E N) (t : ℕ → Tr E N),
+      (∀ k, (t k).strip = s.strip)
+        → (∀ i, Tendsto (fun k => ((t k).twists.getD i 0)) atTop (𝓝 (s.twists.getD i 0)))
+        → Conv t s := by
   intro N s
   induction s with
   | leaf V z₀ =>
@@ -137,7 +143,8 @@ theorem conv_backward : ∀ {N : ℕ} (s : Tr E N) (t : ℕ → Tr E N), (∀ k,
     · by_cases hi : i < s₁.twists.length
       · have h := ht i
         rw [getD_append_left _ _ hi] at h
-        have e : (fun k => ((a k).twists ++ (b k).twists).getD i 0) = fun k => (a k).twists.getD i 0 :=
+        have e
+            : (fun k => ((a k).twists ++ (b k).twists).getD i 0) = fun k => (a k).twists.getD i 0 :=
           funext fun k => getD_append_left _ _ (by rw [hl k]; exact hi)
         rwa [e] at h
       · have e : (fun k => (a k).twists.getD i 0) = fun _ => (0 : ℂ) :=
@@ -146,8 +153,9 @@ theorem conv_backward : ∀ {N : ℕ} (s : Tr E N) (t : ℕ → Tr E N), (∀ k,
         exact tendsto_const_nhds
     · have h := ht (s₁.twists.length + i)
       rw [getD_append_right] at h
-      have e : (fun k => ((a k).twists ++ (b k).twists).getD (s₁.twists.length + i) 0) =
-          fun k => (b k).twists.getD i 0 :=
+      have e
+          : (fun k => ((a k).twists ++ (b k).twists).getD (s₁.twists.length + i) 0)
+            = fun k => (b k).twists.getD i 0 :=
         funext fun k => by rw [← hl k, getD_append_right]
       rwa [e] at h
 

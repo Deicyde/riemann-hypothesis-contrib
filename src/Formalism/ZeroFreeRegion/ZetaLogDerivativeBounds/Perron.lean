@@ -254,8 +254,10 @@ theorem perron_formula : Perron := by
   intro y hy σ₀ hσ
   have hy0 : 0 < y := zero_lt_one.trans_le hy
   refine ⟨perron_integrable_Fy hy0 hσ, ?_⟩
-  have hinv := mellinInv_mellin_eq (-σ₀) (fun x : ℝ => (Formalism.Sz x : ℂ)) hy0 (perron_mellinConvergent hσ)
-    (perron_verticalIntegrable hσ) (perron_Sz_continuousAt y)
+  have hinv :=
+    mellinInv_mellin_eq (-σ₀)
+      (fun x : ℝ => (Formalism.Sz x : ℂ))
+      hy0 (perron_mellinConvergent hσ) (perron_verticalIntegrable hσ) (perron_Sz_continuousAt y)
   rw [← hinv, mellinInv, Complex.real_smul]
   push_cast
   congr 1

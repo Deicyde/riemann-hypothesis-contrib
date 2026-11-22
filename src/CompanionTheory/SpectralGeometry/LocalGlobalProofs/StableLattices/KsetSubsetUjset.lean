@@ -12,8 +12,9 @@ namespace GlobalTheory.CompanionTheory.DSKType
 
 open CompanionTheory.D.DSIC PI.UpqRep
 
-theorem kset_subset_ujset {n : ℕ} {ε : Fin n → Bool} {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Kset ε) :
-    g ∈ UJset ε := by
+theorem kset_subset_ujset
+    {n : ℕ} {ε : Fin n → Bool} {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Kset ε)
+    : g ∈ UJset ε := by
   obtain ⟨h1, h2⟩ := hg
   have h3 : gᴴ * g = 1 := by
     simpa [Matrix.star_eq_conjTranspose] using (Matrix.mem_unitaryGroup_iff'.1 h1)

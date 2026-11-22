@@ -18,10 +18,14 @@ open GlobalTheory.CompanionTheory.Ar.ChartFin
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω]
 
-theorem mem_adjoin_iff {o : Type} [CommRing o] [Algebra o Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {κ : Type}
-    {x : κ → Ω} (hall : ∀ q : X, genPt ξ ⤳ q) (T : CoordTie o ξ x) {c : κ} (hc : x c ≠ 0) {U : X.Opens}
-    (hU : ∀ q : X, q ∈ U ↔ ∃ h : genPt ξ ⤳ q, InChart ξ x c ⟨q, h⟩) (h : genPt ξ ∈ U) (a : Ω) :
-    a ∈ Algebra.adjoin o (Set.range fun j => x j / x c) ↔ ∃ s : Γ(X, U), secVal ξ U h s = a := by
+theorem mem_adjoin_iff
+    {o : Type} [CommRing o] [Algebra o Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {κ : Type} {x : κ → Ω}
+    (hall : ∀ q : X, genPt ξ ⤳ q) (T : CoordTie o ξ x)
+    {c : κ} (hc : x c ≠ 0)
+    {U : X.Opens} (hU : ∀ q : X, q ∈ U ↔ ∃ h : genPt ξ ⤳ q, InChart ξ x c ⟨q, h⟩) (h : genPt ξ ∈ U)
+    (a : Ω)
+    : a ∈ Algebra.adjoin o (Set.range fun j => x j / x c) ↔ ∃ s : Γ(X, U), secVal ξ U h s = a := by
   rw [T.ring c hc a]
   constructor
   · intro H
@@ -32,25 +36,34 @@ theorem mem_adjoin_iff {o : Type} [CommRing o] [Algebra o Ω] {ξ : Spec (CommRi
     have hq : p.1 ∈ U := (hU p.1).2 ⟨p.2, hp⟩
     exact ⟨_, genMap_germ ξ h hq p.2 s⟩
 
-theorem exists_secEquiv {o : Type} [CommRing o] [Algebra o Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X} {κ : Type}
-    {x : κ → Ω} (hall : ∀ q : X, genPt ξ ⤳ q) (T : CoordTie o ξ x) {c : κ} (hc : x c ≠ 0) {U : X.Opens}
-    (hU : ∀ q : X, q ∈ U ↔ ∃ h : genPt ξ ⤳ q, InChart ξ x c ⟨q, h⟩) (h : genPt ξ ∈ U) :
-    ∃ E : Γ(X, U) ≃+* Algebra.adjoin o (Set.range fun j => x j / x c),
-      ∀ s, ((E s : Algebra.adjoin o (Set.range fun j => x j / x c)) : Ω) = secVal ξ U h s := by
+theorem exists_secEquiv
+    {o : Type} [CommRing o] [Algebra o Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {κ : Type} {x : κ → Ω}
+    (hall : ∀ q : X, genPt ξ ⤳ q) (T : CoordTie o ξ x)
+    {c : κ} (hc : x c ≠ 0)
+    {U : X.Opens} (hU : ∀ q : X, q ∈ U ↔ ∃ h : genPt ξ ⤳ q, InChart ξ x c ⟨q, h⟩) (h : genPt ξ ∈ U)
+    : ∃ E : Γ(X, U) ≃+* Algebra.adjoin o (Set.range fun j => x j / x c), ∀ s,
+      ((E s : Algebra.adjoin o (Set.range fun j => x j / x c)) : Ω) = secVal ξ U h s := by
   have hm : ∀ s, secVal ξ U h s ∈ Algebra.adjoin o (Set.range fun j => x j / x c) := fun s =>
     (mem_adjoin_iff hall T hc hU h _).2 ⟨s, rfl⟩
-  refine ⟨RingEquiv.ofBijective ((secVal ξ U h).codRestrict _ hm) ⟨fun a b e => ?_, fun r => ?_⟩, fun _ => rfl⟩
+  refine ⟨
+    RingEquiv.ofBijective ((secVal ξ U h).codRestrict _ hm) ⟨fun a b e => ?_, fun r => ?_⟩,
+    fun _ => rfl
+  ⟩
   · exact secVal_injective hall T.gen.inj U h (congrArg Subtype.val e)
   · obtain ⟨s, hs⟩ := (mem_adjoin_iff hall T hc hU h r).1 r.2
     exact ⟨s, Subtype.ext hs⟩
 
 variable {X' : Scheme.{0}} {Ω' : Type} [Field Ω']
 
-theorem inChart_map {ξ : Spec (CommRingCat.of Ω) ⟶ X} {ξ' : Spec (CommRingCat.of Ω') ⟶ X'} {f : X' ⟶ X}
+theorem inChart_map
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X} {ξ' : Spec (CommRingCat.of Ω') ⟶ X'} {f : X' ⟶ X}
     {i : Ω →+* Ω'} {κ κ' : Type} {x : κ → Ω} {x' : κ' → Ω'} (hall : ∀ q : X, genPt ξ ⤳ q)
-    (T : CoordTie ℤ ξ x) (T' : CoordTie ℤ ξ' x') (hd : Dominates ξ' ξ f i) {c : κ} {c' : κ'} (hc : x c ≠ 0)
-    (hc' : x' c' ≠ 0) (hi : ∀ j, i (x j / x c) ∈ Algebra.adjoin ℤ (Set.range fun j' => x' j' / x' c'))
-    (p' : Cpt ξ') (hp' : InChart ξ' x' c' p') : InChart ξ x c ⟨f p'.1, hall _⟩ := by
+    (T : CoordTie ℤ ξ x) (T' : CoordTie ℤ ξ' x') (hd : Dominates ξ' ξ f i)
+    {c : κ} {c' : κ'} (hc : x c ≠ 0) (hc' : x' c' ≠ 0)
+    (hi : ∀ j, i (x j / x c) ∈ Algebra.adjoin ℤ (Set.range fun j' => x' j' / x' c'))
+    (p' : Cpt ξ') (hp' : InChart ξ' x' c' p')
+    : InChart ξ x c ⟨f p'.1, hall _⟩ := by
   obtain ⟨h, hreg, hunit⟩ := RegAtDom.regAt_dominates X Ω ξ X' Ω' ξ' f i hd p'
   obtain ⟨d, hd0, hdr⟩ := T.cover ⟨f p'.1, h⟩
   have ha0 : x c / x d ≠ 0 := div_ne_zero hc hd0
@@ -59,19 +72,25 @@ theorem inChart_map {ξ : Spec (CommRingCat.of Ω) ⟶ X} {ξ' : Spec (CommRingC
     exact (T'.ring c' hc' _).1 (hi d) p' hp'
   have hu := hunit T'.gen _ (hdr c) ⟨(map_ne_zero i).2 ha0, hreg _ (hdr c), hinv⟩
   refine ⟨hc, fun j => ?_⟩
-  have e : x j / x c = x j / x d * (x c / x d)⁻¹ := by
-    field_simp
+  have e : x j / x c = x j / x d * (x c / x d)⁻¹ := by field_simp
   rw [e]
   exact mul_mem (hdr j) hu.2.2
 
-theorem smooth_chartRing (X X' : Scheme.{0}) (Ω₀ Ω : Type) [Field Ω₀] [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω₀) ⟶ X)
-    (ξ' : Spec (CommRingCat.of Ω) ⟶ X') (f : X' ⟶ X) (i : Ω₀ →+* Ω) (κ κ' : Type) (x : κ → Ω₀) (x' : κ' → Ω) :
-    (∀ q : X, genPt ξ ⤳ q) → (∀ q : X', genPt ξ' ⤳ q) → CoordTie ℤ ξ x → CoordTie ℤ ξ' x' →
-    GlobalTheory.CompanionTheory.Ar.Dominates ξ' ξ f i → Smooth f → ∀ (c : κ) (c' : κ'), x c ≠ 0 → x' c' ≠ 0 →
-    (∀ j, i (x j / x c) ∈ Algebra.adjoin ℤ (Set.range fun j' => x' j' / x' c')) →
-    ∃ φ : Algebra.adjoin ℤ (Set.range fun j => x j / x c) →+* Algebra.adjoin ℤ (Set.range fun j' => x' j' / x' c'),
-      (∀ a, ((φ a : Algebra.adjoin ℤ (Set.range fun j' => x' j' / x' c')) : Ω) = i a) ∧ φ.Smooth := by
+theorem smooth_chartRing
+    (X X' : Scheme.{0})
+    (Ω₀ Ω : Type) [Field Ω₀] [Field Ω]
+    (ξ : Spec (CommRingCat.of Ω₀) ⟶ X) (ξ' : Spec (CommRingCat.of Ω) ⟶ X') (f : X' ⟶ X)
+    (i : Ω₀ →+* Ω)
+    (κ κ' : Type) (x : κ → Ω₀) (x' : κ' → Ω)
+    : (∀ q : X, genPt ξ ⤳ q) → (∀ q : X', genPt ξ' ⤳ q) → CoordTie ℤ ξ x → CoordTie ℤ ξ' x'
+      → GlobalTheory.CompanionTheory.Ar.Dominates ξ' ξ f i → Smooth f
+      → ∀ (c : κ) (c' : κ'),
+        x c ≠ 0 → x' c' ≠ 0
+          → (∀ j, i (x j / x c) ∈ Algebra.adjoin ℤ (Set.range fun j' => x' j' / x' c'))
+          → ∃ φ : Algebra.adjoin ℤ (Set.range fun j => x j / x c)
+              →+* Algebra.adjoin ℤ (Set.range fun j' => x' j' / x' c'),
+            (∀ a, ((φ a : Algebra.adjoin ℤ (Set.range fun j' => x' j' / x' c')) : Ω) = i a)
+              ∧ φ.Smooth := by
   intro hall hall' T T' hd hsm c c' hc hc' hi
   obtain ⟨U, hUa, hUm⟩ := T.affine c hc
   obtain ⟨U', hU'a, hU'm⟩ := T'.affine c' hc'

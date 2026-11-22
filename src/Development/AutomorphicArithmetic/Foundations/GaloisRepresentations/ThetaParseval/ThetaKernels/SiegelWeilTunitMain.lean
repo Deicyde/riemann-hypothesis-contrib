@@ -16,12 +16,14 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix
-open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
 namespace PositivityTheory.SiegelWeilFormula.Tunit
 attribute [-instance] CStarMatrix.instHMulOfFintypeOfMulOfAddCommMonoid
 open PositivityTheory.SiegelWeilFormula.TBij.Adp PositivityTheory.SiegelWeilFormula.KTunit
-local instance (priority := high)  {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] :
-    MeasurableSpace (κ → AF F) := borel _
+local instance (priority := high) {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
+    : MeasurableSpace (κ → AF F) :=
+  borel _
 theorem tUnit_k : _root_.PositivityTheory.SiegelWeilFormula.TUnit_k := by
   intro F E _ _ _ _ _ σ d ν hν x Φ hΦ Φ' hΦ'
   obtain ⟨τ, S0, S0', C, hop, hT⟩ := _root_.PositivityTheory.SiegelWeilFormula.Tunit.T_chart_k d
@@ -29,8 +31,9 @@ theorem tUnit_k : _root_.PositivityTheory.SiegelWeilFormula.TUnit_k := by
   have hunit := d.ok.dbl.weil.2.1.unit
   obtain ⟨hμ, hint⟩ := _root_.PositivityTheory.SiegelWeilFormula.KTunit.map_haar_k d τ ν hν
   set μ := ν.map (_root_.PositivityTheory.SiegelWeilFormula.KTunit.cmap_k d τ) with hμdef
-  have h1 : ∀ Ψ ∈ d.sch, ∀ Ψ' ∈ d.sch, ∫ X, d.T Ψ X * star (d.T Ψ' X) ∂ν =
-      (C * star C) * ∫ y, S0 Ψ y * star (S0 Ψ' y) ∂μ := by
+  have h1
+      : ∀ Ψ ∈ d.sch, ∀ Ψ' ∈ d.sch,
+        ∫ X, d.T Ψ X * star (d.T Ψ' X) ∂ν = (C * star C) * ∫ y, S0 Ψ y * star (S0 Ψ' y) ∂μ := by
     intro Ψ hΨ Ψ' hΨ'
     rw [← integral_const_mul, ← hint]
     refine integral_congr_ae (Filter.Eventually.of_forall fun X => ?_)
@@ -50,7 +53,9 @@ theorem tUnit_k : _root_.PositivityTheory.SiegelWeilFormula.TUnit_k := by
     have e3 := hunit μ hμ x _ (hop.pres' φ hφ)
     simp only [LinearMap.comp_apply]
     rw [e1, e2, e3]
-  have := GlobalTheory.DblUnitaryBox.integral_mul_star_eq μ hμ (S0 ∘ₗ d.om x ∘ₗ S0') hp' hT' (hop.pres Φ hΦ) (hop.pres Φ' hΦ')
+  have :=
+    GlobalTheory.DblUnitaryBox.integral_mul_star_eq μ hμ (S0 ∘ₗ d.om x ∘ₗ S0') hp' hT'
+      (hop.pres Φ hΦ) (hop.pres Φ' hΦ')
   simpa only [LinearMap.comp_apply, hop.left _ hΦ, hop.left _ hΦ'] using this
 end PositivityTheory.SiegelWeilFormula.Tunit
 end

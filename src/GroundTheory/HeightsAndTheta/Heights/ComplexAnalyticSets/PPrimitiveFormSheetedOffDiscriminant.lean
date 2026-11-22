@@ -12,8 +12,10 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology
 
-theorem PrimitiveFormSheetedOffDiscriminant.proof (hcut : PrimitiveFormSheetedLocusCutOut.Statement)
-    (hnear : PrimitiveFormSheetedPointsNear.Statement) : PrimitiveFormSheetedOffDiscriminant.Statement := by
+theorem PrimitiveFormSheetedOffDiscriminant.proof
+    (hcut : PrimitiveFormSheetedLocusCutOut.Statement)
+    (hnear : PrimitiveFormSheetedPointsNear.Statement)
+    : PrimitiveFormSheetedOffDiscriminant.Statement := by
   intro σ _ X w d A hX hirr hiso hinj ℓ N a δ q ha hδ hq hδ0 hP hsep hQ
   obtain ⟨c, e, hc, he, hce, hsh⟩ := hcut σ X w d A hX hiso ℓ N a δ q ha hδ hq hδ0 hP hsep hQ
   rcases hirr.2 c e hc he hce with hc0 | he0

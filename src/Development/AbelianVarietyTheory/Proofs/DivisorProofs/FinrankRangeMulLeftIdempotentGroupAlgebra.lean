@@ -4,11 +4,16 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders GlobalTheory.BadCount Module
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ArithmeticCylinders
+  GlobalTheory.BadCount Module
 
 namespace GlobalTheory.BadCount
 
-theorem finrank_range_mulLeft_idem : ∀ (K H : Type) [Field K] [CharZero K] [Group H] [Finite H] (a : MonoidAlgebra K H), a * a = a → ((finrank K (LinearMap.range (LinearMap.mulLeft K a)) : ℕ) : K) = (Nat.card H : K) * a.coeff 1 := by
+theorem finrank_range_mulLeft_idem
+    : ∀ (K H : Type) [Field K] [CharZero K] [Group H] [Finite H] (a : MonoidAlgebra K H),
+      a * a = a
+        → ((finrank K (LinearMap.range (LinearMap.mulLeft K a)) : ℕ) : K)
+          = (Nat.card H : K) * a.coeff 1 := by
   intro K H _ _ _ _ a ha
   classical
   haveI : Fintype H := Fintype.ofFinite H
@@ -19,8 +24,13 @@ theorem finrank_range_mulLeft_idem : ∀ (K H : Type) [Field K] [CharZero K] [Gr
     rw [← mul_assoc, ha]
   rw [← (LinearMap.IsIdempotentElem.isProj_range _ hi).trace]
   rw [LinearMap.trace_eq_matrix_trace K (MonoidAlgebra.basis H K), Matrix.trace]
-  have h : ∀ g : H, Matrix.diag (LinearMap.toMatrix (MonoidAlgebra.basis H K)
-      (MonoidAlgebra.basis H K) (LinearMap.mulLeft K a)) g = a.coeff 1 := by
+  have h
+      : ∀ g : H,
+        Matrix.diag
+            (LinearMap.toMatrix (MonoidAlgebra.basis H K) (MonoidAlgebra.basis H K)
+              (LinearMap.mulLeft K a))
+            g
+          = a.coeff 1 := by
     intro g
     rw [Matrix.diag_apply, LinearMap.toMatrix_apply, MonoidAlgebra.basis_apply,
       LinearMap.mulLeft_apply]

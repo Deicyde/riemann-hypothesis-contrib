@@ -11,9 +11,11 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem evenNorms_of_unit_nonsquare {K : Type} [Field K] (w : Valuation K ℤᵐ⁰)
-    (hsq : ∀ x : K, w (x - 1) < 1 → IsSquare x) (δ : K) (hδ : w δ = 1) (hn : ¬ IsSquare δ) :
-    EvenNorms w δ := by
+theorem evenNorms_of_unit_nonsquare
+    {K : Type} [Field K]
+    (w : Valuation K ℤᵐ⁰) (hsq : ∀ x : K, w (x - 1) < 1 → IsSquare x)
+    (δ : K) (hδ : w δ = 1) (hn : ¬ IsSquare δ)
+    : EvenNorms w δ := by
   have key : ∀ c : K, c ≠ 0 → ∃ n : ℤ, w c ^ 2 = WithZero.exp (2 * n) := by
     intro c hc
     have h0 : w c ≠ 0 := by simpa using hc
@@ -47,8 +49,7 @@ theorem evenNorms_of_unit_nonsquare {K : Type} [Field K] (w : Valuation K ℤᵐ
     rcases hle.lt_or_eq with hlt | heq
     · exfalso
       apply hn
-      have e : δ * (b / a) ^ 2 - 1 = -((a ^ 2 - δ * b ^ 2) / a ^ 2) := by
-        field_simp; ring
+      have e : δ * (b / a) ^ 2 - 1 = -((a ^ 2 - δ * b ^ 2) / a ^ 2) := by field_simp; ring
       have hs : IsSquare (δ * (b / a) ^ 2) := by
         apply hsq
         rw [e, Valuation.map_neg, map_div₀, ha2, div_lt_one₀ (pow_pos (zero_lt_iff.2 ha0) 2)]
@@ -56,7 +57,8 @@ theorem evenNorms_of_unit_nonsquare {K : Type} [Field K] (w : Valuation K ℤᵐ
       obtain ⟨r, hr⟩ := hs
       refine ⟨r * a / b, ?_⟩
       have : δ = (δ * (b / a) ^ 2) * (a / b) ^ 2 := by field_simp
-      rw [this, hr]; ring
+      rw [this, hr]
+      ring
     · rw [heq]; exact key a ha
   · have ha : a ≠ 0 := by
       rintro rfl
@@ -66,9 +68,10 @@ theorem evenNorms_of_unit_nonsquare {K : Type} [Field K] (w : Valuation K ℤᵐ
     rw [w.map_sub_eq_of_lt_left hlt, ha2]
     exact key a ha
 
-theorem evenNorms_of_odd_place : ∀ (F : Type) [Field F] [NumberField F]
-    (v : HeightOneSpectrum (𝓞 F)), Valued.v (2 : v.adicCompletion F) = 1 →
-    ∀ δ : v.adicCompletion F, Valued.v δ = 1 → ¬ IsSquare δ → EvenNorms Valued.v δ := by
+theorem evenNorms_of_odd_place
+    : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)),
+      Valued.v (2 : v.adicCompletion F) = 1
+        → ∀ δ : v.adicCompletion F, Valued.v δ = 1 → ¬ IsSquare δ → EvenNorms Valued.v δ := by
   intro F _ _ v h2 δ hδ hn
   refine evenNorms_of_unit_nonsquare _ (fun x hx => ?_) δ hδ hn
   apply GlobalTheory.LocalQuad.isSquare_of_valued_sub_one_lt F v x

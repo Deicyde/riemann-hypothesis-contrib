@@ -8,9 +8,12 @@ open Filter Topology
 
 namespace GlobalTheory.CompanionTheory.Twist.FockLogDeriv
 
-theorem eq_zero_of_forall_nhds {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
+theorem eq_zero_of_forall_nhds
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
     (T : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hT : ∀ b, (∀ y, T y b = 0) → b = 0)
-    (y₀ : V) (U : Set V) (hU : U ∈ 𝓝 y₀) (b : V) (hb : ∀ y ∈ U, T y b = 0) : b = 0 := by
+    (y₀ : V) (U : Set V) (hU : U ∈ 𝓝 y₀)
+    (b : V) (hb : ∀ y ∈ U, T y b = 0)
+    : b = 0 := by
   apply hT
   intro z
   obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.mp hU
@@ -18,38 +21,44 @@ theorem eq_zero_of_forall_nhds {V : Type} [NormedAddCommGroup V] [NormedSpace �
   have hz1 : 0 < ‖z‖ + 1 := by positivity
   set t : ℝ := ε / (2 * (‖z‖ + 1)) with ht
   have htpos : 0 < t := by positivity
-  have htz : t * (‖z‖ + 1) = ε / 2 := by
-    rw [ht]; field_simp
+  have htz : t * (‖z‖ + 1) = ε / 2 := by rw [ht]; field_simp
   have hmem : y₀ + t • z ∈ U := by
     apply hball
     rw [Metric.mem_ball, dist_eq_norm, add_sub_cancel_left, norm_smul, Real.norm_of_nonneg htpos.le]
     nlinarith [norm_nonneg z]
   have h1 := hb _ hmem
-  rw [map_add (f := _), LinearMap.add_apply, map_smul, LinearMap.smul_apply, h0, zero_add, smul_eq_mul] at h1
+  rw [map_add (f := _), LinearMap.add_apply, map_smul, LinearMap.smul_apply, h0, zero_add,
+      smul_eq_mul]
+    at h1
   exact (mul_eq_zero.mp h1).resolve_left htpos.ne'
 
-theorem main {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+theorem main
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
     (T : V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hT : ∀ b, (∀ y, T y b = 0) → b = 0)
     (Jm : V × V →ₗ[ℝ] V × V) (f₀ : SchwartzMap V ℂ) (hf : f₀ ≠ 0)
-    (hE : ∀ (p : V × V) (y : V), fderiv ℝ f₀ y (Jm p).1
-        + (-(2 * Real.pi * Complex.I)) * ((T y (Jm p).2 : ℝ) : ℂ) * f₀ y
-      = Complex.I * (fderiv ℝ f₀ y p.1
-        + (-(2 * Real.pi * Complex.I)) * ((T y p.2 : ℝ) : ℂ) * f₀ y)) :
-    ∃ m : V →ₗ[ℝ] V →ₗ[ℝ] ℂ, ∀ a y, fderiv ℝ f₀ y a = m a y * f₀ y := by
-  let Φ : V × V →ₗ[ℝ] (V → ℂ) :=
-    { toFun := fun p y => fderiv ℝ f₀ y p.1 + (-(2 * Real.pi * Complex.I)) * ((T y p.2 : ℝ) : ℂ) * f₀ y
-      map_add' := by
-        intro p q
-        funext y
-        simp only [Prod.fst_add, Prod.snd_add, map_add (f := _), Complex.ofReal_add, Pi.add_apply]
-        ring
-      map_smul' := by
-        intro s p
-        funext y
-        simp only [Prod.smul_fst, Prod.smul_snd, map_smul, smul_eq_mul, Complex.ofReal_mul, RingHom.id_apply,
-          Pi.smul_apply, Complex.real_smul]
-        ring }
-  have hΦ : ∀ p y, Φ p y = fderiv ℝ f₀ y p.1 + (-(2 * Real.pi * Complex.I)) * ((T y p.2 : ℝ) : ℂ) * f₀ y :=
+    (hE : ∀ (p : V × V) (y : V),
+      fderiv ℝ f₀ y (Jm p).1 + (-(2 * Real.pi * Complex.I)) * ((T y (Jm p).2 : ℝ) : ℂ) * f₀ y
+        = Complex.I
+          * (fderiv ℝ f₀ y p.1 + (-(2 * Real.pi * Complex.I)) * ((T y p.2 : ℝ) : ℂ) * f₀ y))
+    : ∃ m : V →ₗ[ℝ] V →ₗ[ℝ] ℂ, ∀ a y, fderiv ℝ f₀ y a = m a y * f₀ y := by
+  let Φ : V × V →ₗ[ℝ] (V → ℂ) := {
+    toFun := fun p y =>
+      fderiv ℝ f₀ y p.1 + (-(2 * Real.pi * Complex.I)) * ((T y p.2 : ℝ) : ℂ) * f₀ y
+    map_add' := by
+      intro p q
+      funext y
+      simp only [Prod.fst_add, Prod.snd_add, map_add (f := _), Complex.ofReal_add, Pi.add_apply]
+      ring
+    map_smul' := by
+      intro s p
+      funext y
+      simp only [Prod.smul_fst, Prod.smul_snd, map_smul, smul_eq_mul, Complex.ofReal_mul,
+        RingHom.id_apply, Pi.smul_apply, Complex.real_smul]
+      ring
+  }
+  have hΦ
+      : ∀ p y,
+        Φ p y = fderiv ℝ f₀ y p.1 + (-(2 * Real.pi * Complex.I)) * ((T y p.2 : ℝ) : ℂ) * f₀ y :=
     fun p y => rfl
   have hEΦ : ∀ p y, Φ (Jm p) y = Complex.I * Φ p y := fun p y => by rw [hΦ, hΦ]; exact hE p y
   have hΦ0 : ∀ w y, Φ (0, w) y = (-(2 * Real.pi * Complex.I)) * ((T y w : ℝ) : ℂ) * f₀ y := by
@@ -57,10 +66,14 @@ theorem main {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimens
     rw [hΦ]
     simp only [map_zero, zero_add]
   let Q : V × V →ₗ[ℝ] V × V :=
-    (LinearMap.inr ℝ V V) ∘ₗ (LinearMap.fst ℝ V V) + Jm ∘ₗ (LinearMap.inr ℝ V V) ∘ₗ (LinearMap.snd ℝ V V)
+    (LinearMap.inr ℝ V V) ∘ₗ (LinearMap.fst ℝ V V)
+      + Jm ∘ₗ (LinearMap.inr ℝ V V) ∘ₗ (LinearMap.snd ℝ V V)
   let Θ : V × V →ₗ[ℝ] (V → ℂ) := Φ ∘ₗ Q
-  have hΘ : ∀ w₁ w₂ y, Θ (w₁, w₂) y = (-(2 * Real.pi * Complex.I)) * ((T y w₁ : ℝ) : ℂ) * f₀ y +
-      Complex.I * ((-(2 * Real.pi * Complex.I)) * ((T y w₂ : ℝ) : ℂ) * f₀ y) := by
+  have hΘ
+      : ∀ w₁ w₂ y,
+        Θ (w₁, w₂) y
+          = (-(2 * Real.pi * Complex.I)) * ((T y w₁ : ℝ) : ℂ) * f₀ y
+            + Complex.I * ((-(2 * Real.pi * Complex.I)) * ((T y w₂ : ℝ) : ℂ) * f₀ y) := by
     intro w₁ w₂ y
     have e : Θ (w₁, w₂) = Φ (0, w₁) + Φ (Jm (0, w₂)) := map_add Φ _ _
     rw [e, Pi.add_apply, hEΦ, hΦ0, hΦ0]
@@ -78,8 +91,10 @@ theorem main {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimens
       have h0 : Θ (w₁, w₂) y = 0 := by rw [h]; rfl
       rw [hΘ] at h0
       have h3 : ((T y w₁ : ℝ) : ℂ) + Complex.I * ((T y w₂ : ℝ) : ℂ) = 0 := by
-        have h4 : (-(2 * Real.pi * Complex.I)) * f₀ y *
-            (((T y w₁ : ℝ) : ℂ) + Complex.I * ((T y w₂ : ℝ) : ℂ)) = 0 := by
+        have h4
+            : (-(2 * Real.pi * Complex.I)) * f₀ y
+                * (((T y w₁ : ℝ) : ℂ) + Complex.I * ((T y w₂ : ℝ) : ℂ))
+              = 0 := by
           rw [← h0]; ring
         rcases mul_eq_zero.mp h4 with h5 | h5
         · rcases mul_eq_zero.mp h5 with h6 | h6
@@ -92,7 +107,8 @@ theorem main {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimens
       exact ⟨hre, him⟩
     have e1 := eq_zero_of_forall_nhds T hT y₀ _ hU w₁ fun y hy => (hsplit y hy).1
     have e2 := eq_zero_of_forall_nhds T hT y₀ _ hU w₂ fun y hy => (hsplit y hy).2
-    rw [e1, e2]; rfl
+    rw [e1, e2]
+    rfl
   have hle : LinearMap.range Θ ≤ LinearMap.range Φ := LinearMap.range_comp_le_range Q Φ
   have hrange : LinearMap.range Θ = LinearMap.range Φ := by
     apply Submodule.eq_of_le_of_finrank_le hle
@@ -107,15 +123,27 @@ theorem main {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimens
     intro a
     have h := congrArg Subtype.val (e.apply_symm_apply ⟨Φ (a, 0), hmem a⟩)
     exact h
-  let m : V →ₗ[ℝ] V →ₗ[ℝ] ℂ := LinearMap.mk₂ ℝ
-    (fun a y => (-(2 * Real.pi * Complex.I)) * ((T y (W a).1 : ℝ) : ℂ) +
-      Complex.I * ((-(2 * Real.pi * Complex.I)) * ((T y (W a).2 : ℝ) : ℂ)))
-    (by intro a₁ a₂ y; simp only [map_add (f := _), Prod.fst_add, Prod.snd_add, Complex.ofReal_add]; ring)
-    (by intro s a y; simp only [map_smul, Prod.smul_fst, Prod.smul_snd, smul_eq_mul, Complex.ofReal_mul,
-      Complex.real_smul]; ring)
-    (by intro a y₁ y₂; simp only [map_add (f := _), LinearMap.add_apply, Complex.ofReal_add]; ring)
-    (by intro s a y; simp only [map_smul, LinearMap.smul_apply, smul_eq_mul, Complex.ofReal_mul,
-      Complex.real_smul]; ring)
+  let m : V →ₗ[ℝ] V →ₗ[ℝ] ℂ :=
+    LinearMap.mk₂ ℝ
+      (fun a y =>
+        (-(2 * Real.pi * Complex.I)) * ((T y (W a).1 : ℝ) : ℂ)
+          + Complex.I * ((-(2 * Real.pi * Complex.I)) * ((T y (W a).2 : ℝ) : ℂ)))
+      (by
+        intro a₁ a₂ y
+        simp only [map_add (f := _), Prod.fst_add, Prod.snd_add, Complex.ofReal_add]
+        ring)
+      (by
+        intro s a y
+        simp only [map_smul, Prod.smul_fst, Prod.smul_snd, smul_eq_mul, Complex.ofReal_mul,
+          Complex.real_smul]
+        ring)
+      (by
+        intro a y₁ y₂; simp only [map_add (f := _), LinearMap.add_apply, Complex.ofReal_add]; ring)
+      (by
+        intro s a y
+        simp only [map_smul, LinearMap.smul_apply, smul_eq_mul, Complex.ofReal_mul,
+          Complex.real_smul]
+        ring)
   refine ⟨m, fun a y => ?_⟩
   have h1 : Φ (a, 0) y = fderiv ℝ f₀ y a := by
     rw [hΦ]; simp only [map_zero, Complex.ofReal_zero, mul_zero, zero_mul, add_zero]

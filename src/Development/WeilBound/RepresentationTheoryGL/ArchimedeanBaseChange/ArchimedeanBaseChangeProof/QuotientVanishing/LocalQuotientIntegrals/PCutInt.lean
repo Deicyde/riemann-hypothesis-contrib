@@ -13,17 +13,17 @@ namespace PositivityTheory.Rg.BcB.CV.AdelicTopology
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem twConj_mul_eq {G : Type} [Group G] (θ : Monoid.End G) (a b δ : G) :
-    twConj θ (a * b) δ = twConj θ b (twConj θ a δ) := by
+theorem twConj_mul_eq {G : Type} [Group G] (θ : Monoid.End G) (a b δ : G)
+    : twConj θ (a * b) δ = twConj θ b (twConj θ a δ) := by
   simp only [twConj, map_mul]
   group
 
-theorem twConj_ratGL (g d : GL (Fin n) E) :
-    twConj (thetaA E n) (ratGL E n g) (ratGL E n d) = ratGL E n (twConj (thetaE E n) g d) := by
+theorem twConj_ratGL (g d : GL (Fin n) E)
+    : twConj (thetaA E n) (ratGL E n g) (ratGL E n d) = ratGL E n (twConj (thetaE E n) g d) := by
   simp only [twConj, GlobalTheory.CompanionTheory.RatDisc.thetaA_ratGL, map_mul, map_inv]
 
-theorem chiT_ratGL_mul (hM : Mahler) (τ : ℝ) (c : GL (Fin n) E) (x : GA E n) :
-    chiT τ (ratGL E n c * x) = chiT τ x := by
+theorem chiT_ratGL_mul (hM : Mahler) (τ : ℝ) (c : GL (Fin n) E) (x : GA E n)
+    : chiT τ (ratGL E n c * x) = chiT τ x := by
   have h := ((hM E n τ).2.1 c x)
   by_cases hx : x ∈ cutSet E n τ
   · unfold chiT
@@ -41,7 +41,10 @@ theorem norm_chiT_le (τ : ℝ) (x : GA E n) : ‖chiT τ x‖ ≤ 1 := by
 end PositivityTheory.Rg.BcB.CV.AdelicTopology
 
 open PositivityTheory.Rg.BcB.CV.AdelicTopology in
-theorem PositivityTheory.Rg.BcB.CV.pf_CutInt : PositivityTheory.Rg.BcB.D4.KerFin → PositivityTheory.Rg.BcB.Mahler → PositivityTheory.Rg.BcB.CV.QInt → PositivityTheory.Rg.BcB.CV.AdTop → PositivityTheory.Rg.BcB.CV.CutInt := by
+theorem PositivityTheory.Rg.BcB.CV.pf_CutInt
+    : PositivityTheory.Rg.BcB.D4.KerFin → PositivityTheory.Rg.BcB.Mahler
+      → PositivityTheory.Rg.BcB.CV.QInt → PositivityTheory.Rg.BcB.CV.AdTop
+      → PositivityTheory.Rg.BcB.CV.CutInt := by
   classical
   intro hK hM hQ hA E _ _ _ n _ _ μ _ τ φ d hφ
   obtain ⟨hLC, hT2, hSC, hθ, -, hrat⟩ := hA E n
@@ -52,9 +55,12 @@ theorem PositivityTheory.Rg.BcB.CV.pf_CutInt : PositivityTheory.Rg.BcB.D4.KerFin
     exact (continuous_inv.mul continuous_const).mul hθ
   have hmeas : Measurable fun x => chiT τ x * φ (twConj (thetaA E n) x (ratGL E n d)) := by
     refine Measurable.mul ?_ (hφ.cont.comp hcont).measurable
-    exact (measurable_one.indicator hcl.measurableSet : Measurable ((cutSet E n τ).indicator (1 : GA E n → ℂ)))
-  have hinvF : ∀ g ∈ ratCent d, ∀ x, chiT τ (g * x) * φ (twConj (thetaA E n) (g * x) (ratGL E n d)) =
-      chiT τ x * φ (twConj (thetaA E n) x (ratGL E n d)) := by
+    exact (measurable_one.indicator hcl.measurableSet
+      : Measurable ((cutSet E n τ).indicator (1 : GA E n → ℂ)))
+  have hinvF
+      : ∀ g ∈ ratCent d, ∀ x,
+        chiT τ (g * x) * φ (twConj (thetaA E n) (g * x) (ratGL E n d))
+          = chiT τ x * φ (twConj (thetaA E n) x (ratGL E n d)) := by
     rintro _ ⟨c, hc, rfl⟩ x
     rw [chiT_ratGL_mul hM τ c x,
       twConj_mul_left _ _ (GlobalTheory.CompanionTheory.RatDisc.ratCent_le d ⟨c, hc, rfl⟩) x]
@@ -67,7 +73,10 @@ theorem PositivityTheory.Rg.BcB.CV.pf_CutInt : PositivityTheory.Rg.BcB.D4.KerFin
   set C' : Set (GA E n) := ⋃ d' ∈ S, (fun c => ratGL E n (pick d') * c) '' C with hC'def
   have hC' : IsCompact C' :=
     hS.isCompact_biUnion fun d' _ => hC.image (continuous_const.mul continuous_id)
-  have hsupp : ∀ x, chiT τ x * φ (twConj (thetaA E n) x (ratGL E n d)) ≠ 0 → x ∈ (ratCent d : Set (GA E n)) * C' := by
+  have hsupp
+      : ∀ x,
+        chiT τ x * φ (twConj (thetaA E n) x (ratGL E n d)) ≠ 0
+          → x ∈ (ratCent d : Set (GA E n)) * C' := by
     intro x hx
     have hxc : x ∈ cutSet E n τ := by
       by_contra h
@@ -96,9 +105,10 @@ theorem PositivityTheory.Rg.BcB.CV.pf_CutInt : PositivityTheory.Rg.BcB.D4.KerFin
   have hbound : ∀ x ∈ C', ‖chiT τ x * φ (twConj (thetaA E n) x (ratGL E n d))‖ ≤ max B 0 := by
     intro x _
     rw [norm_mul]
-    calc ‖chiT τ x‖ * ‖φ (twConj (thetaA E n) x (ratGL E n d))‖
-        ≤ 1 * ‖φ (twConj (thetaA E n) x (ratGL E n d))‖ :=
-          mul_le_mul_of_nonneg_right (norm_chiT_le τ x) (norm_nonneg _)
+    calc
+      ‖chiT τ x‖ * ‖φ (twConj (thetaA E n) x (ratGL E n d))‖
+          ≤ 1 * ‖φ (twConj (thetaA E n) x (ratGL E n d))‖ :=
+        mul_le_mul_of_nonneg_right (norm_chiT_le τ x) (norm_nonneg _)
       _ ≤ max B 0 := by rw [one_mul]; exact (hB _).trans (le_max_left _ _)
   have := hLC
   have := hT2

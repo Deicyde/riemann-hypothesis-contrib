@@ -24,11 +24,13 @@ private lemma finite_middle {R : Type u} [Ring R] {M₁ M₂ M₃ : Type v}
     Module.Finite.equiv g.quotKerEquivRange.symm
   exact Module.Finite.of_submodule_quotient (LinearMap.ker g)
 
-theorem homology_finite_short_exact {R : Type u} [Ring R] {ι : Type w} {c : ComplexShape ι}
-    {S : ShortComplex (HomologicalComplex (ModuleCat.{v} R) c)} (hS : S.ShortExact) (i : ι) :
-    (Finite (S.X₁.homology i) → Finite (S.X₃.homology i) → Finite (S.X₂.homology i)) ∧
-    (IsNoetherianRing R → Module.Finite R (S.X₁.homology i) →
-      Module.Finite R (S.X₃.homology i) → Module.Finite R (S.X₂.homology i)) := by
+theorem homology_finite_short_exact
+    {R : Type u} [Ring R]
+    {ι : Type w} {c : ComplexShape ι} {S : ShortComplex (HomologicalComplex (ModuleCat.{v} R) c)}
+    (hS : S.ShortExact) (i : ι)
+    : (Finite (S.X₁.homology i) → Finite (S.X₃.homology i) → Finite (S.X₂.homology i))
+      ∧ (IsNoetherianRing R → Module.Finite R (S.X₁.homology i) → Module.Finite R (S.X₃.homology i)
+        → Module.Finite R (S.X₂.homology i)) := by
   have hE := hS.homology_exact₂ i
   refine ⟨fun h₁ h₃ ↦ ?_, fun _ h₁ h₃ ↦ ?_⟩
   · exact AddCommGrpCat.isFinite.prop_X₂_of_exact

@@ -4,6 +4,7 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Dis
 
 @[expose] public section
 
-theorem GlobalTheory.T.discreteSeries_detSqrtCover_of_unitary_classification :
-    GlobalTheory.Published.DiscreteSeriesClassification → GlobalTheory.Published.DiscreteSeriesCover :=
+theorem GlobalTheory.T.discreteSeries_detSqrtCover_of_unitary_classification
+    : GlobalTheory.Published.DiscreteSeriesClassification
+      → GlobalTheory.Published.DiscreteSeriesCover :=
   GlobalTheory.CoverDS.discreteSeriesCover_of_classification

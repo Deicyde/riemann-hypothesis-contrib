@@ -11,9 +11,10 @@ namespace GroundTheory.Heights₂.Heights
 
 open Matrix Real
 
-theorem ThetaBound.proof (hG : GaussianSum.Statement) (hMean : ThetaMean.Statement)
-    (hMaj : ThetaNormMajorant.Statement) (hSplit : ThetaFirstCoordSplit.Statement)
-    (hConst : ThetaConstants.Statement) : ThetaBound.Statement := by
+theorem ThetaBound.proof
+    (hG : GaussianSum.Statement) (hMean : ThetaMean.Statement) (hMaj : ThetaNormMajorant.Statement)
+    (hSplit : ThetaFirstCoordSplit.Statement) (hConst : ThetaConstants.Statement)
+    : ThetaBound.Statement := by
   obtain ⟨C₃, hC₃, hG⟩ := hG
   obtain ⟨C, hC, hK⟩ := hConst C₃ hC₃
   refine ⟨C, hC, ?_⟩
@@ -29,17 +30,21 @@ theorem ThetaBound.proof (hG : GaussianSum.Statement) (hMean : ThetaMean.Stateme
   have h3 := (hG g Y ρ hY hR.pos hR.min (a + u₁)).2
   have h4 := hK g ρ Y.det hg hR.pos hY.det_pos hR.sq_le hdet
   have he : 0 ≤ exp (-(π / (2 * ρ ^ 2)) * δ ^ 2) := (exp_pos _).le
-  calc thetaNorm X Y a b u₁ u₂ ≤ ∑' k : Fin g → ℤ, exp (-π * qf Y (intVec k + a + u₁)) := h1
-    _ ≤ exp (-(π / (2 * ρ ^ 2)) * δ ^ 2) *
-          ∑' k : Fin g → ℤ, exp (-(π / 2) * qf Y (intVec k + (a + u₁))) := h2
-    _ ≤ exp (-(π / (2 * ρ ^ 2)) * δ ^ 2) *
-          ((C₃ * g) ^ ((g : ℝ) / 2) * Y.det ^ (-(1 / 2 : ℝ)) * (1 + 1 / ρ) ^ g) :=
-        mul_le_mul_of_nonneg_left h3 he
-    _ ≤ exp (-(π / (2 * ρ ^ 2)) * δ ^ 2) * (((2 : ℝ) ^ g * Y.det) ^ (-(1 / 4 : ℝ)) *
-          exp (g * log (1 + 1 / ρ) + C * g * log (2 * g))) :=
-        mul_le_mul_of_nonneg_left h4 he
-    _ = ((2 : ℝ) ^ g * Y.det) ^ (-(1 / 4 : ℝ)) *
-          exp (-(π / (2 * ρ ^ 2)) * δ ^ 2 + (g * log (1 + 1 / ρ) + C * g * log (2 * g))) := by
-        rw [exp_add (-(π / (2 * ρ ^ 2)) * δ ^ 2)]; ring
+  calc
+    thetaNorm X Y a b u₁ u₂
+      ≤ ∑' k : Fin g → ℤ, exp (-π * qf Y (intVec k + a + u₁)) := h1
+    _ ≤ exp (-(π / (2 * ρ ^ 2)) * δ ^ 2)
+        * ∑' k : Fin g → ℤ, exp (-(π / 2) * qf Y (intVec k + (a + u₁))) :=
+      h2
+    _ ≤ exp (-(π / (2 * ρ ^ 2)) * δ ^ 2)
+        * ((C₃ * g) ^ ((g : ℝ) / 2) * Y.det ^ (-(1 / 2 : ℝ)) * (1 + 1 / ρ) ^ g) :=
+      mul_le_mul_of_nonneg_left h3 he
+    _ ≤ exp (-(π / (2 * ρ ^ 2)) * δ ^ 2)
+        * (((2 : ℝ) ^ g * Y.det) ^ (-(1 / 4 : ℝ))
+          * exp (g * log (1 + 1 / ρ) + C * g * log (2 * g))) :=
+      mul_le_mul_of_nonneg_left h4 he
+    _ = ((2 : ℝ) ^ g * Y.det) ^ (-(1 / 4 : ℝ))
+        * exp (-(π / (2 * ρ ^ 2)) * δ ^ 2 + (g * log (1 + 1 / ρ) + C * g * log (2 * g))) := by
+      rw [exp_add (-(π / (2 * ρ ^ 2)) * δ ^ 2)]; ring
 
 end GroundTheory.Heights₂.Heights

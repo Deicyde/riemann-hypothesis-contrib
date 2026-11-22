@@ -28,9 +28,11 @@ lemma withBot_lt_of_add_one_le {a b : WithBot ℕ∞} (h : a + 1 ≤ b) (hb : b 
       have ha' : a ≠ ⊤ := (lt_of_le_of_lt (le_self_add.trans h') hb').ne
       exact WithBot.coe_lt_coe.mpr ((ENat.add_one_le_iff ha').mp h')
 
-theorem dim_lt_of_closedEmbedding {Z Y : Type*} [TopologicalSpace Z] [TopologicalSpace Y] [IrreducibleSpace Y]
-    (f : Z → Y) (hf : IsClosedEmbedding f) (hfin : topologicalKrullDim Y < ⊤) (hne : (range f)ᶜ.Nonempty) :
-    topologicalKrullDim Z < topologicalKrullDim Y := by
+theorem dim_lt_of_closedEmbedding
+    {Z Y : Type*} [TopologicalSpace Z] [TopologicalSpace Y] [IrreducibleSpace Y]
+    (f : Z → Y) (hf : IsClosedEmbedding f)
+    (hfin : topologicalKrullDim Y < ⊤) (hne : (range f)ᶜ.Nonempty)
+    : topologicalKrullDim Z < topologicalKrullDim Y := by
   have hY : Nonempty (IrreducibleCloseds Y) := ⟨univIC Y⟩
   by_cases hZ : Nonempty (IrreducibleCloseds Z)
   · have hlt : ∀ c : IrreducibleCloseds Z, IrreducibleCloseds.map f hf.continuous c < univIC Y := by
@@ -45,8 +47,8 @@ theorem dim_lt_of_closedEmbedding {Z Y : Type*} [TopologicalSpace Z] [Topologica
       apply h1
       rw [heq]
       trivial
-    let g : WithTop (IrreducibleCloseds Z) → IrreducibleCloseds Y :=
-      fun o => WithTop.recTopCoe (univIC Y) (IrreducibleCloseds.map f hf.continuous) o
+    let g : WithTop (IrreducibleCloseds Z) → IrreducibleCloseds Y := fun o =>
+      WithTop.recTopCoe (univIC Y) (IrreducibleCloseds.map f hf.continuous) o
     have hg : StrictMono g := by
       intro a b hab
       induction a using WithTop.recTopCoe with
@@ -55,7 +57,8 @@ theorem dim_lt_of_closedEmbedding {Z Y : Type*} [TopologicalSpace Z] [Topologica
         induction b using WithTop.recTopCoe with
         | top => exact hlt a
         | coe b =>
-          exact IrreducibleCloseds.map_strictMono_of_isInducing hf.isInducing (WithTop.coe_lt_coe.mp hab)
+          exact IrreducibleCloseds.map_strictMono_of_isInducing hf.isInducing
+            (WithTop.coe_lt_coe.mp hab)
     have h := krullDim_le_of_strictMono g hg
     rw [krullDim_WithTop] at h
     exact withBot_lt_of_add_one_le h hfin (bot_lt_krullDim).ne'

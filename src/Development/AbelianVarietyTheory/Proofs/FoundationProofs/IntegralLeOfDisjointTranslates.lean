@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.EnormPowLeI
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.ThetaSupBall
@@ -15,51 +17,68 @@ namespace GlobalTheory.ThetaSupBall
 open MeasureTheory Filter Set
 open scoped Pointwise
 
-theorem integral_le_of_disjoint_translates {ι : Type} [Fintype ι]
+theorem integral_le_of_disjoint_translates
+    {ι : Type} [Fintype ι]
     (A : AddSubgroup (EuclideanSpace ℂ ι)) [Countable A]
-    (D t : Set (EuclideanSpace ℂ ι)) (hD : IsAddFundamentalDomain A D volume)
-    (ht : MeasurableSet t)
+    (D t : Set (EuclideanSpace ℂ ι)) (hD : IsAddFundamentalDomain A D volume) (ht : MeasurableSet t)
     (hd : ∀ y₁ y₂ : A, y₁ ≠ y₂ → Disjoint (y₁ +ᵥ t) (y₂ +ᵥ t))
     (f : EuclideanSpace ℂ ι → ℝ) (hf0 : ∀ u, 0 ≤ f u) (hfc : Continuous f)
-    (hf : ∀ (y : A) u, f (y +ᵥ u) = f u) (hi : IntegrableOn f D) :
-    ∫ u in t, f u ≤ ∫ u in D, f u := by
+    (hf : ∀ (y : A) u, f (y +ᵥ u) = f u) (hi : IntegrableOn f D)
+    : ∫ u in t, f u ≤ ∫ u in D, f u := by
   haveI : VAddInvariantMeasure A (EuclideanSpace ℂ ι) volume :=
     ⟨fun g s _ => measure_preimage_add volume (g : EuclideanSpace ℂ ι) s⟩
   rw [integral_eq_lintegral_of_nonneg_ae (Eventually.of_forall hf0) hfc.aestronglyMeasurable,
     integral_eq_lintegral_of_nonneg_ae (Eventually.of_forall hf0) hfc.aestronglyMeasurable]
   refine ENNReal.toReal_mono (Integrable.lintegral_lt_top hi).ne ?_
-  calc ∫⁻ u in t, ENNReal.ofReal (f u)
-      = ∑' y : A, ∫⁻ u in (y +ᵥ t) ∩ D, ENNReal.ofReal (f (-y +ᵥ u)) :=
-        hD.setLIntegral_eq_tsum' (fun u => ENNReal.ofReal (f u)) t
+  calc
+    ∫⁻ u in t, ENNReal.ofReal (f u)
+        = ∑' y : A, ∫⁻ u in (y +ᵥ t) ∩ D, ENNReal.ofReal (f (-y +ᵥ u)) :=
+      hD.setLIntegral_eq_tsum' (fun u => ENNReal.ofReal (f u)) t
     _ = ∑' y : A, ∫⁻ u in (y +ᵥ t) ∩ D, ENNReal.ofReal (f u) := by simp_rw [hf]
     _ = ∫⁻ u in ⋃ y : A, (y +ᵥ t) ∩ D, ENNReal.ofReal (f u) := by
-        refine (lintegral_iUnion₀ (fun y => ?_) ?_ _).symm
-        · exact (ht.const_vadd y).nullMeasurableSet.inter hD.nullMeasurableSet
-        · intro y₁ y₂ h
-          exact (((hd y₁ y₂ h).inf_left _).inf_right _).aedisjoint
+      refine (lintegral_iUnion₀ (fun y => ?_) ?_ _).symm
+      · exact (ht.const_vadd y).nullMeasurableSet.inter hD.nullMeasurableSet
+      · intro y₁ y₂ h
+        exact (((hd y₁ y₂ h).inf_left _).inf_right _).aedisjoint
     _ ≤ ∫⁻ u in D, ENNReal.ofReal (f u) :=
-        lintegral_mono_set (iUnion_subset fun _ => inter_subset_right)
+      lintegral_mono_set (iUnion_subset fun _ => inter_subset_right)
 
-theorem factorial_div_le (g : ℕ) {v r : ℝ} (hv : 1 ≤ v) (hr : r ^ 2 = 1 / (4 * v)) :
-    (g.factorial : ℝ) / (Real.pi ^ g * r ^ (2 * g)) ≤ (2 * (g : ℝ) * v + 1) ^ g := by
+theorem factorial_div_le (g : ℕ) {v r : ℝ} (hv : 1 ≤ v) (hr : r ^ 2 = 1 / (4 * v))
+    : (g.factorial : ℝ) / (Real.pi ^ g * r ^ (2 * g)) ≤ (2 * (g : ℝ) * v + 1) ^ g := by
   have hv0 : 0 < v := by linarith
   have hpi := Real.pi_gt_three
   rw [pow_mul, hr, ← mul_pow]
   have h1 : (g.factorial : ℝ) ≤ (g : ℝ) ^ g := by exact_mod_cast Nat.factorial_le_pow g
-  calc (g.factorial : ℝ) / (Real.pi * (1 / (4 * v))) ^ g
+  calc
+    (g.factorial : ℝ) / (Real.pi * (1 / (4 * v))) ^ g
       ≤ (g : ℝ) ^ g / (Real.pi * (1 / (4 * v))) ^ g := by gcongr
     _ = ((g : ℝ) / (Real.pi * (1 / (4 * v)))) ^ g := by rw [div_pow]
     _ ≤ _ := by
-        refine pow_le_pow_left₀ (by positivity) ?_ g
-        rw [div_le_iff₀ (by positivity)]
-        have h2 : (2 * (g : ℝ) * v + 1) * (Real.pi * (1 / (4 * v)))
-            = Real.pi / 2 * g + Real.pi / (4 * v) := by field_simp; ring
-        rw [h2]
-        have h3 : 0 ≤ Real.pi / (4 * v) := by positivity
-        have h4 : (0 : ℝ) ≤ g := Nat.cast_nonneg g
-        nlinarith
+      refine pow_le_pow_left₀ (by positivity) ?_ g
+      rw [div_le_iff₀ (by positivity)]
+      have h2
+          : (2 * (g : ℝ) * v + 1) * (Real.pi * (1 / (4 * v)))
+            = Real.pi / 2 * g + Real.pi / (4 * v) := by
+        field_simp; ring
+      rw [h2]
+      have h3 : 0 ≤ Real.pi / (4 * v) := by positivity
+      have h4 : (0 : ℝ) ≤ g := Nat.cast_nonneg g
+      nlinarith
 
-theorem sup_le_mean_square : ∀ (ι : Type) [Fintype ι] (A : AddSubgroup (EuclideanSpace ℂ ι)) (v : ℝ) (Fd : Set (EuclideanSpace ℂ ι)) (G : EuclideanSpace ℂ ι → ℂ), 1 ≤ v → (∀ x ∈ A, x ≠ 0 → 1 / v ≤ ‖x‖ ^ 2) → MeasureTheory.IsAddFundamentalDomain A Fd MeasureTheory.volume → MeasureTheory.volume Fd = 1 → Differentiable ℂ G → (∀ x ∈ A, ∀ z, ‖G (z + x)‖ ^ 2 * Real.exp (-Real.pi * ‖z + x‖ ^ 2) = ‖G z‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2)) → MeasureTheory.IntegrableOn (fun z => ‖G z‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2)) Fd → ∀ z, ‖G z‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2) ≤ 3 * (2 * (Fintype.card ι : ℝ) * v + 1) ^ Fintype.card ι * ∫ w in Fd, ‖G w‖ ^ 2 * Real.exp (-Real.pi * ‖w‖ ^ 2) := by
+theorem sup_le_mean_square
+    : ∀ (ι : Type) [Fintype ι] (A : AddSubgroup (EuclideanSpace ℂ ι)) (v : ℝ)
+        (Fd : Set (EuclideanSpace ℂ ι)) (G : EuclideanSpace ℂ ι → ℂ),
+      1 ≤ v → (∀ x ∈ A, x ≠ 0 → 1 / v ≤ ‖x‖ ^ 2)
+        → MeasureTheory.IsAddFundamentalDomain A Fd MeasureTheory.volume
+        → MeasureTheory.volume Fd = 1 → Differentiable ℂ G
+        → (∀ x ∈ A, ∀ z,
+          ‖G (z + x)‖ ^ 2 * Real.exp (-Real.pi * ‖z + x‖ ^ 2)
+            = ‖G z‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2))
+        → MeasureTheory.IntegrableOn (fun z => ‖G z‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2)) Fd
+        → ∀ z,
+          ‖G z‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2)
+            ≤ 3 * (2 * (Fintype.card ι : ℝ) * v + 1) ^ Fintype.card ι
+              * ∫ w in Fd, ‖G w‖ ^ 2 * Real.exp (-Real.pi * ‖w‖ ^ 2) := by
   intro ι _ A v Fd G hv hA hD _ hG hinv hint z
   have hv0 : 0 < v := by linarith
   set r : ℝ := Real.sqrt (1 / (4 * v)) with hrdef
@@ -69,8 +88,7 @@ theorem sup_le_mean_square : ∀ (ι : Type) [Fintype ι] (A : AddSubgroup (Eucl
   have hN0 : ∀ u, 0 ≤ N u := fun u => by positivity
   have hGc := hG.continuous
   have hNc : Continuous N := by simp only [hN]; fun_prop
-  have hdisj : ∀ y₁ y₂ : A, y₁ ≠ y₂ →
-      Disjoint (y₁ +ᵥ Metric.ball z r) (y₂ +ᵥ Metric.ball z r) := by
+  have hdisj : ∀ y₁ y₂ : A, y₁ ≠ y₂ → Disjoint (y₁ +ᵥ Metric.ball z r) (y₂ +ᵥ Metric.ball z r) := by
     intro y₁ y₂ hne
     rw [Set.disjoint_left]
     rintro _ ⟨p, hp, rfl⟩ ⟨q, hq, hpq⟩
@@ -85,7 +103,9 @@ theorem sup_le_mean_square : ∀ (ι : Type) [Fintype ι] (A : AddSubgroup (Eucl
       have hp' : dist p z < r := hp
       have hq' : dist q z < r := hq
       rw [← dist_eq_norm]
-      calc dist q p ≤ dist q z + dist z p := dist_triangle _ _ _
+      calc
+        dist q p
+          ≤ dist q z + dist z p := dist_triangle _ _ _
         _ < 2 * r := by rw [dist_comm z p]; linarith
     have h3 : ‖q - p‖ ^ 2 < (2 * r) ^ 2 := by gcongr
     have h4 : (2 * r) ^ 2 = 1 / v := by rw [mul_pow, hr2]; field_simp; norm_num
@@ -112,12 +132,12 @@ theorem sup_le_mean_square : ∀ (ι : Type) [Fintype ι] (A : AddSubgroup (Eucl
     exact (innerSL ℂ z).differentiable.comp (differentiable_id.sub_const z)
   have hφi : IntegrableOn (fun u => ‖φ u‖ ^ 2) (Metric.ball z r) :=
     GlobalTheory.integrableOn_norm_pow_ball volume hφd.continuous.continuousOn 2
-  have hsub := GlobalTheory.norm_pow_le_factorial_div_mul_integral_ball hr0 hφd.differentiableOn 2 hφi
+  have hsub :=
+    GlobalTheory.norm_pow_le_factorial_div_mul_integral_ball hr0 hφd.differentiableOn 2 hφi
   rw [finrank_euclideanSpace] at hsub
   have hφz : φ z = G z := by simp [hφ]
   rw [hφz] at hsub
-  have hpt : ∀ u ∈ Metric.ball z r,
-      ‖φ u‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2) ≤ 3 * N u := by
+  have hpt : ∀ u ∈ Metric.ball z r, ‖φ u‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2) ≤ 3 * N u := by
     intro u hu
     have hu' : ‖u - z‖ < r := by rwa [Metric.mem_ball, dist_eq_norm] at hu
     have h1 : ‖u - z‖ ^ 2 ≤ 1 / 4 := by
@@ -131,10 +151,12 @@ theorem sup_le_mean_square : ∀ (ι : Type) [Fintype ι] (A : AddSubgroup (Eucl
     have h3 : Real.exp (Real.pi * ‖u - z‖ ^ 2) ≤ 3 := by
       have hpi := Real.pi_le_four
       have hpi0 := Real.pi_pos
-      calc Real.exp (Real.pi * ‖u - z‖ ^ 2) ≤ Real.exp 1 := Real.exp_le_exp.mpr (by nlinarith [sq_nonneg ‖u - z‖])
+      calc
+        Real.exp (Real.pi * ‖u - z‖ ^ 2)
+          ≤ Real.exp 1 := Real.exp_le_exp.mpr (by nlinarith [sq_nonneg ‖u - z‖])
         _ ≤ 3 := by have := Real.exp_one_lt_d9; linarith
-    have h4 : ‖φ u‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2)
-        = Real.exp (Real.pi * ‖u - z‖ ^ 2) * N u := by
+    have h4
+        : ‖φ u‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2) = Real.exp (Real.pi * ‖u - z‖ ^ 2) * N u := by
       simp only [hφ, hN]
       rw [norm_mul, Complex.norm_exp, mul_pow, ← Real.exp_nat_mul, mul_assoc, ← Real.exp_add,
         mul_left_comm, ← Real.exp_add, h2]
@@ -147,8 +169,9 @@ theorem sup_le_mean_square : ∀ (ι : Type) [Fintype ι] (A : AddSubgroup (Eucl
   have hNi : IntegrableOn N (Metric.ball z r) :=
     (hNc.continuousOn.integrableOn_compact (isCompact_closedBall z r)).mono_set
       Metric.ball_subset_closedBall
-  have hb : (∫ u in Metric.ball z r, ‖φ u‖ ^ 2) * Real.exp (-Real.pi * ‖z‖ ^ 2)
-      ≤ 3 * ∫ u in Metric.ball z r, N u := by
+  have hb
+      : (∫ u in Metric.ball z r, ‖φ u‖ ^ 2) * Real.exp (-Real.pi * ‖z‖ ^ 2)
+        ≤ 3 * ∫ u in Metric.ball z r, N u := by
     rw [← integral_mul_const, ← integral_const_mul]
     exact setIntegral_mono_on (hφi.mul_const _) (hNi.const_mul _) measurableSet_ball hpt
   have hnum := factorial_div_le (Fintype.card ι) hv hr2
@@ -156,11 +179,12 @@ theorem sup_le_mean_square : ∀ (ι : Type) [Fintype ι] (A : AddSubgroup (Eucl
   set c : ℝ := ((Fintype.card ι).factorial : ℝ) /
     (Real.pi ^ Fintype.card ι * r ^ (2 * Fintype.card ι)) with hc
   have hc0 : 0 ≤ c := by positivity
-  calc ‖G z‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2)
-      ≤ (c * ∫ u in Metric.ball z r, ‖φ u‖ ^ 2) * Real.exp (-Real.pi * ‖z‖ ^ 2) :=
-        mul_le_mul_of_nonneg_right hsub (Real.exp_pos _).le
+  calc
+    ‖G z‖ ^ 2 * Real.exp (-Real.pi * ‖z‖ ^ 2)
+        ≤ (c * ∫ u in Metric.ball z r, ‖φ u‖ ^ 2) * Real.exp (-Real.pi * ‖z‖ ^ 2) :=
+      mul_le_mul_of_nonneg_right hsub (Real.exp_pos _).le
     _ ≤ c * (3 * ∫ u in Metric.ball z r, N u) := by
-        rw [mul_assoc]; exact mul_le_mul_of_nonneg_left hb hc0
+      rw [mul_assoc]; exact mul_le_mul_of_nonneg_left hb hc0
     _ ≤ c * (3 * ∫ u in Fd, N u) := by gcongr
     _ ≤ (2 * (Fintype.card ι : ℝ) * v + 1) ^ Fintype.card ι * (3 * ∫ u in Fd, N u) := by gcongr
     _ = _ := by ring

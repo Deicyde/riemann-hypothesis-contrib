@@ -19,15 +19,26 @@ open Formalism.GrowthSums (gamP rhoP gainG excessGain)
 
 theorem generic_elements_exist : GenericExistsK := by
   intro F σ _ _ _ _
-  let inst : NormedField (Formalism.DworkPowerSeriesWeights.GK F σ) := (Formalism.DworkPowerSeriesWeights.gAbs F σ).toNormedField
+  let inst : NormedField (Formalism.DworkPowerSeriesWeights.GK F σ) :=
+    (Formalism.DworkPowerSeriesWeights.gAbs F σ).toNormedField
   let ι : MvPolynomial σ F →+* Formalism.DworkPowerSeriesWeights.GK F σ := algebraMap _ _
-  have hι : ∀ P, ‖ι P‖ = Formalism.DworkPowerSeriesWeights.gN P := fun P => Formalism.DworkPowerSeriesWeights.gAbs_algebraMap P
-  have hev : ∀ P, MvPolynomial.eval₂ (ι.comp MvPolynomial.C) (fun i => ι (MvPolynomial.X i)) P = ι P :=
+  have hι : ∀ P, ‖ι P‖ = Formalism.DworkPowerSeriesWeights.gN P := fun P =>
+    Formalism.DworkPowerSeriesWeights.gAbs_algebraMap P
+  have hev
+      : ∀ P, MvPolynomial.eval₂ (ι.comp MvPolynomial.C) (fun i => ι (MvPolynomial.X i)) P = ι P :=
     Formalism.DworkPowerSeriesWeights.eval₂_ringHom_eq ι
-  refine ⟨Formalism.DworkPowerSeriesWeights.GK F σ, inst, ?_, ?_, ι.comp MvPolynomial.C, fun i => ι (MvPolynomial.X i),
-    ?_, ?_⟩
-  · exact IsUltrametricDist.isUltrametricDist_of_forall_norm_add_le_max_norm
-      fun x y => Formalism.DworkPowerSeriesWeights.gAbs_add_le_max x y
+  refine ⟨
+    Formalism.DworkPowerSeriesWeights.GK F σ,
+    inst,
+    ?_,
+    ?_,
+    ι.comp MvPolynomial.C,
+    fun i => ι (MvPolynomial.X i),
+    ?_,
+    ?_
+  ⟩
+  · exact IsUltrametricDist.isUltrametricDist_of_forall_norm_add_le_max_norm fun x y =>
+      Formalism.DworkPowerSeriesWeights.gAbs_add_le_max x y
   · exact charZero_of_injective_ringHom (ι.comp MvPolynomial.C).injective
   · intro z
     rw [RingHom.comp_apply, hι, Formalism.DworkPowerSeriesWeights.gN_C]
@@ -39,28 +50,35 @@ namespace EGaussK
 
 open EGauss
 
-theorem reduce (K₁ : Type) [NormedField K₁] [IsUltrametricDist K₁] [CharZero K₁]
-    (p : ℕ) [Fact p.Prime] (ν r0 r1 : ℕ) [NeZero ν] (u : ZMod (2 * ν) → K₁)
-    (F : MvPowerSeries (ZV ν r0 r1) K₁) (TT : Finset (ZMod (2 * ν))) (colN : ZMod (2 * ν) → ℕ)
-    (hts : ∀ s, Fin (colN s) → ℕ) (hp : ∀ s c, hts s c ≤ r0) (I : ∀ s c, Fin (hts s c) → Fin r1)
+theorem reduce
+    (K₁ : Type) [NormedField K₁] [IsUltrametricDist K₁] [CharZero K₁]
+    (p : ℕ) [Fact p.Prime]
+    (ν r0 r1 : ℕ) [NeZero ν]
+    (u : ZMod (2 * ν) → K₁) (F : MvPowerSeries (ZV ν r0 r1) K₁)
+    (TT : Finset (ZMod (2 * ν)))
+    (colN : ZMod (2 * ν) → ℕ) (hts : ∀ s, Fin (colN s) → ℕ)
+    (hp : ∀ s c, hts s c ≤ r0) (I : ∀ s c, Fin (hts s c) → Fin r1)
     (hp2 : 2 < p) (hn1 : ‖(p : K₁)‖ = (p : ℝ)⁻¹) (hu : ∀ s, ‖u s‖ ≤ 1)
-    (hF : InClass (p : K₁) (hhS p u) F) :
-    ∃ (K : Type) (_ : NormedField K), IsUltrametricDist K ∧
-      ∃ (C : ℕ) (u' : ZMod (2 * ν) → K) (F' : MvPowerSeries (ZV ν r0 r1) K)
-        (ξ : ZMod (2 * ν) → Fin r0 → K) (e : TpV ν r1 → ℕ) (l : Fin C → ℕ)
-        (sf : Fin C → ZMod (2 * ν)) (T : ∀ c, Fin (l c) → Fin r0 → K)
-        (I' : ∀ c, Fin (l c) → Fin r1),
-        EntryHyp p ν r0 r1 C u' F' TT ξ e l T ∧
-        (∀ n, ‖AddMonoidAlgebra.coeff (frameJet colN hts hp I F) n‖ ≤
-          ‖jetPair (entryOp ξ e l sf T I') F'‖) ∧
-        alN e = alG TT colN hts ∧ capN sf = capG TT colN hts ∧ lsN l sf = lsG TT colN hts ∧
-        ∀ (J : Finset (Fin r1)) (i : ℕ), 1 ≤ i →
-          (∑ x : TpV ν r1, (if (x.1.val % 2 = 0 ∧ x.2 ∉ J) ∨ (x.1.val % 2 = 1 ∧ x.2 ∈ J)
-              then e x else 0) +
-            ∑ c, (if (sf c).val % 2 = 1 then ((univ.image (I' c)) ∩ J).card else 0)) ≤
-          ∑ s : ZMod (2 * ν), ∑ c : Fin (colN s),
-            (if s.val % 2 = 0 then min (hts s c) i - ((univ.image (I s c)) ∩ J).card
-            else ((univ.image (I s c)) ∩ J).card) := by
+    (hF : InClass (p : K₁) (hhS p u) F)
+    : ∃ (K : Type) (_ : NormedField K),
+      IsUltrametricDist K
+        ∧ ∃ (C : ℕ) (u' : ZMod (2 * ν) → K) (F' : MvPowerSeries (ZV ν r0 r1) K)
+            (ξ : ZMod (2 * ν) → Fin r0 → K) (e : TpV ν r1 → ℕ) (l : Fin C → ℕ)
+            (sf : Fin C → ZMod (2 * ν)) (T : ∀ c, Fin (l c) → Fin r0 → K)
+            (I' : ∀ c, Fin (l c) → Fin r1),
+          EntryHyp p ν r0 r1 C u' F' TT ξ e l T
+            ∧ (∀ n,
+              ‖AddMonoidAlgebra.coeff (frameJet colN hts hp I F) n‖
+                ≤ ‖jetPair (entryOp ξ e l sf T I') F'‖)
+            ∧ alN e = alG TT colN hts ∧ capN sf = capG TT colN hts ∧ lsN l sf = lsG TT colN hts
+            ∧ ∀ (J : Finset (Fin r1)) (i : ℕ),
+              1 ≤ i
+                → (∑ x : TpV ν r1, (if (x.1.val % 2 = 0 ∧ x.2 ∉ J) ∨ (x.1.val % 2 = 1 ∧ x.2 ∈ J)
+                      then e x else 0)
+                    + ∑ c, (if (sf c).val % 2 = 1 then ((univ.image (I' c)) ∩ J).card else 0))
+                  ≤ ∑ s : ZMod (2 * ν), ∑ c : Fin (colN s),
+                      (if s.val % 2 = 0 then min (hts s c) i - ((univ.image (I s c)) ∩ J).card
+                      else ((univ.image (I s c)) ∩ J).card) := by
   have hpp : p.Prime := Fact.out
   obtain ⟨K, instK, hult, hchar, φ, Y, hφ, hgauss⟩ :=
     generic_elements_exist K₁ (ZMod (2 * ν) × Fin r0 × Fin r0)
@@ -74,10 +92,27 @@ theorem reduce (K₁ : Type) [NormedField K₁] [IsUltrametricDist K₁] [CharZe
     classical
     rw [MvPolynomial.coeff_X]
     split_ifs <;> simp
-  obtain ⟨C, ξ, e, l, sf, T, I', hop, hξ, hT, hal, hcap, hls, hB⟩ :=
-    struct TT colN hts hp I Y
-  refine ⟨K, instK, hult, C, fun s => φ (u s), MvPowerSeries.map φ F, ξ, e, l, sf, T, I',
-    ⟨hpp, hp2, hnp, fun s => by rw [hφ]; exact hu s, ?_, ?_, ?_, ?_⟩, ?_, hal, hcap, hls, hB⟩
+  obtain ⟨C, ξ, e, l, sf, T, I', hop, hξ, hT, hal, hcap, hls, hB⟩ := struct TT colN hts hp I Y
+  refine ⟨
+    K,
+    instK,
+    hult,
+    C,
+    fun s => φ (u s),
+    MvPowerSeries.map φ F,
+    ξ,
+    e,
+    l,
+    sf,
+    T,
+    I',
+    ⟨hpp, hp2, hnp, fun s => by rw [hφ]; exact hu s, ?_, ?_, ?_, ?_⟩,
+    ?_,
+    hal,
+    hcap,
+    hls,
+    hB
+  ⟩
   · have h := inClass_map φ hφ _ _ _ hF
     rwa [map_natCast, map_hhS] at h
   · intro s a
@@ -101,13 +136,17 @@ theorem reduce (K₁ : Type) [NormedField K₁] [IsUltrametricDist K₁] [CharZe
     unfold frameJet
     rw [Formalism.DworkPowerSeriesWeights.eval₂_jetPairPoly, map_prod]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Formalism.DworkPowerSeriesWeights.ringMap_minorProd, map_sum, map_mul, MvPolynomial.map_C, MvPolynomial.map_X,
-      MvPolynomial.coe_eval₂Hom, MvPolynomial.eval₂_X]
+      simp only [Formalism.DworkPowerSeriesWeights.ringMap_minorProd, map_sum, map_mul,
+        MvPolynomial.map_C, MvPolynomial.map_X, MvPolynomial.coe_eval₂Hom, MvPolynomial.eval₂_X]
     exact le_rfl
 
-theorem norm_unif_pow {K : Type} [NormedField K] {p : ℕ} [hp : Fact p.Prime]
-    (hn : ‖(p : K)‖ = (p : ℝ)⁻¹) {ϖ : K} (hϖ : ϖ ^ (p ^ 2 - 1) = (p : K))
-    (d : ℕ) : ‖ϖ ^ d‖ = (p : ℝ) ^ (-(rhoP p * d)) := by
+theorem norm_unif_pow
+    {K : Type} [NormedField K]
+    {p : ℕ} [hp : Fact p.Prime]
+    (hn : ‖(p : K)‖ = (p : ℝ)⁻¹)
+    {ϖ : K} (hϖ : ϖ ^ (p ^ 2 - 1) = (p : K))
+    (d : ℕ)
+    : ‖ϖ ^ d‖ = (p : ℝ) ^ (-(rhoP p * d)) := by
   have hp1 : (1 : ℝ) < p := by exact_mod_cast hp.out.one_lt
   have hp0 : (0 : ℝ) < p := by linarith
   have h1p : 1 ≤ p ^ 2 := Nat.one_le_pow _ _ hp.out.pos
@@ -128,16 +167,19 @@ theorem norm_unif_pow {K : Type} [NormedField K] {p : ℕ} [hp : Fact p.Prime]
     have h3 : ‖ϖ‖ ^ (p ^ 2 - 1) = ((p : ℝ) ^ (-(rhoP p))) ^ (p ^ 2 - 1) := h1.trans h2.symm
     have hx : (0 : ℝ) ≤ (p : ℝ) ^ (-(rhoP p)) := Real.rpow_nonneg hp0.le _
     first
-      | exact (pow_left_inj₀ (norm_nonneg _) hx hNne).1 h3
-      | exact (pow_left_inj (norm_nonneg _) hx hNne).1 h3
+    | exact (pow_left_inj₀ (norm_nonneg _) hx hNne).1 h3
+    | exact (pow_left_inj (norm_nonneg _) hx hNne).1 h3
   rw [norm_pow, key, ← Real.rpow_natCast, ← Real.rpow_mul hp0.le]
   congr 1
   ring
 
-theorem descend {K : Type} [NormedField K] {p : ℕ} [hp : Fact p.Prime]
-    (hn : ‖(p : K)‖ = (p : ℝ)⁻¹) {ϖ : K} (hϖ : ϖ ^ (p ^ 2 - 1) = (p : K))
-    (d : ℕ) (g : ℝ) (x y : K) (hxy : x = ϖ ^ d * y)
-    (hx : ‖x‖ ≤ (p : ℝ) ^ (-(g + rhoP p * d))) : ‖y‖ ≤ (p : ℝ) ^ (-g) := by
+theorem descend
+    {K : Type} [NormedField K]
+    {p : ℕ} [hp : Fact p.Prime]
+    (hn : ‖(p : K)‖ = (p : ℝ)⁻¹)
+    {ϖ : K} (hϖ : ϖ ^ (p ^ 2 - 1) = (p : K))
+    (d : ℕ) (g : ℝ) (x y : K) (hxy : x = ϖ ^ d * y) (hx : ‖x‖ ≤ (p : ℝ) ^ (-(g + rhoP p * d)))
+    : ‖y‖ ≤ (p : ℝ) ^ (-g) := by
   have hp0 : (0 : ℝ) < p := by exact_mod_cast hp.out.pos
   rw [hxy, norm_mul, norm_unif_pow hn hϖ d] at hx
   have hpos : (0 : ℝ) < (p : ℝ) ^ (-(rhoP p * d)) := Real.rpow_pos_of_pos hp0 _
@@ -172,36 +214,36 @@ theorem GaussBK_of (hE : EntryB) : GaussBK := by
   intro K _ _ _ p _ ν r0 r1 i _ u F TT colN hts hp I hp2 hn hi hu hF n
   obtain ⟨K', iK, hU, C, u', F', ξ, e, l, sf, T, I', hH, hb, hal, hcap, hls, hJ⟩ :=
     EGaussK.reduce K p ν r0 r1 u F TT colN hts hp I hp2 hn hu hF
-  have h1 := hE K' p ν r0 r1 C u' F' TT ξ e l sf T I'
-    (univ.filter (fun b : Fin r1 => b.val < i)) hH
+  have h1 := hE K' p ν r0 r1 C u' F' TT ξ e l sf T I' (univ.filter (fun b : Fin r1 => b.val < i)) hH
   rw [hal, hcap, hls] at h1
   have h2 := hJ (univ.filter (fun b : Fin r1 => b.val < i)) i hi
   have hn' : ‖(p : K')‖ = (p : ℝ)⁻¹ := hH.2.2.1
   rw [norm_mul, norm_pow, hn'] at h1
   rw [norm_mul, norm_pow, hn]
   have hp1 : (1 : ℝ) ≤ p := by exact_mod_cast (Fact.out : p.Prime).one_lt.le
-  have hinv : (p : ℝ)⁻¹ ≤ 1 := by
-    first
-      | exact inv_le_one_of_one_le₀ hp1
-      | exact inv_le_one hp1
+  have hinv : (p : ℝ)⁻¹ ≤ 1 := by first | exact inv_le_one_of_one_le₀ hp1 | exact inv_le_one hp1
   have hinv0 : (0 : ℝ) ≤ (p : ℝ)⁻¹ := by positivity
   refine le_trans ?_ h1
   exact mul_le_mul (pow_le_pow_of_le_one hinv0 hinv h2) (hb n) (norm_nonneg _) (by positivity)
 
-theorem gauss_a_one_generic : GaussBoundNoOperatorGeneric := gauss_a_one_generic_of_entry Top.entry_a_one
+theorem gauss_a_one_generic : GaussBoundNoOperatorGeneric :=
+  gauss_a_one_generic_of_entry Top.entry_a_one
 
-theorem gauss_a_two_generic : GaussBoundArbitraryGeneric := gauss_a_two_generic_of_entry Top.entry_a_two
+theorem gauss_a_two_generic : GaussBoundArbitraryGeneric :=
+  gauss_a_two_generic_of_entry Top.entry_a_two
 
 theorem gauss_b_generic : GaussBK := GaussBK_of Top.entryB
 
-theorem kernel_a_one_generic_of_gauss (h : GaussBoundNoOperatorGeneric) : KernelValuationBoundUltrametric := by
+theorem kernel_a_one_generic_of_gauss (h : GaussBoundNoOperatorGeneric)
+    : KernelValuationBoundUltrametric := by
   intro K _ _ _ p _ ν r0 r1 _ u ϖ Th TT colN hts hp I h2 hn hϖ hu hF n
   have hb := h K p ν r0 r1 u _ TT colN hts hp I h2 hn hu hF n
   rw [deg_eq] at hb
   refine EGaussK.descend hn hϖ _ _ _ _ ?_ hb
   rw [frameJet_scale, MvPolynomial.coeff_C_mul]
 
-theorem kernel_a_two_generic_of_gauss (h : GaussBoundArbitraryGeneric) : KernelBoundArbitrarySizes := by
+theorem kernel_a_two_generic_of_gauss (h : GaussBoundArbitraryGeneric)
+    : KernelBoundArbitrarySizes := by
   intro K _ _ _ p _ ν r0 r1 _ u ϖ Th TT colN hts hp I h2 hn hϖ hu hF n
   have hb := h K p ν r0 r1 u _ TT colN hts hp I h2 hn hu hF n
   rw [deg_eq] at hb
@@ -221,11 +263,12 @@ theorem kernel_a_one_generic : KernelValuationBoundUltrametric := by
 theorem kernel_a_two_generic : KernelBoundArbitrarySizes := by
   exact kernel_a_two_generic_of_gauss gauss_a_two_generic
 
-theorem kernel_b_generic : KernelBK := by
-  exact KernelBK_of gauss_b_generic
+theorem kernel_b_generic : KernelBK := by exact KernelBK_of gauss_b_generic
 
-theorem kernel_bounds_generic_of_uniform (hS : ThmSUniform) (h1 : KernelValuationBoundUltrametric) (h2 : KernelBoundArbitrarySizes) (h3 : KernelBK) :
-    KernelBoundsGeneric := by
+theorem kernel_bounds_generic_of_uniform
+    (hS : ThmSUniform) (h1 : KernelValuationBoundUltrametric) (h2 : KernelBoundArbitrarySizes)
+    (h3 : KernelBK)
+    : KernelBoundsGeneric := by
   intro p _ K0 _ _ _ _ σ hU hζ F hF be hbe K _ _ _ j ν r0 r1 _ hj om oms ϖ μ U0 Φ hϖ hom hμ0 hμ hU0
     hΦ0 hΦ TT colN hts hp I n
   obtain ⟨c, hc, -, -, hcl⟩ := hS K0 p σ hU hζ F hF be hbe
@@ -247,17 +290,21 @@ theorem kernel_bounds_generic_of_uniform (hS : ThmSUniform) (h1 : KernelValuatio
       exact norm_lift_le_one hU hc
     · rw [hj]
       exact hc
-  have hin' : InClass (p : K) (hhS p (uS (j c) (j (σ c)))) (MvPowerSeries.subst
-      (fun x => MvPowerSeries.C ϖ * (MvPowerSeries.X x : MvPowerSeries (ZV ν r0 r1) K))
-      (thetaLog om oms ϖ μ (mvExp (-Φ) * U0))) := by
+  have hin' : InClass (p : K) (hhS p (uS (j c) (j (σ c))))
+      (MvPowerSeries.subst
+        (fun x => MvPowerSeries.C ϖ * (MvPowerSeries.X x : MvPowerSeries (ZV ν r0 r1) K))
+        (thetaLog om oms ϖ μ (mvExp (-Φ) * U0))) := by
     unfold thetaLog
     rw [scale_scale hϖ0]
     exact hin
-  exact ⟨h1 K p ν r0 r1 _ ϖ _ TT colN hts hp I hp2 hn hϖ hu hin' n,
+  exact ⟨
+    h1 K p ν r0 r1 _ ϖ _ TT colN hts hp I hp2 hn hϖ hu hin' n,
     h2 K p ν r0 r1 _ ϖ _ TT colN hts hp I hp2 hn hϖ hu hin' n,
-    fun i hi => h3 K p ν r0 r1 i _ ϖ _ TT colN hts hp I hp2 hn hi hϖ hu hin' n⟩
+    fun i hi => h3 K p ν r0 r1 i _ ϖ _ TT colN hts hp I hp2 hn hi hϖ hu hin' n
+  ⟩
 
 theorem kernel_bounds_generic : KernelBoundsGeneric := by
-  exact kernel_bounds_generic_of_uniform theorem_s_uniform kernel_a_one_generic kernel_a_two_generic kernel_b_generic
+  exact kernel_bounds_generic_of_uniform theorem_s_uniform kernel_a_one_generic kernel_a_two_generic
+    kernel_b_generic
 
 end Formalism.InvariantFactorPaths.G7

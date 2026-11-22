@@ -15,35 +15,40 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.PiLocalization₂
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 section Alg
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
 
-theorem sigR_scalar_tmul (σ : E →ₐ[F] E) (α : R) :
-    sigR R σ (α ⊗ₜ[F] (1 : E)) = α ⊗ₜ[F] (1 : E) := by
+theorem sigR_scalar_tmul (σ : E →ₐ[F] E) (α : R)
+    : sigR R σ (α ⊗ₜ[F] (1 : E)) = α ⊗ₜ[F] (1 : E) := by
   simp [sigR]
 
-theorem gramR_scl_tmul (σ : E →ₐ[F] E) {N : ℕ} (J : Matrix (Fin N) (Fin N) E) (α : R)
-    (y : Fin 1 → Fin N → R ⊗[F] E) (i j : Fin 1) :
-    gramR R σ J (scl (α ⊗ₜ[F] (1 : E)) y) i j =
-      (α ⊗ₜ[F] (1 : E)) * (α ⊗ₜ[F] (1 : E)) * gramR R σ J y i j := by
+theorem gramR_scl_tmul
+    (σ : E →ₐ[F] E)
+    {N : ℕ} (J : Matrix (Fin N) (Fin N) E)
+    (α : R) (y : Fin 1 → Fin N → R ⊗[F] E) (i j : Fin 1)
+    : gramR R σ J (scl (α ⊗ₜ[F] (1 : E)) y) i j
+      = (α ⊗ₜ[F] (1 : E)) * (α ⊗ₜ[F] (1 : E)) * gramR R σ J y i j := by
   simp only [gramR, hR, hform, scl, map_mul, sigR_scalar_tmul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun l _ => ?_
   ring
 
-theorem corner_half_trace_of_pure_tensor [CharZero F] {d : ℕ} (b : Module.Basis (Fin d) F E) (hd : Module.finrank F E = 2)
-    (x : R) (S : Matrix (Fin (0 + 1)) (Fin (0 + 1)) (R ⊗[F] E)) (h : S 0 0 = x ⊗ₜ[F] (1 : E)) :
-    s0 R S = x := by
-  have hd2 : d = 2 := by
-    rw [← hd, Module.finrank_eq_card_basis b, Fintype.card_fin]
+theorem corner_half_trace_of_pure_tensor
+    [CharZero F]
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (hd : Module.finrank F E = 2)
+    (x : R) (S : Matrix (Fin (0 + 1)) (Fin (0 + 1)) (R ⊗[F] E)) (h : S 0 0 = x ⊗ₜ[F] (1 : E))
+    : s0 R S = x := by
+  have hd2 : d = 2 := by rw [← hd, Module.finrank_eq_card_basis b, Fintype.card_fin]
   subst hd2
   have e : x ⊗ₜ[F] (1 : E) = algebraMap R (R ⊗[F] E) x := by
     simp [Algebra.TensorProduct.algebraMap_apply]
-  rw [s0, h, e, Algebra.trace_algebraMap_of_basis (Algebra.TensorProduct.basis R b), Fintype.card_fin,
-    two_nsmul, ← two_mul, ← mul_assoc]
+  rw [s0, h, e, Algebra.trace_algebraMap_of_basis (Algebra.TensorProduct.basis R b),
+    Fintype.card_fin, two_nsmul, ← two_mul, ← mul_assoc]
   have : algebraMap F R (1 / 2) * 2 = 1 := by
     rw [← map_ofNat (algebraMap F R) 2, ← map_mul]
     simp

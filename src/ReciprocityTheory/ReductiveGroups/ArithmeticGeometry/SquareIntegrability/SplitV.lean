@@ -25,34 +25,38 @@ theorem smul_add_scalar (β β' : 𝓞 E) (v : Vsp dim) : act (β + β') v = act
 theorem Hf_add_rightSquareIntegrability (x w w' : Vsp dim) : Hf x (w + w') = Hf x w + Hf x w' := by
   simp [Hf, mul_add, Finset.sum_add_distrib]
 
-theorem herm_smul_left_conj [IsCMField E] (α : 𝓞 E) (v w : Vsp dim) :
-    Hf (act α v) w = Hf v (act (IsCMField.ringOfIntegersComplexConj E α) w) := by
+theorem herm_smul_left_conj [IsCMField E] (α : 𝓞 E) (v w : Vsp dim)
+    : Hf (act α v) w = Hf v (act (IsCMField.ringOfIntegersComplexConj E α) w) := by
   simp only [Hf, act, PiLp.toLp_apply, IsCMField.coe_ringOfIntegersComplexConj,
     IsCMField.complexEmbedding_complexConj, map_mul, Complex.conj_conj]
   exact Finset.sum_congr rfl fun i _ => by ring
 
 end SlopeTestRemainingChoices
 
-theorem sum_sq_norm_ge_of_span [IsCMField E] (X : PT E) (I : Submodule ℤ (Vsp X.dim)) (hle : I ≤ X.L)
-    (hst : ∀ (α : 𝓞 E) x, x ∈ I → act α x ∈ I) {ξ : Vsp X.dim} (hξ : ξ ∈ I) (hξ0 : ξ ≠ 0)
+theorem sum_sq_norm_ge_of_span
+    [IsCMField E]
+    (X : PT E) (I : Submodule ℤ (Vsp X.dim))
+    (hle : I ≤ X.L) (hst : ∀ (α : 𝓞 E) x, x ∈ I → act α x ∈ I)
+    {ξ : Vsp X.dim} (hξ : ξ ∈ I) (hξ0 : ξ ≠ 0)
     (k : ℕ) (x u : Fin k → Vsp X.dim) (hxu : ∀ j, x j ∈ X.L ∧ IsU I (x j) (u j))
-    (hspan : Submodule.span ℝ {w | ∃ j, ∃ α : 𝓞 E, IsU I (act α (x j)) w} = IR I) :
-    2 * PT.f E / (PT.rd E ^ 2 * ‖ξ‖ ^ 2) ≤ ∑ j, ‖u j‖ ^ 2 / 2 := by
+    (hspan : Submodule.span ℝ {w | ∃ j, ∃ α : 𝓞 E, IsU I (act α (x j)) w} = IR I)
+    : 2 * PT.f E / (PT.rd E ^ 2 * ‖ξ‖ ^ 2) ≤ ∑ j, ‖u j‖ ^ 2 / 2 := by
   classical
-
   have hint : ∀ j (β : 𝓞 E), ∃ n : ℤ, (Hf (x j) (act β ξ)).im = n := fun j β =>
     X.integral _ _ (hxu j).1 (hle (hst β ξ hξ))
-  let φ : Fin k → 𝓞 E →+ ℤ := fun j => AddMonoidHom.mk' (fun β => (hint j β).choose) (by
-    intro β β'
-    apply Int.cast_injective (α := ℝ)
-    push_cast
-    rw [← (hint j (β + β')).choose_spec, ← (hint j β).choose_spec, ← (hint j β').choose_spec,
-      smul_add_scalar, Hf_add_rightSquareIntegrability, Complex.add_im])
+  let φ : Fin k → 𝓞 E →+ ℤ := fun j =>
+    AddMonoidHom.mk' (fun β => (hint j β).choose) (by
+      intro β β'
+      apply Int.cast_injective (α := ℝ)
+      push_cast
+      rw [← (hint j (β + β')).choose_spec, ← (hint j β).choose_spec, ← (hint j β').choose_spec,
+        smul_add_scalar, Hf_add_rightSquareIntegrability, Complex.add_im])
   have hφ : ∀ j β, ((φ j β : ℤ) : ℝ) = (Hf (x j) (act β ξ)).im := fun j β =>
     ((hint j β).choose_spec).symm
 
   choose y hy using fun j => exists_dual (φ j)
-  have hyR : ∀ j (β : 𝓞 E), ((Algebra.trace ℚ E ((β : E) * y j) : ℚ) : ℝ) = (Hf (x j) (act β ξ)).im := by
+  have hyR
+      : ∀ j (β : 𝓞 E), ((Algebra.trace ℚ E ((β : E) * y j) : ℚ) : ℝ) = (Hf (x j) (act β ξ)).im := by
     intro j β
     rw [hy j β, ← hφ j β]
     push_cast
@@ -80,8 +84,8 @@ theorem sum_sq_norm_ge_of_span [IsCMField E] (X : PT E) (I : Submodule ℤ (Vsp 
       exact_mod_cast this.symm
     have hy0 : ∀ j, y j = 0 := by
       intro j
-      have h2 := (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => by positivity)).1 h1 j
-        (Finset.mem_univ j)
+      have h2 :=
+        (Finset.sum_eq_zero_iff_of_nonneg (fun j _ => by positivity)).1 h1 j (Finset.mem_univ j)
       have h3 : σ₀ (y j) = 0 := by simpa using h2
       exact (map_eq_zero_iff σ₀ σ₀.injective).1 h3
     have horth : ∀ w ∈ IR I, inner ℝ w ξ = 0 := by
@@ -90,7 +94,8 @@ theorem sum_sq_norm_ge_of_span [IsCMField E] (X : PT E) (I : Submodule ℤ (Vsp 
       induction hw using Submodule.span_induction with
       | mem w hw =>
         obtain ⟨j, α, hU⟩ := hw
-        rw [hU.2 ξ (Submodule.subset_span hξ), herm_smul_left_conj, ← hyR, hy0 j, mul_zero, map_zero]
+        rw [hU.2 ξ (Submodule.subset_span hξ), herm_smul_left_conj, ← hyR, hy0 j, mul_zero,
+          map_zero]
         simp
       | zero => simp
       | add w w' _ _ h h' => rw [inner_add_left, h, h', add_zero]
@@ -101,8 +106,8 @@ theorem sum_sq_norm_ge_of_span [IsCMField E] (X : PT E) (I : Submodule ℤ (Vsp 
     exact hξ0 (norm_eq_zero.1 h5)
 
   have hmemD : ∀ j, y j ∈ Dual1 E := fun j => mem_dual_of (y j) fun β => ⟨φ j β, hy j β⟩
-  have htr : ∀ z : E, Algebra.trace ℚ E (IsCMField.complexConj E z) = Algebra.trace ℚ E z := fun z =>
-    Algebra.trace_eq_of_algEquiv ((IsCMField.complexConj E).restrictScalars ℚ) z
+  have htr : ∀ z : E, Algebra.trace ℚ E (IsCMField.complexConj E z) = Algebra.trace ℚ E z :=
+    fun z => Algebra.trace_eq_of_algEquiv ((IsCMField.complexConj E).restrictScalars ℚ) z
   have hmemD' : ∀ j, IsCMField.complexConj E (y j) ∈ Dual1 E := fun j =>
     mem_dual_of _ fun β => by
       refine ⟨φ j (IsCMField.ringOfIntegersComplexConj E β), ?_⟩
@@ -155,12 +160,11 @@ theorem sum_sq_norm_ge_of_span [IsCMField E] (X : PT E) (I : Submodule ℤ (Vsp 
   have hsw : ∑ σ, a σ = ∑ j, ∑ σ : E →+* ℂ, ‖σ (y j)‖ ^ 2 := by
     rw [hadef]
     exact Finset.sum_comm
-  calc 2 * PT.f E / (PT.rd E ^ 2 * ‖ξ‖ ^ 2) = (2 * PT.f E / PT.rd E ^ 2) / ‖ξ‖ ^ 2 := by
-        rw [div_div]
-    _ ≤ (∑ σ, a σ) / ‖ξ‖ ^ 2 := by
-        apply div_le_div_of_nonneg_right hsum hξpos.le
-    _ = ∑ j, (∑ σ : E →+* ℂ, ‖σ (y j)‖ ^ 2) / ‖ξ‖ ^ 2 := by
-        rw [hsw, Finset.sum_div]
+  calc
+    2 * PT.f E / (PT.rd E ^ 2 * ‖ξ‖ ^ 2)
+      = (2 * PT.f E / PT.rd E ^ 2) / ‖ξ‖ ^ 2 := by rw [div_div]
+    _ ≤ (∑ σ, a σ) / ‖ξ‖ ^ 2 := by apply div_le_div_of_nonneg_right hsum hξpos.le
+    _ = ∑ j, (∑ σ : E →+* ℂ, ‖σ (y j)‖ ^ 2) / ‖ξ‖ ^ 2 := by rw [hsw, Finset.sum_div]
     _ ≤ ∑ j, ‖u j‖ ^ 2 / 2 := Finset.sum_le_sum fun j _ => hj j
 
 end

@@ -12,15 +12,15 @@ namespace GlobalTheory.AwayNorm
 
 variable {R N : Type} [CommRing R] [CommRing N] [Algebra R N]
 
-
 variable {R N : Type} [CommRing R] [CommRing N] [Algebra R N] in
-theorem _root_.GlobalTheory.AwayNorm.exists_normed_away : ∀ (p : ℕ) (R : Type) [CommRing R],
-    2 ≤ p →
-    _root_.GlobalTheory.Decompl.LAdic.Good p R →
-    ∃ (N : Type) (_ : NormedCommRing N) (_ : CompleteSpace N) (_ : Algebra R N),
-      IsLocalization.Away (p : R) N ∧
-      (∀ (x : N) (r : ℕ), ‖x‖ ≤ ((p : ℝ)⁻¹) ^ r ↔ ∃ y : R, x = (p : N) ^ r * algebraMap R N y) ∧
-      ∀ x : N, ‖(p : N) * x‖ = (p : ℝ)⁻¹ * ‖x‖ := by
+theorem _root_.GlobalTheory.AwayNorm.exists_normed_away
+    : ∀ (p : ℕ) (R : Type) [CommRing R],
+      2 ≤ p → _root_.GlobalTheory.Decompl.LAdic.Good p R
+        → ∃ (N : Type) (_ : NormedCommRing N) (_ : CompleteSpace N) (_ : Algebra R N),
+          IsLocalization.Away (p : R) N
+            ∧ (∀ (x : N) (r : ℕ),
+              ‖x‖ ≤ ((p : ℝ)⁻¹) ^ r ↔ ∃ y : R, x = (p : N) ^ r * algebraMap R N y)
+            ∧ ∀ x : N, ‖(p : N) * x‖ = (p : ℝ)⁻¹ * ‖x‖ := by
   intro p R _ hp hR
   obtain ⟨htf, hsep, hcomp⟩ := hR
   let L := Localization.Away (p : R)
@@ -49,8 +49,8 @@ theorem _root_.GlobalTheory.AwayNorm.exists_normed_away : ∀ (p : ℕ) (R : Typ
     rintro _ ⟨n, rfl⟩
     rw [mem_nonZeroDivisors_iff]
     exact ⟨fun x hx => hpn n x hx, fun x hx => hpn n x (by rw [mul_comm]; exact hx)⟩
-  obtain ⟨D, hD⟩ : ∃ D : L → ℤ → Prop,
-      ∀ x r, D x r ↔ ∃ y : R, x = ((u ^ r : Lˣ) : L) * algebraMap R L y :=
+  obtain ⟨D, hD⟩
+      : ∃ D : L → ℤ → Prop, ∀ x r, D x r ↔ ∃ y : R, x = ((u ^ r : Lˣ) : L) * algebraMap R L y :=
     ⟨_, fun _ _ => Iff.rfl⟩
   have hDnat : ∀ (x : L) (n : ℕ), D x n ↔ ∃ y : R, x = (p : L) ^ n * algebraMap R L y := by
     intro x n
@@ -104,8 +104,8 @@ theorem _root_.GlobalTheory.AwayNorm.exists_normed_away : ∀ (p : ℕ) (R : Typ
     refine ⟨-(n : ℤ), ?_⟩
     rw [hD]
     refine ⟨z.1, ?_⟩
-    rw [← hz, ← hn, map_pow, map_natCast, ← hu', zpow_neg, zpow_natCast,
-      ← Units.val_pow_eq_pow_val, mul_comm x, Units.inv_mul_cancel_left]
+    rw [← hz, ← hn, map_pow, map_natCast, ← hu', zpow_neg, zpow_natCast, ← Units.val_pow_eq_pow_val,
+      mul_comm x, Units.inv_mul_cancel_left]
   have hzero : ∀ r, D 0 r := fun r => (hD 0 r).2 ⟨0, by simp⟩
   have hsepL : ∀ x : L, (∀ n : ℕ, D x n) → x = 0 := by
     intro x hx
@@ -123,10 +123,9 @@ theorem _root_.GlobalTheory.AwayNorm.exists_normed_away : ∀ (p : ℕ) (R : Typ
   have hne : ∀ x, Nonempty {r : ℤ // D x r} := fun x =>
     let ⟨r, hr⟩ := hex x
     ⟨⟨r, hr⟩⟩
-  have hbdd : ∀ x, BddBelow (Set.range fun r : {r : ℤ // D x r} => (p : ℝ)⁻¹ ^ (r : ℤ)) :=
-    fun x => ⟨0, by rintro _ ⟨r, rfl⟩; positivity⟩
-  have hle1 : ∀ x r, D x r → nrm x ≤ (p : ℝ)⁻¹ ^ r := fun x r h =>
-    ciInf_le (hbdd x) ⟨r, h⟩
+  have hbdd : ∀ x, BddBelow (Set.range fun r : {r : ℤ // D x r} => (p : ℝ)⁻¹ ^ (r : ℤ)) := fun x =>
+    ⟨0, by rintro _ ⟨r, rfl⟩; positivity⟩
+  have hle1 : ∀ x r, D x r → nrm x ≤ (p : ℝ)⁻¹ ^ r := fun x r h => ciInf_le (hbdd x) ⟨r, h⟩
   have hge1 : ∀ x (c : ℝ), (∀ r, D x r → c ≤ (p : ℝ)⁻¹ ^ r) → c ≤ nrm x := by
     intro x c h
     haveI := hne x
@@ -162,8 +161,7 @@ theorem _root_.GlobalTheory.AwayNorm.exists_normed_away : ∀ (p : ℕ) (R : Typ
       (hnorm_mono _ _ fun r hr => by have := hneg (-x) r hr; rwa [neg_neg] at this)
   have hnadd : ∀ x y, nrm (x + y) ≤ nrm x + nrm y := by
     intro x y
-    have key : ∀ r s, D x r → D y s →
-        nrm (x + y) ≤ (p : ℝ)⁻¹ ^ r + (p : ℝ)⁻¹ ^ s := by
+    have key : ∀ r s, D x r → D y s → nrm (x + y) ≤ (p : ℝ)⁻¹ ^ r + (p : ℝ)⁻¹ ^ s := by
       intro r s hr hs
       have hr0 : (0 : ℝ) ≤ (p : ℝ)⁻¹ ^ r := by positivity
       have hs0 : (0 : ℝ) ≤ (p : ℝ)⁻¹ ^ s := by positivity
@@ -174,8 +172,7 @@ theorem _root_.GlobalTheory.AwayNorm.exists_normed_away : ∀ (p : ℕ) (R : Typ
         linarith
     have h1 : ∀ s, D y s → nrm (x + y) - (p : ℝ)⁻¹ ^ s ≤ nrm x := fun s hs =>
       hge1 x _ fun r hr => by have := key r s hr hs; linarith
-    have h2 : nrm (x + y) - nrm x ≤ nrm y :=
-      hge1 y _ fun s hs => by have := h1 s hs; linarith
+    have h2 : nrm (x + y) - nrm x ≤ nrm y := hge1 y _ fun s hs => by have := h1 s hs; linarith
     linarith
   have hnmul : ∀ x y, nrm (x * y) ≤ nrm x * nrm y := by
     intro x y
@@ -198,22 +195,25 @@ theorem _root_.GlobalTheory.AwayNorm.exists_normed_away : ∀ (p : ℕ) (R : Typ
       exact hge1 y _ fun s hs => by rw [div_le_iff₀' h0]; exact h1 s hs
   have hnpos : ∀ x, nrm x = 0 → x = 0 := fun x h =>
     hsepL x fun n => (hchar x n).1 (by rw [h]; positivity)
-  let f : RingNorm L :=
-    { toFun := nrm
-      map_zero' := hnz
-      add_le' := hnadd
-      neg' := hnneg
-      mul_le' := hnmul
-      eq_zero_of_map_eq_zero' := hnpos }
+  let f : RingNorm L := {
+    toFun := nrm
+    map_zero' := hnz
+    add_le' := hnadd
+    neg' := hnneg
+    mul_le' := hnmul
+    eq_zero_of_map_eq_zero' := hnpos
+  }
   letI inst : NormedCommRing L := { f.toNormedRing with mul_comm := mul_comm }
   have hnorm : ∀ x : L, ‖x‖ = nrm x := fun _ => rfl
-  have hcharN : ∀ (x : L) (r : ℕ), ‖x‖ ≤ ((p : ℝ)⁻¹) ^ r ↔
-      ∃ y : R, x = (p : L) ^ r * algebraMap R L y := by
+  have hcharN
+      : ∀ (x : L) (r : ℕ), ‖x‖ ≤ ((p : ℝ)⁻¹) ^ r ↔ ∃ y : R, x = (p : L) ^ r * algebraMap R L y := by
     intro x r
     rw [hnorm, ← zpow_natCast, hchar, hDnat]
   have hcomplete : CompleteSpace L := by
-    refine Metric.complete_of_convergent_controlled_sequences (fun n => (p : ℝ)⁻¹ ^ n)
-      (fun n => pow_pos hp0 n) fun v hv => ?_
+    refine Metric.complete_of_convergent_controlled_sequences
+      (fun n => (p : ℝ)⁻¹ ^ n)
+      (fun n => pow_pos hp0 n)
+      fun v hv => ?_
     have hstep : ∀ k : ℕ, ∃ z : R, v (k + 1) - v k = (p : L) ^ (k + 1) * algebraMap R L z := by
       intro k
       rw [← hDnat]
@@ -226,8 +226,8 @@ theorem _root_.GlobalTheory.AwayNorm.exists_normed_away : ∀ (p : ℕ) (R : Typ
     choose z hz using hstep
     obtain ⟨s, hs⟩ := hcomp z
     choose r hr using hs
-    have htel : ∀ n, v n = v 0 + (p : L) *
-        algebraMap R L (∑ i ∈ Finset.range n, (p : R) ^ i * z i) := by
+    have htel
+        : ∀ n, v n = v 0 + (p : L) * algebraMap R L (∑ i ∈ Finset.range n, (p : R) ^ i * z i) := by
       intro n
       induction n with
       | zero => simp
@@ -238,16 +238,16 @@ theorem _root_.GlobalTheory.AwayNorm.exists_normed_away : ∀ (p : ℕ) (R : Typ
     refine ⟨v 0 + (p : L) * algebraMap R L s, Metric.tendsto_atTop.2 fun ε hε => ?_⟩
     obtain ⟨M, hM⟩ := exists_pow_lt_of_lt_one hε hp1
     refine ⟨M, fun n hn => ?_⟩
-    have hdiff : v n - (v 0 + (p : L) * algebraMap R L s) =
-        (p : L) ^ (n + 1) * algebraMap R L (-r n) := by
+    have hdiff
+        : v n - (v 0 + (p : L) * algebraMap R L s)
+          = (p : L) ^ (n + 1) * algebraMap R L (- r n) := by
       rw [htel n, map_neg]
       have := congrArg (algebraMap R L) (hr n)
       rw [map_sub, map_mul, map_pow, map_natCast] at this
       linear_combination (-(p : L)) * this
     have hb : ‖v n - (v 0 + (p : L) * algebraMap R L s)‖ ≤ (p : ℝ)⁻¹ ^ (n + 1) :=
       (hcharN _ _).2 ⟨_, hdiff⟩
-    have hc : (p : ℝ)⁻¹ ^ (n + 1) ≤ (p : ℝ)⁻¹ ^ M :=
-      pow_le_pow_of_le_one hp0.le hp1.le (by omega)
+    have hc : (p : ℝ)⁻¹ ^ (n + 1) ≤ (p : ℝ)⁻¹ ^ M := pow_le_pow_of_le_one hp0.le hp1.le (by omega)
     rw [dist_eq_norm]
     linarith
   refine ⟨L, inst, hcomplete, inferInstance, inferInstance, hcharN, fun x => ?_⟩

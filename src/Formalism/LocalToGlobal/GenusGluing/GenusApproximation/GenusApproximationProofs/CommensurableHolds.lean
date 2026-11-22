@@ -16,24 +16,29 @@ section LocEqSec
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
 
 omit [NumberField F] [NumberField E] [StarRing E] in
-theorem loc_coe_algebraMap (r : 𝓞 F) :
-    ((algebraMap (𝓞 F) (𝓞 E) r : 𝓞 E) : E) = algebraMap F E (r : F) := rfl
+theorem loc_coe_algebraMap (r : 𝓞 F)
+    : ((algebraMap (𝓞 F) (𝓞 E) r : 𝓞 E) : E) = algebraMap F E (r : F) :=
+  rfl
 
-theorem loc_hcompl_prop (PP : Pl E) (s : 𝓞 E) (hs : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := E) PP.asIdeal) :
-    s ∉ PP.asIdeal ∧ starO s ∉ PP.asIdeal := by
+theorem loc_hcompl_prop
+    (PP : Pl E) (s : 𝓞 E) (hs : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := E) PP.asIdeal)
+    : s ∉ PP.asIdeal ∧ starO s ∉ PP.asIdeal := by
   induction hs using Submonoid.closure_induction with
-  | mem x hx =>
-    exact ⟨hx.1, hx.2 (starO x) (starO_coe x)⟩
+  | mem x hx => exact ⟨hx.1, hx.2 (starO x) (starO_coe x)⟩
   | one =>
     have h1 : starO (1 : 𝓞 E) = 1 := map_one (starOHom (E := E))
     rw [h1]
-    exact ⟨PP.isPrime.ne_top ∘ (Ideal.eq_top_of_isUnit_mem _ · isUnit_one),
-      PP.isPrime.ne_top ∘ (Ideal.eq_top_of_isUnit_mem _ · isUnit_one)⟩
+    exact ⟨
+      PP.isPrime.ne_top ∘ (Ideal.eq_top_of_isUnit_mem _ · isUnit_one),
+      PP.isPrime.ne_top ∘ (Ideal.eq_top_of_isUnit_mem _ · isUnit_one)
+    ⟩
   | mul x y _ _ hx hy =>
     have hm : starO (x * y) = starO x * starO y := map_mul (starOHom (E := E)) x y
     rw [hm]
-    exact ⟨fun h => (PP.isPrime.mem_or_mem h).elim hx.1 hy.1,
-      fun h => (PP.isPrime.mem_or_mem h).elim hx.2 hy.2⟩
+    exact ⟨
+      fun h => (PP.isPrime.mem_or_mem h).elim hx.1 hy.1,
+      fun h => (PP.isPrime.mem_or_mem h).elim hx.2 hy.2
+    ⟩
 
 end LocEqSec
 
@@ -50,7 +55,7 @@ theorem localEquality_holds : LocEq := by
     obtain ⟨a, ha⟩ := (hc.fixed (m : E)).1 hfix
     have hint : IsIntegral ℤ a := by
       have h2 : IsIntegral ℤ (algebraMap F E a) := by rw [ha]; exact m.2
-      exact (isIntegral_algebraMap_iff ).1 h2
+      exact (isIntegral_algebraMap_iff).1 h2
     set r : 𝓞 F := ⟨a, hint⟩ with hr
     have hrm : algebraMap (𝓞 F) (𝓞 E) r = m := by
       apply RingOfIntegers.ext
@@ -73,8 +78,9 @@ theorem localEquality_holds : LocEq := by
       rw [underPl_asIdeal, Ideal.mem_comap]
       exact h
     refine ⟨hr', fun t ht htp => hr' ?_⟩
-    have hfix : star (algebraMap (𝓞 E) E (algebraMap (𝓞 F) (𝓞 E) r)) =
-        algebraMap (𝓞 E) E (algebraMap (𝓞 F) (𝓞 E) r) :=
+    have hfix
+        : star (algebraMap (𝓞 E) E (algebraMap (𝓞 F) (𝓞 E) r))
+          = algebraMap (𝓞 E) E (algebraMap (𝓞 F) (𝓞 E) r) :=
       (hc.fixed _).2 ⟨(r : F), rfl⟩
     rw [hfix] at ht
     have : t = algebraMap (𝓞 F) (𝓞 E) r := FaithfulSMul.algebraMap_injective (𝓞 E) E ht
@@ -85,8 +91,8 @@ section CommensSec
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem commens_denoms (s : Finset E) :
-    ∃ d : ℤ, d ≠ 0 ∧ ∀ x ∈ s, ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = (d : E) * x := by
+theorem commens_denoms (s : Finset E)
+    : ∃ d : ℤ, d ≠ 0 ∧ ∀ x ∈ s, ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = (d : E) * x := by
   obtain ⟨y, hy, hint⟩ := exists_integral_multiples ℤ ℚ (L := E) s
   refine ⟨y, hy, fun x hx => ⟨⟨_, hint x hx⟩, ?_⟩⟩
   show (y • x : E) = _
@@ -94,11 +100,13 @@ theorem commens_denoms (s : Finset E) :
 
 end CommensSec
 
-theorem commensurable_holds :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-      (n : ℕ) (N : Submodule (𝓞 E) (Sp E n)), Submodule.IsFullLattice E N →
-      ∃ D : 𝓞 F, D ≠ 0 ∧ (∀ y ∈ N, algebraMap (𝓞 F) (𝓞 E) D • y ∈ stdLat E n) ∧
-        (∀ y ∈ stdLat E n, algebraMap (𝓞 F) (𝓞 E) D • y ∈ N) := by
+theorem commensurable_holds
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n : ℕ)
+        (N : Submodule (𝓞 E) (Sp E n)),
+      Submodule.IsFullLattice E N
+        → ∃ D : 𝓞 F,
+          D ≠ 0 ∧ (∀ y ∈ N, algebraMap (𝓞 F) (𝓞 E) D • y ∈ stdLat E n)
+            ∧ (∀ y ∈ stdLat E n, algebraMap (𝓞 F) (𝓞 E) D • y ∈ N) := by
   intro F E _ _ _ _ _ n N hN
   classical
   let _ : Submodule.IsFullLattice E N := hN
@@ -112,7 +120,8 @@ theorem commensurable_holds :
       rw [stdLat, Submodule.mem_pi]
       intro i _
       rw [Submodule.mem_one]
-      obtain ⟨o, ho⟩ := h1 (x i) (Finset.mem_biUnion.2 ⟨x, hx, Finset.mem_image.2 ⟨i, Finset.mem_univ _, rfl⟩⟩)
+      obtain ⟨o, ho⟩ :=
+        h1 (x i) (Finset.mem_biUnion.2 ⟨x, hx, Finset.mem_image.2 ⟨i, Finset.mem_univ _, rfl⟩⟩)
       refine ⟨o, ?_⟩
       rw [ho, Pi.smul_apply, Algebra.smul_def, map_intCast]
     intro y hy
@@ -129,7 +138,8 @@ theorem commensurable_holds :
     rw [← hsum i, Finset.smul_sum]
     apply Submodule.sum_mem
     intro a ha
-    obtain ⟨o, ho⟩ := h2 (f i a) (Finset.mem_biUnion.2 ⟨i, Finset.mem_univ _, Finset.mem_image.2 ⟨a, ha, rfl⟩⟩)
+    obtain ⟨o, ho⟩ :=
+      h2 (f i a) (Finset.mem_biUnion.2 ⟨i, Finset.mem_univ _, Finset.mem_image.2 ⟨a, ha, rfl⟩⟩)
     have e : ((d2 : 𝓞 E)) • (f i a • a) = o • a := by
       rw [Int.cast_smul_eq_zsmul, ← Int.cast_smul_eq_zsmul E, smul_smul, ← ho, algebraMap_smul]
     rw [e]

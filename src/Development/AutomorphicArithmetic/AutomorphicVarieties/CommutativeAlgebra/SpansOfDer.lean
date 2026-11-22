@@ -6,9 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem UpperTheory.V.Alg.exists_form_of_not_torsion {O L : Type} [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] [AddCommGroup L] [Module O L] [Module.Finite O L] (S : Submodule O L) (p : L)
-    (hp : ∀ c : O, c ≠ 0 → c • p ∉ S) : ∃ φ : L →ₗ[O] O, (∀ s ∈ S, φ s = 0) ∧ φ p ≠ 0 := by
+private theorem UpperTheory.V.Alg.exists_form_of_not_torsion
+    {O L : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup L] [Module O L]
+    [Module.Finite O L]
+    (S : Submodule O L) (p : L) (hp : ∀ c : O, c ≠ 0 → c • p ∉ S)
+    : ∃ φ : L →ₗ[O] O, (∀ s ∈ S, φ s = 0) ∧ φ p ≠ 0 := by
   have hne : (Submodule.torsion O (L ⧸ S)).mkQ (S.mkQ p) ≠ 0 := by
     intro h
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero] at h
@@ -21,9 +23,11 @@ private theorem UpperTheory.V.Alg.exists_form_of_not_torsion {O L : Type} [CommR
   have : S.mkQ s = 0 := (Submodule.Quotient.mk_eq_zero S).2 hs
   simp only [LinearMap.comp_apply, this, map_zero]
 
-private theorem UpperTheory.V.Alg.ker_isHomogeneous {O A X : Type} [CommRing O] [CommRing A] [Algebra O A]
-    [AddCommGroup X] [DecidableEq X] (𝒜 : X → Submodule O A) [GradedAlgebra 𝒜] (x : A →ₐ[O] O)
-    (hx : ∀ i, i ≠ 0 → ∀ f ∈ 𝒜 i, x f = 0) : (RingHom.ker x).IsHomogeneous 𝒜 := by
+private theorem UpperTheory.V.Alg.ker_isHomogeneous
+    {O A X : Type} [CommRing O] [CommRing A] [Algebra O A] [AddCommGroup X] [DecidableEq X]
+    (𝒜 : X → Submodule O A) [GradedAlgebra 𝒜]
+    (x : A →ₐ[O] O) (hx : ∀ i, i ≠ 0 → ∀ f ∈ 𝒜 i, x f = 0)
+    : (RingHom.ker x).IsHomogeneous 𝒜 := by
   have h0 : ∀ f : A, x (DirectSum.decompose 𝒜 f 0 : A) = x f := by
     intro f
     induction f using DirectSum.Decomposition.inductionOn 𝒜 with
@@ -41,15 +45,23 @@ private theorem UpperTheory.V.Alg.ker_isHomogeneous {O A X : Type} [CommRing O] 
     rw [h0, hf]
   · exact hx i hi _ (DirectSum.decompose 𝒜 f i).2
 
-theorem UpperTheory.V.Alg.spans_of_der :
-    ∀ (O A X : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A] [AddCommGroup X] [DecidableEq X] (𝒜 : X → Submodule O A) [GradedAlgebra 𝒜] (x : A →ₐ[O] O),
-      (∀ i, i ≠ 0 → ∀ f ∈ 𝒜 i, x f = 0) → ∀ (j : X), (cotLat x 𝒜 j).FG → ∀ (ι : Type) (F : ι → A), (∀ i, F i ∈ 𝒜 j ∧ x (F i) = 0) →
-      (∀ D ∈ PtDer x O, HasWt 𝒜 j D → (∀ i, D (F i) = 0) → D = 0) → SpansCot x 𝒜 j F := by
+theorem UpperTheory.V.Alg.spans_of_der
+    : ∀ (O A X : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A]
+        [Algebra O A] [AddCommGroup X] [DecidableEq X] (𝒜 : X → Submodule O A) [GradedAlgebra 𝒜]
+        (x : A →ₐ[O] O),
+      (∀ i, i ≠ 0 → ∀ f ∈ 𝒜 i, x f = 0)
+        → ∀ (j : X),
+          (cotLat x 𝒜 j).FG
+            → ∀ (ι : Type) (F : ι → A),
+              (∀ i, F i ∈ 𝒜 j ∧ x (F i) = 0)
+                → (∀ D ∈ PtDer x O, HasWt 𝒜 j D → (∀ i, D (F i) = 0) → D = 0)
+                → SpansCot x 𝒜 j F := by
   intro O A X _ _ _ _ _ _ _ 𝒜 _ x hx j hfg ι F hF hD p hp
   by_contra hcon
   haveI : Module.Finite O (cotLat x 𝒜 j) := Module.Finite.iff_fg.2 hfg
-  obtain ⟨φ, hφS, hφp⟩ := exists_form_of_not_torsion ((cotSpan x F).comap (cotLat x 𝒜 j).subtype) ⟨p, hp⟩
-    (fun c hc h => hcon ⟨c, hc, h⟩)
+  obtain ⟨φ, hφS, hφp⟩ :=
+    exists_form_of_not_torsion ((cotSpan x F).comap (cotLat x 𝒜 j).subtype) ⟨p, hp⟩
+      (fun c hc h => hcon ⟨c, hc, h⟩)
   have hq := ker_isHomogeneous 𝒜 x hx
   have hq2 : (RingHom.ker x ^ 2).IsHomogeneous 𝒜 := by rw [pow_two]; exact hq.mul hq
   let r : A →ₗ[O] A := LinearMap.id - Algebra.linearMap O A ∘ₗ x.toLinearMap

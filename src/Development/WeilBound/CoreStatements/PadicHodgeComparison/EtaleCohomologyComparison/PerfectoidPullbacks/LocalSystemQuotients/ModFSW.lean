@@ -18,7 +18,10 @@ namespace CrystallineSemistableComparison.Pb.LsG
 
 open CrystallineSemistableComparison.Ls
 
-variable (l : ℕ) [Fact l.Prime] {k : Type} [Field k] [CharP k l] [PerfectRing k l] {O : Type} [CommRing O]
+variable
+  (l : ℕ) [Fact l.Prime]
+  {k : Type} [Field k] [CharP k l] [PerfectRing k l]
+  {O : Type} [CommRing O]
   (F : B.Fn O) (ρ : O →+* k)
 
 def thW (m : ℕ) : PDF (WittVector l k) (Thick (Wc.L l F ρ m)) where
@@ -33,7 +36,8 @@ def thW (m : ℕ) : PDF (WittVector l k) (Thick (Wc.L l F ρ m)) where
 
 abbrev fl (m : ℕ) : ObjectProperty (Thick (Wc.L l F ρ m)) := FlatT
 
-abbrev sW (m : ℕ) : PDF (WittVector l k) (fl l F ρ m).FullSubcategory := (thW l F ρ m).res (fl l F ρ m).ι
+abbrev sW (m : ℕ) : PDF (WittVector l k) (fl l F ρ m).FullSubcategory :=
+  (thW l F ρ m).res (fl l F ρ m).ι
 
 abbrev Kt (m : ℕ) : Cx.{1} (WittVector l k) := CH.cx (CH.modF (sW l F ρ m).A)
 

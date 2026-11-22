@@ -9,16 +9,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.QuadraticEx
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Two
 open scoped Classical
 
-private theorem plDvd_eq (F : Type) [Field F] (N : ℕ) (hN : N ≠ 0) :
-    plDvd F N = ⋃ p ∈ N.primeFactors, plDvd F p := by
+private theorem plDvd_eq (F : Type) [Field F] (N : ℕ) (hN : N ≠ 0)
+    : plDvd F N = ⋃ p ∈ N.primeFactors, plDvd F p := by
   ext v
   simp only [plDvd, Set.mem_setOf_eq, Set.mem_iUnion, exists_prop]
   constructor
-  · have key : ∀ M : ℕ, M ≠ 0 → ((M : 𝓞 F) ∈ v.asIdeal) →
-        ∃ p ∈ M.primeFactors, (p : 𝓞 F) ∈ v.asIdeal := by
+  · have key
+        : ∀ M : ℕ,
+          M ≠ 0 → ((M : 𝓞 F) ∈ v.asIdeal) → ∃ p ∈ M.primeFactors, (p : 𝓞 F) ∈ v.asIdeal := by
       intro M
       induction M using Nat.strong_induction_on with
       | _ M ih =>
@@ -47,8 +50,12 @@ private theorem plDvd_eq (F : Type) [Field F] (N : ℕ) (hN : N ≠ 0) :
     rw [hm, Nat.cast_mul]
     exact Ideal.mul_mem_right _ _ hpv
 
-theorem UpperTheory.V.Ws.exists_uniform_bound_ncard_placesDividing :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (U : Subgroup (G ℚ Ω)) (N : ℕ), U.Normal → IsOpen (U : Set (G ℚ Ω)) → N ≠ 0 → ∃ g : ℕ, ∀ (F : IntermediateField ℚ Ω) [NumberField F], cycU l U ≤ F.fixingSubgroup → (plDvd F N).ncard ≤ g := by
+theorem UpperTheory.V.Ws.exists_uniform_bound_ncard_placesDividing
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime]
+        (U : Subgroup (G ℚ Ω)) (N : ℕ),
+      U.Normal → IsOpen (U : Set (G ℚ Ω)) → N ≠ 0
+        → ∃ g : ℕ, ∀ (F : IntermediateField ℚ Ω) [NumberField F],
+          cycU l U ≤ F.fixingSubgroup → (plDvd F N).ncard ≤ g := by
   intro Ω _ _ _ l _ U N hUn hUo hN
   haveI := hUn
   haveI : (cycU l U).Normal := by
@@ -57,8 +64,9 @@ theorem UpperTheory.V.Ws.exists_uniform_bound_ncard_placesDividing :
   have hUi : U.index ≠ 0 := by
     haveI := Subgroup.quotient_finite_of_isOpen U hUo
     exact Subgroup.index_ne_zero_of_finite
-  have hUle : ∀ {X : Type} (s : Finset ℕ) (f : ℕ → Set X),
-      (⋃ p ∈ s, f p).ncard ≤ ∑ p ∈ s, (f p).ncard := by
+  have hUle
+      : ∀ {X : Type} (s : Finset ℕ) (f : ℕ → Set X),
+        (⋃ p ∈ s, f p).ncard ≤ ∑ p ∈ s, (f p).ncard := by
     intro X s f
     refine Finset.induction_on s ?_ ?_
     · simp

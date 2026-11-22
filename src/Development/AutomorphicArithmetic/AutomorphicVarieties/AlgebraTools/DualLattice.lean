@@ -7,23 +7,35 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 open Polynomial Matrix IsLocalRing TensorProduct
 
-private theorem UpperTheory.V.AlgebraTools.dual_lattice_denom {A : Type} [CommRing A] [IsDomain A]
+private theorem UpperTheory.V.AlgebraTools.dual_lattice_denom
+    {A : Type} [CommRing A] [IsDomain A]
     {F V : Type} [Field F] [Algebra A F] [IsFractionRing A F] [AddCommGroup V] [Module F V]
-    [Module A V] [IsScalarTower A F V] (Y : Submodule A V) (hY : Submodule.IsFullLattice F Y)
-    (z : V) : ∃ a : A, a ≠ 0 ∧ a • z ∈ Y :=
+    [Module A V] [IsScalarTower A F V]
+    (Y : Submodule A V) (hY : Submodule.IsFullLattice F Y)
+    (z : V)
+    : ∃ a : A, a ≠ 0 ∧ a • z ∈ Y :=
   _root_.UpperTheory.Reformulated.B.ExistsSmulMemOfIsLattice₂.dual_lattice_denom Y hY z
 
-private theorem UpperTheory.V.AlgebraTools.dual_lattice_pow {A : Type} [CommRing A] [IsDomain A]
-    [IsDiscreteValuationRing A] (a : A) (ha : a ≠ 0) :
-    ∃ s : ℕ, maximalIdeal A ^ s ≤ Ideal.span {a} := by
+private theorem UpperTheory.V.AlgebraTools.dual_lattice_pow
+    {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] (a : A) (ha : a ≠ 0)
+    : ∃ s : ℕ, maximalIdeal A ^ s ≤ Ideal.span {a} := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible A
   obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible ha hϖ
   refine ⟨n, ?_⟩
   rw [hϖ.maximalIdeal_eq, Ideal.span_singleton_pow, Ideal.span_singleton_le_span_singleton]
   exact (Units.isUnit u).mul_left_dvd.mpr dvd_rfl
 
-theorem UpperTheory.V.AlgebraTools.dual_lattice :
-    ∀ {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] {F V : Type} [Field F] [Algebra A F] [IsFractionRing A F] [AddCommGroup V] [Module F V] [Module A V] [IsScalarTower A F V] [Module.Finite F V] (Bf : LinearMap.BilinForm F V), Bf.IsSymm → Bf.Nondegenerate → ∀ Y : Submodule A V, Submodule.IsFullLattice F Y → Submodule.IsFullLattice F (Bf.dualSubmodule Y) ∧ Bf.dualSubmodule (Bf.dualSubmodule Y) = Y ∧ ∀ Z : Submodule A V, Submodule.IsLattice F Z → ∃ s : ℕ, maximalIdeal A ^ s • Z ≤ Y := by
+theorem UpperTheory.V.AlgebraTools.dual_lattice
+    : ∀ {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] {F V : Type} [Field F]
+        [Algebra A F] [IsFractionRing A F] [AddCommGroup V] [Module F V] [Module A V]
+        [IsScalarTower A F V] [Module.Finite F V] (Bf : LinearMap.BilinForm F V),
+      Bf.IsSymm → Bf.Nondegenerate
+        → ∀ Y : Submodule A V,
+          Submodule.IsFullLattice F Y
+            → Submodule.IsFullLattice F (Bf.dualSubmodule Y)
+              ∧ Bf.dualSubmodule (Bf.dualSubmodule Y) = Y
+              ∧ ∀ Z : Submodule A V,
+                Submodule.IsLattice F Z → ∃ s : ℕ, maximalIdeal A ^ s • Z ≤ Y := by
   intro A _ _ _ F V _ _ _ _ _ _ _ _ Bf hs hn Y hY
   classical
   haveI : Module.Free A Y := Submodule.IsLattice.free F Y
@@ -31,14 +43,15 @@ theorem UpperTheory.V.AlgebraTools.dual_lattice :
   let b0 := Module.Free.chooseBasis A Y
   let b := b0.extendOfIsFullLattice F
   have hb : Submodule.span A (Set.range b) = Y := by
-    have : (b : _ → V) = Y.subtype ∘ b0 := by
-      funext i; simp [b]
+    have : (b : _ → V) = Y.subtype ∘ b0 := by funext i; simp [b]
     rw [this, Set.range_comp, ← Submodule.map_span, b0.span_eq, Submodule.map_top,
       Submodule.range_subtype]
   refine ⟨?_, ?_, ?_⟩
   · rw [← hb, LinearMap.BilinForm.dualSubmodule_span_of_basis Bf hn b]
-    exact { toIsLattice := Submodule.IsLattice.of_fg _ (Submodule.fg_span (Set.finite_range _))
-            span_eq_top := by rw [Submodule.span_span_of_tower, Module.Basis.span_eq] }
+    exact {
+      toIsLattice := Submodule.IsLattice.of_fg _ (Submodule.fg_span (Set.finite_range _))
+      span_eq_top := by rw [Submodule.span_span_of_tower, Module.Basis.span_eq]
+    }
   · rw [← hb]
     exact LinearMap.BilinForm.dualSubmodule_dualSubmodule_of_basis Bf hn hs b
   · intro Z hZ

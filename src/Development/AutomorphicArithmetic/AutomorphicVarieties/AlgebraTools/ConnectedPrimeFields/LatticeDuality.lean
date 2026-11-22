@@ -9,9 +9,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-theorem UpperTheory.V.AlgebraTools.Conn.bidual :
-    ∀ {A M : Type} [CommRing A] [IsDomain A] [AddCommGroup M] [Module A M] [Module.Finite A M]
-      (a : Module.Dual A (Module.Dual A M)), ∃ (d : A) (r : M), d ≠ 0 ∧ ∀ l : Module.Dual A M, l r = d * a l := by
+theorem UpperTheory.V.AlgebraTools.Conn.bidual
+    : ∀ {A M : Type} [CommRing A] [IsDomain A] [AddCommGroup M] [Module A M] [Module.Finite A M]
+        (a : Module.Dual A (Module.Dual A M)),
+      ∃ (d : A) (r : M),
+        d ≠ 0 ∧ ∀ l : Module.Dual A M, l r = d * a l := by
   intro A M _ _ _ _ _ a
   classical
   obtain ⟨S, hS⟩ := (Module.Finite.fg_top : (⊤ : Submodule A M).FG)
@@ -28,8 +30,9 @@ theorem UpperTheory.V.AlgebraTools.Conn.bidual :
     intro o
     cases o <;> simp [ψ]
   let v : Option S → K := fun j => if none = j then 1 else 0
-  have key : ∀ w ∈ Submodule.span K (Set.range ψ),
-      ∃ s : A, s ≠ 0 ∧ ∃ l, ∀ o, algebraMap A K s * w o = ψ l o := by
+  have key
+      : ∀ w ∈ Submodule.span K (Set.range ψ), ∃ s : A,
+        s ≠ 0 ∧ ∃ l, ∀ o, algebraMap A K s * w o = ψ l o := by
     intro w hw
     induction hw using Submodule.span_induction with
     | mem x hx =>
@@ -76,7 +79,8 @@ theorem UpperTheory.V.AlgebraTools.Conn.bidual :
   let c : Option S → K := fun o => f (fun j => if o = j then 1 else 0)
   obtain ⟨Dn, hDc⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors A) c
   choose b hb using hDc
-  have hD0 : algebraMap A K (Dn : A) ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors Dn.2
+  have hD0 : algebraMap A K (Dn : A) ≠ 0 :=
+    IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors Dn.2
   have hmain : ∀ l : Module.Dual A M, b none * a l + ∑ i : S, b (some i) * l i = 0 := by
     intro l
     have e : ∑ o, ψ l o * c o = 0 := by
@@ -85,18 +89,19 @@ theorem UpperTheory.V.AlgebraTools.Conn.bidual :
       simpa [c, smul_eq_mul] using h
     apply IsFractionRing.injective A K
     rw [map_zero]
-    calc algebraMap A K (b none * a l + ∑ i : S, b (some i) * l i)
-        = algebraMap A K (Dn : A) * ∑ o, ψ l o * c o := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [Fintype.sum_option, mul_add, Finset.mul_sum, map_add (f := _), map_mul, map_sum]
-          congr 1
-          · rw [hb, Algebra.smul_def]
-            simp only [ψ, Option.elim_none]
-            ring
-          · refine Finset.sum_congr rfl (fun i _ => ?_)
-            rw [map_mul, hb, Algebra.smul_def]
-            simp only [ψ, Option.elim_some]
-            ring
+    calc
+      algebraMap A K (b none * a l + ∑ i : S, b (some i) * l i)
+          = algebraMap A K (Dn : A) * ∑ o, ψ l o * c o := by
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [Fintype.sum_option, mul_add, Finset.mul_sum, map_add (f := _), map_mul, map_sum]
+        congr 1
+        · rw [hb, Algebra.smul_def]
+          simp only [ψ, Option.elim_none]
+          ring
+        · refine Finset.sum_congr rfl (fun i _ => ?_)
+          rw [map_mul, hb, Algebra.smul_def]
+          simp only [ψ, Option.elim_some]
+          ring
       _ = 0 := by rw [e, mul_zero]
   refine ⟨b none, -(∑ i : S, b (some i) • (i : M)), ?_, ?_⟩
   · intro h0

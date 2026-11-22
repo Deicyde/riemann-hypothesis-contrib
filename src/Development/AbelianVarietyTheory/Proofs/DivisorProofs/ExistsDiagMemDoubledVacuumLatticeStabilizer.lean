@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AntiCols
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
 noncomputable section
@@ -17,20 +19,27 @@ open Matrix
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem mat_mul_mat_inv {σ : E →ₐ[F] E} {d : ℕ} {J : Matrix (Fin d) (Fin d) E} (k : UA σ J) :
-    mat k * mat k⁻¹ = 1 := by
+theorem mat_mul_mat_inv {σ : E →ₐ[F] E} {d : ℕ} {J : Matrix (Fin d) (Fin d) E} (k : UA σ J)
+    : mat k * mat k⁻¹ = 1 := by
   show ((k * k⁻¹ : UA σ J) : GL (Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))).1 = 1
-  rw [mul_inv_cancel]; rfl
+  rw [mul_inv_cancel]
+  rfl
 
-theorem mat_inv_mul_mat {σ : E →ₐ[F] E} {d : ℕ} {J : Matrix (Fin d) (Fin d) E} (k : UA σ J) :
-    mat k⁻¹ * mat k = 1 := by
+theorem mat_inv_mul_mat {σ : E →ₐ[F] E} {d : ℕ} {J : Matrix (Fin d) (Fin d) E} (k : UA σ J)
+    : mat k⁻¹ * mat k = 1 := by
   show ((k⁻¹ * k : UA σ J) : GL (Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))).1 = 1
-  rw [inv_mul_cancel]; rfl
+  rw [inv_mul_cancel]
+  rfl
 
-def diagOne {R : Type} [CommRing R] {d : ℕ} (A B : Matrix (Fin d) (Fin d) R) (hAB : A * B = 1) (hBA : B * A = 1) :
-    GL (Fin d ⊕ Fin d) R :=
-  ⟨fromBlocks A 0 0 1, fromBlocks B 0 0 1, by simp [fromBlocks_multiply, hAB, ← fromBlocks_one],
-    by simp [fromBlocks_multiply, hBA, ← fromBlocks_one]⟩
+def diagOne
+    {R : Type} [CommRing R]
+    {d : ℕ} (A B : Matrix (Fin d) (Fin d) R) (hAB : A * B = 1) (hBA : B * A = 1)
+    : GL (Fin d ⊕ Fin d) R := ⟨
+  fromBlocks A 0 0 1,
+  fromBlocks B 0 0 1,
+  by simp [fromBlocks_multiply, hAB, ← fromBlocks_one],
+  by simp [fromBlocks_multiply, hBA, ← fromBlocks_one]
+⟩
 
 theorem diag_mem_KD (σ : E →ₐ[F] E) {d : ℕ} (W : Spc F E d) (v : Pl (F := F)) :
     ∀ k ∈ GlobalTheory.InertSph.KAt σ W v, ∃ g : GlobalTheory.DblVac.UD σ W,

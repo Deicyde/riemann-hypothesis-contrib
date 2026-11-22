@@ -7,34 +7,46 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CechGluingOf
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LogKS Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LogKS Formalism.L2.Pj
 
 namespace GlobalTheory.CechKSSmul
 
-theorem valR_mul_of_le {A : Type} [CommRing A] {Z : Scheme.{0}} (x : Sp A ⟶ Z) (O : Z.Opens)
-    (h : ⊤ ≤ x ⁻¹ᵁ O) (a b : Γ(Z, O)) : valR x O (a * b) = valR x O a * valR x O b := by
+theorem valR_mul_of_le
+    {A : Type} [CommRing A]
+    {Z : Scheme.{0}} (x : Sp A ⟶ Z) (O : Z.Opens) (h : ⊤ ≤ x ⁻¹ᵁ O) (a b : Γ(Z, O))
+    : valR x O (a * b) = valR x O a * valR x O b := by
   simp only [valR, dif_pos h, map_mul]
 
-theorem valR_sub_of_le {A : Type} [CommRing A] {Z : Scheme.{0}} (x : Sp A ⟶ Z) (O : Z.Opens)
-    (h : ⊤ ≤ x ⁻¹ᵁ O) (a b : Γ(Z, O)) : valR x O (a - b) = valR x O a - valR x O b := by
+theorem valR_sub_of_le
+    {A : Type} [CommRing A]
+    {Z : Scheme.{0}} (x : Sp A ⟶ Z) (O : Z.Opens) (h : ⊤ ≤ x ⁻¹ᵁ O) (a b : Γ(Z, O))
+    : valR x O (a - b) = valR x O a - valR x O b := by
   simp only [valR, dif_pos h, map_sub]
 
-theorem valR_appLE_comp {A : Type} [CommRing A] {Y Z : Scheme.{0}} (x : Sp A ⟶ Y) (g : Y ⟶ Z) (U : Z.Opens)
-    (W : Y.Opens) (e : W ≤ g ⁻¹ᵁ U) (h : ⊤ ≤ x ⁻¹ᵁ W) (a : Γ(Z, U)) :
-    valR x W ((g.appLE U W e).hom a) = valR (x ≫ g) U a := by
+theorem valR_appLE_comp
+    {A : Type} [CommRing A]
+    {Y Z : Scheme.{0}} (x : Sp A ⟶ Y) (g : Y ⟶ Z) (U : Z.Opens) (W : Y.Opens) (e : W ≤ g ⁻¹ᵁ U)
+    (h : ⊤ ≤ x ⁻¹ᵁ W) (a : Γ(Z, U))
+    : valR x W ((g.appLE U W e).hom a) = valR (x ≫ g) U a := by
   have h' : ⊤ ≤ (x ≫ g) ⁻¹ᵁ U := fun y hy => e (h hy)
   simp only [valR, dif_pos h, dif_pos h']
-  exact congrArg (fun q => (Scheme.ΓSpecIso (CommRingCat.of A)).hom.hom (q.hom a))
+  exact congrArg
+    (fun q => (Scheme.ΓSpecIso (CommRingCat.of A)).hom.hom (q.hom a))
     (Scheme.Hom.appLE_comp_appLE x g U W ⊤ e h)
 
-theorem fromSpec_appLE_top_eq {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) (h : ⊤ ≤ hU.fromSpec ⁻¹ᵁ U) :
-    hU.fromSpec.appLE U ⊤ h = (Scheme.ΓSpecIso Γ(X, U)).inv := by
+theorem fromSpec_appLE_top_eq
+    {X : Scheme.{0}} {U : X.Opens} (hU : IsAffineOpen U) (h : ⊤ ≤ hU.fromSpec ⁻¹ᵁ U)
+    : hU.fromSpec.appLE U ⊤ h = (Scheme.ΓSpecIso Γ(X, U)).inv := by
   rw [Scheme.Hom.appLE, hU.fromSpec_app_self, Category.assoc, ← Functor.map_comp]
   convert Category.comp_id _
   exact (Spec Γ(X, U)).presheaf.map_id _
 
-theorem valR_spMap_chart {X : Scheme.{0}} (U : X.affineOpens) {S : Type} [CommRing S] (φ : Γ(X, U.1) →+* S)
-    (r : Γ(X, U.1)) : valR (spMap φ ≫ chart U) U.1 r = φ r := by
+theorem valR_spMap_chart
+    {X : Scheme.{0}} (U : X.affineOpens)
+    {S : Type} [CommRing S]
+    (φ : Γ(X, U.1) →+* S) (r : Γ(X, U.1))
+    : valR (spMap φ ≫ chart U) U.1 r = φ r := by
   have h1 : ⊤ ≤ (chart U) ⁻¹ᵁ U.1 := by
     show ⊤ ≤ U.2.fromSpec ⁻¹ᵁ U.1
     rw [U.2.fromSpec_preimage_self]
@@ -53,8 +65,10 @@ theorem valR_spMap_chart {X : Scheme.{0}} (U : X.affineOpens) {S : Type} [CommRi
   congr 1
   exact (Scheme.ΓSpecIso Γ(X, U.1)).inv_hom_id_apply r
 
-theorem resG_appLE' {Y Z : Scheme.{0}} (f : Y ⟶ Z) {W : Z.Opens} {O O' : Y.Opens} (h : O' ≤ O) (e : O ≤ f ⁻¹ᵁ W)
-    (a : Γ(Z, W)) : resG Y h ((f.appLE W O e).hom a) = (f.appLE W O' (h.trans e)).hom a := by
+theorem resG_appLE'
+    {Y Z : Scheme.{0}} (f : Y ⟶ Z)
+    {W : Z.Opens} {O O' : Y.Opens} (h : O' ≤ O) (e : O ≤ f ⁻¹ᵁ W) (a : Γ(Z, W))
+    : resG Y h ((f.appLE W O e).hom a) = (f.appLE W O' (h.trans e)).hom a := by
   rw [← Scheme.Hom.appLE_map f e (homOfLE h).op]
   rfl
 

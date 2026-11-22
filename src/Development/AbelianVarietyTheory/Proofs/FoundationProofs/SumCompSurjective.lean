@@ -8,12 +8,15 @@ namespace GlobalTheory.SumCompSurjective
 
 open Finset
 
-theorem sum_comp_surjective {G Q : Type} [AddCommGroup G] [AddCommGroup Q] [Fintype G] [Fintype Q]
-    (π : G →+ Q) (hπ : Function.Surjective (⇑π : G → Q)) (g : Q → ℂ) :
-    ∃ n : ℕ, 0 < n ∧ ∑ y : G, g (π y) = (n : ℂ) * ∑ q : Q, g q := by
+theorem sum_comp_surjective
+    {G Q : Type} [AddCommGroup G] [AddCommGroup Q] [Fintype G] [Fintype Q]
+    (π : G →+ Q) (hπ : Function.Surjective (⇑π : G → Q))
+    (g : Q → ℂ)
+    : ∃ n : ℕ, 0 < n ∧ ∑ y : G, g (π y) = (n : ℂ) * ∑ q : Q, g q := by
   classical
-  have hfib : ∀ q : Q, (univ.filter fun y : G => π y = q).card
-      = (univ.filter fun y : G => π y = 0).card := by
+  have hfib
+      : ∀ q : Q,
+        (univ.filter fun y : G => π y = q).card = (univ.filter fun y : G => π y = 0).card := by
     intro q
     obtain ⟨a, rfl⟩ := hπ q
     refine Finset.card_bij (fun y _ => y - a) ?_ ?_ ?_

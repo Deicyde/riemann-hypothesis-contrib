@@ -12,7 +12,8 @@ theorem power_of_p_cycle : PowerPCycle := by
   have hpos : orderOf σ ≠ 0 := (orderOf_pos σ).ne'
   refine ⟨orderOf σ / p, ?_⟩
   have hord : orderOf (σ ^ (orderOf σ / p)) = p := orderOf_pow_orderOf_div hpos hdvd
-  obtain ⟨n, hn⟩ := Equiv.Perm.cycleType_prime_order (σ := σ ^ (orderOf σ / p)) (by rw [hord]; exact hp)
+  obtain ⟨n, hn⟩ :=
+    Equiv.Perm.cycleType_prime_order (σ := σ ^ (orderOf σ / p)) (by rw [hord]; exact hp)
   rw [hord] at hn
   have hsum : (σ ^ (orderOf σ / p)).support.card = (n + 1) * p := by
     rw [← Equiv.Perm.sum_cycleType, hn, Multiset.sum_replicate, smul_eq_mul]

@@ -10,15 +10,16 @@ noncomputable section
 
 namespace PI.OpWords
 
-theorem rop_apply_eq (K : Type) [Field K] (k : ℕ) (a b : Fin k) (f : Pol K k) :
-    Rop K k a b f = X (Sum.inl a) * pderiv (Sum.inl b) f - X (Sum.inr b) * pderiv (Sum.inr a) f := rfl
+theorem rop_apply_eq (K : Type) [Field K] (k : ℕ) (a b : Fin k) (f : Pol K k)
+    : Rop K k a b f = X (Sum.inl a) * pderiv (Sum.inl b) f - X (Sum.inr b) * pderiv (Sum.inr a) f :=
+  rfl
 
-theorem pderiv_inl_tt (K : Type) [Field K] (k : ℕ) (b : Fin k) :
-    pderiv (Sum.inl b) (tt K k) = X (Sum.inr b) := by
+theorem pderiv_inl_tt (K : Type) [Field K] (k : ℕ) (b : Fin k)
+    : pderiv (Sum.inl b) (tt K k) = X (Sum.inr b) := by
   simp [tt, Derivation.leibniz, pderiv_X, Pi.single_apply]
 
-theorem pderiv_inr_tt (K : Type) [Field K] (k : ℕ) (a : Fin k) :
-    pderiv (Sum.inr a) (tt K k) = X (Sum.inl a) := by
+theorem pderiv_inr_tt (K : Type) [Field K] (k : ℕ) (a : Fin k)
+    : pderiv (Sum.inr a) (tt K k) = X (Sum.inl a) := by
   simp [tt, Derivation.leibniz, pderiv_X, Pi.single_apply]
 
 theorem rttRelation : RTT := by
@@ -27,9 +28,11 @@ theorem rttRelation : RTT := by
   simp only [Derivation.leibniz, pderiv_inl_tt, pderiv_inr_tt, smul_eq_mul]
   ring
 
-theorem iwh_X_pderiv {σ : Type} {K : Type} [Field K] (w : σ → ℕ) (i j : σ) (hij : w i = w j)
-    {f : MvPolynomial σ K} {n : ℕ} (hf : IsWeightedHomogeneous w f n) :
-    IsWeightedHomogeneous w (X i * pderiv j f) n := by
+theorem iwh_X_pderiv
+    {σ : Type} {K : Type} [Field K]
+    (w : σ → ℕ) (i j : σ) (hij : w i = w j)
+    {f : MvPolynomial σ K} {n : ℕ} (hf : IsWeightedHomogeneous w f n)
+    : IsWeightedHomogeneous w (X i * pderiv j f) n := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     rw [f.as_sum, map_sum, Finset.mul_sum]
@@ -53,20 +56,23 @@ theorem iwh_X_pderiv {σ : Type} {K : Type} [Field K] (w : σ → ℕ) (i j : σ
 
 theorem polarizationBihomogeneous : RBihom := by
   intro K _ _ k d a b f hf
-  have hf' : f ∈ weightedHomogeneousSubmodule K (wx k) d ⊓ weightedHomogeneousSubmodule K (wxi k) d := hf
+  have hf'
+      : f ∈ weightedHomogeneousSubmodule K (wx k) d ⊓ weightedHomogeneousSubmodule K (wxi k) d :=
+    hf
   obtain ⟨h1, h2⟩ := Submodule.mem_inf.1 hf'
   rw [mem_weightedHomogeneousSubmodule] at h1 h2
   show Rop K k a b f ∈ weightedHomogeneousSubmodule K (wx k) d ⊓ weightedHomogeneousSubmodule K (wxi k) d
   rw [rop_apply_eq]
-  refine Submodule.mem_inf.2 ⟨Submodule.sub_mem _ ?_ ?_, Submodule.sub_mem _ ?_ ?_⟩ <;>
-    rw [mem_weightedHomogeneousSubmodule]
+  refine Submodule.mem_inf.2 ⟨Submodule.sub_mem _ ?_ ?_, Submodule.sub_mem _ ?_ ?_⟩
+    <;> rw [mem_weightedHomogeneousSubmodule]
   · exact iwh_X_pderiv _ _ _ (by simp [wx]) h1
   · exact iwh_X_pderiv _ _ _ (by simp [wx]) h1
   · exact iwh_X_pderiv _ _ _ (by simp [wxi]) h2
   · exact iwh_X_pderiv _ _ _ (by simp [wxi]) h2
 
-theorem coeff_X_pderiv_self {σ : Type} {K : Type} [Field K] (i : σ) (f : MvPolynomial σ K)
-    (m : σ →₀ ℕ) : AddMonoidAlgebra.coeff (X i * pderiv i f) m = AddMonoidAlgebra.coeff f m * (m i : K) := by
+theorem coeff_X_pderiv_self
+    {σ : Type} {K : Type} [Field K] (i : σ) (f : MvPolynomial σ K) (m : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (X i * pderiv i f) m = AddMonoidAlgebra.coeff f m * (m i : K) := by
   classical
   induction f using MvPolynomial.induction_on'
   next u a =>
@@ -84,8 +90,7 @@ theorem coeff_X_pderiv_self {σ : Type} {K : Type} [Field K] (i : σ) (f : MvPol
       · subst h
         rfl
       · simp
-  next p q hp hq =>
-    simp only [map_add (f := _), mul_add, MvPolynomial.coeff_add, hp, hq, add_mul]
+  next p q hp hq => simp only [map_add (f := _), mul_add, MvPolynomial.coeff_add, hp, hq, add_mul]
 
 theorem weightOfEigenvector : WtOfEig := by
   intro K _ _ k a w f h m hm
@@ -101,22 +106,26 @@ theorem weightOfEigenvector : WtOfEig := by
 def va (k : ℕ) (a : Fin k) : Fin k ⊕ Fin k → ℤ :=
   Sum.elim (fun i => if i = a then 1 else 0) (fun i => if i = a then -1 else 0)
 
-theorem weight_va (k : ℕ) (a : Fin k) (m : Fin k ⊕ Fin k →₀ ℕ) :
-    weight (va k a) m = (m (Sum.inl a) : ℤ) - m (Sum.inr a) := by
+theorem weight_va (k : ℕ) (a : Fin k) (m : Fin k ⊕ Fin k →₀ ℕ)
+    : weight (va k a) m = (m (Sum.inl a) : ℤ) - m (Sum.inr a) := by
   simp [Finsupp.weight_apply, Finsupp.sum_fintype, va, Fintype.sum_sum_type, sub_eq_add_neg]
 
-theorem tt_va (K : Type) [Field K] (k : ℕ) (a : Fin k) :
-    IsWeightedHomogeneous (va k a) (tt K k) 0 := by
+theorem tt_va (K : Type) [Field K] (k : ℕ) (a : Fin k)
+    : IsWeightedHomogeneous (va k a) (tt K k) 0 := by
   show IsWeightedHomogeneous (va k a) (∑ i, X (Sum.inl i) * X (Sum.inr i) : Pol K k) 0
   apply IsWeightedHomogeneous.sum
   intro i _
-  have h := (isWeightedHomogeneous_X K (va k a) (Sum.inl i)).mul
-    (isWeightedHomogeneous_X K (va k a) (Sum.inr i))
+  have h :=
+    (isWeightedHomogeneous_X K (va k a) (Sum.inl i)).mul
+      (isWeightedHomogeneous_X K (va k a) (Sum.inr i))
   by_cases hi : i = a <;> simpa [va, hi] using h
 
-theorem comp_mul_zero {σ : Type} {K : Type} [Field K] (w : σ → ℤ) {φ : MvPolynomial σ K}
-    (hφ : IsWeightedHomogeneous w φ 0) (n : ℤ) (ψ : MvPolynomial σ K) :
-    weightedHomogeneousComponent w n (φ * ψ) = φ * weightedHomogeneousComponent w n ψ := by
+theorem comp_mul_zero
+    {σ : Type} {K : Type} [Field K]
+    (w : σ → ℤ)
+    {φ : MvPolynomial σ K} (hφ : IsWeightedHomogeneous w φ 0)
+    (n : ℤ) (ψ : MvPolynomial σ K)
+    : weightedHomogeneousComponent w n (φ * ψ) = φ * weightedHomogeneousComponent w n ψ := by
   classical
   ext d
   rw [coeff_weightedHomogeneousComponent, coeff_mul, coeff_mul]
@@ -127,8 +136,7 @@ theorem comp_mul_zero {σ : Type} {K : Type} [Field K] (w : σ → ℤ) {φ : Mv
     · simp [h0]
     · have hx0 := hφ h0
       have hsum := by simpa using hx
-      have hw : weight w x.2 = n := by
-        rw [← hd, ← hsum, map_add (f := _), hx0, zero_add]
+      have hw : weight w x.2 = n := by rw [← hd, ← hsum, map_add (f := _), hx0, zero_add]
       rw [if_pos hw]
   · symm
     refine Finset.sum_eq_zero fun x hx => ?_

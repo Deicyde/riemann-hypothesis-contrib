@@ -16,11 +16,13 @@ open ValuativeRel Topology Filter Polynomial
 
 section Integral
 
-variable {K L : Type*} [Field K] [ValuativeRel K] [Field L] [ValuativeRel L] [Algebra K L]
-  [ValuativeExtension K L]
+variable
+  {K L : Type*}
+  [Field K] [ValuativeRel K] [Field L] [ValuativeRel L] [Algebra K L] [ValuativeExtension K L]
 
-theorem valuation_le_one_of_aeval_eq_zero {p : K[X]} (hp : p.Monic)
-    (hc : ∀ n, valuation K (p.coeff n) ≤ 1) {y : L} (hy : aeval y p = 0) : valuation L y ≤ 1 := by
+theorem valuation_le_one_of_aeval_eq_zero
+    {p : K[X]} (hp : p.Monic) (hc : ∀ n, valuation K (p.coeff n) ≤ 1) {y : L} (hy : aeval y p = 0)
+    : valuation L y ≤ 1 := by
   by_contra h
   push Not at h
   set d := p.natDegree
@@ -30,13 +32,15 @@ theorem valuation_le_one_of_aeval_eq_zero {p : K[X]} (hp : p.Monic)
     rfl
   rw [hsum, add_eq_zero_iff_eq_neg] at hy
   have hy0 : valuation L y ^ d ≠ 0 := pow_ne_zero _ (ne_of_gt (lt_trans zero_lt_one h))
-  have hlt : valuation L (∑ i ∈ Finset.range d, algebraMap K L (p.coeff i) * y ^ i) <
-      valuation L y ^ d := by
+  have hlt
+      : valuation L (∑ i ∈ Finset.range d, algebraMap K L (p.coeff i) * y ^ i)
+        < valuation L y ^ d := by
     refine Valuation.map_sum_lt _ hy0 fun i hi ↦ ?_
     rw [map_mul, map_pow]
     have hci : valuation L (algebraMap K L (p.coeff i)) ≤ 1 :=
       (Valuation.HasExtension.val_map_le_one_iff (valuation K) (valuation L) _).mpr (hc i)
-    calc valuation L (algebraMap K L (p.coeff i)) * valuation L y ^ i
+    calc
+      valuation L (algebraMap K L (p.coeff i)) * valuation L y ^ i
         ≤ 1 * valuation L y ^ i := mul_le_mul_left hci _
       _ = valuation L y ^ i := one_mul _
       _ < valuation L y ^ d := pow_lt_pow_right₀ h (Finset.mem_range.mp hi)
@@ -47,7 +51,8 @@ end Integral
 
 section Spectral
 
-variable (K : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  (K : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   (L : Type*) [Field L] [Algebra K L] [Algebra.IsAlgebraic K L]
 
 @[instance_reducible]
@@ -57,25 +62,28 @@ def algebraicNormedField : NontriviallyNormedField L :=
   haveI := normedField_completeSpace K
   spectralNorm.nontriviallyNormedField K L
 
-theorem algebraicNormedField_isUltrametricDist :
-    (letI := algebraicNormedField K L; IsUltrametricDist L) := by
+theorem algebraicNormedField_isUltrametricDist
+    : (letI := algebraicNormedField K L; IsUltrametricDist L) := by
   let := normedField K
   have := normedField_isUltrametricDist K
   have := normedField_completeSpace K
   let := algebraicNormedField K L
-  exact IsUltrametricDist.isUltrametricDist_of_isNonarchimedean_norm
-    (isNonarchimedean_spectralNorm (K := K) (L := L))
+  exact IsUltrametricDist.isUltrametricDist_of_isNonarchimedean_norm (isNonarchimedean_spectralNorm
+    (K := K) (L := L))
 
-theorem algebraicNormedField_norm_algebraMap (a : K) :
-    (letI := normedField K; letI := algebraicNormedField K L;
-      ‖algebraMap K L a‖ = ‖a‖) := by
+theorem algebraicNormedField_norm_algebraMap (a : K)
+    : (letI := normedField K
+       letI := algebraicNormedField K L
+       ‖algebraMap K L a‖ = ‖a‖) := by
   let := normedField K
   exact spectralNorm_extends a
 
 variable {K L}
 
-theorem valuation_le_one_of_spectralNorm_le_one [ValuativeRel L] [ValuativeExtension K L] {y : L}
-    (h : letI := normedField K; spectralNorm K L y ≤ 1) : valuation L y ≤ 1 := by
+theorem valuation_le_one_of_spectralNorm_le_one
+    [ValuativeRel L] [ValuativeExtension K L]
+    {y : L} (h : letI := normedField K; spectralNorm K L y ≤ 1)
+    : valuation L y ≤ 1 := by
   let := normedField K
   have hint : IsIntegral K y := Algebra.IsIntegral.isIntegral y
   have hc := (spectralValue_le_one_iff (minpoly.monic hint)).mp h
@@ -84,8 +92,8 @@ theorem valuation_le_one_of_spectralNorm_le_one [ValuativeRel L] [ValuativeExten
   rw [normedField_norm_le_norm_iff, (valuation K).vle_iff_le, map_one] at h1
   exact h1
 
-theorem valuation_lt_one_iff_spectralNorm_lt_one [ValuativeRel L] [ValuativeExtension K L] (x : L) :
-    valuation L x < 1 ↔ (letI := normedField K; spectralNorm K L x < 1) := by
+theorem valuation_lt_one_iff_spectralNorm_lt_one [ValuativeRel L] [ValuativeExtension K L] (x : L)
+    : valuation L x < 1 ↔ (letI := normedField K; spectralNorm K L x < 1) := by
   let := normedField K
   let := algebraicNormedField K L
   change valuation L x < 1 ↔ ‖x‖ < 1
@@ -125,18 +133,18 @@ theorem valuation_lt_one_iff_spectralNorm_lt_one [ValuativeRel L] [ValuativeExte
       have : ¬ ‖(1 : K)‖ ≤ ‖a‖ := by rw [norm_one]; exact not_le.mpr ha1
       rw [normedField_norm_le_norm_iff, (valuation K).vle_iff_le, map_one] at this
       exact not_le.mp this
-    have hxn : x ^ n = u * algebraMap K L a := by
-      rw [hu, mul_assoc, inv_mul_cancel₀ hna, mul_one]
+    have hxn : x ^ n = u * algebraMap K L a := by rw [hu, mul_assoc, inv_mul_cancel₀ hna, mul_one]
     have hpow : valuation L x ^ n < 1 := by
       rw [← map_pow, hxn, map_mul]
-      calc valuation L u * valuation L (algebraMap K L a)
+      calc
+        valuation L u * valuation L (algebraMap K L a)
           ≤ 1 * valuation L (algebraMap K L a) := mul_le_mul_left hu1 _
         _ < 1 := by rw [one_mul]; exact hva
     by_contra h
     exact (one_le_pow₀ (not_lt.mp h)).not_gt hpow
 
-theorem vle_iff_spectralNorm_le [ValuativeRel L] [ValuativeExtension K L] (x y : L) :
-    x ≤ᵥ y ↔ (letI := normedField K; spectralNorm K L x ≤ spectralNorm K L y) := by
+theorem vle_iff_spectralNorm_le [ValuativeRel L] [ValuativeExtension K L] (x y : L)
+    : x ≤ᵥ y ↔ (letI := normedField K; spectralNorm K L x ≤ spectralNorm K L y) := by
   let := normedField K
   let := algebraicNormedField K L
   change x ≤ᵥ y ↔ ‖x‖ ≤ ‖y‖
@@ -147,17 +155,18 @@ theorem vle_iff_spectralNorm_le [ValuativeRel L] [ValuativeExtension K L] (x y :
     change ¬ ‖y / x‖ < 1 ↔ _
     rw [norm_div, div_lt_one (norm_pos_iff.mpr hx), not_lt]
 
-
 variable (K) in
-theorem valuativeRel_eq_of_isAlgebraic {v₁ v₂ : ValuativeRel L}
-    (e₁ : @ValuativeExtension K L _ _ _ v₁ _) (e₂ : @ValuativeExtension K L _ _ _ v₂ _) :
-    v₁ = v₂ := by
+theorem valuativeRel_eq_of_isAlgebraic
+    {v₁ v₂ : ValuativeRel L}
+    (e₁ : @ValuativeExtension K L _ _ _ v₁ _) (e₂ : @ValuativeExtension K L _ _ _ v₂ _)
+    : v₁ = v₂ := by
   ext x y
   exact (@vle_iff_spectralNorm_le K _ _ _ _ L _ _ _ v₁ e₁ x y).trans
     (@vle_iff_spectralNorm_le K _ _ _ _ L _ _ _ v₂ e₂ x y).symm
 
-theorem valuation_algEquiv_apply_of_isAlgebraic [ValuativeRel L] [ValuativeExtension K L]
-    (σ : L ≃ₐ[K] L) (x : L) : valuation L (σ x) = valuation L x := by
+theorem valuation_algEquiv_apply_of_isAlgebraic
+    [ValuativeRel L] [ValuativeExtension K L] (σ : L ≃ₐ[K] L) (x : L)
+    : valuation L (σ x) = valuation L x := by
   let := normedField K
   have h : spectralNorm K L (σ x) = spectralNorm K L x := (spectralNorm_eq_of_equiv σ x).symm
   refine le_antisymm ?_ ?_
@@ -168,7 +177,8 @@ end Spectral
 
 section Existence
 
-variable (K : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  (K : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   (L : Type*) [Field L] [Algebra K L] [Algebra.IsAlgebraic K L]
 
 @[instance_reducible]
@@ -181,12 +191,14 @@ def algebraicValuativeRel : ValuativeRel L :=
 def algebraicTopology : TopologicalSpace L :=
   (algebraicNormedField K L).toUniformSpace.toTopologicalSpace
 
-theorem algebraicValuativeRel_vle_iff (x y : L) :
-    (letI := normedField K; letI := algebraicValuativeRel K L;
-      x ≤ᵥ y ↔ spectralNorm K L x ≤ spectralNorm K L y) := Iff.rfl
+theorem algebraicValuativeRel_vle_iff (x y : L)
+    : (letI := normedField K
+       letI := algebraicValuativeRel K L
+       x ≤ᵥ y ↔ spectralNorm K L x ≤ spectralNorm K L y) :=
+  Iff.rfl
 
-theorem algebraicValuativeRel_valuativeExtension :
-    (letI := algebraicValuativeRel K L; ValuativeExtension K L) := by
+theorem algebraicValuativeRel_valuativeExtension
+    : (letI := algebraicValuativeRel K L; ValuativeExtension K L) := by
   let := algebraicValuativeRel K L
   constructor
   intro a b
@@ -196,9 +208,10 @@ theorem algebraicValuativeRel_valuativeExtension :
   rw [← algebraicNormedField_norm_algebraMap K L a, ← algebraicNormedField_norm_algebraMap K L b]
   rfl
 
-theorem algebraicTopology_isValuativeTopology :
-    (letI := algebraicValuativeRel K L; letI := algebraicTopology K L;
-      IsValuativeTopology L) := by
+theorem algebraicTopology_isValuativeTopology
+    : (letI := algebraicValuativeRel K L
+       letI := algebraicTopology K L
+       IsValuativeTopology L) := by
   let := algebraicNormedField K L
   have := algebraicNormedField_isUltrametricDist K L
   let := algebraicValuativeRel K L
@@ -228,21 +241,24 @@ end SeparableClosure
 
 section Topology
 
-theorem topologicalSpace_eq_of_isValuativeTopology {R : Type*} [CommRing R] [ValuativeRel R]
-    {t₁ t₂ : TopologicalSpace R} (h₁ : @IsValuativeTopology R _ _ t₁)
-    (h₂ : @IsValuativeTopology R _ _ t₂) : t₁ = t₂ :=
-  TopologicalSpace.ext_nhds fun x ↦ Filter.ext fun s ↦
-    (@IsValuativeTopology.mem_nhds_iff R _ _ t₁ h₁ s x).trans
-      (@IsValuativeTopology.mem_nhds_iff R _ _ t₂ h₂ s x).symm
+theorem topologicalSpace_eq_of_isValuativeTopology
+    {R : Type*} [CommRing R] [ValuativeRel R]
+    {t₁ t₂ : TopologicalSpace R}
+    (h₁ : @IsValuativeTopology R _ _ t₁) (h₂ : @IsValuativeTopology R _ _ t₂)
+    : t₁ = t₂ :=
+  TopologicalSpace.ext_nhds fun x ↦
+    Filter.ext fun s ↦
+      (@IsValuativeTopology.mem_nhds_iff R _ _ t₁ h₁ s x).trans
+        (@IsValuativeTopology.mem_nhds_iff R _ _ t₂ h₂ s x).symm
 
-variable {K Ω : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω]
-  [Algebra K Ω] [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω]
-
+variable
+  {K Ω : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω] [Algebra K Ω]
+  [ValuativeExtension K Ω] [Algebra.IsAlgebraic K Ω]
 
 omit [TopologicalSpace Ω] [IsValuativeTopology Ω] in
-theorem exists_algebraMap_valuation_lt (γ : (ValueGroupWithZero Ω)ˣ) :
-    ∃ a : K, a ≠ 0 ∧ valuation Ω (algebraMap K Ω a) < γ := by
+theorem exists_algebraMap_valuation_lt (γ : (ValueGroupWithZero Ω)ˣ)
+    : ∃ a : K, a ≠ 0 ∧ valuation Ω (algebraMap K Ω a) < γ := by
   let := normedField K
   let := algebraicNormedField K Ω
   obtain ⟨z, hz⟩ := valuation_surjective (γ : ValueGroupWithZero Ω)
@@ -259,8 +275,8 @@ theorem exists_algebraMap_valuation_lt (γ : (ValueGroupWithZero Ω)ˣ) :
   rw [algebraicNormedField_norm_algebraMap K Ω, norm_pow]
   exact hn
 
-instance intermediateField_isValuativeTopology (E : IntermediateField K Ω) :
-    IsValuativeTopology E := by
+instance intermediateField_isValuativeTopology (E : IntermediateField K Ω)
+    : IsValuativeTopology E := by
   have hmono := ValuativeExtension.mapValueGroupWithZero_strictMono (A := E) (B := Ω)
   have hval := IntermediateField.valuation_coe (E := E)
   have : ContinuousConstVAdd E E :=
@@ -296,8 +312,8 @@ section Inclusion
 
 variable {K Ω : Type*} [Field K] [Field Ω] [Algebra K Ω] [ValuativeRel Ω]
 
-theorem IntermediateField.valuativeExtension_inclusion {E F : IntermediateField K Ω} (h : E ≤ F) :
-    (letI := (IntermediateField.inclusion h).toRingHom.toAlgebra; ValuativeExtension E F) :=
+theorem IntermediateField.valuativeExtension_inclusion {E F : IntermediateField K Ω} (h : E ≤ F)
+    : (letI := (IntermediateField.inclusion h).toRingHom.toAlgebra; ValuativeExtension E F) :=
   letI := (IntermediateField.inclusion h).toRingHom.toAlgebra
   ⟨fun {a b} ↦ by
     rw [← IntermediateField.coe_vle_coe_iff (E := E) a b,
@@ -310,20 +326,22 @@ section Finite
 
 variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
 
-
 variable (K) in
-theorem valuativeRel_eq_finiteExtensionStructure {L : Type*} [Field L] [Algebra K L]
-    [FiniteDimensional K L] [v : ValuativeRel L] [ValuativeExtension K L] :
-    v = (finiteExtensionStructure K L).rel :=
+theorem valuativeRel_eq_finiteExtensionStructure
+    {L : Type*}
+    [Field L] [Algebra K L] [FiniteDimensional K L] [v : ValuativeRel L] [ValuativeExtension K L]
+    : v = (finiteExtensionStructure K L).rel :=
   valuativeRel_eq_of_isAlgebraic K inferInstance (finiteExtensionStructure_valuativeExtension K L)
 
-variable {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω]
-  [Algebra K Ω] [ValuativeExtension K Ω]
+variable
+  {Ω : Type*} [Field Ω] [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω] [Algebra K Ω]
+  [ValuativeExtension K Ω]
 
 variable [Algebra.IsAlgebraic K Ω]
 
 instance intermediateField_isNonarchimedeanLocalField_of_finiteDimensional
-    (L : IntermediateField K Ω) [FiniteDimensional K L] : IsNonarchimedeanLocalField L := by
+    (L : IntermediateField K Ω) [FiniteDimensional K L]
+    : IsNonarchimedeanLocalField L := by
   have hrel := valuativeRel_eq_finiteExtensionStructure K (L := L)
   have h1 : @IsNonarchimedeanLocalField L _ (finiteExtensionStructure K L).rel
       (finiteExtensionStructure K L).top :=
@@ -337,7 +355,8 @@ instance intermediateField_isNonarchimedeanLocalField_of_finiteDimensional
 theorem continuous_algEquiv_of_isAlgebraic (σ : Ω ≃ₐ[K] Ω) : Continuous σ := by
   refine continuous_of_continuousAt_zero σ.toRingEquiv.toAddEquiv.toAddMonoidHom ?_
   change Tendsto σ (𝓝 0) (𝓝 (σ 0))
-  rw [map_zero, (IsValuativeTopology.hasBasis_nhds_zero Ω).tendsto_iff
+  rw [map_zero,
+    (IsValuativeTopology.hasBasis_nhds_zero Ω).tendsto_iff
       (IsValuativeTopology.hasBasis_nhds_zero Ω)]
   intro γ _
   refine ⟨γ, trivial, fun x hx ↦ ?_⟩
@@ -349,7 +368,8 @@ end Finite
 
 section Check
 
-variable (K : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+variable
+  (K : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
   (L : IntermediateField K (SeparableClosure K)) [FiniteDimensional K L]
 
 end Check

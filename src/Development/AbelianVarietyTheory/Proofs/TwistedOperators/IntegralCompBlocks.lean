@@ -67,15 +67,16 @@ lemma integral_comp_blocks {F n J : Type} [Fintype F] [Fintype n] [DecidableEq n
 end cov
 
 section alg
-variable {k : Type} [Field k] {n n' : Type} [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n'] {c : ℕ}
-
+variable
+  {k : Type} [Field k]
+  {n n' : Type} [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n']
+  {c : ℕ}
 
 open Classical in
-def ext (p : ℕ) (e : {rs : (n ⊕ Fin c) × (n' ⊕ Fin (c + 1)) // Free p rs} → k) :
-    Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k :=
-  by
-    classical
-    exact Matrix.of fun r s => if h : Free p (r, s) then e ⟨(r, s), h⟩ else 0
+def ext (p : ℕ) (e : {rs : (n ⊕ Fin c) × (n' ⊕ Fin (c + 1)) // Free p rs} → k)
+    : Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k := by
+  classical
+  exact Matrix.of fun r s => if h : Free p (r, s) then e ⟨(r, s), h⟩ else 0
 
 omit [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n'] in
 lemma affPt_eq (p : ℕ) (x₀ : Matrix n n' k) (e) :
@@ -122,12 +123,12 @@ lemma right_inr (A : Matrix n' n' k) (x : Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 
     Finset.sum_const_zero, zero_add, Matrix.one_apply, mul_ite, mul_one, Finset.sum_ite_eq',
     Finset.mem_univ, if_true]
 
-def TL (p : ℕ) (A : Matrix n n k) (e : {rs : (n ⊕ Fin c) × (n' ⊕ Fin (c + 1)) // Free p rs} → k) :
-    {rs : (n ⊕ Fin c) × (n' ⊕ Fin (c + 1)) // Free p rs} → k := fun rs =>
+def TL (p : ℕ) (A : Matrix n n k) (e : {rs : (n ⊕ Fin c) × (n' ⊕ Fin (c + 1)) // Free p rs} → k)
+    : {rs : (n ⊕ Fin c) × (n' ⊕ Fin (c + 1)) // Free p rs} → k := fun rs =>
   ((fromBlocks A 0 0 1 : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k) * ext p e) rs.1.1 rs.1.2
 
-def TR (p : ℕ) (A : Matrix n' n' k) (e : {rs : (n ⊕ Fin c) × (n' ⊕ Fin (c + 1)) // Free p rs} → k) :
-    {rs : (n ⊕ Fin c) × (n' ⊕ Fin (c + 1)) // Free p rs} → k := fun rs =>
+def TR (p : ℕ) (A : Matrix n' n' k) (e : {rs : (n ⊕ Fin c) × (n' ⊕ Fin (c + 1)) // Free p rs} → k)
+    : {rs : (n ⊕ Fin c) × (n' ⊕ Fin (c + 1)) // Free p rs} → k := fun rs =>
   (ext p e * (fromBlocks A 0 0 1 : Matrix (n' ⊕ Fin (c + 1)) (n' ⊕ Fin (c + 1)) k)) rs.1.1 rs.1.2
 
 omit [DecidableEq n] [Fintype n'] [DecidableEq n'] in
@@ -201,8 +202,9 @@ lemma det_embX (g : GL n k) :
   ext
   simp [embX_val]
 
-variable [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  [MeasurableSpace k] [BorelSpace k]
+variable
+  [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k]
+  [BorelSpace k]
 
 omit [DecidableEq n'] in
 lemma integral_left (p : ℕ) (ψ : AddChar k Circle) (ν : Measure k) [ν.IsAddHaarMeasure]
@@ -276,30 +278,42 @@ end alg
 
 end GlobalTheory.RootEx.OpELevi
 
-
 open GlobalTheory.RootEx.OpELevi in
-theorem GlobalTheory.RootEx.opE_om_embX : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (n n' : Type) [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n'] (c p : ℕ) (_ : 1 ≤ p) (_ : p ≤ c) (ψ : AddChar k Circle) (ν : Measure k) [ν.IsAddHaarMeasure] (μ : kˣ →* ℂˣ) (Φ : Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k → ℂ), (∀ g : GL n k, opE ψ ν p (om μ 1 (embX c g) Φ) = ((nabs k (Matrix.GeneralLinearGroup.det g) ^ (((c : ℝ) + 1) / 2 - p) : ℝ) : ℂ) • om μ 1 g (opE ψ ν p Φ)) ∧ ∀ g : GL n' k, opE ψ ν p (om μ (embX (c + 1) g) 1 Φ) = ((nabs k (Matrix.GeneralLinearGroup.det g) ^ (((c : ℝ) + 2) / 2 - p) : ℝ) : ℂ) • om μ g 1 (opE ψ ν p Φ) := by
+theorem GlobalTheory.RootEx.opE_om_embX
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (n n' : Type) [Fintype n] [DecidableEq n] [Fintype n']
+        [DecidableEq n'] (c p : ℕ) (_ : 1 ≤ p) (_ : p ≤ c) (ψ : AddChar k Circle) (ν : Measure k)
+        [ν.IsAddHaarMeasure] (μ : kˣ →* ℂˣ) (Φ : Matrix (n ⊕ Fin c) (n' ⊕ Fin (c + 1)) k → ℂ),
+      (∀ g : GL n k,
+          opE ψ ν p (om μ 1 (embX c g) Φ)
+            = ((nabs k (Matrix.GeneralLinearGroup.det g) ^ (((c : ℝ) + 1) / 2 - p) : ℝ) : ℂ)
+              • om μ 1 g (opE ψ ν p Φ))
+        ∧ ∀ g : GL n' k,
+          opE ψ ν p (om μ (embX (c + 1) g) 1 Φ)
+            = ((nabs k (Matrix.GeneralLinearGroup.det g) ^ (((c : ℝ) + 2) / 2 - p) : ℝ) : ℂ)
+              • om μ g 1 (opE ψ ν p Φ) := by
   intro k _ _ _ _ _ _ n n' _ _ _ _ c p h1 h2 ψ ν _ μ Φ
   refine ⟨fun g => ?_, fun g => ?_⟩
   · funext x₀
     unfold om
     rw [GlobalTheory.RootEx.OpELevi.opE_const_mul]
     simp only [← map_inv, GlobalTheory.RootEx.OpELevi.embX_val, Units.val_one, Matrix.mul_one,
-      GlobalTheory.RootEx.OpELevi.det_embX, Pi.smul_apply,
-      smul_eq_mul, map_one, nabs_one, Real.one_rpow, Complex.ofReal_one]
+      GlobalTheory.RootEx.OpELevi.det_embX, Pi.smul_apply, smul_eq_mul, map_one, nabs_one,
+      Real.one_rpow, Complex.ofReal_one]
     erw [GlobalTheory.RootEx.OpELevi.integral_left p ψ ν (g⁻¹).val
       (Matrix.GeneralLinearGroup.det g)⁻¹ (by rw [← map_inv]; rfl) Φ]
     have hp := GlobalTheory.RootEx.OpELevi.nabs_pos (Matrix.GeneralLinearGroup.det g)
     set t := nabs k (Matrix.GeneralLinearGroup.det g) with ht
-    have key : t ^ (-(Fintype.card (n' ⊕ Fin (c + 1)) : ℝ) / 2) *
-        (t⁻¹ ^ Fintype.card {i : Fin (c + 1) // p < i.val + 1})⁻¹ =
-        t ^ (((c : ℝ) + 1) / 2 - p) * t ^ (-(Fintype.card n' : ℝ) / 2) := by
-      rw [inv_pow, inv_inv, ← Real.rpow_natCast,
-        GlobalTheory.RootEx.OpELevi.card_cols p h1 h2, ← Real.rpow_add hp,
-        ← Real.rpow_add hp]
+    have key
+        : t ^ (-(Fintype.card (n' ⊕ Fin (c + 1)) : ℝ) / 2)
+            * (t⁻¹ ^ Fintype.card {i : Fin (c + 1) // p < i.val + 1})⁻¹
+          = t ^ (((c : ℝ) + 1) / 2 - p) * t ^ (-(Fintype.card n' : ℝ) / 2) := by
+      rw [inv_pow, inv_inv, ← Real.rpow_natCast, GlobalTheory.RootEx.OpELevi.card_cols p h1 h2,
+        ← Real.rpow_add hp, ← Real.rpow_add hp]
       congr 1
       simp only [Fintype.card_sum, Fintype.card_fin]
-      push_cast; ring
+      push_cast
+      ring
     rw [GlobalTheory.RootEx.OpELevi.nabs_inv, ← ht, Complex.real_smul]
     have key' := congrArg (fun r : ℝ => (r : ℂ)) key
     simp only [Complex.ofReal_mul] at key'
@@ -309,21 +323,22 @@ theorem GlobalTheory.RootEx.opE_om_embX : ∀ (k : Type) [Field k] [ValuativeRel
     unfold om
     rw [GlobalTheory.RootEx.OpELevi.opE_const_mul]
     simp only [inv_one, GlobalTheory.RootEx.OpELevi.embX_val, Units.val_one, Matrix.one_mul,
-      GlobalTheory.RootEx.OpELevi.det_embX, Pi.smul_apply,
-      smul_eq_mul, map_one, nabs_one, Real.one_rpow, Complex.ofReal_one]
-    erw [GlobalTheory.RootEx.OpELevi.integral_right p ψ ν g.val
-      (Matrix.GeneralLinearGroup.det g) rfl Φ]
+      GlobalTheory.RootEx.OpELevi.det_embX, Pi.smul_apply, smul_eq_mul, map_one, nabs_one,
+      Real.one_rpow, Complex.ofReal_one]
+    erw [GlobalTheory.RootEx.OpELevi.integral_right p ψ ν g.val (Matrix.GeneralLinearGroup.det g)
+      rfl Φ]
     have hp := GlobalTheory.RootEx.OpELevi.nabs_pos (Matrix.GeneralLinearGroup.det g)
     set t := nabs k (Matrix.GeneralLinearGroup.det g) with ht
-    have key : t ^ ((Fintype.card (n ⊕ Fin c) : ℝ) / 2) *
-        (t ^ Fintype.card {l : Fin c // l.val + 1 < p})⁻¹ =
-        t ^ (((c : ℝ) + 2) / 2 - p) * t ^ ((Fintype.card n : ℝ) / 2) := by
-      rw [← Real.rpow_natCast, GlobalTheory.RootEx.OpELevi.card_rows p h1 h2,
-        ← Real.rpow_neg hp.le, ← Real.rpow_add hp,
-        ← Real.rpow_add hp]
+    have key
+        : t ^ ((Fintype.card (n ⊕ Fin c) : ℝ) / 2)
+            * (t ^ Fintype.card {l : Fin c // l.val + 1 < p})⁻¹
+          = t ^ (((c : ℝ) + 2) / 2 - p) * t ^ ((Fintype.card n : ℝ) / 2) := by
+      rw [← Real.rpow_natCast, GlobalTheory.RootEx.OpELevi.card_rows p h1 h2, ← Real.rpow_neg hp.le,
+        ← Real.rpow_add hp, ← Real.rpow_add hp]
       congr 1
       simp only [Fintype.card_sum, Fintype.card_fin]
-      push_cast; ring
+      push_cast
+      ring
     rw [Complex.real_smul]
     have key' := congrArg (fun r : ℝ => (r : ℂ)) key
     simp only [Complex.ofReal_mul] at key'

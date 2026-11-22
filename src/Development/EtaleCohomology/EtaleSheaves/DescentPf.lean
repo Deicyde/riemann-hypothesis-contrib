@@ -5,35 +5,42 @@ public import Development.EtaleCohomology.EtaleSheaves.LCSurjPf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.E.t_E1Cut LateralTheory.E.LocallyConstantH0
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.E.t_E1Cut
+  LateralTheory.E.LocallyConstantH0
 
 namespace LateralTheory.E.DescentPf
 
-theorem res_comp {R : Type} [CommRing R] {F : Shv R} {W V U : Scheme.{0}} (h : W ⟶ V) (g : V ⟶ U) (x : Sec F U) :
-    Sec.res (h ≫ g) x = Sec.res h (Sec.res g x) := by
+theorem res_comp
+    {R : Type} [CommRing R] {F : Shv R} {W V U : Scheme.{0}} (h : W ⟶ V) (g : V ⟶ U) (x : Sec F U)
+    : Sec.res (h ≫ g) x = Sec.res h (Sec.res g x) := by
   simp [Sec.res]
 
-theorem val_smul {q : ℕ} [NeZero q] (i : ℤ) {U : Scheme.{0}} (c : ZMod q) (x : Sec (tw q i) U) :
-    c.val • x = (ULift.up c : ULift.{1} (ZMod q)) • x := by
+theorem val_smul {q : ℕ} [NeZero q] (i : ℤ) {U : Scheme.{0}} (c : ZMod q) (x : Sec (tw q i) U)
+    : c.val • x = (ULift.up c : ULift.{1} (ZMod q)) • x := by
   rw [← Nat.cast_smul_eq_nsmul (ULift.{1} (ZMod q))]
   congr 1
   apply ULift.ext
   rw [ULift.down_natCast, ZMod.natCast_zmod_val]
 
-theorem Descent_of (hAC : LateralTheory.E.LCBijPf.TwGenNZAC) : LateralTheory.E.LCSurjPf.Descent := by
+theorem Descent_of (hAC : LateralTheory.E.LCBijPf.TwGenNZAC)
+    : LateralTheory.E.LCSurjPf.Descent := by
   intro q _ i m hm B _ ζ y hloc
   obtain ⟨S, hS, hP⟩ := hloc
-  have hform : ∀ {V W : Scheme.{0}} (g : V ⟶ Spec (CommRingCat.of B)) (h : W ⟶ V) (c : ZMod q),
-      Sec.res g y = c.val • twGen i ((gam ζ).map g.appTop.hom) →
-      Sec.res (h ≫ g) y = c.val • twGen i ((gam ζ).map (h ≫ g).appTop.hom) := by
+  have hform
+      : ∀ {V W : Scheme.{0}} (g : V ⟶ Spec (CommRingCat.of B)) (h : W ⟶ V) (c : ZMod q),
+        Sec.res g y = c.val • twGen i ((gam ζ).map g.appTop.hom)
+          → Sec.res (h ≫ g) y = c.val • twGen i ((gam ζ).map (h ≫ g).appTop.hom) := by
     intro V W g h c hc
-    have hs : ∀ x : Sec (tw q i) V, Sec.res h (c.val • x) = c.val • Sec.res h x := fun x => map_nsmul _ _ x
+    have hs : ∀ x : Sec (tw q i) V, Sec.res h (c.val • x) = c.val • Sec.res h x := fun x =>
+      map_nsmul _ _ x
     rw [res_comp, hc, hs, LateralTheory.E.LCBijPf.twGen_res]
     rfl
-  have huniq : ∀ {V1 V2 : Scheme.{0}} (g1 : V1 ⟶ Spec (CommRingCat.of B)) (g2 : V2 ⟶ Spec (CommRingCat.of B))
-      (c1 c2 : ZMod q), Sec.res g1 y = c1.val • twGen i ((gam ζ).map g1.appTop.hom) →
-      Sec.res g2 y = c2.val • twGen i ((gam ζ).map g2.appTop.hom) →
-      ∀ v1 v2, g1 v1 = g2 v2 → c1 = c2 := by
+  have huniq
+      : ∀ {V1 V2 : Scheme.{0}} (g1 : V1 ⟶ Spec (CommRingCat.of B))
+          (g2 : V2 ⟶ Spec (CommRingCat.of B)) (c1 c2 : ZMod q),
+        Sec.res g1 y = c1.val • twGen i ((gam ζ).map g1.appTop.hom)
+          → Sec.res g2 y = c2.val • twGen i ((gam ζ).map g2.appTop.hom)
+          → ∀ v1 v2, g1 v1 = g2 v2 → c1 = c2 := by
     intro V1 V2 g1 g2 c1 c2 h1 h2 v1 v2 hv
     obtain ⟨z, -, -⟩ := Scheme.Pullback.exists_preimage_pullback v1 v2 hv
     let A := (pullback g1 g2).affineOpenCover
@@ -56,21 +63,29 @@ theorem Descent_of (hAC : LateralTheory.E.LCBijPf.TwGenNZAC) : LateralTheory.E.L
     rw [val_smul, hup, sub_smul, sub_eq_zero]
     exact e
   obtain ⟨𝒰, h𝒰⟩ := (Scheme.mem_grothendieckTopology_iff (P := @Etale)).1 hS
-  have hpiece : ∀ x : PrimeSpectrum B, ∃ (R : CommRingCat.{0}) (g : Spec R ⟶ Spec (CommRingCat.of B)),
-      Etale g ∧ S.arrows g ∧ x ∈ Set.range g := by
+  have hpiece
+      : ∀ x : PrimeSpectrum B, ∃ (R : CommRingCat.{0}) (g : Spec R ⟶ Spec (CommRingCat.of B)),
+        Etale g ∧ S.arrows g ∧ x ∈ Set.range g := by
     intro x
     obtain ⟨j, v, hv⟩ := ((Scheme.presieve₀_mem_precoverage_iff _).1 𝒰.mem₀).1 x
     let A := (𝒰.X j).affineOpenCover
     obtain ⟨w, hw⟩ := A.covers v
     have : Etale (𝒰.f j) := ((Scheme.presieve₀_mem_precoverage_iff _).1 𝒰.mem₀).2 j
-    refine ⟨A.X (A.idx v), A.f (A.idx v) ≫ 𝒰.f j, inferInstance, S.downward_closed (h𝒰 _ _ (Presieve.ofArrows.mk j)) _, ⟨w, ?_⟩⟩
+    refine ⟨
+      A.X (A.idx v),
+      A.f (A.idx v) ≫ 𝒰.f j,
+      inferInstance,
+      S.downward_closed (h𝒰 _ _ (Presieve.ofArrows.mk j)) _,
+      ⟨w, ?_⟩
+    ⟩
     rw [Scheme.Hom.comp_apply, hw, hv]
   choose R g hg hSg hx using hpiece
   have hc : ∀ x, ∃ c : ZMod q, Sec.res (g x) y = c.val • twGen i ((gam ζ).map (g x).appTop.hom) :=
     fun x => hP _ _ (hSg x)
   choose c hc using hc
-  have key : ∀ (x : PrimeSpectrum B) {V : Scheme.{0}} (g' : V ⟶ Spec (CommRingCat.of B)) (c' : ZMod q),
-      Sec.res g' y = c'.val • twGen i ((gam ζ).map g'.appTop.hom) → ∀ v, g' v = x → c x = c' := by
+  have key
+      : ∀ (x : PrimeSpectrum B) {V : Scheme.{0}} (g' : V ⟶ Spec (CommRingCat.of B)) (c' : ZMod q),
+        Sec.res g' y = c'.val • twGen i ((gam ζ).map g'.appTop.hom) → ∀ v, g' v = x → c x = c' := by
     intro x V g' c' h' v hv
     obtain ⟨u, hu⟩ := hx x
     exact huniq (g x) g' _ _ (hc x) h' u v (hu.trans hv.symm)
@@ -83,9 +98,12 @@ theorem Descent_of (hAC : LateralTheory.E.LCBijPf.TwGenNZAC) : LateralTheory.E.L
     exact key x' (g x) (c x) (hc x) u hu
   let ψ : LocallyConstant (PrimeSpectrum B) (ZMod q) := ⟨c, hlc⟩
   refine ⟨ψ, Sieve.ofArrows (fun x => Spec (R x)) g, ?_, ?_⟩
-  · exact Scheme.Cover.mem_grothendieckTopology
-      (Scheme.Cover.mkOfCovers (P := @Etale) (PrimeSpectrum B) (fun x => Spec (R x)) g
-        (fun x => by obtain ⟨u, hu⟩ := hx x; exact ⟨x, u, hu⟩) hg)
+  · exact Scheme.Cover.mem_grothendieckTopology (Scheme.Cover.mkOfCovers (P := @Etale)
+      (PrimeSpectrum B)
+      (fun x => Spec (R x))
+      g
+      (fun x => by obtain ⟨u, hu⟩ := hx x; exact ⟨x, u, hu⟩)
+      hg)
   · intro V k hk
     obtain ⟨W, h, k', hk', rfl⟩ := hk
     obtain ⟨x⟩ := hk'

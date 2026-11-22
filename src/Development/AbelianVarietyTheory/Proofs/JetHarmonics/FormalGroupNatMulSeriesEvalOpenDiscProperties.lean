@@ -12,8 +12,11 @@ open GlobalTheory.ConvSer
 
 namespace GlobalTheory.ConvSer
 
-theorem intg_nMul_for_point {K : Type} [NormedField K] [IsUltrametricDist K] (F : FormalGroup K)
-    (hF : Intg F.toPowerSeries) (n : ℕ) : Intg (nMul F n) := by
+theorem intg_nMul_for_point
+    {K : Type} [NormedField K] [IsUltrametricDist K]
+    (F : FormalGroup K) (hF : Intg F.toPowerSeries)
+    (n : ℕ)
+    : Intg (nMul F n) := by
   induction n with
   | zero =>
     rw [nMul_zero]
@@ -32,26 +35,47 @@ theorem intg_nMul_for_point {K : Type} [NormedField K] [IsUltrametricDist K] (F 
 private lemma ev1_zero {K : Type} [NormedField K] (y : K) : ev1 (0 : PowerSeries K) y = 0 := by
   simp [ev1]
 
-theorem nMul_point : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [CompleteSpace K] (F : FormalGroup K), Intg F.toPowerSeries → (∀ n, Intg (nMul F n)) ∧ ∀ x : K, ‖x‖ < 1 → ev1 (nMul F 0) x = 0 ∧ ev1 (nMul F 1) x = x ∧ (∀ j, ‖ev1 (nMul F j) x‖ ≤ ‖x‖ ∧ (‖(j : K)‖ = 1 → ‖ev1 (nMul F j) x‖ = ‖x‖)) ∧ (∀ i j, ev F.toPowerSeries ![ev1 (nMul F i) x, ev1 (nMul F j) x] = ev1 (nMul F (i + j)) x) ∧ (∀ i j, ev1 (nMul F i) (ev1 (nMul F j) x) = ev1 (nMul F (i * j)) x) ∧ (∀ y : K, ‖y‖ < 1 → ev F.toPowerSeries ![0, y] = y ∧ ev F.toPowerSeries ![y, 0] = y) := by
+theorem nMul_point
+    : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [CompleteSpace K] (F : FormalGroup K),
+      Intg F.toPowerSeries
+        → (∀ n, Intg (nMul F n))
+          ∧ ∀ x : K,
+            ‖x‖ < 1
+              → ev1 (nMul F 0) x = 0 ∧ ev1 (nMul F 1) x = x
+                ∧ (∀ j, ‖ev1 (nMul F j) x‖ ≤ ‖x‖ ∧ (‖(j : K)‖ = 1 → ‖ev1 (nMul F j) x‖ = ‖x‖))
+                ∧ (∀ i j,
+                  ev F.toPowerSeries ![ev1 (nMul F i) x, ev1 (nMul F j) x] = ev1 (nMul F (i + j)) x)
+                ∧ (∀ i j, ev1 (nMul F i) (ev1 (nMul F j) x) = ev1 (nMul F (i * j)) x)
+                ∧ (∀ y : K,
+                  ‖y‖ < 1 → ev F.toPowerSeries ![0, y] = y ∧ ev F.toPowerSeries ![y, 0] = y) := by
   intro K _ _ _ F hF
   have hI : ∀ n, Intg (nMul F n) := intg_nMul_for_point F hF
   have hB : Bdd F.toPowerSeries := GlobalTheory.BddAlg.bdd_of_intg hF
   have hX : Intg (PowerSeries.X : PowerSeries K) := (GlobalTheory.BddAlg.small_X ()).1
 
-  have hleft : MvPowerSeries.subst (![0, PowerSeries.X] : Fin 2 → MvPowerSeries Unit K)
-      F.toPowerSeries = PowerSeries.X := by
+  have hleft
+      : MvPowerSeries.subst (![0, PowerSeries.X] : Fin 2 → MvPowerSeries Unit K) F.toPowerSeries
+        = PowerSeries.X := by
     have h := nMul_succ F 0
     rw [nMul_zero, nMul_one] at h
     exact h.symm
-  have hright : MvPowerSeries.subst (![PowerSeries.X, 0] : Fin 2 → MvPowerSeries Unit K)
-      F.toPowerSeries = PowerSeries.X := by
+  have hright
+      : MvPowerSeries.subst (![PowerSeries.X, 0] : Fin 2 → MvPowerSeries Unit K) F.toPowerSeries
+        = PowerSeries.X := by
     have h := nMul_add F 1 0
     rw [nMul_zero, nMul_one] at h
     simpa using h
   refine ⟨hI, fun x hx => ?_⟩
-  obtain ⟨-, -, -, hevX, -, -, hnorm, hsub, hpair, -, -⟩ := _root_.GlobalTheory.T.powerSeriesEvalTsum_unitDisc_properties_alt K x hx
-  refine ⟨by rw [nMul_zero]; exact ev1_zero x, by rw [nMul_one]; exact hevX, fun j => ?_,
-    fun i j => ?_, fun i j => ?_, fun y hy => ?_⟩
+  obtain ⟨-, -, -, hevX, -, -, hnorm, hsub, hpair, -, -⟩ :=
+    _root_.GlobalTheory.T.powerSeriesEvalTsum_unitDisc_properties_alt K x hx
+  refine ⟨
+    by rw [nMul_zero]; exact ev1_zero x,
+    by rw [nMul_one]; exact hevX,
+    fun j => ?_,
+    fun i j => ?_,
+    fun i j => ?_,
+    fun y hy => ?_
+  ⟩
   · obtain ⟨-, h1, h2⟩ := hnorm (nMul F j) (hI j)
     have h0 : PowerSeries.coeff 0 (nMul F j) = 0 := by
       rw [PowerSeries.coeff_zero_eq_constantCoeff_apply]
@@ -67,13 +91,16 @@ theorem nMul_point : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [Compl
       set v := ev1 (nMul F j) x
       have hlt : ‖v - (j : K) * x‖ < ‖(j : K) * x‖ := by rw [hjx]; exact lt_of_le_of_lt h2 hsq
       have hdecomp : v = (j : K) * x + (v - (j : K) * x) := by ring
-      rw [hdecomp, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm hlt.ne',
-        max_eq_left hlt.le, hjx]
-  · rw [← hpair F.toPowerSeries (nMul F i) (nMul F j) hB (hI i) (hI j)
-      (nMul_constantCoeff F i) (nMul_constantCoeff F j), nMul_add]
+      rw [hdecomp, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm hlt.ne', max_eq_left hlt.le,
+        hjx]
+  · rw [← hpair F.toPowerSeries (nMul F i) (nMul F j) hB (hI i) (hI j) (nMul_constantCoeff F i)
+        (nMul_constantCoeff F j),
+      nMul_add]
   · rw [← hsub (nMul F i) (nMul F j) (hI j) (nMul_constantCoeff F j)
-      (GlobalTheory.BddAlg.bdd_of_intg (hI i)), nMul_subst_nMul]
-  · obtain ⟨-, -, -, hevXy, -, -, -, -, hpairy, -, -⟩ := _root_.GlobalTheory.T.powerSeriesEvalTsum_unitDisc_properties_alt K y hy
+        (GlobalTheory.BddAlg.bdd_of_intg (hI i)),
+      nMul_subst_nMul]
+  · obtain ⟨-, -, -, hevXy, -, -, -, -, hpairy, -, -⟩ :=
+      _root_.GlobalTheory.T.powerSeriesEvalTsum_unitDisc_properties_alt K y hy
     have hz : Intg (0 : PowerSeries K) := GlobalTheory.BddAlg.intg_zero
     have hc0 : PowerSeries.constantCoeff (0 : PowerSeries K) = 0 := by simp
     have hcX : PowerSeries.constantCoeff (PowerSeries.X : PowerSeries K) = 0 := by simp

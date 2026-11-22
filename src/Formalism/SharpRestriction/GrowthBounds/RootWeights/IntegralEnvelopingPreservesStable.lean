@@ -12,8 +12,10 @@ namespace Formalism.MainNotions.G.GLWeightTheory
 
 open Formalism.MainNotions.G Formalism.MainNotions.CovariantDegrees
 
-theorem dvr_fraction_field_charZero {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    (S : UniformizedDVR p O) (hp : p.Prime) : CharZero (KK O) := by
+theorem dvr_fraction_field_charZero
+    {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (S : UniformizedDVR p O) (hp : p.Prime)
+    : CharZero (KK O) := by
   haveI hc := ringChar.charP O
   have hO : CharZero O := by
     rcases CharP.char_is_prime_or_zero O (ringChar O) with hq | hq
@@ -37,8 +39,9 @@ section
 
 variable {n : ℕ} {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
 
-theorem pow_preserves_stable (f : Module.End K V) (W : Submodule K V) (hf : ∀ x ∈ W, f x ∈ W) (k : ℕ) :
-    ∀ x ∈ W, (f ^ k) x ∈ W := by
+theorem pow_preserves_stable
+    (f : Module.End K V) (W : Submodule K V) (hf : ∀ x ∈ W, f x ∈ W) (k : ℕ)
+    : ∀ x ∈ W, (f ^ k) x ∈ W := by
   intro x hx
   induction k with
   | zero => simpa using hx
@@ -46,8 +49,9 @@ theorem pow_preserves_stable (f : Module.End K V) (W : Submodule K V) (hf : ∀ 
     rw [pow_succ', Module.End.mul_apply]
     exact hf _ ih
 
-theorem list_prod_preserves_stable (l : List (Module.End K V)) (W : Submodule K V) (hl : ∀ f ∈ l, ∀ x ∈ W, f x ∈ W) :
-    ∀ x ∈ W, l.prod x ∈ W := by
+theorem list_prod_preserves_stable
+    (l : List (Module.End K V)) (W : Submodule K V) (hl : ∀ f ∈ l, ∀ x ∈ W, f x ∈ W)
+    : ∀ x ∈ W, l.prod x ∈ W := by
   revert hl
   induction l with
   | nil =>
@@ -59,8 +63,9 @@ theorem list_prod_preserves_stable (l : List (Module.End K V)) (W : Submodule K 
     exact hl f (List.mem_cons.mpr (Or.inl rfl)) _
       (ih (fun g hg => hl g (List.mem_cons.mpr (Or.inr hg))) x hx)
 
-theorem integral_enveloping_preserves_stable (E : GLOps n K V) (W : Submodule K V) (hW : ∀ a b, ∀ x ∈ W, E a b x ∈ W) :
-    ∀ u ∈ UZmon E, ∀ x ∈ W, u x ∈ W := by
+theorem integral_enveloping_preserves_stable
+    (E : GLOps n K V) (W : Submodule K V) (hW : ∀ a b, ∀ x ∈ W, E a b x ∈ W)
+    : ∀ u ∈ UZmon E, ∀ x ∈ W, u x ∈ W := by
   intro u hu
   induction hu using Submonoid.closure_induction with
   | mem u hu =>
@@ -85,14 +90,16 @@ theorem integral_enveloping_preserves_stable (E : GLOps n K V) (W : Submodule K 
     rw [Module.End.mul_apply]
     exact hu _ (hv _ hx)
 
-theorem generated_subrep_operator_stable (E : GLOps n K V) (h : V) : ∀ a b, ∀ x ∈ generatedSubrep E h, E a b x ∈ generatedSubrep E h := by
+theorem generated_subrep_operator_stable (E : GLOps n K V) (h : V)
+    : ∀ a b, ∀ x ∈ generatedSubrep E h, E a b x ∈ generatedSubrep E h := by
   intro a b x hx
   induction hx using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨u, hu, rfl⟩ := hx
     exact Submodule.subset_span
       ⟨E a b * u, Submonoid.mul_mem _ (Submonoid.subset_closure ⟨(a, b), rfl⟩) hu, rfl⟩
-  | zero => simp
+  | zero =>
+    simp
   | add x y _ _ hx hy =>
     rw [map_add (f := _)]
     exact Submodule.add_mem _ hx hy
@@ -100,40 +107,59 @@ theorem generated_subrep_operator_stable (E : GLOps n K V) (h : V) : ∀ a b, �
     rw [map_smul]
     exact Submodule.smul_mem _ c hx
 
-theorem isHWV_mem_highestWeightSpace (E : GLOps n K V) (lam : Fin n → ℤ) (v : V) (hv : IsHWV E lam v) : v ∈ highestWeightVectors E lam := by
+theorem isHWV_mem_highestWeightSpace
+    (E : GLOps n K V) (lam : Fin n → ℤ) (v : V) (hv : IsHWV E lam v)
+    : v ∈ highestWeightVectors E lam := by
   refine Submodule.mem_inf.mpr ⟨hv.2.1, ?_⟩
   simp only [Submodule.mem_iInf, LinearMap.mem_ker]
   exact fun a b hab => hv.2.2 a b hab
 
-theorem highestWeight_mem_weightSpace (E : GLOps n K V) (lam : Fin n → ℤ) (v : V) (hv : v ∈ highestWeightVectors E lam) : v ∈ weightSp E lam :=
+theorem highestWeight_mem_weightSpace
+    (E : GLOps n K V) (lam : Fin n → ℤ) (v : V) (hv : v ∈ highestWeightVectors E lam)
+    : v ∈ weightSp E lam :=
   (Submodule.mem_inf.mp hv).1
 
-theorem weight_projection_generated_scalar (E : GLOps n K V) (lam : Fin n → ℤ) (π : Module.End K V) (hπ : IsWtProj E lam π) (h : V)
-    (hh : h ∈ highestWeightVectors E lam)
-    (hB : generatedSubrep E h ≤ Submodule.span K {h} ⊔
-      ⨆ mu ∈ {mu : Fin n → ℤ | mu ≠ lam}, (weightSp E mu ⊓ generatedSubrep E h))
-    (y : V) (hy : y ∈ generatedSubrep E h) : ∃ a : K, π y = a • h := by
+theorem weight_projection_generated_scalar
+    (E : GLOps n K V) (lam : Fin n → ℤ) (π : Module.End K V) (hπ : IsWtProj E lam π)
+    (h : V) (hh : h ∈ highestWeightVectors E lam)
+    (hB : generatedSubrep E h
+      ≤ Submodule.span K {h}
+        ⊔ ⨆ mu ∈ {mu : Fin n → ℤ | mu ≠ lam}, (weightSp E mu ⊓ generatedSubrep E h))
+    (y : V) (hy : y ∈ generatedSubrep E h)
+    : ∃ a : K, π y = a • h := by
   obtain ⟨s, hs, t, ht, rfl⟩ := Submodule.mem_sup.mp (hB hy)
   obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hs
-  have hker : (⨆ mu ∈ {mu : Fin n → ℤ | mu ≠ lam}, (weightSp E mu ⊓ generatedSubrep E h)) ≤ LinearMap.ker π := by
+  have hker
+      : (⨆ mu ∈ {mu : Fin n → ℤ | mu ≠ lam}, (weightSp E mu ⊓ generatedSubrep E h))
+        ≤ LinearMap.ker π := by
     refine iSup₂_le fun mu hmu => ?_
     intro z hz
     exact hπ.2 mu hmu z (Submodule.mem_inf.mp hz).1
   refine ⟨a, ?_⟩
-  rw [map_add (f := _), LinearMap.mem_ker.mp (hker ht), add_zero, map_smul, hπ.1 h (highestWeight_mem_weightSpace E lam h hh)]
+  rw [map_add (f := _), LinearMap.mem_ker.mp (hker ht), add_zero, map_smul,
+    hπ.1 h (highestWeight_mem_weightSpace E lam h hh)]
 
-theorem isotypic_sum_generated_subreps (E : GLOps n K V) (lam : Fin n → ℤ) {k : ℕ} (h : Fin k → V)
-    (hspan : highestWeightVectors E lam ≤ Submodule.span K (Set.range h)) (Y : V) (hY : Y ∈ isoSub E lam) :
-    ∃ y : Fin k → V, (∀ j, y j ∈ generatedSubrep E (h j)) ∧ Y = ∑ j, y j := by
+theorem isotypic_sum_generated_subreps
+    (E : GLOps n K V) (lam : Fin n → ℤ)
+    {k : ℕ} (h : Fin k → V) (hspan : highestWeightVectors E lam ≤ Submodule.span K (Set.range h))
+    (Y : V) (hY : Y ∈ isoSub E lam)
+    : ∃ y : Fin k → V, (∀ j, y j ∈ generatedSubrep E (h j)) ∧ Y = ∑ j, y j := by
   induction hY using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨u, hu, v, hv, rfl⟩ := hx
-    obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun K).mp (hspan (isHWV_mem_highestWeightSpace E lam v hv))
-    refine ⟨fun j => c j • u (h j), fun j => Submodule.smul_mem _ _ (Submodule.subset_span ⟨u, hu, rfl⟩), ?_⟩
+    obtain ⟨c, hc⟩ :=
+      (Submodule.mem_span_range_iff_exists_fun K).mp
+        (hspan (isHWV_mem_highestWeightSpace E lam v hv))
+    refine ⟨
+      fun j => c j • u (h j),
+      fun j => Submodule.smul_mem _ _ (Submodule.subset_span ⟨u, hu, rfl⟩),
+      ?_
+    ⟩
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← hc, map_sum]
     simp only [map_smul]
-  | zero => exact ⟨0, fun j => Submodule.zero_mem _, by simp⟩
+  | zero =>
+    exact ⟨0, fun j => Submodule.zero_mem _, by simp⟩
   | add x z _ _ hx hz =>
     obtain ⟨y, hy, rfl⟩ := hx
     obtain ⟨y', hy', rfl⟩ := hz
@@ -144,8 +170,10 @@ theorem isotypic_sum_generated_subreps (E : GLOps n K V) (lam : Fin n → ℤ) {
 
 end
 
-theorem isotypic_lattice_of_five_parts (D : Formalism.BasicNotions.D7) (hA : IsotypicProjectorFixedMem) (hB : GeneratedMultipleOfHWV) (hC1 : DualLatticeDivisibility) (hC2 : LatticeSubspaceBasis) (hD : GeneratedLatticeCorollary) :
-    TranslateCorollaryField D := by
+theorem isotypic_lattice_of_five_parts
+    (D : Formalism.BasicNotions.D7) (hA : IsotypicProjectorFixedMem) (hB : GeneratedMultipleOfHWV)
+    (hC1 : DualLatticeDivisibility) (hC2 : LatticeSubspaceBasis) (hD : GeneratedLatticeCorollary)
+    : TranslateCorollaryField D := by
   intro p n' O _ _ _ S hG n _ V _ _ _ _ _ E hE M hM hMQ lam hlam e he π hπ c Y _ heY hyp
   have := dvr_fraction_field_charZero S hG.prime
   have hp0 : (p : KK O) ≠ 0 := by exact_mod_cast hG.prime.ne_zero
@@ -153,11 +181,15 @@ theorem isotypic_lattice_of_five_parts (D : Formalism.BasicNotions.D7) (hA : Iso
   have hYiso : Y ∈ isoSub E lam := hA (KK O) V n E hE lam e he Y heY
   obtain ⟨k, h, hh, hli, hspan, hint⟩ := hC2 O V M hM.2 hMQ (highestWeightVectors E lam)
   obtain ⟨y, hy, hYsum⟩ := isotypic_sum_generated_subreps E lam h hspan Y hYiso
-  have hkey : ∀ j, ∀ u ∈ UZmon E, ∃ o : O, π (u (y j)) = ((p : KK O) ^ c * algebraMap O (KK O) o) • h j := by
+  have hkey
+      : ∀ j, ∀ u ∈ UZmon E, ∃ o : O,
+        π (u (y j)) = ((p : KK O) ^ c * algebraMap O (KK O) o) • h j := by
     intro j0 u hu
     have hex : ∀ j, ∃ a : KK O, π (u (y j)) = a • h j := fun j =>
-      weight_projection_generated_scalar E lam π hπ (h j) (hh j).2 (hB (KK O) V n E hE lam (h j) (hh j).2) _
-        (integral_enveloping_preserves_stable E _ (generated_subrep_operator_stable E (h j)) u hu _ (hy j))
+      weight_projection_generated_scalar E lam π hπ (h j) (hh j).2
+        (hB (KK O) V n E hE lam (h j) (hh j).2) _
+        (integral_enveloping_preserves_stable E _ (generated_subrep_operator_stable E (h j)) u hu _
+          (hy j))
     choose a ha using hex
     have hz : π (u Y) = ∑ j, a j • h j := by
       set_option synthInstance.maxHeartbeats 100000 in
@@ -168,7 +200,8 @@ theorem isotypic_lattice_of_five_parts (D : Formalism.BasicNotions.D7) (hA : Iso
       rw [hz]
       exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hh j).2
     have hmHW : m ∈ highestWeightVectors E lam := by
-      have : m = ((p : KK O) ^ c)⁻¹ • π (u Y) := by rw [hm, smul_smul, inv_mul_cancel₀ hpc, one_smul]
+      have : m = ((p : KK O) ^ c)⁻¹ • π (u Y) := by
+        rw [hm, smul_smul, inv_mul_cancel₀ hpc, one_smul]
       rw [this]
       exact Submodule.smul_mem _ _ hzHW
     obtain ⟨o, ho⟩ := hint m hmM hmHW
@@ -182,8 +215,10 @@ theorem isotypic_lattice_of_five_parts (D : Formalism.BasicNotions.D7) (hA : Iso
       rw [h1, hz, sub_self]
     have := Fintype.linearIndependent_iff.1 hli _ hsum j0
     rw [ha j0, sub_eq_zero.1 this]
-  have hfin : ∀ j, ∃ m ∈ M, y j = ((p : KK O) ^ (c - ((N0 n * deF p n (ellWt lam) : ℕ) : ℤ))) • m := fun j =>
-    hD p n' O S hG n V E hE M hM lam hlam π hπ (h j) (hh j).1 (hh j).2 (hli.ne_zero j) c (y j) (hy j) (hkey j)
+  have hfin : ∀ j, ∃ m ∈ M, y j = ((p : KK O) ^ (c - ((N0 n * deF p n (ellWt lam) : ℕ) : ℤ))) • m :=
+    fun j =>
+      hD p n' O S hG n V E hE M hM lam hlam π hπ (h j) (hh j).1 (hh j).2 (hli.ne_zero j) c (y j)
+        (hy j) (hkey j)
   choose m hmM hm using hfin
   refine ⟨∑ j, m j, Submodule.sum_mem _ fun j _ => hmM j, ?_⟩
   rw [hYsum, Finset.smul_sum]

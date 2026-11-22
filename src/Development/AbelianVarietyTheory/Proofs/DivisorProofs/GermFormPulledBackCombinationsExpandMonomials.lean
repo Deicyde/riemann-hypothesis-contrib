@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VanishingFor
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.EndLoc
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.ChartRestriction.G.Out
@@ -17,23 +18,33 @@ noncomputable section
 
 namespace GlobalTheory.FormsLocus
 
-theorem eval₂_expand {Rg S : Type} [CommRing Rg] [CommRing S] (mA mB : ℕ)
-    (ψ : MvPolynomial (Fin (mA * mB)) Rg →+* S) (β : Fin mA → S) (F : MvPolynomial (Fin mB) Rg) :
-    MvPolynomial.eval₂Hom (ψ.comp MvPolynomial.C)
-        (fun j => ∑ i, ψ (MvPolynomial.X (finProdFinEquiv (i, j))) * β i) F =
-      MvPolynomial.eval₂Hom ψ β (expand mA mB F) := by
-  rw [expand, ← MvPolynomial.coe_eval₂Hom (MvPolynomial.C.comp MvPolynomial.C), ← RingHom.comp_apply,
-    MvPolynomial.comp_eval₂Hom]
+theorem eval₂_expand
+    {Rg S : Type} [CommRing Rg] [CommRing S]
+    (mA mB : ℕ)
+    (ψ : MvPolynomial (Fin (mA * mB)) Rg →+* S) (β : Fin mA → S) (F : MvPolynomial (Fin mB) Rg)
+    : MvPolynomial.eval₂Hom (ψ.comp MvPolynomial.C)
+        (fun j => ∑ i, ψ (MvPolynomial.X (finProdFinEquiv (i, j))) * β i)
+        F
+      = MvPolynomial.eval₂Hom ψ β (expand mA mB F) := by
+  rw [expand, ← MvPolynomial.coe_eval₂Hom (MvPolynomial.C.comp MvPolynomial.C),
+    ← RingHom.comp_apply, MvPolynomial.comp_eval₂Hom]
   congr 1
   ext r <;> simp
 
-theorem expand_isHomogeneous {Rg : Type} [CommRing Rg] (mA mB : ℕ) {F : MvPolynomial (Fin mB) Rg} {d : ℕ}
-    (hF : F.IsHomogeneous d) : (expand mA mB F).IsHomogeneous d := by
-  have h := hF.eval₂ (τ := Fin mA)
-    (MvPolynomial.C.comp MvPolynomial.C : Rg →+* MvPolynomial (Fin mA) (MvPolynomial (Fin (mA * mB)) Rg))
-    (fun j => ∑ i : Fin mA, MvPolynomial.C (MvPolynomial.X (finProdFinEquiv (i, j))) * MvPolynomial.X i)
-    (fun r => MvPolynomial.isHomogeneous_C _ _)
-    (fun j => MvPolynomial.IsHomogeneous.sum _ _ _ fun i _ => MvPolynomial.isHomogeneous_C_mul_X _ _)
+theorem expand_isHomogeneous
+    {Rg : Type} [CommRing Rg]
+    (mA mB : ℕ)
+    {F : MvPolynomial (Fin mB) Rg} {d : ℕ} (hF : F.IsHomogeneous d)
+    : (expand mA mB F).IsHomogeneous d := by
+  have h :=
+    hF.eval₂ (τ := Fin mA)
+      (MvPolynomial.C.comp MvPolynomial.C
+        : Rg →+* MvPolynomial (Fin mA) (MvPolynomial (Fin (mA * mB)) Rg))
+      (fun j =>
+        ∑ i : Fin mA, MvPolynomial.C (MvPolynomial.X (finProdFinEquiv (i, j))) * MvPolynomial.X i)
+      (fun r => MvPolynomial.isHomogeneous_C _ _)
+      (fun j =>
+        MvPolynomial.IsHomogeneous.sum _ _ _ fun i _ => MvPolynomial.isHomogeneous_C_mul_X _ _)
   simpa [expand] using h
 
 theorem germ_eval_comb : ∀ (Rg : Type) [CommRing Rg] (A₀ T X : Scheme.{0}) (f : A₀ ⟶ Sp Rg) (N : LB A₀) (mA mB : ℕ) (a : Fin mA → LB.Sec N) (g : T ⟶ Sp (MvPolynomial (Fin (mA * mB)) Rg)) (φ : X ⟶ A₀) (p : X ⟶ T), φ ≫ f = p ≫ g ≫ affπ Rg (mA * mB) → ∀ (d : ℕ) (F : MvPolynomial (Fin mB) Rg), F.IsHomogeneous d → ∀ (z : X) (q : N.ι), φ z ∈ N.U q → MvPolynomial.eval₂Hom (gc (p ≫ g ≫ affπ Rg (mA * mB)) z) (comb a φ p (matOf g) z q) F = ∑ ν ∈ (GlobalTheory.FormsLocus.expand mA mB F).support, gs p z ⊤ (GlobalTheory.FormsLocus.ringOf g ((GlobalTheory.FormsLocus.expand mA mB F).coeff ν)) * gs φ z (N.U q) ((GlobalTheory.FormsLocus.monSec a d ν).f q) := by

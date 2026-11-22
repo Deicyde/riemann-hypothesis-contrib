@@ -7,13 +7,17 @@ public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClas
 
 noncomputable section
 
-open Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps
+open Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField IsDedekindDomain Module
+  Formalism.MainNotions.Gaps.EtaleWeightGaps
 
 namespace Formalism.MainNotions.Gaps.HeightData
 
-variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j}
+variable
+  {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
+  {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j}
 
-def toHtData (G : GlobalFamilyData X ka wL wF) (Qf : ∀ la, LocalPointData G la) (Gc PH Prw Pet : ℝ) : HtData where
+def toHtData (G : GlobalFamilyData X ka wL wF) (Qf : ∀ la, LocalPointData G la) (Gc PH Prw Pet : ℝ)
+    : HtData where
   K := B.KO
   D := WeightFamilies.dimY D j
   δ := G.del
@@ -35,8 +39,10 @@ def toHtData (G : GlobalFamilyData X ka wL wF) (Qf : ∀ la, LocalPointData G la
   f _ ζ := fdeg ζ
   vEt la ζ := (X.vAt la ((Qf la).y ζ) (X.inc _ G.et)).toReal
 
-theorem heights_of_htConcl (G : GlobalFamilyData X ka wL wF) (Qf : ∀ la, LocalPointData G la) (Gc PH Prw Pet : ℝ)
-    (h : HtConcl (toHtData G Qf Gc PH Prw Pet)) : Heights Qf Gc PH Prw Pet := by
+theorem heights_of_htConcl
+    (G : GlobalFamilyData X ka wL wF) (Qf : ∀ la, LocalPointData G la)
+    (Gc PH Prw Pet : ℝ) (h : HtConcl (toHtData G Qf Gc PH Prw Pet))
+    : Heights Qf Gc PH Prw Pet := by
   exact h
 
 end Formalism.MainNotions.Gaps.HeightData

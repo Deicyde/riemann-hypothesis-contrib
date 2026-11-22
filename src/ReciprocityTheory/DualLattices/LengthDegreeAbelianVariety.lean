@@ -19,29 +19,44 @@ namespace ReciprocityTheory.PGsh.Up
 
 open ReciprocityTheory.PGsh.L2
 
-theorem lat_conseq (C : Type) [Field C] [IsAlgClosed C] (v : Valuation C NNReal) (R : Type)
-    [CommRing R] [Algebra R C] (hv : v.Integers R) (hnt : ∃ c : C, 0 < v c ∧ v c < 1)
+theorem lat_conseq
+    (C : Type) [Field C] [IsAlgClosed C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : v.Integers R) (hnt : ∃ c : C, 0 < v c ∧ v c < 1)
     (n : ℕ) (a : Fin n → C) (hinj : Function.Injective a) (hint : ∀ τ, v (a τ) ≤ 1)
     (s h : ℕ) (A : Fin n → Matrix (Fin s) (Fin h) C) (F : Lat v (Fin n × Fin h))
-    (M M' : Lat v (Fin n × Fin s)) (Mτ M'τ : Fin n → Lat v (Fin s)) (hF : F.B = freeMat a h)
-    (hA : ∀ τ, Function.Surjective (A τ).mulVec)
-    (hM' : M'.pts = (fun w : Fin n × Fin h → C => fun y : Fin n × Fin s =>
-        ∑ l, A y.1 y.2 l * w (y.1, l)) '' F.pts)
+    (M M' : Lat v (Fin n × Fin s)) (Mτ M'τ : Fin n → Lat v (Fin s))
+    (hF : F.B = freeMat a h) (hA : ∀ τ, Function.Surjective (A τ).mulVec)
+    (hM' : M'.pts
+      = (fun w : Fin n × Fin h → C => fun y : Fin n × Fin s => ∑ l, A y.1 y.2 l * w (y.1, l))
+        '' F.pts)
     (hMst : IsLaStable a M) (hMτ : ∀ τ, (Mτ τ).pts = projPts M.pts τ)
-    (hM'τ : ∀ τ, (M'τ τ).pts = projPts M'.pts τ) (c : NNReal) (hc : c ≤ colen M' M) :
-    c ^ 2 * v (discr a) ^ h ≤ (∏ τ, colen (M'τ τ) (Mτ τ)) ^ 2 * v (discr a) ^ s :=
+    (hM'τ : ∀ τ, (M'τ τ).pts = projPts M'.pts τ)
+    (c : NNReal) (hc : c ≤ colen M' M)
+    : c ^ 2 * v (discr a) ^ h ≤ (∏ τ, colen (M'τ τ) (Mτ τ)) ^ 2 * v (discr a) ^ s :=
   le_trans (by gcongr)
     (colength_sq_mul_le_prod C v R hv hnt n a hinj hint s h A F M M' Mτ M'τ hF hA hM' hMst hMτ hM'τ)
 
-theorem lengthDegree_abelianVariety : PermutedCokernelLowerBoundStatement := permutedCokernelLowerBound_of u6 lenEx killedGen idemGen
+theorem lengthDegree_abelianVariety : PermutedCokernelLowerBoundStatement :=
+  permutedCokernelLowerBound_of u6 lenEx killedGen idemGen
 
-theorem up_full (hU7 : UnramifiedCokernelLengthStatement) (p : ℕ) [Fact p.Prime] (g : ℕ) (C : Type) [Field C]
-    [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C]
-    [Algebra ℤ_[p] R] (O : Type) [CommRing O] [Algebra ℤ_[p] O] (σ : O ≃ₐ[ℤ_[p]] O) (cp : R)
-    (hp2 : p ≠ 2) (hS : HodgeTateSetting p v R O σ cp) (H : HodgeTateDatum p g v R O σ cp)
-    (U : UnramData p g v R O σ cp H) (i : Fin U.m) (N : Type) [AddCommGroup N] [Module R N]
-    (E : cokE H.Ht U.εT U.εL i (U.cj i) ≃ₗ[R] N) (V1 : NNReal) (hN : HasLen v R N V1) :
-    (v (algebraMap R C (p : R)) : ℝ) ^ (((U.r i : ℝ) + U.r (U.cj i)) / (p - 1) - frobSum U i) ≤ V1 := by
+theorem up_full
+    (hU7 : UnramifiedCokernelLengthStatement)
+    (p : ℕ) [Fact p.Prime]
+    (g : ℕ)
+    (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C] [Algebra ℤ_[p] R]
+    (O : Type) [CommRing O] [Algebra ℤ_[p] O]
+    (σ : O ≃ₐ[ℤ_[p]] O) (cp : R)
+    (hp2 : p ≠ 2) (hS : HodgeTateSetting p v R O σ cp)
+    (H : HodgeTateDatum p g v R O σ cp) (U : UnramData p g v R O σ cp H) (i : Fin U.m)
+    (N : Type) [AddCommGroup N] [Module R N]
+    (E : cokE H.Ht U.εT U.εL i (U.cj i) ≃ₗ[R] N)
+    (V1 : NNReal) (hN : HasLen v R N V1)
+    : (v (algebraMap R C (p : R)) : ℝ) ^ (((U.r i : ℝ) + U.r (U.cj i)) / (p - 1) - frobSum U i)
+      ≤ V1 := by
   obtain ⟨k, c0, ⟨F0⟩, hc0⟩ := hN
   have h10 := unramifiedCokernelLowerBound_of hU7 lenEx killedGen idemGen
   unfold UnramifiedCokernelLowerBoundStatement at h10

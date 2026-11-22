@@ -6,17 +6,23 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LatticeIn
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker GlobalTheory.Mem GlobalTheory.Mem.Col2 Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 Matrix
 open scoped BigOperators
 
 noncomputable section
 
 namespace GlobalTheory.Mem.Col2.CurveLat
 
-theorem exists_periodPair_mul_image {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2)
-    (σ : 𝓞 K →+* ℂ) (hσ : Function.Injective σ) (a : 𝓞 K) (ha : (σ a).im ≠ 0) (δ : ℂ) (hδ : δ ≠ 0) :
-    ∃ L : PeriodPair, ∀ z, z ∈ L.lattice ↔ ∃ c : 𝓞 K, z = δ * σ c := by
-  let b : Module.Basis (Fin 2) ℤ (𝓞 K) := Module.finBasisOfFinrankEq ℤ _ ((RingOfIntegers.rank K).trans hK)
+theorem exists_periodPair_mul_image
+    {K : Type} [Field K] [NumberField K]
+    (hK : Module.finrank ℚ K = 2)
+    (σ : 𝓞 K →+* ℂ) (hσ : Function.Injective σ)
+    (a : 𝓞 K) (ha : (σ a).im ≠ 0)
+    (δ : ℂ) (hδ : δ ≠ 0)
+    : ∃ L : PeriodPair, ∀ z, z ∈ L.lattice ↔ ∃ c : 𝓞 K, z = δ * σ c := by
+  let b : Module.Basis (Fin 2) ℤ (𝓞 K) :=
+    Module.finBasisOfFinrankEq ℤ _ ((RingOfIntegers.rank K).trans hK)
   have hs : ∀ x : 𝓞 K, σ x = b.repr x 0 * σ (b 0) + b.repr x 1 * σ (b 1) := by
     intro x
     have := congrArg σ (b.sum_repr x)
@@ -28,8 +34,9 @@ theorem exists_periodPair_mul_image {K : Type} [Field K] [NumberField K] (hK : M
     have e := hs (a * b 0)
     have e' := congrArg (fun z => (z * starRingEnd ℂ (σ (b 0))).im) e
     simp only [map_mul] at e'
-    rw [add_mul, _root_.mul_assoc, _root_.mul_assoc, _root_.mul_assoc, Complex.mul_conj, Complex.add_im,
-      Complex.mul_im, Complex.mul_im, Complex.mul_im, h0] at e'
+    rw [add_mul, _root_.mul_assoc, _root_.mul_assoc, _root_.mul_assoc, Complex.mul_conj,
+        Complex.add_im, Complex.mul_im, Complex.mul_im, Complex.mul_im, h0]
+      at e'
     simp [ha, hb0] at e'
   refine ⟨⟨δ * σ (b 0), δ * σ (b 1), ?_⟩, fun z => ?_⟩
   · rw [LinearIndependent.pair_iff]
@@ -61,7 +68,8 @@ theorem not_isIntegral_half : ¬ IsIntegral ℤ (1 / 2 : ℂ) := by
   obtain ⟨y, hy⟩ := IsIntegrallyClosed.algebraMap_eq_of_integral h1
   have h2 : (2 * y : ℚ) = 1 := by
     simp only [eq_intCast] at hy
-    rw [hy]; norm_num
+    rw [hy]
+    norm_num
   have h3 : 2 * y = 1 := by exact_mod_cast h2
   omega
 
@@ -87,7 +95,8 @@ theorem mem_lamOf_top (δ z : ℂ) : z ∈ Th.lamOf H ⊤ δ ↔ ∃ c : 𝓞 H.
     | mem x hx =>
       obtain ⟨c, -, rfl⟩ := hx
       exact ⟨c, rfl⟩
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨c, rfl⟩ := hx
       obtain ⟨c', rfl⟩ := hy
@@ -98,9 +107,10 @@ theorem mem_lamOf_top (δ z : ℂ) : z ∈ Th.lamOf H ⊤ δ ↔ ∃ c : 𝓞 H.
   · rintro ⟨c, rfl⟩
     exact AddSubgroup.subset_closure ⟨c, Submodule.mem_top, rfl⟩
 
-theorem exists_periodPair_lamOf (δ : ℂ) (hδ : δ ≠ 0) :
-    ∃ L : PeriodPair, ∀ z, z ∈ Th.lamOf H ⊤ δ ↔ z ∈ L.lattice := by
-  have hK : Module.finrank ℚ H.K = 2 := Formalism.FrobeniusOrbits.SplitK.finrank_K H.hyp.2.1.pos H.sqrtMinusD_sq
+theorem exists_periodPair_lamOf (δ : ℂ) (hδ : δ ≠ 0)
+    : ∃ L : PeriodPair, ∀ z, z ∈ Th.lamOf H ⊤ δ ↔ z ∈ L.lattice := by
+  have hK : Module.finrank ℚ H.K = 2 :=
+    Formalism.FrobeniusOrbits.SplitK.finrank_K H.hyp.2.1.pos H.sqrtMinusD_sq
   have hinj : Function.Injective (embO H) :=
     (H.φ₀.comp H.K.val.toRingHom).injective.comp RingOfIntegers.coe_injective
   have ha : (embO H ⟨_, HostK.isIntegral_half H⟩).im ≠ 0 := by
@@ -115,7 +125,8 @@ theorem exists_periodPair_lamOf (δ : ℂ) (hδ : δ ≠ 0) :
   obtain ⟨L, hL⟩ := exists_periodPair_mul_image hK (embO H) hinj _ ha δ hδ
   exact ⟨L, fun z => by rw [mem_lamOf_top, hL]⟩
 
-theorem not_mem_lamOf (δ : ℂ) (hδ : δ ≠ 0) {z : ℂ} (hz : z.re = 1 / 4) : δ * z ∉ Th.lamOf H ⊤ δ := by
+theorem not_mem_lamOf (δ : ℂ) (hδ : δ ≠ 0) {z : ℂ} (hz : z.re = 1 / 4)
+    : δ * z ∉ Th.lamOf H ⊤ δ := by
   rw [mem_lamOf_top]
   rintro ⟨c, hc⟩
   apply not_isIntegral_of_re hz
@@ -128,11 +139,15 @@ namespace GlobalTheory.Mem.Col2
 
 open CurveLat
 
-theorem exists_curve_lattice : ∀ (R : Ranks) (H : Host R), ∃ (δ : ℂ) (L : PeriodPair) (ω₀ : ℂ), Th.IsDiscriminantTwelfthRootOfIdealLattice H ⊤ δ ∧ L.lattice.toAddSubgroup = Th.lamOf H ⊤ δ ∧ Th.IsTwoTorsionPointUnkilled H (Th.lamOf H ⊤ δ) (ω₀ / 2) := by
+theorem exists_curve_lattice
+    : ∀ (R : Ranks) (H : Host R), ∃ (δ : ℂ) (L : PeriodPair) (ω₀ : ℂ),
+      Th.IsDiscriminantTwelfthRootOfIdealLattice H ⊤ δ ∧ L.lattice.toAddSubgroup = Th.lamOf H ⊤ δ
+        ∧ Th.IsTwoTorsionPointUnkilled H (Th.lamOf H ⊤ δ) (ω₀ / 2) := by
   intro R H
   obtain ⟨L₁, h₁⟩ := exists_periodPair_lamOf H 1 one_ne_zero
   have hΔ := (GlobalTheory.LatticeInvariants.invariants_dictionary L₁ _ h₁).2.2.1
-  obtain ⟨δ, hδ⟩ := IsAlgClosed.exists_pow_nat_eq (TaylorLogMetric.discr (Th.lamOf H ⊤ 1)) (n := 12) (by norm_num)
+  obtain ⟨δ, hδ⟩ :=
+    IsAlgClosed.exists_pow_nat_eq (TaylorLogMetric.discr (Th.lamOf H ⊤ 1)) (n := 12) (by norm_num)
   have hδ0 : δ ≠ 0 := by
     rintro rfl
     exact hΔ (by rw [← hδ]; norm_num)

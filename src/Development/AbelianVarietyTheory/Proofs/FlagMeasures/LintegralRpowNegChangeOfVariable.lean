@@ -5,21 +5,27 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsGau
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory.FlagMeas
 
-theorem lintegral_rpow_neg_change_of_variable :
-    ∀ (N s : ℝ), 0 < N → 0 < s → ∀ F : ℝ → ENNReal, Measurable F →
-      ∫⁻ t in Set.Ioi (0 : ℝ), F ((t / s) ^ (-(1 / N))) / ENNReal.ofReal t =
-        ∫⁻ τ in Set.Ioi (0 : ℝ), F τ * ENNReal.ofReal (N / τ) := by
+theorem lintegral_rpow_neg_change_of_variable
+    : ∀ (N s : ℝ),
+      0 < N → 0 < s
+        → ∀ F : ℝ → ENNReal,
+          Measurable F
+            → ∫⁻ t in Set.Ioi (0 : ℝ), F ((t / s) ^ (-(1 / N))) / ENNReal.ofReal t
+              = ∫⁻ τ in Set.Ioi (0 : ℝ), F τ * ENNReal.ofReal (N / τ) := by
   intro N s hN hs F _
   set a : ℝ := -(1 / N) with ha_def
   have ha : a ≠ 0 := neg_ne_zero.mpr (one_div_ne_zero hN.ne')
 
-  have hderiv : ∀ t ∈ Set.Ioi (0 : ℝ),
-      HasDerivWithinAt (fun t : ℝ => (t / s) ^ a) (1 / s * a * (t / s) ^ (a - 1))
-        (Set.Ioi 0) t := by
+  have hderiv
+      : ∀ t ∈ Set.Ioi (0 : ℝ),
+        HasDerivWithinAt
+          (fun t : ℝ => (t / s) ^ a)
+          (1 / s * a * (t / s) ^ (a - 1)) (Set.Ioi 0) t := by
     intro t ht
     have h1 : HasDerivAt (fun y : ℝ => y / s) (1 / s) t := (hasDerivAt_id' t).div_const s
     exact (h1.rpow_const (Or.inl (div_pos ht hs).ne')).hasDerivWithinAt
@@ -39,8 +45,9 @@ theorem lintegral_rpow_neg_change_of_variable :
       refine ⟨s * τ ^ a⁻¹, mul_pos hs (Real.rpow_pos_of_pos hτ _), ?_⟩
       show (s * τ ^ a⁻¹ / s) ^ a = τ
       rw [mul_div_cancel_left₀ _ hs.ne', Real.rpow_inv_rpow (le_of_lt hτ) ha]
-  have key := lintegral_image_eq_lintegral_abs_deriv_mul measurableSet_Ioi hderiv hinj
-    (fun τ => F τ * ENNReal.ofReal (N / τ))
+  have key :=
+    lintegral_image_eq_lintegral_abs_deriv_mul measurableSet_Ioi hderiv hinj
+      (fun τ => F τ * ENNReal.ofReal (N / τ))
   rw [himage] at key
   rw [key]
   refine setLIntegral_congr_fun measurableSet_Ioi ?_
@@ -58,8 +65,7 @@ theorem lintegral_rpow_neg_change_of_variable :
     rw [hneg, abs_neg, abs_of_pos hpos]
     field_simp
   dsimp only
-  rw [div_eq_mul_inv, ← ENNReal.ofReal_inv_of_pos ht', ← hreal,
-    ENNReal.ofReal_mul (abs_nonneg _)]
+  rw [div_eq_mul_inv, ← ENNReal.ofReal_inv_of_pos ht', ← hreal, ENNReal.ofReal_mul (abs_nonneg _)]
   ring
 
 end GlobalTheory.FlagMeas

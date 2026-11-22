@@ -12,9 +12,9 @@ universe u
 
 noncomputable section
 
-theorem isPrime_map_quotient_localization {R : Type*} [CommRing R] (m W I : Ideal R) [m.IsPrime] [W.IsPrime]
-    (hWm : W ≤ m) (hIW : I ≤ W) :
-    (W.map ((Ideal.Quotient.mk (I.map (algebraMap R (Localization.AtPrime m)))).comp
+theorem isPrime_map_quotient_localization
+    {R : Type*} [CommRing R] (m W I : Ideal R) [m.IsPrime] [W.IsPrime] (hWm : W ≤ m) (hIW : I ≤ W)
+    : (W.map ((Ideal.Quotient.mk (I.map (algebraMap R (Localization.AtPrime m)))).comp
       (algebraMap R (Localization.AtPrime m)))).IsPrime := by
   rw [← Ideal.map_map]
   have hd : Disjoint (m.primeCompl : Set R) (W : Set R) :=
@@ -24,13 +24,16 @@ theorem isPrime_map_quotient_localization {R : Type*} [CommRing R] (m W I : Idea
     (by rw [Ideal.mk_ker]; exact Ideal.map_mono hIW)
 
 def LocalizeQuotientStages.Statement : Prop :=
-  ∀ (R : Type u) [CommRing R] (m W I : Ideal R) [m.IsPrime] [W.IsPrime], W ≤ m → I ≤ W →
-    ∀ (P : Ideal (Localization.AtPrime m ⧸ I.map (algebraMap R (Localization.AtPrime m)))) [P.IsPrime],
-      W.map ((Ideal.Quotient.mk (I.map (algebraMap R (Localization.AtPrime m)))).comp
-        (algebraMap R (Localization.AtPrime m))) = P →
-      Module.length (Localization.AtPrime P) (Localization.AtPrime P) =
-        Module.length (Localization.AtPrime W)
-          (Localization.AtPrime W ⧸ I.map (algebraMap R (Localization.AtPrime W)))
+  ∀ (R : Type u) [CommRing R] (m W I : Ideal R) [m.IsPrime] [W.IsPrime],
+    W ≤ m → I ≤ W
+      → ∀ (P : Ideal (Localization.AtPrime m ⧸ I.map (algebraMap R (Localization.AtPrime m))))
+          [P.IsPrime],
+        W.map ((Ideal.Quotient.mk (I.map (algebraMap R (Localization.AtPrime m)))).comp
+              (algebraMap R (Localization.AtPrime m)))
+            = P
+          → Module.length (Localization.AtPrime P) (Localization.AtPrime P)
+            = Module.length (Localization.AtPrime W)
+              (Localization.AtPrime W ⧸ I.map (algebraMap R (Localization.AtPrime W)))
 
 end
 

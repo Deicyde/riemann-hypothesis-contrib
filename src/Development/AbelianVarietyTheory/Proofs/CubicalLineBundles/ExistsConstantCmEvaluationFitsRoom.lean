@@ -14,19 +14,21 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.MainNotions Formalism.BasicNotions
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj Formalism.MainNotions Formalism.BasicNotions
 open GlobalTheory GlobalTheory.RunIn
 
 namespace GlobalTheory
 
-theorem room_neg_log_epStar (f d L M k0 S : ℝ) (hf : 1 ≤ f) (hd : 1 ≤ d) (hL : 0 ≤ L)
-    (hM : 0 < M) (hk : 0 < k0) (hS : 1 ≤ S)
-    (h : Real.log (M * k0) ≤ 19 * L + 3 + Real.log d) :
-    0 < epStar M f S k0 ∧ epStar M f S k0 ≤ 1 ∧
-      -Real.log (epStar M f S k0) ≤ 19 * L + 6 + Real.log d + f + Real.log S := by
+theorem room_neg_log_epStar
+    (f d L M k0 S : ℝ) (hf : 1 ≤ f) (hd : 1 ≤ d) (hL : 0 ≤ L) (hM : 0 < M) (hk : 0 < k0)
+    (hS : 1 ≤ S) (h : Real.log (M * k0) ≤ 19 * L + 3 + Real.log d)
+    : 0 < epStar M f S k0 ∧ epStar M f S k0 ≤ 1
+      ∧ - Real.log (epStar M f S k0) ≤ 19 * L + 6 + Real.log d + f + Real.log S := by
   have hl2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
   have hl2' : Real.log 2 ≤ 1 := by
-    have := Real.log_le_sub_one_of_pos (show (0:ℝ) < 2 by norm_num); linarith
+    have := Real.log_le_sub_one_of_pos (show (0 : ℝ) < 2 by norm_num); linarith
   have hfS : 1 ≤ f * S := one_le_mul_of_one_le_of_one_le hf hS
   have hld : 0 ≤ Real.log d := Real.log_nonneg hd
   have hlS : 0 ≤ Real.log S := Real.log_nonneg hS
@@ -43,17 +45,21 @@ theorem room_neg_log_epStar (f d L M k0 S : ℝ) (hf : 1 ≤ f) (hd : 1 ≤ d) (
     have h3 : Real.log ((f * S + 2) * Real.log 2) ≤ Real.log (3 * f * S) :=
       Real.log_le_log (by positivity) (by nlinarith)
     have h6 : Real.log (3 * f * S) = Real.log 3 + Real.log f + Real.log S := by
-      rw [Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) (by positivity)]
-    have h4 := Real.log_le_sub_one_of_pos (show (0:ℝ) < 3 by norm_num)
-    have h5 := Real.log_le_sub_one_of_pos (show (0:ℝ) < f by positivity)
+      rw [Real.log_mul (by positivity) (by positivity),
+        Real.log_mul (by positivity) (by positivity)]
+    have h4 := Real.log_le_sub_one_of_pos (show (0 : ℝ) < 3 by norm_num)
+    have h5 := Real.log_le_sub_one_of_pos (show (0 : ℝ) < f by positivity)
     linarith
 
-theorem room_log_radius (f r : ℕ) (d e S : ℝ) (hf : 1 ≤ f) (hr : 1 ≤ r) (hd : 1 ≤ d)
-    (he : 0 < e) (hS : 1 ≤ S) :
-    0 < 2 * ReciprocityTheory.MultiplicativeHeights.approxR r (d5mu f r d (Real.sqrt e / Real.sqrt f)) (3 * frameRadius S r / 5) ∧
-    Real.log (2 * ReciprocityTheory.MultiplicativeHeights.approxR r (d5mu f r d (Real.sqrt e / Real.sqrt f)) (3 * frameRadius S r / 5)) =
-      Real.log (1600 / 3) + Real.log r + (1 / 2) * Real.log f + (1 / 2) * Real.log S
-        + 3 * Real.log ((f : ℝ) * r) + Real.log d - (1 / 2) * Real.log e := by
+theorem room_log_radius
+    (f r : ℕ) (d e S : ℝ) (hf : 1 ≤ f) (hr : 1 ≤ r) (hd : 1 ≤ d) (he : 0 < e) (hS : 1 ≤ S)
+    : 0 < 2 * ReciprocityTheory.MultiplicativeHeights.approxR r
+        (d5mu f r d (Real.sqrt e / Real.sqrt f)) (3 * frameRadius S r / 5)
+      ∧ Real.log
+          (2 * ReciprocityTheory.MultiplicativeHeights.approxR r
+            (d5mu f r d (Real.sqrt e / Real.sqrt f)) (3 * frameRadius S r / 5))
+        = Real.log (1600 / 3) + Real.log r + (1 / 2) * Real.log f + (1 / 2) * Real.log S
+          + 3 * Real.log ((f : ℝ) * r) + Real.log d - (1 / 2) * Real.log e := by
   have hf' : (0 : ℝ) < f := by exact_mod_cast hf
   have hr' : (0 : ℝ) < r := by exact_mod_cast hr
   have hS' : (0 : ℝ) < S := by linarith
@@ -62,8 +68,11 @@ theorem room_log_radius (f r : ℕ) (d e S : ℝ) (hf : 1 ≤ f) (hr : 1 ≤ r) 
   have h2 : 0 < Real.sqrt f := Real.sqrt_pos.2 hf'
   have h3 : 0 < Real.sqrt r := Real.sqrt_pos.2 hr'
   have h4 : 0 < Real.sqrt (S * r) := Real.sqrt_pos.2 (by positivity)
-  have E : 2 * ReciprocityTheory.MultiplicativeHeights.approxR r (d5mu f r d (Real.sqrt e / Real.sqrt f)) (3 * frameRadius S r / 5) =
-      1600 / 3 * Real.sqrt r * Real.sqrt f * Real.sqrt (S * r) * ((f : ℝ) * r) ^ 3 * d / Real.sqrt e := by
+  have E
+      : 2 * ReciprocityTheory.MultiplicativeHeights.approxR r
+          (d5mu f r d (Real.sqrt e / Real.sqrt f)) (3 * frameRadius S r / 5)
+        = 1600 / 3 * Real.sqrt r * Real.sqrt f * Real.sqrt (S * r) * ((f : ℝ) * r) ^ 3 * d
+          / Real.sqrt e := by
     unfold ReciprocityTheory.MultiplicativeHeights.approxR d5mu frameRadius
     field_simp
     norm_num
@@ -71,13 +80,31 @@ theorem room_log_radius (f r : ℕ) (d e S : ℝ) (hf : 1 ≤ f) (hr : 1 ≤ r) 
   refine ⟨by positivity, ?_⟩
   rw [Real.log_div (by positivity) h1.ne', Real.log_mul (by positivity) hd'.ne',
     Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) h4.ne',
-    Real.log_mul (by positivity) h2.ne', Real.log_mul (by positivity) h3.ne',
-    Real.log_pow, Real.log_sqrt he.le, Real.log_sqrt hf'.le, Real.log_sqrt hr'.le,
-    Real.log_sqrt (by positivity), Real.log_mul hS'.ne' hr'.ne']
+    Real.log_mul (by positivity) h2.ne', Real.log_mul (by positivity) h3.ne', Real.log_pow,
+    Real.log_sqrt he.le, Real.log_sqrt hf'.le, Real.log_sqrt hr'.le, Real.log_sqrt (by positivity),
+    Real.log_mul hS'.ne' hr'.ne']
   push_cast
   ring
 
-theorem room_of_constants : ∃ C0 : ℝ, 0 < C0 ∧ ∀ (f r p0 : ℕ) (d L Om M k0 S : ℝ), 1 ≤ f → 1 ≤ r → p0 ≤ r → 1 ≤ d → 0 ≤ L → 0 < M → 0 < k0 → 1 ≤ S → Real.log (M * k0) ≤ 19 * L + 3 + Real.log d → 1 ≤ frameBasisRadius r p0 f d (Real.sqrt (epStar M f S k0)) (3 * frameRadius S r / 5) ∧ ∀ s t : ℝ, 0 ≤ s → 0 ≤ t → s + t ≤ S → ∀ C A : ℝ, C0 ≤ C → 2 ≤ A → (Formalism.L2.LamCM.pDeg Om + (1 / 2) * Real.log (frameBasisRadius r p0 f d (Real.sqrt (epStar M f S k0)) (3 * frameRadius S r / 5))) * (s + t) + s * Real.log ((r : ℝ) * frameBasisRadius r p0 f d (Real.sqrt (epStar M f S k0)) (3 * frameRadius S r / 5)) ≤ C * ((f : ℝ) * r + L + Real.log d + |Om|) ^ A * (1 + Real.log S) * S := by
+theorem room_of_constants
+    : ∃ C0 : ℝ,
+      0 < C0
+        ∧ ∀ (f r p0 : ℕ) (d L Om M k0 S : ℝ),
+          1 ≤ f → 1 ≤ r → p0 ≤ r → 1 ≤ d → 0 ≤ L → 0 < M → 0 < k0 → 1 ≤ S
+            → Real.log (M * k0) ≤ 19 * L + 3 + Real.log d
+            → 1 ≤ frameBasisRadius r p0 f d (Real.sqrt (epStar M f S k0)) (3 * frameRadius S r / 5)
+              ∧ ∀ s t : ℝ,
+                0 ≤ s → 0 ≤ t → s + t ≤ S
+                  → ∀ C A : ℝ,
+                    C0 ≤ C → 2 ≤ A
+                      → (Formalism.L2.LamCM.pDeg Om
+                              + (1 / 2) * Real.log (frameBasisRadius r p0 f d
+                                (Real.sqrt (epStar M f S k0)) (3 * frameRadius S r / 5)))
+                            * (s + t)
+                          + s * Real.log
+                            ((r : ℝ) * frameBasisRadius r p0 f d (Real.sqrt (epStar M f S k0))
+                              (3 * frameRadius S r / 5))
+                        ≤ C * ((f : ℝ) * r + L + Real.log d + |Om|) ^ A * (1 + Real.log S) * S := by
   refine ⟨3000, by norm_num, ?_⟩
   intro f r p0 d L Om M k0 S hf hr hp hd hL hM hk hS h
   have hf' : (1 : ℝ) ≤ f := by exact_mod_cast hf
@@ -99,10 +126,10 @@ theorem room_of_constants : ∃ C0 : ℝ, 0 < C0 ∧ ∀ (f r p0 : ℕ) (d L Om 
   have a4 : 0 ≤ Real.log (r : ℝ) := Real.log_nonneg hr'
   have a5 : 0 ≤ Real.log ((f : ℝ) * r) := Real.log_nonneg hn
   have a6 : 0 ≤ Real.log (1600 / 3 : ℝ) := Real.log_nonneg (by norm_num)
-  have b3 := Real.log_le_sub_one_of_pos (show (0:ℝ) < f by linarith)
-  have b4 := Real.log_le_sub_one_of_pos (show (0:ℝ) < r by linarith)
-  have b5 := Real.log_le_sub_one_of_pos (show (0:ℝ) < (f : ℝ) * r by linarith)
-  have b6 := Real.log_le_sub_one_of_pos (show (0:ℝ) < 1600 / 3 by norm_num)
+  have b3 := Real.log_le_sub_one_of_pos (show (0 : ℝ) < f by linarith)
+  have b4 := Real.log_le_sub_one_of_pos (show (0 : ℝ) < r by linarith)
+  have b5 := Real.log_le_sub_one_of_pos (show (0 : ℝ) < (f : ℝ) * r by linarith)
+  have b6 := Real.log_le_sub_one_of_pos (show (0 : ℝ) < 1600 / 3 by norm_num)
   have hX1 : 0 ≤ Real.log X := by rw [hX]; linarith
   have hX1' : 1 ≤ X := by
     by_contra hc
@@ -122,8 +149,9 @@ theorem room_of_constants : ∃ C0 : ℝ, 0 < C0 ∧ ∀ (f r p0 : ℕ) (d L Om 
   have hlog : Real.log (X ^ (2 * p0 + 1)) ≤ 1800 * (Z ^ 2 * (1 + Real.log S)) := by
     rw [Real.log_pow]
     push_cast
-    calc (2 * (p0 : ℝ) + 1) * Real.log X ≤ (3 * Z) * (600 * (Z * (1 + Real.log S))) :=
-          mul_le_mul (by linarith) hXZ' hX1 (by linarith)
+    calc
+      (2 * (p0 : ℝ) + 1) * Real.log X ≤ (3 * Z) * (600 * (Z * (1 + Real.log S))) :=
+        mul_le_mul (by linarith) hXZ' hX1 (by linarith)
       _ = _ := by ring
   have hlog0 : 0 ≤ Real.log (X ^ (2 * p0 + 1)) := Real.log_nonneg (one_le_pow₀ hX1')
   rw [Real.log_mul (by positivity) (by positivity)]
@@ -141,7 +169,9 @@ theorem room_of_constants : ∃ C0 : ℝ, 0 < C0 ∧ ∀ (f r p0 : ℕ) (d L Om 
     mul_le_mul (by linarith) (by linarith) (by linarith) (by linarith)
   have c3 : 3000 * W ≤ C * Z ^ A * (1 + Real.log S) := by
     have : 3000 * Z ^ 2 ≤ C * Z ^ A := mul_le_mul hC hZA (by positivity) (by linarith)
-    calc 3000 * W = (3000 * Z ^ 2) * (1 + Real.log S) := by rw [hW]; ring
+    calc
+      3000 * W
+        = (3000 * Z ^ 2) * (1 + Real.log S) := by rw [hW]; ring
       _ ≤ _ := mul_le_mul_of_nonneg_right this (by linarith)
   have c4 : 3000 * W * S ≤ C * Z ^ A * (1 + Real.log S) * S :=
     mul_le_mul_of_nonneg_right c3 (by linarith)

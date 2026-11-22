@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.NotCompac
 
 @[expose] public section
 
-open Matrix Formalism.UG GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms GlobalTheory.RegSS
+open Matrix Formalism.UG GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms
+  GlobalTheory.RegSS
 open scoped TensorProduct
 
 namespace GlobalTheory.RegSS
@@ -23,8 +24,8 @@ private lemma cT_mul_mul_eq_iff_mul_adj_eq_one {A : Type} [CommRing A] {n : Type
     have key : J * (J⁻¹ * cT s g * J * g) = J := by rw [h, Matrix.mul_one]
     simpa only [← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hJ, Matrix.one_mul] using key
 
-theorem pointsCentraliser_of_commutant_of_adjoint :
-    PointsCommutant → PointsAdjoint → PointsCentraliser := by
+theorem pointsCentraliser_of_commutant_of_adjoint
+    : PointsCommutant → PointsAdjoint → PointsCentraliser := by
   intro hC hA F E _ _ _ _ n _ _ σ J γ hreg hAlg hPlus R _ _
   obtain ⟨hinj, hcomm⟩ := hC F E n σ J γ hreg hAlg hPlus R
   refine ⟨hinj, fun u => hA F E n σ J γ hreg R u, fun g => ?_⟩
@@ -32,8 +33,10 @@ theorem pointsCentraliser_of_commutant_of_adjoint :
     have h := hreg.nondeg.map (inclE (F := F) R)
     rw [RingHom.map_det] at h
     exact h
-  have hb : ((bc (inclE (F := F) R) γ : GL n (E ⊗[F] R)) : Matrix n n (E ⊗[F] R)) =
-      (γ : Matrix n n E).map (inclE (F := F) R) := rfl
+  have hb
+      : ((bc (inclE (F := F) R) γ : GL n (E ⊗[F] R)) : Matrix n n (E ⊗[F] R))
+        = (γ : Matrix n n E).map (inclE (F := F) R) :=
+    rfl
   simp only [centPts, Subgroup.mem_inf, Subgroup.mem_centralizer_singleton_iff]
   unfold UPts UJ
   simp only [Subgroup.mem_mk, Submonoid.mem_mk, Subsemigroup.mem_mk, Set.mem_ofPred_eq,

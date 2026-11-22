@@ -13,7 +13,11 @@ open GlobalTheory.SplitWeil (SB nabs)
 
 namespace GlobalTheory
 
-theorem KSp.sgn_mul_of_isQuad : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] (E : Type) [Field E] [Algebra F E] [TopologicalSpace E] [IsModuleTopology F E] (c : E →ₐ[F] E) (δ : E) (hE : IsQuad c δ) (s t : Fˣ), sgn E (s * t) = sgn E s * sgn E t := by
+theorem KSp.sgn_mul_of_isQuad
+    : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [TopologicalSpace F]
+        [IsNonarchimedeanLocalField F] (E : Type) [Field E] [Algebra F E] [TopologicalSpace E]
+        [IsModuleTopology F E] (c : E →ₐ[F] E) (δ : E) (hE : IsQuad c δ) (s t : Fˣ),
+      sgn E (s * t) = sgn E s * sgn E t := by
   intro F _ _ _ _ _ E _ _ _ _ c δ hE s t
   set H := (Units.map (Algebra.norm F : E →* F)).range with hH
   unfold sgn

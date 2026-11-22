@@ -19,42 +19,47 @@ def pos (k r : ℕ) : (Fin r ⊕ Fin r) ⊕ Fin (k + 1) → Fin (2 * r + k + 1) 
 theorem pos_bijective (k r : ℕ) : Function.Bijective (pos k r) := by
   rw [Fintype.bijective_iff_injective_and_card]
   refine ⟨?_, by simp; omega⟩
-  rintro ((a | a) | a) ((b | b) | b) h <;>
-    simp only [pos, eI, esI, wI, Sum.elim_inl, Sum.elim_inr, Fin.mk.injEq] at h <;>
-    have ha := a.isLt <;> have hb := b.isLt <;>
-    first
-      | (exfalso; omega)
-      | (have : a = b := Fin.ext (by omega); rw [this])
+  rintro ((a | a) | a) ((b | b) | b) h
+    <;> simp only [pos, eI, esI, wI, Sum.elim_inl, Sum.elim_inr, Fin.mk.injEq] at h
+    <;> have ha := a.isLt <;> have hb := b.isLt
+    <;> first | (exfalso; omega) | (have : a = b := Fin.ext (by omega); rw [this])
 
 def posEquiv (k r : ℕ) : (Fin r ⊕ Fin r) ⊕ Fin (k + 1) ≃ Fin (2 * r + k + 1) :=
   Equiv.ofBijective _ (pos_bijective k r)
 
-theorem gram_submatrix (k r : ℕ) :
-    (Hpk k r).submatrix (pos k r) (pos k r) =
-      fromBlocks (fromBlocks 0 1 1 0) 0 0 (Hb k) := by
-  ext ((a | a) | a) ((b | b) | b) <;>
-    have ha := a.isLt <;> have hb := b.isLt <;>
-    simp only [pos, eI, esI, wI, Hpk, Hb, Sum.elim_inl, Sum.elim_inr, submatrix_apply,
+theorem gram_submatrix (k r : ℕ)
+    : (Hpk k r).submatrix (pos k r) (pos k r) = fromBlocks (fromBlocks 0 1 1 0) 0 0 (Hb k) := by
+  ext ((a | a) | a) ((b | b) | b) <;> have ha := a.isLt <;> have hb := b.isLt
+    <;> simp only [pos, eI, esI, wI, Hpk, Hb, Sum.elim_inl, Sum.elim_inr, submatrix_apply,
       fromBlocks_apply₁₁, fromBlocks_apply₁₂, fromBlocks_apply₂₁, fromBlocks_apply₂₂,
-      Matrix.zero_apply, Matrix.one_apply, diagonal_apply, Fin.ext_iff, Fin.val_last] <;>
-    split_ifs <;> first | rfl | (exfalso; omega) | contradiction | (exfalso; simp_all; done) |
-      (rename_i h1 h2
-       first
-        | exact (if_pos h2).trans (by rw [if_pos (by omega), if_pos (by omega)])
-        | exact (if_neg h2).trans (by rw [if_pos (by omega), if_neg (by omega)]))
+      Matrix.zero_apply, Matrix.one_apply, diagonal_apply, Fin.ext_iff, Fin.val_last]
+    <;> split_ifs
+    <;> first
+      | rfl
+      | (exfalso; omega)
+      | contradiction
+      | (exfalso; simp_all; done)
+      | (
+          rename_i h1 h2
+          first
+          | exact (if_pos h2).trans (by rw [if_pos (by omega), if_pos (by omega)])
+          | exact (if_neg h2).trans (by rw [if_pos (by omega), if_neg (by omega)])
+        )
 
-theorem col_e (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    (i : Fin (2 * r + k + 1)) (b : Fin r) :
-    bigCell k r c μ i (eI k r b) = if i.val = 2 * r + k - b.val then c b else 0 := by
+theorem col_e
+    (k r : ℕ)
+    (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (i : Fin (2 * r + k + 1)) (b : Fin r)
+    : bigCell k r c μ i (eI k r b) = if i.val = 2 * r + k - b.val then c b else 0 := by
   have hb : (eI k r b).val < r := b.isLt
   unfold bigCell
   rw [dite_eq_left hb]
   exact if_congr Fin.ext_iff rfl rfl
 
-theorem col_w (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    (i : Fin (2 * r + k + 1)) (b : Fin (k + 1)) :
-    bigCell k r c μ i (wI k r b) =
-      if hi : r ≤ i.val ∧ i.val ≤ r + k then μ ⟨i.val - r, by omega⟩ b else 0 := by
+theorem col_w
+    (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (i : Fin (2 * r + k + 1))
+    (b : Fin (k + 1))
+    : bigCell k r c μ i (wI k r b)
+      = if hi : r ≤ i.val ∧ i.val ≤ r + k then μ ⟨i.val - r, by omega⟩ b else 0 := by
   have hb := b.isLt
   have hv : (wI k r b).val = r + b.val := rfl
   unfold bigCell
@@ -66,9 +71,10 @@ theorem col_w (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k
     omega
   · rfl
 
-theorem col_es (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    (i : Fin (2 * r + k + 1)) (b : Fin r) :
-    bigCell k r c μ i (esI k r b) = if i.val = b.val then (star (c b))⁻¹ else 0 := by
+theorem col_es
+    (k r : ℕ)
+    (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) (i : Fin (2 * r + k + 1)) (b : Fin r)
+    : bigCell k r c μ i (esI k r b) = if i.val = b.val then (star (c b))⁻¹ else 0 := by
   have hb := b.isLt
   have hv : (esI k r b).val = 2 * r + k - b.val := rfl
   unfold bigCell
@@ -79,12 +85,11 @@ theorem col_es (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (
   show 2 * r + k - (esI k r b).val = b.val
   omega
 
-theorem bigCell_submatrix (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) :
-    (bigCell k r c μ).submatrix (pos k r) (pos k r) =
-      fromBlocks (fromBlocks 0 (diagonal fun a => (star (c a))⁻¹) (diagonal c) 0) 0 0 μ := by
-  ext ((a | a) | a) ((b | b) | b) <;>
-    have ha := a.isLt <;> have hb := b.isLt <;>
-    simp only [pos, Sum.elim_inl, Sum.elim_inr, submatrix_apply, col_e, col_w, col_es,
+theorem bigCell_submatrix (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+    : (bigCell k r c μ).submatrix (pos k r) (pos k r)
+      = fromBlocks (fromBlocks 0 (diagonal fun a => (star (c a))⁻¹) (diagonal c) 0) 0 0 μ := by
+  ext ((a | a) | a) ((b | b) | b) <;> have ha := a.isLt <;> have hb := b.isLt
+    <;> simp only [pos, Sum.elim_inl, Sum.elim_inr, submatrix_apply, col_e, col_w, col_es,
       fromBlocks_apply₁₁, fromBlocks_apply₁₂, fromBlocks_apply₂₁, fromBlocks_apply₂₂,
       Matrix.zero_apply, diagonal_apply]
   · exact if_neg (by show ¬ a.val = _; omega)
@@ -106,31 +111,35 @@ theorem bigCell_submatrix (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k +
 
 end BigCellUnitary
 
-
 open BigCellUnitary in
 theorem bigCell_mem_unitary : Formalism.QuantumDeterminants.BigCellMem := by
   intro k r c μ hc hμ
   change (bigCell k r c μ)ᴴ * Hpk k r * bigCell k r c μ = Hpk k r
   let e := BigCellUnitary.posEquiv k r
-  have key : ((bigCell k r c μ)ᴴ * Hpk k r * bigCell k r c μ).submatrix e e =
-      (Hpk k r).submatrix e e := by
-    rw [← submatrix_mul_equiv _ _ _ e, ← submatrix_mul_equiv _ _ _ e,
-      ← conjTranspose_submatrix]
+  have key
+      : ((bigCell k r c μ)ᴴ * Hpk k r * bigCell k r c μ).submatrix e e
+        = (Hpk k r).submatrix e e := by
+    rw [← submatrix_mul_equiv _ _ _ e, ← submatrix_mul_equiv _ _ _ e, ← conjTranspose_submatrix]
     have hp : ⇑e = BigCellUnitary.pos k r := rfl
     rw [hp, BigCellUnitary.gram_submatrix, BigCellUnitary.bigCell_submatrix]
-    have h1 : diagonal (fun a => star (c a)) * diagonal (fun a => (star (c a))⁻¹) =
-        (1 : Matrix (Fin r) (Fin r) ℂ) := by
+    have h1
+        : diagonal (fun a => star (c a)) * diagonal (fun a => (star (c a))⁻¹)
+          = (1 : Matrix (Fin r) (Fin r) ℂ) := by
       rw [diagonal_mul_diagonal, ← diagonal_one]
-      congr 1; funext a
+      congr 1
+      funext a
       exact mul_inv_cancel₀ (star_ne_zero.2 (hc a))
-    have h2 : diagonal (fun a => star (star (c a))⁻¹) * diagonal c =
-        (1 : Matrix (Fin r) (Fin r) ℂ) := by
+    have h2
+        : diagonal (fun a => star (star (c a))⁻¹) * diagonal c
+          = (1 : Matrix (Fin r) (Fin r) ℂ) := by
       rw [diagonal_mul_diagonal, ← diagonal_one]
-      congr 1; funext a
+      congr 1
+      funext a
       rw [star_inv₀, star_star]
       exact inv_mul_cancel₀ (hc a)
-    simp only [fromBlocks_conjTranspose, fromBlocks_multiply, conjTranspose_zero, diagonal_conjTranspose,
-      Matrix.mul_zero, Matrix.zero_mul, Matrix.mul_one, add_zero, zero_add, hμ]
+    simp only [fromBlocks_conjTranspose, fromBlocks_multiply, conjTranspose_zero,
+      diagonal_conjTranspose, Matrix.mul_zero, Matrix.zero_mul, Matrix.mul_one, add_zero, zero_add,
+      hμ]
     rw [show star c = fun a => star (c a) from rfl,
       show star (fun a => (star (c a))⁻¹) = fun a => star (star (c a))⁻¹ from rfl, h1, h2]
   ext i j

@@ -16,8 +16,9 @@ section Ind
 
 variable {R : Type} [CommRing R] {T : Type} [CommGroup T]
 
-theorem translate_mem {A : Subalgebra R (T → R)} (hA : IsHopfOrder A) {f : T → R} (hf : f ∈ A) (t : T) :
-    (fun h => f (t * h)) ∈ A := by
+theorem translate_mem
+    {A : Subalgebra R (T → R)} (hA : IsHopfOrder A) {f : T → R} (hf : f ∈ A) (t : T)
+    : (fun h => f (t * h)) ∈ A := by
   have key : ∀ g ∈ prodSpan A, (fun h => g (t, h)) ∈ A := by
     intro g hg
     induction hg using Submodule.span_induction with
@@ -29,10 +30,11 @@ theorem translate_mem {A : Subalgebra R (T → R)} (hA : IsHopfOrder A) {f : T �
     | smul r x _ hx => exact A.smul_mem hx r
   exact key _ (hA.comul f hf)
 
-
 omit [CommGroup T] in
-theorem mul_mem_prodSpan {A : Subalgebra R (T → R)} {a b : T → R} (ha : a ∈ A) (hb : b ∈ A)
-    {g : T × T → R} (hg : g ∈ prodSpan A) : (fun z => a z.1 * b z.2 * g z) ∈ prodSpan A := by
+theorem mul_mem_prodSpan
+    {A : Subalgebra R (T → R)} {a b : T → R} (ha : a ∈ A) (hb : b ∈ A)
+    {g : T × T → R} (hg : g ∈ prodSpan A)
+    : (fun z => a z.1 * b z.2 * g z) ∈ prodSpan A := by
   induction hg using Submodule.span_induction with
   | mem x h =>
     obtain ⟨a', ha', b', hb', rfl⟩ := h
@@ -57,25 +59,25 @@ theorem mul_mem_prodSpan {A : Subalgebra R (T → R)} {a b : T → R} (ha : a �
     simp only [Pi.smul_apply, smul_eq_mul]
     ring
 
+open Classical in
+def extZero (H : Subgroup T) (t : T) (a : H → R) : T → R := fun x =>
+  if h : t⁻¹ * x ∈ H then a ⟨_, h⟩ else 0
 
 open Classical in
-def extZero (H : Subgroup T) (t : T) (a : H → R) : T → R :=
-  fun x => if h : t⁻¹ * x ∈ H then a ⟨_, h⟩ else 0
+def extZero₂ (H : Subgroup T) (t s : T) (g : H × H → R) : T × T → R := fun z =>
+  if h : t⁻¹ * z.1 ∈ H ∧ s⁻¹ * z.2 ∈ H then g (⟨_, h.1⟩, ⟨_, h.2⟩) else 0
 
-
-open Classical in
-def extZero₂ (H : Subgroup T) (t s : T) (g : H × H → R) : T × T → R :=
-  fun z => if h : t⁻¹ * z.1 ∈ H ∧ s⁻¹ * z.2 ∈ H then g (⟨_, h.1⟩, ⟨_, h.2⟩) else 0
-
-theorem extZero_mem {H : Subgroup T} {A : Subalgebra R (H → R)} (hA : IsHopfOrder A) (t : T) {a : H → R}
-    (ha : a ∈ A) : extZero H t a ∈ indOrder H.subtype A := by
+theorem extZero_mem
+    {H : Subgroup T} {A : Subalgebra R (H → R)} (hA : IsHopfOrder A)
+    (t : T)
+    {a : H → R} (ha : a ∈ A)
+    : extZero H t a ∈ indOrder H.subtype A := by
   intro u
   by_cases hu : t⁻¹ * u ∈ H
   · have := translate_mem hA ha ⟨_, hu⟩
     convert this using 1
     funext h
-    have h1 : t⁻¹ * (u * H.subtype h) ∈ H := by
-      rw [← mul_assoc]; exact H.mul_mem hu h.2
+    have h1 : t⁻¹ * (u * H.subtype h) ∈ H := by rw [← mul_assoc]; exact H.mul_mem hu h.2
     simp only [extZero]
     rw [dite_eq_left h1]
     congr 1
@@ -91,8 +93,11 @@ theorem extZero_mem {H : Subgroup T} {A : Subalgebra R (H → R)} (hA : IsHopfOr
     rw [this]
     exact A.zero_mem
 
-theorem extZero₂_mem {H : Subgroup T} {A : Subalgebra R (H → R)} (hA : IsHopfOrder A) (t s : T)
-    {g : H × H → R} (hg : g ∈ prodSpan A) : extZero₂ H t s g ∈ prodSpan (indOrder H.subtype A) := by
+theorem extZero₂_mem
+    {H : Subgroup T} {A : Subalgebra R (H → R)} (hA : IsHopfOrder A)
+    (t s : T)
+    {g : H × H → R} (hg : g ∈ prodSpan A)
+    : extZero₂ H t s g ∈ prodSpan (indOrder H.subtype A) := by
   induction hg using Submodule.span_induction with
   | mem x h =>
     obtain ⟨a, ha, b, hb, rfl⟩ := h
@@ -115,9 +120,13 @@ theorem extZero₂_mem {H : Subgroup T} {A : Subalgebra R (H → R)} (hA : IsHop
     have := Submodule.smul_mem _ r hx
     convert this using 1
     funext z
-    simp [extZero₂] 
+    simp [extZero₂]
 
-theorem pair_ind : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T] [Finite T] (H : Subgroup T) (A : Subalgebra R (H → R)) (β : T →* T →* Rˣ), IsHopfOrder A → (fun z : H × H => ((β z.1 z.2 : Rˣ) : R)) ∈ prodSpan A → (fun z : T × T => ((β z.1 z.2 : Rˣ) : R)) ∈ prodSpan (indOrder H.subtype A) := by
+theorem pair_ind
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (T : Type) [CommGroup T]
+        [Finite T] (H : Subgroup T) (A : Subalgebra R (H → R)) (β : T →* T →* Rˣ),
+      IsHopfOrder A → (fun z : H × H => ((β z.1 z.2 : Rˣ) : R)) ∈ prodSpan A
+        → (fun z : T × T => ((β z.1 z.2 : Rˣ) : R)) ∈ prodSpan (indOrder H.subtype A) := by
   intro R _ _ _ T _ _ H A β hA hβ
   classical
   have := Fintype.ofFinite (T ⧸ H)
@@ -134,19 +143,22 @@ theorem pair_ind : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed 
   have key : ∀ (c : T ⧸ H) (x : T), c.out⁻¹ * x ∈ H ↔ c = (x : T ⧸ H) := by
     intro c x
     rw [← QuotientGroup.eq, QuotientGroup.out_eq']
-  have e : (fun z : T × T => ((β z.1 z.2 : Rˣ) : R)) = ∑ c : (T ⧸ H) × (T ⧸ H),
-      extZero₂ H c.1.out c.2.out (fun w : H × H => ((β (c.1.out * w.1) (c.2.out * w.2) : Rˣ) : R)) := by
-    funext z
-    rw [Finset.sum_apply, Finset.sum_eq_single ((z.1 : T ⧸ H), (z.2 : T ⧸ H))]
-    · simp only [extZero₂]
-      rw [dite_eq_left ⟨(key _ _).2 rfl, (key _ _).2 rfl⟩]
-      simp only [mul_inv_cancel_left]
-    · intro c _ hc
-      simp only [extZero₂]
-      rw [dite_eq_right]
-      rintro ⟨a, b⟩
-      exact hc (Prod.ext ((key _ _).1 a) ((key _ _).1 b))
-    · simp
+  have e
+      : (fun z : T × T => ((β z.1 z.2 : Rˣ) : R))
+        = ∑ c : (T ⧸ H) × (T ⧸ H),
+          extZero₂ H c.1.out c.2.out (fun w : H × H => ((β (c.1.out * w.1) (c.2.out * w.2) : Rˣ) : R)) :=
+    by
+      funext z
+      rw [Finset.sum_apply, Finset.sum_eq_single ((z.1 : T ⧸ H), (z.2 : T ⧸ H))]
+      · simp only [extZero₂]
+        rw [dite_eq_left ⟨(key _ _).2 rfl, (key _ _).2 rfl⟩]
+        simp only [mul_inv_cancel_left]
+      · intro c _ hc
+        simp only [extZero₂]
+        rw [dite_eq_right]
+        rintro ⟨a, b⟩
+        exact hc (Prod.ext ((key _ _).1 a) ((key _ _).1 b))
+      · simp
   rw [e]
   exact Submodule.sum_mem _ fun c _ => extZero₂_mem hA _ _ (h1 _ _)
 
@@ -156,13 +168,13 @@ section Val
 
 variable {C : Type} [Field C] {v : Valuation C NNReal} {O : Type} [CommRing O] [Algebra O C]
 
-theorem mem_maximalIdeal_iff [IsLocalRing O] (hv : v.Integers O) (x : O) :
-    x ∈ IsLocalRing.maximalIdeal O ↔ v (algebraMap O C x) < 1 := by
+theorem mem_maximalIdeal_iff [IsLocalRing O] (hv : v.Integers O) (x : O)
+    : x ∈ IsLocalRing.maximalIdeal O ↔ v (algebraMap O C x) < 1 := by
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, hv.isUnit_iff_valuation_eq_one]
   exact ⟨fun h => lt_of_le_of_ne (hv.map_le_one x) h, fun h => h.ne⟩
 
-theorem prime_eq_bot_or_maximal [IsLocalRing O] (hv : v.Integers O) (P : Ideal O) [hP : P.IsPrime] :
-    P = ⊥ ∨ P = IsLocalRing.maximalIdeal O := by
+theorem prime_eq_bot_or_maximal [IsLocalRing O] (hv : v.Integers O) (P : Ideal O) [hP : P.IsPrime]
+    : P = ⊥ ∨ P = IsLocalRing.maximalIdeal O := by
   by_cases h : P = ⊥
   · exact Or.inl h
   right
@@ -177,8 +189,12 @@ theorem henselian [IsAlgClosed C] [IsLocalRing O] (hv : v.Integers O) : Henselia
   is_henselian f hf a₀ h₀ _ := by
     rw [mem_maximalIdeal_iff hv] at h₀
     have hm : (f.map (algebraMap O C)).Monic := hf.map _
-    have e := (IsAlgClosed.splits (f.map (algebraMap O C))).eval_eq_prod_roots_of_monic hm (algebraMap O C a₀)
-    rw [Polynomial.eval_map_algebraMap, Polynomial.aeval_algebraMap_apply, Polynomial.coe_aeval_eq_eval] at e
+    have e :=
+      (IsAlgClosed.splits (f.map (algebraMap O C))).eval_eq_prod_roots_of_monic hm
+        (algebraMap O C a₀)
+    rw [Polynomial.eval_map_algebraMap, Polynomial.aeval_algebraMap_apply,
+        Polynomial.coe_aeval_eq_eval]
+      at e
     have : ∃ r ∈ (f.map (algebraMap O C)).roots, v (algebraMap O C a₀ - r) < 1 := by
       by_contra hne
       push Not at hne
@@ -209,7 +225,8 @@ theorem lev_surjective (p n : ℕ) : Function.Surjective (lev p n : La → LevGr
   obtain ⟨a, ha⟩ := Submodule.Quotient.mk_surjective _ t.toAdd
   exact ⟨a, congrArg Multiplicative.ofAdd ha⟩
 
-theorem finite_levGrp [Module.Finite ℤ La] {p : ℕ} (hp : p ≠ 0) (n : ℕ) : Finite (LevGrp La p n) := by
+theorem finite_levGrp [Module.Finite ℤ La] {p : ℕ} (hp : p ≠ 0) (n : ℕ)
+    : Finite (LevGrp La p n) := by
   have : Finite (La ⧸ LinearMap.range ((p ^ n) • (LinearMap.id : La →ₗ[ℤ] La))) := by
     refine Module.finite_of_fg_torsion _ fun x => ?_
     obtain ⟨a, rfl⟩ := Submodule.Quotient.mk_surjective _ x
@@ -219,8 +236,9 @@ theorem finite_levGrp [Module.Finite ℤ La] {p : ℕ} (hp : p ≠ 0) (n : ℕ) 
     exact ⟨a, by simp only [LinearMap.smul_apply, LinearMap.id_apply, natCast_zsmul]⟩
   infer_instance
 
-theorem exists_bichar {O : Type} [CommRing O] (p n : ℕ) (B : La →ₗ[ℤ] La →ₗ[ℤ] ℤ) (ζ : Oˣ) (hζ : ζ ^ p ^ n = 1) :
-    ∃ β : LevGrp La p n →* LevGrp La p n →* Oˣ, ∀ a b, β (lev p n a) (lev p n b) = ζ ^ B a b := by
+theorem exists_bichar
+    {O : Type} [CommRing O] (p n : ℕ) (B : La →ₗ[ℤ] La →ₗ[ℤ] ℤ) (ζ : Oˣ) (hζ : ζ ^ p ^ n = 1)
+    : ∃ β : LevGrp La p n →* LevGrp La p n →* Oˣ, ∀ a b, β (lev p n a) (lev p n b) = ζ ^ B a b := by
   let N := LinearMap.range ((p ^ n) • (LinearMap.id : La →ₗ[ℤ] La))
   let z : ℤ →ₗ[ℤ] Additive Oˣ := LinearMap.toSpanSingleton ℤ _ (Additive.ofMul ζ)
   have hz : ∀ k : ℤ, z ((p ^ n) • k) = 0 := by
@@ -228,26 +246,34 @@ theorem exists_bichar {O : Type} [CommRing O] (p n : ℕ) (B : La →ₗ[ℤ] La
     rw [map_nsmul, LinearMap.toSpanSingleton_apply, smul_comm, ← ofMul_pow, hζ]
     simp
   let B' : La →ₗ[ℤ] La →ₗ[ℤ] Additive Oˣ := B.compr₂ z
-  let B'' : (La ⧸ N) →ₗ[ℤ] (La ⧸ N) →ₗ[ℤ] Additive Oˣ := B'.liftQ₂ N N
-    (by
-      rintro _ ⟨a, rfl⟩
-      rw [LinearMap.mem_ker]
-      ext b
-      simp only [B', LinearMap.smul_apply, LinearMap.id_apply, LinearMap.compr₂_apply, map_nsmul,
-        LinearMap.zero_apply]
-      rw [← map_nsmul, hz])
-    (by
-      rintro _ ⟨a, rfl⟩
-      rw [LinearMap.mem_ker]
-      ext b
-      simp only [B', LinearMap.smul_apply, LinearMap.id_apply, LinearMap.compr₂_apply, map_nsmul,
-        LinearMap.zero_apply, LinearMap.flip_apply]
-      rw [← map_nsmul, hz])
-  refine ⟨{ toFun := fun x => { toFun := fun y => (B'' x.toAdd y.toAdd).toMul
-                                map_one' := by simp
-                                map_mul' := by simp }
-            map_one' := by ext; simp
-            map_mul' := by intros; ext; simp }, fun a b => ?_⟩
+  let B'' : (La ⧸ N) →ₗ[ℤ] (La ⧸ N) →ₗ[ℤ] Additive Oˣ :=
+    B'.liftQ₂ N N
+      (by
+        rintro _ ⟨a, rfl⟩
+        rw [LinearMap.mem_ker]
+        ext b
+        simp only [B', LinearMap.smul_apply, LinearMap.id_apply, LinearMap.compr₂_apply, map_nsmul,
+          LinearMap.zero_apply]
+        rw [← map_nsmul, hz])
+      (by
+        rintro _ ⟨a, rfl⟩
+        rw [LinearMap.mem_ker]
+        ext b
+        simp only [B', LinearMap.smul_apply, LinearMap.id_apply, LinearMap.compr₂_apply, map_nsmul,
+          LinearMap.zero_apply, LinearMap.flip_apply]
+        rw [← map_nsmul, hz])
+  refine ⟨
+    {
+      toFun := fun x => {
+        toFun := fun y => (B'' x.toAdd y.toAdd).toMul
+        map_one' := by simp
+        map_mul' := by simp
+      }
+      map_one' := by ext; simp
+      map_mul' := by intros; ext; simp
+    },
+    fun a b => ?_
+  ⟩
   change (z (B a b)).toMul = _
   rw [LinearMap.toSpanSingleton_apply, ← ofMul_zpow]
   rfl

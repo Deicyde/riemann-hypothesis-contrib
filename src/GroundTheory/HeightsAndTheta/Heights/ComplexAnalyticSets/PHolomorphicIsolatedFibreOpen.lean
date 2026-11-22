@@ -12,8 +12,8 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology Metric
 
-theorem HolomorphicIsolatedFibreOpen.proof (hPS : ProperHolomorphicSurjective.Statement) :
-    HolomorphicIsolatedFibreOpen.Statement := by
+theorem HolomorphicIsolatedFibreOpen.proof (hPS : ProperHolomorphicSurjective.Statement)
+    : HolomorphicIsolatedFibreOpen.Statement := by
   intro k U g u hU hu hg ⟨W, hW, hiso⟩ V hV
   obtain ⟨r, hr, hrsub⟩ : ∃ r > 0, closedBall u r ⊆ U ∩ W ∩ V :=
     nhds_basis_closedBall.mem_iff.1 (Filter.inter_mem (Filter.inter_mem (hU.mem_nhds hu) hW) hV)
@@ -37,8 +37,9 @@ theorem HolomorphicIsolatedFibreOpen.proof (hPS : ProperHolomorphicSurjective.St
     · exact (hεsub hgv ⟨v, mem_sphere.2 h, rfl⟩).elim
   have hΩ : IsOpen (ball u r ∩ g ⁻¹' ball (g u) ε) :=
     (hgc.mono ball_subset_closedBall).isOpen_inter_preimage isOpen_ball isOpen_ball
-  have hproper : ∀ L ⊆ ball (g u) ε, IsCompact L →
-      IsCompact ((ball u r ∩ g ⁻¹' ball (g u) ε) ∩ g ⁻¹' L) := by
+  have hproper
+      : ∀ L ⊆ ball (g u) ε,
+        IsCompact L → IsCompact ((ball u r ∩ g ⁻¹' ball (g u) ε) ∩ g ⁻¹' L) := by
     intro L hLD hL
     have heq : (ball u r ∩ g ⁻¹' ball (g u) ε) ∩ g ⁻¹' L = closedBall u r ∩ g ⁻¹' L := by
       ext v
@@ -50,9 +51,17 @@ theorem HolomorphicIsolatedFibreOpen.proof (hPS : ProperHolomorphicSurjective.St
     rw [heq]
     exact (isCompact_closedBall u r).of_isClosed_subset
       (hgc.preimage_isClosed_of_isClosed isClosed_closedBall hL.isClosed) Set.inter_subset_left
-  have hsurj := hPS k _ _ g hΩ ⟨u, by exact Set.mem_preimage.mpr (mem_ball_self hr), by exact Set.mem_preimage.mpr (mem_ball_self hε)⟩ isOpen_ball
-    (convex_ball _ _).isPreconnected (hg.mono fun x hx => (hrsub (ball_subset_closedBall hx.1)).1.1)
-    (fun x hx => hx.2) hproper
+  have hsurj :=
+    hPS k _ _ g hΩ
+      ⟨
+        u,
+        by exact Set.mem_preimage.mpr (mem_ball_self hr),
+        by exact Set.mem_preimage.mpr (mem_ball_self hε)
+      ⟩
+      isOpen_ball (convex_ball _ _).isPreconnected
+      (hg.mono fun x hx => (hrsub (ball_subset_closedBall hx.1)).1.1)
+      (fun x hx => hx.2)
+      hproper
   refine Filter.mem_of_superset (ball_mem_nhds _ hε) ?_
   rw [← hsurj]
   exact Set.image_mono fun x hx => (hrsub (ball_subset_closedBall hx.1)).2

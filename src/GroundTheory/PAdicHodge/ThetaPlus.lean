@@ -17,9 +17,9 @@ section Abstract
 
 variable {B : Type*} [CommRing B]
 
-theorem ker_adicCompletion_evalₐ {A : Type*} [CommRing A] {I : Ideal A} (fg : I.FG) (n : ℕ) :
-    RingHom.ker (AdicCompletion.evalₐ I n).toRingHom =
-      (I ^ n).map (algebraMap A (AdicCompletion I A)) := by
+theorem ker_adicCompletion_evalₐ {A : Type*} [CommRing A] {I : Ideal A} (fg : I.FG) (n : ℕ)
+    : RingHom.ker (AdicCompletion.evalₐ I n).toRingHom
+      = (I ^ n).map (algebraMap A (AdicCompletion I A)) := by
   ext x
   have h1 : I ^ n ≤ (I ^ n • ⊤ : Ideal A) := by simp
   have h2 : (I ^ n • ⊤ : Ideal A) ≤ I ^ n := by simp
@@ -38,8 +38,9 @@ theorem ker_adicCompletion_evalₐ {A : Type*} [CommRing A] {I : Ideal A} (fg : 
   · rw [← AdicCompletion.pow_smul_top_eq_ker_eval fg, Ideal.smul_top_eq_map]
     rfl
 
-theorem exists_eq_pow_mul_unit_of_isAdicComplete {π : B} [IsAdicComplete (span {π}) B]
-    (hmax : (span {π}).IsMaximal) {x : B} (hx : x ≠ 0) : ∃ (n : ℕ) (u : Bˣ), x = π ^ n * u := by
+theorem exists_eq_pow_mul_unit_of_isAdicComplete
+    {π : B} [IsAdicComplete (span {π}) B] (hmax : (span {π}).IsMaximal) {x : B} (hx : x ≠ 0)
+    : ∃ (n : ℕ) (u : Bˣ), x = π ^ n * u := by
   classical
   have := hmax
   have : IsLocalRing B := isLocalRing_of_isAdicComplete_maximal (span {π})
@@ -72,8 +73,9 @@ theorem exists_eq_pow_mul_unit_of_isAdicComplete {π : B} [IsAdicComplete (span 
     exact this ⟨c, by rw [pow_succ]; ring⟩
   exact ⟨k, hu.unit, rfl⟩
 
-theorem isDomain_of_isAdicComplete {π : B} [IsAdicComplete (span {π}) B]
-    (hmax : (span {π}).IsMaximal) (hpow : ∀ n : ℕ, π ^ n ≠ 0) : IsDomain B := by
+theorem isDomain_of_isAdicComplete
+    {π : B} [IsAdicComplete (span {π}) B] (hmax : (span {π}).IsMaximal) (hpow : ∀ n : ℕ, π ^ n ≠ 0)
+    : IsDomain B := by
   have : Nontrivial B := ⟨⟨1, 0, by simpa using hpow 0⟩⟩
   have : NoZeroDivisors B := by
     refine ⟨fun {x y} hxy => ?_⟩
@@ -86,10 +88,10 @@ theorem isDomain_of_isAdicComplete {π : B} [IsAdicComplete (span {π}) B]
     exact (Units.mul_left_eq_zero (u * v)).mp this
   exact NoZeroDivisors.to_isDomain B
 
-theorem isDiscreteValuationRing_of_isAdicComplete {π : B} [IsAdicComplete (span {π}) B]
-    (hmax : (span {π}).IsMaximal) (hpow : ∀ n : ℕ, π ^ n ≠ 0) :
-    haveI := isDomain_of_isAdicComplete hmax hpow;
-    IsDiscreteValuationRing B ∧ Irreducible π := by
+theorem isDiscreteValuationRing_of_isAdicComplete
+    {π : B} [IsAdicComplete (span {π}) B] (hmax : (span {π}).IsMaximal) (hpow : ∀ n : ℕ, π ^ n ≠ 0)
+    : haveI := isDomain_of_isAdicComplete hmax hpow
+      IsDiscreteValuationRing B ∧ Irreducible π := by
   have := isDomain_of_isAdicComplete hmax hpow
   have := hmax
   have : IsLocalRing B := isLocalRing_of_isAdicComplete_maximal (span {π})
@@ -123,8 +125,9 @@ end Abstract
 
 section General
 
-variable (R : Type*) [CommRing R] (p : ℕ) [Fact p.Prime] [Fact ¬IsUnit (p : R)]
-  [IsAdicComplete (span {(p : R)}) R]
+variable
+  (R : Type*) [CommRing R]
+  (p : ℕ) [Fact p.Prime] [Fact ¬ IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
 
 local notation "𝕎R♭" => WittVector p (PreTilt R p)
 local notation "𝔸" => Localization.Away (p : 𝕎R♭)
@@ -132,55 +135,54 @@ local notation "𝔸" => Localization.Away (p : 𝕎R♭)
 def toBDeRhamPlus : 𝔸 →+* BDeRhamPlus R p :=
   algebraMap 𝔸 (AdicCompletion (RingHom.ker (fontaineThetaInvertP R p)) 𝔸)
 
-def wittToBDeRhamPlus : 𝕎R♭ →+* BDeRhamPlus R p :=
-  (toBDeRhamPlus R p).comp (algebraMap 𝕎R♭ 𝔸)
+def wittToBDeRhamPlus : 𝕎R♭ →+* BDeRhamPlus R p := (toBDeRhamPlus R p).comp (algebraMap 𝕎R♭ 𝔸)
 
 def thetaBDeRhamPlus : BDeRhamPlus R p →+* Localization.Away (p : R) :=
   (RingHom.kerLift (fontaineThetaInvertP R p)).comp
     (AdicCompletion.evalOneₐ (RingHom.ker (fontaineThetaInvertP R p))).toRingHom
 
 @[simp]
-theorem fontaineThetaInvertP_algebraMap (x : 𝕎R♭) :
-    fontaineThetaInvertP R p (algebraMap 𝕎R♭ 𝔸 x) =
-      algebraMap R (Localization.Away (p : R)) (fontaineTheta R p x) :=
+theorem fontaineThetaInvertP_algebraMap (x : 𝕎R♭)
+    : fontaineThetaInvertP R p (algebraMap 𝕎R♭ 𝔸 x)
+      = algebraMap R (Localization.Away (p : R)) (fontaineTheta R p x) :=
   IsLocalization.lift_eq _ x
 
 @[simp]
-theorem thetaBDeRhamPlus_wittToBDeRhamPlus (x : 𝕎R♭) :
-    thetaBDeRhamPlus R p (wittToBDeRhamPlus R p x) =
-      algebraMap R (Localization.Away (p : R)) (fontaineTheta R p x) :=
+theorem thetaBDeRhamPlus_wittToBDeRhamPlus (x : 𝕎R♭)
+    : thetaBDeRhamPlus R p (wittToBDeRhamPlus R p x)
+      = algebraMap R (Localization.Away (p : R)) (fontaineTheta R p x) :=
   fontaineThetaInvertP_algebraMap R p x
 
-theorem surjective_fontaineThetaInvertP (hθ : Function.Surjective (fontaineTheta R p)) :
-    Function.Surjective (fontaineThetaInvertP R p) := by
+theorem surjective_fontaineThetaInvertP (hθ : Function.Surjective (fontaineTheta R p))
+    : Function.Surjective (fontaineThetaInvertP R p) := by
   intro z
   obtain ⟨⟨r, ⟨_, n, rfl⟩⟩, rfl⟩ := IsLocalization.mk'_surjective (Submonoid.powers (p : R)) z
   obtain ⟨w, rfl⟩ := hθ r
   refine ⟨IsLocalization.mk' 𝔸 w (⟨(p : 𝕎R♭) ^ n, n, rfl⟩ : Submonoid.powers (p : 𝕎R♭)), ?_⟩
   symm
-  have hpn : algebraMap R (Localization.Away (p : R)) ((p : R) ^ n) =
-      fontaineThetaInvertP R p (algebraMap 𝕎R♭ 𝔸 ((p : 𝕎R♭) ^ n)) := by
+  have hpn
+      : algebraMap R (Localization.Away (p : R)) ((p : R) ^ n)
+        = fontaineThetaInvertP R p (algebraMap 𝕎R♭ 𝔸 ((p : 𝕎R♭) ^ n)) := by
     rw [fontaineThetaInvertP_algebraMap]
     simp
   rw [IsLocalization.mk'_eq_iff_eq_mul]
   simp only
   rw [hpn, ← map_mul, IsLocalization.mk'_spec, fontaineThetaInvertP_algebraMap]
 
-theorem surjective_thetaBDeRhamPlus (hF : Function.Surjective (frobenius (ModP R p) p)) :
-    Function.Surjective (thetaBDeRhamPlus R p) := by
+theorem surjective_thetaBDeRhamPlus (hF : Function.Surjective (frobenius (ModP R p) p))
+    : Function.Surjective (thetaBDeRhamPlus R p) := by
   intro z
   obtain ⟨x, rfl⟩ := surjective_fontaineThetaInvertP R p (surjective_fontaineTheta hF) z
   exact ⟨toBDeRhamPlus R p x, rfl⟩
 
 variable {R p}
 
-theorem ker_fontaineThetaInvertP {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) :
-    RingHom.ker (fontaineThetaInvertP R p) = span {algebraMap 𝕎R♭ 𝔸 ξ} := by
+theorem ker_fontaineThetaInvertP {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ})
+    : RingHom.ker (fontaineThetaInvertP R p) = span {algebraMap 𝕎R♭ 𝔸 ξ} := by
   apply le_antisymm
   · intro z hz
     rw [RingHom.mem_ker] at hz
-    obtain ⟨⟨w, ⟨_, n, rfl⟩⟩, rfl⟩ :=
-      IsLocalization.mk'_surjective (Submonoid.powers (p : 𝕎R♭)) z
+    obtain ⟨⟨w, ⟨_, n, rfl⟩⟩, rfl⟩ := IsLocalization.mk'_surjective (Submonoid.powers (p : 𝕎R♭)) z
     have h1 : algebraMap R (Localization.Away (p : R)) (fontaineTheta R p w) = 0 := by
       rw [← fontaineThetaInvertP_algebraMap,
         ← IsLocalization.mk'_spec 𝔸 w (⟨(p : 𝕎R♭) ^ n, n, rfl⟩ : Submonoid.powers (p : 𝕎R♭)),
@@ -192,15 +194,18 @@ theorem ker_fontaineThetaInvertP {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineThe
       exact hk
     obtain ⟨c, hc⟩ := mem_span_singleton'.mp h2
     have hu : IsUnit (algebraMap 𝕎R♭ 𝔸 ((p : 𝕎R♭) ^ k * (p : 𝕎R♭) ^ n)) :=
-      IsLocalization.map_units 𝔸 (⟨_, mul_mem (pow_mem (Submonoid.mem_powers _) k)
-        (pow_mem (Submonoid.mem_powers _) n)⟩ : Submonoid.powers (p : 𝕎R♭))
+      IsLocalization.map_units 𝔸
+        (⟨_, mul_mem (pow_mem (Submonoid.mem_powers _) k) (pow_mem (Submonoid.mem_powers _) n)⟩
+          : Submonoid.powers (p : 𝕎R♭))
     rw [mem_span_singleton, ← hu.dvd_mul_right]
     refine ⟨algebraMap 𝕎R♭ 𝔸 c, ?_⟩
-    calc IsLocalization.mk' 𝔸 w (⟨(p : 𝕎R♭) ^ n, n, rfl⟩ : Submonoid.powers (p : 𝕎R♭)) *
-          algebraMap 𝕎R♭ 𝔸 ((p : 𝕎R♭) ^ k * (p : 𝕎R♭) ^ n)
-        = algebraMap 𝕎R♭ 𝔸 ((p : 𝕎R♭) ^ k) *
-          (IsLocalization.mk' 𝔸 w (⟨(p : 𝕎R♭) ^ n, n, rfl⟩ : Submonoid.powers (p : 𝕎R♭)) *
-            algebraMap 𝕎R♭ 𝔸 ((p : 𝕎R♭) ^ n)) := by rw [map_mul]; ring
+    calc
+      IsLocalization.mk' 𝔸 w (⟨(p : 𝕎R♭) ^ n, n, rfl⟩ : Submonoid.powers (p : 𝕎R♭))
+            * algebraMap 𝕎R♭ 𝔸 ((p : 𝕎R♭) ^ k * (p : 𝕎R♭) ^ n)
+          = algebraMap 𝕎R♭ 𝔸 ((p : 𝕎R♭) ^ k)
+            * (IsLocalization.mk' 𝔸 w (⟨(p : 𝕎R♭) ^ n, n, rfl⟩ : Submonoid.powers (p : 𝕎R♭))
+              * algebraMap 𝕎R♭ 𝔸 ((p : 𝕎R♭) ^ n)) := by
+        rw [map_mul]; ring
       _ = algebraMap 𝕎R♭ 𝔸 ((p : 𝕎R♭) ^ k * w) := by rw [IsLocalization.mk'_spec, map_mul]
       _ = algebraMap 𝕎R♭ 𝔸 ξ * algebraMap 𝕎R♭ 𝔸 c := by rw [← hc, map_mul, mul_comm]
   · rw [span_le, Set.singleton_subset_iff, SetLike.mem_coe, RingHom.mem_ker,
@@ -209,54 +214,60 @@ theorem ker_fontaineThetaInvertP {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineThe
     rw [RingHom.mem_ker] at this
     rw [this, map_zero]
 
-theorem fg_ker_fontaineThetaInvertP {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) :
-    (RingHom.ker (fontaineThetaInvertP R p)).FG :=
+theorem fg_ker_fontaineThetaInvertP {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ})
+    : (RingHom.ker (fontaineThetaInvertP R p)).FG :=
   ⟨{algebraMap 𝕎R♭ 𝔸 ξ}, by rw [ker_fontaineThetaInvertP hξ, Finset.coe_singleton]⟩
 
-theorem ker_thetaBDeRhamPlus {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) :
-    RingHom.ker (thetaBDeRhamPlus R p) = span {wittToBDeRhamPlus R p ξ} := by
+theorem ker_thetaBDeRhamPlus {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ})
+    : RingHom.ker (thetaBDeRhamPlus R p) = span {wittToBDeRhamPlus R p ξ} := by
   have h := AdicCompletion.ker_evalOneₐ_eq_map _ (fg_ker_fontaineThetaInvertP hξ)
-  have h' : span {wittToBDeRhamPlus R p ξ} =
-      (RingHom.ker (fontaineThetaInvertP R p)).map (toBDeRhamPlus R p) := by
+  have h'
+      : span {wittToBDeRhamPlus R p ξ}
+        = (RingHom.ker (fontaineThetaInvertP R p)).map (toBDeRhamPlus R p) := by
     rw [ker_fontaineThetaInvertP hξ, Ideal.map_span, Set.image_singleton]
     rfl
   rw [h']
   ext x
-  have h2 : ∀ y : AdicCompletion (RingHom.ker (fontaineThetaInvertP R p)) 𝔸,
-      y ∈ (RingHom.ker (fontaineThetaInvertP R p)).map
-        (algebraMap 𝔸 (AdicCompletion (RingHom.ker (fontaineThetaInvertP R p)) 𝔸)) ↔
-        AdicCompletion.evalOneₐ (RingHom.ker (fontaineThetaInvertP R p)) y = 0 := fun y => by
+  have h2
+      : ∀ y : AdicCompletion (RingHom.ker (fontaineThetaInvertP R p)) 𝔸,
+        y ∈ (RingHom.ker (fontaineThetaInvertP R p)).map
+            (algebraMap 𝔸 (AdicCompletion (RingHom.ker (fontaineThetaInvertP R p)) 𝔸))
+          ↔ AdicCompletion.evalOneₐ (RingHom.ker (fontaineThetaInvertP R p)) y = 0 := fun y => by
     rw [← h, RingHom.mem_ker]
     rfl
-  have hx : thetaBDeRhamPlus R p x = 0 ↔
-      AdicCompletion.evalOneₐ (RingHom.ker (fontaineThetaInvertP R p)) x = 0 :=
+  have hx
+      : thetaBDeRhamPlus R p x = 0
+        ↔ AdicCompletion.evalOneₐ (RingHom.ker (fontaineThetaInvertP R p)) x = 0 :=
     map_eq_zero_iff (RingHom.kerLift (fontaineThetaInvertP R p)) (RingHom.kerLift_injective _)
   exact (RingHom.mem_ker.trans hx).trans (h2 x).symm
 
-theorem isAdicComplete_bDeRhamPlus {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) :
-    IsAdicComplete (span {wittToBDeRhamPlus R p ξ}) (BDeRhamPlus R p) := by
+theorem isAdicComplete_bDeRhamPlus {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ})
+    : IsAdicComplete (span {wittToBDeRhamPlus R p ξ}) (BDeRhamPlus R p) := by
   have h := AdicCompletion.isAdicComplete_self _ (fg_ker_fontaineThetaInvertP hξ)
-  have h' : span {wittToBDeRhamPlus R p ξ} =
-      (RingHom.ker (fontaineThetaInvertP R p)).map (toBDeRhamPlus R p) := by
+  have h'
+      : span {wittToBDeRhamPlus R p ξ}
+        = (RingHom.ker (fontaineThetaInvertP R p)).map (toBDeRhamPlus R p) := by
     rw [ker_fontaineThetaInvertP hξ, Ideal.map_span, Set.image_singleton]
     rfl
   rw [h']
   exact h
 
-theorem toBDeRhamPlus_mem_span_pow_iff {ξ : 𝕎R♭}
-    (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) (a : 𝔸) (n : ℕ) :
-    toBDeRhamPlus R p a ∈ span {wittToBDeRhamPlus R p ξ ^ n} ↔ algebraMap 𝕎R♭ 𝔸 ξ ^ n ∣ a := by
+theorem toBDeRhamPlus_mem_span_pow_iff
+    {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) (a : 𝔸) (n : ℕ)
+    : toBDeRhamPlus R p a ∈ span {wittToBDeRhamPlus R p ξ ^ n} ↔ algebraMap 𝕎R♭ 𝔸 ξ ^ n ∣ a := by
   have h := ker_adicCompletion_evalₐ (fg_ker_fontaineThetaInvertP hξ) n
-  have h' : span {wittToBDeRhamPlus R p ξ ^ n} =
-      (RingHom.ker (fontaineThetaInvertP R p) ^ n).map (toBDeRhamPlus R p) := by
-    rw [ker_fontaineThetaInvertP hξ, Ideal.span_singleton_pow, Ideal.map_span,
-      Set.image_singleton, map_pow]
+  have h'
+      : span {wittToBDeRhamPlus R p ξ ^ n}
+        = (RingHom.ker (fontaineThetaInvertP R p) ^ n).map (toBDeRhamPlus R p) := by
+    rw [ker_fontaineThetaInvertP hξ, Ideal.span_singleton_pow, Ideal.map_span, Set.image_singleton,
+      map_pow]
     rfl
   rw [h']
-  have h2 : ∀ y : AdicCompletion (RingHom.ker (fontaineThetaInvertP R p)) 𝔸,
-      y ∈ (RingHom.ker (fontaineThetaInvertP R p) ^ n).map
-        (algebraMap 𝔸 (AdicCompletion (RingHom.ker (fontaineThetaInvertP R p)) 𝔸)) ↔
-        AdicCompletion.evalₐ (RingHom.ker (fontaineThetaInvertP R p)) n y = 0 := fun y => by
+  have h2
+      : ∀ y : AdicCompletion (RingHom.ker (fontaineThetaInvertP R p)) 𝔸,
+        y ∈ (RingHom.ker (fontaineThetaInvertP R p) ^ n).map
+            (algebraMap 𝔸 (AdicCompletion (RingHom.ker (fontaineThetaInvertP R p)) 𝔸))
+          ↔ AdicCompletion.evalₐ (RingHom.ker (fontaineThetaInvertP R p)) n y = 0 := fun y => by
     rw [← h, RingHom.mem_ker]
     rfl
   refine (h2 (algebraMap 𝔸 _ a)).trans ?_
@@ -264,10 +275,10 @@ theorem toBDeRhamPlus_mem_span_pow_iff {ξ : 𝕎R♭}
     AdicCompletion.evalₐ_of, Ideal.Quotient.eq_zero_iff_mem, ker_fontaineThetaInvertP hξ,
     Ideal.span_singleton_pow, mem_span_singleton]
 
-
 omit [IsAdicComplete (span {(p : R)}) R] in
-theorem eq_zero_of_algebraMap_mul_eq_zero {x : 𝕎R♭} (hx : x ∈ nonZeroDivisors 𝕎R♭) {y : 𝔸}
-    (h : algebraMap 𝕎R♭ 𝔸 x * y = 0) : y = 0 := by
+theorem eq_zero_of_algebraMap_mul_eq_zero
+    {x : 𝕎R♭} (hx : x ∈ nonZeroDivisors 𝕎R♭) {y : 𝔸} (h : algebraMap 𝕎R♭ 𝔸 x * y = 0)
+    : y = 0 := by
   obtain ⟨⟨w, s⟩, rfl⟩ := IsLocalization.mk'_surjective (Submonoid.powers (p : 𝕎R♭)) y
   rw [IsLocalization.mul_mk'_eq_mk'_of_mul, IsLocalization.mk'_eq_zero_iff] at h
   obtain ⟨m, hm⟩ := h
@@ -276,17 +287,21 @@ theorem eq_zero_of_algebraMap_mul_eq_zero {x : 𝕎R♭} (hx : x ∈ nonZeroDivi
   rw [← hm]
   ring
 
-theorem isMaximal_ker_thetaBDeRhamPlus (hF : Function.Surjective (frobenius (ModP R p) p))
-    (hK : IsField (Localization.Away (p : R))) : (RingHom.ker (thetaBDeRhamPlus R p)).IsMaximal :=
-  Ideal.Quotient.maximal_of_isField _ (MulEquiv.isField hK
-    (RingHom.quotientKerEquivOfSurjective (surjective_thetaBDeRhamPlus R p hF)).toMulEquiv)
+theorem isMaximal_ker_thetaBDeRhamPlus
+    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R)))
+    : (RingHom.ker (thetaBDeRhamPlus R p)).IsMaximal :=
+  Ideal.Quotient.maximal_of_isField _
+    (MulEquiv.isField hK
+      (RingHom.quotientKerEquivOfSurjective (surjective_thetaBDeRhamPlus R p hF)).toMulEquiv)
 
-theorem pow_wittToBDeRhamPlus_ne_zero [Nontrivial (Localization.Away (p : R))] {ξ : 𝕎R♭}
-    (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) (hξ0 : ξ ∈ nonZeroDivisors 𝕎R♭) (n : ℕ) :
-    wittToBDeRhamPlus R p ξ ^ n ≠ 0 := by
+theorem pow_wittToBDeRhamPlus_ne_zero
+    [Nontrivial (Localization.Away (p : R))]
+    {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) (hξ0 : ξ ∈ nonZeroDivisors 𝕎R♭)
+    (n : ℕ)
+    : wittToBDeRhamPlus R p ξ ^ n ≠ 0 := by
   intro h0
-  have hmem : toBDeRhamPlus R p (algebraMap 𝕎R♭ 𝔸 ξ ^ n) ∈
-      span {wittToBDeRhamPlus R p ξ ^ (n + 1)} := by
+  have hmem
+      : toBDeRhamPlus R p (algebraMap 𝕎R♭ 𝔸 ξ ^ n) ∈ span {wittToBDeRhamPlus R p ξ ^ (n + 1)} := by
     rw [map_pow]
     change wittToBDeRhamPlus R p ξ ^ n ∈ _
     rw [h0]
@@ -302,56 +317,58 @@ theorem pow_wittToBDeRhamPlus_ne_zero [Nontrivial (Localization.Away (p : R))] {
   rw [RingHom.mem_ker, map_one] at hone
   exact one_ne_zero hone
 
-theorem isLocalRing_bDeRhamPlus {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ})
-    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R))) :
-    IsLocalRing (BDeRhamPlus R p) := by
+theorem isLocalRing_bDeRhamPlus
+    {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ})
+    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R)))
+    : IsLocalRing (BDeRhamPlus R p) := by
   have := isAdicComplete_bDeRhamPlus hξ
   have : (span {wittToBDeRhamPlus R p ξ}).IsMaximal :=
     ker_thetaBDeRhamPlus hξ ▸ isMaximal_ker_thetaBDeRhamPlus hF hK
   exact isLocalRing_of_isAdicComplete_maximal (span {wittToBDeRhamPlus R p ξ})
 
-theorem isDomain_bDeRhamPlus {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ})
-    (hξ0 : ξ ∈ nonZeroDivisors 𝕎R♭) (hF : Function.Surjective (frobenius (ModP R p) p))
-    (hK : IsField (Localization.Away (p : R))) : IsDomain (BDeRhamPlus R p) := by
+theorem isDomain_bDeRhamPlus
+    {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) (hξ0 : ξ ∈ nonZeroDivisors 𝕎R♭)
+    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R)))
+    : IsDomain (BDeRhamPlus R p) := by
   have := isAdicComplete_bDeRhamPlus hξ
   have := hK.nontrivial
-  exact isDomain_of_isAdicComplete
-    (ker_thetaBDeRhamPlus hξ ▸ isMaximal_ker_thetaBDeRhamPlus hF hK)
+  exact isDomain_of_isAdicComplete (ker_thetaBDeRhamPlus hξ ▸ isMaximal_ker_thetaBDeRhamPlus hF hK)
     (pow_wittToBDeRhamPlus_ne_zero hξ hξ0)
 
-theorem isDiscreteValuationRing_bDeRhamPlus {ξ : 𝕎R♭}
-    (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) (hξ0 : ξ ∈ nonZeroDivisors 𝕎R♭)
-    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R))) :
-    haveI := isDomain_bDeRhamPlus hξ hξ0 hF hK;
-    IsDiscreteValuationRing (BDeRhamPlus R p) := by
+theorem isDiscreteValuationRing_bDeRhamPlus
+    {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) (hξ0 : ξ ∈ nonZeroDivisors 𝕎R♭)
+    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R)))
+    : haveI := isDomain_bDeRhamPlus hξ hξ0 hF hK
+      IsDiscreteValuationRing (BDeRhamPlus R p) := by
   have := isAdicComplete_bDeRhamPlus hξ
   have := hK.nontrivial
   exact (isDiscreteValuationRing_of_isAdicComplete
     (ker_thetaBDeRhamPlus hξ ▸ isMaximal_ker_thetaBDeRhamPlus hF hK)
     (pow_wittToBDeRhamPlus_ne_zero hξ hξ0)).1
 
-theorem irreducible_wittToBDeRhamPlus {ξ : 𝕎R♭}
-    (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) (hξ0 : ξ ∈ nonZeroDivisors 𝕎R♭)
-    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R))) :
-    Irreducible (wittToBDeRhamPlus R p ξ) := by
+theorem irreducible_wittToBDeRhamPlus
+    {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ}) (hξ0 : ξ ∈ nonZeroDivisors 𝕎R♭)
+    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R)))
+    : Irreducible (wittToBDeRhamPlus R p ξ) := by
   have := isAdicComplete_bDeRhamPlus hξ
   have := hK.nontrivial
   exact (isDiscreteValuationRing_of_isAdicComplete
     (ker_thetaBDeRhamPlus hξ ▸ isMaximal_ker_thetaBDeRhamPlus hF hK)
     (pow_wittToBDeRhamPlus_ne_zero hξ hξ0)).2
 
-theorem maximalIdeal_bDeRhamPlus {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ})
-    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R))) :
-    haveI := isLocalRing_bDeRhamPlus hξ hF hK;
-    maximalIdeal (BDeRhamPlus R p) = RingHom.ker (thetaBDeRhamPlus R p) :=
+theorem maximalIdeal_bDeRhamPlus
+    {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ})
+    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R)))
+    : haveI := isLocalRing_bDeRhamPlus hξ hF hK
+      maximalIdeal (BDeRhamPlus R p) = RingHom.ker (thetaBDeRhamPlus R p) :=
   haveI := isLocalRing_bDeRhamPlus hξ hF hK
   (IsLocalRing.eq_maximalIdeal (isMaximal_ker_thetaBDeRhamPlus hF hK)).symm
 
-theorem maximalIdeal_bDeRhamPlus_eq_span {ξ : 𝕎R♭}
-    (hξ : RingHom.ker (fontaineTheta R p) = span {ξ})
-    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R))) :
-    haveI := isLocalRing_bDeRhamPlus hξ hF hK;
-    maximalIdeal (BDeRhamPlus R p) = span {wittToBDeRhamPlus R p ξ} :=
+theorem maximalIdeal_bDeRhamPlus_eq_span
+    {ξ : 𝕎R♭} (hξ : RingHom.ker (fontaineTheta R p) = span {ξ})
+    (hF : Function.Surjective (frobenius (ModP R p) p)) (hK : IsField (Localization.Away (p : R)))
+    : haveI := isLocalRing_bDeRhamPlus hξ hF hK
+      maximalIdeal (BDeRhamPlus R p) = span {wittToBDeRhamPlus R p ξ} :=
   (maximalIdeal_bDeRhamPlus hξ hF hK).trans (ker_thetaBDeRhamPlus hξ)
 
 end General
@@ -398,25 +415,25 @@ theorem isField_away [CharZero K] : IsField (Localization.Away (p : 𝒪)) :=
 def thetaBDeRhamPlusField [CharZero K] : 𝔹 →+* K :=
   (awayEquiv (K := K) p).toRingEquiv.toRingHom.comp (thetaBDeRhamPlus 𝒪 p)
 
-theorem thetaBDeRhamPlusField_wittToBDeRhamPlus [CharZero K] (x : 𝕎𝒪♭) :
-    thetaBDeRhamPlusField p (wittToBDeRhamPlus 𝒪 p x) = (θ x : K) := by
+theorem thetaBDeRhamPlusField_wittToBDeRhamPlus [CharZero K] (x : 𝕎𝒪♭)
+    : thetaBDeRhamPlusField p (wittToBDeRhamPlus 𝒪 p x) = (θ x : K) := by
   simp only [thetaBDeRhamPlusField, RingHom.comp_apply, thetaBDeRhamPlus_wittToBDeRhamPlus]
   exact (awayEquiv (K := K) p).commutes (θ x)
 
-theorem surjective_thetaBDeRhamPlusField [CharZero K] :
-    Function.Surjective (thetaBDeRhamPlusField (K := K) p) :=
+theorem surjective_thetaBDeRhamPlusField [CharZero K]
+    : Function.Surjective (thetaBDeRhamPlusField (K := K) p) :=
   (awayEquiv (K := K) p).surjective.comp (surjective_thetaBDeRhamPlus 𝒪 p (surjective_frobenius p))
 
-theorem ker_thetaBDeRhamPlusField [CharZero K] :
-    RingHom.ker (thetaBDeRhamPlusField (K := K) p) = RingHom.ker (thetaBDeRhamPlus 𝒪 p) := by
+theorem ker_thetaBDeRhamPlusField [CharZero K]
+    : RingHom.ker (thetaBDeRhamPlusField (K := K) p) = RingHom.ker (thetaBDeRhamPlus 𝒪 p) := by
   ext x
   simp only [RingHom.mem_ker, thetaBDeRhamPlusField, RingHom.comp_apply]
   exact map_eq_zero_iff _ (awayEquiv (K := K) p).injective
 
 variable {p}
 
-theorem mem_nonZeroDivisors_of_ker_eq_span {ξ : 𝕎𝒪♭} (hξ : RingHom.ker θ = span {ξ}) :
-    ξ ∈ nonZeroDivisors 𝕎𝒪♭ := by
+theorem mem_nonZeroDivisors_of_ker_eq_span {ξ : 𝕎𝒪♭} (hξ : RingHom.ker θ = span {ξ})
+    : ξ ∈ nonZeroDivisors 𝕎𝒪♭ := by
   have := isDomain_preTilt (K := K) p
   have := isDomain_wittVector_preTilt K p
   refine mem_nonZeroDivisors_of_ne_zero fun h0 => ?_
@@ -425,15 +442,14 @@ theorem mem_nonZeroDivisors_of_ker_eq_span {ξ : 𝕎𝒪♭} (hξ : RingHom.ker
   rw [h₀, zero_coeff] at h1
   exact not_isUnit_zero h1
 
-
 variable (K p) in
 def kerThetaGenerator : 𝕎𝒪♭ :=
   haveI := isPrincipal_ker_fontaineTheta K p
   Submodule.IsPrincipal.generator (RingHom.ker θ)
 
-
 variable (K p) in
-theorem ker_fontaineTheta_eq_span_kerThetaGenerator : RingHom.ker θ = span {kerThetaGenerator K p} :=
+theorem ker_fontaineTheta_eq_span_kerThetaGenerator
+    : RingHom.ker θ = span {kerThetaGenerator K p} :=
   haveI := isPrincipal_ker_fontaineTheta K p
   (Submodule.IsPrincipal.span_singleton_generator (RingHom.ker θ)).symm
 
@@ -445,22 +461,24 @@ instance isDomain_bDeRhamPlus : IsDomain 𝔹 :=
     (surjective_frobenius p) (isField_away p)
 
 instance isDiscreteValuationRing_bDeRhamPlus : IsDiscreteValuationRing 𝔹 :=
-  GroundTheory.PAdicHodge.isDiscreteValuationRing_bDeRhamPlus (ker_fontaineTheta_eq_span_kerThetaGenerator K p)
+  GroundTheory.PAdicHodge.isDiscreteValuationRing_bDeRhamPlus
+    (ker_fontaineTheta_eq_span_kerThetaGenerator K p)
     (mem_nonZeroDivisors_of_ker_eq_span (ker_fontaineTheta_eq_span_kerThetaGenerator K p))
     (surjective_frobenius p) (isField_away p)
 
-theorem maximalIdeal_bDeRhamPlus :
-    maximalIdeal 𝔹 = RingHom.ker (thetaBDeRhamPlusField (K := K) p) := by
+theorem maximalIdeal_bDeRhamPlus
+    : maximalIdeal 𝔹 = RingHom.ker (thetaBDeRhamPlusField (K := K) p) := by
   rw [ker_thetaBDeRhamPlusField]
-  exact GroundTheory.PAdicHodge.maximalIdeal_bDeRhamPlus (ker_fontaineTheta_eq_span_kerThetaGenerator K p)
-    (surjective_frobenius p) (isField_away p)
+  exact GroundTheory.PAdicHodge.maximalIdeal_bDeRhamPlus
+    (ker_fontaineTheta_eq_span_kerThetaGenerator K p) (surjective_frobenius p) (isField_away p)
 
-theorem maximalIdeal_bDeRhamPlus_eq_span {ξ : 𝕎𝒪♭} (hξ : RingHom.ker θ = span {ξ}) :
-    maximalIdeal 𝔹 = span {wittToBDeRhamPlus 𝒪 p ξ} :=
-  GroundTheory.PAdicHodge.maximalIdeal_bDeRhamPlus_eq_span hξ (surjective_frobenius p) (isField_away p)
+theorem maximalIdeal_bDeRhamPlus_eq_span {ξ : 𝕎𝒪♭} (hξ : RingHom.ker θ = span {ξ})
+    : maximalIdeal 𝔹 = span {wittToBDeRhamPlus 𝒪 p ξ} :=
+  GroundTheory.PAdicHodge.maximalIdeal_bDeRhamPlus_eq_span hξ (surjective_frobenius p)
+    (isField_away p)
 
-theorem irreducible_wittToBDeRhamPlus {ξ : 𝕎𝒪♭} (hξ : RingHom.ker θ = span {ξ}) :
-    Irreducible (wittToBDeRhamPlus 𝒪 p ξ) :=
+theorem irreducible_wittToBDeRhamPlus {ξ : 𝕎𝒪♭} (hξ : RingHom.ker θ = span {ξ})
+    : Irreducible (wittToBDeRhamPlus 𝒪 p ξ) :=
   GroundTheory.PAdicHodge.irreducible_wittToBDeRhamPlus hξ (mem_nonZeroDivisors_of_ker_eq_span hξ)
     (surjective_frobenius p) (isField_away p)
 

@@ -7,10 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsAlgebra
 @[expose] public section
 
 open scoped MatrixGroups Matrix
-open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois UpperTheory.Kd.L
+open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois
+  UpperTheory.Kd.L
 
-theorem UpperTheory.normal_modularTowerTop_algebraModel :
-    ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε) (M : ℕ), M ≠ 0 → @Normal (topF X M) (topL X M) _ _ (algMdl X _ _) := by
+theorem UpperTheory.normal_modularTowerTop_algebraModel
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε) (M : ℕ),
+      M ≠ 0 → @Normal (topF X M) (topL X M) _ _ (algMdl X _ _) := by
   intro Ω _ _ _ ε X M hM
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
@@ -26,6 +28,8 @@ theorem UpperTheory.normal_modularTowerTop_algebraModel :
       exact pow_mem (IntermediateField.subset_adjoin ℚ _ (Set.mem_singleton _)) i
     · rw [IntermediateField.adjoin_simple_le_iff]
       exact IntermediateField.subset_adjoin ℚ _ hζ.pow_eq_one
-  have h := GlobalTheory.K4.LevNormal.normal Ω ε X (CongruenceSubgroup.Gamma M) M _ (Nat.pos_of_ne_zero hM) hζ le_rfl
+  have h :=
+    GlobalTheory.K4.LevNormal.normal Ω ε X (CongruenceSubgroup.Gamma M) M _ (Nat.pos_of_ne_zero hM)
+      hζ le_rfl
   rw [← hS] at h
   exact h

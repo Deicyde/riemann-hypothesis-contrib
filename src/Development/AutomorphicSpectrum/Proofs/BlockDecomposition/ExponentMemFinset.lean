@@ -13,8 +13,8 @@ open scoped NumberField.AdeleRing
 namespace GlobalTheory.CompanionTheory.Latexp
 
 open GroundTheory.Automorphic.Reduction in
-theorem detModule_tor_one (K : Type) [Field K] [NumberField K] (n : ℕ) :
-    (detModule K n (PositivityTheory.Rg.Rs.An.tor K fun _ : Fin n => (1 : ℝ)) : ℝ)
+theorem detModule_tor_one (K : Type) [Field K] [NumberField K] (n : ℕ)
+    : (detModule K n (PositivityTheory.Rg.Rs.An.tor K fun _ : Fin n => (1 : ℝ)) : ℝ)
       = Real.exp ((n : ℝ) * (Module.finrank ℚ K : ℝ)) := by
   unfold PositivityTheory.Rg.Rs.An.tor
   rw [CuspidalSpectrum.detModule_diagUnits_posIdele]
@@ -22,8 +22,11 @@ theorem detModule_tor_one (K : Type) [Field K] [NumberField K] (n : ℕ) :
   simp
 
 open GroundTheory.Automorphic.Reduction in
-theorem detModule_lhs (K : Type) [Field K] [NumberField K] (n : ℕ) (γ₀ : GL (Fin n) K) (m : ℤ) :
-    (detModule K n (AdelicGLn.diagonal K n γ₀ * (PositivityTheory.Rg.Rs.An.tor K fun _ : Fin n => (1 : ℝ)) ^ m) : ℝ)
+theorem detModule_lhs (K : Type) [Field K] [NumberField K] (n : ℕ) (γ₀ : GL (Fin n) K) (m : ℤ)
+    : (detModule K n
+          (AdelicGLn.diagonal K n γ₀
+            * (PositivityTheory.Rg.Rs.An.tor K fun _ : Fin n => (1 : ℝ)) ^ m)
+        : ℝ)
       = Real.exp ((m : ℝ) * ((n : ℝ) * (Module.finrank ℚ K : ℝ))) := by
   have h1 : detModule K n (AdelicGLn.diagonal K n γ₀) = 1 :=
     mem_normOneGL_iff_detModule.1 (rationalGL_le_normOneGL ⟨γ₀, rfl⟩)
@@ -35,7 +38,8 @@ theorem detModule_lhs (K : Type) [Field K] [NumberField K] (n : ℕ) (γ₀ : GL
       have h := congrArg Subtype.val (mul_inv_cancel u)
       rw [Positive.val_mul, Positive.val_one] at h
       exact eq_inv_of_mul_eq_one_right h
-    have hpow : ∀ (u : {r : ℝ // 0 < r}) (j : ℕ), ((u ^ j : {r : ℝ // 0 < r}) : ℝ) = (u : ℝ) ^ j := by
+    have hpow
+        : ∀ (u : {r : ℝ // 0 < r}) (j : ℕ), ((u ^ j : {r : ℝ // 0 < r}) : ℝ) = (u : ℝ) ^ j := by
       intro u j
       induction j with
       | zero => simp
@@ -46,9 +50,10 @@ theorem detModule_lhs (K : Type) [Field K] [NumberField K] (n : ℕ) (γ₀ : GL
   rw [hv, detModule_tor_one, ← Real.rpow_intCast, ← Real.exp_mul, mul_comm]
 
 open GroundTheory.Automorphic.Reduction in
-theorem detModule_rhs (K : Type) [Field K] [NumberField K] (n r : ℕ) (X Y : UPos n r → 𝔸[K])
-    (a q : AdelicGLn.AdelicGL K n) :
-    detModule K n (unipGL X * a * q * a⁻¹ * (unipGL Y)⁻¹) = detModule K n q := by
+theorem detModule_rhs
+    (K : Type) [Field K] [NumberField K]
+    (n r : ℕ) (X Y : UPos n r → 𝔸[K]) (a q : AdelicGLn.AdelicGL K n)
+    : detModule K n (unipGL X * a * q * a⁻¹ * (unipGL Y)⁻¹) = detModule K n q := by
   have h1 : detModule K n (unipGL X) = 1 :=
     mem_normOneGL_iff_detModule.1 (CuspidalSpectrum.unipGL_mem_normOneGL X)
   have h2 : detModule K n (unipGL Y) = 1 :=
@@ -61,7 +66,18 @@ end GlobalTheory.CompanionTheory.Latexp
 namespace GlobalTheory.CompanionTheory.Latexp
 
 open GroundTheory.Automorphic.Reduction in
-theorem exponent_mem_finset : ∀ (K : Type) [Field K] [NumberField K] (n r : ℕ), 0 < n → ∀ (Q : Set (AdelicGLn.AdelicGL K n)), IsCompact Q → ∃ M : Finset ℤ, ∀ (t : ℝ) (X Y : UPos n r → 𝔸[K]), ∀ q ∈ Q, ∀ (γ₀ : GL (Fin n) K) (m : ℤ), AdelicGLn.diagonal K n γ₀ * (PositivityTheory.Rg.Rs.An.tor K fun _ : Fin n => (1 : ℝ)) ^ m = unipGL X * PositivityTheory.Rg.Rs.An.aR K n r t * q * (PositivityTheory.Rg.Rs.An.aR K n r t)⁻¹ * (unipGL Y)⁻¹ → m ∈ M := by
+theorem exponent_mem_finset
+    : ∀ (K : Type) [Field K] [NumberField K] (n r : ℕ),
+      0 < n
+        → ∀ (Q : Set (AdelicGLn.AdelicGL K n)),
+          IsCompact Q
+            → ∃ M : Finset ℤ, ∀ (t : ℝ) (X Y : UPos n r → 𝔸[K]), ∀ q ∈ Q,
+              ∀ (γ₀ : GL (Fin n) K) (m : ℤ),
+                AdelicGLn.diagonal K n γ₀
+                      * (PositivityTheory.Rg.Rs.An.tor K fun _ : Fin n => (1 : ℝ)) ^ m
+                    = unipGL X * PositivityTheory.Rg.Rs.An.aR K n r t * q
+                      * (PositivityTheory.Rg.Rs.An.aR K n r t)⁻¹ * (unipGL Y)⁻¹
+                  → m ∈ M := by
   intro K _ _ n r hn Q hQ
   have hdc : Continuous fun g : AdelicGLn.AdelicGL K n => (detModule K n g : ℝ) :=
     continuous_subtype_val.comp continuous_detModule

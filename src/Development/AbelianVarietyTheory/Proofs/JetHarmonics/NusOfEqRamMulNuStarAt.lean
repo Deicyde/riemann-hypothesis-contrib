@@ -10,7 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.WeightExponen
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues
+  Formalism.EigenvalueLevelCeiling
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff)
 open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF (AvFSt HTFSt UpFSt)
 open GlobalTheory.RunDepth GlobalTheory.CharDepth
@@ -20,11 +23,13 @@ noncomputable section
 namespace GlobalTheory.RunDepthScale
 
 open Formalism.MainNotions.ModuliIntegralCharts.H1 in
-theorem nusOf_eq_nuN {D : D7} (B : WeightFamilies.Prov D) {j : ℕ} (w : WeightFamilies.Wt D j)
-    (nu : HeightOneSpectrum (𝓞 B.KO) → ℝ) (la : HeightOneSpectrum (𝓞 B.KO)) (Q : DepPage)
-    (h1 : Q.g1 = D.host.g 0) (h2 : Q.g2 = D.host.g 1) (hq1 : Q.q1 = D.host.q) (hdd : Q.dd = D.host.d)
-    (hsm : Q.sm = D.host.small) (hvd : Q.vd = vdOf D) :
-    nusOf B w nu la = (ramOverZ la : ℝ) * Q.nuN (WeightAlgebra.DF w) (nu la) (resCharOf la) := by
+theorem nusOf_eq_nuN
+    {D : D7} (B : WeightFamilies.Prov D)
+    {j : ℕ} (w : WeightFamilies.Wt D j)
+    (nu : HeightOneSpectrum (𝓞 B.KO) → ℝ) (la : HeightOneSpectrum (𝓞 B.KO))
+    (Q : DepPage) (h1 : Q.g1 = D.host.g 0) (h2 : Q.g2 = D.host.g 1) (hq1 : Q.q1 = D.host.q)
+    (hdd : Q.dd = D.host.d) (hsm : Q.sm = D.host.small) (hvd : Q.vd = vdOf D)
+    : nusOf B w nu la = (ramOverZ la : ℝ) * Q.nuN (WeightAlgebra.DF w) (nu la) (resCharOf la) := by
   classical
   have hq : D.host.q.Prime := D.host.hyp.1
   have hd : D.host.d.Prime := D.host.hyp.2.1
@@ -70,10 +75,23 @@ theorem nusOf_eq_nuN {D : D7} (B : WeightFamilies.Prov D) {j : ℕ} (w : WeightF
       · rw [if_neg b, if_neg (fun h => h.elim a2 b)]
         simp
 
-theorem nusOf_eq_ram_mul_nuStarAt : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm) (hK : DV.KapDef D) (T : Top D) (h : LawsP T) (EX : ErrX D) (j : ℕ), InR D j → letI := T.Q.H.starRing; ∀ la : HeightOneSpectrum (𝓞 T.Q.c.F), nusOf (recB h.toLawsCore) (lR Tp hK j) (fun la' => (nuW (T.Q.Xo j) T.Q.c la' T.Q.l.M (wtA (lR Tp hK j)) Tp.nWn).toReal / (ramOverZ la' : ℝ)) la = (ramOverZ la : ℝ) * nuStarAt (Xo := T.Q.Xo j) (c := T.Q.c) (depOf T.toCore EX Tp hK) la j := by
+theorem nusOf_eq_ram_mul_nuStarAt
+    : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm)
+        (hK : DV.KapDef D) (T : Top D) (h : LawsP T) (EX : ErrX D) (j : ℕ),
+      InR D j
+        → letI := T.Q.H.starRing
+          ∀ la : HeightOneSpectrum (𝓞 T.Q.c.F),
+            nusOf (recB h.toLawsCore) (lR Tp hK j)
+                (fun la' =>
+                  (nuW (T.Q.Xo j) T.Q.c la' T.Q.l.M (wtA (lR Tp hK j)) Tp.nWn).toReal
+                    / (ramOverZ la' : ℝ))
+                la
+              = (ramOverZ la : ℝ)
+                * nuStarAt (Xo := T.Q.Xo j) (c := T.Q.c) (depOf T.toCore EX Tp hK) la j := by
   intro D L Pm Tp hK T h EX j hj la
   letI := T.Q.H.starRing
-  refine (nusOf_eq_nuN (recB h.toLawsCore) (lR Tp hK j) _ la (depOf T.toCore EX Tp hK).Q rfl rfl rfl rfl rfl rfl).trans ?_
+  refine (nusOf_eq_nuN (recB h.toLawsCore) (lR Tp hK j) _ la (depOf T.toCore EX Tp hK).Q rfl rfl rfl
+    rfl rfl rfl).trans ?_
   rw [← GlobalTheory.WeightExponents.DF_wtA h.pins hj (lR Tp hK j)]
   rfl
 

@@ -14,8 +14,10 @@ section Dual
 
 variable {R M ι : Type*} [CommRing R] [AddCommGroup M] [Module R M] [Fintype ι] [DecidableEq ι]
 
-def basisOfDual (v : ι → M) (c : ι → Dual R M) (h₁ : ∀ i j, c i (v j) = if i = j then 1 else 0)
-    (h₂ : ∀ x, ∑ i, c i x • v i = x) : Basis ι R M :=
+def basisOfDual
+    (v : ι → M) (c : ι → Dual R M)
+    (h₁ : ∀ i j, c i (v j) = if i = j then 1 else 0) (h₂ : ∀ x, ∑ i, c i x • v i = x)
+    : Basis ι R M :=
   Basis.ofEquivFun <| LinearEquiv.ofLinear (LinearMap.pi c) (Fintype.linearCombination R v)
     (by
       refine LinearMap.ext fun a => funext fun i => ?_
@@ -33,8 +35,8 @@ variable {R M ι : Type*} [CommRing R] [AddCommGroup M] [Module R M] [Fintype ι
 def basisMulGL (b : Basis ι R M) (g : GL ι R) : Basis ι R M :=
   b.map (Matrix.toLinOfInv b b g.mul_inv g.inv_mul)
 
-theorem basisMulGL_apply (b : Basis ι R M) (g : GL ι R) (j : ι) :
-    basisMulGL b g j = ∑ i, (g : Matrix ι ι R) i j • b i := by
+theorem basisMulGL_apply (b : Basis ι R M) (g : GL ι R) (j : ι)
+    : basisMulGL b g j = ∑ i, (g : Matrix ι ι R) i j • b i := by
   simp [basisMulGL, Matrix.toLinOfInv, Matrix.toLin_self]
 
 end Action
@@ -47,8 +49,8 @@ variable {ι R}
 
 variable {M : Type*} [AddCommGroup M] [Module R M] {n : ℕ}
 
-theorem mem_basis_flag_iff (b : Basis (Fin n) R M) (k : Fin (n + 1)) (x : M) :
-    x ∈ b.flag k ↔ ∀ i : Fin n, k ≤ i.castSucc → b.repr x i = 0 := by
+theorem mem_basis_flag_iff (b : Basis (Fin n) R M) (k : Fin (n + 1)) (x : M)
+    : x ∈ b.flag k ↔ ∀ i : Fin n, k ≤ i.castSucc → b.repr x i = 0 := by
   refine ⟨fun hx i hi => b.flag_le_ker_coord hi hx, fun h => ?_⟩
   rw [← b.sum_repr x]
   refine Submodule.sum_mem _ fun i _ => ?_
@@ -64,21 +66,23 @@ variable {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
 
 abbrev SubQuot (P Q : Submodule R M) : Type _ := Q ⧸ P.submoduleOf Q
 
-def subQuotEquivOfSplitting {L : Type*} [AddCommGroup L] [Module R L] {P Q : Submodule R M}
-    (π : M →ₗ[R] L) (σ : L →ₗ[R] M) (h₁ : ∀ l, π (σ l) = l) (h₂ : ∀ x ∈ P, π x = 0)
-    (h₃ : ∀ l, σ l ∈ Q) (h₄ : ∀ x ∈ Q, x - σ (π x) ∈ P) : SubQuot P Q ≃ₗ[R] L :=
+def subQuotEquivOfSplitting
+    {L : Type*} [AddCommGroup L] [Module R L]
+    {P Q : Submodule R M}
+    (π : M →ₗ[R] L) (σ : L →ₗ[R] M) (h₁ : ∀ l, π (σ l) = l)
+    (h₂ : ∀ x ∈ P, π x = 0) (h₃ : ∀ l, σ l ∈ Q) (h₄ : ∀ x ∈ Q, x - σ (π x) ∈ P)
+    : SubQuot P Q ≃ₗ[R] L :=
   (Submodule.quotEquivOfEq _ (LinearMap.ker (π ∘ₗ Q.subtype)) (by
-    ext x
-    refine ⟨fun hx => h₂ _ hx, fun hx => ?_⟩
-    have hx' : π x = 0 := hx
-    have := h₄ x x.2
-    rwa [hx', map_zero, sub_zero] at this)).trans
+      ext x
+      refine ⟨fun hx => h₂ _ hx, fun hx => ?_⟩
+      have hx' : π x = 0 := hx
+      have := h₄ x x.2
+      rwa [hx', map_zero, sub_zero] at this)).trans
     ((π ∘ₗ Q.subtype).quotKerEquivOfSurjective fun l => ⟨⟨σ l, h₃ l⟩, h₁ l⟩)
 
-
 variable (R M) in
-@[ext] structure FullFlag (n : ℕ) where
-
+@[ext]
+structure FullFlag (n : ℕ) where
   sub : Fin (n + 1) → Submodule R M
   sub_zero : sub 0 = ⊥
   sub_last : sub (Fin.last n) = ⊤
@@ -89,15 +93,17 @@ namespace FullFlag
 
 variable {n : ℕ}
 
-abbrev Step (F : FullFlag (R := R) (M := M) n) (i : Fin n) : Type _ := SubQuot (F.sub i.castSucc) (F.sub i.succ)
+abbrev Step (F : FullFlag (R := R) (M := M) n) (i : Fin n) : Type _ :=
+  SubQuot (F.sub i.castSucc) (F.sub i.succ)
 
-instance (F : FullFlag (R := R) (M := M) n) (i : Fin n) : Module.Invertible R (F.Step i) := F.invertible_step i
+instance (F : FullFlag (R := R) (M := M) n) (i : Fin n) : Module.Invertible R (F.Step i) :=
+  F.invertible_step i
 
 theorem monotone (F : FullFlag (R := R) (M := M) n) : Monotone F.sub :=
   Fin.monotone_iff_le_succ.2 F.castSucc_le_succ
 
-def basisStepEquiv (b : Basis (Fin n) R M) (i : Fin n) :
-    SubQuot (b.flag i.castSucc) (b.flag i.succ) ≃ₗ[R] R :=
+def basisStepEquiv (b : Basis (Fin n) R M) (i : Fin n)
+    : SubQuot (b.flag i.castSucc) (b.flag i.succ) ≃ₗ[R] R :=
   subQuotEquivOfSplitting (b.coord i) (LinearMap.toSpanSingleton R M (b i)) (by simp)
     (fun _ hx => b.flag_le_ker_coord le_rfl hx)
     (fun l => Submodule.smul_mem _ _ (b.self_mem_flag Fin.castSucc_lt_succ))
@@ -117,18 +123,19 @@ def ofBasis (b : Basis (Fin n) R M) : FullFlag (R := R) (M := M) n where
 
 def IsAdapted (F : FullFlag (R := R) (M := M) n) (b : Basis (Fin n) R M) : Prop := b.flag = F.sub
 
-theorem isAdapted_iff {F : FullFlag (R := R) (M := M) n} {b : Basis (Fin n) R M} :
-    F.IsAdapted b ↔ ofBasis b = F := ⟨fun h => FullFlag.ext h, fun h => h ▸ rfl⟩
+theorem isAdapted_iff {F : FullFlag (R := R) (M := M) n} {b : Basis (Fin n) R M}
+    : F.IsAdapted b ↔ ofBasis b = F :=
+  ⟨fun h => FullFlag.ext h, fun h => h ▸ rfl⟩
 
-theorem exists_retraction (F : FullFlag (R := R) (M := M) n) (k : Fin (n + 1)) :
-    ∃ r : M →ₗ[R] M, (∀ x, r x ∈ F.sub k) ∧ ∀ x ∈ F.sub k, r x = x := by
+theorem exists_retraction (F : FullFlag (R := R) (M := M) n) (k : Fin (n + 1))
+    : ∃ r : M →ₗ[R] M, (∀ x, r x ∈ F.sub k) ∧ ∀ x ∈ F.sub k, r x = x := by
   induction k using Fin.reverseInduction with
   | last => exact ⟨LinearMap.id, fun x => by simp [F.sub_last], fun _ _ => rfl⟩
   | cast i ih =>
     obtain ⟨r, hr₁, hr₂⟩ := ih
-    obtain ⟨s, hs⟩ := Module.projective_lifting_property
-      ((F.sub i.castSucc).submoduleOf (F.sub i.succ)).mkQ (LinearMap.id (R := R) (M := F.Step i))
-      (Submodule.mkQ_surjective _)
+    obtain ⟨s, hs⟩ :=
+      Module.projective_lifting_property ((F.sub i.castSucc).submoduleOf (F.sub i.succ)).mkQ
+        (LinearMap.id (R := R) (M := F.Step i)) (Submodule.mkQ_surjective _)
     let r' : M →ₗ[R] F.sub i.succ := r.codRestrict _ hr₁
     refine ⟨r - (F.sub i.succ).subtype ∘ₗ s ∘ₗ Submodule.mkQ _ ∘ₗ r', fun x => ?_, fun x hx => ?_⟩
     · have : r' x - s (Submodule.mkQ _ (r' x)) ∈ (F.sub i.castSucc).submoduleOf (F.sub i.succ) := by
@@ -143,32 +150,39 @@ theorem exists_retraction (F : FullFlag (R := R) (M := M) n) (k : Fin (n + 1)) :
       simp only [LinearMap.sub_apply, LinearMap.comp_apply, this, map_zero, hr₂ x hx']
       exact _root_.sub_zero x
 
-theorem exists_splitting (F : FullFlag (R := R) (M := M) n) (i : Fin n) :
-    ∃ (π : M →ₗ[R] F.Step i) (σ : F.Step i →ₗ[R] M), (∀ l, π (σ l) = l) ∧
-      (∀ x ∈ F.sub i.castSucc, π x = 0) ∧ (∀ l, σ l ∈ F.sub i.succ) ∧
-      (∀ x ∈ F.sub i.succ, x - σ (π x) ∈ F.sub i.castSucc) := by
+theorem exists_splitting (F : FullFlag (R := R) (M := M) n) (i : Fin n)
+    : ∃ (π : M →ₗ[R] F.Step i) (σ : F.Step i →ₗ[R] M),
+      (∀ l, π (σ l) = l) ∧ (∀ x ∈ F.sub i.castSucc, π x = 0) ∧ (∀ l, σ l ∈ F.sub i.succ)
+        ∧ (∀ x ∈ F.sub i.succ, x - σ (π x) ∈ F.sub i.castSucc) := by
   obtain ⟨r, hr₁, hr₂⟩ := F.exists_retraction i.succ
-  obtain ⟨s, hs⟩ := Module.projective_lifting_property
-    ((F.sub i.castSucc).submoduleOf (F.sub i.succ)).mkQ (LinearMap.id (R := R) (M := F.Step i))
-    (Submodule.mkQ_surjective _)
+  obtain ⟨s, hs⟩ :=
+    Module.projective_lifting_property ((F.sub i.castSucc).submoduleOf (F.sub i.succ)).mkQ
+      (LinearMap.id (R := R) (M := F.Step i)) (Submodule.mkQ_surjective _)
   let r' : M →ₗ[R] F.sub i.succ := r.codRestrict _ hr₁
   have hr' : ∀ y : F.sub i.succ, r' y = y := fun y => Subtype.ext (hr₂ y y.2)
-  refine ⟨Submodule.mkQ _ ∘ₗ r', (F.sub i.succ).subtype ∘ₗ s, fun l => ?_, fun x hx => ?_,
-    fun l => (s l).2, fun x hx => ?_⟩
+  refine ⟨
+    Submodule.mkQ _ ∘ₗ r',
+    (F.sub i.succ).subtype ∘ₗ s,
+    fun l => ?_,
+    fun x hx => ?_,
+    fun l => (s l).2,
+    fun x hx => ?_
+  ⟩
   · simp only [LinearMap.comp_apply, Submodule.subtype_apply, hr']
     exact congr($hs l)
   · rw [LinearMap.comp_apply, hr' ⟨x, F.castSucc_le_succ i hx⟩, Submodule.mkQ_apply,
       Submodule.Quotient.mk_eq_zero]
     exact hx
-  · have : (⟨x, hx⟩ : F.sub i.succ) - s (Submodule.mkQ _ ⟨x, hx⟩) ∈
-        (F.sub i.castSucc).submoduleOf (F.sub i.succ) := by
+  · have : (⟨x, hx⟩ : F.sub i.succ) - s (Submodule.mkQ _ ⟨x, hx⟩)
+        ∈ (F.sub i.castSucc).submoduleOf (F.sub i.succ) := by
       rw [← Submodule.Quotient.mk_eq_zero, ← Submodule.mkQ_apply, map_sub]
       exact sub_eq_zero.mpr (congr($hs _)).symm
     simp only [LinearMap.comp_apply, hr' ⟨x, hx⟩]
     exact this
 
-theorem exists_isAdapted_of_free (F : FullFlag (R := R) (M := M) n) (h : ∀ i, Module.Free R (F.Step i)) :
-    ∃ b : Basis (Fin n) R M, F.IsAdapted b := by
+theorem exists_isAdapted_of_free
+    (F : FullFlag (R := R) (M := M) n) (h : ∀ i, Module.Free R (F.Step i))
+    : ∃ b : Basis (Fin n) R M, F.IsAdapted b := by
   choose π σ h₁ h₂ h₃ h₄ using F.exists_splitting
   have e : ∀ i, F.Step i ≃ₗ[R] R := fun i => (Module.Invertible.free_iff_linearEquiv.mp (h i)).some
   let v : Fin n → M := fun i => σ i ((e i).symm 1)
@@ -195,8 +209,9 @@ theorem exists_isAdapted_of_free (F : FullFlag (R := R) (M := M) n) (h : ∀ i, 
     by_contra hne
     push Not at hne
     classical
-    obtain ⟨i, hi, hmax⟩ := Finset.exists_max_image (Finset.univ.filter fun i => a i ≠ 0) id
-      (by obtain ⟨i, hi⟩ := hne; exact ⟨i, by simpa using hi⟩)
+    obtain ⟨i, hi, hmax⟩ :=
+      Finset.exists_max_image (Finset.univ.filter fun i => a i ≠ 0) id
+        (by obtain ⟨i, hi⟩ := hne; exact ⟨i, by simpa using hi⟩)
     have h0 : e i (π i (∑ j, a j • v j)) = a i := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum, map_sum, Finset.sum_eq_single i _ (by simp)]
@@ -217,8 +232,8 @@ theorem exists_isAdapted_of_free (F : FullFlag (R := R) (M := M) n) (h : ∀ i, 
   · rw [Basis.flag, Basis.coe_mk]
     exact hspan k
 
-theorem exists_isAdapted_of_isLocalRing [IsLocalRing R] (F : FullFlag (R := R) (M := M) n) :
-    ∃ b : Basis (Fin n) R M, F.IsAdapted b :=
+theorem exists_isAdapted_of_isLocalRing [IsLocalRing R] (F : FullFlag (R := R) (M := M) n)
+    : ∃ b : Basis (Fin n) R M, F.IsAdapted b :=
   F.exists_isAdapted_of_free fun _ => Module.free_of_flat_of_isLocalRing
 
 end FullFlag

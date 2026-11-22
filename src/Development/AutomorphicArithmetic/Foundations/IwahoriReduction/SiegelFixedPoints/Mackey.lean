@@ -18,7 +18,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsLogDeri
 @[expose] public section
 
 open scoped MatrixGroups Matrix
-open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois UpperTheory.Kd.L
+open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois
+  UpperTheory.Kd.L
 
 namespace UpperTheory.Kd.L.Mk
 
@@ -337,8 +338,35 @@ private lemma cgA_trans {Ω : Type} [Field Ω] {A : ValuationSubring Ω} {l n : 
 end UpperTheory.Kd.L.Mk
 
 open UpperTheory.Kd.L.Mk in
-theorem UpperTheory.Kd.L.mackey :
-    ∀ (l : ℕ) [Fact l.Prime], ∃ cc : ℕ, ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] [CharZero Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) (N : ℕ) [NeZero N] (c d : ℕ) (gm : (ZMod l)ˣ → SL(2, ℤ)), Par l N c d gm → ∀ (A : ValuationSubring Ω), ((l : ℕ) : Ω) ∈ A.nonunits → ∀ (x : ZMod N) (w m n c₀ : ℕ), Odd w → 1 ≤ m → 1 ≤ n → ∀ bB : (Ω ≃ₐ[ℚ] Ω) → X.Fn l, (∀ σ ∈ fixMu Ω (topMu l n m N), LiftB X l N w n c₀ (clsBmu X l n m N x c d (w + 2) gm σ) (bB σ)) → ∀ R, IsReps N l (topMu l n m N) R → ∀ z : (ZMod (l ^ (m + n)))ˣ, ∃ ξ : ℚ → Ω, (∀ r, ξ r ∈ A) ∧ ∀ s, Stab A s → (∀ y ∈ A, A.valuation (s y - y) < 1) → s (zt ε l (m + n)) = zt ε l (m + n) → ∀ t : ZMod (l ^ n), s (zt ε l (m + n + n)) = zt ε l n ^ t.val * zt ε l (m + n + n) → ∀ φ : HahnSeries ℚ Ω, IsThB X A N l n (bMid X l n m N bB s z) φ → ∀ r : ℚ, CgA A l n ((l : Ω) ^ cc * φ.coeff r) (s (ξ r) - ξ r + (l : Ω) ^ cc * ((l : Ω) ^ c₀ * Fsum ε l n m N x c d w gm R z r * (t.val : Ω)))  := by
+theorem UpperTheory.Kd.L.mackey
+    : ∀ (l : ℕ) [Fact l.Prime], ∃ cc : ℕ,
+      ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] [CharZero Ω] (ε : Ω →+* ℂ)
+          (X : Tower Ω ε) (N : ℕ) [NeZero N] (c d : ℕ) (gm : (ZMod l)ˣ → SL(2, ℤ)),
+        Par l N c d gm
+          → ∀ (A : ValuationSubring Ω),
+            ((l : ℕ) : Ω) ∈ A.nonunits
+              → ∀ (x : ZMod N) (w m n c₀ : ℕ),
+                Odd w → 1 ≤ m → 1 ≤ n
+                  → ∀ bB : (Ω ≃ₐ[ℚ] Ω) → X.Fn l,
+                    (∀ σ ∈ fixMu Ω (topMu l n m N),
+                        LiftB X l N w n c₀ (clsBmu X l n m N x c d (w + 2) gm σ) (bB σ))
+                      → ∀ R,
+                        IsReps N l (topMu l n m N) R
+                          → ∀ z : (ZMod (l ^ (m + n)))ˣ, ∃ ξ : ℚ → Ω,
+                            (∀ r, ξ r ∈ A)
+                              ∧ ∀ s,
+                                Stab A s → (∀ y ∈ A, A.valuation (s y - y) < 1)
+                                  → s (zt ε l (m + n)) = zt ε l (m + n)
+                                  → ∀ t : ZMod (l ^ n),
+                                    s (zt ε l (m + n + n)) = zt ε l n ^ t.val * zt ε l (m + n + n)
+                                      → ∀ φ : HahnSeries ℚ Ω,
+                                        IsThB X A N l n (bMid X l n m N bB s z) φ
+                                          → ∀ r : ℚ,
+                                            CgA A l n ((l : Ω) ^ cc * φ.coeff r)
+                                              (s (ξ r) - ξ r
+                                                + (l : Ω) ^ cc
+                                                  * ((l : Ω) ^ c₀ * Fsum ε l n m N x c d w gm R z r
+                                                    * (t.val : Ω))) := by
   intro l _
   obtain ⟨cc, hone⟩ := UpperTheory.Kd.L.one l
   refine ⟨cc, ?_⟩
@@ -358,9 +386,12 @@ theorem UpperTheory.Kd.L.mackey :
     rw [Nat.mul_comm N l]
     exact mul_dvd_mul (dvd_pow_self l (by omega)) (Dvd.intro _ rfl)
   have hrp := fun γ hγ r₀ => (UpperTheory.Kd.L.reps l N c d gm hp (topMu l n m N) hdvd).2 γ hγ r₀
-  have hrep : ∀ γ ∈ Gs N l (topMu l n m N),
-      Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod (topMu l n m N))) (liftSL (topMu l n m N) γ) = γ :=
-    fun γ hγ => (hrp γ hγ 1).1
+  have hrep
+      : ∀ γ ∈ Gs N l (topMu l n m N),
+        Matrix.SpecialLinearGroup.map (Int.castRingHom (ZMod (topMu l n m N)))
+            (liftSL (topMu l n m N) γ)
+          = γ := fun γ hγ =>
+    (hrp γ hγ 1).1
   have hl0 : ((l : ℕ) : Ω) ≠ 0 := Nat.cast_ne_zero.2 hlp.ne_zero
   have hlA : ∀ y, ((l : ℕ) : Ω) ∈ (A.comap ((ρ y : Ω ≃ₐ[ℚ] Ω) : Ω →+* Ω)).nonunits := by
     intro y
@@ -370,14 +401,23 @@ theorem UpperTheory.Kd.L.mackey :
     have h2 := ValuationSubring.mem_comap.1 h
     rw [map_inv₀, map_natCast] at h2
     exact (hl'.resolve_left hl0) h2
-  have hξ : ∀ y (r₀ : (ZMod l)ˣ) (γ : SL(2, ZMod (topMu l n m N))), ∃ ξ : ℚ → Ω, γ ∈ R →
-      ((∀ r, ξ r ∈ A.comap ((ρ y : Ω ≃ₐ[ℚ] Ω) : Ω →+* Ω)) ∧ ∀ s ∈ fixMu Ω (topMu l n m N),
-        Stab (A.comap ((ρ y : Ω ≃ₐ[ℚ] Ω) : Ω →+* Ω)) s → ∀ t : ZMod (l ^ n),
-        s (zt ε l (m + n + n)) = zt ε l n ^ t.val * zt ε l (m + n + n) → ∀ φ : HahnSeries ℚ Ω,
-        IsDl X (A.comap ((ρ y : Ω ≃ₐ[ℚ] Ω) : Ω →+* Ω)) l n ((topMu l n m N) : ℚ)
-          (X.sl (ofSL (gm r₀ * liftSL _ γ)) (wkMu X l n m N x c d s)) φ → ∀ r : ℚ,
-        CgA (A.comap ((ρ y : Ω ≃ₐ[ℚ] Ω) : Ω →+* Ω)) l n ((l : Ω) ^ cc * φ.coeff r)
-          (s (ξ r) - ξ r + (l : Ω) ^ cc * ((N : Ω) ^ 3 * EE ε l (m + n) N x c d (gm r₀ * liftSL _ γ) r * (t.val : Ω)))) := by
+  have hξ
+      : ∀ y (r₀ : (ZMod l)ˣ) (γ : SL(2, ZMod (topMu l n m N))), ∃ ξ : ℚ → Ω,
+        γ ∈ R
+          → ((∀ r, ξ r ∈ A.comap ((ρ y : Ω ≃ₐ[ℚ] Ω) : Ω →+* Ω))
+            ∧ ∀ s ∈ fixMu Ω (topMu l n m N),
+              Stab (A.comap ((ρ y : Ω ≃ₐ[ℚ] Ω) : Ω →+* Ω)) s
+                → ∀ t : ZMod (l ^ n),
+                  s (zt ε l (m + n + n)) = zt ε l n ^ t.val * zt ε l (m + n + n)
+                    → ∀ φ : HahnSeries ℚ Ω,
+                      IsDl X (A.comap ((ρ y : Ω ≃ₐ[ℚ] Ω) : Ω →+* Ω)) l n ((topMu l n m N) : ℚ)
+                          (X.sl (ofSL (gm r₀ * liftSL _ γ)) (wkMu X l n m N x c d s)) φ
+                        → ∀ r : ℚ,
+                          CgA (A.comap ((ρ y : Ω ≃ₐ[ℚ] Ω) : Ω →+* Ω)) l n ((l : Ω) ^ cc * φ.coeff r)
+                            (s (ξ r) - ξ r
+                              + (l : Ω) ^ cc
+                                * ((N : Ω) ^ 3 * EE ε l (m + n) N x c d (gm r₀ * liftSL _ γ) r
+                                  * (t.val : Ω)))) := by
     intro y r₀ γ
     by_cases hγ : γ ∈ R
     · obtain ⟨-, hg1, -, hg2, hg3⟩ := hrp γ (hR.1 hγ) r₀
@@ -385,19 +425,25 @@ theorem UpperTheory.Kd.L.mackey :
       exact ⟨ξ, fun _ => ⟨h1, h2⟩⟩
     · exact ⟨0, fun h => absurd h hγ⟩
   choose ξ hξ using hξ
-  obtain ⟨I, hI⟩ : ∃ I : Finset (_ × (ZMod l)ˣ × SL(2, ZMod (topMu l n m N))),
-      I = S ×ˢ ((Finset.univ : Finset (ZMod l)ˣ) ×ˢ R) := ⟨_, rfl⟩
+  obtain ⟨I, hI⟩
+      : ∃ I : Finset (_ × (ZMod l)ˣ × SL(2, ZMod (topMu l n m N))),
+        I = S ×ˢ ((Finset.univ : Finset (ZMod l)ˣ) ×ˢ R) :=
+    ⟨_, rfl⟩
   have hIR : ∀ i ∈ I, i.2.2 ∈ R := fun i hi => by
     rw [hI] at hi
     exact (Finset.mem_product.1 (Finset.mem_product.1 hi).2).2
-  obtain ⟨mx, hmx⟩ : ∃ mx : (_ × (ZMod l)ˣ × SL(2, ZMod (topMu l n m N))) → ℕ,
-      ∀ i, mx i = ex l n w (gm i.2.1 * liftSL _ i.2.2) * l ^ c₀ := ⟨_, fun _ => rfl⟩
-  refine ⟨fun r => if r.den = 1 then ∑ i ∈ I, (mx i : Ω) * ρ i.1 (ξ i.1 i.2.1 i.2.2 r) else 0, ?_, ?_⟩
+  obtain ⟨mx, hmx⟩
+      : ∃ mx : (_ × (ZMod l)ˣ × SL(2, ZMod (topMu l n m N))) → ℕ, ∀ i,
+        mx i = ex l n w (gm i.2.1 * liftSL _ i.2.2) * l ^ c₀ :=
+    ⟨_, fun _ => rfl⟩
+  refine
+    ⟨fun r => if r.den = 1 then ∑ i ∈ I, (mx i : Ω) * ρ i.1 (ξ i.1 i.2.1 i.2.2 r) else 0, ?_, ?_⟩
   · intro r
     dsimp only
     split_ifs
-    · exact sum_mem fun i hi => mul_mem (natCast_mem A _)
-        (ValuationSubring.mem_comap.1 ((hξ i.1 i.2.1 i.2.2 (hIR i hi)).1 r))
+    · exact sum_mem fun i hi =>
+        mul_mem (natCast_mem A _)
+          (ValuationSubring.mem_comap.1 ((hξ i.1 i.2.1 i.2.2 (hIR i hi)).1 r))
     · exact zero_mem A
   intro s hStab hin hzt t ht φ hφ r
   have hsfix : s ∈ fixMu Ω (topMu l n m N) := mem_fixMu_of_inertial hl hN0 hp.cop hin hzt
@@ -419,78 +465,109 @@ theorem UpperTheory.Kd.L.mackey :
   have hσt : ∀ y, σ y (zt ε l (m + n + n)) = zt ε l n ^ t.val * zt ε l (m + n + n) := fun y => by
     rw [hσd]
     exact conj_apply_zt_eq_of_apply_zt_eq (ρ y) s l (m + n) n t.val ht
-  have hwx : ∀ y, ∃ f : X.Kˣ, (f : X.K) = FF X l n m N x c d w gm (σ y) ^ l ^ c₀ ∧ IsWit X N l n (bB (σ y)) f :=
-    fun y => UpperTheory.Kd.L.wit ε X l N c d gm hp x w m n c₀ hw hm (σ y) _ (hB _ (hσ y))
+  have hwx
+      : ∀ y, ∃ f : X.Kˣ,
+        (f : X.K) = FF X l n m N x c d w gm (σ y) ^ l ^ c₀ ∧ IsWit X N l n (bB (σ y)) f := fun y =>
+    UpperTheory.Kd.L.wit ε X l N c d gm hp x w m n c₀ hw hm (σ y) _ (hB _ (hσ y))
   choose f hf1 hf2 using hwx
   have hwc := fun σ' => (UpperTheory.Kd.L.wcoc ε X l N c d gm hp x m n hm).1 σ'
   have hFF := fun y => FF_eq (w := w) X hp hm (σ y) hR (hwc _).1 hrep
-  have hψx : ∀ y (r₀ : (ZMod l)ˣ) (γ : SL(2, ZMod (topMu l n m N))), ∃ ψ : HahnSeries ℚ Ω,
-      IsDl X (A.comap ((ρ y : Ω ≃ₐ[ℚ] Ω) : Ω →+* Ω)) l n ((topMu l n m N : ℕ) : ℚ)
-        (X.sl (ofSL (gm r₀ * liftSL _ γ)) (wkMu X l n m N x c d (σ y))) ψ ∧
-      ∀ r : ℚ, ψ.coeff r ≠ 0 → (r * ((topMu l n m N : ℕ) : ℚ)).den = 1 := fun y r₀ γ =>
-    GlobalTheory.T.exists_logDerivQExpansion_modPrimePow_of_translationInvariant ε X hj l _ (hlA y) n (topMu l n m N) _ hMpos
-      ((map_ne_zero _).2 (hwc _).2) (sl_mem_KT X (hwc _).1 _)
+  have hψx
+      : ∀ y (r₀ : (ZMod l)ˣ) (γ : SL(2, ZMod (topMu l n m N))), ∃ ψ : HahnSeries ℚ Ω,
+        IsDl X (A.comap ((ρ y : Ω ≃ₐ[ℚ] Ω) : Ω →+* Ω)) l n ((topMu l n m N : ℕ) : ℚ)
+            (X.sl (ofSL (gm r₀ * liftSL _ γ)) (wkMu X l n m N x c d (σ y))) ψ
+          ∧ ∀ r : ℚ, ψ.coeff r ≠ 0 → (r * ((topMu l n m N : ℕ) : ℚ)).den = 1 := fun y r₀ γ =>
+    GlobalTheory.T.exists_logDerivQExpansion_modPrimePow_of_translationInvariant ε X hj l _ (hlA y)
+      n (topMu l n m N) _ hMpos ((map_ne_zero _).2 (hwc _).2) (sl_mem_KT X (hwc _).1 _)
   choose ψ hψ1 hψ2 using hψx
-  have hn2 := fun y r₀ γ => UpperTheory.Kd.L.nrm ε X l _ (hlA y) n (topMu l n m N) hMpos _ (ψ y r₀ γ)
-    (GlobalTheory.Glue.NrmT.resZ (ψ y r₀ γ)) (sl_mem_KT X (hwc _).1 _) (hψ1 y r₀ γ) (hψ2 y r₀ γ)
-    (GlobalTheory.Glue.NrmT.resZ_coeff _)
-  have hD := fun y r₀ γ => UpperTheory.Kd.L.dlgal ε X l A _ (ρ y) (fun _ => ValuationSubring.mem_comap) n 1 _ _ (hn2 y r₀ γ)
-  have hP := GlobalTheory.T.isLogDerivQExpansion_finset_prod_zpow ε X hj l A hl n 1 _ I
-    (fun i => X.gal (ρ i.1) (nrmT X (topMu l n m N) (X.sl (ofSL (gm i.2.1 * liftSL _ i.2.2)) (wkMu X l n m N x c d (σ i.1)))))
-    (fun i => HahnSeries.map (GlobalTheory.Glue.NrmT.resZ (ψ i.1 i.2.1 i.2.2)) (ρ i.1 : Ω →+* Ω))
-    (fun i => (mx i : ℤ)) (fun i _ => hD i.1 i.2.1 i.2.2)
-  have hFval : ((∏ y ∈ S, Units.map (X.gal (ρ y)).toMonoidHom (f y) : X.Kˣ) : X.K) =
-      ∏ i ∈ I, X.gal (ρ i.1) (nrmT X (topMu l n m N) (X.sl (ofSL (gm i.2.1 * liftSL _ i.2.2)) (wkMu X l n m N x c d (σ i.1)))) ^ (mx i : ℤ) := by
-    rw [Units.coe_prod, hI, Finset.prod_product]
-    refine Finset.prod_congr rfl fun y _ => ?_
-    rw [Finset.prod_product]
-    show X.gal (ρ y) (f y) = _
-    rw [hf1, hFF, map_pow, map_prod, ← Finset.prod_pow]
-    refine Finset.prod_congr rfl fun r₀ _ => ?_
-    rw [map_prod, ← Finset.prod_pow]
-    refine Finset.prod_congr rfl fun γ _ => ?_
-    rw [map_pow, hmx, zpow_natCast, pow_mul]
-  have hwit := wit_sum X hN0 S (fun y => X.galB l (ρ y) (bB (σ y)))
-    (fun y => Units.map (X.gal (ρ y)).toMonoidHom (f y))
-    (fun y _ => (UpperTheory.Kd.L.witalg ε X l N n hN0).2.2.1 (ρ y) _ _ (hf2 y))
+  have hn2 := fun y r₀ γ =>
+    UpperTheory.Kd.L.nrm ε X l _ (hlA y) n (topMu l n m N) hMpos _ (ψ y r₀ γ)
+      (GlobalTheory.Glue.NrmT.resZ (ψ y r₀ γ)) (sl_mem_KT X (hwc _).1 _) (hψ1 y r₀ γ) (hψ2 y r₀ γ)
+      (GlobalTheory.Glue.NrmT.resZ_coeff _)
+  have hD := fun y r₀ γ =>
+    UpperTheory.Kd.L.dlgal ε X l A _ (ρ y)
+      (fun _ => ValuationSubring.mem_comap)
+      n 1 _ _ (hn2 y r₀ γ)
+  have hP :=
+    GlobalTheory.T.isLogDerivQExpansion_finset_prod_zpow ε X hj l A hl n 1 _ I
+      (fun i =>
+        X.gal (ρ i.1)
+          (nrmT X (topMu l n m N)
+            (X.sl (ofSL (gm i.2.1 * liftSL _ i.2.2)) (wkMu X l n m N x c d (σ i.1)))))
+      (fun i => HahnSeries.map (GlobalTheory.Glue.NrmT.resZ (ψ i.1 i.2.1 i.2.2)) (ρ i.1 : Ω →+* Ω))
+      (fun i => (mx i : ℤ))
+      (fun i _ => hD i.1 i.2.1 i.2.2)
+  have hFval
+      : ((∏ y ∈ S, Units.map (X.gal (ρ y)).toMonoidHom (f y) : X.Kˣ) : X.K)
+        = ∏ i ∈ I, X.gal (ρ i.1) (nrmT X (topMu l n m N) (X.sl (ofSL (gm i.2.1 * liftSL _ i.2.2)) (wkMu X l n m N x c d (σ i.1)))) ^ (mx i : ℤ) :=
+    by
+      rw [Units.coe_prod, hI, Finset.prod_product]
+      refine Finset.prod_congr rfl fun y _ => ?_
+      rw [Finset.prod_product]
+      show X.gal (ρ y) (f y) = _
+      rw [hf1, hFF, map_pow, map_prod, ← Finset.prod_pow]
+      refine Finset.prod_congr rfl fun r₀ _ => ?_
+      rw [map_prod, ← Finset.prod_pow]
+      refine Finset.prod_congr rfl fun γ _ => ?_
+      rw [map_pow, hmx, zpow_natCast, pow_mul]
+  have hwit :=
+    wit_sum X hN0 S
+      (fun y => X.galB l (ρ y) (bB (σ y)))
+      (fun y => Units.map (X.gal (ρ y)).toMonoidHom (f y))
+      (fun y _ => (UpperTheory.Kd.L.witalg ε X l N n hN0).2.2.1 (ρ y) _ _ (hf2 y))
   have hTh := (isThB_iff X A N l n _ _).2 ⟨_, hwit, by rw [hFval]; exact hP⟩
-  have hmemB : ∑ y ∈ S, X.galB l (ρ y) (bB (σ y)) ∈ X.B N l w := sum_mem fun y _ =>
-    GlobalTheory.T.galB_mem_kummer_invariant_set ε X ε.injective hj N l w hp.odd hp.five
-      ((Nat.Prime.coprime_iff_not_dvd hlp).2 hp.cop).symm hw (ρ y) _ (hB _ (hσ y)).1
+  have hmemB : ∑ y ∈ S, X.galB l (ρ y) (bB (σ y)) ∈ X.B N l w :=
+    sum_mem fun y _ =>
+      GlobalTheory.T.galB_mem_kummer_invariant_set ε X ε.injective hj N l w hp.odd hp.five
+        ((Nat.Prime.coprime_iff_not_dvd hlp).2 hp.cop).symm hw (ρ y) _ (hB _ (hσ y)).1
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
-  have hun := GlobalTheory.T.cuspFunctionalValueModPrimePow_unique_oddWeight Ω ε X A N l X.j_hol hp.odd hp.cop hp.five hl n w hw _ hmemB φ _ hφ hTh r
+  have hun :=
+    GlobalTheory.T.cuspFunctionalValueModPrimePow_unique_oddWeight Ω ε X A N l X.j_hol hp.odd hp.cop
+      hp.five hl n w hw _ hmemB φ _ hφ hTh r
   have hun2 := GlobalTheory.Glue.NrmT.cgA_mul A l n (pow_mem (natCast_mem A l) cc) hun
   refine cgA_trans hun2 ?_
-  have hΦ : ∀ r : ℚ, (∑ i ∈ I, (mx i : ℤ) • HahnSeries.map (GlobalTheory.Glue.NrmT.resZ (ψ i.1 i.2.1 i.2.2)) (ρ i.1 : Ω →+* Ω)).coeff r =
-      ∑ i ∈ I, (mx i : Ω) * ρ i.1 (if r.den = 1 then (ψ i.1 i.2.1 i.2.2).coeff r else 0) := fun r => by
-    rw [HahnSeries.coeff_sum]
-    refine Finset.sum_congr rfl fun i _ => ?_
-    rw [HahnSeries.coeff_smul, zsmul_eq_mul, Int.cast_natCast]
-    rfl
+  have hΦ
+      : ∀ r : ℚ,
+        (∑ i ∈ I, (mx i : ℤ) • HahnSeries.map (GlobalTheory.Glue.NrmT.resZ (ψ i.1 i.2.1 i.2.2)) (ρ i.1 : Ω →+* Ω)).coeff
+            r
+          = ∑ i ∈ I, (mx i : Ω) * ρ i.1 (if r.den = 1 then (ψ i.1 i.2.1 i.2.2).coeff r else 0) :=
+    fun r => by
+      rw [HahnSeries.coeff_sum]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [HahnSeries.coeff_smul, zsmul_eq_mul, Int.cast_natCast]
+      rfl
   rw [hΦ]
   by_cases hr : r.den = 1
   · simp only [hr, if_true]
-    have hab : ∀ i ∈ I, CgA A l n ((l : Ω) ^ cc * ρ i.1 ((ψ i.1 i.2.1 i.2.2).coeff r))
-        (s (ρ i.1 (ξ i.1 i.2.1 i.2.2 r)) - ρ i.1 (ξ i.1 i.2.1 i.2.2 r) +
-          (l : Ω) ^ cc * ((N : Ω) ^ 3 * ρ i.1 (EE ε l (m + n) N x c d (gm i.2.1 * liftSL _ i.2.2) r) * (t.val : Ω))) := by
+    have hab
+        : ∀ i ∈ I,
+          CgA A l n ((l : Ω) ^ cc * ρ i.1 ((ψ i.1 i.2.1 i.2.2).coeff r))
+            (s (ρ i.1 (ξ i.1 i.2.1 i.2.2 r)) - ρ i.1 (ξ i.1 i.2.1 i.2.2 r)
+              + (l : Ω) ^ cc
+                * ((N : Ω) ^ 3 * ρ i.1 (EE ε l (m + n) N x c d (gm i.2.1 * liftSL _ i.2.2) r)
+                  * (t.val : Ω))) := by
       intro i hi
-      have h1 := (hξ i.1 i.2.1 i.2.2 (hIR i hi)).2 (σ i.1) (hσ _) (hσS _) t (hσt _) _ (hψ1 i.1 i.2.1 i.2.2) r
+      have h1 :=
+        (hξ i.1 i.2.1 i.2.2 (hIR i hi)).2 (σ i.1) (hσ _) (hσS _) t (hσt _) _ (hψ1 i.1 i.2.1 i.2.2) r
       have h2 := cgA_map (ρ i.1) h1
       rw [hσd] at h2
       simp only [map_add (f := _), map_sub, map_mul, map_pow, map_natCast, conj_apply] at h2
       exact h2
     have h3 := cgA_sum I mx _ _ hab
-    have e1 : (l : Ω) ^ cc * ∑ i ∈ I, (mx i : Ω) * ρ i.1 ((ψ i.1 i.2.1 i.2.2).coeff r) =
-        ∑ i ∈ I, (mx i : Ω) * ((l : Ω) ^ cc * ρ i.1 ((ψ i.1 i.2.1 i.2.2).coeff r)) := by
+    have e1
+        : (l : Ω) ^ cc * ∑ i ∈ I, (mx i : Ω) * ρ i.1 ((ψ i.1 i.2.1 i.2.2).coeff r)
+          = ∑ i ∈ I, (mx i : Ω) * ((l : Ω) ^ cc * ρ i.1 ((ψ i.1 i.2.1 i.2.2).coeff r)) := by
       rw [Finset.mul_sum]
       exact Finset.sum_congr rfl fun i _ => by ring
     rw [e1]
     convert h3 using 1
-    have e2 : ∑ y ∈ S, ∑ r₀ : (ZMod l)ˣ, ∑ γ ∈ R, (ex l n w (gm r₀ * liftSL _ γ) : Ω) * ρ y (EE ε l (m + n) N x c d (gm r₀ * liftSL _ γ) r) =
-        ∑ i ∈ I, (ex l n w (gm i.2.1 * liftSL _ i.2.2) : Ω) * ρ i.1 (EE ε l (m + n) N x c d (gm i.2.1 * liftSL _ i.2.2) r) := by
-      rw [hI, Finset.sum_product]
-      refine Finset.sum_congr rfl fun y _ => ?_
-      rw [Finset.sum_product]
+    have e2
+        : ∑ y ∈ S, ∑ r₀ : (ZMod l)ˣ, ∑ γ ∈ R, (ex l n w (gm r₀ * liftSL _ γ) : Ω) * ρ y (EE ε l (m + n) N x c d (gm r₀ * liftSL _ γ) r)
+          = ∑ i ∈ I, (ex l n w (gm i.2.1 * liftSL _ i.2.2) : Ω) * ρ i.1 (EE ε l (m + n) N x c d (gm i.2.1 * liftSL _ i.2.2) r) :=
+      by
+        rw [hI, Finset.sum_product]
+        refine Finset.sum_congr rfl fun y _ => ?_
+        rw [Finset.sum_product]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [e2, map_sum, ← Finset.sum_sub_distrib]
     simp only [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_add_distrib]
@@ -498,5 +575,6 @@ theorem UpperTheory.Kd.L.mackey :
     rw [map_mul, map_natCast, hmx]
     push_cast
     ring
-  · simp only [hr, if_false, map_zero, mul_zero, Finset.sum_const_zero, sub_zero, add_zero, zero_mul]
+  · simp only [hr, if_false, map_zero, mul_zero, Finset.sum_const_zero, sub_zero, add_zero,
+      zero_mul]
     exact ⟨0, zero_mem A, by ring⟩

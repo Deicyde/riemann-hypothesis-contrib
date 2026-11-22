@@ -8,19 +8,25 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem fg_int_of_forall_isIntegral (K' : Type) [Field K'] [NumberField K']
-    (M : Submodule ℤ K') (hM : ∀ y ∈ M, IsIntegral ℤ y) : M.FG := by
+theorem fg_int_of_forall_isIntegral
+    (K' : Type) [Field K'] [NumberField K'] (M : Submodule ℤ K') (hM : ∀ y ∈ M, IsIntegral ℤ y)
+    : M.FG := by
   let f : 𝓞 K' →ₗ[ℤ] K' := (algebraMap (𝓞 K') K').toIntAlgHom.toLinearMap
   have hle : M ≤ LinearMap.range f := fun y hy => ⟨⟨y, hM y hy⟩, rfl⟩
   have hfg : (M.comap f).FG := IsNoetherian.noetherian _
   have hmap := hfg.map f
   rwa [Submodule.map_comap_eq, inf_eq_right.mpr hle] at hmap
 
-theorem fg_of_integral_functionals (K : Type) [Field K] [NumberField K] (C : Type)
-    [AddCommGroup C] [Module K C] [FiniteDimensional K C] [Module (𝓞 K) C]
-    [IsScalarTower (𝓞 K) K C] (L : Submodule (𝓞 K) C)
-    (h : ∀ x : C, x ≠ 0 → ∃ (K' : Type) (_ : Field K') (_ : NumberField K') (_ : Algebra K K')
-      (φ : C →ₗ[K] K'), φ x ≠ 0 ∧ ∀ y ∈ L, IsIntegral ℤ (φ y)) : L.FG := by
+theorem fg_of_integral_functionals
+    (K : Type) [Field K] [NumberField K]
+    (C : Type)
+    [AddCommGroup C] [Module K C] [FiniteDimensional K C] [Module (𝓞 K) C] [IsScalarTower (𝓞 K) K C]
+    (L : Submodule (𝓞 K) C)
+    (h : ∀ x : C,
+      x ≠ 0
+        → ∃ (K' : Type) (_ : Field K') (_ : NumberField K') (_ : Algebra K K') (φ : C →ₗ[K] K'),
+          φ x ≠ 0 ∧ ∀ y ∈ L, IsIntegral ℤ (φ y))
+    : L.FG := by
   apply Submodule.FG.of_restrictScalars ℤ
   suffices H : ∀ W : Submodule K C, (L.restrictScalars ℤ ⊓ W.restrictScalars ℤ).FG by
     simpa using H ⊤
@@ -46,8 +52,9 @@ theorem fg_of_integral_functionals (K : Type) [Field K] [NumberField K] (C : Typ
         intro z hz
         obtain ⟨y, hy, rfl⟩ := Submodule.mem_map.mp hz
         exact hφL y (Submodule.mem_inf.mp hy).1
-      · have heq : L.restrictScalars ℤ ⊓ W.restrictScalars ℤ ⊓ LinearMap.ker f
-            = L.restrictScalars ℤ ⊓ (W ⊓ LinearMap.ker φ).restrictScalars ℤ := by
+      · have heq
+            : L.restrictScalars ℤ ⊓ W.restrictScalars ℤ ⊓ LinearMap.ker f
+              = L.restrictScalars ℤ ⊓ (W ⊓ LinearMap.ker φ).restrictScalars ℤ := by
           ext y
           simp [f, and_assoc]
           exact fun _ _ => Iff.rfl

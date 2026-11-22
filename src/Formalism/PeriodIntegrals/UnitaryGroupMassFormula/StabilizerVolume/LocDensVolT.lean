@@ -12,7 +12,8 @@ namespace PI.VolStabS
 namespace VolAAW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes SdUniqW
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes SdUniqW
 
 theorem eq_one_of_pow (z : ℂ) (hz : ‖z‖ = 1) (h : ∀ k : ℕ, 1 / 2 < (z ^ (2 ^ k)).re) : z = 1 := by
   have hsq : ∀ w : ℂ, ‖w‖ = 1 → w.re ^ 2 + w.im ^ 2 = 1 := by
@@ -60,8 +61,8 @@ theorem eq_one_of_pow (z : ℂ) (hz : ‖z‖ = 1) (h : ∀ k : ℕ, 1 / 2 < (z 
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem psiV_nsmul (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (n : ℕ) (y : Fv F v) :
-    psiV F ψ v (n • y) = psiV F ψ v y ^ n := by
+theorem psiV_nsmul (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (n : ℕ) (y : Fv F v)
+    : psiV F ψ v (n • y) = psiV F ψ v y ^ n := by
   induction n with
   | zero =>
     simp only [zero_smul, pow_zero, psiV]
@@ -76,17 +77,19 @@ theorem psiV_nsmul (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (n
     rw [this, AddChar.map_zero_eq_one]
   | succ n ih => rw [succ_nsmul, psiV_add, ih, pow_succ]
 
-theorem ev_triv (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ) :
-    ∀ᶠ v in cofinite, ∀ y ∈ v.adicCompletionIntegers F, psiV F ψ v y = 1 := by
+theorem ev_triv (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ)
+    : ∀ᶠ v in cofinite, ∀ y ∈ v.adicCompletionIntegers F, psiV F ψ v y = 1 := by
   classical
   set U : Set (AF F) := {x | 1 / 2 < (ψ x).re} with hUdef
   have hU : IsOpen U := isOpen_lt continuous_const (Complex.continuous_re.comp hψ.1)
-  let Φ : (∀ v : HeightOneSpectrum (𝓞 F),
-      ((v.adicCompletionIntegers F : Set (v.adicCompletion F)))) → AF F :=
-    fun x => pairA F 0 (RestrictedProduct.structureMap _ _ Filter.cofinite x)
+  let Φ
+      : (∀ v : HeightOneSpectrum (𝓞 F), ((v.adicCompletionIntegers F : Set (v.adicCompletion F))))
+        → AF F := fun x =>
+    pairA F 0 (RestrictedProduct.structureMap _ _ Filter.cofinite x)
   have hΦ : Continuous Φ :=
     continuous_const.prodMk RestrictedProduct.isEmbedding_structureMap.continuous
-  let x0 : ∀ v : HeightOneSpectrum (𝓞 F), ((v.adicCompletionIntegers F : Set (v.adicCompletion F))) :=
+  let x0
+      : ∀ v : HeightOneSpectrum (𝓞 F), ((v.adicCompletionIntegers F : Set (v.adicCompletion F))) :=
     fun v => ⟨0, zero_mem _⟩
   have hx0 : Φ x0 = 0 := by
     show pairA F 0 _ = 0
@@ -132,9 +135,10 @@ theorem ev_triv (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ) :
   exact mul_mem (by exact_mod_cast (natCast_mem (v.adicCompletionIntegers F) (2 ^ k))) hy
 
 def CondExact : Prop :=
-  ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), IsCharAF F ψ →
-    ∀ᶠ v in cofinite, ∀ t : Fv F v,
-      (∀ s ∈ v.adicCompletionIntegers F, psiV F ψ v (s * t) = 1) → t ∈ v.adicCompletionIntegers F
+  ∀ (F : Type) [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
+    IsCharAF F ψ
+      → ∀ᶠ v in cofinite, ∀ t : Fv F v,
+          (∀ s ∈ v.adicCompletionIntegers F, psiV F ψ v (s * t) = 1) → t ∈ v.adicCompletionIntegers F
 
 theorem condAA_of (hE : CondExact) : CondAA := by
   intro F _ _ ψ hψ

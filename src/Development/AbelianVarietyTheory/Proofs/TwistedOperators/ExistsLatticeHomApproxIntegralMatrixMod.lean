@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemHatMxHomL
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
 open GlobalTheory.Grid GlobalTheory.ChiGrid GlobalTheory.GridJoin
@@ -24,7 +26,8 @@ namespace GlobalTheory.FunObj.HatFrame
 
 section General
 
-open Matrix TensorProduct NumberField IsDedekindDomain Formalism.UG Formalism.UG.P Formalism.L2.DIV GlobalTheory.NormSum.AdLattice
+open Matrix TensorProduct NumberField IsDedekindDomain Formalism.UG Formalism.UG.P Formalism.L2.DIV
+  GlobalTheory.NormSum.AdLattice
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {m n : ℕ}
 
@@ -32,11 +35,12 @@ local notation "𝒜" => E ⊗[F] FiniteAdeleRing (𝓞 F) F
 local notation "𝒮" => tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (intOE E) (intAd F)
 local notation "ι" => inclE (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)
 
-theorem approx_of_mem_genGrp {Λ : Submodule (𝓞 E) (Fin n → E)} {Λ' : Submodule (𝓞 E) (Fin m → E)}
-    {β : GL (Fin n) 𝒜} {β' : GL (Fin m) 𝒜} (hβ : IsFrame β Λ) (hβ' : IsFrame β' Λ')
+theorem approx_of_mem_genGrp
+    {Λ : Submodule (𝓞 E) (Fin n → E)} {Λ' : Submodule (𝓞 E) (Fin m → E)} {β : GL (Fin n) 𝒜}
+    {β' : GL (Fin m) 𝒜} (hβ : IsFrame β Λ) (hβ' : IsFrame β' Λ')
     {H : Submodule (𝓞 E) (Matrix (Fin m) (Fin n) E)} (hH : ∀ x ∈ H, ∀ y ∈ Λ, x *ᵥ y ∈ Λ')
-    (I : Ideal (𝓞 E)) (hI : I ≠ ⊥) :
-    ∀ w ∈ genGrp F H, ∃ x₀ ∈ H, x₀.map ι - w ∈ frGrp β β' (idS F I) := by
+    (I : Ideal (𝓞 E)) (hI : I ≠ ⊥)
+    : ∀ w ∈ genGrp F H, ∃ x₀ ∈ H, x₀.map ι - w ∈ frGrp β β' (idS F I) := by
   intro w hw
   induction hw using AddSubgroup.closure_induction with
   | mem w hw =>
@@ -49,16 +53,19 @@ theorem approx_of_mem_genGrp {Λ : Submodule (𝓞 E) (Fin n → E)} {Λ' : Subm
       rw [← hr]
       rfl
     refine ⟨r • x, H.smul_mem r hx, ?_⟩
-    have e : (r • x).map ι - (Matrix.of fun i j => x i j ⊗ₜ[F] α : Matrix (Fin m) (Fin n) 𝒜) =
-        ((oToS F E r - ⟨_, hα'⟩ : 𝒮) : 𝒜) • x.map ι := by
+    have e
+        : (r • x).map ι - (Matrix.of fun i j => x i j ⊗ₜ[F] α : Matrix (Fin m) (Fin n) 𝒜)
+          = ((oToS F E r - ⟨_, hα'⟩ : 𝒮) : 𝒜) • x.map ι := by
       ext i j
       show ((algebraMap (𝓞 E) E r * x i j) ⊗ₜ[F] (1 : FiniteAdeleRing (𝓞 F) F)) - x i j ⊗ₜ[F] α =
         ((algebraMap (𝓞 E) E r ⊗ₜ[F] (1 : FiniteAdeleRing (𝓞 F) F)) - ((1 : E) ⊗ₜ[F] α)) *
           (x i j ⊗ₜ[F] (1 : FiniteAdeleRing (𝓞 F) F))
-      rw [sub_mul, Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul, mul_one]
+      rw [sub_mul, Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul,
+        mul_one, one_mul, mul_one]
     rw [e]
     exact smul_mem_frGrp β β' hr' (fun i j => frame_int hβ hβ' (hH x hx) i j)
-  | zero => exact ⟨0, zero_mem _, by rw [Matrix.map_zero _ (map_zero _), sub_zero]; exact zero_mem _⟩
+  | zero =>
+    exact ⟨0, zero_mem _, by rw [Matrix.map_zero _ (map_zero _), sub_zero]; exact zero_mem _⟩
   | add a b _ _ ha hb =>
     obtain ⟨x, hx, hxa⟩ := ha
     obtain ⟨y, hy, hyb⟩ := hb
@@ -71,12 +78,14 @@ theorem approx_of_mem_genGrp {Λ : Submodule (𝓞 E) (Fin n → E)} {Λ' : Subm
     rw [Matrix.map_neg _ (map_neg _), neg_sub_neg, ← neg_sub]
     exact neg_mem hxa
 
-theorem approx_general {Λ : Submodule (𝓞 E) (Fin n → E)} {Λ' : Submodule (𝓞 E) (Fin m → E)}
-    {β : GL (Fin n) 𝒜} {β' : GL (Fin m) 𝒜} (hβ : IsFrame β Λ) (hβ' : IsFrame β' Λ')
-    {H : Submodule (𝓞 E) (Matrix (Fin m) (Fin n) E)} (hH : ∀ x ∈ H, ∀ y ∈ Λ, x *ᵥ y ∈ Λ')
-    (hH' : ∀ x, (∀ y ∈ Λ, x *ᵥ y ∈ Λ') → x ∈ H) (I : Ideal (𝓞 E)) (hI : I ≠ ⊥)
-    (N : Matrix (Fin m) (Fin n) 𝒮) :
-    ∃ x₀ ∈ H, ∀ i j, ∃ s ∈ idS F I,
+theorem approx_general
+    {Λ : Submodule (𝓞 E) (Fin n → E)} {Λ' : Submodule (𝓞 E) (Fin m → E)} {β : GL (Fin n) 𝒜}
+    {β' : GL (Fin m) 𝒜} (hβ : IsFrame β Λ) (hβ' : IsFrame β' Λ')
+    {H : Submodule (𝓞 E) (Matrix (Fin m) (Fin n) E)}
+    (hH : ∀ x ∈ H, ∀ y ∈ Λ, x *ᵥ y ∈ Λ') (hH' : ∀ x, (∀ y ∈ Λ, x *ᵥ y ∈ Λ') → x ∈ H)
+    (I : Ideal (𝓞 E)) (hI : I ≠ ⊥)
+    (N : Matrix (Fin m) (Fin n) 𝒮)
+    : ∃ x₀ ∈ H, ∀ i j, ∃ s ∈ idS F I,
       (s : 𝒜) = HMul.hMul (HMul.hMul (β'⁻¹).val (x₀.map ι)) β.val i j - (N i j : 𝒜) := by
   set Nc : Matrix (Fin m) (Fin n) 𝒜 := Matrix.of fun i j => (N i j : 𝒜) with hNc
   set z : Matrix (Fin m) (Fin n) 𝒜 := HMul.hMul (HMul.hMul β'.val Nc) (β⁻¹).val with hz
@@ -99,16 +108,32 @@ theorem approx_general {Λ : Submodule (𝓞 E) (Fin n → E)} {Λ' : Submodule 
 
 end General
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
 open GlobalTheory.Grid GlobalTheory.ChiGrid GlobalTheory.GridJoin
 open scoped Pointwise TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem homLat_approx_mod : ∀ {D : D7} {m n : ℕ} (Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) (Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)) (β : GL (Fin n) (EAf D)) (β' : GL (Fin m) (EAf D)), Formalism.L2.DIV.IsFrame β Λ → Formalism.L2.DIV.IsFrame β' Λ' → ∀ (I : Ideal (𝓞 D.host.E)), I ≠ ⊥ → ∀ (N : Matrix (Fin m) (Fin n) (Formalism.L2.Herm.intAf D.host.F D.host.E)), ∃ x₀ ∈ GlobalTheory.ChiGrid.homLat Λ Λ', ∀ i j, ∃ s ∈ Formalism.L2.DIV.idS D.host.F I, (s : EAf D) = HMul.hMul (HMul.hMul (β'⁻¹).val (x₀.map (eToEAf D))) β.val i j - (N i j : EAf D) := by
+theorem homLat_approx_mod
+    : ∀ {D : D7} {m n : ℕ} (Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E))
+        (Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)) (β : GL (Fin n) (EAf D))
+        (β' : GL (Fin m) (EAf D)),
+      Formalism.L2.DIV.IsFrame β Λ → Formalism.L2.DIV.IsFrame β' Λ'
+        → ∀ (I : Ideal (𝓞 D.host.E)),
+          I ≠ ⊥
+            → ∀ (N : Matrix (Fin m) (Fin n) (Formalism.L2.Herm.intAf D.host.F D.host.E)),
+              ∃ x₀ ∈ GlobalTheory.ChiGrid.homLat Λ Λ', ∀ i j, ∃ s ∈ Formalism.L2.DIV.idS D.host.F I,
+                (s : EAf D)
+                  = HMul.hMul (HMul.hMul (β'⁻¹).val (x₀.map (eToEAf D))) β.val i j
+                    - (N i j : EAf D) := by
   intro D m n Λ Λ' β β' hβ hβ' I hI N
-  exact approx_general hβ hβ' (H := GlobalTheory.ChiGrid.homLat Λ Λ') (fun _ hx => hx) (fun _ hx => hx) I hI N
+  exact approx_general hβ hβ' (H := GlobalTheory.ChiGrid.homLat Λ Λ')
+    (fun _ hx => hx)
+    (fun _ hx => hx)
+    I hI N
 
 end GlobalTheory.FunObj.HatFrame
 

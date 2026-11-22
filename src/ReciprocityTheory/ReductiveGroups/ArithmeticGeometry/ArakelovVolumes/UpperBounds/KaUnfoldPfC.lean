@@ -6,7 +6,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.KU
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory Topology Matrix
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+  Topology Matrix
 open scoped ENNReal ComplexOrder
 
 noncomputable section
@@ -17,18 +19,20 @@ local instance instMSMat {m n : Type*} : MeasurableSpace (Matrix m n ℂ) :=
 local instance instBorelMat {m n : Type*} [Fintype m] [Fintype n] : BorelSpace (Matrix m n ℂ) :=
   inferInstanceAs (BorelSpace (m → n → ℂ))
 
-theorem meas_inv {n : Type*} [Fintype n] [DecidableEq n] : Measurable fun A : Matrix n n ℂ => A⁻¹ := by
+theorem meas_inv {n : Type*} [Fintype n] [DecidableEq n]
+    : Measurable fun A : Matrix n n ℂ => A⁻¹ := by
   refine Measurable.of_eval fun i => Measurable.of_eval fun j => ?_
   simp only [Matrix.inv_def, Ring.inverse_eq_inv, Matrix.smul_apply, smul_eq_mul]
   exact (continuous_id.matrix_det.measurable.inv).mul
     (continuous_id.matrix_adjugate.matrix_elem i j).measurable
 
-theorem meas_Yb {p q : ℕ} : Measurable fun M : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ => Yb M := by
+theorem meas_Yb {p q : ℕ}
+    : Measurable fun M : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ => Yb M := by
   have hB : Measurable fun M : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ => M.toBlocks₂₂ :=
     (show Continuous fun M : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ =>
         (M.toBlocks₂₂ : Matrix (Fin q) (Fin q) ℂ) from
-      continuous_pi fun i => continuous_pi fun j =>
-        continuous_id.matrix_elem (Sum.inr i) (Sum.inr j)).measurable
+      continuous_pi fun i =>
+        continuous_pi fun j => continuous_id.matrix_elem (Sum.inr i) (Sum.inr j)).measurable
   have hBi := (meas_inv (n := Fin q)).comp hB
   unfold Yb
   refine Measurable.of_eval fun i => Measurable.of_eval fun j => ?_
@@ -39,12 +43,13 @@ theorem meas_Yb {p q : ℕ} : Measurable fun M : Matrix (Fin p ⊕ Fin q) (Fin p
 
 theorem meas_dpow {p q : ℕ} (s : ℝ) : Measurable fun Z : Matrix (Fin p) (Fin q) ℂ => dpow Z s := by
   unfold dpow
-  exact (Complex.continuous_re.comp ((continuous_const.sub
-    (continuous_id.matrix_mul continuous_id.matrix_conjTranspose)).matrix_det)).measurable.pow_const s
+  exact (Complex.continuous_re.comp ((continuous_const.sub (continuous_id.matrix_mul
+    continuous_id.matrix_conjTranspose)).matrix_det)).measurable.pow_const s
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem cont_mat (X : Data E r) (τ : X.Ψ) : Continuous fun x : Frame X.Ψ r => mat x τ := continuous_apply τ
+theorem cont_mat (X : Data E r) (τ : X.Ψ) : Continuous fun x : Frame X.Ψ r => mat x τ :=
+  continuous_apply τ
 
 theorem cont_Mx (X : Data E r) (x0 : Frame X.Ψ r) (τ : X.Ψ) : Continuous fun x => Mx X x0 x τ := by
   unfold Mx tl
@@ -62,8 +67,10 @@ theorem cont_lact (X : Data E r) (γ : GL (Fin r) E) : Continuous (lact (Ψ := X
   exact continuous_const.matrix_mul (cont_mat X τ)
 
 theorem meas_Bor (X : Data E r) : MeasurableSet (Bor X.Ψ r) := by
-  have h : Bor X.Ψ r = ⋂ τ, ({b : Frame X.Ψ r | (mat b τ).det ≠ 0} ∩
-      ⋂ a, ⋂ c, {b : Frame X.Ψ r | c < a → b τ a c = 0}) := by
+  have h
+      : Bor X.Ψ r
+        = ⋂ τ, ({b : Frame X.Ψ r | (mat b τ).det ≠ 0} ∩
+          ⋂ a, ⋂ c, {b : Frame X.Ψ r | c < a → b τ a c = 0}) := by
     ext b
     simp [Bor]
   rw [h]
@@ -78,8 +85,11 @@ theorem meas_Bor (X : Data E r) : MeasurableSet (Bor X.Ψ r) := by
 def Sset (X : Data E r) (x0 : Frame X.Ψ r) (FF : Set (V (nd X))) : Set (Frame X.Ψ r) :=
   (fun pr : V (nd X) × Frame X.Ψ r => rmul (cpt X x0 pr.1) pr.2) '' (FF ×ˢ Bor X.Ψ r)
 
-theorem meas_S (X : Data E r) {x0 : Frame X.Ψ r} (ho : IsOrth X x0) {FF : Set (V (nd X))}
-    (hFF : MeasurableSet FF) : MeasurableSet (Sset X x0 FF) := by
+theorem meas_S
+    (X : Data E r)
+    {x0 : Frame X.Ψ r} (ho : IsOrth X x0)
+    {FF : Set (V (nd X))} (hFF : MeasurableSet FF)
+    : MeasurableSet (Sset X x0 FF) := by
   have : PolishSpace (V (nd X) × Frame X.Ψ r) := {}
   refine MeasurableSet.image_of_continuousOn_injOn (hFF.prod (meas_Bor X)) ?_ ?_
   · refine Continuous.continuousOn (continuous_pi fun τ => ?_)
@@ -125,11 +135,16 @@ private lemma rmul_rmul_inv_mat (X : Data E r) {b : Frame X.Ψ r} (hb : b ∈ Bo
   rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hu, Matrix.mul_one]
   rfl
 
-theorem rmul_mem_S (X : Data E r) {x0 : Frame X.Ψ r} {FF : Set (V (nd X))} {y b : Frame X.Ψ r}
-    (hb : b ∈ Bor X.Ψ r) : rmul y b ∈ Sset X x0 FF ↔ y ∈ Sset X x0 FF := by
+theorem rmul_mem_S
+    (X : Data E r) {x0 : Frame X.Ψ r} {FF : Set (V (nd X))} {y b : Frame X.Ψ r} (hb : b ∈ Bor X.Ψ r)
+    : rmul y b ∈ Sset X x0 FF ↔ y ∈ Sset X x0 FF := by
   constructor
   · rintro ⟨⟨z, c⟩, ⟨hz, hc⟩, h⟩
-    refine ⟨⟨z, rmul c (fun τ => ((mat b τ)⁻¹ : Matrix (Fin r) (Fin r) ℂ) : Frame X.Ψ r)⟩, ⟨hz, bor_rmul_mem X hc (inv_mat_mem_bor X hb)⟩, ?_⟩
+    refine ⟨
+      ⟨z, rmul c (fun τ => ((mat b τ)⁻¹ : Matrix (Fin r) (Fin r) ℂ) : Frame X.Ψ r)⟩,
+      ⟨hz, bor_rmul_mem X hc (inv_mat_mem_bor X hb)⟩,
+      ?_
+    ⟩
     simp only at h ⊢
     exact (rmul_rmul_eq_rmul_rmul X _ _ _).symm.trans
       ((congrArg (fun w => rmul w _) h).trans (rmul_rmul_inv_mat X hb y))
@@ -138,8 +153,9 @@ theorem rmul_mem_S (X : Data E r) {x0 : Frame X.Ψ r} {FF : Set (V (nd X))} {y b
     simp only at h ⊢
     exact (rmul_rmul_eq_rmul_rmul X _ _ _).symm.trans (congrArg (fun w => rmul w b) h)
 
-theorem cpt_mem_S (X : Data E r) {x0 : Frame X.Ψ r} (ho : IsOrth X x0) {FF : Set (V (nd X))} (z : V (nd X)) :
-    cpt X x0 z ∈ Sset X x0 FF ↔ z ∈ FF := by
+theorem cpt_mem_S
+    (X : Data E r) {x0 : Frame X.Ψ r} (ho : IsOrth X x0) {FF : Set (V (nd X))} (z : V (nd X))
+    : cpt X x0 z ∈ Sset X x0 FF ↔ z ∈ FF := by
   constructor
   · rintro ⟨⟨z', b'⟩, ⟨hz', hb'⟩, h⟩
     simp only at h
@@ -148,8 +164,8 @@ theorem cpt_mem_S (X : Data E r) {x0 : Frame X.Ψ r} (ho : IsOrth X x0) {FF : Se
   · intro hz
     exact ⟨⟨z, ExtFPf.oneF X⟩, ⟨hz, ExtFPf.oneF_mem X⟩, ExtFPf.rmul_oneF X _⟩
 
-theorem lact_rmul' (X : Data E r) (γ : GL (Fin r) E) (x b : Frame X.Ψ r) :
-    lact γ (rmul x b) = rmul (lact γ x) b := by
+theorem lact_rmul' (X : Data E r) (γ : GL (Fin r) E) (x b : Frame X.Ψ r)
+    : lact γ (rmul x b) = rmul (lact γ x) b := by
   funext τ
   show (γ : Matrix (Fin r) (Fin r) E).map τ.1 * mat (rmul x b) τ = mat (lact γ x) τ * mat b τ
   exact (Matrix.mul_assoc ((γ : Matrix (Fin r) (Fin r) E).map τ.1) (mat x τ) (mat b τ)).symm

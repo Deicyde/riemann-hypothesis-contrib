@@ -14,8 +14,8 @@ noncomputable section
 
 def KernelProjMeasurable.Statement : Prop :=
   ∀ (X : Type) [TopologicalSpace X] [MeasurableSpace X] [OpensMeasurableSpace X] (n k : ℕ)
-    (L : X → Matrix (Fin k) (Fin n) ℂ), Continuous L →
-      Measurable fun x => (LinearMap.ker (Matrix.toEuclideanLin (L x))).starProjection
+      (L : X → Matrix (Fin k) (Fin n) ℂ),
+    Continuous L → Measurable fun x => (LinearMap.ker (Matrix.toEuclideanLin (L x))).starProjection
 
 end
 

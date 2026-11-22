@@ -27,4 +27,6 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SameBlock
 
 open PositivityTheory.RgBcC.RealD
 
-theorem UpperTheory.V.Z.GSp4Splitting.coreG : CoreG := coreG_of countG_holds (multG_of_multFor multiplicity_formula_holds) GlobalTheory.CompanionTheory.SignLine.signOne
+theorem UpperTheory.V.Z.GSp4Splitting.coreG : CoreG :=
+  coreG_of countG_holds (multG_of_multFor multiplicity_formula_holds)
+    GlobalTheory.CompanionTheory.SignLine.signOne

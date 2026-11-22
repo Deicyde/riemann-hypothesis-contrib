@@ -15,10 +15,12 @@ noncomputable section
 
 universe u
 
-theorem prime_eq_of_isLocalization_atPrime' {F : Type*} [Field F] {B R : Subring F} (h : B ≤ R)
-    (𝔭₁ 𝔭₂ : Ideal B) [𝔭₁.IsPrime] [𝔭₂.IsPrime]
+theorem prime_eq_of_isLocalization_atPrime'
+    {F : Type*} [Field F]
+    {B R : Subring F} (h : B ≤ R) (𝔭₁ 𝔭₂ : Ideal B) [𝔭₁.IsPrime] [𝔭₂.IsPrime]
     (hl₁ : letI := (Subring.inclusion h).toAlgebra; IsLocalization.AtPrime R 𝔭₁)
-    (hl₂ : letI := (Subring.inclusion h).toAlgebra; IsLocalization.AtPrime R 𝔭₂) : 𝔭₁ = 𝔭₂ := by
+    (hl₂ : letI := (Subring.inclusion h).toAlgebra; IsLocalization.AtPrime R 𝔭₂)
+    : 𝔭₁ = 𝔭₂ := by
   let _ := (Subring.inclusion h).toAlgebra
   have := hl₁
   have := hl₂
@@ -26,9 +28,10 @@ theorem prime_eq_of_isLocalization_atPrime' {F : Type*} [Field F] {B R : Subring
   rw [← IsLocalization.AtPrime.under_maximalIdeal R 𝔭₁ inferInstance,
     ← IsLocalization.AtPrime.under_maximalIdeal R 𝔭₂ inferInstance]
 
-theorem BlowUpOverLocMaxPoint.proof (h₁ : BlowUpOverLocMaxCentre.Statement.{u})
-    (h₂ : BlowUpOverLocFibreMinimal.Statement.{u}) (h₃ : BlowUpOverLocPointDeg.Statement.{u}) :
-    BlowUpOverLocMaxPoint.Statement.{u} := by
+theorem BlowUpOverLocMaxPoint.proof
+    (h₁ : BlowUpOverLocMaxCentre.Statement.{u}) (h₂ : BlowUpOverLocFibreMinimal.Statement.{u})
+    (h₃ : BlowUpOverLocPointDeg.Statement.{u})
+    : BlowUpOverLocMaxPoint.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ J _ P n hP N u hu hu' c x hx hxP W hϖW hWmin hWrel
   have := hP.multiProj.isPrime
   intro 𝔫 h𝔫

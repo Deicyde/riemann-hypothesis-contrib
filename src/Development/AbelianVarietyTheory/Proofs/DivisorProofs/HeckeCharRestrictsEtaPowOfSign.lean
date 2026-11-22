@@ -12,7 +12,9 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Exists
 
 open NumberField MeasureTheory
 open scoped Classical
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Datum
 open Formalism.MainNotions.TaylorLogMetric (VC embT tor0 Hf lamOf area Th U)
 open Formalism.MainNotions.StandardLatticesGL3 (WeilO HeckeU TT stdL pt oddE0)
 open GlobalTheory.NormExact
@@ -21,21 +23,26 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.HeckeSignEta
 
-theorem idF_ratF (D : D7) (a : D.host.Fˣ) :
-    idF D (Units.map (algebraMap D.host.F (AF D.host.F)).toMonoidHom a) =
-      Units.map (incA D).toMonoidHom (Units.map (algebraMap D.host.F D.host.E).toMonoidHom a) := by
+theorem idF_ratF (D : D7) (a : D.host.Fˣ)
+    : idF D (Units.map (algebraMap D.host.F (AF D.host.F)).toMonoidHom a)
+      = Units.map (incA D).toMonoidHom
+        (Units.map (algebraMap D.host.F D.host.E).toMonoidHom a) := by
   refine Units.ext ?_
   show algebraMap (AF D.host.F) (AE D) (algebraMap D.host.F (AF D.host.F) (a : D.host.F)) =
     incA D (algebraMap D.host.F D.host.E (a : D.host.F))
   show _ = Algebra.TensorProduct.includeRight (algebraMap D.host.F D.host.E (a : D.host.F))
   rw [AlgHom.commutes, IsScalarTower.algebraMap_apply D.host.F (AF D.host.F) (AE D)]
 
-theorem resEta_of_sign : ∀ (D : D7) (χ : (AE D)ˣ →* Circle) (N : ℕ), IsHeckeChar D χ →
-    (∀ x y : (AE D)ˣ, (y : AE D) = x * cA D x → χ y = 1) →
-    ∀ θ : InfFam D, IsInfFam θ →
-    (∀ (τ : D.what₂.Tau) (x : (AE D)ˣ), finPart D (x : AE D) = 1 → θ τ (infPart D (x : AE D)) = -1 →
-      (∀ τ', τ' ≠ τ → θ τ' (infPart D (x : AE D)) = 1) → ((χ x : Circle) : ℂ) = (-1) ^ N) →
-    ResEta D χ N := by
+theorem resEta_of_sign
+    : ∀ (D : D7) (χ : (AE D)ˣ →* Circle) (N : ℕ),
+      IsHeckeChar D χ → (∀ x y : (AE D)ˣ, (y : AE D) = x * cA D x → χ y = 1)
+        → ∀ θ : InfFam D,
+          IsInfFam θ
+            → (∀ (τ : D.what₂.Tau) (x : (AE D)ˣ),
+              finPart D (x : AE D) = 1 → θ τ (infPart D (x : AE D)) = -1
+                → (∀ τ', τ' ≠ τ → θ τ' (infPart D (x : AE D)) = 1)
+                → ((χ x : Circle) : ℂ) = (-1) ^ N)
+            → ResEta D χ N := by
   intro D χ N hχ hnorm θ hθ hsign
   refine ⟨GlobalTheory.VolHeckeCompare.exists_isEta D, fun ε hε => ?_⟩
 
@@ -49,9 +56,15 @@ theorem resEta_of_sign : ∀ (D : D7) (χ : (AE D)ˣ →* Circle) (N : ℕ), IsH
       rw [hψa, idF_ratF, hχ.2, hε.2.1 a, one_pow, inv_one, mul_one]
     · rintro _ ⟨x, rfl⟩
       obtain ⟨-, -, hN, -⟩ := GlobalTheory.VolHeckeCompare.exists_form D
-      have e : (idF D (GlobalTheory.VolHeckeCompare.normU D x) : AE D) = (x : AE D) * cA D (x : AE D) := by
-        have e0 : idF D (GlobalTheory.VolHeckeCompare.normU D x) = GlobalTheory.IndefiniteRowSideFullHecke.UnitaryVolumePairs.normId D x := hN x
-        rw [e0]; rfl
+      have e
+          : (idF D (GlobalTheory.VolHeckeCompare.normU D x) : AE D)
+            = (x : AE D) * cA D (x : AE D) := by
+        have e0
+            : idF D (GlobalTheory.VolHeckeCompare.normU D x)
+              = GlobalTheory.IndefiniteRowSideFullHecke.UnitaryVolumePairs.normId D x :=
+          hN x
+        rw [e0]
+        rfl
       show ψ (GlobalTheory.VolHeckeCompare.normU D x) = 1
       rw [hψa, hnorm x _ e, hε.2.2.1 x, one_pow, inv_one, mul_one]
 
@@ -80,7 +93,8 @@ theorem resEta_of_sign : ∀ (D : D7) (χ : (AE D)ˣ →* Circle) (N : ℕ), IsH
   have hηc : ((η x : Circle) : ℂ) = -1 := by rw [hηx θ hθ x x1 xo, xτ, hN1']; simp
   have hfix : cA D (x : AE D) = x := by
     refine GlobalTheory.SplitCharExp.ext_of_chart h ?_ fun τ' => ?_
-    · have e3 : finPart D (cA D (x : AE D)) = sigR (Af D.host.F) D.sp.cm.sig (finPart D (x : AE D)) :=
+    · have e3
+          : finPart D (cA D (x : AE D)) = sigR (Af D.host.F) D.sp.cm.sig (finPart D (x : AE D)) :=
         GlobalTheory.FockCompare.LiftUnitary.snd_sigR D.sp.cm.sig (x : AE D)
       rw [e3, x1, RingHom.map_one]
     · rw [GlobalTheory.FockCompare.comp_cA hθ, x2]

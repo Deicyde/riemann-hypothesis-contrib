@@ -13,27 +13,32 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.RingKrull
 set_option autoImplicit false
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CxPts GlobalTheory.VB
 open scoped TensorProduct
 
 namespace GlobalTheory.RegGenSmooth
 
-theorem injective_of_charZero {k A : Type} [CommRing k] [IsDomain k] [Module.Finite ℤ k]
-    [CommRing A] [CharZero A] (f : k →+* A) : Function.Injective f := by
+theorem injective_of_charZero
+    {k A : Type} [CommRing k] [IsDomain k] [Module.Finite ℤ k] [CommRing A] [CharZero A]
+    (f : k →+* A)
+    : Function.Injective f := by
   rw [RingHom.injective_iff_ker_eq_bot]
   refine Ideal.eq_bot_of_comap_eq_bot (R := ℤ) ?_
   rw [Ideal.under_def, RingHom.comap_ker, ← RingHom.injective_iff_ker_eq_bot]
   exact RingHom.injective_int _
 
-theorem smooth_of_regular (K : Type) [Field K] [PerfectField K] (B : Type) [CommRing B]
-    [Algebra K B] [Algebra.FiniteType K B] (d : ℕ)
-    (h : ∀ (m : Ideal B) [m.IsMaximal], IsRegularLocalRing (Localization.AtPrime m) ∧
-      ringKrullDim (Localization.AtPrime m) = d) :
-    SmoothOfRelativeDimension d (spMap (algebraMap K B)) := by
+theorem smooth_of_regular
+    (K : Type) [Field K] [PerfectField K]
+    (B : Type) [CommRing B] [Algebra K B] [Algebra.FiniteType K B]
+    (d : ℕ)
+    (h : ∀ (m : Ideal B) [m.IsMaximal],
+      IsRegularLocalRing (Localization.AtPrime m) ∧ ringKrullDim (Localization.AtPrime m) = d)
+    : SmoothOfRelativeDimension d (spMap (algebraMap K B)) := by
   have : Algebra.FinitePresentation K B := Algebra.FinitePresentation.of_finiteType.mp ‹_›
-  have key (m : Ideal B) (hm : m.IsMaximal) :
-      ∃ f ∉ m, Algebra.IsStandardSmoothOfRelativeDimension d K (Localization.Away f) := by
+  have key (m : Ideal B) (hm : m.IsMaximal)
+      : ∃ f ∉ m, Algebra.IsStandardSmoothOfRelativeDimension d K (Localization.Away f) := by
     obtain ⟨h₁, h₂⟩ := h m
     have h₃ := formallySmooth_of_isRegularLocalRing_of_perfectField K (Localization.AtPrime m)
     have := formallyEtale_residueField_of_isMaximal K K m (Localization.AtPrime m)
@@ -61,9 +66,13 @@ theorem ringKrullDim_base (h : IsArithVar p D) : ringKrullDim k = 1 := by
   rw [ringKrullDim_eq_of_isIntegral ℤ k]
   exact IsPrincipalIdealRing.ringKrullDim_eq_one ℤ Int.not_isField
 
-theorem chart_props (h : IsArithVar p D) {A : Type} [CommRing A] [Algebra k A] (i : Sp A ⟶ X)
-    [IsOpenImmersion i] (hi : i ≫ p = spMap (algebraMap k A)) [Nontrivial A] :
-    IsDomain A ∧ Algebra.FiniteType k A ∧ FaithfulSMul k A := by
+theorem chart_props
+    (h : IsArithVar p D)
+    {A : Type} [CommRing A] [Algebra k A]
+    (i : Sp A ⟶ X) [IsOpenImmersion i]
+    (hi : i ≫ p = spMap (algebraMap k A))
+    [Nontrivial A]
+    : IsDomain A ∧ Algebra.FiniteType k A ∧ FaithfulSMul k A := by
   have := h.isDomain
   have := h.finite
   have := h.isIntegral
@@ -75,15 +84,22 @@ theorem chart_props (h : IsArithVar p D) {A : Type} [CommRing A] [Algebra k A] (
   rw [HasRingHomProperty.Spec_iff (P := @LocallyOfFiniteType)] at hft
   have hfl : Flat (i ≫ p ≫ spMap (Int.castRingHom k)) := inferInstance
   have h₁ := (flat_int_iff_charZero _).1 hfl
-  have : CharZero A := (Scheme.ΓSpecIso (.of A)).commRingCatIsoToRingEquiv.toRingHom.charZero_iff
-    (Scheme.ΓSpecIso (.of A)).commRingCatIsoToRingEquiv.injective |>.1 h₁
-  exact ⟨‹_›, RingHom.finiteType_algebraMap.mp hft,
-    (faithfulSMul_iff_algebraMap_injective _ _).2 (injective_of_charZero _)⟩
+  have : CharZero A :=
+    (Scheme.ΓSpecIso (.of A)).commRingCatIsoToRingEquiv.toRingHom.charZero_iff
+        (Scheme.ΓSpecIso (.of A)).commRingCatIsoToRingEquiv.injective
+      |>.1 h₁
+  exact ⟨
+    ‹_›,
+    RingHom.finiteType_algebraMap.mp hft,
+    (faithfulSMul_iff_algebraMap_injective _ _).2 (injective_of_charZero _)
+  ⟩
 
-theorem topologicalKrullDim_eq_succ (h : IsArithVar p D) {K : Type} [Field K] [Algebra k K]
-    [IsFractionRing k K] {Y : Scheme.{0}} {j : Y ⟶ X} {q : Y ⟶ Sp K}
-    (H : IsPullback j q p (spMap (algebraMap k K))) {d : ℕ} (hd : topologicalKrullDim Y = d) :
-    topologicalKrullDim X = (d + 1 : ℕ) := by
+theorem topologicalKrullDim_eq_succ
+    (h : IsArithVar p D)
+    {K : Type} [Field K] [Algebra k K] [IsFractionRing k K]
+    {Y : Scheme.{0}} {j : Y ⟶ X} {q : Y ⟶ Sp K} (H : IsPullback j q p (spMap (algebraMap k K)))
+    {d : ℕ} (hd : topologicalKrullDim Y = d)
+    : topologicalKrullDim X = (d + 1 : ℕ) := by
   have := h.isDomain
   have := h.isNoetherianRing
   have : IsProper p := CommonModel.isProper_of_isProjOver h.isProjOver
@@ -136,21 +152,24 @@ theorem topologicalKrullDim_eq_succ (h : IsArithVar p D) {K : Type} [Field K] [A
     refine Order.le_krullDim_iff.2 ⟨(l.map _ hm).cons x hlt, ?_⟩
     simp [hl]
 
-
 attribute [local instance] Algebra.TensorProduct.rightAlgebra in
-theorem ringKrullDim_chart (h : IsArithVar p D) {K : Type} [Field K] [Algebra k K]
-    [IsFractionRing k K] {Y : Scheme.{0}} {j : Y ⟶ X} {q : Y ⟶ Sp K}
-    (H : IsPullback j q p (spMap (algebraMap k K))) {A : Type} [CommRing A] [Algebra k A]
-    (i : Sp A ⟶ X) [IsOpenImmersion i] (hi : i ≫ p = spMap (algebraMap k A)) [Nontrivial A] :
-    IsDomain (K ⊗[k] A) ∧ ringKrullDim (K ⊗[k] A) = D := by
+theorem ringKrullDim_chart
+    (h : IsArithVar p D)
+    {K : Type} [Field K] [Algebra k K] [IsFractionRing k K]
+    {Y : Scheme.{0}} {j : Y ⟶ X} {q : Y ⟶ Sp K} (H : IsPullback j q p (spMap (algebraMap k K)))
+    {A : Type} [CommRing A] [Algebra k A]
+    (i : Sp A ⟶ X) [IsOpenImmersion i]
+    (hi : i ≫ p = spMap (algebraMap k A))
+    [Nontrivial A]
+    : IsDomain (K ⊗[k] A) ∧ ringKrullDim (K ⊗[k] A) = D := by
   have := h.isDomain
   have := h.isIntegral
   have : IsProper p := CommonModel.isProper_of_isProjOver h.isProjOver
   obtain ⟨_, _, _⟩ := chart_props h i hi
   have := IsLocalization.tensorRight (S := A) K (nonZeroDivisors k)
   have hle : Algebra.algebraMapSubmonoid A (nonZeroDivisors k) ≤ nonZeroDivisors A :=
-    Submonoid.map_le_iff_le_comap.mpr fun x hx ↦ mem_nonZeroDivisors_of_ne_zero
-      (by simpa using nonZeroDivisors.ne_zero hx)
+    Submonoid.map_le_iff_le_comap.mpr fun x hx ↦
+      mem_nonZeroDivisors_of_ne_zero (by simpa using nonZeroDivisors.ne_zero hx)
   have : IsDomain (K ⊗[k] A) := IsLocalization.isDomain_of_le_nonZeroDivisors _ hle
   have hinj : Function.Injective (algebraMap A (K ⊗[k] A)) := IsLocalization.injective _ hle
   refine ⟨this, ?_⟩
@@ -164,21 +183,23 @@ theorem ringKrullDim_chart (h : IsArithVar p D) {K : Type} [Field K] [Algebra k 
     (topologicalKrullDim_closure_eq_ringKrullDim_quotient q i₀ η).trans
       ((ringKrullDim_eq_of_ringEquiv (RingEquiv.quotientBot _)).trans hd)
   have e₂ : j (i₀ η) = genericPoint X := by
-    rw [← Scheme.Hom.comp_apply, H₀.w, Scheme.Hom.comp_apply, ← genericPoint_eq_of_isOpenImmersion i]
+    rw [← Scheme.Hom.comp_apply, H₀.w, Scheme.Hom.comp_apply,
+      ← genericPoint_eq_of_isOpenImmersion i]
     congr 1
     rw [genericPoint_eq_bot_of_affine]
     exact PrimeSpectrum.ext (Ideal.comap_bot_of_injective _ hinj)
   have e₃ : closure {i₀ η} = Set.univ :=
-    Set.eq_univ_of_forall fun y => specializes_iff_mem_closure.1
-      (j.isEmbedding.isInducing.specializes_iff.1 (e₂ ▸ genericPoint_specializes _))
+    Set.eq_univ_of_forall fun y =>
+      specializes_iff_mem_closure.1 (j.isEmbedding.isInducing.specializes_iff.1
+        (e₂ ▸ genericPoint_specializes _))
   rw [e₃, (Homeomorph.Set.univ Y).isHomeomorph.topologicalKrullDim_eq] at e₁
   have e₄ := (topologicalKrullDim_eq_succ h H e₁).symm.trans h.dim_eq
   rw [hd]
   have e₅ : d + 1 = D + 1 := by exact_mod_cast e₄
   rw [Nat.succ_injective e₅]
 
-theorem smooth_genericFibre (h : IsArithVar p D) (hr : ∀ x, IsRegularLocalRing (X.presheaf.stalk x)) :
-    SmoothOfRelativeDimension D (pullback.snd p (spMap (algebraMap k (FractionRing k)))) := by
+theorem smooth_genericFibre (h : IsArithVar p D) (hr : ∀ x, IsRegularLocalRing (X.presheaf.stalk x))
+    : SmoothOfRelativeDimension D (pullback.snd p (spMap (algebraMap k (FractionRing k)))) := by
   have := h.isDomain
   have := h.charZero_base
   have H := IsPullback.of_hasPullback p (spMap (algebraMap k (FractionRing k)))
@@ -194,27 +215,32 @@ theorem smooth_genericFibre (h : IsArithVar p D) (hr : ∀ x, IsRegularLocalRing
     have : IsPreimmersion (spMap (algebraMap k (FractionRing k))) :=
       IsPreimmersion.of_isLocalization (nonZeroDivisors k)
     let y : Spec (.of (FractionRing k ⊗[k] A)) := (⟨m, inferInstance⟩ : PrimeSpectrum _)
-    have := GenSpread.isIso_stalkMap_of_flat
-      (pullback.fst p (spMap (algebraMap k (FractionRing k)))) (i₀ y)
+    have :=
+      GenSpread.isIso_stalkMap_of_flat (pullback.fst p (spMap (algebraMap k (FractionRing k))))
+        (i₀ y)
     have := hr (pullback.fst p (spMap (algebraMap k (FractionRing k))) (i₀ y))
     exact IsRegularLocalRing.of_ringEquiv
-      (asIso ((pullback.fst p (spMap (algebraMap k (FractionRing k)))).stalkMap (i₀ y)) ≪≫
-        asIso (i₀.stalkMap y) ≪≫ Spec.stalkIso (.of _) y).commRingCatIsoToRingEquiv
-  · have : Nontrivial (FractionRing k ⊗[k] A) := Ideal.Quotient.nontrivial_iff.2 hm.ne_top |>
-      fun _ => (Ideal.Quotient.mk m).domain_nontrivial
+      (asIso ((pullback.fst p (spMap (algebraMap k (FractionRing k)))).stalkMap (i₀ y))
+        ≪≫ asIso (i₀.stalkMap y) ≪≫ Spec.stalkIso (.of _) y).commRingCatIsoToRingEquiv
+  · have : Nontrivial (FractionRing k ⊗[k] A) :=
+      Ideal.Quotient.nontrivial_iff.2 hm.ne_top |> fun _ => (Ideal.Quotient.mk m).domain_nontrivial
     have : Nontrivial A := by
       by_contra hA
       rw [not_nontrivial_iff_subsingleton] at hA
       exact false_of_nontrivial_of_subsingleton (FractionRing k ⊗[k] A)
     obtain ⟨_, hd⟩ := ringKrullDim_chart h H i hi
     have e := height_add_ringKrullDim_quotient_of_finiteType (FractionRing k) m
-    rw [hd, ringKrullDim_eq_zero_of_isField ((Ideal.Quotient.maximal_ideal_iff_isField_quotient m).1 hm),
-      add_zero] at e
+    rw [hd,
+        ringKrullDim_eq_zero_of_isField ((Ideal.Quotient.maximal_ideal_iff_isField_quotient m).1
+          hm),
+        add_zero]
+      at e
     rw [IsLocalization.AtPrime.ringKrullDim_eq_height m (Localization.AtPrime m), e]
 
-theorem exists_opens_smooth (h : IsArithVar p D) (hr : ∀ x, IsRegularLocalRing (X.presheaf.stalk x))
-    (σ : k →+* ℂ) (y : CxPts p σ) :
-    ∃ U : X.Opens, y ∈ ptsIn p σ U ∧ SmoothOfRelativeDimension D (U.ι ≫ p) := by
+theorem exists_opens_smooth
+    (h : IsArithVar p D) (hr : ∀ x, IsRegularLocalRing (X.presheaf.stalk x))
+    (σ : k →+* ℂ) (y : CxPts p σ)
+    : ∃ U : X.Opens, y ∈ ptsIn p σ U ∧ SmoothOfRelativeDimension D (U.ι ≫ p) := by
   have := h.isDomain
   have := h.finite
   have := h.isNoetherianRing
@@ -226,24 +252,27 @@ theorem exists_opens_smooth (h : IsArithVar p D) (hr : ∀ x, IsRegularLocalRing
     flat_specMap_localization (nonZeroDivisors k) _
   have : IsPreimmersion (spMap (algebraMap k (FractionRing k))) :=
     IsPreimmersion.of_isLocalization (nonZeroDivisors k)
-  obtain ⟨τ, hτ⟩ : ∃ τ : FractionRing k →+* ℂ, τ.comp (algebraMap k _) = σ :=
-    ⟨IsFractionRing.lift (K := FractionRing k) (injective_of_charZero σ), RingHom.ext fun a => by
-      rw [RingHom.comp_apply, IsFractionRing.lift_algebraMap]⟩
+  obtain ⟨τ, hτ⟩ : ∃ τ : FractionRing k →+* ℂ, τ.comp (algebraMap k _) = σ := ⟨
+    IsFractionRing.lift (K := FractionRing k) (injective_of_charZero σ),
+    RingHom.ext fun a => by rw [RingHom.comp_apply, IsFractionRing.lift_algebraMap]
+  ⟩
   have hτ' : spMap τ ≫ spMap (algebraMap k _) = spMap σ := by
     rw [← hτ, ← Spec.map_comp]
     rfl
-  obtain ⟨y', hy'⟩ : ∃ y' : Sp ℂ ⟶ pullback p (spMap (algebraMap k (FractionRing k))),
-      y' ≫ pullback.fst _ _ = y.1 :=
+  obtain ⟨y', hy'⟩
+      : ∃ y' : Sp ℂ ⟶ pullback p (spMap (algebraMap k (FractionRing k))),
+        y' ≫ pullback.fst _ _ = y.1 :=
     ⟨H.lift y.1 (spMap τ) (y.2.trans hτ'.symm), H.lift_fst _ _ _⟩
-  obtain ⟨W, hW, hs⟩ := GenSpread.exists_opens_smoothOfRelativeDimension_of_isPullback H D
-    (y' (IsLocalRing.closedPoint ℂ))
+  obtain ⟨W, hW, hs⟩ :=
+    GenSpread.exists_opens_smoothOfRelativeDimension_of_isPullback H D
+      (y' (IsLocalRing.closedPoint ℂ))
   refine ⟨W, mem_ptsIn.2 ?_, hs⟩
   change y.1 (IsLocalRing.closedPoint ℂ) ∈ W
   rw [← hy']
   exact hW
 
-theorem genSmooth (h : IsArithVar p D) (hr : ∀ x, IsRegularLocalRing (X.presheaf.stalk x)) :
-    GenSmooth p D := fun σ => by
+theorem genSmooth (h : IsArithVar p D) (hr : ∀ x, IsRegularLocalRing (X.presheaf.stalk x))
+    : GenSmooth p D := fun σ => by
   refine ⟨⟨AlgChart p σ D, id, fun y => ?_⟩⟩
   obtain ⟨W, hW, _⟩ := exists_opens_smooth h hr σ y
   obtain ⟨U, x, hU, hz, hx⟩ := ModelCharts.exists_etale_coords_of_opens p D W (mem_ptsIn.1 hW)

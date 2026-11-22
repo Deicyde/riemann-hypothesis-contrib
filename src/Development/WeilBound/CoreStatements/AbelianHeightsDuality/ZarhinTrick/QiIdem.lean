@@ -13,8 +13,10 @@ open TensorProduct
 
 namespace PositivityTheory.PrwZar.Qi
 
-theorem idem_eq_zero {K H : Type} [Field K] [IsAlgClosed K] [CommRing H] [Algebra K H] [FiniteDimensional K H]
-    {f : H} (hf : IsIdempotentElem f) (h : ∀ x : H →ₐ[K] K, x f = 0) : f = 0 := by
+theorem idem_eq_zero
+    {K H : Type} [Field K] [IsAlgClosed K] [CommRing H] [Algebra K H] [FiniteDimensional K H]
+    {f : H} (hf : IsIdempotentElem f) (h : ∀ x : H →ₐ[K] K, x f = 0)
+    : f = 0 := by
   by_contra hne
   have hne1 : Ideal.span {1 - f} ≠ ⊤ := by
     intro htop

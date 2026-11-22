@@ -10,15 +10,18 @@ open scoped Classical
 
 namespace GlobalTheory
 
-theorem shuffle_first_block_upper (a n : ℕ) (σ : Equiv.Perm (Fin n))
-    (h : ∀ i j : Fin n, (i : ℕ) < a → a ≤ (j : ℕ) → (σ j : ℕ) ≠ σ i + 1)
-    (i : Fin n) (hi : (i : ℕ) < a) (k : ℕ) :
-    ∀ j : Fin n, (σ j : ℕ) = σ i + k → (j : ℕ) < a := by
+theorem shuffle_first_block_upper
+    (a n : ℕ) (σ : Equiv.Perm (Fin n))
+    (h : ∀ i j : Fin n, (i : ℕ) < a → a ≤ (j : ℕ) → (σ j : ℕ) ≠ σ i + 1) (i : Fin n)
+    (hi : (i : ℕ) < a)
+    (k : ℕ)
+    : ∀ j : Fin n, (σ j : ℕ) = σ i + k → (j : ℕ) < a := by
   induction k with
   | zero =>
     intro j hj
     have : σ j = σ i := Fin.ext (by simpa using hj)
-    rw [σ.injective this]; exact hi
+    rw [σ.injective this]
+    exact hi
   | succ k ih =>
     intro j hj
     have hlt : (σ i : ℕ) + k < n := by have := (σ j).isLt; omega
@@ -27,8 +30,11 @@ theorem shuffle_first_block_upper (a n : ℕ) (σ : Equiv.Perm (Fin n))
     by_contra hc
     exact h _ j h2 (not_lt.mp hc) (by omega)
 
-theorem shuffle_noDescent_iff_open :
-    ∀ (a b n : ℕ) (σ : Equiv.Perm (Fin n)), n = a + b → (∀ i j : Fin n, i < j → ((j : ℕ) < a ∨ a ≤ (i : ℕ)) → σ i < σ j) → ((∀ i j : Fin n, (i : ℕ) < a → a ≤ (j : ℕ) → (σ j : ℕ) ≠ σ i + 1) ↔ ∀ j : Fin n, (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a) := by
+theorem shuffle_noDescent_iff_open
+    : ∀ (a b n : ℕ) (σ : Equiv.Perm (Fin n)),
+      n = a + b → (∀ i j : Fin n, i < j → ((j : ℕ) < a ∨ a ≤ (i : ℕ)) → σ i < σ j)
+        → ((∀ i j : Fin n, (i : ℕ) < a → a ≤ (j : ℕ) → (σ j : ℕ) ≠ σ i + 1)
+          ↔ ∀ j : Fin n, (σ j : ℕ) = if (j : ℕ) < a then b + j else j - a) := by
   intro a b n σ hn hmono
   constructor
   · intro h
@@ -50,12 +56,15 @@ theorem shuffle_noDescent_iff_open :
       show σ (ρ k) < σ (ρ l)
       by_cases h1 : (k : ℕ) < b
       · by_cases h2 : (l : ℕ) < b
-        · rw [if_pos h1] at hk; rw [if_pos h2] at hl
+        · rw [if_pos h1] at hk
+          rw [if_pos h2] at hl
           exact hmono _ _ (Fin.lt_def.mpr (by omega)) (Or.inr (by omega))
-        · rw [if_pos h1] at hk; rw [if_neg h2] at hl
+        · rw [if_pos h1] at hk
+          rw [if_neg h2] at hl
           exact hup _ _ (by omega) (by omega)
       · have h2 : ¬ (l : ℕ) < b := by omega
-        rw [if_neg h1] at hk; rw [if_neg h2] at hl
+        rw [if_neg h1] at hk
+        rw [if_neg h2] at hl
         exact hmono _ _ (Fin.lt_def.mpr (by omega)) (Or.inl (by omega))
     have hid : ∀ k, σ (ρ k) = k := fun k =>
       le_antisymm (hs.dual.le_apply (x := OrderDual.toDual k)) hs.le_apply

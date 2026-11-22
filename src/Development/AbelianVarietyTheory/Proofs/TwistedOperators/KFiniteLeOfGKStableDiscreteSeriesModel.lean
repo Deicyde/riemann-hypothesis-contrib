@@ -11,7 +11,10 @@ public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.IndefiniteUnitaryPrese
 
 @[expose] public section
 
-open Classical Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Classical Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField
+  Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -23,12 +26,17 @@ open scoped InnerProductSpace
 
 section Model
 
-variable {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {H : Type}
+  [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
-theorem mem_of_dense (h : Std ε σ) {W : Submodule ℂ H} (hd : Dense (W : Set H))
-    (hW : ∀ w ∈ W, IsKFin ε σ w) (hK : ∀ k ∈ Kset ε, ∀ w ∈ W, σ k w ∈ W) {v : H} (hv : IsKFin ε σ v) :
-    v ∈ W := by
+theorem mem_of_dense
+    (h : Std ε σ)
+    {W : Submodule ℂ H}
+    (hd : Dense (W : Set H)) (hW : ∀ w ∈ W, IsKFin ε σ w) (hK : ∀ k ∈ Kset ε, ∀ w ∈ W, σ k w ∈ W)
+    {v : H} (hv : IsKFin ε σ v)
+    : v ∈ W := by
   obtain ⟨c1, c2, c3, c4⟩ := kCoef_kAvg n ε H σ h.1
   have havgW : ∀ e : KG ε → ℂ, Continuous e → ∀ x ∈ W, kAvg ε σ e x ∈ W := by
     intro e he x hx
@@ -36,7 +44,8 @@ theorem mem_of_dense (h : Std ε σ) {W : Submodule ℂ H} (hd : Dense (W : Set 
     haveI := hS
     haveI : FiniteDimensional ℂ (S ⊓ W : Submodule ℂ H) := Submodule.finiteDimensional_inf_left S W
     have hKSW : IsKStableOn ε σ (S ⊓ W) := fun g hg y hy =>
-      Submodule.mem_inf.2 ⟨hKS g hg y (Submodule.mem_inf.1 hy).1, hK g hg y (Submodule.mem_inf.1 hy).2⟩
+      Submodule.mem_inf.2
+        ⟨hKS g hg y (Submodule.mem_inf.1 hy).1, hK g hg y (Submodule.mem_inf.1 hy).2⟩
     exact (Submodule.mem_inf.1 (c4 e he _ inferInstance hKSW x (Submodule.mem_inf.2 ⟨hxS, hx⟩))).2
   have hrange : ∀ e : KG ε → ℂ, KFinFun ε e → Continuous e → ∀ w, kAvg ε σ e w ∈ W := by
     intro e he hc w
@@ -69,31 +78,47 @@ theorem mem_of_dense (h : Std ε σ) {W : Submodule ℂ H} (hd : Dense (W : Set 
     have hc : Continuous fun k : KG ε => star ⟪y, σ (toMK k) y⟫_ℂ := by
       obtain ⟨F, -, h1, h2, -⟩ := hk
       exact h2 _ h1
-    exact c2 y hy0 (Submodule.inner_left_of_mem_orthogonal
-      (Submodule.mem_inf.2 ⟨c4 _ hc S hS hKS y hyS, hrange _ hk hc y⟩) hy)
+    exact c2 y hy0
+      (Submodule.inner_left_of_mem_orthogonal
+        (Submodule.mem_inf.2 ⟨c4 _ hc S hS hKS y hyS, hrange _ hk hc y⟩) hy)
   rw [hvwy, hy0, add_zero]
   exact (Submodule.mem_inf.1 hw).2
 
-theorem inner_exp_eq_zero (hHC : GlobalTheory.Published.HarishChandraModules) (hU : IsURepOn (UJset ε) σ)
-    (hI : IsIrredOn (UJset ε) σ) {W : Submodule ℂ H} (hW : ∀ w ∈ W, IsKFin ε σ w)
+theorem inner_exp_eq_zero
+    (hHC : GlobalTheory.Published.HarishChandraModules) (hU : IsURepOn (UJset ε) σ)
+    (hI : IsIrredOn (UJset ε) σ)
+    {W : Submodule ℂ H} (hW : ∀ w ∈ W, IsKFin ε σ w)
     {X : Matrix (Fin n) (Fin n) ℂ} (hXg : inG ε X) (hX : ∀ w ∈ W, dRep σ X w ∈ W)
-    {a : H} (ha : a ∈ W) {y : H} (hy : y ∈ Wᗮ) (t : ℝ) :
-    ⟪y, σ (NormedSpace.exp (t • X)) a⟫_ℂ = 0 := by
+    {a : H} (ha : a ∈ W)
+    {y : H} (hy : y ∈ Wᗮ)
+    (t : ℝ)
+    : ⟪y, σ (NormedSpace.exp (t • X)) a⟫_ℂ = 0 := by
   have hXl : X ∈ GlobalTheory.SmoothGlob.lieSet ε := hXg
-  have hsplit : ∀ s t : ℝ, NormedSpace.exp (s • X) = NormedSpace.exp (t • X) * NormedSpace.exp ((s - t) • X) := by
+  have hsplit
+      : ∀ s t : ℝ,
+        NormedSpace.exp (s • X) = NormedSpace.exp (t • X) * NormedSpace.exp ((s - t) • X) := by
     intro s t
     rw [← Matrix.exp_add_of_commute _ _ ((Commute.refl X).smul_left t |>.smul_right (s - t))]
     congr 1
-    rw [← add_smul]; congr 1; ring
-  have hderiv : ∀ v, IsKFin ε σ v → ∀ t : ℝ,
-      HasDerivAt (fun s : ℝ => σ (NormedSpace.exp (s • X)) v) (σ (NormedSpace.exp (t • X)) (dRep σ X v)) t := by
+    rw [← add_smul]
+    congr 1
+    ring
+  have hderiv
+      : ∀ v,
+        IsKFin ε σ v
+          → ∀ t : ℝ,
+            HasDerivAt
+              (fun s : ℝ => σ (NormedSpace.exp (s • X)) v)
+              (σ (NormedSpace.exp (t • X)) (dRep σ X v)) t := by
     intro v hv t
     have han := (hHC.analytic hU hI hv).analytic_exp (one_mem_UJ ε) hXg 0
     simp only [one_mul] at han
     have h0 : HasDerivAt (fun s : ℝ => σ (NormedSpace.exp (s • X)) v) (dRep σ X v) 0 :=
       han.differentiableAt.hasDerivAt
     have h1 : HasDerivAt (fun s : ℝ => σ (NormedSpace.exp ((s - t) • X)) v) (dRep σ X v) t := by
-      have := HasDerivAt.comp_sub_const (f := fun s : ℝ => σ (NormedSpace.exp (s • X)) v) t t (by rw [sub_self]; exact h0)
+      have :=
+        HasDerivAt.comp_sub_const (f := fun s : ℝ => σ (NormedSpace.exp (s • X)) v) t t (by
+          rw [sub_self]; exact h0)
       exact this
     have h2 := ((σ (NormedSpace.exp (t • X))).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt t h1
     refine h2.congr_of_eventuallyEq (Filter.Eventually.of_forall fun s => ?_)
@@ -107,7 +132,8 @@ theorem inner_exp_eq_zero (hHC : GlobalTheory.Published.HarishChandraModules) (h
   let f : ℕ → ℝ → ℂ := fun k s => ⟪y, σ (NormedSpace.exp (s • X)) ((dRep σ X)^[k] a)⟫_ℂ
   have hf : ∀ k s, HasDerivAt (f k) (f (k + 1) s) s := by
     intro k s
-    have h := ((innerSL ℂ y).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt s (hderiv _ (hW _ (hmem k)) s)
+    have h :=
+      ((innerSL ℂ y).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt s (hderiv _ (hW _ (hmem k)) s)
     simp only [f, Function.iterate_succ_apply']
     exact h
   have hit : ∀ k, iteratedDeriv k (f 0) = f k := by
@@ -117,7 +143,9 @@ theorem inner_exp_eq_zero (hHC : GlobalTheory.Published.HarishChandraModules) (h
     | succ k ih => rw [iteratedDeriv_succ, ih]; funext s; exact (hf k s).deriv
   have hA : AnalyticOnNhd ℝ (f 0) Set.univ := by
     intro s _
-    have := ((hHC.analytic hU hI (hW a ha)).clm ((innerSL ℂ y).restrictScalars ℝ)).analytic_exp (one_mem_UJ ε) hXg s
+    have :=
+      ((hHC.analytic hU hI (hW a ha)).clm ((innerSL ℂ y).restrictScalars ℝ)).analytic_exp
+        (one_mem_UJ ε) hXg s
     simp only [one_mul] at this
     exact this
   have h0 : ∀ k, f k 0 = 0 := by
@@ -133,11 +161,15 @@ theorem inner_exp_eq_zero (hHC : GlobalTheory.Published.HarishChandraModules) (h
   exact hA.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (Set.mem_univ 0)
     (analyticOrderAt_eq_top.mp htop) (Set.mem_univ t)
 
-theorem dense_of_stable (hHC : GlobalTheory.Published.HarishChandraModules) (hU : IsURepOn (UJset ε) σ)
-    (hI : IsIrredOn (UJset ε) σ) {W : Submodule ℂ H} (hW : ∀ w ∈ W, IsKFin ε σ w)
-    (hX : ∀ X, inG ε X → ∀ w ∈ W, dRep σ X w ∈ W) (hK : ∀ k ∈ Kset ε, ∀ w ∈ W, σ k w ∈ W) (h0 : W ≠ ⊥) :
-    Dense (W : Set H) := by
-  have hexp : ∀ X, inG ε X → ∀ x ∈ W.topologicalClosure, σ (NormedSpace.exp X) x ∈ W.topologicalClosure := by
+theorem dense_of_stable
+    (hHC : GlobalTheory.Published.HarishChandraModules) (hU : IsURepOn (UJset ε) σ)
+    (hI : IsIrredOn (UJset ε) σ)
+    {W : Submodule ℂ H} (hW : ∀ w ∈ W, IsKFin ε σ w) (hX : ∀ X, inG ε X → ∀ w ∈ W, dRep σ X w ∈ W)
+    (hK : ∀ k ∈ Kset ε, ∀ w ∈ W, σ k w ∈ W) (h0 : W ≠ ⊥)
+    : Dense (W : Set H) := by
+  have hexp
+      : ∀ X,
+        inG ε X → ∀ x ∈ W.topologicalClosure, σ (NormedSpace.exp X) x ∈ W.topologicalClosure := by
     intro X hXg x hx
     have hW1 : ∀ a ∈ W, σ (NormedSpace.exp X) a ∈ W.topologicalClosure := by
       intro a ha
@@ -148,8 +180,8 @@ theorem dense_of_stable (hHC : GlobalTheory.Published.HarishChandraModules) (hU 
     have hcl : IsClosed ((σ (NormedSpace.exp X)) ⁻¹' (W.topologicalClosure : Set H)) :=
       (Submodule.isClosed_topologicalClosure _).preimage (ContinuousLinearMap.continuous _)
     exact closure_minimal (fun a ha => hW1 a ha) hcl hx
-  have hKc : ∀ k ∈ Kset ε, ∀ x ∈ W.topologicalClosure, σ k x ∈ W.topologicalClosure := fun k hk x hx =>
-    map_mem_closure (σ k).continuous hx (hK k hk)
+  have hKc : ∀ k ∈ Kset ε, ∀ x ∈ W.topologicalClosure, σ k x ∈ W.topologicalClosure :=
+    fun k hk x hx => map_mem_closure (σ k).continuous hx (hK k hk)
   have hinv : ∀ g ∈ UJset ε, ∀ x ∈ W.topologicalClosure, σ g x ∈ W.topologicalClosure := by
     intro g hg x hx
     obtain ⟨k, P, hk, hP, rfl⟩ := (Formalism.REAL.polar_decomposition_holds n ε).1 g hg
@@ -163,12 +195,17 @@ theorem dense_of_stable (hHC : GlobalTheory.Published.HarishChandraModules) (hU 
 
 end Model
 
-
 open Formalism.IndefR.Mult in
-theorem kFin_le_of_stable : GlobalTheory.Published.HarishChandraModules → ∀ (D : D7) (V : HSp D) (S : D.what₂.Tau → SPar)
-    (M : DSModel V S) (τ : D.what₂.Tau) (W : Submodule ℂ (M.H τ)), W ≤ GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.kFin M τ →
-    (∀ X ∈ lieAt V τ, ∀ w ∈ W, dRep (M.rep τ) X w ∈ W) →
-    (∀ k ∈ GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.maxCpt M τ, ∀ w ∈ W, M.rep τ k w ∈ W) → W ≠ ⊥ → GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.kFin M τ ≤ W := by
+theorem kFin_le_of_stable
+    : GlobalTheory.Published.HarishChandraModules
+      → ∀ (D : D7) (V : HSp D) (S : D.what₂.Tau → SPar) (M : DSModel V S) (τ : D.what₂.Tau)
+          (W : Submodule ℂ (M.H τ)),
+        W ≤ GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.kFin M τ
+          → (∀ X ∈ lieAt V τ, ∀ w ∈ W, dRep (M.rep τ) X w ∈ W)
+          → (∀ k ∈ GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.maxCpt M τ, ∀ w ∈ W,
+            M.rep τ k w ∈ W)
+          → W ≠ ⊥
+          → GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.kFin M τ ≤ W := by
   intro hHC D V S M τ W hWk hX hK h0
   obtain ⟨hc, -, hU, hI, -⟩ := M.ds τ
   haveI := hc
@@ -183,14 +220,15 @@ theorem kFin_le_of_stable : GlobalTheory.Published.HarishChandraModules → ∀ 
       rw [← M.fr_gram τ]
       have h1 : ((M.fr τ)⁻¹)ᴴ * (M.fr τ)ᴴ = 1 := by
         rw [← Matrix.conjTranspose_mul, Matrix.mul_nonsing_inv _ hd, Matrix.conjTranspose_one]
-      calc ((M.fr τ)⁻¹ * X * M.fr τ)ᴴ * ((M.fr τ)ᴴ * Jm (M.ε τ) * M.fr τ) +
-            (M.fr τ)ᴴ * Jm (M.ε τ) * M.fr τ * ((M.fr τ)⁻¹ * X * M.fr τ)
-          = (M.fr τ)ᴴ * Xᴴ * (((M.fr τ)⁻¹)ᴴ * (M.fr τ)ᴴ) * Jm (M.ε τ) * M.fr τ +
-            (M.fr τ)ᴴ * Jm (M.ε τ) * (M.fr τ * (M.fr τ)⁻¹) * X * M.fr τ := by
-            simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+      calc
+        ((M.fr τ)⁻¹ * X * M.fr τ)ᴴ * ((M.fr τ)ᴴ * Jm (M.ε τ) * M.fr τ)
+              + (M.fr τ)ᴴ * Jm (M.ε τ) * M.fr τ * ((M.fr τ)⁻¹ * X * M.fr τ)
+            = (M.fr τ)ᴴ * Xᴴ * (((M.fr τ)⁻¹)ᴴ * (M.fr τ)ᴴ) * Jm (M.ε τ) * M.fr τ
+              + (M.fr τ)ᴴ * Jm (M.ε τ) * (M.fr τ * (M.fr τ)⁻¹) * X * M.fr τ := by
+          simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
         _ = (M.fr τ)ᴴ * (Xᴴ * Jm (M.ε τ) + Jm (M.ε τ) * X) * M.fr τ := by
-            rw [h1, Matrix.mul_nonsing_inv _ hd]
-            simp only [Matrix.mul_one, Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
+          rw [h1, Matrix.mul_nonsing_inv _ hd]
+          simp only [Matrix.mul_one, Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
         _ = 0 := by rw [hXg']; simp
     have e : dRep (M.rep τ) ((M.fr τ)⁻¹ * X * M.fr τ) w = dRep (M.σ τ) X w := by
       unfold dRep
@@ -207,9 +245,12 @@ theorem kFin_le_of_stable : GlobalTheory.Published.HarishChandraModules → ∀ 
     have e : M.fr τ * ((M.fr τ)⁻¹ * k * M.fr τ) * (M.fr τ)⁻¹ = k := by
       rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hd, Matrix.one_mul,
         Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hd, Matrix.mul_one]
-    have hm : (M.fr τ)⁻¹ * k * M.fr τ ∈ GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.maxCpt M τ := by
+    have hm
+        : (M.fr τ)⁻¹ * k * M.fr τ
+          ∈ GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension.maxCpt M τ := by
       show M.fr τ * ((M.fr τ)⁻¹ * k * M.fr τ) * (M.fr τ)⁻¹ ∈ Formalism.REAL.Kset (M.ε τ)
-      rw [e]; exact hk
+      rw [e]
+      exact hk
     have := hK _ hm w hw
     rwa [DSModel.rep, e] at this
   have hdense := dense_of_stable hHC hU hI hW hX' hK' h0

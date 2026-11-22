@@ -17,22 +17,44 @@ public import Development.AbelianVarietyTheory.Definitions.Uniformization.SameB
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
 
 namespace GlobalTheory.ExpansionClause
 
-theorem expBij_of_match : Laws → Laws2 → ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V], CDVR V → ∀ (D : DegData V (IsLocalRing.maximalIdeal V)) (A : PolAV (Spec (CommRingCat.of (FractionRing V)))) (G : Over (Spec (CommRingCat.of V))) [GrpObj G] [IsCommMonObj G] (U : PreU (IsLocalRing.maximalIdeal V) D.toPre A G) (U' : UnifPre (IsLocalRing.maximalIdeal V) D A G), Match U U' → ∀ k : ℕ, 1 ≤ k → U.FE (FractionRing V) k → (∀ s : Fam D.toPre (FractionRing V) k, ∃ t, U.ExpF (FractionRing V) k t s.s) → U'.ExpBij k := by
+theorem expBij_of_match
+    : Laws → Laws2
+      → ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V],
+        CDVR V
+          → ∀ (D : DegData V (IsLocalRing.maximalIdeal V))
+              (A : PolAV (Spec (CommRingCat.of (FractionRing V))))
+              (G : Over (Spec (CommRingCat.of V))) [GrpObj G] [IsCommMonObj G]
+              (U : PreU (IsLocalRing.maximalIdeal V) D.toPre A G)
+              (U' : UnifPre (IsLocalRing.maximalIdeal V) D A G),
+            Match U U'
+              → ∀ k : ℕ,
+                1 ≤ k → U.FE (FractionRing V) k
+                  → (∀ s : Fam D.toPre (FractionRing V) k, ∃ t, U.ExpF (FractionRing V) k t s.s)
+                  → U'.ExpBij k := by
   intro h1 h2 V _ _ _ hV D A G _ _ U U' hM k hk hFE hsurj
-  have hT : U'.SecK k = LB.Sec (LB.LinComb U.P.L.L (K := Fin 1) (fun _ => pullback.fst G.hom (jK V)) (fun _ => (k : ℤ))) := by
+  have hT
+      : U'.SecK k
+        = LB.Sec (LB.LinComb U.P.L.L (K := Fin 1)
+          (fun _ => pullback.fst G.hom (jK V))
+          (fun _ => (k : ℤ))) := by
     unfold UnifPre.SecK
     rw [hM.LG]
   have hK := GlobalTheory.GenericFibreSections.sameK_bijective V _ D.toPre A G U k
-  have hu := GlobalTheory.T.fourierJacobiExpansion_overField_injective V hV D.toPre A G U (FractionRing V) k
-  have ht := GlobalTheory.T.exists_fourierJacobi_expansion_over_field h1 h2 V hV D.toPre A G U (FractionRing V) k hk
+  have hu :=
+    GlobalTheory.T.fourierJacobiExpansion_overField_injective V hV D.toPre A G U (FractionRing V) k
+  have ht :=
+    GlobalTheory.T.exists_fourierJacobi_expansion_over_field h1 h2 V hV D.toPre A G U
+      (FractionRing V) k hk
   have e1 := GlobalTheory.T.valueExpansion_of_chartExpansion V _ D A G U U' hM k
   have e2 := GlobalTheory.T.chartExpansion_of_valueExpansion V _ D A G U U' hM k
   unfold UnifPre.ExpBij

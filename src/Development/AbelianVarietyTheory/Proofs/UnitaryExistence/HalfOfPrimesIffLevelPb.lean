@@ -10,19 +10,22 @@ noncomputable section
 
 namespace GlobalTheory.ParAtCompare
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.IndefiniteRowSideFullHecke
 
-theorem isHalf_of_level (D : D7) (l : Level (hostOfRecord D)) (hl : l.M = D.host.g 0 * D.host.g 1 ∧ l.A = 1) :
-    HalfLevelCoefficients.IsHalf D l.Mb :=
+theorem isHalf_of_level
+    (D : D7) (l : Level (hostOfRecord D)) (hl : l.M = D.host.g 0 * D.host.g 1 ∧ l.A = 1)
+    : HalfLevelCoefficients.IsHalf D l.Mb :=
   ⟨l.fromK, hl.1 ▸ l.prod, l.coprime⟩
 
-theorem levelAt_spec (D : D7) (Mb : Ideal (𝓞 D.host.E)) (h : HalfLevelCoefficients.IsHalf D Mb) :
-    (HalfLevelCoefficients.levelAt D Mb h).M = D.host.g 0 * D.host.g 1 ∧ (HalfLevelCoefficients.levelAt D Mb h).A = 1 :=
+theorem levelAt_spec (D : D7) (Mb : Ideal (𝓞 D.host.E)) (h : HalfLevelCoefficients.IsHalf D Mb)
+    : (HalfLevelCoefficients.levelAt D Mb h).M = D.host.g 0 * D.host.g 1
+      ∧ (HalfLevelCoefficients.levelAt D Mb h).A = 1 :=
   ⟨rfl, rfl⟩
 
-theorem levelPb_iff (D : D7) (pb : Fin 2 → HeightOneSpectrum (𝓞 D.host.K)) :
-    LevelPb D pb ↔ HalfLevelCoefficients.IsHalf D (HalfLevelCoefficients.halfOf D pb) := by
+theorem levelPb_iff (D : D7) (pb : Fin 2 → HeightOneSpectrum (𝓞 D.host.K))
+    : LevelPb D pb ↔ HalfLevelCoefficients.IsHalf D (HalfLevelCoefficients.halfOf D pb) := by
   constructor
   · rintro ⟨l, hl, hb⟩
     have h := isHalf_of_level D l hl

@@ -5,18 +5,22 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
+open AlgebraicGeometry CategoryTheory MvPolynomial NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
 
 namespace GlobalTheory.AntisymmSwap
 
-theorem rename_swap_antisymm : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (m : ι → ℕ) (Q : MvPolynomial (Root m) ℝ) (τ : ι)
-    (i j : Fin (m τ)), i ≠ j →
-      rename (Equiv.swap (⟨τ, i⟩ : Root m) ⟨τ, j⟩) (antisymm Q) = -antisymm Q := by
+theorem rename_swap_antisymm
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (m : ι → ℕ) (Q : MvPolynomial (Root m) ℝ) (τ : ι)
+        (i j : Fin (m τ)),
+      i ≠ j → rename (Equiv.swap (⟨τ, i⟩ : Root m) ⟨τ, j⟩) (antisymm Q) = - antisymm Q := by
   intro ι _ _ m Q τ i j hij
   set u : ∀ t, Equiv.Perm (Fin (m t)) := Function.update 1 τ (Equiv.swap i j) with hu
-  have hf : ∀ w : ∀ t, Equiv.Perm (Fin (m t)),
-      (⇑(Equiv.swap (⟨τ, i⟩ : Root m) ⟨τ, j⟩)) ∘ (fun x : Root m => (⟨x.1, w x.1 x.2⟩ : Root m))
-        = fun x : Root m => (⟨x.1, (u * w) x.1 x.2⟩ : Root m) := by
+  have hf
+      : ∀ w : ∀ t, Equiv.Perm (Fin (m t)),
+        (⇑(Equiv.swap (⟨τ, i⟩ : Root m) ⟨τ, j⟩)) ∘ (fun x : Root m => (⟨x.1, w x.1 x.2⟩ : Root m))
+          = fun x : Root m => (⟨x.1, (u * w) x.1 x.2⟩ : Root m) := by
     intro w
     funext ⟨t, k⟩
     simp only [Function.comp_apply, Pi.mul_apply, Equiv.Perm.mul_apply]
@@ -34,8 +38,9 @@ theorem rename_swap_antisymm : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (m 
     · simp [hu, Equiv.Perm.sign_swap hij]
     · intro t ht
       simp [hu, Function.update_of_ne ht]
-  have hs : ∀ w : ∀ t, Equiv.Perm (Fin (m t)),
-      (∏ t, Equiv.Perm.sign ((u * w) t) : ℤˣ) = -∏ t, Equiv.Perm.sign (w t) := by
+  have hs
+      : ∀ w : ∀ t, Equiv.Perm (Fin (m t)),
+        (∏ t, Equiv.Perm.sign ((u * w) t) : ℤˣ) = - ∏ t, Equiv.Perm.sign (w t) := by
     intro w
     simp only [Pi.mul_apply, map_mul, Finset.prod_mul_distrib, hu1, neg_one_mul]
   unfold GlobalTheory.GoodMetric.antisymm

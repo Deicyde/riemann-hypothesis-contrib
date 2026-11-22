@@ -12,7 +12,9 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.AdmissibleLieWords
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  PI.UnitaryCorollaryDerivatives.CRH
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -113,7 +115,9 @@ end Formalism.FourierDecayAlt.P.AdmissibleLieWords
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH Formalism.FourierDecayAlt.P.AdmissibleLieWords
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  PI.UnitaryCorollaryDerivatives.CRH Formalism.FourierDecayAlt.P.AdmissibleLieWords
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -139,24 +143,35 @@ theorem fibre_unit_normalization : C6.FibUnit := by
   obtain ⟨hψc, CG, hCG0, hCG⟩ := poly_adm (n := i) hGp
   have hGpc : Continuous Gp := by
     have : Gp = fun g => (ψ g).re := by funext g; simp [hψdef]
-    rw [this]; exact Complex.continuous_re.comp hψc.continuous
+    rw [this]
+    exact Complex.continuous_re.comp hψc.continuous
 
-  obtain ⟨C₁, hC₁0, hC₁⟩ := fdb ψ hψc {g | g ∈ GV k r ∧ ε ≤ Gp g} {z : ℂ | ε ≤ z.re}
-    (fun g hg => by simpa [hψdef] using hg.2) gN (fun g hg => gN_ge_one hg.1) (2 * r + 2) 0 CG i
-    (by
-      intro w hw hne g hg
-      have h1 := hCG w hw g hg.1
-      have hl : 1 ≤ w.length := List.length_pos_iff.mpr hne
-      refine h1.trans (mul_le_mul_of_nonneg_left (pow_le_pow_right₀ (gN_ge_one hg.1) ?_) hCG0)
-      nlinarith)
-    i ℂ (Phh ε) (Phh_cd hε) (Phh_bound hε)
+  obtain ⟨C₁, hC₁0, hC₁⟩ :=
+    fdb ψ hψc {g | g ∈ GV k r ∧ ε ≤ Gp g} {z : ℂ | ε ≤ z.re}
+      (fun g hg => by simpa [hψdef] using hg.2)
+      gN
+      (fun g hg => gN_ge_one hg.1)
+      (2 * r + 2) 0 CG i
+      (by
+        intro w hw hne g hg
+        have h1 := hCG w hw g hg.1
+        have hl : 1 ≤ w.length := List.length_pos_iff.mpr hne
+        refine h1.trans (mul_le_mul_of_nonneg_left (pow_le_pow_right₀ (gN_ge_one hg.1) ?_) hCG0)
+        nlinarith)
+      i ℂ (Phh ε) (Phh_cd hε) (Phh_bound hε)
 
-  have hoa : ∀ a, ContDiff ℝ ∞ (fun g => om g a) ∧ ∃ C : ℝ, 0 ≤ C ∧ ∀ w, admitted i w → ∀ g ∈ GV k r,
-      ‖Dw w (fun g => om g a) g‖ ≤ C * gN g ^ (r + 1) := fun a => poly_adm (hom a)
+  have hoa
+      : ∀ a,
+        ContDiff ℝ ∞ (fun g => om g a)
+          ∧ ∃ C : ℝ,
+            0 ≤ C
+              ∧ ∀ w, admitted i w → ∀ g ∈ GV k r, ‖Dw w (fun g => om g a) g‖ ≤ C * gN g ^ (r + 1) :=
+    fun a => poly_adm (hom a)
   choose hoc Co hCo0 hCo using hoa
   set C₂ : ℝ := ∑ a, Co a with hC₂
   have hC₂0 : 0 ≤ C₂ := Finset.sum_nonneg fun a _ => hCo0 a
-  have hCoa : ∀ a, Co a ≤ C₂ := fun a => Finset.single_le_sum (fun b _ => hCo0 b) (Finset.mem_univ a)
+  have hCoa : ∀ a, Co a ≤ C₂ := fun a =>
+    Finset.single_le_sum (fun b _ => hCo0 b) (Finset.mem_univ a)
   refine ⟨Real.sqrt T * (2 ^ i * (C₁ * C₂)), fun u v huv g hg hεg => ?_⟩
   set w := wL u ++ wR v with hw
   have hwA : admitted i w := admissible_of_unit_words huv
@@ -167,16 +182,20 @@ theorem fibre_unit_normalization : C6.FibUnit := by
   have hUtc : ContDiff ℝ ∞ Ut :=
     contDiff_pi.2 fun a => contDiff_const.mul (((Phh_cd hε).comp hψc).mul (hoc a))
   have hO : IsOpen {g : Mat k r | ε / 2 < Gp g} := isOpen_lt continuous_const hGpc
-  have heq : ∀ g' ∈ GV k r, g' ∈ {g : Mat k r | ε / 2 < Gp g} →
-      (fun g' => C6.unitOf T (Gp g') (om g')) g' = Ut g' := by
+  have heq
+      : ∀ g' ∈ GV k r,
+        g' ∈ {g : Mat k r | ε / 2 < Gp g} → (fun g' => C6.unitOf T (Gp g') (om g')) g' = Ut g' := by
     intro g' _ hg'
     have hp : 0 < Gp g' := by simp only [Set.mem_setOf_eq] at hg'; linarith
     funext a
     simp only [C6.unitOf, hUt, Phh, hψdef, Complex.ofReal_re, Pi.smul_apply, smul_eq_mul]
     rw [AdmissibleLieWords.hh, sc_one hε (le_of_lt hg'), one_mul, sqrt_div_eq hT hp]
-    push_cast; ring
+    push_cast
+    ring
   rw [dLR_eq, Dw_congr_loc hlie hO heq g hg (by show ε / 2 < Gp g; linarith)]
-  apply (pi_norm_le_iff_of_nonneg (mul_nonneg (mul_nonneg (Real.sqrt_nonneg _) (mul_nonneg (by positivity) (mul_nonneg hC₁0 hC₂0))) (pow_nonneg (gN_pos hg).le _))).2
+  apply (pi_norm_le_iff_of_nonneg (mul_nonneg
+    (mul_nonneg (Real.sqrt_nonneg _) (mul_nonneg (by positivity) (mul_nonneg hC₁0 hC₂0)))
+    (pow_nonneg (gN_pos hg).le _))).2
   intro a
   have e1 : Dw w Ut g a = Dw w (fun g => Ut g a) g := by
     have := dw_clm (ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin m => ℂ) a) w hUtc
@@ -184,27 +203,37 @@ theorem fibre_unit_normalization : C6.FibUnit := by
   rw [e1]
   have e2 : (fun g => Ut g a) = fun g => (Real.sqrt T : ℂ) • (Phh ε (ψ g) * om g a) := by
     funext g; simp [hUt, smul_eq_mul]
-  rw [e2, Dw_smul, norm_smul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (Real.sqrt_nonneg _)]
+  rw [e2, Dw_smul, norm_smul, Complex.norm_real, Real.norm_eq_abs,
+    abs_of_nonneg (Real.sqrt_nonneg _)]
   rw [mul_assoc]
   apply mul_le_mul_of_nonneg_left _ (Real.sqrt_nonneg _)
-  have hL := leibB g (C₁ * C₂ * gN g ^ ((r + 1) * (2 * i + 1))) w (fun g => Phh ε (ψ g)) (fun g => om g a)
-    ((Phh_cd hε).comp hψc) (hoc a) (by
-      intro w₁ w₂ hs
-      have hlen := spl_len hs
-      obtain ⟨h₁, h₂, _⟩ := hs
-      have b1 := hC₁ w₁ (Adm_sub h₁ hwA) (by have := h₁.length_le; omega) g ⟨hg, hεg⟩
-      have b2 := (hCo a w₂ (Adm_sub h₂ hwA) g hg).trans
-        (mul_le_mul_of_nonneg_right (hCoa a) (pow_nonneg (gN_pos hg).le _))
-      have hexp : (2 * r + 2 + 0) * w₁.length + (r + 1) ≤ (r + 1) * (2 * i + 1) := by
-        have := h₁.length_le; rw [hwl] at this; nlinarith
-      calc ‖Dw w₁ (fun g => Phh ε (ψ g)) g‖ * ‖Dw w₂ (fun g => om g a) g‖
-          ≤ (C₁ * gN g ^ ((2 * r + 2 + 0) * w₁.length)) * (C₂ * gN g ^ (r + 1)) :=
+  have hL :=
+    leibB g (C₁ * C₂ * gN g ^ ((r + 1) * (2 * i + 1))) w
+      (fun g => Phh ε (ψ g))
+      (fun g => om g a)
+      ((Phh_cd hε).comp hψc) (hoc a)
+      (by
+        intro w₁ w₂ hs
+        have hlen := spl_len hs
+        obtain ⟨h₁, h₂, _⟩ := hs
+        have b1 := hC₁ w₁ (Adm_sub h₁ hwA) (by have := h₁.length_le; omega) g ⟨hg, hεg⟩
+        have b2 :=
+          (hCo a w₂ (Adm_sub h₂ hwA) g hg).trans
+            (mul_le_mul_of_nonneg_right (hCoa a) (pow_nonneg (gN_pos hg).le _))
+        have hexp : (2 * r + 2 + 0) * w₁.length + (r + 1) ≤ (r + 1) * (2 * i + 1) := by
+          have := h₁.length_le; rw [hwl] at this; nlinarith
+        calc
+          ‖Dw w₁ (fun g => Phh ε (ψ g)) g‖ * ‖Dw w₂ (fun g => om g a) g‖
+              ≤ (C₁ * gN g ^ ((2 * r + 2 + 0) * w₁.length)) * (C₂ * gN g ^ (r + 1)) :=
             mul_le_mul b1 b2 (norm_nonneg _) (mul_nonneg hC₁0 (pow_nonneg (gN_pos hg).le _))
-        _ = C₁ * C₂ * gN g ^ ((2 * r + 2 + 0) * w₁.length + (r + 1)) := by rw [pow_add]; ring
-        _ ≤ C₁ * C₂ * gN g ^ ((r + 1) * (2 * i + 1)) :=
-            mul_le_mul_of_nonneg_left (pow_le_pow_right₀ (gN_ge_one hg) hexp) (mul_nonneg hC₁0 hC₂0))
+          _ = C₁ * C₂ * gN g ^ ((2 * r + 2 + 0) * w₁.length + (r + 1)) := by rw [pow_add]; ring
+          _ ≤ C₁ * C₂ * gN g ^ ((r + 1) * (2 * i + 1)) :=
+            mul_le_mul_of_nonneg_left (pow_le_pow_right₀ (gN_ge_one hg) hexp)
+              (mul_nonneg hC₁0 hC₂0))
   rw [hwl] at hL
-  calc ‖Dw w (fun g => Phh ε (ψ g) * om g a) g‖ ≤ 2 ^ i * (C₁ * C₂ * gN g ^ ((r + 1) * (2 * i + 1))) := hL
+  calc
+    ‖Dw w (fun g => Phh ε (ψ g) * om g a) g‖
+      ≤ 2 ^ i * (C₁ * C₂ * gN g ^ ((r + 1) * (2 * i + 1))) := hL
     _ = 2 ^ i * (C₁ * C₂) * gN g ^ ((r + 1) * (2 * i + 1)) := by ring
 
 end Formalism.FourierDecayAlt.P

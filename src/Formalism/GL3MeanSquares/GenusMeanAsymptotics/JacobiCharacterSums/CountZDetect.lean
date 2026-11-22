@@ -68,8 +68,7 @@ theorem zero_detection : DetectOf := by
     rw [hX, mul_comm 8, pow_mul]
     exact Nat.pow_le_pow_left h.le 8
   have hY : pY Q = X ^ 4 := by unfold pY; rw [hX]
-  have hYN : pY Q ≤ pN Q := by
-    rw [hY]; exact le_trans (Nat.pow_le_pow_right hX1 (by norm_num)) hNX
+  have hYN : pY Q ≤ pN Q := by rw [hY]; exact le_trans (Nat.pow_le_pow_right hX1 (by norm_num)) hNX
   have hY1 : 1 ≤ pY Q := by rw [hY]; exact Nat.one_le_pow _ _ (by omega)
   have hN1 : 1 ≤ pN Q := le_trans hY1 hYN
 
@@ -90,11 +89,11 @@ theorem zero_detection : DetectOf := by
     have hrho : 1 + ‖ρ‖ / ρ.re ≤ 3 * X := by
       have h1 : ‖ρ‖ ≤ ρ.re + Q := by
         refine (Complex.norm_le_abs_re_add_abs_im ρ).trans ?_
-        rw [abs_of_pos hre0]; linarith
+        rw [abs_of_pos hre0]
+        linarith
       have h2 : ‖ρ‖ / ρ.re ≤ 1 + Q / ρ.re := by
         rw [div_le_iff₀ hre0]; rw [add_mul, one_mul, div_mul_cancel₀ _ hre0.ne']; linarith
-      have h3 : Q / ρ.re ≤ 2 * Q := by
-        rw [div_le_iff₀ hre0]; rw [hs0] at hρ; nlinarith
+      have h3 : Q / ρ.re ≤ 2 * Q := by rw [div_le_iff₀ hre0]; rw [hs0] at hρ; nlinarith
       linarith
     have hNpos : (0 : ℝ) < pN Q := by exact_mod_cast hN1
     have hXpos : (0 : ℝ) < X := by linarith
@@ -107,11 +106,14 @@ theorem zero_detection : DetectOf := by
           ← Real.rpow_add hXpos]
         norm_num
       have hs : (4 : ℝ) ≤ Real.sqrt X := by
-        rw [show (4 : ℝ) = Real.sqrt 16 by rw [show (16 : ℝ) = 4 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]]
+        rw [show (4 : ℝ) = Real.sqrt 16 by
+          rw [show (16 : ℝ) = 4 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]]
         exact Real.sqrt_le_sqrt (by linarith)
-      calc 4 * (X : ℝ) ^ (7 : ℕ) ≤ (X : ℝ) ^ (7 : ℕ) * Real.sqrt X := by
-            have : (0 : ℝ) ≤ (X : ℝ) ^ (7 : ℕ) := by positivity
-            rw [mul_comm]; exact mul_le_mul_of_nonneg_left hs this
+      calc
+        4 * (X : ℝ) ^ (7 : ℕ) ≤ (X : ℝ) ^ (7 : ℕ) * Real.sqrt X := by
+          have : (0 : ℝ) ≤ (X : ℝ) ^ (7 : ℕ) := by positivity
+          rw [mul_comm]
+          exact mul_le_mul_of_nonneg_left hs this
         _ = ((X : ℝ) ^ (8 : ℕ)) ^ (15 / 16 : ℝ) := e.symm
         _ ≤ _ := Real.rpow_le_rpow (by positivity) hN8 (by norm_num)
     have hinv : ((pN Q : ℕ) : ℝ) ^ (-(15 / 16 : ℝ)) ≤ 1 / (4 * (X : ℝ) ^ (7 : ℕ)) := by
@@ -126,24 +128,29 @@ theorem zero_detection : DetectOf := by
       have a12 : 2 * (((N0 + 1 : ℕ) : ℝ) + 1) * (1 + ‖ρ‖ / ρ.re) ≤ 2 * (2 * X) * (3 * X) :=
         mul_le_mul a1 hrho hpos2 (by positivity)
       have a3 : ((pN Q : ℕ) : ℝ) ^ (-ρ.re) ≤ 1 / (4 * (X : ℝ) ^ (7 : ℕ)) := hpow.trans hinv
-      calc 2 * (((N0 + 1 : ℕ) : ℝ) + 1) * (1 + ‖ρ‖ / ρ.re) * ((pN Q : ℕ) : ℝ) ^ (-ρ.re)
-          ≤ 2 * (2 * X) * (3 * X) * ((pN Q : ℕ) : ℝ) ^ (-ρ.re) :=
-            mul_le_mul_of_nonneg_right a12 (Real.rpow_nonneg (Nat.cast_nonneg _) _)
+      calc
+        2 * (((N0 + 1 : ℕ) : ℝ) + 1) * (1 + ‖ρ‖ / ρ.re) * ((pN Q : ℕ) : ℝ) ^ (-ρ.re)
+            ≤ 2 * (2 * X) * (3 * X) * ((pN Q : ℕ) : ℝ) ^ (-ρ.re) :=
+          mul_le_mul_of_nonneg_right a12 (Real.rpow_nonneg (Nat.cast_nonneg _) _)
         _ ≤ 2 * (2 * X) * (3 * X) * (1 / (4 * (X : ℝ) ^ (7 : ℕ))) :=
-            mul_le_mul_of_nonneg_left a3 (by positivity)
+          mul_le_mul_of_nonneg_left a3 (by positivity)
     rw [hYr]
-    calc ‖P‖ * (X : ℝ) ^ (4 : ℕ) ≤ 2 * (2 * X) * (3 * X) * (1 / (4 * (X : ℝ) ^ (7 : ℕ))) * (X : ℝ) ^ (4 : ℕ) :=
-          mul_le_mul_of_nonneg_right hPle (by positivity)
+    calc
+      ‖P‖ * (X : ℝ) ^ (4 : ℕ)
+          ≤ 2 * (2 * X) * (3 * X) * (1 / (4 * (X : ℝ) ^ (7 : ℕ))) * (X : ℝ) ^ (4 : ℕ) :=
+        mul_le_mul_of_nonneg_right hPle (by positivity)
       _ = 3 / X := by
-          have hX0 : (X : ℝ) ≠ 0 := hXpos.ne'
-          rw [eq_div_iff hX0]
-          field_simp
-          ring
+        have hX0 : (X : ℝ) ≠ 0 := hXpos.ne'
+        rw [eq_div_iff hX0]
+        field_simp
+        ring
       _ ≤ 1 / 2 := by rw [div_le_iff₀ hXpos]; linarith
   have h1D : ‖1 + D‖ ≤ 1 / 2 := by
     rw [← hMI]
     rw [norm_mul]
-    calc ‖P‖ * ‖Mo‖ ≤ ‖P‖ * (pY Q : ℝ) := mul_le_mul_of_nonneg_left hMo (norm_nonneg _)
+    calc
+      ‖P‖ * ‖Mo‖
+        ≤ ‖P‖ * (pY Q : ℝ) := mul_le_mul_of_nonneg_left hMo (norm_nonneg _)
       _ ≤ 1 / 2 := hnum
   have hDge : 1 / 2 ≤ ‖D‖ := by
     have := norm_sub_le (1 + D) D
@@ -160,7 +167,8 @@ theorem zero_detection : DetectOf := by
     rw [hsplit]
     refine (norm_sum_le _ _).trans_lt ?_
     have hne : (range (pJ Q)).Nonempty := nonempty_range_iff.mpr (by omega)
-    calc ∑ j ∈ range (pJ Q), ‖blk (pY Q) (pN Q) (pY Q * 2 ^ j) ⟨N0, χ⟩ ρ‖
+    calc
+      ∑ j ∈ range (pJ Q), ‖blk (pY Q) (pN Q) (pY Q * 2 ^ j) ⟨N0, χ⟩ ρ‖
         < ∑ j ∈ range (pJ Q), 1 / (2 * (pJ Q : ℝ)) := sum_lt_sum_of_nonempty hne hcon
       _ = 1 / 2 := by rw [sum_const, card_range, nsmul_eq_mul]; field_simp
   linarith

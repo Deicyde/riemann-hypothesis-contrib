@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TensorModOfT
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.UPel.Sm GlobalTheory.Cris GlobalTheory.DeRham
 open scoped TensorProduct
 
@@ -19,14 +21,22 @@ namespace GlobalTheory
 
 open Submodule
 
-theorem lagrangian_of_idempotent_split_univ :
- ∀ (R : Type) [CommRing R] (H : Type u) [AddCommGroup H] [Module R H] (O : Type) [Ring O] (ρ : O →+* Module.End R H) (bar : O → O) (φ : LinearMap.BilinForm R H) (e : Module.End R H), e * e = e → (∀ a, ρ a * e = e * ρ a) → (∀ a, bar (bar a) = a) → (∀ a x y, φ (ρ a x) y = φ x (ρ (bar a) y)) → (∀ x y, φ (e x) y = φ x (y - e y)) → Function.Bijective φ → φ.IsRefl → ∀ G M : Submodule R H, G ⊓ M = ⊥ → G ⊔ M = LinearMap.range e → (∀ a, ∀ x ∈ G, ρ a x ∈ G) → let E := G ⊔ (LinearMap.ker e ⊓ ⨅ x ∈ G, LinearMap.ker (φ x)); (∃ N : Submodule R H, IsCompl E N) ∧ E ⊓ LinearMap.range e = G ∧ (∀ x ∈ E, ∀ y ∈ E, φ x y = 0) ∧ ∀ a, ∀ x ∈ E, ρ a x ∈ E := by
+theorem lagrangian_of_idempotent_split_univ
+    : ∀ (R : Type) [CommRing R] (H : Type u) [AddCommGroup H] [Module R H] (O : Type) [Ring O]
+        (ρ : O →+* Module.End R H) (bar : O → O) (φ : LinearMap.BilinForm R H) (e : Module.End R H),
+      e * e = e → (∀ a, ρ a * e = e * ρ a) → (∀ a, bar (bar a) = a)
+        → (∀ a x y, φ (ρ a x) y = φ x (ρ (bar a) y)) → (∀ x y, φ (e x) y = φ x (y - e y))
+        → Function.Bijective φ → φ.IsRefl
+        → ∀ G M : Submodule R H,
+          G ⊓ M = ⊥ → G ⊔ M = LinearMap.range e → (∀ a, ∀ x ∈ G, ρ a x ∈ G)
+            → let E := G ⊔ (LinearMap.ker e ⊓ ⨅ x ∈ G, LinearMap.ker (φ x))
+              (∃ N : Submodule R H, IsCompl E N) ∧ E ⊓ LinearMap.range e = G
+                ∧ (∀ x ∈ E, ∀ y ∈ E, φ x y = 0) ∧ ∀ a, ∀ x ∈ E, ρ a x ∈ E := by
   intro R _ H _ _ O _ ρ bar φ e he hρe hbar hφρ hφe hbij hrefl G M hGM hGMr hGst E
   have hee : ∀ x, e (e x) = e x := fun x => by
     have := LinearMap.congr_fun he x
     simpa using this
-  have hrange : ∀ r ∈ LinearMap.range e, e r = r := by
-    rintro r ⟨y, rfl⟩; exact hee y
+  have hrange : ∀ r ∈ LinearMap.range e, e r = r := by rintro r ⟨y, rfl⟩; exact hee y
   have hG : ∀ g ∈ G, e g = g := fun g hg => hrange g (hGMr ▸ (le_sup_left : G ≤ G ⊔ M) hg)
   have hM : ∀ m ∈ M, e m = m := fun m hm => hrange m (hGMr ▸ (le_sup_right : M ≤ G ⊔ M) hm)
   have hrr : ∀ x y, φ (e x) (e y) = 0 := fun x y => by rw [hφe, hee, sub_self, map_zero]
@@ -36,7 +46,8 @@ theorem lagrangian_of_idempotent_split_univ :
     have := hφe k k'
     rw [hk, hk', sub_zero, map_zero, LinearMap.zero_apply] at this
     exact this.symm
-  have memPerp : ∀ (S : Submodule R H) y, y ∈ (⨅ x ∈ S, LinearMap.ker (φ x)) ↔ ∀ x ∈ S, φ x y = 0 := by
+  have memPerp
+      : ∀ (S : Submodule R H) y, y ∈ (⨅ x ∈ S, LinearMap.ker (φ x)) ↔ ∀ x ∈ S, φ x y = 0 := by
     intro S y; simp [Submodule.mem_iInf]
 
   set S := LinearMap.range e with hS
@@ -56,31 +67,30 @@ theorem lagrangian_of_idempotent_split_univ :
       have : x = ⟨m, hmS⟩ + ⟨g, hgS⟩ := Subtype.ext (by simp [← hgm, add_comm])
       rw [this]
       exact Submodule.add_mem_sup (by simpa using hm) (by simpa using hg)
-  let P : H →ₗ[R] H := S.subtype ∘ₗ (M.comap S.subtype).subtype ∘ₗ
-    (Submodule.linearProjOfIsCompl _ _ hc) ∘ₗ e.rangeRestrict
+  let P : H →ₗ[R] H :=
+    S.subtype ∘ₗ (M.comap S.subtype).subtype ∘ₗ (Submodule.linearProjOfIsCompl _ _ hc)
+      ∘ₗ e.rangeRestrict
   have hPG : ∀ g ∈ G, P g = 0 := by
     intro g hg
-    have h1 : e.rangeRestrict g ∈ G.comap S.subtype := by
-      show e g ∈ G; rw [hG g hg]; exact hg
+    have h1 : e.rangeRestrict g ∈ G.comap S.subtype := by show e g ∈ G; rw [hG g hg]; exact hg
     simp only [P, LinearMap.coe_comp, Function.comp_apply]
     have h2 := Submodule.linearProjOfIsCompl_apply_right hc ⟨_, h1⟩
     erw [h2]
     simp
   have hPM : ∀ m ∈ M, P m = m := by
     intro m hm
-    have h1 : e.rangeRestrict m ∈ M.comap S.subtype := by
-      show e m ∈ M; rw [hM m hm]; exact hm
+    have h1 : e.rangeRestrict m ∈ M.comap S.subtype := by show e m ∈ M; rw [hM m hm]; exact hm
     simp only [P, LinearMap.coe_comp, Function.comp_apply]
     have h2 := Submodule.linearProjOfIsCompl_apply_left hc ⟨_, h1⟩
     erw [h2]
     simp [hM m hm]
 
   set K := LinearMap.ker e with hK
-  have hker : ∀ x, x - e x ∈ K := fun x => by
-    rw [hK, LinearMap.mem_ker, map_sub, hee, sub_self]
+  have hker : ∀ x, x - e x ∈ K := fun x => by rw [hK, LinearMap.mem_ker, map_sub, hee, sub_self]
 
-  have hdec : ∀ k ∈ K, ∃ k₂ ∈ K ⊓ (⨅ x ∈ G, LinearMap.ker (φ x)),
-      k - k₂ ∈ K ⊓ (⨅ x ∈ M, LinearMap.ker (φ x)) := by
+  have hdec
+      : ∀ k ∈ K, ∃ k₂ ∈ K ⊓ (⨅ x ∈ G, LinearMap.ker (φ x)),
+        k - k₂ ∈ K ⊓ (⨅ x ∈ M, LinearMap.ker (φ x)) := by
     intro k hk
     obtain ⟨x, hx⟩ := hbij.2 ((φ k).comp P)
     have hx' : ∀ r ∈ S, φ (x - e x) r = φ k (P r) := by
@@ -97,7 +107,9 @@ theorem lagrangian_of_idempotent_split_univ :
       apply hrefl
       rw [map_sub, LinearMap.sub_apply, hx' m (hGMr ▸ (le_sup_right : M ≤ G ⊔ M) hm), hPM m hm,
         sub_self]
-  have hzero : ∀ k ∈ K, k ∈ (⨅ x ∈ G, LinearMap.ker (φ x)) → k ∈ (⨅ x ∈ M, LinearMap.ker (φ x)) → k = 0 := by
+  have hzero
+      : ∀ k ∈ K,
+        k ∈ (⨅ x ∈ G, LinearMap.ker (φ x)) → k ∈ (⨅ x ∈ M, LinearMap.ker (φ x)) → k = 0 := by
     intro k hk hkG hkM
     rw [memPerp] at hkG hkM
     apply hbij.1
@@ -114,14 +126,17 @@ theorem lagrangian_of_idempotent_split_univ :
     intro x hxE hxN
     obtain ⟨g, hg, k₁, hk₁, rfl⟩ := Submodule.mem_sup.1 hxE
     obtain ⟨m, hm, k₂, hk₂, hmk⟩ := Submodule.mem_sup.1 hxN
-    have he1 : e (g + k₁) = g := by rw [map_add (f := _), hG g hg, LinearMap.mem_ker.1 hk₁.1, add_zero]
-    have he2 : e (m + k₂) = m := by rw [map_add (f := _), hM m hm, LinearMap.mem_ker.1 hk₂.1, add_zero]
+    have he1 : e (g + k₁) = g := by
+      rw [map_add (f := _), hG g hg, LinearMap.mem_ker.1 hk₁.1, add_zero]
+    have he2 : e (m + k₂) = m := by
+      rw [map_add (f := _), hM m hm, LinearMap.mem_ker.1 hk₂.1, add_zero]
     have hgm : g = m := by rw [← he1, ← he2, hmk]
     have hg0 : g = 0 := by
       have : g ∈ G ⊓ M := ⟨hg, hgm ▸ hm⟩
       rwa [hGM, Submodule.mem_bot] at this
     have hm0 : m = 0 := hgm ▸ hg0
-    subst hg0; subst hm0
+    subst hg0
+    subst hm0
     rw [zero_add] at hmk ⊢
     rw [zero_add] at hmk
     exact hzero k₁ hk₁.1 hk₁.2 (hmk ▸ hk₂.2)
@@ -141,7 +156,8 @@ theorem lagrangian_of_idempotent_split_univ :
       have : k₁ = 0 := by
         have := congrArg (· - g) h1
         simpa using this.symm
-      rw [this, add_zero]; exact hg
+      rw [this, add_zero]
+      exact hg
     · exact le_inf le_sup_left (hGMr ▸ le_sup_left)
   · intro x hx y hy
     obtain ⟨g, hg, k, hk, rfl⟩ := Submodule.mem_sup.1 hx
@@ -168,18 +184,36 @@ theorem lagrangian_of_idempotent_split_univ :
       rw [← this]
       exact (memPerp G k).1 hk.2 _ (hGst _ g' hg')
 
-theorem lagrangian_completion_sup_smul_eq : ∀ (C : Type) [CommRing C] (I : Ideal C) (H : Type 1) [AddCommGroup H] [Module C H] [Module.Finite C H] [Module.Projective C H] (O : Type) [Ring O] (ρ : O →+* Module.End C H) (bar : O → O) (φ : LinearMap.BilinForm C H) (e : Module.End C H), e * e = e → (∀ a, ρ a * e = e * ρ a) → (∀ x y, φ x y = -φ y x) → (∀ a, bar (bar a) = a) → (∀ a x y, φ (ρ a x) y = φ x (ρ (bar a) y)) → (∀ x y, φ (e x) y = φ x (y - e y)) → Function.Bijective φ → ∀ F : Submodule C H, I • ⊤ ≤ F → (∀ x ∈ F, ∀ y ∈ F, φ x y ∈ I) → (∀ x, (∀ y ∈ F, φ x y ∈ I) → x ∈ F) → (∀ x ∈ F, e x ∈ F) → ∀ G M : Submodule C H, G ⊓ M = ⊥ → G ⊔ M = LinearMap.range e → (∀ a, ∀ x ∈ G, ρ a x ∈ G) → G ⊔ (I • ⊤ ⊓ LinearMap.range e) = F ⊓ LinearMap.range e → ∃ E : Submodule C H, (∃ N : Submodule C H, IsCompl E N) ∧ E ⊓ LinearMap.range e = G ∧ E ⊔ I • ⊤ = F ∧ (∀ x ∈ E, ∀ y ∈ E, φ x y = 0) ∧ (∀ a, ∀ x ∈ E, ρ a x ∈ E) ∧ ∀ x ∈ E, e x ∈ E := by
-  intro C _ I H _ _ _ _ O _ ρ bar φ e he hρe hskew hbar hφρ hφe hbij F hIF hFiso hFlag hFe G M hGM hGMr hGst hGF
+theorem lagrangian_completion_sup_smul_eq
+    : ∀ (C : Type) [CommRing C] (I : Ideal C) (H : Type 1) [AddCommGroup H] [Module C H]
+        [Module.Finite C H] [Module.Projective C H] (O : Type) [Ring O] (ρ : O →+* Module.End C H)
+        (bar : O → O) (φ : LinearMap.BilinForm C H) (e : Module.End C H),
+      e * e = e → (∀ a, ρ a * e = e * ρ a) → (∀ x y, φ x y = - φ y x) → (∀ a, bar (bar a) = a)
+        → (∀ a x y, φ (ρ a x) y = φ x (ρ (bar a) y)) → (∀ x y, φ (e x) y = φ x (y - e y))
+        → Function.Bijective φ
+        → ∀ F : Submodule C H,
+          I • ⊤ ≤ F → (∀ x ∈ F, ∀ y ∈ F, φ x y ∈ I) → (∀ x, (∀ y ∈ F, φ x y ∈ I) → x ∈ F)
+            → (∀ x ∈ F, e x ∈ F)
+            → ∀ G M : Submodule C H,
+              G ⊓ M = ⊥ → G ⊔ M = LinearMap.range e → (∀ a, ∀ x ∈ G, ρ a x ∈ G)
+                → G ⊔ (I • ⊤ ⊓ LinearMap.range e) = F ⊓ LinearMap.range e
+                → ∃ E : Submodule C H,
+                  (∃ N : Submodule C H, IsCompl E N) ∧ E ⊓ LinearMap.range e = G ∧ E ⊔ I • ⊤ = F
+                    ∧ (∀ x ∈ E, ∀ y ∈ E, φ x y = 0) ∧ (∀ a, ∀ x ∈ E, ρ a x ∈ E)
+                    ∧ ∀ x ∈ E, e x ∈ E := by
+  intro C _ I H _ _ _ _ O _ ρ bar φ e he hρe hskew hbar hφρ hφe hbij F hIF hFiso hFlag hFe G M hGM
+    hGMr hGst hGF
   have hrefl : φ.IsRefl := fun x y h => by rw [hskew, h, neg_zero]
-  have key := lagrangian_of_idempotent_split_univ C H O ρ bar φ e he hρe hbar hφρ hφe hbij hrefl G M hGM hGMr hGst
+  have key :=
+    lagrangian_of_idempotent_split_univ C H O ρ bar φ e he hρe hbar hφρ hφe hbij hrefl G M hGM hGMr
+      hGst
   dsimp only at key
   obtain ⟨hcompl, hEr, hiso, hEst⟩ := key
   have hee : ∀ x, e (e x) = e x := fun x => by
     have := LinearMap.congr_fun he x
     simpa using this
   have hker : ∀ x, e (x - e x) = 0 := fun x => by rw [map_sub, hee, sub_self]
-  have hrange : ∀ r ∈ LinearMap.range e, e r = r := by
-    rintro r ⟨y, rfl⟩; exact hee y
+  have hrange : ∀ r ∈ LinearMap.range e, e r = r := by rintro r ⟨y, rfl⟩; exact hee y
   have hGr : G ≤ LinearMap.range e := hGMr ▸ (le_sup_left : G ≤ G ⊔ M)
   have hG : ∀ g ∈ G, e g = g := fun g hg => hrange g (hGr hg)
   have hkk : ∀ k k', e k = 0 → e k' = 0 → φ k k' = 0 := by
@@ -223,13 +257,13 @@ theorem lagrangian_completion_sup_smul_eq : ∀ (C : Type) [CommRing C] (I : Ide
       have : x = ⟨g, hgS⟩ + ⟨m, hmS⟩ := Subtype.ext (by simp [← hgm])
       rw [this]
       exact Submodule.add_mem_sup (by simpa using hg) (by simpa using hm)
-  let P : H →ₗ[C] H := S.subtype ∘ₗ (G.comap S.subtype).subtype ∘ₗ
-    (Submodule.linearProjOfIsCompl _ _ hc) ∘ₗ e.rangeRestrict
+  let P : H →ₗ[C] H :=
+    S.subtype ∘ₗ (G.comap S.subtype).subtype ∘ₗ (Submodule.linearProjOfIsCompl _ _ hc)
+      ∘ₗ e.rangeRestrict
   have hPmem : ∀ x, P x ∈ G := fun x => (Submodule.linearProjOfIsCompl _ _ hc (e.rangeRestrict x)).2
   have hPG : ∀ g ∈ G, P g = g := by
     intro g hg
-    have h1 : e.rangeRestrict g ∈ G.comap S.subtype := by
-      show e g ∈ G; rw [hG g hg]; exact hg
+    have h1 : e.rangeRestrict g ∈ G.comap S.subtype := by show e g ∈ G; rw [hG g hg]; exact hg
     simp only [P, LinearMap.coe_comp, Function.comp_apply]
     have h2 := Submodule.linearProjOfIsCompl_apply_left hc ⟨_, h1⟩
     erw [h2]
@@ -238,7 +272,8 @@ theorem lagrangian_completion_sup_smul_eq : ∀ (C : Type) [CommRing C] (I : Ide
   obtain ⟨n, v, hv⟩ := Module.Finite.exists_fin (R := C) (M := H)
   have hsurj : Function.Surjective (Fintype.linearCombination C v) := by
     rw [← LinearMap.range_eq_top, Fintype.range_linearCombination, hv]
-  obtain ⟨s, hs⟩ := Module.projective_lifting_property (Fintype.linearCombination C v) LinearMap.id hsurj
+  obtain ⟨s, hs⟩ :=
+    Module.projective_lifting_property (Fintype.linearCombination C v) LinearMap.id hsurj
   have hexp : ∀ x, x = ∑ j, s x j • v j := by
     intro x
     have := LinearMap.congr_fun hs x
@@ -252,7 +287,8 @@ theorem lagrangian_completion_sup_smul_eq : ∀ (C : Type) [CommRing C] (I : Ide
     rfl
   choose y hy using hy
 
-  have hmain : ∀ k ∈ F, e k = 0 → ∃ t ∈ (I • ⊤ : Submodule C H), e t = 0 ∧ ∀ g ∈ G, φ g (k - t) = 0 := by
+  have hmain
+      : ∀ k ∈ F, e k = 0 → ∃ t ∈ (I • ⊤ : Submodule C H), e t = 0 ∧ ∀ g ∈ G, φ g (k - t) = 0 := by
     intro k hkF hke
     let f : H →ₗ[C] C := (φ.flip k) ∘ₗ P
     have hf : ∀ x, f x = φ (P x) k := fun x => rfl
@@ -270,7 +306,7 @@ theorem lagrangian_completion_sup_smul_eq : ∀ (C : Type) [CommRing C] (I : Ide
       have h2 : f g = ∑ j, f (v j) * s g j := by
         conv_lhs => rw [hexp g]
         set_option synthInstance.maxHeartbeats 100000 in
-          simp [map_sum, map_smul, mul_comm]
+        simp [map_sum, map_smul, mul_comm]
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sub, map_sum]
       simp only [map_smul, h1, smul_eq_mul]

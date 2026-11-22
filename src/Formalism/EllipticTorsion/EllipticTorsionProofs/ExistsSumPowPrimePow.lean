@@ -15,9 +15,12 @@ open Formalism.G
 
 namespace FrobeniusExpansion
 
-theorem exists_sum_pow_prime_pow {A : Type*} [CommRing A] {ι : Type*} [DecidableEq ι]
-    {p : ℕ} (hp : p.Prime) (s : Finset ι) (f : ι → A) (n : ℕ) :
-    ∃ r : A, (∑ i ∈ s, f i) ^ (p ^ n) = ∑ i ∈ s, f i ^ (p ^ n) + (p : A) * r := by
+theorem exists_sum_pow_prime_pow
+    {A : Type*} [CommRing A]
+    {ι : Type*} [DecidableEq ι]
+    {p : ℕ} (hp : p.Prime)
+    (s : Finset ι) (f : ι → A) (n : ℕ)
+    : ∃ r : A, (∑ i ∈ s, f i) ^ (p ^ n) = ∑ i ∈ s, f i ^ (p ^ n) + (p : A) * r := by
   induction s using Finset.induction_on with
   | empty =>
     refine ⟨0, ?_⟩
@@ -37,19 +40,20 @@ theorem frobenius_expansion : FrobExpand := by
   classical
   set R := unitBall K
   let a' : Fin m → R := fun e => ⟨a e, ha e⟩
-  obtain ⟨r, hr⟩ := FrobeniusExpansion.exists_sum_pow_prime_pow (A := MvPolynomial (Fin m) R) hp
-    Finset.univ (fun e => C (a' e) * X e) j
-  have hmap : (∑ e, C (a e) * X e : MvPolynomial (Fin m) K)
-      = map R.subtype (∑ e, C (a' e) * X e) := by
+  obtain ⟨r, hr⟩ :=
+    FrobeniusExpansion.exists_sum_pow_prime_pow (A := MvPolynomial (Fin m) R) hp Finset.univ
+      (fun e => C (a' e) * X e)
+      j
+  have hmap
+      : (∑ e, C (a e) * X e : MvPolynomial (Fin m) K) = map R.subtype (∑ e, C (a' e) * X e) := by
     simp [a']
-  have key : (∑ e, C (a e) * X e : MvPolynomial (Fin m) K) ^ (p ^ j)
-        - ∑ e, C (b e) * X e ^ (p ^ j)
-      = ∑ e, C (a e ^ (p ^ j) - b e) * X e ^ (p ^ j)
-        + C (p : K) * map R.subtype r := by
+  have key
+      : (∑ e, C (a e) * X e : MvPolynomial (Fin m) K) ^ (p ^ j) - ∑ e, C (b e) * X e ^ (p ^ j)
+        = ∑ e, C (a e ^ (p ^ j) - b e) * X e ^ (p ^ j) + C (p : K) * map R.subtype r := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hmap, ← map_pow, hr, map_add (f := _), map_sum, map_mul, map_natCast]
-    simp only [map_pow, map_mul, map_C, map_X, mul_pow, map_sub, sub_mul,
-      Finset.sum_sub_distrib, map_natCast]
+    simp only [map_pow, map_mul, map_C, map_X, mul_pow, map_sub, sub_mul, Finset.sum_sub_distrib,
+      map_natCast]
     simp [a']
     ring
   rw [key, AddMonoidAlgebra.coeff_add, Finsupp.add_apply, coeff_sum, coeff_C_mul, coeff_map]
@@ -61,8 +65,9 @@ theorem frobenius_expansion : FrobExpand := by
     · simp
   · rw [norm_mul]
     have h1 : ‖(r.coeff α : K)‖ ≤ 1 := (r.coeff α).2
-    calc ‖(p : K)‖ * ‖(r.coeff α : K)‖ ≤ ‖(p : K)‖ * 1 :=
-          mul_le_mul_of_nonneg_left h1 (norm_nonneg _)
+    calc
+      ‖(p : K)‖ * ‖(r.coeff α : K)‖
+        ≤ ‖(p : K)‖ * 1 := mul_le_mul_of_nonneg_left h1 (norm_nonneg _)
       _ = ‖(p : K)‖ := mul_one _
 
 end Formalism.ELL

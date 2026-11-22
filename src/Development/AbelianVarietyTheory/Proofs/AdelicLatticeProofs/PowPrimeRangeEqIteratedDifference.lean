@@ -90,14 +90,14 @@ private lemma exists_pow_factor_of_aeval_cyclotomic {S : Type*} [Ring S] (p : �
   · have h := congrArg (aeval y) e4
     rwa [map_add, map_mul, map_mul, map_natCast, hy, mul_zero, add_zero, map_pow, aeval_X] at h
 
-
 open NumberField IsDedekindDomain Polynomial in
 open scoped WithZero TensorProduct in
-theorem _root_.GlobalTheory.CNorm.pows_eq_range_dif_pow : ∀ (p : ℕ) (M : Type) [CommGroup M] (τ : M →* M)
-    (lam : Monoid.End M), p.Prime → (∀ a, lam a = τ a / a) →
-    (∀ a, _root_.GlobalTheory.CNorm.nrm τ p a = 1) →
-    _root_.GlobalTheory.CNorm.pows p (⊤ : Subgroup M) = MonoidHom.range (lam ^ (p - 1) : Monoid.End M) ∧
-      ∀ a : M, a ^ p = 1 ↔ (lam ^ (p - 1) : Monoid.End M) a = 1 := by
+theorem _root_.GlobalTheory.CNorm.pows_eq_range_dif_pow
+    : ∀ (p : ℕ) (M : Type) [CommGroup M] (τ : M →* M) (lam : Monoid.End M),
+      p.Prime → (∀ a, lam a = τ a / a) → (∀ a, _root_.GlobalTheory.CNorm.nrm τ p a = 1)
+        → _root_.GlobalTheory.CNorm.pows p (⊤ : Subgroup M)
+            = MonoidHom.range (lam ^ (p - 1) : Monoid.End M)
+          ∧ ∀ a : M, a ^ p = 1 ↔ (lam ^ (p - 1) : Monoid.End M) a = 1 := by
   intro p M _ τ lam hp hlam hN
   haveI : Fact p.Prime := ⟨hp⟩
   let T : AddMonoid.End (Additive M) := MonoidHom.toAdditive τ
@@ -113,40 +113,58 @@ theorem _root_.GlobalTheory.CNorm.pows_eq_range_dif_pow : ∀ (p : ℕ) (M : Typ
     simp only [map_pow, aeval_X]
     refine DFunLike.ext _ _ fun x => ?_
     obtain ⟨a, rfl⟩ : ∃ a, Additive.ofMul a = x := ⟨_, ofMul_toMul x⟩
-    have hs := map_sum (AddMonoidHom.mk' (fun g : AddMonoid.End (Additive M) =>
-      g (Additive.ofMul a)) (fun _ _ => rfl)) (fun i => T ^ i) (Finset.range p)
-    change (∑ i ∈ Finset.range p, T ^ i) (Additive.ofMul a) =
-      ∑ i ∈ Finset.range p, (T ^ i) (Additive.ofMul a) at hs
+    have hs :=
+      map_sum
+        (AddMonoidHom.mk'
+          (fun g : AddMonoid.End (Additive M) => g (Additive.ofMul a))
+          (fun _ _ => rfl))
+        (fun i => T ^ i)
+        (Finset.range p)
+    change (∑ i ∈ Finset.range p, T ^ i) (Additive.ofMul a)
+        = ∑ i ∈ Finset.range p, (T ^ i) (Additive.ofMul a)
+      at hs
     rw [hs, Finset.sum_congr rfl fun i _ => pow_apply_ofMul_eq_iterate T τ (fun _ => rfl) i a]
     rw [← ofMul_prod, ← _root_.GlobalTheory.CNorm.nrm_apply, hN, ofMul_one]
     rfl
   have hy : aeval Y ((cyclotomic p ℤ).comp (X + 1)) = 0 := by
     rw [aeval_comp, map_add (f := _), aeval_X, map_one, hYT, hT]
   obtain ⟨W, V, h1, h2, h3, h4⟩ := exists_pow_factor_of_aeval_cyclotomic p Y hy
-  have hL : ∀ a, Additive.ofMul ((lam ^ (p - 1) : Monoid.End M) a) =
-      (Y ^ (p - 1)) (Additive.ofMul a) := fun a => by
+  have hL
+      : ∀ a,
+        Additive.ofMul ((lam ^ (p - 1) : Monoid.End M) a)
+          = (Y ^ (p - 1)) (Additive.ofMul a) := fun a => by
     rw [Monoid.End.coe_pow]
     exact (pow_apply_ofMul_eq_iterate Y lam (fun _ => rfl) _ _).symm
-  have hP : ∀ a : M, ((p : AddMonoid.End (Additive M))) (Additive.ofMul a) =
-      Additive.ofMul (a ^ p) := fun a => by
+  have hP
+      : ∀ a : M,
+        ((p : AddMonoid.End (Additive M))) (Additive.ofMul a)
+          = Additive.ofMul (a ^ p) := fun a => by
     rw [AddMonoid.End.natCast_apply, ofMul_pow]
-  have K1 : ∀ a, (lam ^ (p - 1) : Monoid.End M) a = (Additive.toMul (W (Additive.ofMul a))) ^ p :=
-    fun a => by
-      apply Additive.ofMul.injective
-      rw [hL, h1, ofMul_pow, ofMul_toMul, ← AddMonoid.End.natCast_apply]
-      rfl
-  have K2 : ∀ a, (lam ^ (p - 1) : Monoid.End M) a = Additive.toMul (W (Additive.ofMul (a ^ p))) :=
-    fun a => by
-      apply Additive.ofMul.injective
-      rw [hL, h2, ofMul_toMul, ← hP]
-      rfl
-  have K3 : ∀ a : M, a ^ p = (lam ^ (p - 1) : Monoid.End M) (Additive.toMul (V (Additive.ofMul a))) :=
-    fun a => by
-      apply Additive.ofMul.injective
-      rw [hL, ofMul_toMul, ← hP, h3]
-      rfl
-  have K4 : ∀ a : M, a ^ p =
-      Additive.toMul (V (Additive.ofMul ((lam ^ (p - 1) : Monoid.End M) a))) := fun a => by
+  have K1
+      : ∀ a,
+        (lam ^ (p - 1) : Monoid.End M) a
+          = (Additive.toMul (W (Additive.ofMul a))) ^ p := fun a => by
+    apply Additive.ofMul.injective
+    rw [hL, h1, ofMul_pow, ofMul_toMul, ← AddMonoid.End.natCast_apply]
+    rfl
+  have K2
+      : ∀ a,
+        (lam ^ (p - 1) : Monoid.End M) a
+          = Additive.toMul (W (Additive.ofMul (a ^ p))) := fun a => by
+    apply Additive.ofMul.injective
+    rw [hL, h2, ofMul_toMul, ← hP]
+    rfl
+  have K3
+      : ∀ a : M,
+        a ^ p
+          = (lam ^ (p - 1) : Monoid.End M) (Additive.toMul (V (Additive.ofMul a))) := fun a => by
+    apply Additive.ofMul.injective
+    rw [hL, ofMul_toMul, ← hP, h3]
+    rfl
+  have K4
+      : ∀ a : M,
+        a ^ p
+          = Additive.toMul (V (Additive.ofMul ((lam ^ (p - 1) : Monoid.End M) a))) := fun a => by
     apply Additive.ofMul.injective
     rw [hL, ofMul_toMul, ← hP, h4]
     rfl

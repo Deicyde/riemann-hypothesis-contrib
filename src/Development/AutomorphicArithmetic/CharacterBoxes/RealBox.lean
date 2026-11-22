@@ -7,18 +7,23 @@ public import Development.AutomorphicArithmetic.CharacterBoxes.RealSplit
 
 open Formalism.HC UpperTheory.Top
 
-private theorem UpperTheory.Top.realBox_level {φ : Frame} (H : HostRaw φ) (χ : PChar)
-    (h : H.IsCharE χ.χ) : χ.N ∣ H.QS * H.q * H.d := by
+private theorem UpperTheory.Top.realBox_level
+    {φ : Frame} (H : HostRaw φ) (χ : PChar) (h : H.IsCharE χ.χ)
+    : χ.N ∣ H.QS * H.q * H.d := by
   obtain ⟨θ, hθ⟩ := h
   rw [H.isPrimOf_iff] at hθ
   subst hθ
   exact DirichletCharacter.conductor_dvd_level _
 
-private theorem UpperTheory.Top.realBox_main (M : ℕ) (φ : Frame) (H : HostRaw φ) (eps Y X : ℝ)
-    (hpr : ∀ l : ℕ, l.Prime → l ∣ H.QS → l ∣ 2 * M) (hM : ordCompl[2] H.QS ∣ M) (hg : PairGood M eps Y X H.q H.d)
-    (χ : PChar) (hχ : H.IsCharE χ.χ) (hr : χ.IsReal) (hqd : H.q ∣ χ.N ∨ H.d ∣ χ.N) :
-    ZeroBox (height M eps Y (if H.d ∣ χ.N then 1 else 0)) χ.χ ∧
-      (χ.N : ℝ) ≤ height (ordCompl[2] H.QS) eps Y (if H.d ∣ χ.N then 1 else 0) := by
+private theorem UpperTheory.Top.realBox_main
+    (M : ℕ)
+    (φ : Frame) (H : HostRaw φ)
+    (eps Y X : ℝ)
+    (hpr : ∀ l : ℕ, l.Prime → l ∣ H.QS → l ∣ 2 * M) (hM : ordCompl[2] H.QS ∣ M)
+    (hg : PairGood M eps Y X H.q H.d)
+    (χ : PChar) (hχ : H.IsCharE χ.χ) (hr : χ.IsReal) (hqd : H.q ∣ χ.N ∨ H.d ∣ χ.N)
+    : ZeroBox (height M eps Y (if H.d ∣ χ.N then 1 else 0)) χ.χ
+      ∧ (χ.N : ℝ) ≤ height (ordCompl[2] H.QS) eps Y (if H.d ∣ χ.N then 1 else 0) := by
   have hP := hg.pair
   have hq := hP.q_prime
   have hd := hP.d_prime
@@ -64,8 +69,9 @@ private theorem UpperTheory.Top.realBox_main (M : ℕ) (φ : Frame) (H : HostRaw
     by_contra hc
     push_neg at hc
     obtain ⟨rfl, rfl⟩ := hc
-    rw [show H.q ^ ((0 : Fin 2) : ℕ) = 1 by simp, show H.d ^ ((0 : Fin 2) : ℕ) = 1 by simp,
-      mul_one, mul_one] at hN
+    rw [show H.q ^ ((0 : Fin 2) : ℕ) = 1 by simp, show H.d ^ ((0 : Fin 2) : ℕ) = 1 by simp, mul_one,
+        mul_one]
+      at hN
     rcases hqd with h | h <;> rw [hN] at h
     exacts [hqρ h, hdρ h]
   have hbox := hg.boxes ρ hρr (hρN.trans (mul_dvd_mul_left 8 hM)) i j hij χ.N χ.χ hind
@@ -88,24 +94,27 @@ private theorem UpperTheory.Top.realBox_main (M : ℕ) (φ : Frame) (H : HostRaw
   have hρle : (ρ.N : ℝ) ≤ 8 * ((ordCompl[2] H.QS : ℕ) : ℝ) := by
     exact_mod_cast Nat.le_of_dvd (Nat.mul_pos (by norm_num) hK0) hρN
   have hbound : (χ.N : ℝ) ≤ height (ordCompl[2] H.QS) eps Y j := by
-    have hq1 : (1:ℝ) ≤ H.q := by exact_mod_cast hq.one_lt.le
-    have hqi : (H.q:ℝ) ^ (i:ℕ) ≤ Real.exp (Y ^ (eps / 5)) :=
+    have hq1 : (1 : ℝ) ≤ H.q := by exact_mod_cast hq.one_lt.le
+    have hqi : (H.q : ℝ) ^ (i : ℕ) ≤ Real.exp (Y ^ (eps / 5)) :=
       (pow_le_pow_right₀ hq1 (Nat.lt_succ_iff.1 i.isLt)).trans (by rw [pow_one]; exact hqe)
-    have hdj : (H.d:ℝ) ^ (j:ℕ) ≤ Real.exp (Y ^ (eps / 5) * Real.log Y ^ 2) ^ (j:ℕ) :=
+    have hdj : (H.d : ℝ) ^ (j : ℕ) ≤ Real.exp (Y ^ (eps / 5) * Real.log Y ^ 2) ^ (j : ℕ) :=
       pow_le_pow_left₀ (Nat.cast_nonneg _) hde _
     rw [hN, Nat.cast_mul, Nat.cast_mul, Nat.cast_pow, Nat.cast_pow]
     unfold height
-    exact mul_le_mul (mul_le_mul hρle hqi (by positivity) (by positivity)) hdj
-      (by positivity) (by positivity)
+    exact mul_le_mul (mul_le_mul hρle hqi (by positivity) (by positivity)) hdj (by positivity)
+      (by positivity)
   rw [hjd]
   exact ⟨hbox, hbound⟩
 
-theorem UpperTheory.Top.realBox :
-    ∀ (M : ℕ) (φ : Frame) (H : HostRaw φ) (eps Y X : ℝ), 0 < M → (∀ l : ℕ, l.Prime → l ∣ H.QS → l ∣ 2 * M) → ordCompl[2] H.QS ∣ M →
-      PairGood M eps Y X H.q H.d →
-      (∀ χ : PChar, H.IsCharE χ.χ → χ.IsReal → (H.q ∣ χ.N ∨ H.d ∣ χ.N) →
-        ZeroBox (height M eps Y (if H.d ∣ χ.N then 1 else 0)) χ.χ ∧
-          (χ.N : ℝ) ≤ height (ordCompl[2] H.QS) eps Y (if H.d ∣ χ.N then 1 else 0)) ∧ RealBox H := by
+theorem UpperTheory.Top.realBox
+    : ∀ (M : ℕ) (φ : Frame) (H : HostRaw φ) (eps Y X : ℝ),
+      0 < M → (∀ l : ℕ, l.Prime → l ∣ H.QS → l ∣ 2 * M) → ordCompl[2] H.QS ∣ M
+        → PairGood M eps Y X H.q H.d
+        → (∀ χ : PChar,
+            H.IsCharE χ.χ → χ.IsReal → (H.q ∣ χ.N ∨ H.d ∣ χ.N)
+              → ZeroBox (height M eps Y (if H.d ∣ χ.N then 1 else 0)) χ.χ
+                ∧ (χ.N : ℝ) ≤ height (ordCompl[2] H.QS) eps Y (if H.d ∣ χ.N then 1 else 0))
+          ∧ RealBox H := by
   intro M φ H eps Y X _ hpr hM hg
   refine ⟨fun χ hχ hr hqd => UpperTheory.Top.realBox_main M φ H eps Y X hpr hM hg χ hχ hr hqd, ?_⟩
   intro ψ hψ hr hqd β hβ

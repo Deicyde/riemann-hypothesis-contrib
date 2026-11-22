@@ -92,9 +92,10 @@ lemma range_eq_univ [IsAlgClosed K] [GrpObj Ga] [GrpObj G] (p : Ga ⟶ G) [IsMon
 
 end OpenSubgroupScheme
 
-theorem isIso_of_isOpenImmersion_of_geometricallyConnected :
-    ∀ (S : Scheme.{0}) (Ga G : Over S) [GrpObj Ga] [GrpObj G] (p : Ga ⟶ G), IsMonHom p →
-      IsOpenImmersion p.left → LocallyOfFiniteType G.hom → GeometricallyConnected G.hom → IsIso p := by
+theorem isIso_of_isOpenImmersion_of_geometricallyConnected
+    : ∀ (S : Scheme.{0}) (Ga G : Over S) [GrpObj Ga] [GrpObj G] (p : Ga ⟶ G),
+      IsMonHom p → IsOpenImmersion p.left → LocallyOfFiniteType G.hom → GeometricallyConnected G.hom
+        → IsIso p := by
   intro S Ga G _ _ p _ _ _ _
   have hsurj : Set.range p.left = Set.univ := by
     refine Set.eq_univ_of_forall fun y => ?_
@@ -114,13 +115,15 @@ theorem isIso_of_isOpenImmersion_of_geometricallyConnected :
     have h := OpenSubgroupScheme.range_eq_univ ((Over.pullback t).map p)
     obtain ⟨w, hw⟩ : z ∈ Set.range ((Over.pullback t).map p).left := h ▸ Set.mem_univ _
     refine ⟨pullback.fst Ga.hom t w, ?_⟩
-    have e : ((Over.pullback t).map p).left ≫ pullback.fst G.hom t = pullback.fst Ga.hom t ≫ p.left :=
+    have e
+        : ((Over.pullback t).map p).left ≫ pullback.fst G.hom t = pullback.fst Ga.hom t ≫ p.left :=
       pullback.lift_fst _ _ _
     rw [← hz, ← hw, ← Scheme.Hom.comp_apply, ← e]
     rfl
-  have : IsIso p.left := isIso_of_isOpenImmersion_of_opensRange_eq_top p.left (by
-    ext1
-    exact hsurj)
+  have : IsIso p.left :=
+    isIso_of_isOpenImmersion_of_opensRange_eq_top p.left (by
+      ext1
+      exact hsurj)
   have : IsIso ((Over.forget S).map p) := this
   exact isIso_of_reflects_iso p (Over.forget S)
 

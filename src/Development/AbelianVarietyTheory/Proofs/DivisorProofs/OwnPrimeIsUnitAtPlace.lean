@@ -15,15 +15,20 @@ namespace GlobalTheory.BigOn.Exp.SerBase
 set_option synthInstance.maxHeartbeats 400000
 set_option maxHeartbeats 800000
 
-theorem natPrime_notMem {K : Type} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K)) {q : ℕ} (hq : q.Prime)
-    (hne : q ≠ Formalism.EigenvalueLevelCeiling.plc v) : (q : 𝓞 K) ∉ v.asIdeal := by
+theorem natPrime_notMem
+    {K : Type} [Field K] [NumberField K]
+    (v : HeightOneSpectrum (𝓞 K))
+    {q : ℕ} (hq : q.Prime) (hne : q ≠ Formalism.EigenvalueLevelCeiling.plc v)
+    : (q : 𝓞 K) ∉ v.asIdeal := by
   intro hmem
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast] at hmem
-  have hdvd : Formalism.EigenvalueLevelCeiling.plc v ∣ q := (ringChar.spec (𝓞 K ⧸ v.asIdeal) q).1 hmem
+  have hdvd : Formalism.EigenvalueLevelCeiling.plc v ∣ q :=
+    (ringChar.spec (𝓞 K ⧸ v.asIdeal) q).1 hmem
   exact hne ((Nat.prime_dvd_prime_iff_eq (Formalism.L2.DIV.plc_prime' v) hq).1 hdvd).symm
 
-theorem ownAt_prime_ne (D : D7) (w : D.what₂.places.Pl) :
-    (ownAt D (D.plEq w)).Prime ∧ ownAt D (D.plEq w) ≠ Formalism.EigenvalueLevelCeiling.plc (D.plEq w) := by
+theorem ownAt_prime_ne (D : D7) (w : D.what₂.places.Pl)
+    : (ownAt D (D.plEq w)).Prime
+      ∧ ownAt D (D.plEq w) ≠ Formalism.EigenvalueLevelCeiling.plc (D.plEq w) := by
   unfold ownAt
   split_ifs with h
   · exact ⟨D.host.pde'_prime, fun e => D.host.pde_ne (h.symm.trans e.symm)⟩

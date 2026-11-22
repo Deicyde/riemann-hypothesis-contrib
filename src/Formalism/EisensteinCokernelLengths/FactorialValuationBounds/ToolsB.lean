@@ -8,10 +8,11 @@ public import Formalism.FrobeniusContraction.FrobeniusContractionProofs.LenBound
 namespace Formalism.ZetaNonvanishing.EisensteinCokernelLengthsFacts.FactorialValuationBoundsFacts
 open Formalism.WachCohomologyFacts
 
-theorem key {O M : Type} [CommRing O] [AddCommGroup M] [Module O M] (Z Z₀ I : Submodule O M)
-    (hZ₀Z : Z₀ ≤ Z) :
-    Module.length O (↥Z ⧸ I.comap Z.subtype) =
-      Module.length O (↥Z₀ ⧸ I.comap Z₀.subtype) + Module.length O (↥Z ⧸ (Z₀ ⊔ I).comap Z.subtype) := by
+theorem key
+    {O M : Type} [CommRing O] [AddCommGroup M] [Module O M] (Z Z₀ I : Submodule O M) (hZ₀Z : Z₀ ≤ Z)
+    : Module.length O (↥Z ⧸ I.comap Z.subtype)
+      = Module.length O (↥Z₀ ⧸ I.comap Z₀.subtype)
+        + Module.length O (↥Z ⧸ (Z₀ ⊔ I).comap Z.subtype) := by
   set I' := I.comap Z.subtype
   set J' := (Z₀ ⊔ I).comap Z.subtype
   set I₀ := I.comap Z₀.subtype
@@ -45,29 +46,37 @@ theorem key {O M : Type} [CommRing O] [AddCommGroup M] [Module O M] (Z Z₀ I : 
         simp only [I', Submodule.mem_comap, Submodule.subtype_apply, Submodule.coe_sub,
           Submodule.coe_inclusion]
         have : (a : M) - z = -b := by rw [← hab]; abel
-        rw [this]; exact I.neg_mem hb
+        rw [this]
+        exact I.neg_mem hb
       · rintro ⟨w, hw⟩
         induction w using Submodule.Quotient.induction_on with
         | H a =>
           simp only [f', Submodule.liftQ_apply, f, LinearMap.coe_comp, Function.comp_apply,
-            Submodule.mkQ_apply] at hw
+              Submodule.mkQ_apply]
+            at hw
           rw [Submodule.Quotient.eq] at hw
           simp only [I', Submodule.mem_comap, Submodule.subtype_apply, Submodule.coe_sub,
-            Submodule.coe_inclusion] at hw
+              Submodule.coe_inclusion]
+            at hw
           refine ⟨a, a.2, (z : M) - a, ?_, by abel⟩
-          have := I.neg_mem hw; simpa using this
+          have := I.neg_mem hw
+          simpa using this
   exact Module.length_eq_add_of_exact f' g hf' hg hex
 
 theorem lenBound2 : Formalism.ZetaNonvanishing.EisensteinCokernelLengthsFacts.LenBound2 := by
   intro O M _ _ _ ℓ g g₀ e e' Z Bc I s s₀ hs hZ hBc hs₀ hs₀Z hke hke'
   have hZ₀Z : Submodule.span O (s₀ : Set M) ≤ Z := Submodule.span_le.mpr hs₀Z
-  have h1 := quotientLengthBound_holds O M ℓ g e Z Bc (Submodule.span O (s₀ : Set M) ⊔ I) s hs hZ
-    (hBc.trans le_sup_right) hke
-  have h2 := quotientLengthBound_holds O M ℓ g₀ e' (Submodule.span O (s₀ : Set M)) ⊥ I s₀ hs₀ (by simp)
-    bot_le hke'
+  have h1 :=
+    quotientLengthBound_holds O M ℓ g e Z Bc (Submodule.span O (s₀ : Set M) ⊔ I) s hs hZ
+      (hBc.trans le_sup_right) hke
+  have h2 :=
+    quotientLengthBound_holds O M ℓ g₀ e' (Submodule.span O (s₀ : Set M)) ⊥ I s₀ hs₀ (by simp)
+      bot_le hke'
   rw [key Z _ I hZ₀Z]
-  calc _ ≤ (g₀ : ℕ∞) * (e' : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)}) +
-        (g : ℕ∞) * (e : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)}) := add_le_add h2 h1
+  calc
+    _ ≤ (g₀ : ℕ∞) * (e' : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)})
+        + (g : ℕ∞) * (e : ℕ∞) * Module.length O (O ⧸ Ideal.span {(ℓ : O)}) :=
+      add_le_add h2 h1
     _ = _ := by ring
 
 end Formalism.ZetaNonvanishing.EisensteinCokernelLengthsFacts.FactorialValuationBoundsFacts

@@ -16,10 +16,12 @@ universe u
 
 noncomputable section
 
-theorem subring_map_maximal_cases {D : Type*} [CommRing D] [IsLocalRing D] (C : Subring D)
+theorem subring_map_maximal_cases
+    {D : Type*} [CommRing D] [IsLocalRing D]
+    (C : Subring D)
     (hC : IsLocalRing.maximalIdeal D ≤ ((IsLocalRing.maximalIdeal D).comap C.subtype).map C.subtype)
-    (m : Ideal C) (hm : m.IsMaximal) :
-    m.map C.subtype = ⊤ ∨ IsLocalRing.maximalIdeal D ≤ m.map C.subtype := by
+    (m : Ideal C) (hm : m.IsMaximal)
+    : m.map C.subtype = ⊤ ∨ IsLocalRing.maximalIdeal D ≤ m.map C.subtype := by
   by_cases h : m ≤ (IsLocalRing.maximalIdeal D).comap C.subtype
   · right
     rw [hm.eq_of_le (Ideal.comap_ne_top _ (IsLocalRing.maximalIdeal.isMaximal D).ne_top) h]
@@ -31,36 +33,44 @@ theorem subring_map_maximal_cases {D : Type*} [CommRing D] [IsLocalRing D] (C : 
       exact hc (IsLocalRing.mem_maximalIdeal _ |>.mpr hnu)
     exact Ideal.eq_top_of_isUnit_mem _ (Ideal.mem_map_of_mem _ hcm) hu
 
-theorem length_quot_le_of_subring (h₂ : LengthMapIdealLe.Statement.{u})
-    (h₃ : IntermediateRingQuotLength.Statement.{u}) {A D : Type u} [CommRing A] [IsDomain A]
-    [IsNoetherianRing A] [CommRing D] [IsDomain D] [IsLocalRing D] (hdim : ringKrullDim A = 1)
-    (C : Subring D) (f : A →+* C) (hfinj : Function.Injective f)
-    (hfrac : ∀ c : C, ∃ a, a ≠ 0 ∧ f a * c ∈ Set.range f)
-    (hmax : IsLocalRing.maximalIdeal D ≤
-      ((IsLocalRing.maximalIdeal D).comap C.subtype).map C.subtype)
-    (a : A) (ha : a ≠ 0) :
-    Module.length D (D ⧸ Ideal.span {(f a : D)}) ≤ Module.length A (A ⧸ Ideal.span {a}) := by
+theorem length_quot_le_of_subring
+    (h₂ : LengthMapIdealLe.Statement.{u}) (h₃ : IntermediateRingQuotLength.Statement.{u})
+    {A D : Type u}
+    [CommRing A] [IsDomain A] [IsNoetherianRing A] [CommRing D] [IsDomain D] [IsLocalRing D]
+    (hdim : ringKrullDim A = 1)
+    (C : Subring D) (f : A →+* C)
+    (hfinj : Function.Injective f) (hfrac : ∀ c : C, ∃ a, a ≠ 0 ∧ f a * c ∈ Set.range f)
+    (hmax
+      : IsLocalRing.maximalIdeal D ≤ ((IsLocalRing.maximalIdeal D).comap C.subtype).map C.subtype)
+    (a : A) (ha : a ≠ 0)
+    : Module.length D (D ⧸ Ideal.span {(f a : D)}) ≤ Module.length A (A ⧸ Ideal.span {a}) := by
   let _ : Algebra A C := f.toAlgebra
-  have s3 := h₃ A C hdim hfinj
-    (fun c => by
-      obtain ⟨b, hb, hbc⟩ := hfrac c
-      exact ⟨b, hb, by rw [Algebra.smul_def]; exact hbc⟩) a ha
-  have s2 : Module.length C (C ⧸ Ideal.span {algebraMap A C a}) ≤
-      Module.length A (C ⧸ Ideal.span {algebraMap A C a}) := by
-    have h := Submodule.length_le_length_restrictScalars A
-      (⊤ : Submodule C (C ⧸ Ideal.span {algebraMap A C a}))
+  have s3 :=
+    h₃ A C hdim hfinj
+      (fun c => by
+        obtain ⟨b, hb, hbc⟩ := hfrac c
+        exact ⟨b, hb, by rw [Algebra.smul_def]; exact hbc⟩)
+      a ha
+  have s2
+      : Module.length C (C ⧸ Ideal.span {algebraMap A C a})
+        ≤ Module.length A (C ⧸ Ideal.span {algebraMap A C a}) := by
+    have h :=
+      Submodule.length_le_length_restrictScalars A
+        (⊤ : Submodule C (C ⧸ Ideal.span {algebraMap A C a}))
     rwa [Submodule.restrictScalars_top, Module.length_top, Module.length_top] at h
   have s1 := h₂ C D C.subtype (subring_map_maximal_cases C hmax) (Ideal.span {algebraMap A C a})
   rw [Ideal.map_span, Set.image_singleton] at s1
   exact s1.trans (s2.trans s3)
 
-theorem BlowUpOrderLe.proof (h₁ : LocalizedQuotLength.Statement.{u})
-    (h₂ : LengthMapIdealLe.Statement.{u}) (h₃ : IntermediateRingQuotLength.Statement.{u})
-    (h₄ : BlowUpLocalChart.Statement.{u}) : BlowUpOrderLe.Statement.{u} := by
+theorem BlowUpOrderLe.proof
+    (h₁ : LocalizedQuotLength.Statement.{u}) (h₂ : LengthMapIdealLe.Statement.{u})
+    (h₃ : IntermediateRingQuotLength.Statement.{u}) (h₄ : BlowUpLocalChart.Statement.{u})
+    : BlowUpOrderLe.Statement.{u} := by
   intro R _ _ K _ ι _ J _ P hP u G' y hy hG' hrel x hx hG z hz
   have hGp : G'.IsPrime := hG'.1.1
-  obtain ⟨G₀, W₀, hG₀p, hW₀p, hG₀, hW₀⟩ := BlowUpLocalChart.exists_quotient_primes hGp
-    (le_sup_left.trans hG'.1.2) (le_sup_left.trans hG.1.2)
+  obtain ⟨G₀, W₀, hG₀p, hW₀p, hG₀, hW₀⟩ :=
+    BlowUpLocalChart.exists_quotient_primes hGp (le_sup_left.trans hG'.1.2)
+      (le_sup_left.trans hG.1.2)
   have hRHS0 : (0 : ℤ) ≤ divCycle P z (G'.comap (liftForm (J := J))) := by
     unfold divCycle
     split_ifs <;> positivity
@@ -76,9 +86,11 @@ theorem BlowUpOrderLe.proof (h₁ : LocalizedQuotLength.Statement.{u})
   have hcp : (G'.comap (liftForm (J := J))).IsPrime := hG.1.1
   have hRmin : G'.comap (liftForm (J := J)) ∈ (P ⊔ Ideal.span {z}).minimalPrimes := by
     have h := mem_minimalPrimes_sup_span_mul (P := P) (W := G'.comap (liftForm (J := J))) hz hG
-    refine ⟨⟨hcp, sup_le (le_sup_left.trans hG.1.2) ((Ideal.span_singleton_le_iff_mem _).mpr hzG)⟩, ?_⟩
+    refine
+      ⟨⟨hcp, sup_le (le_sup_left.trans hG.1.2) ((Ideal.span_singleton_le_iff_mem _).mpr hzG)⟩, ?_⟩
     intro q hq hqG
-    refine h.2 ⟨hq.1, sup_le (le_sup_left.trans hq.2) ((Ideal.span_singleton_le_iff_mem _).mpr ?_)⟩ hqG
+    refine h.2 ⟨hq.1, sup_le (le_sup_left.trans hq.2) ((Ideal.span_singleton_le_iff_mem _).mpr ?_)⟩
+      hqG
     exact q.mul_mem_left x (hq.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self z)))
   have hRrel : IsRelevant (G'.comap (liftForm (J := J))) := by
     intro k
@@ -89,11 +101,13 @@ theorem BlowUpOrderLe.proof (h₁ : LocalizedQuotLength.Statement.{u})
   have hfin := length_localizedQuot_ne_top (P ⊔ Ideal.span {z}) (G'.comap (liftForm (J := J))) hRmin
   unfold divCycle
   rw [dite_eq_left hL, dite_eq_left ⟨hRmin, hRrel⟩]
-  suffices key : multAt (blowUpOf P u ⊔ Ideal.span {liftForm z}) G' ≤
-      multAt (P ⊔ Ideal.span {z}) (G'.comap (liftForm (J := J))) by
+  suffices key
+      : multAt (blowUpOf P u ⊔ Ideal.span {liftForm z}) G'
+        ≤ multAt (P ⊔ Ideal.span {z}) (G'.comap (liftForm (J := J))) by
     exact_mod_cast ENat.toNat_le_toNat key hfin
 
-  obtain ⟨C, f, hfinj, hfrac, hfcompat, hmax⟩ := h₄ R K ι J P hP u G' y hy hG' hrel x hx hG G₀ hG₀ W₀ hW₀
+  obtain ⟨C, f, hfinj, hfrac, hfcompat, hmax⟩ :=
+    h₄ R K ι J P hP u G' y hy hG' hrel x hx hG G₀ hG₀ W₀ hW₀
   have hQp : (blowUpOf P u).IsPrime := RingHom.ker_isPrime _
   have hSn : IsNoetherianRing (MRing ι R ⧸ P) := inferInstance
   have hAn : IsNoetherianRing (Localization.AtPrime G₀) :=
@@ -127,9 +141,10 @@ theorem BlowUpOrderLe.proof (h₁ : LocalizedQuotLength.Statement.{u})
   rw [ha_def, hfcompat z] at hchain
   have e₁ := h₁ (MRing (extIdx ι J) R) (blowUpOf P u) W₀ (liftForm z)
   have e₂ := h₁ (MRing ι R) P G₀ z
-  have key : ∀ (H : Ideal (MRing (extIdx ι J) R)) [H.IsPrime] (G : Ideal (MRing ι R)) [G.IsPrime],
-      W₀.comap (Ideal.Quotient.mk (blowUpOf P u)) = H → G₀.comap (Ideal.Quotient.mk P) = G →
-      multAt (blowUpOf P u ⊔ Ideal.span {liftForm z}) H ≤ multAt (P ⊔ Ideal.span {z}) G := by
+  have key
+      : ∀ (H : Ideal (MRing (extIdx ι J) R)) [H.IsPrime] (G : Ideal (MRing ι R)) [G.IsPrime],
+        W₀.comap (Ideal.Quotient.mk (blowUpOf P u)) = H → G₀.comap (Ideal.Quotient.mk P) = G
+          → multAt (blowUpOf P u ⊔ Ideal.span {liftForm z}) H ≤ multAt (P ⊔ Ideal.span {z}) G := by
     intro H _ G _ hH hGG
     subst hH
     subst hGG

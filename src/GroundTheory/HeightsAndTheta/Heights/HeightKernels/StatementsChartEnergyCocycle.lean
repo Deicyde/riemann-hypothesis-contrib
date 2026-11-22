@@ -15,9 +15,11 @@ open scoped ComplexOrder
 noncomputable section
 
 def ChartEnergyCocycle.Statement : Prop :=
-  ∀ (e : ℕ) (M N P : Matrix (Fin (e + 1)) (Fin (e + 1)) ℂ), M.PosDef → N.PosDef → P.PosDef →
-    ∑ k ∈ Finset.range (e + 1), chartMixedEnergy M P k =
-      ∑ k ∈ Finset.range (e + 1), chartMixedEnergy M N k + ∑ k ∈ Finset.range (e + 1), chartMixedEnergy N P k
+  ∀ (e : ℕ) (M N P : Matrix (Fin (e + 1)) (Fin (e + 1)) ℂ),
+    M.PosDef → N.PosDef → P.PosDef
+      → ∑ k ∈ Finset.range (e + 1), chartMixedEnergy M P k
+        = ∑ k ∈ Finset.range (e + 1), chartMixedEnergy M N k
+          + ∑ k ∈ Finset.range (e + 1), chartMixedEnergy N P k
 
 end
 

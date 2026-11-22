@@ -14,20 +14,24 @@ namespace GlobalTheory.Serre
 
 section Eigen
 
-variable {R O O' : Type*} [CommRing R] [CommRing O] [CommRing O'] [Algebra O O'] [Algebra O R]
+variable
+  {R O O' : Type*} [CommRing R] [CommRing O] [CommRing O'] [Algebra O O'] [Algebra O R]
   [Algebra O' R] [IsScalarTower O O' R]
-
 
 variable (R O O') in
 def mulChar : R ⊗[O] O' →ₐ[R] R :=
   Algebra.TensorProduct.lift (AlgHom.id R R) (IsScalarTower.toAlgHom O O' R) fun _ _ ↦ .all _ _
 
-@[simp] theorem mulChar_tmul (r : R) (x : O') :
-    mulChar (R := R) (O := O) (O' := O') (r ⊗ₜ x) = r * algebraMap O' R x := rfl
+@[simp]
+theorem mulChar_tmul (r : R) (x : O')
+    : mulChar (R := R) (O := O) (O' := O') (r ⊗ₜ x) = r * algebraMap O' R x :=
+  rfl
 
-theorem exists_elem_of_unramified {A : Type*} [CommRing A] [Algebra R A]
-    [Algebra.FormallyUnramified R A] [Algebra.EssFiniteType R A] (χ : A →ₐ[R] R) :
-    ∃ e : A, χ e = 1 ∧ ∀ x, x * e = χ x • e := by
+theorem exists_elem_of_unramified
+    {A : Type*}
+    [CommRing A] [Algebra R A] [Algebra.FormallyUnramified R A] [Algebra.EssFiniteType R A]
+    (χ : A →ₐ[R] R)
+    : ∃ e : A, χ e = 1 ∧ ∀ x, x * e = χ x • e := by
   let f : A ⊗[R] A →ₐ[R] A :=
     Algebra.TensorProduct.lift ((Algebra.ofId R A).comp χ) (AlgHom.id R A) fun _ _ ↦ .all _ _
   refine ⟨f (Algebra.FormallyUnramified.elem R A), ?_, fun x ↦ ?_⟩
@@ -41,40 +45,53 @@ theorem exists_elem_of_unramified {A : Type*} [CommRing A] [Algebra R A]
 
 variable {M : Type*} [AddCommGroup M] [Module O M] [Module O' M] [IsScalarTower O O' M]
 
-theorem exists_eigen_of_unramified (N : Type*) [AddCommGroup N] [Module R N] [Module O N]
-    [Module O' N] [IsScalarTower O R N] [IsScalarTower O' R N] [IsScalarTower O O' N]
-    [Algebra.FormallyUnramified R (R ⊗[O] O')] [Algebra.EssFiniteType R (R ⊗[O] O')] :
-    ∃ s : N ⊗[O'] M →ₗ[R] N ⊗[O] M, Function.Injective s ∧ ∀ z, z ∈ LinearMap.range s ↔
-      ∀ x : O', (Algebra.lsmul O O M x).lTensor N z = algebraMap O' R x • z := by
+theorem exists_eigen_of_unramified
+    (N : Type*) [AddCommGroup N] [Module R N] [Module O N] [Module O' N] [IsScalarTower O R N]
+    [IsScalarTower O' R N] [IsScalarTower O O' N] [Algebra.FormallyUnramified R (R ⊗[O] O')]
+    [Algebra.EssFiniteType R (R ⊗[O] O')]
+    : ∃ s : N ⊗[O'] M →ₗ[R] N ⊗[O] M,
+      Function.Injective s
+        ∧ ∀ z,
+          z ∈ LinearMap.range s
+            ↔ ∀ x : O', (Algebra.lsmul O O M x).lTensor N z = algebraMap O' R x • z := by
   obtain ⟨e, he₁, he₂⟩ := exists_elem_of_unramified (mulChar (R := R) (O := O) (O' := O'))
-  let g : O' →ₐ[O] Module.End R (N ⊗[O] M) :=
-    { toFun x := AlgebraTensorModule.lTensor R N (Algebra.lsmul O O M x)
-      map_one' := by ext; simp
-      map_mul' x y := by ext; simp
-      map_zero' := by ext; simp
-      map_add' x y := by ext; simp
-      commutes' x := by ext; simp }
+  let g : O' →ₐ[O] Module.End R (N ⊗[O] M) := {
+    toFun x := AlgebraTensorModule.lTensor R N (Algebra.lsmul O O M x)
+    map_one' := by ext; simp
+    map_mul' x y := by ext; simp
+    map_zero' := by ext; simp
+    map_add' x y := by ext; simp
+    commutes' x := by ext; simp
+  }
   let ρ : R ⊗[O] O' →ₐ[R] Module.End R (N ⊗[O] M) :=
     Algebra.TensorProduct.lift (Algebra.ofId R _) g fun r x ↦ Algebra.commute_algebraMap_left _ _
   have hρ : ∀ (r : R) (x : O') z, ρ (r ⊗ₜ x) z = r • (Algebra.lsmul O O M x).lTensor N z :=
     fun r x z ↦ rfl
-  have hρe : ∀ (x : O') z, (Algebra.lsmul O O M x).lTensor N (ρ e z) = algebraMap O' R x • ρ e z :=
-    fun x z ↦ by
-      have := congrArg (fun y ↦ ρ y z) (he₂ (1 ⊗ₜ x))
-      simpa only [map_mul, map_smul, Module.End.mul_apply, hρ, one_smul, mulChar_tmul, one_mul,
-        LinearMap.smul_apply] using this
-  have hρe' : ∀ (x : O') z, ρ e ((Algebra.lsmul O O M x).lTensor N z) = algebraMap O' R x • ρ e z :=
-    fun x z ↦ by
-      have := congrArg (fun y ↦ ρ y z) ((mul_comm _ _).trans (he₂ (1 ⊗ₜ x)))
-      simpa only [map_mul, map_smul, Module.End.mul_apply, hρ, one_smul, mulChar_tmul, one_mul,
-        LinearMap.smul_apply] using this
-  let s : N ⊗[O'] M →ₗ[R] N ⊗[O] M := AlgebraTensorModule.lift
-    { toFun n :=
-        { toFun m := ρ e (n ⊗ₜ m)
-          map_add' m m' := by rw [tmul_add, map_add (f := _)]
-          map_smul' x m := (hρe' x (n ⊗ₜ m)).trans (algebraMap_smul R x _) }
-      map_add' n n' := LinearMap.ext fun m ↦ (congrArg (ρ e) (add_tmul n n' m)).trans (map_add _ _ _)
-      map_smul' r n := LinearMap.ext fun m ↦ map_smul (ρ e) r (n ⊗ₜ m) }
+  have hρe
+      : ∀ (x : O') z,
+        (Algebra.lsmul O O M x).lTensor N (ρ e z) = algebraMap O' R x • ρ e z := fun x z ↦ by
+    have := congrArg (fun y ↦ ρ y z) (he₂ (1 ⊗ₜ x))
+    simpa only [map_mul, map_smul, Module.End.mul_apply, hρ, one_smul, mulChar_tmul, one_mul,
+        LinearMap.smul_apply]
+      using this
+  have hρe'
+      : ∀ (x : O') z,
+        ρ e ((Algebra.lsmul O O M x).lTensor N z) = algebraMap O' R x • ρ e z := fun x z ↦ by
+    have := congrArg (fun y ↦ ρ y z) ((mul_comm _ _).trans (he₂ (1 ⊗ₜ x)))
+    simpa only [map_mul, map_smul, Module.End.mul_apply, hρ, one_smul, mulChar_tmul, one_mul,
+        LinearMap.smul_apply]
+      using this
+  let s : N ⊗[O'] M →ₗ[R] N ⊗[O] M :=
+    AlgebraTensorModule.lift {
+      toFun n := {
+        toFun m := ρ e (n ⊗ₜ m)
+        map_add' m m' := by rw [tmul_add, map_add (f := _)]
+        map_smul' x m := (hρe' x (n ⊗ₜ m)).trans (algebraMap_smul R x _)
+      }
+      map_add' n n' :=
+        LinearMap.ext fun m ↦ (congrArg (ρ e) (add_tmul n n' m)).trans (map_add _ _ _)
+      map_smul' r n := LinearMap.ext fun m ↦ map_smul (ρ e) r (n ⊗ₜ m)
+    }
   let q : N ⊗[O] M →ₗ[R] N ⊗[O'] M := mapOfCompatibleSMul O' O R N M
   have hq : ∀ y z, q (ρ y z) = mulChar (R := R) (O := O) (O' := O') y • q z := fun y z ↦ by
     induction y with
@@ -100,26 +117,32 @@ theorem exists_eigen_of_unramified (N : Type*) [AddCommGroup N] [Module R N] [Mo
       | tmul r x => rw [hρ, hz, mulChar_tmul, mul_smul]
     rw [hsq, this, he₁, one_smul]
 
-
 omit [Algebra O R] in
-theorem exists_eigen_of_projective (M : Type*) [AddCommGroup M] [Module O M] [Module.Finite O M]
-    [Module.Projective O M] {N L : Type*} [AddCommGroup N] [Module R N] [Module O N]
-    [SMulCommClass O R N] [AddCommGroup L] [Module R L] [Module O L] [SMulCommClass O R L]
-    (τ : O → R) (i : N →ₗ[R] L) (hi : Function.Injective i)
-    (hlin : ∀ (x : O) n, i (x • n) = x • i n)
-    (hr : ∀ l, l ∈ LinearMap.range i ↔ ∀ x : O, x • l = τ x • l) :
-    ∃ j : N ⊗[O] M →ₗ[R] L ⊗[O] M, (∀ n m, j (n ⊗ₜ m) = i n ⊗ₜ m) ∧ Function.Injective j ∧
-      ∀ z, z ∈ LinearMap.range j ↔ ∀ x : O, x • z = τ x • z := by
+theorem exists_eigen_of_projective
+    (M : Type*) [AddCommGroup M] [Module O M] [Module.Finite O M] [Module.Projective O M]
+    {N L : Type*} [AddCommGroup N] [Module R N] [Module O N] [SMulCommClass O R N] [AddCommGroup L]
+    [Module R L] [Module O L] [SMulCommClass O R L]
+    (τ : O → R) (i : N →ₗ[R] L)
+    (hi : Function.Injective i) (hlin : ∀ (x : O) n, i (x • n) = x • i n)
+    (hr : ∀ l, l ∈ LinearMap.range i ↔ ∀ x : O, x • l = τ x • l)
+    : ∃ j : N ⊗[O] M →ₗ[R] L ⊗[O] M,
+      (∀ n m, j (n ⊗ₜ m) = i n ⊗ₜ m) ∧ Function.Injective j
+        ∧ ∀ z, z ∈ LinearMap.range j ↔ ∀ x : O, x • z = τ x • z := by
   let i' : N →ₗ[O] L := { i.toAddHom with map_smul' := hlin }
-  let j : N ⊗[O] M →ₗ[R] L ⊗[O] M :=
-    { (i'.rTensor M).toAddHom with
-      map_smul' := fun r z ↦ by
-        change i'.rTensor M (r • z) = r • i'.rTensor M z
-        induction z with
-        | add z z' hz hz' => simp only [smul_add, map_add (f := _), hz, hz']
-        | tmul n m => simp [smul_tmul', i'] }
-  refine ⟨j, fun _ _ ↦ rfl, Module.Flat.rTensor_preserves_injective_linearMap i' hi,
-    fun z ↦ ⟨?_, fun hz ↦ ?_⟩⟩
+  let j : N ⊗[O] M →ₗ[R] L ⊗[O] M := {
+    (i'.rTensor M).toAddHom with
+    map_smul' := fun r z ↦ by
+      change i'.rTensor M (r • z) = r • i'.rTensor M z
+      induction z with
+      | add z z' hz hz' => simp only [smul_add, map_add (f := _), hz, hz']
+      | tmul n m => simp [smul_tmul', i']
+  }
+  refine ⟨
+    j,
+    fun _ _ ↦ rfl,
+    Module.Flat.rTensor_preserves_injective_linearMap i' hi,
+    fun z ↦ ⟨?_, fun hz ↦ ?_⟩
+  ⟩
   · rintro ⟨z, rfl⟩ x
     induction z with
     | add z z' hz hz' => simp only [smul_add, map_add (f := _), hz, hz']
@@ -146,29 +169,38 @@ theorem exists_eigen_of_projective (M : Type*) [AddCommGroup M] [Module O M] [Mo
       rw [map_sum, ← hsum z]
     exact Finset.sum_congr rfl fun k _ ↦ by rw [← hu]; rfl
 
-theorem exists_eigen_tensor [Module.Finite O M] [Module.Projective O M]
-    {N L : Type*} [AddCommGroup N] [Module R N] [Module O N]
-    [Module O' N] [IsScalarTower O R N] [IsScalarTower O' R N] [IsScalarTower O O' N]
-    [Algebra.FormallyUnramified R (R ⊗[O] O')] [Algebra.EssFiniteType R (R ⊗[O] O')]
-    [AddCommGroup L] [Module R L] [Module O L] [SMulCommClass O R L]
+theorem exists_eigen_tensor
+    [Module.Finite O M] [Module.Projective O M]
+    {N L : Type*} [AddCommGroup N] [Module R N] [Module O N] [Module O' N] [IsScalarTower O R N]
+    [IsScalarTower O' R N] [IsScalarTower O O' N] [Algebra.FormallyUnramified R (R ⊗[O] O')]
+    [Algebra.EssFiniteType R (R ⊗[O] O')] [AddCommGroup L] [Module R L] [Module O L]
+    [SMulCommClass O R L]
     (i : N →ₗ[R] L) (hi : Function.Injective i)
-    (hr : ∀ l, l ∈ LinearMap.range i ↔ ∀ x : O, x • l = algebraMap O R x • l) :
-    ∃ s : N ⊗[O'] M →ₗ[R] L ⊗[O] M, Function.Injective s ∧ ∀ z, z ∈ LinearMap.range s ↔
-      ∀ x : O', (Algebra.lsmul O O M x).lTensor L z = algebraMap O' R x • z := by
+    (hr : ∀ l, l ∈ LinearMap.range i ↔ ∀ x : O, x • l = algebraMap O R x • l)
+    : ∃ s : N ⊗[O'] M →ₗ[R] L ⊗[O] M,
+      Function.Injective s
+        ∧ ∀ z,
+          z ∈ LinearMap.range s
+            ↔ ∀ x : O', (Algebra.lsmul O O M x).lTensor L z = algebraMap O' R x • z := by
   obtain ⟨s, hs₁, hs₂⟩ := exists_eigen_of_unramified (R := R) (O := O) (O' := O') (M := M) N
-  obtain ⟨j, hj₀, hj₁, hj₂⟩ := exists_eigen_of_projective M (algebraMap O R) i hi
-    (fun x n ↦ by rw [(hr _).mp ⟨n, rfl⟩, ← map_smul, algebraMap_smul]) hr
-  have hj : ∀ (x : O') z, j ((Algebra.lsmul O O M x).lTensor N z) =
-      (Algebra.lsmul O O M x).lTensor L (j z) := fun x z ↦ by
+  obtain ⟨j, hj₀, hj₁, hj₂⟩ :=
+    exists_eigen_of_projective M (algebraMap O R) i hi
+      (fun x n ↦ by rw [(hr _).mp ⟨n, rfl⟩, ← map_smul, algebraMap_smul])
+      hr
+  have hj
+      : ∀ (x : O') z,
+        j ((Algebra.lsmul O O M x).lTensor N z)
+          = (Algebra.lsmul O O M x).lTensor L (j z) := fun x z ↦ by
     induction z with
     | add z z' hz hz' => simp only [map_add (f := _), hz, hz']
     | tmul n m => simp [hj₀]
   refine ⟨j ∘ₗ s, hj₁.comp hs₁, fun z ↦ ⟨?_, fun hz ↦ ?_⟩⟩
   · rintro ⟨w, rfl⟩ x
     rw [LinearMap.comp_apply, ← hj, (hs₂ _).mp ⟨w, rfl⟩, map_smul]
-  · obtain ⟨w, rfl⟩ := (hj₂ z).mpr fun x ↦ by
-      rw [IsScalarTower.algebraMap_apply O O' R, ← hz, AlgHom.commutes]
-      simp [Module.algebraMap_end_eq_smul_id]
+  · obtain ⟨w, rfl⟩ :=
+      (hj₂ z).mpr fun x ↦ by
+        rw [IsScalarTower.algebraMap_apply O O' R, ← hz, AlgHom.commutes]
+        simp [Module.algebraMap_end_eq_smul_id]
     obtain ⟨v, rfl⟩ := (hs₂ w).mpr fun x ↦ hj₁ (by rw [hj, hz, map_smul])
     exact ⟨v, rfl⟩
 
@@ -178,9 +210,9 @@ section Integers
 
 open NumberField
 
-variable (k K E : Type*) [Field k] [CharZero k] [Field K] [Field E] [NumberField K] [NumberField E]
-  [Algebra K E]
-
+variable
+  (k K E : Type*)
+  [Field k] [CharZero k] [Field K] [Field E] [NumberField K] [NumberField E] [Algebra K E]
 
 omit [NumberField K] in
 theorem ringOfIntegers_injective (τ : 𝓞 K →+* k) : Function.Injective τ := by
@@ -189,8 +221,8 @@ theorem ringOfIntegers_injective (τ : 𝓞 K →+* k) : Function.Injective τ :
   rw [Ideal.under_def, RingHom.comap_ker, ← RingHom.injective_iff_ker_eq_bot]
   exact RingHom.injective_int _
 
-theorem formallyUnramified_ringOfIntegers [Algebra (𝓞 K) k] :
-    Algebra.FormallyUnramified k (k ⊗[𝓞 K] 𝓞 E) := by
+theorem formallyUnramified_ringOfIntegers [Algebra (𝓞 K) k]
+    : Algebra.FormallyUnramified k (k ⊗[𝓞 K] 𝓞 E) := by
   have hinj := ringOfIntegers_injective k K (algebraMap (𝓞 K) k)
   let : Algebra K k := (IsFractionRing.lift hinj).toAlgebra
   have : IsScalarTower (𝓞 K) K k :=
@@ -204,15 +236,14 @@ theorem formallyUnramified_ringOfIntegers [Algebra (𝓞 K) k] :
     .of_equiv (Algebra.IsPushout.equiv (𝓞 K) K (𝓞 E) E).symm
   exact .of_equiv (Algebra.TensorProduct.cancelBaseChange (𝓞 K) K k k (𝓞 E))
 
-
-
 end Integers
 
-theorem iSupIndep_eigen {k V I : Type*} [Field k] [AddCommGroup V] [Module k V]
-    (f : I → Module.End k V) (hf : ∀ i j, Commute (f i) (f j)) :
-    iSupIndep fun χ : I → k ↦ ⨅ i, (f i).eigenspace (χ i) :=
+theorem iSupIndep_eigen
+    {k V I : Type*} [Field k] [AddCommGroup V] [Module k V]
+    (f : I → Module.End k V) (hf : ∀ i j, Commute (f i) (f j))
+    : iSupIndep fun χ : I → k ↦ ⨅ i, (f i).eigenspace (χ i) :=
   (Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo f fun i j φ ↦
-    Module.End.mapsTo_maxGenEigenspace_of_comm (hf j i) φ).mono fun _ ↦
-      iInf_mono fun i ↦ ((f i).genEigenspace _).monotone le_top
+      Module.End.mapsTo_maxGenEigenspace_of_comm (hf j i) φ).mono fun _ ↦
+    iInf_mono fun i ↦ ((f i).genEigenspace _).monotone le_top
 
 end GlobalTheory.Serre

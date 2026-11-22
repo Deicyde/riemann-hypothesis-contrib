@@ -18,7 +18,8 @@ open MvPolynomial Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnF
 
 noncomputable section
 
-theorem tubeWeight_nonneg {m : ℕ} (Q : MvPolynomial (Fin m) ℂ) (y : Fin m → ℂ) : 0 ≤ tubeWeight Q y := by
+theorem tubeWeight_nonneg {m : ℕ} (Q : MvPolynomial (Fin m) ℂ) (y : Fin m → ℂ)
+    : 0 ≤ tubeWeight Q y := by
   unfold tubeWeight
   split_ifs <;> positivity
 
@@ -28,26 +29,32 @@ theorem LogLogCutHess.proof (hC : HessCCompPluri.Statement) : LogLogCutHess.Stat
   have hc : (1 : ℝ) ≤ (k : ℝ) + 1 := by linarith [(Nat.cast_nonneg k : (0 : ℝ) ≤ k)]
   have hnn : 0 ≤ K / ((k : ℝ) + 1) * tubeWeight Q y :=
     mul_nonneg (div_nonneg hK0 (by linarith)) (tubeWeight_nonneg Q y)
-  have hconst : ∀ c : ℝ, logLogCut Q k =ᶠ[𝓝 y] (fun _ => c) → ∃ a b : ℝ,
-      |a| ≤ K / ((k : ℝ) + 1) * tubeWeight Q y ∧ |b| ≤ K / ((k : ℝ) + 1) * tubeWeight Q y ∧
-      hessC (logLogCut Q k) y = (a : ℂ) • hessC (fun z => logAbsSq Q z ^ 2 / 2) y ∧
-      hessC (fun z => logLogCut Q k z ^ 2 / 2) y = (b : ℂ) • hessC (fun z => logAbsSq Q z ^ 2 / 2) y := by
+  have hconst
+      : ∀ c : ℝ,
+        logLogCut Q k =ᶠ[𝓝 y] (fun _ => c)
+          → ∃ a b : ℝ,
+            |a| ≤ K / ((k : ℝ) + 1) * tubeWeight Q y ∧ |b| ≤ K / ((k : ℝ) + 1) * tubeWeight Q y
+              ∧ hessC (logLogCut Q k) y = (a : ℂ) • hessC (fun z => logAbsSq Q z ^ 2 / 2) y
+              ∧ hessC (fun z => logLogCut Q k z ^ 2 / 2) y
+                = (b : ℂ) • hessC (fun z => logAbsSq Q z ^ 2 / 2) y := by
     intro c hev
     obtain ⟨e1, e2⟩ := hessC_of_eventually_const hev
     exact ⟨0, 0, by simpa using hnn, by simpa using hnn, by simp [e1], by simp [e2]⟩
   by_cases h1 : ‖eval y Q‖ ^ 2 < cutLevel k
   · exact hconst 0 (logLogCut_eventually_zero Q k h1)
-  by_cases h2 : Real.exp (-Real.exp (((k : ℝ) + 1) / 2)) < ‖eval y Q‖ ^ 2
+  by_cases h2 : Real.exp (- Real.exp (((k : ℝ) + 1) / 2)) < ‖eval y Q‖ ^ 2
   · exact hconst 1 (logLogCut_eventually_one Q k h2)
   have hw0 : 0 < ‖eval y Q‖ ^ 2 := lt_of_lt_of_le (cutLevel_mem k).1 (not_lt.1 h1)
   have hw1 : ‖eval y Q‖ ^ 2 < 1 :=
     lt_of_le_of_lt (not_lt.1 h2) (Real.exp_lt_one_iff.2 (neg_neg_of_pos (Real.exp_pos _)))
   have hLy : logAbsSq Q y ≤ -1 := by
-    have e1 : logAbsSq Q y ≤ -Real.exp (((k : ℝ) + 1) / 2) := (Real.log_le_iff_le_exp hw0).2 (not_lt.1 h2)
+    have e1 : logAbsSq Q y ≤ - Real.exp (((k : ℝ) + 1) / 2) :=
+      (Real.log_le_iff_le_exp hw0).2 (not_lt.1 h2)
     have e2 : 1 ≤ Real.exp (((k : ℝ) + 1) / 2) := Real.one_le_exp (by positivity)
     linarith
   have htw : tubeWeight Q y = (logAbsSq Q y ^ 2)⁻¹ := if_pos hLy
-  have hg : AnalyticAt ℂ (fun z => eval z Q) y := AnalyticOnNhd.eval_mvPolynomial Q y (Set.mem_univ y)
+  have hg : AnalyticAt ℂ (fun z => eval z Q) y :=
+    AnalyticOnNhd.eval_mvPolynomial Q y (Set.mem_univ y)
   have hgy : eval y Q ≠ 0 := by
     intro h
     rw [h, norm_zero] at hw0
@@ -66,12 +73,14 @@ theorem LogLogCutHess.proof (hC : HessCCompPluri.Statement) : LogLogCutHess.Stat
     exact (hessC_add_log_norm _ (fun z => eval z Q) y hlcd hg hgy).trans (hessC_log_norm _ y hg hgy)
   obtain ⟨hFcd, hHcd, hF2, hH2⟩ := hK ((k : ℝ) + 1) hc (logAbsSq Q y) (by linarith)
   have hev := logLogCut_eventually_step Q k hw0 hw1
-  have hevsq : (fun z => logLogCut Q k z ^ 2 / 2) =ᶠ[𝓝 y]
-      fun z => cutStep (Real.log (-logAbsSq Q z) / ((k : ℝ) + 1)) ^ 2 / 2 := by
+  have hevsq
+      : (fun z => logLogCut Q k z ^ 2 / 2) =ᶠ[𝓝 y]
+        fun z => cutStep (Real.log (-logAbsSq Q z) / ((k : ℝ) + 1)) ^ 2 / 2 := by
     filter_upwards [hev] with z hz
     rw [hz]
   have eF := hC m (fun x => cutStep (Real.log (-x) / ((k : ℝ) + 1))) (logAbsSq Q) y hFcd hLcd hLpl
-  have eH := hC m (fun x => cutStep (Real.log (-x) / ((k : ℝ) + 1)) ^ 2 / 2) (logAbsSq Q) y hHcd hLcd hLpl
+  have eH :=
+    hC m (fun x => cutStep (Real.log (-x) / ((k : ℝ) + 1)) ^ 2 / 2) (logAbsSq Q) y hHcd hLcd hLpl
   rw [← hessC_congr' hev] at eF
   rw [← hessC_congr' hevsq] at eH
   refine ⟨_, _, ?_, ?_, eF, eH⟩

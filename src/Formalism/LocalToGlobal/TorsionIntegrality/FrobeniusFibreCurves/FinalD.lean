@@ -26,6 +26,7 @@ theorem frobStickStar : FrobStickStar := Fs.FrobStickStar_of frobStick
 theorem fIUnit : FIUnit := E2.formal_inverse_unit_holds
 theorem parThree : ParThree := E2.ParThree_of frobStickStar fIUnit
 theorem cubeFromPars : CubeFromPars := E3.cube_relation_from_parallelograms
-theorem first_level_all_formal_groups : LogSigmaPullbackCocycleJets := E3.log_sigma_pullback_cocycle_jets_of_parallelogram_and_cube parThree cubeFromPars
+theorem first_level_all_formal_groups : LogSigmaPullbackCocycleJets :=
+  E3.log_sigma_pullback_cocycle_jets_of_parallelogram_and_cube parThree cubeFromPars
 
 end Formalism.L2.Th1.B

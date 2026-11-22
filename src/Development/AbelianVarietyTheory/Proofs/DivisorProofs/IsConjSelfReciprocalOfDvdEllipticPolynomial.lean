@@ -7,16 +7,22 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.UnitaryClasses
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  GlobalTheory.UnitaryClasses
 open scoped Classical TensorProduct ComplexOrder
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 noncomputable section
 
 namespace GlobalTheory.SelfRecipFactor
 
-theorem isSelfRecip_of_dvd_ell : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (P : E[X]),
-    P ∈ Ell E n → ∀ Q : E[X], Q.Monic → Irreducible Q → Q ∣ P →
-      GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.IsSelfRecip E Q.natDegree Q := by
+theorem isSelfRecip_of_dvd_ell
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (P : E[X]),
+      P ∈ Ell E n
+        → ∀ Q : E[X],
+          Q.Monic → Irreducible Q → Q ∣ P
+            → GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.IsSelfRecip E
+              Q.natDegree Q := by
   intro E _ _ _ n P hP Q hQm hQi hQP
   obtain ⟨hPm, -, -, hroots⟩ := hP
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
@@ -39,8 +45,7 @@ theorem isSelfRecip_of_dvd_ell : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
   have hτc : τ.comp c = (starRingEnd ℂ).comp τ := by
     ext x
     exact IsCMField.complexEmbedding_complexConj E τ x
-  have hcQ0 : c (Q.coeff 0) ≠ 0 := by
-    simpa using hQ0
+  have hcQ0 : c (Q.coeff 0) ≠ 0 := by simpa using hQ0
   set S := GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField.sharp E d Q with hS
   have hSdef : S = C (c (Q.coeff 0))⁻¹ * reflect d (Q.map c) := rfl
   have hdegc : (Q.map c).natDegree = d := natDegree_map c
@@ -58,12 +63,10 @@ theorem isSelfRecip_of_dvd_ell : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
     refine natDegree_reflect_le.trans ?_
     rw [hdegc, max_self]
 
-  have hdeg : 0 < (Q.map τ).degree := by
-    rw [degree_map]; exact degree_pos_of_irreducible hQi
+  have hdeg : 0 < (Q.map τ).degree := by rw [degree_map]; exact degree_pos_of_irreducible hQi
   obtain ⟨z, hz⟩ := Complex.exists_root hdeg
   have hz1 : ‖z‖ = 1 := hnorm z hz
-  have hz0 : z ≠ 0 := by
-    intro h; rw [h] at hz1; simp at hz1
+  have hz0 : z ≠ 0 := by intro h; rw [h] at hz1; simp at hz1
   have hzinv : z⁻¹ = (starRingEnd ℂ) z := Complex.inv_eq_conj hz1
   have hQz : eval₂ τ z Q = 0 := by
     have : eval z (Q.map τ) = 0 := hz

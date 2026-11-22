@@ -14,14 +14,19 @@ open GlobalTheory.PRep GlobalTheory.SmGL Matrix GlobalTheory.InertSupp
 
 namespace GlobalTheory.UnipCptSub
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {n : Type} [Fintype n] [DecidableEq n]
 
-theorem mem_grp_of_le {c : n → ℤ} {g : GL n k} (hg : g ∈ unipOf k c) {m M : ℕ} (hmM : m ≤ M)
-    (h : g ∈ GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c m)) :
-    g ∈ GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c M) := by
-  have key : ∀ x : GL n k, x ∈ unipOf k c → (∀ i j, GlobalTheory.IwahoriInj.Deep ((m : ℤ) * (c i - c j)) (x.val i j)) →
-      ∀ i j, GlobalTheory.IwahoriInj.Deep ((M : ℤ) * (c i - c j)) (x.val i j) := by
+theorem mem_grp_of_le
+    {c : n → ℤ} {g : GL n k} (hg : g ∈ unipOf k c)
+    {m M : ℕ} (hmM : m ≤ M)
+    (h : g ∈ GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c m))
+    : g ∈ GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c M) := by
+  have key
+      : ∀ x : GL n k,
+        x ∈ unipOf k c → (∀ i j, GlobalTheory.IwahoriInj.Deep ((m : ℤ) * (c i - c j)) (x.val i j))
+          → ∀ i j, GlobalTheory.IwahoriInj.Deep ((M : ℤ) * (c i - c j)) (x.val i j) := by
     intro x hx hd i j
     by_cases hij : c i < c j
     · refine (hd i j).mono ?_
@@ -34,22 +39,25 @@ theorem mem_grp_of_le {c : n → ℤ} {g : GL n k} (hg : g ∈ unipOf k c) {m M 
       · simp [one_apply_ne e, GlobalTheory.IwahoriInj.deep_zero]
   exact ⟨key g hg h.1, key g⁻¹ (inv_mem hg) h.2⟩
 
-theorem isOpen_grp (c : n → ℤ) (m : ℕ) :
-    IsOpen (GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c m) : Set (GL n k)) := by
-  have e : (GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c m) : Set (GL n k)) =
-      (⋂ i, ⋂ j, {g : GL n k | GlobalTheory.IwahoriInj.Deep ((m : ℤ) * (c i - c j)) (g.val i j)}) ∩
-      ⋂ i, ⋂ j, {g : GL n k | GlobalTheory.IwahoriInj.Deep ((m : ℤ) * (c i - c j)) ((g⁻¹).val i j)} := by
-    ext g
-    simp only [SetLike.mem_coe, Set.mem_inter_iff, Set.mem_iInter, Set.mem_setOf_eq]
-    rfl
+theorem isOpen_grp (c : n → ℤ) (m : ℕ)
+    : IsOpen
+      (GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c m)
+        : Set (GL n k)) := by
+  have e
+      : (GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c m) : Set (GL n k))
+        = (⋂ i, ⋂ j, {g : GL n k | GlobalTheory.IwahoriInj.Deep ((m : ℤ) * (c i - c j)) (g.val i j)})
+          ∩ ⋂ i, ⋂ j, {g : GL n k | GlobalTheory.IwahoriInj.Deep ((m : ℤ) * (c i - c j)) ((g⁻¹).val i j)} :=
+    by
+      ext g
+      simp only [SetLike.mem_coe, Set.mem_inter_iff, Set.mem_iInter, Set.mem_setOf_eq]
+      rfl
   rw [e]
   refine IsOpen.inter (isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j => ?_)
     (isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j => ?_)
   · exact (GlobalTheory.SBUniform.isOpen_deep _).preimage (Units.continuous_val.matrix_elem i j)
   · exact (GlobalTheory.SBUniform.isOpen_deep _).preimage (Units.continuous_coe_inv.matrix_elem i j)
 
-theorem unipB_eq_unipOf (N : ℕ) :
-    unipB k (Fin N) = unipOf k (fun i : Fin N => ((i : ℕ) : ℤ)) := by
+theorem unipB_eq_unipOf (N : ℕ) : unipB k (Fin N) = unipOf k (fun i : Fin N => ((i : ℕ) : ℤ)) := by
   ext g
   rw [mem_unipB, mem_unipOf]
   constructor
@@ -68,15 +76,18 @@ theorem unipB_eq_unipOf (N : ℕ) :
       rw [h i j this, one_apply_ne (ne_of_gt hji)]
     · rw [h i i (lt_irrefl _), one_apply_eq]
 
-theorem exists_compact_subgroup_of_isCompact :
-    ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {N : ℕ}
-      (Q : Set (GL (Fin N) k)), IsCompact Q → Q ⊆ (unipB k (Fin N) : Set (GL (Fin N) k)) →
-      ∃ U₀ : Subgroup (GL (Fin N) k), IsCompact (U₀ : Set (GL (Fin N) k)) ∧ Q ⊆ (U₀ : Set (GL (Fin N) k)) := by
+theorem exists_compact_subgroup_of_isCompact
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        {N : ℕ} (Q : Set (GL (Fin N) k)),
+      IsCompact Q → Q ⊆ (unipB k (Fin N) : Set (GL (Fin N) k))
+        → ∃ U₀ : Subgroup (GL (Fin N) k),
+          IsCompact (U₀ : Set (GL (Fin N) k)) ∧ Q ⊆ (U₀ : Set (GL (Fin N) k)) := by
   intro k _ _ _ _ N Q hQ hQU
   set c : Fin N → ℤ := fun i => ((i : ℕ) : ℤ)
   rw [unipB_eq_unipOf] at hQU
   let V : ℕ → Set (GL (Fin N) k) := fun m =>
-    (GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c m) : Set (GL (Fin N) k)) ∪ (unipOf k c : Set _)ᶜ
+    (GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c m) : Set (GL (Fin N) k))
+      ∪ (unipOf k c : Set _)ᶜ
   have hVo : ∀ m, IsOpen (V m) := fun m =>
     (isOpen_grp c m).union (GlobalTheory.UnipCompact.isClosed_unipOf c).isOpen_compl
   have hVmono : Monotone V := by
@@ -87,11 +98,17 @@ theorem exists_compact_subgroup_of_isCompact :
       · exact Or.inr hu
     · exact Or.inr hg
   have hcov : Q ⊆ ⋃ m, V m := fun g hg =>
-    Set.mem_iUnion.2 (((GlobalTheory.UnipCompact.eventually_mem_grp (hQU hg)).exists).imp fun _ h => Or.inl h)
+    Set.mem_iUnion.2 (((GlobalTheory.UnipCompact.eventually_mem_grp (hQU hg)).exists).imp fun _ h =>
+      Or.inl h)
   obtain ⟨M, hM⟩ := hQ.elim_directed_cover V hVo hcov hVmono.directed_le
-  refine ⟨GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c M) ⊓ unipOf k c, ?_, fun g hg => ?_⟩
+  refine ⟨
+    GlobalTheory.IwahoriInj.grp k (GlobalTheory.UnipCompact.conc_mul_sub c M) ⊓ unipOf k c,
+    ?_,
+    fun g hg => ?_
+  ⟩
   · rw [Subgroup.coe_inf]
-    exact (GlobalTheory.IwahoriInj.isCompact_grp _).inter_right (GlobalTheory.UnipCompact.isClosed_unipOf c)
+    exact (GlobalTheory.IwahoriInj.isCompact_grp _).inter_right
+      (GlobalTheory.UnipCompact.isClosed_unipOf c)
   · rcases hM hg with h | h
     · exact ⟨h, hQU hg⟩
     · exact absurd (hQU hg) h

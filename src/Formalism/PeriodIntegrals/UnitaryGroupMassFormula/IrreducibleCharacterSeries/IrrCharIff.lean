@@ -15,9 +15,7 @@ def ConjChar : Prop :=
   ∀ (G : Type) [Group G] [Fintype G] (V : FDRep ℂ G) (x : G), star (V.character x) = V.character x⁻¹
 
 def IrrCharIff : Prop :=
-  ∀ (G : Type) [Group G] [Fintype G] (χ : G → ℂ), IsIrrChar χ ↔ ∃ V : FDRep ℂ G, Simple V ∧ χ = V.character
-
-
-
+  ∀ (G : Type) [Group G] [Fintype G] (χ : G → ℂ),
+    IsIrrChar χ ↔ ∃ V : FDRep ℂ G, Simple V ∧ χ = V.character
 
 end PI.SerBridgeGLW

@@ -5,8 +5,11 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Fla
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (Lv IsTrans Integ KS Mem FEt KSEx KSNice)
 open scoped TensorProduct
 universe u
@@ -43,23 +46,21 @@ private lemma twisted_kernel_forms_nonvanishing (hE : EtDesc) (k : Type) [Field 
   · rw [← cancel_epi ψ₁.left, ← Category.assoc, hg, hw]
   · exact Over.OverMorphism.ext hg
 
-theorem UpperTheory.Gal.G3.pQuotUniq :
-    EtDesc → QuotUniq := by
+theorem UpperTheory.Gal.G3.pQuotUniq : EtDesc → QuotUniq := by
   intro hE k _ _ A A₁ A₂ _ _ _ _ _ _ hA hA₁ hA₂ ψ₁ ψ₂ h₁ h₂ f₁ e₁ s₁ f₂ e₂ s₂ hker
-  obtain ⟨θ, hθ⟩ := twisted_kernel_forms_nonvanishing hE k A A₁ A₂ hA hA₂ ψ₁ ψ₂ (fun Ω _ _ t a => (hker Ω t a).1)
-  obtain ⟨θ', hθ'⟩ := twisted_kernel_forms_nonvanishing hE k A A₂ A₁ hA hA₁ ψ₂ ψ₁ (fun Ω _ _ t a => (hker Ω t a).2)
+  obtain ⟨θ, hθ⟩ :=
+    twisted_kernel_forms_nonvanishing hE k A A₁ A₂ hA hA₂ ψ₁ ψ₂ (fun Ω _ _ t a => (hker Ω t a).1)
+  obtain ⟨θ', hθ'⟩ :=
+    twisted_kernel_forms_nonvanishing hE k A A₂ A₁ hA hA₁ ψ₂ ψ₁ (fun Ω _ _ t a => (hker Ω t a).2)
   haveI : Flat ψ₁.left := inferInstance
   haveI : Flat ψ₂.left := inferInstance
   haveI : Epi ψ₁ := GlobalTheory.FlatQuotient.epi_of_flat_surjective ψ₁
   haveI : Epi ψ₂ := GlobalTheory.FlatQuotient.epi_of_flat_surjective ψ₂
   haveI : Epi (ψ₁ ⊗ₘ ψ₁) := GlobalTheory.FlatQuotient.epi_tensorHom ψ₁ ψ₁
-  have i1 : θ ≫ θ' = 𝟙 _ := by
-    rw [← cancel_epi ψ₁, ← Category.assoc, hθ, hθ', Category.comp_id]
-  have i2 : θ' ≫ θ = 𝟙 _ := by
-    rw [← cancel_epi ψ₂, ← Category.assoc, hθ', hθ, Category.comp_id]
+  have i1 : θ ≫ θ' = 𝟙 _ := by rw [← cancel_epi ψ₁, ← Category.assoc, hθ, hθ', Category.comp_id]
+  have i2 : θ' ≫ θ = 𝟙 _ := by rw [← cancel_epi ψ₂, ← Category.assoc, hθ', hθ, Category.comp_id]
   refine ⟨θ, ⟨θ', i1, i2⟩, ⟨?_, ?_⟩, hθ⟩
   · rw [← IsMonHom.one_hom ψ₁, Category.assoc, hθ, IsMonHom.one_hom ψ₂]
-  · have h1 : (ψ₁ ⊗ₘ ψ₁) ≫ (θ ⊗ₘ θ) = ψ₂ ⊗ₘ ψ₂ := by
-      rw [tensorHom_comp_tensorHom, hθ]
+  · have h1 : (ψ₁ ⊗ₘ ψ₁) ≫ (θ ⊗ₘ θ) = ψ₂ ⊗ₘ ψ₂ := by rw [tensorHom_comp_tensorHom, hθ]
     rw [← cancel_epi (ψ₁ ⊗ₘ ψ₁), ← Category.assoc, ← IsMonHom.mul_hom ψ₁, Category.assoc, hθ,
       IsMonHom.mul_hom ψ₂, ← Category.assoc, h1]

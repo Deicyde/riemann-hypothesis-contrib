@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.BaseChangeIdentities
 
 @[expose] public section
 
-open UpperTheory.V.Z.GSp4Splitting PositivityTheory.RgBcC PositivityTheory.RgBcC.RealD PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.GSp4Splitting PositivityTheory.RgBcC PositivityTheory.RgBcC.RealD
+  PositivityTheory.Rg.BcB.Desc
 
 noncomputable section
 
@@ -13,22 +14,25 @@ namespace UpperTheory.V.Z.GSp4Splitting.LieStabilizer
 
 open Matrix
 
-private theorem flow {S : Type*} [NormedAddCommGroup S] [NormedSpace ℝ S] [CompleteSpace S]
-    (D : S →L[ℝ] S) (c : ℝ → S) (hc : ∀ t, HasDerivAt c (D (c t)) t) :
-    c 1 = NormedSpace.exp D (c 0) := by
+private theorem flow
+    {S : Type*} [NormedAddCommGroup S] [NormedSpace ℝ S] [CompleteSpace S]
+    (D : S →L[ℝ] S) (c : ℝ → S) (hc : ∀ t, HasDerivAt c (D (c t)) t)
+    : c 1 = NormedSpace.exp D (c 0) := by
   have hψ : ∀ t : ℝ, HasDerivAt (fun u : ℝ => NormedSpace.exp ((1 - u) • D) (c u)) 0 t := by
     intro t
     have he := (hasDerivAt_exp_smul_const (𝕂 := ℝ) D (1 - t)).comp_const_sub 1 t
     have h := he.clm_apply (hc t)
     convert h using 1
     simp [ContinuousLinearMap.mul_apply]
-  have hconst := is_const_of_deriv_eq_zero
-    (fun u => (hψ u).differentiableAt) (fun u => (hψ u).deriv) 1 0
+  have hconst :=
+    is_const_of_deriv_eq_zero (fun u => (hψ u).differentiableAt) (fun u => (hψ u).deriv) 1 0
   simpa using hconst
 
-private theorem exp_mem {S : Type*} [NormedAddCommGroup S] [NormedSpace ℝ S] [CompleteSpace S]
+private theorem exp_mem
+    {S : Type*} [NormedAddCommGroup S] [NormedSpace ℝ S] [CompleteSpace S]
     (D : S →L[ℝ] S) (M : Submodule ℝ S) (hM : IsClosed (M : Set S)) (hD : ∀ y ∈ M, D y ∈ M)
-    {x : S} (hx : x ∈ M) : NormedSpace.exp D x ∈ M := by
+    {x : S} (hx : x ∈ M)
+    : NormedSpace.exp D x ∈ M := by
   have hs := NormedSpace.exp_series_hasSum_exp' (𝕂 := ℝ) D
   have hs2 := (ContinuousLinearMap.apply ℝ S x).hasSum hs
   have hpow : ∀ m : ℕ, (D ^ m) x ∈ M := by
@@ -42,19 +46,22 @@ private theorem exp_mem {S : Type*} [NormedAddCommGroup S] [NormedSpace ℝ S] [
   refine M.sum_mem fun m _ => ?_
   simpa using M.smul_mem _ (hpow m)
 
-private theorem lift {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {S : Submodule ℂ V}
-    {c : ℝ → S} {d : S} {t : ℝ} (h : HasDerivAt (fun s => (c s : V)) (d : V) t) : HasDerivAt c d t := by
+private theorem lift
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {S : Submodule ℂ V} {c : ℝ → S} {d : S} {t : ℝ} (h : HasDerivAt (fun s => (c s : V)) (d : V) t)
+    : HasDerivAt c d t := by
   rw [hasDerivAt_iff_isLittleO_nhds_zero] at h ⊢
   exact (Asymptotics.isLittleO_norm_left).1 h.norm_left
 
 variable {n : ℕ}
 
-private def curve (X : Matrix (Fin n) (Fin n) ℂ) (hX : Xᴴ = -X) (t : ℝ) : Un n :=
-  ⟨NormedSpace.exp ((t : ℂ) • X), (UpperTheory.RealTr.skewExp n).1 _ (by
-    rw [conjTranspose_smul, hX]; simp)⟩
+private def curve (X : Matrix (Fin n) (Fin n) ℂ) (hX : Xᴴ = -X) (t : ℝ) : Un n := ⟨
+  NormedSpace.exp ((t : ℂ) • X),
+  (UpperTheory.RealTr.skewExp n).1 _ (by rw [conjTranspose_smul, hX]; simp)
+⟩
 
-private theorem curve_add (X : Matrix (Fin n) (Fin n) ℂ) (hX : Xᴴ = -X) (s t : ℝ) :
-    curve X hX (s + t) = curve X hX s * curve X hX t := by
+private theorem curve_add (X : Matrix (Fin n) (Fin n) ℂ) (hX : Xᴴ = -X) (s t : ℝ)
+    : curve X hX (s + t) = curve X hX s * curve X hX t := by
   apply Subtype.ext
   show NormedSpace.exp (((s + t : ℝ) : ℂ) • X) = NormedSpace.exp ((s : ℂ) • X) * NormedSpace.exp ((t : ℂ) • X)
   have hc : Commute ((s : ℂ) • X) ((t : ℂ) • X) := ((Commute.refl X).smul_left _).smul_right _
@@ -68,8 +75,7 @@ private theorem curve_zero (X : Matrix (Fin n) (Fin n) ℂ) (hX : Xᴴ = -X) : c
 end UpperTheory.V.Z.GSp4Splitting.LieStabilizer
 
 open UpperTheory.V.Z.GSp4Splitting.LieStabilizer in
-theorem UpperTheory.V.Z.GSp4Splitting.lieStab :
-    LieStab := by
+theorem UpperTheory.V.Z.GSp4Splitting.lieStab : LieStab := by
   intro n V _ _ σ Kf hder N hN k x hx
   obtain ⟨X, hX, hXk⟩ := (UpperTheory.RealTr.skewExp n).2 k
   obtain ⟨S, hfd, hxS, hσS, hKS, hd⟩ := hder.2 x
@@ -102,8 +108,7 @@ theorem UpperTheory.V.Z.GSp4Splitting.lieStab :
     have h1 := h0.comp_sub_const t t
     convert h1 using 1
     funext s
-    have : γ s = γ (s - t) * γ t := by
-      rw [← curve_add, sub_add_cancel]
+    have : γ s = γ (s - t) * γ t := by rw [← curve_add, sub_add_cancel]
     show σ (γ s) x = σ (γ (s - t)) (σ (γ t) x)
     rw [this, map_mul, Module.End.mul_apply]
     exact hDapp _

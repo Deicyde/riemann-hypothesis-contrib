@@ -13,11 +13,12 @@ namespace Formalism.HermitianLatticesTheory
 
 section SlopeTestRemainingChoices
 
-variable {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K]
-  [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable
+  {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
+  [Module R V] [IsScalarTower R K V]
 
-theorem isomAct_mem_gmap (g : V ≃ₗ[K] V) (L : Submodule R V) (x : V) :
-    x ∈ gmap g L ↔ g.symm x ∈ L := by
+theorem isomAct_mem_gmap (g : V ≃ₗ[K] V) (L : Submodule R V) (x : V)
+    : x ∈ gmap g L ↔ g.symm x ∈ L := by
   unfold gmap
   rw [Submodule.mem_map]
   constructor
@@ -29,18 +30,17 @@ theorem isomAct_mem_gmap (g : V ≃ₗ[K] V) (L : Submodule R V) (x : V) :
 theorem isomAct_smul (g : V ≃ₗ[K] V) (s : R) (x : V) : g (s • x) = s • g x := by
   exact map_smul ((g : V →ₗ[K] V).restrictScalars R) s x
 
-theorem isomAct_gmap_symm (g : V ≃ₗ[K] V) (L : Submodule R V) :
-    gmap g.symm (gmap g L) = L := by
+theorem isomAct_gmap_symm (g : V ≃ₗ[K] V) (L : Submodule R V) : gmap g.symm (gmap g L) = L := by
   ext x
   simp [isomAct_mem_gmap]
 
-theorem isomAct_mem_dual (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule R V) (x : V) :
-    x ∈ dual h L ↔ ∀ y ∈ L, h y x ∈ (1 : Submodule R K) := by
+theorem isomAct_mem_dual (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule R V) (x : V)
+    : x ∈ dual h L ↔ ∀ y ∈ L, h y x ∈ (1 : Submodule R K) := by
   simp only [dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
     LinearMap.restrictScalars_apply]
 
-theorem isomAct_lattice (g : V ≃ₗ[K] V) (L : Submodule R V) (hL : Submodule.IsLattice K L) :
-    Submodule.IsLattice K (gmap g L) := by
+theorem isomAct_lattice (g : V ≃ₗ[K] V) (L : Submodule R V) (hL : Submodule.IsLattice K L)
+    : Submodule.IsLattice K (gmap g L) := by
   have e : ((gmap g L : Submodule R V) : Set V) = (g : V →ₗ[K] V) '' (L : Set V) := by
     ext x
     simp [gmap]
@@ -53,11 +53,13 @@ theorem isomAct_lattice (g : V ≃ₗ[K] V) (L : Submodule R V) (hL : Submodule.
   rw [← Set.image_preimage_eq s g.surjective] at hli ⊢
   exact (linearIndepOn_id_imageₛ_iff (f := g.toLinearMap) g.injective.injOn).2
     (hL.linearIndepOn _ hpre
-      ((linearIndepOn_id_imageₛ_iff (f := g.toLinearMap.restrictScalars R)
-        g.injective.injOn).1 hli))
+      ((linearIndepOn_id_imageₛ_iff (f := g.toLinearMap.restrictScalars R) g.injective.injOn).1
+        hli))
 
-theorem isomAct_mem_locS {W : Type*} [AddCommGroup W] [Module R W] (S : Submonoid R)
-    (L : Submodule R W) (x : W) : x ∈ locS S L ↔ ∃ s ∈ S, s • x ∈ L := Iff.rfl
+theorem isomAct_mem_locS
+    {W : Type*} [AddCommGroup W] [Module R W] (S : Submonoid R) (L : Submodule R W) (x : W)
+    : x ∈ locS S L ↔ ∃ s ∈ S, s • x ∈ L :=
+  Iff.rfl
 
 end SlopeTestRemainingChoices
 

@@ -11,11 +11,12 @@ open Polynomial
 namespace LateralTheory.KummerTheory
 
 section
-variable (κ K A : Type) [Field κ] [Field K] [Algebra κ K] [IsPurelyInseparable κ K] [CommRing A]
-  [Algebra κ A]
+variable
+  (κ K A : Type)
+  [Field κ] [Field K] [Algebra κ K] [IsPurelyInseparable κ K] [CommRing A] [Algebra κ A]
 
-theorem shInsepRes_pow [Nontrivial (A ⊗[κ] K)] (y : A ⊗[κ] K) :
-    ∃ n : ℕ, ∃ a : A, y ^ (ringExpChar κ) ^ n = algebraMap A (A ⊗[κ] K) a := by
+theorem shInsepRes_pow [Nontrivial (A ⊗[κ] K)] (y : A ⊗[κ] K)
+    : ∃ n : ℕ, ∃ a : A, y ^ (ringExpChar κ) ^ n = algebraMap A (A ⊗[κ] K) a := by
   set q := ringExpChar κ
   have : ExpChar (A ⊗[κ] K) q :=
     expChar_of_injective_algebraMap (algebraMap κ (A ⊗[κ] K)).injective q
@@ -31,8 +32,8 @@ theorem shInsepRes_pow [Nontrivial (A ⊗[κ] K)] (y : A ⊗[κ] K) :
     obtain ⟨n, a, ha⟩ := hx
     obtain ⟨m, b, hb⟩ := hy
     refine ⟨n + m, a ^ q ^ m + b ^ q ^ n, ?_⟩
-    rw [add_pow_expChar_pow, map_add (f := _), map_pow, map_pow, ← ha, ← hb, ← pow_mul, ← pow_mul, ← pow_add,
-      ← pow_add, add_comm m n]
+    rw [add_pow_expChar_pow, map_add (f := _), map_pow, map_pow, ← ha, ← hb, ← pow_mul, ← pow_mul,
+      ← pow_add, ← pow_add, add_comm m n]
 
 omit [IsPurelyInseparable κ K] in
 theorem shInsepRes_inj : Function.Injective (algebraMap A (A ⊗[κ] K)) :=
@@ -57,7 +58,8 @@ theorem SHInsepRes_of : SHInsepRes := by
   have : IsLocalHom (algebraMap A (A ⊗[κ] K)) := shInsepRes_localHom κ K A
   let _ : Algebra (IsLocalRing.ResidueField A) (IsLocalRing.ResidueField (A ⊗[κ] K)) :=
     (IsLocalRing.ResidueField.map (algebraMap A (A ⊗[κ] K))).toAlgebra
-  have : Algebra.IsAlgebraic (IsLocalRing.ResidueField A) (IsLocalRing.ResidueField (A ⊗[κ] K)) := by
+  have : Algebra.IsAlgebraic (IsLocalRing.ResidueField A)
+      (IsLocalRing.ResidueField (A ⊗[κ] K)) := by
     constructor
     intro x
     obtain ⟨y, rfl⟩ := IsLocalRing.residue_surjective x

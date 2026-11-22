@@ -19,8 +19,9 @@ theorem UpperTheory.V.Z.Sym.Loc.finUq : UpperTheory.V.Z.Sym.Loc.FinUq := by
   · intro y
     refine QuotientGroup.induction_on y ?_
     intro y
-    have e : MulAction.stabilizer (U3 Δ) (QuotientGroup.mk y : U3 Δ ⧸ KU O Δ)
-        = (KU O Δ).comap (MulAut.conj y⁻¹).toMonoidHom := by
+    have e
+        : MulAction.stabilizer (U3 Δ) (QuotientGroup.mk y : U3 Δ ⧸ KU O Δ)
+          = (KU O Δ).comap (MulAut.conj y⁻¹).toMonoidHom := by
       ext g
       simp [MulAction.mem_stabilizer_iff, QuotientGroup.eq, mul_assoc]
       constructor

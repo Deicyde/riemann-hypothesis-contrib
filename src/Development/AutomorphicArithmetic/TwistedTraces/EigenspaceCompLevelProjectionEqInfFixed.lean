@@ -8,14 +8,24 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Convolut
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
-open GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.GM UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+  GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic.CuspidalSpectrum
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep
+  Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.GM
+  UpperTheory.ConvolutionTheory.C
 
-theorem UpperTheory.eigenspace_comp_levelProjection_eq_inf_fixed :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ), 0 < n → ∀ (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure] (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
-        (V : Submodule ℂ (LL μ)) (a : TI K n) (x : ℝ) (P : Finset (Pl K)) (Uv : ∀ v : Pl K, Subgroup (Gw n v)), x ≠ 0 →
-        eigIn V (Oinf μ ν a ∘L prj (fixF μ (levOn P Uv))) x =
-          (eigIn V (Oinf μ ν a) x ⊓ sphOff μ P) ⊓ ⨅ v ∈ P, fixL μ v (Uv v) := by
+theorem UpperTheory.eigenspace_comp_levelProjection_eq_inf_fixed
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ),
+      0 < n
+        → ∀ (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
+            (ν : Measure (archGroup K n)) [ν.IsHaarMeasure] (V : Submodule ℂ (LL μ)) (a : TI K n)
+            (x : ℝ) (P : Finset (Pl K)) (Uv : ∀ v : Pl K, Subgroup (Gw n v)),
+          x ≠ 0
+            → eigIn V (Oinf μ ν a ∘L prj (fixF μ (levOn P Uv))) x
+              = (eigIn V (Oinf μ ν a) x ⊓ sphOff μ P) ⊓ ⨅ v ∈ P, fixL μ v (Uv v) := by
   intro K _ _ n hn μ _ ν _ V a x P Uv hx
   obtain ⟨-, hmem, hp1, hp2, -⟩ := UpperTheory.ConvolutionTheory.Tf.commPrj K n μ (levOn P Uv)
   obtain ⟨m, hm, -⟩ := (UpperTheory.ConvolutionTheory.Tf.compatEx K n hn).2.1 μ ν

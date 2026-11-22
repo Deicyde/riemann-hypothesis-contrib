@@ -8,10 +8,13 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.IsobaricBa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.UnitaryClasses
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  GlobalTheory.UnitaryClasses
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField PositivityTheory.BCUSide.HermitianLocalForms
+open GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField
+  PositivityTheory.BCUSide.HermitianLocalForms
 
 noncomputable section
 
@@ -19,12 +22,15 @@ namespace GlobalTheory.CompanionTheory.LocPhiUnit
 
 section Fixed
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (Q : SelfRecip E r)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {r : ℕ} (Q : SelfRecip E r)
   (k : Type) [CommRing k] [Algebra (maximalRealSubfield E) k]
 
-theorem exists_inclPlus_half (z : k ⊗[maximalRealSubfield E] Fld Q) :
-    ∃ a : k ⊗[maximalRealSubfield E] plus Q,
-      inclPlus Q k a = ((1 : k) ⊗ₜ[maximalRealSubfield E] (2⁻¹ : Fld Q)) * (z + involBase Q k z) := by
+theorem exists_inclPlus_half (z : k ⊗[maximalRealSubfield E] Fld Q)
+    : ∃ a : k ⊗[maximalRealSubfield E] plus Q,
+      inclPlus Q k a
+        = ((1 : k) ⊗ₜ[maximalRealSubfield E] (2⁻¹ : Fld Q)) * (z + involBase Q k z) := by
   induction z using TensorProduct.induction_on with
   | zero => exact ⟨0, by simp⟩
   | tmul s y =>
@@ -40,13 +46,16 @@ theorem exists_inclPlus_half (z : k ⊗[maximalRealSubfield E] Fld Q) :
     rw [map_add (f := _), ha, hb, map_add (f := _)]
     ring
 
-theorem exists_inclPlus_of_fixed {z : k ⊗[maximalRealSubfield E] Fld Q} (hz : involBase Q k z = z) :
-    ∃ a : k ⊗[maximalRealSubfield E] plus Q, inclPlus Q k a = z := by
+theorem exists_inclPlus_of_fixed {z : k ⊗[maximalRealSubfield E] Fld Q} (hz : involBase Q k z = z)
+    : ∃ a : k ⊗[maximalRealSubfield E] plus Q, inclPlus Q k a = z := by
   obtain ⟨a, ha⟩ := exists_inclPlus_half Q k z
   refine ⟨a, ?_⟩
-  have h2 : (2 : k ⊗[maximalRealSubfield E] Fld Q) = (1 : k) ⊗ₜ[maximalRealSubfield E] (2 : Fld Q) :=
-    (map_ofNat (Algebra.TensorProduct.includeRight :
-      Fld Q →ₐ[maximalRealSubfield E] k ⊗[maximalRealSubfield E] Fld Q) 2).symm
+  have h2
+      : (2 : k ⊗[maximalRealSubfield E] Fld Q) = (1 : k) ⊗ₜ[maximalRealSubfield E] (2 : Fld Q) :=
+    (map_ofNat
+      (Algebra.TensorProduct.includeRight
+        : Fld Q →ₐ[maximalRealSubfield E] k ⊗[maximalRealSubfield E] Fld Q)
+      2).symm
   rw [ha, hz, ← two_mul, ← mul_assoc, h2, Algebra.TensorProduct.tmul_mul_tmul, mul_one,
     inv_mul_cancel₀ two_ne_zero, ← Algebra.TensorProduct.one_def, one_mul]
 
@@ -54,21 +63,26 @@ theorem inclPlus_injective : Function.Injective (inclPlus Q k) :=
   Module.Flat.lTensor_preserves_injective_linearMap (M := k) (plus Q).val.toLinearMap
     Subtype.val_injective
 
-theorem exists_unit_of_fixed {y : k ⊗[maximalRealSubfield E] Fld Q} (hu : IsUnit y)
-    (hy : involBase Q k y = y) :
-    ∃ x : (k ⊗[maximalRealSubfield E] plus Q)ˣ,
+theorem exists_unit_of_fixed
+    {y : k ⊗[maximalRealSubfield E] Fld Q} (hu : IsUnit y) (hy : involBase Q k y = y)
+    : ∃ x : (k ⊗[maximalRealSubfield E] plus Q)ˣ,
       inclPlus Q k (x : k ⊗[maximalRealSubfield E] plus Q) = y := by
   obtain ⟨u, rfl⟩ := hu
-  have hinv : involBase Q k ((u⁻¹ : (k ⊗[maximalRealSubfield E] Fld Q)ˣ) :
-      k ⊗[maximalRealSubfield E] Fld Q) = (u⁻¹ : (k ⊗[maximalRealSubfield E] Fld Q)ˣ) := by
-    have h1 : (u : k ⊗[maximalRealSubfield E] Fld Q) * involBase Q k
-        ((u⁻¹ : (k ⊗[maximalRealSubfield E] Fld Q)ˣ) : k ⊗[maximalRealSubfield E] Fld Q) = 1 := by
+  have hinv
+      : involBase Q k
+          ((u⁻¹ : (k ⊗[maximalRealSubfield E] Fld Q)ˣ) : k ⊗[maximalRealSubfield E] Fld Q)
+        = (u⁻¹ : (k ⊗[maximalRealSubfield E] Fld Q)ˣ) := by
+    have h1
+        : (u : k ⊗[maximalRealSubfield E] Fld Q) * involBase Q k
+            ((u⁻¹ : (k ⊗[maximalRealSubfield E] Fld Q)ˣ) : k ⊗[maximalRealSubfield E] Fld Q)
+          = 1 := by
       conv_lhs => rw [← hy]
       rw [← map_mul, Units.mul_inv, map_one]
-    calc _ = ((u⁻¹ : (k ⊗[maximalRealSubfield E] Fld Q)ˣ) : k ⊗[maximalRealSubfield E] Fld Q) *
-          ((u : k ⊗[maximalRealSubfield E] Fld Q) * involBase Q k
+    calc
+      _ = ((u⁻¹ : (k ⊗[maximalRealSubfield E] Fld Q)ˣ) : k ⊗[maximalRealSubfield E] Fld Q)
+          * ((u : k ⊗[maximalRealSubfield E] Fld Q) * involBase Q k
             ((u⁻¹ : (k ⊗[maximalRealSubfield E] Fld Q)ˣ) : k ⊗[maximalRealSubfield E] Fld Q)) := by
-          rw [Units.inv_mul_cancel_left]
+        rw [Units.inv_mul_cancel_left]
       _ = _ := by rw [h1, mul_one]
   obtain ⟨a, ha⟩ := exists_inclPlus_of_fixed Q k hy
   obtain ⟨b, hb⟩ := exists_inclPlus_of_fixed Q k hinv
@@ -79,18 +93,18 @@ end Fixed
 
 section Matrix
 
-theorem aeval_mul_of_intertwine {K : Type} [Field K] {n : ℕ} {B C H : Matrix (Fin n) (Fin n) K}
-    (h : B * H = H * C) (g : K[X]) : aeval B g * H = H * aeval C g := by
+theorem aeval_mul_of_intertwine
+    {K : Type} [Field K] {n : ℕ} {B C H : Matrix (Fin n) (Fin n) K} (h : B * H = H * C) (g : K[X])
+    : aeval B g * H = H * aeval C g := by
   induction g using Polynomial.induction_on' with
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), add_mul, mul_add, hp, hq]
   | monomial d a =>
-    have e : B ^ d * H = H * C ^ d :=
-      (((show SemiconjBy H C B from h.symm).pow_right d).eq).symm
+    have e : B ^ d * H = H * C ^ d := (((show SemiconjBy H C B from h.symm).pow_right d).eq).symm
     rw [aeval_monomial, aeval_monomial]
     simp only [Algebra.algebraMap_eq_smul_one, smul_mul_assoc, one_mul, mul_smul_comm, mul_assoc, e]
 
-theorem cT_mul {K : Type} [Field K] (s : K →+* K) {n : ℕ} (B C : Matrix (Fin n) (Fin n) K) :
-    cT s (B * C) = cT s C * cT s B := by
+theorem cT_mul {K : Type} [Field K] (s : K →+* K) {n : ℕ} (B C : Matrix (Fin n) (Fin n) K)
+    : cT s (B * C) = cT s C * cT s B := by
   simp [cT, Matrix.map_mul, Matrix.transpose_mul]
 
 end Matrix
@@ -99,19 +113,23 @@ section Local
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem involBase_locPhi (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w)
-    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E))) (hv : w.under (𝓞 (maximalRealSubfield E)) = v)
-    {r : ℕ} (Q : SelfRecip E r) {r₀ : E[X]} (hr : AdjoinRoot.mk Q.1 (X * r₀ - 1) = 0)
-    (f : (w.adicCompletion E)[X]) :
-    involBase Q (v.adicCompletion (maximalRealSubfield E)) (locPhi hU w hw v hv Q f) =
-      locPhi hU w hw v hv Q ((f.map (cj w)).comp (atPl w r₀)) := by
+theorem involBase_locPhi
+    (hU : Unr E)
+    (w : Pl E) (hw : ¬ IsSplitAt w)
+    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)))
+    (hv : w.under (𝓞 (maximalRealSubfield E)) = v)
+    {r : ℕ} (Q : SelfRecip E r)
+    {r₀ : E[X]} (hr : AdjoinRoot.mk Q.1 (X * r₀ - 1) = 0)
+    (f : (w.adicCompletion E)[X])
+    : involBase Q (v.adicCompletion (maximalRealSubfield E)) (locPhi hU w hw v hv Q f)
+      = locPhi hU w hw v hv Q ((f.map (cj w)).comp (atPl w r₀)) := by
   set k := v.adicCompletion (maximalRealSubfield E)
   let ι : w.adicCompletion E →+* k ⊗[maximalRealSubfield E] Fld Q :=
     (inclBase Q k).toRingHom.comp (locJ hU w hw v hv).toRingHom
   have hιc : ∀ y, involBase Q k (ι y) = ι (cj w y) := by
     intro y
-    change involBase Q k (inclBase Q k (locJ hU w hw v hv y)) =
-      inclBase Q k (locJ hU w hw v hv (cj w y))
+    change involBase Q k (inclBase Q k (locJ hU w hw v hv y))
+      = inclBase Q k (locJ hU w hw v hv (cj w y))
     rw [locJ_cj]
     generalize locJ hU w hw v hv y = t
     induction t using TensorProduct.induction_on with
@@ -135,11 +153,35 @@ theorem involBase_locPhi (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w)
 
 end Local
 
-theorem locPhi_mem_units_plus : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (hU : Unr E) (w : Pl E) (hw : ¬ IsSplitAt w) (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E))) (hv : w.under (𝓞 (maximalRealSubfield E)) = v), ∀ (n : ℕ) (γ₀ : GL (Fin n) E), γ₀.val.charpoly ∈ Ell E n → ∀ H₀ : Matrix (Fin n) (Fin n) E, IsHerm (IsCMField.complexConj E).toRingEquiv.toRingHom H₀ → H₀.det ≠ 0 → cT (IsCMField.complexConj E).toRingEquiv.toRingHom γ₀.val * H₀ * γ₀.val = H₀ → ∀ m : (w.adicCompletion E)[X], IsHerm (cj w) ((H₀.map (algebraMap E (w.adicCompletion E))) * aeval (γ₀.val.map (algebraMap E (w.adicCompletion E))) m) → ((H₀.map (algebraMap E (w.adicCompletion E))) * aeval (γ₀.val.map (algebraMap E (w.adicCompletion E))) m).det ≠ 0 → ∀ (r : ℕ) (Q : SelfRecip E r), Q.1 ∣ γ₀.val.charpoly → ∃ x : ((v.adicCompletion (maximalRealSubfield E)) ⊗[(maximalRealSubfield E)] plus Q)ˣ, inclPlus Q (v.adicCompletion (maximalRealSubfield E)) (x : (v.adicCompletion (maximalRealSubfield E)) ⊗[(maximalRealSubfield E)] plus Q) = locPhi hU w hw v hv Q m := by
+theorem locPhi_mem_units_plus
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (hU : Unr E) (w : Pl E)
+        (hw : ¬ IsSplitAt w) (v : HeightOneSpectrum (𝓞 (maximalRealSubfield E)))
+        (hv : w.under (𝓞 (maximalRealSubfield E)) = v),
+      ∀ (n : ℕ) (γ₀ : GL (Fin n) E),
+        γ₀.val.charpoly ∈ Ell E n
+          → ∀ H₀ : Matrix (Fin n) (Fin n) E,
+            IsHerm (IsCMField.complexConj E).toRingEquiv.toRingHom H₀ → H₀.det ≠ 0
+              → cT (IsCMField.complexConj E).toRingEquiv.toRingHom γ₀.val * H₀ * γ₀.val = H₀
+              → ∀ m : (w.adicCompletion E)[X],
+                IsHerm (cj w)
+                    ((H₀.map (algebraMap E (w.adicCompletion E)))
+                      * aeval (γ₀.val.map (algebraMap E (w.adicCompletion E))) m)
+                  → ((H₀.map (algebraMap E (w.adicCompletion E)))
+                      * aeval (γ₀.val.map (algebraMap E (w.adicCompletion E))) m).det
+                    ≠ 0
+                  → ∀ (r : ℕ) (Q : SelfRecip E r),
+                    Q.1 ∣ γ₀.val.charpoly
+                      → ∃ x
+                          : ((v.adicCompletion (maximalRealSubfield E)) ⊗[(maximalRealSubfield E)] plus Q)ˣ,
+                        inclPlus Q (v.adicCompletion (maximalRealSubfield E))
+                            (x
+                              : (v.adicCompletion (maximalRealSubfield E)) ⊗[(maximalRealSubfield E)] plus Q)
+                          = locPhi hU w hw v hv Q m := by
   intro E _ _ _ hU w hw v hv n γ₀ hell H₀ hH hdet h3 m hM hMdet r Q hQ
   have hsep : γ₀.val.charpoly.Separable := hell.2.2.1
-  obtain ⟨r₀, hr₀⟩ := GlobalTheory.BCT.ClsFin.exists_aeval_of_comm γ₀.val (γ₀⁻¹).val hsep
-    (by rw [Units.mul_inv, Units.inv_mul])
+  obtain ⟨r₀, hr₀⟩ :=
+    GlobalTheory.BCT.ClsFin.exists_aeval_of_comm γ₀.val (γ₀⁻¹).val hsep
+      (by rw [Units.mul_inv, Units.inv_mul])
   have hPr : γ₀.val.charpoly ∣ X * r₀ - 1 := by
     refine GlobalTheory.ClassParam.charpoly_dvd_of_aeval γ₀.val hsep _ ?_
     rw [map_sub, map_mul, aeval_X, ← hr₀, Units.mul_inv, map_one, sub_self]
@@ -163,7 +205,9 @@ theorem locPhi_mem_units_plus : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
     rw [hA, hHd]
     exact this
   have hint : cT (cj w) A * H = H * aeval A (atPl w r₀) := by
-    calc cT (cj w) A * H = cT (cj w) A * H * (A * aeval A (atPl w r₀)) := by rw [hAi, Matrix.mul_one]
+    calc
+      cT (cj w) A * H
+        = cT (cj w) A * H * (A * aeval A (atPl w r₀)) := by rw [hAi, Matrix.mul_one]
       _ = H * aeval A (atPl w r₀) := by rw [← Matrix.mul_assoc, hcA]
   have hH0 : IsUnit H := by
     rw [Matrix.isUnit_iff_isUnit_det, Matrix.det_mul] at *
@@ -177,15 +221,18 @@ theorem locPhi_mem_units_plus : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
       have := hM
       rw [IsHerm, cT_mul, hHh] at this
       exact this
-    rw [hMd, GlobalTheory.NormInert.cT_aeval, aeval_mul_of_intertwine hint, ← aeval_comp, ← hMd] at h1
+    rw [hMd, GlobalTheory.NormInert.cT_aeval, aeval_mul_of_intertwine hint, ← aeval_comp, ← hMd]
+      at h1
     exact (hH0.mul_left_cancel h1).symm
   have hdiv : A.charpoly ∣ (m.map (cj w)).comp (atPl w r₀) - m :=
-    GlobalTheory.ClassParam.charpoly_dvd_of_aeval A hAsep _ (by rw [map_sub, ← hfix, ← hMd, sub_self])
+    GlobalTheory.ClassParam.charpoly_dvd_of_aeval A hAsep _
+      (by rw [map_sub, ← hfix, ← hMd, sub_self])
   have hΦ0 : locPhi hU w hw v hv Q A.charpoly = 0 := by
     rw [hAP, locPhi_atPl]
     exact (congrArg _ (AdjoinRoot.mk_eq_zero.2 hQ)).trans (TensorProduct.tmul_zero _ _)
-  have hy : involBase Q (v.adicCompletion (maximalRealSubfield E)) (locPhi hU w hw v hv Q m) =
-      locPhi hU w hw v hv Q m := by
+  have hy
+      : involBase Q (v.adicCompletion (maximalRealSubfield E)) (locPhi hU w hw v hv Q m)
+        = locPhi hU w hw v hv Q m := by
     obtain ⟨t, ht⟩ := hdiv
     rw [involBase_locPhi hU w hw v hv Q hr, ← sub_eq_zero, ← map_sub, ht, map_mul, hΦ0, zero_mul]
   obtain ⟨u, hu⟩ := hM0
@@ -194,12 +241,14 @@ theorem locPhi_mem_units_plus : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
     have := congrArg (aeval A) (mul_comm (X : (w.adicCompletion E)[X]) m)
     rw [map_mul, map_mul, aeval_X] at this
     exact this
-  obtain ⟨g, hg⟩ := GlobalTheory.BCT.ClsFin.exists_aeval_of_comm A
-    ((u⁻¹ : (Matrix (Fin n) (Fin n) (w.adicCompletion E))ˣ) : Matrix (Fin n) (Fin n) (w.adicCompletion E))
-    hAsep hcomm.units_inv_right.eq
+  obtain ⟨g, hg⟩ :=
+    GlobalTheory.BCT.ClsFin.exists_aeval_of_comm A
+      ((u⁻¹ : (Matrix (Fin n) (Fin n) (w.adicCompletion E))ˣ)
+        : Matrix (Fin n) (Fin n) (w.adicCompletion E))
+      hAsep hcomm.units_inv_right.eq
   have hdiv2 : A.charpoly ∣ m * g - 1 :=
-    GlobalTheory.ClassParam.charpoly_dvd_of_aeval A hAsep _ (by
-      rw [map_sub, map_mul, ← hg, ← hMd, ← hu, Units.mul_inv, map_one, sub_self])
+    GlobalTheory.ClassParam.charpoly_dvd_of_aeval A hAsep _
+      (by rw [map_sub, map_mul, ← hg, ← hMd, ← hu, Units.mul_inv, map_one, sub_self])
   have hone : locPhi hU w hw v hv Q m * locPhi hU w hw v hv Q g = 1 := by
     obtain ⟨t, ht⟩ := hdiv2
     rw [← map_mul, ← sub_eq_zero, ← map_one (locPhi hU w hw v hv Q), ← map_sub, ht, map_mul, hΦ0,

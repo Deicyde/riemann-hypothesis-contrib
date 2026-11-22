@@ -10,7 +10,11 @@ public import Formalism.LocalToGlobal.GlobalTheory.BaseLatticeSelfDual
 
 @[expose] public section
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.MainNotions.G.KAat Formalism.MainNotions.G.CmpJ Formalism.L2.G Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelInstances GlobalTheory.TwU GlobalTheory.TwV
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
+  Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker
+  Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.MainNotions.G.KAat
+  Formalism.MainNotions.G.CmpJ Formalism.L2.G Formalism.L2.G.Cmp Formalism.L2.Forms
+  Formalism.L2.KerInert.SecondKernelInstances GlobalTheory.TwU GlobalTheory.TwV
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
@@ -19,16 +23,17 @@ namespace GlobalTheory.OrthDual
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {N : ℕ}
 
-theorem int_mem_range {t : E} (h : IsIntegral ℤ t) : t ∈ (algebraMap (𝓞 E) E).range :=
-  ⟨⟨t, h⟩, rfl⟩
+theorem int_mem_range {t : E} (h : IsIntegral ℤ t) : t ∈ (algebraMap (𝓞 E) E).range := ⟨⟨t, h⟩, rfl⟩
 
-theorem ringHom_mem_range (τ : E →+* E) {t : E} (h : t ∈ (algebraMap (𝓞 E) E).range) :
-    τ t ∈ (algebraMap (𝓞 E) E).range := by
+theorem ringHom_mem_range (τ : E →+* E) {t : E} (h : t ∈ (algebraMap (𝓞 E) E).range)
+    : τ t ∈ (algebraMap (𝓞 E) E).range := by
   obtain ⟨r, rfl⟩ := h
   exact int_mem_range (IsIntegral.map τ.toIntAlgHom r.isIntegral_coe)
 
-theorem exists_int_smul_mem (M : Submodule (𝓞 E) (Fin N → E)) {v : Fin N → E}
-    (hv : v ∈ Submodule.span E (M : Set (Fin N → E))) : ∃ n : ℤ, n ≠ 0 ∧ (n : E) • v ∈ M := by
+theorem exists_int_smul_mem
+    (M : Submodule (𝓞 E) (Fin N → E))
+    {v : Fin N → E} (hv : v ∈ Submodule.span E (M : Set (Fin N → E)))
+    : ∃ n : ℤ, n ≠ 0 ∧ (n : E) • v ∈ M := by
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩
@@ -57,9 +62,12 @@ theorem exists_int_smul_mem (M : Submodule (𝓞 E) (Fin N → E)) {v : Fin N �
     rw [e1]
     exact M.smul_mem _ hx
 
-theorem isLat_dl (σ : E →ₐ[F] E) (J : Matrix (Fin N) (Fin N) E) (co : (Fin N → E) ≃ₗ[E] (Fin N → E))
-    (hc : Formalism.L2.PairingIndexBounds.F.IsOrthCo (σ : E →+* E) J co) (M : Submodule (𝓞 E) (Fin N → E))
-    (hM : Formalism.L2.GlobalTheoryTheory.Comp.IsLat M) : Formalism.L2.GlobalTheoryTheory.Comp.IsLat (Formalism.L2.GlobalTheoryTheory.Comp.dl σ J M) := by
+theorem isLat_dl
+    (σ : E →ₐ[F] E) (J : Matrix (Fin N) (Fin N) E) (co : (Fin N → E) ≃ₗ[E] (Fin N → E))
+    (hc : Formalism.L2.PairingIndexBounds.F.IsOrthCo (σ : E →+* E) J co)
+    (M : Submodule (𝓞 E) (Fin N → E)) (hM : Formalism.L2.GlobalTheoryTheory.Comp.IsLat M)
+    : Formalism.L2.GlobalTheoryTheory.Comp.IsLat (Formalism.L2.GlobalTheoryTheory.Comp.dl σ J
+      M) := by
   classical
   set v : Fin N → Fin N → E := fun a => co.symm (Pi.single a 1) with hv
   have key : ∀ x y, Formalism.UG.hform (σ : E →+* E) J x y = ∑ b, (σ : E →+* E) (co x b) * co y b :=
@@ -75,14 +83,17 @@ theorem isLat_dl (σ : E →ₐ[F] E) (J : Matrix (Fin N) (Fin N) E) (co : (Fin 
     rw [hsingle, map_smul]
   have hcv : ∀ (c : E) a b, co (c • v a) b = if b = a then c else 0 := by
     intro c a b; simp [v, Pi.single_apply]
-  have hform_v : ∀ (c : E) a x, Formalism.UG.hform (σ : E →+* E) J x (c • v a) = (σ : E →+* E) (co x a) * c := by
+  have hform_v
+      : ∀ (c : E) a x,
+        Formalism.UG.hform (σ : E →+* E) J x (c • v a) = (σ : E →+* E) (co x a) * c := by
     intro c a x; rw [key]; simp [hcv]
 
   have hex : ∀ a, ∃ n : ℤ, n ≠ 0 ∧ (n : E) • v a ∈ M := fun a =>
     exists_int_smul_mem M (by rw [hM.2]; trivial)
   choose n hn0 hnM using hex
-  have hle : Formalism.L2.GlobalTheoryTheory.Comp.dl σ J M ≤
-      Submodule.span (𝓞 E) (Set.range fun a => ((n a : E))⁻¹ • v a) := by
+  have hle
+      : Formalism.L2.GlobalTheoryTheory.Comp.dl σ J M
+        ≤ Submodule.span (𝓞 E) (Set.range fun a => ((n a : E))⁻¹ • v a) := by
     intro y hy
     rw [Formalism.L2.GlobalTheoryTheory.Comp.mem_dl] at hy
     have hr : ∀ a, ∃ r : 𝓞 E, algebraMap (𝓞 E) E r = (n a : E) * co y a := by
@@ -104,21 +115,25 @@ theorem isLat_dl (σ : E →ₐ[F] E) (J : Matrix (Fin N) (Fin N) E) (co : (Fin 
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
   haveI : Module.Finite (𝓞 E) (Submodule.span (𝓞 E) (Set.range fun a => ((n a : E))⁻¹ • v a)) :=
     Module.Finite.span_of_finite _ (Set.finite_range _)
-  refine ⟨Module.Finite.of_injective (Submodule.inclusion hle) (Submodule.inclusion_injective hle), ?_⟩
+  refine
+    ⟨Module.Finite.of_injective (Submodule.inclusion hle) (Submodule.inclusion_injective hle), ?_⟩
 
   obtain ⟨s, hs⟩ := Module.Finite.iff_fg.1 hM.1
-  obtain ⟨m, hm0, hmi⟩ := exists_integral_multiples ℤ ℚ (L := E)
-    (s.biUnion fun x => Finset.univ.image fun b => co x b)
+  obtain ⟨m, hm0, hmi⟩ :=
+    exists_integral_multiples ℤ ℚ (L := E) (s.biUnion fun x => Finset.univ.image fun b => co x b)
   have hint : ∀ a, ∀ x ∈ M, (m : E) * co x a ∈ (algebraMap (𝓞 E) E).range := by
     intro a x hx
     rw [← hs] at hx
     induction hx using Submodule.span_induction with
     | mem x hx =>
       apply int_mem_range
-      have := hmi (co x a) (Finset.mem_biUnion.2 ⟨x, hx, Finset.mem_image.2 ⟨a, Finset.mem_univ _, rfl⟩⟩)
+      have :=
+        hmi (co x a) (Finset.mem_biUnion.2 ⟨x, hx, Finset.mem_image.2 ⟨a, Finset.mem_univ _, rfl⟩⟩)
       rwa [zsmul_eq_mul] at this
-    | zero => simp
-    | add x y _ _ hx hy => rw [map_add (f := _), Pi.add_apply, mul_add]; exact add_mem hx hy
+    | zero =>
+      simp
+    | add x y _ _ hx hy =>
+      rw [map_add (f := _), Pi.add_apply, mul_add]; exact add_mem hx hy
     | smul t x _ hx =>
       rw [← algebraMap_smul E t x, map_smul, Pi.smul_apply, smul_eq_mul, mul_left_comm]
       exact mul_mem ⟨t, rfl⟩ hx
@@ -142,7 +157,14 @@ theorem isLat_dl (σ : E →ₐ[F] E) (J : Matrix (Fin N) (Fin N) E) (co : (Fin 
 
 end GlobalTheory.OrthDual
 
-theorem GlobalTheory.isLat_dl_of_isOrthCo : ∀ {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] (sp : Spaces R F E) {N : ℕ} (J : Matrix (Fin N) (Fin N) E), (∃ co, IsOrthCo (sp.cm.sig : E →+* E) J co) → ∀ M : Submodule (𝓞 E) (Fin N → E), Formalism.L2.GlobalTheoryTheory.Comp.IsLat M → Formalism.L2.GlobalTheoryTheory.Comp.IsLat (Formalism.L2.GlobalTheoryTheory.Comp.dl sp.cm.sig J M) := by
+theorem GlobalTheory.isLat_dl_of_isOrthCo
+    : ∀ {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E]
+        [Algebra F E] (sp : Spaces R F E) {N : ℕ} (J : Matrix (Fin N) (Fin N) E),
+      (∃ co, IsOrthCo (sp.cm.sig : E →+* E) J co)
+        → ∀ M : Submodule (𝓞 E) (Fin N → E),
+          Formalism.L2.GlobalTheoryTheory.Comp.IsLat M
+            → Formalism.L2.GlobalTheoryTheory.Comp.IsLat (Formalism.L2.GlobalTheoryTheory.Comp.dl
+              sp.cm.sig J M) := by
   rintro R F E _ _ _ _ _ _ sp N J ⟨co, hc⟩ M hM
   exact GlobalTheory.OrthDual.isLat_dl sp.cm.sig J co hc M hM
 

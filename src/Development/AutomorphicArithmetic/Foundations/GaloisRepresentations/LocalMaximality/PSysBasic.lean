@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma lft_uni' (hU : WdUni) {β κ : Type} [LinearOrder β] [LinearOrder κ] (b : Finset β)
@@ -38,8 +39,10 @@ private lemma wd_eq_zero {σ E : Type} [LinearOrder σ] [AddCommGroup E] [Module
   exact Finset.sum_eq_zero fun i hi => by rw [h i hi]; simp
 
 section
-variable {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
-  (T : Sys d S E) {κ : Type} [LinearOrder κ]
+variable
+  {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
+  (T : Sys d S E)
+  {κ : Type} [LinearOrder κ]
 
 private lemma col_iff (n : κ → ℕ × ℕ) (z : κ → S) (I J : Finset (Fin (d + 1))) (m : ℤ)
     (x : Finset κ → E) : x ∈ (T.colCx n z I J).C m ↔ ∀ L, x L ∈ (if (L.card : ℤ) = m then
@@ -97,14 +100,21 @@ private lemma top_D (hU : WdUni) (z : κ → S) (c : Finset (Two d ⊕ₗ κ) �
 
 end
 
-private theorem wd_wt_resK_eq_zero_of_wd_eq_zero (hU : WdUni) (hB : WdBasic) {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S]
-    [AddCommGroup E] [Module ℂ E] (T : Sys d S E) {κ : Type} [LinearOrder κ] [Fintype κ]
-    (z : κ → S) {κ' : Type} [LinearOrder κ'] (e : κ' ↪o κ) (c : Finset (Two d ⊕ₗ κ) → E)
-    (hD : wd (T.wt z) c = 0) : wd (T.wt fun l => z (e l)) (resK e c) = 0 := by
+private theorem wd_wt_resK_eq_zero_of_wd_eq_zero
+    (hU : WdUni) (hB : WdBasic)
+    {d : ℕ} {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
+    (T : Sys d S E)
+    {κ : Type} [LinearOrder κ] [Fintype κ]
+    (z : κ → S)
+    {κ' : Type} [LinearOrder κ']
+    (e : κ' ↪o κ)
+    (c : Finset (Two d ⊕ₗ κ) → E) (hD : wd (T.wt z) c = 0)
+    : wd (T.wt fun l => z (e l)) (resK e c) = 0 := by
   have hwl : ∀ {κ₀ : Type} [LinearOrder κ₀] (z₀ : κ₀ → S) (i : Two d), T.wt z₀ (inlE i) = 1 := by
     intro κ₀ _ z₀ i
     simp [Sys.wt, inlE]
-  have hwr : ∀ {κ₀ : Type} [LinearOrder κ₀] (z₀ : κ₀ → S) (l : κ₀), T.wt z₀ (inrE l) = T.act (z₀ l) := by
+  have hwr
+      : ∀ {κ₀ : Type} [LinearOrder κ₀] (z₀ : κ₀ → S) (l : κ₀), T.wt z₀ (inrE l) = T.act (z₀ l) := by
     intro κ₀ _ z₀ l
     simp [Sys.wt, inrE]
   funext s
@@ -113,8 +123,9 @@ private theorem wd_wt_resK_eq_zero_of_wd_eq_zero (hU : WdUni) (hB : WdBasic) {d 
   have hres : ∀ b' L', resK e c (uni b' L') = c (uni b' (L'.map e.toEmbedding)) := by
     intro b' L'
     simp only [resK, lft_uni' hU, rgt_uni' hU]
-  have hmap : wd (fun l => T.act (z (e l))) (fun L' => c (uni b (L'.map e.toEmbedding))) L =
-      wd (fun l => T.act (z l)) (fun L' => c (uni b L')) (L.map e.toEmbedding) :=
+  have hmap
+      : wd (fun l => T.act (z (e l))) (fun L' => c (uni b (L'.map e.toEmbedding))) L
+        = wd (fun l => T.act (z l)) (fun L' => c (uni b L')) (L.map e.toEmbedding) :=
     (hB κ E (fun _ => ⊥) (fun l => T.act (z l))).2.2.2.2.2 κ' e (fun L' => c (uni b L')) L
   have e2 := (hU _ _ _ (T.wt z) c b (L.map e.toEmbedding)).1
   rw [hD] at e2
@@ -124,19 +135,27 @@ private theorem wd_wt_resK_eq_zero_of_wd_eq_zero (hU : WdUni) (hB : WdBasic) {d 
   rw [← e2]
   rfl
 
-theorem UpperTheory.Gal.productCup_of_system.sysBasic_of :
-    WdUni → WdBasic → SysBasic := by
+theorem UpperTheory.Gal.productCup_of_system.sysBasic_of : WdUni → WdBasic → SysBasic := by
   intro hU hB d S E _ _ _ _ T κ _ _ n z N
-  have hmem : ∀ c, c ∈ (T.cx n z).C N → ∀ (I J : Finset (Fin (d + 1))) (L : Finset κ),
-      ¬ (I.Nonempty ∧ J.Nonempty ∧ ((I.card + J.card + L.card : ℕ) : ℤ) = N) →
-      c (uni (uni I J) L) = 0 := by
+  have hmem
+      : ∀ c,
+        c ∈ (T.cx n z).C N
+          → ∀ (I J : Finset (Fin (d + 1))) (L : Finset κ),
+            ¬(I.Nonempty ∧ J.Nonempty ∧ ((I.card + J.card + L.card : ℕ) : ℤ) = N)
+              → c (uni (uni I J) L) = 0 := by
     intro c hc I J L h
     have := (cx_iff T hU n z N c).mp hc I J L
     rw [if_neg h] at this
     exact (Submodule.mem_bot ℂ).mp this
-  have h2 : ∀ c : Finset (Two d ⊕ₗ κ) → E, c ∈ (T.cx n z).C N ↔
-      ∀ (I J : Finset (Fin (d + 1))), col c (uni I J) ∈
-        (if I.Nonempty ∧ J.Nonempty then (T.colCx n z I J).C (N - I.card - J.card) else ⊥) := by
+  have h2
+      : ∀ c : Finset (Two d ⊕ₗ κ) → E,
+        c ∈ (T.cx n z).C N
+          ↔ ∀ (I J : Finset (Fin (d + 1))),
+            col c (uni I J)
+              ∈ (if I.Nonempty ∧ J.Nonempty then
+                   (T.colCx n z I J).C (N - I.card - J.card)
+                 else
+                   ⊥) := by
     intro c
     rw [cx_iff T hU]
     refine forall_congr' fun I => forall_congr' fun J => ?_
@@ -151,7 +170,8 @@ theorem UpperTheory.Gal.productCup_of_system.sysBasic_of :
       refine forall_congr' fun L => ?_
       rw [if_neg (fun h => hIJ ⟨h.1, h.2.1⟩), Submodule.mem_bot]
       rfl
-  have hwr : ∀ {κ₀ : Type} [LinearOrder κ₀] (z₀ : κ₀ → S) (l : κ₀), T.wt z₀ (inrE l) = T.act (z₀ l) := by
+  have hwr
+      : ∀ {κ₀ : Type} [LinearOrder κ₀] (z₀ : κ₀ → S) (l : κ₀), T.wt z₀ (inrE l) = T.act (z₀ l) := by
     intro κ₀ _ z₀ l
     simp [Sys.wt, inrE]
   refine ⟨?_, h2, ?_, ?_, ?_, ?_⟩
@@ -199,8 +219,8 @@ theorem UpperTheory.Gal.productCup_of_system.sysBasic_of :
         exact key _ (Finset.card_erase_lt_of_mem hi)
       rw [hz1, zero_add] at e1
       simp only [hwr, Pi.zero_apply] at e1 ⊢
-      rcases neg_one_pow_eq_or ℤ (uni I J).card with h | h <;> rw [h] at e1 <;> simp at e1 <;>
-        first | exact e1.symm | exact e1 | exact neg_eq_zero.mp e1.symm
+      rcases neg_one_pow_eq_or ℤ (uni I J).card with h | h <;> rw [h] at e1 <;> simp at e1
+        <;> first | exact e1.symm | exact e1 | exact neg_eq_zero.mp e1.symm
   · intro κ' _ _ e c hc
     obtain ⟨hC, hD⟩ := Submodule.mem_inf.mp hc
     refine Submodule.mem_inf.mpr ⟨?_, ?_⟩

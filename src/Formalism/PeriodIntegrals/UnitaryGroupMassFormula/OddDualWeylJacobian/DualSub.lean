@@ -11,26 +11,28 @@ noncomputable section
 
 namespace PI.OddDualWeyl
 
-def genM (R : Type*) [CommRing R] (k : ℕ) : Matrix (Fin k) (Fin k) (MvPolynomial (Fin k × Fin k) R) :=
+def genM (R : Type*) [CommRing R] (k : ℕ)
+    : Matrix (Fin k) (Fin k) (MvPolynomial (Fin k × Fin k) R) :=
   Matrix.of fun a s => X (a, s)
 
-def dualM (R : Type*) [CommRing R] (k : ℕ) : Matrix (Fin k) (Fin k) (MvPolynomial (Fin k × Fin k) R) :=
+def dualM (R : Type*) [CommRing R] (k : ℕ)
+    : Matrix (Fin k) (Fin k) (MvPolynomial (Fin k × Fin k) R) :=
   Matrix.of fun i j => adjugate (genM R k) (Fin.rev j) i
 
-def dualSub (R : Type*) [CommRing R] (k : ℕ) :
-    MvPolynomial (Fin k × Fin k) R →ₐ[R] MvPolynomial (Fin k × Fin k) R :=
+def dualSub (R : Type*) [CommRing R] (k : ℕ)
+    : MvPolynomial (Fin k × Fin k) R →ₐ[R] MvPolynomial (Fin k × Fin k) R :=
   aeval fun v => dualM R k v.1 v.2
 
 def Rel (R : Type*) [CommRing R] (k M : ℕ) (f f' : MvPolynomial (Fin k × Fin k) R) : Prop :=
   dualSub R k f' = (genM R k).det ^ M * f
 
-def pMinor (R : Type*) [CommRing R] {k : ℕ} (σ : Equiv.Perm (Fin k)) (s : ℕ) (hs : s ≤ k) :
-    MvPolynomial (Fin k × Fin k) R :=
+def pMinor (R : Type*) [CommRing R] {k : ℕ} (σ : Equiv.Perm (Fin k)) (s : ℕ) (hs : s ≤ k)
+    : MvPolynomial (Fin k × Fin k) R :=
   (Matrix.of fun p q : Fin s =>
     (X (σ (Fin.castLE hs p), Fin.castLE hs q) : MvPolynomial (Fin k × Fin k) R)).det
 
-def pw (R : Type*) [CommRing R] {k : ℕ} (σ : Equiv.Perm (Fin k)) (ν : Fin k → ℕ) :
-    MvPolynomial (Fin k × Fin k) R :=
+def pw (R : Type*) [CommRing R] {k : ℕ} (σ : Equiv.Perm (Fin k)) (ν : Fin k → ℕ)
+    : MvPolynomial (Fin k × Fin k) R :=
   ∏ s : Fin k, pMinor R σ (s.val + 1) s.isLt ^ (ν s - nuNext ν s)
 
 def low (R : Type*) [CommRing R] {k : ℕ} (ν : Fin k → ℕ) : MvPolynomial (Fin k × Fin k) R :=

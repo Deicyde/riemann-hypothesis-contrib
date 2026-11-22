@@ -11,13 +11,14 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsIrr
 
 open NumberField IsDedekindDomain MeasureTheory Matrix
 open scoped TensorProduct ENNReal Pointwise
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.IndefiniteRowSideFullHecke
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SgAlg
+  GlobalTheory.SgGlob GlobalTheory.IndefiniteRowSideFullHecke
 
 namespace GlobalTheory.SplitResidue
 
-theorem card_eq_ncard_primesOver (E : Type) [Field E] [NumberField E] {g : ℕ} (hg : g.Prime) :
-    Nat.card {w : HeightOneSpectrum (𝓞 E) // (g : 𝓞 E) ∈ w.asIdeal} =
-      (Ideal.primesOver (Ideal.span {(g : ℤ)}) (𝓞 E)).ncard := by
+theorem card_eq_ncard_primesOver (E : Type) [Field E] [NumberField E] {g : ℕ} (hg : g.Prime)
+    : Nat.card {w : HeightOneSpectrum (𝓞 E) // (g : 𝓞 E) ∈ w.asIdeal}
+      = (Ideal.primesOver (Ideal.span {(g : ℤ)}) (𝓞 E)).ncard := by
   have hp : Prime (g : ℤ) := Nat.prime_iff_prime_int.mp hg
   haveI : (Ideal.span {(g : ℤ)}).IsPrime := (Ideal.span_singleton_prime hp.ne_zero).mpr hp
   have hne : (Ideal.span {(g : ℤ)}) ≠ ⊥ := by simpa using hg.ne_zero
@@ -32,13 +33,16 @@ theorem card_eq_ncard_primesOver (E : Type) [Field E] [NumberField E] {g : ℕ} 
     exact Subtype.ext (HeightOneSpectrum.ext (congrArg Subtype.val h))
   · rintro ⟨P, hP, hPl⟩
     refine ⟨⟨⟨P, hP, Ideal.ne_bot_of_liesOver_of_ne_bot hne P⟩, ?_⟩, rfl⟩
-    simpa using (Ideal.mem_of_liesOver P (Ideal.span {(g : ℤ)}) (g : ℤ)).1
-      (Ideal.mem_span_singleton_self _)
+    simpa using
+      (Ideal.mem_of_liesOver P (Ideal.span {(g : ℤ)}) (g : ℤ)).1 (Ideal.mem_span_singleton_self _)
 
-theorem residue_and_unramified : ∀ (E : Type) [Field E] [NumberField E] (g : ℕ), g.Prime →
-    GlobalTheory.IndefiniteRowSideFullHecke.FlagUnipotentStabilizers.SplitsCompletely E g →
-    ∀ w : HeightOneSpectrum (𝓞 E), (g : 𝓞 E) ∈ w.asIdeal →
-      Nonempty ((𝓞 E ⧸ w.asIdeal) ≃+* ZMod g) ∧ (g : 𝓞 E) ∉ w.asIdeal ^ 2 := by
+theorem residue_and_unramified
+    : ∀ (E : Type) [Field E] [NumberField E] (g : ℕ),
+      g.Prime
+        → GlobalTheory.IndefiniteRowSideFullHecke.FlagUnipotentStabilizers.SplitsCompletely E g
+        → ∀ w : HeightOneSpectrum (𝓞 E),
+          (g : 𝓞 E) ∈ w.asIdeal
+            → Nonempty ((𝓞 E ⧸ w.asIdeal) ≃+* ZMod g) ∧ (g : 𝓞 E) ∉ w.asIdeal ^ 2 := by
   intro E _ _ g hg h w hw
   haveI := w.isPrime
   haveI := Fact.mk hg

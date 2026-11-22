@@ -10,7 +10,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -29,9 +30,10 @@ theorem t_ne_zero (D : ℕ) (i : Fin (D + 1)) : t D i ≠ 0 := by
   rw [t, ← map_zero (algebraMap (MvPolynomial (Fin (D + 1)) ℚ) (Fld D))]
   exact (IsFractionRing.injective (MvPolynomial (Fin (D + 1)) ℚ) (Fld D)).ne (X_ne_zero i)
 
-theorem aeval_sq (D : ℕ) (f : MvPolynomial (Fin (D + 1)) ℤ) :
-    aeval (x D ∘ sq D) f = algebraMap (MvPolynomial (Fin (D + 1)) ℚ) (Fld D)
-      (MvPolynomial.map (Int.castRingHom ℚ) (expand 2 f)) := by
+theorem aeval_sq (D : ℕ) (f : MvPolynomial (Fin (D + 1)) ℤ)
+    : aeval (x D ∘ sq D) f
+      = algebraMap (MvPolynomial (Fin (D + 1)) ℚ) (Fld D)
+        (MvPolynomial.map (Int.castRingHom ℚ) (expand 2 f)) := by
   induction f using MvPolynomial.induction_on with
   | C a => simp
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
@@ -49,16 +51,24 @@ theorem coordIdeal_sq (D : ℕ) : coordIdeal ℤ (x D ∘ sq D) = ⊥ := by
     rw [coordIdeal, RingHom.mem_ker] at hf
     rw [hf, Polynomial.coeff_zero]
   rw [aeval_sq] at h1
-  have h2 := IsFractionRing.injective (MvPolynomial (Fin (D + 1)) ℚ) (Fld D) (h1.trans (map_zero _).symm)
-  have h3 := MvPolynomial.map_injective _ (Int.castRingHom ℚ).injective_int (h2.trans (map_zero _).symm)
+  have h2 :=
+    IsFractionRing.injective (MvPolynomial (Fin (D + 1)) ℚ) (Fld D) (h1.trans (map_zero _).symm)
+  have h3 :=
+    MvPolynomial.map_injective _ (Int.castRingHom ℚ).injective_int (h2.trans (map_zero _).symm)
   exact (expand_eq_zero two_pos).mp h3
 
-theorem isIntegral_coord (D : ℕ) (q : Ix (Idx D)) :
-    IsIntegral (coneRing ℤ (x D ∘ sq D)) (Polynomial.C (x D q) * Polynomial.X : Polynomial (Fld D)) := by
-  have hmem : ∀ i, (Polynomial.C (x D (sq D i)) * Polynomial.X : Polynomial (Fld D)) ∈
-      coneRing ℤ (x D ∘ sq D) := fun i => ⟨X i, by simp [coneMap]⟩
-  have hsq : (Polynomial.C (x D q) * Polynomial.X : Polynomial (Fld D)) ^ 2 =
-      (Polynomial.C (x D (sq D q.2.1.1)) * Polynomial.X) * (Polynomial.C (x D (sq D q.2.1.2)) * Polynomial.X) := by
+theorem isIntegral_coord (D : ℕ) (q : Ix (Idx D))
+    : IsIntegral (coneRing ℤ (x D ∘ sq D))
+      (Polynomial.C (x D q) * Polynomial.X : Polynomial (Fld D)) := by
+  have hmem
+      : ∀ i,
+        (Polynomial.C (x D (sq D i)) * Polynomial.X : Polynomial (Fld D))
+          ∈ coneRing ℤ (x D ∘ sq D) := fun i =>
+    ⟨X i, by simp [coneMap]⟩
+  have hsq
+      : (Polynomial.C (x D q) * Polynomial.X : Polynomial (Fld D)) ^ 2
+        = (Polynomial.C (x D (sq D q.2.1.1)) * Polynomial.X)
+          * (Polynomial.C (x D (sq D q.2.1.2)) * Polynomial.X) := by
     simp only [x, sq, map_mul]
     ring
   refine IsIntegral.of_pow two_pos ?_
@@ -71,7 +81,12 @@ theorem isProjFrame_sq (D : ℕ) : IsProjFrame (x D) (sq D) :=
 
 theorem proof : VeroneseArith.Statement := by
   intro D _
-  refine ⟨⟨()⟩, ⟨coordIdeal_isPrime ℤ _, isMultiHomogIdeal_coordIdeal _, ?_⟩, isHorizontal_coordIdeal _, ?_⟩
+  refine ⟨
+    ⟨()⟩,
+    ⟨coordIdeal_isPrime ℤ _, isMultiHomogIdeal_coordIdeal _, ?_⟩,
+    isHorizontal_coordIdeal _,
+    ?_
+  ⟩
   · intro k
     refine ⟨⟨(0, 0), le_rfl⟩, ?_⟩
     rw [X_mem_coordIdeal_iff]

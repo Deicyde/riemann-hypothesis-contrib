@@ -138,22 +138,26 @@ private lemma exists_vBall_subset {m p : Type} {U : Set (Matrix m p k)}
   obtain ⟨⟨J, ⟨I, r⟩⟩, ⟨-, -, hr⟩, hsub⟩ := hb2.mem_iff.1 hU
   exact ⟨r, hr, fun Z hZ => hsub fun i _ j _ => hZ i j⟩
 
-theorem sb_bound {m p : Type} [Fintype m] [Fintype p] {Φ : Matrix m p k → ℂ} (h1 : IsLocallyConstant Φ)
-    (h2 : HasCompactSupport Φ) :
-    ∃ t : k, t ≠ 0 ∧ t ∈ 𝒪[k] ∧ (∀ Y, Φ Y ≠ 0 → IntM (t • Y)) ∧ ∀ Y Z, IntM Z → Φ (Y + t • Z) = Φ Y := by
+theorem sb_bound
+    {m p : Type} [Fintype m] [Fintype p]
+    {Φ : Matrix m p k → ℂ} (h1 : IsLocallyConstant Φ) (h2 : HasCompactSupport Φ)
+    : ∃ t : k,
+      t ≠ 0 ∧ t ∈ 𝒪[k] ∧ (∀ Y, Φ Y ≠ 0 → IntM (t • Y)) ∧ ∀ Y Z, IntM Z → Φ (Y + t • Z) = Φ Y := by
   classical
   have hKc : IsCompact (tsupport Φ) := h2
   haveI : Nonempty {s : k // s ≠ 0} := ⟨⟨1, one_ne_zero⟩⟩
   obtain ⟨s, hs0, hsK⟩ : ∃ s : k, s ≠ 0 ∧ tsupport Φ ⊆ vBall s := by
-    obtain ⟨⟨s, hs⟩, h⟩ := hKc.elim_directed_cover (ι := {s : k // s ≠ 0})
-      (fun s => (vBall s.1 : Set (Matrix m p k))) (fun s => isOpen_vBall s.1 s.2)
-      (fun Y _ => by
-        obtain ⟨r, hr, h⟩ := exists_large (Finset.univ : Finset (m × p)) (fun ij => Y ij.1 ij.2)
-        exact Set.mem_iUnion.2 ⟨⟨r, hr⟩, fun i j => h (i, j) (Finset.mem_univ _)⟩)
-      (fun a b => by
-        rcases le_total (valuation k a.1) (valuation k b.1) with h | h
-        · exact ⟨b, vBall_mono h, subset_rfl⟩
-        · exact ⟨a, subset_rfl, vBall_mono h⟩)
+    obtain ⟨⟨s, hs⟩, h⟩ :=
+      hKc.elim_directed_cover (ι := {s : k // s ≠ 0})
+        (fun s => (vBall s.1 : Set (Matrix m p k)))
+        (fun s => isOpen_vBall s.1 s.2)
+        (fun Y _ => by
+          obtain ⟨r, hr, h⟩ := exists_large (Finset.univ : Finset (m × p)) (fun ij => Y ij.1 ij.2)
+          exact Set.mem_iUnion.2 ⟨⟨r, hr⟩, fun i j => h (i, j) (Finset.mem_univ _)⟩)
+        (fun a b => by
+          rcases le_total (valuation k a.1) (valuation k b.1) with h | h
+          · exact ⟨b, vBall_mono h, subset_rfl⟩
+          · exact ⟨a, subset_rfl, vBall_mono h⟩)
     exact ⟨s, hs, h⟩
   have hloc : ∀ x : Matrix m p k, ∃ r : k, r ≠ 0 ∧ ∀ Z ∈ vBall r, Φ (x + Z) = Φ x := by
     intro x
@@ -163,10 +167,12 @@ theorem sb_bound {m p : Type} [Fintype m] [Fintype p] {Φ : Matrix m p k → ℂ
     obtain ⟨r, hr, hsub⟩ := exists_vBall_subset hU
     exact ⟨r, hr, fun Z hZ => hsub hZ⟩
   choose rr hrr0 hrr using hloc
-  obtain ⟨S, -, hS⟩ := hKc.elim_nhds_subcover (fun x => (fun Y => Y - x) ⁻¹' vBall (rr x))
-    (fun x _ => IsOpen.mem_nhds
-      ((isOpen_vBall _ (hrr0 x)).preimage (continuous_id.sub continuous_const))
-      (by simpa using zero_mem_vBall (m := m) (p := p) (rr x)))
+  obtain ⟨S, -, hS⟩ :=
+    hKc.elim_nhds_subcover
+      (fun x => (fun Y => Y - x) ⁻¹' vBall (rr x))
+      (fun x _ =>
+        IsOpen.mem_nhds ((isOpen_vBall _ (hrr0 x)).preimage (continuous_id.sub continuous_const))
+          (by simpa using zero_mem_vBall (m := m) (p := p) (rr x)))
   obtain ⟨t₁, ht₁0, -, ht₁⟩ := exists_small S rr (fun x _ => hrr0 x)
   have key : ∀ Y ∈ tsupport Φ, ∀ Z ∈ vBall t₁, Φ (Y + Z) = Φ Y := by
     intro Y hY Z hZ
@@ -189,24 +195,35 @@ theorem sb_bound {m p : Type} [Fintype m] [Fintype p] {Φ : Matrix m p k → ℂ
       rw [add_neg_cancel_right] at this
       exact this.symm
     · rw [image_eq_zero_of_notMem_tsupport hY, image_eq_zero_of_notMem_tsupport hYZ]
-  obtain ⟨t, ht0, htO, ht⟩ := exists_small (Finset.univ : Finset (Fin 2)) ![t₁, s⁻¹]
-    (fun i _ => by fin_cases i <;> simp [ht₁0, hs0])
+  obtain ⟨t, ht0, htO, ht⟩ :=
+    exists_small (Finset.univ : Finset (Fin 2)) ![t₁, s⁻¹]
+      (fun i _ => by fin_cases i <;> simp [ht₁0, hs0])
   have ht1 : valuation k t ≤ valuation k t₁ := by simpa using ht 0 (Finset.mem_univ _)
   have hts : valuation k t ≤ valuation k s⁻¹ := by simpa using ht 1 (Finset.mem_univ _)
-  refine ⟨t, ht0, htO, fun Y hY i j => ?_, fun Y Z hZ => hinv Y (t • Z) (vBall_mono ht1 (smul_mem_vBall t hZ))⟩
+  refine ⟨
+    t,
+    ht0,
+    htO,
+    fun Y hY i j => ?_,
+    fun Y Z hZ => hinv Y (t • Z) (vBall_mono ht1 (smul_mem_vBall t hZ))
+  ⟩
   have := hsK (subset_tsupport Φ hY) i j
   rw [Valuation.mem_integer_iff, Matrix.smul_apply, smul_eq_mul, map_mul]
-  calc valuation k t * valuation k (Y i j) ≤ valuation k s⁻¹ * valuation k s := mul_le_mul' hts this
+  calc
+    valuation k t * valuation k (Y i j)
+      ≤ valuation k s⁻¹ * valuation k s := mul_le_mul' hts this
     _ = 1 := by rw [map_inv₀, inv_mul_cancel₀ (by simpa using hs0)]
 
-theorem finite_cover {m p : Type} [Fintype m] [Fintype p] (t : k) (ht : t ≠ 0) :
-    ∃ S : Finset (Matrix m p k), ∀ Y, IntM (t • Y) → ∃ y ∈ S, ∃ Z, IntM Z ∧ Y = y + t • Z := by
+theorem finite_cover {m p : Type} [Fintype m] [Fintype p] (t : k) (ht : t ≠ 0)
+    : ∃ S : Finset (Matrix m p k), ∀ Y, IntM (t • Y) → ∃ y ∈ S, ∃ Z, IntM Z ∧ Y = y + t • Z := by
   classical
   have hc : IsCompact (vBall (m := m) (p := p) t⁻¹) := isCompact_vBall _
-  obtain ⟨S, -, hS⟩ := hc.elim_nhds_subcover (fun x => (fun Y => Y - x) ⁻¹' vBall t)
-    (fun x _ => IsOpen.mem_nhds
-      ((isOpen_vBall _ ht).preimage (continuous_id.sub continuous_const))
-      (by simpa using zero_mem_vBall (m := m) (p := p) t))
+  obtain ⟨S, -, hS⟩ :=
+    hc.elim_nhds_subcover
+      (fun x => (fun Y => Y - x) ⁻¹' vBall t)
+      (fun x _ =>
+        IsOpen.mem_nhds ((isOpen_vBall _ ht).preimage (continuous_id.sub continuous_const))
+          (by simpa using zero_mem_vBall (m := m) (p := p) t))
   refine ⟨S, fun Y hY => ?_⟩
   have hYb : Y ∈ vBall t⁻¹ := by
     intro i j
@@ -218,8 +235,9 @@ theorem finite_cover {m p : Type} [Fintype m] [Fintype p] (t : k) (ht : t ≠ 0)
   refine ⟨y, hyS, t⁻¹ • (Y - y), fun i j => ?_, ?_⟩
   · have h := hy i j
     rw [Valuation.mem_integer_iff, Matrix.smul_apply, smul_eq_mul, map_mul, map_inv₀]
-    calc (valuation k t)⁻¹ * valuation k ((Y - y) i j) ≤ (valuation k t)⁻¹ * valuation k t :=
-          mul_le_mul' le_rfl h
+    calc
+      (valuation k t)⁻¹ * valuation k ((Y - y) i j)
+        ≤ (valuation k t)⁻¹ * valuation k t := mul_le_mul' le_rfl h
       _ = 1 := inv_mul_cancel₀ (by simpa using ht)
   · rw [smul_smul, mul_inv_cancel₀ ht, one_smul, add_sub_cancel]
 

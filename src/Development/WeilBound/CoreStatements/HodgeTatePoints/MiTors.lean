@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.For
 
 noncomputable section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
-open GlobalTheory.CompanionTheory.Ar.BT GlobalTheory.CompanionTheory.Ar.BT.Tors ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
+open GlobalTheory.CompanionTheory.Ar.BT GlobalTheory.CompanionTheory.Ar.BT.Tors
+  ReciprocityTheory.ChartRestriction.G.Semi
 open scoped CategoryTheory.Obj
 
 namespace PositivityTheory.HtPt.Mi
@@ -20,10 +22,11 @@ section Cat
 universe v u
 variable {C : Type u} [Category.{v} C] [CartesianMonoidalCategory C] [BraidedCategory C]
 
-
 omit [BraidedCategory C] in
-theorem isMonHom_of_mul {A B : C} [GrpObj A] [GrpObj B] (j : A ⟶ B)
-    (h : ∀ (Y : C) (y z : Y ⟶ A), (y * z) ≫ j = (y ≫ j) * (z ≫ j)) : IsMonHom j := by
+theorem isMonHom_of_mul
+    {A B : C} [GrpObj A] [GrpObj B]
+    (j : A ⟶ B) (h : ∀ (Y : C) (y z : Y ⟶ A), (y * z) ≫ j = (y ≫ j) * (z ≫ j))
+    : IsMonHom j := by
   constructor
   · have h1 := h (𝟙_ C) 1 1
     rw [_root_.mul_one] at h1
@@ -37,14 +40,21 @@ theorem isMonHom_of_mul {A B : C} [GrpObj A] [GrpObj B] (j : A ⟶ B)
     congr 1
     ext <;> simp
 
-theorem isPullback_of_kernel {A B : C} [GrpObj B] [IsCommMonObj B] {N : ℕ} (j : A ⟶ B)
-    (inj : ∀ (Y : C) (y z : Y ⟶ A), y ≫ j = z ≫ j → y = z)
-    (ker : ∀ (Y : C) (g : Y ⟶ B), g ^ N = 1 ↔ ∃ y : Y ⟶ A, y ≫ j = g) :
-    IsPullback j (toUnit A) ((𝟙 B) ^ N) η[B] := by
+theorem isPullback_of_kernel
+    {A B : C} [GrpObj B] [IsCommMonObj B]
+    {N : ℕ} (j : A ⟶ B) (inj : ∀ (Y : C) (y z : Y ⟶ A), y ≫ j = z ≫ j → y = z)
+    (ker : ∀ (Y : C) (g : Y ⟶ B), g ^ N = 1 ↔ ∃ y : Y ⟶ A, y ≫ j = g)
+    : IsPullback j (toUnit A) ((𝟙 B) ^ N) η[B] := by
   have hw : j ≫ (𝟙 B) ^ N = toUnit A ≫ η[B] := by
     rw [comp_pow_id, (ker A j).2 ⟨𝟙 _, Category.id_comp _⟩, Hom.one_def]
-  refine ⟨⟨hw⟩, ⟨PullbackCone.IsLimit.mk _ (fun s => ((ker _ s.fst).1 ?_).choose) (fun s => ?_) (fun s => ?_)
-    (fun s m h1 _ => ?_)⟩⟩
+  refine ⟨
+    ⟨hw⟩,
+    ⟨PullbackCone.IsLimit.mk _
+      (fun s => ((ker _ s.fst).1 ?_).choose)
+      (fun s => ?_)
+      (fun s => ?_)
+      (fun s m h1 _ => ?_)⟩
+  ⟩
   · rw [← comp_pow_id s.fst, Hom.one_def, ← toUnit_unique s.snd (toUnit _)]
     exact s.condition
   · exact Exists.choose_spec (p := fun y => y ≫ j = s.fst) _
@@ -54,8 +64,8 @@ theorem isPullback_of_kernel {A B : C} [GrpObj B] [IsCommMonObj B] {N : ℕ} (j 
     exact (Exists.choose_spec (p := fun y => y ≫ j = s.fst) _).symm
 
 omit [BraidedCategory C] in
-theorem pow_comp {Y A B : C} [GrpObj A] [GrpObj B] (g : Y ⟶ A) (a : A ⟶ B) [IsMonHom a] (n : ℕ) :
-    (g ^ n) ≫ a = (g ≫ a) ^ n := by
+theorem pow_comp {Y A B : C} [GrpObj A] [GrpObj B] (g : Y ⟶ A) (a : A ⟶ B) [IsMonHom a] (n : ℕ)
+    : (g ^ n) ≫ a = (g ≫ a) ^ n := by
   induction n with
   | zero => simp [MonObj.one_comp]
   | succ n ih => rw [pow_succ, pow_succ, MonObj.mul_comp, ih]
@@ -63,12 +73,16 @@ theorem pow_comp {Y A B : C} [GrpObj A] [GrpObj B] (g : Y ⟶ A) (a : A ⟶ B) [
 end Cat
 
 section Tors
-variable {R : Type} [CommRing R] [IsDomain R] {T : Type} [CommGroup T] {Γ : QFGroup R T} {S : Scheme.{0}}
-  {G : Over S} [GrpObj G] [IsCommMonObj G] {x : Spec (CommRingCat.of R) ⟶ S} {N : ℕ} {i : Γ.G.left ⟶ G.left}
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {T : Type} [CommGroup T]
+  {Γ : QFGroup R T} {S : Scheme.{0}} {G : Over S} [GrpObj G] [IsCommMonObj G]
+  {x : Spec (CommRingCat.of R) ⟶ S} {N : ℕ} {i : Γ.G.left ⟶ G.left}
 
-theorem kernel_of_tors (h : Γ.IsTorsionAlong G x N i) :
-    ∃ j : Γ.G ⟶ (Over.pullback x).obj G, j.left ≫ pullback.fst G.hom x = i ∧
-      IsPullback j (toUnit Γ.G) ((𝟙 ((Over.pullback x).obj G)) ^ N) η[(Over.pullback x).obj G] := by
+theorem kernel_of_tors (h : Γ.IsTorsionAlong G x N i)
+    : ∃ j : Γ.G ⟶ (Over.pullback x).obj G,
+      j.left ≫ pullback.fst G.hom x = i ∧ IsPullback j (toUnit Γ.G)
+        ((𝟙 ((Over.pullback x).obj G)) ^ N) η[(Over.pullback x).obj G] := by
   let g : Over.mk (Γ.G.hom ≫ x) ⟶ G := Over.homMk i h.isOver
   have hj : (toPull x G g).left ≫ pullback.fst G.hom x = i := toPull_fst x G g
   refine ⟨toPull x G g, hj, isPullback_of_kernel _ (fun Y y z e => h.inj Y y z ?_) (fun Y c => ?_)⟩
@@ -91,20 +105,28 @@ theorem kernel_of_tors (h : Γ.IsTorsionAlong G x N i) :
 
 end Tors
 
-theorem kernel_isPullback {Z : Scheme.{0}} {A B D : Over Z} [GrpObj D] {j : A ⟶ B} {q : B ⟶ D}
-    (hp : IsPullback j (toUnit A) q η[D]) : IsPullback j.left A.hom q.left (η[D]).left := by
+theorem kernel_isPullback
+    {Z : Scheme.{0}} {A B D : Over Z} [GrpObj D]
+    {j : A ⟶ B} {q : B ⟶ D} (hp : IsPullback j (toUnit A) q η[D])
+    : IsPullback j.left A.hom q.left (η[D]).left := by
   have hl := hp.map (Over.forget Z)
   have hA : (toUnit A).left = A.hom := by simpa using Over.w (toUnit A)
-  rw [← hA]; exact hl
+  rw [← hA]
+  exact hl
 
-theorem isClosedImmersion_unit {Z : Scheme.{0}} (B : Over Z) [GrpObj B] [IsSeparated B.hom] :
-    IsClosedImmersion (η[B]).left := by
+theorem isClosedImmersion_unit {Z : Scheme.{0}} (B : Over Z) [GrpObj B] [IsSeparated B.hom]
+    : IsClosedImmersion (η[B]).left := by
   have : IsClosedImmersion ((η[B]).left ≫ B.hom) := by
     have : (η[B]).left ≫ B.hom = 𝟙 _ := by simpa using Over.w η[B]
-    rw [this]; infer_instance
+    rw [this]
+    infer_instance
   exact IsClosedImmersion.of_comp _ B.hom
 
-theorem torsion_finite : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (x : Spec (CommRingCat.of R) ⟶ S) (N : ℕ) (i : Γ.G.left ⟶ G.left), Γ.IsTorsionAlong G x N i → IsProper (pullback.snd G.hom x) → IsFinite Γ.G.hom := by
+theorem torsion_finite
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T)
+        (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (x : Spec (CommRingCat.of R) ⟶ S)
+        (N : ℕ) (i : Γ.G.left ⟶ G.left),
+      Γ.IsTorsionAlong G x N i → IsProper (pullback.snd G.hom x) → IsFinite Γ.G.hom := by
   intro R _ _ T _ _ Γ S G _ _ x N i h hprop
   obtain ⟨j, -, hp⟩ := kernel_of_tors h
   have : IsProper ((Over.pullback x).obj G).hom := hprop
@@ -114,7 +136,11 @@ theorem torsion_finite : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [Co
   have := Γ.quasiFinite
   exact IsFinite.of_isProper_of_locallyQuasiFinite _
 
-theorem torsion_etale : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (x : Spec (CommRingCat.of R) ⟶ S) (N : ℕ) (i : Γ.G.left ⟶ G.left), Γ.IsTorsionAlong G x N i → Smooth G.hom → IsUnit (N : R) → Etale Γ.G.hom := by
+theorem torsion_etale
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T)
+        (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (x : Spec (CommRingCat.of R) ⟶ S)
+        (N : ℕ) (i : Γ.G.left ⟶ G.left),
+      Γ.IsTorsionAlong G x N i → Smooth G.hom → IsUnit (N : R) → Etale Γ.G.hom := by
   intro R _ _ T _ _ Γ S G _ _ x N i h _ hN
   obtain ⟨j, -, hp⟩ := kernel_of_tors h
   have hN' : IsUnit (N : Γ(Spec (CommRingCat.of R), ⊤)) := by
@@ -126,7 +152,12 @@ theorem torsion_etale : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [Com
   have := Γ.finPres
   exact Etale.of_formallyUnramified_of_flat _
 
-theorem torsion_end : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (x : Spec (CommRingCat.of R) ⟶ S) (N : ℕ) (i : Γ.G.left ⟶ G.left), Γ.IsTorsionAlong G x N i → ∀ (a : G ⟶ G) [IsMonHom a], ∃ a' : Γ.G ⟶ Γ.G, IsMonHom a' ∧ a'.left ≫ i = i ≫ a.left := by
+theorem torsion_end
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T)
+        (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (x : Spec (CommRingCat.of R) ⟶ S)
+        (N : ℕ) (i : Γ.G.left ⟶ G.left),
+      Γ.IsTorsionAlong G x N i
+        → ∀ (a : G ⟶ G) [IsMonHom a], ∃ a' : Γ.G ⟶ Γ.G, IsMonHom a' ∧ a'.left ≫ i = i ≫ a.left := by
   intro R _ _ T _ _ Γ S G _ _ x N i h a _
   let g : Over.mk (Γ.G.hom ≫ x) ⟶ G := Over.homMk i h.isOver
   have hg : g ^ N = 1 := (h.kernel Γ.G g).2 ⟨𝟙 _, Category.id_comp _⟩
@@ -134,8 +165,9 @@ theorem torsion_end : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommG
   obtain ⟨a', ha'⟩ := (h.kernel Γ.G (g ≫ a)).1 hga
   replace ha' : a'.left ≫ i = i ≫ a.left := ha'
   refine ⟨a', isMonHom_of_mul _ fun Y y z => h.inj Y _ _ ?_, ha'⟩
-  let p : (Y ⟶ Γ.G) → (Over.mk (Y.hom ≫ x) ⟶ G) := fun y => Over.homMk (y.left ≫ i) (by
-    simp only [Over.mk_hom, Category.assoc, h.isOver]; rw [← Category.assoc, Over.w])
+  let p : (Y ⟶ Γ.G) → (Over.mk (Y.hom ≫ x) ⟶ G) := fun y =>
+    Over.homMk (y.left ≫ i)
+      (by simp only [Over.mk_hom, Category.assoc, h.isOver]; rw [← Category.assoc, Over.w])
   have hp : ∀ y, (p y).left = y.left ≫ i := fun _ => rfl
   have hpa : ∀ y, (p y ≫ a).left = (y ≫ a').left ≫ i := fun y => by
     rw [Over.comp_left, Over.comp_left, hp, Category.assoc, Category.assoc, ha']

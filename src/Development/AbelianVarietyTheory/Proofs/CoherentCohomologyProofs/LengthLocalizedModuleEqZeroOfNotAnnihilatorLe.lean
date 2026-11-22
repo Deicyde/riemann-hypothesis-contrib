@@ -14,9 +14,11 @@ section General
 
 variable {R : Type*} [CommRing R]
 
-theorem isFiniteLength_of_isTorsion [IsNoetherianRing R] [Ring.KrullDimLE 1 R]
-    {X : Type*} [AddCommGroup X] [Module R X] [Module.Finite R X] (hX : Module.IsTorsion R X) :
-    IsFiniteLength R X := by
+theorem isFiniteLength_of_isTorsion
+    [IsNoetherianRing R] [Ring.KrullDimLE 1 R]
+    {X : Type*} [AddCommGroup X] [Module R X] [Module.Finite R X]
+    (hX : Module.IsTorsion R X)
+    : IsFiniteLength R X := by
   obtain ⟨r, hr, hr0⟩ := Submodule.annihilator_top_inter_nonZeroDivisors hX
   have hr' : Module.IsTorsionBySet R X (Ideal.span {r}) := by
     rw [Module.isTorsionBySet_span_singleton_iff]
@@ -28,8 +30,10 @@ theorem isFiniteLength_of_isTorsion [IsNoetherianRing R] [Ring.KrullDimLE 1 R]
       (isFiniteLength_quotient_span_singleton R hr0)).2
   haveI : IsArtinianRing (R ⧸ Ideal.span {r}) := isArtinian_of_tower R inferInstance
   rw [isFiniteLength_iff_isNoetherian_isArtinian]
-  exact ⟨inferInstance,
-    isArtinian_of_surjective_algebraMap (R := R ⧸ Ideal.span {r}) Ideal.Quotient.mk_surjective⟩
+  exact ⟨
+    inferInstance,
+    isArtinian_of_surjective_algebraMap (R := R ⧸ Ideal.span {r}) Ideal.Quotient.mk_surjective
+  ⟩
 
 section Submodules
 

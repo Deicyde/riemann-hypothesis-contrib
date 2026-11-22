@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-theorem UpperTheory.V.Z.Win.Birth.awTw :
-    UpperTheory.V.Z.Win.Birth.AwTw := by
+theorem UpperTheory.V.Z.Win.Birth.awTw : UpperTheory.V.Z.Win.Birth.AwTw := by
   intro F Ω _ _ _ _ _ _ l _ n hn ι r κ hκ haut hW
   obtain ⟨_, art, χ, a, hart, -, hL⟩ := hκ
   obtain ⟨π, hreg, hatt⟩ := haut

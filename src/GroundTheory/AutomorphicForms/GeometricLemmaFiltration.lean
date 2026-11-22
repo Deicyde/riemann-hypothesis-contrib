@@ -54,7 +54,8 @@ theorem cellUnion_of_cover (hcov : ∀ x, ∃ l, x ∈ C l) : cellUnion C k = un
   exact (mem_cellUnion C).2 ⟨l, l.2, hl⟩
 
 variable [TopologicalSpace X]
-variable (hdisj : Pairwise fun i j => Disjoint (C i) (C j)) (hcov : ∀ x, ∃ l, x ∈ C l)
+variable
+  (hdisj : Pairwise fun i j => Disjoint (C i) (C j)) (hcov : ∀ x, ∃ l, x ∈ C l)
   (hcl : ∀ j, closure (C j) ⊆ ⋃ l : Fin k, ⋃ (_ : j ≤ l), C l)
 include hdisj hcov hcl
 
@@ -74,17 +75,17 @@ theorem isOpen_cellUnion (j : ℕ) : IsOpen (cellUnion C j) := by
       subst this
       have : (l : ℕ) ≤ l'' := hll''
       omega
-  have hc' : (⋃ l : Fin k, ⋃ (_ : j ≤ (l : ℕ)), closure (C l)) =
-      ⋃ l ∈ Finset.univ.filter (fun l : Fin k => j ≤ (l : ℕ)), closure (C l) := by
+  have hc'
+      : (⋃ l : Fin k, ⋃ (_ : j ≤ (l : ℕ)), closure (C l))
+        = ⋃ l ∈ Finset.univ.filter (fun l : Fin k => j ≤ (l : ℕ)), closure (C l) := by
     ext x
     simp
   rw [← isClosed_compl_iff, hc, hc']
   exact isClosed_biUnion_finset fun l _ => isClosed_closure
 
-
 omit hcov in
-theorem closure_inter_cellUnion_succ (j : Fin k) :
-    closure (C j) ∩ cellUnion C ((j : ℕ) + 1) = C j := by
+theorem closure_inter_cellUnion_succ (j : Fin k)
+    : closure (C j) ∩ cellUnion C ((j : ℕ) + 1) = C j := by
   apply subset_antisymm
   · rintro x ⟨hx, hxu⟩
     obtain ⟨l, hl, hxl⟩ := (mem_cellUnion C).1 hxu
@@ -115,11 +116,12 @@ section Cells
 
 variable {F : Type*} [Field F] {n : ℕ} (β γ : Fin n → ℕ)
 
-theorem exists_cellEnumeration :
-    ∃ (k : ℕ) (w : Fin k → Equiv.Perm (Fin n)),
-      (∀ g : GL (Fin n) F, ∃! j, g ∈ doubleCoset (permGL F (w j))
-        (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ)) ∧
-      Antitone fun j => cellHeight β γ (permGL F (w j)) := by
+theorem exists_cellEnumeration
+    : ∃ (k : ℕ) (w : Fin k → Equiv.Perm (Fin n)),
+      (∀ g : GL (Fin n) F,
+          ∃! j, g ∈ doubleCoset (permGL F (w j))
+            (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ))
+        ∧ Antitone fun j => cellHeight β γ (permGL F (w j)) := by
   classical
   let rk : Equiv.Perm (Fin n) → ℕ → ℕ → ℕ := fun w a b => cellRank β γ (permGL F w) a b
   let S : Finset (ℕ → ℕ → ℕ) := Finset.univ.image rk
@@ -138,8 +140,9 @@ theorem exists_cellEnumeration :
     have hmem : rk w ∈ S := Finset.mem_image_of_mem _ (Finset.mem_univ w)
     obtain ⟨j', hj⟩ := (s.trans e0).surjective ⟨rk w, hmem⟩
     have hj2 : e0 (s j') = ⟨rk w, hmem⟩ := hj
-    have hg : g ∈ doubleCoset (permGL F (rep (e0 (s j')))) (blockUpper F n β : Set (GL (Fin n) F))
-        (blockUpper F n γ) := by
+    have hg
+        : g ∈ doubleCoset (permGL F (rep (e0 (s j')))) (blockUpper F n β : Set (GL (Fin n) F))
+          (blockUpper F n γ) := by
       apply mem_doubleCoset_of_cellRank_eq
       intro a b
       rw [hrep', cellRank_of_mem_doubleCoset hw, hj2]
@@ -159,17 +162,20 @@ end Cells
 
 section CellsTopology
 
-variable {F : Type*} [Field F] [TopologicalSpace F] [IsTopologicalRing F] [T1Space F] {n : ℕ}
-  {β γ : Fin n → ℕ}
+variable
+  {F : Type*} [Field F] [TopologicalSpace F] [IsTopologicalRing F] [T1Space F]
+  {n : ℕ} {β γ : Fin n → ℕ}
 
-theorem closure_doubleCoset_subset_of_antitone {k : ℕ} {w : Fin k → Equiv.Perm (Fin n)}
-    (hcov : ∀ g : GL (Fin n) F, ∃! j, g ∈ doubleCoset (permGL F (w j))
-      (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ))
-    (hanti : Antitone fun j => cellHeight β γ (permGL F (w j))) (j : Fin k) :
-    closure (doubleCoset (permGL F (w j)) (blockUpper F n β : Set (GL (Fin n) F))
-        (blockUpper F n γ)) ⊆
-      ⋃ l : Fin k, ⋃ (_ : j ≤ l), doubleCoset (permGL F (w l))
-        (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ) := by
+theorem closure_doubleCoset_subset_of_antitone
+    {k : ℕ} {w : Fin k → Equiv.Perm (Fin n)}
+    (hcov : ∀ g : GL (Fin n) F,
+      ∃! j, g ∈ doubleCoset (permGL F (w j))
+        (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ))
+    (hanti : Antitone fun j => cellHeight β γ (permGL F (w j))) (j : Fin k)
+    : closure (doubleCoset (permGL F (w j)) (blockUpper F n β : Set (GL (Fin n) F))
+        (blockUpper F n γ))
+      ⊆ ⋃ l : Fin k, ⋃ (_ : j ≤ l), doubleCoset (permGL F (w l))
+          (blockUpper F n β : Set (GL (Fin n) F)) (blockUpper F n γ) := by
   intro x hx
   obtain ⟨l, hl, -⟩ := hcov x
   refine mem_iUnion₂.2 ⟨l, ?_, hl⟩
@@ -187,23 +193,23 @@ end CellsTopology
 
 section Support
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
   {n : ℕ} {β : Fin n → ℕ} (γ : Fin n → ℕ)
-  {W : Type*} [AddCommGroup W] [Module ℂ W] (σ : Representation ℂ (levi F n β) W)
+  {W : Type*} [AddCommGroup W] [Module ℂ W]
+  (σ : Representation ℂ (levi F n β) W)
 
 def supportedIn (Y : Set (GL (Fin n) F)) : Submodule ℂ (parabolicIndSpace F n β σ) where
   carrier := {f | ∀ g ∉ Y, (f : GL (Fin n) F → W) g = 0}
-  add_mem' {f f'} hf hf' g hg := by
-    simp [hf g hg, hf' g hg]
+  add_mem' {f f'} hf hf' g hg := by simp [hf g hg, hf' g hg]
   zero_mem' g _ := rfl
-  smul_mem' c f hf g hg := by
-    simp [hf g hg]
+  smul_mem' c f hf g hg := by simp [hf g hg]
 
 variable {σ}
 
-theorem supportedIn_mono {Y Y' : Set (GL (Fin n) F)} (h : Y ⊆ Y') :
-    supportedIn σ Y ≤ supportedIn σ Y' :=
-  fun f hf g hg => hf g fun hgY => hg (h hgY)
+theorem supportedIn_mono {Y Y' : Set (GL (Fin n) F)} (h : Y ⊆ Y')
+    : supportedIn σ Y ≤ supportedIn σ Y' := fun f hf g hg =>
+  hf g fun hgY => hg (h hgY)
 
 theorem supportedIn_empty : supportedIn σ (∅ : Set (GL (Fin n) F)) = ⊥ := by
   rw [eq_bot_iff]
@@ -218,10 +224,10 @@ theorem supportedIn_univ : supportedIn σ (univ : Set (GL (Fin n) F)) = ⊤ := b
   intro _ _ g hg
   exact absurd (mem_univ g) hg
 
-theorem supportedIn_le_comap {Y : Set (GL (Fin n) F)}
-    (hY : ∀ g ∈ Y, ∀ q ∈ blockUpper F n γ, g * q ∈ Y) {q : GL (Fin n) F}
-    (hq : q ∈ blockUpper F n γ) :
-    supportedIn σ Y ≤ (supportedIn σ Y).comap (parabolicInd F n β σ q) := by
+theorem supportedIn_le_comap
+    {Y : Set (GL (Fin n) F)} (hY : ∀ g ∈ Y, ∀ q ∈ blockUpper F n γ, g * q ∈ Y)
+    {q : GL (Fin n) F} (hq : q ∈ blockUpper F n γ)
+    : supportedIn σ Y ≤ (supportedIn σ Y).comap (parabolicInd F n β σ q) := by
   intro f hf g hg
   show ((parabolicInd F n β σ q f : parabolicIndSpace F n β σ) : GL (Fin n) F → W) g = 0
   rw [coe_indRep_apply]
@@ -230,12 +236,12 @@ theorem supportedIn_le_comap {Y : Set (GL (Fin n) F)}
   apply hg
   simpa using hY _ hgq _ ((blockUpper F n γ).inv_mem hq)
 
-def jacquetFiltration (Y : Set (GL (Fin n) F)) :
-    Submodule ℂ (JacquetModule F n γ (parabolicInd F n β σ)) :=
+def jacquetFiltration (Y : Set (GL (Fin n) F))
+    : Submodule ℂ (JacquetModule F n γ (parabolicInd F n β σ)) :=
   (supportedIn σ Y).map (Representation.Coinvariants.mk _)
 
-theorem jacquetFiltration_mono {Y Y' : Set (GL (Fin n) F)} (h : Y ⊆ Y') :
-    jacquetFiltration γ (σ := σ) Y ≤ jacquetFiltration γ Y' :=
+theorem jacquetFiltration_mono {Y Y' : Set (GL (Fin n) F)} (h : Y ⊆ Y')
+    : jacquetFiltration γ (σ := σ) Y ≤ jacquetFiltration γ Y' :=
   Submodule.map_mono (supportedIn_mono h)
 
 theorem jacquetFiltration_empty : jacquetFiltration γ (σ := σ) ∅ = ⊥ := by
@@ -245,10 +251,10 @@ theorem jacquetFiltration_univ : jacquetFiltration γ (σ := σ) univ = ⊤ := b
   rw [jacquetFiltration, supportedIn_univ, Submodule.map_top, LinearMap.range_eq_top]
   exact Representation.Coinvariants.mk_surjective _
 
-theorem jacquetFiltration_le_comap {Y : Set (GL (Fin n) F)}
-    (hY : ∀ g ∈ Y, ∀ q ∈ blockUpper F n γ, g * q ∈ Y) (m : levi F n γ) :
-    jacquetFiltration γ (σ := σ) Y ≤
-      (jacquetFiltration γ Y).comap (jacquetRep F n γ (parabolicInd F n β σ) m) := by
+theorem jacquetFiltration_le_comap
+    {Y : Set (GL (Fin n) F)} (hY : ∀ g ∈ Y, ∀ q ∈ blockUpper F n γ, g * q ∈ Y) (m : levi F n γ)
+    : jacquetFiltration γ (σ := σ) Y
+      ≤ (jacquetFiltration γ Y).comap (jacquetRep F n γ (parabolicInd F n β σ) m) := by
   rintro _ ⟨f, hf, rfl⟩
   rw [Submodule.mem_comap, jacquetRep_mk]
   exact Submodule.smul_mem _ _ ⟨_, supportedIn_le_comap γ hY (levi_le_blockUpper m.2) hf, rfl⟩

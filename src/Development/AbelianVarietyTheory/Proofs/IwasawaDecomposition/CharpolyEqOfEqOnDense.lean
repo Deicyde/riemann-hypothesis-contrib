@@ -9,7 +9,13 @@ open Formalism.ConjugateSelfDual Formalism.MainNotions.N Polynomial
 
 namespace GlobalTheory
 
-theorem charpoly_eq_of_eqOn_dense : ∀ {X A : Type} [TopologicalSpace X] [Field A] [TopologicalSpace A] [IsTopologicalRing A] [T2Space A] [Infinite A] {n : ℕ} (M N : X → Matrix (Fin n) (Fin n) A), Continuous M → Continuous N → ∀ U : Set X, Dense U → (∀ x ∈ U, (M x).charpoly = (N x).charpoly) → ∀ x, (M x).charpoly = (N x).charpoly := by
+theorem charpoly_eq_of_eqOn_dense
+    : ∀ {X A : Type} [TopologicalSpace X] [Field A] [TopologicalSpace A] [IsTopologicalRing A]
+        [T2Space A] [Infinite A] {n : ℕ} (M N : X → Matrix (Fin n) (Fin n) A),
+      Continuous M → Continuous N
+        → ∀ U : Set X,
+          Dense U → (∀ x ∈ U, (M x).charpoly = (N x).charpoly)
+            → ∀ x, (M x).charpoly = (N x).charpoly := by
   intro X A _ _ _ _ _ _ n M N hM hN U hU hEq x
   apply Polynomial.funext
   intro c

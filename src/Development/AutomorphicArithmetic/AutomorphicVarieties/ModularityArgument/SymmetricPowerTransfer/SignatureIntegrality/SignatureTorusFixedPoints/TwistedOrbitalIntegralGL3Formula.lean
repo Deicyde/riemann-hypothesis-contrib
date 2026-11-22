@@ -9,7 +9,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
 section
 open MulAction
@@ -20,9 +22,13 @@ private def OrbSupp (ι : T →* G) (θ : G →* G) (U : Subgroup G) (f : G → 
   letI : MulAction T (G ⧸ U) := MulAction.compHom _ ι
   {o : orbitRel.Quotient T (G ⧸ U) | f (o.out.out⁻¹ * δ * θ o.out.out) ≠ 0}.Finite
 
-private theorem orb_sum {I : Type} (ι : T →* G) (C : Subgroup T) (θ : G →* G) (U : Subgroup G) (δ : G)
-    (S : Finset I) (f : I → G → ℂ) (h : ∀ i ∈ S, OrbSupp ι θ U (f i) δ) :
-    orb ι C θ U (fun g => ∑ i ∈ S, f i g) δ = ∑ i ∈ S, orb ι C θ U (f i) δ := by
+private theorem orb_sum
+    {I : Type}
+    (ι : T →* G)
+    (C : Subgroup T)
+    (θ : G →* G) (U : Subgroup G) (δ : G) (S : Finset I) (f : I → G → ℂ)
+    (h : ∀ i ∈ S, OrbSupp ι θ U (f i) δ)
+    : orb ι C θ U (fun g => ∑ i ∈ S, f i g) δ = ∑ i ∈ S, orb ι C θ U (f i) δ := by
   letI : MulAction T (G ⧸ U) := MulAction.compHom _ ι
   unfold orb wcount
   simp only [Finset.mul_sum]
@@ -33,9 +39,11 @@ private theorem orb_sum {I : Type} (ι : T →* G) (C : Subgroup T) (θ : G →*
   simp only [Function.mem_support] at ho
   exact right_ne_zero_of_mul ho
 
-private theorem finOrb_of (ι : T →* G) (θ : G →* G) (U : Subgroup G) (f : G → ℂ) (δ : G)
+private theorem finOrb_of
+    (ι : T →* G) (θ : G →* G) (U : Subgroup G) (f : G → ℂ) (δ : G)
     (hf : ∀ u ∈ U, ∀ x, f (u⁻¹ * x * θ u) = f x) (hδ : ∀ t, (ι t)⁻¹ * δ * θ (ι t) = δ)
-    (h : OrbSupp ι θ U f δ) : FinOrb ι θ U f δ := by
+    (h : OrbSupp ι θ U f δ)
+    : FinOrb ι θ U f δ := by
   letI : MulAction T (G ⧸ U) := MulAction.compHom _ ι
   classical
   have h' : {o : orbitRel.Quotient T (G ⧸ U) | f (o.out.out⁻¹ * δ * θ o.out.out) ≠ 0}.Finite := h
@@ -57,7 +65,8 @@ private theorem finOrb_of (ι : T →* G) (θ : G →* G) (U : Subgroup G) (f : 
     show f (s⁻¹ * δ * θ s) ≠ 0
     have e : s⁻¹ * δ * θ s = u⁻¹ * (y⁻¹ * δ * θ y) * θ u := by
       rw [hs', map_mul, map_mul]
-      calc (ι t * y * u)⁻¹ * δ * (θ (ι t) * θ y * θ u)
+      calc
+        (ι t * y * u)⁻¹ * δ * (θ (ι t) * θ y * θ u)
           = u⁻¹ * (y⁻¹ * ((ι t)⁻¹ * δ * θ (ι t)) * θ y) * θ u := by group
         _ = _ := by rw [hδ]
     rw [e, hf u hu]
@@ -65,17 +74,23 @@ private theorem finOrb_of (ι : T →* G) (θ : G →* G) (U : Subgroup G) (f : 
   · rw [hs', map_inv]
     group
 
-private theorem finOrb_sum {I : Type} (ι : T →* G) (θ : G →* G) (U : Subgroup G) (δ : G)
+private theorem finOrb_sum
+    {I : Type}
+    (ι : T →* G)
+    (θ : G →* G) (U : Subgroup G)
+    (δ : G)
     (S : Finset I) (f : I → G → ℂ) (hf : ∀ i ∈ S, ∀ u ∈ U, ∀ x, f i (u⁻¹ * x * θ u) = f i x)
-    (hδ : ∀ t, (ι t)⁻¹ * δ * θ (ι t) = δ) (h : ∀ i ∈ S, OrbSupp ι θ U (f i) δ) :
-    FinOrb ι θ U (fun g => ∑ i ∈ S, f i g) δ := by
+    (hδ : ∀ t, (ι t)⁻¹ * δ * θ (ι t) = δ) (h : ∀ i ∈ S, OrbSupp ι θ U (f i) δ)
+    : FinOrb ι θ U (fun g => ∑ i ∈ S, f i g) δ := by
   refine finOrb_of ι θ U _ δ ?_ hδ ?_
   · intro u hu x
     exact Finset.sum_congr rfl fun i hi => hf i hi u hu x
   · letI : MulAction T (G ⧸ U) := MulAction.compHom _ ι
-    change {o : orbitRel.Quotient T (G ⧸ U) | (∑ i ∈ S, f i (o.out.out⁻¹ * δ * θ o.out.out)) ≠ 0}.Finite
-    have hU : (⋃ i ∈ (S : Set I),
-        {o : orbitRel.Quotient T (G ⧸ U) | f i (o.out.out⁻¹ * δ * θ o.out.out) ≠ 0}).Finite :=
+    change
+      {o : orbitRel.Quotient T (G ⧸ U) | (∑ i ∈ S, f i (o.out.out⁻¹ * δ * θ o.out.out)) ≠ 0}.Finite
+    have hU
+        : (⋃ i ∈ (S : Set I),
+            {o : orbitRel.Quotient T (G ⧸ U) | f i (o.out.out⁻¹ * δ * θ o.out.out) ≠ 0}).Finite :=
       Set.Finite.biUnion S.finite_toSet fun i hi => h i hi
     refine hU.subset ?_
     intro o ho
@@ -85,8 +100,8 @@ private theorem finOrb_sum {I : Type} (ι : T →* G) (θ : G →* G) (U : Subgr
 
 end
 
-theorem UpperTheory.V.Z.Sym.Sig.orbital_integral_over_extended_group :
-    UpperTheory.V.Z.Sym.Sig.TwistedOrbitalIntegralGL3Formula := by
+theorem UpperTheory.V.Z.Sym.Sig.orbital_integral_over_extended_group
+    : UpperTheory.V.Z.Sym.Sig.TwistedOrbitalIntegralGL3Formula := by
   intro k _ _ _ _ V Ry hR t ht T _ r hr g₀ ι hι x y z hxz
   set θ := th k 3 with hθ
   set δ := g₀ * dg ![x, y, z] * Phi k * (θ g₀)⁻¹ with hδdef
@@ -99,13 +114,14 @@ theorem UpperTheory.V.Z.Sym.Sig.orbital_integral_over_extended_group :
       simp only [dg]
       rw [← map_mul, ← map_mul, mul_comm]
     rw [hι s, map_mul, map_mul, map_inv]
-    calc (g₀ * dg ![r s, 1, (r s)⁻¹] * g₀⁻¹)⁻¹ * δ * (θ g₀ * θ (dg ![r s, 1, (r s)⁻¹]) * (θ g₀)⁻¹)
-        = g₀ * (dg ![r s, 1, (r s)⁻¹])⁻¹ * dg ![x, y, z] * (Phi k * θ (dg ![r s, 1, (r s)⁻¹])) *
-            (θ g₀)⁻¹ := by
-          rw [hδdef]; group
-      _ = g₀ * (dg ![r s, 1, (r s)⁻¹])⁻¹ * (dg ![x, y, z] * dg ![r s, 1, (r s)⁻¹]) * Phi k *
-            (θ g₀)⁻¹ := by
-          rw [hΦ]; group
+    calc
+      (g₀ * dg ![r s, 1, (r s)⁻¹] * g₀⁻¹)⁻¹ * δ * (θ g₀ * θ (dg ![r s, 1, (r s)⁻¹]) * (θ g₀)⁻¹)
+          = g₀ * (dg ![r s, 1, (r s)⁻¹])⁻¹ * dg ![x, y, z] * (Phi k * θ (dg ![r s, 1, (r s)⁻¹]))
+            * (θ g₀)⁻¹ := by
+        rw [hδdef]; group
+      _ = g₀ * (dg ![r s, 1, (r s)⁻¹])⁻¹ * (dg ![x, y, z] * dg ![r s, 1, (r s)⁻¹]) * Phi k
+          * (θ g₀)⁻¹ := by
+        rw [hΦ]; group
       _ = δ := by rw [hc, hδdef]; group
   set ϖ := unif k with hϖ
   let d : kˣ → Fin 3 → kˣ := fun a => ![t * ϖ⁻¹, a, ϖ⁻¹]
@@ -123,19 +139,33 @@ theorem UpperTheory.V.Z.Sym.Sig.orbital_integral_over_extended_group :
       simpa [pow_two, hϖ] using ht
     have ht1 : valuation k (t : k) * (valuation k (ϖ : k))⁻¹ < 1 := htw.trans hw1
     have hinv : 1 < (valuation k (ϖ : k))⁻¹ := (one_lt_inv₀ hw0).mpr hw1
-    fin_cases i <;> fin_cases j <;> simp at hij <;>
-      simp [d, map_mul, map_inv₀, Units.val_inv_eq_inv_val]
+    fin_cases i <;> fin_cases j <;> simp at hij
+      <;> simp [d, map_mul, map_inv₀, Units.val_inv_eq_inv_val]
     · exact htw.trans_le hal
     · exact ht1.trans hinv
     · exact hau.trans_lt hinv
-  have hinvar : ∀ a ∈ Ry, ∀ u ∈ V.J 3, ∀ g, V.unitaryDoubleCosetIndicator (d a) (u⁻¹ * g * θ u) = V.unitaryDoubleCosetIndicator (d a) g := by
+  have hinvar
+      : ∀ a ∈ Ry, ∀ u ∈ V.J 3, ∀ g,
+        V.unitaryDoubleCosetIndicator (d a) (u⁻¹ * g * θ u)
+          = V.unitaryDoubleCosetIndicator (d a) g := by
     intro a _ u hu g
     exact ((eqG k V 1 Ry Ry x z (d a)).1 u⁻¹ ((V.J 3).inv_mem hu) u hu g).1
-  have h0 := fun a (ha : a ∈ Ry) => orbital_integral_over_base_group k V T r hr g₀ ι hι (d a) (hSD a ha) x y z hxz
-  have hfun : V.unitaryHeckeTestSum Ry t = fun g => ∑ a ∈ Ry, V.unitaryDoubleCosetIndicator (d a) g := rfl
+  have h0 := fun a (ha : a ∈ Ry) =>
+    orbital_integral_over_base_group k V T r hr g₀ ι hι (d a) (hSD a ha) x y z hxz
+  have hfun
+      : V.unitaryHeckeTestSum Ry t = fun g => ∑ a ∈ Ry, V.unitaryDoubleCosetIndicator (d a) g :=
+    rfl
   rw [hfun]
-  refine ⟨finOrb_sum ι θ (V.J 3) δ Ry (fun a => V.unitaryDoubleCosetIndicator (d a)) hinvar hδ (fun a ha => (h0 a ha).1), ?_⟩
-  rw [orb_sum ι _ θ (V.J 3) δ Ry (fun a => V.unitaryDoubleCosetIndicator (d a)) (fun a ha => (h0 a ha).1)]
+  refine ⟨
+    finOrb_sum ι θ (V.J 3) δ Ry
+      (fun a => V.unitaryDoubleCosetIndicator (d a))
+      hinvar hδ
+      (fun a ha => (h0 a ha).1),
+    ?_
+  ⟩
+  rw [orb_sum ι _ θ (V.J 3) δ Ry
+    (fun a => V.unitaryDoubleCosetIndicator (d a))
+    (fun a ha => (h0 a ha).1)]
   rw [Finset.sum_congr rfl fun a ha => (h0 a ha).2]
   obtain ⟨a₀, ⟨ha₀, hq₀⟩, huniq⟩ := hR.2 y
   rw [Finset.sum_eq_single a₀]

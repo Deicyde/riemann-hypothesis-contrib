@@ -11,7 +11,8 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.DVR.QuadraticAlgebraValuation
 
-open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.DVR.QForm
+open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR
+  ReciprocityTheory.ChartRestriction.G.DVR.QForm
 
 theorem qAl_of (hLaws : Laws) : QAlStatement := by
   unfold QAlStatement
@@ -28,8 +29,7 @@ theorem qAl_of (hLaws : Laws) : QAlStatement := by
       have h := bOf_add_left hϖ D hQ (0 : D.toPre.X) 0 χ
       simp only [zero_add] at h
       simpa using (show bOf D.toPre Q 0 χ = 0 by linarith)
-    | succ n ih =>
-      rw [succ_nsmul, bOf_add_left hϖ D hQ, ih, Nat.cast_succ, add_mul, one_mul]
+    | succ n ih => rw [succ_nsmul, bOf_add_left hϖ D hQ, ih, Nat.cast_succ, add_mul, one_mul]
   have e1 := two_Q_eq hϖ D hQ (star a • χ)
   have e2 := two_Q_eq hϖ D hQ χ
   rw [hb, hN, hlin N, ← e2] at e1

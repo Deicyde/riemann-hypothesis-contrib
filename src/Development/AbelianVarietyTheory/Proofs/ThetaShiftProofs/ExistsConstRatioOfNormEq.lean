@@ -8,21 +8,22 @@ open Complex
 
 namespace GlobalTheory
 
-theorem exists_const_ratio_of_norm_eq :
-    ∀ (I : Type) (T K : ℝ) (f g : I → ℂ → ℂ) (c : ℂ → ℂ), 0 < K →
-      (∀ i, DifferentiableOn ℂ (f i) {w | T < w.im} ∧ DifferentiableOn ℂ (g i) {w | T < w.im}) →
-      (∀ i w, T < w.im → f i w = c w * g i w ∧ ‖f i w‖ = K * ‖g i w‖) →
-      ∃ κ : ℂ, ‖κ‖ = K ∧ ∀ i w, T < w.im → f i w = κ * g i w := by
+theorem exists_const_ratio_of_norm_eq
+    : ∀ (I : Type) (T K : ℝ) (f g : I → ℂ → ℂ) (c : ℂ → ℂ),
+      0 < K
+        → (∀ i, DifferentiableOn ℂ (f i) {w | T < w.im} ∧ DifferentiableOn ℂ (g i) {w | T < w.im})
+        → (∀ i w, T < w.im → f i w = c w * g i w ∧ ‖f i w‖ = K * ‖g i w‖)
+        → ∃ κ : ℂ, ‖κ‖ = K ∧ ∀ i w, T < w.im → f i w = κ * g i w := by
   intro I T K f g c hK hd h
   by_cases h0 : ∀ i w, T < w.im → g i w = 0
   · refine ⟨K, by simp [abs_of_pos hK], fun i w hw => ?_⟩
-    rw [(h i w hw).1, h0 i w hw]; simp
+    rw [(h i w hw).1, h0 i w hw]
+    simp
   push_neg at h0
   obtain ⟨i₀, w₀, hw₀, hg₀⟩ := h0
   have hU : IsOpen {w : ℂ | T < w.im} := isOpen_lt continuous_const Complex.continuous_im
   have hUc : IsPreconnected {w : ℂ | T < w.im} := (convex_halfSpace_im_gt T).isPreconnected
-  have hca : ContinuousAt (g i₀) w₀ :=
-    (hd i₀).2.continuousOn.continuousAt (hU.mem_nhds hw₀)
+  have hca : ContinuousAt (g i₀) w₀ := (hd i₀).2.continuousOn.continuousAt (hU.mem_nhds hw₀)
   have hev : ∀ᶠ w in nhds w₀, T < w.im ∧ g i₀ w ≠ 0 :=
     (hU.eventually_mem hw₀).and (hca.eventually_ne hg₀)
   obtain ⟨r, hr, hB⟩ := Metric.eventually_nhds_iff_ball.1 hev
@@ -35,11 +36,12 @@ theorem exists_const_ratio_of_norm_eq :
     rw [hcq w hw, norm_div, (h i₀ w (hB w hw).1).2,
       mul_div_cancel_right₀ _ (norm_ne_zero_iff.2 (hB w hw).2)]
   have hm : w₀ ∈ Metric.ball w₀ r := Metric.mem_ball_self hr
-  have hconst := Complex.eqOn_of_isPreconnected_of_isMaxOn_norm
-    (convex_ball w₀ r).isPreconnected Metric.isOpen_ball hcd hm
-    (fun w hw => by
-      show ‖c w‖ ≤ ‖c w₀‖
-      rw [hcn w hw, hcn w₀ hm])
+  have hconst :=
+    Complex.eqOn_of_isPreconnected_of_isMaxOn_norm (convex_ball w₀ r).isPreconnected
+      Metric.isOpen_ball hcd hm
+      (fun w hw => by
+        show ‖c w‖ ≤ ‖c w₀‖
+        rw [hcn w hw, hcn w₀ hm])
   refine ⟨c w₀, hcn w₀ hm, fun i w hw => ?_⟩
   have ha : AnalyticOnNhd ℂ (f i) {w : ℂ | T < w.im} := (hd i).1.analyticOnNhd hU
   have hb : AnalyticOnNhd ℂ (fun w => c w₀ * g i w) {w : ℂ | T < w.im} :=

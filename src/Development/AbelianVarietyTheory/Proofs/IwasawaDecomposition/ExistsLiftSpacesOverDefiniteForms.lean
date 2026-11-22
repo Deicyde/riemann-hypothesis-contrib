@@ -11,25 +11,35 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GoodF
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Cx Formalism.IndefR.RecTie
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Cx Formalism.IndefR.RecTie
 open scoped TensorProduct InnerProductSpace ComplexOrder
-attribute [local instance] Formalism.BasicNotions.Host.cmStar Formalism.IndefR.principalLevelFrame.instCMHostI
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar Formalism.IndefR.principalLevelFrame.instCMHostI
 open GlobalTheory.Mem GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw
 
 noncomputable section
 
-theorem GlobalTheory.LiftSpaces.exists_scaled_model {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [FiniteDimensional ℂ H] (S : Submodule ℂ H) (n : ℕ) (hn : Module.finrank ℂ S = n) (a : ℝ) (ha : 0 < a) :
-    ∃ E : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] H, Function.Injective E ∧ LinearMap.range E = S ∧
-      (∀ x, ‖E x‖ ^ 2 = a * ‖x‖ ^ 2) ∧ ∀ x x', ⟪E x, E x'⟫_ℂ = (a : ℂ) * ⟪x, x'⟫_ℂ := by
+theorem GlobalTheory.LiftSpaces.exists_scaled_model
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [FiniteDimensional ℂ H]
+    (S : Submodule ℂ H) (n : ℕ) (hn : Module.finrank ℂ S = n)
+    (a : ℝ) (ha : 0 < a)
+    : ∃ E : EuclideanSpace ℂ (Fin n) →ₗ[ℂ] H,
+      Function.Injective E ∧ LinearMap.range E = S ∧ (∀ x, ‖E x‖ ^ 2 = a * ‖x‖ ^ 2)
+        ∧ ∀ x x', ⟪E x, E x'⟫_ℂ = (a : ℂ) * ⟪x, x'⟫_ℂ := by
   let b := (stdOrthonormalBasis ℂ S).reindex (finCongr hn)
   let c : ℂ := ((Real.sqrt a : ℝ) : ℂ)
   have hc0 : c ≠ 0 := by
     show ((Real.sqrt a : ℝ) : ℂ) ≠ 0
     exact_mod_cast (Real.sqrt_pos.2 ha).ne'
-  have hE : ∀ x, (c • (S.subtype ∘ₗ b.repr.symm.toLinearEquiv.toLinearMap)) x = c • ((b.repr.symm x : S) : H) :=
-    fun x => rfl
+  have hE
+      : ∀ x,
+        (c • (S.subtype ∘ₗ b.repr.symm.toLinearEquiv.toLinearMap)) x
+          = c • ((b.repr.symm x : S) : H) := fun x =>
+    rfl
   refine ⟨c • (S.subtype ∘ₗ b.repr.symm.toLinearEquiv.toLinearMap), ?_, ?_, ?_, ?_⟩
   · intro x x' h
     rw [hE, hE] at h
@@ -38,24 +48,29 @@ theorem GlobalTheory.LiftSpaces.exists_scaled_model {H : Type} [NormedAddCommGro
       Submodule.range_subtype]
   · intro x
     rw [hE, norm_smul, Complex.norm_real, Real.norm_of_nonneg (Real.sqrt_nonneg _),
-      show ‖((b.repr.symm x : S) : H)‖ = ‖x‖ from b.repr.symm.norm_map x, mul_pow, Real.sq_sqrt ha.le]
+      show ‖((b.repr.symm x : S) : H)‖ = ‖x‖ from b.repr.symm.norm_map x, mul_pow,
+      Real.sq_sqrt ha.le]
   · intro x x'
     rw [hE, hE, inner_smul_left, inner_smul_right,
-      show ⟪((b.repr.symm x : S) : H), ((b.repr.symm x' : S) : H)⟫_ℂ = ⟪x, x'⟫_ℂ from b.repr.symm.inner_map_map x x',
+      show ⟪((b.repr.symm x : S) : H), ((b.repr.symm x' : S) : H)⟫_ℂ = ⟪x, x'⟫_ℂ from
+        b.repr.symm.inner_map_map x x',
       ← mul_assoc]
     show (starRingEnd ℂ) ((Real.sqrt a : ℝ) : ℂ) * ((Real.sqrt a : ℝ) : ℂ) * _ = _
     rw [Complex.conj_ofReal, ← Complex.ofReal_mul, Real.mul_self_sqrt ha.le]
 
-theorem GlobalTheory.LiftSpaces.exists_thetaMap {D : D7} {C : ChainReal D} (L : LiftReal D C) (i : Fin D.R.m) (μ : D.what₂.Tup)
+theorem GlobalTheory.LiftSpaces.exists_thetaMap
+    {D : D7} {C : ChainReal D} (L : LiftReal D C) (i : Fin D.R.m) (μ : D.what₂.Tup)
     {X Y : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
-    (J : X →ₗ[ℂ] (GA D (L.V i) → L.TauV i)) (hJ : ∀ x, J x ∈ L.Amt μ i) (jM : Y →ₗ[ℂ] L.AmbW i)
-    (hinj : Function.Injective jM) (hrange : LinearMap.range jM = L.Wc i)
-    (hres : ∀ w ∈ L.MultW i, w ∘ₗ L.embK i = 0 → w = 0) :
-    ∃ th : X →ₗ[ℂ] Y, ∀ x (h : J x ∈ L.Amt μ i) (w : L.AmbW i), w ∈ L.MultW i →
-      w ∘ₗ L.embK i = L.thC μ i ⟨J x, h⟩ → L.eW i ∘ₗ w ∈ L.Wc i → jM (th x) = L.eW i ∘ₗ w := by
+    (J : X →ₗ[ℂ] (GA D (L.V i) → L.TauV i)) (hJ : ∀ x, J x ∈ L.Amt μ i)
+    (jM : Y →ₗ[ℂ] L.AmbW i) (hinj : Function.Injective jM) (hrange : LinearMap.range jM = L.Wc i)
+    (hres : ∀ w ∈ L.MultW i, w ∘ₗ L.embK i = 0 → w = 0)
+    : ∃ th : X →ₗ[ℂ] Y, ∀ x (h : J x ∈ L.Amt μ i) (w : L.AmbW i),
+      w ∈ L.MultW i → w ∘ₗ L.embK i = L.thC μ i ⟨J x, h⟩ → L.eW i ∘ₗ w ∈ L.Wc i
+        → jM (th x) = L.eW i ∘ₗ w := by
   classical
   let W2 : Submodule ℂ (L.AmbW i) := L.MultW i ⊓ (L.Wc i).comap (LinearMap.llcomp ℂ _ _ _ (L.eW i))
-  let res : W2 →ₗ[ℂ] (L.TK i →ₗ[ℂ] (GA D (L.W i) → ℂ)) := LinearMap.lcomp ℂ _ (L.embK i) ∘ₗ W2.subtype
+  let res : W2 →ₗ[ℂ] (L.TK i →ₗ[ℂ] (GA D (L.W i) → ℂ)) :=
+    LinearMap.lcomp ℂ _ (L.embK i) ∘ₗ W2.subtype
   have hker : LinearMap.ker res = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro w hw
@@ -64,7 +79,8 @@ theorem GlobalTheory.LiftSpaces.exists_thetaMap {D : D7} {C : ChainReal D} (L : 
   let ev : W2 →ₗ[ℂ] L.Wc i :=
     ((LinearMap.llcomp ℂ _ _ _ (L.eW i)) ∘ₗ W2.subtype).codRestrict (L.Wc i) (fun w => w.2.2)
   let jinv : L.Wc i →ₗ[ℂ] Y :=
-    (LinearEquiv.ofInjective jM hinj).symm.toLinearMap ∘ₗ (LinearEquiv.ofEq _ _ hrange.symm).toLinearMap
+    (LinearEquiv.ofInjective jM hinj).symm.toLinearMap
+      ∘ₗ (LinearEquiv.ofEq _ _ hrange.symm).toLinearMap
   refine ⟨jinv ∘ₗ ev ∘ₗ ψ ∘ₗ L.thC μ i ∘ₗ J.codRestrict (L.Amt μ i) hJ, ?_⟩
   intro x h w hw e hg
   have h1 : ψ (L.thC μ i ⟨J x, h⟩) = ⟨w, hw, hg⟩ := by

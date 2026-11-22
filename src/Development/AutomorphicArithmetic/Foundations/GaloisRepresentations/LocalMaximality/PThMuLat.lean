@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma det_form {S : Type} [CommRing S] [Algebra ℂ S] (R : Subalgebra ℂ S) {n : ℕ}
@@ -57,8 +58,7 @@ private lemma det_form {S : Type} [CommRing S] [Algebra ℂ S] (R : Subalgebra �
       rw [h0]
       ring
 
-theorem UpperTheory.Gal.productCup_of_system.thMuLat_of :
-    ThMuLat := by
+theorem UpperTheory.Gal.productCup_of_system.thMuLat_of : ThMuLat := by
   unfold ThMuLat
   intro d S E _ _ _ _ T hT
   refine ⟨?_, ?_⟩
@@ -68,8 +68,9 @@ theorem UpperTheory.Gal.productCup_of_system.thMuLat_of :
       hT.memX {i} {j} (Finset.singleton_nonempty j) i (Finset.mem_singleton_self i) a
     have hy : ∀ a, ((T.Y a * (T.Y j)⁻¹ : Sˣ) : S) ∈ T.R {i} {j} := fun a =>
       hT.memY {i} {j} (Finset.singleton_nonempty i) j (Finset.mem_singleton_self j) a
-    have key := sub_mem (mul_mem (hx (ofLex l).1) (hy (ofLex l).2))
-      (mul_mem (hx (ofLex l).2) (hy (ofLex l).1))
+    have key :=
+      sub_mem (mul_mem (hx (ofLex l).1) (hy (ofLex l).2))
+        (mul_mem (hx (ofLex l).2) (hy (ofLex l).1))
     simp only [Units.val_mul] at key
     convert key using 1
     simp only [Sys.r, Sys.u, Sys.mu, n11, pow_one, mul_inv, Units.val_mul]
@@ -81,7 +82,8 @@ theorem UpperTheory.Gal.productCup_of_system.thMuLat_of :
       rw [dite_eq_left h]
       set e := (uni I L).orderEmbOfFin h with he
       have mem_e : ∀ a, e a ∈ uni I L := fun a => Finset.orderEmbOfFin_mem _ h a
-      have mem_l : ∀ i : Fin (d + 1), (toLex (Sum.inl i : Fin (d + 1) ⊕ Mi d) ∈ uni I L) ↔ i ∈ I := by
+      have mem_l
+          : ∀ i : Fin (d + 1), (toLex (Sum.inl i : Fin (d + 1) ⊕ Mi d) ∈ uni I L) ↔ i ∈ I := by
         intro i
         simp [uni]
       have inl_mem : ∀ a i, ofLex (e a) = Sum.inl i → i ∈ I := by
@@ -122,42 +124,51 @@ theorem UpperTheory.Gal.productCup_of_system.thMuLat_of :
         rw [Finset.card_compl, Fintype.card_fin, hPcard]
         omega
       have hu := Units.mul_inv (T.Y j)
-      have hsplit : ∀ (c1 c2 : Prop) [Decidable c1] [Decidable c2] (x y1 y2 : S),
-          ((if c1 then x * y1 else 0) - if c2 then x * y2 else 0) =
-            x * ((if c1 then y1 else 0) - if c2 then y2 else 0) := by
+      have hsplit
+          : ∀ (c1 c2 : Prop) [Decidable c1] [Decidable c2] (x y1 y2 : S),
+            ((if c1 then x * y1 else 0) - if c2 then x * y2 else 0)
+              = x * ((if c1 then y1 else 0) - if c2 then y2 else 0) := by
         intros
         split_ifs <;> ring
-      obtain ⟨s, hs, hdet⟩ := det_form (T.R I J) (Matrix.of fun a b => T.rowMu (e a) b) P I f
-        (fun m => (T.X m : S)) (T.Y j : S)
-        (fun a m => Sum.elim (fun _ => (0 : S)) (fun l => ((if m = (ofLex l).1 then (T.Y (ofLex l).2 : S) else 0) -
-          if m = (ofLex l).2 then (T.Y (ofLex l).1 : S) else 0) * (((T.Y j)⁻¹ : Sˣ) : S)) (ofLex (e a)))
-        (by
-          intro a ha m
-          obtain ⟨i, hi⟩ := (hPm a).1 ha
-          simp only [Matrix.of_apply, Sys.rowMu, hi, Sum.elim_inl, Pi.single_apply, hf a i hi])
-        hfI hIf
-        (by
-          intro a ha m hm
-          rcases hx : ofLex (e a) with i | l
-          · exact absurd ((hPm a).2 ⟨i, hx⟩) ha
-          · simp only [Matrix.of_apply, Sys.rowMu, hx, Sum.elim_inr]
-            rw [hsplit]
-            linear_combination (-((T.X m : S) * ((if m = (ofLex l).1 then (T.Y (ofLex l).2 : S) else 0) -
-              if m = (ofLex l).2 then (T.Y (ofLex l).1 : S) else 0))) * hu)
-        (by
-          intro a m
-          rcases hx : ofLex (e a) with i | l
-          · simp only [hx, Sum.elim_inl]
-            exact zero_mem _
-          · simp only [hx, Sum.elim_inr, sub_mul, ite_mul, zero_mul]
-            rw [← Units.val_mul, ← Units.val_mul]
-            refine sub_mem ?_ ?_
-            · split_ifs
-              · exact hT.memY I J hI j hj _
-              · exact zero_mem _
-            · split_ifs
-              · exact hT.memY I J hI j hj _
-              · exact zero_mem _)
+      obtain ⟨s, hs, hdet⟩ :=
+        det_form (T.R I J) (Matrix.of fun a b => T.rowMu (e a) b) P I f
+          (fun m => (T.X m : S))
+          (T.Y j : S)
+          (fun a m =>
+            Sum.elim
+              (fun _ => (0 : S))
+              (fun l =>
+                ((if m = (ofLex l).1 then (T.Y (ofLex l).2 : S) else 0)
+                    - if m = (ofLex l).2 then (T.Y (ofLex l).1 : S) else 0)
+                  * (((T.Y j)⁻¹ : Sˣ) : S))
+              (ofLex (e a)))
+          (by
+            intro a ha m
+            obtain ⟨i, hi⟩ := (hPm a).1 ha
+            simp only [Matrix.of_apply, Sys.rowMu, hi, Sum.elim_inl, Pi.single_apply, hf a i hi])
+          hfI hIf
+          (by
+            intro a ha m hm
+            rcases hx : ofLex (e a) with i | l
+            · exact absurd ((hPm a).2 ⟨i, hx⟩) ha
+            · simp only [Matrix.of_apply, Sys.rowMu, hx, Sum.elim_inr]
+              rw [hsplit]
+              linear_combination (-((T.X m : S) * ((if m = (ofLex l).1 then (T.Y (ofLex l).2 : S) else 0) -
+                if m = (ofLex l).2 then (T.Y (ofLex l).1 : S) else 0))) * hu)
+          (by
+            intro a m
+            rcases hx : ofLex (e a) with i | l
+            · simp only [hx, Sum.elim_inl]
+              exact zero_mem _
+            · simp only [hx, Sum.elim_inr, sub_mul, ite_mul, zero_mul]
+              rw [← Units.val_mul, ← Units.val_mul]
+              refine sub_mem ?_ ?_
+              · split_ifs
+                · exact hT.memY I J hI j hj _
+                · exact zero_mem _
+              · split_ifs
+                · exact hT.memY I J hI j hj _
+                · exact zero_mem _)
       beta_reduce at hdet
       refine ⟨s, hs, ?_⟩
       rw [hdet, hcard]

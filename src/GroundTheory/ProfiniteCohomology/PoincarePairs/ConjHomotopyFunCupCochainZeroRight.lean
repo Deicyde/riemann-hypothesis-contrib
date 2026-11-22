@@ -24,11 +24,10 @@ def seqProd (F : ℕ → Γ) : ℕ → Γ
   | 0 => 1
   | r + 1 => seqProd F r * F r
 
-theorem seqProd_succ (F : ℕ → Γ) (r : ℕ) : seqProd F (r + 1) = seqProd F r * F r :=
-  rfl
+theorem seqProd_succ (F : ℕ → Γ) (r : ℕ) : seqProd F (r + 1) = seqProd F r * F r := rfl
 
-theorem partialProd_seqTuple {n : ℕ} (F : ℕ → Γ) (r : ℕ) (hr : r < n + 1) :
-    Fin.partialProd (seqTuple n F) ⟨r, hr⟩ = seqProd F r := by
+theorem partialProd_seqTuple {n : ℕ} (F : ℕ → Γ) (r : ℕ) (hr : r < n + 1)
+    : Fin.partialProd (seqTuple n F) ⟨r, hr⟩ = seqProd F r := by
   induction r with
   | zero => exact Fin.partialProd_zero _
   | succ r ih =>
@@ -37,16 +36,16 @@ theorem partialProd_seqTuple {n : ℕ} (F : ℕ → Γ) (r : ℕ) (hr : r < n + 
     rw [h1, ih (by omega), seqProd_succ]
     rfl
 
-theorem seqProd_prismSeq_of_ge (g : Γ) {i r : ℕ} (hr : r ≤ i) (F : ℕ → Γ) :
-    seqProd (prismSeq g i F) r = seqProd F r := by
+theorem seqProd_prismSeq_of_ge (g : Γ) {i r : ℕ} (hr : r ≤ i) (F : ℕ → Γ)
+    : seqProd (prismSeq g i F) r = seqProd F r := by
   induction r with
   | zero => rfl
   | succ r ih =>
     rw [seqProd_succ, seqProd_succ, ih (by omega)]
     simp only [prismSeq, if_pos (show r < i by omega)]
 
-theorem seqProd_prismSeq_of_le (g : Γ) {i r : ℕ} (hi : i ≤ r) (F : ℕ → Γ) :
-    seqProd (prismSeq g i F) (r + 1) = seqProd F r * g := by
+theorem seqProd_prismSeq_of_le (g : Γ) {i r : ℕ} (hi : i ≤ r) (F : ℕ → Γ)
+    : seqProd (prismSeq g i F) (r + 1) = seqProd F r * g := by
   induction r with
   | zero =>
     obtain rfl : i = 0 := by omega
@@ -67,18 +66,21 @@ section Cup
 
 variable {k Γ : Type u} [CommRing k] [Group Γ] {A B : Rep.{u} k Γ}
 
-theorem cupCochain_seqTuple {r s n : ℕ} (h : r + s = n) (F : (Fin r → Γ) → A)
-    (E : (Fin s → Γ) → B) (Y : ℕ → Γ) :
-    cupCochain h F E (seqTuple n Y) =
-      F (seqTuple r Y) ⊗ₜ[k] B.ρ (seqProd Y r) (E (seqTuple s fun l => Y (r + l))) := by
+theorem cupCochain_seqTuple
+    {r s n : ℕ} (h : r + s = n) (F : (Fin r → Γ) → A) (E : (Fin s → Γ) → B) (Y : ℕ → Γ)
+    : cupCochain h F E (seqTuple n Y)
+      = F (seqTuple r Y) ⊗ₜ[k] B.ρ (seqProd Y r) (E (seqTuple s fun l => Y (r + l))) := by
   rw [cupCochain_apply, partialProd_seqTuple]
   rfl
 
-theorem cupCochain_seqTuple_prismSeq_of_le (g : Γ) {r s n : ℕ} (h : r + 1 + s = n)
-    (F : (Fin (r + 1) → Γ) → A) (E : (Fin s → Γ) → B) (Y : ℕ → Γ) {i : ℕ} (hi : i ≤ r) :
-    cupCochain h F E (seqTuple n (prismSeq g i Y)) =
-      F (seqTuple (r + 1) (prismSeq g i Y)) ⊗ₜ[k] B.ρ (seqProd Y r)
-        (conjCochainFun B g E (seqTuple s fun l => Y (r + l))) := by
+theorem cupCochain_seqTuple_prismSeq_of_le
+    (g : Γ)
+    {r s n : ℕ} (h : r + 1 + s = n) (F : (Fin (r + 1) → Γ) → A) (E : (Fin s → Γ) → B)
+    (Y : ℕ → Γ)
+    {i : ℕ} (hi : i ≤ r)
+    : cupCochain h F E (seqTuple n (prismSeq g i Y))
+      = F (seqTuple (r + 1) (prismSeq g i Y)) ⊗ₜ[k] B.ρ (seqProd Y r)
+          (conjCochainFun B g E (seqTuple s fun l => Y (r + l))) := by
   rw [cupCochain_seqTuple, seqProd_prismSeq_of_le g hi, map_mul, Module.End.mul_apply]
   congr 2
   change B.ρ g (E _) = B.ρ g (E _)
@@ -90,11 +92,13 @@ theorem cupCochain_seqTuple_prismSeq_of_le (g : Γ) {r s n : ℕ} (h : r + 1 + s
   congr 3
   omega
 
-theorem cupCochain_seqTuple_prismSeq_add (g : Γ) {r s n : ℕ} (h : r + (s + 1) = n)
-    (F : (Fin r → Γ) → A) (E : (Fin (s + 1) → Γ) → B) (Y : ℕ → Γ) (j : ℕ) :
-    cupCochain h F E (seqTuple n (prismSeq g (r + j) Y)) =
-      F (seqTuple r Y) ⊗ₜ[k] B.ρ (seqProd Y r)
-        (E (seqTuple (s + 1) (prismSeq g j fun l => Y (r + l)))) := by
+theorem cupCochain_seqTuple_prismSeq_add
+    (g : Γ)
+    {r s n : ℕ} (h : r + (s + 1) = n) (F : (Fin r → Γ) → A) (E : (Fin (s + 1) → Γ) → B)
+    (Y : ℕ → Γ) (j : ℕ)
+    : cupCochain h F E (seqTuple n (prismSeq g (r + j) Y))
+      = F (seqTuple r Y) ⊗ₜ[k] B.ρ (seqProd Y r)
+          (E (seqTuple (s + 1) (prismSeq g j fun l => Y (r + l)))) := by
   rw [cupCochain_seqTuple, seqProd_prismSeq_of_ge g (by omega)]
   congr 1
   · congr 1
@@ -111,11 +115,14 @@ section Leibniz
 
 variable {k Γ : Type u} [CommRing k] [Group Γ] {A B : Rep.{u} k Γ}
 
-theorem conjHomotopyFun_cupCochain (g : Γ) {r s m : ℕ} (h : r + 1 + (s + 1) = m + 1)
-    (F : (Fin (r + 1) → Γ) → A) (E : (Fin (s + 1) → Γ) → B) :
-    conjHomotopyFun (A ⊗ B) g m (cupCochain h F E) =
-      cupCochain (show r + (s + 1) = m by omega) (conjHomotopyFun A g r F) (conjCochainFun B g E) +
-        (-1 : k) ^ (r + 1) • cupCochain (show r + 1 + s = m by omega) F (conjHomotopyFun B g s E) := by
+theorem conjHomotopyFun_cupCochain
+    (g : Γ)
+    {r s m : ℕ}
+    (h : r + 1 + (s + 1) = m + 1) (F : (Fin (r + 1) → Γ) → A) (E : (Fin (s + 1) → Γ) → B)
+    : conjHomotopyFun (A ⊗ B) g m (cupCochain h F E)
+      = cupCochain (show r + (s + 1) = m by omega) (conjHomotopyFun A g r F) (conjCochainFun B g E)
+        + (-1 : k) ^ (r + 1)
+          • cupCochain (show r + 1 + s = m by omega) F (conjHomotopyFun B g s E) := by
   obtain rfl : m = r + 1 + s := by omega
   funext γ
   rw [← seqTuple_tupleSeq γ]
@@ -132,10 +139,10 @@ theorem conjHomotopyFun_cupCochain (g : Γ) {r s m : ℕ} (h : r + 1 + (s + 1) =
     refine sum_congr rfl fun j _ => ?_
     rw [cupCochain_seqTuple_prismSeq_add g h F E Y j, map_smul, tmul_smul, smul_smul, pow_add]
 
-theorem conjHomotopyFun_cupCochain_zero_left (g : Γ) {s m : ℕ} (h : 0 + (s + 1) = m + 1)
-    (F : (Fin 0 → Γ) → A) (E : (Fin (s + 1) → Γ) → B) :
-    conjHomotopyFun (A ⊗ B) g m (cupCochain h F E) =
-      cupCochain (show 0 + s = m by omega) F (conjHomotopyFun B g s E) := by
+theorem conjHomotopyFun_cupCochain_zero_left
+    (g : Γ) {s m : ℕ} (h : 0 + (s + 1) = m + 1) (F : (Fin 0 → Γ) → A) (E : (Fin (s + 1) → Γ) → B)
+    : conjHomotopyFun (A ⊗ B) g m (cupCochain h F E)
+      = cupCochain (show 0 + s = m by omega) F (conjHomotopyFun B g s E) := by
   obtain rfl : m = s := by omega
   funext γ
   rw [← seqTuple_tupleSeq γ]
@@ -147,10 +154,10 @@ theorem conjHomotopyFun_cupCochain_zero_left (g : Γ) {s m : ℕ} (h : 0 + (s + 
   rw [zero_add] at e
   rw [e, map_smul, tmul_smul]
 
-theorem conjHomotopyFun_cupCochain_zero_right (g : Γ) {r m : ℕ} (h : r + 1 + 0 = m + 1)
-    (F : (Fin (r + 1) → Γ) → A) (E : (Fin 0 → Γ) → B) :
-    conjHomotopyFun (A ⊗ B) g m (cupCochain h F E) =
-      cupCochain (show r + 0 = m by omega) (conjHomotopyFun A g r F) (conjCochainFun B g E) := by
+theorem conjHomotopyFun_cupCochain_zero_right
+    (g : Γ) {r m : ℕ} (h : r + 1 + 0 = m + 1) (F : (Fin (r + 1) → Γ) → A) (E : (Fin 0 → Γ) → B)
+    : conjHomotopyFun (A ⊗ B) g m (cupCochain h F E)
+      = cupCochain (show r + 0 = m by omega) (conjHomotopyFun A g r F) (conjCochainFun B g E) := by
   obtain rfl : m = r := by omega
   funext γ
   rw [← seqTuple_tupleSeq γ]

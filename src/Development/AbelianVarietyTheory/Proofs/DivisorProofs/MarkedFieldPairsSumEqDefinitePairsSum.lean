@@ -8,12 +8,22 @@ public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.D
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.LKCount
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKDef
+  GlobalTheory.LKCount
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.LKDef
 
-theorem marked_field_pairs_sum_eq_definite_pairs_sum : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p), G.a = 1 → Odd G.n → ∀ (wt sel : Polynomial G.F → ℂ), IsSel G sel → ∀ (Kf : Subgroup G.GAf) (f : G.GAf → ℂ) (r : ℕ) (K : Subgroup (Gr G r)) (φ : Gr G r → ℂ), 0 < r → (∀ k ∈ Kf, ∀ g, f (k⁻¹ * g * k) = f g) → (∀ k ∈ K, ∀ g, φ (k⁻¹ * g * sigG G r k) = φ g) → markedSumIrr G wt sel Kf f r K φ = dSumIrr G wt Kf f r K φ := by
+theorem marked_field_pairs_sum_eq_definite_pairs_sum
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p),
+      G.a = 1 → Odd G.n
+        → ∀ (wt sel : Polynomial G.F → ℂ),
+          IsSel G sel
+            → ∀ (Kf : Subgroup G.GAf) (f : G.GAf → ℂ) (r : ℕ) (K : Subgroup (Gr G r))
+                (φ : Gr G r → ℂ),
+              0 < r → (∀ k ∈ Kf, ∀ g, f (k⁻¹ * g * k) = f g)
+                → (∀ k ∈ K, ∀ g, φ (k⁻¹ * g * sigG G r k) = φ g)
+                → markedSumIrr G wt sel Kf f r K φ = dSumIrr G wt Kf f r K φ := by
   intro p _ G ha hn wt sel hsel Kf f r K φ hr hf hφ
   obtain ⟨e, he⟩ := GlobalTheory.T.markedFieldPairs_equiv_definiteFieldPairs_odd p G ha hn sel hsel
   unfold markedSumIrr dSumIrr

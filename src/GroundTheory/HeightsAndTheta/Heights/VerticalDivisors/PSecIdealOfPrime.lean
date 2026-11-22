@@ -19,16 +19,19 @@ noncomputable section
 
 namespace SecIdealOfPrime
 
-theorem secAlg_of_ratFunc {k E : Type} [Field k] [Field E] (n e : ℕ) (φ : k →+* E) (y : Par e n → E)
-    (hinj : Function.Injective (eval₂Hom φ y))
+theorem secAlg_of_ratFunc
+    {k E : Type} [Field k] [Field E]
+    (n e : ℕ) (φ : k →+* E) (y : Par e n → E) (hinj : Function.Injective (eval₂Hom φ y))
     (hsurj : ∀ z : E, ∃ a b, z = eval₂Hom φ y a / eval₂Hom φ y b)
     (Q : Ideal (MvPolynomial (Fin n) k)) (hQF : IsField (GenSec k e Q))
-    (hQK : RingHom.ker ((Ideal.Quotient.mk
-        (secIdeal (Q.map (MvPolynomial.map (algebraMap k (GenParField k e n)))) (genPar k e n))).comp
-          (MvPolynomial.map (algebraMap k (GenParField k e n)))) = Q) :
-    IsField (SecAlg (Q.map (MvPolynomial.map φ)) y) ∧
-      RingHom.ker ((Ideal.Quotient.mk (secIdeal (Q.map (MvPolynomial.map φ)) y)).comp
-        (MvPolynomial.map φ)) = Q := by
+    (hQK : RingHom.ker ((Ideal.Quotient.mk (secIdeal
+          (Q.map (MvPolynomial.map (algebraMap k (GenParField k e n)))) (genPar k e n))).comp
+        (MvPolynomial.map (algebraMap k (GenParField k e n))))
+      = Q)
+    : IsField (SecAlg (Q.map (MvPolynomial.map φ)) y)
+      ∧ RingHom.ker ((Ideal.Quotient.mk (secIdeal (Q.map (MvPolynomial.map φ)) y)).comp
+          (MvPolynomial.map φ))
+        = Q := by
   let _ : Algebra (MvPolynomial (Par e n) k) E := (eval₂Hom φ y).toAlgebra
   have : FaithfulSMul (MvPolynomial (Par e n) k) E :=
     (faithfulSMul_iff_algebraMap_injective _ _).mpr hinj
@@ -42,19 +45,23 @@ theorem secAlg_of_ratFunc {k E : Type} [Field k] [Field E] (n e : ℕ) (φ : k �
     show σ (algebraMap k (GenParField k e n) c) = φ c
     rw [IsScalarTower.algebraMap_apply k (MvPolynomial (Par e n) k) (GenParField k e n), σ.commutes]
     exact eval₂_C _ _ _
-  have hmm : ∀ {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (φ₁ : A →+* B) (φ₂ : B →+* C),
-      (MvPolynomial.map φ₂).comp (MvPolynomial.map φ₁) =
-        (MvPolynomial.map (φ₂.comp φ₁) : MvPolynomial (Fin n) A →+* MvPolynomial (Fin n) C) :=
+  have hmm
+      : ∀ {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (φ₁ : A →+* B) (φ₂ : B →+* C),
+        (MvPolynomial.map φ₂).comp (MvPolynomial.map φ₁)
+          = (MvPolynomial.map (φ₂.comp φ₁) : MvPolynomial (Fin n) A →+* MvPolynomial (Fin n) C) :=
     fun φ₁ φ₂ ↦ RingHom.ext fun p ↦ MvPolynomial.map_map _ _ p
   let QF := Q.map (MvPolynomial.map (algebraMap k (GenParField k e n)))
   let QE := Q.map (MvPolynomial.map φ)
   let M : MvPolynomial (Fin n) (GenParField k e n) ≃+* MvPolynomial (Fin n) E :=
     MvPolynomial.mapEquiv (Fin n) σ.toRingEquiv
-  have hmσ : (M : MvPolynomial (Fin n) (GenParField k e n) →+* MvPolynomial (Fin n) E) =
-      MvPolynomial.map (σ : GenParField k e n →+* E) :=
+  have hmσ
+      : (M : MvPolynomial (Fin n) (GenParField k e n) →+* MvPolynomial (Fin n) E)
+        = MvPolynomial.map (σ : GenParField k e n →+* E) :=
     RingHom.ext fun _ => rfl
-  have hIJ : secIdeal QE y = (secIdeal QF (genPar k e n)).map
-      (M : MvPolynomial (Fin n) (GenParField k e n) →+* MvPolynomial (Fin n) E) := by
+  have hIJ
+      : secIdeal QE y
+        = (secIdeal QF (genPar k e n)).map
+          (M : MvPolynomial (Fin n) (GenParField k e n) →+* MvPolynomial (Fin n) E) := by
     rw [hmσ]
     simp only [secIdeal, Ideal.map_sup, Ideal.map_span, QF, QE, Ideal.map_map, hmm, hσC]
     congr 3
@@ -67,10 +74,11 @@ theorem secAlg_of_ratFunc {k E : Type} [Field k] [Field E] (n e : ℕ) (φ : k �
       simp [chartForm, linForm, hσX]
   let τ : GenSec k e Q ≃+* SecAlg QE y := Ideal.quotientEquiv _ _ M hIJ
   refine ⟨MulEquiv.isField hQF τ.symm.toMulEquiv, ?_⟩
-  have hc : (Ideal.Quotient.mk (secIdeal QE y)).comp (MvPolynomial.map φ) =
-      (τ : GenSec k e Q →+* SecAlg QE y).comp
-        ((Ideal.Quotient.mk (secIdeal QF (genPar k e n))).comp
-          (MvPolynomial.map (algebraMap k (GenParField k e n)))) := by
+  have hc
+      : (Ideal.Quotient.mk (secIdeal QE y)).comp (MvPolynomial.map φ)
+        = (τ : GenSec k e Q →+* SecAlg QE y).comp
+          ((Ideal.Quotient.mk (secIdeal QF (genPar k e n))).comp
+            (MvPolynomial.map (algebraMap k (GenParField k e n)))) := by
     refine RingHom.ext fun p => ?_
     show Ideal.Quotient.mk (secIdeal QE y) (MvPolynomial.map φ p) =
       Ideal.Quotient.mk (secIdeal QE y) (MvPolynomial.map (σ : GenParField k e n →+* E)
@@ -79,15 +87,19 @@ theorem secAlg_of_ratFunc {k E : Type} [Field k] [Field E] (n e : ℕ) (φ : k �
   rw [hc, RingHom.ker_comp_of_injective _ (f := (τ : GenSec k e Q →+* SecAlg QE y)) τ.injective]
   exact hQK
 
-theorem residue_algebraMap {K : Type*} [Field K] [NumberField K] (e n : ℕ) (v : HeightOneSpectrum (𝓞 K))
-    (a : MvPolynomial (Par e n) (𝓞 K)) :
-    algebraMap (ParDVR e n v) (IsLocalRing.maximalIdeal (ParDVR e n v)).ResidueField
-        (algebraMap (MvPolynomial (Par e n) (𝓞 K)) (ParDVR e n v) a) =
-      eval₂Hom (resToKappa e n v) (parYκ e n v) (a.map (algebraMap (𝓞 K) v.asIdeal.ResidueField)) := by
-  have h : (algebraMap (ParDVR e n v) (IsLocalRing.maximalIdeal (ParDVR e n v)).ResidueField).comp
-        (algebraMap (MvPolynomial (Par e n) (𝓞 K)) (ParDVR e n v)) =
-      (eval₂Hom (resToKappa e n v) (parYκ e n v)).comp
-        (MvPolynomial.map (algebraMap (𝓞 K) v.asIdeal.ResidueField)) := by
+theorem residue_algebraMap
+    {K : Type*} [Field K] [NumberField K]
+    (e n : ℕ)
+    (v : HeightOneSpectrum (𝓞 K)) (a : MvPolynomial (Par e n) (𝓞 K))
+    : algebraMap (ParDVR e n v) (IsLocalRing.maximalIdeal (ParDVR e n v)).ResidueField
+        (algebraMap (MvPolynomial (Par e n) (𝓞 K)) (ParDVR e n v) a)
+      = eval₂Hom (resToKappa e n v) (parYκ e n v)
+        (a.map (algebraMap (𝓞 K) v.asIdeal.ResidueField)) := by
+  have h
+      : (algebraMap (ParDVR e n v) (IsLocalRing.maximalIdeal (ParDVR e n v)).ResidueField).comp
+          (algebraMap (MvPolynomial (Par e n) (𝓞 K)) (ParDVR e n v))
+        = (eval₂Hom (resToKappa e n v) (parYκ e n v)).comp
+          (MvPolynomial.map (algebraMap (𝓞 K) v.asIdeal.ResidueField)) := by
     refine MvPolynomial.ringHom_ext (fun c => ?_) (fun p => ?_)
     · simp only [RingHom.comp_apply, MvPolynomial.map_C, eval₂Hom_C]
       rw [← MvPolynomial.algebraMap_eq, ← IsScalarTower.algebraMap_apply]
@@ -97,23 +109,34 @@ theorem residue_algebraMap {K : Type*} [Field K] [NumberField K] (e n : ℕ) (v 
       rfl
   exact RingHom.congr_fun h a
 
-theorem residue_surj {K : Type*} [Field K] [NumberField K] (e n : ℕ) (v : HeightOneSpectrum (𝓞 K))
-    (z : (IsLocalRing.maximalIdeal (ParDVR e n v)).ResidueField) :
-    ∃ a b, z = eval₂Hom (resToKappa e n v) (parYκ e n v) a / eval₂Hom (resToKappa e n v) (parYκ e n v) b := by
-  obtain ⟨r, rfl⟩ := Ideal.algebraMap_residueField_surjective (IsLocalRing.maximalIdeal (ParDVR e n v)) z
+theorem residue_surj
+    {K : Type*} [Field K] [NumberField K]
+    (e n : ℕ) (v : HeightOneSpectrum (𝓞 K))
+    (z : (IsLocalRing.maximalIdeal (ParDVR e n v)).ResidueField)
+    : ∃ a b,
+      z = eval₂Hom (resToKappa e n v) (parYκ e n v) a
+        / eval₂Hom (resToKappa e n v) (parYκ e n v) b := by
+  obtain ⟨r, rfl⟩ :=
+    Ideal.algebraMap_residueField_surjective (IsLocalRing.maximalIdeal (ParDVR e n v)) z
   obtain ⟨⟨a, s⟩, rfl⟩ := IsLocalization.mk'_surjective (parPrime e n v).primeCompl r
-  refine ⟨a.map (algebraMap (𝓞 K) v.asIdeal.ResidueField),
-    (s : MvPolynomial (Par e n) (𝓞 K)).map (algebraMap (𝓞 K) v.asIdeal.ResidueField), ?_⟩
-  have hs : algebraMap (ParDVR e n v) (IsLocalRing.maximalIdeal (ParDVR e n v)).ResidueField
-      (algebraMap _ (ParDVR e n v) (s : MvPolynomial (Par e n) (𝓞 K))) ≠ 0 :=
+  refine ⟨
+    a.map (algebraMap (𝓞 K) v.asIdeal.ResidueField),
+    (s : MvPolynomial (Par e n) (𝓞 K)).map (algebraMap (𝓞 K) v.asIdeal.ResidueField),
+    ?_
+  ⟩
+  have hs
+      : algebraMap (ParDVR e n v) (IsLocalRing.maximalIdeal (ParDVR e n v)).ResidueField
+          (algebraMap _ (ParDVR e n v) (s : MvPolynomial (Par e n) (𝓞 K)))
+        ≠ 0 :=
     ((IsLocalization.map_units (ParDVR e n v) s).map _).ne_zero
   rw [← residue_algebraMap, ← residue_algebraMap, eq_div_iff hs, ← map_mul, IsLocalization.mk'_spec]
 
 end SecIdealOfPrime
 
-theorem SecIdealOfPrime.proof (hDim : SpecCompDim.Statement) (hExist : ChowFormExists.Statement)
-    (hInd : ResidueAlgIndep.Statement) (hField : SecAlgField.Statement) (hKer : GenSecKer.Statement) :
-    SecIdealOfPrime.Statement := by
+theorem SecIdealOfPrime.proof
+    (hDim : SpecCompDim.Statement) (hExist : ChowFormExists.Statement)
+    (hInd : ResidueAlgIndep.Statement) (hField : SecAlgField.Statement) (hKer : GenSecKer.Statement)
+    : SecIdealOfPrime.Statement := by
   intro K _ _ n e I f v hI hf W hW
   have : v.asIdeal.IsMaximal := v.isMaximal
   obtain ⟨hQ, hQdim⟩ := hDim K n e I f v hI hf W hW
@@ -121,17 +144,20 @@ theorem SecIdealOfPrime.proof (hDim : SpecCompDim.Statement) (hExist : ChowFormE
 
   have hψ : Function.Injective (eval₂Hom (resToKappa e n v) (parYκ e n v)) := fun _ _ hpq =>
     hInd K e n v hpq
-  obtain ⟨hFieldE, hkerE⟩ := SecIdealOfPrime.secAlg_of_ratFunc n e (resToKappa e n v) (parYκ e n v) hψ
-    (SecIdealOfPrime.residue_surj e n v) (reduceMod v W) (hField _ n e _ g hQ hg) (hKer _ n e _ g hQ hg)
+  obtain ⟨hFieldE, hkerE⟩ :=
+    SecIdealOfPrime.secAlg_of_ratFunc n e (resToKappa e n v) (parYκ e n v) hψ
+      (SecIdealOfPrime.residue_surj e n v) (reduceMod v W) (hField _ n e _ g hQ hg)
+      (hKer _ n e _ g hQ hg)
 
   let R := ParDVR e n v
   let E := (IsLocalRing.maximalIdeal R).ResidueField
   let k := v.asIdeal.ResidueField
   let QE := (reduceMod v W).map (MvPolynomial.map (resToKappa e n v))
   let T := secIdeal QE (parYκ e n v)
-  have hmm : ∀ {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (φ₁ : A →+* B) (φ₂ : B →+* C),
-      (MvPolynomial.map φ₂).comp (MvPolynomial.map φ₁) =
-        (MvPolynomial.map (φ₂.comp φ₁) : MvPolynomial (Fin n) A →+* MvPolynomial (Fin n) C) :=
+  have hmm
+      : ∀ {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (φ₁ : A →+* B) (φ₂ : B →+* C),
+        (MvPolynomial.map φ₂).comp (MvPolynomial.map φ₁)
+          = (MvPolynomial.map (φ₂.comp φ₁) : MvPolynomial (Fin n) A →+* MvPolynomial (Fin n) C) :=
     fun φ₁ φ₂ ↦ RingHom.ext fun p ↦ MvPolynomial.map_map _ _ p
   let ι : 𝓞 K →+* R := algebraMap (𝓞 K) R
   let ρ : R →+* E := algebraMap R E
@@ -141,7 +167,7 @@ theorem SecIdealOfPrime.proof (hDim : SpecCompDim.Statement) (hExist : ChowFormE
   have hcomp : ρ.comp ι = (resToKappa e n v).comp (algebraMap (𝓞 K) k) := by
     ext a
     exact (Ideal.ResidueField.map_algebraMap v.asIdeal (IsLocalRing.maximalIdeal (ParDVR e n v))
-        (algebraMap (𝓞 K) (ParDVR e n v)) (comap_maximalIdeal_parDVR e n v).symm a).symm
+      (algebraMap (𝓞 K) (ParDVR e n v)) (comap_maximalIdeal_parDVR e n v).symm a).symm
   have hJW : integralModel I ⊔ Ideal.map C v.asIdeal ≤ W := hW.1.1.2
   let WR : Ideal (MvPolynomial (Fin n) R) := W.map (MvPolynomial.map ι)
   let S := secIdeal (modelR e I v) (parY e n v)
@@ -151,15 +177,17 @@ theorem SecIdealOfPrime.proof (hDim : SpecCompDim.Statement) (hExist : ChowFormE
   have hM : (modelR e I v).map Ψ ≤ QE := by
     rw [← hWR]
     exact Ideal.map_mono (Ideal.map_mono (le_sup_left.trans hJW))
-  have hA : (Ideal.span (Set.range (secForm (parY e n v)))).map Ψ =
-      Ideal.span (Set.range (secForm (parYκ e n v))) := by
+  have hA
+      : (Ideal.span (Set.range (secForm (parY e n v)))).map Ψ
+        = Ideal.span (Set.range (secForm (parYκ e n v))) := by
     rw [Ideal.map_span, ← Set.range_comp]
     congr 2
     funext i
     simp [Ψ, secForm, linForm, parYκ, ρ]
     rfl
-  have hB : (Ideal.span {chartForm (parY e n v) - 1}).map Ψ =
-      Ideal.span {chartForm (parYκ e n v) - 1} := by
+  have hB
+      : (Ideal.span {chartForm (parY e n v) - 1}).map Ψ
+        = Ideal.span {chartForm (parYκ e n v) - 1} := by
     rw [Ideal.map_span, Set.image_singleton]
     congr 2
     simp [Ψ, chartForm, linForm, parYκ, ρ]
@@ -167,8 +195,10 @@ theorem SecIdealOfPrime.proof (hDim : SpecCompDim.Statement) (hExist : ChowFormE
   have hT : (S ⊔ WR).map Ψ = T := by
     simp only [S, T, secIdeal, Ideal.map_sup, hA, hB, hWR]
     apply le_antisymm
-    · exact sup_le (sup_le (sup_le (hM.trans (le_sup_left.trans le_sup_left))
-        (le_sup_right.trans le_sup_left)) le_sup_right) (le_sup_left.trans le_sup_left)
+    · exact sup_le
+        (sup_le (sup_le (hM.trans (le_sup_left.trans le_sup_left)) (le_sup_right.trans le_sup_left))
+          le_sup_right)
+        (le_sup_left.trans le_sup_left)
     · exact sup_le (sup_le le_sup_right (le_sup_right.trans (le_sup_left.trans le_sup_left)))
         (le_sup_right.trans le_sup_left)
   have hkerΨ : RingHom.ker Ψ ≤ WR := by
@@ -196,26 +226,29 @@ theorem SecIdealOfPrime.proof (hDim : SpecCompDim.Statement) (hExist : ChowFormE
     rw [hker, Ideal.map_sup, Ideal.map_quotient_self, bot_sup_eq]
     rfl
   have hcomap : (secIdealOf e I v W).comap (Ideal.Quotient.mk S) = RingHom.ker Φ := by
-    rw [hsec, Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot,
-      Ideal.mk_ker]
+    rw [hsec, Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective,
+      ← RingHom.ker_eq_comap_bot, Ideal.mk_ker]
     exact sup_eq_left.mpr hSle
   refine ⟨?_, ?_⟩
   · rw [hsec]
-    exact Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rw [Ideal.mk_ker]; exact hSle)
-  ·
-    have hto : toSecB e I v = (Ideal.Quotient.mk S).comp (MvPolynomial.map ι) := rfl
-    have hπ : Function.Surjective (MvPolynomial.map (algebraMap (𝓞 K) k) :
-        MvPolynomial (Fin n) (𝓞 K) →+* MvPolynomial (Fin n) k) :=
+    exact Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective
+      (by rw [Ideal.mk_ker]; exact hSle)
+  · have hto : toSecB e I v = (Ideal.Quotient.mk S).comp (MvPolynomial.map ι) := rfl
+    have hπ : Function.Surjective
+        (MvPolynomial.map (algebraMap (𝓞 K) k)
+          : MvPolynomial (Fin n) (𝓞 K) →+* MvPolynomial (Fin n) k) :=
       MvPolynomial.map_surjective _ (Ideal.algebraMap_residueField_surjective v.asIdeal)
     rw [hto, ← Ideal.comap_comap, hcomap]
     ext p
     rw [Ideal.mem_comap, RingHom.mem_ker]
-    have hΦp : Φ (MvPolynomial.map ι p) =
-        ((Ideal.Quotient.mk T).comp (MvPolynomial.map (resToKappa e n v)))
-          (MvPolynomial.map (algebraMap (𝓞 K) k) p) := by
+    have hΦp
+        : Φ (MvPolynomial.map ι p)
+          = ((Ideal.Quotient.mk T).comp (MvPolynomial.map (resToKappa e n v))) (MvPolynomial.map
+            (algebraMap (𝓞 K) k) p) := by
       simp only [Φ, Ψ, RingHom.comp_apply, MvPolynomial.map_map, hcomp]
     rw [hΦp, ← RingHom.mem_ker, hkerE]
-    change MvPolynomial.map (algebraMap (𝓞 K) k) p ∈ W.map (MvPolynomial.map (algebraMap (𝓞 K) k)) ↔ p ∈ W
+    change MvPolynomial.map (algebraMap (𝓞 K) k) p ∈ W.map (MvPolynomial.map (algebraMap (𝓞 K) k))
+      ↔ p ∈ W
     rw [← Ideal.mem_comap, Ideal.comap_map_of_surjective _ hπ, ← RingHom.ker_eq_comap_bot,
       MvPolynomial.ker_map, Ideal.ker_algebraMap_residueField,
       sup_eq_left.mpr (le_sup_right.trans hJW)]

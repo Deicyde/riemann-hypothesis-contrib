@@ -13,6 +13,7 @@ set_option autoImplicit false
 namespace Formalism.L2.FormalSeriesBounds
 
 theorem rank_maximal_self_unconditional : RankMaximalSelfOfNondegenerate :=
-  rank_maximal_self_of_eigen first_vanishing_core funEqCore_holds curve_linear_term_unconditional aLinAdj_holds RowTiePKey.keyEig_holds
+  rank_maximal_self_of_eigen first_vanishing_core funEqCore_holds curve_linear_term_unconditional
+    aLinAdj_holds RowTiePKey.keyEig_holds
 
 end Formalism.L2.FormalSeriesBounds

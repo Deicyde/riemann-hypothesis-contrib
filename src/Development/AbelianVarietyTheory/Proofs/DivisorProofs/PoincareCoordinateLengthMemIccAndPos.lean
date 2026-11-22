@@ -4,14 +4,19 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EndValuedFor
 
 @[expose] public section
 
-open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.GoodTop
+open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar
+  GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame
+  GlobalTheory.GoodMetric GlobalTheory.GoodTop
 open ReciprocityTheory.L2DbarEstimates (V)
 open scoped ContDiff Matrix
 
 namespace GlobalTheory.GoodTop
 
-theorem poinWt_mem_Icc_and_pos : ∀ {n : ℕ} (S : Finset (Fin n)) (v : V n), (∀ a ∈ S, ‖v a‖ ≤ 1 / 2) →
-    (∀ a, 0 ≤ poinWt S v a ∧ poinWt S v a ≤ 1) ∧ ((∀ a ∈ S, v a ≠ 0) → ∀ a, 0 < poinWt S v a) := by
+theorem poinWt_mem_Icc_and_pos
+    : ∀ {n : ℕ} (S : Finset (Fin n)) (v : V n),
+      (∀ a ∈ S, ‖v a‖ ≤ 1 / 2)
+        → (∀ a, 0 ≤ poinWt S v a ∧ poinWt S v a ≤ 1)
+          ∧ ((∀ a ∈ S, v a ≠ 0) → ∀ a, 0 < poinWt S v a) := by
   intro n S v hS
   refine ⟨fun a => ?_, fun hne a => ?_⟩
   · unfold poinWt

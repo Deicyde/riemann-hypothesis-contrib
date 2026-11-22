@@ -17,8 +17,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SymplecticGen
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyKa
@@ -27,11 +29,12 @@ noncomputable section
 
 namespace GlobalTheory.PolFlatDescent
 
-variable {S S' : Scheme.{0}} {f : S' ⟶ S} {A : Over S} {A' : Over S'} [GrpObj A] [GrpObj A']
+variable
+  {S S' : Scheme.{0}} {f : S' ⟶ S} {A : Over S} {A' : Over S'} [GrpObj A] [GrpObj A']
   {φ : A'.left ⟶ A.left}
 
-theorem isCommMonObj_of_pull [Flat f] [Surjective f] (h : IsGrpPullback A' A f φ) [IsCommMonObj A'] :
-    IsCommMonObj A := by
+theorem isCommMonObj_of_pull [Flat f] [Surjective f] (h : IsGrpPullback A' A f φ) [IsCommMonObj A']
+    : IsCommMonObj A := by
   refine ⟨GrpFlatDesc.hom_ext_of_points f fun T t => ?_⟩
   obtain ⟨x, hx⟩ := GrpDense.pushPt_surjective h.1 T (t ≫ fst _ _)
   obtain ⟨y, hy⟩ := GrpDense.pushPt_surjective h.1 T (t ≫ snd _ _)
@@ -41,25 +44,35 @@ theorem isCommMonObj_of_pull [Flat f] [Surjective f] (h : IsGrpPullback A' A f �
   exact Over.OverMorphism.ext ((h.2 T y x _ _ rfl rfl).trans
     ((congrArg (fun z => z.left ≫ φ) (_root_.mul_comm y x)).trans (h.2 T x y _ _ rfl rfl).symm))
 
-theorem isAbelianScheme_of_pull [Flat f] [Surjective f] [QuasiCompact f] (h : IsGrpPullback A' A f φ)
-    (hA : IsAbelianScheme A') : IsAbelianScheme A := by
+theorem isAbelianScheme_of_pull
+    [Flat f] [Surjective f] [QuasiCompact f] (h : IsGrpPullback A' A f φ) (hA : IsAbelianScheme A')
+    : IsAbelianScheme A := by
   have := hA.comm
   have := hA.proper
   have := hA.geomConnected
-  exact ⟨isCommMonObj_of_pull h, MorphismProperty.of_isPullback_of_descendsAlong (P := @Smooth)
-      (Q := @Surjective ⊓ @Flat ⊓ @QuasiCompact) h.1.flip ⟨⟨inferInstance, inferInstance⟩, inferInstance⟩ hA.smooth,
-    GrpFlatDesc.isProper_of_isPullback h.1, GrpFlatDesc.geometricallyConnected_of_isPullback h.1⟩
+  exact ⟨
+    isCommMonObj_of_pull h,
+    MorphismProperty.of_isPullback_of_descendsAlong (P := @Smooth)
+      (Q := @Surjective ⊓ @Flat ⊓ @QuasiCompact) h.1.flip
+      ⟨⟨inferInstance, inferInstance⟩, inferInstance⟩ hA.smooth,
+    GrpFlatDesc.isProper_of_isPullback h.1,
+    GrpFlatDesc.geometricallyConnected_of_isPullback h.1
+  ⟩
 
-theorem inv_left_comp (h : IsGrpPullback A' A f φ) :
-    (GrpObj.inv : A' ⟶ A').left ≫ φ = φ ≫ (GrpObj.inv : A ⟶ A).left := by
+theorem inv_left_comp (h : IsGrpPullback A' A f φ)
+    : (GrpObj.inv : A' ⟶ A').left ≫ φ = φ ≫ (GrpObj.inv : A ⟶ A).left := by
   have e := congrArg (fun q => q.left) (map_inv (pushHom h A') (𝟙 A'))
   simp only [Hom.inv_def, Category.id_comp] at e
   exact e.trans (congrArg (· ≫ _) (Category.id_comp φ))
 
-theorem exists_gen_pull_of_sym (hG : Out.GlobalFnsSt) (h : IsGrpPullback A' A f φ) (hA : IsAbelianScheme A')
-    {L : LB A.left} {L' : LB A'.left} (hL : L.IsLB) (hL' : L'.IsLB) (hw : LBIso L' (L.pull φ)) (hS : Out.Sym A' L')
-    {Y : Scheme.{0}} (r : Y ⟶ A'.left) :
-    ∃ t : ((LB.LinComb L (K := Fin 2) ![(GrpObj.inv : A ⟶ A).left, 𝟙 _] ![1, -1]).pull (r ≫ φ)).Gen, t.IsGen := by
+theorem exists_gen_pull_of_sym
+    (hG : Out.GlobalFnsSt) (h : IsGrpPullback A' A f φ) (hA : IsAbelianScheme A')
+    {L : LB A.left} {L' : LB A'.left}
+    (hL : L.IsLB) (hL' : L'.IsLB) (hw : LBIso L' (L.pull φ)) (hS : Out.Sym A' L')
+    {Y : Scheme.{0}} (r : Y ⟶ A'.left)
+    : ∃ t
+        : ((LB.LinComb L (K := Fin 2) ![(GrpObj.inv : A ⟶ A).left, 𝟙 _] ![1, -1]).pull (r ≫ φ)).Gen,
+      t.IsGen := by
   obtain ⟨w, hw⟩ := hw
   obtain ⟨c, hc⟩ := exists_gen_neg_of_sym hG hA hL' hS
   let δ : Fin 2 → (A.left ⟶ A.left) := ![(GrpObj.inv : A ⟶ A).left, 𝟙 _]
@@ -81,16 +94,18 @@ theorem exists_gen_pull_of_sym (hG : Out.GlobalFnsSt) (h : IsGrpPullback A' A f 
   have hv := (Transport.invIso_spec hB hC v (DVR.linCombIso_isGen w hw ψ ε)).1
   obtain ⟨u, hu, -⟩ := Transport.exists_transport hC hB (Transport.invIso v) hv b hb
   let idx (j : D.ι) : C.ι := fun k _ => j PUnit.unit k
-  have le' (j : D.ι) : D.U j ≤ LB.wchart L (fun k => q ≫ δ k) (j PUnit.unit) :=
-    fun _ hy => Set.mem_iInter.2 fun k => Set.mem_iInter.1 (Set.mem_iInter.1 hy PUnit.unit) k
+  have le' (j : D.ι) : D.U j ≤ LB.wchart L (fun k => q ≫ δ k) (j PUnit.unit) := fun _ hy =>
+    Set.mem_iInter.2 fun k => Set.mem_iInter.1 (Set.mem_iInter.1 hy PUnit.unit) k
   have le (j : D.ι) : D.U j ≤ C.U (idx j) := by
     intro y hy
     refine Set.mem_iInter.2 fun k => Set.mem_iInter.2 fun _ => ?_
     change y ∈ (ψ k ≫ φ) ⁻¹ᵁ L.U (j PUnit.unit k)
     rw [e k]
     exact Set.mem_iInter.1 (le' j hy) k
-  have transition (i j : D.ι) : D.g i j =
-      res (le_inf (inf_le_left.trans (le i)) (inf_le_right.trans (le j))) (C.g (idx i) (idx j)) := by
+  have transition (i j : D.ι)
+      : D.g i j
+        = res (le_inf (inf_le_left.trans (le i)) (inf_le_right.trans (le j)))
+          (C.g (idx i) (idx j)) := by
     let leOverlap := le_inf (inf_le_left.trans (le' i)) (inf_le_right.trans (le' j))
     calc
       D.g i j = res leOverlap (L.lcg (fun k => q ≫ δ k) ε (i PUnit.unit) (j PUnit.unit)) := by
@@ -101,10 +116,13 @@ theorem exists_gen_pull_of_sym (hG : Out.GlobalFnsSt) (h : IsGrpPullback A' A f 
         change _ = res _ ((L.pull φ).lcg ψ ε (idx i) (idx j))
         erw [LB.res_lcg, LB.res_lcg]
         refine Finset.prod_congr rfl fun k _ => congrArg (· ^ ε k) ?_
-        change _ = res _ (pullU (ψ k) _ (L.lcg (fun _ : PUnit => φ) (fun _ => 1) (idx i k) (idx j k)))
-        have pull_eq {a a' : Y ⟶ A.left} (ha : a = a') {U : A.left.Opens} {V : Y.Opens}
-            (hle : V ≤ a ⁻¹ᵁ U) (hle' : V ≤ a' ⁻¹ᵁ U) (x : Γ(A.left, U)ˣ) :
-            res hle (pullU a U x) = res hle' (pullU a' U x) := by
+        change _
+          = res _ (pullU (ψ k) _ (L.lcg (fun _ : PUnit => φ) (fun _ => 1) (idx i k) (idx j k)))
+        have pull_eq
+            {a a' : Y ⟶ A.left} (ha : a = a')
+            {U : A.left.Opens} {V : Y.Opens}
+            (hle : V ≤ a ⁻¹ᵁ U) (hle' : V ≤ a' ⁻¹ᵁ U) (x : Γ(A.left, U)ˣ)
+            : res hle (pullU a U x) = res hle' (pullU a' U x) := by
           subst a'
           rfl
         erw [LB.lcg_pull, LB.pull_res_comp]
@@ -112,21 +130,35 @@ theorem exists_gen_pull_of_sym (hG : Out.GlobalFnsSt) (h : IsGrpPullback A' A f 
         · rw [e k]
           exact leOverlap.trans (LB.wchart_inter_le L _ _ _ k)
   refine ⟨⟨fun j => res (le j) (u.s (idx j))⟩, fun i j => ?_⟩
-  change res inf_le_left (res (le i) (u.s (idx i))) =
-    D.g i j * res inf_le_right (res (le j) (u.s (idx j)))
-  have eq := congrArg (res (le_inf (inf_le_left.trans (le i)) (inf_le_right.trans (le j)))) (hu (idx i) (idx j))
+  change res inf_le_left (res (le i) (u.s (idx i)))
+    = D.g i j * res inf_le_right (res (le j) (u.s (idx j)))
+  have eq :=
+    congrArg (res (le_inf (inf_le_left.trans (le i)) (inf_le_right.trans (le j))))
+      (hu (idx i) (idx j))
   rw [transition]
   simpa only [map_mul, LB.res_res] using eq
 
-theorem polarisation_of_faithfullyFlat : Out.Laws → ∀ (R₀ R : Type) [CommRing R₀] [IsDomain R₀] [IsLocalRing R₀] [IsPrincipalIdealRing R₀] [CommRing R] [IsNoetherianRing R] [Algebra R₀ R] [Module.FaithfullyFlat R₀ R] (P : Out.PolAV (Sp R)) (A₀ : Over (Sp R₀)) [GrpObj A₀] [Flat A₀.hom] (L₀ : LB A₀.left) (π : P.A.left ⟶ A₀.left), IsProjBy A₀.hom → L₀.IsLB → IsGrpPullback P.A A₀ (spMap (algebraMap R₀ R)) π → LBIso P.L (L₀.pull π) → IsAbelianScheme A₀ ∧ SmoothOfRelativeDimension P.g A₀.hom ∧ Out.Rigidified A₀ L₀ ∧ Out.Sym A₀ L₀ ∧ Out.RelAmple A₀ L₀ ∧ Out.KTriv A₀ L₀ := by
+theorem polarisation_of_faithfullyFlat
+    : Out.Laws
+      → ∀ (R₀ R : Type) [CommRing R₀] [IsDomain R₀] [IsLocalRing R₀] [IsPrincipalIdealRing R₀]
+          [CommRing R] [IsNoetherianRing R] [Algebra R₀ R] [Module.FaithfullyFlat R₀ R]
+          (P : Out.PolAV (Sp R)) (A₀ : Over (Sp R₀)) [GrpObj A₀] [Flat A₀.hom] (L₀ : LB A₀.left)
+          (π : P.A.left ⟶ A₀.left),
+        IsProjBy A₀.hom → L₀.IsLB → IsGrpPullback P.A A₀ (spMap (algebraMap R₀ R)) π
+          → LBIso P.L (L₀.pull π)
+          → IsAbelianScheme A₀ ∧ SmoothOfRelativeDimension P.g A₀.hom ∧ Out.Rigidified A₀ L₀
+            ∧ Out.Sym A₀ L₀ ∧ Out.RelAmple A₀ L₀ ∧ Out.KTriv A₀ L₀ := by
   intro hL R₀ R _ _ _ _ _ _ _ _ P A₀ _ _ L₀ π _ hL₀ h hw
-  have : Flat (spMap (algebraMap R₀ R)) := Flat.SpecMap_iff.2 (RingHom.flat_algebraMap_iff.2 inferInstance)
+  have : Flat (spMap (algebraMap R₀ R)) :=
+    Flat.SpecMap_iff.2 (RingHom.flat_algebraMap_iff.2 inferInstance)
   have : Surjective (spMap (algebraMap R₀ R)) := ⟨PrimeSpectrum.comap_surjective_of_faithfullyFlat⟩
   have hA : IsAbelianScheme A₀ := isAbelianScheme_of_pull h P.isAb
   have := hA.smooth
   have := hA.proper
   have := P.isAb.proper
-  have := forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ A₀.hom hA.smooth hA.geomConnected
+  have :=
+    forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ A₀.hom hA.smooth
+      hA.geomConnected
   have : CompactSpace A₀.left := QuasiCompact.compactSpace_of_compactSpace A₀.hom
   have : QuasiSeparatedSpace A₀.left := quasiSeparatedSpace_of_quasiSeparated A₀.hom
   obtain ⟨q, hq⟩ := PrimeSpectrum.comap_surjective_of_faithfullyFlat (A := R₀) (B := R) ⊥
@@ -139,20 +171,31 @@ theorem polarisation_of_faithfullyFlat : Out.Laws → ∀ (R₀ R : Type) [CommR
     rw [show spMap (β.comp (algebraMap R₀ R)) = spMap β ≫ spMap (algebraMap R₀ R) from
       Spec.map_comp (CommRingCat.ofHom (algebraMap R₀ R)) (CommRingCat.ofHom β)]
     exact (IsPullback.of_hasPullback P.A.hom (spMap β)).paste_horiz h.1
-  refine ⟨hA, ?_, DVR.exists_gen_of_local L₀ hL₀ _ _, ?_, ?_, AmpleDescent.kTriv_of_pull h hL₀ P.isLB hw P.ktriv⟩
+  refine ⟨
+    hA,
+    ?_,
+    DVR.exists_gen_of_local L₀ hL₀ _ _,
+    ?_,
+    ?_,
+    AmpleDescent.kTriv_of_pull h hL₀ P.isLB hw P.ktriv
+  ⟩
   · exact CM.smoothOfRelativeDimension_of_fibre R₀ _ _ A₀ _ _ _ P.g hA H
       ((smoothOfRelativeDimension_isStableUnderBaseChange P.g).of_isPullback
         (IsPullback.of_hasPullback P.A.hom (spMap β)) P.smoothDim)
   · have hN := DVR.linComb_isLB L₀ hL₀ (K := Fin 2) ![(GrpObj.inv : A₀ ⟶ A₀).left, 𝟙 _] ![1, -1]
-    obtain ⟨ρ, hρ⟩ := DVR.exists_gen_of_local (V := R₀) _ hN (K := PUnit) (fun _ => eSec A₀) (fun _ => 1)
-    obtain ⟨t, ht⟩ := exists_gen_pull_of_sym hL.globalFns h P.isAb hL₀ P.isLB hw P.sym
-      (pullback.fst P.A.hom (spMap β))
-    obtain ⟨c, hc⟩ := GenericTriv.exists_gen_of_fibre _ hj A₀.hom (eSec A₀) (Over.w η[A₀]) _ _ H
-      (Out.TLinPf.const_pullback hL.globalFns (spMap β) P.A P.isAb) hN ρ hρ t ht
+    obtain ⟨ρ, hρ⟩ :=
+      DVR.exists_gen_of_local (V := R₀) _ hN (K := PUnit) (fun _ => eSec A₀) (fun _ => 1)
+    obtain ⟨t, ht⟩ :=
+      exists_gen_pull_of_sym hL.globalFns h P.isAb hL₀ P.isLB hw P.sym
+        (pullback.fst P.A.hom (spMap β))
+    obtain ⟨c, hc⟩ :=
+      GenericTriv.exists_gen_of_fibre _ hj A₀.hom (eSec A₀) (Over.w η[A₀]) _ _ H
+        (Out.TLinPf.const_pullback hL.globalFns (spMap β) P.A P.isAb) hN ρ hρ t ht
     intro s
     let i := (A₀.hom ⁻¹ᵁ ⊤).ι
-    have e : ![i ≫ (GrpObj.inv : A₀ ⟶ A₀).left, i] =
-        fun k : Fin 2 => i ≫ ![(GrpObj.inv : A₀ ⟶ A₀).left, 𝟙 _] k := by
+    have e
+        : ![i ≫ (GrpObj.inv : A₀ ⟶ A₀).left, i]
+          = fun k : Fin 2 => i ≫ ![(GrpObj.inv : A₀ ⟶ A₀).left, 𝟙 _] k := by
       funext k
       fin_cases k
       · rfl
@@ -163,7 +206,9 @@ theorem polarisation_of_faithfullyFlat : Out.Laws → ∀ (R₀ R : Type) [CommR
     exact ⟨_, DVR.pullGen_isGen L₀ _ _ c hc i⟩
   · have : Flat (Out.specOf (algebraMap R₀ R)) := ‹Flat (spMap (algebraMap R₀ R))›
     have : Surjective (Out.specOf (algebraMap R₀ R)) := ‹Surjective (spMap (algebraMap R₀ R))›
-    refine (relAmple_iff_isAmpleLB_of_isAffine A₀ hL₀).2 (AmpleDescent.isAmpleLB_of_pull _ h.1 hL₀ ?_)
-    exact (isAmpleLB_of_relAmple_of_isAffine P.A P.isLB P.ample).of_lbIso (LB.isLB_pull hL₀ π) hw.symm
+    refine (relAmple_iff_isAmpleLB_of_isAffine A₀ hL₀).2
+      (AmpleDescent.isAmpleLB_of_pull _ h.1 hL₀ ?_)
+    exact (isAmpleLB_of_relAmple_of_isAffine P.A P.isLB P.ample).of_lbIso (LB.isLB_pull hL₀ π)
+      hw.symm
 
 end GlobalTheory.PolFlatDescent

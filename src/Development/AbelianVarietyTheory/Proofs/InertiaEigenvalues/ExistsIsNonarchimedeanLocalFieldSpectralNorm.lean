@@ -8,11 +8,12 @@ open ValuativeRel
 
 namespace GlobalTheory
 
-theorem exists_isNonarchimedeanLocalField_spectralNorm :
-    ∀ (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [CompleteSpace F]
-      [LocallyCompactSpace F] (K : Type) [Field K] [Algebra F K] [FiniteDimensional F K],
-      ∃ (_ : ValuativeRel K) (_ : TopologicalSpace K), IsNonarchimedeanLocalField K ∧
-        ∀ x y : K, x ≤ᵥ y ↔ spectralNorm F K x ≤ spectralNorm F K y := by
+theorem exists_isNonarchimedeanLocalField_spectralNorm
+    : ∀ (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [CompleteSpace F]
+        [LocallyCompactSpace F] (K : Type) [Field K] [Algebra F K] [FiniteDimensional F K],
+      ∃ (_ : ValuativeRel K) (_ : TopologicalSpace K),
+        IsNonarchimedeanLocalField K
+          ∧ ∀ x y : K, x ≤ᵥ y ↔ spectralNorm F K x ≤ spectralNorm F K y := by
   intro F _ _ _ _ K _ _ _
   letI nK : NontriviallyNormedField K := spectralNorm.nontriviallyNormedField F K
   haveI : IsUltrametricDist K := IsUltrametricDist.isUltrametricDist_of_isNonarchimedean_norm

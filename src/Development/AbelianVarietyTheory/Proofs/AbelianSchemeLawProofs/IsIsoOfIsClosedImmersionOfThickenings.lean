@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.E
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -15,22 +17,23 @@ namespace GlobalTheory
 
 namespace ThickeningClosed
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.ThickeningClosed.ker_ideal_le_ker {X Z : Scheme.{0}} (ι : Z ⟶ X) {U : X.Opens}
-    (hU : IsAffineOpen U) {D : CommRingCat.{0}} (ψ : Γ(X, U) ⟶ D) (l : Spec D ⟶ Z)
-    (hl : l ≫ ι = Spec.map ψ ≫ hU.fromSpec) :
-    ι.ker.ideal ⟨U, hU⟩ ≤ RingHom.ker ψ.hom := by
+theorem _root_.GlobalTheory.ThickeningClosed.ker_ideal_le_ker
+    {X Z : Scheme.{0}} (ι : Z ⟶ X)
+    {U : X.Opens} (hU : IsAffineOpen U)
+    {D : CommRingCat.{0}} (ψ : Γ(X, U) ⟶ D) (l : Spec D ⟶ Z) (hl : l ≫ ι = Spec.map ψ ≫ hU.fromSpec)
+    : ι.ker.ideal ⟨U, hU⟩ ≤ RingHom.ker ψ.hom := by
   intro a ha
   have h0 : ι.app U a = 0 := ι.ideal_ker_le ⟨U, hU⟩ ha
   have e : (⊤ : (Spec D).Opens) ≤ (l ≫ ι) ⁻¹ᵁ U := by
     rw [hl, Scheme.Hom.comp_preimage, hU.fromSpec_preimage_self]; simp
-  have h1 : (l ≫ ι).appLE U ⊤ e a = 0 := by
-    rw [Scheme.Hom.comp_appLE]; simp [h0]
-  have h2 : ∀ (g) (_ : g = Spec.map ψ ≫ hU.fromSpec) (e : (⊤ : (Spec D).Opens) ≤ g ⁻¹ᵁ U),
-      g.appLE U ⊤ e = ψ ≫ (Scheme.ΓSpecIso D).inv := by
+  have h1 : (l ≫ ι).appLE U ⊤ e a = 0 := by rw [Scheme.Hom.comp_appLE]; simp [h0]
+  have h2
+      : ∀ (g) (_ : g = Spec.map ψ ≫ hU.fromSpec) (e : (⊤ : (Spec D).Opens) ≤ g ⁻¹ᵁ U),
+        g.appLE U ⊤ e = ψ ≫ (Scheme.ΓSpecIso D).inv := by
     rintro g rfl e
     rw [Scheme.Hom.comp_appLE, IsAffineOpen.fromSpec_app_self, Category.assoc]
     erw [Scheme.Hom.map_appLE]
@@ -46,22 +49,26 @@ theorem _root_.GlobalTheory.ThickeningClosed.ker_ideal_le_ker {X Z : Scheme.{0}}
 def zeroLocusOpen {X : Scheme.{0}} (K : X.IdealSheafData) : Set X :=
   {x | ∃ V : X.affineOpens, x ∈ V.1 ∧ K.ideal V = ⊥}
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.ThickeningClosed.isOpen_zeroLocusOpen {X : Scheme.{0}} (K : X.IdealSheafData) :
-    IsOpen (_root_.GlobalTheory.ThickeningClosed.zeroLocusOpen K) := by
+theorem _root_.GlobalTheory.ThickeningClosed.isOpen_zeroLocusOpen
+    {X : Scheme.{0}} (K : X.IdealSheafData)
+    : IsOpen (_root_.GlobalTheory.ThickeningClosed.zeroLocusOpen K) := by
   rw [isOpen_iff_forall_mem_open]
   rintro x ⟨V, hxV, hV⟩
   exact ⟨V.1, fun y hy ↦ ⟨V, hy, hV⟩, V.1.2, hxV⟩
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.ThickeningClosed.exists_mul_eq_zero_of_mem {X : Scheme.{0}} (K : X.IdealSheafData)
-    (U : X.affineOpens) (q : PrimeSpectrum Γ(X, U))
-    (hq : U.2.fromSpec q ∈ _root_.GlobalTheory.ThickeningClosed.zeroLocusOpen K) {a : Γ(X, U)}
-    (ha : a ∈ K.ideal U) : ∃ s ∉ q.asIdeal, s * a = 0 := by
+theorem _root_.GlobalTheory.ThickeningClosed.exists_mul_eq_zero_of_mem
+    {X : Scheme.{0}} (K : X.IdealSheafData) (U : X.affineOpens) (q : PrimeSpectrum Γ(X, U))
+    (hq : U.2.fromSpec q ∈ _root_.GlobalTheory.ThickeningClosed.zeroLocusOpen K)
+    {a : Γ(X, U)} (ha : a ∈ K.ideal U)
+    : ∃ s ∉ q.asIdeal, s * a = 0 := by
   have hq' : ∃ V : X.affineOpens, U.2.fromSpec q ∈ V.1 ∧ K.ideal V = ⊥ := hq
   obtain ⟨V, hyV, hV⟩ := hq'
   have hyU : U.2.fromSpec q ∈ U.1 := by
@@ -81,14 +88,20 @@ theorem _root_.GlobalTheory.ThickeningClosed.exists_mul_eq_zero_of_mem {X : Sche
   obtain ⟨⟨m, n, rfl⟩, hm⟩ := (IsLocalization.map_eq_zero_iff (Submonoid.powers f) _ a).mp h0
   exact ⟨f ^ n, fun h ↦ hfq (q.2.mem_of_pow_mem n h), hm⟩
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.ThickeningClosed.mem_of_thickenings {R : Type} [CommRing R] (I : Ideal R)
-    {X Z : Scheme.{0}} [IsLocallyNoetherian X] (f : X ⟶ Spec (CommRingCat.of R)) (ι : Z ⟶ X)
-    (h : ∀ n : ℕ, ∃ l : pullback f (_root_.ReciprocityTheory.ChartRestriction.G.Out.thick R I n) ⟶ Z, l ≫ ι = pullback.fst f (_root_.ReciprocityTheory.ChartRestriction.G.Out.thick R I n))
-    (x : X) (hx : I ≤ (f x).asIdeal) : x ∈ _root_.GlobalTheory.ThickeningClosed.zeroLocusOpen ι.ker := by
+theorem _root_.GlobalTheory.ThickeningClosed.mem_of_thickenings
+    {R : Type} [CommRing R]
+    (I : Ideal R)
+    {X Z : Scheme.{0}} [IsLocallyNoetherian X]
+    (f : X ⟶ Spec (CommRingCat.of R)) (ι : Z ⟶ X)
+    (h
+      : ∀ n : ℕ, ∃ l : pullback f (_root_.ReciprocityTheory.ChartRestriction.G.Out.thick R I n) ⟶ Z,
+        l ≫ ι = pullback.fst f (_root_.ReciprocityTheory.ChartRestriction.G.Out.thick R I n))
+    (x : X) (hx : I ≤ (f x).asIdeal)
+    : x ∈ _root_.GlobalTheory.ThickeningClosed.zeroLocusOpen ι.ker := by
   obtain ⟨_, ⟨V, hV, rfl⟩, hxV, -⟩ :=
     (X.isBasis_affineOpens).exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
   haveI : IsNoetherianRing Γ(X, V) := IsLocallyNoetherian.component_noetherian ⟨V, hV⟩
@@ -104,12 +117,14 @@ theorem _root_.GlobalTheory.ThickeningClosed.mem_of_thickenings {R : Type} [Comm
       CommRingCat.ofHom (Ideal.Quotient.mk _)
     let τ : CommRingCat.of (R ⧸ I ^ (n + 1)) ⟶ CommRingCat.of (Γ(X, V) ⧸ J ^ (n + 1)) :=
       CommRingCat.ofHom (Ideal.quotientMap _ φ.hom hle)
-    have hcomm : φ ≫ ψ = CommRingCat.ofHom (Ideal.Quotient.mk _) ≫ τ := by
-      ext r; rfl
-    have hsq : (Spec.map ψ ≫ hV.fromSpec) ≫ f = Spec.map τ ≫ _root_.ReciprocityTheory.ChartRestriction.G.Out.thick R I n := by
+    have hcomm : φ ≫ ψ = CommRingCat.ofHom (Ideal.Quotient.mk _) ≫ τ := by ext r; rfl
+    have hsq
+        : (Spec.map ψ ≫ hV.fromSpec) ≫ f
+          = Spec.map τ ≫ _root_.ReciprocityTheory.ChartRestriction.G.Out.thick R I n := by
       rw [Category.assoc, ← hφ', ← Spec.map_comp, hcomm, Spec.map_comp]
-    have := _root_.GlobalTheory.ThickeningClosed.ker_ideal_le_ker ι hV ψ (pullback.lift _ _ hsq ≫ l)
-      (by rw [Category.assoc, hl, pullback.lift_fst])
+    have :=
+      _root_.GlobalTheory.ThickeningClosed.ker_ideal_le_ker ι hV ψ (pullback.lift _ _ hsq ≫ l)
+        (by rw [Category.assoc, hl, pullback.lift_fst])
     simpa [ψ, Ideal.mk_ker] using this
   set p := hV.primeIdealOf ⟨x, hxV⟩ with hp
   have hpx : hV.fromSpec p = x := hV.fromSpec_primeIdealOf ⟨x, hxV⟩
@@ -130,8 +145,9 @@ theorem _root_.GlobalTheory.ThickeningClosed.mem_of_thickenings {R : Type} [Comm
     refine ⟨g, fun hg ↦ p.2.ne_top ((Ideal.eq_top_iff_one _).mpr ?_), hga⟩
     have : g - (g - 1) ∈ p.asIdeal := Ideal.sub_mem _ hg (hJp hg1)
     simpa using this
-  have hfin : ∀ t : Finset Γ(X, V), (↑t : Set Γ(X, V)) ⊆ ι.ker.ideal ⟨V, hV⟩ →
-      ∃ g ∉ p.asIdeal, ∀ a ∈ t, g * a = 0 := by
+  have hfin
+      : ∀ t : Finset Γ(X, V),
+        (↑t : Set Γ(X, V)) ⊆ ι.ker.ideal ⟨V, hV⟩ → ∃ g ∉ p.asIdeal, ∀ a ∈ t, g * a = 0 := by
     classical
     intro t
     induction t using Finset.induction_on with
@@ -152,15 +168,20 @@ theorem _root_.GlobalTheory.ThickeningClosed.mem_of_thickenings {R : Type} [Comm
   have hgK : ∀ a ∈ ι.ker.ideal ⟨V, hV⟩, g * a = 0 := by
     intro a ha
     rw [← ht] at ha
-    refine Submodule.span_induction (fun b hb ↦ hgt b hb) (by simp) (fun b c _ _ hb hc ↦ ?_)
-      (fun r b _ hb ↦ ?_) ha
+    refine Submodule.span_induction
+      (fun b hb ↦ hgt b hb)
+      (by simp)
+      (fun b c _ _ hb hc ↦ ?_)
+      (fun r b _ hb ↦ ?_)
+      ha
     · rw [mul_add, hb, hc, add_zero]
     · rw [smul_eq_mul, mul_left_comm, hb, mul_zero]
   show ∃ V : X.affineOpens, x ∈ V.1 ∧ ι.ker.ideal V = ⊥
   refine ⟨X.affineBasicOpen (U := ⟨V, hV⟩) g, ?_, ?_⟩
   · have hmem : p ∈ hV.fromSpec ⁻¹ᵁ X.basicOpen g := by
       rw [hV.fromSpec_preimage_basicOpen]; exact hg
-    rw [← hpx]; exact hmem
+    rw [← hpx]
+    exact hmem
   · have := hV.isLocalization_basicOpen g
     rw [← ι.ker.map_ideal_basicOpen ⟨V, hV⟩ g]
     refine (Ideal.map_eq_bot_iff_le_ker _).mpr fun a ha ↦ ?_
@@ -171,21 +192,25 @@ theorem _root_.GlobalTheory.ThickeningClosed.mem_of_thickenings {R : Type} [Comm
     rw [map_mul, map_zero] at h0
     exact (hu.mul_right_eq_zero).mp h0
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.ThickeningClosed.noZeroDivisors_fiber {R C : Type} [CommRing R] [CommRing C]
-    [Algebra R C] {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of R))
-    (j : Spec (CommRingCat.of C) ⟶ X) [IsOpenImmersion j]
+theorem _root_.GlobalTheory.ThickeningClosed.noZeroDivisors_fiber
+    {R C : Type} [CommRing R] [CommRing C] [Algebra R C]
+    {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of R)) (j : Spec (CommRingCat.of C) ⟶ X)
+    [IsOpenImmersion j]
     (hj : Spec.map (CommRingCat.ofHom (algebraMap R C)) = j ≫ f)
-    (p : PrimeSpectrum R) [IsIntegral (f.fiber p)] : NoZeroDivisors (p.asIdeal.Fiber C) := by
+    (p : PrimeSpectrum R) [IsIntegral (f.fiber p)]
+    : NoZeroDivisors (p.asIdeal.Fiber C) := by
   rcases subsingleton_or_nontrivial (p.asIdeal.Fiber C) with hs | hn
   · exact ⟨fun {a b} _ ↦ Or.inl (Subsingleton.elim a 0)⟩
   let e := Spec.fiberToSpecResidueFieldIso R C p
   let s := (Spec (CommRingCat.of R)).fromSpecResidueField p
-  let u₁ : Spec (CommRingCat.of (p.asIdeal.Fiber C)) ⟶
-      pullback (Spec.map (CommRingCat.ofHom (algebraMap R C))) s := (Arrow.leftFunc.mapIso e).inv
+  let u₁
+      : Spec (CommRingCat.of (p.asIdeal.Fiber C))
+        ⟶ pullback (Spec.map (CommRingCat.ofHom (algebraMap R C))) s :=
+    (Arrow.leftFunc.mapIso e).inv
   let u₂ : pullback (Spec.map (CommRingCat.ofHom (algebraMap R C))) s ⟶ pullback (j ≫ f) s :=
     (pullback.congrHom hj rfl).hom
   let u₃ : pullback (j ≫ f) s ⟶ pullback j (pullback.fst f s) :=
@@ -203,22 +228,27 @@ theorem _root_.GlobalTheory.ThickeningClosed.noZeroDivisors_fiber {R C : Type} [
 
 end ThickeningClosed
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.isIso_of_isClosedImmersion_of_thickenings :
-    ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal R), I ≤ Ideal.jacobson ⊥ →
-      ∀ (H : Over (Spec (CommRingCat.of R))) [Flat H.hom] [LocallyOfFiniteType H.hom]
-        (_e : 𝟙_ _ ⟶ H), (∀ p, IsIntegral (H.hom.fiber p)) →
-        ∀ (Z : Scheme.{0}) (ι : Z ⟶ H.left) [IsClosedImmersion ι],
-          (∀ n : ℕ, ∃ l : (_root_.ReciprocityTheory.ChartRestriction.G.Out.thickObj R I n H).left ⟶ Z, l ≫ ι = (_root_.ReciprocityTheory.ChartRestriction.G.Out.fstG I n H).left) →
-            IsIso ι := by
+theorem _root_.GlobalTheory.isIso_of_isClosedImmersion_of_thickenings
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal R),
+      I ≤ Ideal.jacobson ⊥
+        → ∀ (H : Over (Spec (CommRingCat.of R))) [Flat H.hom] [LocallyOfFiniteType H.hom]
+            (_e : 𝟙_ _ ⟶ H),
+          (∀ p, IsIntegral (H.hom.fiber p))
+            → ∀ (Z : Scheme.{0}) (ι : Z ⟶ H.left) [IsClosedImmersion ι],
+              (∀ n : ℕ,
+                  ∃ l : (_root_.ReciprocityTheory.ChartRestriction.G.Out.thickObj R I n H).left ⟶ Z,
+                    l ≫ ι = (_root_.ReciprocityTheory.ChartRestriction.G.Out.fstG I n H).left)
+                → IsIso ι := by
   intro R _ _ I hI H _ _ e hfib Z ι _ hth
   rw [IsClosedImmersion.isIso_iff_ker_eq_bot]
-  have hpre : ∀ U : H.left.affineOpens,
-      Spec.map (Spec.preimage (U.2.fromSpec ≫ H.hom)) = U.2.fromSpec ≫ H.hom :=
-    fun U ↦ Spec.map_preimage _
+  have hpre
+      : ∀ U : H.left.affineOpens,
+        Spec.map (Spec.preimage (U.2.fromSpec ≫ H.hom)) = U.2.fromSpec ≫ H.hom := fun U ↦
+    Spec.map_preimage _
   have hft : ∀ U : H.left.affineOpens, (Spec.preimage (U.2.fromSpec ≫ H.hom)).hom.FiniteType := by
     intro U
     haveI := U.2.isOpenImmersion_fromSpec
@@ -228,7 +258,8 @@ theorem _root_.GlobalTheory.isIso_of_isClosedImmersion_of_thickenings :
   have hfl : ∀ U : H.left.affineOpens, (Spec.preimage (U.2.fromSpec ≫ H.hom)).hom.Flat := by
     intro U
     haveI := U.2.isOpenImmersion_fromSpec
-    rw [← Flat.SpecMap_iff, hpre]; infer_instance
+    rw [← Flat.SpecMap_iff, hpre]
+    infer_instance
   haveI : IsLocallyNoetherian H.left := ⟨fun U ↦ by
     letI := (Spec.preimage (U.2.fromSpec ≫ H.hom)).hom.toAlgebra
     haveI : Algebra.FiniteType R Γ(H.left, U) := hft U
@@ -242,8 +273,10 @@ theorem _root_.GlobalTheory.isIso_of_isClosedImmersion_of_thickenings :
     intro U q
     have : U.2.fromSpec q ∈ Set.range U.2.fromSpec := ⟨q, rfl⟩
     rwa [U.2.range_fromSpec] at this
-  refine Scheme.IdealSheafData.ext_of_iSup_eq_top (fun U : H.left.affineOpens ↦ U)
-    (iSup_affineOpens_eq_top _) fun U ↦ ?_
+  refine Scheme.IdealSheafData.ext_of_iSup_eq_top
+    (fun U : H.left.affineOpens ↦ U)
+    (iSup_affineOpens_eq_top _)
+    fun U ↦ ?_
   refine eq_bot_iff.mpr fun a ha ↦ ?_
   show a = 0
   letI : Algebra R Γ(H.left, U) := (Spec.preimage (U.2.fromSpec ≫ H.hom)).hom.toAlgebra
@@ -252,20 +285,23 @@ theorem _root_.GlobalTheory.isIso_of_isClosedImmersion_of_thickenings :
   haveI := U.2.isOpenImmersion_fromSpec
   have hj : Spec.map (CommRingCat.ofHom (algebraMap R Γ(H.left, U))) = U.2.fromSpec ≫ H.hom :=
     hpre U
-  have hpt : ∀ q : PrimeSpectrum Γ(H.left, U),
-      Ideal.under R q.asIdeal = (H.hom (U.2.fromSpec q)).asIdeal := by
+  have hpt
+      : ∀ q : PrimeSpectrum Γ(H.left, U),
+        Ideal.under R q.asIdeal = (H.hom (U.2.fromSpec q)).asIdeal := by
     intro q
     have : Spec.map (CommRingCat.ofHom (algebraMap R Γ(H.left, U))) q = H.hom (U.2.fromSpec q) := by
       rw [hj]; rfl
-    rw [← this]; rfl
+    rw [← this]
+    rfl
   refine _root_.GlobalTheory.eq_zero_of_flat_of_forall_fiber (A := R) (B := Γ(H.left, U))
     (L := Γ(H.left, U))
-    (fun p _ ↦ haveI := hfib p; _root_.GlobalTheory.ThickeningClosed.noZeroDivisors_fiber H.hom U.2.fromSpec hj p)
+    (fun p _ ↦
+      haveI := hfib p
+      _root_.GlobalTheory.ThickeningClosed.noZeroDivisors_fiber H.hom U.2.fromSpec hj p)
     (fun q _ ↦ ?_)
   obtain ⟨m, hm, hPm⟩ := Ideal.exists_le_maximal _ (H.hom (U.2.fromSpec q)).2.ne_top
   let M : Spec (CommRingCat.of R) := ⟨m, hm.isPrime⟩
-  have hIM : I ≤ (H.hom (e.left M)).asIdeal := by
-    rw [hsec]; exact hI.trans (sInf_le ⟨bot_le, hm⟩)
+  have hIM : I ≤ (H.hom (e.left M)).asIdeal := by rw [hsec]; exact hI.trans (sInf_le ⟨bot_le, hm⟩)
   have hy := _root_.GlobalTheory.ThickeningClosed.mem_of_thickenings I H.hom ι hth (e.left M) hIM
   have hPM : H.hom (U.2.fromSpec q) ⤳ H.hom (e.left M) := by
     rw [hsec]; exact (PrimeSpectrum.le_iff_specializes _ M).mp hPm
@@ -275,13 +311,15 @@ theorem _root_.GlobalTheory.isIso_of_isClosedImmersion_of_thickenings :
   have hirr : IsIrreducible (H.hom ⁻¹' {H.hom (U.2.fromSpec q)}) := by
     rw [← Scheme.Hom.range_fiberι, ← Set.image_univ]
     exact (IrreducibleSpace.isIrreducible_univ _).image _ (H.hom.fiberι _).continuous.continuousOn
-  obtain ⟨z, hzP, hzZ, hzU⟩ := hirr.2 _ _ (_root_.GlobalTheory.ThickeningClosed.isOpen_zeroLocusOpen _) U.1.isOpen
-    ⟨y', hy'P, hy'Z⟩ ⟨U.2.fromSpec q, rfl, hqU U q⟩
+  obtain ⟨z, hzP, hzZ, hzU⟩ :=
+    hirr.2 _ _ (_root_.GlobalTheory.ThickeningClosed.isOpen_zeroLocusOpen _) U.1.isOpen
+      ⟨y', hy'P, hy'Z⟩ ⟨U.2.fromSpec q, rfl, hqU U q⟩
   have hq'z : U.2.fromSpec (U.2.primeIdealOf ⟨z, hzU⟩) = z := U.2.fromSpec_primeIdealOf ⟨z, hzU⟩
   refine ⟨U.2.primeIdealOf ⟨z, hzU⟩, ?_, ?_⟩
   · rw [hpt, hpt, hq'z]
     exact congrArg PrimeSpectrum.asIdeal hzP
   · rw [_root_.GlobalTheory.localizedModule_mk_one_eq_zero_iff]
-    exact _root_.GlobalTheory.ThickeningClosed.exists_mul_eq_zero_of_mem ι.ker U _ (by rw [hq'z]; exact hzZ) ha
+    exact _root_.GlobalTheory.ThickeningClosed.exists_mul_eq_zero_of_mem ι.ker U _
+      (by rw [hq'z]; exact hzZ) ha
 
 end GlobalTheory

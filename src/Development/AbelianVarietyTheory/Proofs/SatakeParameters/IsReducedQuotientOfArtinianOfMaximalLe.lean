@@ -8,9 +8,11 @@ namespace GlobalTheory
 
 open scoped BigOperators
 
-theorem quotient_maximal_le_sq {A : Type} [CommRing A] (I : Ideal A)
-    (h : ∀ m : Ideal A, m.IsMaximal → I ≤ m → m ≤ I ⊔ m ^ 2)
-    (M : Ideal (A ⧸ I)) (hM : M.IsMaximal) : M ≤ M ^ 2 := by
+theorem quotient_maximal_le_sq
+    {A : Type} [CommRing A]
+    (I : Ideal A) (h : ∀ m : Ideal A, m.IsMaximal → I ≤ m → m ≤ I ⊔ m ^ 2) (M : Ideal (A ⧸ I))
+    (hM : M.IsMaximal)
+    : M ≤ M ^ 2 := by
   have hsurj : Function.Surjective (Ideal.Quotient.mk I) := Ideal.Quotient.mk_surjective
   set m := M.comap (Ideal.Quotient.mk I) with hm
   have hmax : m.IsMaximal := Ideal.comap_isMaximal_of_surjective _ hsurj
@@ -18,22 +20,24 @@ theorem quotient_maximal_le_sq {A : Type} [CommRing A] (I : Ideal A)
     intro x hx
     simp [hm, Ideal.Quotient.eq_zero_iff_mem.mpr hx]
   have key := Ideal.map_mono (f := Ideal.Quotient.mk I) (h m hmax hIm)
-  rw [Ideal.map_sup, Ideal.map_pow, Ideal.map_quotient_self, bot_sup_eq,
-    hm, Ideal.map_comap_of_surjective _ hsurj] at key
+  rw [Ideal.map_sup, Ideal.map_pow, Ideal.map_quotient_self, bot_sup_eq, hm,
+      Ideal.map_comap_of_surjective _ hsurj]
+    at key
   exact key
 
-theorem pow_eq_self_of_le_sq {R : Type} [CommRing R] (M : Ideal R) (h : M ≤ M ^ 2) :
-    ∀ k : ℕ, M ^ (k + 1) = M := by
-  have h2 : M * M = M := by
-    rw [← sq]; exact le_antisymm (Ideal.pow_le_self two_ne_zero) h
+theorem pow_eq_self_of_le_sq {R : Type} [CommRing R] (M : Ideal R) (h : M ≤ M ^ 2)
+    : ∀ k : ℕ, M ^ (k + 1) = M := by
+  have h2 : M * M = M := by rw [← sq]; exact le_antisymm (Ideal.pow_le_self two_ne_zero) h
   intro k
   induction k with
   | zero => simp
   | succ k ih => rw [pow_succ, ih, h2]
 
-theorem isReduced_quotient_of_artinian_of_maximal_le (A : Type) [CommRing A] (I : Ideal A)
-    (hart : IsArtinianRing (A ⧸ I))
-    (h : ∀ m : Ideal A, m.IsMaximal → I ≤ m → m ≤ I ⊔ m ^ 2) : IsReduced (A ⧸ I) := by
+theorem isReduced_quotient_of_artinian_of_maximal_le
+    (A : Type) [CommRing A]
+    (I : Ideal A)
+    (hart : IsArtinianRing (A ⧸ I)) (h : ∀ m : Ideal A, m.IsMaximal → I ≤ m → m ≤ I ⊔ m ^ 2)
+    : IsReduced (A ⧸ I) := by
   classical
   set R := A ⧸ I
   haveI : Finite (MaximalSpectrum R) := inferInstance
@@ -55,8 +59,8 @@ theorem isReduced_quotient_of_artinian_of_maximal_le (A : Type) [CommRing A] (I 
     rw [Ideal.mem_jacobson_bot]
     intro y
     by_contra hu
-    obtain ⟨M, hMmax, hM⟩ := Ideal.exists_le_maximal (Ideal.span {x * y + 1})
-      (by rwa [Ne, Ideal.span_singleton_eq_top])
+    obtain ⟨M, hMmax, hM⟩ :=
+      Ideal.exists_le_maximal (Ideal.span {x * y + 1}) (by rwa [Ne, Ideal.span_singleton_eq_top])
     have hxM : x ∈ M := by
       have := (Submodule.mem_iInf _).mp hx ⟨M, hMmax⟩
       simpa using this
@@ -69,7 +73,9 @@ theorem isReduced_quotient_of_artinian_of_maximal_le (A : Type) [CommRing A] (I 
   have hJbot : J = ⊥ := by
     rw [← hpow n]
     refine le_bot_iff.mp ?_
-    calc J ^ (n + 1) ≤ (Ideal.jacobson ⊥) ^ (n + 1) := Ideal.pow_right_mono hJjac _
+    calc
+      J ^ (n + 1)
+        ≤ (Ideal.jacobson ⊥) ^ (n + 1) := Ideal.pow_right_mono hJjac _
       _ ≤ (Ideal.jacobson ⊥) ^ n := Ideal.pow_le_pow_right (Nat.le_succ n)
       _ = ⊥ := hn
   refine ⟨fun x hx => ?_⟩

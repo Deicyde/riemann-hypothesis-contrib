@@ -14,7 +14,9 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsLet
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.NLink
 
 noncomputable section
 
@@ -24,14 +26,16 @@ open Formalism.MainNotions.AdmissibleParameterJ
 
 variable {D : D7}
 
-theorem refl_refl (q : ℚ) : AdmissibleParameterJ.refl D (AdmissibleParameterJ.refl D q) = q := by unfold AdmissibleParameterJ.refl; ring
+theorem refl_refl (q : ℚ) : AdmissibleParameterJ.refl D (AdmissibleParameterJ.refl D q) = q := by
+  unfold AdmissibleParameterJ.refl; ring
 
 theorem refl_injective : Function.Injective (AdmissibleParameterJ.refl D) := fun a b h => by
   have := congrArg (AdmissibleParameterJ.refl D) h
   rwa [refl_refl, refl_refl] at this
 
 theorem ncard_reflS (S : Set ℚ) : (reflS D S).ncard = S.ncard :=
-  Set.ncard_preimage_of_injective_subset_range refl_injective (fun q _ => ⟨AdmissibleParameterJ.refl D q, refl_refl q⟩)
+  Set.ncard_preimage_of_injective_subset_range refl_injective
+    (fun q _ => ⟨AdmissibleParameterJ.refl D q, refl_refl q⟩)
 
 theorem finite_reflS {S : Set ℚ} (h : S.Finite) : (reflS D S).Finite :=
   Set.Finite.preimage (refl_injective.injOn) h
@@ -50,8 +54,8 @@ def intPart (S : Set ℚ) (h : S.Finite) : Finset ℤ :=
 theorem mem_intPart {S : Set ℚ} (h : S.Finite) (a : ℤ) : a ∈ intPart S h ↔ (a : ℚ) ∈ S := by
   simp [intPart]
 
-theorem card_intPart {S : Set ℚ} (h : S.Finite) (hS : ∀ q ∈ S, ∃ z : ℤ, q = z) :
-    (intPart S h).card = S.ncard := by
+theorem card_intPart {S : Set ℚ} (h : S.Finite) (hS : ∀ q ∈ S, ∃ z : ℤ, q = z)
+    : (intPart S h).card = S.ncard := by
   unfold intPart
   refine (Set.ncard_eq_toFinset_card _ _).symm.trans ?_
   exact Set.ncard_preimage_of_injective_subset_range Int.cast_injective
@@ -106,24 +110,29 @@ theorem mem_blockJ (a : ℤ) : (a : ℚ) ∈ blockJ D ↔ 0 ≤ a ∧ a < D.R.t 
 
 theorem mem_reflS_blockJ (a : ℤ) : (a : ℚ) ∈ reflS D (blockJ D) ↔ 0 ≤ a ∧ a < D.R.t := by
   show AdmissibleParameterJ.refl D (a : ℚ) ∈ blockJ D ↔ _
-  have e : AdmissibleParameterJ.refl D (a : ℚ) = (((D.R.t : ℤ) - 1 - a : ℤ) : ℚ) := by unfold AdmissibleParameterJ.refl; push_cast; ring
+  have e : AdmissibleParameterJ.refl D (a : ℚ) = (((D.R.t : ℤ) - 1 - a : ℤ) : ℚ) := by
+    unfold AdmissibleParameterJ.refl; push_cast; ring
   rw [e, mem_blockJ]
   omega
 
-theorem mem_JJ (up : Bool) (j : ℕ) (ρ : D.what₂.Tau) (a : ℤ) : (a : ℚ) ∈ JJ D up j ρ ↔
-    (a : ℚ) ∈ cloudT D up j ρ ∨ (a : ℚ) ∈ lowT D up j ρ ∨ (0 ≤ a ∧ a < D.R.t) := by
+theorem mem_JJ (up : Bool) (j : ℕ) (ρ : D.what₂.Tau) (a : ℤ)
+    : (a : ℚ) ∈ JJ D up j ρ
+      ↔ (a : ℚ) ∈ cloudT D up j ρ ∨ (a : ℚ) ∈ lowT D up j ρ ∨ (0 ≤ a ∧ a < D.R.t) := by
   cases up
   · rw [← mem_reflS_blockJ]
-    simp only [JJ, cloudT, lowT, Bool.false_eq_true, if_false, Jm, Jp, reflS, Set.mem_setOf_eq, Set.mem_union]
+    simp only [JJ, cloudT, lowT, Bool.false_eq_true, if_false, Jm, Jp, reflS, Set.mem_setOf_eq,
+      Set.mem_union]
     tauto
   · rw [← mem_blockJ]
     simp only [JJ, cloudT, lowT, if_true, Jp, Set.mem_union]
     tauto
 
-theorem sz_bounds (L : SizeData₂ D) (P : ParameterChoice' D L) (hP : AdmPar L) (j : ℕ) (hj1 : 1 ≤ j) (hj2 : j ≤ D.R.m)
-    (ρ : D.what₂.Tau) :
-    L.etaSz + D.R.t + 1 + ((D.R.t : ℝ) - 1) / 2 < (sz D j ρ : ℝ) ∧
-      (sz D j ρ : ℝ) ≤ L.sc.b + L.etaSz + 1 := by
+theorem sz_bounds
+    (L : SizeData₂ D) (P : ParameterChoice' D L) (hP : AdmPar L)
+    (j : ℕ) (hj1 : 1 ≤ j) (hj2 : j ≤ D.R.m)
+    (ρ : D.what₂.Tau)
+    : L.etaSz + D.R.t + 1 + ((D.R.t : ℝ) - 1) / 2 < (sz D j ρ : ℝ)
+      ∧ (sz D j ρ : ℝ) ≤ L.sc.b + L.etaSz + 1 := by
   have hw : Formalism.BasicNotions.wj D j ρ = (sz D j ρ : ℝ) := by
     unfold Formalism.BasicNotions.wj sz
     split_ifs <;> simp
@@ -134,8 +143,7 @@ theorem sz_bounds (L : SizeData₂ D) (P : ParameterChoice' D L) (hP : AdmPar L)
     unfold Scale.b' Scale.a Scale.X' Scale.b
     positivity
   have hb : 0 < L.sc.b := Real.exp_pos _
-  have hn : (1 : ℝ) ≤ (D.R.n : ℝ) := by
-    exact_mod_cast D.R.ord_pos
+  have hn : (1 : ℝ) ≤ (D.R.n : ℝ) := by exact_mod_cast D.R.ord_pos
   have hw''0 : 0 ≤ L.sc.w'' D.R.n := by
     unfold Scale.w''
     exact div_nonneg hb'.le (by positivity)
@@ -147,7 +155,9 @@ theorem sz_bounds (L : SizeData₂ D) (P : ParameterChoice' D L) (hP : AdmPar L)
   have hte : (D.R.t : ℝ) ≤ L.etaSz := hP.2.2.2
   have hmt := P.mteta
   have h2 : 2 * ((D.R.t : ℝ) + 1) * L.etaSz ≤ (D.R.m : ℝ) * ((D.R.t : ℝ) + 1) * L.etaSz := by
-    have := mul_le_mul_of_nonneg_right hm (mul_nonneg (by positivity) L.etaSz_pos.le : (0 : ℝ) ≤ ((D.R.t : ℝ) + 1) * L.etaSz)
+    have :=
+      mul_le_mul_of_nonneg_right hm
+        (mul_nonneg (by positivity) L.etaSz_pos.le : (0 : ℝ) ≤ ((D.R.t : ℝ) + 1) * L.etaSz)
     nlinarith
   have hbig : L.etaSz + D.R.t + 1 + ((D.R.t : ℝ) - 1) / 2 < L.sc.w'' D.R.n := by
     nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ 2 * D.R.t + 1) (by linarith : (0 : ℝ) ≤ L.etaSz - D.R.t)]
@@ -165,9 +175,11 @@ theorem sz_bounds (L : SizeData₂ D) (P : ParameterChoice' D L) (hP : AdmPar L)
     · obtain ⟨h1, h2⟩ := L.win_thin j hj1 hj2 ρ ⟨(D.eTau ρ).2, htop, hth⟩
       constructor <;> linarith
 
-theorem iotaQ_eq (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i))
-    (z : FractionRing (D.nd.O i)) :
-    D.naut.iotaQ i z = ((Br.toLLK (D.nbr i w hw) z : ↥(D.nbr i w hw).LL.1) : Qbar (D.nd.l i)) := by
+theorem iotaQ_eq
+    (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i))
+    (z : FractionRing (D.nd.O i))
+    : D.naut.iotaQ i z
+      = ((Br.toLLK (D.nbr i w hw) z : ↥(D.nbr i w hw).LL.1) : Qbar (D.nd.l i)) := by
   have h := (D.loc_tie i w hw).1
   have e : D.naut.iotaQ i = ((D.nbr i w hw).LL.1.val.toRingHom).comp (Br.toLLK (D.nbr i w hw)) := by
     apply IsLocalization.ringHom_ext (nonZeroDivisors (D.nd.O i))
@@ -177,12 +189,15 @@ theorem iotaQ_eq (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : w 
     exact h x
   exact DFunLike.congr_fun e z
 
-theorem typeU_of_emb (i : D.nd.Loc) {w : HeightOneSpectrum (𝓞 D.host.E)}
-    {hw : w ∈ placesOver D.host.E (D.nd.l i)} (C : TruncatedSeriesCountingIdentities.CoefExt D i w hw)
-    (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] ↥C.LL.1) (g : D.R.GG) (ρ : D.what₂.Tau)
-    (hR : ReadAt D i (gEmb C τ) g ρ) (e : Bool)
-    (τ₀ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nbr i w hw)
-    (h0 : EmbeddingTypeJumps.EmbTypeUe e τ₀) (hτ : ∀ x, τ x = C.inc (τ₀ x)) : TypeU D e g := by
+theorem typeU_of_emb
+    (i : D.nd.Loc)
+    {w : HeightOneSpectrum (𝓞 D.host.E)} {hw : w ∈ placesOver D.host.E (D.nd.l i)}
+    (C : TruncatedSeriesCountingIdentities.CoefExt D i w hw)
+    (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] ↥C.LL.1)
+    (g : D.R.GG) (ρ : D.what₂.Tau) (hR : ReadAt D i (gEmb C τ) g ρ)
+    (e : Bool) (τ₀ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nbr i w hw)
+    (h0 : EmbeddingTypeJumps.EmbTypeUe e τ₀) (hτ : ∀ x, τ x = C.inc (τ₀ x))
+    : TypeU D e g := by
   obtain ⟨g', key, hU⟩ := GlobalTheory.HTW.exists_letter_of_local_embedding D i w hw τ₀
   have hemb : ∀ x, D.host.emb g x = D.host.emb g' x := by
     intro x
@@ -190,10 +205,13 @@ theorem typeU_of_emb (i : D.nd.Loc) {w : HeightOneSpectrum (𝓞 D.host.E)}
     rw [← h1]
     show D.naut.iotaQC i ((C.LL.1.val.toRingHom) (τ (Br.cEw D.nbr i w hw x))) = _
     rw [hτ, key]
-    have e1 : (C.LL.1.val.toRingHom) (C.inc (Br.toLLK (D.nbr i w hw)
-        (D.nd.embK i (D.embE (D.host.sigmaOf g' x))))) =
-        ((Br.toLLK (D.nbr i w hw) (D.nd.embK i (D.embE (D.host.sigmaOf g' x))) :
-          ↥(D.nbr i w hw).LL.1) : Qbar (D.nd.l i)) := rfl
+    have e1
+        : (C.LL.1.val.toRingHom) (C.inc (Br.toLLK (D.nbr i w hw)
+            (D.nd.embK i (D.embE (D.host.sigmaOf g' x)))))
+          = ((Br.toLLK (D.nbr i w hw) (D.nd.embK i (D.embE (D.host.sigmaOf g' x)))
+              : ↥(D.nbr i w hw).LL.1)
+            : Qbar (D.nd.l i)) :=
+      rfl
     rw [e1, ← iotaQ_eq i w hw, D.naut.iota_LL]
     exact DFunLike.congr_fun D.embE_φ₀ (D.host.sigmaOf g' x)
   have hgg : g = g' := (factEmb D.R D.host).1.1 (RingHom.ext hemb)
@@ -205,10 +223,8 @@ theorem typeU_of_emb (i : D.nd.Loc) {w : HeightOneSpectrum (𝓞 D.host.E)}
     simp only [Bool.false_eq_true, iff_false]
     intro hgP
     have hm := ((factEmb D.R D.host).2 g).2 hgP
-    have hv := hφr (D.host.sqd)
-      (D.embE (D.host.sigmaOf g (D.host.sqd))) (key _).symm
-    have he2 : D.what₂.embLL (D.embE (D.host.sigmaOf g (D.host.sqd))) =
-        D.host.emb g (D.host.sqd) :=
+    have hv := hφr (D.host.sqd) (D.embE (D.host.sigmaOf g (D.host.sqd))) (key _).symm
+    have he2 : D.what₂.embLL (D.embE (D.host.sigmaOf g (D.host.sqd))) = D.host.emb g (D.host.sqd) :=
       DFunLike.congr_fun D.embE_φ₀ _
     rw [he2] at hv
     have hd : (0 : ℝ) < Real.sqrt (D.host.d : ℝ) := by
@@ -229,20 +245,22 @@ theorem jumpBlockCentreOffset_coe_real : ((c0 D : ℚ) : ℝ) = ((D.R.t : ℝ) -
   push_cast
   ring
 
-theorem key_sets (L : SizeData₂ D) (hJb : CloudCentreDistance L) (hJc : jcCondition L) (j : ℕ) (hj1 : 1 ≤ j) (hj2 : j ≤ D.R.m)
-    (ρ : D.what₂.Tau) (up : Bool)
-    (hlo : L.etaSz + D.R.t + 1 + ((D.R.t : ℝ) - 1) / 2 < (sz D j ρ : ℝ))
-    (hhi : (sz D j ρ : ℝ) ≤ L.sc.b + L.etaSz + 1) :
-    ∃ (s : ℤ) (Jc Jl : Finset ℤ),
-      L.etaSz + D.R.t + 1 < (s : ℝ) ∧ (s : ℝ) ≤ L.sc.b + L.etaSz + D.R.t + 1 ∧
-      Jc.card = D.R.k - 1 ∧ Jl.card = D.R.m ∧
-      (∀ a ∈ Jl,
-          ((-L.etaSz + ((D.R.t : ℝ) - 1) / 2 ≤ (a : ℝ) ∧ a ≤ -2) ∨
-            ((D.R.t : ℤ) + 1 ≤ a ∧ (a : ℝ) ≤ L.etaSz + ((D.R.t : ℝ) - 1) / 2)) ∧
-          ¬ (0 ≤ a ∧ a < D.R.t) ∧ a ≠ -1 ∧ a ≠ D.R.t) ∧
-      (up = true → ∀ a ∈ Jc, s ≤ a ∧ (a : ℝ) ≤ s + L.Sc) ∧
-      (up = false → ∀ a ∈ Jc, -((s : ℝ) + L.Sc) ≤ a ∧ a ≤ -s) ∧
-      ∀ a : ℤ, (a : ℚ) ∈ JJ D up j ρ ↔ a ∈ Jc ∨ a ∈ Jl ∨ (0 ≤ a ∧ a < D.R.t) := by
+theorem key_sets
+    (L : SizeData₂ D) (hJb : CloudCentreDistance L) (hJc : jcCondition L)
+    (j : ℕ) (hj1 : 1 ≤ j) (hj2 : j ≤ D.R.m)
+    (ρ : D.what₂.Tau)
+    (up : Bool) (hlo : L.etaSz + D.R.t + 1 + ((D.R.t : ℝ) - 1) / 2 < (sz D j ρ : ℝ))
+    (hhi : (sz D j ρ : ℝ) ≤ L.sc.b + L.etaSz + 1)
+    : ∃ (s : ℤ) (Jc Jl : Finset ℤ),
+      L.etaSz + D.R.t + 1 < (s : ℝ) ∧ (s : ℝ) ≤ L.sc.b + L.etaSz + D.R.t + 1 ∧ Jc.card = D.R.k - 1
+        ∧ Jl.card = D.R.m
+        ∧ (∀ a ∈ Jl,
+          ((-L.etaSz + ((D.R.t : ℝ) - 1) / 2 ≤ (a : ℝ) ∧ a ≤ -2)
+              ∨ ((D.R.t : ℤ) + 1 ≤ a ∧ (a : ℝ) ≤ L.etaSz + ((D.R.t : ℝ) - 1) / 2))
+            ∧ ¬(0 ≤ a ∧ a < D.R.t) ∧ a ≠ -1 ∧ a ≠ D.R.t)
+        ∧ (up = true → ∀ a ∈ Jc, s ≤ a ∧ (a : ℝ) ≤ s + L.Sc)
+        ∧ (up = false → ∀ a ∈ Jc, -((s : ℝ) + L.Sc) ≤ a ∧ a ≤ -s)
+        ∧ ∀ a : ℤ, (a : ℚ) ∈ JJ D up j ρ ↔ a ∈ Jc ∨ a ∈ Jl ∨ (0 ≤ a ∧ a < D.R.t) := by
   obtain ⟨hcl, -, -, hcard1, hcard2, -⟩ := hJb j hj1 hj2 ρ
   obtain ⟨hlows, -, -, -⟩ := hJc j hj1 hj2 ρ
   obtain ⟨zs, hzs⟩ := sz_int (D := D) j ρ
@@ -262,9 +280,19 @@ theorem key_sets (L : SizeData₂ D) (hJb : CloudCentreDistance L) (hJc : jcCond
   have hc0 := jumpBlockCentreOffset_coe_real (D := D)
   rw [hzR] at hlo hhi
   cases up
-  ·
-    refine ⟨zs - kc, intPart _ (finite_reflS (D := D) (cloudJ_finite j ρ)), intPart _ (finite_reflS (D := D) (lowJ_finite j ρ)),
-      ?_, ?_, ?_, ?_, ?_, fun h => absurd h (by simp), ?_, ?_⟩
+  · refine ⟨
+      zs - kc,
+      intPart _ (finite_reflS (D := D) (cloudJ_finite j ρ)),
+      intPart _ (finite_reflS (D := D) (lowJ_finite j ρ)),
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      fun h => absurd h (by simp),
+      ?_,
+      ?_
+    ⟩
     · push_cast; linarith
     · push_cast; linarith
     · rw [card_intPart _ (int_reflS (D := D) (cloudJ_int j ρ)), ncard_reflS (D := D), hcard1]
@@ -303,7 +331,9 @@ theorem key_sets (L : SizeData₂ D) (hJb : CloudCentreDistance L) (hJc : jcCond
       have hq := hcl _ ha
       have e : AdmissibleParameterJ.refl D (a : ℚ) = (D.R.t : ℚ) - 1 - a := rfl
       rw [e] at hq
-      have hcast : ((((D.R.t : ℚ) - 1 - a) - c0 D : ℚ) : ℝ) = (D.R.t : ℝ) - 1 - a - ((D.R.t : ℝ) - 1) / 2 := by
+      have hcast
+          : ((((D.R.t : ℚ) - 1 - a) - c0 D : ℚ) : ℝ)
+            = (D.R.t : ℝ) - 1 - a - ((D.R.t : ℝ) - 1) / 2 := by
         push_cast [hc0]; ring
       rw [hcast, hzR] at hq
       refine ⟨by push_cast; linarith, ?_⟩
@@ -312,8 +342,19 @@ theorem key_sets (L : SizeData₂ D) (hJb : CloudCentreDistance L) (hJc : jcCond
     · intro a
       rw [mem_JJ, mem_intPart, mem_intPart]
       rfl
-  · refine ⟨zs + kc, intPart _ (cloudJ_finite j ρ), intPart _ (lowJ_finite j ρ),
-      ?_, ?_, ?_, ?_, ?_, ?_, fun h => absurd h (by simp), ?_⟩
+  · refine ⟨
+      zs + kc,
+      intPart _ (cloudJ_finite j ρ),
+      intPart _ (lowJ_finite j ρ),
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      ?_,
+      fun h => absurd h (by simp),
+      ?_
+    ⟩
     · push_cast; linarith
     · push_cast; linarith
     · rw [card_intPart _ (cloudJ_int j ρ), hcard1]
@@ -344,6 +385,5 @@ theorem key_sets (L : SizeData₂ D) (hJb : CloudCentreDistance L) (hJc : jcCond
     · intro a
       rw [mem_JJ, mem_intPart, mem_intPart]
       rfl
-
 
 end GlobalTheory.HostJumpWin

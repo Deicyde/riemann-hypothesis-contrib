@@ -5,8 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal
+  GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
 open Formalism.MainNotions.SumRepresentations.At (sumRep)
 open GlobalTheory.TripleGal (rk1)
 open UpperTheory.V.Af (FrobEig algSat RepIso)
@@ -17,8 +20,7 @@ open GlobalTheory.BlockSum (blockRep)
 open PositivityTheory.AutomorphicGaloisHodgeTate.Div (DivWCoreLac SenWLac HTLac IsSSMat)
 open UpperTheory.Gal.Int.Div
 
-theorem UpperTheory.Gal.Int.Div.rootPin_of :
-    RootPin := by
+theorem UpperTheory.Gal.Int.Div.rootPin_of : RootPin := by
   intro p s m hp hdeg hdvd hprod hgen
   have hspl : p.Splits := IsAlgClosed.splits p
   have hq : rootPol s ^ m ≠ 0 := by
@@ -29,8 +31,7 @@ theorem UpperTheory.Gal.Int.Div.rootPin_of :
     rw [Polynomial.roots_pow]
     unfold rootPol
     rw [roots_multiset_prod_X_sub_C]
-  have hcard : p.roots.card = s.card := by
-    rw [splits_iff_card_roots.mp hspl, hdeg]
+  have hcard : p.roots.card = s.card := by rw [splits_iff_card_roots.mp hspl, hdeg]
   have hmem : ∀ x ∈ p.roots, x ∈ s := by
     intro x hx
     have := Multiset.mem_of_le hle hx

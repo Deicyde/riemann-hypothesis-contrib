@@ -10,26 +10,31 @@ namespace PI.WGL.XiU
 
 open Matrix
 
-theorem normSq_sum_eq {N : ℕ} (u : Fin N → ℂ) :
-    star u ⬝ᵥ u = ((∑ a, Complex.normSq (u a) : ℝ) : ℂ) := by
+theorem normSq_sum_eq {N : ℕ} (u : Fin N → ℂ)
+    : star u ⬝ᵥ u = ((∑ a, Complex.normSq (u a) : ℝ) : ℂ) := by
   simp only [dotProduct, Pi.star_apply, Complex.ofReal_sum]
   refine Finset.sum_congr rfl (fun a _ => ?_)
   rw [Complex.normSq_eq_conj_mul_self, Complex.star_def]
 
-theorem normSq_sum_mulVec {N : ℕ} (x : Matrix (Fin N) (Fin N) ℂ) (hx : x ∈ Matrix.unitaryGroup (Fin N) ℂ)
-    (w : Fin N → ℂ) : ∑ a, Complex.normSq ((x *ᵥ w) a) = ∑ b, Complex.normSq (w b) := by
+theorem normSq_sum_mulVec
+    {N : ℕ} (x : Matrix (Fin N) (Fin N) ℂ) (hx : x ∈ Matrix.unitaryGroup (Fin N) ℂ) (w : Fin N → ℂ)
+    : ∑ a, Complex.normSq ((x *ᵥ w) a) = ∑ b, Complex.normSq (w b) := by
   apply Complex.ofReal_injective
   rw [← normSq_sum_eq, ← normSq_sum_eq, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec,
     Matrix.mulVec_mulVec, ← Matrix.star_eq_conjTranspose, (Matrix.mem_unitaryGroup_iff').1 hx,
     Matrix.one_mulVec]
 
-theorem sum_comp_le {N s : ℕ} (I : Fin s → Fin N) (hI : Function.Injective I) (f : Fin N → ℝ)
-    (hf : ∀ a, 0 ≤ f a) : ∑ p, f (I p) ≤ ∑ a, f a := by
+theorem sum_comp_le
+    {N s : ℕ} (I : Fin s → Fin N) (hI : Function.Injective I) (f : Fin N → ℝ) (hf : ∀ a, 0 ≤ f a)
+    : ∑ p, f (I p) ≤ ∑ a, f a := by
   rw [← Finset.sum_image (fun p _ q _ h => hI h)]
   exact Finset.sum_le_univ_sum_of_nonneg hf
 
-theorem sum_comp_eq {N s : ℕ} {M : Type*} [AddCommMonoid M] (I : Fin s → Fin N) (hI : Function.Injective I)
-    (f : Fin N → M) (hf : ∀ b, b ∉ Set.range I → f b = 0) : ∑ b, f b = ∑ p, f (I p) := by
+theorem sum_comp_eq
+    {N s : ℕ} {M : Type*} [AddCommMonoid M]
+    (I : Fin s → Fin N) (hI : Function.Injective I)
+    (f : Fin N → M) (hf : ∀ b, b ∉ Set.range I → f b = 0)
+    : ∑ b, f b = ∑ p, f (I p) := by
   rw [← Finset.sum_image (fun p _ q _ h => hI h)]
   symm
   apply Finset.sum_subset (Finset.subset_univ _)
@@ -38,9 +43,11 @@ theorem sum_comp_eq {N s : ℕ} {M : Type*} [AddCommMonoid M] (I : Fin s → Fin
   rintro ⟨p, rfl⟩
   exact hb (Finset.mem_image_of_mem _ (Finset.mem_univ p))
 
-theorem sub_contract {N s : ℕ} (x : Matrix (Fin N) (Fin N) ℂ) (hx : x ∈ Matrix.unitaryGroup (Fin N) ℂ)
-    (I J : Fin s → Fin N) (hI : Function.Injective I) (hJ : Function.Injective J) (v : Fin s → ℂ) :
-    ∑ p, Complex.normSq (((Matrix.of fun p q => x (I p) (J q)) *ᵥ v) p) ≤ ∑ q, Complex.normSq (v q) := by
+theorem sub_contract
+    {N s : ℕ} (x : Matrix (Fin N) (Fin N) ℂ) (hx : x ∈ Matrix.unitaryGroup (Fin N) ℂ)
+    (I J : Fin s → Fin N) (hI : Function.Injective I) (hJ : Function.Injective J) (v : Fin s → ℂ)
+    : ∑ p, Complex.normSq (((Matrix.of fun p q => x (I p) (J q)) *ᵥ v) p)
+      ≤ ∑ q, Complex.normSq (v q) := by
   set w : Fin N → ℂ := Function.extend J v 0 with hw
   have hwJ : ∀ q, w (J q) = v q := fun q => hJ.extend_apply v 0 q
   have hw0 : ∀ b, b ∉ Set.range J → w b = 0 := by
@@ -57,10 +64,10 @@ theorem sub_contract {N s : ℕ} (x : Matrix (Fin N) (Fin N) ℂ) (hx : x ∈ Ma
     have hs := sum_comp_eq J hJ (fun b => Complex.normSq (w b)) (fun b hb => by simp [hw0 b hb])
     rw [hs]
     simp only [hwJ]
-  calc ∑ p, Complex.normSq (((Matrix.of fun p q => x (I p) (J q)) *ᵥ v) p)
+  calc
+    ∑ p, Complex.normSq (((Matrix.of fun p q => x (I p) (J q)) *ᵥ v) p)
       = ∑ p, Complex.normSq ((x *ᵥ w) (I p)) := by simp only [hmv]
-    _ ≤ ∑ a, Complex.normSq ((x *ᵥ w) a) :=
-        sum_comp_le I hI _ (fun a => Complex.normSq_nonneg _)
+    _ ≤ ∑ a, Complex.normSq ((x *ᵥ w) a) := sum_comp_le I hI _ (fun a => Complex.normSq_nonneg _)
     _ = ∑ b, Complex.normSq (w b) := normSq_sum_mulVec x hx w
     _ = ∑ q, Complex.normSq (v q) := hnorm
 
@@ -73,9 +80,10 @@ theorem multiset_prod_norm_le_one (m : Multiset ℂ) (h : ∀ μ ∈ m, ‖μ‖
     have hs := ih (fun μ hμ => h μ (by simp [hμ]))
     exact mul_le_one₀ ha (norm_nonneg _) hs
 
-theorem det_sub_norm_le_one {N s : ℕ} (x : Matrix (Fin N) (Fin N) ℂ) (hx : x ∈ Matrix.unitaryGroup (Fin N) ℂ)
-    (I J : Fin s → Fin N) (hI : Function.Injective I) (hJ : Function.Injective J) :
-    ‖(Matrix.of fun p q => x (I p) (J q)).det‖ ≤ 1 := by
+theorem det_sub_norm_le_one
+    {N s : ℕ} (x : Matrix (Fin N) (Fin N) ℂ) (hx : x ∈ Matrix.unitaryGroup (Fin N) ℂ)
+    (I J : Fin s → Fin N) (hI : Function.Injective I) (hJ : Function.Injective J)
+    : ‖(Matrix.of fun p q => x (I p) (J q)).det‖ ≤ 1 := by
   set A := Matrix.of fun p q => x (I p) (J q) with hA
   rw [Matrix.det_eq_prod_roots_charpoly]
   apply multiset_prod_norm_le_one
@@ -86,10 +94,12 @@ theorem det_sub_norm_le_one {N s : ℕ} (x : Matrix (Fin N) (Fin N) ℂ) (hx : x
   obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.2 hspec
   have hAv : A *ᵥ v = μ • v := by
     first
-    | rw [Algebra.algebraMap_eq_smul_one, Matrix.sub_mulVec, Matrix.smul_mulVec,
-        Matrix.one_mulVec, sub_eq_zero] at hv
+    | rw [Algebra.algebraMap_eq_smul_one, Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec,
+          sub_eq_zero]
+        at hv
     | rw [Algebra.algebraMap_eq_smul_one, Matrix.sub_mulVec, Matrix.smul_mulVec_assoc,
-        Matrix.one_mulVec, sub_eq_zero] at hv
+          Matrix.one_mulVec, sub_eq_zero]
+        at hv
     exact hv.symm
   have hc := sub_contract x hx I J hI hJ v
   rw [← hA, hAv] at hc

@@ -10,9 +10,10 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem etale_of_separable_charpoly_mulLeft (E A : Type) [Field E] [CommRing A] [Algebra E A]
-    [Module.Finite E A] (g : A) (h : (LinearMap.mulLeft E g).charpoly.Separable) :
-    Algebra.Etale E A := by
+theorem etale_of_separable_charpoly_mulLeft
+    (E A : Type) [Field E] [CommRing A] [Algebra E A] [Module.Finite E A]
+    (g : A) (h : (LinearMap.mulLeft E g).charpoly.Separable)
+    : Algebra.Etale E A := by
   have hd := GlobalTheory.UnitLemma.charpoly_dvd_minpoly_of_separable (LinearMap.mulLeft E g) h
   have h2 : minpoly E (LinearMap.mulLeft E g) = minpoly E g :=
     minpoly.algHom_eq (Algebra.lmul E A) (Algebra.lmul_injective) g
@@ -27,7 +28,8 @@ theorem etale_of_separable_charpoly_mulLeft (E A : Type) [Field E] [CommRing A] 
   have hdeg : (minpoly E g).natDegree = Module.finrank E A := by
     rw [heq, LinearMap.charpoly_natDegree]
   haveI : Module.Finite E (AdjoinRoot (minpoly E g)) := hm.finite_adjoinRoot
-  let φ : AdjoinRoot (minpoly E g) →ₐ[E] A := AdjoinRoot.liftAlgHom (minpoly E g) (Algebra.ofId E A) g (minpoly.aeval E g)
+  let φ : AdjoinRoot (minpoly E g) →ₐ[E] A :=
+    AdjoinRoot.liftAlgHom (minpoly E g) (Algebra.ofId E A) g (minpoly.aeval E g)
   have hli : LinearIndependent E fun i : Fin (minpoly E g).natDegree => g ^ (i : ℕ) :=
     linearIndependent_pow g
   let b := basisOfLinearIndependentOfCardEqFinrank' _ hli (by simp [hdeg])

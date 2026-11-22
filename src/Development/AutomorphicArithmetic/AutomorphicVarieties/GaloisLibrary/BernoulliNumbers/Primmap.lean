@@ -8,8 +8,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-theorem UpperTheory.V.Bern.b_primmap :
-    ∀ {R S : Type} [CommRing R] [Algebra ℚ R] [CommRing S] [Algebra ℚ S] {N : ℕ} [NeZero N] (f : R →+* S), Function.Injective f → ∀ (k : ℕ) (χ : DirichletCharacter R N), f (Bprim k χ) = Bprim k (χ.ringHomComp f) := by
+theorem UpperTheory.V.Bern.b_primmap
+    : ∀ {R S : Type} [CommRing R] [Algebra ℚ R] [CommRing S] [Algebra ℚ S] {N : ℕ} [NeZero N]
+        (f : R →+* S),
+      Function.Injective f
+        → ∀ (k : ℕ) (χ : DirichletCharacter R N), f (Bprim k χ) = Bprim k (χ.ringHomComp f) := by
   intro R S _ _ _ _ N _ f hf k χ
   obtain ⟨hcond, hval, -⟩ := b_condmap f hf χ
   set_option synthInstance.maxHeartbeats 100000 in

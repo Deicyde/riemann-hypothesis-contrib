@@ -5,14 +5,16 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Galo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys
 open scoped TensorProduct
 
 namespace GlobalTheory.TwSys.InertiaElt
 
 open Filter Topology
 
-theorem exists_coprime_dvd_mul_pow (m : ℕ) (o : ℕ) (ho : o ≠ 0) : ∃ t K : ℕ, Nat.Coprime t m ∧ o ∣ t * m ^ K := by
+theorem exists_coprime_dvd_mul_pow (m : ℕ) (o : ℕ) (ho : o ≠ 0)
+    : ∃ t K : ℕ, Nat.Coprime t m ∧ o ∣ t * m ^ K := by
   induction o using Nat.recOnMul with
   | zero => exact absurd rfl ho
   | one => exact ⟨1, 0, Nat.coprime_one_left m, one_dvd _⟩
@@ -28,10 +30,14 @@ theorem exists_coprime_dvd_mul_pow (m : ℕ) (o : ℕ) (ho : o ≠ 0) : ∃ t K 
     rw [this]
     exact mul_dvd_mul hK hK'
 
-theorem exists_limit_pow {Γ : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
-    (σ : Γ) (m : ℕ) : ∃ z : Γ, (∀ I : Subgroup Γ, IsClosed (I : Set Γ) → σ ∈ I → z ∈ I) ∧
-      (∀ U : Subgroup Γ, IsOpen (U : Set Γ) → ∃ k : ℕ, z⁻¹ * σ ^ (m ^ k) ∈ U) ∧
-      ∀ U : Subgroup Γ, IsOpen (U : Set Γ) → U.Normal → ∃ n : ℕ, Nat.Coprime n m ∧ z ^ n ∈ U := by
+theorem exists_limit_pow
+    {Γ : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    (σ : Γ) (m : ℕ)
+    : ∃ z : Γ,
+      (∀ I : Subgroup Γ, IsClosed (I : Set Γ) → σ ∈ I → z ∈ I)
+        ∧ (∀ U : Subgroup Γ, IsOpen (U : Set Γ) → ∃ k : ℕ, z⁻¹ * σ ^ (m ^ k) ∈ U)
+        ∧ ∀ U : Subgroup Γ,
+          IsOpen (U : Set Γ) → U.Normal → ∃ n : ℕ, Nat.Coprime n m ∧ z ^ n ∈ U := by
   obtain ⟨z, hz⟩ : ∃ z : Γ, MapClusterPt z atTop (fun k : ℕ => σ ^ (m ^ k)) :=
     exists_clusterPt_of_compactSpace (map (fun k : ℕ => σ ^ (m ^ k)) atTop)
   have key : ∀ U : Subgroup Γ, IsOpen (U : Set Γ) → ∃ᶠ k : ℕ in atTop, z⁻¹ * σ ^ (m ^ k) ∈ U := by
@@ -41,7 +47,8 @@ theorem exists_limit_pow {Γ : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopolo
   refine ⟨z, fun I hI hσ => ?_, fun U hU => (key U hU).exists, fun U hU hN => ?_⟩
   · exact hI.mem_of_mapClusterPt hz (Eventually.of_forall fun k => I.pow_mem hσ _)
   · have : Finite (Γ ⧸ U) := U.quotient_finite_of_isOpen hU
-    obtain ⟨t, K, ht, hK⟩ := exists_coprime_dvd_mul_pow m (orderOf (QuotientGroup.mk' U σ)) (orderOf_pos _).ne'
+    obtain ⟨t, K, ht, hK⟩ :=
+      exists_coprime_dvd_mul_pow m (orderOf (QuotientGroup.mk' U σ)) (orderOf_pos _).ne'
     obtain ⟨k, hk, hmem⟩ := frequently_atTop.1 (key U hU) K
     refine ⟨t, ht, ?_⟩
     have e : QuotientGroup.mk' U z = QuotientGroup.mk' U σ ^ (m ^ k) := by
@@ -54,8 +61,10 @@ theorem exists_limit_pow {Γ : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopolo
     rw [mul_comm]
     exact Nat.mul_dvd_mul_right (pow_dvd_pow m hk) t
 
-theorem isUnit_sub_one {O : Type*} [CommRing O] [IsDomain O] {n : ℕ} {ζ : O} (hn : IsUnit (n : O))
-    (h : IsPrimitiveRoot ζ n) (h1 : 1 < n) : IsUnit (ζ - 1) := by
+theorem isUnit_sub_one
+    {O : Type*} [CommRing O] [IsDomain O]
+    {n : ℕ} {ζ : O} (hn : IsUnit (n : O)) (h : IsPrimitiveRoot ζ n) (h1 : 1 < n)
+    : IsUnit (ζ - 1) := by
   obtain ⟨k, rfl⟩ : ∃ k, n = k + 1 + 1 := ⟨n - 2, by omega⟩
   have e := h.prod_one_sub_pow_eq_order
   rw [Finset.prod_range_succ'] at e
@@ -66,18 +75,20 @@ theorem isUnit_sub_one {O : Type*} [CommRing O] [IsDomain O] {n : ℕ} {ζ : O} 
   rw [← neg_sub]
   simpa using hu.neg
 
-theorem exists_place_mem (E : Type) [Field E] [NumberField E] {p : ℕ} (hp : p.Prime) :
-    ∃ v : HeightOneSpectrum (𝓞 E), ((p : ℕ) : 𝓞 E) ∈ v.asIdeal := by
+theorem exists_place_mem (E : Type) [Field E] [NumberField E] {p : ℕ} (hp : p.Prime)
+    : ∃ v : HeightOneSpectrum (𝓞 E), ((p : ℕ) : 𝓞 E) ∈ v.asIdeal := by
   have hnu : ¬ IsUnit ((p : ℕ) : 𝓞 E) := by
     intro h
     have h2 : IsUnit (Algebra.norm ℤ ((p : ℕ) : 𝓞 E)) := h.map _
     have e : Algebra.norm ℤ ((p : ℕ) : 𝓞 E) = (p : ℤ) ^ Module.finrank ℤ (𝓞 E) := by
       rw [← Algebra.norm_algebraMap]
       simp
-    rw [e, isUnit_pow_iff Module.finrank_pos.ne', Int.isUnit_iff_natAbs_eq, Int.natAbs_natCast] at h2
+    rw [e, isUnit_pow_iff Module.finrank_pos.ne', Int.isUnit_iff_natAbs_eq, Int.natAbs_natCast]
+      at h2
     exact hp.one_lt.ne' h2
-  obtain ⟨M, hM, hle⟩ := Ideal.exists_le_maximal (Ideal.span {((p : ℕ) : 𝓞 E)}) (by
-    rwa [Ne, Ideal.span_singleton_eq_top])
+  obtain ⟨M, hM, hle⟩ :=
+    Ideal.exists_le_maximal (Ideal.span {((p : ℕ) : 𝓞 E)})
+      (by rwa [Ne, Ideal.span_singleton_eq_top])
   have hmem : ((p : ℕ) : 𝓞 E) ∈ M := hle (Ideal.mem_span_singleton_self _)
   refine ⟨⟨M, hM.isPrime, ?_⟩, hmem⟩
   rintro rfl
@@ -85,10 +96,12 @@ theorem exists_place_mem (E : Type) [Field E] [NumberField E] {p : ℕ} (hp : p.
 
 end GlobalTheory.TwSys.InertiaElt
 
-
 open GlobalTheory.TwSys.InertiaElt in
-theorem GlobalTheory.TwSys.exists_tameInertiaElementAtAuxiliaryPrime : ∀ (D : Formalism.BasicNotions.D7) (N : NData D.R D.host D.what₂) (X : NTw D.R D.host D.what₂ D.LL0 N)
-    (i : X.Tw), ∃ z, IsTameInertiaElementAtTwistPrime X i z := by
+theorem GlobalTheory.TwSys.exists_tameInertiaElementAtAuxiliaryPrime
+    : ∀ (D : Formalism.BasicNotions.D7) (N : NData D.R D.host D.what₂)
+        (X : NTw D.R D.host D.what₂ D.LL0 N) (i : X.Tw),
+      ∃ z,
+        IsTameInertiaElementAtTwistPrime X i z := by
   intro D N X i
   have hl : (X.l i).Prime := (X.lPrime i).out
   obtain ⟨v, hv⟩ : ∃ v, v ∈ X.pD i := by
@@ -108,12 +121,13 @@ theorem GlobalTheory.TwSys.exists_tameInertiaElementAtAuxiliaryPrime : ∀ (D : 
     · exact ⟨3, by norm_num, by norm_num, by norm_num, fun h' => h h'.symm⟩
   have : Fact p.Prime := ⟨hp⟩
   have hcard := X.delta_15 i v hv A hA
-  have : Finite ((Ine (F := D.host.E) A).map (X.delta i)) := Nat.finite_of_card_ne_zero (by rw [hcard]; norm_num)
-  obtain ⟨⟨y, hy⟩, hyo⟩ := exists_prime_orderOf_dvd_card' (G := (Ine (F := D.host.E) A).map (X.delta i)) p
-    (by rw [hcard]; exact hp15)
+  have : Finite ((Ine (F := D.host.E) A).map (X.delta i)) :=
+    Nat.finite_of_card_ne_zero (by rw [hcard]; norm_num)
+  obtain ⟨⟨y, hy⟩, hyo⟩ :=
+    exists_prime_orderOf_dvd_card' (G := (Ine (F := D.host.E) A).map (X.delta i)) p
+      (by rw [hcard]; exact hp15)
   obtain ⟨σ, hσ, rfl⟩ := Subgroup.mem_map.1 hy
-  have hord : orderOf (X.delta i σ) = p := by
-    rw [← hyo, ← Subgroup.orderOf_coe]
+  have hord : orderOf (X.delta i σ) = p := by rw [← hyo, ← Subgroup.orderOf_coe]
   obtain ⟨z, hz1, hz2, hz3⟩ := exists_limit_pow σ (X.l i * Ideal.absNorm v.asIdeal)
   refine ⟨z, v, hv, A, hA, hz1 _ (isClosed_Ine A) hσ, ?_, hz3⟩
   obtain ⟨k, hk⟩ := hz2 _ (X.delta_open i)
@@ -128,7 +142,8 @@ theorem GlobalTheory.TwSys.exists_tameInertiaElementAtAuxiliaryPrime : ∀ (D : 
     norm_num
   have hprim : IsPrimitiveRoot (X.delta i σ) p := hord ▸ IsPrimitiveRoot.orderOf _
   have hcop : Nat.Coprime ((X.l i * Ideal.absNorm v.asIdeal) ^ k * 2) p :=
-    Nat.Coprime.symm (Nat.Coprime.mul_right (Nat.Coprime.pow_right _ (Nat.Coprime.mul_right hpl' hpq))
+    Nat.Coprime.symm (Nat.Coprime.mul_right
+      (Nat.Coprime.pow_right _ (Nat.Coprime.mul_right hpl' hpq))
       ((Nat.coprime_primes hp Nat.prime_two).2 hp2))
   have hprim2 : IsPrimitiveRoot (((X.delta i z : (X.O0 i)ˣ) : X.O0 i) ^ 2) p := by
     have := hprim.pow_of_coprime _ hcop

@@ -12,9 +12,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CMFieldExpo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem not_valuation_lt_one_of_ne_of_valuation_lt_one {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (p q : ℕ) (hp : Nat.Prime p) (hq : Nat.Prime q) (hpq : p ≠ q) (hA : A.valuation (p : Ω) < 1) : ¬ A.valuation (q : Ω) < 1 := by
+private theorem not_valuation_lt_one_of_ne_of_valuation_lt_one
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω) (p q : ℕ)
+    (hp : Nat.Prime p) (hq : Nat.Prime q) (hpq : p ≠ q) (hA : A.valuation (p : Ω) < 1)
+    : ¬ A.valuation (q : Ω) < 1 := by
   intro hB
   have hcop : IsCoprime (p : ℤ) (q : ℤ) := by
     rw [Nat.isCoprime_iff_coprime]
@@ -28,19 +33,28 @@ private theorem not_valuation_lt_one_of_ne_of_valuation_lt_one {Ω : Type} [Fiel
   have hb : A.valuation (b : Ω) ≤ 1 := (A.valuation_le_one_iff _).2 (intCast_mem A b)
   have hx : A.valuation ((a : Ω) * (p : Ω)) < 1 := by
     rw [map_mul]
-    calc A.valuation (a : Ω) * A.valuation (p : Ω) ≤ 1 * A.valuation (p : Ω) := by gcongr
+    calc
+      A.valuation (a : Ω) * A.valuation (p : Ω)
+        ≤ 1 * A.valuation (p : Ω) := by gcongr
       _ < 1 := by rw [one_mul]; exact hA
   have hy : A.valuation ((b : Ω) * (q : Ω)) < 1 := by
     rw [map_mul]
-    calc A.valuation (b : Ω) * A.valuation (q : Ω) ≤ 1 * A.valuation (q : Ω) := by gcongr
+    calc
+      A.valuation (b : Ω) * A.valuation (q : Ω)
+        ≤ 1 * A.valuation (q : Ω) := by gcongr
       _ < 1 := by rw [one_mul]; exact hB
   have hs := Valuation.map_add_lt A.valuation hx hy
   rw [h1, map_one] at hs
   exact lt_irrefl _ hs
 
-theorem UpperTheory.V.HV.gdOfHost :
-    ∀ (h : Host) (t : ℕ), h.Big t → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] [Algebra (Kstar (pK h.chi)) Ω] (l : ℕ) [Fact l.Prime] (e : ℕ), l ≠ 2 → 0 < e → e < t → h.CaseI l e →
-      ∀ (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N), h.IsChar ψ → PsiEven e ψ → GD Ω (Kstar (pK h.chi)) l e ψ := by
+theorem UpperTheory.V.HV.gdOfHost
+    : ∀ (h : Host) (t : ℕ),
+      h.Big t
+        → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] [Algebra (Kstar (pK h.chi)) Ω]
+            (l : ℕ) [Fact l.Prime] (e : ℕ),
+          l ≠ 2 → 0 < e → e < t → h.CaseI l e
+            → ∀ (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N),
+              h.IsChar ψ → PsiEven e ψ → GD Ω (Kstar (pK h.chi)) l e ψ := by
   intro h t hBig Ω _ _ _ _ l _ e hl2 he0 het hI O _ _ ψ hψ hpar
   have hB := UpperTheory.V.HV.bchiFacts h t hBig
   have hpB : pK h.chi ∈ Bchi h.chi := hB.2.1
@@ -81,7 +95,9 @@ theorem UpperTheory.V.HV.gdOfHost :
     apply hle
     rw [Subgroup.mem_inf]
     refine ⟨?_, ?_⟩
-    · have hlA : ¬ A.valuation (l : Ω) < 1 := not_valuation_lt_one_of_ne_of_valuation_lt_one A (pK h.chi) l hpPrime Fact.out (Ne.symm hlp) hA
+    · have hlA : ¬ A.valuation (l : Ω) < 1 :=
+        not_valuation_lt_one_of_ne_of_valuation_lt_one A (pK h.chi) l hpPrime Fact.out (Ne.symm hlp)
+          hA
       have := ((UpperTheory.V.Base.places ℚ Ω l A).2.2.2 hlA) hx
       rw [MonoidHom.mem_ker] at this ⊢
       simp [cycMod, this]

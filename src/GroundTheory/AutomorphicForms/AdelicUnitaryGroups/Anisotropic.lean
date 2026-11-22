@@ -25,25 +25,29 @@ def hermValue (x : ι → R ⊗[K] E) : R ⊗[K] E :=
 
 variable {K H R}
 
-theorem hermValue_mulVec (g : unitaryPoints K E H R) (x : ι → R ⊗[K] E) :
-    hermValue K H R (unitaryMat g *ᵥ x) = hermValue K H R x := by
-  have hg : ((unitaryMat g).map (conjBase K E R))ᵀ * baseMatrix (K := K) H R * unitaryMat g =
-      baseMatrix (K := K) H R := g.2
-  have h1 : (fun i => conjBase K E R ((unitaryMat g *ᵥ x) i)) =
-      (unitaryMat g).map (conjBase K E R) *ᵥ (fun i => conjBase K E R (x i)) := by
+theorem hermValue_mulVec (g : unitaryPoints K E H R) (x : ι → R ⊗[K] E)
+    : hermValue K H R (unitaryMat g *ᵥ x) = hermValue K H R x := by
+  have hg
+      : ((unitaryMat g).map (conjBase K E R))ᵀ * baseMatrix (K := K) H R * unitaryMat g
+        = baseMatrix (K := K) H R :=
+    g.2
+  have h1
+      : (fun i => conjBase K E R ((unitaryMat g *ᵥ x) i))
+        = (unitaryMat g).map (conjBase K E R) *ᵥ (fun i => conjBase K E R (x i)) := by
     funext i
     exact RingHom.map_mulVec _ _ _ i
   unfold hermValue
   rw [h1, Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.vecMul_transpose,
     Matrix.vecMul_vecMul, ← Matrix.mul_assoc, hg, Matrix.dotProduct_mulVec]
 
-theorem conjBase_smul (c : R) (z : R ⊗[K] E) :
-    conjBase K E R (c • z) = c • conjBase K E R z :=
-  map_smul (show R ⊗[K] E →ₐ[R] R ⊗[K] E from
-    Algebra.TensorProduct.map (AlgHom.id R R) (conj K E).toAlgHom) c z
+theorem conjBase_smul (c : R) (z : R ⊗[K] E) : conjBase K E R (c • z) = c • conjBase K E R z :=
+  map_smul
+    (show R ⊗[K] E →ₐ[R] R ⊗[K] E from
+      Algebra.TensorProduct.map (AlgHom.id R R) (conj K E).toAlgHom)
+    c z
 
-theorem hermValue_smul (c : R) (x : ι → R ⊗[K] E) :
-    hermValue K H R (c • x) = (c * c) • hermValue K H R x := by
+theorem hermValue_smul (c : R) (x : ι → R ⊗[K] E)
+    : hermValue K H R (c • x) = (c * c) • hermValue K H R x := by
   unfold hermValue
   have : (fun i => conjBase K E R ((c • x) i)) = c • fun i => conjBase K E R (x i) := by
     funext i
@@ -54,8 +58,8 @@ end Form
 
 section Compact
 
-attribute [local instance] tensorTopology finite_of_isQuadraticExtension isModuleTopology_tensor
-  isTopologicalRing_tensor
+attribute [local instance]
+  tensorTopology finite_of_isQuadraticExtension isModuleTopology_tensor isTopologicalRing_tensor
 
 variable (H : Matrix ι ι E)
 variable (R : Type*) [NontriviallyNormedField R] [ProperSpace R] [Algebra K R]
@@ -77,14 +81,18 @@ open NumberField
 
 variable (H : Matrix ι ι E)
 
-abbrev completionNontriviallyNormedField (w : InfinitePlace K) :
-    NontriviallyNormedField w.Completion :=
-  { (inferInstance : NormedField w.Completion) with
-    non_trivial := ⟨2, by
-      have := (InfinitePlace.Completion.isometry_extensionEmbedding w).norm_map_of_map_zero
-        (map_zero _) 2
+abbrev completionNontriviallyNormedField (w : InfinitePlace K)
+    : NontriviallyNormedField w.Completion := {
+  (inferInstance : NormedField w.Completion) with
+  non_trivial := ⟨
+    2,
+    by
+      have :=
+        (InfinitePlace.Completion.isometry_extensionEmbedding w).norm_map_of_map_zero (map_zero _) 2
       rw [← this, map_ofNat]
-      norm_num⟩ }
+      norm_num
+  ⟩
+}
 
 variable {H}
 

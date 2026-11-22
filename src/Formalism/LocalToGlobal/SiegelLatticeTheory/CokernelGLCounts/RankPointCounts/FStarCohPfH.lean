@@ -10,8 +10,10 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ScalarPairOrthog
 noncomputable section
 
 open scoped Classical
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut Formalism.L2.SG.LsDatumB
-  Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.PCount Formalism.L2.SG.Pf.FrameGlobalPatching
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
+  Formalism.L2.SG.LsDatumB Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.PCount
+  Formalism.L2.SG.Pf.FrameGlobalPatching
 
 namespace Formalism.L2.SG.Pf.FrameGlobalPatching.FStar
 
@@ -19,24 +21,30 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 open CohGoodPf
 
-variable {D : Formalism.BasicNotions.D7} {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)}
-  {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
+variable
+  {D : Formalism.BasicNotions.D7} {u u' : D.what₂.Word}
+  {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)} {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
 namespace GramNePf
 
-theorem sign_norm {l : ℕ} (hl : l ≤ D.R.rS + 1) :
-    leadMinorE (ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)) l *
-      star (leadMinorE (ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)) l) = 1 := by
-  have hsub : (ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)).submatrix
-      (Fin.castLE hl) (Fin.castLE hl) =
-      Matrix.diagonal (fun i : Fin l => (-1 : D.host.E) ^ (D.R.rS - (Fin.castLE hl i).val)) := by
+theorem sign_norm {l : ℕ} (hl : l ≤ D.R.rS + 1)
+    : leadMinorE (ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)) l
+        * star (leadMinorE (ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)) l)
+      = 1 := by
+  have hsub
+      : (ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)).submatrix
+          (Fin.castLE hl) (Fin.castLE hl)
+        = Matrix.diagonal (fun i : Fin l =>
+          (-1 : D.host.E) ^ (D.R.rS - (Fin.castLE hl i).val)) := by
     ext i j
     rcases eq_or_ne i j with rfl | h
     · simp [ZhatOM]
     · have h' : Fin.castLE hl i ≠ Fin.castLE hl j := fun e => h (Fin.castLE_injective hl e)
       simp [ZhatOM, Matrix.one_apply_ne h', Matrix.diagonal_apply_ne _ h]
-  have hdet : Formalism.MainNotions.S.leadMinorE (ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)) l =
-      (-1 : D.host.E) ^ (∑ i : Fin l, (D.R.rS - (Fin.castLE hl i).val)) := by
+  have hdet
+      : Formalism.MainNotions.S.leadMinorE
+          (ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)) l
+        = (-1 : D.host.E) ^ (∑ i : Fin l, (D.R.rS - (Fin.castLE hl i).val)) := by
     unfold Formalism.MainNotions.S.leadMinorE
     rw [dif_pos hl, hsub, Matrix.det_diagonal, Finset.prod_pow_eq_pow_sum]
   rw [hdet, star_pow, star_neg, star_one, ← pow_add]
@@ -107,23 +115,32 @@ private lemma zhatOM_eq_mul_zhatOM_one {K : Type*} [CommRing K] {r : ℕ} (Z : M
   simp [ZhatOM, Matrix.mul_apply, Matrix.one_apply]
   try ring
 
-theorem gflag_ne (γ : TermDef.Term D u u' F0 what₂) (Z : PairVal.MatR D)
-    (F'₂ : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E)) (hC : Ctx γ Z) (hZ : ZhatL (lf D F0) F'₂ = Z) :
-    Gflag (lf D F0).fl F'₂.fl ≠ 0 := by
+theorem gflag_ne
+    (γ : TermDef.Term D u u' F0 what₂) (Z : PairVal.MatR D)
+    (F'₂ : LFlag (D.sp.Y 0) D.R.rS (((D.mem u').A.T : ℕ) : D.host.E))
+    (hC : Ctx γ Z) (hZ : ZhatL (lf D F0) F'₂ = Z)
+    : Gflag (lf D F0).fl F'₂.fl ≠ 0 := by
   obtain ⟨w, -, w', hG, -, hA⟩ := hC
   obtain ⟨L, U, hL, hU, hM⟩ := hA
-  have hS : ∀ i j : Fin (D.R.rS + 1), j < i →
-      ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E) i j = 0 := by
+  have hS
+      : ∀ i j : Fin (D.R.rS + 1),
+        j < i → ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E) i j = 0 := by
     intro i j h
     simp [ZhatOM, Matrix.one_apply_ne (ne_of_gt h)]
-  have hsq : ∀ l, l ≤ D.R.rS + 1 →
-      Formalism.MainNotions.S.leadMinorE Z l * star (Formalism.MainNotions.S.leadMinorE Z l) = Dmin w' l * D.conjF (Dmin w' l) := by
+  have hsq
+      : ∀ l,
+        l ≤ D.R.rS + 1
+          → Formalism.MainNotions.S.leadMinorE Z l * star (Formalism.MainNotions.S.leadMinorE Z l)
+            = Dmin w' l * D.conjF (Dmin w' l) := by
     intro l hl
-    have h1 : Dmin w' l = Formalism.MainNotions.S.leadMinorE Z l *
-        Formalism.MainNotions.S.leadMinorE (ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)) l := by
+    have h1
+        : Dmin w' l
+          = Formalism.MainNotions.S.leadMinorE Z l * Formalism.MainNotions.S.leadMinorE
+            (ZhatOM (1 : Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E)) l := by
       unfold Dmin Formalism.MainNotions.S.leadMinorE
       simp only [dif_pos hl]
-      rw [← Matrix.det_mul, ← submatrix_castLE_mul_of_upper hl _ _ hS, ← zhatOM_eq_mul_zhatOM_one, hM, det_submatrix_castLE_LPU_eq hl _ _ _ hL hU]
+      rw [← Matrix.det_mul, ← submatrix_castLE_mul_of_upper hl _ _ hS, ← zhatOM_eq_mul_zhatOM_one,
+        hM, det_submatrix_castLE_LPU_eq hl _ _ _ hL hU]
     rw [h1, conjF_star, star_mul']
     linear_combination (-(Formalism.MainNotions.S.leadMinorE Z l * star (Formalism.MainNotions.S.leadMinorE Z l))) * sign_norm hl
   intro h0
@@ -150,9 +167,12 @@ theorem globGramNe_holds : GlobGramNe u u' F0 what₂ := by
       rw [map_sum]
     simp only [map_smul, smul_eq_mul]
     exact (Finset.sum_congr rfl (fun j _ => mul_comm _ _)).trans hk
-  obtain ⟨h1, h2⟩ := PI.UnitaryGroupMassFormula.BetaLUniq.GN.coeffs_zero F0 F'₂.fl (v ∘ Sum.inl) (v ∘ Sum.inr)
-    (∑ j, v j • wG F0 F'₂ j) (by rw [Fintype.sum_sum_type]; rfl)
-    (fun a => hw (Sum.inl a)) (fun b => hw (Sum.inr b)) hG
+  obtain ⟨h1, h2⟩ :=
+    PI.UnitaryGroupMassFormula.BetaLUniq.GN.coeffs_zero F0 F'₂.fl (v ∘ Sum.inl) (v ∘ Sum.inr)
+      (∑ j, v j • wG F0 F'₂ j) (by rw [Fintype.sum_sum_type]; rfl)
+      (fun a => hw (Sum.inl a))
+      (fun b => hw (Sum.inr b))
+      hG
   apply hv0
   funext k
   rcases k with a | b

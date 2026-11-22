@@ -10,27 +10,34 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ProdDerivWei
 
 @[expose] public section
 
-open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published GlobalTheory.CMModel Formalism.L2.Th1.F
+open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published
+  GlobalTheory.CMModel Formalism.L2.Th1.F
 open scoped IntermediateField BigOperators Topology
 
 namespace GlobalTheory
 
-theorem finset_prod_eq_one_of_le_one_eq_one {Γ : Type*} [LinearOrderedCommGroupWithZero Γ] {ι : Type*}
-    [DecidableEq ι] (s : Finset ι) (f : ι → Γ) (hle : ∀ i ∈ s, f i ≤ 1)
-    (hprod : ∏ i ∈ s, f i = 1) : ∀ i ∈ s, f i = 1 := by
+theorem finset_prod_eq_one_of_le_one_eq_one
+    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
+    {ι : Type*} [DecidableEq ι]
+    (s : Finset ι) (f : ι → Γ) (hle : ∀ i ∈ s, f i ≤ 1) (hprod : ∏ i ∈ s, f i = 1)
+    : ∀ i ∈ s, f i = 1 := by
   intro i hi
   refine le_antisymm (hle i hi) ?_
   rw [← Finset.mul_prod_erase s f hi] at hprod
   have h2 : ∏ j ∈ s.erase i, f j ≤ 1 :=
     Finset.prod_le_one' (fun j hj => hle j (Finset.mem_of_mem_erase hj))
-  calc (1 : Γ) = f i * ∏ j ∈ s.erase i, f j := hprod.symm
+  calc
+    (1 : Γ)
+      = f i * ∏ j ∈ s.erase i, f j := hprod.symm
     _ ≤ f i := mul_le_of_le_one_right' h2
 
-theorem valuation_derivWeierstrassP_torsion_odd :
-    ∀ (L : PeriodPair) (β u : ℂ) (V : ValuationSubring ℂ) (N : ℕ), MulStable L β → β.im ≠ 0 →
-      V.valuation u ^ 12 = V.valuation (latticeCurve L).Δ → V.valuation (N : ℂ) = 1 → Odd N →
-      ∀ z, z ∉ L.lattice → (N : ℂ) * z ∈ L.lattice →
-        V.valuation (L.derivWeierstrassP z) = V.valuation u ^ 3 := by
+theorem valuation_derivWeierstrassP_torsion_odd
+    : ∀ (L : PeriodPair) (β u : ℂ) (V : ValuationSubring ℂ) (N : ℕ),
+      MulStable L β → β.im ≠ 0 → V.valuation u ^ 12 = V.valuation (latticeCurve L).Δ
+        → V.valuation (N : ℂ) = 1 → Odd N
+        → ∀ z,
+          z ∉ L.lattice → (N : ℂ) * z ∈ L.lattice
+            → V.valuation (L.derivWeierstrassP z) = V.valuation u ^ 3 := by
   intro L β u V N hβ hβim hu hN hodd z hz hNz
   classical
   have hN0 : (N : ℂ) ≠ 0 := by
@@ -41,12 +48,12 @@ theorem valuation_derivWeierstrassP_torsion_odd :
     have := L.lattice.smul_mem (N : ℤ) hω
     simpa [zsmul_eq_mul] using this
   have hΔ := latticeCurve_Δ_ne_zero L
-  have hvΔ : V.valuation (latticeCurve L).Δ ≠ 0 := by
-    simpa using hΔ
+  have hvΔ : V.valuation (latticeCurve L).Δ ≠ 0 := by simpa using hΔ
   have hu0 : u ≠ 0 := by
     rintro rfl
     apply hvΔ
-    rw [← hu]; simp
+    rw [← hu]
+    simp
   have hvu : V.valuation u ≠ 0 := by simpa using hu0
   obtain ⟨S, hS⟩ := kerRepsExist L (N : ℂ) hN0 hstab
   have hcard := kerRepsCard L (N : ℂ) S hN0 hstab hS
@@ -59,12 +66,13 @@ theorem valuation_derivWeierstrassP_torsion_odd :
     rw [← hcardN] at hodd2
     obtain ⟨k, hk⟩ := hodd2
     exact ⟨k, by omega⟩
-  have hpf := GlobalTheory.T.prod_derivWeierstrassP_kerReps_pow_four_mul' L (N : ℂ) S hN0 hstab hS heven
+  have hpf :=
+    GlobalTheory.T.prod_derivWeierstrassP_kerReps_pow_four_mul' L (N : ℂ) S hN0 hstab hS heven
   have hmem : ∀ t ∈ S, V.valuation (L.derivWeierstrassP t / u ^ 3) ≤ 1 := by
     intro t ht
     rw [ValuationSubring.valuation_le_one_iff]
-    exact (GlobalTheory.T.torsion_weierstrassP_mem_valuationSubring L β u V N hβ hβim hu hN t t (hS.1 t ht).2 (hS.1 t ht).2 (hS.1 t ht).1
-      (hS.1 t ht).1).1
+    exact (GlobalTheory.T.torsion_weierstrassP_mem_valuationSubring L β u V N hβ hβim hu hN t t
+      (hS.1 t ht).2 (hS.1 t ht).2 (hS.1 t ht).1 (hS.1 t ht).1).1
   have hprod : ∏ t ∈ S, V.valuation (L.derivWeierstrassP t / u ^ 3) ^ 4 = 1 := by
     have hv := congrArg V.valuation hpf
     simp only [map_mul, map_pow, map_prod, hN, one_pow, mul_one] at hv

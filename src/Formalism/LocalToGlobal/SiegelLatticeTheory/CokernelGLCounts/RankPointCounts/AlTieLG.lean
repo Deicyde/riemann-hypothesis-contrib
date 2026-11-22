@@ -12,21 +12,26 @@ open scoped Classical TensorProduct
 
 namespace Formalism.L2.SG.Pf.AlTieLG
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.Pf.AlTie
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.Pf.AlTie
   Formalism.L2.SG.Pf.AlTieEta Filter Topology
 
-theorem newton_quad {K : Type*} [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
-    (tr nm c : K) (hc : tr ^ 2 - 4 * nm = c) (hc1 : ‖c‖ = 1) (h4 : ‖(4 : K)‖ ≤ 1)
-    (a₀ : K) (h0 : ‖a₀ ^ 2 - tr * a₀ + nm‖ < 1) : ∃ α : K, α ^ 2 - tr * α + nm = 0 := by
+theorem newton_quad
+    {K : Type*} [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+    (tr nm c : K) (hc : tr ^ 2 - 4 * nm = c) (hc1 : ‖c‖ = 1)
+    (h4 : ‖(4 : K)‖ ≤ 1)
+    (a₀ : K) (h0 : ‖a₀ ^ 2 - tr * a₀ + nm‖ < 1)
+    : ∃ α : K, α ^ 2 - tr * α + nm = 0 := by
   let f : K → K := fun a => a ^ 2 - tr * a + nm
   let f' : K → K := fun a => 2 * a - tr
-  have hid : ∀ a, f' a ^ 2 = 4 * f a + c := by
-    intro a; simp only [f, f']; rw [← hc]; ring
+  have hid : ∀ a, f' a ^ 2 = 4 * f a + c := by intro a; simp only [f, f']; rw [← hc]; ring
   have hder : ∀ a, ‖f a‖ < 1 → ‖f' a‖ = 1 := by
     intro a ha
     have h1 : ‖4 * f a‖ < 1 := by
       rw [norm_mul]
-      calc ‖(4 : K)‖ * ‖f a‖ ≤ 1 * ‖f a‖ := by gcongr
+      calc
+        ‖(4 : K)‖ * ‖f a‖
+          ≤ 1 * ‖f a‖ := by gcongr
         _ < 1 := by rw [one_mul]; exact ha
     have h2 : ‖f' a ^ 2‖ = 1 := by
       rw [hid, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [hc1]; exact h1.ne), hc1]
@@ -49,10 +54,11 @@ theorem newton_quad {K : Type*} [NormedField K] [IsUltrametricDist K] [CompleteS
     | succ n ih =>
       have hlt : ‖f (seq n)‖ < 1 := lt_of_le_of_lt ih (pow_lt_one₀ hρ0 h0 (by positivity))
       have hd := hder _ hlt
-      have hne : f' (seq n) ≠ 0 := by
-        intro h; rw [h, norm_zero] at hd; exact zero_ne_one hd
+      have hne : f' (seq n) ≠ 0 := by intro h; rw [h, norm_zero] at hd; exact zero_ne_one hd
       rw [hseq, hstep _ hne, norm_pow, norm_div, hd, div_one]
-      calc ‖f (seq n)‖ ^ 2 ≤ (‖f a₀‖ ^ 2 ^ n) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) ih 2
+      calc
+        ‖f (seq n)‖ ^ 2
+          ≤ (‖f a₀‖ ^ 2 ^ n) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) ih 2
         _ = ‖f a₀‖ ^ 2 ^ (n + 1) := by rw [← pow_mul, pow_succ]
   have hbound' : ∀ n, ‖f (seq n)‖ ≤ ‖f a₀‖ ^ n := fun n =>
     (hbound n).trans (pow_le_pow_of_le_one hρ0 h0.le (Nat.lt_two_pow_self).le)
@@ -83,29 +89,35 @@ structure QuadAlg : Prop where
 
 variable {T t n}
 
-theorem QuadAlg.span' (hQ : QuadAlg T t n) (z : A) : ∃ x y : K, z = algebraMap K A x + algebraMap K A y * T := by
+theorem QuadAlg.span' (hQ : QuadAlg T t n) (z : A)
+    : ∃ x y : K, z = algebraMap K A x + algebraMap K A y * T := by
   obtain ⟨x, y, hz⟩ := hQ.span z
   exact ⟨x, y, by rw [hz, Algebra.smul_def, Algebra.smul_def, mul_one]⟩
 
-theorem QuadAlg.indep' (hQ : QuadAlg T t n) (x y : K) (h : algebraMap K A x + algebraMap K A y * T = 0) :
-    x = 0 ∧ y = 0 := hQ.indep x y (by rw [Algebra.smul_def, Algebra.smul_def, mul_one]; exact h)
+theorem QuadAlg.indep'
+    (hQ : QuadAlg T t n) (x y : K) (h : algebraMap K A x + algebraMap K A y * T = 0)
+    : x = 0 ∧ y = 0 :=
+  hQ.indep x y (by rw [Algebra.smul_def, Algebra.smul_def, mul_one]; exact h)
 
-private theorem linear_mul_linear_of_quadAlg (hQ : QuadAlg T t n) (p q p' q' : K) :
-    (algebraMap K A p * T + algebraMap K A q) * (algebraMap K A p' * T + algebraMap K A q') =
-      algebraMap K A (p * q' + q * p' + p * p' * t) * T + algebraMap K A (q * q' - p * p' * n) := by
+private theorem linear_mul_linear_of_quadAlg (hQ : QuadAlg T t n) (p q p' q' : K)
+    : (algebraMap K A p * T + algebraMap K A q) * (algebraMap K A p' * T + algebraMap K A q')
+      = algebraMap K A (p * q' + q * p' + p * p' * t) * T
+        + algebraMap K A (q * q' - p * p' * n) := by
   simp only [map_add (f := _), map_sub, map_mul]
   linear_combination (algebraMap K A p * algebraMap K A p') * hQ.rel
 
 theorem root_of_idem (hQ : QuadAlg T t n) (h : IdemNT A) : ∃ β : K, β ^ 2 - t * β + n = 0 := by
   obtain ⟨e, he, he0, he1⟩ := h
   obtain ⟨x, y, rfl⟩ := hQ.span' e
-  have he' : (algebraMap K A y * T + algebraMap K A x) * (algebraMap K A y * T + algebraMap K A x) =
-      algebraMap K A y * T + algebraMap K A x := by
+  have he'
+      : (algebraMap K A y * T + algebraMap K A x) * (algebraMap K A y * T + algebraMap K A x)
+        = algebraMap K A y * T + algebraMap K A x := by
     rw [add_comm (algebraMap K A y * T)]
     exact he
   rw [linear_mul_linear_of_quadAlg hQ] at he'
-  have key : algebraMap K A (x * x - y * y * n - x) +
-      algebraMap K A (y * x + x * y + y * y * t - y) * T = 0 := by
+  have key
+      : algebraMap K A (x * x - y * y * n - x) + algebraMap K A (y * x + x * y + y * y * t - y) * T
+        = 0 := by
     simp only [map_sub, map_add (f := _), map_mul] at he' ⊢
     linear_combination he'
   obtain ⟨h1, h2⟩ := hQ.indep' _ _ key
@@ -160,8 +172,8 @@ theorem idem_of_root (hQ : QuadAlg T t n) {β : K} (hβ : β ^ 2 - t * β + n = 
 theorem idem_iff_root (hQ : QuadAlg T t n) : IdemNT A ↔ ∃ β : K, β ^ 2 - t * β + n = 0 :=
   ⟨root_of_idem hQ, fun ⟨_, hβ⟩ => idem_of_root hQ hβ⟩
 
-theorem unit_of_noRoot (hQ : QuadAlg T t n) (h : ¬ ∃ β : K, β ^ 2 - t * β + n = 0) :
-    ∀ z : A, z ≠ 0 → IsUnit z := by
+theorem unit_of_noRoot (hQ : QuadAlg T t n) (h : ¬ ∃ β : K, β ^ 2 - t * β + n = 0)
+    : ∀ z : A, z ≠ 0 → IsUnit z := by
   intro z hz
   obtain ⟨x, y, rfl⟩ := hQ.span' z
   set N := x ^ 2 + x * y * t + y ^ 2 * n with hN_def
@@ -181,8 +193,10 @@ theorem unit_of_noRoot (hQ : QuadAlg T t n) (h : ¬ ∃ β : K, β ^ 2 - t * β 
         field_simp
         ring]
       rw [hN0, zero_div]
-  have hw : (algebraMap K A x + algebraMap K A y * T) *
-      (algebraMap K A (-(N⁻¹ * y)) * T + algebraMap K A (N⁻¹ * (x + y * t))) = 1 := by
+  have hw
+      : (algebraMap K A x + algebraMap K A y * T)
+          * (algebraMap K A (-(N⁻¹ * y)) * T + algebraMap K A (N⁻¹ * (x + y * t)))
+        = 1 := by
     rw [add_comm (algebraMap K A x), linear_mul_linear_of_quadAlg hQ]
     have hX : y * (N⁻¹ * (x + y * t)) + x * -(N⁻¹ * y) + y * -(N⁻¹ * y) * t = 0 := by ring
     have hY : x * (N⁻¹ * (x + y * t)) - y * -(N⁻¹ * y) * n = 1 := by
@@ -191,8 +205,8 @@ theorem unit_of_noRoot (hQ : QuadAlg T t n) (h : ¬ ∃ β : K, β ^ 2 - t * β 
     rw [hX, hY, map_zero, map_one, zero_mul, zero_add]
   exact ⟨⟨_, _, hw, by rw [mul_comm]; exact hw⟩, rfl⟩
 
-theorem field_iff_noRoot (hQ : QuadAlg T t n) :
-    (∀ z : A, z ≠ 0 → IsUnit z) ↔ ¬ ∃ β : K, β ^ 2 - t * β + n = 0 := by
+theorem field_iff_noRoot (hQ : QuadAlg T t n)
+    : (∀ z : A, z ≠ 0 → IsUnit z) ↔ ¬ ∃ β : K, β ^ 2 - t * β + n = 0 := by
   constructor
   · rintro hu ⟨β, hβ⟩
     obtain ⟨e, he, he0, he1⟩ := idem_of_root hQ hβ
@@ -204,18 +218,22 @@ theorem field_iff_noRoot (hQ : QuadAlg T t n) :
 end Quad
 
 section Approx
-variable {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F] (v : HeightOneSpectrum R)
+variable
+  {R K F : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+  [AddCommGroup F] [Module K F] [Module R F] [IsScalarTower R K F]
+  (v : HeightOneSpectrum R)
 
 abbrev OOv : Subalgebra R K :=
   Localization.subalgebra.ofField K v.asIdeal.primeCompl v.asIdeal.primeCompl_le_nonZeroDivisors
 
-theorem mem_OOv (x : K) :
-    x ∈ OOv (K := K) v ↔ ∃ (a s : R) (_ : s ∈ v.asIdeal.primeCompl),
-      x = algebraMap R K a * (algebraMap R K s)⁻¹ := by
+theorem mem_OOv (x : K)
+    : x ∈ OOv (K := K) v
+      ↔ ∃ (a s : R) (_ : s ∈ v.asIdeal.primeCompl),
+        x = algebraMap R K a * (algebraMap R K s)⁻¹ := by
   first
   | exact Iff.rfl
-  | exact Localization.subalgebra.mem_range_mapToFractionRing_iff_ofField K _ _ (Localization v.asIdeal.primeCompl) x
+  | exact Localization.subalgebra.mem_range_mapToFractionRing_iff_ofField K _ _
+      (Localization v.asIdeal.primeCompl) x
 
 theorem alg_ne_zero {s : R} (hs : s ∉ v.asIdeal) : algebraMap R K s ≠ 0 := by
   intro h0
@@ -235,7 +253,8 @@ theorem mem_OOv_of_val {a : K} (h : v.valuation K a ≤ 1) : a ∈ OOv (K := K) 
   rw [IsDedekindDomain.HeightOneSpectrum.valuationSubringAtPrime_toSubring] at h1
   exact h1
 
-theorem exists_inv_mod (n : ℕ) {s : R} (hs : s ∉ v.asIdeal) : ∃ t : R, 1 - s * t ∈ v.asIdeal ^ n := by
+theorem exists_inv_mod (n : ℕ) {s : R} (hs : s ∉ v.asIdeal)
+    : ∃ t : R, 1 - s * t ∈ v.asIdeal ^ n := by
   have h1 : Ideal.span {s} ⊔ v.asIdeal = ⊤ := by
     by_contra hne
     have heq := v.isMaximal.eq_of_le hne (le_sup_right : v.asIdeal ≤ Ideal.span {s} ⊔ v.asIdeal)
@@ -251,22 +270,28 @@ theorem exists_inv_mod (n : ℕ) {s : R} (hs : s ∉ v.asIdeal) : ∃ t : R, 1 -
   rw [this]
   exact hz
 
-theorem approx (c : v.adicCompletionIntegers K) (n : ℕ) :
-    ∃ r : R, Valued.v ((c : v.adicCompletion K) - algebraMap K (v.adicCompletion K) (algebraMap R K r)) ≤
-      WithZero.exp (-(n : ℤ)) := by
+theorem approx (c : v.adicCompletionIntegers K) (n : ℕ)
+    : ∃ r : R,
+      Valued.v ((c : v.adicCompletion K) - algebraMap K (v.adicCompletion K) (algebraMap R K r))
+        ≤ WithZero.exp (-(n : ℤ)) := by
   obtain ⟨π, hπ⟩ := v.intValuation_exists_uniformizer
   set p : v.adicCompletion K := algebraMap K (v.adicCompletion K) (algebraMap R K π) with hp
   have hpv : Valued.v p = WithZero.exp (-1 : ℤ) := by
     rw [hp, val_alg, HeightOneSpectrum.valuation_of_algebraMap, hπ]
   have hpn : Valued.v (p ^ n) = WithZero.exp (-(n : ℤ)) := by
     rw [map_pow, hpv, ← WithZero.exp_nsmul]; congr 1; simp
-  have hopen : IsOpen {x : v.adicCompletion K |
-      (x - (c : v.adicCompletion K)) * (p ^ n)⁻¹ ∈ (Valued.v.valuationSubring : ValuationSubring (v.adicCompletion K))} :=
+  have hopen : IsOpen
+      {x : v.adicCompletion K |
+        (x - (c : v.adicCompletion K)) * (p ^ n)⁻¹ ∈ (Valued.v.valuationSubring : ValuationSubring (v.adicCompletion K))} :=
     (Valued.isOpen_valuationSubring (v.adicCompletion K)).preimage
       ((continuous_sub_right _).mul continuous_const)
   obtain ⟨k, hk⟩ := (v.denseRange_algebraMap K).exists_mem_open hopen ⟨c, by simp⟩
-  have hk' : Valued.v (algebraMap K (v.adicCompletion K) k - (c : v.adicCompletion K)) ≤ WithZero.exp (-(n : ℤ)) := by
-    have h1 : Valued.v ((algebraMap K (v.adicCompletion K) k - (c : v.adicCompletion K)) * (p ^ n)⁻¹) ≤ 1 :=
+  have hk'
+      : Valued.v (algebraMap K (v.adicCompletion K) k - (c : v.adicCompletion K))
+        ≤ WithZero.exp (-(n : ℤ)) := by
+    have h1
+        : Valued.v ((algebraMap K (v.adicCompletion K) k - (c : v.adicCompletion K)) * (p ^ n)⁻¹)
+          ≤ 1 :=
       (Valuation.mem_valuationSubring_iff _ _).1 hk
     rw [map_mul, map_inv₀, hpn] at h1
     have h2 := mul_le_mul' h1 (le_refl (WithZero.exp (-(n : ℤ))))
@@ -275,30 +300,40 @@ theorem approx (c : v.adicCompletionIntegers K) (n : ℕ) :
     rw [← WithZero.exp_zero, WithZero.exp_le_exp]; omega
   have hk1 : v.valuation K k ≤ 1 := by
     rw [← val_alg]
-    have e : algebraMap K (v.adicCompletion K) k = (algebraMap K (v.adicCompletion K) k - c) + c := by ring
+    have e
+        : algebraMap K (v.adicCompletion K) k = (algebraMap K (v.adicCompletion K) k - c) + c := by
+      ring
     rw [e]
-    exact Valuation.map_add_le _ (hk'.trans hle1) ((HeightOneSpectrum.mem_adicCompletionIntegers R K v).1 c.2)
+    exact Valuation.map_add_le _ (hk'.trans hle1)
+      ((HeightOneSpectrum.mem_adicCompletionIntegers R K v).1 c.2)
   obtain ⟨a, s, hs, rfl⟩ := (mem_OOv v k).mp (mem_OOv_of_val v hk1)
   obtain ⟨t, ht⟩ := exists_inv_mod v n hs
   refine ⟨a * t, ?_⟩
   have hs0 := alg_ne_zero (K := K) v hs
-  have e1 : algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t) =
-      algebraMap R K a * algebraMap R K (1 - s * t) * (algebraMap R K s)⁻¹ := by
+  have e1
+      : algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t)
+        = algebraMap R K a * algebraMap R K (1 - s * t) * (algebraMap R K s)⁻¹ := by
     simp only [map_mul, map_sub, map_one]
     field_simp
   have h2 : v.valuation K (algebraMap R K s) = 1 := by
-    rw [HeightOneSpectrum.valuation_of_algebraMap]; exact (v.intValuation_eq_one_iff_mem_primeCompl s).2 hs
-  have h3 : v.valuation K (algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t)) ≤ WithZero.exp (-(n : ℤ)) := by
+    rw [HeightOneSpectrum.valuation_of_algebraMap]
+    exact (v.intValuation_eq_one_iff_mem_primeCompl s).2 hs
+  have h3
+      : v.valuation K (algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t))
+        ≤ WithZero.exp (-(n : ℤ)) := by
     rw [e1, map_mul, map_mul, map_inv₀, h2, inv_one, mul_one]
-    calc v.valuation K (algebraMap R K a) * v.valuation K (algebraMap R K (1 - s * t))
-        ≤ 1 * WithZero.exp (-(n : ℤ)) := by
-          refine mul_le_mul' (v.valuation_le_one a) ?_
-          rw [HeightOneSpectrum.valuation_of_algebraMap]
-          exact (v.intValuation_le_pow_iff_mem _ n).2 ht
+    calc
+      v.valuation K (algebraMap R K a) * v.valuation K (algebraMap R K (1 - s * t))
+          ≤ 1 * WithZero.exp (-(n : ℤ)) := by
+        refine mul_le_mul' (v.valuation_le_one a) ?_
+        rw [HeightOneSpectrum.valuation_of_algebraMap]
+        exact (v.intValuation_le_pow_iff_mem _ n).2 ht
       _ = _ := one_mul _
-  have e2 : (c : v.adicCompletion K) - algebraMap K (v.adicCompletion K) (algebraMap R K (a * t)) =
-      -(algebraMap K (v.adicCompletion K) (algebraMap R K a * (algebraMap R K s)⁻¹) - c) +
-        algebraMap K (v.adicCompletion K) (algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t)) := by
+  have e2
+      : (c : v.adicCompletion K) - algebraMap K (v.adicCompletion K) (algebraMap R K (a * t))
+        = -(algebraMap K (v.adicCompletion K) (algebraMap R K a * (algebraMap R K s)⁻¹) - c)
+          + algebraMap K (v.adicCompletion K)
+            (algebraMap R K a * (algebraMap R K s)⁻¹ - algebraMap R K (a * t)) := by
     rw [map_sub]; ring
   rw [e2]
   refine Valuation.map_add_le _ ?_ ?_
@@ -311,13 +346,16 @@ section Compl
 
 variable {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
 
-abbrev iotaR : 𝓞 F →+* v.adicCompletion F := (algebraMap F (v.adicCompletion F)).comp (algebraMap (𝓞 F) F)
+abbrev iotaR : 𝓞 F →+* v.adicCompletion F :=
+  (algebraMap F (v.adicCompletion F)).comp (algebraMap (𝓞 F) F)
 
 theorem val_int (x : 𝓞 F) : Valued.v (iotaR v x) = v.intValuation x := by
-  rw [iotaR, RingHom.comp_apply, val_alg, IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
+  rw [iotaR, RingHom.comp_apply, val_alg,
+    IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
 
 theorem norm_int_lt_one (x : 𝓞 F) : ‖iotaR v x‖ < 1 ↔ x ∈ v.asIdeal := by
-  rw [Valued.toNormedField.norm_lt_one_iff, val_int, IsDedekindDomain.HeightOneSpectrum.intValuation_lt_one_iff_mem]
+  rw [Valued.toNormedField.norm_lt_one_iff, val_int,
+    IsDedekindDomain.HeightOneSpectrum.intValuation_lt_one_iff_mem]
 
 theorem norm_int_le_one (x : 𝓞 F) : ‖iotaR v x‖ ≤ 1 := by
   rw [Valued.toNormedField.norm_le_one_iff, val_int]
@@ -339,12 +377,15 @@ theorem approx_one (β : v.adicCompletion F) (hβ : ‖β‖ ≤ 1) : ∃ b : �
 
 end Compl
 
-theorem nsub_le {K : Type*} [NormedField K] [IsUltrametricDist K] (a b : K) : ‖a - b‖ ≤ max ‖a‖ ‖b‖ := by
+theorem nsub_le {K : Type*} [NormedField K] [IsUltrametricDist K] (a b : K)
+    : ‖a - b‖ ≤ max ‖a‖ ‖b‖ := by
   rw [sub_eq_add_neg]
   simpa [norm_neg] using IsUltrametricDist.norm_add_le_max a (-b)
 
-theorem root_norm_le {K : Type*} [NormedField K] [IsUltrametricDist K] {tr nm β : K} (htr : ‖tr‖ ≤ 1)
-    (hnm : ‖nm‖ ≤ 1) (h : β ^ 2 - tr * β + nm = 0) : ‖β‖ ≤ 1 := by
+theorem root_norm_le
+    {K : Type*} [NormedField K] [IsUltrametricDist K]
+    {tr nm β : K} (htr : ‖tr‖ ≤ 1) (hnm : ‖nm‖ ≤ 1) (h : β ^ 2 - tr * β + nm = 0)
+    : ‖β‖ ≤ 1 := by
   by_contra hb
   push_neg at hb
   have h1 : β ^ 2 = tr * β - nm := by linear_combination h
@@ -376,7 +417,8 @@ variable {p}
 
 def thO (h : ThetaAt p θ c tr nm) : 𝓞 D.host.E := ⟨θ, h.int⟩
 
-theorem sigO_thO (h : ThetaAt p θ c tr nm) : ((sigO (thO h) : 𝓞 D.host.E) : D.host.E) = D.conjF θ := by
+theorem sigO_thO (h : ThetaAt p θ c tr nm)
+    : ((sigO (thO h) : 𝓞 D.host.E) : D.host.E) = D.conjF θ := by
   rw [Formalism.MainNotions.LocalModelPeriodLattices.conjF_eq_complexConj]
   rfl
 
@@ -390,23 +432,28 @@ theorem disc_O (h : ThetaAt p θ c tr nm) : tr ^ 2 - 4 * nm = c := by
   rw [h.hc, h.htr, h.hnm]
   ring
 
-theorem prod_eq (h : ThetaAt p θ c tr nm) (b : 𝓞 D.host.F) :
-    (thO h - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b) * (sigO (thO h) - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b) =
-      algebraMap (𝓞 D.host.F) (𝓞 D.host.E) (b ^ 2 - tr * b + nm) := by
+theorem prod_eq (h : ThetaAt p θ c tr nm) (b : 𝓞 D.host.F)
+    : (thO h - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b)
+        * (sigO (thO h) - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b)
+      = algebraMap (𝓞 D.host.F) (𝓞 D.host.E) (b ^ 2 - tr * b + nm) := by
   apply RingOfIntegers.coe_injective
-  have hb : ∀ z : 𝓞 D.host.F,
-      ((algebraMap (𝓞 D.host.F) (𝓞 D.host.E) z : 𝓞 D.host.E) : D.host.E) = ((z : D.host.F) : D.host.E) :=
-    fun z => rfl
+  have hb
+      : ∀ z : 𝓞 D.host.F,
+        ((algebraMap (𝓞 D.host.F) (𝓞 D.host.E) z : 𝓞 D.host.E) : D.host.E)
+          = ((z : D.host.F) : D.host.E) := fun z =>
+    rfl
   push_cast [hb, sigO_thO h]
   rw [h.htr, h.hnm]
   show (θ - _) * (D.conjF θ - _) = _
   ring
 
-theorem c_eq_O (h : ThetaAt p θ c tr nm) :
-    algebraMap (𝓞 D.host.F) (𝓞 D.host.E) c = (thO h - sigO (thO h)) ^ 2 := by
+theorem c_eq_O (h : ThetaAt p θ c tr nm)
+    : algebraMap (𝓞 D.host.F) (𝓞 D.host.E) c = (thO h - sigO (thO h)) ^ 2 := by
   apply RingOfIntegers.coe_injective
-  have hb : algebraMap (𝓞 D.host.E) D.host.E (algebraMap (𝓞 D.host.F) (𝓞 D.host.E) c) =
-      ((c : D.host.F) : D.host.E) := rfl
+  have hb
+      : algebraMap (𝓞 D.host.E) D.host.E (algebraMap (𝓞 D.host.F) (𝓞 D.host.E) c)
+        = ((c : D.host.F) : D.host.E) :=
+    rfl
   rw [hb, h.hc, map_pow, map_sub]
   show _ = ((thO h : D.host.E) - ((sigO (thO h) : 𝓞 D.host.E) : D.host.E)) ^ 2
   rw [sigO_thO h]
@@ -416,9 +463,10 @@ theorem sigO_sigO (x : 𝓞 D.host.E) : sigO (sigO x) = x := by
   apply RingOfIntegers.coe_injective
   simp [sigO]
 
-theorem not_prime_of_root (h : ThetaAt p θ c tr nm) (β : p.adicCompletion D.host.F)
-    (hβ : β ^ 2 - iotaR p tr * β + iotaR p nm = 0) :
-    ¬ (p.asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime := by
+theorem not_prime_of_root
+    (h : ThetaAt p θ c tr nm)
+    (β : p.adicCompletion D.host.F) (hβ : β ^ 2 - iotaR p tr * β + iotaR p nm = 0)
+    : ¬(p.asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime := by
   intro hpr
   have hb1 : ‖β‖ ≤ 1 := root_norm_le (norm_int_le_one p tr) (norm_int_le_one p nm) hβ
   obtain ⟨b, hb⟩ := approx_one p β hb1
@@ -432,8 +480,9 @@ theorem not_prime_of_root (h : ThetaAt p θ c tr nm) (β : p.adicCompletion D.ho
     have h2 : ‖iotaR p b + β - iotaR p tr‖ ≤ 1 := by
       refine (nsub_le _ _).trans (max_le ?_ (norm_int_le_one p tr))
       exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (norm_int_le_one p b) hb1)
-    calc ‖iotaR p b - β‖ * ‖iotaR p b + β - iotaR p tr‖ ≤ ‖iotaR p b - β‖ * 1 :=
-          mul_le_mul_of_nonneg_left h2 (norm_nonneg _)
+    calc
+      ‖iotaR p b - β‖ * ‖iotaR p b + β - iotaR p tr‖
+        ≤ ‖iotaR p b - β‖ * 1 := mul_le_mul_of_nonneg_left h2 (norm_nonneg _)
       _ < 1 := by rw [mul_one]; exact h1
   set I := p.asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) with hI
   have hσI : ∀ z ∈ I, sigO z ∈ I := by
@@ -444,11 +493,14 @@ theorem not_prime_of_root (h : ThetaAt p θ c tr nm) (β : p.adicCompletion D.ho
     intro z hz
     rw [← hmap]
     exact Ideal.mem_map_of_mem ((sigO (D := D) : 𝓞 D.host.E →+* 𝓞 D.host.E)) hz
-  have hmem : (thO h - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b) *
-      (sigO (thO h) - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b) ∈ I := by
+  have hmem
+      : (thO h - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b)
+          * (sigO (thO h) - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b)
+        ∈ I := by
     rw [prod_eq h b]; exact Ideal.mem_map_of_mem _ hfb
-  have h1 : thO h - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b ∈ I ∧
-      sigO (thO h) - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b ∈ I := by
+  have h1
+      : thO h - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b ∈ I
+        ∧ sigO (thO h) - algebraMap (𝓞 D.host.F) (𝓞 D.host.E) b ∈ I := by
     rcases hpr.mem_or_mem hmem with h' | h'
     · refine ⟨h', ?_⟩
       have := hσI _ h'
@@ -466,8 +518,8 @@ theorem not_prime_of_root (h : ThetaAt p θ c tr nm) (β : p.adicCompletion D.ho
     (p.isMaximal.eq_of_le (Ideal.comap_ne_top _ hpr.ne_top) Ideal.le_comap_map).symm
   exact h.hcp (hcomap ▸ Ideal.mem_comap.2 h3)
 
-theorem root_of_twoOver (h : ThetaAt p θ c tr nm) (h2 : TwoOver p.asIdeal) :
-    ∃ β : p.adicCompletion D.host.F, β ^ 2 - iotaR p tr * β + iotaR p nm = 0 := by
+theorem root_of_twoOver (h : ThetaAt p θ c tr nm) (h2 : TwoOver p.asIdeal)
+    : ∃ β : p.adicCompletion D.host.F, β ^ 2 - iotaR p tr * β + iotaR p nm = 0 := by
   obtain ⟨P, Q, hPQ, hP, hQ, hPc, hQc⟩ := h2
   have : p.asIdeal.IsMaximal := p.isMaximal
   have hq0 := p.ne_bot
@@ -477,8 +529,9 @@ theorem root_of_twoOver (h : ThetaAt p θ c tr nm) (h2 : TwoOver p.asIdeal) :
     (IsDedekindDomain.mem_primesOverFinset_iff hq0 _).2 ⟨hQ, ⟨hQc.symm⟩⟩
   have hsum := Ideal.sum_ramification_inertia (𝓞 D.host.E) D.host.F D.host.E hq0
   rw [Formalism.BasicNotions.Examples₂.finrank_FE D.host] at hsum
-  have hpos : ∀ R ∈ IsDedekindDomain.primesOverFinset p.asIdeal (𝓞 D.host.E),
-      1 ≤ p.asIdeal.ramificationIdx' R * p.asIdeal.inertiaDeg' R := by
+  have hpos
+      : ∀ R ∈ IsDedekindDomain.primesOverFinset p.asIdeal (𝓞 D.host.E),
+        1 ≤ p.asIdeal.ramificationIdx' R * p.asIdeal.inertiaDeg' R := by
     intro R hR
     rw [IsDedekindDomain.mem_primesOverFinset_iff hq0] at hR
     obtain ⟨hRp, hRl⟩ := hR
@@ -488,11 +541,15 @@ theorem root_of_twoOver (h : ThetaAt p θ c tr nm) (h2 : TwoOver p.asIdeal) :
       · rw [Ideal.map_le_iff_le_comap]; exact le_of_eq hRl.over
     have hf := Ideal.inertiaDeg'_pos p.asIdeal R
     exact Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero he hf.ne')
-  have hle : p.asIdeal.ramificationIdx' P * p.asIdeal.inertiaDeg' P +
-      p.asIdeal.ramificationIdx' Q * p.asIdeal.inertiaDeg' Q ≤ 2 := by
+  have hle
+      : p.asIdeal.ramificationIdx' P * p.asIdeal.inertiaDeg' P
+          + p.asIdeal.ramificationIdx' Q * p.asIdeal.inertiaDeg' Q
+        ≤ 2 := by
     rw [← hsum]
-    exact Finset.add_le_sum (f := fun R => p.asIdeal.ramificationIdx' R * p.asIdeal.inertiaDeg' R)
-      (fun _ _ => Nat.zero_le _) hP' hQ' hPQ
+    exact Finset.add_le_sum
+      (f := fun R => p.asIdeal.ramificationIdx' R * p.asIdeal.inertiaDeg' R)
+      (fun _ _ => Nat.zero_le _)
+      hP' hQ' hPQ
   have hPpos := hpos P hP'
   have hQpos := hpos Q hQ'
   have hef : p.asIdeal.ramificationIdx' P * p.asIdeal.inertiaDeg' P = 1 := by omega
@@ -502,7 +559,9 @@ theorem root_of_twoOver (h : ThetaAt p θ c tr nm) (h2 : TwoOver p.asIdeal) :
   rw [Ideal.inertiaDeg_algebraMap] at hf1
   letI : Field (𝓞 D.host.F ⧸ p.asIdeal) := Ideal.Quotient.field p.asIdeal
   have hbt := Subalgebra.bot_eq_top_of_finrank_eq_one hf1
-  have hmem : Ideal.Quotient.mk P (thO h) ∈ (⊥ : Subalgebra (𝓞 D.host.F ⧸ p.asIdeal) (𝓞 D.host.E ⧸ P)) := by
+  have hmem
+      : Ideal.Quotient.mk P (thO h)
+        ∈ (⊥ : Subalgebra (𝓞 D.host.F ⧸ p.asIdeal) (𝓞 D.host.E ⧸ P)) := by
     rw [hbt]; trivial
   obtain ⟨c', hc'⟩ := Algebra.mem_bot.1 hmem
   obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective c'
@@ -515,15 +574,16 @@ theorem root_of_twoOver (h : ThetaAt p θ c tr nm) (h2 : TwoOver p.asIdeal) :
   have hdisc : iotaR p tr ^ 2 - 4 * iotaR p nm = iotaR p c := by
     rw [← disc_O h]; simp only [map_sub, map_mul, map_pow, map_ofNat]
   have ha0 : ‖iotaR p a ^ 2 - iotaR p tr * iotaR p a + iotaR p nm‖ < 1 := by
-    have e : iotaR p a ^ 2 - iotaR p tr * iotaR p a + iotaR p nm = iotaR p (a ^ 2 - tr * a + nm) := by
+    have e
+        : iotaR p a ^ 2 - iotaR p tr * iotaR p a + iotaR p nm = iotaR p (a ^ 2 - tr * a + nm) := by
       simp only [map_add (f := _), map_sub, map_mul, map_pow]
     rw [e, norm_int_lt_one]
     exact hfa
   exact newton_quad _ _ _ hdisc (norm_int_eq_one p c h.hcp) (norm_four_le p) _ ha0
 
-theorem root_iff (h : ThetaAt p θ c tr nm) :
-    (∃ β : p.adicCompletion D.host.F, β ^ 2 - iotaR p tr * β + iotaR p nm = 0) ↔
-      ¬ (p.asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime :=
+theorem root_iff (h : ThetaAt p θ c tr nm)
+    : (∃ β : p.adicCompletion D.host.F, β ^ 2 - iotaR p tr * β + iotaR p nm = 0)
+      ↔ ¬(p.asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime :=
   ⟨fun ⟨β, hβ⟩ => not_prime_of_root h β hβ, fun hn => root_of_twoOver h ((twoOver_iff p).2 hn)⟩
 
 end Host
@@ -534,7 +594,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} {p : PlF D} {θ : D.host.E} {c tr nm : 𝓞 D.host.F}
 
-theorem theta_notF (h : ThetaAt p θ c tr nm) (a : D.host.F) : θ ≠ algebraMap D.host.F D.host.E a := by
+theorem theta_notF (h : ThetaAt p θ c tr nm) (a : D.host.F)
+    : θ ≠ algebraMap D.host.F D.host.E a := by
   intro hθ
   apply h.hcp
   have h0 : ((c : D.host.F) : D.host.E) = 0 := by
@@ -558,17 +619,20 @@ theorem li_theta (h : ThetaAt p θ c tr nm) : LinearIndependent D.host.F ![(1 : 
     apply theta_notF h (-(s / t))
     rw [Algebra.algebraMap_eq_smul_one]
     have : t • θ = -(s • (1 : D.host.E)) := eq_neg_of_add_eq_zero_right hst
-    calc θ = t⁻¹ • (t • θ) := by rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
+    calc
+      θ = t⁻¹ • (t • θ) := by rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
       _ = -(s / t) • (1 : D.host.E) := by rw [this, smul_neg, smul_smul, neg_smul, div_eq_inv_mul]
 
 def basE (h : ThetaAt p θ c tr nm) : Module.Basis (Fin 2) D.host.F D.host.E :=
-  basisOfLinearIndependentOfCardEqFinrank (li_theta h) (by rw [Fintype.card_fin, Formalism.BasicNotions.Examples₂.finrank_FE D.host])
+  basisOfLinearIndependentOfCardEqFinrank (li_theta h)
+    (by rw [Fintype.card_fin, Formalism.BasicNotions.Examples₂.finrank_FE D.host])
 
 theorem basE_apply (h : ThetaAt p θ c tr nm) (i : Fin 2) : basE h i = ![(1 : D.host.E), θ] i := by
   simp [basE]
 
-def basA (h : ThetaAt p θ c tr nm) :
-    Module.Basis (Fin 2) (p.adicCompletion D.host.F) (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E) :=
+def basA (h : ThetaAt p θ c tr nm)
+    : Module.Basis (Fin 2) (p.adicCompletion D.host.F)
+      (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E) :=
   Algebra.TensorProduct.basis (p.adicCompletion D.host.F) (basE h)
 
 theorem basA_zero (h : ThetaAt p θ c tr nm) : basA h 0 = 1 := by
@@ -579,42 +643,48 @@ theorem basA_one (h : ThetaAt p θ c tr nm) : basA h 1 = (1 : p.adicCompletion D
   rw [basA, Algebra.TensorProduct.basis_apply, basE_apply]
   rfl
 
-theorem tens_one (a : D.host.F) :
-    (1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] (algebraMap D.host.F D.host.E a) =
-      algebraMap (p.adicCompletion D.host.F) (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E)
+theorem tens_one (a : D.host.F)
+    : (1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] (algebraMap D.host.F D.host.E a)
+      = algebraMap (p.adicCompletion D.host.F) (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E)
         (algebraMap D.host.F (p.adicCompletion D.host.F) a) := by
   rw [Algebra.TensorProduct.algebraMap_apply, Algebra.algebraMap_eq_smul_one a,
     Algebra.algebraMap_eq_smul_one a, TensorProduct.tmul_smul, TensorProduct.smul_tmul']
   simp
 
-theorem tens_alg (a : D.host.F) (y : D.host.E) :
-    (1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] (algebraMap D.host.F D.host.E a * y) =
-      algebraMap (p.adicCompletion D.host.F) (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E)
-        (algebraMap D.host.F (p.adicCompletion D.host.F) a) * ((1 : p.adicCompletion D.host.F) ⊗ₜ y) := by
+theorem tens_alg (a : D.host.F) (y : D.host.E)
+    : (1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] (algebraMap D.host.F D.host.E a * y)
+      = algebraMap (p.adicCompletion D.host.F) (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E)
+          (algebraMap D.host.F (p.adicCompletion D.host.F) a)
+        * ((1 : p.adicCompletion D.host.F) ⊗ₜ y) := by
   rw [← tens_one, Algebra.TensorProduct.tmul_mul_tmul, one_mul]
 
-theorem tens_sq (h : ThetaAt p θ c tr nm) :
-    ((1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] θ) * ((1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] θ) =
-      (1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F]
-        (algebraMap D.host.F D.host.E (tr : D.host.F) * θ - algebraMap D.host.F D.host.E (nm : D.host.F)) := by
-  rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one]
-  congr 1
-  have e1 : algebraMap D.host.F D.host.E (tr : D.host.F) = ((tr : D.host.F) : D.host.E) := rfl
-  have e2 : algebraMap D.host.F D.host.E (nm : D.host.F) = ((nm : D.host.F) : D.host.E) := rfl
-  rw [e1, e2, h.htr, h.hnm]
-  ring
+theorem tens_sq (h : ThetaAt p θ c tr nm)
+    : ((1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] θ)
+        * ((1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] θ)
+      = (1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F]
+          (algebraMap D.host.F D.host.E (tr : D.host.F) * θ - algebraMap D.host.F D.host.E (nm : D.host.F)) :=
+  by
+    rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one]
+    congr 1
+    have e1 : algebraMap D.host.F D.host.E (tr : D.host.F) = ((tr : D.host.F) : D.host.E) := rfl
+    have e2 : algebraMap D.host.F D.host.E (nm : D.host.F) = ((nm : D.host.F) : D.host.E) := rfl
+    rw [e1, e2, h.htr, h.hnm]
+    ring
 
-theorem tens_rel (h : ThetaAt p θ c tr nm) :
-    ((1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] θ) * ((1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] θ) =
-      algebraMap (p.adicCompletion D.host.F) (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E) (iotaR p tr) *
-          ((1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] θ) -
-        algebraMap (p.adicCompletion D.host.F) (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E) (iotaR p nm) := by
+theorem tens_rel (h : ThetaAt p θ c tr nm)
+    : ((1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] θ)
+        * ((1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] θ)
+      = algebraMap (p.adicCompletion D.host.F) (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E)
+            (iotaR p tr)
+          * ((1 : p.adicCompletion D.host.F) ⊗ₜ[D.host.F] θ)
+        - algebraMap (p.adicCompletion D.host.F) (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E)
+          (iotaR p nm) := by
   rw [tens_sq h, TensorProduct.tmul_sub, tens_alg, tens_one]
   rfl
 
-theorem quadAlg_tens (h : ThetaAt p θ c tr nm) :
-    QuadAlg (A := p.adicCompletion D.host.F ⊗[D.host.F] D.host.E) ((1 : p.adicCompletion D.host.F) ⊗ₜ θ)
-      (iotaR p tr) (iotaR p nm) := by
+theorem quadAlg_tens (h : ThetaAt p θ c tr nm)
+    : QuadAlg (A := p.adicCompletion D.host.F ⊗[D.host.F] D.host.E)
+      ((1 : p.adicCompletion D.host.F) ⊗ₜ θ) (iotaR p tr) (iotaR p nm) := by
   refine ⟨?_, ?_, tens_rel h, ?_⟩
   · intro z
     refine ⟨(basA h).repr z 0, (basA h).repr z 1, ?_⟩
@@ -622,9 +692,10 @@ theorem quadAlg_tens (h : ThetaAt p θ c tr nm) :
     rw [Fin.sum_univ_two, basA_zero, basA_one] at hs
     exact hs.symm
   · intro x y hxy
-    have hli := Fintype.linearIndependent_iff.1 (basA h).linearIndependent ![x, y] (by
-      rw [Fin.sum_univ_two, basA_zero, basA_one]
-      exact hxy)
+    have hli :=
+      Fintype.linearIndependent_iff.1 (basA h).linearIndependent ![x, y] (by
+        rw [Fin.sum_univ_two, basA_zero, basA_one]
+        exact hxy)
     exact ⟨hli 0, hli 1⟩
   · have e : iotaR p tr ^ 2 - 4 * iotaR p nm = iotaR p c := by
       rw [← disc_O h]; simp only [map_sub, map_mul, map_pow, map_ofNat]
@@ -634,16 +705,16 @@ theorem quadAlg_tens (h : ThetaAt p θ c tr nm) :
     rw [h0, norm_zero] at this
     exact zero_ne_one this
 
-theorem idem_iff_notPrime (p : PlF D) :
-    IdemNT (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E) ↔
-      ¬ (p.asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime := by
+theorem idem_iff_notPrime (p : PlF D)
+    : IdemNT (p.adicCompletion D.host.F ⊗[D.host.F] D.host.E)
+      ↔ ¬(p.asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime := by
   obtain ⟨θ, c, tr, nm, h⟩ := thetaAt_exists p
   rw [idem_iff_root (quadAlg_tens h)]
   exact root_iff h
 
-theorem unit_iff_prime (p : PlF D) :
-    (∀ z : p.adicCompletion D.host.F ⊗[D.host.F] D.host.E, z ≠ 0 → IsUnit z) ↔
-      (p.asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime := by
+theorem unit_iff_prime (p : PlF D)
+    : (∀ z : p.adicCompletion D.host.F ⊗[D.host.F] D.host.E, z ≠ 0 → IsUnit z)
+      ↔ (p.asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime := by
   obtain ⟨θ, c, tr, nm, h⟩ := thetaAt_exists p
   rw [field_iff_noRoot (quadAlg_tens h), root_iff h, not_not]
 
@@ -657,12 +728,15 @@ variable {D : D7} (X : HidaSetting D)
 
 theorem etaF_holds : EtaF X := by
   intro v
-  have hjk : ∀ a : X.B.I.F, X.ιE (algebraMap X.B.I.F X.B.I.E a) =
-      algebraMap D.host.F D.host.E (Formalism.L2.GlobalTheoryTheory.AFTransport.iotaF X a) :=
+  have hjk
+      : ∀ a : X.B.I.F,
+        X.ιE (algebraMap X.B.I.F X.B.I.E a)
+          = algebraMap D.host.F D.host.E (Formalism.L2.GlobalTheoryTheory.AFTransport.iotaF X a) :=
     fun a => (Formalism.L2.GlobalTheoryTheory.AFTransport.iotaF_coe X a).symm
   have h1 := idemNT_iff (Formalism.L2.GlobalTheoryTheory.AFTransport.iotaF X) X.ιE hjk v
-  have hiff : IdemNT (v.adicCompletion X.B.I.F ⊗[X.B.I.F] X.B.I.E) ↔
-      ¬ ((plEquiv X v).asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime :=
+  have hiff
+      : IdemNT (v.adicCompletion X.B.I.F ⊗[X.B.I.F] X.B.I.E)
+        ↔ ¬((plEquiv X v).asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime :=
     h1.trans (idem_iff_notPrime (plEquiv X v))
   unfold Formalism.L2.SG.LocVol.etaV Formalism.HermitianLattices.Ext.L3.etaF
   split_ifs with ha hb hb
@@ -674,11 +748,12 @@ theorem etaF_holds : EtaF X := by
 theorem fieldDict_holds (u u' : D.what₂.Word) : Formalism.L2.SG.Pf.NcVal.FieldDict X u u' :=
   fieldDict_of_eta X (etaF_holds X) u u'
 
-theorem etaLoc_of_tied (hL : Formalism.L2.SG.Pf.LocCP.LocTied D) (p : PlF D) :
-    (if ∀ x : (D.s.atP p).Ep, x ≠ 0 → IsUnit x then (-1 : ℝ) else 1) =
-      Formalism.HermitianLattices.Ext.L3.etaF D.host.E D.host.F p.asIdeal := by
-  have h1 : (∀ x : (D.s.atP p).Ep, x ≠ 0 → IsUnit x) ↔
-      (p.asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime := by
+theorem etaLoc_of_tied (hL : Formalism.L2.SG.Pf.LocCP.LocTied D) (p : PlF D)
+    : (if ∀ x : (D.s.atP p).Ep, x ≠ 0 → IsUnit x then (-1 : ℝ) else 1)
+      = Formalism.HermitianLattices.Ext.L3.etaF D.host.E D.host.F p.asIdeal := by
+  have h1
+      : (∀ x : (D.s.atP p).Ep, x ≠ 0 → IsUnit x)
+        ↔ (p.asIdeal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))).IsPrime := by
     rw [← unit_iff_prime p]
     obtain ⟨e⟩ := hL p
     constructor

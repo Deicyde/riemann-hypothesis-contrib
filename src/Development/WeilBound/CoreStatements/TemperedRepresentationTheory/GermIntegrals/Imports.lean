@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LinearCha
 
 @[expose] public section
 
-open MeasureTheory GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.ThetaGL ValuativeRel PositivityTheory.Tls2.Ming3
+open MeasureTheory GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.ThetaGL
+  ValuativeRel PositivityTheory.Tls2.Ming3
 
 namespace PositivityTheory.Tls2.Ming3
 

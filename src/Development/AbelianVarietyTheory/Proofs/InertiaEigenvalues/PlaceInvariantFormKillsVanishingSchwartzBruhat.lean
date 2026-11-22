@@ -10,9 +10,12 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FockTheta.RealPlaceImaginar
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DownLift
@@ -23,7 +26,22 @@ noncomputable section
 
 namespace GlobalTheory.DownLift.SplitCoef
 
-theorem form_placeModel_eq_zero_of_vanish : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D), IsStdChar D ψ (-1) → ∀ (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)), IsSelfDualC S ΛS → IsSelfDualC T ΛT → ∀ a b : AE D, IsSplitIdem D a → b * b = b → b * cA D b = 0 → infPart D b = 0 → b * a = a → ∀ (f₀ : WO S T → ℂ) (Tm : (WO S T → ℂ) →ₗ[ℂ] (WO S T → ℂ)), IsThetaFunO ψ S T f₀ → IsPlaceModel ψ (symplO S T) (heisO ψ S T) b (latH S T ΛS ΛT) 1 f₀ Tm → ∀ ℓ, InvForm ψ S T a ℓ → ∀ Ψ : WO S T → ℂ, IsSBHalf b (latH S T ΛS ΛT) Ψ → (∀ t : WO S T, a • t = 0 → Ψ t = 0) → ℓ (Tm Ψ) = 0 := by
+theorem form_placeModel_eq_zero_of_vanish
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D),
+      IsStdChar D ψ (-1)
+        → ∀ (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+            (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),
+          IsSelfDualC S ΛS → IsSelfDualC T ΛT
+            → ∀ a b : AE D,
+              IsSplitIdem D a → b * b = b → b * cA D b = 0 → infPart D b = 0 → b * a = a
+                → ∀ (f₀ : WO S T → ℂ) (Tm : (WO S T → ℂ) →ₗ[ℂ] (WO S T → ℂ)),
+                  IsThetaFunO ψ S T f₀
+                    → IsPlaceModel ψ (symplO S T) (heisO ψ S T) b (latH S T ΛS ΛT) 1 f₀ Tm
+                    → ∀ ℓ,
+                      InvForm ψ S T a ℓ
+                        → ∀ Ψ : WO S T → ℂ,
+                          IsSBHalf b (latH S T ΛS ΛT) Ψ → (∀ t : WO S T, a • t = 0 → Ψ t = 0)
+                            → ℓ (Tm Ψ) = 0 := by
   intro D ψ S T hψ ΛS ΛT hS hT a b ha hbb hbc hbinf hba f₀ Tm hf₀ hTm ℓ hℓ Ψ hΨ hΨ0
   have hth : ∀ Ψ', IsSBHalf b (latH S T ΛS ΛT) Ψ' → IsThetaFunO ψ S T (Tm Ψ') := by
     intro Ψ' h'
@@ -47,7 +65,9 @@ theorem form_placeModel_eq_zero_of_vanish : ∀ (D : D7) (ψ : AddChar (AF D.hos
     map_nsmul (DistribSMul.toAddMonoidHom (WO S T) c) k x
   have haa : a * a = a := ha.1
   have hainf : infPart D a = 0 := GlobalTheory.SplitScalar.infPart_splitIdem ha
-  obtain ⟨Y, hYne, hY1, -, hY3⟩ := GlobalTheory.T.exists_reps_latticeQuotient_conjugateHalf_orthogonal D ψ S T hψ ΛS ΛT hS hT a haa hainf k hk
+  obtain ⟨Y, hYne, hY1, -, hY3⟩ :=
+    GlobalTheory.T.exists_reps_latticeQuotient_conjugateHalf_orthogonal D ψ S T hψ ΛS ΛT hS hT a haa
+      hainf k hk
   have hzero : (fun t => ∑ y ∈ Y, ψ (symplO S T t y) * Ψ t) = 0 := by
     funext t
     simp only [Pi.zero_apply]
@@ -56,8 +76,10 @@ theorem form_placeModel_eq_zero_of_vanish : ∀ (D : D7) (ψ : AddChar (AF D.hos
     rw [← Finset.sum_mul]
     have hsym : ∀ y ∈ Y, symplO S T t y = symplO S T (a • t) y := by
       intro y hy
-      rw [GlobalTheory.SplitScalar.symplO_smul, (GlobalTheory.SplitScalar.isHalf_iff _ _).1 (hY1 y hy).1]
-    have hx : IsHalf a (a • t) := (GlobalTheory.SplitScalar.isHalf_iff _ _).2 (by rw [smul_smul, haa])
+      rw [GlobalTheory.SplitScalar.symplO_smul,
+        (GlobalTheory.SplitScalar.isHalf_iff _ _).1 (hY1 y hy).1]
+    have hx : IsHalf a (a • t) :=
+      (GlobalTheory.SplitScalar.isHalf_iff _ _).2 (by rw [smul_smul, haa])
     have hkx : k • (a • t) ∈ latH S T ΛS ΛT := by
       rw [← hcomm a t]
       exact GlobalTheory.SplitScalar.idem_smul_mem haa _ (hden t ht)
@@ -73,15 +95,17 @@ theorem form_placeModel_eq_zero_of_vanish : ∀ (D : D7) (ψ : AddChar (AF D.hos
       apply hΨ0
       rw [smul_sub, hxu, hcomm a u, (GlobalTheory.SplitScalar.isHalf_iff _ _).1 hau, sub_self]
     · rw [Finset.sum_congr rfl fun y hy => by rw [hsym y hy], h2 hex, zero_mul]
-  have hsum : ∑ y ∈ Y, ℓ (Tm (fun t => ψ (symplO S T t y) * Ψ t)) =
-      ℓ (Tm (fun t => ∑ y ∈ Y, ψ (symplO S T t y) * Ψ t)) := by
+  have hsum
+      : ∑ y ∈ Y, ℓ (Tm (fun t => ψ (symplO S T t y) * Ψ t))
+        = ℓ (Tm (fun t => ∑ y ∈ Y, ψ (symplO S T t y) * Ψ t)) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← map_sum ℓ, ← map_sum Tm]
     congr 2
     funext t
     simp [Finset.sum_apply]
-  rw [hzero, map_zero, map_zero, Finset.sum_congr rfl fun y hy => hmod y (hY1 y hy).1, Finset.sum_const,
-    nsmul_eq_mul] at hsum
+  rw [hzero, map_zero, map_zero, Finset.sum_congr rfl fun y hy => hmod y (hY1 y hy).1,
+      Finset.sum_const, nsmul_eq_mul]
+    at hsum
   have hc : (Y.card : ℂ) ≠ 0 := by exact_mod_cast hYne.card_pos.ne'
   exact (mul_eq_zero.1 hsum).resolve_left hc
 

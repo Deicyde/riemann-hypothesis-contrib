@@ -12,10 +12,14 @@ namespace UpperTheory.V.Fr
 
 section Lau
 
-variable {C K : Type} [CommRing C] [CommRing K] [Algebra C K] (P : ℤ → Submodule C K) [SetLike.GradedMonoid P]
+variable
+  {C K : Type} [CommRing C] [CommRing K] [Algebra C K]
+  (P : ℤ → Submodule C K) [SetLike.GradedMonoid P]
 
-theorem coeff_mul_mem {p q : AddMonoidAlgebra K ℤ} (j : ℤ) (M : Submodule C K)
-    (h : ∀ a b, a + b = j → p.coeff a * q.coeff b ∈ M) : (p * q).coeff j ∈ M := by
+theorem coeff_mul_mem
+    {p q : AddMonoidAlgebra K ℤ}
+    (j : ℤ) (M : Submodule C K) (h : ∀ a b, a + b = j → p.coeff a * q.coeff b ∈ M)
+    : (p * q).coeff j ∈ M := by
   classical
   rw [AddMonoidAlgebra.coeff_mul]
   refine Submodule.sum_mem _ fun a _ => Submodule.sum_mem _ fun b _ => ?_
@@ -30,14 +34,16 @@ def lauSub : Subalgebra C (AddMonoidAlgebra K ℤ) where
   add_mem' {p q} hp hq j := add_mem (hp j) (hq j)
   algebraMap_mem' c j := by
     classical
-    rw [AddMonoidAlgebra.coe_algebraMap, Function.comp_apply, AddMonoidAlgebra.coeff_single, Finsupp.single_apply]
+    rw [AddMonoidAlgebra.coe_algebraMap, Function.comp_apply, AddMonoidAlgebra.coeff_single,
+      Finsupp.single_apply]
     split_ifs with e
     · subst e
       rw [Algebra.algebraMap_eq_smul_one]
       exact Submodule.smul_mem _ _ (SetLike.one_mem_graded P)
     · exact zero_mem _
 
-theorem single_mem_lauSub {j : ℤ} {x : K} (hx : x ∈ P j) : AddMonoidAlgebra.single j x ∈ lauSub P := by
+theorem single_mem_lauSub {j : ℤ} {x : K} (hx : x ∈ P j)
+    : AddMonoidAlgebra.single j x ∈ lauSub P := by
   classical
   intro i
   rw [AddMonoidAlgebra.coeff_single, Finsupp.single_apply]
@@ -51,7 +57,6 @@ variable [IsLocalRing C]
 structure HasVertex : Prop where
   zero : ∀ x ∈ P 0, ∃ c : C, algebraMap C K c = x
   cross : ∀ j, j ≠ 0 → ∀ x ∈ P j, ∀ y ∈ P (-j), ∃ c ∈ maximalIdeal C, algebraMap C K c = x * y
-
 
 variable {P} in
 def vertex (h : HasVertex P) : Ideal (lauSub P) where
@@ -74,16 +79,22 @@ def vertex (h : HasVertex P) : Ideal (lauSub P) where
       exact h.cross a h0 _ (q.2 a) _ (p.2 _)
 
 variable {P} in
-theorem mem_vertex (h : HasVertex P) {p : lauSub P} :
-    p ∈ UpperTheory.V.Fr.vertex (P := P) h ↔
-      ∃ c ∈ maximalIdeal C, algebraMap C K c = p.1.coeff 0 := Iff.rfl
+theorem mem_vertex (h : HasVertex P) {p : lauSub P}
+    : p ∈ UpperTheory.V.Fr.vertex (P := P) h
+      ↔ ∃ c ∈ maximalIdeal C, algebraMap C K c = p.1.coeff 0 :=
+  Iff.rfl
 
 end Lau
 
 section Part
 
-variable {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k} {n : ℕ} (C : Type) [CommRing C] {K : Type}
-  [CommRing K] [Algebra C K] (ρ : NRep F n K)
+variable
+  {l : ℕ} [Fact l.Prime]
+  {k : Type} [Field k]
+  {F : Frame l k} {n : ℕ}
+  (C : Type) [CommRing C]
+  {K : Type} [CommRing K] [Algebra C K]
+  (ρ : NRep F n K)
 
 def NRep.part (j : ℤ) : Submodule C K := Submodule.span C (ρ.mon j)
 
@@ -101,24 +112,35 @@ theorem NRep.r_mem_part (g : F.G0) (i j : Fin n) : ρ.r g i j ∈ ρ.part C (w n
 
 end Part
 
-variable {l : ℕ} [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O] {F : Frame l (ResidueField O)} {n : ℕ}
+variable
+  {l : ℕ} [Fact l.Prime]
+  (O : Type) [CommRing O] [IsLocalRing O]
+  {F : Frame l (ResidueField O)} {n : ℕ}
 
-structure IsVertexRing (C : Type) [CommRing C] [IsLocalRing C] {D : Type} [CommRing D] [Algebra C D] (𝔪 : Ideal D) :
-    Prop where
+structure IsVertexRing
+    (C : Type) [CommRing C] [IsLocalRing C] {D : Type} [CommRing D] [Algebra C D] (𝔪 : Ideal D)
+    : Prop where
   noeth : IsNoetherianRing D
   inj : Function.Injective (algebraMap C D)
   sep : ⨅ N : ℕ, 𝔪 ^ N = ⊥
   comap : 𝔪.comap (algebraMap C D) = maximalIdeal C
   surj : ∀ d : D, ∃ c : C, d - algebraMap C D c ∈ 𝔪
 
-structure IsModel (C : Type) [CommRing C] [Algebra O C] [IsCO O C] {D : Type} [CommRing D] [Algebra C D]
-    (𝔪 : Ideal D) (ρ : NRep F n D) : Prop where
+structure IsModel
+    (C : Type) [CommRing C] [Algebra O C] [IsCO O C]
+    {D : Type} [CommRing D] [Algebra C D]
+    (𝔪 : Ideal D) (ρ : NRep F n D)
+    : Prop where
   cont : ρ.Cont 𝔪
   off : ∀ g i j, i ≠ j → ρ.r g i j ∈ 𝔪
-  dg : ∀ g i, ∃ c : C, algebraMap C D c = ρ.r g i i ∧
-    res O C c = ((F.Ψ g ^ w n i : (ResidueField O)ˣ) : ResidueField O)
-  psi : ∀ v i g, ∃ c : C, algebraMap C D c = ρ.ψ v i g ∧
-    res O C c = ((F.Ψ (F.loc v g) ^ w n i : (ResidueField O)ˣ) : ResidueField O)
+  dg
+    : ∀ g i, ∃ c : C,
+      algebraMap C D c = ρ.r g i i
+        ∧ res O C c = ((F.Ψ g ^ w n i : (ResidueField O)ˣ) : ResidueField O)
+  psi
+    : ∀ v i g, ∃ c : C,
+      algebraMap C D c = ρ.ψ v i g
+        ∧ res O C c = ((F.Ψ (F.loc v g) ^ w n i : (ResidueField O)ˣ) : ResidueField O)
   mon : ∀ x ∈ ρ.mon 0, ∃ c : C, algebraMap C D c = x
 
 end UpperTheory.V.Fr

@@ -10,10 +10,11 @@ open NumberField MeasureTheory
 
 namespace GlobalTheory.WeilM
 
-theorem schA_memLp_two : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ],
-    letI : MeasurableSpace (κ → AdeleRing (𝓞 F) F) := borel _
-    ∀ μ : MeasureTheory.Measure (κ → AdeleRing (𝓞 F) F), μ.IsAddHaarMeasure →
-    ∀ Φ ∈ GlobalTheory.WeilM.schA F κ, MeasureTheory.MemLp Φ 2 μ := by
+theorem schA_memLp_two
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ],
+      letI : MeasurableSpace (κ → AdeleRing (𝓞 F) F) := borel _
+      ∀ μ : MeasureTheory.Measure (κ → AdeleRing (𝓞 F) F),
+        μ.IsAddHaarMeasure → ∀ Φ ∈ GlobalTheory.WeilM.schA F κ, MeasureTheory.MemLp Φ 2 μ := by
   intro F _ _ κ _
   letI : MeasurableSpace (κ → AdeleRing (𝓞 F) F) := borel _
   intro μ hμ Φ hΦ

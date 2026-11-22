@@ -8,9 +8,10 @@ namespace ReciprocityTheory.L2DbarEstimates
 
 open scoped InnerProductSpace
 
-theorem rieszOnRange (E H : Type*) [AddCommGroup E] [Module ℂ E]
-    [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] :
-    RieszOnRangeStatement E H := by
+theorem rieszOnRange
+    (E H : Type*)
+    [AddCommGroup E] [Module ℂ E] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    : RieszOnRangeStatement E H := by
   intro θ ℓ A hA hbd
 
   have hker : LinearMap.ker θ ≤ LinearMap.ker ℓ := by
@@ -25,8 +26,10 @@ theorem rieszOnRange (E H : Type*) [AddCommGroup E] [Module ℂ E]
   let φ : R →ₗ[ℂ] ℂ := (LinearMap.ker θ).liftQ ℓ hker ∘ₗ θ.quotKerEquivRange.symm.toLinearMap
   have hφ : ∀ e : E, φ ⟨θ e, LinearMap.mem_range_self θ e⟩ = ℓ e := by
     intro e
-    have hmk : (⟨θ e, LinearMap.mem_range_self θ e⟩ : R) =
-        θ.quotKerEquivRange (Submodule.Quotient.mk e) := rfl
+    have hmk
+        : (⟨θ e, LinearMap.mem_range_self θ e⟩ : R)
+          = θ.quotKerEquivRange (Submodule.Quotient.mk e) :=
+      rfl
     simp only [φ, LinearMap.comp_apply, LinearEquiv.coe_coe]
     rw [hmk, LinearEquiv.symm_apply_apply, Submodule.liftQ_apply]
   have hsq : ∀ e : E, ‖ℓ e‖ ≤ Real.sqrt A * ‖θ e‖ := by
@@ -52,7 +55,9 @@ theorem rieszOnRange (E H : Type*) [AddCommGroup E] [Module ℂ E]
   haveI : CompleteSpace K := R.isClosed_topologicalClosure.completeSpace_coe
   refine ⟨K.starProjection v, K.starProjection_apply_mem v, ?_, ?_⟩
   · have h3 : ‖K.starProjection v‖ ≤ Real.sqrt A := (K.norm_starProjection_apply_le v).trans hvnorm
-    calc ‖K.starProjection v‖ ^ 2 ≤ Real.sqrt A ^ 2 := by gcongr
+    calc
+      ‖K.starProjection v‖ ^ 2
+        ≤ Real.sqrt A ^ 2 := by gcongr
       _ = A := Real.sq_sqrt hA
   · intro e
     have hmem : θ e ∈ K := R.le_topologicalClosure (LinearMap.mem_range_self θ e)

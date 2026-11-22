@@ -8,7 +8,10 @@ public import Development.AbelianVarietyTheory.Counterexamples.HeightSurvey.Star
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Matrix GlobalTheory.FockCompare GlobalTheory.IndefiniteRowSideFullHecke.FockOrthogonalDecomposition
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Matrix GlobalTheory.FockCompare
+  GlobalTheory.IndefiniteRowSideFullHecke.FockOrthogonalDecomposition
 open scoped TensorProduct ContDiff ComplexOrder Topology
 
 namespace GlobalTheory.FockCompare.ThetaCont
@@ -17,7 +20,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} {θ : InfFam D} {σ : (D.what₂.Tau → ℂ) →+ AE D}
 
-theorem infPart_eq_zero (h : Chart θ σ) (a : AE D) (ha : ∀ τ, θ τ (infPart D a) = 0) : infPart D a = 0 := by
+theorem infPart_eq_zero (h : Chart θ σ) (a : AE D) (ha : ∀ τ, θ τ (infPart D a) = 0)
+    : infPart D a = 0 := by
   let e : AF D.host.F := ((1 : Ainf D.host.F), (0 : Af D.host.F))
   let E : AE D := e ⊗ₜ[D.host.F] (1 : D.host.E)
   have h1 : infPart D E = 1 := rfl
@@ -25,7 +29,8 @@ theorem infPart_eq_zero (h : Chart θ σ) (a : AE D) (ha : ∀ τ, θ τ (infPar
     show (0 : Af D.host.F) ⊗ₜ[D.host.F] (1 : D.host.E) = 0
     exact TensorProduct.zero_tmul _ _
   have h3 : infPart D (E * a) = infPart D a := by rw [RingHom.map_mul, h1, one_mul]
-  have h4 : E * a = 0 := h.ext _ (by rw [RingHom.map_mul, h2, zero_mul]) fun τ => by rw [h3]; exact ha τ
+  have h4 : E * a = 0 :=
+    h.ext _ (by rw [RingHom.map_mul, h2, zero_mul]) fun τ => by rw [h3]; exact ha τ
   rw [← h3, h4, RingHom.map_zero]
 
 theorem continuous_conj : Continuous (cA D) := by
@@ -33,27 +38,38 @@ theorem continuous_conj : Continuous (cA D) := by
     Algebra.TensorProduct.map (AlgHom.id (AF D.host.F) (AF D.host.F)) D.sp.cm.sig
   exact IsModuleTopology.continuous_of_linearMap f.toLinearMap
 
-theorem continuous_hHom (V W : HSp D) {X : Type} [TopologicalSpace X] {x y : X → WA V W} (hx : Continuous x)
-    (hy : Continuous y) : Continuous fun t => hHom V W (x t) (y t) := by
+theorem continuous_hHom
+    (V W : HSp D)
+    {X : Type} [TopologicalSpace X]
+    {x y : X → WA V W} (hx : Continuous x) (hy : Continuous y)
+    : Continuous fun t => hHom V W (x t) (y t) := by
   have hx' : ∀ i j, Continuous fun t => cA D (x t i j) := fun i j =>
     continuous_conj.comp ((continuous_apply j).comp ((continuous_apply i).comp hx))
   have hy' : ∀ i j, Continuous fun t => y t i j := fun i j =>
     (continuous_apply j).comp ((continuous_apply i).comp hy)
   unfold hHom
-  split_ifs <;>
-    exact continuous_finsetSum _ fun _ _ => continuous_finsetSum _ fun _ _ => continuous_finsetSum _ fun _ _ =>
-      continuous_finsetSum _ fun _ _ => (((hx' _ _).mul continuous_const).mul continuous_const).mul (hy' _ _)
+  split_ifs <;> exact continuous_finsetSum _ fun _ _ =>
+    continuous_finsetSum _ fun _ _ =>
+      continuous_finsetSum _ fun _ _ =>
+        continuous_finsetSum _ fun _ _ =>
+          (((hx' _ _).mul continuous_const).mul continuous_const).mul (hy' _ _)
 
-theorem continuous_symplH (V W : HSp D) {X : Type} [TopologicalSpace X] {x y : X → WA V W} (hx : Continuous x)
-    (hy : Continuous y) : Continuous fun t => symplH V W (x t) (y t) := by
-  have ht : Continuous (Algebra.trace (AF D.host.F) (AE D)) := IsModuleTopology.continuous_of_linearMap _
+theorem continuous_symplH
+    (V W : HSp D)
+    {X : Type} [TopologicalSpace X]
+    {x y : X → WA V W} (hx : Continuous x) (hy : Continuous y)
+    : Continuous fun t => symplH V W (x t) (y t) := by
+  have ht : Continuous (Algebra.trace (AF D.host.F) (AE D)) :=
+    IsModuleTopology.continuous_of_linearMap _
   exact continuous_const.mul (ht.comp (continuous_const.mul (continuous_hHom V W hy hx)))
 
-theorem continuous_of_level_of_smooth (D : D7) (θ : InfFam D) (σ : (D.what₂.Tau → ℂ) →+ AE D) (h : Chart θ σ)
+theorem continuous_of_level_of_smooth
+    (D : D7) (θ : InfFam D) (σ : (D.what₂.Tau → ℂ) →+ AE D) (h : Chart θ σ)
     (ψ : AddChar (AF D.host.F) ℂ) (hψ : Continuous ψ) (V W : HSp D) (f : WA V W → ℂ)
-    (hU : ∃ U : AddSubgroup (WA V W), IsOpen (U : Set (WA V W)) ∧
-      ∀ u ∈ U, u.map (infPart D) = 0 → Heisenberg₂ ψ V W u f = f)
-    (hs : Sm (iotaW σ V W) f) : Continuous f := by
+    (hU : ∃ U : AddSubgroup (WA V W),
+      IsOpen (U : Set (WA V W)) ∧ ∀ u ∈ U, u.map (infPart D) = 0 → Heisenberg₂ ψ V W u f = f)
+    (hs : Sm (iotaW σ V W) f)
+    : Continuous f := by
   obtain ⟨U, hUo, hU⟩ := hU
   have : IsTopologicalAddGroup (AE D) := IsTopologicalRing.isTopologicalAddGroup
   haveI : IsTopologicalAddGroup (WA V W) := Pi.topologicalAddGroup
@@ -75,7 +91,7 @@ theorem continuous_of_level_of_smooth (D : D7) (θ : InfFam D) (σ : (D.what₂.
       rw [← sub_sub, AddMonoidHom.map_sub, h.pi_iota, sub_self]
     ext i j
     exact infPart_eq_zero h _ fun τ => congrFun (congrFun (congrFun hp τ) i) j
-  have hg : Continuous fun w' => ψ (-symplH V W (a w') (u w')) * f (a w') :=
+  have hg : Continuous fun w' => ψ (- symplH V W (a w') (u w')) * f (a w') :=
     (hψ.comp (continuous_symplH V W ha hu).neg).mul ((hs w).continuous.comp hx)
   have hev : ∀ᶠ w' in 𝓝 w, u w' ∈ U :=
     hu.continuousAt.preimage_mem_nhds (hUo.mem_nhds (by rw [huw]; exact U.zero_mem))

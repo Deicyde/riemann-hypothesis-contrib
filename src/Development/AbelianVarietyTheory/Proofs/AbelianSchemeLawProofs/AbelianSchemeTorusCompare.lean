@@ -13,8 +13,11 @@ open ReciprocityTheory.ChartRestriction.G.Semi
 
 namespace GlobalTheory.Compare.AbelianSchemeTorusCompare
 
-theorem isAbelianScheme_of_iso {S : Scheme.{0}} {A B : Over S} [GrpObj A] [GrpObj B]
-    (e : A ≅ B) (he : IsMonHom e.hom) (hB : IsAbelianScheme B) : IsAbelianScheme A := by
+theorem isAbelianScheme_of_iso
+    {S : Scheme.{0}} {A B : Over S} [GrpObj A] [GrpObj B]
+    (e : A ≅ B) (he : IsMonHom e.hom)
+    (hB : IsAbelianScheme B)
+    : IsAbelianScheme A := by
   have hw : A.hom = e.hom.left ≫ B.hom := (Over.w e.hom).symm
   have hiso : IsIso e.hom.left := inferInstanceAs (IsIso ((Over.forget S).map e.hom))
   have := hB.comm
@@ -27,8 +30,8 @@ theorem isAbelianScheme_of_iso {S : Scheme.{0}} {A B : Over S} [GrpObj A] [GrpOb
   · rw [hw]; infer_instance
   · rw [hw]; infer_instance
   · rw [hw]
-    have hbc : MorphismProperty.IsStableUnderBaseChange (C := Scheme.{0})
-        @GeometricallyConnected := inferInstance
+    have hbc : MorphismProperty.IsStableUnderBaseChange (C := Scheme.{0}) @GeometricallyConnected :=
+      inferInstance
     have hri : MorphismProperty.RespectsIso (C := Scheme.{0}) @GeometricallyConnected :=
       MorphismProperty.IsStableUnderBaseChange.respectsIso
     exact (MorphismProperty.cancel_left_of_respectsIso @GeometricallyConnected _ _).2 this

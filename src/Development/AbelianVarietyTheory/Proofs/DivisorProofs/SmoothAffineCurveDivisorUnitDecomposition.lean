@@ -26,16 +26,18 @@ theorem artinian_quot {I : Ideal B} (hI : I ≠ ⊥) : IsArtinianRing (B ⧸ I) 
     simp [Ideal.mem_comap, Ideal.Quotient.eq_zero_iff_mem.mpr hx]
   have h2 := Ideal.map_comap_of_surjective (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective p
   rcases Ideal.map_eq_top_or_isMaximal_of_surjective (Ideal.Quotient.mk I)
-    Ideal.Quotient.mk_surjective h1 with h | h
+      Ideal.Quotient.mk_surjective h1
+    with h | h
   · exact absurd (h2 ▸ h) hp.ne_top
   · exact h2 ▸ h
 
-theorem exists_split (f b : B) (hb : b ≠ 0) :
-    ∃ (N : ℕ) (Q : Ideal B), Ideal.span {b} = (Ideal.span {b} ⊔ Ideal.span {f ^ N}) * Q ∧
-      Q ⊔ Ideal.span {f} = ⊤ := by
+theorem exists_split (f b : B) (hb : b ≠ 0)
+    : ∃ (N : ℕ) (Q : Ideal B),
+      Ideal.span {b} = (Ideal.span {b} ⊔ Ideal.span {f ^ N}) * Q ∧ Q ⊔ Ideal.span {f} = ⊤ := by
   haveI := artinian_quot (I := Ideal.span {b}) (by simpa using hb)
-  obtain ⟨N, y, hy⟩ := IsArtinian.exists_pow_succ_smul_dvd
-    (Ideal.Quotient.mk (Ideal.span {b}) f) (1 : B ⧸ Ideal.span {b})
+  obtain ⟨N, y, hy⟩ :=
+    IsArtinian.exists_pow_succ_smul_dvd (Ideal.Quotient.mk (Ideal.span {b}) f)
+      (1 : B ⧸ Ideal.span {b})
   obtain ⟨y', rfl⟩ := Ideal.Quotient.mk_surjective y
   have hmem : f ^ N - f ^ (N + 1) * y' ∈ Ideal.span {b} := by
     rw [← Ideal.Quotient.eq]
@@ -60,12 +62,13 @@ theorem exists_split (f b : B) (hb : b ≠ 0) :
       have e : f ^ N = (f ^ N - f ^ (N + 1) * y') + f ^ N * y' * f := by ring
       rw [e]
       refine add_mem (Ideal.mem_sup_left hmem) (Ideal.mem_sup_right ?_)
-      exact Ideal.mul_mem_mul (Ideal.mul_mem_right _ _ (Ideal.mem_sup_right
-        (Ideal.mem_span_singleton_self _))) (Ideal.mem_span_singleton_self f)
+      exact Ideal.mul_mem_mul
+        (Ideal.mul_mem_right _ _ (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)))
+        (Ideal.mem_span_singleton_self f)
   exact mul_left_cancel₀ hP0 key
 
-theorem exists_mem_coprime {I : Ideal B} (hI : I ≠ ⊥) (f : B) (h : I ⊔ Ideal.span {f} = ⊤) :
-    ∃ g ∈ I, g ≠ 0 ∧ IsCoprime f g := by
+theorem exists_mem_coprime {I : Ideal B} (hI : I ≠ ⊥) (f : B) (h : I ⊔ Ideal.span {f} = ⊤)
+    : ∃ g ∈ I, g ≠ 0 ∧ IsCoprime f g := by
   have h1 : (1 : B) ∈ I ⊔ Ideal.span {f} := h ▸ Submodule.mem_top
   obtain ⟨a, ha, y, hy, hay⟩ := Submodule.mem_sup.1 h1
   obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 hy
@@ -75,8 +78,8 @@ theorem exists_mem_coprime {I : Ideal B} (hI : I ≠ ⊥) (f : B) (h : I ⊔ Ide
     exact ⟨x, hx, hx0, ⟨c, 0, by simpa using hay⟩⟩
   · exact ⟨a, ha, ha0, ⟨c, 1, by linear_combination hay⟩⟩
 
-theorem isCoprime_ideal_of_le {I J J' : Ideal B} (h : IsCoprime I J) (hle : J ≤ J') :
-    IsCoprime I J' := by
+theorem isCoprime_ideal_of_le {I J J' : Ideal B} (h : IsCoprime I J) (hle : J ≤ J')
+    : IsCoprime I J' := by
   rw [Ideal.isCoprime_iff_sup_eq] at h ⊢
   exact eq_top_iff.2 (h ▸ sup_le_sup_left hle I)
 
@@ -86,10 +89,12 @@ namespace GlobalTheory.KummerDiv
 
 variable {B : Type} [CommRing B] [IsDedekindDomain B]
 
-theorem core (q : ℕ) (hq : q ≠ 0) (hdiv : ∀ c : ClassGroup B, ∃ d : ClassGroup B, d ^ q = c)
-    (f b : B) (hf : f ≠ 0) (hb : b ≠ 0) :
-    ∃ (g n t w : B) (N : ℕ), g ≠ 0 ∧ IsCoprime f g ∧ IsCoprime f n ∧ IsCoprime g w ∧
-      b ∣ f ^ N * g ∧ n ∣ g ^ q ∧ b * t ^ q = n * w := by
+theorem core
+    (q : ℕ) (hq : q ≠ 0) (hdiv : ∀ c : ClassGroup B, ∃ d : ClassGroup B, d ^ q = c)
+    (f b : B) (hf : f ≠ 0) (hb : b ≠ 0)
+    : ∃ (g n t w : B) (N : ℕ),
+      g ≠ 0 ∧ IsCoprime f g ∧ IsCoprime f n ∧ IsCoprime g w ∧ b ∣ f ^ N * g ∧ n ∣ g ^ q
+        ∧ b * t ^ q = n * w := by
   obtain ⟨N, Q, hQ, hQf⟩ := exists_split f b hb
   set P := Ideal.span {b} ⊔ Ideal.span {f ^ N} with hPdef
   have hQ0 : Q ≠ ⊥ := by
@@ -114,8 +119,7 @@ theorem core (q : ℕ) (hq : q ≠ 0) (hdiv : ∀ c : ClassGroup B, ∃ d : Clas
     · exact hQ0 h
     · exact hJ0 (pow_eq_zero_iff hq |>.1 h)
 
-  have cQ : IsCoprime (Ideal.span {f}) Q := by
-    rw [Ideal.isCoprime_iff_sup_eq, sup_comm]; exact hQf
+  have cQ : IsCoprime (Ideal.span {f}) Q := by rw [Ideal.isCoprime_iff_sup_eq, sup_comm]; exact hQf
   have cJ : IsCoprime (Ideal.span {f}) (J : Ideal B) := by
     rw [Ideal.isCoprime_iff_sup_eq, sup_comm]; exact hJf
   have hfn : IsCoprime f n := by
@@ -128,7 +132,8 @@ theorem core (q : ℕ) (hq : q ≠ 0) (hdiv : ∀ c : ClassGroup B, ∃ d : Clas
   obtain ⟨g, hgQJ, hg0, hfg⟩ := exists_mem_coprime hQJ0 f hQJf
 
   have hg0' : Ideal.span {g} ≠ ⊥ := by simpa using hg0
-  obtain ⟨J₂, hJ₂g, hJ₂c⟩ := GlobalTheory.SteinitzProd.classGroup_exists_integral_ideal_coprime hg0' (ClassGroup.mk0 J)⁻¹
+  obtain ⟨J₂, hJ₂g, hJ₂c⟩ :=
+    GlobalTheory.SteinitzProd.classGroup_exists_integral_ideal_coprime hg0' (ClassGroup.mk0 J)⁻¹
   have hmemJJ : (J : Ideal B) * (J₂ : Ideal B) ∈ (Ideal B)⁰ := (J * J₂).2
   have h2 : ClassGroup.mk0 ⟨(J : Ideal B) * (J₂ : Ideal B), hmemJJ⟩ = 1 := by
     have : (⟨(J : Ideal B) * (J₂ : Ideal B), hmemJJ⟩ : (Ideal B)⁰) = J * J₂ := rfl
@@ -171,20 +176,31 @@ end GlobalTheory.KummerDiv
 
 namespace GlobalTheory.KummerDiv
 
-theorem divisor_step : ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDedekindDomain B]
-    [Algebra k B] [Algebra.FiniteType k B] (q : ℕ), IsUnit (q : k) → ∀ f : B, f ≠ 0 → ∀ b : B, b ≠ 0 →
-    ∀ m : ℕ, ∃ g : B, g ≠ 0 ∧ IsCoprime f g ∧ ∃ u : (Localization.Away (f * g))ˣ,
-      ∃ n d t n' d' : B, IsCoprime f n ∧ IsCoprime f d ∧ IsCoprime g n' ∧ IsCoprime g d' ∧
-      algebraMap B (Localization.Away (f * g)) (b * d) =
-        (u : Localization.Away (f * g)) * algebraMap B (Localization.Away (f * g)) (n * f ^ m) ∧
-      (u : Localization.Away (f * g)) * algebraMap B (Localization.Away (f * g)) (t ^ q * d') =
-        algebraMap B (Localization.Away (f * g)) n' := by
+theorem divisor_step
+    : ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDedekindDomain B] [Algebra k B]
+        [Algebra.FiniteType k B] (q : ℕ),
+      IsUnit (q : k)
+        → ∀ f : B,
+          f ≠ 0
+            → ∀ b : B,
+              b ≠ 0
+                → ∀ m : ℕ, ∃ g : B,
+                  g ≠ 0 ∧ IsCoprime f g
+                    ∧ ∃ u : (Localization.Away (f * g))ˣ, ∃ n d t n' d' : B,
+                      IsCoprime f n ∧ IsCoprime f d ∧ IsCoprime g n' ∧ IsCoprime g d'
+                        ∧ algebraMap B (Localization.Away (f * g)) (b * d)
+                          = (u : Localization.Away (f * g))
+                            * algebraMap B (Localization.Away (f * g)) (n * f ^ m)
+                        ∧ (u : Localization.Away (f * g))
+                            * algebraMap B (Localization.Away (f * g)) (t ^ q * d')
+                          = algebraMap B (Localization.Away (f * g)) n' := by
   intro k B _ _ _ _ _ _ q hq f hf b hb m
   have hqk : (q : k) ≠ 0 := hq.ne_zero
   have hq0 : q ≠ 0 := by
     rintro rfl
     exact hqk (by simp)
-  have hdiv : ∀ c : ClassGroup B, ∃ d : ClassGroup B, d ^ q = c := GlobalTheory.T.classGroup_dedekind_algClosed_divisible k B q hqk
+  have hdiv : ∀ c : ClassGroup B, ∃ d : ClassGroup B, d ^ q = c :=
+    GlobalTheory.T.classGroup_dedekind_algClosed_divisible k B q hqk
   obtain ⟨g, n, t, w, N, hg0, hfg, hfn, hgw, hbd, hnd, hw⟩ := core q hq0 hdiv f b hf hb
   refine ⟨g, hg0, hfg, ?_⟩
   set L := Localization.Away (f * g)
@@ -203,8 +219,10 @@ theorem divisor_step : ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [
   set un := (hnU.mul (hfU.pow m)).unit with hun
   have hv : (algebraMap B L n * algebraMap B L f ^ m) * ((un⁻¹ : Lˣ) : L) = 1 := by
     have : (un : L) = algebraMap B L n * algebraMap B L f ^ m := rfl
-    rw [← this]; exact Units.mul_inv un
-  refine ⟨hbU.unit * un⁻¹, n, 1, t, w, f ^ m, hfn, isCoprime_one_right, hgw, hfg.symm.pow_right, ?_, ?_⟩
+    rw [← this]
+    exact Units.mul_inv un
+  refine
+    ⟨hbU.unit * un⁻¹, n, 1, t, w, f ^ m, hfn, isCoprime_one_right, hgw, hfg.symm.pow_right, ?_, ?_⟩
   · have hb' : ((hbU.unit : Lˣ) : L) = algebraMap B L b := rfl
     rw [Units.val_mul, hb', map_mul, map_mul, map_one, map_pow]
     linear_combination (-(algebraMap B L b)) * hv

@@ -13,8 +13,9 @@ open Matrix
 
 namespace KCoord
 
-theorem sq_coord_le {ι : Type*} [Fintype ι] [DecidableEq ι] (Y : Matrix ι ι ℝ) (hY : Y.PosDef)
-    (i : ι) (v : ι → ℝ) : v i ^ 2 ≤ Y⁻¹ i i * qf Y v := by
+theorem sq_coord_le
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (Y : Matrix ι ι ℝ) (hY : Y.PosDef) (i : ι) (v : ι → ℝ)
+    : v i ^ 2 ≤ Y⁻¹ i i * qf Y v := by
   have hU : IsUnit Y.det := (Matrix.isUnit_iff_isUnit_det Y).1 hY.isUnit
   have hsymm : Yᵀ = Y := by
     have := hY.1
@@ -39,8 +40,7 @@ theorem sq_coord_le {ι : Type*} [Fintype ι] [DecidableEq ι] (Y : Matrix ι ι
     have h0 : 0 ≤ (v - t • w) ⬝ᵥ (Y *ᵥ (v - t • w)) := by
       have := hY.posSemidef.dotProduct_mulVec_nonneg (v - t • w)
       simpa using this
-    have hexp : (v - t • w) ⬝ᵥ (Y *ᵥ (v - t • w)) =
-        qf Y v - 2 * t * v i + t ^ 2 * Y⁻¹ i i := by
+    have hexp : (v - t • w) ⬝ᵥ (Y *ᵥ (v - t • w)) = qf Y v - 2 * t * v i + t ^ 2 * Y⁻¹ i i := by
       simp only [Matrix.mulVec_sub, Matrix.mulVec_smul, dotProduct_sub, sub_dotProduct,
         dotProduct_smul, smul_dotProduct, smul_eq_mul]
       rw [hwY, hwY, hxY, hwi]
@@ -49,8 +49,9 @@ theorem sq_coord_le {ι : Type*} [Fintype ι] [DecidableEq ι] (Y : Matrix ι ι
     linarith
   have h := hnn (v i / Y⁻¹ i i)
   have hne : Y⁻¹ i i ≠ 0 := ne_of_gt hpos
-  have e : qf Y v - 2 * (v i / Y⁻¹ i i) * v i + (v i / Y⁻¹ i i) ^ 2 * Y⁻¹ i i =
-      qf Y v - v i ^ 2 / Y⁻¹ i i := by
+  have e
+      : qf Y v - 2 * (v i / Y⁻¹ i i) * v i + (v i / Y⁻¹ i i) ^ 2 * Y⁻¹ i i
+        = qf Y v - v i ^ 2 / Y⁻¹ i i := by
     field_simp
     ring
   rw [e] at h

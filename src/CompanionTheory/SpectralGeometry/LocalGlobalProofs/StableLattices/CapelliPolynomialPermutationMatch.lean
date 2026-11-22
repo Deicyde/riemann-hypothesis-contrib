@@ -9,39 +9,46 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.CharOfLowK
 
-theorem roots_prod_X_sub_C {n : ℕ} (k : Fin n → ℂ) :
-    (∏ a, (Polynomial.X - Polynomial.C (k a))).roots = Multiset.map k Finset.univ.val := by
-  have hprod : (∏ a, (Polynomial.X - Polynomial.C (k a))) =
-      ((Multiset.map k Finset.univ.val).map fun x => Polynomial.X - Polynomial.C x).prod := by
+theorem roots_prod_X_sub_C {n : ℕ} (k : Fin n → ℂ)
+    : (∏ a, (Polynomial.X - Polynomial.C (k a))).roots = Multiset.map k Finset.univ.val := by
+  have hprod
+      : (∏ a, (Polynomial.X - Polynomial.C (k a)))
+        = ((Multiset.map k Finset.univ.val).map fun x => Polynomial.X - Polynomial.C x).prod := by
     rw [Multiset.map_map]
     rfl
   rw [hprod, Polynomial.roots_multiset_prod_X_sub_C]
 
-theorem exists_perm_of_capelliPolynomial_eq {n : ℕ} (f g : Fin n → ℂ)
-    (h : ∀ Y, Formalism.QuantumDeterminants.capP f Y = Formalism.QuantumDeterminants.capP g Y) :
-    ∃ τ : Equiv.Perm (Fin n), ∀ a, f a = g (τ a) := by
+theorem exists_perm_of_capelliPolynomial_eq
+    {n : ℕ} (f g : Fin n → ℂ)
+    (h : ∀ Y, Formalism.QuantumDeterminants.capP f Y = Formalism.QuantumDeterminants.capP g Y)
+    : ∃ τ : Equiv.Perm (Fin n), ∀ a, f a = g (τ a) := by
   classical
-  have hp : (∏ a, (Polynomial.X - Polynomial.C (-f a))) = ∏ a, (Polynomial.X - Polynomial.C (-g a)) := by
+  have hp
+      : (∏ a, (Polynomial.X - Polynomial.C (-f a)))
+        = ∏ a, (Polynomial.X - Polynomial.C (-g a)) := by
     apply Polynomial.funext
     intro Y
-    simp only [Polynomial.eval_prod, Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C, sub_neg_eq_add]
+    simp only [Polynomial.eval_prod, Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C,
+      sub_neg_eq_add]
     exact h Y
-  have hmap : Multiset.map (fun a => -f a) Finset.univ.val = Multiset.map (fun a => -g a) Finset.univ.val := by
-    rw [← roots_prod_X_sub_C (fun a => -f a), ← roots_prod_X_sub_C (fun a => -g a)]
+  have hmap
+      : Multiset.map (fun a => - f a) Finset.univ.val
+        = Multiset.map (fun a => - g a) Finset.univ.val := by
+    rw [← roots_prod_X_sub_C (fun a => - f a), ← roots_prod_X_sub_C (fun a => - g a)]
     exact congrArg Polynomial.roots hp
-  have hcard : ∀ c : ℂ, Fintype.card {a // -f a = c} = Fintype.card {a // -g a = c} := by
+  have hcard : ∀ c : ℂ, Fintype.card {a // - f a = c} = Fintype.card {a // - g a = c} := by
     intro c
     have hc := congrArg (Multiset.count c) hmap
     rw [Multiset.count_map, Multiset.count_map] at hc
     rw [Fintype.card_subtype, Fintype.card_subtype, Finset.card, Finset.card, Finset.filter_val,
       Finset.filter_val]
     convert hc using 3 <;> simp [eq_comm]
-  let e : ∀ c, {a // -f a = c} ≃ {a // -g a = c} := fun c => Fintype.equivOfCardEq (hcard c)
+  let e : ∀ c, {a // - f a = c} ≃ {a // - g a = c} := fun c => Fintype.equivOfCardEq (hcard c)
   let τ : Equiv.Perm (Fin n) :=
-    ((Equiv.sigmaFiberEquiv (fun a => -f a)).symm.trans (Equiv.sigmaCongrRight e)).trans
-      (Equiv.sigmaFiberEquiv (fun a => -g a))
+    ((Equiv.sigmaFiberEquiv (fun a => - f a)).symm.trans (Equiv.sigmaCongrRight e)).trans
+      (Equiv.sigmaFiberEquiv (fun a => - g a))
   refine ⟨τ, fun a => ?_⟩
-  have key : -g (τ a) = -f a := (e (-f a) ⟨a, rfl⟩).2
+  have key : - g (τ a) = - f a := (e (- f a) ⟨a, rfl⟩).2
   exact neg_inj.mp key.symm
 
 end GlobalTheory.CompanionTheory.CharOfLowK
@@ -50,8 +57,8 @@ namespace GlobalTheory.CompanionTheory.RgCOBlock
 
 open Finset Polynomial
 
-theorem exists_linear_factors_indexed {ι : Type} [DecidableEq ι] (F : Finset ι) :
-    ∀ P : ℂ[X], P.Monic → P.natDegree = F.card → ∃ r : ι → ℂ, P = ∏ a ∈ F, (X - C (r a)) := by
+theorem exists_linear_factors_indexed {ι : Type} [DecidableEq ι] (F : Finset ι)
+    : ∀ P : ℂ[X], P.Monic → P.natDegree = F.card → ∃ r : ι → ℂ, P = ∏ a ∈ F, (X - C (r a)) := by
   induction F using Finset.induction_on with
   | empty =>
     intro P hm hd
@@ -81,17 +88,19 @@ theorem exists_linear_factors_indexed {ι : Type} [DecidableEq ι] (F : Finset �
     refine Finset.prod_congr rfl fun b hb => ?_
     rw [Function.update_of_ne (fun h : b = a => ha (h ▸ hb))]
 
-theorem exists_perm_of_monic_factors (n M : ℕ) (lev : Fin n → ℕ) (χ : Fin n → ℂ) (P : Fin M → ℂ[X]) (s : Fin M → ℂ)
+theorem exists_perm_of_monic_factors
+    (n M : ℕ) (lev : Fin n → ℕ) (χ : Fin n → ℂ) (P : Fin M → ℂ[X]) (s : Fin M → ℂ)
     (hlev : ∀ a, lev a < M)
     (hP : ∀ i, (P i).Monic ∧ (P i).natDegree = (univ.filter fun a => lev a = (i : ℕ)).card)
-    (hcap : ∀ Y : ℂ, ∏ i, (P i).eval (Y + s i) = Formalism.QuantumDeterminants.capP χ Y) :
-    ∃ σ : Equiv.Perm (Fin n), ∀ i : Fin M,
-      ∑ a ∈ univ.filter (fun a => lev a = (i : ℕ)), χ (σ a) =
-        (P i).nextCoeff + ((univ.filter fun a => lev a = (i : ℕ)).card : ℂ) * s i := by
+    (hcap : ∀ Y : ℂ, ∏ i, (P i).eval (Y + s i) = Formalism.QuantumDeterminants.capP χ Y)
+    : ∃ σ : Equiv.Perm (Fin n), ∀ i : Fin M,
+      ∑ a ∈ univ.filter (fun a => lev a = (i : ℕ)), χ (σ a)
+        = (P i).nextCoeff + ((univ.filter fun a => lev a = (i : ℕ)).card : ℂ) * s i := by
   choose r hr using fun i => exists_linear_factors_indexed _ (P i) (hP i).1 (hP i).2
   let lv : Fin n → Fin M := fun a => ⟨lev a, hlev a⟩
   let g : Fin n → ℂ := fun a => s (lv a) - r (lv a) a
-  have hfil : ∀ i : Fin M, (univ.filter fun a => lev a = (i : ℕ)) = univ.filter fun a => lv a = i := by
+  have hfil
+      : ∀ i : Fin M, (univ.filter fun a => lev a = (i : ℕ)) = univ.filter fun a => lv a = i := by
     intro i
     ext a
     simp [lv, Fin.ext_iff]
@@ -101,7 +110,8 @@ theorem exists_perm_of_monic_factors (n M : ℕ) (lev : Fin n → ℕ) (χ : Fin
       rw [hfil] at ha
       exact (Finset.mem_filter.mp ha).2
     simp only [g, this]
-  have hpoly : ∀ Y, Formalism.QuantumDeterminants.capP g Y = Formalism.QuantumDeterminants.capP χ Y := by
+  have hpoly
+      : ∀ Y, Formalism.QuantumDeterminants.capP g Y = Formalism.QuantumDeterminants.capP χ Y := by
     intro Y
     rw [← hcap Y]
     unfold Formalism.QuantumDeterminants.capP
@@ -114,10 +124,12 @@ theorem exists_perm_of_monic_factors (n M : ℕ) (lev : Fin n → ℕ) (χ : Fin
     rw [hg i a ha]
     simp only [eval_sub, eval_X, eval_C]
     ring
-  obtain ⟨σ, hσ⟩ := GlobalTheory.CompanionTheory.CharOfLowK.exists_perm_of_capelliPolynomial_eq g χ hpoly
+  obtain ⟨σ, hσ⟩ :=
+    GlobalTheory.CompanionTheory.CharOfLowK.exists_perm_of_capelliPolynomial_eq g χ hpoly
   refine ⟨σ, fun i => ?_⟩
-  have h1 : ∑ a ∈ univ.filter (fun a => lev a = (i : ℕ)), χ (σ a) =
-      ∑ a ∈ univ.filter (fun a => lev a = (i : ℕ)), (s i - r i a) :=
+  have h1
+      : ∑ a ∈ univ.filter (fun a => lev a = (i : ℕ)), χ (σ a)
+        = ∑ a ∈ univ.filter (fun a => lev a = (i : ℕ)), (s i - r i a) :=
     Finset.sum_congr rfl fun a ha => by rw [← hσ a, hg i a ha]
   rw [h1, Finset.sum_sub_distrib, Finset.sum_const, nsmul_eq_mul]
   conv_rhs => rw [hr i, prod_X_sub_C_nextCoeff]

@@ -9,9 +9,10 @@ open scoped ContDiff
 
 namespace GlobalTheory
 
-theorem exists_smooth_step_sharp_slope (ρ ε : ℝ) (hε : 0 < ε) (h4 : 4 * ε < ρ) :
-    ∃ η : ℝ → ℝ, ContDiff ℝ ∞ η ∧ (∀ u, u ≤ ε → η u = 1) ∧ (∀ u, ρ - ε ≤ u → η u = 0) ∧
-      (∀ u, 0 ≤ η u) ∧ (∀ u, η u ≤ 1) ∧ ∀ u, -(1 / (ρ - 4 * ε)) ≤ deriv η u := by
+theorem exists_smooth_step_sharp_slope (ρ ε : ℝ) (hε : 0 < ε) (h4 : 4 * ε < ρ)
+    : ∃ η : ℝ → ℝ,
+      ContDiff ℝ ∞ η ∧ (∀ u, u ≤ ε → η u = 1) ∧ (∀ u, ρ - ε ≤ u → η u = 0) ∧ (∀ u, 0 ≤ η u)
+        ∧ (∀ u, η u ≤ 1) ∧ ∀ u, -(1 / (ρ - 4 * ε)) ≤ deriv η u := by
   let ψ : ContDiffBump (ρ / 2 : ℝ) := ⟨ρ / 2 - 2 * ε, ρ / 2 - ε, by linarith, by linarith⟩
   have hψc : Continuous ψ := ψ.continuous
   have hψ0 : ∀ t, t ≤ ε ∨ ρ - ε ≤ t → ψ t = 0 := by
@@ -27,7 +28,8 @@ theorem exists_smooth_step_sharp_slope (ρ ε : ℝ) (hε : 0 < ε) (h4 : 4 * ε
     apply ψ.one_of_mem_closedBall
     rw [Metric.mem_closedBall, Real.dist_eq]
     show |t - ρ / 2| ≤ ρ / 2 - 2 * ε
-    rw [abs_le]; constructor <;> linarith
+    rw [abs_le]
+    constructor <;> linarith
   have hII : ∀ a b, IntervalIntegrable ψ volume a b := fun a b => hψc.intervalIntegrable a b
   obtain ⟨F, hF⟩ : ∃ F : ℝ → ℝ, F = fun u => ∫ t in ε..u, ψ t := ⟨_, rfl⟩
   have hFd : ∀ u, HasDerivAt F (ψ u) u := by
@@ -35,7 +37,8 @@ theorem exists_smooth_step_sharp_slope (ρ ε : ℝ) (hε : 0 < ε) (h4 : 4 * ε
   have hFs : ContDiff ℝ ∞ F := by
     refine contDiff_infty_iff_deriv.2 ⟨fun u => (hFd u).differentiableAt, ?_⟩
     have h : deriv F = ψ := funext fun u => (hFd u).deriv
-    rw [h]; exact ψ.contDiff
+    rw [h]
+    exact ψ.contDiff
   have hFlow : ∀ u, u ≤ ε → F u = 0 := by
     intro u hu
     rw [hF]
@@ -56,16 +59,17 @@ theorem exists_smooth_step_sharp_slope (ρ ε : ℝ) (hε : 0 < ε) (h4 : 4 * ε
       exact hψ0 t (Or.inr (le_trans (le_inf le_rfl hu) ht.1))
   have hIge : ρ - 4 * ε ≤ I := by
     rw [hI]
-    calc ρ - 4 * ε = ∫ _ in (2 * ε)..(ρ - 2 * ε), (1 : ℝ) := by
-          rw [intervalIntegral.integral_const, smul_eq_mul, mul_one]; ring
+    calc
+      ρ - 4 * ε = ∫ _ in (2 * ε)..(ρ - 2 * ε), (1 : ℝ) := by
+        rw [intervalIntegral.integral_const, smul_eq_mul, mul_one]; ring
       _ = ∫ t in (2 * ε)..(ρ - 2 * ε), ψ t := by
-          apply intervalIntegral.integral_congr
-          intro t ht
-          rw [Set.uIcc_of_le (by linarith)] at ht
-          exact (hψ1 t ht.1 ht.2).symm
+        apply intervalIntegral.integral_congr
+        intro t ht
+        rw [Set.uIcc_of_le (by linarith)] at ht
+        exact (hψ1 t ht.1 ht.2).symm
       _ ≤ ∫ t in ε..(ρ - ε), ψ t :=
-          intervalIntegral.integral_mono_interval (by linarith) (by linarith) (by linarith)
-            (Filter.Eventually.of_forall fun t => ψ.nonneg) (hII _ _)
+        intervalIntegral.integral_mono_interval (by linarith) (by linarith) (by linarith)
+          (Filter.Eventually.of_forall fun t => ψ.nonneg) (hII _ _)
   have hIpos : 0 < I := by linarith
   have hFrange : ∀ u, 0 ≤ F u ∧ F u ≤ I := by
     intro u
@@ -75,29 +79,37 @@ theorem exists_smooth_step_sharp_slope (ρ ε : ℝ) (hε : 0 < ε) (h4 : 4 * ε
     · rw [hFhigh u h']; exact ⟨hIpos.le, le_rfl⟩
     have hsplit : F u + ∫ t in u..(ρ - ε), ψ t = I := by
       rw [hF, hI]; exact intervalIntegral.integral_add_adjacent_intervals (hII _ _) (hII _ _)
-    have h1 : 0 ≤ F u := by
-      rw [hF]; exact intervalIntegral.integral_nonneg h fun t _ => ψ.nonneg
+    have h1 : 0 ≤ F u := by rw [hF]; exact intervalIntegral.integral_nonneg h fun t _ => ψ.nonneg
     have h2 : 0 ≤ ∫ t in u..(ρ - ε), ψ t := intervalIntegral.integral_nonneg h' fun t _ => ψ.nonneg
     exact ⟨h1, by linarith⟩
   refine ⟨fun u => 1 - F u / I, contDiff_const.sub (hFs.div_const I), ?_, ?_, ?_, ?_, ?_⟩
   · intro u hu; simp [hFlow u hu]
   · intro u hu; simp [hFhigh u hu, hIpos.ne']
   · intro u
-    rw [sub_nonneg, div_le_one hIpos]; exact (hFrange u).2
+    rw [sub_nonneg, div_le_one hIpos]
+    exact (hFrange u).2
   · intro u
     have : 0 ≤ F u / I := div_nonneg (hFrange u).1 hIpos.le
     linarith
   · intro u
-    have hd : HasDerivAt (fun u => 1 - F u / I) (-(ψ u / I)) u :=
-      ((hFd u).div_const I).const_sub 1
+    have hd : HasDerivAt (fun u => 1 - F u / I) (-(ψ u / I)) u := ((hFd u).div_const I).const_sub 1
     rw [hd.deriv, neg_le_neg_iff, div_le_div_iff₀ hIpos (by linarith)]
     nlinarith [ψ.le_one (x := u), ψ.nonneg (x := u)]
 
-theorem exists_cutoff_log_sharp : ∀ ρ0 θ : ℝ, 0 < ρ0 → 1 < θ → ∃ ε C : ℝ, 0 < ε ∧ ε < ρ0 ∧
-    ∀ δ : ℝ, 0 < δ → δ ≤ 1 → ∃ g : ℝ → ℝ,
-    ContDiffOn ℝ ∞ g (Set.Ioi (-δ)) ∧ (∀ u, ρ0 - ε ≤ u → g u = 0) ∧
-    (∀ u, 0 ≤ u → g u ≤ 0 ∧ 0 ≤ deriv g u ∧ -(θ / ρ0) ≤ deriv g u + u * deriv (deriv g) u) ∧
-    (∀ u, 0 ≤ u → u ≤ ε → g u ≤ Real.log (u + δ) + C) ∧ ∀ u, ε / 2 ≤ u → -C ≤ g u := by
+theorem exists_cutoff_log_sharp
+    : ∀ ρ0 θ : ℝ,
+      0 < ρ0 → 1 < θ
+        → ∃ ε C : ℝ,
+          0 < ε ∧ ε < ρ0
+            ∧ ∀ δ : ℝ,
+              0 < δ → δ ≤ 1
+                → ∃ g : ℝ → ℝ,
+                  ContDiffOn ℝ ∞ g (Set.Ioi (-δ)) ∧ (∀ u, ρ0 - ε ≤ u → g u = 0)
+                    ∧ (∀ u,
+                      0 ≤ u
+                        → g u ≤ 0 ∧ 0 ≤ deriv g u ∧ -(θ / ρ0) ≤ deriv g u + u * deriv (deriv g) u)
+                    ∧ (∀ u, 0 ≤ u → u ≤ ε → g u ≤ Real.log (u + δ) + C)
+                    ∧ ∀ u, ε / 2 ≤ u → -C ≤ g u := by
   intro ρ0 θ hρ hθ
   obtain ⟨ε, hε, hE⟩ : ∃ ε : ℝ, 0 < ε ∧ 8 * θ * ε = ρ0 * (θ - 1) :=
     ⟨ρ0 * (θ - 1) / (8 * θ), div_pos (mul_pos hρ (by linarith)) (by linarith), by field_simp⟩
@@ -119,8 +131,8 @@ theorem exists_cutoff_log_sharp : ∀ ρ0 θ : ℝ, 0 < ρ0 → 1 < θ → ∃ �
   have hfcont := hfc.continuousOn
   have hsub : ∀ a b, -δ < a → -δ < b → Set.uIcc a b ⊆ Set.Ioi (-δ) := fun a b ha hb t ht =>
     lt_of_lt_of_le (lt_inf_iff.2 ⟨ha, hb⟩) ht.1
-  have hII : ∀ a b, -δ < a → -δ < b → IntervalIntegrable f volume a b :=
-    fun a b ha hb => (hfcont.mono (hsub a b ha hb)).intervalIntegrable
+  have hII : ∀ a b, -δ < a → -δ < b → IntervalIntegrable f volume a b := fun a b ha hb =>
+    (hfcont.mono (hsub a b ha hb)).intervalIntegrable
   have hd : ∀ u, -δ < u → HasDerivAt (fun u => ∫ t in ρ0..u, f t) (f u) u := fun u hu =>
     intervalIntegral.integral_hasDerivAt_right (hII ρ0 u (by linarith) hu)
       (hfcont.stronglyMeasurableAtFilter isOpen_Ioi u hu)
@@ -138,14 +150,16 @@ theorem exists_cutoff_log_sharp : ∀ ρ0 θ : ℝ, 0 < ρ0 → 1 < θ → ∃ �
     intro u hu
     rcases le_total u ρ0 with h | h
     · rw [intervalIntegral.integral_symm]
-      have := intervalIntegral.integral_nonneg (μ := volume) h fun t ht =>
-        hnn t (lt_of_lt_of_le (by linarith) ht.1)
+      have :=
+        intervalIntegral.integral_nonneg (μ := volume) h fun t ht =>
+          hnn t (lt_of_lt_of_le (by linarith) ht.1)
       linarith
     · rw [hzero u (by linarith)]
   refine ⟨fun u => ∫ t in ρ0..u, f t, ?_, hzero, ?_, ?_, ?_⟩
-  · exact (contDiffOn_infty_iff_deriv_of_isOpen isOpen_Ioi).2
-      ⟨fun u hu => (hd u hu).differentiableAt.differentiableWithinAt,
-       hfc.congr fun u hu => (hd u hu).deriv⟩
+  · exact (contDiffOn_infty_iff_deriv_of_isOpen isOpen_Ioi).2 ⟨
+      fun u hu => (hd u hu).differentiableAt.differentiableWithinAt,
+      hfc.congr fun u hu => (hd u hu).deriv
+    ⟩
   · intro u hu
     have hu' : -δ < u := by linarith
     have hp : 0 < u + δ := by linarith
@@ -160,8 +174,9 @@ theorem exists_cutoff_log_sharp : ∀ ρ0 θ : ℝ, 0 < ρ0 → 1 < θ → ∃ �
     · rw [hdg, hfv]; exact div_nonneg (hηnn u) hp.le
     · rw [hdg, hdd, hfd.deriv, hfv]
       have ha : 0 < 1 / (ρ0 - 4 * ε) := by positivity
-      have key : η u / (u + δ) + u * ((deriv η u * (u + δ) - η u * 1) / (u + δ) ^ 2)
-          = η u * δ / (u + δ) ^ 2 + u * deriv η u / (u + δ) := by
+      have key
+          : η u / (u + δ) + u * ((deriv η u * (u + δ) - η u * 1) / (u + δ) ^ 2)
+            = η u * δ / (u + δ) ^ 2 + u * deriv η u / (u + δ) := by
         field_simp; ring
       rw [key]
       have h1 : 0 ≤ η u * δ / (u + δ) ^ 2 := div_nonneg (mul_nonneg (hηnn u) hδ.le) (sq_nonneg _)
@@ -174,8 +189,8 @@ theorem exists_cutoff_log_sharp : ∀ ρ0 θ : ℝ, 0 < ρ0 → 1 < θ → ∃ �
     have hp : 0 < u + δ := by linarith
     have hεδ : 0 < ε + δ := by linarith
     have hsplit : ∫ t in ρ0..u, f t = (∫ t in ρ0..ε, f t) - ∫ t in u..ε, f t := by
-      rw [← intervalIntegral.integral_add_adjacent_intervals
-        (hII ρ0 ε (by linarith) (by linarith)) (hII ε u (by linarith) (by linarith)),
+      rw [← intervalIntegral.integral_add_adjacent_intervals (hII ρ0 ε (by linarith) (by linarith))
+          (hII ε u (by linarith) (by linarith)),
         intervalIntegral.integral_symm u ε]
       ring
     have hlog : ∫ t in u..ε, f t = Real.log (ε + δ) - Real.log (u + δ) := by

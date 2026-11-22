@@ -9,23 +9,36 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
-private theorem index_comap {G G' : Type} [Group G] [Group G'] (e : G →* G') (he : Function.Surjective e)
-    {A B : Subgroup G'} (h : A.relIndex B ≠ 0) : (A.comap e).relIndex (B.comap e) ≠ 0 := Subgroup.relIndex_comap_ne_zero e h
+private theorem index_comap
+    {G G' : Type} [Group G] [Group G']
+    (e : G →* G') (he : Function.Surjective e)
+    {A B : Subgroup G'} (h : A.relIndex B ≠ 0)
+    : (A.comap e).relIndex (B.comap e) ≠ 0 :=
+  Subgroup.relIndex_comap_ne_zero e h
 
-private theorem J_index {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (V : Lev k) (n : ℕ) : (V.J n).relIndex (KO k (Fin n)) ≠ 0 :=
-  fun h0 => GlAx.Kc_index (k := k) (n := n) (V.c + 1) le_rfl (Subgroup.relIndex_eq_zero_of_le_left (kc_le V) h0)
+private theorem J_index
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (V : Lev k) (n : ℕ)
+    : (V.J n).relIndex (KO k (Fin n)) ≠ 0 := fun h0 =>
+  GlAx.Kc_index (k := k) (n := n) (V.c + 1) le_rfl
+    (Subgroup.relIndex_eq_zero_of_le_left (kc_le V) h0)
 
-private theorem not_integral {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {O : Type} [CommRing O] [Algebra O k] (hO : IsInts k O) {a : kˣ} (ha : valuation k (a : k) < 1) :
-    ¬ IsIntegral O ((a : k) + (a⁻¹ : kˣ)) := by
+private theorem not_integral
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {O : Type} [CommRing O] [Algebra O k]
+    (hO : IsInts k O)
+    {a : kˣ} (ha : valuation k (a : k) < 1)
+    : ¬ IsIntegral O ((a : k) + (a⁻¹ : kˣ)) := by
   intro hint
-  have hv : Valuation.Integers (valuation k) O :=
-    { hom_inj := hO.inj
-      map_le_one := fun x => (hO.range _).1 ⟨x, rfl⟩
-      exists_of_le_one := fun r hr => (hO.range r).2 hr }
+  have hv : Valuation.Integers (valuation k) O := {
+    hom_inj := hO.inj
+    map_le_one := fun x => (hO.range _).1 ⟨x, rfl⟩
+    exists_of_le_one := fun r hr => (hO.range r).2 hr
+  }
   have h1 : valuation k ((a : k) + ((a⁻¹ : kˣ) : k)) ≤ 1 := hv.isIntegral_iff_v_le_one.mp hint
   have hprod : valuation k ((a⁻¹ : kˣ) : k) * valuation k (a : k) = 1 := by
     rw [← map_mul, Units.inv_mul, map_one]
@@ -35,14 +48,13 @@ private theorem not_integral {k : Type} [Field k] [ValuativeRel k] [TopologicalS
     exact (Valuation.map_sub _ _ _).trans (max_le h1 ha.le)
   exact (mul_lt_of_le_one_of_lt h2 ha).ne hprod
 
-theorem UpperTheory.V.Z.Sym.Sig.okLev :
-    UpperTheory.V.Z.Sym.Sig.OkLev := by
+theorem UpperTheory.V.Z.Sym.Sig.okLev : UpperTheory.V.Z.Sym.Sig.OkLev := by
   intro k _ _ _ _ O _ _ hO h2 Δ s hs hs0 V Ry _ χ _
   obtain ⟨hU, -, hKU, -⟩ := eU_facts k O hO h2 Δ s hs hs0
   obtain ⟨hD, hKD, -⟩ := eD_facts k O hO h2 Δ s hs hs0
   obtain ⟨f1, f2, f3, -, -, f6⟩ := finFacts k V
-  have hpos : V.H.relIndex V.H2 ≠ 0 := fun h0 => f1 (by
-    rw [← Subgroup.relIndex_mul_relIndex _ _ _ f3 f2, h0, zero_mul])
+  have hpos : V.H.relIndex V.H2 ≠ 0 := fun h0 =>
+    f1 (by rw [← Subgroup.relIndex_mul_relIndex _ _ _ f3 f2, h0, zero_mul])
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · rw [← hKU]; exact Subgroup.comap_mono (f6 3).2.2.2
   · rw [← hKU]; exact index_comap _ hU.2 (J_index V 3)

@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsRealSu
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.LKCount
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKDef
+  GlobalTheory.LKCount
 open scoped TensorProduct Classical
 
 noncomputable section
@@ -47,7 +48,17 @@ lemma re_mul {σ : M →+* M}
 end GlobalTheory.NormSignEven
 
 open GlobalTheory.NormSignEven in
-theorem GlobalTheory.NormSign.exists_neg_even_norm_away : ∀ (M : Type) [Field M] [NumberField M] (σ : M →+* M), σ ≠ RingHom.id M → (∀ (φ : M →+* ℂ) (x : M), φ (σ x) = (starRingEnd ℂ) (φ x)) → ∀ (S : Finset (M →+* ℂ)), (∀ φ ∈ S, ComplexEmbedding.conjugate φ ∈ S) → 4 ∣ S.card → ∀ (p : ℕ) [Fact p.Prime], ∃ a : M, a ≠ 0 ∧ σ a = a ∧ (∀ φ ∈ S, (φ a).re < 0) ∧ (∀ φ : M →+* ℂ, φ ∉ S → 0 < (φ a).re) ∧ ∃ u : (AfP p ⊗[ℚ] M)ˣ, (u : AfP p ⊗[ℚ] M) * Algebra.TensorProduct.map (AlgHom.id ℚ (AfP p)) σ.toRatAlgHom u = 1 ⊗ₜ a := by
+theorem GlobalTheory.NormSign.exists_neg_even_norm_away
+    : ∀ (M : Type) [Field M] [NumberField M] (σ : M →+* M),
+      σ ≠ RingHom.id M → (∀ (φ : M →+* ℂ) (x : M), φ (σ x) = (starRingEnd ℂ) (φ x))
+        → ∀ (S : Finset (M →+* ℂ)),
+          (∀ φ ∈ S, ComplexEmbedding.conjugate φ ∈ S) → 4 ∣ S.card
+            → ∀ (p : ℕ) [Fact p.Prime], ∃ a : M,
+              a ≠ 0 ∧ σ a = a ∧ (∀ φ ∈ S, (φ a).re < 0) ∧ (∀ φ : M →+* ℂ, φ ∉ S → 0 < (φ a).re)
+                ∧ ∃ u : (AfP p ⊗[ℚ] M)ˣ,
+                  (u : AfP p ⊗[ℚ] M)
+                      * Algebra.TensorProduct.map (AlgHom.id ℚ (AfP p)) σ.toRatAlgHom u
+                    = 1 ⊗ₜ a := by
   intro M _ _ σ hσ hc S hS h4 p _
   obtain ⟨n, hn⟩ := h4
   induction n generalizing S with
@@ -65,20 +76,24 @@ theorem GlobalTheory.NormSign.exists_neg_even_norm_away : ∀ (M : Type) [Field 
     obtain ⟨ε', hε'⟩ := Finset.card_pos.mp hT
     simp only [Finset.mem_erase] at hε'
     obtain ⟨h1, h2, hε'S⟩ := hε'
-    have hcc : ∀ φ ψ : M →+* ℂ, ComplexEmbedding.conjugate φ = ψ → φ = ComplexEmbedding.conjugate ψ := by
+    have hcc
+        : ∀ φ ψ : M →+* ℂ, ComplexEmbedding.conjugate φ = ψ → φ = ComplexEmbedding.conjugate ψ := by
       intro φ ψ h; rw [← h, cc]
-    have h3 : ε ≠ ComplexEmbedding.conjugate ε' := by
-      intro h; apply h1; rw [h, cc]
+    have h3 : ε ≠ ComplexEmbedding.conjugate ε' := by intro h; apply h1; rw [h, cc]
     set S' := (((S.erase ε).erase (ComplexEmbedding.conjugate ε)).erase ε').erase
       (ComplexEmbedding.conjugate ε') with hS'def
-    have hmem : ∀ φ, φ ∈ S' ↔ φ ≠ ComplexEmbedding.conjugate ε' ∧ φ ≠ ε' ∧
-        φ ≠ ComplexEmbedding.conjugate ε ∧ φ ≠ ε ∧ φ ∈ S := by
+    have hmem
+        : ∀ φ,
+          φ ∈ S'
+            ↔ φ ≠ ComplexEmbedding.conjugate ε' ∧ φ ≠ ε' ∧ φ ≠ ComplexEmbedding.conjugate ε ∧ φ ≠ ε
+              ∧ φ ∈ S := by
       intro φ; simp [hS'def, Finset.mem_erase]
     have hcard : S'.card = 4 * n := by
       have e1 : ε' ∈ ((S.erase ε).erase (ComplexEmbedding.conjugate ε)) := by
         simp [Finset.mem_erase]; exact ⟨h1, h2, hε'S⟩
-      have e2 : ComplexEmbedding.conjugate ε' ∈
-          ((S.erase ε).erase (ComplexEmbedding.conjugate ε)).erase ε' := by
+      have e2
+          : ComplexEmbedding.conjugate ε'
+            ∈ ((S.erase ε).erase (ComplexEmbedding.conjugate ε)).erase ε' := by
         simp only [Finset.mem_erase]
         refine ⟨conj_ne hσ hc ε', ?_, fun h => h3 h.symm, hS _ hε'S⟩
         intro h
@@ -97,9 +112,12 @@ theorem GlobalTheory.NormSign.exists_neg_even_norm_away : ∀ (M : Type) [Field 
       · exact hcc _ _ h
     obtain ⟨b, hb0, hbσ, hbneg, hbpos, ub, hub⟩ := ih S' hS'stab hcard
     obtain ⟨c, hc0, hcσ, hcε, hcε', hcpos, uc, huc⟩ :=
-      GlobalTheory.T.exists_realSubfield_negative_twoPlaces_normEverywhere M σ hσ hc ε ε' (Ne.symm h2) h3 p
-    have hcneg : ∀ φ, φ = ε ∨ φ = ComplexEmbedding.conjugate ε ∨ φ = ε' ∨ φ = ComplexEmbedding.conjugate ε' →
-        (φ c).re < 0 := by
+      GlobalTheory.T.exists_realSubfield_negative_twoPlaces_normEverywhere M σ hσ hc ε ε'
+        (Ne.symm h2) h3 p
+    have hcneg
+        : ∀ φ,
+          φ = ε ∨ φ = ComplexEmbedding.conjugate ε ∨ φ = ε' ∨ φ = ComplexEmbedding.conjugate ε'
+            → (φ c).re < 0 := by
       rintro φ (rfl | rfl | rfl | rfl)
       · exact hcε
       · rw [conj_re]; exact hcε
@@ -109,9 +127,9 @@ theorem GlobalTheory.NormSign.exists_neg_even_norm_away : ∀ (M : Type) [Field 
     · intro φ hφ
       rw [re_mul hc φ hbσ]
       by_cases hφ' : φ ∈ S'
-      · exact mul_neg_of_neg_of_pos (hbneg φ hφ') (hcpos φ (by rw [hmem] at hφ'; exact hφ'.2.2.2.1)
-          (by rw [hmem] at hφ'; exact hφ'.2.2.1) (by rw [hmem] at hφ'; exact hφ'.2.1)
-          (by rw [hmem] at hφ'; exact hφ'.1))
+      · exact mul_neg_of_neg_of_pos (hbneg φ hφ')
+          (hcpos φ (by rw [hmem] at hφ'; exact hφ'.2.2.2.1) (by rw [hmem] at hφ'; exact hφ'.2.2.1)
+            (by rw [hmem] at hφ'; exact hφ'.2.1) (by rw [hmem] at hφ'; exact hφ'.1))
       · refine mul_neg_of_pos_of_neg (hbpos φ hφ') (hcneg φ ?_)
         rw [hmem] at hφ'
         by_contra hne
@@ -126,8 +144,13 @@ theorem GlobalTheory.NormSign.exists_neg_even_norm_away : ∀ (M : Type) [Field 
       · rintro rfl; exact hφ hε'S
       · rintro rfl; exact hφ (hS ε' hε'S)
     · rw [Units.val_mul, map_mul]
-      calc (ub : AfP p ⊗[ℚ] M) * uc * (Algebra.TensorProduct.map (AlgHom.id ℚ (AfP p)) σ.toRatAlgHom ub *
-            Algebra.TensorProduct.map (AlgHom.id ℚ (AfP p)) σ.toRatAlgHom uc)
-          = ((ub : AfP p ⊗[ℚ] M) * Algebra.TensorProduct.map (AlgHom.id ℚ (AfP p)) σ.toRatAlgHom ub) *
-            ((uc : AfP p ⊗[ℚ] M) * Algebra.TensorProduct.map (AlgHom.id ℚ (AfP p)) σ.toRatAlgHom uc) := by ring
+      calc
+        (ub : AfP p ⊗[ℚ] M) * uc
+              * (Algebra.TensorProduct.map (AlgHom.id ℚ (AfP p)) σ.toRatAlgHom ub
+                * Algebra.TensorProduct.map (AlgHom.id ℚ (AfP p)) σ.toRatAlgHom uc)
+            = ((ub : AfP p ⊗[ℚ] M)
+                * Algebra.TensorProduct.map (AlgHom.id ℚ (AfP p)) σ.toRatAlgHom ub)
+              * ((uc : AfP p ⊗[ℚ] M)
+                * Algebra.TensorProduct.map (AlgHom.id ℚ (AfP p)) σ.toRatAlgHom uc) := by
+          ring
         _ = 1 ⊗ₜ (b * c) := by rw [hub, huc, Algebra.TensorProduct.tmul_mul_tmul, one_mul]

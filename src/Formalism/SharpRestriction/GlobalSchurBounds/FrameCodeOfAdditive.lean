@@ -25,7 +25,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.Lnk
 
-open Formalism.BasicNotions Formalism.D5 Formalism.LFunctionChainParameters.LHost Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds
+open Formalism.BasicNotions Formalism.D5 Formalism.LFunctionChainParameters.LHost
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds
 
 section Shares
 
@@ -35,8 +37,10 @@ theorem logWeight_nonneg (w : D.what₂.places.Pl) : 0 ≤ SizeData₂.lwP w := 
   unfold SizeData₂.lwP lw
   exact div_nonneg (Real.log_natCast_nonneg _) (Nat.cast_nonneg _)
 
-theorem kapv_nonneg (X : G.Inst D L) (K : G.Consts) (hK : K.Nonneg) (hI : G.KapIDef X K) (a b : G.HH D → ℤ) (p : ℕ)
-    (t0 : G.HH D) : 0 ≤ G.kapv X K a b p t0 := by
+theorem kapv_nonneg
+    (X : G.Inst D L) (K : G.Consts) (hK : K.Nonneg) (hI : G.KapIDef X K)
+    (a b : G.HH D → ℤ) (p : ℕ) (t0 : G.HH D)
+    : 0 ≤ G.kapv X K a b p t0 := by
   have hk : 0 ≤ K.kII := by
     unfold G.Consts.Nonneg at hK
     exact hK.2.2.1
@@ -45,26 +49,34 @@ theorem kapv_nonneg (X : G.Inst D L) (K : G.Consts) (hK : K.Nonneg) (hI : G.KapI
   split_ifs
   · unfold G.kapIIf
     refine le_min zero_le_one ?_
-    refine mul_nonneg (mul_nonneg (mul_nonneg (mul_nonneg hk (Nat.cast_nonneg _)) (sq_nonneg _)) (Nat.cast_nonneg _)) ?_
+    refine mul_nonneg
+      (mul_nonneg (mul_nonneg (mul_nonneg hk (Nat.cast_nonneg _)) (sq_nonneg _))
+        (Nat.cast_nonneg _))
+      ?_
     exact Real.rpow_nonneg hx _
   · unfold G.KapIDef at hI
     rw [hI]
     exact Real.sInf_nonneg (fun κ hκ => hκ.1)
 
-theorem Sig_nonneg (X : G.Inst D L) (K : G.Consts) (hK : K.Nonneg) (hI : G.KapIDef X K) (a b : G.HH D → ℤ) (p : ℕ) :
-    0 ≤ G.Sig X K a b p := by
+theorem Sig_nonneg
+    (X : G.Inst D L) (K : G.Consts) (hK : K.Nonneg) (hI : G.KapIDef X K) (a b : G.HH D → ℤ) (p : ℕ)
+    : 0 ≤ G.Sig X K a b p := by
   unfold G.Sig
-  exact mul_nonneg (Nat.cast_nonneg _) (Finset.sum_nonneg fun t0 _ => kapv_nonneg X K hK hI a b p t0)
+  exact mul_nonneg (Nat.cast_nonneg _)
+    (Finset.sum_nonneg fun t0 _ => kapv_nonneg X K hK hI a b p t0)
 
-theorem Sv_nonneg (X : G.Inst D L) (K : G.Consts) (a b : G.HH D → ℤ) (p : ℕ) (t0 : G.HH D) :
-    0 ≤ G.Sv X K a b p t0 := by
+theorem Sv_nonneg (X : G.Inst D L) (K : G.Consts) (a b : G.HH D → ℤ) (p : ℕ) (t0 : G.HH D)
+    : 0 ≤ G.Sv X K a b p t0 := by
   unfold G.Sv
-  have h : (0 : ℝ) ≤ ∑ j ∈ SizeData₂.lifts D, max 0 (G.gU X K a b p j t0 - G.Pr X K b p j t0 - max (G.g0 X K a b p j t0) 0) :=
+  have h
+      : (0 : ℝ)
+        ≤ ∑ j ∈ SizeData₂.lifts D, max 0 (G.gU X K a b p j t0 - G.Pr X K b p j t0 - max (G.g0 X K a b p j t0) 0) :=
     Finset.sum_nonneg fun _ _ => le_max_left _ _
   exact_mod_cast Int.ceil_nonneg h
 
-theorem ioP_nonneg (X : G.Inst D L) (K : G.Consts) (hK : K.Nonneg) (hI : G.KapIDef X K) (a b : G.HH D → ℤ) (p : ℕ) :
-    0 ≤ G.ioP X K a b p := by
+theorem ioP_nonneg
+    (X : G.Inst D L) (K : G.Consts) (hK : K.Nonneg) (hI : G.KapIDef X K) (a b : G.HH D → ℤ) (p : ℕ)
+    : 0 ≤ G.ioP X K a b p := by
   unfold G.ioP
   split_ifs with h
   · have ht := h.choose_spec
@@ -72,8 +84,10 @@ theorem ioP_nonneg (X : G.Inst D L) (K : G.Consts) (hK : K.Nonneg) (hI : G.KapID
       (le_trans (Sv_nonneg X K a b p _) (Finset.le_sup' (fun t0 => G.Sv X K a b p t0) ht))
   · exact le_rfl
 
-theorem IOsum_nonneg (X : G.Inst D L) (K : G.Consts) (hK : K.Nonneg) (hI : G.KapIDef X K)
-    (hio : ∀ w, L.io w = G.ioP X K (G.aL L) (G.bL L) (D.what₂.places.resChar w)) : 0 ≤ IOsum L := by
+theorem IOsum_nonneg
+    (X : G.Inst D L) (K : G.Consts) (hK : K.Nonneg) (hI : G.KapIDef X K)
+    (hio : ∀ w, L.io w = G.ioP X K (G.aL L) (G.bL L) (D.what₂.places.resChar w))
+    : 0 ≤ IOsum L := by
   unfold IOsum
   refine Finset.sum_nonneg fun w _ => ?_
   rw [hio w]
@@ -85,18 +99,22 @@ theorem ev_le_rpow (θ : ℝ) (hθ : 0 < θ) (C : ℝ) : ∃ x0 : ℝ, 1 ≤ x0 
   refine ⟨max 1 (|C| ^ θ⁻¹), le_max_left _ _, fun x hx => ?_⟩
   have hx2 : |C| ^ θ⁻¹ ≤ x := le_trans (le_max_right _ _) hx
   have h0 : (0 : ℝ) ≤ |C| ^ θ⁻¹ := Real.rpow_nonneg (abs_nonneg C) _
-  calc C ≤ |C| := le_abs_self C
-    _ = (|C| ^ θ⁻¹) ^ θ := by rw [← Real.rpow_mul (abs_nonneg C), inv_mul_cancel₀ hθ.ne', Real.rpow_one]
+  calc
+    C ≤ |C| := le_abs_self C
+    _ = (|C| ^ θ⁻¹) ^ θ := by
+      rw [← Real.rpow_mul (abs_nonneg C), inv_mul_cancel₀ hθ.ne', Real.rpow_one]
     _ ≤ x ^ θ := Real.rpow_le_rpow h0 hx2 hθ.le
 
-theorem dl_at_of {D : D7} (L : SizeData₂ D) (x eps C5 : ℝ) (h : ChQD_at D x eps C5) : |L.logDerivativeAtOne| ≤ C5 * Real.log x := by
+theorem dl_at_of {D : D7} (L : SizeData₂ D) (x eps C5 : ℝ) (h : ChQD_at D x eps C5)
+    : |L.logDerivativeAtOne| ≤ C5 * Real.log x := by
   obtain ⟨ell, -, h2, -, h4⟩ := char_at L x eps 0 C5 D.R.toFrame _ rfl HEq.rfl
   have h5 := (h4 h chC (Or.inr (Or.inl rfl))).2
   rw [h2]
   exact le_trans (Complex.abs_re_le_norm _) h5
 
-theorem dl_of_chosen {eps : ℝ} (Fm : FamP eps) (C5 : ℝ) (h : ChosenQD Fm C5) :
-    ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, |(Fm.L x i).logDerivativeAtOne| ≤ (Fm.L x i).sc.x ^ (Fm.L x i).sc.eps := by
+theorem dl_of_chosen {eps : ℝ} (Fm : FamP eps) (C5 : ℝ) (h : ChosenQD Fm C5)
+    : ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x,
+      |(Fm.L x i).logDerivativeAtOne| ≤ (Fm.L x i).sc.x ^ (Fm.L x i).sc.eps := by
   have heps : 0 < eps := fam_eps_pos Fm
   obtain ⟨a0, h⟩ := h
   obtain ⟨a1, ha1, h1⟩ := ev_le_rpow (eps / 2) (by positivity) (max C5 0 * (2 / eps))
@@ -113,7 +131,9 @@ theorem dl_of_chosen {eps : ℝ} (Fm : FamP eps) (C5 : ℝ) (h : ChosenQD Fm C5)
   have hp : 0 < x ^ (eps / 2) := Real.rpow_pos_of_pos hx0 _
   have hsplit : x ^ eps = x ^ (eps / 2) * x ^ (eps / 2) := by
     rw [← Real.rpow_add hx0]; congr 1; ring
-  calc |(Fm.L x i).logDerivativeAtOne| ≤ C5 * Real.log x := hd
+  calc
+    |(Fm.L x i).logDerivativeAtOne|
+      ≤ C5 * Real.log x := hd
     _ ≤ max C5 0 * Real.log x := mul_le_mul_of_nonneg_right (le_max_left _ _) hlog0
     _ ≤ max C5 0 * (x ^ (eps / 2) / (eps / 2)) := mul_le_mul_of_nonneg_left hlog (le_max_right _ _)
     _ = (max C5 0 * (2 / eps)) * x ^ (eps / 2) := by field_simp
@@ -128,14 +148,21 @@ noncomputable section
 
 namespace Formalism.MainNotions.Lnk
 
-open Formalism.BasicNotions Formalism.D5 Formalism.FrobeniusOrbits Formalism.LFunctionChainParameters Formalism.LFunctionChainParameters.LHost Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions.ZetaZeroFreeRegion Formalism.MainNotions.ZetaZeroFreeRegion.Br
+open Formalism.BasicNotions Formalism.D5 Formalism.FrobeniusOrbits
+  Formalism.LFunctionChainParameters Formalism.LFunctionChainParameters.LHost
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions.ZetaZeroFreeRegion
+  Formalism.MainNotions.ZetaZeroFreeRegion.Br
 
-theorem frame_code_of_additive (e : Formalism.HC.Frame) (γ : e.GG) : mcode e (UpperTheory.Comparison₂.toE e γ).toAdd = gcode e γ := rfl
-
+theorem frame_code_of_additive (e : Formalism.HC.Frame) (γ : e.GG)
+    : mcode e (UpperTheory.Comparison₂.toE e γ).toAdd = gcode e γ :=
+  rfl
 
 open Classical in
-theorem ASK_congr {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H] (A : characterSumData.ArithData H) (N : ℕ) (a : ℝ) (t : H)
-    (w w' : E0 × H → ℝ) (h : ∀ ρ, InPhi ρ → w ρ = w' ρ) : characterSumData.ASK A N a t w = characterSumData.ASK A N a t w' := by
+theorem ASK_congr
+    {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H]
+    (A : characterSumData.ArithData H) (N : ℕ) (a : ℝ) (t : H)
+    (w w' : E0 × H → ℝ) (h : ∀ ρ, InPhi ρ → w ρ = w' ρ)
+    : characterSumData.ASK A N a t w = characterSumData.ASK A N a t w' := by
   have hP : ∀ p, characterSumData.askP A N a t w p = characterSumData.askP A N a t w' p := by
     intro p
     unfold characterSumData.askP
@@ -150,20 +177,26 @@ theorem ASK_congr {H : Type} [AddCommGroup H] [Fintype H] [DecidableEq H] (A : c
 
 theorem hval_tH (D : D7) (t : G.HH D) : hval D.R.toFrame (tH D t) = t.val := rfl
 
-theorem wj_eq_wSz (D : D7) (j : Fin D.R.m) (τ : D.what₂.Tau) : wj D (j.val + 1) τ = DV.wSz D (j.val + 1) τ := by
+theorem wj_eq_wSz (D : D7) (j : Fin D.R.m) (τ : D.what₂.Tau)
+    : wj D (j.val + 1) τ = DV.wSz D (j.val + 1) τ := by
   unfold wj DV.wSz
   have hj := j.isLt
-  rw [dite_eq_left (by omega : j.val + 1 - 1 < D.R.m), dite_eq_left (⟨by omega, by omega⟩ : 1 ≤ j.val + 1 ∧ j.val + 1 ≤ D.R.m)]
+  rw [dite_eq_left (by omega : j.val + 1 - 1 < D.R.m),
+    dite_eq_left (⟨by omega, by omega⟩ : 1 ≤ j.val + 1 ∧ j.val + 1 ≤ D.R.m)]
 
 def AskRec_at {D : D7} (L : SizeData₂ D) : Prop :=
   (∑ j ∈ SizeData₂.lifts D, ∑ t : D.host.TT,
-    ASKjt D (L.aT t : ℝ) (LocalQuadraticParts.wAt D j) (D.R.tau1 (t : D.R.A))) = LocalQuadraticParts.ASK L
+    ASKjt D (L.aT t : ℝ) (LocalQuadraticParts.wAt D j) (D.R.tau1 (t : D.R.A)))
+    = LocalQuadraticParts.ASK L
 
-theorem reads_w {D : D7} {L : SizeData₂ D} {TT : Finset D.R.A} {a : D.R.A → ℝ}
-    {w : Fin D.R.m → E0 × D.R.A → ℝ} (hr : Reads L D.R.toFrame D.R.m TT a w) (j : Fin D.R.m) (x : E0 × D.R.A)
-    (hx : InPhi x) : w j x = wM D (LocalQuadraticParts.wAt D (j.val + 1)) x := by
+theorem reads_w
+    {D : D7} {L : SizeData₂ D} {TT : Finset D.R.A} {a : D.R.A → ℝ} {w : Fin D.R.m → E0 × D.R.A → ℝ}
+    (hr : Reads L D.R.toFrame D.R.m TT a w) (j : Fin D.R.m) (x : E0 × D.R.A) (hx : InPhi x)
+    : w j x = wM D (LocalQuadraticParts.wAt D (j.val + 1)) x := by
   have hγ : (tE D).symm x ∈ D.R.Psi := (inPhi_symm_iff D x).2 hx
-  have hc : gcode _ ((D.eTau (D.eTau.symm ⟨(tE D).symm x, hγ⟩) : D.R.Psi) : D.R.GG) = mcode D.R.toFrame x := by
+  have hc
+      : gcode _ ((D.eTau (D.eTau.symm ⟨(tE D).symm x, hγ⟩) : D.R.Psi) : D.R.GG)
+        = mcode D.R.toFrame x := by
     rw [Equiv.apply_symm_apply]
     show gcode _ ((tE D).symm x) = _
     rw [← frame_code_of_additive]
@@ -172,11 +205,15 @@ theorem reads_w {D : D7} {L : SizeData₂ D} {TT : Finset D.R.A} {a : D.R.A → 
   unfold wM LocalQuadraticParts.wAt
   rw [dite_eq_left hγ]
 
-theorem askIs_of {D : D7} (L : SizeData₂ D) (hpos : ∀ j : Fin D.R.m, ∀ ρ ∈ D.R.Psi, 0 < LocalQuadraticParts.wAt D (j.val + 1) ρ)
-    (hrec : AskRec_at L) : AskIs L (LocalQuadraticParts.ASK L) := by
+theorem askIs_of
+    {D : D7} (L : SizeData₂ D)
+    (hpos : ∀ j : Fin D.R.m, ∀ ρ ∈ D.R.Psi, 0 < LocalQuadraticParts.wAt D (j.val + 1) ρ)
+    (hrec : AskRec_at L)
+    : AskIs L (LocalQuadraticParts.ASK L) := by
   intro e m AD' N TT a w hr hAD hcut
   obtain ⟨he, hm⟩ := (⟨hr.he, hr.hm⟩ : D.R.toFrame = e ∧ D.R.m = m)
-  subst he; subst hm
+  subst he
+  subst hm
   obtain rfl := eq_of_heq hAD
   rw [← hrec]
   have hTT : TT = TTm D := by
@@ -193,13 +230,13 @@ theorem askIs_of {D : D7} (L : SizeData₂ D) (hpos : ∀ j : Fin D.R.m, ∀ ρ 
       exact ⟨t, ht, by rw [tHe_apply, hval_tH]⟩
   rw [hTT]
   unfold TTm
-  rw [Finset.sum_map, Finset.sum_comm, sum_lifts D D.R.m rfl
-    (fun j => ∑ t : D.host.TT, ASKjt D (L.aT t : ℝ) (LocalQuadraticParts.wAt D j) (D.R.tau1 (t : D.R.A)))]
+  rw [Finset.sum_map, Finset.sum_comm,
+    sum_lifts D D.R.m rfl (fun j =>
+      ∑ t : D.host.TT, ASKjt D (L.aT t : ℝ) (LocalQuadraticParts.wAt D j) (D.R.tau1 (t : D.R.A)))]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   rw [← Finset.sum_coe_sort D.host.TT]
   refine Finset.sum_congr rfl (fun t _ => ?_)
-  have hmem : tH D t.1 ∈ TT := by
-    rw [hr.hTT, hval_tH]; exact Finset.mem_image_of_mem _ t.2
+  have hmem : tH D t.1 ∈ TT := by rw [hr.hTT, hval_tH]; exact Finset.mem_image_of_mem _ t.2
   have hat : a (tH D t.1) = (L.aT t : ℝ) := hr.ha t _ (hval_tH D t.1)
   have hN : ∀ ρ ∈ D.R.Psi, (L.aT t : ℝ) / LocalQuadraticParts.wAt D (j.val + 1) ρ ≤ N := by
     intro ρ hρ
@@ -221,12 +258,15 @@ noncomputable section
 
 namespace Formalism.MainNotions.Lnk
 
-open Formalism.BasicNotions Formalism.D5 Formalism.FrobeniusOrbits Formalism.LFunctionChainParameters Formalism.LFunctionChainParameters.LHost Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions.ZetaZeroFreeRegion Formalism.MainNotions.ZetaZeroFreeRegion.Br NumberField
-  IsDedekindDomain
+open Formalism.BasicNotions Formalism.D5 Formalism.FrobeniusOrbits
+  Formalism.LFunctionChainParameters Formalism.LFunctionChainParameters.LHost
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions.ZetaZeroFreeRegion
+  Formalism.MainNotions.ZetaZeroFreeRegion.Br NumberField IsDedekindDomain
 
 variable (D : D7)
 
-theorem place_over (p : ℕ) (hp : p.Prime) : ∃ w : D.what₂.places.Pl, D.what₂.places.resChar w = p := by
+theorem place_over (p : ℕ) (hp : p.Prime)
+    : ∃ w : D.what₂.places.Pl, D.what₂.places.resChar w = p := by
   have hpZ : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
   have : (Ideal.span {(p : ℤ)}).IsPrime := (Ideal.span_singleton_prime hpZ.ne_zero).mpr hpZ
   obtain ⟨P, hP, hlo⟩ :=
@@ -249,27 +289,37 @@ theorem place_over (p : ℕ) (hp : p.Prime) : ∃ w : D.what₂.places.Pl, D.wha
     (Nat.coprime_primes (D.what₂.places.resChar_prime w) hp).2 hcon
   have hb := Nat.gcd_eq_gcd_ab (D.what₂.places.resChar w) p
   rw [hco] at hb
-  have h1 : (1 : 𝓞 D.what₂.LL) = ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL) *
-      ((Nat.gcdA (D.what₂.places.resChar w) p : ℤ) : 𝓞 D.what₂.LL) +
-      ((p : ℕ) : 𝓞 D.what₂.LL) * ((Nat.gcdB (D.what₂.places.resChar w) p : ℤ) : 𝓞 D.what₂.LL) := by
+  have h1
+      : (1 : 𝓞 D.what₂.LL)
+        = ((D.what₂.places.resChar w : ℕ) : 𝓞 D.what₂.LL)
+            * ((Nat.gcdA (D.what₂.places.resChar w) p : ℤ) : 𝓞 D.what₂.LL)
+          + ((p : ℕ) : 𝓞 D.what₂.LL)
+            * ((Nat.gcdB (D.what₂.places.resChar w) p : ℤ) : 𝓞 D.what₂.LL) := by
     have := congrArg (fun z : ℤ => (z : 𝓞 D.what₂.LL)) hb
     simpa using this
-  exact hP.ne_top ((Ideal.eq_top_iff_one P).2 (by
-    rw [h1]; exact P.add_mem (P.mul_mem_right _ hr) (P.mul_mem_right _ hpP)))
+  exact hP.ne_top ((Ideal.eq_top_iff_one P).2
+    (by rw [h1]; exact P.add_mem (P.mul_mem_right _ hr) (P.mul_mem_right _ hpP)))
 
 theorem frob_mem (p : ℕ) (hp : p.Prime) : frob D p ∈ G.frobSet D p := by
   obtain ⟨P, hP, hL⟩ := exists_prime_over D p hp
   obtain ⟨σ0, hσ0⟩ := (D.host.galE_bijective).2 ((tE D).symm ((AD D).frob p))
-  have hex : ∃ σ : D.host.E ≃ₐ[ℚ] D.host.E, ∃ P : Ideal (𝓞 D.host.E),
-      P.IsPrime ∧ P.LiesOver (Ideal.span {(p : ℤ)}) ∧ IsArithFrobAt ℤ σ P :=
-    ⟨σ0, P, hP, hL, ((fieldFacts D p hp P hP hL σ0).2).2 (by
-      rw [hσ0, Equiv.apply_symm_apply, sub_self]; exact AddSubgroup.zero_mem _)⟩
+  have hex
+      : ∃ σ : D.host.E ≃ₐ[ℚ] D.host.E, ∃ P : Ideal (𝓞 D.host.E),
+        P.IsPrime ∧ P.LiesOver (Ideal.span {(p : ℤ)}) ∧ IsArithFrobAt ℤ σ P := ⟨
+    σ0,
+    P,
+    hP,
+    hL,
+    ((fieldFacts D p hp P hP hL σ0).2).2
+      (by rw [hσ0, Equiv.apply_symm_apply, sub_self]; exact AddSubgroup.zero_mem _)
+  ⟩
   unfold frob
   rw [dite_eq_left hex]
   obtain ⟨P', hP', hL', hF⟩ := hex.choose_spec
   exact ⟨P', hP', hL', hex.choose, hF, rfl⟩
 
-theorem frobSet_eq {p : ℕ} (h : Unram D p) {g : D.R.GG} (hg : g ∈ G.frobSet D p) : g = frob D p := by
+theorem frobSet_eq {p : ℕ} (h : Unram D p) {g : D.R.GG} (hg : g ∈ G.frobSet D p)
+    : g = frob D p := by
   obtain ⟨P, hP, hL, σ, hσ, rfl⟩ := hg
   have h1 := ((fieldFacts D p h.1 P hP hL σ).2).1 hσ
   rw [inertia_unram D h, AddSubgroup.mem_bot, sub_eq_zero] at h1
@@ -277,11 +327,12 @@ theorem frobSet_eq {p : ℕ} (h : Unram D p) {g : D.R.GG} (hg : g ∈ G.frobSet 
 
 theorem hP_eq {p : ℕ} (h : Unram D p) : G.hP D p = D.R.iotaInv (frob D p).2 := by
   unfold G.hP
-  rw [frobSet_eq D h (Classical.epsilon_spec (p := fun g => g ∈ G.frobSet D p) ⟨_, frob_mem D p h.1⟩)]
+  rw [frobSet_eq D h
+    (Classical.epsilon_spec (p := fun g => g ∈ G.frobSet D p) ⟨_, frob_mem D p h.1⟩)]
 
-theorem frob_fst {p : ℕ} (h : ZetaZeroFreeRegion.InertK D p) :
-    (D.host.cls p = PrimeClass.signal → (frob D p).1 = (1, -1)) ∧
-    (D.host.cls p = PrimeClass.inertClass → (frob D p).1 = c0) := by
+theorem frob_fst {p : ℕ} (h : ZetaZeroFreeRegion.InertK D p)
+    : (D.host.cls p = PrimeClass.signal → (frob D p).1 = (1, -1))
+      ∧ (D.host.cls p = PrimeClass.inertClass → (frob D p).1 = c0) := by
   have hU := inertK_unram D h
   obtain ⟨hp, h2⟩ := (unram_iff D p).1 hU
   obtain ⟨P, hP, hL, σ, hσ, hg⟩ := frob_mem D p hp
@@ -299,15 +350,14 @@ theorem sign_group_pow_odd (g : G0) {i : ℕ} (hi : Odd i) : g ^ i = g := by
 
 theorem iotaH_nsmul (e : Formalism.HC.Frame) (x : e.A) (i : ℕ) : e.iota (i • x) = e.iota x ^ i := by
   unfold Formalism.HC.Frame.iota
-  first
-  | exact ofAdd_nsmul x i
-  | rfl
+  first | exact ofAdd_nsmul x i | rfl
 
-theorem plGG_partner {p : ℕ} (h : ZetaZeroFreeRegion.InertK D p) (t : G.HH D) {i : ℕ} (hi : Odd i) :
-    G.plGG D (G.partner D p t i) = rho D (D.R.tau1 t) (frob D p ^ i) := by
+theorem plGG_partner {p : ℕ} (h : ZetaZeroFreeRegion.InertK D p) (t : G.HH D) {i : ℕ} (hi : Odd i)
+    : G.plGG D (G.partner D p t i) = rho D (D.R.tau1 t) (frob D p ^ i) := by
   have hU := inertK_unram D h
   have hH : D.R.iota (t + i • G.hP D p) = 1 * (frob D p).2 ^ i * D.R.iota t := by
-    rw [Formalism.HC.Frame.iota_add, iotaH_nsmul, hP_eq D hU, Formalism.HC.Frame.iota_iotaInv, one_mul, mul_comm]
+    rw [Formalism.HC.Frame.iota_add, iotaH_nsmul, hP_eq D hU, Formalism.HC.Frame.iota_iotaInv,
+      one_mul, mul_comm]
   obtain ⟨f1, f2⟩ := frob_fst D h
   unfold G.plGG G.partner rho
   rcases h.2 with hs | hc
@@ -317,8 +367,7 @@ theorem plGG_partner {p : ℕ} (h : ZetaZeroFreeRegion.InertK D p) (t : G.HH D) 
     show ((-1, 1) : G0) = c0 * (frob D p ^ i).1 * 1
     rw [Prod.pow_fst, sign_group_pow_odd _ hi, f1 hs]
     decide
-  · have hns : ¬ G.IsSg D p := by
-      intro hs; rw [G.IsSg, hc] at hs; exact absurd hs (by decide)
+  · have hns : ¬ G.IsSg D p := by intro hs; rw [G.IsSg, hc] at hs; exact absurd hs (by decide)
     have hdec : decide (G.IsSg D p ∧ Odd i) = false := decide_eq_false (fun hh => hns hh.1)
     simp only [hdec, Bool.false_eq_true, if_false]
     refine Prod.ext ?_ hH
@@ -326,13 +375,15 @@ theorem plGG_partner {p : ℕ} (h : ZetaZeroFreeRegion.InertK D p) (t : G.HH D) 
     rw [Prod.pow_fst, sign_group_pow_odd _ hi, f2 hc]
     decide
 
-theorem frob_pow_mem {p : ℕ} (h : ZetaZeroFreeRegion.InertK D p) (i : ℕ) : frob D p ^ i ∉ D.R.Psi ↔ Odd i := by
+theorem frob_pow_mem {p : ℕ} (h : ZetaZeroFreeRegion.InertK D p) (i : ℕ)
+    : frob D p ^ i ∉ D.R.Psi ↔ Odd i := by
   obtain ⟨f1, f2⟩ := frob_fst D h
   have h2 : (frob D p).1.2 = -1 := by
     rcases h.2 with hs | hc
     · rw [f1 hs]
     · rw [f2 hc]; rfl
-  rw [Formalism.HC.Frame.mem_Psi_iff, Prod.pow_fst, Prod.pow_snd, h2, ← Nat.not_even_iff_odd, not_iff_not]
+  rw [Formalism.HC.Frame.mem_Psi_iff, Prod.pow_fst, Prod.pow_snd, h2, ← Nat.not_even_iff_odd,
+    not_iff_not]
   exact neg_one_pow_eq_one_iff_even (by decide)
 
 end Formalism.MainNotions.Lnk
@@ -343,11 +394,15 @@ noncomputable section
 
 namespace Formalism.MainNotions.Lnk
 
-open Formalism.BasicNotions Formalism.D5 Formalism.FrobeniusOrbits Formalism.LFunctionChainParameters Formalism.LFunctionChainParameters.LHost Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions.ZetaZeroFreeRegion Formalism.MainNotions.ZetaZeroFreeRegion.Br
+open Formalism.BasicNotions Formalism.D5 Formalism.FrobeniusOrbits
+  Formalism.LFunctionChainParameters Formalism.LFunctionChainParameters.LHost
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions.ZetaZeroFreeRegion
+  Formalism.MainNotions.ZetaZeroFreeRegion.Br
 
 variable {D : D7} (L : SizeData₂ D)
 
-theorem one_le_wj (hN : NumN_at L) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau) : 1 ≤ wj D j τ := by
+theorem one_le_wj (hN : NumN_at L) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau)
+    : 1 ≤ wj D j τ := by
   obtain ⟨hw2, hb', -, -⟩ := hN
   have hx : 0 < L.sc.x := lt_trans one_pos L.sc.one_lt_alt
   by_cases hth : ((D.eTau τ : D.R.Psi) : D.R.GG) ∈ D.host.thickPlaces
@@ -362,17 +417,19 @@ theorem one_le_wj (hN : NumN_at L) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (
       linarith
     · exact le_trans hw2 (L.win_thin j h1 h2 τ ⟨(D.eTau τ).2, htp, hth⟩).1
 
-theorem wj_eq_wSz' (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau) : wj D j τ = DV.wSz D j τ := by
+theorem wj_eq_wSz' (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau)
+    : wj D j τ = DV.wSz D j τ := by
   unfold wj DV.wSz
   rw [dite_eq_left (by omega : j - 1 < D.R.m), dite_eq_left (⟨h1, h2⟩ : 1 ≤ j ∧ j ≤ D.R.m)]
 
-theorem wAt_eq (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (ρ : D.R.GG) (hρ : ρ ∈ D.R.Psi) :
-    LocalQuadraticParts.wAt D j ρ = wj D j (D.eTau.symm ⟨ρ, hρ⟩) := by
+theorem wAt_eq (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (ρ : D.R.GG) (hρ : ρ ∈ D.R.Psi)
+    : LocalQuadraticParts.wAt D j ρ = wj D j (D.eTau.symm ⟨ρ, hρ⟩) := by
   unfold LocalQuadraticParts.wAt
   rw [dite_eq_left hρ, wj_eq_wSz' D j h1 h2]
 
-theorem one_le_wAt (hN : NumN_at L) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (ρ : D.R.GG) (hρ : ρ ∈ D.R.Psi) :
-    1 ≤ LocalQuadraticParts.wAt D j ρ := by
+theorem one_le_wAt
+    (hN : NumN_at L) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (ρ : D.R.GG) (hρ : ρ ∈ D.R.Psi)
+    : 1 ≤ LocalQuadraticParts.wAt D j ρ := by
   rw [wAt_eq D j h1 h2 ρ hρ]
   exact one_le_wj L hN j h1 h2 _
 
@@ -380,11 +437,13 @@ theorem aT_toNat (t : D.host.TT) : (L.aT t : ℝ) = ((L.aT t).toNat : ℝ) := by
   have h0 : (0 : ℝ) ≤ (L.aT t : ℝ) := le_trans (sc_a_pos L.sc).le (L.aT_win t).1
   have h1 : 0 ≤ L.aT t := by exact_mod_cast h0
   have h2 : ((L.aT t).toNat : ℤ) = L.aT t := Int.toNat_of_nonneg h1
-  calc (L.aT t : ℝ) = (((L.aT t).toNat : ℤ) : ℝ) := by rw [h2]
+  calc
+    (L.aT t : ℝ)
+      = (((L.aT t).toNat : ℤ) : ℝ) := by rw [h2]
     _ = ((L.aT t).toNat : ℝ) := by push_cast; rfl
 
-theorem term0 (t : D.host.TT) {W : ℝ} (hW : 1 ≤ W) {M : ℕ} (hM : (L.aT t).toNat < M) :
-    max ((L.aT t : ℝ) / (M : ℝ) - W) 0 = 0 := by
+theorem term0 (t : D.host.TT) {W : ℝ} (hW : 1 ≤ W) {M : ℕ} (hM : (L.aT t).toNat < M)
+    : max ((L.aT t : ℝ) / (M : ℝ) - W) 0 = 0 := by
   apply max_eq_right
   have hM0 : (0 : ℝ) < M := by exact_mod_cast (Nat.zero_le _).trans_lt hM
   rw [sub_nonpos]
@@ -393,16 +452,23 @@ theorem term0 (t : D.host.TT) {W : ℝ} (hW : 1 ≤ W) {M : ℕ} (hM : (L.aT t).
   rcases le_or_gt 0 (L.aT t) with h | h
   · have h1 : ((L.aT t).toNat : ℤ) = L.aT t := Int.toNat_of_nonneg h
     have h2 : ((L.aT t).toNat : ℝ) < M := by exact_mod_cast hM
-    calc (L.aT t : ℝ) = ((L.aT t).toNat : ℝ) := by exact_mod_cast h1.symm
+    calc
+      (L.aT t : ℝ)
+        = ((L.aT t).toNat : ℝ) := by exact_mod_cast h1.symm
       _ ≤ M := h2.le
   · have h3 : (L.aT t : ℝ) < 0 := by exact_mod_cast h
     linarith
 
 variable {L}
 
-theorem wPart_eq {X : G.Inst D L} {K : G.Consts} (hF : ∀ w, G.ParametersFill X K w) {p : ℕ} (h : ZetaZeroFreeRegion.InertK D p)
-    {j : ℕ} (hj : j ∈ SizeData₂.lifts D) (t : D.host.TT) {i : ℕ} (hi : Odd i) :
-    L.wPart j t p i = LocalQuadraticParts.wAt D j (rho D (D.R.tau1 (t : D.R.A)) (frob D p ^ i)) := by
+theorem wPart_eq
+    {X : G.Inst D L} {K : G.Consts} (hF : ∀ w, G.ParametersFill X K w)
+    {p : ℕ} (h : ZetaZeroFreeRegion.InertK D p)
+    {j : ℕ} (hj : j ∈ SizeData₂.lifts D)
+    (t : D.host.TT)
+    {i : ℕ} (hi : Odd i)
+    : L.wPart j t p i
+      = LocalQuadraticParts.wAt D j (rho D (D.R.tau1 (t : D.R.A)) (frob D p ^ i)) := by
   obtain ⟨w0, hw0⟩ := place_over D p h.1
   obtain ⟨f1, f2, -⟩ := hF w0
   have hj' := Finset.mem_Icc.mp hj
@@ -415,9 +481,14 @@ theorem wPart_eq {X : G.Inst D L} {K : G.Consts} (hF : ∀ w, G.ParametersFill X
   rw [Equiv.apply_symm_apply]
   exact (plGG_partner D h _ hi).symm
 
-theorem right₃ {X : G.Inst D L} {K : G.Consts} (hF : ∀ w, G.ParametersFill X K w) (hN : NumN_at L) {p : ℕ}
-    (h : ZetaZeroFreeRegion.InertK D p) {j : ℕ} (hj : j ∈ SizeData₂.lifts D) (t : D.host.TT) :
-    askP D (L.aT t : ℝ) (LocalQuadraticParts.wAt D j) (D.R.tau1 (t : D.R.A)) p = L.vonMangoldtClassSum j t p := by
+theorem right₃
+    {X : G.Inst D L} {K : G.Consts} (hF : ∀ w, G.ParametersFill X K w)
+    (hN : NumN_at L)
+    {p : ℕ} (h : ZetaZeroFreeRegion.InertK D p)
+    {j : ℕ} (hj : j ∈ SizeData₂.lifts D)
+    (t : D.host.TT)
+    : askP D (L.aT t : ℝ) (LocalQuadraticParts.wAt D j) (D.R.tau1 (t : D.R.A)) p
+      = L.vonMangoldtClassSum j t p := by
   have hj' := Finset.mem_Icc.mp hj
   unfold askP SizeData₂.vonMangoldtClassSum
   rw [tsum_eq_sum (s := Finset.range (Nat.log p (L.aT t).toNat + 2))]
@@ -438,9 +509,11 @@ theorem right₃ {X : G.Inst D L} {K : G.Consts} (hF : ∀ w, G.ParametersFill X
       rwa [Nat.cast_pow] at this
     · rw [if_neg hc]
 
-theorem primePowerSum_eq_zero_of_lt (hN : NumN_at L) {p : ℕ} {j : ℕ} (hj : j ∈ SizeData₂.lifts D) (t : D.host.TT)
-    (hp : (L.aT t).toNat < p) :
-    askP D (L.aT t : ℝ) (LocalQuadraticParts.wAt D j) (D.R.tau1 (t : D.R.A)) p = 0 := by
+theorem primePowerSum_eq_zero_of_lt
+    (hN : NumN_at L)
+    {p : ℕ} {j : ℕ} (hj : j ∈ SizeData₂.lifts D)
+    (t : D.host.TT) (hp : (L.aT t).toNat < p)
+    : askP D (L.aT t : ℝ) (LocalQuadraticParts.wAt D j) (D.R.tau1 (t : D.R.A)) p = 0 := by
   have hj' := Finset.mem_Icc.mp hj
   unfold askP
   rw [tsum_eq_sum (s := (∅ : Finset ℕ)), Finset.sum_empty]
@@ -452,43 +525,52 @@ theorem primePowerSum_eq_zero_of_lt (hN : NumN_at L) {p : ℕ} {j : ℕ} (hj : j
     rwa [Nat.cast_pow] at this
   · rw [if_neg hc]
 
-theorem inert_sum {X : G.Inst D L} {K : G.Consts} (P : ℕ → Prop) [DecidablePred P] [DecidablePred (ZetaZeroFreeRegion.InertK D)]
+theorem inert_sum
+    {X : G.Inst D L} {K : G.Consts}
+    (P : ℕ → Prop) [DecidablePred P] [DecidablePred (ZetaZeroFreeRegion.InertK D)]
     (hP : ∀ p, P p ↔ (D.host.cls p = PrimeClass.signal ∨ D.host.cls p = PrimeClass.inertClass))
-    (hF : ∀ w, G.ParametersFill X K w) (hN : NumN_at L) {j : ℕ} (hj : j ∈ SizeData₂.lifts D) (t : D.host.TT) :
-    (∑' p : ℕ, if ZetaZeroFreeRegion.InertK D p then
-        2 * Real.log p * askP D (L.aT t : ℝ) (LocalQuadraticParts.wAt D j) (D.R.tau1 (t : D.R.A)) p else 0) =
-      ∑ p ∈ (LocalQuadraticParts.askPrimes (L.aT t)).filter P, 2 * Real.log p * L.vonMangoldtClassSum j t p := by
-  rw [tsum_eq_sum (s := (LocalQuadraticParts.askPrimes (L.aT t)).filter P)]
-  · refine Finset.sum_congr rfl (fun p hp => ?_)
-    obtain ⟨hp1, hp2⟩ := Finset.mem_filter.mp hp
-    have hI : ZetaZeroFreeRegion.InertK D p := ⟨(Finset.mem_filter.mp hp1).2, (hP p).1 hp2⟩
-    rw [if_pos hI, right₃ hF hN hI hj t]
-  · intro p hp
-    by_cases hI : ZetaZeroFreeRegion.InertK D p
-    · rw [if_pos hI]
-      have hlt : (L.aT t).toNat < p := by
-        by_contra hcon
-        exact hp (Finset.mem_filter.mpr ⟨Finset.mem_filter.mpr ⟨Finset.mem_range.mpr (by omega), hI.1⟩,
-          (hP p).2 hI.2⟩)
-      rw [primePowerSum_eq_zero_of_lt hN hj t hlt, mul_zero]
-    · rw [if_neg hI]
+    (hF : ∀ w, G.ParametersFill X K w) (hN : NumN_at L)
+    {j : ℕ} (hj : j ∈ SizeData₂.lifts D)
+    (t : D.host.TT)
+    : (∑' p : ℕ, if ZetaZeroFreeRegion.InertK D p then
+          2 * Real.log p * askP D (L.aT t : ℝ) (LocalQuadraticParts.wAt D j) (D.R.tau1 (t : D.R.A)) p else 0)
+      = ∑ p ∈ (LocalQuadraticParts.askPrimes (L.aT t)).filter P, 2 * Real.log p * L.vonMangoldtClassSum j t p :=
+  by
+    rw [tsum_eq_sum (s := (LocalQuadraticParts.askPrimes (L.aT t)).filter P)]
+    · refine Finset.sum_congr rfl (fun p hp => ?_)
+      obtain ⟨hp1, hp2⟩ := Finset.mem_filter.mp hp
+      have hI : ZetaZeroFreeRegion.InertK D p := ⟨(Finset.mem_filter.mp hp1).2, (hP p).1 hp2⟩
+      rw [if_pos hI, right₃ hF hN hI hj t]
+    · intro p hp
+      by_cases hI : ZetaZeroFreeRegion.InertK D p
+      · rw [if_pos hI]
+        have hlt : (L.aT t).toNat < p := by
+          by_contra hcon
+          exact hp (Finset.mem_filter.mpr
+            ⟨Finset.mem_filter.mpr ⟨Finset.mem_range.mpr (by omega), hI.1⟩, (hP p).2 hI.2⟩)
+        rw [primePowerSum_eq_zero_of_lt hN hj t hlt, mul_zero]
+      · rw [if_neg hI]
 
-theorem askRec_at {X : G.Inst D L} {K : G.Consts} (hF : ∀ w, G.ParametersFill X K w) (hN : NumN_at L) :
-    AskRec_at L := by
+theorem askRec_at
+    {X : G.Inst D L} {K : G.Consts} (hF : ∀ w, G.ParametersFill X K w) (hN : NumN_at L)
+    : AskRec_at L := by
   unfold AskRec_at LocalQuadraticParts.ASK
   refine Finset.sum_congr rfl (fun j hj => Finset.sum_congr rfl (fun t _ => ?_))
   unfold ASKjt
   congr 1
-  exact @inert_sum D L X K (fun p => DV.InertK D p) (fun _ => Classical.propDecidable _)
-    (fun _ => Classical.propDecidable _) (fun p => Iff.rfl) hF hN j hj t
+  exact @inert_sum D L X K
+    (fun p => DV.InertK D p)
+    (fun _ => Classical.propDecidable _)
+    (fun _ => Classical.propDecidable _)
+    (fun p => Iff.rfl)
+    hF hN j hj t
 
 theorem askIsF {eps : ℝ} (Fm : FamP eps) : AskIsF Fm := by
   refine ⟨max (Fm.x1 + 1) 3, fun x hx i => ?_⟩
   have hx1 : Fm.x1 < x := by
     have := le_trans (le_max_left _ _) hx
     linarith
-  have h3 : 3 ≤ (Fm.L x i).sc.x := by
-    rw [Fm.L_x x i hx1]; exact le_trans (le_max_right _ _) hx
+  have h3 : 3 ≤ (Fm.L x i).sc.x := by rw [Fm.L_x x i hx1]; exact le_trans (le_max_right _ _) hx
   have hN : NumN_at (Fm.L x i) := numN_at (Fm.params x hx1 i) (Fm.sizes x hx1 i) h3
   refine askIs_of (Fm.L x i) (fun j ρ hρ => ?_) (askRec_at (Fm.fills x hx1 i) hN)
   have := one_le_wAt (Fm.L x i) hN (j.val + 1) (by omega) j.2 ρ hρ

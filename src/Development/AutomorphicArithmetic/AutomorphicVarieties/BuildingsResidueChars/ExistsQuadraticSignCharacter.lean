@@ -8,19 +8,23 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Published
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
+  UpperTheory.V.Published
 
-private theorem int_le {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {b : Ω} (hb : IsIntegral ℤ b) :
-    A.valuation b ≤ 1 := by
+private theorem int_le {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {b : Ω} (hb : IsIntegral ℤ b)
+    : A.valuation b ≤ 1 := by
   have h : IsIntegral A b := hb.tower_top
   obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.1 h
   rw [A.valuation_le_one_iff, ← hy]
   exact y.2
 
-private theorem exists_gen (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E]
-    (h : Module.finrank F E = 2) :
-    ∃ (d : 𝓞 F) (t : E), d ≠ 0 ∧ t * t = algebraMap F E d ∧ (∀ c : F, algebraMap F E c ≠ t) ∧
-      ∀ x : E, ∃ a b : F, x = algebraMap F E a + algebraMap F E b * t := by
+private theorem exists_gen
+    (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] (h : Module.finrank F E = 2)
+    : ∃ (d : 𝓞 F) (t : E),
+      d ≠ 0 ∧ t * t = algebraMap F E d ∧ (∀ c : F, algebraMap F E c ≠ t)
+        ∧ ∀ x : E, ∃ a b : F, x = algebraMap F E a + algebraMap F E b * t := by
   haveI : Algebra.IsQuadraticExtension F E := ⟨h⟩
   obtain ⟨δ, e, hδ, h0, h1⟩ := GlobalTheory.QuadSymbol.AlmostNorm.exists_basis_sq F E
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 F) δ
@@ -30,7 +34,14 @@ private theorem exists_gen (F E : Type) [Field F] [NumberField F] [Field E] [Alg
   have ha0 : a ≠ 0 := by
     rintro rfl
     exact hδ (by simp)
-  refine ⟨a * b, algebraMap F E (algebraMap (𝓞 F) F b) * e 1, mul_ne_zero ha0 hb0, ?_, fun c hc => ?_, fun x => ?_⟩
+  refine ⟨
+    a * b,
+    algebraMap F E (algebraMap (𝓞 F) F b) * e 1,
+    mul_ne_zero ha0 hb0,
+    ?_,
+    fun c hc => ?_,
+    fun x => ?_
+  ⟩
   · rw [mul_mul_mul_comm, h1, ← map_mul, ← map_mul]
     congr 1
     show _ = algebraMap (𝓞 F) F (a * b)
@@ -45,8 +56,7 @@ private theorem exists_gen (F E : Type) [Field F] [NumberField F] [Field E] [Alg
     rw [Fin.sum_univ_two, h0, map_div₀, Algebra.smul_def, Algebra.smul_def]
     field_simp
 
-theorem UpperTheory.exists_quadratic_sign_character :
-    UpperTheory.V.Af.Bc.SignEx := by
+theorem UpperTheory.exists_quadratic_sign_character : UpperTheory.V.Af.Bc.SignEx := by
   intro F E Ω _ _ _ _ _ _ _ _ _ _ l _ h
   classical
   obtain ⟨d, t, hd, ht, hn, hx⟩ := exists_gen F E h
@@ -55,8 +65,7 @@ theorem UpperTheory.exists_quadratic_sign_character :
   haveI : Algebra.IsAlgebraic F Ω := Algebra.IsAlgebraic.trans F E Ω
   haveI : IsAlgClosure F Ω := ⟨inferInstance, inferInstance⟩
   set θ : Ω := algebraMap E Ω t with hθ
-  have hθ2 : θ * θ = algebraMap F Ω d := by
-    rw [hθ, ← map_mul, ht, ← IsScalarTower.algebraMap_apply]
+  have hθ2 : θ * θ = algebraMap F Ω d := by rw [hθ, ← map_mul, ht, ← IsScalarTower.algebraMap_apply]
   have hd' : algebraMap F Ω d ≠ 0 := by simpa using hd
   have hθ0 : θ ≠ 0 := fun h0 => hd' (by rw [← hθ2, h0, zero_mul])
   have hne : -θ ≠ θ := fun h0 => hθ0 (by linear_combination (-1 / 2 : Ω) * h0)
@@ -67,9 +76,12 @@ theorem UpperTheory.exists_quadratic_sign_character :
     have := congrArg Units.val h0
     simp only [Units.val_neg, Units.val_one] at this
     exact absurd this (by norm_num)
-  let δ : G F Ω →* (Qbar l)ˣ := MonoidHom.mk' (fun s => if s θ = θ then 1 else -1) fun a b => by
-    rcases hpm a with ha | ha <;> rcases hpm b with hb | hb <;>
-      simp [AlgEquiv.mul_apply, ha, hb, hne]
+  let δ : G F Ω →* (Qbar l)ˣ :=
+    MonoidHom.mk'
+      (fun s => if s θ = θ then 1 else -1)
+      fun a b => by
+        rcases hpm a with ha | ha <;> rcases hpm b with hb | hb
+          <;> simp [AlgEquiv.mul_apply, ha, hb, hne]
   have hδ : ∀ s, δ s = 1 ↔ s θ = θ := fun s => by
     show (if s θ = θ then (1 : (Qbar l)ˣ) else -1) = 1 ↔ _
     split_ifs with h0 <;> simp [h0, hm1]
@@ -90,8 +102,9 @@ theorem UpperTheory.exists_quadratic_sign_character :
       refine ⟨AlgEquiv.ofRingEquiv (f := s.toRingEquiv) fun x => ?_, rfl⟩
       obtain ⟨a, b, rfl⟩ := hx x
       show s _ = _
-      rw [map_add (f := _), map_mul, ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply, map_add (f := _), map_mul,
-        AlgEquiv.commutes, AlgEquiv.commutes, ← hθ, hs]
+      rw [map_add (f := _), map_mul, ← IsScalarTower.algebraMap_apply,
+        ← IsScalarTower.algebraMap_apply, map_add (f := _), map_mul, AlgEquiv.commutes,
+        AlgEquiv.commutes, ← hθ, hs]
     · rintro ⟨u, rfl⟩
       exact u.commutes t
   · show (if s θ = θ then (1 : (Qbar l)ˣ) else -1) = 1 ∨ (if s θ = θ then (1 : (Qbar l)ˣ) else -1) = -1

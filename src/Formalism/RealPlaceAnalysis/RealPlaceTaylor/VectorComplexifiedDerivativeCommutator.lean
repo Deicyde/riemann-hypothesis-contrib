@@ -19,15 +19,15 @@ theorem vector_right_derivative_extends : RdExtV := by
   intro n ε E _ _ f F U g X hU hg hgJ hF hfF hX
   unfold RdV
   have hγ := hasDerivAt_mul_exp_smul_zero g X
-  have hγ0 : g * NormedSpace.exp (((0 : ℝ) : ℂ) • X) = g := by
-    simp [NormedSpace.exp_zero]
+  have hγ0 : g * NormedSpace.exp (((0 : ℝ) : ℂ) • X) = g := by simp [NormedSpace.exp_zero]
   have hFd : DifferentiableAt ℝ F g :=
     (hF.differentiableOn (by simp)).differentiableAt (hU.mem_nhds hg)
-  have hcomp : HasDerivAt (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X)))
-      (fderiv ℝ F g (g * X)) 0 :=
+  have hcomp
+      : HasDerivAt (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) (fderiv ℝ F g (g * X)) 0 :=
     hFd.hasFDerivAt.comp_hasDerivAt_of_eq (0 : ℝ) hγ hγ0.symm
-  have hev : (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) =ᶠ[𝓝 0]
-      (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) := by
+  have hev
+      : (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) =ᶠ[𝓝 0]
+        (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) := by
     have hmem : ∀ᶠ t : ℝ in 𝓝 0, g * NormedSpace.exp ((t : ℂ) • X) ∈ U :=
       hγ.continuousAt.preimage_mem_nhds (by rw [hγ0]; exact hU.mem_nhds hg)
     filter_upwards [hmem] with t ht
@@ -45,8 +45,14 @@ theorem rdSmoothV_of (h : RdExtV) : RdSmoothV := by
     ContinuousLinearMap.toNormedAddCommGroup
   letI : NormedSpace ℝ (Matrix (Fin n) (Fin n) ℂ →L[ℝ] E) := ContinuousLinearMap.toNormedSpace
   obtain ⟨U, F, hU, hg0U, hF, hfF⟩ := hf g0 hg0
-  refine ⟨U, fun x => fderiv ℝ F x (x * X), hU, hg0U, ?_,
-    fun x hx hxJ => h n ε E f F U x X hU hx hxJ hF hfF hX⟩
+  refine ⟨
+    U,
+    fun x => fderiv ℝ F x (x * X),
+    hU,
+    hg0U,
+    ?_,
+    fun x hx hxJ => h n ε E f F U x X hU hx hxJ hF hfF hX
+  ⟩
   have hF1 : ContDiffOn ℝ ∞ (fun y => fderiv ℝ F y) U :=
     ((contDiffOn_infty_iff_fderiv_of_isOpen hU).mp hF).2
   have hL : ContDiff ℝ ∞ (fun y : Matrix (Fin n) (Fin n) ℂ => y * X) :=
@@ -74,8 +80,12 @@ theorem rdLinV_of (h : RdExtV) : RdLinV := by
       Matrix.mul_smul, Complex.coe_smul, map_smul, Complex.coe_smul]
   · have hsm : ContDiffOn ℝ ∞ (fun x => F x + c • F' x) (U ∩ U') :=
       (hF.mono Set.inter_subset_left).add ((hF'.mono Set.inter_subset_right).const_smul c)
-    rw [h n ε E (fun x => f x + c • f' x) (fun x => F x + c • F' x) (U ∩ U') g X (hU.inter hU')
-      ⟨hgU, hgU'⟩ hg hsm (fun x hx hxJ => by rw [hfF x hx.1 hxJ, hfF' x hx.2 hxJ]) hX,
+    rw [h n ε E
+        (fun x => f x + c • f' x)
+        (fun x => F x + c • F' x)
+        (U ∩ U') g X (hU.inter hU') ⟨hgU, hgU'⟩ hg hsm
+        (fun x hx hxJ => by rw [hfF x hx.1 hxJ, hfF' x hx.2 hxJ])
+        hX,
       eX, h n ε E f' F' U' g X hU' hgU' hg hF' hfF' hX]
     have hD : HasFDerivAt (fun x => F x + c • F' x) (fderiv ℝ F g + c • fderiv ℝ F' g) g :=
       hFd.hasFDerivAt.add (hFd'.hasFDerivAt.const_smul c)
@@ -111,11 +121,17 @@ theorem rdBracketV_of (h : RdExtV) (_hs : RdSmoothV) : RdBracketV := by
   have hGY : ContDiffOn ℝ ∞ (fun y => fderiv ℝ F y (y * Y)) U :=
     hF1.clm_apply (LY.contDiff.contDiffOn)
   have eY : RdV X (RdV Y f) g = fderiv ℝ (fun y => fderiv ℝ F y (y * Y)) g (g * X) :=
-    h n ε E (RdV Y f) (fun y => fderiv ℝ F y (y * Y)) U g X hU hgU hg hGY
-      (fun x hx hxJ => h n ε E f F U x Y hU hx hxJ hF hfF hY) hX
+    h n ε E (RdV Y f)
+      (fun y => fderiv ℝ F y (y * Y))
+      U g X hU hgU hg hGY
+      (fun x hx hxJ => h n ε E f F U x Y hU hx hxJ hF hfF hY)
+      hX
   have eX : RdV Y (RdV X f) g = fderiv ℝ (fun y => fderiv ℝ F y (y * X)) g (g * Y) :=
-    h n ε E (RdV X f) (fun y => fderiv ℝ F y (y * X)) U g Y hU hgU hg hGX
-      (fun x hx hxJ => h n ε E f F U x X hU hx hxJ hF hfF hX) hY
+    h n ε E (RdV X f)
+      (fun y => fderiv ℝ F y (y * X))
+      U g Y hU hgU hg hGX
+      (fun x hx hxJ => h n ε E f F U x X hU hx hxJ hF hfF hX)
+      hY
   have eXY : RdV (X * Y - Y * X) f g = fderiv ℝ F g (g * (X * Y - Y * X)) :=
     h n ε E f F U g _ hU hgU hg hF hfF (inG_commutator' hX hY)
   have hFd2 : DifferentiableAt ℝ (fun y => fderiv ℝ F y) g :=
@@ -128,16 +144,20 @@ theorem rdBracketV_of (h : RdExtV) (_hs : RdSmoothV) : RdBracketV := by
     hFd2.hasFDerivAt.clm_apply LY.hasFDerivAt
   have hhX : HasFDerivAt (fun y => fderiv ℝ F y (y * X)) _ g :=
     hFd2.hasFDerivAt.clm_apply LX.hasFDerivAt
-  have dY : fderiv ℝ (fun y => fderiv ℝ F y (y * Y)) g (g * X) =
-      fderiv ℝ F g (g * X * Y) + fderiv ℝ (fun y => fderiv ℝ F y) g (g * X) (g * Y) := by
+  have dY
+      : fderiv ℝ (fun y => fderiv ℝ F y (y * Y)) g (g * X)
+        = fderiv ℝ F g (g * X * Y) + fderiv ℝ (fun y => fderiv ℝ F y) g (g * X) (g * Y) := by
     rw [hhY.fderiv]
     rfl
-  have dX : fderiv ℝ (fun y => fderiv ℝ F y (y * X)) g (g * Y) =
-      fderiv ℝ F g (g * Y * X) + fderiv ℝ (fun y => fderiv ℝ F y) g (g * Y) (g * X) := by
+  have dX
+      : fderiv ℝ (fun y => fderiv ℝ F y (y * X)) g (g * Y)
+        = fderiv ℝ F g (g * Y * X) + fderiv ℝ (fun y => fderiv ℝ F y) g (g * Y) (g * X) := by
     rw [hhX.fderiv]
     rfl
-  have hsymm' : fderiv ℝ (fun y => fderiv ℝ F y) g (g * X) (g * Y) =
-      fderiv ℝ (fun y => fderiv ℝ F y) g (g * Y) (g * X) := hsymm
+  have hsymm'
+      : fderiv ℝ (fun y => fderiv ℝ F y) g (g * X) (g * Y)
+        = fderiv ℝ (fun y => fderiv ℝ F y) g (g * Y) (g * X) :=
+    hsymm
   rw [eY, eX, eXY, dY, dX, hsymm', Matrix.mul_sub, map_sub, Matrix.mul_assoc g X Y,
     Matrix.mul_assoc g Y X]
   abel
@@ -302,16 +322,19 @@ end EabGl
 theorem eabGlV_of (hl : RdLinV) (hb : RdBracketV) (hs : RdSmoothV) : EabGlV := by
   intro n ε E _ _ f a b c d g hf hg
   unfold EabV
-  rw [vector_complexified_derivative_commutator hl hb hs ε f _ _ g hf hg, vector_complexified_derivative_sub hl hf hg]
-  have h1 : Matrix.single a b (1 : ℂ) * Matrix.single c d 1 =
-      if b = c then Matrix.single a d 1 else 0 := by
+  rw [vector_complexified_derivative_commutator hl hb hs ε f _ _ g hf hg,
+    vector_complexified_derivative_sub hl hf hg]
+  have h1
+      : Matrix.single a b (1 : ℂ) * Matrix.single c d 1
+        = if b = c then Matrix.single a d 1 else 0 := by
     split_ifs with h
     · subst h
       rw [Matrix.single_mul_single_same, one_mul]
     · rw [Matrix.single_mul_single_of_ne]
       exact h
-  have h2 : Matrix.single c d (1 : ℂ) * Matrix.single a b 1 =
-      if d = a then Matrix.single c b 1 else 0 := by
+  have h2
+      : Matrix.single c d (1 : ℂ) * Matrix.single a b 1
+        = if d = a then Matrix.single c b 1 else 0 := by
     split_ifs with h
     · subst h
       rw [Matrix.single_mul_single_same, one_mul]
@@ -325,16 +348,25 @@ theorem rdVPair_of (h : RdExtV) : RdVPair := by
   have hsm : SmoothOnGV ε (fun x => φ (f x)) := by
     intro g0 hg0
     obtain ⟨U, F, hU, hg0U, hF, hfF⟩ := hf g0 hg0
-    exact ⟨U, fun x => φ (F x), hU, hg0U, (φ.restrictScalars ℝ).contDiff.comp_contDiffOn hF,
-      fun x hx hxJ => by simp only [hfF x hx hxJ]⟩
+    exact ⟨
+      U,
+      fun x => φ (F x),
+      hU,
+      hg0U,
+      (φ.restrictScalars ℝ).contDiff.comp_contDiffOn hF,
+      fun x hx hxJ => by simp only [hfF x hx hxJ]
+    ⟩
   refine ⟨hsm, ?_⟩
   obtain ⟨U, F, hU, hgU, hF, hfF⟩ := hf g hg
   have hd : DifferentiableAt ℝ F g :=
     (hF.differentiableOn (by simp) g hgU).differentiableAt (hU.mem_nhds hgU)
   rw [h n ε E f F U g X hU hgU hg hF hfF hX,
-    h n ε E' (fun x => φ (f x)) (fun x => φ (F x)) U g X hU hgU hg
-      ((φ.restrictScalars ℝ).contDiff.comp_contDiffOn hF)
-      (fun x hx hxJ => by simp only [hfF x hx hxJ]) hX]
+    h n ε E'
+      (fun x => φ (f x))
+      (fun x => φ (F x))
+      U g X hU hgU hg ((φ.restrictScalars ℝ).contDiff.comp_contDiffOn hF)
+      (fun x hx hxJ => by simp only [hfF x hx hxJ])
+      hX]
   have hcomp : fderiv ℝ (fun x => φ (F x)) g = (φ.restrictScalars ℝ).comp (fderiv ℝ F g) :=
     ((φ.restrictScalars ℝ).hasFDerivAt.comp g hd.hasFDerivAt).fderiv
   rw [hcomp]

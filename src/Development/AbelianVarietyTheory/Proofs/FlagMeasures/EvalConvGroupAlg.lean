@@ -8,7 +8,12 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicUnimodular
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.AutomorphicEvaluation Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.SRe
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
+  Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.AutomorphicEvaluation
+  Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned
+  Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory NumberField IsDedekindDomain
+  GlobalTheory.Mem GlobalTheory.Mem.SRe
 open scoped Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,8 +26,8 @@ theorem kset_one (X : HidaSetting D) : (1 : X.B.I.Gf) ∈ X.B.I.Kset := by
   rw [OneMemClass.coe_one]
   exact (Formalism.UG.stabGL X.B.I.Lf).one_mem
 
-theorem kset_mul (X : HidaSetting D) {x y : X.B.I.Gf} (hx : x ∈ X.B.I.Kset) (hy : y ∈ X.B.I.Kset) :
-    x * y ∈ X.B.I.Kset := by
+theorem kset_mul (X : HidaSetting D) {x y : X.B.I.Gf} (hx : x ∈ X.B.I.Kset) (hy : y ∈ X.B.I.Kset)
+    : x * y ∈ X.B.I.Kset := by
   show ((x * y : X.B.I.Gf) : GL _ _) ∈ Formalism.UG.stabGL X.B.I.Lf
   rw [Subgroup.coe_mul]
   exact mul_mem hx hy
@@ -32,14 +37,18 @@ theorem kset_inv (X : HidaSetting D) {x : X.B.I.Gf} (hx : x ∈ X.B.I.Kset) : x�
   rw [Subgroup.coe_inv]
   exact inv_mem hx
 
-theorem red_one (X : HidaSetting D) {red : X.B.I.Gf → G0g D.nd} (hr : IsRedHom X red) : red 1 = 1 := by
+theorem red_one (X : HidaSetting D) {red : X.B.I.Gf → G0g D.nd} (hr : IsRedHom X red)
+    : red 1 = 1 := by
   have h := hr.2.1 1 (kset_one X) 1 (kset_one X)
   rw [one_mul] at h
   exact mul_left_cancel (a := red 1) (by rw [mul_one]; exact h.symm)
 
-theorem fibre_iff (X : HidaSetting D) {red : X.B.I.Gf → G0g D.nd} (hr : IsRedHom X red) {s : X.B.I.Gf}
-    (hs : s ∈ X.B.I.Kset) (x : X.B.I.Gf) :
-    (x ∈ X.B.I.Kset ∧ red x = red s) ↔ s⁻¹ * x ∈ X.B.I.Kg X.B.g := by
+theorem fibre_iff
+    (X : HidaSetting D)
+    {red : X.B.I.Gf → G0g D.nd} (hr : IsRedHom X red)
+    {s : X.B.I.Gf} (hs : s ∈ X.B.I.Kset)
+    (x : X.B.I.Gf)
+    : (x ∈ X.B.I.Kset ∧ red x = red s) ↔ s⁻¹ * x ∈ X.B.I.Kg X.B.g := by
   have hsi : s⁻¹ ∈ X.B.I.Kset := kset_inv X hs
   have hinv : red s⁻¹ = (red s)⁻¹ := by
     have h1 := hr.2.1 s⁻¹ hsi s hs
@@ -66,17 +75,24 @@ theorem one_le_g (X : HidaSetting D) : 1 ≤ X.B.g := by
 
 theorem kg_open (X : HidaSetting D) : IsOpen (X.B.I.Kg X.B.g) := X.B.I.topf_open X.B.g (one_le_g X)
 
-theorem kg_pos_fin (X : HidaSetting D) : 0 < X.B.μf (X.B.I.Kg X.B.g) ∧ X.B.μf (X.B.I.Kg X.B.g) < ⊤ := by
-  have hne : (X.B.I.Kg X.B.g).Nonempty := ⟨1, by
-    refine ⟨kset_one X, fun y _ => ⟨0, zero_mem _, ?_⟩⟩
-    simp [Formalism.MainNotions.S.AutInst.fmat]⟩
+theorem kg_pos_fin (X : HidaSetting D)
+    : 0 < X.B.μf (X.B.I.Kg X.B.g) ∧ X.B.μf (X.B.I.Kg X.B.g) < ⊤ := by
+  have hne : (X.B.I.Kg X.B.g).Nonempty := ⟨
+    1,
+    by
+      refine ⟨kset_one X, fun y _ => ⟨0, zero_mem _, ?_⟩⟩
+      simp [Formalism.MainNotions.S.AutInst.fmat]
+  ⟩
   refine ⟨(kg_open X).measure_pos X.B.μf hne, ?_⟩
-  exact lt_of_le_of_lt (measure_mono fun x hx => hx.1) (PI.WAU.Cpt.isCompact_Kset X.B.I).measure_lt_top
+  exact lt_of_le_of_lt (measure_mono fun x hx => hx.1)
+    (PI.WAU.Cpt.isCompact_Kset X.B.I).measure_lt_top
 
-theorem fibre_meas (X : HidaSetting D) {red : X.B.I.Gf → G0g D.nd} (hr : IsRedHom X red) {s : X.B.I.Gf}
-    (hs : s ∈ X.B.I.Kset) :
-    MeasurableSet {x | x ∈ X.B.I.Kset ∧ red x = red s} ∧
-      X.B.μf {x | x ∈ X.B.I.Kset ∧ red x = red s} = X.B.μf (X.B.I.Kg X.B.g) := by
+theorem fibre_meas
+    (X : HidaSetting D)
+    {red : X.B.I.Gf → G0g D.nd} (hr : IsRedHom X red)
+    {s : X.B.I.Gf} (hs : s ∈ X.B.I.Kset)
+    : MeasurableSet {x | x ∈ X.B.I.Kset ∧ red x = red s}
+      ∧ X.B.μf {x | x ∈ X.B.I.Kset ∧ red x = red s} = X.B.μf (X.B.I.Kg X.B.g) := by
   have e : {x | x ∈ X.B.I.Kset ∧ red x = red s} = (fun x => s⁻¹ * x) ⁻¹' (X.B.I.Kg X.B.g) := by
     ext x; exact fibre_iff X hr hs x
   rw [e]
@@ -84,13 +100,17 @@ theorem fibre_meas (X : HidaSetting D) {red : X.B.I.Gf → G0g D.nd} (hr : IsRed
   exact measure_preimage_mul X.B.μf s⁻¹ _
 
 open scoped InnerProductSpace in
-theorem top_expand [Fintype (G0g D.nd)] (X : HidaSetting D) {red : X.B.I.Gf → G0g D.nd} (hr : IsRedHom X red)
-    (s0 : G0g D.nd → X.B.I.Gf) (hs0 : ∀ γ, s0 γ ∈ X.B.I.Kset ∧ red (s0 γ) = γ) (a : G0g D.nd → ℂ)
-    (Top : L2X X →L[ℂ] L2X X)
+theorem top_expand
+    [Fintype (G0g D.nd)]
+    (X : HidaSetting D)
+    {red : X.B.I.Gf → G0g D.nd} (hr : IsRedHom X red)
+    (s0 : G0g D.nd → X.B.I.Gf) (hs0 : ∀ γ, s0 γ ∈ X.B.I.Kset ∧ red (s0 γ) = γ)
+    (a : G0g D.nd → ℂ) (Top : L2X X →L[ℂ] L2X X)
     (hT : X.B.I.IsRConvF X.B.μf X.B.fund X.B.R
-      (fun x => if x ∈ X.B.I.Kset then a (red x) / ((X.B.μf (X.B.I.Kg X.B.g)).toReal : ℂ) else 0) Top)
-    (y : L2X X) (hy : ∀ k ∈ X.B.I.Kset, X.B.R (1, k) y = X.B.R (1, s0 (red k)) y) :
-    Top y = ∑ γ, a γ • X.B.R (1, s0 γ) y := by
+      (fun x => if x ∈ X.B.I.Kset then a (red x) / ((X.B.μf (X.B.I.Kg X.B.g)).toReal : ℂ) else 0)
+      Top)
+    (y : L2X X) (hy : ∀ k ∈ X.B.I.Kset, X.B.R (1, k) y = X.B.R (1, s0 (red k)) y)
+    : Top y = ∑ γ, a γ • X.B.R (1, s0 γ) y := by
   apply ext_inner_left ℂ
   intro x
   rw [hT.2 x y, inner_sum]
@@ -105,9 +125,10 @@ theorem top_expand [Fintype (G0g D.nd)] (X : HidaSetting D) {red : X.B.I.Gf → 
     rw [(hs0 γ).2] at this
     exact this
   let cf : G0g D.nd → ℂ := fun γ => a γ / (V : ℂ) * ⟪x, X.B.R (1, s0 γ) y⟫_ℂ
-  have hpt : ∀ g : X.B.I.Gf,
-      (if g ∈ X.B.I.Kset then a (red g) / (V : ℂ) else 0) * ⟪x, X.B.R (1, g) y⟫_ℂ =
-        ∑ γ, (Fb γ).indicator (fun _ => cf γ) g := by
+  have hpt
+      : ∀ g : X.B.I.Gf,
+        (if g ∈ X.B.I.Kset then a (red g) / (V : ℂ) else 0) * ⟪x, X.B.R (1, g) y⟫_ℂ
+          = ∑ γ, (Fb γ).indicator (fun _ => cf γ) g := by
     intro g
     by_cases hg : g ∈ X.B.I.Kset
     · rw [if_pos hg, Finset.sum_eq_single (red g)]
@@ -128,7 +149,8 @@ theorem top_expand [Fintype (G0g D.nd)] (X : HidaSetting D) {red : X.B.I.Gf → 
   · intro γ _
     refine (integrable_indicator_iff (hFb γ).1).2 ?_
     refine integrableOn_const ?_
-    rw [(hFb γ).2]; exact (kg_pos_fin X).2.ne
+    rw [(hFb γ).2]
+    exact (kg_pos_fin X).2.ne
 
 end GlobalTheory.Mem.SRe.ConvStep
 

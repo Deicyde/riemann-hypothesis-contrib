@@ -7,14 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsGeneri
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (Lv IsTrans Integ KS Mem FEt KSEx KSNice)
 open scoped TensorProduct
 universe u
 
-theorem UpperTheory.Gal.G3.pTransIso :
-    IsoPts → IsogFEt → TransIso := by
+theorem UpperTheory.Gal.G3.pTransIso : IsoPts → IsogFEt → TransIso := by
   intro IP IF p _ D G L R _ _ gb S s N' N o' o ψ u hu T
   obtain ⟨hmon, -, ⟨ψ', d, hψ', -, hd, hd', hdp⟩, -, tate⟩ := T
   haveI := hmon
@@ -41,19 +43,16 @@ theorem UpperTheory.Gal.G3.pTransIso :
     have hc : a₁ ≫ ψ = a₂ ≫ ψ := by
       ext
       simp [a₁, a₂, hy, hy₂]
-    have ha : (a₂ * a₁⁻¹) ≫ ψ = 1 := by
-      rw [MonObj.mul_comp, GrpObj.inv_comp, ← hc, mul_inv_cancel]
+    have ha : (a₂ * a₁⁻¹) ≫ ψ = 1 := by rw [MonObj.mul_comp, GrpObj.inv_comp, ← hc, mul_inv_cancel]
     have had : (a₂ * a₁⁻¹) ^ d = 1 := by
       have e : (a₂ * a₁⁻¹) ^ d = (a₂ * a₁⁻¹) ≫ ψ ≫ ψ' := by
         rw [hd, MonObj.comp_pow, Category.comp_id]
       rw [e, ← Category.assoc, ha, MonObj.one_comp]
     let β : R →+* Ω := (Spec.preimage (t ≫ s)).hom
-    have hβ : t ≫ s = spMap β := by
-      simp [β, spMap, Spec.map_preimage]
+    have hβ : t ≫ s = spMap β := by simp [β, spMap, Spec.map_preimage]
     obtain ⟨I', I'', -, -, hrel⟩ := tate Ω t β hβ
     obtain ⟨x, hx⟩ := (I'.onto d hd0 _).mp had
-    have h0 : I'.ev d x ≫ ψ = I''.ev d 0 := by
-      rw [hx, ha, HeckeRestrict.ev_zero]
+    have h0 : I'.ev d x ≫ ψ = I''.ev d 0 := by rw [hx, ha, HeckeRestrict.ev_zero]
     obtain ⟨w, hw, hxw⟩ := (hrel d hd0 hdp x 0).mp h0
     have hinv : u⁻¹ ∈ L.KN 1 := Subgroup.inv_mem _ hu
     have hdw : d • w = L.actG u (inAf D x) := by
@@ -62,8 +61,9 @@ theorem UpperTheory.Gal.G3.pTransIso :
     have hxa : inAf D x = d • L.actG u⁻¹ w := by
       rw [← map_nsmul, hdw, ← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one,
         Module.End.one_apply]
-    obtain ⟨z', hz'⟩ := LatDiv.eq_nsmul_of_inAf_eq_nsmul p D x d hd0 hdp _
-      (UpperTheory.Gal.Int.Geo.integ_of_mem hinv w hw) hxa
+    obtain ⟨z', hz'⟩ :=
+      LatDiv.eq_nsmul_of_inAf_eq_nsmul p D x d hd0 hdp _
+        (UpperTheory.Gal.Int.Geo.integ_of_mem hinv w hw) hxa
     have h1 : a₂ * a₁⁻¹ = 1 := by
       rw [← hx]
       exact (I'.ker d hd0 x).mpr ⟨z', hz'⟩

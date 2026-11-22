@@ -14,13 +14,18 @@ set_option autoImplicit false
 noncomputable section
 namespace GlobalTheory.FunctionFieldTrdeg
 
-theorem trdeg_functionField_eq : ∀ (F : Type) [Field F] (G : Scheme.{0}) [IsIntegral G] (s : G ⟶ Sp F) (d : ℕ), IsProjOver s → topologicalKrullDim G = d → ∀ (φ : F →+* G.functionField), G.fromSpecStalk (genericPoint G) ≫ s = spMap φ → (letI := φ.toAlgebra; Algebra.trdeg F G.functionField = d) := by
+theorem trdeg_functionField_eq
+    : ∀ (F : Type) [Field F] (G : Scheme.{0}) [IsIntegral G] (s : G ⟶ Sp F) (d : ℕ),
+      IsProjOver s → topologicalKrullDim G = d
+        → ∀ (φ : F →+* G.functionField),
+          G.fromSpecStalk (genericPoint G) ≫ s = spMap φ
+            → (letI := φ.toAlgebra; Algebra.trdeg F G.functionField = d) := by
   intro F _ G _ s d hs hd φ hφ
   obtain ⟨N, i, hi, hcomp⟩ := hs
   haveI : IsProper (PSpace.str F N) := isProper_str F N
   haveI : LocallyOfFiniteType s := by rw [← hcomp]; infer_instance
-  obtain ⟨_, ⟨U, hU, rfl⟩, hxU, -⟩ := G.isBasis_affineOpens.exists_subset_of_mem_open
-    (Set.mem_univ (genericPoint G)) isOpen_univ
+  obtain ⟨_, ⟨U, hU, rfl⟩, hxU, -⟩ :=
+    G.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ (genericPoint G)) isOpen_univ
   have hU : IsAffineOpen U := hU
   haveI : Nonempty U := ⟨⟨_, hxU⟩⟩
   let ψ := Spec.preimage (hU.fromSpec ≫ s)
@@ -35,7 +40,8 @@ theorem trdeg_functionField_eq : ∀ (F : Type) [Field F] (G : Scheme.{0}) [IsIn
     apply Spec.map_injective
     rw [Spec.map_comp]
     change spMap φ = _
-    rw [← hφ, hψ, ← hU.fromSpecStalk_eq_fromSpecStalk hxU, IsAffineOpen.fromSpecStalk, Category.assoc]
+    rw [← hφ, hψ, ← hU.fromSpecStalk_eq_fromSpecStalk hxU, IsAffineOpen.fromSpecStalk,
+      Category.assoc]
   haveI : IsScalarTower F Γ(G, U) G.functionField :=
     IsScalarTower.of_algebraMap_eq' congr($(key).hom)
   haveI := functionField_isFractionRing_of_isAffineOpen G U hU

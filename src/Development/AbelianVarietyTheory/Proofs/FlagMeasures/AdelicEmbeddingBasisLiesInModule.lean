@@ -7,22 +7,35 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AdelicColumnL
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ColDict GlobalTheory.St GlobalTheory.St.G
+open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions
+  Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting
+  Formalism.L2.SG.ColDict GlobalTheory.St GlobalTheory.St.G
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.St.G.TransportCong
 
-
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1600000 in
-theorem inModL_of_inMod_embA : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (wt : (VS D).V ≃ₗ[D.host.E] (VS D).V) (ιA : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F ≃+* D.host.E ⊗[D.host.F] Ad D.host.F), WittX X u wt → IsAdeleIso X ιA → ∀ (b bd : Fin D.R.k → Fin (D.R.N 0) → D.host.E ⊗[D.host.F] Ad D.host.F) (y : Fin (D.R.N 0) → D.host.E ⊗[D.host.F] Ad D.host.F), InMod X.B.I X.B.g (Set.range (fun i => embA X wt ιA (b i)) ∪ Set.range (fun i => embA X wt ιA (bd i))) (embA X wt ιA y) → InModL (hat D.host.F (Mq wt)) (D.host.g 0 * D.host.g 1) (Set.range b ∪ Set.range bd) y := by
+theorem inModL_of_inMod_embA
+    : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (wt : (VS D).V ≃ₗ[D.host.E] (VS D).V)
+        (ιA : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F ≃+* D.host.E ⊗[D.host.F] Ad D.host.F),
+      WittX X u wt → IsAdeleIso X ιA
+        → ∀ (b bd : Fin D.R.k → Fin (D.R.N 0) → D.host.E ⊗[D.host.F] Ad D.host.F)
+            (y : Fin (D.R.N 0) → D.host.E ⊗[D.host.F] Ad D.host.F),
+          InMod X.B.I X.B.g
+              (Set.range (fun i => embA X wt ιA (b i)) ∪ Set.range (fun i => embA X wt ιA (bd i)))
+              (embA X wt ιA y)
+            → InModL (hat D.host.F (Mq wt)) (D.host.g 0 * D.host.g 1) (Set.range b ∪ Set.range bd)
+              y := by
   intro D X u wt ιA hW hA b bd y hy
-  obtain ⟨h1, -, hinj, -⟩ := GlobalTheory.T.adelicColumnLattice_eq_spanPart_transportedFrame D X u wt ιA hW hA
+  obtain ⟨h1, -, hinj, -⟩ :=
+    GlobalTheory.T.adelicColumnLattice_eq_spanPart_transportedFrame D X u wt ιA hW hA
   have hadd : ∀ x x', embA X wt ιA (x + x') = embA X wt ιA x + embA X wt ιA x' := by
     intro x x'; simp only [embA, Pi.add_apply, map_add (f := _), add_smul, Finset.sum_add_distrib]
-  have hsmul : ∀ (c : D.host.E ⊗[D.host.F] Ad D.host.F) x,
-      embA X wt ιA (c • x) = ιA.symm c • embA X wt ιA x := by
+  have hsmul
+      : ∀ (c : D.host.E ⊗[D.host.F] Ad D.host.F) x,
+        embA X wt ιA (c • x) = ιA.symm c • embA X wt ιA x := by
     intro c x; simp only [embA, Pi.smul_apply, smul_eq_mul, map_mul, mul_smul, Finset.smul_sum]
   have hzero : embA X wt ιA 0 = 0 := by simp [embA]
   have hsub : ∀ x x', embA X wt ιA (x - x') = embA X wt ιA x - embA X wt ιA x' := by
@@ -30,11 +43,14 @@ theorem inModL_of_inMod_embA : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.W
     have := hadd (x - x') x'
     rw [sub_add_cancel] at this
     rw [this, add_sub_cancel_right]
-  have hS : (Set.range (fun i => embA X wt ιA (b i)) ∪ Set.range (fun i => embA X wt ιA (bd i))) =
-      embA X wt ιA '' (Set.range b ∪ Set.range bd) := by
+  have hS
+      : (Set.range (fun i => embA X wt ιA (b i)) ∪ Set.range (fun i => embA X wt ιA (bd i)))
+        = embA X wt ιA '' (Set.range b ∪ Set.range bd) := by
     rw [Set.image_union, ← Set.range_comp, ← Set.range_comp]; rfl
-  have hspan : ∀ s ∈ Submodule.span (IntAf X.B.I.F X.B.I.E) (embA X wt ιA '' (Set.range b ∪ Set.range bd)),
-      ∃ s' ∈ Submodule.span (OAd D.host.F D.host.E) (Set.range b ∪ Set.range bd), embA X wt ιA s' = s := by
+  have hspan
+      : ∀ s ∈ Submodule.span (IntAf X.B.I.F X.B.I.E) (embA X wt ιA '' (Set.range b ∪ Set.range bd)),
+        ∃ s' ∈ Submodule.span (OAd D.host.F D.host.E) (Set.range b ∪ Set.range bd),
+          embA X wt ιA s' = s := by
     intro s hs
     induction hs using Submodule.span_induction with
     | mem x hx => obtain ⟨t, ht, rfl⟩ := hx; exact ⟨t, Submodule.subset_span ht, rfl⟩
@@ -48,8 +64,9 @@ theorem inModL_of_inMod_embA : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.W
       have ha : ιA (a : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) ∈ OAd D.host.F D.host.E := (hA.2 a).1 a.2
       refine ⟨(⟨_, ha⟩ : OAd D.host.F D.host.E) • s1, Submodule.smul_mem _ _ hs1, ?_⟩
       rw [Subring.smul_def, hsmul, RingEquiv.symm_apply_apply, Subring.smul_def]
-  have hmL : ∀ w ∈ mL X.B.I X.B.g, ∃ x ∈ X.B.I.Lf,
-      w = ((X.B.g : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) • x := by
+  have hmL
+      : ∀ w ∈ mL X.B.I X.B.g, ∃ x ∈ X.B.I.Lf,
+        w = ((X.B.g : ℕ) : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) • x := by
     intro w hw
     induction hw using Submodule.span_induction with
     | mem x hx => obtain ⟨x', hx', rfl⟩ := hx; exact ⟨x', hx', rfl⟩
@@ -77,7 +94,13 @@ theorem inModL_of_inMod_embA : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.W
       rw [← map_natCast (algebraMap D.host.F (D.host.E ⊗[D.host.F] Ad D.host.F))]
       exact (IsUnit.mk0 _ (Nat.cast_ne_zero.mpr hpos.ne')).map _
     obtain ⟨c, hc⟩ := hu
-    refine ⟨s', hs', ((c⁻¹ : (D.host.E ⊗[D.host.F] Ad D.host.F)ˣ) : D.host.E ⊗[D.host.F] Ad D.host.F) • (y - s'), ?_, ?_⟩
+    refine ⟨
+      s',
+      hs',
+      ((c⁻¹ : (D.host.E ⊗[D.host.F] Ad D.host.F)ˣ) : D.host.E ⊗[D.host.F] Ad D.host.F) • (y - s'),
+      ?_,
+      ?_
+    ⟩
     · rw [h1, hsmul, hsub, ← hsw, add_sub_cancel_left, smul_smul, ← map_natCast ιA.symm, ← hc,
         ← map_mul, Units.inv_mul, map_one, one_smul]
       exact hx

@@ -11,9 +11,10 @@ open scoped TensorProduct
 
 namespace UpperTheory.V.Lit.Dr
 
-private theorem ev_comp {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a d : ℕ}
-    (m : Sm E a ⊗[ℂ] (Fin d → ℂ)) (j : Fin d) :
-    (fun g => ev m g j) = (TensorProduct.piScalarRight ℂ ℂ (Sm E a) (Fin d) m j).1 := by
+private theorem ev_comp
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    {a d : ℕ} (m : Sm E a ⊗[ℂ] (Fin d → ℂ)) (j : Fin d)
+    : (fun g => ev m g j) = (TensorProduct.piScalarRight ℂ ℂ (Sm E a) (Fin d) m j).1 := by
   induction m using TensorProduct.induction_on with
   | zero =>
     rw [(ev (E := E) (a := a) (d := d)).map_zero,
@@ -37,7 +38,9 @@ theorem evFacts : EvFacts := by
     exact Subtype.property _
   · refine ⟨(TensorProduct.piScalarRight ℂ ℂ (Sm E a) (Fin d)).symm fun j => ⟨_, hf j⟩, ?_⟩
     funext g j
-    have := congrFun (ev_comp ((TensorProduct.piScalarRight ℂ ℂ (Sm E a) (Fin d)).symm fun j => ⟨_, hf j⟩) j) g
+    have :=
+      congrFun
+        (ev_comp ((TensorProduct.piScalarRight ℂ ℂ (Sm E a) (Fin d)).symm fun j => ⟨_, hf j⟩) j) g
     rw [LinearEquiv.apply_symm_apply] at this
     exact this
 

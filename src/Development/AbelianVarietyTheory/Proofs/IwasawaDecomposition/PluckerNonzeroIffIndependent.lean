@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory GlobalTheory.LocM GlobalTheory.LieMet GlobalTheory.DRFlag
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory GlobalTheory.LocM GlobalTheory.LieMet GlobalTheory.DRFlag
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.FlagMod (ev tanPull initSpan)
 open GlobalTheory.FlagEmb (plN plk lform LeftInv)
@@ -21,8 +22,9 @@ noncomputable section
 
 namespace GlobalTheory.FlagEmb.PlkSpan
 
-theorem indep_of_plk_ne_zero (K : Type) [Field K] (N k : ℕ) (u : Fin k → Fin (N + 1) → K)
-    (h : plk u id ≠ 0) : LinearIndependent K u := by
+theorem indep_of_plk_ne_zero
+    (K : Type) [Field K] (N k : ℕ) (u : Fin k → Fin (N + 1) → K) (h : plk u id ≠ 0)
+    : LinearIndependent K u := by
   obtain ⟨q, hq⟩ := Function.ne_iff.1 h
   set r := GlobalTheory.FlagEmb.plE N k q
   have hdet : (Matrix.of fun l l' => u l (r l')).det ≠ 0 := hq
@@ -30,8 +32,9 @@ theorem indep_of_plk_ne_zero (K : Type) [Field K] (N k : ℕ) (u : Fin k → Fin
   refine LinearIndependent.of_comp (LinearMap.funLeft K K r) ?_
   exact hA
 
-theorem plk_ne_zero_of_indep (K : Type) [Field K] (N k : ℕ) (u : Fin k → Fin (N + 1) → K)
-    (h : LinearIndependent K u) : plk u id ≠ 0 := by
+theorem plk_ne_zero_of_indep
+    (K : Type) [Field K] (N k : ℕ) (u : Fin k → Fin (N + 1) → K) (h : LinearIndependent K u)
+    : plk u id ≠ 0 := by
   let Q : Matrix (Fin (N + 1)) (Fin k) K := (Matrix.of u).transpose
   have hinj : Function.Injective Q.mulVec := by
     intro x y hxy
@@ -39,7 +42,9 @@ theorem plk_ne_zero_of_indep (K : Type) [Field K] (N k : ℕ) (u : Fin k → Fin
     have h1 : ∑ l, (x - y) l • u l = 0 := by
       funext r
       have := congrFun h0 r
-      simp only [Q, Matrix.mulVec, dotProduct, Matrix.transpose_apply, Matrix.of_apply, Pi.zero_apply] at this
+      simp only [Q, Matrix.mulVec, dotProduct, Matrix.transpose_apply, Matrix.of_apply,
+          Pi.zero_apply]
+        at this
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
       rw [← this]
       exact Finset.sum_congr rfl fun l _ => mul_comm _ _
@@ -47,8 +52,11 @@ theorem plk_ne_zero_of_indep (K : Type) [Field K] (N k : ℕ) (u : Fin k → Fin
     funext l
     exact sub_eq_zero.1 (h2 l)
   obtain ⟨Q', hQ'⟩ := GlobalTheory.matrix_exists_left_inverse_of_field Q hinj
-  have hCB := GlobalTheory.FlagEmb.CauchyBinet.lform_plk K N k (Fin k) (Fin k) (fun l => Q' l) u id id
-  have hM : (Matrix.of fun l l' => ∑ r, (fun l => Q' l) (id l') r * u (id l) r) = (Q' * Q).transpose := by
+  have hCB :=
+    GlobalTheory.FlagEmb.CauchyBinet.lform_plk K N k (Fin k) (Fin k) (fun l => Q' l) u id id
+  have hM
+      : (Matrix.of fun l l' => ∑ r, (fun l => Q' l) (id l') r * u (id l) r)
+        = (Q' * Q).transpose := by
     ext l l'
     simp [Q, Matrix.mul_apply, mul_comm]
   rw [hM, hQ', Matrix.transpose_one, Matrix.det_one] at hCB
@@ -56,8 +64,9 @@ theorem plk_ne_zero_of_indep (K : Type) [Field K] (N k : ℕ) (u : Fin k → Fin
   rw [h0] at hCB
   simp at hCB
 
-theorem plk_comb (K : Type) [Field K] (N k : ℕ) (u : Fin k → Fin (N + 1) → K) (T : Matrix (Fin k) (Fin k) K) :
-    plk (fun l => ∑ j, T l j • u j) id = T.det • plk u id := by
+theorem plk_comb
+    (K : Type) [Field K] (N k : ℕ) (u : Fin k → Fin (N + 1) → K) (T : Matrix (Fin k) (Fin k) K)
+    : plk (fun l => ∑ j, T l j • u j) id = T.det • plk u id := by
   funext q
   simp only [plk, id, Pi.smul_apply, smul_eq_mul]
   rw [← Matrix.det_mul]
@@ -65,7 +74,13 @@ theorem plk_comb (K : Type) [Field K] (N k : ℕ) (u : Fin k → Fin (N + 1) →
   ext l l'
   simp [Matrix.mul_apply, Finset.sum_apply]
 
-theorem main : ∀ (K : Type) [Field K] (N k : ℕ) (u u' : Fin k → Fin (N + 1) → K), (plk u id ≠ 0 ↔ LinearIndependent K u) ∧ (LinearIndependent K u → ((LinearIndependent K u' ∧ Submodule.span K (Set.range u') = Submodule.span K (Set.range u)) ↔ ∃ r : Kˣ, plk u' id = (r : K) • plk u id)) := by
+theorem main
+    : ∀ (K : Type) [Field K] (N k : ℕ) (u u' : Fin k → Fin (N + 1) → K),
+      (plk u id ≠ 0 ↔ LinearIndependent K u)
+        ∧ (LinearIndependent K u
+          → ((LinearIndependent K u'
+              ∧ Submodule.span K (Set.range u') = Submodule.span K (Set.range u))
+            ↔ ∃ r : Kˣ, plk u' id = (r : K) • plk u id)) := by
   intro K _ N k u u'
   refine ⟨⟨indep_of_plk_ne_zero K N k u, plk_ne_zero_of_indep K N k u⟩, fun hu => ⟨?_, ?_⟩⟩
   · rintro ⟨hu', hs⟩

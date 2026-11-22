@@ -4,9 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Ydd5.main :
-    ∀ {I : Type} (s : Finset I) (c : ℝ),
-      (0 : ℝ) < c → ∀ (f : I → ℝ), (∀ (i : I), (0 : ℝ) < f i) → ∃ (ρ : ℝ), (0 : ℝ) < ρ ∧ ρ ≤ c ∧ ∀ i ∈ s, ρ ≤ f i := by
+theorem UpperTheory.Reformulated.B.Ydd5.main
+    : ∀ {I : Type} (s : Finset I) (c : ℝ),
+      (0 : ℝ) < c
+        → ∀ (f : I → ℝ),
+          (∀ (i : I), (0 : ℝ) < f i) → ∃ (ρ : ℝ), (0 : ℝ) < ρ ∧ ρ ≤ c ∧ ∀ i ∈ s, ρ ≤ f i := by
   intro I s c hc f hf
   classical
   refine Finset.induction_on s ?_ ?_

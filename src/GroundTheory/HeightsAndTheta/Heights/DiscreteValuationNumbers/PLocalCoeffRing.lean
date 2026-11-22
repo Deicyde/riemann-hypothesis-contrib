@@ -11,15 +11,17 @@ namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
 universe u
 
-private theorem mem_minimalPrimes_of_locCycle_ne_zero {S : Type*} [CommRing S] {J W : Ideal S}
-    (h : locCycle J W ≠ 0) : W ∈ J.minimalPrimes := by
+private theorem mem_minimalPrimes_of_locCycle_ne_zero
+    {S : Type*} [CommRing S] {J W : Ideal S} (h : locCycle J W ≠ 0)
+    : W ∈ J.minimalPrimes := by
   by_contra hc
   exact h (by unfold locCycle; rw [dite_eq_right hc])
 
-theorem LocalCoeffRing.proof (h₁ : LocalQuotRing.Statement.{u}) (h₂ : LocalQuotPrimes.Statement.{u})
+theorem LocalCoeffRing.proof
+    (h₁ : LocalQuotRing.Statement.{u}) (h₂ : LocalQuotPrimes.Statement.{u})
     (h₃ : LocCycleLocalQuot.Statement.{u}) (h₄ : LocalQuotColon.Statement.{u})
-    (h₅ : LocalQuotFinsum.Statement.{u}) (h₆ : LocalCoeffLocal.Statement.{u}) :
-    LocalCoeffRing.Statement.{u} := by
+    (h₅ : LocalQuotFinsum.Statement.{u}) (h₆ : LocalCoeffLocal.Statement.{u})
+    : LocalCoeffRing.Statement.{u} := by
   intro R _ _ P U hP hU hPU hchain f g s u v hf hg hs hu huv hno
   have := hU
   obtain ⟨hdom, hloc, hunit, hker⟩ := h₁ R P U hP hPU
@@ -36,13 +38,15 @@ theorem LocalCoeffRing.proof (h₁ : LocalQuotRing.Statement.{u}) (h₂ : LocalQ
   have hUc : (U.map (localQuotMap P U)).comap (localQuotMap P U) = U := (hup U hU hPU le_rfl).2
   have hPbot : P.map (localQuotMap P U) = ⊥ :=
     (Ideal.map_eq_bot_iff_le_ker _).mpr fun y hy => RingHom.mem_ker.mpr ((hker y).2 hy)
-  have hmapx : ∀ x : R, (P ⊔ Ideal.span {x}).map (localQuotMap P U) =
-      Ideal.span {localQuotMap P U x} := by
+  have hmapx
+      : ∀ x : R, (P ⊔ Ideal.span {x}).map (localQuotMap P U) = Ideal.span {localQuotMap P U x} := by
     intro x
     rw [Ideal.map_sup, Ideal.map_span, Set.image_singleton, hPbot, bot_sup_eq]
 
-  have hchain' : ∀ Q₁ Q₂ : Ideal (localQuot P U), Q₁.IsPrime → Q₂.IsPrime → ⊥ < Q₁ → Q₁ < Q₂ →
-      Q₂ < IsLocalRing.maximalIdeal (localQuot P U) → False := by
+  have hchain'
+      : ∀ Q₁ Q₂ : Ideal (localQuot P U),
+        Q₁.IsPrime → Q₂.IsPrime → ⊥ < Q₁ → Q₁ < Q₂ → Q₂ < IsLocalRing.maximalIdeal (localQuot P U)
+          → False := by
     intro Q₁ Q₂ hQ₁ hQ₂ h0 h12 h2m
     obtain ⟨hP1, -, he1⟩ := hdown Q₁ hQ₁
     obtain ⟨-, hU2, he2⟩ := hdown Q₂ hQ₂
@@ -51,25 +55,25 @@ theorem LocalCoeffRing.proof (h₁ : LocalQuotRing.Statement.{u}) (h₂ : LocalQ
       (lt_of_le_of_ne (Ideal.comap_mono h12.le) fun h => h12.ne (by rw [← he1, ← he2, h]))
       (lt_of_le_of_ne hU2 fun h => h2m.ne (by rw [← he2, h, hm]))
   have hne : ∀ x : R, x ∉ P → localQuotMap P U x ≠ 0 := fun x hx h => hx ((hker x).1 h)
-  have hloc' := h₆ (localQuot P U) hchain' (localQuotMap P U f) (localQuotMap P U g)
-    (localQuotMap P U s) (localQuotMap P U u) (localQuotMap P U v) (hne f hf) (hne g hg) (hne s hs)
-    ((hunit _).2 fun h => hu (hUc ▸ Ideal.mem_comap.mpr h))
-    (by rw [← sub_eq_zero, ← map_mul, ← map_mul, ← map_sub]; exact (hker _).2 huv) ?_
+  have hloc' :=
+    h₆ (localQuot P U) hchain' (localQuotMap P U f) (localQuotMap P U g) (localQuotMap P U s)
+      (localQuotMap P U u) (localQuotMap P U v) (hne f hf) (hne g hg) (hne s hs)
+      ((hunit _).2 fun h => hu (hUc ▸ Ideal.mem_comap.mpr h))
+      (by rw [← sub_eq_zero, ← map_mul, ← map_mul, ← map_sub]; exact (hker _).2 huv) ?_
   swap
-  ·
-    intro W hW
+  · intro W hW
     have hWm := hmin' hW
     have := hWm.1.1
     obtain ⟨hPW, hWU, hWe⟩ := hdown W hWm.1.1
     have h := hno (W.comap (localQuotMap P U)) hWU
-    rw [h₃ R P U _ _ le_sup_left inferInstance hPW hWU, h₃ R P U (P ⊔ Ideal.span {f}) _ le_sup_left
-      inferInstance hPW hWU, h₃ R P U (P ⊔ Ideal.span {g}) _ le_sup_left inferInstance hPW hWU,
-      hmapx, hmapx, hmapx, hWe] at h
+    rw [h₃ R P U _ _ le_sup_left inferInstance hPW hWU,
+        h₃ R P U (P ⊔ Ideal.span {f}) _ le_sup_left inferInstance hPW hWU,
+        h₃ R P U (P ⊔ Ideal.span {g}) _ le_sup_left inferInstance hPW hWU, hmapx, hmapx, hmapx, hWe]
+      at h
     exact h hW
   rw [hm] at hloc'
   convert hloc' using 1
-  ·
-    apply h₅ R P U hPU
+  · apply h₅ R P U hPU
     · intro G hG
       have hGU : G ≤ U := le_sup_left.trans (hmin (right_ne_zero_of_mul hG)).1.2
       have h2 := left_ne_zero_of_mul hG
@@ -84,11 +88,11 @@ theorem LocalCoeffRing.proof (h₁ : LocalQuotRing.Statement.{u}) (h₂ : LocalQ
         exact (hmin' h2).1.1
       · exact (hmin' h).1.1
     · intro G hG hPG hGU
-      rw [h₃ R P U _ G le_sup_left hG hPG hGU, h₃ R P U (P ⊔ Ideal.span {g}) G le_sup_left hG hPG hGU,
+      rw [h₃ R P U _ G le_sup_left hG hPG hGU,
+        h₃ R P U (P ⊔ Ideal.span {g}) G le_sup_left hG hPG hGU,
         h₃ R P U (G ⊔ Ideal.span {s}) U (le_sup_of_le_left hPG) hU hPU le_rfl, hmapx, hmapx,
         Ideal.map_sup, Ideal.map_span, Set.image_singleton]
-  ·
-    apply h₅ R P U hPU
+  · apply h₅ R P U hPU
     · intro W hW
       have h1 := hmin (left_ne_zero_of_mul hW)
       have h2 := hmin (right_ne_zero_of_mul hW)
@@ -96,7 +100,8 @@ theorem LocalCoeffRing.proof (h₁ : LocalQuotRing.Statement.{u}) (h₂ : LocalQ
     · intro p hp
       exact (hmin' (left_ne_zero_of_mul hp)).1.1
     · intro W hW hPW hWU
-      rw [h₃ R P U _ W le_sup_left hW hPW hWU, h₃ R P U (W ⊔ _) U (le_sup_of_le_left hPW) hU hPU le_rfl,
-        hmapx, Ideal.map_sup, h₄ R P U f g]
+      rw [h₃ R P U _ W le_sup_left hW hPW hWU,
+        h₃ R P U (W ⊔ _) U (le_sup_of_le_left hPW) hU hPU le_rfl, hmapx, Ideal.map_sup,
+        h₄ R P U f g]
 
 end GroundTheory.Heights₂.Heights.NumbersDVR

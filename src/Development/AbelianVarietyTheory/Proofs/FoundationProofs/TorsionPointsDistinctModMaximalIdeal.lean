@@ -168,10 +168,19 @@ private lemma norm_sub_y_le_norm_sub_x_of_torsion [DecidableEq K] {A B : K} {N :
   rw [this, norm_mul]
   exact mul_le_of_le_one_left (norm_nonneg _) hl
 
-
 open WeierstrassCurve WeierstrassCurve.Affine in
 variable {K : Type} [NormedField K] [IsUltrametricDist K] in
-theorem _root_.GlobalTheory.torsion_points_distinct_mod_maximal_ideal : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [DecidableEq K] (A B : K) (N : ℕ), ‖A‖ ≤ 1 → ‖B‖ ≤ 1 → ‖(2 : K)‖ = 1 → ‖4 * A ^ 3 + 27 * B ^ 2‖ = 1 → Odd N → (∀ (x y : K) (h : (⟨0, 0, 0, A, B⟩ : WeierstrassCurve K).toAffine.Nonsingular x y), N • (WeierstrassCurve.Affine.Point.some x y h) = 0 → ‖x‖ ≤ 1) → ∀ (x y : K) (h : (⟨0, 0, 0, A, B⟩ : WeierstrassCurve K).toAffine.Nonsingular x y), N • (WeierstrassCurve.Affine.Point.some x y h) = 0 → ‖x ^ 3 + A * x + B‖ = 1 ∧ ∀ (x' y' : K) (h' : (⟨0, 0, 0, A, B⟩ : WeierstrassCurve K).toAffine.Nonsingular x' y'), N • (WeierstrassCurve.Affine.Point.some x' y' h') = 0 → x ≠ x' → ‖x - x'‖ = 1 := by
+theorem _root_.GlobalTheory.torsion_points_distinct_mod_maximal_ideal
+    : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] [DecidableEq K] (A B : K) (N : ℕ),
+      ‖A‖ ≤ 1 → ‖B‖ ≤ 1 → ‖(2 : K)‖ = 1 → ‖4 * A ^ 3 + 27 * B ^ 2‖ = 1 → Odd N
+        → (∀ (x y : K) (h : (⟨0, 0, 0, A, B⟩ : WeierstrassCurve K).toAffine.Nonsingular x y),
+          N • (WeierstrassCurve.Affine.Point.some x y h) = 0 → ‖x‖ ≤ 1)
+        → ∀ (x y : K) (h : (⟨0, 0, 0, A, B⟩ : WeierstrassCurve K).toAffine.Nonsingular x y),
+          N • (WeierstrassCurve.Affine.Point.some x y h) = 0
+            → ‖x ^ 3 + A * x + B‖ = 1
+              ∧ ∀ (x' y' : K)
+                  (h' : (⟨0, 0, 0, A, B⟩ : WeierstrassCurve K).toAffine.Nonsingular x' y'),
+                N • (WeierstrassCurve.Affine.Point.some x' y' h') = 0 → x ≠ x' → ‖x - x'‖ = 1 := by
   intro K _ _ _ A B N hA hB h2 hD hN hT x y h hP
   have hy1 := norm_y_eq_one_of_nsmul_eq_zero hA hB h2 hD hN hT h hP
   refine ⟨?_, ?_⟩
@@ -180,8 +189,10 @@ theorem _root_.GlobalTheory.torsion_points_distinct_mod_maximal_ideal : ∀ (K :
     have hxx : ‖x - x'‖ ≤ 1 := norm_sub_le_one_of_le_one (hT _ _ h hP) (hT _ _ h' hP')
     refine le_antisymm hxx (not_lt.mp fun hlt => ?_)
     have hsub := norm_sub_y_le_norm_sub_x_of_torsion hT h h' hP hP' hx
-    have hnegP : N • Point.some x' _
-        (((⟨0, 0, 0, A, B⟩ : WeierstrassCurve K).toAffine.nonsingular_neg x' y').mpr h') = 0 := by
+    have hnegP
+        : N • Point.some x' _
+            (((⟨0, 0, 0, A, B⟩ : WeierstrassCurve K).toAffine.nonsingular_neg x' y').mpr h')
+          = 0 := by
       rw [← Point.neg_some h', smul_neg, hP', neg_zero]
     have hadd := norm_sub_y_le_norm_sub_x_of_torsion hT h _ hP hnegP hx
     rw [short_negY_eq, sub_neg_eq_add] at hadd

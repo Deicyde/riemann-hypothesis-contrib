@@ -19,8 +19,8 @@ theorem I_sqrt_ne_zero : Complex.I * (Real.sqrt H.d : ℂ) ≠ 0 := by
   have h : (0 : ℝ) < H.d := by exact_mod_cast H.hyp.2.1.pos
   exact mul_ne_zero Complex.I_ne_zero (by exact_mod_cast (Real.sqrt_pos.mpr h).ne')
 
-theorem emb_sqd (ψ : H.E →+* ℂ) :
-    ψ H.sqd = Complex.I * (Real.sqrt H.d : ℂ) ∨ ψ H.sqd = -(Complex.I * (Real.sqrt H.d : ℂ)) := by
+theorem emb_sqd (ψ : H.E →+* ℂ)
+    : ψ H.sqd = Complex.I * (Real.sqrt H.d : ℂ) ∨ ψ H.sqd = -(Complex.I * (Real.sqrt H.d : ℂ)) := by
   apply sq_eq_sq_iff_eq_or_eq_neg.mp
   have h : ((Real.sqrt H.d : ℝ) : ℂ) ^ 2 = (H.d : ℂ) := by
     rw [← Complex.ofReal_pow, Real.sq_sqrt (by positivity), Complex.ofReal_natCast]
@@ -37,8 +37,11 @@ theorem cmType_iff (ψ : H.E →+* ℂ) : ψ ∈ H.cmType ↔ (starRingEnd ℂ).
   · intro h1
     exact (emb_sqd H ψ).resolve_right fun h2 => h1 (by rw [h2, neg_neg])
 
-theorem cmType : (∀ ψ : H.E →+* ℂ, ψ ∈ H.cmType ↔ (starRingEnd ℂ).comp ψ ∉ H.cmType) ∧ H.cmType.ncard = 2 * φ.ord ∧
-    ∀ ψ ∈ H.cmType, ∀ σ : H.E ≃ₐ[ℚ] H.E, ψ.comp (σ : H.E →+* H.E) ∈ H.cmType ↔ H.gal σ ∈ φ.Psi := by
+theorem cmType
+    : (∀ ψ : H.E →+* ℂ, ψ ∈ H.cmType ↔ (starRingEnd ℂ).comp ψ ∉ H.cmType)
+      ∧ H.cmType.ncard = 2 * φ.ord
+      ∧ ∀ ψ ∈ H.cmType, ∀ σ : H.E ≃ₐ[ℚ] H.E,
+        ψ.comp (σ : H.E →+* H.E) ∈ H.cmType ↔ H.gal σ ∈ φ.Psi := by
   refine ⟨cmType_iff H, ?_, fun ψ hψ σ => ?_⟩
   · have hinv : Function.Involutive (fun ψ : H.E →+* ℂ => (starRingEnd ℂ).comp ψ) := fun ψ => by
       ext x
@@ -53,8 +56,9 @@ theorem cmType : (∀ ψ : H.E →+* ℂ, ψ ∈ H.cmType ↔ (starRingEnd ℂ).
       · rintro ⟨χ, h2, rfl⟩
         exact (cmType_iff H χ).mp h2
     have h2 := Set.ncard_add_ncard_compl H.cmType
-    rw [h1, Set.ncard_image_of_injective _ hinv.injective, Nat.card_eq_fintype_card, Embeddings.card,
-      finrank_E] at h2
+    rw [h1, Set.ncard_image_of_injective _ hinv.injective, Nat.card_eq_fintype_card,
+        Embeddings.card, finrank_E]
+      at h2
     omega
   · rw [gal_mem_Psi_iff]
     have h1 : ψ H.sqd = _ := hψ
@@ -62,7 +66,8 @@ theorem cmType : (∀ ψ : H.E →+* ℂ, ψ ∈ H.cmType ↔ (starRingEnd ℂ).
     rw [← h1]
     exact ψ.injective.eq_iff
 
-theorem ps_root : ∃ a : H.E, a ≠ 0 ∧ ∀ σ : H.E ≃ₐ[ℚ] H.E, σ a = ((((H.gal σ).1.1 : ℤˣ) : ℤ) : H.E) * a := by
+theorem ps_root
+    : ∃ a : H.E, a ≠ 0 ∧ ∀ σ : H.E ≃ₐ[ℚ] H.E, σ a = ((((H.gal σ).1.1 : ℤˣ) : ℤ) : H.E) * a := by
   let χ : (H.E ≃ₐ[ℚ] H.E) →* ℤˣ := φ.chQ.comp H.gal.toMonoidHom
   have hχ : ∀ σ, (H.gal σ).1.1 = χ σ := fun _ => rfl
   have hs : χ H.conj = -1 := by rw [← hχ, gal_conj]; rfl
@@ -77,7 +82,8 @@ theorem ps_root : ∃ a : H.E, a ≠ 0 ∧ ∀ σ : H.E ≃ₐ[ℚ] H.E, σ a = 
   refine ⟨x - H.conj x, fun h => hne (sub_eq_zero.mp h).symm, fun σ => ?_⟩
   rw [hχ, map_sub]
   rcases Int.units_eq_one_or (χ σ) with h | h
-  · have h2 := hx' (H.conj⁻¹ * (σ * H.conj)) (by rw [map_mul, map_mul, map_inv, h, one_mul, inv_mul_cancel])
+  · have h2 :=
+      hx' (H.conj⁻¹ * (σ * H.conj)) (by rw [map_mul, map_mul, map_inv, h, one_mul, inv_mul_cancel])
     have h3 : σ (H.conj x) = H.conj x := by
       have h4 := congrArg H.conj h2
       rwa [← AlgEquiv.mul_apply, mul_inv_cancel_left] at h4
@@ -91,10 +97,24 @@ theorem ps_root : ∃ a : H.E, a ≠ 0 ∧ ∀ σ : H.E ≃ₐ[ℚ] H.E, σ a = 
     rw [h, h3, h4]
     simp
 
-theorem hostCore : HostCore H :=
-  ⟨art_surj H, cm H, conj_iff H, finrank_E H, finrank_F H, mem_F H, art_ch H, ps_d H,
-    frob H, frob_any H, inertia H, decomp H, inertia_d H, decomp_typeI H, decompConj H,
-    unramEF H⟩
+theorem hostCore : HostCore H := ⟨
+  art_surj H,
+  cm H,
+  conj_iff H,
+  finrank_E H,
+  finrank_F H,
+  mem_F H,
+  art_ch H,
+  ps_d H,
+  frob H,
+  frob_any H,
+  inertia H,
+  decomp H,
+  inertia_d H,
+  decomp_typeI H,
+  decompConj H,
+  unramEF H
+⟩
 
 end Formalism.HC.Der
 

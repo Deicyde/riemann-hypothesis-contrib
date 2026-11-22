@@ -10,8 +10,9 @@ namespace PI.LocMassTypW.WSatP
 
 open Matrix
 
-theorem leftInv_field {K : Type*} [Field K] {n m : ℕ} (A : Matrix (Fin n) (Fin m) K)
-    (h : ∀ t, A *ᵥ t = 0 → t = 0) : ∃ L : Matrix (Fin m) (Fin n) K, L * A = 1 := by
+theorem leftInv_field
+    {K : Type*} [Field K] {n m : ℕ} (A : Matrix (Fin n) (Fin m) K) (h : ∀ t, A *ᵥ t = 0 → t = 0)
+    : ∃ L : Matrix (Fin m) (Fin n) K, L * A = 1 := by
   have hk : LinearMap.ker (Matrix.toLin' A) = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro t ht
@@ -20,11 +21,12 @@ theorem leftInv_field {K : Type*} [Field K] {n m : ℕ} (A : Matrix (Fin n) (Fin
   refine ⟨LinearMap.toMatrix' g, ?_⟩
   rw [← LinearMap.toMatrix'_toLin' A, ← LinearMap.toMatrix'_comp, hg, LinearMap.toMatrix'_id]
 
-theorem leftInv_lift {O : Type*} [CommRing O] [IsLocalRing O] {n m : ℕ}
-    (A : Matrix (Fin n) (Fin m) O)
+theorem leftInv_lift
+    {O : Type*} [CommRing O] [IsLocalRing O]
+    {n m : ℕ} (A : Matrix (Fin n) (Fin m) O)
     (h : ∃ L : Matrix (Fin m) (Fin n) (IsLocalRing.ResidueField O),
-      L * A.map (IsLocalRing.residue O) = 1) :
-    ∃ L : Matrix (Fin m) (Fin n) O, L * A = 1 := by
+      L * A.map (IsLocalRing.residue O) = 1)
+    : ∃ L : Matrix (Fin m) (Fin n) O, L * A = 1 := by
   obtain ⟨Lb, hLb⟩ := h
   let L0 : Matrix (Fin m) (Fin n) O :=
     Matrix.of fun i j => Classical.choose (IsLocalRing.residue_surjective (Lb i j))
@@ -56,8 +58,7 @@ theorem saturated_split_lattice : SatSplit := by
     Classical.choose (IsLocalRing.residue_surjective (tb j))
   have ht : ∀ j, IsLocalRing.residue _ (t j) = tb j := fun j =>
     Classical.choose_spec (IsLocalRing.residue_surjective (tb j))
-  have htj : IsUnit (t j) :=
-    (IsLocalRing.residue_ne_zero_iff_isUnit _).mp (by rw [ht]; exact hj)
+  have htj : IsUnit (t j) := (IsLocalRing.residue_ne_zero_iff_isUnit _).mp (by rw [ht]; exact hj)
   have hAt : ∀ i, (A *ᵥ t) i ∈ IsLocalRing.maximalIdeal (v.adicCompletionIntegers F) := by
     intro i
     rw [← IsLocalRing.residue_eq_zero_iff, RingHom.map_mulVec]
@@ -83,16 +84,16 @@ theorem saturated_split_lattice : SatSplit := by
     obtain ⟨q, hq⟩ := hmemI x (Set.mem_insert _ _)
     rw [mul_zero] at hq
     exact hx.ne_zero hq.symm
-  have hcK : (c : v.adicCompletion F) ≠ 0 := by
-    intro h0; exact hc0 (Subtype.ext h0)
+  have hcK : (c : v.adicCompletion F) ≠ 0 := by intro h0; exact hc0 (Subtype.ext h0)
   let f := (v.adicCompletionIntegers F).subtype
   let t' : Fin m → v.adicCompletion F := (c : v.adicCompletion F)⁻¹ • (f ∘ t)
-  have hint : ∀ i, (A.map (fun a => (a : v.adicCompletion F)) *ᵥ t') i ∈
-      v.adicCompletionIntegers F := by
+  have hint
+      : ∀ i, (A.map (fun a => (a : v.adicCompletion F)) *ᵥ t') i ∈ v.adicCompletionIntegers F := by
     intro i
     obtain ⟨q, hq⟩ := hmemI ((A *ᵥ t) i) (Set.mem_insert_of_mem _ ⟨i, rfl⟩)
-    have e1 : (A.map (fun a => (a : v.adicCompletion F)) *ᵥ t') i =
-        (c : v.adicCompletion F)⁻¹ * f ((A *ᵥ t) i) := by
+    have e1
+        : (A.map (fun a => (a : v.adicCompletion F)) *ᵥ t') i
+          = (c : v.adicCompletion F)⁻¹ * f ((A *ᵥ t) i) := by
       rw [Matrix.mulVec_smul, RingHom.map_mulVec]
       rfl
     rw [e1, ← hq, map_mul]
@@ -107,7 +108,8 @@ theorem saturated_split_lattice : SatSplit := by
   set s : v.adicCompletionIntegers F := ⟨_, hj'⟩ with hs
   have hts : t j = c * s := by
     apply Subtype.ext
-    change (t j : v.adicCompletion F) = (c : v.adicCompletion F) * ((c : v.adicCompletion F)⁻¹ * (t j : v.adicCompletion F))
+    change (t j : v.adicCompletion F)
+      = (c : v.adicCompletion F) * ((c : v.adicCompletion F)⁻¹ * (t j : v.adicCompletion F))
     field_simp
   have : t j ∈ IsLocalRing.maximalIdeal (v.adicCompletionIntegers F) := by
     rw [hts]; exact Ideal.mul_mem_right _ _ hcm

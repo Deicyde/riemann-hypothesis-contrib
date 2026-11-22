@@ -10,11 +10,12 @@ namespace GlobalTheory.CompanionTheory.EisRk1
 
 open MeasureTheory Set Filter Topology
 
-theorem weakFEPair_norm_Λ₀_le (P : WeakFEPair ℂ) {r M : ℝ}
-    (hf : ∀ x : ℝ, 1 ≤ x → ‖P.f x - P.f₀‖ ≤ M * x ^ (-r))
+theorem weakFEPair_norm_Λ₀_le
+    (P : WeakFEPair ℂ)
+    {r M : ℝ} (hf : ∀ x : ℝ, 1 ≤ x → ‖P.f x - P.f₀‖ ≤ M * x ^ (-r))
     (hg : ∀ x : ℝ, 1 ≤ x → ‖P.g x - P.g₀‖ ≤ M * x ^ (-r))
-    (s : ℂ) (hs₁ : s.re < r) (hs₂ : P.k - s.re < r) :
-    ‖P.Λ₀ s‖ ≤ M / (r - s.re) + ‖P.ε‖ * M / (r - (P.k - s.re)) := by
+    (s : ℂ) (hs₁ : s.re < r) (hs₂ : P.k - s.re < r)
+    : ‖P.Λ₀ s‖ ≤ M / (r - s.re) + ‖P.ε‖ * M / (r - (P.k - s.re)) := by
   set σ := s.re with hσ
   have hM : 0 ≤ M := le_trans (norm_nonneg _) (by simpa using hf 1 le_rfl)
   set h : ℝ → ℝ := (Ioi 1).indicator (fun t => M * t ^ (σ - 1 - r)) +
@@ -49,7 +50,8 @@ theorem weakFEPair_norm_Λ₀_le (P : WeakFEPair ℂ) {r M : ℝ}
         ring
       rw [key]
       have hpos : 0 ≤ t ^ (σ - 1) * ‖P.ε‖ * (t ^ P.k)⁻¹ := by positivity
-      calc t ^ (σ - 1) * (‖P.ε‖ * (t ^ P.k)⁻¹ * ‖P.g t⁻¹ - P.g₀‖)
+      calc
+        t ^ (σ - 1) * (‖P.ε‖ * (t ^ P.k)⁻¹ * ‖P.g t⁻¹ - P.g₀‖)
           = (t ^ (σ - 1) * ‖P.ε‖ * (t ^ P.k)⁻¹) * ‖P.g t⁻¹ - P.g₀‖ := by ring
         _ ≤ (t ^ (σ - 1) * ‖P.ε‖ * (t ^ P.k)⁻¹) * (M * t ^ r) := mul_le_mul_of_nonneg_left hb hpos
         _ = ‖P.ε‖ * M * (t ^ (σ - 1) * (t ^ P.k)⁻¹ * t ^ r) := by ring
@@ -66,16 +68,16 @@ theorem weakFEPair_norm_Λ₀_le (P : WeakFEPair ℂ) {r M : ℝ}
       have key : t ^ (σ - 1 - r) = t ^ (σ - 1) * t ^ (-r) := by
         rw [sub_eq_add_neg (σ - 1), Real.rpow_add ht]
       rw [key]
-      calc t ^ (σ - 1) * ‖P.f t - P.f₀‖ ≤ t ^ (σ - 1) * (M * t ^ (-r)) :=
-            mul_le_mul_of_nonneg_left hb (by positivity)
+      calc
+        t ^ (σ - 1) * ‖P.f t - P.f₀‖
+          ≤ t ^ (σ - 1) * (M * t ^ (-r)) := mul_le_mul_of_nonneg_left hb (by positivity)
         _ = M * (t ^ (σ - 1) * t ^ (-r)) := by ring
   have hI : ∫ t in Ioi (0 : ℝ), h t = M / (r - σ) + ‖P.ε‖ * M / (r - (P.k - σ)) := by
     rw [hh, integral_add' hA'.restrict hB'.restrict, setIntegral_indicator measurableSet_Ioi,
-      setIntegral_indicator measurableSet_Ioo,
-      Set.inter_eq_right.2 (Ioi_subset_Ioi zero_le_one), Set.inter_eq_right.2 Ioo_subset_Ioi_self,
-      integral_const_mul, integral_const_mul, integral_Ioi_rpow_of_lt (by linarith) one_pos,
-      ← integral_Ioc_eq_integral_Ioo, ← intervalIntegral.integral_of_le zero_le_one,
-      integral_rpow (Or.inl (by linarith))]
+      setIntegral_indicator measurableSet_Ioo, Set.inter_eq_right.2 (Ioi_subset_Ioi zero_le_one),
+      Set.inter_eq_right.2 Ioo_subset_Ioi_self, integral_const_mul, integral_const_mul,
+      integral_Ioi_rpow_of_lt (by linarith) one_pos, ← integral_Ioc_eq_integral_Ioo,
+      ← intervalIntegral.integral_of_le zero_le_one, integral_rpow (Or.inl (by linarith))]
     have hne : σ - 1 + r - P.k + 1 ≠ 0 := by linarith
     rw [Real.one_rpow, Real.one_rpow, Real.zero_rpow hne]
     have h1 : r - σ ≠ 0 := by linarith
@@ -83,11 +85,13 @@ theorem weakFEPair_norm_Λ₀_le (P : WeakFEPair ℂ) {r M : ℝ}
     have h3 : σ - 1 - r + 1 ≠ 0 := by linarith
     field_simp
     ring
-  calc ‖P.Λ₀ s‖ = ‖∫ t in Ioi (0 : ℝ), (t : ℂ) ^ (s - 1) • P.f_modif t‖ := rfl
+  calc
+    ‖P.Λ₀ s‖
+      = ‖∫ t in Ioi (0 : ℝ), (t : ℂ) ^ (s - 1) • P.f_modif t‖ := rfl
     _ ≤ ∫ t in Ioi (0 : ℝ), ‖(t : ℂ) ^ (s - 1) • P.f_modif t‖ := norm_integral_le_integral_norm _
     _ ≤ ∫ t in Ioi (0 : ℝ), h t :=
-        integral_mono_of_nonneg (ae_of_all _ fun _ => norm_nonneg _) hint
-          ((ae_restrict_iff' measurableSet_Ioi).2 (ae_of_all _ hpt))
+      integral_mono_of_nonneg (ae_of_all _ fun _ => norm_nonneg _) hint
+        ((ae_restrict_iff' measurableSet_Ioi).2 (ae_of_all _ hpt))
     _ = _ := hI
 
 end GlobalTheory.CompanionTheory.EisRk1

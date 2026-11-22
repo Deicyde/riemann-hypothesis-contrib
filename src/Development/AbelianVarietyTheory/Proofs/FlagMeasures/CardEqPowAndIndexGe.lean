@@ -12,9 +12,9 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.FiniteModuleOrder
 
-theorem exists_card_eq_pow (R : Type) [CommRing R] [IsLocalRing R] (n : ℕ) :
-    ∀ (D : Type) [AddCommGroup D] [Module R D] [Finite D], Nat.card D = n →
-      ∃ i : ℕ, Nat.card D = Nat.card (R ⧸ IsLocalRing.maximalIdeal R) ^ i := by
+theorem exists_card_eq_pow (R : Type) [CommRing R] [IsLocalRing R] (n : ℕ)
+    : ∀ (D : Type) [AddCommGroup D] [Module R D] [Finite D],
+      Nat.card D = n → ∃ i : ℕ, Nat.card D = Nat.card (R ⧸ IsLocalRing.maximalIdeal R) ^ i := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
     intro D _ _ _ hn
@@ -34,13 +34,21 @@ theorem exists_card_eq_pow (R : Type) [CommRing R] [IsLocalRing R] (n : ℕ) :
     obtain ⟨i, hi⟩ := ih (Nat.card M) (by rw [← hn, hc]; nlinarith) M rfl
     exact ⟨i + 1, by rw [hc, hi, Nat.card_congr e.toEquiv, pow_succ]⟩
 
-theorem card_eq_pow_and_index_ge : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ ϖ : 𝒪[F], Irreducible ϖ → ∀ (D : Type) [AddCommGroup D] [Module L.O D] [Finite D], (∃ i : ℕ, Nat.card D = resQ ϖ ^ i) ∧ ∀ I : Submodule L.O D, I ≠ ⊤ → resQ ϖ * Nat.card I ≤ Nat.card D := by
+theorem card_eq_pow_and_index_ge
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ ϖ : 𝒪[F],
+        Irreducible ϖ
+          → ∀ (D : Type) [AddCommGroup D] [Module L.O D] [Finite D],
+            (∃ i : ℕ, Nat.card D = resQ ϖ ^ i)
+              ∧ ∀ I : Submodule L.O D, I ≠ ⊤ → resQ ϖ * Nat.card I ≤ Nat.card D := by
   intro F _ _ _ _ _ E _ _ _ L ϖ hϖ
   have hint : ∀ a : 𝒪[F], algebraMap F E a ∈ L.O := fun a =>
     (GlobalTheory.UnramOrder.algebraMap_mem_iff L a).2 a.2
   let i : 𝒪[F] →+* L.O := (algebraMap 𝒪[F] E).codRestrict L.O hint
-  have key : ∀ (D : Type) [AddCommGroup D] [Module L.O D] [Finite D],
-      ∃ i : ℕ, Nat.card D = resQ ϖ ^ i := by
+  have key
+      : ∀ (D : Type) [AddCommGroup D] [Module L.O D] [Finite D], ∃ i : ℕ,
+        Nat.card D = resQ ϖ ^ i := by
     intro D _ _ _
     let : Module 𝒪[F] D := Module.compHom D i
     rw [resQ, ← hϖ.maximalIdeal_eq]

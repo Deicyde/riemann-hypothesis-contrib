@@ -6,13 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TorsionBoun
 
 open CategoryTheory UpperTheory.V.KH
 
-theorem UpperTheory.V.KH.mapNsmul :
-    ∀ (G : Type) [Group G] (A B : Rep ℤ G) (f : A ⟶ B) (g : B ⟶ A) (n j : ℕ),
-      (∀ a, g.hom (f.hom a) = n • a) → Subsingleton (groupHomology B j) →
-      ∀ z : groupHomology A j, n • z = 0 := by
+theorem UpperTheory.V.KH.mapNsmul
+    : ∀ (G : Type) [Group G] (A B : Rep ℤ G) (f : A ⟶ B) (g : B ⟶ A) (n j : ℕ),
+      (∀ a, g.hom (f.hom a) = n • a) → Subsingleton (groupHomology B j)
+        → ∀ z : groupHomology A j, n • z = 0 := by
   intro G _ A B f g n j h hB z
-  have hc : groupHomology.chainsMap (MonoidHom.id G) (f ≫ g) =
-      n • 𝟙 (groupHomology.inhomogeneousChains A) := by
+  have hc
+      : groupHomology.chainsMap (MonoidHom.id G) (f ≫ g)
+        = n • 𝟙 (groupHomology.inhomogeneousChains A) := by
     ext i : 1
     apply ModuleCat.hom_ext
     refine DFunLike.ext _ _ fun c => ?_

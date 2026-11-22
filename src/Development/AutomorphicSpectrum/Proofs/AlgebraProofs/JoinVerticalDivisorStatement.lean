@@ -8,7 +8,8 @@ public import Development.WeilBound.CoreStatements.TorusUniformisation.ChowMahle
 
 namespace GlobalTheory.CompanionTheory.Heights
 
-theorem join_vertical_divisor_statement : GroundTheory.Heights₂.Heights.NumbersDVR.JoinVerticalDivisor.Statement :=
+theorem join_vertical_divisor_statement
+    : GroundTheory.Heights₂.Heights.NumbersDVR.JoinVerticalDivisor.Statement :=
   PositivityTheory.Xgn.t_s_joinvertdiv
 
 end GlobalTheory.CompanionTheory.Heights

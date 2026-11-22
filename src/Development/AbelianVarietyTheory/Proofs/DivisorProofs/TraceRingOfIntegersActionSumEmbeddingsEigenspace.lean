@@ -6,32 +6,38 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
 open scoped Matrix
 open GlobalTheory.UPel.HT GlobalTheory.UPel.HT.LieType
 
 noncomputable section
 namespace GlobalTheory.UPel.HT.LieType
 
-
 open Polynomial in
-theorem toLin'_map_aeval_int {F : Type} [Field F] [NumberField F] {g : ℕ}
-    (φ : 𝓞 F →+* Matrix (Fin g) (Fin g) ℂ) (x : 𝓞 F) (p : ℤ[X]) :
-    Matrix.toLin' (φ (aeval x p)) = aeval (Matrix.toLin' (φ x)) (p.map (algebraMap ℤ ℂ)) := by
+theorem toLin'_map_aeval_int
+    {F : Type} [Field F] [NumberField F]
+    {g : ℕ} (φ : 𝓞 F →+* Matrix (Fin g) (Fin g) ℂ)
+    (x : 𝓞 F) (p : ℤ[X])
+    : Matrix.toLin' (φ (aeval x p)) = aeval (Matrix.toLin' (φ x)) (p.map (algebraMap ℤ ℂ)) := by
   have h1 : φ (aeval x p) = aeval (φ x) p := (Polynomial.aeval_algHom_apply φ.toIntAlgHom x p).symm
   rw [h1, ← Polynomial.aeval_map_algebraMap ℂ (φ x) p]
   exact (Polynomial.aeval_algHom_apply (Matrix.toLinAlgEquiv' (R := ℂ) (n := Fin g)) (φ x) _).symm
 
-
 open Polynomial in
-theorem trace_eq_sum_finrank_eigSp : ∀ (F : Type) [Field F] [NumberField F] (g : ℕ)
-    (φ : 𝓞 F →+* Matrix (Fin g) (Fin g) ℂ) (c : 𝓞 F),
-    (φ c).trace = ∑ τ : F →+* ℂ, (Module.finrank ℂ (eigSp φ τ) : ℂ) * τ (c : F) := by
+theorem trace_eq_sum_finrank_eigSp
+    : ∀ (F : Type) [Field F] [NumberField F] (g : ℕ) (φ : 𝓞 F →+* Matrix (Fin g) (Fin g) ℂ)
+        (c : 𝓞 F),
+      (φ c).trace = ∑ τ : F →+* ℂ, (Module.finrank ℂ (eigSp φ τ) : ℂ) * τ (c : F) := by
   intro F _ _ g φ c
   classical
-  obtain ⟨α, hinj, ⟨f, hf0, hfmap⟩, hmul⟩ := ReciprocityTheory.ChartRestriction.G.PullbackSections.exists_sepElt (E := F) (F := ℂ)
-    (RingHom.id ℂ) (fun τ => τ.comp (algebraMap (𝓞 F) F)) (fun _ _ => rfl)
+  obtain ⟨α, hinj, ⟨f, hf0, hfmap⟩, hmul⟩ :=
+    ReciprocityTheory.ChartRestriction.G.PullbackSections.exists_sepElt (E := F) (F := ℂ)
+      (RingHom.id ℂ)
+      (fun τ => τ.comp (algebraMap (𝓞 F) F))
+      (fun _ _ => rfl)
   simp only [RingHom.comp_apply] at hinj hfmap
   set L : Module.End ℂ (Fin g → ℂ) := Matrix.toLin' (φ α) with hL
 
@@ -56,14 +62,14 @@ theorem trace_eq_sum_finrank_eigSp : ∀ (F : Type) [Field F] [NumberField F] (g
         ⟨Module.End.mem_eigenspace_iff.2 (by rw [hL, Matrix.toLin'_apply]; exact h), hu⟩
       rw [← hL, Module.End.aeval_apply_of_hasEigenvector hev]
       congr 1
-      have h2 : (τ.comp (algebraMap (𝓞 F) F)) (aeval α p) = aeval ((τ.comp (algebraMap (𝓞 F) F)) α) p :=
+      have h2
+          : (τ.comp (algebraMap (𝓞 F) F)) (aeval α p) = aeval ((τ.comp (algebraMap (𝓞 F) F)) α) p :=
         (Polynomial.aeval_algHom_apply (τ.comp (algebraMap (𝓞 F) F)).toIntAlgHom α p).symm
       simp only [RingHom.comp_apply] at h2
       rw [RingOfIntegers.coe_eq_algebraMap, h2, Polynomial.eval_map_algebraMap]
     have e1 : φ ((N : 𝓞 F) * c') = (N : ℂ) • φ c' := by
       rw [map_mul, map_intCast, Int.cast_smul_eq_zsmul, zsmul_eq_mul]
-    have e2 : τ (((N : 𝓞 F) * c' : 𝓞 F) : F) = (N : ℂ) * τ (c' : F) := by
-      simp
+    have e2 : τ (((N : 𝓞 F) * c' : 𝓞 F) : F) = (N : ℂ) * τ (c' : F) := by simp
     rw [e1, e2, Matrix.smul_mulVec, mul_smul] at key
     exact smul_right_injective _ hNC key
 
@@ -79,8 +85,9 @@ theorem trace_eq_sum_finrank_eigSp : ∀ (F : Type) [Field F] [NumberField F] (g
     · rw [hm]; exact bot_le
     · obtain ⟨u, hu, hu0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hm
       have hev : L.HasEigenvector m u := ⟨hu, hu0⟩
-      have h0 := Module.End.aeval_apply_of_hasEigenvector hev
-        (p := ∏ τ : F →+* ℂ, (X - C (τ ((α : 𝓞 F) : F))))
+      have h0 :=
+        Module.End.aeval_apply_of_hasEigenvector hev
+          (p := ∏ τ : F →+* ℂ, (X - C (τ ((α : 𝓞 F) : F))))
       rw [hLf, LinearMap.zero_apply, eq_comm, smul_eq_zero] at h0
       have hroot := h0.resolve_right hu0
       rw [eval_prod, Finset.prod_eq_zero_iff] at hroot

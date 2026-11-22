@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PeriodsOn
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim
 open GlobalTheory.IndefiniteRowSideFullHecke.MinorOrderedEntries
 
 namespace GlobalTheory.RowReal
@@ -37,7 +40,8 @@ theorem rowSizes_nC (D : D7) (i : ℕ) : (rowSizes D).nC i = rankV D i D.R.m := 
 
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts}
 
-theorem rank_top (G : GridData L sc) {j : ℕ} (hj : j ≤ D.R.m) : (G.V (.top j)).rank = (rowSizes D).nR j := by
+theorem rank_top (G : GridData L sc) {j : ℕ} (hj : j ≤ D.R.m)
+    : (G.V (.top j)).rank = (rowSizes D).nR j := by
   rw [rowSizes_nR]
   rcases j with _ | j
   · exact ((G.sp.P_is D.R.m le_rfl).rank).trans (by simp [rankX])
@@ -48,7 +52,8 @@ end GlobalTheory.RowReal
 namespace GlobalTheory.RowReal
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts}
 
-theorem rank_gridM (G : GridData L sc) {i : ℕ} (hi : i ≤ D.R.m) : (G.V (.grid i D.R.m)).rank = (rowSizes D).nC i := by
+theorem rank_gridM (G : GridData L sc) {i : ℕ} (hi : i ≤ D.R.m)
+    : (G.V (.grid i D.R.m)).rank = (rowSizes D).nC i := by
   rw [rowSizes_nC]
   rcases i with _ | i
   · show (columnBlock L D.R.m).sp.rank = _
@@ -74,14 +79,16 @@ namespace GlobalTheory.RowReal
 
 variable {D : D7} {T : Type} {L : LevCh D T} {sc : Consts}
 
-def trCol (G : GridData L sc) (j : Fin D.R.m) :
-    PolF D (G.V (.top (j + 1))).rank (G.V (.top j)).rank →ₐ[ℂ]
-      Pol D.what₂.Tau ((rowSizes D).nR j) ((rowSizes D).nR (j + 1)) :=
-  MvPolynomial.rename fun x => (x.1, Fin.cast (rank_top G (by omega)) x.2.1, Fin.cast (rank_top G j.2.le) x.2.2)
+def trCol (G : GridData L sc) (j : Fin D.R.m)
+    : PolF D (G.V (.top (j + 1))).rank (G.V (.top j)).rank →ₐ[ℂ]
+        Pol D.what₂.Tau ((rowSizes D).nR j) ((rowSizes D).nR (j + 1)) :=
+  MvPolynomial.rename fun x =>
+    (x.1, Fin.cast (rank_top G (by omega)) x.2.1, Fin.cast (rank_top G j.2.le) x.2.2)
 
-def trRow (G : GridData L sc) (i : Fin D.R.m) :
-    PolF D (G.V (.grid i D.R.m)).rank (G.V (.grid (i + 1) D.R.m)).rank →ₐ[ℂ]
-      Pol D.what₂.Tau ((rowSizes D).nC i) ((rowSizes D).nC (i + 1)) :=
-  MvPolynomial.rename fun x => (x.1, Fin.cast (rank_gridM G (by omega)) x.2.2, Fin.cast (rank_gridM G i.2.le) x.2.1)
+def trRow (G : GridData L sc) (i : Fin D.R.m)
+    : PolF D (G.V (.grid i D.R.m)).rank (G.V (.grid (i + 1) D.R.m)).rank →ₐ[ℂ]
+        Pol D.what₂.Tau ((rowSizes D).nC i) ((rowSizes D).nC (i + 1)) :=
+  MvPolynomial.rename fun x =>
+    (x.1, Fin.cast (rank_gridM G (by omega)) x.2.2, Fin.cast (rank_gridM G i.2.le) x.2.1)
 
 end GlobalTheory.RowReal

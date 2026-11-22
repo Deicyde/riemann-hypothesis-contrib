@@ -8,9 +8,11 @@ namespace GlobalTheory
 
 open Polynomial
 
-theorem norm_multiset_sum_le_of_forall_le_ultrametric {K : Type} [NormedField K]
-    [IsUltrametricDist K] (m : Multiset K) {C : ℝ} (hC : 0 ≤ C) (h : ∀ x ∈ m, ‖x‖ ≤ C) :
-    ‖m.sum‖ ≤ C := by
+theorem norm_multiset_sum_le_of_forall_le_ultrametric
+    {K : Type} [NormedField K] [IsUltrametricDist K]
+    (m : Multiset K)
+    {C : ℝ} (hC : 0 ≤ C) (h : ∀ x ∈ m, ‖x‖ ≤ C)
+    : ‖m.sum‖ ≤ C := by
   induction m using Multiset.induction_on with
   | empty => simpa using hC
   | cons a s ih =>
@@ -19,9 +21,9 @@ theorem norm_multiset_sum_le_of_forall_le_ultrametric {K : Type} [NormedField K]
     · exact h a (Multiset.mem_cons_self _ _)
     · exact ih fun x hx => h x (Multiset.mem_cons_of_mem hx)
 
-theorem norm_multiset_prod_le_pow_card_of_forall_le {K : Type} [NormedField K]
-    (m : Multiset K) {B : ℝ} (h : ∀ x ∈ m, ‖x‖ ≤ B) :
-    ‖m.prod‖ ≤ B ^ Multiset.card m := by
+theorem norm_multiset_prod_le_pow_card_of_forall_le
+    {K : Type} [NormedField K] (m : Multiset K) {B : ℝ} (h : ∀ x ∈ m, ‖x‖ ≤ B)
+    : ‖m.prod‖ ≤ B ^ Multiset.card m := by
   induction m using Multiset.induction_on with
   | empty => simp
   | cons a s ih =>
@@ -30,10 +32,12 @@ theorem norm_multiset_prod_le_pow_card_of_forall_le {K : Type} [NormedField K]
     exact mul_le_mul ha (ih fun x hx => h x (Multiset.mem_cons_of_mem hx)) (norm_nonneg _)
       ((norm_nonneg _).trans ha)
 
-theorem norm_coeff_natDegree_sub_le_pow_of_roots_le (K : Type) [NormedField K]
-    [IsUltrametricDist K] [IsAlgClosed K] (Q : Polynomial K) (hQ : Q.Monic) (B : ℝ)
-    (hB : ∀ r : K, Q.IsRoot r → ‖r‖ ≤ B) (i : ℕ) (hi : i ≤ Q.natDegree) :
-    ‖Q.coeff (Q.natDegree - i)‖ ≤ B ^ i := by
+theorem norm_coeff_natDegree_sub_le_pow_of_roots_le
+    (K : Type) [NormedField K] [IsUltrametricDist K] [IsAlgClosed K]
+    (Q : Polynomial K) (hQ : Q.Monic)
+    (B : ℝ) (hB : ∀ r : K, Q.IsRoot r → ‖r‖ ≤ B)
+    (i : ℕ) (hi : i ≤ Q.natDegree)
+    : ‖Q.coeff (Q.natDegree - i)‖ ≤ B ^ i := by
   have hcard : Multiset.card Q.roots = Q.natDegree := IsAlgClosed.card_roots_eq_natDegree
   have hroot : ∀ r ∈ Q.roots, ‖r‖ ≤ B := fun r hr => hB r (isRoot_of_mem_roots hr)
   have hBi : 0 ≤ B ^ i := by

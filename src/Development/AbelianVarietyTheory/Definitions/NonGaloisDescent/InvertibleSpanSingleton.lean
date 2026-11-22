@@ -8,16 +8,20 @@ noncomputable section
 
 namespace GlobalTheory.Prism
 
-def SemiBC {A B M N : Type} [CommRing A] [CommRing B] [AddCommGroup M] [Module A M] [AddCommGroup N]
-    [Module B N] {f : A →+* B} (u : M →ₛₗ[f] N) : Prop :=
+def SemiBC
+    {A B M N : Type}
+    [CommRing A] [CommRing B] [AddCommGroup M] [Module A M] [AddCommGroup N] [Module B N]
+    {f : A →+* B} (u : M →ₛₗ[f] N)
+    : Prop :=
   ∀ (Q : Type) [AddCommGroup Q] [Module B Q] (v : M →ₛₗ[f] Q), ∃! w : N →ₗ[B] Q, ∀ x, w (u x) = v x
 
 structure Delta (l : ℕ) (A : Type) [CommRing A] where
   δ : A → A
   δ_one : δ 1 = 0
   δ_mul : ∀ a b, δ (a * b) = a ^ l * δ b + b ^ l * δ a + (l : A) * δ a * δ b
-  δ_add : ∀ a b, δ (a + b) = δ a + δ b -
-    ∑ k ∈ Finset.Ioo 0 l, ((l.choose k / l : ℕ) : A) * a ^ k * b ^ (l - k)
+  δ_add
+    : ∀ a b,
+      δ (a + b) = δ a + δ b - ∑ k ∈ Finset.Ioo 0 l, ((l.choose k / l : ℕ) : A) * a ^ k * b ^ (l - k)
   φ : A →+* A
   φ_eq : ∀ a, φ a = a ^ l + (l : A) * δ a
 
@@ -40,8 +44,9 @@ structure Hom (P P' : Obj l R) where
   f : P.A →+* P'.A
   f_δ : ∀ a, f (P.D.δ a) = P'.D.δ (f a)
   f_I : ∀ a ∈ P.I, f a ∈ P'.I
-  f_str : ∀ (r : R) (a : P.A), Ideal.Quotient.mk P.I a = P.str r →
-    Ideal.Quotient.mk P'.I (f a) = P'.str r
+  f_str
+    : ∀ (r : R) (a : P.A),
+      Ideal.Quotient.mk P.I a = P.str r → Ideal.Quotient.mk P'.I (f a) = P'.str r
 
 def Hom.id (P : Obj l R) : Hom P P where
   f := RingHom.id _
@@ -55,9 +60,13 @@ def Hom.comp {P P' P'' : Obj l R} (g : Hom P' P'') (f : Hom P P') : Hom P P'' wh
   f_I := fun a h => g.f_I _ (f.f_I a h)
   f_str := fun r a h => g.f_str r _ (f.f_str r a h)
 
-def IsFrac {A M : Type} [CommRing A] [AddCommGroup M] [Module A M] (d : A)
-    (y : LocalizedModule (Submonoid.powers d) M) (m : M) (k : ℕ) : Prop :=
-  y = LocalizedModule.mk m (⟨d ^ k, (Submonoid.mem_powers_iff _ _).2 ⟨k, rfl⟩⟩ : ↥(Submonoid.powers d))
+def IsFrac
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (d : A) (y : LocalizedModule (Submonoid.powers d) M)
+    (m : M) (k : ℕ)
+    : Prop :=
+  y = LocalizedModule.mk m
+    (⟨d ^ k, (Submonoid.mem_powers_iff _ _).2 ⟨k, rfl⟩⟩ : ↥(Submonoid.powers d))
 
 structure FCrys (l : ℕ) (R : Type) [CommRing R] where
   M : Obj l R → Type
@@ -68,24 +77,26 @@ structure FCrys (l : ℕ) (R : Type) [CommRing R] where
   tr : ∀ {P P' : Obj l R} (f : Hom P P'), M P →ₛₗ[f.f] M P'
   tr_bc : ∀ {P P' : Obj l R} (f : Hom P P'), SemiBC (tr f)
   tr_id : ∀ (P : Obj l R) x, tr (Hom.id P) x = x
-  tr_comp : ∀ {P P' P'' : Obj l R} (g : Hom P' P'') (f : Hom P P') x,
-    tr (g.comp f) x = tr g (tr f x)
-
-  Φ : ∀ (P : Obj l R) (d : ↥P.I), M P →ₛₗ[(algebraMap P.A (Localization.Away (d : P.A))).comp P.D.φ]
-    LocalizedModule (Submonoid.powers (d : P.A)) (M P)
+  tr_comp
+    : ∀ {P P' P'' : Obj l R} (g : Hom P' P'') (f : Hom P P') x, tr (g.comp f) x = tr g (tr f x)
+  Φ : ∀ (P : Obj l R) (d : ↥P.I),
+    M P →ₛₗ[(algebraMap P.A (Localization.Away (d : P.A))).comp P.D.φ]
+      LocalizedModule (Submonoid.powers (d : P.A)) (M P)
   Φ_bc : ∀ (P : Obj l R) (d : ↥P.I), SemiBC (Φ P d)
-
-  Φ_nat : ∀ {P P' : Obj l R} (f : Hom P P') (d : ↥P.I) (d' : ↥P'.I) (x m : M P) (k : ℕ) (n : M P') (j : ℕ),
-    IsFrac (d : P.A) (Φ P d x) m k → IsFrac (d' : P'.A) (Φ P' d' (tr f x)) n j →
-      ∃ r : ℕ, (f.f d * d') ^ r • ((d' : P'.A) ^ j • tr f m - f.f d ^ k • n) = 0
+  Φ_nat
+    : ∀ {P P' : Obj l R} (f : Hom P P') (d : ↥P.I) (d' : ↥P'.I) (x m : M P) (k : ℕ) (n : M P')
+        (j : ℕ),
+      IsFrac (d : P.A) (Φ P d x) m k → IsFrac (d' : P'.A) (Φ P' d' (tr f x)) n j
+        → ∃ r : ℕ, (f.f d * d') ^ r • ((d' : P'.A) ^ j • tr f m - f.f d ^ k • n) = 0
 
 attribute [instance] FCrys.acg FCrys.mod
 
 structure FHom (E E' : FCrys l R) where
   u : ∀ P : Obj l R, E.M P →ₗ[P.A] E'.M P
   u_tr : ∀ {P P' : Obj l R} (f : Hom P P') x, u P' (E.tr f x) = E'.tr f (u P x)
-  u_Φ : ∀ (P : Obj l R) (d : ↥P.I) (x m : E.M P) (k : ℕ),
-    IsFrac (d : P.A) (E.Φ P d x) m k → IsFrac (d : P.A) (E'.Φ P d (u P x)) (u P m) k
+  u_Φ
+    : ∀ (P : Obj l R) (d : ↥P.I) (x m : E.M P) (k : ℕ),
+      IsFrac (d : P.A) (E.Φ P d x) m k → IsFrac (d : P.A) (E'.Φ P d (u P x)) (u P m) k
 
 structure VBun (l : ℕ) (R : Type) [CommRing R] where
   M : Obj l R → Type
@@ -96,21 +107,24 @@ structure VBun (l : ℕ) (R : Type) [CommRing R] where
   tr : ∀ {P P' : Obj l R} (f : Hom P P'), M P →ₛₗ[f.f] M P'
   tr_bc : ∀ {P P' : Obj l R} (f : Hom P P'), SemiBC (tr f)
   tr_id : ∀ (P : Obj l R) x, tr (Hom.id P) x = x
-  tr_comp : ∀ {P P' P'' : Obj l R} (g : Hom P' P'') (f : Hom P P') x,
-    tr (g.comp f) x = tr g (tr f x)
+  tr_comp
+    : ∀ {P P' P'' : Obj l R} (g : Hom P' P'') (f : Hom P P') x, tr (g.comp f) x = tr g (tr f x)
 
 attribute [instance] VBun.acg VBun.mod
 
 theorem Delta.δ_zero {A : Type} [CommRing A] (D : Delta l A) : D.δ 0 = 0 := by
   have h := D.δ_add 0 0
   have e : ∑ k ∈ Finset.Ioo 0 l, ((l.choose k / l : ℕ) : A) * (0 : A) ^ k * (0 : A) ^ (l - k) = 0 :=
-    Finset.sum_eq_zero fun k hk => by
-      rw [zero_pow (Finset.mem_Ioo.1 hk).1.ne']; simp
+    Finset.sum_eq_zero fun k hk => by rw [zero_pow (Finset.mem_Ioo.1 hk).1.ne']; simp
   rw [e, add_zero] at h
   linear_combination -h
 
-def Delta.ofLift (l : ℕ) [hl : Fact l.Prime] {A : Type} [CommRing A] (φ : A →+* A)
-    (htf : ∀ x : A, (l : A) * x = 0 → x = 0) (h : ∀ a, ∃ b, φ a = a ^ l + (l : A) * b) : Delta l A where
+def Delta.ofLift
+    (l : ℕ) [hl : Fact l.Prime]
+    {A : Type} [CommRing A]
+    (φ : A →+* A)
+    (htf : ∀ x : A, (l : A) * x = 0 → x = 0) (h : ∀ a, ∃ b, φ a = a ^ l + (l : A) * b)
+    : Delta l A where
   δ a := (h a).choose
   δ_one := by
     apply htf
@@ -118,27 +132,31 @@ def Delta.ofLift (l : ℕ) [hl : Fact l.Prime] {A : Type} [CommRing A] (φ : A �
     simp only [map_one, one_pow] at this ⊢
     linear_combination -this
   δ_mul a b := by
-    rw [← sub_eq_zero]; apply htf
+    rw [← sub_eq_zero]
+    apply htf
     have h1 := (h a).choose_spec
     have h2 := (h b).choose_spec
     have h3 := (h (a * b)).choose_spec
     have h4 := map_mul φ a b
     generalize (h a).choose = x at *
     generalize (h b).choose = y at *
-    generalize (h (a*b)).choose = z at *
+    generalize (h (a * b)).choose = z at *
     rw [h1, h2, h3, mul_pow] at h4
     linear_combination h4
   δ_add a b := by
-    rw [← sub_eq_zero]; apply htf
+    rw [← sub_eq_zero]
+    apply htf
     have h1 := (h a).choose_spec
     have h2 := (h b).choose_spec
     have h3 := (h (a + b)).choose_spec
     have h4 := map_add φ a b
     generalize (h a).choose = x at *
     generalize (h b).choose = y at *
-    generalize (h (a+b)).choose = z at *
-    have h5 : (a + b) ^ l = a ^ l + b ^ l + (l : A) *
-        ∑ k ∈ Finset.Ioo 0 l, ((l.choose k / l : ℕ) : A) * a ^ k * b ^ (l - k) := by
+    generalize (h (a + b)).choose = z at *
+    have h5
+        : (a + b) ^ l
+          = a ^ l + b ^ l
+            + (l : A) * ∑ k ∈ Finset.Ioo 0 l, ((l.choose k / l : ℕ) : A) * a ^ k * b ^ (l - k) := by
       rw [add_pow_prime_eq' hl.out]
       congr 2
       refine Finset.sum_congr rfl fun k _ => by ring
@@ -147,18 +165,31 @@ def Delta.ofLift (l : ℕ) [hl : Fact l.Prime] {A : Type} [CommRing A] (φ : A �
   φ := φ
   φ_eq a := (h a).choose_spec
 
-@[simp] theorem Delta.ofLift_φ (l : ℕ) [Fact l.Prime] {A : Type} [CommRing A] (φ : A →+* A)
-    (htf : ∀ x : A, (l : A) * x = 0 → x = 0) (h : ∀ a, ∃ b, φ a = a ^ l + (l : A) * b) :
-    (Delta.ofLift l φ htf h).φ = φ := rfl
+@[simp]
+theorem Delta.ofLift_φ
+    (l : ℕ) [Fact l.Prime]
+    {A : Type} [CommRing A]
+    (φ : A →+* A)
+    (htf : ∀ x : A, (l : A) * x = 0 → x = 0) (h : ∀ a, ∃ b, φ a = a ^ l + (l : A) * b)
+    : (Delta.ofLift l φ htf h).φ = φ :=
+  rfl
 
-theorem Delta.map_φ_of_map_δ {A B : Type} [CommRing A] [CommRing B] (D : Delta l A) (D' : Delta l B)
-    (f : A →+* B) (h : ∀ a, f (D.δ a) = D'.δ (f a)) (a : A) : f (D.φ a) = D'.φ (f a) := by
+theorem Delta.map_φ_of_map_δ
+    {A B : Type} [CommRing A] [CommRing B]
+    (D : Delta l A) (D' : Delta l B) (f : A →+* B) (h : ∀ a, f (D.δ a) = D'.δ (f a))
+    (a : A)
+    : f (D.φ a) = D'.φ (f a) := by
   simp [D.φ_eq, D'.φ_eq, h]
 
-theorem Delta.map_δ_of_map_φ {A B : Type} [CommRing A] [CommRing B] (D : Delta l A) (D' : Delta l B)
-    (htf : ∀ x : B, (l : B) * x = 0 → x = 0) (f : A →+* B) (h : ∀ a, f (D.φ a) = D'.φ (f a)) (a : A) :
-    f (D.δ a) = D'.δ (f a) := by
-  rw [← sub_eq_zero]; apply htf
+theorem Delta.map_δ_of_map_φ
+    {A B : Type} [CommRing A] [CommRing B]
+    (D : Delta l A) (D' : Delta l B)
+    (htf : ∀ x : B, (l : B) * x = 0 → x = 0)
+    (f : A →+* B) (h : ∀ a, f (D.φ a) = D'.φ (f a))
+    (a : A)
+    : f (D.δ a) = D'.δ (f a) := by
+  rw [← sub_eq_zero]
+  apply htf
   have := h a
   simp only [D.φ_eq, D'.φ_eq, map_add (f := _), map_mul, map_pow, map_natCast] at this
   linear_combination this
@@ -169,30 +200,33 @@ theorem Hom.f_φ {P P' : Obj l R} (f : Hom P P') (a : P.A) : f.f (P.D.φ a) = P'
 theorem Hom.ext' {P P' : Obj l R} {f g : Hom P P'} (h : f.f = g.f) : f = g := by
   cases f; cases g; cases h; rfl
 
-theorem Delta.l_mem_of_isUnit (hl : 0 < l) {A : Type} [CommRing A] (D : Delta l A) {q : A}
-    (hq : IsUnit (D.δ q)) : (l : A) ∈ Ideal.span {q} ⊔ (Ideal.span {q}).map D.φ := by
+theorem Delta.l_mem_of_isUnit
+    (hl : 0 < l) {A : Type} [CommRing A] (D : Delta l A) {q : A} (hq : IsUnit (D.δ q))
+    : (l : A) ∈ Ideal.span {q} ⊔ (Ideal.span {q}).map D.φ := by
   obtain ⟨v, hv⟩ := hq.exists_right_inv
-  have e : (l : A) = v * (D.φ q - q ^ l) := by
-    rw [D.φ_eq]; linear_combination (-(l : A)) * hv
+  have e : (l : A) = v * (D.φ q - q ^ l) := by rw [D.φ_eq]; linear_combination (-(l : A)) * hv
   rw [e]
   refine Ideal.mul_mem_left _ _ (Ideal.sub_mem _ ?_ ?_)
   · exact Ideal.mem_sup_right (Ideal.mem_map_of_mem _ (Ideal.mem_span_singleton_self q))
   · exact Ideal.mem_sup_left (Ideal.pow_mem_of_mem _ (Ideal.mem_span_singleton_self q) _ hl)
 
-theorem invertible_span_singleton {A : Type} [CommRing A] {q : A} (hq : q ∈ nonZeroDivisors A) :
-    Module.Invertible A ↥(Ideal.span {q}) :=
+theorem invertible_span_singleton {A : Type} [CommRing A] {q : A} (hq : q ∈ nonZeroDivisors A)
+    : Module.Invertible A ↥(Ideal.span {q}) :=
   Module.Invertible.congr (M := A)
     ((LinearEquiv.ofInjective (LinearMap.toSpanSingleton A A q) (by
-      rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
-      exact fun a h => (mem_nonZeroDivisors_iff.1 hq).2 a h)).trans
+        rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
+        exact fun a h => (mem_nonZeroDivisors_iff.1 hq).2 a h)).trans
       (LinearEquiv.ofEq _ _ (LinearMap.span_singleton_eq_range A A q).symm))
 
-def Obj.ofDistinguished (hl : 0 < l) {A : Type} [CommRing A] (D : Delta l A) (q : A)
-    (hq : q ∈ nonZeroDivisors A) (hδ : IsUnit (D.δ q))
+def Obj.ofDistinguished
+    (hl : 0 < l)
+    {A : Type} [CommRing A]
+    (D : Delta l A) (q : A) (hq : q ∈ nonZeroDivisors A) (hδ : IsUnit (D.δ q))
     (hc : IsAdicComplete (Ideal.span {(l : A)} ⊔ Ideal.span {q}) A)
-    (hb : ∃ n : ℕ, ∀ x : A ⧸ Ideal.span {q}, (∃ m : ℕ, (l : A ⧸ Ideal.span {q}) ^ m * x = 0) →
-      (l : A ⧸ Ideal.span {q}) ^ n * x = 0)
-    (str : R →+* A ⧸ Ideal.span {q}) : Obj l R where
+    (hb : ∃ n : ℕ, ∀ x : A ⧸ Ideal.span {q},
+      (∃ m : ℕ, (l : A ⧸ Ideal.span {q}) ^ m * x = 0) → (l : A ⧸ Ideal.span {q}) ^ n * x = 0)
+    (str : R →+* A ⧸ Ideal.span {q})
+    : Obj l R where
   A := A
   D := D
   I := Ideal.span {q}
@@ -212,8 +246,8 @@ def Obj.restrict {R' : Type} [CommRing R'] (g : R →+* R') (P : Obj l R') : Obj
   bdd := P.bdd
   str := P.str.comp g
 
-def Hom.restrict {R' : Type} [CommRing R'] (g : R →+* R') {P P' : Obj l R'} (f : Hom P P') :
-    Hom (P.restrict g) (P'.restrict g) where
+def Hom.restrict {R' : Type} [CommRing R'] (g : R →+* R') {P P' : Obj l R'} (f : Hom P P')
+    : Hom (P.restrict g) (P'.restrict g) where
   f := f.f
   f_δ := f.f_δ
   f_I := f.f_I
@@ -235,27 +269,31 @@ def FCrys.pullback {R' : Type} [CommRing R'] (g : R →+* R') (E : FCrys l R) : 
 
 def Obj.crys (l : ℕ) [hl : Fact l.Prime] : Obj l ℤ_[l] where
   A := ℤ_[l]
-  D := Delta.ofLift l (RingHom.id _)
-    (fun x hx => (mul_eq_zero.1 hx).resolve_left (by exact_mod_cast hl.out.ne_zero))
-    (fun a => by
-      have : a - a ^ l ∈ RingHom.ker (PadicInt.toZMod (p := l)) := by
-        simp [RingHom.mem_ker]
-      rw [PadicInt.ker_toZMod, PadicInt.maximalIdeal_eq_span_p, Ideal.mem_span_singleton] at this
-      obtain ⟨b, hb⟩ := this
-      exact ⟨b, by simp only [RingHom.id_apply]; linear_combination hb⟩)
+  D :=
+    Delta.ofLift l (RingHom.id _)
+      (fun x hx => (mul_eq_zero.1 hx).resolve_left (by exact_mod_cast hl.out.ne_zero))
+      (fun a => by
+        have : a - a ^ l ∈ RingHom.ker (PadicInt.toZMod (p := l)) := by simp [RingHom.mem_ker]
+        rw [PadicInt.ker_toZMod, PadicInt.maximalIdeal_eq_span_p, Ideal.mem_span_singleton] at this
+        obtain ⟨b, hb⟩ := this
+        exact ⟨b, by simp only [RingHom.id_apply]; linear_combination hb⟩)
   I := Ideal.span {(l : ℤ_[l])}
-  inv := invertible_span_singleton (mem_nonZeroDivisors_of_ne_zero (by exact_mod_cast hl.out.ne_zero))
-  complete := by
-    rw [sup_idem, ← PadicInt.maximalIdeal_eq_span_p]; infer_instance
+  inv :=
+    invertible_span_singleton (mem_nonZeroDivisors_of_ne_zero (by exact_mod_cast hl.out.ne_zero))
+  complete := by rw [sup_idem, ← PadicInt.maximalIdeal_eq_span_p]; infer_instance
   l_mem := Ideal.mem_sup_left (Ideal.mem_span_singleton_self _)
-  bdd := ⟨1, fun x _ => by
-    have : ((l : ℕ) : ℤ_[l] ⧸ Ideal.span {(l : ℤ_[l])}) = 0 := by
-      rw [← map_natCast (Ideal.Quotient.mk _), Ideal.Quotient.eq_zero_iff_mem]
-      exact Ideal.mem_span_singleton_self _
-    simp [this]⟩
+  bdd := ⟨
+    1,
+    fun x _ => by
+      have : ((l : ℕ) : ℤ_[l] ⧸ Ideal.span {(l : ℤ_[l])}) = 0 := by
+        rw [← map_natCast (Ideal.Quotient.mk _), Ideal.Quotient.eq_zero_iff_mem]
+        exact Ideal.mem_span_singleton_self _
+      simp [this]
+  ⟩
   str := Ideal.Quotient.mk _
 
-theorem semiBC_self {A B : Type} [CommRing A] [CommRing B] (f : A →+* B) : SemiBC f.toSemilinearMap := by
+theorem semiBC_self {A B : Type} [CommRing A] [CommRing B] (f : A →+* B)
+    : SemiBC f.toSemilinearMap := by
   intro Q _ _ v
   refine ⟨LinearMap.toSpanSingleton B Q (v 1), fun x => ?_, fun w hw => ?_⟩
   · have := v.map_smulₛₗ x 1
@@ -277,8 +315,10 @@ def FCrys.unit (l : ℕ) (R : Type) [CommRing R] : FCrys l R where
   Φ_bc P d := semiBC_self _
   Φ_nat := by
     intro P P' f d d' x m k n j h1 h2
-    have key : ∀ {A : Type} [CommRing A] (e y m : A) (k : ℕ),
-        IsFrac e (algebraMap A (Localization.Away e) y) m k → ∃ a : ℕ, e ^ a * (e ^ k * y) = e ^ a * m := by
+    have key
+        : ∀ {A : Type} [CommRing A] (e y m : A) (k : ℕ),
+          IsFrac e (algebraMap A (Localization.Away e) y) m k
+            → ∃ a : ℕ, e ^ a * (e ^ k * y) = e ^ a * m := by
       intro A _ e y m k h
       have h' : LocalizedModule.mk y (1 : Submonoid.powers e) = _ := h
       rw [LocalizedModule.mk_eq] at h'

@@ -21,8 +21,8 @@ def segreMap : MRing (fun _ : Unit => ∀ k, ι k) F →ₐ[F] MRing ι F :=
 def segrePrime (q : Ideal (MRing ι F)) : Ideal (MRing (fun _ : Unit => ∀ k, ι k) F) :=
   q.comap (segreMap F)
 
-theorem segreMap_X (f : ∀ k, ι k) :
-    segreMap F (X ⟨(), f⟩ : MRing (fun _ : Unit => ∀ k, ι k) F) = ∏ k, X ⟨k, f k⟩ :=
+theorem segreMap_X (f : ∀ k, ι k)
+    : segreMap F (X ⟨(), f⟩ : MRing (fun _ : Unit => ∀ k, ι k) F) = ∏ k, X ⟨k, f k⟩ :=
   aeval_X _ _
 
 instance segrePrime.isPrime (q : Ideal (MRing ι F)) [q.IsPrime] : (segrePrime F q).IsPrime :=

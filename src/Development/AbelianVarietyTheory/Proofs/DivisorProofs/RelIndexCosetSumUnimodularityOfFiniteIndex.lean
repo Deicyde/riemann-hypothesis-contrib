@@ -10,9 +10,10 @@ open Formalism.UG GlobalTheory.SatakeWeyl
 
 namespace GlobalTheory.SatakeWeyl
 
-theorem finsum_quotient_subgroupOf {A : Type} [Group A] (Γ W : Subgroup A) (F : A → ℂ)
-    (hΓ : ∀ a, F a ≠ 0 → a ∈ Γ) (hF : ∀ w ∈ W, ∀ a, F (a * w) = F a) :
-    ∑ᶠ y : A ⧸ W, F y.out = ∑ᶠ y : Γ ⧸ W.subgroupOf Γ, F (y.out : Γ) := by
+theorem finsum_quotient_subgroupOf
+    {A : Type} [Group A]
+    (Γ W : Subgroup A) (F : A → ℂ) (hΓ : ∀ a, F a ≠ 0 → a ∈ Γ) (hF : ∀ w ∈ W, ∀ a, F (a * w) = F a)
+    : ∑ᶠ y : A ⧸ W, F y.out = ∑ᶠ y : Γ ⧸ W.subgroupOf Γ, F (y.out : Γ) := by
   have hout : ∀ a : A, F (QuotientGroup.mk a : A ⧸ W).out = F a := by
     intro a
     obtain ⟨w, hw⟩ := QuotientGroup.mk_out_eq_mul W a
@@ -33,20 +34,26 @@ theorem finsum_quotient_subgroupOf {A : Type} [Group A] (Γ W : Subgroup A) (F :
     show (QuotientGroup.mk _ : A ⧸ W) = y
     rw [hw, Subgroup.coe_mul, QuotientGroup.mk_mul_of_mem _ hw']
     exact QuotientGroup.out_eq' y
-  calc ∑ᶠ y : A ⧸ W, F y.out = ∑ᶠ y ∈ Set.range e, F y.out := by
-        rw [← finsum_mem_univ]
-        apply finsum_mem_inter_support_eq
-        rw [Set.univ_inter, Set.inter_eq_right.2 hsupp]
+  calc
+    ∑ᶠ y : A ⧸ W, F y.out = ∑ᶠ y ∈ Set.range e, F y.out := by
+      rw [← finsum_mem_univ]
+      apply finsum_mem_inter_support_eq
+      rw [Set.univ_inter, Set.inter_eq_right.2 hsupp]
     _ = ∑ᶠ y, F (e y).out := finsum_mem_range hinj
     _ = _ := finsum_congr fun y => hout _
 
 theorem unimod_of_unimodFin : UnimodFin → Unimod := by
   intro H A _ Γ U V f _ _ hUi hVi hΓ hfV hfU
-  have h := H Γ (U.subgroupOf Γ) (V.subgroupOf Γ) (fun a => f a) hUi hVi
-    (fun v hv a => hfV _ (Subgroup.mem_subgroupOf.1 hv) _)
-    (fun u hu a => hfU _ (Subgroup.mem_subgroupOf.1 hu) _)
+  have h :=
+    H Γ (U.subgroupOf Γ) (V.subgroupOf Γ)
+      (fun a => f a)
+      hUi hVi
+      (fun v hv a => hfV _ (Subgroup.mem_subgroupOf.1 hv) _)
+      (fun u hu a => hfU _ (Subgroup.mem_subgroupOf.1 hu) _)
   rw [finsum_quotient_subgroupOf Γ U f hΓ hfU,
-    finsum_quotient_subgroupOf Γ V (fun a => f a⁻¹) (fun a ha => (inv_mem_iff.1 (hΓ _ ha)))
+    finsum_quotient_subgroupOf Γ V
+      (fun a => f a⁻¹)
+      (fun a ha => (inv_mem_iff.1 (hΓ _ ha)))
       (fun w hw a => by rw [mul_inv_rev, hfV _ (inv_mem hw)])]
   exact h
 

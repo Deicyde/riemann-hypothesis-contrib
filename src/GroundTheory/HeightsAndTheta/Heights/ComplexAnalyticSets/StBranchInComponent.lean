@@ -15,7 +15,8 @@ noncomputable section
 
 def BranchInComponent.Statement : Prop :=
   ∀ (n : ℕ) (I : Ideal (MvPolynomial (Fin n) ℂ)) (k : ℕ) (q : Fin n → ℂ) (c : VarBranch I k q),
-    ∃ J ∈ I.minimalPrimes, Set.MapsTo c.toFun (Metric.ball 0 c.radius) (zeroSet J)
+    ∃ J ∈ I.minimalPrimes,
+      Set.MapsTo c.toFun (Metric.ball 0 c.radius) (zeroSet J)
 
 end
 

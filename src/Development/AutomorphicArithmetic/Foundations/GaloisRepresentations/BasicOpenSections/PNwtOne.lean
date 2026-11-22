@@ -12,8 +12,9 @@ open CategoryTheory Limits AlgebraicGeometry UpperTheory.Gal.TranscendenceTraces
 
 namespace UpperTheory.Gal.Mod
 
-private theorem mem_basicOpen_of_ne {p : ℕ} {Y : Scheme.{0}} (Ω : Type) [Field Ω]
-    (x : gp Ω ⟶ Y) (hp : (p : Ω) ≠ 0) : pt x ∈ Y.basicOpen (p : Γ(Y, ⊤)) := by
+private theorem mem_basicOpen_of_ne
+    {p : ℕ} {Y : Scheme.{0}} (Ω : Type) [Field Ω] (x : gp Ω ⟶ Y) (hp : (p : Ω) ≠ 0)
+    : pt x ∈ Y.basicOpen (p : Γ(Y, ⊤)) := by
   have hu : IsUnit ((p : ℕ) : Γ(gp Ω, ⊤)) := by
     have h1 : IsUnit ((p : ℕ) : Ω) := isUnit_iff_ne_zero.mpr hp
     have h2 := h1.map (Scheme.ΓSpecIso (CommRingCat.of Ω)).inv.hom
@@ -35,14 +36,14 @@ theorem nwtOne : NwtOne := by
   intro Ω _ _ z hp
   haveI := T.et
   have hD : Dense {s | GenPt ((Y.basicOpen (p : Γ(Y, ⊤))).ι s)} := by
-    have hs : {s | GenPt ((Y.basicOpen (p : Γ(Y, ⊤))).ι s)} =
-        {s | GenPt s} := by
+    have hs : {s | GenPt ((Y.basicOpen (p : Γ(Y, ⊤))).ι s)} = {s | GenPt s} := by
       ext s
       exact genBasic_of.2.1 (Y.basicOpen (p : Γ(Y, ⊤))).ι s
     rw [hs]
     exact genBasic_of.1 _
-  have hc := hNF (T.p ⁻¹ᵁ Y.basicOpen (p : Γ(Y, ⊤))).ι (T.p ∣_ Y.basicOpen (p : Γ(Y, ⊤))) T.p
-    (Y.basicOpen (p : Γ(Y, ⊤))).ι (isPullback_morphismRestrict T.p _).flip hN hD
+  have hc :=
+    hNF (T.p ⁻¹ᵁ Y.basicOpen (p : Γ(Y, ⊤))).ι (T.p ∣_ Y.basicOpen (p : Γ(Y, ⊤))) T.p
+      (Y.basicOpen (p : Γ(Y, ⊤))).ι (isPullback_morphismRestrict T.p _).flip hN hD
   rw [hMB.2.2 (T.p ∣_ Y.basicOpen (p : Γ(Y, ⊤)))] at hc
   have hmem : pt (z ≫ T.p) ∈ Y.basicOpen (p : Γ(Y, ⊤)) := mem_basicOpen_of_ne Ω (z ≫ T.p) hp
   have hr : Set.range z ⊆ Set.range (T.p ⁻¹ᵁ Y.basicOpen (p : Γ(Y, ⊤))).ι := by

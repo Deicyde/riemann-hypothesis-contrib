@@ -250,8 +250,9 @@ theorem secondParameterSizeBounds_holds : ParamsII0 := by
   intro CE C₂ hCE hC₂
   refine ⟨64 * CE + 400 + C₂, by linarith, ?_⟩
   intro p r N N₁ Nₛ J k n' L₁ G' Y a al c₀ c'' D cStar hH hal0 hal
-  obtain ⟨hp13, hr2, hrN1, hN1, hrY, hClog, hk, h256, hCD, hDc, hCa, hL1, hLG, hNs1, hNs2,
-    hJ, hJr⟩ := hH
+  obtain
+      ⟨hp13, hr2, hrN1, hN1, hrY, hClog, hk, h256, hCD, hDc, hCa, hL1, hLG, hNs1, hNs2, hJ, hJr⟩ :=
+    hH
   have hr2' : (2 : ℝ) ≤ r := by exact_mod_cast hr2
   have hrN1' : (r : ℝ) ≤ N₁ := by exact_mod_cast hrN1
   have hN1' : (N₁ : ℝ) ^ 2 ≤ r * N := by exact_mod_cast hN1
@@ -265,7 +266,9 @@ theorem secondParameterSizeBounds_holds : ParamsII0 := by
   have hQ1 : 1 ≤ QII p G' := one_le_pow₀ hp1
   have hpQ : (p : ℝ) ≤ QII p G' := by
     unfold QII
-    calc (p : ℝ) = (p : ℝ) ^ 1 := (pow_one _).symm
+    calc
+      (p : ℝ)
+        = (p : ℝ) ^ 1 := (pow_one _).symm
       _ ≤ (p : ℝ) ^ G' := pow_le_pow_right₀ hp1 (by omega)
   have hom0 : (0 : ℝ) ≤ omII r N n' c₀ c'' := by unfold omII; positivity
   have hc1 : 1 ≤ cPrII r N n' c₀ c'' cStar := by
@@ -294,17 +297,18 @@ theorem secondParameterSizeBounds_holds : ParamsII0 := by
   have ha0 : 0 ≤ a := le_trans (mul_nonneg (by linarith) hM0) hCa'
   refine ⟨?_, ?_, ?_, ?_, hY1, ?_⟩
   · unfold errorTerm mStarII
-    have hs := pII0_size CE p r N N₁ Nₛ k Q c' Y al (by linarith) (Nat.cast_nonneg _) hpQ hQ1
-      hr2' hrN1' hN1' hk' (Nat.cast_nonneg _) hNs1' hNs2' hc1 hY0 hal0 hal
+    have hs :=
+      pII0_size CE p r N N₁ Nₛ k Q c' Y al (by linarith) (Nat.cast_nonneg _) hpQ hQ1 hr2' hrN1' hN1'
+        hk' (Nat.cast_nonneg _) hNs1' hNs2' hc1 hY0 hal0 hal
     have : 32 * (2 * CE + 7) * M ≤ (64 * CE + 400 + C₂) * M :=
       mul_le_mul_of_nonneg_right (by linarith) hM0
     linarith
   · intro B hB
     unfold slII mStarII
-    have hs := pII0_slack r N N₁ k Q c' Y al c₀ hQ1 hr2' hrN1' hN1' hk' hc1 hY0 hal0 hal
-      (Nat.cast_nonneg _) hc0le
-    have h155 : 155 * M ≤ (64 * CE + 400 + C₂) * M :=
-      mul_le_mul_of_nonneg_right (by linarith) hM0
+    have hs :=
+      pII0_slack r N N₁ k Q c' Y al c₀ hQ1 hr2' hrN1' hN1' hk' hc1 hY0 hal0 hal (Nat.cast_nonneg _)
+        hc0le
+    have h155 : 155 * M ≤ (64 * CE + 400 + C₂) * M := mul_le_mul_of_nonneg_right (by linarith) hM0
     have hYk : 100 ≤ Y * (k : ℝ) ^ 2 := by
       have : (64 : ℝ) ≤ (k : ℝ) ^ 2 := by nlinarith
       nlinarith

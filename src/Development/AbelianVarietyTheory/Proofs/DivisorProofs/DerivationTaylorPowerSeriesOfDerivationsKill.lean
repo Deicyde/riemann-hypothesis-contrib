@@ -9,10 +9,14 @@ open IsLocalRing GlobalTheory.FormalOrigin
 
 namespace GlobalTheory.FormalOrigin
 
-theorem foldr_iterate_of_kills {A ι : Type} [Zero A] (ds : ι → A → A) (α : ι → ℕ) (c : A)
-    (hc : ∀ i, ds i c = 0) (h0 : ∀ i, ds i 0 = 0) (l : List ι) :
-    ((∀ i ∈ l, α i = 0) → l.foldr (fun i g => (ds i)^[α i] g) c = c) ∧
-    (¬ (∀ i ∈ l, α i = 0) → l.foldr (fun i g => (ds i)^[α i] g) c = 0) := by
+theorem foldr_iterate_of_kills
+    {A ι : Type} [Zero A]
+    (ds : ι → A → A)
+    (α : ι → ℕ)
+    (c : A) (hc : ∀ i, ds i c = 0)
+    (h0 : ∀ i, ds i 0 = 0) (l : List ι)
+    : ((∀ i ∈ l, α i = 0) → l.foldr (fun i g => (ds i)^[α i] g) c = c)
+      ∧ (¬(∀ i ∈ l, α i = 0) → l.foldr (fun i g => (ds i)^[α i] g) c = 0) := by
   induction l with
   | nil => exact ⟨fun _ => rfl, fun h => absurd (fun i hi => by simp at hi) h⟩
   | cons j l ih =>
@@ -35,8 +39,10 @@ theorem foldr_iterate_of_kills {A ι : Type} [Zero A] (ds : ι → A → A) (α 
       · rw [ih.2 hl]
         exact Function.iterate_fixed (h0 j) _
 
-theorem taylor_const :
-    ∀ (A B : Type) [CommRing A] [CommRing B] [Algebra ℚ B] (n : ℕ) (ev : A →+* B) (ds : Fin n → Derivation ℤ A A) (c : A), (∀ i, ds i c = 0) → taylor ev (fun i => ⇑(ds i)) c = MvPowerSeries.C (ev c) := by
+theorem taylor_const
+    : ∀ (A B : Type) [CommRing A] [CommRing B] [Algebra ℚ B] (n : ℕ) (ev : A →+* B)
+        (ds : Fin n → Derivation ℤ A A) (c : A),
+      (∀ i, ds i c = 0) → taylor ev (fun i => ⇑(ds i)) c = MvPowerSeries.C (ev c) := by
   intro A B _ _ _ n ev ds c hc
   ext α
   rw [MvPowerSeries.coeff_C]

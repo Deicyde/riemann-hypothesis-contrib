@@ -10,7 +10,8 @@ public import Formalism.GL3MeanSquares.HookFormulaTorsion.WeightedVonMangoldtSum
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
@@ -175,20 +176,29 @@ private lemma thin_integral (ε c B : ℝ) (hε : 0 < ε) (hc : 0 < c) (hB : 0 <
     _ = Real.exp (-(c / 16) * x ^ (13 * ε / 100)) := by
         rw [hA, ← Real.exp_add]; congr 1; ring
 
-theorem int_thin :
-    ∀ ε c C A c' : ℝ, 0 < ε → 0 < c → 0 < C → 0 < A → 0 < c' → ∃ x₀ : ℝ, ∀ x ≥ x₀, ∀ (y lam : ℝ) (φ : ℝ → ℂ),
-      Real.exp (x ^ (ε / 3)) / 3 ≤ y → 1 ≤ lam → lam ≤ A * x ^ (ε / 5) * Real.log x ^ 2 →
-      (∀ u : ℝ, y ≤ u → ‖φ u‖ ≤ C * u * (Real.log u + lam) ^ 2 * Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u)))) →
-      ‖(y : ℂ) * ∫ u in Set.Ioi y, φ u / (u : ℂ) ^ 2‖ ≤ y * Real.exp (-(c' * x ^ (ε / 8))) := by
+theorem int_thin
+    : ∀ ε c C A c' : ℝ,
+      0 < ε → 0 < c → 0 < C → 0 < A → 0 < c'
+        → ∃ x₀ : ℝ, ∀ x ≥ x₀, ∀ (y lam : ℝ) (φ : ℝ → ℂ),
+          Real.exp (x ^ (ε / 3)) / 3 ≤ y → 1 ≤ lam → lam ≤ A * x ^ (ε / 5) * Real.log x ^ 2
+            → (∀ u : ℝ,
+              y ≤ u
+                → ‖φ u‖
+                  ≤ C * u * (Real.log u + lam) ^ 2
+                    * Real.exp (-c * Real.log u / (lam + Real.sqrt (Real.log u))))
+            → ‖(y : ℂ) * ∫ u in Set.Ioi y, φ u / (u : ℂ) ^ 2‖
+              ≤ y * Real.exp (-(c' * x ^ (ε / 8))) := by
   intro ε c C A c' hε hc hC hA hc'
   obtain ⟨c1, x1, hc1, hT⟩ := thin_integral ε c A hε hc hA
-  obtain ⟨x2, hN⟩ := Filter.eventually_atTop.1
-    (((tendsto_rpow_atTop (by positivity : 0 < ε / 3)).eventually_ge_atTop 4).and
-      (((tendsto_rpow_atTop (by positivity : 0 < ε / 200)).eventually_ge_atTop (2 * c' / c1)).and
-        (Filter.eventually_gt_atTop 0)))
-  obtain ⟨x3, hx3⟩ := Filter.eventually_atTop.1
-    ((Real.tendsto_exp_atTop.comp ((tendsto_rpow_atTop (by positivity : 0 < 13 * ε / 100)).const_mul_atTop
-      (by positivity : 0 < c1 / 2))).eventually_ge_atTop C)
+  obtain ⟨x2, hN⟩ :=
+    Filter.eventually_atTop.1
+      (((tendsto_rpow_atTop (by positivity : 0 < ε / 3)).eventually_ge_atTop 4).and
+        (((tendsto_rpow_atTop (by positivity : 0 < ε / 200)).eventually_ge_atTop (2 * c' / c1)).and
+          (Filter.eventually_gt_atTop 0)))
+  obtain ⟨x3, hx3⟩ :=
+    Filter.eventually_atTop.1 ((Real.tendsto_exp_atTop.comp
+      ((tendsto_rpow_atTop (by positivity : 0 < 13 * ε / 100)).const_mul_atTop
+        (by positivity : 0 < c1 / 2))).eventually_ge_atTop C)
   refine ⟨max x1 (max x2 x3), fun x hx y lam psi0 hy hl1 hlam hpsi => ?_⟩
   have hxx1 : x1 ≤ x := le_trans (le_max_left _ _) hx
   have hxx2 : x2 ≤ x := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hx
@@ -227,8 +237,8 @@ theorem int_thin :
       have hu' : y < u := hu
       have hu0 : 0 < u := lt_trans hy0 hu'
       exact ⟨Real.log u, Real.log_lt_log hy0 hu', Real.exp_log hu0⟩
-  have hderiv : ∀ v ∈ Set.Ioi V, HasDerivWithinAt Real.exp (Real.exp v) (Set.Ioi V) v :=
-    fun v _ => (Real.hasDerivAt_exp v).hasDerivWithinAt
+  have hderiv : ∀ v ∈ Set.Ioi V, HasDerivWithinAt Real.exp (Real.exp v) (Set.Ioi V) v := fun v _ =>
+    (Real.hasDerivAt_exp v).hasDerivWithinAt
   have hinj : Set.InjOn Real.exp (Set.Ioi V) := Real.exp_injective.injOn
   have hcomp : (fun v => |Real.exp v| • G (Real.exp v)) = F := by
     funext v
@@ -237,37 +247,42 @@ theorem int_thin :
     simp only [abs_of_pos hp, Real.log_exp, smul_eq_mul]
     field_simp
   have hGint : MeasureTheory.IntegrableOn G (Set.Ioi y) := by
-    rw [← himg, MeasureTheory.integrableOn_image_iff_integrableOn_abs_deriv_smul measurableSet_Ioi
-      hderiv hinj, hcomp]
+    rw [← himg,
+      MeasureTheory.integrableOn_image_iff_integrableOn_abs_deriv_smul measurableSet_Ioi hderiv
+        hinj,
+      hcomp]
     exact hint
   have hGval : (∫ u in Set.Ioi y, G u) = ∫ v in Set.Ioi V, F v := by
-    rw [← himg, MeasureTheory.integral_image_eq_integral_abs_deriv_smul measurableSet_Ioi
-      hderiv hinj, hcomp]
+    rw [← himg,
+      MeasureTheory.integral_image_eq_integral_abs_deriv_smul measurableSet_Ioi hderiv hinj, hcomp]
   have hnorm : ‖∫ u in Set.Ioi y, psi0 u / (u : ℂ) ^ 2‖ ≤ C * ∫ u in Set.Ioi y, G u := by
-    calc ‖∫ u in Set.Ioi y, psi0 u / (u : ℂ) ^ 2‖
+    calc
+      ‖∫ u in Set.Ioi y, psi0 u / (u : ℂ) ^ 2‖
         ≤ ∫ u in Set.Ioi y, ‖psi0 u / (u : ℂ) ^ 2‖ := MeasureTheory.norm_integral_le_integral_norm _
       _ ≤ ∫ u in Set.Ioi y, C * G u := by
-          refine MeasureTheory.integral_mono_of_nonneg
-            (Filter.Eventually.of_forall fun _ => norm_nonneg _) (hGint.const_mul C)
-            (MeasureTheory.ae_restrict_of_forall_mem measurableSet_Ioi fun u hu => ?_)
-          have hu' : y < u := hu
-          have hu0 : 0 < u := lt_trans hy0 hu'
-          have h1 := hpsi u hu'.le
-          show ‖psi0 u / (u : ℂ) ^ 2‖ ≤ C * G u
-          rw [norm_div, norm_pow, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hu0,
-            div_le_iff₀ (by positivity)]
-          refine le_trans h1 (le_of_eq ?_)
-          rw [hG, hF]
-          field_simp
+        refine MeasureTheory.integral_mono_of_nonneg
+          (Filter.Eventually.of_forall fun _ => norm_nonneg _) (hGint.const_mul C)
+          (MeasureTheory.ae_restrict_of_forall_mem measurableSet_Ioi fun u hu => ?_)
+        have hu' : y < u := hu
+        have hu0 : 0 < u := lt_trans hy0 hu'
+        have h1 := hpsi u hu'.le
+        show ‖psi0 u / (u : ℂ) ^ 2‖ ≤ C * G u
+        rw [norm_div, norm_pow, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hu0,
+          div_le_iff₀ (by positivity)]
+        refine le_trans h1 (le_of_eq ?_)
+        rw [hG, hF]
+        field_simp
       _ = C * ∫ u in Set.Ioi y, G u := MeasureTheory.integral_const_mul _ _
   rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hy0]
   apply mul_le_mul_of_nonneg_left _ hy0.le
-  calc ‖∫ u in Set.Ioi y, psi0 u / (u : ℂ) ^ 2‖ ≤ C * ∫ u in Set.Ioi y, G u := hnorm
+  calc
+    ‖∫ u in Set.Ioi y, psi0 u / (u : ℂ) ^ 2‖
+      ≤ C * ∫ u in Set.Ioi y, G u := hnorm
     _ = C * ∫ v in Set.Ioi V, F v := by rw [hGval]
     _ ≤ C * Real.exp (-c1 * x ^ (13 * ε / 100)) := mul_le_mul_of_nonneg_left hbd hC.le
     _ ≤ Real.exp (c1 / 2 * x ^ (13 * ε / 100)) * Real.exp (-c1 * x ^ (13 * ε / 100)) :=
-        mul_le_mul_of_nonneg_right hCx (Real.exp_pos _).le
+      mul_le_mul_of_nonneg_right hCx (Real.exp_pos _).le
     _ ≤ Real.exp (-(c' * x ^ (ε / 8))) := by
-        rw [← Real.exp_add]; apply Real.exp_le_exp.mpr; linarith
+      rw [← Real.exp_add]; apply Real.exp_le_exp.mpr; linarith
 
 end QH

@@ -10,15 +10,19 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
+open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison
+  CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
 
 namespace GlobalTheory.CompanionTheory.LatCHyp
 
-theorem isAdicComplete_of_equiv {Q R : Type*} [CommRing Q] [CommRing R] (e : Q ≃+* R) (a : Q)
-    (h : IsAdicComplete (Ideal.span {e a}) R) : IsAdicComplete (Ideal.span {a}) Q := by
-  have hmem : ∀ (n : ℕ) (x y : Q),
-      x ≡ y [SMOD (Ideal.span {a} ^ n • ⊤ : Submodule Q Q)] ↔
-        e x ≡ e y [SMOD (Ideal.span {e a} ^ n • ⊤ : Submodule R R)] := by
+theorem isAdicComplete_of_equiv
+    {Q R : Type*} [CommRing Q] [CommRing R]
+    (e : Q ≃+* R) (a : Q) (h : IsAdicComplete (Ideal.span {e a}) R)
+    : IsAdicComplete (Ideal.span {a}) Q := by
+  have hmem
+      : ∀ (n : ℕ) (x y : Q),
+        x ≡ y [SMOD (Ideal.span {a} ^ n • ⊤ : Submodule Q Q)]
+          ↔ e x ≡ e y [SMOD (Ideal.span {e a} ^ n • ⊤ : Submodule R R)] := by
     intro n x y
     rw [SModEq.sub_mem, SModEq.sub_mem, smul_eq_mul, smul_eq_mul, Ideal.mul_top, Ideal.mul_top,
       Ideal.span_singleton_pow, Ideal.span_singleton_pow, Ideal.mem_span_singleton,
@@ -32,8 +36,8 @@ theorem isAdicComplete_of_equiv {Q R : Type*} [CommRing Q] [CommRing R] (e : Q �
       rwa [map_zero] at this
     exact (map_eq_zero_iff e e.injective).1 h0
   · intro f hf
-    obtain ⟨L, hL⟩ := h.toIsPrecomplete.prec' (fun n => e (f n))
-      (fun {m n} hmn => (hmem m _ _).1 (hf hmn))
+    obtain ⟨L, hL⟩ :=
+      h.toIsPrecomplete.prec' (fun n => e (f n)) (fun {m n} hmn => (hmem m _ _).1 (hf hmn))
     refine ⟨e.symm L, fun n => (hmem n _ _).2 ?_⟩
     rw [RingEquiv.apply_symm_apply]
     exact hL n
@@ -42,7 +46,8 @@ variable (l : ℕ) [Fact l.Prime]
 
 def eQ : (Ainf l ⧸ Ideal.span {xi0 l}) ≃+* OC l :=
   (Ideal.quotEquivOfEq (ker_theta0 (l := l)).symm).trans
-    (RingHom.quotientKerEquivOfSurjective (IsPerfectoidField.surjective_fontaineTheta (K := ℂ_[l]) l))
+    (RingHom.quotientKerEquivOfSurjective (IsPerfectoidField.surjective_fontaineTheta (K := ℂ_[l])
+      l))
 
 theorem eQ_natCast (n : ℕ) : eQ l (n : Ainf l ⧸ Ideal.span {xi0 l}) = (n : OC l) := map_natCast _ n
 
@@ -80,13 +85,19 @@ theorem dvd_total_OC (x y : OC l) : x ∣ y ∨ y ∣ x := by
     · rw [norm_div]; exact div_le_one_of_le₀ h (norm_nonneg _)
     · simp [mul_div_cancel₀ _ hy0]
 
-theorem unit_ainf (n : ℕ) (hn : n ≠ 0) : ∃ (k : ℕ) (u : Ainf l), (n : Ainf l) * u = (l : Ainf l) ^ k := by
+theorem unit_ainf (n : ℕ) (hn : n ≠ 0)
+    : ∃ (k : ℕ) (u : Ainf l), (n : Ainf l) * u = (l : Ainf l) ^ k := by
   have h0 : (n : ℤ_[l]) ≠ 0 := by exact_mod_cast hn
-  refine ⟨(n : ℤ_[l]).valuation, IsPerfectoidField.padicIntToWitt (K := ℂ_[l]) l
-    (((PadicInt.unitCoeff h0)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]), ?_⟩
-  have h1 : (n : ℤ_[l]) * (((PadicInt.unitCoeff h0)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) =
-      (l : ℤ_[l]) ^ (n : ℤ_[l]).valuation := by
-    have e2 := congrArg (· * (((PadicInt.unitCoeff h0)⁻¹ : ℤ_[l]ˣ) : ℤ_[l])) (PadicInt.unitCoeff_spec h0)
+  refine ⟨
+    (n : ℤ_[l]).valuation,
+    IsPerfectoidField.padicIntToWitt (K := ℂ_[l]) l (((PadicInt.unitCoeff h0)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]),
+    ?_
+  ⟩
+  have h1
+      : (n : ℤ_[l]) * (((PadicInt.unitCoeff h0)⁻¹ : ℤ_[l]ˣ) : ℤ_[l])
+        = (l : ℤ_[l]) ^ (n : ℤ_[l]).valuation := by
+    have e2 :=
+      congrArg (· * (((PadicInt.unitCoeff h0)⁻¹ : ℤ_[l]ˣ) : ℤ_[l])) (PadicInt.unitCoeff_spec h0)
     refine e2.trans ?_
     change ((PadicInt.unitCoeff h0 : ℤ_[l]ˣ) : ℤ_[l]) * _ * _ = _
     rw [mul_comm ((PadicInt.unitCoeff h0 : ℤ_[l]ˣ) : ℤ_[l]), mul_assoc, Units.mul_inv, mul_one]
@@ -96,7 +107,8 @@ theorem unit_ainf (n : ℕ) (hn : n ≠ 0) : ∃ (k : ℕ) (u : Ainf l), (n : Ai
 abbrev xiB : BdRp l := wittToBDeRhamPlus (normInteger ℂ_[l]) l (xi0 l)
 
 theorem span_xiB : Ideal.span {xiB l} = Ideal.span {tBdR l} := by
-  rw [← IsPerfectoidField.maximalIdeal_bDeRhamPlus_eq_span (K := ℂ_[l]) (p := l) (ker_theta0 (l := l))]
+  rw [← IsPerfectoidField.maximalIdeal_bDeRhamPlus_eq_span (K := ℂ_[l]) (p := l)
+    (ker_theta0 (l := l))]
   exact maximalIdeal_eq_span_tBdR
 
 theorem xi_dvd_fontaine_t : xiB l ∣ tBdR l :=
@@ -106,32 +118,40 @@ theorem t_dvd_xiB : tBdR l ∣ xiB l :=
   Ideal.mem_span_singleton.1 ((span_xiB l) ▸ Ideal.mem_span_singleton_self _)
 
 theorem xiB_ne_zero : xiB l ≠ 0 :=
-  (IsPerfectoidField.irreducible_wittToBDeRhamPlus (K := ℂ_[l]) (p := l) (ker_theta0 (l := l))).ne_zero
+  (IsPerfectoidField.irreducible_wittToBDeRhamPlus (K := ℂ_[l]) (p := l)
+    (ker_theta0 (l := l))).ne_zero
 
 theorem nil_k (k : ℕ) : fk l k (xi0 l) ^ k = 0 := by
   change Ideal.Quotient.mk _ (xiB l) ^ k = 0
   rw [← map_pow]
-  exact Ideal.Quotient.eq_zero_iff_mem.2
-    (Ideal.mem_span_singleton.2 (pow_dvd_pow_of_dvd (t_dvd_xiB l) k))
+  exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton.2 (pow_dvd_pow_of_dvd
+    (t_dvd_xiB l) k))
 
-theorem dvd_of_witt_mem {a : Ainf l} (h : xiB l ∣ wittToBDeRhamPlus (normInteger ℂ_[l]) l a) : xi0 l ∣ a := by
-  have h1 : wittToBDeRhamPlus (normInteger ℂ_[l]) l a ∈
-      IsLocalRing.maximalIdeal (BDeRhamPlus (normInteger ℂ_[l]) l) := by
-    rw [IsPerfectoidField.maximalIdeal_bDeRhamPlus_eq_span (K := ℂ_[l]) (p := l) (ker_theta0 (l := l))]
+theorem dvd_of_witt_mem {a : Ainf l} (h : xiB l ∣ wittToBDeRhamPlus (normInteger ℂ_[l]) l a)
+    : xi0 l ∣ a := by
+  have h1
+      : wittToBDeRhamPlus (normInteger ℂ_[l]) l a
+        ∈ IsLocalRing.maximalIdeal (BDeRhamPlus (normInteger ℂ_[l]) l) := by
+    rw [IsPerfectoidField.maximalIdeal_bDeRhamPlus_eq_span (K := ℂ_[l]) (p := l)
+      (ker_theta0 (l := l))]
     exact Ideal.mem_span_singleton.2 h
   rw [IsPerfectoidField.maximalIdeal_bDeRhamPlus (K := ℂ_[l]) (p := l), RingHom.mem_ker,
-    IsPerfectoidField.thetaBDeRhamPlusField_wittToBDeRhamPlus] at h1
+      IsPerfectoidField.thetaBDeRhamPlusField_wittToBDeRhamPlus]
+    at h1
   have h2 : a ∈ RingHom.ker (theta0 l) := Subtype.ext h1
   rw [ker_theta0] at h2
   exact Ideal.mem_span_singleton.1 h2
 
-theorem gr_k (k i : ℕ) (hi : i < k) (a : Ainf l) (b : Bk l k)
-    (h : fk l k a * fk l k (xi0 l) ^ i = fk l k (xi0 l) ^ (i + 1) * b) : xi0 l ∣ a := by
+theorem gr_k
+    (k i : ℕ) (hi : i < k)
+    (a : Ainf l) (b : Bk l k) (h : fk l k a * fk l k (xi0 l) ^ i = fk l k (xi0 l) ^ (i + 1) * b)
+    : xi0 l ∣ a := by
   obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective b
   apply dvd_of_witt_mem
   set w := wittToBDeRhamPlus (normInteger ℂ_[l]) l a with hw
-  have h1 : Ideal.Quotient.mk (Ideal.span {tBdR l ^ k}) (w * xiB l ^ i) =
-      Ideal.Quotient.mk _ (xiB l ^ (i + 1) * b) := by
+  have h1
+      : Ideal.Quotient.mk (Ideal.span {tBdR l ^ k}) (w * xiB l ^ i)
+        = Ideal.Quotient.mk _ (xiB l ^ (i + 1) * b) := by
     rw [map_mul, map_mul, map_pow, map_pow]
     exact h
   have h2 := Ideal.mem_span_singleton.1 (Ideal.Quotient.eq.1 h1)
@@ -145,16 +165,17 @@ theorem gr_k (k i : ℕ) (hi : i < k) (a : Ainf l) (b : Bk l k)
 
 theorem hyp_k (l : ℕ) [Fact l.Prime] (k : ℕ) (hk : 1 ≤ k) : Lat.Hyp (Lat.fk l k) (xi0 l) l k := by
   have hl : eQ l (l : Ainf l ⧸ Ideal.span {xi0 l}) = (l : OC l) := eQ_natCast l l
-  refine
-    { one_le := hk
-      nil := nil_k l k
-      gr := fun i hi a b h => gr_k l k i hi a b h
-      dom := (eQ l).toMulEquiv.isDomain _
-      val := fun x y => ?_
-      dv := fun x hx => ?_
-      l0 := fun h => ?_
-      cpl := ?_
-      unit := unit_ainf l }
+  refine {
+    one_le := hk
+    nil := nil_k l k
+    gr := fun i hi a b h => gr_k l k i hi a b h
+    dom := (eQ l).toMulEquiv.isDomain _
+    val := fun x y => ?_
+    dv := fun x hx => ?_
+    l0 := fun h => ?_
+    cpl := ?_
+    unit := unit_ainf l
+  }
   · rcases dvd_total_OC l (eQ l x) (eQ l y) with h | h
     · exact Or.inl ((map_dvd_iff (eQ l)).1 h)
     · exact Or.inr ((map_dvd_iff (eQ l)).1 h)

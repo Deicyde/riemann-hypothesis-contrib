@@ -12,10 +12,11 @@ noncomputable section
 
 namespace GlobalTheory.IdemRankStalk
 
-theorem finrank_range_baseChange_eq {R S M : Type} [CommRing R] [Field S] [Algebra R S]
-    [AddCommGroup M] [Module R M] (e : M →ₗ[R] M) (he : e ∘ₗ e = e) :
-    Module.finrank S (LinearMap.range (e.baseChange S)) =
-      Module.finrank S (S ⊗[R] LinearMap.range e) := by
+theorem finrank_range_baseChange_eq
+    {R S M : Type} [CommRing R] [Field S] [Algebra R S] [AddCommGroup M] [Module R M]
+    (e : M →ₗ[R] M) (he : e ∘ₗ e = e)
+    : Module.finrank S (LinearMap.range (e.baseChange S))
+      = Module.finrank S (S ⊗[R] LinearMap.range e) := by
   let r : M →ₗ[R] LinearMap.range e := e.rangeRestrict
   let i : LinearMap.range e →ₗ[R] M := (LinearMap.range e).subtype
   have hri : r ∘ₗ i = LinearMap.id := by
@@ -37,15 +38,17 @@ theorem finrank_range_baseChange_eq {R S M : Type} [CommRing R] [Field S] [Algeb
   rw [h2, LinearMap.range_comp_of_range_eq_top _ (LinearMap.range_eq_top.2 hsurj),
     LinearMap.finrank_range_of_inj hinj]
 
-theorem finrank_range_map_eq_rankAtStalk (A : Type) [CommRing A] (n : ℕ)
-    (P : Matrix (Fin n) (Fin n) A) (hP : P * P = P) (k : Type) [Field k] (g : A →+* k) :
-    Module.finrank k (LinearMap.range (P.map g).mulVecLin) =
-      Module.rankAtStalk (LinearMap.range P.mulVecLin)
+theorem finrank_range_map_eq_rankAtStalk
+    (A : Type) [CommRing A]
+    (n : ℕ) (P : Matrix (Fin n) (Fin n) A) (hP : P * P = P)
+    (k : Type) [Field k]
+    (g : A →+* k)
+    : Module.finrank k (LinearMap.range (P.map g).mulVecLin)
+      = Module.rankAtStalk (LinearMap.range P.mulVecLin)
         (⟨RingHom.ker g, RingHom.ker_isPrime g⟩ : PrimeSpectrum A) := by
   letI : Algebra A k := g.toAlgebra
   set e : (Fin n → A) →ₗ[A] (Fin n → A) := P.mulVecLin with he_def
-  have he : e ∘ₗ e = e := by
-    rw [he_def, ← Matrix.mulVecLin_mul, hP]
+  have he : e ∘ₗ e = e := by rw [he_def, ← Matrix.mulVecLin_mul, hP]
 
   let r : (Fin n → A) →ₗ[A] LinearMap.range e := e.rangeRestrict
   let i : LinearMap.range e →ₗ[A] (Fin n → A) := (LinearMap.range e).subtype
@@ -59,8 +62,9 @@ theorem finrank_range_map_eq_rankAtStalk (A : Type) [CommRing A] (n : ℕ)
 
   have hst := Module.rankAtStalk_baseChange (R := A) (M := LinearMap.range e) (S := k) ⊥
   rw [Module.rankAtStalk_eq_finrank_of_free] at hst
-  have hcomap : PrimeSpectrum.comap (algebraMap A k) (⊥ : PrimeSpectrum k) =
-      (⟨RingHom.ker g, RingHom.ker_isPrime g⟩ : PrimeSpectrum A) := by
+  have hcomap
+      : PrimeSpectrum.comap (algebraMap A k) (⊥ : PrimeSpectrum k)
+        = (⟨RingHom.ker g, RingHom.ker_isPrime g⟩ : PrimeSpectrum A) := by
     ext x
     change x ∈ Ideal.comap (algebraMap A k) (⊥ : Ideal k) ↔ x ∈ RingHom.ker g
     rw [Ideal.mem_comap, Ideal.mem_bot, RingHom.mem_ker]
@@ -75,15 +79,17 @@ theorem finrank_range_map_eq_rankAtStalk (A : Type) [CommRing A] (n : ℕ)
     | zero => simp
     | tmul c v =>
       ext j
-      simp [Φ, e, TensorProduct.piScalarRight_apply, Matrix.mulVec, dotProduct,
-        Finset.mul_sum, Algebra.smul_def, RingHom.algebraMap_toAlgebra]
+      simp [Φ, e, TensorProduct.piScalarRight_apply, Matrix.mulVec, dotProduct, Finset.mul_sum,
+        Algebra.smul_def, RingHom.algebraMap_toAlgebra]
       rw [Finset.sum_mul]
       exact Finset.sum_congr rfl fun _ _ => mul_assoc _ _ _
     | add x y hx hy => simp only [map_add (f := _), hx, hy]
-  have hrange : LinearMap.range (P.map g).mulVecLin =
-      (LinearMap.range (e.baseChange k)).map (Φ : k ⊗[A] (Fin n → A) →ₗ[k] (Fin n → k)) := by
-    have hc : (P.map g).mulVecLin ∘ₗ (Φ : k ⊗[A] (Fin n → A) →ₗ[k] (Fin n → k)) =
-        (Φ : k ⊗[A] (Fin n → A) →ₗ[k] (Fin n → k)) ∘ₗ e.baseChange k :=
+  have hrange
+      : LinearMap.range (P.map g).mulVecLin
+        = (LinearMap.range (e.baseChange k)).map (Φ : k ⊗[A] (Fin n → A) →ₗ[k] (Fin n → k)) := by
+    have hc
+        : (P.map g).mulVecLin ∘ₗ (Φ : k ⊗[A] (Fin n → A) →ₗ[k] (Fin n → k))
+          = (Φ : k ⊗[A] (Fin n → A) →ₗ[k] (Fin n → k)) ∘ₗ e.baseChange k :=
       LinearMap.ext fun x => (hΦ x).symm
     rw [← LinearMap.range_comp, ← hc, LinearMap.range_comp_of_range_eq_top _ (LinearEquiv.range Φ)]
   rw [hrange, LinearEquiv.finrank_map_eq]

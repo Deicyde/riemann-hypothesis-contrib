@@ -4,12 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qj5.df_exists_prime :
-    ∀
-    (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers ℚ)) (n : ℕ),
-    n ≠ (0 : ℕ) →
-      (↑n : NumberField.RingOfIntegers ℚ) ∈ v.asIdeal →
-        ∃ (p : ℕ), Nat.Prime p ∧ p ∣ n ∧ (↑p : NumberField.RingOfIntegers ℚ) ∈ v.asIdeal := by
+theorem UpperTheory.Reformulated.B.Qj5.df_exists_prime
+    : ∀ (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers ℚ)) (n : ℕ),
+      n ≠ (0 : ℕ) → (↑n : NumberField.RingOfIntegers ℚ) ∈ v.asIdeal
+        → ∃ (p : ℕ), Nat.Prime p ∧ p ∣ n ∧ (↑p : NumberField.RingOfIntegers ℚ) ∈ v.asIdeal := by
   intro v n
   induction n using induction_on_primes with
   | zero => intro h; exact absurd rfl h

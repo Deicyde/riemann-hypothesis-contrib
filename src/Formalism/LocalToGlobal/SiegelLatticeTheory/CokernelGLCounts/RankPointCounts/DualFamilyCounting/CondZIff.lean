@@ -13,7 +13,8 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.fibreCountingData
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt Formalism.L2.SG.Pf.G2 Formalism.L2.SG.Pf.G5
+open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt Formalism.L2.SG.Pf.G2
+  Formalism.L2.SG.Pf.G5
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
 
@@ -26,8 +27,8 @@ variable {𝔭 : Ideal (𝓞 F)} [h𝔭 : 𝔭.IsMaximal] {k : ℕ}
 
 local notation "mk" => Ideal.Quotient.mk (extP K 𝔭 ^ k)
 
-theorem exists_mk_iff {d : 𝓞 F} (hd : d ≠ 0) (hk : vF 𝔭 d ≤ k) (z : 𝓞 K) :
-    (∃ w : 𝓞 K ⧸ extP K 𝔭 ^ k, mk z = w * mk (ι d)) ↔ jK z / jK (ι d) ∈ HU.SP K 𝔭 := by
+theorem exists_mk_iff {d : 𝓞 F} (hd : d ≠ 0) (hk : vF 𝔭 d ≤ k) (z : 𝓞 K)
+    : (∃ w : 𝓞 K ⧸ extP K 𝔭 ^ k, mk z = w * mk (ι d)) ↔ jK z / jK (ι d) ∈ HU.SP K 𝔭 := by
   have hd0 : jK (ι d) ≠ 0 := by
     change algebraMap F K (d : F) ≠ 0
     exact (map_eq_zero_iff _ (algebraMap F K).injective).not.mpr (by exact_mod_cast hd)
@@ -40,10 +41,10 @@ theorem exists_mk_iff {d : 𝓞 F} (hd : d ≠ 0) (hk : vF 𝔭 d ≤ k) (z : �
     have hle : Ideal.span {t} * 𝔭 ^ vF 𝔭 d ≤ Ideal.span {d} :=
       Ideal.span_singleton_mul_le_iff.mpr htx
     have hmap := Ideal.map_mono (f := ι) hle
-    rw [Ideal.map_mul, Ideal.map_span, Set.image_singleton, Ideal.map_pow,
-      Ideal.map_span, Set.image_singleton, ← extP] at hmap
-    obtain ⟨q, hq⟩ := Ideal.mem_span_singleton'.mp
-      (Ideal.span_singleton_mul_le_iff.mp hmap _ hx)
+    rw [Ideal.map_mul, Ideal.map_span, Set.image_singleton, Ideal.map_pow, Ideal.map_span,
+        Set.image_singleton, ← extP]
+      at hmap
+    obtain ⟨q, hq⟩ := Ideal.mem_span_singleton'.mp (Ideal.span_singleton_mul_le_iff.mp hmap _ hx)
     have hdiv : jK (z - w * ι d) / jK (ι d) ∈ HU.SP K 𝔭 := by
       refine HU.mem_SP.mpr ⟨t, ht, q, ?_⟩
       rw [← mul_div_assoc]
@@ -68,26 +69,28 @@ theorem exists_mk_iff {d : 𝓞 F} (hd : d ≠ 0) (hk : vF 𝔭 d ≤ k) (z : �
     have e : mk z = mk ((ι u * w) * ι d) := Ideal.Quotient.eq.mpr hmem
     rw [e, map_mul]
 
-theorem exists_mk_mul_iff {d d' : 𝓞 F} (hd : d ≠ 0) (hd' : d' ≠ 0) (hk : vF 𝔭 d + vF 𝔭 d' ≤ k)
-    (z : 𝓞 K) :
-    (∃ w : 𝓞 K ⧸ extP K 𝔭 ^ k, mk z = mk (ι d) * w * mk (ι d')) ↔
-      jK z / (jK (ι d) * jK (ι d')) ∈ HU.SP K 𝔭 := by
-  have hprime : Prime 𝔭 := Ideal.prime_of_isPrime
-    (Ring.ne_bot_of_isMaximal_of_not_isField h𝔭 (RingOfIntegers.not_isField F)) h𝔭.isPrime
+theorem exists_mk_mul_iff
+    {d d' : 𝓞 F} (hd : d ≠ 0) (hd' : d' ≠ 0) (hk : vF 𝔭 d + vF 𝔭 d' ≤ k) (z : 𝓞 K)
+    : (∃ w : 𝓞 K ⧸ extP K 𝔭 ^ k, mk z = mk (ι d) * w * mk (ι d'))
+      ↔ jK z / (jK (ι d) * jK (ι d')) ∈ HU.SP K 𝔭 := by
+  have hprime : Prime 𝔭 :=
+    Ideal.prime_of_isPrime
+      (Ring.ne_bot_of_isMaximal_of_not_isField h𝔭 (RingOfIntegers.not_isField F)) h𝔭.isPrime
   have hfin {x : 𝓞 F} (hx : x ≠ 0) : FiniteMultiplicity 𝔭 (Ideal.span {x}) :=
     FiniteMultiplicity.of_prime_left hprime (by simpa using hx)
   have hv {x : 𝓞 F} (hx : x ≠ 0) : vF 𝔭 x = multiplicity 𝔭 (Ideal.span {x}) := by
     have hset : {n : ℕ | x ∈ 𝔭 ^ n} = Set.Iic (multiplicity 𝔭 (Ideal.span {x})) := by
       ext n
       simp only [Set.mem_ofPred_eq, Set.mem_Iic]
-      rw [← (hfin hx).pow_dvd_iff_le_multiplicity, Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
+      rw [← (hfin hx).pow_dvd_iff_le_multiplicity, Ideal.dvd_iff_le,
+        Ideal.span_singleton_le_iff_mem]
     rw [vF, hset, csSup_Iic]
   have hdd' := mul_ne_zero hd hd'
   have hval : vF 𝔭 (d * d') = vF 𝔭 d + vF 𝔭 d' := by
     rw [hv hdd', hv hd, hv hd', ← Ideal.span_singleton_mul_span_singleton]
-    exact multiplicity_mul hprime (by simpa only [Ideal.span_singleton_mul_span_singleton] using hfin hdd')
-  have hmk (w : 𝓞 K ⧸ extP K 𝔭 ^ k) :
-      mk (ι d) * w * mk (ι d') = w * mk (ι (d * d')) := by
+    exact multiplicity_mul hprime
+      (by simpa only [Ideal.span_singleton_mul_span_singleton] using hfin hdd')
+  have hmk (w : 𝓞 K ⧸ extP K 𝔭 ^ k) : mk (ι d) * w * mk (ι d') = w * mk (ι (d * d')) := by
     simp only [map_mul]
     rw [mul_comm (mk (ι d)) w, mul_assoc]
   have hden : jK (ι (d * d')) = jK (ι d) * jK (ι d') := by rw [map_mul, map_mul]
@@ -105,10 +108,11 @@ theorem diagQ_eq : diagQ K 𝔭 k a = (diagonal fun i => ι (a i)).map mk := by
   unfold diagQ
   rw [Matrix.diagonal_map (map_zero _)]
 
-theorem condP_iff_eqP (ha : ∀ i, a i ≠ 0) (hk : ∀ i, vF 𝔭 (a i) ≤ k)
-    (Y : Matrix (Fin m) (Fin m) (𝓞 K)) [Fact (IsFixF K F)] :
-    (∃ P, P * diagQ K 𝔭 k a = diagQ K 𝔭 k a * Y.map mk) ↔
-      ∀ i j, jK (ι (a i) * Y i j) / jK (ι (a j)) ∈ HU.SP K 𝔭 := by
+theorem condP_iff_eqP
+    (ha : ∀ i, a i ≠ 0) (hk : ∀ i, vF 𝔭 (a i) ≤ k) (Y : Matrix (Fin m) (Fin m) (𝓞 K))
+    [Fact (IsFixF K F)]
+    : (∃ P, P * diagQ K 𝔭 k a = diagQ K 𝔭 k a * Y.map mk)
+      ↔ ∀ i j, jK (ι (a i) * Y i j) / jK (ι (a j)) ∈ HU.SP K 𝔭 := by
   unfold diagQ
   constructor
   · rintro ⟨P, hP⟩ i j
@@ -123,22 +127,24 @@ theorem condP_iff_eqP (ha : ∀ i, a i ≠ 0) (hk : ∀ i, vF 𝔭 (a i) ≤ k)
     simp only [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.map_apply, Matrix.of_apply]
     rw [← hP i j, map_mul]
 
-theorem form_eq_map (Y : Matrix (Fin m) (Fin m) (𝓞 K)) [Fact (IsFixF K F)] :
-    (Y.map mk)ᴴ * diagQ K 𝔭 k a * Y.map mk - diagQ K 𝔭 k a = (gramO a Y).map mk := by
-  have hs : Function.Semiconj (Ideal.Quotient.mk (extP K 𝔭 ^ k)) star star :=
-    fun x => (idealPowerSpanBounds.star_mk 𝔭 k x).symm
-  have e : ∀ M : Matrix (Fin m) (Fin m) (𝓞 K),
-      M.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) = (Ideal.Quotient.mk (extP K 𝔭 ^ k)).mapMatrix M :=
+theorem form_eq_map (Y : Matrix (Fin m) (Fin m) (𝓞 K)) [Fact (IsFixF K F)]
+    : (Y.map mk)ᴴ * diagQ K 𝔭 k a * Y.map mk - diagQ K 𝔭 k a = (gramO a Y).map mk := by
+  have hs : Function.Semiconj (Ideal.Quotient.mk (extP K 𝔭 ^ k)) star star := fun x =>
+    (idealPowerSpanBounds.star_mk 𝔭 k x).symm
+  have e
+      : ∀ M : Matrix (Fin m) (Fin m) (𝓞 K),
+        M.map (Ideal.Quotient.mk (extP K 𝔭 ^ k)) = (Ideal.Quotient.mk (extP K 𝔭 ^ k)).mapMatrix M :=
     fun _ => rfl
   rw [e (gramO a Y)]
   unfold gramO
   rw [map_sub, map_mul, map_mul, ← e, ← e, ← e, diagQ_eq, Matrix.conjTranspose_map _ hs]
 
-theorem condW_iff (ha : ∀ i, a i ≠ 0) (hk : ∀ i j, vF 𝔭 (a i) + vF 𝔭 (a j) ≤ k)
-    (Y : Matrix (Fin m) (Fin m) (𝓞 K)) [Fact (IsFixF K F)] :
-    (∃ W, (Y.map mk)ᴴ * diagQ K 𝔭 k a * Y.map mk - diagQ K 𝔭 k a =
-        diagQ K 𝔭 k a * W * diagQ K 𝔭 k a) ↔
-      ∀ i j, jK (gramO a Y i j) / (jK (ι (a i)) * jK (ι (a j))) ∈ HU.SP K 𝔭 := by
+theorem condW_iff
+    (ha : ∀ i, a i ≠ 0) (hk : ∀ i j, vF 𝔭 (a i) + vF 𝔭 (a j) ≤ k) (Y : Matrix (Fin m) (Fin m) (𝓞 K))
+    [Fact (IsFixF K F)]
+    : (∃ W,
+        (Y.map mk)ᴴ * diagQ K 𝔭 k a * Y.map mk - diagQ K 𝔭 k a = diagQ K 𝔭 k a * W * diagQ K 𝔭 k a)
+      ↔ ∀ i j, jK (gramO a Y i j) / (jK (ι (a i)) * jK (ι (a j))) ∈ HU.SP K 𝔭 := by
   rw [form_eq_map Y]
   unfold diagQ
   constructor
@@ -153,10 +159,11 @@ theorem condW_iff (ha : ∀ i, a i ≠ 0) (hk : ∀ i j, vF 𝔭 (a i) + vF 𝔭
     simp only [Matrix.map_apply, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.of_apply]
     exact hW i j
 
-theorem condZ_iff (ha : ∀ i, a i ≠ 0) (hk : ∀ i, vF 𝔭 (a i) ≤ k)
-    (Y Y' : Matrix (Fin m) (Fin m) (𝓞 K)) [Fact (IsFixF K F)] :
-    (∃ Z, Y.map mk - Y'.map mk = Z * diagQ K 𝔭 k a) ↔
-      ∀ i j, jK (Y i j - Y' i j) / jK (ι (a j)) ∈ HU.SP K 𝔭 := by
+theorem condZ_iff
+    (ha : ∀ i, a i ≠ 0) (hk : ∀ i, vF 𝔭 (a i) ≤ k) (Y Y' : Matrix (Fin m) (Fin m) (𝓞 K))
+    [Fact (IsFixF K F)]
+    : (∃ Z, Y.map mk - Y'.map mk = Z * diagQ K 𝔭 k a)
+      ↔ ∀ i j, jK (Y i j - Y' i j) / jK (ι (a j)) ∈ HU.SP K 𝔭 := by
   unfold diagQ
   constructor
   · rintro ⟨Z, hZ⟩ i j

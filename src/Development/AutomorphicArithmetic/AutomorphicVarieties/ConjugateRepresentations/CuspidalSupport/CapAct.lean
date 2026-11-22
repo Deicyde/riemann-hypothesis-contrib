@@ -6,14 +6,15 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CommuteR
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.LFun Formalism.UG Formalism.UG.P Formalism.L2.Host UpperTheory.V.Cj.S
-open GroundTheory.Automorphic.AutomorphicForm (UPos unipGL constantTerm archCompact infEmb isExpLieAlgebra)
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.LFun Formalism.UG
+  Formalism.UG.P Formalism.L2.Host UpperTheory.V.Cj.S
+open GroundTheory.Automorphic.AutomorphicForm
+  (UPos unipGL constantTerm archCompact infEmb isExpLieAlgebra)
 open UpperTheory.V.Af.Fin (emb e1 e2 blk Bdd)
 open GlobalTheory.PRep (fixed)
 open scoped TensorProduct
 
-theorem UpperTheory.V.Cj.S.capAct :
-    UpperTheory.V.Cj.S.CapAct := by
+theorem UpperTheory.V.Cj.S.capAct : UpperTheory.V.Cj.S.CapAct := by
   intro E _ _ _ a t u
   have h0 : ∀ w : Cm.UC E a, Commute (cap (a := a) t u) (Cm.uC E a w) := fun w => by
     rw [← Cm.uC_capC]

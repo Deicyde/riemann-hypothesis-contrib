@@ -7,8 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem exists_prime_power_pow_eq_one {l : ℕ} [Fact l.Prime] {D : Type} [CommRing D] [IsDomain D] [IsLocalRing D]
-    [CharP D l] {x : D} (hx : x - 1 ∈ maximalIdeal D) {h : ℕ} (hh : h ≠ 0) (hp : x ^ h = 1) : x = 1 := by
+private theorem exists_prime_power_pow_eq_one
+    {l : ℕ} [Fact l.Prime]
+    {D : Type} [CommRing D] [IsDomain D] [IsLocalRing D] [CharP D l]
+    {x : D} (hx : x - 1 ∈ maximalIdeal D)
+    {h : ℕ} (hh : h ≠ 0) (hp : x ^ h = 1)
+    : x = 1 := by
   have hl : l.Prime := Fact.out
   obtain ⟨a, m, hm, rfl⟩ := Nat.exists_eq_pow_mul_and_not_dvd hh l hl.ne_one
   have h1 : (x ^ m - 1) ^ l ^ a = 0 := by
@@ -23,15 +27,25 @@ private theorem exists_prime_power_pow_eq_one {l : ℕ} [Fact l.Prime] {D : Type
       rwa [map_sub, map_one, sub_eq_zero] at this
     have h4 := congrArg (residue D) h2
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_pow, h3, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one,
-      map_zero] at h4
+      simp only [map_sum, map_pow, h3, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul,
+          mul_one, map_zero]
+        at h4
     have h5 : (l : ResidueField D) = 0 := by
       rw [← map_natCast (residue D), CharP.cast_eq_zero, map_zero]
     haveI : CharP (ResidueField D) l := (CharP.charP_iff_prime_eq_zero hl).2 h5
     exact hm ((CharP.cast_eq_zero_iff _ l m).1 h4)
 
-theorem UpperTheory.V.Fr.frobenius_corner_middle_trivial :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ}, F.Ok C₀ → ∀ (D : Type) [CommRing D] [IsDomain D] [Algebra O D] [IsCO O D], (∀ c ∈ maximalIdeal O, algebraMap O D c = 0) → ∀ χ : F.G0 →* D, AdicCont (maximalIdeal D) χ → (∀ g, χ g - 1 ∈ maximalIdeal D) → (∀ g, χ (F.star g) = χ g) → (∀ v g, g ∈ F.Iv v → F.Ψ (F.loc v g) = 1 → χ (F.loc0 v g) = 1) → ∀ g, χ g = 1 := by
+theorem UpperTheory.V.Fr.frobenius_corner_middle_trivial
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ},
+      F.Ok C₀
+        → ∀ (D : Type) [CommRing D] [IsDomain D] [Algebra O D] [IsCO O D],
+          (∀ c ∈ maximalIdeal O, algebraMap O D c = 0)
+            → ∀ χ : F.G0 →* D,
+              AdicCont (maximalIdeal D) χ → (∀ g, χ g - 1 ∈ maximalIdeal D)
+                → (∀ g, χ (F.star g) = χ g)
+                → (∀ v g, g ∈ F.Iv v → F.Ψ (F.loc v g) = 1 → χ (F.loc0 v g) = 1)
+                → ∀ g, χ g = 1 := by
   intro l _ O _ _ _ _ F C₀ hF D _ _ _ _ hO χ hc h1 hs hI g
   have hl : l.Prime := Fact.out
   have hlO : (l : O) ∈ maximalIdeal O := by

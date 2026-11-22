@@ -13,7 +13,6 @@ variable (C : Type) [CommRing C]
 
 abbrev P := ∀ p : PrimeSpectrum C, C ⧸ p.asIdeal
 
-
 open Classical in
 def e (c : C) : P C := fun p => if c ∈ p.asIdeal then 1 else 0
 
@@ -23,49 +22,66 @@ variable {C}
 
 def Ei (c : C) : D C := ⟨e C c, Algebra.subset_adjoin ⟨c, rfl⟩⟩
 
-theorem coord_alg (c : C) (p : PrimeSpectrum C) :
-    ((algebraMap C (D C) c : D C) : P C) p = Ideal.Quotient.mk p.asIdeal c := rfl
+theorem coord_alg (c : C) (p : PrimeSpectrum C)
+    : ((algebraMap C (D C) c : D C) : P C) p = Ideal.Quotient.mk p.asIdeal c :=
+  rfl
 
 theorem E_mul_one_sub (c : C) : Ei c * (1 - Ei c) = 0 := by
-  apply Subtype.ext; funext p
+  apply Subtype.ext
+  funext p
   show e C c p * (1 - e C c p) = 0
-  unfold e; split_ifs <;> simp
+  unfold e
+  split_ifs <;> simp
 
 theorem E_mul_alg (c : C) : Ei c * algebraMap C (D C) c = 0 := by
-  apply Subtype.ext; funext p
+  apply Subtype.ext
+  funext p
   show e C c p * Ideal.Quotient.mk p.asIdeal c = 0
-  unfold e; split_ifs with h
+  unfold e
+  split_ifs with h
   · rw [Ideal.Quotient.eq_zero_iff_mem.2 h, mul_zero]
   · simp
 
 theorem one_sub_E_mul (a b : C) : 1 - Ei (a * b) = (1 - Ei a) * (1 - Ei b) := by
-  apply Subtype.ext; funext p
+  apply Subtype.ext
+  funext p
   show 1 - e C (a * b) p = (1 - e C a p) * (1 - e C b p)
   unfold e
   have := p.isPrime.mul_mem_iff_mem_or_mem (x := a) (y := b)
   split_ifs <;> simp_all
 
 theorem ann_alg (t : D C) (c : C) (h : t * algebraMap C (D C) c = 0) : t * (1 - Ei c) = 0 := by
-  apply Subtype.ext; funext p
+  apply Subtype.ext
+  funext p
   have hp := congrArg (fun x : D C => (x : P C) p) h
   simp only [Subalgebra.coe_mul, Pi.mul_apply, ZeroMemClass.coe_zero, Pi.zero_apply] at hp
   show (t : P C) p * (1 - e C c p) = 0
-  unfold e; split_ifs with hc
+  unfold e
+  split_ifs with hc
   · simp
   · rw [coord_alg] at hp
-    have hne : Ideal.Quotient.mk p.asIdeal c ≠ 0 := fun h0 => hc (Ideal.Quotient.eq_zero_iff_mem.1 h0)
+    have hne : Ideal.Quotient.mk p.asIdeal c ≠ 0 := fun h0 =>
+      hc (Ideal.Quotient.eq_zero_iff_mem.1 h0)
     rw [mul_eq_zero] at hp
     simp [hp.resolve_right hne]
 
 theorem integral : Algebra.IsIntegral C (D C) := by
   apply Algebra.IsIntegral.adjoin
   rintro _ ⟨c, rfl⟩
-  refine ⟨Polynomial.X * (Polynomial.X - Polynomial.C 1), Polynomial.monic_X.mul (Polynomial.monic_X_sub_C 1), ?_⟩
-  simp only [Polynomial.eval₂_mul, Polynomial.eval₂_sub, Polynomial.eval₂_X, Polynomial.eval₂_C, map_one]
-  funext p; simp only [Pi.mul_apply, Pi.sub_apply, Pi.one_apply, Pi.zero_apply]; unfold e; split_ifs <;> simp
+  refine ⟨
+    Polynomial.X * (Polynomial.X - Polynomial.C 1),
+    Polynomial.monic_X.mul (Polynomial.monic_X_sub_C 1),
+    ?_
+  ⟩
+  simp only [Polynomial.eval₂_mul, Polynomial.eval₂_sub, Polynomial.eval₂_X, Polynomial.eval₂_C,
+    map_one]
+  funext p
+  simp only [Pi.mul_apply, Pi.sub_apply, Pi.one_apply, Pi.zero_apply]
+  unfold e
+  split_ifs <;> simp
 
-theorem approx (r : Ideal (D C)) [r.IsPrime] (s : D C) :
-    ∃ ε : D C, ε ∉ r ∧ ∃ c : C, ε * s = ε * algebraMap C (D C) c := by
+theorem approx (r : Ideal (D C)) [r.IsPrime] (s : D C)
+    : ∃ ε : D C, ε ∉ r ∧ ∃ c : C, ε * s = ε * algebraMap C (D C) c := by
   obtain ⟨x, hx⟩ := s
   induction hx using Algebra.adjoin_induction with
   | mem x hx =>
@@ -76,10 +92,18 @@ theorem approx (r : Ideal (D C)) [r.IsPrime] (s : D C) :
       · rw [map_zero, mul_zero, mul_comm]; exact E_mul_one_sub c
     · refine ⟨Ei c, hc, 1, ?_⟩
       rw [map_one, mul_one]
-      apply Subtype.ext; funext p
+      apply Subtype.ext
+      funext p
       show e C c p * e C c p = e C c p
-      unfold e; split_ifs <;> simp
-  | algebraMap c => exact ⟨1, fun h => (Ideal.IsPrime.ne_top inferInstance) (r.eq_top_of_isUnit_mem h isUnit_one), c, rfl⟩
+      unfold e
+      split_ifs <;> simp
+  | algebraMap c =>
+    exact ⟨
+      1,
+      fun h => (Ideal.IsPrime.ne_top inferInstance) (r.eq_top_of_isUnit_mem h isUnit_one),
+      c,
+      rfl
+    ⟩
   | add x y hx hy ihx ihy =>
     obtain ⟨ε1, h1, c1, e1⟩ := ihx
     obtain ⟨ε2, h2, c2, e2⟩ := ihy
@@ -102,15 +126,19 @@ local notation "L" => Localization.AtPrime r
 theorem unit_of (x : D C) (hx : x ∉ r) : IsUnit (algebraMap (D C) L x) :=
   IsLocalization.map_units L (⟨x, hx⟩ : r.primeCompl)
 
-theorem eq_of_approx (s : D C) : ∃ c : C, algebraMap (D C) L s = algebraMap (D C) L (algebraMap C (D C) c) := by
+theorem eq_of_approx (s : D C)
+    : ∃ c : C, algebraMap (D C) L s = algebraMap (D C) L (algebraMap C (D C) c) := by
   obtain ⟨ε, hε, c, h⟩ := approx r s
   refine ⟨c, ?_⟩
   have h' := congrArg (algebraMap (D C) L) h
   rw [map_mul, map_mul] at h'
   exact (unit_of r ε hε).mul_left_cancel h'
 
-theorem frac (z : L) : ∃ a b : C, IsUnit (algebraMap (D C) L (algebraMap C (D C) b)) ∧
-    z * algebraMap (D C) L (algebraMap C (D C) b) = algebraMap (D C) L (algebraMap C (D C) a) := by
+theorem frac (z : L)
+    : ∃ a b : C,
+      IsUnit (algebraMap (D C) L (algebraMap C (D C) b))
+        ∧ z * algebraMap (D C) L (algebraMap C (D C) b)
+          = algebraMap (D C) L (algebraMap C (D C) a) := by
   obtain ⟨⟨x, t⟩, rfl⟩ := IsLocalization.mk'_surjective r.primeCompl z
   obtain ⟨a, ha⟩ := eq_of_approx r x
   obtain ⟨b, hb⟩ := eq_of_approx r (t : D C)
@@ -124,8 +152,11 @@ theorem zero_of_E (a : C) (h : Ei a ∉ r) : algebraMap (D C) L (algebraMap C (D
   exact (unit_of r _ h).mul_right_eq_zero.1 h'
 
 theorem domain : IsDomain L := by
-  have key : ∀ a b : C, algebraMap (D C) L (algebraMap C (D C) (a * b)) = 0 →
-      algebraMap (D C) L (algebraMap C (D C) a) = 0 ∨ algebraMap (D C) L (algebraMap C (D C) b) = 0 := by
+  have key
+      : ∀ a b : C,
+        algebraMap (D C) L (algebraMap C (D C) (a * b)) = 0
+          → algebraMap (D C) L (algebraMap C (D C) a) = 0
+            ∨ algebraMap (D C) L (algebraMap C (D C) b) = 0 := by
     intro a b h
     obtain ⟨⟨t, ht⟩, h0⟩ := (IsLocalization.map_eq_zero_iff r.primeCompl L _).1 h
     have h1 := ann_alg t (a * b) h0
@@ -152,9 +183,10 @@ theorem domain : IsDomain L := by
 
 end Loc
 
-theorem spS (q : Ideal C) (hq : q.IsPrime) : ∃ Q : Ideal (D C), Q.IsPrime ∧ Q.comap (algebraMap C (D C)) = q := by
-  let φ : D C →+* C ⧸ q := (Pi.evalRingHom (fun p : PrimeSpectrum C => C ⧸ p.asIdeal) ⟨q, hq⟩).comp
-    (D C).val.toRingHom
+theorem spS (q : Ideal C) (hq : q.IsPrime)
+    : ∃ Q : Ideal (D C), Q.IsPrime ∧ Q.comap (algebraMap C (D C)) = q := by
+  let φ : D C →+* C ⧸ q :=
+    (Pi.evalRingHom (fun p : PrimeSpectrum C => C ⧸ p.asIdeal) ⟨q, hq⟩).comp (D C).val.toRingHom
   haveI := hq
   refine ⟨RingHom.ker φ, RingHom.ker_isPrime φ, ?_⟩
   rw [RingHom.comap_ker]

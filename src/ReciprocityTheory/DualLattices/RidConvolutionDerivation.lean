@@ -197,14 +197,15 @@ lemma aeval_eq_zero_of_mem_span (x : Fin d → A) (hxp : ∀ j, x j ^ p = 0)
     simp [RingHom.mem_ker, hxp j]
   exact hle hP
 
-theorem coeff_eq_zero_of_stable (ε : A →ₐ[R] R) (x : Fin d → A) (hx : ∀ i, ε (x i) = 0)
+theorem coeff_eq_zero_of_stable
+    (ε : A →ₐ[R] R) (x : Fin d → A) (hx : ∀ i, ε (x i) = 0)
     (D : Fin d → A →ₗ[R] A) (hD : ∀ i f g, D i (f * g) = f * D i g + g * D i f)
     (hDx : ∀ i j, ε (D i (x j)) = if i = j then 1 else 0)
-    (hsurj : Function.Surjective (aeval (R := R) x))
-    (hp0 : (p : R) = 0) (hunit : ∀ n, 0 < n → n < p → IsUnit (n : R))
+    (hsurj : Function.Surjective (aeval (R := R) x)) (hp0 : (p : R) = 0)
+    (hunit : ∀ n, 0 < n → n < p → IsUnit (n : R))
     (K : Set A) (hK : ∀ a ∈ K, ε a = 0) (hKD : ∀ i, ∀ a ∈ K, D i a ∈ K)
-    (P : MvPolynomial (Fin d) R) (hP : aeval x P ∈ K) :
-    ∀ β : Fin d →₀ ℕ, (∀ j, β j < p) → AddMonoidAlgebra.coeff P β = 0 := by
+    (P : MvPolynomial (Fin d) R) (hP : aeval x P ∈ K)
+    : ∀ β : Fin d →₀ ℕ, (∀ j, β j < p) → AddMonoidAlgebra.coeff P β = 0 := by
   classical
   have hε : ∀ Q : MvPolynomial (Fin d) R, ε (aeval x Q) = constantCoeff Q := by
     intro Q
@@ -212,8 +213,10 @@ theorem coeff_eq_zero_of_stable (ε : A →ₐ[R] R) (x : Fin d → A) (hx : ∀
       rw [comp_aeval]; congr 1; funext i; exact hx i
     rw [← AlgHom.comp_apply, e, aeval_zero']
     rfl
-  have Z : ∀ m, ∀ Q : MvPolynomial (Fin d) R, aeval x Q ∈ K → LowRed p m Q →
-      ∀ α : Fin d →₀ ℕ, (∀ j, α j < p) → α.degree = m → AddMonoidAlgebra.coeff Q α = 0 := by
+  have Z
+      : ∀ m, ∀ Q : MvPolynomial (Fin d) R,
+        aeval x Q ∈ K → LowRed p m Q
+          → ∀ α : Fin d →₀ ℕ, (∀ j, α j < p) → α.degree = m → AddMonoidAlgebra.coeff Q α = 0 := by
     intro m
     induction m with
     | zero =>
@@ -238,8 +241,7 @@ theorem coeff_eq_zero_of_stable (ε : A →ₐ[R] R) (x : Fin d → A) (hx : ∀
         · subst hj; omega
         · omega
       choose T hT using fun j => hsurj (D i (x j))
-      have hTc : ∀ j, constantCoeff (T j) = if i = j then 1 else 0 := fun j => by
-        rw [← hε, hT, hDx]
+      have hTc : ∀ j, constantCoeff (T j) = if i = j then 1 else 0 := fun j => by rw [← hε, hT, hDx]
       set Q' : MvPolynomial (Fin d) R := ∑ j, pderiv j Q * T j with hQ'def
       have hQ' : aeval x Q' ∈ K := by
         have e : aeval x Q' = D i (aeval x Q) := by
@@ -247,21 +249,25 @@ theorem coeff_eq_zero_of_stable (ε : A →ₐ[R] R) (x : Fin d → A) (hx : ∀
             rw [map_aeval_of_leibniz (D i) (hD i), hQ'def, map_sum]
           refine Finset.sum_congr rfl fun j _ => ?_
           rw [map_mul, hT]
-        rw [e]; exact hKD i _ hQ
-      have hsplit : ∀ j (γ : Fin d →₀ ℕ), γ.degree ≤ m → (∀ l, γ l < p) →
-          AddMonoidAlgebra.coeff (pderiv j Q * T j) γ = AddMonoidAlgebra.coeff (pderiv j Q) γ * (if i = j then 1 else 0) := by
+        rw [e]
+        exact hKD i _ hQ
+      have hsplit
+          : ∀ j (γ : Fin d →₀ ℕ),
+            γ.degree ≤ m → (∀ l, γ l < p)
+              → AddMonoidAlgebra.coeff (pderiv j Q * T j) γ
+                = AddMonoidAlgebra.coeff (pderiv j Q) γ * (if i = j then 1 else 0) := by
         intro j γ hγd hγ
         have e : T j = C (constantCoeff (T j)) + (T j - C (constantCoeff (T j))) := by ring
         rw [e, mul_add, MvPolynomial.coeff_add, mul_comm (pderiv j Q) (C _), coeff_C_mul,
-          lowRed_mul (G := T j - C (constantCoeff (T j))) (lowRed_pderiv hp0 hlow j) (by simp) γ hγ hγd,
+          lowRed_mul (G := T j - C (constantCoeff (T j))) (lowRed_pderiv hp0 hlow j) (by simp) γ hγ
+            hγd,
           add_zero, hTc, mul_comm]
       have hlow' : LowRed p m Q' := by
         intro γ hγ hγd
         rw [hQ'def, coeff_sum]
         refine Finset.sum_eq_zero fun j _ => ?_
         rw [hsplit j γ hγd.le hγ, lowRed_pderiv hp0 hlow j γ hγ hγd, zero_mul]
-      have hβr : ∀ j, β j < p := fun j =>
-        lt_of_le_of_lt (by rw [hβdef]; exact tsub_le_self) (hα j)
+      have hβr : ∀ j, β j < p := fun j => lt_of_le_of_lt (by rw [hβdef]; exact tsub_le_self) (hα j)
       have hβd : β.degree = m := by
         have := congrArg Finsupp.degree hαβ
         rw [map_add (f := _), Finsupp.degree_single] at this

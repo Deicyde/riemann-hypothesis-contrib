@@ -8,14 +8,14 @@ namespace GlobalTheory
 
 theorem stable_complement_of_kernel_exists
     (V W H : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    [NormedAddCommGroup H] [InnerProductSpace ℂ H] (ι : V →ₗ[ℂ] H)
-    (hι : Function.Injective ι) (pr : V →ₗ[ℂ] W) (H0 : Submodule ℂ V)
-    (hfin : FiniteDimensional ℂ H0) (A : Set (Module.End ℂ V))
-    (h1 : ∀ a ∈ A, ∀ v ∈ H0, a v ∈ H0)
-    (h2 : ∀ a ∈ A, ∀ v ∈ H0, pr v = 0 → pr (a v) = 0)
-    (h3 : ∀ a ∈ A, ∃ b ∈ A, ∀ u v, inner ℂ (ι (a u)) (ι v) = inner ℂ (ι u) (ι (b v))) :
-    ∀ h ∈ H0, ∃ c ∈ H0, pr c = pr h ∧
-      ∀ a ∈ A, ∀ z : ℂ, pr (a c) = z • pr c → a c = z • c := by
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (ι : V →ₗ[ℂ] H) (hι : Function.Injective ι)
+    (pr : V →ₗ[ℂ] W)
+    (H0 : Submodule ℂ V) (hfin : FiniteDimensional ℂ H0)
+    (A : Set (Module.End ℂ V))
+    (h1 : ∀ a ∈ A, ∀ v ∈ H0, a v ∈ H0) (h2 : ∀ a ∈ A, ∀ v ∈ H0, pr v = 0 → pr (a v) = 0)
+    (h3 : ∀ a ∈ A, ∃ b ∈ A, ∀ u v, inner ℂ (ι (a u)) (ι v) = inner ℂ (ι u) (ι (b v)))
+    : ∀ h ∈ H0, ∃ c ∈ H0, pr c = pr h ∧ ∀ a ∈ A, ∀ z : ℂ, pr (a c) = z • pr c → a c = z • c := by
   intro h hh
   set K : Submodule ℂ V := H0 ⊓ LinearMap.ker pr with hK
   haveI : FiniteDimensional ℂ K := Submodule.finiteDimensional_of_le inf_le_left

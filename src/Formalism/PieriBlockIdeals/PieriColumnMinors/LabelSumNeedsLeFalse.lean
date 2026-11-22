@@ -258,13 +258,17 @@ theorem labelSumLe_holds : LabelSum := by
   have hlpos : 0 < l := hl.pos
   have hhZ : (h : ℤ) < (l : ℤ) ^ 2 := by exact_mod_cast hh
   have hk : (0 : ℝ) ≤ k := Nat.cast_nonneg _
-  have hA := label_sum_le_filter hl (Finset.Icc xm xp) mB (fun _ => (k : ℝ))
-    (fun _ _ => hk) (fun x hx => by
-      rw [Finset.mem_Icc] at hx
-      exact ⟨by omega, by linarith [hx.2]⟩)
+  have hA :=
+    label_sum_le_filter hl (Finset.Icc xm xp) mB
+      (fun _ => (k : ℝ))
+      (fun _ _ => hk)
+      (fun x hx => by
+        rw [Finset.mem_Icc] at hx
+        exact ⟨by omega, by linarith [hx.2]⟩)
   rw [Finset.sum_const, nsmul_eq_mul] at hA
-  have hB : ((((Finset.Icc xm xp).filter (fun x => (l : ℤ) ∣ x - mB)).card : ℕ) : ℝ) ≤
-      ((xp - xm : ℤ) : ℝ) / l + IlInd l xm xp mB := by
+  have hB
+      : ((((Finset.Icc xm xp).filter (fun x => (l : ℤ) ∣ x - mB)).card : ℕ) : ℝ)
+        ≤ ((xp - xm : ℤ) : ℝ) / l + IlInd l xm xp mB := by
     unfold IlInd
     split_ifs with hex
     · exact label_card_le hlpos xm xp mB hxx

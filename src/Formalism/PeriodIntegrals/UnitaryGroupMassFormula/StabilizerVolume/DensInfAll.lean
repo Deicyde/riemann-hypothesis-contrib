@@ -37,8 +37,9 @@ theorem tensR_holds : TensR := by
         rw [mul_one_div_cancel this, map_one]
       ext i j
       simp only [Matrix.smul_apply, smul_eq_mul, nsmul_eq_mul, ← mul_assoc, hc1, one_mul]
-  obtain ⟨m, eH, hH⟩ := exists_coord_sub (X := Matrix (Fin a) (Fin a) (Ainf F ⊗[F] E)) eM hM
-    (HermR (Ainf F) σ a) (isClosed_HermR (Ainf F) σ a) hdiv
+  obtain ⟨m, eH, hH⟩ :=
+    exists_coord_sub (X := Matrix (Fin a) (Fin a) (Ainf F ⊗[F] E)) eM hM (HermR (Ainf F) σ a)
+      (isClosed_HermR (Ainf F) σ a) hdiv
   exact ⟨n, m, eV, eH, hV, hH⟩
 
 theorem densInf_holds : DensInf := densInf_of_tensR tensR_holds

@@ -11,8 +11,9 @@ namespace Formalism.MainNotions.CrystallineLiftingInputs.OL
 
 open Formalism.BasicNotions Formalism.BasicNotions.Loc IsLocalRing
 
-theorem complete_of_pow {R : Type*} [CommRing R] (J : Ideal R) {n : ℕ} (hn : 0 < n)
-    (h : IsAdicComplete (J ^ n) R) : IsAdicComplete J R := by
+theorem complete_of_pow
+    {R : Type*} [CommRing R] (J : Ideal R) {n : ℕ} (hn : 0 < n) (h : IsAdicComplete (J ^ n) R)
+    : IsAdicComplete J R := by
   let : WithIdeal R := ⟨J⟩
   have hJ : IsAdic J := rfl
   have hJn : IsAdic (J ^ n) := is_ideal_adic_pow hJ hn
@@ -35,9 +36,9 @@ theorem l_not_unit (P : LocPrime l) (LL : FinExt l) : ¬ IsUnit ((l : ℕ) : ↥
   rw [pow_one, h0] at h1
   exact absurd h1 (by simp)
 
-theorem l_mem_max (P : LocPrime l) (LL : FinExt l) :
-    letI := Formalism.MainNotions.LiftingTheory.lkd_local P LL
-    ((l : ℕ) : ↥(OL LL)) ∈ maximalIdeal ↥(OL LL) := by
+theorem l_mem_max (P : LocPrime l) (LL : FinExt l)
+    : letI := Formalism.MainNotions.LiftingTheory.lkd_local P LL
+      ((l : ℕ) : ↥(OL LL)) ∈ maximalIdeal ↥(OL LL) := by
   let := Formalism.MainNotions.LiftingTheory.lkd_local P LL
   exact (mem_maximalIdeal _).2 (mem_nonunits_iff.2 (l_not_unit P LL))
 
@@ -52,9 +53,9 @@ theorem OL_dvr (P : LocPrime l) (LL : FinExt l) : IsDiscreteValuationRing ↥(OL
     exact l_ne_zero LL hm
   exact ((IsDiscreteValuationRing.TFAE _ hnf).out 1 3).mpr hded
 
-theorem OL_complete_max (P : LocPrime l) (LL : FinExt l) :
-    letI := Formalism.MainNotions.LiftingTheory.lkd_local P LL
-    IsAdicComplete (maximalIdeal ↥(OL LL)) ↥(OL LL) := by
+theorem OL_complete_max (P : LocPrime l) (LL : FinExt l)
+    : letI := Formalism.MainNotions.LiftingTheory.lkd_local P LL
+      IsAdicComplete (maximalIdeal ↥(OL LL)) ↥(OL LL) := by
   letI := Formalism.MainNotions.LiftingTheory.lkd_local P LL
   have := OL_dvr P LL
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible ↥(OL LL)

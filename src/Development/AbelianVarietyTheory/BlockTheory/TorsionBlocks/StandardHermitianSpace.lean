@@ -8,7 +8,8 @@ public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice NumberField Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice
+  NumberField Formalism.IndefR.Links
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.StandardHermitianSpace
 
@@ -19,8 +20,8 @@ def intVecs (D : D7) (n : ℕ) : Set (Fin n → D.host.E) :=
 
 variable {D : D7}
 
-theorem baseLat_eq {T : Type} {L : LevCh D T} {μ0 : T} (hL : L.Is μ0) (i : Fin D.R.m) :
-    (L.ΛV i : Set (Fin (Vc D i).rank → D.host.E)) = L0c D (Vc D i) := by
+theorem baseLat_eq {T : Type} {L : LevCh D T} {μ0 : T} (hL : L.Is μ0) (i : Fin D.R.m)
+    : (L.ΛV i : Set (Fin (Vc D i).rank → D.host.E)) = L0c D (Vc D i) := by
   obtain ⟨c, hc⟩ := hL.βV i
   unfold Formalism.IndefR.Lev.IsBaseFrame at hc
   obtain ⟨-, -, -, h1, h2⟩ := hc

@@ -13,9 +13,9 @@ namespace GlobalTheory.IndefiniteRowSideFullHecke.FlagVolumeFiltration
 open GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.LatPair
 
 section Objects
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {n n' : Type} {c : ℕ}
-
 
 variable (k n) in
 def flagSub (c i : ℕ) : Submodule 𝒪[k] (n ⊕ Fin c → k) where
@@ -43,34 +43,42 @@ variable [MeasurableSpace k] [BorelSpace k]
 end Objects
 
 section Statements
-variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  (n n' : Type) [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n'] (c : ℕ) (q : Unif k)
+variable
+  (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  (n n' : Type) [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n']
+  (c : ℕ) (q : Unif k)
 
 def DatumTranslate : Prop :=
   ∀ (μ : kˣ →* ℂˣ) (P : Pair k n') (L'₀ : Submodule 𝒪[k] (n' ⊕ Fin (c + 1) → k)) [L'₀.IsLattice k]
-    (L₀ L : Submodule 𝒪[k] (n ⊕ Fin c → k)) [L₀.IsLattice k] (h' : GL (n' ⊕ Fin (c + 1)) k) (h : GL (n ⊕ Fin c) k),
-    h' • L'₀ = GlobalTheory.LatPair.gluedS q (c + 1) P.ker P.vec → h • L₀ = L → ∀ x,
-      GlobalTheory.LatPair.latInd (GlobalTheory.LatPair.gluedS q (c + 1) P.ker P.vec) L x =
-        (((μ (GeneralLinearGroup.det h'))⁻¹ : ℂˣ) : ℂ) * (μ (GeneralLinearGroup.det h) : ℂ) *
-          ((nabs k (GeneralLinearGroup.det h') ^ (-((Fintype.card n : ℝ) + c) / 2) : ℝ) : ℂ) *
-          ((nabs k (GeneralLinearGroup.det h) ^ (((Fintype.card n' : ℝ) + c + 1) / 2) : ℝ) : ℂ) *
-          om μ h' h (GlobalTheory.LatPair.latInd L'₀ L₀) x
+      (L₀ L : Submodule 𝒪[k] (n ⊕ Fin c → k)) [L₀.IsLattice k] (h' : GL (n' ⊕ Fin (c + 1)) k)
+      (h : GL (n ⊕ Fin c) k),
+    h' • L'₀ = GlobalTheory.LatPair.gluedS q (c + 1) P.ker P.vec → h • L₀ = L
+      → ∀ x,
+        GlobalTheory.LatPair.latInd (GlobalTheory.LatPair.gluedS q (c + 1) P.ker P.vec) L x
+          = (((μ (GeneralLinearGroup.det h'))⁻¹ : ℂˣ) : ℂ) * (μ (GeneralLinearGroup.det h) : ℂ)
+            * ((nabs k (GeneralLinearGroup.det h') ^ (-((Fintype.card n : ℝ) + c) / 2) : ℝ) : ℂ)
+            * ((nabs k (GeneralLinearGroup.det h) ^ (((Fintype.card n' : ℝ) + c + 1) / 2) : ℝ) : ℂ)
+            * om μ h' h (GlobalTheory.LatPair.latInd L'₀ L₀) x
 
 def OneOrbit : Prop :=
-  (∀ (L₁ L₂ : Submodule 𝒪[k] (n → k)) (f₁ f₂ : n → k), IsGlue L₁ f₁ → IsGlue L₂ f₂ →
-    ∃ g : GL n k, g • L₁ = L₂ ∧ g • f₁ - f₂ ∈ L₂) ∧
-  ∀ (L₀ : Submodule 𝒪[k] (n ⊕ Fin c → k)) [L₀.IsLattice k] (Q : Pair k n) (h₀ : GL (n ⊕ Fin c) k),
-    h₀ • L₀ = GlobalTheory.LatPair.gluedS q c Q.ker Q.vec → ∀ h : GL (n ⊕ Fin c) k,
-      (∃ u ∈ N k n c 1, ∃ (L'' : Submodule 𝒪[k] (n → k)) (f'' : n → k), IsGlue L'' f'' ∧
-        h • L₀ = u • GlobalTheory.LatPair.gluedS q c L'' f'') ↔ InCoset L₀ h₀ h
+  (∀ (L₁ L₂ : Submodule 𝒪[k] (n → k)) (f₁ f₂ : n → k),
+      IsGlue L₁ f₁ → IsGlue L₂ f₂ → ∃ g : GL n k, g • L₁ = L₂ ∧ g • f₁ - f₂ ∈ L₂)
+    ∧ ∀ (L₀ : Submodule 𝒪[k] (n ⊕ Fin c → k)) [L₀.IsLattice k] (Q : Pair k n)
+        (h₀ : GL (n ⊕ Fin c) k),
+      h₀ • L₀ = GlobalTheory.LatPair.gluedS q c Q.ker Q.vec
+        → ∀ h : GL (n ⊕ Fin c) k,
+          (∃ u ∈ N k n c 1, ∃ (L'' : Submodule 𝒪[k] (n → k)) (f'' : n → k),
+              IsGlue L'' f'' ∧ h • L₀ = u • GlobalTheory.LatPair.gluedS q c L'' f'')
+            ↔ InCoset L₀ h₀ h
 
 variable [MeasurableSpace k] [BorelSpace k] (ψ : AddChar k Circle) (ν : Measure k)
-
 
 end Statements
 
 section Examples
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : Type} {c : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {n : Type} {c : ℕ}
 
 end Examples
 

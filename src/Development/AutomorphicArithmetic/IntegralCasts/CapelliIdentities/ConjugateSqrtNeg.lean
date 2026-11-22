@@ -4,10 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.ConjugateSqrtNeg.conj_sqrt_neg :
-    ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E]
-    [inst_2 : NumberField.IsCMField E] (d : ℕ) (x : E),
-    (0 : ℕ) < d → x ^ (2 : ℕ) = -(↑d : E) → (NumberField.IsCMField.complexConj E : E → E) x = -x := by
+theorem UpperTheory.Reformulated.B.ConjugateSqrtNeg.conj_sqrt_neg
+    : ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E] [inst_2 : NumberField.IsCMField E]
+        (d : ℕ) (x : E),
+      (0 : ℕ) < d → x ^ (2 : ℕ) = -(↑d : E)
+        → (NumberField.IsCMField.complexConj E : E → E) x = -x := by
   intro E _ _ _ d x hd hx
   obtain ⟨φ⟩ : Nonempty (E →+* ℂ) := inferInstance
   have hsq : (NumberField.IsCMField.complexConj E x) ^ 2 = x ^ 2 := by

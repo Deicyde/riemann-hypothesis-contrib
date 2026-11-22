@@ -17,9 +17,10 @@ universe u v w
 
 def TildeVanish.Statement : Prop :=
   ∀ (S : Type u) [CommRing S] [IsNoetherianRing S] (Ω : Type w) [Field Ω] [Algebra S Ω] (N : ℕ)
-    (x : Fin (N + 1) → Ω) (E : Type v) [AddCommGroup E] [Module Ω E] [Module S E]
-    [IsScalarTower S Ω E] (M : FinGradedSub (S := S) (x := x) E),
-    ∃ c₀ : ℤ, ∀ i : ℕ, 1 ≤ i → ∀ c : ℤ, c₀ ≤ c → Subsingleton ((M.tildeSys c).H i)
+      (x : Fin (N + 1) → Ω) (E : Type v) [AddCommGroup E] [Module Ω E] [Module S E]
+      [IsScalarTower S Ω E] (M : FinGradedSub (S := S) (x := x) E),
+    ∃ c₀ : ℤ, ∀ i : ℕ,
+      1 ≤ i → ∀ c : ℤ, c₀ ≤ c → Subsingleton ((M.tildeSys c).H i)
 
 end
 

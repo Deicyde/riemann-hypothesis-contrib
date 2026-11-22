@@ -7,9 +7,13 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsF
 
 @[expose] public section
 
-open CategoryTheory NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.Pj GlobalTheory.DualWeyl GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.CompHt GlobalTheory.DefPt ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+open CategoryTheory NumberField IsDedekindDomain Module Formalism.BasicNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.Pj GlobalTheory.DualWeyl
+  GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.CompHt GlobalTheory.DefPt
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
 open scoped Matrix Classical
-open AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Semi
+open AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
@@ -18,8 +22,9 @@ namespace GlobalTheory.FixedCx
 
 open Cardinal
 
-theorem mk_le_of_essFiniteType {R S : Type} [CommRing R] [CommRing S] [Algebra R S] [Algebra.EssFiniteType R S] :
-    #S ≤ max #R ℵ₀ := by
+theorem mk_le_of_essFiniteType
+    {R S : Type} [CommRing R] [CommRing S] [Algebra R S] [Algebra.EssFiniteType R S]
+    : #S ≤ max #R ℵ₀ := by
   have h1 : #S ≤ #(Algebra.EssFiniteType.subalgebra R S) :=
     IsLocalization.cardinalMk_le (Algebra.EssFiniteType.submonoid R S)
   have h2 := Algebra.cardinalMk_adjoin_le R ((Algebra.EssFiniteType.finset R S : Finset S) : Set S)
@@ -47,8 +52,11 @@ theorem nonempty_ringHom_complex (K : Type) [Field K] [CharZero K] (h : #K ≤ �
     (by rw [hΩ, Cardinal.mk_complex]; exact Cardinal.aleph0_lt_continuum) (Cardinal.eq.1 hΩ)
   exact ⟨e.toRingHom.comp ((algebraMap (FractionRing (MvPolynomial ℝ K)) (AlgebraicClosure (FractionRing (MvPolynomial ℝ K)))).comp ((algebraMap (MvPolynomial ℝ K) (FractionRing (MvPolynomial ℝ K))).comp MvPolynomial.C))⟩
 
-theorem cancel_spec_field {K L : Type} [Field K] [Field L] (φ : L →+* K) {X : Scheme.{0}} (a b : Sp L ⟶ X)
-    (h : spMap φ ≫ a = spMap φ ≫ b) : a = b := by
+theorem cancel_spec_field
+    {K L : Type} [Field K] [Field L]
+    (φ : L →+* K)
+    {X : Scheme.{0}} (a b : Sp L ⟶ X) (h : spMap φ ≫ a = spMap φ ≫ b)
+    : a = b := by
   obtain ⟨⟨p, α⟩, rfl⟩ := (Scheme.SpecToEquivOfField L X).symm.surjective a
   obtain ⟨⟨q, β⟩, rfl⟩ := (Scheme.SpecToEquivOfField L X).symm.surjective b
   simp only [Scheme.SpecToEquivOfField_symm_apply] at h ⊢
@@ -63,9 +71,12 @@ theorem cancel_spec_field {K L : Type} [Field K] [Field L] (φ : L →+* K) {X :
 
 end GlobalTheory.FixedCx
 
-
 open GlobalTheory.FixedCx Cardinal in
-theorem GlobalTheory.FixedCx.exists_fixed_complex_point : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (k : Type) [Field k] (x : Sp k ⟶ Xo.X) (ρ : Xo.X ⟶ Xo.X), x ≫ ρ = x → ∃ x' : Sp ℂ ⟶ Xo.X, x' ≫ ρ = x' := by
+theorem GlobalTheory.FixedCx.exists_fixed_complex_point
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (k : Type) [Field k] (x : Sp k ⟶ Xo.X) (ρ : Xo.X ⟶ Xo.X),
+      x ≫ ρ = x → ∃ x' : Sp ℂ ⟶ Xo.X, x' ≫ ρ = x' := by
   intro E _ _ _ H Dw l Xo k _ x ρ hx
   obtain ⟨⟨p, φ⟩, rfl⟩ := (Scheme.SpecToEquivOfField k Xo.X).symm.surjective x
   simp only [Scheme.SpecToEquivOfField_symm_apply] at hx

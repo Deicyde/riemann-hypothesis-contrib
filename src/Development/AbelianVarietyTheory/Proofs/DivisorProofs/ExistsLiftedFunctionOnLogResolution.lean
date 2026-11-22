@@ -11,10 +11,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RegularAtIff
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 set_option autoImplicit false
 
@@ -24,8 +26,9 @@ namespace GlobalTheory.PairStep.LiftFn
 
 variable {Y : Scheme.{0}}
 
-theorem eq_of_specializes_of_coheight {v w : Y} (h : v ⤳ w) (hv : Order.coheight v = 1)
-    (hw : Order.coheight w = 1) : v = w := by
+theorem eq_of_specializes_of_coheight
+    {v w : Y} (h : v ⤳ w) (hv : Order.coheight v = 1) (hw : Order.coheight w = 1)
+    : v = w := by
   by_contra hne
   have hlt : w < v := lt_of_le_not_ge h fun e => hne (Specializes.antisymm h e).eq
   have h₃ := Order.coheight_add_one_le hlt
@@ -34,22 +37,38 @@ theorem eq_of_specializes_of_coheight {v w : Y} (h : v ⤳ w) (hv : Order.coheig
 
 variable [IsIntegral Y] [IsLocallyNoetherian Y]
 
-theorem mult_neg (F : CartierDiv Y) (z : Y) : (-F).mult z = -F.mult z := by
+theorem mult_neg (F : CartierDiv Y) (z : Y) : (-F).mult z = - F.mult z := by
   have e := CartierDiv.mult_add F (-F) z
-  rw [add_neg_cancel, (CartierDiv.isEqn_zero (X := Y) z).mult_eq, Units.val_one, (unitAt_one z).ord_eq_zero] at e
+  rw [add_neg_cancel, (CartierDiv.isEqn_zero (X := Y) z).mult_eq, Units.val_one,
+      (unitAt_one z).ord_eq_zero]
+    at e
   omega
 
 end GlobalTheory.PairStep.LiftFn
 
 namespace GlobalTheory.PairStep
 
-
 open LiftFn in
-theorem exists_lifted_fn : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (p : X ⟶ Sp ℂ) (n : ℕ), IsProjOver p → topologicalKrullDim X = n → ∀ (η : RatForms p n) (m : ℕ) (G N : CartierDiv X) (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (s : Y ⟶ X) [IsDominant s] (K : CartierDiv Y) (B : Closeds Y) (F : CartierDiv Y), IsLogRes p n η m G s K B → (∀ U : X.Opens, IsAffineOpen U → Subsingleton (cohOn (twist (GlobalTheory.structureModule Y) (toLB (pullCart s N - F))) (s ⁻¹ᵁ U) 1)) → ∀ (y : X) (σ : Y), (∀ v w : Y, v ≠ σ → v ⤳ w → σ ⤳ w → s w ⤳ y → F.mult v ≤ 0) → s σ ⤳ y → Order.coheight σ = 1 → ∃ h : Y.functionField, (-F).RegularAt σ (h - 1) ∧ ∀ v : Y, v ≠ σ → Order.coheight v = 1 → s v ⤳ y → (-F).RegularAt v h := by
+theorem exists_lifted_fn
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (p : X ⟶ Sp ℂ) (n : ℕ),
+      IsProjOver p → topologicalKrullDim X = n
+        → ∀ (η : RatForms p n) (m : ℕ) (G N : CartierDiv X) (Y : Scheme.{0}) [IsIntegral Y]
+            [IsLocallyNoetherian Y] (s : Y ⟶ X) [IsDominant s] (K : CartierDiv Y) (B : Closeds Y)
+            (F : CartierDiv Y),
+          IsLogRes p n η m G s K B
+            → (∀ U : X.Opens,
+              IsAffineOpen U
+                → Subsingleton (cohOn
+                  (twist (GlobalTheory.structureModule Y) (toLB (pullCart s N - F))) (s ⁻¹ᵁ U) 1))
+            → ∀ (y : X) (σ : Y),
+              (∀ v w : Y, v ≠ σ → v ⤳ w → σ ⤳ w → s w ⤳ y → F.mult v ≤ 0) → s σ ⤳ y
+                → Order.coheight σ = 1
+                → ∃ h : Y.functionField,
+                  (-F).RegularAt σ (h - 1)
+                    ∧ ∀ v : Y, v ≠ σ → Order.coheight v = 1 → s v ⤳ y → (-F).RegularAt v h := by
   intro X _ _ p n hp _ η m G N Y _ _ s _ K B F hres hcoh y σ hF hσy hσ
   have hpr : IsProper p := ((isProjOver_iff_isProper_and_exists_isAmpleLB p).1 hp).1
-  have hspr : IsProper (s ≫ p) :=
-    ((isProjOver_iff_isProper_and_exists_isAmpleLB _).1 hres.proj).1
+  have hspr : IsProper (s ≫ p) := ((isProjOver_iff_isProper_and_exists_isAmpleLB _).1 hres.proj).1
   haveI : IsProper s := IsProper.of_comp s p
   haveI : CompactSpace Y := QuasiCompact.compactSpace_of_compactSpace (s ≫ p)
   haveI := hres.smooth
@@ -58,8 +77,9 @@ theorem exists_lifted_fn : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoether
 
   set T : Set Y := {v | v ≠ σ ∧ 0 < F.mult v} with hTdef
   have hT : T.Finite := F.finite_support_mult.subset fun v hv => hv.2.ne'
-  obtain ⟨U, e, hUa, hyU, hNe, hav⟩ := GlobalTheory.T.exists_affine_nhds_avoiding_images_of_specializations X Y s T σ y N hT
-    fun v hv w hvw hσw hwy => not_le.2 hv.2 (hF v w hv.1 hvw hσw hwy)
+  obtain ⟨U, e, hUa, hyU, hNe, hav⟩ :=
+    GlobalTheory.T.exists_affine_nhds_avoiding_images_of_specializations X Y s T σ y N hT
+      fun v hv w hvw hσw hwy => not_le.2 hv.2 (hF v w hv.1 hvw hσw hwy)
   have hTc : IsClosed (⋃ v ∈ T, closure ({v} : Set Y)) :=
     hT.isClosed_biUnion fun _ _ => isClosed_closure
   set W₁ : Y.Opens := s ⁻¹ᵁ U ⊓ ⟨_, hTc.isOpen_compl⟩ with hW₁
@@ -74,13 +94,14 @@ theorem exists_lifted_fn : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoether
   have hc := hcoh U hUa
   rw [← hW] at hc
   set e' : Y.functionFieldˣ := fnPull s e with he'
-  have key : ∀ w ∈ s ⁻¹ᵁ U, ∀ f : Y.functionField,
-      (pullCart s N - F).RegularAt w f ↔ (-F).RegularAt w (f * e') := by
+  have key
+      : ∀ w ∈ s ⁻¹ᵁ U, ∀ f : Y.functionField,
+        (pullCart s N - F).RegularAt w f ↔ (-F).RegularAt w (f * e') := by
     intro w hw f
     obtain ⟨g, hg⟩ := F.exists_isEqn w
     rw [((isEqn_pullCart s (hNe _ hw)).sub hg).regularAt_iff, hg.neg.regularAt_iff]
-    have : f * ((fnPull s e / g : Y.functionFieldˣ) : Y.functionField) =
-        f * (e' : Y.functionField) * ((g⁻¹ : Y.functionFieldˣ) : Y.functionField) := by
+    have : f * ((fnPull s e / g : Y.functionFieldˣ) : Y.functionField)
+        = f * (e' : Y.functionField) * ((g⁻¹ : Y.functionFieldˣ) : Y.functionField) := by
       rw [Units.val_div_eq_div_val, Units.val_inv_eq_inv_val, he']
       ring
     rw [this]
@@ -97,13 +118,17 @@ theorem exists_lifted_fn : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoether
       exact hx.2.2 (specializes_iff_mem_closure.1 hzx)
     · exact hx.1.2 (Set.mem_iUnion₂.2 ⟨z, ⟨hzσ, hz⟩, specializes_iff_mem_closure.1 hzx⟩)
   obtain ⟨h₁, h₂, hsplit, hh₁, hh₂⟩ :=
-    GlobalTheory.T.rational_function_split_regular_divisor Y (pullCart s N - F) W₁ W₂ hc (e' : Y.functionField)⁻¹ hinv
+    GlobalTheory.T.rational_function_split_regular_divisor Y (pullCart s N - F) W₁ W₂ hc
+      (e' : Y.functionField)⁻¹ hinv
   have hσU : σ ∈ s ⁻¹ᵁ U := hσy.mem_open U.isOpen hyU
   refine ⟨h₂ * e', ?_, fun v hvσ hv hvy => ?_⟩
-  · have hσW : σ ∈ W₁ := ⟨hσU, fun hσT => by
-      obtain ⟨v, hv, hσv⟩ := Set.mem_iUnion₂.1 hσT
-      exact hv.1 (eq_of_specializes_of_coheight (specializes_iff_mem_closure.2 hσv)
-        (CartierDiv.coheight_eq_one_of_mult_ne_zero hv.2.ne') hσ)⟩
+  · have hσW : σ ∈ W₁ := ⟨
+      hσU,
+      fun hσT => by
+        obtain ⟨v, hv, hσv⟩ := Set.mem_iUnion₂.1 hσT
+        exact hv.1 (eq_of_specializes_of_coheight (specializes_iff_mem_closure.2 hσv)
+          (CartierDiv.coheight_eq_one_of_mult_ne_zero hv.2.ne') hσ)
+    ⟩
     have e₁ : h₂ * (e' : Y.functionField) - 1 = h₁ * e' := by
       rw [show h₂ = (e' : Y.functionField)⁻¹ + h₁ by rw [hsplit]; ring, add_mul,
         inv_mul_cancel₀ e'.ne_zero]
@@ -111,8 +136,11 @@ theorem exists_lifted_fn : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoether
     rw [e₁]
     exact (key σ hσU h₁).1 (hh₁ σ hσW)
   · have hvU : v ∈ s ⁻¹ᵁ U := hvy.mem_open U.isOpen hyU
-    have hvW : v ∈ W₂ := ⟨hvU, fun hvσ' =>
-      hvσ (eq_of_specializes_of_coheight (specializes_iff_mem_closure.2 hvσ') hσ hv).symm⟩
+    have hvW : v ∈ W₂ := ⟨
+      hvU,
+      fun hvσ' =>
+        hvσ (eq_of_specializes_of_coheight (specializes_iff_mem_closure.2 hvσ') hσ hv).symm
+    ⟩
     exact (key v hvU h₂).1 (hh₂ v hvW)
 
 end GlobalTheory.PairStep

@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.T2Spa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
 open scoped TensorProduct NNReal ENNReal
 
 namespace GlobalTheory.QuadricCount
@@ -69,7 +70,14 @@ lemma gauss_normSq {k : Type} [Field k] [Fintype k] [DecidableEq k] {ι : Type} 
   rw [Complex.conj_mul'] at key
   exact_mod_cast key
 
-theorem card_quadric_sub_sq_le : ∀ (k : Type) [Field k] [Fintype k] [DecidableEq k] (ι : Type) [Fintype ι] [DecidableEq ι] [Nonempty ι] (S : Matrix ι ι k) (β : k), (2 : k) ≠ 0 → S.IsSymm → S.det ≠ 0 → (((Finset.univ.filter fun x : ι → k => x ⬝ᵥ S.mulVec x = β).card : ℝ) - (Fintype.card k : ℝ) ^ (Fintype.card ι - 1)) ^ 2 ≤ (Fintype.card k : ℝ) ^ Fintype.card ι := by
+theorem card_quadric_sub_sq_le
+    : ∀ (k : Type) [Field k] [Fintype k] [DecidableEq k] (ι : Type) [Fintype ι] [DecidableEq ι]
+        [Nonempty ι] (S : Matrix ι ι k) (β : k),
+      (2 : k) ≠ 0 → S.IsSymm → S.det ≠ 0
+        → (((Finset.univ.filter fun x : ι → k => x ⬝ᵥ S.mulVec x = β).card : ℝ)
+              - (Fintype.card k : ℝ) ^ (Fintype.card ι - 1))
+            ^ 2
+          ≤ (Fintype.card k : ℝ) ^ Fintype.card ι := by
   intro k _ _ _ ι _ _ _ S β h2 hS hd
   set ψ := AddChar.FiniteField.primitiveChar_to_Complex k
   have hψ : ψ.IsPrimitive := AddChar.FiniteField.primitiveChar_to_Complex_isPrimitive k
@@ -84,8 +92,7 @@ theorem card_quadric_sub_sq_le : ∀ (k : Type) [Field k] [Fintype k] [Decidable
     rw [← Finset.sum_filter]
     simp [hN, hq, mul_comm]
   rw [Finset.sum_comm, ← Finset.add_sum_erase _ _ (Finset.mem_univ (0 : k))] at e1
-  have e2 : ∑ x : ι → k, ψ (0 * (x ⬝ᵥ S.mulVec x - β)) = (q : ℂ) ^ m := by
-    simp [hq, hm]
+  have e2 : ∑ x : ι → k, ψ (0 * (x ⬝ᵥ S.mulVec x - β)) = (q : ℂ) ^ m := by simp [hq, hm]
   rw [e2] at e1
   set r : ℝ := Real.sqrt ((q : ℝ) ^ m) with hr
   have hr0 : 0 ≤ r := Real.sqrt_nonneg _
@@ -93,11 +100,15 @@ theorem card_quadric_sub_sq_le : ∀ (k : Type) [Field k] [Fintype k] [Decidable
   have e3 : ∀ t ∈ Finset.univ.erase (0 : k), ‖∑ x : ι → k, ψ (t * (x ⬝ᵥ S.mulVec x - β))‖ ≤ r := by
     intro t ht
     have ht0 : t ≠ 0 := (Finset.mem_erase.mp ht).1
-    have : ∑ x : ι → k, ψ (t * (x ⬝ᵥ S.mulVec x - β)) = ψ (-(t * β)) * ∑ x : ι → k, ψ (t * (x ⬝ᵥ S.mulVec x)) := by
+    have : ∑ x : ι → k, ψ (t * (x ⬝ᵥ S.mulVec x - β))
+        = ψ (-(t * β)) * ∑ x : ι → k, ψ (t * (x ⬝ᵥ S.mulVec x)) := by
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun x _ => ?_
-      rw [← AddChar.map_add_eq_mul]; congr 1; ring
-    rw [this, norm_mul, AddChar.norm_apply, one_mul, hr, ← gauss_normSq ψ hψ S h2 hS hd t ht0, Real.sqrt_sq (norm_nonneg _)]
+      rw [← AddChar.map_add_eq_mul]
+      congr 1
+      ring
+    rw [this, norm_mul, AddChar.norm_apply, one_mul, hr, ← gauss_normSq ψ hψ S h2 hS hd t ht0,
+      Real.sqrt_sq (norm_nonneg _)]
   have e4 : ‖(q : ℂ) * N - (q : ℂ) ^ m‖ ≤ q * r := by
     rw [← e1, add_sub_cancel_left]
     refine (norm_sum_le _ _).trans ((Finset.sum_le_card_nsmul _ _ _ e3).trans ?_)

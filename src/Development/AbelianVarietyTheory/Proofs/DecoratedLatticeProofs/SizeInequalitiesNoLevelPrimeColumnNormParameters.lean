@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Foc
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Core GlobalTheory.Core.Ht2 GlobalTheory.CoreHt
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2
+  GlobalTheory.Core GlobalTheory.Core.Ht2 GlobalTheory.CoreHt
 open GlobalTheory.ColumnNormCompare (numDatumOfParameters codeRec plRec)
 attribute [local instance] GlobalTheory.Mem.Col2.starE
 
@@ -16,8 +18,10 @@ namespace GlobalTheory.CoreHt.SizeRowsRec
 
 open GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.ColumnNormCompare.SizeRows
 
-theorem sizeRowsS_numRec : ∀ (D : D7) (L : SizeData₂ D) (CY : ℝ), HtRowsS L CY → ∀ (u : D.what₂.Word),
-    SizeRowsS CY (numDatumOfParameters D L) (codeRec L u) := by
+theorem sizeRowsS_numRec
+    : ∀ (D : D7) (L : SizeData₂ D) (CY : ℝ),
+      HtRowsS L CY
+        → ∀ (u : D.what₂.Word), SizeRowsS CY (numDatumOfParameters D L) (codeRec L u) := by
   intro D large₂ CY hR u
   have hnu := GlobalTheory.T.fockPartitionRows_numericDatum_mem_Icc D large₂ CY hR u
   obtain ⟨⟨P⟩, ⟨s2, s3, s4⟩, hg, ⟨s10, -, -, -, s14⟩, ⟨n, hn⟩, -⟩ := hR
@@ -31,7 +35,18 @@ theorem sizeRowsS_numRec : ∀ (D : D7) (L : SizeData₂ D) (CY : ℝ), HtRowsS 
   have hn0 : 0 < D.R.n := D.R.n_pos'
   have hq := D.host.hyp.1.pos
   have hd := D.host.hyp.2.1.pos
-  refine ⟨⟨?_, ?_, ?_, s4, ?_⟩, fun i => ⟨?_, hg i⟩, trivial, f_mul_N_le_b P s10, hnu, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    ⟨?_, ?_, ?_, s4, ?_⟩,
+    fun i => ⟨?_, hg i⟩,
+    trivial,
+    f_mul_N_le_b P s10,
+    hnu,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact s2
   · refine log_le_L_of_le_cond P hq ?_
     unfold LevelStarExponents.condE
@@ -47,7 +62,9 @@ theorem sizeRowsS_numRec : ∀ (D : D7) (L : SizeData₂ D) (CY : ℝ), HtRowsS 
     refine (large₂.be_close (tauPl D z) i j).trans ?_
     show large₂.etaSz ≤ (D.R.m : ℝ) * ((⌈LevelStarExponents.h0 large₂⌉₊ : ℕ) : ℝ)
     have h := Nat.le_ceil (LevelStarExponents.h0 large₂)
-    calc large₂.etaSz = (D.R.m : ℝ) * LevelStarExponents.h0 large₂ := by unfold LevelStarExponents.h0; field_simp
+    calc
+      large₂.etaSz
+        = (D.R.m : ℝ) * LevelStarExponents.h0 large₂ := by unfold LevelStarExponents.h0; field_simp
       _ ≤ _ := by gcongr
   · intro z i
     rw [hSc]
@@ -59,7 +76,9 @@ theorem sizeRowsS_numRec : ∀ (D : D7) (L : SizeData₂ D) (CY : ℝ), HtRowsS 
     have hl : l < D.R.k - 2 := by
       have : l + 1 + 1 < D.R.k := h2
       omega
-    have e : (numDatumOfParameters D large₂).uW (codeRec large₂ u) z ⟨l + 1, hi⟩ = (D.hcW u (tauPl D z)).u ⟨l + 1, hi⟩ := by
+    have e
+        : (numDatumOfParameters D large₂).uW (codeRec large₂ u) z ⟨l + 1, hi⟩
+          = (D.hcW u (tauPl D z)).u ⟨l + 1, hi⟩ := by
       rw [D.s.u_letter u (tauPl D z) l hl, D.hcW_v]
       unfold NumDatum.uW
       rw [dite_eq_left ⟨h1, h2⟩]

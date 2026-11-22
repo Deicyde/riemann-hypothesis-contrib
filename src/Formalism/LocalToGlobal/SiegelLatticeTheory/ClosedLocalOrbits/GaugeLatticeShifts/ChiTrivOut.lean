@@ -18,7 +18,8 @@ theorem nilradical_conj_level' : NilradicalConjLevel :=
 
 theorem chiTrivialC_outright : ChiTrivialC := chiTrivialC_of_nconj nilradical_conj_level'
 
-theorem lemmaVC_of_rest (hA : AvgCore) (h3 : RCocompactC) (h4 : NonRelCharC) : Formalism.L2.SG.Full.LemmaVC :=
+theorem lemmaVC_of_rest (hA : AvgCore) (h3 : RCocompactC) (h4 : NonRelCharC)
+    : Formalism.L2.SG.Full.LemmaVC :=
   lemmaVC_of_nconj hA nilradical_conj_level' h3 h4
 
 end Formalism.L2.SG.Pf

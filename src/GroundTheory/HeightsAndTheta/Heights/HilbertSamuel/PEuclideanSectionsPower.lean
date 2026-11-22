@@ -10,10 +10,12 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter MeasureTheory
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter MeasureTheory
 
-theorem EuclideanSectionsPower.proof (hL : SectionL2Lattice.Statement) (hP : TensorPowerL2Degree.Statement) :
-    EuclideanSectionsPower.Statement := by
+theorem EuclideanSectionsPower.proof
+    (hL : SectionL2Lattice.Statement) (hP : TensorPowerL2Degree.Statement)
+    : EuclideanSectionsPower.Statement := by
   intro K _ ι _ Ω _ _ y D A P0 II hD hII har hb hA hc
   obtain ⟨μ, m, hμ, hcon, hZ, hm, hdeg⟩ := hP K ι Ω y D A P0 II hD hII har hb hA hc
   obtain ⟨r, φ, hinj, hdisc, hlat, hsup, hmul, hrank, hnorm⟩ :=

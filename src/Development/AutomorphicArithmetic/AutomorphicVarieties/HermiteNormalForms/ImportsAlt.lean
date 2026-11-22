@@ -9,9 +9,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open NumberField Matrix UpperTheory.V UpperTheory.V.KT
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.stab :
-    ∀ (L : Type) [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L] (N : ℕ) (p : ℕ),
-    KH.StabLe (Gm L N) (Sx L N p) (3 ^ (dd L N * N)) := by
+theorem UpperTheory.V.KT.stab
+    : ∀ (L : Type) [Field L] [NumberField L] [_root_.NumberField.IsTotallyComplex L] (N : ℕ)
+        (p : ℕ),
+      KH.StabLe (Gm L N) (Sx L N p) (3 ^ (dd L N * N)) := by
   intro L _ _ _ N p t
   have hle : MulAction.stabilizer (Gm L N) t ≤ MulAction.stabilizer (Gm L N) (t.1 0) := by
     intro g hg
@@ -24,7 +25,7 @@ theorem UpperTheory.V.KT.stab :
     rw [Module.finrank_matrix, RingOfIntegers.rank]
     simp only [Fintype.card_fin, dd]
     ring
-  have h := UpperTheory.V.KT.mink3 (Matrix (Fin N) (Fin N) (𝓞 L))
-    (MulAction.stabilizer (Gm L N) t) hfin
+  have h :=
+    UpperTheory.V.KT.mink3 (Matrix (Fin N) (Fin N) (𝓞 L)) (MulAction.stabilizer (Gm L N) t) hfin
   rw [hrk] at h
   exact ⟨hfin, h⟩

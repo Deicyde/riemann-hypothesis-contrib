@@ -19,7 +19,8 @@ namespace CrystallineSemistableComparison.Pb.Kap.DividedPowerIdealFacts
 
 variable {A B : Type} [CommRing A] [CommRing B] {I : Ideal A} {J : Ideal B}
 
-theorem dividedPowerFiltration_anti (γ : DividedPowers I) {r r' : ℕ} (h : r ≤ r') : pdP γ r' ≤ pdP γ r := by
+theorem dividedPowerFiltration_anti (γ : DividedPowers I) {r r' : ℕ} (h : r ≤ r')
+    : pdP γ r' ≤ pdP γ r := by
   refine Ideal.span_le.2 ?_
   rintro _ ⟨L, hL, hr, rfl⟩
   exact Ideal.subset_span ⟨L, hL, h.trans hr, rfl⟩
@@ -31,7 +32,8 @@ theorem dividedPowerFiltration_zero (γ : DividedPowers I) : pdP γ 0 = ⊤ := b
 theorem dpow_mem_pdP (γ : DividedPowers I) (n : ℕ) {x : A} (hx : x ∈ I) : γ.dpow n x ∈ pdP γ n :=
   Ideal.subset_span ⟨[(n, x)], by simpa using hx, by simp, by simp⟩
 
-theorem dividedPowerFiltration_mul (γ : DividedPowers I) (a b : ℕ) : pdP γ a * pdP γ b ≤ pdP γ (a + b) := by
+theorem dividedPowerFiltration_mul (γ : DividedPowers I) (a b : ℕ)
+    : pdP γ a * pdP γ b ≤ pdP γ (a + b) := by
   unfold pdP
   rw [Ideal.span_mul_span']
   refine Ideal.span_le.2 ?_
@@ -44,9 +46,11 @@ theorem dividedPowerFiltration_mul (γ : DividedPowers I) (a b : ℕ) : pdP γ a
   · simp only [List.map_append, List.sum_append]; omega
   · simp [List.prod_append]
 
-theorem dividedPowerFiltration_le_map (γ : DividedPowers I) (δ : DividedPowers J) (f : A →+* B) (hf : IsDPMorphism γ δ f)
-    (hJ : J = I.map f) (r : ℕ) : pdP δ r ≤ (pdP γ r).map f := by
-
+theorem dividedPowerFiltration_le_map
+    (γ : DividedPowers I) (δ : DividedPowers J) (f : A →+* B)
+    (hf : IsDPMorphism γ δ f) (hJ : J = I.map f)
+    (r : ℕ)
+    : pdP δ r ≤ (pdP γ r).map f := by
   have key : ∀ x ∈ J, ∀ n, δ.dpow n x ∈ (pdP γ n).map f := by
     intro x hx
     have hx' : x ∈ I.map f := hJ ▸ hx
@@ -59,7 +63,8 @@ theorem dividedPowerFiltration_le_map (γ : DividedPowers I) (δ : DividedPowers
     | zero =>
       intro n
       rcases Nat.eq_zero_or_pos n with rfl | hn
-      · rw [δ.dpow_zero J.zero_mem, dividedPowerFiltration_zero, Ideal.map_top]; exact Submodule.mem_top
+      · rw [δ.dpow_zero J.zero_mem, dividedPowerFiltration_zero, Ideal.map_top]
+        exact Submodule.mem_top
       · rw [δ.dpow_eval_zero hn.ne']; exact Ideal.zero_mem _
     | add y z hy hz ihy ihz =>
       intro n
@@ -99,8 +104,10 @@ namespace CgEmpty
 
 variable {O' : Type} [CommRing O'] {R' : Type} [CommRing R'] {I' : Ideal R'}
 
-theorem thick_sub {γ : DividedPowers I'} {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O')} {κ : O' →+* R' ⧸ I'}
-    (hX : IsEmpty X) (T : Thick (nlFun γ 0 X q κ)) : Subsingleton T.B := by
+theorem thick_sub
+    {γ : DividedPowers I'} {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O')} {κ : O' →+* R' ⧸ I'}
+    (hX : IsEmpty X) (T : Thick (nlFun γ 0 X q κ))
+    : Subsingleton T.B := by
   have h1 : Subsingleton (T.B ⧸ T.J) := by
     by_contra hn
     rw [not_subsingleton_iff_nontrivial] at hn
@@ -113,20 +120,28 @@ theorem thick_sub {γ : DividedPowers I'} {X : Scheme.{0}} {q : X ⟶ Spec (Comm
   rw [hn] at h2
   exact subsingleton_of_zero_eq_one ((Submodule.mem_bot _).1 h2).symm
 
-theorem HO_sub {γ : DividedPowers I'} {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O')} {κ : O' →+* R' ⧸ I'}
-    (hX : IsEmpty X) (Q : ObjectProperty (Thick (nlFun γ 0 X q κ))) (j : ℕ) : Subsingleton (HO Q j) := by
+theorem HO_sub
+    {γ : DividedPowers I'} {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O')} {κ : O' →+* R' ⧸ I'}
+    (hX : IsEmpty X) (Q : ObjectProperty (Thick (nlFun γ 0 X q κ)))
+    (j : ℕ)
+    : Subsingleton (HO Q j) := by
   have hc : Subsingleton (CH.Cn (CH.modF (sP Q).A) j) :=
-    ⟨fun f g => funext fun s => @Subsingleton.elim _ (thick_sub hX (s.obj (Fin.last j)).obj) (f s) (g s)⟩
+    ⟨fun f g =>
+      funext fun s => @Subsingleton.elim _ (thick_sub hX (s.obj (Fin.last j)).obj) (f s) (g s)⟩
   refine ⟨fun x y => ?_⟩
   obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ y
   congr 1
   exact Subtype.ext (hc.elim _ _)
 
-theorem HdR_sub {K' : Type} [CommRing K'] {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K')) (hX : IsEmpty X) (j : ℕ) :
-    Subsingleton (HdR q j) := by
+theorem HdR_sub
+    {K' : Type} [CommRing K']
+    {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of K')) (hX : IsEmpty X)
+    (j : ℕ)
+    : Subsingleton (HdR q j) := by
   have hc : Subsingleton (GlobalTheory.CatH.Cn (O (smFun X q)) j) :=
-    ⟨fun f g => funext fun s => @Subsingleton.elim _ (thick_sub hX (s.obj (Fin.last j))) (f s) (g s)⟩
+    ⟨fun f g =>
+      funext fun s => @Subsingleton.elim _ (thick_sub hX (s.obj (Fin.last j))) (f s) (g s)⟩
   refine ⟨fun x y => ?_⟩
   unfold HdR at x y
   obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ x
@@ -143,9 +158,15 @@ theorem cg_basis_pdP {L : Lev R m} (hL : L.Good) : pdP L.γB m = ⊥ := by
   rw [(hL.lat m le_rfl).tf.nil, Ideal.map_bot] at h
   exact le_bot_iff.1 h
 
-theorem cg_basis_empty {L : Lev R m} (hL : L.Good) (M : Model l K) (hM : M.Sm) (s : ℕ) (U : Cov M.q)
-    (hU0 : IsEmpty U.ι) (j : ℕ) {a : ℕ} (bs : Module.Basis (Fin a) K (HdR M.q j)) (w : HO (QB L M s) j) :
-    ∃! g : Fin a → L.B, w = ∑ t, g t • muB L.γB M.q 1 s {⊤} j (bs t) := by
+theorem cg_basis_empty
+    {L : Lev R m} (hL : L.Good)
+    (M : Model l K) (hM : M.Sm)
+    (s : ℕ)
+    (U : Cov M.q) (hU0 : IsEmpty U.ι)
+    (j : ℕ)
+    {a : ℕ} (bs : Module.Basis (Fin a) K (HdR M.q j))
+    (w : HO (QB L M s) j)
+    : ∃! g : Fin a → L.B, w = ∑ t, g t • muB L.γB M.q 1 s {⊤} j (bs t) := by
   have hX : IsEmpty M.gen := by
     have h := U.cover
     rw [iSup_of_empty] at h
@@ -161,9 +182,14 @@ theorem cg_basis_empty {L : Lev R m} (hL : L.Good) (M : Model l K) (hM : M.Sm) (
   subst ha
   exact ⟨Fin.elim0, Subsingleton.elim _ _, fun g _ => funext fun t => t.elim0⟩
 
-theorem cg_basis_pf {L : Lev R m} (hL : L.Good) (M : Model l K) (hM : M.Sm) (s : ℕ) (U : Cov M.q) (hU : ∀ α, U.d α + m ≤ s)
-    (j : ℕ) {a : ℕ} (bs : Module.Basis (Fin a) K (HdR M.q j)) (w : HO (QB L M s) j) :
-    ∃! g : Fin a → L.B, w = ∑ t, g t • muB L.γB M.q 1 s {⊤} j (bs t) := by
+theorem cg_basis_pf
+    {L : Lev R m} (hL : L.Good)
+    (M : Model l K) (hM : M.Sm)
+    (s : ℕ) (U : Cov M.q) (hU : ∀ α, U.d α + m ≤ s)
+    (j : ℕ)
+    {a : ℕ} (bs : Module.Basis (Fin a) K (HdR M.q j))
+    (w : HO (QB L M s) j)
+    : ∃! g : Fin a → L.B, w = ∑ t, g t • muB L.γB M.q 1 s {⊤} j (bs t) := by
   rcases isEmpty_or_nonempty U.ι with h0 | h1
   · exact cg_basis_empty hL M hM s U h0 j bs w
   · obtain ⟨α⟩ := h1

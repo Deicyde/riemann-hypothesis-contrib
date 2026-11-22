@@ -10,14 +10,15 @@ open scoped NNReal
 
 namespace GlobalTheory.AlmostEt
 
-theorem exists_surj_hom_zmod_of_isPGroup :
-    ∀ (p : ℕ) [Fact p.Prime] (G : Type) [Group G] [Finite G] [Nontrivial G],
+theorem exists_surj_hom_zmod_of_isPGroup
+    : ∀ (p : ℕ) [Fact p.Prime] (G : Type) [Group G] [Finite G] [Nontrivial G],
       IsPGroup p G → ∃ χ : G →* Multiplicative (ZMod p), Function.Surjective χ := by
   intro p hp G _ _ _ hG
   obtain ⟨n, hn, hc⟩ := hG.nontrivial_iff_card.1 inferInstance
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
-  obtain ⟨K, hK⟩ := Sylow.exists_subgroup_card_pow_prime (G := G) p (n := m)
-    (by rw [hc]; exact pow_dvd_pow p (Nat.le_succ m))
+  obtain ⟨K, hK⟩ :=
+    Sylow.exists_subgroup_card_pow_prime (G := G) p (n := m)
+      (by rw [hc]; exact pow_dvd_pow p (Nat.le_succ m))
   have hi : K.index = p := by
     have := K.card_mul_index
     rw [hK, hc, pow_succ] at this

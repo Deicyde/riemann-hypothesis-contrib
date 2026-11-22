@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.LamIde
 
 @[expose] public section
 
-open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk GlobalTheory.Mem
+open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk
+  GlobalTheory.Mem
 open scoped Classical
 
 namespace GlobalTheory.Hk
@@ -257,11 +258,32 @@ lemma LFam.integral_theta (𝓕 : LFam) (χ : AddChar 𝓕.G ℂ) (hχ : χ ≠ 
   intro t ht
   exact tsum_exp_eq_integral _ h0 ht (𝓕.summable_norm_aChi_exp χ ht)
 
-theorem LFam.exp_sum_bounds : ∃ C : ℝ, 0 < C ∧ ∀ (𝓕 : LFam) (χ : AddChar 𝓕.G ℂ), (∀ t : ℝ, 0 < t → Summable (fun n : ℕ => ‖𝓕.aChi χ n‖ * Real.exp (-(t * n))) ∧ ‖∑' n : ℕ, 𝓕.aChi χ n * (Real.exp (-(t * n)) : ℂ) - 𝓕.res χ / t‖ ≤ C * 𝓕.B ^ 11 * min t (1 / t)) ∧ (χ ≠ 1 → (∀ t : ℝ, 1 ≤ t → ‖∑' n : ℕ, 𝓕.aChi χ n * (Real.exp (-(t * n)) : ℂ)‖ ≤ C * 𝓕.B * Real.exp (-(t / 2))) ∧ ∫ t in Set.Ioi (0 : ℝ), ∑' n : ℕ, 𝓕.aChi χ n * (Real.exp (-(t * n)) : ℂ) = 𝓕.F χ 1) := by
+theorem LFam.exp_sum_bounds
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (𝓕 : LFam) (χ : AddChar 𝓕.G ℂ),
+          (∀ t : ℝ,
+              0 < t
+                → Summable (fun n : ℕ => ‖𝓕.aChi χ n‖ * Real.exp (-(t * n)))
+                  ∧ ‖∑' n : ℕ, 𝓕.aChi χ n * (Real.exp (-(t * n)) : ℂ) - 𝓕.res χ / t‖
+                    ≤ C * 𝓕.B ^ 11 * min t (1 / t))
+            ∧ (χ ≠ 1
+              → (∀ t : ℝ,
+                  1 ≤ t
+                    → ‖∑' n : ℕ, 𝓕.aChi χ n * (Real.exp (-(t * n)) : ℂ)‖
+                      ≤ C * 𝓕.B * Real.exp (-(t / 2)))
+                ∧ ∫ t in Set.Ioi (0 : ℝ), ∑' n : ℕ, 𝓕.aChi χ n * (Real.exp (-(t * n)) : ℂ)
+                  = 𝓕.F χ 1) := by
   set S : ℝ := 14 * ∑' n : ℕ, (n : ℝ) * Real.exp (-(1 / 2 * n)) with hS
   have hS0 : 0 ≤ S := mul_nonneg (by norm_num) (tsum_nonneg fun n => by positivity)
-  refine ⟨2 * S + 4, by positivity, fun 𝓕 χ => ⟨fun t ht => ⟨𝓕.summable_norm_aChi_exp χ ht, ?_⟩,
-    fun hχ => ⟨fun t ht => ?_, 𝓕.integral_theta χ hχ⟩⟩⟩
+  refine ⟨
+    2 * S + 4,
+    by positivity,
+    fun 𝓕 χ => ⟨
+      fun t ht => ⟨𝓕.summable_norm_aChi_exp χ ht, ?_⟩,
+      fun hχ => ⟨fun t ht => ?_, 𝓕.integral_theta χ hχ⟩
+    ⟩
+  ⟩
   · have hB : 1 ≤ 𝓕.B := le_trans (by norm_num) 𝓕.B_ge
     rcases le_total t 1 with h1 | h1
     · have : t ≤ 1 / t := by rw [le_div_iff₀ ht]; nlinarith
@@ -284,9 +306,10 @@ theorem LFam.exp_sum_bounds : ∃ C : ℝ, 0 < C ∧ ∀ (𝓕 : LFam) (χ : Add
           exact mul_le_mul 𝓕.κ_le 𝓕.card_le (by positivity) (by norm_num)
         · rw [norm_zero]; positivity
       have e3 : 𝓕.B ≤ 𝓕.B ^ 11 := le_self_pow₀ hB (by norm_num)
-      calc _ ≤ S * 𝓕.B * Real.exp (-(t / 2)) + ‖𝓕.res χ‖ * (1 / t) := by
-            refine (norm_sub_le _ _).trans (add_le_add (𝓕.norm_theta_large χ h1) (le_of_eq ?_))
-            rw [norm_div, Complex.norm_real, Real.norm_of_nonneg ht.le, mul_one_div]
+      calc
+        _ ≤ S * 𝓕.B * Real.exp (-(t / 2)) + ‖𝓕.res χ‖ * (1 / t) := by
+          refine (norm_sub_le _ _).trans (add_le_add (𝓕.norm_theta_large χ h1) (le_of_eq ?_))
+          rw [norm_div, Complex.norm_real, Real.norm_of_nonneg ht.le, mul_one_div]
         _ ≤ S * 𝓕.B * (2 * (1 / t)) + 4 * 𝓕.B * (1 / t) := by gcongr
         _ = (2 * S + 4) * 𝓕.B * (1 / t) := by ring
         _ ≤ _ := by gcongr

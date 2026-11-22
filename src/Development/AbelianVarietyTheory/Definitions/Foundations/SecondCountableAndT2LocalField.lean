@@ -16,30 +16,32 @@ variable {k : Type*} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchi
 theorem secondCountable_and_t2_local_field : SecondCountableTopology k ∧ T2Space k := by
   let _ := IsTopologicalAddGroup.rightUniformSpace k
   have := isUniformAddGroup_of_addCommGroup (G := k)
-  let _ : (Valued.v (R := k)).RankOne :=
-  { hom' := IsRankLeOne.nonempty.some.emb (R := k).comp MonoidWithZeroHom.ValueGroup₀.embedding
-    strictMono' := IsRankLeOne.nonempty.some.strictMono.comp
-        MonoidWithZeroHom.ValueGroup₀.embedding_strictMono }
+  let _ : (Valued.v (R := k)).RankOne := {
+    hom' := IsRankLeOne.nonempty.some.emb (R := k).comp MonoidWithZeroHom.ValueGroup₀.embedding
+    strictMono' :=
+      IsRankLeOne.nonempty.some.strictMono.comp MonoidWithZeroHom.ValueGroup₀.embedding_strictMono
+  }
   open scoped Valued in
   have : ProperSpace k := .of_nontriviallyNormedField_of_weaklyLocallyCompactSpace k
   open scoped Valued in
   exact ⟨secondCountable_of_proper, inferInstance⟩
 
-theorem nabs_pos (x : kˣ) : 0 < nabs k x := by
-  unfold nabs; exact_mod_cast distribHaarChar_pos
+theorem nabs_pos (x : kˣ) : 0 < nabs k x := by unfold nabs; exact_mod_cast distribHaarChar_pos
 
-theorem nabs_mul (x y : kˣ) : nabs k (x * y) = nabs k x * nabs k y := by
-  simp [nabs]
+theorem nabs_mul (x y : kˣ) : nabs k (x * y) = nabs k x * nabs k y := by simp [nabs]
 
 theorem nabs_one : nabs k 1 = 1 := by simp [nabs]
 
-theorem om_one {a b : Type*} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b] (μ : kˣ →* ℂˣ)
-    (Φ : Matrix b a k → ℂ) : om μ (1 : GL a k) (1 : GL b k) Φ = Φ := by
+theorem om_one
+    {a b : Type*} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b]
+    (μ : kˣ →* ℂˣ) (Φ : Matrix b a k → ℂ)
+    : om μ (1 : GL a k) (1 : GL b k) Φ = Φ := by
   funext x; simp [om, nabs_one]
 
-theorem om_mul {a b : Type*} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b] (μ : kˣ →* ℂˣ)
-    (g g' : GL a k) (h h' : GL b k) (Φ : Matrix b a k → ℂ) :
-    om μ (g * g') (h * h') Φ = om μ g h (om μ g' h' Φ) := by
+theorem om_mul
+    {a b : Type*} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b]
+    (μ : kˣ →* ℂˣ) (g g' : GL a k) (h h' : GL b k) (Φ : Matrix b a k → ℂ)
+    : om μ (g * g') (h * h') Φ = om μ g h (om μ g' h' Φ) := by
   funext x
   simp only [om, map_mul, nabs_mul, Real.mul_rpow (nabs_pos _).le (nabs_pos _).le,
     _root_.mul_inv_rev, Units.val_mul, Matrix.mul_assoc, Complex.ofReal_mul]
@@ -73,8 +75,7 @@ theorem ratCircle_eq_zero (x : AddCircle (1 : ℚ)) (h : ratCircle x = 0) : x = 
 
 theorem exists_hasConductor : ∃ ψ : AddChar k Circle, HasConductor ψ 1 := by
   obtain ⟨t, ht⟩ := ValuativeRel.valuation_surjective (uniformizer k)⁻¹
-  have ht1 : 1 < valuation k t := by
-    rw [ht]; exact uniformizer_inv_le_iff.1 le_rfl
+  have ht1 : 1 < valuation k t := by rw [ht]; exact uniformizer_inv_le_iff.1 le_rfl
   let O : AddSubgroup k := (𝒪[k]).toAddSubgroup
   have hne : (QuotientAddGroup.mk t : k ⧸ O) ≠ 0 := by
     rw [Ne, QuotientAddGroup.eq_zero_iff]
@@ -82,7 +83,10 @@ theorem exists_hasConductor : ∃ ψ : AddChar k Circle, HasConductor ψ 1 := by
   obtain ⟨c, hc⟩ := CharacterModule.exists_character_apply_ne_zero_of_ne_zero hne
   let c' : (k ⧸ O) →+ AddCircle (1 : ℚ) := c
   let f : k →+ AddCircle (1 : ℝ) := ratCircle.comp (c'.comp (QuotientAddGroup.mk' O))
-  refine ⟨(AddCircle.toCircle_addChar (T := 1)).compAddMonoidHom f, fun x => ⟨fun h => ?_, fun h y hy => ?_⟩⟩
+  refine ⟨
+    (AddCircle.toCircle_addChar (T := 1)).compAddMonoidHom f,
+    fun x => ⟨fun h => ?_, fun h y hy => ?_⟩
+  ⟩
   · by_contra hx
     have hx' : 1 < valuation k x := by simpa using hx
     have h1 := h t (ht ▸ uniformizer_inv_le_iff.2 hx')
@@ -93,7 +97,8 @@ theorem exists_hasConductor : ∃ ψ : AddChar k Circle, HasConductor ψ 1 := by
       rw [QuotientAddGroup.eq_zero_iff]
       exact hy.trans (by simpa using h)
     show AddCircle.toCircle (ratCircle (c' (QuotientAddGroup.mk y))) = 1
-    rw [hy']; simp
+    rw [hy']
+    simp
 
 theorem KOne_le_KO (n : Type*) [Fintype n] [DecidableEq n] : KOne k n ≤ KO k n :=
   Subgroup.map_le_range _ _
@@ -106,17 +111,22 @@ theorem isCompact_int : IsCompact (𝒪[k] : Set k) :=
 variable [MeasurableSpace k] [BorelSpace k]
 
 theorem exists_isUnitVol : ∃ ν : Measure k, IsUnitVol ν := by
-  let K : TopologicalSpace.PositiveCompacts k := ⟨⟨(𝒪[k] : Set k), isCompact_int⟩, by
-    rw [show interior ((⟨(𝒪[k] : Set k), isCompact_int⟩ : TopologicalSpace.Compacts k).carrier) =
-      (𝒪[k] : Set k) from isOpen_int.interior_eq]
-    exact ⟨0, zero_mem _⟩⟩
+  let K : TopologicalSpace.PositiveCompacts k := ⟨
+    ⟨(𝒪[k] : Set k), isCompact_int⟩,
+    by
+      rw [show interior ((⟨(𝒪[k] : Set k), isCompact_int⟩ : TopologicalSpace.Compacts k).carrier)
+          = (𝒪[k] : Set k) from
+        isOpen_int.interior_eq]
+      exact ⟨0, zero_mem _⟩
+  ⟩
   exact ⟨Measure.addHaarMeasure K, inferInstance, Measure.addHaarMeasure_self⟩
 
-theorem nabs_vol (ν : Measure k) (h : IsUnitVol ν) (x : kˣ) :
-    ν (x • (𝒪[k] : Set k)) = ENNReal.ofReal (nabs k x) := by
+theorem nabs_vol (ν : Measure k) (h : IsUnitVol ν) (x : kˣ)
+    : ν (x • (𝒪[k] : Set k)) = ENNReal.ofReal (nabs k x) := by
   have := h.1
   obtain ⟨_, _⟩ := secondCountable_and_t2_local_field (k := k)
-  rw [← distribHaarChar_mul ν x, h.2]; simp [nabs]
+  rw [← distribHaarChar_mul ν x, h.2]
+  simp [nabs]
 
 theorem nabs_le_one (x : kˣ) (hx : valuation k (x : k) ≤ 1) : nabs k x ≤ 1 := by
   obtain ⟨ν, h⟩ := exists_isUnitVol (k := k)
@@ -127,8 +137,8 @@ theorem nabs_le_one (x : kˣ) (hx : valuation k (x : k) ≤ 1) : nabs k x ≤ 1 
   rw [nabs_vol ν h, h.2] at this
   exact ENNReal.ofReal_le_one.1 this
 
-theorem measurableEmbedding_val (n : Type*) [Fintype n] [DecidableEq n] :
-    MeasurableEmbedding (fun g : GL n k => g.val) := by
+theorem measurableEmbedding_val (n : Type*) [Fintype n] [DecidableEq n]
+    : MeasurableEmbedding (fun g : GL n k => g.val) := by
   obtain ⟨_, _⟩ := secondCountable_and_t2_local_field (k := k)
   refine MeasurableEmbedding.iff_comap_eq.2 ⟨Units.val_injective, rfl, ?_⟩
   have hB : BorelSpace (Matrix n n k) := inferInstanceAs (BorelSpace (n → n → k))
@@ -140,24 +150,24 @@ theorem measurableEmbedding_val (n : Type*) [Fintype n] [DecidableEq n] :
   rw [this]
   exact (isOpen_ne_fun (continuous_id.matrix_det) continuous_const).measurableSet
 
-
-
-
 omit [MeasurableSpace k] [BorelSpace k] in
-theorem om_mem_SB {a b : Type*} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b]
-    (μ : kˣ →* ℂˣ) (g : GL a k) (h : GL b k) {Φ : Matrix b a k → ℂ} (hΦ : Φ ∈ SB (Matrix b a k)) :
-    om μ g h Φ ∈ SB (Matrix b a k) := by
-  let e : Matrix b a k ≃ₜ Matrix b a k :=
-    { toFun := fun x => (h⁻¹ : GL b k).val * x * g.val
-      invFun := fun x => h.val * x * (g⁻¹ : GL a k).val
-      left_inv := fun x => by
-        simp only [← Matrix.mul_assoc, Units.mul_inv, Matrix.one_mul]
-        rw [Matrix.mul_assoc, Units.mul_inv, Matrix.mul_one]
-      right_inv := fun x => by
-        simp only [← Matrix.mul_assoc, Units.inv_mul, Matrix.one_mul]
-        rw [Matrix.mul_assoc, Units.inv_mul, Matrix.mul_one]
-      continuous_toFun := (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
-      continuous_invFun := (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const }
+theorem om_mem_SB
+    {a b : Type*} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b]
+    (μ : kˣ →* ℂˣ) (g : GL a k) (h : GL b k)
+    {Φ : Matrix b a k → ℂ} (hΦ : Φ ∈ SB (Matrix b a k))
+    : om μ g h Φ ∈ SB (Matrix b a k) := by
+  let e : Matrix b a k ≃ₜ Matrix b a k := {
+    toFun := fun x => (h⁻¹ : GL b k).val * x * g.val
+    invFun := fun x => h.val * x * (g⁻¹ : GL a k).val
+    left_inv := fun x => by
+      simp only [← Matrix.mul_assoc, Units.mul_inv, Matrix.one_mul]
+      rw [Matrix.mul_assoc, Units.mul_inv, Matrix.mul_one]
+    right_inv := fun x => by
+      simp only [← Matrix.mul_assoc, Units.inv_mul, Matrix.one_mul]
+      rw [Matrix.mul_assoc, Units.inv_mul, Matrix.mul_one]
+    continuous_toFun := (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
+    continuous_invFun := (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
+  }
   have h1 : (Φ ∘ e) ∈ SB (Matrix b a k) :=
     ⟨hΦ.1.comp_continuous e.continuous, hΦ.2.comp_homeomorph e⟩
   exact (SB (Matrix b a k)).smul_mem _ h1

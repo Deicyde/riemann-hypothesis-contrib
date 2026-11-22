@@ -10,22 +10,27 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNormBa
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem exists_isAffineOpen_of_preimage_le_affine : ∀ (R R₁ : Type) [CommRing R] [CommRing R₁] [Algebra R R₁]
-    [Module.Finite R R₁] [Module.Free R R₁] [Nontrivial R₁] [IsLocalRing R] (X X₁ : Scheme.{0})
-    (p : X ⟶ Sp R) (p₁ : X₁ ⟶ Sp R₁) (b : X₁ ⟶ X), IsPullback b p₁ p (spMap (algebraMap R R₁)) →
-    IsSeparated p → QuasiCompact p → ∀ (W : X₁.Opens), IsAffineOpen W → ∀ s : Finset X,
-    (∀ z : X₁, b z ∈ s → z ∈ W) → ∃ O : X.Opens, IsAffineOpen O ∧ ∀ x ∈ s, x ∈ O := by
+theorem exists_isAffineOpen_of_preimage_le_affine
+    : ∀ (R R₁ : Type) [CommRing R] [CommRing R₁] [Algebra R R₁] [Module.Finite R R₁]
+        [Module.Free R R₁] [Nontrivial R₁] [IsLocalRing R] (X X₁ : Scheme.{0}) (p : X ⟶ Sp R)
+        (p₁ : X₁ ⟶ Sp R₁) (b : X₁ ⟶ X),
+      IsPullback b p₁ p (spMap (algebraMap R R₁)) → IsSeparated p → QuasiCompact p
+        → ∀ (W : X₁.Opens),
+          IsAffineOpen W
+            → ∀ s : Finset X,
+              (∀ z : X₁, b z ∈ s → z ∈ W) → ∃ O : X.Opens, IsAffineOpen O ∧ ∀ x ∈ s, x ∈ O := by
   intro R R₁ _ _ _ _ _ _ _ X X₁ p p₁ b H _ _ W hW s hs
   classical
-
   have hg : IsFinite (spMap (algebraMap R R₁)) := by
     rw [IsFinite.SpecMap_iff]
     exact RingHom.finite_algebraMap.2 inferInstance
@@ -37,13 +42,15 @@ theorem exists_isAffineOpen_of_preimage_le_affine : ∀ (R R₁ : Type) [CommRin
   have : IsFinite b := MorphismProperty.of_isPullback H.flip hg
   have : QuasiSeparatedSpace X := quasiSeparatedSpace_of_quasiSeparated p
 
-  let O' : X.Opens := ⟨(b '' (W : Set X₁)ᶜ)ᶜ, (b.isClosedMap _ W.isOpen.isClosed_compl).isOpen_compl⟩
+  let O' : X.Opens :=
+    ⟨(b '' (W : Set X₁)ᶜ)ᶜ, (b.isClosedMap _ W.isOpen.isClosed_compl).isOpen_compl⟩
   have hsO' : ∀ x ∈ s, x ∈ O' := by
     rintro x hx ⟨z, hz, rfl⟩
     exact hz (hs z hx)
   have key : ∀ x ∈ s, ∃ U : X.Opens, IsAffineOpen U ∧ x ∈ U ∧ U ≤ O' := by
     intro x hx
-    obtain ⟨U, hU, hxU, hUO⟩ := (TopologicalSpace.Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens) (hsO' x hx)
+    obtain ⟨U, hU, hxU, hUO⟩ :=
+      (TopologicalSpace.Opens.isBasis_iff_nbhd.1 X.isBasis_affineOpens) (hsO' x hx)
     exact ⟨U, hU, hxU, hUO⟩
   choose U hU hxU hUO using key
   let V : X.Opens := ⨆ x : s, U x.1 x.2
@@ -60,13 +67,15 @@ theorem exists_isAffineOpen_of_preimage_le_affine : ∀ (R R₁ : Type) [CommRin
 
   have hfin : (b ⁻¹' (s : Set X)).Finite :=
     s.finite_toSet.preimage' fun x _ => b.finite_preimage_singleton x
-  obtain ⟨f, hfV, hft⟩ := GlobalTheory.T.exists_basicOpen_between_finset_and_open' X₁ W hW (b ⁻¹ᵁ V) hVW hfin.toFinset
-    (fun z hz => hsV _ ((hfin.mem_toFinset).1 hz))
+  obtain ⟨f, hfV, hft⟩ :=
+    GlobalTheory.T.exists_basicOpen_between_finset_and_open' X₁ W hW (b ⁻¹ᵁ V) hVW hfin.toFinset
+      (fun z hz => hsV _ ((hfin.mem_toFinset).1 hz))
   let f' : Γ(X₁, b ⁻¹ᵁ V) := X₁.presheaf.map (homOfLE hVW).op f
   have hf' : X₁.basicOpen f' = X₁.basicOpen f := by
     rw [Scheme.basicOpen_res]
     exact inf_eq_right.2 hfV
-  obtain ⟨n, hn⟩ := GlobalTheory.T.exists_norm_basicOpen_finiteFree_baseChange R R₁ X X₁ p p₁ b H V hVc hVq f'
+  obtain ⟨n, hn⟩ :=
+    GlobalTheory.T.exists_norm_basicOpen_finiteFree_baseChange R R₁ X X₁ p p₁ b H V hVc hVq f'
   refine ⟨X.basicOpen n, ?_, fun x hx => (hn x).2 ⟨hsV x hx, fun z hz => ?_⟩⟩
   swap
   · rw [hf']

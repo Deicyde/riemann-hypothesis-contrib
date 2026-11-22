@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PadicIsNo
 
 noncomputable section
 
-open Matrix ValuativeRel GlobalTheory.PRep GlobalTheory.BZMir GlobalTheory.BZMir.Fun GlobalTheory.SplitWeil
+open Matrix ValuativeRel GlobalTheory.PRep GlobalTheory.BZMir GlobalTheory.BZMir.Fun
+  GlobalTheory.SplitWeil
 
 namespace GlobalTheory.CompanionTheory.BZMirExhaust
 
@@ -63,16 +64,15 @@ theorem continuous_colMat (n : ℕ) : Continuous (colMat k n) := by
   · simp only [if_neg hj]
     exact continuous_const
 
-theorem continuous_unipMir (n : ℕ) :
-    Continuous (fun v : Fin n → k => unipMir (k := k) n (Multiplicative.ofAdd v)) := by
+theorem continuous_unipMir (n : ℕ)
+    : Continuous (fun v : Fin n → k => unipMir (k := k) n (Multiplicative.ofAdd v)) := by
   have hval : Continuous fun v : Fin n → k =>
       (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) k) + GlobalTheory.BZMir.colMat k n v :=
     continuous_const.add (GlobalTheory.CompanionTheory.BZMirExhaust.continuous_colMat n)
   have hinv : Continuous fun v : Fin n → k =>
       (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) k) - GlobalTheory.BZMir.colMat k n v :=
     continuous_const.sub (GlobalTheory.CompanionTheory.BZMirExhaust.continuous_colMat n)
-  have hGL : Continuous fun v : Fin n → k =>
-      GlobalTheory.BZMir.unip k n (Multiplicative.ofAdd v) :=
+  have hGL : Continuous fun v : Fin n → k => GlobalTheory.BZMir.unip k n (Multiplicative.ofAdd v) :=
     Units.continuous_iff.2 ⟨hval, hinv⟩
   exact hGL.subtype_mk _
 
@@ -84,8 +84,10 @@ theorem ballGroup_le (n : ℕ) (s : kˣ) : ballGroup (k := k) n s ≤ MirUin k n
   rw [GlobalTheory.BZMir.MirUin, Subgroup.mem_subgroupOf, GlobalTheory.BZMir.MirU]
   exact ⟨v, rfl⟩
 
-theorem coe_ballGroup (n : ℕ) (s : kˣ) : (ballGroup (k := k) n s : Set (Mir k n)) =
-    (fun v : Fin n → k => unipMir (k := k) n (Multiplicative.ofAdd v)) '' Set.univ.pi fun _ => cball s := by
+theorem coe_ballGroup (n : ℕ) (s : kˣ)
+    : (ballGroup (k := k) n s : Set (Mir k n))
+      = (fun v : Fin n → k => unipMir (k := k) n (Multiplicative.ofAdd v))
+        '' Set.univ.pi fun _ => cball s := by
   rw [GlobalTheory.CompanionTheory.BZMirExhaust.ballGroup, Subgroup.coe_map]
   ext g
   constructor
@@ -94,24 +96,33 @@ theorem coe_ballGroup (n : ℕ) (s : kˣ) : (ballGroup (k := k) n s : Set (Mir k
   · rintro ⟨v, hv, rfl⟩
     exact ⟨Multiplicative.ofAdd v, hv, rfl⟩
 
-theorem isCompact_ballGroup (n : ℕ) (s : kˣ) : IsCompact (ballGroup (k := k) n s : Set (Mir k n)) := by
+theorem isCompact_ballGroup (n : ℕ) (s : kˣ)
+    : IsCompact (ballGroup (k := k) n s : Set (Mir k n)) := by
   rw [GlobalTheory.CompanionTheory.BZMirExhaust.coe_ballGroup]
   exact (isCompact_univ_pi fun _ => GlobalTheory.SplitWeil.isCompact_cball s).image
     (GlobalTheory.CompanionTheory.BZMirExhaust.continuous_unipMir n)
 
-theorem exhaust (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    GlobalTheory.BZMir.Fun.Exhaust k := by
+theorem exhaust
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : GlobalTheory.BZMir.Fun.Exhaust k := by
   classical
   intro n S hS
-  obtain ⟨s, hs⟩ := GlobalTheory.CompanionTheory.BZMirExhaust.exists_ball_of_finset
-    ((S ×ˢ (Finset.univ : Finset (Fin n))).image fun p =>
-      ((p.1 : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k) (Fin.castSucc p.2) (Fin.last n))
-  refine ⟨GlobalTheory.CompanionTheory.BZMirExhaust.ballGroup n s, GlobalTheory.CompanionTheory.BZMirExhaust.ballGroup_le n s, ?_,
-    GlobalTheory.CompanionTheory.BZMirExhaust.isCompact_ballGroup n s⟩
+  obtain ⟨s, hs⟩ :=
+    GlobalTheory.CompanionTheory.BZMirExhaust.exists_ball_of_finset
+      ((S ×ˢ (Finset.univ : Finset (Fin n))).image fun p =>
+        ((p.1 : GL (Fin (n + 1)) k) : Matrix (Fin (n + 1)) (Fin (n + 1)) k) (Fin.castSucc p.2)
+          (Fin.last n))
+  refine ⟨
+    GlobalTheory.CompanionTheory.BZMirExhaust.ballGroup n s,
+    GlobalTheory.CompanionTheory.BZMirExhaust.ballGroup_le n s,
+    ?_,
+    GlobalTheory.CompanionTheory.BZMirExhaust.isCompact_ballGroup n s
+  ⟩
   intro g hg
   have hgU := hS hg
   rw [SetLike.mem_coe, GlobalTheory.BZMir.MirUin, Subgroup.mem_subgroupOf, GlobalTheory.BZMir.MirU,
-    MonoidHom.mem_range] at hgU
+      MonoidHom.mem_range]
+    at hgU
   obtain ⟨v, hv⟩ := hgU
   rw [Finset.mem_coe] at hg
   rw [SetLike.mem_coe, GlobalTheory.CompanionTheory.BZMirExhaust.ballGroup, Subgroup.mem_map]

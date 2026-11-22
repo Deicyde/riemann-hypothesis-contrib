@@ -8,8 +8,9 @@ open NumberField UniqueFactorizationMonoid
 
 namespace GlobalTheory.SplitRadical
 
-theorem isRadical_of_squarefree {S : Type} [CommRing S] [IsDedekindDomain S] {I : Ideal S}
-    (hI : Squarefree I) : I.IsRadical := by
+theorem isRadical_of_squarefree
+    {S : Type} [CommRing S] [IsDedekindDomain S] {I : Ideal S} (hI : Squarefree I)
+    : I.IsRadical := by
   intro x hx
   obtain ⟨n, hn⟩ := hx
   have h1 : I ∣ Ideal.span {x} ^ n := by
@@ -18,9 +19,10 @@ theorem isRadical_of_squarefree {S : Type} [CommRing S] [IsDedekindDomain S] {I 
   have h2 : I ∣ Ideal.span {x} := hI.isRadical n _ h1
   exact (Ideal.span_singleton_le_iff_mem I).1 (Ideal.dvd_iff_le.1 h2)
 
-theorem isRadical_span_of_ncard_primesOver : ∀ (E : Type) [Field E] [NumberField E] (p : ℕ), p.Prime →
-    (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = Module.finrank ℚ E →
-    (Ideal.span {(p : 𝓞 E)}).IsRadical := by
+theorem isRadical_span_of_ncard_primesOver
+    : ∀ (E : Type) [Field E] [NumberField E] (p : ℕ),
+      p.Prime → (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = Module.finrank ℚ E
+        → (Ideal.span {(p : 𝓞 E)}).IsRadical := by
   intro E _ _ p hp hcard
   haveI : Fact p.Prime := ⟨hp⟩
   set P : Ideal ℤ := Ideal.span {(p : ℤ)} with hP
@@ -34,10 +36,12 @@ theorem isRadical_span_of_ncard_primesOver : ∀ (E : Type) [Field E] [NumberFie
 
   have hsum := Ideal.sum_ramification_inertia_eq_finrank P (𝓞 E)
   rw [NumberField.RingOfIntegers.rank, ← hcard, ← Nat.card_coe_set_eq, Nat.card_eq_fintype_card,
-    ← Finset.card_univ, Finset.card_eq_sum_ones] at hsum
+      ← Finset.card_univ, Finset.card_eq_sum_ones]
+    at hsum
 
-  have hge : ∀ q ∈ (Finset.univ : Finset (P.primesOver (𝓞 E))),
-      1 ≤ q.1.ramificationIdx ℤ * q.1.inertiaDeg ℤ := by
+  have hge
+      : ∀ q ∈ (Finset.univ : Finset (P.primesOver (𝓞 E))),
+        1 ≤ q.1.ramificationIdx ℤ * q.1.inertiaDeg ℤ := by
     intro q _
     haveI : q.1.IsPrime := q.2.1
     exact Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (Ideal.ramificationIdx_pos (R := ℤ) q.1).ne'

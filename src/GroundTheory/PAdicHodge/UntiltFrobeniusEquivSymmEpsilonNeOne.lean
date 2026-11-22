@@ -23,8 +23,9 @@ namespace IsPerfectoidField
 variable {K : Type*} [NontriviallyNormedField K] [IsUltrametricDist K]
 variable {p : ℕ} [Fact p.Prime] [IsPerfectoidField K p] [CharZero K]
 
-instance instIsAdicCompleteMaximalIdealBdR :
-    IsAdicComplete (maximalIdeal (BDeRhamPlus (normInteger K) p)) (BDeRhamPlus (normInteger K) p) :=
+instance instIsAdicCompleteMaximalIdealBdR
+    : IsAdicComplete (maximalIdeal (BDeRhamPlus (normInteger K) p))
+      (BDeRhamPlus (normInteger K) p) :=
   isAdicComplete_maximalIdeal_bDeRhamPlus
 
 end IsPerfectoidField
@@ -53,15 +54,16 @@ theorem muBdR_mem {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) : muBdR p ε ∈ 
     IsPerfectoidField.thetaBDeRhamPlusField_wittToBDeRhamPlus, AInf.fontaineTheta_mu hε]
   rfl
 
-def fontaineT (ε : PreTilt (normInteger ℂ_[p]) p) (hε : PreTilt.untilt ε = 1) :
-    BDeRhamPlus (normInteger ℂ_[p]) p :=
+def fontaineT (ε : PreTilt (normInteger ℂ_[p]) p) (hε : PreTilt.untilt ε = 1)
+    : BDeRhamPlus (normInteger ℂ_[p]) p :=
   logOnePlus 𝔪 (muBdR p ε) (muBdR_mem hε)
 
-theorem fontaineT_sub_sum_mem {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) (n : ℕ) :
-    fontaineT ε hε - ∑ i ∈ Finset.Ico 1 n, algebraMap ℚ 𝔹 ((-1) ^ (i + 1) / i) * muBdR p ε ^ i ∈
-      𝔪 ^ n := by
-  have hs : ∑ i ∈ Finset.Ico 1 n, algebraMap ℚ 𝔹 ((-1) ^ (i + 1) / i) * muBdR p ε ^ i =
-      ∑ i ∈ Finset.range n, algebraMap ℚ 𝔹 (coeff i (log ℚ)) * muBdR p ε ^ i := by
+theorem fontaineT_sub_sum_mem {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) (n : ℕ)
+    : fontaineT ε hε - ∑ i ∈ Finset.Ico 1 n, algebraMap ℚ 𝔹 ((-1) ^ (i + 1) / i) * muBdR p ε ^ i
+      ∈ 𝔪 ^ n := by
+  have hs
+      : ∑ i ∈ Finset.Ico 1 n, algebraMap ℚ 𝔹 ((-1) ^ (i + 1) / i) * muBdR p ε ^ i
+        = ∑ i ∈ Finset.range n, algebraMap ℚ 𝔹 (coeff i (log ℚ)) * muBdR p ε ^ i := by
     rcases n with _ | n
     · simp
     · rw [Finset.range_eq_Ico, Finset.sum_eq_sum_Ico_succ_bot (Nat.succ_pos n), coeff_log,
@@ -80,15 +82,17 @@ theorem isUnit_of_sub_one_mem {u : 𝔹} (hu : u - 1 ∈ 𝔪) : IsUnit u := by
     rwa [sub_sub_cancel] at this
   exact (IsLocalRing.maximalIdeal.isMaximal 𝔹).ne_top ((Ideal.eq_top_iff_one _).2 h2)
 
-theorem maximalIdeal_eq_span_fontaineT {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
-    (hζ : PreTilt.untilt (φi ε) ≠ 1) : 𝔪 = span {fontaineT ε hε} := by
+theorem maximalIdeal_eq_span_fontaineT
+    {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) (hζ : PreTilt.untilt (φi ε) ≠ 1)
+    : 𝔪 = span {fontaineT ε hε} := by
   have hξ := AInf.ker_fontaineTheta_eq_span_xi hε hζ
   have h1 := IsPerfectoidField.maximalIdeal_bDeRhamPlus_eq_span hξ
   have hv : IsUnit (wittToBDeRhamPlus 𝒪 p ((WittVector.frobeniusEquiv p 𝒪♭).symm (AInf.mu ε))) := by
     by_contra h
     have h2 := (IsLocalRing.mem_maximalIdeal _).2 h
     rw [IsPerfectoidField.maximalIdeal_bDeRhamPlus, RingHom.mem_ker,
-      IsPerfectoidField.thetaBDeRhamPlusField_wittToBDeRhamPlus] at h2
+        IsPerfectoidField.thetaBDeRhamPlusField_wittToBDeRhamPlus]
+      at h2
     have h3 := AInf.fontaineTheta_frobeniusEquiv_symm_pow_mu ε 1
     rw [pow_one, pow_one] at h3
     rw [h3] at h2
@@ -107,13 +111,15 @@ theorem maximalIdeal_eq_span_fontaineT {ε : 𝒪♭} (hε : PreTilt.untilt ε =
   have ht : logOnePlus 𝔪 (muBdR p ε) (muBdR_mem hε) = muBdR p ε * u := by
     rw [logOnePlus, hlog, map_mul, seriesEval_X]
   have hu := isUnit_of_sub_one_mem hu1
-  have hμ : muBdR p ε = wittToBDeRhamPlus 𝒪 p (AInf.xi ε) *
-      wittToBDeRhamPlus 𝒪 p ((WittVector.frobeniusEquiv p 𝒪♭).symm (AInf.mu ε)) := by
+  have hμ
+      : muBdR p ε
+        = wittToBDeRhamPlus 𝒪 p (AInf.xi ε)
+          * wittToBDeRhamPlus 𝒪 p ((WittVector.frobeniusEquiv p 𝒪♭).symm (AInf.mu ε)) := by
     rw [muBdR, ← map_mul, ← AInf.mu_eq_xi_mul]
   rw [fontaineT, ht, hμ, mul_assoc, Ideal.span_singleton_mul_right_unit (hv.mul hu), h1]
 
-theorem fontaineT_ne_zero {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
-    (hζ : PreTilt.untilt (φi ε) ≠ 1) : fontaineT ε hε ≠ 0 := by
+theorem fontaineT_ne_zero {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1) (hζ : PreTilt.untilt (φi ε) ≠ 1)
+    : fontaineT ε hε ≠ 0 := by
   intro h
   have h1 := maximalIdeal_eq_span_fontaineT hε hζ
   rw [h, Ideal.span_singleton_eq_bot.2 rfl] at h1
@@ -122,7 +128,6 @@ theorem fontaineT_ne_zero {ε : 𝒪♭} (hε : PreTilt.untilt ε = 1)
 theorem exists_isPrimitiveRoot_p : ∃ ζ : ℂ_[p], IsPrimitiveRoot ζ p := by
   have : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
   exact HasEnoughRootsOfUnity.exists_isPrimitiveRoot ℂ_[p] p
-
 
 variable (p) in
 def rootSeq : ℕ → ℂ_[p]
@@ -148,14 +153,11 @@ theorem norm_rootSeq (n : ℕ) : ‖rootSeq p n‖ = 1 := by
   rw [norm_pow, norm_one] at h
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) (pow_ne_zero _ (Fact.out : p.Prime).ne_zero)).1 h
 
-
 variable (p) in
-def rootSeqInt (n : ℕ) : normInteger ℂ_[p] :=
-  ⟨rootSeq p n, mem_normInteger.2 (norm_rootSeq n).le⟩
+def rootSeqInt (n : ℕ) : normInteger ℂ_[p] := ⟨rootSeq p n, mem_normInteger.2 (norm_rootSeq n).le⟩
 
 theorem rootSeqInt_succ_pow (n : ℕ) : rootSeqInt p (n + 1) ^ p = rootSeqInt p n :=
   Subtype.ext (by simp [rootSeqInt, rootSeq_succ_pow])
-
 
 variable (p) in
 def epsilon : PreTilt (normInteger ℂ_[p]) p :=
@@ -169,7 +171,6 @@ theorem untilt_frobeniusEquiv_symm_epsilon_ne_one : PreTilt.untilt (φi (epsilon
   rw [epsilon, AInf.frobeniusEquiv_symm_ofCompatible, IsPerfectoidField.untilt_ofCompatible]
   intro h
   exact rootSeq_one_ne_one (congrArg Subtype.val h)
-
 
 variable (p) in
 def tBdR : BDeRhamPlus (normInteger ℂ_[p]) p := fontaineT (epsilon p) untilt_epsilon

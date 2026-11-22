@@ -158,7 +158,6 @@ variable (d : ℕ)
 
 variable {d}
 
-
 end Std
 
 end Formalism.MainNotions.InterlacingSignCuts
@@ -252,8 +251,8 @@ open Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.Main
 
 namespace Formalism.MainNotions.InterlacingSignCuts
 
-theorem herm_Hb (k : ℕ) (x y : Fin (k + 1) → ℂ) :
-    herm (Hb k) x y = ∑ j, star (y j) * ((if j = Fin.last k then (-1 : ℂ) else 1) * x j) := by
+theorem herm_Hb (k : ℕ) (x y : Fin (k + 1) → ℂ)
+    : herm (Hb k) x y = ∑ j, star (y j) * ((if j = Fin.last k then (-1 : ℂ) else 1) * x j) := by
   unfold herm Hb
   simp only [dotProduct, Matrix.mulVec_diagonal, Pi.star_apply]
 
@@ -263,8 +262,8 @@ theorem wI_inj (k r : ℕ) : Function.Injective (wI k r) := by
   rw [Fin.mk.injEq] at h
   exact Fin.ext (by omega)
 
-theorem not_range_wI (k r : ℕ) (i : Fin (2 * r + k + 1)) (hi : i ∉ Set.range (wI k r)) :
-    i.val < r ∨ r + k < i.val := by
+theorem not_range_wI (k r : ℕ) (i : Fin (2 * r + k + 1)) (hi : i ∉ Set.range (wI k r))
+    : i.val < r ∨ r + k < i.val := by
   by_contra hc
   push_neg at hc
   apply hi
@@ -274,8 +273,9 @@ theorem not_range_wI (k r : ℕ) (i : Fin (2 * r + k + 1)) (hi : i ∉ Set.range
   show r + (i.val - r) = i.val
   omega
 
-theorem Hpk_wI (k r : ℕ) (j : Fin (k + 1)) (q : Fin (2 * r + k + 1)) :
-    Hpk k r (wI k r j) q = if q = wI k r j then (if j = Fin.last k then (-1 : ℂ) else 1) else 0 := by
+theorem Hpk_wI (k r : ℕ) (j : Fin (k + 1)) (q : Fin (2 * r + k + 1))
+    : Hpk k r (wI k r j) q
+      = if q = wI k r j then (if j = Fin.last k then (-1 : ℂ) else 1) else 0 := by
   have hj := j.isLt
   have hv : (wI k r j).val = r + j.val := rfl
   unfold Hpk
@@ -284,14 +284,15 @@ theorem Hpk_wI (k r : ℕ) (j : Fin (k + 1)) (q : Fin (2 * r + k + 1)) :
   · rw [if_pos hq, if_pos ⟨by rw [hv]; omega, by rw [hv]; omega, hq.symm⟩]
     by_cases hl : j = Fin.last k
     · rw [if_pos hl, if_pos (by rw [hv, hl]; rfl)]
-    · rw [if_neg hl, if_neg (by
-        rw [hv]
-        intro h
-        exact hl (Fin.ext (by rw [Fin.val_last]; omega)))]
+    · rw [if_neg hl,
+        if_neg (by
+          rw [hv]
+          intro h
+          exact hl (Fin.ext (by rw [Fin.val_last]; omega)))]
   · rw [if_neg hq, if_neg (by rintro ⟨_, _, h⟩; exact hq h.symm)]
 
-theorem herm_Hpk_wb (k r : ℕ) (v w : Fin (2 * r + k + 1) → ℂ) (hw : inWb k r w) :
-    herm (Hpk k r) v w = herm (Hb k) (wbPart k r v) (wbPart k r w) := by
+theorem herm_Hpk_wb (k r : ℕ) (v w : Fin (2 * r + k + 1) → ℂ) (hw : inWb k r w)
+    : herm (Hpk k r) v w = herm (Hb k) (wbPart k r v) (wbPart k r w) := by
   rw [herm_Hb]
   unfold herm
   simp only [dotProduct, Pi.star_apply]
@@ -307,9 +308,10 @@ theorem herm_Hpk_wb (k r : ℕ) (v w : Fin (2 * r + k + 1) → ℂ) (hw : inWb k
     rw [this]
     rfl
 
-theorem wbPart_bigCell (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
-    (z' : Fin (2 * r + k + 1) → ℂ) (hz' : inWb k r z') :
-    wbPart k r (bigCell k r c μ *ᵥ z') = μ *ᵥ wbPart k r z' := by
+theorem wbPart_bigCell
+    (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+    (z' : Fin (2 * r + k + 1) → ℂ) (hz' : inWb k r z')
+    : wbPart k r (bigCell k r c μ *ᵥ z') = μ *ᵥ wbPart k r z' := by
   funext j
   simp only [wbPart, Matrix.mulVec, dotProduct]
   symm
@@ -332,11 +334,13 @@ theorem wbPart_bigCell (k r : ℕ) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)
       congr 1 <;> exact Fin.ext (by show r + _ - r = _; omega)
     rw [this]
 
-theorem bigCell_D (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hz' : inWb k r z')
-    (c : Fin r → ℂ) (hc : ∀ a, c a ≠ 0) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) :
-    Dmin k r z z' (bigCell k r c μ) ⟨r, by omega⟩ ≠ 0 ∧
-    Dmin k r z z' (bigCell k r c μ) (Fin.last (r + 1)) =
-      Dmin k r z z' (bigCell k r c μ) ⟨r, by omega⟩ * herm (Hb k) (μ *ᵥ wbPart k r z') (wbPart k r z) := by
+theorem bigCell_D
+    (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hz' : inWb k r z') (c : Fin r → ℂ)
+    (hc : ∀ a, c a ≠ 0) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+    : Dmin k r z z' (bigCell k r c μ) ⟨r, by omega⟩ ≠ 0
+      ∧ Dmin k r z z' (bigCell k r c μ) (Fin.last (r + 1))
+        = Dmin k r z z' (bigCell k r c μ) ⟨r, by omega⟩
+          * herm (Hb k) (μ *ᵥ wbPart k r z') (wbPart k r z) := by
   obtain ⟨m1, -, m3⟩ := Formalism.QuantumDeterminants.bigCellMinors k r z z' c μ hz hz'
   have hDr : Dmin k r z z' (bigCell k r c μ) ⟨r, by omega⟩ ≠ 0 := by
     have h := m1 (Fin.last r)
@@ -364,7 +368,8 @@ end PartAOm
 
 section PartAImg
 
-open Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Topology Filter
+open Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.TopsChoicePartA Topology Filter
 open scoped ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
@@ -402,10 +407,13 @@ namespace Formalism.MainNotions.InterlacingSignCuts.Gm
 
 section Abstract
 
-variable {X Y K Q : Type*} [MeasurableSpace X] [MeasurableSpace Y] [MeasurableSpace K] [MeasurableSpace Q]
+variable
+  {X Y K Q : Type*} [MeasurableSpace X] [MeasurableSpace Y] [MeasurableSpace K] [MeasurableSpace Q]
 
-variable {M ν : Measure X} {Sm : Measure Y} {act : X → Y → X} {LUs : Set X}
-  {μK : Measure K} {μQ : Measure Q} [SFinite μK] [SFinite μQ] {κ : K → Y} {Ψ : K × Q → X} {kc : X → K} {γ : K → ℝ}
+variable
+  {M ν : Measure X} {Sm : Measure Y} {act : X → Y → X} {LUs : Set X} {μK : Measure K}
+  {μQ : Measure Q} [SFinite μK] [SFinite μQ]
+  {κ : K → Y} {Ψ : K × Q → X} {kc : X → K} {γ : K → ℝ}
 
 end Abstract
 
@@ -440,9 +448,11 @@ noncomputable section
 
 namespace Formalism.MainNotions.InterlacingSignCuts.Gm
 
-open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G Formalism.FourierDecayAlt.P
+open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G
+  Formalism.FourierDecayAlt.P
 
-def LUs (s : ℕ) : Set (Msq s × Msq s) := {p | IsLowerUni (Matrix.of p.1) ∧ IsUpperUni (Matrix.of p.2)}
+def LUs (s : ℕ) : Set (Msq s × Msq s) :=
+  {p | IsLowerUni (Matrix.of p.1) ∧ IsUpperUni (Matrix.of p.2)}
 
 end Formalism.MainNotions.InterlacingSignCuts.Gm
 
@@ -459,7 +469,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.InterlacingSignCuts.Gm
 
-open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G Formalism.FourierDecayAlt.P
+open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G
+  Formalism.FourierDecayAlt.P
 
 end Formalism.MainNotions.InterlacingSignCuts.Gm
 
@@ -476,7 +487,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.InterlacingSignCuts.Gm
 
-open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G Formalism.FourierDecayAlt.P
+open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G
+  Formalism.FourierDecayAlt.P
 
 end Formalism.MainNotions.InterlacingSignCuts.Gm
 
@@ -493,7 +505,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.InterlacingSignCuts.Gm
 
-open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G Formalism.FourierDecayAlt.P
+open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G
+  Formalism.FourierDecayAlt.P
 
 end Formalism.MainNotions.InterlacingSignCuts.Gm
 
@@ -510,7 +523,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.InterlacingSignCuts.Gm
 
-open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G Formalism.FourierDecayAlt.P
+open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G
+  Formalism.FourierDecayAlt.P
 
 end Formalism.MainNotions.InterlacingSignCuts.Gm
 
@@ -527,7 +541,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.InterlacingSignCuts.Gm
 
-open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G Formalism.FourierDecayAlt.P Formalism.MainNotions.S
+open Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G
+  Formalism.FourierDecayAlt.P Formalism.MainNotions.S
 
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
 
@@ -579,7 +594,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.InterlacingSignCuts.Gm
 
-open Formalism.MainNotions.S Formalism.MainNotions.S.UnitaryLevelOperators Formalism.FourierDecayAlt.G Formalism.FourierDecayAlt.P
+open Formalism.MainNotions.S Formalism.MainNotions.S.UnitaryLevelOperators
+  Formalism.FourierDecayAlt.G Formalism.FourierDecayAlt.P
 
 section ExpCont
 
@@ -617,7 +633,8 @@ section PartALev
 
 open Matrix MeasureTheory TensorProduct
 open scoped ContDiff
-open Formalism.QuantumDeterminants Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.LevR Formalism.MainNotions.S.UnitaryLevelOperators
+open Formalism.QuantumDeterminants Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.LevR Formalism.MainNotions.S.UnitaryLevelOperators
 
 namespace Formalism.MainNotions.InterlacingSignCuts
 
@@ -709,7 +726,10 @@ theorem f_pos : 0 < D.R.f := by
   exact Fintype.card_pos
 
 theorem prod_places (F : InfinitePlace D.host.E → ℝ) : ∏ w, F w = ∏ v, F (plOf D v) := by
-  exact (Fintype.prod_bijective (plOf D) (plOf_bijective D) (fun v => F (plOf D v)) F (fun v => rfl)).symm
+  exact (Fintype.prod_bijective (plOf D) (plOf_bijective D)
+    (fun v => F (plOf D v))
+    F
+    (fun v => rfl)).symm
 
 end Formalism.MainNotions.InterlacingSignCuts
 
@@ -736,7 +756,10 @@ open Formalism.BasicNotions Formalism.MainNotions.S
 
 section Theta
 
-variable (D : D7) (C1 C2 N T T' : ℝ) (δ : D.host.E) (x : D.what₂.Tau → LocalDataRealPlace D) (L : LatticeDataWithDual D)
+variable
+  (D : D7)
+  (C1 C2 N T T' : ℝ) (δ : D.host.E) (x : D.what₂.Tau → LocalDataRealPlace D)
+  (L : LatticeDataWithDual D)
 
 end Theta
 
@@ -793,7 +816,10 @@ attribute [local instance] Classical.propDecidable
 
 section Sizes
 
-variable (D : D7) (C1 C2 N T T' : ℝ) (δ : D.host.E) (x : D.what₂.Tau → LocalDataRealPlace D) (L : LatticeDataWithDual D) (K : ℕ)
+variable
+  (D : D7)
+  (C1 C2 N T T' : ℝ) (δ : D.host.E) (x : D.what₂.Tau → LocalDataRealPlace D)
+  (L : LatticeDataWithDual D) (K : ℕ)
 
 variable {D C1 C2 N T T' δ x L}
 

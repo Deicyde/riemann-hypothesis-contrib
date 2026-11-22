@@ -11,8 +11,10 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj Complex Matrix Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  Complex Matrix Filter Topology
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped BigOperators Real
 
 namespace GlobalTheory.SectionTheta
@@ -22,33 +24,37 @@ variable {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} {g : ℕ}
 theorem ex_add_lattice (u : HolUnif A L g) (z : Fin g → ℂ) (l : u.Λ) : u.ex (z + l) = u.ex z := by
   rw [u.ex_add, (u.ker l).2 l.2, _root_.mul_one]
 
-theorem quot_eq (u : HolUnif A L g) (z : Fin g → ℂ)
-    (hhom : ∀ U : A.left.Opens, ⊤ ≤ (u.ex z).left ⁻¹ᵁ U →
-      ∃ e : Γ(A.left, U) →+* ℂ, ∀ f, valAt' (u.ex z).left U f = e f)
-    (hres : ∀ (U V : A.left.Opens) (h : V ≤ U) (f : Γ(A.left, U)), ⊤ ≤ (u.ex z).left ⁻¹ᵁ V →
-      valAt' (u.ex z).left V (resG A.left h f) = valAt' (u.ex z).left U f)
+theorem quot_eq
+    (u : HolUnif A L g) (z : Fin g → ℂ)
+    (hhom : ∀ U : A.left.Opens,
+      ⊤ ≤ (u.ex z).left ⁻¹ᵁ U → ∃ e : Γ(A.left, U) →+* ℂ, ∀ f, valAt' (u.ex z).left U f = e f)
+    (hres : ∀ (U V : A.left.Opens) (h : V ≤ U) (f : Γ(A.left, U)),
+      ⊤ ≤ (u.ex z).left ⁻¹ᵁ V → valAt' (u.ex z).left V (resG A.left h f) = valAt' (u.ex z).left U f)
     (n : ℕ) (s : (lbPow L n).Sec) (j j' : (lbPow L n).ι)
-    (hj : ⊤ ≤ (u.ex z).left ⁻¹ᵁ (lbPow L n).U j) (hj' : ⊤ ≤ (u.ex z).left ⁻¹ᵁ (lbPow L n).U j') :
-    valAt' (u.ex z).left ((lbPow L n).U j) (s.f j) / u.fr (j PUnit.unit) z ^ n =
-      valAt' (u.ex z).left ((lbPow L n).U j') (s.f j') / u.fr (j' PUnit.unit) z ^ n := by
-  have hW : ⊤ ≤ (u.ex z).left ⁻¹ᵁ ((lbPow L n).U j ⊓ (lbPow L n).U j') :=
-    fun p hp => ⟨hj hp, hj' hp⟩
+    (hj : ⊤ ≤ (u.ex z).left ⁻¹ᵁ (lbPow L n).U j) (hj' : ⊤ ≤ (u.ex z).left ⁻¹ᵁ (lbPow L n).U j')
+    : valAt' (u.ex z).left ((lbPow L n).U j) (s.f j) / u.fr (j PUnit.unit) z ^ n
+      = valAt' (u.ex z).left ((lbPow L n).U j') (s.f j') / u.fr (j' PUnit.unit) z ^ n := by
+  have hW : ⊤ ≤ (u.ex z).left ⁻¹ᵁ ((lbPow L n).U j ⊓ (lbPow L n).U j') := fun p hp =>
+    ⟨hj hp, hj' hp⟩
   have hi : ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U (j PUnit.unit) := Cartier.lbPow_U L n j ▸ hj
   have hi' : ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U (j' PUnit.unit) := Cartier.lbPow_U L n j' ▸ hj'
-  have hW' : ⊤ ≤ (u.ex z).left ⁻¹ᵁ (L.U (j PUnit.unit) ⊓ L.U (j' PUnit.unit)) :=
-    fun p hp => ⟨hi hp, hi' hp⟩
+  have hW' : ⊤ ≤ (u.ex z).left ⁻¹ᵁ (L.U (j PUnit.unit) ⊓ L.U (j' PUnit.unit)) := fun p hp =>
+    ⟨hi hp, hi' hp⟩
   obtain ⟨e, he⟩ := hhom _ hW
   have h1 := hres _ _ (inf_le_left : (lbPow L n).U j ⊓ (lbPow L n).U j' ≤ _) (s.f j) hW
   have h2 := hres _ _ (inf_le_right : (lbPow L n).U j ⊓ (lbPow L n).U j' ≤ _) (s.f j') hW
-  have h3 := hres _ _ (inf_le_inf (Cartier.lbPow_U L n j).le (Cartier.lbPow_U L n j').le)
-    (L.g (j PUnit.unit) (j' PUnit.unit)).val hW
-  have hc : resG A.left (inf_le_left : (lbPow L n).U j ⊓ (lbPow L n).U j' ≤ _) (s.f j) =
-      (resG A.left (inf_le_inf (Cartier.lbPow_U L n j).le (Cartier.lbPow_U L n j').le)
-        (L.g (j PUnit.unit) (j' PUnit.unit)).val) ^ n *
-      resG A.left (inf_le_right : (lbPow L n).U j ⊓ (lbPow L n).U j' ≤ _) (s.f j') := by
+  have h3 :=
+    hres _ _ (inf_le_inf (Cartier.lbPow_U L n j).le (Cartier.lbPow_U L n j').le)
+      (L.g (j PUnit.unit) (j' PUnit.unit)).val hW
+  have hc
+      : resG A.left (inf_le_left : (lbPow L n).U j ⊓ (lbPow L n).U j' ≤ _) (s.f j)
+        = (resG A.left (inf_le_inf (Cartier.lbPow_U L n j).le (Cartier.lbPow_U L n j').le)
+              (L.g (j PUnit.unit) (j' PUnit.unit)).val)
+            ^ n
+          * resG A.left (inf_le_right : (lbPow L n).U j ⊓ (lbPow L n).U j' ≤ _) (s.f j') := by
     refine (s.compat j j').trans ?_
-    exact congrArg (· * _) ((congrArg Units.val (Cartier.lbPow_g L n j j')).trans
-      (Units.val_pow_eq_pow_val _ _))
+    exact congrArg (· * _)
+      ((congrArg Units.val (Cartier.lbPow_g L n j j')).trans (Units.val_pow_eq_pow_val _ _))
   have hfr := u.fr_compat _ _ z hW'
   have hne := u.fr_ne _ z hi
   have hne' := u.fr_ne _ z hi'
@@ -64,8 +70,39 @@ namespace GlobalTheory
 
 open SectionTheta
 
-theorem sections_pow_theta_functions :
-    (∀ (X : Scheme.{0}) (x : Sp ℂ ⟶ X), (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U ↔ x (default : PrimeSpectrum ℂ) ∈ U) ∧ (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U → ∃ e : Γ(X, U) →+* ℂ, ∀ f, valAt' x U f = e f) ∧ (∀ (U V : X.Opens) (h : V ≤ U) (f : Γ(X, U)), ⊤ ≤ x ⁻¹ᵁ V → valAt' x V (resG X h f) = valAt' x U f) ∧ (∀ (Y : Scheme.{0}) (φ : X ⟶ Y) (U : Y.Opens) (f : Γ(Y, U)), valAt' x (φ ⁻¹ᵁ U) ((φ.app U).hom f) = valAt' (x ≫ φ) U f) ∧ (∀ (U : X.Opens) (f : Γ(X, U)), ⊤ ≤ x ⁻¹ᵁ X.basicOpen f ↔ valAt' x U f ≠ 0) ∧ (∀ (p : X ⟶ Sp ℂ), x ≫ p = 𝟙 _ → ∀ (U : X.Opens) (a : ℂ), ⊤ ≤ x ⁻¹ᵁ U → valAt' x U (constFn p U a) = a)) → (∀ (X : Over (Sp ℂ)), IsReduced X.left → LocallyOfFiniteType X.hom → ∀ (U : X.left.Opens) (f f' : Γ(X.left, U)), (∀ x : (𝟙_ (Over (Sp ℂ)) ⟶ X), ⊤ ≤ (x).left ⁻¹ᵁ U → valAt' x.left U f = valAt' x.left U f') → f = f') → (∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ), Smooth p → IsReduced X) → (∀ (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (Hm : Matrix (Fin P.g) (Fin P.g) ℂ) (χ : u.Λ → ℂ) (Ef : LinearMap.BilinForm ℤ u.Λ), (Hm.IsHermitian ∧ (∀ l, ‖χ l‖ = 1) ∧ (∀ l m : u.Λ, (Ef l m : ℝ) = ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin P.g → ℂ))).im) ∧ ∀ (l : u.Λ) i z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ P.L.U i → u.fr i z = (χ l * cexp (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ))) + Real.pi / 2 * ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ))))) * u.fr i (z + l)) → ∀ n : ℕ, (∀ s, ∃! θ, u.IsThetaFn Hm χ n θ ∧ u.IsFnPow n s θ) ∧ ∀ θ s s', u.IsFnPow n s θ → u.IsFnPow n s' θ → s = s') := by
+theorem sections_pow_theta_functions
+    : (∀ (X : Scheme.{0}) (x : Sp ℂ ⟶ X),
+        (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U ↔ x (default : PrimeSpectrum ℂ) ∈ U)
+          ∧ (∀ (U : X.Opens), ⊤ ≤ x ⁻¹ᵁ U → ∃ e : Γ(X, U) →+* ℂ, ∀ f, valAt' x U f = e f)
+          ∧ (∀ (U V : X.Opens) (h : V ≤ U) (f : Γ(X, U)),
+            ⊤ ≤ x ⁻¹ᵁ V → valAt' x V (resG X h f) = valAt' x U f)
+          ∧ (∀ (Y : Scheme.{0}) (φ : X ⟶ Y) (U : Y.Opens) (f : Γ(Y, U)),
+            valAt' x (φ ⁻¹ᵁ U) ((φ.app U).hom f) = valAt' (x ≫ φ) U f)
+          ∧ (∀ (U : X.Opens) (f : Γ(X, U)), ⊤ ≤ x ⁻¹ᵁ X.basicOpen f ↔ valAt' x U f ≠ 0)
+          ∧ (∀ (p : X ⟶ Sp ℂ),
+            x ≫ p = 𝟙 _ → ∀ (U : X.Opens) (a : ℂ), ⊤ ≤ x ⁻¹ᵁ U → valAt' x U (constFn p U a) = a))
+      → (∀ (X : Over (Sp ℂ)),
+        IsReduced X.left → LocallyOfFiniteType X.hom
+          → ∀ (U : X.left.Opens) (f f' : Γ(X.left, U)),
+            (∀ x : (𝟙_ (Over (Sp ℂ)) ⟶ X),
+                ⊤ ≤ (x).left ⁻¹ᵁ U → valAt' x.left U f = valAt' x.left U f')
+              → f = f')
+      → (∀ (X : Scheme.{0}) (p : X ⟶ Sp ℂ), Smooth p → IsReduced X)
+      → (∀ (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (Hm : Matrix (Fin P.g) (Fin P.g) ℂ)
+          (χ : u.Λ → ℂ) (Ef : LinearMap.BilinForm ℤ u.Λ),
+        (Hm.IsHermitian ∧ (∀ l, ‖χ l‖ = 1)
+            ∧ (∀ l m : u.Λ,
+              (Ef l m : ℝ) = ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin P.g → ℂ))).im)
+            ∧ ∀ (l : u.Λ) i z,
+              ⊤ ≤ (u.ex z).left ⁻¹ᵁ P.L.U i
+                → u.fr i z
+                  = (χ l * cexp
+                      (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ)))
+                        + Real.pi / 2 * ((l : Fin P.g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin P.g → ℂ)))))
+                    * u.fr i (z + l))
+          → ∀ n : ℕ,
+            (∀ s, ∃! θ, u.IsThetaFn Hm χ n θ ∧ u.IsFnPow n s θ)
+              ∧ ∀ θ s s', u.IsFnPow n s θ → u.IsFnPow n s' θ → s = s') := by
   intro hval hext hred P u Hm χ Ef hAH n
   obtain ⟨-, -, -, hlaw⟩ := hAH
   have hcov : ∀ z, ∃ j : (lbPow P.L n).ι, ⊤ ≤ (u.ex z).left ⁻¹ᵁ (lbPow P.L n).U j := by
@@ -76,14 +113,18 @@ theorem sections_pow_theta_functions :
     refine ⟨fun _ => i, ?_⟩
     rw [Cartier.lbPow_U]
     exact ((hval _ (u.ex z).left).1 _).2 hi
-  have hU : ∀ z (j : (lbPow P.L n).ι), ⊤ ≤ (u.ex z).left ⁻¹ᵁ (lbPow P.L n).U j →
-      ⊤ ≤ (u.ex z).left ⁻¹ᵁ P.L.U (j PUnit.unit) := fun z j hj => Cartier.lbPow_U P.L n j ▸ hj
+  have hU
+      : ∀ z (j : (lbPow P.L n).ι),
+        ⊤ ≤ (u.ex z).left ⁻¹ᵁ (lbPow P.L n).U j → ⊤ ≤ (u.ex z).left ⁻¹ᵁ P.L.U (j PUnit.unit) :=
+    fun z j hj => Cartier.lbPow_U P.L n j ▸ hj
   refine ⟨fun s => ?_, fun θ s s' hs hs' => ?_⟩
   · choose c hc using hcov
     let θ : (Fin P.g → ℂ) → ℂ := fun z =>
       valAt' (u.ex z).left ((lbPow P.L n).U (c z)) (s.f (c z)) / u.fr (c z PUnit.unit) z ^ n
-    have hθ : ∀ (j : (lbPow P.L n).ι) z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ (lbPow P.L n).U j →
-        θ z = valAt' (u.ex z).left ((lbPow P.L n).U j) (s.f j) / u.fr (j PUnit.unit) z ^ n :=
+    have hθ
+        : ∀ (j : (lbPow P.L n).ι) z,
+          ⊤ ≤ (u.ex z).left ⁻¹ᵁ (lbPow P.L n).U j
+            → θ z = valAt' (u.ex z).left ((lbPow P.L n).U j) (s.f j) / u.fr (j PUnit.unit) z ^ n :=
       fun j z hj => quot_eq u z (hval _ _).2.1 (hval _ _).2.2.1 n s _ _ (hc z) hj
     have hfn : u.IsFnPow n s θ := by
       intro j z hj
@@ -94,8 +135,9 @@ theorem sections_pow_theta_functions :
       have hd2 : DifferentiableOn ℂ (u.fr (c z PUnit.unit))
           {w | ⊤ ≤ (u.ex w).left ⁻¹ᵁ (lbPow P.L n).U (c z)} :=
         (u.fr_hol _).mono fun w hw => hU w _ hw
-      have hq := (hd.differentiableAt hn).mul (((hd2.differentiableAt hn).pow n).inv
-        (pow_ne_zero n (u.fr_ne _ z (hU z _ (hc z)))))
+      have hq :=
+        (hd.differentiableAt hn).mul
+          (((hd2.differentiableAt hn).pow n).inv (pow_ne_zero n (u.fr_ne _ z (hU z _ (hc z)))))
       refine hq.congr_of_eventuallyEq ?_
       filter_upwards [hn] with w hw
       exact (hθ _ w hw).trans (div_eq_mul_inv _ _)

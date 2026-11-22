@@ -16,9 +16,11 @@ namespace CrystallineSemistableComparison.PAlg
 
 variable {l : ℕ} [Fact l.Prime] (A : PAlg l)
 
-theorem charP [Nontrivial A.A] : CharP A.A l := (CharP.charP_iff_prime_eq_zero Fact.out).2 A.natCast_l
+theorem charP [Nontrivial A.A] : CharP A.A l :=
+  (CharP.charP_iff_prime_eq_zero Fact.out).2 A.natCast_l
 
-theorem subsingleton_W_of_subsingleton_A [Subsingleton A.A] : Subsingleton A.W := ⟨fun _ _ => WittVector.ext fun _ => Subsingleton.elim _ _⟩
+theorem subsingleton_W_of_subsingleton_A [Subsingleton A.A] : Subsingleton A.W :=
+  ⟨fun _ _ => WittVector.ext fun _ => Subsingleton.elim _ _⟩
 
 theorem mem_span_l_iff (x : A.W) : x ∈ Ideal.span {(l : A.W)} ↔ x.coeff 0 = 0 := by
   rcases subsingleton_or_nontrivial A.A with h | h
@@ -57,36 +59,45 @@ theorem xi_eq : A.xi = (l : A.W) - WittVector.teichmuller l A.pi := by
   rw [xi, xi0, map_sub, map_natCast, sW, WittVector.map_teichmuller]; rfl
 
 theorem xi_coeff_zero : A.xi.coeff 0 = -A.pi := by
-  rw [xi_eq, ← WittVector.constantCoeff_apply, map_sub, map_natCast, natCast_l, WittVector.constantCoeff_apply,
-    WittVector.teichmuller_coeff_zero, zero_sub]
+  rw [xi_eq, ← WittVector.constantCoeff_apply, map_sub, map_natCast, natCast_l,
+    WittVector.constantCoeff_apply, WittVector.teichmuller_coeff_zero, zero_sub]
 
 theorem sharp_pi : A.sharp A.pi = (l : A.U) := by
   have h : A.th A.xi = 0 := Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self _)
   rw [xi_eq, map_sub, map_natCast, sub_eq_zero] at h
   exact h.symm
 
-theorem acris_torsion_free : R.TF A.Acr0 := fun k hk => mem_nonZeroDivisors_iff_left.2 fun x hx => Subtype.ext (by
-  have : (k : WL l A.A) * x.1 = 0 := by simpa using congrArg Subtype.val hx
-  exact (A.isUnit_natCast hk).mul_right_eq_zero.1 this)
+theorem acris_torsion_free : R.TF A.Acr0 := fun k hk =>
+  mem_nonZeroDivisors_iff_left.2 fun x hx =>
+    Subtype.ext (by
+      have : (k : WL l A.A) * x.1 = 0 := by simpa using congrArg Subtype.val hx
+      exact (A.isUnit_natCast hk).mul_right_eq_zero.1 this)
 
 theorem constantCoeff_surjective : Function.Surjective (WittVector.constantCoeff : A.W →+* A.A) :=
   fun a => ⟨WittVector.teichmuller l a, WittVector.teichmuller_coeff_zero l a⟩
 
 def aTo1 : A.A →+* A.Acr 1 :=
-  (WittVector.constantCoeff : A.W →+* A.A).liftOfSurjective A.constantCoeff_surjective ⟨A.toAcr 1, fun x hx => by
-    obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 ((A.mem_span_l_iff x).2 hx)
-    have := A.pow_l_acr 1
-    rw [pow_one] at this
-    rw [RingHom.mem_ker, map_mul, map_natCast, this, mul_zero]⟩
+  (WittVector.constantCoeff : A.W →+* A.A).liftOfSurjective A.constantCoeff_surjective ⟨
+    A.toAcr 1,
+    fun x hx => by
+      obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 ((A.mem_span_l_iff x).2 hx)
+      have := A.pow_l_acr 1
+      rw [pow_one] at this
+      rw [RingHom.mem_ker, map_mul, map_natCast, this, mul_zero]
+  ⟩
 
-theorem aTo1_coeff (x : A.W) : A.aTo1 (x.coeff 0) = A.toAcr 1 x := RingHom.liftOfSurjective_comp_apply _ _ _ x
+theorem aTo1_coeff (x : A.W) : A.aTo1 (x.coeff 0) = A.toAcr 1 x :=
+  RingHom.liftOfSurjective_comp_apply _ _ _ x
 
 def aToU1 : A.A →+* A.Un 1 :=
-  (WittVector.constantCoeff : A.W →+* A.A).liftOfSurjective A.constantCoeff_surjective
-    ⟨(Ideal.Quotient.mk _).comp A.th, fun x hx => by
-    obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 ((A.mem_span_l_iff x).2 hx)
-    rw [RingHom.mem_ker, RingHom.comp_apply, map_mul, map_natCast, Ideal.Quotient.eq_zero_iff_mem, pow_one]
-    exact Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _)⟩
+  (WittVector.constantCoeff : A.W →+* A.A).liftOfSurjective A.constantCoeff_surjective ⟨
+    (Ideal.Quotient.mk _).comp A.th,
+    fun x hx => by
+      obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.1 ((A.mem_span_l_iff x).2 hx)
+      rw [RingHom.mem_ker, RingHom.comp_apply, map_mul, map_natCast, Ideal.Quotient.eq_zero_iff_mem,
+        pow_one]
+      exact Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _)
+  ⟩
 
 theorem sharpMap_coeff (x : A.W) : A.aToU1 (x.coeff 0) = Ideal.Quotient.mk _ (A.th x) :=
   RingHom.liftOfSurjective_comp_apply _ _ _ x
@@ -100,7 +111,8 @@ def PFil0 : Ideal A.Acr0 := Ideal.span {(l : A.Acr0)} ⊔ A.Fil0 1
 def expand (c : ℕ →₀ A.A) : A.Acr 1 := c.sum fun k a => A.aTo1 a * A.dxi 1 (l * k)
 
 def contR (Γ : Type) [TopologicalSpace Γ] : Subring (Γ → A.A) where
-  carrier := {f | ∀ k : ℕ, IsLocallyConstant fun γ => Ideal.Quotient.mk (Ideal.span {A.pi ^ k}) (f γ)}
+  carrier :=
+    {f | ∀ k : ℕ, IsLocallyConstant fun γ => Ideal.Quotient.mk (Ideal.span {A.pi ^ k}) (f γ)}
   mul_mem' hf hg k := by simp only [Pi.mul_apply, map_mul]; exact (hf k).mul (hg k)
   one_mem' k := IsLocallyConstant.const (Ideal.Quotient.mk (Ideal.span {A.pi ^ k}) 1)
   add_mem' hf hg k := by simp only [Pi.add_apply, map_add (f := _)]; exact (hf k).add (hg k)
@@ -108,6 +120,7 @@ def contR (Γ : Type) [TopologicalSpace Γ] : Subring (Γ → A.A) where
   neg_mem' hf k := by simp only [Pi.neg_apply, map_neg]; exact (hf k).neg
 
 def contC (Γ : Type) [TopologicalSpace Γ] : A.A →+* A.contR Γ :=
-  (Pi.constRingHom Γ A.A).codRestrict _ fun a k => IsLocallyConstant.const (Ideal.Quotient.mk (Ideal.span {A.pi ^ k}) a)
+  (Pi.constRingHom Γ A.A).codRestrict _ fun a k =>
+    IsLocallyConstant.const (Ideal.Quotient.mk (Ideal.span {A.pi ^ k}) a)
 
 end CrystallineSemistableComparison.PAlg

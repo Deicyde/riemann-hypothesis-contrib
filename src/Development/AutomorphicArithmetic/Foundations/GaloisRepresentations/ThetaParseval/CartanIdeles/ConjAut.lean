@@ -6,10 +6,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 open scoped nonZeroDivisors Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.Gal.TP.Skew
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GroundTheory.Global
+  GroundTheory.Global.IdeleGroup UpperTheory.Gal.TP.Skew
 
-theorem UpperTheory.Gal.TP.Skew.conjAut :
-    UpperTheory.Gal.TP.Skew.ConjAut := by
+theorem UpperTheory.Gal.TP.Skew.conjAut : UpperTheory.Gal.TP.Skew.ConjAut := by
   classical
   intro F E _ _ _ _ _ σ hσ
   obtain ⟨_, hE, h2, hconj⟩ := hσ
@@ -41,8 +42,9 @@ theorem UpperTheory.Gal.TP.Skew.conjAut :
     by_contra hg
     push_neg at hg
     have hle : ({1, s, g} : Finset Gal(E/F)).card ≤ Fintype.card Gal(E/F) := Finset.card_le_univ _
-    rw [Finset.card_insert_of_notMem (by simp [hs1.symm, hg.1.symm]),
-      Finset.card_pair hg.2.symm, hcard] at hle
+    rw [Finset.card_insert_of_notMem (by simp [hs1.symm, hg.1.symm]), Finset.card_pair hg.2.symm,
+        hcard]
+      at hle
     omega
   · exact sub_ne_zero.mpr hx
   · rw [map_sub, hsq]

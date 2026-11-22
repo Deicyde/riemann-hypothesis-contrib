@@ -64,14 +64,15 @@ private lemma continuousOn_weight (k : ℕ) (z : ℂ) :
   exact (ContinuousAt.comp (f := fun y : ℝ => ((|y| : ℝ) : ℂ)) (g := fun w : ℂ => w ^ z)
     (continuousAt_cpow_const h1) h2).continuousWithinAt
 
-theorem UpperTheory.integrable_and_continuous_mellinIntegral_of_rapidDecay :
-    ∀ (W : ℝ → ℝ → ℂ) (c : ℝ → ℂ) (k : ℕ) (s : ℂ),
-        ContinuousOn (fun p : ℝ × ℝ => W p.1 p.2) (({0}ᶜ : Set ℝ) ×ˢ Set.univ) →
-        ContinuousOn c ({0}ᶜ : Set ℝ) → (∀ y, ‖c y‖ = 1) →
-        (∀ r : ℕ, ∃ B : ℝ, ∀ y t, y ≠ 0 → ‖W y t‖ ≤ B * ((1 + |y|) ^ r)⁻¹) →
-        1 - (k : ℝ) < s.re →
-        (∀ t, MeasureTheory.Integrable fun y : ℝ => W y t * c y * (y : ℂ) ^ k * ((|y| : ℝ) : ℂ) ^ (s - 2)) ∧
-        Continuous fun t => ∫ y : ℝ, W y t * c y * (y : ℂ) ^ k * ((|y| : ℝ) : ℂ) ^ (s - 2) := by
+theorem UpperTheory.integrable_and_continuous_mellinIntegral_of_rapidDecay
+    : ∀ (W : ℝ → ℝ → ℂ) (c : ℝ → ℂ) (k : ℕ) (s : ℂ),
+      ContinuousOn (fun p : ℝ × ℝ => W p.1 p.2) (({0}ᶜ : Set ℝ) ×ˢ Set.univ)
+        → ContinuousOn c ({0}ᶜ : Set ℝ) → (∀ y, ‖c y‖ = 1)
+        → (∀ r : ℕ, ∃ B : ℝ, ∀ y t, y ≠ 0 → ‖W y t‖ ≤ B * ((1 + |y|) ^ r)⁻¹) → 1 - (k : ℝ) < s.re
+        → (∀ t,
+            MeasureTheory.Integrable fun y : ℝ =>
+              W y t * c y * (y : ℂ) ^ k * ((|y| : ℝ) : ℂ) ^ (s - 2))
+          ∧ Continuous fun t => ∫ y : ℝ, W y t * c y * (y : ℂ) ^ k * ((|y| : ℝ) : ℂ) ^ (s - 2) := by
   intro W c k s hW hc hc1 hdec hs
   obtain ⟨a, hadef⟩ : ∃ a : ℝ, a = k + s.re - 2 := ⟨_, rfl⟩
   have ha : -1 < a := by rw [hadef]; linarith
@@ -80,35 +81,44 @@ theorem UpperTheory.integrable_and_continuous_mellinIntegral_of_rapidDecay :
   have hae : ∀ᵐ y : ℝ, y ∈ ({0}ᶜ : Set ℝ) := compl_mem_ae_iff.2 (measure_singleton (0 : ℝ))
   have hint : Integrable fun y : ℝ => |B| * (((1 + |y|) ^ r)⁻¹ * |y| ^ a) :=
     (integrable_weight ha hr).const_mul _
-  have hnorm : ∀ t, ∀ᵐ y : ℝ,
-      ‖W y t * c y * (y : ℂ) ^ k * ((|y| : ℝ) : ℂ) ^ (s - 2)‖
-        ≤ |B| * (((1 + |y|) ^ r)⁻¹ * |y| ^ a) := by
+  have hnorm
+      : ∀ t,
+        ∀ᵐ y : ℝ,
+          ‖W y t * c y * (y : ℂ) ^ k * ((|y| : ℝ) : ℂ) ^ (s - 2)‖
+            ≤ |B| * (((1 + |y|) ^ r)⁻¹ * |y| ^ a) := by
     intro t
     filter_upwards [hae] with y hy
     have hy0 : 0 < |y| := abs_pos.2 hy
     have hw : ‖(y : ℂ) ^ k * ((|y| : ℝ) : ℂ) ^ (s - 2)‖ = |y| ^ a := by
       rw [norm_mul, norm_pow, Complex.norm_real, Real.norm_eq_abs,
-        Complex.norm_cpow_eq_rpow_re_of_pos hy0, hadef, ← Real.rpow_natCast,
-        ← Real.rpow_add hy0]
+        Complex.norm_cpow_eq_rpow_re_of_pos hy0, hadef, ← Real.rpow_natCast, ← Real.rpow_add hy0]
       congr 1
       simp only [Complex.sub_re, Complex.re_ofNat]
       ring
     have hp : 0 ≤ |y| ^ a := Real.rpow_nonneg hy0.le _
     have hinv : 0 ≤ ((1 + |y|) ^ r)⁻¹ := by positivity
     rw [mul_assoc, norm_mul, norm_mul, hc1, mul_one, hw]
-    calc ‖W y t‖ * |y| ^ a ≤ (B * ((1 + |y|) ^ r)⁻¹) * |y| ^ a :=
-          mul_le_mul_of_nonneg_right (hB y t hy) hp
+    calc
+      ‖W y t‖ * |y| ^ a
+        ≤ (B * ((1 + |y|) ^ r)⁻¹) * |y| ^ a := mul_le_mul_of_nonneg_right (hB y t hy) hp
       _ ≤ (|B| * ((1 + |y|) ^ r)⁻¹) * |y| ^ a :=
-          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_abs_self B) hinv) hp
+        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_abs_self B) hinv) hp
       _ = |B| * (((1 + |y|) ^ r)⁻¹ * |y| ^ a) := by ring
-  have hmeas : ∀ t, AEStronglyMeasurable
-      (fun y : ℝ => W y t * c y * (y : ℂ) ^ k * ((|y| : ℝ) : ℂ) ^ (s - 2)) volume := by
+  have hmeas
+      : ∀ t,
+        AEStronglyMeasurable
+          (fun y : ℝ => W y t * c y * (y : ℂ) ^ k * ((|y| : ℝ) : ℂ) ^ (s - 2))
+          volume := by
     intro t
     have h1 : ContinuousOn (fun y : ℝ => W y t) ({0}ᶜ : Set ℝ) :=
-      ContinuousOn.comp (g := fun p : ℝ × ℝ => W p.1 p.2) (f := fun y : ℝ => (y, t)) hW
-        (by fun_prop) (fun y hy => ⟨hy, trivial⟩)
+      ContinuousOn.comp
+        (g := fun p : ℝ × ℝ => W p.1 p.2)
+        (f := fun y : ℝ => (y, t))
+        hW (by fun_prop)
+        (fun y hy => ⟨hy, trivial⟩)
     have h2 : ContinuousOn
-        (fun y : ℝ => W y t * c y * (y : ℂ) ^ k * ((|y| : ℝ) : ℂ) ^ (s - 2)) ({0}ᶜ : Set ℝ) := by
+        (fun y : ℝ => W y t * c y * (y : ℂ) ^ k * ((|y| : ℝ) : ℂ) ^ (s - 2))
+        ({0}ᶜ : Set ℝ) := by
       refine ((h1.mul hc).mul (continuousOn_weight k (s - 2))).congr ?_
       intro y _
       simp only [Pi.mul_apply, mul_assoc]

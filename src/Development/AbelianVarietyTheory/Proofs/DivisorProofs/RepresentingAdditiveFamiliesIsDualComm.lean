@@ -5,8 +5,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Exi
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,8 +21,9 @@ namespace GlobalTheory.DualCon
 variable {S : Scheme.{0}}
 
 def addCls (A : Over S) [GrpObj A] (T : Over S) : AddSubgroup (Pic (A ⊗ T).left) where
-  carrier := {c | ∀ (Y : Over S) (a a' : Y ⟶ A) (t : Y ⟶ T),
-    CechPic.pull (lift (a * a') t).left c = CechPic.pull (lift a t).left c + CechPic.pull (lift a' t).left c}
+  carrier :=
+    {c | ∀ (Y : Over S) (a a' : Y ⟶ A) (t : Y ⟶ T),
+      CechPic.pull (lift (a * a') t).left c = CechPic.pull (lift a t).left c + CechPic.pull (lift a' t).left c}
   add_mem' {c d} hc hd Y a a' t := by
     simp only [map_add (f := _)]
     rw [hc Y a a' t, hd Y a a' t]
@@ -32,16 +36,16 @@ def addCls (A : Over S) [GrpObj A] (T : Over S) : AddSubgroup (Pic (A ⊗ T).lef
 
 variable {A : Over S} [GrpObj A]
 
-theorem fam_iff_mem {T : Over S} {N : LB (A ⊗ T).left} (hN : N.IsLB) : Fam A N ↔ cls N hN ∈ addCls A T :=
+theorem fam_iff_mem {T : Over S} {N : LB (A ⊗ T).left} (hN : N.IsLB)
+    : Fam A N ↔ cls N hN ∈ addCls A T :=
   ⟨fun h ↦ (isAdditive_iff hN).1 h.add, fun h ↦ ⟨hN, (isAdditive_iff hN).2 h⟩⟩
 
 def resCls {T' T : Over S} (u : T' ⟶ T) : addCls A T →+ addCls A T' :=
-  ((CechPic.pull (lift (fst A T') (snd A T' ≫ u)).left).comp (addCls A T).subtype).codRestrict _
-    fun c Y a a' t ↦ by
-      simp only [AddMonoidHom.coe_comp, AddSubgroup.coe_subtype, Function.comp_apply, ← CechPic.pull_comp,
-        ← Over.comp_left, comp_lift, lift_fst, lift_snd_assoc]
-      exact c.2 Y a a' (t ≫ u)
-
+  ((CechPic.pull (lift (fst A T') (snd A T' ≫ u)).left).comp
+      (addCls A T).subtype).codRestrict _ fun c Y a a' t ↦ by
+    simp only [AddMonoidHom.coe_comp, AddSubgroup.coe_subtype, Function.comp_apply,
+      ← CechPic.pull_comp, ← Over.comp_left, comp_lift, lift_fst, lift_snd_assoc]
+    exact c.2 Y a a' (t ≫ u)
 
 variable (A) in
 def famFunctor : (Over S)ᵒᵖ ⥤ CommGrpCat.{1} where
@@ -56,8 +60,8 @@ def famFunctor : (Over S)ᵒᵖ ⥤ CommGrpCat.{1} where
   map_comp {T T' T''} g g' := by
     refine CommGrpCat.hom_ext (MonoidHom.ext fun c ↦ ?_)
     refine Subtype.ext ?_
-    change CechPic.pull (lift (fst A T''.unop) (snd A T''.unop ≫ g'.unop ≫ g.unop)).left _ =
-      CechPic.pull (lift (fst A T''.unop) (snd A T''.unop ≫ g'.unop)).left
+    change CechPic.pull (lift (fst A T''.unop) (snd A T''.unop ≫ g'.unop ≫ g.unop)).left _
+      = CechPic.pull (lift (fst A T''.unop) (snd A T''.unop ≫ g'.unop)).left
         (CechPic.pull (lift (fst A T'.unop) (snd A T'.unop ≫ g.unop)).left _)
     rw [← CechPic.pull_comp, ← Over.comp_left, comp_lift, lift_fst, lift_snd_assoc, Category.assoc]
 
@@ -67,16 +71,22 @@ variable {B : Over S} {P : LB (A ⊗ B).left} (h : Rep A (toUnit B) P)
 
 include h
 
-def ptCls (T : Over S) (x : T ⟶ B) : addCls A T :=
-  ⟨evc h.fam.isLB (fst A T) (snd A T ≫ x), (fam_iff_mem (pull_isLB h.fam.isLB _)).1
-    ⟨pull_isLB h.fam.isLB _, fun Y a a' t ↦ by
+def ptCls (T : Over S) (x : T ⟶ B) : addCls A T := ⟨
+  evc h.fam.isLB (fst A T) (snd A T ≫ x),
+  (fam_iff_mem (pull_isLB h.fam.isLB _)).1 ⟨
+    pull_isLB h.fam.isLB _,
+    fun Y a a' t ↦ by
       refine (cls_eq_iff (pull_isLB (pull_isLB h.fam.isLB _) _)
-        (isLB_tens (pull_isLB (pull_isLB h.fam.isLB _) _) (pull_isLB (pull_isLB h.fam.isLB _) _))).1 ?_
+        (isLB_tens (pull_isLB (pull_isLB h.fam.isLB _) _)
+          (pull_isLB (pull_isLB h.fam.isLB _) _))).1 ?_
       rw [cls_tens (pull_isLB (pull_isLB h.fam.isLB _) _) (pull_isLB (pull_isLB h.fam.isLB _) _)]
-      rw [cls_ev (pull_isLB h.fam.isLB _), cls_ev (pull_isLB h.fam.isLB _), cls_ev (pull_isLB h.fam.isLB _)]
+      rw [cls_ev (pull_isLB h.fam.isLB _), cls_ev (pull_isLB h.fam.isLB _),
+        cls_ev (pull_isLB h.fam.isLB _)]
       rw [evc_ev h.fam.isLB, evc_ev h.fam.isLB, evc_ev h.fam.isLB]
       simp only [lift_fst, lift_snd_assoc]
-      exact (isAdditive_iff h.fam.isLB).1 h.fam.add Y _ _ _⟩⟩
+      exact (isAdditive_iff h.fam.isLB).1 h.fam.add Y _ _ _
+  ⟩
+⟩
 
 theorem ptCls_bij (T : Over S) : Function.Bijective (ptCls h T) := by
   have hP := h.fam.isLB
@@ -92,11 +102,11 @@ theorem ptCls_bij (T : Over S) : Function.Bijective (ptCls h T) := by
     obtain ⟨x, ⟨-, hx⟩, -⟩ := h.univ T (toUnit T) N fN
     exact ⟨x, Subtype.ext (((cls_eq_iff hN (pull_isLB hP _)).2 hx).symm.trans hc)⟩
 
-theorem ptCls_comp {T' T : Over S} (g : T' ⟶ T) (x : T ⟶ B) :
-    ptCls h T' (g ≫ x) = resCls g (ptCls h T x) := by
+theorem ptCls_comp {T' T : Over S} (g : T' ⟶ T) (x : T ⟶ B)
+    : ptCls h T' (g ≫ x) = resCls g (ptCls h T x) := by
   refine Subtype.ext ?_
-  change evc h.fam.isLB (fst A T') (snd A T' ≫ g ≫ x) =
-    CechPic.pull (lift (fst A T') (snd A T' ≫ g)).left (evc h.fam.isLB (fst A T) (snd A T ≫ x))
+  change evc h.fam.isLB (fst A T') (snd A T' ≫ g ≫ x)
+    = CechPic.pull (lift (fst A T') (snd A T' ≫ g)).left (evc h.fam.isLB (fst A T) (snd A T ≫ x))
   rw [pull_evc, lift_fst, lift_snd_assoc, Category.assoc]
 
 def famRep : (famFunctor A ⋙ forget CommGrpCat.{1}).RepresentableBy B where
@@ -111,13 +121,14 @@ namespace GlobalTheory.DualCon
 
 variable {S : Scheme.{0}} {A : Over S} [GrpObj A] {B : Over S} {P : LB (A ⊗ B).left}
 
-theorem evc_eq_pull_ptCls (h : Rep A (toUnit B) P) {Y : Over S} (a : Y ⟶ A) (x : Y ⟶ B) :
-    evc h.fam.isLB a x = CechPic.pull (lift a (𝟙 Y)).left (ptCls h Y x : Pic (A ⊗ Y).left) := by
+theorem evc_eq_pull_ptCls (h : Rep A (toUnit B) P) {Y : Over S} (a : Y ⟶ A) (x : Y ⟶ B)
+    : evc h.fam.isLB a x = CechPic.pull (lift a (𝟙 Y)).left (ptCls h Y x : Pic (A ⊗ Y).left) := by
   change _ = CechPic.pull (lift a (𝟙 Y)).left (evc h.fam.isLB (fst A Y) (snd A Y ≫ x))
   rw [pull_evc, lift_fst, lift_snd_assoc, Category.id_comp]
 
-theorem rep_isDual : ∀ (S : Scheme.{0}) (A B : Over S) [GrpObj A] (P : LB (A ⊗ B).left),
-    Rep A (toUnit B) P → ∃ _ : GrpObj B, IsCommMonObj B ∧ IsDual A B P ∧ IsAdditive (swap P) := by
+theorem rep_isDual
+    : ∀ (S : Scheme.{0}) (A B : Over S) [GrpObj A] (P : LB (A ⊗ B).left),
+      Rep A (toUnit B) P → ∃ _ : GrpObj B, IsCommMonObj B ∧ IsDual A B P ∧ IsAdditive (swap P) := by
   intro S A B _ P h
   have hP := h.fam.isLB
   letI inst : CommGrpObj B := CommGrpObj.ofRepresentableBy B _ (famRep h)
@@ -125,7 +136,8 @@ theorem rep_isDual : ∀ (S : Scheme.{0}) (A B : Over S) [GrpObj A] (P : LB (A �
     have hμ : ptCls h (B ⊗ B) μ[B] = ptCls h _ (fst B B) + ptCls h _ (snd B B) :=
       Equiv.ofBijective_apply_symm_apply (ptCls h (B ⊗ B)) (ptCls_bij h _) _
     intro Y x y
-    rw [Hom.mul_def, ptCls_comp, hμ, map_add (f := _), ← ptCls_comp, ← ptCls_comp, lift_fst, lift_snd]
+    rw [Hom.mul_def, ptCls_comp, hμ, map_add (f := _), ← ptCls_comp, ← ptCls_comp, lift_fst,
+      lift_snd]
   have hone : ∀ (Y : Over S), ptCls h Y (1 : Y ⟶ B) = 0 := by
     have hη : ptCls h (𝟙_ (Over S)) η[B] = 0 :=
       Equiv.ofBijective_apply_symm_apply (ptCls h _) (ptCls_bij h _) 0

@@ -13,14 +13,16 @@ open MeasureTheory NumberField Formalism.BasicNotions Matrix
 
 namespace Formalism.L2.SG.Pf.NcReal.JX.NOf
 
-open Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.MainNotions.S Formalism.L2.SG.Pf.NcReal.JX
+open Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.MainNotions.S
+  Formalism.L2.SG.Pf.NcReal.JX
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem theta_int_mem {I : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E} {x : D.host.E} (hx : x ∈ I) :
-    x * theta D ∈ I := by
+theorem theta_int_mem
+    {I : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E} {x : D.host.E} (hx : x ∈ I)
+    : x * theta D ∈ I := by
   unfold theta
   split_ifs with h
   · obtain ⟨hint, -⟩ := h.choose_spec
@@ -30,24 +32,28 @@ theorem theta_int_mem {I : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.h
   · rw [mul_zero]
     exact (I : Submodule (𝓞 D.host.E) D.host.E).zero_mem
 
-theorem inW_sub {X : HidaSetting D} {x y : (VS D).V} (hx : InW X x) (hy : InW X y) : InW X (x - y) := by
+theorem inW_sub {X : HidaSetting D} {x y : (VS D).V} (hx : InW X x) (hy : InW X y)
+    : InW X (x - y) := by
   intro c
   obtain ⟨h1, h2⟩ := hx c
   obtain ⟨h3, h4⟩ := hy c
   exact ⟨by rw [map_sub, h1, h3, sub_zero], by rw [map_sub, h2, h4, sub_zero]⟩
 
-theorem xblk {X : HidaSetting D} (u : D.what₂.Word) (X0 : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E)
-    (xs : Fin D.R.rS → (VS D).V) (M : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E)
-    (p : Formalism.L2.SG.Pf.LsNc5.LtPair D.R.rS) :
-    blkQ X u X0 xs M (Sum.inl (Sum.inl p)) - tauQ X u (Sum.inl (Sum.inl p)) (blkQ X u X0 xs M) =
-      embV X (X0 p.1.1 p.1.2) := by
+theorem xblk
+    {X : HidaSetting D}
+    (u : D.what₂.Word) (X0 : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E) (xs : Fin D.R.rS → (VS D).V)
+    (M : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E) (p : Formalism.L2.SG.Pf.LsNc5.LtPair D.R.rS)
+    : blkQ X u X0 xs M (Sum.inl (Sum.inl p)) - tauQ X u (Sum.inl (Sum.inl p)) (blkQ X u X0 xs M)
+      = embV X (X0 p.1.1 p.1.2) := by
   simp only [blkQ, tauQ]
   first | exact sub_zero _ | rfl | simp
 
-theorem rblk {X : HidaSetting D} (u : D.what₂.Word) (X0 : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E)
-    (xs : Fin D.R.rS → (VS D).V) (M : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E) (b : Fin D.R.rS) :
-    blkQ X u X0 xs M (Sum.inl (Sum.inr b)) - tauQ X u (Sum.inl (Sum.inr b)) (blkQ X u X0 xs M) =
-      rowV X u (xs b) := by
+theorem rblk
+    {X : HidaSetting D}
+    (u : D.what₂.Word) (X0 : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E) (xs : Fin D.R.rS → (VS D).V)
+    (M : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E) (b : Fin D.R.rS)
+    : blkQ X u X0 xs M (Sum.inl (Sum.inr b)) - tauQ X u (Sum.inl (Sum.inr b)) (blkQ X u X0 xs M)
+      = rowV X u (xs b) := by
   simp only [blkQ, tauQ]
   first | exact sub_zero _ | rfl | simp
 
@@ -66,7 +72,8 @@ theorem fibQ_holds : FibQ := by
       simp only [cLat] at h1
       obtain ⟨t, ht, hte⟩ := (CovB.mem_closure_embV X _ _).1 h1
       have : t = X0 b a := CovB.embVHom_injective X hte
-      rw [← this]; exact ht
+      rw [← this]
+      exact ht
 
     have hR : ∀ b, xs b ∈ aaLb X b := by
       intro b
@@ -77,7 +84,8 @@ theorem fibQ_holds : FibQ := by
       have hz : rowV X u (xs b - y) = 0 := by rw [rowV_sub, hye, sub_self]
       have := rowV_inj X u _ (inW_sub (hW b) (aaLb_inW X hy)) hz
       rw [sub_eq_zero] at this
-      rw [this]; exact hy
+      rw [this]
+      exact hy
     have hG := Gp_mem X X0 xs hup hd hX hR
     refine ⟨hX, hR, ?_⟩
 
@@ -88,7 +96,8 @@ theorem fibQ_holds : FibQ := by
       simp only [cLat] at h1
       obtain ⟨t, ht, hte⟩ := (CovB.mem_closure_embV X _ _).1 h1
       have : t = M b a := CovB.embVHom_injective X hte
-      rw [← this]; exact ht
+      rw [← this]
+      exact ht
     intro b a
     rcases lt_trichotomy b a with hba | hba | hba
     · exact hMu b a hba
@@ -102,7 +111,7 @@ theorem fibQ_holds : FibQ := by
       rw [e]
       exact Submodule.sub_mem _ hxi (theta_int_mem (hG b b))
     · have e := entry_rel X hok b a
-      have e2 : M b a = -Gp D X0 xs b a - star (M a b) := by rw [← e]; ring
+      have e2 : M b a = - Gp D X0 xs b a - star (M a b) := by rw [← e]; ring
       rw [e2]
       refine Submodule.sub_mem _ (Submodule.neg_mem _ (hG b a)) ?_
       have hab : M a b ∈ iP D b a := by rw [iP_comm]; exact hMu a b hba

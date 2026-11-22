@@ -29,10 +29,10 @@ theorem isDer_DL : IsDer (DL W) := by
   · simp only [DL, dL_mul]
     ring
 
-theorem DL_C (r : R) : DL W (HahnSeries.C r) = 0 := by
-  simp only [DL, dL_C, mul_zero]
+theorem DL_C (r : R) : DL W (HahnSeries.C r) = 0 := by simp only [DL, dL_C, mul_zero]
 
-theorem constCurve_DL : ConstCurve (DL W) (curveL W) := ⟨DL_C W _, DL_C W _, DL_C W _, DL_C W _, DL_C W _⟩
+theorem constCurve_DL : ConstCurve (DL W) (curveL W) :=
+  ⟨DL_C W _, DL_C W _, DL_C W _, DL_C W _, DL_C W _⟩
 
 theorem DL_toL (f : R⟦X⟧) : DL W (toL f) = toL (D W f) := by
   rw [DL_apply, dL_toL, CurveSer.D_apply, map_mul]
@@ -75,11 +75,8 @@ theorem inv_mul_wSer : uPow (-3) * toL (xS W) * toL (wSer W) = 1 := by
     rw [e0, ← uPow_add]
     show HahnSeries.single (-3 + 3 : ℤ) (1 : R) = 1
     rw [show (-3 + 3 : ℤ) = 0 by norm_num]
-    first
-      | rfl
-      | simp
-  have e2 : toL (wU W) * toL (xS W) = 1 := by
-    rw [← map_mul, CurveSer.wU_mul_xS, map_one]
+    first | rfl | simp
+  have e2 : toL (wU W) * toL (xS W) = 1 := by rw [← map_mul, CurveSer.wU_mul_xS, map_one]
   rw [CurveSer.wSer_eq W, map_mul]
   linear_combination (toL (wU W) * toL (xS W)) * e1 + e2
 
@@ -105,7 +102,7 @@ theorem isFlow_xL_yL : IsFlow (curveL W) (DL W) (xL W) (yL W) := by
   have hv := hD.2 (uPow (-3) * toL (xS W)) (toL (wSer W))
   rw [hvw, h1, hDw] at hv
   unfold fuAt at hv
-  have hneg : ∀ f, DL W (-f) = -DL W f := fun f => by simp only [DL, map_neg, mul_neg]
+  have hneg : ∀ f, DL W (-f) = - DL W f := fun f => by simp only [DL, map_neg, mul_neg]
   unfold IsFlow
   rw [← toL_X_mul_inv W, ← neg_inv W, hD.2, hDu, hneg]
   unfold fwAt
@@ -126,7 +123,7 @@ theorem isFlow_xL_yL : IsFlow (curveL W) (DL W) (xL W) (yL W) := by
   · linear_combination ((curveL W).a₁ * v + 2 * (curveL W).a₂ * u * v
       + (curveL W).a₄ * (v * w + 1) + Dv) * hvw + v * hv
 
-theorem toL_X_mul_yL : toL X * yL W = -xL W := by
+theorem toL_X_mul_yL : toL X * yL W = - xL W := by
   rw [← neg_inv W, ← toL_X_mul_inv W]
   ring
 

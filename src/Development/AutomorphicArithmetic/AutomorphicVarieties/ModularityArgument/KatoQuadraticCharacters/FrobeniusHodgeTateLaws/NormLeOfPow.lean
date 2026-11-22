@@ -6,17 +6,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open UpperTheory.V.Z.Kato.Joint
 
-private theorem norm_le_of_pow {l : ℕ} [Fact l.Prime] (ι : PadicAlgCl l ≃+* ℂ) (z : ℂ) (n : ℕ) (hn : n ≠ 0)
-    (h : z ^ n = 1) : ‖ι.symm z‖ ≤ 1 := by
+private theorem norm_le_of_pow
+    {l : ℕ} [Fact l.Prime] (ι : PadicAlgCl l ≃+* ℂ) (z : ℂ) (n : ℕ) (hn : n ≠ 0) (h : z ^ n = 1)
+    : ‖ι.symm z‖ ≤ 1 := by
   have h1 : ‖ι.symm z‖ ^ n = 1 := by rw [← norm_pow, ← map_pow, h, map_one, norm_one]
   exact ((pow_eq_one_iff_of_nonneg (norm_nonneg _) hn).mp h1).le
 
-private theorem hat_std {N : ℕ} [NeZero N] (φ : ZMod N → ℂ) (d : ℤ) :
-    GlobalTheory.EisM.hat φ d = ∑ y : ZMod N, φ y * ZMod.stdAddChar (y * (d : ZMod N)) := by
+private theorem hat_std {N : ℕ} [NeZero N] (φ : ZMod N → ℂ) (d : ℤ)
+    : GlobalTheory.EisM.hat φ d = ∑ y : ZMod N, φ y * ZMod.stdAddChar (y * (d : ZMod N)) := by
   unfold GlobalTheory.EisM.hat
-  refine Finset.sum_nbij' (fun i => (i : ZMod N)) (fun y => y.val) (fun _ _ => Finset.mem_univ _)
-    (fun y _ => Finset.mem_range.mpr (ZMod.val_lt y)) (fun i hi => ZMod.val_cast_of_lt (Finset.mem_range.mp hi))
-    (fun y _ => ZMod.natCast_zmod_val y) (fun i _ => ?_)
+  refine Finset.sum_nbij'
+    (fun i => (i : ZMod N))
+    (fun y => y.val)
+    (fun _ _ => Finset.mem_univ _)
+    (fun y _ => Finset.mem_range.mpr (ZMod.val_lt y))
+    (fun i hi => ZMod.val_cast_of_lt (Finset.mem_range.mp hi))
+    (fun y _ => ZMod.natCast_zmod_val y)
+    (fun i _ => ?_)
   have h : ((i : ZMod N)) * (d : ZMod N) = (((i : ℤ) * d : ℤ) : ZMod N) := by push_cast; rfl
   rw [h, ZMod.stdAddChar_coe]
   push_cast
@@ -28,8 +34,7 @@ private theorem norm_two' {l : ℕ} [hl : Fact l.Prime] (h : l ≠ 2) : ‖(2 : 
   rw [h1, norm_algebraMap']
   exact Padic.norm_natCast_eq_one_iff.mpr ((Nat.coprime_primes hl.out Nat.prime_two).mpr h)
 
-theorem UpperTheory.V.Z.Kato.Joint.hatW :
-    UpperTheory.V.Z.Kato.Joint.HatW := by
+theorem UpperTheory.V.Z.Kato.Joint.hatW : UpperTheory.V.Z.Kato.Joint.HatW := by
   intro l _ ι N _ θ hl
   refine ⟨?_, fun d => ?_, fun d => ?_⟩
   · by_contra hc

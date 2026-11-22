@@ -9,27 +9,38 @@ public import Development.WeilBound.RepresentationTheoryGL.RegularisedSiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU
 
 namespace PositivityTheory.Rg.Rsw.L.LGenK
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (v : HeightOneSpectrum (𝓞 F))
 
-theorem finEmb_sigR (σ : E →ₐ[F] E) (τ : E →ₐ[F] FvBar F v) (y : Fv F v ⊗[F] E) :
-    finEmb F v τ (sigR (Fv F v) σ y) = finEmb F v (τ.comp σ) y := by
+theorem finEmb_sigR (σ : E →ₐ[F] E) (τ : E →ₐ[F] FvBar F v) (y : Fv F v ⊗[F] E)
+    : finEmb F v τ (sigR (Fv F v) σ y) = finEmb F v (τ.comp σ) y := by
   induction y using TensorProduct.induction_on with
   | zero => simp
   | tmul a x => simp [sigR, finEmb_tmul]
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-theorem sigR_mem (σ : E →ₐ[F] E) {y : Fv F v ⊗[F] E} (hy : y ∈ intLoc F E v) : sigR (Fv F v) σ y ∈ intLoc F E v := sigR_mem_intLoc σ hy
+theorem sigR_mem (σ : E →ₐ[F] E) {y : Fv F v ⊗[F] E} (hy : y ∈ intLoc F E v)
+    : sigR (Fv F v) σ y ∈ intLoc F E v :=
+  sigR_mem_intLoc σ hy
 
 def sR (σ : E →ₐ[F] E) : intLoc F E v →+* intLoc F E v :=
-  ((sigR (Fv F v) σ).comp (intLoc F E v).subtype).codRestrict (intLoc F E v) fun y => sigR_mem v σ y.2
+  ((sigR (Fv F v) σ).comp (intLoc F E v).subtype).codRestrict (intLoc F E v) fun y =>
+    sigR_mem v σ y.2
 
-@[simp] theorem coe_sR (σ : E →ₐ[F] E) (y : intLoc F E v) : (sR v σ y : Fv F v ⊗[F] E) = sigR (Fv F v) σ y := rfl
+@[simp]
+theorem coe_sR (σ : E →ₐ[F] E) (y : intLoc F E v)
+    : (sR v σ y : Fv F v ⊗[F] E) = sigR (Fv F v) σ y :=
+  rfl
 
-theorem absBar_le_one (τ : E →ₐ[F] FvBar F v) (y : intLoc F E v) : absBar F v (finEmb F v τ y) ≤ 1 := (le_absFin F v τ y).trans (absFin_le_one_of_mem_intLoc y.2)
+theorem absBar_le_one (τ : E →ₐ[F] FvBar F v) (y : intLoc F E v)
+    : absBar F v (finEmb F v τ y) ≤ 1 :=
+  (le_absFin F v τ y).trans (absFin_le_one_of_mem_intLoc y.2)
 
 def p0 (τ : E →ₐ[F] FvBar F v) : Ideal (intLoc F E v) where
   carrier := {y | absBar F v (finEmb F v τ y) < 1}
@@ -39,12 +50,14 @@ def p0 (τ : E →ₐ[F] FvBar F v) : Ideal (intLoc F E v) where
     exact (absBar_add_le F v _ _).trans_lt (max_lt ha hb)
   zero_mem' := by
     simp only [Set.mem_setOf_eq, ZeroMemClass.coe_zero, map_zero]
-    rw [(absBar_eq_zero F v).2 rfl]; exact zero_lt_one
+    rw [(absBar_eq_zero F v).2 rfl]
+    exact zero_lt_one
   smul_mem' := by
     intro c y hy
     simp only [Set.mem_setOf_eq, smul_eq_mul, Subring.coe_mul, map_mul, absBar_mul] at *
-    calc absBar F v (finEmb F v τ c) * absBar F v (finEmb F v τ y) ≤ 1 * absBar F v (finEmb F v τ y) :=
-          mul_le_mul_of_nonneg_right (absBar_le_one v τ c) zero_le
+    calc
+      absBar F v (finEmb F v τ c) * absBar F v (finEmb F v τ y) ≤ 1 * absBar F v (finEmb F v τ y) :=
+        mul_le_mul_of_nonneg_right (absBar_le_one v τ c) zero_le
       _ < 1 := by rw [one_mul]; exact hy
 
 theorem absBar_finEmb_one (τ : E →ₐ[F] FvBar F v) : absBar F v (finEmb F v τ 1) = 1 := by
@@ -57,8 +70,9 @@ theorem prime_valuation_ne_top (τ : E →ₐ[F] FvBar F v) : p0 v τ ≠ ⊤ :=
   rw [OneMemClass.coe_one, absBar_finEmb_one] at this
   exact lt_irrefl _ this
 
-theorem isUnit_of_absBar (y : intLoc F E v) (h : ∀ τ : E →ₐ[F] FvBar F v, absBar F v (finEmb F v τ y) = 1) :
-    IsUnit y := by
+theorem isUnit_of_absBar
+    (y : intLoc F E v) (h : ∀ τ : E →ₐ[F] FvBar F v, absBar F v (finEmb F v τ y) = 1)
+    : IsUnit y := by
   have hne : ∀ τ : E →ₐ[F] FvBar F v, finEmb F v τ (y : Fv F v ⊗[F] E) ≠ 0 := by
     intro τ h0
     have h1 := h τ
@@ -85,8 +99,10 @@ theorem isUnit_of_absBar (y : intLoc F E v) (h : ∀ τ : E →ₐ[F] FvBar F v,
     rw [h1, e1]
   exact isUnit_iff_exists_inv.2 ⟨⟨z, hzmem⟩, Subtype.ext hz⟩
 
-theorem emb_cases (σ : E →ₐ[F] E) (hσ1 : σ ≠ AlgHom.id F E) (h2 : Module.finrank F E = 2) (τ0 τ : E →ₐ[F] FvBar F v) :
-    τ = τ0 ∨ τ = τ0.comp σ := by
+theorem emb_cases
+    (σ : E →ₐ[F] E) (hσ1 : σ ≠ AlgHom.id F E)
+    (h2 : Module.finrank F E = 2) (τ0 τ : E →ₐ[F] FvBar F v)
+    : τ = τ0 ∨ τ = τ0.comp σ := by
   classical
   by_contra hne
   push_neg at hne
@@ -104,18 +120,18 @@ theorem emb_cases (σ : E →ₐ[F] E) (hσ1 : σ ≠ AlgHom.id F E) (h2 : Modul
   have h4 := Finset.card_le_univ ({τ, τ0, τ0.comp σ} : Finset (E →ₐ[F] FvBar F v))
   omega
 
-theorem exists_max (σ : E →ₐ[F] E) (hσ1 : σ ≠ AlgHom.id F E) (h2 : Module.finrank F E = 2) :
-    ∃ 𝔭 : Ideal (intLoc F E v), 𝔭.IsMaximal ∧ ∀ x, x ∉ 𝔭 → sR v σ x ∉ 𝔭 → IsUnit x := by
+theorem exists_max (σ : E →ₐ[F] E) (hσ1 : σ ≠ AlgHom.id F E) (h2 : Module.finrank F E = 2)
+    : ∃ 𝔭 : Ideal (intLoc F E v), 𝔭.IsMaximal ∧ ∀ x, x ∉ 𝔭 → sR v σ x ∉ 𝔭 → IsUnit x := by
   have τ0 : E →ₐ[F] FvBar F v := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   obtain ⟨𝔭, hmax, hle⟩ := Ideal.exists_le_maximal _ (prime_valuation_ne_top v τ0)
   refine ⟨𝔭, hmax, fun x hx hsx => isUnit_of_absBar v x fun τ => ?_⟩
   have hone : ∀ w : intLoc F E v, w ∉ 𝔭 → absBar F v (finEmb F v τ0 w) = 1 := by
     intro w hw
-    exact le_antisymm (absBar_le_one v τ0 w) (not_lt.1 fun hlt => hw (hle (show w ∈ p0 v τ0 from hlt)))
+    exact le_antisymm (absBar_le_one v τ0 w)
+      (not_lt.1 fun hlt => hw (hle (show w ∈ p0 v τ0 from hlt)))
   rcases emb_cases v σ hσ1 h2 τ0 τ with rfl | rfl
   · exact hone x hx
   · have h5 := hone _ hsx
@@ -128,7 +144,8 @@ theorem isUnit_two (h : (2 : 𝓞 F) ∉ v.asIdeal) : IsUnit (2 : intLoc F E v) 
         HeightOneSpectrum.adicCompletion.coe_one]
       norm_num
     have e2 : (2 : F) = algebraMap (𝓞 F) F 2 := (map_ofNat (algebraMap (𝓞 F) F) 2).symm
-    rw [e, HeightOneSpectrum.adicCompletion.valued_coe, e2, HeightOneSpectrum.valuation_of_algebraMap,
+    rw [e, HeightOneSpectrum.adicCompletion.valued_coe, e2,
+      HeightOneSpectrum.valuation_of_algebraMap,
       HeightOneSpectrum.intValuation_eq_one_iff_mem_primeCompl]
     exact h
   have hmem : (2 : Fv F v)⁻¹ ∈ HeightOneSpectrum.adicCompletionIntegers F v := by
@@ -138,13 +155,10 @@ theorem isUnit_two (h : (2 : 𝓞 F) ∉ v.asIdeal) : IsUnit (2 : intLoc F E v) 
     rw [h0, map_zero] at hv
     exact zero_ne_one hv
   have h2 : (2 : Fv F v ⊗[F] E) = (2 : Fv F v) ⊗ₜ[F] (1 : E) := by
-    rw [show (2 : Fv F v) = 1 + 1 by norm_num, TensorProduct.add_tmul, ← Algebra.TensorProduct.one_def]
+    rw [show (2 : Fv F v) = 1 + 1 by norm_num, TensorProduct.add_tmul,
+      ← Algebra.TensorProduct.one_def]
     norm_num
-  have hc : ((2 : intLoc F E v) : Fv F v ⊗[F] E) = 2 := by
-    first
-    | rfl
-    | norm_cast
-    | simp
+  have hc : ((2 : intLoc F E v) : Fv F v ⊗[F] E) = 2 := by first | rfl | norm_cast | simp
   refine isUnit_iff_exists_inv.2 ⟨⟨_, tmul_mem_intLoc hmem (1 : 𝓞 E)⟩, Subtype.ext ?_⟩
   push_cast
   rw [hc, h2, Algebra.TensorProduct.tmul_mul_tmul, mul_inv_cancel₀ h0, one_mul,

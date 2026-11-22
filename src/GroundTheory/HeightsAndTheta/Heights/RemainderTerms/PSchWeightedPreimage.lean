@@ -13,23 +13,28 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open MvPolynomial Finset
 
-theorem SchWeightedPreimage.proof (h1 : SchPowerSumHomWeighted.Statement) :
-    SchWeightedPreimage.Statement := by
+theorem SchWeightedPreimage.proof (h1 : SchPowerSumHomWeighted.Statement)
+    : SchWeightedPreimage.Statement := by
   classical
   intro N k P hsym hhom
   obtain ⟨S₀, hS₀⟩ := Flag.exists_powerSumHom_eq hsym
   let w : Fin N → ℕ := fun i => (i : ℕ) + 1
-  refine ⟨weightedHomogeneousComponent w k S₀, ?_,
-    weightedHomogeneousComponent_isWeightedHomogeneous k S₀⟩
+  refine ⟨
+    weightedHomogeneousComponent w k S₀,
+    ?_,
+    weightedHomogeneousComponent_isWeightedHomogeneous k S₀
+  ⟩
   have hfin := weightedHomogeneousComponent_finsupp (w := w) S₀
   have hsum := sum_weightedHomogeneousComponent w S₀
   rw [finsum_eq_sum _ hfin] at hsum
-  have hterm : ∀ m : ℕ, homogeneousComponent k (powerSumHom N (weightedHomogeneousComponent w m S₀))
-      = if k = m then powerSumHom N (weightedHomogeneousComponent w m S₀) else 0 :=
-    fun m => homogeneousComponent_of_mem
-      (h1 N m _ (weightedHomogeneousComponent_isWeightedHomogeneous m S₀))
-  have key : homogeneousComponent k (powerSumHom N S₀) =
-      powerSumHom N (weightedHomogeneousComponent w k S₀) := by
+  have hterm
+      : ∀ m : ℕ,
+        homogeneousComponent k (powerSumHom N (weightedHomogeneousComponent w m S₀))
+          = if k = m then powerSumHom N (weightedHomogeneousComponent w m S₀) else 0 := fun m =>
+    homogeneousComponent_of_mem (h1 N m _ (weightedHomogeneousComponent_isWeightedHomogeneous m S₀))
+  have key
+      : homogeneousComponent k (powerSumHom N S₀)
+        = powerSumHom N (weightedHomogeneousComponent w k S₀) := by
     conv_lhs => rw [← hsum]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, map_sum]

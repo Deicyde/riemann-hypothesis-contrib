@@ -16,18 +16,22 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Fin
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.twistBaseChange : _root_.ReciprocityTheory.ChartRestriction.G.DVR.TwistBaseChangeStatement :=
-  _root_.GlobalTheory.twistBaseChange_of_finrank_sections_one _root_.GlobalTheory.AbLaw.finrank_sections_principal_polarisation_eq_one
+theorem _root_.GlobalTheory.twistBaseChange
+    : _root_.ReciprocityTheory.ChartRestriction.G.DVR.TwistBaseChangeStatement :=
+  _root_.GlobalTheory.twistBaseChange_of_finrank_sections_one
+    _root_.GlobalTheory.AbLaw.finrank_sections_principal_polarisation_eq_one
 
 end GlobalTheory

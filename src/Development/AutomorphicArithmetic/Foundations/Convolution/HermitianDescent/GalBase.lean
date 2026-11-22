@@ -14,8 +14,8 @@ section
 
 variable {k R : Type} [CommRing k] [CommRing R] [Algebra k R] {σ : R ≃ₐ[k] R} {q : ℕ}
 
-private theorem sum_fixed (h : IsGal σ q) (r : R) :
-    σ (∑ j ∈ Finset.range q, (σ ^ j) r) = ∑ j ∈ Finset.range q, (σ ^ j) r := by
+private theorem sum_fixed (h : IsGal σ q) (r : R)
+    : σ (∑ j ∈ Finset.range q, (σ ^ j) r) = ∑ j ∈ Finset.range q, (σ ^ j) r := by
   have h1 := Finset.sum_range_succ (fun j => (σ ^ j) r) q
   have h2 := Finset.sum_range_succ' (fun j => (σ ^ j) r) q
   rw [h1, h.pow, pow_zero] at h2
@@ -24,8 +24,8 @@ private theorem sum_fixed (h : IsGal σ q) (r : R) :
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [pow_succ', AlgEquiv.mul_apply]
 
-private theorem exists_tr (h : IsGal σ q) :
-    ∃ t : R →ₗ[k] k, ∀ r, algebraMap k R (t r) = ∑ j ∈ Finset.range q, (σ ^ j) r := by
+private theorem exists_tr (h : IsGal σ q)
+    : ∃ t : R →ₗ[k] k, ∀ r, algebraMap k R (t r) = ∑ j ∈ Finset.range q, (σ ^ j) r := by
   choose t ht using fun r => h.fix _ (sum_fixed h r)
   refine ⟨⟨⟨t, fun a b => h.inj ?_⟩, fun c a => h.inj ?_⟩, ht⟩
   · rw [map_add (f := _), ht, ht, ht, ← Finset.sum_add_distrib]
@@ -34,26 +34,29 @@ private theorem exists_tr (h : IsGal σ q) :
     rw [map_mul, ht, ht, Finset.mul_sum]
     simp only [Algebra.smul_def, map_mul, AlgEquiv.commutes]
 
-private theorem dual (h : IsGal σ q) {s : ℕ} {x y : Fin s → R}
-    (hxy : ∀ j < q, ∑ i, x i * (σ ^ j) (y i) = if j = 0 then 1 else 0) {t : R →ₗ[k] k}
-    (ht : ∀ r, algebraMap k R (t r) = ∑ j ∈ Finset.range q, (σ ^ j) r) (r : R) :
-    ∑ i, t (y i * r) • x i = r := by
-  calc ∑ i, t (y i * r) • x i
-      = ∑ i, ∑ j ∈ Finset.range q, x i * (σ ^ j) (y i) * (σ ^ j) r := by
-        refine Finset.sum_congr rfl fun i _ => ?_
-        rw [Algebra.smul_def, ht, Finset.sum_mul]
-        refine Finset.sum_congr rfl fun j _ => ?_
-        rw [map_mul]; ring
+private theorem dual
+    (h : IsGal σ q)
+    {s : ℕ} {x y : Fin s → R} (hxy : ∀ j < q, ∑ i, x i * (σ ^ j) (y i) = if j = 0 then 1 else 0)
+    {t : R →ₗ[k] k} (ht : ∀ r, algebraMap k R (t r) = ∑ j ∈ Finset.range q, (σ ^ j) r)
+    (r : R)
+    : ∑ i, t (y i * r) • x i = r := by
+  calc
+    ∑ i, t (y i * r) • x i = ∑ i, ∑ j ∈ Finset.range q, x i * (σ ^ j) (y i) * (σ ^ j) r := by
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [Algebra.smul_def, ht, Finset.sum_mul]
+      refine Finset.sum_congr rfl fun j _ => ?_
+      rw [map_mul]
+      ring
     _ = ∑ j ∈ Finset.range q, (if j = 0 then 1 else 0) * (σ ^ j) r := by
-        rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl fun j hj => ?_
-        rw [← Finset.sum_mul, hxy j (Finset.mem_range.1 hj)]
-    _ = r := by
-        simp [h.pos]
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun j hj => ?_
+      rw [← Finset.sum_mul, hxy j (Finset.mem_range.1 hj)]
+    _ = r := by simp [h.pos]
 
-private theorem pow_tmul (A : Type) [CommRing A] [Algebra k A] (σ : R ≃ₐ[k] R) (j : ℕ) (a : A) (r : R) :
-    ((Algebra.TensorProduct.congr AlgEquiv.refl σ : A ⊗[k] R ≃ₐ[A] A ⊗[k] R) ^ j) (a ⊗ₜ r) =
-      a ⊗ₜ (σ ^ j) r := by
+private theorem pow_tmul
+    (A : Type) [CommRing A] [Algebra k A] (σ : R ≃ₐ[k] R) (j : ℕ) (a : A) (r : R)
+    : ((Algebra.TensorProduct.congr AlgEquiv.refl σ : A ⊗[k] R ≃ₐ[A] A ⊗[k] R) ^ j) (a ⊗ₜ r)
+      = a ⊗ₜ (σ ^ j) r := by
   induction j with
   | zero => simp
   | succ j ih =>
@@ -67,8 +70,10 @@ theorem galBase : GalBase := by
   obtain ⟨t, ht⟩ := exists_tr h
   obtain ⟨s, x, y, hxy⟩ := h.sep
   have hd := dual h hxy ht
-  have hsplit : (Fintype.linearCombination k x).comp
-      (LinearMap.pi fun i => t.comp (LinearMap.mulLeft k (y i))) = LinearMap.id := by
+  have hsplit
+      : (Fintype.linearCombination k x).comp
+          (LinearMap.pi fun i => t.comp (LinearMap.mulLeft k (y i)))
+        = LinearMap.id := by
     ext r
     simpa [Fintype.linearCombination_apply] using hd r
   have hfin : Module.Finite k R :=
@@ -76,14 +81,16 @@ theorem galBase : GalBase := by
       ⟨_, LinearMap.congr_fun hsplit r⟩
   have hproj : Module.Projective k R := Module.Projective.of_split _ _ hsplit
   obtain ⟨c, hc⟩ : ∃ c, t c = 1 := by
-    obtain ⟨r, hr, hr0⟩ := Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul
-      (LinearMap.range t) (⊤ : Submodule k R) Module.Finite.fg_top (by
-        intro r _
-        rw [← hd r]
-        exact Submodule.sum_mem _ fun i _ =>
-          Submodule.smul_mem_smul (LinearMap.mem_range_self _ _) Submodule.mem_top)
-    have h0 : r = 0 := h.inj (by
-      rw [map_zero, Algebra.algebraMap_eq_smul_one]; exact hr0 1 Submodule.mem_top)
+    obtain ⟨r, hr, hr0⟩ :=
+      Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul (LinearMap.range t)
+        (⊤ : Submodule k R) Module.Finite.fg_top
+        (by
+          intro r _
+          rw [← hd r]
+          exact Submodule.sum_mem _ fun i _ =>
+            Submodule.smul_mem_smul (LinearMap.mem_range_self _ _) Submodule.mem_top)
+    have h0 : r = 0 :=
+      h.inj (by rw [map_zero, Algebra.algebraMap_eq_smul_one]; exact hr0 1 Submodule.mem_top)
     obtain ⟨c, hc⟩ := hr
     exact ⟨-c, by rw [map_neg, hc, h0]; ring⟩
   refine ⟨hfin, hproj, ⟨fun m hm hm' => hm.ne_top ?_⟩, ?_⟩
@@ -109,8 +116,8 @@ theorem galBase : GalBase := by
       rw [Algebra.TensorProduct.algebraMap_apply, hpp, mul_one, hc, one_smul]
       rfl
     · intro z hz
-      have h1 : ∀ z, algebraMap A (A ⊗[k] R) (p z) =
-          ∑ j ∈ Finset.range q, (τ ^ j) ((1 ⊗ₜ c) * z) := by
+      have h1
+          : ∀ z, algebraMap A (A ⊗[k] R) (p z) = ∑ j ∈ Finset.range q, (τ ^ j) ((1 ⊗ₜ c) * z) := by
         intro z
         induction z using TensorProduct.induction_on with
         | zero => simp
@@ -119,8 +126,7 @@ theorem galBase : GalBase := by
           rw [← TensorProduct.tmul_sum, ← ht, hpp, Algebra.TensorProduct.algebraMap_apply,
             Algebra.algebraMap_eq_smul_one (t (c * r)), ← TensorProduct.smul_tmul]
           rfl
-        | add a b ha hb =>
-          simp only [map_add (f := _), mul_add, ha, hb, Finset.sum_add_distrib]
+        | add a b ha hb => simp only [map_add (f := _), mul_add, ha, hb, Finset.sum_add_distrib]
       have h2 : ∀ j : ℕ, (τ ^ j) z = z := by
         intro j
         induction j with

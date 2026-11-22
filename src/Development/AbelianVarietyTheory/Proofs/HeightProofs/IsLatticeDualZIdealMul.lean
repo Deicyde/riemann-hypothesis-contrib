@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.BlockTheory.HeightDefect.TotallyP
 
 @[expose] public section
 
-open NumberField Matrix Formalism.BasicNotions GlobalTheory.IndefiniteRowSideFullHecke.TotallyPositiveExponents
+open NumberField Matrix Formalism.BasicNotions
+  GlobalTheory.IndefiniteRowSideFullHecke.TotallyPositiveExponents
 
 namespace GlobalTheory.CuspCharLattice
 
@@ -28,7 +29,8 @@ theorem host_AA_ne_zero (H : Host R) : H.AA ≠ 0 := by
   refine mul_ne_zero ?_ (inv_ne_zero ?_)
   · rw [FractionalIdeal.coeIdeal_ne_zero]
     intro h
-    exact H.ccK_ne_bot ((Ideal.map_eq_bot_iff_of_injective (RingOfIntegers.algebraMap.injective _ _)).1 h)
+    exact H.ccK_ne_bot
+      ((Ideal.map_eq_bot_iff_of_injective (RingOfIntegers.algebraMap.injective _ _)).1 h)
   · rw [FractionalIdeal.coeIdeal_ne_zero]
     intro h
     have h1 := H.𝔟_spec.1

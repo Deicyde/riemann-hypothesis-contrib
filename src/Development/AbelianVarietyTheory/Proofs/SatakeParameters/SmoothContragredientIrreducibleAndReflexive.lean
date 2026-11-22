@@ -12,15 +12,16 @@ open GlobalTheory.PRep GlobalTheory.SmGL
 
 namespace GlobalTheory.ContraRefl
 
-variable {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [AddCommGroup V] [Module ℂ V]
+variable
+  {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
 
-theorem mem_fix {X : Type} [AddCommGroup X] [Module ℂ X] {σ : Representation ℂ G X}
-    {K : Subgroup G} {v : X} : v ∈ fixed σ K ↔ ∀ h ∈ K, σ h v = v := by
+theorem mem_fix
+    {X : Type} [AddCommGroup X] [Module ℂ X] {σ : Representation ℂ G X} {K : Subgroup G} {v : X}
+    : v ∈ fixed σ K ↔ ∀ h ∈ K, σ h v = v := by
   simp [fixed, eig]
 
-theorem isLocallyConstant_orbit {π : Representation ℂ G V} (hπ : IsSmooth π) (u : V) :
-    IsLocallyConstant fun g : G => π g u := by
+theorem isLocallyConstant_orbit {π : Representation ℂ G V} (hπ : IsSmooth π) (u : V)
+    : IsLocallyConstant fun g : G => π g u := by
   refine (IsLocallyConstant.iff_eventually_eq _).2 fun g => ?_
   have ho : IsOpen ((fun x => g⁻¹ * x) ⁻¹' {x : G | π x u = u}) := (hπ u).preimage (by fun_prop)
   filter_upwards [ho.mem_nhds (by simp)] with x hx
@@ -28,8 +29,11 @@ theorem isLocallyConstant_orbit {π : Representation ℂ G V} (hπ : IsSmooth π
   conv_rhs => rw [← hx']
   rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel_left]
 
-theorem eq_zero_of_fixed_twKer {π : Representation ℂ G V} (hπ : IsSmooth π) {K : Subgroup G}
-    (hK : IsCompact (K : Set G)) {w : V} (hw : w ∈ fixed π K) (hw' : w ∈ twKer π K 1) : w = 0 := by
+theorem eq_zero_of_fixed_twKer
+    {π : Representation ℂ G V} (hπ : IsSmooth π)
+    {K : Subgroup G} (hK : IsCompact (K : Set G))
+    {w : V} (hw : w ∈ fixed π K) (hw' : w ∈ twKer π K 1)
+    : w = 0 := by
   classical
   haveI : CompactSpace K := isCompact_iff_compactSpace.1 hK
   obtain ⟨T, hTS, hwT⟩ := Submodule.mem_span_finite_of_mem_span hw'
@@ -39,8 +43,9 @@ theorem eq_zero_of_fixed_twKer {π : Representation ℂ G V} (hπ : IsSmooth π)
     exact ⟨n, v, by simpa using e⟩
   choose! n v hnv using hT
   let O : Set V := ⋃ t ∈ T, Set.range fun h : K => π h (v t)
-  have hOfin : O.Finite := Set.Finite.biUnion T.finite_toSet fun t _ =>
-    ((isLocallyConstant_orbit hπ (v t)).comp_continuous continuous_subtype_val).range_finite
+  have hOfin : O.Finite :=
+    Set.Finite.biUnion T.finite_toSet fun t _ =>
+      ((isLocallyConstant_orbit hπ (v t)).comp_continuous continuous_subtype_val).range_finite
   have hOst : ∀ (k : K) (x : V), x ∈ O → π k x ∈ O := by
     intro k x hx
     simp only [O, Set.mem_iUnion, Set.mem_range] at hx ⊢
@@ -65,15 +70,18 @@ theorem eq_zero_of_fixed_twKer {π : Representation ℂ G V} (hπ : IsSmooth π)
     simp only [A, LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun f _ => ?_
     exact congrArg Subtype.val (congrFun (hr f) ⟨x, hx⟩)
-  let e : K → ι ≃ ι := fun k =>
-    { toFun := fun f => ⟨f.1 ∘ φ k, r f * k, by rw [hφmul, hr f]⟩
-      invFun := fun f => ⟨f.1 ∘ φ k⁻¹, r f * k⁻¹, by rw [hφmul, hr f]⟩
-      left_inv := fun f => Subtype.ext (by
+  let e : K → ι ≃ ι := fun k => {
+    toFun := fun f => ⟨f.1 ∘ φ k, r f * k, by rw [hφmul, hr f]⟩
+    invFun := fun f => ⟨f.1 ∘ φ k⁻¹, r f * k⁻¹, by rw [hφmul, hr f]⟩
+    left_inv := fun f =>
+      Subtype.ext (by
         show (f.1 ∘ φ k) ∘ φ k⁻¹ = f.1
         rw [Function.comp_assoc, ← hφmul, mul_inv_cancel, hφone, Function.comp_id])
-      right_inv := fun f => Subtype.ext (by
+    right_inv := fun f =>
+      Subtype.ext (by
         show (f.1 ∘ φ k⁻¹) ∘ φ k = f.1
-        rw [Function.comp_assoc, ← hφmul, inv_mul_cancel, hφone, Function.comp_id]) }
+        rw [Function.comp_assoc, ← hφmul, inv_mul_cancel, hφone, Function.comp_id])
+  }
   have hAinv : ∀ (k : K) x, x ∈ O → A (π k x) = A x := by
     intro k x hx
     rw [hAO _ (hOst k x hx), hAO x hx]
@@ -94,23 +102,28 @@ end GlobalTheory.ContraRefl
 
 namespace GlobalTheory.ContraRefl
 
-variable {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [AddCommGroup V] [Module ℂ V]
+variable
+  {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
 
-theorem form_ext {X : Type} [AddCommGroup X] [Module ℂ X] {σ : Representation ℂ G X} (hσ : IsSmooth σ)
-    {K : Subgroup G} (hK : IsCompact (K : Set G)) {l l' : Module.Dual ℂ X}
-    (hl : ∀ h ∈ K, ∀ w, l (σ h w) = l w) (hl' : ∀ h ∈ K, ∀ w, l' (σ h w) = l' w)
-    (h : ∀ w ∈ fixed σ K, l w = l' w) : l = l' := by
+theorem form_ext
+    {X : Type} [AddCommGroup X] [Module ℂ X]
+    {σ : Representation ℂ G X} (hσ : IsSmooth σ)
+    {K : Subgroup G} (hK : IsCompact (K : Set G))
+    {l l' : Module.Dual ℂ X} (hl : ∀ h ∈ K, ∀ w, l (σ h w) = l w)
+    (hl' : ∀ h ∈ K, ∀ w, l' (σ h w) = l' w) (h : ∀ w ∈ fixed σ K, l w = l' w)
+    : l = l' := by
   ext u
-  obtain ⟨v, hv, e⟩ := IwahoriOnto.exists_fixed_map_eq hσ hK (l - l') u fun g hg => by
-    simp [hl g hg, hl' g hg]
+  obtain ⟨v, hv, e⟩ :=
+    IwahoriOnto.exists_fixed_map_eq hσ hK (l - l') u fun g hg => by simp [hl g hg, hl' g hg]
   simp only [LinearMap.sub_apply, h v hv, sub_self] at e
   exact sub_eq_zero.1 e.symm
 
-theorem exists_fixed_contra {π : Representation ℂ G V} (hπ : IsSmooth π) {K : Subgroup G}
-    (ho : IsOpen (K : Set G)) (hK : IsCompact (K : Set G)) (m : Module.Dual ℂ (fixed π K)) :
-    ∃ l : smoothPart π.dual, (∀ h ∈ K, contra π h l = l) ∧
-      ∀ v : fixed π K, (l : Module.Dual ℂ V) v = m v := by
+theorem exists_fixed_contra
+    {π : Representation ℂ G V} (hπ : IsSmooth π)
+    {K : Subgroup G}
+    (ho : IsOpen (K : Set G)) (hK : IsCompact (K : Set G)) (m : Module.Dual ℂ (fixed π K))
+    : ∃ l : smoothPart π.dual,
+      (∀ h ∈ K, contra π h l = l) ∧ ∀ v : fixed π K, (l : Module.Dual ℂ V) v = m v := by
   classical
   set N := twKer π K 1
   let g : fixed π K →ₗ[ℂ] V ⧸ N := N.mkQ ∘ₗ (fixed π K).subtype
@@ -131,40 +144,52 @@ theorem exists_fixed_contra {π : Representation ℂ G V} (hπ : IsSmooth π) {K
     intro h hh
     ext u
     exact hinv _ (inv_mem hh) u
-  refine ⟨⟨l₀, mem_smoothPart_of_nhds (Filter.mem_of_superset (ho.mem_nhds (one_mem K)) hdual)⟩,
-    fun h hh => Subtype.ext (hdual h hh), fun v => ?_⟩
+  refine ⟨
+    ⟨l₀, mem_smoothPart_of_nhds (Filter.mem_of_superset (ho.mem_nhds (one_mem K)) hdual)⟩,
+    fun h hh => Subtype.ext (hdual h hh),
+    fun v => ?_
+  ⟩
   have := LinearMap.congr_fun hg' v
   simp only [LinearMap.comp_apply, LinearMap.id_apply] at this
   show m (g' (N.mkQ v)) = m v
   rw [show N.mkQ (v : V) = g v from rfl, this]
 
-def res (π : Representation ℂ G V) (K : Subgroup G) :
-    fixed (contra π) K →ₗ[ℂ] Module.Dual ℂ (fixed π K) :=
+def res (π : Representation ℂ G V) (K : Subgroup G)
+    : fixed (contra π) K →ₗ[ℂ] Module.Dual ℂ (fixed π K) :=
   (fixed π K).subtype.dualMap ∘ₗ (smoothPart π.dual).subtype ∘ₗ (fixed (contra π) K).subtype
 
-theorem invariant_of_fixed {π : Representation ℂ G V} {K : Subgroup G} (l : fixed (contra π) K)
-    (h : G) (hh : h ∈ K) (w : V) :
-    ((l : smoothPart π.dual) : Module.Dual ℂ V) (π h w) = ((l : smoothPart π.dual) : Module.Dual ℂ V) w := by
+theorem invariant_of_fixed
+    {π : Representation ℂ G V} {K : Subgroup G} (l : fixed (contra π) K)
+    (h : G) (hh : h ∈ K)
+    (w : V)
+    : ((l : smoothPart π.dual) : Module.Dual ℂ V) (π h w)
+      = ((l : smoothPart π.dual) : Module.Dual ℂ V) w := by
   have h1 := mem_fix.1 l.2 h⁻¹ (inv_mem hh)
   conv_rhs => rw [← h1]
   rw [contra_apply, inv_inv]
 
-theorem res_injective {π : Representation ℂ G V} (hπ : IsSmooth π) {K : Subgroup G}
-    (hK : IsCompact (K : Set G)) : Function.Injective (res π K) := by
+theorem res_injective
+    {π : Representation ℂ G V} (hπ : IsSmooth π) {K : Subgroup G} (hK : IsCompact (K : Set G))
+    : Function.Injective (res π K) := by
   intro l l' h
   refine Subtype.ext (Subtype.ext ?_)
-  exact form_ext hπ hK (invariant_of_fixed l) (invariant_of_fixed l')
-    fun w hw => LinearMap.congr_fun h ⟨w, hw⟩
+  exact form_ext hπ hK (invariant_of_fixed l) (invariant_of_fixed l') fun w hw =>
+    LinearMap.congr_fun h ⟨w, hw⟩
 
-theorem res_surjective {π : Representation ℂ G V} (hπ : IsSmooth π) {K : Subgroup G}
-    (ho : IsOpen (K : Set G)) (hK : IsCompact (K : Set G)) : Function.Surjective (res π K) := by
+theorem res_surjective
+    {π : Representation ℂ G V} (hπ : IsSmooth π)
+    {K : Subgroup G} (ho : IsOpen (K : Set G)) (hK : IsCompact (K : Set G))
+    : Function.Surjective (res π K) := by
   intro m
   obtain ⟨l, h1, h2⟩ := exists_fixed_contra hπ ho hK m
   exact ⟨⟨l, mem_fix.2 h1⟩, LinearMap.ext h2⟩
 
-theorem exists_smooth_form_ne {π : Representation ℂ G V} (hπ : IsSmooth π)
-    (hG : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
-    {v : V} (hv : v ≠ 0) : ∃ l : smoothPart π.dual, (l : Module.Dual ℂ V) v ≠ 0 := by
+theorem exists_smooth_form_ne
+    {π : Representation ℂ G V} (hπ : IsSmooth π)
+    (hG : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G,
+      IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
+    {v : V} (hv : v ≠ 0)
+    : ∃ l : smoothPart π.dual, (l : Module.Dual ℂ V) v ≠ 0 := by
   obtain ⟨K, ho, hc, hKs⟩ := hG _ ((hπ v).mem_nhds (by simp))
   have hvK : v ∈ fixed π K := mem_fix.2 fun h hh => hKs hh
   obtain ⟨m, hm⟩ : ∃ m : Module.Dual ℂ (fixed π K), m ⟨v, hvK⟩ ≠ 0 := by
@@ -178,16 +203,18 @@ end GlobalTheory.ContraRefl
 
 namespace GlobalTheory.ContraRefl
 
-variable {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [AddCommGroup V] [Module ℂ V]
+variable
+  {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
 
 def ev (π : Representation ℂ G V) (hπ : IsSmooth π) : V →ₗ[ℂ] smoothPart (contra π).dual where
-  toFun v := ⟨Module.Dual.eval ℂ V v ∘ₗ (smoothPart π.dual).subtype,
+  toFun v := ⟨
+    Module.Dual.eval ℂ V v ∘ₗ (smoothPart π.dual).subtype,
     mem_smoothPart_of_nhds (Filter.mem_of_superset ((hπ v).mem_nhds (by simp)) fun g hg => by
       have hg' : π g v = v := hg
       ext l
       show (l : Module.Dual ℂ V) (π g⁻¹⁻¹ v) = (l : Module.Dual ℂ V) v
-      rw [inv_inv, hg'])⟩
+      rw [inv_inv, hg'])
+  ⟩
   map_add' v w := Subtype.ext (LinearMap.ext fun l => by simp)
   map_smul' c v := Subtype.ext (LinearMap.ext fun l => by simp)
 
@@ -199,8 +226,10 @@ def evMap (π : Representation ℂ G V) (hπ : IsSmooth π) : π.IntertwiningMap
     rw [inv_inv]
 
 theorem evMap_bijective
-    (hG : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
-    {π : Representation ℂ G V} (hπ : IsAdmissible π) : Function.Bijective (evMap π hπ.1) := by
+    (hG : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G,
+      IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
+    {π : Representation ℂ G V} (hπ : IsAdmissible π)
+    : Function.Bijective (evMap π hπ.1) := by
   constructor
   · show Function.Injective (ev π hπ.1)
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
@@ -216,13 +245,19 @@ theorem evMap_bijective
     let μ : Module.Dual ℂ (fixed (contra π) K) :=
       (Λ : Module.Dual ℂ (smoothPart π.dual)) ∘ₗ (fixed (contra π) K).subtype
     obtain ⟨v, hv⟩ := (Module.evalEquiv ℂ (fixed π K)).surjective (μ ∘ₗ e.symm.toLinearMap)
-    have hfix : ∀ x : fixed (contra π) K,
-        (Λ : Module.Dual ℂ (smoothPart π.dual)) x = ((x : smoothPart π.dual) : Module.Dual ℂ V) v := by
+    have hfix
+        : ∀ x : fixed (contra π) K,
+          (Λ : Module.Dual ℂ (smoothPart π.dual)) x
+            = ((x : smoothPart π.dual) : Module.Dual ℂ V) v := by
       intro x
       have h1 := LinearMap.congr_fun hv (e x)
       simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply] at h1
       exact h1.symm
-    refine ⟨v, Subtype.ext (form_ext (isSmooth_contra π) hc (fun h hh w => ?_) (fun h hh w => ?_) fun w hw => ?_)⟩
+    refine ⟨
+      v,
+      Subtype.ext
+        (form_ext (isSmooth_contra π) hc (fun h hh w => ?_) (fun h hh w => ?_) fun w hw => ?_)
+    ⟩
     · show ((contra π h w : smoothPart π.dual) : Module.Dual ℂ V) v = (w : Module.Dual ℂ V) v
       rw [contra_apply, mem_fix.1 v.2 _ (inv_mem hh)]
     · have h1 : (contra π).dual h⁻¹ (Λ : Module.Dual ℂ (smoothPart π.dual)) = Λ :=
@@ -233,22 +268,26 @@ theorem evMap_bijective
     · exact (hfix ⟨w, hw⟩).symm
 
 def evEquiv
-    (hG : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
-    {π : Representation ℂ G V} (hπ : IsAdmissible π) : π.Equiv (contra (contra π)) :=
+    (hG : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G,
+      IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
+    {π : Representation ℂ G V} (hπ : IsAdmissible π)
+    : π.Equiv (contra (contra π)) :=
   (evMap π hπ.1).ofBijective (evMap_bijective hG hπ)
 
 end GlobalTheory.ContraRefl
 
 namespace GlobalTheory.ContraRefl
 
-variable {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [AddCommGroup V] [Module ℂ V]
+variable
+  {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
 
 theorem mem_of_annihilator_eq_bot
-    (hG : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
+    (hG : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G,
+      IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
     {π : Representation ℂ G V} (hπ : IsAdmissible π) (U : Subrepresentation (contra π))
     (hA : ∀ v : V, (∀ u ∈ U.toSubmodule, (u : Module.Dual ℂ V) v = 0) → v = 0)
-    (l : smoothPart π.dual) : l ∈ U.toSubmodule := by
+    (l : smoothPart π.dual)
+    : l ∈ U.toSubmodule := by
   obtain ⟨K, ho, hc, hKs⟩ := hG _ ((isSmooth_contra π l).mem_nhds (by simp))
   have hlK : l ∈ fixed (contra π) K := mem_fix.2 fun h hh => hKs hh
   haveI := hπ.2 K ho hc
@@ -261,8 +300,8 @@ theorem mem_of_annihilator_eq_bot
     rw [show l = ((⟨l, hlK⟩ : fixed (contra π) K) : smoothPart π.dual) from rfl, ← this]
     exact hu
   · exfalso
-    obtain ⟨φ, hφ, hφS⟩ := Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.2 hS)
-      inferInstance
+    obtain ⟨φ, hφ, hφS⟩ :=
+      Submodule.exists_dual_map_eq_bot_of_lt_top (lt_top_iff_ne_top.2 hS) inferInstance
     obtain ⟨v, rfl⟩ := (Module.evalEquiv ℂ (fixed π K)).surjective φ
     have hv0 : v ≠ 0 := fun h => hφ (by rw [h, map_zero])
     apply hv0
@@ -270,12 +309,14 @@ theorem mem_of_annihilator_eq_bot
     have hUs : IsSmooth U.toRepresentation := fun x => by
       have : {g : G | U.toRepresentation g x = x} = {g : G | contra π g x.1 = x.1} := by
         ext g; exact Subtype.ext_iff
-      rw [this]; exact isSmooth_contra π x.1
+      rw [this]
+      exact isSmooth_contra π x.1
     let f : U.toSubmodule →ₗ[ℂ] ℂ :=
       Module.Dual.eval ℂ V v ∘ₗ (smoothPart π.dual).subtype ∘ₗ U.toSubmodule.subtype
-    obtain ⟨y, hy, hfy⟩ := IwahoriOnto.exists_fixed_map_eq hUs hc f ⟨u, hu⟩ fun h hh => by
-      show ((contra π h u : smoothPart π.dual) : Module.Dual ℂ V) v = (u : Module.Dual ℂ V) v
-      rw [contra_apply, mem_fix.1 v.2 _ (inv_mem hh)]
+    obtain ⟨y, hy, hfy⟩ :=
+      IwahoriOnto.exists_fixed_map_eq hUs hc f ⟨u, hu⟩ fun h hh => by
+        show ((contra π h u : smoothPart π.dual) : Module.Dual ℂ V) v = (u : Module.Dual ℂ V) v
+        rw [contra_apply, mem_fix.1 v.2 _ (inv_mem hh)]
     have hyK : (y : smoothPart π.dual) ∈ fixed (contra π) K :=
       mem_fix.2 fun h hh => congrArg Subtype.val (mem_fix.1 hy h hh)
     have h1 : res π K ⟨y, hyK⟩ ∈ S := ⟨⟨y, hyK⟩, y.2, rfl⟩
@@ -288,9 +329,10 @@ theorem mem_of_annihilator_eq_bot
     exact h2
 
 theorem contra_isIrreducible
-    (hG : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
-    {π : Representation ℂ G V} (hπ : IsAdmissible π) (hirr : π.IsIrreducible) :
-    (contra π).IsIrreducible := by
+    (hG : ∀ U ∈ nhds (1 : G), ∃ K : Subgroup G,
+      IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
+    {π : Representation ℂ G V} (hπ : IsAdmissible π) (hirr : π.IsIrreducible)
+    : (contra π).IsIrreducible := by
   obtain ⟨v, hv⟩ : ∃ v : V, v ≠ 0 := by
     by_contra h
     push_neg at h
@@ -301,17 +343,17 @@ theorem contra_isIrreducible
     exact ⟨fun _ => zero_mem _, fun _ => zero_mem _⟩
   obtain ⟨l, hl⟩ := exists_smooth_form_ne hπ.1 hG hv
   refine { exists_pair_ne := ⟨⊥, ⊤, fun h => hl ?_⟩, eq_bot_or_eq_top := fun U => ?_ }
-  · have : l ∈ (⊥ : Subrepresentation (contra π)).toSubmodule := by
-      rw [h]; exact Submodule.mem_top
+  · have : l ∈ (⊥ : Subrepresentation (contra π)).toSubmodule := by rw [h]; exact Submodule.mem_top
     rw [(Submodule.mem_bot ℂ).1 this]
     rfl
-  · let A : Subrepresentation π :=
-      { toSubmodule := ⨅ u ∈ U.toSubmodule, LinearMap.ker (u : Module.Dual ℂ V)
-        apply_mem_toSubmodule := fun g v hv => by
-          simp only [Submodule.mem_iInf, LinearMap.mem_ker] at hv ⊢
-          intro u hu
-          have := hv _ (U.apply_mem_toSubmodule g⁻¹ hu)
-          rwa [contra_apply, inv_inv] at this }
+  · let A : Subrepresentation π := {
+      toSubmodule := ⨅ u ∈ U.toSubmodule, LinearMap.ker (u : Module.Dual ℂ V)
+      apply_mem_toSubmodule := fun g v hv => by
+        simp only [Submodule.mem_iInf, LinearMap.mem_ker] at hv ⊢
+        intro u hu
+        have := hv _ (U.apply_mem_toSubmodule g⁻¹ hu)
+        rwa [contra_apply, inv_inv] at this
+    }
     have hmemA : ∀ v, v ∈ A.toSubmodule ↔ ∀ u ∈ U.toSubmodule, (u : Module.Dual ℂ V) v = 0 := by
       intro v; simp [A]
     rcases hirr.eq_bot_or_eq_top A with hA | hA
@@ -323,36 +365,43 @@ theorem contra_isIrreducible
       exact (Submodule.mem_bot ℂ).1 this
     · left
       apply Subrepresentation.ext
-      refine eq_bot_iff.2 fun u hu => (Submodule.mem_bot ℂ).2 (Subtype.ext (LinearMap.ext fun w => ?_))
+      refine eq_bot_iff.2 fun u hu =>
+        (Submodule.mem_bot ℂ).2 (Subtype.ext (LinearMap.ext fun w => ?_))
       have : w ∈ A.toSubmodule := by rw [hA]; exact Submodule.mem_top
       exact (hmemA w).1 this u hu
 
-def contraMap {X Y : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
-    {σ : Representation ℂ G X} {τ : Representation ℂ G Y} (f : σ.IntertwiningMap τ) :
-    (contra τ).IntertwiningMap (contra σ) where
-  toLinearMap :=
-    { toFun := fun l => ⟨(l : Module.Dual ℂ Y) ∘ₗ f.toLinearMap,
-        mem_smoothPart_of_nhds (Filter.mem_of_superset
-          ((show IsOpen {g : G | τ.dual g (l : Module.Dual ℂ Y) = l} from l.2).mem_nhds
-            (by show τ.dual 1 (l : Module.Dual ℂ Y) = l; rw [map_one, Module.End.one_apply]))
-          fun g hg => by
-            have hg' : τ.dual g (l : Module.Dual ℂ Y) = l := hg
-            ext x
-            show (l : Module.Dual ℂ Y) (f (σ g⁻¹ x)) = (l : Module.Dual ℂ Y) (f x)
-            rw [f.isIntertwining]
-            exact LinearMap.congr_fun hg' (f x))⟩
-      map_add' := fun a b => rfl
-      map_smul' := fun c a => rfl }
+def contraMap
+    {X Y : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
+    {σ : Representation ℂ G X} {τ : Representation ℂ G Y} (f : σ.IntertwiningMap τ)
+    : (contra τ).IntertwiningMap (contra σ) where
+  toLinearMap := {
+    toFun := fun l => ⟨
+      (l : Module.Dual ℂ Y) ∘ₗ f.toLinearMap,
+      mem_smoothPart_of_nhds (Filter.mem_of_superset
+        ((show IsOpen {g : G | τ.dual g (l : Module.Dual ℂ Y) = l} from l.2).mem_nhds
+          (by show τ.dual 1 (l : Module.Dual ℂ Y) = l; rw [map_one, Module.End.one_apply]))
+        fun g hg => by
+          have hg' : τ.dual g (l : Module.Dual ℂ Y) = l := hg
+          ext x
+          show (l : Module.Dual ℂ Y) (f (σ g⁻¹ x)) = (l : Module.Dual ℂ Y) (f x)
+          rw [f.isIntertwining]
+          exact LinearMap.congr_fun hg' (f x))
+    ⟩
+    map_add' := fun a b => rfl
+    map_smul' := fun c a => rfl
+  }
   isIntertwining' g := by
     refine LinearMap.ext fun l => Subtype.ext (LinearMap.ext fun x => ?_)
     show (l : Module.Dual ℂ Y) (τ g⁻¹ (f x)) = (l : Module.Dual ℂ Y) (f (σ g⁻¹ x))
     rw [f.isIntertwining]
 
-def contraEquiv {X Y : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
-    {σ : Representation ℂ G X} {τ : Representation ℂ G Y} (e : σ.Equiv τ) :
-    (contra τ).Equiv (contra σ) :=
+def contraEquiv
+    {X Y : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
+    {σ : Representation ℂ G X} {τ : Representation ℂ G Y} (e : σ.Equiv τ)
+    : (contra τ).Equiv (contra σ) :=
   (contraMap e.toIntertwiningMap).ofBijective (by
-    refine Function.bijective_iff_has_inverse.2 ⟨contraMap e.symm.toIntertwiningMap, fun l => ?_, fun l => ?_⟩
+    refine Function.bijective_iff_has_inverse.2
+      ⟨contraMap e.symm.toIntertwiningMap, fun l => ?_, fun l => ?_⟩
     · refine Subtype.ext (LinearMap.ext fun y => ?_)
       show (l : Module.Dual ℂ Y) (e (e.symm y)) = (l : Module.Dual ℂ Y) y
       rw [e.apply_symm_apply]
@@ -360,7 +409,15 @@ def contraEquiv {X Y : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [M
       show (l : Module.Dual ℂ X) (e.symm (e x)) = (l : Module.Dual ℂ X) x
       rw [e.symm_apply_apply])
 
-theorem contra_irreducible_reflexive : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G], (∀ U ∈ nhds (1 : G), ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U) → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (W : Type) [AddCommGroup W] [Module ℂ W] (π : Representation ℂ G V) (π' : Representation ℂ G W), IsAdmissible π → IsAdmissible π' → (π.IsIrreducible → (contra π).IsIrreducible) ∧ Nonempty (π.Equiv (contra (contra π))) ∧ (Nonempty ((contra π).Equiv (contra π')) → Nonempty (π.Equiv π')) := by
+theorem contra_irreducible_reflexive
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G],
+      (∀ U ∈ nhds (1 : G), ∃ K : Subgroup G,
+          IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ U)
+        → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (W : Type) [AddCommGroup W] [Module ℂ W]
+            (π : Representation ℂ G V) (π' : Representation ℂ G W),
+          IsAdmissible π → IsAdmissible π'
+            → (π.IsIrreducible → (contra π).IsIrreducible) ∧ Nonempty (π.Equiv (contra (contra π)))
+              ∧ (Nonempty ((contra π).Equiv (contra π')) → Nonempty (π.Equiv π')) := by
   intro G _ _ _ hG V _ _ W _ _ π π' hπ hπ'
   refine ⟨contra_isIrreducible hG hπ, ⟨evEquiv hG hπ⟩, fun ⟨e⟩ => ⟨?_⟩⟩
   exact ((evEquiv hG hπ).trans (contraEquiv e.symm)).trans (evEquiv hG hπ').symm

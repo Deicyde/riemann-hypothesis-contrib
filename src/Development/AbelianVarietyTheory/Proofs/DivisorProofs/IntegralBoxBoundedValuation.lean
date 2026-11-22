@@ -17,12 +17,14 @@ open GlobalTheory.SplitFlip GlobalTheory.RankCoinv
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem val_le_of_add_vecMul {r : ℕ} {u t : ValueGroupWithZero k} (hu : u < 1) (s : Fin r → k)
-    (E : Matrix (Fin r) (Fin r) k) (hE : ∀ l j, valuation k (E l j) ≤ u)
-    (hw : ∀ l, valuation k ((s + s ᵥ* E) l) ≤ t) (l : Fin r) : valuation k (s l) ≤ t := by
+theorem val_le_of_add_vecMul
+    {r : ℕ} {u t : ValueGroupWithZero k} (hu : u < 1) (s : Fin r → k) (E : Matrix (Fin r) (Fin r) k)
+    (hE : ∀ l j, valuation k (E l j) ≤ u) (hw : ∀ l, valuation k ((s + s ᵥ* E) l) ≤ t) (l : Fin r)
+    : valuation k (s l) ≤ t := by
   by_contra hlt
   push_neg at hlt
-  obtain ⟨l₁, -, hl₁⟩ := Finset.exists_max_image Finset.univ (fun j => valuation k (s j)) ⟨l, Finset.mem_univ _⟩
+  obtain ⟨l₁, -, hl₁⟩ :=
+    Finset.exists_max_image Finset.univ (fun j => valuation k (s j)) ⟨l, Finset.mem_univ _⟩
   have hM : t < valuation k (s l₁) := hlt.trans_le (hl₁ l (Finset.mem_univ _))
   have hM0 : 0 < valuation k (s l₁) := lt_of_le_of_lt zero_le' hM
   have h1 : valuation k ((s ᵥ* E) l₁) ≤ valuation k (s l₁) * u := by
@@ -30,8 +32,9 @@ theorem val_le_of_add_vecMul {r : ℕ} {u t : ValueGroupWithZero k} (hu : u < 1)
     refine Valuation.map_sum_le _ fun j _ => ?_
     rw [map_mul]
     exact mul_le_mul' (hl₁ j (Finset.mem_univ _)) (hE j l₁)
-  have h3 := Valuation.map_sub_le (valuation k) ((hw l₁).trans (le_max_left t (valuation k (s l₁) * u)))
-    (h1.trans (le_max_right _ _))
+  have h3 :=
+    Valuation.map_sub_le (valuation k) ((hw l₁).trans (le_max_left t (valuation k (s l₁) * u)))
+      (h1.trans (le_max_right _ _))
   rw [Pi.add_apply, add_sub_cancel_right] at h3
   have h4 : valuation k (s l₁) * u < valuation k (s l₁) := mul_lt_of_lt_one_right hM0 hu
   rcases le_max_iff.1 h3 with h | h
@@ -41,34 +44,36 @@ theorem val_le_of_add_vecMul {r : ℕ} {u t : ValueGroupWithZero k} (hu : u < 1)
 theorem val_pow (ϖ : kˣ) (n : ℕ) : valuation k ((ϖ ^ n : kˣ) : k) = valuation k (ϖ : k) ^ n := by
   simp [Units.val_pow_eq_pow_val, map_pow]
 
-theorem mem_max_iff {ϖ : kˣ} (hϖ : IsUnif ϖ) (x : 𝒪[k]) :
-    x ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ 1 ↔ valuation k (x : k) ≤ valuation k (ϖ : k) := by
-  rw [pow_one, hϖ.maximalIdeal_eq, Ideal.mem_span_singleton, ← (Valuation.integer.integers (valuation k)).le_iff_dvd]
+theorem mem_max_iff {ϖ : kˣ} (hϖ : IsUnif ϖ) (x : 𝒪[k])
+    : x ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ 1 ↔ valuation k (x : k) ≤ valuation k (ϖ : k) := by
+  rw [pow_one, hϖ.maximalIdeal_eq, Ideal.mem_span_singleton,
+    ← (Valuation.integer.integers (valuation k)).le_iff_dvd]
   exact Iff.rfl
 
 variable {A D : Type} [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D]
 
-
 omit [Fintype A] [Fintype D] [DecidableEq D] in
-theorem mem_box_update {ϖ : kˣ} {C X : Matrix A D k} {i₀ : A} {m : ℕ} (hC : ∀ j, C i₀ j = 0) :
-    X ∈ box ϖ C (Function.update (fun _ => m) i₀ (m - 1)) ↔
-      (∀ i, i ≠ i₀ → ∀ j, valuation k (X i j - C i j) ≤ valuation k (ϖ : k) ^ m) ∧
-        ∀ j, valuation k (X i₀ j) ≤ valuation k (ϖ : k) ^ (m - 1) := by
+theorem mem_box_update {ϖ : kˣ} {C X : Matrix A D k} {i₀ : A} {m : ℕ} (hC : ∀ j, C i₀ j = 0)
+    : X ∈ box ϖ C (Function.update (fun _ => m) i₀ (m - 1))
+      ↔ (∀ i, i ≠ i₀ → ∀ j, valuation k (X i j - C i j) ≤ valuation k (ϖ : k) ^ m)
+        ∧ ∀ j, valuation k (X i₀ j) ≤ valuation k (ϖ : k) ^ (m - 1) := by
   simp only [box, Set.mem_setOf_eq, val_pow]
   constructor
   · intro h
-    exact ⟨fun i hi j => by simpa [Function.update_of_ne hi] using h i j, fun j => by simpa [hC] using h i₀ j⟩
+    exact ⟨
+      fun i hi j => by simpa [Function.update_of_ne hi] using h i j,
+      fun j => by simpa [hC] using h i₀ j
+    ⟩
   · rintro ⟨h1, h2⟩ i j
     by_cases hi : i = i₀
     · subst hi; simpa [hC] using h2 j
     · simpa [Function.update_of_ne hi] using h1 i hi j
 
-
 omit [Fintype A] [Fintype D] [DecidableEq D] in
-theorem mem_box_updateRow {ϖ : kˣ} {C X : Matrix A D k} {i₀ : A} {m : ℕ} (R : D → k) :
-    X ∈ box ϖ (C.updateRow i₀ R) (fun _ => m) ↔
-      (∀ i, i ≠ i₀ → ∀ j, valuation k (X i j - C i j) ≤ valuation k (ϖ : k) ^ m) ∧
-        ∀ j, valuation k (X i₀ j - R j) ≤ valuation k (ϖ : k) ^ m := by
+theorem mem_box_updateRow {ϖ : kˣ} {C X : Matrix A D k} {i₀ : A} {m : ℕ} (R : D → k)
+    : X ∈ box ϖ (C.updateRow i₀ R) (fun _ => m)
+      ↔ (∀ i, i ≠ i₀ → ∀ j, valuation k (X i j - C i j) ≤ valuation k (ϖ : k) ^ m)
+        ∧ ∀ j, valuation k (X i₀ j - R j) ≤ valuation k (ϖ : k) ^ m := by
   simp only [box, Set.mem_setOf_eq, val_pow]
   constructor
   · intro h
@@ -85,36 +90,40 @@ open GlobalTheory.SplitFlip GlobalTheory.RankCoinv
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 variable {D : Type} [Fintype D] [DecidableEq D]
 
-def shiftRow (ϖ : kˣ) (m : ℕ) {r : ℕ} (b : Fin r → Res k 1) : Fin r → k :=
-  fun l => (ϖ : k) ^ (m - 1) * ((Quotient.out (b l) : 𝒪[k]) : k)
+def shiftRow (ϖ : kˣ) (m : ℕ) {r : ℕ} (b : Fin r → Res k 1) : Fin r → k := fun l =>
+  (ϖ : k) ^ (m - 1) * ((Quotient.out (b l) : 𝒪[k]) : k)
 
-theorem inv_pow_mul_pow_le {u : ValueGroupWithZero k} (hu : u < 1) (hu0 : u ≠ 0) {c m : ℕ} (hcm : c + 1 ≤ m) :
-    (u ^ c)⁻¹ * u ^ m ≤ u := by
+theorem inv_pow_mul_pow_le
+    {u : ValueGroupWithZero k} (hu : u < 1) (hu0 : u ≠ 0) {c m : ℕ} (hcm : c + 1 ≤ m)
+    : (u ^ c)⁻¹ * u ^ m ≤ u := by
   obtain ⟨n, rfl⟩ : ∃ n, m = c + 1 + n := ⟨m - (c + 1), by omega⟩
   rw [pow_add, pow_succ, mul_assoc, inv_mul_cancel_left₀ (pow_ne_zero _ hu0)]
   exact mul_le_of_le_one_right' (pow_le_one' hu.le n)
 
-
 omit [DecidableEq D] in
-theorem val_shiftRow_le (ϖ : kˣ) {r m : ℕ} (Y : Matrix (Fin r) D k) (hY : ∀ l j, Y l j ∈ 𝒪[k])
-    (b : Fin r → Res k 1) (j : D) :
-    valuation k ((shiftRow ϖ m b ᵥ* Y) j) ≤ valuation k (ϖ : k) ^ (m - 1) := by
+theorem val_shiftRow_le
+    (ϖ : kˣ)
+    {r m : ℕ} (Y : Matrix (Fin r) D k) (hY : ∀ l j, Y l j ∈ 𝒪[k]) (b : Fin r → Res k 1)
+    (j : D)
+    : valuation k ((shiftRow ϖ m b ᵥ* Y) j) ≤ valuation k (ϖ : k) ^ (m - 1) := by
   simp only [Matrix.vecMul, dotProduct, shiftRow]
   refine Valuation.map_sum_le _ fun l _ => ?_
   rw [map_mul, map_mul, map_pow]
-  calc _ ≤ valuation k (ϖ : k) ^ (m - 1) * 1 * 1 :=
-        mul_le_mul' (mul_le_mul' le_rfl ((Valuation.mem_integer_iff _ _).1 (Quotient.out (b l)).2))
-          ((Valuation.mem_integer_iff _ _).1 (hY l j))
+  calc
+    _ ≤ valuation k (ϖ : k) ^ (m - 1) * 1 * 1 :=
+      mul_le_mul' (mul_le_mul' le_rfl ((Valuation.mem_integer_iff _ _).1 (Quotient.out (b l)).2))
+        ((Valuation.mem_integer_iff _ _).1 (hY l j))
     _ = _ := by rw [mul_one, mul_one]
 
-
 omit [DecidableEq D] in
-theorem shiftRow_unique {ϖ : kˣ} (hϖ : IsUnif ϖ) {r m : ℕ} (hm : 1 ≤ m) (Y : Matrix (Fin r) D k)
-    (Q : Matrix D (Fin r) k) (hQ : ∀ j l, Q j l ∈ 𝒪[k]) (hYQ : Y * Q = 1) (x : D → k)
-    (b b' : Fin r → Res k 1)
+theorem shiftRow_unique
+    {ϖ : kˣ} (hϖ : IsUnif ϖ)
+    {r m : ℕ} (hm : 1 ≤ m) (Y : Matrix (Fin r) D k) (Q : Matrix D (Fin r) k)
+    (hQ : ∀ j l, Q j l ∈ 𝒪[k]) (hYQ : Y * Q = 1)
+    (x : D → k) (b b' : Fin r → Res k 1)
     (hb : ∀ j, valuation k (x j - (shiftRow ϖ m b ᵥ* Y) j) ≤ valuation k (ϖ : k) ^ m)
-    (hb' : ∀ j, valuation k (x j - (shiftRow ϖ m b' ᵥ* Y) j) ≤ valuation k (ϖ : k) ^ m) :
-    b = b' := by
+    (hb' : ∀ j, valuation k (x j - (shiftRow ϖ m b' ᵥ* Y) j) ≤ valuation k (ϖ : k) ^ m)
+    : b = b' := by
   have hu0 : valuation k (ϖ : k) ≠ 0 := by simp
   let δ : Fin r → k := fun l =>
     (ϖ : k) ^ (m - 1) * (((Quotient.out (b l) : 𝒪[k]) : k) - ((Quotient.out (b' l) : 𝒪[k]) : k))
@@ -131,8 +140,9 @@ theorem shiftRow_unique {ϖ : kˣ} (hϖ : IsUnif ϖ) {r m : ℕ} (hm : 1 ≤ m) 
     rw [map_mul]
     exact (mul_le_mul' (h1 j) ((Valuation.mem_integer_iff _ _).1 (hQ j l))).trans (by rw [mul_one])
   funext l
-  have h4 : valuation k (((Quotient.out (b l) : 𝒪[k]) : k) - ((Quotient.out (b' l) : 𝒪[k]) : k)) ≤
-      valuation k (ϖ : k) := by
+  have h4
+      : valuation k (((Quotient.out (b l) : 𝒪[k]) : k) - ((Quotient.out (b' l) : 𝒪[k]) : k))
+        ≤ valuation k (ϖ : k) := by
     have h5 := h3 l
     have hm' : valuation k (ϖ : k) ^ m = valuation k (ϖ : k) ^ (m - 1) * valuation k (ϖ : k) := by
       rw [← pow_succ]; congr 1; omega
@@ -142,13 +152,13 @@ theorem shiftRow_unique {ϖ : kˣ} (hϖ : IsUnif ϖ) {r m : ℕ} (hm : 1 ≤ m) 
   rw [← Ideal.Quotient.mk_out (b l), ← Ideal.Quotient.mk_out (b' l)]
   exact Ideal.Quotient.eq.2 ((mem_max_iff hϖ _).2 h4)
 
-
 omit [DecidableEq D] in
-theorem shiftRow_exists {ϖ : kˣ} (hϖ : IsUnif ϖ) {r c m : ℕ} (hcm : c + 1 ≤ m) (Y Z : Matrix (Fin r) D k)
-    (hY : ∀ l j, Y l j ∈ 𝒪[k])
+theorem shiftRow_exists
+    {ϖ : kˣ} (hϖ : IsUnif ϖ)
+    {r c m : ℕ} (hcm : c + 1 ≤ m) (Y Z : Matrix (Fin r) D k) (hY : ∀ l j, Y l j ∈ 𝒪[k])
     (hZ : ∀ l j, valuation k (Z l j) ≤ (valuation k (ϖ : k) ^ c)⁻¹ * valuation k (ϖ : k) ^ m)
-    (s : Fin r → k) (hs : ∀ l, valuation k (s l) ≤ valuation k (ϖ : k) ^ (m - 1)) :
-    ∃ b : Fin r → Res k 1, ∀ j,
+    (s : Fin r → k) (hs : ∀ l, valuation k (s l) ≤ valuation k (ϖ : k) ^ (m - 1))
+    : ∃ b : Fin r → Res k 1, ∀ j,
       valuation k ((s ᵥ* (Y + Z)) j - (shiftRow ϖ m b ᵥ* Y) j) ≤ valuation k (ϖ : k) ^ m := by
   have hu : valuation k (ϖ : k) < 1 := hϖ ▸ uniformizer_lt_one
   have hu0 : valuation k (ϖ : k) ≠ 0 := by simp
@@ -157,24 +167,32 @@ theorem shiftRow_exists {ϖ : kˣ} (hϖ : IsUnif ϖ) {r c m : ℕ} (hcm : c + 1 
   have hm' : valuation k (ϖ : k) ^ m = valuation k (ϖ : k) ^ (m - 1) * valuation k (ϖ : k) := by
     rw [← pow_succ]; congr 1; omega
   have htt : ∀ l, ((ϖ : k) ^ (m - 1))⁻¹ * s l ∈ 𝒪[k] := fun l => by
-    rw [Valuation.mem_integer_iff, map_mul, map_inv₀, map_pow, inv_mul_le_iff₀ hvp, mul_one]; exact hs l
+    rw [Valuation.mem_integer_iff, map_mul, map_inv₀, map_pow, inv_mul_le_iff₀ hvp, mul_one]
+    exact hs l
   let b₀ : Fin r → Res k 1 := fun l => Ideal.Quotient.mk _ ⟨_, htt l⟩
-  have hb : ∀ l, valuation k (((Quotient.out (b₀ l) : 𝒪[k]) : k) - ((ϖ : k) ^ (m - 1))⁻¹ * s l) ≤
-      valuation k (ϖ : k) :=
-    fun l => (mem_max_iff hϖ _).1 (Ideal.Quotient.eq.1 (Ideal.Quotient.mk_out (b₀ l)))
+  have hb
+      : ∀ l,
+        valuation k (((Quotient.out (b₀ l) : 𝒪[k]) : k) - ((ϖ : k) ^ (m - 1))⁻¹ * s l)
+          ≤ valuation k (ϖ : k) := fun l =>
+    (mem_max_iff hϖ _).1 (Ideal.Quotient.eq.1 (Ideal.Quotient.mk_out (b₀ l)))
   refine ⟨b₀, fun j => ?_⟩
-  have e : (s ᵥ* (Y + Z)) j - (shiftRow ϖ m b₀ ᵥ* Y) j = ((s - shiftRow ϖ m b₀) ᵥ* Y) j + (s ᵥ* Z) j := by
+  have e
+      : (s ᵥ* (Y + Z)) j - (shiftRow ϖ m b₀ ᵥ* Y) j
+        = ((s - shiftRow ϖ m b₀) ᵥ* Y) j + (s ᵥ* Z) j := by
     rw [Matrix.vecMul_add, Matrix.sub_vecMul]; simp only [Pi.add_apply, Pi.sub_apply]; ring
   rw [e]
   refine Valuation.map_add_le _ ?_ ?_
   · show valuation k (∑ l, (s - shiftRow ϖ m b₀) l * Y l j) ≤ _
     refine Valuation.map_sum_le _ fun l _ => ?_
-    have e2 : (s - shiftRow ϖ m b₀) l = -((ϖ : k) ^ (m - 1) *
-        (((Quotient.out (b₀ l) : 𝒪[k]) : k) - ((ϖ : k) ^ (m - 1))⁻¹ * s l)) := by
+    have e2
+        : (s - shiftRow ϖ m b₀) l
+          = -((ϖ : k) ^ (m - 1)
+            * (((Quotient.out (b₀ l) : 𝒪[k]) : k) - ((ϖ : k) ^ (m - 1))⁻¹ * s l)) := by
       simp only [Pi.sub_apply, shiftRow]; rw [mul_sub, mul_inv_cancel_left₀ hp0]; ring
     rw [e2, map_mul, Valuation.map_neg, map_mul, map_pow, hm']
-    exact (mul_le_mul' (mul_le_mul' le_rfl (hb l)) ((Valuation.mem_integer_iff _ _).1 (hY l j))).trans
-      (by rw [mul_one])
+    exact
+      (mul_le_mul' (mul_le_mul' le_rfl (hb l)) ((Valuation.mem_integer_iff _ _).1 (hY l j))).trans
+        (by rw [mul_one])
   · show valuation k (∑ l, s l * Z l j) ≤ _
     refine Valuation.map_sum_le _ fun l _ => ?_
     rw [map_mul, hm']

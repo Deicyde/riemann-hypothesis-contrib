@@ -27,8 +27,10 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 theorem val_mem {n : ℕ} (y : G n) : y.val ∈ GLs n :=
   ((Matrix.isUnit_iff_isUnit_det _).1 y.isUnit).ne_zero
 
-theorem continuous_extend {n : ℕ} {V : Type} [NormedAddCommGroup V] {b : G n → V} (hb : Continuous b)
-    (hs : HasCompactSupport b) : Continuous (Function.extend (Units.val : G n → Mat n) b 0) := by
+theorem continuous_extend
+    {n : ℕ} {V : Type} [NormedAddCommGroup V]
+    {b : G n → V} (hb : Continuous b) (hs : HasCompactSupport b)
+    : Continuous (Function.extend (Units.val : G n → Mat n) b 0) := by
   have he := val_emb n
   refine continuous_of_tsupport fun x h => ?_
   obtain ⟨u, -, rfl⟩ := hs.tsupport_extend_zero_subset he.continuous h
@@ -38,27 +40,39 @@ theorem continuous_extend {n : ℕ} {V : Type} [NormedAddCommGroup V] {b : G n �
   rw [this]
   exact hb.continuousAt
 
-theorem exists_smooth {n : ℕ} {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] {b : G n → V}
-    (hb : Continuous b) (hs : HasCompactSupport b) {δ : ℝ} (hδ : 0 < δ) :
-    ∃ f : Mat n → V, ContDiff ℝ ∞ f ∧ (∀ y : G n, dist (b y) (f y.val) ≤ δ) ∧
-      ∀ y, y ∉ (Units.val : G n → Mat n) '' tsupport b → f y = 0 := by
+theorem exists_smooth
+    {n : ℕ} {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    {b : G n → V} (hb : Continuous b) (hs : HasCompactSupport b)
+    {δ : ℝ} (hδ : 0 < δ)
+    : ∃ f : Mat n → V,
+      ContDiff ℝ ∞ f ∧ (∀ y : G n, dist (b y) (f y.val) ≤ δ)
+        ∧ ∀ y, y ∉ (Units.val : G n → Mat n) '' tsupport b → f y = 0 := by
   have he := val_emb n
-  obtain ⟨f, hf, hd, hsu⟩ := (continuous_extend hb hs).exists_contDiff_approx ⊤ (ε := fun _ => δ)
-    continuous_const fun _ => hδ
+  obtain ⟨f, hf, hd, hsu⟩ :=
+    (continuous_extend hb hs).exists_contDiff_approx ⊤
+      (ε := fun _ => δ)
+      continuous_const
+      fun _ => hδ
   refine ⟨f, hf, fun y => ?_, fun y hy => ?_⟩
   · have := hd y.val
-    rw [show Function.extend (Units.val : G n → Mat n) b 0 y.val = b y from he.injective.extend_apply _ _ _] at this
-    rw [dist_comm]; exact this.le
+    rw [show Function.extend (Units.val : G n → Mat n) b 0 y.val = b y from
+        he.injective.extend_apply _ _ _]
+      at this
+    rw [dist_comm]
+    exact this.le
   · by_contra hne
     have h1 := hsu (Function.mem_support.2 hne)
     exact hy (hs.tsupport_extend_zero_subset he.continuous (subset_tsupport _ h1))
 
-theorem cpt_of {n : ℕ} {V : Type} [Zero V] (hL : LgFacts) {K : Set (G n)} (hK : IsCompact K) {f : Mat n → V}
-    (hf : ∀ y, y ∉ (Units.val : G n → Mat n) '' K → f y = 0) : Cpt f := by
+theorem cpt_of
+    {n : ℕ} {V : Type} [Zero V]
+    (hL : LgFacts)
+    {K : Set (G n)} (hK : IsCompact K)
+    {f : Mat n → V} (hf : ∀ y, y ∉ (Units.val : G n → Mat n) '' K → f y = 0)
+    : Cpt f := by
   have he := val_emb n
   have hc : IsCompact ((Units.val : G n → Mat n) '' K) := hK.image he.continuous
-  have hsub : (Units.val : G n → Mat n) '' K ⊆ GLs n := by
-    rintro _ ⟨u, -, rfl⟩; exact val_mem u
+  have hsub : (Units.val : G n → Mat n) '' K ⊆ GLs n := by rintro _ ⟨u, -, rfl⟩; exact val_mem u
   have hcont : ContinuousOn (lg : Mat n → ℝ) ((Units.val : G n → Mat n) '' K) :=
     ((hL n).2.2.2.1.continuousOn).mono hsub
   obtain ⟨R, hR⟩ := (hc.image_of_continuousOn hcont).bddAbove
@@ -75,8 +89,9 @@ theorem denseD : DenseD := by
   refine (mem_closure_iff_nhds_basis Metric.nhds_basis_closedBall).2 fun ε hε => ?_
   have hp : (2 : ℝ≥0∞) ≠ ⊤ := by norm_num
   have hε2 : 0 < ε / 2 := by positivity
-  obtain ⟨b, hbs, hbd, hbc, hbm⟩ := (Lp.memLp x).exists_hasCompactSupport_eLpNorm_sub_le hp
-    (ε := ENNReal.ofReal (ε / 2)) (by simpa using hε2)
+  obtain ⟨b, hbs, hbd, hbc, hbm⟩ :=
+    (Lp.memLp x).exists_hasCompactSupport_eLpNorm_sub_le hp (ε := ENNReal.ofReal (ε / 2))
+      (by simpa using hε2)
   set K := tsupport b with hKdef
   have hKc : IsCompact K := hbs
   set m : ℝ≥0∞ := μ K ^ (1 / (2 : ℝ≥0∞).toReal) with hm
@@ -105,7 +120,8 @@ theorem denseD : DenseD := by
   refine ⟨hg.toLp _, ⟨f, hf.contDiffOn, cpt_of hL hKc hz, ?_⟩, ?_⟩
   · simp only [cls]; rw [dite_eq_left hg]
   · rw [Metric.mem_closedBall, dist_comm, Lp.dist_def,
-      ← ENNReal.le_ofReal_iff_toReal_le ((Lp.memLp x).sub (Lp.memLp (hg.toLp _))).eLpNorm_ne_top hε.le]
+      ← ENNReal.le_ofReal_iff_toReal_le ((Lp.memLp x).sub (Lp.memLp (hg.toLp _))).eLpNorm_ne_top
+        hε.le]
     have h1 : eLpNorm (⇑x - ⇑(hg.toLp _)) 2 μ = eLpNorm (⇑x - fun y : G n => f y.val) 2 μ :=
       eLpNorm_congr_ae (by filter_upwards [hg.coeFn_toLp] with y hy; simp [hy])
     rw [h1]
@@ -113,7 +129,8 @@ theorem denseD : DenseD := by
       ext y; simp
     rw [h2]
     refine (eLpNorm_add_le (p := 2) (by norm_num)).trans ?_
-    calc _ ≤ ENNReal.ofReal (ε / 2) + ENNReal.ofReal (ε / 2) := add_le_add hbd hbg
+    calc
+      _ ≤ ENNReal.ofReal (ε / 2) + ENNReal.ofReal (ε / 2) := add_le_add hbd hbg
       _ = ENNReal.ofReal ε := by rw [← ENNReal.ofReal_add hε2.le hε2.le]; congr 1; ring
 
 end GlobalTheory.CompanionTheory.DenseCpt

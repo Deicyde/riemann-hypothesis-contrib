@@ -9,11 +9,11 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem exists_prime_not_mem_forall_gt_eq_maximalIdeal (C : Type) [CommRing C] [IsDomain C]
-    [IsLocalRing C] [IsNoetherianRing C] (x : C) (hx : x ≠ 0) (hxm : x ∈ maximalIdeal C) :
-    ∃ q : Ideal C, q.IsPrime ∧ x ∉ q ∧ ∀ P : Ideal C, P.IsPrime → q < P → P = maximalIdeal C := by
+theorem exists_prime_not_mem_forall_gt_eq_maximalIdeal
+    (C : Type) [CommRing C] [IsDomain C] [IsLocalRing C] [IsNoetherianRing C]
+    (x : C) (hx : x ≠ 0) (hxm : x ∈ maximalIdeal C)
+    : ∃ q : Ideal C, q.IsPrime ∧ x ∉ q ∧ ∀ P : Ideal C, P.IsPrime → q < P → P = maximalIdeal C := by
   classical
-
   have hnil : ¬ IsNilpotent x := fun h => hx (IsNilpotent.eq_zero h)
   haveI : Nontrivial (Localization.Away x) :=
     (IsLocalization.injective (Localization.Away x)
@@ -21,11 +21,11 @@ theorem exists_prime_not_mem_forall_gt_eq_maximalIdeal (C : Type) [CommRing C] [
   obtain ⟨M, hM⟩ := Ideal.exists_maximal (Localization.Away x)
   set q : Ideal C := M.comap (algebraMap C (Localization.Away x)) with hqdef
   have hMp : M.IsPrime := hM.isPrime
-  have hqd := (IsLocalization.isPrime_iff_isPrime_disjoint (Submonoid.powers x)
-    (Localization.Away x) M).mp hMp
+  have hqd :=
+    (IsLocalization.isPrime_iff_isPrime_disjoint (Submonoid.powers x) (Localization.Away x) M).mp
+      hMp
   have hqp : q.IsPrime := hqd.1
-  have hxq : x ∉ q := fun h =>
-    Set.disjoint_left.mp hqd.2 (Submonoid.mem_powers x) h
+  have hxq : x ∉ q := fun h => Set.disjoint_left.mp hqd.2 (Submonoid.mem_powers x) h
 
   have habove : ∀ P : Ideal C, P.IsPrime → q < P → x ∈ P := by
     intro P hP hlt
@@ -34,10 +34,12 @@ theorem exists_prime_not_mem_forall_gt_eq_maximalIdeal (C : Type) [CommRing C] [
       rw [Set.disjoint_left]
       rintro _ ⟨n, rfl⟩ h
       exact hxP (hP.mem_of_pow_mem n h)
-    have hPL := IsLocalization.isPrime_of_isPrime_disjoint (Submonoid.powers x)
-      (Localization.Away x) P hP hdisj
-    have hcomap := IsLocalization.under_map_of_isPrime_disjoint (Submonoid.powers x)
-      (Localization.Away x) hP hdisj
+    have hPL :=
+      IsLocalization.isPrime_of_isPrime_disjoint (Submonoid.powers x) (Localization.Away x) P hP
+        hdisj
+    have hcomap :=
+      IsLocalization.under_map_of_isPrime_disjoint (Submonoid.powers x) (Localization.Away x) hP
+        hdisj
     have hMle : M ≤ P.map (algebraMap C (Localization.Away x)) := by
       rw [← IsLocalization.map_under (Submonoid.powers x) (Localization.Away x) M]
       exact Ideal.map_mono hlt.le
@@ -53,8 +55,7 @@ theorem exists_prime_not_mem_forall_gt_eq_maximalIdeal (C : Type) [CommRing C] [
   set m' : Ideal (C ⧸ q) := (maximalIdeal C).map f with hm'
   have hqm : q ≤ maximalIdeal C := le_maximalIdeal hqp.ne_top
   have hm'p : m'.IsPrime := Ideal.map_isPrime_of_surjective hsurj (hker.symm ▸ hqm)
-  have hx0 : f x ≠ 0 := by
-    rw [Ne, Ideal.Quotient.eq_zero_iff_mem]; exact hxq
+  have hx0 : f x ≠ 0 := by rw [Ne, Ideal.Quotient.eq_zero_iff_mem]; exact hxq
   have hht : m'.height ≤ 1 := by
     refine height_le_one_of_forall_mem m' hx0 ?_
     intro p' hp' hp'0 _

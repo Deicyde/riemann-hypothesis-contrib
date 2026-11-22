@@ -10,7 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HcPar
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx Formalism.DivisionValues
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
+  Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx Formalism.DivisionValues
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.IndefiniteRowSideFullHecke.InfinityTypes Formalism.L2.NTheta
 
@@ -194,9 +197,22 @@ theorem arithAt : ∀ (D : D7) (i : Fin D.R.m) (τ : D.what₂.Tau), ArithAt D i
   have hr' : (D.R.r : ℚ) = (pS D i τ : ℚ) + (qS D i τ : ℚ) := by exact_mod_cast hr.symm
   have ho : Odd (pS D i τ + qS D i τ) := hr ▸ odd_r D.R
   have hL := GlobalTheory.ForcedWeights.lamLForced D ((i : ℕ) + 1) (Nat.le_add_left _ _) i.2 τ
-  refine ⟨sig_eq D i τ, ⟨hr, hV⟩, fun a ha => cast_aPlus D i τ ha, fun c hc => aM_cast D i τ hc,
-    fun a b hab hb => ?_, fun a b hab hb => ?_, fun a ha => ?_, fun a ha => ?_, fun a => ?_, fun c => ?_, ?_,
-    lamPrime_eq D i τ, hL, fun a => ?_⟩
+  refine ⟨
+    sig_eq D i τ,
+    ⟨hr, hV⟩,
+    fun a ha => cast_aPlus D i τ ha,
+    fun c hc => aM_cast D i τ hc,
+    fun a b hab hb => ?_,
+    fun a b hab hb => ?_,
+    fun a ha => ?_,
+    fun a ha => ?_,
+    fun a => ?_,
+    fun c => ?_,
+    ?_,
+    lamPrime_eq D i τ,
+    hL,
+    fun a => ?_
+  ⟩
   · rw [← Nat.cast_le (α := ℚ), cast_aPlus D i τ hb, cast_aPlus D i τ (by omega)]
     exact aPlusQ_anti D i τ hab hb
   · rw [← Nat.cast_le (α := ℚ), aM_cast' D i τ hb, aM_cast' D i τ (by omega), neg_le_neg_iff]
@@ -206,9 +222,11 @@ theorem arithAt : ∀ (D : D7) (i : Fin D.R.m) (τ : D.what₂.Tau), ArithAt D i
   · rw [← Nat.cast_le (α := ℚ), aM_cast' D i τ ha, Nat.cast_one]
     exact one_le_neg_dRowQ D i τ (by omega)
   · rw [kapW_cast _ _ _ ho, cast_aPlus D i τ a.2]
-    simp only [kapQ, Sum.elim_inl, aPlusQ, centred, hr']; ring
+    simp only [kapQ, Sum.elim_inl, aPlusQ, centred, hr']
+    ring
   · rw [kapW_cast _ _ _ ho, aM_cast D i τ c.2]
-    simp only [kapQ, Sum.elim_inr, dRowQ, centred, hr']; ring
+    simp only [kapQ, Sum.elim_inr, dRowQ, centred, hr']
+    ring
   · obtain ⟨s, hs⟩ := ho
     have hs' : (qS D i τ : ℚ) = 2 * s + 1 - pS D i τ := by
       have : (pS D i τ : ℚ) + qS D i τ = 2 * s + 1 := by exact_mod_cast hs
@@ -216,7 +234,8 @@ theorem arithAt : ∀ (D : D7) (i : Fin D.R.m) (τ : D.what₂.Tau), ArithAt D i
     obtain ⟨e, he⟩ := (D.hc τ).e_int i
     refine ⟨(pS D i τ : ℕ) - s - 1 - e, ?_⟩
     simp only [dShift, eS, he, hs']
-    push_cast; ring
+    push_cast
+    ring
   · obtain ⟨_, w, hk, hm, ht, hj, he, hv, hb, hw⟩ := hL
     rw [hw a]
     exact lamPrime_eq D i τ w ⟨hk, hm, ht, hj, he, hv, hb⟩ a (hV ▸ a.2)

@@ -13,8 +13,9 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Proo
 
 variable {D : D7} {L : SizeData₂ D}
 
-theorem negEe_le (C : ℝ) (h2 : Formalism.MainNotions.LocalQuadraticParts.adm11 D L C) (u : D.what₂.Word) :
-    -(L.Ee u) ≤ C * D.R.m * L.B0 := by
+theorem negEe_le
+    (C : ℝ) (h2 : Formalism.MainNotions.LocalQuadraticParts.adm11 D L C) (u : D.what₂.Word)
+    : -(L.Ee u) ≤ C * D.R.m * L.B0 := by
   have ha : 0 < L.sc.a := by
     unfold Scale.a Scale.b
     exact mul_pos (by linarith [L.sc.one_lt_alt]) (Real.exp_pos _)
@@ -42,22 +43,32 @@ theorem negEe_le (C : ℝ) (h2 : Formalism.MainNotions.LocalQuadraticParts.adm11
 
 def EcHH (l : List ℝ) : ℝ := 9 * (max (l.headD 0) 5 + 3) + 2
 
-theorem gauge_form_bound_of_uniform_size {eps : ℝ} (Fm : FamP eps) (c2 : Formalism.MainNotions.LocalQuadraticParts.ComplementTwoFamily Fm) :
-    ∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ (i : Fm.Ix x) u,
-      (Fm.L x i).Ga + (Fm.L x i).Fo - (Fm.L x i).Ee u ≤ (Fm.L x i).sc.x ^ EcHH Fm.cOut * (Fm.L x i).sc.b := by
+theorem gauge_form_bound_of_uniform_size
+    {eps : ℝ}
+    (Fm : FamP eps) (c2 : Formalism.MainNotions.LocalQuadraticParts.ComplementTwoFamily Fm)
+    : ∃ x0 : ℝ, ∀ x ≥ x0,
+      Fm.x1 < x
+        → ∀ (i : Fm.Ix x) u,
+          (Fm.L x i).Ga + (Fm.L x i).Fo - (Fm.L x i).Ee u
+            ≤ (Fm.L x i).sc.x ^ EcHH Fm.cOut * (Fm.L x i).sc.b := by
   obtain ⟨C, xa, hC⟩ := c2
   obtain ⟨xg, hg⟩ := Formalism.MainNotions.DIV.HookProducts.Row4.ga_pow Fm
   obtain ⟨xf, hf⟩ := Formalism.MainNotions.DIV.HookProducts.HookProductWeightBounds.fo_pow Fm
   refine ⟨max (max xa xg) (max (max xf 9) (2 + |C|)), fun x hx hx1 i u => ?_⟩
   have hxa : xa ≤ x := le_trans (le_max_left _ _) (le_trans (le_max_left _ _) hx)
   have hxg : xg ≤ x := le_trans (le_max_right _ _) (le_trans (le_max_left _ _) hx)
-  have hxf : xf ≤ x := le_trans (le_max_left _ _) (le_trans (le_max_left _ _) (le_trans (le_max_right _ _) hx))
-  have hx9 : 9 ≤ x := le_trans (le_max_right _ _) (le_trans (le_max_left _ _) (le_trans (le_max_right _ _) hx))
+  have hxf : xf ≤ x :=
+    le_trans (le_max_left _ _) (le_trans (le_max_left _ _) (le_trans (le_max_right _ _) hx))
+  have hx9 : 9 ≤ x :=
+    le_trans (le_max_right _ _) (le_trans (le_max_left _ _) (le_trans (le_max_right _ _) hx))
   have hxC : 2 + |C| ≤ x := le_trans (le_max_right _ _) (le_trans (le_max_right _ _) hx)
   have hLx : (Fm.L x i).sc.x = x := Fm.L_x x i hx1
   have hEe := negEe_le C (hC x hxa i) u
-  have hB := Formalism.MainNotions.DIV.Proofs.const_rank_base_le_poly_fourth (D := Fm.D x i) (L := Fm.L x i) C
-  have hS := Formalism.MainNotions.DIV.Proofs.szPol_le_rpow (Fm.sizes x hx1 i) (by rw [hLx]; exact hx9)
+  have hB :=
+    Formalism.MainNotions.DIV.Proofs.const_rank_base_le_poly_fourth (D := Fm.D x i) (L := Fm.L x i)
+      C
+  have hS :=
+    Formalism.MainNotions.DIV.Proofs.szPol_le_rpow (Fm.sizes x hx1 i) (by rw [hLx]; exact hx9)
   rw [Fm.Ct_eq, hLx] at hS
   have hS1 := one_le_szPol (L := Fm.L x i)
   have hGa := hg x hxg hx1 i
@@ -73,7 +84,9 @@ theorem gauge_form_bound_of_uniform_size {eps : ℝ} (Fm : FamP eps) (c2 : Forma
   have hS4 : Formalism.MainNotions.DIV.Proofs.szPol (Fm.L x i) ^ 4 ≤ x ^ (4 * M) := by
     have e : (x ^ M) ^ (4 : ℕ) = x ^ (4 * M) := by
       rw [← Real.rpow_natCast, ← Real.rpow_mul hx0.le]
-      congr 1; push_cast; ring
+      congr 1
+      push_cast
+      ring
     rw [← e]
     exact pow_le_pow_left₀ (by linarith) hS 4
   have A1 : x ^ (4 * M + 1) ≤ x ^ (9 * M + 1) := Real.rpow_le_rpow_of_exponent_le hx1' (by linarith)
@@ -87,7 +100,9 @@ theorem gauge_form_bound_of_uniform_size {eps : ℝ} (Fm : FamP eps) (c2 : Forma
   have t1 : (Fm.L x i).Ga ≤ P * (Fm.L x i).sc.b := hGa.trans (mul_le_mul_of_nonneg_right A1 hb)
   have t3 : -((Fm.L x i).Ee u) ≤ |C| * (P * (Fm.L x i).sc.b) := by
     have h4 : Formalism.MainNotions.DIV.Proofs.szPol (Fm.L x i) ^ 4 ≤ P := hS4.trans A2
-    have h5 : |C| * Formalism.MainNotions.DIV.Proofs.szPol (Fm.L x i) ^ 4 * (Fm.L x i).sc.b ≤ |C| * (P * (Fm.L x i).sc.b) := by
+    have h5
+        : |C| * Formalism.MainNotions.DIV.Proofs.szPol (Fm.L x i) ^ 4 * (Fm.L x i).sc.b
+          ≤ |C| * (P * (Fm.L x i).sc.b) := by
       rw [mul_assoc]
       exact mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right h4 hb) (abs_nonneg C)
     linarith

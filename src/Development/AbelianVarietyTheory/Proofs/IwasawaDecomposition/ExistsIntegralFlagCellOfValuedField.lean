@@ -6,15 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.ExistsIn
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.LocM GlobalTheory.ShFam.Pad GlobalTheory.ProjSpace GlobalTheory.FlagEmb
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory.LocM GlobalTheory.ShFam.Pad GlobalTheory.ProjSpace
+  GlobalTheory.FlagEmb
 open Formalism.MainNotions.DIV.Cons (intO)
 
 namespace GlobalTheory.FlagEmb
 
-theorem exists_integral_cell : ∀ (T : Type) (m : T → ℕ) (K : Type) [Field K] (A : ValuationSubring K) (M : ℕ)
-    (c u : Let m → Fin (M + 1) → K), InBlock c u → (∀ τ, LinearIndependent K fun j : Fin (m τ) => u ⟨τ, j⟩) →
-    ∃ (w : Pm m) (x : CellVar m → K) (d : Let m → K), (∀ v, x v ∈ A) ∧ (∀ z, d z ≠ 0) ∧
-      Tri (cellVec c w x) u d := by
+theorem exists_integral_cell
+    : ∀ (T : Type) (m : T → ℕ) (K : Type) [Field K] (A : ValuationSubring K) (M : ℕ)
+        (c u : Let m → Fin (M + 1) → K),
+      InBlock c u → (∀ τ, LinearIndependent K fun j : Fin (m τ) => u ⟨τ, j⟩)
+        → ∃ (w : Pm m) (x : CellVar m → K) (d : Let m → K),
+          (∀ v, x v ∈ A) ∧ (∀ z, d z ≠ 0) ∧ Tri (cellVec c w x) u d := by
   intro T m K _ A M c u hin hli
   have hg : ∀ z : Let m, ∃ a : Fin (m z.1) → K, ∑ i, a i • c ⟨z.1, i⟩ = u z := fun z =>
     (Submodule.mem_span_range_iff_exists_fun K).1 (hin z)
@@ -35,7 +39,8 @@ theorem exists_integral_cell : ∀ (T : Type) (m : T → ℕ) (K : Type) [Field 
     exact Fintype.linearIndependent_iff.1 (hli τ) s h0
   have hdec := fun τ => GlobalTheory.exists_integral_pivot_decomposition K A _ _ (g τ) (hgli τ)
   choose ι u0 b huA hu0 hu1 hbt hbd hgub using hdec
-  have hbij : ∀ τ, Function.Bijective (ι τ) := fun τ => Finite.injective_iff_bijective.1 (ι τ).injective
+  have hbij : ∀ τ, Function.Bijective (ι τ) := fun τ =>
+    Finite.injective_iff_bijective.1 (ι τ).injective
   let w : Pm m := fun τ => Equiv.ofBijective _ (hbij τ)
   let x : CellVar m → K := fun v => u0 v.1 (ι v.1 v.2.1.1) v.2.1.2
   refine ⟨w, x, fun z => b z.1 z.2 z.2, fun v => huA _ _ _, fun z => hbd _ _, ?_⟩

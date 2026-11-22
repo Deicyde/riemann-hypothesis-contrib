@@ -9,30 +9,33 @@ open NumberField IsDedekindDomain TensorProduct
 
 namespace GlobalTheory
 
-theorem tensor_exists_decomp {K M N : Type*} [Field K] [AddCommGroup M] [Module K M]
-    [AddCommGroup N] [Module K N] (b : Module.Basis (Fin 2) K M) (z : M ⊗[K] N) :
-    ∃ a c : N, z = b 0 ⊗ₜ[K] a + b 1 ⊗ₜ[K] c := by
-  have h := TensorProduct.equivFinsuppOfBasisLeft_symm_apply b
-    (TensorProduct.equivFinsuppOfBasisLeft b z)
+theorem tensor_exists_decomp
+    {K M N : Type*} [Field K] [AddCommGroup M] [Module K M] [AddCommGroup N] [Module K N]
+    (b : Module.Basis (Fin 2) K M) (z : M ⊗[K] N)
+    : ∃ a c : N, z = b 0 ⊗ₜ[K] a + b 1 ⊗ₜ[K] c := by
+  have h :=
+    TensorProduct.equivFinsuppOfBasisLeft_symm_apply b (TensorProduct.equivFinsuppOfBasisLeft b z)
   rw [LinearEquiv.symm_apply_apply, Finsupp.sum_fintype _ _ (by simp), Fin.sum_univ_two] at h
   exact ⟨_, _, h⟩
 
-theorem tensor_decomp_eq_zero {K M N : Type*} [Field K] [AddCommGroup M] [Module K M]
-    [AddCommGroup N] [Module K N] (b : Module.Basis (Fin 2) K M) (a c : N)
-    (h : b 0 ⊗ₜ[K] a + b 1 ⊗ₜ[K] c = 0) : a = 0 ∧ c = 0 := by
+theorem tensor_decomp_eq_zero
+    {K M N : Type*} [Field K] [AddCommGroup M] [Module K M] [AddCommGroup N] [Module K N]
+    (b : Module.Basis (Fin 2) K M) (a c : N) (h : b 0 ⊗ₜ[K] a + b 1 ⊗ₜ[K] c = 0)
+    : a = 0 ∧ c = 0 := by
   have h' := congrArg (TensorProduct.equivFinsuppOfBasisLeft b) h
   have h0 := DFunLike.congr_fun h' 0
   have h1 := DFunLike.congr_fun h' 1
   simp [map_add (f := _)] at h0 h1
   exact ⟨h0, h1⟩
 
-theorem mem_ALint_of_supported_at_split : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L]
-    (s : ReciprocityTheory.Aut.SplitPlace L) (e : 𝓞 L),
-    Valued.v (s.i (e : L)) = 1 → Valued.v (s.i (IsCMField.complexConj L (e : L))) < 1 →
-    ∀ z : ReciprocityTheory.Aut.AL L, (∀ w, w ≠ s.v → ReciprocityTheory.Aut.compAt L w z = 0) →
-    Valued.v (s.proj (L := L) z) ≤ 1 →
-    Valued.v (s.proj (L := L) (ReciprocityTheory.Aut.conjAL L z)) ≤ 1 →
-    z ∈ ReciprocityTheory.Aut.ALint L := by
+theorem mem_ALint_of_supported_at_split
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (s : ReciprocityTheory.Aut.SplitPlace L)
+        (e : 𝓞 L),
+      Valued.v (s.i (e : L)) = 1 → Valued.v (s.i (IsCMField.complexConj L (e : L))) < 1
+        → ∀ z : ReciprocityTheory.Aut.AL L,
+          (∀ w, w ≠ s.v → ReciprocityTheory.Aut.compAt L w z = 0) → Valued.v (s.proj (L := L) z) ≤ 1
+            → Valued.v (s.proj (L := L) (ReciprocityTheory.Aut.conjAL L z)) ≤ 1
+            → z ∈ ReciprocityTheory.Aut.ALint L := by
   intro L _ _ _ s e he hc z hz hp hq
   have hne : (e : L) ≠ IsCMField.complexConj L (e : L) := by
     intro h
@@ -42,8 +45,11 @@ theorem mem_ALint_of_supported_at_split : ∀ (L : Type) [Field L] [NumberField 
     rw [LinearIndependent.pair_iff]
     intro a t h
     have h' := congrArg (IsCMField.complexConj L) h
-    simp only [Algebra.smul_def, map_add (f := _), map_mul, AlgEquiv.commutes, map_one, map_zero] at h h'
-    have hd : algebraMap (maximalRealSubfield L) L t * ((e : L) - IsCMField.complexConj L (e : L)) = 0 := by
+    simp only [Algebra.smul_def, map_add (f := _), map_mul, AlgEquiv.commutes, map_one, map_zero]
+      at h h'
+    have hd
+        : algebraMap (maximalRealSubfield L) L t * ((e : L) - IsCMField.complexConj L (e : L))
+          = 0 := by
       linear_combination h - h'
     have ht : t = 0 := by
       rcases mul_eq_zero.1 hd with h0 | h0
@@ -70,17 +76,19 @@ theorem mem_ALint_of_supported_at_split : ∀ (L : Type) [Field L] [NumberField 
     rw [hAB]
     simp [ReciprocityTheory.Aut.SplitPlace.proj, Algebra.TensorProduct.lift_tmul]
     rfl
-  have h2 : s.proj (L := L) (ReciprocityTheory.Aut.conjAL L z) =
-      A s.v + s.i (IsCMField.complexConj L (e : L)) * B s.v := by
+  have h2
+      : s.proj (L := L) (ReciprocityTheory.Aut.conjAL L z)
+        = A s.v + s.i (IsCMField.complexConj L (e : L)) * B s.v := by
     rw [hAB]
-    simp [ReciprocityTheory.Aut.SplitPlace.proj, ReciprocityTheory.Aut.conjAL, Algebra.TensorProduct.lift_tmul,
-      Algebra.TensorProduct.map_tmul]
+    simp [ReciprocityTheory.Aut.SplitPlace.proj, ReciprocityTheory.Aut.conjAL,
+      Algebra.TensorProduct.lift_tmul, Algebra.TensorProduct.map_tmul]
     rfl
   have hu : Valued.v (s.i (e : L) - s.i (IsCMField.complexConj L (e : L))) = 1 := by
     rw [Valuation.map_sub_eq_of_lt_left _ (by rw [he]; exact hc), he]
   have hBv : Valued.v (B s.v) ≤ 1 := by
-    have hm : (s.i (e : L) - s.i (IsCMField.complexConj L (e : L))) * B s.v =
-        s.proj (L := L) z - s.proj (L := L) (ReciprocityTheory.Aut.conjAL L z) := by
+    have hm
+        : (s.i (e : L) - s.i (IsCMField.complexConj L (e : L))) * B s.v
+          = s.proj (L := L) z - s.proj (L := L) (ReciprocityTheory.Aut.conjAL L z) := by
       rw [h1, h2]; ring
     have hv := congrArg Valued.v hm
     rw [map_mul, hu, one_mul] at hv
@@ -102,9 +110,10 @@ theorem mem_ALint_of_supported_at_split : ∀ (L : Type) [Field L] [NumberField 
     rcases eq_or_ne w s.v with rfl | hw
     · exact hBv
     · rw [(hoff w hw).2]; exact zero_mem _
-  have hsplit : ((e : L) ⊗ₜ[maximalRealSubfield L] B : ReciprocityTheory.Aut.AL L) =
-      ((e : L) ⊗ₜ[maximalRealSubfield L] (1 : ReciprocityTheory.Aut.AFplus L)) *
-        ((1 : L) ⊗ₜ[maximalRealSubfield L] B) := by
+  have hsplit
+      : ((e : L) ⊗ₜ[maximalRealSubfield L] B : ReciprocityTheory.Aut.AL L)
+        = ((e : L) ⊗ₜ[maximalRealSubfield L] (1 : ReciprocityTheory.Aut.AFplus L))
+          * ((1 : L) ⊗ₜ[maximalRealSubfield L] B) := by
     simp [Algebra.TensorProduct.tmul_mul_tmul]
   rw [hAB, hsplit]
   refine Subring.add_mem _ (Subring.subset_closure (Or.inr ⟨A, hAi, rfl⟩))

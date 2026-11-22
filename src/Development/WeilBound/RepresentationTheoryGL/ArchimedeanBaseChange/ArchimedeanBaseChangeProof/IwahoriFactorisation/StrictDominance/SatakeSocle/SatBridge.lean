@@ -16,9 +16,10 @@ namespace PositivityTheory.SphericalProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 def SatBridge : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ) (V : Type) [AddCommGroup V]
-    [Module ℂ V] (ρ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V), IsSmooth ρ → ρ.IsIrreducible →
-    ∀ α : Fin n → ℂˣ, HasSatake ρ α ↔ HasSatGL w ρ (Finset.univ.val.map α)
+  ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ) (V : Type)
+      [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V),
+    IsSmooth ρ → ρ.IsIrreducible
+      → ∀ α : Fin n → ℂˣ, HasSatake ρ α ↔ HasSatGL w ρ (Finset.univ.val.map α)
 
 end PositivityTheory.SphericalProduct
 

@@ -4,9 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem UpperTheory.Reformulated.B.Qp2.aux {X : Type} (n : ℕ) :
-    ∀ (V : Submodule ℂ (X → ℂ)) [FiniteDimensional ℂ ↥V], Module.finrank ℂ V = n →
-    ∃ (T : Finset X), ∀ v ∈ V, (∀ x ∈ T, v x = (0 : ℂ)) → v = (0 : X → ℂ) := by
+private theorem UpperTheory.Reformulated.B.Qp2.aux {X : Type} (n : ℕ)
+    : ∀ (V : Submodule ℂ (X → ℂ)) [FiniteDimensional ℂ ↥V],
+      Module.finrank ℂ V = n
+        → ∃ (T : Finset X), ∀ v ∈ V, (∀ x ∈ T, v x = (0 : ℂ)) → v = (0 : X → ℂ) := by
   classical
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -29,8 +30,8 @@ private theorem UpperTheory.Reformulated.B.Qp2.aux {X : Type} (n : ℕ) :
       refine ⟨insert x T, fun v hv h => hT v ?_ fun y hy => h y (Finset.mem_insert_of_mem hy)⟩
       exact Submodule.mem_inf.mpr ⟨hv, LinearMap.mem_ker.mpr (h x (Finset.mem_insert_self x T))⟩
 
-theorem UpperTheory.Reformulated.B.Qp2.exists_finset_separating :
-    ∀ {X : Type} (V : Submodule ℂ (X → ℂ)) [FiniteDimensional ℂ ↥V],
-    ∃ (T : Finset X), ∀ v ∈ V, (∀ x ∈ T, v x = (0 : ℂ)) → v = (0 : X → ℂ) := by
+theorem UpperTheory.Reformulated.B.Qp2.exists_finset_separating
+    : ∀ {X : Type} (V : Submodule ℂ (X → ℂ)) [FiniteDimensional ℂ ↥V], ∃ (T : Finset X), ∀ v ∈ V,
+      (∀ x ∈ T, v x = (0 : ℂ)) → v = (0 : X → ℂ) := by
   intro X V _
   exact UpperTheory.Reformulated.B.Qp2.aux _ V rfl

@@ -8,14 +8,15 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
+  Formalism.MainNotions.ElementDenominator.CongruenceModules
 
 theorem gradNCondition : Formalism.MainNotions.N.Ln34.GradNStep := by
   intro D HW F Cm CA CB CK hA l hlp hl K LL hG π' E hR T h' hh' hT
   have h1 : adm1 D HW F Cm := hA.1
   rcases Nat.eq_zero_or_pos (sK l K) with hs0 | hs
-  ·
-    apply gradNPf_small
+  · apply gradNPf_small
     simp [MK, hs0]
   · obtain ⟨f, t, x, u, -, -, hf, ht, hE, hΔ, hγ, hK, hN⟩ :=
       gradNPf_hyps D HW F Cm h1 l hl K LL hG π' E hR T hT hs

@@ -13,32 +13,41 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.IndefiniteRowSideFullHecke.HermitianCompactForm GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad GlobalTheory.ShFam.Hor GlobalTheory.DetLine
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.IndefiniteRowSideFullHecke
+  GlobalTheory.IndefiniteRowSideFullHecke.HermitianCompactForm GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ShFam.Pad GlobalTheory.ShFam.Hor GlobalTheory.DetLine
 open Formalism.L2.Pj
 
 namespace GlobalTheory.DetLine.HorConst
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
 
-theorem exists_matrix {S : Scheme.{0}} {t : SAB H S} {R : Type} [CommRing R] {x : Sp R ⟶ S} {m n : ℕ} (h : m = n)
+theorem exists_matrix
+    {S : Scheme.{0}} {t : SAB H S} {R : Type} [CommRing R]
+    {x : Sp R ⟶ S} {m n : ℕ} (h : m = n)
     {v v' : Fin n → (epsAt x ⟶ t.G)} {u u' : Fin m → (Sp (DualNumber R) ⟶ t.G.left)}
     (hv : ∀ (i : Fin n) (k : Fin m), (i : ℕ) = k → (v i).left = u k)
     (hv' : ∀ (i : Fin n) (k : Fin m), (i : ℕ) = k → (v' i).left = u' k)
-    {M : Matrix (Fin m) (Fin m) R} (hM : ∀ i, IsCombAtG t x u (M i) (u' i)) :
-    ∃ M' : Matrix (Fin n) (Fin n) R, M'.det = M.det ∧ ∀ i, IsCombAt x (M' i) v (v' i) := by
+    {M : Matrix (Fin m) (Fin m) R} (hM : ∀ i, IsCombAtG t x u (M i) (u' i))
+    : ∃ M' : Matrix (Fin n) (Fin n) R, M'.det = M.det ∧ ∀ i, IsCombAt x (M' i) v (v' i) := by
   subst h
   refine ⟨M, rfl, fun i => (EigParts.comb_iff v _ _).2 ?_⟩
   rw [hv' i i rfl, show (fun i => (v i).left) = u from funext fun i => hv i i rfl]
   exact hM i
 
-variable {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F}
-  {Y : Model Xo c β}
-
+variable
+  {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F} {Y : Model Xo c β}
 
 open GlobalTheory.LieLocBasis GlobalTheory.ShFam.EigLoc GlobalTheory.ShFam.CoordUniq in
-theorem exists_matrix_det_ne {k : Type} [Field k] {φ : c.F →+* k} {x : Sp k ⟶ Y.X} (f₁ f₂ : EigFrame Y φ x)
-    (ρ : E →+* ℂ) : ∃ M : Matrix (Fin (D.mult ρ)) (Fin (D.mult ρ)) k,
+theorem exists_matrix_det_ne
+    {k : Type} [Field k] {φ : c.F →+* k} {x : Sp k ⟶ Y.X} (f₁ f₂ : EigFrame Y φ x) (ρ : E →+* ℂ)
+    : ∃ M : Matrix (Fin (D.mult ρ)) (Fin (D.mult ρ)) k,
       (∀ i, IsCombAtG Y.t x (f₁.v ρ) (M i) (f₂.v ρ i)) ∧ M.det ≠ 0 := by
   obtain ⟨n, xc, hx⟩ := exists_chart Y.t x
   choose e₁ he₁ using fun i => vec_exists hx _ (f₁.tan ρ i)
@@ -62,10 +71,14 @@ theorem exists_matrix_det_ne {k : Type} [Field k] {φ : c.F →+* k} {x : Sp k �
   have : ∑ i, a i * M i j = 0 := congrFun ha0 j
   rw [this, zero_smul]
 
-theorem quot_eq {τ : E →+* ℂ} (hτ : τ (H.rt : E) = H.rt0) {e : c.F →+* ℂ} {h : CxFr Y e → ℂ} (hh : HorFn τ h)
-    {V : Set (gen Y)} {σb : RuleY Y} (hσ : SecY Y V τ σb) (a a' : CxFr Y e) (ha : a.1.1 = a'.1.1) (hi : Inner a.1)
+theorem quot_eq
+    {τ : E →+* ℂ} (hτ : τ (H.rt : E) = H.rt0)
+    {e : c.F →+* ℂ} {h : CxFr Y e → ℂ} (hh : HorFn τ h)
+    {V : Set (gen Y)} {σb : RuleY Y} (hσ : SecY Y V τ σb)
+    (a a' : CxFr Y e) (ha : a.1.1 = a'.1.1) (hi : Inner a.1)
     {v w v' w'} (hf : FrY Y V τ e a.1.1 v w) (hm : Match τ a.2 v w) (hf' : FrY Y V τ e a'.1.1 v' w')
-    (hm' : Match τ a'.2 v' w') : σb ℂ a.1.1 v w * (h a)⁻¹ = σb ℂ a'.1.1 v' w' * (h a')⁻¹ := by
+    (hm' : Match τ a'.2 v' w')
+    : σb ℂ a.1.1 v w * (h a)⁻¹ = σb ℂ a'.1.1 v' w' * (h a')⁻¹ := by
   obtain ⟨x, f⟩ := a
   obtain ⟨x', f'⟩ := a'
   obtain rfl : x = x' := Subtype.ext ha
@@ -82,18 +95,32 @@ theorem quot_eq {τ : E →+* ℂ} (hτ : τ (H.rt : E) = H.rt0) {e : c.F →+* 
   refine mul_right_cancel₀ hM0 ?_
   linear_combination σb ℂ x.1 v w * e₂ + h ⟨x, f⟩ * e₁
 
-
 open GlobalTheory.CxPts GlobalTheory.ShFam.Hor.Sec in
-theorem exists_const_mul_horFn : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (τ : E →+* ℂ) (e : c.F →+* ℂ) (h : CxFr Y e → ℂ) (B : GlobalTheory.ProjVar.Var c.F) (io : B.X ⟶ gen Y) (V : Set (gen Y)), IsOpenImmersion io → Set.range io = V → io ≫ genStr Y = B.str → τ (H.rt : E) = H.rt0 → HorFn τ h → ∀ σb : RuleY Y, SecY Y V τ σb → ∃ κ : ℂ, ∀ (a : CxFr Y e) v w, Inner a.1 → FrY Y V τ e a.1.1 v w → Match τ a.2 v w → σb ℂ a.1.1 v w = κ * h a := by
+theorem exists_const_mul_horFn
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
+        (τ : E →+* ℂ) (e : c.F →+* ℂ) (h : CxFr Y e → ℂ) (B : GlobalTheory.ProjVar.Var c.F)
+        (io : B.X ⟶ gen Y) (V : Set (gen Y)),
+      IsOpenImmersion io → Set.range io = V → io ≫ genStr Y = B.str → τ (H.rt : E) = H.rt0
+        → HorFn τ h
+        → ∀ σb : RuleY Y,
+          SecY Y V τ σb
+            → ∃ κ : ℂ, ∀ (a : CxFr Y e) v w,
+              Inner a.1 → FrY Y V τ e a.1.1 v w → Match τ a.2 v w → σb ℂ a.1.1 v w = κ * h a := by
   intro E _ _ _ H D l Xo c O _ β Y τ e h B io V hio hV hstr hτ hh σb hσ
   obtain ⟨W, hW, φ, fr, a, hy, hφ, ha, hv, hf⟩ :=
     GlobalTheory.ShFam.HolFrames.exists_affine_holFrames E H D l Xo c O β Y e B io hio hstr
   choose v₀ w₀ hf₀ hm₀ using fun y => (EigParts.eigFrame_match E H D l Xo c O β Y τ hτ V _ (φ y) _ (hφ y)
     (by rintro _ ⟨z, rfl⟩; rw [← hV, Scheme.Hom.comp_apply]; exact ⟨_, rfl⟩) (fr y)).1
   let s (y : B.X) : Γ(B.X, W y) := σb _ _ (v₀ y) (w₀ y)
-  have key (y) (p : GlobalTheory.CxPts B.str e) (hp : p ∈ ptsIn B.str e (W y)) :
-      ∃ v w, FrY Y V τ e (a y p).1.1 v w ∧ Match τ (a y p).2 v w ∧ σb ℂ (a y p).1.1 v w = ev B.str e _ (s y) p := by
-    have hx : (a y p).1.1 = spMap (evHom hp) ≫ (show Sp Γ(B.X, W y) ⟶ B.X from (hW y).fromSpec) ≫ io := by
+  have key (y) (p : GlobalTheory.CxPts B.str e) (hp : p ∈ ptsIn B.str e (W y))
+      : ∃ v w,
+        FrY Y V τ e (a y p).1.1 v w ∧ Match τ (a y p).2 v w
+          ∧ σb ℂ (a y p).1.1 v w = ev B.str e _ (s y) p := by
+    have hx
+        : (a y p).1.1
+          = spMap (evHom hp) ≫ (show Sp Γ(B.X, W y) ⟶ B.X from (hW y).fromSpec) ≫ io := by
       have : spMap (evHom hp) ≫ (show Sp Γ(B.X, W y) ⟶ B.X from (hW y).fromSpec) = p.1 :=
         GlobalTheory.Points.specMap_valMap_fromSpec (hW y) p.1 hp
       rw [ha, ← Category.assoc, this]
@@ -109,8 +136,8 @@ theorem exists_const_mul_horFn : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
         (by ext <;> simp [Chart.dualMapR]) (hf₀ y) h₁ hx h₂ h₃
   have hA : Dense (ptsIn B.str e (io ⁻¹ᵁ (genBd Y).compl)) := by
     refine (GlobalTheory.T.complexPoints_nonempty_dense_variety c.F B e).2 _ ?_
-    obtain ⟨_, ⟨z, rfl⟩, hz⟩ := Y.jQ_dense.inter_open_nonempty _ io.isOpenEmbedding.isOpen_range
-      (Set.range_nonempty _)
+    obtain ⟨_, ⟨z, rfl⟩, hz⟩ :=
+      Y.jQ_dense.inter_open_nonempty _ io.isOpenEmbedding.isOpen_range (Set.range_nonempty _)
     exact ⟨z, fun hb => hb hz⟩
   let R := AnRead.all B.str e B.dim
   choose u hu he using fun y => exists_extension R io hA (isOpen_ptsIn (W y)) (fun z _ => ha y z) (hf y)
@@ -118,21 +145,31 @@ theorem exists_const_mul_horFn : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
     (logGrowth_inv hh.2.2.2)
   let pt (z : GlobalTheory.CxPts B.str e) : B.X := z.1 (IsLocalRing.closedPoint ℂ)
   have hpt (z : GlobalTheory.CxPts B.str e) : z ∈ ptsIn B.str e (W (pt z)) := mem_ptsIn.2 (hy _)
-  obtain ⟨q, hq, hqe⟩ := exists_holoOn_of_local (R := R) hA (S := Set.univ)
-    (u := fun z => ev B.str e _ (s (pt z)) z * (h (a (pt z) z))⁻¹) fun y _ =>
-    ⟨ptsIn B.str e (W (pt y)), fun z => ev B.str e _ (s (pt y)) z * u (pt y) z, isOpen_ptsIn _, hpt y,
-      (R.holoOn_ev _ _).mul (hu _), fun z hz => by
-        obtain ⟨v, w, h₁, h₂, h₃⟩ := key _ z hz.1
-        obtain ⟨v', w', h₁', h₂', h₃'⟩ := key _ z (hpt z)
-        have := quot_eq hτ hh hσ _ _ ((ha _ _).trans (ha _ _).symm) ((inner_iff (ha _ z)).2 hz.2) h₁ h₂ h₁' h₂'
-        rw [h₃, h₃'] at this
-        simp only [he _ hz]
-        exact this⟩
+  obtain ⟨q, hq, hqe⟩ :=
+    exists_holoOn_of_local (R := R) hA (S := Set.univ)
+      (u := fun z => ev B.str e _ (s (pt z)) z * (h (a (pt z) z))⁻¹)
+      fun y _ => ⟨
+        ptsIn B.str e (W (pt y)),
+        fun z => ev B.str e _ (s (pt y)) z * u (pt y) z,
+        isOpen_ptsIn _,
+        hpt y,
+        (R.holoOn_ev _ _).mul (hu _),
+        fun z hz => by
+          obtain ⟨v, w, h₁, h₂, h₃⟩ := key _ z hz.1
+          obtain ⟨v', w', h₁', h₂', h₃'⟩ := key _ z (hpt z)
+          have :=
+            quot_eq hτ hh hσ _ _ ((ha _ _).trans (ha _ _).symm) ((inner_iff (ha _ z)).2 hz.2) h₁ h₂
+              h₁' h₂'
+          rw [h₃, h₃'] at this
+          simp only [he _ hz]
+          exact this
+      ⟩
   obtain ⟨κ, hκ⟩ := GlobalTheory.ConstFn.holoOn_univ_const c.F B e R q hq
   refine ⟨κ, fun b v w hi hb hm => ?_⟩
   have hr : Set.range b.1.1 ⊆ Set.range io := hV ▸ hb.2.1
   have hl : IsOpenImmersion.lift io b.1.1 hr ≫ io = b.1.1 := IsOpenImmersion.lift_fac _ _ _
-  let z : GlobalTheory.CxPts B.str e := ⟨IsOpenImmersion.lift io b.1.1 hr, by rw [← hstr, ← Category.assoc, hl]; exact b.1.2⟩
+  let z : GlobalTheory.CxPts B.str e :=
+    ⟨IsOpenImmersion.lift io b.1.1 hr, by rw [← hstr, ← Category.assoc, hl]; exact b.1.2⟩
   obtain ⟨v', w', h₁', h₂', h₃'⟩ := key _ z (hpt z)
   have e₁ := quot_eq hτ hh hσ b _ (hl.symm.trans (ha _ z).symm) hi hb hm h₁' h₂'
   have e₂ := hqe (x := z) ⟨trivial, (inner_iff hl.symm).1 hi⟩

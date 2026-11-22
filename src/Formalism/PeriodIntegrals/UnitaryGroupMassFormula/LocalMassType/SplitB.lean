@@ -8,7 +8,8 @@ noncomputable section
 
 namespace PI.LocMassTypS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.LocVol NumberField IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.LocVol NumberField IsDedekindDomain
 open scoped TensorProduct
 open PI.LocMassTypW
 
@@ -56,12 +57,13 @@ theorem split_reduction : SplitR := by
       rw [← sigR_sigR σ v hσσ e, ← hf, hfd]
       simp
   have hσe : sigR (Fv F v) σ e = 1 - e := hfe
-  have hσ1 : sigR (Fv F v) σ (1 - e) = e := by
-    rw [map_sub, map_one, hσe, sub_sub_cancel]
+  have hσ1 : sigR (Fv F v) σ (1 - e) = e := by rw [map_sub, map_one, hσe, sub_sub_cancel]
   have hp2σ : ∀ x, π₂ (sigR (Fv F v) σ x) = π₁ x := by
     intro x
     apply uniq2 h1 (K := Fv F v)
-    calc π₂ (sigR (Fv F v) σ x) • (1 - e) = sigR (Fv F v) σ x * (1 - e) := (hm2 _).symm
+    calc
+      π₂ (sigR (Fv F v) σ x) • (1 - e)
+        = sigR (Fv F v) σ x * (1 - e) := (hm2 _).symm
       _ = sigR (Fv F v) σ x * sigR (Fv F v) σ e := by rw [hσe]
       _ = sigR (Fv F v) σ (x * e) := (map_mul _ _ _).symm
       _ = sigR (Fv F v) σ (π₁ x • e) := by rw [hm1]
@@ -70,7 +72,9 @@ theorem split_reduction : SplitR := by
   have hp1σ : ∀ x, π₁ (sigR (Fv F v) σ x) = π₂ x := by
     intro x
     apply uniq1 h0 (K := Fv F v)
-    calc π₁ (sigR (Fv F v) σ x) • e = sigR (Fv F v) σ x * e := (hm1 _).symm
+    calc
+      π₁ (sigR (Fv F v) σ x) • e
+        = sigR (Fv F v) σ x * e := (hm1 _).symm
       _ = sigR (Fv F v) σ x * sigR (Fv F v) σ (1 - e) := by rw [hσ1]
       _ = sigR (Fv F v) σ (x * (1 - e)) := (map_mul _ _ _).symm
       _ = sigR (Fv F v) σ (π₂ x • (1 - e)) := by rw [hm2]
@@ -96,8 +100,8 @@ theorem split_reduction : SplitR := by
     · rintro ⟨a, b⟩
       refine ⟨sc (E := E) v a * e + sc (E := E) v b * (1 - e), ?_⟩
       show (π₁ _, π₂ _) = (a, b)
-      rw [map_add (f := _), map_add (f := _), map_mul, map_mul, map_mul, map_mul, (hsc a).1, (hsc b).1, (hsc a).2,
-        (hsc b).2, he1, he2, hce1, hce2]
+      rw [map_add (f := _), map_add (f := _), map_mul, map_mul, map_mul, map_mul, (hsc a).1,
+        (hsc b).1, (hsc a).2, (hsc b).2, he1, he2, hce1, hce2]
       simp
   let spl : E ⊗[F] Fv F v ≃+* Fv F v × Fv F v :=
     (cm (E := E) v).toRingEquiv.trans (RingEquiv.ofBijective φ hbij)
@@ -105,11 +109,12 @@ theorem split_reduction : SplitR := by
   have hspl : ∀ a : v.adicCompletion F, spl ((1 : E) ⊗ₜ[F] a) = (a, a) := by
     intro a
     rw [hspl_apply]
-    have e1 : cm (E := E) v ((1 : E) ⊗ₜ[F] a) = sc (E := E) v a := by
-      simp [cm, sc]
+    have e1 : cm (E := E) v ((1 : E) ⊗ₜ[F] a) = sc (E := E) v a := by simp [cm, sc]
     rw [e1, (hsc a).1, (hsc a).2]
-  have hOE : ∀ x, x ∈ OEv (E := E) v ↔
-      π₁ x ∈ v.adicCompletionIntegers F ∧ π₂ x ∈ v.adicCompletionIntegers F := by
+  have hOE
+      : ∀ x,
+        x ∈ OEv (E := E) v
+          ↔ π₁ x ∈ v.adicCompletionIntegers F ∧ π₂ x ∈ v.adicCompletionIntegers F := by
     intro x
     rw [oev_iff_tensInt, split_integral_local F E v spl hspl, hspl_apply]
     simp

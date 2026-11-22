@@ -8,10 +8,13 @@ namespace GlobalTheory.SpanScalarMembership
 
 open NumberField
 
-theorem exists_smul_mem_of_mem_span {K : Type} [Field K] [NumberField K] {V : Type} [AddCommGroup V]
-    [Module K V] [Module (RingOfIntegers K) V] [IsScalarTower (RingOfIntegers K) K V]
-    (T : Submodule (RingOfIntegers K) V) {x : V} (hx : x ∈ Submodule.span K (T : Set V)) :
-    ∃ s : RingOfIntegers K, s ≠ 0 ∧ s • x ∈ T := by
+theorem exists_smul_mem_of_mem_span
+    {K : Type} [Field K] [NumberField K]
+    {V : Type} [AddCommGroup V] [Module K V] [Module (RingOfIntegers K) V]
+    [IsScalarTower (RingOfIntegers K) K V]
+    (T : Submodule (RingOfIntegers K) V)
+    {x : V} (hx : x ∈ Submodule.span K (T : Set V))
+    : ∃ s : RingOfIntegers K, s ≠ 0 ∧ s • x ∈ T := by
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩
@@ -31,10 +34,11 @@ theorem exists_smul_mem_of_mem_span {K : Type} [Field K] [NumberField K] {V : Ty
       intro h
       exact hq0 ((IsFractionRing.injective (RingOfIntegers K) K) (by rw [h, map_zero]))
     refine ⟨s * q, mul_ne_zero hs hq0, ?_⟩
-    have key : (s * q) • ((algebraMap (RingOfIntegers K) K p / algebraMap (RingOfIntegers K) K q) • y)
-        = p • (s • y) := by
-      rw [← algebraMap_smul K (s * q), ← algebraMap_smul K p, ← algebraMap_smul K s,
-        smul_smul, smul_smul, map_mul]
+    have key
+        : (s * q) • ((algebraMap (RingOfIntegers K) K p / algebraMap (RingOfIntegers K) K q) • y)
+          = p • (s • y) := by
+      rw [← algebraMap_smul K (s * q), ← algebraMap_smul K p, ← algebraMap_smul K s, smul_smul,
+        smul_smul, map_mul]
       congr 1
       field_simp
     rw [key]

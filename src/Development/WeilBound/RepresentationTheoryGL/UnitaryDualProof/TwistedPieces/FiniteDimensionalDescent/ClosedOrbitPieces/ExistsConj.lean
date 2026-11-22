@@ -10,11 +10,14 @@ open Matrix Polynomial
 
 namespace PositivityTheory.RgUd.TP.Desc.Piece.TrI
 
-open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Desc.SLF PositivityTheory.RgUd.TP.Desc.Piece.Tr PositivityTheory.RgUd.TP.Desc.Piece.PTop
+open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Desc.SLF PositivityTheory.RgUd.TP.Desc.Piece.Tr
+  PositivityTheory.RgUd.TP.Desc.Piece.PTop
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {N : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {N : ℕ}
 
-def lc {r : ℕ} (s : Fin r → Matrix (Fin N) (Fin N) k) (v : Fin r → k) : Matrix (Fin N) (Fin N) k := ∑ j, v j • s j
+def lc {r : ℕ} (s : Fin r → Matrix (Fin N) (Fin N) k) (v : Fin r → k) : Matrix (Fin N) (Fin N) k :=
+  ∑ j, v j • s j
 
 section Lc
 
@@ -29,16 +32,19 @@ theorem lc_sub (v w : Fin r → k) : lc s (v - w) = lc s v - lc s w := by
 theorem lc_smul (c : k) (v : Fin r → k) : lc s (c • v) = c • lc s v := by
   simp only [lc, Pi.smul_apply, smul_eq_mul, mul_smul, Finset.smul_sum]
 
-theorem lc_sum {ι : Type*} (T : Finset ι) (v : ι → Fin r → k) : lc s (∑ t ∈ T, v t) = ∑ t ∈ T, lc s (v t) := by
+theorem lc_sum {ι : Type*} (T : Finset ι) (v : ι → Fin r → k)
+    : lc s (∑ t ∈ T, v t) = ∑ t ∈ T, lc s (v t) := by
   simp only [lc, Finset.sum_apply, Finset.sum_smul]
   exact Finset.sum_comm
 
-theorem lc_single (j : Fin r) : lc s (Pi.single j 1) = s j := by
-  simp [lc, Pi.single_apply]
+theorem lc_single (j : Fin r) : lc s (Pi.single j 1) = s j := by simp [lc, Pi.single_apply]
 
-theorem lc_mul (c : Fin r → Fin r → Fin r → k) (hmul : ∀ j j', s j * s j' = ∑ t, c j j' t • s t) (v w : Fin r → k) :
-    lc s v * lc s w = lc s (fun t => ∑ j, ∑ j', v j * w j' * c j j' t) := by
-  simp only [lc, Finset.sum_mul, Finset.mul_sum, smul_mul_smul_comm, hmul, Finset.smul_sum, smul_smul, Finset.sum_smul]
+theorem lc_mul
+    (c : Fin r → Fin r → Fin r → k) (hmul : ∀ j j', s j * s j' = ∑ t, c j j' t • s t)
+    (v w : Fin r → k)
+    : lc s v * lc s w = lc s (fun t => ∑ j, ∑ j', v j * w j' * c j j' t) := by
+  simp only [lc, Finset.sum_mul, Finset.mul_sum, smul_mul_smul_comm, hmul, Finset.smul_sum,
+    smul_smul, Finset.sum_smul]
   conv_lhs => arg 2; ext x; rw [Finset.sum_comm]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_comm
@@ -47,8 +53,8 @@ end Lc
 
 variable {Z : Subalgebra k (Matrix (Fin N) (Fin N) k)} {χ : k[X]} {q : ℕ} (D : SData Z χ q)
 
-theorem sx_span {x : Matrix (Fin N) (Fin N) k} (hx : x ∈ Bz Z) (hχ : aeval x χ = 0) :
-    (Sx D x).toSubmodule = Submodule.span k (Set.range fun j => pe (D.a j) x) := by
+theorem sx_span {x : Matrix (Fin N) (Fin N) k} (hx : x ∈ Bz Z) (hχ : aeval x χ = 0)
+    : (Sx D x).toSubmodule = Submodule.span k (Set.range fun j => pe (D.a j) x) := by
   obtain ⟨hm, hu, -⟩ := D.spec x hx hχ
   set P := Submodule.span k (Set.range fun j => pe (D.a j) x) with hP
   have h1 : (1 : Matrix (Fin N) (Fin N) k) ∈ P := by
@@ -68,31 +74,34 @@ theorem sx_span {x : Matrix (Fin N) (Fin N) k} (hx : x ∈ Bz Z) (hχ : aeval x 
   · rw [Submodule.span_le]
     exact Algebra.subset_adjoin
 
-private theorem lc_kappa_complete_orthogonal_primitive_idempotents {x : Matrix (Fin N) (Fin N) k} (hx : x ∈ Bz Z) (hχ : aeval x χ = 0)
-    (s : Fin D.r → Matrix (Fin N) (Fin N) k) (hs : s = fun j => pe (D.a j) x) :
-    (∀ j j', s j * s j' = ∑ t, D.c j j' t • s t) ∧ lc s D.u = 1 ∧
-      (∀ j j', s j * s j' = s j' * s j) ∧
-      (∀ y ∈ Submodule.span k (Set.range s), IsNilpotent y → y = 0) ∧
-      (∀ t, IsIdempotentElem (lc s (D.κ t))) ∧
-      ∑ t, lc s (D.κ t) = 1 ∧
-      (∀ t t', t ≠ t' → lc s (D.κ t) * lc s (D.κ t') = 0) ∧
-      (∀ t, ∀ y ∈ Submodule.span k (Set.range s), IsIdempotentElem y →
-        y * lc s (D.κ t) = y → y = 0 ∨ y = lc s (D.κ t)) ∧
-      (∀ v, lc s v = 0 ↔ ∀ t, lc s (D.κ t) ≠ 0 → v ∈ D.K t) := by
+private theorem lc_kappa_complete_orthogonal_primitive_idempotents
+    {x : Matrix (Fin N) (Fin N) k} (hx : x ∈ Bz Z) (hχ : aeval x χ = 0)
+    (s : Fin D.r → Matrix (Fin N) (Fin N) k) (hs : s = fun j => pe (D.a j) x)
+    : (∀ j j', s j * s j' = ∑ t, D.c j j' t • s t) ∧ lc s D.u = 1
+      ∧ (∀ j j', s j * s j' = s j' * s j)
+      ∧ (∀ y ∈ Submodule.span k (Set.range s), IsNilpotent y → y = 0)
+      ∧ (∀ t, IsIdempotentElem (lc s (D.κ t))) ∧ ∑ t, lc s (D.κ t) = 1
+      ∧ (∀ t t', t ≠ t' → lc s (D.κ t) * lc s (D.κ t') = 0)
+      ∧ (∀ t, ∀ y ∈ Submodule.span k (Set.range s),
+        IsIdempotentElem y → y * lc s (D.κ t) = y → y = 0 ∨ y = lc s (D.κ t))
+      ∧ (∀ v, lc s v = 0 ↔ ∀ t, lc s (D.κ t) ≠ 0 → v ∈ D.K t) := by
   subst hs
   obtain ⟨h1, h2, h3, -, -, h6, -, -, h9, h10, h11, h12, -, h14⟩ := D.spec x hx hχ
   exact ⟨h1, h2, h3, h6, h9, h10, h11, h12, h14⟩
 
-theorem exists_isAttachedHodgeS_conj_mapRep (hO : OrbHom k) (hZ : CR Z) {τ : Fin D.m → ℕ} {x₀ x : Matrix (Fin N) (Fin N) k}
-    (h₀ : x₀ ∈ piece D τ) (h : x ∈ piece D τ) :
-    ∃ g : GL (Fin N) k, ∀ j, pe (D.a j) x = cj g (pe (D.a j) x₀) := by
+theorem exists_isAttachedHodgeS_conj_mapRep
+    (hO : OrbHom k) (hZ : CR Z)
+    {τ : Fin D.m → ℕ} {x₀ x : Matrix (Fin N) (Fin N) k} (h₀ : x₀ ∈ piece D τ) (h : x ∈ piece D τ)
+    : ∃ g : GL (Fin N) k, ∀ j, pe (D.a j) x = cj g (pe (D.a j) x₀) := by
   classical
   obtain ⟨hx₀B, hx₀χ, hx₀τ⟩ := h₀
   obtain ⟨hxB, hxχ, hxτ⟩ := h
   set s0 : Fin D.r → Matrix (Fin N) (Fin N) k := fun j => pe (D.a j) x₀ with hs0
   set s : Fin D.r → Matrix (Fin N) (Fin N) k := fun j => pe (D.a j) x with hs
-  obtain ⟨m0, u0, c0, n0, i0, hsum0, o0, prim0, k0⟩ := lc_kappa_complete_orthogonal_primitive_idempotents D hx₀B hx₀χ s0 hs0
-  obtain ⟨m1, u1, -, -, i1, -, o1, -, k1⟩ := lc_kappa_complete_orthogonal_primitive_idempotents D hxB hxχ s hs
+  obtain ⟨m0, u0, c0, n0, i0, hsum0, o0, prim0, k0⟩ :=
+    lc_kappa_complete_orthogonal_primitive_idempotents D hx₀B hx₀χ s0 hs0
+  obtain ⟨m1, u1, -, -, i1, -, o1, -, k1⟩ :=
+    lc_kappa_complete_orthogonal_primitive_idempotents D hxB hxχ s hs
   have hr0 : ∀ t, (lc s0 (D.κ t)).rank = τ t := fun t => congrFun hx₀τ t
   have hr1 : ∀ t, (lc s (D.κ t)).rank = τ t := fun t => congrFun hxτ t
   have hne : ∀ t, lc s0 (D.κ t) ≠ 0 ↔ lc s (D.κ t) ≠ 0 := by
@@ -116,8 +125,8 @@ theorem exists_isAttachedHodgeS_conj_mapRep (hO : OrbHom k) (hZ : CR Z) {τ : Fi
     obtain ⟨w, rfl⟩ := (memS b).1 hb
     simp only [lc, Finset.sum_mul, Finset.mul_sum, smul_mul_smul_comm]
     rw [Finset.sum_comm]
-    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ =>
-      congrArg₂ (· • ·) (mul_comm _ _) (c0 _ _)
+    exact Finset.sum_congr rfl fun i _ =>
+      Finset.sum_congr rfl fun j _ => congrArg₂ (· • ·) (mul_comm _ _) (c0 _ _)
   have hred : IsReduced (Sx D x₀) := by
     refine ⟨fun a ha => Subtype.ext ?_⟩
     exact n0 a.1 ((memSpan a.1).1 a.2) (ha.map (Sx D x₀).val)
@@ -128,22 +137,25 @@ theorem exists_isAttachedHodgeS_conj_mapRep (hO : OrbHom k) (hZ : CR Z) {τ : Fi
     have h0 : lc s0 (vOf a - v) = 0 := by rw [lc_sub, hvOf, hv, sub_self]
     rw [← sub_eq_zero, ← lc_sub]
     exact (hker _).1 h0
-  let F : Sx D x₀ →ₗ[k] Matrix (Fin N) (Fin N) k :=
-    { toFun := fun a => lc s (vOf a)
-      map_add' := fun a b => by
-        show lc s (vOf (a + b)) = lc s (vOf a) + lc s (vOf b)
-        rw [key (a + b) (vOf a + vOf b) (by rw [lc_add, hvOf, hvOf]; rfl), lc_add]
-      map_smul' := fun c a => by
-        simp only [RingHom.id_apply]
-        rw [key (c • a) (c • vOf a) (by rw [lc_smul, hvOf]; rfl), lc_smul] }
-  let ρ' : Sx D x₀ →ₐ[k] Matrix (Fin N) (Fin N) k := AlgHom.ofLinearMap F
-    (by
-      show lc s (vOf 1) = 1
-      rw [key 1 D.u (by rw [u0]; rfl), u1])
-    (fun a b => by
-      show lc s (vOf (a * b)) = lc s (vOf a) * lc s (vOf b)
-      rw [lc_mul s D.c m1, key (a * b) (fun t => ∑ j, ∑ j', vOf a j * vOf b j' * D.c j j' t)
-        (by rw [← lc_mul s0 D.c m0 (vOf a) (vOf b), hvOf, hvOf]; rfl)])
+  let F : Sx D x₀ →ₗ[k] Matrix (Fin N) (Fin N) k := {
+    toFun := fun a => lc s (vOf a)
+    map_add' := fun a b => by
+      show lc s (vOf (a + b)) = lc s (vOf a) + lc s (vOf b)
+      rw [key (a + b) (vOf a + vOf b) (by rw [lc_add, hvOf, hvOf]; rfl), lc_add]
+    map_smul' := fun c a => by
+      simp only [RingHom.id_apply]
+      rw [key (c • a) (c • vOf a) (by rw [lc_smul, hvOf]; rfl), lc_smul]
+  }
+  let ρ' : Sx D x₀ →ₐ[k] Matrix (Fin N) (Fin N) k :=
+    AlgHom.ofLinearMap F
+      (by
+        show lc s (vOf 1) = 1
+        rw [key 1 D.u (by rw [u0]; rfl), u1])
+      (fun a b => by
+        show lc s (vOf (a * b)) = lc s (vOf a) * lc s (vOf b)
+        rw [lc_mul s D.c m1,
+          key (a * b) (fun t => ∑ j, ∑ j', vOf a j * vOf b j' * D.c j j' t) (by
+            rw [← lc_mul s0 D.c m0 (vOf a) (vOf b), hvOf, hvOf]; rfl)])
   have hρ' : ∀ a, ρ' a = lc s (vOf a) := fun a => rfl
   have hEmem : ∀ t, lc s0 (D.κ t) ∈ Sx D x₀ := fun t => (memS _).2 ⟨_, rfl⟩
   have hrk : ∀ e : Sx D x₀, IsIdempotentElem e → ((Sx D x₀).val e).rank = (ρ' e).rank := by

@@ -15,37 +15,48 @@ namespace Formalism.IndefR.Tow
 
 section Gen
 
-theorem fd_measure_le_of_cover {V : Type*} [AddCommGroup V] [MeasurableSpace V] {μ : Measure V}
-    {Λ : AddSubgroup V} [Countable Λ] [MeasurableConstVAdd Λ V] [VAddInvariantMeasure Λ V μ] {𝓕 : Set V}
-    (h𝓕 : IsAddFundamentalDomain Λ 𝓕 μ) {K : Set V}
-    (hK : ∀ y, ∃ g ∈ Λ, g + y ∈ K) : μ 𝓕 ≤ μ K := by
+theorem fd_measure_le_of_cover
+    {V : Type*} [AddCommGroup V] [MeasurableSpace V]
+    {μ : Measure V} {Λ : AddSubgroup V}
+    [Countable Λ] [MeasurableConstVAdd Λ V] [VAddInvariantMeasure Λ V μ]
+    {𝓕 : Set V} (h𝓕 : IsAddFundamentalDomain Λ 𝓕 μ)
+    {K : Set V} (hK : ∀ y, ∃ g ∈ Λ, g + y ∈ K)
+    : μ 𝓕 ≤ μ K := by
   rw [h𝓕.measure_eq_tsum K]
-  calc μ 𝓕 = μ (⋃ g : Λ, (g +ᵥ K) ∩ 𝓕) := by
-        congr 1
-        ext y
-        simp only [Set.mem_iUnion, Set.mem_inter_iff]
-        constructor
-        · intro hy
-          obtain ⟨g, hg, hgK⟩ := hK y
-          refine ⟨⟨-g, neg_mem hg⟩, ?_, hy⟩
-          refine ⟨g + y, hgK, ?_⟩
-          show -g + (g + y) = y
-          abel
-        · rintro ⟨_, _, hy⟩; exact hy
+  calc
+    μ 𝓕 = μ (⋃ g : Λ, (g +ᵥ K) ∩ 𝓕) := by
+      congr 1
+      ext y
+      simp only [Set.mem_iUnion, Set.mem_inter_iff]
+      constructor
+      · intro hy
+        obtain ⟨g, hg, hgK⟩ := hK y
+        refine ⟨⟨-g, neg_mem hg⟩, ?_, hy⟩
+        refine ⟨g + y, hgK, ?_⟩
+        show -g + (g + y) = y
+        abel
+      · rintro ⟨_, _, hy⟩; exact hy
     _ ≤ ∑' g : Λ, μ ((g +ᵥ K) ∩ 𝓕) := measure_iUnion_le _
 
-theorem fd_measure_lt_top {V : Type*} [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V] {μ : Measure V}
-    [IsFiniteMeasureOnCompacts μ] {Λ : AddSubgroup V} [Countable Λ] [MeasurableConstVAdd Λ V]
-    [VAddInvariantMeasure Λ V μ] {𝓕 : Set V} (h𝓕 : IsAddFundamentalDomain Λ 𝓕 μ) {K : Set V} (hKc : IsCompact K)
-    (hK : ∀ y, ∃ g ∈ Λ, g + y ∈ K) : μ 𝓕 < ⊤ :=
+theorem fd_measure_lt_top
+    {V : Type*} [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V]
+    {μ : Measure V} [IsFiniteMeasureOnCompacts μ]
+    {Λ : AddSubgroup V} [Countable Λ] [MeasurableConstVAdd Λ V] [VAddInvariantMeasure Λ V μ]
+    {𝓕 : Set V} (h𝓕 : IsAddFundamentalDomain Λ 𝓕 μ)
+    {K : Set V} (hKc : IsCompact K) (hK : ∀ y, ∃ g ∈ Λ, g + y ∈ K)
+    : μ 𝓕 < ⊤ :=
   (fd_measure_le_of_cover h𝓕 hK).trans_lt hKc.measure_lt_top
 
-variable {V : Type*} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V]
-  [BorelSpace V] {μ : Measure V} [μ.IsAddHaarMeasure] {Λ : AddSubgroup V} [Countable Λ] {𝓕 : Set V}
+variable
+  {V : Type*}
+  [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
+  {μ : Measure V} [μ.IsAddHaarMeasure]
+  {Λ : AddSubgroup V} [Countable Λ]
+  {𝓕 : Set V}
 
-theorem fd_setIntegral_add (h𝓕 : IsAddFundamentalDomain Λ 𝓕 μ) {f : V → ℂ}
-    (hf : ∀ g ∈ Λ, ∀ x, f (g + x) = f x) (a : V) :
-    ∫ x in 𝓕, f (x + a) ∂μ = ∫ x in 𝓕, f x ∂μ := by
+theorem fd_setIntegral_add
+    (h𝓕 : IsAddFundamentalDomain Λ 𝓕 μ) {f : V → ℂ} (hf : ∀ g ∈ Λ, ∀ x, f (g + x) = f x) (a : V)
+    : ∫ x in 𝓕, f (x + a) ∂μ = ∫ x in 𝓕, f x ∂μ := by
   have hmp := measurePreserving_add_right μ a
   have hemb : MeasurableEmbedding (fun x : V => x + a) := measurableEmbedding_addRight a
   rw [← hmp.setIntegral_image_emb hemb f 𝓕]
@@ -58,9 +69,11 @@ theorem fd_setIntegral_add (h𝓕 : IsAddFundamentalDomain Λ 𝓕 μ) {f : V �
   rw [himg]
   exact (h𝓕.vadd_of_comm a).setIntegral_eq h𝓕 (fun g x => hf g g.2 x)
 
-theorem fd_setIntegral_char_eq_zero (h𝓕 : IsAddFundamentalDomain Λ 𝓕 μ) {χ : V → ℂ}
-    (hmul : ∀ x y, χ (x + y) = χ x * χ y) (hΛ : ∀ g ∈ Λ, χ g = 1) {a : V} (ha : χ a ≠ 1) :
-    ∫ x in 𝓕, χ x ∂μ = 0 := by
+theorem fd_setIntegral_char_eq_zero
+    (h𝓕 : IsAddFundamentalDomain Λ 𝓕 μ)
+    {χ : V → ℂ} (hmul : ∀ x y, χ (x + y) = χ x * χ y) (hΛ : ∀ g ∈ Λ, χ g = 1)
+    {a : V} (ha : χ a ≠ 1)
+    : ∫ x in 𝓕, χ x ∂μ = 0 := by
   have hper : ∀ g ∈ Λ, ∀ x, χ (g + x) = χ x := fun g hg x => by rw [hmul, hΛ g hg, one_mul]
   have h := fd_setIntegral_add h𝓕 hper a
   simp_rw [hmul] at h

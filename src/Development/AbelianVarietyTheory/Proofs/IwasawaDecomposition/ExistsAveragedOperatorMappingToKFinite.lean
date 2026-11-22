@@ -10,33 +10,41 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Compa
 
 noncomputable section
 
-open MeasureTheory Matrix Filter Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
+open MeasureTheory Matrix Filter Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta
+  GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
 open scoped InnerProductSpace Topology
 
 namespace GlobalTheory.TypeSum
 
-theorem exists_isAvg_apply_eq : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Mx n → (H →L[ℂ] H)), Std ε σ → ∀ a : H, a ≠ 0 → ∀ v, IsKFin ε σ v → ∃ T : H → H, IsAvg ε σ T ∧ T a = v := by
+theorem exists_isAvg_apply_eq
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        [CompleteSpace H] (σ : Mx n → (H →L[ℂ] H)),
+      Std ε σ → ∀ a : H, a ≠ 0 → ∀ v, IsKFin ε σ v → ∃ T : H → H, IsAvg ε σ T ∧ T a = v := by
   intro n ε H _ _ _ σ h a ha v hv
   obtain ⟨a1, a2, a3, a4, a5⟩ := isAvg_closure n ε H σ h.1
   obtain ⟨c1, c2, c3, c4⟩ := kCoef_kAvg n ε H σ h.1
-  let A : Submodule ℂ H :=
-    { carrier := {x | ∃ T : H → H, IsAvg ε σ T ∧ T a = x}
-      add_mem' := by
-        rintro _ _ ⟨T, hT, rfl⟩ ⟨T', hT', rfl⟩
-        exact ⟨_, (a2 T T' hT hT').1, rfl⟩
-      zero_mem' := ⟨_, a5, rfl⟩
-      smul_mem' := by
-        rintro c _ ⟨T, hT, rfl⟩
-        exact ⟨_, a3 c T hT, rfl⟩ }
+  let A : Submodule ℂ H := {
+    carrier := {x | ∃ T : H → H, IsAvg ε σ T ∧ T a = x}
+    add_mem' := by
+      rintro _ _ ⟨T, hT, rfl⟩ ⟨T', hT', rfl⟩
+      exact ⟨_, (a2 T T' hT hT').1, rfl⟩
+    zero_mem' := ⟨_, a5, rfl⟩
+    smul_mem' := by
+      rintro c _ ⟨T, hT, rfl⟩
+      exact ⟨_, a3 c T hT, rfl⟩
+  }
   have hA : ∀ T : H → H, IsAvg ε σ T → ∀ x ∈ A, T x ∈ A := by
     rintro T hT _ ⟨T', hT', rfl⟩
     exact ⟨_, (a2 T T' hT hT').2, rfl⟩
   have haA : a ∈ A := ⟨_, a1 1 (one_mem_UJ ε), sigma_one h.1 a⟩
   have hdense : Dense (A : Set H) :=
-    dense_of_irred h.2.1 (fun g hg x hx => hA _ (a1 g hg) x hx) ((Submodule.ne_bot_iff _).2 ⟨a, haA, ha⟩)
+    dense_of_irred h.2.1
+      (fun g hg x hx => hA _ (a1 g hg) x hx)
+      ((Submodule.ne_bot_iff _).2 ⟨a, haA, ha⟩)
   have hrange : ∀ e : KG ε → ℂ, KFinFun ε e → Continuous e → ∀ w, kAvg ε σ e w ∈ A := by
     intro e he hc w
-    obtain ⟨m, b, c, -, -, -, hbc⟩ := GlobalTheory.T.compactAverage_kFinite_finiteRank n ε H σ h e he
+    obtain ⟨m, b, c, -, -, -, hbc⟩ :=
+      GlobalTheory.T.compactAverage_kFinite_finiteRank n ε H σ h e he
     obtain ⟨Q, hQ⟩ := c3 e hc
     let F : Submodule ℂ H := Submodule.span ℂ (Set.range b)
     haveI : FiniteDimensional ℂ F := FiniteDimensional.span_of_finite ℂ (Set.finite_range b)
@@ -64,8 +72,9 @@ theorem exists_isAvg_apply_eq : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [
     have hc : Continuous fun k : KG ε => star ⟪y, σ (toMK k) y⟫_ℂ := by
       obtain ⟨F, -, h1, h2, -⟩ := hk
       exact h2 _ h1
-    exact c2 y hy0 (Submodule.inner_left_of_mem_orthogonal
-      (Submodule.mem_inf.2 ⟨c4 _ hc S hS hK y hyS, hrange _ hk hc y⟩) hy)
+    exact c2 y hy0
+      (Submodule.inner_left_of_mem_orthogonal
+        (Submodule.mem_inf.2 ⟨c4 _ hc S hS hK y hyS, hrange _ hk hc y⟩) hy)
   rw [hvwy, hy0, add_zero]
   exact (Submodule.mem_inf.1 hw).2
 

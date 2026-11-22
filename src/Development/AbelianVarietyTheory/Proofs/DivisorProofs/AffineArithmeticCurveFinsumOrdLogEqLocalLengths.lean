@@ -6,25 +6,31 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsAmbOfIsAri
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.MixHt
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt
+  GlobalTheory.MixHt
 
 namespace GlobalTheory.AffineCurveSum
 
-theorem length_quot_eq {B S : Type} [CommRing B] [CommRing S] [Algebra B S] (p : Submonoid B)
-    [IsLocalization p S] (b : B) :
-    Module.length S (S ⧸ Ideal.span {algebraMap B S b}) =
-      Module.length (Localization p) (LocalizedModule p (B ⧸ Ideal.span {b})) := by
+theorem length_quot_eq
+    {B S : Type} [CommRing B] [CommRing S] [Algebra B S]
+    (p : Submonoid B) [IsLocalization p S]
+    (b : B)
+    : Module.length S (S ⧸ Ideal.span {algebraMap B S b})
+      = Module.length (Localization p) (LocalizedModule p (B ⧸ Ideal.span {b})) := by
   let e := IsLocalization.algEquiv p (Localization p) S
   let : Algebra (Localization p) S := e.toRingEquiv.toRingHom.toAlgebra
   have : IsScalarTower B (Localization p) S := .of_algebraMap_eq fun x => (e.commutes x).symm
-  have h : Submodule.localized' S p (Algebra.linearMap B S) (Ideal.span {b}) =
-      Ideal.span {algebraMap B S b} := by
+  have h
+      : Submodule.localized' S p (Algebra.linearMap B S) (Ideal.span {b})
+        = Ideal.span {algebraMap B S b} := by
     rw [Ideal.localized'_eq_map, Ideal.map_span, Set.image_singleton]
   rw [← h, ← Module.length_eq_of_surjective (S := Localization p) (R := S) e.surjective]
-  exact (((IsLocalizedModule.iso p (Submodule.toLocalizedQuotient' S p (Algebra.linearMap B S)
-    (Ideal.span {b}))).extendScalarsOfIsLocalization p (Localization p)).length_eq).symm
+  exact (((IsLocalizedModule.iso p
+    (Submodule.toLocalizedQuotient' S p (Algebra.linearMap B S)
+      (Ideal.span {b}))).extendScalarsOfIsLocalization p (Localization p)).length_eq).symm
 
 theorem finsum_ord_eq : ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] [IsAffine Y] (q : Y ⟶ Sp k), IsArithVar q 0 → ∀ b : Γ(Y, ⊤), b ≠ 0 → ∑ᶠ z, (Scheme.ord (algebraMap Γ(Y, ⊤) Y.functionField b) z : ℝ) * Real.log (Nat.card (Y.residueField z)) = ∑ᶠ m : MaximalSpectrum Γ(Y, ⊤), ((Module.length (Localization.AtPrime m.asIdeal) (LocalizedModule m.asIdeal.primeCompl (Γ(Y, ⊤) ⧸ Ideal.span {b}))).toNat : ℝ) * Real.log (Nat.card (Γ(Y, ⊤) ⧸ m.asIdeal)) := by
   intro k _ Y _ _ _ q hq b hb

@@ -19,7 +19,11 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FlagPairi
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned
+  Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory
+  NumberField IsDedekindDomain
 open scoped InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SeeConjRead
@@ -30,24 +34,34 @@ namespace GlobalTheory.SeeConjChar
 
 open Classical GlobalTheory.SeeConjRead
 
-theorem hT_eq_hY {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D)
-    (x y : Fin (Yc D 0).rank → EAf D) : hT X h x y = hY D x y := by
+theorem hT_eq_hY
+    {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+    (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (x y : Fin (Yc D 0).rank → EAf D)
+    : hT X h x y = hY D x y := by
   rcases X with ⟨⟨I⟩⟩
   dsimp only at h ⊢
   subst h
   rfl
 
-theorem hY_pair_flag_int {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D)
-    (PP : Pl D.host.E) (a c : Fin (Yc D 0).rank) :
-    hY D (pairAt X h PP a) (flagAt X h PP c) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
+theorem hY_pair_flag_int
+    {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+    (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (PP : Pl D.host.E) (a c : Fin (Yc D 0).rank)
+    : hY D (pairAt X h PP a) (flagAt X h PP c) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
   obtain ⟨β₀, h₀⟩ := GlobalTheory.StdFrames.exists_base (Yc D 0)
   have hU := GlobalTheory.StdFrames.unimod_of_isSD (GlobalTheory.StdFrames.isSD_one h₀)
-  have hF : ∀ i j, ((β₀⁻¹).val * colMat (flagAt X h PP)) i j ∈ Formalism.L2.Herm.intAf D.host.F D.host.E ∧ ((β₀⁻¹).val * colMat (pairAt X h PP)) i j ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
+  have hF
+      : ∀ i j,
+        ((β₀⁻¹).val * colMat (flagAt X h PP)) i j ∈ Formalism.L2.Herm.intAf D.host.F D.host.E
+          ∧ ((β₀⁻¹).val * colMat (pairAt X h PP)) i j
+            ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
     intro i j
-    have hF : Formalism.L2.DIV.IsFrame β₀ (Formalism.L2.Herm.crdLat (Yc D 0) (Yc D 0).L0) := h₀ ▸ GlobalTheory.StdFrames.isFrame_lat β₀
+    have hF : Formalism.L2.DIV.IsFrame β₀ (Formalism.L2.Herm.crdLat (Yc D 0) (Yc D 0).L0) :=
+      h₀ ▸ GlobalTheory.StdFrames.isFrame_lat β₀
     have hLf := GlobalTheory.KgFrame.Lf_eq D
-    have key : ∀ v : Fin (Yc D 0).rank → EAf D, v ∈ (Formalism.L2.SG.InstExistsPf.instOf D).Lf →
-        Matrix.mulVec (β₀⁻¹).val v i ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
+    have key
+        : ∀ v : Fin (Yc D 0).rank → EAf D,
+          v ∈ (Formalism.L2.SG.InstExistsPf.instOf D).Lf
+            → Matrix.mulVec (β₀⁻¹).val v i ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
       intro v hv
       rw [hLf] at hv
       exact (hF v).1 hv i
@@ -77,16 +91,23 @@ theorem hY_pair_flag_int {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D
   set U := colMat (pairAt X h PP) with hUdef
   set W := colMat (flagAt X h PP) with hWdef
   set J := GlobalTheory.IndefiniteRowSideFullHecke.ChainMatrices.ratM (Yc D 0).gram with hJ
-  have e1 : hY D (pairAt X h PP a) (flagAt X h PP c) = (Formalism.UG.cT (GlobalTheory.StdFrames.sg D) U * J * W) a c := by
-    simp only [Matrix.mul_apply, Formalism.UG.hform, Formalism.UG.cT, Finset.sum_mul, Matrix.transpose_apply, Matrix.map_apply, hY]
+  have e1
+      : hY D (pairAt X h PP a) (flagAt X h PP c)
+        = (Formalism.UG.cT (GlobalTheory.StdFrames.sg D) U * J * W) a c := by
+    simp only [Matrix.mul_apply, Formalism.UG.hform, Formalism.UG.cT, Finset.sum_mul,
+      Matrix.transpose_apply, Matrix.map_apply, hY]
     rw [Finset.sum_comm]
     rfl
   set A' := (β₀⁻¹).val * U with hAdef
   set B' := (β₀⁻¹).val * W with hBdef
   set G' := Formalism.UG.cT (GlobalTheory.StdFrames.sg D) β₀.val * J * β₀.val with hGdef
-  have hU' : U = β₀.val * A' := by rw [hAdef, ← Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mul]
-  have hW' : W = β₀.val * B' := by rw [hBdef, ← Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mul]
-  have hX' : Formalism.UG.cT (GlobalTheory.StdFrames.sg D) U * J * W = Formalism.UG.cT (GlobalTheory.StdFrames.sg D) A' * G' * B' := by
+  have hU' : U = β₀.val * A' := by
+    rw [hAdef, ← Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mul]
+  have hW' : W = β₀.val * B' := by
+    rw [hBdef, ← Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mul]
+  have hX'
+      : Formalism.UG.cT (GlobalTheory.StdFrames.sg D) U * J * W
+        = Formalism.UG.cT (GlobalTheory.StdFrames.sg D) A' * G' * B' := by
     rw [hGdef, hU', hW', GlobalTheory.StdFrames.cT_mul']
     simp only [Matrix.mul_assoc]
   rw [e1, hX']
@@ -102,7 +123,16 @@ namespace GlobalTheory.SeeConjChar
 
 open Classical GlobalTheory.SeeConjRead
 
-theorem resT_hT_pair_flag : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D), R.toLevCh.Is A.μ0 → ∀ PP ∈ R.Pg, ∀ a c : Fin (Yc D 0).rank, GlobalTheory.SeeConjChar.resT PP (GlobalTheory.SeeConjChar.hT X h (pairAt X h PP a) (flagAt X h PP c)) = if a = c then sgnD D.R.rS D.R.k a else 0 := by
+theorem resT_hT_pair_flag
+    : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
+        {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+        (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D),
+      R.toLevCh.Is A.μ0
+        → ∀ PP ∈ R.Pg, ∀ a c : Fin (Yc D 0).rank,
+          GlobalTheory.SeeConjChar.resT PP
+              (GlobalTheory.SeeConjChar.hT X h (pairAt X h PP a) (flagAt X h PP c))
+            = if a = c then sgnD D.R.rS D.R.k a else 0 := by
   intro D G _ _ Pl0 T A Ks _ _ _ R X h hL PP hPP a c
   have hg : ((D.host.g 0 * D.host.g 1 : ℕ) : 𝓞 D.host.E) ∈ PP.asIdeal := by
     obtain ⟨l, hl⟩ := (hL.Pg PP).1 hPP
@@ -117,33 +147,43 @@ theorem resT_hT_pair_flag : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T
     have e2 := Formalism.L2.DIV.ranks_r_sym D
     change (Formalism.L2.SG.InstExistsPf.instOf D).n = _
     omega
-  have hsm : SmallAt PP (hY D (pairAt X h PP a) (flagAt X h PP c) - if a = c then sgnD D.R.rS D.R.k a else 0) := by
+  have hsm : SmallAt PP
+      (hY D (pairAt X h PP a) (flagAt X h PP c) - if a = c then sgnD D.R.rS D.R.k a else 0) := by
     by_cases he : GlobalTheory.StdFrames.cpt PP (ewT X h) = 1
     · unfold pairAt flagAt
       rw [if_pos he, if_pos he]
-      exact flagV_pair_table (hY D) (SmallAt PP) _ _ _ hn _ _ _ _ _ (pairTable_of_cpt_one X h PP hg he) a c
+      exact flagV_pair_table (hY D) (SmallAt PP) _ _ _ hn _ _ _ _ _
+        (pairTable_of_cpt_one X h PP hg he) a c
     · unfold pairAt flagAt
       rw [if_neg he, if_neg he]
       exact flagV_pair_table (hY D) (SmallAt PP) _ _ _ hn _ _ _ _ _ (pairTable_rev X h PP hg he) a c
   have hint := hY_pair_flag_int X h PP a c
-  have hs : (if a = c then sgnD D.R.rS D.R.k a else 0 : EAf D) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
+  have hs
+      : (if a = c then sgnD D.R.rS D.R.k a else 0 : EAf D)
+        ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
     unfold sgnD
     split_ifs
     exacts [neg_mem (one_mem _), one_mem _, zero_mem _]
-  have key : Formalism.L2.DIV.resS D.host.F PP ⟨_, hint⟩ - Formalism.L2.DIV.resS D.host.F PP ⟨_, hs⟩ = 0 := by
+  have key
+      : Formalism.L2.DIV.resS D.host.F PP ⟨_, hint⟩ - Formalism.L2.DIV.resS D.host.F PP ⟨_, hs⟩
+        = 0 := by
     rw [← map_sub]
     exact (GlobalTheory.AdIsom.resS_eq_zero_iff_cpt PP _).2 hsm
-  have hres : Formalism.L2.DIV.resS D.host.F PP ⟨_, hs⟩ = if a = c then sgnD D.R.rS D.R.k a else 0 := by
+  have hres
+      : Formalism.L2.DIV.resS D.host.F PP ⟨_, hs⟩ = if a = c then sgnD D.R.rS D.R.k a else 0 := by
     by_cases hac : a = c
     · subst hac
       by_cases hz : a.1 = D.R.rS + D.R.k
-      · have e : (⟨_, hs⟩ : Formalism.L2.Herm.intAf D.host.F D.host.E) = -1 := Subtype.ext (by simp [sgnD, hz])
+      · have e : (⟨_, hs⟩ : Formalism.L2.Herm.intAf D.host.F D.host.E) = -1 :=
+          Subtype.ext (by simp [sgnD, hz])
         rw [e, map_neg, map_one]
         simp [sgnD, hz]
-      · have e : (⟨_, hs⟩ : Formalism.L2.Herm.intAf D.host.F D.host.E) = 1 := Subtype.ext (by simp [sgnD, hz])
+      · have e : (⟨_, hs⟩ : Formalism.L2.Herm.intAf D.host.F D.host.E) = 1 :=
+          Subtype.ext (by simp [sgnD, hz])
         rw [e, map_one]
         simp [sgnD, hz]
-    · have e : (⟨_, hs⟩ : Formalism.L2.Herm.intAf D.host.F D.host.E) = 0 := Subtype.ext (by simp [hac])
+    · have e : (⟨_, hs⟩ : Formalism.L2.Herm.intAf D.host.F D.host.E) = 0 :=
+        Subtype.ext (by simp [hac])
       rw [e, map_zero]
       simp [hac]
   unfold resT

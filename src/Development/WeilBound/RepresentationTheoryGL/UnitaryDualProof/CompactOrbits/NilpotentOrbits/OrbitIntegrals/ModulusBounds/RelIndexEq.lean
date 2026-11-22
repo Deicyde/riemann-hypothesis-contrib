@@ -6,13 +6,13 @@ public import Mathlib
 
 namespace PositivityTheory.RgUd.T.Nil.Orb.BModbound
 
-theorem relIndex_eq {k : Type} [Field k] {n : ℕ} (I J : AddSubgroup (Matrix (Fin n) (Fin n) k))
-    (GI GJ : Subgroup (GL (Fin n) k)) (hJI : J ≤ I)
-    (hGI : ∀ u : GL (Fin n) k, u ∈ GI ↔ u.val - 1 ∈ I)
+theorem relIndex_eq
+    {k : Type} [Field k]
+    {n : ℕ} (I J : AddSubgroup (Matrix (Fin n) (Fin n) k)) (GI GJ : Subgroup (GL (Fin n) k))
+    (hJI : J ≤ I) (hGI : ∀ u : GL (Fin n) k, u ∈ GI ↔ u.val - 1 ∈ I)
     (hGJ : ∀ u : GL (Fin n) k, u ∈ GJ ↔ u.val - 1 ∈ J)
-    (hsurj : ∀ x ∈ I, ∃ u : GL (Fin n) k, u.val = 1 + x)
-    (hmul : ∀ u ∈ GI, ∀ y ∈ J, u.val * y ∈ J) :
-    GJ.relIndex GI = J.relIndex I := by
+    (hsurj : ∀ x ∈ I, ∃ u : GL (Fin n) k, u.val = 1 + x) (hmul : ∀ u ∈ GI, ∀ y ∈ J, u.val * y ∈ J)
+    : GJ.relIndex GI = J.relIndex I := by
   classical
   have hinv : ∀ x ∈ I, ∃ u : GL (Fin n) k, u ∈ GI ∧ u.val = 1 + x := fun x hx => by
     obtain ⟨u, hu⟩ := hsurj x hx
@@ -31,8 +31,10 @@ theorem relIndex_eq {k : Type} [Field k] {n : ℕ} (I J : AddSubgroup (Matrix (F
     show u.val - 1 = x.1
     rw [hux, add_sub_cancel_left]
   let e : GI ≃ I := Equiv.ofBijective f ⟨hf_inj, hf_surj⟩
-  have key : ∀ a b : GI, (QuotientGroup.leftRel (GJ.subgroupOf GI)) a b ↔
-      (QuotientAddGroup.leftRel (J.addSubgroupOf I)) (e a) (e b) := by
+  have key
+      : ∀ a b : GI,
+        (QuotientGroup.leftRel (GJ.subgroupOf GI)) a b
+          ↔ (QuotientAddGroup.leftRel (J.addSubgroupOf I)) (e a) (e b) := by
     intro a b
     rw [QuotientGroup.leftRel_apply, QuotientAddGroup.leftRel_apply, Subgroup.mem_subgroupOf,
       AddSubgroup.mem_addSubgroupOf]

@@ -19,8 +19,8 @@ private theorem circ_mul_conj (z : Circle) : (starRingEnd ℂ) (z : ℂ) * (z : 
   rw [← Complex.normSq_eq_conj_mul_self]
   simp
 
-private theorem tor_unitary (a k : ℕ) (z : Circle) :
-    ∃ u : Matrix.unitaryGroup (Fin a) ℂ, unitaryIncl a u = tor a k z := by
+private theorem tor_unitary (a k : ℕ) (z : Circle)
+    : ∃ u : Matrix.unitaryGroup (Fin a) ℂ, unitaryIncl a u = tor a k z := by
   set d : Fin a → ℂ := fun i => if (i : ℕ) < k then (z : ℂ) else 1 with hd
   have hdd : ∀ i, d i * (starRingEnd ℂ) (d i) = 1 := by
     intro i
@@ -40,13 +40,15 @@ private theorem tor_unitary (a k : ℕ) (z : Circle) :
   ext : 1
   rw [unitaryIncl_coe, tor_coe]
 
-private theorem tor_chi {a : ℕ} (k : ℕ) (z : Circle) (κ : DomWeight a) :
-    chi κ (tor a k z) = (z : ℂ) ^ psum κ k := by
+private theorem tor_chi {a : ℕ} (k : ℕ) (z : Circle) (κ : DomWeight a)
+    : chi κ (tor a k z) = (z : ℂ) ^ psum κ k := by
   have hz : (z : ℂ) ≠ 0 := by simp
   simp only [chi, psum, tor_coe, Matrix.diagonal_apply_eq]
   rw [Finset.sum_filter]
-  have key : ∀ s : Finset (Fin a), ∏ i ∈ s, (if (i : ℕ) < k then (z : ℂ) else 1) ^ κ.w i =
-      (z : ℂ) ^ ∑ i ∈ s, (if (i : ℕ) < k then κ.w i else 0) := by
+  have key
+      : ∀ s : Finset (Fin a),
+        ∏ i ∈ s, (if (i : ℕ) < k then (z : ℂ) else 1) ^ κ.w i
+          = (z : ℂ) ^ ∑ i ∈ s, (if (i : ℕ) < k then κ.w i else 0) := by
     intro s
     induction s using Finset.induction_on with
     | empty => simp
@@ -55,8 +57,8 @@ private theorem tor_chi {a : ℕ} (k : ℕ) (z : Circle) (κ : DomWeight a) :
       split_ifs <;> simp
   exact key _
 
-private theorem tor_conj (a k : ℕ) (z : Circle) :
-    Matrix.GeneralLinearGroup.map (starRingEnd ℂ) (tor a k z) = tor a k z⁻¹ := by
+private theorem tor_conj (a k : ℕ) (z : Circle)
+    : Matrix.GeneralLinearGroup.map (starRingEnd ℂ) (tor a k z) = tor a k z⁻¹ := by
   have hinv : (starRingEnd ℂ) (z : ℂ) = ((z⁻¹ : Circle) : ℂ) := by
     rw [Circle.coe_inv]
     exact eq_inv_of_mul_eq_one_left (circ_mul_conj z)

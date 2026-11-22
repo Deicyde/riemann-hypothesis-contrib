@@ -14,8 +14,10 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
-open PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG
+  PositivityTheory.Rg.BcB.G8
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open scoped Classical
@@ -28,20 +30,24 @@ open PositivityTheory.Rg.BcB.F
 
 attribute [local instance] borelG borelF borelA
 
-theorem cas_infOf_im {n : ℕ} (lam : Fin n → ℤ) : (cas (infOf lam)).im = 0 :=
-  cas_infOf_im' lam
+theorem cas_infOf_im {n : ℕ} (lam : Fin n → ℤ) : (cas (infOf lam)).im = 0 := cas_infOf_im' lam
 
-theorem bump_one (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).im = 0) :
-    ∃ (g : ℝ → ℝ) (T : ℝ), 0 ≤ T ∧ IsBump g T ∧ ∏ i, coshT g (c i) = 1 :=
+theorem bump_one (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).im = 0)
+    : ∃ (g : ℝ → ℝ) (T : ℝ), 0 ≤ T ∧ IsBump g T ∧ ∏ i, coshT g (c i) = 1 :=
   bump_one' ι c hc
 
-theorem phiOf_cs {n : ℕ} [MeasurableSpace (G n)] (μ : Measure (G n)) (M : KMod n) (Tθ : M.V →L[ℂ] M.V)
-    (k : Mat n → (M.V →L[ℂ] M.V)) (val : Inf n → ℂ) (T : ℝ) (h : IsMult μ M k val T) :
-    Continuous (phiOf M Tθ k) ∧ HasCompactSupport (phiOf M Tθ k) :=
+theorem phiOf_cs
+    {n : ℕ} [MeasurableSpace (G n)]
+    (μ : Measure (G n))
+    (M : KMod n) (Tθ : M.V →L[ℂ] M.V) (k : Mat n → (M.V →L[ℂ] M.V))
+    (val : Inf n → ℂ) (T : ℝ) (h : IsMult μ M k val T)
+    : Continuous (phiOf M Tθ k) ∧ HasCompactSupport (phiOf M Tθ k) :=
   phiOf_cs' μ M Tθ k val T h
 
-theorem archEx_of (hG : PositivityTheory.Rg.BcB.E1.GrowthJ) (hC : CompatEx) (hL : Lef) (hV : VCBridge) (hP : LefPair)
-    (hK : KerEx) : ArchEx := by
+theorem archEx_of
+    (hG : PositivityTheory.Rg.BcB.E1.GrowthJ) (hC : CompatEx) (hL : Lef) (hV : VCBridge)
+    (hP : LefPair) (hK : KerEx)
+    : ArchEx := by
   intro E _ _ _ hE a b l₁ l₂ μ₁ μ₂ μa μb h₁ h₂ ha hb
   haveI : Nontrivial (InfinitePlace E) := GlobalTheory.T.nontrivial_infinite_place_of_unramified E hE
   haveI : BorelSpace (GA E a) := ⟨rfl⟩
@@ -59,9 +65,10 @@ theorem archEx_of (hG : PositivityTheory.Rg.BcB.E1.GrowthJ) (hC : CompatEx) (hL 
   obtain ⟨-, -, cb, hcb0, hcb⟩ := GlobalTheory.CompanionTheory.Growth.size_facts E b
   have LA := fun v : InfinitePlace E => hL a (l₁ v).w (l₁ v).anti
   have LB := fun v : InfinitePlace E => hL b (l₂ v).w (l₂ v).anti
-  obtain ⟨bump, T, hT, hbump, hone⟩ := bump_one (InfinitePlace E ⊕ InfinitePlace E)
-    (Sum.elim (fun v => cas (infOf (l₁ v).w)) fun v => cas (infOf (l₂ v).w))
-    (fun i => by cases i <;> exact cas_infOf_im _)
+  obtain ⟨bump, T, hT, hbump, hone⟩ :=
+    bump_one (InfinitePlace E ⊕ InfinitePlace E)
+      (Sum.elim (fun v => cas (infOf (l₁ v).w)) fun v => cas (infOf (l₂ v).w))
+      (fun i => by cases i <;> exact cas_infOf_im _)
   obtain ⟨_, hKa⟩ := hK a
   obtain ⟨_, hKb⟩ := hK b
   let Ma : Mods E a := fun v => (LA v).choose
@@ -89,13 +96,22 @@ theorem archEx_of (hG : PositivityTheory.Rg.BcB.E1.GrowthJ) (hC : CompatEx) (hL 
     growth := fun κ _ => hD (Io Ma Mb κ)
     Ta := Ta
     Tb := Tb
-    vca := fun v k val T' hm => hV a μa (Ma v) (Ta v) k val T' (sa v).1 hm ((sa v).2.2.2 μa k val T' hm).1
-    vcb := fun v k val T' hm => hV b μb (Mb v) (Tb v) k val T' (sb v).1 hm ((sb v).2.2.2 μb k val T' hm).1
-    lef := fun v k k' val val' T' hm hm' => hP a b μa μb (l₁ v) (l₂ v) _ _ _ _
-      ⟨(phiOf_cs μa (Ma v) (Ta v) k val T' hm).1, (phiOf_cs μa (Ma v) (Ta v) k val T' hm).2,
-        fun d z hd hz hi => ((sa v).2.2.2 μa k val T' hm).2 d z hd hz hi |>.2⟩
-      ⟨(phiOf_cs μb (Mb v) (Tb v) k' val' T' hm').1, (phiOf_cs μb (Mb v) (Tb v) k' val' T' hm').2,
-        fun d z hd hz hi => ((sb v).2.2.2 μb k' val' T' hm').2 d z hd hz hi |>.2⟩
+    vca := fun v k val T' hm =>
+      hV a μa (Ma v) (Ta v) k val T' (sa v).1 hm ((sa v).2.2.2 μa k val T' hm).1
+    vcb := fun v k val T' hm =>
+      hV b μb (Mb v) (Tb v) k val T' (sb v).1 hm ((sb v).2.2.2 μb k val T' hm).1
+    lef := fun v k k' val val' T' hm hm' =>
+      hP a b μa μb (l₁ v) (l₂ v) _ _ _ _
+        ⟨
+          (phiOf_cs μa (Ma v) (Ta v) k val T' hm).1,
+          (phiOf_cs μa (Ma v) (Ta v) k val T' hm).2,
+          fun d z hd hz hi => ((sa v).2.2.2 μa k val T' hm).2 d z hd hz hi |>.2
+        ⟩
+        ⟨
+          (phiOf_cs μb (Mb v) (Tb v) k' val' T' hm').1,
+          (phiOf_cs μb (Mb v) (Tb v) k' val' T' hm').2,
+          fun d z hd hz hi => ((sb v).2.2.2 μb k' val' T' hm').2 d z hd hz hi |>.2
+        ⟩
     bump := bump
     T := T
     T_nonneg := hT
@@ -104,7 +120,8 @@ theorem archEx_of (hG : PositivityTheory.Rg.BcB.E1.GrowthJ) (hC : CompatEx) (hL 
     kb := kb
     kera := fun w v => ((hKa μa (Ma v)).1 w bump T hbump).choose_spec
     kerb := fun w v => ((hKb μb (Mb v)).1 w bump T hbump).choose_spec
-    one := by simpa [Fintype.prod_sum_type] using hone }⟩
+    one := by simpa [Fintype.prod_sum_type] using hone
+  }⟩
 
 end PositivityTheory.Rg.BcB.F.F0
 

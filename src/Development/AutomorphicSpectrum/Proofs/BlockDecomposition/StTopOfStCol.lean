@@ -5,11 +5,13 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison
+  CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
 
 namespace GlobalTheory.CompanionTheory.EdgeMap
 
-theorem stTop_of_stCol : CrystallineSemistableComparison.E.StCol → CrystallineSemistableComparison.E.StTop := by
+theorem stTop_of_stCol
+    : CrystallineSemistableComparison.E.StCol → CrystallineSemistableComparison.E.StTop := by
   intro hCol R _ C _ F T hT j z hz s
   obtain ⟨hι, hdv, -, hex0, hex⟩ := hCol R C F T hT
   induction s with

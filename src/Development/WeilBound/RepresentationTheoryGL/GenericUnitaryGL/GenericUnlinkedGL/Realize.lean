@@ -27,8 +27,10 @@ theorem sum_map_fst_ms (Δ : Segment k) : (Δ.ms.map Sigma.fst).sum = Δ.deg := 
   rw [Segment.ms, Multiset.map_map, ← Δ.sum_term_fst]
   rfl
 
-theorem unlinkedRealize_of (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (hL : GlobalTheory.BZSeg.LUnlinkedIrr k)
-    (hG : GlobalTheory.BZSeg.LSegGeneric k) (hP : GlobalTheory.BZMir.Leib.GenericProdIff k) : UnlinkedRealize k := by
+theorem unlinkedRealize_of
+    (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (hL : GlobalTheory.BZSeg.LUnlinkedIrr k)
+    (hG : GlobalTheory.BZSeg.LSegGeneric k) (hP : GlobalTheory.BZMir.Leib.GenericProdIff k)
+    : UnlinkedRealize k := by
   intro N s hs hN
   obtain ⟨h, Δ, hun, hbind⟩ := GlobalTheory.T.unlinked_layers_hold k s hs
   choose π hπ using fun i => GlobalTheory.T.exists_segment_representation hA (Δ i)
@@ -43,17 +45,27 @@ theorem unlinkedRealize_of (hA : GlobalTheory.Published.IrreducibleAdmissibleGL)
   have hirr : (prodIrr x hd).IsIrreducible :=
     hL h N Δ x hd (fun i j => if e : i = j then e ▸ Segment.not_linked_self _ else hun i j e) hx
   refine ⟨h, Δ, x, hd, hun, hx, ?_, ?_⟩
-  · have := GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr (t := fun i => (Δ i).ms)
-      (fun i => (hx i).hasSupport) hirr (IsSubquotient.refl _)
+  · have :=
+      GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr
+        (t := fun i => (Δ i).ms)
+        (fun i => (hx i).hasSupport)
+        hirr (IsSubquotient.refl _)
     rwa [show (∑ i, (Δ i).ms) = s from hbind] at this
-  · exact (hP h N (fun a => (x a).1) hd (fun a => (x a).2.rep.V) (fun a => (x a).rep)
+  · exact (hP h N
+      (fun a => (x a).1)
+      hd
+      (fun a => (x a).2.rep.V)
+      (fun a => (x a).rep)
       (fun a => (x a).2.rep.smooth)).2 fun i => hG (Δ i) _ _ _ (hx i)
 
-theorem unlinkedRealize (hJ : Zc.LSegJacquet k) (hN : GlobalTheory.BZSeg.NuPair k) : UnlinkedRealize k :=
+theorem unlinkedRealize (hJ : Zc.LSegJacquet k) (hN : GlobalTheory.BZSeg.NuPair k)
+    : UnlinkedRealize k :=
   unlinkedRealize_of PositivityTheory.Tls2.BZGL.irreducibleAdmissibleGL_top
     (GlobalTheory.RgGu.Unl.lUnlinkedIrr_nu k hJ PositivityTheory.Geo.geometricLemmaFiltration hN)
-    (GlobalTheory.T.segment_generic_of_jacquet_nu_pair k PositivityTheory.Tls2.BZGL.irreducibleAdmissibleGL_top hJ hN)
-    (GlobalTheory.T.whittaker_heredity_generic_product k (PositivityTheory.rg.gu.hered2.whitHeredity_all k))
+    (GlobalTheory.T.segment_generic_of_jacquet_nu_pair k
+      PositivityTheory.Tls2.BZGL.irreducibleAdmissibleGL_top hJ hN)
+    (GlobalTheory.T.whittaker_heredity_generic_product k
+      (PositivityTheory.rg.gu.hered2.whitHeredity_all k))
 
 end GlobalTheory.RgGu
 

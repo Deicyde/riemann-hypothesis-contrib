@@ -15,30 +15,22 @@ namespace Formalism.L2.Col
 open Formalism.DivisionValues Formalism.L2.DIV
 
 structure GSD (K : Type) [Field K] [NumberField K] [StarRing K] where
-
   G : Type
   [grpG : Group G]
-
   D : Type
   [actD : MulAction G D]
-
   V : Type
   [addV : AddCommGroup V]
   [modV : Module K V]
   [modOV : Module (𝓞 K) V]
   [towV : IsScalarTower (𝓞 K) K V]
-
   ιV : Type
   [finιV : Fintype ιV]
   [decιV : DecidableEq ιV]
   bV : Basis ιV K V
-
   pair : V →ₗ⋆[K] V →ₗ[K] K
-
   ρ : G →* Module.End K V
-
   Nab : D → Submodule (𝓞 K) V
-
   Del : D → Submodule (𝓞 K) V
 
 attribute [instance] GSD.grpG GSD.actD GSD.addV GSD.modV GSD.modOV GSD.towV GSD.finιV GSD.decιV
@@ -70,7 +62,6 @@ variable {S} in
 theorem Sec.exists_mv (s : S.Sec) (d : S.D) : ∃ g : S.G, g • s.rep (S.cls d) = d := by
   exact (S.cls_eq_iff d (s.rep (S.cls d))).1 (s.spec _).symm
 
-
 variable {S} in
 def Sec.mv (s : S.Sec) (d : S.D) : S.G := (s.exists_mv d).choose
 
@@ -85,13 +76,13 @@ structure Ok : Prop where
   del_smul : ∀ (g : S.G) (d : S.D), S.Del (g • d) = (S.Del d).map ((S.ρ g).restrictScalars (𝓞 K))
   inv : ∀ (g : S.G) (x y : S.V), S.pair (S.ρ g x) (S.ρ g y) = S.pair x y
 
+variable {S} in
+@[reducible]
+def Ok.fintypeCl (h : S.Ok) : Fintype S.Cl := @Fintype.ofFinite _ h.fin_orb
 
 variable {S} in
-@[reducible] def Ok.fintypeCl (h : S.Ok) : Fintype S.Cl := @Fintype.ofFinite _ h.fin_orb
-
-
-variable {S} in
-@[reducible] def Ok.fintypeStab (h : S.Ok) (d : S.D) : Fintype (MulAction.stabilizer S.G d) :=
+@[reducible]
+def Ok.fintypeStab (h : S.Ok) (d : S.D) : Fintype (MulAction.stabilizer S.G d) :=
   @Fintype.ofFinite _ (h.fin_stab d)
 
 def EqFun : Submodule K (S.D → S.V) where
@@ -106,7 +97,8 @@ def EqFun : Submodule K (S.D → S.V) where
     intro a φ hφ g d
     simp only [Pi.smul_apply, map_smul, hφ g d]
 
-theorem mem_EqFun (φ : S.D → S.V) : φ ∈ S.EqFun ↔ ∀ (g : S.G) (d : S.D), φ (g • d) = S.ρ g (φ d) := by
+theorem mem_EqFun (φ : S.D → S.V)
+    : φ ∈ S.EqFun ↔ ∀ (g : S.G) (d : S.D), φ (g • d) = S.ρ g (φ d) := by
   exact Iff.rfl
 
 def intOf (N : S.D → Submodule (𝓞 K) S.V) : Submodule (𝓞 K) S.EqFun where
@@ -131,7 +123,8 @@ theorem mem_intNab (φ : S.EqFun) : φ ∈ S.intNab ↔ ∀ d, (φ : S.D → S.V
 theorem mem_intDel (φ : S.EqFun) : φ ∈ S.intDel ↔ ∀ d, (φ : S.D → S.V) d ∈ S.Del d := by
   exact Iff.rfl
 
-@[reducible] def toCSDOf (h : S.Ok) (s : S.Sec) : CSD K where
+@[reducible]
+def toCSDOf (h : S.Ok) (s : S.Sec) : CSD K where
   Cl := S.Cl
   finCl := h.fintypeCl
   V := S.V
@@ -145,37 +138,45 @@ theorem mem_intDel (φ : S.EqFun) : φ ∈ S.intDel ↔ ∀ d, (φ : S.D → S.V
   Nab := fun c => S.Nab (s.rep c)
   Del := fun c => S.Del (s.rep c)
 
-@[reducible] def toCSD (h : S.Ok) : CSD K := S.toCSDOf h S.outSec
+@[reducible]
+def toCSD (h : S.Ok) : CSD K := S.toCSDOf h S.outSec
 
-theorem rho_eq_of_smul_eq (h : S.Ok) (s : S.Sec) (f : (S.toCSDOf h s).Forms) (c : S.Cl) (g₁ g₂ : S.G)
-    (e : g₁ • s.rep c = g₂ • s.rep c) :
-    S.ρ g₁ ((f.1 : S.Cl → S.V) c) = S.ρ g₂ ((f.1 : S.Cl → S.V) c) := by
+theorem rho_eq_of_smul_eq
+    (h : S.Ok) (s : S.Sec) (f : (S.toCSDOf h s).Forms)
+    (c : S.Cl) (g₁ g₂ : S.G) (e : g₁ • s.rep c = g₂ • s.rep c)
+    : S.ρ g₁ ((f.1 : S.Cl → S.V) c) = S.ρ g₂ ((f.1 : S.Cl → S.V) c) := by
   have hmem : g₂⁻¹ * g₁ ∈ MulAction.stabilizer S.G (s.rep c) := by
     rw [MulAction.mem_stabilizer_iff, mul_smul, e, ← mul_smul, inv_mul_cancel, one_smul]
   have hf : S.ρ (g₂⁻¹ * g₁) ((f.1 : S.Cl → S.V) c) = (f.1 : S.Cl → S.V) c := f.2 c ⟨_, hmem⟩
-  calc S.ρ g₁ ((f.1 : S.Cl → S.V) c) = S.ρ (g₂ * (g₂⁻¹ * g₁)) ((f.1 : S.Cl → S.V) c) := by
-        rw [mul_inv_cancel_left]
-    _ = S.ρ g₂ (S.ρ (g₂⁻¹ * g₁) ((f.1 : S.Cl → S.V) c)) := by
-        rw [map_mul, Module.End.mul_apply]
+  calc
+    S.ρ g₁ ((f.1 : S.Cl → S.V) c)
+      = S.ρ (g₂ * (g₂⁻¹ * g₁)) ((f.1 : S.Cl → S.V) c) := by rw [mul_inv_cancel_left]
+    _ = S.ρ g₂ (S.ρ (g₂⁻¹ * g₁) ((f.1 : S.Cl → S.V) c)) := by rw [map_mul, Module.End.mul_apply]
     _ = S.ρ g₂ ((f.1 : S.Cl → S.V) c) := by rw [hf]
 
 def resOf (h : S.Ok) (s : S.Sec) : S.EqFun ≃ₗ[K] (S.toCSDOf h s).Forms where
-  toFun φ := ⟨fun c => (φ : S.D → S.V) (s.rep c), fun c γ => by
-    have h1 := φ.2 ((γ : MulAction.stabilizer S.G (s.rep c)) : S.G) (s.rep c)
-    have h2 : ((γ : MulAction.stabilizer S.G (s.rep c)) : S.G) • s.rep c = s.rep c :=
-      (γ : MulAction.stabilizer S.G (s.rep c)).2
-    rw [h2] at h1
-    exact h1.symm⟩
+  toFun φ := ⟨
+    fun c => (φ : S.D → S.V) (s.rep c),
+    fun c γ => by
+      have h1 := φ.2 ((γ : MulAction.stabilizer S.G (s.rep c)) : S.G) (s.rep c)
+      have h2 : ((γ : MulAction.stabilizer S.G (s.rep c)) : S.G) • s.rep c = s.rep c :=
+        (γ : MulAction.stabilizer S.G (s.rep c)).2
+      rw [h2] at h1
+      exact h1.symm
+  ⟩
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
-  invFun f := ⟨fun d => S.ρ (s.mv d) ((f.1 : S.Cl → S.V) (S.cls d)), fun g d => by
-    show S.ρ (s.mv (g • d)) ((f.1 : S.Cl → S.V) (S.cls (g • d))) =
-      S.ρ g (S.ρ (s.mv d) ((f.1 : S.Cl → S.V) (S.cls d)))
-    have h0 := s.mv_smul (g • d)
-    rw [S.cls_smul g d] at h0 ⊢
-    rw [← Module.End.mul_apply, ← map_mul]
-    refine S.rho_eq_of_smul_eq h s f _ _ _ ?_
-    rw [h0, mul_smul, s.mv_smul d]⟩
+  invFun f := ⟨
+    fun d => S.ρ (s.mv d) ((f.1 : S.Cl → S.V) (S.cls d)),
+    fun g d => by
+      show S.ρ (s.mv (g • d)) ((f.1 : S.Cl → S.V) (S.cls (g • d))) =
+        S.ρ g (S.ρ (s.mv d) ((f.1 : S.Cl → S.V) (S.cls d)))
+      have h0 := s.mv_smul (g • d)
+      rw [S.cls_smul g d] at h0 ⊢
+      rw [← Module.End.mul_apply, ← map_mul]
+      refine S.rho_eq_of_smul_eq h s f _ _ _ ?_
+      rw [h0, mul_smul, s.mv_smul d]
+  ⟩
   left_inv φ := by
     apply Subtype.ext
     funext d
@@ -192,8 +193,9 @@ def resOf (h : S.Ok) (s : S.Sec) : S.EqFun ≃ₗ[K] (S.toCSDOf h s).Forms where
 
 def res (h : S.Ok) : S.EqFun ≃ₗ[K] (S.toCSD h).Forms := S.resOf h S.outSec
 
-theorem resOf_apply (h : S.Ok) (s : S.Sec) (φ : S.EqFun) (c : S.Cl) :
-    ((S.resOf h s φ).1 : S.Cl → S.V) c = (φ : S.D → S.V) (s.rep c) := rfl
+theorem resOf_apply (h : S.Ok) (s : S.Sec) (φ : S.EqFun) (c : S.Cl)
+    : ((S.resOf h s φ).1 : S.Cl → S.V) c = (φ : S.D → S.V) (s.rep c) :=
+  rfl
 
 def ipOf (h : S.Ok) (s : S.Sec) (φ ψ : S.D → S.V) : K :=
   (S.toCSDOf h s).csum (fun c => φ (s.rep c)) (fun c => ψ (s.rep c))
@@ -207,8 +209,10 @@ structure Good (s : ℕ) : Prop where
   nab_lat : ∀ d, Submodule.IsLattice K (S.Nab d)
   del_le : ∀ d, S.Del d ≤ S.Nab d
   s_pos : 0 < s
-  dual_le : ∀ d, ∀ y ∈ Formalism.HermitianLatticesTheory.dual S.pair (S.Nab d), (s : 𝓞 K) • y ∈ S.Del d
-  del_dual : ∀ d, ∀ y ∈ S.Del d, (s : 𝓞 K) • y ∈ Formalism.HermitianLatticesTheory.dual S.pair (S.Nab d)
+  dual_le
+    : ∀ d, ∀ y ∈ Formalism.HermitianLatticesTheory.dual S.pair (S.Nab d), (s : 𝓞 K) • y ∈ S.Del d
+  del_dual
+    : ∀ d, ∀ y ∈ S.Del d, (s : 𝓞 K) • y ∈ Formalism.HermitianLatticesTheory.dual S.pair (S.Nab d)
 
 def gramV : Matrix S.ιV S.ιV K := Matrix.of fun i j => S.pair (S.bV i) (S.bV j)
 
@@ -218,16 +222,17 @@ structure Rat : Prop where
   pos : ∀ v : InfinitePlace K, (S.gramV.map v.embedding).PosDef
 
 theorem toCSDOf_good {n : ℕ} (G : S.Good n) (s : S.Sec) : (S.toCSDOf G.ok s).Good n := by
-  refine
-    { symm := G.symm
-      nondeg := G.nondeg
-      inv := fun c γ x y => G.ok.inv ((γ : MulAction.stabilizer S.G (s.rep c)) : S.G) x y
-      nab_lat := fun c => G.nab_lat (s.rep c)
-      del_le := fun c => G.del_le (s.rep c)
-      del_stable := ?_
-      s_pos := G.s_pos
-      dual_le := fun c => G.dual_le (s.rep c)
-      del_dual := fun c => G.del_dual (s.rep c) }
+  refine {
+    symm := G.symm
+    nondeg := G.nondeg
+    inv := fun c γ x y => G.ok.inv ((γ : MulAction.stabilizer S.G (s.rep c)) : S.G) x y
+    nab_lat := fun c => G.nab_lat (s.rep c)
+    del_le := fun c => G.del_le (s.rep c)
+    del_stable := ?_
+    s_pos := G.s_pos
+    dual_le := fun c => G.dual_le (s.rep c)
+    del_dual := fun c => G.del_dual (s.rep c)
+  }
   intro c γ y hy
   have h1 := G.ok.del_smul ((γ : MulAction.stabilizer S.G (s.rep c)) : S.G) (s.rep c)
   have h2 : ((γ : MulAction.stabilizer S.G (s.rep c)) : S.G) • s.rep c = s.rep c :=
@@ -238,23 +243,22 @@ theorem toCSDOf_good {n : ℕ} (G : S.Good n) (s : S.Sec) : (S.toCSDOf G.ok s).G
   exact Submodule.mem_map_of_mem hy
 
 theorem toCSDOf_rat (h : S.Ok) (R : S.Rat) (s : S.Sec) : (S.toCSDOf h s).Rat := by
-  exact
-    { pair_rat := R.pair_rat
-      act_rat := fun c γ i j => R.act_rat ((γ : MulAction.stabilizer S.G (s.rep c)) : S.G) i j
-      pos := R.pos }
+  exact {
+    pair_rat := R.pair_rat
+    act_rat := fun c γ i j => R.act_rat ((γ : MulAction.stabilizer S.G (s.rep c)) : S.G) i j
+    pos := R.pos
+  }
 
 end GSD
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
 structure LocOp (S S' : GSD K) where
-
   tr : S'.G →* S.G
-
   ker : S'.D → S.D →₀ (S.V →ₗ[K] S'.V)
-
-  equiv : ∀ (g : S'.G) (d' : S'.D) (d : S.D),
-    ker (g • d') (tr g • d) = (S'.ρ g) ∘ₗ (ker d' d) ∘ₗ (S.ρ (tr g)⁻¹)
+  equiv
+    : ∀ (g : S'.G) (d' : S'.D) (d : S.D),
+      ker (g • d') (tr g • d) = (S'.ρ g) ∘ₗ (ker d' d) ∘ₗ (S.ρ (tr g)⁻¹)
 
 namespace LocOp
 
@@ -262,9 +266,11 @@ variable {S S' : GSD K} (A : LocOp S S')
 
 def app (φ : S.D → S.V) (d' : S'.D) : S'.V := (A.ker d').sum fun d k => k (φ d)
 
-theorem ker_smul (g : S'.G) (d' : S'.D) :
-    A.ker (g • d') = (Finsupp.equivMapDomain (MulAction.toPerm (A.tr g)) (A.ker d')).mapRange
-      (fun k => (S'.ρ g) ∘ₗ k ∘ₗ (S.ρ (A.tr g)⁻¹)) (by simp) := by
+theorem ker_smul (g : S'.G) (d' : S'.D)
+    : A.ker (g • d')
+      = (Finsupp.equivMapDomain (MulAction.toPerm (A.tr g)) (A.ker d')).mapRange
+        (fun k => (S'.ρ g) ∘ₗ k ∘ₗ (S.ρ (A.tr g)⁻¹))
+        (by simp) := by
   ext d : 1
   rw [Finsupp.mapRange_apply, Finsupp.equivMapDomain_apply]
   have h := A.equiv g d' ((MulAction.toPerm (A.tr g)).symm d)
@@ -300,11 +306,14 @@ def op : S.EqFun →ₗ[K] S'.EqFun where
     simp only [map_smul]
     exact Finsupp.smul_sum.symm
 
-theorem op_apply (φ : S.EqFun) (d' : S'.D) :
-    ((A.op φ : S'.EqFun) : S'.D → S'.V) d' = (A.ker d').sum fun d k => k ((φ : S.D → S.V) d) := rfl
+theorem op_apply (φ : S.EqFun) (d' : S'.D)
+    : ((A.op φ : S'.EqFun) : S'.D → S'.V) d' = (A.ker d').sum fun d k => k ((φ : S.D → S.V) d) :=
+  rfl
 
-def ofMap (tr : S'.G →* S.G) (p : S'.D → S.D) (T : S.V →ₗ[K] S'.V)
-    (hp : ∀ g d', p (g • d') = tr g • p d') (hT : ∀ g x, T (S.ρ (tr g) x) = S'.ρ g (T x)) : LocOp S S' where
+def ofMap
+    (tr : S'.G →* S.G) (p : S'.D → S.D) (T : S.V →ₗ[K] S'.V)
+    (hp : ∀ g d', p (g • d') = tr g • p d') (hT : ∀ g x, T (S.ρ (tr g) x) = S'.ρ g (T x))
+    : LocOp S S' where
   tr := tr
   ker := fun d' => Finsupp.single (p d') T
   equiv := by
@@ -320,19 +329,22 @@ def ofMap (tr : S'.G →* S.G) (p : S'.D → S.D) (T : S.V →ₗ[K] S'.V)
     · rw [if_neg e, if_neg (fun e' => e (MulAction.injective (tr g) e'))]
       simp
 
-theorem ofMap_op_apply (tr : S'.G →* S.G) (p : S'.D → S.D) (T : S.V →ₗ[K] S'.V)
-    (hp : ∀ g d', p (g • d') = tr g • p d') (hT : ∀ g x, T (S.ρ (tr g) x) = S'.ρ g (T x)) (φ : S.EqFun)
-    (d' : S'.D) : (((ofMap tr p T hp hT).op φ : S'.EqFun) : S'.D → S'.V) d' = T ((φ : S.D → S.V) (p d')) := by
+theorem ofMap_op_apply
+    (tr : S'.G →* S.G) (p : S'.D → S.D) (T : S.V →ₗ[K] S'.V)
+    (hp : ∀ g d', p (g • d') = tr g • p d') (hT : ∀ g x, T (S.ρ (tr g) x) = S'.ρ g (T x))
+    (φ : S.EqFun) (d' : S'.D)
+    : (((ofMap tr p T hp hT).op φ : S'.EqFun) : S'.D → S'.V) d' = T ((φ : S.D → S.V) (p d')) := by
   rw [op_apply]
   show (Finsupp.single (p d') T).sum (fun d k => k ((φ : S.D → S.V) d)) = _
   rw [Finsupp.sum_single_index]
   simp
 
-
 open Classical in
-def ofNbr (tr : S'.G →* S.G) (nb : S'.D → Finset S.D) (T : S.V →ₗ[K] S'.V)
-    (hn : ∀ g d' d, tr g • d ∈ nb (g • d') ↔ d ∈ nb d') (hT : ∀ g x, T (S.ρ (tr g) x) = S'.ρ g (T x)) :
-    LocOp S S' where
+def ofNbr
+    (tr : S'.G →* S.G) (nb : S'.D → Finset S.D) (T : S.V →ₗ[K] S'.V)
+    (hn : ∀ g d' d, tr g • d ∈ nb (g • d') ↔ d ∈ nb d')
+    (hT : ∀ g x, T (S.ρ (tr g) x) = S'.ρ g (T x))
+    : LocOp S S' where
   tr := tr
   ker := fun d' => Finsupp.indicator (nb d') (fun _ _ => T)
   equiv := by
@@ -347,10 +359,12 @@ def ofNbr (tr : S'.G →* S.G) (nb : S'.D → Finset S.D) (T : S.V →ₗ[K] S'.
     · rw [dite_eq_right e, dite_eq_right (fun e' => e ((hn g d' d).mp e'))]
       simp
 
-theorem ofNbr_op_apply (tr : S'.G →* S.G) (nb : S'.D → Finset S.D) (T : S.V →ₗ[K] S'.V)
-    (hn : ∀ g d' d, tr g • d ∈ nb (g • d') ↔ d ∈ nb d') (hT : ∀ g x, T (S.ρ (tr g) x) = S'.ρ g (T x))
-    (φ : S.EqFun) (d' : S'.D) :
-    (((ofNbr tr nb T hn hT).op φ : S'.EqFun) : S'.D → S'.V) d' = ∑ d ∈ nb d', T ((φ : S.D → S.V) d) := by
+theorem ofNbr_op_apply
+    (tr : S'.G →* S.G) (nb : S'.D → Finset S.D) (T : S.V →ₗ[K] S'.V)
+    (hn : ∀ g d' d, tr g • d ∈ nb (g • d') ↔ d ∈ nb d')
+    (hT : ∀ g x, T (S.ρ (tr g) x) = S'.ρ g (T x)) (φ : S.EqFun) (d' : S'.D)
+    : (((ofNbr tr nb T hn hT).op φ : S'.EqFun) : S'.D → S'.V) d'
+      = ∑ d ∈ nb d', T ((φ : S.D → S.V) d) := by
   rw [op_apply]
   show (Finsupp.indicator (nb d') (fun _ _ => T)).sum (fun d k => k ((φ : S.D → S.V) d)) = _
   rw [Finsupp.sum_indicator_index _ (fun _ _ => by simp)]
@@ -358,11 +372,10 @@ theorem ofNbr_op_apply (tr : S'.G →* S.G) (nb : S'.D → Finset S.D) (T : S.V 
 end LocOp
 
 structure ClsKer (S S' : GSD K) where
-
   k : S.D → S'.D → (S.V →ₗ[K] S'.V)
-
-  equiv : ∀ (g : S.G) (g' : S'.G) (d : S.D) (d' : S'.D),
-    k (g • d) (g' • d') = (S'.ρ g') ∘ₗ (k d d') ∘ₗ (S.ρ g⁻¹)
+  equiv
+    : ∀ (g : S.G) (g' : S'.G) (d : S.D) (d' : S'.D),
+      k (g • d) (g' • d') = (S'.ρ g') ∘ₗ (k d d') ∘ₗ (S.ρ g⁻¹)
 
 namespace ClsKer
 
@@ -373,15 +386,18 @@ def appOf (h : S.Ok) (s : S.Sec) (φ : S.D → S.V) (d' : S'.D) : S'.V :=
   ∑ c : S.Cl, (((S.toCSDOf h s).wt c : K))⁻¹ • A.k (s.rep c) d' (φ (s.rep c))
 
 def opOf (h : S.Ok) (s : S.Sec) : S.EqFun →ₗ[K] S'.EqFun where
-  toFun φ := ⟨A.appOf h s φ, fun g' d' => by
-    unfold appOf
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
-    refine Finset.sum_congr rfl fun c _ => ?_
-    have h1 := A.equiv 1 g' (s.rep c) d'
-    rw [one_smul, inv_one, map_one] at h1
-    rw [h1, map_smul]
-    rfl⟩
+  toFun φ := ⟨
+    A.appOf h s φ,
+    fun g' d' => by
+      unfold appOf
+      set_option synthInstance.maxHeartbeats 100000 in
+        rw [map_sum]
+      refine Finset.sum_congr rfl fun c _ => ?_
+      have h1 := A.equiv 1 g' (s.rep c) d'
+      rw [one_smul, inv_one, map_one] at h1
+      rw [h1, map_smul]
+      rfl
+  ⟩
   map_add' φ ψ := by
     apply Subtype.ext
     funext d'
@@ -418,11 +434,14 @@ namespace GSD.Iso
 variable {S S' : GSD K} (e : GSD.Iso S S')
 
 def onForms : S.EqFun ≃ₗ[K] S'.EqFun where
-  toFun φ := ⟨fun d' => e.eV ((φ : S.D → S.V) (e.eD.symm d')), fun g' d' => by
-    have h1 : e.eD.symm (g' • d') = e.eG.symm g' • e.eD.symm d' := by
-      rw [Equiv.symm_apply_eq, e.smul, MulEquiv.apply_symm_apply, Equiv.apply_symm_apply]
-    show e.eV ((φ : S.D → S.V) (e.eD.symm (g' • d'))) = S'.ρ g' (e.eV ((φ : S.D → S.V) (e.eD.symm d')))
-    rw [h1, φ.2, e.rho, MulEquiv.apply_symm_apply]⟩
+  toFun φ := ⟨
+    fun d' => e.eV ((φ : S.D → S.V) (e.eD.symm d')),
+    fun g' d' => by
+      have h1 : e.eD.symm (g' • d') = e.eG.symm g' • e.eD.symm d' := by
+        rw [Equiv.symm_apply_eq, e.smul, MulEquiv.apply_symm_apply, Equiv.apply_symm_apply]
+      show e.eV ((φ : S.D → S.V) (e.eD.symm (g' • d'))) = S'.ρ g' (e.eV ((φ : S.D → S.V) (e.eD.symm d')))
+      rw [h1, φ.2, e.rho, MulEquiv.apply_symm_apply]
+  ⟩
   map_add' φ ψ := by
     apply Subtype.ext
     funext d'
@@ -431,9 +450,12 @@ def onForms : S.EqFun ≃ₗ[K] S'.EqFun where
     apply Subtype.ext
     funext d'
     exact map_smul e.eV _ _
-  invFun ψ := ⟨fun d => e.eV.symm ((ψ : S'.D → S'.V) (e.eD d)), fun g d => by
-    show e.eV.symm ((ψ : S'.D → S'.V) (e.eD (g • d))) = S.ρ g (e.eV.symm ((ψ : S'.D → S'.V) (e.eD d)))
-    rw [e.smul, ψ.2, LinearEquiv.symm_apply_eq, e.rho, LinearEquiv.apply_symm_apply]⟩
+  invFun ψ := ⟨
+    fun d => e.eV.symm ((ψ : S'.D → S'.V) (e.eD d)),
+    fun g d => by
+      show e.eV.symm ((ψ : S'.D → S'.V) (e.eD (g • d))) = S.ρ g (e.eV.symm ((ψ : S'.D → S'.V) (e.eD d)))
+      rw [e.smul, ψ.2, LinearEquiv.symm_apply_eq, e.rho, LinearEquiv.apply_symm_apply]
+  ⟩
   left_inv φ := by
     apply Subtype.ext
     funext d
@@ -446,14 +468,16 @@ def onForms : S.EqFun ≃ₗ[K] S'.EqFun where
     rw [LinearEquiv.apply_symm_apply, Equiv.apply_symm_apply]
 
 def onCl : S.Cl ≃ S'.Cl where
-  toFun := Quotient.map' e.eD (by
-    rintro a b ⟨g, rfl⟩
-    exact ⟨e.eG g, (e.smul g b).symm⟩)
-  invFun := Quotient.map' e.eD.symm (by
-    rintro a b ⟨g, rfl⟩
-    refine ⟨e.eG.symm g, ?_⟩
-    show e.eG.symm g • e.eD.symm b = e.eD.symm (g • b)
-    rw [Equiv.eq_symm_apply, e.smul, MulEquiv.apply_symm_apply, Equiv.apply_symm_apply])
+  toFun :=
+    Quotient.map' e.eD (by
+      rintro a b ⟨g, rfl⟩
+      exact ⟨e.eG g, (e.smul g b).symm⟩)
+  invFun :=
+    Quotient.map' e.eD.symm (by
+      rintro a b ⟨g, rfl⟩
+      refine ⟨e.eG.symm g, ?_⟩
+      show e.eG.symm g • e.eD.symm b = e.eD.symm (g • b)
+      rw [Equiv.eq_symm_apply, e.smul, MulEquiv.apply_symm_apply, Equiv.apply_symm_apply])
   left_inv := by
     rintro ⟨a⟩
     show Quotient.mk'' (e.eD.symm (e.eD a)) = Quotient.mk'' a
@@ -482,11 +506,8 @@ def csOf (h : S.Ok) (s : S.Sec) {M : Type} [AddCommGroup M] [Module K M] (F : S.
 end GSD
 
 structure BiPair (S S' : GSD K) where
-
   tr : S'.G →* S.G
-
   p : S'.D → S.D
-
   B : S.V →ₗ[K] S'.V →ₗ[K] K
   hp : ∀ (g : S'.G) (d' : S'.D), p (g • d') = tr g • p d'
   inv : ∀ (g : S'.G) (x : S.V) (y : S'.V), B (S.ρ (tr g) x) (S'.ρ g y) = B x y
@@ -498,11 +519,9 @@ variable {S S' : GSD K} (P : BiPair S S')
 end BiPair
 
 structure GFam (K : Type) [Field K] [NumberField K] [StarRing K] where
-
   β : Type
   [finβ : Fintype β]
   [decβ : DecidableEq β]
-
   V : Type
   [addV : AddCommGroup V]
   [modV : Module K V]
@@ -512,27 +531,25 @@ structure GFam (K : Type) [Field K] [NumberField K] [StarRing K] where
   [finιV : Fintype ιV]
   [decιV : DecidableEq ιV]
   bV : Basis ιV K V
-
   pair : V →ₗ⋆[K] V →ₗ[K] K
-
   G : β → Type
   [grpG : ∀ b, Group (G b)]
-
   D : β → Type
   [actD : ∀ b, MulAction (G b) (D b)]
-
   ρ : ∀ b, G b →* Module.End K V
   Nab : ∀ b, D b → Submodule (𝓞 K) V
   Del : ∀ b, D b → Submodule (𝓞 K) V
 
-attribute [instance] GFam.finβ GFam.decβ GFam.addV GFam.modV GFam.modOV GFam.towV GFam.finιV GFam.decιV GFam.grpG
+attribute [instance]
+  GFam.finβ GFam.decβ GFam.addV GFam.modV GFam.modOV GFam.towV GFam.finιV GFam.decιV GFam.grpG
   GFam.actD
 
 namespace GFam
 
 variable (F : GFam K)
 
-@[reducible] def mem (b : F.β) : GSD K where
+@[reducible]
+def mem (b : F.β) : GSD K where
   G := F.G b
   D := F.D b
   V := F.V
@@ -553,13 +570,14 @@ def intDel : Submodule (𝓞 K) F.Forms := Submodule.pi Set.univ fun b => (F.mem
 
 abbrev Cl : Type := Σ b, (F.mem b).Cl
 
-
 variable {F} in
-@[reducible] def Ok.fintypeCl (h : F.Ok) : Fintype F.Cl :=
+@[reducible]
+def Ok.fintypeCl (h : F.Ok) : Fintype F.Cl :=
   letI : ∀ b, Fintype (F.mem b).Cl := fun b => (h b).fintypeCl
   inferInstance
 
-@[reducible] def toCSDOf (h : F.Ok) (s : ∀ b, (F.mem b).Sec) : CSD K where
+@[reducible]
+def toCSDOf (h : F.Ok) (s : ∀ b, (F.mem b).Sec) : CSD K where
   Cl := F.Cl
   finCl := h.fintypeCl
   V := F.V
@@ -573,34 +591,40 @@ variable {F} in
   Nab := fun c => F.Nab c.1 ((s c.1).rep c.2)
   Del := fun c => F.Del c.1 ((s c.1).rep c.2)
 
-@[reducible] def toCSD (h : F.Ok) : CSD K := F.toCSDOf h fun b => (F.mem b).outSec
+@[reducible]
+def toCSD (h : F.Ok) : CSD K := F.toCSDOf h fun b => (F.mem b).outSec
 
 def resOf (h : F.Ok) (s : ∀ b, (F.mem b).Sec) : F.Forms ≃ₗ[K] (F.toCSDOf h s).Forms :=
-  (LinearEquiv.piCongrRight fun b => (F.mem b).resOf (h b) (s b)).trans
-    { toFun := fun f => ⟨fun c => (f c.1).1 c.2, fun c γ => (f c.1).2 c.2 γ⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl
-      invFun := fun f b => ⟨fun c => f.1 ⟨b, c⟩, fun c γ => f.2 ⟨b, c⟩ γ⟩
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl }
+  (LinearEquiv.piCongrRight fun b => (F.mem b).resOf (h b) (s b)).trans {
+    toFun := fun f => ⟨fun c => (f c.1).1 c.2, fun c γ => (f c.1).2 c.2 γ⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+    invFun := fun f b => ⟨fun c => f.1 ⟨b, c⟩, fun c γ => f.2 ⟨b, c⟩ γ⟩
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+  }
 
-theorem resOf_apply (h : F.Ok) (s : ∀ b, (F.mem b).Sec) (φ : F.Forms) (c : F.Cl) :
-    (F.resOf h s φ).1 c = ((φ c.1 : (F.mem c.1).EqFun) : F.D c.1 → F.V) ((s c.1).rep c.2) := rfl
+theorem resOf_apply (h : F.Ok) (s : ∀ b, (F.mem b).Sec) (φ : F.Forms) (c : F.Cl)
+    : (F.resOf h s φ).1 c = ((φ c.1 : (F.mem c.1).EqFun) : F.D c.1 → F.V) ((s c.1).rep c.2) :=
+  rfl
 
 def ipOf (h : F.Ok) (s : ∀ b, (F.mem b).Sec) (φ ψ : F.Forms) : K :=
   ∑ b, (F.mem b).ipOf (h b) (s b) (φ b) (ψ b)
 
 abbrev Mat (F F' : GFam K) : Type := ∀ (b : F.β) (b' : F'.β), ClsKer (F.mem b) (F'.mem b')
 
-def Mat.opOf {F F' : GFam K} (M : Mat F F') (h : F.Ok) (s : ∀ b, (F.mem b).Sec) : F.Forms →ₗ[K] F'.Forms :=
+def Mat.opOf {F F' : GFam K} (M : Mat F F') (h : F.Ok) (s : ∀ b, (F.mem b).Sec)
+    : F.Forms →ₗ[K] F'.Forms :=
   LinearMap.pi fun b' => ∑ b, ((M b b').opOf (h b) (s b)) ∘ₗ (LinearMap.proj b)
 
-def Mat.atReps {F F' : GFam K} (M : Mat F F') (s : ∀ b, (F.mem b).Sec) (s' : ∀ b', (F'.mem b').Sec) :
-    F.Cl → F'.Cl → (F.V →ₗ[K] F'.V) := fun c c' => (M c.1 c'.1).k ((s c.1).rep c.2) ((s' c'.1).rep c'.2)
+def Mat.atReps {F F' : GFam K} (M : Mat F F') (s : ∀ b, (F.mem b).Sec) (s' : ∀ b', (F'.mem b').Sec)
+    : F.Cl → F'.Cl → (F.V →ₗ[K] F'.V) := fun c c' =>
+  (M c.1 c'.1).k ((s c.1).rep c.2) ((s' c'.1).rep c'.2)
 
 end GFam
 
-@[reducible] def GSD.toFam (S : GSD K) : GFam K where
+@[reducible]
+def GSD.toFam (S : GSD K) : GFam K where
   β := Unit
   V := S.V
   ιV := S.ιV

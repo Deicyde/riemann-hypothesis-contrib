@@ -21,11 +21,9 @@ theorem dof_add (f g : PS k 1 d) : Dof F v (f + g) = Dof F v f + Dof F v g := by
   unfold Dof
   simp only [map_add (f := _), mul_add, Finset.sum_add_distrib]
 
-theorem dof_zero : Dof F v (0 : PS k 1 d) = 0 := by
-  simp [Dof]
+theorem dof_zero : Dof F v (0 : PS k 1 d) = 0 := by simp [Dof]
 
-theorem dof_C (a : k) : Dof F v (C a : PS k 1 d) = 0 := by
-  simp [Dof]
+theorem dof_C (a : k) : Dof F v (C a : PS k 1 d) = 0 := by simp [Dof]
 
 theorem dof_mul (f g : PS k 1 d) : Dof F v (f * g) = Dof F v f * g + f * Dof F v g := by
   unfold Dof
@@ -46,7 +44,8 @@ variable (F : Fin d → PS k 2 d) {ι : Type} (u : ι → Fin d → k)
 
 def T (w : List ι) (A : PS k 1 d) : PS k 1 d := w.foldr (fun l g => Dof F (u l) g) A
 
-theorem T_cons (l : ι) (w : List ι) (A : PS k 1 d) : T F u (l :: w) A = Dof F (u l) (T F u w A) := rfl
+theorem T_cons (l : ι) (w : List ι) (A : PS k 1 d) : T F u (l :: w) A = Dof F (u l) (T F u w A) :=
+  rfl
 
 theorem T_append (w w' : List ι) (A : PS k 1 d) : T F u (w ++ w') A = T F u w (T F u w' A) := by
   simp [T, List.foldr_append]
@@ -55,8 +54,8 @@ def splits : List ι → List (List ι × List ι)
   | [] => [([], [])]
   | l :: w => (splits w).map (fun p => (l :: p.1, p.2)) ++ (splits w).map (fun p => (p.1, l :: p.2))
 
-theorem T_mul (w : List ι) (A B : PS k 1 d) :
-    T F u w (A * B) = ((splits w).map (fun p => T F u p.1 A * T F u p.2 B)).sum := by
+theorem T_mul (w : List ι) (A B : PS k 1 d)
+    : T F u w (A * B) = ((splits w).map (fun p => T F u p.1 A * T F u p.2 B)).sum := by
   induction w with
   | nil => simp [splits, T]
   | cons l w ih =>

@@ -6,4 +6,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.GramUnitMultipli
 
 @[expose] public section
 
-theorem gramExpansion_orthonormal : PI.FglGram.GramUnit := PI.UnitaryGroupMassFormula.GramUnit.gramUnit
+theorem gramExpansion_orthonormal : PI.FglGram.GramUnit :=
+  PI.UnitaryGroupMassFormula.GramUnit.gramUnit

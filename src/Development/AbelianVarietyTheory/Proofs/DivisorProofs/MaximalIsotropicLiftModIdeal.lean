@@ -6,12 +6,22 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem isotropic_summand_lift : ∀ (R : Type) [CommRing R] (I : Ideal R) (D : Type) [AddCommGroup D] [Module R D] [Module.Finite R D] [Module.Projective R D] (φ : D →ₗ[R] D →ₗ[R] R), I ^ 2 = ⊥ → IsUnit (2 : R) → (∀ x y, φ x y = -φ y x) → (∀ l : D →ₗ[R] R, ∃ z, ∀ x, l x - φ x z ∈ I) → ∀ F N : Submodule R D, IsCompl F N → (∀ x ∈ F, ∀ y ∈ F, φ x y ∈ I) → ∃ E N' : Submodule R D, IsCompl E N' ∧ (∀ x ∈ E, ∀ y ∈ E, φ x y = 0) ∧ E ⊔ I • (⊤ : Submodule R D) = F ⊔ I • (⊤ : Submodule R D) := by
+theorem isotropic_summand_lift
+    : ∀ (R : Type) [CommRing R] (I : Ideal R) (D : Type) [AddCommGroup D] [Module R D]
+        [Module.Finite R D] [Module.Projective R D] (φ : D →ₗ[R] D →ₗ[R] R),
+      I ^ 2 = ⊥ → IsUnit (2 : R) → (∀ x y, φ x y = - φ y x)
+        → (∀ l : D →ₗ[R] R, ∃ z, ∀ x, l x - φ x z ∈ I)
+        → ∀ F N : Submodule R D,
+          IsCompl F N → (∀ x ∈ F, ∀ y ∈ F, φ x y ∈ I)
+            → ∃ E N' : Submodule R D,
+              IsCompl E N' ∧ (∀ x ∈ E, ∀ y ∈ E, φ x y = 0)
+                ∧ E ⊔ I • (⊤ : Submodule R D) = F ⊔ I • (⊤ : Submodule R D) := by
   intro R _ I D _ _ _ _ φ hI2 h2 hskew hsurj F N hFN hF
   have hII : ∀ a ∈ I, ∀ b ∈ I, a * b = 0 := by
     intro a ha b hb
     have h : a * b ∈ I ^ 2 := by rw [pow_two]; exact Ideal.mul_mem_mul ha hb
-    rw [hI2] at h; exact (Submodule.mem_bot R).1 h
+    rw [hI2] at h
+    exact (Submodule.mem_bot R).1 h
   have hφI : ∀ a ∈ I • (⊤ : Submodule R D), ∀ y, φ a y ∈ I := by
     intro a ha y
     refine Submodule.smul_induction_on (p := fun a => φ a y ∈ I) ha ?_ ?_
@@ -58,8 +68,7 @@ theorem isotropic_summand_lift : ∀ (R : Type) [CommRing R] (I : Ideal R) (D : 
   let c : R := ↑(h2.unit⁻¹)
   have hc : c * 2 = 1 := h2.val_inv_mul
   let T : D →ₗ[R] D := ∑ i, (-c) • (LinearMap.smulRight (B (e i)) (z i))
-  have hT : ∀ y, T y = ∑ i, (-c) • (B (e i) y • z i) := fun y => by
-    simp [T]
+  have hT : ∀ y, T y = ∑ i, (-c) • (B (e i) y • z i) := fun y => by simp [T]
   have hTr : ∀ y, T y ∈ I • (⊤ : Submodule R D) := fun y => by
     rw [hT]
     exact Submodule.sum_mem _ fun i _ =>
@@ -68,7 +77,8 @@ theorem isotropic_summand_lift : ∀ (R : Type) [CommRing R] (I : Ideal R) (D : 
     intro a ha
     refine Submodule.smul_induction_on (p := fun a => T a = 0) ha ?_ ?_
     · intro r hr m _
-      rw [map_smul]; exact hsmul0 r hr _ (hTr m)
+      rw [map_smul]
+      exact hsmul0 r hr _ (hTr m)
     · intro x w hx hw
       rw [map_add (f := _), hx, hw, add_zero]
   have hTT : ∀ y, T (T y) = 0 := fun y => hTI _ (hTr y)
@@ -77,7 +87,7 @@ theorem isotropic_summand_lift : ∀ (R : Type) [CommRing R] (I : Ideal R) (D : 
     have hBx : B x y = ∑ i, s x i * B (e i) y := by
       conv_lhs => rw [hexp x]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, LinearMap.sum_apply, smul_eq_mul]
+      simp [map_sum, LinearMap.sum_apply, smul_eq_mul]
     have h0 : ∑ i, B (e i) y * (s x i - φ x (z i)) = 0 :=
       Finset.sum_eq_zero fun i _ => hII _ (hBI _ _) _ (hz' i x)
     set_option synthInstance.maxHeartbeats 100000 in
@@ -86,16 +96,19 @@ theorem isotropic_summand_lift : ∀ (R : Type) [CommRing R] (I : Ideal R) (D : 
     rw [Finset.mul_sum]
     have h1 : ∑ i, -c * (s x i * B (e i) y) - ∑ i, -c * (B (e i) y * φ x (z i)) = 0 := by
       rw [← Finset.sum_sub_distrib]
-      have : ∀ i, -c * (s x i * B (e i) y) - -c * (B (e i) y * φ x (z i))
-          = -c * (B (e i) y * (s x i - φ x (z i))) := fun i => by ring
+      have : ∀ i,
+          -c * (s x i * B (e i) y) - -c * (B (e i) y * φ x (z i))
+            = -c * (B (e i) y * (s x i - φ x (z i))) := fun i => by
+        ring
       simp only [this]
       rw [← Finset.mul_sum, h0, mul_zero]
     exact (sub_eq_zero.1 h1).symm
   have hkey : ∀ x ∈ F, ∀ y ∈ F, φ x (T y) = -c * φ x y := by
     intro x hx y hy
     rw [hkey0, hB, hPx x hx, hPx y hy]
-  let u : D ≃ₗ[R] D := LinearEquiv.ofLinear (LinearMap.id + T) (LinearMap.id - T)
-    (LinearMap.ext fun y => by simp [hTT]) (LinearMap.ext fun y => by simp [hTT])
+  let u : D ≃ₗ[R] D :=
+    LinearEquiv.ofLinear (LinearMap.id + T) (LinearMap.id - T)
+      (LinearMap.ext fun y => by simp [hTT]) (LinearMap.ext fun y => by simp [hTT])
   have hu : ∀ x, u x = x + T x := fun x => rfl
   refine ⟨F.map (u : D →ₗ[R] D), N.map (u : D →ₗ[R] D), ?_, ?_, ?_⟩
   · exact (Submodule.orderIsoMapComap u).isCompl hFN
@@ -116,7 +129,8 @@ theorem isotropic_summand_lift : ∀ (R : Type) [CommRing R] (I : Ideal R) (D : 
       exact Submodule.add_mem_sup hx (hTr x)
     · refine sup_le ?_ le_sup_right
       intro x hx
-      refine Submodule.mem_sup.2 ⟨u x, ⟨x, hx, rfl⟩, -T x, Submodule.neg_mem _ (hTr x), ?_⟩
-      rw [hu]; abel
+      refine Submodule.mem_sup.2 ⟨u x, ⟨x, hx, rfl⟩, - T x, Submodule.neg_mem _ (hTr x), ?_⟩
+      rw [hu]
+      abel
 
 end GlobalTheory

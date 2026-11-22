@@ -7,14 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobKerIdeal
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Katz
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Katz
 
 namespace GlobalTheory
 
-theorem mvPowerSeries_algHom_isNilpotent_of_constantCoeff_zero :
-    ∀ (k : Type) [CommRing k] (σ : Type) [Finite σ] (A : Type) [CommRing A] [Algebra k A],
-      ∀ φ : MvPowerSeries σ k →ₐ[k] A, (∀ i, IsNilpotent (φ (X i))) →
-        ∀ a : MvPowerSeries σ k, constantCoeff a = 0 → IsNilpotent (φ a) := by
+theorem mvPowerSeries_algHom_isNilpotent_of_constantCoeff_zero
+    : ∀ (k : Type) [CommRing k] (σ : Type) [Finite σ] (A : Type) [CommRing A] [Algebra k A],
+      ∀ φ : MvPowerSeries σ k →ₐ[k] A,
+        (∀ i, IsNilpotent (φ (X i)))
+          → ∀ a : MvPowerSeries σ k, constantCoeff a = 0 → IsNilpotent (φ a) := by
   intro k _ σ _ A _ _ φ hφ a ha
   classical
   haveI := Fintype.ofFinite σ

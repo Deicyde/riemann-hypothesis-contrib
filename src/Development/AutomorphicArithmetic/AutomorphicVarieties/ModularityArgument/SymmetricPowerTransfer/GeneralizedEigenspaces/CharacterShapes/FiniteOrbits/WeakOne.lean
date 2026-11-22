@@ -8,9 +8,12 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.FiniteOrderValua
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL Formalism.BasicNotions UpperTheory.V.Hi UpperTheory.V.AlgebraTools
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL Formalism.BasicNotions UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
 open UpperTheory.V.W (Plc Lp)
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -23,8 +26,9 @@ private theorem mem_int (w : Plc L) (x : Kw w) : x ∈ 𝒪[Kw w] ↔ Valued.v x
   show Valued.v x ≤ Valued.v 1 ↔ _
   rw [map_one]
 
-private theorem mem_Uc (w : Plc L) (n : ℕ) (y : (Kw w)ˣ)
-    (h : Valued.v ((y : Kw w) - 1) < WithZero.exp (-(n : ℤ))) : y ∈ Uc (Kw w) n := by
+private theorem mem_Uc
+    (w : Plc L) (n : ℕ) (y : (Kw w)ˣ) (h : Valued.v ((y : Kw w) - 1) < WithZero.exp (-(n : ℤ)))
+    : y ∈ Uc (Kw w) n := by
   obtain ⟨π, hπ⟩ := HeightOneSpectrum.valuation_exists_uniformizer L w
   set ϖ : Kw w := algebraMap L (Kw w) π with hϖdef
   have hϖ : Valued.v ϖ = WithZero.exp (-1) := by rw [hϖdef, PI.FinOrdValD.WA.val_alg, hπ]
@@ -45,9 +49,10 @@ private theorem mem_Uc (w : Plc L) (n : ℕ) (y : (Kw w)ˣ)
   have hyO : (y : Kw w) ∈ 𝒪[Kw w] := (mem_int w _).2 hvy.le
   have hyiO : ((y⁻¹ : (Kw w)ˣ) : Kw w) ∈ 𝒪[Kw w] := (mem_int w _).2 hvyi.le
   let u : 𝒪[Kw w]ˣ := ⟨⟨y, hyO⟩, ⟨_, hyiO⟩, Subtype.ext (by simp), Subtype.ext (by simp)⟩
-  have hϖO : ϖ ∈ 𝒪[Kw w] := (mem_int w _).2 (by
-    rw [hϖ, ← WithZero.exp_zero, WithZero.exp_le_exp]
-    omega)
+  have hϖO : ϖ ∈ 𝒪[Kw w] :=
+    (mem_int w _).2 (by
+      rw [hϖ, ← WithZero.exp_zero, WithZero.exp_le_exp]
+      omega)
   let ϖ₀ : 𝒪[Kw w] := ⟨ϖ, hϖO⟩
   have hϖne : ϖ ≠ 0 := by
     intro h0
@@ -65,13 +70,15 @@ private theorem mem_Uc (w : Plc L) (n : ℕ) (y : (Kw w)ˣ)
     rw [map_mul, map_one, ht] at h2
     change Valued.v ϖ * _ = 1 at h2
     rw [hϖ] at h2
-    have h3 : WithZero.exp (-1) * Valued.v (((t⁻¹ : 𝒪[Kw w]ˣ) : 𝒪[Kw w]) : Kw w) ≤
-        WithZero.exp (-1) := mul_le_of_le_one_right' hv
+    have h3
+        : WithZero.exp (-1) * Valued.v (((t⁻¹ : 𝒪[Kw w]ˣ) : 𝒪[Kw w]) : Kw w) ≤ WithZero.exp (-1) :=
+      mul_le_of_le_one_right' hv
     rw [h2, ← WithZero.exp_zero, WithZero.exp_le_exp] at h3
     omega
-  have hz : ((y : Kw w) - 1) / ϖ ^ n ∈ 𝒪[Kw w] := (mem_int w _).2 (by
-    rw [map_div₀, map_pow, hpow]
-    exact div_le_one_of_le₀ h.le zero_le')
+  have hz : ((y : Kw w) - 1) / ϖ ^ n ∈ 𝒪[Kw w] :=
+    (mem_int w _).2 (by
+      rw [map_div₀, map_pow, hpow]
+      exact div_le_one_of_le₀ h.le zero_le')
   refine ⟨u, ?_, Units.ext rfl⟩
   rw [SetLike.mem_coe, MonoidHom.mem_ker, Units.ext_iff]
   change Ideal.Quotient.mk _ (u : 𝒪[Kw w]) = 1
@@ -87,24 +94,28 @@ private theorem mem_Uc (w : Plc L) (n : ℕ) (y : (Kw w)ˣ)
 end UpperTheory.V.Z.Sym.So.WeakMultiplicityOne
 
 open UpperTheory.V.Z.Sym.So.WeakMultiplicityOne in
-theorem UpperTheory.V.Z.Sym.So.weakOne :
-    UpperTheory.V.Z.Sym.So.WeakOne := by
+theorem UpperTheory.V.Z.Sym.So.weakOne : UpperTheory.V.Z.Sym.So.WeakOne := by
   intro L _ _ _ S hS x c
   classical
   set cj := IsCMField.complexConj L with hcj
   have hfr : Module.finrank (maximalRealSubfield L) L = 2 :=
     Algebra.IsQuadraticExtension.finrank_eq_two _ _
-  have hsp : ∀ w ∈ S, ∃ u : Plc L, u ≠ w ∧ u ∉ S ∧ GlobalTheory.Mem.Chr.ConjPl cj.toRingEquiv w u := by
+  have hsp
+      : ∀ w ∈ S, ∃ u : Plc L, u ≠ w ∧ u ∉ S ∧ GlobalTheory.Mem.Chr.ConjPl cj.toRingEquiv w u := by
     intro w hw
     obtain ⟨u, hne, hu⟩ := hS.split w hw
     refine ⟨u, hne, fun huS => hne (hS.inj huS hw hu), ?_⟩
-    rcases (GlobalTheory.Mem.Chr.under_eq_iff_conjPl cj hfr (IsCMField.complexConj_ne_one L) w u).1 hu with h | h
+    rcases (GlobalTheory.Mem.Chr.under_eq_iff_conjPl cj hfr (IsCMField.complexConj_ne_one L) w u).1
+        hu
+      with h | h
     · exact absurd h hne
     · exact h
   choose! ub hub using hsp
   set E : ℕ := ∑ w ∈ S, c w with hE
-  obtain ⟨a, ha, -⟩ := PI.FinOrdValD.WA.weakApprox_units (S ∪ S.image ub)
-    (fun v => if v ∈ S then x v else 1) (fun _ => (E : ℤ))
+  obtain ⟨a, ha, -⟩ :=
+    PI.FinOrdValD.WA.weakApprox_units (S ∪ S.image ub)
+      (fun v => if v ∈ S then x v else 1)
+      (fun _ => (E : ℤ))
   have hcc : cj (cj (a : L)) = a := IsCMField.complexConj_apply_apply L _
   have ha0 : (a : L) ≠ 0 := a.ne_zero
   have hca0 : cj (a : L) ≠ 0 := by
@@ -144,15 +155,20 @@ theorem UpperTheory.V.Z.Sym.So.weakOne :
       intro h0
       rw [h0, map_zero] at hvB
       exact zero_ne_one hvB
-    have hexpr : ((Units.map (algebraMap L (Kw w) : L →* Kw w) (a * ca⁻¹) / x w : (Kw w)ˣ) : Kw w) =
-        (algebraMap L (Kw w) a * (((x w)⁻¹ : (Kw w)ˣ) : Kw w)) * (algebraMap L (Kw w) (cj a))⁻¹ := by
-      simp only [Units.val_div_eq_div_val, Units.coe_map, Units.val_mul, Units.val_inv_eq_inv_val, ca,
-        Units.val_mk0, MonoidHom.coe_coe, map_mul, map_inv₀, div_eq_mul_inv]
+    have hexpr
+        : ((Units.map (algebraMap L (Kw w) : L →* Kw w) (a * ca⁻¹) / x w : (Kw w)ˣ) : Kw w)
+          = (algebraMap L (Kw w) a * (((x w)⁻¹ : (Kw w)ˣ) : Kw w))
+            * (algebraMap L (Kw w) (cj a))⁻¹ := by
+      simp only [Units.val_div_eq_div_val, Units.coe_map, Units.val_mul, Units.val_inv_eq_inv_val,
+        ca, Units.val_mk0, MonoidHom.coe_coe, map_mul, map_inv₀, div_eq_mul_inv]
       ring
     rw [hexpr]
-    have e2 : (algebraMap L (Kw w) a * (((x w)⁻¹ : (Kw w)ˣ) : Kw w)) * (algebraMap L (Kw w) (cj a))⁻¹ - 1
-        = ((algebraMap L (Kw w) a * (((x w)⁻¹ : (Kw w)ˣ) : Kw w) - 1) -
-          (algebraMap L (Kw w) (cj a) - 1)) * (algebraMap L (Kw w) (cj a))⁻¹ := by
+    have e2
+        : (algebraMap L (Kw w) a * (((x w)⁻¹ : (Kw w)ˣ) : Kw w)) * (algebraMap L (Kw w) (cj a))⁻¹
+            - 1
+          = ((algebraMap L (Kw w) a * (((x w)⁻¹ : (Kw w)ˣ) : Kw w) - 1)
+              - (algebraMap L (Kw w) (cj a) - 1))
+            * (algebraMap L (Kw w) (cj a))⁻¹ := by
       field_simp
       ring
     rw [e2, map_mul, map_inv₀, hvB, inv_one, mul_one]

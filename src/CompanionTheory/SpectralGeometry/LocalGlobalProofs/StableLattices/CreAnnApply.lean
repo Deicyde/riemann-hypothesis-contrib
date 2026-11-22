@@ -22,8 +22,8 @@ def hh (i j : NC ε) (A B : Finset (NC ε)) : ℝ :=
   if i ∈ A ∧ j ∈ B ∧ A.erase i = B.erase j then sgR i (A.erase i) * sgR j (B.erase j) else 0
 
 def coef (c d : Fin n) (i j : NC ε) : ℝ :=
-  (if i.1.1 = c ∧ j.1.1 = d ∧ i.1.2 = j.1.2 then 1 else 0) -
-    (if i.1.2 = d ∧ j.1.2 = c ∧ i.1.1 = j.1.1 then 1 else 0)
+  (if i.1.1 = c ∧ j.1.1 = d ∧ i.1.2 = j.1.2 then 1 else 0)
+    - (if i.1.2 = d ∧ j.1.2 = c ∧ i.1.1 = j.1.1 then 1 else 0)
 
 def gg (c d : Fin n) (A B : Finset (NC ε)) : ℝ := ∑ i : NC ε, ∑ j : NC ε, coef c d i j * hh i j A B
 
@@ -168,8 +168,14 @@ lemma gg_diag (c : Fin n) (A B : Finset (NC ε)) : gg c c A B = if A = B then wt
 
 theorem gFacts : GFacts := by
   intro n ε
-  refine ⟨gg, fun V _ _ c d x A => Gop_apply c d x A, fun c d A B => ?_, fun c d A B h => ?_,
-    gg_diag, fun c d A hdc => ?_⟩
+  refine ⟨
+    gg,
+    fun V _ _ c d x A => Gop_apply c d x A,
+    fun c d A B => ?_,
+    fun c d A B h => ?_,
+    gg_diag,
+    fun c d A hdc => ?_
+  ⟩
   · unfold gg
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_

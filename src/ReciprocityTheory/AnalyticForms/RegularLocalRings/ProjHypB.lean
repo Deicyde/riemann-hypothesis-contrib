@@ -12,11 +12,11 @@ noncomputable section
 
 variable {K : Type} [Fintype K] [Nonempty K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem exists_relevant_minimalPrime_of_chart {P D : Ideal (MvPolynomial (Σ k, ι k) ℂ)}
-    (hP : IsMultiHomogIdeal P) (hD : IsMultiHomogIdeal D) (p : (k : K) → ι k)
-    (M : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (hM : M ∈ (chartIdeal P p).minimalPrimes)
-    (hDM : D ≤ M) :
-    ∃ q ∈ P.minimalPrimes, IsRelevant q ∧ D ≤ q := by
+theorem exists_relevant_minimalPrime_of_chart
+    {P D : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (hD : IsMultiHomogIdeal D)
+    (p : (k : K) → ι k) (M : Ideal (MvPolynomial (Σ k, ι k) ℂ))
+    (hM : M ∈ (chartIdeal P p).minimalPrimes) (hDM : D ≤ M)
+    : ∃ q ∈ P.minimalPrimes, IsRelevant q ∧ D ≤ q := by
   classical
   set R := MvPolynomial (Σ k, ι k) ℂ
   have hMp : M.IsPrime := hM.1.1
@@ -24,8 +24,7 @@ theorem exists_relevant_minimalPrime_of_chart {P D : Ideal (MvPolynomial (Σ k, 
   have hX1 : ∀ k, (X ⟨k, p k⟩ - 1 : R) ∈ M := fun k =>
     hcM (Ideal.mem_sup_right (Ideal.subset_span ⟨k, rfl⟩))
   have hXM : ∀ k, (X ⟨k, p k⟩ : R) ∉ M := fun k h =>
-    hMp.ne_top ((Ideal.eq_top_iff_one _).mpr (by
-      have := M.sub_mem h (hX1 k); simpa using this))
+    hMp.ne_top ((Ideal.eq_top_iff_one _).mpr (by have := M.sub_mem h (hX1 k); simpa using this))
   obtain ⟨q, hq, hqM⟩ := Ideal.exists_minimalPrimes_le (le_sup_left.trans hcM : P ≤ M)
   have hqp : q.IsPrime := hq.1.1
   have hPq : P ≤ q := hq.1.2
@@ -38,14 +37,15 @@ theorem exists_relevant_minimalPrime_of_chart {P D : Ideal (MvPolynomial (Σ k, 
     (Ideal.disjoint_powers_iff_notMem_of_isPrime s).mpr hsq
   let A := Localization.Away s
   have hu : ∀ k, IsUnit (algebraMap R A (X ⟨k, p k⟩)) := fun k =>
-    isUnit_of_dvd_unit (map_dvd (algebraMap R A)
-      (Finset.dvd_prod_of_mem (fun k => (X ⟨k, p k⟩ : R)) (Finset.mem_univ k)))
+    isUnit_of_dvd_unit
+      (map_dvd (algebraMap R A)
+        (Finset.dvd_prod_of_mem (fun k => (X ⟨k, p k⟩ : R)) (Finset.mem_univ k)))
       (IsLocalization.Away.algebraMap_isUnit (S := A) s)
   let u : K → A := fun k => ((hu k).unit⁻¹ : Aˣ)
   have hu1 : ∀ k, u k * algebraMap R A (X ⟨k, p k⟩) = 1 := fun k => (hu k).val_inv_mul
   let σ : R →+* A := eval₂Hom (algebraMap ℂ A) (fun r => u r.1 * algebraMap R A (X r))
-  have hσ : ∀ (f : R) (a : K → ℕ), IsMultiHomog f a →
-      σ f = (∏ k, u k ^ a k) * algebraMap R A f := by
+  have hσ
+      : ∀ (f : R) (a : K → ℕ), IsMultiHomog f a → σ f = (∏ k, u k ^ a k) * algebraMap R A f := by
     intro f a hf
     show eval₂ (algebraMap ℂ A) (fun r => u r.1 * algebraMap R A (X r)) f = _
     rw [eval₂_smul_of_isMultiHomog' (algebraMap ℂ A) hf u (fun r => algebraMap R A (X r))]
@@ -53,7 +53,8 @@ theorem exists_relevant_minimalPrime_of_chart {P D : Ideal (MvPolynomial (Σ k, 
     conv_rhs => rw [← eval₂_eta f, eval₂_comp_left]
     congr 1
   let Q : Ideal A := Ideal.map (algebraMap R A) q
-  have hQp : Q.IsPrime := IsLocalization.isPrime_of_isPrime_disjoint (Submonoid.powers s) A q hqp hdis
+  have hQp : Q.IsPrime :=
+    IsLocalization.isPrime_of_isPrime_disjoint (Submonoid.powers s) A q hqp hdis
   have hQq : Q.comap (algebraMap R A) = q :=
     IsLocalization.under_map_of_isPrime_disjoint (Submonoid.powers s) A hqp hdis
   let M' : Ideal R := Q.comap σ
@@ -61,8 +62,8 @@ theorem exists_relevant_minimalPrime_of_chart {P D : Ideal (MvPolynomial (Σ k, 
 
   have hs1 : IsUnit (Ideal.Quotient.mk M s) := by
     have : ∀ k, Ideal.Quotient.mk M (X ⟨k, p k⟩) = 1 := fun k => by
-      rw [← sub_eq_zero, ← map_one (Ideal.Quotient.mk M), ← map_sub,
-        Ideal.Quotient.eq_zero_iff_mem]; exact hX1 k
+      rw [← sub_eq_zero, ← map_one (Ideal.Quotient.mk M), ← map_sub, Ideal.Quotient.eq_zero_iff_mem]
+      exact hX1 k
     simp [s, map_prod, this]
   let φ : A →+* R ⧸ M := IsLocalization.Away.lift s hs1
   have hφa : ∀ x : R, φ (algebraMap R A x) = Ideal.Quotient.mk M x := fun x =>
@@ -71,13 +72,15 @@ theorem exists_relevant_minimalPrime_of_chart {P D : Ideal (MvPolynomial (Σ k, 
     have h := congrArg φ (hu1 k)
     rw [map_mul, map_one, hφa] at h
     have hx : Ideal.Quotient.mk M (X ⟨k, p k⟩) = 1 := by
-      rw [← sub_eq_zero, ← map_one (Ideal.Quotient.mk M), ← map_sub,
-        Ideal.Quotient.eq_zero_iff_mem]; exact hX1 k
-    rw [hx, mul_one] at h; exact h
+      rw [← sub_eq_zero, ← map_one (Ideal.Quotient.mk M), ← map_sub, Ideal.Quotient.eq_zero_iff_mem]
+      exact hX1 k
+    rw [hx, mul_one] at h
+    exact h
   have hφσ : φ.comp σ = Ideal.Quotient.mk M := by
     apply MvPolynomial.ringHom_ext
     · intro c
-      simp [σ, IsScalarTower.algebraMap_apply ℂ R A, hφa]; rfl
+      simp [σ, IsScalarTower.algebraMap_apply ℂ R A, hφa]
+      rfl
     · intro r
       simp [σ, hφa, hφu]
   have hM'M : M' ≤ M := by
@@ -107,7 +110,8 @@ theorem exists_relevant_minimalPrime_of_chart {P D : Ideal (MvPolynomial (Σ k, 
       have : σ (X ⟨k, p k⟩ - 1) = 0 := by
         have hσX : σ (X ⟨k, p k⟩) = u k * algebraMap R A (X ⟨k, p k⟩) := eval₂_X _ _ _
         rw [map_sub, map_one, hσX, hu1, sub_self]
-      rw [this]; exact Q.zero_mem
+      rw [this]
+      exact Q.zero_mem
   have hMM' : M ≤ M' := hM.2 ⟨inferInstance, hcM'⟩ hM'M
   refine ⟨q, hq, fun k => ⟨p k, fun h => hXM k (hqM h)⟩, ?_⟩
   obtain ⟨T, hT, hDT⟩ := hD
@@ -121,7 +125,8 @@ theorem exists_relevant_minimalPrime_of_chart {P D : Ideal (MvPolynomial (Σ k, 
   have : algebraMap R A f ∈ Q := by
     have := Q.mul_mem_left (hunit.unit⁻¹ : Aˣ).1 hfM'
     rwa [← mul_assoc, hunit.val_inv_mul, one_mul] at this
-  rw [← hQq]; exact this
+  rw [← hQq]
+  exact this
 
 end
 

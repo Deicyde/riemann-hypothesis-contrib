@@ -11,7 +11,15 @@ noncomputable section
 
 namespace GlobalTheory.JR.Hyp
 
-theorem pt_linear : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ), IsStdChar ψ → ∀ (x : A.K) (ν : Measure A.K), ν.IsAddHaarMeasure → ∀ (c : ℂ) (Φ Φ' : A.K × A.K → ℂ), IsTest Φ → IsTest Φ' → Hyp.pt A ν ψ x (c • Φ + Φ') = c • Hyp.pt A ν ψ x Φ + Hyp.pt A ν ψ x Φ' := by
+theorem pt_linear
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ),
+      IsStdChar ψ
+        → ∀ (x : A.K) (ν : Measure A.K),
+          ν.IsAddHaarMeasure
+            → ∀ (c : ℂ) (Φ Φ' : A.K × A.K → ℂ),
+              IsTest Φ → IsTest Φ'
+                → Hyp.pt A ν ψ x (c • Φ + Φ') = c • Hyp.pt A ν ψ x Φ + Hyp.pt A ν ψ x Φ' := by
   intro F E _ _ _ _ _ A ψ hψ x ν hν c Φ Φ' hΦ hΦ'
   haveI := hν
   haveI : T2Space A.K := T2Space.of_injective_continuous (Module.finBasis F A.K).equivFun.injective
@@ -25,11 +33,13 @@ theorem pt_linear : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNo
       have hn : ‖s - t‖ ≤ 1 := by simpa [dist_eq_norm] using hs
       rw [hst, AddChar.map_add_eq_mul, hψ.1 (s - t) hn, mul_one]
     exact continuousAt_const.congr hev.symm
-  have htr : Continuous (fun t : A.K => Algebra.trace F A.K t) := IsModuleTopology.continuous_of_linearMap _
+  have htr : Continuous (fun t : A.K => Algebra.trace F A.K t) :=
+    IsModuleTopology.continuous_of_linearMap _
   have hk : ∀ u, Continuous (fun b => kx A ψ x b u) := fun u => by
     unfold kx Et.psiK
     exact hψc.comp (htr.comp ((continuous_const.mul continuous_id).mul continuous_const))
-  have hint : ∀ Ψ : A.K × A.K → ℂ, IsTest Ψ → ∀ a u, Integrable (fun b => Ψ (a, b) * kx A ψ x b u) ν := by
+  have hint
+      : ∀ Ψ : A.K × A.K → ℂ, IsTest Ψ → ∀ a u, Integrable (fun b => Ψ (a, b) * kx A ψ x b u) ν := by
     intro Ψ hΨ a u
     have hc : Continuous (fun b => Ψ (a, b)) := hΨ.1.continuous.comp (Continuous.prodMk_right a)
     have hs : HasCompactSupport (fun b => Ψ (a, b)) := by

@@ -8,11 +8,11 @@ open Matrix Topology Filter
 
 namespace GlobalTheory.CompanionTheory.HermitianCommuting
 
-theorem exists_maximal_commuting_hermitian_subspace {n : ℕ}
-    (𝔤 : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) :
-    ∃ 𝔞 : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ), 𝔞 ≤ 𝔤 ∧ (∀ A ∈ 𝔞, Aᴴ = A) ∧
-      (∀ A ∈ 𝔞, ∀ B ∈ 𝔞, A * B = B * A) ∧
-      ∀ Y ∈ 𝔤, Yᴴ = Y → (∀ A ∈ 𝔞, Y * A = A * Y) → Y ∈ 𝔞 := by
+theorem exists_maximal_commuting_hermitian_subspace
+    {n : ℕ} (𝔤 : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
+    : ∃ 𝔞 : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ),
+      𝔞 ≤ 𝔤 ∧ (∀ A ∈ 𝔞, Aᴴ = A) ∧ (∀ A ∈ 𝔞, ∀ B ∈ 𝔞, A * B = B * A)
+        ∧ ∀ Y ∈ 𝔤, Yᴴ = Y → (∀ A ∈ 𝔞, Y * A = A * Y) → Y ∈ 𝔞 := by
   let S : Set (Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) :=
     {a | a ≤ 𝔤 ∧ (∀ A ∈ a, Aᴴ = A) ∧ ∀ A ∈ a, ∀ B ∈ a, A * B = B * A}
   have hS : S.Nonempty := by

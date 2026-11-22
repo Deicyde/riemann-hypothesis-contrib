@@ -15,33 +15,47 @@ noncomputable section
 
 namespace GoodPointBranch
 
-theorem exists_branch {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} (M : IndefiniteRowSideFullHecke.ComplexSets.NormalModel J)
+theorem exists_branch
+    {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)}
+    (M : IndefiniteRowSideFullHecke.ComplexSets.NormalModel J)
     {u q : Fin n → ℂ} (hqu : linEval u q = 0)
     {A : (Fin n → ℂ) →L[ℂ] (Fin d → ℂ)} {O : Set (Fin d → ℂ)} {V : Set (Fin n → ℂ)}
     {g : (Fin d → ℂ) → Fin n → ℂ} (hV : IsOpen V) (hqV : q ∈ V) (hg : AnalyticOnNhd ℂ g O)
     (hAg : ∀ y ∈ O, A (g y) = y) (hS : zeroSet J ∩ {x | linEval u x = 0} ∩ V = g '' O)
     {N₀ : Set (Fin n → ℂ)} (hN₀ : N₀ ∈ 𝓝 q)
-    (hdouble : ∀ w ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal, ∀ w' ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal,
-      IndefiniteRowSideFullHecke.ComplexSets.firstCoords w = IndefiniteRowSideFullHecke.ComplexSets.firstCoords w' →
-        IndefiniteRowSideFullHecke.ComplexSets.firstCoords w ∈ N₀ → w ≠ w' → linEval u (IndefiniteRowSideFullHecke.ComplexSets.firstCoords w) = 0)
+    (hdouble : ∀ w ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal,
+      ∀ w' ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal,
+        IndefiniteRowSideFullHecke.ComplexSets.firstCoords w
+            = IndefiniteRowSideFullHecke.ComplexSets.firstCoords w'
+          → IndefiniteRowSideFullHecke.ComplexSets.firstCoords w ∈ N₀ → w ≠ w'
+          → linEval u (IndefiniteRowSideFullHecke.ComplexSets.firstCoords w) = 0)
     {w : Fin n ⊕ Fin M.m → ℂ} (hwq : IndefiniteRowSideFullHecke.ComplexSets.firstCoords w = q)
-    {r : ℝ} {φ : (Fin (d + 1) → ℂ) → Fin n ⊕ Fin M.m → ℂ} {k : ℕ} (hr : 0 < r)
-    (hφd : DifferentiableOn ℂ φ (ball 0 r)) (hφi : InjOn φ (ball 0 r)) (hφ0 : φ 0 = w)
+    {r : ℝ} {φ : (Fin (d + 1) → ℂ) → Fin n ⊕ Fin M.m → ℂ} {k : ℕ}
+    (hr : 0 < r) (hφd : DifferentiableOn ℂ φ (ball 0 r)) (hφi : InjOn φ (ball 0 r)) (hφ0 : φ 0 = w)
     (hφZ : MapsTo φ (ball 0 r) (IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal))
-    (hφU : ∀ s : ℝ, 0 < s → ∃ U ∈ 𝓝 w, IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∩ U ⊆ φ '' ball 0 s)
-    (hvan : VanishesToOrder (fun t => linEval u (IndefiniteRowSideFullHecke.ComplexSets.firstCoords (φ t))) r k)
-    (hinjD : ∀ v : Fin (d + 1) → ℂ, v 0 = 0 →
-      fderiv ℂ (fun t => IndefiniteRowSideFullHecke.ComplexSets.firstCoords (φ t)) 0 v = 0 → v = 0)
-    {G : Set (Fin n ⊕ Fin M.m → ℂ)} (hG : G ∈ 𝓝 w) :
-    ∃ γ : VarBranch J (d + 1) q,
+    (hφU : ∀ s : ℝ,
+      0 < s
+        → ∃ U ∈ 𝓝 w, IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∩ U ⊆ φ '' ball 0 s)
+    (hvan : VanishesToOrder
+      (fun t => linEval u (IndefiniteRowSideFullHecke.ComplexSets.firstCoords (φ t)))
+      r k)
+    (hinjD : ∀ v : Fin (d + 1) → ℂ,
+      v 0 = 0 → fderiv ℂ (fun t => IndefiniteRowSideFullHecke.ComplexSets.firstCoords (φ t)) 0 v = 0
+        → v = 0)
+    {G : Set (Fin n ⊕ Fin M.m → ℂ)} (hG : G ∈ 𝓝 w)
+    : ∃ γ : VarBranch J (d + 1) q,
       (∃ U ∈ 𝓝 w, ∀ w' ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∩ U,
-        IndefiniteRowSideFullHecke.ComplexSets.firstCoords w' ∈ γ.image) ∧
-      (∀ x ∈ γ.image, x ∈ N₀ ∧
-        ∃ w' ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∩ G, IndefiniteRowSideFullHecke.ComplexSets.firstCoords w' = x) ∧
-      (∃ N ∈ 𝓝 q, ∀ x ∈ zeroSet J ∩ N, linEval u x = 0 → x ∈ γ.slice) ∧
-      VanishesToOrder (fun t => linEval u (γ.toFun t)) γ.radius k ∧
-      Function.Bijective (fderiv ℂ (fun τ => vecCons (τ 0)
-        (LinearMap.toMatrix' (A : (Fin n → ℂ) →ₗ[ℂ] (Fin d → ℂ)) *ᵥ γ.toFun τ)) (0 : Fin (d + 1) → ℂ)) := by
+          IndefiniteRowSideFullHecke.ComplexSets.firstCoords w' ∈ γ.image)
+        ∧ (∀ x ∈ γ.image,
+          x ∈ N₀
+            ∧ ∃ w' ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∩ G,
+              IndefiniteRowSideFullHecke.ComplexSets.firstCoords w' = x)
+        ∧ (∃ N ∈ 𝓝 q, ∀ x ∈ zeroSet J ∩ N, linEval u x = 0 → x ∈ γ.slice)
+        ∧ VanishesToOrder (fun t => linEval u (γ.toFun t)) γ.radius k
+        ∧ Function.Bijective (fderiv ℂ
+          (fun τ =>
+            vecCons (τ 0) (LinearMap.toMatrix' (A : (Fin n → ℂ) →ₗ[ℂ] (Fin d → ℂ)) *ᵥ γ.toFun τ))
+          (0 : Fin (d + 1) → ℂ)) := by
   set ψ : (Fin (d + 1) → ℂ) → Fin n → ℂ := fun t => IndefiniteRowSideFullHecke.ComplexSets.firstCoords (φ t) with hψdef
   have hψd : DifferentiableOn ℂ ψ (ball 0 r) :=
     differentiableOn_pi.2 fun i => differentiableOn_pi.1 hφd (Sum.inl i)
@@ -62,7 +76,8 @@ theorem exists_branch {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} (M : In
     exact or_iff_left (hH0 t ht)
   have hψZ : ∀ t ∈ ball (0 : Fin (d + 1) → ℂ) r, ψ t ∈ zeroSet J := fun t ht =>
     NormalModelFibre.firstCoords_mem_zeroSet M (hφZ ht)
-  have hslice : ∀ᶠ v in 𝓝 (0 : Fin d → ℂ), ψ (consZero d v) ∈ zeroSet J ∩ {x | linEval u x = 0} := by
+  have hslice
+      : ∀ᶠ v in 𝓝 (0 : Fin d → ℂ), ψ (consZero d v) ∈ zeroSet J ∩ {x | linEval u x = 0} := by
     filter_upwards [ball_mem_nhds (0 : Fin d → ℂ) hr] with v hv
     have hv' := consZero_mem_ball hv
     exact ⟨hψZ _ hv', (hzero _ hv').2 (consZero_apply_zero v)⟩
@@ -78,24 +93,32 @@ theorem exists_branch {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} (M : In
   have hs1 : ball (0 : Fin (d + 1) → ℂ) (min ε₁ ε₂) ⊆ ball 0 r ∩ φ ⁻¹' G ∩ ψ ⁻¹' N₀ :=
     (ball_subset_ball (min_le_left _ _)).trans hε₁E
   have hsr : ball (0 : Fin (d + 1) → ℂ) (min ε₁ ε₂) ⊆ ball 0 r := fun t ht => (hs1 ht).1.1
-  have hs2 : ball (0 : Fin d → ℂ) (min ε₁ ε₂) ⊆ W := (ball_subset_ball (min_le_right _ _)).trans hε₂W
+  have hs2 : ball (0 : Fin d → ℂ) (min ε₁ ε₂) ⊆ W :=
+    (ball_subset_ball (min_le_right _ _)).trans hε₂W
   have hinj : InjOn ψ (ball 0 (min ε₁ ε₂)) := by
     intro t ht t' ht' htt
     by_cases hφe : φ t = φ t'
     · exact hφi (hsr ht) (hsr ht') hφe
-    · have hu : linEval u (ψ t) = 0 :=
-        hdouble _ (hφZ (hsr ht)) _ (hφZ (hsr ht')) htt (hs1 ht).2 hφe
+    · have hu : linEval u (ψ t) = 0 := hdouble _ (hφZ (hsr ht)) _ (hφZ (hsr ht')) htt (hs1 ht).2 hφe
       have ht0 : t 0 = 0 := (hzero t (hsr ht)).1 hu
       have ht'0 : t' 0 = 0 := (hzero t' (hsr ht')).1 (by rw [← htt]; exact hu)
-      have htail : Fin.tail t = Fin.tail t' := hWinj (hs2 (tail_mem_ball ht)) (hs2 (tail_mem_ball ht'))
-        (by show ψ (consZero d (Fin.tail t)) = ψ (consZero d (Fin.tail t'))
-            rw [consZero_tail t ht0, consZero_tail t' ht'0]
-            exact htt)
-      calc t = consZero d (Fin.tail t) := (consZero_tail t ht0).symm
+      have htail : Fin.tail t = Fin.tail t' :=
+        hWinj (hs2 (tail_mem_ball ht)) (hs2 (tail_mem_ball ht')) (by
+          show ψ (consZero d (Fin.tail t)) = ψ (consZero d (Fin.tail t'))
+          rw [consZero_tail t ht0, consZero_tail t' ht'0]
+          exact htt)
+      calc
+        t = consZero d (Fin.tail t) := (consZero_tail t ht0).symm
         _ = t' := by rw [htail, consZero_tail t' ht'0]
-  let γ : VarBranch J (d + 1) q :=
-    { radius := min ε₁ ε₂, radius_pos := hs, toFun := ψ, differentiableOn := hψd.mono hsr, injOn := hinj,
-      map_zero := hψ0, mapsTo := fun t ht => hψZ t (hsr ht) }
+  let γ : VarBranch J (d + 1) q := {
+    radius := min ε₁ ε₂
+    radius_pos := hs
+    toFun := ψ
+    differentiableOn := hψd.mono hsr
+    injOn := hinj
+    map_zero := hψ0
+    mapsTo := fun t ht => hψZ t (hsr ht)
+  }
   refine ⟨γ, ?_, ?_, ?_, ?_, ?_⟩
   · obtain ⟨U, hU, hUs⟩ := hφU (min ε₁ ε₂) hs
     refine ⟨U, hU, fun w' hw' => ?_⟩
@@ -110,16 +133,19 @@ theorem exists_branch {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} (M : In
   · exact ⟨H, hHd.mono hsr, fun t ht => hH0 t (hsr ht), fun t ht => hF t (hsr ht)⟩
   · have hπ : ∀ x : Fin n → ℂ, LinearMap.toMatrix' (A : (Fin n → ℂ) →ₗ[ℂ] (Fin d → ℂ)) *ᵥ x = A x :=
       fun x => LinearMap.toMatrix'_mulVec _ x
-    have h1 : HasFDerivAt (fun τ : Fin (d + 1) → ℂ => (τ 0, A (ψ τ)))
+    have h1 : HasFDerivAt
+        (fun τ : Fin (d + 1) → ℂ => (τ 0, A (ψ τ)))
         ((ContinuousLinearMap.proj 0).prod (A.comp (fderiv ℂ ψ 0))) 0 :=
       (hasFDerivAt_apply 0 0).prodMk (A.hasFDerivAt.comp 0 hψ.hasFDerivAt)
-    have h2 : HasFDerivAt (fun τ => vecCons (τ 0)
-        (LinearMap.toMatrix' (A : (Fin n → ℂ) →ₗ[ℂ] (Fin d → ℂ)) *ᵥ γ.toFun τ))
+    have h2 : HasFDerivAt
+        (fun τ =>
+          vecCons (τ 0) (LinearMap.toMatrix' (A : (Fin n → ℂ) →ₗ[ℂ] (Fin d → ℂ)) *ᵥ γ.toFun τ))
         ((consCLM d).comp ((ContinuousLinearMap.proj 0).prod (A.comp (fderiv ℂ ψ 0)))) 0 := by
       have h3 := (consCLM d).hasFDerivAt.comp 0 h1
-      have hfun : (fun τ => vecCons (τ 0)
-          (LinearMap.toMatrix' (A : (Fin n → ℂ) →ₗ[ℂ] (Fin d → ℂ)) *ᵥ γ.toFun τ)) =
-          ⇑(consCLM d) ∘ fun τ : Fin (d + 1) → ℂ => (τ 0, A (ψ τ)) := by
+      have hfun
+          : (fun τ =>
+              vecCons (τ 0) (LinearMap.toMatrix' (A : (Fin n → ℂ) →ₗ[ℂ] (Fin d → ℂ)) *ᵥ γ.toFun τ))
+            = ⇑(consCLM d) ∘ fun τ : Fin (d + 1) → ℂ => (τ 0, A (ψ τ)) := by
         funext τ
         rw [Function.comp_apply, consCLM_apply, hπ]
       rw [hfun]
@@ -137,8 +163,11 @@ theorem exists_branch {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} (M : In
         funext j
         simpa using congrFun hv' j.succ
       exact ha v h0 hA
-    exact ⟨hLinj, LinearMap.injective_iff_surjective
-      (f := (L : (Fin (d + 1) → ℂ) →ₗ[ℂ] (Fin (d + 1) → ℂ))).1 hLinj⟩
+    exact ⟨
+      hLinj,
+      LinearMap.injective_iff_surjective (f := (L : (Fin (d + 1) → ℂ) →ₗ[ℂ] (Fin (d + 1) → ℂ))).1
+        hLinj
+    ⟩
 
 end GoodPointBranch
 

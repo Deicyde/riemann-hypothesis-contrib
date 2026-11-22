@@ -18,8 +18,10 @@ public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsAmpleL
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSAmp
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSAmp
 
 set_option autoImplicit false
 
@@ -27,13 +29,19 @@ noncomputable section
 
 namespace GlobalTheory.HSAmp.FBasis
 
-theorem exists_ne_zero_mem_H (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ)
-    (hX : IsArithVar p D) (P : Pair p) (hL : IsAmpleLB P.L.B) (e : ℕ) (he : 0 < e) (a b : ℤ) :
-    ∃ (c : ℕ) (γ : X.functionField), γ ≠ 0 ∧ γ ∈ P.H ((e : ℤ) * c + a) b := by
+theorem exists_ne_zero_mem_H
+    (k : Type) [CommRing k]
+    (X : Scheme.{0}) [IsIntegral X]
+    (p : X ⟶ Sp k) (D : ℕ) (hX : IsArithVar p D)
+    (P : Pair p) (hL : IsAmpleLB P.L.B)
+    (e : ℕ) (he : 0 < e)
+    (a b : ℤ)
+    : ∃ (c : ℕ) (γ : X.functionField), γ ≠ 0 ∧ γ ∈ P.H ((e : ℤ) * c + a) b := by
   obtain ⟨M, hM⟩ := Pair.exists_rep k X p P a b
   have hLe : IsAmpleLB (P.L.pow e).B := (isAmpleLB_pow_iff hL.isLB he).2 hL
-  obtain ⟨c, -, u, hu⟩ := exists_sec_finite_subset_nonzeroLocus k X p D hX M (P.L.pow e) hLe {genericPoint X}
-    (Set.finite_singleton _)
+  obtain ⟨c, -, u, hu⟩ :=
+    exists_sec_finite_subset_nonzeroLocus k X p D hX M (P.L.pow e) hLe {genericPoint X}
+      (Set.finite_singleton _)
   have h1 := (Pair.rep_base k X p P).1
   have h2 := Pair.rep_pow k X p P 1 0 P.L e h1
   have h3 := Pair.rep_pow k X p P _ _ _ c h2
@@ -60,15 +68,18 @@ theorem exists_ne_zero_mem_H (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegra
     exact (hw.map (algebraMap _ X.functionField)).ne_zero h
   exact hz _ hU
 
-theorem exists_linearIndependent_of_frac {K : Type} [Field K] (F : Subfield K) [FiniteDimensional F K] (R : Subring K)
-    (hR : ∀ w : K, ∃ a ∈ R, ∃ b ∈ R, b ≠ 0 ∧ w = a / b) :
-    ∃ β : Fin (Module.finrank F K) → K, (∀ i, β i ∈ R) ∧ LinearIndependent F β := by
+theorem exists_linearIndependent_of_frac
+    {K : Type} [Field K]
+    (F : Subfield K) [FiniteDimensional F K]
+    (R : Subring K) (hR : ∀ w : K, ∃ a ∈ R, ∃ b ∈ R, b ≠ 0 ∧ w = a / b)
+    : ∃ β : Fin (Module.finrank F K) → K, (∀ i, β i ∈ R) ∧ LinearIndependent F β := by
   have hS : Algebra.adjoin F (R : Set K) = ⊤ := by
     refine eq_top_iff.2 fun w _ => ?_
     obtain ⟨a, ha, b, hb, hb0, rfl⟩ := hR w
     have hbS : b ∈ Algebra.adjoin F (R : Set K) := Algebra.subset_adjoin hb
     have hinv : b⁻¹ ∈ Algebra.adjoin F (R : Set K) :=
-      (Algebra.adjoin F (R : Set K)).inv_mem_of_algebraic (x := ⟨b, hbS⟩) (Algebra.IsAlgebraic.isAlgebraic (b : K))
+      (Algebra.adjoin F (R : Set K)).inv_mem_of_algebraic (x := ⟨b, hbS⟩)
+        (Algebra.IsAlgebraic.isAlgebraic (b : K))
     rw [div_eq_mul_inv]
     exact mul_mem (Algebra.subset_adjoin ha) hinv
   have hspan : Submodule.span F (R : Set K) = ⊤ := by
@@ -89,19 +100,28 @@ end GlobalTheory.HSAmp.FBasis
 
 namespace GlobalTheory.HSAmp
 
-theorem exists_linearIndependent_mem_H : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k)
-    (D : ℕ), IsArithVar p D → ∀ (P : Pair p), IsAmpleLB P.L.B → ∀ (e : ℕ) (x : Fin (D + 1) → X.functionField),
-    Gens P D e x → ∀ a b : ℤ, ∃ (c : ℕ) (g : Fin (Module.finrank (ratF x) X.functionField) → X.functionField),
-    (∀ i, g i ∈ P.H (e * c + a) b) ∧ LinearIndependent (ratF x) g := by
+theorem exists_linearIndependent_mem_H
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+      IsArithVar p D
+        → ∀ (P : Pair p),
+          IsAmpleLB P.L.B
+            → ∀ (e : ℕ) (x : Fin (D + 1) → X.functionField),
+              Gens P D e x
+                → ∀ a b : ℤ,
+                  ∃ (c : ℕ) (g : Fin (Module.finrank (ratF x) X.functionField) → X.functionField),
+                    (∀ i, g i ∈ P.H (e * c + a) b) ∧ LinearIndependent (ratF x) g := by
   intro k _ X _ p D hX P hL e x hx a b
-  obtain ⟨hne, -, hfin⟩ := GlobalTheory.T.sectionQuotients_transcendenceBasis_basepointFree k X p D hX P hL e x hx
+  obtain ⟨hne, -, hfin⟩ :=
+    GlobalTheory.T.sectionQuotients_transcendenceBasis_basepointFree k X p D hX P hL e x hx
   obtain ⟨U, hU, hUe, -, hreg, -, hfrac, -⟩ :=
-    GlobalTheory.T.nonvanishingLocus_ample_section_isAffine_model k X p D hX P hL e (x 0) hx.pos (hx.mem 0) (hne 0)
+    GlobalTheory.T.nonvanishingLocus_ample_section_isAffine_model k X p D hX P hL e (x 0) hx.pos
+      (hx.mem 0) (hne 0)
   obtain ⟨β, hβR, hβ⟩ := FBasis.exists_linearIndependent_of_frac (ratF x) (fnOf U hU).range hfrac
   obtain ⟨c₁, γ, hγ0, hγ⟩ := FBasis.exists_ne_zero_mem_H k X p D hX P hL e hx.pos a b
   have hext : ∀ i, ∀ᶠ c : ℕ in atTop, x 0 ^ c * β i ∈ P.H ((e : ℤ) * c + 0) 0 := by
     intro i
-    refine GlobalTheory.T.eventually_pow_mul_mem_hermPairSections k X p D hX P e 0 0 (x 0) (β i) (hx.mem 0) (hne 0) fun z hz i' j _ _ => ?_
+    refine GlobalTheory.T.eventually_pow_mul_mem_hermPairSections k X p D hX P e 0 0 (x 0) (β i)
+      (hx.mem 0) (hne 0) fun z hz i' j _ _ => ?_
     have e0 : P.loc 0 0 (β i) i' j = β i := by simp [Pair.loc]
     rw [e0]
     refine (hreg (β i)).2 (hβR i) z ?_

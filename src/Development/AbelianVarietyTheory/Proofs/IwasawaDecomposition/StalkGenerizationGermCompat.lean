@@ -22,18 +22,21 @@ theorem flat_fromSpecStalk (X : Scheme.{0}) (x : X) : Flat (X.fromSpecStalk x) :
   have h₃ : Flat (IsAffineOpen.fromSpec hU) := inferInstance
   exact MorphismProperty.comp_mem @Flat _ _ this h₃
 
-theorem isIso_stalkMap_fromSpecStalk (X : Scheme.{0}) (x : X) (y : Spec (X.presheaf.stalk x)) :
-    IsIso ((X.fromSpecStalk x).stalkMap y) := by
+theorem isIso_stalkMap_fromSpecStalk (X : Scheme.{0}) (x : X) (y : Spec (X.presheaf.stalk x))
+    : IsIso ((X.fromSpecStalk x).stalkMap y) := by
   have := flat_fromSpecStalk X x
   have hs : SurjectiveOnStalks (X.fromSpecStalk x) := inferInstance
-  refine (ConcreteCategory.isIso_iff_bijective _).mpr ⟨?_, (X.fromSpecStalk x).stalkMap_surjective y⟩
+  refine (ConcreteCategory.isIso_iff_bijective _).mpr
+    ⟨?_, (X.fromSpecStalk x).stalkMap_surjective y⟩
   have hl : IsLocalHom ((X.fromSpecStalk x).stalkMap y).hom := inferInstance
   have h := Flat.stalkMap (X.fromSpecStalk x) y
   algebraize [((X.fromSpecStalk x).stalkMap y).hom]
   have : IsLocalHom (algebraMap (X.presheaf.stalk ((X.fromSpecStalk x) y))
-    ((Spec (X.presheaf.stalk x)).presheaf.stalk y)) := hl
-  have := Module.FaithfullyFlat.of_flat_of_isLocalHom
-    (A := X.presheaf.stalk ((X.fromSpecStalk x) y)) (B := (Spec (X.presheaf.stalk x)).presheaf.stalk y)
+      ((Spec (X.presheaf.stalk x)).presheaf.stalk y)) :=
+    hl
+  have :=
+    Module.FaithfullyFlat.of_flat_of_isLocalHom (A := X.presheaf.stalk ((X.fromSpecStalk x) y))
+      (B := (Spec (X.presheaf.stalk x)).presheaf.stalk y)
   exact FaithfulSMul.algebraMap_injective _ _
 
 end GlobalTheory.LocalRingGeneralisation

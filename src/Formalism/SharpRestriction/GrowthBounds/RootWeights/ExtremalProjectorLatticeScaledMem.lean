@@ -16,8 +16,13 @@ section Wt
 
 variable {n : ℕ} {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
 
-theorem operator_pow_shifts_weight {E : GLOps n K V} (hs : OperatorsShiftWeightsByRoots E) (a b : Fin n) (ν : Fin n → ℤ) (k : ℕ) (x : V)
-    (hx : x ∈ weightSp E ν) : ((E a b) ^ k) x ∈ weightSp E (ν + (k : ℤ) • rootW a b) := by
+theorem operator_pow_shifts_weight
+    {E : GLOps n K V} (hs : OperatorsShiftWeightsByRoots E)
+    (a b : Fin n)
+    (ν : Fin n → ℤ)
+    (k : ℕ)
+    (x : V) (hx : x ∈ weightSp E ν)
+    : ((E a b) ^ k) x ∈ weightSp E (ν + (k : ℤ) • rootW a b) := by
   unfold OperatorsShiftWeightsByRoots at hs
   induction k with
   | zero => simpa using hx
@@ -32,10 +37,13 @@ end Wt
 section Lattice
 
 variable {p : ℕ} {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-variable {n : ℕ} {V : Type*} [AddCommGroup V] [Module (KK O) V] [Module O V] [IsScalarTower O (KK O) V]
+variable
+  {n : ℕ} {V : Type*} [AddCommGroup V] [Module (KK O) V] [Module O V] [IsScalarTower O (KK O) V]
 
-theorem binomial_subring_preserves_lattice {E : GLOps n (KK O) V} {M : Submodule O V} (hM : UZStable (O := O) E M)
-    (u : Module.End (KK O) V) (hu : u ∈ binomialDiagonalSubring E) : ∀ x ∈ M, u x ∈ M := by
+theorem binomial_subring_preserves_lattice
+    {E : GLOps n (KK O) V} {M : Submodule O V} (hM : UZStable (O := O) E M)
+    (u : Module.End (KK O) V) (hu : u ∈ binomialDiagonalSubring E)
+    : ∀ x ∈ M, u x ∈ M := by
   unfold binomialDiagonalSubring at hu
   unfold UZStable at hM
   induction hu using Subring.closure_induction with

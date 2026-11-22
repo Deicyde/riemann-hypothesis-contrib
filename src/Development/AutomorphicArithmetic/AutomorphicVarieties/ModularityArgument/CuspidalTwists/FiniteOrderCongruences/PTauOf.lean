@@ -11,8 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsDec
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N IsLocalRing Polynomial
-open UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S3
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N IsLocalRing Polynomial
+open UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement GlobalTheory.CuspRep GlobalTheory.HeckeGal
+  GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S3
 open UpperTheory.V.Cu
 open scoped Matrix
 
@@ -24,8 +27,8 @@ section Alg
 
 variable {Γ R : Type} [Group Γ] [CommRing R] (H : Subgroup Γ) (k : Γ → R) (u : R) (g0 : Γ)
 
-theorem mat_eq {a b c d a' b' c' d' : R} (h1 : a = a') (h2 : b = b') (h3 : c = c') (h4 : d = d') :
-    (!![a, b; c, d] : M2 R) = !![a', b'; c', d'] := by
+theorem mat_eq {a b c d a' b' c' d' : R} (h1 : a = a') (h2 : b = b') (h3 : c = c') (h4 : d = d')
+    : (!![a, b; c, d] : M2 R) = !![a', b'; c', d'] := by
   rw [h1, h2, h3, h4]
 
 theorem ofTwo {u a b : R} (hu : 2 * u = 1) (h : a * (2 * u) = b) : a = b := by
@@ -72,12 +75,14 @@ theorem xg_mem (hy : Hyp H k u g0) (g : Γ) : xg H g0 g ∈ H := by
 theorem k_inv (hy : Hyp H k u g0) {x : Γ} (hx : x ∈ H) : k x * k x⁻¹ = 1 := by
   rw [← hy.mul x hx _ (inv_mem hx), mul_inv_cancel, hy.one]
 
-theorem Nm_one_of (hy : Hyp H k u g0) {x : Γ} (h1 : k x = 1) (h2 : k x⁻¹ = 1) : (Nm k u x : M2 R) = 1 := by
+theorem Nm_one_of (hy : Hyp H k u g0) {x : Γ} (h1 : k x = 1) (h2 : k x⁻¹ = 1)
+    : (Nm k u x : M2 R) = 1 := by
   rw [Matrix.one_fin_two]
   simp only [Nm, aa, bb, h1, h2]
   refine mat_eq ?_ ?_ ?_ ?_ <;> first | ring1 | linear_combination hy.hu
 
-theorem Nm_mul (hy : Hyp H k u g0) {x y : Γ} (hx : x ∈ H) (hy' : y ∈ H) : Nm k u (x * y) = Nm k u x * Nm k u y := by
+theorem Nm_mul (hy : Hyp H k u g0) {x y : Γ} (hx : x ∈ H) (hy' : y ∈ H)
+    : Nm k u (x * y) = Nm k u x * Nm k u y := by
   have e1 := hy.mul x hx y hy'
   have e2 : k (x * y)⁻¹ = k x⁻¹ * k y⁻¹ := by
     rw [mul_inv_rev, hy.mul _ (inv_mem hy') _ (inv_mem hx), mul_comm]
@@ -90,7 +95,8 @@ theorem Nm_inv (x : Γ) : Nm k u x⁻¹ = !![(1 : R), 0; 0, -1] * Nm k u x * !![
   rw [Matrix.mul_fin_two, Matrix.mul_fin_two]
   refine mat_eq ?_ ?_ ?_ ?_ <;> ring
 
-theorem Nm_conj (hy : Hyp H k u g0) {t x : Γ} (ht : t ∉ H) (hx : x ∈ H) : Nm k u (t * x * t⁻¹) = Nm k u x⁻¹ := by
+theorem Nm_conj (hy : Hyp H k u g0) {t x : Γ} (ht : t ∉ H) (hx : x ∈ H)
+    : Nm k u (t * x * t⁻¹) = Nm k u x⁻¹ := by
   have a := hy.conj t ht x hx
   have b : k (t * x * t⁻¹)⁻¹ = k x := by
     rw [show (t * x * t⁻¹)⁻¹ = t * x⁻¹ * t⁻¹ by group, hy.conj t ht _ (inv_mem hx), inv_inv]
@@ -103,7 +109,8 @@ theorem JJ : (!![(1 : R), 0; 0, -1] * !![(1 : R), 0; 0, -1] : M2 R) = 1 := by
 theorem tauF_mem {g : Γ} (hg : g ∈ H) : tauF H k u g0 g = Nm k u g := by
   simp only [tauF, Nm, xg, sg, if_pos hg, one_mul]
 
-theorem tauF_nmem {g : Γ} (hg : g ∉ H) : tauF H k u g0 g = Nm k u (g * g0⁻¹) * !![(1 : R), 0; 0, -1] := by
+theorem tauF_nmem {g : Γ} (hg : g ∉ H)
+    : tauF H k u g0 g = Nm k u (g * g0⁻¹) * !![(1 : R), 0; 0, -1] := by
   simp only [tauF, Nm, xg, sg, if_neg hg]
   rw [Matrix.mul_fin_two]
   refine mat_eq ?_ ?_ ?_ ?_ <;> ring
@@ -126,7 +133,8 @@ def tau (hy : Hyp H k u g0) : Γ →* M2 R where
     · have hab : a * b ∉ H := fun h => ha (((hm a b).1 h).2 hb)
       have hag : a * g0⁻¹ ∈ H := (hm _ _).2 (iff_of_false ha g0i)
       have e : a * b * g0⁻¹ = a * g0⁻¹ * (g0 * b * g0⁻¹) := by group
-      rw [tauF_nmem hab, tauF_nmem ha, tauF_mem hb, e, Nm_mul hy hag (mem_conj hy g0 hb), Nm_conj hy hy.g0 hb, Nm_inv]
+      rw [tauF_nmem hab, tauF_nmem ha, tauF_mem hb, e, Nm_mul hy hag (mem_conj hy g0 hb),
+        Nm_conj hy hy.g0 hb, Nm_inv]
       simp only [mul_assoc, JJ, mul_one]
     · have hab : a * b ∈ H := (hm a b).2 (iff_of_false ha hb)
       have hag : a * g0⁻¹ ∈ H := (hm _ _).2 (iff_of_false ha g0i)
@@ -136,12 +144,13 @@ def tau (hy : Hyp H k u g0) : Γ →* M2 R where
       have e : a * b = a * g0⁻¹ * (g0 * (b * g0⁻¹) * g0⁻¹) * (g0 * g0) := by group
       have h1 : Nm k u (g0 * g0) = 1 :=
         Nm_one_of hy hy.sq (by have := k_inv hy hsq; rwa [hy.sq, one_mul] at this)
-      rw [tauF_mem hab, tauF_nmem ha, tauF_nmem hb, e, Nm_mul hy (H.mul_mem hag hc) hsq, Nm_mul hy hag hc,
-        Nm_conj hy hy.g0 hbg, Nm_inv, h1]
+      rw [tauF_mem hab, tauF_nmem ha, tauF_nmem hb, e, Nm_mul hy (H.mul_mem hag hc) hsq,
+        Nm_mul hy hag hc, Nm_conj hy hy.g0 hbg, Nm_inv, h1]
       simp only [mul_assoc, mul_one]
 
-theorem form_of (a b s : R) (h1 : a * a - b * b = 1) (h2 : s * s = 1) :
-    (!![a, s * b; b, s * a] : M2 R)ᵀ * !![1, 0; 0, -1] * !![a, s * b; b, s * a] = !![1, 0; 0, -1] := by
+theorem form_of (a b s : R) (h1 : a * a - b * b = 1) (h2 : s * s = 1)
+    : (!![a, s * b; b, s * a] : M2 R)ᵀ * !![1, 0; 0, -1] * !![a, s * b; b, s * a]
+      = !![1, 0; 0, -1] := by
   have eT : (!![a, s * b; b, s * a] : M2 R)ᵀ = !![a, b; s * b, s * a] := by
     ext i j
     fin_cases i <;> fin_cases j <;> rfl
@@ -152,11 +161,12 @@ theorem form_of (a b s : R) (h1 : a * a - b * b = 1) (h2 : s * s = 1) :
   · ring
   · linear_combination (-(s * s)) * h1 - h2
 
-theorem form (hy : Hyp H k u g0) (g : Γ) :
-    (tauF H k u g0 g)ᵀ * !![1, 0; 0, -1] * tauF H k u g0 g = !![1, 0; 0, -1] := by
+theorem form (hy : Hyp H k u g0) (g : Γ)
+    : (tauF H k u g0 g)ᵀ * !![1, 0; 0, -1] * tauF H k u g0 g = !![1, 0; 0, -1] := by
   have hx := xg_mem hy g
   have hkk := k_inv hy hx
-  have hab : aa k u (xg H g0 g) * aa k u (xg H g0 g) - bb k u (xg H g0 g) * bb k u (xg H g0 g) = 1 := by
+  have hab
+      : aa k u (xg H g0 g) * aa k u (xg H g0 g) - bb k u (xg H g0 g) * bb k u (xg H g0 g) = 1 := by
     simp only [aa, bb]
     linear_combination (4 * u ^ 2) * hkk + (2 * u + 1) * hy.hu
   have hs : (sg H g : R) * sg H g = 1 := by
@@ -165,9 +175,11 @@ theorem form (hy : Hyp H k u g0) (g : Γ) :
   exact form_of _ _ _ hab hs
 
 open Classical in
-theorem cont_ite {X Y : Type} [Group X] [TopologicalSpace X] [TopologicalSpace Y] (H : Subgroup X)
-    (hs : IsClopen (H : Set X)) {f g : X → Y} (hf : Continuous f) (hg : Continuous g) :
-    Continuous fun x => if x ∈ H then f x else g x := by
+theorem cont_ite
+    {X Y : Type} [Group X] [TopologicalSpace X] [TopologicalSpace Y]
+    (H : Subgroup X) (hs : IsClopen (H : Set X))
+    {f g : X → Y} (hf : Continuous f) (hg : Continuous g)
+    : Continuous fun x => if x ∈ H then f x else g x := by
   refine Continuous.if (fun a ha => ?_) hf hg
   have e : frontier {x | x ∈ H} = ∅ := hs.frontier_eq
   rw [e] at ha
@@ -199,9 +211,9 @@ theorem two_unit (c : Coef l) (hl : l ≠ 2) : IsUnit (2 : c.O) := by
 theorem res_inj (K' : IntermediateField ℚ Ω) : Function.Injective (resQ K') := fun a b h =>
   AlgEquiv.ext fun x => DFunLike.congr_fun h x
 
-theorem setup (K' : IntermediateField ℚ Ω) [NumberField K'] (hK : Module.finrank ℚ K' = 2) :
-    (∀ g, g ∈ K'.fixingSubgroup ↔ ∃ x, resQ K' x = g) ∧ K'.fixingSubgroup.index = 2 ∧
-      Topology.IsEmbedding (resQ K') ∧ IsOpen (K'.fixingSubgroup : Set (G ℚ Ω)) := by
+theorem setup (K' : IntermediateField ℚ Ω) [NumberField K'] (hK : Module.finrank ℚ K' = 2)
+    : (∀ g, g ∈ K'.fixingSubgroup ↔ ∃ x, resQ K' x = g) ∧ K'.fixingSubgroup.index = 2
+      ∧ Topology.IsEmbedding (resQ K') ∧ IsOpen (K'.fixingSubgroup : Set (G ℚ Ω)) := by
   haveI : FaithfulSMul K' Ω := (faithfulSMul_iff_algebraMap_injective K' Ω).2 (algebraMap K' Ω).injective
   haveI : Module.IsTorsionFree K' Ω := DivisionSemiring.to_moduleIsTorsionFree
   haveI : IsAlgClosure K' Ω := ⟨IsAlgClosure.isAlgClosed ℚ, Algebra.IsAlgebraic.tower_top (K := ℚ) K'⟩
@@ -218,28 +230,33 @@ theorem setup (K' : IntermediateField ℚ Ω) [NumberField K'] (hK : Module.finr
   · rw [← hfix]
     exact hopen
 
-theorem chi_coe (c : Coef l) (g : G ℚ Ω) (m : ℕ) :
-    (((chiO ℚ Ω l c.O g ^ m : c.Oˣ) : c.O) : Qbar l) = ((cycBar ℚ Ω l g ^ m : (Qbar l)ˣ) : Qbar l) := by
+theorem chi_coe (c : Coef l) (g : G ℚ Ω) (m : ℕ)
+    : (((chiO ℚ Ω l c.O g ^ m : c.Oˣ) : c.O) : Qbar l)
+      = ((cycBar ℚ Ω l g ^ m : (Qbar l)ˣ) : Qbar l) := by
   rw [Units.val_pow_eq_pow_val, SubmonoidClass.coe_pow, Units.val_pow_eq_pow_val]
   rfl
 
-theorem exists_ine (A : ValuationSubring Ω) (hv : A.valuation (l : Ω) < 1) {n : ℤ} (hn : n ≠ 0) :
-    ∃ g ∈ Ine (F := ℚ) A, cycBar ℚ Ω l g ^ n ≠ 1 := by
+theorem exists_ine (A : ValuationSubring Ω) (hv : A.valuation (l : Ω) < 1) {n : ℤ} (hn : n ≠ 0)
+    : ∃ g ∈ Ine (F := ℚ) A, cycBar ℚ Ω l g ^ n ≠ 1 := by
   obtain ⟨v, hv'⟩ := GlobalTheory.CycDec.exists_unit_infinite_order l
   obtain ⟨σ, hσ, hσu⟩ := GlobalTheory.CycInertia.cycZ_Ine_surjective Ω l A hv v
   refine ⟨σ, hσ, fun h => hv' n hn ?_⟩
-  have hinj : Function.Injective
-      (Units.map ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom).toMonoidHom) :=
+  have hinj : Function.Injective (Units.map ((algebraMap ℚ_[l] (Qbar l)).comp
+      PadicInt.Coe.ringHom).toMonoidHom) :=
     Units.map_injective ((algebraMap ℚ_[l] (Qbar l)).injective.comp Subtype.val_injective)
   apply hinj
   rw [map_one, ← h, cycBar, MonoidHom.comp_apply, hσu, map_zpow]
 
 section Kap
 
-variable (K' : IntermediateField ℚ Ω) (κ : G K' Ω →* (Qbar l)ˣ) (c : Coef l) (hc : ∀ h, (κ h : Qbar l) ∈ c.O)
+variable
+  (K' : IntermediateField ℚ Ω) (κ : G K' Ω →* (Qbar l)ˣ)
+  (c : Coef l) (hc : ∀ h, (κ h : Qbar l) ∈ c.O)
 
 def kO (g : G ℚ Ω) : c.O :=
-  @dite _ (∃ x, resQ K' x = g) (Classical.propDecidable _) (fun h => ⟨κ h.choose, hc _⟩) (fun _ => 1)
+  @dite _ (∃ x, resQ K' x = g) (Classical.propDecidable _)
+    (fun h => ⟨κ h.choose, hc _⟩)
+    (fun _ => 1)
 
 theorem kO_res (x : G K' Ω) : ((kO K' κ c hc (resQ K' x) : c.O) : Qbar l) = κ x := by
   have h : ∃ y, resQ K' y = resQ K' x := ⟨x, rfl⟩
@@ -255,23 +272,27 @@ theorem kO_off (g : G ℚ Ω) (hg : ¬ ∃ x, resQ K' x = g) : kO K' κ c hc g =
 def PP (e : ℤ) (A : ValuationSubring Ω) : Prop :=
   ∀ h : G K' Ω, resQ K' h ∈ Ine (F := ℚ) A → κ h = cycBar K' Ω l h ^ e
 
-
 open Classical in
 def sA (m : ℕ) (A : ValuationSubring Ω) : c.O := if PP K' κ (m : ℤ) A then 1 else -1
 
 end Kap
 
-theorem excl (K' : IntermediateField ℚ Ω) (hH : ∀ g, g ∈ K'.fixingSubgroup ↔ ∃ x, resQ K' x = g)
+theorem excl
+    (K' : IntermediateField ℚ Ω) (hH : ∀ g, g ∈ K'.fixingSubgroup ↔ ∃ x, resQ K' x = g)
     (hDec : ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → Dec (F := ℚ) A ≤ K'.fixingSubgroup)
-    (κ : G K' Ω →* (Qbar l)ˣ) (m : ℕ) (hm : 1 ≤ m) (B : ValuationSubring Ω) (hB : B.valuation (l : Ω) < 1) :
-    ¬ (PP K' κ (m : ℤ) B ∧ PP K' κ (-(m : ℤ)) B) := by
+    (κ : G K' Ω →* (Qbar l)ˣ)
+    (m : ℕ) (hm : 1 ≤ m)
+    (B : ValuationSubring Ω) (hB : B.valuation (l : Ω) < 1)
+    : ¬(PP K' κ (m : ℤ) B ∧ PP K' κ (-(m : ℤ)) B) := by
   rintro ⟨h1, h2⟩
   obtain ⟨σ, hσ, hne⟩ := exists_ine B hB (n := 2 * (m : ℤ)) (by omega)
   obtain ⟨y, rfl⟩ := (hH σ).1 (hDec B hB (Ine_le_Dec (F := ℚ) B hσ))
   apply hne
-  have e : cycBar K' Ω l y ^ (m : ℤ) = cycBar K' Ω l y ^ (-(m : ℤ)) := (h1 y hσ).symm.trans (h2 y hσ)
+  have e : cycBar K' Ω l y ^ (m : ℤ) = cycBar K' Ω l y ^ (-(m : ℤ)) :=
+    (h1 y hσ).symm.trans (h2 y hσ)
   have e3 : cycBar K' Ω l y ^ (m : ℤ) * cycBar K' Ω l y ^ (m : ℤ) = 1 := by
-    calc _ = cycBar K' Ω l y ^ (m : ℤ) * cycBar K' Ω l y ^ (-(m : ℤ)) := by rw [← e]
+    calc
+      _ = cycBar K' Ω l y ^ (m : ℤ) * cycBar K' Ω l y ^ (-(m : ℤ)) := by rw [← e]
       _ = 1 := by rw [← zpow_add, add_neg_cancel, zpow_zero]
   show cycBar K' Ω l y ^ (2 * (m : ℤ)) = 1
   rw [two_mul, zpow_add]
@@ -286,10 +307,12 @@ open TauOf in
 theorem tauOf : TauOf := by
   intro Ω _ _ _ l _ ι K' _ hl hK hDec g0 hg0 m κ hκ c₂ hc
   obtain ⟨hH, hi, hemb, hopen⟩ := setup K' hK
-  obtain ⟨k, kres, kred⟩ : ∃ k : G ℚ Ω → c₂.O, (∀ x, ((k (resQ K' x) : c₂.O) : Qbar l) = κ x) ∧
-      (∀ g, (∀ x, resQ K' x ≠ g) → k g = 1) :=
+  obtain ⟨k, kres, kred⟩
+      : ∃ k : G ℚ Ω → c₂.O,
+        (∀ x, ((k (resQ K' x) : c₂.O) : Qbar l) = κ x) ∧ (∀ g, (∀ x, resQ K' x ≠ g) → k g = 1) :=
     ⟨kO K' κ c₂ hc, kO_res K' κ c₂ hc, fun g hg => kO_off K' κ c₂ hc g (fun ⟨x, hx⟩ => hg x hx)⟩
-  obtain ⟨u, hu⟩ : ∃ u : c₂.O, 2 * u = 1 := ⟨(((two_unit c₂ hl).unit⁻¹ : c₂.Oˣ) : c₂.O), (two_unit c₂ hl).mul_val_inv⟩
+  obtain ⟨u, hu⟩ : ∃ u : c₂.O, 2 * u = 1 :=
+    ⟨(((two_unit c₂ hl).unit⁻¹ : c₂.Oˣ) : c₂.O), (two_unit c₂ hl).mul_val_inv⟩
   have kH : ∀ x : G K' Ω, resQ K' x ∈ K'.fixingSubgroup := fun x => (hH _).2 ⟨x, rfl⟩
   have kone : k 1 = 1 := Subtype.ext (by rw [← map_one (resQ K'), kres, map_one]; rfl)
   have kmul : ∀ x ∈ K'.fixingSubgroup, ∀ y ∈ K'.fixingSubgroup, k (x * y) = k x * k y := by
@@ -326,36 +349,58 @@ theorem tauOf : TauOf := by
       simpa [Cong] using this
     · rw [kred g (fun x hx => h ⟨x, hx⟩), sub_self]
       exact zero_mem _
-  refine ⟨tau hy, sA K' κ c₂ m, hκ.pos, ?_, fun g => form hy g, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, hκ.cont, hκ.alg⟩
-  ·
-    intro i j
+  refine ⟨
+    tau hy,
+    sA K' κ c₂ m,
+    hκ.pos,
+    ?_,
+    fun g => form hy g,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    hκ.cont,
+    hκ.alg
+  ⟩
+  · intro i j
     apply ((UpperTheory.integrality_of_norm_coefficients l).2 c₂ (G ℚ Ω) _).2
-    have hcl : IsClopen (K'.fixingSubgroup : Set (G ℚ Ω)) := ⟨Subgroup.isClosed_of_isOpen _ hopen, hopen⟩
+    have hcl : IsClopen (K'.fixingSubgroup : Set (G ℚ Ω)) :=
+      ⟨Subgroup.isClosed_of_isOpen _ hopen, hopen⟩
     have hK : Continuous fun g => ((k g : c₂.O) : Qbar l) := by
       rw [continuous_iff_continuousAt]
       intro g
       rcases em (∃ x, resQ K' x = g) with h | h
       · obtain ⟨x, rfl⟩ := h
         have hr : Set.range (resQ K') ∈ nhds (resQ K' x) := by
-          have e : Set.range (resQ K') = (K'.fixingSubgroup : Set (G ℚ Ω)) := Set.ext fun g => (hH g).symm
+          have e : Set.range (resQ K') = (K'.fixingSubgroup : Set (G ℚ Ω)) :=
+            Set.ext fun g => (hH g).symm
           rw [e]
           exact hopen.mem_nhds (kH x)
         rw [← hemb.toIsInducing.continuousAt_iff' hr]
-        have e : (fun g => ((k g : c₂.O) : Qbar l)) ∘ resQ K' = fun x => (κ x : Qbar l) := funext fun x => kres x
+        have e : (fun g => ((k g : c₂.O) : Qbar l)) ∘ resQ K' = fun x => (κ x : Qbar l) :=
+          funext fun x => kres x
         rw [e]
         exact (Units.continuous_val.comp hκ.cont).continuousAt
       · have hc' : (K'.fixingSubgroup : Set (G ℚ Ω))ᶜ ∈ nhds g :=
           hcl.isClosed.isOpen_compl.mem_nhds (fun hg => h ((hH g).1 hg))
         refine (continuousAt_const (y := (1 : Qbar l))).congr ?_
         filter_upwards [hc'] with y hy'
-        exact (congrArg (fun z : c₂.O => (z : Qbar l)) (kred y (fun x hx => hy' ((hH y).2 ⟨x, hx⟩)))).symm
+        exact (congrArg
+          (fun z : c₂.O => (z : Qbar l))
+          (kred y (fun x hx => hy' ((hH y).2 ⟨x, hx⟩)))).symm
     have hxg : Continuous fun g => xg K'.fixingSubgroup g0 g := by
       simp only [xg]
       exact cont_ite _ hcl continuous_id (continuous_id.mul continuous_const)
     have hS : Continuous fun g => ((sg K'.fixingSubgroup g : c₂.O) : Qbar l) := by
       classical
-      have e : (fun g => ((sg K'.fixingSubgroup g : c₂.O) : Qbar l)) =
-          fun g => if g ∈ K'.fixingSubgroup then (1 : Qbar l) else -1 := by
+      have e
+          : (fun g => ((sg K'.fixingSubgroup g : c₂.O) : Qbar l))
+            = fun g => if g ∈ K'.fixingSubgroup then (1 : Qbar l) else -1 := by
         funext g
         unfold sg
         split_ifs <;> simp
@@ -370,19 +415,16 @@ theorem tauOf : TauOf := by
     · exact hS.mul hB
     · exact hB
     · exact hS.mul hA
-  ·
-    intro g hg
+  · intro g hg
     show (sg K'.fixingSubgroup g : c₂.O) * aa k u (xg K'.fixingSubgroup g0 g) = aa k u (xg K'.fixingSubgroup g0 g) ∧
       bb k u (xg K'.fixingSubgroup g0 g) = (sg K'.fixingSubgroup g : c₂.O) * bb k u (xg K'.fixingSubgroup g0 g)
     simp only [sg, if_pos hg, one_mul, and_self]
-  ·
-    intro g hg
+  · intro g hg
     show (sg K'.fixingSubgroup g : c₂.O) * aa k u (xg K'.fixingSubgroup g0 g) = -aa k u (xg K'.fixingSubgroup g0 g) ∧
       bb k u (xg K'.fixingSubgroup g0 g) = -((sg K'.fixingSubgroup g : c₂.O) * bb k u (xg K'.fixingSubgroup g0 g))
     simp only [sg, if_neg hg]
     constructor <;> ring
-  ·
-    intro g
+  · intro g
     show aa k u (xg K'.fixingSubgroup g0 g) - 1 ∈ maximalIdeal c₂.O ∧
       (sg K'.fixingSubgroup g : c₂.O) * bb k u (xg K'.fixingSubgroup g0 g) ∈ maximalIdeal c₂.O
     generalize xg K'.fixingSubgroup g0 g = x
@@ -399,11 +441,9 @@ theorem tauOf : TauOf := by
         ring
       rw [e]
       exact Ideal.mul_mem_left _ _ (Ideal.mul_mem_left _ _ (Ideal.sub_mem _ h1 h2))
-  ·
-    show tauF K'.fixingSubgroup k u g0 g0 = _
+  · show tauF K'.fixingSubgroup k u g0 g0 = _
     rw [tauF_nmem hg0, mul_inv_cancel, Nm_one_of hy hy.one (by rw [inv_one, hy.one]), one_mul]
-  ·
-    intro A hA g hg hgH
+  · intro A hA g hg hgH
     obtain ⟨x, rfl⟩ := (hH g).1 hgH
     have h1 : κ x = 1 := hκ.unr A hA x hg
     have h2 : κ x⁻¹ = 1 := hκ.unr A hA x⁻¹ (by rw [map_inv]; exact inv_mem hg)
@@ -414,12 +454,10 @@ theorem tauOf : TauOf := by
       rfl
     · rw [← map_inv (resQ K') x, kres, h2]
       rfl
-  ·
-    intro A
+  · intro A
     unfold sA
     split_ifs <;> simp
-  ·
-    intro A A' g hA hgA
+  · intro A A' g hA hgA
     have e1 : g (l : Ω) = l := map_natCast g l
     have hA' : A'.valuation (l : Ω) < 1 := by
       have i1 := hgA (l : Ω)
@@ -436,9 +474,13 @@ theorem tauOf : TauOf := by
       have e : UpperTheory.V.conjGal hL σ = g⁻¹ * σ * g := rfl
       rw [← e]
       exact UpperTheory.V.conjGal_mem_Ine hL hgA hσ
-    have tr : ∀ x' : G K' Ω, resQ K' x' ∈ Ine (F := ℚ) A' → ∃ y : G K' Ω, resQ K' y ∈ Ine (F := ℚ) A ∧
-        cycBar K' Ω l x' = cycBar K' Ω l y ∧ (g ∈ K'.fixingSubgroup → κ x' = κ y) ∧
-        (g ∉ K'.fixingSubgroup → κ x' = (κ y)⁻¹) := by
+    have tr
+        : ∀ x' : G K' Ω,
+          resQ K' x' ∈ Ine (F := ℚ) A'
+            → ∃ y : G K' Ω,
+              resQ K' y ∈ Ine (F := ℚ) A ∧ cycBar K' Ω l x' = cycBar K' Ω l y
+                ∧ (g ∈ K'.fixingSubgroup → κ x' = κ y)
+                ∧ (g ∉ K'.fixingSubgroup → κ x' = (κ y)⁻¹) := by
       intro x' hx'
       have hm := hcj _ hx'
       obtain ⟨y, hy'⟩ := (hH _).1 (hDec A hA (Ine_le_Dec (F := ℚ) A hm))
@@ -481,13 +523,14 @@ theorem tauOf : TauOf := by
           obtain ⟨y, hyA, hcy, -, hk⟩ := tr x' hx'
           rw [hk hgH, hQ hP y hyA, hcy, zpow_neg, inv_inv]
         rw [if_neg hP, if_pos hP', neg_neg]
-  ·
-    intro A hA g hg
+  · intro A hA g hg
     have hgH : g ∈ K'.fixingSubgroup := hDec A hA (Ine_le_Dec (F := ℚ) A hg)
     obtain ⟨x, rfl⟩ := (hH g).1 hgH
     apply Subtype.ext
-    rw [chi_coe, show ((cycBar ℚ Ω l (resQ K' x) ^ m : (Qbar l)ˣ) : Qbar l) =
-      ((cycBar K' Ω l x ^ (m : ℤ) : (Qbar l)ˣ) : Qbar l) by rw [zpow_natCast]; rfl]
+    rw [chi_coe,
+      show ((cycBar ℚ Ω l (resQ K' x) ^ m : (Qbar l)ˣ) : Qbar l)
+          = ((cycBar K' Ω l x ^ (m : ℤ) : (Qbar l)ˣ) : Qbar l) by
+        rw [zpow_natCast]; rfl]
     show ((aa k u (xg K'.fixingSubgroup g0 (resQ K' x)) + (sg K'.fixingSubgroup (resQ K' x) : c₂.O) *
       bb k u (xg K'.fixingSubgroup g0 (resQ K' x)) * sA K' κ c₂ m A : c₂.O) : Qbar l) = _
     simp only [xg, sg, if_pos hgH]
@@ -505,8 +548,7 @@ theorem tauOf : TauOf := by
         simp only [aa, bb]
         linear_combination (k (resQ K' x)⁻¹) * hu
       rw [e, kres, map_inv, hQ x hg, zpow_neg, inv_inv]
-  ·
-    intro h
+  · intro h
     have hg := kH h
     have e : (tau hy (resQ K' h) 0 0 + tau hy (resQ K' h) 0 1 : c₂.O) = k (resQ K' h) := by
       show aa k u (xg K'.fixingSubgroup g0 (resQ K' h)) +

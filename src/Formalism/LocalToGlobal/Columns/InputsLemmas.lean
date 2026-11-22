@@ -14,13 +14,15 @@ noncomputable section
 
 namespace Formalism.L2.Col
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.DIV Formalism.HermitianLatticesTheory MvPolynomial
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.DIV
+  Formalism.HermitianLatticesTheory MvPolynomial
 
 theorem minkowskiBound_holds : MinkowskiBound := card_dvd_minkowskiNumber
 
 section Stab
 
-variable {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
+variable
+  {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
   (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : LevFam X.E X.K n SG)
 
 end Stab

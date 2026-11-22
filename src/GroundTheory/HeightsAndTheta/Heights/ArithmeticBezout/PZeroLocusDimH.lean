@@ -18,44 +18,49 @@ noncomputable section
 
 namespace ZeroLocusDimH
 
-theorem eval_eval₂_aeval {n s : ℕ} (π : Fin s → MvPolynomial (Fin n) ℂ)
-    (Q : Polynomial (MvPolynomial (Fin s) ℂ)) (x : Fin n → ℂ) (i : Fin n) :
-    MvPolynomial.eval x (Q.eval₂ (MvPolynomial.aeval π).toRingHom (X i)) =
-      Polynomial.eval (x i) (Q.map (MvPolynomial.eval (paramMap π x))) := by
+theorem eval_eval₂_aeval
+    {n s : ℕ} (π : Fin s → MvPolynomial (Fin n) ℂ) (Q : Polynomial (MvPolynomial (Fin s) ℂ))
+    (x : Fin n → ℂ) (i : Fin n)
+    : MvPolynomial.eval x (Q.eval₂ (MvPolynomial.aeval π).toRingHom (X i))
+      = Polynomial.eval (x i) (Q.map (MvPolynomial.eval (paramMap π x))) := by
   rw [Polynomial.hom_eval₂, Polynomial.eval_map, MvPolynomial.eval_X]
   congr 1
   refine MvPolynomial.ringHom_ext (fun a => ?_) (fun j => ?_)
   · simp
   · simp [paramMap]
 
-theorem mem_zeroSet_iff {n : ℕ} (I : Ideal (MvPolynomial (Fin n) ℂ)) (x : Fin n → ℂ) :
-    (∀ q ∈ I, MvPolynomial.eval x q = 0) ↔ I ≤ RingHom.ker (MvPolynomial.eval x) :=
+theorem mem_zeroSet_iff {n : ℕ} (I : Ideal (MvPolynomial (Fin n) ℂ)) (x : Fin n → ℂ)
+    : (∀ q ∈ I, MvPolynomial.eval x q = 0) ↔ I ≤ RingHom.ker (MvPolynomial.eval x) :=
   ⟨fun h q hq => RingHom.mem_ker.2 (h q hq), fun h _ hq => RingHom.mem_ker.1 (h hq)⟩
 
-theorem ringKrullDim_quot_sup_add_one_le {n : ℕ} (p : Ideal (MvPolynomial (Fin n) ℂ)) [p.IsPrime]
-    (g : MvPolynomial (Fin n) ℂ) (hg : g ∉ p) :
-    ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ (p ⊔ Ideal.span {g})) + 1 ≤
-      ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ p) := by
+theorem ringKrullDim_quot_sup_add_one_le
+    {n : ℕ} (p : Ideal (MvPolynomial (Fin n) ℂ)) [p.IsPrime]
+    (g : MvPolynomial (Fin n) ℂ) (hg : g ∉ p)
+    : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ (p ⊔ Ideal.span {g})) + 1
+      ≤ ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ p) := by
   have hne : Ideal.Quotient.mk p g ≠ 0 := by rwa [Ne, Ideal.Quotient.eq_zero_iff_mem]
   have h := ringKrullDim_quotient_succ_le_of_nonZeroDivisor (mem_nonZeroDivisors_of_ne_zero hne)
-  have e : ((MvPolynomial (Fin n) ℂ ⧸ p) ⧸ Ideal.span {Ideal.Quotient.mk p g}) ≃+*
-      MvPolynomial (Fin n) ℂ ⧸ (p ⊔ Ideal.span {g}) :=
+  have e
+      : ((MvPolynomial (Fin n) ℂ ⧸ p) ⧸ Ideal.span {Ideal.Quotient.mk p g})
+        ≃+* MvPolynomial (Fin n) ℂ ⧸ (p ⊔ Ideal.span {g}) :=
     (Ideal.quotEquivOfEq (by rw [Ideal.map_span, Set.image_singleton])).trans
       (DoubleQuot.quotQuotEquivQuotSup p (Ideal.span {g}))
   rwa [ringKrullDim_eq_of_ringEquiv e] at h
 
-theorem le_of_add_one_le_succ {a : WithBot ℕ∞} {k : ℕ} (h : a + 1 ≤ ((k + 1 : ℕ) : WithBot ℕ∞)) :
-    a ≤ (k : WithBot ℕ∞) :=
+theorem le_of_add_one_le_succ {a : WithBot ℕ∞} {k : ℕ} (h : a + 1 ≤ ((k + 1 : ℕ) : WithBot ℕ∞))
+    : a ≤ (k : WithBot ℕ∞) :=
   _root_.UpperTheory.Reformulated.B.Qn14.le_of_add_one_le_succ h
 
-theorem dimH_le_of_step {n : ℕ} (d : ℕ)
-    (hIH : ∀ J' : Ideal (MvPolynomial (Fin n) ℂ), ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J') + 1 ≤ d →
-      dimH {x : Fin n → ℂ | ∀ q ∈ J', MvPolynomial.eval x q = 0} ≤ 2 * (d : ENNReal))
-    (J : Ideal (MvPolynomial (Fin n) ℂ)) (hJ : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) ≤ d) :
-    dimH {x : Fin n → ℂ | ∀ q ∈ J, MvPolynomial.eval x q = 0} ≤ 2 * (d : ENNReal) := by
-
-  have hcover : {x : Fin n → ℂ | ∀ q ∈ J, MvPolynomial.eval x q = 0} ⊆
-      ⋃ p ∈ J.minimalPrimes, {x : Fin n → ℂ | ∀ q ∈ p, MvPolynomial.eval x q = 0} := by
+theorem dimH_le_of_step
+    {n : ℕ} (d : ℕ)
+    (hIH : ∀ J' : Ideal (MvPolynomial (Fin n) ℂ),
+      ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J') + 1 ≤ d
+        → dimH {x : Fin n → ℂ | ∀ q ∈ J', MvPolynomial.eval x q = 0} ≤ 2 * (d : ENNReal))
+    (J : Ideal (MvPolynomial (Fin n) ℂ)) (hJ : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) ≤ d)
+    : dimH {x : Fin n → ℂ | ∀ q ∈ J, MvPolynomial.eval x q = 0} ≤ 2 * (d : ENNReal) := by
+  have hcover
+      : {x : Fin n → ℂ | ∀ q ∈ J, MvPolynomial.eval x q = 0}
+        ⊆ ⋃ p ∈ J.minimalPrimes, {x : Fin n → ℂ | ∀ q ∈ p, MvPolynomial.eval x q = 0} := by
     intro x hx
     rw [Set.mem_ofPred_eq, mem_zeroSet_iff] at hx
     have : (RingHom.ker (MvPolynomial.eval x)).IsPrime := RingHom.ker_isPrime _
@@ -73,13 +78,16 @@ theorem dimH_le_of_step {n : ℕ} (d : ℕ)
     rw [hgdef, Ideal.IsPrime.prod_mem_iff]
     rintro ⟨i, -, hi⟩
     exact hP' i hi
-  have hsplit : {x : Fin n → ℂ | ∀ q ∈ p, MvPolynomial.eval x q = 0} ⊆
-      {x | x ∈ {x : Fin n → ℂ | ∀ q ∈ p, MvPolynomial.eval x q = 0} ∧ ∀ i, Polynomial.eval (x i)
-        ((Polynomial.derivative (P i)).map (MvPolynomial.eval (paramMap π x))) ≠ 0} ∪
-      {x : Fin n → ℂ | ∀ q ∈ p ⊔ Ideal.span {g}, MvPolynomial.eval x q = 0} := by
+  have hsplit
+      : {x : Fin n → ℂ | ∀ q ∈ p, MvPolynomial.eval x q = 0}
+        ⊆ {x | x ∈ {x : Fin n → ℂ | ∀ q ∈ p, MvPolynomial.eval x q = 0} ∧ ∀ i, Polynomial.eval (x i)
+            ((Polynomial.derivative (P i)).map (MvPolynomial.eval (paramMap π x))) ≠ 0}
+          ∪ {x : Fin n → ℂ | ∀ q ∈ p ⊔ Ideal.span {g}, MvPolynomial.eval x q = 0} := by
     intro x hx
-    by_cases h : ∀ i, Polynomial.eval (x i)
-        ((Polynomial.derivative (P i)).map (MvPolynomial.eval (paramMap π x))) ≠ 0
+    by_cases h
+      : ∀ i,
+        Polynomial.eval (x i) ((Polynomial.derivative (P i)).map (MvPolynomial.eval (paramMap π x)))
+          ≠ 0
     · exact Or.inl ⟨hx, h⟩
     · right
       push Not at h
@@ -92,8 +100,9 @@ theorem dimH_le_of_step {n : ℕ} (d : ℕ)
   refine (dimH_mono hsplit).trans ?_
   rw [dimH_union]
   refine max_le ?_ ?_
-  · have hV : ∀ x ∈ {x : Fin n → ℂ | ∀ q ∈ p, MvPolynomial.eval x q = 0}, ∀ i,
-        Polynomial.eval (x i) ((P i).map (MvPolynomial.eval (paramMap π x))) = 0 := by
+  · have hV
+        : ∀ x ∈ {x : Fin n → ℂ | ∀ q ∈ p, MvPolynomial.eval x q = 0}, ∀ i,
+          Polynomial.eval (x i) ((P i).map (MvPolynomial.eval (paramMap π x))) = 0 := by
       intro x hx i
       rw [← eval_eval₂_aeval]
       exact hx _ (hP i)
@@ -103,9 +112,10 @@ theorem dimH_le_of_step {n : ℕ} (d : ℕ)
     gcongr
   · exact hIH _ ((ringKrullDim_quot_sup_add_one_le p g hg).trans hpd)
 
-theorem dimH_zeroLocus_le (d : ℕ) : ∀ (n : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)),
-    ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) ≤ d →
-      dimH {x : Fin n → ℂ | ∀ q ∈ J, MvPolynomial.eval x q = 0} ≤ 2 * (d : ENNReal) := by
+theorem dimH_zeroLocus_le (d : ℕ)
+    : ∀ (n : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)),
+      ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) ≤ d
+        → dimH {x : Fin n → ℂ | ∀ q ∈ J, MvPolynomial.eval x q = 0} ≤ 2 * (d : ENNReal) := by
   induction d with
   | zero =>
     intro n J hJ

@@ -25,7 +25,8 @@ def Lprim {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (s : ℂ) : ℂ :
   haveI : NeZero χ.conductor := ⟨χ.conductor_ne_zero⟩
   χ.primitiveCharacter.LFunction s
 
-def charSet (Ω : Type*) [CommRing Ω] {N : ℕ} (P : Set (Subgroup (ZMod N)ˣ)) : Set (DirichletCharacter Ω N) :=
+def charSet (Ω : Type*) [CommRing Ω] {N : ℕ} (P : Set (Subgroup (ZMod N)ˣ))
+    : Set (DirichletCharacter Ω N) :=
   {χ | χ.toUnitHom.ker ∈ P}
 
 def parKer (N k : ℕ) : Set (Subgroup (ZMod N)ˣ) := {K | (-1 : (ZMod N)ˣ) ∈ K ↔ Even k}
@@ -34,26 +35,37 @@ def den (N k : ℕ) : ℕ := N * primorial (k + 1)
 
 def bnd (N k : ℕ) : ℝ := 16 * (N : ℝ) ^ (k + 1) * (k.factorial : ℝ)
 
-theorem map_genB {R S : Type*} [CommRing R] [Algebra ℚ R] [CommRing S] [Algebra ℚ S] {N : ℕ} (f : R →+* S) (k : ℕ)
-    (Φ : ZMod N → R) : f (genB k Φ) = genB k (fun a => f (Φ a)) := by
+theorem map_genB
+    {R S : Type*} [CommRing R] [Algebra ℚ R] [CommRing S] [Algebra ℚ S]
+    {N : ℕ}
+    (f : R →+* S) (k : ℕ) (Φ : ZMod N → R)
+    : f (genB k Φ) = genB k (fun a => f (Φ a)) := by
   unfold genB
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [map_mul, RingHom.map_rat_algebraMap]
 
-theorem map_genB_char {R S : Type*} [CommRing R] [Algebra ℚ R] [CommRing S] [Algebra ℚ S] {N : ℕ} (f : R →+* S) (k : ℕ)
-    (χ : DirichletCharacter R N) : f (genB k χ) = genB k (χ.ringHomComp f : ZMod N → S) := by
+theorem map_genB_char
+    {R S : Type*} [CommRing R] [Algebra ℚ R] [CommRing S] [Algebra ℚ S]
+    {N : ℕ}
+    (f : R →+* S) (k : ℕ) (χ : DirichletCharacter R N)
+    : f (genB k χ) = genB k (χ.ringHomComp f : ZMod N → S) := by
   rw [map_genB]
   congr 1
 
-theorem genB_mem {R : Type*} [CommRing R] [Algebra ℚ R] {N : ℕ} (k : ℕ) (Φ : ZMod N → R) (A : Subalgebra ℚ R)
-    (h : ∀ a, Φ a ∈ A) : genB k Φ ∈ A := by
+theorem genB_mem
+    {R : Type*} [CommRing R] [Algebra ℚ R]
+    {N : ℕ}
+    (k : ℕ)
+    (Φ : ZMod N → R) (A : Subalgebra ℚ R) (h : ∀ a, Φ a ∈ A)
+    : genB k Φ ∈ A := by
   unfold genB
   exact A.sum_mem fun a _ => A.mul_mem (h _) (A.algebraMap_mem _)
 
-theorem Bprim_eq {R : Type*} [CommRing R] [Algebra ℚ R] {N : ℕ} (k : ℕ) (χ : DirichletCharacter R N) :
-    Bprim k χ = ∑ a ∈ Icc 1 χ.conductor, primVal χ a * algebraMap ℚ R (bcoef χ.conductor k a) := rfl
+theorem Bprim_eq {R : Type*} [CommRing R] [Algebra ℚ R] {N : ℕ} (k : ℕ) (χ : DirichletCharacter R N)
+    : Bprim k χ = ∑ a ∈ Icc 1 χ.conductor, primVal χ a * algebraMap ℚ R (bcoef χ.conductor k a) :=
+  rfl
 
 theorem den_pos {N : ℕ} (hN : 0 < N) (k : ℕ) : 0 < den N k := by
   unfold den

@@ -4,15 +4,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
 section SlopeTestRemainingChoices
 
 open MvPowerSeries
 
-private theorem wcomp_mul_homog (O : Type) [CommRing O] {σ X : Type} [AddCommGroup X] (wt : σ → X)
-    {w : X} {e : MvPowerSeries σ O} (he : e ∈ wtPart O wt w) (G : MvPowerSeries σ O) (j : X) :
-    wcomp O wt j (G * e) = wcomp O wt (j - w) G * e := by
+private theorem wcomp_mul_homog
+    (O : Type) [CommRing O]
+    {σ X : Type} [AddCommGroup X]
+    (wt : σ → X)
+    {w : X} {e : MvPowerSeries σ O} (he : e ∈ wtPart O wt w)
+    (G : MvPowerSeries σ O) (j : X)
+    : wcomp O wt j (G * e) = wcomp O wt (j - w) G * e := by
   classical
   ext n
   rw [coeff_wcomp, coeff_mul, coeff_mul]
@@ -33,21 +39,38 @@ private theorem wcomp_mul_homog (O : Type) [CommRing O] {σ X : Type} [AddCommGr
       rw [← hp', map_add (f := _), h1, h2, sub_add_cancel]
     · rw [he _ h2, mul_zero]
 
-private theorem span_coeffs {O R X κ N : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup X]
-    (W : WPres O X R) [Fintype κ] (g : κ → R) (c : κ → X) (hg : ∀ i, g i ∈ W.part (c i)) (u : N → X)
-    (B : Submodule O R) (hB : ∀ n i, W.part (u n - c i) ≤ B) (x : R) (hx' : x ∈ ⨆ n, W.part (u n))
-    (hx : x ∈ Ideal.span (Set.range g)) : ∃ a : κ → R, (∀ i, a i ∈ B) ∧ x = ∑ i, a i * g i := by
+private theorem span_coeffs
+    {O R X κ N : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup X]
+    (W : WPres O X R)
+    [Fintype κ]
+    (g : κ → R) (c : κ → X) (hg : ∀ i, g i ∈ W.part (c i))
+    (u : N → X) (B : Submodule O R) (hB : ∀ n i, W.part (u n - c i) ≤ B)
+    (x : R) (hx' : x ∈ ⨆ n, W.part (u n)) (hx : x ∈ Ideal.span (Set.range g))
+    : ∃ a : κ → R, (∀ i, a i ∈ B) ∧ x = ∑ i, a i * g i := by
   classical
   have hg' : ∀ i, ∃ e ∈ wtPart O W.wt (c i), W.π e = g i := fun i => hg i
   choose e he heg using hg'
-  have hl : ∃ f, W.π f = x ∧ ∃ s : Finset X, (∀ j ∈ s, ∃ n, u n = j) ∧
-      ∀ n, Finsupp.weight W.wt n ∉ s → coeff n f = 0 := by
-    refine Submodule.iSup_induction (fun n => W.part (u n))
-      (motive := fun z : R => ∃ f, W.π f = z ∧ ∃ s : Finset X, (∀ j ∈ s, ∃ n, u n = j) ∧
-        ∀ n, Finsupp.weight W.wt n ∉ s → coeff n f = 0) hx' ?_ ?_ ?_
+  have hl
+      : ∃ f,
+        W.π f = x
+          ∧ ∃ s : Finset X,
+            (∀ j ∈ s, ∃ n, u n = j) ∧ ∀ n, Finsupp.weight W.wt n ∉ s → coeff n f = 0 := by
+    refine Submodule.iSup_induction
+      (fun n => W.part (u n))
+      (motive := fun z : R =>
+        ∃ f,
+          W.π f = z
+            ∧ ∃ s : Finset X,
+              (∀ j ∈ s, ∃ n, u n = j) ∧ ∀ n, Finsupp.weight W.wt n ∉ s → coeff n f = 0)
+      hx' ?_ ?_ ?_
     · rintro i _ ⟨f, hf, rfl⟩
-      exact ⟨f, rfl, {u i}, fun j hj => ⟨i, (Finset.mem_singleton.1 hj).symm⟩,
-        fun n hn => hf n (by simpa using hn)⟩
+      exact ⟨
+        f,
+        rfl,
+        {u i},
+        fun j hj => ⟨i, (Finset.mem_singleton.1 hj).symm⟩,
+        fun n hn => hf n (by simpa using hn)
+      ⟩
     · exact ⟨0, map_zero _, ∅, by simp, fun n _ => map_zero _⟩
     · rintro a b ⟨f, hf, s, ht, hs⟩ ⟨f', hf', s', ht', hs'⟩
       refine ⟨f + f', by rw [map_add (f := _), hf, hf'], s ∪ s', fun j hj => ?_, fun n hn => ?_⟩
@@ -93,23 +116,32 @@ private theorem span_coeffs {O R X κ N : Type} [CommRing O] [CommRing R] [Algeb
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.kerA :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ M : Model D, (∀ f : M.A, M.toSS f = 0 ↔ f ∈ M.eqns.ideal) ∧ (∀ n (x : M.SS), x.1 ∈ M.sPart (0, n) → ∃ f ∈ M.gr n, M.toSS f = x) ∧ ∀ n, ∀ f ∈ M.gr n, (M.toSS f).1 ∈ M.sPart (0, n) := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.kerA
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ M : Model D,
+          (∀ f : M.A, M.toSS f = 0 ↔ f ∈ M.eqns.ideal)
+            ∧ (∀ n (x : M.SS), x.1 ∈ M.sPart (0, n) → ∃ f ∈ M.gr n, M.toSS f = x)
+            ∧ ∀ n, ∀ f ∈ M.gr n, (M.toSS f).1 ∈ M.sPart (0, n) := by
   intro Ω _ _ _ l _ c D _ M
   refine ⟨fun f => ⟨fun hf => ?_, fun hf => ?_⟩, ?_, ?_⟩
   · have h0 : (f : M.R) ∈ RingHom.ker M.π := congrArg Subtype.val hf
     rw [M.ker, ← Set.Sum.elim_range, ← Set.Sum.elim_range] at h0
-    obtain ⟨a, ha, hfa⟩ := span_coeffs M.W (Sum.elim (Sum.elim M.F M.E) M.Z)
-      (fun i => ((0 : ℤ), Sum.elim (Sum.elim (fun _ => (-1 : ℤ)) (fun _ => 1)) (fun _ => 0) i))
-      (by
-        rintro ((i | i) | i)
-        · exact M.hF i
-        · exact M.hE i
-        · exact (M.hZ i).1)
-      (fun n : ℤ => ((0 : ℤ), n)) (Subalgebra.toSubmodule M.A)
-      (fun n i x hx => M.aPart_le (n := n - Sum.elim (Sum.elim (fun _ => (-1 : ℤ)) (fun _ => 1)) (fun _ => 0) i)
-        (by simpa [Model.aPart] using hx))
-      f f.2 h0
+    obtain ⟨a, ha, hfa⟩ :=
+      span_coeffs M.W (Sum.elim (Sum.elim M.F M.E) M.Z)
+        (fun i => ((0 : ℤ), Sum.elim (Sum.elim (fun _ => (-1 : ℤ)) (fun _ => 1)) (fun _ => 0) i))
+        (by
+          rintro ((i | i) | i)
+          · exact M.hF i
+          · exact M.hE i
+          · exact (M.hZ i).1)
+        (fun n : ℤ => ((0 : ℤ), n))
+        (Subalgebra.toSubmodule M.A)
+        (fun n i x hx =>
+          M.aPart_le (n := n - Sum.elim (Sum.elim (fun _ => (-1 : ℤ)) (fun _ => 1)) (fun _ => 0) i)
+            (by simpa [Model.aPart] using hx))
+        f f.2 h0
     have hf' : f = ∑ i, (⟨a i, ha i⟩ : M.A) * Sum.elim (Sum.elim M.eqns.F M.eqns.E) M.eqns.Z i := by
       apply Subtype.ext
       rw [hfa, AddSubmonoidClass.coe_finsetSum]

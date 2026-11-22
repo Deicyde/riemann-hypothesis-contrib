@@ -10,20 +10,24 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ImportsB
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.BCT GlobalTheory.LFun PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.CG
-open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.F.FA
+open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.BCT
+  GlobalTheory.LFun PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
+  PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.CG
+open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Tail
+  PositivityTheory.Rg.BcB.F.FA
 open scoped Classical
 open GlobalTheory.CompanionTheory.FinActS
 
 namespace GlobalTheory.CompanionTheory.FinActS.SumFiber
 
-theorem finsum_cosets_retraction {Γ H : Type} [Group Γ] [Group H] (p : Γ →* H) (e : H →* Γ)
-    (hpe : ∀ m, p (e m) = m)
-    (L : Subgroup Γ) (V : Subgroup H) (hLV : ∀ u ∈ L, p u ∈ V) (φ : Γ → ℂ)
-    (hφ : ∀ u ∈ L, ∀ x, φ (x * u) = φ x) (hfin : {q : Γ ⧸ L | φ q.out ≠ 0}.Finite) :
-    ∑ᶠ q : Γ ⧸ L, φ q.out =
-      ∑ᶠ m : H ⧸ V, ∑ᶠ q : Γ ⧸ L,
-        (V : Set H).indicator (1 : H → ℂ) (p q.out) * φ (e m.out * q.out) := by
+theorem finsum_cosets_retraction
+    {Γ H : Type} [Group Γ] [Group H]
+    (p : Γ →* H) (e : H →* Γ) (hpe : ∀ m, p (e m) = m)
+    (L : Subgroup Γ) (V : Subgroup H) (hLV : ∀ u ∈ L, p u ∈ V)
+    (φ : Γ → ℂ) (hφ : ∀ u ∈ L, ∀ x, φ (x * u) = φ x) (hfin : {q : Γ ⧸ L | φ q.out ≠ 0}.Finite)
+    : ∑ᶠ q : Γ ⧸ L, φ q.out
+      = ∑ᶠ m : H ⧸ V, ∑ᶠ q : Γ ⧸ L,
+          (V : Set H).indicator (1 : H → ℂ) (p q.out) * φ (e m.out * q.out) := by
   have outL : ∀ x : Γ, ∃ u ∈ L, (QuotientGroup.mk x : Γ ⧸ L).out = x * u := by
     intro x
     obtain ⟨u, hu⟩ := QuotientGroup.mk_out_eq_mul L x
@@ -54,8 +58,9 @@ theorem finsum_cosets_retraction {Γ H : Type} [Group Γ] [Group H] (p : Γ →*
     have hm : m = m' := by
       rw [← QuotientGroup.out_eq' m, ← QuotientGroup.out_eq' m']
       refine QuotientGroup.eq.2 ?_
-      have h3 : m.out⁻¹ * m'.out
-          = p q.out * ((p q.out)⁻¹ * m.out⁻¹ * (m'.out * p q'.out)) * (p q'.out)⁻¹ := by
+      have h3
+          : m.out⁻¹ * m'.out
+            = p q.out * ((p q.out)⁻¹ * m.out⁻¹ * (m'.out * p q'.out)) * (p q'.out)⁻¹ := by
         group
       rw [h3]
       refine V.mul_mem (V.mul_mem hq1 ?_) (V.inv_mem hq2)
@@ -82,40 +87,39 @@ theorem finsum_cosets_retraction {Γ H : Type} [Group Γ] [Group H] (p : Γ →*
       exact V.inv_mem hv
     refine ⟨(m, ⟨QuotientGroup.mk ((e m.out)⁻¹ * q.out), hS _ hmem⟩), ?_⟩
     obtain ⟨u, hu, h⟩ := outL ((e m.out)⁻¹ * q.out)
-    change (QuotientGroup.mk (e m.out * (QuotientGroup.mk ((e m.out)⁻¹ * q.out) : Γ ⧸ L).out) :
-      Γ ⧸ L) = q
+    change (QuotientGroup.mk (e m.out * (QuotientGroup.mk ((e m.out)⁻¹ * q.out) : Γ ⧸ L).out)
+        : Γ ⧸ L)
+      = q
     rw [h]
     refine Eq.trans (QuotientGroup.eq.2 ?_) (QuotientGroup.out_eq' q)
     have h3 : (e m.out * ((e m.out)⁻¹ * q.out * u))⁻¹ * q.out = u⁻¹ := by group
     rw [h3]
     exact L.inv_mem hu
   let E : (H ⧸ V) × S ≃ Γ ⧸ L := Equiv.ofBijective T ⟨hinj, hsurj⟩
-  have hsupp : (Function.support
-      (fun a : (H ⧸ V) × S => φ (e a.1.out * a.2.1.out))).Finite := by
+  have hsupp : (Function.support (fun a : (H ⧸ V) × S => φ (e a.1.out * a.2.1.out))).Finite := by
     refine (hfin.preimage (f := T) hinj.injOn).subset ?_
     intro a ha
     change φ (QuotientGroup.mk (e a.1.out * a.2.1.out) : Γ ⧸ L).out ≠ 0
     rw [hφout]
     exact ha
-  calc ∑ᶠ q : Γ ⧸ L, φ q.out
-      = ∑ᶠ a : (H ⧸ V) × S, φ (E a).out :=
-        (finsum_comp_equiv E (f := fun q : Γ ⧸ L => φ q.out)).symm
-    _ = ∑ᶠ a : (H ⧸ V) × S, φ (e a.1.out * a.2.1.out) :=
-        finsum_congr fun a => hφout _
+  calc
+    ∑ᶠ q : Γ ⧸ L, φ q.out = ∑ᶠ a : (H ⧸ V) × S, φ (E a).out :=
+      (finsum_comp_equiv E (f := fun q : Γ ⧸ L => φ q.out)).symm
+    _ = ∑ᶠ a : (H ⧸ V) × S, φ (e a.1.out * a.2.1.out) := finsum_congr fun a => hφout _
     _ = ∑ᶠ m : H ⧸ V, ∑ᶠ q : S, φ (e m.out * q.1.out) :=
-        finsum_curry (fun a : (H ⧸ V) × S => φ (e a.1.out * a.2.1.out)) hsupp
+      finsum_curry (fun a : (H ⧸ V) × S => φ (e a.1.out * a.2.1.out)) hsupp
     _ = _ := by
-        refine finsum_congr fun m => ?_
-        rw [finsum_set_coe_eq_finsum_mem S (f := fun q : Γ ⧸ L => φ (e m.out * q.out)),
-          finsum_mem_def]
-        refine finsum_congr fun q => ?_
-        by_cases hq : p q.out ∈ V
-        · have hq' : q ∈ S := hq
-          rw [Set.indicator_of_mem hq', Set.indicator_of_mem (show p q.out ∈ (V : Set H) from hq)]
-          simp
-        · have hq' : q ∉ S := hq
-          rw [Set.indicator_of_notMem hq',
-            Set.indicator_of_notMem (show p q.out ∉ (V : Set H) from hq)]
-          simp
+      refine finsum_congr fun m => ?_
+      rw [finsum_set_coe_eq_finsum_mem S (f := fun q : Γ ⧸ L => φ (e m.out * q.out)),
+        finsum_mem_def]
+      refine finsum_congr fun q => ?_
+      by_cases hq : p q.out ∈ V
+      · have hq' : q ∈ S := hq
+        rw [Set.indicator_of_mem hq', Set.indicator_of_mem (show p q.out ∈ (V : Set H) from hq)]
+        simp
+      · have hq' : q ∉ S := hq
+        rw [Set.indicator_of_notMem hq',
+          Set.indicator_of_notMem (show p q.out ∉ (V : Set H) from hq)]
+        simp
 
 end GlobalTheory.CompanionTheory.FinActS.SumFiber

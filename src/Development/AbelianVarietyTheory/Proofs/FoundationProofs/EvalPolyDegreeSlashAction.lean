@@ -10,15 +10,22 @@ open scoped Manifold
 
 namespace GlobalTheory.HeckeFamilyMatrices
 
-theorem eval_polySlash : ∀ (w : ℕ) (g : Matrix (Fin 2) (Fin 2) ℤ) (p : ℂ[X]) (z : ℂ), p ∈ degreeLT ℂ (w + 1) → ((g 1 0 : ℂ) * z + (g 1 1 : ℂ)) ≠ 0 → (slP w g p).eval z = ((g 1 0 : ℂ) * z + (g 1 1 : ℂ)) ^ w * p.eval (((g 0 0 : ℂ) * z + (g 0 1 : ℂ)) / ((g 1 0 : ℂ) * z + (g 1 1 : ℂ))) := by
+theorem eval_polySlash
+    : ∀ (w : ℕ) (g : Matrix (Fin 2) (Fin 2) ℤ) (p : ℂ[X]) (z : ℂ),
+      p ∈ degreeLT ℂ (w + 1) → ((g 1 0 : ℂ) * z + (g 1 1 : ℂ)) ≠ 0
+        → (slP w g p).eval z
+          = ((g 1 0 : ℂ) * z + (g 1 1 : ℂ)) ^ w
+            * p.eval (((g 0 0 : ℂ) * z + (g 0 1 : ℂ)) / ((g 1 0 : ℂ) * z + (g 1 1 : ℂ))) := by
   intro w g p z hp hz
   have hn : p.natDegree < w + 1 := by
     rcases eq_or_ne p 0 with rfl | h
     · simp
     · exact (natDegree_lt_iff_degree_lt h).2 (mem_degreeLT.1 hp)
-  have hs : slP w g p = ∑ i ∈ Finset.range (w + 1), p.coeff i •
-      ((C ((g 0 0 : ℤ) : ℂ) * X + C ((g 0 1 : ℤ) : ℂ)) ^ i *
-        (C ((g 1 0 : ℤ) : ℂ) * X + C ((g 1 1 : ℤ) : ℂ)) ^ (w - i)) := by
+  have hs
+      : slP w g p
+        = ∑ i ∈ Finset.range (w + 1), p.coeff i •
+          ((C ((g 0 0 : ℤ) : ℂ) * X + C ((g 0 1 : ℤ) : ℂ)) ^ i *
+            (C ((g 1 0 : ℤ) : ℂ) * X + C ((g 1 1 : ℤ) : ℂ)) ^ (w - i)) := by
     simp [slP, LinearMap.sum_apply, LinearMap.toSpanSingleton_apply]
   rw [hs, eval_finsetSum, eval_eq_sum_range' hn, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i hi => ?_

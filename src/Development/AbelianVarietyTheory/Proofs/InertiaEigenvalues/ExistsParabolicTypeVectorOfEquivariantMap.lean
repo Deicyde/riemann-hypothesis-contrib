@@ -10,19 +10,33 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsInS
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead GlobalTheory.PendOf GlobalTheory.LevelType GlobalTheory.StepData GlobalTheory.ProdSupport Matrix ValuativeRel
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead
+  GlobalTheory.PendOf GlobalTheory.LevelType GlobalTheory.StepData GlobalTheory.ProdSupport Matrix
+  ValuativeRel
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.LevelType
 
-theorem exists_parVec_of_map : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] (p : ℕ) [Fact p.Prime] (α n : Type) [Fintype α] [LinearOrder α] [Fintype n] [DecidableEq n] (m : α → Type) [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)] (e : (Σ a, m a) ≃ n) (X : α → Type) [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)] (s : ∀ a, Representation ℂ (GL (m a) F) (X a)) (a : α) (θ : (ZMod p)ˣ →* ℂˣ) (χ : Fˣ →* ℂˣ) (U : Type) [AddCommGroup U] [Module ℂ U] (ρ : Representation ℂ (GL n (ZMod p)) U) (φ : U →ₗ[ℂ] IndSp e (piTensor s)), resCard F = p → CharLift θ χ → (∀ g ∈ KO F (m a), ∀ v, s a g v = (χ (Matrix.GeneralLinearGroup.det g) : ℂ) • v) → φ ≠ 0 → (∀ (g : GL n (ZMod p)) (h : GL n F), IsLift g h → ∀ w, multiProd e s h (φ w) = φ (ρ g w)) → ∃ v : U, v ≠ 0 ∧ ParVec ρ e a θ v := by
+theorem exists_parVec_of_map
+    : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        (p : ℕ) [Fact p.Prime] (α n : Type) [Fintype α] [LinearOrder α] [Fintype n] [DecidableEq n]
+        (m : α → Type) [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)] (e : (Σ a, m a) ≃ n)
+        (X : α → Type) [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)]
+        (s : ∀ a, Representation ℂ (GL (m a) F) (X a)) (a : α) (θ : (ZMod p)ˣ →* ℂˣ) (χ : Fˣ →* ℂˣ)
+        (U : Type) [AddCommGroup U] [Module ℂ U] (ρ : Representation ℂ (GL n (ZMod p)) U)
+        (φ : U →ₗ[ℂ] IndSp e (piTensor s)),
+      resCard F = p → CharLift θ χ
+        → (∀ g ∈ KO F (m a), ∀ v, s a g v = (χ (Matrix.GeneralLinearGroup.det g) : ℂ) • v) → φ ≠ 0
+        → (∀ (g : GL n (ZMod p)) (h : GL n F), IsLift g h → ∀ w, multiProd e s h (φ w) = φ (ρ g w))
+        → ∃ v : U, v ≠ 0 ∧ ParVec ρ e a θ v := by
   intro F _ _ _ _ p _ α n _ _ _ _ m _ _ e X _ _ s a θ χ U _ _ ρ φ hp hθ hs hφ hint
   haveI : Fact (1 < p) := ⟨(Fact.out : p.Prime).one_lt⟩
-  let Λ : U →ₗ[ℂ] (⨂[ℂ] b, X b) :=
-    { toFun := fun w => (φ w).1.1 1
-      map_add' := fun x y => by rw [map_add (f := _)]; rfl
-      map_smul' := fun c x => by rw [map_smul]; rfl }
+  let Λ : U →ₗ[ℂ] (⨂[ℂ] b, X b) := {
+    toFun := fun w => (φ w).1.1 1
+    map_add' := fun x y => by rw [map_add (f := _)]; rfl
+    map_smul' := fun c x => by rw [map_smul]; rfl
+  }
   have hΛ : ∀ w, Λ w = (φ w).1.1 1 := fun _ => rfl
   have hΛ0 : Λ ≠ 0 := by
     obtain ⟨w, hw⟩ : ∃ w, φ w ≠ 0 := by
@@ -41,16 +55,20 @@ theorem exists_parVec_of_map : ∀ (F : Type) [Field F] [ValuativeRel F] [Topolo
       have h3 : (multiProd e s κ (φ w)).1.1 1 = (φ w).1.1 (1 * κ) := rfl
       rwa [h3, one_mul] at h2
     rw [parInd_law, h1, map_zero, smul_zero]
-  let H : Subgroup (GL n (ZMod p)) := Subgroup.map (parab (ZMod p) e).subtype
-    (⨅ b : {b // b ≠ a}, ((Pi.evalMonoidHom (fun c => GL (m c) (ZMod p)) b.1).comp (leviProj (ZMod p) e)).ker)
-  have hH : ∀ x : parab (ZMod p) e, (∀ b, b ≠ a → leviProj (ZMod p) e x b = 1) → (x : GL n (ZMod p)) ∈ H := by
+  let H : Subgroup (GL n (ZMod p)) :=
+    Subgroup.map (parab (ZMod p) e).subtype
+      (⨅ b : {b // b ≠ a}, ((Pi.evalMonoidHom (fun c => GL (m c) (ZMod p)) b.1).comp (leviProj (ZMod p) e)).ker)
+  have hH
+      : ∀ x : parab (ZMod p) e,
+        (∀ b, b ≠ a → leviProj (ZMod p) e x b = 1) → (x : GL n (ZMod p)) ∈ H := by
     intro x hx
     refine ⟨x, ?_, rfl⟩
     rw [SetLike.mem_coe, Subgroup.mem_iInf]
     intro b
     exact MonoidHom.mem_ker.2 (hx b.1 b.2)
-  have hH' : ∀ y ∈ H, ∃ x : parab (ZMod p) e, (x : GL n (ZMod p)) = y ∧
-      ∀ b, b ≠ a → leviProj (ZMod p) e x b = 1 := by
+  have hH'
+      : ∀ y ∈ H, ∃ x : parab (ZMod p) e,
+        (x : GL n (ZMod p)) = y ∧ ∀ b, b ≠ a → leviProj (ZMod p) e x b = 1 := by
     rintro y ⟨x, hx, rfl⟩
     rw [SetLike.mem_coe, Subgroup.mem_iInf] at hx
     exact ⟨x, rfl, fun b hb => MonoidHom.mem_ker.1 (hx ⟨b, hb⟩)⟩
@@ -58,13 +76,14 @@ theorem exists_parVec_of_map : ∀ (F : Type) [Field F] [ValuativeRel F] [Topolo
     intro y hy w
     obtain ⟨x, rfl, hx⟩ := hH' y hy
     obtain ⟨h, hh, hl⟩ := exists_canon_lift hp (x : GL n (ZMod p))
-    have hP : h ∈ parab F e := mem_parab.2 fun i j hij => by
-      have h0 := mem_parab.1 x.2 i j hij
-      change h.val i j = 0
-      rw [hh]
-      change ((((x : GL n (ZMod p)) : Matrix n n (ZMod p)) i j).val : F) = 0
-      rw [h0]
-      simp
+    have hP : h ∈ parab F e :=
+      mem_parab.2 fun i j hij => by
+        have h0 := mem_parab.1 x.2 i j hij
+        change h.val i j = 0
+        rw [hh]
+        change ((((x : GL n (ZMod p)) : Matrix n n (ZMod p)) i j).val : F) = 0
+        rw [h0]
+        simp
     let q : parab F e := ⟨h, hP⟩
     have hq : ∀ b, b ≠ a → leviProj F e q b = 1 := by
       intro b hb
@@ -94,7 +113,9 @@ theorem exists_parVec_of_map : ∀ (F : Type) [Field F] [ValuativeRel F] [Topolo
       by_cases hb : b = a
       · subst hb; exact valuation_det_of_mem_KO hKa
       · rw [hq b hb, map_one]; simp
-    have hdet : χ (GeneralLinearGroup.det (leviProj F e q a)) = θ (GeneralLinearGroup.det (x : GL n (ZMod p))) := by
+    have hdet
+        : χ (GeneralLinearGroup.det (leviProj F e q a))
+          = θ (GeneralLinearGroup.det (x : GL n (ZMod p))) := by
       rw [← CharLift.det hp hθ hl]
       congr 1
       change _ = GeneralLinearGroup.det (q : GL n F)
@@ -108,7 +129,8 @@ theorem exists_parVec_of_map : ∀ (F : Type) [Field F] [ValuativeRel F] [Topolo
     have hlaw := parInd_law e (piTensor s) (φ w) q 1
     rw [mul_one] at hlaw
     change (φ w).1.1 (q : GL n F) = _
-    rw [hlaw, hδ, Units.val_one, one_smul, hqa, piTensor_mulSingle s a _ _ (hs _ hKa), MonoidHom.comp_apply, hdet]
+    rw [hlaw, hδ, Units.val_one, one_smul, hqa, piTensor_mulSingle s a _ _ (hs _ hKa),
+      MonoidHom.comp_apply, hdet]
   obtain ⟨v, hv0, hv⟩ := exists_eigen_of_map ρ H (θ.comp GeneralLinearGroup.det) Λ hΛ0 key
   exact ⟨v, hv0, fun x hx => hv _ (hH x hx)⟩
 

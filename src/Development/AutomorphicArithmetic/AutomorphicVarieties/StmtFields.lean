@@ -33,17 +33,18 @@ end AbF
 
 def IsAbField (A : AbF) (L : Type) [Field L] [NumberField L] : Prop :=
   ∃ (N : ℕ) (_ : NeZero N) (j : L →ₐ[ℚ] CyclotomicField N ℚ) (ζ : CyclotomicField N ℚ),
-    A.m ∣ N ∧ IsPrimitiveRoot ζ N ∧
-    ∀ (τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ) (a : ℕ), τ ζ = ζ ^ a →
-      ((∀ x : L, τ (j x) = j x) ↔ A.ker a)
+    A.m ∣ N ∧ IsPrimitiveRoot ζ N
+      ∧ ∀ (τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ) (a : ℕ),
+        τ ζ = ζ ^ a → ((∀ x : L, τ (j x) = j x) ↔ A.ker a)
 
 def IsCompField (A : AbF) (e q d : ℕ) (E : Type) [Field E] [NumberField E] : Prop :=
   ∃ (N : ℕ) (_ : NeZero N) (j : E →ₐ[ℚ] CyclotomicField N ℚ) (ζ : CyclotomicField N ℚ),
-    2 ^ (e + 2) ∣ N ∧ A.m ∣ N ∧ q ∣ N ∧ d ∣ N ∧ IsPrimitiveRoot ζ N ∧
-    ∀ (τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ) (a : ℕ), τ ζ = ζ ^ a →
-      ((∀ x : E, τ (j x) = j x) ↔
-        (a ≡ 1 [MOD 2 ^ (e + 2)] ∨ a + 1 ≡ 0 [MOD 2 ^ (e + 2)]) ∧ A.ker a ∧
-          jacobiSym (a : ℤ) q = 1 ∧ jacobiSym (a : ℤ) d = 1)
+    2 ^ (e + 2) ∣ N ∧ A.m ∣ N ∧ q ∣ N ∧ d ∣ N ∧ IsPrimitiveRoot ζ N
+      ∧ ∀ (τ : CyclotomicField N ℚ ≃ₐ[ℚ] CyclotomicField N ℚ) (a : ℕ),
+        τ ζ = ζ ^ a
+          → ((∀ x : E, τ (j x) = j x)
+            ↔ (a ≡ 1 [MOD 2 ^ (e + 2)] ∨ a + 1 ≡ 0 [MOD 2 ^ (e + 2)]) ∧ A.ker a
+              ∧ jacobiSym (a : ℤ) q = 1 ∧ jacobiSym (a : ℤ) d = 1)
 
 def condF (E : Type) [Field E] [NumberField E] : ℕ :=
   sInf {N : ℕ | 0 < N ∧ Nonempty (E →ₐ[ℚ] CyclotomicField N ℚ)}
@@ -53,7 +54,8 @@ def IsLayer (l j : ℕ) (L L' : Type) [Field L] [Field L'] [Algebra L L'] : Prop
 
 def Kstar (p : ℕ) : Type := (X ^ 2 + C (p : ℚ) : ℚ[X]).SplittingField
 
-instance (p : ℕ) : Field (Kstar p) := inferInstanceAs (Field (X ^ 2 + C (p : ℚ) : ℚ[X]).SplittingField)
+instance (p : ℕ) : Field (Kstar p) :=
+  inferInstanceAs (Field (X ^ 2 + C (p : ℚ) : ℚ[X]).SplittingField)
 
 instance (p : ℕ) : NumberField (Kstar p) :=
   NumberField.of_module_finite ℚ (X ^ 2 + C (p : ℚ) : ℚ[X]).SplittingField
@@ -71,8 +73,9 @@ def Bchi (ψ : PChar) : Finset ℕ :=
   insert 3 ((ordC ψ * ψ.N * pK ψ * hStar ψ * pOne ψ).primeFactors.erase 2)
 
 def minusBound (C : ℝ) (o n N t : ℕ) : ℝ :=
-  3 * n * (t : ℝ) ^ 2 * Real.log ((t : ℝ) * N) +
-    C * ∑ l ∈ o.primeFactors.erase 2, (l : ℝ) * (n : ℝ) ^ 2 * (t : ℝ) ^ 2 * Real.log ((t : ℝ) * l * N) ^ 2
+  3 * n * (t : ℝ) ^ 2 * Real.log ((t : ℝ) * N)
+    + C
+      * ∑ l ∈ o.primeFactors.erase 2, (l : ℝ) * (n : ℝ) ^ 2 * (t : ℝ) ^ 2 * Real.log ((t : ℝ) * l * N) ^ 2
 
 theorem AbF.ker_ofChar (ψ : PChar) (a : ℕ) : (AbF.ofChar ψ).ker a ↔ ψ.val a = 1 := by
   show (∃ u ∈ ψ.χ.toUnitHom.ker, ((u : (ZMod ψ.N)ˣ) : ZMod ψ.N) = (a : ZMod ψ.N)) ↔
@@ -92,8 +95,8 @@ theorem AbF.ker_ofChar (ψ : PChar) (a : ℕ) : (AbF.ofChar ψ).ker a ↔ ψ.val
     ext
     simpa [MulChar.coe_toUnitHom] using h
 
-theorem isCompField_ofChar (ψ : PChar) (e q d : ℕ) (E : Type) [Field E] [NumberField E] :
-    IsCompField (AbF.ofChar ψ) e q d E ↔ IsChiField ψ e q d E := by
+theorem isCompField_ofChar (ψ : PChar) (e q d : ℕ) (E : Type) [Field E] [NumberField E]
+    : IsCompField (AbF.ofChar ψ) e q d E ↔ IsChiField ψ e q d E := by
   simp only [IsCompField, IsChiField, AbF.ker_ofChar]
   rfl
 

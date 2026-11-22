@@ -8,7 +8,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BaseMetricPull
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 open GlobalTheory.CompanionTheory.Ar.PB.WSq
 
@@ -16,9 +20,12 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.WSq.FC
 
-theorem sameOrbit_fstPt {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] (k₀ : K)
-    {z z' : (Σ o : Option K, ι (o.getD k₀)) → ℂ} (h : SameOrbit z z') :
-    SameOrbit (fstPt k₀ z) (fstPt k₀ z') := by
+theorem sameOrbit_fstPt
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    (k₀ : K)
+    {z z' : (Σ o : Option K, ι (o.getD k₀)) → ℂ} (h : SameOrbit z z')
+    : SameOrbit (fstPt k₀ z) (fstPt k₀ z') := by
   obtain ⟨c, hc, e⟩ := h
   refine ⟨fun k => c (some k), fun k => hc _, ?_⟩
   funext p
@@ -26,9 +33,12 @@ theorem sameOrbit_fstPt {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype
   rw [e]
   rfl
 
-theorem sameOrbit_sndPt {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] (k₀ : K)
-    {z z' : (Σ o : Option K, ι (o.getD k₀)) → ℂ} (h : SameOrbit z z') :
-    SameOrbit (sndPt k₀ z) (sndPt k₀ z') := by
+theorem sameOrbit_sndPt
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    (k₀ : K)
+    {z z' : (Σ o : Option K, ι (o.getD k₀)) → ℂ} (h : SameOrbit z z')
+    : SameOrbit (sndPt k₀ z) (sndPt k₀ z') := by
   obtain ⟨c, hc, e⟩ := h
   refine ⟨fun k => if k = k₀ then c none else c (some k), fun k => ?_, ?_⟩
   · by_cases hk : k = k₀

@@ -16,9 +16,11 @@ namespace GlobalTheory.PsChar
 
 open MvPolynomial
 
-theorem aeval_eq_zero_of_polyApprox {k : Type} [NormedField k] [IsUltrametricDist k] {J : Type} {θ : J → k}
-    {S : Set (J → k)} (h : PolyApprox θ S) (P : MvPolynomial J ℤ) (hP : ∀ η ∈ S, aeval η P = 0) :
-    aeval θ P = 0 := by
+theorem aeval_eq_zero_of_polyApprox
+    {k : Type} [NormedField k] [IsUltrametricDist k]
+    {J : Type} {θ : J → k} {S : Set (J → k)}
+    (h : PolyApprox θ S) (P : MvPolynomial J ℤ) (hP : ∀ η ∈ S, aeval η P = 0)
+    : aeval θ P = 0 := by
   refine norm_le_zero_iff.1 (le_of_forall_pos_le_add fun ε hε => ?_)
   obtain ⟨s, c, hs, hb⟩ := h ε hε
   have hz : ∑ η ∈ s, c η * aeval η P = 0 :=
@@ -27,16 +29,21 @@ theorem aeval_eq_zero_of_polyApprox {k : Type} [NormedField k] [IsUltrametricDis
   rw [hz, sub_zero] at this
   simpa using this
 
-theorem isPsChar_trc {Γ A : Type} [Group Γ] [CommRing A] (a : ℕ) (ρ : Γ →* GL (Fin a) A) : IsPsChar a (trc ρ) :=
+theorem isPsChar_trc {Γ A : Type} [Group Γ] [CommRing A] (a : ℕ) (ρ : Γ →* GL (Fin a) A)
+    : IsPsChar a (trc ρ) :=
   isPsChar_trace Γ A a ((Units.coeHom (Matrix (Fin a) (Fin a) A)).comp ρ)
 
-theorem isPsChar_of_polyApprox_trc : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] (a : ℕ) (T : Γ → PadicAlgCl l)
-    (C : Set (Γ →* GL (Fin a) (PadicAlgCl l))), PolyApprox T (trc '' C) → IsPsChar a T := by
+theorem isPsChar_of_polyApprox_trc
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] (a : ℕ) (T : Γ → PadicAlgCl l)
+        (C : Set (Γ →* GL (Fin a) (PadicAlgCl l))),
+      PolyApprox T (trc '' C) → IsPsChar a T := by
   intro l _ Γ _ a T C h
   have key : ∀ P : MvPolynomial Γ ℤ, (∀ ρ ∈ C, aeval (trc ρ) P = 0) → aeval T P = 0 := fun P hP =>
     aeval_eq_zero_of_polyApprox h P (by rintro η ⟨ρ, hρ, rfl⟩; exact hP ρ hρ)
-  have hm : ∀ (η : Γ → PadicAlgCl l) (x : Fin (a + 1) → Γ),
-      aeval η (alt (fun g => (X g : MvPolynomial Γ ℤ)) (a + 1) x) = alt η (a + 1) x := fun η x => by
+  have hm
+      : ∀ (η : Γ → PadicAlgCl l) (x : Fin (a + 1) → Γ),
+        aeval η (alt (fun g => (X g : MvPolynomial Γ ℤ)) (a + 1) x)
+          = alt η (a + 1) x := fun η x => by
     have := map_alt (aeval η).toRingHom (fun g => (X g : MvPolynomial Γ ℤ)) (a + 1) x
     simpa using this
   refine ⟨?_, ?_, ?_⟩

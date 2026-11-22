@@ -23,15 +23,15 @@ theorem CuspWeightBound.proof : CuspWeightBound.Statement := by
   have h2fρ : (0 : ℝ) < 2 * f * ρ := by positivity
   have hsq : 0 < √(2 * f * ρ : ℝ) := Real.sqrt_pos.mpr h2fρ
 
-  have hmk : (lam / √(2 * f * ρ : ℝ)) ^ (2 * f * ρ) ≤ NI * rd ^ (f * ρ) :=
-    h.covol_eq ▸ h.minkowski
+  have hmk : (lam / √(2 * f * ρ : ℝ)) ^ (2 * f * ρ) ≤ NI * rd ^ (f * ρ) := h.covol_eq ▸ h.minkowski
   have hrdp : (0 : ℝ) < rd ^ (f * ρ) := by positivity
   have hlog := Real.log_le_log (by positivity) hmk
-  rw [Real.log_pow, Real.log_mul hNI.ne' hrdp.ne', Real.log_pow,
-    Real.log_div hlam.ne' hsq.ne', Real.log_sqrt h2fρ.le] at hlog
+  rw [Real.log_pow, Real.log_mul hNI.ne' hrdp.ne', Real.log_pow, Real.log_div hlam.ne' hsq.ne',
+      Real.log_sqrt h2fρ.le]
+    at hlog
   push_cast at hlog
 
-  have hρbound : -log NI ≤ f * ρ * (2 * log (1 / lam) + log (2 * f * ρ * rd)) := by
+  have hρbound : - log NI ≤ f * ρ * (2 * log (1 / lam) + log (2 * f * ρ * rd)) := by
     have hrd0 : rd ≠ 0 := by positivity
     rw [one_div, Real.log_inv, Real.log_mul h2fρ.ne' hrd0]
     nlinarith
@@ -43,16 +43,17 @@ theorem CuspWeightBound.proof : CuspWeightBound.Statement := by
       exact Real.log_nonneg (by linarith)
     have : 0 ≤ max 0 (log (1 / lam)) := le_max_left _ _
     linarith
-  have hin : 2 * log (1 / lam) + log (2 * f * ρ * rd) ≤
-      2 * max 0 (log (1 / lam)) + log (2 * f * j' * rd) := by
+  have hin
+      : 2 * log (1 / lam) + log (2 * f * ρ * rd)
+        ≤ 2 * max 0 (log (1 / lam)) + log (2 * f * j' * rd) := by
     have h1 : log (1 / lam) ≤ max 0 (log (1 / lam)) := le_max_right _ _
     have h2 : log (2 * f * ρ * rd) ≤ log (2 * f * j' * rd) :=
       Real.log_le_log (by positivity) (by gcongr)
     linarith
-  calc -log NI ≤ f * ρ * (2 * log (1 / lam) + log (2 * f * ρ * rd)) := hρbound
-    _ ≤ f * ρ * (2 * max 0 (log (1 / lam)) + log (2 * f * j' * rd)) := by
-        gcongr
-    _ ≤ f * j' * (2 * max 0 (log (1 / lam)) + log (2 * f * j' * rd)) := by
-        gcongr
+  calc
+    - log NI
+      ≤ f * ρ * (2 * log (1 / lam) + log (2 * f * ρ * rd)) := hρbound
+    _ ≤ f * ρ * (2 * max 0 (log (1 / lam)) + log (2 * f * j' * rd)) := by gcongr
+    _ ≤ f * j' * (2 * max 0 (log (1 / lam)) + log (2 * f * j' * rd)) := by gcongr
 
 end GroundTheory.Heights₂.Heights.LowerBound

@@ -10,18 +10,19 @@ set_option maxHeartbeats 1000000
 
 namespace GlobalTheory
 
-
 open Polynomial in
-theorem adjoinRoot_X_pow_sub_C_uniformizer_isDomain :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] (π : R) (e : ℕ),
-      Irreducible π → 0 < e → IsDomain (AdjoinRoot (Polynomial.X ^ e - Polynomial.C π : Polynomial R)) := by
+theorem adjoinRoot_X_pow_sub_C_uniformizer_isDomain
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] (π : R) (e : ℕ),
+      Irreducible π → 0 < e
+        → IsDomain (AdjoinRoot (Polynomial.X ^ e - Polynomial.C π : Polynomial R)) := by
   intro R _ _ _ π e hπ he
   have hπp : Prime π := hπ.prime
   have hP : (Ideal.span {π}).IsPrime := (Ideal.span_singleton_prime hπp.ne_zero).2 hπp
   have hmon : (X ^ e - C π : R[X]).Monic := monic_X_pow_sub_C _ he.ne'
   have hdeg : (X ^ e - C π : R[X]).natDegree = e := natDegree_X_pow_sub_C _
   have hirr : Irreducible (X ^ e - C π : R[X]) := by
-    refine Polynomial.IsEisensteinAt.irreducible ⟨?_, ?_, ?_⟩ hP hmon.isPrimitive (by rw [hdeg]; exact he)
+    refine Polynomial.IsEisensteinAt.irreducible ⟨?_, ?_, ?_⟩ hP hmon.isPrimitive
+      (by rw [hdeg]; exact he)
     · rw [hmon.leadingCoeff]
       exact fun h => hP.ne_top ((Ideal.eq_top_iff_one _).2 h)
     · intro n hn

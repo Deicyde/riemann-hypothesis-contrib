@@ -18,14 +18,15 @@ open scoped ENNReal NNReal
 
 section Abs
 
-theorem detect_of_idem {K : Type} [CommRing K] (O : Subring K) (I : Finset K)
-    (hid : ∀ e ∈ I, e * e = e)
+theorem detect_of_idem
+    {K : Type} [CommRing K]
+    (O : Subring K) (I : Finset K) (hid : ∀ e ∈ I, e * e = e)
     (hdom : ∀ e ∈ I, ∀ x y : K, (e * x) * (e * y) = 0 → e * x = 0 ∨ e * y = 0)
     (htot : ∀ e ∈ I, ∀ x y : K, ∃ z ∈ O, e * x = z * (e * y) ∨ e * y = z * (e * x))
     (hsep : ∀ x : K, (∀ e ∈ I, e * x = 0) → x = 0)
-    (n M : ℕ) (X : Fin n → Fin M → K) (hX : ¬ LinearIndependent K X) :
-    ∃ e ∈ I, ∃ (l : Fin n) (a : Fin n → K), (∀ i, a i ∈ O) ∧ a l = 1 ∧
-      ∀ k, e * ∑ i, X i k * a i = 0 := by
+    (n M : ℕ) (X : Fin n → Fin M → K) (hX : ¬ LinearIndependent K X)
+    : ∃ e ∈ I, ∃ (l : Fin n) (a : Fin n → K),
+      (∀ i, a i ∈ O) ∧ a l = 1 ∧ ∀ k, e * ∑ i, X i k * a i = 0 := by
   classical
   rw [Fintype.not_linearIndependent_iff] at hX
   obtain ⟨c, hc, i₀, hi₀⟩ := hX
@@ -34,8 +35,8 @@ theorem detect_of_idem {K : Type} [CommRing K] (O : Subring K) (I : Finset K)
     push_neg at h
     exact hi₀ (hsep _ h)
   obtain ⟨e, he, hne⟩ := hex
-  have hmax : ∀ s : Finset (Fin n), s.Nonempty →
-      ∃ l ∈ s, ∀ i ∈ s, ∃ z ∈ O, e * c i = z * (e * c l) := by
+  have hmax
+      : ∀ s : Finset (Fin n), s.Nonempty → ∃ l ∈ s, ∀ i ∈ s, ∃ z ∈ O, e * c i = z * (e * c l) := by
     intro s hs
     induction hs using Finset.Nonempty.cons_induction with
     | singleton a =>
@@ -61,7 +62,7 @@ theorem detect_of_idem {K : Type} [CommRing K] (O : Subring K) (I : Finset K)
   have hl0 : e * c l ≠ 0 := by
     intro h0
     apply hne
-    rw [hzc i₀ , h0, mul_zero]
+    rw [hzc i₀, h0, mul_zero]
   have hac : ∀ i, (if i = l then 1 else z i) * (e * c l) = e * c i := by
     intro i
     by_cases h : i = l
@@ -81,14 +82,18 @@ theorem detect_of_idem {K : Type} [CommRing K] (O : Subring K) (I : Finset K)
       rw [hw, Finset.mul_sum, Finset.mul_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       have := hac i
-      calc e * c l * (e * (X i k * (if i = l then 1 else z i)))
+      calc
+        e * c l * (e * (X i k * (if i = l then 1 else z i)))
           = e * (X i k * ((if i = l then 1 else z i) * (e * c l))) := by ring
         _ = e * (c i * X i k * e) := by rw [this]; ring
     rw [h2, ← Finset.sum_mul, hk, zero_mul, mul_zero]
   exact (hdom e he _ _ hz0).resolve_left hl0
 
-theorem line_dom {k K : Type} [Field k] [CommRing K] [Algebra k K] (φ : K →ₐ[k] k) (e : K) (he : φ e = 1)
-    (hl : ∀ x, e * x = φ x • e) (x y : K) (h : (e * x) * (e * y) = 0) : e * x = 0 ∨ e * y = 0 := by
+theorem line_dom
+    {k K : Type} [Field k] [CommRing K] [Algebra k K]
+    (φ : K →ₐ[k] k) (e : K) (he : φ e = 1) (hl : ∀ x, e * x = φ x • e)
+    (x y : K) (h : (e * x) * (e * y) = 0)
+    : e * x = 0 ∨ e * y = 0 := by
   have hee : e * e = e := by rw [hl e, he, one_smul]
   rw [hl x, hl y, smul_mul_smul_comm, hee, smul_eq_zero] at h
   rw [hl x, hl y]
@@ -98,9 +103,12 @@ theorem line_dom {k K : Type} [Field k] [CommRing K] [Algebra k K] (φ : K →�
     · right; rw [h, zero_smul]
   · left; rw [h, smul_zero]
 
-theorem line_tot {k K : Type} [Field k] [CommRing K] [Algebra k K] (A : ValuationSubring k) (O : Subring K)
-    (hA : ∀ r ∈ A, algebraMap k K r ∈ O) (φ : K →ₐ[k] k) (e : K)
-    (hl : ∀ x, e * x = φ x • e) (x y : K) : ∃ z ∈ O, e * x = z * (e * y) ∨ e * y = z * (e * x) := by
+theorem line_tot
+    {k K : Type} [Field k] [CommRing K] [Algebra k K]
+    (A : ValuationSubring k) (O : Subring K) (hA : ∀ r ∈ A, algebraMap k K r ∈ O)
+    (φ : K →ₐ[k] k) (e : K) (hl : ∀ x, e * x = φ x • e)
+    (x y : K)
+    : ∃ z ∈ O, e * x = z * (e * y) ∨ e * y = z * (e * x) := by
   by_cases hy : φ y = 0
   · exact ⟨0, O.zero_mem, Or.inr (by rw [hl y, hy, zero_smul, zero_mul])⟩
   by_cases hx : φ x = 0
@@ -111,9 +119,12 @@ theorem line_tot {k K : Type} [Field k] [CommRing K] [Algebra k K] (A : Valuatio
   · refine ⟨_, hA _ h, Or.inr ?_⟩
     rw [hl x, hl y, ← Algebra.smul_def, smul_smul, inv_div, div_mul_cancel₀ _ hx]
 
-theorem field_total {k L : Type} [NontriviallyNormedField k] [IsUltrametricDist k] [CompleteSpace k] [Field L]
-    [Algebra k L] [FiniteDimensional k L] (A : ValuationSubring k) (hA : ∀ x : k, ‖x‖ ≤ 1 ↔ x ∈ A) [Algebra A L]
-    [IsScalarTower A k L] (x : L) (hx : x ≠ 0) : IsIntegral A x ∨ IsIntegral A x⁻¹ := by
+theorem field_total
+    {k L : Type} [NontriviallyNormedField k] [IsUltrametricDist k] [CompleteSpace k] [Field L]
+    [Algebra k L] [FiniteDimensional k L]
+    (A : ValuationSubring k) (hA : ∀ x : k, ‖x‖ ≤ 1 ↔ x ∈ A) [Algebra A L] [IsScalarTower A k L]
+    (x : L) (hx : x ≠ 0)
+    : IsIntegral A x ∨ IsIntegral A x⁻¹ := by
   haveI : Algebra.IsAlgebraic k L := Algebra.IsAlgebraic.of_finite k L
   have key : ∀ y : L, spectralNorm k L y ≤ 1 → IsIntegral A y := by
     intro y hy
@@ -134,31 +145,40 @@ theorem field_total {k L : Type} [NontriviallyNormedField k] [IsUltrametricDist 
     have h0 : 0 ≤ spectralNorm k L x⁻¹ := spectralNorm_nonneg _
     nlinarith
 
-theorem inv_notMem {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [T2Space K]
-    [FirstCountableTopology K] (O : Subring K) (hc : IsCompact (O : Set K)) (t : Kˣ) (e : K) (he : e ≠ 0)
-    (ht : Tendsto (fun j : ℕ => e * (t : K) ^ j) atTop (𝓝 0)) : ((t⁻¹ : Kˣ) : K) ∉ O := by
+theorem inv_notMem
+    {K : Type}
+    [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [T2Space K] [FirstCountableTopology K]
+    (O : Subring K) (hc : IsCompact (O : Set K))
+    (t : Kˣ) (e : K) (he : e ≠ 0) (ht : Tendsto (fun j : ℕ => e * (t : K) ^ j) atTop (𝓝 0))
+    : ((t⁻¹ : Kˣ) : K) ∉ O := by
   intro hi
   have hmem : ∀ j : ℕ, (((t⁻¹ : Kˣ) : K)) ^ j ∈ (O : Set K) := fun j => O.pow_mem hi j
   obtain ⟨w, -, φ, hφ, hw⟩ := hc.tendsto_subseq hmem
   have h1 := (ht.comp hφ.tendsto_atTop).mul hw
-  have h2 : ∀ j, ((fun j : ℕ => e * (t : K) ^ j) ∘ φ) j * (((fun j : ℕ => (((t⁻¹ : Kˣ) : K)) ^ j) ∘ φ) j) = e := by
+  have h2
+      : ∀ j,
+        ((fun j : ℕ => e * (t : K) ^ j) ∘ φ) j * (((fun j : ℕ => (((t⁻¹ : Kˣ) : K)) ^ j) ∘ φ) j)
+          = e := by
     intro j
     simp only [Function.comp]
     rw [mul_assoc, ← mul_pow, Units.mul_inv, one_pow, mul_one]
   simp only [h2, zero_mul] at h1
   exact he (tendsto_nhds_unique tendsto_const_nhds h1)
 
-theorem contract {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [LocallyCompactSpace K]
-    [SecondCountableTopology K] [T2Space K] [MeasurableSpace K] [BorelSpace K] (μ : Measure K)
-    [μ.IsAddHaarMeasure] (O : Subring K) (hc : IsCompact (O : Set K)) (ho : IsOpen (O : Set K)) (t : Kˣ)
-    (ht : (t : K) ∈ O) (ht' : ((t⁻¹ : Kˣ) : K) ∉ O) :
-    ∃ θ : ℝ≥0, θ < 1 ∧ ∀ Y : Set K, μ ((fun x => (t : K) * x) '' Y) = θ * μ Y := by
-  let φ : K ≃+ K :=
-    { toFun := fun x => ((t⁻¹ : Kˣ) : K) * x
-      invFun := fun x => (t : K) * x
-      left_inv := fun x => by simp
-      right_inv := fun x => by simp
-      map_add' := mul_add _ }
+theorem contract
+    {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [LocallyCompactSpace K]
+    [SecondCountableTopology K] [T2Space K] [MeasurableSpace K] [BorelSpace K]
+    (μ : Measure K) [μ.IsAddHaarMeasure]
+    (O : Subring K) (hc : IsCompact (O : Set K)) (ho : IsOpen (O : Set K))
+    (t : Kˣ) (ht : (t : K) ∈ O) (ht' : ((t⁻¹ : Kˣ) : K) ∉ O)
+    : ∃ θ : ℝ≥0, θ < 1 ∧ ∀ Y : Set K, μ ((fun x => (t : K) * x) '' Y) = θ * μ Y := by
+  let φ : K ≃+ K := {
+    toFun := fun x => ((t⁻¹ : Kˣ) : K) * x
+    invFun := fun x => (t : K) * x
+    left_inv := fun x => by simp
+    right_inv := fun x => by simp
+    map_add' := mul_add _
+  }
   have c1 : Continuous φ := continuous_const.mul continuous_id
   have c2 : Continuous φ.symm := continuous_const.mul continuous_id
   let h : K ≃ₜ K := { φ.toEquiv with continuous_toFun := c1, continuous_invFun := c2 }
@@ -204,12 +224,15 @@ theorem contract {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing
   push_neg at hge
   have h2 : μ (O : Set K) ≤ μ T := by
     rw [hTdef, hall]
-    calc μ (O : Set K) = 1 * μ (O : Set K) := (one_mul _).symm
+    calc
+      μ (O : Set K)
+        = 1 * μ (O : Set K) := (one_mul _).symm
       _ ≤ c * μ (O : Set K) := by
         gcongr
         exact_mod_cast hge
   have h3 : μ (O : Set K) + μ ((O : Set K) \ T) ≤ μ (O : Set K) := by
-    calc _ ≤ μ T + μ ((O : Set K) \ T) := by gcongr
+    calc
+      _ ≤ μ T + μ ((O : Set K) \ T) := by gcongr
       _ = _ := hadd
   have h4 : μ (O : Set K) < μ (O : Set K) + μ ((O : Set K) \ T) :=
     ENNReal.lt_add_right hfin hdiff.ne'
@@ -219,16 +242,18 @@ end Abs
 
 section Pair
 
-theorem pair_props {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [T2Space K]
-    [FirstCountableTopology K] (O : Subring K) (hc : IsCompact (O : Set K)) (p q : K) (hpq : p * q = 1)
-    (hp : p ∈ O) (hpt : Tendsto (fun j : ℕ => p ^ j) atTop (𝓝 0)) (e : K) (he : e * e = e) (he0 : e ≠ 0)
-    (heO : e ∈ O) :
-    ∃ t : Kˣ, (t : K) ∈ O ∧ ((t⁻¹ : Kˣ) : K) ∉ O ∧ (∀ x, e * x = 0 → (t : K) * x = x) ∧
-      Tendsto (fun j : ℕ => e * (t : K) ^ j) atTop (𝓝 0) := by
+theorem pair_props
+    {K : Type}
+    [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [T2Space K] [FirstCountableTopology K]
+    (O : Subring K) (hc : IsCompact (O : Set K))
+    (p q : K) (hpq : p * q = 1) (hp : p ∈ O) (hpt : Tendsto (fun j : ℕ => p ^ j) atTop (𝓝 0))
+    (e : K) (he : e * e = e) (he0 : e ≠ 0) (heO : e ∈ O)
+    : ∃ t : Kˣ,
+      (t : K) ∈ O ∧ ((t⁻¹ : Kˣ) : K) ∉ O ∧ (∀ x, e * x = 0 → (t : K) * x = x)
+        ∧ Tendsto (fun j : ℕ => e * (t : K) ^ j) atTop (𝓝 0) := by
   have h1 : (p * e + 1 - e) * (q * e + 1 - e) = 1 := by
     linear_combination (e * e) * hpq + (2 - p - q) * he
-  have h2 : (q * e + 1 - e) * (p * e + 1 - e) = 1 := by
-    rw [mul_comm]; exact h1
+  have h2 : (q * e + 1 - e) * (p * e + 1 - e) = 1 := by rw [mul_comm]; exact h1
   let t : Kˣ := ⟨p * e + 1 - e, q * e + 1 - e, h1, h2⟩
   have ht : (t : K) = p * e + 1 - e := rfl
   have hpow : ∀ j : ℕ, e * (t : K) ^ j = p ^ j * e := by
@@ -252,17 +277,20 @@ end Pair
 
 section Local
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain
 open scoped TensorProduct
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem exists_idems (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ) (v : HeightOneSpectrum (𝓞 F)) :
-    ∃ I : Finset (Fv F v ⊗[F] E), (∀ e ∈ I, e * e = e ∧ e ≠ 0) ∧
-      (∀ e ∈ I, ∀ x y : Fv F v ⊗[F] E, (e * x) * (e * y) = 0 → e * x = 0 ∨ e * y = 0) ∧
-      (∀ e ∈ I, ∀ x y : Fv F v ⊗[F] E, ∃ z ∈ (integralClosure (v.adicCompletionIntegers F) (Fv F v ⊗[F] E)).toSubring,
-        e * x = z * (e * y) ∨ e * y = z * (e * x)) ∧
-      (∀ x : Fv F v ⊗[F] E, (∀ e ∈ I, e * x = 0) → x = 0) := by
+theorem exists_idems (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ) (v : HeightOneSpectrum (𝓞 F))
+    : ∃ I : Finset (Fv F v ⊗[F] E),
+      (∀ e ∈ I, e * e = e ∧ e ≠ 0)
+        ∧ (∀ e ∈ I, ∀ x y : Fv F v ⊗[F] E, (e * x) * (e * y) = 0 → e * x = 0 ∨ e * y = 0)
+        ∧ (∀ e ∈ I, ∀ x y : Fv F v ⊗[F] E,
+          ∃ z ∈ (integralClosure (v.adicCompletionIntegers F) (Fv F v ⊗[F] E)).toSubring,
+            e * x = z * (e * y) ∨ e * y = z * (e * x))
+        ∧ (∀ x : Fv F v ⊗[F] E, (∀ e ∈ I, e * x = 0) → x = 0) := by
   classical
   letI nf : NontriviallyNormedField (Fv F v) :=
     Valued.toNontriviallyNormedField (Fv F v) (WithZero (Multiplicative ℤ))
@@ -304,7 +332,8 @@ theorem exists_idems (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ) (v : HeightOneS
       field_simp
       norm_num
     let f : (Fv F v ⊗[F] E) →ₗ[Fv F v] Fv F v × Fv F v := ψ₁.toLinearMap.prod ψ₂.toLinearMap
-    have hfr : Module.finrank (Fv F v) (Fv F v ⊗[F] E) = Module.finrank (Fv F v) (Fv F v × Fv F v) := by
+    have hfr
+        : Module.finrank (Fv F v) (Fv F v ⊗[F] E) = Module.finrank (Fv F v) (Fv F v × Fv F v) := by
       rw [Module.finrank_baseChange, hσ.2.2.1]
       simp
     have hsurj : Function.Surjective f := by
@@ -330,19 +359,24 @@ theorem exists_idems (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ) (v : HeightOneS
       refine hext _ _ ?_ ?_
       · simp [v11, v21]
       · simp [v12, v22]
-    have hL : ∀ e ∈ ({e₁, e₂} : Finset (Fv F v ⊗[F] E)),
-        ∃ φ : (Fv F v ⊗[F] E) →ₐ[Fv F v] Fv F v, φ e = 1 ∧ ∀ x, e * x = φ x • e := by
+    have hL
+        : ∀ e ∈ ({e₁, e₂} : Finset (Fv F v ⊗[F] E)), ∃ φ : (Fv F v ⊗[F] E) →ₐ[Fv F v] Fv F v,
+          φ e = 1 ∧ ∀ x, e * x = φ x • e := by
       intro e he
       rw [Finset.mem_insert, Finset.mem_singleton] at he
       rcases he with rfl | rfl
       · exact ⟨ψ₁, v11, l1⟩
       · exact ⟨ψ₂, v22, l2⟩
-    have hA : ∀ r ∈ v.adicCompletionIntegers F, algebraMap (Fv F v) (Fv F v ⊗[F] E) r ∈
-        (integralClosure (v.adicCompletionIntegers F) (Fv F v ⊗[F] E)).toSubring := by
+    have hA
+        : ∀ r ∈ v.adicCompletionIntegers F,
+          algebraMap (Fv F v) (Fv F v ⊗[F] E) r
+            ∈ (integralClosure (v.adicCompletionIntegers F) (Fv F v ⊗[F] E)).toSubring := by
       intro r hr
-      have h := isIntegral_algebraMap (R := v.adicCompletionIntegers F) (A := Fv F v ⊗[F] E)
-        (x := (⟨r, hr⟩ : v.adicCompletionIntegers F))
-      rwa [IsScalarTower.algebraMap_apply (v.adicCompletionIntegers F) (Fv F v) (Fv F v ⊗[F] E)] at h
+      have h :=
+        isIntegral_algebraMap (R := v.adicCompletionIntegers F) (A := Fv F v ⊗[F] E)
+          (x := (⟨r, hr⟩ : v.adicCompletionIntegers F))
+      rwa [IsScalarTower.algebraMap_apply (v.adicCompletionIntegers F) (Fv F v) (Fv F v ⊗[F] E)] at
+        h
     refine ⟨{e₁, e₂}, ?_, ?_, ?_, ?_⟩
     · intro e he
       obtain ⟨φ, h1, h2⟩ := hL e he
@@ -358,10 +392,12 @@ theorem exists_idems (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ) (v : HeightOneS
     · intro x h
       have h1 := h e₁ (by simp)
       have h2 := h e₂ (by simp)
-      calc x = (e₁ + e₂) * x := by rw [hsum, one_mul]
+      calc
+        x = (e₁ + e₂) * x := by rw [hsum, one_mul]
         _ = 0 := by rw [add_mul, h1, h2, add_zero]
   · have hf : IsField (Fv F v ⊗[F] E) :=
-      GlobalTheory.CompanionTheory.DictLoc.isField_tensor_of_no_algHom hσ.2.2.1 (not_nonempty_iff.1 hs)
+      GlobalTheory.CompanionTheory.DictLoc.isField_tensor_of_no_algHom hσ.2.2.1
+        (not_nonempty_iff.1 hs)
     letI fK : Field (Fv F v ⊗[F] E) := hf.toField
     haveI : FiniteDimensional (Fv F v) (Fv F v ⊗[F] E) := inferInstance
     refine ⟨{1}, ?_, ?_, ?_, ?_⟩
@@ -388,16 +424,22 @@ theorem exists_idems (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ) (v : HeightOneS
     · intro x h
       simpa using h 1 (Finset.mem_singleton_self _)
 
-theorem exists_unif (v : HeightOneSpectrum (𝓞 F)) :
-    ∃ w : Fv F v, w ≠ 0 ∧ w ∈ v.adicCompletionIntegers F ∧ Tendsto (fun j : ℕ => w ^ j) atTop (𝓝 0) := by
+theorem exists_unif (v : HeightOneSpectrum (𝓞 F))
+    : ∃ w : Fv F v,
+      w ≠ 0 ∧ w ∈ v.adicCompletionIntegers F ∧ Tendsto (fun j : ℕ => w ^ j) atTop (𝓝 0) := by
   letI nf : NontriviallyNormedField (Fv F v) :=
     Valued.toNontriviallyNormedField (Fv F v) (WithZero (Multiplicative ℤ))
   obtain ⟨w, h0, h1⟩ := NormedField.exists_norm_lt_one (Fv F v)
-  exact ⟨w, norm_pos_iff.1 h0, (PositivityTheory.UnitarySelfGeneration.Mend.specInt_norm_le_one_iff_mem F v w).1 h1.le,
-    tendsto_pow_atTop_nhds_zero_of_norm_lt_one h1⟩
+  exact ⟨
+    w,
+    norm_pos_iff.1 h0,
+    (PositivityTheory.UnitarySelfGeneration.Mend.specInt_norm_le_one_iff_mem F v w).1 h1.le,
+    tendsto_pow_atTop_nhds_zero_of_norm_lt_one h1
+  ⟩
 
-theorem isIntegral_of_idem {A K : Type} [CommRing A] [CommRing K] [Algebra A K] (e : K) (he : e * e = e) :
-    IsIntegral A e := by
+theorem isIntegral_of_idem
+    {A K : Type} [CommRing A] [CommRing K] [Algebra A K] (e : K) (he : e * e = e)
+    : IsIntegral A e := by
   have hd : (Polynomial.X : Polynomial A).degree < ((1 + 1 : ℕ) : WithBot ℕ) :=
     (Polynomial.degree_X_le (R := A)).trans_lt (by norm_cast)
   refine ⟨Polynomial.X ^ (1 + 1) - Polynomial.X, Polynomial.monic_X_pow_sub hd, ?_⟩
@@ -409,8 +451,19 @@ end GlobalTheory.CompanionTheory.AvgFree.Ord
 
 open scoped Matrix NNReal ENNReal TensorProduct
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.WhitFree GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.AvgFree MeasureTheory in
-theorem GlobalTheory.CompanionTheory.AvgFree.exists_ordData : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) (lv : Measure (Fv F v)), GlobalTheory.CompanionTheory.SW.IsStdV v lv → ∃ (O : Subring (Fv F v ⊗[F] E)) (S : Finset ((Fv F v ⊗[F] E)ˣ × (Fv F v ⊗[F] E))), IsOrdData (Fv F v) σ b lv O S := by
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.WhitFree
+  GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.AvgFree
+  MeasureTheory in
+theorem GlobalTheory.CompanionTheory.AvgFree.exists_ordData
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E)
+            (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F))
+            (lv : Measure (Fv F v)),
+          GlobalTheory.CompanionTheory.SW.IsStdV v lv
+            → ∃ (O : Subring (Fv F v ⊗[F] E)) (S : Finset ((Fv F v ⊗[F] E)ˣ × (Fv F v ⊗[F] E))),
+              IsOrdData (Fv F v) σ b lv O S := by
   intro F E _ _ _ _ _ σ hσ d b v lv hlv
   classical
   obtain ⟨r1, r2, r3, r4, -⟩ := GlobalTheory.CompanionTheory.SW.LocFv.isLocR_Fv F v
@@ -419,7 +472,8 @@ theorem GlobalTheory.CompanionTheory.AvgFree.exists_ordData : ∀ (F E : Type) [
   haveI := r3
   haveI := r4
   haveI : BorelSpace (Fv F v) := ⟨rfl⟩
-  obtain ⟨a1, a2, a3, a4, -, -, -, -, -, -⟩ := GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hσ (Fv F v)
+  obtain ⟨a1, a2, a3, a4, -, -, -, -, -, -⟩ :=
+    GlobalTheory.CompanionTheory.SW.TopK.topTens_props F E σ hσ (Fv F v)
   haveI := a1
   haveI := a2
   haveI := a3
@@ -434,7 +488,8 @@ theorem GlobalTheory.CompanionTheory.AvgFree.exists_ordData : ∀ (F E : Type) [
   obtain ⟨hOc, hOo⟩ := GlobalTheory.CompletedOrder.isCompact_isOpen_integralClosure F E σ hσ v
   obtain ⟨I, h1, h2, h3, h4⟩ := GlobalTheory.CompanionTheory.AvgFree.Ord.exists_idems σ hσ v
   obtain ⟨w, hw0, hwA, hwt⟩ := GlobalTheory.CompanionTheory.AvgFree.Ord.exists_unif (F := F) v
-  let O : Subring (Fv F v ⊗[F] E) := (integralClosure (v.adicCompletionIntegers F) (Fv F v ⊗[F] E)).toSubring
+  let O : Subring (Fv F v ⊗[F] E) :=
+    (integralClosure (v.adicCompletionIntegers F) (Fv F v ⊗[F] E)).toSubring
   have hOc' : IsCompact (O : Set (Fv F v ⊗[F] E)) := hOc
   have hOo' : IsOpen (O : Set (Fv F v ⊗[F] E)) := hOo
   let p : Fv F v ⊗[F] E := algebraMap (Fv F v) (Fv F v ⊗[F] E) w
@@ -443,18 +498,22 @@ theorem GlobalTheory.CompanionTheory.AvgFree.exists_ordData : ∀ (F E : Type) [
     simp only [p, q]
     rw [← map_mul, mul_inv_cancel₀ hw0, map_one]
   have hp : p ∈ O := by
-    have h := isIntegral_algebraMap (R := v.adicCompletionIntegers F) (A := Fv F v ⊗[F] E)
-      (x := (⟨w, hwA⟩ : v.adicCompletionIntegers F))
+    have h :=
+      isIntegral_algebraMap (R := v.adicCompletionIntegers F) (A := Fv F v ⊗[F] E)
+        (x := (⟨w, hwA⟩ : v.adicCompletionIntegers F))
     rwa [IsScalarTower.algebraMap_apply (v.adicCompletionIntegers F) (Fv F v) (Fv F v ⊗[F] E)] at h
   have hpt : Filter.Tendsto (fun j : ℕ => p ^ j) Filter.atTop (nhds 0) := by
     have hcont : Continuous (algebraMap (Fv F v) (Fv F v ⊗[F] E)) := continuous_algebraMap _ _
     have h := (hcont.tendsto 0).comp hwt
     simpa [Function.comp_def, p, map_pow] using h
-  have hpair : ∀ e ∈ I, ∃ t : (Fv F v ⊗[F] E)ˣ, (t : Fv F v ⊗[F] E) ∈ O ∧ ((t⁻¹ : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) ∉ O ∧
-      (∀ x, e * x = 0 → (t : Fv F v ⊗[F] E) * x = x) ∧
-      Filter.Tendsto (fun j : ℕ => e * (t : Fv F v ⊗[F] E) ^ j) Filter.atTop (nhds 0) := fun e he =>
-    GlobalTheory.CompanionTheory.AvgFree.Ord.pair_props O hOc' p q hpq hp hpt e (h1 e he).1 (h1 e he).2
-      (GlobalTheory.CompanionTheory.AvgFree.Ord.isIntegral_of_idem e (h1 e he).1)
+  have hpair
+      : ∀ e ∈ I, ∃ t : (Fv F v ⊗[F] E)ˣ,
+        (t : Fv F v ⊗[F] E) ∈ O ∧ ((t⁻¹ : (Fv F v ⊗[F] E)ˣ) : Fv F v ⊗[F] E) ∉ O
+          ∧ (∀ x, e * x = 0 → (t : Fv F v ⊗[F] E) * x = x)
+          ∧ Filter.Tendsto (fun j : ℕ => e * (t : Fv F v ⊗[F] E) ^ j) Filter.atTop (nhds 0) :=
+    fun e he =>
+      GlobalTheory.CompanionTheory.AvgFree.Ord.pair_props O hOc' p q hpq hp hpt e (h1 e he).1
+        (h1 e he).2 (GlobalTheory.CompanionTheory.AvgFree.Ord.isIntegral_of_idem e (h1 e he).1)
   choose! t ht using hpair
   refine ⟨O, I.image fun e => (t e, e), hOc', hOo', ?_, ?_, ?_⟩
   · intro x hx
@@ -464,8 +523,13 @@ theorem GlobalTheory.CompanionTheory.AvgFree.exists_ordData : ∀ (F E : Type) [
   · intro r hr
     obtain ⟨e, he, rfl⟩ := Finset.mem_image.1 hr
     obtain ⟨g1, g2, g3, g4⟩ := ht e he
-    obtain ⟨θ, hθ, hY⟩ := GlobalTheory.CompanionTheory.AvgFree.Ord.contract (GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv) O hOc' hOo' (t e) g1 g2
+    obtain ⟨θ, hθ, hY⟩ :=
+      GlobalTheory.CompanionTheory.AvgFree.Ord.contract
+        (GlobalTheory.CompanionTheory.SW.coordK (Fv F v) b lv) O hOc' hOo' (t e) g1 g2
     exact ⟨g1, (h1 e he).2, g3, g4, θ, hθ, hY⟩
   · intro n M X hX
-    obtain ⟨e, he, l, a, ha, hl, hk⟩ := GlobalTheory.CompanionTheory.AvgFree.Ord.detect_of_idem O I (fun e he => (h1 e he).1) h2 h3 h4 n M X hX
+    obtain ⟨e, he, l, a, ha, hl, hk⟩ :=
+      GlobalTheory.CompanionTheory.AvgFree.Ord.detect_of_idem O I
+        (fun e he => (h1 e he).1)
+        h2 h3 h4 n M X hX
     exact ⟨(t e, e), Finset.mem_image_of_mem _ he, l, a, ha, hl, hk⟩

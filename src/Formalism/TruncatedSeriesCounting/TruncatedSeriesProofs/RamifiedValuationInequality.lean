@@ -59,8 +59,9 @@ theorem ramified_valuation_inequality : RamifiedValuationInequality := by
     C ((mm i : ℕ) : O) * ε ^ (y - i) * u ^ i * C (((v₀⁻¹ : Oˣ) : O) ^ mexp i)
   let ee : ℕ → ℕ := fun i => ℓ * i
   let ms : ℕ → ℕ := fun i => e * mexp i
-  have hsum : (Formalism.WindowSums.p1 ℓ ε u) ^ y =
-      ∑ i ∈ Finset.range (y + 1), w i * X ^ ee i * C (ϖ ^ ms i) := by
+  have hsum
+      : (Formalism.WindowSums.p1 ℓ ε u) ^ y
+        = ∑ i ∈ Finset.range (y + 1), w i * X ^ ee i * C (ϖ ^ ms i) := by
     unfold Formalism.WindowSums.p1
     rw [add_comm, add_pow]
     refine Finset.sum_congr rfl (fun i hi => ?_)
@@ -68,8 +69,9 @@ theorem ramified_valuation_inequality : RamifiedValuationInequality := by
       conv_lhs => rw [← Nat.ordProj_mul_ordCompl_eq_self (y.choose i) ℓ]
       rw [Nat.cast_mul, Nat.cast_pow, ← map_natCast (C (R := O)) ℓ,
         ← map_natCast (C (R := O)) (mm i)]
-    have hC : C (ℓ : O) ^ vv i * C (ℓ : O) ^ (y - i) =
-        C (((v₀⁻¹ : Oˣ) : O) ^ mexp i) * C (ϖ ^ ms i) := by
+    have hC
+        : C (ℓ : O) ^ vv i * C (ℓ : O) ^ (y - i)
+          = C (((v₀⁻¹ : Oˣ) : O) ^ mexp i) * C (ϖ ^ ms i) := by
       rw [← pow_add, ← map_pow, ← map_mul, ← hpow]
     have : (u * X ^ ℓ) ^ i * (C (ℓ : O) * ε) ^ (y - i) * ((y.choose i : ℕ) : PowerSeries O)
         = (C (ℓ : O) ^ vv i * C (ℓ : O) ^ (y - i)) * (C ((mm i : ℕ) : O) * ε ^ (y - i) * u ^ i)
@@ -79,15 +81,16 @@ theorem ramified_valuation_inequality : RamifiedValuationInequality := by
     simp only [w, ee]
     ring
   have hw : ∀ i ∈ Finset.range (y + 1), IsUnit (w i) := fun i hi =>
-    ((((hmmU i hi).map C).mul (hε.pow _)).mul (hu.pow _)).mul
-      (((v₀⁻¹).isUnit.pow _).map C)
+    ((((hmmU i hi).map C).mul (hε.pow _)).mul (hu.pow _)).mul (((v₀⁻¹).isUnit.pow _).map C)
   have hinj : Set.InjOn ee (Finset.range (y + 1) : Set ℕ) := fun a _ c _ h =>
     Nat.eq_of_mul_eq_mul_left hℓpos h
-  have hmem' : (∑ i ∈ Finset.range (y + 1), w i * X ^ ee i * C (ϖ ^ ms i)) ∈
-      Ideal.span {(X : PowerSeries O) ^ b, C (ϖ ^ t)} := by
+  have hmem'
+      : (∑ i ∈ Finset.range (y + 1), w i * X ^ ee i * C (ϖ ^ ms i))
+        ∈ Ideal.span {(X : PowerSeries O) ^ b, C (ϖ ^ t)} := by
     rw [← hsum, Set.pair_comm]; exact hmem
-  have hterm := (Formalism.WindowSums.mem_span_iff_of_distinct_exponents O ϖ hϖ.ne_zero hϖ.not_isUnit (Finset.range (y + 1))
-    w ee ms b t hw hinj).1 hmem' i₀ (Finset.mem_range.2 (by omega))
+  have hterm :=
+    (Formalism.WindowSums.mem_span_iff_of_distinct_exponents O ϖ hϖ.ne_zero hϖ.not_isUnit
+      (Finset.range (y + 1)) w ee ms b t hw hinj).1 hmem' i₀ (Finset.mem_range.2 (by omega))
   have htm : t ≤ e * (vv i₀ + (y - i₀)) := by
     rcases hterm with h | h
     · exact absurd h (by simp only [ee]; omega)

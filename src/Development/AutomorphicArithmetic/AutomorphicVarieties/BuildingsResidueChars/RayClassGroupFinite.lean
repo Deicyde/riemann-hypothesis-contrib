@@ -7,28 +7,34 @@ public import GroundTheory.AutomorphicForms.ReductionIdele
 @[expose] public section
 
 open UpperTheory.V.Sd.Eis
-open NumberField IsDedekindDomain Topology Neutral.B1 Formalism.L2.Host GlobalTheory.CuspRep UpperTheory.V
+open NumberField IsDedekindDomain Topology Neutral.B1 Formalism.L2.Host GlobalTheory.CuspRep
+  UpperTheory.V
 
-private theorem idele_split (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (x : Ideles F) :
-    TR.infId F (Units.map (TR.pInf F).toMonoidHom x) * finId F (Units.map (pFin F).toMonoidHom x) = x := by
+private theorem idele_split (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (x : Ideles F)
+    : TR.infId F (Units.map (TR.pInf F).toMonoidHom x) * finId F (Units.map (pFin F).toMonoidHom x)
+      = x := by
   have h : ∀ x, TR.pInf F (TR.sInf F x) = x := fun x => (TR.infEq F).symm_apply_apply x
   have h2 : ∀ x, TR.pInf F (sFin F x) = 0 := fun x => map_zero (TR.infEq F).symm
   have h3 : ∀ x, pFin F (TR.sInf F x) = 0 := fun x => rfl
   have h4 : ∀ x, pFin F (sFin F x) = x := fun x => rfl
   refine Units.ext (TR.ad_ext ?_ ?_)
-  · change TR.pInf F ((1 - TR.sInf F 1 + TR.sInf F (TR.pInf F x.val)) * (1 - sFin F 1 + sFin F (pFin F x.val))) = _
+  · change TR.pInf F
+        ((1 - TR.sInf F 1 + TR.sInf F (TR.pInf F x.val)) * (1 - sFin F 1 + sFin F (pFin F x.val)))
+      = _
     simp [h, h2]
-  · change pFin F ((1 - TR.sInf F 1 + TR.sInf F (TR.pInf F x.val)) * (1 - sFin F 1 + sFin F (pFin F x.val))) = _
+  · change pFin F
+        ((1 - TR.sInf F 1 + TR.sInf F (TR.pInf F x.val)) * (1 - sFin F 1 + sFin F (pFin F x.val)))
+      = _
     simp [h3, h4]
 
-private theorem cont_pInf (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (v : InfinitePlace F) :
-    Continuous fun x : Ad F => TR.pInf F x v :=
+private theorem cont_pInf
+    (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (v : InfinitePlace F)
+    : Continuous fun x : Ad F => TR.pInf F x v :=
   (InfinitePlace.Completion.isometryEquivRealOfIsReal (IsTotallyReal.isReal v)).continuous.comp
     ((continuous_apply v).comp continuous_fst)
 
 open GroundTheory.Global GroundTheory.Global.IdeleGroup GroundTheory.Automorphic.Reduction in
-theorem UpperTheory.ray_class_group_finite :
-    UpperTheory.V.Sd.Eis.RayFin := by
+theorem UpperTheory.ray_class_group_finite : UpperTheory.V.Sd.Eis.RayFin := by
   intro F _ _ _ H hK hR hf
   have hopen : IsOpen (H : Set (Ideles F)) := by
     apply H.isOpen_of_mem_nhds (g := 1)
@@ -41,7 +47,8 @@ theorem UpperTheory.ray_class_group_finite :
     have h2 : ∀ᶠ x : Ideles F in 𝓝 1, ∀ v, 0 < TR.pInf F x.val v := by
       rw [Filter.eventually_all]
       intro v
-      have c : Continuous fun x : Ideles F => TR.pInf F x.val v := (cont_pInf F v).comp Units.continuous_val
+      have c : Continuous fun x : Ideles F => TR.pInf F x.val v :=
+        (cont_pInf F v).comp Units.continuous_val
       refine c.continuousAt.eventually (lt_mem_nhds ?_)
       simp
     filter_upwards [h1, h2] with x hx1 hx2
@@ -72,7 +79,8 @@ theorem UpperTheory.ray_class_group_finite :
     have ht : 0 < (ideleModule F t : ℝ) := (ideleModule F t).2
     set ρ : ℝ := (ideleModule F t : ℝ) ^ (((2 * Module.finrank ℚ F : ℕ) : ℝ)⁻¹) with hρdef
     have hρ : 0 < ρ := Real.rpow_pos_of_pos ht _
-    have hρn : ρ ^ (2 * Module.finrank ℚ F) = (ideleModule F t : ℝ) := Real.rpow_inv_natCast_pow ht.le hn
+    have hρn : ρ ^ (2 * Module.finrank ℚ F) = (ideleModule F t : ℝ) :=
+      Real.rpow_inv_natCast_pow ht.le hn
     have hzH := hsq ρ hρ
     have hzt : ideleModule F (posIdele ρ hρ ^ 2) = ideleModule F t := by
       refine Subtype.ext ?_

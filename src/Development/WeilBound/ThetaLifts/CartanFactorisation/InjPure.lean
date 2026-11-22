@@ -42,8 +42,8 @@ namespace PositivityTheory.ThKF
 
 open GlobalTheory.ThK
 
-theorem iLeft (hT : ThetaBasic) : ILeft := fun _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hp _ hΦ g =>
-  I_left unimodularity_holds hT hp hΦ g
+theorem iLeft (hT : ThetaBasic) : ILeft :=
+  fun _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hp _ hΦ g => I_left unimodularity_holds hT hp hΦ g
 
 end PositivityTheory.ThKF
 

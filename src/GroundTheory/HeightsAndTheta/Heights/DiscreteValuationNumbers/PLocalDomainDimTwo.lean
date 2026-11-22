@@ -18,7 +18,8 @@ private theorem enat_eq_two_of_le_of_lt {x : ℕ∞} (h2 : 2 ≤ x) (h3 : x < 3)
     have a : 2 ≤ n := by exact_mod_cast h2
     have b : n < 3 := by exact_mod_cast h3
     have : n = 2 := by omega
-    subst this; rfl
+    subst this
+    rfl
 
 private theorem enat_le_one_of_add_one_le_two {x : ℕ∞} (h : x + 1 ≤ 2) : x ≤ 1 := by
   induction x using ENat.recTopCoe with
@@ -46,14 +47,16 @@ theorem LocalDomainDimTwo.proof : LocalDomainDimTwo.Statement := by
     have s2 := p.step ⟨2, by omega⟩
     have e01 : (Fin.succ (⟨0, by omega⟩ : Fin p.length)) = Fin.castSucc ⟨1, by omega⟩ := Fin.ext rfl
     have e12 : (Fin.succ (⟨1, by omega⟩ : Fin p.length)) = Fin.castSucc ⟨2, by omega⟩ := Fin.ext rfl
-    have e2l : (Fin.succ (⟨2, by omega⟩ : Fin p.length)) = Fin.last p.length := Fin.ext (by simp [hlen])
+    have e2l : (Fin.succ (⟨2, by omega⟩ : Fin p.length)) = Fin.last p.length :=
+      Fin.ext (by simp [hlen])
     rw [e01] at s0
     rw [e12] at s1
     rw [e2l] at s2
     have hl : p.toFun (Fin.last p.length) = IsLocalRing.closedPoint A := hlast
     rw [hl] at s2
-    refine hno (p.toFun (Fin.castSucc ⟨1, by omega⟩)).asIdeal (p.toFun (Fin.castSucc ⟨2, by omega⟩)).asIdeal
-      (p.toFun _).isPrime (p.toFun _).isPrime ?_ ((PrimeSpectrum.asIdeal_lt_asIdeal _ _).mpr s1)
+    refine hno (p.toFun (Fin.castSucc ⟨1, by omega⟩)).asIdeal
+      (p.toFun (Fin.castSucc ⟨2, by omega⟩)).asIdeal (p.toFun _).isPrime (p.toFun _).isPrime ?_
+      ((PrimeSpectrum.asIdeal_lt_asIdeal _ _).mpr s1)
       ((PrimeSpectrum.asIdeal_lt_asIdeal _ _).mpr s2)
     exact lt_of_le_of_lt bot_le ((PrimeSpectrum.asIdeal_lt_asIdeal _ _).mpr s0)
   have hm : (IsLocalRing.maximalIdeal A).height = 2 := enat_eq_two_of_le_of_lt hm2 hm3

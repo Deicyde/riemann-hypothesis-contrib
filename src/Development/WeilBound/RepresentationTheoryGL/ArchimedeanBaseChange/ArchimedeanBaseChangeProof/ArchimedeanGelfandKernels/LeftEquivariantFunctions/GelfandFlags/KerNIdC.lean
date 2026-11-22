@@ -17,11 +17,15 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-theorem contOn_avg (hLg : LgCpt) [MeasurableSpace (G n)] [BorelSpace (G n)] {N : Subgroup (G n)}
-    (hNc : IsClosed (N : Set (G n))) (ν : Measure N) [IsFiniteMeasureOnCompacts ν] {X : Type} [NormedAddCommGroup X]
-    [NormedSpace ℝ X] (h : Mat n → X) (hc : ContinuousOn h (GLs n)) (R : ℝ)
-    (hR : ∀ y ∈ GLs n, R < lg y → h y = 0) :
-    ContinuousOn (fun y => ∫ u : N, h ((u : G n).val * y) ∂ν) (GLs n) := by
+theorem contOn_avg
+    (hLg : LgCpt)
+    [MeasurableSpace (G n)] [BorelSpace (G n)]
+    {N : Subgroup (G n)} (hNc : IsClosed (N : Set (G n))) (ν : Measure N)
+    [IsFiniteMeasureOnCompacts ν]
+    {X : Type} [NormedAddCommGroup X] [NormedSpace ℝ X]
+    (h : Mat n → X) (hc : ContinuousOn h (GLs n))
+    (R : ℝ) (hR : ∀ y ∈ GLs n, R < lg y → h y = 0)
+    : ContinuousOn (fun y => ∫ u : N, h ((u : G n).val * y) ∂ν) (GLs n) := by
   haveI : LocallyCompactSpace (Mat n) := inferInstanceAs (LocallyCompactSpace (Fin n → Fin n → ℂ))
   haveI : FirstCountableTopology (Mat n) := inferInstanceAs (FirstCountableTopology (Fin n → Fin n → ℂ))
   intro y₀ hy₀
@@ -60,14 +64,19 @@ theorem contOn_avg (hLg : LgCpt) [MeasurableSpace (G n)] [BorelSpace (G n)] {N :
     have hm : Continuous (fun y : Mat n => ((u : G n) : Mat n) * y) := by fun_prop
     exact (hc.comp hm.continuousOn (fun y hy => mul_memGL _ _ hy)) y₀ hy₀
 
-theorem key (hLg : LgCpt) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
-    (E : KMod n) (k B : Mat n → (E.V →L[ℂ] E.V)) (hkc : ContinuousOn k (GLs n)) (Rk : ℝ)
-    (hkR : ∀ y ∈ GLs n, Rk < lg y → k y = 0) {N : Subgroup (G n)} (hNc : IsClosed (N : Set (G n)))
-    (ν : Measure N) [ν.IsHaarMeasure] [ν.IsInvInvariant] (hBc : ContinuousOn B (GLs n))
-    (hBN : ∀ u : N, ∀ y ∈ GLs n, B ((u : G n).val * y) = B y) (φ : Mat n → E.V) (hφc : ContinuousOn φ (GLs n))
-    (Rφ : ℝ) (hφR : ∀ y ∈ GLs n, Rφ < lg y → φ y = 0) :
-    ∫ y : G n, k y.val (B y.val (∫ u : N, φ ((u : G n).val * y.val) ∂ν)) ∂μ =
-      ∫ y : G n, (∫ u : N, k ((u : G n).val * y.val) ∂ν) (B y.val (φ y.val)) ∂μ := by
+theorem key
+    (hLg : LgCpt)
+    [MeasurableSpace (G n)] [BorelSpace (G n)]
+    (μ : Measure (G n)) [μ.IsHaarMeasure]
+    (E : KMod n) (k B : Mat n → (E.V →L[ℂ] E.V)) (hkc : ContinuousOn k (GLs n))
+    (Rk : ℝ) (hkR : ∀ y ∈ GLs n, Rk < lg y → k y = 0)
+    {N : Subgroup (G n)} (hNc : IsClosed (N : Set (G n))) (ν : Measure N)
+    [ν.IsHaarMeasure] [ν.IsInvInvariant]
+    (hBc : ContinuousOn B (GLs n)) (hBN : ∀ u : N, ∀ y ∈ GLs n, B ((u : G n).val * y) = B y)
+    (φ : Mat n → E.V) (hφc : ContinuousOn φ (GLs n))
+    (Rφ : ℝ) (hφR : ∀ y ∈ GLs n, Rφ < lg y → φ y = 0)
+    : ∫ y : G n, k y.val (B y.val (∫ u : N, φ ((u : G n).val * y.val) ∂ν)) ∂μ
+      = ∫ y : G n, (∫ u : N, k ((u : G n).val * y.val) ∂ν) (B y.val (φ y.val)) ∂μ := by
   haveI : SecondCountableTopology (Matrix (Fin n) (Fin n) ℂ) :=
     inferInstanceAs (SecondCountableTopology (Fin n → Fin n → ℂ))
   haveI : SecondCountableTopology (Matrix (Fin n) (Fin n) ℂ)ᵐᵒᵖ :=
@@ -127,11 +136,15 @@ theorem key (hLg : LgCpt) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measu
       have h1 := lg_le_of_mul ((u : G n) : Mat n) y.val (memGL y)
       rw [hkR _ (mul_memGL _ _ (memGL y)) (by linarith), ContinuousLinearMap.zero_apply]
     · rw [hφR _ (memGL y) (lt_of_not_ge hy), map_zero, map_zero]
-  have s1 : ∀ y : G n, k y.val (B y.val (∫ u : N, φ ((u : G n).val * y.val) ∂ν)) = ∫ u : N, F y u ∂ν := by
+  have s1
+      : ∀ y : G n,
+        k y.val (B y.val (∫ u : N, φ ((u : G n).val * y.val) ∂ν)) = ∫ u : N, F y u ∂ν := by
     intro y
     exact (ContinuousLinearMap.integral_comp_comm ((k y.val).comp (B y.val)) (iφ y)).symm
-  have s6 : ∀ y : G n, (∫ u : N, k ((u : G n).val * y.val) ∂ν) (B y.val (φ y.val)) = ∫ u : N, H y u ∂ν :=
-    fun y => ContinuousLinearMap.integral_apply (ik y) _
+  have s6
+      : ∀ y : G n,
+        (∫ u : N, k ((u : G n).val * y.val) ∂ν) (B y.val (φ y.val)) = ∫ u : N, H y u ∂ν := fun y =>
+    ContinuousLinearMap.integral_apply (ik y) _
   have s3 : ∀ u : N, ∫ y : G n, F y u ∂μ = ∫ y : G n, H y u⁻¹ ∂μ := by
     intro u
     rw [← integral_mul_left_eq_self (μ := μ) (fun x : G n => H x u⁻¹) (u : G n)]
@@ -144,7 +157,8 @@ theorem key (hLg : LgCpt) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measu
       exact hBN u x.val (memGL x)
     simp only [hF, hH]
     rw [e1, e2, Units.val_mul]
-  calc ∫ y : G n, k y.val (B y.val (∫ u : N, φ ((u : G n).val * y.val) ∂ν)) ∂μ
+  calc
+    ∫ y : G n, k y.val (B y.val (∫ u : N, φ ((u : G n).val * y.val) ∂ν)) ∂μ
       = ∫ y : G n, ∫ u : N, F y u ∂ν ∂μ := integral_congr_ae (Filter.Eventually.of_forall s1)
     _ = ∫ u : N, ∫ y : G n, F y u ∂μ ∂ν := integral_integral_swap iF
     _ = ∫ u : N, ∫ y : G n, H y u⁻¹ ∂μ ∂ν := integral_congr_ae (Filter.Eventually.of_forall s3)

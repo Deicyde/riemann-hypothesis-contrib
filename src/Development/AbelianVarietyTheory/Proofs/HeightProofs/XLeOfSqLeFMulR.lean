@@ -15,8 +15,8 @@ open Formalism.BasicNotions Formalism.MainNotions NumberField
 
 variable {D : D7}
 
-theorem choose_two_add (p q : ℕ) :
-    p * q + p * (p - 1) / 2 + q * (q - 1) / 2 = (p + q).choose 2 := by
+theorem choose_two_add (p q : ℕ)
+    : p * q + p * (p - 1) / 2 + q * (q - 1) / 2 = (p + q).choose 2 := by
   rw [← Nat.choose_two_right, ← Nat.choose_two_right]
   induction q with
   | zero => simp

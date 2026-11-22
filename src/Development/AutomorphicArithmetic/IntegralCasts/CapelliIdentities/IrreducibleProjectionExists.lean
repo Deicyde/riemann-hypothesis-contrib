@@ -23,14 +23,16 @@ private lemma sepCore {R S N ι : Type} [Ring R] [AddCommGroup S] [Module R S] [
   obtain ⟨i, hi⟩ := Finsupp.ne_iff.mp hne
   exact ⟨(Finsupp.lapply i) ∘ₗ e.toLinearMap, by simpa using hi⟩
 
-theorem UpperTheory.irreducible_projection_exists :
-    ∀ {H V M : Type} [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup M] [Module ℂ M]
-        (σ : Representation ℂ H V) (ρ : Representation ℂ H M), σ.IsIrreducible →
-        ∀ (Y : Submodule ℂ M),
+theorem UpperTheory.irreducible_projection_exists
+    : ∀ {H V M : Type} [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup M] [Module ℂ M]
+        (σ : Representation ℂ H V) (ρ : Representation ℂ H M),
+      σ.IsIrreducible
+        → ∀ (Y : Submodule ℂ M),
           Y ≤ ⨆ (f : { f : V →ₗ[ℂ] M // (∀ (g : H) (v : V), f (σ g v) = ρ g (f v)) ∧ LinearMap.range f ≤ Y }),
-            LinearMap.range f.1 →
-          ∀ {F : M}, F ∈ Y → F ≠ 0 →
-            ∃ p : M →ₗ[ℂ] V, (∀ (g : H), ∀ y ∈ Y, p (ρ g y) = σ g (p y)) ∧ p F ≠ 0 := by
+              LinearMap.range f.1
+            → ∀ {F : M},
+              F ∈ Y → F ≠ 0
+                → ∃ p : M →ₗ[ℂ] V, (∀ (g : H), ∀ y ∈ Y, p (ρ g y) = σ g (p y)) ∧ p F ≠ 0 := by
   intro H V M _ _ _ _ _ σ ρ hσ Y hY F hF hF0
   have hinv : ∀ (g : H) {y : M}, y ∈ Y → ρ g y ∈ Y := by
     intro g y hy
@@ -44,19 +46,25 @@ theorem UpperTheory.irreducible_projection_exists :
       exact Y.add_mem ha hb
   let Ys : Subrepresentation ρ := ⟨Y, hinv⟩
   let τ : Representation ℂ H Y := Ys.toRepresentation
-  let φ : { f : V →ₗ[ℂ] M // (∀ (g : H) (v : V), f (σ g v) = ρ g (f v)) ∧ LinearMap.range f ≤ Y } →
-      Representation.IntertwiningMap σ τ := fun f =>
+  let φ
+      : {f : V →ₗ[ℂ] M // (∀ (g : H) (v : V), f (σ g v) = ρ g (f v)) ∧ LinearMap.range f ≤ Y}
+        → Representation.IntertwiningMap σ τ := fun f =>
     (f.1.codRestrict Y (fun v => f.2.2 ⟨v, rfl⟩)).intertwiningMap_of_isIntertwiningMap σ τ
       (fun g v => Subtype.ext (f.2.1 g v))
   let ψ := fun i => Representation.IntertwiningMap.equivLinearMapAsModule σ τ (φ i)
   haveI : IsSimpleModule (MonoidAlgebra ℂ H) σ.asModule :=
     (Representation.irreducible_iff_isSimpleModule_asModule σ).mp hσ
-  have hall : ∀ y ∈ (⨆ (f : { f : V →ₗ[ℂ] M // (∀ (g : H) (v : V), f (σ g v) = ρ g (f v)) ∧ LinearMap.range f ≤ Y }),
-      LinearMap.range f.1), ∃ hy : y ∈ Y,
-      (show τ.asModule from (⟨y, hy⟩ : Y)) ∈ ⨆ i, LinearMap.range (ψ i) := by
+  have hall
+      : ∀ y
+          ∈ (⨆ (f : { f : V →ₗ[ℂ] M // (∀ (g : H) (v : V), f (σ g v) = ρ g (f v)) ∧ LinearMap.range f ≤ Y }),
+              LinearMap.range f.1),
+        ∃ hy : y ∈ Y,
+          (show τ.asModule from (⟨y, hy⟩ : Y)) ∈ ⨆ i, LinearMap.range (ψ i) := by
     intro y hy
-    refine Submodule.iSup_induction _ (motive := fun y => ∃ hy : y ∈ Y,
-      (show τ.asModule from (⟨y, hy⟩ : Y)) ∈ ⨆ i, LinearMap.range (ψ i)) hy ?_ ?_ ?_
+    refine Submodule.iSup_induction _
+      (motive := fun y =>
+        ∃ hy : y ∈ Y, (show τ.asModule from (⟨y, hy⟩ : Y)) ∈ ⨆ i, LinearMap.range (ψ i))
+      hy ?_ ?_ ?_
     · rintro f x ⟨v, rfl⟩
       exact ⟨f.2.2 ⟨v, rfl⟩, Submodule.mem_iSup_of_mem f ⟨v, rfl⟩⟩
     · exact ⟨Y.zero_mem, Submodule.zero_mem _⟩
@@ -67,8 +75,9 @@ theorem UpperTheory.irreducible_projection_exists :
     intro x _
     obtain ⟨_, hx⟩ := hall (x : Y).1 (hY (x : Y).2)
     exact hx
-  obtain ⟨p, hp⟩ := sepCore ψ htop (x := (show τ.asModule from (⟨F, hF⟩ : Y)))
-    (fun h => hF0 (congrArg Subtype.val (show (⟨F, hF⟩ : Y) = 0 from h)))
+  obtain ⟨p, hp⟩ :=
+    sepCore ψ htop (x := (show τ.asModule from (⟨F, hF⟩ : Y)))
+      (fun h => hF0 (congrArg Subtype.val (show (⟨F, hF⟩ : Y) = 0 from h)))
   let p' := (Representation.IntertwiningMap.equivLinearMapAsModule τ σ).symm p
   obtain ⟨q, hq⟩ := LinearMap.exists_extend p'.toLinearMap
   have hqy : ∀ (y : M) (hy : y ∈ Y), q y = p' ⟨y, hy⟩ := fun y hy =>

@@ -21,15 +21,16 @@ set_option maxHeartbeats 1000000
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.T0
+open NumberField IsDedekindDomain Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.T0
 
 namespace GlobalTheory.HeightDefinite
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
 
-theorem ex_zero : ex Dw (0 : (E →+* ℂ) × ℕ → ℕ) 0 = fun _ => 0 := by
-  funext i; cases i <;> rfl
+theorem ex_zero : ex Dw (0 : (E →+* ℂ) × ℕ → ℕ) 0 = fun _ => 0 := by funext i; cases i <;> rfl
 
 theorem one_mem_sec : (1 : Rul Xo c) ∈ sec Xo c 0 0 := by
   refine ⟨fun p q φ y z _ => ?_, fun p t y y' _ => ?_⟩
@@ -38,15 +39,16 @@ theorem one_mem_sec : (1 : Rul Xo c) ∈ sec Xo c 0 0 := by
   · show (1 : p.R) = wchar (ex Dw 0 0) t * 1
     simp [wchar, ex_zero]
 
-theorem wtZ_zero : wtZ (E := E) 0 0 = 0 := by
-  ext <;> simp [wtZ]
+theorem wtZ_zero : wtZ (E := E) 0 0 = 0 := by ext <;> simp [wtZ]
 
 theorem evC_one {h : GenFrEx Xo c} (hgt : GenFromTest Xo c h) (Z : Comp Xo c) : evC h Z 1 = 1 :=
   evalAt_one _ _ _ (hgt Z)
 
-theorem exists_nat_comb {ι : Type} [Finite ι] {Ω : ι → Type} [∀ Z, Field (Ω Z)] [∀ Z, CharZero (Ω Z)] {n : ℕ}
-    (a : ∀ Z, Fin n → Ω Z) (ha : ∀ Z, ∃ k, a Z k ≠ 0) :
-    ∃ m : Fin n → ℕ, ∀ Z, ∑ k, (m k : Ω Z) * a Z k ≠ 0 := by
+theorem exists_nat_comb
+    {ι : Type} [Finite ι]
+    {Ω : ι → Type} [∀ Z, Field (Ω Z)] [∀ Z, CharZero (Ω Z)]
+    {n : ℕ} (a : ∀ Z, Fin n → Ω Z) (ha : ∀ Z, ∃ k, a Z k ≠ 0)
+    : ∃ m : Fin n → ℕ, ∀ Z, ∑ k, (m k : Ω Z) * a Z k ≠ 0 := by
   classical
   let p : ∀ Z, Polynomial (Ω Z) := fun Z => ∑ k : Fin n, Polynomial.monomial (k : ℕ) (a Z k)
   have hp : ∀ Z, p Z ≠ 0 := by
@@ -54,11 +56,15 @@ theorem exists_nat_comb {ι : Type} [Finite ι] {Ω : ι → Type} [∀ Z, Field
     obtain ⟨k, hk⟩ := ha Z
     have h1 := congrArg (fun q => _root_.AddMonoidAlgebra.coeff (M := ℕ) q (k : ℕ)) h0
     simp only [p, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial, Finsupp.single_apply,
-      Polynomial.coeff_zero] at h1
-    rw [Finset.sum_eq_single k (fun b _ hb => if_neg fun e => hb (Fin.ext e)) (by simp), if_pos rfl] at h1
+        Polynomial.coeff_zero]
+      at h1
+    rw [Finset.sum_eq_single k (fun b _ hb => if_neg fun e => hb (Fin.ext e)) (by simp), if_pos rfl]
+      at h1
     exact hk h1
   have hfin : ∀ Z, {t : ℕ | (p Z).IsRoot (t : Ω Z)}.Finite := fun Z =>
-    Set.Finite.preimage (f := fun t : ℕ => (t : Ω Z)) Nat.cast_injective.injOn (Polynomial.finite_setOf_isRoot (hp Z))
+    Set.Finite.preimage
+      (f := fun t : ℕ => (t : Ω Z))
+      Nat.cast_injective.injOn (Polynomial.finite_setOf_isRoot (hp Z))
   obtain ⟨t, ht⟩ := (Set.finite_iUnion hfin).exists_notMem
   refine ⟨fun k => t ^ (k : ℕ), fun Z h0 => ht (Set.mem_iUnion.2 ⟨Z, ?_⟩)⟩
   show (p Z).eval (t : Ω Z) = 0
@@ -67,7 +73,8 @@ theorem exists_nat_comb {ι : Type} [Finite ι] {Ω : ι → Type} [∀ Z, Field
 
 variable [Fintype (Comp Xo c)]
 
-theorem supBdd_one (fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ) : SupBdd Xo c fn 0 0 1 := by
+theorem supBdd_one (fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ)
+    : SupBdd Xo c fn 0 0 1 := by
   intro σ
   refine ⟨1, ?_⟩
   rintro _ ⟨y, rfl⟩
@@ -80,53 +87,62 @@ theorem supBdd_one (fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw �
     exact le_of_eq (norm_one (α := ℂ))
   · exact le_of_eq_of_le (norm_zero (E := ℂ)) zero_le_one
 
-theorem log_sup_le {h : GenFrEx Xo c} {fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ}
-    {yP : ∀ Z : Comp Xo c, ∀ P : Om Z →+* ℂ, FrPt Xo c (CAt (sgOf P))}
-    (hfn : FnNe Xo c fn) (hfg : FnFG Xo c) (hcx : ValAtCx h yP) {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ}
-    {f : Rul Xo c} (hS : f ∈ sec Xo c a n) (hB : SupBdd Xo c fn a n f) (hN : NZSome h f ∨ f = 0) (σ : c.F →+* ℂ) :
-    Real.log (⨆ p : (Σ Z : Comp Xo c, PT (Ω := Om Z) σ), nrmC fn (yP p.1) (wtZ a n) (valC h a n f p.1) p.2) ≤
-      Real.log (supR Xo c fn σ a n f) := by
+theorem log_sup_le
+    {h : GenFrEx Xo c} {fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ}
+    {yP : ∀ Z : Comp Xo c, ∀ P : Om Z →+* ℂ, FrPt Xo c (CAt (sgOf P))} (hfn : FnNe Xo c fn)
+    (hfg : FnFG Xo c) (hcx : ValAtCx h yP)
+    {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} {f : Rul Xo c}
+    (hS : f ∈ sec Xo c a n) (hB : SupBdd Xo c fn a n f) (hN : NZSome h f ∨ f = 0)
+    (σ : c.F →+* ℂ)
+    : Real.log
+        (⨆ p : (Σ Z : Comp Xo c, PT (Ω := Om Z) σ), nrmC fn (yP p.1) (wtZ a n) (valC h a n f p.1) p.2)
+      ≤ Real.log (supR Xo c fn σ a n f) := by
   rcases hN with hN | rfl
   · exact log_supN_le hfn (ptNe_of_fnFG hfg) hcx hS hB hN σ
   · unfold supR supAt
     simp only [valC_zero, nrmC_zero, ptNorm_zero, Real.iSup_const_zero, le_refl]
 
-variable (h : GenFrEx Xo c)
-    (δ : ∀ Z : Comp Xo c, AddValuation (Om Z) (WithTop ℤ) → Ix Dw → ℤ)
-    (fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ)
-    (yP : ∀ Z : Comp Xo c, ∀ P : Om Z →+* ℂ, FrPt Xo c (CAt (sgOf P)))
-    (Dd N : ℕ) (uL uF uta2 : WtR E)
-    (wR : Fin (N + 1) → Rul Xo c) (jc : Comp Xo c → Fin (N + 1))
-    (np : ℕ) (thpR : Fin np → Rul Xo c) (etR ta2R : Rul Xo c)
-    (nu : HeightOneSpectrum (𝓞 c.F) → ℝ)
-    (wsize : WTZ E → ℝ) (DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO : ℝ)
+variable
+  (h : GenFrEx Xo c) (δ : ∀ Z : Comp Xo c, AddValuation (Om Z) (WithTop ℤ) → Ix Dw → ℤ)
+  (fn : ∀ σ : c.F →+* ℂ, FrPt Xo c (CAt σ) → Ix Dw → ℝ)
+  (yP : ∀ Z : Comp Xo c, ∀ P : Om Z →+* ℂ, FrPt Xo c (CAt (sgOf P)))
+  (Dd N : ℕ)
+  (uL uF uta2 : WtR E) (wR : Fin (N + 1) → Rul Xo c) (jc : Comp Xo c → Fin (N + 1))
+  (np : ℕ) (thpR : Fin np → Rul Xo c)
+  (etR ta2R : Rul Xo c) (nu : HeightOneSpectrum (𝓞 c.F) → ℝ) (wsize : WTZ E → ℝ)
+  (DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO : ℝ)
 
 abbrev dat : Data c.F (Comp Xo c) (fun Z => Om Z) (WTZ E) (fun Z => AC Z) :=
-  dataOf h δ fn yP Dd N 0 1 1 0 uL uF uL uL uL (0, 0) uta2 wR jc np thpR 0 Fin.elim0 uF 0 Fin.elim0 ∅ etR 1 ta2R nu
-    (fun _ _ _ => 0) wsize DF PN 1 1 PP0' 1 Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO 0 0
+  dataOf h δ fn yP Dd N 0 1 1 0 uL uF uL uL uL (0, 0) uta2 wR jc np thpR 0 Fin.elim0 uF 0 Fin.elim0
+    ∅ etR 1 ta2R nu
+    (fun _ _ _ => 0)
+    wsize DF PN 1 1 PP0' 1 Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO 0 0
 
 omit [NumberField E] [IsCMField E] in
 theorem wt_et : wtZ uL.1 uL.2 = (1 * 1 : ℕ) • wtZ uL.1 uL.2 := by simp
 
 omit [NumberField E] [IsCMField E] in
-theorem weightZ_zero_eq_two_smul_sub_self : wtZ ((0, 0) : WtR E).1 ((0, 0) : WtR E).2 = (2 : ℕ) • (wtZ uL.1 uL.2 - wtZ uL.1 uL.2) := by
+theorem weightZ_zero_eq_two_smul_sub_self
+    : wtZ ((0, 0) : WtR E).1 ((0, 0) : WtR E).2 = (2 : ℕ) • (wtZ uL.1 uL.2 - wtZ uL.1 uL.2) := by
   rw [sub_self, smul_zero]
   ext <;> simp [wtZ]
 
-theorem htSup_dat (hgt : GenFromTest Xo c h) (hfn : FnNe Xo c fn) (hfg : FnFG Xo c) (hcx : ValAtCx h yP)
+theorem htSup_dat
+    (hgt : GenFromTest Xo c h) (hfn : FnNe Xo c fn) (hfg : FnFG Xo c) (hcx : ValAtCx h yP)
     (huta2 : wtZ uta2.1 uta2.2 = (Dd + 4 : ℕ) • wtZ uL.1 uL.2 - wtZ uF.1 uF.2)
     (hwS : ∀ k, wR k ∈ sec Xo c uL.1 uL.2) (hwB : ∀ k, SupBdd Xo c fn uL.1 uL.2 (wR k))
-    (hwN : ∀ k, NZSome h (wR k) ∨ wR k = 0)
-    (hpS : ∀ k, thpR k ∈ sec Xo c uF.1 uF.2) (hpB : ∀ k, SupBdd Xo c fn uF.1 uF.2 (thpR k))
-    (hpN : ∀ k, NZSome h (thpR k) ∨ thpR k = 0)
+    (hwN : ∀ k, NZSome h (wR k) ∨ wR k = 0) (hpS : ∀ k, thpR k ∈ sec Xo c uF.1 uF.2)
+    (hpB : ∀ k, SupBdd Xo c fn uF.1 uF.2 (thpR k)) (hpN : ∀ k, NZSome h (thpR k) ∨ thpR k = 0)
     (h2S : ta2R ∈ sec Xo c uta2.1 uta2.2) (h2B : SupBdd Xo c fn uta2.1 uta2.2 ta2R)
     (h2N : NZSome h ta2R ∨ ta2R = 0)
     (mx : (c.F →+* ℂ) → ℝ) (hmx : ∀ σ k, Real.log (supR Xo c fn σ uL.1 uL.2 (wR k)) ≤ mx σ)
     (hmxm : meanK mx ≤ Gc * wsize (wtZ uL.1 uL.2))
-    (hth : ∀ k, meanK (fun σ => Real.log (supR Xo c fn σ uF.1 uF.2 (thpR k))) ≤ Gc * wsize (wtZ uF.1 uF.2))
+    (hth : ∀ k,
+      meanK (fun σ => Real.log (supR Xo c fn σ uF.1 uF.2 (thpR k))) ≤ Gc * wsize (wtZ uF.1 uF.2))
     (hta1 : 0 ≤ 2 * PI4 * Dd * wsize (wtZ uL.1 uL.2))
-    (hta2 : ∀ σ, Real.log (supR Xo c fn σ uta2.1 uta2.2 ta2R) ≤ PI4 * Dd * wsize (wtZ uL.1 uL.2)) :
-    (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).HtSup := by
+    (hta2 : ∀ σ, Real.log (supR Xo c fn σ uta2.1 uta2.2 ta2R) ≤ PI4 * Dd * wsize (wtZ uL.1 uL.2))
+    : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO).HtSup := by
   have hmean : ∀ (F : (c.F →+* ℂ) → ℝ) (b : ℝ), (∀ σ, F σ ≤ b) → meanK F ≤ b := by
     intro F b hF
     have hn : (0 : ℝ) < Fintype.card (c.F →+* ℂ) := by
@@ -153,11 +169,17 @@ theorem htSup_dat (hgt : GenFromTest Xo c h) (hfn : FnNe Xo c fn) (hfg : FnFG Xo
     rw [huta2] at h2
     exact h2
 
-theorem htI2be_dat {rU : ℕ} (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ rU) (xR : ℝ)
-    (htie : NrmTieU h fn yP U xR wR uL etR uL)
-    (hI2 : ∀ σ, GoodEmb c σ → ∀ (k : (U σ).Comp) (x : ReciprocityTheory.ChartRestriction.G.FD.Frame ((U σ).X k).Ψ rU),
-      x ∈ ((U σ).X k).dom → -Real.log (Real.sqrt (∑ j, recNrm (U σ) xR uL.1 uL.2 (wR j) k x ^ 2)) ≤ tableLineDegreeFive * DF) :
-    (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).HeightIntegralBoundEstimate := by
+theorem htI2be_dat
+    {rU : ℕ} (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ rU)
+    (xR : ℝ) (htie : NrmTieU h fn yP U xR wR uL etR uL)
+    (hI2 : ∀ σ,
+      GoodEmb c σ
+        → ∀ (k : (U σ).Comp) (x : ReciprocityTheory.ChartRestriction.G.FD.Frame ((U σ).X k).Ψ rU),
+          x ∈ ((U σ).X k).dom
+            → - Real.log (Real.sqrt (∑ j, recNrm (U σ) xR uL.1 uL.2 (wR j) k x ^ 2))
+              ≤ tableLineDegreeFive * DF)
+    : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO).HeightIntegralBoundEstimate := by
   intro Z P
   obtain ⟨σ, hσ, k, x, hx, hw, -⟩ := htie Z P
   have h1 := hI2 σ hσ k x hx
@@ -166,71 +188,115 @@ theorem htI2be_dat {rU : ℕ} (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ rU) (xR :
   simp only [hw, zero_div, zero_mul, add_zero]
   exact h1
 
-theorem lawBdd_dat (hcx : ValAtCx h yP)
-    (huta2 : wtZ uta2.1 uta2.2 = (Dd + 4 : ℕ) • wtZ uL.1 uL.2 - wtZ uF.1 uF.2)
+theorem lawBdd_dat
+    (hcx : ValAtCx h yP) (huta2 : wtZ uta2.1 uta2.2 = (Dd + 4 : ℕ) • wtZ uL.1 uL.2 - wtZ uF.1 uF.2)
     (hwS : ∀ k, wR k ∈ sec Xo c uL.1 uL.2) (hwB : ∀ k, SupBdd Xo c fn uL.1 uL.2 (wR k))
     (hpS : ∀ k, thpR k ∈ sec Xo c uF.1 uF.2) (hpB : ∀ k, SupBdd Xo c fn uF.1 uF.2 (thpR k))
     (heS : etR ∈ sec Xo c uL.1 uL.2) (heB : SupBdd Xo c fn uL.1 uL.2 etR)
-    (h2S : ta2R ∈ sec Xo c uta2.1 uta2.2) (h2B : SupBdd Xo c fn uta2.1 uta2.2 ta2R) :
-    LawBdd (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO) :=
-  GlobalTheory.Reg.LawBddPf.lawBdd_dataOf E H Dw l Xo c h δ fn yP _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    _ _ _ _ _ _ _ _ _ _ _ _ _ _ hcx (fun k => ⟨hwS k, hwB k⟩) (fun k => ⟨hpS k, hpB k⟩) ⟨heS, heB⟩
-    ⟨one_mem_sec, supBdd_one fn⟩ ⟨h2S, h2B⟩ (wt_et uL) (weightZ_zero_eq_two_smul_sub_self uL) huta2
+    (h2S : ta2R ∈ sec Xo c uta2.1 uta2.2) (h2B : SupBdd Xo c fn uta2.1 uta2.2 ta2R)
+    : LawBdd (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO) :=
+  GlobalTheory.Reg.LawBddPf.lawBdd_dataOf E H Dw l Xo c h δ fn yP _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hcx
+    (fun k => ⟨hwS k, hwB k⟩)
+    (fun k => ⟨hpS k, hpB k⟩)
+    ⟨heS, heB⟩ ⟨one_mem_sec, supBdd_one fn⟩ ⟨h2S, h2B⟩ (wt_et uL)
+    (weightZ_zero_eq_two_smul_sub_self uL) huta2
 
-theorem exists_htConcl (hgt : GenFromTest Xo c h)
-    (hne : CompNe Xo c) (hfg : FnFG Xo c) (htr : FnTrdeg Xo c Dd) (hac : FnAlgClosed (Xo := Xo) (c := c))
-    (hwb : ∀ Z, evC h Z (wR (jc Z)) ≠ 0) (het : NZAt h etR) (hta2 : NZAt h ta2R)
-    (huta2 : wtZ uta2.1 uta2.2 = (Dd + 4 : ℕ) • wtZ uL.1 uL.2 - wtZ uF.1 uF.2)
+theorem exists_htConcl
+    (hgt : GenFromTest Xo c h) (hne : CompNe Xo c) (hfg : FnFG Xo c) (htr : FnTrdeg Xo c Dd)
+    (hac : FnAlgClosed (Xo := Xo) (c := c)) (hwb : ∀ Z, evC h Z (wR (jc Z)) ≠ 0) (het : NZAt h etR)
+    (hta2 : NZAt h ta2R) (huta2 : wtZ uta2.1 uta2.2 = (Dd + 4 : ℕ) • wtZ uL.1 uL.2 - wtZ uF.1 uF.2)
     (hfn : FnNe Xo c fn) (hconj : FnConj Xo c fn yP)
-    (hbdd : LawBdd (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
-    (ha1 : A1Bigness (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
-    (ha2 : A2RegularityOrders (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
-    (ha3' : LawA3' (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
-    (sel : Fin (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).del → Fin np)
-    (ha4 : A4Selection (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO) sel)
-    (hnum : NumOK (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
-    (ha13 : A13Measurable (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
-    (hH1 : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).FinitePlaceHyp)
-    (hF1d : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).TrivialPlaceHyp)
-    (hLAM : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).HtLAM)
-    (hSup : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).HtSup)
-    (hI2et : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).HeightIntegralEstimateTrivialPlace)
-    (hI2be : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).HeightIntegralBoundEstimate) :
-    ∃ (hd : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).AxH (fun Z => AG Z))
-      (hs : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).S1),
-      hd.sel = sel ∧ Formalism.MainNotions.Gaps.HeightData.HtConcl ((dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO).htOf hd hs) := by
+    (hbdd : LawBdd (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4
+      Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
+    (ha1 : A1Bigness (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc
+      PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
+    (ha2 : A2RegularityOrders (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN
+      PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
+    (ha3' : LawA3' (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4
+      Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
+    (sel : Fin (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+        tableLineDegreeFive tableLineDegreeTwo Prw PO).del
+      → Fin np)
+    (ha4 : A4Selection
+      (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+        tableLineDegreeFive tableLineDegreeTwo Prw PO)
+      sel)
+    (hnum : NumOK (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4
+      Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
+    (ha13 : A13Measurable (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0'
+      Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO))
+    (hH1 : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO).FinitePlaceHyp)
+    (hF1d : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO).TrivialPlaceHyp)
+    (hLAM : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO).HtLAM)
+    (hSup : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO).HtSup)
+    (hI2et : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO).HeightIntegralEstimateTrivialPlace)
+    (hI2be : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+      tableLineDegreeFive tableLineDegreeTwo Prw PO).HeightIntegralBoundEstimate)
+    : ∃ (hd : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+        tableLineDegreeFive tableLineDegreeTwo Prw PO).AxH (fun Z => AG Z))
+        (hs : (dat h δ fn yP Dd N uL uF uta2 wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet
+          tableLineDegreeFive tableLineDegreeTwo Prw PO).S1),
+      hd.sel = sel ∧ Formalism.MainNotions.Gaps.HeightData.HtConcl ((dat h δ fn yP Dd N uL uF uta2
+        wR jc np thpR etR ta2R nu wsize DF PN PP0' Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo
+        Prw PO).htOf hd hs) := by
   have h1 : NZAt h 1 := fun Z => by rw [evC_one hgt]; exact one_ne_zero
-  refine ⟨_, _, ?_, htConcl_dataOf h δ fn yP Dd N 0 1 1 0 uL uF uL uL uL (0, 0) uta2 wR jc np thpR 0 Fin.elim0 uF 0
-    Fin.elim0 ∅ etR 1 ta2R nu (fun _ _ _ => 0) wsize DF PN 1 1 PP0' 1 Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO 0 0 hne hfg htr hac hwb
-    het h1 hta2 (wt_et uL) (weightZ_zero_eq_two_smul_sub_self uL) huta2 hfn hconj hbdd ha1 ha2 ha3' sel ha4 hnum ha13 hH1 hF1d hLAM hSup hI2et
-    hI2be⟩
+  refine ⟨
+    _,
+    _,
+    ?_,
+    htConcl_dataOf h δ fn yP Dd N 0 1 1 0 uL uF uL uL uL (0, 0) uta2 wR jc np thpR 0 Fin.elim0 uF 0
+      Fin.elim0 ∅ etR 1 ta2R nu
+      (fun _ _ _ => 0)
+      wsize DF PN 1 1 PP0' 1 Gc PI4 Pet tableLineDegreeFive tableLineDegreeTwo Prw PO 0 0 hne hfg
+      htr hac hwb het h1 hta2 (wt_et uL) (weightZ_zero_eq_two_smul_sub_self uL) huta2 hfn hconj hbdd
+      ha1 ha2 ha3' sel ha4 hnum ha13 hH1 hF1d hLAM hSup hI2et hI2be
+  ⟩
   obtain ⟨hD, hi, hg, hc0, hc1, hcg, hL, hDF, hrw, hnK, hrd, hP⟩ := hnum
   rfl
 
 section Transfer
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.MainNotions.Gaps.HeightData
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra
+  Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.MainNotions.Gaps.HeightData
 
-variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j}
-  {ι : Type} [Fintype ι] {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra B.KO (Ω c)]
+variable
+  {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} {X : PJ D B P j}
+  {ka wL wF : WeightFamilies.Wt D j} {ι : Type} [Fintype ι]
+  {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra B.KO (Ω c)]
   {WT : Type} [AddCommGroup WT]
   {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra B.KO (A c)]
-  [∀ c, Algebra (𝓞 B.KO) (A c)] {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
+  [∀ c, Algebra (𝓞 B.KO) (A c)]
+  {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
-theorem heights_of_first (d : Data B.KO ι Ω WT A) (hd : d.AxH 𝒜) (hs : d.S1)
-    (G : GlobalFamilyData X ka wL wF) (Qf : ∀ la, LocalPointData G la) (Gc PH Prw Pet : ℝ) (hj : ¬ j < D.R.m)
-    (hD : d.D = WeightFamilies.dimY D j) (hδ : d.del = G.del) (hL : d.wsize d.wL = wL.size) (hG : d.Gc = Gc)
-    (hPH : d.PHc = PH) (hPrw : d.Prw = Prw)
+theorem heights_of_first
+    (d : Data B.KO ι Ω WT A) (hd : d.AxH 𝒜) (hs : d.S1)
+    (G : GlobalFamilyData X ka wL wF) (Qf : ∀ la, LocalPointData G la)
+    (Gc PH Prw Pet : ℝ)
+    (hj : ¬ j < D.R.m) (hD : d.D = WeightFamilies.dimY D j) (hδ : d.del = G.del)
+    (hL : d.wsize d.wL = wL.size) (hG : d.Gc = Gc) (hPH : d.PHc = PH) (hPrw : d.Prw = Prw)
     (hS : ∑ k, (d.htOf hd hs).S k ≤ ∑ k, WeightFamilies.meanLogSup B (G.th' k))
-    (hI : IlaTie d hd hs G Qf Gc PH Prw Pet) (h : HtConcl (d.htOf hd hs)) : Heights Qf Gc PH Prw Pet := by
+    (hI : IlaTie d hd hs G Qf Gc PH Prw Pet) (h : HtConcl (d.htOf hd hs))
+    : Heights Qf Gc PH Prw Pet := by
   refine heights_of_htConcl G Qf Gc PH Prw Pet ?_
   obtain ⟨hfin, hsum, hineq, -⟩ := h
-  have hle : ∀ la : HeightOneSpectrum (𝓞 B.KO),
-      (((toHtData G Qf Gc PH Prw Pet).Ila la).toNat : ℝ) * Formalism.MainNotions.Gaps.HeightData.lN B.KO la ≤
-        (((d.htOf hd hs).Ila la).toNat : ℝ) * Formalism.MainNotions.Gaps.HeightData.lN B.KO la := fun la =>
-    mul_le_mul_of_nonneg_right (by exact_mod_cast ENat.toNat_le_toNat (hI la) (hfin la)) (lN_nonneg' _ la)
+  have hle
+      : ∀ la : HeightOneSpectrum (𝓞 B.KO),
+        (((toHtData G Qf Gc PH Prw Pet).Ila la).toNat : ℝ)
+            * Formalism.MainNotions.Gaps.HeightData.lN B.KO la
+          ≤ (((d.htOf hd hs).Ila la).toNat : ℝ)
+            * Formalism.MainNotions.Gaps.HeightData.lN B.KO la := fun la =>
+    mul_le_mul_of_nonneg_right (by exact_mod_cast ENat.toNat_le_toNat (hI la) (hfin la))
+      (lN_nonneg' _ la)
   have hsum' : Summable fun la : HeightOneSpectrum (𝓞 B.KO) =>
-      (((toHtData G Qf Gc PH Prw Pet).Ila la).toNat : ℝ) * Formalism.MainNotions.Gaps.HeightData.lN B.KO la :=
+      (((toHtData G Qf Gc PH Prw Pet).Ila la).toNat : ℝ)
+        * Formalism.MainNotions.Gaps.HeightData.lN B.KO la :=
     Summable.of_nonneg_of_le (fun la => mul_nonneg (Nat.cast_nonneg _) (lN_nonneg' _ la)) hle hsum
   have hDr : ((d.htOf hd hs).D : ℝ) = (WeightFamilies.dimY D j : ℝ) := by exact_mod_cast hD
   have hδr : ((d.htOf hd hs).δ : ℝ) = (G.del : ℝ) := by exact_mod_cast hδ
@@ -240,11 +306,14 @@ theorem heights_of_first (d : Data B.KO ι Ω WT A) (hd : d.AxH 𝒜) (hs : d.S1
   have hPrw' : (d.htOf hd hs).Prw = Prw := hPrw
   refine ⟨fun la => ne_top_of_le_ne_top (hfin la) (hI la), hsum', ?_, fun he => absurd he hj⟩
   have ht := Summable.tsum_le_tsum hle hsum' hsum
-  have hineq' : 2 * ∑' la : HeightOneSpectrum (𝓞 B.KO),
-        (((d.htOf hd hs).Ila la).toNat : ℝ) * Formalism.MainNotions.Gaps.HeightData.lN B.KO la ≤
-      (G.del : ℝ) * Real.log G.del + 2 * ∑ k, (d.htOf hd hs).S k +
-      8 / 3 * (WeightFamilies.dimY D j : ℝ) * ((WeightFamilies.dimY D j : ℝ) + 4) * G.del * Prw * wL.size +
-      2 * ((WeightFamilies.dimY D j : ℝ) + 4) * ((WeightFamilies.dimY D j : ℝ) + 1) * G.del * (2 * Gc + 6 * PH) * wL.size := by
+  have hineq'
+      : 2 * ∑' la : HeightOneSpectrum (𝓞 B.KO),
+          (((d.htOf hd hs).Ila la).toNat : ℝ) * Formalism.MainNotions.Gaps.HeightData.lN B.KO la
+        ≤ (G.del : ℝ) * Real.log G.del + 2 * ∑ k, (d.htOf hd hs).S k
+          + 8 / 3 * (WeightFamilies.dimY D j : ℝ) * ((WeightFamilies.dimY D j : ℝ) + 4) * G.del
+            * Prw * wL.size
+          + 2 * ((WeightFamilies.dimY D j : ℝ) + 4) * ((WeightFamilies.dimY D j : ℝ) + 1) * G.del
+            * (2 * Gc + 6 * PH) * wL.size := by
     rw [hDr, hδr, hL', hG', hPH', hPrw'] at hineq
     exact hineq
   show 2 * ∑' la : HeightOneSpectrum (𝓞 B.KO),

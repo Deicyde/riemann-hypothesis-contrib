@@ -6,12 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.ClearingDenominatorsInOrder
 
-theorem main {E W : Type} [Field E] [NumberField E] [AddCommGroup W] [Module E W]
-    [Module (NumberField.RingOfIntegers E) W]
-    [IsScalarTower (NumberField.RingOfIntegers E) E W]
-    (L : Submodule (NumberField.RingOfIntegers E) W) :
-    ∀ v ∈ Submodule.span E (↑L : Set W),
-      ∃ (c : NumberField.RingOfIntegers E), c ≠ (0 : NumberField.RingOfIntegers E) ∧ c • v ∈ L := by
+theorem main
+    {E W : Type} [Field E] [NumberField E] [AddCommGroup W] [Module E W]
+    [Module (NumberField.RingOfIntegers E) W] [IsScalarTower (NumberField.RingOfIntegers E) E W]
+    (L : Submodule (NumberField.RingOfIntegers E) W)
+    : ∀ v ∈ Submodule.span E (↑L : Set W), ∃ (c : NumberField.RingOfIntegers E),
+      c ≠ (0 : NumberField.RingOfIntegers E) ∧ c • v ∈ L := by
   intro v hv
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩

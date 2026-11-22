@@ -94,13 +94,17 @@ theorem Grade_of : Grade := by
   have hor : ∀ k l, k ≠ l → p k * p l = 0 := fun k l h => hco.ortho h
   have hsum : ∑ k, p k = 1 := hco.complete
   have hXp : ∀ k, X * p k = e k • p k := by
-    intro k; rw [hXdef, Finset.sum_mul]; simp only [smul_mul_assoc]
+    intro k
+    rw [hXdef, Finset.sum_mul]
+    simp only [smul_mul_assoc]
     rw [Finset.sum_eq_single k]
     · rw [hid]
     · intro b _ hb; rw [hor b k hb, smul_zero]
     · simp
   have hpX : ∀ k, p k * X = e k • p k := by
-    intro k; rw [hXdef, Finset.mul_sum]; simp only [mul_smul_comm]
+    intro k
+    rw [hXdef, Finset.mul_sum]
+    simp only [mul_smul_comm]
     rw [Finset.sum_eq_single k]
     · rw [hid]
     · intro b _ hb; rw [hor k b (Ne.symm hb), smul_zero]
@@ -109,12 +113,15 @@ theorem Grade_of : Grade := by
     have : (∑ k, p k) * Y * (∑ l, p l) = ∑ kl : Fin n × Fin n, p kl.1 * Y * p kl.2 := by
       rw [Finset.sum_mul, Finset.sum_mul, Fintype.sum_prod_type]; simp_rw [Finset.mul_sum]
     rw [← this, hsum, one_mul, mul_one]
-  have heig : ∀ kl : Fin n × Fin n, adX X (p kl.1 * Y * p kl.2) = (e kl.1 - e kl.2) • (p kl.1 * Y * p kl.2) := by
+  have heig
+      : ∀ kl : Fin n × Fin n,
+        adX X (p kl.1 * Y * p kl.2) = (e kl.1 - e kl.2) • (p kl.1 * Y * p kl.2) := by
     intro kl
     rw [adX_apply, ← mul_assoc, ← mul_assoc, hXp, mul_assoc (p kl.1 * Y), hpX]
     simp [sub_smul, smul_mul_assoc, mul_smul_comm]
   have hstab : ∀ Z ∈ g, adX X Z ∈ g := fun Z hZ => by rw [adX_apply]; exact hg Z hZ
-  let q : C[X] := ∏ kl ∈ (Finset.univ : Finset (Fin n × Fin n)).erase (i, j), (Polynomial.X - Polynomial.C (e kl.1 - e kl.2))
+  let q : C[X] :=
+    ∏ kl ∈ (Finset.univ : Finset (Fin n × Fin n)).erase (i, j), (Polynomial.X - Polynomial.C (e kl.1 - e kl.2))
   have hq : aeval (adX X) q Y = q.eval (e i - e j) • (p i * Y * p j) := by
     conv_lhs => rw [hdec]
     set_option synthInstance.maxHeartbeats 100000 in

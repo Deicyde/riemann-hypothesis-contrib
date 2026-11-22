@@ -40,11 +40,12 @@ def hxi (G : Matrix (Fin r) (Fin r) E) (ξ : Fin r → E) : (Fin r → E) →ₗ
   map_add' x y := HermitianTraceFormVanishing.herm_add_left G x y ξ
   map_smul' a x := HermitianTraceFormVanishing.herm_smul_left G a x ξ
 
-theorem exists_beta (X : Data E r) {ξ : Fin r → E} (hξξ : herm X.Gm ξ ξ = 0) (hξ0 : ξ ≠ 0) :
-    ∃ β : Fin (r - 2) → Fin r → E, (∀ k, herm X.Gm (β k) ξ = 0) ∧
-      LinearIndependent E (Fin.cons ξ β : Fin (r - 2 + 1) → Fin r → E) ∧
-      (∀ x : Fin r → E, herm X.Gm x ξ = 0 →
-        ∃ (c : Fin (r - 2) → E) (e : E), x = ∑ k, c k • β k + e • ξ) := by
+theorem exists_beta (X : Data E r) {ξ : Fin r → E} (hξξ : herm X.Gm ξ ξ = 0) (hξ0 : ξ ≠ 0)
+    : ∃ β : Fin (r - 2) → Fin r → E,
+      (∀ k, herm X.Gm (β k) ξ = 0)
+        ∧ LinearIndependent E (Fin.cons ξ β : Fin (r - 2 + 1) → Fin r → E)
+        ∧ (∀ x : Fin r → E,
+          herm X.Gm x ξ = 0 → ∃ (c : Fin (r - 2) → E) (e : E), x = ∑ k, c k • β k + e • ξ) := by
   classical
   set f := hxi X.Gm ξ with hf
   have hfx : ∀ x, f x = herm X.Gm x ξ := fun _ => rfl
@@ -117,11 +118,13 @@ theorem exists_beta (X : Data E r) {ξ : Fin r → E} (hξξ : herm X.Gm ξ ξ =
         (Submodule.smul_mem _ _ ?_)
       · exact Submodule.subset_span ⟨k.succ, by simp⟩
       · exact Submodule.subset_span ⟨0, by simp⟩
-    have hli := linearIndependent_of_top_le_span_of_card_eq_finrank hspan
-      (by rw [Fintype.card_fin, hKr]; omega)
+    have hli :=
+      linearIndependent_of_top_le_span_of_card_eq_finrank hspan
+        (by rw [Fintype.card_fin, hKr]; omega)
     have hmap := hli.map' K.subtype (Submodule.ker_subtype K)
-    have heq : (K.subtype ∘ (Fin.cons ξK βK : Fin (r - 2 + 1) → K)) =
-        (Fin.cons ξ (fun k => (βK k : Fin r → E)) : Fin (r - 2 + 1) → Fin r → E) := by
+    have heq
+        : (K.subtype ∘ (Fin.cons ξK βK : Fin (r - 2 + 1) → K))
+          = (Fin.cons ξ (fun k => (βK k : Fin r → E)) : Fin (r - 2 + 1) → Fin r → E) := by
       funext i
       refine Fin.cases ?_ (fun k => ?_) i <;> simp [ξK]
     exact heq ▸ hmap
@@ -139,8 +142,9 @@ def LBsub {n : ℕ} (β : Fin n → Fin r → E) (ξ : Fin r → E) : Submodule 
   add_mem' := by
     rintro c c' ⟨e, he⟩ ⟨e', he'⟩
     refine ⟨e + e', ?_⟩
-    have h : ∑ k, (c + c') k • β k + (e + e') • ξ =
-        (∑ k, c k • β k + e • ξ) + (∑ k, c' k • β k + e' • ξ) := by
+    have h
+        : ∑ k, (c + c') k • β k + (e + e') • ξ
+          = (∑ k, c k • β k + e • ξ) + (∑ k, c' k • β k + e' • ξ) := by
       simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib]
       abel
     rw [h]

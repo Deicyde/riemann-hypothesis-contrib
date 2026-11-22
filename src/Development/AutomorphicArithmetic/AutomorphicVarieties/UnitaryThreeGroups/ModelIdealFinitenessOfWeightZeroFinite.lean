@@ -6,9 +6,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 open Matrix IsLocalRing UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.HV
 
-private theorem map_sub_map_mem_pow_of_dist_le_zpow_neg {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] (J : Ideal R)
-    (hl : (l : R) ∈ J) {k : ℕ} (φ : (Fin k → ℤ_[l]) →+ R) (n : ℕ) (v w : Fin k → ℤ_[l])
-    (h : dist v w ≤ (l : ℝ) ^ (-(n : ℤ))) : φ v - φ w ∈ J ^ n := by
+private theorem map_sub_map_mem_pow_of_dist_le_zpow_neg
+    {l : ℕ} [Fact l.Prime]
+    {R : Type} [CommRing R]
+    (J : Ideal R) (hl : (l : R) ∈ J)
+    {k : ℕ} (φ : (Fin k → ℤ_[l]) →+ R)
+    (n : ℕ) (v w : Fin k → ℤ_[l]) (h : dist v w ≤ (l : ℝ) ^ (-(n : ℤ)))
+    : φ v - φ w ∈ J ^ n := by
   have hdiv : ∀ i, ∃ u : ℤ_[l], v i - w i = (l : ℤ_[l]) ^ n * u := by
     intro i
     have hi : ‖v i - w i‖ ≤ (l : ℝ) ^ (-(n : ℤ)) := by
@@ -26,9 +30,14 @@ private theorem map_sub_map_mem_pow_of_dist_le_zpow_neg {l : ℕ} [Fact l.Prime]
   rw [Nat.cast_pow]
   exact Ideal.pow_mem_pow hl n
 
-private theorem mem_range_of_approx {l : ℕ} [Fact l.Prime] {R : Type} [CommRing R] (J : Ideal R)
-    [IsHausdorff J R] (hl : (l : R) ∈ J) {k : ℕ} (φ : (Fin k → ℤ_[l]) →+ R) (y : R)
-    (h : ∀ n : ℕ, ∃ v, y - φ v ∈ J ^ n) : ∃ v, φ v = y := by
+private theorem mem_range_of_approx
+    {l : ℕ} [Fact l.Prime]
+    {R : Type} [CommRing R]
+    (J : Ideal R) [IsHausdorff J R]
+    (hl : (l : R) ∈ J)
+    {k : ℕ} (φ : (Fin k → ℤ_[l]) →+ R)
+    (y : R) (h : ∀ n : ℕ, ∃ v, y - φ v ∈ J ^ n)
+    : ∃ v, φ v = y := by
   choose v hv using h
   obtain ⟨a, ψ, hψ, htend⟩ := SeqCompactSpace.tendsto_subseq v
   refine ⟨a, ?_⟩
@@ -51,8 +60,8 @@ private theorem mem_range_of_approx {l : ℕ} [Fact l.Prime] {R : Type} [CommRin
     exact hall n
   exact (sub_eq_zero.mp h0).symm
 
-private theorem norm_coe_coefO_le_one {l : ℕ} [Fact l.Prime] (c : Coef l) (x : c.O) :
-    ‖(x : PadicAlgCl l)‖ ≤ 1 := by
+private theorem norm_coe_coefO_le_one {l : ℕ} [Fact l.Prime] (c : Coef l) (x : c.O)
+    : ‖(x : PadicAlgCl l)‖ ≤ 1 := by
   haveI := c.fin
   have hint : IsIntegral ℤ_[l] (x : PadicAlgCl l) := by
     have hx : IsIntegral ℤ_[l] x := Algebra.IsIntegral.isIntegral x
@@ -61,25 +70,32 @@ private theorem norm_coe_coefO_le_one {l : ℕ} [Fact l.Prime] (c : Coef l) (x :
   by_contra hgt
   push_neg at hgt
   rw [hmon.as_sum, Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finsetSum] at hp
-  have hcoef : ∀ i ∈ Finset.range p.natDegree,
-      ‖Polynomial.eval₂ (algebraMap ℤ_[l] (PadicAlgCl l)) (x : PadicAlgCl l)
-        (Polynomial.C (p.coeff i) * Polynomial.X ^ i)‖ ≤ ‖(x : PadicAlgCl l)‖ ^ i := by
+  have hcoef
+      : ∀ i ∈ Finset.range p.natDegree,
+        ‖Polynomial.eval₂ (algebraMap ℤ_[l] (PadicAlgCl l)) (x : PadicAlgCl l)
+          (Polynomial.C (p.coeff i) * Polynomial.X ^ i)‖
+          ≤ ‖(x : PadicAlgCl l)‖ ^ i := by
     intro i _
     rw [Polynomial.eval₂_mul, Polynomial.eval₂_C, Polynomial.eval₂_X_pow, norm_mul, norm_pow]
     have hc : ‖algebraMap ℤ_[l] (PadicAlgCl l) (p.coeff i)‖ ≤ 1 := by
       rw [IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] (PadicAlgCl l), PadicAlgCl.norm_extends]
       exact PadicInt.norm_le_one _
-    calc _ ≤ 1 * ‖(x : PadicAlgCl l)‖ ^ i := by gcongr
+    calc
+      _ ≤ 1 * ‖(x : PadicAlgCl l)‖ ^ i := by gcongr
       _ = _ := one_mul _
-  have hlt : ‖∑ i ∈ Finset.range p.natDegree, Polynomial.eval₂ (algebraMap ℤ_[l] (PadicAlgCl l))
-      (x : PadicAlgCl l) (Polynomial.C (p.coeff i) * Polynomial.X ^ i)‖ <
-      ‖(x : PadicAlgCl l)‖ ^ p.natDegree := by
+  have hlt
+      : ‖∑ i ∈ Finset.range p.natDegree, Polynomial.eval₂ (algebraMap ℤ_[l] (PadicAlgCl l))
+          (x : PadicAlgCl l) (Polynomial.C (p.coeff i) * Polynomial.X ^ i)‖
+        < ‖(x : PadicAlgCl l)‖ ^ p.natDegree := by
     rcases Nat.eq_zero_or_pos p.natDegree with hn | hn
     · rw [hn]
       simp
-    · obtain ⟨i, hi, hle⟩ := IsUltrametricDist.exists_norm_finsetSum_le_of_nonempty
-        (Finset.nonempty_range_iff.mpr hn.ne') (fun i => Polynomial.eval₂
-          (algebraMap ℤ_[l] (PadicAlgCl l)) (x : PadicAlgCl l) (Polynomial.C (p.coeff i) * Polynomial.X ^ i))
+    · obtain ⟨i, hi, hle⟩ :=
+        IsUltrametricDist.exists_norm_finsetSum_le_of_nonempty
+          (Finset.nonempty_range_iff.mpr hn.ne')
+          (fun i =>
+            Polynomial.eval₂ (algebraMap ℤ_[l] (PadicAlgCl l)) (x : PadicAlgCl l)
+              (Polynomial.C (p.coeff i) * Polynomial.X ^ i))
       exact lt_of_le_of_lt (hle.trans (hcoef i hi)) (pow_lt_pow_right₀ hgt (Finset.mem_range.mp hi))
   have heq := eq_neg_of_add_eq_zero_left hp
   have hn := congrArg norm heq
@@ -104,11 +120,14 @@ private theorem natCast_not_isUnit {l : ℕ} [Fact l.Prime] (c : Coef l) : ¬ Is
   linarith
 
 set_option synthInstance.maxHeartbeats 200000 in
-theorem UpperTheory.V.U3.modelIdeal_finiteness_of_weightZero_finite :
-    ∀ {l : ℕ} [Fact l.Prime] {c : Coef l} {Γ H : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group H] [TopologicalSpace H] [IsTopologicalGroup H]
-      {η : Γ →* ℤˣ} {Ψ : Γ →* (c.O)ˣ} {N : Set Γ} {ι : H →* Γ} {hι : Continuous ι}
-      {U : Univ (GCond.noCondition c.O (η.comp ι) (Ψ.comp ι))} {I : Ideal U.R} {cc g₁ : Γ} (S : SRing N hι U I cc g₁) (M : Model S (PadicAlgCl l)), l ≠ 2 → Marks η Ψ cc g₁ →
-      Module.Finite c.O (weightZeroSubalgebra c.O S.r.hom) → M2 M.𝒜 M.Q.ideal := by
+theorem UpperTheory.V.U3.modelIdeal_finiteness_of_weightZero_finite
+    : ∀ {l : ℕ} [Fact l.Prime] {c : Coef l} {Γ H : Type} [Group Γ] [TopologicalSpace Γ]
+        [IsTopologicalGroup Γ] [Group H] [TopologicalSpace H] [IsTopologicalGroup H] {η : Γ →* ℤˣ}
+        {Ψ : Γ →* (c.O)ˣ} {N : Set Γ} {ι : H →* Γ} {hι : Continuous ι}
+        {U : Univ (GCond.noCondition c.O (η.comp ι) (Ψ.comp ι))} {I : Ideal U.R} {cc g₁ : Γ}
+        (S : SRing N hι U I cc g₁) (M : Model S (PadicAlgCl l)),
+      l ≠ 2 → Marks η Ψ cc g₁ → Module.Finite c.O (weightZeroSubalgebra c.O S.r.hom)
+        → M2 M.𝒜 M.Q.ideal := by
   intro l _ c Γ H _ _ _ _ _ _ η Ψ N ι hι U I cc g₁ S M hl2 hmk hfin
   haveI := c.dvr
   haveI := c.fin
@@ -123,13 +142,16 @@ theorem UpperTheory.V.U3.modelIdeal_finiteness_of_weightZero_finite :
   obtain ⟨n, b, hb⟩ := Module.Finite.exists_fin (R := c.O) (M := weightZeroSubalgebra c.O S.r.hom)
   obtain ⟨t, o, ho⟩ := Module.Finite.exists_fin (R := ℤ_[l]) (M := c.O)
   let F : (Fin n × Fin t → ℤ_[l]) → Fin n × Fin t → S.R := fun z q =>
-    algebraMap c.O S.R (algebraMap ℤ_[l] c.O (z q) * o q.2) * ((b q.1 : weightZeroSubalgebra c.O S.r.hom) : S.R)
-  let φ : (Fin (n * t) → ℤ_[l]) →+ S.R :=
-    { toFun := fun v => ∑ q : Fin n × Fin t, F (v ∘ finProdFinEquiv) q
-      map_zero' := by simp [F]
-      map_add' := by
-        intro v w
-        simp only [F, Function.comp_apply, Pi.add_apply, map_add (f := _), add_mul, Finset.sum_add_distrib] }
+    algebraMap c.O S.R (algebraMap ℤ_[l] c.O (z q) * o q.2)
+      * ((b q.1 : weightZeroSubalgebra c.O S.r.hom) : S.R)
+  let φ : (Fin (n * t) → ℤ_[l]) →+ S.R := {
+    toFun := fun v => ∑ q : Fin n × Fin t, F (v ∘ finProdFinEquiv) q
+    map_zero' := by simp [F]
+    map_add' := by
+      intro v w
+      simp only [F, Function.comp_apply, Pi.add_apply, map_add (f := _), add_mul,
+        Finset.sum_add_distrib]
+  }
   have hφB : ∀ v, φ v ∈ weightZeroSubalgebra c.O S.r.hom := by
     intro v
     show (∑ q : Fin n × Fin t, F (v ∘ finProdFinEquiv) q) ∈ _
@@ -154,8 +176,9 @@ theorem UpperTheory.V.U3.modelIdeal_finiteness_of_weightZero_finite :
     refine ⟨(fun q : Fin n × Fin t => z q.1 q.2) ∘ finProdFinEquiv.symm, ?_⟩
     show ∑ q : Fin n × Fin t,
       F (((fun q : Fin n × Fin t => z q.1 q.2) ∘ finProdFinEquiv.symm) ∘ finProdFinEquiv) q = x
-    have hcomp : ((fun q : Fin n × Fin t => z q.1 q.2) ∘ finProdFinEquiv.symm) ∘ finProdFinEquiv =
-        fun q => z q.1 q.2 := by
+    have hcomp
+        : ((fun q : Fin n × Fin t => z q.1 q.2) ∘ finProdFinEquiv.symm) ∘ finProdFinEquiv
+          = fun q => z q.1 q.2 := by
       funext q
       simp
     rw [hcomp, Fintype.sum_prod_type, ← hx2]
@@ -168,15 +191,20 @@ theorem UpperTheory.V.U3.modelIdeal_finiteness_of_weightZero_finite :
     rw [Algebra.smul_def]
   have key : ∀ f ∈ M.𝒜 0, M.q f ∈ weightZeroSubalgebra c.O S.r.hom := by
     intro f hf
-    obtain ⟨v, hv⟩ := mem_range_of_approx (maximalIdeal S.R) hlm φ (M.q f) (fun m => by
-      obtain ⟨y, hy, hdiff⟩ := M.dense 0 f hf m
-      have hle : Submodule.span c.O (entMon S.r.hom 0) ≤ Subalgebra.toSubmodule (weightZeroSubalgebra c.O S.r.hom) :=
-        Submodule.span_le.mpr (fun z hz => Algebra.subset_adjoin hz)
-      obtain ⟨v, hv⟩ := hBφ y (hle hy)
-      exact ⟨v, by rw [hv]; exact hdiff⟩)
+    obtain ⟨v, hv⟩ :=
+      mem_range_of_approx (maximalIdeal S.R) hlm φ (M.q f) (fun m => by
+        obtain ⟨y, hy, hdiff⟩ := M.dense 0 f hf m
+        have hle
+            : Submodule.span c.O (entMon S.r.hom 0)
+              ≤ Subalgebra.toSubmodule (weightZeroSubalgebra c.O S.r.hom) :=
+          Submodule.span_le.mpr (fun z hz => Algebra.subset_adjoin hz)
+        obtain ⟨v, hv⟩ := hBφ y (hle hy)
+        exact ⟨v, by rw [hv]; exact hdiff⟩)
     rw [← hv]
     exact hφB v
-  have hsub : (M.𝒜 0).map M.q.toLinearMap ≤ Subalgebra.toSubmodule (weightZeroSubalgebra c.O S.r.hom) := by
+  have hsub
+      : (M.𝒜 0).map M.q.toLinearMap
+        ≤ Subalgebra.toSubmodule (weightZeroSubalgebra c.O S.r.hom) := by
     rintro _ ⟨f, hf, rfl⟩
     exact key f hf
   haveI : Module.Finite c.O (Subalgebra.toSubmodule (weightZeroSubalgebra c.O S.r.hom)) := hfin

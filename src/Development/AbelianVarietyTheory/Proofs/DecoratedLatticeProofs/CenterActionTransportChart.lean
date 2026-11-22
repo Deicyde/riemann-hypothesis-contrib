@@ -17,8 +17,11 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IsA
 @[expose] public section
 
 open scoped Matrix NNReal TensorProduct Classical
-open MeasureTheory NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.Eis GlobalTheory.MixModel GlobalTheory.RegSW GlobalTheory.RegSch
+open MeasureTheory NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.Eis GlobalTheory.MixModel GlobalTheory.RegSW GlobalTheory.RegSch
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero (swSec sZero IsKFinVec)
 open GlobalTheory.Core.Rk.SW (sch)
@@ -33,12 +36,17 @@ open GlobalTheory.Mem.AutSpace GlobalTheory.Mem.RealTranslate
 
 variable {D : D7}
 
-theorem trace_pow_conj {R : Type} [Ring R] [Algebra ℂ R] {n : ℕ} (E : Fin n → Fin n → R)
-    (P Q : Matrix (Fin n) (Fin n) ℂ) (hQP : Q * P = 1) (m : ℕ) :
-    ∑ c, (Matrix.of (fun a b => ∑ c, ∑ d, (P a c * Q d b) • E c d) ^ m) c c = ∑ c, (Matrix.of E ^ m) c c := by
+theorem trace_pow_conj
+    {R : Type} [Ring R] [Algebra ℂ R]
+    {n : ℕ} (E : Fin n → Fin n → R) (P Q : Matrix (Fin n) (Fin n) ℂ) (hQP : Q * P = 1)
+    (m : ℕ)
+    : ∑ c, (Matrix.of (fun a b => ∑ c, ∑ d, (P a c * Q d b) • E c d) ^ m) c c
+      = ∑ c, (Matrix.of E ^ m) c c := by
   have hPQ : P * Q = 1 := mul_eq_one_comm.1 hQP
   let φ : Matrix (Fin n) (Fin n) ℂ →+* Matrix (Fin n) (Fin n) R := (algebraMap ℂ R).mapMatrix
-  have hc : ∀ (M : Matrix (Fin n) (Fin n) R) a b, (φ P * M * φ Q) a b = ∑ c, ∑ d, (P a c * Q d b) • M c d := by
+  have hc
+      : ∀ (M : Matrix (Fin n) (Fin n) R) a b,
+        (φ P * M * φ Q) a b = ∑ c, ∑ d, (P a c * Q d b) • M c d := by
     intro M a b
     simp only [Matrix.mul_apply, φ, RingHom.mapMatrix_apply, Matrix.map_apply, Finset.sum_mul]
     rw [Finset.sum_comm]
@@ -62,7 +70,8 @@ theorem trace_pow_conj {R : Type} [Ring R] [Algebra ℂ R] {n : ℕ} (E : Fin n 
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun c _ => ?_
   rw [Finset.sum_comm]
-  have : ∀ d, ∑ a, (P a c * Q d a) • (Matrix.of E ^ m) c d = (Q * P) d c • (Matrix.of E ^ m) c d := by
+  have : ∀ d,
+      ∑ a, (P a c * Q d a) • (Matrix.of E ^ m) c d = (Q * P) d c • (Matrix.of E ^ m) c d := by
     intro d
     rw [← Finset.sum_smul, Matrix.mul_apply]
     simp only [mul_comm]
@@ -70,8 +79,12 @@ theorem trace_pow_conj {R : Type} [Ring R] [Algebra ℂ R] {n : ℕ} (E : Fin n 
 
 section Chart
 
-variable (A : HSp D) (μ : D.host.E) (hμ : GlobalTheory.StdUnn.IsSkew μ) (κ : GA D (dblSp A) ≃* GlobalTheory.StdUnn.G D A.rank)
-  (hκ : GlobalTheory.StdUnn.IsChart A μ κ) {θ : InfFam D} (hθ : IsInfFam θ) (τ : D.what₂.Tau)
+variable
+  (A : HSp D)
+  (μ : D.host.E) (hμ : GlobalTheory.StdUnn.IsSkew μ)
+  (κ : GA D (dblSp A) ≃* GlobalTheory.StdUnn.G D A.rank) (hκ : GlobalTheory.StdUnn.IsChart A μ κ)
+  {θ : InfFam D} (hθ : IsInfFam θ)
+  (τ : D.what₂.Tau)
 
 end Chart
 

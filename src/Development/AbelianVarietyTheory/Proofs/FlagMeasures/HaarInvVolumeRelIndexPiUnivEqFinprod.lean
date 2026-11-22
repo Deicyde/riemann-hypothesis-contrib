@@ -14,11 +14,13 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL
 
-theorem invVol_pi_univ : ∀ {ι : Type} {G : ι → Type} [∀ i, Group (G i)] (K U : ∀ i, Subgroup (G i)),
-    {i | K i ≠ U i}.Finite → (∀ i, (K i).relIndex (U i) ≠ 0 ∧ (U i).relIndex (K i) ≠ 0) →
-    (Subgroup.pi Set.univ K).relIndex (Subgroup.pi Set.univ U) ≠ 0 ∧
-    (Subgroup.pi Set.univ U).relIndex (Subgroup.pi Set.univ K) ≠ 0 ∧
-    invVol (Subgroup.pi Set.univ K) (Subgroup.pi Set.univ U) = ∏ᶠ i, invVol (K i) (U i) := by
+theorem invVol_pi_univ
+    : ∀ {ι : Type} {G : ι → Type} [∀ i, Group (G i)] (K U : ∀ i, Subgroup (G i)),
+      {i | K i ≠ U i}.Finite → (∀ i, (K i).relIndex (U i) ≠ 0 ∧ (U i).relIndex (K i) ≠ 0)
+        → (Subgroup.pi Set.univ K).relIndex (Subgroup.pi Set.univ U) ≠ 0
+          ∧ (Subgroup.pi Set.univ U).relIndex (Subgroup.pi Set.univ K) ≠ 0
+          ∧ invVol (Subgroup.pi Set.univ K) (Subgroup.pi Set.univ U)
+            = ∏ᶠ i, invVol (K i) (U i) := by
   intro ι G _ K U hfin hne
   classical
   set S := hfin.toFinset with hSdef
@@ -26,14 +28,21 @@ theorem invVol_pi_univ : ∀ {ι : Type} {G : ι → Type} [∀ i, Group (G i)] 
     intro i hi
     by_contra h
     exact hi (hfin.mem_toFinset.2 h)
-  have key : ∀ A B : ∀ i, Subgroup (G i), (∀ i, i ∉ S → A i ≤ B i) →
-      (Subgroup.pi Set.univ B).relIndex (Subgroup.pi Set.univ A) =
-        ∏ i ∈ S, (B i).relIndex (A i) := by
+  have key
+      : ∀ A B : ∀ i, Subgroup (G i),
+        (∀ i, i ∉ S → A i ≤ B i)
+          → (Subgroup.pi Set.univ B).relIndex (Subgroup.pi Set.univ A)
+            = ∏ i ∈ S, (B i).relIndex (A i) := by
     intro A B hAB
-    exact GlobalTheory.relIndex_eq_prod_local (∀ i, G i) ι G (fun i => Pi.evalMonoidHom G i) ⊤
-      (Subgroup.pi Set.univ A) (Subgroup.pi Set.univ B) A B S
-      (fun v h _ => ⟨Pi.mulSingle v h, Subgroup.mem_top _, by simp,
-        fun w hw => by simp [Pi.mulSingle_eq_of_ne hw]⟩)
+    exact GlobalTheory.relIndex_eq_prod_local (∀ i, G i) ι G
+      (fun i => Pi.evalMonoidHom G i)
+      ⊤ (Subgroup.pi Set.univ A) (Subgroup.pi Set.univ B) A B S
+      (fun v h _ => ⟨
+        Pi.mulSingle v h,
+        Subgroup.mem_top _,
+        by simp,
+        fun w hw => by simp [Pi.mulSingle_eq_of_ne hw]
+      ⟩)
       (fun g => by simp [Subgroup.mem_pi])
       (fun g => by simp [Subgroup.mem_pi])
       hAB

@@ -9,21 +9,30 @@ open Polynomial
 
 namespace LateralTheory.CohomologicalPurity.Hz
 
-def LeafRootStd : Prop := ∀ (A : Type) [CommRing A] (I : Ideal A) (f : A[X]) (a : A), f.Monic → f.eval a ∈ I →
-  IsUnit (Ideal.Quotient.mk I (f.derivative.eval a)) →
-  ∃ (S : Type) (_ : CommRing S) (φ : A →+* S) (b : S), φ.Etale ∧
-    (∃ r : S →+* A ⧸ I, r.comp φ = Ideal.Quotient.mk I) ∧ (∀ s : S, ∃ a' : A, s - φ a' ∈ I.map φ) ∧
-    (f.map φ).IsRoot b ∧ b - φ a ∈ I.map φ ∧
-    (∀ (B : Type) [CommRing B] (χ₁ χ₂ : S →+* B), χ₁.comp φ = χ₂.comp φ → χ₁ b = χ₂ b → χ₁ = χ₂) ∧
-    (∀ (B : Type) [CommRing B] (ψ : A →+* B) (c : B), (f.map ψ).IsRoot c →
-      IsUnit ((f.derivative.map ψ).eval c) → IsUnit (((f /ₘ (X - C a)).map ψ).eval c) →
-      ∃ χ : S →+* B, χ.comp φ = ψ ∧ χ b = c)
+def LeafRootStd : Prop :=
+  ∀ (A : Type) [CommRing A] (I : Ideal A) (f : A[X]) (a : A),
+    f.Monic → f.eval a ∈ I → IsUnit (Ideal.Quotient.mk I (f.derivative.eval a))
+      → ∃ (S : Type) (_ : CommRing S) (φ : A →+* S) (b : S),
+        φ.Etale ∧ (∃ r : S →+* A ⧸ I, r.comp φ = Ideal.Quotient.mk I)
+          ∧ (∀ s : S, ∃ a' : A, s - φ a' ∈ I.map φ) ∧ (f.map φ).IsRoot b ∧ b - φ a ∈ I.map φ
+          ∧ (∀ (B : Type) [CommRing B] (χ₁ χ₂ : S →+* B),
+            χ₁.comp φ = χ₂.comp φ → χ₁ b = χ₂ b → χ₁ = χ₂)
+          ∧ (∀ (B : Type) [CommRing B] (ψ : A →+* B) (c : B),
+            (f.map ψ).IsRoot c → IsUnit ((f.derivative.map ψ).eval c)
+              → IsUnit (((f /ₘ (X - C a)).map ψ).eval c)
+              → ∃ χ : S →+* B, χ.comp φ = ψ ∧ χ b = c)
 
-def LeafRootHens : Prop := ∀ (A B : Type) [CommRing A] [CommRing B] (I : Ideal A) (J : Ideal B), HenselianRing B J →
-  ∀ (ψ : A →+* B), I ≤ J.comap ψ → ∀ (f : A[X]) (a : A), f.Monic → f.eval a ∈ I →
-  IsUnit (Ideal.Quotient.mk I (f.derivative.eval a)) →
-  ∃ c : B, (f.map ψ).IsRoot c ∧ c - ψ a ∈ J ∧ IsUnit ((f.derivative.map ψ).eval c) ∧
-    IsUnit (((f /ₘ (X - C a)).map ψ).eval c) ∧ ∀ c' : B, (f.map ψ).IsRoot c' → c' - ψ a ∈ J → c' = c
+def LeafRootHens : Prop :=
+  ∀ (A B : Type) [CommRing A] [CommRing B] (I : Ideal A) (J : Ideal B),
+    HenselianRing B J
+      → ∀ (ψ : A →+* B),
+        I ≤ J.comap ψ
+          → ∀ (f : A[X]) (a : A),
+            f.Monic → f.eval a ∈ I → IsUnit (Ideal.Quotient.mk I (f.derivative.eval a))
+              → ∃ c : B,
+                (f.map ψ).IsRoot c ∧ c - ψ a ∈ J ∧ IsUnit ((f.derivative.map ψ).eval c)
+                  ∧ IsUnit (((f /ₘ (X - C a)).map ψ).eval c)
+                  ∧ ∀ c' : B, (f.map ψ).IsRoot c' → c' - ψ a ∈ J → c' = c
 
 theorem LeafRoot_of (h1 : LeafRootStd) (h2 : LeafRootHens) : LeafRoot := by
   intro A _ I f a hf hfa hu

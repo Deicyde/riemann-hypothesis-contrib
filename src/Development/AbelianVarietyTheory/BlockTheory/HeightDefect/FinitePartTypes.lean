@@ -7,45 +7,55 @@ public import Formalism.LocalToGlobal.BesselHermitianTheta.TiedSmooth
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S Formalism.L2.Theta Matrix
 open scoped TensorProduct
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.FinitePartTypes
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-def kFin {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (ε : Fin n → Bool)
-    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) : Submodule ℂ H :=
+def kFin
+    {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    : Submodule ℂ H :=
   sSup {W | FiniteDimensional ℂ W ∧ IsKStableOn ε σ W}
 
-variable {D : D7} (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) (V : HSp D) (τ : D.what₂.Tau)
+variable
+  {D : D7}
+  (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) (V : HSp D) (τ : D.what₂.Tau)
 
-structure IsGKMap {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (ε : Fin V.rank → Bool)
-    (σ : Matrix (Fin V.rank) (Fin V.rank) ℂ → (H →L[ℂ] H)) (P : Matrix (Fin V.rank) (Fin V.rank) ℂ)
-    (T : kFin ε σ →ₗ[ℂ] (GA D V → ℂ)) : Prop where
-
+structure IsGKMap
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (ε : Fin V.rank → Bool) (σ : Matrix (Fin V.rank) (Fin V.rank) ℂ → (H →L[ℂ] H))
+    (P : Matrix (Fin V.rank) (Fin V.rank) ℂ) (T : kFin ε σ →ₗ[ℂ] (GA D V → ℂ))
+    : Prop where
   aut : ∀ v, IsAutFunSm θ V (T v)
-
-  mapK : ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ), P * g * P⁻¹ ∈ Formalism.REAL.Kset ε →
-    ∀ v w : kFin ε σ, (w : H) = σ (P * g * P⁻¹) v → T w = rTr V (atTau θ V τ g) (T v)
-
-  mapLie : ∀ X ∈ lieAt V τ, ∀ v w : kFin ε σ,
-    HasDerivAt (fun t : ℝ => σ (P * NormedSpace.exp (t • X) * P⁻¹) (v : H)) (w : H) 0 →
-      T w = Rder θ V τ X (T v)
+  mapK
+    : ∀ g ∈ Formalism.QuantumDeterminants.UH (gramAt D V τ),
+      P * g * P⁻¹ ∈ Formalism.REAL.Kset ε
+        → ∀ v w : kFin ε σ, (w : H) = σ (P * g * P⁻¹) v → T w = rTr V (atTau θ V τ g) (T v)
+  mapLie
+    : ∀ X ∈ lieAt V τ, ∀ v w : kFin ε σ,
+      HasDerivAt (fun t : ℝ => σ (P * NormedSpace.exp (t • X) * P⁻¹) (v : H)) (w : H) 0
+        → T w = Rder θ V τ X (T v)
 
 def finPartOfType (S : SPar) : Submodule ℂ (GA D V → ℂ) :=
-  sSup {W | ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
-    (σ : Matrix (Fin V.rank) (Fin V.rank) ℂ → (H →L[ℂ] H)) (lam : Fin V.rank → ℝ) (ε : Fin V.rank → Bool)
-    (P : Matrix (Fin V.rank) (Fin V.rank) ℂ) (T : kFin ε σ →ₗ[ℂ] (GA D V → ℂ)),
-    IsEnum S lam ε ∧ Formalism.QuantumDeterminants.IsHCParam lam ∧ IsDS ε lam σ ∧ IsUnit P ∧
-      Pᴴ * Formalism.REAL.Jm ε * P = gramAt D V τ ∧ IsGKMap θ V τ ε σ P T ∧ W = LinearMap.range T}
+  sSup
+    {W | ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
+      (σ : Matrix (Fin V.rank) (Fin V.rank) ℂ → (H →L[ℂ] H)) (lam : Fin V.rank → ℝ) (ε : Fin V.rank → Bool)
+      (P : Matrix (Fin V.rank) (Fin V.rank) ℂ) (T : kFin ε σ →ₗ[ℂ] (GA D V → ℂ)),
+      IsEnum S lam ε ∧ Formalism.QuantumDeterminants.IsHCParam lam ∧ IsDS ε lam σ ∧ IsUnit P ∧
+        Pᴴ * Formalism.REAL.Jm ε * P = gramAt D V τ ∧ IsGKMap θ V τ ε σ P T ∧ W = LinearMap.range T}
 
 def HasTypeAt (S : SPar) (φ : GA D V → ℂ) : Prop :=
-  ∀ C : Set (GA D V), IsCompact C → ∀ δ : ℝ, 0 < δ →
-    ∃ ψ ∈ finPartOfType θ V τ S, ∀ x ∈ C, ‖φ x - ψ x‖ < δ
+  ∀ C : Set (GA D V),
+    IsCompact C → ∀ δ : ℝ, 0 < δ → ∃ ψ ∈ finPartOfType θ V τ S, ∀ x ∈ C, ‖φ x - ψ x‖ < δ
 
-theorem HasTypeAt.of_mem {S : SPar} {φ : GA D V → ℂ} (h : φ ∈ finPartOfType θ V τ S) : HasTypeAt θ V τ S φ :=
-  fun _ _ δ hδ => ⟨φ, h, fun x _ => by simpa using hδ⟩
+theorem HasTypeAt.of_mem {S : SPar} {φ : GA D V → ℂ} (h : φ ∈ finPartOfType θ V τ S)
+    : HasTypeAt θ V τ S φ := fun _ _ δ hδ =>
+  ⟨φ, h, fun x _ => by simpa using hδ⟩
 
 def typeSub (S : SPar) : Submodule ℂ (GA D V → ℂ) where
   carrier := {φ | HasTypeAt θ V τ S φ}

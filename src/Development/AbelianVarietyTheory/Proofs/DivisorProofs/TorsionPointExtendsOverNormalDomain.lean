@@ -6,8 +6,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsStalkL
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.DVR
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UT GlobalTheory.ZH
@@ -17,13 +20,20 @@ noncomputable section
 
 namespace GlobalTheory.Poinc.Tors
 
-theorem torsion_extend : Laws → ∀ (R : Type) [CommRing R] [IsDomain R], IsNoetherianRing R → IsIntegrallyClosed R → ∀ (P : PolAV (Spec (CommRingCat.of R))) (N : ℕ), 1 ≤ N → ∀ x : TF (R := R) (FractionRing R) ⟶ P.A, x ^ N = 1 → ∃ b : 𝟙_ (Over (Spec (CommRingCat.of R))) ⟶ P.A, b ^ N = 1 ∧ x = toUnit _ ≫ b := by
+theorem torsion_extend
+    : Laws
+      → ∀ (R : Type) [CommRing R] [IsDomain R],
+        IsNoetherianRing R → IsIntegrallyClosed R
+          → ∀ (P : PolAV (Spec (CommRingCat.of R))) (N : ℕ),
+            1 ≤ N
+              → ∀ x : TF (R := R) (FractionRing R) ⟶ P.A,
+                x ^ N = 1
+                  → ∃ b : 𝟙_ (Over (Spec (CommRingCat.of R))) ⟶ P.A,
+                    b ^ N = 1 ∧ x = toUnit _ ≫ b := by
   intro hL R _ _ hR hIC P N hN x hx
   have hfin : IsFinite (mulA P.A N).left := (hL.mulN _ P N hN).1
-  have hj : jFK (R := R) (FractionRing R) = 𝟙 _ := by
-    simp [jFK]
-  have hTF : (TF (R := R) (FractionRing R)).hom = jK R := by
-    simp [TF, hj]
+  have hj : jFK (R := R) (FractionRing R) = 𝟙 _ := by simp [jFK]
+  have hTF : (TF (R := R) (FractionRing R)).hom = jK R := by simp [TF, hj]
   have e1 : x ≫ mulA P.A N = toUnit _ ≫ η[P.A] := by
     rw [mulA, MonObj.comp_pow, Category.comp_id, hx]; rfl
   have h : x.left ≫ (mulA P.A N).left = jK R ≫ η[P.A].left := by

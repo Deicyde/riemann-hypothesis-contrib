@@ -8,12 +8,23 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EtaleEmpty
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
 namespace GlobalTheory.OTY
 
-theorem contDiffAt_psi_of_notMem_zeroSet : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La] (A : WeightedAtlas n Y ι La), ∀ (L : La) (s : Fin n → ι → Y → ℂ), (∀ k, A.IsSec L (s k)) → ∀ y, y ∉ A.zeroSet s → ∀ i, y ∈ (A.chart i).source → ContDiffAt ℝ ∞ (psi A L s ∘ (A.chart i).symm) (A.chart i y) := by
+theorem contDiffAt_psi_of_notMem_zeroSet
+    : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
+        [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La]
+        (A : WeightedAtlas n Y ι La),
+      ∀ (L : La) (s : Fin n → ι → Y → ℂ),
+        (∀ k, A.IsSec L (s k))
+          → ∀ y,
+            y ∉ A.zeroSet s
+              → ∀ i,
+                y ∈ (A.chart i).source
+                  → ContDiffAt ℝ ∞ (psi A L s ∘ (A.chart i).symm) (A.chart i y) := by
   intro n Y _ _ _ _ _ ι La _ A L s hs y hy i hi
   have hv : A.chart i y ∈ (A.chart i).target := (A.chart i).map_source hi
   have hU : (A.chart i).target ∈ 𝓝 (A.chart i y) := (A.chart i).open_target.mem_nhds hv
@@ -21,8 +32,11 @@ theorem contDiffAt_psi_of_notMem_zeroSet : ∀ (n : ℕ) (Y : Type) [Topological
     hyq_contDiffAt_of_holo (A.chart i).open_target (by simpa using (hs k).1 i) hv
   have hph : ContDiffAt ℝ ∞ (A.ph L i ∘ (A.chart i).symm) (A.chart i y) :=
     (A.smooth_ph L i).contDiffAt hU
-  have h1 : ContDiffAt ℝ ∞ (fun v => ∑ k, ‖(s k i ∘ (A.chart i).symm) v‖ ^ 2 *
-      Real.exp (-(A.ph L i ∘ (A.chart i).symm) v)) (A.chart i y) :=
+  have h1 : ContDiffAt ℝ ∞
+      (fun v =>
+        ∑ k, ‖(s k i ∘ (A.chart i).symm) v‖ ^ 2 *
+          Real.exp (-(A.ph L i ∘ (A.chart i).symm) v))
+      (A.chart i y) :=
     ContDiffAt.sum fun k _ => ((hsk k).norm_sq ℂ).mul hph.neg.exp
   have h2 : ContDiffAt ℝ ∞ (A.sqn L s ∘ (A.chart i).symm) (A.chart i y) := by
     refine h1.congr_of_eventuallyEq ?_

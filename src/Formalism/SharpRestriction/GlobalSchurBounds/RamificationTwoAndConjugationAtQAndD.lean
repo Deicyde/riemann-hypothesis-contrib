@@ -36,7 +36,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.ZetaZeroFreeRegion.Br
 
-open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions Formalism.LFunctionChainParameters Finset
+open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions Formalism.LFunctionChainParameters
+  Finset
 open scoped Pointwise ComplexConjugate
 
 open Classical
@@ -46,7 +48,8 @@ abbrev MM (D : D7) : Type := D5.E0 × D.R.A
 def AD (D : D7) : characterSumData.ArithData D.R.A := UpperTheory.Comparison₂.arith D.host.toHostRaw
 
 def tE (D : D7) : D.R.GG ≃ MM D :=
-  Equiv.ofBijective (fun g => (UpperTheory.Comparison₂.toE D.R.toFrame g).toAdd)
+  Equiv.ofBijective
+    (fun g => (UpperTheory.Comparison₂.toE D.R.toFrame g).toAdd)
     (Multiplicative.toAdd.bijective.comp (UpperTheory.Comparison₂.toE_bij D.R.toFrame).1)
 
 variable (D : D7)
@@ -62,46 +65,52 @@ theorem tE_pow (g : D.R.GG) (i : ℕ) : tE D (g ^ i) = i • tE D g := by
   rw [map_pow, toAdd_pow]
 
 def cOf (φ : AddChar (MM D) ℂ) : Chr D :=
-  MonoidHom.toHomUnits
-    { toFun := fun g => φ (tE D g)
-      map_one' := by simp [tE_one]
-      map_mul' := fun g g' => by simp [tE_mul, AddChar.map_add_eq_mul] }
+  MonoidHom.toHomUnits {
+    toFun := fun g => φ (tE D g)
+    map_one' := by simp [tE_one]
+    map_mul' := fun g g' => by simp [tE_mul, AddChar.map_add_eq_mul]
+  }
 
-theorem exists_prime_over (p : ℕ) (hp : p.Prime) :
-    ∃ P : Ideal (𝓞 D.host.E), P.IsPrime ∧ P.LiesOver (Ideal.span {(p : ℤ)}) := by
+theorem exists_prime_over (p : ℕ) (hp : p.Prime)
+    : ∃ P : Ideal (𝓞 D.host.E), P.IsPrime ∧ P.LiesOver (Ideal.span {(p : ℤ)}) := by
   haveI hp' : (Ideal.span {(p : ℤ)}).IsPrime :=
     (Ideal.span_singleton_prime (by exact_mod_cast hp.ne_zero)).mpr (Nat.prime_iff_prime_int.mp hp)
-  obtain ⟨Q, -, hQ, hc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (S := 𝓞 D.host.E)
-    (Ideal.span {(p : ℤ)}) ⊥ (Ideal.comap_bot_le_of_injective _ (RingHom.injective_int _))
+  obtain ⟨Q, -, hQ, hc⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (S := 𝓞 D.host.E) (Ideal.span {(p : ℤ)}) ⊥
+      (Ideal.comap_bot_le_of_injective _ (RingHom.injective_int _))
   exact ⟨Q, hQ, ⟨hc.symm⟩⟩
 
-theorem fieldFacts (p : ℕ) (hp : p.Prime) (P : Ideal (𝓞 D.host.E)) (hP : P.IsPrime)
-    (hL : P.LiesOver (Ideal.span {(p : ℤ)})) (σ : D.host.E ≃ₐ[ℚ] D.host.E) :
-    ((∀ x : 𝓞 D.host.E, σ • x - x ∈ P) ↔
-      tE D (D.host.galE σ) ∈ (AD D).inertia p) ∧
-    (IsArithFrobAt ℤ σ P ↔
-      tE D (D.host.galE σ) - (AD D).frob p ∈ (AD D).inertia p) := by
+theorem fieldFacts
+    (p : ℕ) (hp : p.Prime)
+    (P : Ideal (𝓞 D.host.E)) (hP : P.IsPrime) (hL : P.LiesOver (Ideal.span {(p : ℤ)}))
+    (σ : D.host.E ≃ₐ[ℚ] D.host.E)
+    : ((∀ x : 𝓞 D.host.E, σ • x - x ∈ P) ↔ tE D (D.host.galE σ) ∈ (AD D).inertia p)
+      ∧ (IsArithFrobAt ℤ σ P ↔ tE D (D.host.galE σ) - (AD D).frob p ∈ (AD D).inertia p) := by
   haveI : Fact p.Prime := ⟨hp⟩
   haveI := hP
   haveI := hL
   exact Formalism.MainNotions.GlobalTheoryTheory.ConductorLiftingHypotheses.fld D p P σ
 
-theorem frob_spec (p : ℕ) (hp : p.Prime) :
-    tE D (frob D p) - (AD D).frob p ∈ (AD D).inertia p := by
+theorem frob_spec (p : ℕ) (hp : p.Prime) : tE D (frob D p) - (AD D).frob p ∈ (AD D).inertia p := by
   obtain ⟨P, hP, hL⟩ := exists_prime_over D p hp
   haveI : Fact p.Prime := ⟨hp⟩
   haveI := hP
   haveI := hL
   exact Formalism.MainNotions.GlobalTheoryTheory.ConductorLiftingHypotheses.frob_mem D p P
 
-theorem unram_iff (p : ℕ) :
-    Unram D p ↔ p.Prime ∧ ¬ p ∣ D.host.condN :=
-  ⟨fun h => ⟨h.1, Formalism.MainNotions.GlobalTheoryTheory.ConductorDivisibility.not_dvd_condN_of_unram' D p h⟩,
-    fun h => Formalism.MainNotions.GlobalTheoryTheory.ConductorDivisibility.jnt_unram D p h.1 h.2⟩
+theorem unram_iff (p : ℕ) : Unram D p ↔ p.Prime ∧ ¬ p ∣ D.host.condN := ⟨
+  fun h => ⟨
+    h.1,
+    Formalism.MainNotions.GlobalTheoryTheory.ConductorDivisibility.not_dvd_condN_of_unram' D p h
+  ⟩,
+  fun h => Formalism.MainNotions.GlobalTheoryTheory.ConductorDivisibility.jnt_unram D p h.1 h.2
+⟩
 
 theorem inertia_unram {p : ℕ} (h : Unram D p) : (AD D).inertia p = ⊥ := by
-  have hu := (LHost.unramified_spec D.host.condN p (Formalism.MainNotions.GlobalTheoryTheory.ConductorLiftingHypotheses.hostN_ne D) h.1
-    ((unram_iff D p).mp h).2).1
+  have hu :=
+    (LHost.unramified_spec D.host.condN p
+      (Formalism.MainNotions.GlobalTheoryTheory.ConductorLiftingHypotheses.hostN_ne D) h.1
+      ((unram_iff D p).mp h).2).1
   show Subgroup.toAddSubgroup' ((LHost.localUnits D.host.condN p).map (UpperTheory.Comparison₂.recH D.host.toHostRaw)) = ⊥
   rw [hu, Subgroup.map_bot]
   rfl
@@ -121,7 +130,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.ZetaZeroFreeRegion.Br
 
-open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions Formalism.LFunctionChainParameters Finset
+open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions Formalism.LFunctionChainParameters
+  Finset
 open scoped Pointwise ComplexConjugate
 
 open Classical
@@ -140,20 +151,19 @@ theorem tE_cc : tE D (D.R.cc) = D5.cconj := rfl
 theorem top_place_of_first_tau (t : HH D) : tE D (D.R.tau1 t) = D5.topPl (tH D t) := rfl
 theorem tE_iner : tE D (iner D) = characterSumData.sgc0 := rfl
 
-theorem tE_rho (t : HH D) (g : D.R.GG) :
-    tE D (rho D (D.R.tau1 t) g) = characterSumData.partner (tH D t) (tE D g) := by
+theorem tE_rho (t : HH D) (g : D.R.GG)
+    : tE D (rho D (D.R.tau1 t) g) = characterSumData.partner (tH D t) (tE D g) := by
   unfold rho characterSumData.partner
   rw [tE_mul, tE_mul, tE_cc, top_place_of_first_tau]
 
 def wM (w : D.R.GG → ℝ) : MM D → ℝ := fun x => w ((tE D).symm x)
 
-theorem wM_partner (w : D.R.GG → ℝ) (t : HH D) (g : D.R.GG) :
-    wM D w (characterSumData.partner (tH D t) (tE D g)) = w (rho D (D.R.tau1 t) g) := by
+theorem wM_partner (w : D.R.GG → ℝ) (t : HH D) (g : D.R.GG)
+    : wM D w (characterSumData.partner (tH D t) (tE D g)) = w (rho D (D.R.tau1 t) g) := by
   unfold wM
   rw [← tE_rho, Equiv.symm_apply_apply]
 
-theorem rho_mem (t : HH D) {g : D.R.GG} (hg : g ∉ D.R.Psi) :
-    rho D (D.R.tau1 t) g ∈ D.R.Psi := by
+theorem rho_mem (t : HH D) {g : D.R.GG} (hg : g ∉ D.R.Psi) : rho D (D.R.tau1 t) g ∈ D.R.Psi := by
   rw [← inPhi_iff, tE_rho]
   exact characterSumData.partner_inPhi _ (fun h => hg ((inPhi_iff D g).1 h))
 
@@ -173,8 +183,8 @@ theorem inertK_unram {p : ℕ} (h : InertK D p) : Unram D p := by
   obtain ⟨hp, hN, -⟩ := (UpperTheory.GL.isInert_iff D.host.toHostAx p).1 ((isInert_iff D p).2 h)
   exact (unram_iff D p).2 ⟨hp, hN⟩
 
-theorem term_zero {a W : ℝ} {N M : ℕ} (hW : 0 < W) (hN : a / W ≤ N) (hM : N < M) :
-    max (a / (M : ℝ) - W) 0 = 0 := by
+theorem term_zero {a W : ℝ} {N M : ℕ} (hW : 0 < W) (hN : a / W ≤ N) (hM : N < M)
+    : max (a / (M : ℝ) - W) 0 = 0 := by
   have h2 : (N : ℝ) < M := by exact_mod_cast hM
   have hN0 : (0 : ℝ) ≤ N := Nat.cast_nonneg N
   have hM0 : (0 : ℝ) < M := lt_of_le_of_lt hN0 h2
@@ -184,15 +194,15 @@ theorem term_zero {a W : ℝ} {N M : ℕ} (hW : 0 < W) (hN : a / W ≤ N) (hM : 
     nlinarith
   exact max_eq_right (by linarith)
 
-theorem gD_spec (i : ℕ) :
-    tE D (gD D i) - i • (AD D).frob (AD D).d ∈ (AD D).inertia (AD D).d ∧ ¬ D5.InPhi (tE D (gD D i)) := by
+theorem gD_spec (i : ℕ)
+    : tE D (gD D i) - i • (AD D).frob (AD D).d ∈ (AD D).inertia (AD D).d
+      ∧ ¬ D5.InPhi (tE D (gD D i)) := by
   have h0 : tE D (frob D D.host.d ^ i) - i • (AD D).frob (AD D).d ∈ (AD D).inertia (AD D).d := by
     rw [tE_pow, ← smul_sub]
     exact AddSubgroup.nsmul_mem _ (frob_spec D D.host.d D.host.hyp.2.1) i
   have hs : characterSumData.sgc0 ∈ (AD D).inertia (AD D).d :=
     ((UpperTheory.GL.inertia_d D.host.toHostAx).1 _).2 (Or.inr rfl)
-  have hin : iner D ∉ D.R.Psi := by
-    rw [Formalism.HC.Frame.mem_Psi_iff]; show (sgc0).2 ≠ 1; decide
+  have hin : iner D ∉ D.R.Psi := by rw [Formalism.HC.Frame.mem_Psi_iff]; show (sgc0).2 ≠ 1; decide
   unfold gD
   by_cases hm : frob D D.host.d ^ i ∈ D.R.Psi
   · rw [if_neg (by tauto)]
@@ -205,12 +215,15 @@ theorem gD_spec (i : ℕ) :
     exact ⟨h0, by rw [inPhi_iff]; exact hm⟩
 
 section vonMangoldtClassSum
-variable (a : ℝ) (w : D.R.GG → ℝ) (hw : ∀ ρ ∈ D.R.Psi, 0 < w ρ) (N : ℕ)
-  (hN : ∀ ρ ∈ D.R.Psi, a / w ρ ≤ N) (t : HH D)
+variable
+  (a : ℝ)
+  (w : D.R.GG → ℝ) (hw : ∀ ρ ∈ D.R.Psi, 0 < w ρ)
+  (N : ℕ) (hN : ∀ ρ ∈ D.R.Psi, a / w ρ ≤ N)
+  (t : HH D)
 include hw hN
 
-theorem primePowerSum_eq_local {p : ℕ} (hp : InertK D p) :
-    askP D a w (D.R.tau1 t) p = characterSumData.askP (AD D) N a (tH D t) (wM D w) p := by
+theorem primePowerSum_eq_local {p : ℕ} (hp : InertK D p)
+    : askP D a w (D.R.tau1 t) p = characterSumData.askP (AD D) N a (tH D t) (wM D w) p := by
   have hU := inertK_unram D hp
   have hfr := frob_unram D hU
   unfold askP characterSumData.askP
@@ -233,8 +246,8 @@ theorem primePowerSum_eq_local {p : ℕ} (hp : InertK D p) :
       rwa [Nat.cast_pow] at this
     · rw [if_neg hc]
 
-theorem primePowerSum_eq_zero_of_cutoff_lt {p : ℕ} (hpN : N < p) :
-    characterSumData.askP (AD D) N a (tH D t) (wM D w) p = 0 := by
+theorem primePowerSum_eq_zero_of_cutoff_lt {p : ℕ} (hpN : N < p)
+    : characterSumData.askP (AD D) N a (tH D t) (wM D w) p = 0 := by
   unfold characterSumData.askP
   refine Finset.sum_eq_zero (fun i hi => ?_)
   obtain ⟨hi1, hi2⟩ := Finset.mem_filter.1 hi
@@ -245,8 +258,7 @@ theorem primePowerSum_eq_zero_of_cutoff_lt {p : ℕ} (hpN : N < p) :
   have := term_zero (a := a) (hw _ hρ) (hN _ hρ) hpi
   rwa [Nat.cast_pow] at this
 
-theorem askD_eq :
-    askD D a w (D.R.tau1 t) = characterSumData.askD (AD D) N a (tH D t) (wM D w) := by
+theorem askD_eq : askD D a w (D.R.tau1 t) = characterSumData.askD (AD D) N a (tH D t) (wM D w) := by
   unfold askD characterSumData.askD
   rw [tsum_eq_sum (s := Icc 1 N)]
   · refine Finset.sum_congr rfl (fun i hi => ?_)
@@ -254,7 +266,8 @@ theorem askD_eq :
     rw [if_pos hi1]
     obtain ⟨g0, -, huniq⟩ := (UpperTheory.GL.inertia_d D.host.toHostAx).2.2 i
     have hg := gD_spec D i
-    rw [Finset.sum_eq_single_of_mem (tE D (gD D i)) (by simp only [mem_filter, mem_univ, true_and]; exact hg)]
+    rw [Finset.sum_eq_single_of_mem (tE D (gD D i))
+      (by simp only [mem_filter, mem_univ, true_and]; exact hg)]
     · rw [wM_partner]; rfl
     · intro b hb hne
       simp only [mem_filter, mem_univ, true_and] at hb
@@ -271,8 +284,7 @@ theorem askD_eq :
       rwa [Nat.cast_pow] at this
     · rw [if_neg hc]
 
-theorem ASK_eq :
-    ASKjt D a w (D.R.tau1 t) = characterSumData.ASK (AD D) N a (tH D t) (wM D w) := by
+theorem ASK_eq : ASKjt D a w (D.R.tau1 t) = characterSumData.ASK (AD D) N a (tH D t) (wM D w) := by
   unfold ASKjt characterSumData.ASK
   rw [askD_eq D a w hw N hN t]
   congr 1
@@ -283,8 +295,8 @@ theorem ASK_eq :
     · rw [if_neg hp, if_neg (fun h => hp ((isInert_iff D p).1 h))]
   · intro p hp
     by_cases hI : InertK D p
-    · rw [if_pos hI, primePowerSum_eq_local D a w hw N hN t hI, primePowerSum_eq_zero_of_cutoff_lt D a w hw N hN t (by
-        simpa using hp), mul_zero]
+    · rw [if_pos hI, primePowerSum_eq_local D a w hw N hN t hI,
+        primePowerSum_eq_zero_of_cutoff_lt D a w hw N hN t (by simpa using hp), mul_zero]
     · rw [if_neg hI]
 
 end vonMangoldtClassSum
@@ -297,7 +309,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.ZetaZeroFreeRegion.Br
 
-open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions Formalism.LFunctionChainParameters Finset
+open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions
+  Formalism.LFunctionChainParameters Finset
 
 variable (D : D7) (s : Scale)
 
@@ -309,15 +322,16 @@ noncomputable section
 
 namespace Formalism.MainNotions.ZetaZeroFreeRegion.Br
 
-open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions Formalism.LFunctionChainParameters Finset
+open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions Formalism.LFunctionChainParameters
+  Finset
 open scoped Pointwise ComplexConjugate
 
 open Classical
 
 variable (D : D7)
 
-def tHe : HH D ≃ D.R.A :=
-  Equiv.ofBijective (tH D) Function.bijective_id
+def tHe : HH D ≃ D.R.A := Equiv.ofBijective (tH D) Function.bijective_id
 
 theorem tHe_apply (t : HH D) : tHe D t = tH D t := rfl
 
@@ -339,7 +353,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.ZetaZeroFreeRegion
 
-open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions Formalism.LFunctionChainParameters
+open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions
+  Formalism.LFunctionChainParameters
 
 end Formalism.MainNotions.ZetaZeroFreeRegion
 

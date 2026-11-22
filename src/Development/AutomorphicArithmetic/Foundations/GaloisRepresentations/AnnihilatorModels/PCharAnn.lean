@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.charAnn_of :
-    CharOfAnn := by
+theorem UpperTheory.Gal.crystallineComparison.charAnn_of : CharOfAnn := by
   intro K _ n M s hcard hgen hann hdet
   classical
   set L := AlgebraicClosure K
@@ -17,18 +16,22 @@ theorem UpperTheory.Gal.crystallineComparison.charAnn_of :
   have hf : Function.Injective f := f.injective
   set M' : Matrix (Fin n) (Fin n) L := M.map f
   have hchar : M'.charpoly = M.charpoly.map f := Matrix.charpoly_map M f
-  have hpmap : (rootPol s).map f = (Multiset.map (fun a => Polynomial.X - Polynomial.C a) (s.map f)).prod := by
+  have hpmap
+      : (rootPol s).map f
+        = (Multiset.map (fun a => Polynomial.X - Polynomial.C a) (s.map f)).prod := by
     simp [rootPol, Polynomial.map_multiset_prod, Multiset.map_map, Function.comp_def]
   have hannL : Polynomial.aeval M' (rootPol s) = 0 := by
-    have h1 : M' = (Algebra.ofId K L).mapMatrix M := by
-      rw [AlgHom.mapMatrix_apply]; rfl
+    have h1 : M' = (Algebra.ofId K L).mapMatrix M := by rw [AlgHom.mapMatrix_apply]; rfl
     rw [h1, Polynomial.aeval_algHom_apply, hann, map_zero]
   set R := M'.charpoly.roots
   have hmem : ∀ r ∈ R, r ∈ s.map f := by
     intro r hr
-    have hroot : M'.charpoly.IsRoot r := (Polynomial.mem_roots (Matrix.charpoly_monic M').ne_zero).1 hr
+    have hroot : M'.charpoly.IsRoot r :=
+      (Polynomial.mem_roots (Matrix.charpoly_monic M').ne_zero).1 hr
     have hsp : r ∈ spectrum L M' := Matrix.mem_spectrum_of_isRoot_charpoly hroot
-    have hev : Polynomial.eval r ((rootPol s).map f) ∈ spectrum L (Polynomial.aeval M' ((rootPol s).map f)) :=
+    have hev
+        : Polynomial.eval r ((rootPol s).map f)
+          ∈ spectrum L (Polynomial.aeval M' ((rootPol s).map f)) :=
       spectrum.subset_polynomial_aeval M' _ ⟨r, hsp, rfl⟩
     have hz : Polynomial.aeval M' ((rootPol s).map f) = 0 := by
       rw [Polynomial.aeval_map_algebraMap]; exact hannL
@@ -38,7 +41,9 @@ theorem UpperTheory.Gal.crystallineComparison.charAnn_of :
       exact (spectrum.mem_iff.1 hev) (by
         simpa using (isUnit_iff_ne_zero.2 hne).map (algebraMap L (Matrix (Fin n) (Fin n) L)))
     have hne0 : (rootPol s).map f ≠ 0 := by
-      rw [hpmap]; exact (Polynomial.monic_multiset_prod_of_monic _ _ (fun a _ => Polynomial.monic_X_sub_C a)).ne_zero
+      rw [hpmap]
+      exact (Polynomial.monic_multiset_prod_of_monic _ _
+        (fun a _ => Polynomial.monic_X_sub_C a)).ne_zero
     have : r ∈ ((rootPol s).map f).roots := (Polynomial.mem_roots hne0).2 h0
     rwa [hpmap, Polynomial.roots_multiset_prod_X_sub_C] at this
   set g := Function.invFun f
@@ -57,7 +62,8 @@ theorem UpperTheory.Gal.crystallineComparison.charAnn_of :
     intro x hx
     have : f x ∈ s.map f := hmem (f x) (by rw [← htR]; exact Multiset.mem_map_of_mem f hx)
     obtain ⟨a, ha, hax⟩ := Multiset.mem_map.1 this
-    rw [← hf hax]; exact ha
+    rw [← hf hax]
+    exact ha
   have htprod : t.prod = s.prod := by
     apply hf
     rw [map_multiset_prod, htR, ← Matrix.det_eq_prod_roots_charpoly, ← hdet, RingHom.map_det]

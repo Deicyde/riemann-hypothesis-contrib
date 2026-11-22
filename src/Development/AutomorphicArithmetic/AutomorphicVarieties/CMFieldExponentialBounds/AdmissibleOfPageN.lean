@@ -19,14 +19,18 @@ namespace UpperTheory.V
 
 open Formalism.HC UpperTheory.Top
 
-theorem VVminusLe.mono {E : Type} [Field E] [NumberField E] [IsCMField E] {t : ℕ} {B B' : ℝ} (h : VVminusLe E t B)
-    (hB : B ≤ B') : VVminusLe E t B' := by
+theorem VVminusLe.mono
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {t : ℕ} {B B' : ℝ} (h : VVminusLe E t B) (hB : B ≤ B')
+    : VVminusLe E t B' := by
   intro Ω _ _ _ ld
   obtain ⟨h1, h2⟩ := h Ω ld
   exact ⟨h1, fun S hS => (h2 S hS).trans hB⟩
 
-theorem admissible_of_pageN {eps Ct : ℝ} (h0 : 0 < eps) (h1 : eps < 1 / 52) (hC : 1 ≤ Ct) {e : ℝ → ℕ}
-    (he : ∀ x ≥ (1 : ℝ), PageN eps x (e x)) : admitted 4 Ct e fun x => ⌊x ^ Ct⌋₊ := by
+theorem admissible_of_pageN
+    {eps Ct : ℝ} (h0 : 0 < eps) (h1 : eps < 1 / 52) (hC : 1 ≤ Ct)
+    {e : ℝ → ℕ} (he : ∀ x ≥ (1 : ℝ), PageN eps x (e x))
+    : admitted 4 Ct e fun x => ⌊x ^ Ct⌋₊ := by
   intro x hx
   have hx1 : (1 : ℝ) ≤ x := by linarith
   obtain ⟨a, b⟩ := he x hx1
@@ -37,12 +41,18 @@ theorem admissible_of_pageN {eps Ct : ℝ} (h0 : 0 < eps) (h1 : eps < 1 / 52) (h
   have h5 : (0 : ℝ) ≤ x ^ (3 : ℝ) := by positivity
   have h6 : x ≤ x ^ Ct := Real.self_le_rpow_of_one_le hx1 hC
   have h8 : 2 * x ^ (3 : ℝ) ≤ x * x ^ (3 : ℝ) := mul_le_mul_of_nonneg_right hx h5
-  refine ⟨?_, b.trans ((mul_le_mul_of_nonneg_left h3 zero_le_two).trans (h8.trans h4.ge)), Nat.le_floor (by push_cast; linarith), Nat.floor_le (by linarith)⟩
+  refine ⟨
+    ?_,
+    b.trans ((mul_le_mul_of_nonneg_left h3 zero_le_two).trans (h8.trans h4.ge)),
+    Nat.le_floor (by push_cast; linarith),
+    Nat.floor_le (by linarith)
+  ⟩
   rw [Real.rpow_two] at h2
   have h7 : (2 : ℝ) ^ 2 ≤ 2 ^ e x := by nlinarith
   exact (pow_le_pow_iff_right₀ (by norm_num)).1 h7
 
-theorem vwinAt_of_joint {Ct : ℝ} (hC : 1 ≤ Ct) (hJ : JointWin Ct) (hc : ThmBc Ct) (ψ : PChar) : VWinAt ψ Ct := by
+theorem vwinAt_of_joint {Ct : ℝ} (hC : 1 ≤ Ct) (hJ : JointWin Ct) (hc : ThmBc Ct) (ψ : PChar)
+    : VWinAt ψ Ct := by
   intro eps h0 h1 e he
   set t : ℝ → ℕ := fun x => ⌊x ^ Ct⌋₊ with ht
   have hadm : admitted 4 Ct e t := admissible_of_pageN h0 h1 hC he
@@ -52,13 +62,19 @@ theorem vwinAt_of_joint {Ct : ℝ} (hC : 1 ≤ Ct) (hJ : JointWin Ct) (hc : ThmB
   obtain ⟨xT, hxT⟩ := error_terms_le_sqrt_exp_rpow eps K C h0
   obtain ⟨xN, hxN⟩ := log_conductor_mul_height_le_of_pageN eps Ct ψ.N h0 h1
   obtain ⟨Y0, hY0⟩ := log_mul_le_rpow_of_winPair eps h0
-  obtain ⟨J', hJ'1, hJJ'⟩ : ∃ J' : ℝ, 1 ≤ J' ∧ J ≤ J' := ⟨max J 1, le_max_right _ _, le_max_left _ _⟩
+  obtain ⟨J', hJ'1, hJJ'⟩ : ∃ J' : ℝ, 1 ≤ J' ∧ J ≤ J' :=
+    ⟨max J 1, le_max_right _ _, le_max_left _ _⟩
   have hJ'0 : 0 < J' := by linarith
-  obtain ⟨P', hPP', hNP'⟩ : ∃ P' : ℝ, P ≤ P' ∧ (ψ.N : ℝ) ≤ P' := ⟨max P (ψ.N : ℝ), le_max_left _ _, le_max_right _ _⟩
+  obtain ⟨P', hPP', hNP'⟩ : ∃ P' : ℝ, P ≤ P' ∧ (ψ.N : ℝ) ≤ P' :=
+    ⟨max P (ψ.N : ℝ), le_max_left _ _, le_max_right _ _⟩
   obtain ⟨XB, hXB⟩ := eventually_winPair_gt_power eps J' Ct P' h0 hJ'0
-  obtain ⟨L, hxTL, hxNL, hY0L, h2L⟩ : ∃ L : ℝ, xT ≤ L ∧ xN ≤ L ∧ Y0 ≤ L ∧ 2 ≤ L :=
-    ⟨max (max xT xN) (max Y0 2), le_max_of_le_left (le_max_left _ _), le_max_of_le_left (le_max_right _ _),
-      le_max_of_le_right (le_max_left _ _), le_max_of_le_right (le_max_right _ _)⟩
+  obtain ⟨L, hxTL, hxNL, hY0L, h2L⟩ : ∃ L : ℝ, xT ≤ L ∧ xN ≤ L ∧ Y0 ≤ L ∧ 2 ≤ L := ⟨
+    max (max xT xN) (max Y0 2),
+    le_max_of_le_left (le_max_left _ _),
+    le_max_of_le_left (le_max_right _ _),
+    le_max_of_le_right (le_max_left _ _),
+    le_max_of_le_right (le_max_right _ _)
+  ⟩
   have hL1 : (1 : ℝ) ≤ L := by linarith
   have hL0 : (0 : ℝ) ≤ L := by linarith
   refine ⟨J', hJ'1, max (max XJ XB) (L ^ J'), ?_⟩
@@ -80,7 +96,8 @@ theorem vwinAt_of_joint {Ct : ℝ} (hC : 1 ≤ Ct) (hJ : JointWin Ct) (hc : ThmB
     congr 1
     field_simp
   have hmono : X ^ (eps / (4 * J')) ≤ X ^ (eps / (4 * J)) :=
-    Real.rpow_le_rpow_of_exponent_le hX1 (div_le_div_of_nonneg_left h0.le (by positivity) (by linarith))
+    Real.rpow_le_rpow_of_exponent_le hX1
+      (div_le_div_of_nonneg_left h0.le (by positivity) (by linarith))
   have hlogJ : Real.log (↑q * ↑d) ≤ X ^ (eps / (4 * J)) := by
     rw [hpow] at hlog
     exact hlog.trans hmono
@@ -88,14 +105,21 @@ theorem vwinAt_of_joint {Ct : ℝ} (hC : 1 ≤ Ct) (hJ : JointWin Ct) (hc : ThmB
   have hcop : ∀ r : ℕ, Nat.Prime r → (ψ.N : ℝ) < r → Nat.Coprime r ψ.N := by
     intro r hr hlt
     have hlt' : ψ.N < r := by exact_mod_cast hlt
-    exact (Nat.Prime.coprime_iff_not_dvd hr).2 (fun hdvd => absurd (Nat.le_of_dvd hN0 hdvd) (not_le.2 hlt'))
-  have hpp : PrimePair ψ.N q d :=
-    ⟨hw.q_prime, hw.q_mod, hw.d_prime, hw.d_mod,
-      Nat.Coprime.mul_left (hcop q hw.q_prime (lt_of_le_of_lt hNP' hPq)) (hcop d hw.d_prime (lt_of_le_of_lt hNP' hPd))⟩
+    exact (Nat.Prime.coprime_iff_not_dvd hr).2
+      (fun hdvd => absurd (Nat.le_of_dvd hN0 hdvd) (not_le.2 hlt'))
+  have hpp : PrimePair ψ.N q d := ⟨
+    hw.q_prime,
+    hw.q_mod,
+    hw.d_prime,
+    hw.d_mod,
+    Nat.Coprime.mul_left (hcop q hw.q_prime (lt_of_le_of_lt hNP' hPq))
+      (hcop d hw.d_prime (lt_of_le_of_lt hNP' hPd))
+  ⟩
   obtain ⟨Y, ⟨hYlo, hYhi⟩, hY⟩ :=
     hmain X hXJ q d hpp hq3 hd3 (lt_of_le_of_lt hPP' hPq) (lt_of_le_of_lt hPP' hPd) hlogJ
   have hWY : X ^ (1 / J') ≤ Y :=
-    le_trans (Real.rpow_le_rpow_of_exponent_le hX1 (one_div_le_one_div_of_le (by linarith) hJJ')) hYlo
+    le_trans (Real.rpow_le_rpow_of_exponent_le hX1 (one_div_le_one_div_of_le (by linarith) hJJ'))
+      hYlo
   refine ⟨Y, hWY, hYhi, ?_⟩
   intro x hxY hxY2
   have hWx : X ^ (1 / J') ≤ x := hWY.trans hxY

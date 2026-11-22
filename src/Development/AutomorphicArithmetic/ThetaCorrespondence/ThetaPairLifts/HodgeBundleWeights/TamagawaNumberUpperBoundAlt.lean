@@ -9,6 +9,8 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 section
 namespace MainStatements.Tam.Plug
-theorem tamagawa_number_upper_bound : _root_.MainStatements.Tam.ArchimedeanTamagawaUpperBound := _root_.MainStatements.Tam.tamagawa_number_upper_bound MainStatements.Tam.vol MainStatements.Tam.stab MainStatements.Tam.num
+theorem tamagawa_number_upper_bound : _root_.MainStatements.Tam.ArchimedeanTamagawaUpperBound :=
+  _root_.MainStatements.Tam.tamagawa_number_upper_bound MainStatements.Tam.vol
+    MainStatements.Tam.stab MainStatements.Tam.num
 end MainStatements.Tam.Plug
 end

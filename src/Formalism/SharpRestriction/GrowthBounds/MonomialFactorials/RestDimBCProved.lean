@@ -9,7 +9,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.G.SymmetricFormBlocks
 
-open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.MainNotions.G.CountingStatementReduction
+open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.flipOneThree
+  Formalism.MainNotions.G.CountingStatementReduction
 
 variable (C0 CE1 CE2 : ℝ) (X : flipOneThree.Inst)
 
@@ -36,10 +37,12 @@ theorem restDimBC_proved : RestDimBC C0 CE1 CE2 X := by
     | add x y _ _ hx hy => rw [map_add (f := _)]; exact W.add_mem hx hy
     | smul a x _ hx => rw [map_smul_Q]; exact W.smul_mem _ hx
   set bs := Module.finBasis ℚ_[X.p] V0
-  have hli : LinearIndependent ℚ_[X.p] (fun i => (bs i : MvPolynomial (Formalism.GM.M.BVar (2 * X.s + 1) X.r (gmB Dd).T.t) ℚ_[X.p])) :=
+  have hli : LinearIndependent ℚ_[X.p] (fun i =>
+      (bs i : MvPolynomial (Formalism.GM.M.BVar (2 * X.s + 1) X.r (gmB Dd).T.t) ℚ_[X.p])) :=
     bs.linearIndependent.map' V0.subtype (Submodule.ker_subtype V0)
   have hli2 := li_map (iotaX X) _ hli
-  let w : Fin (Module.finrank ℚ_[X.p] V0) → W := fun i => ⟨MvPolynomial.map (iotaX X) (bs i).1, hmemW _ (bs i).2⟩
+  let w : Fin (Module.finrank ℚ_[X.p] V0) → W := fun i =>
+    ⟨MvPolynomial.map (iotaX X) (bs i).1, hmemW _ (bs i).2⟩
   have hli3 : LinearIndependent (KK X.O) w := LinearIndependent.of_comp W.subtype hli2
   have h := hli3.fintype_card_le_finrank
   rw [Fintype.card_fin] at h

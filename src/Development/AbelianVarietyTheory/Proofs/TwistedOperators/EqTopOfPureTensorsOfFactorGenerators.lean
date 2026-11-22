@@ -67,32 +67,36 @@ private lemma tmul_tprod_update_apply_mem_of_stab {ι : Type} [DecidableEq ι] {
   have := hN _ hmem _ h
   rwa [TensorProduct.map_tmul, LinearMap.id_apply, _root_.GlobalTheory.TensHead.piOp_tprod_update] at this
 
-
 open scoped TensorProduct in
-theorem _root_.GlobalTheory.TensHead.eq_top_of_pure_generators :
-    ∀ {ι : Type} [Fintype ι] [DecidableEq ι] {M₀ : Type} [AddCommGroup M₀] [Module ℂ M₀]
-    {M : ι → Type} [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)]
-    (Op₀ : Set (Module.End ℂ M₀)) (Op : ∀ i, Set (Module.End ℂ (M i)))
-    (Rel₀ : Submodule ℂ M₀) (Rel : ∀ i, Submodule ℂ (M i)) (F₀ : Finset M₀) (F : ∀ i, Finset (M i)),
-    (∀ N : Submodule ℂ M₀, Rel₀ ≤ N → _root_.GlobalTheory.TensHead.Stab Op₀ N → (↑F₀ : Set M₀) ⊆ ↑N → N = ⊤) →
-    (∀ i, ∀ N : Submodule ℂ (M i), Rel i ≤ N → _root_.GlobalTheory.TensHead.Stab (Op i) N →
-      (↑(F i) : Set (M i)) ⊆ ↑N → N = ⊤) →
-    ∀ N : Submodule ℂ (M₀ ⊗[ℂ] (⨂[ℂ] i, M i)),
-      (∀ x ∈ Rel₀, ∀ y, x ⊗ₜ[ℂ] y ∈ N) →
-      (∀ i, ∀ x ∈ Rel i, ∀ (x₀ : M₀) (y : ∀ j, M j),
-        x₀ ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ (Function.update y i x) ∈ N) →
-      _root_.GlobalTheory.TensHead.Stab (_root_.GlobalTheory.TensHead.tensOps Op₀ (_root_.GlobalTheory.TensHead.piOps Op)) N →
-      (∀ x₀ ∈ F₀, ∀ y : ∀ i, M i, (∀ i, y i ∈ F i) → x₀ ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ y ∈ N) →
-      N = ⊤ := by
+theorem _root_.GlobalTheory.TensHead.eq_top_of_pure_generators
+    : ∀ {ι : Type} [Fintype ι] [DecidableEq ι] {M₀ : Type} [AddCommGroup M₀] [Module ℂ M₀]
+        {M : ι → Type} [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)] (Op₀ : Set (Module.End ℂ M₀))
+        (Op : ∀ i, Set (Module.End ℂ (M i))) (Rel₀ : Submodule ℂ M₀) (Rel : ∀ i, Submodule ℂ (M i))
+        (F₀ : Finset M₀) (F : ∀ i, Finset (M i)),
+      (∀ N : Submodule ℂ M₀,
+          Rel₀ ≤ N → _root_.GlobalTheory.TensHead.Stab Op₀ N → (↑F₀ : Set M₀) ⊆ ↑N → N = ⊤)
+        → (∀ i, ∀ N : Submodule ℂ (M i),
+          Rel i ≤ N → _root_.GlobalTheory.TensHead.Stab (Op i) N → (↑(F i) : Set (M i)) ⊆ ↑N
+            → N = ⊤)
+        → ∀ N : Submodule ℂ (M₀ ⊗[ℂ] (⨂[ℂ] i, M i)),
+          (∀ x ∈ Rel₀, ∀ y, x ⊗ₜ[ℂ] y ∈ N)
+            → (∀ i, ∀ x ∈ Rel i, ∀ (x₀ : M₀) (y : ∀ j, M j),
+              x₀ ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ (Function.update y i x) ∈ N)
+            → _root_.GlobalTheory.TensHead.Stab
+              (_root_.GlobalTheory.TensHead.tensOps Op₀ (_root_.GlobalTheory.TensHead.piOps Op)) N
+            → (∀ x₀ ∈ F₀, ∀ y : ∀ i, M i, (∀ i, y i ∈ F i) → x₀ ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ y ∈ N)
+            → N = ⊤ := by
   intro ι _ _ M₀ _ _ M _ _ Op₀ Op Rel₀ Rel F₀ F h₀ hF N hRel₀ hRel hN hgen
-  have key : ∀ s : Finset ι, ∀ y : ∀ j, M j, (∀ j, j ∉ s → y j ∈ F j) →
-      ∀ a : M₀, a ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ y ∈ N := by
+  have key
+      : ∀ s : Finset ι, ∀ y : ∀ j, M j,
+        (∀ j, j ∉ s → y j ∈ F j) → ∀ a : M₀, a ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ y ∈ N := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
       intro y hy a
-      have hT := h₀ (N.comap ((TensorProduct.mk ℂ M₀ (⨂[ℂ] i, M i)).flip
-        (PiTensorProduct.tprod ℂ y))) ?_ ?_ ?_
+      have hT :=
+        h₀ (N.comap ((TensorProduct.mk ℂ M₀ (⨂[ℂ] i, M i)).flip (PiTensorProduct.tprod ℂ y))) ?_ ?_
+          ?_
       · have ha : a ∈ (⊤ : Submodule ℂ M₀) := trivial
         rw [← hT] at ha
         simpa using ha
@@ -108,12 +112,17 @@ theorem _root_.GlobalTheory.TensHead.eq_top_of_pure_generators :
         exact hgen x hx y (fun j => hy j (by simp))
     | insert i s hi ih =>
       intro y hy a
-      let S : Submodule ℂ (M i) := ⨅ (b : M₀)
-        (z : {z : ∀ j, M j // ∀ j, j ∉ s → j ≠ i → z j ∈ F j}),
-        N.comap ((TensorProduct.mk ℂ M₀ (⨂[ℂ] j, M j) b) ∘ₗ
-          (PiTensorProduct.tprod ℂ).toLinearMap z.1 i)
-      have hS : ∀ x, x ∈ S ↔ ∀ (b : M₀) (z : ∀ j, M j), (∀ j, j ∉ s → j ≠ i → z j ∈ F j) →
-          b ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ (Function.update z i x) ∈ N := by
+      let S : Submodule ℂ (M i) :=
+        ⨅ (b : M₀)
+          (z : {z : ∀ j, M j // ∀ j, j ∉ s → j ≠ i → z j ∈ F j}),
+          N.comap ((TensorProduct.mk ℂ M₀ (⨂[ℂ] j, M j) b) ∘ₗ
+            (PiTensorProduct.tprod ℂ).toLinearMap z.1 i)
+      have hS
+          : ∀ x,
+            x ∈ S
+              ↔ ∀ (b : M₀) (z : ∀ j, M j),
+                (∀ j, j ∉ s → j ≠ i → z j ∈ F j)
+                  → b ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ (Function.update z i x) ∈ N := by
         intro x
         simp only [S, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.comp_apply,
           MultilinearMap.toLinearMap_apply, TensorProduct.mk_apply, Subtype.forall]

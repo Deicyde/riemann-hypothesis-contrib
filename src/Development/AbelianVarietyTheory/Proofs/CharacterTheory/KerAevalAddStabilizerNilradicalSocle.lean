@@ -11,15 +11,17 @@ namespace GlobalTheory.CuspGL
 
 variable {F : Type} [Field F] {V : Type} [AddCommGroup V] [Module F V]
 
-theorem pow_add_nilRad {A : Submodule F V} {g h : Module.End F V} (hg : ∀ x ∈ A, g x ∈ A)
-    (hh : h ∈ nilRad A) (n : ℕ) :
-    (∀ x ∈ A, ((g + h) ^ n) x = (g ^ n) x ∧ (g ^ n) x ∈ A) ∧ ∀ x, ((g + h) ^ n) x - (g ^ n) x ∈ A := by
+theorem pow_add_nilRad
+    {A : Submodule F V} {g h : Module.End F V} (hg : ∀ x ∈ A, g x ∈ A) (hh : h ∈ nilRad A) (n : ℕ)
+    : (∀ x ∈ A, ((g + h) ^ n) x = (g ^ n) x ∧ (g ^ n) x ∈ A)
+      ∧ ∀ x, ((g + h) ^ n) x - (g ^ n) x ∈ A := by
   induction n with
   | zero => exact ⟨fun x hx => ⟨by simp, by simpa using hx⟩, fun x => by simp⟩
   | succ n ih =>
     refine ⟨fun x hx => ?_, fun x => ?_⟩
     · obtain ⟨h1, h2⟩ := ih.1 x hx
-      simp only [pow_succ', Module.End.mul_apply, LinearMap.add_apply, h1, hh.2 _ h2, add_zero, true_and]
+      simp only [pow_succ', Module.End.mul_apply, LinearMap.add_apply, h1, hh.2 _ h2, add_zero,
+        true_and]
       exact hg _ h2
     · have h1 := hg _ (ih.2 x)
       have h2 := hh.1 (((g + h) ^ n) x)
@@ -29,9 +31,10 @@ theorem pow_add_nilRad {A : Submodule F V} {g h : Module.End F V} (hg : ∀ x �
       convert this using 1
       abel
 
-theorem aeval_add_nilRad {A : Submodule F V} {g h : Module.End F V} (hg : ∀ x ∈ A, g x ∈ A)
-    (hh : h ∈ nilRad A) (p : F[X]) :
-    (∀ x ∈ A, aeval (g + h) p x = aeval g p x) ∧ ∀ x, aeval (g + h) p x - aeval g p x ∈ A := by
+theorem aeval_add_nilRad
+    {A : Submodule F V} {g h : Module.End F V} (hg : ∀ x ∈ A, g x ∈ A) (hh : h ∈ nilRad A)
+    (p : F[X])
+    : (∀ x ∈ A, aeval (g + h) p x = aeval g p x) ∧ ∀ x, aeval (g + h) p x - aeval g p x ∈ A := by
   induction p using Polynomial.induction_on' with
   | add p q hp hq =>
     refine ⟨fun x hx => ?_, fun x => ?_⟩
@@ -47,8 +50,15 @@ theorem aeval_add_nilRad {A : Submodule F V} {g h : Module.End F V} (hg : ∀ x 
     · simp only [aeval_monomial, Module.End.mul_apply, Module.algebraMap_end_apply, ← smul_sub]
       exact A.smul_mem _ (H.2 x)
 
-theorem ker_aeval_add_nilRad :
-    ∀ (F : Type) [Field F] (V : Type) [AddCommGroup V] [Module F V] [FiniteDimensional F V] (g h : Module.End F V) (f : F[X]), h ∈ nilRad (LinearMap.ker (aeval g f)) → LinearMap.ker (aeval g f) ≤ LinearMap.ker (aeval (g + h) f) ∧ (LinearMap.ker (aeval (g + h) f) = LinearMap.ker (aeval g f) → ∀ j : ℕ, Module.finrank F (LinearMap.ker (aeval g (f ^ j))) = Module.finrank F (LinearMap.ker (aeval (g + h) (f ^ j)))) := by
+theorem ker_aeval_add_nilRad
+    : ∀ (F : Type) [Field F] (V : Type) [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+        (g h : Module.End F V) (f : F[X]),
+      h ∈ nilRad (LinearMap.ker (aeval g f))
+        → LinearMap.ker (aeval g f) ≤ LinearMap.ker (aeval (g + h) f)
+          ∧ (LinearMap.ker (aeval (g + h) f) = LinearMap.ker (aeval g f)
+            → ∀ j : ℕ,
+              Module.finrank F (LinearMap.ker (aeval g (f ^ j)))
+                = Module.finrank F (LinearMap.ker (aeval (g + h) (f ^ j)))) := by
   intro F _ V _ _ _ g h f hh
   have hg : ∀ x ∈ LinearMap.ker (aeval g f), g x ∈ LinearMap.ker (aeval g f) := by
     intro x hx
@@ -68,11 +78,13 @@ theorem ker_aeval_add_nilRad :
       | succ j =>
         ext x
         have H := (aeval_add_nilRad hg hh (f ^ j)).2 x
-        have e1 : x ∈ LinearMap.ker (aeval g (f ^ (j + 1))) ↔
-            aeval g (f ^ j) x ∈ LinearMap.ker (aeval g f) := by
+        have e1
+            : x ∈ LinearMap.ker (aeval g (f ^ (j + 1)))
+              ↔ aeval g (f ^ j) x ∈ LinearMap.ker (aeval g f) := by
           rw [pow_succ', map_mul, LinearMap.mem_ker, LinearMap.mem_ker, Module.End.mul_apply]
-        have e2 : x ∈ LinearMap.ker (aeval (g + h) (f ^ (j + 1))) ↔
-            aeval (g + h) (f ^ j) x ∈ LinearMap.ker (aeval (g + h) f) := by
+        have e2
+            : x ∈ LinearMap.ker (aeval (g + h) (f ^ (j + 1)))
+              ↔ aeval (g + h) (f ^ j) x ∈ LinearMap.ker (aeval (g + h) f) := by
           rw [pow_succ', map_mul, LinearMap.mem_ker, LinearMap.mem_ker, Module.End.mul_apply]
         rw [e1, e2, he]
         constructor

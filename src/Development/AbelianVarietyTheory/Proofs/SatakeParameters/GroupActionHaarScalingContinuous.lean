@@ -15,11 +15,15 @@ open scoped TensorProduct
 
 namespace GlobalTheory.IndEtaleComp
 
-theorem isIndEtale_of_model (X E Y G F : Type) [CommRing X] [CommRing E] [CommRing Y] [CommRing G]
-    [CommRing F] [Algebra X E] [Algebra X Y] [Algebra E Y] [IsScalarTower X E Y]
-    [Algebra.Etale X E] [Algebra E G] [Algebra.Etale E G] [Algebra Y F]
-    (e : Y ⊗[E] G ≃ₐ[Y] F) (h : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap X Y)) :
-    GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale ((algebraMap Y F).comp (algebraMap X Y)) := by
+theorem isIndEtale_of_model
+    (X E Y G F : Type) [CommRing X] [CommRing E] [CommRing Y] [CommRing G] [CommRing F]
+    [Algebra X E] [Algebra X Y] [Algebra E Y] [IsScalarTower X E Y] [Algebra.Etale X E]
+    [Algebra E G] [Algebra.Etale E G] [Algebra Y F]
+    (e : Y ⊗[E] G ≃ₐ[Y] F)
+    (h
+      : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap X Y))
+    : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale
+      ((algebraMap Y F).comp (algebraMap X Y)) := by
   have h1 := GlobalTheory.IndEtaleCancel.isIndEtale_of_etale_of_isIndEtale X E Y h
   have h2 := GlobalTheory.isIndEtale_tensorProduct_left E Y G h1
   letI : Algebra G F :=
@@ -32,8 +36,9 @@ theorem isIndEtale_of_model (X E Y G F : Type) [CommRing X] [CommRing E] [CommRi
     RingHom.Etale.stableUnderComposition _ _ (RingHom.etale_algebraMap.2 inferInstance)
       (RingHom.etale_algebraMap.2 inferInstance)
   have h5 := GlobalTheory.EtC.isIndEtale_comp_etale _ h4 _ h3
-  have h6 : (algebraMap Y F).comp (algebraMap X Y) =
-      (algebraMap G F).comp ((algebraMap E G).comp (algebraMap X E)) := by
+  have h6
+      : (algebraMap Y F).comp (algebraMap X Y)
+        = (algebraMap G F).comp ((algebraMap E G).comp (algebraMap X E)) := by
     ext x
     change _ = e ((1 : Y) ⊗ₜ[E] algebraMap E G (algebraMap X E x))
     rw [← Algebra.TensorProduct.algebraMap_apply', IsScalarTower.algebraMap_apply E Y (Y ⊗[E] G),
@@ -42,15 +47,19 @@ theorem isIndEtale_of_model (X E Y G F : Type) [CommRing X] [CommRing E] [CommRi
   rw [h6]
   exact h5
 
-theorem isIndEtale_etale_comp {X Y F : Type} [CommRing X] [CommRing Y] [CommRing F]
-    (f : X →+* Y) (g : Y →+* F) (hf : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale f) (hg : g.Etale) :
-    GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (g.comp f) := by
+theorem isIndEtale_etale_comp
+    {X Y F : Type} [CommRing X] [CommRing Y] [CommRing F]
+    (f : X →+* Y) (g : Y →+* F)
+    (hf : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale f)
+    (hg : g.Etale)
+    : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (g.comp f) := by
   have hf' := hf
   obtain ⟨J, _, _, D, s, t, hs, hj⟩ := hf'
   letI : Algebra Y F := g.toAlgebra
   haveI : Algebra.Etale Y F := hg
   obtain ⟨i, G, _, _, hG, ⟨e⟩⟩ :=
-    GlobalTheory.EtaleDescent.exists_etale_model_of_isColimit J D (Cocone.mk (CommRingCat.of Y) t) hs F
+    GlobalTheory.EtaleDescent.exists_etale_model_of_isColimit J D (Cocone.mk (CommRingCat.of Y) t)
+      hs F
   letI : Algebra (D.obj i) Y := (t.app i).hom.toAlgebra
   letI : Algebra X (D.obj i) := (s.app i).hom.toAlgebra
   letI : Algebra X Y := f.toAlgebra
@@ -59,10 +68,16 @@ theorem isIndEtale_etale_comp {X Y F : Type} [CommRing X] [CommRing Y] [CommRing
     (congrArg (fun φ : CommRingCat.of X ⟶ CommRingCat.of Y => φ.hom x) (hj i).2).symm)
   exact isIndEtale_of_model X (D.obj i) Y G F e hf
 
-theorem isIndEtale_comp : ∀ (X Y Z : Type) [CommRing X] [CommRing Y] [CommRing Z] (f : X →+* Y) (g : Y →+* Z), GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale f → GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale g → GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (g.comp f) := by
+theorem isIndEtale_comp
+    : ∀ (X Y Z : Type) [CommRing X] [CommRing Y] [CommRing Z] (f : X →+* Y) (g : Y →+* Z),
+      GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale f
+        → GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale g
+        → GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (g.comp
+          f) := by
   intro X Y Z _ _ _ f g hf hg
-  have hp : RingHom.toMorphismProperty @RingHom.Etale ≤
-      MorphismProperty.isFinitelyPresentable.{0} CommRingCat.{0} := by
+  have hp
+      : RingHom.toMorphismProperty @RingHom.Etale
+        ≤ MorphismProperty.isFinitelyPresentable.{0} CommRingCat.{0} := by
     intro X Y f hf
     refine CommRingCat.isFinitelyPresentable_hom f ?_
     letI := f.hom.toAlgebra
@@ -71,8 +86,16 @@ theorem isIndEtale_comp : ∀ (X Y Z : Type) [CommRing X] [CommRing Y] [CommRing
   obtain ⟨J, _, _, D, s, t, hs, hj⟩ := hg
   unfold GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale
   rw [← MorphismProperty.ind_ind hp]
-  refine ⟨J, inferInstance, inferInstance, D, (Functor.const J).map (CommRingCat.ofHom f) ≫ s, t, hs,
-    fun j => ⟨?_, ?_⟩⟩
+  refine ⟨
+    J,
+    inferInstance,
+    inferInstance,
+    D,
+    (Functor.const J).map (CommRingCat.ofHom f) ≫ s,
+    t,
+    hs,
+    fun j => ⟨?_, ?_⟩
+  ⟩
   · exact isIndEtale_etale_comp (F := D.obj j) f (s.app j).hom hf (hj j).1
   · have h2 := (hj j).2
     show CommRingCat.ofHom f ≫ s.app j ≫ t.app j = CommRingCat.ofHom (g.comp f)

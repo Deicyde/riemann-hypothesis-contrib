@@ -17,8 +17,11 @@ public import Development.AbelianVarietyTheory.Definitions.TeichmullerDepth.IsEi
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -28,22 +31,29 @@ open ReciprocityTheory.ChartRestriction.G.Chart (spMap_left spMap_id)
 namespace PositivityTheory.HtPt.Rf
 
 section Pull
-variable {R₀ O : Type} [CommRing R₀] [CommRing O] [Algebra R₀ O]
+variable
+  {R₀ O : Type} [CommRing R₀] [CommRing O] [Algebra R₀ O]
   {G : Over (Spec (CommRingCat.of R₀))} [GrpObj G]
-  {G' : Over (Spec (CommRingCat.of O))} [GrpObj G'] {ψ : G'.left ⟶ G.left}
+  {G' : Over (Spec (CommRingCat.of O))} [GrpObj G']
+  {ψ : G'.left ⟶ G.left}
 
-theorem sp_hom_comp (S : Type) [CommRing S] [Algebra O S] [Algebra R₀ S] [IsScalarTower R₀ O S] :
-    (sp (R₀ := O) S).hom ≫ Spec.map (CommRingCat.ofHom (algebraMap R₀ O)) = (sp (R₀ := R₀) S).hom := by
-  simp only [sp, Over.mk_hom, ← Spec.map_comp, ← CommRingCat.ofHom_comp, ← IsScalarTower.algebraMap_eq]
+theorem sp_hom_comp (S : Type) [CommRing S] [Algebra O S] [Algebra R₀ S] [IsScalarTower R₀ O S]
+    : (sp (R₀ := O) S).hom ≫ Spec.map (CommRingCat.ofHom (algebraMap R₀ O))
+      = (sp (R₀ := R₀) S).hom := by
+  simp only [sp, Over.mk_hom, ← Spec.map_comp, ← CommRingCat.ofHom_comp,
+    ← IsScalarTower.algebraMap_eq]
 
-noncomputable def down (h : Geo.Tor.IsGrpPullback G' G (Spec.map (CommRingCat.ofHom (algebraMap R₀ O))) ψ)
+noncomputable def down
+    (h : Geo.Tor.IsGrpPullback G' G (Spec.map (CommRingCat.ofHom (algebraMap R₀ O))) ψ)
     {S : Type} [CommRing S] [Algebra O S] [Algebra R₀ S] [IsScalarTower R₀ O S]
-    (x : sp (R₀ := O) S ⟶ G') : sp (R₀ := R₀) S ⟶ G :=
+    (x : sp (R₀ := O) S ⟶ G')
+    : sp (R₀ := R₀) S ⟶ G :=
   Over.homMk (x.left ≫ ψ) (by
     rw [Category.assoc, h.1.w, ← Category.assoc, Over.w x]
     exact sp_hom_comp S)
 
-variable (h : Geo.Tor.IsGrpPullback G' G (Spec.map (CommRingCat.ofHom (algebraMap R₀ O))) ψ)
+variable
+  (h : Geo.Tor.IsGrpPullback G' G (Spec.map (CommRingCat.ofHom (algebraMap R₀ O))) ψ)
   {S : Type} [CommRing S] [Algebra O S] [Algebra R₀ S] [IsScalarTower R₀ O S]
 
 theorem down_left (x : sp (R₀ := O) S ⟶ G') : (down h x).left = x.left ≫ ψ := rfl
@@ -51,10 +61,8 @@ theorem down_left (x : sp (R₀ := O) S ⟶ G') : (down h x).left = x.left ≫ �
 theorem down_bij : Function.Bijective (down h (S := S)) := by
   constructor
   · intro x y hxy
-    have h1 : x.left ≫ ψ = y.left ≫ ψ := by
-      rw [← down_left h x, ← down_left h y, hxy]
-    have h2 : x.left ≫ G'.hom = y.left ≫ G'.hom := by
-      rw [Over.w x, Over.w y]
+    have h1 : x.left ≫ ψ = y.left ≫ ψ := by rw [← down_left h x, ← down_left h y, hxy]
+    have h2 : x.left ≫ G'.hom = y.left ≫ G'.hom := by rw [Over.w x, Over.w y]
     exact Over.OverMorphism.ext (h.1.hom_ext h1 h2)
   · intro z
     refine ⟨Over.homMk (h.1.lift z.left (sp (R₀ := O) S).hom ?_) (h.1.lift_snd _ _ _), ?_⟩
@@ -65,12 +73,18 @@ theorem down_bij : Function.Bijective (down h (S := S)) := by
       exact h.1.lift_fst _ _ _
 
 theorem down_mul (x y : sp (R₀ := O) S ⟶ G') : down h (x * y) = down h x * down h y := by
-  have hw : ∀ z : sp (R₀ := O) S ⟶ G', (z.left ≫ ψ) ≫ G.hom =
-      (Over.mk ((sp (R₀ := O) S).hom ≫ Spec.map (CommRingCat.ofHom (algebraMap R₀ O)))).hom := by
+  have hw
+      : ∀ z : sp (R₀ := O) S ⟶ G',
+        (z.left ≫ ψ) ≫ G.hom
+          = (Over.mk
+            ((sp (R₀ := O) S).hom ≫ Spec.map (CommRingCat.ofHom (algebraMap R₀ O)))).hom := by
     intro z
-    change (z.left ≫ ψ) ≫ G.hom = (sp (R₀ := O) S).hom ≫ Spec.map (CommRingCat.ofHom (algebraMap R₀ O))
+    change (z.left ≫ ψ) ≫ G.hom
+      = (sp (R₀ := O) S).hom ≫ Spec.map (CommRingCat.ofHom (algebraMap R₀ O))
     rw [Category.assoc, h.1.w, ← Category.assoc, Over.w z]
-  let e : sp (R₀ := R₀) S ⟶ Over.mk ((sp (R₀ := O) S).hom ≫ Spec.map (CommRingCat.ofHom (algebraMap R₀ O))) :=
+  let e
+      : sp (R₀ := R₀) S
+        ⟶ Over.mk ((sp (R₀ := O) S).hom ≫ Spec.map (CommRingCat.ofHom (algebraMap R₀ O))) :=
     Over.homMk (𝟙 _) (by
       change 𝟙 _ ≫ (sp (R₀ := O) S).hom ≫ Spec.map (CommRingCat.ofHom (algebraMap R₀ O)) = _
       rw [Category.id_comp]
@@ -98,36 +112,44 @@ theorem down_pow_eq_one (x : sp (R₀ := O) S ⟶ G') (n : ℕ) : down h x ^ n =
     | succ m ih => rw [_root_.pow_succ, _root_.pow_succ, down_mul, ih]
   rw [← hp, ← h1, (down_bij h).1.eq_iff]
 
-theorem down_nat {S' : Type} [CommRing S'] [Algebra O S'] [Algebra R₀ S'] [IsScalarTower R₀ O S']
-    (f : S →ₐ[O] S') (x : sp (R₀ := O) S ⟶ G') :
-    down h (spMap f ≫ x) = spMap (f.restrictScalars R₀) ≫ down h x := by
+theorem down_nat
+    {S' : Type} [CommRing S'] [Algebra O S'] [Algebra R₀ S'] [IsScalarTower R₀ O S']
+    (f : S →ₐ[O] S') (x : sp (R₀ := O) S ⟶ G')
+    : down h (spMap f ≫ x) = spMap (f.restrictScalars R₀) ≫ down h x := by
   apply Over.OverMorphism.ext
   rw [down_left, Over.comp_left, Over.comp_left, down_left, spMap_left, spMap_left, Category.assoc]
   rfl
 
 end Pull
 
-theorem isLocalHom_of_finite (O S : Type) [CommRing O] [IsLocalRing O] [CommRing S] [IsLocalRing S]
-    [Algebra O S] [Module.Finite O S] : IsLocalHom (algebraMap O S) := by
+theorem isLocalHom_of_finite
+    (O S : Type)
+    [CommRing O] [IsLocalRing O] [CommRing S] [IsLocalRing S] [Algebra O S] [Module.Finite O S]
+    : IsLocalHom (algebraMap O S) := by
   constructor
   intro a ha
   by_contra hna
   have hm : (IsLocalRing.maximalIdeal S).comap (algebraMap O S) = IsLocalRing.maximalIdeal O :=
-    IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap _ _) (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance)) (IsLocalRing.maximalIdeal S))
+    IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap _ _)
+      (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance))
+      (IsLocalRing.maximalIdeal S))
   have hmem : a ∈ (IsLocalRing.maximalIdeal S).comap (algebraMap O S) := by
     rw [hm]
     exact hna
   exact (IsLocalRing.mem_maximalIdeal _).mp hmem ha
 
-theorem e_pow {R₀ : Type} [CommRing R₀] {B : BX R₀} {G : Over (Spec (CommRingCat.of R₀))} [GrpObj G]
+theorem e_pow
+    {R₀ : Type} [CommRing R₀]
+    {B : BX R₀} {G : Over (Spec (CommRingCat.of R₀))} [GrpObj G]
     {e : ∀ R : LAlg R₀, B.G R → (sp (R₀ := R₀) (R : Type) ⟶ G)}
     (hb : ∀ R, Function.Bijective (e R)) (ha : ∀ R x y, e R (x + y) = e R x * e R y)
-    (R : LAlg R₀) (x : B.G R) (n : ℕ) : e R x ^ n = 1 ↔ n • x = 0 := by
+    (R : LAlg R₀) (x : B.G R)
+    (n : ℕ)
+    : e R x ^ n = 1 ↔ n • x = 0 := by
   have h0 : e R 0 = 1 := by
     have hm := ha R 0 0
     rw [add_zero] at hm
-    have hm' : e R 0 * e R 0 = e R 0 * 1 := by
-      rw [_root_.mul_one, ← hm]
+    have hm' : e R 0 * e R 0 = e R 0 * 1 := by rw [_root_.mul_one, ← hm]
     exact mul_left_cancel hm'
   have hp : ∀ m : ℕ, e R (m • x) = e R x ^ m := by
     intro m
@@ -136,9 +158,12 @@ theorem e_pow {R₀ : Type} [CommRing R₀] {B : BX R₀} {G : Over (Spec (CommR
     | succ m ih => rw [succ_nsmul, ha, ih, _root_.pow_succ]
   rw [← hp, ← h0, (hb R).1.eq_iff]
 
-theorem ptOf_add {R₀ : Type} [CommRing R₀] {B : BX R₀} {O : LAlg R₀} {g p : ℕ} [NeZero p]
-    (τ : Ix g → ℕ → B.G O) (hτ : ∀ j, p • τ j 0 = 0) (s t : Ix g → ZMod p) :
-    ptOf B τ (s + t) = ptOf B τ s + ptOf B τ t := by
+theorem ptOf_add
+    {R₀ : Type} [CommRing R₀]
+    {B : BX R₀} {O : LAlg R₀} {g p : ℕ} [NeZero p]
+    (τ : Ix g → ℕ → B.G O) (hτ : ∀ j, p • τ j 0 = 0)
+    (s t : Ix g → ZMod p)
+    : ptOf B τ (s + t) = ptOf B τ s + ptOf B τ t := by
   unfold ptOf
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl (fun j _ => ?_)
@@ -146,7 +171,24 @@ theorem ptOf_add {R₀ : Type} [CommRing R₀] {B : BX R₀} {O : LAlg R₀} {g 
   conv_rhs => rw [← Nat.mod_add_div ((s j).val + (t j).val) p]
   rw [add_nsmul, mul_nsmul, hτ j, nsmul_zero, add_zero]
 
-theorem htd_tie : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) {R₀ : Type} [CommRing R₀] (g : ℕ) (B : BX R₀) (Tw : ATowerL R₀ p) (Dt : DualTower Tw) [Algebra (Tw.O : Type) C], v.Integers (Tw.O : Type) → v (p : C) < 1 → ∀ [Algebra ℤ_[p] (Tw.O : Type)] (Oe : Type) [CommRing Oe] [Algebra ℤ_[p] Oe] (σ : Oe ≃ₐ[ℤ_[p]] Oe) (cp : (Tw.O : Type)) (D : Dat p g B Tw Dt Oe σ cp) (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G] [IsCommMonObj G] (e : ∀ R : LAlg R₀, B.G R → (sp (R₀ := R₀) (R : Type) ⟶ G)), (∀ R, Function.Bijective (e R)) → (∀ R x y, e R (x + y) = e R x * e R y) → (∀ {R S : LAlg R₀} (f : LHom R S) (x : B.G R), e S (B.map f x) = spMap f.1 ≫ e R x) → ∀ (G' : Over (Spec (CommRingCat.of (Tw.O : Type)))) [GrpObj G'] [IsCommMonObj G'] (ψ : G'.left ⟶ G.left), Geo.Tor.IsGrpPullback G' G (Spec.map (CommRingCat.ofHom (algebraMap R₀ (Tw.O : Type)))) ψ → ∃ pt : Nb p g → (sp (R₀ := (Tw.O : Type)) (Tw.O : Type) ⟶ G'), (∀ t, (pt t).left ≫ ψ = (e Tw.O (ptOf B D.L.τ t)).left) ∧ IsTorsPts G' p pt ∧ ∀ T : TorsRep G' p, D.evImg C = torsFun C T pt := by
+theorem htd_tie
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) {R₀ : Type} [CommRing R₀] (g : ℕ) (B : BX R₀) (Tw : ATowerL R₀ p)
+        (Dt : DualTower Tw) [Algebra (Tw.O : Type) C],
+      v.Integers (Tw.O : Type) → v (p : C) < 1
+        → ∀ [Algebra ℤ_[p] (Tw.O : Type)] (Oe : Type) [CommRing Oe] [Algebra ℤ_[p] Oe]
+            (σ : Oe ≃ₐ[ℤ_[p]] Oe) (cp : (Tw.O : Type)) (D : Dat p g B Tw Dt Oe σ cp)
+            (G : Over (Spec (CommRingCat.of R₀))) [GrpObj G] [IsCommMonObj G]
+            (e : ∀ R : LAlg R₀, B.G R → (sp (R₀ := R₀) (R : Type) ⟶ G)),
+          (∀ R, Function.Bijective (e R)) → (∀ R x y, e R (x + y) = e R x * e R y)
+            → (∀ {R S : LAlg R₀} (f : LHom R S) (x : B.G R), e S (B.map f x) = spMap f.1 ≫ e R x)
+            → ∀ (G' : Over (Spec (CommRingCat.of (Tw.O : Type)))) [GrpObj G'] [IsCommMonObj G']
+                (ψ : G'.left ⟶ G.left),
+              Geo.Tor.IsGrpPullback G' G
+                  (Spec.map (CommRingCat.ofHom (algebraMap R₀ (Tw.O : Type)))) ψ
+                → ∃ pt : Nb p g → (sp (R₀ := (Tw.O : Type)) (Tw.O : Type) ⟶ G'),
+                  (∀ t, (pt t).left ≫ ψ = (e Tw.O (ptOf B D.L.τ t)).left) ∧ IsTorsPts G' p pt
+                    ∧ ∀ T : TorsRep G' p, D.evImg C = torsFun C T pt := by
   intro p _ C _ _ _ v R₀ _ g B Tw Dt _ hv hp _ Oe _ _ σ cp D G _ _ e hb ha hn G' _ _ ψ h
   have hτ : ∀ j, p • D.L.τ j 0 = 0 := by
     intro j
@@ -184,19 +226,24 @@ theorem htd_tie : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed
   refine ⟨pt, fun t => ?_, hpts, ?_⟩
   · rw [← down_left h, hdpt]
   · intro T
-    have hspec : ∀ t, (D.ptMap t).comp (D.fin.sO (D.ptIdx t)) = LHom.id Tw.O ∧
-        B.map (D.ptMap t) (D.fin.y (D.ptIdx t)) = ptOf B D.L.τ t := fun t =>
-      ⟨(Classical.choose_spec (Classical.choose_spec
-          (D.fin.univ Tw.O (LHom.id Tw.O) _ (D.pt_p t)))).1,
-        (Classical.choose_spec (Classical.choose_spec
-          (D.fin.univ Tw.O (LHom.id Tw.O) _ (D.pt_p t)))).2.1⟩
+    have hspec
+        : ∀ t,
+          (D.ptMap t).comp (D.fin.sO (D.ptIdx t)) = LHom.id Tw.O
+            ∧ B.map (D.ptMap t) (D.fin.y (D.ptIdx t)) = ptOf B D.L.τ t := fun t => ⟨
+      (Classical.choose_spec (Classical.choose_spec (D.fin.univ Tw.O (LHom.id Tw.O) _
+        (D.pt_p t)))).1,
+      (Classical.choose_spec (Classical.choose_spec (D.fin.univ Tw.O (LHom.id Tw.O) _
+        (D.pt_p t)))).2.1
+    ⟩
     obtain ⟨φT, hφT⟩ := exists_pts T hpts
     letI instA : ∀ i, Algebra (Tw.O : Type) (D.fin.AAx i).carrier := fun i =>
       ((D.fin.sO i).1 : (Tw.O : Type) →+* (D.fin.AAx i).carrier).toAlgebra
     haveI instT : ∀ i, IsScalarTower R₀ (Tw.O : Type) (D.fin.AAx i).carrier := fun i =>
       IsScalarTower.of_algebraMap_eq (fun r => ((D.fin.sO i).1.commutes r).symm)
-    have hy : ∀ i, ∃ z : sp (R₀ := (Tw.O : Type)) (D.fin.AAx i).carrier ⟶ G',
-        down h z = e (D.fin.AAx i) (D.fin.y i) := fun i => (down_bij h).2 _
+    have hy
+        : ∀ i, ∃ z : sp (R₀ := (Tw.O : Type)) (D.fin.AAx i).carrier ⟶ G',
+          down h z = e (D.fin.AAx i) (D.fin.y i) := fun i =>
+      (down_bij h).2 _
     choose y' hy' using hy
     have hyp : ∀ i, y' i ^ p = 1 := by
       intro i
@@ -205,11 +252,12 @@ theorem htd_tie : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed
     choose χ hχ using fun i => (T.univ _ (y' i) (hyp i)).exists
     have hfac : ∀ t (a : T.A), φT t a = (D.ptMap t).1 (χ (D.ptIdx t) a) := by
       intro t a
-      let f : (D.fin.AAx (D.ptIdx t)).carrier →ₐ[(Tw.O : Type)] (Tw.O : Type) :=
-        { toRingHom := (D.ptMap t).1.toRingHom
-          commutes' := fun r => by
-            have hr := congrArg (fun φ : LHom Tw.O Tw.O => φ.1 r) (hspec t).1
-            exact hr }
+      let f : (D.fin.AAx (D.ptIdx t)).carrier →ₐ[(Tw.O : Type)] (Tw.O : Type) := {
+        toRingHom := (D.ptMap t).1.toRingHom
+        commutes' := fun r => by
+          have hr := congrArg (fun φ : LHom Tw.O Tw.O => φ.1 r) (hspec t).1
+          exact hr
+      }
       have hf : φT t = f.comp (χ _) := by
         apply tors_ext T
         rw [hφT, spc, hχ]
@@ -219,15 +267,21 @@ theorem htd_tie : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed
       exact DFunLike.congr_fun hf a
     haveI hTfin : Module.Finite (Tw.O : Type) T.A := T.fin
     haveI hAfin : ∀ i, Module.Finite (Tw.O : Type) (D.fin.AAx i).carrier := fun i => (D.fin.free i).2
-    have hloc : ∀ (A S : LAlg R₀) [Algebra (Tw.O : Type) A.carrier] [Algebra (Tw.O : Type) S.carrier]
-        [Module.Finite (Tw.O : Type) A.carrier] [IsLocalHom (algebraMap (Tw.O : Type) S.carrier)]
-        (f : A.carrier →ₐ[(Tw.O : Type)] S.carrier), IsLocalHom (f : A.carrier →+* S.carrier) := by
+    have hloc
+        : ∀ (A S : LAlg R₀) [Algebra (Tw.O : Type) A.carrier] [Algebra (Tw.O : Type) S.carrier]
+            [Module.Finite (Tw.O : Type) A.carrier]
+            [IsLocalHom (algebraMap (Tw.O : Type) S.carrier)]
+            (f : A.carrier →ₐ[(Tw.O : Type)] S.carrier),
+          IsLocalHom (f : A.carrier →+* S.carrier) := by
       intro A S _ _ _ _ f
-      have hc : (IsLocalRing.maximalIdeal S.carrier).comap (f : A.carrier →+* S.carrier) =
-          IsLocalRing.maximalIdeal A.carrier := by
+      have hc
+          : (IsLocalRing.maximalIdeal S.carrier).comap (f : A.carrier →+* S.carrier)
+            = IsLocalRing.maximalIdeal A.carrier := by
         apply IsLocalRing.eq_maximalIdeal
         apply Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := (Tw.O : Type))
-        change ((IsLocalRing.maximalIdeal S.carrier).comap (f : A.carrier →+* S.carrier)).comap (algebraMap (Tw.O : Type) A.carrier) |>.IsMaximal
+        change ((IsLocalRing.maximalIdeal S.carrier).comap (f : A.carrier →+* S.carrier)).comap
+            (algebraMap (Tw.O : Type) A.carrier)
+          |>.IsMaximal
         rw [Ideal.comap_comap, AlgHom.comp_algebraMap, IsLocalRing.maximalIdeal_comap]
         exact IsLocalRing.maximalIdeal.isMaximal _
       constructor
@@ -237,17 +291,23 @@ theorem htd_tie : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed
         rw [hc]
         exact hna
       exact (IsLocalRing.mem_maximalIdeal _).mp hmem ha
-    have key : ∀ (S : LAlg R₀) [Algebra (Tw.O : Type) S.carrier] [IsScalarTower R₀ (Tw.O : Type) S.carrier]
-        [Module.Finite (Tw.O : Type) S.carrier] (α : T.A →ₐ[(Tw.O : Type)] S.carrier),
-        ∃ i, ∃ β : (D.fin.AAx i).carrier →ₐ[(Tw.O : Type)] S.carrier, β.comp (χ i) = α ∧
-          (∀ j (β' : (D.fin.AAx j).carrier →ₐ[(Tw.O : Type)] S.carrier), β'.comp (χ j) = α → j = i) ∧
-          ∀ β' : (D.fin.AAx i).carrier →ₐ[(Tw.O : Type)] S.carrier, β'.comp (χ i) = α → β' = β := by
+    have key
+        : ∀ (S : LAlg R₀) [Algebra (Tw.O : Type) S.carrier]
+            [IsScalarTower R₀ (Tw.O : Type) S.carrier] [Module.Finite (Tw.O : Type) S.carrier]
+            (α : T.A →ₐ[(Tw.O : Type)] S.carrier),
+          ∃ i, ∃ β : (D.fin.AAx i).carrier →ₐ[(Tw.O : Type)] S.carrier,
+            β.comp (χ i) = α
+              ∧ (∀ j (β' : (D.fin.AAx j).carrier →ₐ[(Tw.O : Type)] S.carrier),
+                β'.comp (χ j) = α → j = i)
+              ∧ ∀ β' : (D.fin.AAx i).carrier →ₐ[(Tw.O : Type)] S.carrier,
+                β'.comp (χ i) = α → β' = β := by
       intro S _ _ _ α
       haveI hOS : IsLocalHom (algebraMap (Tw.O : Type) S.carrier) := isLocalHom_of_finite _ _
       let s : LHom Tw.O S := ⟨IsScalarTower.toAlgHom R₀ (Tw.O : Type) S.carrier, hOS⟩
-      have hcomp : ∀ j (β' : (D.fin.AAx j).carrier →ₐ[(Tw.O : Type)] S.carrier),
-          down h (spMap (β'.comp (χ j)) ≫ T.y) =
-            e S (B.map ⟨β'.restrictScalars R₀, hloc _ _ β'⟩ (D.fin.y j)) := by
+      have hcomp
+          : ∀ j (β' : (D.fin.AAx j).carrier →ₐ[(Tw.O : Type)] S.carrier),
+            down h (spMap (β'.comp (χ j)) ≫ T.y)
+              = e S (B.map ⟨β'.restrictScalars R₀, hloc _ _ β'⟩ (D.fin.y j)) := by
         intro j β'
         rw [spc, hχ, down_nat, hy']
         exact (hn ⟨β'.restrictScalars R₀, hloc _ _ β'⟩ (D.fin.y j)).symm
@@ -256,46 +316,57 @@ theorem htd_tie : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed
         rw [← e_pow hb ha, hw, down_pow_eq_one h]
         exact tors_pow T α
       obtain ⟨i, β, hβs, hβy, huniq⟩ := D.fin.univ S s w hwp
-      let βO : (D.fin.AAx i).carrier →ₐ[(Tw.O : Type)] S.carrier :=
-        { toRingHom := β.1.toRingHom
-          commutes' := fun r => congrArg (fun φ : LHom Tw.O S => φ.1 r) hβs }
+      let βO : (D.fin.AAx i).carrier →ₐ[(Tw.O : Type)] S.carrier := {
+        toRingHom := β.1.toRingHom
+        commutes' := fun r => congrArg (fun φ : LHom Tw.O S => φ.1 r) hβs
+      }
       refine ⟨i, βO, ?_, ?_, ?_⟩
       · apply tors_ext T
         apply (down_bij h).1
         rw [hcomp, ← hw, ← hβy]
         rfl
       · intro j β' hβ'
-        have h1 : LHom.comp (⟨β'.restrictScalars R₀, hloc _ _ β'⟩ : LHom (D.fin.AAx j) S) (D.fin.sO j) = s := by
+        have h1
+            : LHom.comp (⟨β'.restrictScalars R₀, hloc _ _ β'⟩ : LHom (D.fin.AAx j) S) (D.fin.sO j)
+              = s := by
           apply Subtype.ext
           apply AlgHom.ext
           intro r
           exact β'.commutes r
-        have h2 : B.map (⟨β'.restrictScalars R₀, hloc _ _ β'⟩ : LHom (D.fin.AAx j) S) (D.fin.y j) = w := by
+        have h2
+            : B.map (⟨β'.restrictScalars R₀, hloc _ _ β'⟩ : LHom (D.fin.AAx j) S) (D.fin.y j)
+              = w := by
           apply (hb S).1
           rw [← hcomp, hβ', hw]
         exact (huniq j _ h1 h2).1
       · intro β' hβ'
-        have h1 : LHom.comp (⟨β'.restrictScalars R₀, hloc _ _ β'⟩ : LHom (D.fin.AAx i) S) (D.fin.sO i) = s := by
+        have h1
+            : LHom.comp (⟨β'.restrictScalars R₀, hloc _ _ β'⟩ : LHom (D.fin.AAx i) S) (D.fin.sO i)
+              = s := by
           apply Subtype.ext
           apply AlgHom.ext
           intro r
           exact β'.commutes r
-        have h2 : B.map (⟨β'.restrictScalars R₀, hloc _ _ β'⟩ : LHom (D.fin.AAx i) S) (D.fin.y i) = w := by
+        have h2
+            : B.map (⟨β'.restrictScalars R₀, hloc _ _ β'⟩ : LHom (D.fin.AAx i) S) (D.fin.y i)
+              = w := by
           apply (hb S).1
           rw [← hcomp, hβ', hw]
         have h3 := eq_of_heq (huniq i _ h1 h2).2
         apply AlgHom.ext
         intro a
         exact DFunLike.congr_fun (congrArg Subtype.val h3) a
-    have hidem : ∀ i (β' : (D.fin.AAx i).carrier →ₐ[(Tw.O : Type)] (D.fin.AAx i).carrier),
-        β'.comp (χ i) = χ i → β' = AlgHom.id _ _ := by
+    have hidem
+        : ∀ i (β' : (D.fin.AAx i).carrier →ₐ[(Tw.O : Type)] (D.fin.AAx i).carrier),
+          β'.comp (χ i) = χ i → β' = AlgHom.id _ _ := by
       intro i β' hβ'
       obtain ⟨i0, β0, -, hu1, hu2⟩ := key (D.fin.AAx i) (χ i)
       have hi := hu1 i (AlgHom.id _ _) (AlgHom.id_comp _)
       subst hi
       rw [hu2 β' hβ', hu2 (AlgHom.id _ _) (AlgHom.id_comp _)]
-    have hidx : ∀ i j (β' : (D.fin.AAx j).carrier →ₐ[(Tw.O : Type)] (D.fin.AAx i).carrier),
-        β'.comp (χ j) = χ i → j = i := by
+    have hidx
+        : ∀ i j (β' : (D.fin.AAx j).carrier →ₐ[(Tw.O : Type)] (D.fin.AAx i).carrier),
+          β'.comp (χ j) = χ i → j = i := by
       intro i j β' hβ'
       obtain ⟨i0, β0, -, hu1, -⟩ := key (D.fin.AAx i) (χ i)
       rw [hu1 j β' hβ', hu1 i (AlgHom.id _ _) (AlgHom.id_comp _)]
@@ -328,8 +399,10 @@ theorem htd_tie : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed
         rfl
       obtain ⟨x, hx⟩ := (AlgHom.mem_range (χ i')).mp (β a).2
       exact ⟨x, hx.trans ha'⟩
-    have hmax : ∀ i (M : Ideal T.A), M.IsMaximal → RingHom.ker (χ i) ≤ M →
-        M = (IsLocalRing.maximalIdeal (D.fin.AAx i).carrier).comap (χ i) := by
+    have hmax
+        : ∀ i (M : Ideal T.A),
+          M.IsMaximal → RingHom.ker (χ i) ≤ M
+            → M = (IsLocalRing.maximalIdeal (D.fin.AAx i).carrier).comap (χ i) := by
       intro i M hM hK
       have hle : M ≤ (IsLocalRing.maximalIdeal (D.fin.AAx i).carrier).comap (χ i) := by
         intro x hx
@@ -401,12 +474,17 @@ theorem htd_tie : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed
     have hcrt : ∀ F : (i : D.fin.ι) → (D.fin.AAx i).carrier, ∃ a : T.A, ∀ i, χ i a = F i := by
       intro F
       choose b hb' using fun i => hsurj i (F i)
-      obtain ⟨r, hr⟩ := Ideal.quotientInfToPiQuotient_surj (I := fun i => RingHom.ker (χ i))
-        (fun i j hij => hcop i j hij) (fun i => Ideal.Quotient.mk _ (b i))
+      obtain ⟨r, hr⟩ :=
+        Ideal.quotientInfToPiQuotient_surj
+          (I := fun i => RingHom.ker (χ i))
+          (fun i j hij => hcop i j hij)
+          (fun i => Ideal.Quotient.mk _ (b i))
       obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective r
       refine ⟨a, fun i => ?_⟩
       have hri := congrFun hr i
-      rw [Ideal.quotientInfToPiQuotient_mk', Ideal.Quotient.eq, RingHom.mem_ker, map_sub, sub_eq_zero] at hri
+      rw [Ideal.quotientInfToPiQuotient_mk', Ideal.Quotient.eq, RingHom.mem_ker, map_sub,
+          sub_eq_zero]
+        at hri
       rw [hri, hb']
     apply le_antisymm
     · apply Submodule.span_le.mpr

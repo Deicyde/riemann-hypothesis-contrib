@@ -10,13 +10,15 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem continuousMultilinearMap_ext_hilbertBasis (ι : Type) [Fintype ι] [DecidableEq ι]
+theorem continuousMultilinearMap_ext_hilbertBasis
+    (ι : Type) [Fintype ι] [DecidableEq ι]
     (Hs : ι → Type) [∀ i, NormedAddCommGroup (Hs i)] [∀ i, InnerProductSpace ℂ (Hs i)]
-    (J : ι → Type) (e : ∀ i, HilbertBasis (J i) ℂ (Hs i)) (F : Type) [NormedAddCommGroup F]
-    [NormedSpace ℂ F] (f g : ContinuousMultilinearMap ℂ Hs F)
-    (h : ∀ j : ∀ i, J i, f (fun i => e i (j i)) = g (fun i => e i (j i))) : f = g := by
-  have key : ∀ s : Finset ι, ∀ y : ∀ i, Hs i,
-      (∀ i, i ∉ s → y i ∈ Set.range (e i)) → f y = g y := by
+    (J : ι → Type) (e : ∀ i, HilbertBasis (J i) ℂ (Hs i))
+    (F : Type) [NormedAddCommGroup F] [NormedSpace ℂ F]
+    (f g : ContinuousMultilinearMap ℂ Hs F)
+    (h : ∀ j : ∀ i, J i, f (fun i => e i (j i)) = g (fun i => e i (j i)))
+    : f = g := by
+  have key : ∀ s : Finset ι, ∀ y : ∀ i, Hs i, (∀ i, i ∉ s → y i ∈ Set.range (e i)) → f y = g y := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
@@ -44,8 +46,9 @@ theorem continuousMultilinearMap_ext_hilbertBasis (ι : Type) [Fintype ι] [Deci
       have hL0 : L = 0 := ContinuousLinearMap.ext_on hdense hL
       have hya := congrArg (fun M : Hs a →L[ℂ] F => M (y a)) hL0
       simp only [L, ContinuousMultilinearMap.toContinuousLinearMap_apply,
-        ContinuousMultilinearMap.sub_apply, ContinuousLinearMap.zero_apply, sub_eq_zero,
-        Function.update_eq_self] at hya
+          ContinuousMultilinearMap.sub_apply, ContinuousLinearMap.zero_apply, sub_eq_zero,
+          Function.update_eq_self]
+        at hya
       exact hya
   ext y
   exact key Finset.univ y (by simp)

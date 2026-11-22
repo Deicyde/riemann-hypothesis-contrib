@@ -18,9 +18,12 @@ variable {K : Type*} [Field K] [NumberField K]
 theorem exists_int_trace_eq {t : K} (ht : IsIntegral ℤ t) : ∃ n : ℤ, Algebra.trace ℚ K t = n :=
   ⟨Algebra.trace ℤ (𝓞 K) ⟨t, ht⟩, (Algebra.coe_trace_int (K := K) ⟨t, ht⟩).symm⟩
 
-theorem exists_int_isIntegral_of_trace :
-    ∃ D : ℤ, D ≠ 0 ∧ ∀ t : K, (∀ s, ∃ n : ℤ, Algebra.trace ℚ K (t * integralBasis K s) = n) →
-      IsIntegral ℤ ((D : K) * t) := by
+theorem exists_int_isIntegral_of_trace
+    : ∃ D : ℤ,
+      D ≠ 0
+        ∧ ∀ t : K,
+          (∀ s, ∃ n : ℤ, Algebra.trace ℚ K (t * integralBasis K s) = n)
+            → IsIntegral ℤ ((D : K) * t) := by
   classical
   let B := (Algebra.traceForm ℚ K).dualBasis (traceForm_nondegenerate ℚ K) (integralBasis K)
   obtain ⟨D, hD0, hD⟩ := exists_int_mul_isIntegral (Finset.univ.image fun s => B s)
@@ -52,7 +55,6 @@ variable {E : Type*} [CommRing E] [Algebra K E] [Algebra.IsQuadraticExtension K 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι] {H : Matrix ι ι E}
 variable {κ : Type*} [Fintype κ] [DecidableEq κ] (b : Basis κ K E)
 
-
 end ShortBasis
 
 section Coordinates
@@ -62,13 +64,6 @@ variable {E : Type*} [CommRing E] [Algebra K E] [Algebra.IsQuadraticExtension K 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι] {H : Matrix ι ι E}
 variable {κ : Type*} [Fintype κ] [DecidableEq κ] (b : Basis κ K E)
 
-
-
-
-
-
-
-
 end Coordinates
 
 section EBound
@@ -77,8 +72,6 @@ variable {K : Type*} [Field K] [NumberField K]
 variable {E : Type*} [CommRing E] [Algebra K E] [Algebra.IsQuadraticExtension K E]
 variable {ι : Type*} [Fintype ι] [DecidableEq ι] {H : Matrix ι ι E}
 variable {κ : Type*} [Fintype κ] (b : Basis κ K E)
-
-
 
 end EBound
 

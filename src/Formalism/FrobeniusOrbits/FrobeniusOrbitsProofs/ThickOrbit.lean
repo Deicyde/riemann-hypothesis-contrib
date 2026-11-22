@@ -10,23 +10,25 @@ open Classical
 namespace Formalism.FrobeniusOrbits
 namespace ThickOrbit
 
-theorem bound_aux {n L : ℕ} (j : ℤ) (s : ℕ) (hj : j ≤ L) (hs : 4 * L * s < n) :
-    4 * (j * (s : ℤ)) < n := by
+theorem bound_aux {n L : ℕ} (j : ℤ) (s : ℕ) (hj : j ≤ L) (hs : 4 * L * s < n)
+    : 4 * (j * (s : ℤ)) < n := by
   have hs' : (4 * L * s : ℤ) < n := by exact_mod_cast hs
   have h0 : (0 : ℤ) ≤ s := by positivity
   nlinarith
 
-theorem int_mul_lt_of_le_four_mul {n L : ℕ} (j : ℤ) (s : ℕ) (hj : j ≤ 4 * L) (hs : 4 * L * s < n) :
-    j * (s : ℤ) < n := by
+theorem int_mul_lt_of_le_four_mul {n L : ℕ} (j : ℤ) (s : ℕ) (hj : j ≤ 4 * L) (hs : 4 * L * s < n)
+    : j * (s : ℤ) < n := by
   have hs' : (4 * L * s : ℤ) < n := by exact_mod_cast hs
   have h0 : (0 : ℤ) ≤ s := by positivity
   nlinarith
 
-theorem key {n L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < n) (hR : NoRel T L)
-    (u₀ t h : ZMod n) (hord : 4 * L < addOrderOf h) (i₀ a b c : ℤ)
-    (ha : a ∈ Finset.Ico i₀ (i₀ + L)) (hc : c ∈ Finset.Ico i₀ (i₀ + L)) (hab : a < b)
+theorem key
+    {n L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < n) (hR : NoRel T L)
+    (u₀ t h : ZMod n) (hord : 4 * L < addOrderOf h)
+    (i₀ a b c : ℤ) (ha : a ∈ Finset.Ico i₀ (i₀ + L)) (hc : c ∈ Finset.Ico i₀ (i₀ + L)) (hab : a < b)
     (hbc : b < c) (hxa : InTranslate T u₀ (t + a • h)) (hxb : InTranslate T u₀ (t + b • h))
-    (hxc : InTranslate T u₀ (t + c • h)) : False := by
+    (hxc : InTranslate T u₀ (t + c • h))
+    : False := by
   rw [Finset.mem_Ico] at ha hc
   obtain ⟨sa, hsa, ea⟩ := hxa
   obtain ⟨sb, hsb, eb⟩ := hxb
@@ -50,7 +52,8 @@ theorem key {n L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < n) (hR :
     exact hz (c - b) (by omega) (by omega) (by push_cast; linear_combination ec - eb)
   set X : ℤ := (c - a) * ((sb : ℤ) - sa) - (b - a) * ((sc : ℤ) - sa) with hX
   have hX0 : (X : ZMod n) = 0 := by
-    rw [hX]; push_cast
+    rw [hX]
+    push_cast
     linear_combination (↑b - ↑a) * (ec - ea) - (↑c - ↑a) * (eb - ea)
   have hdvd : (n : ℤ) ∣ X := (ZMod.intCast_zmod_eq_zero_iff_dvd X n).mp hX0
   have h1 := bound_aux (c - a) sb (by omega) (hT sb hsb)
@@ -72,9 +75,11 @@ theorem key {n L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < n) (hR :
   · rw [abs_le]; constructor <;> omega
   · rw [hX] at hXz; linarith
 
-theorem part_one {n L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < n) (hR : NoRel T L)
-    (u₀ t h : ZMod n) (hord : 4 * L < addOrderOf h) (i₀ : ℤ) :
-    ((Finset.Ico i₀ (i₀ + L)).filter (fun i : ℤ => InTranslate T u₀ (t + i • h))).card ≤ 2 := by
+theorem part_one
+    {n L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < n) (hR : NoRel T L)
+    (u₀ t h : ZMod n) (hord : 4 * L < addOrderOf h)
+    (i₀ : ℤ)
+    : ((Finset.Ico i₀ (i₀ + L)).filter (fun i : ℤ => InTranslate T u₀ (t + i • h))).card ≤ 2 := by
   set S := (Finset.Ico i₀ (i₀ + L)).filter (fun i : ℤ => InTranslate T u₀ (t + i • h)) with hS
   by_contra hlt
   push_neg at hlt
@@ -97,9 +102,11 @@ theorem part_one {n L : ℕ} (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < n) 
   rw [hS, Finset.mem_filter] at haS hbS hcS
   exact key T hT hR u₀ t h hord i₀ a b c haS.1 hcS.1 hab hbc' haS.2 hbS.2 hcS.2
 
-theorem part_two {n L : ℕ} (hn : 0 < n) (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < n)
-    (u₀ t h : ZMod n) (hord : addOrderOf h ≤ 4 * L) :
-    {x : ZMod n | (∃ i : ℤ, x = t + i • h) ∧ InTranslate T u₀ x}.ncard ≤ 1 := by
+theorem part_two
+    {n L : ℕ} (hn : 0 < n)
+    (T : Finset ℕ) (hT : ∀ s ∈ T, 4 * L * s < n)
+    (u₀ t h : ZMod n) (hord : addOrderOf h ≤ 4 * L)
+    : {x : ZMod n | (∃ i : ℤ, x = t + i • h) ∧ InTranslate T u₀ x}.ncard ≤ 1 := by
   haveI : NeZero n := ⟨by omega⟩
   rw [Set.ncard_le_one]
   rintro x ⟨⟨i, rfl⟩, s₁, hs₁, e₁⟩ y ⟨⟨i', rfl⟩, s₂, hs₂, e₂⟩
@@ -111,7 +118,8 @@ theorem part_two {n L : ℕ} (hn : 0 < n) (T : Finset ℕ) (hT : ∀ s ∈ T, 4 
   rw [zsmul_eq_mul] at e₁ e₂
   set X : ℤ := (m : ℤ) * ((s₁ : ℤ) - s₂) with hX
   have hX0 : (X : ZMod n) = 0 := by
-    rw [hX]; push_cast
+    rw [hX]
+    push_cast
     linear_combination (↑m : ZMod n) * (e₂ - e₁) + ((↑i : ZMod n) - ↑i') * hmh
   have hdvd : (n : ℤ) ∣ X := (ZMod.intCast_zmod_eq_zero_iff_dvd X n).mp hX0
   have h1 := int_mul_lt_of_le_four_mul (m : ℤ) s₁ (by exact_mod_cast hord) (hT s₁ hs₁)
@@ -135,7 +143,9 @@ end ThickOrbit
 
 theorem hostThickOrbit : HostThickOrbit := by
   intro n L hn _ T hT hR u₀ t h
-  exact ⟨fun hord i₀ => ThickOrbit.part_one T hT hR u₀ t h hord i₀,
-    fun hord => ThickOrbit.part_two hn T hT u₀ t h hord⟩
+  exact ⟨
+    fun hord i₀ => ThickOrbit.part_one T hT hR u₀ t h hord i₀,
+    fun hord => ThickOrbit.part_two hn T hT u₀ t h hord
+  ⟩
 
 end Formalism.FrobeniusOrbits

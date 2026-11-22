@@ -16,11 +16,15 @@ noncomputable section
 
 namespace Formalism.L2.DIV.SlopeMaxB
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Pk Formalism.MainNotions.DIV.Proofs Formalism.MainNotions.DIV.Proofs.HHParts
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Pk
+  Formalism.MainNotions.DIV.Proofs Formalism.MainNotions.DIV.Proofs.HHParts
 
-theorem muMax_le_pol {D : D7} (L : SizeData₂ D) (hS : SizesAt L) (C CTu : ℝ)
-    (hTu : ∀ u, Real.log ((D.mem u).A.T : ℝ) ≤ CTu * D.R.m * L.sc.L) (h : LocalQuadraticParts.FrobeniusExpansionCongruence L C) (u : D.what₂.Word) :
-    ((D.fm u).lat 0).muMax ≤ |C| * (12 + 2 * |CTu|) * szPol L ^ 4 * L.sc.b := by
+theorem muMax_le_pol
+    {D : D7} (L : SizeData₂ D) (hS : SizesAt L)
+    (C CTu : ℝ) (hTu : ∀ u, Real.log ((D.mem u).A.T : ℝ) ≤ CTu * D.R.m * L.sc.L)
+    (h : LocalQuadraticParts.FrobeniusExpansionCongruence L C)
+    (u : D.what₂.Word)
+    : ((D.fm u).lat 0).muMax ≤ |C| * (12 + 2 * |CTu|) * szPol L ^ 4 * L.sc.b := by
   obtain ⟨hN, -, hK, -, -, -, hQD, hTT, -, -, -, -, -, -, -, -, hDel, -, -, -, -, -, -⟩ := hS
   have hP := one_le_szPol L
   have hb := one_le_b L
@@ -67,7 +71,9 @@ theorem muMax_le_pol {D : D7} (L : SizeData₂ D) (hS : SizesAt L) (C CTu : ℝ)
       mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right (le_abs_self _) hm0) hL0
     have e2 : (D.R.m : ℝ) * L.sc.L ≤ szPol L * szPol L := mul_le_mul hmP hLP hL0 hP0
     have e3 := mul_le_mul_of_nonneg_left e2 (abs_nonneg CTu)
-    calc CTu * D.R.m * L.sc.L ≤ |CTu| * D.R.m * L.sc.L := e1
+    calc
+      CTu * D.R.m * L.sc.L
+        ≤ |CTu| * D.R.m * L.sc.L := e1
       _ = |CTu| * ((D.R.m : ℝ) * L.sc.L) := by ring
       _ ≤ _ := e3
   have hc0 := abs_nonneg CTu
@@ -76,56 +82,85 @@ theorem muMax_le_pol {D : D7} (L : SizeData₂ D) (hS : SizesAt L) (C CTu : ℝ)
     have hk5 : 5 ≤ D.R.k := by have := D.R.m_add_three_le_k; have := D.R.two_le_m; omega
     have hkR : (5 : ℝ) ≤ D.R.k := by exact_mod_cast hk5
     have hv : D.host.v = D.host.rdE / 2 := rfl
-    rw [hv]; nlinarith
+    rw [hv]
+    nlinarith
 
-  have q1 : LocalQuadraticParts.nTT D * L.sc.a * lkv ≤ szPol L * (szPol L * L.sc.b) * (3 * szPol L) :=
+  have q1
+      : LocalQuadraticParts.nTT D * L.sc.a * lkv ≤ szPol L * (szPol L * L.sc.b) * (3 * szPol L) :=
     mul_le_mul (mul_le_mul hTP haP ha0 hP0) hlkv hlkv0 (by positivity)
   have q2a : (D.R.k : ℝ) * lkv + lT ≤ szPol L * (3 * szPol L) + |CTu| * (szPol L * szPol L) :=
     add_le_add (mul_le_mul hkP hlkv hlkv0 hP0) hlTP
   have q2b : L.sc.b' + L.Sc ≤ 2 * (szPol L * L.sc.b) := by linarith
-  have q2 : (D.R.f : ℝ) * (L.sc.b' + L.Sc) * ((D.R.k : ℝ) * lkv + lT) ≤
-      szPol L * (2 * (szPol L * L.sc.b)) * (szPol L * (3 * szPol L) + |CTu| * (szPol L * szPol L)) :=
+  have q2
+      : (D.R.f : ℝ) * (L.sc.b' + L.Sc) * ((D.R.k : ℝ) * lkv + lT)
+        ≤ szPol L * (2 * (szPol L * L.sc.b))
+          * (szPol L * (3 * szPol L) + |CTu| * (szPol L * szPol L)) :=
     mul_le_mul (mul_le_mul hfP q2b (by linarith) hP0) q2a (by positivity) (by positivity)
   have q3 : (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * L.sc.L ≤ szPol L * szPol L ^ 2 * szPol L :=
-    mul_le_mul (mul_le_mul hfP (pow_le_pow_left₀ hk0 hkP 2) (by positivity) hP0) hLP hL0 (by positivity)
+    mul_le_mul (mul_le_mul hfP (pow_le_pow_left₀ hk0 hkP 2) (by positivity) hP0) hLP hL0
+      (by positivity)
   have q10 : 0 ≤ LocalQuadraticParts.nTT D * L.sc.a * lkv := by positivity
   have q20 : 0 ≤ (D.R.f : ℝ) * (L.sc.b' + L.Sc) * ((D.R.k : ℝ) * lkv + lT) := by positivity
   have q30 : 0 ≤ (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * L.sc.L := by positivity
-  have hsum : LocalQuadraticParts.nTT D * L.sc.a * lkv + (D.R.f : ℝ) * (L.sc.b' + L.Sc) * ((D.R.k : ℝ) * lkv + lT) +
-      (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * L.sc.L ≤ (12 + 2 * |CTu|) * szPol L ^ 4 * L.sc.b := by
+  have hsum
+      : LocalQuadraticParts.nTT D * L.sc.a * lkv
+          + (D.R.f : ℝ) * (L.sc.b' + L.Sc) * ((D.R.k : ℝ) * lkv + lT)
+          + (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * L.sc.L
+        ≤ (12 + 2 * |CTu|) * szPol L ^ 4 * L.sc.b := by
     have p34 : szPol L ^ 3 * L.sc.b ≤ szPol L ^ 4 * L.sc.b :=
       mul_le_mul_of_nonneg_right (pow_mono_P (L := L) (by norm_num)) hb0
     have p4 : szPol L ^ 4 ≤ szPol L ^ 4 * L.sc.b := le_mul_of_one_le_right (by positivity) hb
     have r1 : szPol L * (szPol L * L.sc.b) * (3 * szPol L) = 3 * (szPol L ^ 3 * L.sc.b) := by ring
-    have r2 : szPol L * (2 * (szPol L * L.sc.b)) * (szPol L * (3 * szPol L) + |CTu| * (szPol L * szPol L)) =
-        (6 + 2 * |CTu|) * (szPol L ^ 4 * L.sc.b) := by ring
+    have r2
+        : szPol L * (2 * (szPol L * L.sc.b))
+            * (szPol L * (3 * szPol L) + |CTu| * (szPol L * szPol L))
+          = (6 + 2 * |CTu|) * (szPol L ^ 4 * L.sc.b) := by
+      ring
     have r3 : szPol L * szPol L ^ 2 * szPol L = szPol L ^ 4 := by ring
-    rw [r1] at q1; rw [r2] at q2; rw [r3] at q3
-    have : (12 + 2 * |CTu|) * szPol L ^ 4 * L.sc.b =
-        3 * (szPol L ^ 4 * L.sc.b) + (6 + 2 * |CTu|) * (szPol L ^ 4 * L.sc.b) + 3 * (szPol L ^ 4 * L.sc.b) := by ring
+    rw [r1] at q1
+    rw [r2] at q2
+    rw [r3] at q3
+    have : (12 + 2 * |CTu|) * szPol L ^ 4 * L.sc.b
+        = 3 * (szPol L ^ 4 * L.sc.b) + (6 + 2 * |CTu|) * (szPol L ^ 4 * L.sc.b)
+          + 3 * (szPol L ^ 4 * L.sc.b) := by
+      ring
     have p40 : 0 ≤ szPol L ^ 4 * L.sc.b := by positivity
     linarith
   have h2 := (h u).2
-  have e : C * LocalQuadraticParts.nTT D * L.sc.a * lkv + C * D.R.f * (L.sc.b' + L.Sc) * (D.R.k * lkv + lT) +
-      C * D.R.f * (D.R.k : ℝ) ^ 2 * L.sc.L =
-      C * (LocalQuadraticParts.nTT D * L.sc.a * lkv + (D.R.f : ℝ) * (L.sc.b' + L.Sc) * ((D.R.k : ℝ) * lkv + lT) +
-      (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * L.sc.L) := by ring
+  have e
+      : C * LocalQuadraticParts.nTT D * L.sc.a * lkv
+          + C * D.R.f * (L.sc.b' + L.Sc) * (D.R.k * lkv + lT) + C * D.R.f * (D.R.k : ℝ) ^ 2 * L.sc.L
+        = C
+          * (LocalQuadraticParts.nTT D * L.sc.a * lkv
+            + (D.R.f : ℝ) * (L.sc.b' + L.Sc) * ((D.R.k : ℝ) * lkv + lT)
+            + (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * L.sc.L) := by
+    ring
   rw [e] at h2
   refine h2.trans ?_
-  calc C * (LocalQuadraticParts.nTT D * L.sc.a * lkv + (D.R.f : ℝ) * (L.sc.b' + L.Sc) * ((D.R.k : ℝ) * lkv + lT) +
-        (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * L.sc.L)
-      ≤ |C| * (LocalQuadraticParts.nTT D * L.sc.a * lkv + (D.R.f : ℝ) * (L.sc.b' + L.Sc) * ((D.R.k : ℝ) * lkv + lT) +
-        (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * L.sc.L) := mul_le_mul_of_nonneg_right (le_abs_self _) (by linarith)
-    _ ≤ |C| * ((12 + 2 * |CTu|) * szPol L ^ 4 * L.sc.b) := mul_le_mul_of_nonneg_left hsum (abs_nonneg _)
+  calc
+    C * (LocalQuadraticParts.nTT D * L.sc.a * lkv
+          + (D.R.f : ℝ) * (L.sc.b' + L.Sc) * ((D.R.k : ℝ) * lkv + lT)
+          + (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * L.sc.L)
+        ≤ |C|
+          * (LocalQuadraticParts.nTT D * L.sc.a * lkv
+            + (D.R.f : ℝ) * (L.sc.b' + L.Sc) * ((D.R.k : ℝ) * lkv + lT)
+            + (D.R.f : ℝ) * (D.R.k : ℝ) ^ 2 * L.sc.L) :=
+      mul_le_mul_of_nonneg_right (le_abs_self _) (by linarith)
+    _ ≤ |C| * ((12 + 2 * |CTu|) * szPol L ^ 4 * L.sc.b) :=
+      mul_le_mul_of_nonneg_left hsum (abs_nonneg _)
     _ = |C| * (12 + 2 * |CTu|) * szPol L ^ 4 * L.sc.b := by ring
 
 def EbMu (l : List ℝ) : ℝ := 4 * (max (l.headD 0) 5 + 3) + 1
 
 def BoundB {eps : ℝ} (Fm : FamP eps) (Eb : List ℝ → ℝ) : Prop :=
-  ∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ (i : Fm.Ix x) u,
-    (((Fm.D x i).fm u).lat 0).muMax ≤ (Fm.L x i).sc.x ^ Eb Fm.cOut * (Fm.L x i).sc.b
+  ∃ x0 : ℝ, ∀ x ≥ x0,
+    Fm.x1 < x
+      → ∀ (i : Fm.Ix x) u,
+        (((Fm.D x i).fm u).lat 0).muMax ≤ (Fm.L x i).sc.x ^ Eb Fm.cOut * (Fm.L x i).sc.b
 
-theorem boundB_of_slopes {eps : ℝ} (Fm : FamP eps) (hT : TuSize Fm) (h : LocalQuadraticParts.SlopesFamily Fm) : BoundB Fm EbMu := by
+theorem boundB_of_slopes
+    {eps : ℝ} (Fm : FamP eps) (hT : TuSize Fm) (h : LocalQuadraticParts.SlopesFamily Fm)
+    : BoundB Fm EbMu := by
   obtain ⟨C, xa, h⟩ := h
   obtain ⟨xt, hT⟩ := hT
   refine ⟨max (max xa xt) (max 9 (|C| * (12 + 2 * |Fm.CTu|))), fun x hx hx1 i u => ?_⟩
@@ -141,13 +176,21 @@ theorem boundB_of_slopes {eps : ℝ} (Fm : FamP eps) (hT : TuSize Fm) (h : Local
   rw [hE]
   exact h1.trans h2
 
-theorem slopes_of_values {eps : ℝ} (Fm : FamP eps) (hT : TuSize Fm)
-    (hCV : ∃ x0 : ℝ, ∀ x ≥ x0, ∀ (i : Fm.Ix x) u, Nonempty (flipTwoThree.ColVal (Fm.D x i) u)) : LocalQuadraticParts.SlopesFamily Fm :=
-  J.slopes_family_of_column_values Fm hT (top2c2_dlSize eps Fm) (flipTwoThree.familySlopeLower_of_open Fm (Formalism.L2.GlobalTheoryTheory.TraceIntegrality.lower_slope_inequality_family Fm))
-    (flipTwoThree.familySlopeMax_of_open Fm 4 (Formalism.L2.GlobalTheoryTheory.TraceIntegrality.slope_inequality_family_four Fm)) hCV
+theorem slopes_of_values
+    {eps : ℝ} (Fm : FamP eps) (hT : TuSize Fm)
+    (hCV : ∃ x0 : ℝ, ∀ x ≥ x0, ∀ (i : Fm.Ix x) u, Nonempty (flipTwoThree.ColVal (Fm.D x i) u))
+    : LocalQuadraticParts.SlopesFamily Fm :=
+  J.slopes_family_of_column_values Fm hT (top2c2_dlSize eps Fm)
+    (flipTwoThree.familySlopeLower_of_open Fm
+      (Formalism.L2.GlobalTheoryTheory.TraceIntegrality.lower_slope_inequality_family Fm))
+    (flipTwoThree.familySlopeMax_of_open Fm 4
+      (Formalism.L2.GlobalTheoryTheory.TraceIntegrality.slope_inequality_family_four Fm))
+    hCV
 
-theorem boundB_of_values {eps : ℝ} (Fm : FamP eps) (hT : TuSize Fm)
-    (hCV : ∃ x0 : ℝ, ∀ x ≥ x0, ∀ (i : Fm.Ix x) u, Nonempty (flipTwoThree.ColVal (Fm.D x i) u)) : BoundB Fm EbMu :=
+theorem boundB_of_values
+    {eps : ℝ} (Fm : FamP eps) (hT : TuSize Fm)
+    (hCV : ∃ x0 : ℝ, ∀ x ≥ x0, ∀ (i : Fm.Ix x) u, Nonempty (flipTwoThree.ColVal (Fm.D x i) u))
+    : BoundB Fm EbMu :=
   boundB_of_slopes Fm hT (slopes_of_values Fm hT hCV)
 
 end Formalism.L2.DIV.SlopeMaxB

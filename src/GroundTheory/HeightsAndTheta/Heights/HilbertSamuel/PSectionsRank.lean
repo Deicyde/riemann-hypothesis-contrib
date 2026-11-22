@@ -12,15 +12,17 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 open scoped Pointwise
 
 noncomputable section
 
 namespace SectionsRank
 
-theorem sec_eq_span (o : Type*) [CommRing o] {Ω : Type*} [CommRing Ω] [Algebra o Ω] {ι : Type*}
-    (x : ι → Ω) (n : ℕ) : sec o x n = Submodule.span o (Set.range x ^ n) := by
+theorem sec_eq_span
+    (o : Type*) [CommRing o] {Ω : Type*} [CommRing Ω] [Algebra o Ω] {ι : Type*} (x : ι → Ω) (n : ℕ)
+    : sec o x n = Submodule.span o (Set.range x ^ n) := by
   unfold sec
   rw [← MvPolynomial.homogeneousSubmodule_one_pow, Submodule.map_pow,
     MvPolynomial.homogeneousSubmodule_one_eq_span_X, Submodule.map_span, ← Set.range_comp,
@@ -29,8 +31,8 @@ theorem sec_eq_span (o : Type*) [CommRing o] {Ω : Type*} [CommRing Ω] [Algebra
   ext i
   simp
 
-theorem exists_int_multiple {ι : Type*} (f : MvPolynomial ι ℚ) :
-    ∃ N : ℕ, 0 < N ∧ ∃ p : MvPolynomial ι ℤ, map (Int.castRingHom ℚ) p = (N : ℚ) • f := by
+theorem exists_int_multiple {ι : Type*} (f : MvPolynomial ι ℚ)
+    : ∃ N : ℕ, 0 < N ∧ ∃ p : MvPolynomial ι ℤ, map (Int.castRingHom ℚ) p = (N : ℚ) • f := by
   induction f using MvPolynomial.induction_on with
   | C q =>
     refine ⟨q.den, q.pos, C q.num, ?_⟩
@@ -50,13 +52,14 @@ theorem exists_int_multiple {ι : Type*} (f : MvPolynomial ι ℚ) :
 
 variable {Ω : Type} [Field Ω] [CharZero Ω] {J : Type}
 
-theorem mem_map_coordIdeal_iff [Fintype J] (x : J → Ω) {n : ℕ} {f : MvPolynomial J ℚ}
-    (hf : f.IsHomogeneous n) :
-    f ∈ (coordIdeal ℤ x).map (MvPolynomial.map (Int.castRingHom ℚ)) ↔ aeval x f = 0 := by
+theorem mem_map_coordIdeal_iff
+    [Fintype J] (x : J → Ω) {n : ℕ} {f : MvPolynomial J ℚ} (hf : f.IsHomogeneous n)
+    : f ∈ (coordIdeal ℤ x).map (MvPolynomial.map (Int.castRingHom ℚ)) ↔ aeval x f = 0 := by
   constructor
   · intro h
-    have hle : (coordIdeal ℤ x).map (MvPolynomial.map (Int.castRingHom ℚ)) ≤
-        RingHom.ker (aeval x : MvPolynomial J ℚ →ₐ[ℚ] Ω) := by
+    have hle
+        : (coordIdeal ℤ x).map (MvPolynomial.map (Int.castRingHom ℚ))
+          ≤ RingHom.ker (aeval x : MvPolynomial J ℚ →ₐ[ℚ] Ω) := by
       rw [Ideal.map_le_iff_le_comap]
       intro p hp
       rw [Ideal.mem_comap, RingHom.mem_ker, ← algebraMap_int_eq]
@@ -73,17 +76,19 @@ theorem mem_map_coordIdeal_iff [Fintype J] (x : J → Ω) {n : ℕ} {f : MvPolyn
         (Submodule.smul_mem _ _ ((mem_homogeneousSubmodule n f).mpr hf))
     have hp0 : aeval x p = 0 := by
       rw [← aeval_map_algebraMap ℚ, algebraMap_int_eq, hp, map_smul, h, smul_zero]
-    have hmem := Ideal.mem_map_of_mem (MvPolynomial.map (Int.castRingHom ℚ))
-      (mem_coordIdeal_of_isHomogeneous ℤ x hpn hp0)
+    have hmem :=
+      Ideal.mem_map_of_mem (MvPolynomial.map (Int.castRingHom ℚ))
+        (mem_coordIdeal_of_isHomogeneous ℤ x hpn hp0)
     rw [hp, smul_eq_C_mul] at hmem
     have hN' : (N : ℚ) ≠ 0 := by exact_mod_cast hN.ne'
     have := Ideal.mul_mem_left _ (C (N : ℚ)⁻¹) hmem
     rwa [← mul_assoc, ← C_mul, inv_mul_cancel₀ hN', C_1, one_mul] at this
 
-theorem finrank_map_eq {K M N N' : Type*} [Field K] [AddCommGroup M] [Module K M]
-    [AddCommGroup N] [Module K N] [AddCommGroup N'] [Module K N'] (V : Submodule K M)
-    (f : M →ₗ[K] N) (g : M →ₗ[K] N') (h : ∀ v ∈ V, f v = 0 ↔ g v = 0) :
-    Module.finrank K (V.map f) = Module.finrank K (V.map g) := by
+theorem finrank_map_eq
+    {K M N N' : Type*} [Field K] [AddCommGroup M] [Module K M] [AddCommGroup N] [Module K N]
+    [AddCommGroup N'] [Module K N']
+    (V : Submodule K M) (f : M →ₗ[K] N) (g : M →ₗ[K] N') (h : ∀ v ∈ V, f v = 0 ↔ g v = 0)
+    : Module.finrank K (V.map f) = Module.finrank K (V.map g) := by
   have ef : V.map f = LinearMap.range (f ∘ₗ V.subtype) := by
     rw [LinearMap.range_comp, Submodule.range_subtype]
   have eg : V.map g = LinearMap.range (g ∘ₗ V.subtype) := by
@@ -95,8 +100,8 @@ theorem finrank_map_eq {K M N N' : Type*} [Field K] [AddCommGroup M] [Module K M
   exact ((f ∘ₗ V.subtype).quotKerEquivRange.symm.trans
     ((Submodule.quotEquivOfEq _ _ hk).trans (g ∘ₗ V.subtype).quotKerEquivRange)).finrank_eq
 
-theorem finrank_sec_int [Fintype J] (x : J → Ω) (n : ℕ) :
-    Module.finrank ℤ (sec ℤ x n) = Module.finrank ℚ (sec ℚ x n) := by
+theorem finrank_sec_int [Fintype J] (x : J → Ω) (n : ℕ)
+    : Module.finrank ℤ (sec ℤ x n) = Module.finrank ℚ (sec ℚ x n) := by
   have : Module.Finite ℤ (sec ℤ x n) := Module.Finite.iff_fg.mpr (sec_fg x n)
   let b := Module.Free.chooseBasis ℤ (sec ℤ x n)
   let v : Module.Free.ChooseBasisIndex ℤ (sec ℤ x n) → Ω := fun i => (b i : Ω)
@@ -104,8 +109,7 @@ theorem finrank_sec_int [Fintype J] (x : J → Ω) (n : ℕ) :
     b.linearIndependent.map' (sec ℤ x n).subtype (Submodule.ker_subtype _)
   have hliQ : LinearIndependent ℚ v := (LinearIndependent.iff_fractionRing ℤ ℚ).mp hli
   have hspanZ : Submodule.span ℤ (Set.range v) = sec ℤ x n := by
-    have : Set.range v = (sec ℤ x n).subtype '' Set.range b := by
-      rw [← Set.range_comp]; rfl
+    have : Set.range v = (sec ℤ x n).subtype '' Set.range b := by rw [← Set.range_comp]; rfl
     rw [this, Submodule.span_image, b.span_eq, Submodule.map_subtype_top]
   have hspanQ : Submodule.span ℚ (Set.range v) = sec ℚ x n := by
     rw [← Submodule.span_span_of_tower ℤ, hspanZ, sec_eq_span ℤ, sec_eq_span ℚ,
@@ -114,27 +118,33 @@ theorem finrank_sec_int [Fintype J] (x : J → Ω) (n : ℕ) :
 
 end SectionsRank
 
-
 open SectionsRank in
 theorem SectionsRank.proof : SectionsRank.Statement := by
   intro Ω _ _ κ _ x n
   set q := (coordIdeal ℤ x).map (MvPolynomial.map (Int.castRingHom ℚ))
-  have hw : GroundTheory.Heights₂.Heights.NumbersDVR.blockWeight (GlobalTheory κ) = fun _ _ => 1 := by
+  have hw
+      : GroundTheory.Heights₂.Heights.NumbersDVR.blockWeight (GlobalTheory κ) = fun _ _ => 1 := by
     funext v u
     simp [GroundTheory.Heights₂.Heights.NumbersDVR.blockWeight]
-  have hV : weightedHomogeneousSubmodule ℚ (GroundTheory.Heights₂.Heights.NumbersDVR.blockWeight (GlobalTheory κ))
-      (fun _ => n) = homogeneousSubmodule (Ix κ) ℚ n := by
+  have hV
+      : weightedHomogeneousSubmodule ℚ
+          (GroundTheory.Heights₂.Heights.NumbersDVR.blockWeight (GlobalTheory κ)) (fun _ => n)
+        = homogeneousSubmodule (Ix κ) ℚ n := by
     ext f
     rw [mem_weightedHomogeneousSubmodule, mem_homogeneousSubmodule, hw]
-    have hwt : ∀ d : Ix κ →₀ ℕ,
-        Finsupp.weight (fun _ _ => (1 : ℕ) : Ix κ → Unit → ℕ) d = fun _ => Finsupp.weight 1 d := by
+    have hwt
+        : ∀ d : Ix κ →₀ ℕ,
+          Finsupp.weight (fun _ _ => (1 : ℕ) : Ix κ → Unit → ℕ) d
+            = fun _ => Finsupp.weight 1 d := by
       intro d
       funext u
       simp [Finsupp.weight_apply, Finsupp.sum, Finset.sum_apply]
     simp only [IsHomogeneous, IsWeightedHomogeneous, hwt, funext_iff, forall_const]
-  have hg : ∀ m : Unit → ℕ, m = (fun _ => n) →
-      GroundTheory.Heights₂.Heights.NumbersDVR.gradedPiece q m =
-        (homogeneousSubmodule (Ix κ) ℚ n).map (Ideal.Quotient.mkₐ ℚ q).toLinearMap := by
+  have hg
+      : ∀ m : Unit → ℕ,
+        m = (fun _ => n)
+          → GroundTheory.Heights₂.Heights.NumbersDVR.gradedPiece q m
+            = (homogeneousSubmodule (Ix κ) ℚ n).map (Ideal.Quotient.mkₐ ℚ q).toLinearMap := by
     rintro m rfl
     unfold GroundTheory.Heights₂.Heights.NumbersDVR.gradedPiece
     rw [hV]

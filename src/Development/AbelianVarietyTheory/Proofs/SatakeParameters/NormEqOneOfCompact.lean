@@ -14,11 +14,15 @@ noncomputable section
 
 namespace GlobalTheory.XiOver
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.RowTie GlobalTheory.SplitRead
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+  GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.RowTie
+  GlobalTheory.SplitRead
 
 section Coeff
 
-variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N) (i : N.Loc)
+variable
+  {R : Ranks} {H : Host R} {what₂ : Rows.Data R} (N : NData R H what₂) (A : NAut N) (i : N.Loc)
 
 theorem norm_iota_le_one (b : N.O i) : ‖iotaOQ N A i b‖ ≤ 1 := by
   obtain ⟨C, hC⟩ := GlobalTheory.CoeffEmbedding.exists_norm_le N A i
@@ -29,8 +33,8 @@ theorem norm_iota_le_one (b : N.O i) : ‖iotaOQ N A i b‖ ≤ 1 := by
   rw [map_pow, norm_pow] at this
   linarith
 
-theorem norm_iota_lt_one {c : N.O i} (hc : c ∈ IsLocalRing.maximalIdeal (N.O i)) :
-    ‖iotaOQ N A i c‖ < 1 := by
+theorem norm_iota_lt_one {c : N.O i} (hc : c ∈ IsLocalRing.maximalIdeal (N.O i))
+    : ‖iotaOQ N A i c‖ < 1 := by
   obtain ⟨e, he⟩ := GlobalTheory.CoeffEmbedding.exists_pow_le_span N A i
   have h1 : c ^ e ∈ Ideal.span {((N.l i : ℕ) : N.O i)} := he (Ideal.pow_mem_pow hc e)
   obtain ⟨b, hb⟩ := Ideal.mem_span_singleton.1 h1
@@ -41,7 +45,8 @@ theorem norm_iota_lt_one {c : N.O i} (hc : c ∈ IsLocalRing.maximalIdeal (N.O i
   rw [not_lt] at h
   have h2 := one_le_pow₀ h (n := e)
   rw [← norm_pow, ← map_pow, hb, map_mul, norm_mul] at h2
-  exact absurd ((mul_le_of_le_one_right (norm_nonneg _) (norm_iota_le_one N A i b)).trans_lt hl) (not_lt.2 h2)
+  exact absurd ((mul_le_of_le_one_right (norm_nonneg _) (norm_iota_le_one N A i b)).trans_lt hl)
+    (not_lt.2 h2)
 
 theorem isUnit_of_norm {c : N.O i} (hc : ‖iotaOQ N A i c‖ = 1) : IsUnit c := by
   by_contra hu
@@ -59,8 +64,9 @@ theorem norm_iota_unit {c : N.O i} (hc : IsUnit c) : ‖iotaOQ N A i c‖ = 1 :=
 theorem iota_inj : Function.Injective (iotaOQ N A i) :=
   (A.iotaQ i).injective.comp (IsFractionRing.injective (N.O i) (FractionRing (N.O i)))
 
-theorem iota_smul (z : ℤ_[N.l i]) (y : N.O i) :
-    iotaOQ N A i (z • y) = algebraMap ℚ_[N.l i] (Qbar (N.l i)) (z : ℚ_[N.l i]) * iotaOQ N A i y := by
+theorem iota_smul (z : ℤ_[N.l i]) (y : N.O i)
+    : iotaOQ N A i (z • y)
+      = algebraMap ℚ_[N.l i] (Qbar (N.l i)) (z : ℚ_[N.l i]) * iotaOQ N A i y := by
   rw [Algebra.smul_def, map_mul]
   congr 1
   exact A.iotaQ_alg i z
@@ -84,7 +90,8 @@ theorem isClosed_range_iota : IsClosed (Set.range (iotaOQ N A i)) := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
       simp only [f, iota_smul]
-      exact Finset.sum_coe_sort s (fun y => algebraMap ℚ_[N.l i] (Qbar (N.l i)) (c y : ℚ_[N.l i]) * iotaOQ N A i y)
+      exact Finset.sum_coe_sort s
+        (fun y => algebraMap ℚ_[N.l i] (Qbar (N.l i)) (c y : ℚ_[N.l i]) * iotaOQ N A i y)
     · rintro ⟨c, rfl⟩
       refine ⟨∑ y : s, c y • (y : N.O i), ?_⟩
       set_option synthInstance.maxHeartbeats 100000 in
@@ -93,8 +100,8 @@ theorem isClosed_range_iota : IsClosed (Set.range (iotaOQ N A i)) := by
   rw [hr]
   exact (isCompact_range hf).isClosed
 
-theorem mem_range_of_norm {x : FractionRing (N.O i)} (hx : ‖A.iotaQ i x‖ = 1) :
-    A.iotaQ i x ∈ Set.range (iotaOQ N A i) := by
+theorem mem_range_of_norm {x : FractionRing (N.O i)} (hx : ‖A.iotaQ i x‖ = 1)
+    : A.iotaQ i x ∈ Set.range (iotaOQ N A i) := by
   have hx0 : x ≠ 0 := by
     rintro rfl
     simp at hx
@@ -107,14 +114,20 @@ theorem mem_range_of_norm {x : FractionRing (N.O i)} (hx : ‖A.iotaQ i x‖ = 1
     refine ⟨((u⁻¹ : (N.O i)ˣ) : N.O i), ?_⟩
     show A.iotaQ i (algebraMap _ _ _) = _
     congr 1
-    have h2 : algebraMap (N.O i) (FractionRing (N.O i)) (u : N.O i) * algebraMap (N.O i) (FractionRing (N.O i)) ((u⁻¹ : (N.O i)ˣ) : N.O i) = 1 := by
+    have h2
+        : algebraMap (N.O i) (FractionRing (N.O i)) (u : N.O i)
+            * algebraMap (N.O i) (FractionRing (N.O i)) ((u⁻¹ : (N.O i)ˣ) : N.O i)
+          = 1 := by
       rw [← map_mul, Units.mul_inv, map_one]
     rw [hc] at h2
     field_simp at h2
     exact h2
 
-theorem norm_eq_one_of_compact {Γ k : Type} [Group Γ] [TopologicalSpace Γ] [CompactSpace Γ] [NormedField k]
-    (d : Γ →* k) (hd : Continuous d) (g : Γ) : ‖d g‖ = 1 := by
+theorem norm_eq_one_of_compact
+    {Γ k : Type} [Group Γ] [TopologicalSpace Γ] [CompactSpace Γ] [NormedField k]
+    (d : Γ →* k) (hd : Continuous d)
+    (g : Γ)
+    : ‖d g‖ = 1 := by
   obtain ⟨C, hC⟩ := (isCompact_range (continuous_norm.comp hd)).bddAbove
   have hle : ∀ g, ‖d g‖ ≤ 1 := by
     intro g
@@ -125,11 +138,15 @@ theorem norm_eq_one_of_compact {Γ k : Type} [Group Γ] [TopologicalSpace Γ] [C
     rw [map_pow, norm_pow] at this
     linarith
   have h1 : ‖d g‖ * ‖d g⁻¹‖ = 1 := by rw [← norm_mul, ← map_mul, mul_inv_cancel, map_one, norm_one]
-  have := hle g; have := hle g⁻¹; have := norm_nonneg (d g); have := norm_nonneg (d g⁻¹)
+  have := hle g
+  have := hle g⁻¹
+  have := norm_nonneg (d g)
+  have := norm_nonneg (d g⁻¹)
   nlinarith
 
-theorem mem_pow_of_norm_lt (k : ℕ) : ∃ δ : ℝ, 0 < δ ∧ ∀ y : N.O i, ‖iotaOQ N A i y‖ < δ →
-    y ∈ IsLocalRing.maximalIdeal (N.O i) ^ k := by
+theorem mem_pow_of_norm_lt (k : ℕ)
+    : ∃ δ : ℝ,
+      0 < δ ∧ ∀ y : N.O i, ‖iotaOQ N A i y‖ < δ → y ∈ IsLocalRing.maximalIdeal (N.O i) ^ k := by
   obtain ⟨p, hp⟩ := IsDiscreteValuationRing.exists_irreducible (N.O i)
   have hp0 : iotaOQ N A i p ≠ 0 := by
     intro h
@@ -140,8 +157,8 @@ theorem mem_pow_of_norm_lt (k : ℕ) : ∃ δ : ℝ, 0 < δ ∧ ∀ y : N.O i, �
   · exact zero_mem _
   obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hy0 hp
   rw [map_mul, norm_mul, norm_iota_unit N A i u.isUnit, one_mul, map_pow, norm_pow] at hy
-  have hlt : ‖iotaOQ N A i p‖ < 1 := norm_iota_lt_one N A i (by
-    rw [hp.maximalIdeal_eq]; exact Ideal.mem_span_singleton_self p)
+  have hlt : ‖iotaOQ N A i p‖ < 1 :=
+    norm_iota_lt_one N A i (by rw [hp.maximalIdeal_eq]; exact Ideal.mem_span_singleton_self p)
   have hkn : k ≤ n := by
     by_contra h
     rw [not_le] at h
@@ -149,27 +166,32 @@ theorem mem_pow_of_norm_lt (k : ℕ) : ∃ δ : ℝ, 0 < δ ∧ ∀ y : N.O i, �
   rw [hp.maximalIdeal_eq, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
   exact (pow_dvd_pow p hkn).mul_left _
 
-theorem exists_integral_char (d : G H.E N.Om →* Qbar (N.l i)) (hd : Continuous d) (S : Set (G H.E N.Om))
-    (hS : closure S = Set.univ) (hv : ∀ σ ∈ S, d σ ∈ Set.range (A.iotaQ i)) :
-    ∃ ξ : G H.E N.Om →* (N.O i)ˣ, Continuous (fun g => ((ξ g : (N.O i)ˣ) : N.O i)) ∧
-      ∀ g, iotaOQ N A i ((ξ g : (N.O i)ˣ) : N.O i) = d g := by
+theorem exists_integral_char
+    (d : G H.E N.Om →* Qbar (N.l i)) (hd : Continuous d)
+    (S : Set (G H.E N.Om)) (hS : closure S = Set.univ) (hv : ∀ σ ∈ S, d σ ∈ Set.range (A.iotaQ i))
+    : ∃ ξ : G H.E N.Om →* (N.O i)ˣ,
+      Continuous (fun g => ((ξ g : (N.O i)ˣ) : N.O i))
+        ∧ ∀ g, iotaOQ N A i ((ξ g : (N.O i)ˣ) : N.O i) = d g := by
   have : IsGalois H.E N.Om := {}
   have hn := norm_eq_one_of_compact d hd
   have hinj := iota_inj N A i
   have hall : ∀ g, d g ∈ Set.range (iotaOQ N A i) := by
     have hsub : closure S ⊆ d ⁻¹' Set.range (iotaOQ N A i) :=
-      closure_minimal (fun σ hσ => by
-        obtain ⟨x, hx⟩ := hv σ hσ
-        have := mem_range_of_norm N A i (x := x) (by rw [hx]; exact hn σ)
-        rw [hx] at this
-        exact this) ((isClosed_range_iota N A i).preimage hd)
+      closure_minimal
+        (fun σ hσ => by
+          obtain ⟨x, hx⟩ := hv σ hσ
+          have := mem_range_of_norm N A i (x := x) (by rw [hx]; exact hn σ)
+          rw [hx] at this
+          exact this)
+        ((isClosed_range_iota N A i).preimage hd)
     intro g
     exact hsub (hS ▸ Set.mem_univ g)
   choose u hu using hall
-  let ξ0 : G H.E N.Om →* N.O i :=
-    { toFun := u
-      map_one' := hinj (by rw [hu, map_one, map_one])
-      map_mul' := fun a b => hinj (by rw [hu, map_mul, map_mul, hu, hu]) }
+  let ξ0 : G H.E N.Om →* N.O i := {
+    toFun := u
+    map_one' := hinj (by rw [hu, map_one, map_one])
+    map_mul' := fun a b => hinj (by rw [hu, map_mul, map_mul, hu, hu])
+  }
   refine ⟨ξ0.toHomUnits, ?_, fun g => ?_⟩
   · have hval : (fun g => ((ξ0.toHomUnits g : (N.O i)ˣ) : N.O i)) = u := funext fun g => rfl
     rw [hval, continuous_iff_continuousAt]
@@ -193,8 +215,11 @@ section Main
 
 open Formalism.L2.Host
 
-theorem inf_int (D : D7) (hA : Formalism.MainNotions.SumRepresentations.At.TieAut D.nd D.naut) (τ : D.host.E →+* ℂ) (z : ℂ)
-    (hz : z ∈ D.naut.infG D.naut.etaTinv τ) : ∃ k : ℤ, z + ((-(D.R.t : ℝ) / 2 : ℝ) : ℂ) = (k : ℂ) := by
+theorem inf_int
+    (D : D7)
+    (hA : Formalism.MainNotions.SumRepresentations.At.TieAut D.nd D.naut) (τ : D.host.E →+* ℂ)
+    (z : ℂ) (hz : z ∈ D.naut.infG D.naut.etaTinv τ)
+    : ∃ k : ℤ, z + ((-(D.R.t : ℝ) / 2 : ℝ) : ℂ) = (k : ℂ) := by
   obtain ⟨v, hv⟩ := D.R.t_odd
   have hs : ((-(D.R.t : ℝ) / 2 : ℝ) : ℂ) = -(v : ℂ) - 1 / 2 := by
     rw [hv]
@@ -212,10 +237,12 @@ theorem inf_int (D : D7) (hA : Formalism.MainNotions.SumRepresentations.At.TieAu
     subst hz
     exact ⟨-(v : ℤ), by rw [hs]; push_cast; ring⟩
 
-theorem frob_value (D : D7) (C : CharFrame D) (nch : NChoice D) (Tp : TupTied D C nch)
-    (T : NCharTied D C nch Tp) (V : ValLL0 D C) (w : PlE D.host) :
-    ∃ x : D.what₂.LL, D.naut.frobEig (D.naut.lpTw (D.naut.locG D.naut.etaTinv w) (-(D.R.t : ℝ) / 2)) =
-      {D.what₂.embLL x} := by
+theorem frob_value
+    (D : D7) (C : CharFrame D) (nch : NChoice D) (Tp : TupTied D C nch)
+    (T : NCharTied D C nch Tp) (V : ValLL0 D C) (w : PlE D.host)
+    : ∃ x : D.what₂.LL,
+      D.naut.frobEig (D.naut.lpTw (D.naut.locG D.naut.etaTinv w) (-(D.R.t : ℝ) / 2))
+        = {D.what₂.embLL x} := by
   obtain ⟨v, hv⟩ := D.R.t_odd
   have hu := (D.naut.etaTinv_def w).1
   have hU := (T.unr_iff _ w).1 hu
@@ -228,8 +255,9 @@ theorem frob_value (D : D7) (C : CharFrame D) (nch : NChoice D) (Tp : TupTied D 
     exact Nat.cast_ne_zero.2 Nat.card_pos.ne'
   have hn : (Ideal.absNorm w.asIdeal : ℕ) = normV w := by
     simp [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply]
-  have hy' : D.what₂.embLL (y : D.what₂.LL) =
-      ((C.eta.val w : ℂˣ) : ℂ) * ((normV w : ℕ) : ℂ) ^ (-(((1 / 2 : ℝ)) : ℂ)) := by
+  have hy'
+      : D.what₂.embLL (y : D.what₂.LL)
+        = ((C.eta.val w : ℂˣ) : ℂ) * ((normV w : ℕ) : ℂ) ^ (-(((1 / 2 : ℝ)) : ℂ)) := by
     have e : D.what₂.embLL (y : D.what₂.LL) = C.eta.valTw (1 / 2) w := hy
     rw [e, HChar.valTw, hn]
   refine ⟨(y : D.what₂.LL) * (((normV w : ℕ) : D.what₂.LL)⁻¹) ^ v, ?_⟩

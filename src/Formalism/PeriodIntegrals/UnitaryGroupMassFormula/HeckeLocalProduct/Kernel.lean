@@ -8,21 +8,35 @@ public import Lemmata.MiscLemmasM.Imports
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host RestrictedProduct Topology
+open NumberField IsDedekindDomain Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host
+  RestrictedProduct Topology
 
 namespace PI.HeckeProdW
 
 theorem no_small (z : ℂ) (h : ∀ n : ℕ, ‖z ^ n - 1‖ < 1 / 2) : z = 1 := by
-  first | exact Bl.SecondBlockLemmaN.goal1 .. | (apply Bl.SecondBlockLemmaN.goal1 <;> assumption) | (intros; apply Bl.SecondBlockLemmaN.goal1 <;> assumption) | (apply @Bl.SecondBlockLemmaN.goal1 <;> assumption) | (intros; apply @Bl.SecondBlockLemmaN.goal1 <;> assumption) | (apply @Bl.SecondBlockLemmaN.goal1 <;> first | assumption | infer_instance) | exact @Bl.SecondBlockLemmaN.goal1 z h | exact @Bl.SecondBlockLemmaN.goal1 z
+  first
+  | exact Bl.SecondBlockLemmaN.goal1 ..
+  | (apply Bl.SecondBlockLemmaN.goal1 <;> assumption)
+  | (intros; apply Bl.SecondBlockLemmaN.goal1 <;> assumption)
+  | (apply @Bl.SecondBlockLemmaN.goal1 <;> assumption)
+  | (intros; apply @Bl.SecondBlockLemmaN.goal1 <;> assumption)
+  | (apply @Bl.SecondBlockLemmaN.goal1 <;> first | assumption | infer_instance)
+  | exact @Bl.SecondBlockLemmaN.goal1 z h
+  | exact @Bl.SecondBlockLemmaN.goal1 z
 
 variable (L : Type) [Field L] [NumberField L]
 
 abbrev Pu : Type := (v : HeightOneSpectrum (𝓞 L)) → (v.adicCompletionIntegers L)ˣ
 
 def gI : ((v : HeightOneSpectrum (𝓞 L)) → v.adicCompletionIntegers L) →* AdeleRing (𝓞 L) L where
-  toFun x := ((1 : InfiniteAdeleRing L),
-    (structureMap (fun v : HeightOneSpectrum (𝓞 L) => v.adicCompletion L)
-      (fun v => v.adicCompletionIntegers L) Filter.cofinite x : FiniteAdeleRing (𝓞 L) L))
+  toFun x := (
+    (1 : InfiniteAdeleRing L),
+    (structureMap
+        (fun v : HeightOneSpectrum (𝓞 L) => v.adicCompletion L)
+        (fun v => v.adicCompletionIntegers L)
+        Filter.cofinite x
+      : FiniteAdeleRing (𝓞 L) L)
+  )
   map_one' := rfl
   map_mul' _ _ := Prod.ext (mul_one 1).symm rfl
 
@@ -33,18 +47,20 @@ theorem gI_cont : Continuous (gI L) := by
   exact continuous_const.prodMk isEmbedding_structureMap.continuous
 
 def Phi : Pu L →* Ideles L :=
-  (Units.map (gI L)).comp (MulEquiv.piUnits (M := fun v : HeightOneSpectrum (𝓞 L) =>
-    v.adicCompletionIntegers L)).symm.toMonoidHom
+  (Units.map (gI L)).comp
+    (MulEquiv.piUnits
+      (M := fun v : HeightOneSpectrum (𝓞 L) => v.adicCompletionIntegers L)).symm.toMonoidHom
 
 theorem Phi_cont : Continuous (Phi L) :=
   (Continuous.units_map _ (gI_cont L)).comp
-    (ContinuousMulEquiv.piUnits (M := fun v : HeightOneSpectrum (𝓞 L) =>
-      v.adicCompletionIntegers L)).symm.continuous
+    (ContinuousMulEquiv.piUnits
+      (M := fun v : HeightOneSpectrum (𝓞 L) => v.adicCompletionIntegers L)).symm.continuous
 
 variable {L}
 
-theorem exists_strictHenselian_absolutely_closed_local_ring (χ : HChar L) : ∃ T : Finset (HeightOneSpectrum (𝓞 L)),
-    ∀ y : Pu L, (∀ v ∈ T, y v = 1) → χ.1 (Phi L y) = 1 := by
+theorem exists_strictHenselian_absolutely_closed_local_ring (χ : HChar L)
+    : ∃ T : Finset (HeightOneSpectrum (𝓞 L)), ∀ y : Pu L,
+      (∀ v ∈ T, y v = 1) → χ.1 (Phi L y) = 1 := by
   set W : Set ℂˣ := {z | ‖(z : ℂ) - 1‖ < 1 / 2} with hWdef
   have hW : IsOpen W :=
     isOpen_lt (continuous_norm.comp (Units.continuous_val.sub continuous_const)) continuous_const

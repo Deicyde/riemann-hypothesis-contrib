@@ -12,12 +12,20 @@ open Formalism.AUTREP (GAf)
 
 namespace GlobalTheory.LocRelIndex
 
-theorem main : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (s : SplitPlace L) (J : Subgroup (GAf L n)) (H : Subgroup (GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L)))), (∀ κ, TrivOutside {s.v} κ → (κ ∈ J ↔ s.loc n κ ∈ H)) → J.relIndex (GlobalTheory.HeckeScalarSph.locK n s.v) = H.relIndex (Formalism.UG.GLint (Fin n) (s.v.adicCompletionIntegers (maximalRealSubfield L)).toSubring) := by
+theorem main
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (s : SplitPlace L)
+        (J : Subgroup (GAf L n))
+        (H : Subgroup (GL (Fin n) (s.v.adicCompletion (maximalRealSubfield L)))),
+      (∀ κ, TrivOutside {s.v} κ → (κ ∈ J ↔ s.loc n κ ∈ H))
+        → J.relIndex (GlobalTheory.HeckeScalarSph.locK n s.v)
+          = H.relIndex (Formalism.UG.GLint (Fin n)
+            (s.v.adicCompletionIntegers (maximalRealSubfield L)).toSubring) := by
   intro L _ _ _ n s J H hJH
   set K := GlobalTheory.HeckeScalarSph.locK (L := L) n s.v with hK
   set O := Formalism.UG.GLint (Fin n) (s.v.adicCompletionIntegers (maximalRealSubfield L)).toSubring with hO
   let φ : K →* O :=
-    ((s.loc n).comp K.subtype).codRestrict O (fun κ => (GlobalTheory.HeckeScalarSph.loc_mem_GLint_iff s κ.2.2).2 κ.2.1)
+    ((s.loc n).comp K.subtype).codRestrict O
+      (fun κ => (GlobalTheory.HeckeScalarSph.loc_mem_GLint_iff s κ.2.2).2 κ.2.1)
   have hsurj : Function.Surjective φ := by
     intro A
     obtain ⟨x, hx, -⟩ := (GlobalTheory.T.unitaryFiniteAdeles_splitPlace_decomposition L n s).2.2 A.1

@@ -15,11 +15,26 @@ public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.BddSecCu
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up GlobalTheory.RunIn GlobalTheory.Shares
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps
+  Formalism.MainNotions.Gaps.EtaleWeightGaps Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  GlobalTheory.RunIn GlobalTheory.Shares
 
 namespace GlobalTheory.Shares
 
-theorem rdOnto_rec : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2 → ∀ (D : D7) (T : Top D) (h : LawsP T) (j : ℕ) (hj : InR D j) , LawsSh T → GamAt T.toCore → 0 < badN D → (∀ j, InR D j → ∀ k k', ((T.U j T.σ₀).X k).Gm = ((T.U j T.σ₀).X k').Gm ∧ ((T.U j T.σ₀).X k).ξ0 = ((T.U j T.σ₀).X k').ξ0) → ∀ u : WeightFamilies.Wt D j, 8 * D.R.f * D.R.r + 4 ≤ u.n → LastPos (T.Q.Dw j) (wtA u) → RdOnto h j u := by
+theorem rdOnto_rec
+    : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2
+      → ∀ (D : D7) (T : Top D) (h : LawsP T) (j : ℕ) (hj : InR D j),
+        LawsSh T → GamAt T.toCore → 0 < badN D
+          → (∀ j,
+            InR D j
+              → ∀ k k',
+                ((T.U j T.σ₀).X k).Gm = ((T.U j T.σ₀).X k').Gm
+                  ∧ ((T.U j T.σ₀).X k).ξ0 = ((T.U j T.σ₀).X k').ξ0)
+          → ∀ u : WeightFamilies.Wt D j,
+            8 * D.R.f * D.R.r + 4 ≤ u.n → LastPos (T.Q.Dw j) (wtA u) → RdOnto h j u := by
   intro hCI D T h j hj hSh hGam hbad hX u hu hLast f hf
   have hcu : ∀ g ∈ T.sh j u, ∃ F : (recB h.toLawsCore).Cusp j u, F.1 = g := by
     intro g hg
@@ -27,7 +42,9 @@ theorem rdOnto_rec : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2
     have hC := hSh.shCusp j hj (wtA u) u.n (dom_wtA u) hLast (dom_wtA u) hLast hg
     unfold cutR
     exact Submodule.mem_inf.2 ⟨hC, (Submodule.mem_iInf _).2 fun hn => absurd hj hn⟩
-  have hspan := GlobalTheory.T.holomorphicCuspForms_frames_le_span_shortThetaReadings hCI D T h.toLawsCore.toLawsM hSh hGam hbad hX j hj u hu
+  have hspan :=
+    GlobalTheory.T.holomorphicCuspForms_frames_le_span_shortThetaReadings hCI D T
+      h.toLawsCore.toLawsM hSh hGam hbad hX j hj u hu
   classical
   let f0 := fun (k : (T.U j T.σ₀).Comp) (x : Frame ((T.U j T.σ₀).X k).Ψ D.R.r) =>
     if x ∈ ((T.U j T.σ₀).X k).dom then f k x else 0

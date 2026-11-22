@@ -9,7 +9,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsDe
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -20,18 +21,20 @@ namespace ExistsNonSplitPlace
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem mem_of_not_isSplitAt {Sec : Set (Pl E)} (hS : IsSection Sec) {w : Pl E} (hw : ¬ IsSplitAt w) :
-    w ∈ Sec := by
+theorem mem_of_not_isSplitAt {Sec : Set (Pl E)} (hS : IsSection Sec) {w : Pl E} (hw : ¬ IsSplitAt w)
+    : w ∈ Sec := by
   obtain ⟨u, ⟨hu, hue⟩, -⟩ := hS w
   by_cases h : u = w
   · exact h ▸ hu
   · exact absurd ⟨u, h, hue⟩ hw
 
-theorem exists_not_isSplitAt (B : Set (Pl E)) (hB : B.Finite) : ∃ w : Pl E, w ∉ B ∧ ¬ IsSplitAt w := by
+theorem exists_not_isSplitAt (B : Set (Pl E)) (hB : B.Finite)
+    : ∃ w : Pl E, w ∉ B ∧ ¬ IsSplitAt w := by
   set F := maximalRealSubfield E
   have h2 : Module.finrank F E = 2 := Algebra.IsQuadraticExtension.finrank_eq_two F E
-  obtain ⟨v, -, hvB, hv⟩ := GlobalTheory.CompanionTheory.Density.exists_degreeOnePrime_not_splitsCompletely F F E
-    (by omega) ((fun w : Pl E => w.under (𝓞 F)) '' B) (hB.image _)
+  obtain ⟨v, -, hvB, hv⟩ :=
+    GlobalTheory.CompanionTheory.Density.exists_degreeOnePrime_not_splitsCompletely F F E (by omega)
+      ((fun w : Pl E => w.under (𝓞 F)) '' B) (hB.image _)
   haveI := v.isMaximal
   obtain ⟨⟨P, hP⟩⟩ := v.asIdeal.nonempty_primesOver (S := 𝓞 E)
   have hP0 : P ≠ ⊥ := Ideal.ne_bot_of_mem_primesOver v.ne_bot hP
@@ -65,8 +68,9 @@ theorem inertPlaceEx : InertPlaceEx := by
   intro E _ _ _ _ n π hπ Sec hS X
   have hfin : {w : Pl E | ¬ IsUnramU π w}.Finite :=
     Filter.eventually_cofinite.1 (PositivityTheory.Rg.BcB.F.Rig.eventually_isUnramU hπ)
-  obtain ⟨w, hwB, hw⟩ := ExistsNonSplitPlace.exists_not_isSplitAt ((X : Set (Pl E)) ∪ {w | ¬ IsUnramU π w})
-    (X.finite_toSet.union hfin)
+  obtain ⟨w, hwB, hw⟩ :=
+    ExistsNonSplitPlace.exists_not_isSplitAt ((X : Set (Pl E)) ∪ {w | ¬ IsUnramU π w})
+      (X.finite_toSet.union hfin)
   refine ⟨w, ExistsNonSplitPlace.mem_of_not_isSplitAt hS hw, fun h => hwB (Or.inl h), hw, ?_⟩
   by_contra h
   exact hwB (Or.inr h)

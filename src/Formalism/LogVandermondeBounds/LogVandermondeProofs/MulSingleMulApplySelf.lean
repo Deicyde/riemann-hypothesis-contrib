@@ -12,7 +12,13 @@ section Core
 
 variable {ι H K : Type} [Fintype ι] [DecidableEq ι] [Group H] [Fintype H] [DecidableEq H] [Field K]
 
-def eps (a h : H) : K := if h = a then 1 else if h = 1 then -1 else 0
+def eps (a h : H) : K :=
+  if h = a then
+    1
+  else if h = 1 then
+    -1
+  else
+    0
 
 def bas (a : ι → {c : H // c ≠ 1}) (h : ι → H) : K := ∏ w, (eps ((a w : H)) (h w) : K)
 
@@ -112,41 +118,49 @@ end Core
 
 section Main
 
-variable {ι H X K : Type} [Fintype ι] [DecidableEq ι] [Group H] [Fintype H] [DecidableEq H]
-  [Fintype X] [MulAction (ι → H) X] [Field K]
+variable
+  {ι H X K : Type} [Fintype ι] [DecidableEq ι] [Group H] [Fintype H] [DecidableEq H] [Fintype X]
+  [MulAction (ι → H) X] [Field K]
 
-def restr (Q : Type) (e : Q × (ι → H) ≃ X) :
-    ramSub ι H X K →ₗ[K] (Q × (ι → {c : H // c ≠ 1}) → K) where
+def restr (Q : Type) (e : Q × (ι → H) ≃ X)
+    : ramSub ι H X K →ₗ[K] (Q × (ι → {c : H // c ≠ 1}) → K) where
   toFun φ p := (φ : X → K) (e (p.1, fun w => (p.2 w : H)))
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem finrank_core (Q : Type) [Fintype Q] (e : Q × (ι → H) ≃ X)
-    (he : ∀ (m : ι → H) (ω : Q) (g : ι → H), e (ω, m * g) = m • e (ω, g)) :
-    Module.finrank K (ramSub ι H X K) = Fintype.card Q * (Fintype.card H - 1) ^ Fintype.card ι := by
+theorem finrank_core
+    (Q : Type) [Fintype Q]
+    (e : Q × (ι → H) ≃ X) (he : ∀ (m : ι → H) (ω : Q) (g : ι → H), e (ω, m * g) = m • e (ω, g))
+    : Module.finrank K (ramSub ι H X K)
+      = Fintype.card Q * (Fintype.card H - 1) ^ Fintype.card ι := by
   classical
-  have hmem : ∀ φ : ramSub ι H X K, ∀ v x,
-      ∑ c : H, (φ : X → K) ((Pi.mulSingle v c : ι → H) • x) = 0 := fun φ => φ.2
+  have hmem
+      : ∀ φ : ramSub ι H X K, ∀ v x, ∑ c : H, (φ : X → K) ((Pi.mulSingle v c : ι → H) • x) = 0 :=
+    fun φ => φ.2
   have hinj : Function.Injective (restr (K := K) Q e) := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro φ hφ
     apply Subtype.ext
     funext x
     obtain ⟨⟨ω, g⟩, rfl⟩ := e.surjective x
-    have hz := inj_core (K := K) (fun h => (φ : X → K) (e (ω, h)))
-      (fun v h => by simpa only [he] using hmem φ v (e (ω, h)))
-      (fun a => congrFun hφ (ω, a)) g
+    have hz :=
+      inj_core (K := K)
+        (fun h => (φ : X → K) (e (ω, h)))
+        (fun v h => by simpa only [he] using hmem φ v (e (ω, h)))
+        (fun a => congrFun hφ (ω, a))
+        g
     simpa using hz
   have hsurj : Function.Surjective (restr (K := K) Q e) := by
     intro f
-    let φ0 : X → K := fun x =>
-      ∑ a : ι → {c : H // c ≠ 1}, f ((e.symm x).1, a) * bas a (e.symm x).2
+    let φ0 : X → K := fun x => ∑ a : ι → {c : H // c ≠ 1}, f ((e.symm x).1, a) * bas a (e.symm x).2
     have hφ0 : φ0 ∈ ramSub ι H X K := by
       show ∀ (v : ι) (x : X), ∑ c : H, φ0 ((Pi.mulSingle v c : ι → H) • x) = 0
       intro v x
       obtain ⟨⟨ω, g⟩, rfl⟩ := e.surjective x
-      have hx : ∀ c : H, e.symm ((Pi.mulSingle v c : ι → H) • e (ω, g))
-          = (ω, (Pi.mulSingle v c : ι → H) * g) := by
+      have hx
+          : ∀ c : H,
+            e.symm ((Pi.mulSingle v c : ι → H) • e (ω, g))
+              = (ω, (Pi.mulSingle v c : ι → H) * g) := by
         intro c
         rw [← he, Equiv.symm_apply_apply]
       simp only [φ0, hx]
@@ -166,16 +180,18 @@ theorem finrank_core (Q : Type) [Fintype Q] (e : Q × (ι → H) ≃ X)
 
 end Main
 
-theorem exists_equiv (ι H X : Type) [Fintype ι] [DecidableEq ι] [Group H] [Fintype H] [Fintype X]
-    [MulAction (ι → H) X] (hfree : ∀ (g : ι → H) (x : X), g • x = x → g = 1) :
-    ∃ (Q : Type) (_ : Fintype Q) (e : Q × (ι → H) ≃ X),
-      ∀ (m : ι → H) (ω : Q) (g : ι → H), e (ω, m * g) = m • e (ω, g) := by
+theorem exists_equiv
+    (ι H X : Type)
+    [Fintype ι] [DecidableEq ι] [Group H] [Fintype H] [Fintype X] [MulAction (ι → H) X]
+    (hfree : ∀ (g : ι → H) (x : X), g • x = x → g = 1)
+    : ∃ (Q : Type) (_ : Fintype Q) (e : Q × (ι → H) ≃ X), ∀ (m : ι → H) (ω : Q) (g : ι → H),
+      e (ω, m * g) = m • e (ω, g) := by
   classical
   let Q := MulAction.orbitRel.Quotient (ι → H) X
   letI : Fintype Q := Fintype.ofFinite Q
   let rep : Q → X := fun ω => Quotient.out ω
-  have hrep : ∀ ω : Q, Quotient.mk (MulAction.orbitRel (ι → H) X) (rep ω) = ω :=
-    fun ω => Quotient.out_eq ω
+  have hrep : ∀ ω : Q, Quotient.mk (MulAction.orbitRel (ι → H) X) (rep ω) = ω := fun ω =>
+    Quotient.out_eq ω
   let f : Q × (ι → H) → X := fun p => p.2 • rep p.1
   have hf : Function.Bijective f := by
     constructor

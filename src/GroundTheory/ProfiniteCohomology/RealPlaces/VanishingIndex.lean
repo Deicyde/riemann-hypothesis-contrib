@@ -22,9 +22,10 @@ section FixedVector
 
 variable {W : Type u} [Group W]
 
-theorem exists_ne_zero_forall_ρ_eq (N : Rep.{u} (ULift.{u} ℤ) W) [Finite N] [Nontrivial N]
-    (h2 : ∀ m : N, 2 • m = 0) (hN : ∀ w : W, ∃ k : ℕ, N.ρ (w ^ 2 ^ k) = 1) :
-    ∃ m : N, m ≠ 0 ∧ ∀ w : W, N.ρ w m = m := by
+theorem exists_ne_zero_forall_ρ_eq
+    (N : Rep.{u} (ULift.{u} ℤ) W) [Finite N] [Nontrivial N]
+    (h2 : ∀ m : N, 2 • m = 0) (hN : ∀ w : W, ∃ k : ℕ, N.ρ (w ^ 2 ^ k) = 1)
+    : ∃ m : N, m ≠ 0 ∧ ∀ w : W, N.ρ w m = m := by
   have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   let R : Subgroup (N →ₗ[ULift.{u} ℤ] N)ˣ := N.ρ.asGroupHom.range
   have hR : IsPGroup 2 R := by
@@ -35,8 +36,7 @@ theorem exists_ne_zero_forall_ρ_eq (N : Rep.{u} (ULift.{u} ℤ) W) [Finite N] [
     rw [← map_pow, Representation.asGroupHom_apply, hk]
   have hcard := hR.card_modEq_card_fixedPoints N
   obtain ⟨m₀, hm₀⟩ := exists_ne (0 : N)
-  have hord : addOrderOf m₀ = 2 :=
-    addOrderOf_eq_prime (h2 m₀) hm₀
+  have hord : addOrderOf m₀ = 2 := addOrderOf_eq_prime (h2 m₀) hm₀
   have h2N : 2 ∣ Nat.card N := hord ▸ addOrderOf_dvd_natCard m₀
   have h2F : 2 ∣ Nat.card (MulAction.fixedPoints R N) := (hcard.dvd_iff (dvd_refl 2)).1 h2N
   have h0 : (0 : N) ∈ MulAction.fixedPoints R N := fun r => by
@@ -44,8 +44,7 @@ theorem exists_ne_zero_forall_ρ_eq (N : Rep.{u} (ULift.{u} ℤ) W) [Finite N] [
     exact map_zero _
   have hF : Finite (MulAction.fixedPoints R N) := Subtype.finite
   have hlt : 1 < Nat.card (MulAction.fixedPoints R N) := by
-    have hpos : 0 < Nat.card (MulAction.fixedPoints R N) :=
-      Nat.card_pos_iff.2 ⟨⟨⟨0, h0⟩⟩, hF⟩
+    have hpos : 0 < Nat.card (MulAction.fixedPoints R N) := Nat.card_pos_iff.2 ⟨⟨⟨0, h0⟩⟩, hF⟩
     obtain ⟨c, hc⟩ := h2F
     omega
   obtain ⟨⟨a, ha⟩, ⟨b, hb⟩, hab⟩ := Finite.one_lt_card_iff_nontrivial.1 hlt |>.exists_pair_ne
@@ -66,77 +65,90 @@ section ZModTwo
 variable {W : Type u} [Group W]
 
 def zmodTwoAddHom {N : Type*} [AddCommGroup N] (m : N) (hm : 2 • m = 0) : ZMod 2 →+ N :=
-  ZMod.lift 2 ⟨zmultiplesHom N m, by
-    change ((2 : ℕ) : ℤ) • m = 0
-    rw [natCast_zsmul]
-    exact hm⟩
+  ZMod.lift 2 ⟨
+    zmultiplesHom N m,
+    by
+      change ((2 : ℕ) : ℤ) • m = 0
+      rw [natCast_zsmul]
+      exact hm
+  ⟩
 
-theorem zmodTwoAddHom_intCast {N : Type*} [AddCommGroup N] (m : N) (hm : 2 • m = 0) (k : ℤ) :
-    zmodTwoAddHom m hm (k : ZMod 2) = k • m :=
+theorem zmodTwoAddHom_intCast {N : Type*} [AddCommGroup N] (m : N) (hm : 2 • m = 0) (k : ℤ)
+    : zmodTwoAddHom m hm (k : ZMod 2) = k • m :=
   ZMod.lift_coe _ _ k
 
-theorem zmodTwoAddHom_one {N : Type*} [AddCommGroup N] (m : N) (hm : 2 • m = 0) :
-    zmodTwoAddHom m hm 1 = m := by
+theorem zmodTwoAddHom_one {N : Type*} [AddCommGroup N] (m : N) (hm : 2 • m = 0)
+    : zmodTwoAddHom m hm 1 = m := by
   have h := zmodTwoAddHom_intCast m hm 1
   rwa [Int.cast_one, one_zsmul] at h
 
-theorem zmodTwoAddHom_injective {N : Type*} [AddCommGroup N] {m : N} (hm : 2 • m = 0)
-    (hm0 : m ≠ 0) : Function.Injective (zmodTwoAddHom m hm) :=
+theorem zmodTwoAddHom_injective {N : Type*} [AddCommGroup N] {m : N} (hm : 2 • m = 0) (hm0 : m ≠ 0)
+    : Function.Injective (zmodTwoAddHom m hm) :=
   (injective_iff_map_eq_zero _).2 fun a ha => by
     fin_cases a
     · rfl
     · exact absurd ((zmodTwoAddHom_one m hm).symm.trans ha) hm0
 
-def zmodTwoHom (N : Rep.{u} (ULift.{u} ℤ) W) (m : N) (hm : 2 • m = 0) (hfix : ∀ w : W, N.ρ w m = m) :
-    zmodRep.{u} W 2 ⟶ N :=
-  Rep.ofHom ⟨(uliftIntLinearEquivAddHom (zmodRep.{u} W 2) N).symm
-    ((zmodTwoAddHom m hm).comp (AddEquiv.ulift : ULift.{u} (ZMod 2) ≃+ ZMod 2).toAddMonoidHom),
+def zmodTwoHom (N : Rep.{u} (ULift.{u} ℤ) W) (m : N) (hm : 2 • m = 0) (hfix : ∀ w : W, N.ρ w m = m)
+    : zmodRep.{u} W 2 ⟶ N :=
+  Rep.ofHom ⟨
+    (uliftIntLinearEquivAddHom (zmodRep.{u} W 2) N).symm
+      ((zmodTwoAddHom m hm).comp (AddEquiv.ulift : ULift.{u} (ZMod 2) ≃+ ZMod 2).toAddMonoidHom),
     fun w => by
       refine LinearMap.ext fun a => ?_
       obtain ⟨a⟩ := a
       obtain ⟨k, rfl⟩ := ZMod.intCast_surjective a
       change zmodTwoAddHom m hm (k : ZMod 2) = N.ρ w (zmodTwoAddHom m hm (k : ZMod 2))
-      rw [zmodTwoAddHom_intCast, map_zsmul, hfix]⟩
+      rw [zmodTwoAddHom_intCast, map_zsmul, hfix]
+  ⟩
 
-theorem zmodTwoHom_hom_apply (N : Rep.{u} (ULift.{u} ℤ) W) (m : N) (hm : 2 • m = 0)
-    (hfix : ∀ w : W, N.ρ w m = m) (a : zmodRep.{u} W 2) :
-    (zmodTwoHom N m hm hfix).hom a = zmodTwoAddHom m hm (ULift.down a) :=
+theorem zmodTwoHom_hom_apply
+    (N : Rep.{u} (ULift.{u} ℤ) W) (m : N) (hm : 2 • m = 0) (hfix : ∀ w : W, N.ρ w m = m)
+    (a : zmodRep.{u} W 2)
+    : (zmodTwoHom N m hm hfix).hom a = zmodTwoAddHom m hm (ULift.down a) :=
   rfl
 
 end ZModTwo
 
-instance isDiscreteRep_zmodRep {W : Type u} [Group W] [TopologicalSpace W] (n : ℕ) :
-    IsDiscreteRep (zmodRep.{u} W n) :=
+instance isDiscreteRep_zmodRep {W : Type u} [Group W] [TopologicalSpace W] (n : ℕ)
+    : IsDiscreteRep (zmodRep.{u} W n) :=
   isDiscreteRep_of_isTrivial (zmodRep.{u} W n)
 
 section Tate
 
-variable {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
-  {ι : Type u} {H : ι → Type u} [∀ v, Group (H v)] [∀ v, TopologicalSpace (H v)]
-  [∀ v, IsTopologicalGroup (H v)] (φ : ∀ v, H v →ₜ* G)
+variable
+  {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+  {ι : Type u} {H : ι → Type u}
+  [∀ v, Group (H v)] [∀ v, TopologicalSpace (H v)] [∀ v, IsTopologicalGroup (H v)]
+  (φ : ∀ v, H v →ₜ* G)
   {κ : Type u} {F : κ → Type u} [∀ w, Group (F w)] [∀ w, TopologicalSpace (F w)]
-  [∀ w, IsTopologicalGroup (F w)] [∀ w, Fintype (F w)] (ψ : ∀ w, F w →ₜ* G)
+  [∀ w, IsTopologicalGroup (F w)] [∀ w, Fintype (F w)]
+  (ψ : ∀ w, F w →ₜ* G)
 
-instance isDiscreteRep_coind_zmodRep_openSubgroup (W : OpenSubgroup G) (n : ℕ) :
-    IsDiscreteRep (Rep.coind (W : Subgroup G).subtype (zmodRep.{u} (W : Subgroup G) n)) :=
+instance isDiscreteRep_coind_zmodRep_openSubgroup (W : OpenSubgroup G) (n : ℕ)
+    : IsDiscreteRep (Rep.coind (W : Subgroup G).subtype (zmodRep.{u} (W : Subgroup G) n)) :=
   isDiscreteRep_coind W _
 
-
 omit [CompactSpace G] in
-theorem eq_zero_tateCompactCohomologyRes_of_subsingleton {k : Type u} [CommRing k]
-    {A B : Rep.{u} k G} [IsDiscreteRep A] [IsDiscreteRep B] [Subsingleton A] (n : ℕ)
-    (hB : ∀ x : tateCompactCohomologyRes φ ψ B n, x = 0) (x : tateCompactCohomologyRes φ ψ A n) :
-    x = 0 :=
+theorem eq_zero_tateCompactCohomologyRes_of_subsingleton
+    {k : Type u} [CommRing k]
+    {A B : Rep.{u} k G} [IsDiscreteRep A] [IsDiscreteRep B] [Subsingleton A]
+    (n : ℕ)
+    (hB : ∀ x : tateCompactCohomologyRes φ ψ B n, x = 0) (x : tateCompactCohomologyRes φ ψ A n)
+    : x = 0 :=
   eq_zero_tateCompactCohomologyRes_of_retract φ ψ (0 : A ⟶ B) 0
-    (Rep.hom_ext (Representation.IntertwiningMap.ext (LinearMap.ext fun _ => Subsingleton.elim _ _)))
+    (Rep.hom_ext (Representation.IntertwiningMap.ext (LinearMap.ext fun _ =>
+      Subsingleton.elim _ _)))
     n hB x
 
-theorem eq_zero_tateCompactCohomologyRes_coind_of_two_nsmul (n : ℕ) (W : OpenSubgroup G)
+theorem eq_zero_tateCompactCohomologyRes_coind_of_two_nsmul
+    (n : ℕ) (W : OpenSubgroup G)
     (hW : ∀ x : tateCompactCohomologyRes φ ψ
-      (Rep.coind (W : Subgroup G).subtype (zmodRep.{u} (W : Subgroup G) 2)) n, x = 0) :
-    ∀ (d : ℕ) (N : Rep.{u} (ULift.{u} ℤ) (W : Subgroup G)) [IsDiscreteRep N] [Finite N],
-      Nat.card N ≤ d → (∀ m : N, 2 • m = 0) → (∀ w, ∃ k : ℕ, N.ρ (w ^ 2 ^ k) = 1) →
-      ∀ x : tateCompactCohomologyRes φ ψ (Rep.coind (W : Subgroup G).subtype N) n, x = 0 := by
+        (Rep.coind (W : Subgroup G).subtype (zmodRep.{u} (W : Subgroup G) 2)) n,
+      x = 0)
+    : ∀ (d : ℕ) (N : Rep.{u} (ULift.{u} ℤ) (W : Subgroup G)) [IsDiscreteRep N] [Finite N],
+      Nat.card N ≤ d → (∀ m : N, 2 • m = 0) → (∀ w, ∃ k : ℕ, N.ρ (w ^ 2 ^ k) = 1)
+        → ∀ x : tateCompactCohomologyRes φ ψ (Rep.coind (W : Subgroup G).subtype N) n, x = 0 := by
   intro d
   induction d with
   | zero =>
@@ -173,7 +185,7 @@ theorem eq_zero_tateCompactCohomologyRes_coind_of_two_nsmul (n : ℕ) (W : OpenS
       have hS : S.ShortExact := by
         refine { exact := ?_, mono_f := (Rep.mono_iff_injective _).2 hfinj, epi_g := ?_ }
         · rw [← ShortComplex.exact_map_iff_of_faithful _
-            (forget₂ (Rep.{u} (ULift.{u} ℤ) (W : Subgroup G)) (ModuleCat.{u} (ULift.{u} ℤ))),
+              (forget₂ (Rep.{u} (ULift.{u} ℤ) (W : Subgroup G)) (ModuleCat.{u} (ULift.{u} ℤ))),
             ShortComplex.moduleCat_exact_iff]
           intro a ha
           change Submodule.Quotient.mk (p := T) a = 0 at ha
@@ -189,12 +201,15 @@ theorem eq_zero_tateCompactCohomologyRes_coind_of_two_nsmul (n : ℕ) (W : OpenS
       have : Finite (N ⧸ T) := Finite.of_surjective _ (Submodule.mkQ_surjective T)
       have hcardT : 2 ≤ Nat.card T := by
         have h0 : (0 : N) ∈ T := T.zero_mem
-        have hm : m ∈ T := ⟨ULift.up 1, by
-          rw [LinearMap.coe_mk]
-          exact (zmodTwoHom_hom_apply N m (h2 m) hfix _).trans (zmodTwoAddHom_one m (h2 m))⟩
+        have hm : m ∈ T := ⟨
+          ULift.up 1,
+          by
+            rw [LinearMap.coe_mk]
+            exact (zmodTwoHom_hom_apply N m (h2 m) hfix _).trans (zmodTwoAddHom_one m (h2 m))
+        ⟩
         have : Finite T := Subtype.finite
-        exact Finite.one_lt_card_iff_nontrivial.2 ⟨⟨⟨0, h0⟩, ⟨m, hm⟩,
-          fun h => hm0 (congrArg Subtype.val h).symm⟩⟩
+        exact Finite.one_lt_card_iff_nontrivial.2
+          ⟨⟨⟨0, h0⟩, ⟨m, hm⟩, fun h => hm0 (congrArg Subtype.val h).symm⟩⟩
       have hcardQ : Nat.card (N ⧸ T) ≤ d := by
         have hc := Submodule.card_eq_card_quotient_mul_card T
         have hpos : 0 < Nat.card (N ⧸ T) := Nat.card_pos
@@ -212,11 +227,15 @@ theorem eq_zero_tateCompactCohomologyRes_coind_of_two_nsmul (n : ℕ) (W : OpenS
         rw [hk]
         rfl
 
-theorem eq_zero_tateCompactCohomologyRes_of_two_nsmul (n : ℕ)
-    (hW : ∀ W : OpenSubgroup G, ∀ x : tateCompactCohomologyRes φ ψ
-      (Rep.coind (W : Subgroup G).subtype (zmodRep.{u} (W : Subgroup G) 2)) n, x = 0)
-    (M : Rep.{u} (ULift.{u} ℤ) G) [IsDiscreteRep M] [Finite M] (h2 : ∀ m : M, 2 • m = 0)
-    (x : tateCompactCohomologyRes φ ψ M n) : x = 0 := by
+theorem eq_zero_tateCompactCohomologyRes_of_two_nsmul
+    (n : ℕ)
+    (hW : ∀ W : OpenSubgroup G,
+      ∀ x : tateCompactCohomologyRes φ ψ
+          (Rep.coind (W : Subgroup G).subtype (zmodRep.{u} (W : Subgroup G) 2)) n,
+        x = 0)
+    (M : Rep.{u} (ULift.{u} ℤ) G) [IsDiscreteRep M] [Finite M]
+    (h2 : ∀ m : M, 2 • m = 0) (x : tateCompactCohomologyRes φ ψ M n)
+    : x = 0 := by
   have : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
   let U : Subgroup G := ⨅ m : M, stabilizer M.ρ m
   have hU : IsOpen (U : Set G) := by
@@ -232,11 +251,15 @@ theorem eq_zero_tateCompactCohomologyRes_of_two_nsmul (n : ℕ)
   have : K₀.FiniteIndex := finiteIndex_openSubgroup K
   have : Finite (G ⧸ K₀) := Subgroup.finite_quotient_of_finiteIndex
   let P : Sylow 2 (G ⧸ K₀) := Classical.arbitrary _
-  let W : OpenSubgroup G := ⟨(P : Subgroup (G ⧸ K₀)).comap (QuotientGroup.mk' K₀),
-    Subgroup.isOpen_mono (fun g hg => by
-      change QuotientGroup.mk' K₀ g ∈ (P : Subgroup (G ⧸ K₀))
-      rw [QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff g).2 hg]
-      exact one_mem _) (Subgroup.isOpen_mono hUK hU)⟩
+  let W : OpenSubgroup G := ⟨
+    (P : Subgroup (G ⧸ K₀)).comap (QuotientGroup.mk' K₀),
+    Subgroup.isOpen_mono
+      (fun g hg => by
+        change QuotientGroup.mk' K₀ g ∈ (P : Subgroup (G ⧸ K₀))
+        rw [QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff g).2 hg]
+        exact one_mem _)
+      (Subgroup.isOpen_mono hUK hU)
+  ⟩
   have hidx : (W : Subgroup G).index = (P : Subgroup (G ⧸ K₀)).index :=
     Subgroup.index_comap_of_surjective _ (QuotientGroup.mk'_surjective K₀)
   have : (P : Subgroup (G ⧸ K₀)).FiniteIndex := Subgroup.finiteIndex_of_finite
@@ -252,7 +275,9 @@ theorem eq_zero_tateCompactCohomologyRes_of_two_nsmul (n : ℕ)
     rw [hc, add_smul, mul_comm, mul_smul, h2, smul_zero, zero_add, one_smul]
   refine eq_zero_tateCompactCohomologyRes_of_retract φ ψ _ _ hunit n ?_ x
   refine eq_zero_tateCompactCohomologyRes_coind_of_two_nsmul φ ψ n W (hW W) _
-    (Rep.res (W : Subgroup G).subtype M) le_rfl (fun m => h2 m) ?_
+    (Rep.res (W : Subgroup G).subtype M) le_rfl
+    (fun m => h2 m)
+    ?_
   intro w
   obtain ⟨k, hk⟩ := P.isPGroup' ⟨QuotientGroup.mk' K₀ (w : G), w.2⟩
   refine ⟨k, ?_⟩

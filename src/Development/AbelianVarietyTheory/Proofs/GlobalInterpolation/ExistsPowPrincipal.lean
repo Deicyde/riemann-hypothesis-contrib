@@ -5,19 +5,22 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.MaxVSp
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions GlobalTheory.CharVal GlobalTheory.IndefiniteRowSideFullHecke.CharacterValuation
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions GlobalTheory.CharVal
+  GlobalTheory.IndefiniteRowSideFullHecke.CharacterValuation
 
 namespace GlobalTheory.NormOneIdeal
 
-theorem star_integer_smul {E : Type} [Field E] [NumberField E] [StarRing E] (a : 𝓞 E) :
-    ∃ b : 𝓞 E, (b : E) = star (a : E) := by
+theorem star_integer_smul {E : Type} [Field E] [NumberField E] [StarRing E] (a : 𝓞 E)
+    : ∃ b : 𝓞 E, (b : E) = star (a : E) := by
   refine ⟨⟨star (a : E), ?_⟩, rfl⟩
   have h : IsIntegral ℤ (a : E) := a.isIntegral_coe
   exact h.map (starRingEnd E).toIntAlgHom
 
-theorem star_mem_mul {E : Type} [Field E] [NumberField E] [StarRing E]
-    {A B C D : Submodule (𝓞 E) E} (h1 : ∀ x ∈ A, star x ∈ C) (h2 : ∀ x ∈ B, star x ∈ D) :
-    ∀ x ∈ A * B, star x ∈ C * D := by
+theorem star_mem_mul
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {A B C D : Submodule (𝓞 E) E} (h1 : ∀ x ∈ A, star x ∈ C) (h2 : ∀ x ∈ B, star x ∈ D)
+    : ∀ x ∈ A * B, star x ∈ C * D := by
   intro x hx
   refine Submodule.mul_induction_on hx ?_ ?_
   · intro m hm n hn
@@ -27,17 +30,20 @@ theorem star_mem_mul {E : Type} [Field E] [NumberField E] [StarRing E]
     rw [star_add]
     exact add_mem ha hb
 
-theorem star_mem_span {E : Type} [Field E] [NumberField E] [StarRing E] (z x : E)
-    (hx : x ∈ Submodule.span (𝓞 E) {z}) : star x ∈ Submodule.span (𝓞 E) {star z} := by
+theorem star_mem_span
+    {E : Type} [Field E] [NumberField E] [StarRing E] (z x : E) (hx : x ∈ Submodule.span (𝓞 E) {z})
+    : star x ∈ Submodule.span (𝓞 E) {star z} := by
   obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.1 hx
   obtain ⟨b, hb⟩ := star_integer_smul a
   refine Submodule.mem_span_singleton.2 ⟨b, ?_⟩
   rw [Algebra.smul_def, Algebra.smul_def, star_mul']
   exact congrArg (· * star z) hb
 
-theorem star_mem_pow {E : Type} [Field E] [NumberField E] [StarRing E]
-    {A C : Submodule (𝓞 E) E} (h1 : ∀ x ∈ A, star x ∈ C) (n : ℕ) :
-    ∀ x ∈ A ^ n, star x ∈ C ^ n := by
+theorem star_mem_pow
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {A C : Submodule (𝓞 E) E} (h1 : ∀ x ∈ A, star x ∈ C)
+    (n : ℕ)
+    : ∀ x ∈ A ^ n, star x ∈ C ^ n := by
   induction n with
   | zero =>
     intro x hx
@@ -47,9 +53,8 @@ theorem star_mem_pow {E : Type} [Field E] [NumberField E] [StarRing E]
     rw [pow_succ, pow_succ]
     exact star_mem_mul ih h1
 
-theorem exists_pow_principal {E : Type} [Field E] [NumberField E]
-    (I : (Submodule (𝓞 E) E)ˣ) :
-    ∃ (h : ℕ) (z : E), 0 < h ∧ (I : Submodule (𝓞 E) E) ^ h = Submodule.span (𝓞 E) {z} := by
+theorem exists_pow_principal {E : Type} [Field E] [NumberField E] (I : (Submodule (𝓞 E) E)ˣ)
+    : ∃ (h : ℕ) (z : E), 0 < h ∧ (I : Submodule (𝓞 E) E) ^ h = Submodule.span (𝓞 E) {z} := by
   let e := FractionalIdeal.unitsMulEquivSubmodule (S := nonZeroDivisors (𝓞 E)) (P := E)
   let F := e.symm I
   have hF : ClassGroup.mk E (F ^ Fintype.card (ClassGroup (𝓞 E))) = 1 := by
@@ -62,7 +67,11 @@ theorem exists_pow_principal {E : Type} [Field E] [NumberField E]
   rw [← Units.val_pow_eq_pow_val, ← this]
   rfl
 
-theorem pow_eq_span_norm_one : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (I J : Submodule (𝓞 E) E), (∀ x, x ∈ J ↔ star x ∈ I) → I * J = 1 → (∀ (n : ℕ) (x : E), x ∈ J ^ n ↔ star x ∈ I ^ n) ∧ ∃ (h : ℕ) (y : E), 0 < h ∧ star y * y = 1 ∧ Submodule.span (𝓞 E) {y} = I ^ h := by
+theorem pow_eq_span_norm_one
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (I J : Submodule (𝓞 E) E),
+      (∀ x, x ∈ J ↔ star x ∈ I) → I * J = 1
+        → (∀ (n : ℕ) (x : E), x ∈ J ^ n ↔ star x ∈ I ^ n)
+          ∧ ∃ (h : ℕ) (y : E), 0 < h ∧ star y * y = 1 ∧ Submodule.span (𝓞 E) {y} = I ^ h := by
   intro E _ _ _ I J hJ hIJ
   have h1 : ∀ (n : ℕ) (x : E), x ∈ J ^ n ↔ star x ∈ I ^ n := by
     intro n x
@@ -89,7 +98,8 @@ theorem pow_eq_span_norm_one : ∀ (E : Type) [Field E] [NumberField E] [StarRin
     simp at this
   have hs0 : star z ≠ 0 := star_ne_zero.2 hz0
   have hinv : Submodule.span (𝓞 E) {(star z)⁻¹} = I ^ h := by
-    calc Submodule.span (𝓞 E) {(star z)⁻¹}
+    calc
+      Submodule.span (𝓞 E) {(star z)⁻¹}
         = I ^ h * J ^ h * Submodule.span (𝓞 E) {(star z)⁻¹} := by rw [hm, one_mul]
       _ = I ^ h := by
         rw [mul_assoc, hJh, Submodule.span_mul_span, Set.singleton_mul_singleton,

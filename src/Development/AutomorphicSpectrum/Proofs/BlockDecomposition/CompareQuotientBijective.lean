@@ -10,12 +10,14 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.LsQ
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris CrystallineSemistableComparison
+  CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.LsQ
 
 namespace GlobalTheory.CompanionTheory.LsCmp
 
-theorem cmpq_bijective (R : Type) [CommRing R] (C : Type 1) [Category.{0} C]
-    (A : C ⥤ CommAlgCat.{0} R) (l n i : ℕ) : Function.Bijective ((cmpq A l n).f i) := by
+theorem cmpq_bijective
+    (R : Type) [CommRing R] (C : Type 1) [Category.{0} C] (A : C ⥤ CommAlgCat.{0} R) (l n i : ℕ)
+    : Function.Bijective ((cmpq A l n).f i) := by
   have hmk := cmpq_mk A l n i
   constructor
   · rw [injective_iff_map_eq_zero]
@@ -23,13 +25,17 @@ theorem cmpq_bijective (R : Type) [CommRing R] (C : Type 1) [Category.{0} C]
     obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ q
     rw [hmk] at hq
     rw [Submodule.Quotient.mk_eq_zero]
-    have hy : ∀ s : ComposableArrows C i, ∃ a : ↑(A.obj (s.obj (Fin.last i))),
-        a * algebraMap R ↑(A.obj (s.obj (Fin.last i))) ((l : R) ^ n) = y s := by
+    have hy
+        : ∀ s : ComposableArrows C i, ∃ a : ↑(A.obj (s.obj (Fin.last i))),
+          a * algebraMap R ↑(A.obj (s.obj (Fin.last i))) ((l : R) ^ n) = y s := by
       intro s
       have h1 : ((qM A l n).pullC i y) s = 0 := by
         rw [hq]
         rfl
-      have h2 : Ideal.Quotient.mk (Ideal.span {algebraMap R ↑(A.obj (s.obj (Fin.last i))) ((l : R) ^ n)}) (y s) = 0 :=
+      have h2
+          : Ideal.Quotient.mk
+              (Ideal.span {algebraMap R ↑(A.obj (s.obj (Fin.last i))) ((l : R) ^ n)}) (y s)
+            = 0 :=
         congrArg Subtype.val h1
       exact Ideal.mem_span_singleton'.mp (Ideal.Quotient.eq_zero_iff_mem.mp h2)
     choose a ha using hy
@@ -40,9 +46,12 @@ theorem cmpq_bijective (R : Type) [CommRing R] (C : Type 1) [Category.{0} C]
     rw [Algebra.smul_def, mul_comm]
     exact ha s
   · intro g
-    have hx : ∀ s : ComposableArrows C i, ∃ x : ↑(A.obj (s.obj (Fin.last i))),
-        Ideal.Quotient.mk (Ideal.span {algebraMap R ↑(A.obj (s.obj (Fin.last i))) ((l : R) ^ n)}) x =
-          Subtype.val (g s) := fun s => Ideal.Quotient.mk_surjective _
+    have hx
+        : ∀ s : ComposableArrows C i, ∃ x : ↑(A.obj (s.obj (Fin.last i))),
+          Ideal.Quotient.mk (Ideal.span {algebraMap R ↑(A.obj (s.obj (Fin.last i))) ((l : R) ^ n)})
+              x
+            = Subtype.val (g s) := fun s =>
+      Ideal.Quotient.mk_surjective _
     choose x hx using hx
     refine ⟨Submodule.Quotient.mk x, ?_⟩
     rw [hmk]

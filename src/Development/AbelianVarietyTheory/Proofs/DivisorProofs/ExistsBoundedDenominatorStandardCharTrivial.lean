@@ -9,16 +9,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardAddC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 open scoped TensorProduct NNReal Matrix nonZeroDivisors
 
 noncomputable section
 namespace GlobalTheory.FinSupp
 
-theorem exists_den_of_trace_int (F : Type) [Field F] [NumberField F] :
-    ∃ D : ℕ, 1 ≤ D ∧ ∀ t : F, (∀ a : 𝓞 F, ∃ m : ℤ, Algebra.trace ℚ F ((a : F) * t) = m) →
-      IsIntegral ℤ ((D : F) * t) := by
+theorem exists_den_of_trace_int (F : Type) [Field F] [NumberField F]
+    : ∃ D : ℕ,
+      1 ≤ D
+        ∧ ∀ t : F,
+          (∀ a : 𝓞 F, ∃ m : ℤ, Algebra.trace ℚ F ((a : F) * t) = m)
+            → IsIntegral ℤ ((D : F) * t) := by
   classical
   obtain ⟨c, hc, hfr⟩ := (FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 F)⁰ F)).2
   have hc0 : c ≠ 0 := nonZeroDivisors.ne_zero hc
@@ -50,8 +55,11 @@ theorem exists_den_of_trace_int (F : Type) [Field F] [NumberField F] :
     rw [this]
     exact (e * y).isIntegral_coe
 
-theorem trace_int_of_finPart {F : Type} [Field F] [NumberField F] {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ) (s : F)
-    (hs : ψ (finPart F (algebraMap F (AF F) s)) = 1) : ∃ m : ℤ, Algebra.trace ℚ F s = m := by
+theorem trace_int_of_finPart
+    {F : Type} [Field F] [NumberField F]
+    {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ)
+    (s : F) (hs : ψ (finPart F (algebraMap F (AF F) s)) = 1)
+    : ∃ m : ℤ, Algebra.trace ℚ F s = m := by
   set x : AF F := algebraMap F (AF F) s with hx
   set z : AF F := x - finPart F x with hzdef
   have hz : At (evI F) z := by
@@ -68,7 +76,9 @@ theorem trace_int_of_finPart {F : Type} [Field F] [NumberField F] {ψ : AddChar 
       rw [sub_self, mul_zero]
   have hψz : ψ z = 1 := by
     have h := hψ.2.1 s
-    rw [← hx, show x = z + finPart F x by rw [hzdef, sub_add_cancel], AddChar.map_add_eq_mul, hs, mul_one] at h
+    rw [← hx, show x = z + finPart F x by rw [hzdef, sub_add_cancel], AddChar.map_add_eq_mul, hs,
+        mul_one]
+      at h
     exact h
   have hev : evI F z = mixedEmbedding F s := by
     show InfiniteAdeleRing.ringEquiv_mixedSpace F (x.1 - 0) = _
@@ -89,10 +99,18 @@ end GlobalTheory.FinSupp
 
 namespace GlobalTheory.FinSupp.DenStd
 
-theorem exists_den : ∀ (F : Type) [Field F] [NumberField F], ∃ D : ℕ, 1 ≤ D ∧ ∀ ψ : AddChar (AF F) ℂ, IsStd ψ → ∀ t : F,
-    (∀ a : 𝓞 F, ψ (GlobalTheory.FinSupp.finPart F (algebraMap F (AF F) ((a : F) * t))) = 1) → IsIntegral ℤ ((D : F) * t) := by
+theorem exists_den
+    : ∀ (F : Type) [Field F] [NumberField F], ∃ D : ℕ,
+      1 ≤ D
+        ∧ ∀ ψ : AddChar (AF F) ℂ,
+          IsStd ψ
+            → ∀ t : F,
+              (∀ a : 𝓞 F,
+                  ψ (GlobalTheory.FinSupp.finPart F (algebraMap F (AF F) ((a : F) * t))) = 1)
+                → IsIntegral ℤ ((D : F) * t) := by
   intro F _ _
   obtain ⟨D, hD, hint⟩ := GlobalTheory.FinSupp.exists_den_of_trace_int F
-  exact ⟨D, hD, fun ψ hψ t ht => hint t fun a => GlobalTheory.FinSupp.trace_int_of_finPart hψ _ (ht a)⟩
+  exact
+    ⟨D, hD, fun ψ hψ t ht => hint t fun a => GlobalTheory.FinSupp.trace_int_of_finPart hψ _ (ht a)⟩
 
 end GlobalTheory.FinSupp.DenStd

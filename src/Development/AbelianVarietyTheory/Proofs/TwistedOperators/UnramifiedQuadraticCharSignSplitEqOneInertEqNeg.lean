@@ -6,8 +6,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InnerProduct
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep GlobalTheory.FinZeta GlobalTheory.AdelicScalar GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.LiftRows
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep
+  GlobalTheory.FinZeta GlobalTheory.AdelicScalar
+  GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.LiftRows
 open Formalism.IndefR.Lev (levG levChi IsBaseFrame)
 open Formalism.UG (IsUnifV qV IsUnramInv GU KU IsInertAt Hecke dosetInd IsCommensurated)
 open Formalism.MainNotions.SchurIrreducible (IsSplit)
@@ -17,9 +22,10 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.QuadSignLocal
 
-theorem primesOver_eq_image (D : D7) (v : HeightOneSpectrum (𝓞 D.host.F)) :
-    Ideal.primesOver v.asIdeal (𝓞 D.host.E) =
-      HeightOneSpectrum.asIdeal '' {u : HeightOneSpectrum (𝓞 D.host.E) | u.under (𝓞 D.host.F) = v} := by
+theorem primesOver_eq_image (D : D7) (v : HeightOneSpectrum (𝓞 D.host.F))
+    : Ideal.primesOver v.asIdeal (𝓞 D.host.E)
+      = HeightOneSpectrum.asIdeal
+        '' {u : HeightOneSpectrum (𝓞 D.host.E) | u.under (𝓞 D.host.F) = v} := by
   ext P
   constructor
   · rintro ⟨hP, hlo⟩
@@ -33,13 +39,20 @@ theorem primesOver_eq_image (D : D7) (v : HeightOneSpectrum (𝓞 D.host.F)) :
     simp only [HeightOneSpectrum.under_asIdeal] at this
     exact this.symm
 
-theorem ncard_primesOver (D : D7) (v : HeightOneSpectrum (𝓞 D.host.F)) :
-    (Ideal.primesOver v.asIdeal (𝓞 D.host.E)).ncard =
-      {u : HeightOneSpectrum (𝓞 D.host.E) | u.under (𝓞 D.host.F) = v}.ncard := by
+theorem ncard_primesOver (D : D7) (v : HeightOneSpectrum (𝓞 D.host.F))
+    : (Ideal.primesOver v.asIdeal (𝓞 D.host.E)).ncard
+      = {u : HeightOneSpectrum (𝓞 D.host.E) | u.under (𝓞 D.host.F) = v}.ncard := by
   rw [primesOver_eq_image]
   exact Set.ncard_image_of_injective _ (fun a b h => HeightOneSpectrum.ext h)
 
-theorem quadSign_split_inert : ∀ (D : D7) (v : HeightOneSpectrum (𝓞 D.host.F)), (∀ w w' : HeightOneSpectrum (𝓞 D.host.E), w ≠ w' → (∀ u : HeightOneSpectrum (𝓞 D.host.E), u.under (𝓞 D.host.F) = v ↔ u = w ∨ u = w') → quadSign D v = 1) ∧ (∀ w : HeightOneSpectrum (𝓞 D.host.E), (∀ u : HeightOneSpectrum (𝓞 D.host.E), u.under (𝓞 D.host.F) = v ↔ u = w) → quadSign D v = -1) := by
+theorem quadSign_split_inert
+    : ∀ (D : D7) (v : HeightOneSpectrum (𝓞 D.host.F)),
+      (∀ w w' : HeightOneSpectrum (𝓞 D.host.E),
+          w ≠ w' → (∀ u : HeightOneSpectrum (𝓞 D.host.E), u.under (𝓞 D.host.F) = v ↔ u = w ∨ u = w')
+            → quadSign D v = 1)
+        ∧ (∀ w : HeightOneSpectrum (𝓞 D.host.E),
+          (∀ u : HeightOneSpectrum (𝓞 D.host.E), u.under (𝓞 D.host.F) = v ↔ u = w)
+            → quadSign D v = -1) := by
   intro D v
   constructor
   · intro w w' hne h

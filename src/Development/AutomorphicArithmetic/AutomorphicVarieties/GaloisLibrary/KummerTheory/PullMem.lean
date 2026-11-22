@@ -9,18 +9,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-theorem UpperTheory.V.Kum.pullMem :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (K : Type) [Field K] [NumberField K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω] [IsAlgClosure K Ω] (U : Subgroup (G F Ω)) (hU : U ≤ galOf F K Ω) (N : ℕ) (R M : Type) [CommRing R] [AddCommGroup M] [Module R M], N ≠ 0 → (ClDual K N R M).map (clPull K hU R M) ≤ XDual N U R M ∧ (galOf F K Ω ≤ U → Function.Injective (clPull K hU R M)) := by
+theorem UpperTheory.V.Kum.pullMem
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (K : Type)
+        [Field K] [NumberField K] [Algebra F K] [Algebra K Ω] [IsScalarTower F K Ω]
+        [IsAlgClosure K Ω] (U : Subgroup (G F Ω)) (hU : U ≤ galOf F K Ω) (N : ℕ) (R M : Type)
+        [CommRing R] [AddCommGroup M] [Module R M],
+      N ≠ 0
+        → (ClDual K N R M).map (clPull K hU R M) ≤ XDual N U R M
+          ∧ (galOf F K Ω ≤ U → Function.Injective (clPull K hU R M)) := by
   intro F Ω _ _ _ _ _ K _ _ _ _ _ _ U hU N R M _ _ _ hN
   obtain ⟨hD, hI, hc, hH⟩ := toGalDict F Ω K U hU
   obtain ⟨hS, hL⟩ := artSurj K Ω
   obtain ⟨-, hP, hT, hA⟩ := placeDict K Ω
   refine ⟨?_, fun h => ?_⟩
   · rintro _ ⟨θ, ⟨hm, hv⟩, rfl⟩
-    let θ' : ClassGroup (𝓞 K) →* Multiplicative M := MonoidHom.mk' (fun c => Multiplicative.ofAdd (θ c)) fun a b => by
-      rw [hm, ofAdd_add]
+    let θ' : ClassGroup (𝓞 K) →* Multiplicative M :=
+      MonoidHom.mk' (fun c => Multiplicative.ofAdd (θ c)) fun a b => by rw [hm, ofAdd_add]
     have h1 : θ 1 = 0 := congrArg Multiplicative.toAdd θ'.map_one
     refine ⟨?_, fun a b => ?_, fun A u hu => ?_, fun A hAN u hu => ?_⟩
     · exact (hL.comp_continuous hc).comp θ

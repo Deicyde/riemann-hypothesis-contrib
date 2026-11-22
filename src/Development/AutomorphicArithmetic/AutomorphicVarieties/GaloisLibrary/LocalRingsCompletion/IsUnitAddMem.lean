@@ -8,15 +8,18 @@ open PowerSeries IsLocalRing UpperTheory.V.abelian₂
 open IsDiscreteValuationRing (addVal)
 open scoped Pointwise TensorProduct Topology
 
-private theorem binom_prime {R : Type*} [CommRing R] {l : ℕ} (hl : l.Prime) (y : R) :
-    ∃ s : R, (1 + y) ^ l - 1 = y ^ l + l * y * (1 + y * s) := by
+private theorem binom_prime {R : Type*} [CommRing R] {l : ℕ} (hl : l.Prime) (y : R)
+    : ∃ s : R, (1 + y) ^ l - 1 = y ^ l + l * y * (1 + y * s) := by
   obtain ⟨r, hr⟩ := exists_add_pow_prime_eq hl (1 : Polynomial ℤ) Polynomial.X
   have h1 := congrArg (fun p : Polynomial ℤ => p.coeff 1) hr
   have hl1 : (1 : ℕ) ≠ l := hl.one_lt.ne
-  have e : ((l : Polynomial ℤ) * 1 * Polynomial.X * r) = Polynomial.C (l : ℤ) * (Polynomial.X * r) := by
+  have e
+      : ((l : Polynomial ℤ) * 1 * Polynomial.X * r)
+        = Polynomial.C (l : ℤ) * (Polynomial.X * r) := by
     simp [mul_assoc]
   simp only [Polynomial.coeff_one_add_X_pow, Nat.choose_one_right, one_pow, Polynomial.coeff_add,
-    Polynomial.coeff_X_pow, if_neg hl1, e, Polynomial.coeff_C_mul, Polynomial.coeff_one] at h1
+      Polynomial.coeff_X_pow, if_neg hl1, e, Polynomial.coeff_C_mul, Polynomial.coeff_one]
+    at h1
   have h2 : (Polynomial.X * r).coeff 1 = r.coeff 0 := Polynomial.coeff_X_mul r 0
   rw [h2] at h1
   have hl0 : (l : ℤ) ≠ 0 := by exact_mod_cast hl.ne_zero
@@ -35,8 +38,8 @@ private theorem binom_prime {R : Type*} [CommRing R] {l : ℕ} (hl : l.Prime) (y
   rw [h5]
   ring
 
-private theorem binom_one {R : Type*} [CommRing R] (y : R) (n : ℕ) :
-    ∃ s : R, (1 + y) ^ n - 1 = y * (n + y * s) := by
+private theorem binom_one {R : Type*} [CommRing R] (y : R) (n : ℕ)
+    : ∃ s : R, (1 + y) ^ n - 1 = y * (n + y * s) := by
   induction n with
   | zero => exact ⟨0, by simp⟩
   | succ n ih =>
@@ -46,38 +49,43 @@ private theorem binom_one {R : Type*} [CommRing R] (y : R) (n : ℕ) :
     push_cast
     ring
 
-private theorem isUnit_add_mem {O : Type*} [CommRing O] [IsLocalRing O] {a b : O} (ha : IsUnit a)
-    (hb : b ∈ maximalIdeal O) : IsUnit (a + b) := by
+private theorem isUnit_add_mem
+    {O : Type*} [CommRing O] [IsLocalRing O] {a b : O} (ha : IsUnit a) (hb : b ∈ maximalIdeal O)
+    : IsUnit (a + b) := by
   by_contra h
   have h1 : a + b ∈ maximalIdeal O := h
   have h2 : a ∈ maximalIdeal O := by simpa using (maximalIdeal O).sub_mem h1 hb
   exact h2 ha
 
-private theorem step_prime {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    {l : ℕ} (hl : l.Prime) {y : O} (hy : y ∈ maximalIdeal O)
-    (h : addVal O (l : O) < ((l - 1 : ℕ) : ℕ∞) * addVal O y) :
-    addVal O ((1 + y) ^ l - 1) = addVal O y + addVal O (l : O) := by
+private theorem step_prime
+    {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {l : ℕ} (hl : l.Prime)
+    {y : O} (hy : y ∈ maximalIdeal O) (h : addVal O (l : O) < ((l - 1 : ℕ) : ℕ∞) * addVal O y)
+    : addVal O ((1 + y) ^ l - 1) = addVal O y + addVal O (l : O) := by
   have h' : addVal O (l : O) < addVal O (y ^ (l - 1)) := by
     rwa [IsDiscreteValuationRing.addVal_pow, nsmul_eq_mul]
   obtain ⟨c, hc⟩ := IsDiscreteValuationRing.addVal_le_iff_dvd.1 h'.le
   have hcm : c ∈ maximalIdeal O := by
     intro hu
     rw [hc, IsDiscreteValuationRing.addVal_mul, IsDiscreteValuationRing.addVal_eq_zero_iff.2 hu,
-      add_zero] at h'
+        add_zero]
+      at h'
     exact lt_irrefl _ h'
   obtain ⟨s, hs⟩ := binom_prime hl y
-  have e : y ^ l = y * (l * c) := by
-    rw [← hc, ← pow_succ', Nat.sub_add_cancel hl.one_lt.le]
+  have e : y ^ l = y * (l * c) := by rw [← hc, ← pow_succ', Nat.sub_add_cancel hl.one_lt.le]
   have hu : IsUnit (1 + (y * s + c)) :=
     isUnit_add_mem isUnit_one ((maximalIdeal O).add_mem (Ideal.mul_mem_right _ _ hy) hcm)
   have e2 : (1 + y) ^ l - 1 = y * l * (1 + (y * s + c)) := by rw [hs, e]; ring
   rw [e2, IsDiscreteValuationRing.addVal_mul, IsDiscreteValuationRing.addVal_mul,
     IsDiscreteValuationRing.addVal_eq_zero_iff.2 hu, add_zero]
 
-private theorem lte_nat {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    {l : ℕ} (hl : l.Prime) (hlm : (l : O) ∈ maximalIdeal O) (n : ℕ) :
-    ∀ y : O, y ∈ maximalIdeal O → addVal O (l : O) < ((l - 1 : ℕ) : ℕ∞) * addVal O y →
-      addVal O ((1 + y) ^ n - 1) = addVal O y + addVal O (n : O) := by
+private theorem lte_nat
+    {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {l : ℕ} (hl : l.Prime) (hlm : (l : O) ∈ maximalIdeal O)
+    (n : ℕ)
+    : ∀ y : O,
+      y ∈ maximalIdeal O → addVal O (l : O) < ((l - 1 : ℕ) : ℕ∞) * addVal O y
+        → addVal O ((1 + y) ^ n - 1) = addVal O y + addVal O (n : O) := by
   induction n using Nat.strong_induction_on with
   | _ n ih =>
     intro y hy h
@@ -92,10 +100,12 @@ private theorem lte_nat {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuati
         obtain ⟨s, hs⟩ := binom_one y l
         rw [hs]
         exact Ideal.mul_mem_right _ _ hy
-      have h2 := ih k hlt _ hy' (h.trans_le (by
-        rw [h1]
-        gcongr
-        exact le_self_add))
+      have h2 :=
+        ih k hlt _ hy'
+          (h.trans_le (by
+            rw [h1]
+            gcongr
+            exact le_self_add))
       rw [add_sub_cancel, ← pow_mul, h1] at h2
       rw [h2, Nat.cast_mul, IsDiscreteValuationRing.addVal_mul, add_assoc]
     · have hu : IsUnit (n : O) := by
@@ -108,22 +118,29 @@ private theorem lte_nat {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuati
         exact this isUnit_one
       obtain ⟨s, hs⟩ := binom_one y n
       rw [hs, IsDiscreteValuationRing.addVal_mul, IsDiscreteValuationRing.addVal_eq_zero_iff.2 hu,
-        IsDiscreteValuationRing.addVal_eq_zero_iff.2 (isUnit_add_mem hu (Ideal.mul_mem_right _ _ hy))]
+        IsDiscreteValuationRing.addVal_eq_zero_iff.2 (isUnit_add_mem hu
+          (Ideal.mul_mem_right _ _ hy))]
 
-theorem UpperTheory.V.abelian₂.lte :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] (l : ℕ), l.Prime → (l : O) ∈ maximalIdeal O → ∀ u : oneUnits O,
-      addVal O (l : O) < ((l - 1 : ℕ) : ℕ∞) * addVal O (pt u : O) → (∀ n : ℤ, addVal O (pt (u ^ n) : O) = addVal O (pt u : O) + addVal O (n : O)) := by
+theorem UpperTheory.V.abelian₂.lte
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] (l : ℕ),
+      l.Prime → (l : O) ∈ maximalIdeal O
+        → ∀ u : oneUnits O,
+          addVal O (l : O) < ((l - 1 : ℕ) : ℕ∞) * addVal O (pt u : O)
+            → (∀ n : ℤ, addVal O (pt (u ^ n) : O) = addVal O (pt u : O) + addVal O (n : O)) := by
   intro O _ _ _ _ l hl hlm u h n
-  have key : ∀ k : ℕ, addVal O (((u : Oˣ) : O) ^ k - 1) = addVal O (pt u : O) + addVal O (k : O) := by
+  have key
+      : ∀ k : ℕ, addVal O (((u : Oˣ) : O) ^ k - 1) = addVal O (pt u : O) + addVal O (k : O) := by
     intro k
     have := lte_nat hl hlm k _ (pt u).2 h
     rwa [coe_pt, add_sub_cancel] at this
   obtain ⟨k, rfl | rfl⟩ := n.eq_nat_or_neg
   · rw [zpow_natCast, Int.cast_natCast, ← key k, coe_pt]
     simp
-  · have e : (pt (u ^ (-(k : ℤ))) : O) = ((-((u : Oˣ) ^ k)⁻¹ : Oˣ) : O) * (((u : Oˣ) : O) ^ k - 1) := by
-      rw [coe_pt, zpow_neg, zpow_natCast, ← Units.val_pow_eq_pow_val, Units.val_neg, neg_mul, mul_sub,
-        Units.inv_mul, mul_one, neg_sub]
+  · have e
+        : (pt (u ^ (-(k : ℤ))) : O)
+          = ((-((u : Oˣ) ^ k)⁻¹ : Oˣ) : O) * (((u : Oˣ) : O) ^ k - 1) := by
+      rw [coe_pt, zpow_neg, zpow_natCast, ← Units.val_pow_eq_pow_val, Units.val_neg, neg_mul,
+        mul_sub, Units.inv_mul, mul_one, neg_sub]
       simp
     rw [e, IsDiscreteValuationRing.addVal_mul, key k,
       IsDiscreteValuationRing.addVal_eq_zero_iff.2 (Units.isUnit _), zero_add, Int.cast_neg,

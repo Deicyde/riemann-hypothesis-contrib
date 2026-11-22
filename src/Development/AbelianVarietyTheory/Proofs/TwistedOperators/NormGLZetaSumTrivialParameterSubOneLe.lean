@@ -7,8 +7,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.TendstoOn
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep GlobalTheory.FinZeta GlobalTheory.AdelicScalar GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.LiftRows
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep
+  GlobalTheory.FinZeta GlobalTheory.AdelicScalar
+  GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.LiftRows
 open Formalism.IndefR.Lev (levG levChi IsBaseFrame)
 open Formalism.UG (IsUnifV qV IsUnramInv GU KU IsInertAt Hecke dosetInd IsCommensurated)
 open Formalism.MainNotions.SchurIrreducible (IsSplit)
@@ -20,32 +25,33 @@ noncomputable section
 
 namespace GlobalTheory.GLZetaBound
 
-theorem norm_mul_sub_one_le {a b : ℂ} {c : ℝ} (hc : 0 ≤ c) {m k : ℕ}
-    (ha : ‖a - 1‖ ≤ (1 + c) ^ m - 1) (hb : ‖b - 1‖ ≤ (1 + c) ^ k - 1) :
-    ‖a * b - 1‖ ≤ (1 + c) ^ (m + k) - 1 := by
+theorem norm_mul_sub_one_le
+    {a b : ℂ} {c : ℝ} (hc : 0 ≤ c)
+    {m k : ℕ} (ha : ‖a - 1‖ ≤ (1 + c) ^ m - 1) (hb : ‖b - 1‖ ≤ (1 + c) ^ k - 1)
+    : ‖a * b - 1‖ ≤ (1 + c) ^ (m + k) - 1 := by
   have e : a * b - 1 = (a - 1) * (b - 1) + (a - 1) + (b - 1) := by ring
   rw [e, pow_add]
   have h1 : ‖(a - 1) * (b - 1)‖ ≤ ((1 + c) ^ m - 1) * ((1 + c) ^ k - 1) := by
     rw [norm_mul]; exact mul_le_mul ha hb (norm_nonneg _) ((norm_nonneg _).trans ha)
-  calc ‖(a - 1) * (b - 1) + (a - 1) + (b - 1)‖
+  calc
+    ‖(a - 1) * (b - 1) + (a - 1) + (b - 1)‖
       ≤ ‖(a - 1) * (b - 1)‖ + ‖a - 1‖ + ‖b - 1‖ := norm_add₃_le
-    _ ≤ ((1 + c) ^ m - 1) * ((1 + c) ^ k - 1) + ((1 + c) ^ m - 1) + ((1 + c) ^ k - 1) := by
-        gcongr
+    _ ≤ ((1 + c) ^ m - 1) * ((1 + c) ^ k - 1) + ((1 + c) ^ m - 1) + ((1 + c) ^ k - 1) := by gcongr
     _ = (1 + c) ^ m * (1 + c) ^ k - 1 := by ring
 
-theorem norm_inv_one_sub_sub_one_le {y : ℂ} (hy : ‖y‖ ≤ 1 / 2) :
-    ‖(1 - y)⁻¹ - 1‖ ≤ 2 * ‖y‖ := by
+theorem norm_inv_one_sub_sub_one_le {y : ℂ} (hy : ‖y‖ ≤ 1 / 2) : ‖(1 - y)⁻¹ - 1‖ ≤ 2 * ‖y‖ := by
   have h1 : 1 - ‖y‖ ≤ ‖1 - y‖ := by
     have := norm_sub_norm_le (1 : ℂ) y
     rwa [norm_one] at this
-  have h2 : (1 : ℂ) - y ≠ 0 := by
-    intro h; rw [h, norm_zero] at h1; linarith
+  have h2 : (1 : ℂ) - y ≠ 0 := by intro h; rw [h, norm_zero] at h1; linarith
   have e : (1 - y)⁻¹ - 1 = y / (1 - y) := by field_simp; ring
   rw [e, norm_div, div_le_iff₀ (norm_pos_iff.2 h2)]
   nlinarith [norm_nonneg y]
 
-theorem norm_eulerFac_sub_one_le {B : Multiset ℂˣ} {x : ℂ} {δ : ℝ} (hδ0 : 0 ≤ δ) (hδ : δ ≤ 1 / 2)
-    (h : ∀ b ∈ B, ‖(b : ℂ) * x‖ ≤ δ) : ‖GlobalTheory.LFun.eulerFac B x - 1‖ ≤ (1 + 2 * δ) ^ B.card - 1 := by
+theorem norm_eulerFac_sub_one_le
+    {B : Multiset ℂˣ} {x : ℂ} {δ : ℝ}
+    (hδ0 : 0 ≤ δ) (hδ : δ ≤ 1 / 2) (h : ∀ b ∈ B, ‖(b : ℂ) * x‖ ≤ δ)
+    : ‖GlobalTheory.LFun.eulerFac B x - 1‖ ≤ (1 + 2 * δ) ^ B.card - 1 := by
   rw [GlobalTheory.LFun.eulerFac_eq_prod]
   induction B using Multiset.induction_on with
   | empty => simp
@@ -58,8 +64,9 @@ theorem norm_eulerFac_sub_one_le {B : Multiset ℂˣ} {x : ℂ} {δ : ℝ} (hδ0
     have := norm_inv_one_sub_sub_one_le (h2.trans hδ)
     linarith
 
-theorem norm_prod_one_sub_sub_one_le {ι : Type*} (s : Finset ι) (z : ι → ℂ) {δ : ℝ} (hδ0 : 0 ≤ δ)
-    (h : ∀ i ∈ s, ‖z i‖ ≤ δ) : ‖∏ i ∈ s, (1 - z i) - 1‖ ≤ (1 + 2 * δ) ^ s.card - 1 := by
+theorem norm_prod_one_sub_sub_one_le
+    {ι : Type*} (s : Finset ι) (z : ι → ℂ) {δ : ℝ} (hδ0 : 0 ≤ δ) (h : ∀ i ∈ s, ‖z i‖ ≤ δ)
+    : ‖∏ i ∈ s, (1 - z i) - 1‖ ≤ (1 + 2 * δ) ^ s.card - 1 := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -69,12 +76,12 @@ theorem norm_prod_one_sub_sub_one_le {ι : Type*} (s : Finset ι) (z : ι → �
     rw [Finset.prod_insert ha, Finset.card_insert_of_notMem ha, add_comm s.card 1]
     refine norm_mul_sub_one_le (by linarith) ?_ h1
     rw [pow_one]
-    have e : (1 - z a) - 1 = -z a := by ring
+    have e : (1 - z a) - 1 = - z a := by ring
     rw [e, norm_neg]
     linarith
 
-theorem one_add_two_mul_pow_sub_one_le {δ : ℝ} (hδ0 : 0 ≤ δ) (hδ : δ ≤ 1 / 4) (m : ℕ) :
-    (1 + 2 * δ) ^ m - 1 ≤ 3 ^ m * δ := by
+theorem one_add_two_mul_pow_sub_one_le {δ : ℝ} (hδ0 : 0 ≤ δ) (hδ : δ ≤ 1 / 4) (m : ℕ)
+    : (1 + 2 * δ) ^ m - 1 ≤ 3 ^ m * δ := by
   have key : (1 + 2 * δ) ^ m - 1 ≤ (3 ^ m - 1) * δ := by
     induction m with
     | zero => simp
@@ -92,7 +99,20 @@ theorem one_add_two_mul_pow_sub_one_le {δ : ℝ} (hδ0 : 0 ≤ δ) (hδ : δ �
   have : (3 ^ m - 1) * δ ≤ 3 ^ m * δ := by nlinarith
   linarith
 
-theorem norm_trivial_sub_one_le : ∀ (q : ℕ), 2 ≤ q → ∀ (r t : ℕ), r + 5 ≤ t → ∀ (B : Multiset ℂˣ), B.card = r → (∀ β ∈ B, ‖(β : ℂ)‖ ≤ (q : ℝ) ^ (((r : ℝ) - 1) / 2) ∧ ‖((β⁻¹ : ℂˣ) : ℂ)‖ ≤ (q : ℝ) ^ (((r : ℝ) - 1) / 2)) → ∀ X : ℂ, ‖X‖ = (q : ℝ) ^ (-((1 + (t : ℝ)) / 2)) → ‖eulerFac B X * eulerFac (B.map fun β => β⁻¹) X * ∏ i ∈ Finset.Ioc t (r + t), (1 - ((q : ℂ) ^ i)⁻¹) - 1‖ ≤ 27 ^ r * ((q : ℝ) ^ 2)⁻¹ := by
+theorem norm_trivial_sub_one_le
+    : ∀ (q : ℕ),
+      2 ≤ q
+        → ∀ (r t : ℕ),
+          r + 5 ≤ t
+            → ∀ (B : Multiset ℂˣ),
+              B.card = r
+                → (∀ β ∈ B,
+                  ‖(β : ℂ)‖ ≤ (q : ℝ) ^ (((r : ℝ) - 1) / 2)
+                    ∧ ‖((β⁻¹ : ℂˣ) : ℂ)‖ ≤ (q : ℝ) ^ (((r : ℝ) - 1) / 2))
+                → ∀ X : ℂ,
+                  ‖X‖ = (q : ℝ) ^ (-((1 + (t : ℝ)) / 2))
+                    → ‖eulerFac B X * eulerFac (B.map fun β => β⁻¹) X * ∏ i ∈ Finset.Ioc t (r + t), (1 - ((q : ℂ) ^ i)⁻¹) - 1‖
+                      ≤ 27 ^ r * ((q : ℝ) ^ 2)⁻¹ := by
   intro q hq r t hrt B hB hβ X hX
   set δ : ℝ := ((q : ℝ) ^ 2)⁻¹ with hδdef
   have hq2 : (2 : ℝ) ≤ q := by exact_mod_cast hq
@@ -107,8 +127,7 @@ theorem norm_trivial_sub_one_le : ∀ (q : ℕ), 2 ≤ q → ∀ (r t : ℕ), r 
   have hrt' : (r : ℝ) + 5 ≤ t := by exact_mod_cast hrt
   have hbx : (q : ℝ) ^ (((r : ℝ) - 1) / 2) * ‖X‖ ≤ δ := by
     rw [hX, ← Real.rpow_add hq0]
-    have e : δ = (q : ℝ) ^ (-(2 : ℝ)) := by
-      rw [hδdef, Real.rpow_neg hq0.le, Real.rpow_two]
+    have e : δ = (q : ℝ) ^ (-(2 : ℝ)) := by rw [hδdef, Real.rpow_neg hq0.le, Real.rpow_two]
     rw [e]
     apply Real.rpow_le_rpow_of_exponent_le hq1
     linarith
@@ -123,11 +142,10 @@ theorem norm_trivial_sub_one_le : ∀ (q : ℕ), 2 ≤ q → ∀ (r t : ℕ), r 
     exact (mul_le_mul_of_nonneg_right (hβ β hβB).2 (norm_nonneg _)).trans hbx
   have h1 := norm_eulerFac_sub_one_le hδ0 (by linarith) hB1
   have h2 := norm_eulerFac_sub_one_le hδ0 (by linarith) hB2
-  have h3 := norm_prod_one_sub_sub_one_le (Finset.Ioc t (r + t)) (fun i => ((q : ℂ) ^ i)⁻¹) hδ0
-    (by
+  have h3 :=
+    norm_prod_one_sub_sub_one_le (Finset.Ioc t (r + t)) (fun i => ((q : ℂ) ^ i)⁻¹) hδ0 (by
       intro i hi
-      have hi2 : 2 ≤ i := by
-        have := (Finset.mem_Ioc.1 hi).1; omega
+      have hi2 : 2 ≤ i := by have := (Finset.mem_Ioc.1 hi).1; omega
       rw [norm_inv, norm_pow, Complex.norm_natCast, hδdef]
       apply inv_anti₀ (by positivity)
       exact pow_le_pow_right₀ hq1 hi2)

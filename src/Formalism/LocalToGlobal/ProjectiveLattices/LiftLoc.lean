@@ -9,10 +9,13 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Gaps.EtaleWeightGaps NumberField IsDedekindDomain Finset
+open Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.Gaps.EtaleWeightGaps NumberField IsDedekindDomain Finset
 
-variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} {X : PJ D B P j} {E : PtExt X} {hM : IntAtExt X E}
-  {ka wL wF : WeightFamilies.Wt D j} {G : GlobalFamilyData (xplus X E hM) ka wL wF} {la : HeightOneSpectrum (𝓞 B.KO)}
+variable
+  {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} {X : PJ D B P j}
+  {E : PtExt X} {hM : IntAtExt X E} {ka wL wF : WeightFamilies.Wt D j}
+  {G : GlobalFamilyData (xplus X E hM) ka wL wF} {la : HeightOneSpectrum (𝓞 B.KO)}
   {y : PtsG G la → E.Pt' la}
 
 lemma nval_neg' {T : CDVR} (e : ℕ) (x : T.Fr) : nval T.V e (-x) = nval T.V e x := by
@@ -34,10 +37,12 @@ def locSub : Submonoid (Lc (xplus X E hM) la G.w) where
   carrier := {x | ∀ ζ, liftC hs ζ x ≠ 0}
   mul_mem' := fun {a b} ha hb ζ => by
     show liftC hs ζ (a * b) ≠ 0
-    rw [map_mul]; exact mul_ne_zero (ha ζ) (hb ζ)
+    rw [map_mul]
+    exact mul_ne_zero (ha ζ) (hb ζ)
   one_mem' := fun ζ => by
     show liftC hs ζ 1 ≠ 0
-    rw [map_one]; exact one_ne_zero
+    rw [map_one]
+    exact one_ne_zero
 
 abbrev LamL : Type := Localization (locSub hs)
 
@@ -169,7 +174,8 @@ lemma mem_RGL_of_stable {S : Set (LamL hs)} (hS : ∀ β, ∀ s ∈ S, hdL hs β
   exact hI _ this
 
 def eFormL (F : X.Forms) : LamL hs :=
-  ιL hs (algebraMap (Rp (xplus X E hM) la G.N) (Lc (xplus X E hM) la G.w) (emb (xplus X E hM) la G.N F))
+  ιL hs
+    (algebraMap (Rp (xplus X E hM) la G.N) (Lc (xplus X E hM) la G.w) (emb (xplus X E hM) la G.N F))
 
 lemma evL_eFormL (ζ : PtsG G la) (F : X.Forms) :
     evL hs ζ (eFormL hs F) = (hs ζ).ev (emb (xplus X E hM) la G.N F) := by
@@ -215,9 +221,13 @@ namespace Formalism.L2.Pj
 
 open Formalism.MainNotions.Gaps.EtaleWeightGaps
 
-theorem eq_zero_of_ord_top {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    {A : Type*} [CommRing A] [Algebra O A] {ϖ : O} [∀ ζ : Pts O A, IsDVRAt ζ] (h : IsUnif A ϖ) (c : A)
-    (hc : ∀ ζ : Pts O A, ord ϖ ζ c = ⊤) : c = 0 := by
+theorem eq_zero_of_ord_top
+    {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {A : Type*} [CommRing A] [Algebra O A]
+    {ϖ : O} [∀ ζ : Pts O A, IsDVRAt ζ]
+    (h : IsUnif A ϖ)
+    (c : A) (hc : ∀ ζ : Pts O A, ord ϖ ζ c = ⊤)
+    : c = 0 := by
   obtain ⟨n, hn⟩ := h.denom c
   have hb : (⟨ϖ ^ n • c, hn⟩ : ↥(As O A)) = 0 := by
     apply eq_zero_of_localization
@@ -239,10 +249,13 @@ end Formalism.L2.Pj
 
 namespace Formalism.L2.Pj
 
-open Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Gaps.EtaleWeightGaps NumberField IsDedekindDomain
+open Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.Gaps.EtaleWeightGaps NumberField IsDedekindDomain
 
-variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} {X : PJ D B P j} {E : PtExt X} {hM : IntAtExt X E}
-  {ka wL wF : WeightFamilies.Wt D j} {G : GlobalFamilyData (xplus X E hM) ka wL wF} {la : HeightOneSpectrum (𝓞 B.KO)}
+variable
+  {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} {X : PJ D B P j}
+  {E : PtExt X} {hM : IntAtExt X E} {ka wL wF : WeightFamilies.Wt D j}
+  {G : GlobalFamilyData (xplus X E hM) ka wL wF} {la : HeightOneSpectrum (𝓞 B.KO)}
   {y : PtsG G la → E.Pt' la}
 
 lemma curve_span_mem_Jid {g0 : B.Cusp j wF} (CM : CurveModel G la g0) {z : ↥CM.A'}
@@ -257,13 +270,16 @@ lemma curve_span_mem_Jid {g0 : B.Cusp j wF} (CM : CurveModel G la g0) {z : ↥CM
 
 variable (hs : ∀ ζ, SecPt ζ (y ζ))
 
-theorem res_ker_of (hfd : FiniteDimensional (Kp (xplus X E hM) la G.N) (OsK (xplus X E hM) la G.w))
-    (hred : IsReduced (OsK (xplus X E hM) la G.w)) {g0 : B.Cusp j wF} (CM : CurveModel G la g0)
-    (hg0 : ∀ ζ, (hs ζ).ev (emb (xplus X E hM) la G.N (X.inc wF g0)) ≠ 0)
+theorem res_ker_of
+    (hfd : FiniteDimensional (Kp (xplus X E hM) la G.N) (OsK (xplus X E hM) la G.w))
+    (hred : IsReduced (OsK (xplus X E hM) la G.w))
+    {g0 : B.Cusp j wF}
+    (CM : CurveModel G la g0) (hg0 : ∀ ζ, (hs ζ).ev (emb (xplus X E hM) la G.N (X.inc wF g0)) ≠ 0)
     (x : ↥(HK (xplus X E hM) la G.w wF))
-    (hx : ιW hs (x : Lw (xplus X E hM) la G.w) ∈ Ideal.span (Set.range fun i : Fin (WeightFamilies.dimY D j) =>
-        ιW hs (sfr (xplus X E hM) la G.w i.succ : Lw (xplus X E hM) la G.w))) :
-    toA0K (xplus X E hM) la G.w wF x = 0 := by
+    (hx : ιW hs (x : Lw (xplus X E hM) la G.w)
+      ∈ Ideal.span (Set.range fun i : Fin (WeightFamilies.dimY D j) =>
+        ιW hs (sfr (xplus X E hM) la G.w i.succ : Lw (xplus X E hM) la G.w)))
+    : toA0K (xplus X E hM) la G.w wF x = 0 := by
   have hU := isUnif_of_ring (G := G) hfd
   have hD : ∀ ζ : PtsG G la, IsDVRAt ζ := isDVRAt_of_ring hfd hred
   have hz : ∀ ζ, (hs ζ).lift (x : Lw (xplus X E hM) la G.w) = 0 := fun ζ => by
@@ -272,15 +288,19 @@ theorem res_ker_of (hfd : FiniteDimensional (Kp (xplus X E hM) la G.N) (OsK (xpl
   have hJh : ((CM.h : ↥(Frac0 (xplus X E hM) la G.w)) - 1) ∈ Jid (xplus X E hM) la G.w := by
     have := curve_span_mem_Jid CM CM.h_one
     rwa [Subalgebra.coe_sub, Subalgebra.coe_one] at this
-  have hlh : ∀ ζ, (hs ζ).lift (((CM.h : ↥(Frac0 (xplus X E hM) la G.w))) : Lw (xplus X E hM) la G.w) = 1 :=
-    fun ζ => by
-      have h1 := (hs ζ).lift_Jid hJh
-      rwa [Subalgebra.coe_sub, Subalgebra.coe_one, map_sub, map_one, sub_eq_zero] at h1
-  have hla : ∀ ζ, (hs ζ).lift (((a : ↥(Frac0 (xplus X E hM) la G.w))) : Lw (xplus X E hM) la G.w) = 0 :=
-    fun ζ => by
-      have h1 := congrArg (hs ζ).lift ha
-      rw [map_mul, map_mul, map_pow, hlh ζ, hz ζ, one_pow, mul_zero, (hs ζ).lift_alg] at h1
-      exact (mul_eq_zero.1 h1.symm).resolve_right (hg0 ζ)
+  have hlh
+      : ∀ ζ,
+        (hs ζ).lift (((CM.h : ↥(Frac0 (xplus X E hM) la G.w))) : Lw (xplus X E hM) la G.w)
+          = 1 := fun ζ => by
+    have h1 := (hs ζ).lift_Jid hJh
+    rwa [Subalgebra.coe_sub, Subalgebra.coe_one, map_sub, map_one, sub_eq_zero] at h1
+  have hla
+      : ∀ ζ,
+        (hs ζ).lift (((a : ↥(Frac0 (xplus X E hM) la G.w))) : Lw (xplus X E hM) la G.w)
+          = 0 := fun ζ => by
+    have h1 := congrArg (hs ζ).lift ha
+    rw [map_mul, map_mul, map_pow, hlh ζ, hz ζ, one_pow, mul_zero, (hs ζ).lift_alg] at h1
+    exact (mul_eq_zero.1 h1.symm).resolve_right (hg0 ζ)
   have hoa : toOsK (xplus X E hM) la G.w (a : ↥(Frac0 (xplus X E hM) la G.w)) = 0 := by
     apply eq_zero_of_ord_top hU
     intro ζ
@@ -295,24 +315,33 @@ theorem res_ker_of (hfd : FiniteDimensional (Kp (xplus X E hM) la G.N) (OsK (xpl
       rw [← sub_eq_zero, ← map_one (toOsK (xplus X E hM) la G.w), ← map_sub]
       exact (toOsK_eq_zero_iff _ _ _ _).2 hJh
     rw [this, one_pow, sub_self]
-  have hg' : algebraMap (Rp (xplus X E hM) la G.N) (Lw (xplus X E hM) la G.w)
-      (emb (xplus X E hM) la G.N (X.inc wF g0)) ∈ HK (xplus X E hM) la G.w wF := by
+  have hg'
+      : algebraMap (Rp (xplus X E hM) la G.N) (Lw (xplus X E hM) la G.w)
+          (emb (xplus X E hM) la G.N (X.inc wF g0))
+        ∈ HK (xplus X E hM) la G.w wF := by
     rw [← frac_zero]
     exact frac_mem_HK _ _ _ (by rw [addL_zero]; exact emb_mem_Vw _ _ _ wF g0)
   let g' : ↥(HK (xplus X E hM) la G.w wF) := ⟨_, hg'⟩
-  have e3 : (CM.h : ↥(Frac0 (xplus X E hM) la G.w)) ^ m • x = (a : ↥(Frac0 (xplus X E hM) la G.w)) • g' := by
+  have e3
+      : (CM.h : ↥(Frac0 (xplus X E hM) la G.w)) ^ m • x
+        = (a : ↥(Frac0 (xplus X E hM) la G.w)) • g' := by
     apply Subtype.ext
-    rw [Submodule.coe_smul, Submodule.coe_smul, Subalgebra.smul_def, Subalgebra.smul_def, smul_eq_mul, smul_eq_mul,
-      SubmonoidClass.coe_pow]
+    rw [Submodule.coe_smul, Submodule.coe_smul, Subalgebra.smul_def, Subalgebra.smul_def,
+      smul_eq_mul, smul_eq_mul, SubmonoidClass.coe_pow]
     exact ha
-  have e1 : toA0K (xplus X E hM) la G.w wF (((CM.h : ↥(Frac0 (xplus X E hM) la G.w)) ^ m - 1) • x) = 0 :=
-    (reduction_eq_zero_iff_mem_ideal_smul _ _ _ _ _).2 (Submodule.smul_mem_smul hJm Submodule.mem_top)
+  have e1
+      : toA0K (xplus X E hM) la G.w wF (((CM.h : ↥(Frac0 (xplus X E hM) la G.w)) ^ m - 1) • x)
+        = 0 :=
+    (reduction_eq_zero_iff_mem_ideal_smul _ _ _ _ _).2
+      (Submodule.smul_mem_smul hJm Submodule.mem_top)
   have e2 : toA0K (xplus X E hM) la G.w wF ((a : ↥(Frac0 (xplus X E hM) la G.w)) • g') = 0 :=
-    (reduction_eq_zero_iff_mem_ideal_smul _ _ _ _ _).2 (Submodule.smul_mem_smul haJ Submodule.mem_top)
-  calc toA0K (xplus X E hM) la G.w wF x
-      = toA0K (xplus X E hM) la G.w wF ((CM.h : ↥(Frac0 (xplus X E hM) la G.w)) ^ m • x) -
-          toA0K (xplus X E hM) la G.w wF (((CM.h : ↥(Frac0 (xplus X E hM) la G.w)) ^ m - 1) • x) := by
-        rw [← map_sub, sub_smul, one_smul, sub_sub_cancel]
+    (reduction_eq_zero_iff_mem_ideal_smul _ _ _ _ _).2
+      (Submodule.smul_mem_smul haJ Submodule.mem_top)
+  calc
+    toA0K (xplus X E hM) la G.w wF x
+        = toA0K (xplus X E hM) la G.w wF ((CM.h : ↥(Frac0 (xplus X E hM) la G.w)) ^ m • x) - toA0K
+          (xplus X E hM) la G.w wF (((CM.h : ↥(Frac0 (xplus X E hM) la G.w)) ^ m - 1) • x) := by
+      rw [← map_sub, sub_smul, one_smul, sub_sub_cancel]
     _ = 0 := by rw [e3, e2, e1, sub_zero]
 
 end Formalism.L2.Pj

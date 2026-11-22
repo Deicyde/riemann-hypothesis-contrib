@@ -11,7 +11,7 @@ namespace Formalism.RepresentationBoundsCohomology.N2
 theorem residue_finite_holds : StatResFinite := by
   unfold StatResFinite
   intro n _ ℓ c s H hℓ hrec i m
-  have hq : (0:ℝ) < ℓ - 1 := by linarith
+  have hq : (0 : ℝ) < ℓ - 1 := by linarith
   induction m with
   | zero => simp
   | succ m ih =>
@@ -21,19 +21,24 @@ theorem residue_finite_holds : StatResFinite := by
       ring
     rw [he] at h1
     have hpow : 0 < (ℓ - 1) ^ m := pow_pos hq m
-    have h2 : s (i + (m : ZMod n)) / (ℓ - 1) ^ m ≤
-        (H (i + ((m + 1 : ℕ) : ZMod n)) + c + 3 + s (i + ((m + 1 : ℕ) : ZMod n)) / (ℓ - 1)) / (ℓ - 1) ^ m := by
+    have h2
+        : s (i + (m : ZMod n)) / (ℓ - 1) ^ m
+          ≤ (H (i + ((m + 1 : ℕ) : ZMod n)) + c + 3 + s (i + ((m + 1 : ℕ) : ZMod n)) / (ℓ - 1))
+            / (ℓ - 1) ^ m := by
       rw [div_eq_mul_inv, div_eq_mul_inv _ ((ℓ - 1) ^ m)]
       exact mul_le_mul_of_nonneg_right h1 (inv_nonneg.mpr hpow.le)
-    have h3 : (H (i + ((m + 1 : ℕ) : ZMod n)) + c + 3 + s (i + ((m + 1 : ℕ) : ZMod n)) / (ℓ - 1)) / (ℓ - 1) ^ m =
-        (H (i + ((m + 1 : ℕ) : ZMod n)) + c + 3) / (ℓ - 1) ^ m + s (i + ((m + 1 : ℕ) : ZMod n)) / (ℓ - 1) ^ (m + 1) := by
+    have h3
+        : (H (i + ((m + 1 : ℕ) : ZMod n)) + c + 3 + s (i + ((m + 1 : ℕ) : ZMod n)) / (ℓ - 1))
+            / (ℓ - 1) ^ m
+          = (H (i + ((m + 1 : ℕ) : ZMod n)) + c + 3) / (ℓ - 1) ^ m
+            + s (i + ((m + 1 : ℕ) : ZMod n)) / (ℓ - 1) ^ (m + 1) := by
       rw [pow_succ, ← div_div]
       ring
     rw [Finset.sum_range_succ]
     linarith
 
-theorem geom_id (K L : ℝ) (hL : 1 < L) (j : ℕ) :
-    (∑ a ∈ Finset.range j, K / L ^ a) + K * L / ((L - 1) * L ^ j) = K * L / (L - 1) := by
+theorem geom_id (K L : ℝ) (hL : 1 < L) (j : ℕ)
+    : (∑ a ∈ Finset.range j, K / L ^ a) + K * L / ((L - 1) * L ^ j) = K * L / (L - 1) := by
   have hL0 : L ≠ 0 := by positivity
   have hL1 : L - 1 ≠ 0 := by
     intro h
@@ -53,12 +58,13 @@ theorem residue_at_truncation : StatResCut := by
   intro n _ ℓ c G Hm s H i j hℓ hc hG hHm hH hrec
   have hF : StatResFinite := residue_finite_holds
   unfold StatResFinite at hF
-  have hq : (1:ℝ) < ℓ - 1 := by linarith
-  have hq0 : (0:ℝ) < ℓ - 1 := by linarith
+  have hq : (1 : ℝ) < ℓ - 1 := by linarith
+  have hq0 : (0 : ℝ) < ℓ - 1 := by linarith
   have h1 := hF n ℓ c s H (by linarith) hrec i j
-  have hK0 : (0:ℝ) ≤ 2 * G + c + 3 := by linarith
-  have hsum : ∑ a ∈ Finset.range j, (H (i + ((a + 1 : ℕ) : ZMod n)) + c + 3) / (ℓ - 1) ^ a ≤
-      ∑ a ∈ Finset.range j, (2 * G + c + 3) / (ℓ - 1) ^ a := by
+  have hK0 : (0 : ℝ) ≤ 2 * G + c + 3 := by linarith
+  have hsum
+      : ∑ a ∈ Finset.range j, (H (i + ((a + 1 : ℕ) : ZMod n)) + c + 3) / (ℓ - 1) ^ a
+        ≤ ∑ a ∈ Finset.range j, (2 * G + c + 3) / (ℓ - 1) ^ a := by
     apply Finset.sum_le_sum
     intro a ha
     rw [Finset.mem_range] at ha
@@ -80,30 +86,30 @@ theorem residue_at_truncation : StatResCut := by
 theorem residue_always_holds : StatResAlways := by
   unfold StatResAlways
   intro ℓ s H c r hℓ hsH hr
-  have hℓR : (3:ℝ) ≤ ℓ := by exact_mod_cast hℓ
-  have hq0 : (0:ℝ) < (ℓ:ℝ) - 1 := by linarith
-  have hne : (ℓ:ℝ) - 1 ≠ 0 := hq0.ne'
-  have hsH' : (s:ℝ) ≤ H := by exact_mod_cast hsH
-  have e1 : ((ℓ - 2 : ℕ) : ℝ) = (ℓ:ℝ) - 2 := by
-    rw [Nat.cast_sub (by omega : 2 ≤ ℓ)] <;> norm_num
-  have e2 : ((ℓ - 1 : ℕ) : ℝ) = (ℓ:ℝ) - 1 := by
-    rw [Nat.cast_sub (by omega : 1 ≤ ℓ)] <;> norm_num
+  have hℓR : (3 : ℝ) ≤ ℓ := by exact_mod_cast hℓ
+  have hq0 : (0 : ℝ) < (ℓ : ℝ) - 1 := by linarith
+  have hne : (ℓ : ℝ) - 1 ≠ 0 := hq0.ne'
+  have hsH' : (s : ℝ) ≤ H := by exact_mod_cast hsH
+  have e1 : ((ℓ - 2 : ℕ) : ℝ) = (ℓ : ℝ) - 2 := by rw [Nat.cast_sub (by omega : 2 ≤ ℓ)] <;> norm_num
+  have e2 : ((ℓ - 1 : ℕ) : ℝ) = (ℓ : ℝ) - 1 := by rw [Nat.cast_sub (by omega : 1 ≤ ℓ)] <;> norm_num
   have hd0 := Nat.cast_div_le (α := ℝ) (m := s + (ℓ - 2)) (n := ℓ - 1)
   rw [Nat.cast_add, e1, e2] at hd0
-  have hA : (H:ℝ) / ((ℓ:ℝ) - 1) + 1 - ((s:ℝ) + ((ℓ:ℝ) - 2)) / ((ℓ:ℝ) - 1) =
-      ((H:ℝ) - s + 1) / ((ℓ:ℝ) - 1) := by
+  have hA
+      : (H : ℝ) / ((ℓ : ℝ) - 1) + 1 - ((s : ℝ) + ((ℓ : ℝ) - 2)) / ((ℓ : ℝ) - 1)
+        = ((H : ℝ) - s + 1) / ((ℓ : ℝ) - 1) := by
     field_simp
     ring
-  have hA0 : 0 ≤ ((H:ℝ) - s + 1) / ((ℓ:ℝ) - 1) := div_nonneg (by linarith) hq0.le
-  have hB : (H:ℝ) * (2 * (ℓ:ℝ) - 1) / ((ℓ:ℝ) - 1) ^ 2 + 1 -
-      (((s:ℝ) + ((ℓ:ℝ) - 2)) / ((ℓ:ℝ) - 1) + (s:ℝ) * (ℓ:ℝ) / ((ℓ:ℝ) - 1) ^ 2) =
-      (((H:ℝ) - s) * (2 * (ℓ:ℝ) - 1) + ((ℓ:ℝ) - 1)) / ((ℓ:ℝ) - 1) ^ 2 := by
+  have hA0 : 0 ≤ ((H : ℝ) - s + 1) / ((ℓ : ℝ) - 1) := div_nonneg (by linarith) hq0.le
+  have hB
+      : (H : ℝ) * (2 * (ℓ : ℝ) - 1) / ((ℓ : ℝ) - 1) ^ 2 + 1
+          - (((s : ℝ) + ((ℓ : ℝ) - 2)) / ((ℓ : ℝ) - 1) + (s : ℝ) * (ℓ : ℝ) / ((ℓ : ℝ) - 1) ^ 2)
+        = (((H : ℝ) - s) * (2 * (ℓ : ℝ) - 1) + ((ℓ : ℝ) - 1)) / ((ℓ : ℝ) - 1) ^ 2 := by
     field_simp
     ring
-  have hB0 : 0 ≤ (((H:ℝ) - s) * (2 * (ℓ:ℝ) - 1) + ((ℓ:ℝ) - 1)) / ((ℓ:ℝ) - 1) ^ 2 := by
+  have hB0 : 0 ≤ (((H : ℝ) - s) * (2 * (ℓ : ℝ) - 1) + ((ℓ : ℝ) - 1)) / ((ℓ : ℝ) - 1) ^ 2 := by
     apply div_nonneg ?_ (sq_nonneg _)
-    have h5 : (0:ℝ) ≤ (H:ℝ) - s := by linarith
-    have h6 : (0:ℝ) ≤ 2 * (ℓ:ℝ) - 1 := by linarith
+    have h5 : (0 : ℝ) ≤ (H : ℝ) - s := by linarith
+    have h6 : (0 : ℝ) ≤ 2 * (ℓ : ℝ) - 1 := by linarith
     nlinarith [mul_nonneg h5 h6]
   constructor
   · linarith
@@ -123,9 +129,15 @@ theorem superadditivity_holds : StatASuper := by
   unfold aH
   have hd : ℓ ^ (padicValNat ℓ r.factorial + padicValNat ℓ s.factorial) ∣ (r + s).factorial := by
     rw [pow_add]
-    exact (Nat.mul_dvd_mul (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _)) (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))).trans
+    exact (Nat.mul_dvd_mul (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
+        (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))).trans
       (Nat.factorial_mul_factorial_dvd_factorial_add r s)
-  have h := ((by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat} (ha : a ≠ 0), p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a) (Nat.factorial_ne_zero _)).mp hd
+  have h :=
+    ((by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le
+        : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat}
+            (ha : a ≠ 0),
+          p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a)
+      (Nat.factorial_ne_zero _)).mp hd
   omega
 
 theorem frame_invariance_holds : StatFrameInv := by
@@ -142,8 +154,9 @@ theorem frame_invariance_holds : StatFrameInv := by
       exact hL _
     · have hs := hconv r hr
       simp only [Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk, Nat.succ_eq_add_one,
-        Finset.sum_range_succ', h0, one_mul, Nat.sub_zero] at hs
-      have hCr : Cf' r = -∑ k ∈ Finset.range r, Cf (k + 1) * Cf' (r - (k + 1)) := by
+          Finset.sum_range_succ', h0, one_mul, Nat.sub_zero]
+        at hs
+      have hCr : Cf' r = - ∑ k ∈ Finset.range r, Cf (k + 1) * Cf' (r - (k + 1)) := by
         rw [eq_neg_iff_add_eq_zero, add_comm]
         exact hs
       rw [hCr, mul_neg, Finset.mul_sum]
@@ -156,10 +169,11 @@ theorem frame_invariance_holds : StatFrameInv := by
         rwa [Nat.add_sub_cancel' (by omega)] at h7
       have hcomm : Commute ((ℓ : E) ^ aH ℓ (r - (k + 1))) (Cf (k + 1)) :=
         (Nat.cast_commute ℓ (Cf (k + 1))).pow_left _
-      have heq : (ℓ : E) ^ aH ℓ r * (Cf (k + 1) * Cf' (r - (k + 1))) =
-          (ℓ : E) ^ (aH ℓ r - (aH ℓ (k + 1) + aH ℓ (r - (k + 1)))) *
-            ((ℓ : E) ^ aH ℓ (k + 1) * Cf (k + 1)) *
-            ((ℓ : E) ^ aH ℓ (r - (k + 1)) * Cf' (r - (k + 1))) := by
+      have heq
+          : (ℓ : E) ^ aH ℓ r * (Cf (k + 1) * Cf' (r - (k + 1)))
+            = (ℓ : E) ^ (aH ℓ r - (aH ℓ (k + 1) + aH ℓ (r - (k + 1))))
+              * ((ℓ : E) ^ aH ℓ (k + 1) * Cf (k + 1))
+              * ((ℓ : E) ^ aH ℓ (r - (k + 1)) * Cf' (r - (k + 1))) := by
         conv_lhs => rw [← Nat.sub_add_cancel hle, pow_add, pow_add]
         simp only [mul_assoc]
         rw [← mul_assoc ((ℓ : E) ^ aH ℓ (r - (k + 1))) (Cf (k + 1)), hcomm.eq, mul_assoc]
@@ -169,20 +183,21 @@ theorem frame_invariance_holds : StatFrameInv := by
 theorem sigma_j_numerical : StatSigJNum := by
   unfold StatSigJNum
   intro ℓ hℓ j y r hj
-  have hℓR : (3:ℝ) ≤ ℓ := by exact_mod_cast hℓ
-  have hq : (0:ℝ) < (ℓ:ℝ) - 1 := by linarith
-  have hP : (0:ℝ) < (ℓ:ℝ) ^ (j - 1) := pow_pos (by linarith) _
+  have hℓR : (3 : ℝ) ≤ ℓ := by exact_mod_cast hℓ
+  have hq : (0 : ℝ) < (ℓ : ℝ) - 1 := by linarith
+  have hP : (0 : ℝ) < (ℓ : ℝ) ^ (j - 1) := pow_pos (by linarith) _
   rw [← div_div]
   set Y := (y:ℝ) / (ℓ:ℝ) ^ (j - 1) with hYdef
-  have e1 : (r:ℝ) * ℓ / ((ℓ:ℝ) - 1) - Y / ((ℓ:ℝ) - 1) = ((ℓ:ℝ) * r - Y) / ((ℓ:ℝ) - 1) := by
+  have e1
+      : (r : ℝ) * ℓ / ((ℓ : ℝ) - 1) - Y / ((ℓ : ℝ) - 1) = ((ℓ : ℝ) * r - Y) / ((ℓ : ℝ) - 1) := by
     ring
-  rcases le_total ((ℓ:ℝ) * r - Y) 0 with h | h
+  rcases le_total ((ℓ : ℝ) * r - Y) 0 with h | h
   · rw [max_eq_left h]
-    have h8 : 0 ≤ (-((ℓ:ℝ) * r - Y)) / ((ℓ:ℝ) - 1) := div_nonneg (by linarith) hq.le
-    have h9 : (-((ℓ:ℝ) * r - Y)) / ((ℓ:ℝ) - 1) = -(((ℓ:ℝ) * r - Y) / ((ℓ:ℝ) - 1)) := by ring
+    have h8 : 0 ≤ (-((ℓ : ℝ) * r - Y)) / ((ℓ : ℝ) - 1) := div_nonneg (by linarith) hq.le
+    have h9 : (-((ℓ : ℝ) * r - Y)) / ((ℓ : ℝ) - 1) = -(((ℓ : ℝ) * r - Y) / ((ℓ : ℝ) - 1)) := by ring
     linarith
   · rw [max_eq_right h]
-    have h8 : ((ℓ:ℝ) * r - Y) / ((ℓ:ℝ) - 1) ≤ (ℓ:ℝ) * r - Y := div_le_self h (by linarith)
+    have h8 : ((ℓ : ℝ) * r - Y) / ((ℓ : ℝ) - 1) ≤ (ℓ : ℝ) * r - Y := div_le_self h (by linarith)
     linarith
 
 end Formalism.RepresentationBoundsCohomology.N2

@@ -11,48 +11,54 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GramChartSub
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.PeakWeightLevi
 
 open Complex ComplexConjugate Filter
 
-theorem deriv_zero_of_eqOn {χ : ℝ → ℝ} {U : Set ℝ} (hU : IsOpen U) {c : ℝ}
-    (h : ∀ s ∈ U, χ s = c) : ∀ s ∈ U, deriv χ s = 0 ∧ deriv (deriv χ) s = 0 := by
+theorem deriv_zero_of_eqOn {χ : ℝ → ℝ} {U : Set ℝ} (hU : IsOpen U) {c : ℝ} (h : ∀ s ∈ U, χ s = c)
+    : ∀ s ∈ U, deriv χ s = 0 ∧ deriv (deriv χ) s = 0 := by
   have h1 : ∀ s ∈ U, deriv χ s = 0 := fun s hs => by
     have e : χ =ᶠ[𝓝 s] fun _ => c := Filter.eventually_of_mem (hU.mem_nhds hs) h
-    rw [e.deriv_eq]; simp
+    rw [e.deriv_eq]
+    simp
   intro s hs
   refine ⟨h1 s hs, ?_⟩
   have e : deriv χ =ᶠ[𝓝 s] fun _ => (0 : ℝ) := Filter.eventually_of_mem (hU.mem_nhds hs) h1
-  rw [e.deriv_eq]; simp
+  rw [e.deriv_eq]
+  simp
 
-theorem hasDerivAt_logShift {δ s : ℝ} (hs : 0 < s + δ) :
-    HasDerivAt (fun s => Real.log ((s + δ) / 2)) (s + δ)⁻¹ s := by
+theorem hasDerivAt_logShift {δ s : ℝ} (hs : 0 < s + δ)
+    : HasDerivAt (fun s => Real.log ((s + δ) / 2)) (s + δ)⁻¹ s := by
   have h1 : HasDerivAt (fun s : ℝ => (s + δ) / 2) (1 / 2) s :=
     ((hasDerivAt_id' s).add_const δ).div_const 2
   convert h1.log (by positivity) using 1
   field_simp
 
-theorem hasDerivAt_cutLog {χ : ℝ → ℝ} (hχ : ContDiff ℝ ∞ χ) {δ s : ℝ} (hs : 0 < s + δ) :
-    HasDerivAt (fun s => χ s * Real.log ((s + δ) / 2))
+theorem hasDerivAt_cutLog {χ : ℝ → ℝ} (hχ : ContDiff ℝ ∞ χ) {δ s : ℝ} (hs : 0 < s + δ)
+    : HasDerivAt
+      (fun s => χ s * Real.log ((s + δ) / 2))
       (deriv χ s * Real.log ((s + δ) / 2) + χ s * (s + δ)⁻¹) s := by
   have hd : Differentiable ℝ χ := hχ.differentiable (by simp)
   exact (hd s).hasDerivAt.mul (hasDerivAt_logShift hs)
 
-theorem derivs_cutLog {χ : ℝ → ℝ} (hχ : ContDiff ℝ ∞ χ) {δ t : ℝ} (ht : 0 < t + δ) :
-    deriv (fun s => χ s * Real.log ((s + δ) / 2)) t =
-        deriv χ t * Real.log ((t + δ) / 2) + χ t * (t + δ)⁻¹ ∧
-      deriv (deriv (fun s => χ s * Real.log ((s + δ) / 2))) t =
-        deriv (deriv χ) t * Real.log ((t + δ) / 2) + 2 * deriv χ t * (t + δ)⁻¹ -
-          χ t * ((t + δ)⁻¹) ^ 2 := by
+theorem derivs_cutLog {χ : ℝ → ℝ} (hχ : ContDiff ℝ ∞ χ) {δ t : ℝ} (ht : 0 < t + δ)
+    : deriv (fun s => χ s * Real.log ((s + δ) / 2)) t
+        = deriv χ t * Real.log ((t + δ) / 2) + χ t * (t + δ)⁻¹
+      ∧ deriv (deriv (fun s => χ s * Real.log ((s + δ) / 2))) t
+        = deriv (deriv χ) t * Real.log ((t + δ) / 2) + 2 * deriv χ t * (t + δ)⁻¹
+          - χ t * ((t + δ)⁻¹) ^ 2 := by
   have hd : Differentiable ℝ χ := hχ.differentiable (by simp)
   have hd2 : Differentiable ℝ (deriv χ) :=
     (contDiff_infty_iff_deriv.1 hχ).2.differentiable (by simp)
   have hU : Set.Ioi (-δ) ∈ 𝓝 t := Ioi_mem_nhds (by linarith)
-  have e : deriv (fun s => χ s * Real.log ((s + δ) / 2)) =ᶠ[𝓝 t]
-      fun s => deriv χ s * Real.log ((s + δ) / 2) + χ s * (s + δ)⁻¹ :=
+  have e
+      : deriv (fun s => χ s * Real.log ((s + δ) / 2)) =ᶠ[𝓝 t]
+        fun s => deriv χ s * Real.log ((s + δ) / 2) + χ s * (s + δ)⁻¹ :=
     Filter.eventually_of_mem hU fun s hs =>
       (hasDerivAt_cutLog hχ (by simp only [Set.mem_Ioi] at hs; linarith)).deriv
   refine ⟨(hasDerivAt_cutLog hχ ht).deriv, ?_⟩
@@ -65,12 +71,16 @@ theorem derivs_cutLog {χ : ℝ → ℝ} (hχ : ContDiff ℝ ∞ χ) {δ t : ℝ
   field_simp
   ring
 
-theorem cutLog_bounds (χ : ℝ → ℝ) (A : ℝ) (hχ : ContDiff ℝ ∞ χ) (h01 : ∀ t, 0 ≤ χ t ∧ χ t ≤ 1)
-    (h1 : ∀ t, t ≤ 1 / 4 → χ t = 1) (h0 : ∀ t, 1 ≤ t → χ t = 0) (hA1 : ∀ t, |deriv χ t| ≤ A)
-    (hA2 : ∀ t, |deriv (deriv χ) t| ≤ A) {δ : ℝ} (hδ : 0 < δ) (hδ1 : δ ≤ 1) {t : ℝ} (ht : 0 ≤ t) :
-    -(13 * A + 20) ≤ deriv (fun s => χ s * Real.log ((s + δ) / 2)) t ∧
-      -(13 * A + 20) ≤ deriv (fun s => χ s * Real.log ((s + δ) / 2)) t +
-        t * deriv (deriv (fun s => χ s * Real.log ((s + δ) / 2))) t := by
+theorem cutLog_bounds
+    (χ : ℝ → ℝ) (A : ℝ)
+    (hχ : ContDiff ℝ ∞ χ) (h01 : ∀ t, 0 ≤ χ t ∧ χ t ≤ 1) (h1 : ∀ t, t ≤ 1 / 4 → χ t = 1)
+    (h0 : ∀ t, 1 ≤ t → χ t = 0) (hA1 : ∀ t, |deriv χ t| ≤ A) (hA2 : ∀ t, |deriv (deriv χ) t| ≤ A)
+    {δ : ℝ} (hδ : 0 < δ) (hδ1 : δ ≤ 1)
+    {t : ℝ} (ht : 0 ≤ t)
+    : -(13 * A + 20) ≤ deriv (fun s => χ s * Real.log ((s + δ) / 2)) t
+      ∧ -(13 * A + 20)
+        ≤ deriv (fun s => χ s * Real.log ((s + δ) / 2)) t
+          + t * deriv (deriv (fun s => χ s * Real.log ((s + δ) / 2))) t := by
   have htd : 0 < t + δ := by linarith
   obtain ⟨e1, e2⟩ := derivs_cutLog hχ htd
   rw [e1, e2]
@@ -78,15 +88,15 @@ theorem cutLog_bounds (χ : ℝ → ℝ) (A : ℝ) (hχ : ContDiff ℝ ∞ χ) (
   set L := Real.log ((t + δ) / 2)
   set u := (t + δ)⁻¹ with hu_def
   have hu : 0 < u := inv_pos.2 htd
-  have htu : t * u ≤ 1 := by
-    rw [hu_def, ← div_eq_mul_inv, div_le_one htd]; linarith
+  have htu : t * u ≤ 1 := by rw [hu_def, ← div_eq_mul_inv, div_le_one htd]; linarith
   have htu0 : 0 ≤ t * u := mul_nonneg ht hu.le
   have hc0 := h01 t
-  have hpos : 0 ≤ χ t * u * (1 - t * u) :=
-    mul_nonneg (mul_nonneg hc0.1 hu.le) (by linarith)
-  have hexp : deriv χ t * L + χ t * u + t * (deriv (deriv χ) t * L + 2 * deriv χ t * u - χ t * u ^ 2) =
-      deriv χ t * L + t * (deriv (deriv χ) t * L) + 2 * (deriv χ t * (t * u)) +
-        χ t * u * (1 - t * u) := by ring
+  have hpos : 0 ≤ χ t * u * (1 - t * u) := mul_nonneg (mul_nonneg hc0.1 hu.le) (by linarith)
+  have hexp
+      : deriv χ t * L + χ t * u + t * (deriv (deriv χ) t * L + 2 * deriv χ t * u - χ t * u ^ 2)
+        = deriv χ t * L + t * (deriv (deriv χ) t * L) + 2 * (deriv χ t * (t * u))
+          + χ t * u * (1 - t * u) := by
+    ring
   rw [hexp]
   by_cases hc : t < 1 / 4 ∨ 1 < t
   · have hz : deriv χ t = 0 ∧ deriv (deriv χ) t = 0 := by
@@ -101,7 +111,9 @@ theorem cutLog_bounds (χ : ℝ → ℝ) (A : ℝ) (hχ : ContDiff ℝ ∞ χ) (
     have hx0 : 1 / 8 ≤ (t + δ) / 2 := by linarith
     have hL0 : L ≤ 0 := Real.log_nonpos (by linarith) hx1
     have hl8 : Real.log (1 / 8) = -(3 * Real.log 2) := by
-      rw [show (1 : ℝ) / 8 = ((2 : ℝ) ^ 3)⁻¹ by norm_num, Real.log_inv, Real.log_pow]; push_cast; ring
+      rw [show (1 : ℝ) / 8 = ((2 : ℝ) ^ 3)⁻¹ by norm_num, Real.log_inv, Real.log_pow]
+      push_cast
+      ring
     have hL1 : -3 ≤ L := by
       have := Real.log_le_log (by norm_num) hx0
       have := Real.log_two_lt_d9
@@ -125,24 +137,30 @@ theorem cutLog_bounds (χ : ℝ → ℝ) (A : ℝ) (hχ : ContDiff ℝ ∞ χ) (
     have : 0 ≤ χ t * u := mul_nonneg hc0.1 hu.le
     constructor <;> nlinarith
 
-theorem normSq_sum_conj_mul_le {n : ℕ} (a b : Fin n → ℂ) :
-    Complex.normSq (∑ m, conj (a m) * b m) ≤
-      (∑ m, Complex.normSq (a m)) * ∑ m, Complex.normSq (b m) := by
+theorem normSq_sum_conj_mul_le {n : ℕ} (a b : Fin n → ℂ)
+    : Complex.normSq (∑ m, conj (a m) * b m)
+      ≤ (∑ m, Complex.normSq (a m)) * ∑ m, Complex.normSq (b m) := by
   have h1 : ‖∑ m, conj (a m) * b m‖ ≤ ∑ m, ‖a m‖ * ‖b m‖ :=
-    (norm_sum_le _ _).trans (le_of_eq (Finset.sum_congr rfl fun m _ => by
-      rw [norm_mul, Complex.norm_conj]))
+    (norm_sum_le _ _).trans
+      (le_of_eq (Finset.sum_congr rfl fun m _ => by rw [norm_mul, Complex.norm_conj]))
   have h2 := Finset.sum_mul_sq_le_sq_mul_sq Finset.univ (fun m => ‖a m‖) (fun m => ‖b m‖)
   simp only [Complex.normSq_eq_norm_sq]
-  calc ‖∑ m, conj (a m) * b m‖ ^ 2 ≤ (∑ m, ‖a m‖ * ‖b m‖) ^ 2 :=
-        pow_le_pow_left₀ (norm_nonneg _) h1 2
+  calc
+    ‖∑ m, conj (a m) * b m‖ ^ 2
+      ≤ (∑ m, ‖a m‖ * ‖b m‖) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) h1 2
     _ ≤ _ := h2
 
-theorem levi_cutLog_lower : ∀ (χ : ℝ → ℝ) (A : ℝ), ContDiff ℝ ∞ χ → (∀ t, 0 ≤ χ t ∧ χ t ≤ 1) →
-    (∀ t, t ≤ 1 / 4 → χ t = 1) → (∀ t, 1 ≤ t → χ t = 0) → (∀ t, |deriv χ t| ≤ A) →
-    (∀ t, |deriv (deriv χ) t| ≤ A) → ∀ (n : ℕ) (ρ δ : ℝ), 0 < ρ → 0 < δ → δ ≤ 1 →
-    ∀ (z : V n) (ξ : Fin n → ℂ), -((13 * A + 20) / ρ ^ 2 * ∑ j, ‖ξ j‖ ^ 2) ≤
-      (leviV n (fun w => ((χ (‖w‖ ^ 2 / ρ ^ 2) * Real.log ((‖w‖ ^ 2 / ρ ^ 2 + δ) / 2) : ℝ) : ℂ))
-        z ξ).re := by
+theorem levi_cutLog_lower
+    : ∀ (χ : ℝ → ℝ) (A : ℝ),
+      ContDiff ℝ ∞ χ → (∀ t, 0 ≤ χ t ∧ χ t ≤ 1) → (∀ t, t ≤ 1 / 4 → χ t = 1)
+        → (∀ t, 1 ≤ t → χ t = 0) → (∀ t, |deriv χ t| ≤ A) → (∀ t, |deriv (deriv χ) t| ≤ A)
+        → ∀ (n : ℕ) (ρ δ : ℝ),
+          0 < ρ → 0 < δ → δ ≤ 1
+            → ∀ (z : V n) (ξ : Fin n → ℂ),
+              -((13 * A + 20) / ρ ^ 2 * ∑ j, ‖ξ j‖ ^ 2)
+                ≤ (leviV n
+                  (fun w => ((χ (‖w‖ ^ 2 / ρ ^ 2) * Real.log ((‖w‖ ^ 2 / ρ ^ 2 + δ) / 2) : ℝ) : ℂ))
+                  z ξ).re := by
   intro χ A hχ h01 h1 h0 hA1 hA2 n ρ δ hρ hδ hδ1 z ξ
   set k : ℝ → ℝ := fun s => χ s * Real.log ((s + δ) / 2) with hk
   let L : Fin n → V n →L[ℂ] ℂ := fun j => ((ρ : ℂ)⁻¹) • EuclideanSpace.proj j
@@ -156,8 +174,9 @@ theorem levi_cutLog_lower : ∀ (χ : ℝ → ℝ) (A : ℝ), ContDiff ℝ ∞ �
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Complex.norm_mul, norm_inv, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hρ]
     field_simp
-  have hfun : (fun w : V n => ((χ (‖w‖ ^ 2 / ρ ^ 2) * Real.log ((‖w‖ ^ 2 / ρ ^ 2 + δ) / 2) : ℝ) : ℂ))
-      = fun w => ((k (v w) : ℝ) : ℂ) := by
+  have hfun
+      : (fun w : V n => ((χ (‖w‖ ^ 2 / ρ ^ 2) * Real.log ((‖w‖ ^ 2 / ρ ^ 2 + δ) / 2) : ℝ) : ℂ))
+        = fun w => ((k (v w) : ℝ) : ℂ) := by
     funext w; rw [hv w]
   rw [hfun]
   have hLc : ∀ j, ContDiffAt ℂ 2 (fun y => L j y) z := fun j => (L j).contDiff.contDiffAt
@@ -174,8 +193,9 @@ theorem levi_cutLog_lower : ∀ (χ : ℝ → ℝ) (A : ℝ), ContDiff ℝ ∞ �
     intro j m
     rw [wd_of_differentiableAt (L j).differentiableAt, (L j).fderiv, hLapp]
     simp [bas, PiLp.single_apply]
-  have hLevi : leviV n (fun y => ((v y : ℝ) : ℂ)) z ξ =
-      ((∑ j, Complex.normSq ((ρ : ℂ)⁻¹ * ξ j) : ℝ) : ℂ) := by
+  have hLevi
+      : leviV n (fun y => ((v y : ℝ) : ℂ)) z ξ
+        = ((∑ j, Complex.normSq ((ρ : ℂ)⁻¹ * ξ j) : ℝ) : ℂ) := by
     rw [show (fun y => ((v y : ℝ) : ℂ)) = fun y => ((∑ j, Complex.normSq (L j y) : ℝ) : ℂ) from rfl,
       H.leviV_ofReal_sum hu, Complex.ofReal_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -195,8 +215,9 @@ theorem levi_cutLog_lower : ∀ (χ : ℝ → ℝ) (A : ℝ), ContDiff ℝ ∞ �
   have hP0 : 0 ≤ P := Finset.sum_nonneg fun j _ => Complex.normSq_nonneg _
   have hN0 : 0 ≤ N := Complex.normSq_nonneg _
   have hNt : N ≤ v z * P := by
-    have e : ∑ m, (ρ : ℂ)⁻¹ * conj ((ρ : ℂ)⁻¹ * z m) * ξ m =
-        ∑ m, conj ((ρ : ℂ)⁻¹ * z m) * ((ρ : ℂ)⁻¹ * ξ m) :=
+    have e
+        : ∑ m, (ρ : ℂ)⁻¹ * conj ((ρ : ℂ)⁻¹ * z m) * ξ m
+          = ∑ m, conj ((ρ : ℂ)⁻¹ * z m) * ((ρ : ℂ)⁻¹ * ξ m) :=
       Finset.sum_congr rfl fun m _ => by ring
     have ev : v z = ∑ m, Complex.normSq ((ρ : ℂ)⁻¹ * z m) :=
       Finset.sum_congr rfl fun m _ => by rw [hLapp]

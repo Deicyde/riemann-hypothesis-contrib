@@ -13,10 +13,9 @@ noncomputable section
 
 variable {e : ℕ} {X : Type} [TopologicalSpace X]
 
-theorem st_hessC_congr {D : ℕ} {f g : (Fin D → ℂ) → ℝ} {y : Fin D → ℂ} (h : f =ᶠ[𝓝 y] g) :
-    hessC f y = hessC g y := by
-  have h2 : fderiv ℝ (fderiv ℝ f) y = fderiv ℝ (fderiv ℝ g) y :=
-    (h.fderiv (𝕜 := ℝ)).fderiv_eq
+theorem st_hessC_congr {D : ℕ} {f g : (Fin D → ℂ) → ℝ} {y : Fin D → ℂ} (h : f =ᶠ[𝓝 y] g)
+    : hessC f y = hessC g y := by
+  have h2 : fderiv ℝ (fderiv ℝ f) y = fderiv ℝ (fderiv ℝ g) y := (h.fderiv (𝕜 := ℝ)).fderiv_eq
   unfold hessC
   rw [h2]
 
@@ -96,9 +95,10 @@ private lemma hessC_re_of_analyticAt {D : ℕ} {H : (Fin D → ℂ) → ℂ} {y 
   simp only [hessC, hv, Matrix.zero_apply, map_smul, ContinuousLinearMap.smul_apply, smul_eq_mul]
   simp [Complex.mul_re, Complex.mul_im]
 
-theorem st_maDens_cons_congr {n : ℕ} {f g : (Fin (n + 1) → ℂ) → ℝ}
-    (φ : Fin n → (Fin (n + 1) → ℂ) → ℝ) {y : Fin (n + 1) → ℂ} (h : f =ᶠ[𝓝 y] g) :
-    maDens (Fin.cons f φ) y = maDens (Fin.cons g φ) y := by
+theorem st_maDens_cons_congr
+    {n : ℕ} {f g : (Fin (n + 1) → ℂ) → ℝ} (φ : Fin n → (Fin (n + 1) → ℂ) → ℝ)
+    {y : Fin (n + 1) → ℂ} (h : f =ᶠ[𝓝 y] g)
+    : maDens (Fin.cons f φ) y = maDens (Fin.cons g φ) y := by
   apply maDens_congr_of_hessC_eq
   intro k
   refine Fin.cases ?_ (fun i => ?_) k
@@ -121,19 +121,23 @@ private lemma continuous_of_atlas_smooth' (A : FinHolAtlas e X) {f : X → ℝ} 
   filter_upwards [(A.chart k).open_source.mem_nhds hk] with z hz
   simp [(A.chart k).left_inv hz]
 
-theorem st_mInt_eq_chart [CompactSpace X] [T2Space X] (A : FinHolAtlas e X)
-    (Ψ : Fin e → LocPot X) (hΨ : ∀ i, IsPotential A (Ψ i)) (j : Fin A.n) (g : X → ℝ)
-    (hg : Continuous g) (hgs : tsupport g ⊆ (A.chart j).source) :
-    mInt A Ψ g = ∫ y in (A.chart j).target, g ((A.chart j).symm y) * locDens A Ψ j y := by
+theorem st_mInt_eq_chart
+    [CompactSpace X] [T2Space X]
+    (A : FinHolAtlas e X) (Ψ : Fin e → LocPot X) (hΨ : ∀ i, IsPotential A (Ψ i))
+    (j : Fin A.n) (g : X → ℝ) (hg : Continuous g) (hgs : tsupport g ⊆ (A.chart j).source)
+    : mInt A Ψ g = ∫ y in (A.chart j).target, g ((A.chart j).symm y) * locDens A Ψ j y := by
   unfold mInt
   rw [dite_eq_left (existsPartition A)]
   exact mIntLocalize A _ Ψ hΨ j g hgs (mIntegrableCont A Ψ hΨ g hg)
 
-theorem st_mInt_eq_piece [CompactSpace X] [T2Space X] (A : FinHolAtlas e X)
-    (Ψ : Fin e → LocPot X) (hΨ : ∀ i, IsPotential A (Ψ i)) (j : Fin A.n) (G : Set X)
-    (hG : G ⊆ (A.chart j).source) (g : X → ℝ) (hg : Continuous g) (hgs : tsupport g ⊆ G) :
-    mInt A Ψ g = ∫ y in (A.chart j).target ∩ (A.chart j).symm ⁻¹' G,
-      g ((A.chart j).symm y) * locDens A Ψ j y := by
+theorem st_mInt_eq_piece
+    [CompactSpace X] [T2Space X]
+    (A : FinHolAtlas e X) (Ψ : Fin e → LocPot X) (hΨ : ∀ i, IsPotential A (Ψ i))
+    (j : Fin A.n) (G : Set X) (hG : G ⊆ (A.chart j).source)
+    (g : X → ℝ) (hg : Continuous g) (hgs : tsupport g ⊆ G)
+    : mInt A Ψ g
+      = ∫ y in (A.chart j).target ∩ (A.chart j).symm ⁻¹' G,
+        g ((A.chart j).symm y) * locDens A Ψ j y := by
   rw [st_mInt_eq_chart A Ψ hΨ j g hg (hgs.trans hG)]
   refine setIntegral_eq_of_subset_of_forall_diff_eq_zero (A.chart j).open_target.measurableSet
     inter_subset_left ?_
@@ -144,62 +148,72 @@ theorem st_mInt_eq_piece [CompactSpace X] [T2Space X] (A : FinHolAtlas e X)
 
 section Piece
 
-variable [CompactSpace X] [T2Space X] (A : FinHolAtlas (e + 1) X) (Φ : Fin e → LocPot X)
-  (hΦ : ∀ i, IsPotential A (Φ i)) (j : Fin A.n) (G : Set X) (hGo : IsOpen G)
-  (hG : G ⊆ (A.chart j).source) (x0 : Fin e → X) (hGU : ∀ i, G ⊆ (Φ i).U (x0 i))
-
+variable
+  [CompactSpace X] [T2Space X]
+  (A : FinHolAtlas (e + 1) X) (Φ : Fin e → LocPot X) (hΦ : ∀ i, IsPotential A (Φ i))
+  (j : Fin A.n) (G : Set X) (hGo : IsOpen G) (hG : G ⊆ (A.chart j).source)
+  (x0 : Fin e → X) (hGU : ∀ i, G ⊆ (Φ i).U (x0 i))
 
 include hΦ hG hGU in
-theorem st_locDens_piece (u : X → ℝ) (hu : A.Smooth u) {y : Fin (e + 1) → ℂ}
-    (hy : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' G) :
-    locDens A (Fin.cons (LocPot.ofFun u) Φ) j y =
-      maDens (Fin.cons (u ∘ (A.chart j).symm) fun i => (Φ i).φ (x0 i) ∘ (A.chart j).symm) y := by
+theorem st_locDens_piece
+    (u : X → ℝ) (hu : A.Smooth u)
+    {y : Fin (e + 1) → ℂ} (hy : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' G)
+    : locDens A (Fin.cons (LocPot.ofFun u) Φ) j y
+      = maDens (Fin.cons (u ∘ (A.chart j).symm) fun i => (Φ i).φ (x0 i) ∘ (A.chart j).symm) y := by
   unfold locDens
   apply maDens_congr_of_hessC_eq
   intro k
   refine Fin.cases ?_ (fun i => ?_) k
-  · first
-      | rfl
-      | (simp only [Fin.cons_zero]; rfl)
-      | simp [LocPot.ofFun, Function.comp_def]
+  · first | rfl | (simp only [Fin.cons_zero]; rfl) | simp [LocPot.ofFun, Function.comp_def]
   · simp only [Fin.cons_succ]
     have hyG : (A.chart j).symm y ∈ G := hy.2
     obtain ⟨W, hWo, haW, Gh, hGh, hdiff⟩ :=
       (hΦ i).2 ((A.chart j).symm y) (x0 i) ((A.chart j).symm y) ⟨(Φ i).mem_U _, hGU i hyG⟩
-    have hSo : IsOpen ((A.chart j).target ∩ (A.chart j).symm ⁻¹'
-        (W ∩ (Φ i).U ((A.chart j).symm y) ∩ (Φ i).U (x0 i))) :=
-      (A.chart j).isOpen_inter_preimage_symm ((hWo.inter ((Φ i).isOpen_U _)).inter ((Φ i).isOpen_U _))
-    have hyS : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹'
-        (W ∩ (Φ i).U ((A.chart j).symm y) ∩ (Φ i).U (x0 i)) :=
+    have hSo : IsOpen
+        ((A.chart j).target
+          ∩ (A.chart j).symm ⁻¹' (W ∩ (Φ i).U ((A.chart j).symm y) ∩ (Φ i).U (x0 i))) :=
+      (A.chart j).isOpen_inter_preimage_symm
+        ((hWo.inter ((Φ i).isOpen_U _)).inter ((Φ i).isOpen_U _))
+    have hyS
+        : y
+          ∈ (A.chart j).target
+            ∩ (A.chart j).symm ⁻¹' (W ∩ (Φ i).U ((A.chart j).symm y) ∩ (Φ i).U (x0 i)) :=
       ⟨hy.1, ⟨⟨haW, (Φ i).mem_U _⟩, hGU i hyG⟩⟩
     have hSn := hSo.mem_nhds hyS
     have hf2 : ∀ᶠ z in 𝓝 y, ContDiffAt ℝ 2 ((Φ i).φ (x0 i) ∘ (A.chart j).symm) z := by
       filter_upwards [hSn] with z hz
       have hon := (hΦ i).1 (x0 i) j
-      exact ((hon.mono (fun w (hw : w ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' (W ∩ (Φ i).U ((A.chart j).symm y) ∩ (Φ i).U (x0 i))) => ⟨hw.1, hw.2.2⟩)).contDiffAt (hSo.mem_nhds hz)).of_le
-        two_le_infty_withTop
-    have hK : ∀ z ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹'
-        (W ∩ (Φ i).U ((A.chart j).symm y) ∩ (Φ i).U (x0 i)),
-        AnalyticAt ℂ (Gh ∘ (A.chart j).symm) z := fun z hz => hGh j z ⟨hz.1, hz.2.1.1⟩
+      exact ((hon.mono (fun w
+          (hw
+            : w
+              ∈ (A.chart j).target
+                ∩ (A.chart j).symm ⁻¹' (W ∩ (Φ i).U ((A.chart j).symm y) ∩ (Φ i).U (x0 i))) =>
+        ⟨hw.1, hw.2.2⟩)).contDiffAt (hSo.mem_nhds hz)).of_le two_le_infty_withTop
+    have hK
+        : ∀ z
+            ∈ (A.chart j).target
+              ∩ (A.chart j).symm ⁻¹' (W ∩ (Φ i).U ((A.chart j).symm y) ∩ (Φ i).U (x0 i)),
+          AnalyticAt ℂ (Gh ∘ (A.chart j).symm) z := fun z hz =>
+      hGh j z ⟨hz.1, hz.2.1.1⟩
     have hh : ∀ᶠ z in 𝓝 y, ContDiffAt ℝ 2 (fun w => ((Gh ∘ (A.chart j).symm) w).re) z := by
       filter_upwards [hSn] with z hz
       exact contDiffAt_two_re_of_analyticAt (hK z hz)
-    have heq : (fun y' => (Φ i).φ ((A.chart j).symm y) ((A.chart j).symm y')) =ᶠ[𝓝 y]
-        fun w => ((Φ i).φ (x0 i) ∘ (A.chart j).symm) w + ((Gh ∘ (A.chart j).symm) w).re := by
+    have heq
+        : (fun y' => (Φ i).φ ((A.chart j).symm y) ((A.chart j).symm y')) =ᶠ[𝓝 y]
+          fun w => ((Φ i).φ (x0 i) ∘ (A.chart j).symm) w + ((Gh ∘ (A.chart j).symm) w).re := by
       filter_upwards [hSn] with z hz
       have hz' := hdiff ((A.chart j).symm z) hz.2
       simp only [Function.comp_apply]
       linarith
     rw [st_hessC_congr heq, hessC_add_potential hf2 hh, hessC_re_of_analyticAt (hK y hyS), add_zero]
 
-
 include hΦ hGo hG hGU in
-theorem st_left_piece (w ψ : X → ℝ) (hw : A.Smooth w) (hψ : A.Smooth ψ) (hψG : tsupport ψ ⊆ G) :
-    mInt A (Fin.cons (LocPot.ofFun w) Φ) ψ =
-      ∫ y in (A.chart j).target ∩ (A.chart j).symm ⁻¹' G,
-        (A.chart j).target.indicator (ψ ∘ (A.chart j).symm) y *
-          maDens (Fin.cons (w ∘ (A.chart j).symm)
-            fun i => (Φ i).φ (x0 i) ∘ (A.chart j).symm) y := by
+theorem st_left_piece (w ψ : X → ℝ) (hw : A.Smooth w) (hψ : A.Smooth ψ) (hψG : tsupport ψ ⊆ G)
+    : mInt A (Fin.cons (LocPot.ofFun w) Φ) ψ
+      = ∫ y in (A.chart j).target ∩ (A.chart j).symm ⁻¹' G,
+          (A.chart j).target.indicator (ψ ∘ (A.chart j).symm) y *
+            maDens (Fin.cons (w ∘ (A.chart j).symm)
+              fun i => (Φ i).φ (x0 i) ∘ (A.chart j).symm) y := by
   have hP0 : IsPotential A (LocPot.ofFun w) := by
     unfold IsPotential
     refine ⟨fun _ => hw, fun x x' z _ => ⟨univ, isOpen_univ, mem_univ _, fun _ => 0, ?_, ?_⟩⟩
@@ -222,20 +236,20 @@ theorem st_left_piece (w ψ : X → ℝ) (hw : A.Smooth w) (hψ : A.Smooth ψ) (
     Set.indicator_of_mem hy.1 _
   simp only [h1, h2]
 
-
 include hΦ hGo hG hGU in
-theorem st_right_piece (w ψ : X → ℝ) (hw : A.Smooth w) (hψ : A.Smooth ψ) (hψG : tsupport ψ ⊆ G) :
-    mInt A (Fin.cons (LocPot.ofFun ψ) Φ) w =
-      ∫ y in (A.chart j).target ∩ (A.chart j).symm ⁻¹' G,
-        (w ∘ (A.chart j).symm) y *
-          maDens (Fin.cons ((A.chart j).target.indicator (ψ ∘ (A.chart j).symm))
-            fun i => (Φ i).φ (x0 i) ∘ (A.chart j).symm) y := by
-  obtain ⟨ρ, hρs, hρ1, -⟩ := exists_tsupport_one_of_isOpen_isClosed hGo
-    isClosed_closure.isCompact (isClosed_tsupport ψ) hψG
+theorem st_right_piece (w ψ : X → ℝ) (hw : A.Smooth w) (hψ : A.Smooth ψ) (hψG : tsupport ψ ⊆ G)
+    : mInt A (Fin.cons (LocPot.ofFun ψ) Φ) w
+      = ∫ y in (A.chart j).target ∩ (A.chart j).symm ⁻¹' G,
+          (w ∘ (A.chart j).symm) y *
+            maDens (Fin.cons ((A.chart j).target.indicator (ψ ∘ (A.chart j).symm))
+              fun i => (Φ i).φ (x0 i) ∘ (A.chart j).symm) y := by
+  obtain ⟨ρ, hρs, hρ1, -⟩ :=
+    exists_tsupport_one_of_isOpen_isClosed hGo isClosed_closure.isCompact (isClosed_tsupport ψ) hψG
   have hpot := st_isPotential_cons A hψ hΦ
 
-  have h1 : mInt A (Fin.cons (LocPot.ofFun ψ) Φ) w =
-      mInt A (Fin.cons (LocPot.ofFun ψ) Φ) (fun x => ρ x * w x) := by
+  have h1
+      : mInt A (Fin.cons (LocPot.ofFun ψ) Φ) w
+        = mInt A (Fin.cons (LocPot.ofFun ψ) Φ) (fun x => ρ x * w x) := by
     unfold mInt
     split_ifs with hP
     · unfold integralWith
@@ -246,8 +260,10 @@ theorem st_right_piece (w ψ : X → ℝ) (hw : A.Smooth w) (hψ : A.Smooth ψ) 
       · simp [hρ1 hs]
       · simp [st_locDens_cons_eq_zero A k ψ Φ hy hs]
     · rfl
-  rw [h1, st_mInt_eq_piece A _ hpot j G hG (fun x => ρ x * w x) (ρ.continuous.mul (st_smooth_continuous A hw))
-    ((tsupport_mul_subset_left).trans hρs)]
+  rw [h1,
+    st_mInt_eq_piece A _ hpot j G hG
+      (fun x => ρ x * w x)
+      (ρ.continuous.mul (st_smooth_continuous A hw)) ((tsupport_mul_subset_left).trans hρs)]
   refine setIntegral_congr_fun ((A.chart j).isOpen_inter_preimage_symm hGo).measurableSet ?_
   intro y hy
   have hV : (A.chart j).target ∩ (A.chart j).symm ⁻¹' G ∈ 𝓝 y :=
@@ -263,11 +279,11 @@ theorem st_right_piece (w ψ : X → ℝ) (hw : A.Smooth w) (hψ : A.Smooth ψ) 
     rw [st_locDens_piece A Φ hΦ j G hG x0 hGU ψ hψ hy] at h0
     simp [h0]
 
-
 include hΦ hGo hG hGU in
-theorem st_symm_piece (hP : ReciprocityTheory.AnForm.A.PartsStatement) (w ψ : X → ℝ) (hw : A.Smooth w)
-    (hψ : A.Smooth ψ) (hψG : tsupport ψ ⊆ G) :
-    mInt A (Fin.cons (LocPot.ofFun w) Φ) ψ = mInt A (Fin.cons (LocPot.ofFun ψ) Φ) w := by
+theorem st_symm_piece
+    (hP : ReciprocityTheory.AnForm.A.PartsStatement)
+    (w ψ : X → ℝ) (hw : A.Smooth w) (hψ : A.Smooth ψ) (hψG : tsupport ψ ⊆ G)
+    : mInt A (Fin.cons (LocPot.ofFun w) Φ) ψ = mInt A (Fin.cons (LocPot.ofFun ψ) Φ) w := by
   rw [st_left_piece A Φ hΦ j G hGo hG x0 hGU w ψ hw hψ hψG,
     st_right_piece A Φ hΦ j G hGo hG x0 hGU w ψ hw hψ hψG]
   have hSo : IsOpen ((A.chart j).target ∩ (A.chart j).symm ⁻¹' G) :=
@@ -275,8 +291,9 @@ theorem st_symm_piece (hP : ReciprocityTheory.AnForm.A.PartsStatement) (w ψ : X
   have hsG : tsupport ψ ⊆ (A.chart j).source := hψG.trans hG
   have hKc : IsCompact ((A.chart j) '' tsupport ψ) :=
     (isClosed_tsupport ψ).isCompact.image_of_continuousOn ((A.chart j).continuousOn.mono hsG)
-  have hsupp : Function.support ((A.chart j).target.indicator (ψ ∘ (A.chart j).symm)) ⊆
-      (A.chart j) '' tsupport ψ := by
+  have hsupp
+      : Function.support ((A.chart j).target.indicator (ψ ∘ (A.chart j).symm))
+        ⊆ (A.chart j) '' tsupport ψ := by
     intro y hy
     have hy' := Function.mem_support.1 hy
     by_cases hyt : y ∈ (A.chart j).target
@@ -284,41 +301,56 @@ theorem st_symm_piece (hP : ReciprocityTheory.AnForm.A.PartsStatement) (w ψ : X
       rw [Set.indicator_of_mem hyt] at hy'
       exact hy'
     · exact absurd (Set.indicator_of_notMem hyt _) hy'
-  have hts : tsupport ((A.chart j).target.indicator (ψ ∘ (A.chart j).symm)) ⊆
-      (A.chart j) '' tsupport ψ := closure_minimal hsupp hKc.isClosed
+  have hts
+      : tsupport ((A.chart j).target.indicator (ψ ∘ (A.chart j).symm))
+        ⊆ (A.chart j) '' tsupport ψ :=
+    closure_minimal hsupp hKc.isClosed
   have hKS : (A.chart j) '' tsupport ψ ⊆ (A.chart j).target ∩ (A.chart j).symm ⁻¹' G := by
     rintro _ ⟨x, hx, rfl⟩
     refine ⟨(A.chart j).map_source (hsG hx), ?_⟩
     show (A.chart j).symm ((A.chart j) x) ∈ G
     rw [(A.chart j).left_inv (hsG hx)]
     exact hψG hx
-  have hH : ReciprocityTheory.AnForm.A.PartsHyp (fun i => (Φ i).φ (x0 i) ∘ (A.chart j).symm)
+  have hH : ReciprocityTheory.AnForm.A.PartsHyp
+      (fun i => (Φ i).φ (x0 i) ∘ (A.chart j).symm)
       ((A.chart j).target.indicator (ψ ∘ (A.chart j).symm)) (w ∘ (A.chart j).symm)
       ((A.chart j).target ∩ (A.chart j).symm ⁻¹' G) := by
     unfold ReciprocityTheory.AnForm.A.PartsHyp
     refine ⟨hSo, ?_, hKc.of_isClosed_subset (isClosed_tsupport _) hts, hts.trans hKS, ?_, ?_⟩
-    · exact (((hψ j).mono (fun y (hy : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' G) => ⟨hy.1, mem_univ _⟩)).of_le three_le_infty_withTop).congr
+    · exact (((hψ j).mono (fun y (hy : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' G) =>
+          ⟨hy.1, mem_univ _⟩)).of_le three_le_infty_withTop).congr
         (fun y hy => Set.indicator_of_mem hy.1 _)
-    · exact ((hw j).mono (fun y (hy : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' G) => ⟨hy.1, mem_univ _⟩)).of_le three_le_infty_withTop
+    · exact ((hw j).mono (fun y (hy : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' G) =>
+        ⟨hy.1, mem_univ _⟩)).of_le three_le_infty_withTop
     · intro i
-      exact (((hΦ i).1 (x0 i) j).mono (fun y (hy : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' G) => ⟨hy.1, hGU i hy.2⟩)).of_le three_le_infty_withTop
-  have key := (hP e (fun i => (Φ i).φ (x0 i) ∘ (A.chart j).symm)
-    ((A.chart j).target.indicator (ψ ∘ (A.chart j).symm)) (w ∘ (A.chart j).symm)
-    ((A.chart j).target ∩ (A.chart j).symm ⁻¹' G) hH).2.2.2.2
+      exact (((hΦ i).1 (x0 i) j).mono
+        (fun y (hy : y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' G) =>
+          ⟨hy.1, hGU i hy.2⟩)).of_le three_le_infty_withTop
+  have key :=
+    (hP e
+      (fun i => (Φ i).φ (x0 i) ∘ (A.chart j).symm)
+      ((A.chart j).target.indicator (ψ ∘ (A.chart j).symm)) (w ∘ (A.chart j).symm)
+      ((A.chart j).target ∩ (A.chart j).symm ⁻¹' G) hH).2.2.2.2
   exact key.symm
 
 end Piece
 
-theorem st_byPartsSymm_of (hP : ReciprocityTheory.AnForm.A.PartsStatement) : ByPartsSymmStatement := by
+theorem st_byPartsSymm_of (hP : ReciprocityTheory.AnForm.A.PartsStatement)
+    : ByPartsSymmStatement := by
   intro e X _ _ _ A v w hv hw Φ hΦ
   obtain ⟨M, θ, G, j, x0, hθs, -, hθ1, hθG, hGo, hGs, hGU⟩ := st_exists_good_partition A Φ
   have hsum : (fun x => ∑ m, θ m x * v x) = v := by
     funext x
     rw [← Finset.sum_mul, hθ1, one_mul]
-  have hL := st_mInt_finset_sum A _ (st_isPotential_cons A hw hΦ) Finset.univ
-    (fun m x => θ m x * v x) (fun m => st_smooth_continuous A (st_smooth_mul A (hθs m) hv))
-  have hR := st_mInt_cons_finset_sum A Φ hΦ Finset.univ (fun m x => θ m x * v x)
-    (fun m => st_smooth_mul A (hθs m) hv) w (st_smooth_continuous A hw)
+  have hL :=
+    st_mInt_finset_sum A _ (st_isPotential_cons A hw hΦ) Finset.univ
+      (fun m x => θ m x * v x)
+      (fun m => st_smooth_continuous A (st_smooth_mul A (hθs m) hv))
+  have hR :=
+    st_mInt_cons_finset_sum A Φ hΦ Finset.univ
+      (fun m x => θ m x * v x)
+      (fun m => st_smooth_mul A (hθs m) hv)
+      w (st_smooth_continuous A hw)
   rw [hsum] at hL hR
   rw [hL, hR]
   refine Finset.sum_congr rfl fun m _ => ?_

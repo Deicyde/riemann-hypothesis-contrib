@@ -10,17 +10,18 @@ open Filter Topology MeasureTheory GlobalTheory.HSAmp
 open scoped ComplexOrder Matrix
 namespace GlobalTheory.HSAmp
 
-theorem star_mulVec_single_dot (ι : Type) [Fintype ι] [DecidableEq ι]
-    (T M : Matrix ι ι ℂ) (i : ι) :
-    star (T *ᵥ Pi.single i 1) ⬝ᵥ M *ᵥ (T *ᵥ Pi.single i 1) = (Tᴴ * M * T) i i := by
+theorem star_mulVec_single_dot (ι : Type) [Fintype ι] [DecidableEq ι] (T M : Matrix ι ι ℂ) (i : ι)
+    : star (T *ᵥ Pi.single i 1) ⬝ᵥ M *ᵥ (T *ᵥ Pi.single i 1) = (Tᴴ * M * T) i i := by
   rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec]
   simp [Matrix.mulVec_single, dotProduct_single]
 
-theorem det_re_le_pow_mul_det_re (ι : Type) [Fintype ι] [DecidableEq ι] (A B : Matrix ι ι ℂ)
-    (κ : ℝ) (hA : A.PosDef) (hB : B.PosDef)
-    (hle : ∀ c : ι → ℂ, (star c ⬝ᵥ A *ᵥ c).re ≤ κ * (star c ⬝ᵥ B *ᵥ c).re) :
-    A.det.re ≤ κ ^ Fintype.card ι * B.det.re := by
-  obtain ⟨T, d, hT, hTB, hTA⟩ := GlobalTheory.T.exists_simultaneous_diagonalisation_posDef_hermitian ι B A hB hA.isHermitian
+theorem det_re_le_pow_mul_det_re
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (A B : Matrix ι ι ℂ) (κ : ℝ) (hA : A.PosDef) (hB : B.PosDef)
+    (hle : ∀ c : ι → ℂ, (star c ⬝ᵥ A *ᵥ c).re ≤ κ * (star c ⬝ᵥ B *ᵥ c).re)
+    : A.det.re ≤ κ ^ Fintype.card ι * B.det.re := by
+  obtain ⟨T, d, hT, hTB, hTA⟩ :=
+    GlobalTheory.T.exists_simultaneous_diagonalisation_posDef_hermitian ι B A hB hA.isHermitian
   have hTu : IsUnit T := (Matrix.isUnit_iff_isUnit_det T).2 hT
   have hinj : Function.Injective T.mulVec := Matrix.mulVec_injective_iff_isUnit.2 hTu
 
@@ -48,11 +49,13 @@ theorem det_re_le_pow_mul_det_re (ι : Type) [Fintype ι] [DecidableEq ι] (A B 
   have hdetB : (Complex.normSq t : ℂ) * B.det = 1 := by
     have := congrArg Matrix.det hTB
     rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, Matrix.det_one] at this
-    rw [hn, ← this]; ring
+    rw [hn, ← this]
+    ring
   have hdetA : (Complex.normSq t : ℂ) * A.det = ((∏ i, d i : ℝ) : ℂ) := by
     have := congrArg Matrix.det hTA
     rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, Matrix.det_diagonal] at this
-    rw [hn, Complex.ofReal_prod, ← this]; ring
+    rw [hn, Complex.ofReal_prod, ← this]
+    ring
   have hpos : 0 < Complex.normSq t := Complex.normSq_pos.2 hT.ne_zero
   have hBre : Complex.normSq t * B.det.re = 1 := by
     have := congrArg Complex.re hdetB
@@ -61,13 +64,15 @@ theorem det_re_le_pow_mul_det_re (ι : Type) [Fintype ι] [DecidableEq ι] (A B 
     have := congrArg Complex.re hdetA
     rwa [Complex.re_ofReal_mul, Complex.ofReal_re] at this
   have hprod : ∏ i, d i ≤ κ ^ Fintype.card ι := by
-    calc ∏ i, d i ≤ ∏ _i : ι, κ :=
-          Finset.prod_le_prod₀ (fun i _ => (hdpos i).le) (fun i _ => hdle i)
+    calc
+      ∏ i, d i
+        ≤ ∏ _i : ι, κ := Finset.prod_le_prod₀ (fun i _ => (hdpos i).le) (fun i _ => hdle i)
       _ = κ ^ Fintype.card ι := by simp
   refine le_of_mul_le_mul_left ?_ hpos
-  calc Complex.normSq t * A.det.re = ∏ i, d i := hAre
+  calc
+    Complex.normSq t * A.det.re
+      = ∏ i, d i := hAre
     _ ≤ κ ^ Fintype.card ι := hprod
-    _ = Complex.normSq t * (κ ^ Fintype.card ι * B.det.re) := by
-        rw [mul_left_comm, hBre, mul_one]
+    _ = Complex.normSq t * (κ ^ Fintype.card ι * B.det.re) := by rw [mul_left_comm, hBre, mul_one]
 
 end GlobalTheory.HSAmp

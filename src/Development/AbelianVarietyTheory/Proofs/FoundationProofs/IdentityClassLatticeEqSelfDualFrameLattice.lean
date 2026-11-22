@@ -12,23 +12,29 @@ noncomputable section
 
 namespace GlobalTheory.Equiv.StdSpace
 
-open NumberField Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Links
+open NumberField Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Links
 open scoped TensorProduct Matrix
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem coe_pi_one_eq_intVecs (n : ℕ) :
-    ((Submodule.pi Set.univ (fun _ => (1 : Submodule (𝓞 D.host.E) D.host.E)) :
-      Submodule (𝓞 D.host.E) (Fin n → D.host.E)) : Set (Fin n → D.host.E)) = GlobalTheory.IndefiniteRowSideFullHecke.StandardHermitianSpace.intVecs D n := by
+theorem coe_pi_one_eq_intVecs (n : ℕ)
+    : ((Submodule.pi Set.univ (fun _ => (1 : Submodule (𝓞 D.host.E) D.host.E))
+          : Submodule (𝓞 D.host.E) (Fin n → D.host.E))
+        : Set (Fin n → D.host.E))
+      = GlobalTheory.IndefiniteRowSideFullHecke.StandardHermitianSpace.intVecs D n := by
   ext x
   rw [SetLike.mem_coe, Submodule.mem_pi]
   exact ⟨fun k a => Submodule.mem_one.1 (k a trivial), fun k a _ => Submodule.mem_one.2 (k a)⟩
 
-theorem identityClassLattice_eq_selfDualFrameLattice (V : HSp D) : (Bridge.hLat V 1 : Set (Fin V.rank → D.host.E)) = L0c D V := by
+theorem identityClassLattice_eq_selfDualFrameLattice (V : HSp D)
+    : (Bridge.hLat V 1 : Set (Fin V.rank → D.host.E)) = L0c D V := by
   obtain ⟨-, -, hfg, hsp, -⟩ := GlobalTheory.Member.latHat_eq_hat_and_gram D V
-  have key := (GlobalTheory.AdLat.hat_rational_points_and_approx D.host.F D.host.E V.rank _ hfg hsp).1
+  have key :=
+    (GlobalTheory.AdLat.hat_rational_points_and_approx D.host.F D.host.E V.rank _ hfg hsp).1
   rw [← GlobalTheory.Member.coe_selfDualLatticeInFrameCoordinates_eq, SetLike.coe_set_eq]
   unfold Bridge.hLat
   rw [← Submodule.span_eq (GlobalTheory.Member.latC V)]
@@ -41,9 +47,10 @@ theorem identityClassLattice_eq_selfDualFrameLattice (V : HSp D) : (Bridge.hLat 
   rw [Matrix.one_mulVec]
   exact Iff.rfl
 
-theorem lattice_clause_iff (V : HSp D) :
-    (Bridge.hLat V 1 = Submodule.pi Set.univ fun _ => (1 : Submodule (𝓞 D.host.E) D.host.E)) ↔
-      L0c D V = GlobalTheory.IndefiniteRowSideFullHecke.StandardHermitianSpace.intVecs D V.rank := by
+theorem lattice_clause_iff (V : HSp D)
+    : (Bridge.hLat V 1 = Submodule.pi Set.univ fun _ => (1 : Submodule (𝓞 D.host.E) D.host.E))
+      ↔ L0c D V
+        = GlobalTheory.IndefiniteRowSideFullHecke.StandardHermitianSpace.intVecs D V.rank := by
   rw [← identityClassLattice_eq_selfDualFrameLattice, ← coe_pi_one_eq_intVecs, SetLike.coe_set_eq]
 
 end GlobalTheory.Equiv.StdSpace

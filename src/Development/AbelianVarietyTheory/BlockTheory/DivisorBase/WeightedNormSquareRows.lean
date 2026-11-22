@@ -17,7 +17,11 @@ namespace GlobalTheory.IndefiniteRowSideFullHecke.WeightedNormSquareDivisors
 
 open Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV
 
-def normSqAt {K : Type} [Field K] [NumberField K] [StarRing K] (S : GSD K) (h : S.Ok) (s : K →+* ℂ) (φ : S.D → S.V) : ℝ :=
+def normSqAt
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    (S : GSD K) (h : S.Ok)
+    (s : K →+* ℂ) (φ : S.D → S.V)
+    : ℝ :=
   (S.ipAt h (InfinitePlace.mk s) φ φ).re
 
 section Comparison₂
@@ -28,18 +32,21 @@ end Comparison₂
 
 section Ev
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m)
-  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) (Sg : Set ℕ)
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m)
+  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
+  (Sg : Set ℕ)
 
-theorem mem_of_mem_divs {A : Type} [CommRing A] [IsDedekindDomain A] {a : A} {P : HeightOneSpectrum A} (h : P ∈ divs a) :
-    a ∈ P.asIdeal := by
+theorem mem_of_mem_divs
+    {A : Type} [CommRing A] [IsDedekindDomain A] {a : A} {P : HeightOneSpectrum A} (h : P ∈ divs a)
+    : a ∈ P.asIdeal := by
   unfold divs at h
   split_ifs at h with hf
   · simpa using h
   · simp at h
 
-theorem evOk (hX : X.Ok) (hPr : Pr.Ok) (P : LevFam X.E X.K R.r Pr.vGs) (u : Pr.Word) :
-    (evGSD W Ch sel (mu0 X.F X.E X.K Sg) P u).Ok := by
+theorem evOk (hX : X.Ok) (hPr : Pr.Ok) (P : LevFam X.E X.K R.r Pr.vGs) (u : Pr.Word)
+    : (evGSD W Ch sel (mu0 X.F X.E X.K Sg) P u).Ok := by
   have hM := mtildeOk W Ch sel (mu0 X.F X.E X.K Sg) hX P
   have hC := colVal_eqv W hX u R.m (Pr.vT u) (rowSG Pr sel (mu0 X.F X.E X.K Sg))
   have hT : ∀ Q : Pr.vT u, cO X.E (Pr.piT u) ∉ Q.1.asIdeal := by
@@ -47,7 +54,8 @@ theorem evOk (hX : X.Ok) (hPr : Pr.Ok) (P : LevFam X.E X.K R.r Pr.vGs) (u : Pr.W
     have h1 : Pr.piT u ∈ Q.1.asIdeal := mem_of_mem_divs Q.2
     have h2 : X.conjO (Pr.piT u) ∈ Q.1.asIdeal := hQ
     obtain ⟨a, b, hab⟩ := hPr.piT_cop u
-    exact Q.1.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 (hab ▸ add_mem (Ideal.mul_mem_left _ _ h1) (Ideal.mul_mem_left _ _ h2)))
+    exact Q.1.isPrime.ne_top ((Ideal.eq_top_iff_one _).2
+      (hab ▸ add_mem (Ideal.mul_mem_left _ _ h1) (Ideal.mul_mem_left _ _ h2)))
   have hG : ∀ w : rowSG Pr sel (mu0 X.F X.E X.K Sg), Pr.piT u ∉ w.1.asIdeal := by
     classical
     intro w hw
@@ -70,8 +78,9 @@ theorem evOk (hX : X.Ok) (hPr : Pr.Ok) (P : LevFam X.E X.K R.r Pr.vGs) (u : Pr.W
     obtain ⟨c, hc⟩ := hPr.piT_cong u
     have h1 : Pr.piT u - 1 ∈ w.1.asIdeal := hc ▸ Ideal.mul_mem_right _ _ hgg
     exact w.1.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 (by simpa using sub_mem hw h1))
-  have hroot : ∀ g : FormG (rowTy Ch sel (mu0 X.F X.E X.K Sg) P).inv, ∃ m : ℕ, 0 < m ∧
-      ((((rowTy Ch sel (mu0 X.F X.E X.K Sg) P).inv.chr g.2)⁻¹ : X.Kˣ) : X.K) ^ m = 1 := by
+  have hroot
+      : ∀ g : FormG (rowTy Ch sel (mu0 X.F X.E X.K Sg) P).inv, ∃ m : ℕ,
+        0 < m ∧ ((((rowTy Ch sel (mu0 X.F X.E X.K Sg) P).inv.chr g.2)⁻¹ : X.Kˣ) : X.K) ^ m = 1 := by
     intro g
     obtain ⟨m, hm, hc⟩ := (rowTy Ch sel (mu0 X.F X.E X.K Sg) P).inv.chr_root g.2
     exact ⟨m, hm, by rw [Units.val_inv_eq_inv_val, inv_pow, hc, inv_one]⟩

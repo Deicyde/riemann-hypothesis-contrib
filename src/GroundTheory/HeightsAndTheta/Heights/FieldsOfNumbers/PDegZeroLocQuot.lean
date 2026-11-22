@@ -25,8 +25,8 @@ theorem DegZeroLocQuot.proof : DegZeroLocQuot.Statement := by
       Ideal.Quotient.eq_zero_iff_mem]
     exact hg
   let Q : FractionRing (MRing ι F ⧸ P) → Prop := fun y =>
-    ∃ (b : K → ℕ) (f g : MRing ι F), IsMultiHomog f b ∧ IsMultiHomog g b ∧
-      g ∉ P ∧ (∀ W ∈ 𝒲, g ∉ W) ∧ y = φ f / φ g
+    ∃ (b : K → ℕ) (f g : MRing ι F),
+      IsMultiHomog f b ∧ IsMultiHomog g b ∧ g ∉ P ∧ (∀ W ∈ 𝒲, g ∉ W) ∧ y = φ f / φ g
   have key : Q x := by
     refine Algebra.adjoin_induction (p := fun y _ => Q y) ?_ ?_ ?_ ?_ hx
     · rintro y ⟨b, f, g, hf, hg, hgP, hgW, rfl⟩
@@ -40,7 +40,8 @@ theorem DegZeroLocQuot.proof : DegZeroLocQuot.Statement := by
           IsScalarTower.algebraMap_apply F (MRing ι F ⧸ P) (FractionRing (MRing ι F ⧸ P))]
         rfl
     · rintro y z - - ⟨b, f, g, hf, hg, hgP, hgW, rfl⟩ ⟨b', f', g', hf', hg', hgP', hgW', rfl⟩
-      refine ⟨b + b', f * g' + g * f', g * g', (hf.mul hg').add (hg.mul hf'), hg.mul hg', ?_, ?_, ?_⟩
+      refine
+        ⟨b + b', f * g' + g * f', g * g', (hf.mul hg').add (hg.mul hf'), hg.mul hg', ?_, ?_, ?_⟩
       · exact fun h => ((Ideal.IsPrime.mem_or_mem inferInstance h).elim hgP hgP')
       · intro W hW h
         exact ((h𝒲 W hW).mem_or_mem h).elim (hgW W hW) (hgW' W hW)

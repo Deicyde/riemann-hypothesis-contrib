@@ -44,8 +44,10 @@ end InverseIntegralClassesKeyFacts
 
 open InverseIntegralClassesKeyFacts
 
-theorem FunEqSubst_of (h4 : Formalism.LT.IntegralSubst.{u, v}) (h5 : Formalism.LT.CoeffBound.{u})
-    (h6 : Formalism.LT.PowCongr.{u, v}) (h7 : Formalism.LT.FrobCongr.{u, v}) : Formalism.G.FunEqSubst.{u, v} := by
+theorem FunEqSubst_of
+    (h4 : Formalism.LT.IntegralSubst.{u, v}) (h5 : Formalism.LT.CoeffBound.{u})
+    (h6 : Formalism.LT.PowCongr.{u, v}) (h7 : Formalism.LT.FrobCongr.{u, v})
+    : Formalism.G.FunEqSubst.{u, v} := by
   intro K _ _ _ p q hq σ hS f hf0 hfT ι α hα0 hαI
   obtain ⟨hp, ⟨h, hh, hqh⟩, hp1, hσ⟩ := id hS
   have hp1' : ‖(p : K)‖ ≤ 1 := hp1.le
@@ -56,11 +58,9 @@ theorem FunEqSubst_of (h4 : Formalism.LT.IntegralSubst.{u, v}) (h5 : Formalism.L
   set g : PowerSeries K := f - (p : K)⁻¹ • fs.subst ((PowerSeries.X : PowerSeries K) ^ q) with hg
   set β : MvPowerSeries ι K := MvPowerSeries.expand q hq (MvPowerSeries.map σ α) with hβ
   have hαS : PowerSeries.HasSubst α := HasSubst.of_constantCoeff_zero hα0
-  have hαq0 : MvPowerSeries.constantCoeff (α ^ q) = 0 := by
-    rw [map_pow, hα0, zero_pow hq]
+  have hαq0 : MvPowerSeries.constantCoeff (α ^ q) = 0 := by rw [map_pow, hα0, zero_pow hq]
   have hαqS : PowerSeries.HasSubst (α ^ q) := HasSubst.of_constantCoeff_zero hαq0
-  have hmα0 : MvPowerSeries.constantCoeff (MvPowerSeries.map σ α) = 0 := by
-    simp [hα0]
+  have hmα0 : MvPowerSeries.constantCoeff (MvPowerSeries.map σ α) = 0 := by simp [hα0]
   have hmαS : PowerSeries.HasSubst (MvPowerSeries.map σ α) := HasSubst.of_constantCoeff_zero hmα0
   have hβ0 : MvPowerSeries.constantCoeff β = 0 := by
     rw [hβ, MvPowerSeries.constantCoeff_expand, hmα0]
@@ -68,11 +68,13 @@ theorem FunEqSubst_of (h4 : Formalism.LT.IntegralSubst.{u, v}) (h5 : Formalism.L
   have hXqS : PowerSeries.HasSubst ((PowerSeries.X : PowerSeries K) ^ q) :=
     HasSubst.of_constantCoeff_zero' (by simp [hq])
 
-  have hdec : f.subst α - (p : K)⁻¹ • MvPowerSeries.expand q hq (MvPowerSeries.map σ (f.subst α))
-      = g.subst α + (p : K)⁻¹ • (fs.subst (α ^ q) - fs.subst β) := by
-    have e1 : f = g + (p : K)⁻¹ • fs.subst ((PowerSeries.X : PowerSeries K) ^ q) := by
-      rw [hg]; abel
-    have e2 : PowerSeries.subst α (fs.subst ((PowerSeries.X : PowerSeries K) ^ q) : PowerSeries K) = fs.subst (α ^ q) := by
+  have hdec
+      : f.subst α - (p : K)⁻¹ • MvPowerSeries.expand q hq (MvPowerSeries.map σ (f.subst α))
+        = g.subst α + (p : K)⁻¹ • (fs.subst (α ^ q) - fs.subst β) := by
+    have e1 : f = g + (p : K)⁻¹ • fs.subst ((PowerSeries.X : PowerSeries K) ^ q) := by rw [hg]; abel
+    have e2
+        : PowerSeries.subst α (fs.subst ((PowerSeries.X : PowerSeries K) ^ q) : PowerSeries K)
+          = fs.subst (α ^ q) := by
       rw [PowerSeries.subst_comp_subst_apply hXqS hαS, PowerSeries.subst_pow hαS,
         PowerSeries.subst_X hαS]
     have e3 : MvPowerSeries.expand q hq (MvPowerSeries.map σ (f.subst α)) = fs.subst β := by
@@ -80,7 +82,8 @@ theorem FunEqSubst_of (h4 : Formalism.LT.IntegralSubst.{u, v}) (h5 : Formalism.L
     have e4 : f.subst α = g.subst α + (p : K)⁻¹ • fs.subst (α ^ q) := by
       conv_lhs => rw [e1]
       rw [PowerSeries.subst_add hαS, PowerSeries.subst_smul hαS, e2]
-    rw [e3, e4, smul_sub]; abel
+    rw [e3, e4, smul_sub]
+    abel
 
   have hXqI : IntegralPS ((PowerSeries.X : PowerSeries K) ^ q) := by
     intro n
@@ -92,8 +95,9 @@ theorem FunEqSubst_of (h4 : Formalism.LT.IntegralSubst.{u, v}) (h5 : Formalism.L
   have hdiv : DivByMv (p : K) (α ^ q - β) := h7 K p q hq σ hS ι α hαI
   have hβI : IntegralMv β := by
     intro d
-    have e : MvPowerSeries.coeff d β
-        = MvPowerSeries.coeff d (α ^ q) - MvPowerSeries.coeff d (α ^ q - β) := by
+    have e
+        : MvPowerSeries.coeff d β
+          = MvPowerSeries.coeff d (α ^ q) - MvPowerSeries.coeff d (α ^ q - β) := by
       rw [map_sub]; ring
     rw [e]
     exact norm_sub_le_of (hαqI d) ((hdiv d).trans hp1')
@@ -117,15 +121,17 @@ theorem FunEqSubst_of (h4 : Formalism.LT.IntegralSubst.{u, v}) (h5 : Formalism.L
       have h0 : ‖coeff (q ^ k * m) f * (p : K) ^ k‖ ≤ 1 := by rw [norm_mul, norm_pow]; exact hk
       have h' := norm_sigma_le_one hσ hp1' h0
       rwa [map_mul, map_pow, map_natCast, norm_mul, norm_pow] at h'
-    have hc : ‖MvPowerSeries.coeff d ((α ^ q) ^ (q ^ k * m) - β ^ (q ^ k * m))‖
-        ≤ ‖(p : K)‖ ^ k * ‖(p : K)‖ := by
+    have hc
+        : ‖MvPowerSeries.coeff d ((α ^ q) ^ (q ^ k * m) - β ^ (q ^ k * m))‖
+          ≤ ‖(p : K)‖ ^ k * ‖(p : K)‖ := by
       refine hc0.trans ?_
       rw [norm_pow, pow_add, pow_one, mul_comm]
       exact mul_le_mul_of_nonneg_right
         (pow_le_pow_of_le_one (norm_nonneg _) hp1' (Nat.le_mul_of_pos_left k hh)) (norm_nonneg _)
-    calc ‖σ (coeff (q ^ k * m) f)‖ * ‖MvPowerSeries.coeff d ((α ^ q) ^ (q ^ k * m) - β ^ (q ^ k * m))‖
-        ≤ ‖σ (coeff (q ^ k * m) f)‖ * (‖(p : K)‖ ^ k * ‖(p : K)‖) :=
-          mul_le_mul_of_nonneg_left hc (norm_nonneg _)
+    calc
+      ‖σ (coeff (q ^ k * m) f)‖ * ‖MvPowerSeries.coeff d ((α ^ q) ^ (q ^ k * m) - β ^ (q ^ k * m))‖
+          ≤ ‖σ (coeff (q ^ k * m) f)‖ * (‖(p : K)‖ ^ k * ‖(p : K)‖) :=
+        mul_le_mul_of_nonneg_left hc (norm_nonneg _)
       _ = (‖σ (coeff (q ^ k * m) f)‖ * ‖(p : K)‖ ^ k) * ‖(p : K)‖ := by ring
       _ ≤ 1 * ‖(p : K)‖ := mul_le_mul_of_nonneg_right hs (norm_nonneg _)
       _ = ‖(p : K)‖ := one_mul _
@@ -136,8 +142,10 @@ theorem FunEqSubst_of (h4 : Formalism.LT.IntegralSubst.{u, v}) (h5 : Formalism.L
   rw [map_add (f := _), MvPowerSeries.coeff_smul]
   refine norm_add_le_of (hgI d) ?_
   rw [norm_mul, norm_inv]
-  calc ‖(p : K)‖⁻¹ * ‖MvPowerSeries.coeff d (fs.subst (α ^ q) - fs.subst β)‖
-      ≤ ‖(p : K)‖⁻¹ * ‖(p : K)‖ := mul_le_mul_of_nonneg_left (hbr d) (inv_nonneg.mpr (norm_nonneg _))
+  calc
+    ‖(p : K)‖⁻¹ * ‖MvPowerSeries.coeff d (fs.subst (α ^ q) - fs.subst β)‖
+        ≤ ‖(p : K)‖⁻¹ * ‖(p : K)‖ :=
+      mul_le_mul_of_nonneg_left (hbr d) (inv_nonneg.mpr (norm_nonneg _))
     _ = 1 := inv_mul_cancel₀ hppos.ne'
 
 end Formalism.LT

@@ -26,9 +26,10 @@ lemma mul_basisMat_eq {n : ℕ} (V : Submodule ℂ (Fin n → ℂ)) {d : Type} [
   rw [h2]
   simp [Matrix.mul_apply, LinearMap.toMatrix_apply, Finset.sum_apply, mul_comm]
 
-theorem detOn_conjTranspose : ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) ℂ) (V : Submodule ℂ (Fin n → ℂ)),
-    (∀ y ∈ V, g *ᵥ y ∈ V) → (∀ y ∈ V, gᴴ *ᵥ y ∈ V) →
-      GlobalTheory.FlagMeas.detOn gᴴ V = GlobalTheory.FlagMeas.detOn g V := by
+theorem detOn_conjTranspose
+    : ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) ℂ) (V : Submodule ℂ (Fin n → ℂ)),
+      (∀ y ∈ V, g *ᵥ y ∈ V) → (∀ y ∈ V, gᴴ *ᵥ y ∈ V)
+        → GlobalTheory.FlagMeas.detOn gᴴ V = GlobalTheory.FlagMeas.detOn g V := by
   intro n g V hg hgh
   have hg' : ∀ y ∈ V, Matrix.toLin' g y ∈ V := by simpa [Matrix.toLin'_apply] using hg
   have hgh' : ∀ y ∈ V, Matrix.toLin' gᴴ y ∈ V := by simpa [Matrix.toLin'_apply] using hgh
@@ -41,7 +42,8 @@ theorem detOn_conjTranspose : ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) ℂ) (V 
   set A := LinearMap.toMatrix b b f
   set A' := LinearMap.toMatrix b b f'
   have h1 : g * B = B * A := mul_basisMat_eq V b g f (fun v => by simp [f, Matrix.toLin'_apply])
-  have h2 : gᴴ * B = B * A' := mul_basisMat_eq V b gᴴ f' (fun v => by simp [f', Matrix.toLin'_apply])
+  have h2 : gᴴ * B = B * A' :=
+    mul_basisMat_eq V b gᴴ f' (fun v => by simp [f', Matrix.toLin'_apply])
   have hinj : Function.Injective B.mulVec := by
     rw [Matrix.mulVec_injective_iff]
     have : B.col = fun j => (b j : Fin n → ℂ) := by ext j i; rfl
@@ -49,7 +51,9 @@ theorem detOn_conjTranspose : ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) ℂ) (V 
     exact b.linearIndependent.map' V.subtype (Submodule.ker_subtype V)
   have hG : (Bᴴ * B).det ≠ 0 := (Matrix.PosDef.conjTranspose_mul_self B hinj).det_pos.ne'
   have key : (Bᴴ * B) * A = A'ᴴ * (Bᴴ * B) := by
-    calc (Bᴴ * B) * A = Bᴴ * (g * B) := by rw [h1, Matrix.mul_assoc]
+    calc
+      (Bᴴ * B) * A
+        = Bᴴ * (g * B) := by rw [h1, Matrix.mul_assoc]
       _ = (gᴴ * B)ᴴ * B := by
         rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Matrix.mul_assoc]
       _ = A'ᴴ * (Bᴴ * B) := by rw [h2, Matrix.conjTranspose_mul, Matrix.mul_assoc]

@@ -5,4 +5,6 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistRed
 
 @[expose] public section
 
-theorem LateralTheory.Ext.etale_roots_of_unity_reduction_generator : LateralTheory.EtaleFoundations.EtaleRootsOfUnityReductionMapGenerator := GlobalTheory.T.tateTwistReductionResolutionMap_generator
+theorem LateralTheory.Ext.etale_roots_of_unity_reduction_generator
+    : LateralTheory.EtaleFoundations.EtaleRootsOfUnityReductionMapGenerator :=
+  GlobalTheory.T.tateTwistReductionResolutionMap_generator

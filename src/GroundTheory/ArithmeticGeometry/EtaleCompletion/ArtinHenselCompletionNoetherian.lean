@@ -10,8 +10,8 @@ namespace GroundTheory.Arith.Etale
 
 open IsLocalRing
 
-theorem isNoetherianRing_adicCompletion (R : Type*) [CommRing R] [IsNoetherianRing R]
-    (I : Ideal R) : IsNoetherianRing (AdicCompletion I R) := by
+theorem isNoetherianRing_adicCompletion (R : Type*) [CommRing R] [IsNoetherianRing R] (I : Ideal R)
+    : IsNoetherianRing (AdicCompletion I R) := by
   classical
   obtain ⟨s, hs⟩ := (isNoetherianRing_iff_ideal_fg R).1 inferInstance I
   set k := s.card
@@ -35,8 +35,7 @@ theorem isNoetherianRing_adicCompletion (R : Type*) [CommRing R] [IsNoetherianRi
     simp [hσX]
   have hJn : ∀ n, (J ^ n).map σ = I ^ n := fun n ↦ by rw [Ideal.map_pow, hJ]
   have hσs : Function.Surjective σ := fun r ↦ ⟨MvPolynomial.C r, MvPolynomial.eval_C _⟩
-  have hle : ∀ n, J ^ n ≤ (I ^ n).comap σ := fun n ↦ by
-    rw [← Ideal.map_le_iff_le_comap, hJn]
+  have hle : ∀ n, J ^ n ≤ (I ^ n).comap σ := fun n ↦ by rw [← Ideal.map_le_iff_le_comap, hJn]
   let g : (n : ℕ) → AdicCompletion J P →+* R ⧸ I ^ n := fun n ↦
     (Ideal.quotientMap (I ^ n) σ (hle n)).comp (AdicCompletion.evalₐ J n).toRingHom
   have hg : ∀ {m n : ℕ} (hmn : m ≤ n), (Ideal.Quotient.factorPow I hmn).comp (g n) = g m := by
@@ -52,8 +51,8 @@ theorem isNoetherianRing_adicCompletion (R : Type*) [CommRing R] [IsNoetherianRi
       rw [Ideal.Quotient.eq]
       have := Ideal.add_mem _ h1 h2
       rwa [sub_add_sub_cancel] at this
-    simp only [g, RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe,
-      RingHom.coe_coe, ← hq, hq', Ideal.quotientMap_mk, Ideal.Quotient.factor_mk]
+    simp only [g, RingHom.coe_comp, Function.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+      ← hq, hq', Ideal.quotientMap_mk, Ideal.Quotient.factor_mk]
   let ψ := AdicCompletion.liftRingHom I g hg
   have hψ : Function.Surjective ψ := by
     intro x
@@ -73,13 +72,12 @@ theorem isNoetherianRing_adicCompletion (R : Type*) [CommRing R] [IsNoetherianRi
         simp only [Q, add_sub_add_left_eq_sub]
         rw [Finset.sum_Ico_eq_sub _ hmn]
       rw [this]
-      exact Ideal.sum_mem _ fun j hj ↦
-        Ideal.pow_le_pow_right (Finset.mem_Ico.1 hj).1 (hPj j)
+      exact Ideal.sum_mem _ fun j hj ↦ Ideal.pow_le_pow_right (Finset.mem_Ico.1 hj).1 (hPj j)
     let Qc : AdicCompletion.AdicCauchySequence J P := ⟨Q, hQ⟩
     refine ⟨AdicCompletion.mk J P Qc, AdicCompletion.ext_evalₐ fun n ↦ ?_⟩
     rw [AdicCompletion.evalₐ_liftRingHom, AdicCompletion.evalₐ_mk]
-    change Ideal.quotientMap (I ^ n) σ (hle n)
-      (AdicCompletion.evalₐ J n (AdicCompletion.mk J P Qc)) = _
+    change Ideal.quotientMap (I ^ n) σ (hle n) (AdicCompletion.evalₐ J n (AdicCompletion.mk J P Qc))
+      = _
     rw [AdicCompletion.evalₐ_mk, Ideal.quotientMap_mk]
     refine congrArg _ ?_
     change σ (Q n) = f.val n
@@ -92,8 +90,9 @@ theorem isNoetherianRing_adicCompletion (R : Type*) [CommRing R] [IsNoetherianRi
     isNoetherianRing_of_ringEquiv _ (MvPowerSeries.toAdicCompletionAlgEquiv (Fin k) R).toRingEquiv
   exact isNoetherianRing_of_surjective _ _ ψ hψ
 
-instance instIsNoetherianRingAdicCompletion (R : Type*) [CommRing R] [IsNoetherianRing R]
-    (I : Ideal R) : IsNoetherianRing (AdicCompletion I R) :=
+instance instIsNoetherianRingAdicCompletion
+    (R : Type*) [CommRing R] [IsNoetherianRing R] (I : Ideal R)
+    : IsNoetherianRing (AdicCompletion I R) :=
   isNoetherianRing_adicCompletion R I
 
 end GroundTheory.Arith.Etale

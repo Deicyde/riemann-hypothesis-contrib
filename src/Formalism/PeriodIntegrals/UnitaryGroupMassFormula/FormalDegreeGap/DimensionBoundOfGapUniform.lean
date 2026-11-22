@@ -11,10 +11,10 @@ namespace PI.UnitaryGroupMassFormula.HCFdegRGap
 
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S MeasureTheory Matrix
 
-theorem gap_big {p q N ep0 h0 : ℝ} (hp : 1 ≤ p) (hq : 1 ≤ q) (hN : N = p + q)
-    (he1 : Real.exp (-N) ≤ ep0) (he2 : ep0 < 1 / 2)
-    (hh : 8192 * min p q * (p * q) ^ 3 * Real.log N / ep0 ^ 2 ≤ h0) :
-    32 * N * p * q + 2 < h0 := by
+theorem gap_big
+    {p q N ep0 h0 : ℝ} (hp : 1 ≤ p) (hq : 1 ≤ q) (hN : N = p + q) (he1 : Real.exp (-N) ≤ ep0)
+    (he2 : ep0 < 1 / 2) (hh : 8192 * min p q * (p * q) ^ 3 * Real.log N / ep0 ^ 2 ≤ h0)
+    : 32 * N * p * q + 2 < h0 := by
   have hN2 : (2 : ℝ) ≤ N := by linarith
   have hlog2 := Real.log_two_gt_d9
   have hlog : (0.69 : ℝ) < Real.log N :=
@@ -27,7 +27,8 @@ theorem gap_big {p q N ep0 h0 : ℝ} (hp : 1 ≤ p) (hq : 1 ≤ q) (hN : N = p +
   set X := 8192 * min p q * (p * q) ^ 3 * Real.log N with hXdef
   have hX : 8192 * 0.69 * (p * q) ^ 3 ≤ X := by
     have h3 : 0 ≤ (p * q) ^ 3 := by positivity
-    have h4 : (1 : ℝ) * 0.69 ≤ min p q * Real.log N := mul_le_mul hmin hlog.le (by norm_num) (by linarith)
+    have h4 : (1 : ℝ) * 0.69 ≤ min p q * Real.log N :=
+      mul_le_mul hmin hlog.le (by norm_num) (by linarith)
     rw [hXdef]
     nlinarith
   have hdiv : 4 * X ≤ X / ep0 ^ 2 := by

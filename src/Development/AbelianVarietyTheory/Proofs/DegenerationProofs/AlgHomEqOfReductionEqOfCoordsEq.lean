@@ -7,12 +7,23 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 
-theorem algHom_eq_of_reduction_eq_of_coords_eq :
-    ∀ (O B : Type) [CommRing O] [IsLocalRing O] [CommRing B] [Algebra O B] [Algebra.FiniteType O B] (s s' : B →ₐ[O] O) (g : ℕ) (u : Fin g → B), (∀ b, s b - s' b ∈ IsLocalRing.maximalIdeal O) → (∀ i, s (u i) = s' (u i)) → (∀ b, s b = 0 → ∃ t : B, IsUnit (s t) ∧ t * b ∈ Ideal.span (Set.range fun i => u i - algebraMap O B (s (u i))) ⊔ (IsLocalRing.maximalIdeal O).map (algebraMap O B)) → s = s' := by
+theorem algHom_eq_of_reduction_eq_of_coords_eq
+    : ∀ (O B : Type) [CommRing O] [IsLocalRing O] [CommRing B] [Algebra O B]
+        [Algebra.FiniteType O B] (s s' : B →ₐ[O] O) (g : ℕ) (u : Fin g → B),
+      (∀ b, s b - s' b ∈ IsLocalRing.maximalIdeal O) → (∀ i, s (u i) = s' (u i))
+        → (∀ b,
+          s b = 0
+            → ∃ t : B,
+              IsUnit (s t)
+                ∧ t * b
+                  ∈ Ideal.span (Set.range fun i => u i - algebraMap O B (s (u i)))
+                    ⊔ (IsLocalRing.maximalIdeal O).map (algebraMap O B))
+        → s = s' := by
   intro O B _ _ _ _ hft s s' g u hred hu hgen
   classical
   obtain ⟨S, hS⟩ := hft.out
@@ -22,20 +33,21 @@ theorem algHom_eq_of_reduction_eq_of_coords_eq :
     intro b
     have hb : b ∈ Algebra.adjoin O (S : Set B) := hS ▸ Algebra.mem_top
     induction hb using Algebra.adjoin_induction with
-    | mem x hx =>
-      exact Ideal.subset_span (by
-        simp only [Finset.coe_image]; exact ⟨x, hx, rfl⟩)
+    | mem x hx => exact Ideal.subset_span (by simp only [Finset.coe_image]; exact ⟨x, hx, rfl⟩)
     | algebraMap r => simp
     | add x y _ _ hx hy =>
       have : s' (x + y) - s (x + y) = (s' x - s x) + (s' y - s y) := by
         simp only [map_add (f := _)]; ring
-      rw [this]; exact N.add_mem hx hy
+      rw [this]
+      exact N.add_mem hx hy
     | mul x y _ _ hx hy =>
       have : s' (x * y) - s (x * y) = s' x * (s' y - s y) + s y * (s' x - s x) := by
         simp only [map_mul]; ring
-      rw [this]; exact N.add_mem (N.mul_mem_left _ hy) (N.mul_mem_left _ hx)
-  have h2 : ∀ y ∈ (IsLocalRing.maximalIdeal O).map (algebraMap O B),
-      ∀ c : B, s' (c * y) - s (c * y) ∈ IsLocalRing.maximalIdeal O * N := by
+      rw [this]
+      exact N.add_mem (N.mul_mem_left _ hy) (N.mul_mem_left _ hx)
+  have h2
+      : ∀ y ∈ (IsLocalRing.maximalIdeal O).map (algebraMap O B), ∀ c : B,
+        s' (c * y) - s (c * y) ∈ IsLocalRing.maximalIdeal O * N := by
     intro y hy
     induction hy using Submodule.span_induction with
     | mem x hx =>
@@ -43,28 +55,36 @@ theorem algHom_eq_of_reduction_eq_of_coords_eq :
       intro c
       have : s' (c * algebraMap O B a) - s (c * algebraMap O B a) = a * (s' c - s c) := by
         simp only [map_mul, AlgHom.commutes, Algebra.algebraMap_self, RingHom.id_apply]; ring
-      rw [this]; exact Ideal.mul_mem_mul ha (h1 c)
-    | zero => intro c; simp
+      rw [this]
+      exact Ideal.mul_mem_mul ha (h1 c)
+    | zero =>
+      intro c; simp
     | add x y _ _ hx hy =>
       intro c
       have : s' (c * (x + y)) - s (c * (x + y))
           = (s' (c * x) - s (c * x)) + (s' (c * y) - s (c * y)) := by
         simp only [map_add (f := _), map_mul]; ring
-      rw [this]; exact Ideal.add_mem _ (hx c) (hy c)
+      rw [this]
+      exact Ideal.add_mem _ (hx c) (hy c)
     | smul a x _ hx =>
       intro c
       have := hx (c * a)
       rwa [_root_.mul_assoc] at this
-  have h3 : ∀ j ∈ Ideal.span (Set.range fun i => u i - algebraMap O B (s (u i))),
-      s j = 0 ∧ s' j = 0 := by
+  have h3
+      : ∀ j ∈ Ideal.span (Set.range fun i => u i - algebraMap O B (s (u i))),
+        s j = 0 ∧ s' j = 0 := by
     intro j hj
-    have a1 : Ideal.span (Set.range fun i => u i - algebraMap O B (s (u i))) ≤
-        RingHom.ker (s : B →+* O) := by
-      rw [Ideal.span_le]; rintro _ ⟨i, rfl⟩
+    have a1
+        : Ideal.span (Set.range fun i => u i - algebraMap O B (s (u i)))
+          ≤ RingHom.ker (s : B →+* O) := by
+      rw [Ideal.span_le]
+      rintro _ ⟨i, rfl⟩
       simp [RingHom.mem_ker]
-    have a2 : Ideal.span (Set.range fun i => u i - algebraMap O B (s (u i))) ≤
-        RingHom.ker (s' : B →+* O) := by
-      rw [Ideal.span_le]; rintro _ ⟨i, rfl⟩
+    have a2
+        : Ideal.span (Set.range fun i => u i - algebraMap O B (s (u i)))
+          ≤ RingHom.ker (s' : B →+* O) := by
+      rw [Ideal.span_le]
+      rintro _ ⟨i, rfl⟩
       simp [RingHom.mem_ker, hu i]
     exact ⟨a1 hj, a2 hj⟩
   have h4 : ∀ x, s' x - s x ∈ IsLocalRing.maximalIdeal O * N := by
@@ -86,8 +106,7 @@ theorem algHom_eq_of_reduction_eq_of_coords_eq :
     rw [map_add (f := _), map_mul, hb', j2] at e2
     have h5 := h2 y hy 1
     rw [_root_.one_mul] at h5
-    have : s' y - s y = s' t * (s' x - s x) := by
-      linear_combination e2 - e1
+    have : s' y - s y = s' t * (s' x - s x) := by linear_combination e2 - e1
     rw [this] at h5
     exact (Ideal.unit_mul_mem_iff_mem _ ht').1 h5
   have hN : N = ⊥ := by

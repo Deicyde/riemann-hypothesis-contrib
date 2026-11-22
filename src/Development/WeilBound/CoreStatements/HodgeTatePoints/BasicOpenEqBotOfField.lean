@@ -7,8 +7,12 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+  Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.CompanionTheory.Ar.Crv
+  GlobalTheory.CompanionTheory.Ar.Conj
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -16,13 +20,17 @@ noncomputable section
 
 namespace PositivityTheory.HtPt.Cf
 
-theorem basicOpen_eq_bot_of_field {K : Type} [Field K] {Y : Scheme.{0}} (π : Y ⟶ Sp K) [UniversallyClosed π]
-    [ConnectedSpace Y] (f : Γ(Y, ⊤)) (y₀ : Y) (h₀ : y₀ ∉ Y.basicOpen f) : Y.basicOpen f = ⊥ := by
+theorem basicOpen_eq_bot_of_field
+    {K : Type} [Field K]
+    {Y : Scheme.{0}} (π : Y ⟶ Sp K) [UniversallyClosed π] [ConnectedSpace Y]
+    (f : Γ(Y, ⊤)) (y₀ : Y) (h₀ : y₀ ∉ Y.basicOpen f)
+    : Y.basicOpen f = ⊥ := by
   let φ : K →+* Γ(Y, ⊤) := π.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom
-  have hφ : φ.IsIntegral := RingHom.IsIntegral.trans _ _
-    (RingHom.isIntegral_of_surjective _
-      (Scheme.ΓSpecIso (CommRingCat.of K)).symm.commRingCatIsoToRingEquiv.surjective)
-    (isIntegral_appTop_of_universallyClosed π)
+  have hφ : φ.IsIntegral :=
+    RingHom.IsIntegral.trans _ _
+      (RingHom.isIntegral_of_surjective _
+        (Scheme.ΓSpecIso (CommRingCat.of K)).symm.commRingCatIsoToRingEquiv.surjective)
+      (isIntegral_appTop_of_universallyClosed π)
   obtain ⟨p, hp, hpf⟩ := hφ f
   obtain ⟨q, hq, hn⟩ := Polynomial.exists_eq_pow_rootMultiplicity_mul_and_not_dvd p hp.ne_zero 0
   have hc : q.coeff 0 ≠ 0 := fun h => hn (by simpa using Polynomial.X_dvd_iff.2 h)
@@ -50,7 +58,8 @@ theorem basicOpen_eq_bot_of_field {K : Type} [Field K] {Y : Scheme.{0}} (π : Y 
   have hcl : IsClopen (Y.basicOpen f : Set Y) := by
     refine ⟨⟨?_⟩, (Y.basicOpen f).isOpen⟩
     have : (Y.basicOpen f : Set Y)ᶜ = Y.basicOpen g := Set.ext key
-    rw [this]; exact (Y.basicOpen g).isOpen
+    rw [this]
+    exact (Y.basicOpen g).isOpen
   rcases isClopen_iff.1 hcl with h | h
   · exact TopologicalSpace.Opens.ext h
   · exact absurd (show y₀ ∈ (Y.basicOpen f : Set Y) from h ▸ trivial) h₀
@@ -71,11 +80,13 @@ theorem exists_generic {S : Scheme.{0}} (s : S) : ∃ z : S, z ⤳ s ∧ ∀ z' 
     eq_irreducibleComponent isIrreducible_singleton.closure.isPreirreducible hsub
   exact (IsGenericPoint.eq (show IsGenericPoint z' _ from he) hg)
 
-theorem bijective_of_generic {X S : Scheme.{0}} (π : X ⟶ S) (e : S ⟶ X) (he : e ≫ π = 𝟙 S) [Smooth π]
-    [GeometricallyConnected π] [IsReduced S] [IsLocallyNoetherian S]
-    (h : ∀ z : S, (∀ z' : S, z' ⤳ z → z' = z) →
-      ∃ (K : Type) (_ : Field K) (t : Sp K ⟶ S), z ∈ Set.range t ∧ IsProper (pullback.snd π t)) :
-    Function.Bijective π.appTop.hom := by
+theorem bijective_of_generic
+    {X S : Scheme.{0}} (π : X ⟶ S) (e : S ⟶ X) (he : e ≫ π = 𝟙 S)
+    [Smooth π] [GeometricallyConnected π] [IsReduced S] [IsLocallyNoetherian S]
+    (h : ∀ z : S,
+      (∀ z' : S, z' ⤳ z → z' = z)
+        → ∃ (K : Type) (_ : Field K) (t : Sp K ⟶ S), z ∈ Set.range t ∧ IsProper (pullback.snd π t))
+    : Function.Bijective π.appTop.hom := by
   have hret : ∀ a, e.appTop (π.appTop a) = a := fun a => by
     rw [← CommRingCat.comp_apply, ← Scheme.Hom.comp_appTop, he, Scheme.Hom.id_appTop]; rfl
   refine ⟨Function.LeftInverse.injective hret, fun f => ⟨e.appTop f, ?_⟩⟩
@@ -84,8 +95,7 @@ theorem bijective_of_generic {X S : Scheme.{0}} (π : X ⟶ S) (e : S ⟶ X) (he
   symm
   rw [← sub_eq_zero, ← basicOpen_eq_bot_iff]
   set f' := f - π.appTop.hom (e.appTop f) with hf'
-  have h0 : e.appTop f' = 0 := by
-    rw [hf', map_sub]; exact sub_eq_zero.2 (hret _).symm
+  have h0 : e.appTop f' = 0 := by rw [hf', map_sub]; exact sub_eq_zero.2 (hret _).symm
   have hout : ∀ s, e s ∉ X.basicOpen f' := fun s hs => by
     have : s ∈ e ⁻¹ᵁ X.basicOpen f' := hs
     rw [Scheme.preimage_basicOpen_top, h0, Scheme.basicOpen_zero] at this
@@ -98,47 +108,64 @@ theorem bijective_of_generic {X S : Scheme.{0}} (π : X ⟶ S) (e : S ⟶ X) (he
   obtain ⟨K, _, t, ⟨w, hw⟩, hp⟩ := h z hgen
   have : ConnectedSpace ↥(pullback π t) :=
     GeometricallyConnected.geometrically_connectedSpace _ _ _ (.of_hasPullback π t)
-  obtain ⟨y, hy, -⟩ := Scheme.Pullback.exists_preimage_pullback (f := π) (g := t) x' w (hxz.trans hw.symm)
-  obtain ⟨y₀, hy₀, -⟩ := Scheme.Pullback.exists_preimage_pullback (f := π) (g := t) (e z) w
-    (((Scheme.Hom.comp_apply e π z).symm.trans (by rw [he]; rfl)).trans hw.symm)
-  have hb := basicOpen_eq_bot_of_field (pullback.snd π t) ((pullback.fst π t).appTop f') y₀ (by
-    rw [← Scheme.preimage_basicOpen_top]
-    show pullback.fst π t y₀ ∉ X.basicOpen f'
-    rw [hy₀]; exact hout z)
+  obtain ⟨y, hy, -⟩ :=
+    Scheme.Pullback.exists_preimage_pullback (f := π) (g := t) x' w (hxz.trans hw.symm)
+  obtain ⟨y₀, hy₀, -⟩ :=
+    Scheme.Pullback.exists_preimage_pullback (f := π) (g := t) (e z) w
+      (((Scheme.Hom.comp_apply e π z).symm.trans (by rw [he]; rfl)).trans hw.symm)
+  have hb :=
+    basicOpen_eq_bot_of_field (pullback.snd π t) ((pullback.fst π t).appTop f') y₀ (by
+      rw [← Scheme.preimage_basicOpen_top]
+      show pullback.fst π t y₀ ∉ X.basicOpen f'
+      rw [hy₀]
+      exact hout z)
   have : y ∈ pullback.fst π t ⁻¹ᵁ X.basicOpen f' := by
     show pullback.fst π t y ∈ X.basicOpen f'
-    rw [hy]; exact hx'
+    rw [hy]
+    exact hx'
   rw [Scheme.preimage_basicOpen_top, hb] at this
   exact this
 
-theorem pow_smooth_conn {S : Scheme.{0}} (G : Over S) [Smooth G.hom] [GeometricallyConnected G.hom] :
-    ∀ n : ℕ, Smooth (Out.powObj G n).hom ∧ GeometricallyConnected (Out.powObj G n).hom := by
+theorem pow_smooth_conn {S : Scheme.{0}} (G : Over S) [Smooth G.hom] [GeometricallyConnected G.hom]
+    : ∀ n : ℕ, Smooth (Out.powObj G n).hom ∧ GeometricallyConnected (Out.powObj G n).hom := by
   intro n
   induction n with
   | zero =>
-    exact ⟨inferInstanceAs (Smooth (𝟙 S)), ⟨fun K _ y Z fst snd h => by
-      have : IsIso snd := h.isIso_snd_of_isIso (f := 𝟙 S)
-      have : ConnectedSpace (Spec (CommRingCat.of K)) := inferInstanceAs (ConnectedSpace (PrimeSpectrum K))
-      exact snd.homeomorph.connectedSpace_iff.2 this⟩⟩
+    exact ⟨
+      inferInstanceAs (Smooth (𝟙 S)),
+      ⟨fun K _ y Z fst snd h => by
+        have : IsIso snd := h.isIso_snd_of_isIso (f := 𝟙 S)
+        have : ConnectedSpace (Spec (CommRingCat.of K)) :=
+          inferInstanceAs (ConnectedSpace (PrimeSpectrum K))
+        exact snd.homeomorph.connectedSpace_iff.2 this⟩
+    ⟩
   | succ n ih =>
     obtain ⟨h1, h2⟩ := ih
-    rw [show Out.powObj G (n + 1) = G ⊗ Out.powObj G n from rfl, Over.tensorObj_hom, pullback.condition]
+    rw [show Out.powObj G (n + 1) = G ⊗ Out.powObj G n from rfl, Over.tensorObj_hom,
+      pullback.condition]
     exact ⟨inferInstance, GeometricallyConnected.comp _ _⟩
 
-theorem pow_proper {S : Scheme.{0}} (G : Over S) [IsProper G.hom] : ∀ n : ℕ, IsProper (Out.powObj G n).hom
+theorem pow_proper {S : Scheme.{0}} (G : Over S) [IsProper G.hom]
+    : ∀ n : ℕ, IsProper (Out.powObj G n).hom
   | 0 => inferInstanceAs (IsProper (𝟙 S))
   | n + 1 => by
     have := pow_proper G n
-    rw [show Out.powObj G (n + 1) = G ⊗ Out.powObj G n from rfl, Over.tensorObj_hom, pullback.condition]
+    rw [show Out.powObj G (n + 1) = G ⊗ Out.powObj G n from rfl, Over.tensorObj_hom,
+      pullback.condition]
     infer_instance
 
-theorem pow_fns : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X0 : Scheme.{0}) (t : SAB H X0), IsReduced X0 → IsLocallyNoetherian X0 → (∀ z : X0, (∀ z' : X0, z' ⤳ z → z' = z) → z ∈ abLocus t.G) → PowFns t := by
+theorem pow_fns
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X0 : Scheme.{0})
+        (t : SAB H X0),
+      IsReduced X0 → IsLocallyNoetherian X0
+        → (∀ z : X0, (∀ z' : X0, z' ⤳ z → z' = z) → z ∈ abLocus t.G)
+        → PowFns t := by
   intro E _ _ _ H X0 t _ _ h n
   have := t.semi.smooth
   have := t.semi.geomConnected
   obtain ⟨h1, h2⟩ := pow_smooth_conn t.G n
-  refine bijective_of_generic (Out.powObj t.G n).hom (η[Out.powObj t.G n]).left (Over.w (η[Out.powObj t.G n]))
-    fun z hz => ?_
+  refine bijective_of_generic (Out.powObj t.G n).hom (η[Out.powObj t.G n]).left
+    (Over.w (η[Out.powObj t.G n])) fun z hz => ?_
   let K := AlgebraicClosure (X0.residueField z)
   let x : Sp K ⟶ X0 := spMap (algebraMap (X0.residueField z) K) ≫ X0.fromSpecResidueField z
   have hx : z ∈ Set.range x := ⟨IsLocalRing.closedPoint K, Scheme.fromSpecResidueField_apply z _⟩

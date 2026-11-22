@@ -8,19 +8,36 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoordAp
 
 @[expose] public section
 
-open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.NB GlobalTheory.CycFr GlobalTheory.WachTie
+open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.BasicNotions.Loc GlobalTheory.NB GlobalTheory.CycFr GlobalTheory.WachTie
 
 noncomputable section
 
 namespace GlobalTheory.WachTie
 
-theorem exists_matrix_gamma : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K] {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B] [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR] [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR] {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n) {l : ℕ} (R : Fr l O) (j : O⟦X⟧ →ₐ[O] O⟦X⟧) (jE : (ZMod n → R.EE) →ₐ[O] W.EE) (T : LocLat G Qp LL O) {r : ℕ} (b : Module.Basis (Fin r) (LetA O n) ↥(W.N T)), FrTie W R j → EETie W R j jE → (∀ k, (b k : W.DD T) ∈ W.NΔ T) → ∃ Gm : ZMod n → Matrix (Fin r) (Fin r) O⟦X⟧, (∀ i, ∃ B : Matrix (Fin r) (Fin r) O⟦X⟧, Gm i = 1 + (X : O⟦X⟧) • B) ∧ (∀ k, W.γD T W.gam (b k : W.DD T) = ∑ m, (fun i => j (Gm i m k) : LetA O n) • (b m : W.DD T)) := by
-  intro G _ _ Qp K₀ K _ _ _ _ _ _ _ B BdR _ _ _ _ _ _ _ _ _ _ _ PD LL O _ _ _ _ _ v n W l R j jE T r b
-    hF _ hb
+theorem exists_matrix_gamma
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+        [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K] {B BdR : Type}
+        [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+        [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+        [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR] {PD : PeriodData G Qp K₀ K B BdR}
+        {LL O : Type} [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+        {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n) {l : ℕ} (R : Fr l O)
+        (j : O⟦X⟧ →ₐ[O] O⟦X⟧) (jE : (ZMod n → R.EE) →ₐ[O] W.EE) (T : LocLat G Qp LL O) {r : ℕ}
+        (b : Module.Basis (Fin r) (LetA O n) ↥(W.N T)),
+      FrTie W R j → EETie W R j jE → (∀ k, (b k : W.DD T) ∈ W.NΔ T)
+        → ∃ Gm : ZMod n → Matrix (Fin r) (Fin r) O⟦X⟧,
+          (∀ i, ∃ B : Matrix (Fin r) (Fin r) O⟦X⟧, Gm i = 1 + (X : O⟦X⟧) • B)
+            ∧ (∀ k,
+              W.γD T W.gam (b k : W.DD T)
+                = ∑ m, (fun i => j (Gm i m k) : LetA O n) • (b m : W.DD T)) := by
+  intro G _ _ Qp K₀ K _ _ _ _ _ _ _ B BdR _ _ _ _ _ _ _ _ _ _ _ PD LL O _ _ _ _ _ v n W l R j jE T r
+    b hF _ hb
   classical
   obtain ⟨-, hinv, -, -, -, hs, hX, -⟩ := hF
-  have hsm : ∀ (g : W.Gam) (a : LetA O n) (x : W.DD T),
-      W.γD T g (a • x) = letγ (W.γ₀ g) a • W.γD T g x := fun g a x => by
+  have hsm
+      : ∀ (g : W.Gam) (a : LetA O n) (x : W.DD T),
+        W.γD T g (a • x) = letγ (W.γ₀ g) a • W.γD T g x := fun g a x => by
     have := W.γD_smul T g (algebraMap (LetA O n) W.EE a) x
     rw [algebraMap_smul, W.γE_ext, algebraMap_smul] at this
     exact this
@@ -57,10 +74,12 @@ theorem exists_matrix_gamma : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp 
       have h1 : z k - b k = (letπ : LetA O n) • (⟨y, hy⟩ : ↥(W.N T)) := Subtype.ext hy'
       have h2 := congrArg (fun w => b.repr w m i) h1
       simp only [map_sub, map_smul, Finsupp.sub_apply, Finsupp.smul_apply, Pi.sub_apply,
-        smul_eq_mul, Pi.mul_apply, b.repr_self, letπ] at h2
+          smul_eq_mul, Pi.mul_apply, b.repr_self, letπ]
+        at h2
       rw [X_dvd_iff, ← constantCoeff_algHom j hXj, ← X_dvd_iff, map_sub, hc]
-      have h3 : j ((1 : Matrix (Fin r) (Fin r) O⟦X⟧) m k) =
-          (Finsupp.single k (1 : LetA O n) : Fin r →₀ LetA O n) m i := by
+      have h3
+          : j ((1 : Matrix (Fin r) (Fin r) O⟦X⟧) m k)
+            = (Finsupp.single k (1 : LetA O n) : Fin r →₀ LetA O n) m i := by
         by_cases h : m = k
         · subst h; simp
         · rw [Matrix.one_apply_ne h, Finsupp.single_eq_of_ne h]; simp
@@ -70,7 +89,8 @@ theorem exists_matrix_gamma : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp 
     refine ⟨Matrix.of d, ?_⟩
     ext1 m k
     simp only [Matrix.of_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
-    rw [← hd]; ring
+    rw [← hd]
+    ring
   · simp only [Matrix.of_apply, hc]
     exact hexp (z k)
 

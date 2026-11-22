@@ -16,6 +16,7 @@ namespace PositivityTheory.KB.BlockInvariants
 theorem aGood : AGood := TwAG.aGood
 
 theorem swt_all (hE : SEv) (hS : SStokes) : SWt :=
-  swt hE hS (fft_of cplx sw1 sw2) aGood wPad weylTwoBlockMatrix wInv wOne wCyc tStab tBlk pStab blockSum_preserves_cone
+  swt hE hS (fft_of cplx sw1 sw2) aGood wPad weylTwoBlockMatrix wInv wOne wCyc tStab tBlk pStab
+    blockSum_preserves_cone
 
 end PositivityTheory.KB.BlockInvariants

@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
 private theorem genPt_exists_spec {S : Scheme.{0}} (s : S) : ∃ t : S, t ⤳ s ∧ GenPt t := by
   have hC : IsIrreducible (irreducibleComponent s) := isIrreducible_irreducibleComponent
@@ -22,8 +23,8 @@ private theorem genPt_exists_spec {S : Scheme.{0}} (s : S) : ∃ t : S, t ⤳ s 
   have ht' : IsGenericPoint t' (irreducibleComponent s) := heq
   exact ht'.eq ht
 
-private theorem genPt_open {U S : Scheme.{0}} (j : U ⟶ S) [IsOpenImmersion j] (s : U) :
-    GenPt (j s) ↔ GenPt s := by
+private theorem genPt_open {U S : Scheme.{0}} (j : U ⟶ S) [IsOpenImmersion j] (s : U)
+    : GenPt (j s) ↔ GenPt s := by
   have he := j.isOpenEmbedding
   constructor
   · intro h t hts
@@ -34,16 +35,15 @@ private theorem genPt_open {U S : Scheme.{0}} (j : U ⟶ S) [IsOpenImmersion j] 
     have : t' ⤳ s := he.isInducing.specializes_iff.1 hts
     rw [h t' this]
 
-private theorem genPt_integral (S : Scheme.{0}) [IsIntegral S] (s : S) :
-    GenPt s ↔ s = genericPoint S := by
+private theorem genPt_integral (S : Scheme.{0}) [IsIntegral S] (s : S)
+    : GenPt s ↔ s = genericPoint S := by
   constructor
   · intro h
     exact (h _ (genericPoint_specializes s)).symm
   · rintro rfl t ht
     exact (ht.antisymm (genericPoint_specializes t)).eq
 
-theorem UpperTheory.Gal.TranscendenceTraces.genBasic_of :
-    GenBasic := by
+theorem UpperTheory.Gal.TranscendenceTraces.genBasic_of : GenBasic := by
   refine ⟨fun S => ?_, fun j _ s => genPt_open j s, fun S _ s => genPt_integral S s⟩
   rw [dense_iff_inter_open]
   rintro N hN ⟨s, hs⟩

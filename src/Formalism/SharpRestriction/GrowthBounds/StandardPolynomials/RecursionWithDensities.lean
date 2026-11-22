@@ -14,8 +14,9 @@ section YC
 
 variable {K : Type} [Field K] [CharZero K] {N r : ℕ} [NeZero r]
 
-theorem glAct_mul' (Lt : Letters (Fin N)) (S : Set (Fin N)) (c d : Fin r) (f h : MvPolynomial (Fin N × Fin r) K) :
-    glAct K Lt S c d (f * h) = glAct K Lt S c d f * h + f * glAct K Lt S c d h := by
+theorem glAct_mul'
+    (Lt : Letters (Fin N)) (S : Set (Fin N)) (c d : Fin r) (f h : MvPolynomial (Fin N × Fin r) K)
+    : glAct K Lt S c d (f * h) = glAct K Lt S c d f * h + f * glAct K Lt S c d h := by
   classical
   unfold glAct
   simp only [LinearMap.sum_apply]
@@ -23,33 +24,39 @@ theorem glAct_mul' (Lt : Letters (Fin N)) (S : Set (Fin N)) (c d : Fin r) (f h :
   refine Finset.sum_congr rfl fun l _ => ?_
   by_cases hl : l ∈ S
   · by_cases hv : Lt.vec l = true
-    · simp only [if_pos hl, if_pos hv, LinearMap.comp_apply, LinearMap.mulLeft_apply, Derivation.coeFn_coe,
-        Derivation.leibniz, smul_eq_mul]
-      ring
-    · simp only [if_pos hl, if_neg hv, LinearMap.neg_apply, LinearMap.comp_apply, LinearMap.mulLeft_apply,
+    · simp only [if_pos hl, if_pos hv, LinearMap.comp_apply, LinearMap.mulLeft_apply,
         Derivation.coeFn_coe, Derivation.leibniz, smul_eq_mul]
+      ring
+    · simp only [if_pos hl, if_neg hv, LinearMap.neg_apply, LinearMap.comp_apply,
+        LinearMap.mulLeft_apply, Derivation.coeFn_coe, Derivation.leibniz, smul_eq_mul]
       ring
   · simp only [if_neg hl, LinearMap.zero_apply]
     ring
 
 open Classical in
-theorem glAct_X' (Lt : Letters (Fin N)) (S : Set (Fin N)) (c d : Fin r) (a : Fin N) (e : Fin r) :
-    glAct K Lt S c d (X (a, e)) =
-      if a ∈ S then (if Lt.vec a = true then (if e = d then X (a, c) else 0) else (if e = c then -X (a, d) else 0))
-      else 0 := by
+theorem glAct_X' (Lt : Letters (Fin N)) (S : Set (Fin N)) (c d : Fin r) (a : Fin N) (e : Fin r)
+    : glAct K Lt S c d (X (a, e))
+      = if a ∈ S then
+          (if Lt.vec a = true then
+             (if e = d then X (a, c) else 0)
+           else
+             (if e = c then - X (a, d) else 0))
+        else
+          0 := by
   classical
   unfold glAct
   simp only [LinearMap.sum_apply]
   rw [Finset.sum_eq_single a]
   · by_cases hl : a ∈ S
     · by_cases hv : Lt.vec a = true
-      · simp only [if_pos hl, if_pos hv, LinearMap.comp_apply, LinearMap.mulLeft_apply, Derivation.coeFn_coe, pderiv_X]
+      · simp only [if_pos hl, if_pos hv, LinearMap.comp_apply, LinearMap.mulLeft_apply,
+          Derivation.coeFn_coe, pderiv_X]
         by_cases he : e = d
         · subst he; simp
         · have : (a, d) ≠ (a, e) := fun h => he (Prod.mk.inj h).2.symm
           simp [he, Pi.single_apply, Ne.symm this]
-      · simp only [if_pos hl, if_neg hv, LinearMap.neg_apply, LinearMap.comp_apply, LinearMap.mulLeft_apply,
-          Derivation.coeFn_coe, pderiv_X]
+      · simp only [if_pos hl, if_neg hv, LinearMap.neg_apply, LinearMap.comp_apply,
+          LinearMap.mulLeft_apply, Derivation.coeFn_coe, pderiv_X]
         by_cases he : e = c
         · subst he; simp
         · have : (a, c) ≠ (a, e) := fun h => he (Prod.mk.inj h).2.symm
@@ -63,22 +70,26 @@ theorem glAct_X' (Lt : Letters (Fin N)) (S : Set (Fin N)) (c d : Fin r) (a : Fin
       exact hla (Prod.mk.inj h).1.symm
     by_cases hl : l ∈ S
     · by_cases hv : Lt.vec l = true
-      · simp only [if_pos hl, if_pos hv, LinearMap.comp_apply, LinearMap.mulLeft_apply, Derivation.coeFn_coe, h1, mul_zero]
-      · simp only [if_pos hl, if_neg hv, LinearMap.neg_apply, LinearMap.comp_apply, LinearMap.mulLeft_apply,
-          Derivation.coeFn_coe, h1, mul_zero, neg_zero]
+      · simp only [if_pos hl, if_pos hv, LinearMap.comp_apply, LinearMap.mulLeft_apply,
+          Derivation.coeFn_coe, h1, mul_zero]
+      · simp only [if_pos hl, if_neg hv, LinearMap.neg_apply, LinearMap.comp_apply,
+          LinearMap.mulLeft_apply, Derivation.coeFn_coe, h1, mul_zero, neg_zero]
     · simp only [if_neg hl, LinearMap.zero_apply]
   · intro h; exact absurd (Finset.mem_univ _) h
 
-theorem chWt_add (LL : ChainLetters N) (j : ℕ) (c : Fin r) (m m' : Fin N × Fin r →₀ ℕ) :
-    chWt LL j c (m + m') = chWt LL j c m + chWt LL j c m' := by
+theorem chWt_add (LL : ChainLetters N) (j : ℕ) (c : Fin r) (m m' : Fin N × Fin r →₀ ℕ)
+    : chWt LL j c (m + m') = chWt LL j c m + chWt LL j c m' := by
   unfold chWt
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun i _ => ?_
   split_ifs <;> simp [Finsupp.add_apply] <;> ring
 
-theorem chWt_single (LL : ChainLetters N) (j : ℕ) (a : Fin N) (e : Fin r) :
-    chWt LL j (0 : Fin r) (Finsupp.single (a, e) 1) =
-      if (a : ℕ) < j then (if LL.vec a = true then (if e = 0 then 1 else 0) else (if e = 0 then -1 else 0)) else 0 := by
+theorem chWt_single (LL : ChainLetters N) (j : ℕ) (a : Fin N) (e : Fin r)
+    : chWt LL j (0 : Fin r) (Finsupp.single (a, e) 1)
+      = if (a : ℕ) < j then
+          (if LL.vec a = true then (if e = 0 then 1 else 0) else (if e = 0 then -1 else 0))
+        else
+          0 := by
   classical
   unfold chWt
   rw [Finset.sum_eq_single a]
@@ -91,24 +102,29 @@ theorem chWt_single (LL : ChainLetters N) (j : ℕ) (a : Fin N) (e : Fin r) :
     simp [Finsupp.single_apply, this]
   · intro h; exact absurd (Finset.mem_univ _) h
 
-theorem ycond_of_stable (LL : ChainLetters N) (j : ℕ) (M : WithTop ℤ) (V : Submodule K (MvPolynomial (Fin N × Fin r) K))
-    (h1 : V ≤ MvPolynomial.restrictSupport K {m | ((chWt LL j 0 m : ℤ) : WithTop ℤ) ≤ M}) (h2 : chStable K LL j V) :
-    V ≤ YCond K (r := r) LL j M :=
+theorem ycond_of_stable
+    (LL : ChainLetters N) (j : ℕ) (M : WithTop ℤ) (V : Submodule K (MvPolynomial (Fin N × Fin r) K))
+    (h1 : V ≤ MvPolynomial.restrictSupport K {m | ((chWt LL j 0 m : ℤ) : WithTop ℤ) ≤ M})
+    (h2 : chStable K LL j V)
+    : V ≤ YCond K (r := r) LL j M :=
   le_sSup (show V ∈ {S | S ≤ _ ∧ chStable K LL j S} from ⟨h1, h2⟩)
 
-theorem ycond_mono (LL : ChainLetters N) (j : ℕ) {M M' : WithTop ℤ} (h : M ≤ M') :
-    YCond K (r := r) LL j M ≤ YCond K (r := r) LL j M' := by
+theorem ycond_mono (LL : ChainLetters N) (j : ℕ) {M M' : WithTop ℤ} (h : M ≤ M')
+    : YCond K (r := r) LL j M ≤ YCond K (r := r) LL j M' := by
   refine ycond_of_stable LL j M' _ ?_ (ycond_stable LL j M)
   refine (ycond_le LL j M).trans ?_
   intro x hx
   rw [MvPolynomial.mem_restrictSupport_iff] at hx ⊢
   exact fun m hm => le_trans (hx hm) h
 
-theorem ycond_mul (LL : ChainLetters N) (j : ℕ) (M M' : WithTop ℤ) {f h : MvPolynomial (Fin N × Fin r) K}
-    (hf : f ∈ YCond K (r := r) LL j M) (hh : h ∈ YCond K (r := r) LL j M') :
-    f * h ∈ YCond K (r := r) LL j (M + M') := by
+theorem ycond_mul
+    (LL : ChainLetters N) (j : ℕ) (M M' : WithTop ℤ)
+    {f h : MvPolynomial (Fin N × Fin r) K}
+    (hf : f ∈ YCond K (r := r) LL j M) (hh : h ∈ YCond K (r := r) LL j M')
+    : f * h ∈ YCond K (r := r) LL j (M + M') := by
   classical
-  have key : YCond K (r := r) LL j M * YCond K (r := r) LL j M' ≤ YCond K (r := r) LL j (M + M') := by
+  have key
+      : YCond K (r := r) LL j M * YCond K (r := r) LL j M' ≤ YCond K (r := r) LL j (M + M') := by
     refine ycond_of_stable LL j _ _ ?_ ?_
     · refine Submodule.mul_le.2 fun f hf h hh => ?_
       have h1 := ycond_le LL j M hf
@@ -130,9 +146,12 @@ theorem ycond_mul (LL : ChainLetters N) (j : ℕ) (M M' : WithTop ℤ) {f h : Mv
         exact Submodule.add_mem _ hx hy
   exact key (Submodule.mul_mem_mul hf hh)
 
-theorem ycond_one (LL : ChainLetters N) (j : ℕ) : (1 : MvPolynomial (Fin N × Fin r) K) ∈ YCond K (r := r) LL j (0 : ℤ) := by
+theorem ycond_one (LL : ChainLetters N) (j : ℕ)
+    : (1 : MvPolynomial (Fin N × Fin r) K) ∈ YCond K (r := r) LL j (0 : ℤ) := by
   classical
-  have key : Submodule.span K {(1 : MvPolynomial (Fin N × Fin r) K)} ≤ YCond K (r := r) LL j ((0 : ℤ) : WithTop ℤ) := by
+  have key
+      : Submodule.span K {(1 : MvPolynomial (Fin N × Fin r) K)}
+        ≤ YCond K (r := r) LL j ((0 : ℤ) : WithTop ℤ) := by
     refine ycond_of_stable LL j _ _ ?_ ?_
     · rw [Submodule.span_le]
       rintro _ rfl
@@ -149,7 +168,10 @@ theorem ycond_one (LL : ChainLetters N) (j : ℕ) : (1 : MvPolynomial (Fin N × 
       simp [chWt]
     · intro c d x hx
       obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.1 hx
-      have h1 : glAct K (⟨LL.vec⟩ : Letters (Fin N)) {i : Fin N | (i : ℕ) < j} c d (1 : MvPolynomial (Fin N × Fin r) K) = 0 := by
+      have h1
+          : glAct K (⟨LL.vec⟩ : Letters (Fin N)) {i : Fin N | (i : ℕ) < j} c d
+              (1 : MvPolynomial (Fin N × Fin r) K)
+            = 0 := by
         have := glAct_mul' (K := K) (⟨LL.vec⟩ : Letters (Fin N)) {i : Fin N | (i : ℕ) < j} c d 1 1
         simp only [mul_one, one_mul] at this
         exact left_eq_add.1 this |>.symm ▸ rfl
@@ -157,13 +179,16 @@ theorem ycond_one (LL : ChainLetters N) (j : ℕ) : (1 : MvPolynomial (Fin N × 
       exact Submodule.zero_mem _
   exact key (Submodule.subset_span rfl)
 
-def vWt (LL : ChainLetters N) (j : ℕ) (a : Fin N) : ℕ := if LL.vec a = true ∧ (a : ℕ) < j then 1 else 0
+def vWt (LL : ChainLetters N) (j : ℕ) (a : Fin N) : ℕ :=
+  if LL.vec a = true ∧ (a : ℕ) < j then 1 else 0
 
-theorem ycond_X (LL : ChainLetters N) (j : ℕ) (a : Fin N) (e : Fin r) :
-    (X (a, e) : MvPolynomial (Fin N × Fin r) K) ∈ YCond K (r := r) LL j ((vWt LL j a : ℤ) : WithTop ℤ) := by
+theorem ycond_X (LL : ChainLetters N) (j : ℕ) (a : Fin N) (e : Fin r)
+    : (X (a, e) : MvPolynomial (Fin N × Fin r) K)
+      ∈ YCond K (r := r) LL j ((vWt LL j a : ℤ) : WithTop ℤ) := by
   classical
-  have key : Submodule.span K (Set.range fun e' : Fin r => (X (a, e') : MvPolynomial (Fin N × Fin r) K)) ≤
-      YCond K (r := r) LL j ((vWt LL j a : ℤ) : WithTop ℤ) := by
+  have key
+      : Submodule.span K (Set.range fun e' : Fin r => (X (a, e') : MvPolynomial (Fin N × Fin r) K))
+        ≤ YCond K (r := r) LL j ((vWt LL j a : ℤ) : WithTop ℤ) := by
     refine ycond_of_stable LL j _ _ ?_ ?_
     · rw [Submodule.span_le]
       rintro _ ⟨e', rfl⟩
@@ -196,9 +221,11 @@ theorem ycond_X (LL : ChainLetters N) (j : ℕ) (a : Fin N) (e : Fin r) :
       | smul t x _ hx => rw [map_smul]; exact Submodule.smul_mem _ _ hx
   exact key (Submodule.subset_span ⟨e, rfl⟩)
 
-theorem ycond_pow (LL : ChainLetters N) (j : ℕ) (z : ℤ) {f : MvPolynomial (Fin N × Fin r) K}
-    (hf : f ∈ YCond K (r := r) LL j (z : WithTop ℤ)) (n : ℕ) :
-    f ^ n ∈ YCond K (r := r) LL j (((n : ℤ) * z : ℤ) : WithTop ℤ) := by
+theorem ycond_pow
+    (LL : ChainLetters N) (j : ℕ) (z : ℤ)
+    {f : MvPolynomial (Fin N × Fin r) K} (hf : f ∈ YCond K (r := r) LL j (z : WithTop ℤ))
+    (n : ℕ)
+    : f ^ n ∈ YCond K (r := r) LL j (((n : ℤ) * z : ℤ) : WithTop ℤ) := by
   induction n with
   | zero => simpa using ycond_one (K := K) LL j
   | succ n ih =>
@@ -208,27 +235,34 @@ theorem ycond_pow (LL : ChainLetters N) (j : ℕ) (z : ℤ) {f : MvPolynomial (F
     have e : (n : ℤ) * z + z = ((n + 1 : ℕ) : ℤ) * z := by push_cast; ring
     rwa [e] at this
 
-theorem ycond_prod (LL : ChainLetters N) (j : ℕ) {ι : Type} (s : Finset ι) (z : ι → ℤ)
-    (f : ι → MvPolynomial (Fin N × Fin r) K) (hf : ∀ i ∈ s, f i ∈ YCond K (r := r) LL j (z i : WithTop ℤ)) :
-    ∏ i ∈ s, f i ∈ YCond K (r := r) LL j ((∑ i ∈ s, z i : ℤ) : WithTop ℤ) := by
+theorem ycond_prod
+    (LL : ChainLetters N) (j : ℕ)
+    {ι : Type} (s : Finset ι) (z : ι → ℤ) (f : ι → MvPolynomial (Fin N × Fin r) K)
+    (hf : ∀ i ∈ s, f i ∈ YCond K (r := r) LL j (z i : WithTop ℤ))
+    : ∏ i ∈ s, f i ∈ YCond K (r := r) LL j ((∑ i ∈ s, z i : ℤ) : WithTop ℤ) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using ycond_one (K := K) LL j
   | insert a s ha ih =>
     rw [Finset.prod_insert ha, Finset.sum_insert ha, WithTop.coe_add]
-    exact ycond_mul LL j _ _ (hf a (Finset.mem_insert_self a s)) (ih fun i hi => hf i (Finset.mem_insert_of_mem hi))
+    exact ycond_mul LL j _ _ (hf a (Finset.mem_insert_self a s))
+      (ih fun i hi => hf i (Finset.mem_insert_of_mem hi))
 
-def tcPairP (K : Type) [CommRing K] {N r : ℕ} (a a' : Fin N) : MvPolynomial (Fin N × Fin r) K := ∑ c, X (a, c) * X (a', c)
+def tcPairP (K : Type) [CommRing K] {N r : ℕ} (a a' : Fin N) : MvPolynomial (Fin N × Fin r) K :=
+  ∑ c, X (a, c) * X (a', c)
 
 def pWt (j : ℕ) (a a' : Fin N) : ℕ := if (a : ℕ) < j ∧ ¬ (a' : ℕ) < j then 1 else 0
 
-theorem ycond_pair (LL : ChainLetters N) (j : ℕ) (a a' : Fin N) (ha : LL.vec a = true) (ha' : LL.vec a' = false) :
-    tcPairP K (r := r) a a' ∈ YCond K (r := r) LL j ((pWt j a a' : ℤ) : WithTop ℤ) := by
+theorem ycond_pair
+    (LL : ChainLetters N) (j : ℕ) (a a' : Fin N) (ha : LL.vec a = true) (ha' : LL.vec a' = false)
+    : tcPairP K (r := r) a a' ∈ YCond K (r := r) LL j ((pWt j a a' : ℤ) : WithTop ℤ) := by
   classical
   by_cases hboth : (a : ℕ) < j ∧ (a' : ℕ) < j
   · have hp : pWt j a a' = 0 := by unfold pWt; rw [if_neg]; tauto
     rw [hp]
-    have key : Submodule.span K {tcPairP K (r := r) a a'} ≤ YCond K (r := r) LL j (((0 : ℕ) : ℤ) : WithTop ℤ) := by
+    have key
+        : Submodule.span K {tcPairP K (r := r) a a'}
+          ≤ YCond K (r := r) LL j (((0 : ℕ) : ℤ) : WithTop ℤ) := by
       refine ycond_of_stable LL j _ _ ?_ ?_
       · rw [Submodule.span_le]
         rintro _ rfl
@@ -241,11 +275,15 @@ theorem ycond_pair (LL : ChainLetters N) (j : ℕ) (a a' : Fin N) (ha : LL.vec a
         rw [Finset.mem_singleton.1 hx, Finset.mem_singleton.1 hy]
         show ((chWt LL j 0 _ : ℤ) : WithTop ℤ) ≤ _
         have hv' : ¬ LL.vec a' = true := by rw [ha']; exact Bool.false_ne_true
-        rw [chWt_add, chWt_single, chWt_single, if_pos hboth.1, if_pos hboth.2, if_pos ha, if_neg hv']
+        rw [chWt_add, chWt_single, chWt_single, if_pos hboth.1, if_pos hboth.2, if_pos ha,
+          if_neg hv']
         by_cases hc : c = 0 <;> simp [hc]
       · intro c d x hx
         obtain ⟨t, rfl⟩ := Submodule.mem_span_singleton.1 hx
-        have h0 : glAct K (⟨LL.vec⟩ : Letters (Fin N)) {i : Fin N | (i : ℕ) < j} c d (tcPairP K (r := r) a a') = 0 := by
+        have h0
+            : glAct K (⟨LL.vec⟩ : Letters (Fin N)) {i : Fin N | (i : ℕ) < j} c d
+                (tcPairP K (r := r) a a')
+              = 0 := by
           unfold tcPairP
           set_option synthInstance.maxHeartbeats 100000 in
             rw [map_sum]
@@ -254,12 +292,15 @@ theorem ycond_pair (LL : ChainLetters N) (j : ℕ) (a a' : Fin N) (ha : LL.vec a
           have m2 : a' ∈ {i : Fin N | (i : ℕ) < j} := hboth.2
           simp only [if_pos m1, if_pos m2, if_pos ha, ha', Bool.false_eq_true, if_false]
           rw [Finset.sum_add_distrib]
-          simp only [ite_mul, mul_ite, zero_mul, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+          simp only [ite_mul, mul_ite, zero_mul, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
+            if_true]
           ring
         rw [map_smul, h0, smul_zero]
         exact Submodule.zero_mem _
     exact key (Submodule.subset_span rfl)
-  · have hle : ((vWt LL j a : ℤ) : WithTop ℤ) + ((vWt LL j a' : ℤ) : WithTop ℤ) ≤ ((pWt j a a' : ℤ) : WithTop ℤ) := by
+  · have hle
+        : ((vWt LL j a : ℤ) : WithTop ℤ) + ((vWt LL j a' : ℤ) : WithTop ℤ)
+          ≤ ((pWt j a a' : ℤ) : WithTop ℤ) := by
       rw [← WithTop.coe_add, WithTop.coe_le_coe]
       unfold vWt pWt
       simp only [ha, ha', true_and, Bool.false_eq_true, false_and, if_false]

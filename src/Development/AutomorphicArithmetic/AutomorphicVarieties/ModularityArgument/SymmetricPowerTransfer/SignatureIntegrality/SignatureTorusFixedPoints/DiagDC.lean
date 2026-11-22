@@ -7,10 +7,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
-private theorem vo {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (x : kˣ) :
-    valuation k (x : k) = uniformizer k ^ ord k x := by
+private theorem vo
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (x : kˣ)
+    : valuation k (x : k) = uniformizer k ^ ord k x := by
   have h1 := GlAx.val_div_ord x
   have h2 := GlAx.val_zpow (k := k) (ord k x)
   have e : (x : k) = ((x / unif k ^ ord k x : kˣ) : k) * ((unif k ^ ord k x : kˣ) : k) := by
@@ -31,10 +35,10 @@ theorem UpperTheory.V.Z.Sym.Sig.diagDC : UpperTheory.V.Z.Sym.Sig.DiagDC := by
     have hb2 : b = (x2 * diagT k (Fin n) h2 * y2)⁻¹ := by rw [← hb', inv_inv]
     subst hb2
     have hY0 : (diagT k (Fin n) d)⁻¹ * y1 * diagT k (Fin n) d ∈ (glIwa k n).Nm V.c := by
-      have hv : ∀ i, valuation k ((d⁻¹ i : kˣ) : k) = uniformizer k ^ (-ord k (d i)) := by
+      have hv : ∀ i, valuation k ((d⁻¹ i : kˣ) : k) = uniformizer k ^ (- ord k (d i)) := by
         intro i
         rw [Pi.inv_apply, Units.val_inv_eq_inv_val, map_inv₀, vo, _root_.zpow_neg]
-      have hc : ∀ i j : Fin n, j < i → (V.c : ℤ) + -ord k (d j) ≤ (V.c : ℤ) + -ord k (d i) := by
+      have hc : ∀ i j : Fin n, j < i → (V.c : ℤ) + - ord k (d j) ≤ (V.c : ℤ) + - ord k (d i) := by
         intro i j hji
         have h0 := hd j i hji.le
         rw [vo, vo, zpow_le_zpow_iff_right_of_lt_one₀ hpos hlt] at h0
@@ -43,13 +47,17 @@ theorem UpperTheory.V.Z.Sym.Sig.diagDC : UpperTheory.V.Z.Sym.Sig.DiagDC := by
       rwa [map_inv, inv_inv] at this
     have hY : (diagT k (Fin n) d)⁻¹ * y1 * diagT k (Fin n) d * y2⁻¹ ∈ (glIwa k n).Nm V.c :=
       mul_mem hY0 (inv_mem hy2)
-    have hY' : diagT k (Fin n) h2 * ((diagT k (Fin n) d)⁻¹ * y1 * diagT k (Fin n) d * y2⁻¹) *
-        (diagT k (Fin n) h2)⁻¹ ∈ (glIwa k n).Nm V.c := by
+    have hY'
+        : diagT k (Fin n) h2 * ((diagT k (Fin n) d)⁻¹ * y1 * diagT k (Fin n) d * y2⁻¹)
+            * (diagT k (Fin n) h2)⁻¹
+          ∈ (glIwa k n).Nm V.c := by
       have hv : ∀ i, valuation k ((h2 i : kˣ) : k) = uniformizer k ^ ((0 : Fin n → ℤ) i) := by
         intro i
         rw [Pi.zero_apply, zpow_zero]
         exact V.H_le (hh2 i (Set.mem_univ i))
-      have hc : ∀ i j : Fin n, j < i → (V.c : ℤ) + (0 : Fin n → ℤ) j ≤ (V.c : ℤ) + (0 : Fin n → ℤ) i := by
+      have hc
+          : ∀ i j : Fin n,
+            j < i → (V.c : ℤ) + (0 : Fin n → ℤ) j ≤ (V.c : ℤ) + (0 : Fin n → ℤ) i := by
         intro i j _
         simp
       exact GlAx.conj_Nm hv hc hY
@@ -68,10 +76,11 @@ theorem UpperTheory.V.Z.Sym.Sig.diagDC : UpperTheory.V.Z.Sym.Sig.DiagDC := by
       have h0 := GlAx.conj_up s hx2.1
       have := GlAx.conj_up (h1 * d * h2⁻¹)⁻¹ h0
       rwa [map_inv, inv_inv] at this
-    have hDu : diagT k (Fin n) ((h1 * d * h2⁻¹)⁻¹ * s) = T⁻¹ * dg s := by
-      rw [map_mul, map_inv]
-    have heq : (T⁻¹ * x1⁻¹ * T * (T⁻¹ * (dg s * x2 * (dg s)⁻¹) * T)) *
-        diagT k (Fin n) ((h1 * d * h2⁻¹)⁻¹ * s) * Y'⁻¹ = 1 := by
+    have hDu : diagT k (Fin n) ((h1 * d * h2⁻¹)⁻¹ * s) = T⁻¹ * dg s := by rw [map_mul, map_inv]
+    have heq
+        : (T⁻¹ * x1⁻¹ * T * (T⁻¹ * (dg s * x2 * (dg s)⁻¹) * T))
+            * diagT k (Fin n) ((h1 * d * h2⁻¹)⁻¹ * s) * Y'⁻¹
+          = 1 := by
       rw [hDu, hs]
       group
     have hu := (GlAx.uniq _ (mul_mem hP1 hP2) (inv_mem hY'.1) heq).2

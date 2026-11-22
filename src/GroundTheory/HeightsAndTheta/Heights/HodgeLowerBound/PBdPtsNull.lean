@@ -17,10 +17,17 @@ open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo
 theorem BdPtsNull.proof (h : ParamImageNull.Statement) : BdPtsNull.Statement := by
   intro II Ψ _ K _ ι _ Ω _ _ E _ _ D
   classical
-  refine h K ι (mCoordIdeal D.y) D.n D.nCharts (fun _ => Metric.ball 0 1)
-    (fun a => {t | t ∈ Metric.ball (0 : Fin D.n → ℂ) 1 ∧ ∃ i : Fin D.n, (i : ℕ) < (D.chart a).a ∧ t i = 0})
-    (fun a => (D.chart a).γ) D.Bd (fun _ => Metric.isOpen_ball) (fun _ _ ht => ht.1) ?_
-    (fun a => (D.chart a).analytic) ?_
+  refine h K ι (mCoordIdeal D.y) D.n D.nCharts
+    (fun _ => Metric.ball 0 1)
+    (fun a =>
+      {t | t ∈ Metric.ball (0 : Fin D.n → ℂ) 1 ∧ ∃ i : Fin D.n, (i : ℕ) < (D.chart a).a ∧ t i = 0})
+    (fun a => (D.chart a).γ)
+    D.Bd
+    (fun _ => Metric.isOpen_ball)
+    (fun _ _ ht => ht.1)
+    ?_
+    (fun a => (D.chart a).analytic)
+    ?_
   · intro a
     refine measure_mono_null (t := ⋃ i : Fin D.n, {t : Fin D.n → ℂ | t i = 0}) ?_
       (measure_iUnion_null fun i => ?_)

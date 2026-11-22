@@ -47,7 +47,9 @@ theorem dimension_induction_holds : DimStep := by
       rfl)
     (dimStep_stab.1 hS1) (dimStep_stab.1 hS2)
     (fun S' h s1 s2 => hSirr S' h (dimStep_stab.2 s1) (dimStep_stab.2 s2))
-    hXS hX0 (dimStep_stab.1 hX1) (fun X' h s => hXi X' h (dimStep_stab.2 s))
-    hYS hY0 (dimStep_stab.1 hY2) (fun Y' h s => hYi Y' h (dimStep_stab.2 s))
+    hXS hX0 (dimStep_stab.1 hX1)
+    (fun X' h s => hXi X' h (dimStep_stab.2 s))
+    hYS hY0 (dimStep_stab.1 hY2)
+    (fun Y' h s => hYi Y' h (dimStep_stab.2 s))
 
 end PI.WeylForKWork

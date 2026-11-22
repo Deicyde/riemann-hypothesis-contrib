@@ -12,19 +12,20 @@ namespace PIW.AdelicOrbitU
 open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open scoped RestrictedProduct
 
-theorem uc_coeffs {A : Type} [CommRing A] {k : ℕ} {f : Fin k → A}
-    (hf : Ideal.span (Set.range f) = ⊤) : ∃ a : Fin k → A, ∑ i, a i * f i = 1 := by
+theorem uc_coeffs
+    {A : Type} [CommRing A] {k : ℕ} {f : Fin k → A} (hf : Ideal.span (Set.range f) = ⊤)
+    : ∃ a : Fin k → A, ∑ i, a i * f i = 1 := by
   have h1 : (1 : A) ∈ Ideal.span (Set.range f) := by
     rw [hf]
     exact Submodule.mem_top
   exact Ideal.mem_span_range_iff_exists_fun.mp h1
 
-theorem uc_span {A : Type} [CommRing A] {k : ℕ} (f a : Fin k → A) (h : ∑ i, a i * f i = 1) :
-    Ideal.span (Set.range f) = ⊤ := by
+theorem uc_span {A : Type} [CommRing A] {k : ℕ} (f a : Fin k → A) (h : ∑ i, a i * f i = 1)
+    : Ideal.span (Set.range f) = ⊤ := by
   exact (Ideal.eq_top_iff_one _).mpr (Ideal.mem_span_range_iff_exists_fun.mpr ⟨a, h⟩)
 
-theorem uc_prod {A B : Type} [CommRing A] [CommRing B] (hA : UnitChoice A) (hB : UnitChoice B) :
-    UnitChoice (A × B) := by
+theorem uc_prod {A B : Type} [CommRing A] [CommRing B] (hA : UnitChoice A) (hB : UnitChoice B)
+    : UnitChoice (A × B) := by
   unfold UnitChoice at hA hB ⊢
   intro k f hf
   obtain ⟨a, ha⟩ := uc_coeffs hf
@@ -81,8 +82,9 @@ theorem uc_pi {ι : Type} (K : ι → Type) [∀ v, Field (K v)] : UnitChoice (�
     · intro h
       exact absurd (Finset.mem_univ _) h
 
-theorem local_sum {A : Type} [CommRing A] [IsLocalRing A] {k : ℕ} (a f : Fin k → A)
-    (h : ∑ i, a i * f i = 1) : ∃ i, IsUnit (f i) := by
+theorem local_sum
+    {A : Type} [CommRing A] [IsLocalRing A] {k : ℕ} (a f : Fin k → A) (h : ∑ i, a i * f i = 1)
+    : ∃ i, IsUnit (f i) := by
   by_contra hne
   push_neg at hne
   have hmem : ∀ i, a i * f i ∈ IsLocalRing.maximalIdeal A := fun i =>
@@ -92,14 +94,16 @@ theorem local_sum {A : Type} [CommRing A] [IsLocalRing A] {k : ℕ} (a f : Fin k
     exact Ideal.sum_mem _ fun i _ => hmem i
   exact (IsLocalRing.mem_maximalIdeal _).mp h1 isUnit_one
 
-theorem uc_rp {ι : Type} (K : ι → Type) [∀ v, Field (K v)] {S : ι → Type} [∀ v, SetLike (S v) (K v)]
-    [∀ v, SubringClass (S v) (K v)] (B : ∀ v, S v) (𝓕 : Filter ι)
-    (hloc : ∀ v (k : ℕ) (a f : Fin k → B v), ∑ i, a i * f i = 1 → ∃ i, IsUnit (f i)) :
-    UnitChoice (Πʳ v, [K v, B v]_[𝓕]) := by
+theorem uc_rp
+    {ι : Type} (K : ι → Type) [∀ v, Field (K v)]
+    {S : ι → Type} [∀ v, SetLike (S v) (K v)] [∀ v, SubringClass (S v) (K v)]
+    (B : ∀ v, S v)
+    (𝓕 : Filter ι) (hloc : ∀ v (k : ℕ) (a f : Fin k → B v), ∑ i, a i * f i = 1 → ∃ i, IsUnit (f i))
+    : UnitChoice (Πʳ v, [K v, B v]_[𝓕]) := by
   intro k f hf
   obtain ⟨a, ha⟩ := uc_coeffs hf
-  have hev : ∀ (x : Fin k → Πʳ v, [K v, B v]_[𝓕]) (v : ι), (∑ i, x i) v = ∑ i, x i v :=
-    fun x v => map_sum (RestrictedProduct.evalRingHom K v) x Finset.univ
+  have hev : ∀ (x : Fin k → Πʳ v, [K v, B v]_[𝓕]) (v : ι), (∑ i, x i) v = ∑ i, x i v := fun x v =>
+    map_sum (RestrictedProduct.evalRingHom K v) x Finset.univ
   have hcomp : ∀ v, ∑ i, a i v * f i v = 1 := by
     intro v
     have h := congrArg (fun x : Πʳ v, [K v, B v]_[𝓕] => x v) ha
@@ -110,8 +114,10 @@ theorem uc_rp {ι : Type} (K : ι → Type) [∀ v, Field (K v)] {S : ι → Typ
     by_cases hg : ∀ j, a j v ∈ B v ∧ f j v ∈ B v
     · have hsum : ∑ j, (⟨a j v, (hg j).1⟩ : B v) * ⟨f j v, (hg j).2⟩ = 1 := by
         apply Subtype.ext
-        have h1 := map_sum (SubringClass.subtype (B v))
-          (fun j => (⟨a j v, (hg j).1⟩ : B v) * ⟨f j v, (hg j).2⟩) Finset.univ
+        have h1 :=
+          map_sum (SubringClass.subtype (B v))
+            (fun j => (⟨a j v, (hg j).1⟩ : B v) * ⟨f j v, (hg j).2⟩)
+            Finset.univ
         simp only [map_mul] at h1
         exact h1.trans (hcomp v)
       obtain ⟨i, hi⟩ := hloc v k (fun j => ⟨a j v, (hg j).1⟩) (fun j => ⟨f j v, (hg j).2⟩) hsum
@@ -132,7 +138,8 @@ theorem uc_rp {ι : Type} (K : ι → Type) [∀ v, Field (K v)] {S : ι → Typ
   choose c hc using hex
   classical
   let e : Fin k → Πʳ v, [K v, B v]_[𝓕] := fun i =>
-    RestrictedProduct.mk (fun v => if c v = i then (1 : K v) else 0)
+    RestrictedProduct.mk
+      (fun v => if c v = i then (1 : K v) else 0)
       (Filter.Eventually.of_forall fun v => by
         show (if c v = i then (1 : K v) else 0) ∈ B v
         split_ifs
@@ -147,8 +154,7 @@ theorem uc_rp {ι : Type} (K : ι → Type) [∀ v, Field (K v)] {S : ι → Typ
   · intro i j hij
     apply RestrictedProduct.ext
     intro v
-    rw [RestrictedProduct.mul_apply, he, he,
-      show ((0 : Πʳ v, [K v, B v]_[𝓕]) v) = 0 from rfl]
+    rw [RestrictedProduct.mul_apply, he, he, show ((0 : Πʳ v, [K v, B v]_[𝓕]) v) = 0 from rfl]
     split_ifs with h1 h2 <;> simp_all
   · apply RestrictedProduct.ext
     intro v
@@ -158,8 +164,8 @@ theorem uc_rp {ι : Type} (K : ι → Type) [∀ v, Field (K v)] {S : ι → Typ
       rw [Filter.eventually_all]
       intro j
       exact (a j).2.and (f j).2
-    let z : Πʳ v, [K v, B v]_[𝓕] := RestrictedProduct.mk (fun v => (f (c v) v)⁻¹)
-      (hgood.mono fun v hv => (hc v).2 hv)
+    let z : Πʳ v, [K v, B v]_[𝓕] :=
+      RestrictedProduct.mk (fun v => (f (c v) v)⁻¹) (hgood.mono fun v hv => (hc v).2 hv)
     refine isUnit_iff_exists_inv.mpr ⟨z, ?_⟩
     apply RestrictedProduct.ext
     intro v
@@ -174,10 +180,13 @@ theorem uc_rp {ι : Type} (K : ι → Type) [∀ v, Field (K v)] {S : ι → Typ
     rw [hs]
     exact mul_inv_cancel₀ (hc v).1
 
-theorem uc_fin (F : Type) [Field F] [NumberField F] :
-    UnitChoice (IsDedekindDomain.FiniteAdeleRing (NumberField.RingOfIntegers F) F) := by
-  exact uc_rp (fun v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F) =>
-    v.adicCompletion F) (fun v => v.adicCompletionIntegers F) Filter.cofinite
+theorem uc_fin (F : Type) [Field F] [NumberField F]
+    : UnitChoice (IsDedekindDomain.FiniteAdeleRing (NumberField.RingOfIntegers F) F) := by
+  exact uc_rp
+    (fun v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F) =>
+      v.adicCompletion F)
+    (fun v => v.adicCompletionIntegers F)
+    Filter.cofinite
     (fun v k a f h => local_sum a f h)
 
 theorem stP : StP := by

@@ -176,13 +176,16 @@ private lemma exists_isMF_mul_eq_of_vanishes_on_orbit {Γ : Subgroup SL(2, ℤ)}
     filter_upwards [hEc.eventually_ne hc] with τ hτ
     rw [Pi.mul_apply, hkey x τ hτ, div_eq_mul_inv]
 
-
 open UpperHalfPlane Filter in
 open ModularForm (E₄ E₆) in
 open scoped MatrixGroups ModularForm Manifold Topology in
-theorem _root_.GlobalTheory.OddFrame.reduces_of_det_evM_eq_zero : ∀ (Γ : Subgroup SL(2, ℤ)) (r : ℕ) (s : Fin r → SL(2, ℤ)) (w : Fin r → ℤ)
-    (F : Fin r → ℍ → ℂ) (τ₀ : ℍ), _root_.GlobalTheory.OddFrame.IsReps Γ s → (∀ j, Odd (w j) ∧ _root_.GlobalTheory.OddFrame.IsMF Γ (w j) (F j)) →
-    (_root_.GlobalTheory.OddFrame.evM s w F τ₀).det = 0 → _root_.GlobalTheory.OddFrame.Reduces Γ w F := by
+theorem _root_.GlobalTheory.OddFrame.reduces_of_det_evM_eq_zero
+    : ∀ (Γ : Subgroup SL(2, ℤ)) (r : ℕ) (s : Fin r → SL(2, ℤ)) (w : Fin r → ℤ) (F : Fin r → ℍ → ℂ)
+        (τ₀ : ℍ),
+      _root_.GlobalTheory.OddFrame.IsReps Γ s
+        → (∀ j, Odd (w j) ∧ _root_.GlobalTheory.OddFrame.IsMF Γ (w j) (F j))
+        → (_root_.GlobalTheory.OddFrame.evM s w F τ₀).det = 0
+        → _root_.GlobalTheory.OddFrame.Reduces Γ w F := by
   intro Γ r s w F τ₀ hs hF hdet
   classical
   obtain ⟨v, hv0, hv⟩ := Matrix.exists_mulVec_eq_zero_iff.2 hdet
@@ -190,18 +193,20 @@ theorem _root_.GlobalTheory.OddFrame.reduces_of_det_evM_eq_zero : ∀ (Γ : Subg
     intro i
     have := congrFun hv i
     simp only [Matrix.mulVec, dotProduct, _root_.GlobalTheory.OddFrame.evM, Matrix.of_apply,
-      Pi.zero_apply] at this
+        Pi.zero_apply]
+      at this
     rw [← this]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
-  have hrel : ∀ x : SL(2, ℤ), ∑ j, v j * (F j ∣[w j] x) τ₀ = 0 :=
-    fun x => hs.sum_eq_zero hF v τ₀ hrow x
+  have hrel : ∀ x : SL(2, ℤ), ∑ j, v j * (F j ∣[w j] x) τ₀ = 0 := fun x =>
+    hs.sum_eq_zero hF v τ₀ hrow x
   obtain ⟨n, a, b, E, u, hu, hn, hζ, hab, hba, hE, hzero, hlim, hforms⟩ :=
     _root_.GlobalTheory.LevelOneLocal.exists_local_data τ₀
   set ζ := denom (Matrix.SpecialLinearGroup.toGL
     ((Matrix.SpecialLinearGroup.map (Int.castRingHom ℝ)) u)) (τ₀ : ℂ) with hζdef
   have hζ0 : ζ ≠ 0 := denom_ne_zero _ _
-  have hpow : ∀ (m : ℕ) (x : SL(2, ℤ)) (j : Fin r),
-      (F j ∣[w j] (x * u ^ m)) τ₀ = (F j ∣[w j] x) τ₀ * ζ ^ (-((m : ℤ) * w j)) := by
+  have hpow
+      : ∀ (m : ℕ) (x : SL(2, ℤ)) (j : Fin r),
+        (F j ∣[w j] (x * u ^ m)) τ₀ = (F j ∣[w j] x) τ₀ * ζ ^ (-((m : ℤ) * w j)) := by
     intro m
     induction m with
     | zero => intro x j; simp
@@ -212,22 +217,25 @@ theorem _root_.GlobalTheory.OddFrame.reduces_of_det_evM_eq_zero : ∀ (Γ : Subg
       congr 2
       push_cast
       ring
-  have hrelm : ∀ (m : ℕ) (x : SL(2, ℤ)),
-      ∑ j, v j * (F j ∣[w j] x) τ₀ * ζ ^ (-((m : ℤ) * w j)) = 0 := by
+  have hrelm
+      : ∀ (m : ℕ) (x : SL(2, ℤ)), ∑ j, v j * (F j ∣[w j] x) τ₀ * ζ ^ (-((m : ℤ) * w j)) = 0 := by
     intro m x
     rw [← hrel (x * u ^ m)]
     exact Finset.sum_congr rfl fun j _ => by rw [hpow, mul_assoc]
   obtain ⟨j₁, hj₁⟩ : ∃ j, v j ≠ 0 := by simpa using Function.ne_iff.1 hv0
-  have hclass : ∀ x : SL(2, ℤ),
-      ∑ j, (if (n : ℤ) ∣ w j - w j₁ then v j else 0) * (F j ∣[w j] x) τ₀ = 0 := by
+  have hclass
+      : ∀ x : SL(2, ℤ), ∑ j, (if (n : ℤ) ∣ w j - w j₁ then v j else 0) * (F j ∣[w j] x) τ₀ = 0 := by
     intro x
     have hn0 : (n : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
-    have hsum : ∑ m ∈ Finset.range n, ζ ^ ((m : ℤ) * w j₁) *
-        ∑ j, v j * (F j ∣[w j] x) τ₀ * ζ ^ (-((m : ℤ) * w j)) = 0 :=
+    have hsum
+        : ∑ m ∈ Finset.range n, ζ ^ ((m : ℤ) * w j₁) *
+            ∑ j, v j * (F j ∣[w j] x) τ₀ * ζ ^ (-((m : ℤ) * w j))
+          = 0 :=
       Finset.sum_eq_zero fun m _ => by rw [hrelm, mul_zero]
-    have hswap : ∑ m ∈ Finset.range n, ζ ^ ((m : ℤ) * w j₁) *
-        ∑ j, v j * (F j ∣[w j] x) τ₀ * ζ ^ (-((m : ℤ) * w j)) =
-        ∑ j, v j * (F j ∣[w j] x) τ₀ * ∑ m ∈ Finset.range n, (ζ ^ (w j₁ - w j)) ^ m := by
+    have hswap
+        : ∑ m ∈ Finset.range n, ζ ^ ((m : ℤ) * w j₁) *
+            ∑ j, v j * (F j ∣[w j] x) τ₀ * ζ ^ (-((m : ℤ) * w j))
+          = ∑ j, v j * (F j ∣[w j] x) τ₀ * ∑ m ∈ Finset.range n, (ζ ^ (w j₁ - w j)) ^ m := by
       simp_rw [Finset.mul_sum]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun m _ => ?_
@@ -236,8 +244,11 @@ theorem _root_.GlobalTheory.OddFrame.reduces_of_det_evM_eq_zero : ∀ (Γ : Subg
       ring
     rw [hswap] at hsum
     simp_rw [sum_range_zpow_primitiveRoot_pow hζ] at hsum
-    have hmul : (n : ℂ) * ∑ j, (if (n : ℤ) ∣ w j - w j₁ then v j else 0) *
-        (F j ∣[w j] x) τ₀ = 0 := by
+    have hmul
+        : (n : ℂ)
+            * ∑ j, (if (n : ℤ) ∣ w j - w j₁ then v j else 0) *
+              (F j ∣[w j] x) τ₀
+          = 0 := by
       refine Eq.trans ?_ hsum
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
@@ -252,19 +263,20 @@ theorem _root_.GlobalTheory.OddFrame.reduces_of_det_evM_eq_zero : ∀ (Γ : Subg
     ⟨j₁, Finset.mem_filter.2 ⟨Finset.mem_univ _, hj₁, by simp⟩⟩
   obtain ⟨j₀, hj₀S, hj₀max⟩ := (Finset.univ.filter P).exists_max_image w hne
   have hj₀ : P j₀ := (Finset.mem_filter.1 hj₀S).2
-  have hforms' : ∀ j, ∃ f : ℍ → ℂ,
-      _root_.GlobalTheory.OddFrame.IsMF ⊤ (w j₀ - w j + a) f ∧ (P j → f τ₀ ≠ 0) := by
+  have hforms'
+      : ∀ j, ∃ f : ℍ → ℂ,
+        _root_.GlobalTheory.OddFrame.IsMF ⊤ (w j₀ - w j + a) f ∧ (P j → f τ₀ ≠ 0) := by
     intro j
     by_cases hj : P j
-    · obtain ⟨f, hf, hf0⟩ := hforms (w j₀ - w j)
-        (sub_nonneg.2 (hj₀max j (Finset.mem_filter.2 ⟨Finset.mem_univ _, hj⟩)))
-        (by have := dvd_sub hj₀.2 hj.2; rwa [sub_sub_sub_cancel_right] at this)
+    · obtain ⟨f, hf, hf0⟩ :=
+        hforms (w j₀ - w j) (sub_nonneg.2 (hj₀max j (Finset.mem_filter.2 ⟨Finset.mem_univ _, hj⟩)))
+          (by have := dvd_sub hj₀.2 hj.2; rwa [sub_sub_sub_cancel_right] at this)
       exact ⟨f, hf, fun _ => hf0⟩
     · exact ⟨0, _root_.GlobalTheory.OddFrame.IsMF.zero _ _, fun h' => absurd h' hj⟩
   choose f hfmf hfne using hforms'
   set e : Fin r → ℍ → ℂ := fun j => (if P j then v j / f j τ₀ else 0) • f j with he_def
-  have he_mf : ∀ j, _root_.GlobalTheory.OddFrame.IsMF ⊤ (w j₀ - w j + a) (e j) :=
-    fun j => (hfmf j).smul _
+  have he_mf : ∀ j, _root_.GlobalTheory.OddFrame.IsMF ⊤ (w j₀ - w j + a) (e j) := fun j =>
+    (hfmf j).smul _
   have he0 : ∀ j, e j τ₀ = if (n : ℤ) ∣ w j - w j₁ then v j else 0 := by
     intro j
     simp only [he_def, Pi.smul_apply, smul_eq_mul]
@@ -279,8 +291,7 @@ theorem _root_.GlobalTheory.OddFrame.reduces_of_det_evM_eq_zero : ∀ (Γ : Subg
   have hHmf : _root_.GlobalTheory.OddFrame.IsMF Γ (w j₀ + a) H :=
     _root_.GlobalTheory.OddFrame.IsMF.sum _ fun j _ =>
       ((he_mf j).mono le_top).mul (hF j).2 (by ring)
-  have hHslash : ∀ (x : SL(2, ℤ)) (τ : ℍ),
-      (H ∣[w j₀ + a] x) τ = ∑ j, e j τ * (F j ∣[w j] x) τ := by
+  have hHslash : ∀ (x : SL(2, ℤ)) (τ : ℍ), (H ∣[w j₀ + a] x) τ = ∑ j, e j τ * (F j ∣[w j] x) τ := by
     intro x τ
     rw [ModularForm.SL_slash_apply, hH_def, Finset.sum_apply, Finset.sum_mul]
     refine Finset.sum_congr rfl fun j _ => ?_

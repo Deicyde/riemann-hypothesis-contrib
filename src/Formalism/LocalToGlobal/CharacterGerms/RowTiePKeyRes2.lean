@@ -19,11 +19,7 @@ section Res
 variable {C : Type} [Field C] (V : VF C)
 
 theorem valuation_nonneg_iff (a : C) : V.Ge 0 a ↔ 0 ≤ V.v a := by
-  first
-  | exact Iff.rfl
-  | (simp only [VF.Ge]; done)
-  | (unfold VF.Ge; done)
-  | (simp [VF.Ge])
+  first | exact Iff.rfl | (simp only [VF.Ge]; done) | (unfold VF.Ge; done) | (simp [VF.Ge])
 
 def Rv : Subring C where
   carrier := {x | V.Ge 0 x}
@@ -47,7 +43,9 @@ def mm : Ideal (Rv V) where
     have hc : (0 : WithTop ℝ) ≤ V.v c := (valuation_nonneg_iff V c).1 c.2
     show (0 : WithTop ℝ) < V.v ((c : C) * x)
     rw [AddValuation.map_mul]
-    calc (0 : WithTop ℝ) < V.v x := hx'
+    calc
+      (0 : WithTop ℝ)
+        < V.v x := hx'
       _ = 0 + V.v x := (zero_add _).symm
       _ ≤ V.v c + V.v x := add_le_add hc le_rfl
 
@@ -65,11 +63,12 @@ theorem mm_max : (mm V).IsMaximal := by
       rw [h0]
       simp
     have hvx : V.v (x : C) = 0 := le_antisymm (not_lt.1 hx') ((valuation_nonneg_iff V x).1 x.2)
-    have hy : V.Ge 0 ((x : C)⁻¹) := (valuation_nonneg_iff V _).2 (by
-      first
-      | (rw [AddValuation.map_inv, hvx, neg_zero]; done)
-      | (rw [AddValuation.map_inv, hvx, neg_zero]; exact le_rfl)
-      | simp [AddValuation.map_inv, hvx])
+    have hy : V.Ge 0 ((x : C)⁻¹) :=
+      (valuation_nonneg_iff V _).2 (by
+        first
+        | (rw [AddValuation.map_inv, hvx, neg_zero]; done)
+        | (rw [AddValuation.map_inv, hvx, neg_zero]; exact le_rfl)
+        | simp [AddValuation.map_inv, hvx])
     have h1 : (1 : Rv V) = ⟨(x : C)⁻¹, hy⟩ * x := Subtype.ext (by simp [hx0])
     rw [h1]
     exact J.mul_mem_left _ hxJ
@@ -85,24 +84,24 @@ theorem charP_Kr : CharP (Kr V) V.l := by
   rw [← map_natCast (Ideal.Quotient.mk (mm V)) V.l, Ideal.Quotient.eq_zero_iff_mem]
   show (0 : WithTop ℝ) < V.v ((V.l : Rv V) : C)
   rw [SubringClass.coe_natCast, V.4]
-  first
-  | exact WithTop.coe_lt_coe.2 zero_lt_one
-  | norm_num
-  | simp
+  first | exact WithTop.coe_lt_coe.2 zero_lt_one | norm_num | simp
 
 variable {V}
 
 def red {O : Type} [CommRing O] (f : O →+* C) (hf : ∀ x, V.Ge 0 (f x)) : O →+* Kr V :=
   (Ideal.Quotient.mk (mm V)).comp (f.codRestrict (Rv V) hf)
 
-theorem red_eq_iff {O : Type} [CommRing O] (f g : O →+* C) (hf : ∀ x, V.Ge 0 (f x)) (hg : ∀ x, V.Ge 0 (g x))
-    (x y : O) : red f hf x = red g hg y ↔ V.MM (f x - g y) := by
+theorem red_eq_iff
+    {O : Type} [CommRing O]
+    (f g : O →+* C) (hf : ∀ x, V.Ge 0 (f x)) (hg : ∀ x, V.Ge 0 (g x))
+    (x y : O)
+    : red f hf x = red g hg y ↔ V.MM (f x - g y) := by
   unfold red
   rw [RingHom.comp_apply, RingHom.comp_apply, Ideal.Quotient.eq]
   exact Iff.rfl
 
-theorem red_zero_iff {O : Type} [CommRing O] (f : O →+* C) (hf : ∀ x, V.Ge 0 (f x)) (x : O) :
-    red f hf x = 0 ↔ V.MM (f x) := by
+theorem red_zero_iff {O : Type} [CommRing O] (f : O →+* C) (hf : ∀ x, V.Ge 0 (f x)) (x : O)
+    : red f hf x = 0 ↔ V.MM (f x) := by
   unfold red
   rw [RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem]
   exact Iff.rfl
@@ -113,7 +112,8 @@ section Fin
 
 variable {k : Type} [Field k]
 
-theorem fixed_nat (p : ℕ) [hp : Fact p.Prime] [CharP k p] (a : k) (ha : a ^ p = a) : ∃ i : ℕ, a = i := by
+theorem fixed_nat (p : ℕ) [hp : Fact p.Prime] [CharP k p] (a : k) (ha : a ^ p = a)
+    : ∃ i : ℕ, a = i := by
   classical
   let φ : ZMod p →+* k := ZMod.castHom (dvd_refl p) k
   have hφ : Function.Injective φ := φ.injective
@@ -142,20 +142,22 @@ theorem fixed_nat (p : ℕ) [hp : Fact p.Prime] [CharP k p] (a : k) (ha : a ^ p 
   have h1 := Finset.card_le_card hsub
   have h3 : (insert a (Finset.univ.image φ)).card = p + 1 := by
     first
-    | rw [Finset.card_insert_of_notMem hnotin, Finset.card_image_of_injective _ hφ, Finset.card_univ,
-        ZMod.card]
-    | rw [Finset.card_insert_of_not_mem hnotin, Finset.card_image_of_injective _ hφ, Finset.card_univ,
-        ZMod.card]
+    | rw [Finset.card_insert_of_notMem hnotin, Finset.card_image_of_injective _ hφ,
+        Finset.card_univ, ZMod.card]
+    | rw [Finset.card_insert_of_not_mem hnotin, Finset.card_image_of_injective _ hφ,
+        Finset.card_univ, ZMod.card]
   rw [h3] at h1
   have h2 : (X ^ p - X : k[X]).roots.toFinset.card ≤ p := by
-    calc (X ^ p - X : k[X]).roots.toFinset.card ≤ Multiset.card (X ^ p - X : k[X]).roots :=
-          Multiset.toFinset_card_le _
+    calc
+      (X ^ p - X : k[X]).roots.toFinset.card
+        ≤ Multiset.card (X ^ p - X : k[X]).roots := Multiset.toFinset_card_le _
       _ ≤ (X ^ p - X : k[X]).natDegree := Polynomial.card_roots' _
       _ = p := Polynomial.natDegree_X_pow_sub_X (R := k) hp1
   omega
 
-theorem exists_lift (p : ℕ) [Fact p.Prime] [CharP k p] (Q : k[X]) (hQ : ∀ i, Q.coeff i ^ p = Q.coeff i) :
-    ∃ μ : ℤ[X], μ.map (Int.castRingHom k) = Q := by
+theorem exists_lift
+    (p : ℕ) [Fact p.Prime] [CharP k p] (Q : k[X]) (hQ : ∀ i, Q.coeff i ^ p = Q.coeff i)
+    : ∃ μ : ℤ[X], μ.map (Int.castRingHom k) = Q := by
   classical
   choose f hf using fun i => fixed_nat p (Q.coeff i) (hQ i)
   refine ⟨∑ i ∈ Q.support, Polynomial.monomial i ((f i : ℕ) : ℤ), ?_⟩
@@ -166,7 +168,8 @@ theorem exists_lift (p : ℕ) [Fact p.Prime] [CharP k p] (Q : k[X]) (hQ : ∀ i,
   rw [Polynomial.map_monomial, hf i]
   simp
 
-def Hs {O : Type} [CommRing O] (f : O →+* k) (q : ℕ) (hq2 : 2 ≤ q) (hq : ∀ y, f y ^ q = f y) : Subgroup kˣ where
+def Hs {O : Type} [CommRing O] (f : O →+* k) (q : ℕ) (hq2 : 2 ≤ q) (hq : ∀ y, f y ^ q = f y)
+    : Subgroup kˣ where
   carrier := {u | ∃ y, f y = (u : k)}
   one_mem' := ⟨1, by simp⟩
   mul_mem' := by
@@ -183,9 +186,13 @@ def Hs {O : Type} [CommRing O] (f : O →+* k) (q : ℕ) (hq2 : 2 ≤ q) (hq : �
       exact mul_right_cancel₀ u.ne_zero h5
     exact Units.eq_inv_of_mul_eq_one_left (by rw [mul_comm]; exact hu1)
 
-theorem core (p : ℕ) [hp : Fact p.Prime] [CharP k p] {O : Type} [CommRing O] {d : ℕ} [NeZero d]
-    (e : ZMod d → (O →+* k)) (hfr : ∀ a x, e (a + 1) x = e a x ^ p) (χ : O →+* k)
-    (hker : ∀ z, (∀ a, e a z = 0) → χ z = 0) : ∃ c, ∀ y, χ y = e c y := by
+theorem core
+    (p : ℕ) [hp : Fact p.Prime] [CharP k p]
+    {O : Type} [CommRing O]
+    {d : ℕ} [NeZero d]
+    (e : ZMod d → (O →+* k)) (hfr : ∀ a x, e (a + 1) x = e a x ^ p)
+    (χ : O →+* k) (hker : ∀ z, (∀ a, e a z = 0) → χ z = 0)
+    : ∃ c, ∀ y, χ y = e c y := by
   classical
   have : ExpChar k p := ExpChar.prime hp.out
   have hpow : ∀ (j : ℕ) x, e (j : ZMod d) x = e 0 x ^ (p ^ j) := by
@@ -193,8 +200,7 @@ theorem core (p : ℕ) [hp : Fact p.Prime] [CharP k p] {O : Type} [CommRing O] {
     induction j with
     | zero => simp
     | succ j ih => rw [Nat.cast_succ, hfr, ih, ← pow_mul, pow_succ]
-  have hall : ∀ a x, e a x = e 0 x ^ (p ^ a.val) := fun a x => by
-    rw [← hpow, ZMod.natCast_zmod_val]
+  have hall : ∀ a x, e a x = e 0 x ^ (p ^ a.val) := fun a x => by rw [← hpow, ZMod.natCast_zmod_val]
   have hkill : ∀ x, e 0 x = 0 → ∀ a, e a x = 0 := fun x h a => by
     rw [hall, h, zero_pow (pow_ne_zero _ hp.out.ne_zero)]
   have hq : ∀ x, e 0 x ^ (p ^ d) = e 0 x := fun x => by rw [← hpow, ZMod.natCast_self]
@@ -213,10 +219,12 @@ theorem core (p : ℕ) [hp : Fact p.Prime] [CharP k p] {O : Type} [CommRing O] {
       exact h1
     obtain ⟨μ, hμ⟩ := exists_lift p Q hcoef
     have hev : ∀ g : O →+* k, g (μ.eval₂ (Int.castRingHom O) y) = Q.eval (g y) := fun g => by
-      rw [hom_eval₂, RingHom.ext_int (g.comp (Int.castRingHom O)) (Int.castRingHom k), eval₂_eq_eval_map, hμ]
-    have hz : χ (μ.eval₂ (Int.castRingHom O) y) = 0 := hker _ fun a => by
-      rw [hev, hQ, eval_prod]
-      exact Finset.prod_eq_zero (Finset.mem_univ a) (by rw [eval_sub, eval_X, eval_C, sub_self])
+      rw [hom_eval₂, RingHom.ext_int (g.comp (Int.castRingHom O)) (Int.castRingHom k),
+        eval₂_eq_eval_map, hμ]
+    have hz : χ (μ.eval₂ (Int.castRingHom O) y) = 0 :=
+      hker _ fun a => by
+        rw [hev, hQ, eval_prod]
+        exact Finset.prod_eq_zero (Finset.mem_univ a) (by rw [eval_sub, eval_X, eval_C, sub_self])
     rw [hev, hQ, eval_prod, Finset.prod_eq_zero_iff] at hz
     obtain ⟨c, -, hc⟩ := hz
     rw [eval_sub, eval_X, eval_C, sub_eq_zero] at hc
@@ -224,11 +232,14 @@ theorem core (p : ℕ) [hp : Fact p.Prime] [CharP k p] {O : Type} [CommRing O] {
 
   have hfin : Finite (Hs (e 0) (p ^ d) hq1 hq) := by
     have hQ0 : (X ^ (p ^ d) - X : k[X]) ≠ 0 := Polynomial.X_pow_sub_X_ne_zero hq1
-    have hF : Finite ↥(((X ^ (p ^ d) - X : k[X]).roots.toFinset : Set k)) := (Finset.finite_toSet _).to_subtype
+    have hF : Finite ↥(((X ^ (p ^ d) - X : k[X]).roots.toFinset : Set k)) :=
+      (Finset.finite_toSet _).to_subtype
     refine Finite.of_injective (β := ↥(((X ^ (p ^ d) - X : k[X]).roots.toFinset : Set k)))
-      (fun u => ⟨((u : kˣ) : k), ?_⟩) ?_
+      (fun u => ⟨((u : kˣ) : k), ?_⟩)
+      ?_
     · obtain ⟨y, hy⟩ := u.2
-      rw [Finset.mem_coe, Multiset.mem_toFinset, mem_roots hQ0, IsRoot, eval_sub, eval_pow, eval_X, ← hy, hq, sub_self]
+      rw [Finset.mem_coe, Multiset.mem_toFinset, mem_roots hQ0, IsRoot, eval_sub, eval_pow, eval_X,
+        ← hy, hq, sub_self]
     · intro u v huv
       exact Subtype.ext (Units.ext (congrArg Subtype.val huv))
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := Hs (e 0) (p ^ d) hq1 hq)
@@ -257,7 +268,8 @@ theorem keyRes_holds : KeyResSt := by
   intro C _ _ V O _ n d _ K χ hχ hz
   have : Fact V.l.Prime := ⟨V.l_prime⟩
   have : CharP (Kr V) V.l := charP_Kr V
-  have hfr : ∀ a x, red (K.em (a + 1)) (K.em_int (a + 1)) x = red (K.em a) (K.em_int a) x ^ V.l := by
+  have hfr
+      : ∀ a x, red (K.em (a + 1)) (K.em_int (a + 1)) x = red (K.em a) (K.em_int a) x ^ V.l := by
     intro a x
     rw [← map_pow, red_eq_iff, map_pow]
     exact K.em_frob a x

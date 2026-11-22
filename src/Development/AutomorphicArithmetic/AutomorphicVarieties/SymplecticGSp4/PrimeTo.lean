@@ -4,10 +4,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 
-private theorem pt_modEq_one (l d : ℕ) (hd : d ≠ 0) (h : l.Coprime d) :
-    ∀ᶠ n : ℕ in Filter.atTop, l ^ n.factorial ≡ 1 [MOD d] := by
+private theorem pt_modEq_one (l d : ℕ) (hd : d ≠ 0) (h : l.Coprime d)
+    : ∀ᶠ n : ℕ in Filter.atTop, l ^ n.factorial ≡ 1 [MOD d] := by
   filter_upwards [Filter.eventually_ge_atTop d.totient] with n hn
   obtain ⟨k, hk⟩ := Nat.dvd_factorial (Nat.totient_pos.2 (Nat.pos_of_ne_zero hd)) hn
   rw [hk, pow_mul]
@@ -17,8 +19,8 @@ private theorem pt_dvd (l a : ℕ) : ∀ᶠ n : ℕ in Filter.atTop, l ^ a ∣ l
   filter_upwards [Filter.eventually_ge_atTop a] with n hn
   exact pow_dvd_pow _ (hn.trans (Nat.self_le_factorial n))
 
-private theorem pt_const (l : ℕ) (hl : l.Prime) {H : Type} [Group H] [Finite H] (x : H) :
-    ∃ y, ∀ᶠ n : ℕ in Filter.atTop, x ^ l ^ n.factorial = y := by
+private theorem pt_const (l : ℕ) (hl : l.Prime) {H : Type} [Group H] [Finite H] (x : H)
+    : ∃ y, ∀ᶠ n : ℕ in Filter.atTop, x ^ l ^ n.factorial = y := by
   have h0 : orderOf x ≠ 0 := (orderOf_pos x).ne'
   obtain ⟨a, d, hnd, hod⟩ := Nat.exists_eq_pow_mul_and_not_dvd h0 l hl.one_lt.ne'
   have hcop : l.Coprime d := (Nat.Prime.coprime_iff_not_dvd hl).2 hnd
@@ -33,16 +35,22 @@ private theorem pt_const (l : ℕ) (hl : l.Prime) {H : Type} [Group H] [Finite H
   obtain ⟨h1', h2'⟩ := hN N le_rfl
   exact ⟨(Nat.modEq_zero_iff_dvd.2 h2).trans (Nat.modEq_zero_iff_dvd.2 h2').symm, h1.trans h1'.symm⟩
 
-private theorem pt_exists (l : ℕ) (hl : l.Prime) (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
-    [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (g : Γ) :
-    ∃ g', Filter.Tendsto (fun n : ℕ => g ^ l ^ n.factorial) Filter.atTop (nhds g') := by
-  obtain ⟨g', -, hg'⟩ : ∃ g' ∈ Set.univ, ClusterPt g' (Filter.map (fun n : ℕ => g ^ l ^ n.factorial) Filter.atTop) :=
+private theorem pt_exists
+    (l : ℕ) (hl : l.Prime)
+    (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    [TotallyDisconnectedSpace Γ]
+    (g : Γ)
+    : ∃ g', Filter.Tendsto (fun n : ℕ => g ^ l ^ n.factorial) Filter.atTop (nhds g') := by
+  obtain ⟨g', -, hg'⟩
+      : ∃ g' ∈ Set.univ,
+        ClusterPt g' (Filter.map (fun n : ℕ => g ^ l ^ n.factorial) Filter.atTop) :=
     isCompact_univ.exists_clusterPt (Filter.le_principal_iff.2 Filter.univ_mem)
   refine ⟨g', ?_⟩
   rw [(nhds_basis_opens g').tendsto_right_iff]
   rintro V ⟨hgV, hVo⟩
-  obtain ⟨H, hH⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one
-    (hVo.preimage (continuous_const_mul g')) (by simpa using hgV)
+  obtain ⟨H, hH⟩ :=
+    ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one
+      (hVo.preimage (continuous_const_mul g')) (by simpa using hgV)
   haveI : H.toSubgroup.Normal := H.isNormal'
   haveI : Finite (Γ ⧸ H.toSubgroup) := H.toSubgroup.quotient_finite_of_isOpen H.isOpen'
   obtain ⟨y, hy⟩ := pt_const l hl (QuotientGroup.mk (s := H.toSubgroup) g)
@@ -63,14 +71,19 @@ private theorem pt_exists (l : ℕ) (hl : l.Prime) (Γ : Type) [Group Γ] [Topol
   have := hH (H.toSubgroup.inv_mem hm)
   simpa using this
 
-private theorem pt_step {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι] (I J : Ideal R) (hJ : J ≤ I) (l : ℕ)
-    (hl : (l : R) ∈ I) (X : Matrix ι ι R) (hX : ∀ a b, (X - 1) a b ∈ J) : ∀ a b, (X ^ l - 1) a b ∈ I * J := by
+private theorem pt_step
+    {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι]
+    (I J : Ideal R) (hJ : J ≤ I)
+    (l : ℕ) (hl : (l : R) ∈ I)
+    (X : Matrix ι ι R) (hX : ∀ a b, (X - 1) a b ∈ J)
+    : ∀ a b, (X ^ l - 1) a b ∈ I * J := by
   classical
   have hXi : ∀ i : ℕ, ∀ a b, (X ^ i - 1 : Matrix ι ι R) a b ∈ J := by
     intro i
     have h0 : (Ideal.Quotient.mk J).mapMatrix (X - 1) = 0 := by
       ext a b
-      rw [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.zero_apply, Ideal.Quotient.eq_zero_iff_mem]
+      rw [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.zero_apply,
+        Ideal.Quotient.eq_zero_iff_mem]
       exact hX a b
     have h1 : (Ideal.Quotient.mk J).mapMatrix X = 1 := by
       rw [map_sub, map_one, sub_eq_zero] at h0
@@ -79,10 +92,13 @@ private theorem pt_step {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι]
       rw [map_sub, map_pow, h1, one_pow, map_one, sub_self]
     intro a b
     have := congrFun (congrFun h2 a) b
-    rw [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.zero_apply, Ideal.Quotient.eq_zero_iff_mem] at this
+    rw [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.zero_apply,
+        Ideal.Quotient.eq_zero_iff_mem]
+      at this
     exact this
   have hgeom : X ^ l - 1 = (X - 1) * ((l : Matrix ι ι R) + ∑ i ∈ Finset.range l, (X ^ i - 1)) := by
-    rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_range, nsmul_one, add_sub_cancel, mul_geom_sum]
+    rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_range, nsmul_one, add_sub_cancel,
+      mul_geom_sum]
   intro a b
   rw [hgeom, Matrix.mul_apply]
   refine Ideal.sum_mem _ (fun c _ => ?_)
@@ -93,20 +109,34 @@ private theorem pt_step {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι]
   rw [mul_comm ((X - 1) a c)]
   exact Ideal.mul_mem_mul hW (hX a c)
 
-private theorem pt_pow {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι] (I : Ideal R) (l : ℕ)
-    (hl : (l : R) ∈ I) (X : Matrix ι ι R) (hX : ∀ a b, (X - 1) a b ∈ I) (k : ℕ) :
-    ∀ a b, (X ^ l ^ k - 1) a b ∈ I ^ (k + 1) := by
+private theorem pt_pow
+    {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι]
+    (I : Ideal R) (l : ℕ) (hl : (l : R) ∈ I)
+    (X : Matrix ι ι R) (hX : ∀ a b, (X - 1) a b ∈ I)
+    (k : ℕ)
+    : ∀ a b, (X ^ l ^ k - 1) a b ∈ I ^ (k + 1) := by
   induction k with
   | zero => simpa using hX
   | succ k ih =>
     intro a b
-    have h := pt_step I (I ^ (k + 1)) (Ideal.pow_le_self (Nat.succ_ne_zero k)) l hl (X ^ l ^ k) ih a b
+    have h :=
+      pt_step I (I ^ (k + 1)) (Ideal.pow_le_self (Nat.succ_ne_zero k)) l hl (X ^ l ^ k) ih a b
     rw [← pow_mul, ← pow_succ] at h
     rw [pow_succ' I (k + 1)]
     exact h
 
-theorem UpperTheory.V.GradeZeroInterpolatingElement.primeTo :
-    ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [TotallyDisconnectedSpace Γ] [T2Space Γ] (g : Γ), (∃ g', Filter.Tendsto (fun n : ℕ => g ^ l ^ n.factorial) Filter.atTop (nhds g')) ∧ ∀ g', Filter.Tendsto (fun n : ℕ => g ^ l ^ n.factorial) Filter.atTop (nhds g') → ∀ (O : Type) [CommRing O] [IsLocalRing O] [Finite (ResidueField O)] [CharP (ResidueField O) l] (ι : Type) [Fintype ι] [DecidableEq ι] (rbar : Γ →* Matrix ι ι (ResidueField O)) (m : ℕ), l.Coprime m → rbar g ^ m = 1 → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (ρ : Lift O rbar R), rbar g' = rbar g ∧ ρ.hom g' ^ m = 1 := by
+theorem UpperTheory.V.GradeZeroInterpolatingElement.primeTo
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [TotallyDisconnectedSpace Γ] [T2Space Γ] (g : Γ),
+      (∃ g', Filter.Tendsto (fun n : ℕ => g ^ l ^ n.factorial) Filter.atTop (nhds g'))
+        ∧ ∀ g',
+          Filter.Tendsto (fun n : ℕ => g ^ l ^ n.factorial) Filter.atTop (nhds g')
+            → ∀ (O : Type) [CommRing O] [IsLocalRing O] [Finite (ResidueField O)]
+                [CharP (ResidueField O) l] (ι : Type) [Fintype ι] [DecidableEq ι]
+                (rbar : Γ →* Matrix ι ι (ResidueField O)) (m : ℕ),
+              l.Coprime m → rbar g ^ m = 1
+                → ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (ρ : Lift O rbar R),
+                  rbar g' = rbar g ∧ ρ.hom g' ^ m = 1 := by
   intro l _ Γ _ _ _ _ _ _ g
   have hl : l.Prime := Fact.out
   refine ⟨pt_exists l hl Γ g, ?_⟩
@@ -119,12 +149,15 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.primeTo :
     have hk' : k % orderOf x = 1 % orderOf x := Nat.ModEq.of_dvd (orderOf_dvd_of_pow_eq_one hx) hk
     rw [← pow_mod_orderOf, hk', pow_mod_orderOf, pow_one]
   have hcong := pt_modEq_one l m hm0 hcop
-  have hloc : ∀ N : ℕ, ∀ᶠ n : ℕ in Filter.atTop,
-      (Ideal.Quotient.mk (maximalIdeal R ^ N)).mapMatrix (ρ.hom (g ^ l ^ n.factorial)) =
-      (Ideal.Quotient.mk (maximalIdeal R ^ N)).mapMatrix (ρ.hom g') := by
+  have hloc
+      : ∀ N : ℕ,
+        ∀ᶠ n : ℕ in Filter.atTop,
+          (Ideal.Quotient.mk (maximalIdeal R ^ N)).mapMatrix (ρ.hom (g ^ l ^ n.factorial)) =
+          (Ideal.Quotient.mk (maximalIdeal R ^ N)).mapMatrix (ρ.hom g') := by
     intro N
-    have h1 : ∀ᶠ y in nhds g', ∀ a b, Ideal.Quotient.mk (maximalIdeal R ^ N) (ρ.hom y a b) =
-        Ideal.Quotient.mk (maximalIdeal R ^ N) (ρ.hom g' a b) := by
+    have h1
+        : ∀ᶠ y in nhds g', ∀ a b, Ideal.Quotient.mk (maximalIdeal R ^ N) (ρ.hom y a b) =
+          Ideal.Quotient.mk (maximalIdeal R ^ N) (ρ.hom g' a b) := by
       simp only [Filter.eventually_all]
       intro a b
       exact (ρ.cont a b N).eventually_eq g'
@@ -132,8 +165,10 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.primeTo :
     ext a b
     simp only [RingHom.mapMatrix_apply, Matrix.map_apply]
     exact hn a b
-  have hres : ∀ x y : R, Ideal.Quotient.mk (maximalIdeal R ^ 1) x = Ideal.Quotient.mk (maximalIdeal R ^ 1) y →
-      res O R x = res O R y := by
+  have hres
+      : ∀ x y : R,
+        Ideal.Quotient.mk (maximalIdeal R ^ 1) x = Ideal.Quotient.mk (maximalIdeal R ^ 1) y
+          → res O R x = res O R y := by
     intro x y h
     rw [Ideal.Quotient.eq, pow_one] at h
     rw [← sub_eq_zero, ← map_sub]
@@ -159,10 +194,13 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.primeTo :
       exact hn.trans ((Nat.self_le_factorial n).trans (Nat.le_succ _))
     obtain ⟨n, hn1, hn2⟩ := ((hloc N).and hfin).exists
     have hp := pt_pow (maximalIdeal R) l hlM _ hX n.factorial
-    have hq : (Ideal.Quotient.mk (maximalIdeal R ^ N)).mapMatrix (((ρ.hom g) ^ m) ^ l ^ n.factorial) = 1 := by
+    have hq
+        : (Ideal.Quotient.mk (maximalIdeal R ^ N)).mapMatrix (((ρ.hom g) ^ m) ^ l ^ n.factorial)
+          = 1 := by
       rw [← sub_eq_zero, ← map_one ((Ideal.Quotient.mk (maximalIdeal R ^ N)).mapMatrix), ← map_sub]
       ext a b
-      rw [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.zero_apply, Ideal.Quotient.eq_zero_iff_mem]
+      rw [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.zero_apply,
+        Ideal.Quotient.eq_zero_iff_mem]
       exact Ideal.pow_le_pow_right hn2 (hp a b)
     have e : (ρ.hom (g ^ l ^ n.factorial)) ^ m = ((ρ.hom g) ^ m) ^ l ^ n.factorial := by
       rw [map_pow, ← pow_mul, ← pow_mul, mul_comm]
@@ -173,14 +211,17 @@ theorem UpperTheory.V.GradeZeroInterpolatingElement.primeTo :
     have h2 : (Ideal.Quotient.mk (maximalIdeal R ^ N)).mapMatrix ((ρ.hom g') ^ m - 1) = 0 := by
       rw [map_sub, hr, map_one, sub_self]
     have := congrFun (congrFun h2 a) b
-    rw [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.zero_apply, Ideal.Quotient.eq_zero_iff_mem] at this
+    rw [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.zero_apply,
+        Ideal.Quotient.eq_zero_iff_mem]
+      at this
     exact this
   refine ⟨hA, ?_⟩
   have hbot : ⨅ i : ℕ, maximalIdeal R ^ i = ⊥ :=
     Ideal.iInf_pow_eq_bot_of_isLocalRing _ (maximalIdeal.isMaximal R).ne_top
   rw [← sub_eq_zero]
   ext a b
-  have hmem : ((ρ.hom g') ^ m - 1) a b ∈ ⨅ i : ℕ, maximalIdeal R ^ i := Ideal.mem_iInf.2 (fun N => hB N a b)
+  have hmem : ((ρ.hom g') ^ m - 1) a b ∈ ⨅ i : ℕ, maximalIdeal R ^ i :=
+    Ideal.mem_iInf.2 (fun N => hB N a b)
   rw [hbot, Ideal.mem_bot] at hmem
   rw [Matrix.zero_apply]
   exact hmem

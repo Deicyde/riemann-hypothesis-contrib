@@ -42,6 +42,6 @@ theorem steenrod_prism_chain_differential_squared_eq_zero_of_etale : leaf_dbd :=
   intro N c
   unfold Pr.bd
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_zsmul, d_push]
+  simp only [map_sum, map_zsmul, d_push]
 
 end LateralTheory.EtaleFoundations.SteenPf

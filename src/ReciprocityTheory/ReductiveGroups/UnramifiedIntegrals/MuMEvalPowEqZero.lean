@@ -24,8 +24,8 @@ def muM : Submonoid ℂ_[l] where
       · exact hlm h
     · rw [mul_pow, pow_mul, ha, one_pow, mul_comm n m, pow_mul, hb, one_pow, one_mul]
 
-theorem muM_common (S : Finset (muM l)) :
-    ∃ n : ℕ, 0 < n ∧ ¬ l ∣ n ∧ ∀ a ∈ S, (a : ℂ_[l]) ^ n = 1 := by
+theorem muM_common (S : Finset (muM l))
+    : ∃ n : ℕ, 0 < n ∧ ¬ l ∣ n ∧ ∀ a ∈ S, (a : ℂ_[l]) ^ n = 1 := by
   classical
   induction S using Finset.induction_on with
   | empty => exact ⟨1, one_pos, fun h => (Fact.out : l.Prime).one_lt.ne' (Nat.dvd_one.1 h), by simp⟩
@@ -41,8 +41,8 @@ theorem muM_common (S : Finset (muM l)) :
       · rw [mul_comm, pow_mul, ha, one_pow]
       · rw [pow_mul, hS b hb, one_pow]
 
-theorem muM_exists_gen (n : ℕ) (hn : 0 < n) :
-    ∃ g : ℂ_[l], g ^ n = 1 ∧ ∀ a : ℂ_[l], a ^ n = 1 → ∃ k : ℕ, g ^ k = a := by
+theorem muM_exists_gen (n : ℕ) (hn : 0 < n)
+    : ∃ g : ℂ_[l], g ^ n = 1 ∧ ∀ a : ℂ_[l], a ^ n = 1 → ∃ k : ℕ, g ^ k = a := by
   have : NeZero n := ⟨hn.ne'⟩
   obtain ⟨g, hg⟩ := IsCyclic.exists_monoid_generator (α := rootsOfUnity n ℂ_[l])
   refine ⟨((g : ℂ_[l]ˣ) : ℂ_[l]), ?_, fun a ha => ?_⟩
@@ -54,9 +54,12 @@ theorem muM_exists_gen (n : ℕ) (hn : 0 < n) :
     have := congrArg (fun x : rootsOfUnity n ℂ_[l] => ((x : ℂ_[l]ˣ) : ℂ_[l])) hk
     simpa using this
 
-theorem muM_eval_pow_eq_zero {K : Type*} [Field K] [CharZero K] (n : ℕ) (hn : 0 < n) (hln : ¬ l ∣ n)
-    (g : K) (hg : g ^ n = 1) (p : ℤ[X]) (hp : p.eval₂ (Int.castRingHom K) g = 0) :
-    p.eval₂ (Int.castRingHom K) (g ^ l) = 0 := by
+theorem muM_eval_pow_eq_zero
+    {K : Type*} [Field K] [CharZero K]
+    (n : ℕ) (hn : 0 < n) (hln : ¬ l ∣ n)
+    (g : K) (hg : g ^ n = 1)
+    (p : ℤ[X]) (hp : p.eval₂ (Int.castRingHom K) g = 0)
+    : p.eval₂ (Int.castRingHom K) (g ^ l) = 0 := by
   rw [← algebraMap_int_eq, ← aeval_def] at hp ⊢
   have hd : orderOf g ∣ n := orderOf_dvd_of_pow_eq_one hg
   have hd0 : 0 < orderOf g := Nat.pos_of_dvd_of_pos hd hn
@@ -109,8 +112,9 @@ theorem phiM_surj (x : ℂ_[l]) (hx : x ∈ Rmu l) : ∃ f, phiM l f = x := by
     simp [phiM]
   exact this hx
 
-theorem rmu_sigma : ∃ s : Rmu l →+* Rmu l,
-    ∀ (ζ : ℂ_[l]) (hζ : ζ ∈ muP l), ((s ⟨ζ, Subring.subset_closure hζ⟩ : Rmu l) : ℂ_[l]) = ζ ^ l := by
+theorem rmu_sigma
+    : ∃ s : Rmu l →+* Rmu l, ∀ (ζ : ℂ_[l]) (hζ : ζ ∈ muP l),
+      ((s ⟨ζ, Subring.subset_closure hζ⟩ : Rmu l) : ℂ_[l]) = ζ ^ l := by
   let φ : MonoidAlgebra ℤ (muM l) →+* Rmu l :=
     (phiM l : MonoidAlgebra ℤ (muM l) →+* ℂ_[l]).codRestrict (Rmu l) (phiM_mem l)
   let ψ : MonoidAlgebra ℤ (muM l) →+* Rmu l :=
@@ -129,23 +133,28 @@ theorem rmu_sigma : ∃ s : Rmu l →+* Rmu l,
   rw [h1, RingHom.liftOfRightInverse_comp_apply]
   simp [ψ, psiM]
 
-theorem rmu_sigma_congr (s : Rmu l →+* Rmu l)
+theorem rmu_sigma_congr
+    (s : Rmu l →+* Rmu l)
     (hs : ∀ (ζ : ℂ_[l]) (hζ : ζ ∈ muP l),
-      ((s ⟨ζ, Subring.subset_closure hζ⟩ : Rmu l) : ℂ_[l]) = ζ ^ l) (x : Rmu l) :
-    ∃ r ∈ Rmu l, ((s x : Rmu l) : ℂ_[l]) - (x : ℂ_[l]) ^ l = (l : ℂ_[l]) * r := by
+      ((s ⟨ζ, Subring.subset_closure hζ⟩ : Rmu l) : ℂ_[l]) = ζ ^ l)
+    (x : Rmu l)
+    : ∃ r ∈ Rmu l, ((s x : Rmu l) : ℂ_[l]) - (x : ℂ_[l]) ^ l = (l : ℂ_[l]) * r := by
   have hl : l.Prime := Fact.out
-  have key : ∀ (y : ℂ_[l]) (hy : y ∈ Rmu l), ∃ r : Rmu l, s ⟨y, hy⟩ - ⟨y, hy⟩ ^ l = (l : Rmu l) * r := by
+  have key
+      : ∀ (y : ℂ_[l]) (hy : y ∈ Rmu l), ∃ r : Rmu l, s ⟨y, hy⟩ - ⟨y, hy⟩ ^ l = (l : Rmu l) * r := by
     intro y hy
     induction hy using Subring.closure_induction with
     | mem ζ hζ => exact ⟨0, Subtype.ext (by simp [hs ζ hζ])⟩
     | zero =>
       refine ⟨0, ?_⟩
       have : (⟨0, zero_mem _⟩ : Rmu l) = 0 := rfl
-      rw [this, map_zero, zero_pow hl.ne_zero]; simp
+      rw [this, map_zero, zero_pow hl.ne_zero]
+      simp
     | one =>
       refine ⟨0, ?_⟩
       have : (⟨1, one_mem _⟩ : Rmu l) = 1 := rfl
-      rw [this, map_one, one_pow]; simp
+      rw [this, map_one, one_pow]
+      simp
     | add a b ha hb iha ihb =>
       obtain ⟨r, hr⟩ := iha
       obtain ⟨t, ht⟩ := ihb

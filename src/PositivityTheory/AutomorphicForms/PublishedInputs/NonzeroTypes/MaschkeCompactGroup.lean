@@ -10,18 +10,23 @@ namespace UpperTheory.NonzeroTypeTheory.MaschkeCompactGroup
 
 variable {K : Type} [Group K] {m : ℕ}
 
-theorem ker_isOpen [TopologicalSpace K] [IsTopologicalGroup K] (V : Representation ℂ K (Fin m → ℂ))
-    (hs : GlobalTheory.PRep.IsSmooth V) : IsOpen ((MonoidHom.ker V : Subgroup K) : Set K) := by
-  refine Subgroup.isOpen_of_mem_nhds (MonoidHom.ker V) (g := 1) (Filter.mem_of_superset
-    ((isOpen_iInter_of_finite fun i : Fin m => hs (Pi.single i 1)).mem_nhds (by simp)) fun g hg => ?_)
+theorem ker_isOpen
+    [TopologicalSpace K] [IsTopologicalGroup K]
+    (V : Representation ℂ K (Fin m → ℂ)) (hs : GlobalTheory.PRep.IsSmooth V)
+    : IsOpen ((MonoidHom.ker V : Subgroup K) : Set K) := by
+  refine Subgroup.isOpen_of_mem_nhds (MonoidHom.ker V) (g := 1)
+    (Filter.mem_of_superset
+      ((isOpen_iInter_of_finite fun i : Fin m => hs (Pi.single i 1)).mem_nhds (by simp))
+      fun g hg => ?_)
   refine MonoidHom.mem_ker.2 ((Pi.basisFun ℂ (Fin m)).ext fun i => ?_)
   rw [Pi.basisFun_apply]
   exact Set.mem_iInter.1 hg i
 
-theorem maschke [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
+theorem maschke
+    [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
     (V : Representation ℂ K (Fin m → ℂ)) (hs : GlobalTheory.PRep.IsSmooth V)
-    (U : Submodule ℂ (Fin m → ℂ)) (hU : ∀ k, ∀ u ∈ U, V k u ∈ U) :
-    ∃ S : Submodule ℂ (Fin m → ℂ), IsCompl U S ∧ ∀ k, ∀ s ∈ S, V k s ∈ S := by
+    (U : Submodule ℂ (Fin m → ℂ)) (hU : ∀ k, ∀ u ∈ U, V k u ∈ U)
+    : ∃ S : Submodule ℂ (Fin m → ℂ), IsCompl U S ∧ ∀ k, ∀ s ∈ S, V k s ∈ S := by
   classical
   have : Finite (K ⧸ MonoidHom.ker V) := Subgroup.quotient_finite_of_isOpen _ (ker_isOpen V hs)
   let _ : Fintype (K ⧸ MonoidHom.ker V) := Fintype.ofFinite _
@@ -85,13 +90,15 @@ open MaschkeCompactGroup in
 theorem invariantComplement_holds : SmoothRepIrreducibleSubcontainingVector := by
   intro K _ _ _ _ m V hs v0 hv0
   classical
-  have hbot : (∀ k, ∀ w ∈ (⊥ : Submodule ℂ (Fin m → ℂ)), V k w ∈ (⊥ : Submodule ℂ (Fin m → ℂ))) ∧
-      v0 ∉ (⊥ : Submodule ℂ (Fin m → ℂ)) := by
+  have hbot
+      : (∀ k, ∀ w ∈ (⊥ : Submodule ℂ (Fin m → ℂ)), V k w ∈ (⊥ : Submodule ℂ (Fin m → ℂ)))
+        ∧ v0 ∉ (⊥ : Submodule ℂ (Fin m → ℂ)) := by
     refine ⟨fun k w hw => ?_, fun h => hv0 ((Submodule.mem_bot ℂ).1 h)⟩
     rw [Submodule.mem_bot] at hw ⊢
     rw [hw, map_zero]
-  obtain ⟨U, ⟨hUst, hv0U⟩, hUmax⟩ := set_has_maximal_iff_noetherian.mpr inferInstance
-    {W : Submodule ℂ (Fin m → ℂ) | (∀ k, ∀ w ∈ W, V k w ∈ W) ∧ v0 ∉ W} ⟨⊥, hbot⟩
+  obtain ⟨U, ⟨hUst, hv0U⟩, hUmax⟩ :=
+    set_has_maximal_iff_noetherian.mpr inferInstance
+      {W : Submodule ℂ (Fin m → ℂ) | (∀ k, ∀ w ∈ W, V k w ∈ W) ∧ v0 ∉ W} ⟨⊥, hbot⟩
   obtain ⟨S, hUS, hSst⟩ := maschke V hs U hUst
   let p := S.projection U hUS.symm
   have hpS : ∀ v, p v ∈ S := fun v => Submodule.projection_apply_mem hUS.symm v
@@ -101,7 +108,8 @@ theorem invariantComplement_holds : SmoothRepIrreducibleSubcontainingVector := b
   have hpU : ∀ u ∈ U, p u = 0 := fun u hu => (hp0 u).2 hu
   have hpv0 : p v0 ≠ 0 := fun h => hv0U ((hp0 v0).1 h)
 
-  have key : ∀ W : Submodule ℂ (Fin m → ℂ), W ≤ S → (∀ k, ∀ w ∈ W, V k w ∈ W) → W ≠ ⊥ → p v0 ∈ W := by
+  have key
+      : ∀ W : Submodule ℂ (Fin m → ℂ), W ≤ S → (∀ k, ∀ w ∈ W, V k w ∈ W) → W ≠ ⊥ → p v0 ∈ W := by
     intro W hWS hWst hW0
     have hsup : ∀ k, ∀ x ∈ U ⊔ W, V k x ∈ U ⊔ W := by
       intro k x hx
@@ -111,7 +119,8 @@ theorem invariantComplement_holds : SmoothRepIrreducibleSubcontainingVector := b
     have hmem : v0 ∈ U ⊔ W := by
       by_contra hn
       refine hUmax (U ⊔ W) ⟨hsup, hn⟩ (lt_of_le_of_ne le_sup_left fun heq => hW0 ?_)
-      refine eq_bot_iff.2 ((le_inf (le_sup_right.trans heq.ge) hWS).trans (disjoint_iff.1 hUS.disjoint).le)
+      refine eq_bot_iff.2 ((le_inf (le_sup_right.trans heq.ge) hWS).trans
+        (disjoint_iff.1 hUS.disjoint).le)
     obtain ⟨u, hu, w, hw, hsum⟩ := Submodule.mem_sup.1 hmem
     rw [← hsum, map_add (f := _), hpU u hu, zero_add, hpid w (hWS hw)]
     exact hw
@@ -126,8 +135,12 @@ theorem invariantComplement_holds : SmoothRepIrreducibleSubcontainingVector := b
     obtain ⟨T, hST, hTst⟩ := maschke V hs S' hS'st
     have hST0 : S ⊓ T = ⊥ := by
       by_contra hn
-      have h2 := key (S ⊓ T) inf_le_left
-        (fun k x hx => Submodule.mem_inf.2 ⟨hSst k x (Submodule.mem_inf.1 hx).1, hTst k x (Submodule.mem_inf.1 hx).2⟩) hn
+      have h2 :=
+        key (S ⊓ T) inf_le_left
+          (fun k x hx =>
+            Submodule.mem_inf.2
+              ⟨hSst k x (Submodule.mem_inf.1 hx).1, hTst k x (Submodule.mem_inf.1 hx).2⟩)
+          hn
       have h3 : p v0 ∈ S' ⊓ T := Submodule.mem_inf.2 ⟨h1, (Submodule.mem_inf.1 h2).2⟩
       rw [disjoint_iff.1 hST.disjoint, Submodule.mem_bot] at h3
       exact hpv0 h3

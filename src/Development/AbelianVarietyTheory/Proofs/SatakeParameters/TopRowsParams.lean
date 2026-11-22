@@ -11,12 +11,15 @@ open Formalism.MainNotions Formalism.BasicNotions Formalism.MainNotions.G Classi
 
 namespace GlobalTheory.TopRows
 
-theorem nuRow_tauPl_of_isTopPl {D : D7} (L : SizeData₂ D) (u : D.what₂.Word) (j : ℕ) (hj : j < D.R.m)
-    (z : Bool × HH D) (hz : IsTopPl D z) :
-    DV.nuRow D u (j + 1) (tauPl D z) 0 = (aL L z.2 : ℝ) + (wPl D (j + 1) z - kaJ D (j + 1)) ∧
-    DV.nuRow D u (j + 1) (tauPl D z) (D.R.k - 1) = (wPl D (j + 1) z - kaJ D (j + 1)) - (bL L z.2 : ℝ) ∧
-    0 ≤ DV.nuRow D u (j + 1) (tauPl D z) (D.R.k - 1) ∧
-    DV.nuRow D u (j + 1) (tauPl D z) (D.R.k - 1) ≤ L.sc.b' / L.sc.x + L.etaSz := by
+theorem nuRow_tauPl_of_isTopPl
+    {D : D7} (L : SizeData₂ D) (u : D.what₂.Word)
+    (j : ℕ) (hj : j < D.R.m)
+    (z : Bool × HH D) (hz : IsTopPl D z)
+    : DV.nuRow D u (j + 1) (tauPl D z) 0 = (aL L z.2 : ℝ) + (wPl D (j + 1) z - kaJ D (j + 1))
+      ∧ DV.nuRow D u (j + 1) (tauPl D z) (D.R.k - 1)
+        = (wPl D (j + 1) z - kaJ D (j + 1)) - (bL L z.2 : ℝ)
+      ∧ 0 ≤ DV.nuRow D u (j + 1) (tauPl D z) (D.R.k - 1)
+      ∧ DV.nuRow D u (j + 1) (tauPl D z) (D.R.k - 1) ≤ L.sc.b' / L.sc.x + L.etaSz := by
   obtain ⟨hz1, hz2⟩ := hz
   have hk : 0 < D.R.k := by have := D.R.m_add_three_le_k; omega
   have hτ : (D.eTau (tauPl D z) : D.R.GG) = D.R.tau1 (⟨z.2, hz2⟩ : D.host.TT) := by
@@ -31,16 +34,18 @@ theorem nuRow_tauPl_of_isTopPl {D : D7} (L : SizeData₂ D) (u : D.what₂.Word)
     unfold wPl wj
     rw [dite_eq_left (by simpa using hj), D.hcW_e]
     rfl
-  have hkc : ((D.R.k - 1 : ℕ) : ℝ) = (D.R.k : ℝ) - 1 := by
-    rw [Nat.cast_sub (by omega)]; simp
-  have e1 : DV.nuRow D u (j + 1) (tauPl D z) 0 = (aL L z.2 : ℝ) + (wPl D (j + 1) z - kaJ D (j + 1)) := by
+  have hkc : ((D.R.k - 1 : ℕ) : ℝ) = (D.R.k : ℝ) - 1 := by rw [Nat.cast_sub (by omega)]; simp
+  have e1
+      : DV.nuRow D u (j + 1) (tauPl D z) 0
+        = (aL L z.2 : ℝ) + (wPl D (j + 1) z - kaJ D (j + 1)) := by
     rw [RowWeightLemmas.nuRow_head D u j hj _ 0 hk, D.hcW_first u _ hk, ha, hwe]
     unfold kaJ Ranks.N
     push_cast
     rw [hu1]
     ring
-  have e2 : DV.nuRow D u (j + 1) (tauPl D z) (D.R.k - 1) =
-      (wPl D (j + 1) z - kaJ D (j + 1)) - (bL L z.2 : ℝ) := by
+  have e2
+      : DV.nuRow D u (j + 1) (tauPl D z) (D.R.k - 1)
+        = (wPl D (j + 1) z - kaJ D (j + 1)) - (bL L z.2 : ℝ) := by
     rw [RowWeightLemmas.nuRow_head D u j hj _ (D.R.k - 1) (by omega), D.hcW_last u _ hk, hb, hwe]
     unfold kaJ Ranks.N
     push_cast
@@ -56,7 +61,8 @@ theorem nuRow_tauPl_of_isTopPl {D : D7} (L : SizeData₂ D) (u : D.what₂.Word)
   change wPl D (j + 1) z ≤ _ at hw
   linarith
 
-theorem eta_le {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) : L.etaSz ≤ L.sc.b' / L.sc.x := by
+theorem eta_le {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L)
+    : L.etaSz ≤ L.sc.b' / L.sc.x := by
   have hx : 0 < L.sc.x := lt_trans one_pos L.sc.one_lt_alt
   have hb : 0 < L.sc.b := Real.exp_pos _
   have hb' : 0 < L.sc.b' := div_pos (mul_pos hx hb) (Real.exp_pos _)
@@ -72,7 +78,19 @@ theorem eta_le {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) : L.etaSz
     exact div_le_div_of_nonneg_left hb'.le hx (le_mul_of_one_le_right hx.le hn1)
   exact h1.trans (P.mteta.trans h2)
 
-theorem top_rows : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ i : Fm.Ix x, ∀ (u : (Fm.D x i).what₂.Word), ∀ j < (Fm.D x i).R.m, ∀ (z : Bool × HH (Fm.D x i)), IsTopPl (Fm.D x i) z → DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) 0 = (aL (Fm.L x i) z.2 : ℝ) + (wPl (Fm.D x i) (j + 1) z - kaJ (Fm.D x i) (j + 1)) ∧ DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) ((Fm.D x i).R.k - 1) = (wPl (Fm.D x i) (j + 1) z - kaJ (Fm.D x i) (j + 1)) - (bL (Fm.L x i) z.2 : ℝ) ∧ 0 ≤ DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) ((Fm.D x i).R.k - 1) ∧ DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) ((Fm.D x i).R.k - 1) ≤ 2 * (Fm.L x i).sc.b' / (Fm.L x i).sc.x := by
+theorem top_rows
+    : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0,
+      Fm.x1 < x
+        → ∀ i : Fm.Ix x, ∀ (u : (Fm.D x i).what₂.Word), ∀ j < (Fm.D x i).R.m,
+          ∀ (z : Bool × HH (Fm.D x i)),
+            IsTopPl (Fm.D x i) z
+              → DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) 0
+                  = (aL (Fm.L x i) z.2 : ℝ) + (wPl (Fm.D x i) (j + 1) z - kaJ (Fm.D x i) (j + 1))
+                ∧ DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) ((Fm.D x i).R.k - 1)
+                  = (wPl (Fm.D x i) (j + 1) z - kaJ (Fm.D x i) (j + 1)) - (bL (Fm.L x i) z.2 : ℝ)
+                ∧ 0 ≤ DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) ((Fm.D x i).R.k - 1)
+                ∧ DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) ((Fm.D x i).R.k - 1)
+                  ≤ 2 * (Fm.L x i).sc.b' / (Fm.L x i).sc.x := by
   intro eps Fm
   refine ⟨0, fun x _ hx1 i u j hj z hz => ?_⟩
   have h4 := eta_le (Fm.params x hx1 i)

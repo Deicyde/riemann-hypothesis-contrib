@@ -9,34 +9,42 @@ open Topology Filter
 
 namespace GlobalTheory.CompanionTheory.HolFamily
 
-theorem continuousOn_deriv_param {G : Type} [TopologicalSpace G] {U : Set ℂ} (hU : IsOpen U)
+theorem continuousOn_deriv_param
+    {G : Type} [TopologicalSpace G]
+    {U : Set ℂ} (hU : IsOpen U)
     {E : ℂ → G → ℂ} (hd : ∀ g, DifferentiableOn ℂ (E · g) U)
-    (hc : ContinuousOn (fun y : ℂ × G => E y.1 y.2) (U ×ˢ Set.univ)) :
-    ContinuousOn (fun y : ℂ × G => deriv (E · y.2) y.1) (U ×ˢ Set.univ) := by
+    (hc : ContinuousOn (fun y : ℂ × G => E y.1 y.2) (U ×ˢ Set.univ))
+    : ContinuousOn (fun y : ℂ × G => deriv (E · y.2) y.1) (U ×ˢ Set.univ) := by
   have hc' : ContinuousOn (fun q : G × ℂ => E q.2 q.1) (Set.univ ×ˢ U) :=
     hc.comp continuous_swap.continuousOn fun q hq => ⟨hq.2, Set.mem_univ _⟩
   have h := continuousOn_deriv_family G U hU (fun g z => E z g) hc' hd
   exact h.comp continuous_swap.continuousOn fun y hy => ⟨Set.mem_univ _, hy.1⟩
 
-theorem deriv_param_invariant {G : Type} [Group G] (Γ : Subgroup G) {U : Set ℂ} (hU : IsOpen U)
-    {E : ℂ → G → ℂ} (hinv : ∀ z ∈ U, ∀ γ ∈ Γ, ∀ g, E z (γ * g) = E z g) :
-    ∀ z ∈ U, ∀ γ ∈ Γ, ∀ g, deriv (E · (γ * g)) z = deriv (E · g) z := by
+theorem deriv_param_invariant
+    {G : Type} [Group G]
+    (Γ : Subgroup G)
+    {U : Set ℂ} (hU : IsOpen U)
+    {E : ℂ → G → ℂ} (hinv : ∀ z ∈ U, ∀ γ ∈ Γ, ∀ g, E z (γ * g) = E z g)
+    : ∀ z ∈ U, ∀ γ ∈ Γ, ∀ g, deriv (E · (γ * g)) z = deriv (E · g) z := by
   intro z hz γ hγ g
   apply Filter.EventuallyEq.deriv_eq
   filter_upwards [hU.mem_nhds hz] with w hw using hinv w hw γ hγ g
 
-theorem hasDerivAt_functional {G : Type} [Group G] [TopologicalSpace G] (Γ : Subgroup G)
-    (Lf : (G → ℂ) → ℂ)
-    (hlin : ∀ (a : ℂ) (f f' : G → ℂ), Continuous f → Continuous f' →
-      (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g) → (∀ γ ∈ Γ, ∀ g, f' (γ * g) = f' g) →
-      Lf (a • f + f') = a * Lf f + Lf f')
+theorem hasDerivAt_functional
+    {G : Type} [Group G] [TopologicalSpace G]
+    (Γ : Subgroup G) (Lf : (G → ℂ) → ℂ)
+    (hlin : ∀ (a : ℂ) (f f' : G → ℂ),
+      Continuous f → Continuous f' → (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g)
+        → (∀ γ ∈ Γ, ∀ g, f' (γ * g) = f' g)
+        → Lf (a • f + f') = a * Lf f + Lf f')
     {C : Set G} (hC : IsCompact C)
-    (hb : ∀ (f : G → ℂ) (M : ℝ), Continuous f → (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g) →
-      (∀ x ∈ C, ‖f x‖ ≤ M) → ‖Lf f‖ ≤ M)
+    (hb : ∀ (f : G → ℂ) (M : ℝ),
+      Continuous f → (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g) → (∀ x ∈ C, ‖f x‖ ≤ M) → ‖Lf f‖ ≤ M)
     {U : Set ℂ} {E : ℂ → G → ℂ} (hU : IsOpen U) (hd : ∀ g, DifferentiableOn ℂ (E · g) U)
     (hc : ContinuousOn (fun y : ℂ × G => E y.1 y.2) (U ×ˢ Set.univ))
-    (hinv : ∀ z ∈ U, ∀ γ ∈ Γ, ∀ g, E z (γ * g) = E z g) {z : ℂ} (hz : z ∈ U) :
-    HasDerivAt (fun w => Lf (E w)) (Lf fun g => deriv (E · g) z) z := by
+    (hinv : ∀ z ∈ U, ∀ γ ∈ Γ, ∀ g, E z (γ * g) = E z g)
+    {z : ℂ} (hz : z ∈ U)
+    : HasDerivAt (fun w => Lf (E w)) (Lf fun g => deriv (E · g) z) z := by
   obtain ⟨D, hD⟩ : ∃ D : G → ℂ, D = fun g => deriv (E · g) z := ⟨_, rfl⟩
   rw [← hD]
   have hD' := continuousOn_deriv_param hU hd hc
@@ -62,12 +70,13 @@ theorem hasDerivAt_functional {G : Type} [Group G] [TopologicalSpace G] (Γ : Su
     have h2 := Metric.tendsto_nhds.mp hcont2 (c / 2) (by positivity)
     filter_upwards [h1, h2] with y hy1 hy2
     rw [dist_eq_norm] at hy1 hy2
-    calc ‖deriv (E · y.2) y.1 - deriv (E · y.2) z‖
-        = ‖(deriv (E · y.2) y.1 - deriv (E · g) z) - (deriv (E · y.2) z - deriv (E · g) z)‖ := by
-          congr 1
-          ring
+    calc
+      ‖deriv (E · y.2) y.1 - deriv (E · y.2) z‖
+          = ‖(deriv (E · y.2) y.1 - deriv (E · g) z) - (deriv (E · y.2) z - deriv (E · g) z)‖ := by
+        congr 1
+        ring
       _ ≤ ‖deriv (E · y.2) y.1 - deriv (E · g) z‖ + ‖deriv (E · y.2) z - deriv (E · g) z‖ :=
-          norm_sub_le _ _
+        norm_sub_le _ _
       _ ≤ c := by linarith
   obtain ⟨δ, hδ, hball⟩ := Metric.eventually_nhds_iff_ball.mp (hunif.and (hU.mem_nhds hz))
   filter_upwards [Metric.ball_mem_nhds z hδ] with w hw
@@ -75,18 +84,25 @@ theorem hasDerivAt_functional {G : Type} [Group G] [TopologicalSpace G] (Γ : Su
   have hbound : ∀ g ∈ C, ‖E w g - E z g - (w - z) * D g‖ ≤ c * ‖w - z‖ := by
     intro g hg
     rw [hD]
-    have hφ : ∀ ζ ∈ Metric.ball z δ, HasDerivAt (fun ζ => E ζ g - ζ * deriv (E · g) z)
-        (deriv (E · g) ζ - 1 * deriv (E · g) z) ζ := by
+    have hφ
+        : ∀ ζ ∈ Metric.ball z δ,
+          HasDerivAt
+            (fun ζ => E ζ g - ζ * deriv (E · g) z)
+            (deriv (E · g) ζ - 1 * deriv (E · g) z) ζ := by
       intro ζ hζ
-      have hdiff : DifferentiableAt ℂ (E · g) ζ := (hd g).differentiableAt (hU.mem_nhds (hball ζ hζ).2)
+      have hdiff : DifferentiableAt ℂ (E · g) ζ :=
+        (hd g).differentiableAt (hU.mem_nhds (hball ζ hζ).2)
       exact hdiff.hasDerivAt.sub ((hasDerivAt_id ζ).mul_const _)
-    have hmv := Convex.norm_image_sub_le_of_norm_deriv_le (fun ζ hζ => (hφ ζ hζ).differentiableAt)
-      (fun ζ hζ => by rw [(hφ ζ hζ).deriv, one_mul]; exact (hball ζ hζ).1 g hg)
-      (convex_ball z δ) (Metric.mem_ball_self hδ) hw
-    calc ‖E w g - E z g - (w - z) * deriv (E · g) z‖
-        = ‖(E w g - w * deriv (E · g) z) - (E z g - z * deriv (E · g) z)‖ := by
-          congr 1
-          ring
+    have hmv :=
+      Convex.norm_image_sub_le_of_norm_deriv_le
+        (fun ζ hζ => (hφ ζ hζ).differentiableAt)
+        (fun ζ hζ => by rw [(hφ ζ hζ).deriv, one_mul]; exact (hball ζ hζ).1 g hg)
+        (convex_ball z δ) (Metric.mem_ball_self hδ) hw
+    calc
+      ‖E w g - E z g - (w - z) * deriv (E · g) z‖
+          = ‖(E w g - w * deriv (E · g) z) - (E z g - z * deriv (E · g) z)‖ := by
+        congr 1
+        ring
       _ ≤ c * ‖w - z‖ := hmv
   have hEw := hslice w hwU
   have hEz := hslice z hz
@@ -111,27 +127,35 @@ theorem hasDerivAt_functional {G : Type} [Group G] [TopologicalSpace G] (Γ : Su
   rw [hring]
   exact hLF
 
-theorem iteratedDeriv_functional {G : Type} [Group G] [TopologicalSpace G] (Γ : Subgroup G)
-    (Lf : (G → ℂ) → ℂ)
-    (hlin : ∀ (a : ℂ) (f f' : G → ℂ), Continuous f → Continuous f' →
-      (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g) → (∀ γ ∈ Γ, ∀ g, f' (γ * g) = f' g) →
-      Lf (a • f + f') = a * Lf f + Lf f')
+theorem iteratedDeriv_functional
+    {G : Type} [Group G] [TopologicalSpace G]
+    (Γ : Subgroup G) (Lf : (G → ℂ) → ℂ)
+    (hlin : ∀ (a : ℂ) (f f' : G → ℂ),
+      Continuous f → Continuous f' → (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g)
+        → (∀ γ ∈ Γ, ∀ g, f' (γ * g) = f' g)
+        → Lf (a • f + f') = a * Lf f + Lf f')
     {C : Set G} (hC : IsCompact C)
-    (hb : ∀ (f : G → ℂ) (M : ℝ), Continuous f → (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g) →
-      (∀ x ∈ C, ‖f x‖ ≤ M) → ‖Lf f‖ ≤ M)
-    {U : Set ℂ} (hU : IsOpen U) (j : ℕ) :
-    ∀ E : ℂ → G → ℂ, (∀ g, DifferentiableOn ℂ (E · g) U) →
-      ContinuousOn (fun y : ℂ × G => E y.1 y.2) (U ×ˢ Set.univ) →
-      (∀ z ∈ U, ∀ γ ∈ Γ, ∀ g, E z (γ * g) = E z g) →
-      ∀ z ∈ U, iteratedDeriv j (fun z => Lf (E z)) z = Lf fun g => iteratedDeriv j (E · g) z := by
+    (hb : ∀ (f : G → ℂ) (M : ℝ),
+      Continuous f → (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g) → (∀ x ∈ C, ‖f x‖ ≤ M) → ‖Lf f‖ ≤ M)
+    {U : Set ℂ} (hU : IsOpen U)
+    (j : ℕ)
+    : ∀ E : ℂ → G → ℂ,
+      (∀ g, DifferentiableOn ℂ (E · g) U)
+        → ContinuousOn (fun y : ℂ × G => E y.1 y.2) (U ×ˢ Set.univ)
+        → (∀ z ∈ U, ∀ γ ∈ Γ, ∀ g, E z (γ * g) = E z g)
+        → ∀ z ∈ U,
+          iteratedDeriv j (fun z => Lf (E z)) z = Lf fun g => iteratedDeriv j (E · g) z := by
   induction j with
   | zero =>
     intro E _ _ _ z _
     simp
   | succ j ih =>
     intro E hd hc hinv z hz
-    have key := ih (fun z g => deriv (E · g) z) (fun g => (hd g).deriv hU)
-      (continuousOn_deriv_param hU hd hc) (deriv_param_invariant Γ hU hinv) z hz
+    have key :=
+      ih
+        (fun z g => deriv (E · g) z)
+        (fun g => (hd g).deriv hU)
+        (continuousOn_deriv_param hU hd hc) (deriv_param_invariant Γ hU hinv) z hz
     have hloc : deriv (fun z => Lf (E z)) =ᶠ[𝓝 z] fun z => Lf (fun g => deriv (E · g) z) := by
       filter_upwards [hU.mem_nhds hz] with w hw
       exact (hasDerivAt_functional Γ Lf hlin hC hb hU hd hc hinv hw).deriv
@@ -140,11 +164,30 @@ theorem iteratedDeriv_functional {G : Type} [Group G] [TopologicalSpace G] (Γ :
     funext g
     rw [iteratedDeriv_succ']
 
-theorem functional_commutes_iteratedDeriv :
-    ∀ {G : Type} [Group G] [TopologicalSpace G] (Γ : Subgroup G) (Lf : (G → ℂ) → ℂ), (∀ (a : ℂ) (f f' : G → ℂ), Continuous f → Continuous f' → (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g) → (∀ γ ∈ Γ, ∀ g, f' (γ * g) = f' g) → Lf (a • f + f') = a * Lf f + Lf f') → (∃ C : Set G, IsCompact C ∧ ∀ (f : G → ℂ) (M : ℝ), Continuous f → (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g) → (∀ x ∈ C, ‖f x‖ ≤ M) → ‖Lf f‖ ≤ M) → ∀ (U : Set ℂ) (Ê : ℂ → G → ℂ), IsOpen U → (∀ g, DifferentiableOn ℂ (Ê · g) U) → ContinuousOn (fun y : ℂ × G => Ê y.1 y.2) (U ×ˢ Set.univ) → (∀ z ∈ U, ∀ γ ∈ Γ, ∀ g, Ê z (γ * g) = Ê z g) → DifferentiableOn ℂ (fun z => Lf (Ê z)) U ∧ ∀ z ∈ U, ∀ j : ℕ, iteratedDeriv j (fun z => Lf (Ê z)) z = Lf fun g => iteratedDeriv j (Ê · g) z := by
+theorem functional_commutes_iteratedDeriv
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] (Γ : Subgroup G) (Lf : (G → ℂ) → ℂ),
+      (∀ (a : ℂ) (f f' : G → ℂ),
+          Continuous f → Continuous f' → (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g)
+            → (∀ γ ∈ Γ, ∀ g, f' (γ * g) = f' g)
+            → Lf (a • f + f') = a * Lf f + Lf f')
+        → (∃ C : Set G,
+          IsCompact C
+            ∧ ∀ (f : G → ℂ) (M : ℝ),
+              Continuous f → (∀ γ ∈ Γ, ∀ g, f (γ * g) = f g) → (∀ x ∈ C, ‖f x‖ ≤ M) → ‖Lf f‖ ≤ M)
+        → ∀ (U : Set ℂ) (Ê : ℂ → G → ℂ),
+          IsOpen U → (∀ g, DifferentiableOn ℂ (Ê · g) U)
+            → ContinuousOn (fun y : ℂ × G => Ê y.1 y.2) (U ×ˢ Set.univ)
+            → (∀ z ∈ U, ∀ γ ∈ Γ, ∀ g, Ê z (γ * g) = Ê z g)
+            → DifferentiableOn ℂ (fun z => Lf (Ê z)) U
+              ∧ ∀ z ∈ U, ∀ j : ℕ,
+                iteratedDeriv j (fun z => Lf (Ê z)) z = Lf fun g => iteratedDeriv j (Ê · g) z := by
   intro G _ _ Γ Lf hlin hCex U Ê hU hd hc hinv
   obtain ⟨C, hC, hb⟩ := hCex
-  exact ⟨fun z hz => (hasDerivAt_functional Γ Lf hlin hC hb hU hd hc hinv hz).differentiableAt.differentiableWithinAt,
-    fun z hz j => iteratedDeriv_functional Γ Lf hlin hC hb hU j Ê hd hc hinv z hz⟩
+  exact ⟨
+    fun z hz =>
+      (hasDerivAt_functional Γ Lf hlin hC hb hU hd hc hinv
+        hz).differentiableAt.differentiableWithinAt,
+    fun z hz j => iteratedDeriv_functional Γ Lf hlin hC hb hU j Ê hd hc hinv z hz
+  ⟩
 
 end GlobalTheory.CompanionTheory.HolFamily

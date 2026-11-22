@@ -6,13 +6,14 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.WittOnFalse
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory.PerfectProj
 
-theorem exists_pow_prime_pow_kill (p : ℕ) (hp : 1 < p) (k B : Type) [Field k] [CommRing B]
-    [Algebra k B] [Module.Finite k B] :
-    ∃ r : ℕ, ∀ x : B, IsNilpotent x → x ^ (p ^ r) = 0 := by
+theorem exists_pow_prime_pow_kill
+    (p : ℕ) (hp : 1 < p) (k B : Type) [Field k] [CommRing B] [Algebra k B] [Module.Finite k B]
+    : ∃ r : ℕ, ∀ x : B, IsNilpotent x → x ^ (p ^ r) = 0 := by
   haveI : IsArtinianRing B := IsArtinianRing.of_finite k B
   obtain ⟨n, hn⟩ := IsArtinianRing.isNilpotent_nilradical (R := B)
   refine ⟨n, fun x hx => ?_⟩
@@ -20,8 +21,9 @@ theorem exists_pow_prime_pow_kill (p : ℕ) (hp : 1 < p) (k B : Type) [Field k] 
   rw [hn, Ideal.zero_eq_bot, Ideal.mem_bot] at hmem
   exact pow_eq_zero_of_le (Nat.lt_pow_self hp).le hmem
 
-theorem exists_eq_pow_prime_pow (p : ℕ) {A : Type} [CommRing A] (π : A → A)
-    (h : ∀ a, ∃ b, π a = π b ^ p) : ∀ (m : ℕ) (a : A), ∃ b, π a = π b ^ (p ^ m) := by
+theorem exists_eq_pow_prime_pow
+    (p : ℕ) {A : Type} [CommRing A] (π : A → A) (h : ∀ a, ∃ b, π a = π b ^ p)
+    : ∀ (m : ℕ) (a : A), ∃ b, π a = π b ^ (p ^ m) := by
   intro m
   induction m with
   | zero => intro a; exact ⟨a, by simp⟩
@@ -31,11 +33,21 @@ theorem exists_eq_pow_prime_pow (p : ℕ) {A : Type} [CommRing A] (π : A → A)
     obtain ⟨c, hc⟩ := h b
     exact ⟨c, by rw [hb, hc, ← pow_mul, pow_succ']⟩
 
-theorem natural_idempotent_reduced : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] (A B : Type) [CommRing A] [Algebra k A] [CommRing B] [Algebra k B] [Module.Finite k B] (π : A →ₐ[k] A) (π' : B →ₐ[k] B), ((∀ a : A, IsNilpotent (a - π a)) ∧ ∀ a : A, ∃ b : A, π a = π b ^ p) → ((∀ a : B, IsNilpotent (a - π' a)) ∧ ∀ a : B, ∃ b : B, π' a = π' b ^ p) → (∀ (f : A →ₐ[k] B) (a : A), f (π a) = π' (f a)) ∧ (∀ b, π' (π' b) = π' b) ∧ ∀ b, IsNilpotent (π' b) → π' b = 0 := by
+theorem natural_idempotent_reduced
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] (A B : Type) [CommRing A]
+        [Algebra k A] [CommRing B] [Algebra k B] [Module.Finite k B] (π : A →ₐ[k] A)
+        (π' : B →ₐ[k] B),
+      ((∀ a : A, IsNilpotent (a - π a)) ∧ ∀ a : A, ∃ b : A, π a = π b ^ p)
+        → ((∀ a : B, IsNilpotent (a - π' a)) ∧ ∀ a : B, ∃ b : B, π' a = π' b ^ p)
+        → (∀ (f : A →ₐ[k] B) (a : A), f (π a) = π' (f a)) ∧ (∀ b, π' (π' b) = π' b)
+          ∧ ∀ b, IsNilpotent (π' b) → π' b = 0 := by
   intro p _ k _ _ A B _ _ _ _ _ π π' hA hB
   rcases subsingleton_or_nontrivial B with hs | hs
-  · exact ⟨fun _ _ => Subsingleton.elim _ _, fun _ => Subsingleton.elim _ _,
-      fun _ _ => Subsingleton.elim _ _⟩
+  · exact ⟨
+      fun _ _ => Subsingleton.elim _ _,
+      fun _ => Subsingleton.elim _ _,
+      fun _ _ => Subsingleton.elim _ _
+    ⟩
   haveI : CharP B p := charP_of_injective_algebraMap (algebraMap k B).injective p
   obtain ⟨r, hr⟩ := exists_pow_prime_pow_kill p (Fact.out : p.Prime).one_lt k B
   have iA := exists_eq_pow_prime_pow p π hA.2 r
@@ -61,8 +73,7 @@ theorem natural_idempotent_reduced : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Fi
   · obtain ⟨c, hc⟩ := iB y
     have he : π' (π' y) - π' y = (π' (π' c) - π' c) ^ (p ^ r) := by
       rw [sub_pow_char_pow, hc, map_pow]
-    have hn : IsNilpotent (π' (π' c) - π' c) := by
-      rw [← neg_sub]; exact (hB.1 (π' c)).neg
+    have hn : IsNilpotent (π' (π' c) - π' c) := by rw [← neg_sub]; exact (hB.1 (π' c)).neg
     exact sub_eq_zero.mp (he.trans (hr _ hn))
 
 end GlobalTheory.PerfectProj

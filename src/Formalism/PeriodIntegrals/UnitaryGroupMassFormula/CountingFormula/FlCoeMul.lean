@@ -12,20 +12,25 @@ namespace PI.UnitaryGroupMassFormula.CntFormula
 open Formalism.MainNotions.S Polynomial
 open ValuativeRel
 
-theorem fl_hensel {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
-    (hl : IsNonarchimedeanLocalField F) : HenselianRing 𝒪[F] 𝓂[F] := by
+theorem fl_hensel
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] (hl : IsNonarchimedeanLocalField F)
+    : HenselianRing 𝒪[F] 𝓂[F] := by
   haveI := hl
   letI : UniformSpace F := IsTopologicalAddGroup.rightUniformSpace F
   haveI : IsUniformAddGroup F := isUniformAddGroup_of_addCommGroup
   exact IsAdicComplete.henselianRing _ _
 
-theorem fl_coe_mul {F : Type} [Field F] [ValuativeRel F] (a b : 𝒪[F]) :
-    ((a * b : 𝒪[F]) : F) = (a : F) * b := rfl
+theorem fl_coe_mul {F : Type} [Field F] [ValuativeRel F] (a b : 𝒪[F])
+    : ((a * b : 𝒪[F]) : F) = (a : F) * b :=
+  rfl
 
-theorem fl_sq_div {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E]
-    [Algebra F E] [TopologicalSpace E] (L : Loc.LocE F E) (hl : IsNonarchimedeanLocalField F)
-    (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) (b n : 𝒪[F]) (hbn : b * b = n) (hn : n ∈ 𝓂[F]) :
-    ∃ z ∈ L.O, algebraMap F E b = algebraMap F E ϖ * z := by
+theorem fl_sq_div
+    {F E : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E] [TopologicalSpace E]
+    (L : Loc.LocE F E) (hl : IsNonarchimedeanLocalField F)
+    (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ)
+    (b n : 𝒪[F]) (hbn : b * b = n) (hn : n ∈ 𝓂[F])
+    : ∃ z ∈ L.O, algebraMap F E b = algebraMap F E ϖ * z := by
   haveI := hl
   have hb : b ∈ 𝓂[F] := by
     have h2 : b * b ∈ 𝓂[F] := hbn ▸ hn
@@ -34,20 +39,22 @@ theorem fl_sq_div {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [
   obtain ⟨c, rfl⟩ := hb
   exact ⟨algebraMap F E c, fl_int_mem L c, by rw [fl_coe_mul, map_mul]⟩
 
-theorem fl_local {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E]
-    [Algebra F E] [TopologicalSpace E] (L : Loc.LocE F E) (hl : IsNonarchimedeanLocalField F)
-    (hE : ∀ x : E, x ≠ 0 → IsUnit x) (hinj : Function.Injective (algebraMap F E))
-    (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) :
-    ∀ x ∈ L.O, (¬ ∃ z ∈ L.O, x = algebraMap F E ϖ * z) → ∃ y ∈ L.O, x * y = 1 := by
+theorem fl_local
+    {F E : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E] [TopologicalSpace E]
+    (L : Loc.LocE F E) (hl : IsNonarchimedeanLocalField F) (hE : ∀ x : E, x ≠ 0 → IsUnit x)
+    (hinj : Function.Injective (algebraMap F E))
+    (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ)
+    : ∀ x ∈ L.O, (¬ ∃ z ∈ L.O, x = algebraMap F E ϖ * z) → ∃ y ∈ L.O, x * y = 1 := by
   intro x hx hnd
   haveI := hl
   obtain ⟨n, hn⟩ := fl_norm L hinj hx
   obtain ⟨t, ht⟩ := fl_trace L hinj hx
-  have hquad : x * x = algebraMap F E t * x - algebraMap F E n := by
-    rw [ht, hn]; ring
+  have hquad : x * x = algebraMap F E t * x - algebraMap F E n := by rw [ht, hn]; ring
   by_cases hnu : IsUnit n
   · obtain ⟨u, rfl⟩ := hnu
-    refine ⟨L.cj x * algebraMap F E ((↑u⁻¹ : 𝒪[F]) : F), mul_mem (fl_cj_mem L hx) (fl_int_mem L _), ?_⟩
+    refine
+      ⟨L.cj x * algebraMap F E ((↑u⁻¹ : 𝒪[F]) : F), mul_mem (fl_cj_mem L hx) (fl_int_mem L _), ?_⟩
     rw [← mul_assoc, ← hn, ← map_mul, ← fl_coe_mul, Units.mul_inv]
     simp
   · exfalso
@@ -59,8 +66,13 @@ theorem fl_local {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [C
       obtain ⟨t', rfl⟩ := htm
       obtain ⟨n', rfl⟩ := hnm
       have hsp : x * x ∈ Submodule.span L.O {algebraMap F E ϖ} := by
-        refine Submodule.mem_span_singleton.2 ⟨⟨algebraMap F E t' * x - algebraMap F E n',
-          sub_mem (mul_mem (fl_int_mem L t') hx) (fl_int_mem L n')⟩, ?_⟩
+        refine Submodule.mem_span_singleton.2 ⟨
+          ⟨
+            algebraMap F E t' * x - algebraMap F E n',
+            sub_mem (mul_mem (fl_int_mem L t') hx) (fl_int_mem L n')
+          ⟩,
+          ?_
+        ⟩
         rw [hquad, fl_coe_mul, fl_coe_mul, map_mul, map_mul]
         show (algebraMap F E t' * x - algebraMap F E n') * algebraMap F E ϖ = _
         ring
@@ -84,11 +96,15 @@ theorem fl_local {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [C
         exact hne.isUnit
       obtain ⟨a, ha, -⟩ := HenselianRing.is_henselian f hf 0 h0 h1
       have hroot : a ^ 2 + (n - t * a) = 0 := by simpa [f, Polynomial.IsRoot] using ha
-      have hrootE : algebraMap F E (a : F) ^ 2 + (algebraMap F E (n : F) -
-          algebraMap F E (t : F) * algebraMap F E (a : F)) = 0 := by
+      have hrootE
+          : algebraMap F E (a : F) ^ 2
+              + (algebraMap F E (n : F) - algebraMap F E (t : F) * algebraMap F E (a : F))
+            = 0 := by
         have := congrArg (fun r : 𝒪[F] => algebraMap F E (r : F)) hroot
         simpa [map_sub, map_mul, map_pow, map_add (f := _)] using this
-      have hfac : (x - algebraMap F E (a : F)) * (x - (algebraMap F E (t : F) - algebraMap F E (a : F))) = 0 := by
+      have hfac
+          : (x - algebraMap F E (a : F)) * (x - (algebraMap F E (t : F) - algebraMap F E (a : F)))
+            = 0 := by
         linear_combination hquad - hrootE
       have hxF : ∃ b : 𝒪[F], x = algebraMap F E (b : F) := by
         by_cases hxa : x - algebraMap F E (a : F) = 0

@@ -9,18 +9,23 @@ public import GroundTheory.GlobalFields.Adele.IntegersLattice
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix SchwartzMap Classical InnerProductSpace
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.KFPB
 
 open PositivityTheory.SiegelWeilFormula.KFP
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 variable {d : SD σ}
 
-theorem continuous_loc (R : RD d) (w : InfinitePlace F) : Continuous (fun X : Mx F E d.m d.n => R.loc w X) := by
+theorem continuous_loc (R : RD d) (w : InfinitePlace F)
+    : Continuous (fun X : Mx F E d.m d.n => R.loc w X) := by
   have h := Place.continuous_cw d w (p := Fin d.m) (q := Fin d.n)
   unfold RD.loc
   refine continuous_pi fun a => continuous_pi fun j => ?_
@@ -39,45 +44,59 @@ theorem continuous_arc (R : RD d) : Continuous (arc R) := by
 
 theorem continuous_fin : Continuous (fin d) := by
   unfold fin
-  exact continuous_pi fun k => continuous_snd.comp ((continuous_apply k).comp (KFock.continuous_crd d))
+  exact continuous_pi fun k =>
+    continuous_snd.comp ((continuous_apply k).comp (KFock.continuous_crd d))
 
-theorem homeo_symm_eq (x : mixedEmbedding.mixedSpace F) :
-    (GroundTheory.Global.homeomorphMixedSpace F).symm x = (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm x := by
+theorem homeo_symm_eq (x : mixedEmbedding.mixedSpace F)
+    : (GroundTheory.Global.homeomorphMixedSpace F).symm x
+      = (InfiniteAdeleRing.ringEquiv_mixedSpace F).symm x := by
   apply (InfiniteAdeleRing.ringEquiv_mixedSpace F).injective
   rw [RingEquiv.apply_symm_apply]
   exact (GroundTheory.Global.homeomorphMixedSpace F).apply_symm_apply x
 
 theorem continuous_zOf : Continuous (fun u : Iw d → ℝ => zOf u) := by
   refine continuous_pi fun w => continuous_pi fun a => continuous_pi fun j => ?_
-  have : (fun u : Iw d → ℝ => zOf u w a j) =
-      fun u => Complex.equivRealProdCLM.symm (u (w, a, j, true), u (w, a, j, false)) := by
+  have : (fun u : Iw d → ℝ => zOf u w a j)
+      = fun u => Complex.equivRealProdCLM.symm (u (w, a, j, true), u (w, a, j, false)) := by
     funext u
     rfl
   rw [this]
-  exact Complex.equivRealProdCLM.symm.continuous.comp ((continuous_apply _).prodMk (continuous_apply _))
+  exact Complex.equivRealProdCLM.symm.continuous.comp ((continuous_apply _).prodMk
+    (continuous_apply _))
 
 theorem zOf_add (u v : Iw d → ℝ) : zOf (u + v) = zOf u + zOf v := by
   funext w a j
   apply Complex.ext <;> simp [zOf]
 
-theorem jn_eq_cmb (R : RD d) :
-    ∃ cF : Vw d × Yf d → (Fin d.m × Fin d.n × Fin 2 → AF F), Continuous cF ∧
-      (∀ p q, cF (p + q) = cF p + cF q) ∧ ∀ p, jn R p.1 p.2 = d.cmb (cF p) := by
+theorem jn_eq_cmb (R : RD d)
+    : ∃ cF : Vw d × Yf d → (Fin d.m × Fin d.n × Fin 2 → AF F),
+      Continuous cF ∧ (∀ p q, cF (p + q) = cF p + cF q) ∧ ∀ p, jn R p.1 p.2 = d.cmb (cF p) := by
   obtain ⟨L, hL⟩ := KFock.archEquiv d R
   let cF : Vw d × Yf d → (Fin d.m × Fin d.n × Fin 2 → AF F) := fun p k =>
-    (Prod.mk ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm (L.symm (zOf (EuclideanSpace.equiv (Iw d) ℝ p.1)) k))
-      (p.2 k) : AF F)
+    (Prod.mk
+        ((InfiniteAdeleRing.ringEquiv_mixedSpace F).symm
+          (L.symm (zOf (EuclideanSpace.equiv (Iw d) ℝ p.1)) k))
+        (p.2 k)
+      : AF F)
   refine ⟨cF, ?_, fun p q => ?_, fun p => ?_⟩
   · refine continuous_pi fun k => ?_
-    have e : (fun p : Vw d × Yf d => cF p k) = fun p =>
-        (Prod.mk ((GroundTheory.Global.homeomorphMixedSpace F).symm (L.symm (zOf (EuclideanSpace.equiv (Iw d) ℝ p.1)) k))
-          (p.2 k) : AF F) := by
+    have e
+        : (fun p : Vw d × Yf d => cF p k)
+          = fun p =>
+            (Prod.mk
+                ((GroundTheory.Global.homeomorphMixedSpace F).symm
+                  (L.symm (zOf (EuclideanSpace.equiv (Iw d) ℝ p.1)) k))
+                (p.2 k)
+              : AF F) := by
       funext p
       simp only [cF]
       rw [homeo_symm_eq]
     rw [e]
-    exact Continuous.prodMk ((GroundTheory.Global.homeomorphMixedSpace F).symm.continuous.comp ((continuous_apply k).comp
-      (L.symm.continuous.comp (continuous_zOf.comp ((EuclideanSpace.equiv (Iw d) ℝ).continuous.comp continuous_fst)))))
+    exact Continuous.prodMk
+      ((GroundTheory.Global.homeomorphMixedSpace F).symm.continuous.comp
+        ((continuous_apply k).comp
+          (L.symm.continuous.comp (continuous_zOf.comp
+            ((EuclideanSpace.equiv (Iw d) ℝ).continuous.comp continuous_fst)))))
       ((continuous_apply k).comp continuous_snd)
   · funext k
     refine Prod.ext ?_ ?_
@@ -91,8 +110,8 @@ theorem jn_eq_cmb (R : RD d) :
     · rw [arc_eq_iff]
       intro w
       rw [← hL (cF p) w]
-      have : (fun k => InfiniteAdeleRing.ringEquiv_mixedSpace F (cF p k).1) =
-          L.symm (zOf (EuclideanSpace.equiv (Iw d) ℝ p.1)) := by
+      have : (fun k => InfiniteAdeleRing.ringEquiv_mixedSpace F (cF p k).1)
+          = L.symm (zOf (EuclideanSpace.equiv (Iw d) ℝ p.1)) := by
         funext k
         exact RingEquiv.apply_symm_apply _ _
       rw [this, ContinuousLinearEquiv.apply_symm_apply]

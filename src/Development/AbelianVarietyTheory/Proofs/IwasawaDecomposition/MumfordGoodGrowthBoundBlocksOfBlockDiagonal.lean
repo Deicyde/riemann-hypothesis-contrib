@@ -9,15 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DetBlockChan
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.LieBase
+open AlgebraicGeometry CategoryTheory MvPolynomial NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
+  GlobalTheory.LieBase
 open Classical
 open Matrix
 open scoped ComplexOrder Topology
 
 namespace GlobalTheory.GoodMetric
 
-theorem pow_le_logTwo_mul_pow {L : ℝ} {N N' k : ℕ} (hN' : N = 0 → N' = 0) (hL : N = 0 ∨ Real.log 2 ≤ L)
-    (hk : k ≤ N') : L ^ k ≤ (Real.log 2)⁻¹ ^ N' * L ^ N' := by
+theorem pow_le_logTwo_mul_pow
+    {L : ℝ} {N N' k : ℕ} (hN' : N = 0 → N' = 0) (hL : N = 0 ∨ Real.log 2 ≤ L) (hk : k ≤ N')
+    : L ^ k ≤ (Real.log 2)⁻¹ ^ N' * L ^ N' := by
   have h2 : 0 < Real.log 2 := Real.log_pos one_lt_two
   have h2' : Real.log 2 < 1 := by have := Real.log_two_lt_d9; linarith
   have hD : 1 ≤ (Real.log 2)⁻¹ ^ N' := one_le_pow₀ (one_le_inv₀ h2 |>.2 h2'.le)
@@ -29,16 +33,22 @@ theorem pow_le_logTwo_mul_pow {L : ℝ} {N N' k : ℕ} (hN' : N = 0 → N' = 0) 
     simp
   · have hL0 : 0 < L := h2.trans_le hL
     rcases le_or_gt 1 L with h1 | h1
-    · calc L ^ k ≤ L ^ N' := pow_le_pow_right₀ h1 hk
+    · calc
+        L ^ k
+          ≤ L ^ N' := pow_le_pow_right₀ h1 hk
         _ = 1 * L ^ N' := (one_mul _).symm
         _ ≤ _ := mul_le_mul_of_nonneg_right hD (by positivity)
-    · calc L ^ k ≤ 1 := pow_le_one₀ hL0.le h1.le
-        _ ≤ (L * (Real.log 2)⁻¹) ^ N' := one_le_pow₀ (by rw [← div_eq_mul_inv, one_le_div h2]; exact hL)
+    · calc
+        L ^ k
+          ≤ 1 := pow_le_one₀ hL0.le h1.le
+        _ ≤ (L * (Real.log 2)⁻¹) ^ N' :=
+          one_le_pow₀ (by rw [← div_eq_mul_inv, one_le_div h2]; exact hL)
         _ = _ := by rw [mul_pow, mul_comm]
 
-theorem sum_abs_log_eq_zero_or_ge {n : ℕ} (S : Finset (Fin n)) (v : ReciprocityTheory.L2DbarEstimates.V n)
-    (hS : ∀ a ∈ S, ‖v a‖ < 1 / 2) :
-    ∑ a ∈ S, |Real.log ‖v a‖| = 0 ∨ Real.log 2 ≤ ∑ a ∈ S, |Real.log ‖v a‖| := by
+theorem sum_abs_log_eq_zero_or_ge
+    {n : ℕ}
+    (S : Finset (Fin n)) (v : ReciprocityTheory.L2DbarEstimates.V n) (hS : ∀ a ∈ S, ‖v a‖ < 1 / 2)
+    : ∑ a ∈ S, |Real.log ‖v a‖| = 0 ∨ Real.log 2 ≤ ∑ a ∈ S, |Real.log ‖v a‖| := by
   by_cases h : ∀ a ∈ S, |Real.log ‖v a‖| = 0
   · exact Or.inl (Finset.sum_eq_zero h)
   · push_neg at h
@@ -51,13 +61,24 @@ theorem sum_abs_log_eq_zero_or_ge {n : ℕ} (S : Finset (Fin n)) (v : Reciprocit
       rw [one_div, Real.log_inv] at hlt
       rw [abs_of_neg (by linarith [Real.log_pos one_lt_two])]
       linarith
-    exact hl.trans (Finset.single_le_sum (f := fun a => |Real.log ‖v a‖|) (fun _ _ => abs_nonneg _) ha)
+    exact hl.trans
+      (Finset.single_le_sum (f := fun a => |Real.log ‖v a‖|) (fun _ _ => abs_nonneg _) ha)
 
 end GlobalTheory.GoodMetric
 
 namespace GlobalTheory.GoodMetric
 
-theorem goodBound_of_blockDiagonal' : ∀ (n : ℕ) (S : Finset (Fin n)) (ι : Type) [Fintype ι] [DecidableEq ι] (m : ι → ℕ) (G : ∀ τ : ι, ReciprocityTheory.L2DbarEstimates.V n → Matrix (Fin (m τ)) (Fin (m τ)) ℂ) (c : ℝ) (N : ℕ), ∃ (c' : ℝ) (N' : ℕ), ∀ v : ReciprocityTheory.L2DbarEstimates.V n, (∀ a ∈ S, ‖v a‖ < 1 / 2) → (Matrix.blockDiagonal' fun τ => G τ v).det ≠ 0 → (∀ p q, ContDiffAt ℝ 2 (fun u => (Matrix.blockDiagonal' fun τ => G τ u) p q) v) → GlobalTheory.GoodMetric.GoodBound S c N (fun u => Matrix.blockDiagonal' fun τ => G τ u) v → ∀ τ, GlobalTheory.GoodMetric.GoodBound S c' N' (G τ) v := by
+theorem goodBound_of_blockDiagonal'
+    : ∀ (n : ℕ) (S : Finset (Fin n)) (ι : Type) [Fintype ι] [DecidableEq ι] (m : ι → ℕ)
+        (G : ∀ τ : ι, ReciprocityTheory.L2DbarEstimates.V n → Matrix (Fin (m τ)) (Fin (m τ)) ℂ)
+        (c : ℝ) (N : ℕ),
+      ∃ (c' : ℝ) (N' : ℕ), ∀ v : ReciprocityTheory.L2DbarEstimates.V n,
+        (∀ a ∈ S, ‖v a‖ < 1 / 2) → (Matrix.blockDiagonal' fun τ => G τ v).det ≠ 0
+          → (∀ p q, ContDiffAt ℝ 2 (fun u => (Matrix.blockDiagonal' fun τ => G τ u) p q) v)
+          → GlobalTheory.GoodMetric.GoodBound S c N
+            (fun u => Matrix.blockDiagonal' fun τ => G τ u)
+            v
+          → ∀ τ, GlobalTheory.GoodMetric.GoodBound S c' N' (G τ) v := by
   intro n S ι _ _ m G c N
   set K := ∑ τ, m τ
   set N' := N * (K + 1)
@@ -87,12 +108,15 @@ theorem goodBound_of_blockDiagonal' : ∀ (n : ℕ) (S : Finset (Fin n)) (ι : T
   have hF : 1 ≤ F := by
     have : F = ((∏ τ, (m τ).factorial : ℕ) : ℝ) := by simp [F]
     rw [this]
-    exact_mod_cast Nat.one_le_iff_ne_zero.2 (Finset.prod_ne_zero_iff.2 fun _ _ => Nat.factorial_ne_zero _)
-  have hD : 1 ≤ D := one_le_pow₀ ((one_le_inv₀ (Real.log_pos one_lt_two)).2
-    (by have := Real.log_two_lt_d9; linarith))
+    exact_mod_cast Nat.one_le_iff_ne_zero.2 (Finset.prod_ne_zero_iff.2 fun _ _ =>
+      Nat.factorial_ne_zero _)
+  have hD : 1 ≤ D :=
+    one_le_pow₀ ((one_le_inv₀ (Real.log_pos one_lt_two)).2
+      (by have := Real.log_two_lt_d9; linarith))
   have hM1 : 1 ≤ max 1 c := le_max_left _ _
   have hcF : c ≤ F * (max 1 c) ^ (K + 1) :=
-    calc c ≤ max 1 c := le_max_right _ _
+    calc
+      c ≤ max 1 c := le_max_right _ _
       _ ≤ (max 1 c) ^ (K + 1) := le_self_pow₀ hM1 (by omega)
       _ = 1 * (max 1 c) ^ (K + 1) := (one_mul _).symm
       _ ≤ _ := mul_le_mul_of_nonneg_right hF (by positivity)
@@ -110,29 +134,42 @@ theorem goodBound_of_blockDiagonal' : ∀ (n : ℕ) (S : Finset (Fin n)) (ι : T
   have hCτ : ∀ τ', GlobalTheory.HermFrame.MContDiffAt 2 (G τ') v := fun τ' i j => by
     have := hC ⟨τ', i⟩ ⟨τ', j⟩
     simpa [Matrix.blockDiagonal'_apply_eq] using this
-  have hconn : ∀ ξ, GlobalTheory.HermFrame.conn (fun u => Matrix.blockDiagonal' fun τ => G τ u) v ξ =
-      Matrix.blockDiagonal' fun τ => GlobalTheory.HermFrame.conn (G τ) v ξ := fun ξ =>
+  have hconn
+      : ∀ ξ,
+        GlobalTheory.HermFrame.conn (fun u => Matrix.blockDiagonal' fun τ => G τ u) v ξ
+          = Matrix.blockDiagonal' fun τ => GlobalTheory.HermFrame.conn (G τ) v ξ := fun ξ =>
     GlobalTheory.HermFrame.conn_blockDiagonal' hunit ξ
-  have hcurv : ∀ ξ η, GlobalTheory.HermFrame.curv (fun u => Matrix.blockDiagonal' fun τ => G τ u) v ξ η =
-      Matrix.blockDiagonal' fun τ => GlobalTheory.HermFrame.curv (G τ) v ξ η := fun ξ η =>
+  have hcurv
+      : ∀ ξ η,
+        GlobalTheory.HermFrame.curv (fun u => Matrix.blockDiagonal' fun τ => G τ u) v ξ η
+          = Matrix.blockDiagonal' fun τ => GlobalTheory.HermFrame.curv (G τ) v ξ η := fun ξ η =>
     GlobalTheory.HermFrame.curv_blockDiagonal' hCτ hunit ξ η
-  have hdel : ∀ ξ η, GlobalTheory.HermFrame.mdel (fun u => GlobalTheory.HermFrame.conn
-      (fun u => Matrix.blockDiagonal' fun τ => G τ u) u ξ) v η =
-      Matrix.blockDiagonal' fun τ => GlobalTheory.HermFrame.mdel (fun u => GlobalTheory.HermFrame.conn (G τ) u ξ) v η := by
+  have hdel
+      : ∀ ξ η,
+        GlobalTheory.HermFrame.mdel
+            (fun u =>
+              GlobalTheory.HermFrame.conn (fun u => Matrix.blockDiagonal' fun τ => G τ u) u ξ)
+            v η
+          = Matrix.blockDiagonal' fun τ =>
+            GlobalTheory.HermFrame.mdel (fun u => GlobalTheory.HermFrame.conn (G τ) u ξ) v η := by
     intro ξ η
-    have he : (fun u => GlobalTheory.HermFrame.conn (fun u => Matrix.blockDiagonal' fun τ => G τ u) u ξ) =ᶠ[𝓝 v]
-        fun u => Matrix.blockDiagonal' fun τ => GlobalTheory.HermFrame.conn (G τ) u ξ :=
-      (Filter.eventually_all.2 fun i => (hCτ i).eventually_isUnit (hunit i)).mono
-        fun x hx => GlobalTheory.HermFrame.conn_blockDiagonal' hx ξ
+    have he
+        : (fun u => GlobalTheory.HermFrame.conn (fun u => Matrix.blockDiagonal' fun τ => G τ u) u ξ) =ᶠ[𝓝 v]
+          fun u => Matrix.blockDiagonal' fun τ => GlobalTheory.HermFrame.conn (G τ) u ξ :=
+      (Filter.eventually_all.2 fun i => (hCτ i).eventually_isUnit (hunit i)).mono fun x hx =>
+        GlobalTheory.HermFrame.conn_blockDiagonal' hx ξ
     rw [GlobalTheory.HermFrame.mdel_congr he, GlobalTheory.HermFrame.mdel_blockDiagonal']
 
   set e := c * L ^ N
   set M := max 1 e
   have hM : 1 ≤ M := le_max_left _ _
   have hdetle : ∀ τ', ‖(G τ' v).det‖ ≤ ((m τ').factorial : ℝ) * M ^ m τ' := fun τ' => by
-    have := Matrix.det_le (abv := NormedField.toAbsoluteValue ℂ) (A := G τ' v) (x := M)
-      fun i j => (hent τ' i j).trans (le_max_right _ _)
-    calc ‖(G τ' v).det‖ = (NormedField.toAbsoluteValue ℂ) (G τ' v).det := rfl
+    have :=
+      Matrix.det_le (abv := NormedField.toAbsoluteValue ℂ) (A := G τ' v) (x := M) fun i j =>
+        (hent τ' i j).trans (le_max_right _ _)
+    calc
+      ‖(G τ' v).det‖
+        = (NormedField.toAbsoluteValue ℂ) (G τ' v).det := rfl
       _ ≤ _ := this
       _ = _ := by simp [Fintype.card_fin, nsmul_eq_mul]
   set P := ∏ τ' ∈ Finset.univ.erase τ, ‖(G τ' v).det‖
@@ -144,8 +181,9 @@ theorem goodBound_of_blockDiagonal' : ∀ (n : ℕ) (S : Finset (Fin n)) (ι : T
   have hPle : P ≤ F * M ^ K := by
     have h1 : P ≤ ∏ τ' ∈ Finset.univ.erase τ, ((m τ').factorial : ℝ) * M ^ m τ' :=
       Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) fun τ' _ => hdetle τ'
-    have h2 : ∏ τ' ∈ Finset.univ.erase τ, ((m τ').factorial : ℝ) * M ^ m τ' ≤
-        ∏ τ', ((m τ').factorial : ℝ) * M ^ m τ' := by
+    have h2
+        : ∏ τ' ∈ Finset.univ.erase τ, ((m τ').factorial : ℝ) * M ^ m τ'
+          ≤ ∏ τ', ((m τ').factorial : ℝ) * M ^ m τ' := by
       rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ τ)]
       refine le_mul_of_one_le_left (Finset.prod_nonneg fun _ _ => by positivity) ?_
       exact one_le_mul_of_one_le_of_one_le
@@ -161,18 +199,23 @@ theorem goodBound_of_blockDiagonal' : ∀ (n : ℕ) (S : Finset (Fin n)) (ι : T
     · rw [max_eq_right h, ← pow_mul]; exact key _ le_rfl
     · rw [max_eq_left h, one_pow]; simpa using key 0 (Nat.zero_le _)
   refine ⟨fun i j => ?_, ?_, fun a i j => ?_, fun a b i j => ?_, fun a b i j => ?_⟩
-  · calc ‖G τ v i j‖ ≤ c * L ^ N := hent τ i j
-      _ ≤ c * (D * L ^ N') := mul_le_mul_of_nonneg_left (key N (by simp [N']; exact Nat.le_mul_of_pos_right _ (by omega))) hc.le
+  · calc
+      ‖G τ v i j‖
+        ≤ c * L ^ N := hent τ i j
+      _ ≤ c * (D * L ^ N') :=
+        mul_le_mul_of_nonneg_left (key N (by simp [N']; exact Nat.le_mul_of_pos_right _ (by omega)))
+          hc.le
       _ = c * D * L ^ N' := by ring
       _ ≤ F * (max 1 c) ^ (K + 1) * D * L ^ N' :=
         mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hcF (by positivity)) (by positivity)
   · rw [hinv]
-    calc ‖(Matrix.blockDiagonal' fun τ => G τ v).det‖⁻¹ * P ≤ e * (F * M ^ K) :=
-          mul_le_mul hG.det hPle hP0.le hcY.le
+    calc
+      ‖(Matrix.blockDiagonal' fun τ => G τ v).det‖⁻¹ * P
+        ≤ e * (F * M ^ K) := mul_le_mul hG.det hPle hP0.le hcY.le
       _ ≤ M * (F * M ^ K) := mul_le_mul_of_nonneg_right (le_max_right _ _) (by positivity)
       _ = F * M ^ (K + 1) := by ring
       _ ≤ F * (max 1 c * max 1 (L ^ N)) ^ (K + 1) :=
-          mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by positivity) hMle _) (by positivity)
+        mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by positivity) hMle _) (by positivity)
       _ = F * (max 1 c) ^ (K + 1) * (max 1 (L ^ N)) ^ (K + 1) := by ring
       _ ≤ F * (max 1 c) ^ (K + 1) * (D * L ^ N') := mul_le_mul_of_nonneg_left hMY (by positivity)
       _ = _ := by ring
@@ -183,8 +226,9 @@ theorem goodBound_of_blockDiagonal' : ∀ (n : ℕ) (S : Finset (Fin n)) (ι : T
     rw [hcurv, Matrix.blockDiagonal'_apply_eq] at this
     exact this.trans hcc'
   · have := hG.del a b ⟨τ, i⟩ ⟨τ, j⟩
-    rw [hdel, hdel, Matrix.sub_apply, Matrix.blockDiagonal'_apply_eq, Matrix.blockDiagonal'_apply_eq,
-      ← Matrix.sub_apply] at this
+    rw [hdel, hdel, Matrix.sub_apply, Matrix.blockDiagonal'_apply_eq,
+        Matrix.blockDiagonal'_apply_eq, ← Matrix.sub_apply]
+      at this
     exact this.trans hcc'
 
 end GlobalTheory.GoodMetric

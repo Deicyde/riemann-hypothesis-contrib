@@ -17,7 +17,7 @@ namespace GlobalTheory.CompactDualSwap
 variable {P Q P' Q' : ℕ}
 
 def AntiIso (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') : Prop :=
-  (Formalism.UG.Jpq P Q).submatrix e.symm e.symm = -Formalism.UG.Jpq P' Q'
+  (Formalism.UG.Jpq P Q).submatrix e.symm e.symm = - Formalism.UG.Jpq P' Q'
 
 theorem AntiIso.symm {e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q'} (h : AntiIso e) : AntiIso e.symm := by
   unfold AntiIso at *
@@ -29,29 +29,34 @@ theorem AntiIso.symm {e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q'} (h : AntiIso e)
 def grpHom (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) : UpqT P Q →* UpqT P' Q' :=
   let f : Formalism.UG.Upq P Q →* GL (Fin P' ⊕ Fin Q') ℂ :=
     (Units.map (Matrix.reindexAlgEquiv ℂ ℂ e).toMonoidHom).comp (Formalism.UG.Upq P Q).subtype
-  let f' : Formalism.UG.Upq P Q →* Formalism.UG.Upq P' Q' := f.codRestrict _ (by
-    rintro ⟨g, hg⟩
-    change Formalism.UG.cT _ g.val * _ * g.val = _ at hg
-    change Formalism.UG.cT _ (g.val.submatrix e.symm e.symm) * _ *
-      (g.val.submatrix e.symm e.symm) = _
-    have h2 : Formalism.UG.Jpq P' Q' = -(Formalism.UG.Jpq P Q).submatrix e.symm e.symm := by
-      rw [h, neg_neg]
-    have h3 : Formalism.UG.cT (starRingEnd ℂ) (g.val.submatrix e.symm e.symm) =
-      (Formalism.UG.cT (starRingEnd ℂ) g.val).submatrix e.symm e.symm := rfl
-    rw [h2, h3, Matrix.mul_neg, Matrix.neg_mul, Matrix.submatrix_mul_equiv,
-      Matrix.submatrix_mul_equiv, hg])
+  let f' : Formalism.UG.Upq P Q →* Formalism.UG.Upq P' Q' :=
+    f.codRestrict _ (by
+      rintro ⟨g, hg⟩
+      change Formalism.UG.cT _ g.val * _ * g.val = _ at hg
+      change Formalism.UG.cT _ (g.val.submatrix e.symm e.symm) * _ * (g.val.submatrix e.symm e.symm)
+        = _
+      have h2 : Formalism.UG.Jpq P' Q' = - (Formalism.UG.Jpq P Q).submatrix e.symm e.symm := by
+        rw [h, neg_neg]
+      have h3
+          : Formalism.UG.cT (starRingEnd ℂ) (g.val.submatrix e.symm e.symm)
+            = (Formalism.UG.cT (starRingEnd ℂ) g.val).submatrix e.symm e.symm :=
+        rfl
+      rw [h2, h3, Matrix.mul_neg, Matrix.neg_mul, Matrix.submatrix_mul_equiv,
+        Matrix.submatrix_mul_equiv, hg])
   f'
 
-theorem mat_grpHom (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) (g : UpqT P Q) :
-    (grpHom e h g).mat = g.mat.submatrix e.symm e.symm := rfl
+theorem mat_grpHom (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) (g : UpqT P Q)
+    : (grpHom e h g).mat = g.mat.submatrix e.symm e.symm :=
+  rfl
 
 theorem mat_injective : Function.Injective (UpqT.mat : UpqT P Q → _) :=
   (GlobalTheory.UpqTopology.upq_lcsc P Q).2.2.2.2.2.injective
 
-theorem continuous_grpHom (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) :
-    Continuous (grpHom e h) := by
+theorem continuous_grpHom (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e)
+    : Continuous (grpHom e h) := by
   rw [(GlobalTheory.UpqTopology.upq_lcsc P' Q').2.2.2.2.2.isInducing.continuous_iff]
-  exact ((GlobalTheory.UpqTopology.upq_lcsc P Q).2.2.2.2.2.continuous).matrix_submatrix e.symm e.symm
+  exact ((GlobalTheory.UpqTopology.upq_lcsc P Q).2.2.2.2.2.continuous).matrix_submatrix e.symm
+    e.symm
 
 def grpEquiv (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) : UpqT P Q ≃ₜ* UpqT P' Q' where
   toFun := grpHom e h
@@ -62,12 +67,13 @@ def grpEquiv (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) : UpqT 
   continuous_toFun := continuous_grpHom e h
   continuous_invFun := continuous_grpHom e.symm h.symm
 
-theorem lie_mem (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) (X : lieU P Q) :
-    X.val.submatrix e.symm e.symm ∈ lieU P' Q' := by
+theorem lie_mem (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) (X : lieU P Q)
+    : X.val.submatrix e.symm e.symm ∈ lieU P' Q' := by
   have hX : X.valᴴ * Formalism.UG.Jpq P Q + Formalism.UG.Jpq P Q * X.val = 0 := X.2
-  change (X.val.submatrix e.symm e.symm)ᴴ * Formalism.UG.Jpq P' Q' +
-    Formalism.UG.Jpq P' Q' * X.val.submatrix e.symm e.symm = 0
-  have h2 : Formalism.UG.Jpq P' Q' = -(Formalism.UG.Jpq P Q).submatrix e.symm e.symm := by
+  change (X.val.submatrix e.symm e.symm)ᴴ * Formalism.UG.Jpq P' Q'
+      + Formalism.UG.Jpq P' Q' * X.val.submatrix e.symm e.symm
+    = 0
+  have h2 : Formalism.UG.Jpq P' Q' = - (Formalism.UG.Jpq P Q).submatrix e.symm e.symm := by
     rw [h, neg_neg]
   rw [h2, Matrix.conjTranspose_submatrix, Matrix.mul_neg, Matrix.neg_mul,
     Matrix.submatrix_mul_equiv, Matrix.submatrix_mul_equiv, ← neg_add, neg_eq_zero]
@@ -84,11 +90,12 @@ def lieEquiv (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) : lieU 
   continuous_toFun := (continuous_subtype_val.matrix_submatrix e.symm e.symm).subtype_mk _
   continuous_invFun := (continuous_subtype_val.matrix_submatrix e e).subtype_mk _
 
-theorem coe_lieEquiv (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) (X : lieU P Q) :
-    ((lieEquiv e h X : lieU P' Q') : Matrix _ _ ℂ) = X.val.submatrix e.symm e.symm := rfl
+theorem coe_lieEquiv (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) (X : lieU P Q)
+    : ((lieEquiv e h X : lieU P' Q') : Matrix _ _ ℂ) = X.val.submatrix e.symm e.symm :=
+  rfl
 
-theorem mem_ball (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) (X : lieU P Q) (r : ℝ) :
-    lieEquiv e h X ∈ ballU P' Q' r ↔ X ∈ ballU P Q r := by
+theorem mem_ball (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) (X : lieU P Q) (r : ℝ)
+    : lieEquiv e h X ∈ ballU P' Q' r ↔ X ∈ ballU P Q r := by
   simp only [ballU, Set.mem_ofPred_eq, coe_lieEquiv, submatrix_apply]
   have : ∑ i, ∑ j, ‖X.val (e.symm i) (e.symm j)‖ = ∑ i, ∑ j, ‖X.val i j‖ := by
     rw [← e.symm.sum_comp (fun i => ∑ j, ‖X.val i j‖)]
@@ -96,14 +103,17 @@ theorem mem_ball (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e) (X 
   rw [this]
 
 open scoped Matrix.Norms.Operator in
-theorem exp_submatrix {m n : Type} [Fintype m] [Fintype n] [DecidableEq m] [DecidableEq n]
-    (e : m ≃ n) (X : Matrix m m ℂ) :
-    NormedSpace.exp (X.submatrix e.symm e.symm) = (NormedSpace.exp X).submatrix e.symm e.symm :=
-  (NormedSpace.map_exp (Matrix.reindexAlgEquiv ℂ ℂ e)
-    (continuous_id.matrix_submatrix e.symm e.symm) X).symm
+theorem exp_submatrix
+    {m n : Type} [Fintype m] [Fintype n] [DecidableEq m] [DecidableEq n]
+    (e : m ≃ n) (X : Matrix m m ℂ)
+    : NormedSpace.exp (X.submatrix e.symm e.symm) = (NormedSpace.exp X).submatrix e.symm e.symm :=
+  (NormedSpace.map_exp (Matrix.reindexAlgEquiv ℂ ℂ e) (continuous_id.matrix_submatrix e.symm e.symm)
+    X).symm
 
-theorem isOmegaLeb_map (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e)
-    (lam : Measure (lieU P Q)) (hl : IsOmegaLeb lam) : IsOmegaLeb (lam.map (lieEquiv e h)) := by
+theorem isOmegaLeb_map
+    (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e)
+    (lam : Measure (lieU P Q)) (hl : IsOmegaLeb lam)
+    : IsOmegaLeb (lam.map (lieEquiv e h)) := by
   have : BorelSpace (lieU P Q) := ⟨rfl⟩
   have : BorelSpace (lieU P' Q') := ⟨rfl⟩
   have : SecondCountableTopology (Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) :=
@@ -116,15 +126,20 @@ theorem isOmegaLeb_map (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso 
   obtain ⟨h1, h2⟩ := hl
   refine ⟨(lieEquiv e h).isAddHaarMeasure_map lam, ?_⟩
   have hm : Measurable (lieEquiv e h) := (lieEquiv e h).continuous.measurable
-  have hc : ∀ A B : ℕ, Continuous (fun ab : lieU A B × lieU A B =>
-      entries ((ab.1 : Matrix (Fin A ⊕ Fin B) (Fin A ⊕ Fin B) ℂ) +
-        Complex.I • (ab.2 : Matrix (Fin A ⊕ Fin B) (Fin A ⊕ Fin B) ℂ))) := by
+  have hc
+      : ∀ A B : ℕ,
+        Continuous (fun ab : lieU A B × lieU A B =>
+          entries
+            ((ab.1 : Matrix (Fin A ⊕ Fin B) (Fin A ⊕ Fin B) ℂ)
+              + Complex.I • (ab.2 : Matrix (Fin A ⊕ Fin B) (Fin A ⊕ Fin B) ℂ))) := by
     intro A B
     refine continuous_pi fun ij => ?_
     exact ((continuous_subtype_val.comp continuous_fst).add
       ((continuous_subtype_val.comp continuous_snd).const_smul Complex.I)).matrix_elem ij.1 ij.2
-  have hv := volume_measurePreserving_piCongrLeft
-    (fun _ : (Fin P' ⊕ Fin Q') × (Fin P' ⊕ Fin Q') => ℂ) (e.prodCongr e)
+  have hv :=
+    volume_measurePreserving_piCongrLeft
+      (fun _ : (Fin P' ⊕ Fin Q') × (Fin P' ⊕ Fin Q') => ℂ)
+      (e.prodCongr e)
   rw [Measure.map_prod_map _ _ hm hm, Measure.map_map (hc P' Q').measurable (hm.prodMap hm),
     ← hv.map_eq, ← h2, Measure.map_map hv.measurable (hc P Q).measurable]
   congr 1
@@ -133,9 +148,10 @@ theorem isOmegaLeb_map (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso 
   simp only [Function.comp_apply, MeasurableEquiv.piCongrLeft_apply_apply]
   simp [entries, coe_lieEquiv]
 
-theorem omegaDensity_map (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e)
-    (μ : Measure (UpqT P Q)) (c : ENNReal) (hμ : OmegaDensity μ c) :
-    OmegaDensity (μ.map (grpEquiv e h)) c := by
+theorem omegaDensity_map
+    (e : Fin P ⊕ Fin Q ≃ Fin P' ⊕ Fin Q') (h : AntiIso e)
+    (μ : Measure (UpqT P Q)) (c : ENNReal) (hμ : OmegaDensity μ c)
+    : OmegaDensity (μ.map (grpEquiv e h)) c := by
   have : BorelSpace (lieU P Q) := ⟨rfl⟩
   have : BorelSpace (lieU P' Q') := ⟨rfl⟩
   have : BorelSpace (UpqT P Q) := ⟨rfl⟩

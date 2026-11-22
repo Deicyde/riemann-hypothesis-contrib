@@ -13,9 +13,9 @@ open scoped nonZeroDivisors
 
 namespace GlobalTheory.CompanionTheory.PartialZeta
 
-theorem infiniteEmbedding_mem_standardOpenSubgroup {F : Type*} [Field F] [NumberField F]
-    (w : InfinitePlace F) (a : (w.Completion)ˣ) :
-    infiniteEmbedding w a ∈ standardOpenSubgroup F := by
+theorem infiniteEmbedding_mem_standardOpenSubgroup
+    {F : Type*} [Field F] [NumberField F] (w : InfinitePlace F) (a : (w.Completion)ˣ)
+    : infiniteEmbedding w a ∈ standardOpenSubgroup F := by
   refine (mem_standardOpenSubgroup F).2 fun v ↦ ?_
   have h1 : ((infiniteEmbedding w a : IdeleGroup F) : AdeleRing (𝓞 F) F).2 v = 1 := by
     rw [coe_infiniteEmbedding]
@@ -26,17 +26,20 @@ theorem infiniteEmbedding_mem_standardOpenSubgroup {F : Type*} [Field F] [Number
   rw [h1, h2]
   exact ⟨one_mem _, one_mem _⟩
 
-theorem infiniteParams_eq_zero {F : Type*} [Field F] [NumberField F] (χ : HeckeCharacter F)
-    (hχ : standardOpenSubgroup F ≤ χ.toIdele.ker) (w : InfinitePlace F) :
-    χ.infiniteParams w = (0, 0) := by
+theorem infiniteParams_eq_zero
+    {F : Type*} [Field F] [NumberField F]
+    (χ : HeckeCharacter F) (hχ : standardOpenSubgroup F ≤ χ.toIdele.ker)
+    (w : InfinitePlace F)
+    : χ.infiniteParams w = (0, 0) := by
   refine (χ.infiniteParams_unique w (p := (0, 0)) (fun _ ↦ ⟨le_rfl, by norm_num⟩) fun a ↦ ?_).symm
   have h : χ.toIdele (infiniteEmbedding w a) = 1 :=
     hχ (infiniteEmbedding_mem_standardOpenSubgroup w a)
   simp [HeckeCharacter.infiniteComponent_apply, h]
 
-theorem gammaFactor_eq_of_unramified : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
-    (χ : HeckeCharacter F), standardOpenSubgroup F ≤ χ.toIdele.ker →
-    ∀ s : ℂ, χ.gammaFactor s = Complex.Gammaℝ s ^ Module.finrank ℚ F := by
+theorem gammaFactor_eq_of_unramified
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (χ : HeckeCharacter F),
+      standardOpenSubgroup F ≤ χ.toIdele.ker
+        → ∀ s : ℂ, χ.gammaFactor s = Complex.Gammaℝ s ^ Module.finrank ℚ F := by
   intro F _ _ _ χ hχ s
   have hw : ∀ w : InfinitePlace F, χ.infiniteGamma w s = Complex.Gammaℝ s := fun w ↦ by
     have hr : w.IsReal := IsTotallyReal.isReal w

@@ -9,13 +9,17 @@ open PositivityTheory.Rg.Tf.Loc
 
 namespace GlobalTheory.CompanionTheory.Tf.Loc
 
-theorem isUnitIntegral_of_conj_mem_unitGL {F : Type} [Field F] [ValuativeRel F] {n : ℕ}
-    (γ g : GL (Fin n) F) (h : g⁻¹ * γ * g ∈ unitGL (n := Fin n) F) : IsUnitIntegral γ := by
+theorem isUnitIntegral_of_conj_mem_unitGL
+    {F : Type} [Field F] [ValuativeRel F]
+    {n : ℕ} (γ g : GL (Fin n) F) (h : g⁻¹ * γ * g ∈ unitGL (n := Fin n) F)
+    : IsUnitIntegral γ := by
   obtain ⟨u, hu⟩ := h
-  have hcp : (γ : Matrix (Fin n) (Fin n) F).charpoly =
-      ((u : Matrix (Fin n) (Fin n) (intO F)).charpoly).map (intO F).subtype := by
-    have h1 : ((g⁻¹ * γ * g : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).charpoly =
-        (γ : Matrix (Fin n) (Fin n) F).charpoly := by
+  have hcp
+      : (γ : Matrix (Fin n) (Fin n) F).charpoly
+        = ((u : Matrix (Fin n) (Fin n) (intO F)).charpoly).map (intO F).subtype := by
+    have h1
+        : ((g⁻¹ * γ * g : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).charpoly
+          = (γ : Matrix (Fin n) (Fin n) F).charpoly := by
       rw [Units.val_mul, Units.val_mul, Matrix.coe_units_inv, Matrix.charpoly_units_conj']
     rw [← h1, ← hu, ← Matrix.charpoly_map]
     rfl
@@ -31,12 +35,14 @@ theorem isUnitIntegral_of_conj_mem_unitGL {F : Type} [Field F] [ValuativeRel F] 
       exact isUnit_of_mul_isUnit_right hdet
     exact hint.isUnit_iff_valuation_eq_one.1 hc
 
-theorem normGL_mem_unitGL {k E : Type} [Field k] [Field E] [ValuativeRel E] [Algebra k E] {n : ℕ}
+theorem normGL_mem_unitGL
+    {k E : Type} [Field k] [Field E] [ValuativeRel E] [Algebra k E]
+    {n : ℕ}
     (σ : E ≃ₐ[k] E)
     (hστ : ∀ (τ : E ≃ₐ[k] E) (g : GL (Fin n) E),
       sigmaGL τ g ∈ unitGL (n := Fin n) E ↔ g ∈ unitGL (n := Fin n) E)
-    {u : GL (Fin n) E} (hu : u ∈ unitGL (n := Fin n) E) :
-    normGL σ u ∈ unitGL (n := Fin n) E := by
+    {u : GL (Fin n) E} (hu : u ∈ unitGL (n := Fin n) E)
+    : normGL σ u ∈ unitGL (n := Fin n) E := by
   refine Subgroup.list_prod_mem _ ?_
   intro x hx
   obtain ⟨i, -, rfl⟩ := List.mem_map.1 hx

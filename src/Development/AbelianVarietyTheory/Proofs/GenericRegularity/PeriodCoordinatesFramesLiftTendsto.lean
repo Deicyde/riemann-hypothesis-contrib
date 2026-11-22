@@ -10,13 +10,15 @@ open scoped Matrix
 
 namespace GlobalTheory.PeriodLift
 
-theorem exists_matrix_lift {r : ℕ} {ι : Type} {𝓕 : Filter ι} (p : Fin r → Prop) [DecidablePred p]
-    (A₀ : Matrix (Fin r) (Fin r) ℂ) (A : ι → Matrix (Fin r) (Fin r) ℂ)
-    (h0 : A₀.det ≠ 0) (hA : ∀ᶠ n in 𝓕, (A n).det ≠ 0)
-    (hc : ∀ a, p a → ∀ k, Tendsto (fun n => A n k a) 𝓕 (𝓝 (A₀ k a)))
-    (hr : ∀ a, ¬ p a → ∀ k, Tendsto (fun n => (A n)⁻¹ a k) 𝓕 (𝓝 (A₀⁻¹ a k))) :
-    ∃ B : ι → Matrix (Fin r) (Fin r) ℂ, Tendsto B 𝓕 (𝓝 A₀) ∧ ∀ᶠ n in 𝓕,
-      (∀ a, p a → ∀ k, B n k a = A n k a) ∧ (∀ a, ¬ p a → ∀ k, (B n)⁻¹ a k = (A n)⁻¹ a k) := by
+theorem exists_matrix_lift
+    {r : ℕ} {ι : Type} {𝓕 : Filter ι} (p : Fin r → Prop) [DecidablePred p]
+    (A₀ : Matrix (Fin r) (Fin r) ℂ) (A : ι → Matrix (Fin r) (Fin r) ℂ) (h0 : A₀.det ≠ 0)
+    (hA : ∀ᶠ n in 𝓕, (A n).det ≠ 0) (hc : ∀ a, p a → ∀ k, Tendsto (fun n => A n k a) 𝓕 (𝓝 (A₀ k a)))
+    (hr : ∀ a, ¬ p a → ∀ k, Tendsto (fun n => (A n)⁻¹ a k) 𝓕 (𝓝 (A₀⁻¹ a k)))
+    : ∃ B : ι → Matrix (Fin r) (Fin r) ℂ,
+      Tendsto B 𝓕 (𝓝 A₀)
+        ∧ ∀ᶠ n in 𝓕,
+          (∀ a, p a → ∀ k, B n k a = A n k a) ∧ (∀ a, ¬ p a → ∀ k, (B n)⁻¹ a k = (A n)⁻¹ a k) := by
   set Q : ι → Matrix (Fin r) (Fin r) ℂ :=
     fun n => Matrix.of fun k a => if p a then A n k a else A₀ k a with hQdef
   set D : ι → Matrix (Fin r) (Fin r) ℂ :=
@@ -27,8 +29,7 @@ theorem exists_matrix_lift {r : ℕ} {ι : Type} {𝓕 : Filter ι} (p : Fin r �
     by_cases h : p a
     · simpa [hQdef, h] using hc a h k
     · simpa [hQdef, h] using tendsto_const_nhds
-  have hQ : Tendsto Q 𝓕 (𝓝 A₀) :=
-    tendsto_pi_nhds.2 fun k => tendsto_pi_nhds.2 fun a => hQe k a
+  have hQ : Tendsto Q 𝓕 (𝓝 A₀) := tendsto_pi_nhds.2 fun k => tendsto_pi_nhds.2 fun a => hQe k a
   have hD : Tendsto D 𝓕 (𝓝 1) := by
     refine tendsto_pi_nhds.2 fun a => tendsto_pi_nhds.2 fun j => ?_
     by_cases h : p a
@@ -47,8 +48,7 @@ theorem exists_matrix_lift {r : ℕ} {ι : Type} {𝓕 : Filter ι} (p : Fin r �
     have := hc1.tendsto.comp hD
     simpa [Function.comp_def] using this
   have hQd : ∀ᶠ n in 𝓕, (Q n).det ≠ 0 := ((hdet.tendsto _).comp hQ).eventually_ne h0
-  have hDd : ∀ᶠ n in 𝓕, (D n).det ≠ 0 :=
-    ((hdet.tendsto _).comp hD).eventually_ne (by simp)
+  have hDd : ∀ᶠ n in 𝓕, (D n).det ≠ 0 := ((hdet.tendsto _).comp hD).eventually_ne (by simp)
   refine ⟨fun n => Q n * (D n)⁻¹, by simpa using hQ.mul hDi, ?_⟩
   filter_upwards [hA, hQd, hDd] with n hAn hQn hDn
   constructor
@@ -72,14 +72,14 @@ theorem exists_matrix_lift {r : ℕ} {ι : Type} {𝓕 : Filter ι} (p : Fin r �
     rw [← e, Matrix.mul_apply, Matrix.mul_apply]
     simp [hDdef, ha]
 
-theorem tendsto_of_span {E : Type} [Field E] {r : ℕ} {ι : Type} {𝓕 : Filter ι}
-    (S : Set (Fin r → E)) (hS : Submodule.span E S = ⊤) (σ : E → ℂ)
-    (Φ : ι → (Fin r → E) → ℂ) (Φ₀ : (Fin r → E) → ℂ)
+theorem tendsto_of_span
+    {E : Type} [Field E]
+    {r : ℕ} {ι : Type} {𝓕 : Filter ι} (S : Set (Fin r → E)) (hS : Submodule.span E S = ⊤)
+    (σ : E → ℂ) (Φ : ι → (Fin r → E) → ℂ) (Φ₀ : (Fin r → E) → ℂ)
     (ha : ∀ n v w, Φ n (v + w) = Φ n v + Φ n w) (ha₀ : ∀ v w, Φ₀ (v + w) = Φ₀ v + Φ₀ w)
     (hs : ∀ n (c : E) v, Φ n (c • v) = σ c * Φ n v) (hs₀ : ∀ (c : E) v, Φ₀ (c • v) = σ c * Φ₀ v)
-    (hσ : σ 0 = 0)
-    (h : ∀ v ∈ S, Tendsto (fun n => Φ n v) 𝓕 (𝓝 (Φ₀ v))) (v : Fin r → E) :
-    Tendsto (fun n => Φ n v) 𝓕 (𝓝 (Φ₀ v)) := by
+    (hσ : σ 0 = 0) (h : ∀ v ∈ S, Tendsto (fun n => Φ n v) 𝓕 (𝓝 (Φ₀ v))) (v : Fin r → E)
+    : Tendsto (fun n => Φ n v) 𝓕 (𝓝 (Φ₀ v)) := by
   have hv : v ∈ Submodule.span E S := hS ▸ Submodule.mem_top
   induction hv using Submodule.span_induction with
   | mem x hx => exact h x hx
@@ -91,11 +91,16 @@ theorem tendsto_of_span {E : Type} [Field E] {r : ℕ} {ι : Type} {𝓕 : Filte
   | add x y _ _ hx hy => simpa only [ha, ha₀] using hx.add hy
   | smul c x _ hx => simpa only [hs, hs₀] using hx.const_mul (σ c)
 
-theorem hermC_emb_inv_col {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
-    (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (hG : G.det ≠ 0) (u : Fin r → ℂ) (k : Fin r) :
-    hermC τ G u (Data.emb τ fun b => cc (G⁻¹ b k)) = u k := by
-  have e : ∀ a, ∑ b, u a * τ (G a b) * (starRingEnd ℂ) (τ (cc (G⁻¹ b k))) =
-      u a * τ ((G * G⁻¹) a k) := by
+theorem hermC_emb_inv_col
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ}
+    (τ : E →+* ℂ)
+    (G : Matrix (Fin r) (Fin r) E) (hG : G.det ≠ 0)
+    (u : Fin r → ℂ) (k : Fin r)
+    : hermC τ G u (Data.emb τ fun b => cc (G⁻¹ b k)) = u k := by
+  have e
+      : ∀ a,
+        ∑ b, u a * τ (G a b) * (starRingEnd ℂ) (τ (cc (G⁻¹ b k))) = u a * τ ((G * G⁻¹) a k) := by
     intro a
     set_option synthInstance.maxHeartbeats 100000 in
       rw [Matrix.mul_apply, map_sum, Finset.mul_sum]

@@ -15,8 +15,8 @@ namespace Formalism.L2.SG.Pf.Cnt
 open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.G2
 
 theorem jordan_invariants_holds : JordanInv := by
-  intro K F V V' _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _hK hF h h' _hs _hs' X X' L L' hL hL' 𝔭 h𝔭 b a b' a'
-    hJ hJ' hiso j
+  intro K F V V' _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _hK hF h h' _hs _hs' X X' L L' hL hL' 𝔭 h𝔭 b a b'
+    a' hJ hJ' hiso j
   obtain ⟨f⟩ := hiso
   obtain ⟨g⟩ := disc_equiv hF h𝔭 hL hJ.1 hJ.2.1 hJ.2.2.1 hJ.2.2.2.1 hJ.2.2.2.2
   obtain ⟨g'⟩ := disc_equiv hF h𝔭 hL' hJ'.1 hJ'.2.1 hJ'.2.2.1 hJ'.2.2.2.1 hJ'.2.2.2.2

@@ -13,8 +13,9 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology Filter
 
-theorem PrimeGermCanonicalCover.proof (h₁ : PrimeGermPrimitivePresentation.Statement)
-    (h₂ : PrimitivePresentationCover.Statement) : PrimeGermCanonicalCover.Statement := by
+theorem PrimeGermCanonicalCover.proof
+    (h₁ : PrimeGermPrimitivePresentation.Statement) (h₂ : PrimitivePresentationCover.Statement)
+    : PrimeGermCanonicalCover.Statement := by
   intro σ _ w k p hp hP
   obtain ⟨d, A, ℓ, N, c, δ, hpres, hδ⟩ := h₁ σ w k p hp hP
   have hδa : AnalyticAt ℂ δ (A w) := hpres.2.1

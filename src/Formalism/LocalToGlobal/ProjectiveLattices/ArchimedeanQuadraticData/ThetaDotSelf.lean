@@ -15,13 +15,15 @@ open NumberField Matrix ComplexConjugate ReciprocityTheory.MultiplicativeHeights
 
 variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι] {r : ℕ}
 
-theorem trace_id (σ : ι → K →+* ℂ) (hinj : Function.Injective σ)
+theorem trace_id
+    (σ : ι → K →+* ℂ) (hinj : Function.Injective σ)
     (hcm : ∀ τ : K →+* ℂ, (∃ i, σ i = τ) ↔ ¬ ∃ i, σ i = ComplexEmbedding.conjugate τ)
     (Q : ι → Matrix (Fin r) (Fin r) ℂ) (p : ℕ) (S : HermForm K r)
     (hform : ∀ i x y, σ i (S.h x y) = jForm p (Q i *ᵥ embVec (σ i) x) (Q i *ᵥ embVec (σ i) y))
-    {N : ℕ} (eqv : Fin N ≃ ι × Fin r × Fin 2) (y v : Fin r → K) :
-    rho eqv (Theta p (Phi σ Q y)) ⬝ᵥ rho eqv (Phi σ Q v) =
-      (1 / 2 : ℝ) * ((Algebra.trace ℚ K (S.h y v) : ℚ) : ℝ) := by
+    {N : ℕ} (eqv : Fin N ≃ ι × Fin r × Fin 2)
+    (y v : Fin r → K)
+    : rho eqv (Theta p (Phi σ Q y)) ⬝ᵥ rho eqv (Phi σ Q v)
+      = (1 / 2 : ℝ) * ((Algebra.trace ℚ K (S.h y v) : ℚ) : ℝ) := by
   rw [rho_dot, ← sum_re_cmType σ hinj hcm (S.h y v)]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [hform i y v, jForm, Complex.re_sum]
@@ -38,17 +40,19 @@ private lemma rho_dot_self_lemma {N : ℕ} (eqv : Fin N ≃ ι × Fin r × Fin 2
       (if x.2.2 = 0 then (w x.1 x.2.1).re else (w x.1 x.2.1).im))).trans ?_
   simp [Fintype.sum_prod_type, Fin.sum_univ_two, Complex.normSq_apply]
 
-theorem theta_dot_self (p : ℕ) {N : ℕ} (eqv : Fin N ≃ ι × Fin r × Fin 2) (w : ι → Fin r → ℂ) :
-    rho eqv (Theta p w) ⬝ᵥ rho eqv (Theta p w) = rho eqv w ⬝ᵥ rho eqv w := by
+theorem theta_dot_self (p : ℕ) {N : ℕ} (eqv : Fin N ≃ ι × Fin r × Fin 2) (w : ι → Fin r → ℂ)
+    : rho eqv (Theta p w) ⬝ᵥ rho eqv (Theta p w) = rho eqv w ⬝ᵥ rho eqv w := by
   rw [rho_dot_self_lemma, rho_dot_self_lemma]
   unfold Theta sgn
   simp only [map_mul]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   split_ifs <;> simp
 
-theorem phi_dot_self (σ : ι → K →+* ℂ) (Q : ι → Matrix (Fin r) (Fin r) ℂ) {N : ℕ}
-    (eqv : Fin N ≃ ι × Fin r × Fin 2) (v : Fin r → K) :
-    rho eqv (Phi σ Q v) ⬝ᵥ rho eqv (Phi σ Q v) = majSq σ Q v := by
+theorem phi_dot_self
+    (σ : ι → K →+* ℂ) (Q : ι → Matrix (Fin r) (Fin r) ℂ)
+    {N : ℕ} (eqv : Fin N ≃ ι × Fin r × Fin 2)
+    (v : Fin r → K)
+    : rho eqv (Phi σ Q v) ⬝ᵥ rho eqv (Phi σ Q v) = majSq σ Q v := by
   rw [rho_dot_self_lemma]
   unfold Phi majSq normSq
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
@@ -59,22 +63,29 @@ theorem trace_one_ne : Algebra.trace ℚ K 1 ≠ 0 := by
   simp only [nsmul_eq_mul, mul_one, ne_eq, Nat.cast_eq_zero]
   exact Module.finrank_pos.ne'
 
-theorem nondeg [Nonempty ι] (σ : ι → K →+* ℂ) (Q : ι → Matrix (Fin r) (Fin r) ℂ)
-    (hQ : ∀ i, (Q i).det ≠ 0) (p : ℕ) (S : HermForm K r)
+theorem nondeg
+    [Nonempty ι]
+    (σ : ι → K →+* ℂ)
+    (Q : ι → Matrix (Fin r) (Fin r) ℂ) (hQ : ∀ i, (Q i).det ≠ 0)
+    (p : ℕ) (S : HermForm K r)
     (hform : ∀ i x y, σ i (S.h x y) = jForm p (Q i *ᵥ embVec (σ i) x) (Q i *ᵥ embVec (σ i) y))
-    (x : Fin r → K) (h : ∀ v, Algebra.trace ℚ K (S.h v x) = 0) : x = 0 := by
+    (x : Fin r → K) (h : ∀ v, Algebra.trace ℚ K (S.h v x) = 0)
+    : x = 0 := by
   classical
   unfold jForm embVec at hform
   obtain ⟨i₀⟩ := ‹Nonempty ι›
-  have hsingle : ∀ (j : Fin r) (b : K),
-      (fun a => σ i₀ ((Pi.single j b : Fin r → K) a)) = (Pi.single j (σ i₀ b) : Fin r → ℂ) := by
+  have hsingle
+      : ∀ (j : Fin r) (b : K),
+        (fun a => σ i₀ ((Pi.single j b : Fin r → K) a)) = (Pi.single j (σ i₀ b) : Fin r → ℂ) := by
     intro j b
     funext a
     by_cases ha : a = j
     · subst ha
       simp
     · simp [Pi.single_eq_of_ne ha]
-  have hcol : ∀ (j : Fin r) (z : ℂ) (k : Fin r), (Q i₀ *ᵥ (Pi.single j z : Fin r → ℂ)) k = Q i₀ k j * z := by
+  have hcol
+      : ∀ (j : Fin r) (z : ℂ) (k : Fin r),
+        (Q i₀ *ᵥ (Pi.single j z : Fin r → ℂ)) k = Q i₀ k j * z := by
     intro j z k
     simp [Matrix.mulVec, dotProduct, Pi.single_apply]
   have hg : ∀ j : Fin r, S.h (Pi.single j 1) x = 0 := by

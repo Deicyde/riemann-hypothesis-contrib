@@ -26,9 +26,9 @@ theorem keyL_inj : Function.Injective (keyL (T := T) (r := r) (n := n)) := by
   obtain rfl : i = i' := Fin.ext hi
   rfl
 
-theorem rowShift_X (σ : T) (i i' : Fin (r σ)) (t : C) (ℓ : Letter T r n) :
-    rowShift r n C σ i i' t (X ℓ) =
-      if keyL ℓ = (σ, i.val, ℓ.2.2) then X ℓ + MvPolynomial.C t * X ⟨σ, i', ℓ.2.2⟩ else X ℓ := by
+theorem rowShift_X (σ : T) (i i' : Fin (r σ)) (t : C) (ℓ : Letter T r n)
+    : rowShift r n C σ i i' t (X ℓ)
+      = if keyL ℓ = (σ, i.val, ℓ.2.2) then X ℓ + MvPolynomial.C t * X ⟨σ, i', ℓ.2.2⟩ else X ℓ := by
   unfold rowShift
   simp only [MvPolynomial.aeval_X]
   have key : (∃ b, ℓ = ⟨σ, (i, b)⟩) ↔ keyL ℓ = (σ, ↑i, ℓ.snd.2) := by
@@ -45,8 +45,11 @@ end Atom
 
 section Fam
 
-variable {C : Type} [Field C] {V : VF C} {d : ℕ} [NeZero d] {T : Type} {r : T → ℕ} {cc : T → T} {a : T → ℕ → ℕ}
-  {Orb : Type} [Fintype Orb] {tau : Orb → Fin 2 → ZMod d → T} {J : Orb → Fin 2 → Type} [∀ o g, Fintype (J o g)]
+variable
+  {C : Type} [Field C]
+  {V : VF C} {d : ℕ} [NeZero d]
+  {T : Type} {r : T → ℕ} {cc : T → T} {a : T → ℕ → ℕ} {Orb : Type} [Fintype Orb]
+  {tau : Orb → Fin 2 → ZMod d → T} {J : Orb → Fin 2 → Type} [∀ o g, Fintype (J o g)]
   {X : ∀ o, RowData C V d (IIof r tau o) (J o)} {F : ∀ o, Flag (X o)} {Z : Finset Orb}
   {ga : Orb → Fin 2 → ZMod d → ℕ → ℕ} {n : ℕ} {L : Orb → List (GlobalTheory d × ℝ)}
   {pl : (Σ o, Σ i : Fin (L o).length, Fin (rowsAt (X := X) L o i)) → Fin n}

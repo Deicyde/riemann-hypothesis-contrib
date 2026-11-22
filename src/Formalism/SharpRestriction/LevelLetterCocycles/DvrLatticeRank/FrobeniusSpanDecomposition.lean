@@ -11,45 +11,61 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
+  Formalism.MainNotions.ElementDenominator.CongruenceModules
 
 section KerLam2Local
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
 
-private theorem kl2_dec_lemma (W : LocWach PD LL O v n) [IsAdicComplete (Ideal.span {((PD.p : ℕ) : O)}) O]
-    (T : LocLat G Qp LL O) (S : Submodule (LetA O n) (W.DD T)) (a : LetA O n) (s : W.DD T) (hs : s ∈ S) :
-    ∃ t : Fin PD.p → W.DD T, (∀ k, t k ∈ S) ∧
-      a • W.φD T s = ∑ k : Fin PD.p, (letπ : LetA O n) ^ (k : ℕ) • W.φD T (t k) := by
+private theorem kl2_dec_lemma
+    (W : LocWach PD LL O v n)
+    [IsAdicComplete (Ideal.span {((PD.p : ℕ) : O)}) O]
+    (T : LocLat G Qp LL O) (S : Submodule (LetA O n) (W.DD T))
+    (a : LetA O n)
+    (s : W.DD T) (hs : s ∈ S)
+    : ∃ t : Fin PD.p → W.DD T,
+      (∀ k, t k ∈ S)
+        ∧ a • W.φD T s = ∑ k : Fin PD.p, (letπ : LetA O n) ^ (k : ℕ) • W.φD T (t k) := by
   obtain ⟨e, he⟩ := Formalism.MainNotions.LiftingTheory.PhiBasis_of W a
   refine ⟨fun k => e k • s, fun k => S.smul_mem _ hs, ?_⟩
   rw [he, Finset.sum_smul]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [Formalism.MainNotions.LiftingTheory.wmap_φD_smul, mul_smul]
 
-theorem frobenius_span_decomposition (W : LocWach PD LL O v n) [IsAdicComplete (Ideal.span {((PD.p : ℕ) : O)}) O]
+theorem frobenius_span_decomposition
+    (W : LocWach PD LL O v n)
+    [IsAdicComplete (Ideal.span {((PD.p : ℕ) : O)}) O]
     (T : LocLat G Qp LL O) (S : Submodule (LetA O n) (W.DD T)) (z : W.DD T)
-    (hz : z ∈ Formalism.MainNotions.DeltaInvariantLattices.φspan W T S) :
-    ∃ s : Fin PD.p → W.DD T, (∀ k, s k ∈ S) ∧
-      z = ∑ k : Fin PD.p, (letπ : LetA O n) ^ (k : ℕ) • W.φD T (s k) := by
+    (hz : z ∈ Formalism.MainNotions.DeltaInvariantLattices.φspan W T S)
+    : ∃ s : Fin PD.p → W.DD T,
+      (∀ k, s k ∈ S) ∧ z = ∑ k : Fin PD.p, (letπ : LetA O n) ^ (k : ℕ) • W.φD T (s k) := by
   unfold Formalism.MainNotions.DeltaInvariantLattices.φspan at hz
   induction hz using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨s, hs, rfl⟩ := hx
     obtain ⟨t, ht, he⟩ := kl2_dec_lemma W T S 1 s hs
     exact ⟨t, ht, by rw [← he, one_smul]⟩
-  | zero => exact ⟨fun _ => 0, fun _ => S.zero_mem, by simp⟩
+  | zero =>
+    exact ⟨fun _ => 0, fun _ => S.zero_mem, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨s, hs, rfl⟩ := hx
     obtain ⟨s', hs', rfl⟩ := hy
-    exact ⟨fun k => s k + s' k, fun k => S.add_mem (hs k) (hs' k),
-      by simp only [map_add (f := _), smul_add, Finset.sum_add_distrib]⟩
+    exact ⟨
+      fun k => s k + s' k,
+      fun k => S.add_mem (hs k) (hs' k),
+      by simp only [map_add (f := _), smul_add, Finset.sum_add_distrib]
+    ⟩
   | smul a x _ hx =>
     obtain ⟨s, hs, rfl⟩ := hx
     choose t ht he using fun k : Fin PD.p =>
@@ -59,13 +75,17 @@ theorem frobenius_span_decomposition (W : LocWach PD LL O v n) [IsAdicComplete (
       simp only [Finset.smul_sum, ← mul_smul, he, map_sum]
     rw [Finset.sum_comm]
 
-theorem frobenius_span_exact_lift (W : LocWach PD LL O v n) [IsAdicComplete (Ideal.span {((PD.p : ℕ) : O)}) O]
-    {T Tp T'' : LocLat G Qp LL O} (ι : LatHom T.L Tp.L) (π : LatHom Tp.L T''.L)
-    (c'' : IsCrys PD T''.ρ) (hinj : Function.Injective (W.map ι))
-    (hex : ∀ x, W.map π x = 0 → ∃ y, W.map ι y = x)
-    (h4 : ∀ x : W.DD T, W.map ι x ∈ W.N Tp → x ∈ W.N T) (i : ZMod n)
-    (z : W.DD Tp) (hz : z ∈ Formalism.MainNotions.DeltaInvariantLattices.φspan W Tp (W.Nl Tp i)) (h0 : W.map π z = 0) :
-    ∃ z' ∈ Formalism.MainNotions.DeltaInvariantLattices.φspan W T (W.Nl T i), W.map ι z' = z := by
+theorem frobenius_span_exact_lift
+    (W : LocWach PD LL O v n)
+    [IsAdicComplete (Ideal.span {((PD.p : ℕ) : O)}) O]
+    {T Tp T'' : LocLat G Qp LL O}
+    (ι : LatHom T.L Tp.L) (π : LatHom Tp.L T''.L) (c'' : IsCrys PD T''.ρ)
+    (hinj : Function.Injective (W.map ι)) (hex : ∀ x, W.map π x = 0 → ∃ y, W.map ι y = x)
+    (h4 : ∀ x : W.DD T, W.map ι x ∈ W.N Tp → x ∈ W.N T)
+    (i : ZMod n) (z : W.DD Tp)
+    (hz : z ∈ Formalism.MainNotions.DeltaInvariantLattices.φspan W Tp (W.Nl Tp i))
+    (h0 : W.map π z = 0)
+    : ∃ z' ∈ Formalism.MainNotions.DeltaInvariantLattices.φspan W T (W.Nl T i), W.map ι z' = z := by
   obtain ⟨s, hs, rfl⟩ := frobenius_span_decomposition W Tp (W.Nl Tp i) z hz
   have hπs : ∀ k, W.map π (s k) = 0 := by
     refine Formalism.MainNotions.LiftingTheory.phii_DD W T'' c'' (fun k => W.map π (s k)) ?_
@@ -84,7 +104,8 @@ theorem frobenius_span_exact_lift (W : LocWach PD LL O v n) [IsAdicComplete (Ide
     rw [Formalism.MainNotions.LiftingTheory.wmap_mem_Nl]
     refine ⟨y k, hyN, ?_⟩
     apply hinj
-    rw [Formalism.MainNotions.LiftingTheory.wmap_map_smul, hy k, Formalism.MainNotions.LiftingTheory.wmap_Nl_fix W Tp i (s k) (hs k)]
+    rw [Formalism.MainNotions.LiftingTheory.wmap_map_smul, hy k,
+      Formalism.MainNotions.LiftingTheory.wmap_Nl_fix W Tp i (s k) (hs k)]
   refine ⟨∑ k : Fin PD.p, (letπ : LetA O n) ^ (k : ℕ) • W.φD T (y k), ?_, ?_⟩
   · refine Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ ?_
     unfold Formalism.MainNotions.DeltaInvariantLattices.φspan
@@ -94,17 +115,20 @@ theorem frobenius_span_exact_lift (W : LocWach PD LL O v n) [IsAdicComplete (Ide
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [Formalism.MainNotions.LiftingTheory.wmap_map_smul, W.map_φ, hy k]
 
-theorem frobenius_span_exact_local (W : LocWach PD LL O v n) [IsAdicComplete (Ideal.span {((PD.p : ℕ) : O)}) O]
+theorem frobenius_span_exact_local
+    (W : LocWach PD LL O v n)
+    [IsAdicComplete (Ideal.span {((PD.p : ℕ) : O)}) O]
     {T Tp T'' : LocLat G Qp LL O} (ι : LatHom T.L Tp.L) (π : LatHom Tp.L T''.L)
-    (π' Eπ : LetA O n) (h' : ℕ) (c'' : IsCrys PD T''.ρ)
-    (hinj : Function.Injective (W.map ι))
+    (π' Eπ : LetA O n)
+    (h' : ℕ) (c'' : IsCrys PD T''.ρ) (hinj : Function.Injective (W.map ι))
     (hex : ∀ x, W.map π x = 0 ↔ ∃ y, W.map ι y = x)
     (h4 : ∀ x : W.DD T, W.map ι x ∈ W.N Tp → x ∈ W.N T)
-    (hπ' : IsUnit (algebraMap (LetA O n) W.EE π')) :
-    KerLam W ι π π' Eπ h' := by
+    (hπ' : IsUnit (algebraMap (LetA O n) W.EE π'))
+    : KerLam W ι π π' Eπ h' := by
   have hex' : ∀ x, W.map π x = 0 → ∃ y, W.map ι y = x := fun x hx => (hex x).1 hx
-  have hΔ : ∀ x : W.DD T, (∀ δ ∈ W.DelF, W.γD Tp δ (W.map ι x) = W.map ι x) →
-      ∀ δ ∈ W.DelF, W.γD T δ x = x := by
+  have hΔ
+      : ∀ x : W.DD T,
+        (∀ δ ∈ W.DelF, W.γD Tp δ (W.map ι x) = W.map ι x) → ∀ δ ∈ W.DelF, W.γD T δ x = x := by
     intro x hx δ hδ
     apply hinj
     rw [W.map_γ, hx δ hδ]
@@ -132,12 +156,14 @@ theorem frobenius_span_exact_local (W : LocWach PD LL O v n) [IsAdicComplete (Id
     rw [mem_LamPS] at hy
     obtain ⟨hyE, hyΔ, hyL⟩ := hy
     obtain ⟨x, rfl⟩ := hex' y hyπ
-    obtain ⟨z', hz', hz'e⟩ := frobenius_span_exact_lift W ι π c'' hinj hex' h4 (c - 1) (Eπ ^ h' • W.map ι x) hyE
-      (by rw [Formalism.MainNotions.LiftingTheory.wmap_map_smul, hyπ, smul_zero])
+    obtain ⟨z', hz', hz'e⟩ :=
+      frobenius_span_exact_lift W ι π c'' hinj hex' h4 (c - 1) (Eπ ^ h' • W.map ι x) hyE
+        (by rw [Formalism.MainNotions.LiftingTheory.wmap_map_smul, hyπ, smul_zero])
     refine ⟨x, ?_, rfl⟩
     rw [mem_LamPS]
     refine ⟨?_, hΔ x hyΔ, hL x _ hyL⟩
-    have e : z' = Eπ ^ h' • x := hinj (by rw [hz'e, Formalism.MainNotions.LiftingTheory.wmap_map_smul])
+    have e : z' = Eπ ^ h' • x :=
+      hinj (by rw [hz'e, Formalism.MainNotions.LiftingTheory.wmap_map_smul])
     rw [← e]
     exact hz'
   · intro y hy hyπ
@@ -165,7 +191,8 @@ theorem kerlam2_pf : KerLamStep := by
     exact Formalism.MainNotions.LiftingTheory.phib_OL_complete LL
   refine frobenius_span_exact_local _ ι π π' _ h' hT'' hEx.1 hEx.2.2 hsat ?_
   rw [hw, map_mul, map_pow]
-  exact (w.isUnit.map _).mul (by simpa using (Formalism.MainNotions.LiftingTheory.wmap_unit _ 0).pow _)
+  exact (w.isUnit.map _).mul
+    (by simpa using (Formalism.MainNotions.LiftingTheory.wmap_unit _ 0).pow _)
 
 end Formalism.MainNotions.N.Ln34
 

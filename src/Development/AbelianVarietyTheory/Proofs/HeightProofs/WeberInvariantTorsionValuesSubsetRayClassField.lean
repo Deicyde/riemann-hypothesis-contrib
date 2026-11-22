@@ -19,13 +19,19 @@ namespace GlobalTheory.FieldSize.InRayAny
 set_option autoImplicit false in
 open NumberField IsDedekindDomain Polynomial in
 open scoped IntermediateField in
-private theorem weberSet_subset_of_isRay_span_natCast :
-    ∀ (K : IntermediateField ℚ ℂ) [NumberField K] [_root_.NumberField.IsTotallyComplex K], Module.finrank ℚ K = 2 →
-      discr K < -4 → ∀ L : PeriodPair, (∀ z, z ∈ L.lattice ↔ ∃ a : 𝓞 K, ((a : K) : ℂ) = z) →
-      ∀ n : ℕ, 3 ≤ n → ∀ (R : IntermediateField K ℂ) [NumberField R] [IsAbelianGalois K R],
-      _root_.GlobalTheory.FieldSize.IsRay R (Ideal.span {(n : 𝓞 K)}) → _root_.GlobalTheory.FieldSize.weberSet L n ⊆ R := by
+private theorem weberSet_subset_of_isRay_span_natCast
+    : ∀ (K : IntermediateField ℚ ℂ) [NumberField K] [_root_.NumberField.IsTotallyComplex K],
+      Module.finrank ℚ K = 2 → discr K < -4
+        → ∀ L : PeriodPair,
+          (∀ z, z ∈ L.lattice ↔ ∃ a : 𝓞 K, ((a : K) : ℂ) = z)
+            → ∀ n : ℕ,
+              3 ≤ n
+                → ∀ (R : IntermediateField K ℂ) [NumberField R] [IsAbelianGalois K R],
+                  _root_.GlobalTheory.FieldSize.IsRay R (Ideal.span {(n : 𝓞 K)})
+                    → _root_.GlobalTheory.FieldSize.weberSet L n ⊆ R := by
   intro K _ _ h2 hd L hL n hn R _ _ hR
-  obtain ⟨hM, S, hS⟩ := _root_.GlobalTheory.WeberSplitAny.splits_completely_of_three_le K h2 hd L hL n hn
+  obtain ⟨hM, S, hS⟩ :=
+    _root_.GlobalTheory.WeberSplitAny.splits_completely_of_three_le K h2 hd L hL n hn
   have hn0 : 0 < n := by omega
   have hN : Ideal.absNorm (Ideal.span {(n : 𝓞 K)}) ≠ 0 := by
     rw [Ne, Ideal.absNorm_eq_zero_iff, Ideal.span_singleton_eq_bot]
@@ -33,7 +39,7 @@ private theorem weberSet_subset_of_isRay_span_natCast :
   have hMR : IntermediateField.adjoin (↥K) (_root_.GlobalTheory.FieldSize.weberSet L n) ≤ R := by
     apply _root_.GlobalTheory.Bauer.le_of_finite_split_not_split (↥K) ℂ R _
     refine ((Ideal.finite_setOfPred_absNorm_le (S := 𝓞 K)
-      (S.sup id + Ideal.absNorm (Ideal.span {(n : 𝓞 K)}))).preimage
+        (S.sup id + Ideal.absNorm (Ideal.span {(n : 𝓞 K)}))).preimage
       (f := fun v : HeightOneSpectrum (𝓞 K) => v.asIdeal)
       (fun a _ b _ h => HeightOneSpectrum.ext h)).subset ?_
     rintro 𝔭 ⟨hp, hsplit, hnot⟩
@@ -45,21 +51,26 @@ private theorem weberSet_subset_of_isRay_span_natCast :
       exact Ideal.absNorm_dvd_absNorm_of_le ((Ideal.span_singleton_le_iff_mem _).mpr hn𝔭)
     · exfalso
       obtain ⟨π, hπ, hπ1⟩ :=
-        (_root_.GlobalTheory.FieldSize.RaySplit.ncard_eq_finrank_iff (↥K) (↥R) n hn0 hR 𝔭 hn𝔭).mp hsplit
+        (_root_.GlobalTheory.FieldSize.RaySplit.ncard_eq_finrank_iff (↥K) (↥R) n hn0 hR 𝔭 hn𝔭).mp
+          hsplit
       apply hnot
       rw [hπ] at hp hpS ⊢
       exact hS π _ hp hpS rfl hπ1
   exact fun x hx => hMR (IntermediateField.subset_adjoin _ _ hx)
 
-
 set_option autoImplicit false in
 open NumberField IsDedekindDomain Polynomial in
 open scoped IntermediateField in
-theorem _root_.GlobalTheory.FieldSize.InRayAny.weberSet_subset :
-    ∀ (K : IntermediateField ℚ ℂ) [NumberField K] [_root_.NumberField.IsTotallyComplex K], Module.finrank ℚ K = 2 →
-      discr K < -4 → ∀ L : PeriodPair, (∀ z, z ∈ L.lattice ↔ ∃ a : 𝓞 K, ((a : K) : ℂ) = z) →
-      ∀ n : ℕ, 3 ≤ n → ∀ (R : IntermediateField K ℂ) [NumberField R] [IsAbelianGalois K R],
-      _root_.GlobalTheory.FieldSize.IsRay R (Ideal.span {(n : 𝓞 K)}) → _root_.GlobalTheory.FieldSize.weberSet L n ⊆ R :=
+theorem _root_.GlobalTheory.FieldSize.InRayAny.weberSet_subset
+    : ∀ (K : IntermediateField ℚ ℂ) [NumberField K] [_root_.NumberField.IsTotallyComplex K],
+      Module.finrank ℚ K = 2 → discr K < -4
+        → ∀ L : PeriodPair,
+          (∀ z, z ∈ L.lattice ↔ ∃ a : 𝓞 K, ((a : K) : ℂ) = z)
+            → ∀ n : ℕ,
+              3 ≤ n
+                → ∀ (R : IntermediateField K ℂ) [NumberField R] [IsAbelianGalois K R],
+                  _root_.GlobalTheory.FieldSize.IsRay R (Ideal.span {(n : 𝓞 K)})
+                    → _root_.GlobalTheory.FieldSize.weberSet L n ⊆ R :=
   weberSet_subset_of_isRay_span_natCast
 
 end GlobalTheory.FieldSize.InRayAny

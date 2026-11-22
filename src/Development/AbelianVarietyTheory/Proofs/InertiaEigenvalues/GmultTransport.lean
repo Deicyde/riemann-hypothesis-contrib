@@ -13,8 +13,8 @@ namespace GlobalTheory.PhiGam.SenAdd
 section
 variable {k A B : Type} [Field k] [AddCommGroup A] [Module k A] [AddCommGroup B] [Module k B]
 
-theorem pow_mem (T : Module.End k A) (Q : Submodule k A) (hQ : ∀ y ∈ Q, T y ∈ Q) (x : k) (m : ℕ) :
-    ∀ y ∈ Q, ((T - algebraMap k (Module.End k A) x) ^ m) y ∈ Q := by
+theorem pow_mem (T : Module.End k A) (Q : Submodule k A) (hQ : ∀ y ∈ Q, T y ∈ Q) (x : k) (m : ℕ)
+    : ∀ y ∈ Q, ((T - algebraMap k (Module.End k A) x) ^ m) y ∈ Q := by
   induction m with
   | zero => intro y hy; simpa using hy
   | succ m ih =>
@@ -24,9 +24,9 @@ theorem pow_mem (T : Module.End k A) (Q : Submodule k A) (hQ : ∀ y ∈ Q, T y 
     rw [LinearMap.sub_apply, Module.algebraMap_end_apply]
     exact Q.sub_mem (hQ y hy) (Q.smul_mem _ hy)
 
-theorem mem_gen (T : Module.End k A) (Q : Submodule k A) (hQ : ∀ y ∈ Q, T y ∈ Q) (x : k) (y : A) :
-    y ∈ (⨆ m : ℕ, Q.comap ((T - algebraMap k (Module.End k A) x) ^ m)) ↔
-      ∃ m : ℕ, ((T - algebraMap k (Module.End k A) x) ^ m) y ∈ Q := by
+theorem mem_gen (T : Module.End k A) (Q : Submodule k A) (hQ : ∀ y ∈ Q, T y ∈ Q) (x : k) (y : A)
+    : y ∈ (⨆ m : ℕ, Q.comap ((T - algebraMap k (Module.End k A) x) ^ m))
+      ↔ ∃ m : ℕ, ((T - algebraMap k (Module.End k A) x) ^ m) y ∈ Q := by
   have hm : Monotone fun m : ℕ => Q.comap ((T - algebraMap k (Module.End k A) x) ^ m) := by
     refine monotone_nat_of_le_succ fun m z hz => ?_
     rw [Submodule.mem_comap] at hz ⊢
@@ -34,9 +34,11 @@ theorem mem_gen (T : Module.End k A) (Q : Submodule k A) (hQ : ∀ y ∈ Q, T y 
     simpa using pow_mem T Q hQ x 1 _ hz
   exact Submodule.mem_iSup_of_directed _ hm.directed_le
 
-theorem pow_comm (T : Module.End k A) (T' : Module.End k B) (h : A →ₗ[k] B) (hT : ∀ y, h (T y) = T' (h y))
-    (x : k) (m : ℕ) (y : A) :
-    h (((T - algebraMap k (Module.End k A) x) ^ m) y) = ((T' - algebraMap k (Module.End k B) x) ^ m) (h y) := by
+theorem pow_comm
+    (T : Module.End k A) (T' : Module.End k B) (h : A →ₗ[k] B) (hT : ∀ y, h (T y) = T' (h y))
+    (x : k) (m : ℕ) (y : A)
+    : h (((T - algebraMap k (Module.End k A) x) ^ m) y)
+      = ((T' - algebraMap k (Module.End k B) x) ^ m) (h y) := by
   induction m generalizing y with
   | zero => simp
   | succ m ih =>
@@ -44,11 +46,12 @@ theorem pow_comm (T : Module.End k A) (T' : Module.End k B) (h : A →ₗ[k] B) 
     congr 1
     simp [Module.algebraMap_end_apply, hT]
 
-theorem gmult_transport (T : Module.End k A) (T' : Module.End k B) (h : A →ₗ[k] B)
-    (hT : ∀ y, h (T y) = T' (h y)) (P Q : Submodule k A) (P' Q' : Submodule k B)
-    (hP : ∀ y ∈ P, T y ∈ P) (hQP : Q ≤ P) (hQ' : ∀ y ∈ Q', T' y ∈ Q')
-    (hmap : ∀ y ∈ P, h y ∈ P') (hker : ∀ y ∈ P, h y ∈ Q' ↔ y ∈ Q)
-    (hsur : ∀ z ∈ P', ∃ y ∈ P, z - h y ∈ Q') (x : k) : gmult T P Q x = gmult T' P' Q' x := by
+theorem gmult_transport
+    (T : Module.End k A) (T' : Module.End k B) (h : A →ₗ[k] B) (hT : ∀ y, h (T y) = T' (h y))
+    (P Q : Submodule k A) (P' Q' : Submodule k B)
+    (hP : ∀ y ∈ P, T y ∈ P) (hQP : Q ≤ P) (hQ' : ∀ y ∈ Q', T' y ∈ Q') (hmap : ∀ y ∈ P, h y ∈ P')
+    (hker : ∀ y ∈ P, h y ∈ Q' ↔ y ∈ Q) (hsur : ∀ z ∈ P', ∃ y ∈ P, z - h y ∈ Q') (x : k)
+    : gmult T P Q x = gmult T' P' Q' x := by
   have hQ : ∀ y ∈ Q, T y ∈ Q := fun y hy =>
     (hker _ (hP y (hQP hy))).1 (by rw [hT]; exact hQ' _ ((hker y (hQP hy)).2 hy))
   unfold gmult
@@ -87,17 +90,21 @@ theorem gmult_transport (T : Module.End k A) (T' : Module.End k B) (h : A →ₗ
 end
 
 section
-variable {k : Type} [Field k] {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X⟧ V] [Module k V]
+variable
+  {k : Type} [Field k]
+  {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X⟧ V] [Module k V]
   [IsScalarTower k⟦X⟧ k⸨X⸩ V] [IsScalarTower k k⸨X⸩ V] [IsScalarTower k k⟦X⟧ V]
-
 
 omit [Module k V] [IsScalarTower k k⸨X⸩ V] [IsScalarTower k k⟦X⟧ V] in
 theorem sh_one_le (N : Submodule k⟦X⟧ V) : sh 1 N ≤ N := by
   have := sh_le_sh_of_le (zero_le_one' ℤ) N
   rwa [sh_zero_eq] at this
 
-theorem nab_mem_sh_one {l : ℕ} (R : RingPG k l) (g : V →ₗ[k] V) (hg : Semi R.γ g) (N : Submodule k⟦X⟧ V)
-    (hN : CondC g N) : ∀ y ∈ sh 1 N, nab g y ∈ sh 1 N := by
+theorem nab_mem_sh_one
+    {l : ℕ} (R : RingPG k l)
+    (g : V →ₗ[k] V) (hg : Semi R.γ g)
+    (N : Submodule k⟦X⟧ V) (hN : CondC g N)
+    : ∀ y ∈ sh 1 N, nab g y ∈ sh 1 N := by
   intro y hy
   obtain ⟨z, hz, rfl⟩ := mem_sh_iff_exists.1 hy
   obtain ⟨κ, -, hκ⟩ := R.γ_v
@@ -106,18 +113,18 @@ theorem nab_mem_sh_one {l : ℕ} (R : RingPG k l) (g : V →ₗ[k] V) (hg : Semi
   have h2 : g z ∈ N := by simpa using N.add_mem (sh_one_le N h1) hz
   have h3 : vv k ^ (1 : ℤ) • (κ • g z) ∈ sh 1 N := mem_sh_iff_exists.2 ⟨_, N.smul_mem κ h2, rfl⟩
   have h4 : nab g (vv k ^ (1 : ℤ) • z) = (g z - z) - vv k ^ (1 : ℤ) • (κ • g z) := by
-    rw [nab_apply_eq, zpow_one, hg, hκ, ← algebraMap_smul k⸨X⸩ κ, mul_smul, ← smul_sub, inv_smul_smul₀ hv,
-      sub_smul, one_smul, smul_smul, mul_comm (vv k)]
+    rw [nab_apply_eq, zpow_one, hg, hκ, ← algebraMap_smul k⸨X⸩ κ, mul_smul, ← smul_sub,
+      inv_smul_smul₀ hv, sub_smul, one_smul, smul_smul, mul_comm (vv k)]
     change g z - ((κ : k⸨X⸩) * vv k) • g z - z = g z - z - ((κ : k⸨X⸩) * vv k) • g z
     abel
   rw [h4]
   exact Submodule.sub_mem _ h1 h3
 
-
 omit [IsScalarTower k k⸨X⸩ V] in
-theorem finite_quot (N : Submodule k⟦X⟧ V) (hN : N.FG) :
-    FiniteDimensional k (↥(N.restrictScalars k) ⧸
-      ((sh 1 N).restrictScalars k).submoduleOf (N.restrictScalars k)) := by
+theorem finite_quot (N : Submodule k⟦X⟧ V) (hN : N.FG)
+    : FiniteDimensional k
+      (↥(N.restrictScalars k) ⧸
+        ((sh 1 N).restrictScalars k).submoduleOf (N.restrictScalars k)) := by
   obtain ⟨s, hs⟩ := hN
   have hle : Submodule.span k (s : Set V) ≤ N.restrictScalars k :=
     Submodule.span_le.2 fun y hy => hs ▸ Submodule.subset_span hy
@@ -139,12 +146,16 @@ theorem finite_quot (N : Submodule k⟦X⟧ V) (hN : N.FG) :
       set t : k⟦X⟧ := PowerSeries.mk fun n => PowerSeries.coeff (n + 1) a
       have ha : a = PowerSeries.X * t + algebraMap k k⟦X⟧ (PowerSeries.constantCoeff a) :=
         PowerSeries.eq_X_mul_shift_add_const a
-      have h3 : vv k ^ (1 : ℤ) • (t • z) ∈ sh 1 N := mem_sh_iff_exists.2 ⟨_, N.smul_mem t (hle hz), rfl⟩
+      have h3 : vv k ^ (1 : ℤ) • (t • z) ∈ sh 1 N :=
+        mem_sh_iff_exists.2 ⟨_, N.smul_mem t (hle hz), rfl⟩
       have h4 : vv k ^ (1 : ℤ) • (t • z) = (PowerSeries.X * t : k⟦X⟧) • z := by
         rw [zpow_one, mul_smul, vv_eq_coe_X]
         exact algebraMap_smul k⸨X⸩ (PowerSeries.X : k⟦X⟧) (t • z)
-      have h5 : a • y - PowerSeries.constantCoeff a • z = a • (y - z) + (PowerSeries.X * t : k⟦X⟧) • z := by
-        rw [← algebraMap_smul k⟦X⟧ (PowerSeries.constantCoeff a) z, eq_sub_of_add_eq ha.symm, smul_sub, sub_smul]
+      have h5
+          : a • y - PowerSeries.constantCoeff a • z
+            = a • (y - z) + (PowerSeries.X * t : k⟦X⟧) • z := by
+        rw [← algebraMap_smul k⟦X⟧ (PowerSeries.constantCoeff a) z, eq_sub_of_add_eq ha.symm,
+          smul_sub, sub_smul]
         abel
       rw [h5]
       exact Submodule.add_mem _ (Submodule.smul_mem _ _ h) (h4 ▸ h3)
@@ -159,8 +170,25 @@ theorem finite_quot (N : Submodule k⟦X⟧ V) (hN : N.FG) :
 
 end
 
-theorem main : ∀ {k : Type} [Field k] {l : ℕ} [Fact l.Prime] [CharP k l] (R : RingPG k l) {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X⟧ V] [Module k V] [IsScalarTower k⟦X⟧ k⸨X⸩ V] [IsScalarTower k k⸨X⸩ V] [IsScalarTower k k⟦X⟧ V] [FiniteDimensional k⸨X⸩ V] {W : Type} [AddCommGroup W] [Module k⸨X⸩ W] [Module k⟦X⟧ W] [Module k W] [IsScalarTower k⟦X⟧ k⸨X⸩ W] [IsScalarTower k k⸨X⸩ W] [IsScalarTower k k⟦X⟧ W] [FiniteDimensional k⸨X⸩ W] {U : Type} [AddCommGroup U] [Module k⸨X⸩ U] [Module k⟦X⟧ U] [Module k U] [IsScalarTower k⟦X⟧ k⸨X⸩ U] [IsScalarTower k k⸨X⸩ U] [IsScalarTower k k⟦X⟧ U] [FiniteDimensional k⸨X⸩ U] (gV : V →ₗ[k] V) (gW : W →ₗ[k] W) (gU : U →ₗ[k] U) (f : W →ₗ[k⸨X⸩] V) (p : V →ₗ[k⸨X⸩] U), Semi R.γ gV → Function.Injective f → Function.Surjective p → Function.Exact f p → (∀ x, f (gW x) = gV (f x)) → (∀ x, p (gV x) = gU (p x)) → ∀ N : Submodule k⟦X⟧ V, IsLat N → CondC gV N → ∀ x : k, sen gV N x = sen gW (N.comap (f.restrictScalars k⟦X⟧)) x + sen gU (N.map (p.restrictScalars k⟦X⟧)) x := by
-  intro k _ l _ _ R V _ _ _ _ _ _ _ _ W _ _ _ _ _ _ _ _ U _ _ _ _ _ _ _ _ gV gW gU f p hg _ _ hex hf hp N hN hC x
+theorem main
+    : ∀ {k : Type} [Field k] {l : ℕ} [Fact l.Prime] [CharP k l] (R : RingPG k l) {V : Type}
+        [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X⟧ V] [Module k V] [IsScalarTower k⟦X⟧ k⸨X⸩ V]
+        [IsScalarTower k k⸨X⸩ V] [IsScalarTower k k⟦X⟧ V] [FiniteDimensional k⸨X⸩ V] {W : Type}
+        [AddCommGroup W] [Module k⸨X⸩ W] [Module k⟦X⟧ W] [Module k W] [IsScalarTower k⟦X⟧ k⸨X⸩ W]
+        [IsScalarTower k k⸨X⸩ W] [IsScalarTower k k⟦X⟧ W] [FiniteDimensional k⸨X⸩ W] {U : Type}
+        [AddCommGroup U] [Module k⸨X⸩ U] [Module k⟦X⟧ U] [Module k U] [IsScalarTower k⟦X⟧ k⸨X⸩ U]
+        [IsScalarTower k k⸨X⸩ U] [IsScalarTower k k⟦X⟧ U] [FiniteDimensional k⸨X⸩ U]
+        (gV : V →ₗ[k] V) (gW : W →ₗ[k] W) (gU : U →ₗ[k] U) (f : W →ₗ[k⸨X⸩] V) (p : V →ₗ[k⸨X⸩] U),
+      Semi R.γ gV → Function.Injective f → Function.Surjective p → Function.Exact f p
+        → (∀ x, f (gW x) = gV (f x)) → (∀ x, p (gV x) = gU (p x))
+        → ∀ N : Submodule k⟦X⟧ V,
+          IsLat N → CondC gV N
+            → ∀ x : k,
+              sen gV N x
+                = sen gW (N.comap (f.restrictScalars k⟦X⟧)) x
+                  + sen gU (N.map (p.restrictScalars k⟦X⟧)) x := by
+  intro k _ l _ _ R V _ _ _ _ _ _ _ _ W _ _ _ _ _ _ _ _ U _ _ _ _ _ _ _ _ gV gW gU f p hg _ _ hex hf
+    hp N hN hC x
   have hN1 := (condC_iff_nab_mem gV N).1 hC
   have hN2 := nab_mem_sh_one R gV hg N hC
   have nf : ∀ y, f (nab gW y) = nab gV (f y) := fun y => by
@@ -181,18 +209,26 @@ theorem main : ∀ {k : Type} [Field k] {l : ℕ} [Fact l.Prime] [CharP k l] (R 
     intro u hu
     obtain ⟨y, hy, rfl⟩ := (hsh u).1 hu
     exact (hsh _).2 ⟨_, hN2 y hy, np y⟩
-  let Q : Submodule k V := N.restrictScalars k ⊓ ((sh 1 N').restrictScalars k).comap (p.restrictScalars k)
+  let Q : Submodule k V :=
+    N.restrictScalars k ⊓ ((sh 1 N').restrictScalars k).comap (p.restrictScalars k)
   have hQ : ∀ y, y ∈ Q ↔ y ∈ N ∧ p y ∈ sh 1 N' := fun _ => Iff.rfl
-  have hadd := GlobalTheory.PhiGam.GmultAdd.main (nab gV) (N.restrictScalars k) Q ((sh 1 N).restrictScalars k)
-    (fun y hy => (hQ y).2 ⟨sh_one_le N hy, (hsh _).2 ⟨y, hy, rfl⟩⟩) inf_le_left hN1
-    (fun y hy => (hQ _).2 ⟨hN1 y hy.1, by rw [np]; exact hU _ hy.2⟩) hN2 (finite_quot N hN.1) x
+  have hadd :=
+    GlobalTheory.PhiGam.GmultAdd.main (nab gV) (N.restrictScalars k) Q ((sh 1 N).restrictScalars k)
+      (fun y hy => (hQ y).2 ⟨sh_one_le N hy, (hsh _).2 ⟨y, hy, rfl⟩⟩)
+      inf_le_left hN1
+      (fun y hy => (hQ _).2 ⟨hN1 y hy.1, by rw [np]; exact hU _ hy.2⟩)
+      hN2 (finite_quot N hN.1) x
   have e1 : gmult (nab gV) (N.restrictScalars k) Q x = sen gU N' x :=
     gmult_transport (nab gV) (nab gU) (p.restrictScalars k) np _ _ (N'.restrictScalars k)
       ((sh 1 N').restrictScalars k) hN1 inf_le_left hU
-      (fun y hy => ⟨y, hy, rfl⟩) (fun y hy => ⟨fun h => ⟨hy, h⟩, fun h => h.2⟩)
+      (fun y hy => ⟨y, hy, rfl⟩)
+      (fun y hy => ⟨fun h => ⟨hy, h⟩, fun h => h.2⟩)
       (by rintro _ ⟨y, hy, rfl⟩; exact ⟨y, hy, by simp⟩) x
-  have e2 : sen gW (N.comap (f.restrictScalars k⟦X⟧)) x = gmult (nab gV) Q ((sh 1 N).restrictScalars k) x := by
-    refine gmult_transport (nab gW) (nab gV) (f.restrictScalars k) nf _ _ _ _ ?_ (sh_one_le _) hN2 ?_ ?_ ?_ x
+  have e2
+      : sen gW (N.comap (f.restrictScalars k⟦X⟧)) x
+        = gmult (nab gV) Q ((sh 1 N).restrictScalars k) x := by
+    refine gmult_transport (nab gW) (nab gV) (f.restrictScalars k) nf _ _ _ _ ?_ (sh_one_le _) hN2
+      ?_ ?_ ?_ x
     · intro y hy
       change f (nab gW y) ∈ N
       rw [nf]

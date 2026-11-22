@@ -19,8 +19,10 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.EntireApply
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyPow GlobalTheory.KeyKa
@@ -32,7 +34,8 @@ open Matrix
 
 variable {g : ℕ}
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory in
 attribute [local instance] Over.cartesianMonoidalCategory in
 open Matrix in
 private lemma exists_column_sum_eq_add_two_mul (m : ℕ) (al : Matrix (Fin 4) (Fin 4) ℤ) (hal : al.transpose * al = (m : ℤ) • (1 : Matrix (Fin 4) (Fin 4) ℤ)) (c : Fin 4) :
@@ -47,7 +50,8 @@ private lemma exists_column_sum_eq_add_two_mul (m : ℕ) (al : Matrix (Fin 4) (F
     simp [mul_sub, Finset.sum_sub_distrib]
   linarith
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory in
 attribute [local instance] Over.cartesianMonoidalCategory in
 open Matrix in
 private lemma exists_int_two_mul_dotProduct_of_half_integral {g : ℕ} (a : Fin g → ℂ) (ha : ∀ i, a i = 0 ∨ a i = 1 / 2) (k : Fin g → ℤ) :
@@ -57,7 +61,8 @@ private lemma exists_int_two_mul_dotProduct_of_half_integral {g : ℕ} (a : Fin 
   refine Finset.sum_congr rfl fun i _ => ?_
   rcases ha i with h | h <;> simp [h]
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory in
 attribute [local instance] Over.cartesianMonoidalCategory in
 open Matrix in
 private lemma sum_intCast_mul_column_eq_of_transpose_mul_eq_smul (m : ℕ) (al : Matrix (Fin 4) (Fin 4) ℤ) (hal : al.transpose * al = (m : ℤ) • (1 : Matrix (Fin 4) (Fin 4) ℤ)) (c c' : Fin 4) :
@@ -84,17 +89,31 @@ private lemma sum_column_smul_add_tors_eq {g : ℕ} (τ : Matrix (Fin g) (Fin g)
   rw [h3]
   simp
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory in
 attribute [local instance] Over.cartesianMonoidalCategory in
 open Matrix in
 private lemma intCast_zsmul_vector {g : ℕ} (α : ℤ) (v : Fin g → ℤ) :
     (fun i => (((α • v) i : ℤ) : ℂ)) = (α : ℂ) • fun i => (v i : ℂ) := by
   ext i; simp
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory in
 attribute [local instance] Over.cartesianMonoidalCategory in
 open Matrix in
-theorem _root_.GlobalTheory.SimilTheta.aut_similitude_and_mul : ∀ (g m : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ) (a b : Fin g → ℂ) (al : Matrix (Fin 4) (Fin 4) ℤ), _root_.GlobalTheory.KeyPow.charHalf g a b → τ.IsSymm → 1 ≤ m → al.transpose * al = (m : ℤ) • (1 : Matrix (Fin 4) (Fin 4) ℤ) → (∀ (k n : Fin 4 → Fin g → ℤ) (y : Fin 4 → Fin g → ℂ) (c : Fin 4) (k₀ n₀ : Fin g → ℤ), (∏ r, _root_.GlobalTheory.SimilTheta.aut τ a b (al r c • k₀) (al r c • n₀) (∑ c', al r c' • y c' + _root_.GlobalTheory.SimilTheta.tors τ al m k n r)) * Complex.exp (2 * Real.pi * Complex.I * ((fun i => (n c i : ℂ)) ⬝ᵥ _root_.GlobalTheory.SimilTheta.lat τ k₀ n₀)) = _root_.GlobalTheory.SimilTheta.aut τ a b k₀ n₀ (y c) ^ m) ∧ ∀ (k₀ n₀ : Fin g → ℤ) (z : Fin g → ℂ), _root_.GlobalTheory.SimilTheta.aut τ a b ((m : ℤ) • k₀) ((m : ℤ) • n₀) ((m : ℤ) • z) = _root_.GlobalTheory.SimilTheta.aut τ a b k₀ n₀ z ^ (m ^ 2) := by
+theorem _root_.GlobalTheory.SimilTheta.aut_similitude_and_mul
+    : ∀ (g m : ℕ) (τ : Matrix (Fin g) (Fin g) ℂ) (a b : Fin g → ℂ) (al : Matrix (Fin 4) (Fin 4) ℤ),
+      _root_.GlobalTheory.KeyPow.charHalf g a b → τ.IsSymm → 1 ≤ m
+        → al.transpose * al = (m : ℤ) • (1 : Matrix (Fin 4) (Fin 4) ℤ)
+        → (∀ (k n : Fin 4 → Fin g → ℤ) (y : Fin 4 → Fin g → ℂ) (c : Fin 4) (k₀ n₀ : Fin g → ℤ),
+            (∏ r, _root_.GlobalTheory.SimilTheta.aut τ a b (al r c • k₀) (al r c • n₀) (∑ c', al r c' • y c' + _root_.GlobalTheory.SimilTheta.tors τ al m k n r))
+                * Complex.exp
+                  (2 * Real.pi * Complex.I
+                    * ((fun i => (n c i : ℂ)) ⬝ᵥ _root_.GlobalTheory.SimilTheta.lat τ k₀ n₀))
+              = _root_.GlobalTheory.SimilTheta.aut τ a b k₀ n₀ (y c) ^ m)
+          ∧ ∀ (k₀ n₀ : Fin g → ℤ) (z : Fin g → ℂ),
+            _root_.GlobalTheory.SimilTheta.aut τ a b ((m : ℤ) • k₀) ((m : ℤ) • n₀) ((m : ℤ) • z)
+              = _root_.GlobalTheory.SimilTheta.aut τ a b k₀ n₀ z ^ (m ^ 2) := by
   intro g m τ a b al hab hτ hm hal
   refine ⟨fun k n y c k₀ n₀ => ?_, fun k₀ n₀ z => ?_⟩
   · obtain ⟨s, hs⟩ := exists_column_sum_eq_add_two_mul m al hal c
@@ -103,23 +122,34 @@ theorem _root_.GlobalTheory.SimilTheta.aut_similitude_and_mul : ∀ (g m : ℕ) 
     have hV := sum_column_smul_add_tors_eq τ m hm al hal k n y c
     unfold _root_.GlobalTheory.SimilTheta.aut
     simp only [intCast_zsmul_vector, smul_dotProduct, dotProduct_smul, mulVec_smul, smul_eq_mul]
-    rw [← Complex.exp_sum, ← Complex.exp_add, ← Complex.exp_nat_mul, Complex.exp_eq_exp_iff_exists_int]
+    rw [← Complex.exp_sum, ← Complex.exp_add, ← Complex.exp_nat_mul,
+      Complex.exp_eq_exp_iff_exists_int]
     set K₀ : Fin g → ℂ := fun i => (k₀ i : ℂ)
     set N₀ : Fin g → ℂ := fun i => (n₀ i : ℂ)
     set Kc : Fin g → ℂ := fun i => (k c i : ℂ)
     set Nc : Fin g → ℂ := fun i => (n c i : ℂ)
-    have hterm : ∀ x, (2 * ↑Real.pi * Complex.I *
-            (((↑(al x c) * a ⬝ᵥ K₀) - ↑(al x c) * b ⬝ᵥ N₀) -
-                ↑(al x c) * (↑(al x c) * N₀ ⬝ᵥ τ *ᵥ N₀) / 2 -
-              ↑(al x c) * N₀ ⬝ᵥ (∑ c', al x c' • y c' + _root_.GlobalTheory.SimilTheta.tors τ al m k n x)) : ℂ) =
-        2 * ↑Real.pi * Complex.I * ((al x c : ℂ) * (a ⬝ᵥ K₀ - b ⬝ᵥ N₀) - (al x c : ℂ) * al x c * (N₀ ⬝ᵥ τ *ᵥ N₀ / 2)
-          - N₀ ⬝ᵥ ((al x c : ℂ) • (∑ c', al x c' • y c' + _root_.GlobalTheory.SimilTheta.tors τ al m k n x))) := by
+    have hterm
+        : ∀ x,
+          (2 * ↑Real.pi * Complex.I
+                * (((↑(al x c) * a ⬝ᵥ K₀) - ↑(al x c) * b ⬝ᵥ N₀)
+                  - ↑(al x c) * (↑(al x c) * N₀ ⬝ᵥ τ *ᵥ N₀) / 2
+                  - ↑(al x c)
+                    * N₀
+                      ⬝ᵥ (∑ c', al x c' • y c' + _root_.GlobalTheory.SimilTheta.tors τ al m k n x))
+              : ℂ)
+            = 2 * ↑Real.pi * Complex.I
+              * ((al x c : ℂ) * (a ⬝ᵥ K₀ - b ⬝ᵥ N₀) - (al x c : ℂ) * al x c * (N₀ ⬝ᵥ τ *ᵥ N₀ / 2)
+                - N₀
+                  ⬝ᵥ ((al x c : ℂ)
+                    • (∑ c', al x c' • y c'
+                      + _root_.GlobalTheory.SimilTheta.tors τ al m k n x))) := by
       intro x
       rw [dotProduct_smul, smul_eq_mul]
       ring
     simp only [hterm]
-    rw [← Finset.mul_sum, Finset.sum_sub_distrib, Finset.sum_sub_distrib, ← Finset.sum_mul, ← Finset.sum_mul,
-      ← dotProduct_sum, hV, sum_intCast_mul_column_eq_of_transpose_mul_eq_smul m al hal c c, if_pos rfl]
+    rw [← Finset.mul_sum, Finset.sum_sub_distrib, Finset.sum_sub_distrib, ← Finset.sum_mul,
+      ← Finset.sum_mul, ← dotProduct_sum, hV,
+      sum_intCast_mul_column_eq_of_transpose_mul_eq_smul m al hal c c, if_pos rfl]
     have hs' : ∑ x, (al x c : ℂ) = m + 2 * s := by exact_mod_cast hs
     rw [hs']
     have hsym : Nc ⬝ᵥ τ *ᵥ N₀ = N₀ ⬝ᵥ τ *ᵥ Nc := by

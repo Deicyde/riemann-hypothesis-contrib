@@ -12,9 +12,11 @@ noncomputable section
 
 namespace GlobalTheory.SZShift
 
-theorem totalDegree_aeval_le_of_deg_le_one {σ τ F E : Type} [CommRing F] [CommRing E] [Algebra F E]
-    (g : σ → MvPolynomial τ E) (hg : ∀ i, (g i).totalDegree ≤ 1) (P : MvPolynomial σ F) :
-    (aeval g P).totalDegree ≤ P.totalDegree := by
+theorem totalDegree_aeval_le_of_deg_le_one
+    {σ τ F E : Type} [CommRing F] [CommRing E] [Algebra F E]
+    (g : σ → MvPolynomial τ E) (hg : ∀ i, (g i).totalDegree ≤ 1)
+    (P : MvPolynomial σ F)
+    : (aeval g P).totalDegree ≤ P.totalDegree := by
   classical
   conv_lhs => rw [P.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in

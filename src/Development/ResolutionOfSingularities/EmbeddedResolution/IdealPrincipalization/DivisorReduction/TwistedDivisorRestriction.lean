@@ -34,21 +34,26 @@ namespace FunctorialResolution.EmbeddedResolution
 
 namespace DivisorReduction
 
-private theorem orderAt_le_mult (T : MarkedIdealWithBoundary.{u}) (hOB : T.IsOrderBoundedByMult) (x : ↥T.scheme) :
-    orderAt T.ideal x ≤ (T.mult : ℕ∞) := hOB x
+private theorem orderAt_le_mult
+    (T : MarkedIdealWithBoundary.{u}) (hOB : T.IsOrderBoundedByMult) (x : ↥T.scheme)
+    : orderAt T.ideal x ≤ (T.mult : ℕ∞) :=
+  hOB x
 
-private theorem isDerivBalanced_of_isBalanced (T : MarkedIdealWithBoundary.{u})
-    (h : AlgebraicGeometry.LocallyOfFiniteType T.structMap) (hbal : T.IsBalanced h) :
-    IsDerivBalanced T.base T.structMap T.ideal T.mult := hbal
+private theorem isDerivBalanced_of_isBalanced
+    (T : MarkedIdealWithBoundary.{u}) (h : AlgebraicGeometry.LocallyOfFiniteType T.structMap)
+    (hbal : T.IsBalanced h)
+    : IsDerivBalanced T.base T.structMap T.ideal T.mult :=
+  hbal
 
-private theorem mem_support_of_mem_support_comap {X Y : Scheme.{u}} (f : Y ⟶ X)
-    (I : X.IdealSheafData) {y : ↥Y} (hy : y ∈ (I.comap f).support) : f y ∈ I.support := by
+private theorem mem_support_of_mem_support_comap
+    {X Y : Scheme.{u}} (f : Y ⟶ X) (I : X.IdealSheafData) {y : ↥Y} (hy : y ∈ (I.comap f).support)
+    : f y ∈ I.support := by
   rw [Scheme.IdealSheafData.support_comap] at hy
   exact hy
 
-private theorem disjoint_irreducibleComponents_boundary_subscheme (T : MarkedIdealWithBoundary.{u}) (hV : T.IsAdmissible) (j : ℕ)
-    (hj : j < T.boundary.length) :
-    ∀ C₁ ∈ irreducibleComponents ↥(T.boundary.get ⟨j, hj⟩).subscheme,
+private theorem disjoint_irreducibleComponents_boundary_subscheme
+    (T : MarkedIdealWithBoundary.{u}) (hV : T.IsAdmissible) (j : ℕ) (hj : j < T.boundary.length)
+    : ∀ C₁ ∈ irreducibleComponents ↥(T.boundary.get ⟨j, hj⟩).subscheme,
       ∀ C₂ ∈ irreducibleComponents ↥(T.boundary.get ⟨j, hj⟩).subscheme,
         C₁ ≠ C₂ → Disjoint C₁ C₂ := by
   have := hV.charZero
@@ -61,30 +66,40 @@ private theorem disjoint_irreducibleComponents_boundary_subscheme (T : MarkedIde
   unfold IrreducibleComponentsDisjointOfSmooth at h
   exact h T.base _ _ hsm
 
-private theorem containedComponentsIdeal_pow_mul_lowerIdealAfterBlowup (T : MarkedIdealWithBoundary.{u}) (hV : T.IsAdmissible) (j : ℕ)
-    (hj : j < T.boundary.length) :
-    DivisorReduction.containedComponentsIdeal T j hj ^ T.mult * DivisorReduction.lowerIdealAfterBlowup T j hj = T.ideal := by
+private theorem containedComponentsIdeal_pow_mul_lowerIdealAfterBlowup
+    (T : MarkedIdealWithBoundary.{u}) (hV : T.IsAdmissible) (j : ℕ) (hj : j < T.boundary.length)
+    : DivisorReduction.containedComponentsIdeal T j hj ^ T.mult
+        * DivisorReduction.lowerIdealAfterBlowup T j hj
+      = T.ideal := by
   have hex : ∃ B, DivisorReduction.containedComponentsIdeal T j hj ^ T.mult * B = T.ideal :=
     exists_mul_pow_containedComponentsIdeal_eq_ideal T hV j hj
-  have h := pow_mul_residualByPow T.ideal (DivisorReduction.containedComponentsIdeal T j hj) T.mult hex
+  have h :=
+    pow_mul_residualByPow T.ideal (DivisorReduction.containedComponentsIdeal T j hj) T.mult hex
   simpa [DivisorReduction.lowerIdealAfterBlowup, exceptionalIdeal_id,
-    Scheme.IdealSheafData.comap_id] using h
+      Scheme.IdealSheafData.comap_id]
+    using h
 
-theorem nonzeroOnComponents_comap_lowerIdealAfterBlowup (T : MarkedIdealWithBoundary.{u}) (hV : T.IsAdmissible)
-    (hOB : T.IsOrderBoundedByMult) (hbal : T.IsBalanced hV.locallyOfFiniteType) (j : ℕ)
-    (hj : j < T.boundary.length) :
-    NonzeroOnComponents
-      ((DivisorReduction.lowerIdealAfterBlowup T j hj).comap (T.boundary.get ⟨j, hj⟩).subschemeι) := by
+theorem nonzeroOnComponents_comap_lowerIdealAfterBlowup
+    (T : MarkedIdealWithBoundary.{u}) (hV : T.IsAdmissible)
+    (hOB : T.IsOrderBoundedByMult) (hbal : T.IsBalanced hV.locallyOfFiniteType)
+    (j : ℕ) (hj : j < T.boundary.length)
+    : NonzeroOnComponents ((DivisorReduction.lowerIdealAfterBlowup T j hj).comap
+      (T.boundary.get ⟨j, hj⟩).subschemeι) := by
   have := hV.charZero
   have := hV.locallyOfFiniteType
   have := hV.smooth
   have : TopologicalSpace.NoetherianSpace ↥(T.boundary.get ⟨j, hj⟩).subscheme :=
     EmbeddedResolution.noetherianSpace_boundary_subscheme T hV j hj
-  have hfact : DivisorReduction.containedComponentsIdeal T j hj ^ T.mult *
-      DivisorReduction.lowerIdealAfterBlowup T j hj = T.ideal := containedComponentsIdeal_pow_mul_lowerIdealAfterBlowup T hV j hj
-  have horder : ∀ x : ↥T.scheme, orderAt T.ideal x =
-      (T.mult : ℕ∞) * orderAt (DivisorReduction.containedComponentsIdeal T j hj) x +
-        orderAt (DivisorReduction.lowerIdealAfterBlowup T j hj) x := by
+  have hfact
+      : DivisorReduction.containedComponentsIdeal T j hj ^ T.mult
+          * DivisorReduction.lowerIdealAfterBlowup T j hj
+        = T.ideal :=
+    containedComponentsIdeal_pow_mul_lowerIdealAfterBlowup T hV j hj
+  have horder
+      : ∀ x : ↥T.scheme,
+        orderAt T.ideal x
+          = (T.mult : ℕ∞) * orderAt (DivisorReduction.containedComponentsIdeal T j hj) x
+            + orderAt (DivisorReduction.lowerIdealAfterBlowup T j hj) x := by
     intro x
     rw [← hfact, orderAt_mul T.base T.structMap, orderAt_pow T.base T.structMap]
   rw [nonzeroOnComponents_iff]
@@ -97,31 +112,43 @@ theorem nonzeroOnComponents_comap_lowerIdealAfterBlowup (T : MarkedIdealWithBoun
     have hxrel : x ∈ divisorComponentsInOrderLocus T j hj := by
       intro z hz
       exact hcase z (hcc hz)
-    have hopen : IsOpen (divisorComponentsInOrderLocus T j hj) := isOpen_setOf_connectedComponent_subset_orderAtLeastLocus T hV j hj
-    have hcl : IsClosed (divisorComponentsInOrderLocus T j hj) := isClosed_divisorComponentsInOrderLocus T hV j hj
-    have hZsupp : (T.boundary.get ⟨j, hj⟩).subschemeι x ∈
-        (DivisorReduction.containedComponentsIdeal T j hj).support := by
+    have hopen : IsOpen (divisorComponentsInOrderLocus T j hj) :=
+      isOpen_setOf_connectedComponent_subset_orderAtLeastLocus T hV j hj
+    have hcl : IsClosed (divisorComponentsInOrderLocus T j hj) :=
+      isClosed_divisorComponentsInOrderLocus T hV j hj
+    have hZsupp
+        : (T.boundary.get ⟨j, hj⟩).subschemeι x
+          ∈ (DivisorReduction.containedComponentsIdeal T j hj).support := by
       rw [containedComponentsIdeal_eq_openSubschemeKer T j hj hopen]
-      have hmem : (T.boundary.get ⟨j, hj⟩).subschemeι x ∈
-          ((openSubschemeKer (T.boundary.get ⟨j, hj⟩)
-            ⟨divisorComponentsInOrderLocus T j hj, hopen⟩).support : Set ↥T.scheme) := by
+      have hmem
+          : (T.boundary.get ⟨j, hj⟩).subschemeι x
+            ∈ ((openSubschemeKer (T.boundary.get ⟨j, hj⟩)
+                ⟨divisorComponentsInOrderLocus T j hj, hopen⟩).support
+              : Set ↥T.scheme) := by
         rw [support_openSubschemeKer _ _ hcl]
         exact ⟨x, hxrel, rfl⟩
       exact hmem
-    have hxsupp : (T.boundary.get ⟨j, hj⟩).subschemeι x ∈
-        (DivisorReduction.lowerIdealAfterBlowup T j hj).support :=
+    have hxsupp
+        : (T.boundary.get ⟨j, hj⟩).subschemeι x
+          ∈ (DivisorReduction.lowerIdealAfterBlowup T j hj).support :=
       mem_support_of_mem_support_comap _ _ (hsub hx)
-    have h1 : (1 : ℕ∞) ≤ orderAt (DivisorReduction.lowerIdealAfterBlowup T j hj)
-        ((T.boundary.get ⟨j, hj⟩).subschemeι x) :=
+    have h1
+        : (1 : ℕ∞)
+          ≤ orderAt (DivisorReduction.lowerIdealAfterBlowup T j hj)
+            ((T.boundary.get ⟨j, hj⟩).subschemeι x) :=
       (one_le_orderAt_iff_mem_support _ _).mpr hxsupp
-    have h2 : (1 : ℕ∞) ≤ orderAt (DivisorReduction.containedComponentsIdeal T j hj)
-        ((T.boundary.get ⟨j, hj⟩).subschemeι x) :=
+    have h2
+        : (1 : ℕ∞)
+          ≤ orderAt (DivisorReduction.containedComponentsIdeal T j hj)
+            ((T.boundary.get ⟨j, hj⟩).subschemeι x) :=
       (one_le_orderAt_iff_mem_support _ _).mpr hZsupp
     have h3 : (T.mult : ℕ∞) + 1 ≤ orderAt T.ideal ((T.boundary.get ⟨j, hj⟩).subschemeι x) := by
-      calc (T.mult : ℕ∞) + 1 = (T.mult : ℕ∞) * 1 + 1 := by rw [mul_one]
+      calc
+        (T.mult : ℕ∞) + 1
+          = (T.mult : ℕ∞) * 1 + 1 := by rw [mul_one]
         _ ≤ (T.mult : ℕ∞) * orderAt (DivisorReduction.containedComponentsIdeal T j hj)
-              ((T.boundary.get ⟨j, hj⟩).subschemeι x) +
-            orderAt (DivisorReduction.lowerIdealAfterBlowup T j hj)
+              ((T.boundary.get ⟨j, hj⟩).subschemeι x)
+            + orderAt (DivisorReduction.lowerIdealAfterBlowup T j hj)
               ((T.boundary.get ⟨j, hj⟩).subschemeι x) := by
           gcongr
         _ = orderAt T.ideal ((T.boundary.get ⟨j, hj⟩).subschemeι x) := (horder _).symm
@@ -147,34 +174,45 @@ theorem nonzeroOnComponents_comap_lowerIdealAfterBlowup (T : MarkedIdealWithBoun
       rw [hsub, pow_one] at hpow
       have hord := orderAt_le_of_le hpow ((T.boundary.get ⟨j, hj⟩).subschemeι y)
       rw [orderAt_pow T.base T.structMap] at hord
-      have hne : orderAt (derivIdealSheafIterate T.base T.structMap (T.mult - 1) T.ideal)
-          ((T.boundary.get ⟨j, hj⟩).subschemeι y) ≠ 0 := by
+      have hne
+          : orderAt (derivIdealSheafIterate T.base T.structMap (T.mult - 1) T.ideal)
+              ((T.boundary.get ⟨j, hj⟩).subschemeι y)
+            ≠ 0 := by
         intro hz
         rw [hz, mul_zero] at hord
         exact h0 (le_antisymm hord zero_le)
-      have hmem : (T.boundary.get ⟨j, hj⟩).subschemeι y ∈
-          (derivIdealSheafIterate T.base T.structMap (T.mult - 1) T.ideal).support := by
+      have hmem
+          : (T.boundary.get ⟨j, hj⟩).subschemeι y
+            ∈ (derivIdealSheafIterate T.base T.structMap (T.mult - 1) T.ideal).support := by
         by_contra hc
         exact hne ((orderAt_eq_zero_iff_not_mem_support _ _).mpr hc)
       apply hy
       rw [← support_derivIdealSheafIterate_eq_orderAtLeastLocus T.base T.structMap T.ideal hm]
       exact hmem
-    have hle : orderAt (DivisorReduction.lowerIdealAfterBlowup T j hj)
-        ((T.boundary.get ⟨j, hj⟩).subschemeι y) ≤ 0 := by
+    have hle
+        : orderAt (DivisorReduction.lowerIdealAfterBlowup T j hj)
+            ((T.boundary.get ⟨j, hj⟩).subschemeι y)
+          ≤ 0 := by
       rw [← hy0, horder]
       exact le_add_self
-    have hJ0 : orderAt (DivisorReduction.lowerIdealAfterBlowup T j hj)
-        ((T.boundary.get ⟨j, hj⟩).subschemeι y) = 0 := le_antisymm hle zero_le
-    have hmem : (T.boundary.get ⟨j, hj⟩).subschemeι y ∈
-        (DivisorReduction.lowerIdealAfterBlowup T j hj).support :=
+    have hJ0
+        : orderAt (DivisorReduction.lowerIdealAfterBlowup T j hj)
+            ((T.boundary.get ⟨j, hj⟩).subschemeι y)
+          = 0 :=
+      le_antisymm hle zero_le
+    have hmem
+        : (T.boundary.get ⟨j, hj⟩).subschemeι y
+          ∈ (DivisorReduction.lowerIdealAfterBlowup T j hj).support :=
       mem_support_of_mem_support_comap _ _ (hsub hyC)
     rw [← one_le_orderAt_iff_mem_support, hJ0] at hmem
     simp at hmem
 
-theorem isAdmissible_restrictTwistedToDivisor (T : MarkedIdealWithBoundary.{u}) (hV : T.IsAdmissible)
-    (hOB : T.IsOrderBoundedByMult) (hbal : T.IsBalanced hV.locallyOfFiniteType) (j : ℕ)
-    (hj : j < T.boundary.length) (_hZ : DivisorReduction.containedComponentsIdeal T j hj ≠ ⊤) :
-    (DivisorReduction.restrictTwistedToDivisor T j hj).IsAdmissible := by
+theorem isAdmissible_restrictTwistedToDivisor
+    (T : MarkedIdealWithBoundary.{u}) (hV : T.IsAdmissible)
+    (hOB : T.IsOrderBoundedByMult) (hbal : T.IsBalanced hV.locallyOfFiniteType)
+    (j : ℕ) (hj : j < T.boundary.length)
+    (_hZ : DivisorReduction.containedComponentsIdeal T j hj ≠ ⊤)
+    : (DivisorReduction.restrictTwistedToDivisor T j hj).IsAdmissible := by
   have := hV.charZero
   have := hV.locallyOfFiniteType
   have := hV.quasiCompact
@@ -183,18 +221,22 @@ theorem isAdmissible_restrictTwistedToDivisor (T : MarkedIdealWithBoundary.{u}) 
     ((isSmoothDivisor_iff T.structMap (T.boundary.get ⟨j, hj⟩)).mp
       (isSmoothDivisor_boundary_get T hV j hj)).2
   have := hsm
-  have hlft : AlgebraicGeometry.LocallyOfFiniteType
-      ((T.boundary.get ⟨j, hj⟩).subschemeι ≫ T.structMap) := inferInstance
-  have hqc : AlgebraicGeometry.QuasiCompact
-      ((T.boundary.get ⟨j, hj⟩).subschemeι ≫ T.structMap) := inferInstance
-  exact
-    { charZero := hV.charZero
-      locallyOfFiniteType := hlft
-      nonzeroOnComponents := nonzeroOnComponents_comap_lowerIdealAfterBlowup T hV hOB hbal j hj
-      one_le_mult := hV.one_le_mult
-      quasiCompact := hqc
-      smooth := hsm
-      snc := DivisorReductionBoundary.inStrictNormalCrossingPosition_comap_lowerBoundaryAfterBlowup T hV j hj }
+  have hlft
+      : AlgebraicGeometry.LocallyOfFiniteType ((T.boundary.get ⟨j, hj⟩).subschemeι ≫ T.structMap) :=
+    inferInstance
+  have hqc : AlgebraicGeometry.QuasiCompact ((T.boundary.get ⟨j, hj⟩).subschemeι ≫ T.structMap) :=
+    inferInstance
+  exact {
+    charZero := hV.charZero
+    locallyOfFiniteType := hlft
+    nonzeroOnComponents := nonzeroOnComponents_comap_lowerIdealAfterBlowup T hV hOB hbal j hj
+    one_le_mult := hV.one_le_mult
+    quasiCompact := hqc
+    smooth := hsm
+    snc :=
+      DivisorReductionBoundary.inStrictNormalCrossingPosition_comap_lowerBoundaryAfterBlowup T hV j
+        hj
+  }
 
 end DivisorReduction
 

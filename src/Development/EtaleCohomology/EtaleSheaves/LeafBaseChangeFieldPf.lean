@@ -10,18 +10,20 @@ open Polynomial IntermediateField
 namespace LateralTheory.E.LeafBaseChangeFieldPf
 
 def ratMap (F G : Type) [Field F] [Field G] [Algebra F G] : RatFunc F →+* RatFunc G :=
-  RatFunc.liftRingHom ((algebraMap G[X] (RatFunc G)).comp (Polynomial.mapRingHom (algebraMap F G))) (show
-      nonZeroDivisors F[X] ≤ Submonoid.comap ((algebraMap G[X] (RatFunc G)).comp
-        (Polynomial.mapRingHom (algebraMap F G))) (nonZeroDivisors (RatFunc G)) from by
-    intro p hp
-    rw [Submonoid.mem_comap]
-    refine mem_nonZeroDivisors_of_ne_zero ?_
-    have hp0 : p ≠ 0 := nonZeroDivisors.ne_zero hp
-    simp only [RingHom.coe_comp, Function.comp_apply, Polynomial.coe_mapRingHom]
-    intro h
-    apply hp0
-    have h1 := RatFunc.algebraMap_injective G (h.trans (map_zero _).symm)
-    exact (Polynomial.map_eq_zero_iff (algebraMap F G).injective).1 h1)
+  RatFunc.liftRingHom ((algebraMap G[X] (RatFunc G)).comp (Polynomial.mapRingHom (algebraMap F G)))
+    (show nonZeroDivisors F[X]
+        ≤ Submonoid.comap
+          ((algebraMap G[X] (RatFunc G)).comp (Polynomial.mapRingHom (algebraMap F G)))
+          (nonZeroDivisors (RatFunc G)) from by
+      intro p hp
+      rw [Submonoid.mem_comap]
+      refine mem_nonZeroDivisors_of_ne_zero ?_
+      have hp0 : p ≠ 0 := nonZeroDivisors.ne_zero hp
+      simp only [RingHom.coe_comp, Function.comp_apply, Polynomial.coe_mapRingHom]
+      intro h
+      apply hp0
+      have h1 := RatFunc.algebraMap_injective G (h.trans (map_zero _).symm)
+      exact (Polynomial.map_eq_zero_iff (algebraMap F G).injective).1 h1)
 
 lemma ratMap_algebraMap (F G : Type) [Field F] [Field G] [Algebra F G] (f : F) :
     ratMap F G (algebraMap F (RatFunc F) f) = algebraMap G (RatFunc G) (algebraMap F G f) := by
@@ -62,7 +64,8 @@ lemma finite_over_adjoin {G L : Type} [Field G] [Field L] [Algebra (RatFunc G) L
 end LateralTheory.E.LeafBaseChangeFieldPf
 
 open LateralTheory.E.LeafBaseChangeFieldPf in
-theorem LateralTheory.E.LeafBaseChangeFieldPf.LeafBaseChangeField_of : LateralTheory.E.LeafCurveVCut.LeafBaseChangeField := by
+theorem LateralTheory.E.LeafBaseChangeFieldPf.LeafBaseChangeField_of
+    : LateralTheory.E.LeafCurveVCut.LeafBaseChangeField := by
   intro F G K _ _ _ _ _ t ht hfin
   let e := RatFunc.algEquivOfTranscendental t ht
   let h : F⟮t⟯ →+* RatFunc G := (ratMap F G).comp e.symm.toRingHom
@@ -77,16 +80,25 @@ theorem LateralTheory.E.LeafBaseChangeFieldPf.LeafBaseChangeField_of : LateralTh
   haveI : Module.Finite (RatFunc G) (TensorProduct F⟮t⟯ (RatFunc G) K ⧸ M) :=
     Module.Finite.of_surjective (Ideal.Quotient.mkₐ (RatFunc G) M).toLinearMap Ideal.Quotient.mk_surjective
   haveI : IsScalarTower G (RatFunc G) (TensorProduct F⟮t⟯ (RatFunc G) K ⧸ M) := inferInstance
-  refine ⟨TensorProduct F⟮t⟯ (RatFunc G) K ⧸ M, inferInstance, inferInstance,
+  refine ⟨
+    TensorProduct F⟮t⟯ (RatFunc G) K ⧸ M,
+    inferInstance,
+    inferInstance,
     algebraMap (RatFunc G) _ RatFunc.X,
-    (Ideal.Quotient.mk M).comp (Algebra.TensorProduct.includeRight (R := F⟮t⟯) (A := RatFunc G) (B := K)).toRingHom,
-    transc_X_image, finite_over_adjoin, ?_⟩
+    (Ideal.Quotient.mk M).comp
+      (Algebra.TensorProduct.includeRight (R := F⟮t⟯) (A := RatFunc G) (B := K)).toRingHom,
+    transc_X_image,
+    finite_over_adjoin,
+    ?_
+  ⟩
   ext f
   have h1 : h (algebraMap F F⟮t⟯ f) = algebraMap G (RatFunc G) (algebraMap F G f) := by
     show ratMap F G (e.symm (algebraMap F F⟮t⟯ f)) = _
     rw [AlgEquiv.commutes]
     exact ratMap_algebraMap F G f
-  rw [RingHom.comp_apply, RingHom.comp_apply, IsScalarTower.algebraMap_apply F F⟮t⟯ K, AlgHom.toRingHom_eq_coe,
-    RingHom.coe_coe, AlgHom.commutes, IsScalarTower.algebraMap_apply F⟮t⟯ (RatFunc G)]
-  rw [RingHom.comp_apply, IsScalarTower.algebraMap_apply G (RatFunc G) (TensorProduct F⟮t⟯ (RatFunc G) K ⧸ M), ← h1]
+  rw [RingHom.comp_apply, RingHom.comp_apply, IsScalarTower.algebraMap_apply F F⟮t⟯ K,
+    AlgHom.toRingHom_eq_coe, RingHom.coe_coe, AlgHom.commutes,
+    IsScalarTower.algebraMap_apply F⟮t⟯ (RatFunc G)]
+  rw [RingHom.comp_apply,
+    IsScalarTower.algebraMap_apply G (RatFunc G) (TensorProduct F⟮t⟯ (RatFunc G) K ⧸ M), ← h1]
   rfl

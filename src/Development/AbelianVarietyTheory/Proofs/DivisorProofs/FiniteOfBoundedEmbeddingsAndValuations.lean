@@ -8,7 +8,8 @@ open NumberField IsDedekindDomain Filter
 
 namespace GlobalTheory.BddFinite
 
-theorem exists_le_exp_nat (B : WithZero (Multiplicative ℤ)) : ∃ n : ℕ, B ≤ WithZero.exp (n : ℤ) := by
+theorem exists_le_exp_nat (B : WithZero (Multiplicative ℤ))
+    : ∃ n : ℕ, B ≤ WithZero.exp (n : ℤ) := by
   induction B using WithZero.recZeroCoe with
   | zero => exact ⟨0, zero_le'⟩
   | coe m =>
@@ -17,10 +18,11 @@ theorem exists_le_exp_nat (B : WithZero (Multiplicative ℤ)) : ∃ n : ℕ, B �
     simp only [toAdd_ofAdd]
     exact Int.self_le_toNat _
 
-theorem exists_clearing {K : Type} [Field K] [NumberField K] (A : Set K)
-    (w : HeightOneSpectrum (𝓞 K)) (B : WithZero (Multiplicative ℤ))
-    (hB : ∀ x ∈ A, w.valuation K x ≤ B) :
-    ∃ a : 𝓞 K, a ≠ 0 ∧ ∀ x ∈ A, w.valuation K ((a : K) * x) ≤ 1 := by
+theorem exists_clearing
+    {K : Type} [Field K] [NumberField K]
+    (A : Set K) (w : HeightOneSpectrum (𝓞 K)) (B : WithZero (Multiplicative ℤ))
+    (hB : ∀ x ∈ A, w.valuation K x ≤ B)
+    : ∃ a : 𝓞 K, a ≠ 0 ∧ ∀ x ∈ A, w.valuation K ((a : K) * x) ≤ 1 := by
   obtain ⟨n, hn⟩ := exists_le_exp_nat B
   have hne : w.asIdeal ^ n ≠ ⊥ := pow_ne_zero n w.ne_bot
   obtain ⟨r, hr, hr0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
@@ -29,11 +31,18 @@ theorem exists_clearing {K : Type} [Field K] [NumberField K] (A : Set K)
   rw [map_mul]
   have h2 : w.valuation K (r : K) = w.intValuation r := w.valuation_of_algebraMap r
   rw [h2]
-  calc w.intValuation r * w.valuation K x ≤ WithZero.exp (-(n : ℤ)) * WithZero.exp (n : ℤ) :=
-        mul_le_mul' h1 ((hB x hx).trans hn)
+  calc
+    w.intValuation r * w.valuation K x
+      ≤ WithZero.exp (-(n : ℤ)) * WithZero.exp (n : ℤ) := mul_le_mul' h1 ((hB x hx).trans hn)
     _ = 1 := by rw [← WithZero.exp_add]; simp
 
-theorem finite_of_bdd : ∀ (K : Type) [Field K] [NumberField K] (A : Set K) (R : ℝ), (∀ x ∈ A, ∀ τ : K →+* ℂ, ‖τ x‖ ≤ R) → (∀ w : HeightOneSpectrum (𝓞 K), ∃ B : WithZero (Multiplicative ℤ), ∀ x ∈ A, w.valuation K x ≤ B) → (∀ᶠ w : HeightOneSpectrum (𝓞 K) in cofinite, ∀ x ∈ A, w.valuation K x ≤ 1) → A.Finite := by
+theorem finite_of_bdd
+    : ∀ (K : Type) [Field K] [NumberField K] (A : Set K) (R : ℝ),
+      (∀ x ∈ A, ∀ τ : K →+* ℂ, ‖τ x‖ ≤ R)
+        → (∀ w : HeightOneSpectrum (𝓞 K), ∃ B : WithZero (Multiplicative ℤ), ∀ x ∈ A,
+          w.valuation K x ≤ B)
+        → (∀ᶠ w : HeightOneSpectrum (𝓞 K) in cofinite, ∀ x ∈ A, w.valuation K x ≤ 1)
+        → A.Finite := by
   classical
   intro K _ _ A R hR hB hcof
   choose B hB using hB
@@ -70,7 +79,10 @@ theorem finite_of_bdd : ∀ (K : Type) [Field K] [NumberField K] (A : Set K) (R 
   · intro τ
     rw [map_mul, norm_mul]
     have h1 : ‖τ (d : K)‖ ≤ M :=
-      Finset.single_le_sum (f := fun τ : K →+* ℂ => ‖τ (d : K)‖) (fun τ _ => norm_nonneg _) (Finset.mem_univ τ)
+      Finset.single_le_sum
+        (f := fun τ : K →+* ℂ => ‖τ (d : K)‖)
+        (fun τ _ => norm_nonneg _)
+        (Finset.mem_univ τ)
     exact mul_le_mul h1 (hR x hx τ) (norm_nonneg _) hM0
   · simp only
     rw [← mul_assoc, inv_mul_cancel₀ hdK, one_mul]

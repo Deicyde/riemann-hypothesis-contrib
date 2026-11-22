@@ -9,7 +9,8 @@ noncomputable section
 
 namespace MassDataIdxSteps
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.TypedSets NumberField IsDedekindDomain Formalism.BasicNotions
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.TypedSets NumberField IsDedekindDomain Formalism.BasicNotions
   Formalism.L2.SG.HidaSetting
 open scoped TensorProduct Matrix
 
@@ -17,8 +18,8 @@ section Loc
 
 variable {D : D7} (X : HidaSetting D) (p : TypX X) (θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p)
 
-theorem dual_fwd (hθ : IsSplitEquiv X p θ) (z : Fin X.B.I.n → FpX X p) (hz : z ∈ Mlat2 X p θ) :
-    ∀ y ∈ Mlat1 X p θ, z ⬝ᵥ (J1 X p θ *ᵥ y) ∈ OpX X p := by
+theorem dual_fwd (hθ : IsSplitEquiv X p θ) (z : Fin X.B.I.n → FpX X p) (hz : z ∈ Mlat2 X p θ)
+    : ∀ y ∈ Mlat1 X p θ, z ⬝ᵥ (J1 X p θ *ᵥ y) ∈ OpX X p := by
   intro y hy
   induction hz using Submodule.span_induction with
   | mem z hz' =>
@@ -27,7 +28,8 @@ theorem dual_fwd (hθ : IsSplitEquiv X p θ) (z : Fin X.B.I.n → FpX X p) (hz :
     | mem y hy' =>
       obtain ⟨l, hl, rfl⟩ := hy'
       exact dual_gen X p θ hθ l l' hl hl'
-    | zero => simp
+    | zero =>
+      simp
     | add a b _ _ ha hb =>
       rw [Matrix.mulVec_add]
       first
@@ -39,7 +41,8 @@ theorem dual_fwd (hθ : IsSplitEquiv X p θ) (z : Fin X.B.I.n → FpX X p) (hz :
       first
       | (rw [dotProduct_smul, smul_eq_mul]; exact mul_mem c.2 ha)
       | (rw [Matrix.dotProduct_smul, smul_eq_mul]; exact mul_mem c.2 ha)
-  | zero => simp
+  | zero =>
+    simp
   | add a b _ _ ha hb =>
     first
     | (rw [add_dotProduct]; exact add_mem ha hb)
@@ -50,8 +53,7 @@ theorem dual_fwd (hθ : IsSplitEquiv X p θ) (z : Fin X.B.I.n → FpX X p) (hz :
     | (rw [smul_dotProduct, smul_eq_mul]; exact mul_mem c.2 ha)
     | (rw [Matrix.smul_dotProduct, smul_eq_mul]; exact mul_mem c.2 ha)
 
-def DualBack : Prop :=
-  ∀ z, (∀ y ∈ Mlat1 X p θ, z ⬝ᵥ (J1 X p θ *ᵥ y) ∈ OpX X p) → z ∈ Mlat2 X p θ
+def DualBack : Prop := ∀ z, (∀ y ∈ Mlat1 X p θ, z ⬝ᵥ (J1 X p θ *ᵥ y) ∈ OpX X p) → z ∈ Mlat2 X p θ
 
 theorem latDual_of (hθ : IsSplitEquiv X p θ) (hB : DualBack X p θ) : LatDualP X p θ := by
   first
@@ -60,9 +62,11 @@ theorem latDual_of (hθ : IsSplitEquiv X p θ) (hB : DualBack X p θ) : LatDualP
   | (unfold LatDualP; done)
 
 theorem latBasisAll_of_back
-    (hB : ∀ θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p, IsSplitEquiv X p θ → DualBack X p θ) :
-    LatBasisAll X p :=
-  latBasisAll_of X p (fun θ hθ => latSplit_of X p θ (unitElt_holds X p θ hθ)) (fun θ _ => latFree_holds X p θ)
+    (hB : ∀ θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p, IsSplitEquiv X p θ → DualBack X p θ)
+    : LatBasisAll X p :=
+  latBasisAll_of X p
+    (fun θ hθ => latSplit_of X p θ (unitElt_holds X p θ hθ))
+    (fun θ _ => latFree_holds X p θ)
     (fun θ hθ => latDual_of X p θ hθ (hB θ hθ))
 
 end Loc

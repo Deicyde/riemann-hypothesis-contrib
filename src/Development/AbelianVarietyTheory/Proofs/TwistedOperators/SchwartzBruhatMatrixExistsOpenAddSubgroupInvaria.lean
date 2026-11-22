@@ -10,16 +10,18 @@ open scoped Topology
 
 namespace GlobalTheory.RootEx
 
-
 open MeasureTheory ValuativeRel Matrix in
 open scoped Topology Pointwise in
-theorem _root_.GlobalTheory.RootEx.exists_isOpen_addSubgroup_add_eq {X : Type*}
-    [AddCommGroup X] [TopologicalSpace X]
-    [IsTopologicalAddGroup X] {Φ : X → ℂ} (hlc : IsLocallyConstant Φ) (hcs : IsCompact (tsupport Φ)) :
-    ∃ Λ : AddSubgroup X, IsOpen (Λ : Set X) ∧ ∀ x, ∀ y ∈ Λ, Φ (x + y) = Φ x := by
+theorem _root_.GlobalTheory.RootEx.exists_isOpen_addSubgroup_add_eq
+    {X : Type*} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X]
+    {Φ : X → ℂ} (hlc : IsLocallyConstant Φ) (hcs : IsCompact (tsupport Φ))
+    : ∃ Λ : AddSubgroup X, IsOpen (Λ : Set X) ∧ ∀ x, ∀ y ∈ Λ, Φ (x + y) = Φ x := by
   classical
-  obtain ⟨t, ht⟩ := hcs.elim_finite_subcover (fun c : ℂ => {x | Φ x = c})
-    (fun c => hlc.isOpen_fiber c) (fun x _ => Set.mem_iUnion.2 ⟨Φ x, rfl⟩)
+  obtain ⟨t, ht⟩ :=
+    hcs.elim_finite_subcover
+      (fun c : ℂ => {x | Φ x = c})
+      (fun c => hlc.isOpen_fiber c)
+      (fun x _ => Set.mem_iUnion.2 ⟨Φ x, rfl⟩)
   have hV : ∀ c : ℂ, ∃ V ∈ 𝓝 (0 : X), c ≠ 0 → {x | Φ x = c} + V ⊆ {x | Φ x = c} := by
     intro c
     by_cases hc : c = 0
@@ -30,8 +32,9 @@ theorem _root_.GlobalTheory.RootEx.exists_isOpen_addSubgroup_add_eq {X : Type*}
           rw [Set.mem_setOf_eq] at hx
           rw [hx]
           exact hc)
-      obtain ⟨V, hV0, hVs⟩ := compact_open_separated_add_right
-        (hcs.of_isClosed_subset (hlc.isClosed_fiber c) hsub) (hlc.isOpen_fiber c) le_rfl
+      obtain ⟨V, hV0, hVs⟩ :=
+        compact_open_separated_add_right (hcs.of_isClosed_subset (hlc.isClosed_fiber c) hsub)
+          (hlc.isOpen_fiber c) le_rfl
       exact ⟨V, hV0, fun _ => hVs⟩
   choose V hV0 hVsub using hV
   have hW : (⋂ c ∈ t, (V c ∩ -V c)) ∈ 𝓝 (0 : X) :=
@@ -61,9 +64,12 @@ theorem _root_.GlobalTheory.RootEx.exists_isOpen_addSubgroup_add_eq {X : Type*}
       have h := hVsub c hc0 (Set.add_mem_add hc (hv' c hct).1)
       have h' : Φ (x + v) = c := h
       exact h'.trans hc'.symm
-  refine ⟨AddSubgroup.closure (⋂ c ∈ t, (V c ∩ -V c)),
+  refine ⟨
+    AddSubgroup.closure (⋂ c ∈ t, (V c ∩ -V c)),
     AddSubgroup.isOpen_of_mem_nhds _ (g := 0)
-      (Filter.mem_of_superset hW AddSubgroup.subset_closure), ?_⟩
+      (Filter.mem_of_superset hW AddSubgroup.subset_closure),
+    ?_
+  ⟩
   intro x y hy
   induction hy using AddSubgroup.closure_induction generalizing x with
   | mem y hy => exact hstep x y hy
@@ -74,14 +80,13 @@ theorem _root_.GlobalTheory.RootEx.exists_isOpen_addSubgroup_add_eq {X : Type*}
     rw [neg_add_cancel_right] at h
     exact h.symm
 
-
 open MeasureTheory ValuativeRel Matrix in
 open scoped Topology Pointwise in
-theorem _root_.GlobalTheory.RootEx.sb_matrix_exists_isOpen_addSubgroup :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-      (a b : Type) [Fintype a] [Fintype b], ∀ Φ ∈ _root_.GlobalTheory.SplitWeil.SB (Matrix a b k),
-      ∃ Λ : AddSubgroup (Matrix a b k), IsOpen (Λ : Set (Matrix a b k)) ∧
-        ∀ x, ∀ y ∈ Λ, Φ (x + y) = Φ x := by
+theorem _root_.GlobalTheory.RootEx.sb_matrix_exists_isOpen_addSubgroup
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (a b : Type) [Fintype a] [Fintype b],
+      ∀ Φ ∈ _root_.GlobalTheory.SplitWeil.SB (Matrix a b k), ∃ Λ : AddSubgroup (Matrix a b k),
+        IsOpen (Λ : Set (Matrix a b k)) ∧ ∀ x, ∀ y ∈ Λ, Φ (x + y) = Φ x := by
   intro k _ _ _ _ a b _ _ Φ hΦ
   obtain ⟨hlc, hcs⟩ := hΦ
   exact _root_.GlobalTheory.RootEx.exists_isOpen_addSubgroup_add_eq hlc hcs

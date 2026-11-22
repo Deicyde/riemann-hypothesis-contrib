@@ -21,17 +21,19 @@ theorem smul_field (c : 𝓞 K) (y : K) : c • y = (c : K) * y := Algebra.smul_
 theorem smul_coord (c : 𝓞 K) (x : Fin n → K) (i : Fin n) : (c • x) i = (c : K) * x i :=
   smul_field c (x i)
 
-theorem exists_smul_mem (M : Submodule (𝓞 K) (Fin n → K)) {x : Fin n → K}
-    (hx : x ∈ Submodule.span K (M : Set (Fin n → K))) :
-    ∃ c : 𝓞 K, c ≠ 0 ∧ c • x ∈ M :=
-  _root_.UpperTheory.Reformulated.B.P6.r03a.GlobalTheory.CompanionTheory.Adelic.SatLine.exists_smul_mem M hx
+theorem exists_smul_mem
+    (M : Submodule (𝓞 K) (Fin n → K))
+    {x : Fin n → K} (hx : x ∈ Submodule.span K (M : Set (Fin n → K)))
+    : ∃ c : 𝓞 K, c ≠ 0 ∧ c • x ∈ M :=
+  _root_.UpperTheory.Reformulated.B.P6.r03a.GlobalTheory.CompanionTheory.Adelic.SatLine.exists_smul_mem
+    M hx
 
-theorem exists_denominator {M : Submodule (𝓞 K) (Fin n → K)} (hM : M.FG) (j : Fin n) (a : K) :
-    ∃ d : 𝓞 K, d ≠ 0 ∧ ∀ x ∈ M, ∃ t : 𝓞 K, (d : K) * (a * x j) = t := by
+theorem exists_denominator {M : Submodule (𝓞 K) (Fin n → K)} (hM : M.FG) (j : Fin n) (a : K)
+    : ∃ d : 𝓞 K, d ≠ 0 ∧ ∀ x ∈ M, ∃ t : 𝓞 K, (d : K) * (a * x j) = t := by
   classical
   obtain ⟨S, hS⟩ := hM
-  obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finset (𝓞 K)⁰
-    (S.image fun x : Fin n → K => a * x j)
+  obtain ⟨b, hb⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (𝓞 K)⁰ (S.image fun x : Fin n → K => a * x j)
   refine ⟨b, nonZeroDivisors.ne_zero b.2, fun x hx => ?_⟩
   rw [← hS] at hx
   induction hx using Submodule.span_induction with
@@ -41,7 +43,8 @@ theorem exists_denominator {M : Submodule (𝓞 K) (Fin n → K)} (hM : M.FG) (j
     have h1 : algebraMap (𝓞 K) K t = (b : 𝓞 K) • (a * x j) := ht
     rw [Algebra.smul_def] at h1
     exact h1.symm
-  | zero => exact ⟨0, by simp⟩
+  | zero =>
+    exact ⟨0, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨s, hs⟩ := hx
     obtain ⟨t, ht⟩ := hy
@@ -58,13 +61,18 @@ theorem exists_denominator {M : Submodule (𝓞 K) (Fin n → K)} (hM : M.FG) (j
 
 end aux
 
-theorem saturatedLine_eq_ideal_div :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (M : Submodule (𝓞 K) (Fin n → K)), M.FG →
-      Submodule.span K (M : Set (Fin n → K)) = ⊤ → ∀ v : Fin n → K, v ≠ 0 →
-      ∃ (I : Ideal (𝓞 K)) (d : 𝓞 K), I ≠ ⊥ ∧ d ≠ 0 ∧ (∀ t ∈ I, ((t : K) / (d : K)) • v ∈ M) ∧
-        genIndex (M ⊓ (Submodule.span K (Set.range fun _ : Fin 1 => v)).restrictScalars (𝓞 K)).toAddSubgroup
-          (Submodule.span (𝓞 K) (Set.range fun _ : Fin 1 => v)).toAddSubgroup =
-        |((Algebra.norm ℚ (d : K) : ℚ) : ℝ)| / (I.absNorm : ℝ) := by
+theorem saturatedLine_eq_ideal_div
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (M : Submodule (𝓞 K) (Fin n → K)),
+      M.FG → Submodule.span K (M : Set (Fin n → K)) = ⊤
+        → ∀ v : Fin n → K,
+          v ≠ 0
+            → ∃ (I : Ideal (𝓞 K)) (d : 𝓞 K),
+              I ≠ ⊥ ∧ d ≠ 0 ∧ (∀ t ∈ I, ((t : K) / (d : K)) • v ∈ M)
+                ∧ genIndex
+                    (M ⊓ (Submodule.span K (Set.range fun _ : Fin 1 => v)).restrictScalars
+                      (𝓞 K)).toAddSubgroup
+                    (Submodule.span (𝓞 K) (Set.range fun _ : Fin 1 => v)).toAddSubgroup
+                  = |((Algebra.norm ℚ (d : K) : ℚ) : ℝ)| / (I.absNorm : ℝ) := by
   intro K _ _ n M hM hspan v hv
   obtain ⟨j, hj⟩ : ∃ j, v j ≠ 0 := Function.ne_iff.mp hv
   obtain ⟨d, hd, hden⟩ := exists_denominator hM j (v j)⁻¹
@@ -86,8 +94,9 @@ theorem saturatedLine_eq_ideal_div :
     change g t ∈ M ↔ _
     rw [hg_apply]
   have hI : I ≠ ⊥ := by
-    obtain ⟨c, hc, hcv⟩ := exists_smul_mem M (show v ∈ Submodule.span K (M : Set (Fin n → K)) by
-      rw [hspan]; exact Submodule.mem_top)
+    obtain ⟨c, hc, hcv⟩ :=
+      exists_smul_mem M
+        (show v ∈ Submodule.span K (M : Set (Fin n → K)) by rw [hspan]; exact Submodule.mem_top)
     intro h
     have hcd : c * d ∈ I := by
       rw [hmemI]
@@ -101,8 +110,9 @@ theorem saturatedLine_eq_ideal_div :
     rw [h, Ideal.mem_bot] at hcd
     exact mul_ne_zero hc hd hcd
   refine ⟨I, d, hI, hd, fun t ht => (hmemI t).1 ht, ?_⟩
-  have hline : M ⊓ (Submodule.span K (Set.range fun _ : Fin 1 => v)).restrictScalars (𝓞 K) =
-      Submodule.map g I := by
+  have hline
+      : M ⊓ (Submodule.span K (Set.range fun _ : Fin 1 => v)).restrictScalars (𝓞 K)
+        = Submodule.map g I := by
     ext x
     simp only [Submodule.mem_inf, Submodule.restrictScalars_mem, Set.range_const,
       Submodule.mem_span_singleton, Submodule.mem_map]
@@ -116,15 +126,15 @@ theorem saturatedLine_eq_ideal_div :
       exact ⟨t, (show g t ∈ M by rw [hgt]; exact hx), hgt⟩
     · rintro ⟨t, ht, rfl⟩
       exact ⟨ht, (t : K) / (d : K), (hg_apply t).symm⟩
-  have hN : Submodule.span (𝓞 K) (Set.range fun _ : Fin 1 => v) =
-      Submodule.map g (Ideal.span {d}) := by
+  have hN
+      : Submodule.span (𝓞 K) (Set.range fun _ : Fin 1 => v) = Submodule.map g (Ideal.span {d}) := by
     have e : g d = v := by rw [hg_apply, div_self hdK, one_smul]
     rw [Set.range_const, Ideal.span, Submodule.map_span, Set.image_singleton, e]
   have hd0 : (Ideal.span {d} : Ideal (𝓞 K)) ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]
     exact hd
-  have hnorm : (((Ideal.span {d} : Ideal (𝓞 K))).absNorm : ℝ) =
-      |((Algebra.norm ℚ (d : K) : ℚ) : ℝ)| := by
+  have hnorm
+      : (((Ideal.span {d} : Ideal (𝓞 K))).absNorm : ℝ) = |((Algebra.norm ℚ (d : K) : ℚ) : ℝ)| := by
     rw [Ideal.absNorm_span_singleton, Nat.cast_natAbs, Int.cast_abs, ← Rat.cast_intCast,
       Algebra.coe_norm_int]
   rw [hline, hN, Submodule.map_toAddSubgroup, Submodule.map_toAddSubgroup, genIndex,

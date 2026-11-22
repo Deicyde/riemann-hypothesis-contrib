@@ -12,8 +12,8 @@ namespace PositivityTheory.Rg.Cz
 
 namespace LieInverse
 
-theorem exists_ne_of_ne_one {n : ℕ} (σ : Equiv.Perm (Fin n)) (hσ : σ ≠ 1) (i : Fin n) :
-    ∃ j, j ≠ i ∧ σ j ≠ j := by
+theorem exists_ne_of_ne_one {n : ℕ} (σ : Equiv.Perm (Fin n)) (hσ : σ ≠ 1) (i : Fin n)
+    : ∃ j, j ≠ i ∧ σ j ≠ j := by
   by_contra h
   push Not at h
   apply hσ
@@ -26,14 +26,21 @@ theorem exists_ne_of_ne_one {n : ℕ} (σ : Equiv.Perm (Fin n)) (hσ : σ ≠ 1)
   · subst hj; simp [hi]
   · simp [h j hj]
 
-theorem hasDerivAt_det {n : ℕ} (A : ℝ → Matrix (Fin n) (Fin n) ℂ) (Y : Matrix (Fin n) (Fin n) ℂ)
-    (h0 : A 0 = 1) (hA : ∀ i j, HasDerivAt (fun t => A t i j) (Y i j) 0) :
-    HasDerivAt (fun t => (A t).det) Y.trace 0 := by
-  have key : ∀ σ : Equiv.Perm (Fin n), HasDerivAt (fun t => ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, A t (σ i) i)
-      (((Equiv.Perm.sign σ : ℤ) : ℂ) * ∑ i, (∏ j ∈ Finset.univ.erase i, A 0 (σ j) j) * Y (σ i) i) 0 := by
+theorem hasDerivAt_det
+    {n : ℕ} (A : ℝ → Matrix (Fin n) (Fin n) ℂ) (Y : Matrix (Fin n) (Fin n) ℂ) (h0 : A 0 = 1)
+    (hA : ∀ i j, HasDerivAt (fun t => A t i j) (Y i j) 0)
+    : HasDerivAt (fun t => (A t).det) Y.trace 0 := by
+  have key
+      : ∀ σ : Equiv.Perm (Fin n),
+        HasDerivAt
+          (fun t => ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, A t (σ i) i)
+          (((Equiv.Perm.sign σ : ℤ) : ℂ)
+            * ∑ i, (∏ j ∈ Finset.univ.erase i, A 0 (σ j) j) * Y (σ i) i)
+          0 := by
     intro σ
-    have := (HasDerivAt.finsetProd (u := Finset.univ) (fun i _ => hA (σ i) i)).const_mul
-      ((Equiv.Perm.sign σ : ℤ) : ℂ)
+    have :=
+      (HasDerivAt.finsetProd (u := Finset.univ) (fun i _ => hA (σ i) i)).const_mul
+        ((Equiv.Perm.sign σ : ℤ) : ℂ)
     refine this.congr_of_eventuallyEq (Filter.Eventually.of_forall fun t => ?_)
     simp [Finset.prod_apply]
   have hs := HasDerivAt.sum (u := Finset.univ) (fun σ _ => key σ)
@@ -46,22 +53,28 @@ theorem hasDerivAt_det {n : ℕ} (A : ℝ → Matrix (Fin n) (Fin n) ℂ) (Y : M
     · simp [h0]
     · intro σ _ hσ
       obtain ⟨j, hji, hj⟩ := exists_ne_of_ne_one σ hσ i
-      rw [Finset.prod_eq_zero (Finset.mem_erase.mpr ⟨hji, Finset.mem_univ j⟩) (by rw [h0]; exact Matrix.one_apply_ne hj)]
+      rw [Finset.prod_eq_zero (Finset.mem_erase.mpr ⟨hji, Finset.mem_univ j⟩)
+        (by rw [h0]; exact Matrix.one_apply_ne hj)]
       simp
     · simp
 
-def Sop {ι : Type} {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M] (E : ι → Fin n → Fin n → Module.End ℂ M)
-    (bar : ι → ι) (τ : ι) (X : Matrix (Fin n) (Fin n) ℂ) : Module.End ℂ M :=
+def Sop
+    {ι : Type} {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M]
+    (E : ι → Fin n → Fin n → Module.End ℂ M) (bar : ι → ι) (τ : ι) (X : Matrix (Fin n) (Fin n) ℂ)
+    : Module.End ℂ M :=
   ∑ a, ∑ b, (X a b • E τ a b + star (X a b) • E (bar τ) a b)
 
-theorem Sop_add {ι : Type} {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M] (E : ι → Fin n → Fin n → Module.End ℂ M)
-    (bar : ι → ι) (τ : ι) (X Y : Matrix (Fin n) (Fin n) ℂ) : Sop E bar τ (X + Y) = Sop E bar τ X + Sop E bar τ Y := by
+theorem Sop_add
+    {ι : Type} {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M]
+    (E : ι → Fin n → Fin n → Module.End ℂ M) (bar : ι → ι) (τ : ι) (X Y : Matrix (Fin n) (Fin n) ℂ)
+    : Sop E bar τ (X + Y) = Sop E bar τ X + Sop E bar τ Y := by
   simp only [Sop, Matrix.add_apply, add_smul, star_add, ← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by abel
 
-theorem Sop_single {ι : Type} {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M]
-    (E : ι → Fin n → Fin n → Module.End ℂ M) (bar : ι → ι) (τ : ι) (p q : Fin n) (z : ℂ) :
-    Sop E bar τ (Matrix.single p q z) = z • E τ p q + star z • E (bar τ) p q := by
+theorem Sop_single
+    {ι : Type} {n : ℕ} {M : Type} [AddCommGroup M] [Module ℂ M]
+    (E : ι → Fin n → Fin n → Module.End ℂ M) (bar : ι → ι) (τ : ι) (p q : Fin n) (z : ℂ)
+    : Sop E bar τ (Matrix.single p q z) = z • E τ p q + star z • E (bar τ) p q := by
   unfold Sop
   rw [Finset.sum_eq_single p, Finset.sum_eq_single q]
   · simp [Matrix.single_apply]
@@ -77,11 +90,18 @@ open LieInverse in
 theorem lieInv_holds : LieInv := by
   intro n M _ _ ι _ _ Γ _ _ bar κ E ρ hK hG c ξ hξ τ a b
   have hbt : bar τ ≠ τ := hK.ne τ
-  have hD : ∀ X : Matrix (Fin n) (Fin n) ℂ, Xᴴ = -X →
-      Sop E bar τ X ξ = ((c τ : ℂ) * X.trace + (c (bar τ) : ℂ) * star X.trace) • ξ := by
+  have hD
+      : ∀ X : Matrix (Fin n) (Fin n) ℂ,
+        Xᴴ = -X → Sop E bar τ X ξ = ((c τ : ℂ) * X.trace + (c (bar τ) : ℂ) * star X.trace) • ξ := by
     intro X hX
     obtain ⟨cv, hc0, hcd, hcoth, hρ⟩ := hG.der τ X hX
-    let D : ι → ℂ := fun τ' => if τ' = τ then X.trace else if τ' = bar τ then star X.trace else 0
+    let D : ι → ℂ := fun τ' =>
+      if τ' = τ then
+        X.trace
+      else if τ' = bar τ then
+        star X.trace
+      else
+        0
     have hdet : ∀ τ', HasDerivAt (fun t => (κ τ' (cv t)).det) (D τ') 0 := by
       intro τ'
       by_cases h1 : τ' = τ
@@ -99,15 +119,18 @@ theorem lieInv_holds : LieInv := by
         · simp only [D, if_neg h1, if_neg h2]
           have hf : (fun t => (κ τ' (cv t)).det) = fun _ => 1 := by
             funext t; rw [hcoth τ' h1 h2 t, Matrix.det_one]
-          rw [hf]; exact hasDerivAt_const _ _
+          rw [hf]
+          exact hasDerivAt_const _ _
     have h1 : ∀ τ', (κ τ' (cv 0)).det = 1 := fun τ' => by rw [hc0, hK.one, Matrix.det_one]
     have hz : ∀ τ', HasDerivAt (fun t => (κ τ' (cv t)).det ^ c τ') ((c τ' : ℂ) * D τ') 0 := by
       intro τ'
-      have := (hasDerivAt_zpow (c τ') ((κ τ' (cv 0)).det) (Or.inl (by rw [h1]; exact one_ne_zero))).comp
-        (0 : ℝ) (hdet τ')
+      have :=
+        (hasDerivAt_zpow (c τ') ((κ τ' (cv 0)).det) (Or.inl (by rw [h1]; exact one_ne_zero))).comp
+          (0 : ℝ) (hdet τ')
       rw [h1, _root_.one_zpow, mul_one] at this
       exact this
-    have hχ : HasDerivAt (fun t => ∏ τ', (κ τ' (cv t)).det ^ c τ')
+    have hχ : HasDerivAt
+        (fun t => ∏ τ', (κ τ' (cv t)).det ^ c τ')
         ((c τ : ℂ) * X.trace + (c (bar τ) : ℂ) * star X.trace) 0 := by
       have := HasDerivAt.finsetProd (u := Finset.univ) (fun τ' _ => hz τ')
       refine (this.congr_of_eventuallyEq (Filter.Eventually.of_forall fun t => by
@@ -119,7 +142,8 @@ theorem lieInv_holds : LieInv := by
     rw [← sub_eq_zero]
     apply (Module.forall_dual_apply_eq_zero_iff ℂ _).mp
     intro lam
-    have h2 : HasDerivAt (fun t => lam (ρ (cv t) ξ))
+    have h2 : HasDerivAt
+        (fun t => lam (ρ (cv t) ξ))
         (((c τ : ℂ) * X.trace + (c (bar τ) : ℂ) * star X.trace) * lam ξ) 0 := by
       refine (hχ.mul_const (lam ξ)).congr_of_eventuallyEq (Filter.Eventually.of_forall fun t => ?_)
       simp only [hξ, map_smul, smul_eq_mul]
@@ -129,7 +153,7 @@ theorem lieInv_holds : LieInv := by
   by_cases hab : a = b
   · subst hab
     rw [if_pos rfl]
-    have hX : (Matrix.single a a Complex.I)ᴴ = -Matrix.single a a Complex.I := by
+    have hX : (Matrix.single a a Complex.I)ᴴ = - Matrix.single a a Complex.I := by
       ext i j
       simp only [Matrix.conjTranspose_apply, Matrix.neg_apply, Matrix.single_apply]
       split_ifs with h1 h2 h2
@@ -147,22 +171,28 @@ theorem lieInv_holds : LieInv := by
     · exact absurd h Complex.I_ne_zero
     · exact sub_eq_zero.mp h
   · rw [if_neg hab]
-    have hX1 : (Matrix.single a b (1 : ℂ) + Matrix.single b a (-1))ᴴ =
-        -(Matrix.single a b (1 : ℂ) + Matrix.single b a (-1)) := by
+    have hX1
+        : (Matrix.single a b (1 : ℂ) + Matrix.single b a (-1))ᴴ
+          = -(Matrix.single a b (1 : ℂ) + Matrix.single b a (-1)) := by
       ext i j
-      simp only [Matrix.conjTranspose_apply, Matrix.neg_apply, Matrix.add_apply, Matrix.single_apply]
+      simp only [Matrix.conjTranspose_apply, Matrix.neg_apply, Matrix.add_apply,
+        Matrix.single_apply]
       split_ifs <;> simp_all
-    have hX2 : (Matrix.single a b Complex.I + Matrix.single b a Complex.I)ᴴ =
-        -(Matrix.single a b Complex.I + Matrix.single b a Complex.I) := by
+    have hX2
+        : (Matrix.single a b Complex.I + Matrix.single b a Complex.I)ᴴ
+          = -(Matrix.single a b Complex.I + Matrix.single b a Complex.I) := by
       ext i j
-      simp only [Matrix.conjTranspose_apply, Matrix.neg_apply, Matrix.add_apply, Matrix.single_apply]
+      simp only [Matrix.conjTranspose_apply, Matrix.neg_apply, Matrix.add_apply,
+        Matrix.single_apply]
       split_ifs <;> simp_all
     have e1 := hD _ hX1
     have e2 := hD _ hX2
     rw [Sop_add, Sop_single, Sop_single, Matrix.trace_add, Matrix.trace_single_eq_of_ne _ _ _ hab,
-      Matrix.trace_single_eq_of_ne _ _ _ (Ne.symm hab)] at e1 e2
-    simp only [LinearMap.add_apply, LinearMap.smul_apply, add_zero, star_zero, mul_zero, zero_smul, hsI,
-      star_one, star_neg] at e1 e2
+        Matrix.trace_single_eq_of_ne _ _ _ (Ne.symm hab)]
+      at e1 e2
+    simp only [LinearMap.add_apply, LinearMap.smul_apply, add_zero, star_zero, mul_zero, zero_smul,
+        hsI, star_one, star_neg]
+      at e1 e2
     have e2' : Complex.I • (E τ a b ξ + E τ b a ξ - E (bar τ) a b ξ - E (bar τ) b a ξ) = 0 := by
       linear_combination (norm := module) e2
     have e3 : E τ a b ξ + E τ b a ξ - E (bar τ) a b ξ - E (bar τ) b a ξ = 0 :=

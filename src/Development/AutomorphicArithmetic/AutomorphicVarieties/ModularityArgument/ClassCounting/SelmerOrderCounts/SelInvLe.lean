@@ -8,8 +8,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.ZK UpperTheory.V.ZK.Ct
 
-private theorem ofMul_mem_mt_iff_exists_pow_mul_finOrder {F : Type} [Field F] (l : ℕ) (α : Fˣ) :
-    Additive.ofMul α ∈ Ct.mt (Additive Fˣ) l ↔ ∃ w t : Fˣ, IsOfFinOrder t ∧ α = w ^ l * t := by
+private theorem ofMul_mem_mt_iff_exists_pow_mul_finOrder {F : Type} [Field F] (l : ℕ) (α : Fˣ)
+    : Additive.ofMul α ∈ Ct.mt (Additive Fˣ) l ↔ ∃ w t : Fˣ, IsOfFinOrder t ∧ α = w ^ l * t := by
   unfold Ct.mt
   rw [Submodule.mem_sup]
   constructor
@@ -36,17 +36,16 @@ private theorem ofMul_mem_mt_iff_exists_pow_mul_finOrder {F : Type} [Field F] (l
       rfl
     · rfl
 
-private theorem exists_units_generator_of_finOrder_units (F : Type) [Field F] [NumberField F] : ∃ ρ : Fˣ, ∀ t : Fˣ, IsOfFinOrder t → ∃ k : ℤ, t = ρ ^ k := by
+private theorem exists_units_generator_of_finOrder_units (F : Type) [Field F] [NumberField F]
+    : ∃ ρ : Fˣ, ∀ t : Fˣ, IsOfFinOrder t → ∃ k : ℤ, t = ρ ^ k := by
   have hs : (Set.range (fun u : CommGroup.torsion Fˣ => ((u : Fˣ) : F))).Finite := by
     refine (NumberField.Embeddings.finite_of_norm_le F ℂ 1).subset ?_
     rintro _ ⟨u, rfl⟩
     have hu : IsOfFinOrder (u : Fˣ) := (CommGroup.mem_torsion _).mp u.2
     obtain ⟨n, hn, hpow⟩ := isOfFinOrder_iff_pow_eq_one.mp hu
-    have hx : ((u : Fˣ) : F) ^ n = 1 := by
-      rw [← Units.val_pow_eq_pow_val, hpow, Units.val_one]
+    have hx : ((u : Fˣ) : F) ^ n = 1 := by rw [← Units.val_pow_eq_pow_val, hpow, Units.val_one]
     refine ⟨IsIntegral.of_pow hn (by rw [hx]; exact isIntegral_one), fun φ => ?_⟩
-    have hφ : (φ ((u : Fˣ) : F)) ^ n = 1 := by
-      rw [← map_pow, hx, map_one]
+    have hφ : (φ ((u : Fˣ) : F)) ^ n = 1 := by rw [← map_pow, hx, map_one]
     exact le_of_eq (Complex.norm_eq_one_of_pow_eq_one hφ hn.ne')
   have hinj : Function.Injective (fun u : CommGroup.torsion Fˣ => ((u : Fˣ) : F)) := by
     intro a b h
@@ -57,7 +56,10 @@ private theorem exists_units_generator_of_finOrder_units (F : Type) [Field F] [N
   obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp (hg ⟨t, (CommGroup.mem_torsion _).mpr ht⟩)
   exact ⟨k, by simpa using (congrArg Subtype.val hk).symm⟩
 
-private theorem exists_heightOneSpectrum_liesOver (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F] (p : HeightOneSpectrum (𝓞 L)) : ∃ P : HeightOneSpectrum (𝓞 F), P.asIdeal.LiesOver p.asIdeal := by
+private theorem exists_heightOneSpectrum_liesOver
+    (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F]
+    (p : HeightOneSpectrum (𝓞 L))
+    : ∃ P : HeightOneSpectrum (𝓞 F), P.asIdeal.LiesOver p.asIdeal := by
   haveI := p.isMaximal
   obtain ⟨Q, hQm, hQ⟩ := Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 F) p.asIdeal
   refine ⟨⟨Q, hQm.isPrime, ?_⟩, hQ⟩
@@ -66,8 +68,15 @@ private theorem exists_heightOneSpectrum_liesOver (L F : Type) [Field L] [Number
   rw [hQ.over, hQbot]
   exact Ideal.comap_bot_of_injective _ (FaithfulSMul.algebraMap_injective _ _)
 
-private theorem exists_rep_of_mem_selInv_ordP_dvd_actU_eq (L F : Type) [Field L] [Field F] [NumberField F] [Algebra L F] (l a : ℕ) (hl0 : 0 < l) (γ : F ≃ₐ[L] F) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ)) (hD : IsDat γ a D) (ρ : Fˣ) (hρ : ∀ t : Fˣ, IsOfFinOrder t → ∃ k : ℤ, t = ρ ^ k) (x : Additive Fˣ ⧸ Ct.mt (Additive Fˣ) l) (hx : x ∈ D.SelInv l) :
-    ∃ (r : ℕ) (α v : Fˣ), r < l ∧ Submodule.Quotient.mk (Additive.ofMul α) = x ∧ (∀ P, (l : ℤ) ∣ ordP P α) ∧ actU γ α = α * v ^ l * ρ ^ r := by
+private theorem exists_rep_of_mem_selInv_ordP_dvd_actU_eq
+    (L F : Type) [Field L] [Field F] [NumberField F] [Algebra L F]
+    (l a : ℕ) (hl0 : 0 < l)
+    (γ : F ≃ₐ[L] F) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ)) (hD : IsDat γ a D)
+    (ρ : Fˣ) (hρ : ∀ t : Fˣ, IsOfFinOrder t → ∃ k : ℤ, t = ρ ^ k)
+    (x : Additive Fˣ ⧸ Ct.mt (Additive Fˣ) l) (hx : x ∈ D.SelInv l)
+    : ∃ (r : ℕ) (α v : Fˣ),
+      r < l ∧ Submodule.Quotient.mk (Additive.ofMul α) = x ∧ (∀ P, (l : ℤ) ∣ ordP P α)
+        ∧ actU γ α = α * v ^ l * ρ ^ r := by
   obtain ⟨y, rfl, hg, i, hi⟩ := hx
   have hy : y = Additive.ofMul (Additive.toMul y) := rfl
   set α := Additive.toMul y with hα
@@ -105,10 +114,21 @@ private theorem exists_rep_of_mem_selInv_ordP_dvd_actU_eq (L F : Type) [Field L]
   rw [zpow_add, zpow_mul', zpow_natCast, zpow_natCast]
   simp only [mul_pow, inv_pow, mul_assoc]
 
-private theorem selInvLe_lemma_5 (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F] (l c ν a : ℕ) (ζ : (𝓞 F)ˣ) (γ : F ≃ₐ[L] F) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ)) (hl : l.Prime) (hL : Lay l c ν ζ γ) (hD : IsDat γ a D) (α α' v v' ρ : Fˣ) (r : ℕ) (hord : ∀ P, (l : ℤ) ∣ ordP P α) (hord' : ∀ P, (l : ℤ) ∣ ordP P α') (h : actU γ α = α * v ^ l * ρ ^ r) (h' : actU γ α' = α' * v' ^ l * ρ ^ r) (hN : Algebra.norm L (v : F) = Algebra.norm L (v' : F)) :
-    ∃ x₀ : Lˣ, (QuotientGroup.mk x₀ : Lˣ ⧸ (powMonoidHom l).range) ∈ SelL l L ∧
-      (Submodule.Quotient.mk (Additive.ofMul α) : Additive Fˣ ⧸ Ct.mt (Additive Fˣ) l) =
-        Submodule.Quotient.mk (Additive.ofMul α') + Submodule.Quotient.mk (Additive.ofMul (Units.map (algebraMap L F : L →* F) x₀)) := by
+private theorem selInvLe_lemma_5
+    (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F]
+    (l c ν a : ℕ)
+    (ζ : (𝓞 F)ˣ)
+    (γ : F ≃ₐ[L] F)
+    (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ))
+    (hl : l.Prime) (hL : Lay l c ν ζ γ) (hD : IsDat γ a D)
+    (α α' v v' ρ : Fˣ) (r : ℕ) (hord : ∀ P, (l : ℤ) ∣ ordP P α) (hord' : ∀ P, (l : ℤ) ∣ ordP P α')
+    (h : actU γ α = α * v ^ l * ρ ^ r) (h' : actU γ α' = α' * v' ^ l * ρ ^ r)
+    (hN : Algebra.norm L (v : F) = Algebra.norm L (v' : F))
+    : ∃ x₀ : Lˣ,
+      (QuotientGroup.mk x₀ : Lˣ ⧸ (powMonoidHom l).range) ∈ SelL l L
+        ∧ (Submodule.Quotient.mk (Additive.ofMul α) : Additive Fˣ ⧸ Ct.mt (Additive Fˣ) l)
+          = Submodule.Quotient.mk (Additive.ofMul α')
+            + Submodule.Quotient.mk (Additive.ofMul (Units.map (algebraMap L F : L →* F) x₀)) := by
   have hβ : actU γ (α * α'⁻¹) = (α * α'⁻¹) * (v * v'⁻¹) ^ l := by
     rw [map_mul, map_inv, h, h']
     ext
@@ -119,7 +139,8 @@ private theorem selInvLe_lemma_5 (L F : Type) [Field L] [NumberField L] [Field F
     rw [mul_pow, inv_pow]
     field_simp
   have hN1 : Algebra.norm L ((v * v'⁻¹ : Fˣ) : F) = 1 := by
-    rw [Units.val_mul, map_mul, hN, ← map_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, map_one]
+    rw [Units.val_mul, map_mul, hN, ← map_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+      map_one]
   obtain ⟨x₀, z, hz⟩ := h90 L F γ l hL.gal hL.gen (α * α'⁻¹) (v * v'⁻¹) hβ hN1
   have hx₀ : Units.map (algebraMap L F : L →* F) x₀ = α * α'⁻¹ * (z ^ l)⁻¹ := by
     rw [eq_mul_inv_iff_mul_eq, hz]
@@ -137,8 +158,10 @@ private theorem selInvLe_lemma_5 (L F : Type) [Field L] [NumberField L] [Field F
       rw [← hD.d_eq, ← hD.d_eq, ofMul_pow, map_nsmul, Finsupp.smul_apply, nsmul_eq_mul]
     rw [hx₀, hadd, hadd, hinv, hinv, hpow]
     exact dvd_add (dvd_add (hord P) (dvd_neg.mpr (hord' P))) (dvd_neg.mpr (dvd_mul_right _ _))
-  · rw [← Submodule.Quotient.mk_add, Submodule.Quotient.eq, sub_eq_add_neg, ← ofMul_mul, ← ofMul_inv, ← ofMul_mul, hx₀]
-    refine (ofMul_mem_mt_iff_exists_pow_mul_finOrder l _).mpr ⟨z, 1, isOfFinOrder_iff_pow_eq_one.mpr ⟨1, one_pos, one_pow 1⟩, ?_⟩
+  · rw [← Submodule.Quotient.mk_add, Submodule.Quotient.eq, sub_eq_add_neg, ← ofMul_mul,
+      ← ofMul_inv, ← ofMul_mul, hx₀]
+    refine (ofMul_mem_mt_iff_exists_pow_mul_finOrder l _).mpr
+      ⟨z, 1, isOfFinOrder_iff_pow_eq_one.mpr ⟨1, one_pos, one_pow 1⟩, ?_⟩
     have h1 : (α' : F) ≠ 0 := α'.ne_zero
     have h2 : (z : F) ≠ 0 := z.ne_zero
     have h3 : (α : F) ≠ 0 := α.ne_zero
@@ -146,42 +169,57 @@ private theorem selInvLe_lemma_5 (L F : Type) [Field L] [NumberField L] [Field F
     simp only [Units.val_mul, Units.val_pow_eq_pow_val, Units.val_inv_eq_inv_val, Units.val_one]
     field_simp
 
-private theorem norm_pow_eq_inv_norm_pow_of_actU_eq_mul_pow (L F : Type) [Field L] [Field F] [Algebra L F] (γ : F ≃ₐ[L] F) (α v ρ : Fˣ) (l r : ℕ) (h : actU γ α = α * v ^ l * ρ ^ r) :
-    Algebra.norm L (v : F) ^ l = (Algebra.norm L (ρ : F) ^ r)⁻¹ := by
+private theorem norm_pow_eq_inv_norm_pow_of_actU_eq_mul_pow
+    (L F : Type) [Field L] [Field F] [Algebra L F]
+    (γ : F ≃ₐ[L] F) (α v ρ : Fˣ) (l r : ℕ) (h : actU γ α = α * v ^ l * ρ ^ r)
+    : Algebra.norm L (v : F) ^ l = (Algebra.norm L (ρ : F) ^ r)⁻¹ := by
   have e := congrArg (fun u : Fˣ => Algebra.norm L (u : F)) h
   have hγ : ((actU γ α : Fˣ) : F) = γ (α : F) := by simp [actU]
-  simp only [hγ, Algebra.norm_eq_of_algEquiv, Units.val_mul, Units.val_pow_eq_pow_val, map_mul, map_pow] at e
+  simp only [hγ, Algebra.norm_eq_of_algEquiv, Units.val_mul, Units.val_pow_eq_pow_val, map_mul,
+      map_pow]
+    at e
   have hu : ∀ b : Fˣ, Algebra.norm L (b : F) * Algebra.norm L ((b⁻¹ : Fˣ) : F) = 1 := by
     intro b
     rw [← map_mul, Units.mul_inv, map_one]
   have hα : Algebra.norm L (α : F) ≠ 0 := left_ne_zero_of_mul_eq_one (hu α)
   have hρ : Algebra.norm L (ρ : F) ^ r ≠ 0 := pow_ne_zero _ (left_ne_zero_of_mul_eq_one (hu ρ))
-  have e2 : Algebra.norm L (α : F) * (Algebra.norm L (v : F) ^ l * Algebra.norm L (ρ : F) ^ r) = Algebra.norm L (α : F) * 1 := by
+  have e2
+      : Algebra.norm L (α : F) * (Algebra.norm L (v : F) ^ l * Algebra.norm L (ρ : F) ^ r)
+        = Algebra.norm L (α : F) * 1 := by
     rw [mul_one, ← mul_assoc]
     exact e.symm
   have e3 := mul_left_cancel₀ hα e2
   exact eq_inv_of_mul_eq_one_left e3
 
-theorem UpperTheory.V.ZK.Ct.selInvLe :
-    ∀ (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F] (l c ν a : ℕ) (ζ : (𝓞 F)ˣ) (γ : F ≃ₐ[L] F) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ)), l.Prime → Lay l c ν ζ γ → IsDat γ a D → Finite (SelL l L) → Finite (D.SelInv l) ∧ Nat.card (D.SelInv l) ≤ Nat.card (SelL l L) * l ^ 2 := by
+theorem UpperTheory.V.ZK.Ct.selInvLe
+    : ∀ (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F] (l c ν a : ℕ)
+        (ζ : (𝓞 F)ˣ) (γ : F ≃ₐ[L] F) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ)),
+      l.Prime → Lay l c ν ζ γ → IsDat γ a D → Finite (SelL l L)
+        → Finite (D.SelInv l) ∧ Nat.card (D.SelInv l) ≤ Nat.card (SelL l L) * l ^ 2 := by
   intro L F _ _ _ _ _ l c ν a ζ γ D hl hL hD hfin
   classical
   obtain ⟨ρ, hρ⟩ := exists_units_generator_of_finOrder_units F
   have hl0 : 0 < l := hl.pos
-  let T : Finset (ℕ × L) := (Finset.range l).biUnion
-    (fun r => ((Polynomial.nthRoots l (Algebra.norm L (ρ : F) ^ r)⁻¹).toFinset).image (fun z => (r, z)))
+  let T : Finset (ℕ × L) :=
+    (Finset.range l).biUnion (fun r =>
+      ((Polynomial.nthRoots l (Algebra.norm L (ρ : F) ^ r)⁻¹).toFinset).image (fun z => (r, z)))
   have hT : T.card ≤ l * l := by
     refine Finset.card_biUnion_le.trans ?_
-    calc ∑ r ∈ Finset.range l, (((Polynomial.nthRoots l (Algebra.norm L (ρ : F) ^ r)⁻¹).toFinset).image (fun z => (r, z))).card
-        ≤ ∑ r ∈ Finset.range l, l := Finset.sum_le_sum (fun r _ =>
-          Finset.card_image_le.trans ((Multiset.toFinset_card_le _).trans (Polynomial.card_nthRoots _ _)))
+    calc
+      ∑ r ∈ Finset.range l, (((Polynomial.nthRoots l (Algebra.norm L (ρ : F) ^ r)⁻¹).toFinset).image (fun z => (r, z))).card
+          ≤ ∑ r ∈ Finset.range l, l :=
+        Finset.sum_le_sum (fun r _ =>
+          Finset.card_image_le.trans ((Multiset.toFinset_card_le _).trans
+            (Polynomial.card_nthRoots _ _)))
       _ = l * l := by simp
   let Ty : (Additive Fˣ ⧸ Ct.mt (Additive Fˣ) l) → ℕ × L → Prop := fun x t =>
-    ∃ α v : Fˣ, Submodule.Quotient.mk (Additive.ofMul α) = x ∧ (∀ P, (l : ℤ) ∣ ordP P α) ∧
-      actU γ α = α * v ^ l * ρ ^ t.1 ∧ Algebra.norm L (v : F) = t.2
+    ∃ α v : Fˣ,
+      Submodule.Quotient.mk (Additive.ofMul α) = x ∧ (∀ P, (l : ℤ) ∣ ordP P α)
+        ∧ actU γ α = α * v ^ l * ρ ^ t.1 ∧ Algebra.norm L (v : F) = t.2
   have hty : ∀ x ∈ D.SelInv l, ∃ t ∈ T, Ty x t := by
     intro x hx
-    obtain ⟨r, α, v, hr, hxα, hord, hact⟩ := exists_rep_of_mem_selInv_ordP_dvd_actU_eq L F l a hl0 γ D hD ρ hρ x hx
+    obtain ⟨r, α, v, hr, hxα, hord, hact⟩ :=
+      exists_rep_of_mem_selInv_ordP_dvd_actU_eq L F l a hl0 γ D hD ρ hρ x hx
     refine ⟨(r, Algebra.norm L (v : F)), ?_, α, v, hxα, hord, hact, rfl⟩
     simp only [T, Finset.mem_biUnion, Finset.mem_range, Finset.mem_image, Multiset.mem_toFinset]
     refine ⟨r, hr, _, ?_, rfl⟩
@@ -193,16 +231,22 @@ theorem UpperTheory.V.ZK.Ct.selInvLe :
     Submodule.Quotient.mk (Additive.ofMul (Units.map (algebraMap L F : L →* F) s.out))
   let f : (ℕ × L) × (Lˣ ⧸ (powMonoidHom l).range) → (Additive Fˣ ⧸ Ct.mt (Additive Fˣ) l) :=
     fun p => rep p.1 + ψ p.2
-  have hψ : ∀ x₀ : Lˣ, ψ (QuotientGroup.mk x₀) =
-      Submodule.Quotient.mk (Additive.ofMul (Units.map (algebraMap L F : L →* F) x₀)) := by
+  have hψ
+      : ∀ x₀ : Lˣ,
+        ψ (QuotientGroup.mk x₀)
+          = Submodule.Quotient.mk (Additive.ofMul (Units.map (algebraMap L F : L →* F) x₀)) := by
     intro x₀
     obtain ⟨hh, hhe⟩ := QuotientGroup.mk_out_eq_mul (powMonoidHom l).range x₀
     obtain ⟨b, hb⟩ := hh.2
     show Submodule.Quotient.mk (Additive.ofMul (Units.map (algebraMap L F : L →* F)
       (Quotient.out (QuotientGroup.mk x₀ : Lˣ ⧸ (powMonoidHom l).range)))) = _
     rw [hhe, Submodule.Quotient.eq, sub_eq_add_neg, ← ofMul_inv, ← ofMul_mul]
-    refine (ofMul_mem_mt_iff_exists_pow_mul_finOrder l _).mpr ⟨Units.map (algebraMap L F : L →* F) b, 1,
-      isOfFinOrder_iff_pow_eq_one.mpr ⟨1, one_pos, one_pow 1⟩, ?_⟩
+    refine (ofMul_mem_mt_iff_exists_pow_mul_finOrder l _).mpr ⟨
+      Units.map (algebraMap L F : L →* F) b,
+      1,
+      isOfFinOrder_iff_pow_eq_one.mpr ⟨1, one_pos, one_pow 1⟩,
+      ?_
+    ⟩
     rw [map_mul, ← hb, powMonoidHom_apply, map_pow, mul_one, mul_comm, inv_mul_cancel_left]
   have hsub : D.SelInv l ⊆ f '' ((↑T : Set (ℕ × L)) ×ˢ SelL l L) := by
     intro x hx
@@ -212,8 +256,9 @@ theorem UpperTheory.V.ZK.Ct.selInvLe :
     obtain ⟨_, hx't⟩ := hex.choose_spec
     obtain ⟨α, v, hxα, hord, hact, hN⟩ := hxt
     obtain ⟨α', v', hxα', hord', hact', hN'⟩ := hx't
-    obtain ⟨x₀, hx₀S, hx₀⟩ := selInvLe_lemma_5 L F l c ν a ζ γ D hl hL hD α α' v v' ρ t.1 hord hord'
-      hact hact' (hN.trans hN'.symm)
+    obtain ⟨x₀, hx₀S, hx₀⟩ :=
+      selInvLe_lemma_5 L F l c ν a ζ γ D hl hL hD α α' v v' ρ t.1 hord hord' hact hact'
+        (hN.trans hN'.symm)
     refine ⟨(t, QuotientGroup.mk x₀), ⟨htT, hx₀S⟩, ?_⟩
     show rep t + ψ (QuotientGroup.mk x₀) = x
     rw [hrep, ← hxα', ← hxα, hx₀, hψ]
@@ -222,7 +267,9 @@ theorem UpperTheory.V.ZK.Ct.selInvLe :
   have hfinI := hfinT.image f
   refine ⟨(hfinI.subset hsub).to_subtype, ?_⟩
   rw [Nat.card_coe_set_eq, Nat.card_coe_set_eq]
-  calc (D.SelInv l).ncard ≤ (f '' ((↑T : Set (ℕ × L)) ×ˢ SelL l L)).ncard := Set.ncard_le_ncard hsub hfinI
+  calc
+    (D.SelInv l).ncard
+      ≤ (f '' ((↑T : Set (ℕ × L)) ×ˢ SelL l L)).ncard := Set.ncard_le_ncard hsub hfinI
     _ ≤ ((↑T : Set (ℕ × L)) ×ˢ SelL l L).ncard := Set.ncard_image_le hfinT
     _ = (↑T : Set (ℕ × L)).ncard * (SelL l L).ncard := Set.ncard_prod
     _ ≤ (l * l) * (SelL l L).ncard := by

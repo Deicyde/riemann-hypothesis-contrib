@@ -6,9 +6,12 @@ public import Mathlib
 
 namespace UpperTheory.Reformulated.B.S3
 
-private theorem prod_mul_mem {k : Type} [Field k] {n : ℕ} (W : Submodule k (Fin n → k)) (d : Fin n → k)
-    (hW : ∀ v ∈ W, (Matrix.diagonal d).mulVec v ∈ W) (v : Fin n → k) (hv : v ∈ W) (s : Finset (Fin n)) :
-    (fun j => (∏ l ∈ s, (d j - d l)) * v j) ∈ W := by
+private theorem prod_mul_mem
+    {k : Type} [Field k]
+    {n : ℕ}
+    (W : Submodule k (Fin n → k)) (d : Fin n → k) (hW : ∀ v ∈ W, (Matrix.diagonal d).mulVec v ∈ W)
+    (v : Fin n → k) (hv : v ∈ W) (s : Finset (Fin n))
+    : (fun j => (∏ l ∈ s, (d j - d l)) * v j) ∈ W := by
   induction s using Finset.induction_on with
   | empty => simpa using hv
   | insert a s ha ih =>
@@ -18,9 +21,12 @@ private theorem prod_mul_mem {k : Type} [Field k] {n : ℕ} (W : Submodule k (Fi
     simp [Matrix.mulVec_diagonal, Finset.prod_insert ha, smul_eq_mul]
     ring
 
-theorem single_mem {k : Type} [Field k] {n : ℕ} (W : Submodule k (Fin n → k)) (d : Fin n → k) (hd : Function.Injective d)
-    (hW : ∀ v ∈ W, (Matrix.diagonal d).mulVec v ∈ W) (v : Fin n → k) (hv : v ∈ W) (i : Fin n) (hi : v i ≠ 0) :
-    (Pi.single i 1 : Fin n → k) ∈ W := by
+theorem single_mem
+    {k : Type} [Field k]
+    {n : ℕ} (W : Submodule k (Fin n → k)) (d : Fin n → k) (hd : Function.Injective d)
+    (hW : ∀ v ∈ W, (Matrix.diagonal d).mulVec v ∈ W) (v : Fin n → k) (hv : v ∈ W) (i : Fin n)
+    (hi : v i ≠ 0)
+    : (Pi.single i 1 : Fin n → k) ∈ W := by
   have h := prod_mul_mem W d hW v hv (Finset.univ.erase i)
   have hc : (∏ l ∈ Finset.univ.erase i, (d i - d l)) * v i ≠ 0 := by
     refine mul_ne_zero (Finset.prod_ne_zero_iff.mpr fun l hl => ?_) hi

@@ -10,14 +10,21 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.RhoCompactTwi
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible Formalism.L2.Theta Matrix GlobalTheory.RealPar GlobalTheory.CoverDS
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible Formalism.L2.Theta Matrix
+  GlobalTheory.RealPar GlobalTheory.CoverDS
 open GlobalTheory.IndefiniteRowSideFullHecke.IsotypicSignedParameters (SignedPar IsDSPar)
-open Formalism.MainNotions.S (IsURepOn IsIrredOn IsKFin IsKStableOn IsWtOn IsKTypeOf IsDS IsSqIntOn UJset)
+open Formalism.MainNotions.S
+  (IsURepOn IsIrredOn IsKFin IsKStableOn IsWtOn IsKTypeOf IsDS IsSqIntOn UJset)
 
 noncomputable section
 namespace GlobalTheory.CoverDS
 
-theorem unitEquiv_of_dsUnique : GlobalTheory.Dec.DSUnique → ∀ (p q : ℕ), 1 ≤ p + q → ∀ (T : GrpData p q) (R R' : DSRep T) (lam : Ix p q → ℚ), IsParam lam → HasParam R lam → HasParam R' lam → UnitEquiv R R' := by
+theorem unitEquiv_of_dsUnique
+    : GlobalTheory.Dec.DSUnique
+      → ∀ (p q : ℕ),
+        1 ≤ p + q
+          → ∀ (T : GrpData p q) (R R' : DSRep T) (lam : Ix p q → ℚ),
+            IsParam lam → HasParam R lam → HasParam R' lam → UnitEquiv R R' := by
   intro hU p q hn T R R' lam hl hR hR'
   have h0 : 0 < p + q := hn
   obtain ⟨P, e, -, h, rfl | rfl⟩ := GlobalTheory.RealPar.isParam_cases hl

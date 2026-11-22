@@ -27,9 +27,9 @@ private lemma sum_prod_le {ι : Type*} [Fintype ι] [DecidableEq ι] {α : Type*
       exact hs.sum_le_tsum (t i) fun x _ => hg x
   exact h1.trans (h2.symm.le.trans h3)
 
-theorem UpperTheory.Reformulated.B.Qo1.summable_prod_coord.{u_2, u_3} :
-    ∀ {ι : Type u_2} [inst : Fintype ι] [DecidableEq ι] {α : Type u_3} {g : α → ℝ},
-    (∀ (x : α), (0 : ℝ) ≤ g x) → Summable g → Summable fun (ξ : ι → α) ↦ ∏ i : ι, g (ξ i) := by
+theorem UpperTheory.Reformulated.B.Qo1.summable_prod_coord.{u_2, u_3}
+    : ∀ {ι : Type u_2} [inst : Fintype ι] [DecidableEq ι] {α : Type u_3} {g : α → ℝ},
+      (∀ (x : α), (0 : ℝ) ≤ g x) → Summable g → Summable fun (ξ : ι → α) ↦ ∏ i : ι, g (ξ i) := by
   intro ι _ _ α g hg hs
   have h0 : ∀ ξ : ι → α, 0 ≤ ∏ i, g (ξ i) := fun ξ => Finset.prod_nonneg fun i _ => hg (ξ i)
   exact summable_of_sum_le h0 (sum_prod_le hg hs)

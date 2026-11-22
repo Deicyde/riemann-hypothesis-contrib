@@ -8,9 +8,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.FiniteAlgebraUnit
 
-theorem exists_isUnit_mem_of_forall_point :
-    ∀ (k : Type) [Field k] [IsAlgClosed k] (R : Type) [CommRing R] [Algebra k R] [Module.Finite k R]
-    (U : Submodule k R), (∀ x : R →ₐ[k] k, ∃ t ∈ U, x t ≠ 0) → ∃ w ∈ U, IsUnit w := by
+theorem exists_isUnit_mem_of_forall_point
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (R : Type) [CommRing R] [Algebra k R]
+        [Module.Finite k R] (U : Submodule k R),
+      (∀ x : R →ₐ[k] k, ∃ t ∈ U, x t ≠ 0) → ∃ w ∈ U, IsUnit w := by
   intro k _ _ R _ _ _ U hU
   haveI : IsArtinianRing R := IsArtinianRing.of_finite k R
   haveI : Infinite k := IsAlgClosed.instInfinite
@@ -22,8 +23,7 @@ theorem exists_isUnit_mem_of_forall_point :
       Module.Finite.of_surjective (Ideal.Quotient.mkₐ k m).toLinearMap
         (Ideal.Quotient.mkₐ_surjective k m)
     let e : k ≃ₐ[k] (R ⧸ m) :=
-      AlgEquiv.ofBijective (Algebra.ofId k (R ⧸ m))
-        IsAlgClosed.algebraMap_bijective_of_isIntegral
+      AlgEquiv.ofBijective (Algebra.ofId k (R ⧸ m)) IsAlgClosed.algebraMap_bijective_of_isIntegral
     refine ⟨(e.symm : (R ⧸ m) →ₐ[k] k).comp (Ideal.Quotient.mkₐ k m), fun r hr => ?_⟩
     have h0 : Ideal.Quotient.mkₐ k m r = 0 := Ideal.Quotient.eq_zero_iff_mem.mpr hr
     change e.symm (Ideal.Quotient.mkₐ k m r) = 0

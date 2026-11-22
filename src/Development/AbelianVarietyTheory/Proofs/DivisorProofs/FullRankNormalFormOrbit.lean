@@ -13,14 +13,13 @@ attribute [-instance] Formalism.DoubleCosetMeasures.instMeasGL
 
 namespace GlobalTheory.FullRankCoinv
 
-theorem exists_eq_normal_form_mul_of_rank_eq (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n d : ℕ) (hnd : n ≤ d)
-    (Y : Matrix (Fin n) (Fin d) k) (hY : Y.rank = n) :
-    ∃ h : GL (Fin d) k, Y = GlobalTheory.FullRankCoinv.Y0 k n d * h.val := by
+theorem exists_eq_normal_form_mul_of_rank_eq
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n d : ℕ) (hnd : n ≤ d) (Y : Matrix (Fin n) (Fin d) k) (hY : Y.rank = n)
+    : ∃ h : GL (Fin d) k, Y = GlobalTheory.FullRankCoinv.Y0 k n d * h.val := by
   let σ : Fin n ⊕ Fin (d - n) ≃ Fin d :=
     (Equiv.sumComm _ _).trans (finSumFinEquiv.trans (finCongr (by omega)))
-  have hσ : ∀ i : Fin n, ((σ (Sum.inl i) : Fin d) : ℕ) = d - n + i := fun i => by
-    simp [σ]
+  have hσ : ∀ i : Fin n, ((σ (Sum.inl i) : Fin d) : ℕ) = d - n + i := fun i => by simp [σ]
   have hX : X0 k σ = GlobalTheory.FullRankCoinv.Y0 k n d := by
     ext i j
     simp only [X0, GlobalTheory.FullRankCoinv.Y0, Matrix.of_apply]

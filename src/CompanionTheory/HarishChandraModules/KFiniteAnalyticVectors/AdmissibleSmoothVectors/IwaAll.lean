@@ -27,7 +27,7 @@ theorem pr_pr (ε : Fin n → Bool) (i : Fin n) : pr ε (pr ε i) = i := by
   unfold pr
   by_cases h : ε i.rev = ε i
   · simp [h]
-  · have h' : ¬ε i = ε i.rev := fun e => h e.symm
+  · have h' : ¬ ε i = ε i.rev := fun e => h e.symm
     simp [h, h']
 
 theorem rev_cast (i : Fin n) : ((i.rev : Fin n) : ℤ) = n - 1 - i := by
@@ -51,8 +51,9 @@ theorem ht_eq_zero {ε : Fin n → Bool} {i : Fin n} : ht ε i = 0 ↔ ε i.rev 
   · rw [if_neg h]
     exact ⟨fun e => absurd e (ht_ne h), fun e => absurd e h⟩
 
-theorem lt_of_sign {ε : Fin n → Bool} (hε : Monotone ε) {i j : Fin n} (hi : ε i = false) (hj : ε j = true) :
-    (i : ℤ) < j := by
+theorem lt_of_sign
+    {ε : Fin n → Bool} (hε : Monotone ε) {i j : Fin n} (hi : ε i = false) (hj : ε j = true)
+    : (i : ℤ) < j := by
   by_contra hc
   have hji : j ≤ i := by
     rw [Fin.le_iff_val_le_val]
@@ -80,12 +81,12 @@ theorem adapted {ε : Fin n → Bool} (hε : Monotone ε) : Adapted (pr ε) (ht 
     unfold ht
     split_ifs with a b b
     · exact le_refl _
-    · have key : ∀ x y z w : Bool, x ≤ z → w ≤ y → y = x → ¬w = z → z = true ∧ w = false := by
+    · have key : ∀ x y z w : Bool, x ≤ z → w ≤ y → y = x → ¬ w = z → z = true ∧ w = false := by
         intro x y z w
         cases x <;> cases y <;> cases z <;> cases w <;> simp (config := { decide := true })
       obtain ⟨hz, hw⟩ := key _ _ _ _ h1 h2 a b
       exact (hpos j hz hw).le
-    · have key : ∀ x y z w : Bool, x ≤ z → w ≤ y → ¬y = x → w = z → x = false ∧ y = true := by
+    · have key : ∀ x y z w : Bool, x ≤ z → w ≤ y → ¬ y = x → w = z → x = false ∧ y = true := by
         intro x y z w
         cases x <;> cases y <;> cases z <;> cases w <;> simp (config := { decide := true })
       obtain ⟨hx, hy⟩ := key _ _ _ _ h1 h2 a b
@@ -95,8 +96,8 @@ theorem adapted {ε : Fin n → Bool} (hε : Monotone ε) : Adapted (pr ε) (ht 
     unfold ht pr
     by_cases h : ε i.rev = ε i
     · simp [h]
-    · have h' : ¬ε i = ε i.rev := fun e => h e.symm
-      simp only [h, h', ↓reduceIte, Fin.rev_rev]
+    · have h' : ¬ ε i = ε i.rev := fun e => h e.symm
+      simp only [h, h', ↓ reduceIte, Fin.rev_rev]
       rw [rev_cast]
       ring
   · intro i h
@@ -104,8 +105,8 @@ theorem adapted {ε : Fin n → Bool} (hε : Monotone ε) : Adapted (pr ε) (ht 
     unfold pr
     rw [if_pos h']
   · intro i j hi hij
-    have hi' : ¬ε i.rev = ε i := fun e => hi (ht_eq_zero.mpr e)
-    have hj' : ¬ε j.rev = ε j := fun e => hi (hij.trans (ht_eq_zero.mpr e))
+    have hi' : ¬ ε i.rev = ε i := fun e => hi (ht_eq_zero.mpr e)
+    have hj' : ¬ ε j.rev = ε j := fun e => hi (hij.trans (ht_eq_zero.mpr e))
     unfold ht at hij
     rw [if_neg hi', if_neg hj'] at hij
     ext
@@ -120,7 +121,7 @@ theorem adapted {ε : Fin n → Bool} (hε : Monotone ε) : Adapted (pr ε) (ht 
     unfold wt pr
     by_cases h : ε i.rev = ε i
     · simp [h]
-    · have h' : ¬ε i = ε i.rev := fun e => h e.symm
+    · have h' : ¬ ε i = ε i.rev := fun e => h e.symm
       simp [h, h']
   · intro i j hi hj
     have hi' := ht_eq_zero.mp hi
@@ -158,8 +159,10 @@ theorem dec_of_monotone {ε : Fin n → Bool} (hε : Monotone ε) : Dec (Jm ε) 
     rw [star_inv₀, Complex.star_def, Complex.conj_ofReal]
   have hsg2 : ∀ i, sg ε i * sg ε i = 1 := fun i => by unfold sg; split_ifs <;> norm_num
   have hsgs : ∀ i, star (sg ε i) = sg ε i := fun i => by unfold sg; split_ifs <;> simp
-  have hnf : ∀ i, ¬ε i.rev = ε i →
-      pr ε i = i.rev ∧ ¬ε (pr ε i).rev = ε (pr ε i) ∧ sg ε (pr ε i) = -sg ε i := by
+  have hnf
+      : ∀ i,
+        ¬ ε i.rev = ε i
+          → pr ε i = i.rev ∧ ¬ ε (pr ε i).rev = ε (pr ε i) ∧ sg ε (pr ε i) = - sg ε i := by
     intro i h
     have hpi : pr ε i = i.rev := by unfold pr; rw [if_neg h]
     refine ⟨hpi, ?_, ?_⟩
@@ -186,9 +189,9 @@ theorem dec_of_monotone {ε : Fin n → Bool} (hε : Monotone ε) : Dec (Jm ε) 
       have h := pr_eq_iff.mp hi
       simp [α, β, h, hi]
     · intro i hi
-      have h : ¬ε i.rev = ε i := fun e => hi (pr_eq_iff.mpr e)
+      have h : ¬ ε i.rev = ε i := fun e => hi (pr_eq_iff.mpr e)
       obtain ⟨hpi, hpp, hs⟩ := hnf i h
-      simp only [α, β, h, hpp, ↓reduceIte, hs, Pi.zero_apply]
+      simp only [α, β, h, hpp, ↓ reduceIte, hs, Pi.zero_apply]
       constructor
       · linear_combination (1 + sg ε i * sg ε i) * hqq + (1 / 2 : ℂ) * hsg2 i
       · ring
@@ -199,9 +202,9 @@ theorem dec_of_monotone {ε : Fin n → Bool} (hε : Monotone ε) : Dec (Jm ε) 
         have h := pr_eq_iff.mp hi
         simp [α, β, h, hi, wt]
       · intro i hi
-        have h : ¬ε i.rev = ε i := fun e => hi (pr_eq_iff.mpr e)
+        have h : ¬ ε i.rev = ε i := fun e => hi (pr_eq_iff.mpr e)
         obtain ⟨hpi, hpp, hs⟩ := hnf i h
-        simp only [α, β, wt, h, hpp, ↓reduceIte, hs, Pi.zero_apply]
+        simp only [α, β, wt, h, hpp, ↓ reduceIte, hs, Pi.zero_apply]
         constructor
         · linear_combination (-(sg ε i) * q * q) * hsg2 i
         · linear_combination (2 * sg ε i * sg ε i) * hqq + hsg2 i
@@ -241,7 +244,9 @@ theorem iwasawa_decomposition_unitary_group : IwaAll := by
   have hk1 : k * k.conjTranspose = 1 := by
     rw [← Matrix.star_eq_conjTranspose]
     exact Matrix.mem_unitaryGroup_iff.mp hk
-  calc k * Jm ε = k * (k.conjTranspose * Jm ε * k) := by rw [hkJ]
+  calc
+    k * Jm ε
+      = k * (k.conjTranspose * Jm ε * k) := by rw [hkJ]
     _ = k * k.conjTranspose * Jm ε * k := by simp only [Matrix.mul_assoc]
     _ = Jm ε * k := by rw [hk1, Matrix.one_mul]
 

@@ -23,8 +23,8 @@ theorem nfLeib_thChain_rpow (s : ℝ) : ThChain (fun n x => s ^ n * x ^ s) := by
   rw [e]
   exact h
 
-theorem nfLeib_xD_contDiff (φ : ℝ → ℝ) (hφ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) φ) :
-    ∀ n : ℕ, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (xD^[n] φ) := by
+theorem nfLeib_xD_contDiff (φ : ℝ → ℝ) (hφ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) φ)
+    : ∀ n : ℕ, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (xD^[n] φ) := by
   intro n
   induction n with
   | zero => simpa using hφ
@@ -33,8 +33,8 @@ theorem nfLeib_xD_contDiff (φ : ℝ → ℝ) (hφ : ContDiff ℝ ((⊤ : ℕ∞
     unfold xD
     exact contDiff_id.mul (contDiff_infty_iff_deriv.1 ih).2
 
-theorem nfLeib_thChain_xD (φ : ℝ → ℝ) (hφ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) φ) :
-    ThChain (fun n => xD^[n] φ) := by
+theorem nfLeib_thChain_xD (φ : ℝ → ℝ) (hφ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) φ)
+    : ThChain (fun n => xD^[n] φ) := by
   intro n x hx
   have h := nfLeib_xD_contDiff φ hφ n
   have hd := ((contDiff_infty_iff_deriv.1 h).1 x).hasDerivAt
@@ -49,11 +49,15 @@ theorem nfLeib_thChain_xD (φ : ℝ → ℝ) (hφ : ContDiff ℝ ((⊤ : ℕ∞)
 
 section cont
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-theorem nfLeib_ckOn_contOn {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] {m : ℕ∞} {UU : Set (B.Mat k r)}
-    (hUU : UU ⊆ B.GV k r) {f : B.Mat k r → E} (h : B.CkOn m UU f) : ContinuousOn f UU := by
+theorem nfLeib_ckOn_contOn
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {m : ℕ∞} {UU : Set (B.Mat k r)} (hUU : UU ⊆ B.GV k r)
+    {f : B.Mat k r → E} (h : B.CkOn m UU f)
+    : ContinuousOn f UU := by
   unfold B.CkOn at h
   intro g₀ hg₀
   obtain ⟨U, f', hU, hgU, hc, he⟩ := h g₀ hg₀
@@ -68,13 +72,15 @@ theorem nfLeib_domL_eq (Bs : B.RealPlaceData k r Wp Wq) : C6.domL Bs ∅ = B.GPo
   ext g
   simp
 
-theorem nfLeib_opApply_contOn (Bs : B.RealPlaceData k r Wp Wq) (L : B.DiffOp k r Wp Wq)
-    (hL : B.SmoothCoef (C6.domL Bs ∅) L) (F : B.Mat k r → (Wq →L[ℂ] Wp)) (hF : B.CkOn ⊤ (B.GV k r) F) :
-    ContinuousOn (B.opApply L F) (B.GPos Bs) := by
+theorem nfLeib_opApply_contOn
+    (Bs : B.RealPlaceData k r Wp Wq) (L : B.DiffOp k r Wp Wq) (hL : B.SmoothCoef (C6.domL Bs ∅) L)
+    (F : B.Mat k r → (Wq →L[ℂ] Wp)) (hF : B.CkOn ⊤ (B.GV k r) F)
+    : ContinuousOn (B.opApply L F) (B.GPos Bs) := by
   induction L with
   | nil =>
     have e : B.opApply ([] : B.DiffOp k r Wp Wq) F = fun _ => 0 := by funext g; simp [B.opApply]
-    rw [e]; exact continuousOn_const
+    rw [e]
+    exact continuousOn_const
   | cons T L ih =>
     have e : B.opApply (T :: L) F = fun g => T.coef g (B.Rw T.word F g) + B.opApply L F g := by
       funext g; simp [B.opApply]
@@ -89,11 +95,14 @@ theorem nfLeib_opApply_contOn (Bs : B.RealPlaceData k r Wp Wq) (L : B.DiffOp k r
 
 end cont
 
-theorem nfLeib_thr (Cb c₃ R Kk W o κ A : ℝ) (hR : 0 ≤ R) (hK : 0 ≤ Kk) (hW : 0 ≤ W) (ho0 : 0 ≤ o) (hκ0 : 0 ≤ κ)
+theorem nfLeib_thr
+    (Cb c₃ R Kk W o κ A : ℝ) (hR : 0 ≤ R) (hK : 0 ≤ Kk) (hW : 0 ≤ W) (ho0 : 0 ≤ o) (hκ0 : 0 ≤ κ)
     (ho : o ≤ Cb * W * (2 * R + Kk + 1)) (hκ : κ ≤ Cb * (R + 1) * o)
-    (hA : (max Cb 0 ^ 2 + 5 * max Cb 0 + max c₃ 0) * (R + 1) ^ 4 *
-      (W * (2 * R + Kk + 1) ^ 2 + (2 * R + Kk + 1) ^ 3) ≤ A) :
-    c₃ * (R + 1) ^ 2 * (R * (2 * R + Kk + 1) + 1) ≤ A - (κ + 3 * (R + 1) * o + (2 * R + 2) * o) := by
+    (hA : (max Cb 0 ^ 2 + 5 * max Cb 0 + max c₃ 0) * (R + 1) ^ 4
+        * (W * (2 * R + Kk + 1) ^ 2 + (2 * R + Kk + 1) ^ 3)
+      ≤ A)
+    : c₃ * (R + 1) ^ 2 * (R * (2 * R + Kk + 1) + 1)
+      ≤ A - (κ + 3 * (R + 1) * o + (2 * R + 2) * o) := by
   have hM : Cb ≤ max Cb 0 := le_max_left _ _
   have hM0 : 0 ≤ max Cb 0 := le_max_right _ _
   have hc : c₃ ≤ max c₃ 0 := le_max_left _ _
@@ -139,7 +148,9 @@ theorem nfLeib_thr (Cb c₃ R Kk W o κ A : ℝ) (hR : 0 ≤ R) (hK : 0 ≤ Kk) 
   have h1 : c₃ * (R + 1) ^ 2 * (R * T + 1) ≤ c * ((R + 1) ^ 4 * T ^ 3) := by
     have e1 := mul_le_mul_of_nonneg_right hc hX0
     have e2 := mul_le_mul_of_nonneg_left hXY hc0
-    calc c₃ * (R + 1) ^ 2 * (R * T + 1) = c₃ * ((R + 1) ^ 2 * (R * T + 1)) := by ring
+    calc
+      c₃ * (R + 1) ^ 2 * (R * T + 1)
+        = c₃ * ((R + 1) ^ 2 * (R * T + 1)) := by ring
       _ ≤ c * ((R + 1) ^ 4 * T ^ 3) := e1.trans e2
   have hMR : 0 ≤ (M + 5) * (R + 1) := mul_nonneg (by linarith) hR0
   have h3 := mul_le_mul_of_nonneg_left ho' hMR
@@ -163,9 +174,12 @@ theorem nfLeibV_of (hO : NFLeibOps) (hB : NFLeibBd) (hV : NFVLin) : NFLeibV := b
   refine ⟨Q, L, hsm, ?_, ?_⟩
   · intro s F hF g hg
     have hG : 0 < Gf P.k P.r p.T.base.z p.T.base.z' g := hg.2.1
-    have e1 : (fun g' => ((Gf P.k P.r p.T.base.z p.T.base.z' g' ^ s : ℝ) : ℂ) • F g') =
-        fun y => (((fun (n : ℕ) (x : ℝ) => s ^ n * x ^ s) 0 (Gf P.k P.r p.T.base.z p.T.base.z' y) : ℝ) : ℂ) •
-          F y := by
+    have e1
+        : (fun g' => ((Gf P.k P.r p.T.base.z p.T.base.z' g' ^ s : ℝ) : ℂ) • F g')
+          = fun y =>
+            (((fun (n : ℕ) (x : ℝ) => s ^ n * x ^ s) 0 (Gf P.k P.r p.T.base.z p.T.base.z' y) : ℝ)
+                : ℂ)
+              • F y := by
       funext y; simp
     rw [hΘ _ g hg, e1, hexp _ (nfLeib_thChain_rpow s) F hF g hg, Finset.smul_sum]
     refine Finset.sum_congr rfl fun q _ => ?_
@@ -179,31 +193,43 @@ theorem nfLeibV_of (hO : NFLeibOps) (hB : NFLeibBd) (hV : NFVLin) : NFLeibV := b
   · intro φ hφ F A hF hdec hA γ hγ hGγ
     obtain ⟨b, hb⟩ := hdec o
     set m : ℝ := (κ : ℝ) + 3 * ((P.r : ℝ) + 1) * o + (2 * (P.r : ℝ) + 2) * o with hm
-    have hdecq : ∀ q : Fin (Q + 1), ∀ ε : ℝ, 0 < ε → ∃ C : ℝ, ∀ g ∈ B.GV P.k P.r,
-        ε ≤ Gf P.k P.r p.T.base.z p.T.base.z' g → ‖B.opApply (L q) F g‖ ≤ C * B.gN g ^ (-(A - m)) := by
+    have hdecq
+        : ∀ q : Fin (Q + 1), ∀ ε : ℝ,
+          0 < ε
+            → ∃ C : ℝ, ∀ g ∈ B.GV P.k P.r,
+              ε ≤ Gf P.k P.r p.T.base.z p.T.base.z' g
+                → ‖B.opApply (L q) F g‖ ≤ C * B.gN g ^ (-(A - m)) := by
       intro q ε hε
       obtain ⟨K, -, hK⟩ := hB P.k P.r Wp Wq p.T.base nf fib o κ Dop hfib hIn (L q) (hterm q) ε hε
       refine ⟨K * b, fun g hg hgε => ?_⟩
       have := hK F A b hb g hg hgε
-      have ee : (κ : ℝ) + 3 * ((P.r : ℝ) + 1) * o + (2 * (P.r : ℝ) + 2) * o - A = -(A - m) := by rw [hm]; ring
+      have ee : (κ : ℝ) + 3 * ((P.r : ℝ) + 1) * o + (2 * (P.r : ℝ) + 2) * o - A = -(A - m) := by
+        rw [hm]; ring
       rwa [ee] at this
-    have hthr : c₃ * ((P.r : ℝ) + 1) ^ 2 * ((P.r : ℝ) * ((2 * P.r + P.k + 1 : ℕ) : ℝ) + 1) ≤ A - m := by
-      have h0 := nfLeib_thr Cb c₃ P.r P.k w.length o κ A (by positivity) (by positivity) (by positivity)
-        (by positivity) (by positivity) (by push_cast at ho; linarith) hκ (by linarith)
+    have hthr
+        : c₃ * ((P.r : ℝ) + 1) ^ 2 * ((P.r : ℝ) * ((2 * P.r + P.k + 1 : ℕ) : ℝ) + 1) ≤ A - m := by
+      have h0 :=
+        nfLeib_thr Cb c₃ P.r P.k w.length o κ A (by positivity) (by positivity) (by positivity)
+          (by positivity) (by positivity) (by push_cast at ho; linarith) hκ (by linarith)
       push_cast
       rw [hm]
       linarith
-    have hsplit : ∀ g ∈ B.GPos p.T.base, p.Θ.Θ w e
-        (fun g => ((φ (Gf P.k P.r p.T.base.z p.T.base.z' g) : ℝ) : ℂ) • F g) g =
-        ∑ q : Fin (Q + 1), (fun (q : Fin (Q + 1)) (x : ℝ) => ((xD^[(q : ℕ)] φ x : ℝ) : ℂ)) q
-          (Gf P.k P.r p.T.base.z p.T.base.z' g) • B.opApply (L q) F g := by
+    have hsplit
+        : ∀ g ∈ B.GPos p.T.base,
+          p.Θ.Θ w e (fun g => ((φ (Gf P.k P.r p.T.base.z p.T.base.z' g) : ℝ) : ℂ) • F g) g
+            = ∑ q : Fin (Q + 1), (fun (q : Fin (Q + 1)) (x : ℝ) => ((xD^[(q : ℕ)] φ x : ℝ) : ℂ)) q
+                (Gf P.k P.r p.T.base.z p.T.base.z' g) • B.opApply (L q) F g := by
       intro g hg
       have hgd : g ∈ C6.domL p.T.base ∅ := by rw [nfLeib_domL_eq]; exact hg
       rw [hΘ _ g hgd]
       exact hexp (fun n => xD^[n] φ) (nfLeib_thChain_xD φ hφ) F hF g hgd
-    exact hc₃ P.k P.r Wp Wq p.T.base p.ν' p.m₀ Q (fun q x => ((xD^[(q : ℕ)] φ x : ℝ) : ℂ)) _
-      (fun q => B.opApply (L q) F) (A - m) hthr
-      (fun q => nfLeib_opApply_contOn p.T.base (L q) (hsm q) F hF) hdecq hsplit γ hγ hGγ
+    exact hc₃ P.k P.r Wp Wq p.T.base p.ν' p.m₀ Q
+      (fun q x => ((xD^[(q : ℕ)] φ x : ℝ) : ℂ))
+      _
+      (fun q => B.opApply (L q) F)
+      (A - m) hthr
+      (fun q => nfLeib_opApply_contOn p.T.base (L q) (hsm q) F hF)
+      hdecq hsplit γ hγ hGγ
 
 end
 

@@ -31,7 +31,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Lintegr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG GlobalTheory.LFun Formalism.L2.Host
+open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG
+  GlobalTheory.LFun Formalism.L2.Host
 open scoped ENNReal ComplexConjugate ContDiff
 
 noncomputable section
@@ -42,11 +43,12 @@ open GlobalTheory.CellDec GroundTheory.Automorphic.FourierWhittaker
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
 
-theorem blockGL_finGL {j n : ℕ} (hj : j ≤ n) (k : GL (Fin j) (Af E)) :
-    blockGL hj (finGL E j k) = finGL E n (blockGL hj k) := by
-  have hm : ∀ {R S : Type} [CommRing R] [CommRing S] (p : R →+* S) (g : GL (Fin j) R),
-      Matrix.GeneralLinearGroup.map p (blockGL hj g) = blockGL hj (Matrix.GeneralLinearGroup.map p g) :=
-    by
+theorem blockGL_finGL {j n : ℕ} (hj : j ≤ n) (k : GL (Fin j) (Af E))
+    : blockGL hj (finGL E j k) = finGL E n (blockGL hj k) := by
+  have hm
+      : ∀ {R S : Type} [CommRing R] [CommRing S] (p : R →+* S) (g : GL (Fin j) R),
+        Matrix.GeneralLinearGroup.map p (blockGL hj g)
+          = blockGL hj (Matrix.GeneralLinearGroup.map p g) := by
     intro R S _ _ p g
     ext a b
     simp [blockMat_apply]
@@ -55,14 +57,20 @@ theorem blockGL_finGL {j n : ℕ} (hj : j ≤ n) (k : GL (Fin j) (Af E)) :
   · rw [hm, pInf_finGL, pInf_finGL, map_one]
   · rw [hm, pFin_finGL, pFin_finGL]
 
-
 omit [_root_.NumberField.IsTotallyComplex E] in
-theorem blockGL_mem_integral {j n : ℕ} (hj : j ≤ n) {k : GL (Fin j) (Af E)}
-    (hk : k ∈ GroundTheory.Automorphic.AdelicGLn.integralFiniteGL E j) :
-    blockGL hj k ∈ GroundTheory.Automorphic.AdelicGLn.integralFiniteGL E n := by
+theorem blockGL_mem_integral
+    {j n : ℕ} (hj : j ≤ n)
+    {k : GL (Fin j) (Af E)} (hk : k ∈ GroundTheory.Automorphic.AdelicGLn.integralFiniteGL E j)
+    : blockGL hj k ∈ GroundTheory.Automorphic.AdelicGLn.integralFiniteGL E n := by
   rw [GroundTheory.Automorphic.AdelicGLn.mem_integralFiniteGL_iff] at hk ⊢
-  have hI : ∀ (g : GL (Fin j) (Af E)), (∀ a b, (g : Matrix (Fin j) (Fin j) (Af E)) a b ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 E) E) →
-      ∀ a b, ((blockGL hj g : GL (Fin n) (Af E)) : Matrix (Fin n) (Fin n) (Af E)) a b ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 E) E := by
+  have hI
+      : ∀ (g : GL (Fin j) (Af E)),
+        (∀ a b,
+            (g : Matrix (Fin j) (Fin j) (Af E)) a b
+              ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 E) E)
+          → ∀ a b,
+            ((blockGL hj g : GL (Fin n) (Af E)) : Matrix (Fin n) (Fin n) (Af E)) a b
+              ∈ GroundTheory.Global.integralFiniteAdeles (𝓞 E) E := by
     intro g hg a b
     rw [coe_blockGL, blockMat_apply]
     split_ifs
@@ -84,62 +92,94 @@ open scoped ComplexConjugate
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
 
 omit [_root_.NumberField.IsTotallyComplex E] in
-theorem map_blockGL {R S : Type} [CommRing R] [CommRing S] (p : R →+* S) {j n : ℕ} (hj : j ≤ n)
-    (g : GL (Fin j) R) :
-    Matrix.GeneralLinearGroup.map p (blockGL hj g) = blockGL hj (Matrix.GeneralLinearGroup.map p g) := by
+theorem map_blockGL
+    {R S : Type} [CommRing R] [CommRing S] (p : R →+* S) {j n : ℕ} (hj : j ≤ n) (g : GL (Fin j) R)
+    : Matrix.GeneralLinearGroup.map p (blockGL hj g)
+      = blockGL hj (Matrix.GeneralLinearGroup.map p g) := by
   ext a b
   simp [blockMat_apply]
   split_ifs <;> simp
 
-
 omit [_root_.NumberField.IsTotallyComplex E] in
-theorem blockGL_level {j n : ℕ} (hj : j ≤ n) (S : Finset (HeightOneSpectrum (𝓞 E))) {k : GL (Fin j) (Af E)}
-    (hk1 : ∀ v, Matrix.GeneralLinearGroup.map (pLoc E v) k ∈ KGL v (n := j))
-    (hkS : ∀ v ∈ S, Matrix.GeneralLinearGroup.map (pLoc E v) k = 1) :
-    (∀ v, Matrix.GeneralLinearGroup.map (pLoc E v) (blockGL hj k) ∈ KGL v (n := n)) ∧
-      ∀ v ∈ S, Matrix.GeneralLinearGroup.map (pLoc E v) (blockGL hj k) = 1 := by
-  refine ⟨GlobalTheory.RSLocalPart.mem_integralFiniteGL_iff_KGL.1
-    (blockGL_mem_integral hj (GlobalTheory.RSLocalPart.mem_integralFiniteGL_iff_KGL.2 hk1)), fun v hv => ?_⟩
+theorem blockGL_level
+    {j n : ℕ} (hj : j ≤ n)
+    (S : Finset (HeightOneSpectrum (𝓞 E)))
+    {k : GL (Fin j) (Af E)} (hk1 : ∀ v, Matrix.GeneralLinearGroup.map (pLoc E v) k ∈ KGL v (n := j))
+    (hkS : ∀ v ∈ S, Matrix.GeneralLinearGroup.map (pLoc E v) k = 1)
+    : (∀ v, Matrix.GeneralLinearGroup.map (pLoc E v) (blockGL hj k) ∈ KGL v (n := n))
+      ∧ ∀ v ∈ S, Matrix.GeneralLinearGroup.map (pLoc E v) (blockGL hj k) = 1 := by
+  refine ⟨
+    GlobalTheory.RSLocalPart.mem_integralFiniteGL_iff_KGL.1 (blockGL_mem_integral hj
+      (GlobalTheory.RSLocalPart.mem_integralFiniteGL_iff_KGL.2 hk1)),
+    fun v hv => ?_
+  ⟩
   rw [map_blockGL, hkS v hv, map_one]
 
-theorem uIntNM_decomp {m r : ℕ} {S : Finset (HeightOneSpectrum (𝓞 E))}
-    {φ : GA E (m + r + 1 + 1) → ℂ} {φ' : GA E (m + 1) → ℂ} {κ : GA E (m + 1) → ℝ} {F : (Fin (m + 1) → Ad E) → ℂ}
-    (hN : ∀ u ∈ GlobalTheory.JSW.NA (E := E) (a := (m + r + 1 + 1)), ∀ g, GlobalTheory.JSW.whit φ (u * g) = GlobalTheory.JSW.psiN u * GlobalTheory.JSW.whit φ g)
-    (hN' : ∀ u ∈ GlobalTheory.JSW.NA (E := E) (a := (m + 1)), ∀ g, GlobalTheory.JSW.whit φ' (u * g) = GlobalTheory.JSW.psiN u * GlobalTheory.JSW.whit φ' g)
-    (hK : ∀ k : GL (Fin (m + r + 1 + 1)) (Af E), (∀ v, Matrix.GeneralLinearGroup.map (pLoc E v) k ∈ KGL v (n := (m + r + 1 + 1))) →
-      (∀ v ∈ S, Matrix.GeneralLinearGroup.map (pLoc E v) k = 1) → ∀ g, GlobalTheory.JSW.whit φ (g * finGL E (m + r + 1 + 1) k) = GlobalTheory.JSW.whit φ g)
-    (hK' : ∀ k : GL (Fin (m + 1)) (Af E), (∀ v, Matrix.GeneralLinearGroup.map (pLoc E v) k ∈ KGL v (n := (m + 1))) →
-      (∀ v ∈ S, Matrix.GeneralLinearGroup.map (pLoc E v) k = 1) → ∀ g, GlobalTheory.JSW.whit φ' (g * finGL E (m + 1) k) = GlobalTheory.JSW.whit φ' g)
-    (hM : ∀ h ∈ GlobalTheory.JSW.supS (E := E) (a := (m + 1)) S, GlobalTheory.JSW.whit φ (blockGL (by omega : m + 1 ≤ m + r + 1 + 1) h) = (κ h : ℂ) * GlobalTheory.JSW.whit φ' h)
-    (hF : ∀ y, 0 ≤ (GroundTheory.Automorphic.GJMatrix.adelicFourierPi E F y).re ∧ (GroundTheory.Automorphic.GJMatrix.adelicFourierPi E F y).im = 0)
-    {u h g : GA E (m + 1)} {k : GL (Fin (m + 1)) (Af E)} (hu : u ∈ GlobalTheory.CellDec.NA E (m + 1)) (hh : h ∈ GlobalTheory.JSW.supS (E := E) (a := (m + 1)) S)
+theorem uIntNM_decomp
+    {m r : ℕ} {S : Finset (HeightOneSpectrum (𝓞 E))} {φ : GA E (m + r + 1 + 1) → ℂ}
+    {φ' : GA E (m + 1) → ℂ} {κ : GA E (m + 1) → ℝ} {F : (Fin (m + 1) → Ad E) → ℂ}
+    (hN : ∀ u ∈ GlobalTheory.JSW.NA (E := E) (a := (m + r + 1 + 1)), ∀ g,
+      GlobalTheory.JSW.whit φ (u * g) = GlobalTheory.JSW.psiN u * GlobalTheory.JSW.whit φ g)
+    (hN' : ∀ u ∈ GlobalTheory.JSW.NA (E := E) (a := (m + 1)), ∀ g,
+      GlobalTheory.JSW.whit φ' (u * g) = GlobalTheory.JSW.psiN u * GlobalTheory.JSW.whit φ' g)
+    (hK : ∀ k : GL (Fin (m + r + 1 + 1)) (Af E),
+      (∀ v, Matrix.GeneralLinearGroup.map (pLoc E v) k ∈ KGL v (n := (m + r + 1 + 1)))
+        → (∀ v ∈ S, Matrix.GeneralLinearGroup.map (pLoc E v) k = 1)
+        → ∀ g, GlobalTheory.JSW.whit φ (g * finGL E (m + r + 1 + 1) k) = GlobalTheory.JSW.whit φ g)
+    (hK' : ∀ k : GL (Fin (m + 1)) (Af E),
+      (∀ v, Matrix.GeneralLinearGroup.map (pLoc E v) k ∈ KGL v (n := (m + 1)))
+        → (∀ v ∈ S, Matrix.GeneralLinearGroup.map (pLoc E v) k = 1)
+        → ∀ g, GlobalTheory.JSW.whit φ' (g * finGL E (m + 1) k) = GlobalTheory.JSW.whit φ' g)
+    (hM : ∀ h ∈ GlobalTheory.JSW.supS (E := E) (a := (m + 1)) S,
+      GlobalTheory.JSW.whit φ (blockGL (by omega : m + 1 ≤ m + r + 1 + 1) h)
+        = (κ h : ℂ) * GlobalTheory.JSW.whit φ' h)
+    (hF : ∀ y,
+      0 ≤ (GroundTheory.Automorphic.GJMatrix.adelicFourierPi E F y).re
+        ∧ (GroundTheory.Automorphic.GJMatrix.adelicFourierPi E F y).im = 0)
+    {u h g : GA E (m + 1)} {k : GL (Fin (m + 1)) (Af E)}
+    (hu : u ∈ GlobalTheory.CellDec.NA E (m + 1))
+    (hh : h ∈ GlobalTheory.JSW.supS (E := E) (a := (m + 1)) S)
     (hk1 : ∀ v, Matrix.GeneralLinearGroup.map (pLoc E v) k ∈ KGL v (n := (m + 1)))
-    (hkS : ∀ v ∈ S, Matrix.GeneralLinearGroup.map (pLoc E v) k = 1) (hg : g = u * h * finGL E (m + 1) k) :
-    GlobalTheory.JSW.whit φ (blockGL (by omega : m + 1 ≤ m + r + 1 + 1) g) = GlobalTheory.JSW.psiN u * ((κ h : ℂ) * GlobalTheory.JSW.whit φ' h) ∧
-      GlobalTheory.JSW.whit φ' g = GlobalTheory.JSW.psiN u * GlobalTheory.JSW.whit φ' h ∧
-      GlobalTheory.RSnmUnf.uIntNM (by omega : m + 1 ≤ m + r + 1 + 1) F φ φ' 0 g =
-        ((κ h * Complex.normSq (GlobalTheory.JSW.whit φ' h) * (GroundTheory.Automorphic.GJMatrix.adelicFourierPi E F (GlobalTheory.ZEul.lastRow g)).re *
-          GlobalTheory.RSnm.detAbs g ^ (-((r : ℝ) + 1) / 2) : ℝ) : ℂ) := by
+    (hkS : ∀ v ∈ S, Matrix.GeneralLinearGroup.map (pLoc E v) k = 1)
+    (hg : g = u * h * finGL E (m + 1) k)
+    : GlobalTheory.JSW.whit φ (blockGL (by omega : m + 1 ≤ m + r + 1 + 1) g)
+        = GlobalTheory.JSW.psiN u * ((κ h : ℂ) * GlobalTheory.JSW.whit φ' h)
+      ∧ GlobalTheory.JSW.whit φ' g = GlobalTheory.JSW.psiN u * GlobalTheory.JSW.whit φ' h
+      ∧ GlobalTheory.RSnmUnf.uIntNM (by omega : m + 1 ≤ m + r + 1 + 1) F φ φ' 0 g
+        = ((κ h * Complex.normSq (GlobalTheory.JSW.whit φ' h)
+              * (GroundTheory.Automorphic.GJMatrix.adelicFourierPi E F
+                (GlobalTheory.ZEul.lastRow g)).re
+              * GlobalTheory.RSnm.detAbs g ^ (-((r : ℝ) + 1) / 2)
+            : ℝ)
+          : ℂ) := by
   obtain ⟨h1, h2⟩ := (GlobalTheory.SmGL.mem_unipB _).1 hu
   have hu' : u ∈ GlobalTheory.JSW.NA (E := E) (a := (m + 1)) := ⟨h1, h2⟩
   have hlev := blockGL_level (by omega : m + 1 ≤ m + r + 1 + 1) S hk1 hkS
-  have hW : GlobalTheory.JSW.whit φ (blockGL (by omega : m + 1 ≤ m + r + 1 + 1) g) =
-      GlobalTheory.JSW.psiN u * ((κ h : ℂ) * GlobalTheory.JSW.whit φ' h) := by
+  have hW
+      : GlobalTheory.JSW.whit φ (blockGL (by omega : m + 1 ≤ m + r + 1 + 1) g)
+        = GlobalTheory.JSW.psiN u * ((κ h : ℂ) * GlobalTheory.JSW.whit φ' h) := by
     rw [hg, map_mul, blockGL_finGL, hK _ hlev.1 hlev.2, map_mul,
-      hN _ (GlobalTheory.RSnmUnfProps.blockGL_mem_NA _ hu'), GlobalTheory.RSnmUnfProps.psiN_blockGL, hM h hh]
+      hN _ (GlobalTheory.RSnmUnfProps.blockGL_mem_NA _ hu'), GlobalTheory.RSnmUnfProps.psiN_blockGL,
+      hM h hh]
   have hW' : GlobalTheory.JSW.whit φ' g = GlobalTheory.JSW.psiN u * GlobalTheory.JSW.whit φ' h := by
     rw [hg, hK' k hk1 hkS, hN' u hu']
   refine ⟨hW, hW', ?_⟩
   have hp : GlobalTheory.JSW.psiN u * conj (GlobalTheory.JSW.psiN u) = 1 := by
     rw [Complex.mul_conj, Complex.normSq_eq_norm_sq, GlobalTheory.RSnmUnfProps.norm_psiN]; simp
-  have hd : ((GlobalTheory.RSnm.detAbs g : ℝ) : ℂ) ^ (((0 : ℝ) : ℂ) - (((m + r + 1 + 1 : ℕ) : ℂ) - ((m + 1 : ℕ) : ℂ)) / 2) =
-      ((GlobalTheory.RSnm.detAbs g ^ (-((r : ℝ) + 1) / 2) : ℝ) : ℂ) := by
+  have hd
+      : ((GlobalTheory.RSnm.detAbs g : ℝ) : ℂ)
+          ^ (((0 : ℝ) : ℂ) - (((m + r + 1 + 1 : ℕ) : ℂ) - ((m + 1 : ℕ) : ℂ)) / 2)
+        = ((GlobalTheory.RSnm.detAbs g ^ (-((r : ℝ) + 1) / 2) : ℝ) : ℂ) := by
     rw [Complex.ofReal_cpow (GlobalTheory.RSnm.detAbs_pos g).le]
     congr 1
-    push_cast; ring
+    push_cast
+    ring
   set y := GroundTheory.Automorphic.GJMatrix.adelicFourierPi E F (GlobalTheory.ZEul.lastRow g)
   have hy : y = (y.re : ℂ) := Complex.ext rfl (by simp [(hF _).2, y])
-  have hw : GlobalTheory.JSW.whit φ' h * conj (GlobalTheory.JSW.whit φ' h) = (Complex.normSq (GlobalTheory.JSW.whit φ' h) : ℂ) := Complex.mul_conj _
+  have hw
+      : GlobalTheory.JSW.whit φ' h * conj (GlobalTheory.JSW.whit φ' h)
+        = (Complex.normSq (GlobalTheory.JSW.whit φ' h) : ℂ) :=
+    Complex.mul_conj _
   unfold GlobalTheory.RSnmUnf.uIntNM
   rw [hW, hW', hd, map_mul]
   change _ * _ * y * _ = _
@@ -155,25 +195,38 @@ namespace GlobalTheory.RSnmFT
 open GroundTheory.Automorphic.FourierWhittaker
 open scoped Pointwise
 
-theorem integrableOn_cell_pos {E : Type} [Field E] [NumberField E] {n : ℕ} (μ : Measure (GA E n)) [μ.IsHaarMeasure]
-    (S : Finset (HeightOneSpectrum (𝓞 E))) {𝓕 : Set (GA E n)} (h𝓕 : IsFundamentalDomain (GlobalTheory.CellDec.NE E n) 𝓕 μ)
+theorem integrableOn_cell_pos
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} (μ : Measure (GA E n)) [μ.IsHaarMeasure]
+    (S : Finset (HeightOneSpectrum (𝓞 E)))
+    {𝓕 : Set (GA E n)} (h𝓕 : IsFundamentalDomain (GlobalTheory.CellDec.NE E n) 𝓕 μ)
     {B : GA E n → ℝ} (hc : Continuous B) (hB0 : ∀ g, 0 ≤ B g)
-    (hN : ∀ u ∈ GlobalTheory.CellDec.NA E n, ∀ g, B (u * g) = B g) {K : Set (GA E n)} (hK : IsCompact K)
-    (hs : ∀ g ∈ GlobalTheory.CellDec.C0 E n S, B g ≠ 0 → ∃ u ∈ GlobalTheory.CellDec.NA E n, u * g ∈ K)
-    (h1 : ∃ g ∈ GlobalTheory.CellDec.C0 E n S, B g ≠ 0) :
-    IntegrableOn B (𝓕 ∩ GlobalTheory.CellDec.C0 E n S) μ ∧ 0 < ∫ g in 𝓕 ∩ GlobalTheory.CellDec.C0 E n S, B g ∂μ := by
+    (hN : ∀ u ∈ GlobalTheory.CellDec.NA E n, ∀ g, B (u * g) = B g)
+    {K : Set (GA E n)} (hK : IsCompact K)
+    (hs
+      : ∀ g ∈ GlobalTheory.CellDec.C0 E n S, B g ≠ 0 → ∃ u ∈ GlobalTheory.CellDec.NA E n, u * g ∈ K)
+    (h1 : ∃ g ∈ GlobalTheory.CellDec.C0 E n S, B g ≠ 0)
+    : IntegrableOn B (𝓕 ∩ GlobalTheory.CellDec.C0 E n S) μ
+      ∧ 0 < ∫ g in 𝓕 ∩ GlobalTheory.CellDec.C0 E n S, B g ∂μ := by
   obtain ⟨D, hD, hDu⟩ := GlobalTheory.RSLocalPart.exists_isCompact_unip E n
   haveI := GlobalTheory.ThetaUnfold.countable_range_ratGL (E := E) (a := n)
   haveI : Countable (GlobalTheory.CellDec.NE E n) :=
     (Subgroup.inclusion_injective (Subgroup.map_le_range (ratGL E n) _)).countable
-  obtain ⟨i1, -, i3⟩ := GlobalTheory.RSLocalPart.integral_family_pos μ (GlobalTheory.CellDec.NE E n) h𝓕 (GlobalTheory.CellDec.isOpen_adelicUnipotentTimesIntegralOutsideSet E n S)
-    (hD.mul hK) (fun γ hγ g hg => GlobalTheory.CellDec.adelicUnitriangular_mul_mem_unipotentTimesIntegral (GlobalTheory.RSLocalPart.NE_le hγ) hg) (B := fun _ => B)
-    (hc.comp continuous_snd) (fun _ => hB0) (fun _ γ hγ => hN γ (GlobalTheory.RSLocalPart.NE_le hγ))
-    (fun _ g hg h0 => by
-      obtain ⟨u, hu, hk⟩ := hs g hg h0
-      obtain ⟨γ, hγ, hd⟩ := hDu _ (inv_mem hu)
-      exact ⟨γ, hγ, _, hd, _, hk, by group⟩)
-    fun _ => h1
+  obtain ⟨i1, -, i3⟩ :=
+    GlobalTheory.RSLocalPart.integral_family_pos μ (GlobalTheory.CellDec.NE E n) h𝓕
+      (GlobalTheory.CellDec.isOpen_adelicUnipotentTimesIntegralOutsideSet E n S) (hD.mul hK)
+      (fun γ hγ g hg =>
+        GlobalTheory.CellDec.adelicUnitriangular_mul_mem_unipotentTimesIntegral
+          (GlobalTheory.RSLocalPart.NE_le hγ) hg)
+      (B := fun _ => B)
+      (hc.comp continuous_snd)
+      (fun _ => hB0)
+      (fun _ γ hγ => hN γ (GlobalTheory.RSLocalPart.NE_le hγ))
+      (fun _ g hg h0 => by
+        obtain ⟨u, hu, hk⟩ := hs g hg h0
+        obtain ⟨γ, hγ, hd⟩ := hDu _ (inv_mem hu)
+        exact ⟨γ, hγ, _, hd, _, hk, by group⟩)
+      fun _ => h1
   exact ⟨i1 0, i3 0⟩
 
 set_option synthInstance.maxHeartbeats 400000 in
@@ -367,23 +420,32 @@ end GlobalTheory.RSnmFT
 namespace GlobalTheory.RSnmFT
 
 set_option synthInstance.maxHeartbeats 400000 in
-theorem lintegral_whit_sq_ne_top {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {m : ℕ}
-    {π' : CuspSub E (m + 1)} (hπ : π'.IsUnitary) {φ' : GA E (m + 1) → ℂ} (hφ : φ' ∈ GlobalTheory.JSW.mspanR π')
-    {G : (Fin (m + 1) → Ad E) → ℂ} (hG : G ∈ GroundTheory.Automorphic.GJMatrix.schwartzBruhatPi (K := E) (ι := Fin (m + 1)))
-    (hGc : Continuous G) (μ : Measure (GA E (m + 1))) [μ.IsHaarMeasure] {𝓕₀ : Set (GA E (m + 1))}
-    (h𝓕 : IsFundamentalDomain (GlobalTheory.CellDec.NE E (m + 1)) 𝓕₀ μ) {x : ℝ} (hx : 1 < x) :
-    ∫⁻ g in 𝓕₀, ‖GlobalTheory.JSW.whit φ' g‖ₑ ^ 2 * ‖G (GlobalTheory.ZEul.lastRow g)‖ₑ * ENNReal.ofReal (GlobalTheory.RSnm.detAbs g ^ x) ∂μ ≠ ⊤ := by
+theorem lintegral_whit_sq_ne_top
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    {m : ℕ} {π' : CuspSub E (m + 1)} (hπ : π'.IsUnitary)
+    {φ' : GA E (m + 1) → ℂ} (hφ : φ' ∈ GlobalTheory.JSW.mspanR π')
+    {G : (Fin (m + 1) → Ad E) → ℂ}
+    (hG : G ∈ GroundTheory.Automorphic.GJMatrix.schwartzBruhatPi (K := E) (ι := Fin (m + 1)))
+    (hGc : Continuous G)
+    (μ : Measure (GA E (m + 1))) [μ.IsHaarMeasure]
+    {𝓕₀ : Set (GA E (m + 1))} (h𝓕 : IsFundamentalDomain (GlobalTheory.CellDec.NE E (m + 1)) 𝓕₀ μ)
+    {x : ℝ} (hx : 1 < x)
+    : ∫⁻ g in 𝓕₀, ‖GlobalTheory.JSW.whit φ' g‖ₑ ^ 2 * ‖G (GlobalTheory.ZEul.lastRow g)‖ₑ * ENNReal.ofReal (GlobalTheory.RSnm.detAbs g ^ x) ∂μ
+      ≠ ⊤ := by
   obtain ⟨𝓕, h1, h2⟩ := lintegral_whit_sq_eq E m π' hπ φ' hφ G hGc μ 𝓕₀ h𝓕
   let B : GA E (m + 1) → ℝ≥0∞ := fun g =>
-    ‖φ' g‖ₑ ^ 2 * (∑' ξ : {ξ : Fin (m + 1) → E // ξ ≠ 0},
-      ‖G (Matrix.vecMul (fun j => algebraMap E (Ad E) (ξ.1 j)) g.val)‖ₑ) *
-      ENNReal.ofReal (GlobalTheory.RSnm.detAbs g ^ x)
+    ‖φ' g‖ₑ ^ 2
+      * (∑' ξ : {ξ : Fin (m + 1) → E // ξ ≠ 0},
+          ‖G (Matrix.vecMul (fun j => algebraMap E (Ad E) (ξ.1 j)) g.val)‖ₑ)
+      * ENNReal.ofReal (GlobalTheory.RSnm.detAbs g ^ x)
   have hup : ∫⁻ g in 𝓕 ∩ {g | 1 ≤ GlobalTheory.RSnm.detAbs g}, B g ∂μ ≠ ⊤ := by
     have hd := GlobalTheory.MSpanDecay.Good.decays (GlobalTheory.MSpanDecay.mspanR_le_goodSub hπ hφ)
-    obtain ⟨C, hC⟩ := (GlobalTheory.SBThetaUpper.isSmallKernel_sq_mul hd hG).tsum_le
-      (N := ⌈x⌉₊ + 1) (by omega)
-    have hI := ((GlobalTheory.RSTheta.integrableOn_absDet_rpow_neg (Nat.succ_pos m) μ h1
-      (s := (⌈x⌉₊ + 1 : ℕ) - x) (by push_cast; linarith [Nat.le_ceil x])).const_mul C).lintegral_lt_top
+    obtain ⟨C, hC⟩ :=
+      (GlobalTheory.SBThetaUpper.isSmallKernel_sq_mul hd hG).tsum_le (N := ⌈x⌉₊ + 1) (by omega)
+    have hI :=
+      ((GlobalTheory.RSTheta.integrableOn_absDet_rpow_neg (Nat.succ_pos m) μ h1
+          (s := (⌈x⌉₊ + 1 : ℕ) - x) (by push_cast; linarith [Nat.le_ceil x])).const_mul
+        C).lintegral_lt_top
     refine ne_top_of_le_ne_top hI.ne (lintegral_mono fun g => ?_)
     obtain ⟨hs, hle⟩ := hC g
     have h0 := GlobalTheory.RSnm.detAbs_pos g
@@ -392,16 +454,16 @@ theorem lintegral_whit_sq_ne_top {E : Type} [Field E] [NumberField E] [_root_.Nu
     dsimp only [B]
     have hsum := ENNReal.ofReal_tsum_of_nonneg (fun _ => norm_nonneg _) hs
     simp only [ofReal_norm, eNorm_mul, eNorm_pow] at hsum
-    rw [← ENNReal.tsum_mul_left, ← hsum,
-      ← ENNReal.ofReal_mul (tsum_nonneg fun _ => norm_nonneg _), neg_sub, sub_eq_neg_add,
-      Real.rpow_add h0, ← mul_assoc]
+    rw [← ENNReal.tsum_mul_left, ← hsum, ← ENNReal.ofReal_mul (tsum_nonneg fun _ => norm_nonneg _),
+      neg_sub, sub_eq_neg_add, Real.rpow_add h0, ← mul_assoc]
     exact ENNReal.ofReal_le_ofReal (mul_le_mul_of_nonneg_right hle (by positivity))
   have hlow : ∫⁻ g in 𝓕 ∩ {g | GlobalTheory.RSnm.detAbs g ≤ 1}, B g ∂μ ≠ ⊤ := by
     obtain ⟨C, hC⟩ := GlobalTheory.ThetaSqLow.exists_bound hπ hφ hG
-    have hi : IntegrableOn (fun g : GA E (m + 1) => GlobalTheory.RSnm.detAbs g ^ (x - 1))
+    have hi : IntegrableOn
+        (fun g : GA E (m + 1) => GlobalTheory.RSnm.detAbs g ^ (x - 1))
         (𝓕 ∩ {g | GlobalTheory.RSnm.detAbs g ≤ 1}) μ :=
-      GlobalTheory.T.integrableOn_absDet_rpow_le_one_fundamentalDomain
-        E (m + 1) m.succ_pos μ 𝓕 h1 (x - 1) (by linarith)
+      GlobalTheory.T.integrableOn_absDet_rpow_le_one_fundamentalDomain E (m + 1) m.succ_pos μ 𝓕 h1
+        (x - 1) (by linarith)
     refine ne_top_of_le_ne_top (hi.const_mul C).lintegral_lt_top.ne (lintegral_mono fun g => ?_)
     have hδ := GlobalTheory.RSnm.detAbs_pos g
     dsimp only [B]
@@ -410,12 +472,14 @@ theorem lintegral_whit_sq_ne_top {E : Type} [Field E] [NumberField E] [_root_.Nu
     refine ENNReal.ofReal_le_ofReal (le_of_eq ?_)
     rw [Real.rpow_sub_one hδ.ne']
     ring
-  have hsub : 𝓕 ⊆ (𝓕 ∩ {g | 1 ≤ GlobalTheory.RSnm.detAbs g}) ∪ (𝓕 ∩ {g | GlobalTheory.RSnm.detAbs g ≤ 1}) := fun g hg =>
-    (le_total 1 (GlobalTheory.RSnm.detAbs g)).imp (fun h => ⟨hg, h⟩) fun h => ⟨hg, h⟩
+  have hsub
+      : 𝓕
+        ⊆ (𝓕 ∩ {g | 1 ≤ GlobalTheory.RSnm.detAbs g}) ∪ (𝓕 ∩ {g | GlobalTheory.RSnm.detAbs g ≤ 1}) :=
+    fun g hg => (le_total 1 (GlobalTheory.RSnm.detAbs g)).imp (fun h => ⟨hg, h⟩) fun h => ⟨hg, h⟩
   rw [h2 x]
   change (∫⁻ g in 𝓕, B g ∂μ) ≠ ⊤
-  exact ne_of_lt ((lintegral_mono_set hsub).trans_lt ((lintegral_union_le _ _ _).trans_lt
-    (ENNReal.add_lt_top.2 ⟨hup.lt_top, hlow.lt_top⟩)))
+  exact ne_of_lt ((lintegral_mono_set hsub).trans_lt
+    ((lintegral_union_le _ _ _).trans_lt (ENNReal.add_lt_top.2 ⟨hup.lt_top, hlow.lt_top⟩)))
 
 set_option synthInstance.maxHeartbeats 400000 in
 theorem exists_cellPart_unfoldedIntegral_positive_alt : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (m r : ℕ) (S : Finset (HeightOneSpectrum (𝓞 E)))

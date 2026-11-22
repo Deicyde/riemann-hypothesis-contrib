@@ -20,11 +20,10 @@ namespace GroundTheory.Heights₂.Heights.NumbersDVR
 universe u
 
 theorem IntNumIsFieldIntersection.of_intNumBase_cutRational
-    (hBase : FieldNumbers.IntNumBase.Statement.{u})
-    (hCut : FieldNumbers.CutRational.Statement.{u}) :
-    IntNumIsFieldIntersection.Statement.{u} :=
+    (hBase : FieldNumbers.IntNumBase.Statement.{u}) (hCut : FieldNumbers.CutRational.Statement.{u})
+    : IntNumIsFieldIntersection.Statement.{u} :=
   IntNumIsFieldIntersection.proof VocabMultiHomog.proof
-    (VocabMultiHomogIdeal.proof VocabMultiHomog.proof) VocabDivCycle.proof
-    (IntNumPoint.proof hBase) (IntNumRatSection.proof hCut)
+    (VocabMultiHomogIdeal.proof VocabMultiHomog.proof) VocabDivCycle.proof (IntNumPoint.proof hBase)
+    (IntNumRatSection.proof hCut)
 
 end GroundTheory.Heights₂.Heights.NumbersDVR

@@ -111,26 +111,30 @@ lemma det_valuation_le_one {K E : Type} [Field K] [NumberField K] [Field E] [Alg
   rw [LinearMap.det_toMatrix'] at hUd
   exact valuation_le_one_of_denom 𝔭 hp𝔭 hU hUd
 
-theorem ordK_detRel_eq_zero {K E : Type} [Field K] [NumberField K] [Field E] [Algebra K E] {n : Type}
-    [Fintype n] {M : Set E} {g g' : (Fin 4 → E) ≃ₗ[K] (Fin 4 × n → K)} {p : ℕ}
+theorem ordK_detRel_eq_zero
+    {K E : Type} [Field K] [NumberField K] [Field E] [Algebra K E]
+    {n : Type} [Fintype n]
+    {M : Set E} {g g' : (Fin 4 → E) ≃ₗ[K] (Fin 4 × n → K)} {p : ℕ}
     (𝔭 : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) (hp𝔭 : ((p : ℕ) : 𝓞 K) ∈ 𝔭.asIdeal)
-    (hg : AtP M g p) (hg' : AtP M g' p) : ordK 𝔭 (detRel g' g) = 0 := by
+    (hg : AtP M g p) (hg' : AtP M g' p)
+    : ordK 𝔭 (detRel g' g) = 0 := by
   have h1 : 𝔭.valuation K (detRel g' g) ≤ 1 := det_valuation_le_one 𝔭 hp𝔭 hg hg'
   have h2 : 𝔭.valuation K (detRel g g') ≤ 1 := det_valuation_le_one 𝔭 hp𝔭 hg' hg
   have hprod : detRel g' g * detRel g g' = 1 := by
     unfold detRel
     rw [← LinearMap.det_comp]
-    have hc : ((g.symm.trans g' : (Fin 4 × n → K) ≃ₗ[K] _) :
-        (Fin 4 × n → K) →ₗ[K] (Fin 4 × n → K)).comp
-        ((g'.symm.trans g : (Fin 4 × n → K) ≃ₗ[K] _) :
-        (Fin 4 × n → K) →ₗ[K] (Fin 4 × n → K)) = LinearMap.id :=
+    have hc
+        : ((g.symm.trans g' : (Fin 4 × n → K) ≃ₗ[K] _) : (Fin 4 × n → K) →ₗ[K] (Fin 4 × n → K)).comp
+            ((g'.symm.trans g : (Fin 4 × n → K) ≃ₗ[K] _) : (Fin 4 × n → K) →ₗ[K] (Fin 4 × n → K))
+          = LinearMap.id :=
       LinearMap.ext fun x => by simp
     rw [hc, LinearMap.det_id]
   have hm : 𝔭.valuation K (detRel g' g) * 𝔭.valuation K (detRel g g') = 1 := by
     rw [← map_mul, hprod, map_one]
   have hv : 𝔭.valuation K (detRel g' g) = 1 := by
     refine le_antisymm h1 ?_
-    calc 1 = 𝔭.valuation K (detRel g' g) * 𝔭.valuation K (detRel g g') := hm.symm
+    calc
+      1 = 𝔭.valuation K (detRel g' g) * 𝔭.valuation K (detRel g g') := hm.symm
       _ ≤ 𝔭.valuation K (detRel g' g) * 1 := by gcongr
       _ = 𝔭.valuation K (detRel g' g) := mul_one _
   unfold ordK

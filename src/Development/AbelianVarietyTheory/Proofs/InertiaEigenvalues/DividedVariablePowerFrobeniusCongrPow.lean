@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoeffOf
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Filter GlobalTheory.CrysPrism
 open scoped Formalism.Per
 
 noncomputable section
@@ -19,8 +21,8 @@ theorem pow_factorial_dvd (i m : ℕ) : i.factorial ^ m ∣ (m * i).factorial :=
     rw [pow_succ, Nat.succ_mul]
     exact (Nat.mul_dvd_mul_right ih _).trans (Nat.factorial_mul_factorial_dvd_factorial_add _ _)
 
-theorem mul_pow_factorial_dvd (l i : ℕ) (hl : l ≠ 0) (hi : i ≠ 0) :
-    i.factorial ^ l * l ∣ (l * i).factorial := by
+theorem mul_pow_factorial_dvd (l i : ℕ) (hl : l ≠ 0) (hi : i ≠ 0)
+    : i.factorial ^ l * l ∣ (l * i).factorial := by
   obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hl
   have h1 : i ≤ (m + 1) * i := by nlinarith
   have h2 := Nat.choose_mul_factorial_mul_factorial h1
@@ -28,10 +30,11 @@ theorem mul_pow_factorial_dvd (l i : ℕ) (hl : l ≠ 0) (hi : i ≠ 0) :
   rw [h3, Nat.choose_mul_right hi] at h2
   obtain ⟨c, hc⟩ := pow_factorial_dvd i m
   refine ⟨((m + 1) * i - 1).choose (i - 1) * c, ?_⟩
-  rw [Nat.succ_eq_add_one, ← h2, hc]; ring
+  rw [Nat.succ_eq_add_one, ← h2, hc]
+  ring
 
-theorem exists_padic (l : ℕ) [hl : Fact l.Prime] (i : ℕ) (hi : i ≠ 0) :
-    ∃ d : ℤ_[l], (i.factorial : ℤ_[l]) * d = (l : ℤ_[l]) ^ (i - 1) := by
+theorem exists_padic (l : ℕ) [hl : Fact l.Prime] (i : ℕ) (hi : i ≠ 0)
+    : ∃ d : ℤ_[l], (i.factorial : ℤ_[l]) * d = (l : ℤ_[l]) ^ (i - 1) := by
   have hv : multiplicity l i.factorial ≤ i - 1 := by
     have h := hl.out.sub_one_mul_multiplicity_factorial (n := i)
     have h2 := hl.out.two_le
@@ -42,7 +45,9 @@ theorem exists_padic (l : ℕ) [hl : Fact l.Prime] (i : ℕ) (hi : i ≠ 0) :
     have h4 : 1 * multiplicity l i.factorial ≤ (l - 1) * multiplicity l i.factorial :=
       Nat.mul_le_mul_right _ (by omega)
     omega
-  obtain ⟨s, hs⟩ : l ^ multiplicity l i.factorial ∣ i.factorial := (by rw [← Nat.padicValNat_def]; exact _root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
+  obtain ⟨s, hs⟩ : l ^ multiplicity l i.factorial ∣ i.factorial := (by
+    rw [← Nat.padicValNat_def]
+    exact _root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
   have hs' : ¬ l ∣ s := by
     intro h
     refine pow_succ_multiplicity_not_dvd (p := l) (Nat.factorial_ne_zero i) ?_
@@ -57,18 +62,25 @@ theorem exists_padic (l : ℕ) [hl : Fact l.Prime] (i : ℕ) (hi : i ≠ 0) :
   obtain ⟨s', hs2⟩ := hu.exists_right_inv
   obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le hv
   refine ⟨(l : ℤ_[l]) ^ k * s', ?_⟩
-  have h5 : (i.factorial : ℤ_[l]) = (l : ℤ_[l]) ^ multiplicity l i.factorial * s := by exact_mod_cast congrArg (Nat.cast : ℕ → ℤ_[l]) hs
+  have h5 : (i.factorial : ℤ_[l]) = (l : ℤ_[l]) ^ multiplicity l i.factorial * s := by
+    exact_mod_cast congrArg (Nat.cast : ℕ → ℤ_[l]) hs
   rw [hk, pow_add]
   linear_combination ((l : ℤ_[l]) ^ k * s') * h5 + ((l : ℤ_[l]) ^ multiplicity l i.factorial * (l : ℤ_[l]) ^ k) * hs2
 
-theorem abstract {R : Type} [CommRing R] (htf : ∀ n : ℕ, n ≠ 0 → ∀ x : R, (n : R) * x = 0 → x = 0)
-    (S : Subring R) (φ : R →+* R) (l : ℕ) (hl : l ≠ 0) (u x : R) (xs : ℕ → R)
-    (hxs : ∀ k : ℕ, (k.factorial : R) * xs k = x ^ k) (hu : u ∈ S) (hxS : ∀ k, xs k ∈ S)
-    (hφ : φ x = (u + x) ^ l - u ^ l) (i : ℕ) (hi : i ≠ 0) (d : R) (hd : d ∈ S)
-    (hdi : (i.factorial : R) * d = (l : R) ^ (i - 1)) :
-    φ (xs i) ∈ S ∧ ∃ B ∈ S, φ (xs i) = xs i ^ l + (l : R) * B := by
+theorem abstract
+    {R : Type} [CommRing R]
+    (htf : ∀ n : ℕ, n ≠ 0 → ∀ x : R, (n : R) * x = 0 → x = 0)
+    (S : Subring R)
+    (φ : R →+* R)
+    (l : ℕ) (hl : l ≠ 0)
+    (u x : R) (xs : ℕ → R) (hxs : ∀ k : ℕ, (k.factorial : R) * xs k = x ^ k)
+    (hu : u ∈ S) (hxS : ∀ k, xs k ∈ S) (hφ : φ x = (u + x) ^ l - u ^ l)
+    (i : ℕ) (hi : i ≠ 0)
+    (d : R) (hd : d ∈ S) (hdi : (i.factorial : R) * d = (l : R) ^ (i - 1))
+    : φ (xs i) ∈ S ∧ ∃ B ∈ S, φ (xs i) = xs i ^ l + (l : R) * B := by
   obtain ⟨Y, hY, hP⟩ : ∃ Y ∈ S, φ x = (l : R) * Y := by
-    refine ⟨∑ m ∈ Finset.range l, ((l - 1).descFactorial m : R) * u ^ (l - (m + 1)) * xs (m + 1), ?_, ?_⟩
+    refine
+      ⟨∑ m ∈ Finset.range l, ((l - 1).descFactorial m : R) * u ^ (l - (m + 1)) * xs (m + 1), ?_, ?_⟩
     · exact S.sum_mem fun m _ => S.mul_mem (S.mul_mem (natCast_mem S _) (S.pow_mem hu _)) (hxS _)
     · rw [hφ, add_comm u x, add_pow, Finset.sum_range_succ', Finset.mul_sum]
       simp only [pow_zero, one_mul, Nat.sub_zero, Nat.choose_zero_right, Nat.cast_one, mul_one,
@@ -78,7 +90,9 @@ theorem abstract {R : Type} [CommRing R] (htf : ∀ n : ℕ, n ≠ 0 → ∀ x :
         rw [← Nat.descFactorial_eq_factorial_mul_choose]
         obtain ⟨n, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hl
         exact Nat.succ_descFactorial_succ n m
-      have h' : ((m + 1).factorial : R) * (l.choose (m + 1) : R) = (l : R) * ((l - 1).descFactorial m : R) := by
+      have h'
+          : ((m + 1).factorial : R) * (l.choose (m + 1) : R)
+            = (l : R) * ((l - 1).descFactorial m : R) := by
         exact_mod_cast congrArg (Nat.cast : ℕ → R) h
       rw [← hxs]
       linear_combination (u ^ (l - (m + 1)) * xs (m + 1)) * h'
@@ -87,8 +101,7 @@ theorem abstract {R : Type} [CommRing R] (htf : ∀ n : ℕ, n ≠ 0 → ∀ x :
     apply htf _ (Nat.factorial_ne_zero i)
     have h := congrArg φ (hxs i)
     rw [map_mul, map_natCast, map_pow, hP, mul_pow] at h
-    have h2 : (l : R) ^ i = l * (l : R) ^ (i - 1) := by
-      rw [← pow_succ']; congr 1; omega
+    have h2 : (l : R) ^ i = l * (l : R) ^ (i - 1) := by rw [← pow_succ']; congr 1; omega
     rw [h2] at h
     linear_combination h - ((l : R) * Y ^ i) * hdi
   obtain ⟨c, hc⟩ := mul_pow_factorial_dvd l i hl hi
@@ -103,19 +116,29 @@ theorem abstract {R : Type} [CommRing R] (htf : ∀ n : ℕ, n ≠ 0 → ∀ x :
     push_cast at h3 ⊢
     linear_combination h - h3
   have hm : d * Y ^ i ∈ S := S.mul_mem hd (S.pow_mem hY _)
-  refine ⟨h1 ▸ S.mul_mem (natCast_mem S _) hm, d * Y ^ i - c * xs (l * i),
-    S.sub_mem hm (S.mul_mem (natCast_mem S _) (hxS _)), ?_⟩
-  rw [h1, h2]; ring
+  refine ⟨
+    h1 ▸ S.mul_mem (natCast_mem S _) hm,
+    d * Y ^ i - c * xs (l * i),
+    S.sub_mem hm (S.mul_mem (natCast_mem S _) (hxS _)),
+    ?_
+  ⟩
+  rw [h1, h2]
+  ring
 
 section Q
 
-variable {l : ℕ} [hl : Fact l.Prime] {a : ℕ} [NeZero a] {O : Type} [CommRing O] [Algebra ℤ_[l] O]
-  (t : Wq l a →ₐ[ℤ_[l]] O) (K : Type) [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+variable
+  {l : ℕ} [hl : Fact l.Prime]
+  {a : ℕ} [NeZero a]
+  {O : Type} [CommRing O] [Algebra ℤ_[l] O]
+  (t : Wq l a →ₐ[ℤ_[l]] O)
+  (K : Type) [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
   (e : ℕ)
 
-theorem mono_mem (c : Wq l a) (i n : ℕ) :
-    (fun τ => C (C (algebraMap O K (emb t τ c) / (dpDen e i n : K)) * X ^ n) * X ^ i :
-      ZMod a → K⟦X⟧⟦X⟧) ∈ QSet t K e := by
+theorem mono_mem (c : Wq l a) (i n : ℕ)
+    : (fun τ => C (C (algebraMap O K (emb t τ c) / (dpDen e i n : K)) * X ^ n) * X ^ i
+        : ZMod a → K⟦X⟧⟦X⟧)
+      ∈ QSet t K e := by
   refine ⟨fun p => if p = (i, n) then c else 0, funext fun τ => ?_⟩
   ext j m
   rw [coeff_ofW, coeff_C_mul, coeff_X_pow]
@@ -127,7 +150,8 @@ theorem mono_mem (c : Wq l a) (i n : ℕ) :
     · simp [hm]
   · simp [hj]
 
-theorem add_mem {x y : ZMod a → K⟦X⟧⟦X⟧} (hx : x ∈ QSet t K e) (hy : y ∈ QSet t K e) : x + y ∈ QSet t K e := by
+theorem add_mem {x y : ZMod a → K⟦X⟧⟦X⟧} (hx : x ∈ QSet t K e) (hy : y ∈ QSet t K e)
+    : x + y ∈ QSet t K e := by
   obtain ⟨v, rfl⟩ := hx
   obtain ⟨w, rfl⟩ := hy
   refine ⟨v + w, funext fun τ => ?_⟩
@@ -153,25 +177,34 @@ theorem xFam_mem (i : ℕ) : xFam a K i ∈ QSet t K e := by
 theorem uFam_mem : uFam a K ∈ QSet t K e := by
   convert mono_mem t K e 1 0 1 using 1
   funext τ
-  have h : (1 / e).factorial = 1 := by
-    rw [Nat.factorial_eq_one]; exact Nat.div_le_self _ _
+  have h : (1 / e).factorial = 1 := by rw [Nat.factorial_eq_one]; exact Nat.div_le_self _ _
   simp [uFam, dpDen, h]
 
-def qSub (h : ∀ x ∈ QSet t K e, ∀ y ∈ QSet t K e, x * y ∈ QSet t K e) : Subring (ZMod a → K⟦X⟧⟦X⟧) where
+def qSub (h : ∀ x ∈ QSet t K e, ∀ y ∈ QSet t K e, x * y ∈ QSet t K e)
+    : Subring (ZMod a → K⟦X⟧⟦X⟧) where
   carrier := QSet t K e
   mul_mem' := fun hx hy => h _ hx _ hy
   one_mem' := by
     convert cstW_mem t K e 1 using 1
-    funext τ; simp [cstW]
+    funext τ
+    simp [cstW]
   add_mem' := add_mem t K e
   zero_mem' := by
     convert cstW_mem t K e 0 using 1
-    funext τ; simp [cstW]
+    funext τ
+    simp [cstW]
   neg_mem' := neg_mem t K e
 
 end Q
 
-theorem xFam_mem_GoodSet : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O] [Algebra ℤ_[l] O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] [NormedAlgebra ℚ_[l] K] (t : Wq l a →ₐ[ℤ_[l]] O), ∀ (φ₂ : K⟦X⟧⟦X⟧ →+* K⟦X⟧⟦X⟧), (∀ f : K⟦X⟧, φ₂ (C f) = C (frob K l f)) → φ₂ X = (C X + X) ^ l - C (X ^ l) → (∀ x ∈ QSet t K e, ∀ y ∈ QSet t K e, x * y ∈ QSet t K e) → ∀ i : ℕ, xFam a K i ∈ GoodSet t e φ₂ := by
+theorem xFam_mem_GoodSet
+    : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O]
+        [Algebra ℤ_[l] O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+        [NormedAlgebra ℚ_[l] K] (t : Wq l a →ₐ[ℤ_[l]] O),
+      ∀ (φ₂ : K⟦X⟧⟦X⟧ →+* K⟦X⟧⟦X⟧),
+        (∀ f : K⟦X⟧, φ₂ (C f) = C (frob K l f)) → φ₂ X = (C X + X) ^ l - C (X ^ l)
+          → (∀ x ∈ QSet t K e, ∀ y ∈ QSet t K e, x * y ∈ QSet t K e)
+          → ∀ i : ℕ, xFam a K i ∈ GoodSet t e φ₂ := by
   intro l hl a e _ _ O K _ _ _ _ _ _ _ t φ₂ hC hX hmul i
   haveI : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ_[l] K).injective
   refine ⟨xFam_mem t K e i, ?_⟩
@@ -181,14 +214,19 @@ theorem xFam_mem_GoodSet : ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [
     rw [h, map_one]
     exact ⟨(qSub t K e hmul).one_mem, 0, (qSub t K e hmul).zero_mem, by simp⟩
   obtain ⟨d, hd⟩ := exists_padic l i hi
-  refine abstract (fun n hn x hx => tf_pi (natCast_ne_zero_ps (natCast_ne_zero_ps (Nat.cast_ne_zero.2 hn))) x hx)
-    (qSub t K e hmul) (frob2 φ₂) l hl.out.ne_zero (uFam a K) (fun _ => X) (xFam a K) (fun k => ?_)
-    (uFam_mem t K e) (xFam_mem t K e) ?_ i hi (cstW t K (algebraMap ℤ_[l] _ d)) (cstW_mem t K e _) ?_
+  refine abstract
+    (fun n hn x hx => tf_pi (natCast_ne_zero_ps (natCast_ne_zero_ps (Nat.cast_ne_zero.2 hn))) x hx)
+    (qSub t K e hmul) (frob2 φ₂) l hl.out.ne_zero (uFam a K)
+    (fun _ => X)
+    (xFam a K)
+    (fun k => ?_)
+    (uFam_mem t K e) (xFam_mem t K e) ?_ i hi (cstW t K (algebraMap ℤ_[l] _ d)) (cstW_mem t K e _)
+    ?_
   · funext τ
     have h : (k.factorial : K) ≠ 0 := Nat.cast_ne_zero.2 (Nat.factorial_ne_zero k)
     simp only [Pi.mul_apply, Pi.natCast_apply, Pi.pow_apply, xFam]
-    rw [← mul_assoc, ← map_natCast (C : K⟦X⟧ →+* K⟦X⟧⟦X⟧), ← map_natCast (C : K →+* K⟦X⟧), ← map_mul, ← map_mul,
-      mul_inv_cancel₀ h]
+    rw [← mul_assoc, ← map_natCast (C : K⟦X⟧ →+* K⟦X⟧⟦X⟧), ← map_natCast (C : K →+* K⟦X⟧),
+      ← map_mul, ← map_mul, mul_inv_cancel₀ h]
     simp
   · funext τ
     change φ₂ X = (C X + X) ^ l - C X ^ l

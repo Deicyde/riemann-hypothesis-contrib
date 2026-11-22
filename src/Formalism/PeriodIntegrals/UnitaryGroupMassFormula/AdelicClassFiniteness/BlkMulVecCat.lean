@@ -20,16 +20,22 @@ open scoped Matrix
 
 namespace SpO
 
-def cat {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (c : Fin k → E) (y : Fin n → E) :
-    Fin m → E :=
-  fun r => Sum.elim c y (e.symm r)
+def cat {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (c : Fin k → E) (y : Fin n → E)
+    : Fin m → E := fun r =>
+  Sum.elim c y (e.symm r)
 
-def blk {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (V : Matrix (Fin m) (Fin k) E)
-    (W : Matrix (Fin m) (Fin n) E) : Matrix (Fin m) (Fin m) E :=
+def blk
+    {E : Type} [Field E]
+    {m k n : ℕ}
+    (e : Fin k ⊕ Fin n ≃ Fin m) (V : Matrix (Fin m) (Fin k) E) (W : Matrix (Fin m) (Fin n) E)
+    : Matrix (Fin m) (Fin m) E :=
   Matrix.of fun r s => Sum.elim (fun i => V r i) (fun j => W r j) (e.symm s)
 
-def catR {E : Type} [Field E] (R : Type) [CommRing R] [Algebra R E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) :
-    (Fin n → E) →ₗ[R] (Fin m → E) where
+def catR
+    {E : Type} [Field E]
+    (R : Type) [CommRing R] [Algebra R E]
+    {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m)
+    : (Fin n → E) →ₗ[R] (Fin m → E) where
   toFun y := cat e 0 y
   map_add' y y' := by
     funext r
@@ -40,56 +46,66 @@ def catR {E : Type} [Field E] (R : Type) [CommRing R] [Algebra R E] {m k n : ℕ
     simp only [cat, Pi.smul_apply, RingHom.id_apply]
     cases e.symm r <;> simp
 
-theorem catR_apply {E : Type} [Field E] (R : Type) [CommRing R] [Algebra R E] {m k n : ℕ}
-    (e : Fin k ⊕ Fin n ≃ Fin m) (y : Fin n → E) : catR R e y = cat e 0 y := rfl
+theorem catR_apply
+    {E : Type} [Field E]
+    (R : Type) [CommRing R] [Algebra R E]
+    {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (y : Fin n → E)
+    : catR R e y = cat e 0 y :=
+  rfl
 
-theorem cat_add {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (c : Fin k → E) (y : Fin n → E) :
-    cat e c 0 + cat e 0 y = cat e c y := by
+theorem cat_add
+    {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (c : Fin k → E) (y : Fin n → E)
+    : cat e c 0 + cat e 0 y = cat e c y := by
   funext r
   simp only [cat, Pi.add_apply]
   cases e.symm r <;> simp
 
-theorem blk_mulVec {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (V : Matrix (Fin m) (Fin k) E)
-    (W : Matrix (Fin m) (Fin n) E) (x : Fin m → E) :
-    blk e V W *ᵥ x = V *ᵥ (fun i => x (e (Sum.inl i))) + W *ᵥ (fun j => x (e (Sum.inr j))) := by
+theorem blk_mulVec
+    {E : Type} [Field E]
+    {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (V : Matrix (Fin m) (Fin k) E)
+    (W : Matrix (Fin m) (Fin n) E) (x : Fin m → E)
+    : blk e V W *ᵥ x = V *ᵥ (fun i => x (e (Sum.inl i))) + W *ᵥ (fun j => x (e (Sum.inr j))) := by
   funext r
   simp only [Matrix.mulVec, dotProduct, blk, Matrix.of_apply, Pi.add_apply]
   rw [← Equiv.sum_comp e, Fintype.sum_sum_type]
   simp
 
-theorem blk_mulVec_cat {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (V : Matrix (Fin m) (Fin k) E)
-    (W : Matrix (Fin m) (Fin n) E) (c : Fin k → E) (y : Fin n → E) :
-    blk e V W *ᵥ cat e c y = V *ᵥ c + W *ᵥ y := by
+theorem blk_mulVec_cat
+    {E : Type} [Field E]
+    {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (V : Matrix (Fin m) (Fin k) E)
+    (W : Matrix (Fin m) (Fin n) E) (c : Fin k → E) (y : Fin n → E)
+    : blk e V W *ᵥ cat e c y = V *ᵥ c + W *ᵥ y := by
   rw [blk_mulVec]
   simp [cat]
 
-theorem single_inl {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (i : Fin k) :
-    (Pi.single (e (Sum.inl i)) (1 : E) : Fin m → E) = cat e (Pi.single i 1) 0 := by
+theorem single_inl {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (i : Fin k)
+    : (Pi.single (e (Sum.inl i)) (1 : E) : Fin m → E) = cat e (Pi.single i 1) 0 := by
   funext r
   obtain ⟨t, rfl⟩ := e.surjective r
   cases t with
   | inl a => simp [cat, Pi.single_apply, e.injective.eq_iff]
   | inr b => simp [cat, Pi.single_apply, e.injective.eq_iff]
 
-theorem single_inr {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (j : Fin n) :
-    (Pi.single (e (Sum.inr j)) (1 : E) : Fin m → E) = cat e 0 (Pi.single j 1) := by
+theorem single_inr {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (j : Fin n)
+    : (Pi.single (e (Sum.inr j)) (1 : E) : Fin m → E) = cat e 0 (Pi.single j 1) := by
   funext r
   obtain ⟨t, rfl⟩ := e.surjective r
   cases t with
   | inl a => simp [cat, Pi.single_apply, e.injective.eq_iff]
   | inr b => simp [cat, Pi.single_apply, e.injective.eq_iff]
 
-theorem cat_eq_sum {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (c : Fin k → E) :
-    cat e c 0 = ∑ i, c i • (Pi.single (e (Sum.inl i)) (1 : E) : Fin m → E) := by
+theorem cat_eq_sum {E : Type} [Field E] {m k n : ℕ} (e : Fin k ⊕ Fin n ≃ Fin m) (c : Fin k → E)
+    : cat e c 0 = ∑ i, c i • (Pi.single (e (Sum.inl i)) (1 : E) : Fin m → E) := by
   funext r
   obtain ⟨t, rfl⟩ := e.surjective r
   cases t with
   | inl a => simp [cat, Finset.sum_apply, Pi.single_apply, e.injective.eq_iff]
   | inr b => simp [cat, Finset.sum_apply, Pi.single_apply, e.injective.eq_iff]
 
-theorem entry_eq {E : Type} [Field E] [StarRing E] {m : ℕ} (J A : Matrix (Fin m) (Fin m) E) (r s : Fin m) :
-    (cT (starRingEnd E) A * J * A) r s =
-      hform (starRingEnd E) J (A *ᵥ Pi.single r 1) (A *ᵥ Pi.single s 1) := by
+theorem entry_eq
+    {E : Type} [Field E] [StarRing E] {m : ℕ} (J A : Matrix (Fin m) (Fin m) E) (r s : Fin m)
+    : (cT (starRingEnd E) A * J * A) r s
+      = hform (starRingEnd E) J (A *ᵥ Pi.single r 1) (A *ᵥ Pi.single s 1) := by
   simp only [cT, hform, Matrix.mul_apply, Matrix.mulVec_single_one, Matrix.transpose_apply,
     Matrix.map_apply, Finset.sum_mul]
   rw [Finset.sum_comm]
@@ -107,7 +123,9 @@ theorem spOne : SpOne := by
     rintro p ⟨_, v, _, hvΓ⟩
     exfalso
     apply hkm
-    have hg : cT (starRingEnd E) (Matrix.of fun r i => v i r) * p.1 * (Matrix.of fun r i => v i r) = Γ :=
+    have hg
+        : cT (starRingEnd E) (Matrix.of fun r i => v i r) * p.1 * (Matrix.of fun r i => v i r)
+          = Γ :=
       (gram_eq p.1 v).symm.trans (Set.mem_singleton_iff.mp hvΓ)
     refine (spComp E k m (cT (starRingEnd E) (Matrix.of fun r i => v i r) * p.1)
       ((Matrix.of fun r i => v i r) * Γ⁻¹) ?_).1
@@ -118,8 +136,9 @@ theorem spOne : SpOne := by
   obtain ⟨T', hT'f, hT'⟩ := ih (m - k) hnm (d * D) hdD
   let e : Fin k ⊕ Fin (m - k) ≃ Fin m := finSumFinEquiv.trans (finCongr (by omega))
   let N : Submodule (𝓞 E) (Fin (m - k) → E) → Submodule (𝓞 E) (Fin m → E) := fun M' =>
-    Submodule.span (𝓞 E) (Set.range fun i : Fin k => (Pi.single (e (Sum.inl i)) (1 : E) : Fin m → E)) ⊔
-      M'.map (catR (𝓞 E) e)
+    Submodule.span (𝓞 E)
+        (Set.range fun i : Fin k => (Pi.single (e (Sum.inl i)) (1 : E) : Fin m → E))
+      ⊔ M'.map (catR (𝓞 E) e)
   let Jb : Matrix (Fin (m - k)) (Fin (m - k)) E → Matrix (Fin m) (Fin m) E := fun J' =>
     Matrix.of fun r s => Matrix.fromBlocks Γ 0 0 J' (e.symm r) (e.symm s)
   let T : Set (Matrix (Fin m) (Fin m) E × Submodule (𝓞 E) (Fin m → E)) :=
@@ -135,15 +154,17 @@ theorem spOne : SpOne := by
     refine Set.Finite.image _ (partBetween E m (N q'.2) ?_ (D : 𝓞 E) hD0)
     exact (Submodule.fg_span (Set.finite_range _)).sup (hq'.2.map _)
   rintro p ⟨hp, v, hv, hvΓ⟩
-  have hg : cT (starRingEnd E) (Matrix.of fun r i => v i r) * p.1 * (Matrix.of fun r i => v i r) = Γ :=
+  have hg
+      : cT (starRingEnd E) (Matrix.of fun r i => v i r) * p.1 * (Matrix.of fun r i => v i r) = Γ :=
     (gram_eq p.1 v).symm.trans (Set.mem_singleton_iff.mp hvΓ)
   set V : Matrix (Fin m) (Fin k) E := Matrix.of fun r i => v i r with hVdef
   have hPR : (cT (starRingEnd E) V * p.1) * (V * Γ⁻¹) = 1 := by
     rw [← Matrix.mul_assoc, hg, Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr hΓ)]
   obtain ⟨-, U, hPU, hUinj, hUsurj⟩ := spComp E k m _ _ hPR
   have hVM : ∀ i, (fun r => V r i) ∈ p.2 := fun i => hv i
-  obtain ⟨hLat', hdec⟩ := spLat E m k (m - k) d D p.1 p.2 V U hp hVM hD1 (by rw [hg]; exact hΓ)
-    (by rw [hg]; exact hDΓ) hPU hUinj hUsurj
+  obtain ⟨hLat', hdec⟩ :=
+    spLat E m k (m - k) d D p.1 p.2 V U hp hVM hD1 (by rw [hg]; exact hΓ) (by rw [hg]; exact hDΓ)
+      hPU hUinj hUsurj
   obtain ⟨q', hq', B, hB1, hB2⟩ := hT' _ hLat'
   set W : Matrix (Fin m) (Fin (m - k)) E := U * (B : Matrix (Fin (m - k)) (Fin (m - k)) E) with hWdef
   set A : Matrix (Fin m) (Fin m) E := blk e V W with hAdef
@@ -152,7 +173,8 @@ theorem spOne : SpOne := by
     have h := congrArg Matrix.conjTranspose hPU
     rw [cT_star] at h ⊢
     rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, hJh,
-      Matrix.conjTranspose_zero, ← Matrix.mul_assoc] at h
+        Matrix.conjTranspose_zero, ← Matrix.mul_assoc]
+      at h
     exact h
   have hPW : cT (starRingEnd E) V * p.1 * W = 0 := by
     rw [hWdef, ← Matrix.mul_assoc, hPU, Matrix.zero_mul]
@@ -163,7 +185,8 @@ theorem spOne : SpOne := by
     rw [hAdef, blk_mulVec] at hx
     have h1 := congrArg (fun z => (cT (starRingEnd E) V * p.1) *ᵥ z) hx
     simp only [Matrix.mulVec_add, Matrix.mulVec_mulVec, hg, hPW, Matrix.zero_mulVec, add_zero,
-      Matrix.mulVec_zero] at h1
+        Matrix.mulVec_zero]
+      at h1
     have hΓu : IsUnit Γ := (Matrix.isUnit_iff_isUnit_det Γ).mpr (isUnit_iff_ne_zero.mpr hΓ)
     have hc0 : (fun i => x (e (Sum.inl i))) = 0 :=
       Matrix.mulVec_injective_iff_isUnit.mpr hΓu (by rw [h1, Matrix.mulVec_zero])
@@ -185,19 +208,26 @@ theorem spOne : SpOne := by
     ((Matrix.isUnit_iff_isUnit_det A).mp (Matrix.mulVec_injective_iff_isUnit.mp hAinj)).ne_zero
   set A' : GL (Fin m) E := Matrix.GeneralLinearGroup.mkOfDetNeZero A hdetA with hA'def
   have hA'v : (A' : Matrix (Fin m) (Fin m) E) = A := rfl
-  have hAcat : ∀ c y, A *ᵥ cat e c y = V *ᵥ c + U *ᵥ ((B : Matrix (Fin (m - k)) (Fin (m - k)) E) *ᵥ y) := by
+  have hAcat
+      : ∀ c y,
+        A *ᵥ cat e c y = V *ᵥ c + U *ᵥ ((B : Matrix (Fin (m - k)) (Fin (m - k)) E) *ᵥ y) := by
     intro c y
     rw [hAdef, blk_mulVec_cat, hWy]
   have hcol1 : ∀ i, A *ᵥ Pi.single (e (Sum.inl i)) 1 = V *ᵥ Pi.single i 1 := fun i => by
     rw [single_inl, hAcat, Matrix.mulVec_zero, Matrix.mulVec_zero, add_zero]
-  have hcol2 : ∀ j, A *ᵥ Pi.single (e (Sum.inr j)) 1 =
-      U *ᵥ ((B : Matrix (Fin (m - k)) (Fin (m - k)) E) *ᵥ Pi.single j 1) := fun j => by
+  have hcol2
+      : ∀ j,
+        A *ᵥ Pi.single (e (Sum.inr j)) 1
+          = U *ᵥ ((B : Matrix (Fin (m - k)) (Fin (m - k)) E) *ᵥ Pi.single j 1) := fun j => by
     rw [single_inr, hAcat, Matrix.mulVec_zero, zero_add]
   set M₀ : Submodule (𝓞 E) (Fin m → E) := p.2.comap (A.mulVecLin.restrictScalars (𝓞 E)) with hM₀
   have hmem : ∀ x, x ∈ M₀ ↔ A *ᵥ x ∈ p.2 := fun x => Iff.rfl
   have hfg' : q'.2.FG := by
-    have heq : q'.2 = (p.2.comap (U.mulVecLin.restrictScalars (𝓞 E))).map
-        (((B⁻¹ : GL (Fin (m - k)) E) : Matrix (Fin (m - k)) (Fin (m - k)) E).mulVecLin.restrictScalars (𝓞 E)) := by
+    have heq
+        : q'.2
+          = (p.2.comap (U.mulVecLin.restrictScalars (𝓞 E))).map
+            (((B⁻¹ : GL (Fin (m - k)) E)
+              : Matrix (Fin (m - k)) (Fin (m - k)) E).mulVecLin.restrictScalars (𝓞 E)) := by
       ext w
       simp only [Submodule.mem_map, LinearMap.restrictScalars_apply, Matrix.mulVecLin_apply]
       constructor
@@ -229,13 +259,20 @@ theorem spOne : SpOne := by
       rw [Nat.cast_smul_eq_nsmul, ← Nat.cast_smul_eq_nsmul E, Matrix.mulVec_smul, hdecx, catR_apply,
         cat_add, hAcat, hBy0]
     rw [hxe]
-    refine Submodule.add_mem _ (Submodule.mem_sup_left ?_) (Submodule.mem_sup_right (Submodule.mem_map_of_mem hy0))
+    refine Submodule.add_mem _ (Submodule.mem_sup_left ?_)
+      (Submodule.mem_sup_right (Submodule.mem_map_of_mem hy0))
     rw [cat_eq_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     obtain ⟨a, ha⟩ := hc i
     rw [← ha, algebraMap_smul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
-  refine ⟨(Jb q'.1, M₀), Set.mem_biUnion (x := q') ⟨hq', hfg'⟩ (Set.mem_image_of_mem _ ⟨hNle, hDN⟩), A', ?_, ?_⟩
+  refine ⟨
+    (Jb q'.1, M₀),
+    Set.mem_biUnion (x := q') ⟨hq', hfg'⟩ (Set.mem_image_of_mem _ ⟨hNle, hDN⟩),
+    A',
+    ?_,
+    ?_
+  ⟩
   · show cT (starRingEnd E) (A' : Matrix (Fin m) (Fin m) E) * p.1 * (A' : Matrix (Fin m) (Fin m) E) = Jb q'.1
     rw [hA'v]
     ext r s
@@ -253,7 +290,8 @@ theorem spOne : SpOne := by
     · intro hw
       refine ⟨((A'⁻¹ : GL (Fin m) E) : Matrix (Fin m) (Fin m) E) *ᵥ w, ?_, ?_⟩
       · show A *ᵥ (((A'⁻¹ : GL (Fin m) E) : Matrix (Fin m) (Fin m) E) *ᵥ w) ∈ p.2
-        rw [← hA'v, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
+        rw [← hA'v, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+          Matrix.one_mulVec]
         exact hw
       · rw [Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
     · rintro ⟨u, hu, rfl⟩

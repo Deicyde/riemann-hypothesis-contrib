@@ -15,34 +15,44 @@ open Formalism.G.LogCR
 
 variable {R : Type*} [CommRing R]
 
-theorem hs2 {σ : Type*} {u v : MvPowerSeries σ R} (hu : constantCoeff u = 0)
-    (hv : constantCoeff v = 0) : MvPowerSeries.HasSubst ![u, v] := by
+theorem hs2
+    {σ : Type*} {u v : MvPowerSeries σ R} (hu : constantCoeff u = 0) (hv : constantCoeff v = 0)
+    : MvPowerSeries.HasSubst ![u, v] := by
   exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun i => by fin_cases i <;> simp [hu, hv])
 
-theorem hs3 {σ : Type*} {u v w : MvPowerSeries σ R} (hu : constantCoeff u = 0)
-    (hv : constantCoeff v = 0) (hw : constantCoeff w = 0) : MvPowerSeries.HasSubst ![u, v, w] := by
+theorem hs3
+    {σ : Type*} {u v w : MvPowerSeries σ R}
+    (hu : constantCoeff u = 0) (hv : constantCoeff v = 0) (hw : constantCoeff w = 0)
+    : MvPowerSeries.HasSubst ![u, v, w] := by
   exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun i => by fin_cases i <;> simp [hu, hv, hw])
 
-theorem subst2_subst {σ τ : Type*} (Φ : MvPowerSeries (Fin 2) R) {u v : MvPowerSeries σ R}
-    (hu : constantCoeff u = 0) (hv : constantCoeff v = 0) {b : σ → MvPowerSeries τ R}
-    (hb : MvPowerSeries.HasSubst b) :
-    (Φ.subst ![u, v]).subst b = Φ.subst ![u.subst b, v.subst b] := by
+theorem subst2_subst
+    {σ τ : Type*}
+    (Φ : MvPowerSeries (Fin 2) R)
+    {u v : MvPowerSeries σ R} (hu : constantCoeff u = 0) (hv : constantCoeff v = 0)
+    {b : σ → MvPowerSeries τ R} (hb : MvPowerSeries.HasSubst b)
+    : (Φ.subst ![u, v]).subst b = Φ.subst ![u.subst b, v.subst b] := by
   rw [MvPowerSeries.subst_comp_subst_apply (hs2 hu hv) hb]
   congr 1
   funext i
   fin_cases i <;> rfl
 
-theorem psubst_subst {σ τ : Type*} (φ : PowerSeries R) {u : MvPowerSeries σ R}
-    (hu : constantCoeff u = 0) {b : σ → MvPowerSeries τ R} (hb : MvPowerSeries.HasSubst b) :
-    (φ.subst u).subst b = φ.subst (u.subst b) := by
+theorem psubst_subst
+    {σ τ : Type*}
+    (φ : PowerSeries R)
+    {u : MvPowerSeries σ R} (hu : constantCoeff u = 0)
+    {b : σ → MvPowerSeries τ R} (hb : MvPowerSeries.HasSubst b)
+    : (φ.subst u).subst b = φ.subst (u.subst b) := by
   have hu' : MvPowerSeries.HasSubst (fun _ : Unit => u) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun _ => hu)
   unfold PowerSeries.subst
   rw [MvPowerSeries.subst_comp_subst_apply hu' hb]
 
-theorem constantCoeff_subst_of_zero {σ τ : Type*} [Finite σ] [Finite τ]
-    (Φ : MvPowerSeries σ R) {b : σ → MvPowerSeries τ R} (hb : ∀ i, constantCoeff (b i) = 0) :
-    constantCoeff (Φ.subst b) = constantCoeff Φ := by
+theorem constantCoeff_subst_of_zero
+    {σ τ : Type*} [Finite σ] [Finite τ]
+    (Φ : MvPowerSeries σ R)
+    {b : σ → MvPowerSeries τ R} (hb : ∀ i, constantCoeff (b i) = 0)
+    : constantCoeff (Φ.subst b) = constantCoeff Φ := by
   have hb' : MvPowerSeries.HasSubst b := MvPowerSeries.hasSubst_of_constantCoeff_zero hb
   rw [MvPowerSeries.constantCoeff_subst hb', finsum_eq_single _ 0]
   · simp
@@ -69,43 +79,47 @@ def omegaF : PowerSeries R :=
     (MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries)
 
 theorem constantCoeff_omega : PowerSeries.constantCoeff (omegaF F) = 1 := by
-  have := constantCoeff_subst_of_zero (MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries)
-    (b := ![(PowerSeries.X : PowerSeries R), 0]) (fun i => by fin_cases i <;> simp [PowerSeries.X])
+  have :=
+    constantCoeff_subst_of_zero (MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries)
+      (b := ![(PowerSeries.X : PowerSeries R), 0])
+      (fun i => by fin_cases i <;> simp [PowerSeries.X])
   rw [omegaF, PowerSeries.constantCoeff, this, ← coeff_zero_eq_constantCoeff_apply, coeff_pderiv]
   simpa using F.lin_coeff_Y
 
 theorem hb0 : MvPowerSeries.HasSubst ![(PowerSeries.X : PowerSeries R), 0] := by
-  exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun i => by fin_cases i <;> simp [PowerSeries.X])
+  exact MvPowerSeries.hasSubst_of_constantCoeff_zero (fun i => by
+    fin_cases i <;> simp [PowerSeries.X])
 
-theorem hX0 : constantCoeff (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R) = 0 := by
-  simp
-theorem hX1 : constantCoeff (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) R) = 0 := by
-  simp
+theorem hX0 : constantCoeff (MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R) = 0 := by simp
+theorem hX1 : constantCoeff (MvPowerSeries.X 1 : MvPowerSeries (Fin 2) R) = 0 := by simp
 
-theorem eval_zero_subst_law (φ : PowerSeries R) :
-    MvPowerSeries.subst ![(PowerSeries.X : PowerSeries R), 0] (φ.subst F.toPowerSeries) = φ := by
+theorem eval_zero_subst_law (φ : PowerSeries R)
+    : MvPowerSeries.subst ![(PowerSeries.X : PowerSeries R), 0] (φ.subst F.toPowerSeries) = φ := by
   rw [psubst_subst φ F.zero_constantCoeff hb0]
-  have : MvPowerSeries.subst ![(PowerSeries.X : PowerSeries R), 0] F.toPowerSeries =
-      PowerSeries.X := F.Xzero_eq_X
+  have : MvPowerSeries.subst ![(PowerSeries.X : PowerSeries R), 0] F.toPowerSeries
+      = PowerSeries.X :=
+    F.Xzero_eq_X
   rw [this, PowerSeries.X_subst]
 
-theorem evalYZero_atY (φ : PowerSeries R) :
-    MvPowerSeries.subst ![(PowerSeries.X : PowerSeries R), 0] (atY φ) =
-      PowerSeries.C (PowerSeries.constantCoeff φ) := by
+theorem evalYZero_atY (φ : PowerSeries R)
+    : MvPowerSeries.subst ![(PowerSeries.X : PowerSeries R), 0] (atY φ)
+      = PowerSeries.C (PowerSeries.constantCoeff φ) := by
   rw [atY, psubst_subst φ hX1 hb0, subst_X hb0]
   simp [PowerSeries.subst_zero_eq_C_constantCoeff]
   rfl
 
-theorem pderiv_log {g : PowerSeries R} (hg : IsLog F g) :
-    (PowerSeries.derivative (R := R) g).subst F.toPowerSeries * MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries =
-      atY (PowerSeries.derivative (R := R) g) := by
+theorem pderiv_log {g : PowerSeries R} (hg : IsLog F g)
+    : (PowerSeries.derivative (R := R) g).subst F.toPowerSeries
+        * MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries
+      = atY (PowerSeries.derivative (R := R) g) := by
   have := congrArg (MvPowerSeries.pderiv (R := R) 1) hg.2.2
   rw [pderiv_psubst F.zero_constantCoeff, map_add (f := _), atX, atY, pderiv_psubst hX0,
-    pderiv_psubst hX1] at this
+      pderiv_psubst hX1]
+    at this
   simpa [pderiv_X_of_ne (show (0 : Fin 2) ≠ 1 by decide)] using this
 
-theorem derivative_log_mul_omega {g : PowerSeries R} (hg : IsLog F g) :
-    PowerSeries.derivative (R := R) g * omegaF F = 1 := by
+theorem derivative_log_mul_omega {g : PowerSeries R} (hg : IsLog F g)
+    : PowerSeries.derivative (R := R) g * omegaF F = 1 := by
   have := congrArg (MvPowerSeries.subst ![(PowerSeries.X : PowerSeries R), 0]) (pderiv_log F hg)
   rw [subst_mul hb0, eval_zero_subst_law, evalYZero_atY] at this
   rw [omegaF, this]
@@ -114,15 +128,16 @@ theorem derivative_log_mul_omega {g : PowerSeries R} (hg : IsLog F g) :
     simp
   rw [h1, map_one]
 
-theorem log_unique [Algebra ℚ R] {f g : PowerSeries R} (hf : IsLog F f) (hg : IsLog F g) :
-    f = g := by
+theorem log_unique [Algebra ℚ R] {f g : PowerSeries R} (hf : IsLog F f) (hg : IsLog F g)
+    : f = g := by
   have hd : PowerSeries.derivative (R := R) f = PowerSeries.derivative (R := R) g := by
     have hu := PowerSeries.mul_invOfUnit (omegaF F) 1 (by simp [constantCoeff_omega])
-    calc PowerSeries.derivative (R := R) f
-        = PowerSeries.derivative (R := R) f * omegaF F * PowerSeries.invOfUnit (omegaF F) 1 := by
-          rw [mul_assoc, hu, mul_one]
+    calc
+      PowerSeries.derivative (R := R) f
+          = PowerSeries.derivative (R := R) f * omegaF F * PowerSeries.invOfUnit (omegaF F) 1 := by
+        rw [mul_assoc, hu, mul_one]
       _ = PowerSeries.derivative (R := R) g * omegaF F * PowerSeries.invOfUnit (omegaF F) 1 := by
-          rw [derivative_log_mul_omega F hf, derivative_log_mul_omega F hg]
+        rw [derivative_log_mul_omega F hf, derivative_log_mul_omega F hg]
       _ = PowerSeries.derivative (R := R) g := by rw [mul_assoc, hu, mul_one]
   ext n
   cases n with
@@ -130,8 +145,7 @@ theorem log_unique [Algebra ℚ R] {f g : PowerSeries R} (hf : IsLog F f) (hg : 
   | succ n =>
     have := congrArg (PowerSeries.coeff n) hd
     rw [PowerSeries.coeff_derivative, PowerSeries.coeff_derivative] at this
-    exact (isUnit_natCast_succ (R := R) n).mul_left_cancel (by
-      rw [mul_comm, this, mul_comm])
+    exact (isUnit_natCast_succ (R := R) n).mul_left_cancel (by rw [mul_comm, this, mul_comm])
 
 end Formalism.G.LogP
 
@@ -141,20 +155,21 @@ open Formalism.G.LogCR
 
 variable {R : Type*} [CommRing R]
 
-theorem subst_zero' {σ τ : Type*} {b : σ → MvPowerSeries τ R} (hb : MvPowerSeries.HasSubst b) :
-    (0 : MvPowerSeries σ R).subst b = 0 := by
+theorem subst_zero' {σ τ : Type*} {b : σ → MvPowerSeries τ R} (hb : MvPowerSeries.HasSubst b)
+    : (0 : MvPowerSeries σ R).subst b = 0 := by
   rw [← MvPowerSeries.coe_substAlgHom hb, map_zero]
 
-theorem subst_XX (Φ : MvPowerSeries (Fin 2) R) :
-    Φ.subst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), MvPowerSeries.X 1] = Φ := by
-  have h : ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), MvPowerSeries.X 1] = MvPowerSeries.X := by
+theorem subst_XX (Φ : MvPowerSeries (Fin 2) R)
+    : Φ.subst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), MvPowerSeries.X 1] = Φ := by
+  have h
+      : ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), MvPowerSeries.X 1] = MvPowerSeries.X := by
     funext i
     fin_cases i <;> rfl
   rw [h, MvPowerSeries.subst_self, id]
 
-theorem omega_subst {σ : Type*} {u : MvPowerSeries σ R} (hu : constantCoeff u = 0)
-    (F : FormalGroup R) :
-    (omegaF F).subst u = (MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries).subst ![u, 0] := by
+theorem omega_subst
+    {σ : Type*} {u : MvPowerSeries σ R} (hu : constantCoeff u = 0) (F : FormalGroup R)
+    : (omegaF F).subst u = (MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries).subst ![u, 0] := by
   have hu' : MvPowerSeries.HasSubst (fun _ : Unit => u) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun _ => hu)
   unfold omegaF
@@ -168,44 +183,62 @@ theorem omega_subst {σ : Type*} {u : MvPowerSeries σ R} (hu : constantCoeff u 
 
 variable (F : FormalGroup R)
 
-theorem omega_key :
-    (omegaF F).subst F.toPowerSeries =
-      MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries * atY (omegaF F) := by
+theorem omega_key
+    : (omegaF F).subst F.toPowerSeries
+      = MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries * atY (omegaF F) := by
   have hFc : constantCoeff F.toPowerSeries = 0 := F.zero_constantCoeff
-  have hY : ∀ i, constantCoeff (MvPowerSeries.X i : MvPowerSeries (Fin 3) R) = 0 := fun i => by
-    simp
-  have hG : constantCoeff (F.toPowerSeries.subst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 3) R),
-      MvPowerSeries.X 1]) = 0 := by
+  have hY : ∀ i, constantCoeff (MvPowerSeries.X i : MvPowerSeries (Fin 3) R) = 0 := fun i => by simp
+  have hG
+      : constantCoeff (F.toPowerSeries.subst
+          ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 3) R),
+            MvPowerSeries.X 1])
+        = 0 := by
     rw [constantCoeff_subst_of_zero _ (fun i => by fin_cases i <;> simp), hFc]
-  have hH : constantCoeff (F.toPowerSeries.subst ![(MvPowerSeries.X 1 : MvPowerSeries (Fin 3) R),
-      MvPowerSeries.X 2]) = 0 := by
+  have hH
+      : constantCoeff (F.toPowerSeries.subst
+          ![(MvPowerSeries.X 1 : MvPowerSeries (Fin 3) R),
+            MvPowerSeries.X 2])
+        = 0 := by
     rw [constantCoeff_subst_of_zero _ (fun i => by fin_cases i <;> simp), hFc]
-  have dG : MvPowerSeries.pderiv (R := R) 2 (F.toPowerSeries.subst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 3) R),
-      MvPowerSeries.X 1]) = 0 := by
+  have dG
+      : MvPowerSeries.pderiv (R := R) 2
+          (F.toPowerSeries.subst
+            ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 3) R),
+              MvPowerSeries.X 1])
+        = 0 := by
     rw [pderiv_subst (fun i => by fin_cases i <;> simp)]
     simp [Fin.sum_univ_two, pderiv_X_of_ne (show (0 : Fin 3) ≠ 2 by decide),
       pderiv_X_of_ne (show (1 : Fin 3) ≠ 2 by decide)]
-  have dH : MvPowerSeries.pderiv (R := R) 2 (F.toPowerSeries.subst ![(MvPowerSeries.X 1 : MvPowerSeries (Fin 3) R),
-      MvPowerSeries.X 2]) = (MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries).subst
-        ![(MvPowerSeries.X 1 : MvPowerSeries (Fin 3) R), MvPowerSeries.X 2] := by
+  have dH
+      : MvPowerSeries.pderiv (R := R) 2
+          (F.toPowerSeries.subst
+            ![(MvPowerSeries.X 1 : MvPowerSeries (Fin 3) R),
+              MvPowerSeries.X 2])
+        = (MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries).subst
+          ![(MvPowerSeries.X 1 : MvPowerSeries (Fin 3) R), MvPowerSeries.X 2] := by
     rw [pderiv_subst (fun i => by fin_cases i <;> simp)]
     simp [Fin.sum_univ_two, pderiv_X_of_ne (show (1 : Fin 3) ≠ 2 by decide)]
   have E := congrArg (MvPowerSeries.pderiv (R := R) 2) F.assoc
   rw [pderiv_subst (fun i => by fin_cases i <;> simp [hG]),
-    pderiv_subst (fun i => by fin_cases i <;> simp [hH])] at E
+      pderiv_subst (fun i => by fin_cases i <;> simp [hH])]
+    at E
   simp only [Fin.sum_univ_two, Fin.isValue, Matrix.cons_val_zero, Matrix.cons_val_one,
-    Matrix.cons_val_fin_one, dG, dH, pderiv_X_self,
-    pderiv_X_of_ne (show (0 : Fin 3) ≠ 2 by decide), mul_zero, zero_add, mul_one] at E
+      Matrix.cons_val_fin_one, dG, dH, pderiv_X_self,
+      pderiv_X_of_ne (show (0 : Fin 3) ≠ 2 by decide), mul_zero, zero_add, mul_one]
+    at E
   have hc3 : MvPowerSeries.HasSubst
       ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), MvPowerSeries.X 1, 0] :=
     hs3 (by simp) (by simp) (by simp)
-  have E' := congrArg (MvPowerSeries.subst
-    ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), MvPowerSeries.X 1, 0]) E
+  have E' :=
+    congrArg
+      (MvPowerSeries.subst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), MvPowerSeries.X 1, 0]) E
   rw [subst_mul hc3, subst2_subst _ hG (hY 2) hc3, subst2_subst _ (hY 0) hH hc3,
-    subst2_subst _ (hY 1) (hY 2) hc3, subst2_subst _ (hY 0) (hY 1) hc3,
-    subst2_subst _ (hY 1) (hY 2) hc3] at E'
+      subst2_subst _ (hY 1) (hY 2) hc3, subst2_subst _ (hY 0) (hY 1) hc3,
+      subst2_subst _ (hY 1) (hY 2) hc3]
+    at E'
   simp only [subst_X hc3, Fin.isValue, Matrix.cons_val_zero, Matrix.cons_val_one,
-    Matrix.cons_val_two, Matrix.tail_cons, Matrix.head_cons] at E'
+      Matrix.cons_val_two, Matrix.tail_cons, Matrix.head_cons]
+    at E'
   rw [subst_XX, F.add_zero (PowerSeries.HasSubst.of_constantCoeff_zero hX1), subst_XX] at E'
   rw [omega_subst hFc, atY, omega_subst hX1]
   exact E'
@@ -218,20 +251,22 @@ open Formalism.G.LogCR
 
 variable {R : Type*} [CommRing R]
 
-theorem psubst_one {σ : Type*} {a : MvPowerSeries σ R} (ha : PowerSeries.HasSubst a) :
-    (1 : PowerSeries R).subst a = 1 := by
+theorem psubst_one {σ : Type*} {a : MvPowerSeries σ R} (ha : PowerSeries.HasSubst a)
+    : (1 : PowerSeries R).subst a = 1 := by
   rw [← PowerSeries.coe_substAlgHom ha, map_one]
 
-theorem subst_X0_zero_eq_rescale (Φ : MvPowerSeries (Fin 2) R) :
-    Φ.subst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), 0] = rescale ![1, 0] Φ := by
+theorem subst_X0_zero_eq_rescale (Φ : MvPowerSeries (Fin 2) R)
+    : Φ.subst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), 0] = rescale ![1, 0] Φ := by
   rw [MvPowerSeries.rescale_eq_subst]
   congr 1
   funext s
   fin_cases s <;> simp
 
-theorem eq_zero_of_pderiv_one [Algebra ℚ R] {h : MvPowerSeries (Fin 2) R}
-    (hD : MvPowerSeries.pderiv (R := R) 1 h = 0)
-    (h0 : h.subst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), 0] = 0) : h = 0 := by
+theorem eq_zero_of_pderiv_one
+    [Algebra ℚ R]
+    {h : MvPowerSeries (Fin 2) R} (hD : MvPowerSeries.pderiv (R := R) 1 h = 0)
+    (h0 : h.subst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), 0] = 0)
+    : h = 0 := by
   rw [subst_X0_zero_eq_rescale] at h0
   ext n
   rw [map_zero]
@@ -252,7 +287,8 @@ theorem eq_zero_of_pderiv_one [Algebra ℚ R] {h : MvPowerSeries (Fin 2) R}
       fin_cases i <;> simp <;> omega
     have h1 := congrArg (MvPowerSeries.coeff (n - Finsupp.single 1 1)) hD
     rw [MvPowerSeries.coeff_pderiv, map_zero, ← hm] at h1
-    have hu : IsUnit ((((n - Finsupp.single 1 1 : Fin 2 →₀ ℕ) 1 : ℕ) : R) + 1) := isUnit_natCast_succ _
+    have hu : IsUnit ((((n - Finsupp.single 1 1 : Fin 2 →₀ ℕ) 1 : ℕ) : R) + 1) :=
+      isUnit_natCast_succ _
     exact (hu.mul_left_eq_zero).mp h1
 
 variable (F : FormalGroup R)
@@ -265,8 +301,11 @@ theorem omega_mul_lam : omegaF F * lam F = 1 := by
 variable [Algebra ℚ R]
 
 def logF : PowerSeries R :=
-  PowerSeries.mk fun n => if n = 0 then 0 else
-    algebraMap ℚ R (1 / (n : ℚ)) * PowerSeries.coeff (n - 1) (lam F)
+  PowerSeries.mk fun n =>
+    if n = 0 then
+      0
+    else
+      algebraMap ℚ R (1 / (n : ℚ)) * PowerSeries.coeff (n - 1) (lam F)
 
 theorem derivative_logF : PowerSeries.derivative (R := R) (logF F) = lam F := by
   ext n
@@ -295,17 +334,21 @@ theorem logF_isLog : IsLog F (logF F) := by
     have hY1 : atY (lam F) * atY (omegaF F) = 1 := by
       rw [atY, atY, ← PowerSeries.subst_mul hX1s, mul_comm, hω, psubst_one hX1s]
     have hk := omega_key F
-    have hD : MvPowerSeries.pderiv (R := R) 1
-        ((logF F).subst F.toPowerSeries - atX (logF F) - atY (logF F)) = 0 := by
+    have hD
+        : MvPowerSeries.pderiv (R := R) 1
+            ((logF F).subst F.toPowerSeries - atX (logF F) - atY (logF F))
+          = 0 := by
       rw [map_sub, map_sub, pderiv_psubst hFc, atX, atY, pderiv_psubst hX0, pderiv_psubst hX1,
         derivative_logF, pderiv_X_self, pderiv_X_of_ne (show (0 : Fin 2) ≠ 1 by decide)]
       linear_combination (-((lam F).subst F.toPowerSeries *
         MvPowerSeries.pderiv (R := R) 1 F.toPowerSeries)) * hY1 + atY (lam F) * hF1 -
         (lam F).subst F.toPowerSeries * atY (lam F) * hk
-    have hc2 : MvPowerSeries.HasSubst
-        ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), 0] := hs2 (by simp) (by simp)
-    have h0 : ((logF F).subst F.toPowerSeries - atX (logF F) - atY (logF F)).subst
-        ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), 0] = 0 := by
+    have hc2 : MvPowerSeries.HasSubst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), 0] :=
+      hs2 (by simp) (by simp)
+    have h0
+        : ((logF F).subst F.toPowerSeries - atX (logF F) - atY (logF F)).subst
+            ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) R), 0]
+          = 0 := by
       rw [subst_sub hc2, subst_sub hc2, atX, atY, psubst_subst _ hFc hc2, psubst_subst _ hX0 hc2,
         psubst_subst _ hX1 hc2, F.add_zero (PowerSeries.HasSubst.of_constantCoeff_zero hX0),
         subst_X hc2, subst_X hc2]
@@ -320,9 +363,11 @@ namespace Formalism.G.LogP
 
 variable {R : Type*} [CommRing R]
 
-theorem psubst_injective {f : PowerSeries R} (hf0 : PowerSeries.constantCoeff f = 0)
-    (hf1 : PowerSeries.coeff 1 f = 1) {σ : Type*} {a b : MvPowerSeries σ R}
-    (ha : constantCoeff a = 0) (hb : constantCoeff b = 0) (h : f.subst a = f.subst b) : a = b := by
+theorem psubst_injective
+    {f : PowerSeries R} (hf0 : PowerSeries.constantCoeff f = 0) (hf1 : PowerSeries.coeff 1 f = 1)
+    {σ : Type*} {a b : MvPowerSeries σ R}
+    (ha : constantCoeff a = 0) (hb : constantCoeff b = 0) (h : f.subst a = f.subst b)
+    : a = b := by
   have : Invertible (PowerSeries.coeff 1 f) := hf1 ▸ invertibleOne
   have hfs : PowerSeries.HasSubst f := PowerSeries.HasSubst.of_constantCoeff_zero' hf0
   have inv : ∀ c : MvPowerSeries σ R, constantCoeff c = 0 → f.substInv.subst (f.subst c) = c := by
@@ -336,5 +381,8 @@ end Formalism.G.LogP
 
 theorem Formalism.G.log_exists_unique : Formalism.G.LogExistsUnique := by
   intro R _ _ F
-  exact ⟨Formalism.G.LogP.logF F, Formalism.G.LogP.logF_isLog F,
-    fun g hg => Formalism.G.LogP.log_unique F hg (Formalism.G.LogP.logF_isLog F)⟩
+  exact ⟨
+    Formalism.G.LogP.logF F,
+    Formalism.G.LogP.logF_isLog F,
+    fun g hg => Formalism.G.LogP.log_unique F hg (Formalism.G.LogP.logF_isLog F)
+  ⟩

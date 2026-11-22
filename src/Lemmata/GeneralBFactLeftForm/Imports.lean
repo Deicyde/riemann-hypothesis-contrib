@@ -9,8 +9,8 @@ universe u v w
 
 namespace Bl.general_b_fact_left_form
 
-theorem goal1 {n : ℕ} (f : Fin n → ℝ) (hf : Antitone f) (θ : ℝ) (j : Fin n) :
-    θ ≤ f j ↔ (j : ℕ) < (Finset.univ.filter (fun i => θ ≤ f i)).card := by
+theorem goal1 {n : ℕ} (f : Fin n → ℝ) (hf : Antitone f) (θ : ℝ) (j : Fin n)
+    : θ ≤ f j ↔ (j : ℕ) < (Finset.univ.filter (fun i => θ ≤ f i)).card := by
   constructor
   · intro h
     have hsub : Finset.Iic j ⊆ Finset.univ.filter (fun i => θ ≤ f i) := by

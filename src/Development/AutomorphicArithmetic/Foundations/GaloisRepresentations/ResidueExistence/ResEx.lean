@@ -6,7 +6,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory Limits AlgebraicGeometry TensorProduct GroundTheory.PAdicHodge CrystallineSemistableComparison
+open CategoryTheory Limits AlgebraicGeometry TensorProduct GroundTheory.PAdicHodge
+  CrystallineSemistableComparison
 
-theorem UpperTheory.Gal.CD.resEx :
-    CrystallineSemistableComparison.ResEx := CrystallineSemistableComparison.resEx
+theorem UpperTheory.Gal.CD.resEx : CrystallineSemistableComparison.ResEx :=
+  CrystallineSemistableComparison.resEx

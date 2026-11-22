@@ -15,22 +15,20 @@ namespace TaylorWp
 
 def T (f : ℂ → ℂ) (F : PowerSeries ℂ) : Prop := AnalyticAt ℂ f 0 ∧ taylor0 f = F
 
-theorem T.add (hr : TaylorRing) {f g : ℂ → ℂ} {F G : PowerSeries ℂ} (hf : T f F) (hg : T g G) :
-    T (fun z => f z + g z) (F + G) :=
+theorem T.add (hr : TaylorRing) {f g : ℂ → ℂ} {F G : PowerSeries ℂ} (hf : T f F) (hg : T g G)
+    : T (fun z => f z + g z) (F + G) :=
   ⟨hf.1.add hg.1, by rw [(hr.1 f g hf.1 hg.1).1, hf.2, hg.2]⟩
 
-theorem T.mul (hr : TaylorRing) {f g : ℂ → ℂ} {F G : PowerSeries ℂ} (hf : T f F) (hg : T g G) :
-    T (fun z => f z * g z) (F * G) :=
+theorem T.mul (hr : TaylorRing) {f g : ℂ → ℂ} {F G : PowerSeries ℂ} (hf : T f F) (hg : T g G)
+    : T (fun z => f z * g z) (F * G) :=
   ⟨hf.1.mul hg.1, by rw [(hr.1 f g hf.1 hg.1).2, hf.2, hg.2]⟩
 
-theorem T.const (hr : TaylorRing) (c : ℂ) : T (fun _ => c) (C c) :=
-  ⟨analyticAt_const, hr.2.1 c⟩
+theorem T.const (hr : TaylorRing) (c : ℂ) : T (fun _ => c) (C c) := ⟨analyticAt_const, hr.2.1 c⟩
 
-theorem T.id (hr : TaylorRing) : T (fun z => z) X :=
-  ⟨analyticAt_id, hr.2.2.1⟩
+theorem T.id (hr : TaylorRing) : T (fun z => z) X := ⟨analyticAt_id, hr.2.2.1⟩
 
-theorem T.pow (hr : TaylorRing) {f : ℂ → ℂ} {F : PowerSeries ℂ} (hf : T f F) (k : ℕ) :
-    T (fun z => f z ^ k) (F ^ k) := by
+theorem T.pow (hr : TaylorRing) {f : ℂ → ℂ} {F : PowerSeries ℂ} (hf : T f F) (k : ℕ)
+    : T (fun z => f z ^ k) (F ^ k) := by
   induction k with
   | zero => simpa using T.const hr 1
   | succ k ih => simpa only [pow_succ] using T.mul hr ih hf
@@ -55,23 +53,29 @@ theorem taylorIsWp_of (hr : TaylorRing) (hd : TaylorDeriv) : TaylorIsWp := by
   refine ⟨?_, ?_, ?_⟩
   · rw [← coeff_zero_eq_constantCoeff_apply, weierstrass_p_series_coeff L 0]; simp
   · intro n hn
-    rw [weierstrass_p_series_coeff L n, L.G_eq_zero_of_odd (n + 2) (by
-      obtain ⟨k, rfl⟩ := hn; exact ⟨k + 1, by ring⟩)]
+    rw [weierstrass_p_series_coeff L n,
+      L.G_eq_zero_of_odd (n + 2) (by obtain ⟨k, rfl⟩ := hn; exact ⟨k + 1, by ring⟩)]
     simp
   · have hp : T (L.weierstrassPExcept 0) (pSeries L) := ⟨L.analyticAt_weierstrassPExcept 0, rfl⟩
     have hp' : T (deriv (L.weierstrassPExcept 0)) (Formalism.L2.Th1.B.dz (pSeries L)) :=
       ⟨hp.1.deriv, hd.1 _ hp.1⟩
     have hq := T.add hr (T.const hr 1) (T.mul hr (T.pow hr (T.id hr) 2) hp)
     have h1 := T.pow hr (T.add hr (T.const hr (-2)) (T.mul hr (T.pow hr (T.id hr) 3) hp')) 2
-    have h2 := T.add hr (T.add hr (T.mul hr (T.const hr 4) (T.pow hr hq 3))
-      (T.mul hr (T.mul hr (T.const hr (-L.g₂)) (T.pow hr (T.id hr) 4)) hq))
-      (T.mul hr (T.const hr (-L.g₃)) (T.pow hr (T.id hr) 6))
-    have key := hr.2.2.2 _ _ (?_ : (fun z => (-2 + z ^ 3 * deriv (L.weierstrassPExcept 0) z) ^ 2)
-      =ᶠ[nhds 0] fun z => 4 * (1 + z ^ 2 * L.weierstrassPExcept 0 z) ^ 3
-        + -L.g₂ * z ^ 4 * (1 + z ^ 2 * L.weierstrassPExcept 0 z) + -L.g₃ * z ^ 6)
+    have h2 :=
+      T.add hr
+        (T.add hr (T.mul hr (T.const hr 4) (T.pow hr hq 3))
+          (T.mul hr (T.mul hr (T.const hr (-L.g₂)) (T.pow hr (T.id hr) 4)) hq))
+        (T.mul hr (T.const hr (-L.g₃)) (T.pow hr (T.id hr) 6))
+    have key :=
+      hr.2.2.2 _ _
+        (?_
+          : (fun z => (-2 + z ^ 3 * deriv (L.weierstrassPExcept 0) z) ^ 2)
+            =ᶠ[nhds 0] fun z => 4 * (1 + z ^ 2 * L.weierstrassPExcept 0 z) ^ 3
+              + -L.g₂ * z ^ 4 * (1 + z ^ 2 * L.weierstrassPExcept 0 z) + -L.g₃ * z ^ 6)
     · rw [h1.2, h2.2] at key
       simp only [map_neg, map_ofNat, map_one] at key
-      rw [key]; ring
+      rw [key]
+      ring
     · filter_upwards [L.compl_lattice_sdiff_singleton_mem_nhds 0] with z hz
       rw [L.eqOn_deriv_weierstrassPExcept_derivWeierstrassPExcept 0 hz]
       by_cases hz0 : z = 0
@@ -82,8 +86,10 @@ theorem taylorIsWp_of (hr : TaylorRing) (hd : TaylorDeriv) : TaylorIsWp := by
       have e2 := L.derivWeierstrassPExcept_def 0 z
       simp only [ZeroMemClass.coe_zero, sub_zero] at e1 e2
       rw [e1, e2]
-      have e3 : (z ^ 3 * L.derivWeierstrassP z) ^ 2 = z ^ 6 * (4 * L.weierstrassP z ^ 3
-          - L.g₂ * L.weierstrassP z - L.g₃) := by rw [← hE]; ring
+      have e3
+          : (z ^ 3 * L.derivWeierstrassP z) ^ 2
+            = z ^ 6 * (4 * L.weierstrassP z ^ 3 - L.g₂ * L.weierstrassP z - L.g₃) := by
+        rw [← hE]; ring
       field_simp
       simp
       linear_combination e3
@@ -107,14 +113,17 @@ theorem weierstrass_series_unique : IsWpUnique := by
     | zero => simp
     | succ n ih =>
       obtain ⟨E, hE⟩ := ih
-      have hD : X * (derivative P - derivative Q)
-          = X ^ n * ((n : PowerSeries K) * E + X * derivative E) := by
+      have hD
+          : X * (derivative P - derivative Q)
+            = X ^ n * ((n : PowerSeries K) * E + X * derivative E) := by
         rw [← map_sub, hE, Derivation.leibniz, smul_eq_mul, smul_eq_mul]
         linear_combination E * hdX n
-      have hc : ((n : PowerSeries K) * E + X * derivative E)
-            * (-4 + X ^ 3 * (derivative P + derivative Q))
-          = E * (4 * ((1 + X ^ 2 * P) ^ 2 + (1 + X ^ 2 * P) * (1 + X ^ 2 * Q) + (1 + X ^ 2 * Q) ^ 2)
-              - C g2 * X ^ 4) := by
+      have hc
+          : ((n : PowerSeries K) * E + X * derivative E)
+              * (-4 + X ^ 3 * (derivative P + derivative Q))
+            = E
+              * (4 * ((1 + X ^ 2 * P) ^ 2 + (1 + X ^ 2 * P) * (1 + X ^ 2 * Q) + (1 + X ^ 2 * Q) ^ 2)
+                - C g2 * X ^ 4) := by
         apply mul_left_cancel₀ (pow_ne_zero (n + 2) hX)
         have hs := congrArg₂ (· - ·) hP hQ
         simp only [Formalism.L2.Th1.B.dz] at hs
@@ -123,10 +132,10 @@ theorem weierstrass_series_unique : IsWpUnique := by
           + X ^ 2 * (4 * ((1 + X ^ 2 * P) ^ 2 + (1 + X ^ 2 * P) * (1 + X ^ 2 * Q)
               + (1 + X ^ 2 * Q) ^ 2) - C g2 * X ^ 4) * hE
       have h0 := congrArg constantCoeff hc
-      simp only [map_mul, map_add (f := _), map_sub, map_neg, map_pow, map_natCast, map_ofNat, map_one,
-        constantCoeff_X, constantCoeff_C] at h0
-      have h1 : (4 * (n : K) + 12) * constantCoeff E = 0 := by
-        linear_combination -h0
+      simp only [map_mul, map_add (f := _), map_sub, map_neg, map_pow, map_natCast, map_ofNat,
+          map_one, constantCoeff_X, constantCoeff_C]
+        at h0
+      have h1 : (4 * (n : K) + 12) * constantCoeff E = 0 := by linear_combination -h0
       have h2 : (4 * (n : K) + 12) ≠ 0 := by
         have : ((4 * n + 12 : ℕ) : K) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
         push_cast at this

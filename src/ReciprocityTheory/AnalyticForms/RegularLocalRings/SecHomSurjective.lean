@@ -13,10 +13,11 @@ noncomputable section
 
 variable {W : Scheme.{0}} {sW : W ⟶ Spec (.of ℂ)}
 
-theorem val_eval₂ {S : Scheme.{0}} (s : S ⟶ Spec (.of ℂ)) [LocallyOfFiniteType s] {U : S.Opens}
-    {σ : Type} (u : σ → Γ(S, U)) (F : MvPolynomial σ ℂ) (x : S) (hx : x ∈ U)
-    (hc : IsClosed ({x} : Set S)) :
-    val s (eval₂ (constSec s U) u F) x hx = eval (fun t => val s (u t) x hx) F := by
+theorem val_eval₂
+    {S : Scheme.{0}} (s : S ⟶ Spec (.of ℂ)) [LocallyOfFiniteType s]
+    {U : S.Opens} {σ : Type} (u : σ → Γ(S, U)) (F : MvPolynomial σ ℂ)
+    (x : S) (hx : x ∈ U) (hc : IsClosed ({x} : Set S))
+    : val s (eval₂ (constSec s U) u F) x hx = eval (fun t => val s (u t) x hx) F := by
   obtain ⟨φ, hφ⟩ := val_ringHom s U x hx hc
   rw [← hφ, eval₂_comp_left]
   have h1 : φ.comp (constSec s U) = RingHom.id ℂ := by
@@ -31,20 +32,24 @@ theorem val_eval₂ {S : Scheme.{0}} (s : S ⟶ Spec (.of ℂ)) [LocallyOfFinite
 
 namespace AffPres
 
-
 set_option backward.isDefEq.respectTransparency false in
 theorem secHom_C (P : AffPres sW) (c : ℂ) : P.secHom (C c) = constSec sW P.V c := by
-  have key : (Scheme.ΓSpecIso (.of ℂ)).inv ≫
-      (Spec.map (CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin P.n) ℂ ⧸ P.K)))).appTop ≫
-      P.iso.hom.appTop ≫ P.V.topIso.hom =
-      (Scheme.ΓSpecIso (.of ℂ)).inv ≫ sW.appLE ⊤ P.V le_top := by
+  have key
+      : (Scheme.ΓSpecIso (.of ℂ)).inv
+          ≫ (Spec.map (CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin P.n) ℂ ⧸ P.K)))).appTop
+          ≫ P.iso.hom.appTop ≫ P.V.topIso.hom
+        = (Scheme.ΓSpecIso (.of ℂ)).inv ≫ sW.appLE ⊤ P.V le_top := by
     rw [← Scheme.Hom.comp_appTop_assoc, P.hover, Scheme.Hom.comp_appTop, Category.assoc]
-    simp only [Scheme.Hom.appTop, Scheme.Hom.appLE, Scheme.Opens.ι_appTop,
-      Scheme.Opens.topIso_hom, ← W.presheaf.map_comp]
+    simp only [Scheme.Hom.appTop, Scheme.Hom.appLE, Scheme.Opens.ι_appTop, Scheme.Opens.topIso_hom,
+      ← W.presheaf.map_comp]
     rfl
-  have e3 : P.secHom (C c) = ((CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin P.n) ℂ ⧸ P.K))) ≫
-      (Scheme.ΓSpecIso (.of (MvPolynomial (Fin P.n) ℂ ⧸ P.K))).inv ≫
-      P.iso.hom.appTop ≫ P.V.topIso.hom) c := rfl
+  have e3
+      : P.secHom (C c)
+        = ((CommRingCat.ofHom (algebraMap ℂ (MvPolynomial (Fin P.n) ℂ ⧸ P.K)))
+            ≫ (Scheme.ΓSpecIso (.of (MvPolynomial (Fin P.n) ℂ ⧸ P.K))).inv ≫ P.iso.hom.appTop
+            ≫ P.V.topIso.hom)
+          c :=
+    rfl
   rw [e3, Scheme.ΓSpecIso_inv_naturality_assoc, key]
   rfl
 
@@ -62,16 +67,19 @@ theorem secHom_surjective (P : AffPres sW) : Function.Surjective P.secHom := by
   obtain ⟨f, rfl⟩ := Ideal.Quotient.mk_surjective a3
   exact ⟨f, rfl⟩
 
-theorem val_secHom [LocallyOfFiniteType sW] (P : AffPres sW) (y : W) (hy : y ∈ P.V)
-    (hc : IsClosed ({y} : Set W)) (f : MvPolynomial (Fin P.n) ℂ) :
-    val sW (P.secHom f) y hy = eval (P.coord y hy) f := by
+theorem val_secHom
+    [LocallyOfFiniteType sW]
+    (P : AffPres sW) (y : W) (hy : y ∈ P.V) (hc : IsClosed ({y} : Set W))
+    (f : MvPolynomial (Fin P.n) ℂ)
+    : val sW (P.secHom f) y hy = eval (P.coord y hy) f := by
   obtain ⟨φ, hφ⟩ := val_ringHom sW P.V y hy hc
   have hker : ∀ g ∈ ptIdeal (P.coord y hy), val sW (P.secHom g) y hy = 0 := by
     intro g hg
     rw [val_eq_zero_iff sW _ y hy hc, ← Scheme.germ_residue, CommRingCat.comp_apply]
     apply (IsLocalRing.residue_eq_zero_iff _).mpr
-    have h2 : P.stalkEquiv y hy hc (W.presheaf.germ P.V y hy (P.secHom g)) ∈
-        (IsLocalRing.maximalIdeal (W.presheaf.stalk y)).map (P.stalkEquiv y hy hc) := by
+    have h2
+        : P.stalkEquiv y hy hc (W.presheaf.germ P.V y hy (P.secHom g))
+          ∈ (IsLocalRing.maximalIdeal (W.presheaf.stalk y)).map (P.stalkEquiv y hy hc) := by
       rw [P.map_maximalIdeal_stalk y hy hc, P.stalkEquiv_germ]
       exact Ideal.mem_map_of_mem _ hg
     obtain ⟨w, hw, hwe⟩ := (Ideal.mem_map_of_equiv _ _).mp h2
@@ -79,8 +87,7 @@ theorem val_secHom [LocallyOfFiniteType sW] (P : AffPres sW) (y : W) (hy : y ∈
     exact hw
   let ψ : MvPolynomial (Fin P.n) ℂ →+* ℂ := φ.comp P.secHom
   have hψ : ∀ g, ψ g = val sW (P.secHom g) y hy := fun g => hφ _
-  have hC : ∀ c, ψ (C c) = c := fun c => by
-    rw [hψ, secHom_C, val_const sW P.V y hy hc]
+  have hC : ∀ c, ψ (C c) = c := fun c => by rw [hψ, secHom_C, val_const sW P.V y hy hc]
   have hX : ∀ j, ψ (MvPolynomial.X j) = P.coord y hy j := fun j => by
     have hm : X j - C (P.coord y hy j) ∈ ptIdeal (P.coord y hy) := by
       simp [ptIdeal, RingHom.mem_ker]
@@ -95,20 +102,26 @@ theorem val_secHom [LocallyOfFiniteType sW] (P : AffPres sW) (y : W) (hy : y ∈
 
 end AffPres
 
-theorem exists_ratio_core {S T : Scheme.{0}} (s : S ⟶ Spec (.of ℂ)) (t : T ⟶ Spec (.of ℂ))
-    (g : S ⟶ T) (hg : g ≫ t = s) [LocallyOfFiniteType s] [LocallyOfFiniteType t]
-    (V : T.Opens) (hV : IsAffineOpen V) {σ : Type} (u : σ → Γ(T, V))
-    (hu : ∀ a : Γ(T, V), ∃ F : MvPolynomial σ ℂ, a = eval₂ (constSec t V) u F)
-    {ι : Type} [Finite ι] (Ω : S.Opens) (e : ι → Γ(S, Ω)) (x : S) (hxΩ : x ∈ Ω)
-    (hxV : g.base x ∈ V) (hc : IsClosed ({x} : Set S))
-    (hsurj : Function.Surjective (g.stalkMap x)) :
-    ∃ O : S.Opens, x ∈ O ∧ O ≤ Ω ⊓ g ⁻¹ᵁ V ∧
-      ∃ (q : MvPolynomial σ ℂ) (F : ι → MvPolynomial σ ℂ),
-        eval (fun a => val t (u a) (g.base x) hxV) q ≠ 0 ∧
-        ∀ (y : S) (hyΩ : y ∈ Ω) (hyV : g.base y ∈ V), y ∈ O → IsClosed ({y} : Set S) →
-          eval (fun a => val t (u a) (g.base y) hyV) q ≠ 0 ∧
-          ∀ i, val s (e i) y hyΩ * eval (fun a => val t (u a) (g.base y) hyV) q =
-            eval (fun a => val t (u a) (g.base y) hyV) (F i) := by
+theorem exists_ratio_core
+    {S T : Scheme.{0}} (s : S ⟶ Spec (.of ℂ)) (t : T ⟶ Spec (.of ℂ)) (g : S ⟶ T) (hg : g ≫ t = s)
+    [LocallyOfFiniteType s] [LocallyOfFiniteType t]
+    (V : T.Opens) (hV : IsAffineOpen V)
+    {σ : Type}
+    (u : σ → Γ(T, V)) (hu : ∀ a : Γ(T, V), ∃ F : MvPolynomial σ ℂ, a = eval₂ (constSec t V) u F)
+    {ι : Type} [Finite ι]
+    (Ω : S.Opens) (e : ι → Γ(S, Ω))
+    (x : S) (hxΩ : x ∈ Ω) (hxV : g.base x ∈ V) (hc : IsClosed ({x} : Set S))
+    (hsurj : Function.Surjective (g.stalkMap x))
+    : ∃ O : S.Opens,
+      x ∈ O ∧ O ≤ Ω ⊓ g ⁻¹ᵁ V
+        ∧ ∃ (q : MvPolynomial σ ℂ) (F : ι → MvPolynomial σ ℂ),
+          eval (fun a => val t (u a) (g.base x) hxV) q ≠ 0
+            ∧ ∀ (y : S) (hyΩ : y ∈ Ω) (hyV : g.base y ∈ V),
+              y ∈ O → IsClosed ({y} : Set S)
+                → eval (fun a => val t (u a) (g.base y) hyV) q ≠ 0
+                  ∧ ∀ i,
+                    val s (e i) y hyΩ * eval (fun a => val t (u a) (g.base y) hyV) q
+                      = eval (fun a => val t (u a) (g.base y) hyV) (F i) := by
   classical
   cases nonempty_fintype ι
   let z : V := ⟨g.base x, hxV⟩
@@ -116,16 +129,19 @@ theorem exists_ratio_core {S T : Scheme.{0}} (s : S ⟶ Spec (.of ℂ)) (t : T �
     TopCat.Presheaf.algebra_section_stalk T.presheaf z
   have : IsLocalization.AtPrime (T.presheaf.stalk (g.base x)) (hV.primeIdealOf z).asIdeal :=
     hV.isLocalization_stalk z
-  have hw : ∀ i, ∃ w : T.presheaf.stalk (g.base x),
-      g.stalkMap x w = S.presheaf.germ Ω x hxΩ (e i) := fun i => hsurj _
+  have hw
+      : ∀ i, ∃ w : T.presheaf.stalk (g.base x), g.stalkMap x w = S.presheaf.germ Ω x hxΩ (e i) :=
+    fun i => hsurj _
   choose w hw using hw
   obtain ⟨⟨b, hb⟩, hint⟩ :=
     IsLocalization.exist_integer_multiples_of_finite (hV.primeIdealOf z).asIdeal.primeCompl w
   have hint' : ∀ i, ∃ a : Γ(T, V), algebraMap Γ(T, V) (T.presheaf.stalk (g.base x)) a = b • w i :=
     fun i => hint i
   choose a ha using hint'
-  have halg : ∀ c : Γ(T, V), algebraMap Γ(T, V) (T.presheaf.stalk (g.base x)) c =
-      T.presheaf.germ V (g.base x) hxV c := fun c => rfl
+  have halg
+      : ∀ c : Γ(T, V),
+        algebraMap Γ(T, V) (T.presheaf.stalk (g.base x)) c = T.presheaf.germ V (g.base x) hxV c :=
+    fun c => rfl
   have hunit : IsUnit (T.presheaf.germ V (g.base x) hxV b) := by
     rw [← halg]
     exact IsLocalization.map_units (T.presheaf.stalk (g.base x))
@@ -134,14 +150,17 @@ theorem exists_ratio_core {S T : Scheme.{0}} (s : S ⟶ Spec (.of ℂ)) (t : T �
   have hΩ'V : Ω' ≤ g ⁻¹ᵁ V := inf_le_right
   have hΩ'Ω : Ω' ≤ Ω := inf_le_left
   have hxΩ' : x ∈ Ω' := ⟨hxΩ, hxV⟩
-  have hgerm : ∀ c : Γ(T, V), S.presheaf.germ Ω' x hxΩ' (g.appLE V Ω' hΩ'V c) =
-      g.stalkMap x (T.presheaf.germ V (g.base x) hxV c) := by
+  have hgerm
+      : ∀ c : Γ(T, V),
+        S.presheaf.germ Ω' x hxΩ' (g.appLE V Ω' hΩ'V c)
+          = g.stalkMap x (T.presheaf.germ V (g.base x) hxV c) := by
     intro c
     rw [Scheme.Hom.germ_stalkMap_apply, Scheme.Hom.appLE, CommRingCat.comp_apply,
       TopCat.Presheaf.germ_res_apply]
-  have hEq : ∀ i, S.presheaf.germ Ω' x hxΩ'
-      (g.appLE V Ω' hΩ'V b * S.presheaf.map (homOfLE hΩ'Ω).op (e i)) =
-      S.presheaf.germ Ω' x hxΩ' (g.appLE V Ω' hΩ'V (a i)) := by
+  have hEq
+      : ∀ i,
+        S.presheaf.germ Ω' x hxΩ' (g.appLE V Ω' hΩ'V b * S.presheaf.map (homOfLE hΩ'Ω).op (e i))
+          = S.presheaf.germ Ω' x hxΩ' (g.appLE V Ω' hΩ'V (a i)) := by
     intro i
     rw [map_mul, hgerm, hgerm, TopCat.Presheaf.germ_res_apply, ← hw i, ← map_mul]
     congr 1
@@ -159,8 +178,10 @@ theorem exists_ratio_core {S T : Scheme.{0}} (s : S ⟶ Spec (.of ℂ)) (t : T �
     simp only [Set.iInf_eq_iInter, Set.mem_iInter] at h2
     exact h2 i (Finset.mem_univ i)
 
-  have hne : ∀ (y : S) (hyV : g.base y ∈ V), IsClosed ({y} : Set S) →
-      g.base y ∈ T.basicOpen b → eval (fun a => val t (u a) (g.base y) hyV) q ≠ 0 := by
+  have hne
+      : ∀ (y : S) (hyV : g.base y ∈ V),
+        IsClosed ({y} : Set S) → g.base y ∈ T.basicOpen b
+          → eval (fun a => val t (u a) (g.base y) hyV) q ≠ 0 := by
     intro y hyV hcy hyb
     have hcy' := isClosed_image_of_closed s t g hg y hcy
     rw [← val_eval₂ t u q _ hyV hcy', ← hq]
@@ -183,13 +204,16 @@ theorem exists_ratio_core {S T : Scheme.{0}} (s : S ⟶ Spec (.of ℂ)) (t : T �
     obtain ⟨φ, hφ⟩ := val_ringHom s Ω' y hyΩ' hcy
     have h1 := congrArg (fun f => val s f y (hyOi i)) (hOi i)
     simp only at h1
-    rw [show iU i = homOfLE (leOfHom (iU i)) from rfl, show iV i = homOfLE (leOfHom (iV i)) from rfl,
-      val_restrict, val_restrict, ← hφ, map_mul, hφ, hφ, val_restrict] at h1
+    rw [show iU i = homOfLE (leOfHom (iU i)) from rfl,
+        show iV i = homOfLE (leOfHom (iV i)) from rfl, val_restrict, val_restrict, ← hφ, map_mul,
+        hφ, hφ, val_restrict]
+      at h1
     rw [(val_comp s t g hg hΩ'V b y hyΩ' hcy).2, (val_comp s t g hg hΩ'V (a i) y hyΩ' hcy).2] at h1
     have e1 : val t b (g.base y) (hΩ'V hyΩ') = eval (fun a => val t (u a) (g.base y) hyV) q := by
       rw [hq]; exact val_eval₂ t u q _ hyV hcy'
-    have e2 : val t (a i) (g.base y) (hΩ'V hyΩ') =
-        eval (fun a => val t (u a) (g.base y) hyV) (F i) := by
+    have e2
+        : val t (a i) (g.base y) (hΩ'V hyΩ')
+          = eval (fun a => val t (u a) (g.base y) hyV) (F i) := by
       rw [hF i]; exact val_eval₂ t u (F i) _ hyV hcy'
     rw [e1, e2] at h1
     rw [mul_comm]

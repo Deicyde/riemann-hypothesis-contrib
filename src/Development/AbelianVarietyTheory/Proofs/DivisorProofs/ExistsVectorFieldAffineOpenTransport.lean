@@ -6,11 +6,18 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Den
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LogKS
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LogKS
 
 namespace GlobalTheory.FieldTransport
 
-theorem exists_isField_transport : ∀ (Z : Scheme.{0}) (W : Z.Opens) (hW : IsAffineOpen W) (δ : Γ(Z, W) → Γ(Z, W)) (d' : ∀ O : (Spec Γ(Z, W)).Opens, Γ(Spec Γ(Z, W), O) → Γ(Spec Γ(Z, W), O)), IsField ⊤ d' → (∀ a, d' ⊤ ((Scheme.ΓSpecIso Γ(Z, W)).inv.hom a) = (Scheme.ΓSpecIso Γ(Z, W)).inv.hom (δ a)) → ∃ d : ∀ O : Z.Opens, Γ(Z, O) → Γ(Z, O), IsField W d ∧ ∀ a, d W a = δ a := by
+theorem exists_isField_transport
+    : ∀ (Z : Scheme.{0}) (W : Z.Opens) (hW : IsAffineOpen W) (δ : Γ(Z, W) → Γ(Z, W))
+        (d' : ∀ O : (Spec Γ(Z, W)).Opens, Γ(Spec Γ(Z, W), O) → Γ(Spec Γ(Z, W), O)),
+      IsField ⊤ d'
+        → (∀ a,
+          d' ⊤ ((Scheme.ΓSpecIso Γ(Z, W)).inv.hom a) = (Scheme.ΓSpecIso Γ(Z, W)).inv.hom (δ a))
+        → ∃ d : ∀ O : Z.Opens, Γ(Z, O) → Γ(Z, O), IsField W d ∧ ∀ a, d W a = δ a := by
   intro Z W hW δ d' hd hδ
   classical
   have hiso : ∀ O : Z.Opens, O ≤ W → IsIso (hW.fromSpec.app O) := fun O h =>
@@ -18,14 +25,18 @@ theorem exists_isField_transport : ∀ (Z : Scheme.{0}) (W : Z.Opens) (hW : IsAf
   let e : ∀ O : Z.Opens, O ≤ W → Γ(Z, O) ≃+* Γ(Spec Γ(Z, W), hW.fromSpec ⁻¹ᵁ O) := fun O h =>
     haveI := hiso O h; (asIso (hW.fromSpec.app O)).commRingCatIsoToRingEquiv
   have he : ∀ O (h : O ≤ W) f, e O h f = (hW.fromSpec.app O).hom f := fun _ _ _ => rfl
-  have hres : ∀ O O' (h : O' ≤ O) (f : Γ(Z, O)),
-      (hW.fromSpec.app O').hom (resG Z h f) =
-        resG (Spec Γ(Z, W)) (hW.fromSpec.preimage_mono h) ((hW.fromSpec.app O).hom f) := by
+  have hres
+      : ∀ O O' (h : O' ≤ O) (f : Γ(Z, O)),
+        (hW.fromSpec.app O').hom (resG Z h f)
+          = resG (Spec Γ(Z, W)) (hW.fromSpec.preimage_mono h) ((hW.fromSpec.app O).hom f) := by
     intro O O' h f
     have := congrArg (fun g => g.hom f) (hW.fromSpec.naturality (homOfLE h).op)
     simpa [resG] using this
-  refine ⟨fun O f => if h : O ≤ W then (e O h).symm (d' (hW.fromSpec ⁻¹ᵁ O) (e O h f)) else 0,
-    ⟨?_, ?_, ?_⟩, ?_⟩
+  refine ⟨
+    fun O f => if h : O ≤ W then (e O h).symm (d' (hW.fromSpec ⁻¹ᵁ O) (e O h f)) else 0,
+    ⟨?_, ?_, ?_⟩,
+    ?_
+  ⟩
   · intro O h f f'
     simp only [dif_pos h, map_add (f := _), hd.1 _ le_top]
   · intro O h f f'
@@ -41,7 +52,9 @@ theorem exists_isField_transport : ∀ (Z : Scheme.{0}) (W : Z.Opens) (hW : IsAf
     simp only [dif_pos (le_refl W)]
     apply (e W (le_refl W)).symm_apply_eq.mpr
     have hs : hW.fromSpec ⁻¹ᵁ W ≤ ⊤ := le_top
-    have key : ∀ x, e W (le_refl W) x = resG (Spec Γ(Z, W)) hs ((Scheme.ΓSpecIso Γ(Z, W)).inv.hom x) := by
+    have key
+        : ∀ x,
+          e W (le_refl W) x = resG (Spec Γ(Z, W)) hs ((Scheme.ΓSpecIso Γ(Z, W)).inv.hom x) := by
       intro x
       rw [he W (le_refl W), IsAffineOpen.fromSpec_app_self, CommRingCat.comp_apply]
       rfl

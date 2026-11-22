@@ -22,9 +22,11 @@ theorem divSupp_one (P : Ideal (MRing ι)) : divSupp P 1 = ∅ := by
     rwa [Ideal.span_singleton_one, sup_top_eq] at h2
   exact fun _ => hp.1.ne_top (top_le_iff.1 htop)
 
-theorem logNorm_ofWeight_one (u : ((Σ k, ι k) → ℂ) → ℝ)
-    (hu : ∀ (c : K → ℂ) z, (∀ k, c k ≠ 0) → u (fun p => c p.1 * z p) = u z) (z : (Σ k, ι k) → ℂ) :
-    logNorm (HermLine.ofWeight u hu) 1 z = u z := by
+theorem logNorm_ofWeight_one
+    (u : ((Σ k, ι k) → ℂ) → ℝ)
+    (hu : ∀ (c : K → ℂ) z, (∀ k, c k ≠ 0) → u (fun p => c p.1 * z p) = u z)
+    (z : (Σ k, ι k) → ℂ)
+    : logNorm (HermLine.ofWeight u hu) 1 z = u z := by
   simp [logNorm, HermLine.ofWeight, Real.exp_neg, Real.log_exp]
 
 theorem isMultiHomog_one : IsMultiHomog (1 : MRing ι) (fun _ => 0) := by
@@ -41,7 +43,7 @@ theorem metricChange : MetricChangeStatement := by
     exact hsm.neg.exp
   have h1 : (1 : MRing ι) ∉ P := fun h => hP.2.1.1.ne_top ((Ideal.eq_top_iff_one P).2 h)
   have hlog : logNorm (HermLine.ofWeight u hu) 1 = u := funext (logNorm_ofWeight_one u hu)
-  have hrec : recR I P L (HermLine.ofWeight u hu) 1 = -ptsIntegral P (pot L) u := by
+  have hrec : recR I P L (HermLine.ofWeight u hu) 1 = - ptsIntegral P (pot L) u := by
     unfold recR
     rw [divSupp_one]
     simp only [finsum_mem_empty, zero_sub, arInt, hlog]

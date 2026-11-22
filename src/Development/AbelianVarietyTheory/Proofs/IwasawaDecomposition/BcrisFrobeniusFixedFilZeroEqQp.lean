@@ -21,22 +21,24 @@ namespace GlobalTheory.MemLoc
 open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
 open scoped Formalism.Per
 
-theorem fund_phiB_alg (l : ℕ) [Fact l.Prime] (x : Per.Acris l) :
-    Per.φB l (algebraMap (Per.Acris l) (Per.Bcris l) x) =
-      algebraMap (Per.Acris l) (Per.Bcris l) (phiA l x) :=
+theorem fund_phiB_alg (l : ℕ) [Fact l.Prime] (x : Per.Acris l)
+    : Per.φB l (algebraMap (Per.Acris l) (Per.Bcris l) x)
+      = algebraMap (Per.Acris l) (Per.Bcris l) (phiA l x) :=
   GlobalTheory.CrisMaps.φB_phiA l x
 
-theorem fund_zB (l : ℕ) [Fact l.Prime] (z : ℤ_[l]) :
-    Per.zB l z = algebraMap (Per.Acris l) (Per.Bcris l)
-      (algebraMap (Per.Ainf l) (Per.Acris l) (Per.zA l z)) :=
+theorem fund_zB (l : ℕ) [Fact l.Prime] (z : ℤ_[l])
+    : Per.zB l z
+      = algebraMap (Per.Acris l) (Per.Bcris l)
+        (algebraMap (Per.Ainf l) (Per.Acris l) (Per.zA l z)) :=
   (GlobalTheory.RingIface.zB_eq_aB_zA l z).trans (GlobalTheory.RingIface.aB_eq_alg l _)
 
 set_option allowUnsafeReducibility true in
 attribute [local irreducible] Per.Acris Per.Bcris
 
-theorem fundamental_exact (l : ℕ) [Fact l.Prime] (C : Core l) (b : Per.Bcris l)
-    (hφ : Per.φB l b = b) (hF : C.ι b ∈ Per.FilD l 0) :
-    ∃ c : ℚ_[l], C.u (algebraMap ℚ_[l] ↥(MaximalUnramifiedExtension l) c) = b := by
+theorem fundamental_exact
+    (l : ℕ) [Fact l.Prime]
+    (C : Core l) (b : Per.Bcris l) (hφ : Per.φB l b = b) (hF : C.ι b ∈ Per.FilD l 0)
+    : ∃ c : ℚ_[l], C.u (algebraMap ℚ_[l] ↥(MaximalUnramifiedExtension l) c) = b := by
   obtain ⟨r, x, hx⟩ := GlobalTheory.T.bcris_eq_acris_localization_periodT l C b
   obtain ⟨-, hinj, -, -⟩ := GlobalTheory.T.bdRPlus_isDomain_bdR_isField l
   obtain ⟨-, h1, hmul, -, -, -, hP⟩ := GlobalTheory.T.bdR_filtration_laws l
@@ -51,11 +53,10 @@ theorem fundamental_exact (l : ℕ) [Fact l.Prime] (C : Core l) (b : Per.Bcris l
     rw [← C.ι_j, ← C.ι_j, h]
   have e1 : phiA l x = (l : Per.Acris l) ^ r * x := by
     apply hA
-    rw [← fund_phiB_alg, map_mul, map_pow, map_natCast, ← hx, map_mul, map_pow, hφ,
-      fund_phiB_alg, htφ, map_mul, map_natCast, mul_pow]
+    rw [← fund_phiB_alg, map_mul, map_pow, map_natCast, ← hx, map_mul, map_pow, hφ, fund_phiB_alg,
+      htφ, map_mul, map_natCast, mul_pow]
     ring
-  have ht1' : algebraMap (Per.BdRp l) (Per.BdR l) (C.j C.t) ∈ Per.FilD l 1 :=
-    (hP 1 _).2 ht1
+  have ht1' : algebraMap (Per.BdRp l) (Per.BdR l) (C.j C.t) ∈ Per.FilD l 1 := (hP 1 _).2 ht1
   have htr : ∀ n : ℕ, algebraMap (Per.BdRp l) (Per.BdR l) (C.j C.t) ^ n ∈ Per.FilD l (n : ℤ) := by
     intro n
     induction n with
@@ -77,8 +78,7 @@ theorem fundamental_exact (l : ℕ) [Fact l.Prime] (C : Core l) (b : Per.Bcris l
   apply (hlu.pow k).mul_left_cancel
   rw [e3, ← huz]
   have hl : (l : ℚ_[l]) ^ k ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero)
-  have e4 : (z : ℚ_[l]) = (l : ℚ_[l]) ^ k * ((z : ℚ_[l]) / (l : ℚ_[l]) ^ k) := by
-    field_simp
+  have e4 : (z : ℚ_[l]) = (l : ℚ_[l]) ^ k * ((z : ℚ_[l]) / (l : ℚ_[l]) ^ k) := by field_simp
   conv_rhs => rw [e4]
   rw [map_mul, map_mul, map_pow, map_pow, map_natCast, map_natCast]
 

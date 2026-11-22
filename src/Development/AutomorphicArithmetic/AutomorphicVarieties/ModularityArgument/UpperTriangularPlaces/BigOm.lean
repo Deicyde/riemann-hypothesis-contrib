@@ -7,10 +7,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-theorem UpperTheory.V.Keep.bigOm :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), Ctx2 D → ∀ (κ : G ℚ Ω →* c.Oˣ) (j : ℕ), κ ^ l ^ j = 1 → ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∃ g ∈ Dec (F := ℚ) A, D.om g = 1 ∧ Raw.bar D.Psi g = 1 ∧ κ g = 1 ∧ Raw.bar D.ξ g ^ 4 ≠ 1 := by
+theorem UpperTheory.V.Keep.bigOm
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      Ctx2 D
+        → ∀ (κ : G ℚ Ω →* c.Oˣ) (j : ℕ),
+          κ ^ l ^ j = 1
+            → ∀ A : ValuationSubring Ω,
+              A.valuation (l : Ω) < 1
+                → ∃ g ∈ Dec (F := ℚ) A,
+                  D.om g = 1 ∧ Raw.bar D.Psi g = 1 ∧ κ g = 1 ∧ Raw.bar D.ξ g ^ 4 ≠ 1 := by
   intro Ω _ _ _ l _ c D hC κ j hj A hA
   obtain ⟨hD, h, t, e, ψ, hB, he0, het, hX, hII, hO⟩ := hC
   obtain ⟨_, ξ', ξ₀, hprim, _, hξ₀, hξ⟩ := hO.xi
@@ -27,26 +37,25 @@ theorem UpperTheory.V.Keep.bigOm :
     exact Nat.not_dvd_of_pos_of_lt (by omega) (by omega)
   have homσ : D.om (D.sg l) = 1 := by
     apply large₂.redOne c (l - 1) hcop
-    · have e1 : (D.om (D.sg l)) ^ (l - 1) = (D.om ^ (l - 1)) (D.sg l) := by
-        rw [MonoidHom.pow_apply]
+    · have e1 : (D.om (D.sg l)) ^ (l - 1) = (D.om ^ (l - 1)) (D.sg l) := by rw [MonoidHom.pow_apply]
       rw [e1, hD.om_pow, MonoidHom.one_apply]
     · have h1 := hD.om_bar (D.sg l)
       simp only [Raw.bar] at h1
       rw [h1]
       simp [chiO, hD.sg_cyc]
   obtain ⟨hIsChar, _⟩ := (Host.mem_X h).mp hX
-  have hψexp : ∃ a u : ℕ, Odd u ∧ ψ ^ (2 ^ a * u) = 1 ∧
-      l ^ 2 * 2 ^ (a + 2) ≤ 2 ^ h.nII l ψ := by
+  have hψexp : ∃ a u : ℕ, Odd u ∧ ψ ^ (2 ^ a * u) = 1 ∧ l ^ 2 * 2 ^ (a + 2) ≤ 2 ^ h.nII l ψ := by
     have hq : 0 < h.q := NeZero.pos _
     have ho : 0 < h.o := orderOf_pos _
     obtain ⟨tψ, ⟨s, hs⟩, -⟩ := X.th1Facts c.O h.N ψ l hlp hl2
     obtain ⟨-, -, t3, -⟩ := hostTh1 h c.O ψ hIsChar l hlp hl2
     obtain ⟨-, b2⟩ := max_le_iff.1 (Nat.le_pow_clog one_lt_two _ : _ ≤ 2 ^ h.nII l ψ)
     refine ⟨c2 ψ + 1 + h.o.factorization 2, ordCompl[2] h.o * l ^ s, ?_, ?_, ?_⟩
-    · exact (Nat.odd_iff.2 (Nat.two_dvd_ne_zero.1
-        (Nat.not_dvd_ordCompl Nat.prime_two ho.ne'))).mul (hlp.odd_of_ne_two hl2).pow
-    · have e1 : 2 ^ (c2 ψ + 1 + h.o.factorization 2) * (ordCompl[2] h.o * l ^ s) =
-          2 ^ c2 ψ * (2 * h.o) * l ^ s := by
+    · exact (Nat.odd_iff.2 (Nat.two_dvd_ne_zero.1 (Nat.not_dvd_ordCompl Nat.prime_two ho.ne'))).mul
+        (hlp.odd_of_ne_two hl2).pow
+    · have e1
+          : 2 ^ (c2 ψ + 1 + h.o.factorization 2) * (ordCompl[2] h.o * l ^ s)
+            = 2 ^ c2 ψ * (2 * h.o) * l ^ s := by
         conv_rhs => rw [← Nat.ordProj_mul_ordCompl_eq_self h.o 2]
         ring
       have p1 : psi2 ψ ^ 2 ^ c2 ψ = 1 := by
@@ -76,28 +85,23 @@ theorem UpperTheory.V.Keep.bigOm :
     · have v2 : 2 ^ h.o.factorization 2 ≤ h.o := Nat.ordProj_le 2 ho.ne'
       refine le_trans ?_ b2
       calc
-        l ^ 2 * 2 ^ (c2 ψ + 1 + h.o.factorization 2 + 2) =
-            2 ^ (c2 ψ + 3) * 2 ^ h.o.factorization 2 * l ^ 2 * 1 := by ring
+        l ^ 2 * 2 ^ (c2 ψ + 1 + h.o.factorization 2 + 2)
+          = 2 ^ (c2 ψ + 3) * 2 ^ h.o.factorization 2 * l ^ 2 * 1 := by ring
         _ ≤ 2 ^ (c2 ψ + 6) * h.o * l ^ 3 * h.q ^ 2 := by
-          have hp : 2 ^ (c2 ψ + 3) ≤ 2 ^ (c2 ψ + 6) :=
-            Nat.pow_le_pow_right (by decide) (by omega)
+          have hp : 2 ^ (c2 ψ + 3) ≤ 2 ^ (c2 ψ + 6) := Nat.pow_le_pow_right (by decide) (by omega)
           have hlpow : l ^ 2 ≤ l ^ 3 := Nat.pow_le_pow_right hlp.pos (by decide)
-          exact Nat.mul_le_mul (Nat.mul_le_mul (Nat.mul_le_mul hp v2) hlpow)
-            (Nat.one_le_pow _ _ hq)
+          exact Nat.mul_le_mul (Nat.mul_le_mul (Nat.mul_le_mul hp v2) hlpow) (Nat.one_le_pow _ _ hq)
   obtain ⟨a, u, hu, hψu, hbound⟩ := hψexp
   set M := l ^ j * (2 ^ a * u) with hM
   set g := D.sg l ^ M with hg
   have hgD : g ∈ Dec (F := ℚ) (D.pl l) := Subgroup.pow_mem _ hσD M
-  have hom : D.om g = 1 := by
-    rw [hg, map_pow, homσ, one_pow]
+  have hom : D.om g = 1 := by rw [hg, map_pow, homσ, one_pow]
   have hκ : κ g = 1 := by
     rw [hg, map_pow, hM, pow_mul, ← MonoidHom.pow_apply, hj, MonoidHom.one_apply, one_pow]
-  have dirG_one {N : ℕ} [NeZero N] :
-      Chr.dirG ℚ Ω (1 : DirichletCharacter c.O N) (D.sg l) = 1 :=
+  have dirG_one {N : ℕ} [NeZero N] : Chr.dirG ℚ Ω (1 : DirichletCharacter c.O N) (D.sg l) = 1 :=
     Units.ext (MulChar.one_apply_coe _)
   have hψ : D.ψ g = 1 := by
-    have dirG_pow (k : ℕ) :
-        Chr.dirG ℚ Ω (ψ ^ k) (D.sg l) = Chr.dirG ℚ Ω ψ (D.sg l) ^ k :=
+    have dirG_pow (k : ℕ) : Chr.dirG ℚ Ω (ψ ^ k) (D.sg l) = Chr.dirG ℚ Ω ψ (D.sg l) ^ k :=
       Units.ext (MulChar.pow_apply_coe ψ k _)
     rw [hg, hO.psi, map_pow, hM, mul_comm, pow_mul, ← dirG_pow, hψu, dirG_one, one_pow]
   have hξ₀1 : ξ₀ = 1 := orderOf_eq_one_iff.mp hξ₀
@@ -106,10 +110,11 @@ theorem UpperTheory.V.Keep.bigOm :
     exact hl2 ((Nat.prime_dvd_prime_iff_eq hlp Nat.prime_two).mp (hlp.dvd_of_dvd_pow hd))
   have hfr : (Chr.dirG ℚ Ω ξ' (D.sg l) : c.O) = ξ' (l : ZMod (2 ^ h.nII l ψ)) := by
     have hc := (Nat.Prime.coprime_iff_not_dvd hlp).2 hndvd
-    have h1 := (ML.placeBasic Ω).2.2.2.2.2.2.1 (D.pl l) l (2 ^ h.nII l ψ) (D.sg l) hfrob
-      ((ML.placeBasic Ω).2.2.2.1 (D.pl l) l (2 ^ h.nII l ψ) hc (hD.pl_over l hlp))
-    have h2 := (Chr.clsFacts ℚ Ω (2 ^ h.nII l ψ)).2.2.1 (D.sg l) (ZMod.unitOfCoprime l hc)
-      fun ζ hζ => by
+    have h1 :=
+      (ML.placeBasic Ω).2.2.2.2.2.2.1 (D.pl l) l (2 ^ h.nII l ψ) (D.sg l) hfrob
+        ((ML.placeBasic Ω).2.2.2.1 (D.pl l) l (2 ^ h.nII l ψ) hc (hD.pl_over l hlp))
+    have h2 :=
+      (Chr.clsFacts ℚ Ω (2 ^ h.nII l ψ)).2.2.1 (D.sg l) (ZMod.unitOfCoprime l hc) fun ζ hζ => by
         rw [h1 ζ hζ, ZMod.coe_unitOfCoprime, ZMod.val_natCast, ← pow_eq_pow_mod l hζ]
     rw [Chr.dirG, MonoidHom.comp_apply, h2, MulChar.coe_toUnitHom, ZMod.coe_unitOfCoprime]
   have hξ4 : D.ξ g ^ 4 ≠ 1 := by
@@ -126,8 +131,9 @@ theorem UpperTheory.V.Keep.bigOm :
       simp only [Units.val_pow_eq_pow_val, Units.val_one] at h5
       rw [hfr] at h5
       exact h5
-    have hlt := UpperTheory.two_pow_lt_sq_mul_of_primitive_char_pow_eq_one c.O (h.nII l ψ) ξ' hprim l (a + 2) (l ^ j * u)
-      (hlp.odd_of_ne_two hl2) (by omega) ((hlp.odd_of_ne_two hl2).pow.mul hu) hval
+    have hlt :=
+      UpperTheory.two_pow_lt_sq_mul_of_primitive_char_pow_eq_one c.O (h.nII l ψ) ξ' hprim l (a + 2)
+        (l ^ j * u) (hlp.odd_of_ne_two hl2) (by omega) ((hlp.odd_of_ne_two hl2).pow.mul hu) hval
     omega
   have hbarξ : Raw.bar D.ξ g ^ 4 ≠ 1 := by
     intro h4
@@ -150,18 +156,22 @@ theorem UpperTheory.V.Keep.bigOm :
   · simp only [Raw.bar, conj]
     exact hbarξ
 
-theorem UpperTheory.V.Keep.loc2 {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c)
-    (hC : Ctx2 D) (X : Set2 D) (T : Tower D) (hOn : X.On T) :
-    ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → (∃ g ∈ Ine (F := T.F) A, Raw.bar D.om (resQ T.F g) ≠ 1) ∨
-      ∃ g ∈ Dec (F := T.F) A, Raw.bar D.om (resQ T.F g) = 1 ∧ T.rb wPs g = 1 ∧ T.rb wAl g ≠ 1 := by
+theorem UpperTheory.V.Keep.loc2
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {l : ℕ} [Fact l.Prime]
+    {c : Coef l} (D : Raw Ω c) (hC : Ctx2 D) (X : Set2 D) (T : Tower D) (hOn : X.On T)
+    : ∀ A : ValuationSubring Ω,
+      A.valuation (l : Ω) < 1
+        → (∃ g ∈ Ine (F := T.F) A, Raw.bar D.om (resQ T.F g) ≠ 1)
+          ∨ ∃ g ∈ Dec (F := T.F) A,
+            Raw.bar D.om (resQ T.F g) = 1 ∧ T.rb wPs g = 1 ∧ T.rb wAl g ≠ 1 := by
   intro A hA
   right
   have hD : D.Good := hC.1
   haveI := T.nF
   obtain ⟨j, hj⟩ := X.kap.pow
   obtain ⟨g, hgA, hom, hPs, hκ, hξ⟩ := UpperTheory.V.Keep.bigOm D hC X.κ j hj A hA
-  have hsq : ∀ u : ℤˣ, u ^ 2 = 1 := fun u => by
-    rcases Int.units_eq_one_or u with h | h <;> simp [h]
+  have hsq : ∀ u : ℤˣ, u ^ 2 = 1 := fun u => by rcases Int.units_eq_one_or u with h | h <;> simp [h]
   have hH : g ^ 2 ∈ T.F.fixingSubgroup := by
     rw [hOn.1, Set2.mem_H]
     refine ⟨?_, ?_, ?_⟩
@@ -194,14 +204,24 @@ theorem UpperTheory.V.Keep.loc2 {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosu
     have e : Raw.bar D.ξ (g ^ 2) = Raw.bar D.ξ g ^ 2 := by
       simp only [Raw.bar, map_pow, Units.val_pow_eq_pow_val]
     rw [e] at h
-    calc Raw.bar D.ξ g ^ 4 = (Raw.bar D.ξ g ^ 2) ^ 2 := by ring
+    calc
+      Raw.bar D.ξ g ^ 4
+        = (Raw.bar D.ξ g ^ 2) ^ 2 := by ring
       _ = 1 := by rw [h, one_pow]
 
-theorem UpperTheory.V.Keep.loc3 {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [hl : Fact l.Prime] {c : Coef l} (D : Raw Ω c)
-    (hD : D.Good) (h5 : 5 ≤ l) (T : Tower D)
-    (hsq : ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∀ g ∈ Ine (F := ℚ) A, g ^ 2 ∈ T.F.fixingSubgroup) :
-    ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → (∃ g ∈ Ine (F := T.F) A, Raw.bar D.om (resQ T.F g) ≠ 1) ∨
-      ∃ g ∈ Dec (F := T.F) A, Raw.bar D.om (resQ T.F g) = 1 ∧ T.rb wPs g = 1 ∧ T.rb wAl g ≠ 1 := by
+theorem UpperTheory.V.Keep.loc3
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {l : ℕ} [hl : Fact l.Prime]
+    {c : Coef l} (D : Raw Ω c) (hD : D.Good)
+    (h5 : 5 ≤ l)
+    (T : Tower D)
+    (hsq : ∀ A : ValuationSubring Ω,
+      A.valuation (l : Ω) < 1 → ∀ g ∈ Ine (F := ℚ) A, g ^ 2 ∈ T.F.fixingSubgroup)
+    : ∀ A : ValuationSubring Ω,
+      A.valuation (l : Ω) < 1
+        → (∃ g ∈ Ine (F := T.F) A, Raw.bar D.om (resQ T.F g) ≠ 1)
+          ∨ ∃ g ∈ Dec (F := T.F) A,
+            Raw.bar D.om (resQ T.F g) = 1 ∧ T.rb wPs g = 1 ∧ T.rb wAl g ≠ 1 := by
   intro A hA
   left
   haveI := T.nF
@@ -222,8 +242,7 @@ theorem UpperTheory.V.Keep.loc3 {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosu
     rw [hs] at h1
     have h2 : D.om (g ^ 2) = 1 := by
       apply large₂.redOne c (l - 1) hcop
-      · have e : (D.om (g ^ 2)) ^ (l - 1) = (D.om ^ (l - 1)) (g ^ 2) := by
-          rw [MonoidHom.pow_apply]
+      · have e : (D.om (g ^ 2)) ^ (l - 1) = (D.om ^ (l - 1)) (g ^ 2) := by rw [MonoidHom.pow_apply]
         rw [e, hD.om_pow, MonoidHom.one_apply]
       · exact h1
     rw [MonoidHom.mem_ker, MonoidHom.pow_apply, ← map_pow]

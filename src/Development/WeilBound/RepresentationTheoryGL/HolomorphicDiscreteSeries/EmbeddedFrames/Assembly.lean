@@ -38,8 +38,9 @@ theorem hs_emb_sub (a : Matrix (Fin n) (Fin n) ℂ) : hs (emb e a - 1) = hs (a -
   simp only [Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_apply_apply]
   simp [← e.sum_comp, Fintype.sum_sum_type]
 
-theorem emb_mulVec_alt (a : Matrix (Fin n) (Fin n) ℂ) :
-    emb e a *ᵥ (Pi.single (e (Sum.inr ())) (1 : ℂ) : Fin (n + 1) → ℂ) = Pi.single (e (Sum.inr ())) 1 := by
+theorem emb_mulVec_alt (a : Matrix (Fin n) (Fin n) ℂ)
+    : emb e a *ᵥ (Pi.single (e (Sum.inr ())) (1 : ℂ) : Fin (n + 1) → ℂ)
+      = Pi.single (e (Sum.inr ())) 1 := by
   ext i
   rw [Matrix.mulVec_single_one]
   obtain ⟨i, rfl⟩ := e.surjective i
@@ -70,7 +71,8 @@ theorem frame : PositivityTheory.RgHe.Frame := by
         exact hj ((hs2 j).2 h')
       rw [he.neg_one_pow, one_mul] at h
       linarith
-  obtain ⟨g, X, hgU, hXg, hblk, hβ⟩ := GlobalTheory.T.exists_unitary_interlacing_realization n ε d ε' d' e hF.1 hF.2 hinj hD hR
+  obtain ⟨g, X, hgU, hXg, hblk, hβ⟩ :=
+    GlobalTheory.T.exists_unitary_interlacing_realization n ε d ε' d' e hF.1 hF.2 hinj hD hR
   set J := Jm ε with hJ
   have hJJ : J * J = 1 := Jm_mul_self ε
   have h2 : (J * gᴴ * J) * g = 1 := by
@@ -81,8 +83,7 @@ theorem frame : PositivityTheory.RgHe.Frame := by
   have h1 : g * (J * gᴴ * J) = 1 := by rw [← hinv]; exact Matrix.mul_nonsing_inv g hdet
   let gu : UJ ε := ⟨⟨g, J * gᴴ * J, h1, h2⟩, hgU⟩
   have hgu : um gu = g := rfl
-  have hgu' : um gu⁻¹ = g⁻¹ := by
-    rw [hinv]; rfl
+  have hgu' : um gu⁻¹ = g⁻¹ := by rw [hinv]; rfl
   refine ⟨gu, fun Y => ?_, ?_⟩
   · rw [hgu, hgu']
     exact GlobalTheory.T.trace_diagonal_block_conjugate_formula n e d d' g X hdet hXg hblk Y
@@ -95,9 +96,15 @@ theorem frame : PositivityTheory.RgHe.Frame := by
     have hcyc : ∀ A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ, A * X = X * A → A *ᵥ v = 0 → A = 0 := by
       intro A hA hAv
       rw [hX] at hA
-      exact GlobalTheory.T.commutant_annihilating_vector_zero g _ v hdet hdi (fun i => by rw [hinv]; exact hβ i) A hA hAv
+      exact GlobalTheory.T.commutant_annihilating_vector_zero g _ v hdet hdi
+        (fun i => by rw [hinv]; exact hβ i)
+        A hA hAv
     obtain ⟨c, hc, hAc⟩ := GlobalTheory.T.commutator_coercive_on_annihilator X v hcyc
-    refine ⟨c * hs g * hs g⁻¹ + 1, by have := hs_nonneg' g; have := hs_nonneg' g⁻¹; positivity, fun h => ?_⟩
+    refine ⟨
+      c * hs g * hs g⁻¹ + 1,
+      by have := hs_nonneg' g; have := hs_nonneg' g⁻¹; positivity,
+      fun h => ?_
+    ⟩
     set B := emb e (um h) with hB
     set B' := emb e (um h⁻¹) with hB'
     have hBB : B * B' = 1 := by
@@ -115,8 +122,10 @@ theorem frame : PositivityTheory.RgHe.Frame := by
       have e1 : g⁻¹ * g = 1 := Matrix.nonsing_inv_mul _ hdet
       have e2 : g * g⁻¹ = 1 := Matrix.mul_nonsing_inv _ hdet
       simp only [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, Matrix.one_mul, Matrix.mul_assoc]
-      have e3 : B * (g * (g⁻¹ * (B' * (g * (D * (g⁻¹ * (B * (g * g⁻¹)))))))) = g * (D * (g⁻¹ * B)) := by
-        rw [e2, Matrix.mul_one, ← Matrix.mul_assoc g g⁻¹, e2, Matrix.one_mul, ← Matrix.mul_assoc B B', hBB, Matrix.one_mul]
+      have e3
+          : B * (g * (g⁻¹ * (B' * (g * (D * (g⁻¹ * (B * (g * g⁻¹)))))))) = g * (D * (g⁻¹ * B)) := by
+        rw [e2, Matrix.mul_one, ← Matrix.mul_assoc g g⁻¹, e2, Matrix.one_mul,
+          ← Matrix.mul_assoc B B', hBB, Matrix.one_mul]
       rw [e3]
       abel
     have hAv : (B - 1) *ᵥ v = 0 := by
@@ -124,12 +133,20 @@ theorem frame : PositivityTheory.RgHe.Frame := by
     have i1 := hAc (B - 1) hAv
     rw [key] at i1
     have i2 : hs (B * (g * δ * g⁻¹)) ≤ hs B * (hs g * hs δ * hs g⁻¹) := by
-      refine (GlobalTheory.T.hilbert_schmidt_norm_submultiplicative _ _).trans (mul_le_mul_of_nonneg_left ?_ (hs_nonneg' _))
-      refine (GlobalTheory.T.hilbert_schmidt_norm_submultiplicative _ _).trans (mul_le_mul_of_nonneg_right (GlobalTheory.T.hilbert_schmidt_norm_submultiplicative _ _) (hs_nonneg' _))
+      refine (GlobalTheory.T.hilbert_schmidt_norm_submultiplicative _ _).trans
+        (mul_le_mul_of_nonneg_left ?_ (hs_nonneg' _))
+      refine (GlobalTheory.T.hilbert_schmidt_norm_submultiplicative _ _).trans
+        (mul_le_mul_of_nonneg_right (GlobalTheory.T.hilbert_schmidt_norm_submultiplicative _ _)
+          (hs_nonneg' _))
     have i3 : hs (um h - 1) = hs (B - 1) := (hs_emb_sub (e := e) (um h)).symm
     rw [i3]
-    have := hs_nonneg' B; have := hs_nonneg' δ; have := hs_nonneg' g; have := hs_nonneg' g⁻¹
-    calc hs (B - 1) ≤ c * (hs B * (hs g * hs δ * hs g⁻¹)) := i1.trans (mul_le_mul_of_nonneg_left i2 hc.le)
+    have := hs_nonneg' B
+    have := hs_nonneg' δ
+    have := hs_nonneg' g
+    have := hs_nonneg' g⁻¹
+    calc
+      hs (B - 1)
+        ≤ c * (hs B * (hs g * hs δ * hs g⁻¹)) := i1.trans (mul_le_mul_of_nonneg_left i2 hc.le)
       _ = (c * hs g * hs g⁻¹) * hs B * hs δ := by ring
       _ ≤ (c * hs g * hs g⁻¹ + 1) * hs B * hs δ := by gcongr; linarith
 

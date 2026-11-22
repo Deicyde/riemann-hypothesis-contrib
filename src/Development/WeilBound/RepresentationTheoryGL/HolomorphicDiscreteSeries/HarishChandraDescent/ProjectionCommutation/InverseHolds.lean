@@ -14,9 +14,10 @@ namespace InverseCommuting
 
 variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
 
-theorem commute_proj (K : Submodule ℂ H) [K.HasOrthogonalProjection] (A : H →L[ℂ] H)
-    (hA : ∀ x ∈ K, A x ∈ K) (hA' : ∀ x ∈ K, ContinuousLinearMap.adjoint A x ∈ K) :
-    Commute K.starProjection A := by
+theorem commute_proj
+    (K : Submodule ℂ H) [K.HasOrthogonalProjection]
+    (A : H →L[ℂ] H) (hA : ∀ x ∈ K, A x ∈ K) (hA' : ∀ x ∈ K, ContinuousLinearMap.adjoint A x ∈ K)
+    : Commute K.starProjection A := by
   have hPmem : ∀ v : H, K.starProjection v ∈ K := by
     intro v
     rw [Submodule.starProjection_apply]
@@ -38,10 +39,12 @@ theorem commute_proj (K : Submodule ℂ H) [K.HasOrthogonalProjection] (A : H �
     Submodule.starProjection_eq_self_iff.2 (hA _ (hPmem x))
   have e2 := hzero _ hAw
   have hx : x = K.starProjection x + (x - K.starProjection x) := by abel
-  calc K.starProjection (A x)
-      = K.starProjection (A (K.starProjection x)) + K.starProjection (A (x - K.starProjection x)) := by
-        conv_lhs => rw [hx]
-        rw [map_add (f := _), map_add (f := _)]
+  calc
+    K.starProjection (A x)
+        = K.starProjection (A (K.starProjection x))
+          + K.starProjection (A (x - K.starProjection x)) := by
+      conv_lhs => rw [hx]
+      rw [map_add (f := _), map_add (f := _)]
     _ = A (K.starProjection x) := by rw [e1, e2, add_zero]
 
 end InverseCommuting
@@ -62,14 +65,17 @@ theorem inverse_holds : Inv := by
     exact sub_eq_zero.1 (norm_le_zero_iff.1 h1)
   let R : Submodule ℂ H := LinearMap.range f
   let eqv : ↥D ≃ₗ[ℂ] ↥R := LinearEquiv.ofInjective f hf_inj
-  have heqv : ∀ z : ↥D, ((eqv z : ↥R) : H) = ((B z : ↥D) : H) := fun z => LinearEquiv.ofInjective_apply f z
+  have heqv : ∀ z : ↥D, ((eqv z : ↥R) : H) = ((B z : ↥D) : H) := fun z =>
+    LinearEquiv.ofInjective_apply f z
   let g₀ : ↥R →ₗ[ℂ] H := D.subtype ∘ₗ eqv.symm.toLinearMap
   have hg₀ : ∀ r : ↥R, ‖g₀ r‖ ≤ 1 * ‖r‖ := by
     intro r
     have h2 := heqv (eqv.symm r)
     rw [eqv.apply_symm_apply] at h2
     rw [one_mul]
-    calc ‖g₀ r‖ = ‖eqv.symm r‖ := rfl
+    calc
+      ‖g₀ r‖
+        = ‖eqv.symm r‖ := rfl
       _ ≤ ‖B (eqv.symm r)‖ := hnorm _
       _ = ‖(r : H)‖ := by
         show ‖((B (eqv.symm r) : ↥D) : H)‖ = ‖(r : H)‖
@@ -111,9 +117,10 @@ theorem inverse_holds : Inv := by
     have hBx : K.starProjection ((B x : ↥D) : H) = ((B x : ↥D) : H) :=
       Submodule.starProjection_eq_self_iff.2 (R.le_topologicalClosure ⟨x, rfl⟩)
     have hByx : B y = B x := Subtype.ext (hy2.trans hBx)
-    have hyx : y = x := hf_inj (by
-      show ((B y : ↥D) : H) = ((B x : ↥D) : H)
-      rw [hByx])
+    have hyx : y = x :=
+      hf_inj (by
+        show ((B y : ↥D) : H) = ((B x : ↥D) : H)
+        rw [hByx])
     apply Submodule.starProjection_eq_self_iff.1
     rw [← hy1, hyx]
   have hKtop : K = ⊤ := by
@@ -138,27 +145,33 @@ theorem inverse_holds : Inv := by
     have h3 := hT ⟨((B x : ↥D) : H), LinearMap.mem_range_self f x⟩
     rw [hgB] at h3
     exact h3
-  have base : ∀ x y : ↥D, ⟪T ((B x : ↥D) : H), ((B y : ↥D) : H)⟫_ℂ = ⟪((B x : ↥D) : H), T ((B y : ↥D) : H)⟫_ℂ := by
+  have base
+      : ∀ x y : ↥D,
+        ⟪T ((B x : ↥D) : H), ((B y : ↥D) : H)⟫_ℂ = ⟪((B x : ↥D) : H), T ((B y : ↥D) : H)⟫_ℂ := by
     intro x y
     rw [hTB, hTB]
     exact (hB x y).symm
   have step1 : ∀ (u : H) (y : ↥D), ⟪T u, ((B y : ↥D) : H)⟫_ℂ = ⟪u, T ((B y : ↥D) : H)⟫_ℂ := by
     intro u y
-    have hfun := Continuous.ext_on hRd (T.continuous.inner continuous_const)
-      (continuous_id.inner continuous_const)
-      (f := fun u => ⟪T u, ((B y : ↥D) : H)⟫_ℂ) (g := fun u => ⟪u, T ((B y : ↥D) : H)⟫_ℂ)
-      (by
-        rintro _ ⟨x, rfl⟩
-        exact base x y)
+    have hfun :=
+      Continuous.ext_on hRd (T.continuous.inner continuous_const)
+        (continuous_id.inner continuous_const)
+        (f := fun u => ⟪T u, ((B y : ↥D) : H)⟫_ℂ)
+        (g := fun u => ⟪u, T ((B y : ↥D) : H)⟫_ℂ)
+        (by
+          rintro _ ⟨x, rfl⟩
+          exact base x y)
     exact congrFun hfun u
   have hsym : ∀ u v : H, ⟪T u, v⟫_ℂ = ⟪u, T v⟫_ℂ := by
     intro u v
-    have hfun := Continuous.ext_on hRd (continuous_const.inner continuous_id)
-      (continuous_const.inner T.continuous)
-      (f := fun v => ⟪T u, v⟫_ℂ) (g := fun v => ⟪u, T v⟫_ℂ)
-      (by
-        rintro _ ⟨y, rfl⟩
-        exact step1 u y)
+    have hfun :=
+      Continuous.ext_on hRd (continuous_const.inner continuous_id)
+        (continuous_const.inner T.continuous)
+        (f := fun v => ⟪T u, v⟫_ℂ)
+        (g := fun v => ⟪u, T v⟫_ℂ)
+        (by
+          rintro _ ⟨y, rfl⟩
+          exact step1 u y)
     exact congrFun hfun v
   refine ⟨T, ?_, ?_, hTB⟩
   · show star T = T

@@ -17,14 +17,15 @@ open NumberField IsDedekindDomain in
 open scoped WithZero in
 variable {F E : Type} [Field F] [Field E] [Algebra F E] {δ : F} {θ : E} {σ : E ≃ₐ[F] E} in
 theorem _root_.GlobalTheory.QNorm.IsQuad.coord_indep
-    (h : _root_.GlobalTheory.QNorm.IsQuad δ θ σ) (a b : F)
-    (hab : algebraMap F E a + algebraMap F E b * θ = 0) : a = 0 ∧ b = 0 := by
+    (h : _root_.GlobalTheory.QNorm.IsQuad δ θ σ)
+    (a b : F) (hab : algebraMap F E a + algebraMap F E b * θ = 0)
+    : a = 0 ∧ b = 0 := by
   have hb : b = 0 := by
     by_contra hb
     apply h.nonsq
     refine ⟨-a / b, (algebraMap F E).injective ?_⟩
     have hb' : algebraMap F E b ≠ 0 := (map_ne_zero _).2 hb
-    have hθ : θ = -algebraMap F E a / algebraMap F E b := by
+    have hθ : θ = - algebraMap F E a / algebraMap F E b := by
       field_simp
       linear_combination hab
     rw [← h.sq, hθ]
@@ -37,8 +38,8 @@ theorem _root_.GlobalTheory.QNorm.IsQuad.coord_indep
 open NumberField IsDedekindDomain in
 open scoped WithZero in
 variable {F E : Type} [Field F] [Field E] [Algebra F E] {δ : F} {θ : E} {σ : E ≃ₐ[F] E} in
-theorem _root_.GlobalTheory.QNorm.IsQuad.root_ne_zero (h : _root_.GlobalTheory.QNorm.IsQuad δ θ σ) :
-    θ ≠ 0 := by
+theorem _root_.GlobalTheory.QNorm.IsQuad.root_ne_zero (h : _root_.GlobalTheory.QNorm.IsQuad δ θ σ)
+    : θ ≠ 0 := by
   intro hθ
   apply h.nonsq
   refine ⟨0, (algebraMap F E).injective ?_⟩
@@ -47,17 +48,17 @@ theorem _root_.GlobalTheory.QNorm.IsQuad.root_ne_zero (h : _root_.GlobalTheory.Q
 
 end
 
-
 open NumberField IsDedekindDomain in
 open scoped WithZero in
-theorem _root_.GlobalTheory.QNorm.isQuad_basic : ∀ (F E : Type) [Field F] [CharZero F] [Field E]
-    [Algebra F E] (δ : F) (θ : E) (σ : E ≃ₐ[F] E), _root_.GlobalTheory.QNorm.IsQuad δ θ σ →
-    (∀ x, σ (σ x) = x) ∧ (∀ x, σ x = x → ∃ a : F, x = algebraMap F E a) ∧
-    (∀ a b : F, algebraMap F E a + algebraMap F E b * θ = 0 → a = 0 ∧ b = 0) ∧
-    (∀ x : E, ∃ a b : F, x * σ x = algebraMap F E (a ^ 2 - δ * b ^ 2)) ∧
-    (∀ x : E, x * σ x = 1 → ∃ y : E, y ≠ 0 ∧ x = y / σ y) ∧
-    (∀ u : F, IsSquare (algebraMap F E u) → IsSquare u ∨ IsSquare (u * δ)) ∧
-    Module.finrank F E = 2 := by
+theorem _root_.GlobalTheory.QNorm.isQuad_basic
+    : ∀ (F E : Type) [Field F] [CharZero F] [Field E] [Algebra F E] (δ : F) (θ : E) (σ : E ≃ₐ[F] E),
+      _root_.GlobalTheory.QNorm.IsQuad δ θ σ
+        → (∀ x, σ (σ x) = x) ∧ (∀ x, σ x = x → ∃ a : F, x = algebraMap F E a)
+          ∧ (∀ a b : F, algebraMap F E a + algebraMap F E b * θ = 0 → a = 0 ∧ b = 0)
+          ∧ (∀ x : E, ∃ a b : F, x * σ x = algebraMap F E (a ^ 2 - δ * b ^ 2))
+          ∧ (∀ x : E, x * σ x = 1 → ∃ y : E, y ≠ 0 ∧ x = y / σ y)
+          ∧ (∀ u : F, IsSquare (algebraMap F E u) → IsSquare u ∨ IsSquare (u * δ))
+          ∧ Module.finrank F E = 2 := by
   intro F E _ _ _ _ δ θ σ h
   have t1 := h.coord_indep
   have hθ := h.root_ne_zero
@@ -83,16 +84,16 @@ theorem _root_.GlobalTheory.QNorm.isQuad_basic : ∀ (F E : Type) [Field F] [Cha
     · refine ⟨θ, hθ, ?_⟩
       rw [hc, h1, div_neg, div_self hθ]
     · have hy : (1 + x) ≠ 0 := fun h0 => h1 (by linear_combination h0)
-      have hσy : σ (1 + x) ≠ 0 := by
-        rwa [ne_eq, map_eq_zero_iff _ σ.injective]
+      have hσy : σ (1 + x) ≠ 0 := by rwa [ne_eq, map_eq_zero_iff _ σ.injective]
       refine ⟨1 + x, hy, ?_⟩
       rw [eq_div_iff hσy, map_add (f := _), map_one]
       linear_combination hx
   · rintro u ⟨y, hy⟩
     obtain ⟨a, b, rfl⟩ := h.span y
-    have := t1 (u - a ^ 2 - b ^ 2 * δ) (-(2 * a * b)) (by
-      simp only [map_sub, map_mul, map_pow, map_neg, map_ofNat]
-      linear_combination hy + (algebraMap F E b) ^ 2 * hs)
+    have :=
+      t1 (u - a ^ 2 - b ^ 2 * δ) (-(2 * a * b)) (by
+        simp only [map_sub, map_mul, map_pow, map_neg, map_ofNat]
+        linear_combination hy + (algebraMap F E b) ^ 2 * hs)
     have h2 : a * b = 0 := by
       have h3 := this.2
       have h4 : (2 : F) * (a * b) = 0 := by linear_combination -h3

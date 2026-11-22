@@ -15,8 +15,8 @@ namespace GlobalTheory.InducedPBW
 
 attribute [local instance] LieRing.ofAssociativeRing LieAlgebra.ofAssociativeAlgebra
 
-theorem ug_mem_span_listProd (p q : ℕ) (u : Ug p q) :
-    u ∈ Submodule.span ℂ {u : Ug p q | ∃ l : List (Mat p q), u = (l.map (ugι p q)).prod} := by
+theorem ug_mem_span_listProd (p q : ℕ) (u : Ug p q)
+    : u ∈ Submodule.span ℂ {u : Ug p q | ∃ l : List (Mat p q), u = (l.map (ugι p q)).prod} := by
   have htop : Algebra.adjoin ℂ (Set.range (ugι p q)) = ⊤ := by
     rw [eq_top_iff]
     rintro x -
@@ -27,7 +27,8 @@ theorem ug_mem_span_listProd (p q : ℕ) (u : Ug p q) :
     | algebraMap r =>
       rw [AlgHom.commutes]
       exact Subalgebra.algebraMap_mem _ r
-    | ι y => exact Algebra.subset_adjoin ⟨y, rfl⟩
+    | ι y =>
+      exact Algebra.subset_adjoin ⟨y, rfl⟩
     | mul a b ha hb =>
       rw [map_mul]
       exact mul_mem ha hb
@@ -43,14 +44,16 @@ theorem ug_mem_span_listProd (p q : ℕ) (u : Ug p q) :
   | mem y hy =>
     obtain ⟨m, rfl⟩ := hy
     exact ⟨[m], by simp⟩
-  | one => exact ⟨[], by simp⟩
+  | one =>
+    exact ⟨[], by simp⟩
   | mul a b _ _ ha hb =>
     obtain ⟨la, rfl⟩ := ha
     obtain ⟨lb, rfl⟩ := hb
     exact ⟨la ++ lb, by simp [List.map_append, List.prod_append]⟩
 
-theorem iSup_indF_eq_top (p q : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
-    (act : Mat p q →ₗ[ℂ] Module.End ℂ V) : (⨆ k, indF act k) = ⊤ := by
+theorem iSup_indF_eq_top
+    (p q : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (act : Mat p q →ₗ[ℂ] Module.End ℂ V)
+    : (⨆ k, indF act k) = ⊤ := by
   rw [eq_top_iff]
   rintro z -
   obtain ⟨t, rfl⟩ := Submodule.mkQ_surjective (indRel act) z
@@ -66,7 +69,8 @@ theorem iSup_indF_eq_top (p q : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
       obtain ⟨l, rfl⟩ := hw
       refine Submodule.mem_iSup_of_mem l.length (Submodule.subset_span ⟨_, ?_, v, rfl⟩)
       exact Submodule.subset_span ⟨l, le_rfl, rfl⟩
-    | zero => simp
+    | zero =>
+      simp
     | add a b _ _ ha hb =>
       rw [TensorProduct.add_tmul, map_add (f := _)]
       exact add_mem ha hb

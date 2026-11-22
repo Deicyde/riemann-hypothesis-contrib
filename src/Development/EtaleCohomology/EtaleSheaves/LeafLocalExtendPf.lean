@@ -32,8 +32,8 @@ theorem LeafLocalExtend_of : LateralTheory.E.LeafExtendCut.LeafLocalExtend := by
   have hsq : CommSq ψ (Spec.map (C.presheaf.stalkSpecializes h)) p (C.fromSpecStalk y ≫ sC) :=
     ⟨by rw [Scheme.SpecMap_stalkSpecializes_fromSpecStalk_assoc, hψ]⟩
   let sq : ValuativeCommSq p :=
-    @ValuativeCommSq.mk _ _ p (C.presheaf.stalk y) _ hdom hv (C.presheaf.stalk x) fld alg hfr
-      ψ (C.fromSpecStalk y ≫ sC) hsq
+    @ValuativeCommSq.mk _ _ p (C.presheaf.stalk y) _ hdom hv (C.presheaf.stalk x) fld alg hfr ψ
+      (C.fromSpecStalk y ≫ sC) hsq
   obtain ⟨⟨l, hl1, hl2⟩⟩ := (existence_of_isProper p sq).exists_lift
   change Spec.map (C.presheaf.stalkSpecializes h) ≫ l = ψ at hl1
   change l ≫ p = C.fromSpecStalk y ≫ sC at hl2

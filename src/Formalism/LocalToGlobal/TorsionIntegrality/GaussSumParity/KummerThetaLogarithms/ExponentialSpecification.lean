@@ -12,9 +12,10 @@ open scoped BigOperators
 namespace Formalism.L2.Th1.D
 
 open Formalism.DworkPowerSeriesWeights (Integral mvExp torus)
-open Formalism.InvariantFactorPaths.G7 (lgF at1 Simeq DivAB d1 swap2 UnrOK IsLawOfLog BetaHyp frobVar)
-open Formalism.InvariantFactorPaths.G7.FormalGroupLaws (constantCoeff_lgF coeff_one_lgF lgF_subst_inj lgF_funEq map_lgF
-  rescale_lgF)
+open Formalism.InvariantFactorPaths.G7
+  (lgF at1 Simeq DivAB d1 swap2 UnrOK IsLawOfLog BetaHyp frobVar)
+open Formalism.InvariantFactorPaths.G7.FormalGroupLaws
+  (constantCoeff_lgF coeff_one_lgF lgF_subst_inj lgF_funEq map_lgF rescale_lgF)
 
 namespace FormalExponential
 
@@ -26,24 +27,27 @@ theorem isUnit_coeff_one (l : ℕ) (hl : 2 ≤ l) : IsUnit (PowerSeries.coeff 1 
   rw [coeff_one_lgF l hl]
   exact isUnit_one
 
-theorem expF_eq (l : ℕ) (hl : 2 ≤ l) :
-    expF K l = PowerSeries.substInvOfIsUnit (lgF K l) (isUnit_coeff_one l hl) := by
+theorem expF_eq (l : ℕ) (hl : 2 ≤ l)
+    : expF K l = PowerSeries.substInvOfIsUnit (lgF K l) (isUnit_coeff_one l hl) := by
   unfold expF
   rw [dite_eq_left (isUnit_coeff_one l hl)]
 
-theorem inj (l : ℕ) (hl : 2 ≤ l) (a b : PowerSeries K) (ha : PowerSeries.constantCoeff a = 0)
-    (hb : PowerSeries.constantCoeff b = 0)
-    (h : PowerSeries.subst a (lgF K l) = PowerSeries.subst b (lgF K l)) : a = b :=
+theorem inj
+    (l : ℕ) (hl : 2 ≤ l)
+    (a b : PowerSeries K)
+    (ha : PowerSeries.constantCoeff a = 0) (hb : PowerSeries.constantCoeff b = 0)
+    (h : PowerSeries.subst a (lgF K l) = PowerSeries.subst b (lgF K l))
+    : a = b :=
   lgF_subst_inj (ι := Unit) l hl a b ha hb h
 
-theorem isMul_root {ζ : K} {l : ℕ} (hl : 2 ≤ l) (hζ : ζ ^ (l ^ 2 - 1) = 1) :
-    IsMul l ζ (PowerSeries.C ζ * PowerSeries.X) := by
+theorem isMul_root {ζ : K} {l : ℕ} (hl : 2 ≤ l) (hζ : ζ ^ (l ^ 2 - 1) = 1)
+    : IsMul l ζ (PowerSeries.C ζ * PowerSeries.X) := by
   refine ⟨by simp, ?_⟩
   rw [← rescale_lgF hζ hl, PowerSeries.rescale_eq_subst, PowerSeries.smul_eq_C_mul]
 
-theorem at_variable_C_mul_X {ι : Type} (x : ι) (ζ : K) :
-    at1 x (PowerSeries.C ζ * PowerSeries.X) =
-      MvPowerSeries.C ζ * (MvPowerSeries.X x : MvPowerSeries ι K) := by
+theorem at_variable_C_mul_X {ι : Type} (x : ι) (ζ : K)
+    : at1 x (PowerSeries.C ζ * PowerSeries.X)
+      = MvPowerSeries.C ζ * (MvPowerSeries.X x : MvPowerSeries ι K) := by
   unfold at1
   rw [PowerSeries.subst_mul (PowerSeries.HasSubst.X x), PowerSeries.subst_C,
     PowerSeries.subst_X (PowerSeries.HasSubst.X x)]
@@ -58,8 +62,8 @@ theorem norm_eq_one_of_pow {a : K} {n : ℕ} (hn : n ≠ 0) (h : a ^ n = 1) : �
   have h1 : ‖a‖ ^ n = 1 := by rw [← norm_pow, h, norm_one]
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg a) hn).1 h1
 
-theorem norm_pow_sub_pow_le {a b : K} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) (i : ℕ) :
-    ‖a ^ i - b ^ i‖ ≤ ‖a - b‖ := by
+theorem norm_pow_sub_pow_le {a b : K} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) (i : ℕ)
+    : ‖a ^ i - b ^ i‖ ≤ ‖a - b‖ := by
   induction i with
   | zero => simp
   | succ i ih =>
@@ -67,16 +71,19 @@ theorem norm_pow_sub_pow_le {a b : K} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) 
     rw [e]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)
     · rw [norm_mul]
-      calc ‖a‖ * ‖a ^ i - b ^ i‖ ≤ 1 * ‖a - b‖ :=
-            mul_le_mul ha ih (norm_nonneg _) zero_le_one
+      calc
+        ‖a‖ * ‖a ^ i - b ^ i‖
+          ≤ 1 * ‖a - b‖ := mul_le_mul ha ih (norm_nonneg _) zero_le_one
         _ = ‖a - b‖ := one_mul _
     · rw [norm_mul, norm_pow]
-      calc ‖a - b‖ * ‖b‖ ^ i ≤ ‖a - b‖ * 1 :=
-            mul_le_mul_of_nonneg_left (pow_le_one₀ (norm_nonneg _) hb) (norm_nonneg _)
+      calc
+        ‖a - b‖ * ‖b‖ ^ i ≤ ‖a - b‖ * 1 :=
+          mul_le_mul_of_nonneg_left (pow_le_one₀ (norm_nonneg _) hb) (norm_nonneg _)
         _ = ‖a - b‖ := mul_one _
 
-theorem root_eq_of_norm_lt {a b : K} {N : ℕ} (hN : ‖(N : K)‖ = 1) (ha : a ^ N = 1)
-    (hb : b ^ N = 1) (hab : ‖a - b‖ < 1) : a = b := by
+theorem root_eq_of_norm_lt
+    {a b : K} {N : ℕ} (hN : ‖(N : K)‖ = 1) (ha : a ^ N = 1) (hb : b ^ N = 1) (hab : ‖a - b‖ < 1)
+    : a = b := by
   by_contra hne
   have hN0 : N ≠ 0 := by
     rintro rfl
@@ -95,12 +102,10 @@ theorem root_eq_of_norm_lt {a b : K} {N : ℕ} (hN : ‖(N : K)‖ = 1) (ha : a 
       rw [← pow_add]
       congr 1
       omega
-  have hD : (N : K) * b ^ (N - 1) =
-      - ∑ i ∈ Finset.range N, (a ^ i - b ^ i) * b ^ (N - 1 - i) := by
+  have hD : (N : K) * b ^ (N - 1) = - ∑ i ∈ Finset.range N, (a ^ i - b ^ i) * b ^ (N - 1 - i) := by
     simp only [sub_mul, Finset.sum_sub_distrib, hS, hT]
     ring
-  have h1 : ‖(N : K) * b ^ (N - 1)‖ = 1 := by
-    rw [norm_mul, norm_pow, hN, nb, one_pow, one_mul]
+  have h1 : ‖(N : K) * b ^ (N - 1)‖ = 1 := by rw [norm_mul, norm_pow, hN, nb, one_pow, one_mul]
   have h2 : ‖(N : K) * b ^ (N - 1)‖ ≤ ‖a - b‖ := by
     rw [hD, norm_neg]
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (norm_nonneg _) fun i _ => ?_
@@ -115,13 +120,15 @@ theorem integral_X : Integral (PowerSeries.X : MvPowerSeries Unit K) := by
   rw [MvPowerSeries.coeff_X]
   split_ifs <;> simp
 
-theorem ip_lgF (l : ℕ) (σ : K →+* K) (hl : 2 ≤ l) (hlK : (l : K) ≠ 0) :
-    IP l σ (lgF K l : MvPowerSeries Unit K) := by
+theorem ip_lgF (l : ℕ) (σ : K →+* K) (hl : 2 ≤ l) (hlK : (l : K) ≠ 0)
+    : IP l σ (lgF K l : MvPowerSeries Unit K) := by
   refine ⟨constantCoeff_lgF l hl, ?_⟩
   have h1 : MvPowerSeries.map (σ.comp σ) (lgF K l : MvPowerSeries Unit K) = lgF K l :=
     map_lgF (σ.comp σ) l
-  have h2 : (lgF K l : MvPowerSeries Unit K) - MvPowerSeries.C ((l : K)⁻¹) *
-      frobVar (l ^ 2) (lgF K l : MvPowerSeries Unit K) = (PowerSeries.X : PowerSeries K) := by
+  have h2
+      : (lgF K l : MvPowerSeries Unit K)
+          - MvPowerSeries.C ((l : K)⁻¹) * frobVar (l ^ 2) (lgF K l : MvPowerSeries Unit K)
+        = (PowerSeries.X : PowerSeries K) := by
     have h := lgF_funEq (K := K) l hl hlK
     rw [PowerSeries.smul_eq_C_mul] at h
     exact h
@@ -163,7 +170,8 @@ theorem teichmuller_sigma : TeichSigma := by
       have := (Nat.dvd_sub h1 h)
       rwa [Nat.sub_sub_self hpos] at this
     exact hp.one_lt.ne' (Nat.dvd_one.1 h2)
-  have hN : ‖((l ^ d - 1 : ℕ) : K)‖ = 1 := Formalism.DworkPowerSeriesWeights.norm_natCast_eq_one_of_not_dvd hp hlt hnd
+  have hN : ‖((l ^ d - 1 : ℕ) : K)‖ = 1 :=
+    Formalism.DworkPowerSeriesWeights.norm_natCast_eq_one_of_not_dvd hp hlt hnd
   have hN0 : l ^ d - 1 ≠ 0 := by
     intro h
     rw [h] at hnd
@@ -187,11 +195,14 @@ theorem MulSpec_of : ExpSpec → IPLemma → IPClosure → MulSpec := by
   refine ⟨?_, huniq, ?_⟩
   · have hg0 : PowerSeries.constantCoeff (PowerSeries.C c * lgF K l) = 0 := by
       rw [map_mul, h0, mul_zero]
-    refine ⟨PowerSeries.subst (PowerSeries.C c * lgF K l) (expF K l),
-      PowerSeries.constantCoeff_subst_eq_zero hg0 _ hc, ?_⟩
+    refine ⟨
+      PowerSeries.subst (PowerSeries.C c * lgF K l) (expF K l),
+      PowerSeries.constantCoeff_subst_eq_zero hg0 _ hc,
+      ?_
+    ⟩
     rw [← PowerSeries.subst_comp_subst_apply (PowerSeries.HasSubst.of_constantCoeff_zero' hc)
-      (PowerSeries.HasSubst.of_constantCoeff_zero' hg0), h1,
-      PowerSeries.subst_X (PowerSeries.HasSubst.of_constantCoeff_zero' hg0)]
+        (PowerSeries.HasSubst.of_constantCoeff_zero' hg0),
+      h1, PowerSeries.subst_X (PowerSeries.HasSubst.of_constantCoeff_zero' hg0)]
   · intro hc1 hσc e he n
     have hip : IP l σ (MvPowerSeries.C c * (lgF K l : MvPowerSeries Unit K)) :=
       (hC K l σ Unit).2.2 c _ hc1 hσc (ip_lgF l σ hl hlK)
@@ -211,14 +222,14 @@ theorem BetaHypOfF_of : TeichSigma → BetaHypOfF := by
     omega
   have nζ : ‖ζ‖ = 1 := norm_eq_one_of_pow hN0 hζ
   have hσ : σ ζ = ζ ^ l := hT K l 2 σ hU (by norm_num) ζ hζ
-  have hζl : (ζ ^ l) ^ (l ^ 2 - 1) = 1 := by
-    rw [← pow_mul, mul_comm, pow_mul, hζ, one_pow]
+  have hζl : (ζ ^ l) ^ (l ^ 2 - 1) = 1 := by rw [← pow_mul, mul_comm, pow_mul, hζ, one_pow]
   have hσσ : σ (σ ζ) = ζ := by
     rw [hσ, map_pow, hσ, ← pow_mul, ← sq]
     have : l ^ 2 = (l ^ 2 - 1) + 1 := by omega
     rw [this, pow_succ, hζ, one_mul]
-  have h := hF2 ζ nζ.le hσσ (PowerSeries.C ζ * PowerSeries.X)
-    (PowerSeries.C (ζ ^ l) * PowerSeries.X) (isMul_root hl hζ) (by rw [hσ]; exact isMul_root hl hζl)
+  have h :=
+    hF2 ζ nζ.le hσσ (PowerSeries.C ζ * PowerSeries.X) (PowerSeries.C (ζ ^ l) * PowerSeries.X)
+      (isMul_root hl hζ) (by rw [hσ]; exact isMul_root hl hζl)
   rw [at_variable_C_mul_X, at_variable_C_mul_X] at h
   exact h
 

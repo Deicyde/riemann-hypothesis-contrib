@@ -14,18 +14,21 @@ namespace Formalism.L2.SG.GoodFamilyMass
 
 open Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG Formalism.MainNotions.BridgeLemma
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] {H : HermSp M V} {r : ℕ}
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  {H : HermSp M V} {r : ℕ}
 
-theorem mkW_eq_iff (f : Fin (r + 1) → V) (x y : ↥(H.perp (H.X f))) :
-    H.mkW f x = H.mkW f y ↔ (x : V) - y ∈ H.X f := by
+theorem mkW_eq_iff (f : Fin (r + 1) → V) (x y : ↥(H.perp (H.X f)))
+    : H.mkW f x = H.mkW f y ↔ (x : V) - y ∈ H.X f := by
   unfold Formalism.MainNotions.S.Loc.HermSp.mkW
   rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq, Submodule.mem_comap]
   rfl
 
-theorem N_perp (Fr : FrameD H r) {s : V ≃ₗ[E] V} (hs : s ∈ Fr.N) {v : V} (hv : v ∈ H.perp (H.X Fr.f)) :
-    s v ∈ H.perp (H.X Fr.f) ∧ s v - v ∈ H.X Fr.f := by
+theorem N_perp
+    (Fr : FrameD H r) {s : V ≃ₗ[E] V} (hs : s ∈ Fr.N) {v : V} (hv : v ∈ H.perp (H.X Fr.f))
+    : s v ∈ H.perp (H.X Fr.f) ∧ s v - v ∈ H.X Fr.f := by
   have hiso : ∀ x ∈ H.X Fr.f, ∀ y ∈ H.X Fr.f, H.h x y = 0 := by
     have hgen : ∀ a b : Fin r, H.h (Fr.f a.castSucc) (Fr.f b.castSucc) = 0 := fun a b =>
       Fr.h_iso _ _ (Or.inl (Fin.castSucc_ne_last a))
@@ -60,7 +63,8 @@ theorem N_perp (Fr : FrameD H r) {s : V ≃ₗ[E] V} (hs : s ∈ Fr.N) {v : V} (
   have hFmono : ∀ j, Fr.Fj (j - 1) ≤ Fr.Fj j := fun j =>
     Submodule.span_mono (Set.image_mono fun a (ha : a.val < j - 1) => (show a.val < j by omega))
   have hFsucc : ∀ j, Fr.Fj j ≤ Fr.Fj (j + 1) := fun j => by simpa using hFmono (j + 1)
-  have gen : ∀ g ∈ Fr.NSet, (∀ y ∈ H.X Fr.f, g y ∈ H.X Fr.f) ∧ (∀ y ∈ H.X Fr.f, g⁻¹ y ∈ H.X Fr.f) := by
+  have gen
+      : ∀ g ∈ Fr.NSet, (∀ y ∈ H.X Fr.f, g y ∈ H.X Fr.f) ∧ (∀ y ∈ H.X Fr.f, g⁻¹ y ∈ H.X Fr.f) := by
     intro g hg
     obtain ⟨_, hgF, _⟩ := hg
     have pres : ∀ j, j ≤ r → ∀ w ∈ Fr.Fj j, g w ∈ Fr.Fj j := fun j hj w hw => by
@@ -85,12 +89,18 @@ theorem N_perp (Fr : FrameD H r) {s : V ≃ₗ[E] V} (hs : s ∈ Fr.N) {v : V} (
         exact sub_mem hw (hFsucc j h2)
     rw [← hFr]
     exact ⟨pres r le_rfl, presinv r le_rfl⟩
-  have inPerp : ∀ t : V ≃ₗ[E] V, (∀ w ∈ H.perp (H.X Fr.f), t w - w ∈ H.X Fr.f) → ∀ w ∈ H.perp (H.X Fr.f), t w ∈ H.perp (H.X Fr.f) := by
+  have inPerp
+      : ∀ t : V ≃ₗ[E] V,
+        (∀ w ∈ H.perp (H.X Fr.f), t w - w ∈ H.X Fr.f)
+          → ∀ w ∈ H.perp (H.X Fr.f), t w ∈ H.perp (H.X Fr.f) := by
     intro t ht w hw
     have h1 := (H.perp (H.X Fr.f)).add_mem hw (hXp _ (ht w hw))
     simpa using h1
-  have hQ : ∀ t ∈ Fr.N, IsUnitary H t ∧ (∀ y ∈ H.X Fr.f, t y ∈ H.X Fr.f) ∧ (∀ y ∈ H.X Fr.f, t⁻¹ y ∈ H.X Fr.f) ∧
-      (∀ w ∈ H.perp (H.X Fr.f), t w - w ∈ H.X Fr.f) ∧ (∀ w ∈ H.perp (H.X Fr.f), t⁻¹ w - w ∈ H.X Fr.f) := by
+  have hQ
+      : ∀ t ∈ Fr.N,
+        IsUnitary H t ∧ (∀ y ∈ H.X Fr.f, t y ∈ H.X Fr.f) ∧ (∀ y ∈ H.X Fr.f, t⁻¹ y ∈ H.X Fr.f)
+          ∧ (∀ w ∈ H.perp (H.X Fr.f), t w - w ∈ H.X Fr.f)
+          ∧ (∀ w ∈ H.perp (H.X Fr.f), t⁻¹ w - w ∈ H.X Fr.f) := by
     intro t ht
     induction ht using Subgroup.closure_induction with
     | mem g hg =>
@@ -106,8 +116,14 @@ theorem N_perp (Fr : FrameD H r) {s : V ≃ₗ[E] V} (hs : s ∈ Fr.N) {v : V} (
       rw [LinearEquiv.coe_inv]
       have h2 := (H.X Fr.f).neg_mem h1
       simpa using h2
-    | one => exact ⟨fun x y => rfl, fun y hy => hy, fun y hy => by simpa using hy, fun w _ => by simp,
-        fun w _ => by simp⟩
+    | one =>
+      exact ⟨
+        fun x y => rfl,
+        fun y hy => hy,
+        fun y hy => by simpa using hy,
+        fun w _ => by simp,
+        fun w _ => by simp
+      ⟩
     | mul x y _ _ hx hy =>
       refine ⟨fun u v => ?_, fun z hz => ?_, fun z hz => ?_, fun w hw => ?_, fun w hw => ?_⟩
       · rw [LinearEquiv.mul_apply, LinearEquiv.mul_apply, hx.1, hy.1]
@@ -148,8 +164,7 @@ theorem e_mem_X' (a : Fin r) : Fr.e a ∈ H.X Fr.f := Submodule.subset_span ⟨a
 
 theorem sub_prF_mem_X {v : V} (hv : v ∈ H.perp (H.X Fr.f)) : v - Fr.prF v ∈ H.X Fr.f := by
   have h0 : ∀ a, H.h v (Fr.e a) = 0 := fun a => hv _ (e_mem_X' Fr a)
-  have h1 : v - Fr.prF v = ∑ a, H.h v (Fr.es a) • Fr.e a := by
-    simp [FrameD.prF, h0]
+  have h1 : v - Fr.prF v = ∑ a, H.h v (Fr.es a) • Fr.e a := by simp [FrameD.prF, h0]
   rw [h1]
   exact Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (e_mem_X' Fr a)
 
@@ -158,14 +173,16 @@ theorem prF_mem_perp (v : V) : Fr.prF v ∈ H.perp (H.X Fr.f) := by
   have hsub : ∀ x x' y, H.h (x - x') y = H.h x y - H.h x' y := fun x x' y => by
     rw [sub_eq_add_neg, ← neg_one_smul E x', H.h_add_left, H.h_smul_left]
     ring
-  have hsum : ∀ (s : Finset (Fin r)) (g : Fin r → V) y, H.h (∑ a ∈ s, g a) y = ∑ a ∈ s, H.h (g a) y := by
+  have hsum
+      : ∀ (s : Finset (Fin r)) (g : Fin r → V) y, H.h (∑ a ∈ s, g a) y = ∑ a ∈ s, H.h (g a) y := by
     intro s g y
     induction s using Finset.induction_on with
     | empty => simpa using hz y
     | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, H.h_add_left, ih]
   have hee : ∀ a b : Fin r, H.h (Fr.e a) (Fr.e b) = 0 := fun a b =>
     Fr.h_iso _ _ (Or.inl (Fin.castSucc_ne_last a))
-  have hees : ∀ a b : Fin r, H.h (Fr.e a) (Fr.es b) = if a = b then 1 else 0 := fun a b => Fr.h_es a b
+  have hees : ∀ a b : Fin r, H.h (Fr.e a) (Fr.es b) = if a = b then 1 else 0 := fun a b =>
+    Fr.h_es a b
   have hese : ∀ a b : Fin r, H.h (Fr.es a) (Fr.e b) = if b = a then 1 else 0 := fun a b => by
     rw [H.h_herm, hees b a]
     split_ifs <;> simp
@@ -173,10 +190,10 @@ theorem prF_mem_perp (v : V) : Fr.prF v ∈ H.perp (H.X Fr.f) := by
   have hkey : ∀ (v : V) b, H.h (Fr.prF v) (Fr.e b) = 0 ∧ H.h (Fr.prF v) (Fr.es b) = 0 := by
     intro v b
     constructor
-    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hee, hese, mul_zero, Finset.sum_const_zero, sub_zero,
-        mul_ite, mul_one, Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
-    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hees, hss, mul_zero, Finset.sum_const_zero, sub_zero,
-        mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self]
+    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hee, hese, mul_zero, Finset.sum_const_zero,
+        sub_zero, mul_ite, mul_one, Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
+    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hees, hss, mul_zero, Finset.sum_const_zero,
+        sub_zero, mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self]
   have hR : ∀ u y, H.h u y = M.L.cj (H.h y u) := fun u y => H.h_herm y u
   intro y hy
   unfold Formalism.MainNotions.S.Loc.HermSp.X at hy
@@ -193,14 +210,16 @@ theorem prF_prF' (v : V) : Fr.prF (Fr.prF v) = Fr.prF v := by
   have hsub : ∀ x x' y, H.h (x - x') y = H.h x y - H.h x' y := fun x x' y => by
     rw [sub_eq_add_neg, ← neg_one_smul E x', H.h_add_left, H.h_smul_left]
     ring
-  have hsum : ∀ (s : Finset (Fin r)) (g : Fin r → V) y, H.h (∑ a ∈ s, g a) y = ∑ a ∈ s, H.h (g a) y := by
+  have hsum
+      : ∀ (s : Finset (Fin r)) (g : Fin r → V) y, H.h (∑ a ∈ s, g a) y = ∑ a ∈ s, H.h (g a) y := by
     intro s g y
     induction s using Finset.induction_on with
     | empty => simpa using hz y
     | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, H.h_add_left, ih]
   have hee : ∀ a b : Fin r, H.h (Fr.e a) (Fr.e b) = 0 := fun a b =>
     Fr.h_iso _ _ (Or.inl (Fin.castSucc_ne_last a))
-  have hees : ∀ a b : Fin r, H.h (Fr.e a) (Fr.es b) = if a = b then 1 else 0 := fun a b => Fr.h_es a b
+  have hees : ∀ a b : Fin r, H.h (Fr.e a) (Fr.es b) = if a = b then 1 else 0 := fun a b =>
+    Fr.h_es a b
   have hese : ∀ a b : Fin r, H.h (Fr.es a) (Fr.e b) = if b = a then 1 else 0 := fun a b => by
     rw [H.h_herm, hees b a]
     split_ifs <;> simp
@@ -208,29 +227,31 @@ theorem prF_prF' (v : V) : Fr.prF (Fr.prF v) = Fr.prF v := by
   have hkey : ∀ (v : V) b, H.h (Fr.prF v) (Fr.e b) = 0 ∧ H.h (Fr.prF v) (Fr.es b) = 0 := by
     intro v b
     constructor
-    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hee, hese, mul_zero, Finset.sum_const_zero, sub_zero,
-        mul_ite, mul_one, Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
-    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hees, hss, mul_zero, Finset.sum_const_zero, sub_zero,
-        mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self]
+    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hee, hese, mul_zero, Finset.sum_const_zero,
+        sub_zero, mul_ite, mul_one, Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
+    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hees, hss, mul_zero, Finset.sum_const_zero,
+        sub_zero, mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self]
   have h1 : ∀ a, H.h (Fr.prF v) (Fr.e a) = 0 := fun a => (hkey v a).1
   have h2 : ∀ a, H.h (Fr.prF v) (Fr.es a) = 0 := fun a => (hkey v a).2
   show Fr.prF v - ∑ a, H.h (Fr.prF v) (Fr.es a) • Fr.e a - ∑ a, H.h (Fr.prF v) (Fr.e a) • Fr.es a = Fr.prF v
   simp only [h1, h2, zero_smul, Finset.sum_const_zero, sub_zero]
 
-theorem lset_LamStd (L : Submodule M.L.O (H.Wb Fr.f)) (w : H.Wb Fr.f) :
-    w ∈ L ↔ w ∈ H.Lset (Fr.LamStd L) Fr.f := by
+theorem lset_LamStd (L : Submodule M.L.O (H.Wb Fr.f)) (w : H.Wb Fr.f)
+    : w ∈ L ↔ w ∈ H.Lset (Fr.LamStd L) Fr.f := by
   have hz : ∀ y, H.h 0 y = 0 := fun y => by simpa using H.h_smul_left 0 0 y
   have hsub : ∀ x x' y, H.h (x - x') y = H.h x y - H.h x' y := fun x x' y => by
     rw [sub_eq_add_neg, ← neg_one_smul E x', H.h_add_left, H.h_smul_left]
     ring
-  have hsum : ∀ (s : Finset (Fin r)) (g : Fin r → V) y, H.h (∑ a ∈ s, g a) y = ∑ a ∈ s, H.h (g a) y := by
+  have hsum
+      : ∀ (s : Finset (Fin r)) (g : Fin r → V) y, H.h (∑ a ∈ s, g a) y = ∑ a ∈ s, H.h (g a) y := by
     intro s g y
     induction s using Finset.induction_on with
     | empty => simpa using hz y
     | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, H.h_add_left, ih]
   have hee : ∀ a b : Fin r, H.h (Fr.e a) (Fr.e b) = 0 := fun a b =>
     Fr.h_iso _ _ (Or.inl (Fin.castSucc_ne_last a))
-  have hees : ∀ a b : Fin r, H.h (Fr.e a) (Fr.es b) = if a = b then 1 else 0 := fun a b => Fr.h_es a b
+  have hees : ∀ a b : Fin r, H.h (Fr.e a) (Fr.es b) = if a = b then 1 else 0 := fun a b =>
+    Fr.h_es a b
   have hese : ∀ a b : Fin r, H.h (Fr.es a) (Fr.e b) = if b = a then 1 else 0 := fun a b => by
     rw [H.h_herm, hees b a]
     split_ifs <;> simp
@@ -238,10 +259,10 @@ theorem lset_LamStd (L : Submodule M.L.O (H.Wb Fr.f)) (w : H.Wb Fr.f) :
   have hkey : ∀ (v : V) b, H.h (Fr.prF v) (Fr.e b) = 0 ∧ H.h (Fr.prF v) (Fr.es b) = 0 := by
     intro v b
     constructor
-    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hee, hese, mul_zero, Finset.sum_const_zero, sub_zero,
-        mul_ite, mul_one, Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
-    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hees, hss, mul_zero, Finset.sum_const_zero, sub_zero,
-        mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self]
+    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hee, hese, mul_zero, Finset.sum_const_zero,
+        sub_zero, mul_ite, mul_one, Finset.sum_ite_eq, Finset.mem_univ, if_true, sub_self]
+    · simp only [FrameD.prF, hsub, hsum, H.h_smul_left, hees, hss, mul_zero, Finset.sum_const_zero,
+        sub_zero, mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, if_true, sub_self]
   constructor
   · intro hw
     obtain ⟨x, hxw⟩ := Submodule.mkQ_surjective _ w
@@ -253,8 +274,13 @@ theorem lset_LamStd (L : Submodule M.L.O (H.Wb Fr.f)) (w : H.Wb Fr.f) :
       simpa using h3
     have hS : Fr.prF (x : V) ∈ Fr.LamStd L := by
       apply Submodule.subset_span
-      refine ⟨fun a => (hkey x a).2 ▸ zero_mem _, fun a => (hkey x a).1 ▸ zero_mem _, ⟨Fr.prF x, hpx⟩,
-        (prF_prF' Fr (x : V)).symm, ?_⟩
+      refine ⟨
+        fun a => (hkey x a).2 ▸ zero_mem _,
+        fun a => (hkey x a).1 ▸ zero_mem _,
+        ⟨Fr.prF x, hpx⟩,
+        (prF_prF' Fr (x : V)).symm,
+        ?_
+      ⟩
       rw [hmk, hxw']
       exact hw
     exact ⟨⟨Fr.prF x, hpx⟩, hS, by rw [hmk, hxw']⟩
@@ -264,7 +290,8 @@ theorem lset_LamStd (L : Submodule M.L.O (H.Wb Fr.f)) (w : H.Wb Fr.f) :
       induction hu using Submodule.span_induction with
       | mem u hu =>
         obtain ⟨_, _, w', hw'1, hw'2⟩ := hu
-        have h6 : (⟨Fr.prF u, prF_mem_perp Fr u⟩ : ↥(H.perp (H.X Fr.f))) = w' := Subtype.ext hw'1.symm
+        have h6 : (⟨Fr.prF u, prF_mem_perp Fr u⟩ : ↥(H.perp (H.X Fr.f))) = w' :=
+          Subtype.ext hw'1.symm
         rw [h6]
         exact hw'2
       | zero =>
@@ -273,12 +300,16 @@ theorem lset_LamStd (L : Submodule M.L.O (H.Wb Fr.f)) (w : H.Wb Fr.f) :
         rw [h6, map_zero]
         exact zero_mem _
       | add a b _ _ ha hb =>
-        have h6 : (⟨Fr.prF (a + b), prF_mem_perp Fr _⟩ : ↥(H.perp (H.X Fr.f))) =
-            ⟨Fr.prF a, prF_mem_perp Fr a⟩ + ⟨Fr.prF b, prF_mem_perp Fr b⟩ := Subtype.ext (prF_add' Fr a b)
+        have h6
+            : (⟨Fr.prF (a + b), prF_mem_perp Fr _⟩ : ↥(H.perp (H.X Fr.f)))
+              = ⟨Fr.prF a, prF_mem_perp Fr a⟩ + ⟨Fr.prF b, prF_mem_perp Fr b⟩ :=
+          Subtype.ext (prF_add' Fr a b)
         rw [h6, map_add (f := _)]
         exact add_mem ha hb
       | smul c a _ ha =>
-        have h6 : (⟨Fr.prF (c • a), prF_mem_perp Fr _⟩ : ↥(H.perp (H.X Fr.f))) = (c : E) • ⟨Fr.prF a, prF_mem_perp Fr a⟩ :=
+        have h6
+            : (⟨Fr.prF (c • a), prF_mem_perp Fr _⟩ : ↥(H.perp (H.X Fr.f)))
+              = (c : E) • ⟨Fr.prF a, prF_mem_perp Fr a⟩ :=
           Subtype.ext (prF_smul' Fr (c : E) a)
         rw [h6, map_smul]
         exact L.smul_mem c ha
@@ -289,8 +320,8 @@ theorem lset_LamStd (L : Submodule M.L.O (H.Wb Fr.f)) (w : H.Wb Fr.f) :
       simpa using h3
     rwa [h2] at h1
 
-theorem lset_N {n : V ≃ₗ[E] V} (hn : n ∈ Fr.N) (Λ : Submodule M.L.O V) (w : H.Wb Fr.f) :
-    w ∈ H.Lset Λ Fr.f ↔ w ∈ H.Lset (img n Λ) Fr.f := by
+theorem lset_N {n : V ≃ₗ[E] V} (hn : n ∈ Fr.N) (Λ : Submodule M.L.O V) (w : H.Wb Fr.f)
+    : w ∈ H.Lset Λ Fr.f ↔ w ∈ H.Lset (img n Λ) Fr.f := by
   constructor
   · rintro ⟨x, hxΛ, rfl⟩
     obtain ⟨h1, h2⟩ := N_perp Fr hn x.2
@@ -311,8 +342,9 @@ theorem lset_N {n : V ≃ₗ[E] V} (hn : n ∈ Fr.N) (Λ : Submodule M.L.O V) (w
 
 end Lset
 
-theorem lset_term {P : FPair H r} {d : Datum P} {t : Term V M r} (ht : IsTermOver P d t) :
-    (∀ w, w ∈ d.L ↔ w ∈ H.Lset t.abelian₂ P.A.f) ∧ (∀ w, w ∈ d.L' ↔ w ∈ H.Lset t.abelian₂ P.B.f) := by
+theorem lset_term {P : FPair H r} {d : Datum P} {t : Term V M r} (ht : IsTermOver P d t)
+    : (∀ w, w ∈ d.L ↔ w ∈ H.Lset t.abelian₂ P.A.f)
+      ∧ (∀ w, w ∈ d.L' ↔ w ∈ H.Lset t.abelian₂ P.B.f) := by
   obtain ⟨_, _, ⟨n, hn, _, hL⟩, ⟨n', hn', _, hL'⟩, _⟩ := ht
   refine ⟨fun w => ?_, fun w => ?_⟩
   · rw [hL, lset_LamStd P.A d.L w, lset_N P.A hn]

@@ -16,15 +16,15 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CmConjug
 
 @[expose] public section
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
 open scoped Matrix
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS.Decomp
 
-def IsI {K : Type} [Field K] [NumberField K] (x : K) : Prop :=
-  ∃ o : 𝓞 K, algebraMap (𝓞 K) K o = x
+def IsI {K : Type} [Field K] [NumberField K] (x : K) : Prop := ∃ o : 𝓞 K, algebraMap (𝓞 K) K o = x
 
 section I
 
@@ -46,18 +46,17 @@ theorem IsI.mul {x y : K} (hx : IsI x) (hy : IsI y) : IsI (x * y) := by
 
 theorem isI_zero : IsI (0 : K) := ⟨0, by simp⟩
 
-theorem isI_sum {ι : Type} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, IsI (f i)) :
-    IsI (∑ i ∈ s, f i) := by
+theorem isI_sum {ι : Type} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, IsI (f i))
+    : IsI (∑ i ∈ s, f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using (isI_zero : IsI (0 : K))
   | insert a s ha ih =>
     rw [Finset.sum_insert ha]
-    exact (h a (Finset.mem_insert_self a s)).add
-      (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
+    exact (h a (Finset.mem_insert_self a s)).add (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
-theorem Kc_le_add {n : ℕ} (c h : Matrix (Fin n) (Fin n) K) (hh : ∀ a b, IsI (h a b)) :
-    Kc c ≤ Kc (c + h) := by
+theorem Kc_le_add {n : ℕ} (c h : Matrix (Fin n) (Fin n) K) (hh : ∀ a b, IsI (h a b))
+    : Kc c ≤ Kc (c + h) := by
   intro y hy i
   have h1 : IsI ((c *ᵥ fun j => algebraMap (𝓞 K) K (y j)) i) := hy i
   have h2 : IsI ((h *ᵥ fun j => algebraMap (𝓞 K) K (y j)) i) := by
@@ -67,21 +66,25 @@ theorem Kc_le_add {n : ℕ} (c h : Matrix (Fin n) (Fin n) K) (hh : ∀ a b, IsI 
   rw [Matrix.add_mulVec]
   exact h3
 
-theorem Kc_add {n : ℕ} (c h : Matrix (Fin n) (Fin n) K) (hh : ∀ a b, IsI (h a b)) :
-    Kc (c + h) = Kc c := by
+theorem Kc_add {n : ℕ} (c h : Matrix (Fin n) (Fin n) K) (hh : ∀ a b, IsI (h a b))
+    : Kc (c + h) = Kc c := by
   refine le_antisymm ?_ (Kc_le_add c h hh)
   have := Kc_le_add (c + h) (-h) fun a b => by simpa using IsI.neg (hh a b)
   simpa using this
 
-theorem delta_add {n : ℕ} (c h : Matrix (Fin n) (Fin n) K) (hh : ∀ a b, IsI (h a b)) :
-    delta (c + h) = delta c := by
+theorem delta_add {n : ℕ} (c h : Matrix (Fin n) (Fin n) K) (hh : ∀ a b, IsI (h a b))
+    : delta (c + h) = delta c := by
   unfold delta
   rw [Kc_add c h hh]
 
-theorem vec_out {m : ℕ} (t : Fin m → K) (i : Fin m) :
-    IsI ((Quotient.out (Submodule.Quotient.mk t : (Fin m → K) ⧸ intVec K m) : Fin m → K) i - t i) := by
-  have h : Submodule.Quotient.mk (Quotient.out (Submodule.Quotient.mk t : (Fin m → K) ⧸ intVec K m))
-      = (Submodule.Quotient.mk t : (Fin m → K) ⧸ intVec K m) := Quotient.out_eq _
+theorem vec_out {m : ℕ} (t : Fin m → K) (i : Fin m)
+    : IsI
+      ((Quotient.out (Submodule.Quotient.mk t : (Fin m → K) ⧸ intVec K m) : Fin m → K) i
+        - t i) := by
+  have h
+      : Submodule.Quotient.mk (Quotient.out (Submodule.Quotient.mk t : (Fin m → K) ⧸ intVec K m))
+        = (Submodule.Quotient.mk t : (Fin m → K) ⧸ intVec K m) :=
+    Quotient.out_eq _
   have h2 := (Submodule.Quotient.eq _).1 h
   exact h2 i
 
@@ -91,15 +94,19 @@ section H
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E] [NumberField E]
 
-theorem herm_out (σ : E →ₐ[F] E) {n : ℕ} (t : hermE σ n) (a b : Fin n) :
-    IsI ((Quotient.out (QuotientAddGroup.mk t : hermE σ n ⧸ hermO σ n)).1 a b - t.1 a b) := by
-  have h : (QuotientAddGroup.mk (Quotient.out (QuotientAddGroup.mk t : hermE σ n ⧸ hermO σ n)) :
-      hermE σ n ⧸ hermO σ n) = QuotientAddGroup.mk t := Quotient.out_eq _
+theorem herm_out (σ : E →ₐ[F] E) {n : ℕ} (t : hermE σ n) (a b : Fin n)
+    : IsI ((Quotient.out (QuotientAddGroup.mk t : hermE σ n ⧸ hermO σ n)).1 a b - t.1 a b) := by
+  have h
+      : (QuotientAddGroup.mk (Quotient.out (QuotientAddGroup.mk t : hermE σ n ⧸ hermO σ n))
+          : hermE σ n ⧸ hermO σ n)
+        = QuotientAddGroup.mk t :=
+    Quotient.out_eq _
   have h2 : IsI ((-(Quotient.out (QuotientAddGroup.mk t : hermE σ n ⧸ hermO σ n)) + t).1 a b) :=
     (QuotientAddGroup.eq.1 h) a b
   have h3 := h2.neg
-  have e : -(-(Quotient.out (QuotientAddGroup.mk t : hermE σ n ⧸ hermO σ n)) + t).1 a b =
-      (Quotient.out (QuotientAddGroup.mk t : hermE σ n ⧸ hermO σ n)).1 a b - t.1 a b := by
+  have e
+      : - (-(Quotient.out (QuotientAddGroup.mk t : hermE σ n ⧸ hermO σ n)) + t).1 a b
+        = (Quotient.out (QuotientAddGroup.mk t : hermE σ n ⧸ hermO σ n)).1 a b - t.1 a b := by
     simp
     ring
   rwa [e] at h3
@@ -107,27 +114,36 @@ theorem herm_out (σ : E →ₐ[F] E) {n : ℕ} (t : hermE σ n) (a b : Fin n) :
 def topB (σ : E →ₐ[F] E) {m : ℕ} (C : hermE σ (m + 1)) : hermE σ m :=
   ⟨fun a b => C.1 a.castSucc b.castSucc, fun a b => C.2 a.castSucc b.castSucc⟩
 
-def lastCol {m : ℕ} (C : Matrix (Fin (m + 1)) (Fin (m + 1)) E) : Fin m → E :=
-  fun a => C a.castSucc (Fin.last m)
+def lastCol {m : ℕ} (C : Matrix (Fin (m + 1)) (Fin (m + 1)) E) : Fin m → E := fun a =>
+  C a.castSucc (Fin.last m)
 
-theorem blk_cc (σ : E →ₐ[F] E) {m : ℕ} (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E) (d : E)
-    (a b : Fin m) : blk σ c u d a.castSucc b.castSucc = c a b := by simp [blk]
+theorem blk_cc
+    (σ : E →ₐ[F] E) {m : ℕ} (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E) (d : E) (a b : Fin m)
+    : blk σ c u d a.castSucc b.castSucc = c a b := by
+  simp [blk]
 
-theorem blk_cl (σ : E →ₐ[F] E) {m : ℕ} (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E) (d : E)
-    (a : Fin m) : blk σ c u d a.castSucc (Fin.last m) = u a := by simp [blk]
+theorem blk_cl
+    (σ : E →ₐ[F] E) {m : ℕ} (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E) (d : E) (a : Fin m)
+    : blk σ c u d a.castSucc (Fin.last m) = u a := by
+  simp [blk]
 
-theorem blk_lc (σ : E →ₐ[F] E) {m : ℕ} (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E) (d : E)
-    (b : Fin m) : blk σ c u d (Fin.last m) b.castSucc = σ (u b) := by simp [blk]
+theorem blk_lc
+    (σ : E →ₐ[F] E) {m : ℕ} (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E) (d : E) (b : Fin m)
+    : blk σ c u d (Fin.last m) b.castSucc = σ (u b) := by
+  simp [blk]
 
-theorem blk_ll (σ : E →ₐ[F] E) {m : ℕ} (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E) (d : E) :
-    blk σ c u d (Fin.last m) (Fin.last m) = d := by simp [blk]
+theorem blk_ll (σ : E →ₐ[F] E) {m : ℕ} (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E) (d : E)
+    : blk σ c u d (Fin.last m) (Fin.last m) = d := by
+  simp [blk]
 
-theorem blk_sub_isI (σ : E →ₐ[F] E) (hσ : ∀ x : E, IsI x → IsI (σ x)) {m : ℕ}
-    (C : hermE σ (m + 1)) (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E) (d : E)
+theorem blk_sub_isI
+    (σ : E →ₐ[F] E) (hσ : ∀ x : E, IsI x → IsI (σ x))
+    {m : ℕ} (C : hermE σ (m + 1)) (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E)
+    (d : E)
     (hc : ∀ a b : Fin m, IsI (c a b - C.1 a.castSucc b.castSucc))
     (hu : ∀ a : Fin m, IsI (u a - C.1 a.castSucc (Fin.last m)))
-    (hd : IsI (d - C.1 (Fin.last m) (Fin.last m))) (i j : Fin (m + 1)) :
-    IsI (blk σ c u d i j - C.1 i j) := by
+    (hd : IsI (d - C.1 (Fin.last m) (Fin.last m))) (i j : Fin (m + 1))
+    : IsI (blk σ c u d i j - C.1 i j) := by
   induction i using Fin.lastCases with
   | last =>
     induction j using Fin.lastCases with
@@ -140,11 +156,12 @@ theorem blk_sub_isI (σ : E →ₐ[F] E) (hσ : ∀ x : E, IsI x → IsI (σ x))
     | last => rw [blk_cl]; exact hu a
     | cast b => rw [blk_cc]; exact hc a b
 
-theorem herm_isI (σ : E →ₐ[F] E) (hσ : ∀ x : E, IsI x → IsI (σ x)) {m : ℕ}
-    (D : hermE σ (m + 1))
-    (hc : ∀ a b : Fin m, IsI (D.1 a.castSucc b.castSucc))
-    (hu : ∀ a : Fin m, IsI (D.1 a.castSucc (Fin.last m)))
-    (hd : IsI (D.1 (Fin.last m) (Fin.last m))) (i j : Fin (m + 1)) : IsI (D.1 i j) := by
+theorem herm_isI
+    (σ : E →ₐ[F] E) (hσ : ∀ x : E, IsI x → IsI (σ x))
+    {m : ℕ} (D : hermE σ (m + 1)) (hc : ∀ a b : Fin m, IsI (D.1 a.castSucc b.castSucc))
+    (hu : ∀ a : Fin m, IsI (D.1 a.castSucc (Fin.last m))) (hd : IsI (D.1 (Fin.last m) (Fin.last m)))
+    (i j : Fin (m + 1))
+    : IsI (D.1 i j) := by
   induction i using Fin.lastCases with
   | last =>
     induction j using Fin.lastCases with
@@ -159,25 +176,44 @@ theorem herm_isI (σ : E →ₐ[F] E) (hσ : ∀ x : E, IsI x → IsI (σ x)) {m
 
 end H
 
-theorem isI_algebraMap {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] {y : F} (hy : IsI y) : IsI (algebraMap F E y) := by
+theorem isI_algebraMap
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {y : F} (hy : IsI y)
+    : IsI (algebraMap F E y) := by
   obtain ⟨o, rfl⟩ := hy
   have h : IsIntegral ℤ (algebraMap F E (algebraMap (𝓞 F) F o)) :=
     (RingOfIntegers.isIntegral_coe o).algebraMap
   exact ⟨IsIntegralClosure.mk' (𝓞 E) _ h, IsIntegralClosure.algebraMap_mk' _ _ h⟩
 
-theorem hermClass_blocks : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ m : ℕ, ∃ ι : (hermE σ (m + 1) ⧸ hermO σ (m + 1)) → (hermE σ m ⧸ hermO σ m) × ((Fin m → E) ⧸ intVec E m) × FQ F, Function.Injective ι ∧ ∀ x, delta (Quotient.out x).1 = delta (blk σ (Quotient.out (ι x).1).1 (Quotient.out (ι x).2.1) (algebraMap F E ((Quotient.out (ι x).2.2 : Fin 1 → F) 0))) := by
+theorem hermClass_blocks
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ m : ℕ,
+          ∃ ι : (hermE σ (m + 1) ⧸ hermO σ (m + 1))
+              → (hermE σ m ⧸ hermO σ m) × ((Fin m → E) ⧸ intVec E m) × FQ F,
+            Function.Injective ι
+              ∧ ∀ x,
+                delta (Quotient.out x).1
+                  = delta (blk σ (Quotient.out (ι x).1).1 (Quotient.out (ι x).2.1)
+                    (algebraMap F E ((Quotient.out (ι x).2.2 : Fin 1 → F) 0))) := by
   intro F E _ _ _ _ _ σ hcm m
   obtain ⟨-, hfix, hsO, -⟩ := GlobalTheory.T.cm_conjugation_properties F E σ hcm
   have hσ : ∀ x : E, IsI x → IsI (σ x) := by
     rintro x ⟨o, rfl⟩
     exact ⟨sO σ o, hsO o⟩
-  have hcorner : ∀ C : hermE σ (m + 1), ∃ y : F,
-      algebraMap F E y = C.1 (Fin.last m) (Fin.last m) := fun C => hfix _ (C.2 _ _)
+  have hcorner : ∀ C : hermE σ (m + 1), ∃ y : F, algebraMap F E y = C.1 (Fin.last m) (Fin.last m) :=
+    fun C => hfix _ (C.2 _ _)
   choose dd hdd using hcorner
-  refine ⟨fun x => (QuotientAddGroup.mk (topB σ (Quotient.out x)),
-    Submodule.Quotient.mk (lastCol (Quotient.out x).1),
-    Submodule.Quotient.mk (fun _ => dd (Quotient.out x))), ?_, ?_⟩
+  refine ⟨
+    fun x => (
+      QuotientAddGroup.mk (topB σ (Quotient.out x)),
+      Submodule.Quotient.mk (lastCol (Quotient.out x).1),
+      Submodule.Quotient.mk (fun _ => dd (Quotient.out x))
+    ),
+    ?_,
+    ?_
+  ⟩
   · intro x x' hxx
     obtain ⟨h1, h2, h3⟩ : _ ∧ _ ∧ _ := by simpa [Prod.ext_iff] using hxx
     have h1' := QuotientAddGroup.eq.1 h1

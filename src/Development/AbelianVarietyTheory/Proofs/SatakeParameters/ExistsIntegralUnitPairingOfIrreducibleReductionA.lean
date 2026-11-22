@@ -11,8 +11,10 @@ namespace GlobalTheory.Cong.UnitPairing
 
 open IsLocalRing
 
-variable {R k : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field k]
-  [Algebra R k] [IsFractionRing R k] {a : ℕ}
+variable
+  {R k : Type}
+  [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field k] [Algebra R k] [IsFractionRing R k]
+  {a : ℕ}
 
 noncomputable def intLattice (W : Submodule k (Fin a → k)) : Submodule R (Fin a → R) :=
   (W.restrictScalars R).comap ((Algebra.linearMap R k).compLeft (Fin a))
@@ -43,8 +45,8 @@ lemma exists_integral_multiple (y : Fin a → k) :
   rw [hx i]
   simp [Algebra.smul_def]
 
-noncomputable def redLattice (L : Submodule R (Fin a → R)) :
-    Submodule (ResidueField R) (Fin a → ResidueField R) where
+noncomputable def redLattice (L : Submodule R (Fin a → R))
+    : Submodule (ResidueField R) (Fin a → ResidueField R) where
   carrier := {v | ∃ x ∈ L, (fun i => residue R (x i)) = v}
   add_mem' := by
     rintro _ _ ⟨x, hx, rfl⟩ ⟨y, hy, rfl⟩
@@ -65,12 +67,14 @@ lemma exists_eq_smul_of_residue_eq_zero {ϖ : R} (hϖ : maximalIdeal R = Ideal.s
   choose z hz using this
   exact ⟨z, funext fun i => by simp [hz i]⟩
 
-theorem main (B : Matrix (Fin a) (Fin a) R)
+theorem main
+    (B : Matrix (Fin a) (Fin a) R)
     (hB : ∀ W : Submodule (ResidueField R) (Fin a → ResidueField R),
       (∀ v ∈ W, (B.map (residue R)).mulVec v ∈ W) → W = ⊥ ∨ W = ⊤)
-    (W : Submodule k (Fin a → k)) (hW0 : W ≠ ⊥) (hWt : W ≠ ⊤) :
-    ∃ w f : Fin a → R, (fun i => algebraMap R k (w i)) ∈ W ∧
-      (∀ y ∈ W, (fun i => algebraMap R k (f i)) ⬝ᵥ y = 0) ∧ IsUnit (f ⬝ᵥ B.mulVec w) := by
+    (W : Submodule k (Fin a → k)) (hW0 : W ≠ ⊥) (hWt : W ≠ ⊤)
+    : ∃ w f : Fin a → R,
+      (fun i => algebraMap R k (w i)) ∈ W ∧ (∀ y ∈ W, (fun i => algebraMap R k (f i)) ⬝ᵥ y = 0)
+        ∧ IsUnit (f ⬝ᵥ B.mulVec w) := by
   classical
   obtain ⟨ϖ, hϖirr⟩ := IsDiscreteValuationRing.exists_irreducible R
   have hϖ : maximalIdeal R = Ideal.span {ϖ} :=
@@ -89,8 +93,11 @@ theorem main (B : Matrix (Fin a) (Fin a) R)
       rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero] at h
       exact (Submodule.Quotient.mk_eq_zero L).mpr (mem_intLattice_of_smul hr h)
   haveI : Module.Free R ((Fin a → R) ⧸ L) := Module.free_of_finite_type_torsion_free'
-  have hmemL : ∀ {y : Fin a → k}, y ∈ W → ∀ {d : R} {x : Fin a → R},
-      (fun i => algebraMap R k (x i)) = algebraMap R k d • y → x ∈ L := by
+  have hmemL
+      : ∀ {y : Fin a → k},
+        y ∈ W
+          → ∀ {d : R} {x : Fin a → R},
+            (fun i => algebraMap R k (x i)) = algebraMap R k d • y → x ∈ L := by
     intro y hy d x hx
     show (fun i => algebraMap R k (x i)) ∈ W
     rw [hx]
@@ -106,8 +113,9 @@ theorem main (B : Matrix (Fin a) (Fin a) R)
         exact (Submodule.mem_bot _).mp hm
       obtain ⟨z, rfl⟩ := exists_eq_smul_of_residue_eq_zero hϖ h0
       exact Submodule.smul_mem_smul hϖm (mem_intLattice_of_smul hϖ0 hx)
-    have hL : L = ⊥ := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal R) L
-      (IsNoetherian.noetherian L) hle (maximalIdeal_le_jacobson _)
+    have hL : L = ⊥ :=
+      Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal R) L (IsNoetherian.noetherian L)
+        hle (maximalIdeal_le_jacobson _)
     obtain ⟨y, hyW, hy0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hW0
     obtain ⟨d, hd, x, hx⟩ := exists_integral_multiple (R := R) y
     have hxL := hmemL hyW hx
@@ -139,8 +147,9 @@ theorem main (B : Matrix (Fin a) (Fin a) R)
         exact hl
       rw [hq]
       exact Submodule.smul_mem_smul hϖm Submodule.mem_top
-    have htopQ := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal R) ⊤
-      Module.Finite.fg_top hle (maximalIdeal_le_jacobson _)
+    have htopQ :=
+      Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (maximalIdeal R) ⊤ Module.Finite.fg_top hle
+        (maximalIdeal_le_jacobson _)
     apply hWt
     rw [eq_top_iff]
     intro y _
@@ -162,13 +171,15 @@ theorem main (B : Matrix (Fin a) (Fin a) R)
     · exact hA h
     · exact hT h
   obtain ⟨_, ⟨w, hwL, rfl⟩, hBw⟩ := hnot
-  have hres : (B.map (residue R)).mulVec (fun i => residue R (w i)) =
-      fun i => residue R (B.mulVec w i) := by
+  have hres
+      : (B.map (residue R)).mulVec (fun i => residue R (w i))
+        = fun i => residue R (B.mulVec w i) := by
     ext i
     exact (RingHom.map_mulVec (residue R) B w i).symm
   rw [hres] at hBw
-  have hnotsmul : ∀ z : Fin a → R,
-      Submodule.Quotient.mk (p := L) (B.mulVec w) ≠ ϖ • Submodule.Quotient.mk z := by
+  have hnotsmul
+      : ∀ z : Fin a → R,
+        Submodule.Quotient.mk (p := L) (B.mulVec w) ≠ ϖ • Submodule.Quotient.mk z := by
     intro z hz
     rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.eq] at hz
     apply hBw
@@ -183,8 +194,8 @@ theorem main (B : Matrix (Fin a) (Fin a) R)
       have := hcon j
       rwa [hϖ, Ideal.mem_span_singleton] at this
     choose c hc using hdv
-    obtain ⟨z, hz⟩ := Submodule.Quotient.mk_surjective L
-      (b.repr.symm (Finsupp.equivFunOnFinite.symm c))
+    obtain ⟨z, hz⟩ :=
+      Submodule.Quotient.mk_surjective L (b.repr.symm (Finsupp.equivFunOnFinite.symm c))
     apply hnotsmul z
     apply b.repr.injective
     ext j
@@ -206,10 +217,11 @@ theorem main (B : Matrix (Fin a) (Fin a) R)
     have hxL := hmemL hy hx
     have hφx : φ x = 0 := by
       rw [hφ, (Submodule.Quotient.mk_eq_zero L).mpr hxL, map_zero, Finsupp.zero_apply]
-    have e1 : (fun i => algebraMap R k (f i)) ⬝ᵥ (fun i => algebraMap R k (x i)) =
-        algebraMap R k (f ⬝ᵥ x) := by
+    have e1
+        : (fun i => algebraMap R k (f i)) ⬝ᵥ (fun i => algebraMap R k (x i))
+          = algebraMap R k (f ⬝ᵥ x) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [dotProduct, map_sum, map_mul]
+      simp [dotProduct, map_sum, map_mul]
     rw [hx, dotProduct_smul, smul_eq_mul, hf, hφx, map_zero] at e1
     rcases mul_eq_zero.mp e1 with h | h
     · exact absurd h ((map_ne_zero_iff _ hinj).mpr hd)
@@ -222,7 +234,17 @@ end GlobalTheory.Cong.UnitPairing
 
 namespace GlobalTheory.Cong
 
-theorem exists_integral_unit_pairing_of_irreducible_reduction : ∀ (R k : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field k] [Algebra R k] [IsFractionRing R k] (a : ℕ) (B : Matrix (Fin a) (Fin a) R), (∀ W : Submodule (IsLocalRing.ResidueField R) (Fin a → IsLocalRing.ResidueField R), (∀ v ∈ W, (B.map (IsLocalRing.residue R)).mulVec v ∈ W) → W = ⊥ ∨ W = ⊤) → ∀ W : Submodule k (Fin a → k), W ≠ ⊥ → W ≠ ⊤ → ∃ w f : Fin a → R, (fun i => algebraMap R k (w i)) ∈ W ∧ (∀ y ∈ W, (fun i => algebraMap R k (f i)) ⬝ᵥ y = 0) ∧ IsUnit (f ⬝ᵥ B.mulVec w) := by
+theorem exists_integral_unit_pairing_of_irreducible_reduction
+    : ∀ (R k : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field k] [Algebra R k]
+        [IsFractionRing R k] (a : ℕ) (B : Matrix (Fin a) (Fin a) R),
+      (∀ W : Submodule (IsLocalRing.ResidueField R) (Fin a → IsLocalRing.ResidueField R),
+          (∀ v ∈ W, (B.map (IsLocalRing.residue R)).mulVec v ∈ W) → W = ⊥ ∨ W = ⊤)
+        → ∀ W : Submodule k (Fin a → k),
+          W ≠ ⊥ → W ≠ ⊤
+            → ∃ w f : Fin a → R,
+              (fun i => algebraMap R k (w i)) ∈ W
+                ∧ (∀ y ∈ W, (fun i => algebraMap R k (f i)) ⬝ᵥ y = 0)
+                ∧ IsUnit (f ⬝ᵥ B.mulVec w) := by
   intro R k _ _ _ _ _ _ a B hB W hW0 hWt
   exact UnitPairing.main B hB W hW0 hWt
 

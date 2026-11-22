@@ -19,23 +19,33 @@ variable {k r : ℕ}
 
 abbrev GN (k r : ℕ) := Grp (Nset k r : Set (Mx k r)) n_clsub
 
-def conjE (a : Mx k r) (ha : IsUnit a.det) (h1 : ∀ g ∈ Nset k r, a⁻¹ * g * a ∈ Nset k r)
-    (h2 : ∀ g ∈ Nset k r, a * g * a⁻¹ ∈ Nset k r) : GN k r ≃* GN k r where
+def conjE
+    (a : Mx k r) (ha : IsUnit a.det) (h1 : ∀ g ∈ Nset k r, a⁻¹ * g * a ∈ Nset k r)
+    (h2 : ∀ g ∈ Nset k r, a * g * a⁻¹ ∈ Nset k r)
+    : GN k r ≃* GN k r where
   toFun g := Grp.mk (a⁻¹ * g.val * a) (h1 _ g.mem)
   invFun g := Grp.mk (a * g.val * a⁻¹) (h2 _ g.mem)
-  left_inv g := Grp.ext' (by
-    show a * (a⁻¹ * g.val * a) * a⁻¹ = g.val
-    calc a * (a⁻¹ * g.val * a) * a⁻¹ = (a * a⁻¹) * g.val * (a * a⁻¹) := by simp only [Matrix.mul_assoc]
-      _ = g.val := by rw [Matrix.mul_nonsing_inv a ha, Matrix.one_mul, Matrix.mul_one])
-  right_inv g := Grp.ext' (by
-    show a⁻¹ * (a * g.val * a⁻¹) * a = g.val
-    calc a⁻¹ * (a * g.val * a⁻¹) * a = (a⁻¹ * a) * g.val * (a⁻¹ * a) := by simp only [Matrix.mul_assoc]
-      _ = g.val := by rw [Matrix.nonsing_inv_mul a ha, Matrix.one_mul, Matrix.mul_one])
-  map_mul' g g' := Grp.ext' (by
-    show a⁻¹ * (g.val * g'.val) * a = (a⁻¹ * g.val * a) * (a⁻¹ * g'.val * a)
-    calc a⁻¹ * (g.val * g'.val) * a = a⁻¹ * g.val * (a * a⁻¹) * g'.val * a := by
+  left_inv g :=
+    Grp.ext' (by
+      show a * (a⁻¹ * g.val * a) * a⁻¹ = g.val
+      calc
+        a * (a⁻¹ * g.val * a) * a⁻¹
+          = (a * a⁻¹) * g.val * (a * a⁻¹) := by simp only [Matrix.mul_assoc]
+        _ = g.val := by rw [Matrix.mul_nonsing_inv a ha, Matrix.one_mul, Matrix.mul_one])
+  right_inv g :=
+    Grp.ext' (by
+      show a⁻¹ * (a * g.val * a⁻¹) * a = g.val
+      calc
+        a⁻¹ * (a * g.val * a⁻¹) * a
+          = (a⁻¹ * a) * g.val * (a⁻¹ * a) := by simp only [Matrix.mul_assoc]
+        _ = g.val := by rw [Matrix.nonsing_inv_mul a ha, Matrix.one_mul, Matrix.mul_one])
+  map_mul' g g' :=
+    Grp.ext' (by
+      show a⁻¹ * (g.val * g'.val) * a = (a⁻¹ * g.val * a) * (a⁻¹ * g'.val * a)
+      calc
+        a⁻¹ * (g.val * g'.val) * a = a⁻¹ * g.val * (a * a⁻¹) * g'.val * a := by
           rw [Matrix.mul_nonsing_inv a ha, Matrix.mul_one]; simp only [Matrix.mul_assoc]
-      _ = (a⁻¹ * g.val * a) * (a⁻¹ * g'.val * a) := by simp only [Matrix.mul_assoc])
+        _ = (a⁻¹ * g.val * a) * (a⁻¹ * g'.val * a) := by simp only [Matrix.mul_assoc])
 
 lemma conjE_val (a : Mx k r) (ha : IsUnit a.det) (h1 : ∀ g ∈ Nset k r, a⁻¹ * g * a ∈ Nset k r)
     (h2 : ∀ g ∈ Nset k r, a * g * a⁻¹ ∈ Nset k r) (g : GN k r) :
@@ -114,11 +124,16 @@ lemma mod_bound : ∃ K : Set (GN k r), K ∈ 𝓝 (1 : GN k r) ∧ ∃ B : ℝ�
   exact hle
 
 def wt (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℤ :=
-  if i.val < r then (r : ℤ) - i.val else if i.val ≤ r + k then 0 else (r : ℤ) + k - i.val
+  if i.val < r then
+    (r : ℤ) - i.val
+  else if i.val ≤ r + k then
+    0
+  else
+    (r : ℤ) + k - i.val
 
 def NWtUpper : Prop :=
-  ∀ (k r : ℕ) (m : Mx k r), m ∈ Nset k r → ∀ i j : Fin (2 * r + k + 1),
-    wt k r i ≤ wt k r j → m i j = if i = j then 1 else 0
+  ∀ (k r : ℕ) (m : Mx k r),
+    m ∈ Nset k r → ∀ i j : Fin (2 * r + k + 1), wt k r i ≤ wt k r j → m i j = if i = j then 1 else 0
 
 lemma wt_tau (i : Fin (2 * r + k + 1)) : wt k r (tau k r i) = - wt k r i := by
   unfold wt tau
@@ -266,19 +281,25 @@ theorem mod_one (hB : NWtUpper) (g : GN k r) : Measure.modularCharacter g = 1 :=
   have hprod : Measure.modularCharacter g * Measure.modularCharacter g⁻¹ = 1 := by
     rw [← map_mul, mul_inv_cancel, map_one]
   apply le_antisymm (hle g)
-  calc (1 : ℝ≥0) = Measure.modularCharacter g * Measure.modularCharacter g⁻¹ := hprod.symm
+  calc
+    (1 : ℝ≥0)
+      = Measure.modularCharacter g * Measure.modularCharacter g⁻¹ := hprod.symm
     _ ≤ Measure.modularCharacter g * 1 := mul_le_mul_of_nonneg_left (hle g⁻¹) zero_le
     _ = Measure.modularCharacter g := mul_one _
 
-theorem haar_right (hB : NWtUpper) (g : GN k r) :
-    Measure.map (· * g) (Measure.haar : Measure (GN k r)) = Measure.haar := by
+theorem haar_right (hB : NWtUpper) (g : GN k r)
+    : Measure.map (· * g) (Measure.haar : Measure (GN k r)) = Measure.haar := by
   rw [map_rmul, mod_one hB, one_smul]
 
-def conjW (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z) (h : Mx k r)
-    (hh : h ∈ UWset k r z) : GN k r ≃* GN k r :=
-  conjE h (isUnit_of_uh hh.1) (fun g hg => ((subgroup_hypothesis_holds k r z 0 hz hT).2.2.2.2 h hh g hg).1)
+def conjW
+    (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z)
+    (h : Mx k r) (hh : h ∈ UWset k r z)
+    : GN k r ≃* GN k r :=
+  conjE h (isUnit_of_uh hh.1)
+    (fun g hg => ((subgroup_hypothesis_holds k r z 0 hz hT).2.2.2.2 h hh g hg).1)
     (fun g hg => by
-      have := ((subgroup_hypothesis_holds k r z 0 hz hT).2.2.2.2 h⁻¹ ((uw_clsub z).inv_mem h hh) g hg).1
+      have :=
+        ((subgroup_hypothesis_holds k r z 0 hz hT).2.2.2.2 h⁻¹ ((uw_clsub z).inv_mem h hh) g hg).1
       rwa [Matrix.nonsing_inv_nonsing_inv h (isUnit_of_uh hh.1)] at this)
 
 lemma conjW_cont (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z) (h : Mx k r)
@@ -287,9 +308,10 @@ lemma conjW_cont (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < T
 lemma conjW_symm_cont (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z) (h : Mx k r)
     (hh : h ∈ UWset k r z) : Continuous (conjW z hz hT h hh).symm := conjE_symm_cont _ _ _ _
 
-theorem haar_conj (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z) (h : Mx k r)
-    (hh : h ∈ UWset k r z) :
-    Measure.map (conjW z hz hT h hh) (Measure.haar : Measure (GN k r)) = Measure.haar := by
+theorem haar_conj
+    (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < Tz k r z)
+    (h : Mx k r) (hh : h ∈ UWset k r z)
+    : Measure.map (conjW z hz hT h hh) (Measure.haar : Measure (GN k r)) = Measure.haar := by
   have he := conjW_cont z hz hT h hh
   have hs := conjW_symm_cont z hz hT h hh
   obtain ⟨s, -, hEq⟩ := auto_scalar (conjW z hz hT h hh) he hs
@@ -297,7 +319,8 @@ theorem haar_conj (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < 
   have hW := uw_clsub (k := k) (r := r) z
   obtain ⟨K, hK, hKn⟩ := exists_compact_mem_nhds (1 : GN k r)
   let F : Mx k r × Mx k r → Mx k r := fun p => p.1 * p.2 * jinv p.1
-  have hF : Continuous F := (continuous_fst.matrix_mul continuous_snd).matrix_mul (jinv_cont.comp continuous_fst)
+  have hF : Continuous F :=
+    (continuous_fst.matrix_mul continuous_snd).matrix_mul (jinv_cont.comp continuous_fst)
   let K' : Set (GN k r) := Grp.val ⁻¹' (F '' ((UWset k r z : Set (Mx k r)) ×ˢ (Grp.val '' K)))
   have hK' : IsCompact K' :=
     Grp.emb.isCompact_preimage (((compactW z hz hT).prod (hK.image Grp.emb.continuous)).image hF)
@@ -326,7 +349,9 @@ theorem haar_conj (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < 
       have hy' : h⁻¹ * g.val * h = h' * x.val * h'⁻¹ := hy
       refine ⟨h * h', hW.mul_mem _ hh _ hh', x, hx, ?_⟩
       rw [Matrix.mul_inv_rev]
-      calc g.val = (h * h⁻¹) * g.val * (h * h⁻¹) := by rw [e1, Matrix.one_mul, Matrix.mul_one]
+      calc
+        g.val
+          = (h * h⁻¹) * g.val * (h * h⁻¹) := by rw [e1, Matrix.one_mul, Matrix.mul_one]
         _ = h * (h⁻¹ * g.val * h) * h⁻¹ := by simp only [Matrix.mul_assoc]
         _ = h * (h' * x.val * h'⁻¹) * h⁻¹ := by rw [hy']
         _ = h * h' * x.val * (h'⁻¹ * h⁻¹) := by simp only [Matrix.mul_assoc]
@@ -342,31 +367,39 @@ theorem haar_conj (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z) (hT : 0 < 
   simp only [Measure.smul_apply, ENNReal.smul_def, smul_eq_mul] at ev
   rw [Measure.map_apply he.measurable hK'.isClosed.measurableSet, hpre] at ev
   have hs1 : s = 1 := by
-    have h2 : (s : ℝ≥0∞) * (Measure.haar : Measure (GN k r)) K' = 1 * (Measure.haar : Measure (GN k r)) K' := by
+    have h2
+        : (s : ℝ≥0∞) * (Measure.haar : Measure (GN k r)) K'
+          = 1 * (Measure.haar : Measure (GN k r)) K' := by
       rw [one_mul]; exact ev.symm
     exact ENNReal.coe_eq_one.mp ((ENNReal.mul_left_inj hK0 hKt).mp h2)
   rw [hEq, hs1, one_smul]
 
-theorem nUnimod_core (hB : NWtUpper) (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (μN : Measure (Mt k r))
-    (hz : inWb k r z) (hT : 0 < Tz k r z) (hN : IsHaarOn (Nset k r) μN)
+theorem nUnimod_core
+    (hB : NWtUpper)
+    (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (μN : Measure (Mt k r)) (hz : inWb k r z)
+    (hT : 0 < Tz k r z) (hN : IsHaarOn (Nset k r) μN)
     (_hNc : ∀ K : Set (Mt k r), IsCompact K → μN K < ⊤) (h : Mx k r) (hh : h ∈ UWset k r z)
-    (m₀ : Mx k r) (hm₀ : m₀ ∈ Nset k r) :
-    μN.map (fun x : Mt k r => fun i j => (h⁻¹ * Matrix.of x * h * m₀) i j) = μN := by
+    (m₀ : Mx k r) (hm₀ : m₀ ∈ Nset k r)
+    : μN.map (fun x : Mt k r => fun i j => (h⁻¹ * Matrix.of x * h * m₀) i j) = μN := by
   obtain ⟨c, -, -, hμ⟩ := n_unique μN hN
   have hΦ : Measurable (fun x : Mt k r => fun i j => (h⁻¹ * Matrix.of x * h * m₀) i j) := by
     have : Continuous (fun x : Mt k r => fun i j => (h⁻¹ * Matrix.of x * h * m₀) i j) := by
       show Continuous fun x : Mt k r => (h⁻¹ * Matrix.of x * h * m₀ : Mx k r)
-      exact ((continuous_const.matrix_mul continuous_id).matrix_mul continuous_const).matrix_mul continuous_const
+      exact ((continuous_const.matrix_mul continuous_id).matrix_mul continuous_const).matrix_mul
+        continuous_const
     exact this.measurable
   have he := conjW_cont z hz hT h hh
-  have hcomp : (fun x : Mt k r => fun i j => (h⁻¹ * Matrix.of x * h * m₀) i j) ∘ Grp.vt =
-      Grp.vt ∘ (fun g : GN k r => conjW z hz hT h hh g * Grp.mk m₀ hm₀) := by
+  have hcomp
+      : (fun x : Mt k r => fun i j => (h⁻¹ * Matrix.of x * h * m₀) i j) ∘ Grp.vt
+        = Grp.vt ∘ (fun g : GN k r => conjW z hz hT h hh g * Grp.mk m₀ hm₀) := by
     funext g
     rfl
   have hψ : Measurable (fun g : GN k r => conjW z hz hT h hh g * Grp.mk m₀ hm₀) :=
     he.measurable.mul_const _
-  have hsplit : (fun g : GN k r => conjW z hz hT h hh g * Grp.mk m₀ hm₀) =
-      (· * Grp.mk m₀ hm₀) ∘ conjW z hz hT h hh := rfl
+  have hsplit
+      : (fun g : GN k r => conjW z hz hT h hh g * Grp.mk m₀ hm₀)
+        = (· * Grp.mk m₀ hm₀) ∘ conjW z hz hT h hh :=
+    rfl
   rw [hμ, haarNm_eq, Measure.map_smul c hΦ.aemeasurable,
     Measure.map_map hΦ Grp.embt.continuous.measurable, hcomp,
     ← Measure.map_map Grp.embt.continuous.measurable hψ, hsplit,

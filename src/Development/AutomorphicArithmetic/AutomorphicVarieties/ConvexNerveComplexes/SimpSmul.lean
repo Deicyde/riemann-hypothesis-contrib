@@ -6,8 +6,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConvexNerve
 
 open Set UpperTheory.V.ConeExtensionAcyclic
 
-theorem UpperTheory.V.ConeExtensionAcyclic.simp_smul :
-    ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {q : Y → E →L[ℝ] ℝ} {T : Set E} (g : E ≃L[ℝ] E) (π : Y ≃ Y), (∀ y h, q (π y) (g h) = q y h) → (∀ k, g k ∈ T ↔ k ∈ T) → (∀ h, IsVert q h → IsVert q (g h)) ∧ ∀ (n : ℕ) (t t' : Fin n → Vert q), (∀ j, (t' j).1 = g (t j).1) → t ∈ simp q T n → t' ∈ simp q T n := by
+theorem UpperTheory.V.ConeExtensionAcyclic.simp_smul
+    : ∀ {E Y : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] {q : Y → E →L[ℝ] ℝ} {T : Set E}
+        (g : E ≃L[ℝ] E) (π : Y ≃ Y),
+      (∀ y h, q (π y) (g h) = q y h) → (∀ k, g k ∈ T ↔ k ∈ T)
+        → (∀ h, IsVert q h → IsVert q (g h))
+          ∧ ∀ (n : ℕ) (t t' : Fin n → Vert q),
+            (∀ j, (t' j).1 = g (t j).1) → t ∈ simp q T n → t' ∈ simp q T n := by
   intro E Y _ _ q T g π hq hT
   have hpoly : ∀ h, h ∈ poly q → g.symm h ∈ poly q := by
     intro h hh

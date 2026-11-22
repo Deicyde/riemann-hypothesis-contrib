@@ -26,9 +26,9 @@ end Field
 
 section Local
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F]
-  [IsNonarchimedeanLocalField F] [CharZero F]
-
+variable
+  {F : Type*}
+  [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
 
 end Local
 

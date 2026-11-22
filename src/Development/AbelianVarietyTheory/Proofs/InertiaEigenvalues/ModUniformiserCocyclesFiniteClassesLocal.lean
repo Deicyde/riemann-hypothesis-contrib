@@ -10,7 +10,20 @@ open ReciprocityTheory.Gal
 
 namespace GlobalTheory
 
-theorem modpi_cocycles_finite_classes : Formalism.GaloisCohomology.LocalTateDualityK → ∀ {p : ℕ} [Fact p.Prime] {K : IntermediateField ℚ_[p] (PadicAlgCl p)}, FiniteDimensional ℚ_[p] K → ∀ {O : Type} [CommRing O] {M : Type} [AddCommGroup M] [Module O M] [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul O M] [CompactSpace M] {G : Type} [Group G] [TopologicalSpace G] (i : G ≃ₜ* Formalism.GaloisCohomology.GK p K) (ρ : Representation O G M), ContAction ρ → ∀ (ϖ : O), (p : O) ∈ Ideal.span {ϖ} → IsOpen (LinearMap.range (LinearMap.lsmul O M ϖ) : Set M) → ∃ s : Finset (Z1 ρ), ∀ c : Z1 ρ, ∃ i ∈ s, ∃ x : M, ∀ g, (c : G → M) g - (i : G → M) g - (ρ g x - x) ∈ LinearMap.range (LinearMap.lsmul O M ϖ) := by
+theorem modpi_cocycles_finite_classes
+    : Formalism.GaloisCohomology.LocalTateDualityK
+      → ∀ {p : ℕ} [Fact p.Prime] {K : IntermediateField ℚ_[p] (PadicAlgCl p)},
+        FiniteDimensional ℚ_[p] K
+          → ∀ {O : Type} [CommRing O] {M : Type} [AddCommGroup M] [Module O M] [TopologicalSpace M]
+              [IsTopologicalAddGroup M] [ContinuousConstSMul O M] [CompactSpace M] {G : Type}
+              [Group G] [TopologicalSpace G] (i : G ≃ₜ* Formalism.GaloisCohomology.GK p K)
+              (ρ : Representation O G M),
+            ContAction ρ
+              → ∀ (ϖ : O),
+                (p : O) ∈ Ideal.span {ϖ} → IsOpen (LinearMap.range (LinearMap.lsmul O M ϖ) : Set M)
+                  → ∃ s : Finset (Z1 ρ), ∀ c : Z1 ρ, ∃ i ∈ s, ∃ x : M, ∀ g,
+                    (c : G → M) g - (i : G → M) g - (ρ g x - x)
+                      ∈ LinearMap.range (LinearMap.lsmul O M ϖ) := by
   classical
   intro hT p _ K hK O _ M _ _ _ _ _ _ G _ _ e ρ hρ ϖ hp hN
   set N : Submodule O M := LinearMap.range (LinearMap.lsmul O M ϖ) with hNdef
@@ -18,7 +31,8 @@ theorem modpi_cocycles_finite_classes : Formalism.GaloisCohomology.LocalTateDual
   have hstab : ∀ g : G, N ≤ N.comap (ρ g) := by
     rintro g _ ⟨m, rfl⟩
     show ρ g (ϖ • m) ∈ N
-    rw [map_smul]; exact hmemN _
+    rw [map_smul]
+    exact hmemN _
   haveI hdisc : DiscreteTopology (M ⧸ N) :=
     QuotientAddGroup.discreteTopology (N := N.toAddSubgroup) hN
   haveI : CompactSpace (M ⧸ N) :=
@@ -33,7 +47,8 @@ theorem modpi_cocycles_finite_classes : Formalism.GaloisCohomology.LocalTateDual
     rw [pow_one, ← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
     have : (p • m : M) = ϖ • (r • m) := by
       rw [← Nat.cast_smul_eq_nsmul O, ← hr, smul_smul, mul_comm]
-    rw [this]; exact hmemN _
+    rw [this]
+    exact hmemN _
   haveI : Module (ZMod (p ^ k)) (M ⧸ N) := AddCommGroup.zmodModule (n := p ^ k) hkill
   haveI : ContinuousConstSMul (ZMod (p ^ k)) (M ⧸ N) := ⟨fun _ => continuous_of_discreteTopology⟩
   let f : Formalism.GaloisCohomology.GK p K → Module.End (ZMod (p ^ k)) (M ⧸ N) := fun h =>
@@ -44,14 +59,18 @@ theorem modpi_cocycles_finite_classes : Formalism.GaloisCohomology.LocalTateDual
     show Submodule.Quotient.mk _ = Submodule.Quotient.mk _
     simp
   have hfm : ∀ a b, f (a * b) = f a * f b := by
-    intro a b; refine LinearMap.ext fun q => ?_
+    intro a b
+    refine LinearMap.ext fun q => ?_
     obtain ⟨m, rfl⟩ := Submodule.Quotient.mk_surjective N q
     show Submodule.Quotient.mk _ = Submodule.Quotient.mk _
     simp
-  let ρ' : Representation (ZMod (p ^ k)) (Formalism.GaloisCohomology.GK p K) (M ⧸ N) := MonoidHom.mk (OneHom.mk f hf1) hfm
-  have hρ'mk : ∀ h m, ρ' h (Submodule.Quotient.mk m) = Submodule.Quotient.mk (ρ (e.symm h) m) := fun h m => rfl
+  let ρ' : Representation (ZMod (p ^ k)) (Formalism.GaloisCohomology.GK p K) (M ⧸ N) :=
+    MonoidHom.mk (OneHom.mk f hf1) hfm
+  have hρ'mk : ∀ h m, ρ' h (Submodule.Quotient.mk m) = Submodule.Quotient.mk (ρ (e.symm h) m) :=
+    fun h m => rfl
   have hρ' : ContAction ρ' := by
-    have hq : Topology.IsQuotientMap (Prod.map (id : Formalism.GaloisCohomology.GK p K → Formalism.GaloisCohomology.GK p K) (N.mkQ)) :=
+    have hq : Topology.IsQuotientMap (Prod.map
+        (id : Formalism.GaloisCohomology.GK p K → Formalism.GaloisCohomology.GK p K) (N.mkQ)) :=
       (IsOpenQuotientMap.id.prodMap (Submodule.isOpenQuotientMap_mkQ N)).isQuotientMap
     show Continuous _
     rw [hq.continuous_iff]
@@ -61,8 +80,10 @@ theorem modpi_cocycles_finite_classes : Formalism.GaloisCohomology.LocalTateDual
     rw [this]
     exact (Submodule.isOpenQuotientMap_mkQ N).continuous.comp
       (hρ.comp ((e.symm.continuous.comp continuous_fst).prodMk continuous_snd))
-  have hfin := (GlobalTheory.finite_H1_H2_of_localTateDuality hT p K hK k (M ⧸ N) ρ' (by omega) hρ').1
-  let cb : Z1 ρ → (Formalism.GaloisCohomology.GK p K → M ⧸ N) := fun c h => Submodule.Quotient.mk ((c : G → M) (e.symm h))
+  have hfin :=
+    (GlobalTheory.finite_H1_H2_of_localTateDuality hT p K hK k (M ⧸ N) ρ' (by omega) hρ').1
+  let cb : Z1 ρ → (Formalism.GaloisCohomology.GK p K → M ⧸ N) := fun c h =>
+    Submodule.Quotient.mk ((c : G → M) (e.symm h))
   have hcb : ∀ c, cb c ∈ Z1 ρ' := by
     intro c
     refine ⟨(Submodule.isOpenQuotientMap_mkQ N).continuous.comp (c.2.1.comp e.symm.continuous), ?_⟩
@@ -84,9 +105,11 @@ theorem modpi_cocycles_finite_classes : Formalism.GaloisCohomology.LocalTateDual
   refine ⟨x, fun g => ?_⟩
   have := hq (e g)
   simp only [Submodule.coe_subtype, Submodule.coe_sub, Pi.sub_apply, cb, hρ'mk,
-    MulEquiv.symm_apply_apply, ContinuousMulEquiv.symm_apply_apply] at this
+      MulEquiv.symm_apply_apply, ContinuousMulEquiv.symm_apply_apply]
+    at this
   rw [← Submodule.Quotient.mk_eq_zero]
   simp only [Submodule.Quotient.mk_sub]
-  rw [this]; abel
+  rw [this]
+  abel
 
 end GlobalTheory

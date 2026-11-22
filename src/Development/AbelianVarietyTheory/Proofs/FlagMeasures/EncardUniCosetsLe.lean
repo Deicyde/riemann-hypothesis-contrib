@@ -17,8 +17,8 @@ namespace GlobalTheory.HL.UniCount
 section
 variable {E : Type} [CommRing E] {N : ℕ}
 
-theorem isUni_mul {s t : Matrix (Fin N) (Fin N) E} (hs : IsUni s) (ht : IsUni t) :
-    IsUni (s * t) := by
+theorem isUni_mul {s t : Matrix (Fin N) (Fin N) E} (hs : IsUni s) (ht : IsUni t)
+    : IsUni (s * t) := by
   refine ⟨fun i j h => ?_, fun i => ?_⟩
   · rw [Matrix.mul_apply]
     refine Finset.sum_eq_zero fun l _ => ?_
@@ -36,13 +36,12 @@ theorem isUni_mul {s t : Matrix (Fin N) (Fin N) E} (hs : IsUni s) (ht : IsUni t)
 def rowM (k : Fin N) (c : Fin N → E) : Matrix (Fin N) (Fin N) E :=
   1 + Matrix.of fun a b => if a = k then c b else 0
 
-theorem mul_rowM (w : Matrix (Fin N) (Fin N) E) (k : Fin N) (c : Fin N → E) (i j : Fin N) :
-    (w * rowM k c) i j = w i j + w i k * c j := by
+theorem mul_rowM (w : Matrix (Fin N) (Fin N) E) (k : Fin N) (c : Fin N → E) (i j : Fin N)
+    : (w * rowM k c) i j = w i j + w i k * c j := by
   rw [rowM, Matrix.mul_add, Matrix.mul_one, Matrix.add_apply, Matrix.mul_apply]
   simp
 
-theorem isUni_rowM (k : Fin N) (c : Fin N → E) (hc : ∀ j, j ≤ k → c j = 0) :
-    IsUni (rowM k c) := by
+theorem isUni_rowM (k : Fin N) (c : Fin N → E) (hc : ∀ j, j ≤ k → c j = 0) : IsUni (rowM k c) := by
   refine ⟨fun i j h => ?_, fun i => ?_⟩
   · simp only [rowM, Matrix.add_apply, Matrix.of_apply, Matrix.one_apply_ne h.ne']
     split_ifs with h1
@@ -57,13 +56,14 @@ end
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] {N : ℕ}
 
-theorem isIntM_mul (L : LocE F E) {s t : Matrix (Fin N) (Fin N) E} (hs : IsIntM L s)
-    (ht : IsIntM L t) : IsIntM L (s * t) := fun i j => by
+theorem isIntM_mul
+    (L : LocE F E) {s t : Matrix (Fin N) (Fin N) E} (hs : IsIntM L s) (ht : IsIntM L t)
+    : IsIntM L (s * t) := fun i j => by
   rw [Matrix.mul_apply]
   exact sum_mem fun l _ => mul_mem (hs i l) (ht l j)
 
-theorem isIntM_rowM (L : LocE F E) (k : Fin N) (c : Fin N → E) (hc : ∀ j, c j ∈ L.O) :
-    IsIntM L (rowM k c) := fun i j => by
+theorem isIntM_rowM (L : LocE F E) (k : Fin N) (c : Fin N → E) (hc : ∀ j, c j ∈ L.O)
+    : IsIntM L (rowM k c) := fun i j => by
   simp only [rowM, Matrix.add_apply, Matrix.of_apply, Matrix.one_apply]
   refine add_mem ?_ ?_
   · split_ifs
@@ -74,13 +74,17 @@ theorem isIntM_rowM (L : LocE F E) (k : Fin N) (c : Fin N → E) (hc : ∀ j, c 
 def cos (L : LocE F E) (u : Matrix (Fin N) (Fin N) E) : Set (Matrix (Fin N) (Fin N) E) :=
   {v | ∃ A, IsUni A ∧ IsIntM L A ∧ v = u * A}
 
-theorem cos_mul_subset (L : LocE F E) (u B : Matrix (Fin N) (Fin N) E) (h1 : IsUni B)
-    (h2 : IsIntM L B) : cos L (u * B) ⊆ cos L u := by
+theorem cos_mul_subset
+    (L : LocE F E) (u B : Matrix (Fin N) (Fin N) E) (h1 : IsUni B) (h2 : IsIntM L B)
+    : cos L (u * B) ⊆ cos L u := by
   rintro v ⟨A, hA, hA', rfl⟩
   exact ⟨B * A, isUni_mul h1 hA, isIntM_mul L h2 hA', Matrix.mul_assoc _ _ _⟩
 
-theorem cos_rowM (L : LocE F E) (u : Matrix (Fin N) (Fin N) E) (k : Fin N) (c : Fin N → E)
-    (hc : ∀ j, j ≤ k → c j = 0) (hc' : ∀ j, c j ∈ L.O) : cos L (u * rowM k c) = cos L u := by
+theorem cos_rowM
+    (L : LocE F E)
+    (u : Matrix (Fin N) (Fin N) E)
+    (k : Fin N) (c : Fin N → E) (hc : ∀ j, j ≤ k → c j = 0) (hc' : ∀ j, c j ∈ L.O)
+    : cos L (u * rowM k c) = cos L u := by
   refine (cos_mul_subset L u _ (isUni_rowM k c hc) (isIntM_rowM L k c hc')).antisymm ?_
   have : u = u * rowM k c * rowM k (-c) := by
     ext i j
@@ -90,11 +94,13 @@ theorem cos_rowM (L : LocE F E) (u : Matrix (Fin N) (Fin N) E) (k : Fin N) (c : 
   exact cos_mul_subset L _ _ (isUni_rowM k _ fun j hj => by simp [hc j hj])
     (isIntM_rowM L k _ fun j => neg_mem (hc' j))
 
-theorem exists_rep (L : LocE F E) (δ : E) (R : Set E)
-    (hR : ∀ x : E, δ * x ∈ L.O → ∃ r ∈ R, r - x ∈ L.O)
-    (u : Matrix (Fin N) (Fin N) E) (hu : IsUni u) (hδ : ∀ i j, δ * u i j ∈ L.O) (m : ℕ) :
-    ∃ w : Matrix (Fin N) (Fin N) E, IsUni w ∧ (∀ i j, δ * w i j ∈ L.O) ∧ cos L w = cos L u ∧
-      ∀ i j : Fin N, N ≤ i.val + m → i < j → w i j ∈ R := by
+theorem exists_rep
+    (L : LocE F E) (δ : E) (R : Set E) (hR : ∀ x : E, δ * x ∈ L.O → ∃ r ∈ R, r - x ∈ L.O)
+    (u : Matrix (Fin N) (Fin N) E) (hu : IsUni u) (hδ : ∀ i j, δ * u i j ∈ L.O)
+    (m : ℕ)
+    : ∃ w : Matrix (Fin N) (Fin N) E,
+      IsUni w ∧ (∀ i j, δ * w i j ∈ L.O) ∧ cos L w = cos L u
+        ∧ ∀ i j : Fin N, N ≤ i.val + m → i < j → w i j ∈ R := by
   induction m with
   | zero => exact ⟨u, hu, hδ, rfl, fun i j h _ => absurd i.2 (by omega)⟩
   | succ m ih =>
@@ -109,8 +115,13 @@ theorem exists_rep (L : LocE F E) (δ : E) (R : Set E)
       simp only [c]
       split_ifs
       exacts [hr j, zero_mem _]
-    refine ⟨w * rowM k c, isUni_mul hw (isUni_rowM k c hc0), fun i j => ?_,
-      (cos_rowM L w k c hc0 hc1).trans hc, fun i j h hij => ?_⟩
+    refine ⟨
+      w * rowM k c,
+      isUni_mul hw (isUni_rowM k c hc0),
+      fun i j => ?_,
+      (cos_rowM L w k c hc0 hc1).trans hc,
+      fun i j h hij => ?_
+    ⟩
     · rw [mul_rowM, mul_add, ← mul_assoc]
       exact add_mem (hwδ i j) (mul_mem (hwδ i k) (hc1 j))
     · rw [mul_rowM]
@@ -126,11 +137,11 @@ theorem exists_rep (L : LocE F E) (δ : E) (R : Set E)
         rw [hw.1 i k h3, zero_mul, add_zero]
         exact hg i j (by omega) hij
 
-theorem encard_le (L : LocE F E) (δ : L.O) (hδ : IsUnit (δ : E))
-    [Finite (L.O ⧸ Ideal.span {δ})] (N : ℕ) :
-    {C : Set (Matrix (Fin N) (Fin N) E) | ∃ u, IsUni u ∧ (∀ i j, (δ : E) * u i j ∈ L.O) ∧
-      C = cos L u}.encard ≤
-      ((Nat.card (L.O ⧸ Ideal.span {δ}) ^ (N * (N - 1) / 2) : ℕ) : ℕ∞) := by
+theorem encard_le
+    (L : LocE F E) (δ : L.O) (hδ : IsUnit (δ : E)) [Finite (L.O ⧸ Ideal.span {δ})] (N : ℕ)
+    : {C : Set (Matrix (Fin N) (Fin N) E) | ∃ u, IsUni u ∧ (∀ i j, (δ : E) * u i j ∈ L.O) ∧
+        C = cos L u}.encard
+      ≤ ((Nat.card (L.O ⧸ Ideal.span {δ}) ^ (N * (N - 1) / 2) : ℕ) : ℕ∞) := by
   obtain ⟨d, hd⟩ := hδ
   let ρ : (L.O ⧸ Ideal.span {δ}) → E := fun q => (d⁻¹ : Eˣ) * (Quotient.out q : L.O)
   have hR : ∀ x : E, (δ : E) * x ∈ L.O → ∃ r ∈ Set.range ρ, r - x ∈ L.O := by
@@ -140,8 +151,9 @@ theorem encard_le (L : LocE F E) (δ : L.O) (hδ : IsUnit (δ : E))
     have h1 : Quotient.out (Ideal.Quotient.mk (Ideal.span {δ}) y) - y ∈ Ideal.span {δ} :=
       Ideal.Quotient.eq.1 (Ideal.Quotient.mk_out _)
     obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.1 h1
-    have h2 : ((Quotient.out (Ideal.Quotient.mk (Ideal.span {δ}) y) : L.O) : E)
-        = (a : E) * d + d * x := by
+    have h2
+        : ((Quotient.out (Ideal.Quotient.mk (Ideal.span {δ}) y) : L.O) : E)
+          = (a : E) * d + d * x := by
       have := congrArg (Subtype.val) ha
       push_cast at this
       rw [hd, this]
@@ -155,9 +167,17 @@ theorem encard_le (L : LocE F E) (δ : L.O) (hδ : IsUnit (δ : E))
     exact a.2
   let P := {p : Fin N × Fin N // p.1 < p.2}
   let mk : (P → L.O ⧸ Ideal.span {δ}) → Matrix (Fin N) (Fin N) E := fun f =>
-    Matrix.of fun i j => if h : i < j then ρ (f ⟨(i, j), h⟩) else if i = j then 1 else 0
-  have hsub : {C : Set (Matrix (Fin N) (Fin N) E) | ∃ u, IsUni u ∧
-      (∀ i j, (δ : E) * u i j ∈ L.O) ∧ C = cos L u} ⊆ (fun f => cos L (mk f)) '' Set.univ := by
+    Matrix.of fun i j =>
+      if h : i < j then
+        ρ (f ⟨(i, j), h⟩)
+      else if i = j then
+        1
+      else
+        0
+  have hsub
+      : {C : Set (Matrix (Fin N) (Fin N) E) | ∃ u, IsUni u ∧
+          (∀ i j, (δ : E) * u i j ∈ L.O) ∧ C = cos L u}
+        ⊆ (fun f => cos L (mk f)) '' Set.univ := by
     rintro C ⟨u, hu, huδ, rfl⟩
     obtain ⟨w, hw, -, hc, hg⟩ := exists_rep L δ _ hR u hu huδ N
     choose f hf using fun p : P => hg p.1.1 p.1.2 (by omega) p.2
@@ -177,8 +197,8 @@ theorem encard_le (L : LocE F E) (δ : L.O) (hδ : IsUnit (δ : E))
       Fintype.card_fin, Nat.choose_two_right]
   rw [Set.encard_univ, ENat.card_eq_coe_natCard, Nat.card_fun, hP]
 
-theorem resQ_ne_zero [IsNonarchimedeanLocalField F] (ϖ : 𝒪[F]) (h : Irreducible ϖ) :
-    resQ ϖ ≠ 0 := by
+theorem resQ_ne_zero [IsNonarchimedeanLocalField F] (ϖ : 𝒪[F]) (h : Irreducible ϖ)
+    : resQ ϖ ≠ 0 := by
   have : Finite (𝒪[F] ⧸ Ideal.span {ϖ}) := by
     rw [← h.maximalIdeal_eq]
     exact inferInstanceAs (Finite 𝓀[F])
@@ -186,7 +206,17 @@ theorem resQ_ne_zero [IsNonarchimedeanLocalField F] (ϖ : 𝒪[F]) (h : Irreduci
 
 end GlobalTheory.HL.UniCount
 
-theorem GlobalTheory.HL.encard_uniCosets_le : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (ϖ : 𝒪[F]), Irreducible ϖ → ∀ (δ : E), δ ∈ L.O → IsUnit δ → ∀ N : ℕ, ({C : Set (Matrix (Fin N) (Fin N) E) | ∃ u, IsUni u ∧ (∀ i j, δ * u i j ∈ L.O) ∧ C = {v | ∃ A, IsUni A ∧ IsIntM L A ∧ v = u * A}}.encard : ℝ≥0∞) ≤ (resQ ϖ : ℝ≥0∞) ^ ((vE L ϖ (δ * L.cj δ)).toNat * (N * (N - 1) / 2)) := by
+theorem GlobalTheory.HL.encard_uniCosets_le
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (ϖ : 𝒪[F]),
+        Irreducible ϖ
+          → ∀ (δ : E),
+            δ ∈ L.O → IsUnit δ
+              → ∀ N : ℕ,
+                ({C : Set (Matrix (Fin N) (Fin N) E) | ∃ u, IsUni u ∧ (∀ i j, δ * u i j ∈ L.O) ∧ C = {v | ∃ A, IsUni A ∧ IsIntM L A ∧ v = u * A}}.encard
+                    : ℝ≥0∞)
+                  ≤ (resQ ϖ : ℝ≥0∞) ^ ((vE L ϖ (δ * L.cj δ)).toNat * (N * (N - 1) / 2)) := by
   intro F _ _ _ _ _ E _ _ _ L ϖ hϖ δ hδ hu N
   have hc := (GlobalTheory.UnramCard.card_quot_eq_pow L ϖ hϖ ⟨δ, hδ⟩ hu).2
   have hfin : Finite (L.O ⧸ Ideal.span {(⟨δ, hδ⟩ : L.O)}) :=

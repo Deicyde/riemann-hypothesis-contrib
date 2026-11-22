@@ -11,20 +11,22 @@ open scoped Classical
 
 namespace GlobalTheory.CompanionTheory.ExpSums
 
-theorem tendsto_one_add_pow_mul_pow {t : ℝ} (h0 : 0 ≤ t) (h1 : t < 1) (N : ℕ) :
-    Tendsto (fun n : ℕ => (1 + (n : ℝ)) ^ N * t ^ n) atTop (𝓝 0) := by
+theorem tendsto_one_add_pow_mul_pow {t : ℝ} (h0 : 0 ≤ t) (h1 : t < 1) (N : ℕ)
+    : Tendsto (fun n : ℕ => (1 + (n : ℝ)) ^ N * t ^ n) atTop (𝓝 0) := by
   have ht : |t| < 1 := by rw [abs_of_nonneg h0]; exact h1
   have hlim : Tendsto (fun n : ℕ => (2 : ℝ) ^ N * ((n : ℝ) ^ N * t ^ n)) atTop (𝓝 0) := by
     have h := (tendsto_pow_const_mul_const_pow_of_abs_lt_one N ht).const_mul ((2 : ℝ) ^ N)
     rwa [mul_zero] at h
-  refine squeeze_zero' (Filter.Eventually.of_forall fun n => mul_nonneg (by positivity) (pow_nonneg h0 n)) ?_ hlim
+  refine squeeze_zero'
+    (Filter.Eventually.of_forall fun n => mul_nonneg (by positivity) (pow_nonneg h0 n)) ?_ hlim
   filter_upwards [eventually_ge_atTop 1] with n hn
   have hn' : (1 : ℝ) ≤ n := by exact_mod_cast hn
   have hle : (1 + (n : ℝ)) ^ N ≤ (2 * (n : ℝ)) ^ N := by
     gcongr
     linarith
-  calc (1 + (n : ℝ)) ^ N * t ^ n ≤ (2 * (n : ℝ)) ^ N * t ^ n :=
-        mul_le_mul_of_nonneg_right hle (pow_nonneg h0 n)
+  calc
+    (1 + (n : ℝ)) ^ N * t ^ n
+      ≤ (2 * (n : ℝ)) ^ N * t ^ n := mul_le_mul_of_nonneg_right hle (pow_nonneg h0 n)
     _ = (2 : ℝ) ^ N * ((n : ℝ) ^ N * t ^ n) := by ring
 
 theorem expSum_holds : PositivityTheory.Rg.BcB.F.ExpSum := by
@@ -60,7 +62,8 @@ theorem expSum_holds : PositivityTheory.Rg.BcB.F.ExpSum := by
     exact (Equiv.sum_comp e (fun x : S => d x * (x : ℂ) ^ n)).trans
       (Finset.sum_coe_sort S (fun ν => d ν * ν ^ n))
   obtain ⟨C', hC'⟩ := GlobalTheory.CompanionTheory.ExpSums.vandermonde_separation S.card α hinj
-  obtain ⟨C1, hC1, hC'1⟩ : ∃ C1 : ℝ, 0 ≤ C1 ∧ C' ≤ C1 := ⟨max C' 0, le_max_right _ _, le_max_left _ _⟩
+  obtain ⟨C1, hC1, hC'1⟩ : ∃ C1 : ℝ, 0 ≤ C1 ∧ C' ≤ C1 :=
+    ⟨max C' 0, le_max_right _ _, le_max_left _ _⟩
   obtain ⟨C2, hC2, hCC2⟩ : ∃ C2 : ℝ, 0 ≤ C2 ∧ C ≤ C2 := ⟨max C 0, le_max_right _ _, le_max_left _ _⟩
   obtain ⟨B, hB⟩ : ∃ B : ℝ, B = ∑ s : Fin S.card, (1 + ((s : ℕ) : ℝ)) ^ N * ρ ^ (s : ℕ) := ⟨_, rfl⟩
   obtain ⟨K0, hK0⟩ := Filter.eventually_atTop.mp hbound
@@ -69,12 +72,14 @@ theorem expSum_holds : PositivityTheory.Rg.BcB.F.ExpSum := by
     refine (hK0 k hk).trans ?_
     exact mul_le_mul_of_nonneg_right
       (mul_le_mul_of_nonneg_right hCC2 (pow_nonneg (by positivity) N)) (pow_nonneg hρ k)
-  obtain ⟨j, hj⟩ : ∃ j : Fin S.card, α j = μ := ⟨e.symm ⟨μ, hμS⟩, by rw [hα, Equiv.apply_symm_apply]⟩
+  obtain ⟨j, hj⟩ : ∃ j : Fin S.card, α j = μ :=
+    ⟨e.symm ⟨μ, hμS⟩, by rw [hα, Equiv.apply_symm_apply]⟩
   have key : ∀ m : ℕ, K0 ≤ m → ‖d μ‖ * ‖μ‖ ^ m ≤ C1 * (C2 * (1 + (m : ℝ)) ^ N * ρ ^ m * B) := by
     intro m hm
     have h1 := hC' (fun k => d (α k) * α k ^ m) j
-    have hinner : ∀ s : Fin S.card,
-        ∑ k, d (α k) * α k ^ m * α k ^ (s : ℕ) = ∑ i, c i * lam i ^ (m + (s : ℕ)) := by
+    have hinner
+        : ∀ s : Fin S.card,
+          ∑ k, d (α k) * α k ^ m * α k ^ (s : ℕ) = ∑ i, c i * lam i ^ (m + (s : ℕ)) := by
       intro s
       rw [← hpow (m + (s : ℕ))]
       refine Finset.sum_congr rfl fun k _ => ?_
@@ -83,8 +88,9 @@ theorem expSum_holds : PositivityTheory.Rg.BcB.F.ExpSum := by
     simp only [hinner, hj, norm_mul, norm_pow] at h1
     have hT : 0 ≤ ∑ s : Fin S.card, ‖∑ i, c i * lam i ^ (m + (s : ℕ))‖ :=
       Finset.sum_nonneg fun _ _ => norm_nonneg _
-    have hsb : ∑ s : Fin S.card, ‖∑ i, c i * lam i ^ (m + (s : ℕ))‖ ≤
-        C2 * (1 + (m : ℝ)) ^ N * ρ ^ m * B := by
+    have hsb
+        : ∑ s : Fin S.card, ‖∑ i, c i * lam i ^ (m + (s : ℕ))‖
+          ≤ C2 * (1 + (m : ℝ)) ^ N * ρ ^ m * B := by
       rw [hB, Finset.mul_sum]
       refine Finset.sum_le_sum fun s _ => ?_
       have hk := hK0' (m + (s : ℕ)) (le_trans hm (Nat.le_add_right m _))
@@ -92,17 +98,21 @@ theorem expSum_holds : PositivityTheory.Rg.BcB.F.ExpSum := by
       have hbase : 1 + ((m : ℝ) + ((s : ℕ) : ℝ)) ≤ (1 + (m : ℝ)) * (1 + ((s : ℕ) : ℝ)) := by
         have hms : (0 : ℝ) ≤ (m : ℝ) * ((s : ℕ) : ℝ) := by positivity
         nlinarith
-      have hle : (1 + ((m : ℝ) + ((s : ℕ) : ℝ))) ^ N ≤ (1 + (m : ℝ)) ^ N * (1 + ((s : ℕ) : ℝ)) ^ N := by
+      have hle
+          : (1 + ((m : ℝ) + ((s : ℕ) : ℝ))) ^ N ≤ (1 + (m : ℝ)) ^ N * (1 + ((s : ℕ) : ℝ)) ^ N := by
         rw [← mul_pow]
         exact pow_le_pow_left₀ (by positivity) hbase N
-      calc ‖∑ i, c i * lam i ^ (m + (s : ℕ))‖
+      calc
+        ‖∑ i, c i * lam i ^ (m + (s : ℕ))‖
           ≤ C2 * (1 + ((m : ℝ) + ((s : ℕ) : ℝ))) ^ N * ρ ^ (m + (s : ℕ)) := hk
         _ ≤ C2 * ((1 + (m : ℝ)) ^ N * (1 + ((s : ℕ) : ℝ)) ^ N) * ρ ^ (m + (s : ℕ)) :=
           mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hle hC2) (pow_nonneg hρ _)
         _ = C2 * (1 + (m : ℝ)) ^ N * ρ ^ m * ((1 + ((s : ℕ) : ℝ)) ^ N * ρ ^ (s : ℕ)) := by
           rw [pow_add]
           ring
-    calc ‖d μ‖ * ‖μ‖ ^ m ≤ C' * ∑ s : Fin S.card, ‖∑ i, c i * lam i ^ (m + (s : ℕ))‖ := h1
+    calc
+      ‖d μ‖ * ‖μ‖ ^ m
+        ≤ C' * ∑ s : Fin S.card, ‖∑ i, c i * lam i ^ (m + (s : ℕ))‖ := h1
       _ ≤ C1 * ∑ s : Fin S.card, ‖∑ i, c i * lam i ^ (m + (s : ℕ))‖ :=
         mul_le_mul_of_nonneg_right hC'1 hT
       _ ≤ C1 * (C2 * (1 + (m : ℝ)) ^ N * ρ ^ m * B) := mul_le_mul_of_nonneg_left hsb hC1
@@ -116,7 +126,9 @@ theorem expSum_holds : PositivityTheory.Rg.BcB.F.ExpSum := by
     intro m hm
     have h := (le_div_iff₀ (pow_pos hμpos m)).mpr (key m hm)
     rw [ht, div_pow]
-    calc ‖d μ‖ ≤ C1 * (C2 * (1 + (m : ℝ)) ^ N * ρ ^ m * B) / ‖μ‖ ^ m := h
+    calc
+      ‖d μ‖
+        ≤ C1 * (C2 * (1 + (m : ℝ)) ^ N * ρ ^ m * B) / ‖μ‖ ^ m := h
       _ = C1 * (C2 * B) * ((1 + (m : ℝ)) ^ N * (ρ ^ m / ‖μ‖ ^ m)) := by ring
   have h0 : ‖d μ‖ ≤ 0 := ge_of_tendsto hlim (Filter.eventually_atTop.mpr ⟨K0, hle⟩)
   exact norm_le_zero_iff.mp h0

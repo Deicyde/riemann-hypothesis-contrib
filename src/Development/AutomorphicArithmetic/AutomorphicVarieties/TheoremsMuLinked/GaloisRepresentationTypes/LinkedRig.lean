@@ -17,16 +17,24 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.HV GlobalTheory.GalOfCusp UpperTheory.V.Th
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Polynomial UpperTheory.V UpperTheory.V.HV GlobalTheory.GalOfCusp UpperTheory.V.Th
 
-theorem UpperTheory.V.Th.linkedRig :
-    Af.HypothesesH → AdL → LinkedRig := by
+theorem UpperTheory.V.Th.linkedRig : Af.HypothesesH → AdL → LinkedRig := by
   intro hH hAd Ω _ _ _ l _ ι c _ N _ e ψ η σ g₁ B M H L _ _ _ _ _ Φ C₀ k hok hbig hseed
   have hP : Af.Hypotheses₂ := hH.toClassicalTheorems
   have hN := hP.litN
   have hA : GlobalTheory.Published.GlobalArtinReciprocity := hN.aut.art
-  have hC : Pa.CohP :=
-    ⟨hN.coh.lf, hN.coh.lt, hN.coh.le, hN.coh.gf, hN.coh.ge, hN.coh.gw, hN.coh.pt, GlobalTheory.Published.TameLocal_of_duality hN.coh.lt⟩
+  have hC : Pa.CohP := ⟨
+    hN.coh.lf,
+    hN.coh.lt,
+    hN.coh.le,
+    hN.coh.gf,
+    hN.coh.ge,
+    hN.coh.gw,
+    hN.coh.pt,
+    GlobalTheory.Published.TameLocal_of_duality hN.coh.lt
+  ⟩
   have hLoc : W.LocCFTAll := W.locCFT hA hC
   have hB0 : W.ProModularRingExists := W.b0Ex (W.phiAll hC)
   obtain ⟨K, _, _, _, N', w, χ', η', θ, j, hD, hne, hord, hη, hcong, hdisc⟩ := hseed
@@ -41,9 +49,15 @@ theorem UpperTheory.V.Th.linkedRig :
   obtain ⟨ka, hk2, -⟩ := hk2 K hker κ hκ
   obtain ⟨c₁, hle, hL, hv3, hv2, f, hf⟩ := Pr.coefEx l c L Ω _ _ hk3.alg.1 hk2.alg.1
   haveI := Pr.coefIs l c₁
-  obtain ⟨R₂⟩ := Pr.cRealEx hA hLoc W.levEx hB0 Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 2 ka C₀ (Or.inl rfl)
-    hok hbig hle hf hk2 hv2
-  obtain ⟨R₃⟩ := Pr.cRealEx hA hLoc W.levEx hB0 Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 3 _ C₀ (Or.inr rfl)
-    hok hbig hle hf hk3 hv3
-  exact ⟨rigPtOf hA hAd Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 3 _ R₃ hL hk3,
-    ka, hk2, rigPtOf hA hAd Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 2 ka R₂ hL hk2⟩
+  obtain ⟨R₂⟩ :=
+    Pr.cRealEx hA hLoc W.levEx hB0 Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 2 ka C₀ (Or.inl rfl) hok
+      hbig hle hf hk2 hv2
+  obtain ⟨R₃⟩ :=
+    Pr.cRealEx hA hLoc W.levEx hB0 Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 3 _ C₀ (Or.inr rfl) hok
+      hbig hle hf hk3 hv3
+  exact ⟨
+    rigPtOf hA hAd Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 3 _ R₃ hL hk3,
+    ka,
+    hk2,
+    rigPtOf hA hAd Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 2 ka R₂ hL hk2
+  ⟩

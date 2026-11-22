@@ -11,12 +11,14 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P5
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd Formalism.YangianSpanCharacter.T
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Wd Formalism.YangianSpanCharacter.T
 
 theorem isClosed_nonneg_complex : IsClosed {z : ℂ | 0 ≤ z} := by
   have h : {z : ℂ | 0 ≤ z} = {z : ℂ | 0 ≤ z.re} ∩ {z : ℂ | z.im = 0} := by
     ext z
-    simp only [Set.mem_setOf_eq, Set.mem_inter_iff, Complex.le_def, Complex.zero_re, Complex.zero_im]
+    simp only [Set.mem_setOf_eq, Set.mem_inter_iff, Complex.le_def, Complex.zero_re,
+      Complex.zero_im]
     constructor
     · rintro ⟨h1, h2⟩; exact ⟨h1, h2.symm⟩
     · rintro ⟨h1, h2⟩; exact ⟨h1, h2.symm⟩
@@ -24,8 +26,9 @@ theorem isClosed_nonneg_complex : IsClosed {z : ℂ | 0 ≤ z} := by
   exact (isClosed_le continuous_const Complex.continuous_re).inter
     (isClosed_eq Complex.continuous_im continuous_const)
 
-theorem integral_nonneg_complex {α : Type*} [MeasurableSpace α] (ν : Measure α) (f : α → ℂ)
-    (h : ∀ a, 0 ≤ f a) : 0 ≤ ∫ a, f a ∂ν := by
+theorem integral_nonneg_complex
+    {α : Type*} [MeasurableSpace α] (ν : Measure α) (f : α → ℂ) (h : ∀ a, 0 ≤ f a)
+    : 0 ≤ ∫ a, f a ∂ν := by
   have hre : ∀ a, f a = ((f a).re : ℂ) := fun a => by
     apply Complex.ext
     · simp
@@ -44,8 +47,8 @@ theorem continuous_fsv (s : ℂ) : Continuous (fsv s) := by
   exact ((continuous_const.mul continuous_id).sub
     (continuous_const.mul Complex.continuous_conj)).cexp
 
-theorem nonneg_of_continuous {φ : ℂ → ℂ} (hc : Continuous φ) (h : ∀ t, t ≠ 0 → 0 ≤ φ t) :
-    ∀ t, 0 ≤ φ t := by
+theorem nonneg_of_continuous {φ : ℂ → ℂ} (hc : Continuous φ) (h : ∀ t, t ≠ 0 → 0 ≤ φ t)
+    : ∀ t, 0 ≤ φ t := by
   have hcl : IsClosed {t | 0 ≤ φ t} := isClosed_nonneg_complex.preimage hc
   have hsub : ({(0 : ℂ)}ᶜ : Set ℂ) ⊆ {t | 0 ≤ φ t} := fun t ht => h t ht
   have hcl2 := hcl.closure_subset_iff.mpr hsub
@@ -53,28 +56,36 @@ theorem nonneg_of_continuous {φ : ℂ → ℂ} (hc : Continuous φ) (h : ∀ t,
   intro t
   exact hcl2 (Set.mem_univ t)
 
-theorem eq_of_continuous_off_zero {f g : ℂ → ℂ} (hf : Continuous f) (hg : Continuous g)
-    (h : ∀ t, t ≠ 0 → f t = g t) : f = g := hf.ext_on (dense_compl_singleton (0 : ℂ)) hg (fun t ht => h t ht)
+theorem eq_of_continuous_off_zero
+    {f g : ℂ → ℂ} (hf : Continuous f) (hg : Continuous g) (h : ∀ t, t ≠ 0 → f t = g t)
+    : f = g :=
+  hf.ext_on (dense_compl_singleton (0 : ℂ)) hg (fun t ht => h t ht)
 
-theorem update_mem_OmX {m : ℕ} {c : Fin m → ℂ} (hc : c ∈ OmX m) (l : Fin m) {t : ℂ} (ht : t ≠ 0) :
-    Function.update c l t ∈ OmX m := by
+theorem update_mem_OmX {m : ℕ} {c : Fin m → ℂ} (hc : c ∈ OmX m) (l : Fin m) {t : ℂ} (ht : t ≠ 0)
+    : Function.update c l t ∈ OmX m := by
   intro j
   rcases eq_or_ne j l with rfl | hj
   · simpa using ht
   · rw [Function.update_of_ne hj]
     exact hc j
 
-theorem nonneg_all_levels {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] {S : Type} [Fintype S]
-    [DecidableEq S] (P : M.Par) (z z' : Fin (2 * P.r + P.k + 1) → ℂ) (π : Mx P.k P.r → (Wp →L[ℂ] Wp))
-    (π' : Mx P.k P.r → (Wq →L[ℂ] Wq)) (μ : Measure (Mt P.k P.r))
-    (L : R.LevelData (Pr (RadSp P.k P.r z z' π π')) P.r) (st : Fr.Start (Pr (RadSp P.k P.r z z' π π')))
-    (K : Fin (P.r + 1) → Submodule ℂ (RadSp P.k P.r z z' π π')) (l0 : ℕ)
-    (hTI : TopIdent (S := S) P z z' π π' μ L st K l0) (hTN : TopDensNonneg (S := S) P z z' π π' L st K l0)
+theorem nonneg_all_levels
+    {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+    {S : Type} [Fintype S] [DecidableEq S]
+    (P : M.Par) (z z' : Fin (2 * P.r + P.k + 1) → ℂ) (π : Mx P.k P.r → (Wp →L[ℂ] Wp))
+    (π' : Mx P.k P.r → (Wq →L[ℂ] Wq))
+    (μ : Measure (Mt P.k P.r)) (L : R.LevelData (Pr (RadSp P.k P.r z z' π π')) P.r)
+    (st : Fr.Start (Pr (RadSp P.k P.r z z' π π')))
+    (K : Fin (P.r + 1) → Submodule ℂ (RadSp P.k P.r z z' π π'))
+    (l0 : ℕ) (hTI : TopIdent (S := S) P z z' π π' μ L st K l0)
+    (hTN : TopDensNonneg (S := S) P z z' π π' L st K l0)
     (hSI : SliceIn (S := S) P z z' π π' L st K l0) (hSD : StepDens (S := S) P z z' π π' μ L st K l0)
-    (w : List (Letter ℂ S)) (hw : WordOK P z z' π π' st l0 w) :
-    ∀ (n : ℕ) (i : Fin (P.r + 1)), i.val + n = P.r → ∀ c ∈ OmX P.r,
-      ∀ x : Ix S → RadSp P.k P.r z z' π π', InK (K i) x → 0 ≤ RRform L st μ i w x x c := by
+    (w : List (Letter ℂ S)) (hw : WordOK P z z' π π' st l0 w)
+    : ∀ (n : ℕ) (i : Fin (P.r + 1)),
+      i.val + n = P.r
+        → ∀ c ∈ OmX P.r, ∀ x : Ix S → RadSp P.k P.r z z' π π',
+          InK (K i) x → 0 ≤ RRform L st μ i w x x c := by
   intro n
   induction n with
   | zero =>
@@ -114,8 +125,8 @@ theorem thmPFromStepsAll : ThmPFromStepsAll := by
       congr 1
       funext g
       rw [hD]
-    · exact nonneg_all_levels (S := S) P z z' π π' μ L st K l0 hTI hTN hSI hSD w hw 0
-        (Fin.last P.r) (by simp) c hc x hx
+    · exact nonneg_all_levels (S := S) P z z' π π' μ L st K l0 hTI hTN hSI hSD w hw 0 (Fin.last P.r)
+        (by simp) c hc x hx
   · intro l x y hx hy c hc
     obtain ⟨φ, hφc, hφ, hC, -⟩ := hSD w hw l x y hx hy c hc
     refine ⟨φ, hφc, hφ, hC, ?_⟩

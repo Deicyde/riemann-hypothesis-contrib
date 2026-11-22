@@ -32,8 +32,10 @@ theorem J_star : Jᴴ = J := by
   rcases i with i | i <;> simp
 
 theorem isClosed_lieU : IsClosed (lieU P Q : Set (MM P Q)) :=
-  isClosed_eq ((continuous_id.matrix_conjTranspose.matrix_mul continuous_const).add
-    (continuous_const.matrix_mul continuous_id)) continuous_const
+  isClosed_eq
+    ((continuous_id.matrix_conjTranspose.matrix_mul continuous_const).add
+      (continuous_const.matrix_mul continuous_id))
+    continuous_const
 
 instance instLCLie : LocallyCompactSpace (lieU P Q) :=
   haveI : LocallyCompactSpace (MM P Q) :=
@@ -47,22 +49,26 @@ instance instSCLie : SecondCountableTopology (lieU P Q) :=
 
 theorem finDimLie : FiniteDimensional ℝ (lieU P Q) := inferInstance
 
-theorem mem_lieU_iff (Z : MM P Q) : Z ∈ lieU P Q ↔ J * (-Zᴴ) * J = Z := by
+theorem mem_lieU_iff (Z : MM P Q) : Z ∈ lieU P Q ↔ J * (- Zᴴ) * J = Z := by
   show Zᴴ * J + J * Z = 0 ↔ _
   constructor
   · intro h
     have h1 : Zᴴ * J = -(J * Z) := eq_neg_of_add_eq_zero_left h
-    calc J * (-Zᴴ) * J = -(J * (Zᴴ * J)) := by simp [Matrix.mul_assoc]
+    calc
+      J * (- Zᴴ) * J
+        = -(J * (Zᴴ * J)) := by simp [Matrix.mul_assoc]
       _ = J * J * Z := by rw [h1]; simp [Matrix.mul_assoc]
       _ = Z := by rw [J_sq, Matrix.one_mul]
   · intro h
     have : J * Z = -(Zᴴ * J) := by
-      calc J * Z = J * (J * (-Zᴴ) * J) := by rw [h]
-        _ = (J * J) * (-Zᴴ) * J := by simp only [Matrix.mul_assoc]
+      calc
+        J * Z
+          = J * (J * (- Zᴴ) * J) := by rw [h]
+        _ = (J * J) * (- Zᴴ) * J := by simp only [Matrix.mul_assoc]
         _ = -(Zᴴ * J) := by rw [J_sq]; simp
     rw [this, add_neg_cancel]
 
-def th (Z : MM P Q) : MM P Q := J * (-Zᴴ) * J
+def th (Z : MM P Q) : MM P Q := J * (- Zᴴ) * J
 
 theorem th_add (Z W : MM P Q) : th P Q (Z + W) = th P Q Z + th P Q W := by
   simp [th, Matrix.mul_add, Matrix.add_mul, add_comm]
@@ -74,7 +80,9 @@ theorem th_th (Z : MM P Q) : th P Q (th P Q Z) = Z := by
   unfold th
   rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, J_star, Matrix.conjTranspose_neg,
     Matrix.conjTranspose_conjTranspose]
-  calc J * -(J * (-Z * J)) * J = (J * J) * Z * (J * J) := by simp [Matrix.mul_assoc]
+  calc
+    J * -(J * (-Z * J)) * J
+      = (J * J) * Z * (J * J) := by simp [Matrix.mul_assoc]
     _ = Z := by rw [J_sq]; simp
 
 theorem th_of_mem (X : lieU P Q) : th P Q (X : MM P Q) = X := (mem_lieU_iff P Q _).mp X.2
@@ -106,8 +114,11 @@ theorem psiLin_bij : Function.Bijective (psiLin P Q) := by
       simpa [th, sub_eq_add_neg] using this
     have ha : (a : MM P Q) = 0 := by
       have : (2 : ℂ) • (a : MM P Q) = 0 := by
-        have e : (2 : ℂ) • (a : MM P Q) = ((a : MM P Q) + Complex.I • (b : MM P Q)) +
-            ((a : MM P Q) - Complex.I • (b : MM P Q)) := by rw [two_smul]; abel
+        have e
+            : (2 : ℂ) • (a : MM P Q)
+              = ((a : MM P Q) + Complex.I • (b : MM P Q))
+                + ((a : MM P Q) - Complex.I • (b : MM P Q)) := by
+          rw [two_smul]; abel
         rw [e, h1, h2, add_zero]
       simpa using this
     have hb : (b : MM P Q) = 0 := by
@@ -123,9 +134,8 @@ theorem psiLin_bij : Function.Bijective (psiLin P Q) := by
     have hb : ((-Complex.I / 2 : ℂ) • (Z - th P Q Z)) ∈ lieU P Q := by
       rw [mem_lieU_iff]
       show th P Q _ = _
-      rw [th_smul, sub_eq_add_neg, th_add,
-        show -th P Q Z = (-1 : ℂ) • th P Q Z by simp, th_smul, th_th, map_div₀, map_neg,
-        Complex.conj_I, map_ofNat, map_neg, map_one]
+      rw [th_smul, sub_eq_add_neg, th_add, show - th P Q Z = (-1 : ℂ) • th P Q Z by simp, th_smul,
+        th_th, map_div₀, map_neg, Complex.conj_I, map_ofNat, map_neg, map_one]
       module
     refine ⟨(⟨_, ha⟩, ⟨_, hb⟩), ?_⟩
     funext ij
@@ -141,8 +151,10 @@ def psiE : (lieU P Q × lieU P Q) ≃L[ℝ] ((Fin P ⊕ Fin Q) × (Fin P ⊕ Fin
   haveI : FiniteDimensional ℝ (lieU P Q × lieU P Q) := Module.Finite.prod
   (LinearEquiv.ofBijective (psiLin P Q) (psiLin_bij P Q)).toContinuousLinearEquiv
 
-theorem psiE_coe : ⇑(psiE P Q) = fun ab : lieU P Q × lieU P Q =>
-    entries ((ab.1 : MM P Q) + Complex.I • (ab.2 : MM P Q)) := by
+theorem psiE_coe
+    : ⇑(psiE P Q)
+      = fun ab : lieU P Q × lieU P Q =>
+        entries ((ab.1 : MM P Q) + Complex.I • (ab.2 : MM P Q)) := by
   funext ab
   rfl
 
@@ -158,22 +170,23 @@ theorem exists_omegaLeb : ∃ lam : Measure (lieU P Q), IsOmegaLeb lam := by
   have hts : t * t * s = 1 := by
     have h1 : NNReal.sqrt s * NNReal.sqrt s = s := NNReal.mul_self_sqrt s
     have h2 : NNReal.sqrt s ≠ 0 := (NNReal.sqrt_pos.mpr hs0).ne'
-    calc (NNReal.sqrt s)⁻¹ * (NNReal.sqrt s)⁻¹ * s
+    calc
+      (NNReal.sqrt s)⁻¹ * (NNReal.sqrt s)⁻¹ * s
         = (NNReal.sqrt s)⁻¹ * (NNReal.sqrt s)⁻¹ * (NNReal.sqrt s * NNReal.sqrt s) := by rw [h1]
       _ = 1 := by field_simp
   have hl : (t • lam0).IsAddHaarMeasure := Measure.IsAddHaarMeasure.nnreal_smul lam0 ht0
   refine ⟨t • lam0, hl, ?_⟩
   have hmeas : Measurable (psiE P Q) := (psiE P Q).continuous.measurable
   rw [← psiE_coe]
-  rw [Measure.prod_smul_left, Measure.prod_smul_right,
-    Measure.map_smul _ hmeas.aemeasurable, Measure.map_smul _ hmeas.aemeasurable]
+  rw [Measure.prod_smul_left, Measure.prod_smul_right, Measure.map_smul _ hmeas.aemeasurable,
+    Measure.map_smul _ hmeas.aemeasurable]
   show t • t • m = volume
   rw [hs, smul_smul, smul_smul, hts, one_smul]
 
 theorem isOpen_ballU (r : ℝ) : IsOpen (ballU P Q r) := by
   have : Continuous (fun X : lieU P Q => ∑ i, ∑ j, ‖(X : MM P Q) i j‖) :=
-    continuous_finsetSum _ fun i _ => continuous_finsetSum _ fun j _ =>
-      (continuous_subtype_val.matrix_elem i j).norm
+    continuous_finsetSum _ fun i _ =>
+      continuous_finsetSum _ fun j _ => (continuous_subtype_val.matrix_elem i j).norm
   exact isOpen_lt this continuous_const
 
 theorem zero_mem_ballU {r : ℝ} (hr : 0 < r) : (0 : lieU P Q) ∈ ballU P Q r := by
@@ -181,14 +194,21 @@ theorem zero_mem_ballU {r : ℝ} (hr : 0 < r) : (0 : lieU P Q) ∈ ballU P Q r :
   simpa using hr
 
 theorem entry_le_sum (X : MM P Q) (i j : Fin P ⊕ Fin Q) : ‖X i j‖ ≤ ∑ i, ∑ j, ‖X i j‖ :=
-  (Finset.single_le_sum (f := fun j => ‖X i j‖) (fun _ _ => norm_nonneg _) (Finset.mem_univ j)).trans
-    (Finset.single_le_sum (f := fun i => ∑ j, ‖X i j‖)
-      (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _) (Finset.mem_univ i))
+  (Finset.single_le_sum
+      (f := fun j => ‖X i j‖)
+      (fun _ _ => norm_nonneg _)
+      (Finset.mem_univ j)).trans
+    (Finset.single_le_sum
+      (f := fun i => ∑ j, ‖X i j‖)
+      (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _)
+      (Finset.mem_univ i))
 
-theorem ballU_lt_top (lam : Measure (lieU P Q)) [lam.IsAddHaarMeasure] (r : ℝ) :
-    lam (ballU P Q r) < ⊤ := by
-  have hbox : IsCompact (Set.pi Set.univ fun _ : Fin P ⊕ Fin Q =>
-      Set.pi Set.univ fun _ : Fin P ⊕ Fin Q => Metric.closedBall (0 : ℂ) r : Set (MM P Q)) :=
+theorem ballU_lt_top (lam : Measure (lieU P Q)) [lam.IsAddHaarMeasure] (r : ℝ)
+    : lam (ballU P Q r) < ⊤ := by
+  have hbox : IsCompact
+      (Set.pi Set.univ fun _ : Fin P ⊕ Fin Q =>
+          Set.pi Set.univ fun _ : Fin P ⊕ Fin Q => Metric.closedBall (0 : ℂ) r
+        : Set (MM P Q)) :=
     isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall 0 r
   have hK := (isClosed_lieU P Q).isClosedEmbedding_subtypeVal.isCompact_preimage hbox
   refine lt_of_le_of_lt (measure_mono ?_) hK.measure_lt_top
@@ -196,8 +216,8 @@ theorem ballU_lt_top (lam : Measure (lieU P Q)) [lam.IsAddHaarMeasure] (r : ℝ)
   rw [mem_closedBall_zero_iff]
   exact (entry_le_sum P Q X i j).trans (le_of_lt hX)
 
-theorem ballU_pos (lam : Measure (lieU P Q)) [lam.IsAddHaarMeasure] {r : ℝ} (hr : 0 < r) :
-    0 < lam (ballU P Q r) :=
+theorem ballU_pos (lam : Measure (lieU P Q)) [lam.IsAddHaarMeasure] {r : ℝ} (hr : 0 < r)
+    : 0 < lam (ballU P Q r) :=
   (isOpen_ballU P Q r).measure_pos lam ⟨0, zero_mem_ballU P Q hr⟩
 
 end Formalism.BasicNotions.Examples₂.CD

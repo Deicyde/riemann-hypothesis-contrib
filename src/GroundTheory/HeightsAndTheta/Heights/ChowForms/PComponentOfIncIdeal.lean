@@ -14,8 +14,9 @@ open MvPolynomial
 
 namespace ComponentOfIncIdeal
 
-theorem ringKrullDim_quot_add_one_le {A : Type} [CommRing A] {P Q : Ideal A} [P.IsPrime]
-    (hPQ : P ≤ Q) (hne : P ≠ Q) : ringKrullDim (A ⧸ Q) + 1 ≤ ringKrullDim (A ⧸ P) := by
+theorem ringKrullDim_quot_add_one_le
+    {A : Type} [CommRing A] {P Q : Ideal A} [P.IsPrime] (hPQ : P ≤ Q) (hne : P ≠ Q)
+    : ringKrullDim (A ⧸ Q) + 1 ≤ ringKrullDim (A ⧸ P) := by
   obtain ⟨x, hxQ, hxP⟩ := SetLike.exists_of_lt (lt_of_le_of_ne hPQ hne)
   have hne' : Q.map (Ideal.Quotient.mk P) ≠ ⊥ := by
     intro h0
@@ -25,8 +26,9 @@ theorem ringKrullDim_quot_add_one_le {A : Type} [CommRing A] {P Q : Ideal A} [P.
   have h := GroundTheory.Arith.Abelian.Jacobian.ringKrullDim_quotient_add_one_le _ hne'
   rwa [ringKrullDim_eq_of_ringEquiv (DoubleQuot.quotQuotEquivQuotOfLE hPQ)] at h
 
-theorem one_le_ringKrullDim_quot {F : Type} [Field F] {n : ℕ} {W : Ideal (MvPolynomial (Fin n) F)}
-    (hW : IsProjPrime W) : (1 : WithBot ℕ∞) ≤ ringKrullDim (MvPolynomial (Fin n) F ⧸ W) := by
+theorem one_le_ringKrullDim_quot
+    {F : Type} [Field F] {n : ℕ} {W : Ideal (MvPolynomial (Fin n) F)} (hW : IsProjPrime W)
+    : (1 : WithBot ℕ∞) ≤ ringKrullDim (MvPolynomial (Fin n) F ⧸ W) := by
   have hWp := hW.isPrime
   set m : Ideal (MvPolynomial (Fin n) F) := RingHom.ker (constantCoeff : MvPolynomial (Fin n) F →+* F)
   have hmp : m.IsPrime := RingHom.ker_isPrime _
@@ -47,8 +49,9 @@ theorem one_le_ringKrullDim_quot {F : Type} [Field F] {n : ℕ} {W : Ideal (MvPo
     ringKrullDim_nonneg_of_nontrivial
   exact (le_add_of_nonneg_left h0).trans h
 
-theorem exists_nat_of_bounds {x : WithBot ℕ∞} {e : ℕ} (h1 : 1 ≤ x) (h2 : x + 1 ≤ ((e + 1 : ℕ) : WithBot ℕ∞)) :
-    ∃ k : ℕ, x = (k : WithBot ℕ∞) ∧ 1 ≤ k ∧ k ≤ e := by
+theorem exists_nat_of_bounds
+    {x : WithBot ℕ∞} {e : ℕ} (h1 : 1 ≤ x) (h2 : x + 1 ≤ ((e + 1 : ℕ) : WithBot ℕ∞))
+    : ∃ k : ℕ, x = (k : WithBot ℕ∞) ∧ 1 ≤ k ∧ k ≤ e := by
   induction x using WithBot.recBotCoe with
   | bot => exact absurd h1 (by simp)
   | coe y =>
@@ -67,10 +70,10 @@ theorem exists_nat_of_bounds {x : WithBot ℕ∞} {e : ℕ} (h1 : 1 ≤ x) (h2 :
 
 end ComponentOfIncIdeal
 
-
 open ComponentOfIncIdeal in
-theorem ComponentOfIncIdeal.proof (h₁ : IncIdealDim.Statement) (h₂ : IncIdealPrime.Statement)
-    (h₃ : ConeDimComponent.Statement) : ComponentOfIncIdeal.Statement := by
+theorem ComponentOfIncIdeal.proof
+    (h₁ : IncIdealDim.Statement) (h₂ : IncIdealPrime.Statement) (h₃ : ConeDimComponent.Statement)
+    : ComponentOfIncIdeal.Statement := by
   intro F _ n e I W u q hI hdim hu hW hle hq hinc
   have hWp := hW.isPrime
   have := hI.isPrime
@@ -85,9 +88,11 @@ theorem ComponentOfIncIdeal.proof (h₁ : IncIdealDim.Statement) (h₂ : IncIdea
   have hdimInc := h₁ F n e (k - 1) W hW (by rw [hk]; congr 2; omega)
   have hincp : (incIdeal W e).IsPrime := h₂ F n e W hWp hW.isRelevant
   have hS : ringKrullDim (MvPolynomial (Fin e × Fin n) F) = ((e * n : ℕ) : WithBot ℕ∞) := by
-    rw [MvPolynomial.ringKrullDim_of_isNoetherianRing, ringKrullDim_eq_zero_of_isField (Field.toIsField F)]
+    rw [MvPolynomial.ringKrullDim_of_isNoetherianRing,
+      ringKrullDim_eq_zero_of_isField (Field.toIsField F)]
     simp [Nat.card_eq_fintype_card]
-  have hsum := GroundTheory.Arith.Abelian.Jacobian.height_add_ringKrullDim_quotient (k := F) (incIdeal W e)
+  have hsum :=
+    GroundTheory.Arith.Abelian.Jacobian.height_add_ringKrullDim_quotient (k := F) (incIdeal W e)
   rw [hdimInc, hS] at hsum
   have hqle : (Ideal.span {q}).height ≤ 1 := Ideal.height_span_singleton_le_one hq.not_isUnit
   have hht : (incIdeal W e).height ≤ 1 := (Ideal.height_mono hinc).trans hqle
@@ -96,7 +101,9 @@ theorem ComponentOfIncIdeal.proof (h₁ : IncIdealDim.Statement) (h₂ : IncIdea
   rw [hh] at hsum hht
   have hh1 : h ≤ 1 := by exact_mod_cast hht
   have hnat : h + (e * n - e + min e (k - 1)) = e * n := by
-    have h5 : (((h + (e * n - e + min e (k - 1)) : ℕ) : ℕ∞) : WithBot ℕ∞) = (((e * n : ℕ) : ℕ∞) : WithBot ℕ∞) := by
+    have h5
+        : (((h + (e * n - e + min e (k - 1)) : ℕ) : ℕ∞) : WithBot ℕ∞)
+          = (((e * n : ℕ) : ℕ∞) : WithBot ℕ∞) := by
       rw [Nat.cast_add, WithBot.coe_add]
       exact hsum
     exact_mod_cast WithBot.coe_inj.mp h5
@@ -110,8 +117,7 @@ theorem ComponentOfIncIdeal.proof (h₁ : IncIdealDim.Statement) (h₂ : IncIdea
   have hke' : k = e := by omega
   have hh' : h = 1 := by omega
   refine ⟨?_, ?_⟩
-  ·
-    obtain ⟨W'', hmin'', hW''⟩ := Ideal.exists_minimalPrimes_le hle
+  · obtain ⟨W'', hmin'', hW''⟩ := Ideal.exists_minimalPrimes_le hle
     have hrel : IsRelevant W'' := by
       obtain ⟨j, hj⟩ := hW.isRelevant
       exact ⟨j, fun hj'' => hj (hW'' hj'')⟩
@@ -123,8 +129,7 @@ theorem ComponentOfIncIdeal.proof (h₁ : IncIdealDim.Statement) (h₂ : IncIdea
       rw [hdim'', hk, hke'] at hlt
       have : e + 1 ≤ e := by exact_mod_cast hlt
       omega
-  ·
-    by_contra hne
+  · by_contra hne
     have : (Ideal.span {q}).IsPrime := (Ideal.span_singleton_prime hq.ne_zero).mpr hq
     have : (Ideal.span {q}).FiniteHeight :=
       (Ideal.span {q}).finiteHeight_iff.mpr (Or.inr (ne_top_of_le_ne_top (by simp) hqle))

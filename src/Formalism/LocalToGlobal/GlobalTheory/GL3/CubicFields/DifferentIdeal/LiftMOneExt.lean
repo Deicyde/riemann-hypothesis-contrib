@@ -11,29 +11,35 @@ namespace Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5
 open NumberField Classical
 open scoped Pointwise
 
-theorem liftM_val_ext {M : IntermediateField ℚ ℂ} {x : ℂ} (h : x ∈ M) : ((liftM M x : M) : ℂ) = x := by
+theorem liftM_val_ext {M : IntermediateField ℚ ℂ} {x : ℂ} (h : x ∈ M)
+    : ((liftM M x : M) : ℂ) = x := by
   simp [liftM, h]
 
-theorem liftM_mul_ext {E : Type} [Field E] (M : IntermediateField ℚ ℂ) (σ : E →+* ℂ) (hσ : ∀ y, σ y ∈ M)
-    (a b : E) : liftM M (σ (a * b)) = liftM M (σ a) * liftM M (σ b) := by
+theorem liftM_mul_ext
+    {E : Type} [Field E] (M : IntermediateField ℚ ℂ) (σ : E →+* ℂ) (hσ : ∀ y, σ y ∈ M) (a b : E)
+    : liftM M (σ (a * b)) = liftM M (σ a) * liftM M (σ b) := by
   apply Subtype.ext
   rw [liftM_val_ext (hσ (a * b)), IntermediateField.coe_mul, liftM_val_ext (hσ a),
     liftM_val_ext (hσ b), map_mul]
 
-theorem liftM_add_ext {E : Type} [Field E] (M : IntermediateField ℚ ℂ) (σ : E →+* ℂ) (hσ : ∀ y, σ y ∈ M)
-    (a b : E) : liftM M (σ (a + b)) = liftM M (σ a) + liftM M (σ b) := by
+theorem liftM_add_ext
+    {E : Type} [Field E] (M : IntermediateField ℚ ℂ) (σ : E →+* ℂ) (hσ : ∀ y, σ y ∈ M) (a b : E)
+    : liftM M (σ (a + b)) = liftM M (σ a) + liftM M (σ b) := by
   apply Subtype.ext
   rw [liftM_val_ext (hσ (a + b)), IntermediateField.coe_add, liftM_val_ext (hσ a),
     liftM_val_ext (hσ b), map_add]
 
-theorem liftM_one_ext {E : Type} [Field E] (M : IntermediateField ℚ ℂ) (σ : E →+* ℂ) :
-    liftM M (σ 1) = 1 := by
+theorem liftM_one_ext {E : Type} [Field E] (M : IntermediateField ℚ ℂ) (σ : E →+* ℂ)
+    : liftM M (σ 1) = 1 := by
   apply Subtype.ext
   rw [map_one, liftM_val_ext (one_mem M), IntermediateField.coe_one]
 
-theorem liftM_int_ext {E : Type} [Field E] [NumberField E] (M : IntermediateField ℚ ℂ) [NumberField M]
-    (σ : E →+* ℂ) (hσ : ∀ y, σ y ∈ M) (e : 𝓞 E) :
-    liftM M (σ (algebraMap (𝓞 E) E e)) ∈ (algebraMap (𝓞 M) M).range := by
+theorem liftM_int_ext
+    {E : Type} [Field E] [NumberField E]
+    (M : IntermediateField ℚ ℂ) [NumberField M]
+    (σ : E →+* ℂ) (hσ : ∀ y, σ y ∈ M)
+    (e : 𝓞 E)
+    : liftM M (σ (algebraMap (𝓞 E) E e)) ∈ (algebraMap (𝓞 M) M).range := by
   have h1 : IsIntegral ℤ (σ (algebraMap (𝓞 E) E e)) :=
     (RingOfIntegers.isIntegral_coe e).map σ.toIntAlgHom
   have hx : IsIntegral ℤ (liftM M (σ (algebraMap (𝓞 E) E e))) := by
@@ -42,16 +48,26 @@ theorem liftM_int_ext {E : Type} [Field E] [NumberField E] (M : IntermediateFiel
     rwa [liftM_val_ext (hσ _)]
   exact ⟨⟨_, hx⟩, rfl⟩
 
-theorem mem_imI_iff {E : Type} [Field E] [NumberField E] (M : IntermediateField ℚ ℂ) [NumberField M]
-    (σ : E →+* ℂ) (hσ : ∀ y, σ y ∈ M) (J : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hJ : J ≠ 0) (x : M) :
-    x ∈ imI M σ J ↔
-      ∀ b ∈ ((J⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E), x * liftM M (σ b) ∈ (algebraMap (𝓞 M) M).range := by
-  have hJJ : (1 : E) ∈ (J : Submodule (𝓞 E) E) * ((J⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) :
-      Submodule (𝓞 E) E) := by
+theorem mem_imI_iff
+    {E : Type} [Field E] [NumberField E]
+    (M : IntermediateField ℚ ℂ) [NumberField M]
+    (σ : E →+* ℂ) (hσ : ∀ y, σ y ∈ M)
+    (J : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (hJ : J ≠ 0)
+    (x : M)
+    : x ∈ imI M σ J
+      ↔ ∀ b ∈ ((J⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E),
+        x * liftM M (σ b) ∈ (algebraMap (𝓞 M) M).range := by
+  have hJJ
+      : (1 : E)
+        ∈ (J : Submodule (𝓞 E) E)
+          * ((J⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E) := by
     rw [← FractionalIdeal.coe_mul, mul_inv_cancel₀ hJ, FractionalIdeal.coe_one]
     exact Submodule.mem_one.2 ⟨1, map_one _⟩
-  have hint : ∀ z ∈ (J : Submodule (𝓞 E) E) * ((J⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) :
-      Submodule (𝓞 E) E), liftM M (σ z) ∈ (algebraMap (𝓞 M) M).range := by
+  have hint
+      : ∀ z
+          ∈ (J : Submodule (𝓞 E) E)
+            * ((J⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E),
+        liftM M (σ z) ∈ (algebraMap (𝓞 M) M).range := by
     intro z hz
     rw [← FractionalIdeal.coe_mul, mul_inv_cancel₀ hJ, FractionalIdeal.coe_one] at hz
     obtain ⟨y, rfl⟩ := Submodule.mem_one.1 hz
@@ -77,8 +93,11 @@ theorem mem_imI_iff {E : Type} [Field E] [NumberField E] (M : IntermediateField 
       rw [smul_mul_assoc, Algebra.smul_def]
       exact mul_mem (RingHom.mem_range_self _ r) (hy b hb)
   · intro hx
-    have key : ∀ z ∈ (J : Submodule (𝓞 E) E) * ((J⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) :
-        Submodule (𝓞 E) E), x * liftM M (σ z) ∈ imI M σ J := by
+    have key
+        : ∀ z
+            ∈ (J : Submodule (𝓞 E) E)
+              * ((J⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E),
+          x * liftM M (σ z) ∈ imI M σ J := by
       intro z hz
       induction hz using Submodule.mul_induction_on' with
       | mem_mul_mem a ha b hb =>

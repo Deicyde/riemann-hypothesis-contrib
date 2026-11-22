@@ -17,8 +17,8 @@ open MeasureTheory ComplexConjugate
 
 namespace GlobalTheory.SqIntUnit
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {N : ℕ}
-
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {N : ℕ}
 
 variable (k) in
 theorem exists_ne_zero_ne_one : ∃ x : k, x ≠ 0 ∧ x ≠ 1 := by
@@ -29,35 +29,40 @@ theorem exists_ne_zero_ne_one : ∃ x : k, x ≠ 0 ∧ x ≠ 1 := by
   refine ⟨z, z.ne_zero, fun e => hz ?_⟩
   rw [show z = 1 from Units.ext e, map_one]
 
-
 variable (k N) in
 theorem modularCharacterFun_eq_one (g : AdGL k N) : Measure.modularCharacterFun g = 1 := by
   obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective g
   let φ : GL (Fin N) k →* NNReal :=
     Measure.modularCharacter.comp (QuotientGroup.mk' (Subgroup.center (GL (Fin N) k)))
-  refine GlobalTheory.T.gl_hom_nnreal_trivial_of_scalar_trivial k (exists_ne_zero_ne_one k) N φ (fun z => ?_) g
+  refine GlobalTheory.T.gl_hom_nnreal_trivial_of_scalar_trivial k (exists_ne_zero_ne_one k) N φ
+    (fun z => ?_)
+    g
   have hz : Matrix.GeneralLinearGroup.scalar (Fin N) z ∈ Subgroup.center (GL (Fin N) k) :=
     Subgroup.mem_center_iff.2 fun h => (Matrix.GeneralLinearGroup.scalar_commute z h).symm
   show Measure.modularCharacter (QuotientGroup.mk' _ _) = 1
   rw [QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff _).2 hz, map_one]
 
-theorem isMulRightInvariant [MeasurableSpace (AdGL k N)] [BorelSpace (AdGL k N)] (μ : Measure (AdGL k N))
-    [μ.IsHaarMeasure] : μ.IsMulRightInvariant := by
+theorem isMulRightInvariant
+    [MeasurableSpace (AdGL k N)] [BorelSpace (AdGL k N)] (μ : Measure (AdGL k N)) [μ.IsHaarMeasure]
+    : μ.IsMulRightInvariant := by
   refine ⟨fun g => ?_⟩
   rw [Measure.isMulLeftInvariant_eq_smul (Measure.map (· * g) μ) μ,
     ← Measure.modularCharacterFun_eq_haarScalarFactor μ g, modularCharacterFun_eq_one, one_smul]
 
-
 variable (k) in
-theorem compactOpen_basis (n : ℕ) : ∀ U ∈ nhds (1 : GL (Fin n) k), ∃ K : Subgroup (GL (Fin n) k),
-    IsOpen (K : Set (GL (Fin n) k)) ∧ IsCompact (K : Set (GL (Fin n) k)) ∧ (K : Set (GL (Fin n) k)) ⊆ U := by
+theorem compactOpen_basis (n : ℕ)
+    : ∀ U ∈ nhds (1 : GL (Fin n) k), ∃ K : Subgroup (GL (Fin n) k),
+      IsOpen (K : Set (GL (Fin n) k)) ∧ IsCompact (K : Set (GL (Fin n) k))
+        ∧ (K : Set (GL (Fin n) k)) ⊆ U := by
   intro U hU
   obtain ⟨J, h1, h2, h3, -⟩ := exists_open_normalised_subgroup_subset k (Fin n) U hU
-  exact ⟨J, h1, GlobalTheory.SplitFlip.isCompact_KO.of_isClosed_subset (J.isClosed_of_isOpen h1) h3, h2⟩
+  exact
+    ⟨J, h1, GlobalTheory.SplitFlip.isCompact_KO.of_isClosed_subset (J.isClosed_of_isOpen h1) h3, h2⟩
 
-theorem main : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (N : ℕ)
-    (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V),
-    IsSmooth π → π.IsIrreducible → IsSqIntCoeff π → IsUnitarisable π := by
+theorem main
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (N : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V),
+      IsSmooth π → π.IsIrreducible → IsSqIntCoeff π → IsUnitarisable π := by
   intro k _ _ _ _ N V _ _ π hs hi hsq
   classical
   have := Model.nontrivial_of_isIrreducible hi
@@ -74,15 +79,21 @@ theorem main : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [I
     exact h1.preimage continuous_inv
   borelize (AdGL k N)
   let μ : Measure (AdGL k N) := Measure.haar
-  have hF : ∀ v, ∃ F : AdGL k N → ℝ, (∀ g, F (QuotientGroup.mk g) = ‖L (π g v)‖) ∧ MemLp F 2 μ := fun v => by
+  have hF
+      : ∀ v, ∃ F : AdGL k N → ℝ,
+        (∀ g, F (QuotientGroup.mk g) = ‖L (π g v)‖) ∧ MemLp F 2 μ := fun v => by
     obtain ⟨F, h1, h2⟩ := hsq μ inferInstance v L hLo
     exact ⟨F, h1, by simpa using h2⟩
   choose F hF1 hF2 using hF
   have hc : ∀ z ∈ Subgroup.center (GL (Fin N) k), ∃ c : ℂ, ‖c‖ = 1 ∧ ∀ v, π z v = c • v := by
     intro z hz
-    obtain ⟨c, hc⟩ := schur_GL hs hi ⟨π z, fun g => by
-      rw [← Module.End.mul_eq_comp, ← Module.End.mul_eq_comp, ← map_mul, ← map_mul]
-      exact congrArg π (Subgroup.mem_center_iff.1 hz g).symm⟩
+    obtain ⟨c, hc⟩ :=
+      schur_GL hs hi ⟨
+        π z,
+        fun g => by
+          rw [← Module.End.mul_eq_comp, ← Module.End.mul_eq_comp, ← map_mul, ← map_mul]
+          exact congrArg π (Subgroup.mem_center_iff.1 hz g).symm
+      ⟩
     refine ⟨c, ?_, hc⟩
     have h1 := hF1 v₀ z
     have h2 := hF1 v₀ 1
@@ -131,20 +142,23 @@ theorem main : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [I
       (Filter.Eventually.of_forall fun x => ?_)
     rw [hnorm]
     rfl
-  have hadd1 : ∀ v v' w, Φ (v + v') w = fun x => Φ v w x + Φ v' w x := fun v v' w => funext fun x => by
-    simp only [Φ, f, map_add (f := _), add_mul]
-  have hsmul1 : ∀ (a : ℂ) v w, Φ (a • v) w = fun x => a * Φ v w x := fun a v w => funext fun x => by
-    simp only [Φ, f, map_smul, smul_eq_mul, mul_assoc]
-  have hadd2 : ∀ v w w', Φ v (w + w') = fun x => Φ v w x + Φ v w' x := fun v w w' => funext fun x => by
-    simp only [Φ, f, map_add (f := _), mul_add]
-  have hsmul2 : ∀ (a : ℂ) v w, Φ v (a • w) = fun x => conj a * Φ v w x := fun a v w => funext fun x => by
-    simp only [Φ, f, map_smul, smul_eq_mul, map_mul]
-    ring
-  let B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ := LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) (fun v w => ∫ x, Φ v w x ∂μ)
-    (fun v v' w => by rw [hadd1, integral_add (hint _ _) (hint _ _)])
-    (fun a v w => by rw [hsmul1, integral_const_mul, RingHom.id_apply, smul_eq_mul])
-    (fun v w w' => by rw [hadd2, integral_add (hint _ _) (hint _ _)])
-    (fun a v w => by rw [hsmul2, integral_const_mul, smul_eq_mul])
+  have hadd1 : ∀ v v' w, Φ (v + v') w = fun x => Φ v w x + Φ v' w x := fun v v' w =>
+    funext fun x => by simp only [Φ, f, map_add (f := _), add_mul]
+  have hsmul1 : ∀ (a : ℂ) v w, Φ (a • v) w = fun x => a * Φ v w x := fun a v w =>
+    funext fun x => by simp only [Φ, f, map_smul, smul_eq_mul, mul_assoc]
+  have hadd2 : ∀ v w w', Φ v (w + w') = fun x => Φ v w x + Φ v w' x := fun v w w' =>
+    funext fun x => by simp only [Φ, f, map_add (f := _), mul_add]
+  have hsmul2 : ∀ (a : ℂ) v w, Φ v (a • w) = fun x => conj a * Φ v w x := fun a v w =>
+    funext fun x => by
+      simp only [Φ, f, map_smul, smul_eq_mul, map_mul]
+      ring
+  let B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ :=
+    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+      (fun v w => ∫ x, Φ v w x ∂μ)
+      (fun v v' w => by rw [hadd1, integral_add (hint _ _) (hint _ _)])
+      (fun a v w => by rw [hsmul1, integral_const_mul, RingHom.id_apply, smul_eq_mul])
+      (fun v w w' => by rw [hadd2, integral_add (hint _ _) (hint _ _)])
+      (fun a v w => by rw [hsmul2, integral_const_mul, smul_eq_mul])
   have hB : ∀ v w, B v w = ∫ x, Φ v w x ∂μ := fun v w => rfl
   have hre : ∀ v x, (Φ v v x).re = F v x ^ 2 := by
     intro v x
@@ -178,15 +192,18 @@ theorem main : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [I
       have := congrFun h2 (QuotientGroup.mk g)
       rw [Pi.zero_apply, hF1] at this
       simpa using this
-    let W : Subrepresentation π :=
-      ⟨{ carrier := {u | ∀ g, L (π g u) = 0}
-         add_mem' := fun {a b} ha hb g => by simp [ha g, hb g]
-         zero_mem' := fun g => by simp
-         smul_mem' := fun c u hu g => by simp [hu g] },
-        fun g u hu h => by
-          show L (π h (π g u)) = 0
-          rw [← Module.End.mul_apply, ← map_mul]
-          exact hu (h * g)⟩
+    let W : Subrepresentation π := ⟨
+      {
+        carrier := {u | ∀ g, L (π g u) = 0}
+        add_mem' := fun {a b} ha hb g => by simp [ha g, hb g]
+        zero_mem' := fun g => by simp
+        smul_mem' := fun c u hu g => by simp [hu g]
+      },
+      fun g u hu h => by
+        show L (π h (π g u)) = 0
+        rw [← Module.End.mul_apply, ← map_mul]
+        exact hu (h * g)
+    ⟩
     haveI : IsSimpleOrder (Subrepresentation π) := hi
     rcases eq_bot_or_eq_top W with hW | hW
     · have hvW : v ∈ W.toSubmodule := h3

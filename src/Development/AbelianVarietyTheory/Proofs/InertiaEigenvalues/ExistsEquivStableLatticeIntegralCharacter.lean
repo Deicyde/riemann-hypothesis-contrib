@@ -15,18 +15,21 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DvrComp
 
 @[expose] public section
 
-open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
+open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
 set_option synthInstance.maxHeartbeats 400000
 open ReciprocityTheory.Def (Z1 B1 H1)
 open TensorProduct
 
 namespace GlobalTheory.CharLat
 
-theorem nonempty_equiv_of_free {O K : Type} [CommRing O] [IsDomain O] [Field K] [Module O K]
-    (φ : O →+* K) (hsm : ∀ (o : O) (x : K), o • x = φ o * x)
-    (hfr : ∀ z : K, ∃ a d : O, d ≠ 0 ∧ z * φ d = φ a)
-    (T : Submodule O K) [Module.Free O T] (hT : T ≠ ⊥) :
-    Nonempty (O ≃ₗ[O] T) := by
+theorem nonempty_equiv_of_free
+    {O K : Type} [CommRing O] [IsDomain O] [Field K] [Module O K]
+    (φ : O →+* K)
+    (hsm : ∀ (o : O) (x : K), o • x = φ o * x) (hfr : ∀ z : K, ∃ a d : O, d ≠ 0 ∧ z * φ d = φ a)
+    (T : Submodule O K) [Module.Free O T]
+    (hT : T ≠ ⊥)
+    : Nonempty (O ≃ₗ[O] T) := by
   let b := Module.Free.chooseBasis O T
   haveI hsub : Subsingleton (Module.Free.ChooseBasisIndex O T) := by
     constructor
@@ -69,11 +72,13 @@ end GlobalTheory.CharLat
 
 namespace GlobalTheory.CharLat
 
-
 set_option maxHeartbeats 2000000 in
-theorem exists_equiv_charLattice : ∀ {l : ℕ} [Fact l.Prime] (LL : FinExt l) {G : Type} [Group G] [TopologicalSpace G]
-    (θ : G →* (↥(OL LL))ˣ) (Lc : Lattice (O := ↥(OL LL)) (charRep (tableLineDegreeTwo.charL (LL := ↥LL.1) θ))),
-    ∃ e : ↥(OL LL) ≃ₗ[↥(OL LL)] ↥Lc.T, ∀ g a, e (Formalism.GaloisCohomology.scalRep (↥(OL LL)) θ g a) = latRep Lc g (e a) := by
+theorem exists_equiv_charLattice
+    : ∀ {l : ℕ} [Fact l.Prime] (LL : FinExt l) {G : Type} [Group G] [TopologicalSpace G]
+        (θ : G →* (↥(OL LL))ˣ)
+        (Lc : Lattice (O := ↥(OL LL)) (charRep (tableLineDegreeTwo.charL (LL := ↥LL.1) θ))),
+      ∃ e : ↥(OL LL) ≃ₗ[↥(OL LL)] ↥Lc.T, ∀ g a,
+        e (Formalism.GaloisCohomology.scalRep (↥(OL LL)) θ g a) = latRep Lc g (e a) := by
   intro l _ LL G _ _ θ Lc
   haveI := LL.2
   haveI hF : IsFractionRing (↥(OL LL)) (↥LL.1) :=
@@ -84,10 +89,11 @@ theorem exists_equiv_charLattice : ∀ {l : ℕ} [Fact l.Prime] (LL : FinExt l) 
     have hs := Lc.span
     rw [h, Submodule.bot_coe, Submodule.span_zero_singleton] at hs
     exact bot_ne_top hs
-  have hsm : ∀ (o : ↥(OL LL)) (x : ↥LL.1), o • x = algebraMap (↥(OL LL)) (↥LL.1) o * x :=
-    fun o x => rfl
-  have hfr : ∀ z : ↥LL.1, ∃ a d : ↥(OL LL), d ≠ 0 ∧ z * algebraMap (↥(OL LL)) (↥LL.1) d =
-      algebraMap (↥(OL LL)) (↥LL.1) a := by
+  have hsm : ∀ (o : ↥(OL LL)) (x : ↥LL.1), o • x = algebraMap (↥(OL LL)) (↥LL.1) o * x := fun o x =>
+    rfl
+  have hfr
+      : ∀ z : ↥LL.1, ∃ a d : ↥(OL LL),
+        d ≠ 0 ∧ z * algebraMap (↥(OL LL)) (↥LL.1) d = algebraMap (↥(OL LL)) (↥LL.1) a := by
     intro z
     obtain ⟨⟨a, d⟩, hd⟩ := IsLocalization.surj (nonZeroDivisors (↥(OL LL))) z
     exact ⟨a, d, nonZeroDivisors.coe_ne_zero d, hd⟩

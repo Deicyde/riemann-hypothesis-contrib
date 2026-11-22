@@ -15,12 +15,10 @@ section Cochain
 
 variable {ι : Type} [LinearOrder ι] {E : Type} [AddCommGroup E]
 
-def delta (c : Finset ι → E) : Finset ι → E :=
-  fun t => ∑ i ∈ t, cubeSign t i • c (t.erase i)
+def delta (c : Finset ι → E) : Finset ι → E := fun t => ∑ i ∈ t, cubeSign t i • c (t.erase i)
 
-def Dtot (d : E →+ E) (c : Finset ι → E) : Finset ι → E :=
-  fun t => delta c t + (-1 : ℤ) ^ t.card • d (c t)
-
+def Dtot (d : E →+ E) (c : Finset ι → E) : Finset ι → E := fun t =>
+  delta c t + (-1 : ℤ) ^ t.card • d (c t)
 
 omit [LinearOrder ι] in
 def InCech (N : Finset ι → AddSubgroup E) (m : ℕ) (c : Finset ι → E) : Prop :=
@@ -28,7 +26,6 @@ def InCech (N : Finset ι → AddSubgroup E) (m : ℕ) (c : Finset ι → E) : P
 
 def CechZero (N : Finset ι → AddSubgroup E) (b : ℕ) : Prop :=
   ∀ c, InCech N (b + 1) c → delta c = 0 → ∃ y, InCech N b y ∧ delta y = c
-
 
 omit [LinearOrder ι] in
 def InTot (T : ℕ → Finset ι → AddSubgroup E) (m : ℕ) (c : Finset ι → E) : Prop :=
@@ -43,8 +40,8 @@ structure CartierAt (d : E →+ E) (γ : E → E) (N T : ℕ → AddSubgroup E) 
   surj_zero : ∀ y ∈ T 0, d y = 0 → ∃ x ∈ N 0, y = γ x
   surj_succ : ∀ a, ∀ y ∈ T (a + 1), d y = 0 → ∃ x ∈ N (a + 1), ∃ z ∈ T a, y = γ x + d z
 
-def cup (Φ : E → Finset ι → E) (c : Finset ι → E) : Finset ι → E :=
-  fun u => ∑ j ∈ u, Φ (c (u.filter (· ≤ j))) (u.filter (j ≤ ·))
+def cup (Φ : E → Finset ι → E) (c : Finset ι → E) : Finset ι → E := fun u =>
+  ∑ j ∈ u, Φ (c (u.filter (· ≤ j))) (u.filter (j ≤ ·))
 
 end Cochain
 
@@ -56,33 +53,41 @@ structure IsOddDer (d : ExteriorAlgebra K V →+ ExteriorAlgebra K V) : Prop whe
   mul : ∀ x y, d (x * y) = d x * y + CliffordAlgebra.involute x * d y
   sq : ∀ x, d (d x) = 0
 
-structure IsExtD (k K : Type) [CommRing k] [CommRing K] [Algebra k K]
-    (d : ExteriorAlgebra K Ω[K⁄k] →+ ExteriorAlgebra K Ω[K⁄k]) : Prop extends IsOddDer d where
+structure IsExtD
+    (k K : Type) [CommRing k] [CommRing K] [Algebra k K]
+    (d : ExteriorAlgebra K Ω[K⁄k] →+ ExteriorAlgebra K Ω[K⁄k])
+    : Prop
+    extends IsOddDer d where
   alg : ∀ a : K, d (algebraMap K _ a) = ExteriorAlgebra.ι K (KaehlerDifferential.D k K a)
 
 def forms (B : Set K) (L : Set V) (q : ℕ) : AddSubgroup (ExteriorAlgebra K V) :=
-  AddSubgroup.closure {x | ∃ b ∈ B, ∃ v : Fin q → V, (∀ k, v k ∈ L) ∧ x = b • ExteriorAlgebra.ιMulti K q v}
+  AddSubgroup.closure
+    {x | ∃ b ∈ B, ∃ v : Fin q → V, (∀ k, v k ∈ L) ∧ x = b • ExteriorAlgebra.ιMulti K q v}
 
 variable {ι : Type} [LinearOrder ι]
 
-
 omit [LinearOrder ι] in
-structure IsDatum (p : ℕ) (d : ExteriorAlgebra K V →+ ExteriorAlgebra K V) (f : ι → V →+ V)
-    (h : ι → ι → V →+ K) : Prop where
+structure IsDatum
+    (p : ℕ) (d : ExteriorAlgebra K V →+ ExteriorAlgebra K V) (f : ι → V →+ V) (h : ι → ι → V →+ K)
+    : Prop where
   f_smul : ∀ i (c : K) v, f i (c • v) = c ^ p • f i v
   h_smul : ∀ i j (c : K) v, h i j (c • v) = c ^ p * h i j v
   closed : ∀ i v, d (ExteriorAlgebra.ι K (f i v)) = 0
-  dh : ∀ i j v, d (algebraMap K _ (h i j v)) = ExteriorAlgebra.ι K (f j v) - ExteriorAlgebra.ι K (f i v)
+  dh
+    : ∀ i j v,
+      d (algebraMap K _ (h i j v)) = ExteriorAlgebra.ι K (f j v) - ExteriorAlgebra.ι K (f i v)
   cocycle : ∀ i j l v, h i j v + h j l v = h i l v
 
-def Lop (f : ι → V →+ V) (h : ι → ι → V →+ K) (v : V) (y : Finset ι → ExteriorAlgebra K V) :
-    Finset ι → ExteriorAlgebra K V := fun t =>
+def Lop (f : ι → V →+ V) (h : ι → ι → V →+ K) (v : V) (y : Finset ι → ExteriorAlgebra K V)
+    : Finset ι → ExteriorAlgebra K V := fun t =>
   if ht : t.Nonempty then
-    (-1 : ℤ) ^ t.card • (ExteriorAlgebra.ι K (f (t.min' ht) v) * y t) +
-      (if h2 : (t.erase (t.min' ht)).Nonempty then
-        h (t.min' ht) ((t.erase (t.min' ht)).min' h2) v • y (t.erase (t.min' ht)) else 0)
-  else 0
-
+    (-1 : ℤ) ^ t.card • (ExteriorAlgebra.ι K (f (t.min' ht) v) * y t)
+      + (if h2 : (t.erase (t.min' ht)).Nonempty then
+           h (t.min' ht) ((t.erase (t.min' ht)).min' h2) v • y (t.erase (t.min' ht))
+         else
+           0)
+  else
+    0
 
 omit [LinearOrder ι] in
 def oneC : Finset ι → ExteriorAlgebra K V := fun t => if t.card = 1 then 1 else 0
@@ -90,16 +95,19 @@ def oneC : Finset ι → ExteriorAlgebra K V := fun t => if t.card = 1 then 1 el
 def prodL (f : ι → V →+ V) (h : ι → ι → V →+ K) (vs : List V) : Finset ι → ExteriorAlgebra K V :=
   vs.foldr (Lop f h) oneC
 
-def alt (f : ι → V →+ V) (h : ι → ι → V →+ K) (a : ℕ) (v : Fin a → V) : Finset ι → ExteriorAlgebra K V :=
+def alt (f : ι → V →+ V) (h : ι → ι → V →+ K) (a : ℕ) (v : Fin a → V)
+    : Finset ι → ExteriorAlgebra K V :=
   ∑ σ : Equiv.Perm (Fin a), ((Equiv.Perm.sign σ : ℤˣ) : ℤ) • prodL f h (List.ofFn (v ∘ σ))
 
-def IsPhi (p : ℕ) (f : ι → V →+ V) (h : ι → ι → V →+ K)
-    (Φ : ExteriorAlgebra K V →+ (Finset ι → ExteriorAlgebra K V)) : Prop :=
+def IsPhi
+    (p : ℕ) (f : ι → V →+ V) (h : ι → ι → V →+ K)
+    (Φ : ExteriorAlgebra K V →+ (Finset ι → ExteriorAlgebra K V))
+    : Prop :=
   ∀ (c : K) (a : ℕ) (v : Fin a → V), Φ (c • ExteriorAlgebra.ιMulti K a v) = c ^ p • alt f h a v
 
 def IsGamma (p : ℕ) (f : V →+ V) (γ : ExteriorAlgebra K V →+* ExteriorAlgebra K V) : Prop :=
-  (∀ c : K, γ (algebraMap K _ c) = algebraMap K _ (c ^ p)) ∧
-    ∀ v, γ (ExteriorAlgebra.ι K v) = ExteriorAlgebra.ι K (f v)
+  (∀ c : K, γ (algebraMap K _ c) = algebraMap K _ (c ^ p))
+    ∧ ∀ v, γ (ExteriorAlgebra.ι K v) = ExteriorAlgebra.ι K (f v)
 
 end Forms
 
@@ -115,15 +123,18 @@ structure IsFlatLift (p : ℕ) (π : Kt →+* K) : Prop where
 def IsFrob (p : ℕ) (π : Kt →+* K) (F : Kt →+* Kt) : Prop := ∀ z, π (F z) = π z ^ p
 
 def IsF (p : ℕ) (π : Kt →+* K) (F : Kt →+* Kt) (f : Ω[K⁄ℤ] →+ Ω[K⁄ℤ]) : Prop :=
-  (∀ (c : K) v, f (c • v) = c ^ p • f v) ∧ ∀ z w : Kt, F z = z ^ p + p * w →
-    f (KaehlerDifferential.D ℤ K (π z)) =
-      π z ^ (p - 1) • KaehlerDifferential.D ℤ K (π z) + KaehlerDifferential.D ℤ K (π w)
+  (∀ (c : K) v, f (c • v) = c ^ p • f v)
+    ∧ ∀ z w : Kt,
+      F z = z ^ p + p * w
+        → f (KaehlerDifferential.D ℤ K (π z))
+          = π z ^ (p - 1) • KaehlerDifferential.D ℤ K (π z) + KaehlerDifferential.D ℤ K (π w)
 
 def IsH (p : ℕ) (π : Kt →+* K) (F F' : Kt →+* Kt) (h : Ω[K⁄ℤ] →+ K) : Prop :=
-  (∀ (c : K) v, h (c • v) = c ^ p * h v) ∧ ∀ z w : Kt, F' z = F z + p * w →
-    h (KaehlerDifferential.D ℤ K (π z)) = π w
+  (∀ (c : K) v, h (c • v) = c ^ p * h v)
+    ∧ ∀ z w : Kt, F' z = F z + p * w → h (KaehlerDifferential.D ℤ K (π z)) = π w
 
-def LogLift {ι : Type} (p : ℕ) (π : Kt →+* K) (F : ι → Kt →+* Kt) (s : Finset ι) (A : Set K) (g : K) : Prop :=
+def LogLift {ι : Type} (p : ℕ) (π : Kt →+* K) (F : ι → Kt →+* Kt) (s : Finset ι) (A : Set K) (g : K)
+    : Prop :=
   ∃ z, π z = g ∧ ∀ i ∈ s, ∃ w, π w ∈ A ∧ F i z = z ^ p * (1 + p * w)
 
 end Lift

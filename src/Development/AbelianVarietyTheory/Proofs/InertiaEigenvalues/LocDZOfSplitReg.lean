@@ -12,7 +12,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin GlobalTheory.PendOf
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+  GlobalTheory.PendOf
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.DepthZeroAssembly
@@ -22,12 +26,16 @@ open GlobalTheory.SplitRead.BlockParam (charPol_lpChar_of_unr twistIrr)
 
 section Local
 
-variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-  {B : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver B w} {g : ℕ} [Fact g.Prime]
+variable
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+  {B : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver B w} {g : ℕ}
+  [Fact g.Prime]
 
-theorem lab_lpChar_of_unr (τ : AlgebraicClosure (ZMod g) →* ℂ) (γ : G E Ω) (x χ : WD h) (hx : x.unr)
-    (hd : χ.lpDim = 1) (u : ZMod g) (hχ : WD.lab τ γ χ = X - C u) :
-    WD.lab τ γ (x.lpChar χ) = (X - C u) ^ x.lpDim := by
+theorem lab_lpChar_of_unr
+    (τ : AlgebraicClosure (ZMod g) →* ℂ) (γ : G E Ω)
+    (x χ : WD h) (hx : x.unr) (hd : χ.lpDim = 1)
+    (u : ZMod g) (hχ : WD.lab τ γ χ = X - C u)
+    : WD.lab τ γ (x.lpChar χ) = (X - C u) ^ x.lpDim := by
   have H : TeichmullerInertiaLabelCondition B w τ γ := by
     by_contra H
     rw [WD.lab_of_not H] at hχ
@@ -39,11 +47,13 @@ theorem lab_lpChar_of_unr (τ : AlgebraicClosure (ZMod g) →* ℂ) (γ : G E Ω
     intro σ hσ
     have := (WD.tame_iff_inePol χ).1 htχ σ hσ
     rw [WD.inePol_of_mem_Ine _ σ.2, hd, pow_one] at this
-    rw [C_1]; exact this
+    rw [C_1]
+    exact this
   have hdim : (x.lpChar χ).lpDim = x.lpDim := by
     obtain ⟨σ, hσ⟩ : ∃ σ : Ine (F := E) B, (σ : G E Ω) ∈ Wild E B := ⟨1, (Wild E B).one_mem⟩
     have h1 := charPol_lpChar_of_unr x χ hx σ 1 (hc1 σ hσ)
-    rw [← WD.charPol_natDegree (x.lpChar χ) (ineIncl h σ), h1, natDegree_pow, natDegree_X_sub_C, mul_one]
+    rw [← WD.charPol_natDegree (x.lpChar χ) (ineIncl h σ), h1, natDegree_pow, natDegree_X_sub_C,
+      mul_one]
   have ht : WD.tame (x.lpChar χ) := by
     rw [WD.tame_iff_inePol]
     intro σ hσ
@@ -52,14 +62,15 @@ theorem lab_lpChar_of_unr (τ : AlgebraicClosure (ZMod g) →* ℂ) (γ : G E Ω
   set p := χ.charPol (ineIncl h ⟨γ, H.2.1⟩) with hp
   have hpm : p.Monic := WD.charPol_monic _ _
   have hpd : p.natDegree = 1 := by rw [hp, WD.charPol_natDegree, hd]
-  have hpe : p = X - C (-p.coeff 0) := by rw [map_neg, sub_neg_eq_add]; exact hpm.eq_X_add_C hpd
+  have hpe : p = X - C (- p.coeff 0) := by rw [map_neg, sub_neg_eq_add]; exact hpm.eq_X_add_C hpd
   have hχ' := (WD.lab_eq_iff_of_tame H htχ).1 hχ
   have hr1 := WD.rootsBar_X_sub_C_pow u 1
   rw [pow_one, one_nsmul] at hr1
-  rw [WD.inePol_of_mem_Ine _ H.2.1, ← hp, hpe, roots_X_sub_C, hr1,
-    Multiset.map_singleton, Multiset.singleton_inj] at hχ'
+  rw [WD.inePol_of_mem_Ine _ H.2.1, ← hp, hpe, roots_X_sub_C, hr1, Multiset.map_singleton,
+      Multiset.singleton_inj]
+    at hχ'
   rw [WD.lab_eq_iff_of_tame H ht, WD.inePol_of_mem_Ine _ H.2.1,
-    charPol_lpChar_of_unr x χ hx ⟨γ, H.2.1⟩ (-p.coeff 0) (hpe ▸ rfl), roots_pow, roots_X_sub_C,
+    charPol_lpChar_of_unr x χ hx ⟨γ, H.2.1⟩ (- p.coeff 0) (hpe ▸ rfl), roots_pow, roots_X_sub_C,
     WD.rootsBar_X_sub_C_pow, Multiset.map_nsmul, Multiset.map_singleton, hχ'.2]
   exact ⟨(monic_X_sub_C u).pow _, rfl⟩
 
@@ -72,7 +83,9 @@ namespace GlobalTheory.DepthZeroAssembly
 open GlobalTheory.WeilDeligne (WD)
 open GlobalTheory.SplitRead.BlockParam (twistIrr)
 
-theorem locDZ_of_split_reg : ∀ (hL : GlobalTheory.Published.LocalLanglandsGL) (D : D7), SplitLoc hL D → RegLoc hL D → LocDZ hL D := by
+theorem locDZ_of_split_reg
+    : ∀ (hL : GlobalTheory.Published.LocalLanglandsGL) (D : D7),
+      SplitLoc hL D → RegLoc hL D → LocDZ hL D := by
   intro hL D hS hR k v χ hχ u π ρ f ht hlab hser hsq hnr hx
   obtain ⟨π₁, π₂, hsph, e, y, hy1, hy2⟩ := hS k v χ hχ u π ρ f ht hlab hser hnr hx
   obtain ⟨hm1, hl1⟩ := hR k v π₁ ρ f hser hsq ⟨y, hy1, hy2⟩

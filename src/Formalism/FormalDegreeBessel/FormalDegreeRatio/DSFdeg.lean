@@ -23,7 +23,7 @@ theorem formal_degree_pos_holds : FdegPos := by
   · refine Finset.prod_pos fun a _ => Finset.prod_pos fun b hb => ?_
     rw [Finset.mem_filter] at hb
     exact abs_pos.mpr (sub_ne_zero.mpr fun h => hb.2.ne (hl h))
-  · exact Finset.prod_pos fun a _ => Finset.prod_pos fun b hb =>
-      fin_sub_pos (Finset.mem_filter.mp hb).2
+  · exact Finset.prod_pos fun a _ =>
+      Finset.prod_pos fun b hb => fin_sub_pos (Finset.mem_filter.mp hb).2
 
 end Formalism.QuantumDeterminants

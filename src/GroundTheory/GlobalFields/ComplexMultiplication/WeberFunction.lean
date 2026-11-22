@@ -28,78 +28,86 @@ end ShortWeierstrass
 
 open ShortWeierstrass
 
-theorem IsShortForm.Δ_eq {W : WeierstrassCurve F} (hW : IsShortForm W) :
-    W.Δ = -16 * (4 * W.a₄ ^ 3 + 27 * W.a₆ ^ 2) := by
+theorem IsShortForm.Δ_eq {W : WeierstrassCurve F} (hW : IsShortForm W)
+    : W.Δ = -16 * (4 * W.a₄ ^ 3 + 27 * W.a₆ ^ 2) := by
   simp only [WeierstrassCurve.Δ, b₂, b₄, b₆, b₈, hW.a₁_eq, hW.a₂_eq, hW.a₃_eq]
   ring
 
-theorem IsShortForm.a₄_ne_zero_or_a₆_ne_zero {W : WeierstrassCurve F} [W.IsElliptic]
-    (hW : IsShortForm W) : W.a₄ ≠ 0 ∨ W.a₆ ≠ 0 := by
+theorem IsShortForm.a₄_ne_zero_or_a₆_ne_zero
+    {W : WeierstrassCurve F} [W.IsElliptic] (hW : IsShortForm W)
+    : W.a₄ ≠ 0 ∨ W.a₆ ≠ 0 := by
   by_contra h
   push Not at h
   have := W.isUnit_Δ.ne_zero
   rw [hW.Δ_eq, h.1, h.2] at this
   simp at this
 
-
 open Classical in
 open scoped Classical in
 noncomputable def weberValue (W : WeierstrassCurve F) (x : F) : F :=
-  if W.a₆ = 0 then g₂ W ^ 2 / W.Δ * x ^ 2
-  else if W.a₄ = 0 then g₃ W / W.Δ * x ^ 3
-  else g₂ W * g₃ W / W.Δ * x
+  if W.a₆ = 0 then
+    g₂ W ^ 2 / W.Δ * x ^ 2
+  else if W.a₄ = 0 then
+    g₃ W / W.Δ * x ^ 3
+  else
+    g₂ W * g₃ W / W.Δ * x
 
 noncomputable def weberFunction (W : WeierstrassCurve F) : W.toAffine.Point → OnePoint F
   | .zero => ∞
   | .some x _ _ => OnePoint.some (weberValue W x)
 
 @[simp]
-theorem weberFunction_some (W : WeierstrassCurve F) {x y : F} (h : W.toAffine.Nonsingular x y) :
-    weberFunction W (.some x y h) = OnePoint.some (weberValue W x) := rfl
+theorem weberFunction_some (W : WeierstrassCurve F) {x y : F} (h : W.toAffine.Nonsingular x y)
+    : weberFunction W (.some x y h) = OnePoint.some (weberValue W x) :=
+  rfl
 
-theorem weberValue_of_a₆_eq_zero {W : WeierstrassCurve F} (hb : W.a₆ = 0) (x : F) :
-    weberValue W x = g₂ W ^ 2 / W.Δ * x ^ 2 := by
+theorem weberValue_of_a₆_eq_zero {W : WeierstrassCurve F} (hb : W.a₆ = 0) (x : F)
+    : weberValue W x = g₂ W ^ 2 / W.Δ * x ^ 2 := by
   simp [weberValue, hb]
 
-theorem weberValue_of_a₄_eq_zero {W : WeierstrassCurve F} (ha : W.a₄ = 0) (hb : W.a₆ ≠ 0)
-    (x : F) : weberValue W x = g₃ W / W.Δ * x ^ 3 := by
+theorem weberValue_of_a₄_eq_zero {W : WeierstrassCurve F} (ha : W.a₄ = 0) (hb : W.a₆ ≠ 0) (x : F)
+    : weberValue W x = g₃ W / W.Δ * x ^ 3 := by
   simp [weberValue, ha, hb]
 
-theorem weberValue_of_ne_zero {W : WeierstrassCurve F} (ha : W.a₄ ≠ 0) (hb : W.a₆ ≠ 0)
-    (x : F) : weberValue W x = g₂ W * g₃ W / W.Δ * x := by
+theorem weberValue_of_ne_zero {W : WeierstrassCurve F} (ha : W.a₄ ≠ 0) (hb : W.a₆ ≠ 0) (x : F)
+    : weberValue W x = g₂ W * g₃ W / W.Δ * x := by
   simp [weberValue, ha, hb]
 
 section Isomorphism
 
 variable [CharZero F]
 
-theorem variableChange_rst_eq_zero {C : VariableChange F} {W : WeierstrassCurve F}
-    (hW : IsShortForm W) (hCW : IsShortForm (C • W)) : C.r = 0 ∧ C.s = 0 ∧ C.t = 0 := by
+theorem variableChange_rst_eq_zero
+    {C : VariableChange F} {W : WeierstrassCurve F} (hW : IsShortForm W) (hCW : IsShortForm (C • W))
+    : C.r = 0 ∧ C.s = 0 ∧ C.t = 0 := by
   have hv : (↑C.u⁻¹ : F) ≠ 0 := Units.ne_zero _
   have h1 := hCW.a₁_eq
   have h2 := hCW.a₂_eq
   have h3 := hCW.a₃_eq
-  simp only [variableChange_a₁, variableChange_a₂, variableChange_a₃, hW.a₁_eq, hW.a₂_eq,
-    hW.a₃_eq] at h1 h2 h3
+  simp only [variableChange_a₁, variableChange_a₂, variableChange_a₃, hW.a₁_eq, hW.a₂_eq, hW.a₃_eq]
+    at h1 h2 h3
   have hs : C.s = 0 := by simpa [hv] using h1
   have ht : C.t = 0 := by simpa [hv] using h3
   have hr : C.r = 0 := by simpa [hv, hs] using h2
   exact ⟨hr, hs, ht⟩
 
-theorem variableChange_a₄_of_isShortForm {C : VariableChange F} {W : WeierstrassCurve F}
-    (hW : IsShortForm W) (hCW : IsShortForm (C • W)) : (C • W).a₄ = ↑C.u⁻¹ ^ 4 * W.a₄ := by
+theorem variableChange_a₄_of_isShortForm
+    {C : VariableChange F} {W : WeierstrassCurve F} (hW : IsShortForm W) (hCW : IsShortForm (C • W))
+    : (C • W).a₄ = ↑C.u⁻¹ ^ 4 * W.a₄ := by
   obtain ⟨hr, hs, ht⟩ := variableChange_rst_eq_zero hW hCW
   simp [variableChange_a₄, hr, hs, ht]
 
-theorem variableChange_a₆_of_isShortForm {C : VariableChange F} {W : WeierstrassCurve F}
-    (hW : IsShortForm W) (hCW : IsShortForm (C • W)) : (C • W).a₆ = ↑C.u⁻¹ ^ 6 * W.a₆ := by
+theorem variableChange_a₆_of_isShortForm
+    {C : VariableChange F} {W : WeierstrassCurve F} (hW : IsShortForm W) (hCW : IsShortForm (C • W))
+    : (C • W).a₆ = ↑C.u⁻¹ ^ 6 * W.a₆ := by
   obtain ⟨hr, hs, ht⟩ := variableChange_rst_eq_zero hW hCW
   simp [variableChange_a₆, hr, ht]
 
-theorem weberFunction_variableChangePoint (C : VariableChange F) {W W' : WeierstrassCurve F}
-    [W.IsElliptic] (hC : C • W = W') (hW : IsShortForm W) (hW' : IsShortForm W')
-    (P : W.toAffine.Point) :
-    weberFunction W' (variableChangePoint C hC P) = weberFunction W P := by
+theorem weberFunction_variableChangePoint
+    (C : VariableChange F)
+    {W W' : WeierstrassCurve F} [W.IsElliptic]
+    (hC : C • W = W') (hW : IsShortForm W) (hW' : IsShortForm W') (P : W.toAffine.Point)
+    : weberFunction W' (variableChangePoint C hC P) = weberFunction W P := by
   subst hC
   obtain ⟨hr, hs, ht⟩ := variableChange_rst_eq_zero hW hW'
   cases P with
@@ -131,14 +139,14 @@ section FieldOfDefinition
 
 variable {L : Type*} [Field L]
 
-def pointMapOfRingHom (φ : F →+* L) {W : WeierstrassCurve F} :
-    W.toAffine.Point → (W.map φ).toAffine.Point
+def pointMapOfRingHom (φ : F →+* L) {W : WeierstrassCurve F}
+    : W.toAffine.Point → (W.map φ).toAffine.Point
   | .zero => .zero
   | .some x y h => .some (φ x) (φ y) ((W.toAffine.map_nonsingular φ.injective x y).mpr h)
 
-theorem weberFunction_pointMapOfRingHom (φ : F →+* L) (W : WeierstrassCurve F)
-    (P : W.toAffine.Point) :
-    weberFunction (W.map φ) (pointMapOfRingHom φ P) = OnePoint.map φ (weberFunction W P) := by
+theorem weberFunction_pointMapOfRingHom
+    (φ : F →+* L) (W : WeierstrassCurve F) (P : W.toAffine.Point)
+    : weberFunction (W.map φ) (pointMapOfRingHom φ P) = OnePoint.map φ (weberFunction W P) := by
   cases P with
   | zero => rfl
   | some x y h =>

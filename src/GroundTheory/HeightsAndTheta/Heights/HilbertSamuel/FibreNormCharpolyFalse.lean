@@ -9,15 +9,18 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry MvPolynomial
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+  MvPolynomial
 
 noncomputable section
 
 namespace FibreNormCharpoly
 
-theorem aeval_mul_of_isHomogeneous {σ' Ω : Type*} [Field Ω] [CharZero Ω] {p : MvPolynomial σ' ℚ} {d : ℕ}
-    (hp : p.IsHomogeneous d) (μ : Ω) (f : σ' → Ω) :
-    aeval (fun j => μ * f j) p = μ ^ d * aeval f p := by
+theorem aeval_mul_of_isHomogeneous
+    {σ' Ω : Type*} [Field Ω] [CharZero Ω]
+    {p : MvPolynomial σ' ℚ} {d : ℕ} (hp : p.IsHomogeneous d)
+    (μ : Ω) (f : σ' → Ω)
+    : aeval (fun j => μ * f j) p = μ ^ d * aeval f p := by
   classical
   conv_lhs => rw [p.as_sum]
   conv_rhs => rw [p.as_sum]

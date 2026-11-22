@@ -9,15 +9,18 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.SW.LGPrim
 
-theorem real_bound (q N Nf : ℝ) (hq : 0 < q) (M : ℕ) (hM : 1 ≤ M)
-    (h : |Nf - q ^ (2 * M - 1)| ≤ q ^ M) (h1 : N ≤ Nf) (h2 : Nf ≤ N + 1) :
-    |N * (q⁻¹) ^ (2 * M - 1) - 1| ≤ 1 / q ^ (M - 1) + 1 / q ^ (2 * M - 1) := by
+theorem real_bound
+    (q N Nf : ℝ) (hq : 0 < q)
+    (M : ℕ) (hM : 1 ≤ M) (h : |Nf - q ^ (2 * M - 1)| ≤ q ^ M)
+    (h1 : N ≤ Nf) (h2 : Nf ≤ N + 1)
+    : |N * (q⁻¹) ^ (2 * M - 1) - 1| ≤ 1 / q ^ (M - 1) + 1 / q ^ (2 * M - 1) := by
   obtain ⟨m, rfl⟩ : ∃ m, M = m + 1 := ⟨M - 1, by omega⟩
   have e1 : 2 * (m + 1) - 1 = 2 * m + 1 := by omega
   have e2 : m + 1 - 1 = m := by omega
@@ -39,9 +42,10 @@ theorem real_bound (q N Nf : ℝ) (hq : 0 < q) (M : ℕ) (hM : 1 ≤ M)
   rw [e4]
   exact habs
 
-theorem map_quad {R S ι : Type} [CommRing R] [CommRing S] [Fintype ι] (f : R →+* S)
-    (B : Matrix ι ι R) (x : ι → R) :
-    f (x ⬝ᵥ (B *ᵥ x)) = (f ∘ x) ⬝ᵥ ((B.map f) *ᵥ (f ∘ x)) := by
+theorem map_quad
+    {R S ι : Type} [CommRing R] [CommRing S] [Fintype ι]
+    (f : R →+* S) (B : Matrix ι ι R) (x : ι → R)
+    : f (x ⬝ᵥ (B *ᵥ x)) = (f ∘ x) ⬝ᵥ ((B.map f) *ᵥ (f ∘ x)) := by
   rw [RingHom.map_dotProduct]
   congr 1
   funext i
@@ -78,7 +82,8 @@ theorem res_eq_zero_iff (a : 𝒪) : res a = 0 ↔ Valued.v (a : Fv F v) < 1 := 
     rw [map_mul] at h3
     have hb1 : Valued.v (b : Fv F v) ≤ 1 := b.2
     have h4 : Valued.v (a : Fv F v) * Valued.v (b : Fv F v) < 1 := by
-      calc _ ≤ Valued.v (a : Fv F v) * 1 := by gcongr
+      calc
+        _ ≤ Valued.v (a : Fv F v) * 1 := by gcongr
         _ < 1 := by simpa using h
     exact absurd h3 (ne_of_lt h4)
 
@@ -92,9 +97,9 @@ theorem res_lift (y : 𝓴) : res (lift y) = y := Function.surjInv_eq _ y
 
 def lf {ι : Type} (y : ι → 𝓴) : ι → Fv F v := fun i => (lift (y i) : 𝒪)
 
-theorem cover {ι : Type} (x : ι → Fv F v) :
-    ((∀ i, x i ∈ 𝒪) ∧ ∃ i, Valued.v (x i) = 1) ↔
-      ∃ y : ι → 𝓴, y ≠ 0 ∧ ∀ i, Valued.v (x i - lf y i) < 1 := by
+theorem cover {ι : Type} (x : ι → Fv F v)
+    : ((∀ i, x i ∈ 𝒪) ∧ ∃ i, Valued.v (x i) = 1)
+      ↔ ∃ y : ι → 𝓴, y ≠ 0 ∧ ∀ i, Valued.v (x i - lf y i) < 1 := by
   constructor
   · rintro ⟨hx, i₀, hi₀⟩
     refine ⟨fun i => res ⟨x i, hx i⟩, ?_, fun i => ?_⟩
@@ -117,8 +122,10 @@ theorem cover {ι : Type} (x : ι → Fv F v) :
     rw [← e]
     exact (res_eq_zero_iff _).2 hlt
 
-theorem eq_of_close {ι : Type} (x : ι → Fv F v) (y y' : ι → 𝓴)
-    (h : ∀ i, Valued.v (x i - lf y i) < 1) (h' : ∀ i, Valued.v (x i - lf y' i) < 1) : y = y' := by
+theorem eq_of_close
+    {ι : Type} (x : ι → Fv F v) (y y' : ι → 𝓴) (h : ∀ i, Valued.v (x i - lf y i) < 1)
+    (h' : ∀ i, Valued.v (x i - lf y' i) < 1)
+    : y = y' := by
   funext i
   have h1 := Valuation.map_sub_lt _ (h' i) (h i)
   have e : (x i - lf y' i) - (x i - lf y i) = lf y i - lf y' i := by ring
@@ -128,13 +135,19 @@ theorem eq_of_close {ι : Type} (x : ι → Fv F v) (y y' : ι → 𝓴)
 
 abbrev phi : 𝒪 →+* Fv F v := ValuationSubring.subtype _
 
-theorem res_Q {ι : Type} [Fintype ι] (c : 𝒪) (hc : (c : Fv F v) = 2⁻¹) (hr : res c = 2⁻¹)
-    (BO : Matrix ι ι 𝒪) (y : ι → 𝓴) :
-    ∃ a : 𝒪, (a : Fv F v) = (2 : Fv F v)⁻¹ * (lf y ⬝ᵥ ((BO.map phi) *ᵥ lf y)) ∧
-      res a = (2 : 𝓴)⁻¹ * (y ⬝ᵥ ((BO.map res) *ᵥ y)) := by
+theorem res_Q
+    {ι : Type} [Fintype ι]
+    (c : 𝒪) (hc : (c : Fv F v) = 2⁻¹) (hr : res c = 2⁻¹)
+    (BO : Matrix ι ι 𝒪) (y : ι → 𝓴)
+    : ∃ a : 𝒪,
+      (a : Fv F v) = (2 : Fv F v)⁻¹ * (lf y ⬝ᵥ ((BO.map phi) *ᵥ lf y))
+        ∧ res a = (2 : 𝓴)⁻¹ * (y ⬝ᵥ ((BO.map res) *ᵥ y)) := by
   refine ⟨c * ((lift ∘ y) ⬝ᵥ (BO *ᵥ (lift ∘ y))), ?_, ?_⟩
   · have h1 := map_quad phi BO (lift ∘ y)
-    have h2 : (phi : 𝒪 →+* Fv F v) (c * ((lift ∘ y) ⬝ᵥ (BO *ᵥ (lift ∘ y)))) = phi c * phi ((lift ∘ y) ⬝ᵥ (BO *ᵥ (lift ∘ y))) := map_mul _ _ _
+    have h2
+        : (phi : 𝒪 →+* Fv F v) (c * ((lift ∘ y) ⬝ᵥ (BO *ᵥ (lift ∘ y))))
+          = phi c * phi ((lift ∘ y) ⬝ᵥ (BO *ᵥ (lift ∘ y))) :=
+      map_mul _ _ _
     rw [h1] at h2
     have h3 : phi c = (2 : Fv F v)⁻¹ := hc
     rw [h3] at h2
@@ -145,16 +158,24 @@ theorem res_Q {ι : Type} [Fintype ι] (c : 𝒪) (hc : (c : Fv F v) = 2⁻¹) (
       exact res_lift _
     rw [this]
 
-theorem core (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (h2 : Valued.v (2 : Fv F v) = 1)
-    (ι : Type) [Fintype ι] [DecidableEq ι] (B : Matrix ι ι (Fv F v)) (hBs : B.IsSymm)
-    (hBint : ∀ i j, B i j ∈ v.adicCompletionIntegers F) (hBdet : Valued.v B.det = 1)
-    (M : ℕ) (hM : Fintype.card ι = 2 * M) (hM1 : 1 ≤ M) (s : Fv F v)
-    (hs : s ∈ v.adicCompletionIntegers F) :
-    ∃ D : ℝ≥0, |(D : ℝ) - 1| ≤ 1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (M - 1) +
-        1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (2 * M - 1) ∧
-      ∀ A : Set (Fv F v), MeasurableSet A → A ⊆ {z | Valued.v (z - s) < 1} →
-        (Measure.pi fun _ : ι => lam) {x | (∀ i, x i ∈ v.adicCompletionIntegers F) ∧
-          (∃ i, Valued.v (x i) = 1) ∧ (2 : Fv F v)⁻¹ * (x ⬝ᵥ (B *ᵥ x)) ∈ A} = (D : ℝ≥0∞) * lam A := by
+theorem core
+    (lam : Measure (Fv F v)) (hlam : IsStdV v lam)
+    (h2 : Valued.v (2 : Fv F v) = 1)
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (B : Matrix ι ι (Fv F v)) (hBs : B.IsSymm) (hBint : ∀ i j, B i j ∈ v.adicCompletionIntegers F)
+    (hBdet : Valued.v B.det = 1)
+    (M : ℕ) (hM : Fintype.card ι = 2 * M) (hM1 : 1 ≤ M)
+    (s : Fv F v) (hs : s ∈ v.adicCompletionIntegers F)
+    : ∃ D : ℝ≥0,
+      |(D : ℝ) - 1|
+          ≤ 1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (M - 1)
+            + 1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (2 * M - 1)
+        ∧ ∀ A : Set (Fv F v),
+          MeasurableSet A → A ⊆ {z | Valued.v (z - s) < 1}
+            → (Measure.pi fun _ : ι => lam)
+                {x | (∀ i, x i ∈ v.adicCompletionIntegers F) ∧
+                  (∃ i, Valued.v (x i) = 1) ∧ (2 : Fv F v)⁻¹ * (x ⬝ᵥ (B *ᵥ x)) ∈ A}
+              = (D : ℝ≥0∞) * lam A := by
   classical
   have hLoc := GlobalTheory.T.completion_is_local_ring F v
   haveI : SecondCountableTopology (Fv F v) := hLoc.2.2.1
@@ -206,7 +227,9 @@ theorem core (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (h2 : Valued.v (2 : 
     rw [e2, hBdet] at h3
     exact lt_irrefl _ h3
   set sb : 𝓴 := res (⟨s, hs⟩ : 𝒪) with hsb
-  have hcount := GlobalTheory.T.finite_field_quadratic_form_point_count 𝓴 hchar ι M hM hM1 (BO.map res) hBks hBkdet sb
+  have hcount :=
+    GlobalTheory.T.finite_field_quadratic_form_point_count 𝓴 hchar ι M hM hM1 (BO.map res) hBks
+      hBkdet sb
   let qk : (ι → 𝓴) → 𝓴 := fun y => (2 : 𝓴)⁻¹ * (y ⬝ᵥ ((BO.map res) *ᵥ y))
   let Fl : Finset (ι → 𝓴) := Finset.univ.filter fun y => qk y = sb
   let T : Finset (ι → 𝓴) := Fl.filter fun y => y ≠ 0
@@ -222,7 +245,8 @@ theorem core (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (h2 : Valued.v (2 : 
       · exact Finset.mem_insert_of_mem (Finset.mem_filter.2 ⟨hy, h0⟩)
     exact (Finset.card_le_card hsub).trans (Finset.card_insert_le _ _)
   have hqpos : (0 : ℝ) < (Ideal.absNorm v.asIdeal : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero hq0
-  refine ⟨(T.card : ℝ≥0) * ((Ideal.absNorm v.asIdeal : ℝ≥0)⁻¹) ^ (2 * M - 1), ?_, fun A hA hAs => ?_⟩
+  refine
+    ⟨(T.card : ℝ≥0) * ((Ideal.absNorm v.asIdeal : ℝ≥0)⁻¹) ^ (2 * M - 1), ?_, fun A hA hAs => ?_⟩
   · push_cast
     exact real_bound _ _ (Fl.card : ℝ) hqpos M hM1 hcount (by exact_mod_cast hle1)
       (by exact_mod_cast hle2)
@@ -233,9 +257,10 @@ theorem core (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (h2 : Valued.v (2 : 
     let P : (ι → 𝓴) → Set (ι → Fv F v) := fun y =>
       {x | (∀ i, Valued.v (x i - lf y i) < 1) ∧ Qf x ∈ A}
     let T0 : Finset (ι → 𝓴) := Finset.univ.filter fun y => y ≠ 0
-    have hS : {x : ι → Fv F v | (∀ i, x i ∈ v.adicCompletionIntegers F) ∧
-        (∃ i, Valued.v (x i) = 1) ∧ (2 : Fv F v)⁻¹ * (x ⬝ᵥ ((BO.map phi) *ᵥ x)) ∈ A} =
-        ⋃ y ∈ T0, P y := by
+    have hS
+        : {x : ι → Fv F v | (∀ i, x i ∈ v.adicCompletionIntegers F) ∧
+            (∃ i, Valued.v (x i) = 1) ∧ (2 : Fv F v)⁻¹ * (x ⬝ᵥ ((BO.map phi) *ᵥ x)) ∈ A}
+          = ⋃ y ∈ T0, P y := by
       ext x
       simp only [Set.mem_setOf_eq, Set.mem_iUnion, exists_prop]
       constructor
@@ -245,13 +270,14 @@ theorem core (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (h2 : Valued.v (2 : 
       · rintro ⟨y, hy, h, h4⟩
         obtain ⟨h1, h3⟩ := (cover x).2 ⟨y, (Finset.mem_filter.1 hy).2, h⟩
         exact ⟨h1, h3, h4⟩
-    have hball : MeasurableSet {a : Fv F v | Valued.v a < 1} :=
-      by
+    have hball : MeasurableSet {a : Fv F v | Valued.v a < 1} := by
       have h := (Valued.isOpen_ball (Fv F v) 1).measurableSet
       simpa [Valuation.restrict_lt_iff_lt_embedding] using h
     have hmeas : ∀ y ∈ T0, MeasurableSet (P y) := by
       intro y _
-      have e : P y = (⋂ i, (fun x : ι → Fv F v => x i - lf y i) ⁻¹' {a | Valued.v a < 1}) ∩ Qf ⁻¹' A := by
+      have e
+          : P y
+            = (⋂ i, (fun x : ι → Fv F v => x i - lf y i) ⁻¹' {a | Valued.v a < 1}) ∩ Qf ⁻¹' A := by
         ext x
         simp [P]
       rw [e]
@@ -260,13 +286,20 @@ theorem core (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (h2 : Valued.v (2 : 
     have hdisj : Set.PairwiseDisjoint (↑T0) P := by
       intro y _ y' _ hne
       exact Set.disjoint_left.2 fun x hx hx' => hne (eq_of_close x y y' hx.1 hx'.1)
-    have hclass : ∀ y ∈ T0, (Measure.pi fun _ : ι => lam) (P y) =
-        if qk y = sb then ((Ideal.absNorm v.asIdeal : ℝ≥0∞)⁻¹ ^ (2 * M - 1)) * lam A else 0 := by
+    have hclass
+        : ∀ y ∈ T0,
+          (Measure.pi fun _ : ι => lam) (P y)
+            = if qk y = sb then
+                ((Ideal.absNorm v.asIdeal : ℝ≥0∞)⁻¹ ^ (2 * M - 1)) * lam A
+              else
+                0 := by
       intro y hy
       have hy0 : y ≠ 0 := (Finset.mem_filter.1 hy).2
       obtain ⟨hint, hprim⟩ := (cover (lf y)).2 ⟨y, hy0, fun i => by simp⟩
       obtain ⟨a, haQ, har⟩ := res_Q c hc hr BO y
-      have key := GlobalTheory.T.primitive_vector_quadratic_level_measure F v lam hlam h2 ι (BO.map phi) hBs hBint hBdet (lf y) hint hprim A hA
+      have key :=
+        GlobalTheory.T.primitive_vector_quadratic_level_measure F v lam hlam h2 ι (BO.map phi) hBs
+          hBint hBdet (lf y) hint hprim A hA
       have hkey : (Measure.pi fun _ : ι => lam) (P y) = _ := key
       rw [hkey, hM]
       have hcl : Valued.v (s - Qf (lf y)) < 1 ↔ qk y = sb := by
@@ -276,7 +309,8 @@ theorem core (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (h2 : Valued.v (2 : 
         exact ⟨fun h => (this.2 h).symm, fun h => this.1 h.symm⟩
       split_ifs with he
       · have hlt := hcl.2 he
-        have : A ∩ {s' | Valued.v (s' - (2 : Fv F v)⁻¹ * (lf y ⬝ᵥ ((BO.map phi) *ᵥ lf y))) < 1} = A := by
+        have : A ∩ {s' | Valued.v (s' - (2 : Fv F v)⁻¹ * (lf y ⬝ᵥ ((BO.map phi) *ᵥ lf y))) < 1}
+            = A := by
           refine Set.inter_eq_left.2 fun z hz => ?_
           have h5 : Valued.v (z - s) < 1 := hAs hz
           have h6 := Valuation.map_add_lt _ h5 hlt
@@ -284,7 +318,8 @@ theorem core (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (h2 : Valued.v (2 : 
           rw [e] at h6
           exact h6
         rw [this]
-      · have : A ∩ {s' | Valued.v (s' - (2 : Fv F v)⁻¹ * (lf y ⬝ᵥ ((BO.map phi) *ᵥ lf y))) < 1} = ∅ := by
+      · have : A ∩ {s' | Valued.v (s' - (2 : Fv F v)⁻¹ * (lf y ⬝ᵥ ((BO.map phi) *ᵥ lf y))) < 1}
+            = ∅ := by
           refine Set.eq_empty_iff_forall_notMem.2 fun z hz => he (hcl.1 ?_)
           have h5 : Valued.v (z - s) < 1 := hAs hz.1
           have h6 : Valued.v (z - Qf (lf y)) < 1 := hz.2
@@ -303,7 +338,24 @@ theorem core (lam : Measure (Fv F v)) (hlam : IsStdV v lam) (h2 : Valued.v (2 : 
     push_cast [ENNReal.coe_inv hq0']
     rw [mul_assoc]
 
-theorem density_primitive : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)), IsStdV v lam → Valued.v (2 : Fv F v) = 1 → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (B : Matrix ι ι (Fv F v)), B.IsSymm → (∀ i j, B i j ∈ v.adicCompletionIntegers F) → Valued.v B.det = 1 → ∀ M : ℕ, Fintype.card ι = 2 * M → 1 ≤ M → ∀ s : Fv F v, s ∈ v.adicCompletionIntegers F → ∃ D : ℝ≥0, |(D : ℝ) - 1| ≤ 1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (M - 1) + 1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (2 * M - 1) ∧ ∀ A : Set (Fv F v), MeasurableSet A → A ⊆ {z | Valued.v (z - s) < 1} → (Measure.pi fun _ : ι => lam) {x | (∀ i, x i ∈ v.adicCompletionIntegers F) ∧ (∃ i, Valued.v (x i) = 1) ∧ (2 : Fv F v)⁻¹ * (x ⬝ᵥ (B *ᵥ x)) ∈ A} = (D : ℝ≥0∞) * lam A := by
+theorem density_primitive
+    : ∀ (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (lam : Measure (Fv F v)),
+      IsStdV v lam → Valued.v (2 : Fv F v) = 1
+        → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (B : Matrix ι ι (Fv F v)),
+          B.IsSymm → (∀ i j, B i j ∈ v.adicCompletionIntegers F) → Valued.v B.det = 1
+            → ∀ M : ℕ,
+              Fintype.card ι = 2 * M → 1 ≤ M
+                → ∀ s : Fv F v,
+                  s ∈ v.adicCompletionIntegers F
+                    → ∃ D : ℝ≥0,
+                      |(D : ℝ) - 1|
+                          ≤ 1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (M - 1)
+                            + 1 / (Ideal.absNorm v.asIdeal : ℝ) ^ (2 * M - 1)
+                        ∧ ∀ A : Set (Fv F v),
+                          MeasurableSet A → A ⊆ {z | Valued.v (z - s) < 1}
+                            → (Measure.pi fun _ : ι => lam)
+                                {x | (∀ i, x i ∈ v.adicCompletionIntegers F) ∧ (∃ i, Valued.v (x i) = 1) ∧ (2 : Fv F v)⁻¹ * (x ⬝ᵥ (B *ᵥ x)) ∈ A}
+                              = (D : ℝ≥0∞) * lam A := by
   intro F _ _ v lam hlam h2 ι _ _ B hBs hBint hBdet M hM hM1 s hs
   exact core lam hlam h2 ι B hBs hBint hBdet M hM hM1 s hs
 

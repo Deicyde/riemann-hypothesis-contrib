@@ -53,8 +53,8 @@ theorem ChartSupBound.proof : ChartSupBound.Statement := by
   have hzS : ∀ z ∈ B, closedBall w ‖z‖ ⊆ S := fun z hz =>
     (closedBall_subset_closedBall ((mem_closedBall_zero_iff.1 hz).trans hsr)).trans
       (closedBall_subset_cthickening hw r)
-  have hwzS : ∀ z ∈ B, w + z ∈ S := fun z hz => hzS z hz (by
-    rw [mem_closedBall, dist_eq_norm, add_sub_cancel_left])
+  have hwzS : ∀ z ∈ B, w + z ∈ S := fun z hz =>
+    hzS z hz (by rw [mem_closedBall, dist_eq_norm, add_sub_cancel_left])
 
   set ℓ := fderiv ℝ ψ w with hℓ
   set lam : (Fin D → ℂ) →L[ℂ] ℂ := StrongDual.extendRCLike (𝕜 := ℂ) ℓ with hlam
@@ -75,8 +75,10 @@ theorem ChartSupBound.proof : ChartSupBound.Statement := by
   set k : ℝ := ν₀ * Real.exp (-(n : ℝ) * ψ w) * Real.exp (-(M' * r ^ 2)) with hk
   have hk0 : 0 ≤ k := by positivity
 
-  have hpt : ∀ z ∈ B, ENNReal.ofReal (k * ‖G z‖ ^ 2) ≤
-      ENNReal.ofReal (‖F (w + z)‖ ^ 2 * Real.exp (-(n : ℝ) * ψ (w + z)) * ν (w + z)) := by
+  have hpt
+      : ∀ z ∈ B,
+        ENNReal.ofReal (k * ‖G z‖ ^ 2)
+          ≤ ENNReal.ofReal (‖F (w + z)‖ ^ 2 * Real.exp (-(n : ℝ) * ψ (w + z)) * ν (w + z)) := by
     intro z hz
     apply ENNReal.ofReal_le_ofReal
     have hGz : ‖G z‖ ^ 2 = ‖F (w + z)‖ ^ 2 * Real.exp (-(n : ℝ) * ℓ z) := by
@@ -85,15 +87,19 @@ theorem ChartSupBound.proof : ChartSupBound.Statement := by
         ← Real.exp_add]
       congr 2
       ring
-    have hT := ChartTaylorCover.taylor_le hV hψ ((hzS z hz).trans hrV)
-      (fun x hx => (hM x (hzS z hz hx)).trans (le_abs_self M))
+    have hT :=
+      ChartTaylorCover.taylor_le hV hψ ((hzS z hz).trans hrV)
+        (fun x hx => (hM x (hzS z hz hx)).trans (le_abs_self M))
     have hz' : ‖z‖ ≤ s := mem_closedBall_zero_iff.1 hz
     have hnz : (n : ℝ) * (M' * ‖z‖ ^ 2) ≤ M' * r ^ 2 := by
-      calc (n : ℝ) * (M' * ‖z‖ ^ 2) = M' * ((n : ℝ) * ‖z‖ ^ 2) := by ring
+      calc
+        (n : ℝ) * (M' * ‖z‖ ^ 2)
+          = M' * ((n : ℝ) * ‖z‖ ^ 2) := by ring
         _ ≤ M' * ((n : ℝ) * s ^ 2) := by gcongr
         _ = M' * r ^ 2 := by rw [hs2]
-    have hexp : Real.exp (-(M' * r ^ 2)) * (Real.exp (-(n : ℝ) * ψ w) * Real.exp (-(n : ℝ) * ℓ z)) ≤
-        Real.exp (-(n : ℝ) * ψ (w + z)) := by
+    have hexp
+        : Real.exp (-(M' * r ^ 2)) * (Real.exp (-(n : ℝ) * ψ w) * Real.exp (-(n : ℝ) * ℓ z))
+          ≤ Real.exp (-(n : ℝ) * ψ (w + z)) := by
       rw [← Real.exp_add, ← Real.exp_add]
       apply Real.exp_le_exp.2
       have := mul_le_mul_of_nonneg_left hT hnpos.le
@@ -101,59 +107,69 @@ theorem ChartSupBound.proof : ChartSupBound.Statement := by
     have hνz : ν₀ ≤ ν (w + z) := isMinOn_iff.1 hmin _ (hwzS z hz)
     rw [hGz, hk]
     have hF0 : 0 ≤ ‖F (w + z)‖ ^ 2 := by positivity
-    calc ν₀ * Real.exp (-(n : ℝ) * ψ w) * Real.exp (-(M' * r ^ 2)) *
-          (‖F (w + z)‖ ^ 2 * Real.exp (-(n : ℝ) * ℓ z))
-        = ‖F (w + z)‖ ^ 2 * (Real.exp (-(M' * r ^ 2)) *
-            (Real.exp (-(n : ℝ) * ψ w) * Real.exp (-(n : ℝ) * ℓ z))) * ν₀ := by ring
+    calc
+      ν₀ * Real.exp (-(n : ℝ) * ψ w) * Real.exp (-(M' * r ^ 2))
+            * (‖F (w + z)‖ ^ 2 * Real.exp (-(n : ℝ) * ℓ z))
+          = ‖F (w + z)‖ ^ 2
+            * (Real.exp (-(M' * r ^ 2)) * (Real.exp (-(n : ℝ) * ψ w) * Real.exp (-(n : ℝ) * ℓ z)))
+            * ν₀ := by
+        ring
       _ ≤ ‖F (w + z)‖ ^ 2 * Real.exp (-(n : ℝ) * ψ (w + z)) * ν (w + z) :=
-          mul_le_mul (mul_le_mul_of_nonneg_left hexp hF0) hνz hν₀pos.le (by positivity)
+        mul_le_mul (mul_le_mul_of_nonneg_left hexp hF0) hνz hν₀pos.le (by positivity)
 
   have hΦ : MeasurePreserving (fun z : Fin D → ℂ => w + z) volume volume :=
     measurePreserving_add_left volume w
   have hemb : MeasurableEmbedding (fun z : Fin D → ℂ => w + z) :=
     (Homeomorph.addLeft w).isClosedEmbedding.measurableEmbedding
   have hint : ENNReal.ofReal (∫ z in B, ‖G z‖ ^ 2) ≤ ∫⁻ z in B, ENNReal.ofReal (‖G z‖ ^ 2) := by
-    calc _ ≤ ‖∫ z in B, ‖G z‖ ^ 2‖ₑ := by
-          rw [Real.enorm_eq_ofReal_abs]; exact ENNReal.ofReal_le_ofReal (le_abs_self _)
+    calc
+      _ ≤ ‖∫ z in B, ‖G z‖ ^ 2‖ₑ := by
+        rw [Real.enorm_eq_ofReal_abs]; exact ENNReal.ofReal_le_ofReal (le_abs_self _)
       _ ≤ ∫⁻ z in B, ‖‖G z‖ ^ 2‖ₑ := enorm_integral_le_lintegral_enorm _
       _ = _ := lintegral_congr fun z => Real.enorm_eq_ofReal (by positivity)
-  have hmain : ENNReal.ofReal (k * (‖F w‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * P)) ≤
-      ∫⁻ z in V, ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (-(n : ℝ) * ψ z) * ν z) := by
-    calc _ ≤ ENNReal.ofReal (k * ∫ z in B, ‖G z‖ ^ 2) :=
-          ENNReal.ofReal_le_ofReal (mul_le_mul_of_nonneg_left hPn hk0)
+  have hmain
+      : ENNReal.ofReal (k * (‖F w‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * P))
+        ≤ ∫⁻ z in V, ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (-(n : ℝ) * ψ z) * ν z) := by
+    calc
+      _ ≤ ENNReal.ofReal (k * ∫ z in B, ‖G z‖ ^ 2) :=
+        ENNReal.ofReal_le_ofReal (mul_le_mul_of_nonneg_left hPn hk0)
       _ = ENNReal.ofReal k * ENNReal.ofReal (∫ z in B, ‖G z‖ ^ 2) := ENNReal.ofReal_mul hk0
       _ ≤ ENNReal.ofReal k * ∫⁻ z in B, ENNReal.ofReal (‖G z‖ ^ 2) := by gcongr
       _ = ∫⁻ z in B, ENNReal.ofReal k * ENNReal.ofReal (‖G z‖ ^ 2) :=
-          (lintegral_const_mul' _ _ ENNReal.ofReal_ne_top).symm
+        (lintegral_const_mul' _ _ ENNReal.ofReal_ne_top).symm
       _ = ∫⁻ z in B, ENNReal.ofReal (k * ‖G z‖ ^ 2) :=
-          lintegral_congr fun z => (ENNReal.ofReal_mul hk0).symm
+        lintegral_congr fun z => (ENNReal.ofReal_mul hk0).symm
       _ ≤ ∫⁻ z in B, ENNReal.ofReal (‖F (w + z)‖ ^ 2 * Real.exp (-(n : ℝ) * ψ (w + z)) *
             ν (w + z)) :=
-          setLIntegral_mono' isClosed_closedBall.measurableSet hpt
+        setLIntegral_mono' isClosed_closedBall.measurableSet hpt
       _ = ∫⁻ y in (fun z : Fin D → ℂ => w + z) '' B,
             ENNReal.ofReal (‖F y‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y) * ν y) :=
-          hΦ.setLIntegral_comp_emb hemb
-            (fun y => ENNReal.ofReal (‖F y‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y) * ν y)) B
+        hΦ.setLIntegral_comp_emb hemb
+          (fun y => ENNReal.ofReal (‖F y‖ ^ 2 * Real.exp (-(n : ℝ) * ψ y) * ν y))
+          B
       _ ≤ _ := lintegral_mono_set (image_subset_iff.2 fun z hz => hrV (hwzS z hz))
   have hC0 : 0 ≤ Real.exp (M' * r ^ 2) / (ν₀ * P) * (n : ℝ) ^ D := by positivity
-  have heq : Real.exp (M' * r ^ 2) / (ν₀ * P) * (n : ℝ) ^ D *
-      (k * (‖F w‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * P)) = ‖F w‖ ^ 2 * Real.exp (-(n : ℝ) * ψ w) := by
+  have heq
+      : Real.exp (M' * r ^ 2) / (ν₀ * P) * (n : ℝ) ^ D * (k * (‖F w‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * P))
+        = ‖F w‖ ^ 2 * Real.exp (-(n : ℝ) * ψ w) := by
     have hnD : (n : ℝ) ^ D ≠ 0 := by positivity
-    have he : Real.exp (M' * r ^ 2) * Real.exp (-(M' * r ^ 2)) = 1 := by
-      rw [← Real.exp_add]; simp
+    have he : Real.exp (M' * r ^ 2) * Real.exp (-(M' * r ^ 2)) = 1 := by rw [← Real.exp_add]; simp
     have hνP : ν₀ * P ≠ 0 := by positivity
     rw [hk, div_eq_mul_inv]
-    calc Real.exp (M' * r ^ 2) * (ν₀ * P)⁻¹ * (n : ℝ) ^ D *
-          (ν₀ * Real.exp (-(n : ℝ) * ψ w) * Real.exp (-(M' * r ^ 2)) *
-            (‖F w‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * P))
-        = (Real.exp (M' * r ^ 2) * Real.exp (-(M' * r ^ 2))) * ((n : ℝ) ^ D * ((n : ℝ) ^ D)⁻¹) *
-            ((ν₀ * P) * (ν₀ * P)⁻¹) * (‖F w‖ ^ 2 * Real.exp (-(n : ℝ) * ψ w)) := by ring
+    calc
+      Real.exp (M' * r ^ 2) * (ν₀ * P)⁻¹ * (n : ℝ) ^ D
+            * (ν₀ * Real.exp (-(n : ℝ) * ψ w) * Real.exp (-(M' * r ^ 2))
+              * (‖F w‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * P))
+          = (Real.exp (M' * r ^ 2) * Real.exp (-(M' * r ^ 2))) * ((n : ℝ) ^ D * ((n : ℝ) ^ D)⁻¹)
+            * ((ν₀ * P) * (ν₀ * P)⁻¹) * (‖F w‖ ^ 2 * Real.exp (-(n : ℝ) * ψ w)) := by
+        ring
       _ = ‖F w‖ ^ 2 * Real.exp (-(n : ℝ) * ψ w) := by
         rw [he, mul_inv_cancel₀ hnD, mul_inv_cancel₀ hνP]; ring
-  calc ENNReal.ofReal (‖F w‖ ^ 2 * Real.exp (-(n : ℝ) * ψ w))
-      = ENNReal.ofReal (Real.exp (M' * r ^ 2) / (ν₀ * P) * (n : ℝ) ^ D) *
-          ENNReal.ofReal (k * (‖F w‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * P)) := by
-        rw [← ENNReal.ofReal_mul hC0, heq]
+  calc
+    ENNReal.ofReal (‖F w‖ ^ 2 * Real.exp (-(n : ℝ) * ψ w))
+        = ENNReal.ofReal (Real.exp (M' * r ^ 2) / (ν₀ * P) * (n : ℝ) ^ D)
+          * ENNReal.ofReal (k * (‖F w‖ ^ 2 * ((n : ℝ) ^ D)⁻¹ * P)) := by
+      rw [← ENNReal.ofReal_mul hC0, heq]
     _ ≤ _ := by gcongr
 
 end

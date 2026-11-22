@@ -9,8 +9,11 @@ open CategoryTheory Limits
 
 namespace LateralTheory.E.ColimHensPf
 
-variable {B : Type} [CommRing B] {J : Type} [SmallCategory J] [IsFiltered J] {D : J ⥤ CommRingCat.{0}}
-  (β : (Functor.const J).obj (CommRingCat.of B) ⟶ D) {c : Cocone D}
+variable
+  {B : Type} [CommRing B]
+  {J : Type} [SmallCategory J] [IsFiltered J]
+  {D : J ⥤ CommRingCat.{0}} (β : (Functor.const J).obj (CommRingCat.of B) ⟶ D)
+  {c : Cocone D}
 
 lemma beta_nat {j j' : J} (f : j ⟶ j') (b : B) : (D.map f).hom ((β.app j).hom b) = (β.app j').hom b := by
   have h := congrArg (fun g => g.hom b) (β.naturality f)
@@ -28,7 +31,8 @@ lemma mapI (I : Ideal B) {j j' : J} (f : j ⟶ j') {x : D.obj j} (hx : x ∈ I.m
   rwa [Ideal.map_map, h] at this
 
 def phi (c : Cocone D) : B →+* c.pt :=
-  (c.ι.app (IsFiltered.nonempty (C := J)).some).hom.comp (β.app (IsFiltered.nonempty (C := J)).some).hom
+  (c.ι.app (IsFiltered.nonempty (C := J)).some).hom.comp
+    (β.app (IsFiltered.nonempty (C := J)).some).hom
 
 lemma phi_eq (c : Cocone D) (j : J) (b : B) : (c.ι.app j).hom ((β.app j).hom b) = phi β c b := by
   let j0 := (IsFiltered.nonempty (C := J)).some
@@ -138,10 +142,13 @@ open LateralTheory.E.ColimHensPf
 
 theorem ColimHens_of : LateralTheory.E.HensCut.ColimHens := by
   intro B _ I J _ _ D β c hc ha hb hcc
-  refine ⟨I.map (phi β c), ⟨?_, ?_⟩, ⟨RingEquiv.ofBijective
-    (Ideal.quotientMap (I.map (phi β c)) (phi β c) Ideal.le_comap_map) ⟨?_, ?_⟩⟩⟩
-  ·
-    intro k hk
+  refine ⟨
+    I.map (phi β c),
+    ⟨?_, ?_⟩,
+    ⟨RingEquiv.ofBijective (Ideal.quotientMap (I.map (phi β c)) (phi β c) Ideal.le_comap_map)
+      ⟨?_, ?_⟩⟩
+  ⟩
+  · intro k hk
     rw [Ring.mem_jacobson_iff]
     intro y
     obtain ⟨j, x, hx, hxe⟩ := Krep β hc I (Ideal.mul_mem_right y _ hk)
@@ -149,8 +156,7 @@ theorem ColimHens_of : LateralTheory.E.HensCut.ColimHens := by
     have := hu.map (c.ι.app j').hom
     rw [iota_nat, map_add (f := _), map_one, hxe, add_comm] at this
     exact this
-  ·
-    intro g hg a₀ hev hder
+  · intro g hg a₀ hev hder
     by_cases hnt : Nontrivial c.pt
     swap
     · rw [not_nontrivial_iff_subsingleton] at hnt
@@ -172,8 +178,9 @@ theorem ColimHens_of : LateralTheory.E.HensCut.ColimHens := by
     have hy2 : (c.ι.app j3).hom (p3.derivative.eval b3 * v - 1) ∈ I.map (phi β c) := by
       rw [map_sub, map_mul, map_one, ev_map, ← Polynomial.derivative_map, hp3g, hb3a, hv]; exact hw
     obtain ⟨j4, f34, h4⟩ := memK_descend β hc I _ hy1
-    obtain ⟨j5, f45, h5⟩ := memK_descend β hc I ((D.map f34).hom (p3.derivative.eval b3 * v - 1))
-      (by rw [iota_nat]; exact hy2)
+    obtain ⟨j5, f45, h5⟩ :=
+      memK_descend β hc I ((D.map f34).hom (p3.derivative.eval b3 * v - 1))
+        (by rw [iota_nat]; exact hy2)
     let h := f34 ≫ f45
     set P := p3.map (D.map h).hom with hP
     set b := (D.map h).hom b3 with hb
@@ -183,7 +190,9 @@ theorem ColimHens_of : LateralTheory.E.HensCut.ColimHens := by
       have := mapI β I f45 h4
       simpa [h] using this
     have hPd : IsUnit (Ideal.Quotient.mk (I.map (β.app j5).hom) (P.derivative.eval b)) := by
-      have e : (D.map h).hom (p3.derivative.eval b3 * v - 1) = P.derivative.eval b * (D.map h).hom v - 1 := by
+      have e
+          : (D.map h).hom (p3.derivative.eval b3 * v - 1)
+            = P.derivative.eval b * (D.map h).hom v - 1 := by
         rw [map_sub, map_mul, map_one, ev_map, ← Polynomial.derivative_map]
       have h5' : P.derivative.eval b * (D.map h).hom v - 1 ∈ I.map (β.app j5).hom := by
         rw [← e]; simpa [h] using h5
@@ -196,21 +205,20 @@ theorem ColimHens_of : LateralTheory.E.HensCut.ColimHens := by
       rwa [pmap, hP, pmap, hp3g] at hr
     · have := KofI β c I ha2
       rwa [map_sub, iota_nat, hb, iota_nat, hb3a] at this
-  ·
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  · set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha0
     obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective a
     rw [Ideal.quotientMap_mk, Ideal.Quotient.eq_zero_iff_mem] at ha0
     obtain ⟨j, x, hx, hxe⟩ := Krep β hc I ha0
-    obtain ⟨j', f, hf⟩ := zero_later hc ((β.app j).hom b - x)
-      (by rw [map_sub, hxe, phi_eq, sub_self])
+    obtain ⟨j', f, hf⟩ :=
+      zero_later hc ((β.app j).hom b - x) (by rw [map_sub, hxe, phi_eq, sub_self])
     rw [map_sub, sub_eq_zero, beta_nat] at hf
     have hm : (β.app j').hom b ∈ I.map (β.app j').hom := by rw [hf]; exact mapI β I f hx
     apply (ha j').1
     rw [map_zero, Ideal.quotientMap_mk, Ideal.Quotient.eq_zero_iff_mem]
     exact hm
-  ·
-    intro z
+  · intro z
     obtain ⟨z', rfl⟩ := Ideal.Quotient.mk_surjective z
     obtain ⟨j, y, rfl⟩ := rep hc z'
     obtain ⟨w, hw⟩ := (ha j).2 (Ideal.Quotient.mk _ y)

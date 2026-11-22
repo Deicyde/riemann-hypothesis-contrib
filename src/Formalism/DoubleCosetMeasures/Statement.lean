@@ -12,18 +12,17 @@ namespace Formalism.DoubleCosetMeasures
 
 def IntTwoSided : Prop :=
   ∀ (G₁ G₂ : Type) [Group G₁] [TopologicalSpace G₁] [IsTopologicalGroup G₁] [MeasurableSpace G₁]
-    [BorelSpace G₁] [Group G₂] [TopologicalSpace G₂] [IsTopologicalGroup G₂] [MeasurableSpace G₂]
-    [BorelSpace G₂] (μ₁ : Measure G₁) (μ₂ : Measure G₂) [μ₁.IsMulRightInvariant]
-    [μ₂.IsMulLeftInvariant] [SFinite μ₁] [SFinite μ₂] (K₁ : Subgroup G₁) (K₂ : Subgroup G₂),
-    IsOpen (K₁ : Set G₁) → IsOpen (K₂ : Set G₂) →
-    ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E] (f : G₁ × G₂ → E),
-      (∀ a ∈ K₁, ∀ b ∈ K₂, ∀ x : G₁, ∀ y : G₂, f (a * x, y * b) = f (x, y)) →
-      HasCompactSupport f →
-      (Function.support (fun p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂) =>
-          f (p.1.out, p.2.out))).Finite ∧
-      ∫ p, f p ∂(μ₁.prod μ₂) =
-        ∑ᶠ p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂),
-          ((μ₁ (K₁ : Set G₁)).toReal * (μ₂ (K₂ : Set G₂)).toReal) • f (p.1.out, p.2.out)
+      [BorelSpace G₁] [Group G₂] [TopologicalSpace G₂] [IsTopologicalGroup G₂] [MeasurableSpace G₂]
+      [BorelSpace G₂] (μ₁ : Measure G₁) (μ₂ : Measure G₂) [μ₁.IsMulRightInvariant]
+      [μ₂.IsMulLeftInvariant] [SFinite μ₁] [SFinite μ₂] (K₁ : Subgroup G₁) (K₂ : Subgroup G₂),
+    IsOpen (K₁ : Set G₁) → IsOpen (K₂ : Set G₂)
+      → ∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E] (f : G₁ × G₂ → E),
+        (∀ a ∈ K₁, ∀ b ∈ K₂, ∀ x : G₁, ∀ y : G₂, f (a * x, y * b) = f (x, y)) → HasCompactSupport f
+          → (Function.support (fun p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂) =>
+              f (p.1.out, p.2.out))).Finite
+            ∧ ∫ p, f p ∂(μ₁.prod μ₂)
+              = ∑ᶠ p : Quotient (QuotientGroup.rightRel K₁) × (G₂ ⧸ K₂),
+                  ((μ₁ (K₁ : Set G₁)).toReal * (μ₂ (K₂ : Set G₂)).toReal) • f (p.1.out, p.2.out)
 
 section Mat
 
@@ -62,8 +61,7 @@ def coeLin : (Fin n → R) →ₗ[R] (Fin n → K) :=
   LinearMap.pi (fun j => (Algebra.linearMap R K).comp (LinearMap.proj j))
 
 def latZ (Z : Matrix (Fin n) (Fin n) K) : Submodule R (Fin n → R) :=
-  Submodule.comap (coeLin R)
-    (LinearMap.range ((Z.mulVecLin.restrictScalars R).comp (coeLin R)))
+  Submodule.comap (coeLin R) (LinearMap.range ((Z.mulVecLin.restrictScalars R).comp (coeLin R)))
 
 abbrev coker (Z : Matrix (Fin n) (Fin n) K) : Type := (Fin n → R) ⧸ latZ R Z
 
@@ -79,21 +77,24 @@ def lastCoord : (Fin n → K) →ₗ[R] K :=
 def lamLin (Z : Matrix (Fin n) (Fin n) K) : (Fin n → R) →ₗ[R] KR R :=
   (Submodule.mkQ _).comp ((lastCoord R).comp ((Z⁻¹.mulVecLin.restrictScalars R).comp (coeLin R)))
 
-def isoSet (Z : Matrix (Fin n) (Fin n) K) (C : Type) [AddCommGroup C] [Module R C] (e : C)
-    (lam : C →ₗ[R] KR R) : Set (coker R Z ≃ₗ[R] C) :=
+def isoSet
+    (Z : Matrix (Fin n) (Fin n) K)
+    (C : Type) [AddCommGroup C] [Module R C]
+    (e : C) (lam : C →ₗ[R] KR R)
+    : Set (coker R Z ≃ₗ[R] C) :=
   {φ | φ (eZ R Z) = e ∧ ∀ v : Fin n → R, lam (φ (Submodule.Quotient.mk v)) = lamLin R Z v}
 
 end Coker
 
 def UniGroup : Prop :=
   ∀ (K : Type) [CommRing K] (n : ℕ) (x y : Matrix (Fin n) (Fin n) K),
-    (IsLowUni x → IsLowUni y → IsLowUni (x * y)) ∧ (IsUpUni x → IsUpUni y → IsUpUni (x * y)) ∧
-    (IsLowUni x → IsLowUni x⁻¹ ∧ x.det = 1) ∧ (IsUpUni x → IsUpUni x⁻¹ ∧ x.det = 1)
+    (IsLowUni x → IsLowUni y → IsLowUni (x * y)) ∧ (IsUpUni x → IsUpUni y → IsUpUni (x * y))
+      ∧ (IsLowUni x → IsLowUni x⁻¹ ∧ x.det = 1) ∧ (IsUpUni x → IsUpUni x⁻¹ ∧ x.det = 1)
 
 def SimpleAdd : Prop :=
   ∀ (K : Type) [CommRing K] (n : ℕ) (x y : Matrix (Fin n) (Fin n) K),
-    (IsLowUni x → IsLowUni y → sLow (x * y) = sLow x + sLow y) ∧
-    (IsUpUni x → IsUpUni y → sUp (x * y) = sUp x + sUp y)
+    (IsLowUni x → IsLowUni y → sLow (x * y) = sLow x + sLow y)
+      ∧ (IsUpUni x → IsUpUni y → sUp (x * y) = sUp x + sUp y)
 
 def IntInv : Prop :=
   ∀ (K : Type) [CommRing K] (R : Subring K) (n : ℕ) (a b Z : Matrix (Fin n) (Fin n) K),
@@ -101,9 +102,9 @@ def IntInv : Prop :=
 
 def IsoInv : Prop :=
   ∀ (K : Type) [CommRing K] (R : Subring K) (n : ℕ) (a b Z : Matrix (Fin n) (Fin n) K),
-    IsLowUni a → IsUpUni b → IsInt R a → IsInt R b →
-    ∀ (C : Type) [AddCommGroup C] [Module R C] (e : C) (lam : C →ₗ[R] KR R),
-      Nat.card (isoSet R (a * Z * b) C e lam) = Nat.card (isoSet R Z C e lam)
+    IsLowUni a → IsUpUni b → IsInt R a → IsInt R b
+      → ∀ (C : Type) [AddCommGroup C] [Module R C] (e : C) (lam : C →ₗ[R] KR R),
+        Nat.card (isoSet R (a * Z * b) C e lam) = Nat.card (isoSet R Z C e lam)
 
 def PhaseWellDef : Prop :=
   ∀ (K : Type) [CommRing K] (s : List ℕ) (t : ℕ → Kˣ) (x y : Matrix (Fin s.sum) (Fin s.sum) K),
@@ -113,8 +114,8 @@ section Groups
 
 variable (K : Type) [CommRing K]
 
-theorem isLowUni_mul {n : ℕ} {x y : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x)
-    (hy : IsLowUni y) : IsLowUni (x * y) := by
+theorem isLowUni_mul {n : ℕ} {x y : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) (hy : IsLowUni y)
+    : IsLowUni (x * y) := by
   refine ⟨hx.1.mul hy.1, fun a => ?_⟩
   rw [Matrix.mul_apply, Finset.sum_eq_single a]
   · rw [hx.2, hy.2, mul_one]
@@ -124,8 +125,8 @@ theorem isLowUni_mul {n : ℕ} {x y : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x
     · exact mul_eq_zero_of_left (hx.1 (OrderDual.toDual_lt_toDual.2 h)) _
   · intro h; exact absurd (Finset.mem_univ a) h
 
-theorem isUpUni_mul {n : ℕ} {x y : Matrix (Fin n) (Fin n) K} (hx : IsUpUni x)
-    (hy : IsUpUni y) : IsUpUni (x * y) := by
+theorem isUpUni_mul {n : ℕ} {x y : Matrix (Fin n) (Fin n) K} (hx : IsUpUni x) (hy : IsUpUni y)
+    : IsUpUni (x * y) := by
   refine ⟨hx.1.mul hy.1, fun a => ?_⟩
   rw [Matrix.mul_apply, Finset.sum_eq_single a]
   · rw [hx.2, hy.2, mul_one]
@@ -143,8 +144,7 @@ theorem isUpUni_det {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsUpUni x) : 
   rw [Matrix.det_of_upperTriangular hx.1]
   simp [hx.2]
 
-theorem isLowUni_inv {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) :
-    IsLowUni x⁻¹ := by
+theorem isLowUni_inv {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) : IsLowUni x⁻¹ := by
   have hu : IsUnit x.det := by rw [isLowUni_det K hx]; exact isUnit_one
   letI := Matrix.invertibleOfIsUnitDet x hu
   have hT : x⁻¹.IsLowerTriangular := Matrix.blockTriangular_inv_of_blockTriangular hx.1
@@ -158,8 +158,7 @@ theorem isLowUni_inv {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsLowUni x) 
     · exact mul_eq_zero_of_left (hT (OrderDual.toDual_lt_toDual.2 h')) _
   · intro h'; exact absurd (Finset.mem_univ a) h'
 
-theorem isUpUni_inv {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsUpUni x) :
-    IsUpUni x⁻¹ := by
+theorem isUpUni_inv {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsUpUni x) : IsUpUni x⁻¹ := by
   have hu : IsUnit x.det := by rw [isUpUni_det K hx]; exact isUnit_one
   letI := Matrix.invertibleOfIsUnitDet x hu
   have hT : x⁻¹.IsUpperTriangular := Matrix.blockTriangular_inv_of_blockTriangular hx.1
@@ -173,9 +172,11 @@ theorem isUpUni_inv {n : ℕ} {x : Matrix (Fin n) (Fin n) K} (hx : IsUpUni x) :
     · exact mul_eq_zero_of_right _ (hx.1 h')
   · intro h'; exact absurd (Finset.mem_univ a) h'
 
-theorem isLowUni_one {n : ℕ} : IsLowUni (1 : Matrix (Fin n) (Fin n) K) := ⟨Matrix.blockTriangular_one, fun a => Matrix.one_apply_eq a⟩
+theorem isLowUni_one {n : ℕ} : IsLowUni (1 : Matrix (Fin n) (Fin n) K) :=
+  ⟨Matrix.blockTriangular_one, fun a => Matrix.one_apply_eq a⟩
 
-theorem isUpUni_one {n : ℕ} : IsUpUni (1 : Matrix (Fin n) (Fin n) K) := ⟨Matrix.blockTriangular_one, fun a => Matrix.one_apply_eq a⟩
+theorem isUpUni_one {n : ℕ} : IsUpUni (1 : Matrix (Fin n) (Fin n) K) :=
+  ⟨Matrix.blockTriangular_one, fun a => Matrix.one_apply_eq a⟩
 
 def upUniG (n : ℕ) : Subgroup (GL (Fin n) K) where
   carrier := {g | IsUpUni (g : Matrix (Fin n) (Fin n) K)}
@@ -184,8 +185,9 @@ def upUniG (n : ℕ) : Subgroup (GL (Fin n) K) where
   inv_mem' := by intro a ha; simpa [Matrix.coe_units_inv] using isUpUni_inv K ha
 
 def lowW (s : List ℕ) (t : ℕ → Kˣ) : Subgroup (GL (Fin s.sum) K) where
-  carrier := {g | IsLowUni (g : Matrix (Fin s.sum) (Fin s.sum) K) ∧
-    ∃ h : Matrix (Fin s.sum) (Fin s.sum) K, IsLowUni h ∧ (g : Matrix _ _ K) * pt s t = pt s t * h}
+  carrier :=
+    {g | IsLowUni (g : Matrix (Fin s.sum) (Fin s.sum) K) ∧
+      ∃ h : Matrix (Fin s.sum) (Fin s.sum) K, IsLowUni h ∧ (g : Matrix _ _ K) * pt s t = pt s t * h}
   one_mem' := ⟨by simpa using isLowUni_one K, 1, isLowUni_one K, by simp⟩
   mul_mem' := by
     rintro a b ⟨ha, h₁, hh₁, e₁⟩ ⟨hb, h₂, hh₂, e₂⟩
@@ -196,22 +198,21 @@ def lowW (s : List ℕ) (t : ℕ → Kˣ) : Subgroup (GL (Fin s.sum) K) where
     rintro a ⟨ha, h, hh, e⟩
     refine ⟨by simpa [Matrix.coe_units_inv] using isLowUni_inv K ha, h⁻¹, isLowUni_inv K hh, ?_⟩
     have hdet : IsUnit h.det := by simp [isLowUni_det K hh]
-    have hadet : IsUnit (a : Matrix (Fin s.sum) (Fin s.sum) K).det := by
-      simp [isLowUni_det K ha]
+    have hadet : IsUnit (a : Matrix (Fin s.sum) (Fin s.sum) K).det := by simp [isLowUni_det K ha]
     simp only [Matrix.coe_units_inv]
-    calc (a : Matrix _ _ K)⁻¹ * pt s t
-        = (a : Matrix _ _ K)⁻¹ * pt s t * (h * h⁻¹) := by
-          rw [Matrix.mul_nonsing_inv h hdet, Matrix.mul_one]
+    calc
+      (a : Matrix _ _ K)⁻¹ * pt s t = (a : Matrix _ _ K)⁻¹ * pt s t * (h * h⁻¹) := by
+        rw [Matrix.mul_nonsing_inv h hdet, Matrix.mul_one]
       _ = (a : Matrix _ _ K)⁻¹ * ((a : Matrix _ _ K) * pt s t) * h⁻¹ := by
-          rw [e]; simp only [Matrix.mul_assoc]
-      _ = pt s t * h⁻¹ := by
-          rw [← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hadet, Matrix.one_mul]
+        rw [e]; simp only [Matrix.mul_assoc]
+      _ = pt s t * h⁻¹ := by rw [← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hadet, Matrix.one_mul]
 
 variable {K}
 
 def intSub (R : Subring K) {n : ℕ} (H : Subgroup (GL (Fin n) K)) : Subgroup H where
-  carrier := {g | IsInt R ((g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) ∧
-    IsInt R (((g : GL (Fin n) K)⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)}
+  carrier :=
+    {g | IsInt R ((g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) ∧
+      IsInt R (((g : GL (Fin n) K)⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)}
   one_mem' := by
     constructor <;> intro a b <;> by_cases h : a = b <;> simp [h, R.one_mem, R.zero_mem]
   mul_mem' := by
@@ -236,64 +237,90 @@ variable {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K]
 instance instMeasGL (n : ℕ) : MeasurableSpace (GL (Fin n) K) := borel _
 instance instBorelGL (n : ℕ) : BorelSpace (GL (Fin n) K) := ⟨rfl⟩
 
-
 open Classical in
-def phi (R : Subring K) (s : List ℕ) (t : ℕ → Kˣ) (ψ : AddChar K ℂ) (C : Type) [AddCommGroup C]
-    [Module R C] (e : C) (lam : C →ₗ[R] KR R) (p : lowW K s t × upUniG K s.sum) : ℂ := by
+def phi
+    (R : Subring K)
+    (s : List ℕ) (t : ℕ → Kˣ)
+    (ψ : AddChar K ℂ)
+    (C : Type) [AddCommGroup C] [Module R C]
+    (e : C) (lam : C →ₗ[R] KR R) (p : lowW K s t × upUniG K s.sum)
+    : ℂ := by
   classical
-  exact (if IsInt R (((p.1 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t * ((p.2 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K))
-    then (Nat.card (isoSet R (((p.1 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t *
-      ((p.2 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K)) C e lam) : ℂ) else 0) *
-    ψ (sLow ((p.1 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K) + sUp ((p.2 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K))
+  exact
+    (if IsInt R
+         (((p.1 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t
+           * ((p.2 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K)) then
+       (Nat.card (isoSet R
+           (((p.1 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K) * pt s t
+             * ((p.2 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K))
+           C e lam)
+         : ℂ)
+     else
+       0)
+      * ψ
+        (sLow ((p.1 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K)
+          + sUp ((p.2 : GL (Fin s.sum) K) : Matrix (Fin s.sum) (Fin s.sum) K))
 
-def BB (R : Subring K) (s : List ℕ) (t : ℕ → Kˣ) (ψ : AddChar K ℂ) (C : Type) [AddCommGroup C]
-    [Module R C] (e : C) (lam : C →ₗ[R] KR R) (μ₁ : Measure (lowW K s t))
-    (μ₂ : Measure (upUniG K s.sum)) : ℂ :=
+def BB
+    (R : Subring K)
+    (s : List ℕ) (t : ℕ → Kˣ)
+    (ψ : AddChar K ℂ)
+    (C : Type) [AddCommGroup C] [Module R C]
+    (e : C) (lam : C →ₗ[R] KR R) (μ₁ : Measure (lowW K s t)) (μ₂ : Measure (upUniG K s.sum))
+    : ℂ :=
   ∫ p, phi R s t ψ C e lam p ∂(μ₁.prod μ₂)
 
 end Integral
 
 def BBFinite : Prop :=
   ∀ (K : Type) [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] (R : Subring K),
-    IsOpen (R : Set K) → ∀ (s : List ℕ) (t : ℕ → Kˣ) (ψ : AddChar K ℂ), (∀ r ∈ R, ψ r = 1) →
-    ∀ (μ₁ : Measure (lowW K s t)) (μ₂ : Measure (upUniG K s.sum)) [μ₁.IsMulRightInvariant]
-      [μ₂.IsMulLeftInvariant] [SFinite μ₁] [SFinite μ₂] (C : Type) [AddCommGroup C] [Module R C] (e : C) (lam : C →ₗ[R] KR R),
-      HasCompactSupport (phi R s t ψ C e lam) →
-      (Function.support (fun p : Quotient (QuotientGroup.rightRel (intSub R (lowW K s t))) ×
-          (upUniG K s.sum ⧸ intSub R (upUniG K s.sum)) =>
-          phi R s t ψ C e lam (p.1.out, p.2.out))).Finite ∧
-      BB R s t ψ C e lam μ₁ μ₂ =
-        ∑ᶠ p : Quotient (QuotientGroup.rightRel (intSub R (lowW K s t))) ×
-            (upUniG K s.sum ⧸ intSub R (upUniG K s.sum)),
-          (((μ₁ (intSub R (lowW K s t) : Set (lowW K s t))).toReal *
-            (μ₂ (intSub R (upUniG K s.sum) : Set (upUniG K s.sum))).toReal : ℝ) : ℂ) *
-            phi R s t ψ C e lam (p.1.out, p.2.out)
+    IsOpen (R : Set K)
+      → ∀ (s : List ℕ) (t : ℕ → Kˣ) (ψ : AddChar K ℂ),
+        (∀ r ∈ R, ψ r = 1)
+          → ∀ (μ₁ : Measure (lowW K s t)) (μ₂ : Measure (upUniG K s.sum)) [μ₁.IsMulRightInvariant]
+              [μ₂.IsMulLeftInvariant] [SFinite μ₁] [SFinite μ₂] (C : Type) [AddCommGroup C]
+              [Module R C] (e : C) (lam : C →ₗ[R] KR R),
+            HasCompactSupport (phi R s t ψ C e lam)
+              → (Function.support (fun p
+                    : Quotient (QuotientGroup.rightRel (intSub R (lowW K s t)))
+                      × (upUniG K s.sum ⧸ intSub R (upUniG K s.sum)) =>
+                  phi R s t ψ C e lam (p.1.out, p.2.out))).Finite
+                ∧ BB R s t ψ C e lam μ₁ μ₂
+                  = ∑ᶠ p : Quotient (QuotientGroup.rightRel (intSub R (lowW K s t))) ×
+                        (upUniG K s.sum ⧸ intSub R (upUniG K s.sum)),
+                      (((μ₁ (intSub R (lowW K s t) : Set (lowW K s t))).toReal *
+                        (μ₂ (intSub R (upUniG K s.sum) : Set (upUniG K s.sum))).toReal : ℝ) : ℂ) *
+                        phi R s t ψ C e lam (p.1.out, p.2.out)
 
 def BBNorm : Prop :=
   ∀ (K : Type) [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] (R : Subring K),
-    IsOpen (R : Set K) → ∀ (s : List ℕ) (t : ℕ → Kˣ) (ψ : AddChar K ℂ), (∀ r ∈ R, ψ r = 1) →
-    ∀ (μ₁ : Measure (lowW K s t)) (μ₂ : Measure (upUniG K s.sum)) [μ₁.IsMulRightInvariant]
-      [μ₂.IsMulLeftInvariant] [SFinite μ₁] [SFinite μ₂],
-      μ₁ (intSub R (lowW K s t) : Set (lowW K s t)) = 1 →
-      μ₂ (intSub R (upUniG K s.sum) : Set (upUniG K s.sum)) = 1 →
-      ∀ (C : Type) [AddCommGroup C] [Module R C] (e : C) (lam : C →ₗ[R] KR R),
-      HasCompactSupport (phi R s t ψ C e lam) →
-      BB R s t ψ C e lam μ₁ μ₂ =
-        ∑ᶠ p : Quotient (QuotientGroup.rightRel (intSub R (lowW K s t))) ×
-            (upUniG K s.sum ⧸ intSub R (upUniG K s.sum)), phi R s t ψ C e lam (p.1.out, p.2.out)
+    IsOpen (R : Set K)
+      → ∀ (s : List ℕ) (t : ℕ → Kˣ) (ψ : AddChar K ℂ),
+        (∀ r ∈ R, ψ r = 1)
+          → ∀ (μ₁ : Measure (lowW K s t)) (μ₂ : Measure (upUniG K s.sum)) [μ₁.IsMulRightInvariant]
+              [μ₂.IsMulLeftInvariant] [SFinite μ₁] [SFinite μ₂],
+            μ₁ (intSub R (lowW K s t) : Set (lowW K s t)) = 1
+              → μ₂ (intSub R (upUniG K s.sum) : Set (upUniG K s.sum)) = 1
+              → ∀ (C : Type) [AddCommGroup C] [Module R C] (e : C) (lam : C →ₗ[R] KR R),
+                HasCompactSupport (phi R s t ψ C e lam)
+                  → BB R s t ψ C e lam μ₁ μ₂
+                    = ∑ᶠ p : Quotient (QuotientGroup.rightRel (intSub R (lowW K s t))) ×
+                          (upUniG K s.sum ⧸ intSub R (upUniG K s.sum)), phi R s t ψ C e lam (p.1.out, p.2.out)
 
 def SuppCompact : Prop :=
   ∀ (K : Type) [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [T2Space K] (R : Subring K),
-    IsOpen (R : Set K) → IsCompact (R : Set K) → ∀ (s : List ℕ) (t : ℕ → Kˣ) (ψ : AddChar K ℂ)
-      (C : Type) [AddCommGroup C] [Module R C] (e : C) (lam : C →ₗ[R] KR R),
-      HasCompactSupport (phi R s t ψ C e lam)
+    IsOpen (R : Set K) → IsCompact (R : Set K)
+      → ∀ (s : List ℕ) (t : ℕ → Kˣ) (ψ : AddChar K ℂ) (C : Type) [AddCommGroup C] [Module R C]
+          (e : C) (lam : C →ₗ[R] KR R),
+        HasCompactSupport (phi R s t ψ C e lam)
 
 def IsoFinite : Prop :=
   ∀ (K : Type) [CommRing K] (R : Subring K),
-    (∀ d : R, IsUnit (d : K) → Finite (R ⧸ Ideal.span {d})) →
-    ∀ (n : ℕ) (Z : Matrix (Fin n) (Fin n) K), IsInt R Z → IsUnit Z.det →
-    Finite (coker R Z) ∧
-    ∀ (C : Type) [AddCommGroup C] [Module R C] (e : C) (lam : C →ₗ[R] KR R),
-      (isoSet R Z C e lam).Finite
+    (∀ d : R, IsUnit (d : K) → Finite (R ⧸ Ideal.span {d}))
+      → ∀ (n : ℕ) (Z : Matrix (Fin n) (Fin n) K),
+        IsInt R Z → IsUnit Z.det
+          → Finite (coker R Z)
+            ∧ ∀ (C : Type) [AddCommGroup C] [Module R C] (e : C) (lam : C →ₗ[R] KR R),
+              (isoSet R Z C e lam).Finite
 
 end Formalism.DoubleCosetMeasures

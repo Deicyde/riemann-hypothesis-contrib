@@ -21,8 +21,8 @@ theorem interp_of : SpanProd → Expand → Extract → DenseCoset → Interp :=
   let A := {α : Fin k → O // (∀ s, N ∣ α s - a s) ∧ eval (pt τ α) Q ≠ 0}
   let x : A → ι × Fin k → K := fun α => pt τ α.1
   have hdense : ZDense (Set.range x) := by
-    have hset : Set.range x =
-        {z | ∃ α, (∀ s, N ∣ α s - a s) ∧ eval (pt τ α) Q ≠ 0 ∧ z = pt τ α} := by
+    have hset
+        : Set.range x = {z | ∃ α, (∀ s, N ∣ α s - a s) ∧ eval (pt τ α) Q ≠ 0 ∧ z = pt τ α} := by
       ext z
       constructor
       · rintro ⟨α, rfl⟩
@@ -31,8 +31,8 @@ theorem interp_of : SpanProd → Expand → Extract → DenseCoset → Interp :=
         exact ⟨⟨α, h1, h2⟩, rfl⟩
     rw [hset]
     exact hC O K ι τ hτ N hN k a Q hQ
-  have he : Function.Injective
-      (fun (m : ι × Fin k → Fin (n + 1)) (p : ι × Fin k) => (m p : ℕ)) := by
+  have he
+      : Function.Injective (fun (m : ι × Fin k → Fin (n + 1)) (p : ι × Fin k) => (m p : ℕ)) := by
     intro m₁ m₂ h
     funext p
     exact Fin.ext (congrFun h p)
@@ -43,8 +43,9 @@ theorem interp_of : SpanProd → Expand → Extract → DenseCoset → Interp :=
     exact β.2
   · intro R _ _ g
     let F : (Fin k → O) → R := fun α => ∏ t, ∏ s, detOne (algebraMap K R (τ t (α s))) (g t)
-    have hmd : ((c.mapDomain Subtype.val).sum fun α (r : K) => r • F α) =
-        c.sum fun β (r : K) => r • F β.1 := by
+    have hmd
+        : ((c.mapDomain Subtype.val).sum fun α (r : K) => r • F α)
+          = c.sum fun β (r : K) => r • F β.1 := by
       apply Finsupp.sum_mapDomain_index
       · intro _
         exact zero_smul K _
@@ -52,9 +53,11 @@ theorem interp_of : SpanProd → Expand → Extract → DenseCoset → Interp :=
         exact add_smul r₁ r₂ _
     change ((c.mapDomain Subtype.val).sum fun α (r : K) => r • F α) = _
     rw [hmd]
-    have hexp : ∀ β : A, F β.1 =
-        ∑ m : ι × Fin k → Fin (n + 1), algebraMap K R (∏ p, x β p ^ (m p : ℕ)) *
-          ∏ p : ι × Fin k, (-1) ^ (m p : ℕ) * aeval (g p.1) (esymm (Fin n) K (m p : ℕ)) := by
+    have hexp
+        : ∀ β : A,
+          F β.1
+            = ∑ m : ι × Fin k → Fin (n + 1), algebraMap K R (∏ p, x β p ^ (m p : ℕ)) *
+                ∏ p : ι × Fin k, (-1) ^ (m p : ℕ) * aeval (g p.1) (esymm (Fin n) K (m p : ℕ)) := by
       intro β
       have h := hE K R (ι × Fin k) n (fun p => algebraMap K R (pt τ β.1 p)) (fun p => g p.1)
       rw [Fintype.prod_prod_type] at h

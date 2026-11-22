@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LocCl
 @[expose] public section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.OrbitRel
@@ -19,8 +22,10 @@ variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableS
 variable {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
 variable {H : HermSp M V} {r : ℕ}
 
-theorem framePairFixator_unitary_and_fixes_frame (P : Formalism.MainNotions.S.LocNG.FPair H r) {g : V ≃ₗ[E] V} (hg : g ∈ P.UW0) :
-    Formalism.MainNotions.S.LocNG.IsUnitary H g ∧ ∀ b, g (P.A.f b) = P.A.f b ∧ g (P.B.f b) = P.B.f b := by
+theorem framePairFixator_unitary_and_fixes_frame
+    (P : Formalism.MainNotions.S.LocNG.FPair H r) {g : V ≃ₗ[E] V} (hg : g ∈ P.UW0)
+    : Formalism.MainNotions.S.LocNG.IsUnitary H g
+      ∧ ∀ b, g (P.A.f b) = P.A.f b ∧ g (P.B.f b) = P.B.f b := by
   unfold Formalism.MainNotions.S.LocNG.FPair.UW0 at hg
   induction hg using Subgroup.closure_induction with
   | mem x hx => exact hx
@@ -45,10 +50,14 @@ theorem framePairFixator_unitary_and_fixes_frame (P : Formalism.MainNotions.S.Lo
       conv_lhs => rw [← (hx.2 b).2]
       simp
 
-theorem perp_stable {g : V ≃ₗ[E] V} (hu : Formalism.MainNotions.S.LocNG.IsUnitary H g) {f : Fin (r + 1) → V}
-    (hf : ∀ b, g (f b) = f b) {x : V} (hx : x ∈ H.perp (H.X f)) : g x ∈ H.perp (H.X f) := by
+theorem perp_stable
+    {g : V ≃ₗ[E] V} (hu : Formalism.MainNotions.S.LocNG.IsUnitary H g)
+    {f : Fin (r + 1) → V} (hf : ∀ b, g (f b) = f b)
+    {x : V} (hx : x ∈ H.perp (H.X f))
+    : g x ∈ H.perp (H.X f) := by
   intro v hv
-  have hfix : Set.EqOn (g : V →ₗ[E] V) (LinearMap.id : V →ₗ[E] V) (Set.range fun a : Fin r => f a.castSucc) := by
+  have hfix : Set.EqOn (g : V →ₗ[E] V) (LinearMap.id : V →ₗ[E] V)
+      (Set.range fun a : Fin r => f a.castSucc) := by
     rintro _ ⟨a, rfl⟩
     simpa using hf a.castSucc
   have hv' : g v = v := LinearMap.eqOn_span' hfix hv
@@ -57,20 +66,24 @@ theorem perp_stable {g : V ≃ₗ[E] V} (hu : Formalism.MainNotions.S.LocNG.IsUn
   rw [this]
   exact hx v hv
 
-theorem rel_equivalence (P : Formalism.MainNotions.S.LocNG.FPair H r) :
-    Equivalence (Formalism.MainNotions.S.LocNG.Datum.Rel (P := P)) := by
+theorem rel_equivalence (P : Formalism.MainNotions.S.LocNG.FPair H r)
+    : Equivalence (Formalism.MainNotions.S.LocNG.Datum.Rel (P := P)) := by
   refine ⟨fun d => ?_, fun {d d'} h => ?_, fun {d d' d''} h h' => ?_⟩
   · refine ⟨1, P.UW0.one_mem, ?_, ?_, ?_⟩
     · intro x y hxy
       have : y = x := Subtype.ext (by simpa using hxy)
-      subst this; exact Iff.rfl
+      subst this
+      exact Iff.rfl
     · intro x y hxy
       have : y = x := Subtype.ext (by simpa using hxy)
-      subst this; exact Iff.rfl
+      subst this
+      exact Iff.rfl
     · intro x' y' x y hx' hx
       have e1 : y' = x' := Subtype.ext (by simpa using hx')
       have e2 : y = x := Subtype.ext (by simpa using hx)
-      subst e1; subst e2; exact Iff.rfl
+      subst e1
+      subst e2
+      exact Iff.rfl
   · obtain ⟨g, hg, h1, h2, h3⟩ := h
     refine ⟨g⁻¹, P.UW0.inv_mem hg, ?_, ?_, ?_⟩
     · intro x y hxy
@@ -88,22 +101,20 @@ theorem rel_equivalence (P : Formalism.MainNotions.S.LocNG.FPair H r) :
     have hs := framePairFixator_unitary_and_fixes_frame P hg
     refine ⟨g' * g, P.UW0.mul_mem hg' hg, ?_, ?_, ?_⟩
     · intro x y hxy
-      let z : ↥(H.perp (H.X P.A.f)) :=
-        ⟨g x, perp_stable hs.1 (fun b => (hs.2 b).1) x.2⟩
+      let z : ↥(H.perp (H.X P.A.f)) := ⟨g x, perp_stable hs.1 (fun b => (hs.2 b).1) x.2⟩
       exact (h1 x z rfl).trans (h1' z y hxy)
     · intro x y hxy
-      let z : ↥(H.perp (H.X P.B.f)) :=
-        ⟨g x, perp_stable hs.1 (fun b => (hs.2 b).2) x.2⟩
+      let z : ↥(H.perp (H.X P.B.f)) := ⟨g x, perp_stable hs.1 (fun b => (hs.2 b).2) x.2⟩
       exact (h2 x z rfl).trans (h2' z y hxy)
     · intro x' y' x y hx' hx
-      let z' : ↥(H.perp (H.X P.B.f)) :=
-        ⟨g x', perp_stable hs.1 (fun b => (hs.2 b).2) x'.2⟩
-      let z : ↥(H.perp (H.X P.A.f)) :=
-        ⟨g x, perp_stable hs.1 (fun b => (hs.2 b).1) x.2⟩
+      let z' : ↥(H.perp (H.X P.B.f)) := ⟨g x', perp_stable hs.1 (fun b => (hs.2 b).2) x'.2⟩
+      let z : ↥(H.perp (H.X P.A.f)) := ⟨g x, perp_stable hs.1 (fun b => (hs.2 b).1) x.2⟩
       exact (h3 x' z' x z rfl rfl).trans (h3' z' y' z y hx' hx)
 
-theorem relEqv : ∀ (D : D7) (Z : LocDat D) (FP : ∀ p : PlF D, Formalism.MainNotions.S.LocNG.FPair (locH Z p) D.R.rS)
-    (p : PlF D), Equivalence (Formalism.MainNotions.S.LocNG.Datum.Rel (P := FP p)) :=
-  fun _ _ FP p => rel_equivalence (FP p)
+theorem relEqv
+    : ∀ (D : D7) (Z : LocDat D)
+        (FP : ∀ p : PlF D, Formalism.MainNotions.S.LocNG.FPair (locH Z p) D.R.rS) (p : PlF D),
+      Equivalence (Formalism.MainNotions.S.LocNG.Datum.Rel (P := FP p)) := fun _ _ FP p =>
+  rel_equivalence (FP p)
 
 end GlobalTheory.OrbitRel

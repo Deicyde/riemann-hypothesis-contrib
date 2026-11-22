@@ -9,11 +9,13 @@ open scoped NNReal
 
 namespace GlobalTheory.AlmostEt
 
-theorem exists_reps_of_cosetTrace : ∀ (L : Type) [Field L] (G : Type) [Group G] [MulSemiringAction G L]
-    (U : Subgroup G) [Fintype (G ⧸ U)] (S : Finset L), (∀ s ∈ S, s ∈ Fix L U) → ∀ y₀ ∈ Fix L U,
-    ∃ (y : L) (D E : Finset G), y = ∑ d ∈ D, d • y₀ ∧
-      (∀ h : G, ∃! g, g ∈ E ∧ h • y = g • y ∧ ∀ s ∈ S, h • s = g • s) ∧
-      ∑ g ∈ E, g • y = cosetTrace U y₀ := by
+theorem exists_reps_of_cosetTrace
+    : ∀ (L : Type) [Field L] (G : Type) [Group G] [MulSemiringAction G L] (U : Subgroup G)
+        [Fintype (G ⧸ U)] (S : Finset L),
+      (∀ s ∈ S, s ∈ Fix L U)
+        → ∀ y₀ ∈ Fix L U, ∃ (y : L) (D E : Finset G),
+          y = ∑ d ∈ D, d • y₀ ∧ (∀ h : G, ∃! g, g ∈ E ∧ h • y = g • y ∧ ∀ s ∈ S, h • s = g • s)
+            ∧ ∑ g ∈ E, g • y = cosetTrace U y₀ := by
   intro L _ G _ _ U _ S hS y₀ hy₀
   classical
   set V : Subgroup G := fixingSubgroup G (S : Set L) with hV
@@ -26,7 +28,9 @@ theorem exists_reps_of_cosetTrace : ∀ (L : Type) [Field L] (G : Type) [Group G
     intro a b hab
     rw [QuotientGroup.eq] at hab
     have h1 : (a⁻¹ * b) • y₀ = y₀ := hy₀ ⟨_, hab⟩
-    calc a • y₀ = a • ((a⁻¹ * b) • y₀) := by rw [h1]
+    calc
+      a • y₀
+        = a • ((a⁻¹ * b) • y₀) := by rw [h1]
       _ = b • y₀ := by rw [smul_smul, mul_inv_cancel_left]
   set f : G ⧸ U → L := fun q => q.out • y₀ with hf
   have hfmk : ∀ g : G, f (g : G ⧸ U) = g • y₀ := fun g => hy0 _ _ (QuotientGroup.out_eq' _)
@@ -74,7 +78,14 @@ theorem exists_reps_of_cosetTrace : ∀ (L : Type) [Field L] (G : Type) [Group G
       simp only [inv_smul_smul]
     · intro q _
       rw [hfeq, smul_inv_smul]
-  refine ⟨∑ q ∈ F, f q, F.image Quotient.out, (Finset.univ : Finset (G ⧸ V)).image Quotient.out, ?_, ?_, ?_⟩
+  refine ⟨
+    ∑ q ∈ F, f q,
+    F.image Quotient.out,
+    (Finset.univ : Finset (G ⧸ V)).image Quotient.out,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [Finset.sum_image (fun a _ b _ hab => hout a b hab)]
   · intro h
     have hgh : (h : G ⧸ V).out⁻¹ * h ∈ V := QuotientGroup.eq.1 (QuotientGroup.out_eq' _)
@@ -87,8 +98,8 @@ theorem exists_reps_of_cosetTrace : ∀ (L : Type) [Field L] (G : Type) [Group G
       rw [← smul_smul, h2]
     · rintro g' ⟨hg'E, _, hg'S⟩
       obtain ⟨c, _, rfl⟩ := Finset.mem_image.1 hg'E
-      have h3 : c.out⁻¹ * h ∈ V := (mem_fixingSubgroup_iff G).2 (fun s hs => by
-        rw [← smul_smul, hg'S s hs, inv_smul_smul])
+      have h3 : c.out⁻¹ * h ∈ V :=
+        (mem_fixingSubgroup_iff G).2 (fun s hs => by rw [← smul_smul, hg'S s hs, inv_smul_smul])
       have h4 : (c.out : G ⧸ V) = (h : G ⧸ V) := QuotientGroup.eq.2 h3
       rw [QuotientGroup.out_eq'] at h4
       rw [h4]

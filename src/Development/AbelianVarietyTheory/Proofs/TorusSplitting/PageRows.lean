@@ -11,11 +11,18 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.EtaForm GlobalTheory.EtaAn
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.EtaForm GlobalTheory.EtaAn
 
 namespace GlobalTheory.EtaAn
 
-theorem page_rows : ∀ (D : D7) (large₂ : SizeData₂ D) (CA : ℝ), WeightAlgebra.ParA large₂ CA → SizesAt large₂ → 2 ≤ large₂.sc.L ∧ Real.log D.R.r ≤ large₂.sc.L ∧ Real.log D.host.rdE ≤ 2 * large₂.sc.L ∧ Real.log D.R.f ≤ 2 * large₂.sc.L ∧ (∀ i, Real.log (D.host.g i) ≤ 9 * large₂.sc.L + 1) ∧ 16 ≤ D.R.f := by
+theorem page_rows
+    : ∀ (D : D7) (large₂ : SizeData₂ D) (CA : ℝ),
+      WeightAlgebra.ParA large₂ CA → SizesAt large₂
+        → 2 ≤ large₂.sc.L ∧ Real.log D.R.r ≤ large₂.sc.L ∧ Real.log D.host.rdE ≤ 2 * large₂.sc.L
+          ∧ Real.log D.R.f ≤ 2 * large₂.sc.L ∧ (∀ i, Real.log (D.host.g i) ≤ 9 * large₂.sc.L + 1)
+          ∧ 16 ≤ D.R.f := by
   intro D large₂ CA hA hS
   have hm4 := host_m_pow_four_le_f hS
   rw [hostSize_f] at hm4
@@ -26,7 +33,8 @@ theorem page_rows : ∀ (D : D7) (large₂ : SizeData₂ D) (CA : ℝ), WeightAl
   have hC : SizeCond large₂ := hS.2.2.2.2.2.1
   have hQ : SizeQD large₂ := hS.2.2.2.2.2.2.1
   have hrd1 : 1 ≤ D.host.rdE := hQ.2.2.2.2.2.2.1
-  have hrd2 : D.host.rdE ≤ (D.host.QS : ℝ) / 2 * Real.sqrt ((D.host.q : ℝ) * D.host.d) := hQ.2.2.2.2.2.2.2
+  have hrd2 : D.host.rdE ≤ (D.host.QS : ℝ) / 2 * Real.sqrt ((D.host.q : ℝ) * D.host.d) :=
+    hQ.2.2.2.2.2.2.2
   have hn : (1 : ℝ) ≤ D.R.n := by
     have : 1 ≤ D.R.n := D.R.ord_pos
     exact_mod_cast this
@@ -41,17 +49,18 @@ theorem page_rows : ∀ (D : D7) (large₂ : SizeData₂ D) (CA : ℝ), WeightAl
   have hsq : Real.sqrt ((D.host.q : ℝ) * D.host.d) ≤ (D.host.q : ℝ) * D.host.d := by
     rw [Real.sqrt_le_left (by linarith)]
     nlinarith
-  have hc : szCond large₂ = (D.host.QS : ℝ) * ((D.host.q : ℝ) * D.host.d) := by
-    unfold szCond; ring
+  have hc : szCond large₂ = (D.host.QS : ℝ) * ((D.host.q : ℝ) * D.host.d) := by unfold szCond; ring
   have hfn : (D.R.f : ℝ) = 2 * D.R.n := by unfold Ranks.f; push_cast; ring
   have hfc : (D.R.f : ℝ) ≤ szCond large₂ := by
-    have h4 : ((4 * D.R.n : ℕ) : ℝ) ≤ ((D.host.QS * D.host.q * D.host.d : ℕ) : ℝ) := Nat.cast_le.2 D.host.four_ord_le_condN
+    have h4 : ((4 * D.R.n : ℕ) : ℝ) ≤ ((D.host.QS * D.host.q * D.host.d : ℕ) : ℝ) :=
+      Nat.cast_le.2 D.host.four_ord_le_condN
     push_cast at h4
-    rw [hc, hfn]; nlinarith
+    rw [hc, hfn]
+    nlinarith
   have hrc : D.host.rdE ≤ szCond large₂ := by
     rw [hc]
-    have : (D.host.QS : ℝ) / 2 * Real.sqrt ((D.host.q : ℝ) * D.host.d) ≤
-        (D.host.QS : ℝ) / 2 * ((D.host.q : ℝ) * D.host.d) :=
+    have : (D.host.QS : ℝ) / 2 * Real.sqrt ((D.host.q : ℝ) * D.host.d)
+        ≤ (D.host.QS : ℝ) / 2 * ((D.host.q : ℝ) * D.host.d) :=
       mul_le_mul_of_nonneg_left hsq (by positivity)
     have h0 : 0 ≤ (D.host.QS : ℝ) * ((D.host.q : ℝ) * D.host.d) := by positivity
     nlinarith
@@ -60,7 +69,8 @@ theorem page_rows : ∀ (D : D7) (large₂ : SizeData₂ D) (CA : ℝ), WeightAl
   have hrt : D.R.r + 5 ≤ D.R.t := D.R.rank_add_five_le
   have hr1 : 1 ≤ D.R.r := by
     have := D.R.m_add_three_le_k
-    unfold Ranks.r; omega
+    unfold Ranks.r
+    omega
   have ht3 : (3 : ℝ) ≤ D.R.t := by
     have : 3 ≤ D.R.t := by omega
     exact_mod_cast this

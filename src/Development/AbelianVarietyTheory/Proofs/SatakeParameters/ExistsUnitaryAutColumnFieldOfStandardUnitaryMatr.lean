@@ -9,18 +9,28 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.Joints
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions Formalism.UG Formalism.L2.Col Formalism.L2.Ker Formalism.L2.DIV GlobalTheory.TwU GlobalTheory.TwV
+open NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions Formalism.UG
+  Formalism.L2.Col Formalism.L2.Ker Formalism.L2.DIV GlobalTheory.TwU GlobalTheory.TwV
 open scoped TensorProduct
 
 namespace GlobalTheory.TwU.UnitaryFrom
 
-theorem exists_uf_seamGL_eq : ∀ {D : D7} {X : Fields} (s : Seam D X), s.Ok → ∀ {n : ℕ} (G : GL (Fin n) D.host.E), cT (Formalism.L2.Forms.sigD D : D.host.E →+* D.host.E) (G : Matrix (Fin n) (Fin n) D.host.E) * (G : Matrix (Fin n) (Fin n) D.host.E) = 1 → ∃ g : UF X.E n, seamGL s g.1 = G := by
+theorem exists_uf_seamGL_eq
+    : ∀ {D : D7} {X : Fields} (s : Seam D X),
+      s.Ok
+        → ∀ {n : ℕ} (G : GL (Fin n) D.host.E),
+          cT (Formalism.L2.Forms.sigD D : D.host.E →+* D.host.E)
+                  (G : Matrix (Fin n) (Fin n) D.host.E)
+                * (G : Matrix (Fin n) (Fin n) D.host.E)
+              = 1
+            → ∃ g : UF X.E n, seamGL s g.1 = G := by
   intro D X s hs n G hG
   have hconj : ∀ a : D.host.E, s.iE.symm (D.host.conj a) = star (s.iE.symm a) := by
     intro a
     apply s.iE.injective
     rw [RingEquiv.apply_symm_apply, hs.2, RingEquiv.apply_symm_apply]
-  have hsig : ∀ a : D.host.E, (Formalism.L2.Forms.sigD D : D.host.E →+* D.host.E) a = D.host.conj a :=
+  have hsig
+      : ∀ a : D.host.E, (Formalism.L2.Forms.sigD D : D.host.E →+* D.host.E) a = D.host.conj a :=
     fun a => Formalism.MainNotions.GlobalTheoryTheory.jnt_sig_eq_conj D a
   let Gx : GL (Fin n) X.E := bc (s.iE.symm : D.host.E →+* X.E) G
   let M : Matrix (Fin n) (Fin n) X.E := (G : Matrix (Fin n) (Fin n) D.host.E).map s.iE.symm
@@ -29,7 +39,8 @@ theorem exists_uf_seamGL_eq : ∀ {D : D7} {X : Fields} (s : Seam D X), s.Ok →
     have h := congrArg s.iE.symm (congrFun (congrFun hG i) j)
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Matrix.mul_apply, cT, Matrix.transpose_apply, Matrix.map_apply, map_sum, map_mul,
-      hsig, hconj] at h
+          hsig, hconj]
+        at h
     rw [Matrix.mul_apply]
     simp only [Matrix.conjTranspose_apply, M, Matrix.map_apply]
     rw [h]
@@ -37,7 +48,8 @@ theorem exists_uf_seamGL_eq : ∀ {D : D7} {X : Fields} (s : Seam D X), s.Ok →
     · subst hij; simp
     · simp [Matrix.one_apply, hij]
   let g : Sp X.E n ≃ₗ[X.E] Sp X.E n :=
-    LinearMap.GeneralLinearGroup.generalLinearEquiv X.E (Fin n → X.E) (Matrix.GeneralLinearGroup.toLin Gx)
+    LinearMap.GeneralLinearGroup.generalLinearEquiv X.E (Fin n → X.E)
+      (Matrix.GeneralLinearGroup.toLin Gx)
   have hg : ∀ x, g x = M *ᵥ x := by
     intro x
     rfl

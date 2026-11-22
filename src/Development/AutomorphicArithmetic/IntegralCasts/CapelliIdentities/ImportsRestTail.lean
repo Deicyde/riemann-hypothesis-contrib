@@ -4,11 +4,12 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Yhd2.main :
-    ∀ {G M : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
-      [inst_4 : AddCommGroup M] [inst_5 : _root_.Module ℂ M] (ρ : Representation ℂ G M) (x : M),
-      IsOpen {g : G | ((ρ : G → M →ₗ[ℂ] M) g : M → M) x = x} →
-        (Set.range fun (g : G) ↦ ((ρ : G → M →ₗ[ℂ] M) g : M → M) x).Countable := by
+theorem UpperTheory.Reformulated.B.Yhd2.main
+    : ∀ {G M : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G]
+        [SecondCountableTopology G] [inst_4 : AddCommGroup M] [inst_5 : _root_.Module ℂ M]
+        (ρ : Representation ℂ G M) (x : M),
+      IsOpen {g : G | ((ρ : G → M →ₗ[ℂ] M) g : M → M) x = x}
+        → (Set.range fun (g : G) ↦ ((ρ : G → M →ₗ[ℂ] M) g : M → M) x).Countable := by
   intro G M _ _ _ _ _ _ ρ x hS
   obtain ⟨D, hDc, hDd⟩ := TopologicalSpace.exists_countable_dense G
   apply (hDc.image (fun (g : G) ↦ ((ρ : G → M →ₗ[ℂ] M) g : M → M) x)).mono

@@ -22,14 +22,17 @@ section ClassNumbers
 variable {K : Type*} [DecidableEq K] {ι : K → Type*}
 variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem classNum_add {σ : Type*} (cls : σ → K → ℤ) (H₁ H₂ : MvPolynomial σ ℤ)
-    (Q : List (K → ℤ)) (W : Ideal (MRing ι O)) :
-    classNum cls (H₁ + H₂) Q W = classNum cls H₁ Q W + classNum cls H₂ Q W := by
+theorem classNum_add
+    {σ : Type*} (cls : σ → K → ℤ) (H₁ H₂ : MvPolynomial σ ℤ)
+    (Q : List (K → ℤ)) (W : Ideal (MRing ι O))
+    : classNum cls (H₁ + H₂) Q W = classNum cls H₁ Q W + classNum cls H₂ Q W := by
   classical
   unfold classNum
-  have ext : ∀ (H : MvPolynomial σ ℤ) (s : Finset (σ →₀ ℕ)), H.support ⊆ s →
-      ∑ μ ∈ H.support, H.coeff μ * vNumL W (classList cls μ ++ Q) =
-        ∑ μ ∈ s, H.coeff μ * vNumL W (classList cls μ ++ Q) := by
+  have ext
+      : ∀ (H : MvPolynomial σ ℤ) (s : Finset (σ →₀ ℕ)),
+        H.support ⊆ s
+          → ∑ μ ∈ H.support, H.coeff μ * vNumL W (classList cls μ ++ Q)
+            = ∑ μ ∈ s, H.coeff μ * vNumL W (classList cls μ ++ Q) := by
     intro H s hs
     refine Finset.sum_subset hs fun μ _ hμ => ?_
     rw [MvPolynomial.mem_support_iff, not_not] at hμ
@@ -40,20 +43,21 @@ theorem classNum_add {σ : Type*} (cls : σ → K → ℤ) (H₁ H₂ : MvPolyno
   refine Finset.sum_congr rfl fun μ _ => ?_
   rw [MvPolynomial.coeff_add, add_mul]
 
-def classNumHom {σ : Type*} (cls : σ → K → ℤ) (Q : List (K → ℤ)) (W : Ideal (MRing ι O)) :
-    MvPolynomial σ ℤ →+ ℤ where
+def classNumHom {σ : Type*} (cls : σ → K → ℤ) (Q : List (K → ℤ)) (W : Ideal (MRing ι O))
+    : MvPolynomial σ ℤ →+ ℤ where
   toFun H := classNum cls H Q W
   map_zero' := by simp [classNum]
   map_add' H₁ H₂ := classNum_add cls H₁ H₂ Q W
 
-theorem classNum_sum {σ τ : Type*} (cls : σ → K → ℤ) (s : Finset τ) (H : τ → MvPolynomial σ ℤ)
-    (Q : List (K → ℤ)) (W : Ideal (MRing ι O)) :
-    classNum cls (∑ t ∈ s, H t) Q W = ∑ t ∈ s, classNum cls (H t) Q W :=
+theorem classNum_sum
+    {σ τ : Type*} (cls : σ → K → ℤ) (s : Finset τ) (H : τ → MvPolynomial σ ℤ)
+    (Q : List (K → ℤ)) (W : Ideal (MRing ι O))
+    : classNum cls (∑ t ∈ s, H t) Q W = ∑ t ∈ s, classNum cls (H t) Q W :=
   map_sum (classNumHom cls Q W) H s
 
-theorem classNum_monomial {σ : Type*} (cls : σ → K → ℤ) (μ : σ →₀ ℕ) (c : ℤ)
-    (Q : List (K → ℤ)) (W : Ideal (MRing ι O)) :
-    classNum cls (monomial μ c) Q W = c * vNumL W (classList cls μ ++ Q) := by
+theorem classNum_monomial
+    {σ : Type*} (cls : σ → K → ℤ) (μ : σ →₀ ℕ) (c : ℤ) (Q : List (K → ℤ)) (W : Ideal (MRing ι O))
+    : classNum cls (monomial μ c) Q W = c * vNumL W (classList cls μ ++ Q) := by
   classical
   unfold classNum
   by_cases hc : c = 0
@@ -61,24 +65,24 @@ theorem classNum_monomial {σ : Type*} (cls : σ → K → ℤ) (μ : σ →₀ 
     simp
   · rw [support_monomial, if_neg hc, Finset.sum_singleton, coeff_monomial, if_pos rfl]
 
-
 omit [DecidableEq K] in
-theorem classList_diag {N : ℕ} (x : Fin N → K → ℤ) (i : Fin N) (j l : ℕ) :
-    classList (Sum.elim x x) (Finsupp.single (Sum.inl i) j + Finsupp.single (Sum.inr i) l) =
-      classList x (Finsupp.single i (j + l)) := by
+theorem classList_diag {N : ℕ} (x : Fin N → K → ℤ) (i : Fin N) (j l : ℕ)
+    : classList (Sum.elim x x) (Finsupp.single (Sum.inl i) j + Finsupp.single (Sum.inr i) l)
+      = classList x (Finsupp.single i (j + l)) := by
   unfold classList
   congr 1
   simp [Finsupp.toMultiset_add, Finsupp.toMultiset_single, Multiset.map_nsmul]
 
-theorem classNum_psumExpansion_diag {N : ℕ} (x : Fin N → K → ℤ) (k : ℕ) (i : Fin N)
-    (Q : List (K → ℤ)) (W : Ideal (MRing ι O)) :
-    classNum (Sum.elim x x) (psumExpansion N k i) Q W =
-      k * vNumL W (classList x (Finsupp.single i (k - 1)) ++ Q) := by
+theorem classNum_psumExpansion_diag
+    {N : ℕ} (x : Fin N → K → ℤ) (k : ℕ) (i : Fin N) (Q : List (K → ℤ)) (W : Ideal (MRing ι O))
+    : classNum (Sum.elim x x) (psumExpansion N k i) Q W
+      = k * vNumL W (classList x (Finsupp.single i (k - 1)) ++ Q) := by
   unfold psumExpansion
   rw [classNum_sum]
-  have key : ∀ j ∈ Finset.range k,
-      classNum (Sum.elim x x) (X (Sum.inl i) ^ j * X (Sum.inr i) ^ (k - 1 - j)) Q W =
-        vNumL W (classList x (Finsupp.single i (k - 1)) ++ Q) := by
+  have key
+      : ∀ j ∈ Finset.range k,
+        classNum (Sum.elim x x) (X (Sum.inl i) ^ j * X (Sum.inr i) ^ (k - 1 - j)) Q W
+          = vNumL W (classList x (Finsupp.single i (k - 1)) ++ Q) := by
     intro j hj
     have e : j + (k - 1 - j) = k - 1 := by
       have := Finset.mem_range.mp hj
@@ -87,19 +91,17 @@ theorem classNum_psumExpansion_diag {N : ℕ} (x : Fin N → K → ℤ) (k : ℕ
       classList_diag, e]
   rw [Finset.sum_congr rfl key, Finset.sum_const, Finset.card_range, nsmul_eq_mul]
 
-theorem classNum_psum {N : ℕ} (x : Fin N → K → ℤ) (m : ℕ) (Q : List (K → ℤ))
-    (W : Ideal (MRing ι O)) :
-    classNum x (psum (Fin N) ℤ m) Q W =
-      ∑ i, vNumL W (classList x (Finsupp.single i m) ++ Q) := by
+theorem classNum_psum {N : ℕ} (x : Fin N → K → ℤ) (m : ℕ) (Q : List (K → ℤ)) (W : Ideal (MRing ι O))
+    : classNum x (psum (Fin N) ℤ m) Q W = ∑ i, vNumL W (classList x (Finsupp.single i m) ++ Q) := by
   unfold psum
   rw [classNum_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [X_pow_eq_monomial, classNum_monomial, one_mul]
 
-theorem sum_classNum_psumExpansion_diag {N : ℕ} (x : Fin N → K → ℤ) (k : ℕ)
-    (Q : List (K → ℤ)) (W : Ideal (MRing ι O)) :
-    ∑ i, classNum (Sum.elim x x) (psumExpansion N k i) Q W =
-      k * classNum x (psum (Fin N) ℤ (k - 1)) Q W := by
+theorem sum_classNum_psumExpansion_diag
+    {N : ℕ} (x : Fin N → K → ℤ) (k : ℕ) (Q : List (K → ℤ)) (W : Ideal (MRing ι O))
+    : ∑ i, classNum (Sum.elim x x) (psumExpansion N k i) Q W
+      = k * classNum x (psum (Fin N) ℤ (k - 1)) Q W := by
   simp_rw [classNum_psumExpansion_diag, classNum_psum, Finset.mul_sum]
 
 end ClassNumbers
@@ -109,8 +111,8 @@ section Divisors
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem divCycle_support_finite (P : Ideal (MRing ι O)) (f : MRing ι O) :
-    (Function.support (divCycle P f)).Finite := by
+theorem divCycle_support_finite (P : Ideal (MRing ι O)) (f : MRing ι O)
+    : (Function.support (divCycle P f)).Finite := by
   refine (Ideal.finite_minimalPrimes_of_isNoetherianRing _ (P ⊔ Ideal.span {f})).subset ?_
   intro W hW
   rw [Function.mem_support] at hW
@@ -118,7 +120,6 @@ theorem divCycle_support_finite (P : Ideal (MRing ι O)) (f : MRing ι O) :
   split_ifs at hW with h
   · exact h.1
   · exact absurd rfl hW
-
 
 omit [Fintype K] [∀ k, Fintype (ι k)] [IsDomain O] [IsDiscreteValuationRing O] in
 theorem divCycle_unit (P : Ideal (MRing ι O)) (u : Oˣ) : divCycle P (C (u : O)) = 0 := by
@@ -132,9 +133,12 @@ theorem divCycle_unit (P : Ideal (MRing ι O)) (u : Oˣ) : divCycle P (C (u : O)
     rw [Ideal.span_singleton_eq_top.mpr (u.isUnit.map C), sup_top_eq]
   exact hW.ne_top (top_le_iff.mp (this ▸ h.1.2))
 
-theorem divCycle_const (P : Ideal (MRing ι O)) [P.IsPrime]
-    (hP : ∀ a : O, a ≠ 0 → (C a : MRing ι O) ∉ P) {ϖ : O} (hϖ : ϖ ≠ 0) (u : Oˣ) (n : ℕ) :
-    divCycle P (C ((u : O) * ϖ ^ n)) = fun W => (n : ℤ) * divCycle P (C ϖ) W := by
+theorem divCycle_const
+    (P : Ideal (MRing ι O)) [P.IsPrime]
+    (hP : ∀ a : O, a ≠ 0 → (C a : MRing ι O) ∉ P)
+    {ϖ : O} (hϖ : ϖ ≠ 0)
+    (u : Oˣ) (n : ℕ)
+    : divCycle P (C ((u : O) * ϖ ^ n)) = fun W => (n : ℤ) * divCycle P (C ϖ) W := by
   induction n with
   | zero =>
     funext W
@@ -142,27 +146,32 @@ theorem divCycle_const (P : Ideal (MRing ι O)) [P.IsPrime]
   | succ n ih =>
     have hmul : (C ((u : O) * ϖ ^ (n + 1)) : MRing ι O) = C ((u : O) * ϖ ^ n) * C ϖ := by
       rw [← map_mul, pow_succ, mul_assoc]
-    rw [hmul, DivCycleMul.proof O K ι P _ _ inferInstance
-      (hP _ (mul_ne_zero u.ne_zero (pow_ne_zero _ hϖ))) (hP _ hϖ), ih]
+    rw [hmul,
+      DivCycleMul.proof O K ι P _ _ inferInstance (hP _ (mul_ne_zero u.ne_zero (pow_ne_zero _ hϖ)))
+        (hP _ hϖ),
+      ih]
     funext W
     simp only [Pi.add_apply]
     push_cast
     ring
 
-theorem ratDiv_const (P : Ideal (MRing ι O)) [P.IsPrime]
-    (hP : ∀ a : O, a ≠ 0 → (C a : MRing ι O) ∉ P) {ϖ : O} (hϖ : ϖ ≠ 0) (u : Oˣ) (n : ℕ) :
-    ratDiv P (C ((u : O) * ϖ ^ n)) 1 = fun W => (n : ℤ) * divCycle P (C ϖ) W := by
+theorem ratDiv_const
+    (P : Ideal (MRing ι O)) [P.IsPrime]
+    (hP : ∀ a : O, a ≠ 0 → (C a : MRing ι O) ∉ P)
+    {ϖ : O} (hϖ : ϖ ≠ 0)
+    (u : Oˣ) (n : ℕ)
+    : ratDiv P (C ((u : O) * ϖ ^ n)) 1 = fun W => (n : ℤ) * divCycle P (C ϖ) W := by
   funext W
   unfold ratDiv
   rw [divCycle_const P hP hϖ u n, divCycle_one, sub_zero]
 
 variable [DecidableEq K]
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] [IsDomain O] [IsDiscreteValuationRing O] in
-theorem isVerticalDivisor_const (P : Ideal (MRing ι O)) [P.IsPrime] (ϖ : O) (u : Oˣ) (n : ℕ)
-    (hP : (C ((u : O) * ϖ ^ n) : MRing ι O) ∉ P) :
-    IsVerticalDivisor P ϖ 0 (C ((u : O) * ϖ ^ n)) 1 := by
+theorem isVerticalDivisor_const
+    (P : Ideal (MRing ι O)) [P.IsPrime]
+    (ϖ : O) (u : Oˣ) (n : ℕ) (hP : (C ((u : O) * ϖ ^ n) : MRing ι O) ∉ P)
+    : IsVerticalDivisor P ϖ 0 (C ((u : O) * ϖ ^ n)) 1 := by
   refine IsVerticalDivisor.of_unit_off_special
     ⟨0, 0, isWeightedHomogeneous_C _ _, isWeightedHomogeneous_one _ _, by funext k; simp⟩ hP
     (Ideal.IsPrime.ne_top' ∘ (Ideal.eq_top_of_isUnit_mem _ · isUnit_one)) ?_
@@ -176,17 +185,22 @@ theorem isVerticalDivisor_const (P : Ideal (MRing ι O)) [P.IsPrime] (ϖ : O) (u
   · rw [one_mul, mul_one, sub_self]
     exact Submodule.zero_mem _
 
-theorem pairNum_const (P : Ideal (MRing ι O)) [P.IsPrime]
-    (hP : ∀ a : O, a ≠ 0 → (C a : MRing ι O) ∉ P) {ϖ : O} (hϖ : ϖ ≠ 0) (u : Oˣ) (n : ℕ)
-    {N : ℕ} (x : Fin N → K → ℤ) (k : ℕ) (Q : List (K → ℤ)) :
-    pairNum P x x (fun _ => C ((u : O) * ϖ ^ n)) (fun _ => 1) (psumExpansion N k) Q =
-      (k : ℤ) * n * cycEval (fun W => classNum x (psum (Fin N) ℤ (k - 1)) Q W)
-        (divCycle P (C ϖ)) := by
+theorem pairNum_const
+    (P : Ideal (MRing ι O)) [P.IsPrime]
+    (hP : ∀ a : O, a ≠ 0 → (C a : MRing ι O) ∉ P)
+    {ϖ : O} (hϖ : ϖ ≠ 0)
+    (u : Oˣ) (n : ℕ)
+    {N : ℕ} (x : Fin N → K → ℤ)
+    (k : ℕ) (Q : List (K → ℤ))
+    : pairNum P x x (fun _ => C ((u : O) * ϖ ^ n)) (fun _ => 1) (psumExpansion N k) Q
+      = (k : ℤ) * n
+        * cycEval (fun W => classNum x (psum (Fin N) ℤ (k - 1)) Q W) (divCycle P (C ϖ)) := by
   unfold pairNum cycEval
   simp only [ratDiv_const P hP hϖ u n]
   have hfin := divCycle_support_finite P (C ϖ)
-  have sub : ∀ h : Ideal (MRing ι O) → ℤ, (∀ W, divCycle P (C ϖ) W = 0 → h W = 0) →
-      ∑ᶠ W, h W = ∑ W ∈ hfin.toFinset, h W := by
+  have sub
+      : ∀ h : Ideal (MRing ι O) → ℤ,
+        (∀ W, divCycle P (C ϖ) W = 0 → h W = 0) → ∑ᶠ W, h W = ∑ W ∈ hfin.toFinset, h W := by
     intro h hh
     refine finsum_eq_sum_of_support_subset h fun W hW => ?_
     rw [Set.Finite.coe_toFinset, Function.mem_support]
@@ -203,8 +217,8 @@ end Divisors
 end ScalarQuotient
 
 theorem ScalarQuotient.proof (hFI : FlagIndependence.Statement) : ScalarQuotient.Statement := by
-  intro O _ _ _ ϖ hϖ Ω _ _ K _ _ ι _ y d hmod N E _ _ B B' n u hlat w w' x x' f g hpair k Gs hGs
-    Q hQ
+  intro O _ _ _ ϖ hϖ Ω _ _ K _ _ ι _ y d hmod N E _ _ B B' n u hlat w w' x x' f g hpair k Gs hGs Q
+    hQ
   have : (pointIdeal O y).IsPrime := hmod.multiProj.isPrime
   have hC : ∀ a : O, a ≠ 0 → (C a : MRing ι O) ∉ pointIdeal O y := by
     intro a ha hmem
@@ -234,8 +248,12 @@ theorem ScalarQuotient.proof (hFI : FlagIndependence.Statement) : ScalarQuotient
         obtain ⟨z₀, hz₀, rfl⟩ := (hlat c hc v).mp hv
         exact ⟨z₀, hz₀, fun j hj => by rw [← hrep]; exact hz j hj, (hrep z₀ i).symm⟩
       · rintro ⟨z₀, hz₀, hz, rfl⟩
-        exact ⟨γ • z₀, (hlat c hc _).mpr ⟨z₀, hz₀, rfl⟩, fun j hj => by rw [hrep]; exact hz j hj,
-          hrep z₀ i⟩
+        exact ⟨
+          γ • z₀,
+          (hlat c hc _).mpr ⟨z₀, hz₀, rfl⟩,
+          fun j hj => by rw [hrep]; exact hz j hj,
+          hrep z₀ i
+        ⟩
     · rw [hw₂, map_smul, Module.Basis.repr_self]
       simp [hij.ne]
     · rw [sub_self]
@@ -253,8 +271,8 @@ theorem ScalarQuotient.proof (hFI : FlagIndependence.Statement) : ScalarQuotient
       rw [pow_zero, one_smul]
       exact B.stable c _ (Subalgebra.algebraMap_mem _ _) _ hz₀
   rw [hFI O ϖ hϖ Ω K ι y d hmod N E B B' hsame w w' w w₂ x x' x x f g _ _ hpair hpair₂ k
-    (psum (Fin N) ℤ k) (isHomogeneous_psum N k) (psum_isSymmetric _ _ k) Gs (psumExpansion N k)
-    hGs (isPairExpansion_psum N k) Q hQ]
+    (psum (Fin N) ℤ k) (isHomogeneous_psum N k) (psum_isSymmetric _ _ k) Gs (psumExpansion N k) hGs
+    (isPairExpansion_psum N k) Q hQ]
   exact ScalarQuotient.pairNum_const _ hC hϖ.ne_zero u n x k Q
 
 end

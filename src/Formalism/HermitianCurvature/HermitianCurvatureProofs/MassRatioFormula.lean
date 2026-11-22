@@ -125,8 +125,9 @@ theorem indexRatio : Formalism.FourierDecayAlt.Sz.IndexRatio := by
   have hn'' : k + 2 * r + 1 = n := by omega
   unfold rowIdx colIdx
   rw [hn'', glCard_eq n q hq0, glCard_eq k q hq0]
-  have hsplit : ∏ i ∈ range n, (1 - (q ^ (i + 1))⁻¹) =
-      (∏ i ∈ range k, (1 - (q ^ (i + 1))⁻¹)) * ∏ j ∈ Ioc k n, (1 - (q ^ j)⁻¹) := by
+  have hsplit
+      : ∏ i ∈ range n, (1 - (q ^ (i + 1))⁻¹)
+        = (∏ i ∈ range k, (1 - (q ^ (i + 1))⁻¹)) * ∏ j ∈ Ioc k n, (1 - (q ^ j)⁻¹) := by
     rw [hn']; exact prod_split k (2 * r + 1) q
   have hG := prod_ne_zero k q hq
   have hpow : q ^ (n * n) = q ^ (k * k) * q ^ dimN k r * q ^ (k * m + m * (m - 1) / 2) := by
@@ -186,22 +187,25 @@ theorem massRatioFormula : Formalism.FourierDecayAlt.Sz.PropA := by
   have hdim : ∏ w, S.dimPi w = (∏ w, S.Vu w) / (sfac S.k : ℝ) ^ S.f := by
     unfold SizeData.dimPi SizeData.f
     rw [Finset.prod_div_distrib, Finset.prod_const, Finset.card_univ]
-  have hprod : ∏ w, (S.TcritPow w / (S.T : ℝ) ^ S.k) =
-      ((S.ka ^ ((S.m - 1) * S.k + S.m * (S.m - 1) / 2))⁻¹ * S.rd ^ (-(((S.m : ℝ) - 1) / 2)) *
-        S.g ^ (S.k * S.m + S.m * (S.m - 1) / 2) * (sfac S.n : ℝ) / (S.T : ℝ) ^ S.k) ^ S.f *
-        (∏ w, S.dsig w) / (∏ w, S.Vu w) := by
-    have h : ∀ w ∈ (Finset.univ : Finset ι), S.TcritPow w / (S.T : ℝ) ^ S.k =
-        ((S.ka ^ ((S.m - 1) * S.k + S.m * (S.m - 1) / 2))⁻¹ * S.rd ^ (-(((S.m : ℝ) - 1) / 2)) *
-        S.g ^ (S.k * S.m + S.m * (S.m - 1) / 2) * (sfac S.n : ℝ) / (S.T : ℝ) ^ S.k) *
-        S.dsig w / S.Vu w := by
+  have hprod
+      : ∏ w, (S.TcritPow w / (S.T : ℝ) ^ S.k)
+        = ((S.ka ^ ((S.m - 1) * S.k + S.m * (S.m - 1) / 2))⁻¹ * S.rd ^ (-(((S.m : ℝ) - 1) / 2))
+              * S.g ^ (S.k * S.m + S.m * (S.m - 1) / 2) * (sfac S.n : ℝ) / (S.T : ℝ) ^ S.k)
+            ^ S.f
+          * (∏ w, S.dsig w) / (∏ w, S.Vu w) := by
+    have h
+        : ∀ w ∈ (Finset.univ : Finset ι),
+          S.TcritPow w / (S.T : ℝ) ^ S.k
+            = ((S.ka ^ ((S.m - 1) * S.k + S.m * (S.m - 1) / 2))⁻¹ * S.rd ^ (-(((S.m : ℝ) - 1) / 2))
+                * S.g ^ (S.k * S.m + S.m * (S.m - 1) / 2) * (sfac S.n : ℝ) / (S.T : ℝ) ^ S.k)
+              * S.dsig w / S.Vu w := by
       intro w _
       unfold SizeData.TcritPow Sz.TcritPow SizeData.VV
       ring
     rw [Finset.prod_congr rfl h, Finset.prod_div_distrib, Finset.prod_mul_distrib,
       Finset.prod_const, Finset.card_univ]
     rfl
-  have hT1 : (1 - ((S.T : ℝ) ^ S.k)⁻¹) = ((S.T : ℝ) ^ S.k - 1) / (S.T : ℝ) ^ S.k := by
-    field_simp
+  have hT1 : (1 - ((S.T : ℝ) ^ S.k)⁻¹) = ((S.T : ℝ) ^ S.k - 1) / (S.T : ℝ) ^ S.k := by field_simp
   rw [hprod, hC, hdim]
   unfold SizeData.Dstar SizeData.Ea SizeData.idxRow SizeData.idxCol SizeData.g
   rw [hvc, hi1, hi2, hT1, ← hfac]

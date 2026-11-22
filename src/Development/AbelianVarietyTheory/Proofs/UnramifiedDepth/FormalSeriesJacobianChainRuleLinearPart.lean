@@ -15,38 +15,51 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.NEvalSqZer
 set_option autoImplicit false
 noncomputable section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ChF
 
-private theorem hs {R : Type} [CommRing R] {m n d e : ℕ} (a : Fin m → Fin d → PS R n e)
-    (h : ∀ i j, MvPowerSeries.constantCoeff (a i j) = 0) :
-    MvPowerSeries.HasSubst (fun q : Fin m × Fin d => a q.1 q.2) :=
+private theorem hs
+    {R : Type} [CommRing R]
+    {m n d e : ℕ}
+    (a : Fin m → Fin d → PS R n e) (h : ∀ i j, MvPowerSeries.constantCoeff (a i j) = 0)
+    : MvPowerSeries.HasSubst (fun q : Fin m × Fin d => a q.1 q.2) :=
   MvPowerSeries.hasSubst_of_constantCoeff_zero (fun q => h q.1 q.2)
 
-private theorem sub_sub' {R : Type} [CommRing R] {m n k d e f : ℕ} (a : Fin m → Fin d → PS R n e)
-    (b : Fin n → Fin e → PS R k f) (ha : ∀ i j, MvPowerSeries.constantCoeff (a i j) = 0)
-    (hb : ∀ i j, MvPowerSeries.constantCoeff (b i j) = 0) (u : PS R m d) :
-    sub b (sub a u) = sub (fun i j => sub b (a i j)) u :=
+private theorem sub_sub'
+    {R : Type} [CommRing R]
+    {m n k d e f : ℕ} (a : Fin m → Fin d → PS R n e) (b : Fin n → Fin e → PS R k f)
+    (ha : ∀ i j, MvPowerSeries.constantCoeff (a i j) = 0)
+    (hb : ∀ i j, MvPowerSeries.constantCoeff (b i j) = 0) (u : PS R m d)
+    : sub b (sub a u) = sub (fun i j => sub b (a i j)) u :=
   MvPowerSeries.subst_comp_subst_apply (hs a ha) (hs b hb) u
 
-private theorem sub_X {R : Type} [CommRing R] {m n d e : ℕ} (a : Fin m → Fin d → PS R n e)
-    (ha : ∀ i j, MvPowerSeries.constantCoeff (a i j) = 0) (q : Fin m × Fin d) :
-    sub a (MvPowerSeries.X q) = a q.1 q.2 :=
+private theorem sub_X
+    {R : Type} [CommRing R]
+    {m n d e : ℕ} (a : Fin m → Fin d → PS R n e)
+    (ha : ∀ i j, MvPowerSeries.constantCoeff (a i j) = 0) (q : Fin m × Fin d)
+    : sub a (MvPowerSeries.X q) = a q.1 q.2 :=
   MvPowerSeries.subst_X (hs a ha) q
 
-private theorem sub_mul' {R : Type} [CommRing R] {m n d e : ℕ} (a : Fin m → Fin d → PS R n e)
-    (ha : ∀ i j, MvPowerSeries.constantCoeff (a i j) = 0) (u v : PS R m d) :
-    sub a (u * v) = sub a u * sub a v :=
+private theorem sub_mul'
+    {R : Type} [CommRing R]
+    {m n d e : ℕ} (a : Fin m → Fin d → PS R n e)
+    (ha : ∀ i j, MvPowerSeries.constantCoeff (a i j) = 0) (u v : PS R m d)
+    : sub a (u * v) = sub a u * sub a v :=
   MvPowerSeries.subst_mul (hs a ha) u v
 
-private theorem const_sub {R : Type} [CommRing R] {m n d e : ℕ} (a : Fin m → Fin d → PS R n e)
-    (ha : ∀ i j, MvPowerSeries.constantCoeff (a i j) = 0) (u : PS R m d) :
-    MvPowerSeries.constantCoeff (sub a u) = MvPowerSeries.constantCoeff u := by
+private theorem const_sub
+    {R : Type} [CommRing R]
+    {m n d e : ℕ} (a : Fin m → Fin d → PS R n e)
+    (ha : ∀ i j, MvPowerSeries.constantCoeff (a i j) = 0) (u : PS R m d)
+    : MvPowerSeries.constantCoeff (sub a u) = MvPowerSeries.constantCoeff u := by
   obtain ⟨-, -, h3, -, -, h6⟩ := nv_calculus R R (RingHom.id R) n e 0 (fun _ _ => IsNilpotent.zero)
   obtain ⟨-, -, -, -, -, h6'⟩ := nv_calculus R R (RingHom.id R) m d 0 (fun _ _ => IsNilpotent.zero)
   have h6 := h6 (by simp)
@@ -54,13 +67,16 @@ private theorem const_sub {R : Type} [CommRing R] {m n d e : ℕ} (a : Fin m →
   have h := h3 m d a u ha
   have e0 : (fun i j => nv (RingHom.id R) (a i j) 0) = 0 := by
     funext i j
-    rw [h6, ha]; simp
+    rw [h6, ha]
+    simp
   rw [e0, h6, h6'] at h
   simpa using h
 
-private theorem coeff_sub {R : Type} [CommRing R] {d e : ℕ} (φ : Fin e → PS R 1 d)
-    (hφ : ∀ j, MvPowerSeries.constantCoeff (φ j) = 0) (u : PS R 1 e) (k : Fin d) :
-    dl (sub ![φ] u) k = ∑ i, lin φ i k * dl u i := by
+private theorem coeff_sub
+    {R : Type} [CommRing R]
+    {d e : ℕ} (φ : Fin e → PS R 1 d) (hφ : ∀ j, MvPowerSeries.constantCoeff (φ j) = 0)
+    (u : PS R 1 e) (k : Fin d)
+    : dl (sub ![φ] u) k = ∑ i, lin φ i k * dl u i := by
   classical
   have hφ' : ∀ (i : Fin 1) j, MvPowerSeries.constantCoeff ((![φ] : Fin 1 → _) i j) = 0 := by
     intro i j; fin_cases i; exact hφ j
@@ -79,25 +95,40 @@ private theorem coeff_sub {R : Type} [CommRing R] {d e : ℕ} (φ : Fin e → PS
     fin_cases i
     rw [h6, hφ']
     ext
-    · have hf : ∀ (t : Finset (Fin 1 × Fin d)) (g : Fin 1 × Fin d → TrivSqZeroExt R R),
-          (∑ q ∈ t, g q).fst = ∑ q ∈ t, (g q).fst := fun t g =>
+    · have hf
+          : ∀ (t : Finset (Fin 1 × Fin d)) (g : Fin 1 × Fin d → TrivSqZeroExt R R),
+            (∑ q ∈ t, g q).fst = ∑ q ∈ t, (g q).fst := fun t g =>
         map_sum (TrivSqZeroExt.fstHom R R R) g t
       simp [s, a, b, hf, apply_ite TrivSqZeroExt.fst]
-    · simp [s, a, b, TrivSqZeroExt.snd_sum, Fintype.sum_prod_type, lin, TrivSqZeroExt.algebraMap_eq_inl]
+    · simp [s, a, b, TrivSqZeroExt.snd_sum, Fintype.sum_prod_type, lin,
+        TrivSqZeroExt.algebraMap_eq_inl]
   rw [e0, h6, h6'] at h
   have h2 := congrArg TrivSqZeroExt.snd h
   simpa [s, a, b, TrivSqZeroExt.snd_sum, Fintype.sum_prod_type, TrivSqZeroExt.algebraMap_eq_inl, dl,
-    mul_comm] using h2
+      mul_comm]
+    using h2
 
-theorem chain_rule_lin : ∀ (R : Type) [CommRing R] (d e : ℕ) (φ : Fin e → PS R 1 d), (∀ j, MvPowerSeries.constantCoeff (φ j) = 0) → (∀ u : PS R 1 e, dl (sub ![φ] u) = (lin φ)ᵀ *ᵥ dl u ∧ MvPowerSeries.constantCoeff (sub ![φ] u) = MvPowerSeries.constantCoeff u) ∧ (∀ (m : ℕ) (ψ : Fin m → PS R 1 e), lin (fun j => sub ![φ] (ψ j)) = lin ψ * lin φ) ∧ ∀ (F : FGLaw R d) (F' : FGLaw R e), IsHomF F.F F'.F φ → ∀ u, IsCh F'.F u → IsCh F.F (sub ![φ] u) := by
+theorem chain_rule_lin
+    : ∀ (R : Type) [CommRing R] (d e : ℕ) (φ : Fin e → PS R 1 d),
+      (∀ j, MvPowerSeries.constantCoeff (φ j) = 0)
+        → (∀ u : PS R 1 e,
+            dl (sub ![φ] u) = (lin φ)ᵀ *ᵥ dl u
+              ∧ MvPowerSeries.constantCoeff (sub ![φ] u) = MvPowerSeries.constantCoeff u)
+          ∧ (∀ (m : ℕ) (ψ : Fin m → PS R 1 e), lin (fun j => sub ![φ] (ψ j)) = lin ψ * lin φ)
+          ∧ ∀ (F : FGLaw R d) (F' : FGLaw R e),
+            IsHomF F.F F'.F φ → ∀ u, IsCh F'.F u → IsCh F.F (sub ![φ] u) := by
   intro R _ d e φ hφ
-  have one : ∀ {n f g : ℕ} (x : Fin g → PS R n f), (∀ j, MvPowerSeries.constantCoeff (x j) = 0) →
-      ∀ (i : Fin 1) j, MvPowerSeries.constantCoeff ((![x] : Fin 1 → _) i j) = 0 := by
+  have one
+      : ∀ {n f g : ℕ} (x : Fin g → PS R n f),
+        (∀ j, MvPowerSeries.constantCoeff (x j) = 0)
+          → ∀ (i : Fin 1) j, MvPowerSeries.constantCoeff ((![x] : Fin 1 → _) i j) = 0 := by
     intro n f g x hx i j; fin_cases i; exact hx j
-  have two : ∀ {n f g : ℕ} (x y : Fin g → PS R n f), (∀ j, MvPowerSeries.constantCoeff (x j) = 0) →
-      (∀ j, MvPowerSeries.constantCoeff (y j) = 0) →
-      ∀ (i : Fin 2) j, MvPowerSeries.constantCoeff ((![x, y] : Fin 2 → _) i j) = 0 := by
-    intro n f g x y hx hy i j; fin_cases i
+  have two
+      : ∀ {n f g : ℕ} (x y : Fin g → PS R n f),
+        (∀ j, MvPowerSeries.constantCoeff (x j) = 0) → (∀ j, MvPowerSeries.constantCoeff (y j) = 0)
+          → ∀ (i : Fin 2) j, MvPowerSeries.constantCoeff ((![x, y] : Fin 2 → _) i j) = 0 := by
+    intro n f g x y hx hy i j
+    fin_cases i
     · exact hx j
     · exact hy j
   have hφ' := one φ hφ
@@ -112,10 +143,13 @@ theorem chain_rule_lin : ∀ (R : Type) [CommRing R] (d e : ℕ) (φ : Fin e →
   · rw [const_sub _ hφ' u, hu.1]
   · have hpt : ∀ (f : ℕ) (i : Fin 2) j, MvPowerSeries.constantCoeff (pt R (n := 2) f i j) = 0 :=
       fun f i j => MvPowerSeries.constantCoeff_X _
-    have hid : ∀ (f : ℕ) (G : Fin f → PS R 2 f), addOf G (pt R (n := 2) f 0) (pt R (n := 2) f 1) = G := by
+    have hid
+        : ∀ (f : ℕ) (G : Fin f → PS R 2 f),
+          addOf G (pt R (n := 2) f 0) (pt R (n := 2) f 1) = G := by
       intro f G
       funext i
-      have : (fun p : Fin 2 × Fin f => (![pt R (n := 2) f 0, pt R (n := 2) f 1] : Fin 2 → _) p.1 p.2)
+      have : (fun p : Fin 2 × Fin f =>
+            (![pt R (n := 2) f 0, pt R (n := 2) f 1] : Fin 2 → _) p.1 p.2)
           = MvPowerSeries.X := by
         funext ⟨p, q⟩
         fin_cases p <;> rfl
@@ -131,22 +165,28 @@ theorem chain_rule_lin : ∀ (R : Type) [CommRing R] (d e : ℕ) (φ : Fin e →
     have hy0 : ∀ j, MvPowerSeries.constantCoeff (y j) = 0 := fun j => by
       rw [hy]; dsimp only; rw [const_sub _ (one _ (hpt d 1)), hφ]
     have hxy := two x y hx0 hy0
-    have h : sub ![x, y] (sub ![F'.F] u) =
-        sub ![x, y] (sub ![pt R (n := 2) e 0] u * sub ![pt R (n := 2) e 1] u) := congrArg _ hu2
+    have h
+        : sub ![x, y] (sub ![F'.F] u)
+          = sub ![x, y] (sub ![pt R (n := 2) e 0] u * sub ![pt R (n := 2) e 1] u) :=
+      congrArg _ hu2
     rw [sub_mul' _ hxy, sub_sub' _ _ (one _ F'.const) hxy, sub_sub' _ _ (one _ (hpt e 0)) hxy,
-      sub_sub' _ _ (one _ (hpt e 1)) hxy] at h
-    change sub ![F.F] (sub ![φ] u) =
-      sub ![pt R (n := 2) d 0] (sub ![φ] u) * sub ![pt R (n := 2) d 1] (sub ![φ] u)
+        sub_sub' _ _ (one _ (hpt e 1)) hxy]
+      at h
+    change sub ![F.F] (sub ![φ] u)
+      = sub ![pt R (n := 2) d 0] (sub ![φ] u) * sub ![pt R (n := 2) d 1] (sub ![φ] u)
     rw [sub_sub' _ _ hφ' (one _ F.const), sub_sub' _ _ hφ' (one _ (hpt d 0)),
       sub_sub' _ _ hφ' (one _ (hpt d 1))]
-    have e1 : (fun i j => sub ![F.F] ((![φ] : Fin 1 → _) i j)) =
-        fun i j => sub ![x, y] ((![F'.F] : Fin 1 → _) i j) := by
+    have e1
+        : (fun i j => sub ![F.F] ((![φ] : Fin 1 → _) i j))
+          = fun i j => sub ![x, y] ((![F'.F] : Fin 1 → _) i j) := by
       funext i j; fin_cases i; exact hF.2 j
-    have e2 : (fun i j => sub ![pt R (n := 2) d 0] ((![φ] : Fin 1 → _) i j)) =
-        fun i j => sub ![x, y] ((![pt R (n := 2) e 0] : Fin 1 → _) i j) := by
+    have e2
+        : (fun i j => sub ![pt R (n := 2) d 0] ((![φ] : Fin 1 → _) i j))
+          = fun i j => sub ![x, y] ((![pt R (n := 2) e 0] : Fin 1 → _) i j) := by
       funext i j; fin_cases i; exact (sub_X _ hxy (0, j)).symm
-    have e3 : (fun i j => sub ![pt R (n := 2) d 1] ((![φ] : Fin 1 → _) i j)) =
-        fun i j => sub ![x, y] ((![pt R (n := 2) e 1] : Fin 1 → _) i j) := by
+    have e3
+        : (fun i j => sub ![pt R (n := 2) d 1] ((![φ] : Fin 1 → _) i j))
+          = fun i j => sub ![x, y] ((![pt R (n := 2) e 1] : Fin 1 → _) i j) := by
       funext i j; fin_cases i; exact (sub_X _ hxy (1, j)).symm
     rw [e1, e2, e3]
     exact h

@@ -4,15 +4,16 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.DYha5.main :
-    ∀ {Ω Ω₀ F F₀ : Type} [inst : Field Ω] [inst_1 : Field Ω₀] [inst_2 : AddCommGroup F] [inst_3 : _root_.Module Ω F]
-      [inst_4 : AddCommGroup F₀] [inst_5 : _root_.Module Ω₀ F₀] (i : Ω₀ →+* Ω) (ι : F₀ →+ F),
-      (∀ (a : Ω₀) (e : F₀), (ι : F₀ → F) (a • e) = (i : Ω₀ → Ω) a • (ι : F₀ → F) e) →
-        ∀ (W : Subring Ω) (A : Subring Ω₀),
-          (∀ a ∈ A, (i : Ω₀ → Ω) a ∈ W) →
-            ∀ (T : Set F₀),
-              Submodule.span (↥W) ((⇑ι : F₀ → F) '' (↑(Submodule.span (↥A) T) : Set F₀)) =
-                Submodule.span (↥W) ((⇑ι : F₀ → F) '' T) := by
+theorem UpperTheory.Reformulated.B.DYha5.main
+    : ∀ {Ω Ω₀ F F₀ : Type} [inst : Field Ω] [inst_1 : Field Ω₀] [inst_2 : AddCommGroup F]
+        [inst_3 : _root_.Module Ω F] [inst_4 : AddCommGroup F₀] [inst_5 : _root_.Module Ω₀ F₀]
+        (i : Ω₀ →+* Ω) (ι : F₀ →+ F),
+      (∀ (a : Ω₀) (e : F₀), (ι : F₀ → F) (a • e) = (i : Ω₀ → Ω) a • (ι : F₀ → F) e)
+        → ∀ (W : Subring Ω) (A : Subring Ω₀),
+          (∀ a ∈ A, (i : Ω₀ → Ω) a ∈ W)
+            → ∀ (T : Set F₀),
+              Submodule.span (↥W) ((⇑ι : F₀ → F) '' (↑(Submodule.span (↥A) T) : Set F₀))
+                = Submodule.span (↥W) ((⇑ι : F₀ → F) '' T) := by
   intro Ω Ω₀ F F₀ _ _ _ _ _ _ i ι hι W A hA T
   apply le_antisymm
   · rw [Submodule.span_le]

@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HilbertEisen
 @[expose] public section
 
 open NumberField UpperHalfPlane GlobalTheory.HilbFam GlobalTheory.QFam
-open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
+open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization
+  (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
 open GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates (iterD partialD)
 open scoped Classical MatrixGroups nonZeroDivisors
 
@@ -202,10 +203,20 @@ private lemma hasSum_powerSeries_pow_of_absolutely_summable (A : PowerSeries ℂ
     rw [pow_succ, pow_succ]
     exact hasSum_powerSeries_mul_of_absolutely_summable _ _ z _ _ ih.1 ih.2 hA hA'
 
-
 open NumberField UpperHalfPlane in
 open scoped Classical MatrixGroups nonZeroDivisors in
-theorem _root_.GlobalTheory.HilbFam.ExpH.hasQ_hfun : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ) (𝔞 𝔟 : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Frac F) (a₀ : ℂ) (a : F → ℂ) (x : F) (N : ℕ) (κ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ) (Ch : ℍ → ℂ) (c : ℕ → ℂ), 0 < N → Even k → _root_.GlobalTheory.HilbFam.IsCoef k 𝔞 𝔟 a₀ a → _root_.GlobalTheory.HilbFam.HasLevel N (_root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x) → _root_.GlobalTheory.QFam.HasQ N Ch c → _root_.GlobalTheory.QFam.HasQ N (_root_.GlobalTheory.HilbFam.hfun k (_root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x) κ Ch) (fun n ↦ PowerSeries.coeff n (_root_.GlobalTheory.HilbFam.hser k N 𝔞 a x κ c)) := by
+theorem _root_.GlobalTheory.HilbFam.ExpH.hasQ_hfun
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ)
+        (𝔞 𝔟 : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Frac F) (a₀ : ℂ)
+        (a : F → ℂ) (x : F) (N : ℕ)
+        (κ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ)
+        (Ch : ℍ → ℂ) (c : ℕ → ℂ),
+      0 < N → Even k → _root_.GlobalTheory.HilbFam.IsCoef k 𝔞 𝔟 a₀ a
+        → _root_.GlobalTheory.HilbFam.HasLevel N (_root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x)
+        → _root_.GlobalTheory.QFam.HasQ N Ch c
+        → _root_.GlobalTheory.QFam.HasQ N
+          (_root_.GlobalTheory.HilbFam.hfun k (_root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x) κ Ch)
+          (fun n ↦ PowerSeries.coeff n (_root_.GlobalTheory.HilbFam.hser k N 𝔞 a x κ c)) := by
   intro F _ _ _ k 𝔞 𝔟 a₀ a x N κ Ch c hN hk ha hlev hCh
   rw [_root_.GlobalTheory.QFam.hasQ_iff] at hCh ⊢
   intro τ
@@ -215,35 +226,50 @@ theorem _root_.GlobalTheory.HilbFam.ExpH.hasQ_hfun : ∀ (F : Type) [Field F] [N
   set C : ℂ := (P ^ Module.finrank ℚ F * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.omegaFactor 𝔞 : ℂ)) ^ k with hC
   have hC0 : C ≠ 0 :=
     pow_ne_zero _ (mul_ne_zero (pow_ne_zero _ hP0) (by exact_mod_cast omegaFactor_ne_zero' 𝔞))
-  let V : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ) → ℂ := fun μ =>
-    _root_.GlobalTheory.HilbFam.jet k (_root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x) μ τ 0 (-P) /
-      (C * (-P ^ 2) ^ (∑ i, μ i))
+  let V : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ) → ℂ :=
+    fun μ =>
+      _root_.GlobalTheory.HilbFam.jet k (_root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x) μ τ 0 (-P)
+        / (C * (- P ^ 2) ^ (∑ i, μ i))
   have hc : HasSum (fun n => PowerSeries.coeff n (PowerSeries.mk c) * q ^ n) (Ch τ) := by
     simpa only [PowerSeries.coeff_mk] using hCh τ
   have hc' : Summable (fun n => ‖PowerSeries.coeff n (PowerSeries.mk c) * q ^ n‖) := by
-    simpa only [PowerSeries.coeff_mk] using summable_norm_qExpansion_of_hasSum_everywhere N hN c Ch hCh τ
-  have hterm : ∀ μ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ, HasSum (fun n => PowerSeries.coeff n
-      ((PowerSeries.mk c ^ ∑ i, (κ i - μ i)) *
-        PowerSeries.mk (_root_.GlobalTheory.HilbFam.ecoef N a x μ)) * q ^ n)
-      (Ch τ ^ (∑ i, (κ i - μ i)) * V μ) := by
+    simpa only [PowerSeries.coeff_mk] using
+      summable_norm_qExpansion_of_hasSum_everywhere N hN c Ch hCh τ
+  have hterm
+      : ∀ μ : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Emb F → ℕ,
+        HasSum
+          (fun n =>
+            PowerSeries.coeff n
+                ((PowerSeries.mk c ^ ∑ i, (κ i - μ i))
+                  * PowerSeries.mk (_root_.GlobalTheory.HilbFam.ecoef N a x μ))
+              * q ^ n)
+          (Ch τ ^ (∑ i, (κ i - μ i)) * V μ) := by
     intro μ
-    have hD := fun σ : ℍ => hasSum_hilbertDiagonalTraceCoefficient_lemma_3 F k 𝔞 𝔟 a₀ a x N hN hk ha hlev μ σ
-    have hD1 : HasSum (fun n => PowerSeries.coeff n
-        (PowerSeries.mk (_root_.GlobalTheory.HilbFam.ecoef N a x μ)) * q ^ n) (V μ) := by
+    have hD := fun σ : ℍ =>
+      hasSum_hilbertDiagonalTraceCoefficient_lemma_3 F k 𝔞 𝔟 a₀ a x N hN hk ha hlev μ σ
+    have hD1 : HasSum
+        (fun n =>
+          PowerSeries.coeff n (PowerSeries.mk (_root_.GlobalTheory.HilbFam.ecoef N a x μ)) * q ^ n)
+        (V μ) := by
       simpa only [PowerSeries.coeff_mk] using hD τ
-    have hD2 : Summable (fun n => ‖PowerSeries.coeff n
-        (PowerSeries.mk (_root_.GlobalTheory.HilbFam.ecoef N a x μ)) * q ^ n‖) := by
+    have hD2 : Summable (fun n =>
+        ‖PowerSeries.coeff n
+          (PowerSeries.mk (_root_.GlobalTheory.HilbFam.ecoef N a x μ)) * q ^ n‖) := by
       simpa only [PowerSeries.coeff_mk] using
         summable_norm_qExpansion_of_hasSum_everywhere N hN _ _ hD τ
     have hpow := hasSum_powerSeries_pow_of_absolutely_summable _ q _ hc hc' (∑ i, (κ i - μ i))
     exact (hasSum_powerSeries_mul_of_absolutely_summable _ _ q _ _ hpow.1 hpow.2 hD1 hD2).1
-  have hs := (hasSum_sum (s := Finset.Iic κ) fun μ _ => (hterm μ).mul_left
-    (((∏ i, _root_.GlobalTheory.HilbFam.rco k (κ i) (μ i) * (-1) ^ μ i : ℤ) : ℂ))).mul_left
-    ((_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.omegaFactor 𝔞 : ℂ) ^ k)
-  suffices hv : _root_.GlobalTheory.HilbFam.hfun k (_root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x) κ Ch τ =
-      (_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.omegaFactor 𝔞 : ℂ) ^ k * ∑ μ ∈ Finset.Iic κ,
-        ((∏ i, _root_.GlobalTheory.HilbFam.rco k (κ i) (μ i) * (-1) ^ μ i : ℤ) : ℂ) *
-          (Ch τ ^ (∑ i, (κ i - μ i)) * V μ) by
+  have hs :=
+    (hasSum_sum (s := Finset.Iic κ) fun μ _ =>
+        (hterm μ).mul_left
+          (((∏ i, _root_.GlobalTheory.HilbFam.rco k (κ i) (μ i) * (-1) ^ μ i : ℤ) : ℂ))).mul_left
+      ((_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.omegaFactor 𝔞 : ℂ) ^ k)
+  suffices hv
+      : _root_.GlobalTheory.HilbFam.hfun k (_root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x) κ Ch τ
+        = (_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.omegaFactor 𝔞 : ℂ) ^ k
+          * ∑ μ ∈ Finset.Iic κ,
+            ((∏ i, _root_.GlobalTheory.HilbFam.rco k (κ i) (μ i) * (-1) ^ μ i : ℤ) : ℂ) *
+              (Ch τ ^ (∑ i, (κ i - μ i)) * V μ) by
     rw [hv]
     refine hs.congr_fun fun n => ?_
     unfold _root_.GlobalTheory.HilbFam.hser
@@ -253,8 +279,9 @@ theorem _root_.GlobalTheory.HilbFam.ExpH.hasQ_hfun : ∀ (F : Type) [Field F] [N
     push_cast
     ring
   unfold _root_.GlobalTheory.HilbFam.hfun _root_.GlobalTheory.HilbFam.wt
-  have hadd := _root_.GlobalTheory.HilbFam.jet_split_add F k 𝔞 𝔟 a₀ a x τ 0 (-P)
-    (P ^ 2 * Ch τ) κ hk ha τ.im_pos
+  have hadd :=
+    _root_.GlobalTheory.HilbFam.jet_split_add F k 𝔞 𝔟 a₀ a x τ 0 (-P) (P ^ 2 * Ch τ) κ hk ha
+      τ.im_pos
   rw [zero_add] at hadd
   rw [← hP, hadd, Finset.sum_div, Finset.mul_sum (Finset.Iic κ)]
   refine Finset.sum_congr rfl fun μ hμ => ?_
@@ -262,11 +289,14 @@ theorem _root_.GlobalTheory.HilbFam.ExpH.hasQ_hfun : ∀ (F : Type) [Field F] [N
   have hsum : ∑ i, κ i = ∑ i, (κ i - μ i) + ∑ i, μ i := by
     rw [← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun i _ => (Nat.sub_add_cancel (hμ i)).symm
-  have hΩ : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.omegaFactor 𝔞 : ℂ) ≠ 0 := by exact_mod_cast omegaFactor_ne_zero' 𝔞
+  have hΩ
+      : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.omegaFactor 𝔞 : ℂ)
+        ≠ 0 := by
+    exact_mod_cast omegaFactor_ne_zero' 𝔞
   simp only [V]
   rw [hC]
   clear_value P
-  have hm : (-P ^ 2) ^ (∑ i, μ i) ≠ 0 := pow_ne_zero _ (neg_ne_zero.mpr (pow_ne_zero _ hP0))
+  have hm : (- P ^ 2) ^ (∑ i, μ i) ≠ 0 := pow_ne_zero _ (neg_ne_zero.mpr (pow_ne_zero _ hP0))
   push_cast
   rw [Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum, hsum, neg_pow (P ^ 2)]
   field_simp

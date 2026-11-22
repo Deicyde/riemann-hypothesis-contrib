@@ -12,8 +12,10 @@ noncomputable section
 
 namespace GlobalTheory.AbsIrrMap
 
-theorem isAbsIrrChar_map : ∀ {K K' G : Type} [Field K] [Field K'] [CharZero K] [CharZero K'] [Group G] [Fintype G]
-    (φ : K →+* K') (χ : G → K), IsAbsIrrChar χ → IsAbsIrrChar (fun g => φ (χ g)) := by
+theorem isAbsIrrChar_map
+    : ∀ {K K' G : Type} [Field K] [Field K'] [CharZero K] [CharZero K'] [Group G] [Fintype G]
+        (φ : K →+* K') (χ : G → K),
+      IsAbsIrrChar χ → IsAbsIrrChar (fun g => φ (χ g)) := by
   intro K K' G _ _ _ _ _ _ φ χ h
   classical
   obtain ⟨n, ρ, hi, hρ⟩ := h
@@ -22,15 +24,16 @@ theorem isAbsIrrChar_map : ∀ {K K' G : Type} [Field K] [Field K'] [CharZero K]
   letI : Algebra K A' := ((algebraMap K' A').comp φ).toAlgebra
   let ψ : A →ₐ[K] A' := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have hψ : ∀ x : K, ψ (algebraMap K A x) = algebraMap K' A' (φ x) := fun x => by
     rw [AlgHom.commutes]; rfl
-  let ρ' : Representation A' G (Fin n → A') := GlobalTheory.BrauerRealise.mapScalars (ψ : A →+* A') ρ
+  let ρ' : Representation A' G (Fin n → A') :=
+    GlobalTheory.BrauerRealise.mapScalars (ψ : A →+* A') ρ
   have hch : ∀ g, ρ'.character g = ψ (ρ.character g) :=
     GlobalTheory.BrauerRealise.character_mapScalars (ψ : A →+* A') ρ
-  refine ⟨n, ρ', GlobalTheory.BrauerRealise.isIrreducible_of_sum_char_mul_char_inv ρ' ?_, fun t => ?_⟩
+  refine
+    ⟨n, ρ', GlobalTheory.BrauerRealise.isIrreducible_of_sum_char_mul_char_inv ρ' ?_, fun t => ?_⟩
   · have : Invertible ((Nat.card G : ℕ) : A) :=
       invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
     have hcard : ((Nat.card G : ℕ) : A) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'

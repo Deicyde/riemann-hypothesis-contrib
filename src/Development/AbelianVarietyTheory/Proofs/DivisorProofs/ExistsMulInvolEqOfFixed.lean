@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_mul_invol_eq_of_fixed (k : Type) [Field k] [Finite k] (τ : k →+* k)
-    (hτ : Function.Involutive τ) (hne : ∃ b : k, τ b ≠ b) (c : k) (hc : τ c = c) :
-    ∃ a : k, a * τ a = c := by
+theorem exists_mul_invol_eq_of_fixed
+    (k : Type) [Field k] [Finite k]
+    (τ : k →+* k) (hτ : Function.Involutive τ) (hne : ∃ b : k, τ b ≠ b)
+    (c : k) (hc : τ c = c)
+    : ∃ a : k, a * τ a = c := by
   classical
   obtain ⟨b, hb⟩ := hne
   let F : Subfield k := τ.eqLocusField (RingHom.id k)
@@ -71,7 +73,9 @@ theorem exists_mul_invol_eq_of_fixed (k : Type) [Field k] [Finite k] (τ : k →
   have h := Algebra.norm_eq_prod_automorphisms F a
   rw [ha, huniv, Finset.prod_pair hne1] at h
   refine ⟨a, ?_⟩
-  calc a * τ a = (1 : k ≃ₐ[F] k) a * τ' a := rfl
+  calc
+    a * τ a
+      = (1 : k ≃ₐ[F] k) a * τ' a := rfl
     _ = c := h.symm
 
 end GlobalTheory

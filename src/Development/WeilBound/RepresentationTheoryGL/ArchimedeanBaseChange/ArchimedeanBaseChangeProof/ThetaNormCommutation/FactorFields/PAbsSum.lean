@@ -6,7 +6,9 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.G3
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  PositivityTheory.Rg.BcB.G3
 open scoped Classical TensorProduct
 
 namespace PositivityTheory.Rg.BcB.G3.AbsSumP
@@ -17,19 +19,22 @@ theorem PositivityTheory.Rg.BcB.G3.absSum_pf : PositivityTheory.Rg.BcB.G3.AbsSum
   set T : Set V := {v | ¬ ∀ l ∈ A v, f v l = if l = o v then 1 else 0} with hTdef
   have hT : T.Finite := Filter.eventually_cofinite.mp hf
   let _ : ∀ v, Fintype (A v) := fun v => (hA v).fintype
-  obtain ⟨U, hUS, hgood⟩ : ∃ U : Finset V, (∀ v ∈ U, v ∈ S) ∧
-      ∀ v, v ∈ S → v ∉ U → ∀ l ∈ A v, f v l = if l = o v then 1 else 0 := by
+  obtain ⟨U, hUS, hgood⟩
+      : ∃ U : Finset V,
+        (∀ v ∈ U, v ∈ S) ∧ ∀ v, v ∈ S → v ∉ U → ∀ l ∈ A v, f v l = if l = o v then 1 else 0 := by
     refine ⟨hT.toFinset.filter (fun v => v ∈ S), fun v hv => (Finset.mem_filter.mp hv).2, ?_⟩
     intro v hvS hvU
     by_contra h
     exact hvU (Finset.mem_filter.mpr ⟨hT.mem_toFinset.mpr h, hvS⟩)
-  have hkey : ∀ c ∈ D, (∏ᶠ v ∈ S, f v (loc c v)) =
-      if (∀ v ∈ S, v ∉ U → loc c v = o v) then ∏ v ∈ U, f v (loc c v) else 0 := by
+  have hkey
+      : ∀ c ∈ D,
+        (∏ᶠ v ∈ S, f v (loc c v))
+          = if (∀ v ∈ S, v ∉ U → loc c v = o v) then ∏ v ∈ U, f v (loc c v) else 0 := by
     intro c hc
     obtain ⟨hcA, hcf⟩ := hD c hc
     have hW : {v | ¬ loc c v = o v}.Finite := Filter.eventually_cofinite.mp hcf
-    obtain ⟨F, hUF, hFS, hWF⟩ : ∃ F : Finset V, U ⊆ F ∧ (↑F : Set V) ⊆ S ∧
-        ∀ v ∈ S, ¬ loc c v = o v → v ∈ F := by
+    obtain ⟨F, hUF, hFS, hWF⟩
+        : ∃ F : Finset V, U ⊆ F ∧ (↑F : Set V) ⊆ S ∧ ∀ v ∈ S, ¬ loc c v = o v → v ∈ F := by
       refine ⟨U ∪ hW.toFinset.filter (fun v => v ∈ S), Finset.subset_union_left, ?_, ?_⟩
       · intro v hv
         rcases Finset.mem_union.mp (Finset.mem_coe.mp hv) with hv | hv
@@ -101,10 +106,12 @@ theorem PositivityTheory.Rg.BcB.G3.absSum_pf : PositivityTheory.Rg.BcB.G3.AbsSum
     by_contra hcG
     apply hne
     rw [if_neg]
-    intro h; exact hcG ⟨hcD, h⟩
+    intro h
+    exact hcG ⟨hcD, h⟩
   refine ⟨hGfin.subset (fun c hc => hsuppG c hc.1 hc.2), ?_⟩
-  have hsum1 : (∑ᶠ c : C, if c ∈ D then ∏ᶠ v ∈ S, f v (loc c v) else 0) =
-      ∑ c ∈ hGfin.toFinset, ∏ v : U, f v.1 (zmap c v).1 := by
+  have hsum1
+      : (∑ᶠ c : C, if c ∈ D then ∏ᶠ v ∈ S, f v (loc c v) else 0)
+        = ∑ c ∈ hGfin.toFinset, ∏ v : U, f v.1 (zmap c v).1 := by
     rw [finsum_eq_sum_of_support_subset _ (s := hGfin.toFinset) ?_]
     · apply Finset.sum_congr rfl
       intro c hc
@@ -144,8 +151,10 @@ theorem PositivityTheory.Rg.BcB.G3.absSum_pf : PositivityTheory.Rg.BcB.G3.AbsSum
         rw [hc v.1 (hUS v.1 v.2)]
         dsimp only [yz]
         rw [dite_eq_left v.2]
-  have hcardfib : ∀ z (s' : Finset C), (∀ c, c ∈ s' ↔ (c ∈ D ∧ ∀ v ∈ S, loc c v = yz z v)) →
-      s'.card = Nat.card {c : C // c ∈ D ∧ ∀ v ∈ S, loc c v = yz z v} := by
+  have hcardfib
+      : ∀ z (s' : Finset C),
+        (∀ c, c ∈ s' ↔ (c ∈ D ∧ ∀ v ∈ S, loc c v = yz z v))
+          → s'.card = Nat.card {c : C // c ∈ D ∧ ∀ v ∈ S, loc c v = yz z v} := by
     intro z s' hs'
     rw [← Nat.card_eq_finsetCard]
     exact Nat.card_congr (Equiv.subtypeEquivRight hs')
@@ -154,8 +163,8 @@ theorem PositivityTheory.Rg.BcB.G3.absSum_pf : PositivityTheory.Rg.BcB.G3.AbsSum
   rw [Finset.sum_congr rfl (g := fun z => (N : ℂ) * ∏ v : U, f v.1 (z v).1) ?_, ← Finset.mul_sum]
   swap
   · intro z _
-    rw [Finset.sum_congr rfl (g := fun _ => ∏ v : U, f v.1 (z v).1) ?_, Finset.sum_const, nsmul_eq_mul,
-      mul_right_comm]
+    rw [Finset.sum_congr rfl (g := fun _ => ∏ v : U, f v.1 (z v).1) ?_, Finset.sum_const,
+      nsmul_eq_mul, mul_right_comm]
     swap
     · intro c hc
       rw [(Finset.mem_filter.mp hc).2]
@@ -176,8 +185,8 @@ theorem PositivityTheory.Rg.BcB.G3.absSum_pf : PositivityTheory.Rg.BcB.G3.AbsSum
   have hR1 : ∀ v, v ∈ S → v ∉ U → (∑ᶠ l : L v, if l ∈ A v then f v l else 0) = 1 := by
     intro v hvS hvU
     rw [hR, Finset.sum_set_coe (f := fun l => f v l),
-      Finset.sum_congr rfl (fun l hl => hgood v hvS hvU l (Set.mem_toFinset.mp hl)), Finset.sum_ite_eq',
-      if_pos (Set.mem_toFinset.mpr (ho v))]
+      Finset.sum_congr rfl (fun l hl => hgood v hvS hvU l (Set.mem_toFinset.mp hl)),
+      Finset.sum_ite_eq', if_pos (Set.mem_toFinset.mpr (ho v))]
   rw [← Fintype.prod_sum (fun (v : U) (l : A v.1) => f v.1 l.1)]
   rw [finprod_mem_eq_prod_of_subset _ (t := U) ?_ ?_]
   · rw [← Finset.prod_coe_sort U]

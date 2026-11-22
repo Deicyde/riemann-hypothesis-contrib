@@ -39,7 +39,8 @@ lemma rp_mk_mem_iff {P : Subgroup G} {Ω : Set G} (hl : ∀ p ∈ P, ∀ x ∈ �
   simpa using hl p⁻¹ (P.inv_mem hp) _ H
 
 def coord {N : Type} [Zero N] {P : Subgroup G} (Ω : Set G) (τ : G → N) (q : G ⧸ P) : N :=
-  open Classical in if rp q ∈ Ω then τ (rp q) else 0
+  open Classical in
+  if rp q ∈ Ω then τ (rp q) else 0
 
 lemma coord_of_mem {N : Type} [Zero N] {P : Subgroup G} {Ω : Set G} {τ : G → N} {q : G ⧸ P}
     (hq : rp q ∈ Ω) : coord Ω τ q = τ (rp q) := by
@@ -95,8 +96,8 @@ theorem cellFormula_of_invM (hI : InvM) : CellFormula := by
   let T : G ⧸ P → N := coord Ω τ
   have Tm : Measurable T := measurable_coord hc.isOpen hc.left hc.cont
   let lam' : Measure N := (ν.map T).withDensity fun y => (D y : ℝ≥0∞)
-  have hlin : ∀ φ : N → ℝ≥0∞, Measurable φ →
-      ∫⁻ y, φ y ∂lam' = ∫⁻ q, (D (T q) : ℝ≥0∞) * φ (T q) ∂ν := by
+  have hlin
+      : ∀ φ : N → ℝ≥0∞, Measurable φ → ∫⁻ y, φ y ∂lam' = ∫⁻ q, (D (T q) : ℝ≥0∞) * φ (T q) ∂ν := by
     intro φ hφ
     have h1 : Measurable fun y => (D y : ℝ≥0∞) := Dm.coe_nnreal_ennreal
     rw [lintegral_withDensity_eq_lintegral_mul _ h1 hφ, lintegral_map (h1.mul hφ) Tm]
@@ -104,8 +105,10 @@ theorem cellFormula_of_invM (hI : InvM) : CellFormula := by
   have hae : ∀ᵐ q ∂ν, rp q ∈ Ω := by
     rw [ae_iff]
     exact hnull
-  have hshift : ∀ (a : N) (φ : N → ℝ≥0∞), Measurable φ →
-      ∫⁻ q, (D (T q) : ℝ≥0∞) * φ (a + T q) ∂ν = ∫⁻ q, (D (T q) : ℝ≥0∞) * φ (T q) ∂ν := by
+  have hshift
+      : ∀ (a : N) (φ : N → ℝ≥0∞),
+        Measurable φ
+          → ∫⁻ q, (D (T q) : ℝ≥0∞) * φ (a + T q) ∂ν = ∫⁻ q, (D (T q) : ℝ≥0∞) * φ (T q) ∂ν := by
     intro a φ hφ
     have hF : Measurable fun q => (D (T q) : ℝ≥0∞) * φ (T q) :=
       ((Dm.comp Tm).coe_nnreal_ennreal).mul (hφ.comp Tm)
@@ -179,7 +182,8 @@ theorem cellFormula_of_invM (hI : InvM) : CellFormula := by
     exact hint.congr hcomp.symm
   · rw [hmu]
     change _ = ∫ y, f (w * nb y) ∂((ν.map T).withDensity fun y => (D y : ℝ≥0∞))
-    rw [integral_withDensity_eq_integral_smul Dm, integral_map Tm.aemeasurable ψc.aestronglyMeasurable]
+    rw [integral_withDensity_eq_integral_smul Dm,
+      integral_map Tm.aemeasurable ψc.aestronglyMeasurable]
     exact (integral_congr_ae hcomp).symm
 
 end GlobalTheory.CompanionTheory.RswCell

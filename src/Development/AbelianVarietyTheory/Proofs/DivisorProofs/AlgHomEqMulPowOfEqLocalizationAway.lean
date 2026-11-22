@@ -9,11 +9,11 @@ open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.T
 
 namespace GlobalTheory
 
-theorem algHom_eq_mul_pow_of_eq_localizationAway :
-    ∀ (R' A S : Type) [CommRing R'] [CommRing A] [CommRing S] [Algebra R' A] [Algebra R' S]
-    [Algebra.FiniteType R' A] (χ₁ χ₂ : A →ₐ[R'] S) (g : S),
-    (∀ x, algebraMap S (Localization.Away g) (χ₁ x) = algebraMap S (Localization.Away g) (χ₂ x)) →
-    ∃ N : ℕ, ∀ x, g ^ N * χ₁ x = g ^ N * χ₂ x := by
+theorem algHom_eq_mul_pow_of_eq_localizationAway
+    : ∀ (R' A S : Type) [CommRing R'] [CommRing A] [CommRing S] [Algebra R' A] [Algebra R' S]
+        [Algebra.FiniteType R' A] (χ₁ χ₂ : A →ₐ[R'] S) (g : S),
+      (∀ x, algebraMap S (Localization.Away g) (χ₁ x) = algebraMap S (Localization.Away g) (χ₂ x))
+        → ∃ N : ℕ, ∀ x, g ^ N * χ₁ x = g ^ N * χ₂ x := by
   intro R' A S _ _ _ _ _ _ χ₁ χ₂ g h
   have key : ∀ x, ∃ n : ℕ, g ^ n * χ₁ x = g ^ n * χ₂ x := by
     intro x
@@ -30,11 +30,15 @@ theorem algHom_eq_mul_pow_of_eq_localizationAway :
   | mem x hxs =>
     have hle : n x ≤ N := Finset.single_le_sum (fun _ _ => Nat.zero_le _) hxs
     rw [← Nat.sub_add_cancel hle, pow_add, mul_assoc, mul_assoc, hn x]
-  | algebraMap r => rw [AlgHom.commutes, AlgHom.commutes]
-  | add x y _ _ hx hy => rw [map_add (f := _), map_add (f := _), mul_add, mul_add, hx, hy]
+  | algebraMap r =>
+    rw [AlgHom.commutes, AlgHom.commutes]
+  | add x y _ _ hx hy =>
+    rw [map_add (f := _), map_add (f := _), mul_add, mul_add, hx, hy]
   | mul x y _ _ hx hy =>
     rw [map_mul, map_mul]
-    calc g ^ N * (χ₁ x * χ₁ y) = χ₁ x * (g ^ N * χ₁ y) := by ring
+    calc
+      g ^ N * (χ₁ x * χ₁ y)
+        = χ₁ x * (g ^ N * χ₁ y) := by ring
       _ = χ₁ x * (g ^ N * χ₂ y) := by rw [hy]
       _ = (g ^ N * χ₁ x) * χ₂ y := by ring
       _ = (g ^ N * χ₂ x) * χ₂ y := by rw [hx]

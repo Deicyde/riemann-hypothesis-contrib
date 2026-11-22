@@ -69,7 +69,8 @@ theorem hpk_ne_zero : Hpk k r ≠ 0 := by
   rw [h, Matrix.det_zero] at e
   exact e rfl
 
-theorem mul_mem_GV {a b : B.Mat k r} (ha : a ∈ B.GV k r) (hb : b ∈ B.GV k r) : a * b ∈ B.GV k r := by
+theorem mul_mem_GV {a b : B.Mat k r} (ha : a ∈ B.GV k r) (hb : b ∈ B.GV k r)
+    : a * b ∈ B.GV k r := by
   have ha' : aᴴ * Hpk k r * a = Hpk k r := ha
   have hb' : bᴴ * Hpk k r * b = Hpk k r := hb
   show (a * b)ᴴ * Hpk k r * (a * b) = Hpk k r
@@ -81,8 +82,8 @@ theorem inLie_neg {X : B.Mat k r} (hX : B.inLie k r X) : B.inLie k r (-X) := by
   unfold B.inLie at *
   rw [Matrix.conjTranspose_neg, Matrix.neg_mul, Matrix.mul_neg, ← neg_add, hX, neg_zero]
 
-theorem exp_mem_GV {X : B.Mat k r} (hX : B.inLie k r X) (t : ℝ) :
-    NormedSpace.exp ((t : ℂ) • X) ∈ B.GV k r := by
+theorem exp_mem_GV {X : B.Mat k r} (hX : B.inLie k r X) (t : ℝ)
+    : NormedSpace.exp ((t : ℂ) • X) ∈ B.GV k r := by
   have hH2 : Hpk k r * Hpk k r = 1 := hpk_mul_self
   have hU : IsUnit (Hpk k r) :=
     (Matrix.isUnit_iff_isUnit_det _).mpr (isUnit_iff_ne_zero.mpr hpk_det_ne)
@@ -90,23 +91,29 @@ theorem exp_mem_GV {X : B.Mat k r} (hX : B.inLie k r X) (t : ℝ) :
   have hX' : Xᴴ * Hpk k r + Hpk k r * X = 0 := hX
   have e1 : Xᴴ * Hpk k r = -(Hpk k r * X) := eq_neg_of_add_eq_zero_left hX'
   have hXa : Xᴴ = -(Hpk k r * X * Hpk k r) := by
-    calc Xᴴ = Xᴴ * (Hpk k r * Hpk k r) := by rw [hH2, Matrix.mul_one]
+    calc
+      Xᴴ
+        = Xᴴ * (Hpk k r * Hpk k r) := by rw [hH2, Matrix.mul_one]
       _ = Xᴴ * Hpk k r * Hpk k r := by rw [Matrix.mul_assoc]
       _ = -(Hpk k r * X * Hpk k r) := by rw [e1, Matrix.neg_mul]
   have hAa : ((t : ℂ) • X)ᴴ = Hpk k r * (-((t : ℂ) • X)) * (Hpk k r)⁻¹ := by
     rw [hinv, Matrix.conjTranspose_smul, hXa, Complex.star_def, Complex.conj_ofReal]
     simp only [Matrix.smul_mul, Matrix.mul_smul, smul_neg, Matrix.mul_neg, Matrix.neg_mul]
-  have hE : (NormedSpace.exp ((t : ℂ) • X))ᴴ =
-      Hpk k r * NormedSpace.exp (-((t : ℂ) • X)) * (Hpk k r)⁻¹ := by
+  have hE
+      : (NormedSpace.exp ((t : ℂ) • X))ᴴ
+        = Hpk k r * NormedSpace.exp (-((t : ℂ) • X)) * (Hpk k r)⁻¹ := by
     rw [← Matrix.exp_conjTranspose, hAa, Matrix.exp_conj _ _ hU]
   have hN : NormedSpace.exp (-((t : ℂ) • X)) * NormedSpace.exp ((t : ℂ) • X) = 1 := by
     have hc : Commute (-((t : ℂ) • X)) ((t : ℂ) • X) := (Commute.refl _).neg_left
     rw [← Matrix.exp_add_of_commute _ _ hc, neg_add_cancel, NormedSpace.exp_zero]
   show (NormedSpace.exp ((t : ℂ) • X))ᴴ * Hpk k r * NormedSpace.exp ((t : ℂ) • X) = Hpk k r
   rw [hE, hinv]
-  calc Hpk k r * NormedSpace.exp (-((t : ℂ) • X)) * Hpk k r * Hpk k r * NormedSpace.exp ((t : ℂ) • X)
-      = Hpk k r * (NormedSpace.exp (-((t : ℂ) • X)) * (Hpk k r * Hpk k r) *
-          NormedSpace.exp ((t : ℂ) • X)) := by simp only [Matrix.mul_assoc]
+  calc
+    Hpk k r * NormedSpace.exp (-((t : ℂ) • X)) * Hpk k r * Hpk k r * NormedSpace.exp ((t : ℂ) • X)
+        = Hpk k r
+          * (NormedSpace.exp (-((t : ℂ) • X)) * (Hpk k r * Hpk k r)
+            * NormedSpace.exp ((t : ℂ) • X)) := by
+      simp only [Matrix.mul_assoc]
     _ = Hpk k r := by rw [hH2, Matrix.mul_one, hN, Matrix.mul_one]
 
 section gN
@@ -126,11 +133,13 @@ theorem one_le_gN {g : B.Mat k r} (hg : g ∈ B.GV k r) : 1 ≤ B.gN g := by
   have hH : (0 : ℝ) < ‖Hpk k r‖ := norm_pos_iff.mpr hpk_ne_zero
   have h1 : gᴴ * Hpk k r * g = Hpk k r := hg
   have h2 : ‖Hpk k r‖ ≤ ‖g‖ * ‖Hpk k r‖ * ‖g‖ := by
-    calc ‖Hpk k r‖ = ‖gᴴ * Hpk k r * g‖ := by rw [h1]
+    calc
+      ‖Hpk k r‖
+        = ‖gᴴ * Hpk k r * g‖ := by rw [h1]
       _ ≤ ‖gᴴ * Hpk k r‖ * ‖g‖ := Matrix.frobenius_norm_mul _ _
       _ ≤ ‖gᴴ‖ * ‖Hpk k r‖ * ‖g‖ := by
-          gcongr
-          exact Matrix.frobenius_norm_mul _ _
+        gcongr
+        exact Matrix.frobenius_norm_mul _ _
       _ = ‖g‖ * ‖Hpk k r‖ * ‖g‖ := by rw [Matrix.frobenius_norm_conjTranspose]
   have h3 : 1 ≤ ‖g‖ * ‖g‖ := by nlinarith
   nlinarith [norm_nonneg g]
@@ -144,19 +153,22 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 variable {n : ℕ}
 
 open scoped Matrix.Norms.Operator in
-theorem exp_entry (X : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) :
-    HasDerivAt (fun t : ℝ => (NormedSpace.exp ((t : ℂ) • X)) i j) (X i j) 0 := by
+theorem exp_entry (X : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n)
+    : HasDerivAt (fun t : ℝ => (NormedSpace.exp ((t : ℂ) • X)) i j) (X i j) 0 := by
   have h := hasDerivAt_exp_smul_const (𝕂 := ℝ) X (0 : ℝ)
   simp only [zero_smul, NormedSpace.exp_zero, one_mul] at h
-  let L : Matrix (Fin n) (Fin n) ℂ →L[ℝ] ℂ := LinearMap.toContinuousLinearMap (Matrix.entryLinearMap ℝ ℂ i j)
+  let L : Matrix (Fin n) (Fin n) ℂ →L[ℝ] ℂ :=
+    LinearMap.toContinuousLinearMap (Matrix.entryLinearMap ℝ ℂ i j)
   have := L.hasFDerivAt.comp_hasDerivAt (0 : ℝ) h
   simp only [Complex.coe_smul]
   exact this
 
-theorem exp_deriv (X : Matrix (Fin n) (Fin n) ℂ) :
-    HasDerivAt (fun t : ℝ => NormedSpace.exp ((t : ℂ) • X)) X 0 := by
-  have : HasDerivAt (fun t : ℝ => (fun i j => (NormedSpace.exp ((t : ℂ) • X)) i j : Fin n → Fin n → ℂ))
-      (fun i j => X i j) 0 := by
+theorem exp_deriv (X : Matrix (Fin n) (Fin n) ℂ)
+    : HasDerivAt (fun t : ℝ => NormedSpace.exp ((t : ℂ) • X)) X 0 := by
+  have : HasDerivAt
+      (fun t : ℝ => (fun i j => (NormedSpace.exp ((t : ℂ) • X)) i j : Fin n → Fin n → ℂ))
+      (fun i j => X i j)
+      0 := by
     rw [hasDerivAt_pi]
     intro i
     rw [hasDerivAt_pi]
@@ -187,15 +199,14 @@ def D : Bool → B.Mat k r → (B.Mat k r → E) → (B.Mat k r → E)
   | true, X, f => B.LdV X f
   | false, X, f => Formalism.REAL.RdV X f
 
-theorem D_eq (b : Bool) (X : B.Mat k r) (f : B.Mat k r → E) (g : B.Mat k r) :
-    D b X f g = deriv (fun t : ℝ => f (cv b X g t)) 0 := by
+theorem D_eq (b : Bool) (X : B.Mat k r) (f : B.Mat k r → E) (g : B.Mat k r)
+    : D b X f g = deriv (fun t : ℝ => f (cv b X g t)) 0 := by
   cases b <;> rfl
 
-theorem cv_zero (b : Bool) (X g : B.Mat k r) : cv b X g 0 = g := by
-  cases b <;> simp [cv]
+theorem cv_zero (b : Bool) (X g : B.Mat k r) : cv b X g 0 = g := by cases b <;> simp [cv]
 
-theorem cv_mem {b : Bool} {X g : B.Mat k r} (hg : g ∈ B.GV k r) (hX : B.inLie k r X) (t : ℝ) :
-    cv b X g t ∈ B.GV k r := by
+theorem cv_mem {b : Bool} {X g : B.Mat k r} (hg : g ∈ B.GV k r) (hX : B.inLie k r X) (t : ℝ)
+    : cv b X g t ∈ B.GV k r := by
   cases b with
   | true =>
     show NormedSpace.exp (-((t : ℂ) • X)) * g ∈ B.GV k r
@@ -210,8 +221,9 @@ theorem cv_deriv (b : Bool) (X g : B.Mat k r) : HasDerivAt (cv b X g) (vel b X g
   | true =>
     show HasDerivAt (fun t : ℝ => NormedSpace.exp (-((t : ℂ) • X)) * g) (-(X * g)) 0
     have h := (mulR g).hasFDerivAt.comp_hasDerivAt (0 : ℝ) (exp_deriv (-X))
-    have e1 : (⇑(mulR g) ∘ fun t : ℝ => NormedSpace.exp ((t : ℂ) • -X)) =
-        fun t : ℝ => NormedSpace.exp (-((t : ℂ) • X)) * g := by
+    have e1
+        : (⇑(mulR g) ∘ fun t : ℝ => NormedSpace.exp ((t : ℂ) • -X))
+          = fun t : ℝ => NormedSpace.exp (-((t : ℂ) • X)) * g := by
       funext t
       simp only [Function.comp, mulR_apply, smul_neg]
     have e2 : (mulR g) (-X) = -(X * g) := by
@@ -222,15 +234,16 @@ theorem cv_deriv (b : Bool) (X g : B.Mat k r) : HasDerivAt (cv b X g) (vel b X g
   | false =>
     show HasDerivAt (fun t : ℝ => g * NormedSpace.exp ((t : ℂ) • X)) (g * X) 0
     have h := (mulL g).hasFDerivAt.comp_hasDerivAt (0 : ℝ) (exp_deriv X)
-    have e1 : (⇑(mulL g) ∘ fun t : ℝ => NormedSpace.exp ((t : ℂ) • X)) =
-        fun t : ℝ => g * NormedSpace.exp ((t : ℂ) • X) := by
+    have e1
+        : (⇑(mulL g) ∘ fun t : ℝ => NormedSpace.exp ((t : ℂ) • X))
+          = fun t : ℝ => g * NormedSpace.exp ((t : ℂ) • X) := by
       funext t
       rfl
     rw [e1] at h
     exact h.congr_deriv (mulL_apply g X)
 
-theorem contDiff_vel (b : Bool) (X : B.Mat k r) {m : WithTop ℕ∞} :
-    ContDiff ℝ m (fun h : B.Mat k r => vel b X h) := by
+theorem contDiff_vel (b : Bool) (X : B.Mat k r) {m : WithTop ℕ∞}
+    : ContDiff ℝ m (fun h : B.Mat k r => vel b X h) := by
   cases b with
   | true =>
     show ContDiff ℝ m (fun h : B.Mat k r => -(X * h))
@@ -239,18 +252,17 @@ theorem contDiff_vel (b : Bool) (X : B.Mat k r) {m : WithTop ℕ∞} :
     show ContDiff ℝ m (fun h : B.Mat k r => h * X)
     exact (mulR X).contDiff
 
-theorem vel_sum (b : Bool) {N : ℕ} (c : Fin N → ℝ) (e : Fin N → B.Mat k r) (g : B.Mat k r) :
-    vel b (∑ i, c i • e i) g = ∑ i, c i • vel b (e i) g := by
+theorem vel_sum (b : Bool) {N : ℕ} (c : Fin N → ℝ) (e : Fin N → B.Mat k r) (g : B.Mat k r)
+    : vel b (∑ i, c i • e i) g = ∑ i, c i • vel b (e i) g := by
   cases b with
-  | true =>
-    simp only [vel, Finset.sum_mul, smul_mul_assoc, ← Finset.sum_neg_distrib, smul_neg]
-  | false =>
-    simp only [vel, Finset.mul_sum, mul_smul_comm]
+  | true => simp only [vel, Finset.sum_mul, smul_mul_assoc, ← Finset.sum_neg_distrib, smul_neg]
+  | false => simp only [vel, Finset.mul_sum, mul_smul_comm]
 
-theorem hasDerivAt_D {b : Bool} {X g : B.Mat k r} {f f' : B.Mat k r → E} {U : Set (B.Mat k r)}
+theorem hasDerivAt_D
+    {b : Bool} {X g : B.Mat k r} {f f' : B.Mat k r → E} {U : Set (B.Mat k r)}
     (hU : IsOpen U) (hgU : g ∈ U) (hgG : g ∈ B.GV k r) (hfe : ∀ h ∈ U, h ∈ B.GV k r → f h = f' h)
-    (hd : DifferentiableAt ℝ f' g) (hX : B.inLie k r X) :
-    HasDerivAt (fun t : ℝ => f (cv b X g t)) (fderiv ℝ f' g (vel b X g)) 0 := by
+    (hd : DifferentiableAt ℝ f' g) (hX : B.inLie k r X)
+    : HasDerivAt (fun t : ℝ => f (cv b X g t)) (fderiv ℝ f' g (vel b X g)) 0 := by
   have hc := cv_deriv b X g
   have h0 : cv b X g 0 = g := cv_zero b X g
   have hf' : HasFDerivAt f' (fderiv ℝ f' g) (cv b X g 0) := by
@@ -263,62 +275,70 @@ theorem hasDerivAt_D {b : Bool} {X g : B.Mat k r} {f f' : B.Mat k r → E} {U : 
   filter_upwards [hU'] with t ht
   exact hfe _ ht (cv_mem hgG hX t)
 
-theorem D_eq_fderiv {b : Bool} {X g : B.Mat k r} {f f' : B.Mat k r → E} {U : Set (B.Mat k r)}
+theorem D_eq_fderiv
+    {b : Bool} {X g : B.Mat k r} {f f' : B.Mat k r → E} {U : Set (B.Mat k r)}
     (hU : IsOpen U) (hgU : g ∈ U) (hgG : g ∈ B.GV k r) (hfe : ∀ h ∈ U, h ∈ B.GV k r → f h = f' h)
-    (hd : DifferentiableAt ℝ f' g) (hX : B.inLie k r X) :
-    D b X f g = fderiv ℝ f' g (vel b X g) := by
+    (hd : DifferentiableAt ℝ f' g) (hX : B.inLie k r X)
+    : D b X f g = fderiv ℝ f' g (vel b X g) := by
   rw [D_eq]
   exact (hasDerivAt_D hU hgU hgG hfe hd hX).deriv
 
 abbrev SS (k r : ℕ) (f : B.Mat k r → E) : Prop := B.CkOn (⊤ : ℕ∞) (B.GV k r) f
 
-theorem ss_rep {f : B.Mat k r → E} (hf : SS k r f) {g : B.Mat k r} (hg : g ∈ B.GV k r) :
-    ∃ (U : Set (B.Mat k r)) (f' : B.Mat k r → E), IsOpen U ∧ g ∈ U ∧ DifferentiableAt ℝ f' g ∧
-      ∀ h ∈ U, h ∈ B.GV k r → f h = f' h := by
+theorem ss_rep {f : B.Mat k r → E} (hf : SS k r f) {g : B.Mat k r} (hg : g ∈ B.GV k r)
+    : ∃ (U : Set (B.Mat k r)) (f' : B.Mat k r → E),
+      IsOpen U ∧ g ∈ U ∧ DifferentiableAt ℝ f' g ∧ ∀ h ∈ U, h ∈ B.GV k r → f h = f' h := by
   obtain ⟨U, f', hU, hgU, hcd, hfe⟩ := hf g hg
   exact ⟨U, f', hU, hgU, (hcd.contDiffAt (hU.mem_nhds hgU)).differentiableAt (by simp), hfe⟩
 
-theorem ss_D {b : Bool} {X : B.Mat k r} {f : B.Mat k r → E} (hf : SS k r f) (hX : B.inLie k r X) :
-    SS k r (D b X f) := by
+theorem ss_D {b : Bool} {X : B.Mat k r} {f : B.Mat k r → E} (hf : SS k r f) (hX : B.inLie k r X)
+    : SS k r (D b X f) := by
   intro g₀ hg₀
   obtain ⟨U, f', hU, hgU, hcd, hfe⟩ := hf g₀ hg₀
   refine ⟨U, fun h => fderiv ℝ f' h (vel b X h), hU, hgU, ?_, ?_⟩
   · exact (hcd.fderiv_of_isOpen hU (by simp)).clm_apply (contDiff_vel b X).contDiffOn
   · intro h hU' hG
-    exact D_eq_fderiv hU hU' hG hfe
-      ((hcd.contDiffAt (hU.mem_nhds hU')).differentiableAt (by simp)) hX
+    exact D_eq_fderiv hU hU' hG hfe ((hcd.contDiffAt (hU.mem_nhds hU')).differentiableAt (by simp))
+      hX
 
-theorem hasDerivAt_D_of {b : Bool} {X g : B.Mat k r} {f : B.Mat k r → E} (hf : SS k r f)
-    (hg : g ∈ B.GV k r) (hX : B.inLie k r X) :
-    HasDerivAt (fun t : ℝ => f (cv b X g t)) (D b X f g) 0 := by
+theorem hasDerivAt_D_of
+    {b : Bool} {X g : B.Mat k r} {f : B.Mat k r → E}
+    (hf : SS k r f) (hg : g ∈ B.GV k r) (hX : B.inLie k r X)
+    : HasDerivAt (fun t : ℝ => f (cv b X g t)) (D b X f g) 0 := by
   obtain ⟨U, f', hU, hgU, hd, hfe⟩ := ss_rep hf hg
   rw [D_eq_fderiv hU hgU hg hfe hd hX]
   exact hasDerivAt_D hU hgU hg hfe hd hX
 
-theorem D_congr {b : Bool} {X g : B.Mat k r} {f₁ f₂ : B.Mat k r → E}
-    (h : ∀ y ∈ B.GV k r, f₁ y = f₂ y) (hg : g ∈ B.GV k r) (hX : B.inLie k r X) :
-    D b X f₁ g = D b X f₂ g := by
+theorem D_congr
+    {b : Bool} {X g : B.Mat k r} {f₁ f₂ : B.Mat k r → E}
+    (h : ∀ y ∈ B.GV k r, f₁ y = f₂ y) (hg : g ∈ B.GV k r) (hX : B.inLie k r X)
+    : D b X f₁ g = D b X f₂ g := by
   rw [D_eq, D_eq]
   congr 1
   funext t
   exact h _ (cv_mem hg hX t)
 
-theorem D_add {b : Bool} {X g : B.Mat k r} {f₁ f₂ : B.Mat k r → E} (h₁ : SS k r f₁) (h₂ : SS k r f₂)
-    (hg : g ∈ B.GV k r) (hX : B.inLie k r X) :
-    D b X (f₁ + f₂) g = D b X f₁ g + D b X f₂ g := by
+theorem D_add
+    {b : Bool} {X g : B.Mat k r} {f₁ f₂ : B.Mat k r → E}
+    (h₁ : SS k r f₁) (h₂ : SS k r f₂) (hg : g ∈ B.GV k r) (hX : B.inLie k r X)
+    : D b X (f₁ + f₂) g = D b X f₁ g + D b X f₂ g := by
   rw [D_eq]
   exact ((hasDerivAt_D_of h₁ hg hX).add (hasDerivAt_D_of h₂ hg hX)).deriv
 
-theorem D_smul {b : Bool} {X g : B.Mat k r} (c : ℝ) {f : B.Mat k r → E} (hf : SS k r f)
-    (hg : g ∈ B.GV k r) (hX : B.inLie k r X) :
-    D b X (c • f) g = c • D b X f g := by
+theorem D_smul
+    {b : Bool} {X g : B.Mat k r}
+    (c : ℝ)
+    {f : B.Mat k r → E} (hf : SS k r f)
+    (hg : g ∈ B.GV k r) (hX : B.inLie k r X)
+    : D b X (c • f) g = c • D b X f g := by
   rw [D_eq]
   exact ((hasDerivAt_D_of hf hg hX).const_smul c).deriv
 
-theorem D_letter {b : Bool} {N : ℕ} {e : Fin N → B.Mat k r} {c : Fin N → ℝ} {X g : B.Mat k r}
-    {f : B.Mat k r → E} (hf : SS k r f) (hg : g ∈ B.GV k r) (he : ∀ i, B.inLie k r (e i))
-    (hX : B.inLie k r X) (hXe : X = ∑ i, c i • e i) :
-    D b X f g = ∑ i, c i • D b (e i) f g := by
+theorem D_letter
+    {b : Bool} {N : ℕ} {e : Fin N → B.Mat k r} {c : Fin N → ℝ} {X g : B.Mat k r} {f : B.Mat k r → E}
+    (hf : SS k r f) (hg : g ∈ B.GV k r) (he : ∀ i, B.inLie k r (e i)) (hX : B.inLie k r X)
+    (hXe : X = ∑ i, c i • e i)
+    : D b X f g = ∑ i, c i • D b (e i) f g := by
   obtain ⟨U, f', hU, hgU, hd, hfe⟩ := ss_rep hf hg
   set_option synthInstance.maxHeartbeats 100000 in
     rw [D_eq_fderiv hU hgU hg hfe hd hX, hXe, vel_sum, map_sum]

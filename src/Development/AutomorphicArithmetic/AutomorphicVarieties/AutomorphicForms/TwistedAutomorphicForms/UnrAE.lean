@@ -7,8 +7,7 @@ public import Mathlib.RingTheory.DedekindDomain.Different
 
 open NumberField IsDedekindDomain
 
-theorem UpperTheory.V.Af.Tw.unrAE :
-    UpperTheory.V.Af.Tw.UnrAE := by
+theorem UpperTheory.V.Af.Tw.unrAE : UpperTheory.V.Af.Tw.UnrAE := by
   unfold UpperTheory.V.Af.Tw.UnrAE
   intro F L _ _ _ _ _
   letI := FractionRing.liftAlgebra (𝓞 F) (FractionRing (𝓞 L))
@@ -23,13 +22,16 @@ theorem UpperTheory.V.Af.Tw.unrAE :
   push_neg at hv
   obtain ⟨w, rfl, he⟩ := hv
   refine ⟨w, ?_, rfl⟩
-  have hle : Ideal.map (algebraMap (𝓞 F) (𝓞 L)) (HeightOneSpectrum.under (𝓞 F) w).asIdeal ≤
-      w.asIdeal := Ideal.map_comap_le
-  have h2 : Ideal.map (algebraMap (𝓞 F) (𝓞 L)) (HeightOneSpectrum.under (𝓞 F) w).asIdeal ≤
-      w.asIdeal ^ 2 := by
+  have hle
+      : Ideal.map (algebraMap (𝓞 F) (𝓞 L)) (HeightOneSpectrum.under (𝓞 F) w).asIdeal ≤ w.asIdeal :=
+    Ideal.map_comap_le
+  have h2
+      : Ideal.map (algebraMap (𝓞 F) (𝓞 L)) (HeightOneSpectrum.under (𝓞 F) w).asIdeal
+        ≤ w.asIdeal ^ 2 := by
     by_contra h
     exact he (Ideal.ramificationIdx'_spec (by rwa [pow_one]) h)
   haveI := (HeightOneSpectrum.under (𝓞 F) w).isMaximal
-  have hdvd := pow_sub_one_dvd_differentIdeal (A := 𝓞 F) (P := w.asIdeal) (e := 2)
-    (hp := (HeightOneSpectrum.under (𝓞 F) w).ne_bot) (hP := Ideal.dvd_iff_le.mpr h2)
+  have hdvd :=
+    pow_sub_one_dvd_differentIdeal (A := 𝓞 F) (P := w.asIdeal) (e := 2)
+      (hp := (HeightOneSpectrum.under (𝓞 F) w).ne_bot) (hP := Ideal.dvd_iff_le.mpr h2)
   simpa using hdvd

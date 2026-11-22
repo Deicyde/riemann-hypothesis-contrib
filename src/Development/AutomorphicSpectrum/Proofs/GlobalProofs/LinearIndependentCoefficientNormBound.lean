@@ -5,22 +5,25 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.IsSmoothVec
 
 @[expose] public section
 
-open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.LinRed GlobalTheory.FlagMeas GlobalTheory.RealInd GlobalTheory.CompanionTheory.Hypotheses₂ GlobalTheory.CompanionTheory.Hypotheses₂.HCA
+open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.LinRed
+  GlobalTheory.FlagMeas GlobalTheory.RealInd GlobalTheory.CompanionTheory.Hypotheses₂
+  GlobalTheory.CompanionTheory.Hypotheses₂.HCA
 open scoped InnerProductSpace ContDiff
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.HCA.Coord
 
-theorem sum_abs_coord_le_mnorm {n d : ℕ} (b : Fin d → Matrix (Fin n) (Fin n) ℂ)
-    (hli : LinearIndependent ℝ b) :
-    ∃ D : ℝ, 0 ≤ D ∧ ∀ r : Fin d → ℝ, ∑ i, |r i| ≤ D * mnorm (∑ i, r i • b i) := by
-  let L : (Fin d → ℝ) →ₗ[ℝ] (Fin n → Fin n → ℂ) :=
-    { toFun := fun r a c => ∑ i, r i • b i a c
-      map_add' := fun r s => by
-        funext a c
-        simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib]
-      map_smul' := fun t r => by
-        funext a c
-        simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.smul_sum, mul_smul] }
+theorem sum_abs_coord_le_mnorm
+    {n d : ℕ} (b : Fin d → Matrix (Fin n) (Fin n) ℂ) (hli : LinearIndependent ℝ b)
+    : ∃ D : ℝ, 0 ≤ D ∧ ∀ r : Fin d → ℝ, ∑ i, |r i| ≤ D * mnorm (∑ i, r i • b i) := by
+  let L : (Fin d → ℝ) →ₗ[ℝ] (Fin n → Fin n → ℂ) := {
+    toFun := fun r a c => ∑ i, r i • b i a c
+    map_add' := fun r s => by
+      funext a c
+      simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib]
+    map_smul' := fun t r => by
+      funext a c
+      simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.smul_sum, mul_smul]
+  }
   have hL : ∀ r a c, L r a c = (∑ i, r i • b i) a c := by
     intro r a c
     simp [L, Matrix.sum_apply, Matrix.smul_apply]
@@ -46,22 +49,30 @@ theorem sum_abs_coord_le_mnorm {n d : ℕ} (b : Fin d → Matrix (Fin n) (Fin n)
     refine (pi_norm_le_iff_of_nonneg hN).mpr fun c => ?_
     rw [hL]
     unfold GlobalTheory.CompanionTheory.Hypotheses₂.HCA.mnorm
-    calc ‖(∑ i, r i • b i) a c‖ ≤ ∑ c', ‖(∑ i, r i • b i) a c'‖ :=
-          Finset.single_le_sum (f := fun c' => ‖(∑ i, r i • b i) a c'‖)
-            (fun _ _ => norm_nonneg _) (Finset.mem_univ c)
+    calc
+      ‖(∑ i, r i • b i) a c‖ ≤ ∑ c', ‖(∑ i, r i • b i) a c'‖ :=
+        Finset.single_le_sum
+          (f := fun c' => ‖(∑ i, r i • b i) a c'‖)
+          (fun _ _ => norm_nonneg _)
+          (Finset.mem_univ c)
       _ ≤ ∑ a', ∑ c', ‖(∑ i, r i • b i) a' c'‖ :=
-          Finset.single_le_sum (f := fun a' => ∑ c', ‖(∑ i, r i • b i) a' c'‖)
-            (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _) (Finset.mem_univ a)
+        Finset.single_le_sum
+          (f := fun a' => ∑ c', ‖(∑ i, r i • b i) a' c'‖)
+          (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _)
+          (Finset.mem_univ a)
   have h3 : ∑ i, |r i| ≤ d * ‖r‖ := by
-    calc ∑ i, |r i| ≤ ∑ _i : Fin d, ‖r‖ :=
-          Finset.sum_le_sum fun i _ => by
-            rw [← Real.norm_eq_abs]
-            exact norm_le_pi_norm r i
+    calc
+      ∑ i, |r i| ≤ ∑ _i : Fin d, ‖r‖ :=
+        Finset.sum_le_sum fun i _ => by
+          rw [← Real.norm_eq_abs]
+          exact norm_le_pi_norm r i
       _ = d * ‖r‖ := by simp
-  calc ∑ i, |r i| ≤ d * ‖r‖ := h3
+  calc
+    ∑ i, |r i|
+      ≤ d * ‖r‖ := h3
     _ ≤ d * (K * ‖L r‖) := mul_le_mul_of_nonneg_left h1 (Nat.cast_nonneg _)
     _ ≤ d * (K * GlobalTheory.CompanionTheory.Hypotheses₂.HCA.mnorm (∑ i, r i • b i)) :=
-        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h2 K.coe_nonneg) (Nat.cast_nonneg _)
+      mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h2 K.coe_nonneg) (Nat.cast_nonneg _)
     _ = d * K * GlobalTheory.CompanionTheory.Hypotheses₂.HCA.mnorm (∑ i, r i • b i) := by ring
 
 end GlobalTheory.CompanionTheory.Hypotheses₂.HCA.Coord

@@ -8,17 +8,20 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemTwKer
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.TwistedAverage
 
-theorem sum_reps_eq_sum_out {H V : Type} [Group H] [AddCommGroup V] (K : Subgroup H)
-    [Fintype (H ⧸ K)] (T : Finset H) (hT : ∀ x : H, ∃! t, t ∈ T ∧ t⁻¹ * x ∈ K) (f : H → V)
-    (hf : ∀ x, ∀ k ∈ K, f (x * k) = f x) :
-    ∑ t ∈ T, f t = ∑ q : H ⧸ K, f q.out := by
-  refine Finset.sum_bij (fun t _ => (QuotientGroup.mk t : H ⧸ K)) (fun _ _ => Finset.mem_univ _)
-    ?_ ?_ ?_
+theorem sum_reps_eq_sum_out
+    {H V : Type} [Group H] [AddCommGroup V]
+    (K : Subgroup H) [Fintype (H ⧸ K)]
+    (T : Finset H) (hT : ∀ x : H, ∃! t, t ∈ T ∧ t⁻¹ * x ∈ K)
+    (f : H → V) (hf : ∀ x, ∀ k ∈ K, f (x * k) = f x)
+    : ∑ t ∈ T, f t = ∑ q : H ⧸ K, f q.out := by
+  refine
+    Finset.sum_bij (fun t _ => (QuotientGroup.mk t : H ⧸ K)) (fun _ _ => Finset.mem_univ _) ?_ ?_ ?_
   · intro a ha b hb hab
     exact (hT b).unique ⟨ha, QuotientGroup.eq.1 hab⟩ ⟨hb, by simp⟩
   · intro q _
@@ -30,8 +33,18 @@ theorem sum_reps_eq_sum_out {H V : Type} [Group H] [AddCommGroup V] (K : Subgrou
     obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul K t
     rw [hh, hf _ _ h.2]
 
-theorem sum_reps_eq_zero_of_mem_twKer :
-    ∀ {G Z : Type} [Group G] [AddCommGroup Z] [Module ℂ Z] [TopologicalSpace G] [IsTopologicalGroup G] (ρ : Representation ℂ G Z), IsSmooth ρ → ∀ (L : Subgroup G), IsCompact (L : Set G) → ∀ v : Z, v ∈ twKer ρ L 1 → ∀ (K : Subgroup L) (T : Finset L), IsOpen (K : Set L) → (∀ x ∈ K, ρ (x : G) v = v) → (∀ x : L, ∃! t, t ∈ T ∧ t⁻¹ * x ∈ K) → ∑ t ∈ T, ρ (t : G) v = 0 := by
+theorem sum_reps_eq_zero_of_mem_twKer
+    : ∀ {G Z : Type} [Group G] [AddCommGroup Z] [Module ℂ Z] [TopologicalSpace G]
+        [IsTopologicalGroup G] (ρ : Representation ℂ G Z),
+      IsSmooth ρ
+        → ∀ (L : Subgroup G),
+          IsCompact (L : Set G)
+            → ∀ v : Z,
+              v ∈ twKer ρ L 1
+                → ∀ (K : Subgroup L) (T : Finset L),
+                  IsOpen (K : Set L) → (∀ x ∈ K, ρ (x : G) v = v)
+                    → (∀ x : L, ∃! t, t ∈ T ∧ t⁻¹ * x ∈ K)
+                    → ∑ t ∈ T, ρ (t : G) v = 0 := by
   intro G Z _ _ _ _ _ ρ hρ L hL v hv K T hKo hKv hT
   classical
   haveI : CompactSpace L := isCompact_iff_compactSpace.mp hL

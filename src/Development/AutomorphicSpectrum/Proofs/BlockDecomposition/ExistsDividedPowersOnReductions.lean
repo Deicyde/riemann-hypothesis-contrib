@@ -11,13 +11,20 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Filtrati
 
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.PAlg
+open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison
+  CrystallineSemistableComparison.PAlg
 
 namespace GlobalTheory.CompanionTheory.PerfFil
 
-theorem mem_span_pow_of_factorial_mul_eq {S : Type} [CommRing S] (hS : R.TF S) {l : ℕ}
-    (hl : l.Prime) (n : ℕ) {x : S} (hx : x ∈ Ideal.span {(l : S) ^ n}) {k : ℕ} (hk : k ≠ 0)
-    {y : S} (e : (k.factorial : S) * y = x ^ k) : y ∈ Ideal.span {(l : S) ^ n} := by
+theorem mem_span_pow_of_factorial_mul_eq
+    {S : Type} [CommRing S]
+    (hS : R.TF S)
+    {l : ℕ} (hl : l.Prime)
+    (n : ℕ)
+    {x : S} (hx : x ∈ Ideal.span {(l : S) ^ n})
+    {k : ℕ} (hk : k ≠ 0)
+    {y : S} (e : (k.factorial : S) * y = x ^ k)
+    : y ∈ Ideal.span {(l : S) ^ n} := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · simp
   obtain ⟨x', rfl⟩ := Ideal.mem_span_singleton'.1 hx
@@ -50,27 +57,35 @@ theorem mem_span_pow_of_factorial_mul_eq {S : Type} [CommRing S] (hS : R.TF S) {
   have hab' : (a : S) * (m : S) + (b : S) * (l : S) ^ n = 1 := by
     exact_mod_cast congrArg (Int.cast : ℤ → S) hab
   have hy : y = ((a : S) * ((l : S) ^ t * x' ^ k) + (b : S) * y) * (l : S) ^ n := by
-    calc y = ((a : S) * (m : S) + (b : S) * (l : S) ^ n) * y := by rw [hab', one_mul]
+    calc
+      y = ((a : S) * (m : S) + (b : S) * (l : S) ^ n) * y := by rw [hab', one_mul]
       _ = (a : S) * ((m : S) * y) + (b : S) * (l : S) ^ n * y := by ring
       _ = _ := by rw [e3]; ring
   rw [hy]
   exact Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _)
 
-theorem exists_dividedPowers_map_mkAcr {l : ℕ} [hl : Fact l.Prime] (A : PAlg l) (n : ℕ)
-    (I : Ideal A.Acr0) (hI : R.PdI I) (K : Ideal (A.Acr n)) (hK : K = I.map (A.mkAcr n)) :
-    ∃ δ : DividedPowers K, R.IsPd (A.mkAcr n) I δ := by
+theorem exists_dividedPowers_map_mkAcr
+    {l : ℕ} [hl : Fact l.Prime]
+    (A : PAlg l)
+    (n : ℕ)
+    (I : Ideal A.Acr0) (hI : R.PdI I)
+    (K : Ideal (A.Acr n)) (hK : K = I.map (A.mkAcr n))
+    : ∃ δ : DividedPowers K, R.IsPd (A.mkAcr n) I δ := by
   subst hK
   exact GlobalTheory.CompanionTheory.PdTF.exists_dividedPowers_map_quotient A.acris_torsion_free I
     (Ideal.span {(l : A.Acr0) ^ n}) hI
     fun x _ hx k hk y e => mem_span_pow_of_factorial_mul_eq A.acris_torsion_free hl.out n hx hk e
 
-theorem exists_dividedPowers_fil_pfil : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ),
-    (∃ δ : DividedPowers (A.Fil n 1), R.IsPd (A.mkAcr n) (A.Fil0 1) δ) ∧
-      ∃ δ : DividedPowers (A.PFil n), R.IsPd (A.mkAcr n) A.PFil0 δ := by
+theorem exists_dividedPowers_fil_pfil
+    : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ),
+      (∃ δ : DividedPowers (A.Fil n 1), R.IsPd (A.mkAcr n) (A.Fil0 1) δ)
+        ∧ ∃ δ : DividedPowers (A.PFil n), R.IsPd (A.mkAcr n) A.PFil0 δ := by
   intro l _ A n
   obtain ⟨-, -, -, -, h1, h2, -⟩ := GlobalTheory.T.crystalline_filtration_multiplicative A
   obtain ⟨p1, p2, -⟩ := GlobalTheory.T.filtration_divided_power_structures A
-  exact ⟨exists_dividedPowers_map_mkAcr A n _ p1 _ (h1 n 1),
-    exists_dividedPowers_map_mkAcr A n _ p2 _ (h2 n)⟩
+  exact ⟨
+    exists_dividedPowers_map_mkAcr A n _ p1 _ (h1 n 1),
+    exists_dividedPowers_map_mkAcr A n _ p2 _ (h2 n)
+  ⟩
 
 end GlobalTheory.CompanionTheory.PerfFil

@@ -16,26 +16,29 @@ section Fam
 
 variable {ι : Type} [Fintype ι]
 
-def kap (b : ι → Fin 2 → Fin 2 → ℂ) : ι → Fin 2 → Fin 2 → ℝ :=
-  fun τ i k => if (i : ℕ) ≤ k then (b τ i k).re else (b τ k i).im
+def kap (b : ι → Fin 2 → Fin 2 → ℂ) : ι → Fin 2 → Fin 2 → ℝ := fun τ i k =>
+  if (i : ℕ) ≤ k then (b τ i k).re else (b τ k i).im
 
-def th (y : ι → Fin 2 → Fin 2 → ℝ) : ι → Fin 2 → Fin 2 → ℂ :=
-  fun τ i k => if i = k then (y τ i k : ℂ) else if (i : ℕ) < k then (y τ i k : ℂ) + I * y τ k i
-    else (y τ k i : ℂ) - I * y τ i k
+def th (y : ι → Fin 2 → Fin 2 → ℝ) : ι → Fin 2 → Fin 2 → ℂ := fun τ i k =>
+  if i = k then
+    (y τ i k : ℂ)
+  else if (i : ℕ) < k then
+    (y τ i k : ℂ) + I * y τ k i
+  else
+    (y τ k i : ℂ) - I * y τ i k
 
 def kapL : (ι → Fin 2 → Fin 2 → ℂ) →ₗ[ℝ] (ι → Fin 2 → Fin 2 → ℝ) where
   toFun := kap
-  map_add' b c := by
-    funext τ i k; simp only [kap, Pi.add_apply]; split_ifs <;> simp
+  map_add' b c := by funext τ i k; simp only [kap, Pi.add_apply]; split_ifs <;> simp
   map_smul' s b := by
     funext τ i k; simp only [kap, Pi.smul_apply, RingHom.id_apply]; split_ifs <;> simp
 
 def thL : (ι → Fin 2 → Fin 2 → ℝ) →ₗ[ℝ] (ι → Fin 2 → Fin 2 → ℂ) where
   toFun := th
-  map_add' y z := by
-    funext τ i k; simp only [th, Pi.add_apply]; split_ifs <;> push_cast <;> ring
+  map_add' y z := by funext τ i k; simp only [th, Pi.add_apply]; split_ifs <;> push_cast <;> ring
   map_smul' s y := by
-    funext τ i k; simp only [th, Pi.smul_apply, RingHom.id_apply, smul_eq_mul, Complex.real_smul]
+    funext τ i k
+    simp only [th, Pi.smul_apply, RingHom.id_apply, smul_eq_mul, Complex.real_smul]
     split_ifs <;> push_cast <;> ring
 
 lemma th_herm (y : ι → Fin 2 → Fin 2 → ℝ) : IsHermFam (th y) := by
@@ -87,7 +90,8 @@ def prL (χ : ι → Fin 2 → Fin 2 → ℂ) : (ι → Fin 2 → Fin 2 → ℂ)
 def prR (b : ι → Fin 2 → Fin 2 → ℂ) : (ι → Fin 2 → Fin 2 → ℂ) →ₗ[ℝ] ℝ where
   toFun χ := pr χ b
   map_add' χ ψ := pr_add_left χ ψ b
-  map_smul' s χ := by simp only [RingHom.id_apply, smul_eq_mul]; rw [← Complex.coe_smul, pr_smul_left]
+  map_smul' s χ := by
+    simp only [RingHom.id_apply, smul_eq_mul]; rw [← Complex.coe_smul, pr_smul_left]
 
 lemma pr_sum {N : ℕ} (χ : ι → Fin 2 → Fin 2 → ℂ) (c : Fin N → ℝ) (ω : Fin N → ι → Fin 2 → Fin 2 → ℂ) :
     pr χ (∑ j, (c j : ℂ) • ω j) = ∑ j, c j * pr χ (ω j) := by
@@ -133,9 +137,10 @@ lemma kap_li (hω : ∀ j, IsHermFam (ω j)) (hli : LinearIndependent ℝ ω) :
   rw [map_smul]
   exact congrArg _ (th_kap (hω j)).symm
 
-def basR (hω : ∀ j, IsHermFam (ω j)) (hli : LinearIndependent ℝ ω) (hN : N = 4 * Fintype.card ι) :
-    Module.Basis (Fin N) ℝ (ι → Fin 2 → Fin 2 → ℝ) :=
-  basisOfLinearIndependentOfCardEqFinrank' _ (kap_li ω hω hli) (by rw [Fintype.card_fin, finrank_rfam, hN])
+def basR (hω : ∀ j, IsHermFam (ω j)) (hli : LinearIndependent ℝ ω) (hN : N = 4 * Fintype.card ι)
+    : Module.Basis (Fin N) ℝ (ι → Fin 2 → Fin 2 → ℝ) :=
+  basisOfLinearIndependentOfCardEqFinrank' _ (kap_li ω hω hli)
+    (by rw [Fintype.card_fin, finrank_rfam, hN])
 
 lemma herm_eq_sum (hω : ∀ j, IsHermFam (ω j)) (hli : LinearIndependent ℝ ω)
     (hN : N = 4 * Fintype.card ι) {b : ι → Fin 2 → Fin 2 → ℂ} (hb : IsHermFam b) :
@@ -179,8 +184,10 @@ lemma phiL_surj (hω : ∀ j, IsHermFam (ω j)) (hli : LinearIndependent ℝ ω)
     (hN : N = 4 * Fintype.card ι) : Function.Surjective (phiL ω) := (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
     (by rw [finrank_rfam, Module.finrank_fin_fun, hN])).mp (phiL_inj ω hω hli hN)
 
-def chiOf (hω : ∀ j, IsHermFam (ω j)) (hli : LinearIndependent ℝ ω)
-    (hN : N = 4 * Fintype.card ι) (m : Fin N → ℝ) : ι → Fin 2 → Fin 2 → ℂ :=
+def chiOf
+    (hω : ∀ j, IsHermFam (ω j)) (hli : LinearIndependent ℝ ω) (hN : N = 4 * Fintype.card ι)
+    (m : Fin N → ℝ)
+    : ι → Fin 2 → Fin 2 → ℂ :=
   th ((LinearEquiv.ofBijective (phiL ω) ⟨phiL_inj ω hω hli hN, phiL_surj ω hω hli hN⟩).symm m)
 
 variable (hω : ∀ j, IsHermFam (ω j)) (hli : LinearIndependent ℝ ω) (hN : N = 4 * Fintype.card ι)
@@ -211,8 +218,8 @@ end Basis
 
 section ZbFacts
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
-  (u : Fin 2 → Fin r → E)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r) (u : Fin 2 → Fin r → E)
 
 lemma mat_Zb (b : X.Ψ → Fin 2 → Fin 2 → ℂ) (x : Frame X.Ψ r) (τ : X.Ψ) :
     mat (X.Zb u b x) τ = X.zmat u b τ * mat x τ := rfl

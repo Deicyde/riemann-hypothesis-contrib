@@ -22,22 +22,27 @@ theorem enlarge_initial_lattice : EnlargeInitialLattice := by
   have c := (idxCutLe K Z w ⊤ W Th1 Th1 h1 h1 le_rfl le_top).1
   have d : cut W Th1 ≤ cut W Th := inf_le_inf_right _ h1T
   have e := idxMono K Z w W (cut W M) (cut W Th1) (cut W Th) a c b d
-  have e' : (lix w (cut W M) (cut W Th) : ℝ) ≤ (lix w (cut W M) (cut W Th1) : ℝ) := by exact_mod_cast e
+  have e' : (lix w (cut W M) (cut W Th) : ℝ) ≤ (lix w (cut W M) (cut W Th1) : ℝ) := by
+    exact_mod_cast e
   exact le_trans e' (h W)
 
 theorem twist_chain : TwChain := by
   intro K _ _ _ Z _ _ _ _ _ w W e A Th0 ThJ X₃ hA h0 hJ hle ε h
   have a := idxMono K Z w W A _ _ hA h0 hJ (Submodule.map_mono hle)
-  have a' : (lix w A (ThJ.map (e.restrictScalars (𝓞 K))) : ℝ) ≤
-      (lix w A (Th0.map (e.restrictScalars (𝓞 K))) : ℝ) := by exact_mod_cast a
+  have a'
+      : (lix w A (ThJ.map (e.restrictScalars (𝓞 K))) : ℝ)
+        ≤ (lix w A (Th0.map (e.restrictScalars (𝓞 K))) : ℝ) := by
+    exact_mod_cast a
   linarith
 
 theorem local_conditions_family : OnLocalJ := by
-  intro K _ _ _ Z _ _ _ _ _ w P _ _ ρ U ψ hMk V₀ e he hr M Th ThK Th0 ThJ X₃ X₄ hM hTh hThK hle hFG hEig hMs hTs
-    σ hσ hsc hdata a E r ha hE hT0 h0 hJ h0J h3 h4 h34 ε hTW d φ hinj hrng Mj Tj hMj hTj
-  exact onLocal K Z w P ρ U ψ hMk V₀ e he hr M Th ThK Th0 X₃ X₄ hM hTh hThK hle hFG hEig hMs hTs σ hσ hsc hdata
-    a E r ha hE hT0 h0 h3 h4 h34 ε
-    (twist_chain K Z w _ e _ Th0 ThJ X₃ (idxCutLe K Z w ⊤ _ M Th hM hTh hle le_top).1 h0 hJ h0J ε hTW)
+  intro K _ _ _ Z _ _ _ _ _ w P _ _ ρ U ψ hMk V₀ e he hr M Th ThK Th0 ThJ X₃ X₄ hM hTh hThK hle hFG
+    hEig hMs hTs σ hσ hsc hdata a E r ha hE hT0 h0 hJ h0J h3 h4 h34 ε hTW d φ hinj hrng Mj Tj hMj
+    hTj
+  exact onLocal K Z w P ρ U ψ hMk V₀ e he hr M Th ThK Th0 X₃ X₄ hM hTh hThK hle hFG hEig hMs hTs σ
+    hσ hsc hdata a E r ha hE hT0 h0 h3 h4 h34 ε
+    (twist_chain K Z w _ e _ Th0 ThJ X₃ (idxCutLe K Z w ⊤ _ M Th hM hTh hle le_top).1 h0 hJ h0J ε
+      hTW)
     d φ hinj hrng Mj Tj hMj hTj
 
 theorem theta_identity : ThetaIdentity := by
@@ -84,7 +89,11 @@ theorem theta_identity_orthogonal : ThetaIdentityOrth := by
       rw [← LinearMap.mem_ker, hker]
       exact hkerθ _ (hsub x)
     rw [h1, map_add (f := _), h2, add_zero, hfix _ (hEr _ (hrp x))]
-  refine ⟨LinearMap.ext hcomm, fun x hx => ⟨?_, hsub x, fun k hk => (hrange (p x)).1 (hrp x) k hk⟩, fun Mt => ?_⟩
+  refine ⟨
+    LinearMap.ext hcomm,
+    fun x hx => ⟨?_, hsub x, fun k hk => (hrange (p x)).1 (hrp x) k hk⟩,
+    fun Mt => ?_
+  ⟩
   · obtain ⟨y, rfl⟩ := hx
     rw [hcomm]
     exact LinearMap.mem_range_self eX (p y)
@@ -103,8 +112,11 @@ theorem theta_identity_orthogonal : ThetaIdentityOrth := by
     · rintro ⟨z, ⟨m, hm, rfl⟩, rfl⟩
       exact ⟨eX (p m), ⟨p m, ⟨m, hm, rfl⟩, rfl⟩, key m⟩
 
-private theorem vw_mul_lemma (K : Type) [Field K] [NumberField K] [StarRing K] (w : HeightOneSpectrum (𝓞 K))
-    (a b : K) (ha : a ≠ 0) (hb : b ≠ 0) : vw w (a * b) = vw w a + vw w b := by
+private theorem vw_mul_lemma
+    (K : Type) [Field K] [NumberField K] [StarRing K]
+    (w : HeightOneSpectrum (𝓞 K))
+    (a b : K) (ha : a ≠ 0) (hb : b ≠ 0)
+    : vw w (a * b) = vw w a + vw w b := by
   unfold vw
   rw [← FractionalIdeal.spanSingleton_mul_spanSingleton]
   apply FractionalIdeal.count_mul <;> rwa [Ne, FractionalIdeal.spanSingleton_eq_zero_iff]
@@ -125,37 +137,37 @@ theorem constant_b_bound : ConstB := by
     nlinarith [k1, k2]
   have hN : 0 ≤ RR * PP * DF ^ 2 := mul_nonneg (mul_nonneg hRR hPP0) (sq_nonneg DF)
   have hinv : g'⁻¹ ≤ qmin⁻¹ := by
-    first
-      | exact inv_anti₀ hq hqg
-      | exact inv_le_inv_of_le hq hqg
-      | exact (inv_le_inv hg hq).2 hqg
-  calc n1 * d' * (RR * d' ^ 3) / (4 * g') + 2 * (RR * d' ^ 3) * DF ^ 2 / g'
-      = (n1 * d' * (RR * d' ^ 3) / 4 + 2 * (RR * d' ^ 3) * DF ^ 2) * g'⁻¹ := by
-        first
-          | ring
-          | (field_simp; ring)
+    first | exact inv_anti₀ hq hqg | exact inv_le_inv_of_le hq hqg | exact (inv_le_inv hg hq).2 hqg
+  calc
+    n1 * d' * (RR * d' ^ 3) / (4 * g') + 2 * (RR * d' ^ 3) * DF ^ 2 / g'
+        = (n1 * d' * (RR * d' ^ 3) / 4 + 2 * (RR * d' ^ 3) * DF ^ 2) * g'⁻¹ := by
+      first | ring | (field_simp; ring)
     _ ≤ RR * PP * DF ^ 2 * g'⁻¹ := mul_le_mul_of_nonneg_right hC (inv_nonneg.mpr hg.le)
     _ ≤ RR * PP * DF ^ 2 * qmin⁻¹ := mul_le_mul_of_nonneg_left hinv hN
     _ = RR * PP * DF ^ 2 / qmin := by rw [div_eq_mul_inv]
 
 theorem local_conditions_weighted : LocalConditionsWeighted := by
-  intro K _ _ _ Z _ _ _ _ _ w P _ _ ρ U ψ hMk V₀ e he hr M Th1 Th ThK Th0 ThJ X₃ hM hTh1 hTh hThK h1le hle hFG hEig
-    hMs hTs σ hσ hsc hdata a E r ha hE hT0 h0 hJ h0J h3 X _ _ _ _ θ' eX pr Mt hc hk h4 h34 ε hTW d φ hinj hrng
-    Mj Tj hMj hTj
+  intro K _ _ _ Z _ _ _ _ _ w P _ _ ρ U ψ hMk V₀ e he hr M Th1 Th ThK Th0 ThJ X₃ hM hTh1 hTh hThK
+    h1le hle hFG hEig hMs hTs σ hσ hsc hdata a E r ha hE hT0 h0 hJ h0J h3 X _ _ _ _ θ' eX pr Mt hc
+    hk h4 h34 ε hTW d φ hinj hrng Mj Tj hMj hTj
   have hT0' := enlarge_initial_lattice K Z w M Th1 Th hM hTh1 hTh h1le hle (E : ℝ) r hT0
-  have hc' : (θ'.restrictScalars (𝓞 K)) ∘ₗ (eX.restrictScalars (𝓞 K)) =
-      (e.restrictScalars (𝓞 K)) ∘ₗ (θ'.restrictScalars (𝓞 K)) :=
+  have hc'
+      : (θ'.restrictScalars (𝓞 K)) ∘ₗ (eX.restrictScalars (𝓞 K))
+        = (e.restrictScalars (𝓞 K)) ∘ₗ (θ'.restrictScalars (𝓞 K)) :=
     LinearMap.ext fun x => LinearMap.congr_fun hc x
-  have hk' : ∀ x ∈ LinearMap.range (eX.restrictScalars (𝓞 K)),
-      x - (pr.restrictScalars (𝓞 K)) x ∈ LinearMap.ker (θ'.restrictScalars (𝓞 K)) := by
+  have hk'
+      : ∀ x ∈ LinearMap.range (eX.restrictScalars (𝓞 K)),
+        x - (pr.restrictScalars (𝓞 K)) x ∈ LinearMap.ker (θ'.restrictScalars (𝓞 K)) := by
     intro x hx
     obtain ⟨y, rfl⟩ := LinearMap.mem_range.1 hx
     exact LinearMap.mem_ker.2 (LinearMap.mem_ker.1 (hk _ (LinearMap.mem_range_self eX y)))
-  have hid := theta_identity (𝓞 K) X Z (θ'.restrictScalars (𝓞 K)) (eX.restrictScalars (𝓞 K))
-    (pr.restrictScalars (𝓞 K)) (e.restrictScalars (𝓞 K)) hc' hk' Mt
+  have hid :=
+    theta_identity (𝓞 K) X Z (θ'.restrictScalars (𝓞 K)) (eX.restrictScalars (𝓞 K))
+      (pr.restrictScalars (𝓞 K)) (e.restrictScalars (𝓞 K)) hc' hk' Mt
   exact local_conditions_family K Z w P ρ U ψ hMk V₀ e he hr M Th ThK Th0 ThJ X₃
-    ((Mt.map (θ'.restrictScalars (𝓞 K))).map (e.restrictScalars (𝓞 K))) hM hTh hThK hle hFG hEig hMs hTs
-    σ hσ hsc hdata a E r ha hE hT0' h0 hJ h0J h3 h4 h34 ε hTW d φ hinj hrng Mj Tj hMj (hTj.trans hid)
+    ((Mt.map (θ'.restrictScalars (𝓞 K))).map (e.restrictScalars (𝓞 K))) hM hTh hThK hle hFG hEig hMs
+    hTs σ hσ hsc hdata a E r ha hE hT0' h0 hJ h0J h3 h4 h34 ε hTW d φ hinj hrng Mj Tj hMj
+    (hTj.trans hid)
 
 theorem gapConditions_of_largeGaps : GapNum := by
   intro T D nW r t h0 c hD hr ht hnW hT
@@ -167,7 +179,6 @@ theorem gapConditions_of_largeGaps : GapNum := by
   have e : (3.75 : ℝ) = 15 / 4 := by norm_num
   rw [e]
   exact ⟨by nlinarith [sq_nonneg T], fun hh hc => by nlinarith [sq_nonneg T]⟩
-
 
 section Instance
 

@@ -7,39 +7,49 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExtId
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.UChart GlobalTheory.UCanon GlobalTheory.PolDeg GlobalTheory.TInj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.UChart
+  GlobalTheory.UCanon GlobalTheory.PolDeg GlobalTheory.TInj
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.BalMono
 
-theorem coords_eq_zero {O : Type} [CommRing O] [StarRing O] [IsDedekindDomain O]
-    [Module.Finite ℤ O] [Module.Free ℤ O] {w : O} (hw : w + star w = 1)
+theorem coords_eq_zero
+    {O : Type} [CommRing O] [StarRing O] [IsDedekindDomain O] [Module.Finite ℤ O] [Module.Free ℤ O]
+    {w : O} (hw : w + star w = 1)
     {X : Type} [AddCommGroup X] [Module O X] [Module.Finite ℤ X] [Module.Free ℤ X]
-    {J : Type} [Fintype J] (ε : Module.Basis J ℤ (PolFan.balForms (star : O → O) X))
-    {B : Type} [AddCommGroup B] (c : J → B)
-    (hc : ∀ a b, ∑ k, (ε k : LinearMap.BilinForm ℤ X) a b • c k = 0) (k : J) : c k = 0 := by
+    {J : Type} [Fintype J]
+    (ε : Module.Basis J ℤ (PolFan.balForms (star : O → O) X))
+    {B : Type} [AddCommGroup B]
+    (c : J → B) (hc : ∀ a b, ∑ k, (ε k : LinearMap.BilinForm ℤ X) a b • c k = 0)
+    (k : J)
+    : c k = 0 := by
   classical
   have := Forms.projective_of_int O X
   have := Forms.finite_balTensor (O := O) (X := X)
   have := Forms.free_balTensor (X := X) hw
   let e := Module.Free.chooseBasis ℤ ((TensorProduct ℤ X X) ⧸ Forms.balTensorRel (O := O) (X := X))
   have hm := Forms.balTensorMk_mem_balForms O X
-  let β : _ → PolFan.balForms (star : O → O) X := fun j =>
-    ⟨(Forms.balTensorMk O).compr₂ (e.coord j),
-      fun y x => congrArg (e.coord j) (hm.1 y x), fun a y x => congrArg (e.coord j) (hm.2 a y x)⟩
+  let β : _ → PolFan.balForms (star : O → O) X := fun j => ⟨
+    (Forms.balTensorMk O).compr₂ (e.coord j),
+    fun y x => congrArg (e.coord j) (hm.1 y x),
+    fun a y x => congrArg (e.coord j) (hm.2 a y x)
+  ⟩
   let L : J → ((TensorProduct ℤ X X) ⧸ Forms.balTensorRel (O := O) (X := X)) →+ ℤ := fun i =>
     Forms.balTensorLift (O := O) ⟨(ε i : LinearMap.BilinForm ℤ X), (ε i).2.1, (ε i).2.2⟩
   have hL (i a b) : L i (Forms.balTensorMk O a b) = (ε i : LinearMap.BilinForm ℤ X) a b := rfl
   let Φ : ((TensorProduct ℤ X X) ⧸ Forms.balTensorRel (O := O) (X := X)) →+ B :=
     ∑ i, (zmultiplesHom B (c i)).comp (L i)
-  have hΦa (t) : Φ t = ∑ i, L i t • c i := by
-    simp [Φ, AddMonoidHom.finsetSum_apply]
-  have hΦ : Φ = 0 := Forms.balTensor_hom_ext fun a b => by
-    rw [hΦa]
-    exact hc a b
+  have hΦa (t) : Φ t = ∑ i, L i t • c i := by simp [Φ, AddMonoidHom.finsetSum_apply]
+  have hΦ : Φ = 0 :=
+    Forms.balTensor_hom_ext fun a b => by
+      rw [hΦa]
+      exact hc a b
   have hε (i) : ε i = ∑ j, L i (e j) • β j := by
     apply Subtype.ext
     refine LinearMap.ext fun a => LinearMap.ext fun b => ?_
@@ -62,7 +72,15 @@ theorem coords_eq_zero {O : Type} [CommRing O] [StarRing O] [IsDedekindDomain O]
   simp only [hδ, hΦ, AddMonoidHom.zero_apply] at h
   simpa [Finsupp.single_apply] using h.symm
 
-theorem eq_of_prod_zpow_eq : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Free ℤ X] [Module.Finite ℤ X] (F : Type) [Field F] (I : Type) [Fintype I] (ε : Module.Basis I ℤ (balForms H.bar X)) (x y : I → F), (∀ i, x i ≠ 0) → (∀ i, y i ≠ 0) → (∀ a b, ∏ i, x i ^ (ε i : LinearMap.BilinForm ℤ X) a b = ∏ i, y i ^ (ε i : LinearMap.BilinForm ℤ X) a b) → x = y := by
+theorem eq_of_prod_zpow_eq
+    : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) (X : Type) [AddCommGroup X]
+        [Module (𝓞 E) X] [Module.Free ℤ X] [Module.Finite ℤ X] (F : Type) [Field F] (I : Type)
+        [Fintype I] (ε : Module.Basis I ℤ (balForms H.bar X)) (x y : I → F),
+      (∀ i, x i ≠ 0) → (∀ i, y i ≠ 0)
+        → (∀ a b,
+          ∏ i, x i ^ (ε i : LinearMap.BilinForm ℤ X) a b
+            = ∏ i, y i ^ (ε i : LinearMap.BilinForm ℤ X) a b)
+        → x = y := by
   intro E _ _ _ H X _ _ _ _ F _ I _ ε x y hx hy h
   letI : StarRing (𝓞 E) :=
     { star := H.bar
@@ -81,11 +99,14 @@ theorem eq_of_prod_zpow_eq : ∀ {E : Type} [Field E] [NumberField E] [IsCMField
     apply Units.ext
     simpa [u, v, Units.coe_prod] using h a b
   funext k
-  have hk := coords_eq_zero (O := 𝓞 E) hw ε (fun i => Additive.ofMul (u i / v i))
-    (fun a b => by
-      apply Additive.toMul.injective
-      simp only [toMul_sum, toMul_zsmul, toMul_ofMul, toMul_zero]
-      exact huv a b) k
+  have hk :=
+    coords_eq_zero (O := 𝓞 E) hw ε
+      (fun i => Additive.ofMul (u i / v i))
+      (fun a b => by
+        apply Additive.toMul.injective
+        simp only [toMul_sum, toMul_zsmul, toMul_ofMul, toMul_zero]
+        exact huv a b)
+      k
   have hk' : u k / v k = 1 := hk
   simpa [u, v] using congrArg Units.val (div_eq_one.1 hk')
 

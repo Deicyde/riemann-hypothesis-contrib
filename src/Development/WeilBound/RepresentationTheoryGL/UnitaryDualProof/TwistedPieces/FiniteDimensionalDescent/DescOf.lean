@@ -10,8 +10,11 @@ open PositivityTheory.RgUd.T PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.D
 
 variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem desc_of (hR : Restr k) (hP : PieceGood k) (p : ℕ) [Fact p.Prime] [CharP k p]
-    (hU : PositivityTheory.RgUd.T.Desc.SLF.Unimod (k := k)) : Desc k := by
+theorem desc_of
+    (hR : Restr k) (hP : PieceGood k)
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (hU : PositivityTheory.RgUd.T.Desc.SLF.Unimod (k := k))
+    : Desc k := by
   refine ⟨fun n Z => mu Z, fun n Z hZ χ => ?_⟩
   obtain ⟨N, q, Z', hZ', hmu, hq, hr, hb, hpull⟩ := hR p n Z hZ
   obtain ⟨l, hl⟩ := hpull χ

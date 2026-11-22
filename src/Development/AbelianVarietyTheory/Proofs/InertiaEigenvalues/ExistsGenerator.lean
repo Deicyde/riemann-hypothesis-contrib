@@ -8,15 +8,18 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpS
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
 
 namespace GlobalTheory.LineLattice
 
-theorem exists_generator {LL : Type} [Field LL] {O : Type} [CommRing O] [IsDomain O]
-    [Algebra O LL] [IsFractionRing O LL] {V : Type} [AddCommGroup V] [Module LL V] [Module O V]
-    [IsScalarTower O LL V] (T : Submodule O V) [Module.Free O T]
-    (hsp : Submodule.span LL (T : Set V) = ⊤) (h1 : Module.finrank LL V = 1) :
-    ∃ v : V, v ≠ 0 ∧ T = Submodule.span O {v} := by
+theorem exists_generator
+    {LL : Type} [Field LL]
+    {O : Type} [CommRing O] [IsDomain O] [Algebra O LL] [IsFractionRing O LL]
+    {V : Type} [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
+    (T : Submodule O V) [Module.Free O T]
+    (hsp : Submodule.span LL (T : Set V) = ⊤) (h1 : Module.finrank LL V = 1)
+    : ∃ v : V, v ≠ 0 ∧ T = Submodule.span O {v} := by
   classical
   have hfin : Module.Finite LL V := Module.finite_of_finrank_eq_succ h1
   let b := Module.Free.chooseBasis O T
@@ -37,8 +40,7 @@ theorem exists_generator {LL : Type} [Field LL] {O : Type} [CommRing O] [IsDomai
   rcases isEmpty_or_nonempty (Module.Free.ChooseBasisIndex O T) with he | ⟨⟨i⟩⟩
   · exfalso
     rw [Set.range_eq_empty, Submodule.span_empty] at hT
-    have hb : Submodule.span LL (T : Set V) = ⊥ := by
-      rw [hT]; simp
+    have hb : Submodule.span LL (T : Set V) = ⊥ := by rw [hT]; simp
     have : Nontrivial V := Module.nontrivial_of_finrank_eq_succ h1
     exact bot_ne_top (hb.symm.trans hsp)
   · refine ⟨b i, hli.ne_zero i, ?_⟩
@@ -47,17 +49,21 @@ theorem exists_generator {LL : Type} [Field LL] {O : Type} [CommRing O] [IsDomai
     ext x
     constructor
     · rintro ⟨j, rfl⟩
-      rw [Subsingleton.elim j i]; rfl
+      rw [Subsingleton.elim j i]
+      rfl
     · rintro rfl
       exact ⟨i, rfl⟩
 
-theorem lattice_rank_one {G : Type} [Group G] {LL : Type} [Field LL] {O : Type} [CommRing O]
-    [IsDomain O] [Algebra O LL] [IsFractionRing O LL] {V : Type} [AddCommGroup V] [Module LL V]
-    [Module O V] [IsScalarTower O LL V] {ρ : Representation LL G V} (L : Lattice (O := O) ρ)
-    (h1 : Module.finrank LL V = 1) :
-    (∃ e : LL ≃ₗ[LL] V, ∀ x : LL, e x ∈ L.T ↔ x ∈ Set.range (algebraMap O LL)) ∧
-    ∀ a : O, a ≠ 0 →
-      Nonempty (↥(Submodule.torsionBy O (V ⧸ L.T) a) ≃ₗ[O] (O ⧸ Ideal.span {a})) := by
+theorem lattice_rank_one
+    {G : Type} [Group G]
+    {LL : Type} [Field LL]
+    {O : Type} [CommRing O] [IsDomain O] [Algebra O LL] [IsFractionRing O LL]
+    {V : Type} [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
+    {ρ : Representation LL G V} (L : Lattice (O := O) ρ)
+    (h1 : Module.finrank LL V = 1)
+    : (∃ e : LL ≃ₗ[LL] V, ∀ x : LL, e x ∈ L.T ↔ x ∈ Set.range (algebraMap O LL))
+      ∧ ∀ a : O,
+        a ≠ 0 → Nonempty (↥(Submodule.torsionBy O (V ⧸ L.T) a) ≃ₗ[O] (O ⧸ Ideal.span {a})) := by
   haveI := L.free
   obtain ⟨v, hv, hT⟩ := exists_generator L.T L.span h1
   have hsurj : ∀ w : V, ∃ c : LL, c • v = w := (finrank_eq_one_iff_of_nonzero' v hv).1 h1
@@ -71,20 +77,22 @@ theorem lattice_rank_one {G : Type} [Group G] {LL : Type} [Field LL] {O : Type} 
       exact smul_left_injective LL hv hc
     · rintro ⟨c, rfl⟩
       exact ⟨c, (algebraMap_smul LL c v).symm⟩
-  refine ⟨⟨LinearEquiv.ofBijective (LinearMap.toSpanSingleton LL V v)
-    ⟨smul_left_injective LL hv, hsurj⟩, hmem⟩, ?_⟩
+  refine ⟨
+    ⟨
+      LinearEquiv.ofBijective (LinearMap.toSpanSingleton LL V v) ⟨smul_left_injective LL hv, hsurj⟩,
+      hmem
+    ⟩,
+    ?_
+  ⟩
   intro a ha
-  have ha' : algebraMap O LL a ≠ 0 := by
-    simpa using ha
+  have ha' : algebraMap O LL a ≠ 0 := by simpa using ha
   have hx : L.T.mkQ ((algebraMap O LL a)⁻¹ • v) ∈ Submodule.torsionBy O (V ⧸ L.T) a := by
-    rw [Submodule.mem_torsionBy_iff, ← map_smul, Submodule.mkQ_apply,
-      Submodule.Quotient.mk_eq_zero, ← algebraMap_smul LL a, smul_smul, hmem,
-      mul_inv_cancel₀ ha']
+    rw [Submodule.mem_torsionBy_iff, ← map_smul, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero,
+      ← algebraMap_smul LL a, smul_smul, hmem, mul_inv_cancel₀ ha']
     exact ⟨1, map_one _⟩
-  let f : O →ₗ[O] Submodule.torsionBy O (V ⧸ L.T) a :=
-    LinearMap.toSpanSingleton O _ ⟨_, hx⟩
-  have hf : ∀ c : O, (f c : V ⧸ L.T) =
-      L.T.mkQ ((algebraMap O LL c * (algebraMap O LL a)⁻¹) • v) := by
+  let f : O →ₗ[O] Submodule.torsionBy O (V ⧸ L.T) a := LinearMap.toSpanSingleton O _ ⟨_, hx⟩
+  have hf
+      : ∀ c : O, (f c : V ⧸ L.T) = L.T.mkQ ((algebraMap O LL c * (algebraMap O LL a)⁻¹) • v) := by
     intro c
     rw [← smul_smul, algebraMap_smul, map_smul]
     rfl
@@ -92,8 +100,9 @@ theorem lattice_rank_one {G : Type} [Group G] {LL : Type} [Field LL] {O : Type} 
     rintro ⟨y, hy⟩
     obtain ⟨w, rfl⟩ := L.T.mkQ_surjective y
     obtain ⟨x, rfl⟩ := hsurj w
-    rw [Submodule.mem_torsionBy_iff, ← map_smul, Submodule.mkQ_apply,
-      Submodule.Quotient.mk_eq_zero, ← algebraMap_smul LL a, smul_smul, hmem] at hy
+    rw [Submodule.mem_torsionBy_iff, ← map_smul, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero,
+        ← algebraMap_smul LL a, smul_smul, hmem]
+      at hy
     obtain ⟨c, hc⟩ := hy
     refine ⟨c, Subtype.ext ?_⟩
     rw [hf, hc, mul_comm (algebraMap O LL a) x, mul_assoc, mul_inv_cancel₀ ha', mul_one]

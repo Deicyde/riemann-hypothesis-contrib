@@ -6,16 +6,19 @@ public import Mathlib
 
 namespace GlobalTheory.NormBoundOfSpan
 
-theorem norm_le_of_mem_span {K E ι : Type} [NormedField K] [AddCommGroup E] [Module K E]
-    (φ : ι → E →ₗ[K] K) :
-    ∀ f ∈ Submodule.span K (Set.range φ), ∃ (C : ℝ), (0 : ℝ) ≤ C ∧ ∀ (p : E) (r : ℝ),
-      (0 : ℝ) ≤ r → (∀ (j : ι), ‖(φ j : E → K) p‖ ≤ r) → ‖(f : E → K) p‖ ≤ C * r := by
+theorem norm_le_of_mem_span
+    {K E ι : Type} [NormedField K] [AddCommGroup E] [Module K E] (φ : ι → E →ₗ[K] K)
+    : ∀ f ∈ Submodule.span K (Set.range φ), ∃ (C : ℝ),
+      (0 : ℝ) ≤ C
+        ∧ ∀ (p : E) (r : ℝ),
+          (0 : ℝ) ≤ r → (∀ (j : ι), ‖(φ j : E → K) p‖ ≤ r) → ‖(f : E → K) p‖ ≤ C * r := by
   intro f hf
   induction hf using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨j, rfl⟩ := hx
     exact ⟨1, zero_le_one, fun p r _ h => by simpa using h j⟩
-  | zero => exact ⟨0, le_rfl, fun p r _ _ => by simp⟩
+  | zero =>
+    exact ⟨0, le_rfl, fun p r _ _ => by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨C, hC, h1⟩ := hx
     obtain ⟨D, hD, h2⟩ := hy

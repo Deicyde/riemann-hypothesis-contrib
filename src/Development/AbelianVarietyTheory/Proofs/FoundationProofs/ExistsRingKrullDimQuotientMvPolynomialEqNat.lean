@@ -13,19 +13,22 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 section Graded
 
-variable {A : Type*} [CommRing A] {τ : Type*} [SetLike τ A] [AddSubgroupClass τ A]
+variable
+  {A : Type*} [CommRing A]
+  {τ : Type*} [SetLike τ A] [AddSubgroupClass τ A]
   (𝒜 : ℕ → τ) [GradedRing 𝒜]
 
-theorem isHomogeneous_of_mem_minimalPrimes {J p : Ideal A} (hJ : J.IsHomogeneous 𝒜)
-    (hp : p ∈ J.minimalPrimes) : p.IsHomogeneous 𝒜 := by
+theorem isHomogeneous_of_mem_minimalPrimes
+    {J p : Ideal A} (hJ : J.IsHomogeneous 𝒜) (hp : p ∈ J.minimalPrimes)
+    : p.IsHomogeneous 𝒜 := by
   have hpp : p.IsPrime := hp.1.1
   rw [Ideal.IsHomogeneous.iff_eq]
   refine le_antisymm (Ideal.toIdeal_homogeneousCore_le _ _) ?_
   refine hp.2 ⟨hpp.homogeneousCore, ?_⟩ (Ideal.toIdeal_homogeneousCore_le _ _)
   exact hJ.toIdeal_homogeneousCore_eq_self.symm.trans_le (Ideal.homogeneousCore_mono _ hp.1.2)
 
-theorem exists_homogeneous_notMem_of_not_le {J p : Ideal A} (hJ : J.IsHomogeneous 𝒜)
-    (h : ¬ J ≤ p) : ∃ n, ∃ x ∈ 𝒜 n, x ∈ J ∧ x ∉ p := by
+theorem exists_homogeneous_notMem_of_not_le {J p : Ideal A} (hJ : J.IsHomogeneous 𝒜) (h : ¬ J ≤ p)
+    : ∃ n, ∃ x ∈ 𝒜 n, x ∈ J ∧ x ∉ p := by
   classical
   by_contra hcon
   push Not at hcon
@@ -33,11 +36,10 @@ theorem exists_homogeneous_notMem_of_not_le {J p : Ideal A} (hJ : J.IsHomogeneou
   rw [← DirectSum.sum_support_decompose 𝒜 x]
   exact p.sum_mem fun i _ => hcon i _ (SetLike.coe_mem _) (hJ i hx)
 
-theorem exists_homogeneous_forall_notMem (s : Finset (Ideal A))
-    (hprime : ∀ p ∈ s, p.IsPrime) (hhom : ∀ p ∈ s, p.IsHomogeneous 𝒜)
-    (hinc : ∀ p ∈ s, ∀ q ∈ s, q ≤ p → q = p)
-    (hpos : ∀ p ∈ s, ∃ n, 0 < n ∧ ∃ x ∈ 𝒜 n, x ∉ p) :
-    ∃ n, 0 < n ∧ ∃ x ∈ 𝒜 n, ∀ p ∈ s, x ∉ p := by
+theorem exists_homogeneous_forall_notMem
+    (s : Finset (Ideal A)) (hprime : ∀ p ∈ s, p.IsPrime) (hhom : ∀ p ∈ s, p.IsHomogeneous 𝒜)
+    (hinc : ∀ p ∈ s, ∀ q ∈ s, q ≤ p → q = p) (hpos : ∀ p ∈ s, ∃ n, 0 < n ∧ ∃ x ∈ 𝒜 n, x ∉ p)
+    : ∃ n, 0 < n ∧ ∃ x ∈ 𝒜 n, ∀ p ∈ s, x ∉ p := by
   classical
   have key : ∀ p : s, ∃ n, 0 < n ∧ ∃ g ∈ 𝒜 n, g ∉ p.1 ∧ ∀ q ∈ s, q ≠ p.1 → g ∈ q := by
     rintro ⟨p, hp⟩
@@ -75,18 +77,18 @@ theorem exists_homogeneous_forall_notMem (s : Finset (Ideal A))
 
 end Graded
 
-theorem ringKrullDim_quotient_radical_sup_succ_le {A : Type*} [CommRing A] (J : Ideal A) {f : A}
-    (hf : ∀ p ∈ J.minimalPrimes, f ∉ p) :
-    ringKrullDim (A ⧸ (J.radical ⊔ Ideal.span {f})) + 1 ≤ ringKrullDim (A ⧸ J) := by
-  refine le_trans ?_ (ringKrullDim_le_of_surjective (Ideal.Quotient.factor J.le_radical)
-    (Ideal.Quotient.factor_surjective _))
+theorem ringKrullDim_quotient_radical_sup_succ_le
+    {A : Type*} [CommRing A] (J : Ideal A) {f : A} (hf : ∀ p ∈ J.minimalPrimes, f ∉ p)
+    : ringKrullDim (A ⧸ (J.radical ⊔ Ideal.span {f})) + 1 ≤ ringKrullDim (A ⧸ J) := by
+  refine le_trans ?_
+    (ringKrullDim_le_of_surjective (Ideal.Quotient.factor J.le_radical)
+      (Ideal.Quotient.factor_surjective _))
   refine ringKrullDim_succ_le_of_surjective (Ideal.Quotient.factor le_sup_left)
     (Ideal.Quotient.factor_surjective _) (r := Ideal.Quotient.mk _ f) ?_ ?_
   · rw [mem_nonZeroDivisors_iff_right]
     intro x hx
     obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
-    rw [← map_mul, Ideal.Quotient.eq_zero_iff_mem, ← Ideal.sInf_minimalPrimes,
-      Ideal.mem_sInf] at hx
+    rw [← map_mul, Ideal.Quotient.eq_zero_iff_mem, ← Ideal.sInf_minimalPrimes, Ideal.mem_sInf] at hx
     rw [Ideal.Quotient.eq_zero_iff_mem, ← Ideal.sInf_minimalPrimes, Ideal.mem_sInf]
     intro p hp
     exact (hp.1.1.mem_or_mem (hx hp)).resolve_right (hf p hp)
@@ -97,19 +99,21 @@ section Poly
 
 variable {σ : Type*}
 
-theorem mem_idealOfVars_pow_of_isHomogeneous {R : Type*} [CommRing R] {p : MvPolynomial σ R}
-    {d n : ℕ} (hp : p.IsHomogeneous d) (h : n ≤ d) : p ∈ idealOfVars σ R ^ n := by
+theorem mem_idealOfVars_pow_of_isHomogeneous
+    {R : Type*} [CommRing R] {p : MvPolynomial σ R} {d n : ℕ} (hp : p.IsHomogeneous d) (h : n ≤ d)
+    : p ∈ idealOfVars σ R ^ n := by
   rw [mem_pow_idealOfVars_iff']
   intro x hx
   exact hp.coeff_eq_zero (by omega)
 
-theorem le_idealOfVars_of_isHomogeneous {k : Type*} [Field k] {J : Ideal (MvPolynomial σ k)}
-    (hJ : J.IsHomogeneous (homogeneousSubmodule σ k)) (hJ' : J ≠ ⊤) : J ≤ idealOfVars σ k := by
+theorem le_idealOfVars_of_isHomogeneous
+    {k : Type*} [Field k]
+    {J : Ideal (MvPolynomial σ k)} (hJ : J.IsHomogeneous (homogeneousSubmodule σ k)) (hJ' : J ≠ ⊤)
+    : J ≤ idealOfVars σ k := by
   intro x hx
   rw [← pow_one (idealOfVars σ k), mem_pow_idealOfVars_iff']
   intro m hm
-  have hm0 : m = 0 := by
-    rw [← Finsupp.degree_eq_zero_iff]; omega
+  have hm0 : m = 0 := by rw [← Finsupp.degree_eq_zero_iff]; omega
   subst hm0
   by_contra hne
   have h0 := homogeneousComponent_mem_of_mem hJ hx 0
@@ -122,12 +126,13 @@ theorem idealOfVars_ne_top {k : Type*} [Field k] : idealOfVars σ k ≠ ⊤ := f
 
 variable [Finite σ] {k : Type*} [Field k]
 
-theorem exists_form_forall_notMem_minimalPrimes {J : Ideal (MvPolynomial σ k)}
-    (hJ : J.IsHomogeneous (homogeneousSubmodule σ k)) (h : ¬ idealOfVars σ k ≤ J.radical) :
-    ∃ n, 0 < n ∧ ∃ f : MvPolynomial σ k, f.IsHomogeneous n ∧ ∀ p ∈ J.minimalPrimes, f ∉ p := by
+theorem exists_form_forall_notMem_minimalPrimes
+    {J : Ideal (MvPolynomial σ k)}
+    (hJ : J.IsHomogeneous (homogeneousSubmodule σ k)) (h : ¬ idealOfVars σ k ≤ J.radical)
+    : ∃ n, 0 < n ∧ ∃ f : MvPolynomial σ k, f.IsHomogeneous n ∧ ∀ p ∈ J.minimalPrimes, f ∉ p := by
   have hfin := J.finite_minimalPrimes_of_isNoetherianRing
-  have hhom : ∀ p ∈ J.minimalPrimes, p.IsHomogeneous (homogeneousSubmodule σ k) :=
-    fun p hp => isHomogeneous_of_mem_minimalPrimes _ hJ hp
+  have hhom : ∀ p ∈ J.minimalPrimes, p.IsHomogeneous (homogeneousSubmodule σ k) := fun p hp =>
+    isHomogeneous_of_mem_minimalPrimes _ hJ hp
   obtain ⟨q, hq, hqm⟩ : ∃ q ∈ J.minimalPrimes, ¬ idealOfVars σ k ≤ q := by
     by_contra hcon
     push Not at hcon
@@ -136,31 +141,39 @@ theorem exists_form_forall_notMem_minimalPrimes {J : Ideal (MvPolynomial σ k)}
     intro p hp hle
     have hqp : q ≤ p := (le_idealOfVars_of_isHomogeneous (hhom q hq) hq.1.1.ne_top).trans hle
     exact hqm (hle.trans (hp.2 hq.1 hqp))
-  obtain ⟨n, hn, f, hf, hfp⟩ := exists_homogeneous_forall_notMem (homogeneousSubmodule σ k)
-    hfin.toFinset (fun p hp => (hfin.mem_toFinset.mp hp).1.1)
-    (fun p hp => hhom p (hfin.mem_toFinset.mp hp))
-    (fun p hp q hq hqp => le_antisymm hqp
-      ((hfin.mem_toFinset.mp hp).2 (hfin.mem_toFinset.mp hq).1 hqp))
-    (fun p hp => by
-      have h1 := hnle p (hfin.mem_toFinset.mp hp)
-      rw [Ideal.span_le, Set.range_subset_iff] at h1
-      push Not at h1
-      obtain ⟨i, hi⟩ := h1
-      exact ⟨1, one_pos, X i, isHomogeneous_X k i, hi⟩)
+  obtain ⟨n, hn, f, hf, hfp⟩ :=
+    exists_homogeneous_forall_notMem (homogeneousSubmodule σ k) hfin.toFinset
+      (fun p hp => (hfin.mem_toFinset.mp hp).1.1)
+      (fun p hp => hhom p (hfin.mem_toFinset.mp hp))
+      (fun p hp q hq hqp =>
+        le_antisymm hqp ((hfin.mem_toFinset.mp hp).2 (hfin.mem_toFinset.mp hq).1 hqp))
+      (fun p hp => by
+        have h1 := hnle p (hfin.mem_toFinset.mp hp)
+        rw [Ideal.span_le, Set.range_subset_iff] at h1
+        push Not at h1
+        obtain ⟨i, hi⟩ := h1
+        exact ⟨1, one_pos, X i, isHomogeneous_X k i, hi⟩)
   exact ⟨n, hn, f, hf, fun p hp => hfp p (hfin.mem_toFinset.mpr hp)⟩
 
-theorem exists_forms_idealOfVars_le_radical (n : ℕ) :
-    ∀ (J : Ideal (MvPolynomial σ k)), J.IsHomogeneous (homogeneousSubmodule σ k) → J ≠ ⊤ →
-      ringKrullDim (MvPolynomial σ k ⧸ J) ≤ n →
-      ∃ e, 0 < e ∧ ∃ F : Fin n → MvPolynomial σ k, (∀ i, (F i).IsHomogeneous e) ∧
-        idealOfVars σ k ≤ (J ⊔ Ideal.span (Set.range F)).radical := by
-  have step : ∀ (J : Ideal (MvPolynomial σ k)), J.IsHomogeneous (homogeneousSubmodule σ k) →
-      J ≠ ⊤ → ¬ idealOfVars σ k ≤ J.radical →
-      ∃ m, 0 < m ∧ ∃ f : MvPolynomial σ k, f.IsHomogeneous m ∧
-        (J.radical ⊔ Ideal.span {f}).IsHomogeneous (homogeneousSubmodule σ k) ∧
-        J.radical ⊔ Ideal.span {f} ≠ ⊤ ∧
-        ringKrullDim (MvPolynomial σ k ⧸ (J.radical ⊔ Ideal.span {f})) + 1 ≤
-          ringKrullDim (MvPolynomial σ k ⧸ J) := by
+theorem exists_forms_idealOfVars_le_radical (n : ℕ)
+    : ∀ (J : Ideal (MvPolynomial σ k)),
+      J.IsHomogeneous (homogeneousSubmodule σ k) → J ≠ ⊤ → ringKrullDim (MvPolynomial σ k ⧸ J) ≤ n
+        → ∃ e,
+          0 < e
+            ∧ ∃ F : Fin n → MvPolynomial σ k,
+              (∀ i, (F i).IsHomogeneous e)
+                ∧ idealOfVars σ k ≤ (J ⊔ Ideal.span (Set.range F)).radical := by
+  have step
+      : ∀ (J : Ideal (MvPolynomial σ k)),
+        J.IsHomogeneous (homogeneousSubmodule σ k) → J ≠ ⊤ → ¬ idealOfVars σ k ≤ J.radical
+          → ∃ m,
+            0 < m
+              ∧ ∃ f : MvPolynomial σ k,
+                f.IsHomogeneous m
+                  ∧ (J.radical ⊔ Ideal.span {f}).IsHomogeneous (homogeneousSubmodule σ k)
+                  ∧ J.radical ⊔ Ideal.span {f} ≠ ⊤
+                  ∧ ringKrullDim (MvPolynomial σ k ⧸ (J.radical ⊔ Ideal.span {f})) + 1
+                    ≤ ringKrullDim (MvPolynomial σ k ⧸ J) := by
     intro J hJ hJ' h
     obtain ⟨m, hm, f, hf, hfp⟩ := exists_form_forall_notMem_minimalPrimes hJ h
     refine ⟨m, hm, f, hf, ?_, ?_, ringKrullDim_quotient_radical_sup_succ_le J hfp⟩
@@ -175,20 +188,22 @@ theorem exists_forms_idealOfVars_le_radical (n : ℕ) :
   | zero =>
     intro J hJ hJ' hdim
     by_cases h : idealOfVars σ k ≤ J.radical
-    · exact ⟨1, one_pos, 0, fun i => isHomogeneous_zero _ _ _,
-        h.trans (Ideal.radical_mono le_sup_left)⟩
+    · exact
+        ⟨1, one_pos, 0, fun i => isHomogeneous_zero _ _ _, h.trans (Ideal.radical_mono le_sup_left)⟩
     · exfalso
       obtain ⟨m, hm, f, hf, h1, h2, h3⟩ := step J hJ hJ' h
       haveI := Ideal.Quotient.nontrivial_iff.mpr h2
-      have h4 := (add_le_add_left (ringKrullDim_nonneg_of_nontrivial
-        (R := MvPolynomial σ k ⧸ (J.radical ⊔ Ideal.span {f}))) 1).trans (h3.trans hdim)
+      have h4 :=
+        (add_le_add_left
+          (ringKrullDim_nonneg_of_nontrivial (R := MvPolynomial σ k ⧸ (J.radical ⊔ Ideal.span {f})))
+          1).trans (h3.trans hdim)
       rw [zero_add, Nat.cast_zero] at h4
       exact absurd h4 (not_le.mpr zero_lt_one)
   | succ n ih =>
     intro J hJ hJ' hdim
     by_cases h : idealOfVars σ k ≤ J.radical
-    · exact ⟨1, one_pos, 0, fun i => isHomogeneous_zero _ _ _,
-        h.trans (Ideal.radical_mono le_sup_left)⟩
+    · exact
+        ⟨1, one_pos, 0, fun i => isHomogeneous_zero _ _ _, h.trans (Ideal.radical_mono le_sup_left)⟩
     · obtain ⟨m, hm, f, hf, h1, h2, h3⟩ := step J hJ hJ' h
       have h4 : ringKrullDim (MvPolynomial σ k ⧸ (J.radical ⊔ Ideal.span {f})) ≤ n := by
         have h5 := h3.trans hdim
@@ -215,22 +230,24 @@ section AnyBase
 
 variable {σ ι R S : Type*} [CommRing R] [Fintype ι] [CommRing S] [Algebra R S]
 
-theorem exists_forms_sub_sum_mem {I : Ideal (MvPolynomial σ R)}
-    (hI : I.IsHomogeneous (homogeneousSubmodule σ R)) {F : ι → MvPolynomial σ R} {e N d : ℕ}
-    (hF : ∀ i, (F i).IsHomogeneous e)
+theorem exists_forms_sub_sum_mem
+    {I : Ideal (MvPolynomial σ R)} (hI : I.IsHomogeneous (homogeneousSubmodule σ R))
+    {F : ι → MvPolynomial σ R} {e N d : ℕ} (hF : ∀ i, (F i).IsHomogeneous e)
     (hN : idealOfVars σ R ^ N ≤ I ⊔ Ideal.span (Set.range F)) (hNd : N ≤ d) (hed : e ≤ d)
-    {p : MvPolynomial σ R} (hp : p.IsHomogeneous d) :
-    ∃ G : ι → MvPolynomial σ R, (∀ i, (G i).IsHomogeneous (d - e)) ∧ p - ∑ i, F i * G i ∈ I := by
+    {p : MvPolynomial σ R} (hp : p.IsHomogeneous d)
+    : ∃ G : ι → MvPolynomial σ R, (∀ i, (G i).IsHomogeneous (d - e)) ∧ p - ∑ i, F i * G i ∈ I := by
   obtain ⟨a, ha, b, hb, hab⟩ :=
     Submodule.mem_sup.mp (hN (mem_idealOfVars_pow_of_isHomogeneous hp hNd))
   obtain ⟨c, rfl⟩ := Ideal.mem_span_range_iff_exists_fun.mp hb
-  refine ⟨fun i => homogeneousComponent (d - e) (c i),
-    fun i => homogeneousComponent_isHomogeneous _ _, ?_⟩
-  have h1 : ∀ i, homogeneousComponent d (c i * F i) =
-      F i * homogeneousComponent (d - e) (c i) := by
+  refine ⟨
+    fun i => homogeneousComponent (d - e) (c i),
+    fun i => homogeneousComponent_isHomogeneous _ _,
+    ?_
+  ⟩
+  have h1 : ∀ i, homogeneousComponent d (c i * F i) = F i * homogeneousComponent (d - e) (c i) := by
     intro i
-    have := DirectSum.coe_decompose_mul_of_left_mem_of_le (homogeneousSubmodule σ R)
-      (b := c i) (hF i) hed
+    have :=
+      DirectSum.coe_decompose_mul_of_left_mem_of_le (homogeneousSubmodule σ R) (b := c i) (hF i) hed
     rw [mul_comm]
     exact (decomposition.decompose'_apply _ _).symm.trans
       (this.trans (congrArg _ (decomposition.decompose'_apply _ _)))
@@ -241,12 +258,18 @@ theorem exists_forms_sub_sum_mem {I : Ideal (MvPolynomial σ R)}
   rw [← h2, add_sub_cancel_right]
   exact homogeneousComponent_mem_of_mem hI ha d
 
-theorem finite_aeval_of_forms_eq_sum [Finite σ] (π : MvPolynomial σ R →ₐ[R] S)
-    (hπ : Function.Surjective π) (f : ι → S) {e d₀ : ℕ} (he : 0 < e) (hed : e ≤ d₀)
-    (h : ∀ d, d₀ ≤ d → ∀ p : MvPolynomial σ R, p.IsHomogeneous d →
-      ∃ G : ι → MvPolynomial σ R,
-        (∀ i, (G i).IsHomogeneous (d - e)) ∧ π p = ∑ i, f i * π (G i)) :
-    (aeval f : MvPolynomial ι R →ₐ[R] S).Finite := by
+theorem finite_aeval_of_forms_eq_sum
+    [Finite σ]
+    (π : MvPolynomial σ R →ₐ[R] S) (hπ : Function.Surjective π)
+    (f : ι → S)
+    {e d₀ : ℕ} (he : 0 < e) (hed : e ≤ d₀)
+    (h : ∀ d,
+      d₀ ≤ d
+        → ∀ p : MvPolynomial σ R,
+          p.IsHomogeneous d
+            → ∃ G : ι → MvPolynomial σ R,
+              (∀ i, (G i).IsHomogeneous (d - e)) ∧ π p = ∑ i, f i * π (G i))
+    : (aeval f : MvPolynomial ι R →ₐ[R] S).Finite := by
   classical
   letI : Algebra (MvPolynomial ι R) S := (aeval f : MvPolynomial ι R →ₐ[R] S).toRingHom.toAlgebra
   haveI : IsScalarTower R (MvPolynomial ι R) S :=
@@ -284,23 +307,28 @@ theorem finite_aeval_of_forms_eq_sum [Finite σ] (π : MvPolynomial σ R →ₐ[
 
 end AnyBase
 
-theorem injective_of_finite_of_ringKrullDim_eq {k S : Type*} [Field k] [CommRing S] {δ : ℕ}
-    (φ : MvPolynomial (Fin δ) k →+* S) (hφ : φ.Finite) (hdim : ringKrullDim S = δ) :
-    Function.Injective φ := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem injective_of_finite_of_ringKrullDim_eq
+    {k S : Type*} [Field k] [CommRing S]
+    {δ : ℕ} (φ : MvPolynomial (Fin δ) k →+* S) (hφ : φ.Finite) (hdim : ringKrullDim S = δ)
+    : Function.Injective φ := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro r hr
   by_contra hne
   letI := φ.toAlgebra
   haveI : Module.Finite (MvPolynomial (Fin δ) k) S := hφ
-  have h1 := ReciprocityTheory.CA.ringKrullDim_quotient_eq_quotient_comap_of_isIntegral
-    (A := MvPolynomial (Fin δ) k) (⊥ : Ideal S)
+  have h1 :=
+    ReciprocityTheory.CA.ringKrullDim_quotient_eq_quotient_comap_of_isIntegral
+      (A := MvPolynomial (Fin δ) k) (⊥ : Ideal S)
   rw [ringKrullDim_eq_of_ringEquiv (RingEquiv.quotientBot S), hdim] at h1
-  have h2 := ringKrullDim_succ_le_of_surjective
-    (Ideal.Quotient.mk ((⊥ : Ideal S).comap (algebraMap (MvPolynomial (Fin δ) k) S)))
-    Ideal.Quotient.mk_surjective (mem_nonZeroDivisors_of_ne_zero hne)
-    (Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_comap.mpr (Ideal.mem_bot.mpr hr)))
+  have h2 :=
+    ringKrullDim_succ_le_of_surjective
+      (Ideal.Quotient.mk ((⊥ : Ideal S).comap (algebraMap (MvPolynomial (Fin δ) k) S)))
+      Ideal.Quotient.mk_surjective (mem_nonZeroDivisors_of_ne_zero hne)
+      (Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_comap.mpr (Ideal.mem_bot.mpr hr)))
   rw [← h1, MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field,
-    zero_add, Nat.card_eq_fintype_card, Fintype.card_fin] at h2
+      zero_add, Nat.card_eq_fintype_card, Fintype.card_fin]
+    at h2
   have h3 : δ + 1 ≤ δ := by exact_mod_cast h2
   omega
 
@@ -308,13 +336,12 @@ section Main
 
 variable {σ : Type*} [Finite σ] {k : Type*} [Field k]
 
-theorem exists_ringKrullDim_quotient_mvPolynomial_eq_nat {I : Ideal (MvPolynomial σ k)}
-    (hI : I ≠ ⊤) : ∃ δ : ℕ, ringKrullDim (MvPolynomial σ k ⧸ I) = δ := by
+theorem exists_ringKrullDim_quotient_mvPolynomial_eq_nat {I : Ideal (MvPolynomial σ k)} (hI : I ≠ ⊤)
+    : ∃ δ : ℕ, ringKrullDim (MvPolynomial σ k ⧸ I) = δ := by
   haveI := Ideal.Quotient.nontrivial_iff.mpr hI
   have h0 := ringKrullDim_nonneg_of_nontrivial (R := MvPolynomial σ k ⧸ I)
   have h1 := ringKrullDim_quotient_le I
-  rw [MvPolynomial.ringKrullDim_of_isNoetherianRing, ringKrullDim_eq_zero_of_field,
-    zero_add] at h1
+  rw [MvPolynomial.ringKrullDim_of_isNoetherianRing, ringKrullDim_eq_zero_of_field, zero_add] at h1
   generalize ringKrullDim (MvPolynomial σ k ⧸ I) = x at h0 h1
   induction x with
   | bot => simp at h0
@@ -323,37 +350,54 @@ theorem exists_ringKrullDim_quotient_mvPolynomial_eq_nat {I : Ideal (MvPolynomia
     | top => exact absurd h1 (not_le.mpr (by exact_mod_cast ENat.card_lt_top_of_finite (α := σ)))
     | coe n => exact ⟨n, rfl⟩
 
-theorem exists_forms_algebraicIndependent_finite {I : Ideal (MvPolynomial σ k)}
-    (hI : I.IsHomogeneous (homogeneousSubmodule σ k)) {δ : ℕ}
-    (hdim : ringKrullDim (MvPolynomial σ k ⧸ I) = δ) :
-    ∃ (e d₀ : ℕ) (F : Fin δ → MvPolynomial σ k), 1 ≤ e ∧ e ≤ d₀ ∧
-      (∀ i, (F i).IsHomogeneous e) ∧
-      AlgebraicIndependent k (fun i => Ideal.Quotient.mk I (F i)) ∧
-      (∀ d, d₀ ≤ d → ∀ p : MvPolynomial σ k, p.IsHomogeneous d →
-        ∃ G : Fin δ → MvPolynomial σ k,
-          (∀ i, (G i).IsHomogeneous (d - e)) ∧ p - ∑ i, F i * G i ∈ I) ∧
-      (aeval (fun i => Ideal.Quotient.mk I (F i)) :
-        MvPolynomial (Fin δ) k →ₐ[k] MvPolynomial σ k ⧸ I).Finite := by
+theorem exists_forms_algebraicIndependent_finite
+    {I : Ideal (MvPolynomial σ k)} (hI : I.IsHomogeneous (homogeneousSubmodule σ k))
+    {δ : ℕ} (hdim : ringKrullDim (MvPolynomial σ k ⧸ I) = δ)
+    : ∃ (e d₀ : ℕ) (F : Fin δ → MvPolynomial σ k),
+      1 ≤ e ∧ e ≤ d₀ ∧ (∀ i, (F i).IsHomogeneous e)
+        ∧ AlgebraicIndependent k (fun i => Ideal.Quotient.mk I (F i))
+        ∧ (∀ d,
+          d₀ ≤ d
+            → ∀ p : MvPolynomial σ k,
+              p.IsHomogeneous d
+                → ∃ G : Fin δ → MvPolynomial σ k,
+                  (∀ i, (G i).IsHomogeneous (d - e)) ∧ p - ∑ i, F i * G i ∈ I)
+        ∧ (aeval (fun i => Ideal.Quotient.mk I (F i))
+          : MvPolynomial (Fin δ) k →ₐ[k] MvPolynomial σ k ⧸ I).Finite := by
   have hI' : I ≠ ⊤ := by
     rintro rfl
     rw [ringKrullDim_eq_bot_of_subsingleton] at hdim
     exact absurd hdim (WithBot.bot_ne_coe (a := (δ : ℕ∞)))
   obtain ⟨e, he, F, hF, hle⟩ := exists_forms_idealOfVars_le_radical δ I hI hI' hdim.le
   obtain ⟨N, hN⟩ := Ideal.exists_pow_le_of_le_radical_of_fg hle (idealOfVars_fg σ k)
-  have hgen : ∀ d, max N e ≤ d → ∀ p : MvPolynomial σ k, p.IsHomogeneous d →
-      ∃ G : Fin δ → MvPolynomial σ k,
-        (∀ i, (G i).IsHomogeneous (d - e)) ∧ p - ∑ i, F i * G i ∈ I := fun d hd p hp =>
+  have hgen
+      : ∀ d,
+        max N e ≤ d
+          → ∀ p : MvPolynomial σ k,
+            p.IsHomogeneous d
+              → ∃ G : Fin δ → MvPolynomial σ k,
+                (∀ i, (G i).IsHomogeneous (d - e)) ∧ p - ∑ i, F i * G i ∈ I := fun d hd p hp =>
     exists_forms_sub_sum_mem hI hF hN (le_of_max_le_left hd) (le_of_max_le_right hd) hp
-  have hfin : (aeval (fun i => Ideal.Quotient.mk I (F i)) :
-      MvPolynomial (Fin δ) k →ₐ[k] MvPolynomial σ k ⧸ I).Finite := by
+  have hfin
+      : (aeval (fun i => Ideal.Quotient.mk I (F i))
+        : MvPolynomial (Fin δ) k →ₐ[k] MvPolynomial σ k ⧸ I).Finite := by
     refine finite_aeval_of_forms_eq_sum (Ideal.Quotient.mkₐ k I) (Ideal.Quotient.mkₐ_surjective k I)
       _ he (le_max_right N e) fun d hd p hp => ?_
     obtain ⟨G, hG, hs⟩ := hgen d hd p hp
     refine ⟨G, hG, ?_⟩
     have := Ideal.Quotient.eq.mpr hs
     simpa using this
-  exact ⟨e, max N e, F, he, le_max_right N e, hF,
-    injective_of_finite_of_ringKrullDim_eq _ hfin hdim, hgen, hfin⟩
+  exact ⟨
+    e,
+    max N e,
+    F,
+    he,
+    le_max_right N e,
+    hF,
+    injective_of_finite_of_ringKrullDim_eq _ hfin hdim,
+    hgen,
+    hfin
+  ⟩
 
 end Main
 

@@ -6,7 +6,8 @@ public import Development.EtaleCohomology.TateTwists.EtaleKInjectiveHomLiftAlong
 
 open CategoryTheory Limits GlobalTheory.EtC
 
-theorem LateralTheory.EtaleFoundations.etale_kInjective_hom_lift_along_quasiIso_holds : LateralTheory.EtaleFoundations.EtaleKInjectiveHomLiftAlongQuasiIsoUpToHomotopy := by
+theorem LateralTheory.EtaleFoundations.etale_kInjective_hom_lift_along_quasiIso_holds
+    : LateralTheory.EtaleFoundations.EtaleKInjectiveHomLiftAlongQuasiIsoUpToHomotopy := by
   intro R _ K L I _ f _
   have hI := CochainComplex.IsKInjective.rightOrthogonal I
   rw [← ObjectProperty.isLocal_trW] at hI
@@ -20,7 +21,8 @@ theorem LateralTheory.EtaleFoundations.etale_kInjective_hom_lift_along_quasiIso_
   · obtain ⟨m', hm'⟩ := hb.2 ((HomotopyCategory.quotient _ _).map a)
     obtain ⟨m, rfl⟩ := (HomotopyCategory.quotient _ _).map_surjective m'
     refine ⟨m, ⟨HomotopyCategory.homotopyOfEq _ _ ?_⟩⟩
-    rw [Functor.map_comp]; exact hm'
+    rw [Functor.map_comp]
+    exact hm'
   · obtain ⟨h⟩ := h
     have e := HomotopyCategory.eq_of_homotopy _ _ h
     rw [Functor.map_comp, Functor.map_comp] at e

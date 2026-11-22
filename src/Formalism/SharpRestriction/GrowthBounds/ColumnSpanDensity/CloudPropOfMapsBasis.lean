@@ -17,7 +17,8 @@ theorem latRetract : LatRetract := by
   set L' := Submodule.span O (Set.range b') with hL'
   have hcoord : ∀ x ∈ L, ∀ i, ∃ a : O, algebraMap O K a = b.repr x i := by
     intro x hx i
-    exact ⟨(b.restrictScalars O).repr ⟨x, hx⟩ i, Module.Basis.restrictScalars_repr_apply O b ⟨x, hx⟩ i⟩
+    exact
+      ⟨(b.restrictScalars O).repr ⟨x, hx⟩ i, Module.Basis.restrictScalars_repr_apply O b ⟨x, hx⟩ i⟩
   have hinj : Function.Injective io := by
     rw [← LinearMap.ker_eq_bot, Submodule.eq_bot_iff]
     intro F hF
@@ -60,15 +61,17 @@ theorem latRetract : LatRetract := by
     have hmem : (algebraMap O K a)⁻¹ • (x : V) ∈ L := (hio _).1 (hyio ▸ y.2)
     exact ⟨⟨_, hmem⟩, Subtype.ext hyio.symm⟩
   haveI : Module.Free O (L' ⧸ LinearMap.range φ) := Module.free_of_finite_type_torsion_free'
-  obtain ⟨s, hs⟩ := Module.projective_lifting_property (LinearMap.range φ).mkQ LinearMap.id
-    (Submodule.mkQ_surjective _)
+  obtain ⟨s, hs⟩ :=
+    Module.projective_lifting_property (LinearMap.range φ).mkQ LinearMap.id
+      (Submodule.mkQ_surjective _)
   let pr : L' →ₗ[O] L' := LinearMap.id - s ∘ₗ (LinearMap.range φ).mkQ
   have hpr : ∀ y, pr y ∈ LinearMap.range φ := by
     intro y
     have h2 := LinearMap.congr_fun hs ((LinearMap.range φ).mkQ y)
     simp only [LinearMap.comp_apply, LinearMap.id_apply] at h2
     rw [← Submodule.ker_mkQ (LinearMap.range φ), LinearMap.mem_ker]
-    simp only [pr, LinearMap.sub_apply, LinearMap.id_apply, LinearMap.comp_apply, map_sub, h2, sub_self]
+    simp only [pr, LinearMap.sub_apply, LinearMap.id_apply, LinearMap.comp_apply, map_sub, h2,
+      sub_self]
   let e := LinearEquiv.ofInjective φ hφ
   let r0 : L' →ₗ[O] L := e.symm.toLinearMap ∘ₗ LinearMap.codRestrict (LinearMap.range φ) pr hpr
   have hr0 : ∀ x : L, r0 (φ x) = x := by
@@ -80,7 +83,8 @@ theorem latRetract : LatRetract := by
     rw [LinearEquiv.symm_apply_eq]
     apply Subtype.ext
     simp [LinearMap.codRestrict_apply, h1, e, pr, LinearEquiv.ofInjective_apply]
-  let ret : V' →ₗ[K] V := b'.constr K (fun j => ((r0 ⟨b' j, Submodule.subset_span ⟨j, rfl⟩⟩ : L) : V))
+  let ret : V' →ₗ[K] V :=
+    b'.constr K (fun j => ((r0 ⟨b' j, Submodule.subset_span ⟨j, rfl⟩⟩ : L) : V))
   have hA : ∀ y : L', ret (y : V') = (r0 y : V) := by
     have h3 : (ret.restrictScalars O) ∘ₗ L'.subtype = L.subtype ∘ₗ r0 := by
       refine (b'.restrictScalars O).ext (fun j => ?_)
@@ -104,10 +108,13 @@ theorem latRetract : LatRetract := by
     rw [hA ⟨G, hG⟩]
     exact (r0 ⟨G, hG⟩).2
 
-theorem cloud_prop_of_maps_basis (hC : RestCloudMaps) (hBP : BePerfect) (hD3 : DualHeightBasis) : CloudLowerBoundWeyl :=
+theorem cloud_prop_of_maps_basis (hC : RestCloudMaps) (hBP : BePerfect) (hD3 : DualHeightBasis)
+    : CloudLowerBoundWeyl :=
   cloud_prop_of_maps_retraction_basis hC latRetract hBP hD3
 
-theorem cloud_bound_of_maps (hC : RestCloudMaps) (hBP : BePerfect) (hD3 : DualHeightBasis) (hW : WeylV) : CloudWeightLowerBound :=
+theorem cloud_bound_of_maps
+    (hC : RestCloudMaps) (hBP : BePerfect) (hD3 : DualHeightBasis) (hW : WeylV)
+    : CloudWeightLowerBound :=
   cloud_bound_of_prop_and_weyl_dimension (cloud_prop_of_maps_basis hC hBP hD3) hW
 
 end Formalism.MainNotions.flipOneThree.Pf

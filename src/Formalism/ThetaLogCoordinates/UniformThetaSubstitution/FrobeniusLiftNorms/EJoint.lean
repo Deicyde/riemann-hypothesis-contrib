@@ -17,12 +17,15 @@ open Formalism.DworkPowerSeriesWeights (Integral jetPair mfact)
 
 namespace MinorFormHomogeneity
 
-theorem coeff_subst_scale {K ι : Type} [Field K] (ϖ : K) (Th : MvPowerSeries ι K) (n : ι →₀ ℕ) :
-    MvPowerSeries.coeff n (MvPowerSeries.subst
-      (fun i => MvPowerSeries.C ϖ * (MvPowerSeries.X i : MvPowerSeries ι K)) Th) =
-      ϖ ^ n.degree * MvPowerSeries.coeff n Th := by
-  have h : (fun i => MvPowerSeries.C ϖ * (MvPowerSeries.X i : MvPowerSeries ι K)) =
-      (fun _ : ι => ϖ) • (MvPowerSeries.X : ι → MvPowerSeries ι K) := by
+theorem coeff_subst_scale {K ι : Type} [Field K] (ϖ : K) (Th : MvPowerSeries ι K) (n : ι →₀ ℕ)
+    : MvPowerSeries.coeff n
+        (MvPowerSeries.subst
+          (fun i => MvPowerSeries.C ϖ * (MvPowerSeries.X i : MvPowerSeries ι K))
+          Th)
+      = ϖ ^ n.degree * MvPowerSeries.coeff n Th := by
+  have h
+      : (fun i => MvPowerSeries.C ϖ * (MvPowerSeries.X i : MvPowerSeries ι K))
+        = (fun _ : ι => ϖ) • (MvPowerSeries.X : ι → MvPowerSeries ι K) := by
     funext i
     simp [MvPowerSeries.smul_eq_C_mul]
   rw [h, ← MvPowerSeries.rescale_eq_subst, MvPowerSeries.coeff_rescale, Finsupp.prod,

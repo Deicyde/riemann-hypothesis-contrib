@@ -6,29 +6,36 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.TopLeWcha
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory CategoryTheory.Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt GlobalTheory.ArcQ GlobalTheory.Frames CategoryTheory.MonObj GlobalTheory.AbelianLetters
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt GlobalTheory.ArcQ GlobalTheory.Frames
+  CategoryTheory.MonObj GlobalTheory.AbelianLetters
 open scoped LaurentSeries
 
 namespace GlobalTheory.PeriodSpan
 
-theorem eq_of_exp_mul_eq {a b : ℂ} (H : ∀ s : ℂ, Complex.exp (s * a) = Complex.exp (s * b)) :
-    a = b := by
+theorem eq_of_exp_mul_eq {a b : ℂ} (H : ∀ s : ℂ, Complex.exp (s * a) = Complex.exp (s * b))
+    : a = b := by
   by_contra hne
   have hd : a - b ≠ 0 := sub_ne_zero.mpr hne
   have h1 := H (Real.pi * Complex.I / (a - b))
-  have h2 : Complex.exp (Real.pi * Complex.I / (a - b) * a - Real.pi * Complex.I / (a - b) * b)
-      = 1 := by
+  have h2
+      : Complex.exp (Real.pi * Complex.I / (a - b) * a - Real.pi * Complex.I / (a - b) * b)
+        = 1 := by
     rw [Complex.exp_sub, h1, div_self (Complex.exp_ne_zero _)]
   rw [← mul_sub, div_mul_cancel₀ _ hd, Complex.exp_pi_mul_I] at h2
   norm_num at h2
 
-theorem exists_block_solution {g : ℕ} (S : Finset (Fin g)) (A : Matrix (Fin g) (Fin g) ℝ)
-    (hA : A.PosDef) (y : Fin g → ℝ) :
-    ∃ b : Fin g → ℝ, (∀ k ∈ S, b k = 0) ∧ ∀ k ∉ S, A.mulVec b k = y k := by
+theorem exists_block_solution
+    {g : ℕ} (S : Finset (Fin g)) (A : Matrix (Fin g) (Fin g) ℝ) (hA : A.PosDef) (y : Fin g → ℝ)
+    : ∃ b : Fin g → ℝ, (∀ k ∈ S, b k = 0) ∧ ∀ k ∉ S, A.mulVec b k = y k := by
   classical
   let T : (Fin g → ℝ) →ₗ[ℝ] (Fin g → ℝ) :=
-    LinearMap.pi fun k => if k ∈ S then LinearMap.proj k
-      else (LinearMap.proj k).comp A.mulVecLin
+    LinearMap.pi fun k =>
+      if k ∈ S then
+        LinearMap.proj k
+      else
+        (LinearMap.proj k).comp A.mulVecLin
   have hT : ∀ b k, T b k = if k ∈ S then b k else A.mulVec b k := by
     intro b k
     by_cases hk : k ∈ S <;> simp [T, hk]
@@ -48,8 +55,7 @@ theorem exists_block_solution {g : ℕ} (S : Finset (Fin g)) (A : Matrix (Fin g)
       · simp only [hk, if_false, Pi.zero_apply] at h1
         simp [← h1]
     exact hpos.ne' this
-  obtain ⟨b, hb⟩ := LinearMap.surjective_of_injective hinj
-    (fun k => if k ∈ S then 0 else y k)
+  obtain ⟨b, hb⟩ := LinearMap.surjective_of_injective hinj (fun k => if k ∈ S then 0 else y k)
   refine ⟨b, fun k hk => ?_, fun k hk => ?_⟩
   · have := hT b k
     rw [hb] at this
@@ -58,7 +64,22 @@ theorem exists_block_solution {g : ℕ} (S : Finset (Fin g)) (A : Matrix (Fin g)
     rw [hb] at this
     simpa [hk] using this.symm
 
-theorem mem_span_periods : ∀ (g n : ℕ) (S : Finset (Fin g)) (h τ : Matrix (Fin g) (Fin g) ℂ) (p : (Fin g ⊕ Fin g → ℤ) →+ (Fin g → ℂ)) (ℓ : Fin g → (Fin g → ℂ) →ₗ[ℂ] ℂ), 0 < n → (τ.map Complex.im).PosDef → (∀ k, h.mulVec (p (Pi.single (.inl k) 1)) = Pi.single k 1 ∧ h.mulVec (p (Pi.single (.inr k) 1)) = τ.mulVec (Pi.single k 1)) → (∀ k ∈ S, ∀ k' ∈ S, ∀ s : ℂ, Complex.exp (ℓ k (s • p (Pi.single (.inl k') 1))) = eTwoPi (n * s * if k' = k then 1 else 0)) → (∀ u : Fin g ⊕ Fin g → ℤ, (∀ k ∈ S, u (.inr k) = 0) → ∀ k ∈ S, Complex.exp (ℓ k (p u)) = 1) → ∀ z : Fin g → ℂ, (∀ k ∈ S, ℓ k z = 0) → z ∈ Submodule.span ℝ {q | ∃ u : Fin g ⊕ Fin g → ℤ, (∀ k ∈ S, u (.inr k) = 0) ∧ q = p u} := by
+theorem mem_span_periods
+    : ∀ (g n : ℕ) (S : Finset (Fin g)) (h τ : Matrix (Fin g) (Fin g) ℂ)
+        (p : (Fin g ⊕ Fin g → ℤ) →+ (Fin g → ℂ)) (ℓ : Fin g → (Fin g → ℂ) →ₗ[ℂ] ℂ),
+      0 < n → (τ.map Complex.im).PosDef
+        → (∀ k,
+          h.mulVec (p (Pi.single (.inl k) 1)) = Pi.single k 1
+            ∧ h.mulVec (p (Pi.single (.inr k) 1)) = τ.mulVec (Pi.single k 1))
+        → (∀ k ∈ S, ∀ k' ∈ S, ∀ s : ℂ,
+          Complex.exp (ℓ k (s • p (Pi.single (.inl k') 1)))
+            = eTwoPi (n * s * if k' = k then 1 else 0))
+        → (∀ u : Fin g ⊕ Fin g → ℤ,
+          (∀ k ∈ S, u (.inr k) = 0) → ∀ k ∈ S, Complex.exp (ℓ k (p u)) = 1)
+        → ∀ z : Fin g → ℂ,
+          (∀ k ∈ S, ℓ k z = 0)
+            → z ∈ Submodule.span ℝ
+              {q | ∃ u : Fin g ⊕ Fin g → ℤ, (∀ k ∈ S, u (.inr k) = 0) ∧ q = p u} := by
   classical
   intro g n S h τ p ℓ hn hτ hp hℓ hu z hz
   set R := Submodule.span ℝ {q | ∃ u : Fin g ⊕ Fin g → ℤ, (∀ k ∈ S, u (.inr k) = 0) ∧ q = p u}
@@ -71,14 +92,14 @@ theorem mem_span_periods : ∀ (g n : ℕ) (S : Finset (Fin g)) (h τ : Matrix (
     have hM : h * (Matrix.of fun i k => e k i) = 1 := by
       ext i k
       have := congrFun (hhe k) i
-      simpa [Matrix.mul_apply, Matrix.mulVec, dotProduct, Matrix.one_apply, Pi.single_apply]
-        using this
+      simpa [Matrix.mul_apply, Matrix.mulVec, dotProduct, Matrix.one_apply, Pi.single_apply] using
+        this
     have hM' := mul_eq_one_comm.mp hM
     intro x y hxy
     have := congrArg (Matrix.of fun i k => e k i).mulVec hxy
     simpa [Matrix.mulVec_mulVec, hM'] using this
-  have hℓe : ∀ k ∈ S, ∀ k' ∈ S, ℓ k (e k') =
-      2 * Real.pi * Complex.I * n * if k' = k then 1 else 0 := by
+  have hℓe
+      : ∀ k ∈ S, ∀ k' ∈ S, ℓ k (e k') = 2 * Real.pi * Complex.I * n * if k' = k then 1 else 0 := by
     intro k hk k' hk'
     refine eq_of_exp_mul_eq fun s => ?_
     have := hℓ k hk k' hk' s
@@ -95,17 +116,23 @@ theorem mem_span_periods : ∀ (g n : ℕ) (S : Finset (Fin g)) (h τ : Matrix (
       obtain ⟨m, hm⟩ := Complex.exp_eq_one_iff.mp (hu u hu' k hk)
       rw [hm]
       simp
-    | zero => simp
-    | add x y _ _ hx hy => simp [hx, hy]
+    | zero =>
+      simp
+    | add x y _ _ hx hy =>
+      simp [hx, hy]
     | smul a x _ hx =>
       rw [← Complex.coe_smul, map_smul]
       simp [hx]
   have heR : ∀ k, e k ∈ R := fun k =>
     Submodule.subset_span ⟨Pi.single (.inl k) 1, fun k' _ => by simp, rfl⟩
   have hfR : ∀ k ∉ S, f k ∈ R := fun k hk =>
-    Submodule.subset_span ⟨Pi.single (.inr k) 1, fun k' hk' => by
-      have : k' ≠ k := fun e => hk (e ▸ hk')
-      simp [this], rfl⟩
+    Submodule.subset_span ⟨
+      Pi.single (.inr k) 1,
+      fun k' hk' => by
+        have : k' ≠ k := fun e => hk (e ▸ hk')
+        simp [this],
+      rfl
+    ⟩
   obtain ⟨b, hbS, hb⟩ := exists_block_solution S _ hτ fun k => (h.mulVec z k).im
   set c : Fin g → ℂ := h.mulVec z - τ.mulVec fun k => (b k : ℂ) with hc
   have hcim : ∀ k ∉ S, (c k).im = 0 := by
@@ -123,7 +150,8 @@ theorem mem_span_periods : ∀ (g n : ℕ) (S : Finset (Fin g)) (h τ : Matrix (
     rw [Matrix.mulVec_add, Matrix.mulVec_sum, Matrix.mulVec_sum]
     simp only [Matrix.mulVec_smul, hhe, hhf, h2]
     simp only [← Matrix.mulVec_smul, ← Matrix.mulVec_sum, h1]
-    rw [hc]; abel
+    rw [hc]
+    abel
   set r : Fin g → ℂ := ∑ k, (b k : ℂ) • f k + ∑ k, ((c k).re : ℂ) • e k with hr
   have hrR : r ∈ R := by
     refine R.add_mem (R.sum_mem fun k _ => ?_) (R.sum_mem fun k _ => ?_)

@@ -7,28 +7,44 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsCuspFun
 @[expose] public section
 
 open scoped MatrixGroups Matrix
-open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois UpperTheory.Kd.L
+open GlobalTheory.KZ GlobalTheory.K4 GlobalTheory.Glue GlobalTheory.KummerEisensteinGalois
+  UpperTheory.Kd.L
 
-private theorem gal_mul' {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε) (s t : Ω ≃ₐ[ℚ] Ω) (f : X.K) :
-    X.gal (s * t) f = X.gal s (X.gal t f) := by
+private theorem gal_mul'
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε) (s t : Ω ≃ₐ[ℚ] Ω) (f : X.K)
+    : X.gal (s * t) f = X.gal s (X.gal t f) := by
   apply X.exp.toRingHom.injective
   show X.exp _ = X.exp _
   ext r
   simp [X.gal_exp]
 
-private theorem kmap_comp' {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε) (l : ℕ) [Fact l.Prime]
-    (φ ψ χ : X.K ≃+* X.K) (h : ∀ f, χ f = φ (ψ f)) (a : X.Khat l) : X.kmap l χ a = X.kmap l φ (X.kmap l ψ a) := by
+private theorem kmap_comp'
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {ε : Ω →+* ℂ} (X : Tower Ω ε)
+    (l : ℕ) [Fact l.Prime]
+    (φ ψ χ : X.K ≃+* X.K) (h : ∀ f, χ f = φ (ψ f))
+    (a : X.Khat l)
+    : X.kmap l χ a = X.kmap l φ (X.kmap l ψ a) := by
   unfold Tower.kmap
-  have e : (AddMonoidHom.toIntLinearMap (MonoidHom.toAdditive (Units.map χ.toMonoidHom))) =
-      (AddMonoidHom.toIntLinearMap (MonoidHom.toAdditive (Units.map φ.toMonoidHom))) ∘ₗ
-        (AddMonoidHom.toIntLinearMap (MonoidHom.toAdditive (Units.map ψ.toMonoidHom))) := by
+  have e
+      : (AddMonoidHom.toIntLinearMap (MonoidHom.toAdditive (Units.map χ.toMonoidHom)))
+        = (AddMonoidHom.toIntLinearMap (MonoidHom.toAdditive (Units.map φ.toMonoidHom)))
+          ∘ₗ (AddMonoidHom.toIntLinearMap (MonoidHom.toAdditive (Units.map ψ.toMonoidHom))) := by
     ext u
     exact h _
   show AdicCompletion.map (idl l) _ a = AdicCompletion.map (idl l) _ (AdicCompletion.map (idl l) _ a)
   rw [AdicCompletion.map_comp_apply, ← LinearMap.baseChange_comp, e]
 
-theorem UpperTheory.Kd.L.witalg :
-    ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] [CharZero Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (N n : ℕ), 1 ≤ N → (∀ (b b' : X.Fn l) (f f' : X.Kˣ), IsWit X N l n b f → IsWit X N l n b' f' → IsWit X N l n (b + b') (f * f')) ∧ IsWit X N l n 0 1 ∧ (∀ (s : Ω ≃ₐ[ℚ] Ω) (b : X.Fn l) (f : X.Kˣ), IsWit X N l n b f → IsWit X N l n (X.galB l s b) (Units.map (X.gal s).toMonoidHom f)) ∧ ∀ s t : Ω ≃ₐ[ℚ] Ω, ∀ b : X.Fn l, X.galB l (s * t) b = X.galB l s (X.galB l t b) := by
+theorem UpperTheory.Kd.L.witalg
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] [CharZero Ω] (ε : Ω →+* ℂ)
+        (X : Tower Ω ε) (l : ℕ) [Fact l.Prime] (N n : ℕ),
+      1 ≤ N
+        → (∀ (b b' : X.Fn l) (f f' : X.Kˣ),
+            IsWit X N l n b f → IsWit X N l n b' f' → IsWit X N l n (b + b') (f * f'))
+          ∧ IsWit X N l n 0 1
+          ∧ (∀ (s : Ω ≃ₐ[ℚ] Ω) (b : X.Fn l) (f : X.Kˣ),
+            IsWit X N l n b f → IsWit X N l n (X.galB l s b) (Units.map (X.gal s).toMonoidHom f))
+          ∧ ∀ s t : Ω ≃ₐ[ℚ] Ω, ∀ b : X.Fn l, X.galB l (s * t) b = X.galB l s (X.galB l t b) := by
   intro Ω _ _ _ _ ε X l _ N n _
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have hl : 0 < l := (Fact.out : l.Prime).pos
@@ -50,11 +66,19 @@ theorem UpperTheory.Kd.L.witalg :
     have hf : ((Units.map (X.gal s).toMonoidHom f : X.Kˣ) : X.K) = X.gal s f := rfl
     refine ⟨?_, ?_, ?_⟩
     · rw [hf]; exact GlobalTheory.ThGal.inv_gal X s _ _ hfI
-    · have hu : (![(![1, 0] : Fin 2 → ℤ_[l]) 0,
-          (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) * (![1, 0] : Fin 2 → ℤ_[l]) 1] : Fin 2 → ℤ_[l]) = ![1, 0] := by
+    · have hu
+          : (![(![1, 0] : Fin 2 → ℤ_[l]) 0,
+                (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) * (![1, 0] : Fin 2 → ℤ_[l]) 1]
+              : Fin 2 → ℤ_[l])
+            = ![1, 0] := by
         funext i; fin_cases i <;> simp
-      have hg : X.galB l s b ![1, 0] = X.kmap l (X.gal s) (b ![(![1, 0] : Fin 2 → ℤ_[l]) 0,
-          (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) * (![1, 0] : Fin 2 → ℤ_[l]) 1]) := rfl
+      have hg
+          : X.galB l s b ![1, 0]
+            = X.kmap l (X.gal s)
+              (b
+                ![(![1, 0] : Fin 2 → ℤ_[l]) 0,
+                  (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) * (![1, 0] : Fin 2 → ℤ_[l]) 1]) :=
+        rfl
       rw [hu] at hg
       rw [AdicCompletion.eval_apply] at hcls
       rw [hg, AdicCompletion.eval_apply, Tower.kmap]

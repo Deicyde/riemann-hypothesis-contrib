@@ -14,7 +14,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.Q.TInvW
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.QuantumDeterminants.GBasic Formalism.FourierDecayAlt.Q
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.QuantumDeterminants.GBasic
+  Formalism.FourierDecayAlt.Q
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -169,30 +170,32 @@ lemma hpart_cols (i : Fin (r + 1)) (p q : Fin (mdim k r i)) :
       | rw [Matrix.smul_apply, Matrix.add_apply]
       simp only [e1, e2, e3, e4, sub_zero, add_zero, smul_zero]
 
-theorem exp_hpart1_mem (i : Fin (r + 1)) (p q : Fin (mdim k r i)) (t : ℝ) :
-    NormedSpace.exp ((t : ℂ) • hpart1 (Hpk k r) (Matrix.single (posL k r i p) (posL k r i q) 1))
-      ∈ Glev k r i := exp_mem_glev i _ (hpart1_skew _) (hpart_cols i p q).1 t
+theorem exp_hpart1_mem (i : Fin (r + 1)) (p q : Fin (mdim k r i)) (t : ℝ)
+    : NormedSpace.exp ((t : ℂ) • hpart1 (Hpk k r) (Matrix.single (posL k r i p) (posL k r i q) 1))
+      ∈ Glev k r i :=
+  exp_mem_glev i _ (hpart1_skew _) (hpart_cols i p q).1 t
 
-theorem exp_hpart2_mem (i : Fin (r + 1)) (p q : Fin (mdim k r i)) (t : ℝ) :
-    NormedSpace.exp ((t : ℂ) • hpart2 (Hpk k r) (Matrix.single (posL k r i p) (posL k r i q) 1))
-      ∈ Glev k r i := exp_mem_glev i _ (hpart2_skew _) (hpart_cols i p q).2 t
+theorem exp_hpart2_mem (i : Fin (r + 1)) (p q : Fin (mdim k r i)) (t : ℝ)
+    : NormedSpace.exp ((t : ℂ) • hpart2 (Hpk k r) (Matrix.single (posL k r i p) (posL k r i q) 1))
+      ∈ Glev k r i :=
+  exp_mem_glev i _ (hpart2_skew _) (hpart_cols i p q).2 t
 
-theorem rdV_ext {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+theorem rdV_ext
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
     (i : Fin (r + 1)) (X : Mx k r) (hX : ∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) ∈ Glev k r i)
     (f F : Mx k r → E) (U : Set (Mx k r)) (g : Mx k r) (hU : IsOpen U) (hg : g ∈ U)
-    (hgG : g ∈ Glev k r i) (hF : ContDiffOn ℝ ∞ F U)
-    (hfF : ∀ x ∈ U, x ∈ Glev k r i → f x = F x) :
-    RdV X f g = fderiv ℝ F g (g * X) := by
+    (hgG : g ∈ Glev k r i) (hF : ContDiffOn ℝ ∞ F U) (hfF : ∀ x ∈ U, x ∈ Glev k r i → f x = F x)
+    : RdV X f g = fderiv ℝ F g (g * X) := by
   have hγ := hasDerivAt_mul_exp_smul_zero g X
-  have hγ0 : g * NormedSpace.exp (((0 : ℝ) : ℂ) • X) = g := by
-    simp [NormedSpace.exp_zero]
+  have hγ0 : g * NormedSpace.exp (((0 : ℝ) : ℂ) • X) = g := by simp [NormedSpace.exp_zero]
   have hFd : DifferentiableAt ℝ F g :=
     (hF.differentiableOn (by simp)).differentiableAt (hU.mem_nhds hg)
-  have hcomp : HasDerivAt (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X)))
-      (fderiv ℝ F g (g * X)) 0 :=
+  have hcomp
+      : HasDerivAt (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) (fderiv ℝ F g (g * X)) 0 :=
     hFd.hasFDerivAt.comp_hasDerivAt_of_eq (0 : ℝ) hγ hγ0.symm
-  have hev : (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) =ᶠ[𝓝 0]
-      (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) := by
+  have hev
+      : (fun t : ℝ => f (g * NormedSpace.exp ((t : ℂ) • X))) =ᶠ[𝓝 0]
+        (fun t : ℝ => F (g * NormedSpace.exp ((t : ℂ) • X))) := by
     have hmem : ∀ᶠ t : ℝ in 𝓝 0, g * NormedSpace.exp ((t : ℂ) • X) ∈ U :=
       hγ.continuousAt.preimage_mem_nhds (by rw [hγ0]; exact hU.mem_nhds hg)
     filter_upwards [hmem] with t ht
@@ -201,8 +204,9 @@ theorem rdV_ext {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
 theorem transfer_invariance_congruence : StepCongr := by
   intro E _ _ k r i D a b f f' g hD hg hff
-  have key : ∀ X : Mx k r, (∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) ∈ Glev k r i) →
-      RdV X f g = RdV X f' g := by
+  have key
+      : ∀ X : Mx k r,
+        (∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) ∈ Glev k r i) → RdV X f g = RdV X f' g := by
     intro X hX
     unfold RdV
     apply Filter.EventuallyEq.deriv_eq
@@ -361,53 +365,66 @@ theorem transfer_invariance_right : StepRight := by
     have h0 := hs'
     simp only [Glev, Set.mem_setOf_eq] at h0
     exact h0.1
-  have hEH : ∀ Z : Mx k r, (∀ t : ℝ, NormedSpace.exp ((t : ℂ) • hpart1 (Hpk k r) Z) ∈ Glev k r i) →
-      (∀ t : ℝ, NormedSpace.exp ((t : ℂ) • hpart2 (Hpk k r) Z) ∈ Glev k r i) →
-      RdV (hpart1 (Hpk k r) Z) f (g * s') + Complex.I • RdV (hpart2 (Hpk k r) Z) f (g * s') =
-        lam (fderiv ℝ F (g * s')) (g * s') Z := by
+  have hEH
+      : ∀ Z : Mx k r,
+        (∀ t : ℝ, NormedSpace.exp ((t : ℂ) • hpart1 (Hpk k r) Z) ∈ Glev k r i)
+          → (∀ t : ℝ, NormedSpace.exp ((t : ℂ) • hpart2 (Hpk k r) Z) ∈ Glev k r i)
+          → RdV (hpart1 (Hpk k r) Z) f (g * s') + Complex.I • RdV (hpart2 (Hpk k r) Z) f (g * s')
+            = lam (fderiv ℝ F (g * s')) (g * s') Z := by
     intro Z h1 h2
-    rw [rdV_ext i _ h1 f F U (g * s') hU hgU hgs'G hF hfF, rdV_ext i _ h2 f F U (g * s') hU hgU hgs'G hF hfF]
+    rw [rdV_ext i _ h1 f F U (g * s') hU hgU hgs'G hF hfF,
+      rdV_ext i _ h2 f F U (g * s') hU hgU hgs'G hF hfF]
     rfl
-  have hinj : ∀ c c' : Fin (mdim k r i), posL k r i c = posL k r i c' ↔ c = c' :=
-    fun c c' => ⟨posL_inj, congrArg _⟩
-  have hconj : s'⁻¹ * Matrix.single (posL k r i a) (posL k r i b) (1 : ℂ) * s' =
-      ∑ c, ∑ d, (blk i s'⁻¹ c a * blk i s' b d) • Matrix.single (posL k r i c) (posL k r i d) (1 : ℂ) := by
-    ext x y
-    have hL : (s'⁻¹ * Matrix.single (posL k r i a) (posL k r i b) (1 : ℂ) * s') x y =
-        s'⁻¹ x (posL k r i a) * s' (posL k r i b) y := by
-      simp [Matrix.mul_apply, Matrix.single_apply, ite_and, ite_mul]
-    rw [hL]
-    simp only [Matrix.sum_apply, Matrix.smul_apply, Matrix.single_apply, smul_eq_mul, blk]
-    by_cases hx : ∃ c, posL k r i c = x
-    · by_cases hy : ∃ d, posL k r i d = y
-      · obtain ⟨c0, rfl⟩ := hx
-        obtain ⟨d0, rfl⟩ := hy
-        simp [hinj, ite_and]
-      · push_neg at hy
-        have h0 : s' (posL k r i b) y = 0 := by
-          rw [glev_col hs' _ y (fun d e => hy d e.symm), (bvec_posL_outer b y (fun d e => hy d e.symm)).1]
-        simp [h0, hy]
-    · push_neg at hx
-      have h0 : s'⁻¹ x (posL k r i a) = 0 := by
-        rw [glev_row' hiG x _ (fun c e => hx c e.symm), (bvec_posL_outer a x (fun c e => hx c e.symm)).2]
-      simp [h0, hx]
-  calc EH k r (posL k r i a) (posL k r i b) (fun x => f (x * s')) g
-      = lam (fderiv ℝ F (g * s')) (g * s') (s'⁻¹ * Matrix.single (posL k r i a) (posL k r i b) (1 : ℂ) * s') := by
-        show RdV _ (fun x => f (x * s')) g + Complex.I • RdV _ (fun x => f (x * s')) g = _
-        rw [rdV_right _ _ _ _ hu.1 hu.2, rdV_right _ _ _ _ hu.1 hu.2, ← hpart1_conj hsU, ← hpart2_conj hsU]
-        exact hEH _ (fun t => by rw [hpart1_conj hsU]; exact exp_conj_mem hs' (exp_hpart1_mem i a b) t)
-          (fun t => by rw [hpart2_conj hsU]; exact exp_conj_mem hs' (exp_hpart2_mem i a b) t)
+  have hinj : ∀ c c' : Fin (mdim k r i), posL k r i c = posL k r i c' ↔ c = c' := fun c c' =>
+    ⟨posL_inj, congrArg _⟩
+  have hconj
+      : s'⁻¹ * Matrix.single (posL k r i a) (posL k r i b) (1 : ℂ) * s'
+        = ∑ c, ∑ d, (blk i s'⁻¹ c a * blk i s' b d) • Matrix.single (posL k r i c) (posL k r i d) (1 : ℂ) :=
+    by
+      ext x y
+      have hL
+          : (s'⁻¹ * Matrix.single (posL k r i a) (posL k r i b) (1 : ℂ) * s') x y
+            = s'⁻¹ x (posL k r i a) * s' (posL k r i b) y := by
+        simp [Matrix.mul_apply, Matrix.single_apply, ite_and, ite_mul]
+      rw [hL]
+      simp only [Matrix.sum_apply, Matrix.smul_apply, Matrix.single_apply, smul_eq_mul, blk]
+      by_cases hx : ∃ c, posL k r i c = x
+      · by_cases hy : ∃ d, posL k r i d = y
+        · obtain ⟨c0, rfl⟩ := hx
+          obtain ⟨d0, rfl⟩ := hy
+          simp [hinj, ite_and]
+        · push_neg at hy
+          have h0 : s' (posL k r i b) y = 0 := by
+            rw [glev_col hs' _ y (fun d e => hy d e.symm),
+              (bvec_posL_outer b y (fun d e => hy d e.symm)).1]
+          simp [h0, hy]
+      · push_neg at hx
+        have h0 : s'⁻¹ x (posL k r i a) = 0 := by
+          rw [glev_row' hiG x _ (fun c e => hx c e.symm),
+            (bvec_posL_outer a x (fun c e => hx c e.symm)).2]
+        simp [h0, hx]
+  calc
+    EH k r (posL k r i a) (posL k r i b) (fun x => f (x * s')) g
+        = lam (fderiv ℝ F (g * s')) (g * s')
+          (s'⁻¹ * Matrix.single (posL k r i a) (posL k r i b) (1 : ℂ) * s') := by
+      show RdV _ (fun x => f (x * s')) g + Complex.I • RdV _ (fun x => f (x * s')) g = _
+      rw [rdV_right _ _ _ _ hu.1 hu.2, rdV_right _ _ _ _ hu.1 hu.2, ← hpart1_conj hsU,
+        ← hpart2_conj hsU]
+      exact hEH _
+        (fun t => by rw [hpart1_conj hsU]; exact exp_conj_mem hs' (exp_hpart1_mem i a b) t)
+        (fun t => by rw [hpart2_conj hsU]; exact exp_conj_mem hs' (exp_hpart2_mem i a b) t)
     _ = ∑ c, ∑ d, (blk i s'⁻¹ c a * blk i s' b d) •
           lam (fderiv ℝ F (g * s')) (g * s') (Matrix.single (posL k r i c) (posL k r i d) (1 : ℂ)) := by
-        rw [hconj]
-        change lamL (fderiv ℝ F (g * s')) (g * s')
-          (∑ c, ∑ d, (blk i s'⁻¹ c a * blk i s' b d) • Matrix.single (posL k r i c) (posL k r i d) (1 : ℂ)) = _
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sum, map_smul]
-        rfl
+      rw [hconj]
+      change lamL (fderiv ℝ F (g * s')) (g * s')
+          (∑ c, ∑ d, (blk i s'⁻¹ c a * blk i s' b d) • Matrix.single (posL k r i c) (posL k r i d) (1 : ℂ))
+        = _
+      set_option synthInstance.maxHeartbeats 100000 in
+        simp only [map_sum, map_smul]
+      rfl
     _ = _ := by
-        refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun d _ => ?_
-        rw [← hEH _ (exp_hpart1_mem i c d) (exp_hpart2_mem i c d)]
-        rfl
+      refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun d _ => ?_
+      rw [← hEH _ (exp_hpart1_mem i c d) (exp_hpart2_mem i c d)]
+      rfl
 
 end Formalism.FourierDecayAlt.Q.TInvW

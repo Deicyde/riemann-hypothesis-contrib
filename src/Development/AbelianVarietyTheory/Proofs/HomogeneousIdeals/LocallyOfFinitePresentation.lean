@@ -12,13 +12,13 @@ namespace GlobalTheory.Retract
 
 section Algebra
 
-variable {R A B : Type*} [CommRing R] [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
+variable
+  {R A B : Type*} [CommRing R] [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
   (s : A →ₐ[R] B) (p : B →ₐ[R] A) (h : p.comp s = AlgHom.id R A)
 
 include h
 
-theorem algHom_surjective : Function.Surjective p :=
-  fun a ↦ ⟨s a, congr($h a)⟩
+theorem algHom_surjective : Function.Surjective p := fun a ↦ ⟨s a, congr($h a)⟩
 
 theorem flat_algebra [Module.Flat R B] : Module.Flat R A :=
   Module.Flat.of_retract s.toLinearMap p.toLinearMap (LinearMap.ext fun a ↦ congr($h a))
@@ -47,8 +47,8 @@ theorem fg_ker [Algebra.FiniteType R B] : (RingHom.ker p.toRingHom).FG := by
     simp only [AlgHom.comp_apply, hb', map_zero, Ideal.Quotient.mkₐ_eq_mk] at this
     exact Ideal.Quotient.eq_zero_iff_mem.mp this
 
-theorem finitePresentation_algebra [Algebra.FinitePresentation R B] :
-    Algebra.FinitePresentation R A :=
+theorem finitePresentation_algebra [Algebra.FinitePresentation R B]
+    : Algebra.FinitePresentation R A :=
   Algebra.FinitePresentation.of_surjective (algHom_surjective s p h) (fg_ker s p h)
 
 theorem formallySmooth_algebra [Algebra.FormallySmooth R B] : Algebra.FormallySmooth R A := by
@@ -57,8 +57,8 @@ theorem formallySmooth_algebra [Algebra.FormallySmooth R B] : Algebra.FormallySm
   ext a
   exact congr($h a)
 
-theorem formallyUnramified_algebra [Algebra.FormallyUnramified R B] :
-    Algebra.FormallyUnramified R A :=
+theorem formallyUnramified_algebra [Algebra.FormallyUnramified R B]
+    : Algebra.FormallyUnramified R A :=
   Algebra.FormallyUnramified.of_surjective p (algHom_surjective s p h)
 
 theorem formallyEtale_algebra [Algebra.FormallyEtale R B] : Algebra.FormallyEtale R A :=
@@ -83,9 +83,9 @@ theorem section_comp (hir : i ≫ r = 𝟙 X) (hr : r ≫ f = g) : i ≫ g = f :
 theorem apply_apply (hir : i ≫ r = 𝟙 X) (x : X) : r (i x) = x := by
   rw [← Scheme.Hom.comp_apply, hir]; rfl
 
-theorem exists_affine_le (hir : i ≫ r = 𝟙 X) (x : X) (O : X.Opens) (hx : x ∈ O) :
-    ∃ (U : X.Opens) (V : Y.Opens), IsAffineOpen U ∧ IsAffineOpen V ∧ x ∈ U ∧ U ≤ O ∧
-      U ≤ i ⁻¹ᵁ V ∧ V ≤ r ⁻¹ᵁ U := by
+theorem exists_affine_le (hir : i ≫ r = 𝟙 X) (x : X) (O : X.Opens) (hx : x ∈ O)
+    : ∃ (U : X.Opens) (V : Y.Opens),
+      IsAffineOpen U ∧ IsAffineOpen V ∧ x ∈ U ∧ U ≤ O ∧ U ≤ i ⁻¹ᵁ V ∧ V ≤ r ⁻¹ᵁ U := by
   obtain ⟨U₀, hU₀, hxU₀, hU₀O⟩ := Opens.isBasis_iff_nbhd.mp X.isBasis_affineOpens hx
   have hix : i x ∈ r ⁻¹ᵁ U₀ := by
     change r (i x) ∈ U₀
@@ -94,8 +94,16 @@ theorem exists_affine_le (hir : i ≫ r = 𝟙 X) (x : X) (O : X.Opens) (hx : x 
   obtain ⟨a, ha, hxa⟩ := IsAffineOpen.exists_basicOpen_le hU₀ (V := i ⁻¹ᵁ V₀) ⟨x, hxV₀⟩ hxU₀
   have hV : Y.basicOpen (r.appLE U₀ V₀ hV₀U₀ a) = V₀ ⊓ r ⁻¹ᵁ X.basicOpen a := by
     simp [Scheme.Hom.appLE, ← Scheme.preimage_basicOpen]
-  refine ⟨X.basicOpen a, Y.basicOpen (r.appLE U₀ V₀ hV₀U₀ a), IsAffineOpen.basicOpen hU₀ a,
-    IsAffineOpen.basicOpen hV₀ _, hxa, (X.basicOpen_le a).trans hU₀O, ?_, ?_⟩
+  refine ⟨
+    X.basicOpen a,
+    Y.basicOpen (r.appLE U₀ V₀ hV₀U₀ a),
+    IsAffineOpen.basicOpen hU₀ a,
+    IsAffineOpen.basicOpen hV₀ _,
+    hxa,
+    (X.basicOpen_le a).trans hU₀O,
+    ?_,
+    ?_
+  ⟩
   · rw [hV]
     intro z hz
     refine ⟨ha hz, ?_⟩
@@ -104,9 +112,9 @@ theorem exists_affine_le (hir : i ≫ r = 𝟙 X) (x : X) (O : X.Opens) (hx : x 
   · rw [hV]
     exact inf_le_right
 
-theorem appLE_comp_appLE (hir : i ≫ r = 𝟙 X) {U : X.Opens} {V : Y.Opens}
-    (hUV : U ≤ i ⁻¹ᵁ V) (hVU : V ≤ r ⁻¹ᵁ U) :
-    r.appLE U V hVU ≫ i.appLE V U hUV = 𝟙 Γ(X, U) := by
+theorem appLE_comp_appLE
+    (hir : i ≫ r = 𝟙 X) {U : X.Opens} {V : Y.Opens} (hUV : U ≤ i ⁻¹ᵁ V) (hVU : V ≤ r ⁻¹ᵁ U)
+    : r.appLE U V hVU ≫ i.appLE V U hUV = 𝟙 Γ(X, U) := by
   rw [Scheme.Hom.appLE_comp_appLE]
   generalize_proofs e
   revert e
@@ -114,25 +122,31 @@ theorem appLE_comp_appLE (hir : i ≫ r = 𝟙 X) {U : X.Opens} {V : Y.Opens}
   intro e
   exact (Category.id_comp _).trans (X.presheaf.map_id _)
 
-theorem base_appLE_comp_retraction (hr : r ≫ f = g) {U : X.Opens} {V : Y.Opens} {W : S.Opens}
-    (hVU : V ≤ r ⁻¹ᵁ U) (hUW : U ≤ f ⁻¹ᵁ W) (hVW : V ≤ g ⁻¹ᵁ W) :
-    f.appLE W U hUW ≫ r.appLE U V hVU = g.appLE W V hVW := by
+theorem base_appLE_comp_retraction
+    (hr : r ≫ f = g)
+    {U : X.Opens} {V : Y.Opens} {W : S.Opens}
+    (hVU : V ≤ r ⁻¹ᵁ U) (hUW : U ≤ f ⁻¹ᵁ W) (hVW : V ≤ g ⁻¹ᵁ W)
+    : f.appLE W U hUW ≫ r.appLE U V hVU = g.appLE W V hVW := by
   subst hr
   rw [Scheme.Hom.appLE_comp_appLE]
 
-theorem base_appLE_comp_section (hi : i ≫ g = f) {U : X.Opens} {V : Y.Opens} {W : S.Opens}
-    (hUV : U ≤ i ⁻¹ᵁ V) (hUW : U ≤ f ⁻¹ᵁ W) (hVW : V ≤ g ⁻¹ᵁ W) :
-    g.appLE W V hVW ≫ i.appLE V U hUV = f.appLE W U hUW := by
+theorem base_appLE_comp_section
+    (hi : i ≫ g = f)
+    {U : X.Opens} {V : Y.Opens} {W : S.Opens}
+    (hUV : U ≤ i ⁻¹ᵁ V) (hUW : U ≤ f ⁻¹ᵁ W) (hVW : V ≤ g ⁻¹ᵁ W)
+    : g.appLE W V hVW ≫ i.appLE V U hUV = f.appLE W U hUW := by
   subst hi
   rw [Scheme.Hom.appLE_comp_appLE]
 
-theorem exists_algHom_retract (hir : i ≫ r = 𝟙 X) (hr : r ≫ f = g)
+theorem exists_algHom_retract
+    (hir : i ≫ r = 𝟙 X) (hr : r ≫ f = g)
     {U : X.Opens} {V : Y.Opens} {W : S.Opens}
-    (hUV : U ≤ i ⁻¹ᵁ V) (hVU : V ≤ r ⁻¹ᵁ U) (hUW : U ≤ f ⁻¹ᵁ W) (hVW : V ≤ g ⁻¹ᵁ W) :
-    (letI := (f.appLE W U hUW).hom.toAlgebra; letI := (g.appLE W V hVW).hom.toAlgebra;
-    ∃ (s : Γ(X, U) →ₐ[Γ(S, W)] Γ(Y, V)) (p : Γ(Y, V) →ₐ[Γ(S, W)] Γ(X, U)),
-      s.toRingHom = (r.appLE U V hVU).hom ∧ p.toRingHom = (i.appLE V U hUV).hom ∧
-        p.comp s = AlgHom.id _ _ ) := by
+    (hUV : U ≤ i ⁻¹ᵁ V) (hVU : V ≤ r ⁻¹ᵁ U) (hUW : U ≤ f ⁻¹ᵁ W) (hVW : V ≤ g ⁻¹ᵁ W)
+    : (letI := (f.appLE W U hUW).hom.toAlgebra
+       letI := (g.appLE W V hVW).hom.toAlgebra
+       ∃ (s : Γ(X, U) →ₐ[Γ(S, W)] Γ(Y, V)) (p : Γ(Y, V) →ₐ[Γ(S, W)] Γ(X, U)),
+         s.toRingHom = (r.appLE U V hVU).hom ∧ p.toRingHom = (i.appLE V U hUV).hom
+           ∧ p.comp s = AlgHom.id _ _) := by
   letI := (f.appLE W U hUW).hom.toAlgebra
   letI := (g.appLE W V hVW).hom.toAlgebra
   refine ⟨⟨(r.appLE U V hVU).hom, fun a ↦ ?_⟩, ⟨(i.appLE V U hUV).hom, fun a ↦ ?_⟩, rfl, rfl, ?_⟩
@@ -141,13 +155,20 @@ theorem exists_algHom_retract (hir : i ≫ r = 𝟙 X) (hr : r ≫ f = g)
   · ext a
     exact congr($(appLE_comp_appLE hir hUV hVU).hom a)
 
-theorem exists_baseChange (hir : i ≫ r = 𝟙 X) (hr : r ≫ f = g) {T X' Y' : Scheme.{u}} {y : T ⟶ S}
-    {a : X' ⟶ X} {f' : X' ⟶ T} (hX : IsPullback a f' f y)
-    {b : Y' ⟶ Y} {g' : Y' ⟶ T} (hY : IsPullback b g' g y) :
-    ∃ (i' : X' ⟶ Y') (r' : Y' ⟶ X'), i' ≫ r' = 𝟙 X' ∧ r' ≫ f' = g' ∧
-      i' ≫ b = a ≫ i ∧ r' ≫ a = b ≫ r := by
-  refine ⟨hY.lift (a ≫ i) f' (by rw [Category.assoc, section_comp hir hr, hX.w]),
-    hX.lift (b ≫ r) g' (by rw [Category.assoc, hr, hY.w]), ?_, by simp, by simp, by simp⟩
+theorem exists_baseChange
+    (hir : i ≫ r = 𝟙 X) (hr : r ≫ f = g)
+    {T X' Y' : Scheme.{u}} {y : T ⟶ S} {a : X' ⟶ X} {f' : X' ⟶ T} (hX : IsPullback a f' f y)
+    {b : Y' ⟶ Y} {g' : Y' ⟶ T} (hY : IsPullback b g' g y)
+    : ∃ (i' : X' ⟶ Y') (r' : Y' ⟶ X'),
+      i' ≫ r' = 𝟙 X' ∧ r' ≫ f' = g' ∧ i' ≫ b = a ≫ i ∧ r' ≫ a = b ≫ r := by
+  refine ⟨
+    hY.lift (a ≫ i) f' (by rw [Category.assoc, section_comp hir hr, hX.w]),
+    hX.lift (b ≫ r) g' (by rw [Category.assoc, hr, hY.w]),
+    ?_,
+    by simp,
+    by simp,
+    by simp
+  ⟩
   apply hX.hom_ext <;> simp [hir]
 
 end Local
@@ -156,18 +177,20 @@ section RingHomProperty
 
 variable {X Y S : Scheme.{u}} {f : X ⟶ S} {g : Y ⟶ S} {i : X ⟶ Y} {r : Y ⟶ X}
 
-theorem of_hasRingHomProperty (P : MorphismProperty Scheme.{u})
+theorem of_hasRingHomProperty
+    (P : MorphismProperty Scheme.{u})
     {Q : ∀ {R A : Type u} [CommRing R] [CommRing A], (R →+* A) → Prop} [HasRingHomProperty P Q]
     (hQ : ∀ {R A B : Type u} [CommRing R] [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
-      (s : A →ₐ[R] B) (p : B →ₐ[R] A), p.comp s = AlgHom.id R A →
-        Q (algebraMap R B) → Q (algebraMap R A))
-    (hir : i ≫ r = 𝟙 X) (hr : r ≫ f = g) (hg : P g) : P f := by
+        (s : A →ₐ[R] B) (p : B →ₐ[R] A),
+      p.comp s = AlgHom.id R A → Q (algebraMap R B) → Q (algebraMap R A))
+    (hir : i ≫ r = 𝟙 X) (hr : r ≫ f = g) (hg : P g)
+    : P f := by
   wlog hS : IsAffine S generalizing X Y S
   · rw [IsZariskiLocalAtTarget.iff_of_openCover (P := P) S.affineCover]
     intro j
-    obtain ⟨i', r', h₁, h₂, -, -⟩ := exists_baseChange hir hr
-      (IsPullback.of_hasPullback f (S.affineCover.f j))
-      (IsPullback.of_hasPullback g (S.affineCover.f j))
+    obtain ⟨i', r', h₁, h₂, -, -⟩ :=
+      exists_baseChange hir hr (IsPullback.of_hasPullback f (S.affineCover.f j))
+        (IsPullback.of_hasPullback g (S.affineCover.f j))
     exact this h₁ h₂ (IsZariskiLocalAtTarget.of_isPullback (.of_hasPullback _ _) hg) inferInstance
   choose U V hU hV hxU _ hUV hVU using fun x ↦ exists_affine_le hir x ⊤ trivial
   refine HasRingHomProperty.of_iSup_eq_top (fun x ↦ ⟨U x, hU x⟩) ?_ fun x ↦ ?_
@@ -181,30 +204,40 @@ variable (hir : i ≫ r = 𝟙 X) (hr : r ≫ f = g)
 include hir hr
 
 theorem locallyOfFiniteType [hg : LocallyOfFiniteType g] : LocallyOfFiniteType f :=
-  of_hasRingHomProperty @LocallyOfFiniteType (fun s p h H ↦ by
-    rw [RingHom.finiteType_algebraMap] at H ⊢
-    exact finiteType_algebra s p h) hir hr hg
+  of_hasRingHomProperty @LocallyOfFiniteType
+    (fun s p h H ↦ by
+      rw [RingHom.finiteType_algebraMap] at H ⊢
+      exact finiteType_algebra s p h)
+    hir hr hg
 
-theorem locallyOfFinitePresentation [hg : LocallyOfFinitePresentation g] :
-    LocallyOfFinitePresentation f :=
-  of_hasRingHomProperty @LocallyOfFinitePresentation (fun s p h H ↦ by
-    rw [RingHom.finitePresentation_algebraMap] at H ⊢
-    exact finitePresentation_algebra s p h) hir hr hg
+theorem locallyOfFinitePresentation [hg : LocallyOfFinitePresentation g]
+    : LocallyOfFinitePresentation f :=
+  of_hasRingHomProperty @LocallyOfFinitePresentation
+    (fun s p h H ↦ by
+      rw [RingHom.finitePresentation_algebraMap] at H ⊢
+      exact finitePresentation_algebra s p h)
+    hir hr hg
 
 theorem flat [hg : Flat g] : Flat f :=
-  of_hasRingHomProperty @Flat (fun s p h H ↦ by
-    rw [RingHom.flat_algebraMap_iff] at H ⊢
-    exact flat_algebra s p h) hir hr hg
+  of_hasRingHomProperty @Flat
+    (fun s p h H ↦ by
+      rw [RingHom.flat_algebraMap_iff] at H ⊢
+      exact flat_algebra s p h)
+    hir hr hg
 
 theorem smooth [hg : Smooth g] : Smooth f :=
-  of_hasRingHomProperty @Smooth (fun s p h H ↦ by
-    rw [RingHom.smooth_algebraMap] at H ⊢
-    exact smooth_algebra s p h) hir hr hg
+  of_hasRingHomProperty @Smooth
+    (fun s p h H ↦ by
+      rw [RingHom.smooth_algebraMap] at H ⊢
+      exact smooth_algebra s p h)
+    hir hr hg
 
 theorem etale [hg : Etale g] : Etale f :=
-  of_hasRingHomProperty @Etale (fun s p h H ↦ by
-    rw [RingHom.etale_algebraMap] at H ⊢
-    exact etale_algebra s p h) hir hr hg
+  of_hasRingHomProperty @Etale
+    (fun s p h H ↦ by
+      rw [RingHom.etale_algebraMap] at H ⊢
+      exact etale_algebra s p h)
+    hir hr hg
 
 end RingHomProperty
 
@@ -213,11 +246,9 @@ section Absolute
 variable {X Y : Scheme.{u}} {i : X ⟶ Y} {r : Y ⟶ X} (hir : i ≫ r = 𝟙 X)
 include hir
 
-theorem surjective_retraction : Surjective r :=
-  ⟨fun x ↦ ⟨i x, apply_apply hir x⟩⟩
+theorem surjective_retraction : Surjective r := ⟨fun x ↦ ⟨i x, apply_apply hir x⟩⟩
 
-theorem mono_section : Mono i :=
-  (SplitMono.mk r hir).mono
+theorem mono_section : Mono i := (SplitMono.mk r hir).mono
 
 theorem connectedSpace [ConnectedSpace Y] : ConnectedSpace X :=
   (surjective_retraction hir).surj.connectedSpace r.continuous
@@ -226,7 +257,8 @@ end Absolute
 
 section Global
 
-variable {X Y S : Scheme.{u}} {f : X ⟶ S} {g : Y ⟶ S} {i : X ⟶ Y} {r : Y ⟶ X}
+variable
+  {X Y S : Scheme.{u}} {f : X ⟶ S} {g : Y ⟶ S} {i : X ⟶ Y} {r : Y ⟶ X}
   (hir : i ≫ r = 𝟙 X) (hr : r ≫ f = g)
 include hir hr
 
@@ -241,7 +273,8 @@ theorem quasiCompact [QuasiCompact g] : QuasiCompact f := by
   refine ⟨fun U hU hU' ↦ ?_⟩
   have := (QuasiCompact.isCompact_preimage (f := r ≫ f) U hU hU').image r.continuous
   rwa [Scheme.Hom.comp_base, TopCat.coe_comp, Set.preimage_comp,
-    Set.image_preimage_eq _ (surjective_retraction hir).surj] at this
+      Set.image_preimage_eq _ (surjective_retraction hir).surj]
+    at this
 
 theorem isSeparated [IsSeparated g] : IsSeparated f := by
   have := mono_section hir
@@ -263,9 +296,11 @@ theorem isFinite [IsFinite g] : IsFinite f := by
   rw [← section_comp hir hr]
   infer_instance
 
-theorem geometrically (P : ObjectProperty Scheme.{u})
+theorem geometrically
+    (P : ObjectProperty Scheme.{u})
     (hP : ∀ {A B : Scheme.{u}} (a : A ⟶ B) (b : B ⟶ A), a ≫ b = 𝟙 A → P B → P A)
-    (hg : AlgebraicGeometry.geometrically P g) : AlgebraicGeometry.geometrically P f := by
+    (hg : AlgebraicGeometry.geometrically P g)
+    : AlgebraicGeometry.geometrically P f := by
   intro K _ y Z fst snd h
   obtain ⟨i', r', h₁, -, -, -⟩ := exists_baseChange hir hr h (IsPullback.of_hasPullback g y)
   exact hP i' r' h₁ (pullback_of_geometrically hg K y)
@@ -273,19 +308,28 @@ theorem geometrically (P : ObjectProperty Scheme.{u})
 theorem geometricallyConnected [hg : GeometricallyConnected g] : GeometricallyConnected f :=
   ⟨geometrically hir hr _ (fun _ _ h _ ↦ connectedSpace h) hg.1⟩
 
-theorem properties :
-    (LocallyOfFiniteType g → LocallyOfFiniteType f) ∧
-    (LocallyOfFinitePresentation g → LocallyOfFinitePresentation f) ∧
-    (Flat g → Flat f) ∧ (Smooth g → Smooth f) ∧ (Etale g → Etale f) ∧
-    (QuasiCompact g → QuasiCompact f) ∧ (IsSeparated g → IsSeparated f) ∧
-    (UniversallyClosed g → UniversallyClosed f) ∧ (IsProper g → IsProper f) ∧
-    (IsFinite g → IsFinite f) ∧ (GeometricallyConnected g → GeometricallyConnected f) ∧
-    Surjective r ∧ (IsSeparated g → IsClosedImmersion i) :=
-  ⟨fun _ ↦ locallyOfFiniteType hir hr, fun _ ↦ locallyOfFinitePresentation hir hr,
-    fun _ ↦ flat hir hr, fun _ ↦ smooth hir hr, fun _ ↦ etale hir hr,
-    fun _ ↦ quasiCompact hir hr, fun _ ↦ isSeparated hir hr, fun _ ↦ universallyClosed hir hr,
-    fun _ ↦ isProper hir hr, fun _ ↦ isFinite hir hr, fun _ ↦ geometricallyConnected hir hr,
-    surjective_retraction hir, fun _ ↦ isClosedImmersion_section hir hr⟩
+theorem properties
+    : (LocallyOfFiniteType g → LocallyOfFiniteType f)
+      ∧ (LocallyOfFinitePresentation g → LocallyOfFinitePresentation f) ∧ (Flat g → Flat f)
+      ∧ (Smooth g → Smooth f) ∧ (Etale g → Etale f) ∧ (QuasiCompact g → QuasiCompact f)
+      ∧ (IsSeparated g → IsSeparated f) ∧ (UniversallyClosed g → UniversallyClosed f)
+      ∧ (IsProper g → IsProper f) ∧ (IsFinite g → IsFinite f)
+      ∧ (GeometricallyConnected g → GeometricallyConnected f) ∧ Surjective r
+      ∧ (IsSeparated g → IsClosedImmersion i) := ⟨
+  fun _ ↦ locallyOfFiniteType hir hr,
+  fun _ ↦ locallyOfFinitePresentation hir hr,
+  fun _ ↦ flat hir hr,
+  fun _ ↦ smooth hir hr,
+  fun _ ↦ etale hir hr,
+  fun _ ↦ quasiCompact hir hr,
+  fun _ ↦ isSeparated hir hr,
+  fun _ ↦ universallyClosed hir hr,
+  fun _ ↦ isProper hir hr,
+  fun _ ↦ isFinite hir hr,
+  fun _ ↦ geometricallyConnected hir hr,
+  surjective_retraction hir,
+  fun _ ↦ isClosedImmersion_section hir hr
+⟩
 
 end Global
 
@@ -296,15 +340,15 @@ variable {S : Scheme.{u}} {X Y : Over S}
 theorem over_left_comp (h : CategoryTheory.Retract X Y) : h.i.left ≫ h.r.left = 𝟙 X.left := by
   rw [← Over.comp_left, h.retract, Over.id_left]
 
-theorem over_properties (h : CategoryTheory.Retract X Y) :
-    (LocallyOfFiniteType Y.hom → LocallyOfFiniteType X.hom) ∧
-    (LocallyOfFinitePresentation Y.hom → LocallyOfFinitePresentation X.hom) ∧
-    (Flat Y.hom → Flat X.hom) ∧ (Smooth Y.hom → Smooth X.hom) ∧ (Etale Y.hom → Etale X.hom) ∧
-    (QuasiCompact Y.hom → QuasiCompact X.hom) ∧ (IsSeparated Y.hom → IsSeparated X.hom) ∧
-    (UniversallyClosed Y.hom → UniversallyClosed X.hom) ∧ (IsProper Y.hom → IsProper X.hom) ∧
-    (IsFinite Y.hom → IsFinite X.hom) ∧
-    (GeometricallyConnected Y.hom → GeometricallyConnected X.hom) ∧
-    Surjective h.r.left ∧ (IsSeparated Y.hom → IsClosedImmersion h.i.left) :=
+theorem over_properties (h : CategoryTheory.Retract X Y)
+    : (LocallyOfFiniteType Y.hom → LocallyOfFiniteType X.hom)
+      ∧ (LocallyOfFinitePresentation Y.hom → LocallyOfFinitePresentation X.hom)
+      ∧ (Flat Y.hom → Flat X.hom) ∧ (Smooth Y.hom → Smooth X.hom) ∧ (Etale Y.hom → Etale X.hom)
+      ∧ (QuasiCompact Y.hom → QuasiCompact X.hom) ∧ (IsSeparated Y.hom → IsSeparated X.hom)
+      ∧ (UniversallyClosed Y.hom → UniversallyClosed X.hom) ∧ (IsProper Y.hom → IsProper X.hom)
+      ∧ (IsFinite Y.hom → IsFinite X.hom)
+      ∧ (GeometricallyConnected Y.hom → GeometricallyConnected X.hom) ∧ Surjective h.r.left
+      ∧ (IsSeparated Y.hom → IsClosedImmersion h.i.left) :=
   properties (over_left_comp h) (Over.w h.r)
 
 end Over

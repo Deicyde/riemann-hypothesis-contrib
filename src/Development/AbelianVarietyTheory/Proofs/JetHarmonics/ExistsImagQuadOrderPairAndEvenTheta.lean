@@ -37,8 +37,8 @@ theorem isOK_pair {d : ℕ} (hd : 0 < d) : IsOK d (pair hd) := by
   simp only [pair, mul_one, InOK]
   exact ⟨fun ⟨m, n, h⟩ => ⟨m, n, h.symm⟩, fun ⟨m, n, h⟩ => ⟨m, n, h.symm⟩⟩
 
-theorem G_eq {d : ℕ} {L : PeriodPair} (h : IsOK d L) {k : ℕ} (hk : k ≠ 0) :
-    L.G (2 * k) = eis d k := by
+theorem G_eq {d : ℕ} {L : PeriodPair} (h : IsOK d L) {k : ℕ} (hk : k ≠ 0)
+    : L.G (2 * k) = eis d k := by
   unfold PeriodPair.G eis
   have e1 := tsum_subtype (L.lattice : Set ℂ) (fun w : ℂ => (w ^ (2 * k))⁻¹)
   have e2 := tsum_subtype {w : ℂ | InOK d w ∧ w ≠ 0} (fun w : ℂ => 1 / w ^ (2 * k))
@@ -60,40 +60,42 @@ theorem mem_lam (d : ℕ) (z : ℂ) : z ∈ lam d ↔ InOK d z := by
   simp only [zsmul_eq_mul, mul_one, InOK]
   exact ⟨fun ⟨m, n, h⟩ => ⟨m, n, h.symm⟩, fun ⟨m, n, h⟩ => ⟨m, n, h.symm⟩⟩
 
-theorem area_lam {d : ℕ} (hd : 0 < d) : Formalism.MainNotions.TaylorLogMetric.area (lam d) = Real.sqrt d / 2 := by
+theorem area_lam {d : ℕ} (hd : 0 < d)
+    : Formalism.MainNotions.TaylorLogMetric.area (lam d) = Real.sqrt d / 2 := by
   rw [lam, GlobalTheory.TransInv.area_closure_pair (indep hd)]
   simp [wK, abs_div]
 
-theorem thetaTranslationOperator_apply {d : ℕ} (hd : 0 < d) (x : ℂ) (F : ℂ → ℂ) (z : ℂ) :
-    Formalism.MainNotions.TaylorLogMetric.U1 (lam d) x F z = U1 d x F z := by
+theorem thetaTranslationOperator_apply {d : ℕ} (hd : 0 < d) (x : ℂ) (F : ℂ → ℂ) (z : ℂ)
+    : Formalism.MainNotions.TaylorLogMetric.U1 (lam d) x F z = U1 d x F z := by
   simp only [Formalism.MainNotions.TaylorLogMetric.U1, U1, h1, area_lam hd]
   congr 2
   push_cast
   ring
 
-theorem thetaTranslation_comp_eq_cocycle_mul (d : ℕ) (a b : ℂ) (F : ℂ → ℂ) (z : ℂ) :
-    U1 d a (U1 d b F) z =
-      Complex.exp ((Real.pi : ℂ) / 2 * (h1 d b a - h1 d a b)) * U1 d (a + b) F z := by
+theorem thetaTranslation_comp_eq_cocycle_mul (d : ℕ) (a b : ℂ) (F : ℂ → ℂ) (z : ℂ)
+    : U1 d a (U1 d b F) z
+      = Complex.exp ((Real.pi : ℂ) / 2 * (h1 d b a - h1 d a b)) * U1 d (a + b) F z := by
   simp only [U1]
   rw [mul_assoc, ← Complex.exp_add, mul_left_comm, ← Complex.exp_add, add_assoc z a b]
   congr 2
   simp only [h1, map_add (f := _)]
   ring
 
-theorem half_not_mem {d : ℕ} (hd : 0 < d) (u v : ℤ) (h : ¬ (Odd u ∧ Even v)) :
-    ((u : ℂ) + (v : ℂ) * wK d) / 2 + 1 / 2 ∉ lam d := by
+theorem half_not_mem {d : ℕ} (hd : 0 < d) (u v : ℤ) (h : ¬(Odd u ∧ Even v))
+    : ((u : ℂ) + (v : ℂ) * wK d) / 2 + 1 / 2 ∉ lam d := by
   rw [mem_lam]
   rintro ⟨m, n, e⟩
-  have := (LinearIndependent.pair_iff.1 (indep hd)) ((u + 1 - 2 * m : ℤ) : ℝ) ((v - 2 * n : ℤ) : ℝ) (by
-    simp only [Complex.real_smul]
-    push_cast
-    linear_combination 2 * e)
+  have :=
+    (LinearIndependent.pair_iff.1 (indep hd)) ((u + 1 - 2 * m : ℤ) : ℝ) ((v - 2 * n : ℤ) : ℝ) (by
+      simp only [Complex.real_smul]
+      push_cast
+      linear_combination 2 * e)
   have h1 : u + 1 - 2 * m = 0 := by exact_mod_cast this.1
   have h2 : v - 2 * n = 0 := by exact_mod_cast this.2
   exact h ⟨⟨m - 1, by omega⟩, ⟨n, by omega⟩⟩
 
-theorem normSq_eq {d : ℕ} (c : ℤ) (hc : (d : ℤ) + 1 = 8 * c) (u v : ℤ) :
-    Complex.normSq ((u : ℂ) + (v : ℂ) * wK d) = ((u ^ 2 + u * v + 2 * c * v ^ 2 : ℤ) : ℝ) := by
+theorem normSq_eq {d : ℕ} (c : ℤ) (hc : (d : ℤ) + 1 = 8 * c) (u v : ℤ)
+    : Complex.normSq ((u : ℂ) + (v : ℂ) * wK d) = ((u ^ 2 + u * v + 2 * c * v ^ 2 : ℤ) : ℝ) := by
   have hs : Real.sqrt d * Real.sqrt d = d := Real.mul_self_sqrt (Nat.cast_nonneg d)
   have hc' : (d : ℝ) + 1 = 8 * c := by exact_mod_cast hc
   simp [Complex.normSq_apply, wK]
@@ -106,9 +108,9 @@ theorem exp_even {n : ℤ} (h : Even n) : Complex.exp ((Real.pi : ℂ) * Complex
   push_cast
   ring
 
-theorem comm_eq {d : ℕ} (hd : 0 < d) (u v : ℤ) :
-    h1 d (wK d) ((u : ℂ) + (v : ℂ) * wK d) - h1 d ((u : ℂ) + (v : ℂ) * wK d) (wK d) =
-      2 * u * Complex.I := by
+theorem comm_eq {d : ℕ} (hd : 0 < d) (u v : ℤ)
+    : h1 d (wK d) ((u : ℂ) + (v : ℂ) * wK d) - h1 d ((u : ℂ) + (v : ℂ) * wK d) (wK d)
+      = 2 * u * Complex.I := by
   have hs : ((Real.sqrt d : ℝ) : ℂ) ≠ 0 :=
     Complex.ofReal_ne_zero.2 (Real.sqrt_pos.mpr (by exact_mod_cast hd)).ne'
   simp only [h1, wK, map_add (f := _), map_mul, map_div₀, map_intCast, map_one, Complex.conj_I,
@@ -121,12 +123,12 @@ theorem exists_isTh {d : ℕ} (hd8 : d % 8 = 7) : ∃ θ : ℂ → ℂ, IsTh d �
   have hd : 0 < d := by omega
   obtain ⟨c, hc⟩ : ∃ c : ℤ, (d : ℤ) + 1 = 8 * c := ⟨((d : ℤ) + 1) / 8, by omega⟩
   have hlat : GlobalTheory.EvenTheta.IsLat (lam d) := ⟨1, wK d, indep hd, rfl⟩
-  have ht : (1 / 2 : ℂ) ∉ lam d := by
-    simpa using half_not_mem hd 0 0 (by simp)
+  have ht : (1 / 2 : ℂ) ∉ lam d := by simpa using half_not_mem hd 0 0 (by simp)
   have ht2 : 2 * (1 / 2 : ℂ) ∈ lam d := (mem_lam d _).2 ⟨1, 0, by simp⟩
-  obtain ⟨b1, b2, b3, -, b5, b6⟩ := GlobalTheory.EvenTheta.evenThetaTwoTorsion_basic_properties (lam d) hlat (1 / 2) ht ht2
+  obtain ⟨b1, b2, b3, -, b5, b6⟩ :=
+    GlobalTheory.EvenTheta.evenThetaTwoTorsion_basic_properties (lam d) hlat (1 / 2) ht ht2
   generalize Formalism.MainNotions.GL3Theta.th0 (lam d) (1 / 2) = θ at b1 b2 b3 b5 b6
-  have fix : ∀ u v : ℤ, ¬ (Odd u ∧ Even v) → U1 d ((u : ℂ) + (v : ℂ) * wK d) θ = θ := by
+  have fix : ∀ u v : ℤ, ¬(Odd u ∧ Even v) → U1 d ((u : ℂ) + (v : ℂ) * wK d) θ = θ := by
     intro u v h
     funext z
     rw [← thetaTranslationOperator_apply hd]
@@ -137,16 +139,19 @@ theorem exists_isTh {d : ℕ} (hd8 : d % 8 = 7) : ∃ θ : ℂ → ℂ, IsTh d �
     simp only [W1]
     rw [normSq_eq c hc, Complex.ofReal_intCast]
     by_cases h : Odd u ∧ Even v
-    · have f1 := fix u (v - 1) (by
-        rintro ⟨-, h2⟩
-        rcases h2 with ⟨a, ha⟩
-        rcases h.2 with ⟨b, hb⟩
-        omega)
+    · have f1 :=
+        fix u (v - 1) (by
+          rintro ⟨-, h2⟩
+          rcases h2 with ⟨a, ha⟩
+          rcases h.2 with ⟨b, hb⟩
+          omega)
       have f2 : U1 d (wK d) θ = θ := by simpa using fix 0 1 (by simp)
-      have k := thetaTranslation_comp_eq_cocycle_mul d ((u : ℂ) + ((v - 1 : ℤ) : ℂ) * wK d) (wK d) θ z
+      have k :=
+        thetaTranslation_comp_eq_cocycle_mul d ((u : ℂ) + ((v - 1 : ℤ) : ℂ) * wK d) (wK d) θ z
       rw [f2, f1, comm_eq hd,
-        show (u : ℂ) + ((v - 1 : ℤ) : ℂ) * wK d + wK d = (u : ℂ) + (v : ℂ) * wK d by
-          push_cast; ring] at k
+          show (u : ℂ) + ((v - 1 : ℤ) : ℂ) * wK d + wK d = (u : ℂ) + (v : ℂ) * wK d by
+            push_cast; ring]
+        at k
       have hev : Even (u ^ 2 + u * v + 2 * c * v ^ 2 - u) := by
         obtain ⟨⟨a, rfl⟩, ⟨b, rfl⟩⟩ := h
         exact ⟨(2 * a + 1) * a + (2 * a + 1) * b + c * (b + b) ^ 2, by ring⟩
@@ -171,7 +176,11 @@ end GlobalTheory.MomOne.ThetaZero
 
 namespace GlobalTheory.MomOne
 
-theorem exists_pair_and_isTh : ∀ d : ℕ, d.Prime → d % 16 = 7 → (∃ L : PeriodPair, IsOK d L ∧ L.g₂ ^ 3 - 27 * L.g₃ ^ 2 = discr d) ∧ ∃ θ : ℂ → ℂ, IsTh d θ := by
+theorem exists_pair_and_isTh
+    : ∀ d : ℕ,
+      d.Prime → d % 16 = 7
+        → (∃ L : PeriodPair, IsOK d L ∧ L.g₂ ^ 3 - 27 * L.g₃ ^ 2 = discr d)
+          ∧ ∃ θ : ℂ → ℂ, IsTh d θ := by
   intro d hp h
   refine ⟨⟨ThetaZero.pair hp.pos, ThetaZero.isOK_pair hp.pos, ?_⟩, ThetaZero.exists_isTh (by omega)⟩
   have h2 := ThetaZero.G_eq (ThetaZero.isOK_pair hp.pos) (k := 2) (by norm_num)

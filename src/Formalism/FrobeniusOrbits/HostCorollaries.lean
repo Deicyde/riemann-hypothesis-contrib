@@ -35,17 +35,37 @@ open Formalism.FrobeniusOrbits
 
 theorem conj : HostConj := hostConj_of hostGalois hostGalSpec
 theorem real : HostReal := hostReal_of hostGalois hostGalSpec conj
-theorem f1 : TwoPowerCyclotomicLayerRealSubfieldCharacterization := real_subfield_of_galois_spec hostGalSpec
+theorem f1 : TwoPowerCyclotomicLayerRealSubfieldCharacterization :=
+  real_subfield_of_galois_spec hostGalSpec
 theorem cmType : HostCMType := hostCMType_of hostGalois hostGalSpec
 theorem frob : HostFrob := hostFrob_of hostGalois hostGalSpec
 theorem splitK : HostSplitK := hostSplitK_of (hostFrob_of hostGalois hostGalSpec)
 theorem efgTwo : HostEFGTwo := hostEFGTwo_of hostInertia hostDecomp
 
-theorem host_field :
-    HostExample ∧ HostGroup ∧ HostOrders ∧ HostRecip ∧ HostFixed ∧ HostGalois ∧ HostGalSpec ∧
-    HostConj ∧ HostReal ∧ TwoPowerCyclotomicLayerRealSubfieldCharacterization ∧ HostMu ∧ HostFrob ∧ HostInertia ∧ HostUnramEF ∧
-    HostDecomp ∧ HostDecompConj ∧ HostEFGTwo ∧ HostSplitK ∧ HostCMType :=
-  ⟨hostExample, hostGroup, hostOrders, hostRecip, hostFixed, hostGalois, hostGalSpec, conj, real, f1, hostMu,
-    frob, hostInertia, hostUnramEF, hostDecomp, hostDecompConj, efgTwo, splitK, cmType⟩
+theorem host_field
+    : HostExample ∧ HostGroup ∧ HostOrders ∧ HostRecip ∧ HostFixed ∧ HostGalois ∧ HostGalSpec
+      ∧ HostConj ∧ HostReal ∧ TwoPowerCyclotomicLayerRealSubfieldCharacterization ∧ HostMu
+      ∧ HostFrob ∧ HostInertia ∧ HostUnramEF ∧ HostDecomp ∧ HostDecompConj ∧ HostEFGTwo ∧ HostSplitK
+      ∧ HostCMType := ⟨
+  hostExample,
+  hostGroup,
+  hostOrders,
+  hostRecip,
+  hostFixed,
+  hostGalois,
+  hostGalSpec,
+  conj,
+  real,
+  f1,
+  hostMu,
+  frob,
+  hostInertia,
+  hostUnramEF,
+  hostDecomp,
+  hostDecompConj,
+  efgTwo,
+  splitK,
+  cmType
+⟩
 
 end Formalism.FrobeniusOrbits.Final

@@ -20,32 +20,36 @@ namespace CutOffDominated
 
 variable {n d : ℕ}
 
-theorem chartDens_congr_zeroSet {J : Ideal (MvPolynomial (Fin n) ℂ)} {A : Matrix (Fin d) (Fin n) ℂ}
-    {f g : (Fin n → ℂ) → ℝ} (h : ∀ x ∈ zeroSet J, f x = g x) (φ : Fin d → (Fin n → ℂ) → ℝ) :
-    chartDens J A f φ = chartDens J A g φ := by
+theorem chartDens_congr_zeroSet
+    {J : Ideal (MvPolynomial (Fin n) ℂ)} {A : Matrix (Fin d) (Fin n) ℂ} {f g : (Fin n → ℂ) → ℝ}
+    (h : ∀ x ∈ zeroSet J, f x = g x)
+    (φ : Fin d → (Fin n → ℂ) → ℝ)
+    : chartDens J A f φ = chartDens J A g φ := by
   funext y
   unfold chartDens sheetSum
   refine finsum_congr fun x => finsum_congr fun hx => ?_
   simp only [h x hx.1]
 
-
 open Classical in
-theorem sheetSum_eq_sum {J : Ideal (MvPolynomial (Fin n) ℂ)} {A : Matrix (Fin d) (Fin n) ℂ}
-    (F : (Fin n → ℂ) → ((Fin d → ℂ) → Fin n → ℂ) → ℝ) {y : Fin d → ℂ} (hfin : (fibre J A y).Finite) :
-    sheetSum J A F y =
-      ∑ x ∈ hfin.toFinset, if h : ∃ s, IsSheetAt J A x s then F x h.choose else 0 :=
+theorem sheetSum_eq_sum
+    {J : Ideal (MvPolynomial (Fin n) ℂ)} {A : Matrix (Fin d) (Fin n) ℂ}
+    (F : (Fin n → ℂ) → ((Fin d → ℂ) → Fin n → ℂ) → ℝ)
+    {y : Fin d → ℂ} (hfin : (fibre J A y).Finite)
+    : sheetSum J A F y
+      = ∑ x ∈ hfin.toFinset, if h : ∃ s, IsSheetAt J A x s then F x h.choose else 0 :=
   finsum_mem_eq_finite_toFinset_sum _ hfin
 
-theorem ae_eval_ne_zero {ι : Type*} [Fintype ι] (g : MvPolynomial ι ℂ) (hg : g ≠ 0) :
-    ∀ᵐ u : ι → ℂ, eval u g ≠ 0 := by
+theorem ae_eval_ne_zero {ι : Type*} [Fintype ι] (g : MvPolynomial ι ℂ) (hg : g ≠ 0)
+    : ∀ᵐ u : ι → ℂ, eval u g ≠ 0 := by
   have hU : (⋃ r : ℕ, LogInt.polydisc ι r) = Set.univ := by
     refine Set.eq_univ_of_forall fun u => ?_
     obtain ⟨r, hr⟩ := exists_nat_ge ‖u‖
     refine Set.mem_iUnion.mpr ⟨r, Set.mem_univ_pi.mpr fun i => ?_⟩
     rw [Metric.mem_closedBall, dist_zero_right]
     exact (norm_le_pi_norm u i).trans hr
-  have h := (ae_restrict_iUnion_iff (fun r : ℕ => LogInt.polydisc ι r) (fun u => eval u g ≠ 0)).mpr
-    fun r => LogInt.ae_eval_ne_zero g hg r
+  have h :=
+    (ae_restrict_iUnion_iff (fun r : ℕ => LogInt.polydisc ι r) (fun u => eval u g ≠ 0)).mpr fun r =>
+      LogInt.ae_eval_ne_zero g hg r
   rwa [hU, Measure.restrict_univ] at h
 
 end CutOffDominated
@@ -59,11 +63,15 @@ theorem CutOffDominated.proof : CutOffDominated.Statement := by
   have hg : Measurable g :=
     hf.measurable_piecewise continuousOn_const (SheetSumMeasurable.isClosed_zeroSet J).measurableSet
   have hmeas : ∀ k, Measurable (chartDens J A (fun x => χ k x * f x) ψ) := fun k => by
-    rw [CutOffDominated.chartDens_congr_zeroSet (g := fun x => χ k x * g x)
+    rw [CutOffDominated.chartDens_congr_zeroSet
+      (g := fun x => χ k x * g x)
       (fun x hx => by rw [hgdef, Set.piecewise_eq_of_mem _ _ _ hx])]
     exact (SheetSumMeasurable.proof n d J A _ ψ hJ hdim hA ((hχm k).mul hg) hψ).1
   refine tendsto_integral_of_dominated_convergence (chartAbsDens J A f ψ)
-    (fun k => (hmeas k).aestronglyMeasurable) hint (fun k => Eventually.of_forall fun y => ?_) ?_
+    (fun k => (hmeas k).aestronglyMeasurable)
+    hint
+    (fun k => Eventually.of_forall fun y => ?_)
+    ?_
   · rw [Real.norm_eq_abs]
     unfold chartDens chartAbsDens
     rw [CutOffDominated.sheetSum_eq_sum _ (hfin y), CutOffDominated.sheetSum_eq_sum _ (hfin y)]
@@ -79,8 +87,9 @@ theorem CutOffDominated.proof : CutOffDominated.Statement := by
     rw [Set.Finite.mem_toFinset] at hx
     have hxl := hlim x hx.1 (by rw [show A *ᵥ x = y from hx.2]; exact hy)
     split_ifs with h
-    · simpa using (hxl.mul_const (f x)).mul_const
-        (ReciprocityTheory.AnForm.maDens (fun k => ψ k ∘ h.choose) y)
+    · simpa using
+        (hxl.mul_const (f x)).mul_const
+          (ReciprocityTheory.AnForm.maDens (fun k => ψ k ∘ h.choose) y)
     · exact tendsto_const_nhds
 
 end

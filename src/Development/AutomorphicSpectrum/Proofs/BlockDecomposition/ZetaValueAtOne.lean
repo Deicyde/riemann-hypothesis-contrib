@@ -16,19 +16,23 @@ open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Godem
 
 variable {k : Type} [Field k] [NumberField k]
 
-theorem lineZeta_ratV_unit (Ψ₁ : (Unit → 𝔸[k]) → ℂ) (ω : HeckeCharacter k) (z : ℂ)
-    (ξ : Unit → k) (hξ : ξ ≠ 0) : lineZeta Ψ₁ ω z (ratV ξ) = tate Ψ₁ ω z := by
+theorem lineZeta_ratV_unit
+    (Ψ₁ : (Unit → 𝔸[k]) → ℂ) (ω : HeckeCharacter k) (z : ℂ) (ξ : Unit → k) (hξ : ξ ≠ 0)
+    : lineZeta Ψ₁ ω z (ratV ξ) = tate Ψ₁ ω z := by
   have h0 : ξ () ≠ 0 := fun h => hξ (funext fun i => by cases i; exact h)
   haveI := isHaarMeasure_ideleMeasure k
   haveI := IdeleGroup.borelSpace k
-  have key := integral_mul_left_eq_self (μ := ideleMeasure k)
-    (fun x : IdeleGroup k => Ψ₁ (fun _ => (x : 𝔸[k])) * ((ω.toIdele x : Circle) : ℂ) *
-      ((((IdeleGroup.ideleModule k x : {r : ℝ // 0 < r}) : ℝ) : ℂ) ^ z))
-    (IdeleGroup.diagonal k (Units.mk0 (ξ ()) h0))
+  have key :=
+    integral_mul_left_eq_self (μ := ideleMeasure k)
+      (fun x : IdeleGroup k =>
+        Ψ₁ (fun _ => (x : 𝔸[k])) * ((ω.toIdele x : Circle) : ℂ)
+          * ((((IdeleGroup.ideleModule k x : {r : ℝ // 0 < r}) : ℝ) : ℂ) ^ z))
+      (IdeleGroup.diagonal k (Units.mk0 (ξ ()) h0))
   refine Eq.trans ?_ key
   refine integral_congr_ae (Filter.Eventually.of_forall fun x => ?_)
-  have hx : ((x : 𝔸[k]) • ratV ξ) =
-      fun _ => ((IdeleGroup.diagonal k (Units.mk0 (ξ ()) h0) * x : IdeleGroup k) : 𝔸[k]) := by
+  have hx
+      : ((x : 𝔸[k]) • ratV ξ)
+        = fun _ => ((IdeleGroup.diagonal k (Units.mk0 (ξ ()) h0) * x : IdeleGroup k) : 𝔸[k]) := by
     funext i
     cases i
     simp [ratV, IdeleGroup.diagonal, mul_comm]
@@ -43,8 +47,8 @@ theorem proj_unit_eq (l l' : Projectivization k (Unit → k)) : l = l' := by
   have hw0 : w () ≠ 0 := fun h => hw (funext fun i => by cases i; exact h)
   exact ⟨v () / w (), funext fun i => by cases i; simp [div_mul_cancel₀ _ hw0]⟩
 
-theorem epstein_unit_one (Ψ₁ : (Unit → 𝔸[k]) → ℂ) (ω : HeckeCharacter k) (z : ℂ) :
-    epstein Ψ₁ ω z 1 = tate Ψ₁ ω z := by
+theorem epstein_unit_one (Ψ₁ : (Unit → 𝔸[k]) → ℂ) (ω : HeckeCharacter k) (z : ℂ)
+    : epstein Ψ₁ ω z 1 = tate Ψ₁ ω z := by
   have hne : (fun _ : Unit => (1 : k)) ≠ 0 := fun h => one_ne_zero (congrFun h ())
   unfold epstein
   rw [tsum_eq_single (Projectivization.mk k (fun _ : Unit => (1 : k)) hne)

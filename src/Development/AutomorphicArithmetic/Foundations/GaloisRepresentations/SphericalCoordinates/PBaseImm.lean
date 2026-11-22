@@ -5,23 +5,39 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCounta
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
 namespace UpperTheory.Gal.W2
 
-private theorem chart_at {X : Scheme.{0}} (s : X ⟶ Sp ℂ) (d : ℕ) [SmoothOfRelativeDimension d s]
-    (x : GlobalTheory.CxPts s (RingHom.id ℂ)) :
-    ∃ (T : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → (Sp ℂ ⟶ X)) (U : X.Opens) (xs : Fin d → Γ(X, U)) (b₀ : Fin d → ℂ),
-      IsOpen T ∧ b₀ ∈ T ∧ IsHolTo T y ∧ (∀ b ∈ T, y b ≫ s = spMap (RingHom.id ℂ)) ∧ y b₀ = x.1 ∧
-      ⊤ ≤ x.1 ⁻¹ᵁ U ∧ ∀ b ∈ T, ∀ l, valAt' (y b) U (xs l) = b l := by
+private theorem chart_at
+    {X : Scheme.{0}} (s : X ⟶ Sp ℂ)
+    (d : ℕ) [SmoothOfRelativeDimension d s]
+    (x : GlobalTheory.CxPts s (RingHom.id ℂ))
+    : ∃ (T : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → (Sp ℂ ⟶ X)) (U : X.Opens) (xs : Fin d → Γ(X, U))
+        (b₀ : Fin d → ℂ),
+      IsOpen T ∧ b₀ ∈ T ∧ IsHolTo T y ∧ (∀ b ∈ T, y b ≫ s = spMap (RingHom.id ℂ)) ∧ y b₀ = x.1
+        ∧ ⊤ ≤ x.1 ⁻¹ᵁ U ∧ ∀ b ∈ T, ∀ l, valAt' (y b) U (xs l) = b l := by
   obtain ⟨c, hc⟩ : ∃ c : GlobalTheory.AlgChart s (RingHom.id ℂ) d, x ∈ c.e.source :=
     GlobalTheory.AlgChart.exists_mem_source x
-  refine ⟨c.finChart.target, fun z => (c.finChart.symm z).1, c.U, c.x, c.finChart x,
-    c.finChart.open_target, c.finChart.map_source hc, GlobalTheory.CountableCharts.isHolTo_finChart_symm c,
-    fun b _ => (c.finChart.symm b).2, ?_, c.source_subset hc, ?_⟩
+  refine ⟨
+    c.finChart.target,
+    fun z => (c.finChart.symm z).1,
+    c.U,
+    c.x,
+    c.finChart x,
+    c.finChart.open_target,
+    c.finChart.map_source hc,
+    GlobalTheory.CountableCharts.isHolTo_finChart_symm c,
+    fun b _ => (c.finChart.symm b).2,
+    ?_,
+    c.source_subset hc,
+    ?_
+  ⟩
   · show (c.finChart.symm (c.finChart x)).1 = x.1
     rw [c.finChart.left_inv hc]
   · intro b hb l
@@ -34,9 +50,10 @@ end UpperTheory.Gal.W2
 
 namespace UpperTheory.Gal.W2
 
-private theorem inj_of_leftInv {d : ℕ} (τ cc : (Fin d → ℂ) → (Fin d → ℂ)) (b₀ : Fin d → ℂ)
-    (hτ : DifferentiableAt ℂ τ (cc b₀)) (hcc : DifferentiableAt ℂ cc b₀)
-    (h : ∀ᶠ b in 𝓝 b₀, τ (cc b) = b) : Function.Injective (fderiv ℂ τ (cc b₀)) := by
+private theorem inj_of_leftInv
+    {d : ℕ} (τ cc : (Fin d → ℂ) → (Fin d → ℂ)) (b₀ : Fin d → ℂ) (hτ : DifferentiableAt ℂ τ (cc b₀))
+    (hcc : DifferentiableAt ℂ cc b₀) (h : ∀ᶠ b in 𝓝 b₀, τ (cc b) = b)
+    : Function.Injective (fderiv ℂ τ (cc b₀)) := by
   have hcomp : fderiv ℂ (τ ∘ cc) b₀ = (fderiv ℂ τ (cc b₀)).comp (fderiv ℂ cc b₀) :=
     fderiv_comp b₀ hτ hcc
   have heq : τ ∘ cc =ᶠ[𝓝 b₀] id := h
@@ -47,13 +64,14 @@ private theorem inj_of_leftInv {d : ℕ} (τ cc : (Fin d → ℂ) → (Fin d →
     refine ⟨fderiv ℂ cc b₀ v, ?_⟩
     have := congrArg (fun L : (Fin d → ℂ) →L[ℂ] (Fin d → ℂ) => L v) (hcomp.symm.trans hid)
     simpa using this
-  have := LinearMap.injective_iff_surjective (f := (fderiv ℂ τ (cc b₀) : (Fin d → ℂ) →ₗ[ℂ] (Fin d → ℂ)))
+  have :=
+    LinearMap.injective_iff_surjective (f := (fderiv ℂ τ (cc b₀) : (Fin d → ℂ) →ₗ[ℂ] (Fin d → ℂ)))
   exact this.mpr hsurj
 
 end UpperTheory.Gal.W2
 
-theorem UpperTheory.Gal.W2.baseImm_of :
-    UpperTheory.Gal.W2.PerNear → UpperTheory.Gal.W2.PerCoordLoc → UpperTheory.Gal.W2.BaseImm := by
+theorem UpperTheory.Gal.W2.baseImm_of
+    : UpperTheory.Gal.W2.PerNear → UpperTheory.Gal.W2.PerCoordLoc → UpperTheory.Gal.W2.BaseImm := by
   intro hNear hLoc O _ bar g ρ D X s A _ S d hsm P₀ M₀ hP hH co hco w hw
   haveI := hsm
   set pt : (Fin d → ℂ) → (Sp ℂ ⟶ X) := fun b => S.u (perC P₀ (co b)) with hpt
@@ -95,8 +113,8 @@ theorem UpperTheory.Gal.W2.baseImm_of :
     show valAt' (pt (c b)) U (xs l) = b l
     rw [← hu, hPu b hbB']
     exact hxs b (hB'T hbB') l
-  have hinj := inj_of_leftInv (fun b l => valAt' (pt b) U (xs l)) c b₀
-    (by rw [hc0]; exact hτd) hcd hleft
+  have hinj :=
+    inj_of_leftInv (fun b l => valAt' (pt b) U (xs l)) c b₀ (by rw [hc0]; exact hτd) hcd hleft
   rw [hc0] at hinj
   apply hinj
   rw [map_zero, fderiv_pi hcompdiff]

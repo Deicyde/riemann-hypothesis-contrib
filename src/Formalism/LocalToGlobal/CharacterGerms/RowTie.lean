@@ -15,8 +15,12 @@ open Formalism.IncomingBounds
 
 namespace RawChart
 
-variable {C : Type} [Field C] {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ]
-  (X : RawChart C d I κ) {V : VF C}
+variable
+  {C : Type} [Field C]
+  {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)]
+  {κ : Type} [Fintype κ]
+  (X : RawChart C d I κ)
+  {V : VF C}
 
 theorem pairK_int (g : Fin 2) (q : JJ I g) (c : I (1 - g)) : V.Ge 0 (X.pairK g q c) := by
   unfold pairK
@@ -37,9 +41,10 @@ theorem k_inv_int (hk : V.v (X.k : C) = 0) : V.Ge 0 ((X.k : C)⁻¹) := by
   rw [h1]
   rfl
 
-theorem pairK_onto (hk : V.v (X.k : C) = 0) (g : Fin 2) :
-    ∃ s : I (1 - g) → JJ I g → C, (∀ c q, V.Ge 0 (s c q)) ∧
-      ∀ q q' : JJ I g, ∑ c, X.pairK g q c * s c q' = if q = q' then 1 else 0 := by
+theorem pairK_onto (hk : V.v (X.k : C) = 0) (g : Fin 2)
+    : ∃ s : I (1 - g) → JJ I g → C,
+      (∀ c q, V.Ge 0 (s c q))
+        ∧ ∀ q q' : JJ I g, ∑ c, X.pairK g q c * s c q' = if q = q' then 1 else 0 := by
   refine ⟨fun c q => if c = q then -(X.k : C)⁻¹ else 0, ?_, ?_⟩
   · intro c q
     dsimp only
@@ -53,9 +58,10 @@ theorem pairK_onto (hk : V.v (X.k : C) = 0) (g : Fin 2) :
     · field_simp
     · simp
 
-theorem rk_fil (H : X.RankHyp) (g : Fin 2) (a : ZMod d) :
-    (Finset.univ.filter fun q : I (1 - g) => X.ty (1 - g) q = a).card + 0 +
-      (Finset.univ.filter fun c : I g => X.ty g c = a).card = X.n + X.j + X.j' := by
+theorem rk_fil (H : X.RankHyp) (g : Fin 2) (a : ZMod d)
+    : (Finset.univ.filter fun q : I (1 - g) => X.ty (1 - g) q = a).card + 0
+        + (Finset.univ.filter fun c : I g => X.ty g c = a).card
+      = X.n + X.j + X.j' := by
   by_cases hb : X.big g a
   · have h1 : ¬ X.big (1 - g) a := fun h => (H.big_compl g a).1 h hb
     rw [H.rk_big g a hb, H.rk_small (1 - g) a h1]
@@ -64,9 +70,12 @@ theorem rk_fil (H : X.RankHyp) (g : Fin 2) (a : ZMod d) :
     rw [H.rk_small g a hb, H.rk_big (1 - g) a h1]
     omega
 
-theorem hLf_axes (H : X.AxesSt) (g : Fin 2) (a a' : ZMod d) (μ : WV I →₀ ℕ)
-    (h : (∀ w ∈ μ.support, w.1 = g) ∨ (∀ w ∈ μ.support, w.1 = 1 - g)) :
-    MvPowerSeries.coeff μ (X.hLf g a a') = 0 := by
+theorem hLf_axes
+    (H : X.AxesSt)
+    (g : Fin 2)
+    (a a' : ZMod d)
+    (μ : WV I →₀ ℕ) (h : (∀ w ∈ μ.support, w.1 = g) ∨ (∀ w ∈ μ.support, w.1 = 1 - g))
+    : MvPowerSeries.coeff μ (X.hLf g a a') = 0 := by
   have h2 : (∀ w ∈ μ.support, w.1 = 0) ∨ (∀ w ∈ μ.support, w.1 = 1) := by
     fin_cases g
     · exact h

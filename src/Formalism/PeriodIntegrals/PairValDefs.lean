@@ -14,7 +14,8 @@ open scoped Classical
 
 namespace PI.PairValDefs
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef MeasureTheory
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.L2.SG.TermDef MeasureTheory
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -35,7 +36,8 @@ end Phase
 
 section Coef
 
-variable {D : D7} {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
+variable
+  {D : D7} {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
   {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
 abbrev MatR (D : D7) : Type := Matrix (Fin (D.R.rS + 1)) (Fin (D.R.rS + 1)) D.host.E
@@ -46,7 +48,8 @@ end Coef
 
 section VolDef
 
-variable {D : D7} {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
+variable
+  {D : D7} {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
   {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
 variable (D u u' F0 what₂)

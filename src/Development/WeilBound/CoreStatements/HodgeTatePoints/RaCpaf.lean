@@ -56,7 +56,16 @@ lemma tl_mem_order (hv : v.Integers R) (p : ℕ) [Fact p.Prime] (hp : v (p : C) 
 
 end
 
-theorem cpaf : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (N : Type) [AddCommGroup N] [Fintype N] [DecidableEq N], ∀ AA : HopfOrder (C := C) R N, ∀ μ : N →+ ZMod p, ∃ g ∈ afFun p AA.carrier, ∃ ε : R, v (algebraMap R C ε) ^ (p - 1) = v (p : C) ∧ g 0 = 0 ∧ ∀ x, g x - algebraMap R C ε * ((μ x).val : C) ∈ pInt (C := C) R p ∧ v (g x - algebraMap R C ε * ((μ x).val : C)) < v (algebraMap R C ε) := by
+theorem cpaf
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (N : Type) [AddCommGroup N] [Fintype N] [DecidableEq N], ∀ AA : HopfOrder (C := C) R N,
+          ∀ μ : N →+ ZMod p, ∃ g ∈ afFun p AA.carrier, ∃ ε : R,
+            v (algebraMap R C ε) ^ (p - 1) = v (p : C) ∧ g 0 = 0
+              ∧ ∀ x,
+                g x - algebraMap R C ε * ((μ x).val : C) ∈ pInt (C := C) R p
+                  ∧ v (g x - algebraMap R C ε * ((μ x).val : C)) < v (algebraMap R C ε) := by
   intro p _ C _ _ _ v R _ _ hv hp N _ _ _ AA μ
   have hpp : p.Prime := Fact.out
   have : NeZero (p : C) := ⟨Nat.cast_ne_zero.2 hpp.ne_zero⟩
@@ -68,8 +77,14 @@ theorem cpaf : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C]
   have hζ1 := val_root v p hpp.ne_zero hζ.pow_eq_one
   have hε := val_tl_prim v p hp hζ
   obtain ⟨ε, hεe⟩ := hv.exists_of_le_one (r := tl p ζ) (hε.le.trans (val_prim_lt v p hp hζ).le)
-  refine ⟨fun x => tl p (ψ x), ⟨tl_mem_order hv p hp AA (charmem p C v R hv hp N AA ψ), ?_⟩,
-    ε, ?_, ?_, fun x => ⟨?_, ?_⟩⟩
+  refine ⟨
+    fun x => tl p (ψ x),
+    ⟨tl_mem_order hv p hp AA (charmem p C v R hv hp N AA ψ), ?_⟩,
+    ε,
+    ?_,
+    ?_,
+    fun x => ⟨?_, ?_⟩
+  ⟩
   · intro x y
     rw [mem_pInt_iff hv]
     simp only [AddChar.map_add_eq_mul]
@@ -97,7 +112,16 @@ lemma form_add {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C] (p : �
   rw [Nat.cast_add, Nat.cast_add, Nat.cast_mul] at h'
   linear_combination (-algebraMap R C (l i)) * h'
 
-theorem lifts : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (AA : HopfOrder (C := C) R (ι → ZMod p)), ∀ (l : ι → R) (ε : R), ε • l ∈ afLat p AA.carrier → v (p : C) ≤ v (algebraMap R C ε) ^ (p - 1) → ∃ u : (ι → ZMod p) → C, (fun x => algebraMap R C ε * u x) ∈ afFun p AA.carrier ∧ (∀ x, v (u x) ≤ 1) ∧ ∀ x, v (u x - algebraMap R C (∑ i, l i * ((x i).val : R))) < 1 := by
+theorem lifts
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (AA : HopfOrder (C := C) R (ι → ZMod p)),
+          ∀ (l : ι → R) (ε : R),
+            ε • l ∈ afLat p AA.carrier → v (p : C) ≤ v (algebraMap R C ε) ^ (p - 1)
+              → ∃ u : (ι → ZMod p) → C,
+                (fun x => algebraMap R C ε * u x) ∈ afFun p AA.carrier ∧ (∀ x, v (u x) ≤ 1)
+                  ∧ ∀ x, v (u x - algebraMap R C (∑ i, l i * ((x i).val : R))) < 1 := by
   intro p _ C _ _ _ v R _ _ hv hp ι _ _ AA l ε hl hε
   have hpp : p.Prime := Fact.out
   have hp1 : p - 1 ≠ 0 := by have := hpp.two_le; omega
@@ -107,8 +131,10 @@ theorem lifts : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C
     rw [h, zero_pow hp1] at hε
     exact hp0 (le_antisymm hε zero_le)
   have hε0' : algebraMap R C ε ≠ 0 := (Valuation.ne_zero_iff v).1 hε0
-  suffices h : ∃ u : (ι → ZMod p) → C, (fun x => algebraMap R C ε * u x) ∈ afFun p AA.carrier ∧
-      ∀ x, v (u x - algebraMap R C (∑ i, l i * ((x i).val : R))) < 1 by
+  suffices h
+      : ∃ u : (ι → ZMod p) → C,
+        (fun x => algebraMap R C ε * u x) ∈ afFun p AA.carrier
+          ∧ ∀ x, v (u x - algebraMap R C (∑ i, l i * ((x i).val : R))) < 1 by
     obtain ⟨u, h1, h2⟩ := h
     refine ⟨u, h1, fun x => ?_, h2⟩
     rw [← sub_add_cancel (u x) (algebraMap R C (∑ i, l i * ((x i).val : R)))]
@@ -118,13 +144,15 @@ theorem lifts : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C
     refine ⟨fun x => g x / algebraMap R C ε, ?_, fun x => ?_⟩
     · simp only [mul_div_cancel₀ _ hε0']
       refine ⟨hg, fun x y => ?_⟩
-      have := Submodule.add_mem _ (Submodule.sub_mem _ (Submodule.sub_mem _ (h (x + y)) (h x)) (h y))
-        (form_add (C := C) p (ε • l) x y)
+      have :=
+        Submodule.add_mem _ (Submodule.sub_mem _ (Submodule.sub_mem _ (h (x + y)) (h x)) (h y))
+          (form_add (C := C) p (ε • l) x y)
       convert this using 1
       ring
     · have h1 := (mem_pInt_iff hv p _).1 (h x)
-      have h2 : g x / algebraMap R C ε - algebraMap R C (∑ i, l i * ((x i).val : R)) =
-          (g x - algebraMap R C (∑ i, (ε • l) i * ((x i).val : R))) / algebraMap R C ε := by
+      have h2
+          : g x / algebraMap R C ε - algebraMap R C (∑ i, l i * ((x i).val : R))
+            = (g x - algebraMap R C (∑ i, (ε • l) i * ((x i).val : R))) / algebraMap R C ε := by
         simp only [Pi.smul_apply, smul_eq_mul, mul_assoc, ← Finset.mul_sum, map_mul]
         field_simp
       rw [h2, map_div₀, div_lt_one₀ (pos_iff_ne_zero.2 hε0)]
@@ -136,13 +164,13 @@ theorem lifts : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C
       refine hge.trans ?_
       rw [← he i]
       exact pow_le_of_le_one zero_le (hv.map_le_one _) hp1
-    have he0 : ∀ i, v (algebraMap R C (e i)) ≠ 0 := fun i h =>
-      hε0 (le_antisymm (h ▸ hee i) zero_le)
+    have he0 : ∀ i, v (algebraMap R C (e i)) ≠ 0 := fun i h => hε0 (le_antisymm (h ▸ hee i) zero_le)
     have he0' : ∀ i, algebraMap R C (e i) ≠ 0 := fun i => (Valuation.ne_zero_iff v).1 (he0 i)
     choose r hr using fun i => hv.dvd_of_le (hee i)
     refine ⟨fun x => ∑ i, algebraMap R C (l i) * (g i x / algebraMap R C (e i)), ?_, fun x => ?_⟩
-    · have := Submodule.sum_mem (afFun p AA.carrier) (t := Finset.univ)
-        fun i _ => Submodule.smul_mem _ (l i * r i) (hg i)
+    · have :=
+        Submodule.sum_mem (afFun p AA.carrier) (t := Finset.univ) fun i _ =>
+          Submodule.smul_mem _ (l i * r i) (hg i)
       convert this using 1
       funext x
       rw [Finset.sum_apply, Finset.mul_sum]
@@ -155,9 +183,11 @@ theorem lifts : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C
       rw [map_sum, ← Finset.sum_sub_distrib]
       refine v.map_sum_lt one_ne_zero fun i _ => ?_
       have h0 := he0' i
-      have h2 : algebraMap R C (l i) * (g i x / algebraMap R C (e i)) -
-          algebraMap R C (l i * ((x i).val : R)) = algebraMap R C (l i) *
-          ((g i x - algebraMap R C (e i) * ((x i).val : C)) / algebraMap R C (e i)) := by
+      have h2
+          : algebraMap R C (l i) * (g i x / algebraMap R C (e i))
+              - algebraMap R C (l i * ((x i).val : R))
+            = algebraMap R C (l i)
+              * ((g i x - algebraMap R C (e i) * ((x i).val : C)) / algebraMap R C (e i)) := by
         rw [map_mul, map_natCast]
         field_simp
       rw [h2, map_mul, map_div₀]

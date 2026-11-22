@@ -14,14 +14,15 @@ noncomputable section
 
 section Trivial
 
-variable {K : Type*} [Field K] [NumberField K] (L : Type*) [Field L] [NumberField L] [Algebra K L]
-  [IsGalois K L] [IsMulCommutative (L ≃ₐ[K] L)]
+variable
+  {K : Type*} [Field K] [NumberField K]
+  (L : Type*) [Field L] [NumberField L] [Algebra K L] [IsGalois K L] [IsMulCommutative (L ≃ₐ[K] L)]
 
-theorem range_ideleNorm_eq_top_of_ideleSymbol_eq_one (h : ∀ x, ideleSymbol K L x = 1) :
-    (ideleNorm K L).range = ⊤ := by
+theorem range_ideleNorm_eq_top_of_ideleSymbol_eq_one (h : ∀ x, ideleSymbol K L x = 1)
+    : (ideleNorm K L).range = ⊤ := by
   classical
-  refine eq_top_iff.2 fun x _ ↦ (IdeleNorm.mem_range_ideleNorm_iff_forall L x).2
-    ⟨fun v ↦ ?_, fun v ↦ ?_⟩
+  refine eq_top_iff.2 fun x _ ↦
+    (IdeleNorm.mem_range_ideleNorm_iff_forall L x).2 ⟨fun v ↦ ?_, fun v ↦ ?_⟩
   · obtain ⟨w⟩ := nonempty_placesOver L v
     have h1 : finiteProj v x ∈ (localSymbol L v).ker := by
       rw [MonoidHom.mem_ker, ← ideleSymbol_finiteEmbedding]
@@ -43,27 +44,29 @@ universe u
 
 section Cyclic
 
-variable {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-  [IsGalois K L] [IsCyclic (L ≃ₐ[K] L)]
+variable
+  {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
+  [IsCyclic (L ≃ₐ[K] L)]
 
-theorem finrank_eq_one_of_ideleSymbol_eq_one (h : ∀ x, ideleSymbol K L x = 1) :
-    Module.finrank K L = 1 :=
-  firstInequality.finrank_eq_one_of_sup_eq_top
-    (top_le_iff.1 (range_ideleNorm_eq_top_of_ideleSymbol_eq_one L h ▸ le_sup_left))
+theorem finrank_eq_one_of_ideleSymbol_eq_one (h : ∀ x, ideleSymbol K L x = 1)
+    : Module.finrank K L = 1 :=
+  firstInequality.finrank_eq_one_of_sup_eq_top (top_le_iff.1
+    (range_ideleNorm_eq_top_of_ideleSymbol_eq_one L h ▸ le_sup_left))
 
 end Cyclic
 
 section Surjective
 
-variable {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-  [IsGalois K L] [IsMulCommutative (L ≃ₐ[K] L)]
+variable
+  {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] [IsGalois K L]
+  [IsMulCommutative (L ≃ₐ[K] L)]
 
 attribute [local instance] galCommGroup
 
-
 omit [NumberField K] [NumberField L] [IsMulCommutative (L ≃ₐ[K] L)] in
-theorem restrictNormal_fixedField_eq_one {N : Subgroup (L ≃ₐ[K] L)} [N.Normal] {σ : L ≃ₐ[K] L}
-    (hσ : σ ∈ N) : σ.restrictNormal (fixedField N) = 1 := by
+theorem restrictNormal_fixedField_eq_one
+    {N : Subgroup (L ≃ₐ[K] L)} [N.Normal] {σ : L ≃ₐ[K] L} (hσ : σ ∈ N)
+    : σ.restrictNormal (fixedField N) = 1 := by
   ext y
   change ((σ.restrictNormal (fixedField N) y : fixedField N) : L) = y
   exact (AlgEquiv.restrictNormal_commutes σ (fixedField N) y).trans
@@ -75,8 +78,7 @@ theorem ideleSymbol_surjective : Function.Surjective (ideleSymbol K L) := by
   obtain ⟨σ, hσ⟩ := not_forall.1 hs
   set H := (ideleSymbol K L).range with hH
   have hσH : σ ∉ H := fun ⟨x, hx⟩ ↦ hσ ⟨x, hx⟩
-  obtain ⟨ι, _, n, _, ⟨e⟩⟩ := CommGroup.equiv_prod_multiplicative_zmod_of_finite
-    ((L ≃ₐ[K] L) ⧸ H)
+  obtain ⟨ι, _, n, _, ⟨e⟩⟩ := CommGroup.equiv_prod_multiplicative_zmod_of_finite ((L ≃ₐ[K] L) ⧸ H)
   have hne : (QuotientGroup.mk' H σ) ≠ 1 := by
     rwa [ne_eq, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
   obtain ⟨i, hi⟩ : ∃ i, e (QuotientGroup.mk' H σ) i ≠ 1 := by
@@ -102,8 +104,7 @@ theorem ideleSymbol_surjective : Function.Surjective (ideleSymbol K L) := by
     rw [← restrictNormal_ideleSymbol F L x]
     exact restrictNormal_fixedField_eq_one (hHN x)
   have hbot : F = ⊥ := finrank_eq_one_iff.1 (finrank_eq_one_of_ideleSymbol_eq_one hF1)
-  have htop : N = ⊤ := by
-    rw [← fixingSubgroup_fixedField N, ← hF, hbot, fixingSubgroup_bot]
+  have htop : N = ⊤ := by rw [← fixingSubgroup_fixedField N, ← hF, hbot, fixingSubgroup_bot]
   exact hσN (htop ▸ Subgroup.mem_top σ)
 
 end Surjective

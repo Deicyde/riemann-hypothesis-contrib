@@ -60,8 +60,11 @@ theorem pf_GFin : GFin := by
       rintro _ ⟨y, hy, rfl⟩
       exact hFP y (hVP hy)
     have hfin := (hPr L N).2 _ (hW.union hK'c) (Set.union_subset hWP hK'P)
-    refine ⟨Subtype.val ⁻¹' interior V,
-      continuous_subtype_val.continuousAt.preimage_mem_nhds (isOpen_interior.mem_nhds hV0), ?_⟩
+    refine ⟨
+      Subtype.val ⁻¹' interior V,
+      continuous_subtype_val.continuousAt.preimage_mem_nhds (isOpen_interior.mem_nhds hV0),
+      ?_
+    ⟩
     refine (hfin.preimage inv_injective.injOn).subset ?_
     rintro γ ⟨h, hS, hU⟩
     have hk := hψsupp _ hS
@@ -74,8 +77,9 @@ theorem pf_GFin : GFin := by
     rw [← hψsum (ret μ (nf h)) (hFP h hh) ⟨γ0, hγ0⟩]
     refine finsum_congr fun γ => ?_
     rw [hinv, hinv, hFeq _ _ hh]
-  · have hcl : closure {k : ↑(Pos L N) | ψ (ret μ (nf ↑k)) ≠ 0} ⊆
-        {k : ↑(Pos L N) | ret μ (nf ↑k) ∈ K'} := by
+  · have hcl
+        : closure {k : ↑(Pos L N) | ψ (ret μ (nf ↑k)) ≠ 0}
+          ⊆ {k : ↑(Pos L N) | ret μ (nf ↑k) ∈ K'} := by
       apply closure_minimal
       · intro k hk
         exact hψsupp _ hk
@@ -93,8 +97,9 @@ theorem pf_GFin : GFin := by
   · refine ⟨(N : ℝ) * (Cψ * Cr * Cn * (1 + c0⁻¹)), fun x => ?_⟩
     have h0P : actL x ↑(one L N) ∈ Pos L N := (x • one L N).2
     obtain ⟨t, htp, et⟩ := hnt _ h0P
-    have hprod : lam (nf (actL x ↑(one L N))) * lamD (nf (actL x ↑(one L N))) =
-        lam (actL x ↑(one L N)) * lamD (actL x ↑(one L N)) := by
+    have hprod
+        : lam (nf (actL x ↑(one L N))) * lamD (nf (actL x ↑(one L N)))
+          = lam (actL x ↑(one L N)) * lamD (actL x ↑(one L N)) := by
       rw [et]
       exact hnLL t htp _ h0P
     have hhtx : (lam (actL x ↑(one L N)) * lamD (actL x ↑(one L N)))⁻¹ = ht x := rfl
@@ -105,20 +110,24 @@ theorem pf_GFin : GFin := by
     have hε : (0 : ℝ) < 1 / (4 * (Cn + 1)) := by positivity
     have hdiff : DifferentiableAt ℝ (fun h => ψ (ret μ (nf h))) (actL x ↑(one L N)) :=
       (hφS.contDiffAt (hPopen.mem_nhds h0P)).differentiableAt (by simp)
-    have key := hDB L N (fun h => ψ (ret μ (nf h))) x (Cψ * Cr * (1 + ht x) * Cn)
-      (1 / (4 * (Cn + 1))) hB hε hdiff (by
-        intro δ hδ0 hδε k hk
-        have hm : δ * (4 * (Cn + 1)) ≤ 1 := by
-          rw [le_div_iff₀ (by positivity)] at hδε
-          exact hδε
-        have hδ4 : δ ≤ 1 / 4 := by nlinarith
-        have hCnδ : Cn * δ ≤ 1 / 4 := by nlinarith
-        have c1 := hnLip δ hδ0 hδ4 _ h0P k hk
-        have c2 := hrLip (Cn * δ) (mul_nonneg hCn hδ0) hCnδ _ (hnP _ h0P) (nf k) c1
-        rw [hprod, hhtx] at c2
-        have c3 := hψlip _ (mul_nonneg (mul_nonneg hCr (by linarith))
-          (mul_nonneg hCn hδ0)) _ (hFP _ h0P) _ c2
-        exact le_of_le_of_eq c3 (by ring))
+    have key :=
+      hDB L N
+        (fun h => ψ (ret μ (nf h)))
+        x (Cψ * Cr * (1 + ht x) * Cn) (1 / (4 * (Cn + 1))) hB hε hdiff
+        (by
+          intro δ hδ0 hδε k hk
+          have hm : δ * (4 * (Cn + 1)) ≤ 1 := by
+            rw [le_div_iff₀ (by positivity)] at hδε
+            exact hδε
+          have hδ4 : δ ≤ 1 / 4 := by nlinarith
+          have hCnδ : Cn * δ ≤ 1 / 4 := by nlinarith
+          have c1 := hnLip δ hδ0 hδ4 _ h0P k hk
+          have c2 := hrLip (Cn * δ) (mul_nonneg hCn hδ0) hCnδ _ (hnP _ h0P) (nf k) c1
+          rw [hprod, hhtx] at c2
+          have c3 :=
+            hψlip _ (mul_nonneg (mul_nonneg hCr (by linarith)) (mul_nonneg hCn hδ0)) _ (hFP _ h0P) _
+              c2
+          exact le_of_le_of_eq c3 (by ring))
     show _ ≤ _ * ht x ^ 1
     rw [pow_one]
     have e1 : 1 ≤ c0⁻¹ * ht x := by
@@ -127,7 +136,8 @@ theorem pf_GFin : GFin := by
     have e2 : 1 + ht x ≤ (1 + c0⁻¹) * ht x := by nlinarith
     have hK0 : 0 ≤ (N : ℝ) * (Cψ * Cr * Cn) :=
       mul_nonneg (Nat.cast_nonneg _) (mul_nonneg (mul_nonneg hCψ hCr) hCn)
-    calc _ ≤ (N : ℝ) * (Cψ * Cr * (1 + ht x) * Cn) := key
+    calc
+      _ ≤ (N : ℝ) * (Cψ * Cr * (1 + ht x) * Cn) := key
       _ = (N : ℝ) * (Cψ * Cr * Cn) * (1 + ht x) := by ring
       _ ≤ (N : ℝ) * (Cψ * Cr * Cn) * ((1 + c0⁻¹) * ht x) := mul_le_mul_of_nonneg_left e2 hK0
       _ = _ := by ring

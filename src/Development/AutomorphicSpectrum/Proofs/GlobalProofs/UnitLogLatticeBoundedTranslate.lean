@@ -7,13 +7,17 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.CongSubgroup
 
 @[expose] public section
 
-open NumberField NumberField.Units NumberField.Units.dirichletUnitTheorem GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
+open NumberField NumberField.Units NumberField.Units.dirichletUnitTheorem
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Cones
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.UnitLattice
 
-theorem multiples_relativelyDense (F : Type) [Field F] [NumberField F] (e : ℕ) (he : 0 < e) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ y : logSpace F, ∃ u : (𝓞 F)ˣ,
-      ∀ w, |y w + (e : ℝ) * logEmbedding F (Additive.ofMul u) w| ≤ C := by
+theorem multiples_relativelyDense (F : Type) [Field F] [NumberField F] (e : ℕ) (he : 0 < e)
+    : ∃ C : ℝ,
+      0 ≤ C
+        ∧ ∀ y : logSpace F, ∃ u : (𝓞 F)ˣ, ∀ w,
+          |y w + (e : ℝ) * logEmbedding F (Additive.ofMul u) w| ≤ C := by
   classical
   let b := (basisUnitLattice F).ofZLatticeBasis ℝ (unitLattice F)
   let R : ℝ := ∑ i, ‖b i‖
@@ -30,11 +34,14 @@ theorem multiples_relativelyDense (F : Type) [Field F] [NumberField F] (e : ℕ)
     simpa [ZSpan.fract_apply] using ZSpan.norm_fract_le b v
   have h1 := norm_le_pi_norm (v - (ZSpan.floor b v : logSpace F)) w
   rw [← hx] at h1 hfr
-  have h2 : (logEmbedding F).toIntLinearMap x w
-      = logEmbedding F (Additive.ofMul (Additive.toMul x)) w := rfl
+  have h2
+      : (logEmbedding F).toIntLinearMap x w
+        = logEmbedding F (Additive.ofMul (Additive.toMul x)) w :=
+    rfl
   rw [Pi.sub_apply, h2, Real.norm_eq_abs] at h1
-  have h3 : y w + (e : ℝ) * logEmbedding F (Additive.ofMul (Additive.toMul x)) w
-      = -((e : ℝ) * (v w - logEmbedding F (Additive.ofMul (Additive.toMul x)) w)) := by
+  have h3
+      : y w + (e : ℝ) * logEmbedding F (Additive.ofMul (Additive.toMul x)) w
+        = -((e : ℝ) * (v w - logEmbedding F (Additive.ofMul (Additive.toMul x)) w)) := by
     simp only [v]; field_simp; ring
   rw [h3, abs_neg, abs_mul, abs_of_pos he0]
   exact mul_le_mul_of_nonneg_left (h1.trans hfr) he0.le

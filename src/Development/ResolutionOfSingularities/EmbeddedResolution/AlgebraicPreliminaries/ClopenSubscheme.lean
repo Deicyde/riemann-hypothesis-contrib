@@ -10,17 +10,17 @@ universe u
 
 namespace AlgebraicGeometry.Scheme.Opens
 
-theorem isClosedImmersion_ι_of_isClosed {X : Scheme.{u}} (U : X.Opens)
-    (hU : IsClosed (U : Set X)) : IsClosedImmersion U.ι :=
+theorem isClosedImmersion_ι_of_isClosed {X : Scheme.{u}} (U : X.Opens) (hU : IsClosed (U : Set X))
+    : IsClosedImmersion U.ι :=
   IsClosedImmersion.of_isPreimmersion U.ι (by rw [U.range_ι]; exact hU)
 
 end AlgebraicGeometry.Scheme.Opens
 
 namespace FunctorialResolution.EmbeddedResolution
 
-private theorem exists_iso_subscheme_vanishingIdeal_of_coe_eq {X : Scheme} [IsReduced X]
-    (C : X.Opens) (Z : Closeds X) (hZ : (Z : Set X) = (C : Set X)) :
-    ∃ e : (Scheme.IdealSheafData.vanishingIdeal Z).subscheme ≅ C.toScheme,
+private theorem exists_iso_subscheme_vanishingIdeal_of_coe_eq
+    {X : Scheme} [IsReduced X] (C : X.Opens) (Z : Closeds X) (hZ : (Z : Set X) = (C : Set X))
+    : ∃ e : (Scheme.IdealSheafData.vanishingIdeal Z).subscheme ≅ C.toScheme,
       e.hom ≫ C.ι = (Scheme.IdealSheafData.vanishingIdeal Z).subschemeι := by
   have hCclosed : IsClosed (C : Set X) := by rw [← hZ]; exact Z.2
   have : IsClosedImmersion C.ι :=
@@ -35,20 +35,19 @@ private theorem exists_iso_subscheme_vanishingIdeal_of_coe_eq {X : Scheme} [IsRe
   have hsupp : (Scheme.IdealSheafData.vanishingIdeal Z).support = Z := by
     rw [hvan, Scheme.IdealSheafData.support_radical]
     exact hZsupp
-  have hrange :
-      Set.range ⇑(Scheme.IdealSheafData.vanishingIdeal Z).subschemeι = (C : Set X) := by
+  have hrange : Set.range ⇑(Scheme.IdealSheafData.vanishingIdeal Z).subschemeι = (C : Set X) := by
     rw [Scheme.IdealSheafData.range_subschemeι, hsupp]
     exact hZ
-  have hle : Scheme.Hom.ker C.ι ≤
-      Scheme.Hom.ker (Scheme.IdealSheafData.vanishingIdeal Z).subschemeι := by
+  have hle
+      : Scheme.Hom.ker C.ι
+        ≤ Scheme.Hom.ker (Scheme.IdealSheafData.vanishingIdeal Z).subschemeι := by
     rw [Scheme.IdealSheafData.ker_subschemeι, hvan]
     exact Scheme.IdealSheafData.le_radical _
   let φ : (Scheme.IdealSheafData.vanishingIdeal Z).subscheme ⟶ C.toScheme :=
     IsClosedImmersion.lift C.ι (Scheme.IdealSheafData.vanishingIdeal Z).subschemeι hle
   have hφ : φ ≫ C.ι = (Scheme.IdealSheafData.vanishingIdeal Z).subschemeι :=
     IsClosedImmersion.lift_fac _ _ hle
-  have hφbase : ∀ x, ⇑C.ι (⇑φ x) =
-      ⇑(Scheme.IdealSheafData.vanishingIdeal Z).subschemeι x := by
+  have hφbase : ∀ x, ⇑C.ι (⇑φ x) = ⇑(Scheme.IdealSheafData.vanishingIdeal Z).subschemeι x := by
     intro x
     rw [← hφ]
     simp
@@ -75,11 +74,12 @@ private theorem exists_iso_subscheme_vanishingIdeal_of_coe_eq {X : Scheme} [IsRe
   exact ⟨asIso φ, hφ⟩
 
 theorem exists_iso_subscheme_vanishingIdeal_of_isClosed
-    {X : Scheme} [IsReduced X] (C : X.Opens) (hC : IsClosed (C : Set X)) :
-    ∃ e : (Scheme.IdealSheafData.vanishingIdeal
-        (⟨(C : Set X), hC⟩ : TopologicalSpace.Closeds X)).subscheme ≅ C.toScheme,
-      e.hom ≫ C.ι =
-        (Scheme.IdealSheafData.vanishingIdeal
+    {X : Scheme} [IsReduced X] (C : X.Opens) (hC : IsClosed (C : Set X))
+    : ∃ e : (Scheme.IdealSheafData.vanishingIdeal
+          (⟨(C : Set X), hC⟩ : TopologicalSpace.Closeds X)).subscheme
+        ≅ C.toScheme,
+      e.hom ≫ C.ι
+        = (Scheme.IdealSheafData.vanishingIdeal
           (⟨(C : Set X), hC⟩ : TopologicalSpace.Closeds X)).subschemeι :=
   exists_iso_subscheme_vanishingIdeal_of_coe_eq C _ rfl
 

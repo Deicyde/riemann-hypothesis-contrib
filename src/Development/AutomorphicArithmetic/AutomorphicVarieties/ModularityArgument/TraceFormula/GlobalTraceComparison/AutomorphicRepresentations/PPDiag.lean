@@ -12,7 +12,8 @@ open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi DiscreteGroups.T1.G
 
 noncomputable section
 
-open NumberField MeasureTheory GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.Desc
+open NumberField MeasureTheory GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB.E
+  PositivityTheory.Rg.BcB.Desc
 
 attribute [local instance] PositivityTheory.Rg.BcB.E.borelH
 
@@ -111,8 +112,7 @@ end SlopeTestRemainingChoices
 
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.pDiag_pf :
-    PDiag := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.pDiag_pf : PDiag := by
   intro E _ _ _ n D π ι _ v c
   show _ = vecM ((piSp D π Unit).starProjection (vecM v fun _ : Unit => 1) ()) c
   have hmem := (piSp D π Unit).starProjection_apply_mem (vecM v fun _ : Unit => 1)

@@ -6,14 +6,15 @@ public import Mathlib
 
 namespace Bl.general_b_fact_right_alt_form
 
-theorem goal1 :
-  ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {V : Type} [inst_2 : AddCommGroup.{0} V]
-  [inst_3 : Module.{0, 0} E V] [inst_4 : Module.{0, 0} (NumberField.RingOfIntegers.{0} E) V]
-  [IsScalarTower.{0, 0, 0} (NumberField.RingOfIntegers.{0} E) E V] (A : Set.{0} V) (y : V),
-  Membership.mem.{0, 0} (Submodule.span.{0, 0} E A) y →
-    Exists.{1} fun (d : NumberField.RingOfIntegers.{0} E) ↦
-      And (Ne.{1} d 0)
-        (Membership.mem.{0, 0} (Submodule.span.{0, 0} (NumberField.RingOfIntegers.{0} E) A) (HSMul.hSMul.{0, 0, 0} d y)) := by
+theorem goal1
+    : ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {V : Type} [inst_2 : AddCommGroup.{0} V]
+        [inst_3 : Module.{0, 0} E V] [inst_4 : Module.{0, 0} (NumberField.RingOfIntegers.{0} E) V]
+        [IsScalarTower.{0, 0, 0} (NumberField.RingOfIntegers.{0} E) E V] (A : Set.{0} V) (y : V),
+      Membership.mem.{0, 0} (Submodule.span.{0, 0} E A) y
+        → Exists.{1} fun (d : NumberField.RingOfIntegers.{0} E) ↦
+          And (Ne.{1} d 0)
+            (Membership.mem.{0, 0} (Submodule.span.{0, 0} (NumberField.RingOfIntegers.{0} E) A)
+              (HSMul.hSMul.{0, 0, 0} d y)) := by
   intro E _ _ V _ _ _ _ A y hy
   induction hy using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by rw [one_smul]; exact Submodule.subset_span hx⟩

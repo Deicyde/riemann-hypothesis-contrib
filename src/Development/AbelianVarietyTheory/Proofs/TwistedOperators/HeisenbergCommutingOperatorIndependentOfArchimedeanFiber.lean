@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StandardAdel
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 noncomputable section
 
@@ -19,23 +20,24 @@ def fin (x : κ → AF F) : κ → Af F := fun i => (x i).2
 
 def mkv (a : κ → Ainf F) (w : κ → Af F) : κ → AF F := fun i => (a i, w i)
 
-def chi (ψ : AddChar (AF F) ℂ) (q : κ → Af F) (w : κ → Af F) : ℂ := GlobalTheory.HeisSchA.finChar ψ (w ⬝ᵥ q)
-
+def chi (ψ : AddChar (AF F) ℂ) (q : κ → Af F) (w : κ → Af F) : ℂ :=
+  GlobalTheory.HeisSchA.finChar ψ (w ⬝ᵥ q)
 
 variable (κ) in
-def alg (ψ : AddChar (AF F) ℂ) : Submodule ℂ ((κ → Af F) → ℂ) := Submodule.span ℂ (Set.range (chi (κ := κ) ψ))
+def alg (ψ : AddChar (AF F) ℂ) : Submodule ℂ ((κ → Af F) → ℂ) :=
+  Submodule.span ℂ (Set.range (chi (κ := κ) ψ))
 
-theorem chi_zero (ψ : AddChar (AF F) ℂ) : chi (κ := κ) ψ 0 = 1 := by
-  funext w; simp [chi]
+theorem chi_zero (ψ : AddChar (AF F) ℂ) : chi (κ := κ) ψ 0 = 1 := by funext w; simp [chi]
 
-theorem chi_add (ψ : AddChar (AF F) ℂ) (q q' : κ → Af F) : chi (κ := κ) ψ (q + q') = chi ψ q * chi ψ q' := by
+theorem chi_add (ψ : AddChar (AF F) ℂ) (q q' : κ → Af F)
+    : chi (κ := κ) ψ (q + q') = chi ψ q * chi ψ q' := by
   funext w; simp [chi, dotProduct_add, AddChar.map_add_eq_mul]
 
 theorem one_mem (ψ : AddChar (AF F) ℂ) : (1 : (κ → Af F) → ℂ) ∈ alg κ ψ :=
   chi_zero (κ := κ) ψ ▸ Submodule.subset_span ⟨0, rfl⟩
 
-theorem mul_mem (ψ : AddChar (AF F) ℂ) {C D : (κ → Af F) → ℂ} (hC : C ∈ alg κ ψ) (hD : D ∈ alg κ ψ) :
-    C * D ∈ alg κ ψ := by
+theorem mul_mem (ψ : AddChar (AF F) ℂ) {C D : (κ → Af F) → ℂ} (hC : C ∈ alg κ ψ) (hD : D ∈ alg κ ψ)
+    : C * D ∈ alg κ ψ := by
   have h := Submodule.mul_mem_mul hC hD
   rw [alg, Submodule.span_mul_span] at h
   refine Submodule.span_mono ?_ h
@@ -47,8 +49,10 @@ end GlobalTheory.FinFibre
 namespace GlobalTheory.FinFibre
 variable {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
 
-theorem exists_ne_one (ψ : AddChar (AF F) ℂ) (hψ : ∀ w : Pl (F := F), ∃ t, GlobalTheory.LatVac.psiAt ψ w t ≠ 1) {a : Af F}
-    (ha : a ≠ 0) : ∃ b : Af F, GlobalTheory.HeisSchA.finChar ψ (a * b) ≠ 1 := by
+theorem exists_ne_one
+    (ψ : AddChar (AF F) ℂ) (hψ : ∀ w : Pl (F := F), ∃ t, GlobalTheory.LatVac.psiAt ψ w t ≠ 1)
+    {a : Af F} (ha : a ≠ 0)
+    : ∃ b : Af F, GlobalTheory.HeisSchA.finChar ψ (a * b) ≠ 1 := by
   classical
   obtain ⟨v, hv⟩ : ∃ v, evalV F v a ≠ 0 := by
     by_contra h
@@ -68,17 +72,23 @@ theorem exists_ne_one (ψ : AddChar (AF F) ℂ) (hψ : ∀ w : Pl (F := F), ∃ 
   rw [e]
   exact ht
 
-theorem exists_chi_ne_one (ψ : AddChar (AF F) ℂ) (hψ : ∀ w : Pl (F := F), ∃ t, GlobalTheory.LatVac.psiAt ψ w t ≠ 1) {d : κ → Af F}
-    (hd : d ≠ 0) : ∃ q : κ → Af F, chi ψ q d ≠ 1 := by
+theorem exists_chi_ne_one
+    (ψ : AddChar (AF F) ℂ) (hψ : ∀ w : Pl (F := F), ∃ t, GlobalTheory.LatVac.psiAt ψ w t ≠ 1)
+    {d : κ → Af F} (hd : d ≠ 0)
+    : ∃ q : κ → Af F, chi ψ q d ≠ 1 := by
   classical
   obtain ⟨i, hi⟩ := Function.ne_iff.mp hd
   obtain ⟨b, hb⟩ := exists_ne_one ψ hψ hi
   exact ⟨Pi.single i b, by rw [chi, dotProduct_single]; exact hb⟩
 
-theorem chi_mul_eq_schr (ψ : AddChar (AF F) ℂ) (q : κ → Af F) (Φ : (κ → AF F) → ℂ) :
-    (fun x => chi ψ q (fin x) * Φ x) =
-      schr ψ ((GlobalTheory.HeisSchA.mk 0 1 : AF F) • (0 : κ → AF F),
-        (GlobalTheory.HeisSchA.mk 0 1 : AF F) • fun i => GlobalTheory.HeisSchA.mk 0 (q i)) Φ := by
+theorem chi_mul_eq_schr (ψ : AddChar (AF F) ℂ) (q : κ → Af F) (Φ : (κ → AF F) → ℂ)
+    : (fun x => chi ψ q (fin x) * Φ x)
+      = schr ψ
+        (
+          (GlobalTheory.HeisSchA.mk 0 1 : AF F) • (0 : κ → AF F),
+          (GlobalTheory.HeisSchA.mk 0 1 : AF F) • fun i => GlobalTheory.HeisSchA.mk 0 (q i)
+        )
+        Φ := by
   funext x
   simp only [schr, smul_zero, zero_dotProduct, mul_zero, add_zero]
   congr 1
@@ -102,11 +112,15 @@ end GlobalTheory.FinFibre
 namespace GlobalTheory.FinFibre
 variable {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
 
-theorem comm_alg (ψ : AddChar (AF F) ℂ) (T : Module.End ℂ ((κ → AF F) → ℂ))
-    (hT : ∀ u : AF F, evI F u = 0 → ∀ p q : κ → AF F, ∀ Φ ∈ schA F κ,
-      T (schr ψ (u • p, u • q) Φ) = schr ψ (u • p, u • q) (T Φ))
-    {C : (κ → Af F) → ℂ} (hC : C ∈ alg κ ψ) {Φ : (κ → AF F) → ℂ} (hΦ : Φ ∈ schA F κ) :
-    T (fun x => C (fin x) * Φ x) = fun x => C (fin x) * T Φ x := by
+theorem comm_alg
+    (ψ : AddChar (AF F) ℂ) (T : Module.End ℂ ((κ → AF F) → ℂ))
+    (hT : ∀ u : AF F,
+      evI F u = 0
+        → ∀ p q : κ → AF F, ∀ Φ ∈ schA F κ,
+          T (schr ψ (u • p, u • q) Φ) = schr ψ (u • p, u • q) (T Φ))
+    {C : (κ → Af F) → ℂ} (hC : C ∈ alg κ ψ)
+    {Φ : (κ → AF F) → ℂ} (hΦ : Φ ∈ schA F κ)
+    : T (fun x => C (fin x) * Φ x) = fun x => C (fin x) * T Φ x := by
   induction hC using Submodule.span_induction with
   | mem C h =>
     obtain ⟨q, rfl⟩ := h
@@ -120,19 +134,26 @@ theorem comm_alg (ψ : AddChar (AF F) ℂ) (T : Module.End ℂ ((κ → AF F) �
     have e' : (fun x : κ → AF F => (0 : (κ → Af F) → ℂ) (fin x) * Φ x) = 0 := by funext x; simp
     rw [e, e', map_zero]
   | add C D _ _ hC hD =>
-    have e : (fun x : κ → AF F => (C + D) (fin x) * Φ x) =
-        (fun x => C (fin x) * Φ x) + fun x => D (fin x) * Φ x := by funext x; simp [add_mul]
+    have e
+        : (fun x : κ → AF F => (C + D) (fin x) * Φ x)
+          = (fun x => C (fin x) * Φ x) + fun x => D (fin x) * Φ x := by
+      funext x; simp [add_mul]
     rw [e, map_add (f := _), hC, hD]
-    funext x; simp [add_mul]
+    funext x
+    simp [add_mul]
   | smul a C _ hC =>
     have e : (fun x : κ → AF F => (a • C) (fin x) * Φ x) = a • fun x => C (fin x) * Φ x := by
       funext x; simp [mul_assoc]
     rw [e, map_smul, hC]
-    funext x; simp [mul_assoc]
+    funext x
+    simp [mul_assoc]
 
-theorem exists_sep (ψ : AddChar (AF F) ℂ) (hc : Continuous ψ)
-    (hψ : ∀ w : Pl (F := F), ∃ t, GlobalTheory.LatVac.psiAt ψ w t ≠ 1) (y₀ : κ → Af F) {S : Set (κ → Af F)} (hS : IsCompact S)
-    (hy : y₀ ∉ S) : ∃ C ∈ alg κ ψ, C y₀ = 1 ∧ ∀ w ∈ S, C w = 0 := by
+theorem exists_sep
+    (ψ : AddChar (AF F) ℂ)
+    (hc : Continuous ψ) (hψ : ∀ w : Pl (F := F), ∃ t, GlobalTheory.LatVac.psiAt ψ w t ≠ 1)
+    (y₀ : κ → Af F)
+    {S : Set (κ → Af F)} (hS : IsCompact S) (hy : y₀ ∉ S)
+    : ∃ C ∈ alg κ ψ, C y₀ = 1 ∧ ∀ w ∈ S, C w = 0 := by
   have hlc := GlobalTheory.HeisSchA.finChar_isLocallyConstant ψ hc
   refine hS.induction_on (p := fun t => ∃ C ∈ alg κ ψ, C y₀ = 1 ∧ ∀ w ∈ t, C w = 0) ?_ ?_ ?_ ?_
   · exact ⟨1, one_mem ψ, rfl, fun _ h => h.elim⟩
@@ -148,14 +169,17 @@ theorem exists_sep (ψ : AddChar (AF F) ℂ) (hc : Continuous ψ)
     obtain ⟨q, hq⟩ := exists_chi_ne_one ψ hψ hne
     set ζ := chi ψ q (w - y₀)
     have hζ : 1 - ζ ≠ 0 := sub_ne_zero.mpr (Ne.symm hq)
-    let C : (κ → Af F) → ℂ := (1 - ζ)⁻¹ • (GlobalTheory.HeisSchA.finChar ψ (-(y₀ ⬝ᵥ q)) • chi ψ q - ζ • chi ψ 0)
+    let C : (κ → Af F) → ℂ :=
+      (1 - ζ)⁻¹ • (GlobalTheory.HeisSchA.finChar ψ (-(y₀ ⬝ᵥ q)) • chi ψ q - ζ • chi ψ 0)
     have hCv : ∀ w', C w' = (1 - ζ)⁻¹ * (chi ψ q (w' - y₀) - ζ) := by
       intro w'
       simp only [C, chi_zero, Pi.smul_apply, Pi.sub_apply, Pi.one_apply, smul_eq_mul, mul_one]
       congr 2
       rw [chi, chi, sub_dotProduct, sub_eq_neg_add, AddChar.map_add_eq_mul]
-    have hCm : C ∈ alg κ ψ := Submodule.smul_mem _ _ (Submodule.sub_mem _
-      (Submodule.smul_mem _ _ (Submodule.subset_span ⟨q, rfl⟩)) (Submodule.smul_mem _ _ (Submodule.subset_span ⟨0, rfl⟩)))
+    have hCm : C ∈ alg κ ψ :=
+      Submodule.smul_mem _ _
+        (Submodule.sub_mem _ (Submodule.smul_mem _ _ (Submodule.subset_span ⟨q, rfl⟩))
+          (Submodule.smul_mem _ _ (Submodule.subset_span ⟨0, rfl⟩)))
     have hcont : Continuous fun w' : κ → Af F => (w' - y₀) ⬝ᵥ q :=
       (continuous_id.sub continuous_const).dotProduct continuous_const
     have hev := (IsLocallyConstant.iff_eventually_eq _).mp (hlc.comp_continuous hcont) w
@@ -172,9 +196,9 @@ end GlobalTheory.FinFibre
 namespace GlobalTheory.FinFibre
 variable {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
 
-theorem schA_struct {Φ : (κ → AF F) → ℂ} (hΦ : Φ ∈ schA F κ) :
-    (∃ K : Set (κ → Af F), IsCompact K ∧ ∀ x, fin x ∉ K → Φ x = 0) ∧
-      ∀ w₀ : κ → Af F, ∀ᶠ w in nhds w₀, ∀ a : κ → Ainf F, Φ (mkv a w) = Φ (mkv a w₀) := by
+theorem schA_struct {Φ : (κ → AF F) → ℂ} (hΦ : Φ ∈ schA F κ)
+    : (∃ K : Set (κ → Af F), IsCompact K ∧ ∀ x, fin x ∉ K → Φ x = 0)
+      ∧ ∀ w₀ : κ → Af F, ∀ᶠ w in nhds w₀, ∀ a : κ → Ainf F, Φ (mkv a w) = Φ (mkv a w₀) := by
   induction hΦ using Submodule.span_induction with
   | mem Φ h =>
     obtain ⟨f, g, hg, rfl⟩ := h
@@ -185,7 +209,9 @@ theorem schA_struct {Φ : (κ → AF F) → ℂ} (hΦ : Φ ∈ schA F κ) :
       change _ * g w = _ * g w₀
       rw [hw]
       rfl
-  | zero => exact ⟨⟨∅, isCompact_empty, fun _ _ => rfl⟩, fun _ => Filter.Eventually.of_forall fun _ _ => rfl⟩
+  | zero =>
+    exact
+      ⟨⟨∅, isCompact_empty, fun _ _ => rfl⟩, fun _ => Filter.Eventually.of_forall fun _ _ => rfl⟩
   | add Φ Ψ _ _ hΦ hΨ =>
     obtain ⟨⟨K, hK, h0⟩, h1⟩ := hΦ
     obtain ⟨⟨K', hK', h0'⟩, h1'⟩ := hΨ
@@ -200,17 +226,22 @@ theorem schA_struct {Φ : (κ → AF F) → ℂ} (hΦ : Φ ∈ schA F κ) :
     filter_upwards [h1 w₀] with w hw a
     simp [hw a]
 
-theorem main (ψ : AddChar (AF F) ℂ) (T : Module.End ℂ ((κ → AF F) → ℂ)) (hψ : IsStd ψ)
-    (hnd : ∀ w : Pl (F := F), ∃ t, GlobalTheory.LatVac.psiAt ψ w t ≠ 1)
-    (hT : ∀ u : AF F, evI F u = 0 → ∀ p q : κ → AF F, ∀ Φ ∈ schA F κ,
-      T (schr ψ (u • p, u • q) Φ) = schr ψ (u • p, u • q) (T Φ))
-    (Φ : (κ → AF F) → ℂ) (hΦ : Φ ∈ schA F κ) (y : κ → AF F) (hy : ∀ z, At (evI F) z → Φ (y + z) = 0) :
-    T Φ y = 0 := by
+theorem main
+    (ψ : AddChar (AF F) ℂ) (T : Module.End ℂ ((κ → AF F) → ℂ))
+    (hψ : IsStd ψ) (hnd : ∀ w : Pl (F := F), ∃ t, GlobalTheory.LatVac.psiAt ψ w t ≠ 1)
+    (hT : ∀ u : AF F,
+      evI F u = 0
+        → ∀ p q : κ → AF F, ∀ Φ ∈ schA F κ,
+          T (schr ψ (u • p, u • q) Φ) = schr ψ (u • p, u • q) (T Φ))
+    (Φ : (κ → AF F) → ℂ) (hΦ : Φ ∈ schA F κ)
+    (y : κ → AF F) (hy : ∀ z, At (evI F) z → Φ (y + z) = 0)
+    : T Φ y = 0 := by
   obtain ⟨⟨K, hK, h0⟩, h1⟩ := schA_struct hΦ
   set U := {w : κ → Af F | ∀ a : κ → Ainf F, Φ (mkv a w) = Φ (mkv a (fin y))}
   have hU : U ∈ nhds (fin y) := h1 (fin y)
-  obtain ⟨C, hC, hC1, hC0⟩ := exists_sep ψ hψ.1 hnd (fin y) (hK.diff isOpen_interior)
-    (fun h => h.2 (mem_interior_iff_mem_nhds.mpr hU))
+  obtain ⟨C, hC, hC1, hC0⟩ :=
+    exists_sep ψ hψ.1 hnd (fin y) (hK.diff isOpen_interior)
+      (fun h => h.2 (mem_interior_iff_mem_nhds.mpr hU))
   have hzero : (fun x => C (fin x) * Φ x) = 0 := by
     funext x
     by_cases hxK : fin x ∈ K
@@ -218,7 +249,9 @@ theorem main (ψ : AddChar (AF F) ℂ) (T : Module.End ℂ ((κ → AF F) → �
       · have hx := interior_subset hxU (fun i => (x i).1)
         have e1 : mkv (fun i => (x i).1) (fin x) = x := rfl
         rw [e1] at hx
-        have e2 : mkv (fun i => (x i).1) (fin y) = y + fun i => GlobalTheory.HeisSchA.mk ((x i).1 - (y i).1) 0 := by
+        have e2
+            : mkv (fun i => (x i).1) (fin y)
+              = y + fun i => GlobalTheory.HeisSchA.mk ((x i).1 - (y i).1) 0 := by
           funext i
           refine Prod.ext ?_ ?_
           · change (x i).1 = (y i).1 + ((x i).1 - (y i).1)
@@ -235,10 +268,15 @@ theorem main (ψ : AddChar (AF F) ℂ) (T : Module.End ℂ ((κ → AF F) → �
 
 end GlobalTheory.FinFibre
 
-
 open GlobalTheory.FinFibre in
-theorem GlobalTheory.FinFibre.fibre_zero : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (ψ : AddChar (AF F) ℂ) (T : Module.End ℂ ((κ → AF F) → ℂ)),
-    IsStd ψ → (∀ Φ ∈ schA F κ, T Φ ∈ schA F κ) →
-    (∀ u : AF F, evI F u = 0 → ∀ p q : κ → AF F, ∀ Φ ∈ schA F κ, T (schr ψ (u • p, u • q) Φ) = schr ψ (u • p, u • q) (T Φ)) →
-    ∀ Φ ∈ schA F κ, ∀ y : κ → AF F, (∀ z, At (evI F) z → Φ (y + z) = 0) → T Φ y = 0 :=
-  fun ψ T hψ _ hT Φ hΦ y hy => main ψ T hψ (GlobalTheory.T.standardAdelicAddChar_nontrivial_finitePlace ψ hψ) hT Φ hΦ y hy
+theorem GlobalTheory.FinFibre.fibre_zero
+    : ∀ {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ] (ψ : AddChar (AF F) ℂ)
+        (T : Module.End ℂ ((κ → AF F) → ℂ)),
+      IsStd ψ → (∀ Φ ∈ schA F κ, T Φ ∈ schA F κ)
+        → (∀ u : AF F,
+          evI F u = 0
+            → ∀ p q : κ → AF F, ∀ Φ ∈ schA F κ,
+              T (schr ψ (u • p, u • q) Φ) = schr ψ (u • p, u • q) (T Φ))
+        → ∀ Φ ∈ schA F κ, ∀ y : κ → AF F,
+          (∀ z, At (evI F) z → Φ (y + z) = 0) → T Φ y = 0 := fun ψ T hψ _ hT Φ hΦ y hy =>
+  main ψ T hψ (GlobalTheory.T.standardAdelicAddChar_nontrivial_finitePlace ψ hψ) hT Φ hΦ y hy

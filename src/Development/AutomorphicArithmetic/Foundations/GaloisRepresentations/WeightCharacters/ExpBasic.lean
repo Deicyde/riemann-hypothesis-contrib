@@ -14,10 +14,11 @@ private theorem pow_mem_le {s m : ℤ} (h : m ≤ s) : (fun z : Circle => (z : �
 private theorem pow_mem_ge {s m : ℤ} (h : s ≤ m) : (fun z : Circle => (z : ℂ) ^ m) ∈ ExpGe s :=
   Submodule.subset_span ⟨m, h, rfl⟩
 
-private theorem circle_mul_mem_of_mem_span_of_mem_span {S T : Set (Circle → ℂ)} {P : Submodule ℂ (Circle → ℂ)}
-    (h : ∀ f ∈ S, ∀ g ∈ T, (fun z => f z * g z) ∈ P) {f g : Circle → ℂ}
-    (hf : f ∈ Submodule.span ℂ S) (hg : g ∈ Submodule.span ℂ T) :
-    (fun z => f z * g z) ∈ P := by
+private theorem circle_mul_mem_of_mem_span_of_mem_span
+    {S T : Set (Circle → ℂ)} {P : Submodule ℂ (Circle → ℂ)}
+    (h : ∀ f ∈ S, ∀ g ∈ T, (fun z => f z * g z) ∈ P)
+    {f g : Circle → ℂ} (hf : f ∈ Submodule.span ℂ S) (hg : g ∈ Submodule.span ℂ T)
+    : (fun z => f z * g z) ∈ P := by
   induction hf using Submodule.span_induction with
   | mem f hfS =>
     induction hg using Submodule.span_induction with
@@ -61,9 +62,11 @@ private theorem circle_mul_mem_of_mem_span_of_mem_span {S T : Set (Circle → �
     rw [e]
     exact P.smul_mem c h₁
 
-private theorem circle_comp_inv_mem_of_mem_span {S : Set (Circle → ℂ)} {P : Submodule ℂ (Circle → ℂ)}
-    (h : ∀ f ∈ S, (fun z : Circle => f z⁻¹) ∈ P) {f : Circle → ℂ}
-    (hf : f ∈ Submodule.span ℂ S) : (fun z : Circle => f z⁻¹) ∈ P := by
+private theorem circle_comp_inv_mem_of_mem_span
+    {S : Set (Circle → ℂ)} {P : Submodule ℂ (Circle → ℂ)}
+    (h : ∀ f ∈ S, (fun z : Circle => f z⁻¹) ∈ P)
+    {f : Circle → ℂ} (hf : f ∈ Submodule.span ℂ S)
+    : (fun z : Circle => f z⁻¹) ∈ P := by
   induction hf using Submodule.span_induction with
   | mem f hfS => exact h f hfS
   | zero =>
@@ -85,13 +88,13 @@ private theorem circle_comp_inv_mem_of_mem_span {S : Set (Circle → ℂ)} {P : 
     rw [e]
     exact P.smul_mem c h₁
 
-private theorem circle_zpow_mul_zpow_eq_zpow_add (m n : ℤ) :
-    (fun z : Circle => (z : ℂ) ^ m * (z : ℂ) ^ n) = fun z : Circle => (z : ℂ) ^ (m + n) := by
+private theorem circle_zpow_mul_zpow_eq_zpow_add (m n : ℤ)
+    : (fun z : Circle => (z : ℂ) ^ m * (z : ℂ) ^ n) = fun z : Circle => (z : ℂ) ^ (m + n) := by
   funext z
   rw [zpow_add₀ (Circle.coe_ne_zero z)]
 
-private theorem circle_inv_zpow_eq_zpow_neg (m : ℤ) :
-    (fun z : Circle => ((z⁻¹ : Circle) : ℂ) ^ m) = fun z : Circle => (z : ℂ) ^ (-m) := by
+private theorem circle_inv_zpow_eq_zpow_neg (m : ℤ)
+    : (fun z : Circle => ((z⁻¹ : Circle) : ℂ) ^ m) = fun z : Circle => (z : ℂ) ^ (-m) := by
   funext z
   rw [Circle.coe_inv, inv_zpow, zpow_neg]
 

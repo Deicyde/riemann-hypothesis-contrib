@@ -14,8 +14,10 @@ noncomputable section
 
 section Tower
 
-variable {A : Type u} [CommRing A] {E : ℕ → Type u} [∀ n, AddCommGroup (E n)]
-  [∀ n, Module A (E n)] (τ : ∀ n, E (n + 1) →ₗ[A] E n)
+variable
+  {A : Type u} [CommRing A]
+  {E : ℕ → Type u} [∀ n, AddCommGroup (E n)] [∀ n, Module A (E n)]
+  (τ : ∀ n, E (n + 1) →ₗ[A] E n)
 
 def towerLimit : Submodule A (∀ n, E n) where
   carrier := {x | ∀ n, τ n (x (n + 1)) = x n}
@@ -54,25 +56,26 @@ end Tower
 
 section Exact
 
-variable {A : Type u} [CommRing A]
-  {P E Q : ℕ → Type u} [∀ n, AddCommGroup (P n)] [∀ n, Module A (P n)]
-  [∀ n, AddCommGroup (E n)] [∀ n, Module A (E n)] [∀ n, AddCommGroup (Q n)]
-  [∀ n, Module A (Q n)]
+variable
+  {A : Type u} [CommRing A]
+  {P E Q : ℕ → Type u} [∀ n, AddCommGroup (P n)] [∀ n, Module A (P n)] [∀ n, AddCommGroup (E n)]
+  [∀ n, Module A (E n)] [∀ n, AddCommGroup (Q n)] [∀ n, Module A (Q n)]
   (τP : ∀ n, P (n + 1) →ₗ[A] P n) (τE : ∀ n, E (n + 1) →ₗ[A] E n) (τQ : ∀ n, Q (n + 1) →ₗ[A] Q n)
   (ι : ∀ n, P n →ₗ[A] E n) (π : ∀ n, E n →ₗ[A] Q n)
   (hι : ∀ n, (τE n).comp (ι (n + 1)) = (ι n).comp (τP n))
   (hπ : ∀ n, (τQ n).comp (π (n + 1)) = (π n).comp (τE n))
 
-
-
-variable (hinj : ∀ n, Function.Injective (ι n))
-  (hex : ∀ n, LinearMap.range (ι n) = LinearMap.ker (π n))
+variable
+  (hinj : ∀ n, Function.Injective (ι n)) (hex : ∀ n, LinearMap.range (ι n) = LinearMap.ker (π n))
 
 def towerLimitMap : towerLimit τP →ₗ[A] towerLimit τE where
-  toFun x := ⟨fun n => ι n (x.1 n), fun n => by
-    have := congrArg (fun f => f (x.1 (n + 1))) (hι n)
-    simp only [LinearMap.comp_apply] at this
-    rw [this, x.2 n]⟩
+  toFun x := ⟨
+    fun n => ι n (x.1 n),
+    fun n => by
+      have := congrArg (fun f => f (x.1 (n + 1))) (hι n)
+      simp only [LinearMap.comp_apply] at this
+      rw [this, x.2 n]
+  ⟩
   map_add' x y := by
     ext n
     exact map_add (ι n) _ _
@@ -80,13 +83,12 @@ def towerLimitMap : towerLimit τP →ₗ[A] towerLimit τE where
     ext n
     exact map_smul (ι n) _ _
 
-
 include hι hπ hinj hex in
-theorem bijective_towerLimitMap (hinj : ∀ n, Function.Injective (ι n))
-    (hex : ∀ n, LinearMap.range (ι n) = LinearMap.ker (π n))
+theorem bijective_towerLimitMap
+    (hinj : ∀ n, Function.Injective (ι n)) (hex : ∀ n, LinearMap.range (ι n) = LinearMap.ker (π n))
     (hπ : ∀ n, (τQ n).comp (π (n + 1)) = (π n).comp (τE n))
-    {c : ℕ} (hc : ∀ n, towerComp τQ n c = 0) :
-    Function.Bijective (towerLimitMap τP τE ι hι) := by
+    {c : ℕ} (hc : ∀ n, towerComp τQ n c = 0)
+    : Function.Bijective (towerLimitMap τP τE ι hι) := by
   constructor
   · intro x y hxy
     ext n
@@ -117,11 +119,14 @@ end Exact
 
 section Adic
 
-variable {A : Type u} [CommRing A] (I : Ideal A) {H : Type u} [AddCommGroup H] [Module A H]
+variable
+  {A : Type u} [CommRing A]
+  (I : Ideal A)
+  {H : Type u} [AddCommGroup H] [Module A H]
   (K : ℕ → Submodule A H) (hK : Antitone K)
 
-def quotTower : ∀ n, (H ⧸ K (n + 1)) →ₗ[A] (H ⧸ K n) :=
-  fun n => Submodule.factor (hK (Nat.le_succ n))
+def quotTower : ∀ n, (H ⧸ K (n + 1)) →ₗ[A] (H ⧸ K n) := fun n =>
+  Submodule.factor (hK (Nat.le_succ n))
 
 variable {I K}
 

@@ -16,12 +16,10 @@ private def pA (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] : Subalgebr
   Algebra.adjoin ℂ (Set.range fun l : V →ₗ[ℝ] ℂ => (l : V → ℂ))
 
 omit [FiniteDimensional ℝ V] in
-private theorem lin_mem (l : V →ₗ[ℝ] ℂ) : (l : V → ℂ) ∈ pA V :=
-  Algebra.subset_adjoin ⟨l, rfl⟩
+private theorem lin_mem (l : V →ₗ[ℝ] ℂ) : (l : V → ℂ) ∈ pA V := Algebra.subset_adjoin ⟨l, rfl⟩
 
 omit [FiniteDimensional ℝ V] in
-private theorem const_mem (c : ℂ) : (fun _ : V => c) ∈ pA V :=
-  (pA V).algebraMap_mem c
+private theorem const_mem (c : ℂ) : (fun _ : V => c) ∈ pA V := (pA V).algebraMap_mem c
 
 private theorem pA_smooth {P : V → ℂ} (hP : P ∈ pA V) : ContDiff ℝ ∞ P := by
   induction hP using Algebra.adjoin_induction with
@@ -33,7 +31,8 @@ private theorem pA_smooth {P : V → ℂ} (hP : P ∈ pA V) : ContDiff ℝ ∞ P
   | mul f g _ _ hf hg => exact hf.mul hg
 
 omit [FiniteDimensional ℝ V] in
-private theorem pA_comp (T : V →ₗ[ℝ] V) {P : V → ℂ} (hP : P ∈ pA V) : (fun x => P (T x)) ∈ pA V := by
+private theorem pA_comp (T : V →ₗ[ℝ] V) {P : V → ℂ} (hP : P ∈ pA V)
+    : (fun x => P (T x)) ∈ pA V := by
   induction hP using Algebra.adjoin_induction with
   | mem f hf =>
     obtain ⟨l, rfl⟩ := hf
@@ -42,8 +41,9 @@ private theorem pA_comp (T : V →ₗ[ℝ] V) {P : V → ℂ} (hP : P ∈ pA V) 
   | add f g _ _ hf hg => exact (pA V).add_mem hf hg
   | mul f g _ _ hf hg => exact (pA V).mul_mem hf hg
 
-private theorem pA_der (F : V → V) (hF : ∀ l : V →ₗ[ℝ] ℂ, (fun x => l (F x)) ∈ pA V) {P : V → ℂ}
-    (hP : P ∈ pA V) : (fun x => fderiv ℝ P x (F x)) ∈ pA V := by
+private theorem pA_der
+    (F : V → V) (hF : ∀ l : V →ₗ[ℝ] ℂ, (fun x => l (F x)) ∈ pA V) {P : V → ℂ} (hP : P ∈ pA V)
+    : (fun x => fderiv ℝ P x (F x)) ∈ pA V := by
   induction hP using Algebra.adjoin_induction with
   | mem f hf =>
     obtain ⟨l, rfl⟩ := hf
@@ -56,14 +56,16 @@ private theorem pA_der (F : V → V) (hF : ∀ l : V →ₗ[ℝ] ℂ, (fun x => 
     have h : (fun x => fderiv ℝ (algebraMap ℂ (V → ℂ) c) x (F x)) = fun _ => 0 := by
       funext x
       have : fderiv ℝ (algebraMap ℂ (V → ℂ) c) x = 0 := fderiv_const_apply c
-      rw [this]; rfl
+      rw [this]
+      rfl
     rw [h]
     exact const_mem 0
   | add f g hf' hg' hf hg =>
     have df := (pA_smooth hf').differentiable (by simp)
     have dg := (pA_smooth hg').differentiable (by simp)
-    have h : (fun x => fderiv ℝ (f + g) x (F x)) =
-        (fun x => fderiv ℝ f x (F x)) + fun x => fderiv ℝ g x (F x) := by
+    have h
+        : (fun x => fderiv ℝ (f + g) x (F x))
+          = (fun x => fderiv ℝ f x (F x)) + fun x => fderiv ℝ g x (F x) := by
       funext x
       rw [fderiv_add (df x) (dg x)]
       rfl
@@ -72,16 +74,17 @@ private theorem pA_der (F : V → V) (hF : ∀ l : V →ₗ[ℝ] ℂ, (fun x => 
   | mul f g hf' hg' hf hg =>
     have df := (pA_smooth hf').differentiable (by simp)
     have dg := (pA_smooth hg').differentiable (by simp)
-    have h : (fun x => fderiv ℝ (f * g) x (F x)) =
-        f * (fun x => fderiv ℝ g x (F x)) + g * fun x => fderiv ℝ f x (F x) := by
+    have h
+        : (fun x => fderiv ℝ (f * g) x (F x))
+          = f * (fun x => fderiv ℝ g x (F x)) + g * fun x => fderiv ℝ f x (F x) := by
       funext x
       rw [fderiv_mul (df x) (dg x)]
       simp
     rw [h]
     exact (pA V).add_mem ((pA V).mul_mem hf' hg) ((pA V).mul_mem hg' hf)
 
-private theorem pA_bd (q : V → ℝ) (hq : ∀ x, ‖x‖ ^ 2 ≤ q x) {P : V → ℂ} (hP : P ∈ pA V) :
-    ∃ (C : ℝ) (k : ℕ), 0 ≤ C ∧ ∀ x, ‖P x‖ ≤ C * (1 + q x) ^ k := by
+private theorem pA_bd (q : V → ℝ) (hq : ∀ x, ‖x‖ ^ 2 ≤ q x) {P : V → ℂ} (hP : P ∈ pA V)
+    : ∃ (C : ℝ) (k : ℕ), 0 ≤ C ∧ ∀ x, ‖P x‖ ≤ C * (1 + q x) ^ k := by
   have h1 : ∀ x, 1 ≤ 1 + q x := fun x => by nlinarith [hq x, sq_nonneg ‖x‖]
   induction hP using Algebra.adjoin_induction with
   | mem f hf =>
@@ -113,8 +116,7 @@ private theorem pA_bd (q : V → ℝ) (hq : ∀ x, ‖x‖ ^ 2 ≤ q x) {P : V �
 
 end aux
 
-theorem UpperTheory.admissibleFunctionClass_closure_properties :
-    PolyBd := by
+theorem UpperTheory.admissibleFunctionClass_closure_properties : PolyBd := by
   intro E _ _ a P hP
   have hq := fun x => ((UpperTheory.geometric_side_quadraticForm_identity E a).2.2.2.2.2 x).1
   refine ⟨pA_smooth hP, ?_, fun T => ⟨?_, pA_comp T hP, fun u => ?_⟩⟩

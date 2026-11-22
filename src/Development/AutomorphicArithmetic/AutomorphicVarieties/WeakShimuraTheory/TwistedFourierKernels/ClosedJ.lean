@@ -6,11 +6,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 open IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Ws.H5
 
-theorem UpperTheory.V.Ws.H5.closedJ :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (J : Ideal R) (b : R), (∀ N : ℕ, b ∈ J ⊔ maximalIdeal R ^ (N + 1)) → b ∈ J := by
+theorem UpperTheory.V.Ws.H5.closedJ
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (J : Ideal R) (b : R),
+      (∀ N : ℕ, b ∈ J ⊔ maximalIdeal R ^ (N + 1)) → b ∈ J := by
   intro R _ _ _ J b hb
-  have hK := Ideal.iInf_pow_smul_eq_bot_of_isLocalRing (M := R ⧸ J) (maximalIdeal R)
-    (IsLocalRing.maximalIdeal.isMaximal R).ne_top
+  have hK :=
+    Ideal.iInf_pow_smul_eq_bot_of_isLocalRing (M := R ⧸ J) (maximalIdeal R)
+      (IsLocalRing.maximalIdeal.isMaximal R).ne_top
   have hx : Ideal.Quotient.mk J b ∈ (⨅ i : ℕ, (maximalIdeal R) ^ i • ⊤ : Submodule R (R ⧸ J)) := by
     rw [Submodule.mem_iInf]
     intro i

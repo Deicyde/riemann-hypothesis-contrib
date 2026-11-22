@@ -7,13 +7,16 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.PartialSum
 
 @[expose] public section
 
-open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
+open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel.Glue
 
-theorem entire_of_halfPlane_continuations :
-    ∀ (S : ℂ → ℂ) (G : ℕ → ℂ → ℂ), (∀ k, DifferentiableOn ℂ (G k) {s | -(k : ℝ) < s.re}) →
-  (∀ k s, 1 < s.re → G k s = S s) → ∃ T : ℂ → ℂ, Differentiable ℂ T ∧ ∀ (k : ℕ) (s : ℂ), -(k : ℝ) < s.re → T s = G k s := by
+theorem entire_of_halfPlane_continuations
+    : ∀ (S : ℂ → ℂ) (G : ℕ → ℂ → ℂ),
+      (∀ k, DifferentiableOn ℂ (G k) {s | -(k : ℝ) < s.re}) → (∀ k s, 1 < s.re → G k s = S s)
+        → ∃ T : ℂ → ℂ, Differentiable ℂ T ∧ ∀ (k : ℕ) (s : ℂ), -(k : ℝ) < s.re → T s = G k s := by
   intro S G hG hS
   have hopen : ∀ r : ℝ, IsOpen {s : ℂ | r < s.re} := fun r =>
     isOpen_lt continuous_const Complex.continuous_re
@@ -25,8 +28,7 @@ theorem entire_of_halfPlane_continuations :
       have h1 : (j : ℝ) ≤ k := by exact_mod_cast hjk
       simp only [Set.mem_setOf_eq] at hs ⊢
       linarith
-    have hfj : AnalyticOnNhd ℂ (G j) {s : ℂ | -(j : ℝ) < s.re} :=
-      (hG j).analyticOnNhd (hopen _)
+    have hfj : AnalyticOnNhd ℂ (G j) {s : ℂ | -(j : ℝ) < s.re} := (hG j).analyticOnNhd (hopen _)
     have hfk : AnalyticOnNhd ℂ (G k) {s : ℂ | -(j : ℝ) < s.re} :=
       ((hG k).mono hsub).analyticOnNhd (hopen _)
     have hpre : IsPreconnected {s : ℂ | -(j : ℝ) < s.re} :=
@@ -36,8 +38,7 @@ theorem entire_of_halfPlane_continuations :
       simp only [Set.mem_setOf_eq, Complex.re_ofNat]
       linarith
     have hev : G j =ᶠ[nhds (2 : ℂ)] G k := by
-      have hmem : {s : ℂ | (1 : ℝ) < s.re} ∈ nhds (2 : ℂ) :=
-        (hopen 1).mem_nhds (by simp)
+      have hmem : {s : ℂ | (1 : ℝ) < s.re} ∈ nhds (2 : ℂ) := (hopen 1).mem_nhds (by simp)
       filter_upwards [hmem] with s hs
       rw [hS j s hs, hS k s hs]
     exact hfj.eqOn_of_preconnected_of_eventuallyEq hfk hpre h2 hev

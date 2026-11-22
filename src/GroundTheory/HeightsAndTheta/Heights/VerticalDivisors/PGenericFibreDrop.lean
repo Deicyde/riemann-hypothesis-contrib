@@ -30,8 +30,7 @@ theorem GenericFibreDrop.proof : GenericFibreDrop.Statement := by
     have h1 : o ∈ P'.comap (C : O →+* A) := hmem
     rw [hP'C, Ideal.mem_bot] at h1
     exact nonZeroDivisors.ne_zero ho h1
-  have hdisj : Disjoint (M : Set A) (P : Set A) :=
-    Set.disjoint_of_subset_right hPP' hdisj'
+  have hdisj : Disjoint (M : Set A) (P : Set A) := Set.disjoint_of_subset_right hPP' hdisj'
 
   let I : Ideal T := P.map (algebraMap A T)
   let I' : Ideal T := P'.map (algebraMap A T)
@@ -67,8 +66,9 @@ theorem GenericFibreDrop.proof : GenericFibreDrop.Statement := by
   have _ : (I'.map (Ideal.Quotient.mk I)).IsPrime :=
     Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rwa [Ideal.mk_ker])
 
-  have key := GroundTheory.Arith.Abelian.Jacobian.height_add_ringKrullDim_quotient (k := F)
-    (I'.map (Ideal.Quotient.mk I))
+  have key :=
+    GroundTheory.Arith.Abelian.Jacobian.height_add_ringKrullDim_quotient (k := F)
+      (I'.map (Ideal.Quotient.mk I))
   rw [hh, ringKrullDim_eq_of_ringEquiv (DoubleQuot.quotQuotEquivQuotOfLE hII')] at key
   show ringKrullDim (T ⧸ I) = ringKrullDim (T ⧸ I') + 1
   rw [← key, add_comm]

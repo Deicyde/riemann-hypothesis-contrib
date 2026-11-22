@@ -10,10 +10,12 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FirstStan
 
 namespace GlobalTheory.HatProductMembership
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.FunObj.SqNum
+open NumberField Formalism.BasicNotions Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.FunObj.SqNum
 
-theorem mul_mem_hat_mul {D : D7} {I J : Ideal (𝓞 D.host.E)} {x y : AE D}
-    (hx : x ∈ hatId D I) (hy : y ∈ hatId D J) : x * y ∈ hatId D (I * J) := by
+theorem mul_mem_hat_mul
+    {D : D7} {I J : Ideal (𝓞 D.host.E)} {x y : AE D} (hx : x ∈ hatId D I) (hy : y ∈ hatId D J)
+    : x * y ∈ hatId D (I * J) := by
   unfold hatId at hx hy ⊢
   induction hx using AddSubgroup.closure_induction with
   | mem a ha =>

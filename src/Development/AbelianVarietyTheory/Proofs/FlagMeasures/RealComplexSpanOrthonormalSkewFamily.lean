@@ -5,21 +5,27 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LowersMulZero
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
 
 namespace GlobalTheory.SkewSpan
 
-theorem skew_conj {n : ℕ} (ε : Fin n → Bool) {B : Matrix (Fin n) (Fin n) ℂ}
-    (h : Formalism.REAL.inG ε B) : Formalism.REAL.Jm ε * Bᴴ * Formalism.REAL.Jm ε = -B := by
+theorem skew_conj
+    {n : ℕ} (ε : Fin n → Bool) {B : Matrix (Fin n) (Fin n) ℂ} (h : Formalism.REAL.inG ε B)
+    : Formalism.REAL.Jm ε * Bᴴ * Formalism.REAL.Jm ε = -B := by
   have h' : Bᴴ * Formalism.REAL.Jm ε = -(Formalism.REAL.Jm ε * B) := eq_neg_of_add_eq_zero_left h
   rw [Matrix.mul_assoc, h', Matrix.mul_neg, ← Matrix.mul_assoc, Formalism.REAL.Jm_mul_self,
     Matrix.one_mul]
 
-theorem trace_twisted {n : ℕ} (ε : Fin n → Bool) {B : Matrix (Fin n) (Fin n) ℂ}
-    (h : Formalism.REAL.inG ε B) (X : Matrix (Fin n) (Fin n) ℂ) :
-    (Formalism.REAL.Jm ε * Xᴴ * Formalism.REAL.Jm ε * Bᴴ).trace = - starRingEnd ℂ (X * Bᴴ).trace := by
-  have h1 : (Formalism.REAL.Jm ε * Xᴴ * Formalism.REAL.Jm ε * Bᴴ).trace
-      = (Xᴴ * (Formalism.REAL.Jm ε * Bᴴ * Formalism.REAL.Jm ε)).trace := by
+theorem trace_twisted
+    {n : ℕ} (ε : Fin n → Bool)
+    {B : Matrix (Fin n) (Fin n) ℂ} (h : Formalism.REAL.inG ε B)
+    (X : Matrix (Fin n) (Fin n) ℂ)
+    : (Formalism.REAL.Jm ε * Xᴴ * Formalism.REAL.Jm ε * Bᴴ).trace
+      = - starRingEnd ℂ (X * Bᴴ).trace := by
+  have h1
+      : (Formalism.REAL.Jm ε * Xᴴ * Formalism.REAL.Jm ε * Bᴴ).trace
+        = (Xᴴ * (Formalism.REAL.Jm ε * Bᴴ * Formalism.REAL.Jm ε)).trace := by
     rw [Matrix.mul_assoc, Matrix.mul_assoc, Matrix.trace_mul_comm]
     simp only [Matrix.mul_assoc]
   have h2 : starRingEnd ℂ (X * Bᴴ).trace = (Xᴴ * B).trace := by
@@ -27,13 +33,16 @@ theorem trace_twisted {n : ℕ} (ε : Fin n → Bool) {B : Matrix (Fin n) (Fin n
       Matrix.conjTranspose_conjTranspose, Matrix.trace_mul_comm]
   rw [h1, h2, skew_conj ε h, Matrix.mul_neg, Matrix.trace_neg]
 
-theorem real_span (n d : ℕ) (ε : Fin n → Bool) (B : Fin d → Matrix (Fin n) (Fin n) ℂ)
+theorem real_span
+    (n d : ℕ) (ε : Fin n → Bool) (B : Fin d → Matrix (Fin n) (Fin n) ℂ)
     (s : Set (Fin d)) (hB : ∀ i k, (B i * (B k)ᴴ).trace = if i = k then 1 else 0)
-    (hG : ∀ i, Formalism.REAL.inG ε (B i)) :
-    (∀ X, (X ∈ Submodule.span ℂ (B '' s) ∧ Formalism.REAL.inG ε X) ↔ X ∈ Submodule.span ℝ (B '' s)) ∧
-    (∀ X ∈ Submodule.span ℂ (B '' s), ∀ i, i ∉ s → (X * (B i)ᴴ).trace = 0) ∧
-    ∀ X i, (Formalism.REAL.Jm ε * Xᴴ * Formalism.REAL.Jm ε * (B i)ᴴ).trace
-      = - starRingEnd ℂ (X * (B i)ᴴ).trace := by
+    (hG : ∀ i, Formalism.REAL.inG ε (B i))
+    : (∀ X,
+        (X ∈ Submodule.span ℂ (B '' s) ∧ Formalism.REAL.inG ε X) ↔ X ∈ Submodule.span ℝ (B '' s))
+      ∧ (∀ X ∈ Submodule.span ℂ (B '' s), ∀ i, i ∉ s → (X * (B i)ᴴ).trace = 0)
+      ∧ ∀ X i,
+        (Formalism.REAL.Jm ε * Xᴴ * Formalism.REAL.Jm ε * (B i)ᴴ).trace
+          = - starRingEnd ℂ (X * (B i)ᴴ).trace := by
   have h2 : ∀ X ∈ Submodule.span ℂ (B '' s), ∀ i, i ∉ s → (X * (B i)ᴴ).trace = 0 := by
     intro X hX i hi
     induction hX using Submodule.span_induction with
@@ -51,7 +60,8 @@ theorem real_span (n d : ℕ) (ε : Fin n → Bool) (B : Fin d → Matrix (Fin n
     | mem x hx =>
       obtain ⟨k, hk, rfl⟩ := hx
       simp [hB]
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       simp only [Matrix.add_mul, Matrix.trace_add, add_smul, Finset.sum_add_distrib]
       rw [← hx, ← hy]
@@ -77,14 +87,15 @@ theorem real_span (n d : ℕ) (ε : Fin n → Bool) (B : Fin d → Matrix (Fin n
     | mem x hx =>
       obtain ⟨k, hk, rfl⟩ := hx
       exact hG k
-    | zero => simp [Formalism.REAL.inG]
+    | zero =>
+      simp [Formalism.REAL.inG]
     | add x y _ _ hx hy =>
       unfold Formalism.REAL.inG at *
       rw [Matrix.conjTranspose_add, Matrix.add_mul, Matrix.mul_add, add_add_add_comm, hx, hy,
         add_zero]
     | smul c x _ hx =>
       unfold Formalism.REAL.inG at *
-      rw [Matrix.conjTranspose_smul, star_trivial, Matrix.smul_mul, Matrix.mul_smul, ← smul_add,
-        hx, smul_zero]
+      rw [Matrix.conjTranspose_smul, star_trivial, Matrix.smul_mul, Matrix.mul_smul, ← smul_add, hx,
+        smul_zero]
 
 end GlobalTheory.SkewSpan

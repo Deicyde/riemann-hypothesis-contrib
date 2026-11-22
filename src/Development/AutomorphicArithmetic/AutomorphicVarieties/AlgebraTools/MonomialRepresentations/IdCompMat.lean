@@ -7,19 +7,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open Polynomial Matrix
 
-private noncomputable def UpperTheory.V.AlgebraTools.icmPt {K ι : Type} [Field K] (A : Matrix ι ι K) :
-    PrimeSpectrum (MvPolynomial (ι × ι) K) :=
+private noncomputable def UpperTheory.V.AlgebraTools.icmPt {K ι : Type} [Field K] (A : Matrix ι ι K)
+    : PrimeSpectrum (MvPolynomial (ι × ι) K) :=
   ⟨RingHom.ker (MvPolynomial.eval (fun p : ι × ι => A p.1 p.2)), RingHom.ker_isPrime _⟩
 
-private theorem UpperTheory.V.AlgebraTools.icmPt_left {K ι : Type} [Field K] [Fintype ι] (A : Matrix ι ι K) :
-    ∃ ψ : MvPolynomial (ι × ι) K →+* MvPolynomial (ι × ι) K, ∀ B : Matrix ι ι K,
-      UpperTheory.V.AlgebraTools.icmPt (A * B) = PrimeSpectrum.comap ψ (UpperTheory.V.AlgebraTools.icmPt B) := by
-  refine ⟨(MvPolynomial.aeval fun p : ι × ι =>
-    ∑ k, MvPolynomial.C (A p.1 k) * MvPolynomial.X (k, p.2)).toRingHom, fun B => ?_⟩
-  have key : (MvPolynomial.eval fun p : ι × ι => (A * B) p.1 p.2) =
-      (MvPolynomial.eval fun p : ι × ι => B p.1 p.2).comp
-        (MvPolynomial.aeval fun p : ι × ι =>
-          ∑ k, MvPolynomial.C (A p.1 k) * MvPolynomial.X (k, p.2)).toRingHom := by
+private theorem UpperTheory.V.AlgebraTools.icmPt_left
+    {K ι : Type} [Field K] [Fintype ι] (A : Matrix ι ι K)
+    : ∃ ψ : MvPolynomial (ι × ι) K →+* MvPolynomial (ι × ι) K, ∀ B : Matrix ι ι K,
+      UpperTheory.V.AlgebraTools.icmPt (A * B)
+        = PrimeSpectrum.comap ψ (UpperTheory.V.AlgebraTools.icmPt B) := by
+  refine ⟨
+    (MvPolynomial.aeval fun p : ι × ι =>
+      ∑ k, MvPolynomial.C (A p.1 k) * MvPolynomial.X (k, p.2)).toRingHom,
+    fun B => ?_
+  ⟩
+  have key
+      : (MvPolynomial.eval fun p : ι × ι => (A * B) p.1 p.2)
+        = (MvPolynomial.eval fun p : ι × ι => B p.1 p.2).comp
+          (MvPolynomial.aeval fun p : ι × ι =>
+            ∑ k, MvPolynomial.C (A p.1 k) * MvPolynomial.X (k, p.2)).toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro a
       simp
@@ -29,15 +35,21 @@ private theorem UpperTheory.V.AlgebraTools.icmPt_left {K ι : Type} [Field K] [F
   show RingHom.ker _ = Ideal.comap _ (RingHom.ker _)
   rw [key, RingHom.comap_ker]
 
-private theorem UpperTheory.V.AlgebraTools.icmPt_right {K ι : Type} [Field K] [Fintype ι] (A : Matrix ι ι K) :
-    ∃ ψ : MvPolynomial (ι × ι) K →+* MvPolynomial (ι × ι) K, ∀ B : Matrix ι ι K,
-      UpperTheory.V.AlgebraTools.icmPt (B * A) = PrimeSpectrum.comap ψ (UpperTheory.V.AlgebraTools.icmPt B) := by
-  refine ⟨(MvPolynomial.aeval fun p : ι × ι =>
-    ∑ k, MvPolynomial.X (p.1, k) * MvPolynomial.C (A k p.2)).toRingHom, fun B => ?_⟩
-  have key : (MvPolynomial.eval fun p : ι × ι => (B * A) p.1 p.2) =
-      (MvPolynomial.eval fun p : ι × ι => B p.1 p.2).comp
-        (MvPolynomial.aeval fun p : ι × ι =>
-          ∑ k, MvPolynomial.X (p.1, k) * MvPolynomial.C (A k p.2)).toRingHom := by
+private theorem UpperTheory.V.AlgebraTools.icmPt_right
+    {K ι : Type} [Field K] [Fintype ι] (A : Matrix ι ι K)
+    : ∃ ψ : MvPolynomial (ι × ι) K →+* MvPolynomial (ι × ι) K, ∀ B : Matrix ι ι K,
+      UpperTheory.V.AlgebraTools.icmPt (B * A)
+        = PrimeSpectrum.comap ψ (UpperTheory.V.AlgebraTools.icmPt B) := by
+  refine ⟨
+    (MvPolynomial.aeval fun p : ι × ι =>
+      ∑ k, MvPolynomial.X (p.1, k) * MvPolynomial.C (A k p.2)).toRingHom,
+    fun B => ?_
+  ⟩
+  have key
+      : (MvPolynomial.eval fun p : ι × ι => (B * A) p.1 p.2)
+        = (MvPolynomial.eval fun p : ι × ι => B p.1 p.2).comp
+          (MvPolynomial.aeval fun p : ι × ι =>
+            ∑ k, MvPolynomial.X (p.1, k) * MvPolynomial.C (A k p.2)).toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro a
       simp
@@ -47,16 +59,21 @@ private theorem UpperTheory.V.AlgebraTools.icmPt_right {K ι : Type} [Field K] [
   show RingHom.ker _ = Ideal.comap _ (RingHom.ker _)
   rw [key, RingHom.comap_ker]
 
-theorem UpperTheory.V.AlgebraTools.idCompMat :
-    ∀ (K G ι : Type) [Field K] [Group G] [Fintype ι] [DecidableEq ι] (r : G →* Matrix ι ι K),
-      ∃ N : Subgroup G, N.Normal ∧ N.FiniteIndex ∧
-        (∃ I : Set (MvPolynomial (ι × ι) K), ∀ g, g ∈ N ↔ ∀ f ∈ I, MvPolynomial.eval (fun p => r g p.1 p.2) f = 0) ∧
-        ∀ (U : Subgroup G), U.FiniteIndex → ∀ (σ : G) (s : Finset (MvPolynomial (ι × ι) K)),
-          (∀ f ∈ s, ∃ g ∈ N, MvPolynomial.eval (fun p => r (σ * g) p.1 p.2) f ≠ 0) →
-          ∃ g ∈ U ⊓ N, ∀ f ∈ s, MvPolynomial.eval (fun p => r (σ * g) p.1 p.2) f ≠ 0 := by
+theorem UpperTheory.V.AlgebraTools.idCompMat
+    : ∀ (K G ι : Type) [Field K] [Group G] [Fintype ι] [DecidableEq ι] (r : G →* Matrix ι ι K),
+      ∃ N : Subgroup G,
+        N.Normal ∧ N.FiniteIndex
+          ∧ (∃ I : Set (MvPolynomial (ι × ι) K), ∀ g,
+            g ∈ N ↔ ∀ f ∈ I, MvPolynomial.eval (fun p => r g p.1 p.2) f = 0)
+          ∧ ∀ (U : Subgroup G),
+            U.FiniteIndex
+              → ∀ (σ : G) (s : Finset (MvPolynomial (ι × ι) K)),
+                (∀ f ∈ s, ∃ g ∈ N, MvPolynomial.eval (fun p => r (σ * g) p.1 p.2) f ≠ 0)
+                  → ∃ g ∈ U ⊓ N, ∀ f ∈ s, MvPolynomial.eval (fun p => r (σ * g) p.1 p.2) f ≠ 0 := by
   classical
   intro K G ι _ _ _ _ r
-  let f : G → PrimeSpectrum (MvPolynomial (ι × ι) K) := fun g => UpperTheory.V.AlgebraTools.icmPt (r g)
+  let f : G → PrimeSpectrum (MvPolynomial (ι × ι) K) := fun g =>
+    UpperTheory.V.AlgebraTools.icmPt (r g)
   letI tG : TopologicalSpace G := TopologicalSpace.induced f inferInstance
   have hind : Topology.IsInducing f := ⟨rfl⟩
   haveI : TopologicalSpace.NoetherianSpace G := hind.noetherianSpace
@@ -82,8 +99,10 @@ theorem UpperTheory.V.AlgebraTools.idCompMat :
     rw [this]
     exact (PrimeSpectrum.continuous_comap ψ).comp hf
   obtain ⟨N, hNn, hNf, hNc, hNi, hNd⟩ := UpperTheory.V.AlgebraTools.idComp G hL hR
-  have hmemZ : ∀ (S : Set (MvPolynomial (ι × ι) K)) (g : G),
-      f g ∈ PrimeSpectrum.zeroLocus S ↔ ∀ q ∈ S, MvPolynomial.eval (fun p => r g p.1 p.2) q = 0 := by
+  have hmemZ
+      : ∀ (S : Set (MvPolynomial (ι × ι) K)) (g : G),
+        f g ∈ PrimeSpectrum.zeroLocus S
+          ↔ ∀ q ∈ S, MvPolynomial.eval (fun p => r g p.1 p.2) q = 0 := by
     intro S g
     rw [PrimeSpectrum.mem_zeroLocus]
     constructor
@@ -106,8 +125,8 @@ theorem UpperTheory.V.AlgebraTools.idCompMat :
       rw [hNt] at h'
       exact h'
   · intro U hU σ s hs
-    let W : MvPolynomial (ι × ι) K → Set G :=
-      fun q => {g | MvPolynomial.eval (fun p => r (σ * g) p.1 p.2) q ≠ 0}
+    let W : MvPolynomial (ι × ι) K → Set G := fun q =>
+      {g | MvPolynomial.eval (fun p => r (σ * g) p.1 p.2) q ≠ 0}
     have hWo : ∀ q, IsOpen (W q) := by
       intro q
       have h1 : IsOpen (f ⁻¹' (PrimeSpectrum.basicOpen q : Set _)) :=
@@ -119,17 +138,18 @@ theorem UpperTheory.V.AlgebraTools.idCompMat :
         PrimeSpectrum.mem_basicOpen]
       show _ ↔ q ∉ RingHom.ker _
       rw [RingHom.mem_ker]
-    obtain ⟨x, hxN, hxO⟩ := (isIrreducible_iff_sInter.1 hNi) (s.image W)
-      (by
-        intro u hu
-        obtain ⟨q, -, rfl⟩ := Finset.mem_image.1 hu
-        exact hWo q)
-      (by
-        intro u hu
-        obtain ⟨q, hq, rfl⟩ := Finset.mem_image.1 hu
-        obtain ⟨g, hgN, hg⟩ := hs q hq
-        exact ⟨g, hgN, hg⟩)
-    have hOo : IsOpen (⋂₀ (↑(s.image W) : Set (Set G))) := by
+    obtain ⟨x, hxN, hxO⟩ :=
+      (isIrreducible_iff_sInter.1 hNi) (s.image W)
+        (by
+          intro u hu
+          obtain ⟨q, -, rfl⟩ := Finset.mem_image.1 hu
+          exact hWo q)
+        (by
+          intro u hu
+          obtain ⟨q, hq, rfl⟩ := Finset.mem_image.1 hu
+          obtain ⟨g, hgN, hg⟩ := hs q hq
+          exact ⟨g, hgN, hg⟩)
+    have hOo : IsOpen (⋂₀(↑(s.image W) : Set (Set G))) := by
       apply Set.Finite.isOpen_sInter (Finset.finite_toSet _)
       intro u hu
       obtain ⟨q, -, rfl⟩ := Finset.mem_image.1 hu

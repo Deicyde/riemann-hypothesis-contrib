@@ -16,32 +16,38 @@ section Alg
 
 variable {E : Type} [Field E] [StarRing E] {r : ℕ}
 
-theorem alg_identity (α α' β β' : Fin r → E) (G s : Fin r → Fin r → E)
-    (hs : ∀ a b, G a b + s a b + star (s b a) = 0) :
-    (∑ a, α' a * star (β a)) + (∑ a, star (α a) * β' a) +
-      (∑ a, ∑ b, star (α a) * (α' b * G a b)) +
-      (∑ a, (-β' a + ∑ b, s a b * α' b) * star (α a)) +
-      (∑ a, star (-β a + ∑ b, s a b * α b) * α' a) = 0 := by
-  have key : ∀ a b, star (α a) * (α' b * G a b) + s a b * α' b * star (α a) +
-      star (s b a) * star (α a) * α' b = 0 := by
+theorem alg_identity
+    (α α' β β' : Fin r → E) (G s : Fin r → Fin r → E) (hs : ∀ a b, G a b + s a b + star (s b a) = 0)
+    : (∑ a, α' a * star (β a)) + (∑ a, star (α a) * β' a) + (∑ a, ∑ b, star (α a) * (α' b * G a b))
+        + (∑ a, (-β' a + ∑ b, s a b * α' b) * star (α a))
+        + (∑ a, star (-β a + ∑ b, s a b * α b) * α' a)
+      = 0 := by
+  have key
+      : ∀ a b,
+        star (α a) * (α' b * G a b) + s a b * α' b * star (α a) + star (s b a) * star (α a) * α' b
+          = 0 := by
     intro a b
     have := hs a b
     linear_combination (star (α a) * α' b) * this
-  have h1 : (∑ a, (-β' a + ∑ b, s a b * α' b) * star (α a)) =
-      -(∑ a, star (α a) * β' a) + ∑ a, ∑ b, s a b * α' b * star (α a) := by
+  have h1
+      : (∑ a, (-β' a + ∑ b, s a b * α' b) * star (α a))
+        = -(∑ a, star (α a) * β' a) + ∑ a, ∑ b, s a b * α' b * star (α a) := by
     simp only [add_mul, neg_mul, Finset.sum_add_distrib, Finset.sum_neg_distrib, Finset.sum_mul]
     congr 1
     exact congrArg Neg.neg (Finset.sum_congr rfl fun a _ => mul_comm _ _)
-  have h2 : (∑ a, star (-β a + ∑ b, s a b * α b) * α' a) =
-      -(∑ a, α' a * star (β a)) + ∑ a, ∑ b, star (s b a) * star (α a) * α' b := by
+  have h2
+      : (∑ a, star (-β a + ∑ b, s a b * α b) * α' a)
+        = -(∑ a, α' a * star (β a)) + ∑ a, ∑ b, star (s b a) * star (α a) * α' b := by
     simp only [star_add, star_neg, star_sum, star_mul', add_mul, neg_mul, Finset.sum_add_distrib,
       Finset.sum_neg_distrib, Finset.sum_mul]
     congr 1
     · exact congrArg Neg.neg (Finset.sum_congr rfl fun a _ => mul_comm _ _)
     · rw [Finset.sum_comm]
   rw [h1, h2]
-  have h3 : (∑ a, ∑ b, star (α a) * (α' b * G a b)) + (∑ a, ∑ b, s a b * α' b * star (α a)) +
-      (∑ a, ∑ b, star (s b a) * star (α a) * α' b) = 0 := by
+  have h3
+      : (∑ a, ∑ b, star (α a) * (α' b * G a b)) + (∑ a, ∑ b, s a b * α' b * star (α a))
+          + (∑ a, ∑ b, star (s b a) * star (α a) * α' b)
+        = 0 := by
     rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
     refine Finset.sum_eq_zero fun a _ => ?_
     rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
@@ -50,39 +56,39 @@ theorem alg_identity (α α' β β' : Fin r → E) (G s : Fin r → Fin r → E)
 
 end Alg
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {V : Type} [AddCommGroup V] [Module E V]
-  [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V] [FiniteDimensional E V]
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {V : Type}
+  [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V] [FiniteDimensional E V]
 
-theorem one_mul_mem {a b : E} (ha : a ∈ (1 : Submodule (𝓞 E) E)) (hb : b ∈ (1 : Submodule (𝓞 E) E)) :
-    a * b ∈ (1 : Submodule (𝓞 E) E) := by
+theorem one_mul_mem {a b : E} (ha : a ∈ (1 : Submodule (𝓞 E) E)) (hb : b ∈ (1 : Submodule (𝓞 E) E))
+    : a * b ∈ (1 : Submodule (𝓞 E) E) := by
   simpa using Submodule.mul_mem_mul ha hb
 
-theorem core (h : V →ₗ⋆[E] V →ₗ[E] E) (hs : h.IsSymm) (hnd : h.Nondegenerate)
+theorem core
+    (h : V →ₗ⋆[E] V →ₗ[E] E) (hs : h.IsSymm) (hnd : h.Nondegenerate)
     (Λ : Submodule (𝓞 E) V) (hfg : Λ.FG) (hsp : Submodule.span E (Λ : Set V) = ⊤)
     (hU : Formalism.HermitianLatticesTheory.dual h Λ = Λ)
-    (X : Submodule E V) (hiso : ∀ x ∈ X, ∀ y ∈ X, h x y = 0) {r : ℕ}
-    (e e' : Fin r → V) (he : ∀ a, e a ∈ X) (he' : ∀ a, e' a ∈ X)
-    (c c' : Fin r → V → E)
+    (X : Submodule E V) (hiso : ∀ x ∈ X, ∀ y ∈ X, h x y = 0)
+    {r : ℕ} (e e' : Fin r → V) (he : ∀ a, e a ∈ X) (he' : ∀ a, e' a ∈ X) (c c' : Fin r → V → E)
     (hc : ∀ x ∈ X, x = ∑ a, c a x • e a) (hc' : ∀ x ∈ X, x = ∑ a, c' a x • e' a)
     (hcadd : ∀ a, ∀ x ∈ X, ∀ y ∈ X, c a (x + y) = c a x + c a y)
     (hcadd' : ∀ a, ∀ x ∈ X, ∀ y ∈ X, c' a (x + y) = c' a x + c' a y)
     (hcsmul : ∀ a (t : E), ∀ x ∈ X, c a (t • x) = t * c a x)
     (hcsmul' : ∀ a (t : E), ∀ x ∈ X, c' a (t • x) = t * c' a x)
-    (hδ : ∀ a b, c a (e b) = if a = b then 1 else 0) (hδ' : ∀ a b, c' a (e' b) = if a = b then 1 else 0)
-    (J : Fin r → Submodule (𝓞 E) E)
+    (hδ : ∀ a b, c a (e b) = if a = b then 1 else 0)
+    (hδ' : ∀ a b, c' a (e' b) = if a = b then 1 else 0) (J : Fin r → Submodule (𝓞 E) E)
     (hJ1 : ∀ a, ∀ t ∈ J a, t • e a ∈ Λ ∧ t • e' a ∈ Λ)
     (hJ2 : ∀ x ∈ Λ, x ∈ X → ∀ a, c a x ∈ J a ∧ c' a x ∈ J a)
-    (θ : 𝓞 E) (hθ : (θ : E) + star (θ : E) = 1) :
-    ∃ n : V ≃ₗ[E] V, n ∈ Formalism.HermitianLatticesTheory.isom h ∧ Formalism.HermitianLatticesTheory.gmap n Λ = Λ ∧ (∀ a, n (e a) = e' a) ∧
-      ∀ v, (∀ x ∈ X, h x v = 0) → n v - v ∈ X := by
+    (θ : 𝓞 E) (hθ : (θ : E) + star (θ : E) = 1)
+    : ∃ n : V ≃ₗ[E] V,
+      n ∈ Formalism.HermitianLatticesTheory.isom h ∧ Formalism.HermitianLatticesTheory.gmap n Λ = Λ
+        ∧ (∀ a, n (e a) = e' a) ∧ ∀ v, (∀ x ∈ X, h x v = 0) → n v - v ∈ X := by
   classical
-
   have hl : ∀ (t : E) x y, h (t • x) y = star t * h x y := fun t x y => by
     rw [LinearMap.map_smulₛₗ₂, starRingEnd_apply, smul_eq_mul]
-  have hr : ∀ (t : E) x y, h x (t • y) = t * h x y := fun t x y => by
-    rw [map_smul, smul_eq_mul]
-  have hsy : ∀ x y, h y x = star (h x y) := fun x y => by
-    rw [← hs.eq x y, starRingEnd_apply]
+  have hr : ∀ (t : E) x y, h x (t • y) = t * h x y := fun t x y => by rw [map_smul, smul_eq_mul]
+  have hsy : ∀ x y, h y x = star (h x y) := fun x y => by rw [← hs.eq x y, starRingEnd_apply]
   have memΛ : ∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, h y x ∈ (1 : Submodule (𝓞 E) E) := fun x => by
     conv_lhs => rw [← hU]
     exact Formalism.HermitianLatticesTheory.dualBasic_mem_dual h Λ x
@@ -95,13 +101,14 @@ theorem core (h : V →ₗ⋆[E] V →ₗ[E] E) (hs : h.IsSymm) (hnd : h.Nondege
     simp only [φ, hcadd a x hx y hy, hcadd' a x hx y hy]; ring
   have hφsmul : ∀ a (t : E), ∀ x ∈ X, φ a (t • x) = t * φ a x := fun a t x hx => by
     simp only [φ, hcsmul a t x hx, hcsmul' a t x hx]; ring
-  let ψ : Fin r → (Λ →ₗ[𝓞 E] E) := fun a =>
-    { toFun := fun y => φ a (ρ y : V)
-      map_add' := fun y₁ y₂ => by
-        rw [map_add (f := _), Submodule.coe_add, hφadd a _ (hρX y₁) _ (hρX y₂)]
-      map_smul' := fun o y => by
-        rw [map_smul, Submodule.coe_smul, ← algebraMap_smul E o, hφsmul a _ _ (hρX y),
-          RingHom.id_apply, Algebra.smul_def] }
+  let ψ : Fin r → (Λ →ₗ[𝓞 E] E) := fun a => {
+    toFun := fun y => φ a (ρ y : V)
+    map_add' := fun y₁ y₂ => by
+      rw [map_add (f := _), Submodule.coe_add, hφadd a _ (hρX y₁) _ (hρX y₂)]
+    map_smul' := fun o y => by
+      rw [map_smul, Submodule.coe_smul, ← algebraMap_smul E o, hφsmul a _ _ (hρX y),
+        RingHom.id_apply, Algebra.smul_def]
+  }
   choose w hw using fun a => riesz h hs hnd Λ hfg hsp (ψ a)
   have hwX : ∀ a, ∀ x ∈ X, h (w a) x = φ a x := by
     intro a x hx
@@ -131,7 +138,13 @@ theorem core (h : V →ₗ⋆[E] V →ₗ[E] E) (hs : h.IsSymm) (hnd : h.Nondege
     rw [← hc _ (he' b)]
 
   let G : Fin r → Fin r → E := fun a b => h (w a) (w b)
-  let k : Fin r → Fin r → E := fun a b => if a < b then -1 else if a = b then -(θ : E) else 0
+  let k : Fin r → Fin r → E := fun a b =>
+    if a < b then
+      -1
+    else if a = b then
+      -(θ : E)
+    else
+      0
   let s : Fin r → Fin r → E := fun a b => k a b * G a b
   have hkint : ∀ a b, k a b ∈ (1 : Submodule (𝓞 E) E) := by
     intro a b
@@ -153,18 +166,15 @@ theorem core (h : V →ₗ⋆[E] V →ₗ[E] E) (hs : h.IsSymm) (hnd : h.Nondege
       linear_combination (-(G a a)) * hθ
     · have h1 : ¬ a < b := not_lt.2 hab.le
       have h2 : a ≠ b := hab.ne'
-      simp only [s, k, if_pos hab, if_neg h1, if_neg h2, zero_mul, star_mul', star_neg, star_one, hG]
+      simp only [s, k, if_pos hab, if_neg h1, if_neg h2, zero_mul, star_mul', star_neg, star_one,
+        hG]
       ring
 
   let cc : Fin r → (V →ₗ[E] E) := fun a => -(h (w a)) + ∑ b, s a b • h (e b)
-  have hcc : ∀ a v, cc a v = -h (w a) v + ∑ b, s a b * h (e b) v := fun a v => by
-    simp [cc]
-  let nL : V →ₗ[E] V :=
-    LinearMap.id + ∑ a, (h (e a)).smulRight (w a) + ∑ a, (cc a).smulRight (e' a)
-  have hn : ∀ v, nL v = v + ∑ a, h (e a) v • w a + ∑ a, cc a v • e' a := fun v => by
-    simp [nL]
-  have hBX : ∀ v, ∑ a, cc a v • e' a ∈ X := fun v =>
-    X.sum_mem fun a _ => X.smul_mem _ (he' a)
+  have hcc : ∀ a v, cc a v = - h (w a) v + ∑ b, s a b * h (e b) v := fun a v => by simp [cc]
+  let nL : V →ₗ[E] V := LinearMap.id + ∑ a, (h (e a)).smulRight (w a) + ∑ a, (cc a).smulRight (e' a)
+  have hn : ∀ v, nL v = v + ∑ a, h (e a) v • w a + ∑ a, cc a v • e' a := fun v => by simp [nL]
+  have hBX : ∀ v, ∑ a, cc a v • e' a ∈ X := fun v => X.sum_mem fun a _ => X.smul_mem _ (he' a)
 
   have K1 : ∀ v a, h (v + ∑ b, h (e b) v • w b) (e' a) = star (h (e a) v) := by
     intro v a
@@ -195,25 +205,34 @@ theorem core (h : V →ₗ⋆[E] V →ₗ[E] E) (hs : h.IsSymm) (hnd : h.Nondege
       rw [LinearMap.map_sum₂]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [hl, hsy P' (e' a), K1, star_star]
-    have hPP : h P P' = h v v' + ((∑ a, h (e a) v' * star (h (w a) v)) +
-        (∑ a, star (h (e a) v) * h (w a) v') +
-        (∑ a, ∑ b, star (h (e a) v) * (h (e b) v' * G a b))) := by
+    have hPP
+        : h P P'
+          = h v v'
+            + ((∑ a, h (e a) v' * star (h (w a) v)) + (∑ a, star (h (e a) v) * h (w a) v')
+              + (∑ a, ∑ b, star (h (e a) v) * (h (e b) v' * G a b))) := by
       have e1 : ∀ a, h v (w a) = star (h (w a) v) := fun a => hsy _ _
-      have hdbl : (∑ b, h (e b) v' * ∑ a, star (h (e a) v) * h (w a) (w b)) =
-          ∑ a, ∑ b, star (h (e a) v) * (h (e b) v' * G a b) := by
+      have hdbl
+          : (∑ b, h (e b) v' * ∑ a, star (h (e a) v) * h (w a) (w b))
+            = ∑ a, ∑ b, star (h (e a) v) * (h (e b) v' * G a b) := by
         simp only [Finset.mul_sum]
         rw [Finset.sum_comm]
         exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by simp only [G]; ring
       rw [hP, hP']
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_add (f := _), LinearMap.add_apply, map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ,
-        LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, e1, RingHom.id_apply, mul_add]
+        simp only [map_add (f := _), LinearMap.add_apply, map_sum, LinearMap.sum_apply,
+          LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, e1,
+          RingHom.id_apply, mul_add]
       rw [Finset.sum_add_distrib, hdbl]
       ring
     simp only [map_add (f := _), LinearMap.add_apply]
     rw [hBB, hPB, hBP, hPP]
-    have := alg_identity (fun a => h (e a) v) (fun a => h (e a) v') (fun a => h (w a) v)
-      (fun a => h (w a) v') G s hsG
+    have :=
+      alg_identity
+        (fun a => h (e a) v)
+        (fun a => h (e a) v')
+        (fun a => h (w a) v)
+        (fun a => h (w a) v')
+        G s hsG
     simp only [hcc]
     linear_combination this
   have hinj : Function.Injective nL := by
@@ -252,8 +271,10 @@ theorem core (h : V →ₗ⋆[E] V →ₗ[E] E) (hs : h.IsSymm) (hnd : h.Nondege
       intro b
       have := intΛ _ (P1' a y hy) _ (P1 b v hv)
       rw [hl, hr] at this
-      have e1 : s a b * h (e b) v * star (h (e' a) y) =
-          k a b * (star (h (e' a) y) * (h (e b) v * h (w a) (w b))) := by simp only [s, G]; ring
+      have e1
+          : s a b * h (e b) v * star (h (e' a) y)
+            = k a b * (star (h (e' a) y) * (h (e b) v * h (w a) (w b))) := by
+        simp only [s, G]; ring
       rw [e1]
       exact one_mul_mem (hkint a b) this
     rw [add_mul, Finset.sum_mul, neg_mul]

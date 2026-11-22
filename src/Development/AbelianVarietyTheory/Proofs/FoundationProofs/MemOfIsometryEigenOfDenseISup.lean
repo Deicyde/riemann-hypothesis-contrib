@@ -5,13 +5,19 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.InstSecon
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH GlobalTheory.HolDS Matrix MeasureTheory Filter Topology
+open Formalism.BasicNotions Formalism.BasicNotions.TH GlobalTheory.HolDS Matrix MeasureTheory Filter
+  Topology
 open scoped InnerProductSpace
 
 namespace GlobalTheory
 
-theorem mem_of_isometry_eigen_of_dense_iSup :
-    ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (U : H →L[ℂ] H), (∀ v, ‖U v‖ = ‖v‖) → ∀ (E : ℕ → Submodule ℂ H) (lam : ℕ → ℂ), Function.Injective lam → (∀ m, FiniteDimensional ℂ (E m)) → (∀ m, ∀ e ∈ E m, U e = lam m • e) → Dense ((⨆ m, E m : Submodule ℂ H) : Set H) → ∀ (m : ℕ) (y : H), U y = lam m • y → y ∈ E m := by
+theorem mem_of_isometry_eigen_of_dense_iSup
+    : ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (U : H →L[ℂ] H),
+      (∀ v, ‖U v‖ = ‖v‖)
+        → ∀ (E : ℕ → Submodule ℂ H) (lam : ℕ → ℂ),
+          Function.Injective lam → (∀ m, FiniteDimensional ℂ (E m))
+            → (∀ m, ∀ e ∈ E m, U e = lam m • e) → Dense ((⨆ m, E m : Submodule ℂ H) : Set H)
+            → ∀ (m : ℕ) (y : H), U y = lam m • y → y ∈ E m := by
   intro H _ _ _ U hU E lam hlam hfin hE hd m y hy
   let V : H →ₗᵢ[ℂ] H := ⟨U.toLinearMap, hU⟩
   have hin : ∀ a b : H, ⟪U a, U b⟫_ℂ = ⟪a, b⟫_ℂ := fun a b => V.inner_map_map a b

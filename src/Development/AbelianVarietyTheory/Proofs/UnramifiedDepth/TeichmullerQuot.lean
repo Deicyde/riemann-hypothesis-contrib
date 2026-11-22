@@ -10,7 +10,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
+open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -47,16 +49,27 @@ private lemma teich_decomp (p : ℕ) [Fact p.Prime] {K : Type} [CommRing K] [Cha
   rw [pow_one] at hw
   rw [mul_comm, hw]; abel
 
-theorem teichmuller_quot :
-  (∀ (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C] {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C]
-    [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] (hv : v.Integers O) (ε : PreTilt O p)
-    (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p) (ϖ : PreTilt O p), ϖ.untilt = (p : O) →
-    ∀ (W : Type) [CommRing W] (pr : Ainf.A p O →+* W), Function.Surjective pr →
-    RingHom.ker pr = Ideal.span {(p : Ainf.A p O) ^ 2, WittVector.teichmuller p ϖ} →
-    (∀ w : W, ∃ c : PreTilt O p, ∃ c' : W, w = pr (WittVector.teichmuller p c) + p * c') ∧
-    (∀ (n : ℕ) (a : Fin n → PreTilt O p), ∑ j, pr (WittVector.teichmuller p (a j)) = pr (WittVector.teichmuller p (∑ j, a j)) +
-      p * pr (WittVector.teichmuller p (MvPolynomial.eval₂ (Int.castRingHom (PreTilt O p)) (fun j => (frobeniusEquiv (PreTilt O p) p).symm (a j)) (wS p n)))) ∧
-    (∀ c : PreTilt O p, WittVector.fontaineTheta O p (WittVector.teichmuller p c) ∈ Ideal.span {(p : O)} → pr (WittVector.teichmuller p c) = 0)) := by
+theorem teichmuller_quot
+    : (∀ (p : ℕ) [Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+        {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] (hv : v.Integers O) (ε : PreTilt O p)
+        (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
+        (ϖ : PreTilt O p),
+      ϖ.untilt = (p : O)
+        → ∀ (W : Type) [CommRing W] (pr : Ainf.A p O →+* W),
+          Function.Surjective pr
+            → RingHom.ker pr = Ideal.span {(p : Ainf.A p O) ^ 2, WittVector.teichmuller p ϖ}
+            → (∀ w : W, ∃ c : PreTilt O p, ∃ c' : W, w = pr (WittVector.teichmuller p c) + p * c')
+              ∧ (∀ (n : ℕ) (a : Fin n → PreTilt O p),
+                ∑ j, pr (WittVector.teichmuller p (a j))
+                  = pr (WittVector.teichmuller p (∑ j, a j))
+                    + p * pr (WittVector.teichmuller p
+                      (MvPolynomial.eval₂ (Int.castRingHom (PreTilt O p))
+                        (fun j => (frobeniusEquiv (PreTilt O p) p).symm (a j))
+                        (wS p n))))
+              ∧ (∀ c : PreTilt O p,
+                WittVector.fontaineTheta O p (WittVector.teichmuller p c) ∈ Ideal.span {(p : O)}
+                  → pr (WittVector.teichmuller p c) = 0)) := by
   intro p _ C _ _ _ v O _ _ _ _ hv ε hε ϖ hϖ W _ pr hpr hker
   have hp2 : pr ((p : Ainf.A p O) ^ 2) = 0 := by
     rw [← RingHom.mem_ker, hker]; exact Ideal.subset_span (by simp)
@@ -71,17 +84,21 @@ theorem teichmuller_quot :
   · obtain ⟨w, hw⟩ := ((teichSum p (Fin n) Finset.univ).2 (PreTilt O p) a (wS p n) (wS_mul p n)).1
     have h := congrArg pr hw
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_add (f := _), map_add (f := _), map_mul, map_mul, hp2, zero_mul, add_zero, map_natCast] at h
+      rw [map_sum, map_add (f := _), map_add (f := _), map_mul, map_mul, hp2, zero_mul, add_zero,
+          map_natCast]
+        at h
     rw [h, MvPolynomial.aeval_def]
     rfl
   · have hK := ((a0 p C v O hv).2.2.1 ϖ hϖ).2.2
-    have hm : WittVector.teichmuller p c ∈
-        Ideal.span {(p : WittVector p (PreTilt O p)), WittVector.teichmuller p ϖ} := by
+    have hm
+        : WittVector.teichmuller p c
+          ∈ Ideal.span {(p : WittVector p (PreTilt O p)), WittVector.teichmuller p ϖ} := by
       rw [← hK, RingHom.mem_ker, RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem]
       exact hc
     obtain ⟨x, y, hxy⟩ := Ideal.mem_span_pair.mp hm
     have h := congrArg (WittVector.constantCoeff (p := p) (R := PreTilt O p)) hxy
-    rw [map_add (f := _), map_mul, map_mul, map_natCast, CharP.cast_eq_zero, mul_zero, zero_add] at h
+    rw [map_add (f := _), map_mul, map_mul, map_natCast, CharP.cast_eq_zero, mul_zero, zero_add]
+      at h
     simp only [WittVector.constantCoeff_apply, WittVector.teichmuller_coeff_zero] at h
     rw [← h, map_mul, map_mul, hϖ0, mul_zero]
 

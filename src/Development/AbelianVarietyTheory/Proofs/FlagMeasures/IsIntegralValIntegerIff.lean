@@ -10,10 +10,10 @@ open scoped ComplexOrder
 
 namespace GlobalTheory.SgLoc
 
-noncomputable def idemPairHom {F E : Type} [Field F] [CommRing E] [Algebra F E] (p q : E)
-    (h1 : p + q = 1) (h0 : p * q = 0) : F × F →ₐ[F] E :=
-  AlgHom.ofLinearMap
-    ((LinearMap.toSpanSingleton F E p).coprod (LinearMap.toSpanSingleton F E q))
+noncomputable def idemPairHom
+    {F E : Type} [Field F] [CommRing E] [Algebra F E] (p q : E) (h1 : p + q = 1) (h0 : p * q = 0)
+    : F × F →ₐ[F] E :=
+  AlgHom.ofLinearMap ((LinearMap.toSpanSingleton F E p).coprod (LinearMap.toSpanSingleton F E q))
     (by simpa using h1)
     (by
       rintro ⟨a, b⟩ ⟨c, d⟩

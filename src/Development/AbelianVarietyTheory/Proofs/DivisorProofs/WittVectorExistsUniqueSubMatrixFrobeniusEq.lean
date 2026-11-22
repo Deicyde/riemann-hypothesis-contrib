@@ -8,11 +8,13 @@ namespace GlobalTheory.WittSolve
 
 open WittVector
 
-variable {p : ℕ} [hp : Fact p.Prime] {R : Type} [CommRing R] [CharP R p] [PerfectRing R p]
+variable
+  {p : ℕ} [hp : Fact p.Prime]
+  {R : Type} [CommRing R] [CharP R p] [PerfectRing R p]
   {ι : Type} [Fintype ι]
 
-noncomputable def F (M : Matrix ι ι (WittVector p R)) (v : ι → WittVector p R) :
-    ι → WittVector p R :=
+noncomputable def F (M : Matrix ι ι (WittVector p R)) (v : ι → WittVector p R)
+    : ι → WittVector p R :=
   v - M.mulVec (fun k => WittVector.frobenius (v k))
 
 lemma F_add (M : Matrix ι ι (WittVector p R)) (v w : ι → WittVector p R) :
@@ -197,12 +199,15 @@ end GlobalTheory.WittSolve
 
 namespace GlobalTheory
 
-theorem wittSolve_unique : ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] [CharP R p]
-    [PerfectRing R p] (ι : Type) [Fintype ι] (M : Matrix ι ι (WittVector p R)),
-    (∀ c : ι → R, ∃! x : ι → R,
-      x - (M.map WittVector.constantCoeff).mulVec (fun k => frobenius R p (x k)) = c) →
-    ∀ c : ι → WittVector p R, ∃! v : ι → WittVector p R,
-      v - M.mulVec (fun k => WittVector.frobenius (v k)) = c := by
+theorem wittSolve_unique
+    : ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] [CharP R p] [PerfectRing R p] (ι : Type)
+        [Fintype ι] (M : Matrix ι ι (WittVector p R)),
+      (∀ c : ι → R,
+          ∃! x : ι → R,
+            x - (M.map WittVector.constantCoeff).mulVec (fun k => frobenius R p (x k)) = c)
+        → ∀ c : ι → WittVector p R,
+          ∃! v : ι → WittVector p R,
+            v - M.mulVec (fun k => WittVector.frobenius (v k)) = c := by
   intro p _ R _ _ _ ι _ M hU c
   obtain ⟨v, hv⟩ := WittSolve.exists_sol hU c
   refine ⟨v, hv, fun y hy => ?_⟩

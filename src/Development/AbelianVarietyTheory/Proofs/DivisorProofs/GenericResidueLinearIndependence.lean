@@ -10,30 +10,38 @@ namespace GlobalTheory
 
 open IsLocalRing
 
-theorem derivation_mem_of_mem_sq {k A : Type} [CommRing k] [CommRing A] [Algebra k A]
-    (δ : Derivation k A A) (q : Ideal A) {x : A} (hx : x ∈ q ^ 2) : δ x ∈ q := by
+theorem derivation_mem_of_mem_sq
+    {k A : Type} [CommRing k] [CommRing A] [Algebra k A]
+    (δ : Derivation k A A)
+    (q : Ideal A)
+    {x : A} (hx : x ∈ q ^ 2)
+    : δ x ∈ q := by
   rw [pow_two] at hx
   refine Submodule.mul_induction_on hx ?_ ?_
   · intro m hm n hn
     rw [Derivation.leibniz, smul_eq_mul, smul_eq_mul]
     exact q.add_mem (q.mul_mem_right _ hm) (q.mul_mem_right _ hn)
   · intro x y hx hy
-    rw [map_add (f := _)]; exact q.add_mem hx hy
+    rw [map_add (f := _)]
+    exact q.add_mem hx hy
 
-theorem residue_algebraMap_eq_zero_iff_mem {A R : Type} [CommRing A] [CommRing R] [IsLocalRing R]
-    [Algebra A R] (q : Ideal A) [q.IsPrime] [IsLocalization.AtPrime R q] (x : A) :
-    residue R (algebraMap A R x) = 0 ↔ x ∈ q := by
+theorem residue_algebraMap_eq_zero_iff_mem
+    {A R : Type} [CommRing A] [CommRing R] [IsLocalRing R] [Algebra A R]
+    (q : Ideal A) [q.IsPrime] [IsLocalization.AtPrime R q]
+    (x : A)
+    : residue R (algebraMap A R x) = 0 ↔ x ∈ q := by
   rw [residue_eq_zero_iff]
   conv_rhs => rw [← IsLocalization.AtPrime.under_maximalIdeal R q]
   rfl
 
-theorem cotangent_relation_derivation {k A R : Type} [CommRing k] [CommRing A] [Algebra k A]
-    (q : Ideal A) [q.IsPrime] [CommRing R] [IsLocalRing R] [Algebra A R]
-    [IsLocalization.AtPrime R q]
-    (δ : Derivation k A A) {κ : Type} (J : Finset κ) (g : κ → A)
-    (hg : ∀ j, algebraMap A R (g j) ∈ maximalIdeal R) (c : κ → ResidueField R)
-    (hrel : ∑ j ∈ J, c j • (maximalIdeal R).toCotangent ⟨_, hg j⟩ = 0) :
-    ∑ j ∈ J, c j * residue R (algebraMap A R (δ (g j))) = 0 := by
+theorem cotangent_relation_derivation
+    {k A R : Type} [CommRing k] [CommRing A] [Algebra k A]
+    (q : Ideal A)
+    [q.IsPrime] [CommRing R] [IsLocalRing R] [Algebra A R] [IsLocalization.AtPrime R q]
+    (δ : Derivation k A A)
+    {κ : Type} (J : Finset κ) (g : κ → A) (hg : ∀ j, algebraMap A R (g j) ∈ maximalIdeal R)
+    (c : κ → ResidueField R) (hrel : ∑ j ∈ J, c j • (maximalIdeal R).toCotangent ⟨_, hg j⟩ = 0)
+    : ∑ j ∈ J, c j * residue R (algebraMap A R (δ (g j))) = 0 := by
   set ψ : A →+* ResidueField R := (residue R).comp (algebraMap A R) with hψdef
   have hψ : ∀ x, ψ x = 0 ↔ x ∈ q := fun x => residue_algebraMap_eq_zero_iff_mem q x
   have hgq : ∀ j, g j ∈ q := fun j => (hψ _).1 ((residue_eq_zero_iff _).2 (hg j))
@@ -49,23 +57,27 @@ theorem cotangent_relation_derivation {k A R : Type} [CommRing k] [CommRing A] [
   set y : A := ∑ j ∈ J, a j * g j with hy
   have hyq : y ∈ q := q.sum_mem fun j _ => q.mul_mem_left _ (hgq j)
 
-  have hT : (maximalIdeal R).toCotangent
-      (∑ j ∈ J, algebraMap A R (a j) • (⟨_, hg j⟩ : maximalIdeal R)) = 0 := by
+  have hT
+      : (maximalIdeal R).toCotangent (∑ j ∈ J, algebraMap A R (a j) • (⟨_, hg j⟩ : maximalIdeal R))
+        = 0 := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
-    have : ∀ j ∈ J, (maximalIdeal R).toCotangent (algebraMap A R (a j) • (⟨_, hg j⟩ : maximalIdeal R))
-        = ψ b • (c j • (maximalIdeal R).toCotangent ⟨_, hg j⟩) := by
+    have : ∀ j ∈ J,
+        (maximalIdeal R).toCotangent (algebraMap A R (a j) • (⟨_, hg j⟩ : maximalIdeal R))
+          = ψ b • (c j • (maximalIdeal R).toCotangent ⟨_, hg j⟩) := by
       intro j hj
       rw [map_smul, smul_smul, ← hψa j hj]
       exact (algebraMap_smul (ResidueField R) (algebraMap A R (a j)) _).symm
     rw [Finset.sum_congr rfl this, ← Finset.smul_sum, hrel, smul_zero]
   rw [Ideal.toCotangent_eq_zero] at hT
-  have hcoe : ((∑ j ∈ J, algebraMap A R (a j) • (⟨_, hg j⟩ : maximalIdeal R) : maximalIdeal R) : R)
-      = algebraMap A R y := by
+  have hcoe
+      : ((∑ j ∈ J, algebraMap A R (a j) • (⟨_, hg j⟩ : maximalIdeal R) : maximalIdeal R) : R)
+        = algebraMap A R y := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [hy, Submodule.coe_sum, map_sum, map_mul, Algebra.smul_def]
+    simp [hy, Submodule.coe_sum, map_sum, map_mul, Algebra.smul_def]
   rw [hcoe, ← IsLocalization.AtPrime.map_eq_maximalIdeal q R, ← Ideal.map_pow,
-    IsLocalization.mem_map_algebraMap_iff q.primeCompl R] at hT
+      IsLocalization.mem_map_algebraMap_iff q.primeCompl R]
+    at hT
   obtain ⟨⟨x, s⟩, hxs⟩ := hT
   rw [← map_mul, IsLocalization.eq_iff_exists q.primeCompl R] at hxs
   obtain ⟨t, ht⟩ := hxs
@@ -80,7 +92,8 @@ theorem cotangent_relation_derivation {k A R : Type} [CommRing k] [CommRing A] [
   have hg0 : ∀ j, ψ (g j) = 0 := fun j => (hψ _).2 (hgq j)
   set_option synthInstance.maxHeartbeats 100000 in
     rw [hy, map_sum, map_sum] at hδy
-  simp only [Derivation.leibniz, smul_eq_mul, map_add (f := _), map_mul, hg0, zero_mul, add_zero] at hδy
+  simp only [Derivation.leibniz, smul_eq_mul, map_add (f := _), map_mul, hg0, zero_mul, add_zero]
+    at hδy
   rw [Finset.sum_congr rfl (fun j hj => by rw [hψa j hj, mul_assoc]), ← Finset.mul_sum] at hδy
   exact (mul_eq_zero.1 hδy).resolve_left hb0
 
@@ -89,7 +102,22 @@ end GlobalTheory
 namespace GlobalTheory
 open IsLocalRing
 
-theorem bertini_cotangent_independent : ∀ (k A : Type) [Field k] [CharZero k] [CommRing A] [Algebra k A] [Algebra.Smooth k A] {ι : Type} [Fintype ι] (f : ι → A) (M : ℕ), ∃ Q : MvPolynomial (Fin M × ι) k, Q ≠ 0 ∧ ∀ u : Fin M × ι → k, MvPolynomial.eval u Q ≠ 0 → ∀ (q : Ideal A) [q.IsPrime] (R : Type) [CommRing R] [IsLocalRing R] [Algebra A R] [IsLocalization.AtPrime R q], (∃ p, f p ∉ q) → LinearIndependent (IsLocalRing.ResidueField R) (fun j : {j : Fin M // algebraMap A R (∑ p, u (j, p) • f p) ∈ IsLocalRing.maximalIdeal R} => ((IsLocalRing.maximalIdeal R).toCotangent ⟨_, j.2⟩ : IsLocalRing.CotangentSpace R)) := by
+theorem bertini_cotangent_independent
+    : ∀ (k A : Type) [Field k] [CharZero k] [CommRing A] [Algebra k A] [Algebra.Smooth k A]
+        {ι : Type} [Fintype ι] (f : ι → A) (M : ℕ),
+      ∃ Q : MvPolynomial (Fin M × ι) k,
+        Q ≠ 0
+          ∧ ∀ u : Fin M × ι → k,
+            MvPolynomial.eval u Q ≠ 0
+              → ∀ (q : Ideal A) [q.IsPrime] (R : Type) [CommRing R] [IsLocalRing R] [Algebra A R]
+                  [IsLocalization.AtPrime R q],
+                (∃ p, f p ∉ q)
+                  → LinearIndependent (IsLocalRing.ResidueField R)
+                    (fun j
+                        : {j : Fin M
+                          // algebraMap A R (∑ p, u (j, p) • f p) ∈ IsLocalRing.maximalIdeal R} =>
+                      ((IsLocalRing.maximalIdeal R).toCotangent ⟨_, j.2⟩
+                        : IsLocalRing.CotangentSpace R)) := by
   intro k A _ _ _ _ _ ι _ f M
   obtain ⟨n, δ, ω, hD⟩ := GlobalTheory.T.exists_derivation_split_kaehlerD_smooth k A
   have hC := fun (J : Finset (Fin M)) (i₀ : Fin M) (p₀ : ι) (h : i₀ ∈ J) =>
@@ -128,12 +156,18 @@ theorem bertini_cotangent_independent : ∀ (k A : Type) [Field k] [CharZero k] 
       obtain ⟨j, _, rfl⟩ := Finset.mem_map.1 hi
       exact (residue_eq_zero_iff _).2 j.2
     · intro l
-      have hrel : ∑ j ∈ s, (w j / w i₀) •
-          (maximalIdeal R).toCotangent ⟨_, j.2⟩ = 0 := by
+      have hrel
+          : ∑ j ∈ s, (w j / w i₀) •
+              (maximalIdeal R).toCotangent ⟨_, j.2⟩
+            = 0 := by
         simp_rw [div_eq_mul_inv, mul_comm _ (w i₀)⁻¹, mul_smul]
         rw [← Finset.smul_sum, hw, smul_zero]
-      have key := cotangent_relation_derivation q (δ l) s
-        (fun j => ∑ p, u (j.1, p) • f p) (fun j => j.2) (fun j => w j / w i₀) hrel
+      have key :=
+        cotangent_relation_derivation q (δ l) s
+          (fun j => ∑ p, u (j.1, p) • f p)
+          (fun j => j.2)
+          (fun j => w j / w i₀)
+          hrel
       rw [Finset.sum_map]
       convert key using 2 with j hj
       show c j.1 * φ _ = _

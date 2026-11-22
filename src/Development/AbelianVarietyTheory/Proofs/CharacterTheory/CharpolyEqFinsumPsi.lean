@@ -10,10 +10,12 @@ open Polynomial GlobalTheory.CuspGL
 
 namespace GlobalTheory.CuspGL
 
-theorem charpoly_eq_finsum_psi (F : Type) [Field F] [Finite F] (V : Type) [AddCommGroup V] [Module F V]
-    [FiniteDimensional F V] (s : F[X] → ℂ) (g : Module.End F V) :
-    s (LinearMap.charpoly g) =
-      ∑ᶠ W : {W : Submodule F V // ∀ x ∈ W, g x ∈ W}, psi s W.1 (g.restrict W.2) := by
+theorem charpoly_eq_finsum_psi
+    (F : Type) [Field F] [Finite F]
+    (V : Type) [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+    (s : F[X] → ℂ) (g : Module.End F V)
+    : s (LinearMap.charpoly g)
+      = ∑ᶠ W : {W : Submodule F V // ∀ x ∈ W, g x ∈ W}, psi s W.1 (g.restrict W.2) := by
   classical
   haveI : Finite V := Module.finite_of_finite F
   haveI : Finite (Submodule F V) := Finite.of_injective _ (SetLike.coe_injective (A := Submodule F V))

@@ -8,7 +8,8 @@ noncomputable section
 
 open scoped Matrix
 
-open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA Formalism.L2.SG.LocalCountModules.LocCntCommon
+open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA
+  Formalism.L2.SG.LocalCountModules.LocCntCommon
 
 namespace Formalism.L2.SG.LocalCountModules.UnitaryGroupMassFormula.LocCntUL
 
@@ -25,18 +26,24 @@ theorem cornerU_holds (M : Model F E) (r : ℕ) : CornerU M r := by
     simp [(hY a b).2]
   have hu₁ : IsUnit (Y₁.Z.map M.R.subtype).det := Y₁.unit
   have hu₂ : IsUnit (Y₂.Z.map M.R.subtype).det := Y₂.unit
-  have h1 : (Z₁.Z.map M.R.subtype).det =
-      (Y₁.Z.map M.R.subtype).det * ((Z₁.Z (Fin.last r) (Fin.last r) : E) - lamE Y₁ al₁ be₁) := by
+  have h1
+      : (Z₁.Z.map M.R.subtype).det
+        = (Y₁.Z.map M.R.subtype).det
+          * ((Z₁.Z (Fin.last r) (Fin.last r) : E) - lamE Y₁ al₁ be₁) := by
     rw [det_schur _ (by rw [hsub₁]; exact hu₁), hsub₁, lamE_apply]
     congr 2
     apply Finset.sum_congr rfl
     intro i _
-    have hv : (fun j : Fin r => (Z₁.Z.map M.R.subtype) j.castSucc (Fin.last r)) = fun j => ((be₁ j : M.R) : E) := by
+    have hv
+        : (fun j : Fin r => (Z₁.Z.map M.R.subtype) j.castSucc (Fin.last r))
+          = fun j => ((be₁ j : M.R) : E) := by
       funext j
       simp [(hb j).1]
     rw [hv]
     simp [(hb i).2.2.1]
-  have h2 : Zh₂.det = (Y₂.Z.map M.R.subtype).det * (Zh₂ (Fin.last r) (Fin.last r) - lamE Y₂ al₂ be₂) := by
+  have h2
+      : Zh₂.det
+        = (Y₂.Z.map M.R.subtype).det * (Zh₂ (Fin.last r) (Fin.last r) - lamE Y₂ al₂ be₂) := by
     rw [det_schur _ (by rw [hsub₂]; exact hu₂), hsub₂, lamE_apply]
     congr 2
     apply Finset.sum_congr rfl
@@ -49,8 +56,9 @@ theorem cornerU_holds (M : Model F E) (r : ℕ) : CornerU M r := by
     unfold headDet
     rw [hsub₁]
   rw [hh, h1, h2, hsub₂] at hdet
-  have hkey : Zh₂ (Fin.last r) (Fin.last r) - lamE Y₂ al₂ be₂ =
-      (Z₁.Z (Fin.last r) (Fin.last r) : E) - lamE Y₁ al₁ be₁ := by
+  have hkey
+      : Zh₂ (Fin.last r) (Fin.last r) - lamE Y₂ al₂ be₂
+        = (Z₁.Z (Fin.last r) (Fin.last r) : E) - lamE Y₁ al₁ be₁ := by
     have hu := hu₁.mul hu₂
     apply hu.mul_left_cancel
     linear_combination hdet
@@ -58,8 +66,9 @@ theorem cornerU_holds (M : Model F E) (r : ℕ) : CornerU M r := by
   rw [hφb, linQ_mk, linQ_mk] at hq
   have hmem : lamE Y₂ al₂ be₂ - lamE Y₁ al₁ be₁ ∈ M.Rsub := (Submodule.Quotient.eq _).1 hq
   obtain ⟨x, hx⟩ := hmem
-  have hc : Zh₂ (Fin.last r) (Fin.last r) =
-      (Z₁.Z (Fin.last r) (Fin.last r) : E) + (lamE Y₂ al₂ be₂ - lamE Y₁ al₁ be₁) := by
+  have hc
+      : Zh₂ (Fin.last r) (Fin.last r)
+        = (Z₁.Z (Fin.last r) (Fin.last r) : E) + (lamE Y₂ al₂ be₂ - lamE Y₁ al₁ be₁) := by
     linear_combination hkey
   rw [hc, ← hx]
   exact M.R.add_mem (Z₁.Z (Fin.last r) (Fin.last r)).2 x.2

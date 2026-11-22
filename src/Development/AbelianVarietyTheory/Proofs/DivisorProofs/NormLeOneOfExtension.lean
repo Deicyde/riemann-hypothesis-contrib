@@ -8,12 +8,14 @@ namespace GlobalTheory.NormExtensionBound
 
 open scoped Pointwise
 
-theorem exists_extension {A B K : Type} [CommRing A] [CommRing B] [Field K] [IsAlgClosed K]
-    [Algebra A B] [Algebra.IsIntegral A B] (hinj : Function.Injective (algebraMap A B))
-    (ev : A →+* K) : ∃ ev' : B →+* K, ∀ a, ev' (algebraMap A B a) = ev a := by
+theorem exists_extension
+    {A B K : Type}
+    [CommRing A] [CommRing B] [Field K] [IsAlgClosed K] [Algebra A B] [Algebra.IsIntegral A B]
+    (hinj : Function.Injective (algebraMap A B)) (ev : A →+* K)
+    : ∃ ev' : B →+* K, ∀ a, ev' (algebraMap A B a) = ev a := by
   haveI hP : (RingHom.ker ev).IsPrime := RingHom.ker_isPrime ev
-  obtain ⟨Q, -, hQ, hQP⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (S := B)
-    (RingHom.ker ev) ⊥ (by
+  obtain ⟨Q, -, hQ, hQP⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (S := B) (RingHom.ker ev) ⊥ (by
       intro a ha
       have : a = 0 := hinj (by simpa using ha)
       simp [this])
@@ -35,41 +37,47 @@ theorem exists_extension {A B K : Type} [CommRing A] [CommRing B] [Field K] [IsA
     ⟨fun x => (Algebra.IsIntegral.isIntegral x).isAlgebraic⟩
   let f : (B ⧸ Q) →ₐ[A ⧸ RingHom.ker ev] K := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨f.toRingHom.comp (Ideal.Quotient.mk Q), fun a => ?_⟩
   have h := f.commutes (Ideal.Quotient.mk _ a)
   exact h
 
-theorem norm_le_one_of_extension {p : ℕ} [Fact p.Prime] {A B : Type} [CommRing A] [CommRing B]
-    [Algebra A B] [Algebra.IsIntegral A B] (ev : A →+* PadicAlgCl p) (h : ∀ a, ‖ev a‖ ≤ 1)
-    (ev' : B →+* PadicAlgCl p) (hev : ∀ a, ev' (algebraMap A B a) = ev a) (b : B) :
-    ‖ev' b‖ ≤ 1 := by
+theorem norm_le_one_of_extension
+    {p : ℕ} [Fact p.Prime]
+    {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Algebra.IsIntegral A B]
+    (ev : A →+* PadicAlgCl p) (h : ∀ a, ‖ev a‖ ≤ 1)
+    (ev' : B →+* PadicAlgCl p) (hev : ∀ a, ev' (algebraMap A B a) = ev a)
+    (b : B)
+    : ‖ev' b‖ ≤ 1 := by
   haveI : IsUltrametricDist (PadicAlgCl p) :=
     IsUltrametricDist.isUltrametricDist_of_isNonarchimedean_norm (PadicAlgCl.isNonarchimedean p)
   obtain ⟨q, hqm, hq⟩ := Algebra.IsIntegral.isIntegral (R := A) b
   have hcomp : ev'.comp (algebraMap A B) = ev := RingHom.ext hev
   have hq' := congrArg ev' hq
   rw [map_zero, Polynomial.hom_eval₂, hcomp, hqm.as_sum, Polynomial.eval₂_add,
-    Polynomial.eval₂_X_pow, Polynomial.eval₂_finsetSum] at hq'
+      Polynomial.eval₂_X_pow, Polynomial.eval₂_finsetSum]
+    at hq'
   simp only [Polynomial.eval₂_mul, Polynomial.eval₂_C, Polynomial.eval₂_X_pow] at hq'
   set y := ev' b
   by_contra hy
   push_neg at hy
-  have hxn : y ^ q.natDegree = -∑ i ∈ Finset.range q.natDegree, ev (q.coeff i) * y ^ i :=
+  have hxn : y ^ q.natDegree = - ∑ i ∈ Finset.range q.natDegree, ev (q.coeff i) * y ^ i :=
     eq_neg_of_add_eq_zero_left hq'
   rcases Nat.eq_zero_or_pos q.natDegree with h0 | hn
   · rw [h0] at hxn
     simp at hxn
   have hy1 : 1 ≤ ‖y‖ := hy.le
-  have hle : ‖∑ i ∈ Finset.range q.natDegree, ev (q.coeff i) * y ^ i‖ ≤ ‖y‖ ^ (q.natDegree - 1) := by
+  have hle
+      : ‖∑ i ∈ Finset.range q.natDegree, ev (q.coeff i) * y ^ i‖ ≤ ‖y‖ ^ (q.natDegree - 1) := by
     apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (pow_nonneg (norm_nonneg _) _)
     intro i hi
     rw [norm_mul, norm_pow]
     have hi' := Finset.mem_range.mp hi
-    calc ‖ev (q.coeff i)‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ (q.natDegree - 1) :=
-          mul_le_mul (h _) (pow_le_pow_right₀ hy1 (by omega)) (pow_nonneg (norm_nonneg _) _) zero_le_one
+    calc
+      ‖ev (q.coeff i)‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ (q.natDegree - 1) :=
+        mul_le_mul (h _) (pow_le_pow_right₀ hy1 (by omega)) (pow_nonneg (norm_nonneg _) _)
+          zero_le_one
       _ = ‖y‖ ^ (q.natDegree - 1) := one_mul _
   have h1 : ‖y‖ ^ q.natDegree ≤ ‖y‖ ^ (q.natDegree - 1) := by
     rw [← norm_pow, hxn, norm_neg]
@@ -77,28 +85,32 @@ theorem norm_le_one_of_extension {p : ℕ} [Fact p.Prime] {A B : Type} [CommRing
   have h2 : ‖y‖ ^ (q.natDegree - 1) < ‖y‖ ^ q.natDegree := pow_lt_pow_right₀ hy (by omega)
   linarith
 
-theorem main : ∀ (p : ℕ) [Fact (Nat.Prime p)] (A B : Type) [CommRing A] [IsLocalRing A]
-    [CommRing B] [IsDomain B] [Algebra A B] [Module.Finite A B] [Finite (B ≃ₐ[A] B)]
-    (𝔷 : Ideal B), Function.Injective (algebraMap A B) →
-    (∀ (b : B), (∀ (σ : B ≃ₐ[A] B), σ b = b) → b ∈ Set.range (algebraMap A B)) →
-    Ideal.IsMaximal 𝔷 → ∀ (ev : A →+* PadicAlgCl p), (∀ (a : A), ‖ev a‖ ≤ (1 : ℝ)) →
-    (∀ a ∈ IsLocalRing.maximalIdeal A, ‖ev a‖ < (1 : ℝ)) →
-    ∃ (ev' : B →+* PadicAlgCl p), (∀ (a : A), ev' (algebraMap A B a) = ev a) ∧
-      (∀ (b : B), ‖ev' b‖ ≤ (1 : ℝ)) ∧ ∀ b ∈ 𝔷, ‖ev' b‖ < (1 : ℝ) := by
+theorem main
+    : ∀ (p : ℕ) [Fact (Nat.Prime p)] (A B : Type) [CommRing A] [IsLocalRing A] [CommRing B]
+        [IsDomain B] [Algebra A B] [Module.Finite A B] [Finite (B ≃ₐ[A] B)] (𝔷 : Ideal B),
+      Function.Injective (algebraMap A B)
+        → (∀ (b : B), (∀ (σ : B ≃ₐ[A] B), σ b = b) → b ∈ Set.range (algebraMap A B))
+        → Ideal.IsMaximal 𝔷
+        → ∀ (ev : A →+* PadicAlgCl p),
+          (∀ (a : A), ‖ev a‖ ≤ (1 : ℝ)) → (∀ a ∈ IsLocalRing.maximalIdeal A, ‖ev a‖ < (1 : ℝ))
+            → ∃ (ev' : B →+* PadicAlgCl p),
+              (∀ (a : A), ev' (algebraMap A B a) = ev a) ∧ (∀ (b : B), ‖ev' b‖ ≤ (1 : ℝ))
+                ∧ ∀ b ∈ 𝔷, ‖ev' b‖ < (1 : ℝ) := by
   intro p _ A B _ _ _ _ _ _ _ 𝔷 hinj hfix hmax ev h1 h2
   obtain ⟨e, he⟩ := exists_extension hinj ev
   have hle := norm_le_one_of_extension ev h1 e he
-  let m : Ideal B :=
-    { carrier := {b | ‖e b‖ < 1}
-      add_mem' := fun {a b} ha hb => by
-        show ‖e (a + b)‖ < 1
-        rw [map_add (f := _)]
-        exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt ha hb)
-      zero_mem' := by simp
-      smul_mem' := fun c b hb => by
-        show ‖e (c * b)‖ < 1
-        rw [map_mul, norm_mul]
-        exact mul_lt_one_of_nonneg_of_lt_one_right (hle c) (norm_nonneg _) hb }
+  let m : Ideal B := {
+    carrier := {b | ‖e b‖ < 1}
+    add_mem' := fun {a b} ha hb => by
+      show ‖e (a + b)‖ < 1
+      rw [map_add (f := _)]
+      exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt ha hb)
+    zero_mem' := by simp
+    smul_mem' := fun c b hb => by
+      show ‖e (c * b)‖ < 1
+      rw [map_mul, norm_mul]
+      exact mul_lt_one_of_nonneg_of_lt_one_right (hle c) (norm_nonneg _) hb
+  }
   have hm : ∀ b, b ∈ m ↔ ‖e b‖ < 1 := fun _ => Iff.rfl
   have hmne : m ≠ ⊤ := by
     rw [Ideal.ne_top_iff_one, hm]
@@ -117,8 +129,8 @@ theorem main : ∀ (p : ℕ) [Fact (Nat.Prime p)] (A B : Type) [CommRing A] [IsL
   have hzu : 𝔷.under A = IsLocalRing.maximalIdeal A :=
     IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := A) 𝔷)
   haveI : Algebra.IsInvariant A B (B ≃ₐ[A] B) := ⟨fun b hb => hfix b hb⟩
-  obtain ⟨g, hg⟩ := Algebra.IsInvariant.exists_smul_of_under_eq A B (B ≃ₐ[A] B) 𝔷 m
-    (hzu.trans hmu.symm)
+  obtain ⟨g, hg⟩ :=
+    Algebra.IsInvariant.exists_smul_of_under_eq A B (B ≃ₐ[A] B) 𝔷 m (hzu.trans hmu.symm)
   refine ⟨e.comp (g : B →+* B), fun a => ?_, fun b => hle _, fun b hb => ?_⟩
   · simp [he]
   · have : g • b ∈ m := by

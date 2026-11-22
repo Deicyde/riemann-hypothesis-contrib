@@ -11,17 +11,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsSubquotSmI
 
 noncomputable section
 
-open NumberField ReciprocityTheory.Gal Formalism.ConjugateSelfDual IsDedekindDomain GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
-  GlobalTheory.CuspRep GlobalTheory.DefiniteBC
+open NumberField ReciprocityTheory.Gal Formalism.ConjugateSelfDual IsDedekindDomain
+  GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.CuspRep GlobalTheory.DefiniteBC
 
 namespace GlobalTheory.LFun.SatBridge
 
-theorem hasSatGL_of_hasSatake : ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ)
-    (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V)
-    (α : Fin n → ℂˣ),
-    letI := GlobalTheory.LocalData.complRel w
-    haveI := GlobalTheory.LocalData.isLocalField w
-    HasSatake π α → GlobalTheory.LFun.HasSatGL w π (Finset.univ.val.map α) := by
+theorem hasSatGL_of_hasSatake
+    : ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ) (V : Type)
+        [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V)
+        (α : Fin n → ℂˣ),
+      letI := GlobalTheory.LocalData.complRel w
+      haveI := GlobalTheory.LocalData.isLocalField w
+      HasSatake π α → GlobalTheory.LFun.HasSatGL w π (Finset.univ.val.map α) := by
   intro E _ _ w n V _ _ π α
   letI := GlobalTheory.LocalData.complRel w
   haveI := GlobalTheory.LocalData.isLocalField w

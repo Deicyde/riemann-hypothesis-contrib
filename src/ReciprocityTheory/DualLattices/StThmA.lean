@@ -14,11 +14,14 @@ universe u
 
 variable {R₀ : Type u} [CommRing R₀]
 
-def ξmul {R' R : LAlg R₀} (π : LHom R' R) (ξ : (R' : Type u)) (hξ : ξ ∈ π.ker) :
-    (R' : Type u) →ₗ[R₀] π.ker where
-  toFun r := ⟨ξ * r, by
-    rw [Submodule.restrictScalars_mem] at hξ ⊢
-    exact Ideal.mul_mem_right r _ hξ⟩
+def ξmul {R' R : LAlg R₀} (π : LHom R' R) (ξ : (R' : Type u)) (hξ : ξ ∈ π.ker)
+    : (R' : Type u) →ₗ[R₀] π.ker where
+  toFun r := ⟨
+    ξ * r,
+    by
+      rw [Submodule.restrictScalars_mem] at hξ ⊢
+      exact Ideal.mul_mem_right r _ hξ
+  ⟩
   map_add' a b := by ext; simp [mul_add]
   map_smul' c r := by ext; simp
 

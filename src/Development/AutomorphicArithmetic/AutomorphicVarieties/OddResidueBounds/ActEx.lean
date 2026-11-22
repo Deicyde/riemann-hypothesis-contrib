@@ -5,10 +5,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
 
-theorem UpperTheory.V.Odd.actEx :
-    ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (N : ℕ) [NeZero N], Nonempty (E →ₐ[ℚ] CyclotomicField N ℚ) → ∃ ρ : (ZMod N)ˣ →* (E ≃ₐ[ℚ] E), IsCycAct Ω N ρ := by
+theorem UpperTheory.V.Odd.actEx
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (N : ℕ)
+        [NeZero N],
+      Nonempty (E →ₐ[ℚ] CyclotomicField N ℚ) → ∃ ρ : (ZMod N)ˣ →* (E ≃ₐ[ℚ] E), IsCycAct Ω N ρ := by
   intro E Ω _ _ _ _ _ N _ hf
   obtain ⟨f⟩ := hf
   haveI : NeZero (N : ℚ) := ⟨by exact_mod_cast NeZero.ne N⟩
@@ -24,26 +28,31 @@ theorem UpperTheory.V.Odd.actEx :
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
   let g : CyclotomicField N ℚ →ₐ[E] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
-  refine ⟨(AlgEquiv.restrictNormalHom E).comp
-    (IsCyclotomicExtension.Rat.galEquivZMod N (CyclotomicField N ℚ)).symm.toMonoidHom, ?_⟩
+  refine ⟨
+    (AlgEquiv.restrictNormalHom E).comp
+      (IsCyclotomicExtension.Rat.galEquivZMod N (CyclotomicField N ℚ)).symm.toMonoidHom,
+    ?_
+  ⟩
   intro b σ hσ x
   set τ := (IsCyclotomicExtension.Rat.galEquivZMod N (CyclotomicField N ℚ)).symm b with hτ
   have hζ := IsCyclotomicExtension.zeta_spec N ℚ (CyclotomicField N ℚ)
   have key : ∀ y : CyclotomicField N ℚ, σ (g y) = g (τ y) := by
-    have hcomp : (σ.toRingHom.comp (g : CyclotomicField N ℚ →+* Ω)).toRatAlgHom =
-        ((g : CyclotomicField N ℚ →+* Ω).comp (τ : CyclotomicField N ℚ →+* CyclotomicField N ℚ)).toRatAlgHom := by
+    have hcomp
+        : (σ.toRingHom.comp (g : CyclotomicField N ℚ →+* Ω)).toRatAlgHom
+          = ((g : CyclotomicField N ℚ →+* Ω).comp
+            (τ : CyclotomicField N ℚ →+* CyclotomicField N ℚ)).toRatAlgHom := by
       apply (hζ.powerBasis ℚ).algHom_ext
       simp only [IsPrimitiveRoot.powerBasis_gen, RingHom.toRatAlgHom_apply, RingHom.coe_comp,
-        Function.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom, AlgHom.coe_toRingHom]
+        Function.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom,
+        AlgHom.coe_toRingHom]
       have h1 : (g (IsCyclotomicExtension.zeta N ℚ (CyclotomicField N ℚ))) ^ N = 1 := by
         rw [← map_pow, hζ.pow_eq_one, map_one]
-      change σ (g (IsCyclotomicExtension.zeta N ℚ (CyclotomicField N ℚ))) =
-        g (τ (IsCyclotomicExtension.zeta N ℚ (CyclotomicField N ℚ)))
-      rw [hσ _ h1, IsCyclotomicExtension.Rat.galEquivZMod_apply_of_pow_eq N _ τ hζ.pow_eq_one, map_pow, hτ,
-        MulEquiv.apply_symm_apply]
+      change σ (g (IsCyclotomicExtension.zeta N ℚ (CyclotomicField N ℚ)))
+        = g (τ (IsCyclotomicExtension.zeta N ℚ (CyclotomicField N ℚ)))
+      rw [hσ _ h1, IsCyclotomicExtension.Rat.galEquivZMod_apply_of_pow_eq N _ τ hζ.pow_eq_one,
+        map_pow, hτ, MulEquiv.apply_symm_apply]
     intro y
     exact congrArg (fun φ => φ y) hcomp
   change σ (algebraMap E Ω x) = algebraMap E Ω ((AlgEquiv.restrictNormal τ E) x)

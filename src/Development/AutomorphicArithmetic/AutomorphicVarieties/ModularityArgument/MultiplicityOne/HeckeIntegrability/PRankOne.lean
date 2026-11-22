@@ -46,13 +46,17 @@ theorem rankOne_pf : RankOne := by
   right
   obtain ⟨c, hcA⟩ := hx A
   have hfA : f * A = c • f := by
-    calc f * A = f * f * A := by rw [hf]
+    calc
+      f * A
+        = f * f * A := by rw [hf]
       _ = f * (f * A) := mul_assoc _ _ _
       _ = f * (A * f) := by rw [hc]
       _ = f * A * f := (mul_assoc _ _ _).symm
       _ = c • f := hcA
   have hsq : (c * c) • f = f := by
-    calc (c * c) • f = (c • f) * (c • f) := by rw [smul_mul_smul_comm, hf]
+    calc
+      (c * c) • f
+        = (c • f) * (c • f) := by rw [smul_mul_smul_comm, hf]
       _ = (f * A) * (f * A) := by rw [hfA]
       _ = f * (A * f) * A := by simp only [mul_assoc]
       _ = f * (f * A) * A := by rw [hc]

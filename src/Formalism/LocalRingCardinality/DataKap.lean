@@ -18,24 +18,31 @@ def eQ (D : D7) (j : ℕ) (τ : D.what₂.Tau) : ℚ :=
   if h : 1 ≤ j ∧ j ≤ D.R.m then (D.hc τ).e ⟨j - 1, by omega⟩ else 0
 
 def sigPar (D : D7) (τ : D.what₂.Tau) (i : ℕ) : ℚ :=
-  if h : i < D.R.k - 1 then (D.hc τ).v ⟨i, h⟩
-  else if hb : i - (D.R.k - 1) < D.R.m then -(D.hc τ).b ⟨i - (D.R.k - 1), hb⟩ else 0
+  if h : i < D.R.k - 1 then
+    (D.hc τ).v ⟨i, h⟩
+  else if hb : i - (D.R.k - 1) < D.R.m then
+    - (D.hc τ).b ⟨i - (D.R.k - 1), hb⟩
+  else
+    0
 
 def aPlusQ (D : D7) (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) : ℚ :=
-  sigPar D τ i + eQ D j τ - ((D.R.nV : ℚ) - 1 - 2 * (i : ℚ)) / 2 -
-    (((D.R.k : ℚ) + j - 1) - ((D.R.m : ℚ) - j)) / 2
+  sigPar D τ i + eQ D j τ - ((D.R.nV : ℚ) - 1 - 2 * (i : ℚ)) / 2
+    - (((D.R.k : ℚ) + j - 1) - ((D.R.m : ℚ) - j)) / 2
 
 def aMinusQ (D : D7) (j : ℕ) (τ : D.what₂.Tau) (c : ℕ) : ℚ :=
-  (if h : j + c < D.R.m then (D.hc τ).b ⟨j + c, h⟩ else 0) - eQ D j τ - ((D.R.t : ℚ) + 1 + 2 * (c : ℚ)) / 2
+  (if h : j + c < D.R.m then (D.hc τ).b ⟨j + c, h⟩ else 0) - eQ D j τ
+    - ((D.R.t : ℚ) + 1 + 2 * (c : ℚ)) / 2
 
 def aPlus (D : D7) (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) : ℝ := ((aPlusQ D j τ i : ℚ) : ℝ)
 
 def aMinus (D : D7) (j : ℕ) (τ : D.what₂.Tau) (c : ℕ) : ℝ := ((aMinusQ D j τ c : ℚ) : ℝ)
 
 def KapDef (D : D7) : Prop :=
-  ∀ j, 1 ≤ j → j ≤ D.R.m → ∀ τ,
-    (∀ i : Fin (D.R.sigW j).1, (D.what₂.kaBig j τ i : ℚ) = aPlusQ D j τ i) ∧
-    (∀ c : Fin (D.R.sigW j).2, (D.what₂.kaSmall j τ c : ℚ) = -aMinusQ D j τ c)
+  ∀ j,
+    1 ≤ j → j ≤ D.R.m
+      → ∀ τ,
+        (∀ i : Fin (D.R.sigW j).1, (D.what₂.kaBig j τ i : ℚ) = aPlusQ D j τ i)
+          ∧ (∀ c : Fin (D.R.sigW j).2, (D.what₂.kaSmall j τ c : ℚ) = - aMinusQ D j τ c)
 
 theorem eQ_cast (D : D7) (j : ℕ) (τ : D.what₂.Tau) : ((eQ D j τ : ℚ) : ℝ) = wSz D j τ := by
   unfold eQ wSz
@@ -61,8 +68,9 @@ theorem nV_cast (R : Ranks) : (R.nV : ℚ) = (R.k : ℚ) + R.m - 1 + R.t := by
   push_cast [Nat.cast_sub h]
   ring
 
-theorem aPlusQ_eq (D : D7) (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) :
-    aPlusQ D j τ i = sigPar D τ i + eQ D j τ - ((D.R.k : ℚ) + j - 1 - 1 - i) - ((D.R.t : ℚ) + 1) / 2 := by
+theorem aPlusQ_eq (D : D7) (j : ℕ) (τ : D.what₂.Tau) (i : ℕ)
+    : aPlusQ D j τ i
+      = sigPar D τ i + eQ D j τ - ((D.R.k : ℚ) + j - 1 - 1 - i) - ((D.R.t : ℚ) + 1) / 2 := by
   unfold aPlusQ
   rw [nV_cast]
   ring
@@ -90,10 +98,10 @@ theorem aMinusQ_int (D : D7) (j : ℕ) (τ : D.what₂.Tau) (c : ℕ) : ∃ z : 
   push_cast
   ring
 
-theorem aPlusQ_last (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau) :
-    1 ≤ aPlusQ D j τ (D.R.k + j - 1 - 1) := by
+theorem aPlusQ_last (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D.what₂.Tau)
+    : 1 ≤ aPlusQ D j τ (D.R.k + j - 1 - 1) := by
   have hk : 5 ≤ D.R.k := by have := D.R.m_add_three_le_k; have := D.R.two_le_m; omega
-  have hi : ¬ (D.R.k + j - 1 - 1 < D.R.k - 1) := by omega
+  have hi : ¬(D.R.k + j - 1 - 1 < D.R.k - 1) := by omega
   have hb : D.R.k + j - 1 - 1 - (D.R.k - 1) < D.R.m := by omega
   have hidx : D.R.k + j - 1 - 1 - (D.R.k - 1) = j - 1 := by omega
   have hc : ((D.R.k + j - 1 - 1 : ℕ) : ℚ) = (D.R.k : ℚ) + j - 1 - 1 := by
@@ -109,38 +117,51 @@ theorem aPlusQ_last (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j ≤ D.R.m) (τ : D
   rw [this]
   linarith
 
-theorem aMinusQ_last (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j < D.R.m) (τ : D.what₂.Tau) :
-    1 ≤ aMinusQ D j τ 0 := by
+theorem aMinusQ_last (D : D7) (j : ℕ) (h1 : 1 ≤ j) (h2 : j < D.R.m) (τ : D.what₂.Tau)
+    : 1 ≤ aMinusQ D j τ 0 := by
   have hg := (D.hc τ).gap_eb ⟨j - 1, by omega⟩ (by show j - 1 + 1 < D.R.m; omega)
-  have hidx : (⟨j - 1 + 1, by omega⟩ : Fin D.R.m) = ⟨j + 0, by omega⟩ := Fin.ext (by show j - 1 + 1 = j + 0; omega)
+  have hidx : (⟨j - 1 + 1, by omega⟩ : Fin D.R.m) = ⟨j + 0, by omega⟩ :=
+    Fin.ext (by show j - 1 + 1 = j + 0; omega)
   unfold aMinusQ eQ
   rw [dite_eq_left (by omega : j + 0 < D.R.m), dite_eq_left ⟨h1, h2.le⟩]
   rw [hidx] at hg
   push_cast
   linarith
 
-theorem exists_blocks (D : D7) :
-    ∃ (kb : ∀ j, D.what₂.Tau → Fin (D.R.sigW j).1 → ℤ) (ks : ∀ j, D.what₂.Tau → Fin (D.R.sigW j).2 → ℤ),
-      ∀ j τ, (∀ i, (kb j τ i : ℚ) = aPlusQ D j τ i) ∧ (∀ c, (ks j τ c : ℚ) = -aMinusQ D j τ c) :=
-  ⟨fun j τ i => (aPlusQ_int D j τ i).choose, fun j τ c => -(aMinusQ_int D j τ c).choose,
-    fun j τ => ⟨fun i => (aPlusQ_int D j τ i).choose_spec.symm,
-      fun c => by push_cast; rw [← (aMinusQ_int D j τ c).choose_spec]⟩⟩
+theorem exists_blocks (D : D7)
+    : ∃ (kb : ∀ j, D.what₂.Tau → Fin (D.R.sigW j).1 → ℤ)
+        (ks : ∀ j, D.what₂.Tau → Fin (D.R.sigW j).2 → ℤ),
+      ∀ j τ,
+        (∀ i, (kb j τ i : ℚ) = aPlusQ D j τ i) ∧ (∀ c, (ks j τ c : ℚ) = - aMinusQ D j τ c) := ⟨
+  fun j τ i => (aPlusQ_int D j τ i).choose,
+  fun j τ c => -(aMinusQ_int D j τ c).choose,
+  fun j τ => ⟨
+    fun i => (aPlusQ_int D j τ i).choose_spec.symm,
+    fun c => by push_cast; rw [← (aMinusQ_int D j τ c).choose_spec]
+  ⟩
+⟩
 
 def lamTr (D : D7) (μ : D.what₂.Tup) (j : ℕ) (π : D.what₂.FT) : ℝ :=
   (LinearMap.trace ℂ (D.what₂.Mj j)
-    (D.what₂.thetaP μ j ∘ₗ D.what₂.thetaT μ j ∘ₗ ((D.what₂.isot j π).starProjection : D.what₂.Mj j →ₗ[ℂ] D.what₂.Mj j))).re /
-    (Module.finrank ℂ (D.what₂.isot j π) : ℝ)
+      (D.what₂.thetaP μ j ∘ₗ D.what₂.thetaT μ j
+        ∘ₗ ((D.what₂.isot j π).starProjection : D.what₂.Mj j →ₗ[ℂ] D.what₂.Mj j))).re
+    / (Module.finrank ℂ (D.what₂.isot j π) : ℝ)
 
 def LamDef (D : D7) : Prop :=
   ∀ μ j, 1 ≤ j → j ≤ D.R.m → ∀ π, D.what₂.isot j π ≠ ⊥ → D.what₂.lamP μ j π = lamTr D μ j π
 
-theorem lamTr_of_scalar (D : D7) (μ : D.what₂.Tup) (j : ℕ) (π : D.what₂.FT) (c : ℝ) (h0 : D.what₂.isot j π ≠ ⊥)
-    (hc : ∀ x ∈ D.what₂.isot j π, D.what₂.thetaP μ j (D.what₂.thetaT μ j x) = (c : ℂ) • x) : lamTr D μ j π = c := by
+theorem lamTr_of_scalar
+    (D : D7) (μ : D.what₂.Tup)
+    (j : ℕ) (π : D.what₂.FT) (c : ℝ) (h0 : D.what₂.isot j π ≠ ⊥)
+    (hc : ∀ x ∈ D.what₂.isot j π, D.what₂.thetaP μ j (D.what₂.thetaT μ j x) = (c : ℂ) • x)
+    : lamTr D μ j π = c := by
   set W := D.what₂.isot j π with hW
   have hP : LinearMap.IsProj W (W.starProjection : D.what₂.Mj j →ₗ[ℂ] D.what₂.Mj j) :=
     ⟨fun x => W.starProjection_apply_mem x, fun x hx => Submodule.starProjection_eq_self_iff.2 hx⟩
-  have hT : D.what₂.thetaP μ j ∘ₗ D.what₂.thetaT μ j ∘ₗ (W.starProjection : D.what₂.Mj j →ₗ[ℂ] D.what₂.Mj j) =
-      (c : ℂ) • (W.starProjection : D.what₂.Mj j →ₗ[ℂ] D.what₂.Mj j) := by
+  have hT
+      : D.what₂.thetaP μ j ∘ₗ D.what₂.thetaT μ j
+          ∘ₗ (W.starProjection : D.what₂.Mj j →ₗ[ℂ] D.what₂.Mj j)
+        = (c : ℂ) • (W.starProjection : D.what₂.Mj j →ₗ[ℂ] D.what₂.Mj j) := by
     ext y
     exact hc _ (W.starProjection_apply_mem y)
   have hf : (Module.finrank ℂ W : ℝ) ≠ 0 := by
@@ -160,8 +181,9 @@ end DV
 
 namespace RowSide
 
-variable {D : D7} {EE : Type} [NormedAddCommGroup EE] [InnerProductSpace ℂ EE]
-  [FiniteDimensional ℂ EE] (S : RowSide D EE)
+variable
+  {D : D7} {EE : Type} [NormedAddCommGroup EE] [InnerProductSpace ℂ EE] [FiniteDimensional ℂ EE]
+  (S : RowSide D EE)
 
 def iiStar : EE →ₗ[ℂ] EE := S.iotaQ D.what₂.mu0 ∘ₗ LinearMap.adjoint (S.iotaQ D.what₂.mu0)
 

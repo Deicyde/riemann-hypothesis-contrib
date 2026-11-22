@@ -112,21 +112,28 @@ private lemma de_zero_bounds {p m : ℕ} (y : Yp p m) :
     rw [norm_bco_sq_eq, hb0]
     nlinarith [sq_nonneg (-(∑ i, ‖(tailPt y).2.2.1 i‖ ^ 2) / 2 - (bS (tailPt y) 1).re)]
 
-theorem beta_bound (hL : SLOW) {p m : ℕ} (e : Fin (p + 2) → ℝ) {γ : ℝ} (he : ∀ l, 0 < e l)
-    (he1 : ∀ l, e l ≤ 1) (hγ2 : γ < 2) (hα : 0 < γ / 2 - e 0) :
-    ∃ CS : ℝ, 0 < CS ∧ ∀ (a : Fin (p + 1) → ℂ) (a'' : Fin p → ℂ) (u : Fin m → ℂ),
-      ∫⁻ β : ℝ, ENNReal.ofReal (Lsq (tailPt (a, a'', u, β)) 1 ^ (-1 + γ / 2)) *
-          ENNReal.ofReal (de (tailPt (a, a'', u, β)) 0 ^ (-(γ - e 0))) *
-          ∏ i : Fin (p + 1), ENNReal.ofReal
-            (de (tailPt (a, a'', u, β)) i.succ ^ (-(s0N (p + 1) m i.succ - e i.succ))) ≤
-        ENNReal.ofReal CS * ∫⁻ β : ℝ,
-          ENNReal.ofReal (Lsq (tailPt (a, a'', u, β)) 1 ^ ((-2 + (γ / 2 - e 0)) / 2)) *
-          ENNReal.ofReal (de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0))) *
-          ∏ i : Fin (p + 1), ENNReal.ofReal (de (tailPt (a, a'', u, β)) i.succ ^
-            (-(s0N (p + 1) m i.succ + (fun i : Fin (p + 1) => -e i.succ) i))) := by
+theorem beta_bound
+    (hL : SLOW)
+    {p m : ℕ} (e : Fin (p + 2) → ℝ)
+    {γ : ℝ}
+    (he : ∀ l, 0 < e l) (he1 : ∀ l, e l ≤ 1) (hγ2 : γ < 2) (hα : 0 < γ / 2 - e 0)
+    : ∃ CS : ℝ,
+      0 < CS
+        ∧ ∀ (a : Fin (p + 1) → ℂ) (a'' : Fin p → ℂ) (u : Fin m → ℂ),
+          ∫⁻ β : ℝ, ENNReal.ofReal (Lsq (tailPt (a, a'', u, β)) 1 ^ (-1 + γ / 2)) *
+              ENNReal.ofReal (de (tailPt (a, a'', u, β)) 0 ^ (-(γ - e 0))) *
+              ∏ i : Fin (p + 1), ENNReal.ofReal
+                (de (tailPt (a, a'', u, β)) i.succ ^ (-(s0N (p + 1) m i.succ - e i.succ)))
+            ≤ ENNReal.ofReal CS
+              * ∫⁻ β : ℝ,
+                ENNReal.ofReal (Lsq (tailPt (a, a'', u, β)) 1 ^ ((-2 + (γ / 2 - e 0)) / 2)) *
+                ENNReal.ofReal (de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0))) *
+                ∏ i : Fin (p + 1), ENNReal.ofReal (de (tailPt (a, a'', u, β)) i.succ ^
+                  (-(s0N (p + 1) m i.succ + (fun i : Fin (p + 1) => -e i.succ) i))) := by
   have hγ0 : 0 < γ := by linarith [he 0]
-  obtain ⟨C, hC⟩ := hL (p + 1) (γ / 2 - e 0 + ∑ i : Fin (p + 1), s0N (p + 1) m i.succ) (γ / 2)
-    (by linarith) (by linarith)
+  obtain ⟨C, hC⟩ :=
+    hL (p + 1) (γ / 2 - e 0 + ∑ i : Fin (p + 1), s0N (p + 1) m i.succ) (γ / 2) (by linarith)
+      (by linarith)
   refine ⟨max C 1, lt_of_lt_of_le one_pos (le_max_right _ _), fun a a'' u => ?_⟩
   set L := Lsq (tailPt (a, a'', u, 0)) 1 with hLdef
   have hLX : ∀ β : ℝ, Lsq (tailPt (a, a'', u, β)) 1 = L := fun β => rfl
@@ -137,17 +144,20 @@ theorem beta_bound (hL : SLOW) {p m : ℕ} (e : Fin (p + 2) → ℝ) {γ : ℝ} 
   set c := bl 1 with hc
   set t : Fin (p + 1) → ℝ := fun i => s0N (p + 1) m i.succ - e i.succ + if i = 0 then γ / 2 - e 0 else 0
     with ht
-  have hfac : ∀ (β : ℝ) (l : Fin (p + 2)) (r : ℝ),
-      de (tailPt (a, a'', u, β)) l ^ r = (Al l ^ 2 + (β - bl l) ^ 2) ^ (r / 2) := by
+  have hfac
+      : ∀ (β : ℝ) (l : Fin (p + 2)) (r : ℝ),
+        de (tailPt (a, a'', u, β)) l ^ r = (Al l ^ 2 + (β - bl l) ^ 2) ^ (r / 2) := by
     intro β l r
     rw [de_rpow, hAl, hbl]
     simp only
     rw [Real.sq_sqrt (qB_nonneg _ _)]
     rfl
-  have hG : ∀ β : ℝ, ENNReal.ofReal (de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0))) *
-      ∏ i : Fin (p + 1), ENNReal.ofReal
-        (de (tailPt (a, a'', u, β)) i.succ ^ (-(s0N (p + 1) m i.succ - e i.succ))) =
-      slowly t (fun i => Al i.succ) (fun i => bl i.succ) β := by
+  have hG
+      : ∀ β : ℝ,
+        ENNReal.ofReal (de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0)))
+            * ∏ i : Fin (p + 1), ENNReal.ofReal
+                (de (tailPt (a, a'', u, β)) i.succ ^ (-(s0N (p + 1) m i.succ - e i.succ)))
+          = slowly t (fun i => Al i.succ) (fun i => bl i.succ) β := by
     intro β
     have hd1 : 0 < de (tailPt (a, a'', u, β)) 1 := lt_of_lt_of_le one_pos (de_ge_one _ _)
     unfold slowly
@@ -164,23 +174,27 @@ theorem beta_bound (hL : SLOW) {p m : ℕ} (e : Fin (p + 2) → ℝ) {γ : ℝ} 
       congr 2
       simp only [ht, Fin.succ_ne_zero, if_false]
       ring
-  have hR : ∀ β : ℝ,
-      ENNReal.ofReal (Lsq (tailPt (a, a'', u, β)) 1 ^ ((-2 + (γ / 2 - e 0)) / 2)) *
-        ENNReal.ofReal (de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0))) *
-        ∏ i : Fin (p + 1), ENNReal.ofReal (de (tailPt (a, a'', u, β)) i.succ ^
-          (-(s0N (p + 1) m i.succ + (fun i : Fin (p + 1) => -e i.succ) i))) =
-      ENNReal.ofReal (L ^ ((-2 + (γ / 2 - e 0)) / 2)) *
-        slowly t (fun i => Al i.succ) (fun i => bl i.succ) β := by
+  have hR
+      : ∀ β : ℝ,
+        ENNReal.ofReal (Lsq (tailPt (a, a'', u, β)) 1 ^ ((-2 + (γ / 2 - e 0)) / 2))
+            * ENNReal.ofReal (de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0)))
+            * ∏ i : Fin (p + 1), ENNReal.ofReal (de (tailPt (a, a'', u, β)) i.succ ^
+                (-(s0N (p + 1) m i.succ + (fun i : Fin (p + 1) => -e i.succ) i)))
+          = ENNReal.ofReal (L ^ ((-2 + (γ / 2 - e 0)) / 2))
+            * slowly t (fun i => Al i.succ) (fun i => bl i.succ) β := by
     intro β
     rw [← hG β, hLX, mul_assoc]
     simp only [sub_eq_add_neg]
-  have hpt : ∀ β : ℝ, β ≠ c →
-      ENNReal.ofReal (Lsq (tailPt (a, a'', u, β)) 1 ^ (-1 + γ / 2)) *
-          ENNReal.ofReal (de (tailPt (a, a'', u, β)) 0 ^ (-(γ - e 0))) *
-          ∏ i : Fin (p + 1), ENNReal.ofReal
-            (de (tailPt (a, a'', u, β)) i.succ ^ (-(s0N (p + 1) m i.succ - e i.succ))) ≤
-        ENNReal.ofReal (L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2)) *
-          (slowly t (fun i => Al i.succ) (fun i => bl i.succ) β * ENNReal.ofReal (|β - c| ^ (-(γ / 2)))) := by
+  have hpt
+      : ∀ β : ℝ,
+        β ≠ c
+          → ENNReal.ofReal (Lsq (tailPt (a, a'', u, β)) 1 ^ (-1 + γ / 2))
+              * ENNReal.ofReal (de (tailPt (a, a'', u, β)) 0 ^ (-(γ - e 0)))
+              * ∏ i : Fin (p + 1), ENNReal.ofReal
+                  (de (tailPt (a, a'', u, β)) i.succ ^ (-(s0N (p + 1) m i.succ - e i.succ)))
+            ≤ ENNReal.ofReal (L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2))
+              * (slowly t (fun i => Al i.succ) (fun i => bl i.succ) β
+                * ENNReal.ofReal (|β - c| ^ (-(γ / 2)))) := by
     intro β hβ
     rw [hLX, ← hG β]
     obtain ⟨hsq, habs⟩ := de_zero_bounds (a, a'', u, β)
@@ -189,11 +203,14 @@ theorem beta_bound (hL : SLOW) {p m : ℕ} (e : Fin (p + 2) → ℝ) {γ : ℝ} 
     have hd0 : 0 < de (tailPt (a, a'', u, β)) 0 := lt_of_lt_of_le one_pos (de_ge_one _ _)
     have hd1 : 0 < de (tailPt (a, a'', u, β)) 1 := lt_of_lt_of_le one_pos (de_ge_one _ _)
     have hcpos : 0 < |β - c| := abs_pos.mpr (sub_ne_zero.mpr hβ)
-    have hreal : de (tailPt (a, a'', u, β)) 0 ^ (-(γ - e 0)) ≤
-        L ^ ((γ / 2 - e 0) / 2) * de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0)) *
-          |β - c| ^ (-(γ / 2)) := by
-      have hsplit : de (tailPt (a, a'', u, β)) 0 ^ (-(γ - e 0)) =
-          de (tailPt (a, a'', u, β)) 0 ^ (-(γ / 2 - e 0)) * de (tailPt (a, a'', u, β)) 0 ^ (-(γ / 2)) := by
+    have hreal
+        : de (tailPt (a, a'', u, β)) 0 ^ (-(γ - e 0))
+          ≤ L ^ ((γ / 2 - e 0) / 2) * de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0))
+            * |β - c| ^ (-(γ / 2)) := by
+      have hsplit
+          : de (tailPt (a, a'', u, β)) 0 ^ (-(γ - e 0))
+            = de (tailPt (a, a'', u, β)) 0 ^ (-(γ / 2 - e 0))
+              * de (tailPt (a, a'', u, β)) 0 ^ (-(γ / 2)) := by
         rw [← Real.rpow_add hd0]; congr 1; ring
       rw [hsplit]
       set s := Real.sqrt L with hs
@@ -203,9 +220,11 @@ theorem beta_bound (hL : SLOW) {p m : ℕ} (e : Fin (p + 2) → ℝ) {γ : ℝ} 
         nlinarith [mul_pos hs0 hd0]
       have hdiv : de (tailPt (a, a'', u, β)) 1 / s ≤ de (tailPt (a, a'', u, β)) 0 := by
         rw [div_le_iff₀ hs0]; linarith
-      have h1 : de (tailPt (a, a'', u, β)) 0 ^ (-(γ / 2 - e 0)) ≤
-          L ^ ((γ / 2 - e 0) / 2) * de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0)) := by
-        refine (Real.rpow_le_rpow_of_nonpos (div_pos hd1 hs0) hdiv (by linarith)).trans (le_of_eq ?_)
+      have h1
+          : de (tailPt (a, a'', u, β)) 0 ^ (-(γ / 2 - e 0))
+            ≤ L ^ ((γ / 2 - e 0) / 2) * de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0)) := by
+        refine (Real.rpow_le_rpow_of_nonpos (div_pos hd1 hs0) hdiv (by linarith)).trans
+          (le_of_eq ?_)
         rw [Real.div_rpow hd1.le hs0.le, Real.rpow_neg hs0.le, div_inv_eq_mul, hs,
           Real.sqrt_eq_rpow, ← Real.rpow_mul hL0.le, mul_comm]
         congr 2
@@ -214,12 +233,14 @@ theorem beta_bound (hL : SLOW) {p m : ℕ} (e : Fin (p + 2) → ℝ) {γ : ℝ} 
         Real.rpow_le_rpow_of_nonpos hcpos habs' (by linarith)
       exact mul_le_mul h1 h2 (Real.rpow_nonneg hd0.le _)
         (mul_nonneg (Real.rpow_nonneg hL0.le _) (Real.rpow_nonneg hd1.le _))
-    calc _ ≤ ENNReal.ofReal (L ^ (-1 + γ / 2)) *
-          ENNReal.ofReal (L ^ ((γ / 2 - e 0) / 2) * de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0)) *
-            |β - c| ^ (-(γ / 2))) *
-          ∏ i : Fin (p + 1), ENNReal.ofReal
-            (de (tailPt (a, a'', u, β)) i.succ ^ (-(s0N (p + 1) m i.succ - e i.succ))) :=
-          by gcongr
+    calc
+      _ ≤ ENNReal.ofReal (L ^ (-1 + γ / 2))
+          * ENNReal.ofReal
+            (L ^ ((γ / 2 - e 0) / 2) * de (tailPt (a, a'', u, β)) 1 ^ (-(γ / 2 - e 0))
+              * |β - c| ^ (-(γ / 2)))
+          * ∏ i : Fin (p + 1), ENNReal.ofReal
+              (de (tailPt (a, a'', u, β)) i.succ ^ (-(s0N (p + 1) m i.succ - e i.succ))) := by
+        gcongr
       _ = _ := by
         rw [ENNReal.ofReal_mul (mul_nonneg (Real.rpow_nonneg hL0.le _) (Real.rpow_nonneg hd1.le _)),
           ENNReal.ofReal_mul (Real.rpow_nonneg hL0.le _),
@@ -240,8 +261,8 @@ theorem beta_bound (hL : SLOW) {p m : ℕ} (e : Fin (p + 2) → ℝ) {γ : ℝ} 
     split_ifs <;> linarith
   have hT : ∑ i, t i ≤ γ / 2 - e 0 + ∑ i : Fin (p + 1), s0N (p + 1) m i.succ := by
     simp only [ht, Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.mem_univ, if_true]
-    have : ∑ i : Fin (p + 1), (s0N (p + 1) m i.succ - e i.succ) ≤
-        ∑ i : Fin (p + 1), s0N (p + 1) m i.succ :=
+    have : ∑ i : Fin (p + 1), (s0N (p + 1) m i.succ - e i.succ)
+        ≤ ∑ i : Fin (p + 1), s0N (p + 1) m i.succ :=
       Finset.sum_le_sum (fun i _ => by linarith [he i.succ])
     linarith
   have hA : ∀ i : Fin (p + 1), L ≤ Al i.succ := by
@@ -260,13 +281,17 @@ theorem beta_bound (hL : SLOW) {p m : ℕ} (e : Fin (p + 2) → ℝ) {γ : ℝ} 
     rw [← Real.sqrt_sq hL0.le]
     exact Real.sqrt_le_sqrt hq
   have hslow := hC t (fun i => Al i.succ) (fun i => bl i.succ - c) L hL0 ht0 hT hA
-  have htr1 : ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ) β *
-      ENNReal.ofReal (|β - c| ^ (-(γ / 2))) =
-      ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ - c) β *
-        ENNReal.ofReal (|β| ^ (-(γ / 2))) := by
-    have h := lintegral_add_right_eq_self (μ := (volume : Measure ℝ))
-      (fun β => slowly t (fun i => Al i.succ) (fun i => bl i.succ) β *
-        ENNReal.ofReal (|β - c| ^ (-(γ / 2)))) c
+  have htr1
+      : ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ) β *
+          ENNReal.ofReal (|β - c| ^ (-(γ / 2)))
+        = ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ - c) β *
+            ENNReal.ofReal (|β| ^ (-(γ / 2))) := by
+    have h :=
+      lintegral_add_right_eq_self (μ := (volume : Measure ℝ))
+        (fun β =>
+          slowly t (fun i => Al i.succ) (fun i => bl i.succ) β
+            * ENNReal.ofReal (|β - c| ^ (-(γ / 2))))
+        c
     rw [← h]
     refine lintegral_congr (fun β => ?_)
     simp only [add_sub_cancel_right]
@@ -274,10 +299,13 @@ theorem beta_bound (hL : SLOW) {p m : ℕ} (e : Fin (p + 2) → ℝ) {γ : ℝ} 
     unfold slowly
     refine Finset.prod_congr rfl (fun i _ => ?_)
     rw [show β + c - bl i.succ = β - (bl i.succ - c) by ring]
-  have htr2 : ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ - c) β =
-      ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ) β := by
-    have h := lintegral_add_right_eq_self (μ := (volume : Measure ℝ))
-      (fun β => slowly t (fun i => Al i.succ) (fun i => bl i.succ) β) c
+  have htr2
+      : ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ - c) β
+        = ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ) β := by
+    have h :=
+      lintegral_add_right_eq_self (μ := (volume : Measure ℝ))
+        (fun β => slowly t (fun i => Al i.succ) (fun i => bl i.succ) β)
+        c
     rw [← h]
     refine lintegral_congr (fun β => ?_)
     unfold slowly
@@ -285,42 +313,45 @@ theorem beta_bound (hL : SLOW) {p m : ℕ} (e : Fin (p + 2) → ℝ) {γ : ℝ} 
     rw [show β + c - bl i.succ = β - (bl i.succ - c) by ring]
   have hK0 : 0 ≤ L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2) :=
     mul_nonneg (Real.rpow_nonneg hL0.le _) (Real.rpow_nonneg hL0.le _)
-  have hid : L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2) * (max C 1 * L ^ (-(γ / 2))) =
-      max C 1 * L ^ ((-2 + (γ / 2 - e 0)) / 2) := by
+  have hid
+      : L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2) * (max C 1 * L ^ (-(γ / 2)))
+        = max C 1 * L ^ ((-2 + (γ / 2 - e 0)) / 2) := by
     rw [mul_comm (max C 1), ← mul_assoc, ← Real.rpow_add hL0, ← Real.rpow_add hL0, mul_comm]
     congr 2
     ring
   have hle : ENNReal.ofReal (C * L ^ (-(γ / 2))) ≤ ENNReal.ofReal (max C 1 * L ^ (-(γ / 2))) :=
-    ENNReal.ofReal_le_ofReal
-      (mul_le_mul_of_nonneg_right (le_max_left _ _) (Real.rpow_nonneg hL0.le _))
-  calc _ ≤ ∫⁻ β : ℝ, ENNReal.ofReal (L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2)) *
-          (slowly t (fun i => Al i.succ) (fun i => bl i.succ) β *
-            ENNReal.ofReal (|β - c| ^ (-(γ / 2)))) := by
-        refine lintegral_mono_ae ?_
-        filter_upwards [Measure.ae_ne volume c] with β hβ
-        exact hpt β hβ
-    _ = ENNReal.ofReal (L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2)) *
-          ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ - c) β *
+    ENNReal.ofReal_le_ofReal (mul_le_mul_of_nonneg_right (le_max_left _ _)
+      (Real.rpow_nonneg hL0.le _))
+  calc
+    _ ≤ ∫⁻ β : ℝ, ENNReal.ofReal (L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2)) *
+        (slowly t (fun i => Al i.succ) (fun i => bl i.succ) β *
+          ENNReal.ofReal (|β - c| ^ (-(γ / 2)))) := by
+      refine lintegral_mono_ae ?_
+      filter_upwards [Measure.ae_ne volume c] with β hβ
+      exact hpt β hβ
+    _ = ENNReal.ofReal (L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2))
+        * ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ - c) β *
             ENNReal.ofReal (|β| ^ (-(γ / 2))) := by
-        rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top, htr1]
-    _ ≤ ENNReal.ofReal (L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2)) *
-          (ENNReal.ofReal (C * L ^ (-(γ / 2))) *
-            ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ) β) := by
-        rw [← htr2]
-        exact mul_le_mul_of_nonneg_left hslow zero_le
-    _ ≤ ENNReal.ofReal (L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2)) *
-          (ENNReal.ofReal (max C 1 * L ^ (-(γ / 2))) *
-            ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ) β) := by
-        gcongr
-    _ = ENNReal.ofReal (max C 1) * (ENNReal.ofReal (L ^ ((-2 + (γ / 2 - e 0)) / 2)) *
-          ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ) β) := by
-        rw [← mul_assoc, ← ENNReal.ofReal_mul hK0, hid,
-          ENNReal.ofReal_mul (le_trans zero_le_one (le_max_right _ _)), mul_assoc]
+      rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top, htr1]
+    _ ≤ ENNReal.ofReal (L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2))
+        * (ENNReal.ofReal (C * L ^ (-(γ / 2)))
+          * ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ) β) := by
+      rw [← htr2]
+      exact mul_le_mul_of_nonneg_left hslow zero_le
+    _ ≤ ENNReal.ofReal (L ^ (-1 + γ / 2) * L ^ ((γ / 2 - e 0) / 2))
+        * (ENNReal.ofReal (max C 1 * L ^ (-(γ / 2)))
+          * ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ) β) := by
+      gcongr
+    _ = ENNReal.ofReal (max C 1)
+        * (ENNReal.ofReal (L ^ ((-2 + (γ / 2 - e 0)) / 2))
+          * ∫⁻ β : ℝ, slowly t (fun i => Al i.succ) (fun i => bl i.succ) β) := by
+      rw [← mul_assoc, ← ENNReal.ofReal_mul hK0, hid,
+        ENNReal.ofReal_mul (le_trans zero_le_one (le_max_right _ _)), mul_assoc]
     _ = _ := by
-        rw [← lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
-        congr 1
-        refine lintegral_congr (fun β => ?_)
-        exact (hR β).symm
+      rw [← lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
+      congr 1
+      refine lintegral_congr (fun β => ?_)
+      exact (hR β).symm
 
 end OSAux
 end ReciprocityTheory.ChartRestriction.DS.Xi

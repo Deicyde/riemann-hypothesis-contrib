@@ -5,15 +5,19 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.GlobS
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc GlobalTheory.Unfold GlobalTheory.LocOver GlobalTheory.GenMass
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+  GlobalTheory.LocOver GlobalTheory.GenMass
 open scoped Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
 
 namespace GlobalTheory.LocStdInt
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E]
-  [TopologicalSpace E] [MeasurableSpace E] {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+  {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
 
 lemma cj_mem {x : E} (hx : x ∈ M.L.O) : M.L.cj x ∈ M.L.O := by
   rw [M.L.O_def] at hx ⊢
@@ -92,11 +96,18 @@ private lemma form_mem_O_of_frame_coords_mem_O (H : HermSp M V) {r : ℕ} (Fr : 
   · exact sum_mem fun a _ => mul_mem (hus a) (h_symm_mem H (hve a))
   · exact sum_mem fun a _ => mul_mem (hue a) (h_symm_mem H (hvs a))
 
-theorem lamStd_integral : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) {r : ℕ} (Fr : FrameD H r) (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.IsInner L), ∀ x ∈ Fr.LamStd L, ∀ y ∈ Fr.LamStd L, H.h x y ∈ M.L.O := by
+theorem lamStd_integral
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] {M : Model F E} {V : Type}
+        [AddCommGroup V] [Module E V] (H : HermSp M V) {r : ℕ} (Fr : FrameD H r)
+        (L : Submodule M.L.O (H.Wb Fr.f)) (hL : Fr.IsInner L),
+      ∀ x ∈ Fr.LamStd L, ∀ y ∈ Fr.LamStd L,
+        H.h x y ∈ M.L.O := by
   intro F _ _ _ E _ _ _ _ M V _ _ H r Fr L hL x hx y hy
   unfold FrameD.LamStd at hx hy
   refine span_left H _ y ?_ x hx
   intro u hu
-  exact h_symm_mem H (span_left H _ u (fun v hv => form_mem_O_of_frame_coords_mem_O H Fr L hL hv hu) y hy)
+  exact h_symm_mem H
+    (span_left H _ u (fun v hv => form_mem_O_of_frame_coords_mem_O H Fr L hL hv hu) y hy)
 
 end GlobalTheory.LocStdInt

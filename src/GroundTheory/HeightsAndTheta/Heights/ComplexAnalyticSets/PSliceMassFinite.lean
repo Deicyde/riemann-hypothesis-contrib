@@ -18,11 +18,13 @@ open scoped nonZeroDivisors
 
 noncomputable section
 
-theorem SliceMassFinite.exists_projClosure {n e : ℕ} (I : Ideal (MvPolynomial (Fin n) ℂ)) (ℓ : Fin n → ℂ)
-    (hI : I.IsPrime) (hℓ : linForm ℓ - 1 ∈ I)
-    (hdim : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ I) = ((e + 1 : ℕ) : WithBot ℕ∞)) :
-    ∃ (W : Ideal (MvPolynomial (Fin n) ℂ)) (F : MvPolynomial (Fin (e + 2) × Fin n) ℂ),
-      IsProjPrime W ∧ IsChowForm W (e + 2) F ∧ linForm ℓ ∉ W ∧ W ⊔ Ideal.span {linForm ℓ - 1} = I := by
+theorem SliceMassFinite.exists_projClosure
+    {n e : ℕ}
+    (I : Ideal (MvPolynomial (Fin n) ℂ)) (ℓ : Fin n → ℂ) (hI : I.IsPrime) (hℓ : linForm ℓ - 1 ∈ I)
+    (hdim : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ I) = ((e + 1 : ℕ) : WithBot ℕ∞))
+    : ∃ (W : Ideal (MvPolynomial (Fin n) ℂ)) (F : MvPolynomial (Fin (e + 2) × Fin n) ℂ),
+      IsProjPrime W ∧ IsChowForm W (e + 2) F ∧ linForm ℓ ∉ W
+        ∧ W ⊔ Ideal.span {linForm ℓ - 1} = I := by
   obtain ⟨W, hW, hℓW, hWI, -⟩ := ChartHomogenise.proof ℂ n I ℓ hI hℓ
   have hP := hW.isPrime
 
@@ -41,8 +43,9 @@ theorem SliceMassFinite.exists_projClosure {n e : ℕ} (I : Ideal (MvPolynomial 
 
   have h2 : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) ≤ (n : WithBot ℕ∞) := by
     have := ringKrullDim_quotient_le W
-    rwa [MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field, zero_add,
-      Nat.card_eq_fintype_card, Fintype.card_fin] at this
+    rwa [MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field,
+        zero_add, Nat.card_eq_fintype_card, Fintype.card_fin]
+      at this
 
   have hdimW : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) = ((e + 1 + 1 : ℕ) : WithBot ℕ∞) := by
     generalize hD : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) = D at h1 h2
@@ -57,14 +60,16 @@ theorem SliceMassFinite.exists_projClosure {n e : ℕ} (I : Ideal (MvPolynomial 
       | coe m =>
         have hm1 : e + 1 + 1 ≤ m := by exact_mod_cast h1
         obtain ⟨k, rfl⟩ : ∃ k, m = k + 1 := ⟨m - 1, by omega⟩
-        have hA' : IndefiniteRowSideFullHecke.ComplexSets.IsAffVariety W (k + 1) := ⟨hP, by rw [hD]; rfl⟩
+        have hA' : IndefiniteRowSideFullHecke.ComplexSets.IsAffVariety W (k + 1) :=
+          ⟨hP, by rw [hD]; rfl⟩
         have h3 := IndefiniteRowSideFullHecke.ComplexSets.le_ringKrullDim_slice hA' hW.isHomog hℓW
         rw [hWI, hdim] at h3
         have hk : k ≤ e + 1 := by exact_mod_cast h3
         have hke : k + 1 = e + 1 + 1 := by omega
         rw [hke]
         rfl
-  obtain ⟨F, hFW⟩ := (IndefiniteRowSideFullHecke.ComplexSets.exists_isChowForm_iff (e := e + 1) hW).mpr ⟨hP, hdimW⟩
+  obtain ⟨F, hFW⟩ :=
+    (IndefiniteRowSideFullHecke.ComplexSets.exists_isChowForm_iff (e := e + 1) hW).mpr ⟨hP, hdimW⟩
   exact ⟨W, F, hW, hFW, hℓW, hWI⟩
 
 end

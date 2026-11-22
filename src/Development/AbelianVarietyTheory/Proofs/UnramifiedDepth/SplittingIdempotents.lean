@@ -11,16 +11,19 @@ namespace GlobalTheory.SplittingIdempotents
 
 open GlobalTheory.EigenSplit
 
-private theorem exists_eq_of_isSplitting {A R ι : Type} [CommRing A] [CommRing R] [IsDomain R]
-    [Fintype ι] {σ : ι → A →+* R} (h : IsSplitting σ) (χ : A →+* R) : ∃ i, σ i = χ := by
+private theorem exists_eq_of_isSplitting
+    {A R ι : Type} [CommRing A] [CommRing R] [IsDomain R] [Fintype ι]
+    {σ : ι → A →+* R} (h : IsSplitting σ)
+    (χ : A →+* R)
+    : ∃ i, σ i = χ := by
   classical
   let F : R ⊗[ℤ] A →ₐ[R] (Unit → R) := splitMap (fun _ : Unit => χ)
   have h1 : ∑ i, F (idem h i) () = 1 := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← Finset.sum_apply, ← map_sum, (completeOrthogonalIdempotents_idem h).complete, map_one]
     rfl
-  obtain ⟨i, -, hi⟩ := Finset.exists_ne_zero_of_sum_ne_zero (h1 ▸ one_ne_zero :
-    ∑ i, F (idem h i) () ≠ 0)
+  obtain ⟨i, -, hi⟩ :=
+    Finset.exists_ne_zero_of_sum_ne_zero (h1 ▸ one_ne_zero : ∑ i, F (idem h i) () ≠ 0)
   refine ⟨i, RingHom.ext fun a => ?_⟩
   have h2 := congrArg (fun t => F t ()) (one_tmul_mul_idem h i a)
   simp only [map_mul, map_smul, Pi.mul_apply, Pi.smul_apply, smul_eq_mul] at h2
@@ -28,14 +31,17 @@ private theorem exists_eq_of_isSplitting {A R ι : Type} [CommRing A] [CommRing 
   rw [h3] at h2
   exact (mul_right_cancel₀ hi h2).symm
 
-private theorem exists_det_sq (OE : Type) [CommRing OE] [IsDedekindDomain OE] [CharZero OE]
-    [Module.Free ℤ OE] [Module.Finite ℤ OE] [DecidableEq (Module.Free.ChooseBasisIndex ℤ OE)]
+private theorem exists_det_sq
+    (OE : Type) [CommRing OE] [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE]
+    [Module.Finite ℤ OE] [DecidableEq (Module.Free.ChooseBasisIndex ℤ OE)]
     (K : Type) [Field K] [CharZero K] [Algebra OE K] [IsFractionRing OE K]
-    (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal)
-    (R : Type) [CommRing R] [Algebra R C] (hv : v.Integers R) :
-    ∃ σ : Module.Free.ChooseBasisIndex ℤ OE → OE →+* R,
-      ((Algebra.discr ℤ (Module.Free.chooseBasis ℤ OE) : ℤ) : R) =
-        (Matrix.of fun i j => σ i (Module.Free.chooseBasis ℤ OE j)).det ^ 2 := by
+    (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : v.Integers R)
+    : ∃ σ : Module.Free.ChooseBasisIndex ℤ OE → OE →+* R,
+      ((Algebra.discr ℤ (Module.Free.chooseBasis ℤ OE) : ℤ) : R)
+        = (Matrix.of fun i j => σ i (Module.Free.chooseBasis ℤ OE j)).det ^ 2 := by
   have : IsScalarTower ℤ OE K := AddCommGroup.intIsScalarTower
   have : IsLocalization (Algebra.algebraMapSubmonoid OE (nonZeroDivisors ℤ)) K := inferInstance
   set b := Module.Free.chooseBasis ℤ OE with hb
@@ -55,15 +61,17 @@ private theorem exists_det_sq (OE : Type) [CommRing OE] [IsDedekindDomain OE] [C
         ((e j).toRingHom.comp (algebraMap OE K)).toIntAlgHom
     exact this.tower_top
   choose N hN using hent
-  let σ : Module.Free.ChooseBasisIndex ℤ OE → OE →+* R := fun j =>
-    { toFun := N j
-      map_one' := hv.hom_inj (by simp [hN])
-      map_mul' := fun x y => hv.hom_inj (by simp [hN])
-      map_zero' := hv.hom_inj (by simp [hN])
-      map_add' := fun x y => hv.hom_inj (by simp [hN]) }
+  let σ : Module.Free.ChooseBasisIndex ℤ OE → OE →+* R := fun j => {
+    toFun := N j
+    map_one' := hv.hom_inj (by simp [hN])
+    map_mul' := fun x y => hv.hom_inj (by simp [hN])
+    map_zero' := hv.hom_inj (by simp [hN])
+    map_add' := fun x y => hv.hom_inj (by simp [hN])
+  }
   refine ⟨σ, ?_⟩
-  have hM : Algebra.embeddingsMatrixReindex ℚ C bK e =
-      (algebraMap R C).mapMatrix (Matrix.of fun i j => σ i (b j)).transpose := by
+  have hM
+      : Algebra.embeddingsMatrixReindex ℚ C bK e
+        = (algebraMap R C).mapMatrix (Matrix.of fun i j => σ i (b j)).transpose := by
     ext i j
     simp [Algebra.embeddingsMatrixReindex, Algebra.embeddingsMatrix, hN, bK, σ]
   rw [hM, ← RingHom.map_det, ← map_pow, Matrix.det_transpose] at h1
@@ -71,18 +79,24 @@ private theorem exists_det_sq (OE : Type) [CommRing OE] [IsDedekindDomain OE] [C
   rw [← h1]
   simp
 
-private theorem exists_isSplitting (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C]
-    [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C]
-    (hv : v.Integers O) (hp : ¬IsUnit (p : O)) [IsLocalRing O] (OE : Type) [CommRing OE]
-    [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE] [Module.Finite ℤ OE]
-    (hd : ¬ ((p : ℤ) ∣ Algebra.discr ℤ (Module.Free.chooseBasis ℤ OE))) :
-    ∃ σ : Module.Free.ChooseBasisIndex ℤ OE → OE →+* O, IsSplitting σ := by
+private theorem exists_isSplitting
+    (p : ℕ) [Fact p.Prime]
+    (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+    (v : Valuation C NNReal)
+    (O : Type) [CommRing O] [Algebra O C]
+    (hv : v.Integers O) (hp : ¬ IsUnit (p : O))
+    [IsLocalRing O]
+    (OE : Type)
+    [CommRing OE] [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE] [Module.Finite ℤ OE]
+    (hd : ¬((p : ℤ) ∣ Algebra.discr ℤ (Module.Free.chooseBasis ℤ OE)))
+    : ∃ σ : Module.Free.ChooseBasisIndex ℤ OE → OE →+* O, IsSplitting σ := by
   classical
   obtain ⟨σ, hσ⟩ := exists_det_sq OE (FractionRing OE) C v O hv
   refine ⟨σ, (isSplitting_iff_isUnit_det σ (Module.Free.chooseBasis ℤ OE)).2 ?_⟩
   by_contra hdet
-  have hdm : ((Algebra.discr ℤ (Module.Free.chooseBasis ℤ OE) : ℤ) : O) ∈
-      IsLocalRing.maximalIdeal O := by
+  have hdm
+      : ((Algebra.discr ℤ (Module.Free.chooseBasis ℤ OE) : ℤ) : O)
+        ∈ IsLocalRing.maximalIdeal O := by
     rw [hσ]
     exact Ideal.pow_mem_of_mem _ (by exact hdet) 2 (by norm_num)
   have hpm : (p : O) ∈ IsLocalRing.maximalIdeal O := hp
@@ -96,7 +110,18 @@ private theorem exists_isSplitting (p : ℕ) [Fact p.Prime] (C : Type) [Field C]
     exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ hpm) (Ideal.mul_mem_left _ _ hdm)
   exact (IsLocalRing.maximalIdeal.isMaximal O).ne_top ((Ideal.eq_top_iff_one _).mpr h1)
 
-theorem exists_splitting_idempotents_frobenius : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O → ∀ [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsLocalRing O] (OE : Type) [CommRing OE] [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE] [Module.Finite ℤ OE], ¬ ((p : ℤ) ∣ Algebra.discr ℤ (Module.Free.chooseBasis ℤ OE)) → ∃ (m : ℕ) (τ : Fin m ≃ (OE →+* O)) (ε : Fin m → O ⊗[ℤ] OE) (φ : Equiv.Perm (Fin m)), CompleteOrthogonalIdempotents ε ∧ (∀ i a, (1 ⊗ₜ[ℤ] a) * ε i = τ i a • ε i) ∧ (∀ i j, i ≠ j → ∃ a, IsUnit (τ i a - τ j a)) ∧ ∀ i a, τ (φ i) a - τ i a ^ p ∈ IsLocalRing.maximalIdeal O := by
+theorem exists_splitting_idempotents_frobenius
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C],
+      v.Integers O
+        → ∀ [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsLocalRing O]
+            (OE : Type) [CommRing OE] [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE]
+            [Module.Finite ℤ OE],
+          ¬((p : ℤ) ∣ Algebra.discr ℤ (Module.Free.chooseBasis ℤ OE))
+            → ∃ (m : ℕ) (τ : Fin m ≃ (OE →+* O)) (ε : Fin m → O ⊗[ℤ] OE) (φ : Equiv.Perm (Fin m)),
+              CompleteOrthogonalIdempotents ε ∧ (∀ i a, (1 ⊗ₜ[ℤ] a) * ε i = τ i a • ε i)
+                ∧ (∀ i j, i ≠ j → ∃ a, IsUnit (τ i a - τ j a))
+                ∧ ∀ i a, τ (φ i) a - τ i a ^ p ∈ IsLocalRing.maximalIdeal O := by
   intro p _ C _ _ _ v O _ _ hv hp _ _ OE _ _ _ _ _ hd
   classical
   obtain ⟨σ, hσ⟩ := exists_isSplitting p C v O hv hp.out OE hd
@@ -110,8 +135,7 @@ theorem exists_splitting_idempotents_frobenius : ∀ (p : ℕ) [Fact p.Prime] (C
     rw [← map_natCast r]
     exact (IsLocalRing.residue_eq_zero_iff _).2 hp.out
   have : CharP k p := (CharP.charP_iff_prime_eq_zero Fact.out).2 hpk
-  have hbij : Function.Bijective σ :=
-    ⟨hσ.injective, fun χ => exists_eq_of_isSplitting hσ χ⟩
+  have hbij : Function.Bijective σ := ⟨hσ.injective, fun χ => exists_eq_of_isSplitting hσ χ⟩
   choose f hf using fun i => exists_eq_of_isSplitting hσk ((frobenius k p).comp (r.comp (σ i)))
   have hfi : Function.Injective f := by
     intro i j hij
@@ -124,8 +148,16 @@ theorem exists_splitting_idempotents_frobenius : ∀ (p : ℕ) [Fact p.Prime] (C
     exact h1.symm.trans h2
   let φ : Equiv.Perm ι := Equiv.ofBijective f (Finite.injective_iff_bijective.1 hfi)
   let e : Fin (Fintype.card ι) ≃ ι := (Fintype.equivFin ι).symm
-  refine ⟨Fintype.card ι, e.trans (Equiv.ofBijective σ hbij), idem hσ ∘ e,
-    (e.trans φ).trans e.symm, ?_, fun i a => ?_, fun i j hij => ?_, fun i a => ?_⟩
+  refine ⟨
+    Fintype.card ι,
+    e.trans (Equiv.ofBijective σ hbij),
+    idem hσ ∘ e,
+    (e.trans φ).trans e.symm,
+    ?_,
+    fun i a => ?_,
+    fun i j hij => ?_,
+    fun i a => ?_
+  ⟩
   · exact (CompleteOrthogonalIdempotents.equiv e).2 (completeOrthogonalIdempotents_idem hσ)
   · exact one_tmul_mul_idem hσ (e i) a
   · by_contra hne

@@ -6,18 +6,17 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_regular_exponent_of_sum_sq_eq :
-    ∀ (q d : ℕ) (a : ℕ → ℤ), 2 ≤ q → 0 < d →
-      (∀ k l i : ℕ, k * q ^ i ≡ l [MOD q ^ d - 1] → a k = a l) →
-      ∑ k ∈ Finset.range (q ^ d - 1), a k ^ 2 = d →
-      (∀ s e l : ℕ, s * e = d → l * q ^ e ≡ l [MOD q ^ d - 1] → (s : ℤ) ∣ a l) →
-      ∃ k : ℕ, a k ≠ 0 ∧ ∀ i : ℕ, 0 < i → i < d → ¬ k * q ^ i ≡ k [MOD q ^ d - 1] := by
+theorem exists_regular_exponent_of_sum_sq_eq
+    : ∀ (q d : ℕ) (a : ℕ → ℤ),
+      2 ≤ q → 0 < d → (∀ k l i : ℕ, k * q ^ i ≡ l [MOD q ^ d - 1] → a k = a l)
+        → ∑ k ∈ Finset.range (q ^ d - 1), a k ^ 2 = d
+        → (∀ s e l : ℕ, s * e = d → l * q ^ e ≡ l [MOD q ^ d - 1] → (s : ℤ) ∣ a l)
+        → ∃ k : ℕ, a k ≠ 0 ∧ ∀ i : ℕ, 0 < i → i < d → ¬ k * q ^ i ≡ k [MOD q ^ d - 1] := by
   classical
   intro q d a hq hd hinv hsum hdiv
   have h1 : 1 < q ^ d := Nat.one_lt_pow hd.ne' (by omega)
   have hN : 0 < q ^ d - 1 := by omega
-  have hqd : q ^ d ≡ 1 [MOD q ^ d - 1] :=
-    ((Nat.modEq_iff_dvd' h1.le).2 dvd_rfl).symm
+  have hqd : q ^ d ≡ 1 [MOD q ^ d - 1] := ((Nat.modEq_iff_dvd' h1.le).2 dvd_rfl).symm
   generalize q ^ d - 1 = N at *
   obtain ⟨k, hk⟩ : ∃ k, a k ≠ 0 := by
     by_contra h
@@ -28,8 +27,8 @@ theorem exists_regular_exponent_of_sum_sq_eq :
   have hex : ∃ e, 0 < e ∧ k * q ^ e ≡ k [MOD N] := ⟨i, hi, hki⟩
   have hspec := Nat.find_spec hex
   have hle : Nat.find hex ≤ i := Nat.find_min' hex ⟨hi, hki⟩
-  have hmin : ∀ m, 0 < m → m < Nat.find hex → ¬ k * q ^ m ≡ k [MOD N] :=
-    fun m hm hlt h => Nat.find_min hex hlt ⟨hm, h⟩
+  have hmin : ∀ m, 0 < m → m < Nat.find hex → ¬ k * q ^ m ≡ k [MOD N] := fun m hm hlt h =>
+    Nat.find_min hex hlt ⟨hm, h⟩
   generalize Nat.find hex = e at hspec hle hmin
   obtain ⟨he, hke⟩ := hspec
   have hmul : ∀ m, k * q ^ (e * m) ≡ k [MOD N] := by
@@ -55,8 +54,7 @@ theorem exists_regular_exponent_of_sum_sq_eq :
     have : e * s ≤ e * 1 := Nat.mul_le_mul_left _ this
     omega
   have hdv : (s : ℤ) ∣ a k := hdiv s e k (by rw [hs, mul_comm]) hke
-  have hsq : (s : ℤ) ^ 2 ≤ a k ^ 2 :=
-    Int.le_of_dvd (by positivity) (pow_dvd_pow_of_dvd hdv 2)
+  have hsq : (s : ℤ) ^ 2 ≤ a k ^ 2 := Int.le_of_dvd (by positivity) (pow_dvd_pow_of_dvd hdv 2)
   have key : ∀ i j, i < j → j < e → ¬ k * q ^ i ≡ k * q ^ j [MOD N] := by
     intro i j hij hj h
     apply hmin (i + (e - j)) (by omega) (by omega)
@@ -74,8 +72,8 @@ theorem exists_regular_exponent_of_sum_sq_eq :
     intro x hx
     obtain ⟨i, -, rfl⟩ := Finset.mem_image.1 hx
     exact Finset.mem_range.2 (Nat.mod_lt _ hN)
-  have hle2 := Finset.sum_le_sum_of_subset_of_nonneg (f := fun k => a k ^ 2) hsub
-    (fun _ _ _ => by positivity)
+  have hle2 :=
+    Finset.sum_le_sum_of_subset_of_nonneg (f := fun k => a k ^ 2) hsub (fun _ _ _ => by positivity)
   rw [Finset.sum_image hinj, hsum] at hle2
   have heq : ∑ i ∈ Finset.range e, a (k * q ^ i % N) ^ 2 = (e : ℤ) * a k ^ 2 := by
     rw [Finset.sum_congr rfl (fun i _ => by rw [← hinv k _ i (Nat.mod_modEq _ _).symm])]

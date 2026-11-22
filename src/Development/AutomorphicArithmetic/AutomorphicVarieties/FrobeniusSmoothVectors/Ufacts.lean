@@ -9,11 +9,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PartsSign
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV
+  UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
 open scoped Pointwise
 
-private theorem uf_pow {Γ : Type} [Group Γ] {H : Subgroup Γ} (h : commutator Γ ≤ H) {l a b : ℕ} (hi : H.index = l ^ a)
-    (hab : a ≤ b) (t : Γ) : t ^ l ^ b ∈ H := by
+private theorem uf_pow
+    {Γ : Type} [Group Γ]
+    {H : Subgroup Γ} (h : commutator Γ ≤ H)
+    {l a b : ℕ} (hi : H.index = l ^ a) (hab : a ≤ b)
+    (t : Γ)
+    : t ^ l ^ b ∈ H := by
   haveI : H.Normal := by
     refine ⟨fun n hn g => ?_⟩
     have hc : g * n * g⁻¹ * n⁻¹ ∈ H :=
@@ -24,19 +29,24 @@ private theorem uf_pow {Γ : Type} [Group Γ] {H : Subgroup Γ} (h : commutator 
   rw [hi, ← pow_mul, ← pow_add, Nat.sub_add_cancel hab] at h1
   exact h1
 
-private theorem uf_comm {Γ : Type} [Group Γ] {H : Subgroup Γ} (hi : H.index = 2) : commutator Γ ≤ H := by
+private theorem uf_comm {Γ : Type} [Group Γ] {H : Subgroup Γ} (hi : H.index = 2)
+    : commutator Γ ≤ H := by
   rw [commutator_def, Subgroup.commutator_le]
   intro a _ b _
   rw [commutatorElement_def, mul_assoc (a * b), Subgroup.mul_mem_iff_of_index_two hi,
-    Subgroup.mul_mem_iff_of_index_two hi, Subgroup.mul_mem_iff_of_index_two hi, inv_mem_iff, inv_mem_iff]
+    Subgroup.mul_mem_iff_of_index_two hi, Subgroup.mul_mem_iff_of_index_two hi, inv_mem_iff,
+    inv_mem_iff]
 
-private theorem uf_frob {k : Type} [Field k] (l : ℕ) [Fact l.Prime] [CharP k l] {x : kˣ} {a : ℕ} (h : x ^ l ^ a = 1) :
-    x = 1 := by
+private theorem uf_frob
+    {k : Type} [Field k] (l : ℕ) [Fact l.Prime] [CharP k l] {x : kˣ} {a : ℕ} (h : x ^ l ^ a = 1)
+    : x = 1 := by
   have h1 : ((x : k) - 1) ^ l ^ a = 0 := by
     rw [sub_pow_char_pow, one_pow, ← Units.val_pow_eq_pow_val, h, Units.val_one, sub_self]
-  exact Units.ext (sub_eq_zero.1 (pow_eq_zero_iff (pow_ne_zero a (Fact.out : l.Prime).ne_zero) |>.1 h1))
+  exact Units.ext (sub_eq_zero.1 (pow_eq_zero_iff (pow_ne_zero a (Fact.out : l.Prime).ne_zero)
+    |>.1 h1))
 
-private theorem uf_neg {k : Type} [Field k] (l : ℕ) [Fact l.Prime] [CharP k l] (hl : l ≠ 2) : (-1 : kˣ) ≠ 1 := by
+private theorem uf_neg {k : Type} [Field k] (l : ℕ) [Fact l.Prime] [CharP k l] (hl : l ≠ 2)
+    : (-1 : kˣ) ≠ 1 := by
   intro h
   have h1 : (-1 : k) = 1 := by simpa using congrArg Units.val h
   have h2 : ((2 : ℕ) : k) = 0 := by
@@ -47,8 +57,10 @@ private theorem uf_neg {k : Type} [Field k] (l : ℕ) [Fact l.Prime] [CharP k l]
 
 section
 
-variable {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O]
-  [CharP (ResidueField O) l]
+variable
+  {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+  (l : ℕ) [Fact l.Prime]
+  {O : Type} [CommRing O] [IsLocalRing O] [CharP (ResidueField O) l]
 
 private theorem uf_om {s : G ℚ Ω} (h : cycMod ℚ Ω l 1 s = -1) : omO Ω l O s = -1 := by
   simp [omO, GC.cycF, h]
@@ -76,8 +88,14 @@ private theorem uf_sq {σ : G ℚ Ω} (h : IsCC σ) : σ ^ 2 = 1 := by
 
 end
 
-theorem UpperTheory.V.Fr.ufacts :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] [CharP (ResidueField O) l] (η : G ℚ Ω →* ℤˣ) (Ψ : G ℚ Ω →* Oˣ) (σ : G ℚ Ω) (B : ValuationSubring Ω) (M : ℕ) (Hb : Subgroup (G ℚ Ω)), Gen l η Ψ σ B M Hb → ∀ (H₀ : Subgroup (G ℚ Ω)) (w : ℕ), FrobeniusSplitPrimeDatum η M H₀ → FrobeniusWitnessPrime l η Ψ M w → ∀ m, UFacts l η Ψ M m (Upl l Hb H₀ w m) := by
+theorem UpperTheory.V.Fr.ufacts
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] {O : Type}
+        [CommRing O] [IsLocalRing O] [CharP (ResidueField O) l] (η : G ℚ Ω →* ℤˣ) (Ψ : G ℚ Ω →* Oˣ)
+        (σ : G ℚ Ω) (B : ValuationSubring Ω) (M : ℕ) (Hb : Subgroup (G ℚ Ω)),
+      Gen l η Ψ σ B M Hb
+        → ∀ (H₀ : Subgroup (G ℚ Ω)) (w : ℕ),
+          FrobeniusSplitPrimeDatum η M H₀ → FrobeniusWitnessPrime l η Ψ M w
+            → ∀ m, UFacts l η Ψ M m (Upl l Hb H₀ w m) := by
   intro Ω _ _ _ l _ O _ _ _ η Ψ σ B M Hb hG H₀ w h0 hW m
   have hl : l.Prime := Fact.out
   obtain ⟨thO, thA, thI, thU, thR⟩ := hth Ω l w hW.prime hW.one
@@ -85,8 +103,9 @@ theorem UpperTheory.V.Fr.ufacts :
   obtain ⟨pb1, pb2, pb3, pb4, pb5, pb6, pb7, pb8, pb9, pb10⟩ := ML.placeBasic Ω
   obtain ⟨a, ha⟩ := hG.Hb_idx
   have hU : Upl l Hb H₀ w m = H₀ ⊓ Hth Ω l w ⊓ Hb ⊓ Hlay Ω l m := rfl
-  have hoddpow : ∀ (H : Subgroup (G ℚ Ω)) (b : ℕ), commutator (G ℚ Ω) ≤ H → H.index = l ^ b →
-      ∀ τ : G ℚ Ω, τ ^ 2 = 1 → τ ∈ H := by
+  have hoddpow
+      : ∀ (H : Subgroup (G ℚ Ω)) (b : ℕ),
+        commutator (G ℚ Ω) ≤ H → H.index = l ^ b → ∀ τ : G ℚ Ω, τ ^ 2 = 1 → τ ∈ H := by
     intro H b hc hi τ hτ
     have h1 := uf_pow hc hi le_rfl τ
     obtain ⟨k, hk⟩ : Odd (l ^ b) := (hl.odd_of_ne_two hG.odd).pow
@@ -120,8 +139,10 @@ theorem UpperTheory.V.Fr.ufacts :
   case real =>
     intro τ hτ
     have h2 := uf_sq hτ
-    exact ⟨⟨⟨h0.real τ hτ, hoddpow _ 1 thA (by rw [thI, pow_one]) τ h2⟩, hoddpow _ a hG.Hb_ab ha τ h2⟩,
-      hoddpow _ m lyA lyI τ h2⟩
+    exact ⟨
+      ⟨⟨h0.real τ hτ, hoddpow _ 1 thA (by rw [thI, pow_one]) τ h2⟩, hoddpow _ a hG.Hb_ab ha τ h2⟩,
+      hoddpow _ m lyA lyI τ h2
+    ⟩
   case unr =>
     intro B' s hs
     by_cases hB' : B'.valuation (M : Ω) < 1
@@ -132,7 +153,8 @@ theorem UpperTheory.V.Fr.ufacts :
       have hno : ∀ e : ℕ, ¬ ML.Over B' (M ^ e) := by
         intro e
         induction e with
-        | zero => simp only [pow_zero, ML.Over, Nat.cast_one, map_one, lt_self_iff_false, not_false_eq_true]
+        | zero =>
+          simp only [pow_zero, ML.Over, Nat.cast_one, map_one, lt_self_iff_false, not_false_eq_true]
         | succ e ih =>
           rw [pow_succ, pb3]
           rintro (h | h)
@@ -181,16 +203,20 @@ theorem UpperTheory.V.Fr.ufacts :
   case deg =>
     intro B' hB'
     have hfi : (H₀ ⊓ Hth Ω l w ⊓ Hb ⊓ Hlay Ω l m).index ≠ 0 := by
-      refine Subgroup.index_inf_ne_zero (Subgroup.index_inf_ne_zero (Subgroup.index_inf_ne_zero ?_ ?_) ?_) ?_
+      refine Subgroup.index_inf_ne_zero
+        (Subgroup.index_inf_ne_zero (Subgroup.index_inf_ne_zero ?_ ?_) ?_) ?_
       · rw [h0.idx]; norm_num
       · rw [thI]; exact hl.ne_zero
       · rw [ha]; exact pow_ne_zero _ hl.ne_zero
       · rw [lyI]; exact pow_ne_zero _ hl.ne_zero
     have hrel : ∀ H : Subgroup (G ℚ Ω), H.index ≠ 0 → ∀ L : Subgroup (G ℚ Ω), H.relIndex L ≠ 0 :=
-      fun H hH L => Subgroup.relIndex_ne_zero_trans (K := ⊤) (by rw [Subgroup.relIndex_top_right]; exact hH)
-        (by rw [Subgroup.relIndex_top_left]; exact one_ne_zero)
+      fun H hH L =>
+        Subgroup.relIndex_ne_zero_trans (K := ⊤) (by rw [Subgroup.relIndex_top_right]; exact hH)
+          (by rw [Subgroup.relIndex_top_left]; exact one_ne_zero)
     have hlayi : (Hlay Ω l m).index ≠ 0 := by rw [lyI]; exact pow_ne_zero _ hl.ne_zero
-    calc l ^ m = (Hlay Ω l m).relIndex (Ine B') := ((lyR B' hB').1).symm
+    calc
+      l ^ m
+        = (Hlay Ω l m).relIndex (Ine B') := ((lyR B' hB').1).symm
       _ ≤ (Hlay Ω l m).relIndex (Dec B') :=
         Subgroup.relIndex_le_of_le_right (Ine_le_Dec B') (hrel _ hlayi _)
       _ ≤ (H₀ ⊓ Hth Ω l w ⊓ Hb ⊓ Hlay Ω l m).relIndex (Dec B') :=
@@ -199,16 +225,20 @@ theorem UpperTheory.V.Fr.ufacts :
     intro j _
     by_contra hc
     push_neg at hc
-    have h1 := (l15 l η Ψ σ B M Hb hG H₀ w h0 hW m 1 j).2.2 (fun s hs => by rw [zpow_one]; exact hc s hs) s'
-      (MonoidHom.mem_ker.2 hs'η)
+    have h1 :=
+      (l15 l η Ψ σ B M Hb hG H₀ w h0 hW m 1 j).2.2
+        (fun s hs => by rw [zpow_one]; exact hc s hs)
+        s' (MonoidHom.mem_ker.2 hs'η)
     rw [zpow_one, hs'om, hs'b, one_zpow, mul_one] at h1
     exact hneg h1
   case f2c =>
     intro j _
     by_contra hc
     push_neg at hc
-    have h1 := (l15 l η Ψ σ B M Hb hG H₀ w h0 hW m 1 j).2.2 (fun s hs => by rw [zpow_one]; exact hc s hs) s'
-      (MonoidHom.mem_ker.2 hs'η)
+    have h1 :=
+      (l15 l η Ψ σ B M Hb hG H₀ w h0 hW m 1 j).2.2
+        (fun s hs => by rw [zpow_one]; exact hc s hs)
+        s' (MonoidHom.mem_ker.2 hs'η)
     rw [zpow_one, hs'om, hs'b, one_zpow, mul_one] at h1
     exact hneg h1
   case f3 =>
@@ -227,16 +257,29 @@ theorem UpperTheory.V.Fr.ufacts :
       have h1 : g * t * g⁻¹ ∈ Dec B' ⊓ η.ker := ⟨ht'D, ht'η⟩
       rw [← h0.loc B' (hMl B' hB')] at h1
       exact h1.2
-    refine ⟨(g * t * g⁻¹) ^ l ^ (a + m + 1), ⟨pow_mem ht'D _, ⟨⟨⟨pow_mem ht'H0 _,
-      uf_pow thA (by rw [thI, pow_one]) (by omega) _⟩, uf_pow hG.Hb_ab ha (by omega) _⟩,
-      uf_pow lyA lyI (by omega) _⟩⟩, fun h1 => htb ?_⟩
+    refine ⟨
+      (g * t * g⁻¹) ^ l ^ (a + m + 1),
+      ⟨
+        pow_mem ht'D _,
+        ⟨
+          ⟨
+            ⟨pow_mem ht'H0 _, uf_pow thA (by rw [thI, pow_one]) (by omega) _⟩,
+            uf_pow hG.Hb_ab ha (by omega) _
+          ⟩,
+          uf_pow lyA lyI (by omega) _
+        ⟩
+      ⟩,
+      fun h1 => htb ?_
+    ⟩
     rw [← ht'b]
     apply uf_frob l (a := a + m + 1)
     rw [map_pow, ← pow_mul, mul_comm, pow_mul] at h1
     exact h1
   case f5 =>
     rintro ⟨j, hj⟩
-    have h1 := (l15 l η Ψ σ B M Hb hG H₀ w h0 hW m 1 (-j)).2.2
-      (fun s hs => by rw [zpow_one, hj s hs, ← zpow_add, add_neg_cancel, zpow_zero]) s' (MonoidHom.mem_ker.2 hs'η)
+    have h1 :=
+      (l15 l η Ψ σ B M Hb hG H₀ w h0 hW m 1 (-j)).2.2
+        (fun s hs => by rw [zpow_one, hj s hs, ← zpow_add, add_neg_cancel, zpow_zero])
+        s' (MonoidHom.mem_ker.2 hs'η)
     rw [zpow_one, hs'om, hs'b, one_zpow, mul_one] at h1
     exact hneg h1

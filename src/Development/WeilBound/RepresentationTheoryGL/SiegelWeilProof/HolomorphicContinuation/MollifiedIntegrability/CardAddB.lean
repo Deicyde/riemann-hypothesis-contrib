@@ -13,9 +13,12 @@ namespace PositivityTheory.Rg.Sw.WR.D
 
 open PositivityTheory.Rg.Sw
 
-theorem cardAddB {m : ℕ} (ε : Fin m → Bool) :
-    (Finset.univ.filter fun a => ε a = true).card + (Finset.univ.filter fun a => ε a = false).card = m := by
-  have := Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin m))) (fun a => ε a = true)
+theorem cardAddB {m : ℕ} (ε : Fin m → Bool)
+    : (Finset.univ.filter fun a => ε a = true).card + (Finset.univ.filter fun a => ε a = false).card
+      = m := by
+  have :=
+    Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin m)))
+      (fun a => ε a = true)
   simpa using this
 
 theorem nexpB (t r : ℝ) : ‖Complex.exp (-(Complex.I * t * r))‖ = 1 := by

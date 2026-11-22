@@ -7,17 +7,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BijectiveRea
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount
 open scoped TensorProduct Classical
 
 noncomputable section
 
 namespace GlobalTheory.LKMid
 
-theorem trivR_of_gram_psi_inv_congr : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (β : G.Cˣ),
-    (∀ v : InfinitePlace G.F, ∃ W : GL (Fin G.n) ℂ, G.gram v * G.psi v ((β⁻¹ : G.Cˣ) : G.C) =
-      (W : Matrix (Fin G.n) (Fin G.n) ℂ)ᴴ * G.gram v * (W : Matrix (Fin G.n) (Fin G.n) ℂ)) →
-    ∃ z : (ℝ ⊗[ℚ] G.C)ˣ, Triv G ℝ β z 1 := by
+theorem trivR_of_gram_psi_inv_congr
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (β : G.Cˣ),
+      (∀ v : InfinitePlace G.F, ∃ W : GL (Fin G.n) ℂ,
+          G.gram v * G.psi v ((β⁻¹ : G.Cˣ) : G.C)
+            = (W : Matrix (Fin G.n) (Fin G.n) ℂ)ᴴ * G.gram v * (W : Matrix (Fin G.n) (Fin G.n) ℂ))
+        → ∃ z : (ℝ ⊗[ℚ] G.C)ˣ, Triv G ℝ β z 1 := by
   intro p _ G β hW
   choose W hW using hW
   obtain ⟨hinj, hsurj⟩ := GlobalTheory.T.bijective_realTensor_to_prod_matrixAlgebras_infPlaces p G
@@ -26,10 +29,12 @@ theorem trivR_of_gram_psi_inv_congr : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup 
   have hz1 : ∀ v, G.psiR v z = (W v : Matrix (Fin G.n) (Fin G.n) ℂ) := fun v => congrFun hz v
   have hz2 : ∀ v, G.psiR v z' = (((W v)⁻¹ : GL (Fin G.n) ℂ) : Matrix (Fin G.n) (Fin G.n) ℂ) :=
     fun v => congrFun hz' v
-  have e1 : z * z' = 1 := hinj (funext fun v => show G.psiR v (z * z') = G.psiR v 1 by
-    rw [map_mul, map_one, hz1, hz2, Units.mul_inv])
-  have e2 : z' * z = 1 := hinj (funext fun v => show G.psiR v (z' * z) = G.psiR v 1 by
-    rw [map_mul, map_one, hz1, hz2, Units.inv_mul])
+  have e1 : z * z' = 1 :=
+    hinj (funext fun v =>
+      show G.psiR v (z * z') = G.psiR v 1 by rw [map_mul, map_one, hz1, hz2, Units.mul_inv])
+  have e2 : z' * z = 1 :=
+    hinj (funext fun v =>
+      show G.psiR v (z' * z) = G.psiR v 1 by rw [map_mul, map_one, hz1, hz2, Units.inv_mul])
   refine ⟨⟨z, z', e1, e2⟩, ?_⟩
   unfold Triv
   rw [Units.val_one, map_one]

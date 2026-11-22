@@ -4,9 +4,12 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsCMFra
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open Matrix GlobalTheory GlobalTheory.CM GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Matrix GlobalTheory GlobalTheory.CM GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl
 open scoped ComplexOrder
 
 noncomputable section
@@ -17,7 +20,8 @@ open Module Classical
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-def pure_type_projection {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ) : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ) where
+def pure_type_projection {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ)
+    : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ) where
   toFun := tyPart ty σ
   map_add' a b := by
     funext k
@@ -28,18 +32,20 @@ def pure_type_projection {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* 
     simp only [tyPart, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
     split_ifs <;> simp
 
-theorem typeProjection_apply {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ) (w : Fin g → ℂ) (k : Fin g) :
-    pure_type_projection ty σ w k = if ty k = σ then w k else 0 := by
+theorem typeProjection_apply
+    {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ) (w : Fin g → ℂ) (k : Fin g)
+    : pure_type_projection ty σ w k = if ty k = σ then w k else 0 := by
   simp [pure_type_projection, tyPart]
 
-def typeSupportedVectors {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ) : Submodule ℂ (Fin g → ℂ) where
+def typeSupportedVectors {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ)
+    : Submodule ℂ (Fin g → ℂ) where
   carrier := {w | ∀ k, ty k ≠ σ → w k = 0}
   add_mem' {a b} ha hb k hk := by simp [ha k hk, hb k hk]
   zero_mem' k _ := rfl
   smul_mem' c a ha k hk := by simp [ha k hk]
 
-theorem mem_typeSupportedVectors_iff {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ) (w : Fin g → ℂ) :
-    w ∈ typeSupportedVectors ty σ ↔ tyPart ty σ w = w := by
+theorem mem_typeSupportedVectors_iff {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ) (w : Fin g → ℂ)
+    : w ∈ typeSupportedVectors ty σ ↔ tyPart ty σ w = w := by
   constructor
   · intro h
     funext k
@@ -51,8 +57,8 @@ theorem mem_typeSupportedVectors_iff {g : ℕ} (ty : Fin g → (E →+* ℂ)) (�
     rw [← h]
     simp [tyPart, hk]
 
-def typeSupportedEquiv {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ) :
-    typeSupportedVectors ty σ ≃ₗ[ℂ] ({k // ty k = σ} → ℂ) where
+def typeSupportedEquiv {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ)
+    : typeSupportedVectors ty σ ≃ₗ[ℂ] ({k // ty k = σ} → ℂ) where
   toFun v k := v.1 k
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
@@ -68,16 +74,20 @@ def typeSupportedEquiv {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* �
     funext k
     simp [k.2]
 
-theorem finrank_typeSupportedVectors {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ) :
-    finrank ℂ (typeSupportedVectors ty σ) = Nat.card {k // ty k = σ} := by
-  rw [(typeSupportedEquiv ty σ).finrank_eq, Module.finrank_fintype_fun_eq_card, Nat.card_eq_fintype_card]
+theorem finrank_typeSupportedVectors {g : ℕ} (ty : Fin g → (E →+* ℂ)) (σ : E →+* ℂ)
+    : finrank ℂ (typeSupportedVectors ty σ) = Nat.card {k // ty k = σ} := by
+  rw [(typeSupportedEquiv ty σ).finrank_eq, Module.finrank_fintype_fun_eq_card,
+    Nat.card_eq_fintype_card]
 
-theorem type_part_linear_independent (H : Host E) (D : Datum H) {g : ℕ} (ty : Fin g → (E →+* ℂ)) (P : D.La →+ (Fin g → ℂ))
-    (hP : IsPeriod D ty P) {k k' : ℕ} (y : Fin k → D.La) (z : Fin k' → D.La) (σ : E →+* ℂ)
-    (hz : ∀ b, tyPart ty σ (P (z b)) = 0) (hcount : Nat.card {i // ty i = σ} = k)
-    (hrk : k + k' = finrank (𝓞 E) D.La) (hli : LinearIndependent (𝓞 E) (Sum.elim y z)) :
-    LinearIndependent ℂ (fun a => tyPart ty σ (P (y a))) ∧
-      ∀ w : Fin g → ℂ, w ∈ Submodule.span ℂ (Set.range fun a => tyPart ty σ (P (y a))) ↔ tyPart ty σ w = w := by
+theorem type_part_linear_independent
+    (H : Host E) (D : Datum H)
+    {g : ℕ} (ty : Fin g → (E →+* ℂ)) (P : D.La →+ (Fin g → ℂ)) (hP : IsPeriod D ty P)
+    {k k' : ℕ} (y : Fin k → D.La) (z : Fin k' → D.La)
+    (σ : E →+* ℂ) (hz : ∀ b, tyPart ty σ (P (z b)) = 0) (hcount : Nat.card {i // ty i = σ} = k)
+    (hrk : k + k' = finrank (𝓞 E) D.La) (hli : LinearIndependent (𝓞 E) (Sum.elim y z))
+    : LinearIndependent ℂ (fun a => tyPart ty σ (P (y a)))
+      ∧ ∀ w : Fin g → ℂ,
+        w ∈ Submodule.span ℂ (Set.range fun a => tyPart ty σ (P (y a))) ↔ tyPart ty σ w = w := by
   haveI := D.fin
   set T := pure_type_projection ty σ
   set S := Submodule.span ℂ (Set.range fun a => tyPart ty σ (P (y a)))
@@ -91,11 +101,13 @@ theorem type_part_linear_independent (H : Host E) (D : Datum H) {g : ℕ} (ty : 
     · rw [hP.1, h]
     · simp
 
-  have hmult : ∀ v : D.La, ∃ a : 𝓞 E, a ≠ 0 ∧ a • v ∈ Submodule.span (𝓞 E) (Set.range (Sum.elim y z)) := by
+  have hmult
+      : ∀ v : D.La, ∃ a : 𝓞 E, a ≠ 0 ∧ a • v ∈ Submodule.span (𝓞 E) (Set.range (Sum.elim y z)) := by
     intro v
     by_contra hne
     push_neg at hne
-    have hli2 : LinearIndependent (𝓞 E) (fun o : Option (Fin k ⊕ Fin k') => o.elim v (Sum.elim y z)) := by
+    have hli2
+        : LinearIndependent (𝓞 E) (fun o : Option (Fin k ⊕ Fin k') => o.elim v (Sum.elim y z)) := by
       rw [Fintype.linearIndependent_iff]
       intro c hc
       rw [Fintype.sum_option] at hc
@@ -103,10 +115,10 @@ theorem type_part_linear_independent (H : Host E) (D : Datum H) {g : ℕ} (ty : 
       have hcn : c none = 0 := by
         by_contra h0
         apply hne (c none) h0
-        have : c none • v = -∑ i, c (some i) • Sum.elim y z i := eq_neg_of_add_eq_zero_left hc
+        have : c none • v = - ∑ i, c (some i) • Sum.elim y z i := eq_neg_of_add_eq_zero_left hc
         rw [this]
-        exact Submodule.neg_mem _ (Submodule.sum_mem _ fun i _ =>
-          Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))
+        exact Submodule.neg_mem _
+          (Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))
       rw [hcn, zero_smul, zero_add] at hc
       have := Fintype.linearIndependent_iff.mp hli (fun i => c (some i)) hc
       intro o
@@ -178,8 +190,9 @@ theorem Host_rt0_conj_eq_neg (H : Host E) : starRingEnd ℂ H.rt0 = -H.rt0 := by
   apply Complex.ext
   · have h1 := congrArg Complex.re h
     have h2 := congrArg Complex.im h
-    simp only [pow_two, Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.natCast_re, Complex.neg_im,
-      Complex.natCast_im, neg_zero] at h1 h2
+    simp only [pow_two, Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.natCast_re,
+        Complex.neg_im, Complex.natCast_im, neg_zero]
+      at h1 h2
     have hb : H.rt0.im ≠ 0 := by
       intro hb
       rw [hb] at h1
@@ -201,7 +214,21 @@ theorem Host_rt0_ne_zero (H : Host E) : H.rt0 ≠ 0 := by
   have h2 : -(H.d : ℂ) = 0 := by rw [← h1]; ring
   simpa using h2
 
-theorem pure_type_projection_independent : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (P : D.La →+ (Fin g → ℂ)) (hP : IsPeriod D ty P) (p q : ℕ) (x : Fin p ⊕ Fin q → D.La) (τ : E →+* ℂ), IsTypeFn H p q ty → p + q = D.p + D.q → τ (H.rt : E) = H.rt0 → IsPure hP x → LinearIndependent (𝓞 E) x → (LinearIndependent ℂ (fun a => tyPart ty τ (P (x (.inl a)))) ∧ ∀ w : Fin g → ℂ, w ∈ Submodule.span ℂ (Set.range fun a => tyPart ty τ (P (x (.inl a)))) ↔ tyPart ty τ w = w) ∧ LinearIndependent ℂ (fun a => tyPart ty (ComplexEmbedding.conjugate τ) (P (x (.inr a)))) ∧ ∀ w : Fin g → ℂ, w ∈ Submodule.span ℂ (Set.range fun a => tyPart ty (ComplexEmbedding.conjugate τ) (P (x (.inr a)))) ↔ tyPart ty (ComplexEmbedding.conjugate τ) w = w := by
+theorem pure_type_projection_independent
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (g : ℕ)
+        (ty : Fin g → (E →+* ℂ)) (P : D.La →+ (Fin g → ℂ)) (hP : IsPeriod D ty P) (p q : ℕ)
+        (x : Fin p ⊕ Fin q → D.La) (τ : E →+* ℂ),
+      IsTypeFn H p q ty → p + q = D.p + D.q → τ (H.rt : E) = H.rt0 → IsPure hP x
+        → LinearIndependent (𝓞 E) x
+        → (LinearIndependent ℂ (fun a => tyPart ty τ (P (x (.inl a))))
+            ∧ ∀ w : Fin g → ℂ,
+              w ∈ Submodule.span ℂ (Set.range fun a => tyPart ty τ (P (x (.inl a))))
+                ↔ tyPart ty τ w = w)
+          ∧ LinearIndependent ℂ (fun a => tyPart ty (ComplexEmbedding.conjugate τ) (P (x (.inr a))))
+          ∧ ∀ w : Fin g → ℂ,
+            w ∈ Submodule.span ℂ
+                (Set.range fun a => tyPart ty (ComplexEmbedding.conjugate τ) (P (x (.inr a))))
+              ↔ tyPart ty (ComplexEmbedding.conjugate τ) w = w := by
   intro E _ _ _ H D g ty P hP p q x τ hty hpq hτ hpure hli
   have hne : H.rt0 ≠ -H.rt0 := by
     intro h
@@ -212,7 +239,10 @@ theorem pure_type_projection_independent : ∀ (E : Type) [Field E] [NumberField
     rw [ComplexEmbedding.conjugate_coe_eq, hτ, Host_rt0_conj_eq_neg]
   have hrk : p + q = finrank (𝓞 E) D.La := by rw [hpq, D.rank]
   constructor
-  · refine type_part_linear_independent H D ty P hP (fun a => x (.inl a)) (fun b => x (.inr b)) τ ?_ ((hty τ).1 hτ) hrk ?_
+  · refine type_part_linear_independent H D ty P hP
+      (fun a => x (.inl a))
+      (fun b => x (.inr b))
+      τ ?_ ((hty τ).1 hτ) hrk ?_
     · intro b
       funext i
       simp only [tyPart, Pi.zero_apply]
@@ -229,7 +259,10 @@ theorem pure_type_projection_independent : ∀ (E : Type) [Field E] [NumberField
       apply ((hty _).2)
       rw [hcτ]
       exact hne.symm
-    refine type_part_linear_independent H D ty P hP (fun b => x (.inr b)) (fun a => x (.inl a)) _ ?_ hq (by rw [← hrk, add_comm]) ?_
+    refine type_part_linear_independent H D ty P hP
+      (fun b => x (.inr b))
+      (fun a => x (.inl a))
+      _ ?_ hq (by rw [← hrk, add_comm]) ?_
     · intro a
       funext i
       simp only [tyPart, Pi.zero_apply]

@@ -19,9 +19,11 @@ open ModularForm EisensteinSeries ModularFormClass UpperHalfPlane Formalism.L2.T
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem isIntegral_of_root {P : Polynomial ℂ} (hP : ∀ i, IsIntegral ℤ (P.coeff i))
-    (hu : IsIntegral ℤ (P.leadingCoeff)⁻¹) (h0 : P.leadingCoeff ≠ 0) {x : ℂ} (hx : P.eval x = 0) :
-    IsIntegral ℤ x := by
+theorem isIntegral_of_root
+    {P : Polynomial ℂ} (hP : ∀ i, IsIntegral ℤ (P.coeff i)) (hu : IsIntegral ℤ (P.leadingCoeff)⁻¹)
+    (h0 : P.leadingCoeff ≠ 0)
+    {x : ℂ} (hx : P.eval x = 0)
+    : IsIntegral ℤ x := by
   have hmon : (Polynomial.C (P.leadingCoeff)⁻¹ * P).Monic :=
     Polynomial.monic_C_mul_of_mul_leadingCoeff_eq_one (inv_mul_cancel₀ h0)
   have hdeg : (Polynomial.C (P.leadingCoeff)⁻¹ * P).natDegree ≠ 0 := by
@@ -38,20 +40,22 @@ theorem isIntegral_of_root {P : Polynomial ℂ} (hP : ∀ i, IsIntegral ℤ (P.c
     rw [Polynomial.coeff_C_mul]
     exact hu.mul (hP i)
 
-theorem jT_isIntegral {m : ℕ} (hm : 0 < m) (hsq : ¬ IsSquare m) {τ : ℍ} (h : Gm m τ = 0) :
-    IsIntegral ℤ (jT τ) := by
+theorem jT_isIntegral {m : ℕ} (hm : 0 < m) (hsq : ¬ IsSquare m) {τ : ℍ} (h : Gm m τ = 0)
+    : IsIntegral ℤ (jT τ) := by
   obtain ⟨n0, u, hu1, hu2, hu3, hlow, hcoef⟩ := gmQ_low hm hsq
   have hmf : IsMF (12 * ((2 * (Tm m).card : ℕ) : ℤ)) (Gm m) :=
     (gmForm hm).congr_weight (by push_cast; ring)
-  obtain ⟨P, hPR, -, hlead, hval⟩ := qPrin_low (Rm m) _ (Gm m) hmf (gmQ_coeffIn hm) n0 u hu3 hlow hcoef
+  obtain ⟨P, hPR, -, hlead, hval⟩ :=
+    qPrin_low (Rm m) _ (Gm m) hmf (gmQ_coeffIn hm) n0 u hu3 hlow hcoef
   have h1 := hval τ
   rw [h] at h1
   have h2 : P.eval (jT τ) = 0 := by
     rcases mul_eq_zero.mp h1.symm with h3 | h3
     · exact absurd h3 (pow_ne_zero _ (DD_ne_zero τ))
     · exact h3
-  exact isIntegral_of_root (fun i => Rm_isIntegral hm (hPR i)) (by rw [hlead]; exact Rm_isIntegral hm hu2)
-    (by rw [hlead]; exact hu3) h2
+  exact isIntegral_of_root
+    (fun i => Rm_isIntegral hm (hPR i))
+    (by rw [hlead]; exact Rm_isIntegral hm hu2) (by rw [hlead]; exact hu3) h2
 
 theorem cm1 : JInvariantIntegrality := by
   intro d L hsf hd4 hL

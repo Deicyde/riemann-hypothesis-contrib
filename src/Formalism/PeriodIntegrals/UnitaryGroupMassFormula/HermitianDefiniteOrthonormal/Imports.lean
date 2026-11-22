@@ -10,11 +10,17 @@ namespace PI.UnitaryGroupMassFormula.HermDefON
 open Matrix
 open scoped ComplexOrder
 
-private theorem exists_unitary_diagonal_pos_of_posDef {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (hG : G.PosDef) :
-    ∃ (U : Matrix (Fin n) (Fin n) ℂ) (μ : Fin n → ℝ), Uᴴ * U = 1 ∧ (∀ i, 0 < μ i) ∧
-      G = U * diagonal (fun i => (μ i : ℂ)) * Uᴴ := by
-  refine ⟨(hG.1.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ), hG.1.eigenvalues, ?_,
-    fun i => hG.eigenvalues_pos i, ?_⟩
+private theorem exists_unitary_diagonal_pos_of_posDef
+    {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (hG : G.PosDef)
+    : ∃ (U : Matrix (Fin n) (Fin n) ℂ) (μ : Fin n → ℝ),
+      Uᴴ * U = 1 ∧ (∀ i, 0 < μ i) ∧ G = U * diagonal (fun i => (μ i : ℂ)) * Uᴴ := by
+  refine ⟨
+    (hG.1.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ),
+    hG.1.eigenvalues,
+    ?_,
+    fun i => hG.eigenvalues_pos i,
+    ?_
+  ⟩
   · have h := hG.1.eigenvectorUnitary.2
     rw [Matrix.mem_unitaryGroup_iff'] at h
     simpa [Matrix.star_eq_conjTranspose] using h
@@ -22,8 +28,8 @@ private theorem exists_unitary_diagonal_pos_of_posDef {n : ℕ} (G : Matrix (Fin
     refine h.trans ?_
     rfl
 
-theorem exists_congr_one {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (hG : G.PosDef) :
-    ∃ y : Matrix (Fin n) (Fin n) ℂ, IsUnit y.det ∧ yᴴ * G * y = 1 := by
+theorem exists_congr_one {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (hG : G.PosDef)
+    : ∃ y : Matrix (Fin n) (Fin n) ℂ, IsUnit y.det ∧ yᴴ * G * y = 1 := by
   classical
   obtain ⟨U, μ, hUU, hμ, hG'⟩ := exists_unitary_diagonal_pos_of_posDef G hG
   have hr : ∀ i, Real.sqrt (μ i) * (Real.sqrt (μ i))⁻¹ = 1 := fun i =>
@@ -32,9 +38,10 @@ theorem exists_congr_one {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (hG : G.PosD
     intro i
     have hs : Real.sqrt (μ i) ≠ 0 := (Real.sqrt_pos.mpr (hμ i)).ne'
     have hsq : Real.sqrt (μ i) * Real.sqrt (μ i) = μ i := Real.mul_self_sqrt (hμ i).le
-    calc (Real.sqrt (μ i))⁻¹ * μ i * (Real.sqrt (μ i))⁻¹
-        = (Real.sqrt (μ i))⁻¹ * (Real.sqrt (μ i) * Real.sqrt (μ i)) * (Real.sqrt (μ i))⁻¹ := by
-          rw [hsq]
+    calc
+      (Real.sqrt (μ i))⁻¹ * μ i * (Real.sqrt (μ i))⁻¹
+          = (Real.sqrt (μ i))⁻¹ * (Real.sqrt (μ i) * Real.sqrt (μ i)) * (Real.sqrt (μ i))⁻¹ := by
+        rw [hsq]
       _ = 1 := by rw [← mul_assoc, inv_mul_cancel₀ hs, one_mul, mul_inv_cancel₀ hs]
   let d : Fin n → ℂ := fun i => (((Real.sqrt (μ i))⁻¹ : ℝ) : ℂ)
   let e : Fin n → ℂ := fun i => ((Real.sqrt (μ i) : ℝ) : ℂ)
@@ -53,17 +60,19 @@ theorem exists_congr_one {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (hG : G.PosD
     simp [d]
   refine ⟨U * diagonal d, ?_, ?_⟩
   · have h : diagonal e * Uᴴ * (U * diagonal d) = 1 := by
-      calc diagonal e * Uᴴ * (U * diagonal d) = diagonal e * (Uᴴ * U) * diagonal d := by
-            simp only [Matrix.mul_assoc]
+      calc
+        diagonal e * Uᴴ * (U * diagonal d)
+          = diagonal e * (Uᴴ * U) * diagonal d := by simp only [Matrix.mul_assoc]
         _ = 1 := by
           rw [hUU, Matrix.mul_one, Matrix.diagonal_mul_diagonal]
           simp only [hde]
           exact Matrix.diagonal_one
     exact Matrix.isUnit_det_of_left_inverse h
   · rw [Matrix.conjTranspose_mul, hdH, hG']
-    calc diagonal d * Uᴴ * (U * diagonal (fun i => (μ i : ℂ)) * Uᴴ) * (U * diagonal d)
-        = diagonal d * (Uᴴ * U) * diagonal (fun i => (μ i : ℂ)) * (Uᴴ * U) * diagonal d := by
-          simp only [Matrix.mul_assoc]
+    calc
+      diagonal d * Uᴴ * (U * diagonal (fun i => (μ i : ℂ)) * Uᴴ) * (U * diagonal d)
+          = diagonal d * (Uᴴ * U) * diagonal (fun i => (μ i : ℂ)) * (Uᴴ * U) * diagonal d := by
+        simp only [Matrix.mul_assoc]
       _ = 1 := by
         rw [hUU, Matrix.mul_one, Matrix.mul_one, Matrix.diagonal_mul_diagonal,
           Matrix.diagonal_mul_diagonal]

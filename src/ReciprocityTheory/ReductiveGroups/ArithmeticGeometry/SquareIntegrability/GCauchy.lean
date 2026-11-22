@@ -43,9 +43,11 @@ theorem gCauchy : GCauchyStatement := by
     e ((Finsupp.toMultiset α).toList.get (j.cast (Multiset.length_toList _).symm))
   have hc := cauchy_gauss_le G hG S hGS l
   have hF' : ContDiff ℂ k F := contDiff_of_differentiable_fd hF k
-  have hcomp : iteratedFDeriv ℂ k G 0 (fun j => Pi.single (l j) 1) =
-      iteratedFDeriv ℂ k F 0 (fun j => EuclideanSpace.single
-        ((Finsupp.toMultiset α).toList.get (j.cast (Multiset.length_toList _).symm)) 1) := by
+  have hcomp
+      : iteratedFDeriv ℂ k G 0 (fun j => Pi.single (l j) 1)
+        = iteratedFDeriv ℂ k F 0 (fun j =>
+          EuclideanSpace.single
+            ((Finsupp.toMultiset α).toList.get (j.cast (Multiset.length_toList _).symm)) 1) := by
     rw [show G = F ∘ T from rfl, T.iteratedFDeriv_comp_right hF' 0 le_rfl]
     simp only [ContinuousMultilinearMap.compContinuousLinearMap_apply, map_zero]
     congr 1
@@ -53,9 +55,7 @@ theorem gCauchy : GCauchyStatement := by
     exact hTs _
   have hk : k = α.degree := by
     simp only [k, Finsupp.card_toMultiset]
-    first
-      | rfl
-      | simp [Finsupp.sum, Finsupp.degree]
+    first | rfl | simp [Finsupp.sum, Finsupp.degree]
   have hdeg : (k : ℝ) = (α.degree : ℝ) := by rw [hk]
   unfold polyDeriv
   rw [MvPolynomial.support_monomial, if_neg one_ne_zero, Finset.sum_singleton,

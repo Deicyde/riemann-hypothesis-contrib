@@ -19,24 +19,28 @@ def S (E : Fin n → Fin n → Module.End ℂ U) (x0 : U) : ℕ → Submodule �
   | 0 => ℂ ∙ x0
   | j + 1 => S E x0 j ⊔ ⨆ c, ⨆ d, (S E x0 j).map (E c d)
 
-theorem S_le_succ (E : Fin n → Fin n → Module.End ℂ U) (x0 : U) (j : ℕ) : S E x0 j ≤ S E x0 (j + 1) :=
+theorem S_le_succ (E : Fin n → Fin n → Module.End ℂ U) (x0 : U) (j : ℕ)
+    : S E x0 j ≤ S E x0 (j + 1) :=
   le_sup_left
 
-theorem E_mem_S (E : Fin n → Fin n → Module.End ℂ U) (x0 : U) {j : ℕ} {y : U} (hy : y ∈ S E x0 j) (c d : Fin n) :
-    E c d y ∈ S E x0 (j + 1) := by
+theorem E_mem_S
+    (E : Fin n → Fin n → Module.End ℂ U) (x0 : U) {j : ℕ} {y : U} (hy : y ∈ S E x0 j) (c d : Fin n)
+    : E c d y ∈ S E x0 (j + 1) := by
   have h : (S E x0 j).map (E c d) ≤ S E x0 (j + 1) :=
     le_sup_of_le_right (le_iSup_of_le c (le_iSup_of_le d le_rfl))
   exact h (Submodule.mem_map_of_mem hy)
 
-theorem base_vector_mem_span_filtration (E : Fin n → Fin n → Module.End ℂ U) (x0 : U) : ∀ j, x0 ∈ S E x0 j
+theorem base_vector_mem_span_filtration (E : Fin n → Fin n → Module.End ℂ U) (x0 : U)
+    : ∀ j, x0 ∈ S E x0 j
   | 0 => Submodule.mem_span_singleton_self x0
   | j + 1 => S_le_succ E x0 j (base_vector_mem_span_filtration E x0 j)
 
 theorem S_mono (E : Fin n → Fin n → Module.End ℂ U) (x0 : U) : Monotone (S E x0) :=
   monotone_nat_of_le_succ (S_le_succ E x0)
 
-theorem raise_S {E : Fin n → Fin n → Module.End ℂ U} {x0 : U} (hgl : GlRel E) (hx : ∀ a b, a < b → E a b x0 = 0) :
-    ∀ j, ∀ a b : Fin n, a < b → ∀ y ∈ S E x0 j, E a b y ∈ S E x0 j := by
+theorem raise_S
+    {E : Fin n → Fin n → Module.End ℂ U} {x0 : U} (hgl : GlRel E) (hx : ∀ a b, a < b → E a b x0 = 0)
+    : ∀ j, ∀ a b : Fin n, a < b → ∀ y ∈ S E x0 j, E a b y ∈ S E x0 j := by
   intro j
   induction j with
   | zero =>
@@ -56,8 +60,10 @@ theorem raise_S {E : Fin n → Fin n → Module.End ℂ U} {x0 : U} (hgl : GlRel
         show E a b (E c d u) ∈ S E x0 (j + 1)
         have hc := congrArg (fun T : Module.End ℂ U => T u) (hgl a b c d)
         simp only [LinearMap.sub_apply, Module.End.mul_apply] at hc
-        have hsplit : E a b (E c d u) = E c d (E a b u) +
-            ((if b = c then E a d else 0) - (if d = a then E c b else 0)) u := by
+        have hsplit
+            : E a b (E c d u)
+              = E c d (E a b u)
+                + ((if b = c then E a d else 0) - (if d = a then E c b else 0)) u := by
           rw [LinearMap.sub_apply, ← hc]; abel
         rw [hsplit, LinearMap.sub_apply]
         refine Submodule.add_mem _ (E_mem_S E x0 (ih a b hab u hu) c d) (Submodule.sub_mem _ ?_ ?_)
@@ -69,10 +75,11 @@ theorem raise_S {E : Fin n → Fin n → Module.End ℂ U} {x0 : U} (hgl : GlRel
           · rw [LinearMap.zero_apply]; exact Submodule.zero_mem _
     exact hle hy
 
-theorem psi_S {E : Fin n → Fin n → Module.End ℂ U} {x0 : U} {ν : Fin n → ℂ} (hgl : GlRel E) (hx : IsHW E ν x0)
+theorem psi_S
+    {E : Fin n → Fin n → Module.End ℂ U} {x0 : U} {ν : Fin n → ℂ} (hgl : GlRel E) (hx : IsHW E ν x0)
     (ψ : U →ₗ[ℂ] ℂ) (hlow : ∀ a b : Fin n, b < a → ∀ u, ψ (E a b u) = 0)
-    (hdiag : ∀ (a : Fin n) (u : U), ψ (E a a u) = ν a * ψ u) (h0 : ψ x0 = 0) :
-    ∀ j, ∀ y ∈ S E x0 j, ψ y = 0 := by
+    (hdiag : ∀ (a : Fin n) (u : U), ψ (E a a u) = ν a * ψ u) (h0 : ψ x0 = 0)
+    : ∀ j, ∀ y ∈ S E x0 j, ψ y = 0 := by
   intro j
   induction j with
   | zero =>
@@ -107,9 +114,11 @@ theorem W_stab (E : Fin n → Fin n → Module.End ℂ U) (x0 : U) : Qr.Stab E (
   obtain ⟨j, hj⟩ := mem_W.mp hy
   exact mem_W.mpr ⟨j + 1, E_mem_S E x0 hj a b⟩
 
-theorem lowest_functional_vanishes_on_module {E : Fin n → Fin n → Module.End ℂ U} {x0 : U} {ν : Fin n → ℂ} (hgl : GlRel E) (hx : IsHW E ν x0)
+theorem lowest_functional_vanishes_on_module
+    {E : Fin n → Fin n → Module.End ℂ U} {x0 : U} {ν : Fin n → ℂ} (hgl : GlRel E) (hx : IsHW E ν x0)
     (ψ : U →ₗ[ℂ] ℂ) (hlow : ∀ a b : Fin n, b < a → ∀ u, ψ (E a b u) = 0)
-    (hdiag : ∀ (a : Fin n) (u : U), ψ (E a a u) = ν a * ψ u) (h0 : ψ x0 = 0) : ∀ y ∈ W E x0, ψ y = 0 := by
+    (hdiag : ∀ (a : Fin n) (u : U), ψ (E a a u) = ν a * ψ u) (h0 : ψ x0 = 0)
+    : ∀ y ∈ W E x0, ψ y = 0 := by
   intro y hy
   obtain ⟨j, hj⟩ := mem_W.mp hy
   exact psi_S hgl hx ψ hlow hdiag h0 j y hj
@@ -118,24 +127,28 @@ end Cyc
 
 section HW
 
-theorem hw_of {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Nontrivial V] {n : ℕ}
-    (E : Fin n → Fin n → Module.End ℂ V) (m : Fin n → ℂ) (hgl : GlRel E) (hsd : Qr.SDec m)
-    (hcap : ∀ (w : ℂ) (v : V), qdet E w v = Qr.cpol m w • v) :
-    ∃ v : V, v ≠ 0 ∧ IsHW E (fun j => m j + ((j : ℕ) : ℂ)) v := by
+theorem hw_of
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] [Nontrivial V]
+    {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (m : Fin n → ℂ) (hgl : GlRel E) (hsd : Qr.SDec m)
+    (hcap : ∀ (w : ℂ) (v : V), qdet E w v = Qr.cpol m w • v)
+    : ∃ v : V, v ≠ 0 ∧ IsHW E (fun j => m j + ((j : ℕ) : ℂ)) v := by
   have htop : Qr.CapSp E m = ⊤ := eq_top_iff.mpr fun x _ => Qr.mem_CapSp.mpr fun w => hcap w x
   obtain ⟨ν, v, -, hv0, hhw, -⟩ :=
     exists_singular_maximal_vector V n E hgl ⊤ (fun _ _ _ _ => trivial) top_ne_bot
-  have hs := (capelli_singular V n E m hgl (by rw [htop]; exact top_ne_bot)).2 hsd ν v
-    (by rw [htop]; trivial) hv0 hhw
+  have hs :=
+    (capelli_singular V n E m hgl (by rw [htop]; exact top_ne_bot)).2 hsd ν v
+      (by rw [htop]; trivial) hv0 hhw
   have hν : ν = fun j => m j + ((j : ℕ) : ℂ) := funext hs
   exact ⟨v, hv0, hν ▸ hhw⟩
 
-theorem functional_of {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] {n : ℕ}
-    (E : Fin n → Fin n → Module.End ℂ V) (m : Fin n → ℂ) (hgl : GlRel E) (hirr : Qr.Irr E) (hsd : Qr.SDec m)
-    (hcap : ∀ (w : ℂ) (v : V), qdet E w v = Qr.cpol m w • v) (v : V) (hv : IsHW E (fun j => m j + ((j : ℕ) : ℂ)) v)
-    (hv0 : v ≠ 0) :
-    ∃ φ : V →ₗ[ℂ] ℂ, φ v = 1 ∧ (∀ a b : Fin n, b < a → ∀ u, φ (E a b u) = 0) ∧
-      ∀ (a : Fin n) (u : V), φ (E a a u) = (m a + ((a : ℕ) : ℂ)) * φ u := by
+theorem functional_of
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (m : Fin n → ℂ) (hgl : GlRel E) (hirr : Qr.Irr E)
+    (hsd : Qr.SDec m) (hcap : ∀ (w : ℂ) (v : V), qdet E w v = Qr.cpol m w • v)
+    (v : V) (hv : IsHW E (fun j => m j + ((j : ℕ) : ℂ)) v) (hv0 : v ≠ 0)
+    : ∃ φ : V →ₗ[ℂ] ℂ,
+      φ v = 1 ∧ (∀ a b : Fin n, b < a → ∀ u, φ (E a b u) = 0)
+        ∧ ∀ (a : Fin n) (u : V), φ (E a a u) = (m a + ((a : ℕ) : ℂ)) * φ u := by
   classical
   obtain ⟨hdgl, hdmin⟩ := dual_minor V n E hgl
   have : Nontrivial (Module.Dual ℂ V) := by
@@ -168,7 +181,8 @@ theorem functional_of {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensio
     apply hφ0
     have hW : W E v = ⊤ := by
       rcases hirr.2 (W E v) (W_stab E v) with h | h
-      · exfalso; apply hv0
+      · exfalso
+        apply hv0
         have := base_point_mem_half_plane_alt E v
         rw [h] at this
         exact (Submodule.mem_bot ℂ).mp this
@@ -190,12 +204,14 @@ section Prod
 
 variable {V V' : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V'] {n : ℕ}
 
-def Ep (E : Fin n → Fin n → Module.End ℂ V) (E' : Fin n → Fin n → Module.End ℂ V') :
-    Fin n → Fin n → Module.End ℂ (V × V') :=
-  fun a b => LinearMap.prodMap (E a b) (E' a b)
+def Ep (E : Fin n → Fin n → Module.End ℂ V) (E' : Fin n → Fin n → Module.End ℂ V')
+    : Fin n → Fin n → Module.End ℂ (V × V') := fun a b =>
+  LinearMap.prodMap (E a b) (E' a b)
 
-theorem glRel_Ep {E : Fin n → Fin n → Module.End ℂ V} {E' : Fin n → Fin n → Module.End ℂ V'} (hgl : GlRel E)
-    (hgl' : GlRel E') : GlRel (Ep E E') := by
+theorem glRel_Ep
+    {E : Fin n → Fin n → Module.End ℂ V} {E' : Fin n → Fin n → Module.End ℂ V'}
+    (hgl : GlRel E) (hgl' : GlRel E')
+    : GlRel (Ep E E') := by
   intro a b c d
   apply LinearMap.ext
   intro p
@@ -228,15 +244,16 @@ theorem lie_algebra_isomorphism_holds : KLIsoAlg := by
   have hx : IsHW F ν x0 := by
     refine ⟨fun a => ?_, fun a b hab => ?_⟩
     · simp only [hF, Ep, hx0, LinearMap.prodMap_apply, hvhw.1 a, hvhw'.1 a, Prod.smul_mk]
-    · simp only [hF, Ep, hx0, LinearMap.prodMap_apply, hvhw.2 a b hab, hvhw'.2 a b hab, Prod.mk_zero_zero]
+    · simp only [hF, Ep, hx0, LinearMap.prodMap_apply, hvhw.2 a b hab, hvhw'.2 a b hab,
+        Prod.mk_zero_zero]
   set ψ : V × V' →ₗ[ℂ] ℂ := φ.comp (LinearMap.fst ℂ V V') - φ'.comp (LinearMap.snd ℂ V V') with hψ
   have hψlow : ∀ a b : Fin n, b < a → ∀ u, ψ (F a b u) = 0 := by
     intro a b hba u
     simp [hψ, hF, Ep, hφlow a b hba, hφlow' a b hba]
   have hψdiag : ∀ (a : Fin n) (u : V × V'), ψ (F a a u) = ν a * ψ u := by
     intro a u
-    simp only [hψ, hF, Ep, LinearMap.sub_apply, LinearMap.comp_apply, LinearMap.fst_apply, LinearMap.snd_apply,
-      LinearMap.prodMap_apply, hφdiag, hφdiag', hν]
+    simp only [hψ, hF, Ep, LinearMap.sub_apply, LinearMap.comp_apply, LinearMap.fst_apply,
+      LinearMap.snd_apply, LinearMap.prodMap_apply, hφdiag, hφdiag', hν]
     ring
   have hψ0 : ψ x0 = 0 := by simp [hψ, hx0, hφv, hφv']
   have hkill := lowest_functional_vanishes_on_module hglF hx ψ hψlow hψdiag hψ0
@@ -264,7 +281,8 @@ theorem lie_algebra_isomorphism_holds : KLIsoAlg := by
     have hmem : (w : V × V').1 ∈ K := by
       show ((w : V × V').1, (0 : V')) ∈ Wm
       have : ((w : V × V').1, (0 : V')) = (w : V × V') := by ext <;> simp [h2]
-      rw [this]; exact w.2
+      rw [this]
+      exact w.2
     rw [hKbot] at hmem
     have h1 : (w : V × V').1 = 0 := (Submodule.mem_bot ℂ).mp hmem
     ext <;> simp [h1, h2]
@@ -276,8 +294,10 @@ theorem lie_algebra_isomorphism_holds : KLIsoAlg := by
       refine ⟨⟨F a b (w : V × V'), hstab a b _ w.2⟩, ?_⟩
       simp [hp2, hF, Ep]
     rcases hirr'.2 _ hRst with h | h
-    · exfalso; apply hv0'
-      have : v' ∈ LinearMap.range p2 := ⟨⟨x0, base_point_mem_half_plane_alt F x0⟩, by simp [hp2, hx0]⟩
+    · exfalso
+      apply hv0'
+      have : v' ∈ LinearMap.range p2 :=
+        ⟨⟨x0, base_point_mem_half_plane_alt F x0⟩, by simp [hp2, hx0]⟩
       rw [h] at this
       exact (Submodule.mem_bot ℂ).mp this
     · exact h
@@ -299,8 +319,8 @@ theorem lie_algebra_isomorphism_holds : KLIsoAlg := by
       show E' a b y = p2 ⟨F a b (w : V × V'), hstab a b _ w.2⟩
       rw [← hpw]
       simp [hp2, hF, Ep]
-    simp only [LinearMap.comp_apply, hA, LinearEquiv.coe_coe, hs, Submodule.subtype_apply, LinearMap.fst_apply,
-      hF, Ep, LinearMap.prodMap_apply, hw]
+    simp only [LinearMap.comp_apply, hA, LinearEquiv.coe_coe, hs, Submodule.subtype_apply,
+      LinearMap.fst_apply, hF, Ep, LinearMap.prodMap_apply, hw]
 
 end
 

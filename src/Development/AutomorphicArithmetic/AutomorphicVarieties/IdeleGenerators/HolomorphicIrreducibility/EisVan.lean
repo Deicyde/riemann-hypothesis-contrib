@@ -23,14 +23,19 @@ private lemma vecMul_mem_cSet {N : ℕ} {b : Fin 2 → ZMod N} {v : Fin 2 → �
 
 private def cEquiv {N : ℕ} (b : Fin 2 → ZMod N) (γ : SL(2, ℤ)) : cSet b ≃ cSet (b ᵥ* γ) where
   toFun v := ⟨v.1 ᵥ* γ, vecMul_mem_cSet v.2 γ⟩
-  invFun v := ⟨v.1 ᵥ* ↑(γ⁻¹), by
+  invFun v := ⟨
+    v.1 ᵥ* ↑(γ⁻¹),
+    by
       have := vecMul_mem_cSet v.2 γ⁻¹
-      have h1 : ((γ : SL(2, ZMod N)) : Matrix (Fin 2) (Fin 2) (ZMod N)) *
-          (((γ⁻¹ : SL(2, ℤ)) : SL(2, ZMod N)) : Matrix (Fin 2) (Fin 2) (ZMod N)) = 1 := by
+      have h1
+          : ((γ : SL(2, ZMod N)) : Matrix (Fin 2) (Fin 2) (ZMod N))
+              * (((γ⁻¹ : SL(2, ℤ)) : SL(2, ZMod N)) : Matrix (Fin 2) (Fin 2) (ZMod N))
+            = 1 := by
         have h0 : (γ : SL(2, ZMod N)) * ((γ⁻¹ : SL(2, ℤ)) : SL(2, ZMod N)) = 1 :=
           (map_mul (SpecialLinearGroup.map (Int.castRingHom (ZMod N))) γ γ⁻¹).symm.trans (by simp)
         exact congrArg Subtype.val h0
-      rwa [vecMul_vecMul, h1, vecMul_one] at this⟩
+      rwa [vecMul_vecMul, h1, vecMul_one] at this
+  ⟩
   left_inv v := by
     have h : (γ : Matrix (Fin 2) (Fin 2) ℤ) * ((γ⁻¹ : SL(2, ℤ)) : Matrix (Fin 2) (Fin 2) ℤ) = 1 :=
       congrArg Subtype.val (mul_inv_cancel γ)
@@ -54,8 +59,8 @@ private lemma cSer_slash {N : ℕ} (b : Fin 2 → ZMod N) (k : ℤ) (γ : SL(2, 
   congr 1
   exact (cEquiv b γ).tsum_eq (eisSummand k · z)
 
-private noncomputable def cSIF {N : ℕ} (b : Fin 2 → ZMod N) (k : ℤ) :
-    SlashInvariantForm (CongruenceSubgroup.Gamma N) k where
+private noncomputable def cSIF {N : ℕ} (b : Fin 2 → ZMod N) (k : ℤ)
+    : SlashInvariantForm (CongruenceSubgroup.Gamma N) k where
   toFun := cSer b k
   slash_action_eq' A hA := by
     obtain ⟨A, (hA : A ∈ CongruenceSubgroup.Gamma N), rfl⟩ := hA
@@ -160,8 +165,7 @@ private lemma eisFun_eq (N k : ℕ) (a : ZMod N) :
 
 end UpperTheory.V.Sd
 
-theorem UpperTheory.V.Sd.eisVan :
-    UpperTheory.V.Sd.EisVan := by
+theorem UpperTheory.V.Sd.eisVan : UpperTheory.V.Sd.EisVan := by
   intro N k _ hk a ha hN γ hγ
   rw [UpperTheory.V.Sd.eisFun_eq, ModularForm.SL_smul_slash, UpperTheory.V.Sd.cSer_slash]
   apply Filter.ZeroAtFilter.smul
@@ -169,7 +173,9 @@ theorem UpperTheory.V.Sd.eisVan :
   have hc : ((γ 1 0 : ℤ) : ZMod N) ≠ 0 := by
     rw [Ne, ZMod.intCast_zmod_eq_zero_iff_dvd]
     exact hγ
-  have e : (![0, a] ᵥ* ((γ : SL(2, ZMod N)) : Matrix (Fin 2) (Fin 2) (ZMod N))) 0 = a * ((γ 1 0 : ℤ) : ZMod N) := by
+  have e
+      : (![0, a] ᵥ* ((γ : SL(2, ZMod N)) : Matrix (Fin 2) (Fin 2) (ZMod N))) 0
+        = a * ((γ 1 0 : ℤ) : ZMod N) := by
     simp [Matrix.vecMul, dotProduct, Fin.sum_univ_two, SpecialLinearGroup.map_apply_coe,
       RingHom.mapMatrix_apply]
   rw [e]

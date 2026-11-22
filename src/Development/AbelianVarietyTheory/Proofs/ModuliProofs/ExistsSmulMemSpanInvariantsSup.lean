@@ -10,20 +10,25 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSumSmul
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 
 namespace GlobalTheory
 
-theorem exists_smul_mem_span_invariants_sup :
-    ∀ (Γ : Type) [Group Γ] [Finite Γ] (B : Type) [CommRing B] [MulSemiringAction Γ B] (N : Type)
-      [AddCommGroup N] [Module B N] [DistribMulAction Γ N],
-      (∀ (g : Γ) (b : B) (x : N), g • (b • x) = (g • b) • (g • x)) → ∀ q : Ideal B, q.IsPrime →
-      (Nat.card (q.inertia Γ) : B) ∉ q →
-      (∀ g ∈ q.inertia Γ, ∀ x : N, g • x - x ∈ q • (⊤ : Submodule B N)) →
-      ∀ x : N, ∃ s : B, s ∉ q ∧
-        s • x ∈ Submodule.span B {y : N | ∀ g : Γ, g • y = y} ⊔ q • (⊤ : Submodule B N) := by
+theorem exists_smul_mem_span_invariants_sup
+    : ∀ (Γ : Type) [Group Γ] [Finite Γ] (B : Type) [CommRing B] [MulSemiringAction Γ B] (N : Type)
+        [AddCommGroup N] [Module B N] [DistribMulAction Γ N],
+      (∀ (g : Γ) (b : B) (x : N), g • (b • x) = (g • b) • (g • x))
+        → ∀ q : Ideal B,
+          q.IsPrime → (Nat.card (q.inertia Γ) : B) ∉ q
+            → (∀ g ∈ q.inertia Γ, ∀ x : N, g • x - x ∈ q • (⊤ : Submodule B N))
+            → ∀ x : N, ∃ s : B,
+              s ∉ q
+                ∧ s • x
+                  ∈ Submodule.span B {y : N | ∀ g : Γ, g • y = y} ⊔ q • (⊤ : Submodule B N) := by
   intro Γ _ _ B _ _ N _ _ _ hsemi q hq hcard htriv x
   classical
   have : Fintype Γ := Fintype.ofFinite Γ
@@ -47,8 +52,8 @@ theorem exists_smul_mem_span_invariants_sup :
   have hc : Nat.card (q.inertia Γ) = (Finset.univ.filter (fun g : Γ => g ∈ q.inertia Γ)).card := by
     rw [Nat.card_eq_fintype_card]
     exact Fintype.card_subtype _
-  have hsumI : ((Nat.card (q.inertia Γ) : B) * s) • x
-      = ∑ g : Γ, if g ∈ q.inertia Γ then s • x else 0 := by
+  have hsumI
+      : ((Nat.card (q.inertia Γ) : B) * s) • x = ∑ g : Γ, if g ∈ q.inertia Γ then s • x else 0 := by
     rw [← Finset.sum_filter, Finset.sum_const, hc, ← Nat.cast_smul_eq_nsmul B, smul_smul]
 
   have hdiff : z - ((Nat.card (q.inertia Γ) : B) * s) • x ∈ q • (⊤ : Submodule B N) := by
@@ -56,8 +61,9 @@ theorem exists_smul_mem_span_invariants_sup :
     refine Submodule.sum_mem _ (fun g _ => ?_)
     by_cases hg : g ∈ q.inertia Γ
     · rw [if_pos hg]
-      have e : (∑ j, d j * g • c j) • (g • x) - s • x
-          = ((∑ j, d j * g • c j) - s) • (g • x) + s • (g • x - x) := by
+      have e
+          : (∑ j, d j * g • c j) • (g • x) - s • x
+            = ((∑ j, d j * g • c j) - s) • (g • x) + s • (g • x - x) := by
         rw [sub_smul, smul_sub]; abel
       rw [e]
       exact Submodule.add_mem _ (Submodule.smul_mem_smul ((hsep g).1 hg) Submodule.mem_top)

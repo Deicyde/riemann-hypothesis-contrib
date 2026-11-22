@@ -10,9 +10,10 @@ open scoped ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.TailCut
 
-theorem tprod_tail_cut : ∀ (ι : Type) [DecidableEq ι] (a : ι → ℝ) (S S' : Finset ι),
-    Summable (fun v => |a v - 1|) → S ⊆ S' →
-      ∏' v : {v // v ∉ S}, a v.1 = (∏ v ∈ S' \ S, a v) * ∏' v : {v // v ∉ S'}, a v.1 := by
+theorem tprod_tail_cut
+    : ∀ (ι : Type) [DecidableEq ι] (a : ι → ℝ) (S S' : Finset ι),
+      Summable (fun v => |a v - 1|) → S ⊆ S'
+        → ∏' v : {v // v ∉ S}, a v.1 = (∏ v ∈ S' \ S, a v) * ∏' v : {v // v ∉ S'}, a v.1 := by
   intro ι _ a S S' hsum hSS'
   have hmul : ∀ T : Set ι, Multipliable (T.mulIndicator a) := by
     intro T
@@ -27,8 +28,9 @@ theorem tprod_tail_cut : ∀ (ι : Type) [DecidableEq ι] (a : ι → ℝ) (S S'
     tprod_subtype {v | v ∉ S} a
   have e2 : (∏' v : {v // v ∉ S'}, a v.1) = ∏' v, Set.mulIndicator {v | v ∉ S'} a v :=
     tprod_subtype {v | v ∉ S'} a
-  have hsplit : (∏' v, Set.mulIndicator {v | v ∉ S} a v) =
-      ∏' v, (Set.mulIndicator (↑(S' \ S) : Set ι) a v * Set.mulIndicator {v | v ∉ S'} a v) := by
+  have hsplit
+      : (∏' v, Set.mulIndicator {v | v ∉ S} a v)
+        = ∏' v, (Set.mulIndicator (↑(S' \ S) : Set ι) a v * Set.mulIndicator {v | v ∉ S'} a v) := by
     refine tprod_congr fun v => ?_
     by_cases h1 : v ∈ S
     · have h2 : v ∈ S' := hSS' h1

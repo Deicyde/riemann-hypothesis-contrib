@@ -7,34 +7,41 @@ public import Development.WeilBound.RepresentationTheoryGL.RegularisedSiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal
-open Matrix NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU
+open Matrix NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU
 
 namespace PositivityTheory.Rg.Rsw.L.LGenK
 
 variable {n : Type} [Fintype n] [DecidableEq n]
 
-theorem cj_fromBlocks {R : Type} [CommRing R] (s : R →+* R) (a b c d : Matrix n n R) :
-    cj s (fromBlocks a b c d) = fromBlocks (cj s a) (cj s c) (cj s b) (cj s d) := by
+theorem cj_fromBlocks {R : Type} [CommRing R] (s : R →+* R) (a b c d : Matrix n n R)
+    : cj s (fromBlocks a b c d) = fromBlocks (cj s a) (cj s c) (cj s b) (cj s d) := by
   unfold cj
   rw [Matrix.fromBlocks_map, Matrix.fromBlocks_transpose]
 
-theorem cj_neg {R : Type} [CommRing R] (s : R →+* R) {m p : Type} (M : Matrix m p R) : cj s (-M) = -cj s M := by
+theorem cj_neg {R : Type} [CommRing R] (s : R →+* R) {m p : Type} (M : Matrix m p R)
+    : cj s (-M) = - cj s M := by
   ext i j; simp [cj]
 
-theorem cj_zero {R : Type} [CommRing R] (s : R →+* R) {m p : Type} : cj s (0 : Matrix m p R) = 0 := by
+theorem cj_zero {R : Type} [CommRing R] (s : R →+* R) {m p : Type}
+    : cj s (0 : Matrix m p R) = 0 := by
   ext i j; simp [cj]
 
-theorem unit_rel {R : Type} [CommRing R] (s : R →+* R) (a b c d : Matrix n n R)
-    (h : cj s (fromBlocks a b c d) * fromBlocks 0 1 (-1) 0 * fromBlocks a b c d = fromBlocks 0 1 (-1) 0) :
-    a * cj s d - b * cj s c = 1 ∧ c * cj s d = d * cj s c ∧ d * cj s a - c * cj s b = 1 := by
+theorem unit_rel
+    {R : Type} [CommRing R]
+    (s : R →+* R) (a b c d : Matrix n n R)
+    (h : cj s (fromBlocks a b c d) * fromBlocks 0 1 (-1) 0 * fromBlocks a b c d
+      = fromBlocks 0 1 (-1) 0)
+    : a * cj s d - b * cj s c = 1 ∧ c * cj s d = d * cj s c ∧ d * cj s a - c * cj s b = 1 := by
   set M := fromBlocks a b c d with hM
   set J : Matrix (n ⊕ n) (n ⊕ n) R := fromBlocks 0 1 (-1) 0 with hJ
   have hJJ : J * J = -1 := by
     rw [hJ, Matrix.fromBlocks_multiply, ← Matrix.fromBlocks_one, Matrix.fromBlocks_neg]
     simp
   have h1 : (-(J * cj s M * J)) * M = 1 := by
-    calc (-(J * cj s M * J)) * M = -(J * (cj s M * J * M)) := by
-          simp [Matrix.mul_assoc]
+    calc
+      (-(J * cj s M * J)) * M
+        = -(J * (cj s M * J * M)) := by simp [Matrix.mul_assoc]
       _ = 1 := by rw [h, hJJ, neg_neg]
   have h2 : M * (-(J * cj s M * J)) = 1 := mul_eq_one_comm.mp h1
   have e : M * J * cj s M * J = -1 := by
@@ -42,7 +49,9 @@ theorem unit_rel {R : Type} [CommRing R] (s : R →+* R) (a b c d : Matrix n n R
     simp only [Matrix.mul_assoc] at h2 ⊢
     exact neg_eq_iff_eq_neg.mp h2
   have h3 : M * J * cj s M = J := by
-    calc M * J * cj s M = -(M * J * cj s M * (J * J)) := by rw [hJJ]; simp
+    calc
+      M * J * cj s M
+        = -(M * J * cj s M * (J * J)) := by rw [hJJ]; simp
       _ = -(M * J * cj s M * J * J) := by simp [Matrix.mul_assoc]
       _ = J := by rw [e]; simp
   rw [hM, hJ, cj_fromBlocks, Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply] at h3
@@ -54,16 +63,21 @@ theorem unit_rel {R : Type} [CommRing R] (s : R →+* R) (a b c d : Matrix n n R
 
 section Local
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (v : HeightOneSpectrum (𝓞 F))
 
-theorem local_choice (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (hσ1 : σ ≠ AlgHom.id F E)
-    (hfr : Module.finrank F E = 2) (h2 : (2 : 𝓞 F) ∉ v.asIdeal) (a b c d : Matrix n n (Fv F v ⊗[F] E))
-    (ha : ∀ i j, a i j ∈ intLoc F E v) (hb : ∀ i j, b i j ∈ intLoc F E v) (hc : ∀ i j, c i j ∈ intLoc F E v)
-    (hd : ∀ i j, d i j ∈ intLoc F E v)
-    (hu : cj (sigR (Fv F v) σ) (fromBlocks a b c d) * fromBlocks 0 1 (-1) 0 * fromBlocks a b c d =
-      fromBlocks 0 1 (-1) 0) :
-    ∃ x : Matrix n n (Fv F v ⊗[F] E), (∀ i j, x i j ∈ intLoc F E v) ∧ cj (sigR (Fv F v) σ) x = x ∧
-      ∃ z ∈ intLoc F E v, (d + c * x).det * z = 1 := by
+theorem local_choice
+    (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (hσ1 : σ ≠ AlgHom.id F E)
+    (hfr : Module.finrank F E = 2) (h2 : (2 : 𝓞 F) ∉ v.asIdeal)
+    (a b c d : Matrix n n (Fv F v ⊗[F] E))
+    (ha : ∀ i j, a i j ∈ intLoc F E v) (hb : ∀ i j, b i j ∈ intLoc F E v)
+    (hc : ∀ i j, c i j ∈ intLoc F E v) (hd : ∀ i j, d i j ∈ intLoc F E v)
+    (hu : cj (sigR (Fv F v) σ) (fromBlocks a b c d) * fromBlocks 0 1 (-1) 0 * fromBlocks a b c d
+      = fromBlocks 0 1 (-1) 0)
+    : ∃ x : Matrix n n (Fv F v ⊗[F] E),
+      (∀ i j, x i j ∈ intLoc F E v) ∧ cj (sigR (Fv F v) σ) x = x
+        ∧ ∃ z ∈ intLoc F E v, (d + c * x).det * z = 1 := by
   have hinv : ∀ y : Fv F v ⊗[F] E, sigR (Fv F v) σ (sigR (Fv F v) σ y) = y := by
     intro y
     induction y using TensorProduct.induction_on with
@@ -90,16 +104,19 @@ theorem local_choice (σ : E →ₐ[F] E) (hσ : ∀ x, σ (σ x) = x) (hσ1 : �
     ext i j
     rw [Matrix.map_apply, Matrix.one_apply, Matrix.one_apply]
     split_ifs <;> simp
-  have hJm : (fromBlocks 0 1 (-1) 0 : Matrix (n ⊕ n) (n ⊕ n) (intLoc F E v)).map (intLoc F E v).subtype
-      = fromBlocks 0 1 (-1) 0 := by
+  have hJm
+      : (fromBlocks 0 1 (-1) 0 : Matrix (n ⊕ n) (n ⊕ n) (intLoc F E v)).map (intLoc F E v).subtype
+        = fromBlocks 0 1 (-1) 0 := by
     rw [Matrix.fromBlocks_map, Matrix.map_neg _ (map_neg (intLoc F E v).subtype), h1m]
     simp
-  have hu' : cj s (fromBlocks a' b' c' d') * fromBlocks 0 1 (-1) 0 * fromBlocks a' b' c' d' =
-      fromBlocks 0 1 (-1) 0 := by
+  have hu'
+      : cj s (fromBlocks a' b' c' d') * fromBlocks 0 1 (-1) 0 * fromBlocks a' b' c' d'
+        = fromBlocks 0 1 (-1) 0 := by
     apply Matrix.map_injective Subtype.val_injective
     have key := hu
-    rw [← ea, ← eb, ← ec, ← ed, ← Matrix.fromBlocks_map, ← map_cj s _ _ hπ, ← hJm,
-      ← Matrix.map_mul, ← Matrix.map_mul] at key
+    rw [← ea, ← eb, ← ec, ← ed, ← Matrix.fromBlocks_map, ← map_cj s _ _ hπ, ← hJm, ← Matrix.map_mul,
+        ← Matrix.map_mul]
+      at key
     exact key
   obtain ⟨k1, k2, k3⟩ := unit_rel s a' b' c' d' hu'
   obtain ⟨𝔭, h𝔭, hloc⟩ := exists_max v σ hσ1 hfr

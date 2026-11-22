@@ -7,13 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.I
 
 open IsLocalRing
 
-theorem UpperTheory.V.AlgebraTools.exists_isRegular_of_free_quotient :
-    ∀ (L B : Type) [CommRing L] [IsRegularLocalRing L] [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
-      [Algebra L B] [IsLocalHom (algebraMap L B)] (M : Type) [AddCommGroup M] [Module B M] [Module L M]
-      [IsScalarTower L B M] [Module.Finite B M] [Nontrivial M] (r e : ℕ) (y : Fin r → B),
-      ringKrullDim L = e → (∀ i, y i ∈ maximalIdeal B) → GlobalTheory.IsQuasiRegularSeq M y →
-      Module.Free L (M ⧸ Ideal.span (Set.range y) • (⊤ : Submodule B M)) →
-      ∃ xs : List B, xs.length = r + e ∧ (∀ x ∈ xs, x ∈ maximalIdeal B) ∧ RingTheory.Sequence.IsRegular M xs := by
+theorem UpperTheory.V.AlgebraTools.exists_isRegular_of_free_quotient
+    : ∀ (L B : Type) [CommRing L] [IsRegularLocalRing L] [CommRing B] [IsLocalRing B]
+        [IsNoetherianRing B] [Algebra L B] [IsLocalHom (algebraMap L B)] (M : Type) [AddCommGroup M]
+        [Module B M] [Module L M] [IsScalarTower L B M] [Module.Finite B M] [Nontrivial M] (r e : ℕ)
+        (y : Fin r → B),
+      ringKrullDim L = e → (∀ i, y i ∈ maximalIdeal B) → GlobalTheory.IsQuasiRegularSeq M y
+        → Module.Free L (M ⧸ Ideal.span (Set.range y) • (⊤ : Submodule B M))
+        → ∃ xs : List B,
+          xs.length = r + e ∧ (∀ x ∈ xs, x ∈ maximalIdeal B)
+            ∧ RingTheory.Sequence.IsRegular M xs := by
   intro L B _ _ _ _ _ _ _ M _ _ _ _ _ _ r e y he hy hq hfree
   obtain ⟨zs, h, hd⟩ := GlobalTheory.exists_ofList_eq_maximalIdeal_length_eq L
   have hreg := (GlobalTheory.isRegular_of_ofList_eq_maximalIdeal h hd.le).toIsWeaklyRegular

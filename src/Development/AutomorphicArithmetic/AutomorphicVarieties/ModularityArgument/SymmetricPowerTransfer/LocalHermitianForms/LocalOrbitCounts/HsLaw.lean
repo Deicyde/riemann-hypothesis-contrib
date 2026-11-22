@@ -44,8 +44,7 @@ theorem UpperTheory.V.Z.Sym.Loc.hsLaw : UpperTheory.V.Z.Sym.Loc.HsLaw := by
       unfold hs
       rw [if_neg]
       rintro ⟨a, b, hab⟩
-      have e : a ^ 2 - algebraMap O K ↑U * (s * b) ^ 2 = algebraMap O K p := by
-        rw [← hab]; ring
+      have e : a ^ 2 - algebraMap O K ↑U * (s * b) ^ 2 = algebraMap O K p := by rw [← hab]; ring
       apply L.not_even hp
       rw [← e]
       exact L.even_of_norm U hUsq (by rw [e]; exact hp0)

@@ -5,15 +5,17 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.FromBaseAlt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
 
 namespace GlobalTheory
 
-theorem eq_maximalIdeal_of_trdeg_le (F A : Type) [Field F] [CommRing A] [IsDomain A]
-    [IsLocalRing A] [Algebra F A] (hA : Algebra.EssFiniteType F A) (p : Ideal A)
-    (hp : p.IsPrime)
-    (htr : Algebra.trdeg F (FractionRing (A ⧸ p)) ≤ Algebra.trdeg F (ResidueField A)) :
-    p = maximalIdeal A := by
+theorem eq_maximalIdeal_of_trdeg_le
+    (F A : Type) [Field F] [CommRing A] [IsDomain A] [IsLocalRing A] [Algebra F A]
+    (hA : Algebra.EssFiniteType F A)
+    (p : Ideal A) (hp : p.IsPrime)
+    (htr : Algebra.trdeg F (FractionRing (A ⧸ p)) ≤ Algebra.trdeg F (ResidueField A))
+    : p = maximalIdeal A := by
   classical
   by_contra hne
   have hle : p ≤ maximalIdeal A := le_maximalIdeal hp.ne_top
@@ -28,8 +30,8 @@ theorem eq_maximalIdeal_of_trdeg_le (F A : Type) [Field F] [CommRing A] [IsDomai
   obtain ⟨s, hs⟩ := exists_isTranscendenceBasis F (ResidueField A)
   haveI : Finite s := finite_of_isTranscendenceBasis hs
   let f : A ⧸ p →ₐ[F] ResidueField A :=
-    Ideal.Quotient.liftₐ p (IsScalarTower.toAlgHom F A (ResidueField A)) (fun x hx => by
-      simpa [IsLocalRing.residue_eq_zero_iff] using hle hx)
+    Ideal.Quotient.liftₐ p (IsScalarTower.toAlgHom F A (ResidueField A))
+      (fun x hx => by simpa [IsLocalRing.residue_eq_zero_iff] using hle hx)
   have hfmk : ∀ x : A, f (Ideal.Quotient.mk p x) = IsLocalRing.residue A x := fun x => rfl
   choose y hy using fun i : s => IsLocalRing.residue_surjective (R := A) i.1
   let z : s → A ⧸ p := fun i => Ideal.Quotient.mk p (y i)
@@ -74,8 +76,9 @@ theorem eq_maximalIdeal_of_trdeg_le (F A : Type) [Field F] [CommRing A] [IsDomai
     rfl
   have hopt : AlgebraicIndependent F (fun o : Option s => o.elim b z) :=
     AlgebraicIndependent.option_iff.mpr ⟨hz, htrans⟩
-  have hopt' := hopt.map' (f := IsScalarTower.toAlgHom F (A ⧸ p) (FractionRing (A ⧸ p)))
-    (IsFractionRing.injective (A ⧸ p) (FractionRing (A ⧸ p)))
+  have hopt' :=
+    hopt.map' (f := IsScalarTower.toAlgHom F (A ⧸ p) (FractionRing (A ⧸ p)))
+      (IsFractionRing.injective (A ⧸ p) (FractionRing (A ⧸ p)))
   have hc1 := hopt'.cardinalMk_le_trdeg
   rw [← hs.cardinalMk_eq_trdeg] at htr
   have hle2 : Cardinal.mk (Option s) ≤ Cardinal.mk s := hc1.trans htr

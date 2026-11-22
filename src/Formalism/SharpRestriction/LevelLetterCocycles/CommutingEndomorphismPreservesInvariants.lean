@@ -11,12 +11,14 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.GaloisEquivariantKe
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions
 open scoped TensorProduct
 
 namespace Formalism.MainNotions.IntegralHeckeForms
 
-variable {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
+variable
+  {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
   {X : NTw D.R D.host D.what₂ D.LL0 N} (Y : NExp D.R D.host D.what₂ D.LL0 N X)
 
 namespace Idx
@@ -27,7 +29,8 @@ open scoped TensorProduct
 
 section Comm
 
-variable {R W : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [AddCommGroup W] [Module R W]
+variable
+  {R W : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [AddCommGroup W] [Module R W]
 
 end Comm
 
@@ -41,18 +44,16 @@ open scoped TensorProduct
 
 section BaseChange
 
-variable {R R' W W' : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-  [CommRing R'] [IsDomain R'] [IsDiscreteValuationRing R'] [Algebra R R']
-  [AddCommGroup W] [Module R W] [AddCommGroup W'] [Module R W'] [Module R' W'] [IsScalarTower R R' W']
+variable
+  {R R' W W' : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [CommRing R']
+  [IsDomain R'] [IsDiscreteValuationRing R'] [Algebra R R'] [AddCommGroup W] [Module R W]
+  [AddCommGroup W'] [Module R W'] [Module R' W'] [IsScalarTower R R' W']
 
 variable {ι : W →ₗ[R] W'}
 
 variable (hι : IsBaseChange R' ι)
 
-
 variable {ϖ : R} {ϖ' : R'} {u : R'ˣ} {e : ℕ}
-
-
 
 end BaseChange
 
@@ -66,11 +67,11 @@ open scoped TensorProduct
 
 section Transfer
 
-variable {O Ok O' Fm : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  [CommRing Ok] [IsDomain Ok] [IsDiscreteValuationRing Ok] [CommRing O'] [IsDomain O']
+variable
+  {O Ok O' Fm : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing Ok]
+  [IsDomain Ok] [IsDiscreteValuationRing Ok] [CommRing O'] [IsDomain O']
   [IsDiscreteValuationRing O'] [Algebra O Ok] [Algebra Ok O'] [Algebra O O'] [IsScalarTower O Ok O']
   [AddCommGroup Fm] [Module O Fm]
-
 
 end Transfer
 
@@ -84,7 +85,8 @@ open scoped TensorProduct
 
 section More
 
-variable {R W : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [AddCommGroup W] [Module R W]
+variable
+  {R W : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [AddCommGroup W] [Module R W]
 
 end More
 
@@ -96,36 +98,47 @@ instance finite_levelGroup (N : NData D.R D.host D.what₂) : Finite (G0g N) := 
   unfold G0g
   infer_instance
 
-theorem natCard_codeWordStages_finiteGroup_eq (N : NData D.R D.host D.what₂) : Nat.card (G0g N) = D.what₂.restRowsFiniteGroupCard := by
+theorem natCard_codeWordStages_finiteGroup_eq (N : NData D.R D.host D.what₂)
+    : Nat.card (G0g N) = D.what₂.restRowsFiniteGroupCard := by
   unfold G0g
   rw [Nat.card_pi, Fintype.prod_sigma, N.restN_card_levelGroup_eq]
   refine Finset.prod_congr rfl fun k _ => ?_
   show ∏ _y : N.PlG k, Nat.card (GL (Fin D.R.r) (ZMod (D.host.g k))) = _
   rw [Finset.prod_const, Finset.card_univ, N.card_PlG]
 
-def repG (i : X.Tw) (j : ℕ) (b : Bool) : Representation (FractionRing (X.O i)) (G0g N) (Y.Fm i j b) :=
+def repG (i : X.Tw) (j : ℕ) (b : Bool)
+    : Representation (FractionRing (X.O i)) (G0g N) (Y.Fm i j b) :=
   LinearEquiv.automorphismGroup.toLinearMapMonoidHom.comp (Y.actG i j b)
 
-theorem repG_apply (i : X.Tw) (j : ℕ) (b : Bool) (g : G0g N) (x : Y.Fm i j b) :
-    repG Y i j b g x = Y.actG i j b g x := rfl
+theorem repG_apply (i : X.Tw) (j : ℕ) (b : Bool) (g : G0g N) (x : Y.Fm i j b)
+    : repG Y i j b g x = Y.actG i j b g x :=
+  rfl
 
-theorem eG_eq (i : X.Tw) (j : ℕ) (b : Bool) : eG Y i j b = (repG Y i j b).asAlgebraHom (Y.eAlg i b) := rfl
+theorem eG_eq (i : X.Tw) (j : ℕ) (b : Bool)
+    : eG Y i j b = (repG Y i j b).asAlgebraHom (Y.eAlg i b) :=
+  rfl
 
-theorem eAlg_integral (i : X.Tw) (b : Bool) [CharZero (FractionRing (X.O i))] :
-    ∃ c : MonoidAlgebra (X.O i) (G0g N),
-      MonoidAlgebra.map (algebraMap (X.O i) (FractionRing (X.O i))).toAddMonoidHom c =
-        ((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i)) • Y.eAlg i b := by
+theorem eAlg_integral (i : X.Tw) (b : Bool) [CharZero (FractionRing (X.O i))]
+    : ∃ c : MonoidAlgebra (X.O i) (G0g N),
+      MonoidAlgebra.map (algebraMap (X.O i) (FractionRing (X.O i))).toAddMonoidHom c
+        = ((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i)) • Y.eAlg i b := by
   classical
   let _ : Fintype (G0g N) := Fintype.ofFinite _
   have hcard : Fintype.card (G0g N) = D.what₂.restRowsFiniteGroupCard := by
     rw [← Nat.card_eq_fintype_card, natCard_codeWordStages_finiteGroup_eq]
-  have hint : ∀ g : G0g N, ∃ o : X.O i, algebraMap (X.O i) (FractionRing (X.O i)) o =
-      ((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i)) * (Y.eAlg i b).coeff g := by
+  have hint
+      : ∀ g : G0g N, ∃ o : X.O i,
+        algebraMap (X.O i) (FractionRing (X.O i)) o
+          = ((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i))
+            * (Y.eAlg i b).coeff g := by
     intro g
-    have h := Formalism.IrreducibleCountingLemmas.TW.central_idempotent_integral_twist (FractionRing (X.O i)) (G0g N) (Y.eAlg i b)
-      (Y.eAlg_idem i b) (Y.eAlg_central i b) g
+    have h :=
+      Formalism.IrreducibleCountingLemmas.TW.central_idempotent_integral_twist
+        (FractionRing (X.O i)) (G0g N) (Y.eAlg i b) (Y.eAlg_idem i b) (Y.eAlg_central i b) g
     rw [hcard] at h
-    have hO : IsIntegral (X.O i) (((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i)) * (Y.eAlg i b).coeff g) := by
+    have hO : IsIntegral (X.O i)
+        (((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i))
+          * (Y.eAlg i b).coeff g) := by
       obtain ⟨p, hp, he⟩ := h
       refine ⟨p.map (Int.castRingHom (X.O i)), hp.map _, ?_⟩
       rw [Polynomial.eval₂_map]
@@ -136,22 +149,26 @@ theorem eAlg_integral (i : X.Tw) (b : Bool) [CharZero (FractionRing (X.O i))] :
   ext g
   simp [MonoidAlgebra.coeff_map, ho]
 
-theorem eG_idem (i : X.Tw) (j : ℕ) (b : Bool) (x : Y.Fm i j b) :
-    eG Y i j b (eG Y i j b x) = eG Y i j b x := by
+theorem eG_idem (i : X.Tw) (j : ℕ) (b : Bool) (x : Y.Fm i j b)
+    : eG Y i j b (eG Y i j b x) = eG Y i j b x := by
   rw [eG_eq, ← Module.End.mul_apply, ← map_mul, Y.eAlg_idem]
 
-theorem eG_comm (i : X.Tw) (j : ℕ) (b : Bool) (g : G0g N) (x : Y.Fm i j b) :
-    Y.actG i j b g (eG Y i j b x) = eG Y i j b (Y.actG i j b g x) := by
+theorem eG_comm (i : X.Tw) (j : ℕ) (b : Bool) (g : G0g N) (x : Y.Fm i j b)
+    : Y.actG i j b g (eG Y i j b x) = eG Y i j b (Y.actG i j b g x) := by
   rw [← repG_apply, ← repG_apply, eG_eq, ← Representation.asAlgebraHom_single_one (repG Y i j b) g,
     ← Module.End.mul_apply, ← map_mul, ← Module.End.mul_apply, ← map_mul, Y.eAlg_central]
 
-theorem eG_mem (i : X.Tw) (j : ℕ) (b : Bool) (W : Submodule (FractionRing (X.O i)) (Y.Fm i j b))
-    (hW : GStable Y i j b W) (x : Y.Fm i j b) (hx : x ∈ W) : eG Y i j b x ∈ W := by
+theorem eG_mem
+    (i : X.Tw) (j : ℕ) (b : Bool) (W : Submodule (FractionRing (X.O i)) (Y.Fm i j b))
+    (hW : GStable Y i j b W) (x : Y.Fm i j b) (hx : x ∈ W)
+    : eG Y i j b x ∈ W := by
   rw [eG_eq, Formalism.IrreducibleCountingLemmas.TW.asAlgebraHom_apply_eq_sum]
   exact Submodule.sum_mem _ fun g _ => W.smul_mem _ (hW g x hx)
 
-theorem eG_irred (i : X.Tw) (j : ℕ) (b : Bool) (W : Submodule (FractionRing (X.O i)) (Y.Fm i j b))
-    (hW : GIrred Y i j b W) : (∀ x ∈ W, eG Y i j b x = x) ∨ (∀ x ∈ W, eG Y i j b x = 0) := by
+theorem eG_irred
+    (i : X.Tw) (j : ℕ) (b : Bool)
+    (W : Submodule (FractionRing (X.O i)) (Y.Fm i j b)) (hW : GIrred Y i j b W)
+    : (∀ x ∈ W, eG Y i j b x = x) ∨ (∀ x ∈ W, eG Y i j b x = 0) := by
   obtain ⟨_, hst, hirr⟩ := hW
   have hle : W.map (eG Y i j b) ≤ W := by
     rintro _ ⟨x, hx, rfl⟩
@@ -172,45 +189,56 @@ theorem eG_irred (i : X.Tw) (j : ℕ) (b : Bool) (W : Submodule (FractionRing (X
     exact eG_idem Y i j b y
 
 def HeckeCommutesLevelGroup : Prop :=
-  ∀ (i : X.Tw), X.NonzeroIndexPlace i → ∀ (b : Bool), ∀ j ∈ Finset.Icc 1 D.R.m, ∀ g k P, HkIdx i k P →
-    (Y.actG i j b g).toLinearMap ∘ₗ Y.hkF i j b k P = Y.hkF i j b k P ∘ₗ (Y.actG i j b g).toLinearMap
+  ∀ (i : X.Tw),
+    X.NonzeroIndexPlace i
+      → ∀ (b : Bool), ∀ j ∈ Finset.Icc 1 D.R.m, ∀ g k P,
+        HkIdx i k P
+          → (Y.actG i j b g).toLinearMap ∘ₗ Y.hkF i j b k P
+            = Y.hkF i j b k P ∘ₗ (Y.actG i j b g).toLinearMap
 
-theorem admissibleGoodIdempotent_iff_reduced [∀ i : X.Tw, CharZero (FractionRing (X.O i))] : GroupAlgebraIntegrality Y ↔ HeckeCommutesLevelGroup Y := by
+theorem admissibleGoodIdempotent_iff_reduced [∀ i : X.Tw, CharZero (FractionRing (X.O i))]
+    : GroupAlgebraIntegrality Y ↔ HeckeCommutesLevelGroup Y := by
   constructor
   · intro h i hi b j hj
     exact ((h i hi b).2 j hj).1
   · intro h i hi b
     exact ⟨eAlg_integral Y i b, fun j hj => ⟨h i hi b j hj, fun _ W _ hW => eG_irred Y i j b W hW⟩⟩
 
-theorem mem_typeSubspace_iff_unipotent_character {i : X.Tw} {j : ℕ} {b : Bool} (x : Y.Fm i j b) :
-    x ∈ Fm0 Y i j b ↔ ∀ u : Y.U, Y.actG i j b u x =
-      ((Y.psiU i b u : (FractionRing (X.O i))ˣ) : FractionRing (X.O i)) • x := by
+theorem mem_typeSubspace_iff_unipotent_character {i : X.Tw} {j : ℕ} {b : Bool} (x : Y.Fm i j b)
+    : x ∈ Fm0 Y i j b
+      ↔ ∀ u : Y.U,
+        Y.actG i j b u x
+          = ((Y.psiU i b u : (FractionRing (X.O i))ˣ) : FractionRing (X.O i)) • x := by
   unfold Fm0
   simp only [Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply,
     LinearMap.id_apply, sub_eq_zero, LinearEquiv.coe_coe]
 
-theorem AO_apply (i : X.Tw) (j : ℕ) (b : Bool) (x : Y.Fm i j b) :
-    AO Y i j b x = ((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i)) • eG Y i j b x := by
+theorem AO_apply (i : X.Tw) (j : ℕ) (b : Bool) (x : Y.Fm i j b)
+    : AO Y i j b x
+      = ((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i)) • eG Y i j b x := by
   show ((D.what₂.restRowsFiniteGroupCard : ℕ) : X.O i) • eG Y i j b x = _
   rw [Nat.cast_smul_eq_nsmul, Nat.cast_smul_eq_nsmul]
 
-theorem card_ne_zero (i : X.Tw) [CharZero (FractionRing (X.O i))] :
-    ((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i)) ≠ 0 :=
+theorem card_ne_zero (i : X.Tw) [CharZero (FractionRing (X.O i))]
+    : ((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i)) ≠ 0 :=
   Nat.cast_ne_zero.2 D.what₂.restRowsFiniteGroupCard_pos.ne'
 
 section Lat
 
 open Formalism.IrreducibleCountingLemmas
 
-theorem sIdx_eq {R W : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [AddCommGroup W]
-    [Module R W] (l : ℕ) (M N' : Submodule R W) :
-    sIdx l M N' = (TW.sIdx M N' : ℝ) / ((IsDiscreteValuationRing.addVal R (l : R)).toNat : ℝ) := by
+theorem sIdx_eq
+    {R W : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [AddCommGroup W] [Module R W]
+    (l : ℕ) (M N' : Submodule R W)
+    : sIdx l M N'
+      = (TW.sIdx M N' : ℝ) / ((IsDiscreteValuationRing.addVal R (l : R)).toNat : ℝ) := by
   unfold sIdx lenR TW.sIdx TW.relLen
   push_cast
   rw [sub_div]
 
-variable {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] {U : Type} [AddCommGroup U]
-  [Module R U]
+variable
+  {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+  {U : Type} [AddCommGroup U] [Module R U]
 
 end Lat
 
@@ -218,9 +246,10 @@ section BC
 
 open Formalism.IrreducibleCountingLemmas
 
-theorem full_span {R U : Type*} [CommRing R] [IsDomain R] [AddCommGroup U] [Module R U]
-    (N' : Submodule R U) (s : Set U) (hs : ∀ x ∈ s, ∃ c : R, c ≠ 0 ∧ c • x ∈ N') :
-    ∀ x ∈ Submodule.span R s, ∃ c : R, c ≠ 0 ∧ c • x ∈ N' := by
+theorem full_span
+    {R U : Type*} [CommRing R] [IsDomain R] [AddCommGroup U] [Module R U]
+    (N' : Submodule R U) (s : Set U) (hs : ∀ x ∈ s, ∃ c : R, c ≠ 0 ∧ c • x ∈ N')
+    : ∀ x ∈ Submodule.span R s, ∃ c : R, c ≠ 0 ∧ c • x ∈ N' := by
   intro x hx
   induction hx using Submodule.span_induction with
   | mem x h => exact hs x h
@@ -237,21 +266,24 @@ theorem full_span {R U : Type*} [CommRing R] [IsDomain R] [AddCommGroup U] [Modu
     obtain ⟨c, hc, hcx⟩ := hx
     exact ⟨c, hc, by rw [smul_comm]; exact N'.smul_mem a hcx⟩
 
-variable {O : Type} [CommRing O] [IsDomain O] {W : Type} [AddCommGroup W] [Module O W]
-  [Module (FractionRing O) W] [IsScalarTower O (FractionRing O) W]
+variable
+  {O : Type} [CommRing O] [IsDomain O]
+  {W : Type}
+  [AddCommGroup W] [Module O W] [Module (FractionRing O) W] [IsScalarTower O (FractionRing O) W]
 
 omit [IsDomain O] [Module (FractionRing O) W] [IsScalarTower O (FractionRing O) W] in
-theorem baseChange_mono' (O' : Type) [CommRing O'] [Algebra O O'] {P V : Submodule O W} (h : P ≤ V) :
-    P.baseChange O' ≤ V.baseChange O' := by
+theorem baseChange_mono' (O' : Type) [CommRing O'] [Algebra O O'] {P V : Submodule O W} (h : P ≤ V)
+    : P.baseChange O' ≤ V.baseChange O' := by
   rw [Submodule.baseChange_eq_span, Submodule.span_le]
   rintro _ ⟨x, hx, rfl⟩
   exact Submodule.tmul_mem_baseChange_of_mem 1 (h hx)
 
-
 omit [Module (FractionRing O) W] [IsScalarTower O (FractionRing O) W] in
-theorem isLatIn_baseChange (O' : Type) [CommRing O'] [IsDomain O'] [Algebra O O']
-    (hinj : Function.Injective (algebraMap O O')) (P V : Submodule O W) (h : IsLatIn P V) :
-    IsLatIn (P.baseChange O') (V.baseChange O') := by
+theorem isLatIn_baseChange
+    (O' : Type) [CommRing O'] [IsDomain O'] [Algebra O O']
+    (hinj : Function.Injective (algebraMap O O'))
+    (P V : Submodule O W) (h : IsLatIn P V)
+    : IsLatIn (P.baseChange O') (V.baseChange O') := by
   obtain ⟨⟨t, ht⟩, hle, hfull⟩ := h
   refine ⟨?_, baseChange_mono' O' hle, ?_⟩
   · rw [← ht, Submodule.baseChange_span]
@@ -264,21 +296,13 @@ theorem isLatIn_baseChange (O' : Type) [CommRing O'] [IsDomain O'] [Algebra O O'
     rw [TensorProduct.mk_apply, algebraMap_smul, ← TensorProduct.tmul_smul]
     exact Submodule.tmul_mem_baseChange_of_mem 1 hcv
 
-
-variable {Ok O' : Type} [CommRing Ok] [CommRing O'] [Algebra O Ok] [Algebra O O'] [Algebra Ok O']
-  [IsScalarTower O Ok O']
-
+variable
+  {Ok O' : Type}
+  [CommRing Ok] [CommRing O'] [Algebra O Ok] [Algebra O O'] [Algebra Ok O'] [IsScalarTower O Ok O']
 
 variable (O W Ok O') in
 abbrev rho : Ok ⊗[O] W →ₗ[O] O' ⊗[O] W :=
   LinearMap.rTensor W (IsScalarTower.toAlgHom O Ok O').toLinearMap
-
-
-
-
-
-
-
 
 end BC
 
@@ -286,12 +310,15 @@ section Tw
 
 open Formalism.MainNotions.BlochKatoReduction.Gen (psiAt PsiOk)
 
-theorem psiAt_comp {Γ Γ' A : Type} [Group Γ] [Group Γ'] [CommGroup A] (b : Bool) (χ : Γ' →* A)
-    (f : Γ →* Γ') : psiAt b (χ.comp f) = (psiAt b χ).comp f := by
+theorem psiAt_comp
+    {Γ Γ' A : Type} [Group Γ] [Group Γ'] [CommGroup A] (b : Bool) (χ : Γ' →* A) (f : Γ →* Γ')
+    : psiAt b (χ.comp f) = (psiAt b χ).comp f := by
   cases b <;> rfl
 
-theorem TwOK_inv {i : X.Tw} {k : ℕ} {Q : Finset (PlE D.host)} {ψ : G D.host.E N.Om →* (X.Ok i k)ˣ}
-    (h : TwOK i k Q ψ) : TwOK i k Q ψ⁻¹ := by
+theorem TwOK_inv
+    {i : X.Tw} {k : ℕ} {Q : Finset (PlE D.host)} {ψ : G D.host.E N.Om →* (X.Ok i k)ˣ}
+    (h : TwOK i k Q ψ)
+    : TwOK i k Q ψ⁻¹ := by
   obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ := h
   have hk : (ψ⁻¹).ker = ψ.ker := by
     ext g
@@ -309,21 +336,26 @@ theorem TwOK_inv {i : X.Tw} {k : ℕ} {Q : Finset (PlE D.host)} {ψ : G D.host.E
   · intro v hv A' hA' σ hσ
     rw [MonoidHom.inv_apply, h7 v hv A' hA' σ hσ, inv_one]
 
-theorem TwOK_psiAt {i : X.Tw} {k : ℕ} {Q : Finset (PlE D.host)} {ψ : G D.host.E N.Om →* (X.Ok i k)ˣ}
-    (b : Bool) (h : TwOK i k Q ψ) : TwOK i k Q (psiAt b ψ) := by
+theorem TwOK_psiAt
+    {i : X.Tw} {k : ℕ} {Q : Finset (PlE D.host)} {ψ : G D.host.E N.Om →* (X.Ok i k)ˣ}
+    (b : Bool) (h : TwOK i k Q ψ)
+    : TwOK i k Q (psiAt b ψ) := by
   cases b
   · exact TwOK_inv h
   · exact h
 
-theorem TwOK_of_PsiOk {i : X.Tw} {A Q : Finset (PlE D.host)} {k' : ℕ} {ψ' : X.RCG i Q →* (X.Ok i k')ˣ}
-    (h : PsiOk i A Q k' ψ') : TwOK i k' Q (ψ'.comp (X.art i Q)) := by
+theorem TwOK_of_PsiOk
+    {i : X.Tw} {A Q : Finset (PlE D.host)} {k' : ℕ} {ψ' : X.RCG i Q →* (X.Ok i k')ˣ}
+    (h : PsiOk i A Q k' ψ')
+    : TwOK i k' Q (ψ'.comp (X.art i Q)) := by
   classical
   obtain ⟨h1, h2, _, h4, h5, h6, h7, h8⟩ := h
   exact ⟨fun P hP => (h1 P hP).1, (Finset.disjoint_union_right.1 h2).1, h4, h5, h6, h7, h8⟩
 
 end Tw
 
-instance charZero_K (D : Formalism.BasicNotions.D7) (i : D.ntw.Tw) : CharZero (FractionRing (D.ntw.O i)) :=
+instance charZero_K (D : Formalism.BasicNotions.D7) (i : D.ntw.Tw)
+    : CharZero (FractionRing (D.ntw.O i)) :=
   (D.nth.iC i).charZero
 
 end Formalism.MainNotions.IntegralHeckeForms

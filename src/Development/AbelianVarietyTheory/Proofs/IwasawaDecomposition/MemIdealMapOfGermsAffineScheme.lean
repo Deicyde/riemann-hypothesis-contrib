@@ -9,27 +9,32 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Stalk
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsLocalRing TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R Formalism.L2.Pj
 open scoped TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.GermAff
 
-theorem mem_map_of_germ : ∀ {T Y' : Scheme.{0}} [IsAffine T] (χ : T ⟶ Y') (I : Y'.IdealSheafData) (W : Y'.affineOpens)
-    (hle : ⊤ ≤ χ ⁻¹ᵁ (W : Y'.Opens)) (s : Γ(T, ⊤)),
-    (∀ t : T, (T.presheaf.germ ⊤ t trivial).hom s ∈ FinalTheorems.stalkId (I.comap χ) t) →
-      s ∈ (I.ideal W).map (χ.appLE W ⊤ hle).hom := by
+theorem mem_map_of_germ
+    : ∀ {T Y' : Scheme.{0}} [IsAffine T] (χ : T ⟶ Y') (I : Y'.IdealSheafData) (W : Y'.affineOpens)
+        (hle : ⊤ ≤ χ ⁻¹ᵁ (W : Y'.Opens)) (s : Γ(T, ⊤)),
+      (∀ t : T, (T.presheaf.germ ⊤ t trivial).hom s ∈ FinalTheorems.stalkId (I.comap χ) t)
+        → s ∈ (I.ideal W).map (χ.appLE W ⊤ hle).hom := by
   intro T Y' _ χ I W hle s hs
   set K := (I.ideal W).map (χ.appLE W ⊤ hle).hom with hK
   have hc : I.comap χ = Scheme.IdealSheafData.ofIdealTop K := by
     refine (GlobalTheory.Vanishing.eq_comap_of_stalk fun z => ?_).symm
     have hz : χ z ∈ W.1 := hle trivial
-    rw [GlobalTheory.LocM.stalkId_ofIdealTop, ds_stalkId_eq_map I W _ hz, Ideal.map_map, Ideal.map_map,
-      ← CommRingCat.hom_comp, ← CommRingCat.hom_comp, Scheme.Hom.germ_stalkMap, Scheme.Hom.appLE, Category.assoc]
+    rw [GlobalTheory.LocM.stalkId_ofIdealTop, ds_stalkId_eq_map I W _ hz, Ideal.map_map,
+      Ideal.map_map, ← CommRingCat.hom_comp, ← CommRingCat.hom_comp, Scheme.Hom.germ_stalkMap,
+      Scheme.Hom.appLE, Category.assoc]
     congr 3
     exact T.presheaf.germ_res (homOfLE hle) z (by trivial)
-  have hs' : ∀ t : T, (T.presheaf.germ ⊤ t trivial).hom s ∈ K.map (T.presheaf.germ ⊤ t trivial).hom := by
+  have hs'
+      : ∀ t : T, (T.presheaf.germ ⊤ t trivial).hom s ∈ K.map (T.presheaf.germ ⊤ t trivial).hom := by
     intro t
     rw [← GlobalTheory.LocM.stalkId_ofIdealTop, ← hc]
     exact hs t

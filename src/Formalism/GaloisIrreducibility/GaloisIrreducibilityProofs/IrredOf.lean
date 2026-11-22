@@ -18,16 +18,20 @@ theorem irreducible_of_galois_conditions : IrredOf := by
   classical
   have hs1 : ∀ v, IsSubSum ((I v).val.map fun i => (O v i).card) (Module.finrank K W) := by
     intro v
-    obtain ⟨J, hJ, hJeq⟩ := hA K V ι (τ v) (F v) (q v) (O v) (I v) (hFτ v) (hO v) (hroots v) ⊥ W
-      bot_le (by simp) (by simp) (hWτ v) (hWF v)
+    obtain ⟨J, hJ, hJeq⟩ :=
+      hA K V ι (τ v) (F v) (q v) (O v) (I v) (hFτ v) (hO v) (hroots v) ⊥ W bot_le (by simp)
+        (by simp) (hWτ v) (hWF v)
     rw [finrank_bot, Nat.sub_zero] at hJeq
     rw [hJeq]
     exact isSubSum_of_subset _ _ _ hJ
-  have hs2 : ∀ v, IsSubSum ((I v).val.map fun i => (O v i).card)
-      (Module.finrank K V - Module.finrank K W) := by
+  have hs2
+      : ∀ v,
+        IsSubSum ((I v).val.map fun i => (O v i).card)
+          (Module.finrank K V - Module.finrank K W) := by
     intro v
-    obtain ⟨J, hJ, hJeq⟩ := hA K V ι (τ v) (F v) (q v) (O v) (I v) (hFτ v) (hO v) (hroots v) W ⊤
-      le_top (hWτ v) (hWF v) (by simp) (by simp)
+    obtain ⟨J, hJ, hJeq⟩ :=
+      hA K V ι (τ v) (F v) (q v) (O v) (I v) (hFτ v) (hO v) (hroots v) W ⊤ le_top (hWτ v) (hWF v)
+        (by simp) (by simp)
     rw [finrank_top] at hJeq
     rw [hJeq]
     exact isSubSum_of_subset _ _ _ hJ
@@ -36,10 +40,9 @@ theorem irreducible_of_galois_conditions : IrredOf := by
   obtain ⟨h0, h1⟩ := hne
   have hd0 : 0 < Module.finrank K W :=
     Nat.pos_of_ne_zero fun h => h0 (Submodule.finrank_eq_zero.mp h)
-  have hdN : Module.finrank K W < Module.finrank K V :=
-    Submodule.finrank_lt h1
-  obtain ⟨v, hv⟩ := hsub (min (Module.finrank K W) (Module.finrank K V - Module.finrank K W))
-    (by omega) (by omega)
+  have hdN : Module.finrank K W < Module.finrank K V := Submodule.finrank_lt h1
+  obtain ⟨v, hv⟩ :=
+    hsub (min (Module.finrank K W) (Module.finrank K V - Module.finrank K W)) (by omega) (by omega)
   apply hv
   rcases min_choice (Module.finrank K W) (Module.finrank K V - Module.finrank K W) with h | h
   · rw [h]

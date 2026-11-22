@@ -15,13 +15,14 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.TameShapi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.KA
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.KA
 open scoped Matrix
 
 noncomputable section
 
 namespace GlobalTheory.KZ
-
 
 open GlobalTheory.KZGlobAsm in
 theorem glob_of_shapiro_system_noLayer (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
@@ -87,27 +88,34 @@ theorem glob_of_shapiro_system_noLayer (l : ℕ) [Fact l.Prime] (Ω : Type) [Fie
   exact GlobalTheory.T.unramified_away_from_l_of_twisted_shapiro_limit l Ω W c θ ρ Y η y hWc hθc hWO hWθ hρO hYc hYO hY hYp hηO (fun r s x => hcong r s x) hZ1
     (fun r s i => hyA s i r)
 
-theorem iwSys2_of_shCoc (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] (W : R2 Ω l) (c : Coef l)
-    (A : ValuationSubring Ω) (θ : G ℚ Ω →* (Qbar l)ˣ) (ρ : G ℚ Ω → Matrix (Fin 2) (Fin 2) (Qbar l))
-    (ν : G ℚ Ω → (Qbar l)ˣ) (Y : ∀ r : ℕ, G ℚ Ω → (ZMod (l ^ r))ˣ → Fin 2 → Qbar l)
-    (hWθ : ∀ s, mat W s = (θ s : Qbar l) • ρ s)
-    (hY : ∀ r, ShCoc ρ (cycMod ℚ Ω l r)⁻¹ (Y r)) (hO : ∀ r s x i, Y r s x i ∈ c.O)
-    (hN : ∀ r s, Y r s = push (Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r))).toMonoidHom)
-      (Y (r + 1)) s)
-    (hρ : ∀ s ∈ Dec (F := ℚ) A, ρ s 1 0 = 0 ∧ ρ s 1 1 = (ν s : Qbar l)) :
-    IwSys2 c A ν (fun r s x => Y r s x 1) := by
+theorem iwSys2_of_shCoc
+    (l : ℕ) [Fact l.Prime]
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω]
+    (W : R2 Ω l) (c : Coef l) (A : ValuationSubring Ω) (θ : G ℚ Ω →* (Qbar l)ˣ)
+    (ρ : G ℚ Ω → Matrix (Fin 2) (Fin 2) (Qbar l)) (ν : G ℚ Ω → (Qbar l)ˣ)
+    (Y : ∀ r : ℕ, G ℚ Ω → (ZMod (l ^ r))ˣ → Fin 2 → Qbar l)
+    (hWθ : ∀ s, mat W s = (θ s : Qbar l) • ρ s) (hY : ∀ r, ShCoc ρ (cycMod ℚ Ω l r)⁻¹ (Y r))
+    (hO : ∀ r s x i, Y r s x i ∈ c.O)
+    (hN : ∀ r s,
+      Y r s
+        = push (Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r))).toMonoidHom)
+          (Y (r + 1)) s)
+    (hρ : ∀ s ∈ Dec (F := ℚ) A, ρ s 1 0 = 0 ∧ ρ s 1 1 = (ν s : Qbar l))
+    : IwSys2 c A ν (fun r s x => Y r s x 1) := by
   have hρmul : ∀ s t, ρ (s * t) = ρ s * ρ t := by
     intro s t
     have h := mat_mul' W s t
     rw [hWθ, hWθ, hWθ, map_mul, Units.val_mul, Matrix.smul_mul, Matrix.mul_smul, smul_smul] at h
     exact smul_right_injective _ (mul_ne_zero (θ s).ne_zero (θ t).ne_zero) h
-  refine ⟨fun s hs t ht => ?_, fun r => ⟨fun s x => hO r s x 1, fun s hs t _ x => ?_⟩, fun r s x => ?_⟩
+  refine
+    ⟨fun s hs t ht => ?_, fun r => ⟨fun s x => hO r s x 1, fun s hs t _ x => ?_⟩, fun r s x => ?_⟩
   · apply Units.ext
-    rw [Units.val_mul, ← (hρ _ (mul_mem hs ht)).2, ← (hρ s hs).2, ← (hρ t ht).2, hρmul, Matrix.mul_apply,
-      Fin.sum_univ_two, (hρ s hs).1, zero_mul, zero_add]
+    rw [Units.val_mul, ← (hρ _ (mul_mem hs ht)).2, ← (hρ s hs).2, ← (hρ t ht).2, hρmul,
+      Matrix.mul_apply, Fin.sum_univ_two, (hρ s hs).1, zero_mul, zero_add]
   · have h := congrFun (hY r s t x) 1
-    simp only [Pi.add_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two, (hρ s hs).1, (hρ s hs).2, zero_mul,
-      zero_add, MonoidHom.inv_apply] at h
+    simp only [Pi.add_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two, (hρ s hs).1, (hρ s hs).2,
+        zero_mul, zero_add, MonoidHom.inv_apply]
+      at h
     exact h
   · have h := congrFun (congrFun (hN r s) x) 1
     simp only [push, Finset.sum_apply] at h
@@ -117,8 +125,10 @@ end GlobalTheory.KZ
 
 namespace GlobalTheory.KZ
 
-theorem norm_sub_mul_add_le_of_ultrametric_replace {l : ℕ} [Fact l.Prime] {a b c' d P : Qbar l} {ε : ℝ} (h1 : ‖a - (P * b + d)‖ ≤ ε)
-    (h2 : ‖c' - b‖ ≤ ε) (hP : ‖P‖ ≤ 1) : ‖a - (P * c' + d)‖ ≤ ε := by
+theorem norm_sub_mul_add_le_of_ultrametric_replace
+    {l : ℕ} [Fact l.Prime]
+    {a b c' d P : Qbar l} {ε : ℝ} (h1 : ‖a - (P * b + d)‖ ≤ ε) (h2 : ‖c' - b‖ ≤ ε) (hP : ‖P‖ ≤ 1)
+    : ‖a - (P * c' + d)‖ ≤ ε := by
   have e : a - (P * c' + d) = (a - (P * b + d)) + P * (b - c') := by ring
   rw [e]
   refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le h1 ?_)

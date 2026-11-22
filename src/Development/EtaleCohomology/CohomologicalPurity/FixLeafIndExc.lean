@@ -34,7 +34,8 @@ theorem exc : LeafExc :=
     (LeafExcSheaf_of (LeafFreeCok_of_inj LeafFreeCokInj_of) LeafSurjGeo_of LeafInjGeo_of)
 
 theorem offCont : LeafOffCont :=
-  leafOffCont_of offContBasic_of (etale_purity_continuity_off_closed_of_local_and_chase OffContLoc_of OffChaseGeo_full)
+  leafOffCont_of offContBasic_of
+    (etale_purity_continuity_off_closed_of_local_and_chase OffContLoc_of OffChaseGeo_full)
 
 theorem intersectionNumber_baseChange : LeafIndExc :=
   leafIndExc_of (leafNbhdExc_of exc) (leafHsCont_of' bd exc offCont)

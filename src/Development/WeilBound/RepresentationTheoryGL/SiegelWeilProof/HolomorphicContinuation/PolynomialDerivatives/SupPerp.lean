@@ -20,10 +20,11 @@ include h
 theorem sup_perp [FiniteDimensional ℂ V] (W : Submodule ℂ V) : W ⊔ h.perp W = ⊤ := by
   classical
   let b := Module.finBasis ℂ W
-  let L : V →ₗ[ℂ] (Fin (Module.finrank ℂ W) → ℂ) :=
-    { toFun := fun v k => φ (b k : V) v
-      map_add' := fun v w => by funext k; exact h.add _ v w
-      map_smul' := fun r v => by funext k; simp [h.smul] }
+  let L : V →ₗ[ℂ] (Fin (Module.finrank ℂ W) → ℂ) := {
+    toFun := fun v k => φ (b k : V) v
+    map_add' := fun v w => by funext k; exact h.add _ v w
+    map_smul' := fun r v => by funext k; simp [h.smul]
+  }
   have hker : LinearMap.ker L ≤ h.perp W := by
     intro v hv w hw
     have hv' : ∀ k, φ (b k : V) v = 0 := fun k => congrFun (LinearMap.mem_ker.1 hv) k
@@ -36,10 +37,12 @@ theorem sup_perp [FiniteDimensional ℂ V] (W : Submodule ℂ V) : W ⊔ h.perp 
     simp [hv']
   have hrank := LinearMap.finrank_range_add_finrank_ker L
   have hr : Module.finrank ℂ (LinearMap.range L) ≤ Module.finrank ℂ W := by
-    calc Module.finrank ℂ (LinearMap.range L) ≤ Module.finrank ℂ (Fin (Module.finrank ℂ W) → ℂ) :=
-          Submodule.finrank_le _
+    calc
+      Module.finrank ℂ (LinearMap.range L)
+        ≤ Module.finrank ℂ (Fin (Module.finrank ℂ W) → ℂ) := Submodule.finrank_le _
       _ = Module.finrank ℂ W := by simp
-  have hk : Module.finrank ℂ (LinearMap.ker L) ≤ Module.finrank ℂ (h.perp W) := Submodule.finrank_mono hker
+  have hk : Module.finrank ℂ (LinearMap.ker L) ≤ Module.finrank ℂ (h.perp W) :=
+    Submodule.finrank_mono hker
   have hsum := Submodule.finrank_sup_add_finrank_inf_eq W (h.perp W)
   rw [h.inf_perp, finrank_bot] at hsum
   apply Submodule.eq_top_of_finrank_eq

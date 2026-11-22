@@ -30,10 +30,12 @@ theorem BdPartition.proof : BdPartition.Statement := by
     ReciprocityTheory.AnForm.M.pa_compat_restr A (R.ψ j) (R.compat j) _ (isOpen_bdDom R j)
   have hcov : ∀ x, ∃ j, x ∈ (e j).source := fun x =>
     ⟨bdIdx R x, by rw [hsrc]; exact mem_bdDom_bdIdx R x⟩
-  have htr : ∀ i j, ContDiffOn ℝ ∞ (e j ∘ (e i).symm)
-      ((e i).target ∩ (e i).symm ⁻¹' (e j).source) := fun i j =>
+  have htr
+      : ∀ i j,
+        ContDiffOn ℝ ∞ (e j ∘ (e i).symm) ((e i).target ∩ (e i).symm ⁻¹' (e j).source) := fun i j =>
     ReciprocityTheory.AnForm.M.pa_holoSmooth _ _ fun v hv =>
-      ReciprocityTheory.AnForm.M.SimpleNormalCrossingSliceCharts.compat_trans A (hc i) (hc j) hv.1 hv.2
+      ReciprocityTheory.AnForm.M.SimpleNormalCrossingSliceCharts.compat_trans A (hc i) (hc j) hv.1
+        hv.2
   obtain ⟨χ, h0, h1, hs, hsm⟩ := ReciprocityTheory.AnForm.exists_chart_partition e hcov htr
   obtain ⟨B, hAB, -, hB⟩ := ReciprocityTheory.AnForm.M.atlasOfCompat A e hc hcov
   have hBs : ∀ i, B.Smooth (χ i) := by
@@ -41,8 +43,13 @@ theorem BdPartition.proof : BdPartition.Statement := by
     obtain ⟨l, hl⟩ := hB j
     rw [hl]
     exact (hsm i l).mono Set.inter_subset_left
-  refine ⟨χ, fun i => ReciprocityTheory.AnForm.M.smoothOn_of_compatible hAB.symm' isOpen_univ (hBs i),
-    h0, h1, fun i => ?_⟩
+  refine ⟨
+    χ,
+    fun i => ReciprocityTheory.AnForm.M.smoothOn_of_compatible hAB.symm' isOpen_univ (hBs i),
+    h0,
+    h1,
+    fun i => ?_
+  ⟩
   rw [← hsrc]
   exact hs i
 

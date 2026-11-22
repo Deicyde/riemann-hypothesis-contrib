@@ -17,18 +17,24 @@ namespace WeierstrassPointSeriesTail
 def wTail {R : Type u} [CommRing R] (W : WeierstrassCurve R) (w : PowerSeries R) : PowerSeries R :=
   C W.a₁ * X * w + C W.a₂ * X ^ 2 * w + C W.a₃ * w ^ 2 + C W.a₄ * X * w ^ 2 + C W.a₆ * w ^ 3
 
-theorem wTail_dvd {R : Type u} [CommRing R] (W : WeierstrassCurve R) (w : PowerSeries R)
-    (k : ℕ) (hk : 1 ≤ k) (h : (X : PowerSeries R) ^ k ∣ w) :
-    (X : PowerSeries R) ^ (k + 1) ∣ wTail W w := by
+theorem wTail_dvd
+    {R : Type u} [CommRing R]
+    (W : WeierstrassCurve R)
+    (w : PowerSeries R) (k : ℕ) (hk : 1 ≤ k) (h : (X : PowerSeries R) ^ k ∣ w)
+    : (X : PowerSeries R) ^ (k + 1) ∣ wTail W w := by
   obtain ⟨j, rfl⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
   obtain ⟨u, rfl⟩ := h
-  refine ⟨C W.a₁ * u + C W.a₂ * X * u + C W.a₃ * X ^ j * u ^ 2 + C W.a₄ * X ^ (j + 1) * u ^ 2 +
-    C W.a₆ * X ^ (2 * j + 1) * u ^ 3, ?_⟩
+  refine ⟨
+    C W.a₁ * u + C W.a₂ * X * u + C W.a₃ * X ^ j * u ^ 2 + C W.a₄ * X ^ (j + 1) * u ^ 2
+      + C W.a₆ * X ^ (2 * j + 1) * u ^ 3,
+    ?_
+  ⟩
   unfold wTail
   ring
 
-theorem factor {R : Type u} [CommRing R] (W : WeierstrassCurve R) (w : PowerSeries R)
-    (hw : WFixed W w) : ∃ e : PowerSeries R, w = X ^ 3 * (1 + X * e) := by
+theorem factor
+    {R : Type u} [CommRing R] (W : WeierstrassCurve R) (w : PowerSeries R) (hw : WFixed W w)
+    : ∃ e : PowerSeries R, w = X ^ 3 * (1 + X * e) := by
   have hsplit : w = X ^ 3 + wTail W w := by
     unfold wTail
     conv_lhs => rw [hw.2]
@@ -52,9 +58,11 @@ theorem wSeriesNonsingularPoint_holds : WPoint := by
   intro K _ W w hw σ _ s hs0 hs
   have : IsDomain (MvPowerSeries σ K) := NoZeroDivisors.to_isDomain _
   have hsub : PowerSeries.HasSubst s := PowerSeries.HasSubst.of_constantCoeff_zero hs0
-  have hE : w.subst s = s ^ 3 + MvPowerSeries.C W.a₁ * s * w.subst s +
-      MvPowerSeries.C W.a₂ * s ^ 2 * w.subst s + MvPowerSeries.C W.a₃ * (w.subst s) ^ 2 +
-      MvPowerSeries.C W.a₄ * s * (w.subst s) ^ 2 + MvPowerSeries.C W.a₆ * (w.subst s) ^ 3 := by
+  have hE
+      : w.subst s
+        = s ^ 3 + MvPowerSeries.C W.a₁ * s * w.subst s + MvPowerSeries.C W.a₂ * s ^ 2 * w.subst s
+          + MvPowerSeries.C W.a₃ * (w.subst s) ^ 2 + MvPowerSeries.C W.a₄ * s * (w.subst s) ^ 2
+          + MvPowerSeries.C W.a₆ * (w.subst s) ^ 3 := by
     conv_lhs => rw [hw.2]
     simp only [PowerSeries.subst_add hsub, PowerSeries.subst_mul hsub, PowerSeries.subst_pow hsub,
       PowerSeries.subst_X hsub, PowerSeries.subst_C]
@@ -73,17 +81,21 @@ theorem wSeriesNonsingularPoint_holds : WPoint := by
   have hinj := IsFractionRing.injective (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K))
   have hV : algebraMap (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K)) (w.subst s) ≠ 0 :=
     (map_ne_zero_iff _ hinj).mpr hws0
-  have hC : ∀ a : K, algebraMap (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K))
-      (MvPowerSeries.C a) = algebraMap K (FractionRing (MvPowerSeries σ K)) a := fun a =>
+  have hC
+      : ∀ a : K,
+        algebraMap (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K)) (MvPowerSeries.C a)
+          = algebraMap K (FractionRing (MvPowerSeries σ K)) a := fun a =>
     (IsScalarTower.algebraMap_apply K (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K)) a).symm
   have hE' := congrArg (algebraMap (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K))) hE
   simp only [map_add (f := _), map_mul, map_pow, hC] at hE'
-  have hx : xOf w s * algebraMap (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K)) (w.subst s) =
-      algebraMap (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K)) s := by
+  have hx
+      : xOf w s * algebraMap (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K)) (w.subst s)
+        = algebraMap (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K)) s := by
     simp only [xOf]
     exact div_mul_cancel₀ _ hV
-  have hy : yOf w s * algebraMap (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K)) (w.subst s) =
-      -1 := by
+  have hy
+      : yOf w s * algebraMap (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K)) (w.subst s)
+        = -1 := by
     simp only [yOf]
     rw [div_mul_cancel₀ _ hV]
   set Z := algebraMap (MvPowerSeries σ K) (FractionRing (MvPowerSeries σ K)) s
@@ -105,9 +117,12 @@ theorem wSeriesNonsingularPoint_holds : WPoint := by
   · by_contra hcon
     push Not at hcon
     obtain ⟨hP, hQ⟩ := hcon
-    have hD0 : (1 - MvPowerSeries.C W.a₁ * s - 2 * MvPowerSeries.C W.a₃ * w.subst s -
-        MvPowerSeries.C W.a₂ * s ^ 2 - 2 * MvPowerSeries.C W.a₄ * s * w.subst s -
-        3 * MvPowerSeries.C W.a₆ * (w.subst s) ^ 2 : MvPowerSeries σ K) ≠ 0 := by
+    have hD0
+        : (1 - MvPowerSeries.C W.a₁ * s - 2 * MvPowerSeries.C W.a₃ * w.subst s
+              - MvPowerSeries.C W.a₂ * s ^ 2 - 2 * MvPowerSeries.C W.a₄ * s * w.subst s
+              - 3 * MvPowerSeries.C W.a₆ * (w.subst s) ^ 2
+            : MvPowerSeries σ K)
+          ≠ 0 := by
       intro h0
       have := congrArg MvPowerSeries.constantCoeff h0
       simp [hs0, hwc] at this

@@ -8,8 +8,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level
 open GlobalTheory.SW hiding Level
 open Formalism.L2.Pj Formalism.L2.PjFree
@@ -25,7 +28,8 @@ theorem mem_range_iff (x : E) : x ∈ (algebraMap (𝓞 E) E).range ↔ IsIntegr
   ⟨fun ⟨a, ha⟩ => ha ▸ a.isIntegral_coe, fun h => ⟨⟨x, h⟩, rfl⟩⟩
 
 theorem mem_std (v : Fin n → E) : v ∈ Formalism.L2.Pj.stdLat E n ↔ ∀ i, IsIntegral ℤ (v i) := by
-  simp only [Formalism.L2.Pj.stdLat, Submodule.mem_pi, Set.mem_univ, true_imp_iff, Submodule.mem_one]
+  simp only [Formalism.L2.Pj.stdLat, Submodule.mem_pi, Set.mem_univ, true_imp_iff,
+    Submodule.mem_one]
   exact forall_congr' fun i => mem_range_iff (v i)
 
 theorem std_eq : Formalism.L2.Pj.stdLat E n = stdL E n := by
@@ -46,8 +50,8 @@ theorem std_eq : Formalism.L2.Pj.stdLat E n = stdL E n := by
     · subst h; simpa using isIntegral_one
     · simpa [Pi.single_apply, h] using isIntegral_zero
 
-theorem span_smul_le (k : ℕ) (A B : Lt E n) :
-    Ideal.span {(k : 𝓞 E)} • A ≤ B ↔ ∀ v ∈ A, (k : E) • v ∈ B := by
+theorem span_smul_le (k : ℕ) (A B : Lt E n)
+    : Ideal.span {(k : 𝓞 E)} • A ≤ B ↔ ∀ v ∈ A, (k : E) • v ∈ B := by
   have e : ∀ v : Fin n → E, (k : 𝓞 E) • v = (k : E) • v := fun v => by
     rw [Nat.cast_smul_eq_nsmul, Nat.cast_smul_eq_nsmul]
   rw [Submodule.ideal_span_singleton_smul]
@@ -57,13 +61,14 @@ theorem span_smul_le (k : ℕ) (A B : Lt E n) :
     exact h (Submodule.smul_mem_pointwise_smul v _ A hv)
   · intro h x hx
     obtain ⟨v, hv, rfl⟩ := (Submodule.mem_smul_pointwise_iff_exists _ _ _).1 hx
-    rw [e]; exact h v hv
+    rw [e]
+    exact h v hv
 
 theorem natCast_smul_mem (k : ℕ) {A : Lt E n} {v : Fin n → E} (hv : v ∈ A) : (k : E) • v ∈ A := by
   rw [Nat.cast_smul_eq_nsmul]; exact A.toAddSubgroup.nsmul_mem hv k
 
-theorem fg_of_smul_le {Λ : Lt E n} {s : ℕ} (hs : 0 < s) (h : ∀ v ∈ Λ, (s : E) • v ∈ stdL E n) :
-    Λ.FG := by
+theorem fg_of_smul_le {Λ : Lt E n} {s : ℕ} (hs : 0 < s) (h : ∀ v ∈ Λ, (s : E) • v ∈ stdL E n)
+    : Λ.FG := by
   have h0 : (stdL E n).FG := Submodule.fg_span (Set.finite_range _)
   have h1 := h0.map ((LinearMap.lsmul E (Fin n → E) (s : E)⁻¹).restrictScalars (𝓞 E))
   refine h1.of_le fun v hv => ⟨(s : E) • v, h v hv, ?_⟩
@@ -72,19 +77,21 @@ theorem fg_of_smul_le {Λ : Lt E n} {s : ℕ} (hs : 0 < s) (h : ∀ v ∈ Λ, (s
 
 variable [IsCMField E]
 
-theorem herm_one_eq (x y : Fin n → E) :
-    herm 1 x y = cc (∑ j, IsCMField.complexConj E (x j) * y j) := by
+theorem herm_one_eq (x y : Fin n → E)
+    : herm 1 x y = cc (∑ j, IsCMField.complexConj E (x j) * y j) := by
   simp [herm, cc, Matrix.one_apply]
 
-theorem unimod_iff (Λ : Lt E n) : (⟨Λ⟩ : GenLat E n).Unimod ↔
-    ∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, IsIntegral ℤ (herm 1 x y) := by
+theorem unimod_iff (Λ : Lt E n)
+    : (⟨Λ⟩ : GenLat E n).Unimod ↔ ∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, IsIntegral ℤ (herm 1 x y) := by
   refine forall_congr' fun x => iff_congr Iff.rfl (forall₂_congr fun y _ => ?_)
   rw [mem_range_iff, herm_one_eq]
   refine ⟨Base.isIntegral_cc, fun h => ?_⟩
   simpa [cc] using Base.isIntegral_cc h
 
-theorem smul_mem_std {Λ : Lt E n} (hU : ∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, IsIntegral ℤ (herm 1 x y)) {s : ℕ}
-    (h : ∀ v ∈ stdL E n, (s : E) • v ∈ Λ) : ∀ v ∈ Λ, (s : E) • v ∈ stdL E n := by
+theorem smul_mem_std
+    {Λ : Lt E n} (hU : ∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, IsIntegral ℤ (herm 1 x y))
+    {s : ℕ} (h : ∀ v ∈ stdL E n, (s : E) • v ∈ Λ)
+    : ∀ v ∈ Λ, (s : E) • v ∈ stdL E n := by
   intro v hv
   rw [← std_eq, mem_std]
   intro i
@@ -92,14 +99,30 @@ theorem smul_mem_std {Λ : Lt E n} (hU : ∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, IsInt
   convert this using 1
   simp [herm, cc, Matrix.one_apply, Pi.single_apply, mul_comm, apply_ite (IsCMField.complexConj E)]
 
-theorem genLat_vset : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (Λ : Lt E n), (∀ bad M : ℕ, 0 < bad → Odd M → Λ ∈ Vset E n (2 * bad * M) → (⟨Λ⟩ : GenLat E n).Unimod ∧ (⟨Λ⟩ : GenLat E n).TrivAt bad ∧ (⟨Λ⟩ : GenLat E n).TrivAt M ∧ ∃ N, NOK Λ N M) ∧ (∀ M N : ℕ, 0 < M → (⟨Λ⟩ : GenLat E n).Unimod → (⟨Λ⟩ : GenLat E n).TrivAt M → NOK Λ N M → Λ ∈ Vset E n M) ∧ (∀ M M' : ℕ, M ∣ M' → Λ ∈ Vset E n M' → Λ ∈ Vset E n M) ∧ stdLat E n = stdL E n := by
+theorem genLat_vset
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (Λ : Lt E n),
+      (∀ bad M : ℕ,
+          0 < bad → Odd M → Λ ∈ Vset E n (2 * bad * M)
+            → (⟨Λ⟩ : GenLat E n).Unimod ∧ (⟨Λ⟩ : GenLat E n).TrivAt bad
+              ∧ (⟨Λ⟩ : GenLat E n).TrivAt M ∧ ∃ N, NOK Λ N M)
+        ∧ (∀ M N : ℕ,
+          0 < M → (⟨Λ⟩ : GenLat E n).Unimod → (⟨Λ⟩ : GenLat E n).TrivAt M → NOK Λ N M
+            → Λ ∈ Vset E n M)
+        ∧ (∀ M M' : ℕ, M ∣ M' → Λ ∈ Vset E n M' → Λ ∈ Vset E n M) ∧ stdLat E n = stdL E n := by
   intro E _ _ _ n Λ
   refine ⟨?_, ?_, ?_, std_eq⟩
   · rintro bad M - hM ⟨-, hU, s, -, hs, h1, h2⟩
     have t : ∀ m, s.Coprime m → (⟨Λ⟩ : GenLat E n).TrivAt m := fun m hm =>
       ⟨s, hm, by rw [std_eq, span_smul_le]; exact h1, by rw [std_eq, span_smul_le]; exact h2⟩
-    refine ⟨(unimod_iff Λ).2 hU, t _ hs.coprime_mul_right_right.coprime_mul_left_right,
-      t _ hs.coprime_mul_left_right, s * M, ?_, Dvd.intro_left _ rfl, ?_⟩
+    refine ⟨
+      (unimod_iff Λ).2 hU,
+      t _ hs.coprime_mul_right_right.coprime_mul_left_right,
+      t _ hs.coprime_mul_left_right,
+      s * M,
+      ?_,
+      Dvd.intro_left _ rfl,
+      ?_
+    ⟩
     · exact (Nat.coprime_two_right.1 hs.coprime_mul_right_right.coprime_mul_right_right).mul hM
     · rw [span_smul_le]
       intro v hv

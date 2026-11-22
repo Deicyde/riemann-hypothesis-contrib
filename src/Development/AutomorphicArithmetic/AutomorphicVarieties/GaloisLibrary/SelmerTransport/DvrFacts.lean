@@ -5,12 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
 
 section Alg
 
-variable {l : ℕ} [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
+variable
+  {l : ℕ} [Fact l.Prime]
+  (O : Type)
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
 
 private theorem algebraMap_inj : Function.Injective (algebraMap ℤ_[l] O) := by
   rw [RingHom.injective_iff_ker_eq_bot]
@@ -23,8 +26,10 @@ private theorem algebraMap_inj : Function.Injective (algebraMap ℤ_[l] O) := by
     exact hmax
   exact IsDiscreteValuationRing.not_a_field O (IsLocalRing.eq_maximalIdeal hbot).symm
 
-private theorem length_quot [Module.Free ℤ_[l] O] : Module.length ℤ_[l] (O ⧸ Ideal.span {(l : O)}) = Module.finrank ℤ_[l] O := by
-  have hspan : Ideal.span {(l : O)} = (IsLocalRing.maximalIdeal ℤ_[l]).map (algebraMap ℤ_[l] O) := by
+private theorem length_quot [Module.Free ℤ_[l] O]
+    : Module.length ℤ_[l] (O ⧸ Ideal.span {(l : O)}) = Module.finrank ℤ_[l] O := by
+  have hspan
+      : Ideal.span {(l : O)} = (IsLocalRing.maximalIdeal ℤ_[l]).map (algebraMap ℤ_[l] O) := by
     rw [PadicInt.maximalIdeal_eq_span_p, Ideal.map_span, Set.image_singleton, map_natCast]
   rw [hspan, ← IsLocalRing.finrank_quotient_map (R := ℤ_[l]) (S := O)]
   letI : Field (ℤ_[l] ⧸ IsLocalRing.maximalIdeal ℤ_[l]) := Ideal.Quotient.field _
@@ -36,21 +41,23 @@ private theorem length_quot [Module.Free ℤ_[l] O] : Module.length ℤ_[l] (O �
 
 end Alg
 
-theorem UpperTheory.V.Base.dvrFacts :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O],
-      Function.Injective (algebraMap ℤ_[l] O) ∧ Module.Free ℤ_[l] O ∧ IsLocalHom (algebraMap ℤ_[l] O) ∧
-      IsAdicComplete (IsLocalRing.maximalIdeal O) O ∧
-      eO l O = Module.length O (O ⧸ (IsLocalRing.maximalIdeal ℤ_[l]).map (algebraMap ℤ_[l] O)) ∧ eO l O ≠ 0 ∧
-      eO l O ≤ (Module.finrank ℤ_[l] O : ℕ∞) ∧ eO l O = IsDiscreteValuationRing.addVal O (l : O) ∧
-      ∀ n : ℕ, ¬ l ∣ n → IsUnit (n : O) := by
+theorem UpperTheory.V.Base.dvrFacts
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O],
+      Function.Injective (algebraMap ℤ_[l] O) ∧ Module.Free ℤ_[l] O
+        ∧ IsLocalHom (algebraMap ℤ_[l] O) ∧ IsAdicComplete (IsLocalRing.maximalIdeal O) O
+        ∧ eO l O = Module.length O (O ⧸ (IsLocalRing.maximalIdeal ℤ_[l]).map (algebraMap ℤ_[l] O))
+        ∧ eO l O ≠ 0 ∧ eO l O ≤ (Module.finrank ℤ_[l] O : ℕ∞)
+        ∧ eO l O = IsDiscreteValuationRing.addVal O (l : O)
+        ∧ ∀ n : ℕ, ¬ l ∣ n → IsUnit (n : O) := by
   intro l _ O _ _ _ _ _
   have hinj : Function.Injective (algebraMap ℤ_[l] O) := algebraMap_inj O
   haveI : CharZero O := charZero_of_injective_algebraMap hinj
   obtain ⟨hcomp, -, hlm, -, hfree, hloc⟩ := UpperTheory.V.abelian₂.dvr_finite l O
   haveI := hfree
   haveI := hloc
-  have hspan : Ideal.span {(l : O)} =
-      (IsLocalRing.maximalIdeal ℤ_[l]).map (algebraMap ℤ_[l] O) := by
+  have hspan
+      : Ideal.span {(l : O)} = (IsLocalRing.maximalIdeal ℤ_[l]).map (algebraMap ℤ_[l] O) := by
     rw [PadicInt.maximalIdeal_eq_span_p, Ideal.map_span, Set.image_singleton, map_natCast]
   have hl0 : (l : O) ≠ 0 := by
     intro h

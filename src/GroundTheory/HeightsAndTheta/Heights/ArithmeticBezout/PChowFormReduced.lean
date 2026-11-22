@@ -20,14 +20,17 @@ section Helpers
 
 variable {F : Type*} [Field F] {n k : ℕ}
 
-theorem incidence_mono {I W : Ideal (MvPolynomial (Fin n) F)} (hIW : I ≤ W)
-    {u : Fin k × Fin n → AlgebraicClosure F} (hu : u ∈ incidence W k) : u ∈ incidence I k := by
+theorem incidence_mono
+    {I W : Ideal (MvPolynomial (Fin n) F)} (hIW : I ≤ W)
+    {u : Fin k × Fin n → AlgebraicClosure F} (hu : u ∈ incidence W k)
+    : u ∈ incidence I k := by
   obtain ⟨x, hx0, hxW, hxu⟩ := hu
   exact ⟨x, hx0, fun g hg => hxW g (hIW hg), hxu⟩
 
-theorem exists_relComps_of_mem_incidence {J : Ideal (MvPolynomial (Fin n) F)}
-    {u : Fin k × Fin n → AlgebraicClosure F} (hu : u ∈ incidence J k) :
-    ∃ W ∈ relComps J, u ∈ incidence W k := by
+theorem exists_relComps_of_mem_incidence
+    {J : Ideal (MvPolynomial (Fin n) F)} {u : Fin k × Fin n → AlgebraicClosure F}
+    (hu : u ∈ incidence J k)
+    : ∃ W ∈ relComps J, u ∈ incidence W k := by
   obtain ⟨x, hx0, hxJ, hxu⟩ := hu
   let φ : MvPolynomial (Fin n) F →ₐ[F] AlgebraicClosure F := aeval x
   have hP : (RingHom.ker φ).IsPrime := RingHom.ker_isPrime _
@@ -43,8 +46,9 @@ theorem exists_relComps_of_mem_incidence {J : Ideal (MvPolynomial (Fin n) F)}
   have := RingHom.mem_ker.mp (hWP hj)
   simpa [φ] using this
 
-theorem mem_support_fundCycle_iff {J : Ideal (MvPolynomial (Fin n) F)} (hJ : J.IsRadical)
-    {W : Ideal (MvPolynomial (Fin n) F)} : W ∈ (fundCycle J).support ↔ W ∈ relComps J := by
+theorem mem_support_fundCycle_iff
+    {J : Ideal (MvPolynomial (Fin n) F)} (hJ : J.IsRadical) {W : Ideal (MvPolynomial (Fin n) F)}
+    : W ∈ (fundCycle J).support ↔ W ∈ relComps J := by
   classical
   rw [Finsupp.mem_support_iff]
   unfold fundCycle

@@ -8,12 +8,12 @@ universe u
 
 namespace GlobalTheory
 
-theorem quotient_retract_pi_quotient :
-    ∀ {C : Type} [CommRing C] [IsLocalRing C] (I : Ideal C) {H : Type u} [AddCommGroup H] [Module C H]
-      [Module.Finite C H] [Module.Projective C H] (F : Submodule C H), I • ⊤ ≤ F →
-      (∃ E' M : Submodule C H, IsCompl E' M ∧ E' ⊔ I • ⊤ = F) →
-      ∃ (m : ℕ) (s : (H ⧸ F) →ₗ[C] (Fin m → C ⧸ I)) (r : (Fin m → C ⧸ I) →ₗ[C] (H ⧸ F)),
-        r ∘ₗ s = LinearMap.id := by
+theorem quotient_retract_pi_quotient
+    : ∀ {C : Type} [CommRing C] [IsLocalRing C] (I : Ideal C) {H : Type u} [AddCommGroup H]
+        [Module C H] [Module.Finite C H] [Module.Projective C H] (F : Submodule C H),
+      I • ⊤ ≤ F → (∃ E' M : Submodule C H, IsCompl E' M ∧ E' ⊔ I • ⊤ = F)
+        → ∃ (m : ℕ) (s : (H ⧸ F) →ₗ[C] (Fin m → C ⧸ I)) (r : (Fin m → C ⧸ I) →ₗ[C] (H ⧸ F)),
+          r ∘ₗ s = LinearMap.id := by
   intro C _ _ I H _ _ _ _ F hIF hEx
   obtain ⟨E', M, hc, hF⟩ := hEx
   obtain ⟨n, π, hπ⟩ := Module.Finite.exists_fin' C H
@@ -25,7 +25,8 @@ theorem quotient_retract_pi_quotient :
   have hqE : ∀ x ∈ E', q x = 0 := fun x hx => by
     have h0 : P x = 0 := (Submodule.linearProjOfIsCompl_apply_eq_zero_iff hc.symm).2 hx
     show ((P x : M) : H) = 0
-    rw [h0]; rfl
+    rw [h0]
+    rfl
   have hxq : ∀ x, x - q x ∈ F := by
     intro x
     rw [← hF]
@@ -62,8 +63,8 @@ theorem quotient_retract_pi_quotient :
   have h1 : r (s (F.mkQ x)) = F.mkQ (q (π (σ (q x)))) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [LinearMap.pi_apply_eq_sum_univ π (σ (q x)), map_sum, map_sum]
-    simp only [r, s, g, LinearMap.sum_apply, LinearMap.comp_apply,
-      LinearMap.proj_apply, Submodule.liftQ_apply, Submodule.mkQ_apply, s0, LinearMap.pi_apply]
+    simp only [r, s, g, LinearMap.sum_apply, LinearMap.comp_apply, LinearMap.proj_apply,
+      Submodule.liftQ_apply, Submodule.mkQ_apply, s0, LinearMap.pi_apply]
     refine Finset.sum_congr rfl (fun k _ => ?_)
     rw [LinearMap.toSpanSingleton_apply, map_smul, ← Submodule.Quotient.mk_smul]
   rw [LinearMap.comp_apply, LinearMap.comp_apply, h1, hσπ, hqq]

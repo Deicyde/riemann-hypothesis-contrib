@@ -20,8 +20,10 @@ theorem eta_eq_of_norm_eq {F : Type} [NormedField F] {x y : F} (h : ‖x‖ = �
   · rw [if_pos hx, if_pos (h ▸ hx)]
   · rw [if_neg hx, if_neg (h ▸ hx)]
 
-theorem isLocallyConstant_eta_comp {X F : Type} [TopologicalSpace X] [NormedField F] [IsUltrametricDist F]
-    (h : X → F) (hc : Continuous h) (h0 : ∀ x, h x ≠ 0) : IsLocallyConstant (fun x => eta (h x)) := by
+theorem isLocallyConstant_eta_comp
+    {X F : Type} [TopologicalSpace X] [NormedField F] [IsUltrametricDist F]
+    (h : X → F) (hc : Continuous h) (h0 : ∀ x, h x ≠ 0)
+    : IsLocallyConstant (fun x => eta (h x)) := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
   have hx : 0 < ‖h x‖ := norm_pos_iff.mpr (h0 x)
@@ -40,45 +42,55 @@ theorem isLocallyConstant_eta_comp {X F : Type} [TopologicalSpace X] [NormedFiel
     · exact e2.trans (max_le hh le_rfl)
     · exact absurd (e2.trans (max_le le_rfl hh)) (not_le.mpr hy')
 
-theorem continuous_act {r : ℕ} {k : Type} [CommRing k] [TopologicalSpace k] [IsTopologicalRing k] (Y : Gl r k) :
-    Continuous (fun g : GL (Fin r) k => act g Y) := by
+theorem continuous_act
+    {r : ℕ} {k : Type} [CommRing k] [TopologicalSpace k] [IsTopologicalRing k] (Y : Gl r k)
+    : Continuous (fun g : GL (Fin r) k => act g Y) := by
   unfold act
   refine Continuous.prodMk ?_ (Continuous.prodMk ?_ (Continuous.prodMk ?_ continuous_const))
   · exact (Units.continuous_val.matrix_mul continuous_const).matrix_mul Units.continuous_coe_inv
   · exact Units.continuous_val.matrix_mulVec continuous_const
   · exact continuous_const.matrix_vecMul Units.continuous_coe_inv
 
-theorem actU_mul {r : ℕ} {F E : Type} [CommRing F] [CommRing E] [StarRing E] [Algebra F E]
-    (g h : Matrix.unitaryGroup (Fin r) E) (X : Hn r F E) : actU (g * h) X = actU g (actU h X) := by
+theorem actU_mul
+    {r : ℕ} {F E : Type} [CommRing F] [CommRing E] [StarRing E] [Algebra F E]
+    (g h : Matrix.unitaryGroup (Fin r) E) (X : Hn r F E)
+    : actU (g * h) X = actU g (actU h X) := by
   unfold actU
   refine Prod.ext (Subtype.ext ?_) (Prod.ext ?_ rfl)
   · simp only [Submonoid.coe_mul, star_mul, Matrix.mul_assoc]
   · simp only [Submonoid.coe_mul, Matrix.mulVec_mulVec]
 
-theorem continuous_actU {r : ℕ} {F E : Type} [CommRing F] [CommRing E] [StarRing E] [Algebra F E]
-    [TopologicalSpace F] [TopologicalSpace E] [IsTopologicalRing E] [ContinuousStar E] (X : Hn r F E) :
-    Continuous (fun g : Matrix.unitaryGroup (Fin r) E => actU g X) := by
+theorem continuous_actU
+    {r : ℕ} {F E : Type} [CommRing F] [CommRing E] [StarRing E] [Algebra F E] [TopologicalSpace F]
+    [TopologicalSpace E] [IsTopologicalRing E] [ContinuousStar E]
+    (X : Hn r F E)
+    : Continuous (fun g : Matrix.unitaryGroup (Fin r) E => actU g X) := by
   unfold actU
   refine Continuous.prodMk (Continuous.subtype_mk ?_ _) (Continuous.prodMk ?_ continuous_const)
-  · exact (continuous_subtype_val.matrix_mul continuous_const).matrix_mul continuous_subtype_val.star
+  · exact (continuous_subtype_val.matrix_mul continuous_const).matrix_mul
+      continuous_subtype_val.star
   · exact continuous_subtype_val.matrix_mulVec continuous_const
 
 end GlobalTheory.JR.OrbTest
 
 namespace GlobalTheory.JR.OrbTest
 
-theorem isTest_orbG_integrand (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E]
-    [NormedAlgebra F E] [StarRing E] [Unram F E] (r : ℕ) (f' : Gl r F → ℂ) (hf : IsTest f') (Y : Gl r F)
-    (hY : Delta (inv Y) ≠ 0) :
-    IsTest (fun g : GL (Fin r) F => f' (act g Y) * omega (act g Y)) := by
+theorem isTest_orbG_integrand
+    (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+    [StarRing E] [Unram F E]
+    (r : ℕ) (f' : Gl r F → ℂ) (hf : IsTest f') (Y : Gl r F) (hY : Delta (inv Y) ≠ 0)
+    : IsTest (fun g : GL (Fin r) F => f' (act g Y) * omega (act g Y)) := by
   haveI : IsUltrametricDist F := Unram.ultraF (E := E)
-  obtain ⟨-, hL1b, hL1c, hL1d, hL1e⟩ := GlobalTheory.T.jacquetRallis_borderedMatrix_normalForm_invariants F r
+  obtain ⟨-, hL1b, hL1c, hL1d, hL1e⟩ :=
+    GlobalTheory.T.jacquetRallis_borderedMatrix_normalForm_invariants F r
   obtain ⟨hL6a, hL6b⟩ := GlobalTheory.T.jacquetRallis_transfer_factor_krylov_det F r
   obtain ⟨-, -, -, hL4⟩ := GlobalTheory.T.jacquetRallis_orbit_invariant_map_proper F E r
   have hC : (Cm Y).det ≠ 0 := by
     intro h0; apply hY; rw [Delta, ← hL1c Y, Matrix.det_mul, h0, zero_mul]
-  have hld : (fun g : GL (Fin r) F => lastDet (act g Y)) = fun g =>
-      (-1) ^ r * ((Cm Y).det * ((g⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F).det) := by
+  have hld
+      : (fun g : GL (Fin r) F => lastDet (act g Y))
+        = fun g =>
+          (-1) ^ r * ((Cm Y).det * ((g⁻¹ : GL (Fin r) F) : Matrix (Fin r) (Fin r) F).det) := by
     funext g; rw [hL6a, hL6b, Matrix.det_mul]
   refine ⟨?_, ?_⟩
   · refine IsLocallyConstant.comp₂ (hf.1.comp_continuous (continuous_act Y)) ?_ (fun a b => a * b)
@@ -95,23 +107,29 @@ theorem isTest_orbG_integrand (F E : Type) [NontriviallyNormedField F] [Nontrivi
     have hS : IsCompact {h : GL (Fin r) F | act h (sec (inv Y)) ∈ tsupport f'} := by
       have := hL4 (tsupport f') {inv Y} hf.2 isCompact_singleton (by rintro b rfl; exact hY)
       convert this.image continuous_fst using 1
-      ext h; constructor
+      ext h
+      constructor
       · intro hh; exact ⟨(h, inv Y), ⟨rfl, hh⟩, rfl⟩
       · rintro ⟨⟨h', a'⟩, ⟨ha', hc⟩, rfl⟩
-        simp only [Set.mem_singleton_iff] at ha'; subst ha'; exact hc
+        simp only [Set.mem_singleton_iff] at ha'
+        subst ha'
+        exact hc
     have hK : IsCompact {g : GL (Fin r) F | act g Y ∈ tsupport f'} := by
       have := (Homeomorph.mulRight g₀).isCompact_preimage.mpr hS
       convert this using 1
-      ext g; simp [Homeomorph.coe_mulRight, hL1d, hg₀]
+      ext g
+      simp [Homeomorph.coe_mulRight, hL1d, hg₀]
     refine HasCompactSupport.intro' hK ((isClosed_tsupport f').preimage (continuous_act Y)) ?_
     intro g hg
     simp only [Set.mem_setOf_eq] at hg
     simp only [image_eq_zero_of_notMem_tsupport hg, zero_mul]
 
-theorem isTest_orbU_integrand (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E]
-    [NormedAlgebra F E] [StarRing E] [Unram F E] (r : ℕ) (f : Hn r F E → ℂ) (hf : IsTest f) (a : Inv r F)
-    (X : Hn r F E) (ha : Delta a ≠ 0) (hX : HasInv X a) :
-    IsTest (fun g : Matrix.unitaryGroup (Fin r) E => f (actU g X)) := by
+theorem isTest_orbU_integrand
+    (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+    [StarRing E] [Unram F E]
+    (r : ℕ) (f : Hn r F E → ℂ) (hf : IsTest f) (a : Inv r F) (X : Hn r F E)
+    (ha : Delta a ≠ 0) (hX : HasInv X a)
+    : IsTest (fun g : Matrix.unitaryGroup (Fin r) E => f (actU g X)) := by
   haveI : ContinuousStar E := ⟨by
     have : Continuous (starAddEquiv : E ≃+ E) :=
       AddMonoidHomClass.continuous_of_bound (starAddEquiv : E ≃+ E) 1
@@ -123,16 +141,21 @@ theorem isTest_orbU_integrand (F E : Type) [NontriviallyNormedField F] [Nontrivi
   obtain ⟨g₀, hg₀, -⟩ := hL5c (s a) X a ha (hs a haΩ).2 hX
   refine ⟨hf.1.comp_continuous (continuous_actU X), ?_⟩
   have hS : IsCompact {h : Matrix.unitaryGroup (Fin r) E | actU h (s a) ∈ tsupport f} := by
-    have h1 := (hprop (tsupport f) hf.2).inter_right (isClosed_univ.prod (isClosed_singleton (x := a)))
+    have h1 :=
+      (hprop (tsupport f) hf.2).inter_right (isClosed_univ.prod (isClosed_singleton (x := a)))
     convert h1.image continuous_fst using 1
-    ext h; constructor
+    ext h
+    constructor
     · intro hh; exact ⟨(h, a), ⟨⟨haΩ, hh⟩, Set.mem_univ _, rfl⟩, rfl⟩
     · rintro ⟨⟨h', a'⟩, ⟨⟨-, hc⟩, -, ha'⟩, rfl⟩
-      simp only [Set.mem_singleton_iff] at ha'; subst ha'; exact hc
+      simp only [Set.mem_singleton_iff] at ha'
+      subst ha'
+      exact hc
   have hK : IsCompact {g : Matrix.unitaryGroup (Fin r) E | actU g X ∈ tsupport f} := by
     have := (Homeomorph.mulRight g₀).isCompact_preimage.mpr hS
     convert this using 1
-    ext g; simp [Homeomorph.coe_mulRight, actU_mul, hg₀]
+    ext g
+    simp [Homeomorph.coe_mulRight, actU_mul, hg₀]
   refine HasCompactSupport.intro' hK ((isClosed_tsupport f).preimage (continuous_actU X)) ?_
   intro g hg
   simp only [Set.mem_setOf_eq] at hg
@@ -140,9 +163,21 @@ theorem isTest_orbU_integrand (F E : Type) [NontriviallyNormedField F] [Nontrivi
 
 end GlobalTheory.JR.OrbTest
 
-
 open GlobalTheory.JR.OrbTest in
-theorem GlobalTheory.JR.orb_integrand_isTest : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (r : ℕ) (M : Meas r F E), (∀ (f' : Gl r F → ℂ), IsTest f' → ∀ Y : Gl r F, Delta (inv Y) ≠ 0 → IsTest (fun g : GL (Fin r) F => f' (act g Y) * omega (act g Y))) ∧ ∀ (f : Hn r F E → ℂ), IsTest f → ∀ (a : Inv r F) (X : Hn r F E), Delta a ≠ 0 → HasInv X a → IsTest (fun g : Matrix.unitaryGroup (Fin r) E => f (actU g X)) := by
+theorem GlobalTheory.JR.orb_integrand_isTest
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (r : ℕ) (M : Meas r F E),
+      (∀ (f' : Gl r F → ℂ),
+          IsTest f'
+            → ∀ Y : Gl r F,
+              Delta (inv Y) ≠ 0 → IsTest (fun g : GL (Fin r) F => f' (act g Y) * omega (act g Y)))
+        ∧ ∀ (f : Hn r F E → ℂ),
+          IsTest f
+            → ∀ (a : Inv r F) (X : Hn r F E),
+              Delta a ≠ 0 → HasInv X a
+                → IsTest (fun g : Matrix.unitaryGroup (Fin r) E => f (actU g X)) := by
   intro F E _ _ _ _ _ r _
-  exact ⟨fun f' hf Y hY => isTest_orbG_integrand F E r f' hf Y hY,
-    fun f hf a X ha hX => isTest_orbU_integrand F E r f hf a X ha hX⟩
+  exact ⟨
+    fun f' hf Y hY => isTest_orbG_integrand F E r f' hf Y hY,
+    fun f hf a X ha hX => isTest_orbU_integrand F E r f hf a X ha hX
+  ⟩

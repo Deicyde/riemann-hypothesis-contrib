@@ -10,15 +10,17 @@ open IsLocalRing GlobalTheory.Pat
 
 namespace GlobalTheory.Pat
 
-theorem flat_quotientMap_map {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) (hφ : φ.Flat)
-    (I : Ideal R) : (Ideal.quotientMap (I.map φ) φ Ideal.le_comap_map).Flat := by
+theorem flat_quotientMap_map
+    {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S) (hφ : φ.Flat) (I : Ideal R)
+    : (Ideal.quotientMap (I.map φ) φ Ideal.le_comap_map).Flat := by
   algebraize [φ]
   have h1 : (algebraMap (R ⧸ I) (TensorProduct R (R ⧸ I) S)).Flat :=
     RingHom.flat_algebraMap_iff.2 inferInstance
   let e : TensorProduct R (R ⧸ I) S ≃+* S ⧸ I.map φ :=
     (Algebra.TensorProduct.comm R (R ⧸ I) S).toRingEquiv.trans
       (Algebra.TensorProduct.quotIdealMapEquivTensorQuot S I).symm.toRingEquiv
-  have h2 : (e : TensorProduct R (R ⧸ I) S →+* S ⧸ I.map φ).Flat := RingHom.Flat.of_bijective e.bijective
+  have h2 : (e : TensorProduct R (R ⧸ I) S →+* S ⧸ I.map φ).Flat :=
+    RingHom.Flat.of_bijective e.bijective
   have h3 := h1.comp h2
   convert h3 using 1
   refine Ideal.Quotient.ringHom_ext (RingHom.ext fun r => ?_)

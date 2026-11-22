@@ -15,10 +15,15 @@ open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual Recipro
 
 namespace GlobalTheory.ChevalleySUnits
 
-theorem exists_kummer_field (E F Ω : Type) [Field E] [NumberField E] [Field F] [Field Ω] [IsAlgClosed Ω]
-    [Algebra E F] [Algebra E Ω] [Algebra F Ω] [IsScalarTower E F Ω] (Γ : Subgroup Eˣ) [hΓ : Group.FG Γ] (M : ℕ) (hM : 0 < M)
-    (ζ : F) (hζ : IsPrimitiveRoot ζ M) : ∃ L : IntermediateField F Ω, FiniteDimensional F L ∧ IsGalois F L ∧
-      ∀ (u : Γ) (w : Ω), w ^ M = algebraMap E Ω ((u : Eˣ) : E) → w ∈ L := by
+theorem exists_kummer_field
+    (E F Ω : Type) [Field E] [NumberField E] [Field F] [Field Ω] [IsAlgClosed Ω] [Algebra E F]
+    [Algebra E Ω] [Algebra F Ω] [IsScalarTower E F Ω]
+    (Γ : Subgroup Eˣ) [hΓ : Group.FG Γ]
+    (M : ℕ) (hM : 0 < M)
+    (ζ : F) (hζ : IsPrimitiveRoot ζ M)
+    : ∃ L : IntermediateField F Ω,
+      FiniteDimensional F L ∧ IsGalois F L
+        ∧ ∀ (u : Γ) (w : Ω), w ^ M = algebraMap E Ω ((u : Eˣ) : E) → w ∈ L := by
   classical
   haveI : CharZero F := charZero_of_injective_algebraMap (algebraMap E F).injective
   obtain ⟨s, hs⟩ := hΓ.out
@@ -79,9 +84,11 @@ theorem exists_kummer_field (E F Ω : Type) [Field E] [NumberField E] [Field F] 
     have := inv_mem (ha _ h')
     rwa [inv_inv] at this
 
-theorem exists_integral_mul {E : Type} [Field E] [NumberField E] (t : HeightOneSpectrum (𝓞 E)) (x : E)
-    (hx : t.valuation E (x - 1) < 1) (M : ℕ) (hM : 0 < M) :
-    ∃ (d : E) (z : 𝓞 E), d ≠ 0 ∧ (z : E) = d ^ M * x ∧ z - 1 ∈ t.asIdeal := by
+theorem exists_integral_mul
+    {E : Type} [Field E] [NumberField E]
+    (t : HeightOneSpectrum (𝓞 E)) (x : E) (hx : t.valuation E (x - 1) < 1)
+    (M : ℕ) (hM : 0 < M)
+    : ∃ (d : E) (z : 𝓞 E), d ≠ 0 ∧ (z : E) = d ^ M * x ∧ z - 1 ∈ t.asIdeal := by
   classical
   have hx1 : t.valuation E x ≤ 1 := by
     have hsplit : x = (x - 1) + 1 := by ring
@@ -119,17 +126,22 @@ theorem exists_integral_mul {E : Type} [Field E] [NumberField E] (t : HeightOneS
   · rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_mul, map_mul, map_pow, hD1, one_pow, one_mul,
       hnd', ← map_mul, hD1, map_one, sub_self]
 
-theorem core (E : Type) [Field E] [NumberField E] (Γ : Subgroup Eˣ) [Group.FG Γ] (S : Finset (HeightOneSpectrum (𝓞 E)))
-    (l r : ℕ) (hl : l.Prime) :
-    ∃ T : Finset (HeightOneSpectrum (𝓞 E)), Disjoint S T ∧
-      ∀ x ∈ Γ, (∀ t ∈ T, t.valuation E ((x : E) - 1) < 1) → ∃ y : E, y ^ (l ^ r) = x := by
+theorem core
+    (E : Type) [Field E] [NumberField E]
+    (Γ : Subgroup Eˣ) [Group.FG Γ]
+    (S : Finset (HeightOneSpectrum (𝓞 E)))
+    (l r : ℕ) (hl : l.Prime)
+    : ∃ T : Finset (HeightOneSpectrum (𝓞 E)),
+      Disjoint S T
+        ∧ ∀ x ∈ Γ, (∀ t ∈ T, t.valuation E ((x : E) - 1) < 1) → ∃ y : E, y ^ (l ^ r) = x := by
   classical
   obtain ⟨M, hM, -, hdesc⟩ := GlobalTheory.exists_pow_descent_cyclotomic E l r hl
   haveI : NeZero M := ⟨hM.ne'⟩
   haveI : CharZero (AlgebraicClosure E) :=
     charZero_of_injective_algebraMap (algebraMap E (AlgebraicClosure E)).injective
-  obtain ⟨ζ, hζr⟩ := IsAlgClosed.exists_root (Polynomial.cyclotomic M (AlgebraicClosure E))
-    (Polynomial.degree_cyclotomic_pos M _ hM).ne'
+  obtain ⟨ζ, hζr⟩ :=
+    IsAlgClosed.exists_root (Polynomial.cyclotomic M (AlgebraicClosure E))
+      (Polynomial.degree_cyclotomic_pos M _ hM).ne'
   have hζ : IsPrimitiveRoot ζ M := Polynomial.isRoot_cyclotomic_iff.mp hζr
   set K : IntermediateField E (AlgebraicClosure E) := IntermediateField.adjoin E {ζ} with hK
   have hζint : IsIntegral E ζ := (Algebra.IsAlgebraic.isAlgebraic ζ).isIntegral
@@ -144,8 +156,8 @@ theorem core (E : Type) [Field E] [NumberField E] (Γ : Subgroup Eˣ) [Group.FG 
   haveI := hLfin
   haveI := hLgal
 
-  have hSne : ∀ s : HeightOneSpectrum (𝓞 E), ∃ b ∈ s.asIdeal, b ≠ 0 :=
-    fun s => Submodule.exists_mem_ne_zero_of_ne_bot s.ne_bot
+  have hSne : ∀ s : HeightOneSpectrum (𝓞 E), ∃ b ∈ s.asIdeal, b ≠ 0 := fun s =>
+    Submodule.exists_mem_ne_zero_of_ne_bot s.ne_bot
   choose a ha ha0 using hSne
   set N : 𝓞 E := (M : 𝓞 E) * ∏ s ∈ S, a s with hN
   have hN0 : N ≠ 0 := by
@@ -196,13 +208,16 @@ theorem core (E : Type) [Field E] [NumberField E] (Γ : Subgroup Eˣ) [Group.FG 
         show N' ∈ (v τ).asIdeal
         rw [hN', hN, map_mul, map_natCast]
         exact Ideal.mul_mem_right _ _ hMin
-      have hroot : (algebraMap E (AlgebraicClosure E) d * w) ^ M =
-          algebraMap K (AlgebraicClosure E) ((algebraMap (𝓞 E) (𝓞 K) z : 𝓞 K) : K) := by
+      have hroot
+          : (algebraMap E (AlgebraicClosure E) d * w) ^ M
+            = algebraMap K (AlgebraicClosure E) ((algebraMap (𝓞 E) (𝓞 K) z : 𝓞 K) : K) := by
         have hzc : ((algebraMap (𝓞 E) (𝓞 K) z : 𝓞 K) : K) = algebraMap E K (z : E) := rfl
         rw [hzc, ← IsScalarTower.algebraMap_apply, hz, mul_pow, hw, map_mul, map_pow]
-      have hσw := GlobalTheory.frob_fixes_root_of_one_mod K (AlgebraicClosure E) M ζK hζK (v τ) hMv (B τ) (hB τ) (σ τ)
-        (hσ τ) _ hzK _ hroot
-      have hσd : (σ τ) (algebraMap E (AlgebraicClosure E) d) = algebraMap E (AlgebraicClosure E) d := by
+      have hσw :=
+        GlobalTheory.frob_fixes_root_of_one_mod K (AlgebraicClosure E) M ζK hζK (v τ) hMv (B τ)
+          (hB τ) (σ τ) (hσ τ) _ hzK _ hroot
+      have hσd
+          : (σ τ) (algebraMap E (AlgebraicClosure E) d) = algebraMap E (AlgebraicClosure E) d := by
         rw [IsScalarTower.algebraMap_apply E K (AlgebraicClosure E)]
         exact (σ τ).commutes _
       have hdΩ : algebraMap E (AlgebraicClosure E) d ≠ 0 := (_root_.map_ne_zero _).mpr hd0
@@ -213,7 +228,8 @@ theorem core (E : Type) [Field E] [NumberField E] (Γ : Subgroup Eˣ) [Group.FG 
       change ((σ τ).restrictNormal L ⟨w, hwL⟩ : AlgebraicClosure E) = w
       have hc := AlgEquiv.restrictNormal_commutes (σ τ) L ⟨w, hwL⟩
       exact hc.trans hσw'
-    have hbot : (⟨w, hwL⟩ : L) ∈ (⊥ : IntermediateField K L) := (IsGalois.mem_bot_iff_fixed _).mpr hfix
+    have hbot : (⟨w, hwL⟩ : L) ∈ (⊥ : IntermediateField K L) :=
+      (IsGalois.mem_bot_iff_fixed _).mpr hfix
     rw [IntermediateField.mem_bot] at hbot
     obtain ⟨k, hk⟩ := hbot
     have hwK : w ∈ K := by
@@ -222,10 +238,13 @@ theorem core (E : Type) [Field E] [NumberField E] (Γ : Subgroup Eˣ) [Group.FG 
       exact k.2
     exact hdesc (AlgebraicClosure E) ζ hζ (x : E) w hwK hw
 
-theorem exists_places_of_fg (E : Type) [Field E] [NumberField E] (Γ : Subgroup Eˣ) [Group.FG Γ]
-    (S : Finset (HeightOneSpectrum (𝓞 E))) (m : ℕ) (hm : 0 < m) :
-    ∃ T : Finset (HeightOneSpectrum (𝓞 E)), Disjoint S T ∧
-      ∀ x ∈ Γ, (∀ t ∈ T, t.valuation E ((x : E) - 1) < 1) → ∃ y : E, y ^ m = x := by
+theorem exists_places_of_fg
+    (E : Type) [Field E] [NumberField E]
+    (Γ : Subgroup Eˣ) [Group.FG Γ]
+    (S : Finset (HeightOneSpectrum (𝓞 E)))
+    (m : ℕ) (hm : 0 < m)
+    : ∃ T : Finset (HeightOneSpectrum (𝓞 E)),
+      Disjoint S T ∧ ∀ x ∈ Γ, (∀ t ∈ T, t.valuation E ((x : E) - 1) < 1) → ∃ y : E, y ^ m = x := by
   classical
   induction m using Nat.recOnPosPrimePosCoprime with
   | prime_pow p n hp _ => exact core E Γ S p n hp
@@ -255,10 +274,13 @@ theorem exists_places_of_fg (E : Type) [Field E] [NumberField E] (Γ : Subgroup 
       ring
     rw [e1, e2, ← zpow_add₀ hx0, add_comm, hbez, zpow_one]
 
-theorem exists_places (E : Type) [Field E] [NumberField E] (S : Finset (HeightOneSpectrum (𝓞 E))) (m : ℕ) (hm : 0 < m) :
-    ∃ T : Finset (HeightOneSpectrum (𝓞 E)), Disjoint S T ∧
-      ∀ x : Eˣ, (∀ v, v ∉ S → v.valuation E (x : E) = 1) → (∀ t ∈ T, t.valuation E ((x : E) - 1) < 1) →
-        ∃ y : E, y ^ m = x := by
+theorem exists_places
+    (E : Type) [Field E] [NumberField E] (S : Finset (HeightOneSpectrum (𝓞 E))) (m : ℕ) (hm : 0 < m)
+    : ∃ T : Finset (HeightOneSpectrum (𝓞 E)),
+      Disjoint S T
+        ∧ ∀ x : Eˣ,
+          (∀ v, v ∉ S → v.valuation E (x : E) = 1) → (∀ t ∈ T, t.valuation E ((x : E) - 1) < 1)
+            → ∃ y : E, y ^ m = x := by
   haveI := GlobalTheory.QNorm.sUnits_fg E S
   obtain ⟨T, hST, hT⟩ := exists_places_of_fg E (GlobalTheory.QNorm.sUnits E S) S m hm
   exact ⟨T, hST, fun x hx hxT => hT x ((GlobalTheory.QNorm.mem_sUnits E S x).mpr hx) hxT⟩

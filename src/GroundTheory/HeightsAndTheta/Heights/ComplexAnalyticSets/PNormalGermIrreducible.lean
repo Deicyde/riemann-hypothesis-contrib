@@ -15,9 +15,11 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Topology Filter
 
-theorem eq_zero_of_mem_closure_of_continuousAt {σ : Type} [Fintype σ] {k : (σ → ℂ) → ℂ}
-    {S : Set (σ → ℂ)} {u : σ → ℂ} (hk : ContinuousAt k u) (hu : u ∈ closure S)
-    (h0 : ∀ y ∈ S, k y = 0) : k u = 0 := by
+theorem eq_zero_of_mem_closure_of_continuousAt
+    {σ : Type} [Fintype σ]
+    {k : (σ → ℂ) → ℂ} {S : Set (σ → ℂ)} {u : σ → ℂ}
+    (hk : ContinuousAt k u) (hu : u ∈ closure S) (h0 : ∀ y ∈ S, k y = 0)
+    : k u = 0 := by
   have h1 := hk.continuousWithinAt.mem_closure_image hu
   have h2 : k '' S ⊆ {0} := by
     rintro _ ⟨y, hy, rfl⟩
@@ -25,9 +27,10 @@ theorem eq_zero_of_mem_closure_of_continuousAt {σ : Type} [Fintype σ] {k : (σ
   have h3 := closure_mono h2 h1
   rwa [closure_singleton, Set.mem_singleton_iff] at h3
 
-theorem NormalGermIrreducible.proof (hreg : RegularLocusIdentity.Statement)
-    (hext : NormalRiemannExtensionLocal.Statement) (hvan : VanishNearPoint.Statement) :
-    NormalGermIrreducible.Statement := by
+theorem NormalGermIrreducible.proof
+    (hreg : RegularLocusIdentity.Statement) (hext : NormalRiemannExtensionLocal.Statement)
+    (hvan : VanishNearPoint.Statement)
+    : NormalGermIrreducible.Statement := by
   classical
   intro σ _ I w hI hnorm hw
   refine ⟨hw, fun f g hf hg hfg => ?_⟩
@@ -42,8 +45,11 @@ theorem NormalGermIrreducible.proof (hreg : RegularLocusIdentity.Statement)
 
   set E : (σ → ℂ) → Prop := fun z => ∀ᶠ y in 𝓝 z, y ∈ X → f y = 0 with hE
 
-  have key : ∀ z ∈ X ∩ U, eval z h ≠ 0 → ∃ V : Set (σ → ℂ), IsOpen V ∧ z ∈ V ∧ V ⊆ U ∧
-      ((∀ u ∈ X ∩ V, E u) ∨ (∀ u ∈ X ∩ V, ¬ E u ∧ g u = 0)) := by
+  have key
+      : ∀ z ∈ X ∩ U,
+        eval z h ≠ 0
+          → ∃ V : Set (σ → ℂ),
+            IsOpen V ∧ z ∈ V ∧ V ⊆ U ∧ ((∀ u ∈ X ∩ V, E u) ∨ (∀ u ∈ X ∩ V, ¬ E u ∧ g u = 0)) := by
     rintro z ⟨hzX, hzU⟩ hhz
     obtain ⟨V, hVo, hzV, hVU, hVid⟩ := hid z hzX hhz U (hUo.mem_nhds hzU)
     refine ⟨V, hVo, hzV, hVU, ?_⟩
@@ -94,13 +100,15 @@ theorem NormalGermIrreducible.proof (hreg : RegularLocusIdentity.Statement)
   have hwN : w ∈ N := ⟨hwV, Set.mem_preimage.mpr (Metric.mem_ball_self (by norm_num))⟩
   have hdense := zeroSetIn_subset_closure_diff hvan I h hI hhI
 
-  have spread : ∀ k : (σ → ℂ) → ℂ, (∀ y ∈ U, ContinuousAt k y) →
-      (∀ y ∈ X ∩ N, eval y h ≠ 0 → k y = 0) → ∀ᶠ u in 𝓝 w, u ∈ X → k u = 0 := by
+  have spread
+      : ∀ k : (σ → ℂ) → ℂ,
+        (∀ y ∈ U, ContinuousAt k y) → (∀ y ∈ X ∩ N, eval y h ≠ 0 → k y = 0)
+          → ∀ᶠ u in 𝓝 w, u ∈ X → k u = 0 := by
     intro k hk h0
     filter_upwards [hNo.mem_nhds hwN] with u huN huX
     have hcl : u ∈ closure (N ∩ (X \ {z | eval z h = 0})) := hNo.inter_closure ⟨huN, hdense huX⟩
-    exact eq_zero_of_mem_closure_of_continuousAt (hk u (hVU huN.1)) hcl
-      fun y hy => h0 y ⟨hy.2.1, hy.1⟩ hy.2.2
+    exact eq_zero_of_mem_closure_of_continuousAt (hk u (hVU huN.1)) hcl fun y hy =>
+      h0 y ⟨hy.2.1, hy.1⟩ hy.2.2
   have hφN : ∀ y ∈ X ∩ N, eval y h ≠ 0 → ‖φ y - F w‖ < 1 / 2 := by
     rintro y ⟨hyX, hyV, hyF⟩ hhy
     rw [← hFeq ⟨⟨hyX, hyV⟩, hhy⟩]
@@ -113,7 +121,9 @@ theorem NormalGermIrreducible.proof (hreg : RegularLocusIdentity.Statement)
       have h1 := hφN y hy hhy
       simp only [hφ, if_neg hnE] at h1
       have : ‖(1 : ℂ)‖ < 1 := by
-        calc ‖(1 : ℂ)‖ = ‖(1 - F w) + F w‖ := by ring_nf
+        calc
+          ‖(1 : ℂ)‖
+            = ‖(1 - F w) + F w‖ := by ring_nf
           _ ≤ ‖1 - F w‖ + ‖F w‖ := norm_add_le _ _
           _ < 1 / 2 + 1 / 2 := add_lt_add h1 hc
           _ = 1 := by norm_num

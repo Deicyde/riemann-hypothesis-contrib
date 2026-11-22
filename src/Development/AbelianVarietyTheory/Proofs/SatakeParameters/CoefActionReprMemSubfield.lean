@@ -52,27 +52,44 @@ private lemma actP_mem_range_map_of_entries_mem {K : Type} [Field K] (K₀ : Sub
   intro τ a b
   exact hg τ b a
 
-
 open NumberField in
-theorem _root_.GlobalTheory.coefAction_repr_mem_subfield : ∀ {E K ι : Type} [Field E] [NumberField E] [Field K] [NumberField K] [Fintype ι] {n : ℕ} (emb : ι → E →+* K) (K₀ : Subfield K) (lam : ι → _root_.Formalism.BasicNotions.DomWeight n), (∀ τ x, emb τ x ∈ K₀) → ∀ (g : GL (Fin n) E) i j, (_root_.Formalism.L2.DIV.bVV K lam).repr (_root_.Formalism.L2.DIV.rhoV emb lam g (_root_.Formalism.L2.DIV.bVV K lam j)) i ∈ K₀ ∧ (_root_.Formalism.L2.DIV.bVV K lam).repr (_root_.Formalism.L2.DIV.rhoVr emb lam g (_root_.Formalism.L2.DIV.bVV K lam j)) i ∈ K₀ := by
+theorem _root_.GlobalTheory.coefAction_repr_mem_subfield
+    : ∀ {E K ι : Type} [Field E] [NumberField E] [Field K] [NumberField K] [Fintype ι] {n : ℕ}
+        (emb : ι → E →+* K) (K₀ : Subfield K) (lam : ι → _root_.Formalism.BasicNotions.DomWeight n),
+      (∀ τ x, emb τ x ∈ K₀)
+        → ∀ (g : GL (Fin n) E) i j,
+          (_root_.Formalism.L2.DIV.bVV K lam).repr
+                (_root_.Formalism.L2.DIV.rhoV emb lam g (_root_.Formalism.L2.DIV.bVV K lam j)) i
+              ∈ K₀
+            ∧ (_root_.Formalism.L2.DIV.bVV K lam).repr
+                (_root_.Formalism.L2.DIV.rhoVr emb lam g (_root_.Formalism.L2.DIV.bVV K lam j)) i
+              ∈ K₀ := by
   intro E K ι _ _ _ _ _ n emb K₀ lam hemb γ i j
   classical
-  have hbase : ∀ l, _root_.Formalism.L2.DIV.bVVfun K lam l ∈ (MvPolynomial.map K₀.subtype).range := by
+  have hbase
+      : ∀ l, _root_.Formalism.L2.DIV.bVVfun K lam l ∈ (MvPolynomial.map K₀.subtype).range := by
     intro l
     obtain ⟨P, hP⟩ := _root_.Formalism.L2.DIV.bVVfun_int K lam l
     rw [hP]
     exact _root_.Formalism.L2.DIV.fk_int_mem K₀ P
-  have key : ∀ x : _root_.Formalism.L2.DIV.VV K lam, (x : _root_.Formalism.L2.DIV.Pol K ι n) ∈ (MvPolynomial.map K₀.subtype).range →
-      (_root_.Formalism.L2.DIV.bVV K lam).repr x i ∈ K₀ := by
+  have key
+      : ∀ x : _root_.Formalism.L2.DIV.VV K lam,
+        (x : _root_.Formalism.L2.DIV.Pol K ι n) ∈ (MvPolynomial.map K₀.subtype).range
+          → (_root_.Formalism.L2.DIV.bVV K lam).repr x i ∈ K₀ := by
     intro x hx
-    refine _root_.Formalism.L2.DIV.fk_descent K₀ (_root_.Formalism.L2.DIV.bVVfun K lam) (_root_.Formalism.L2.DIV.bVVfun_spec K lam).1 hbase (fun l => (_root_.Formalism.L2.DIV.bVV K lam).repr x l) ?_ i
+    refine _root_.Formalism.L2.DIV.fk_descent K₀ (_root_.Formalism.L2.DIV.bVVfun K lam)
+      (_root_.Formalism.L2.DIV.bVVfun_spec K lam).1 hbase
+      (fun l => (_root_.Formalism.L2.DIV.bVV K lam).repr x l)
+      ?_ i
     have hs := congrArg Subtype.val ((_root_.Formalism.L2.DIV.bVV K lam).sum_repr x)
     rw [Submodule.coe_sum] at hs
     simp only [Submodule.coe_smul, _root_.Formalism.L2.DIV.bVV_coe] at hs
     rw [hs]
     exact hx
-  have hj : ((_root_.Formalism.L2.DIV.bVV K lam j : _root_.Formalism.L2.DIV.VV K lam) : _root_.Formalism.L2.DIV.Pol K ι n) ∈
-      (MvPolynomial.map K₀.subtype).range := by
+  have hj
+      : ((_root_.Formalism.L2.DIV.bVV K lam j : _root_.Formalism.L2.DIV.VV K lam)
+          : _root_.Formalism.L2.DIV.Pol K ι n)
+        ∈ (MvPolynomial.map K₀.subtype).range := by
     rw [_root_.Formalism.L2.DIV.bVV_coe]; exact hbase j
   constructor
   · apply key
@@ -87,7 +104,8 @@ theorem _root_.GlobalTheory.coefAction_repr_mem_subfield : ∀ {E K ι : Type} [
     rw [MonoidHom.comp_apply, _root_.Formalism.L2.DIV.rhoK_coe]
     refine actP_mem_range_map_of_entries_mem K₀ lam _ ?_ hj
     intro τ a b
-    rw [MonoidHom.comp_apply, _root_.Formalism.L2.DIV.invTrK_coe, _root_.Formalism.L2.DIV.embGL_inv, _root_.Formalism.L2.DIV.embGL_coe]
+    rw [MonoidHom.comp_apply, _root_.Formalism.L2.DIV.invTrK_coe, _root_.Formalism.L2.DIV.embGL_inv,
+      _root_.Formalism.L2.DIV.embGL_coe]
     exact hemb τ _
 
 end GlobalTheory

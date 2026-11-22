@@ -5,10 +5,14 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison
+  CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
 
-theorem UpperTheory.Gal.KunnethLefschetz.G.PX.kerRes :
-    ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z} {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) (α : B.ι) {N : Z.Opens} (_ : IsAffineOpen N) (h : N ≤ B.V α), RingHom.ker (i.app N).hom = Ideal.span (Set.range (tN B α h)) := by
+theorem UpperTheory.Gal.KunnethLefschetz.G.PX.kerRes
+    : ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z}
+        {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) (α : B.ι) {N : Z.Opens}
+        (_ : IsAffineOpen N) (h : N ≤ B.V α),
+      RingHom.ker (i.app N).hom = Ideal.span (Set.range (tN B α h)) := by
   intro K _ W Z Y q i π D d B α N hN h
   haveI := B.closed
   have hUV : (⟨N, hN⟩ : Z.affineOpens) ≤ ⟨B.V α, (B.c α).affine⟩ := h

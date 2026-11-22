@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 noncomputable section
 
@@ -21,9 +23,9 @@ theorem pos_add {x y : WithTop ℤ} (hx : 0 ≤ x) (hy : 0 < y) : 0 < x + y := b
     induction y using WithTop.recTopCoe with
     | top => simp
     | coe k =>
-      have h1 : (0:ℤ) ≤ m := by exact_mod_cast hx
-      have h2 : (0:ℤ) < k := by exact_mod_cast hy
-      exact_mod_cast (by omega : (0:ℤ) < m + k)
+      have h1 : (0 : ℤ) ≤ m := by exact_mod_cast hx
+      have h2 : (0 : ℤ) < k := by exact_mod_cast hy
+      exact_mod_cast (by omega : (0 : ℤ) < m + k)
 
 variable {K : Type} [Field K] [NumberField K] (Pl : Rows.Places K) (w : Pl.Pl)
 
@@ -78,8 +80,8 @@ theorem primeW_ne_bot : primeW Pl w ≠ ⊥ := by
   have := (Pl.resChar_prime w).ne_zero
   exact this (by exact_mod_cast hl)
 
-theorem exists_den (t : K) (ht : (0 : WithTop ℤ) ≤ Pl.val w t) :
-    ∃ a s : 𝓞 K, Pl.val w (s : K) = 0 ∧ (s : K) * t = a := by
+theorem exists_den (t : K) (ht : (0 : WithTop ℤ) ≤ Pl.val w t)
+    : ∃ a s : 𝓞 K, Pl.val w (s : K) = 0 ∧ (s : K) * t = a := by
   have hS : (primeW Pl w).primeCompl ≤ nonZeroDivisors (𝓞 K) :=
     Ideal.primeCompl_le_nonZeroDivisors _
   let R := Localization.subalgebra.ofField K (primeW Pl w).primeCompl hS
@@ -95,14 +97,13 @@ theorem exists_den (t : K) (ht : (0 : WithTop ℤ) ≤ Pl.val w t) :
   · exact ⟨0, 1, by simp, by simp [h0]⟩
   rcases ValuationRing.isInteger_or_isInteger R t with ⟨r, hr⟩ | ⟨r, hr⟩
   · obtain ⟨a, s, hs, e⟩ := memR r
-    have hs0 : (s : K) ≠ 0 := by
-      intro h; apply hs; rw [mem_primeW, h]; simp
+    have hs0 : (s : K) ≠ 0 := by intro h; apply hs; rw [mem_primeW, h]; simp
     refine ⟨a, s, val_eq_zero_of_not_mem Pl w s hs, ?_⟩
     have : (r : K) = t := hr
-    rw [← this, e]; field_simp
+    rw [← this, e]
+    field_simp
   · obtain ⟨a, s, hs, e⟩ := memR r
-    have hs0 : (s : K) ≠ 0 := by
-      intro h; apply hs; rw [mem_primeW, h]; simp
+    have hs0 : (s : K) ≠ 0 := by intro h; apply hs; rw [mem_primeW, h]; simp
     have hrt : (r : K) = t⁻¹ := hr
     by_cases ha : a ∈ primeW Pl w
     · exfalso
@@ -115,18 +116,24 @@ theorem exists_den (t : K) (ht : (0 : WithTop ℤ) ≤ Pl.val w t) :
       have := pos_add ht ha
       rw [h2] at this
       exact lt_irrefl _ this
-    · have ha0 : (a : K) ≠ 0 := by
-        intro h; apply ha; rw [mem_primeW, h]; simp
+    · have ha0 : (a : K) ≠ 0 := by intro h; apply ha; rw [mem_primeW, h]; simp
       refine ⟨s, a, val_eq_zero_of_not_mem Pl w a ha, ?_⟩
-      have : t = (s : K) * (a : K)⁻¹ := by
-        rw [← inv_inv t, ← hrt, e]; field_simp
-      rw [this]; field_simp
+      have : t = (s : K) * (a : K)⁻¹ := by rw [← inv_inv t, ← hrt, e]; field_simp
+      rw [this]
+      field_simp
 
 end GlobalTheory.LocW
 
-
 open GlobalTheory.LocW in
-theorem GlobalTheory.Mem.Col2.GStep.locW_latOf_iff : ∀ {E K ι : Type} [Field E] [NumberField E] [StarRing E] [Field K] [NumberField K] [StarRing K] [Fintype ι] {n : ℕ} (S : GStep E K n) (emb : ι → E →+* K) (lam : ι → DomWeight n) (h : (S.fam emb lam).Ok) (Pl : Rows.Places K) (w : Pl.Pl) (p : ℕ) [Fact p.Prime] (iL : K →+* ℂ_[p]), (∀ x, x ∈ intW Pl w ↔ ‖iL x‖ ≤ 1) → ∀ x : S.FormsK emb lam h, x ∈ locW Pl w (S.latOf emb lam h fun c => delAtr emb lam (S.Lsh c.1 (S.rep c))) ↔ ∀ c, x.1 c ∈ locW Pl w (delAtr emb lam (S.Lsh c.1 (S.rep c))) := by
+theorem GlobalTheory.Mem.Col2.GStep.locW_latOf_iff
+    : ∀ {E K ι : Type} [Field E] [NumberField E] [StarRing E] [Field K] [NumberField K] [StarRing K]
+        [Fintype ι] {n : ℕ} (S : GStep E K n) (emb : ι → E →+* K) (lam : ι → DomWeight n)
+        (h : (S.fam emb lam).Ok) (Pl : Rows.Places K) (w : Pl.Pl) (p : ℕ) [Fact p.Prime]
+        (iL : K →+* ℂ_[p]),
+      (∀ x, x ∈ intW Pl w ↔ ‖iL x‖ ≤ 1)
+        → ∀ x : S.FormsK emb lam h,
+          x ∈ locW Pl w (S.latOf emb lam h fun c => delAtr emb lam (S.Lsh c.1 (S.rep c)))
+            ↔ ∀ c, x.1 c ∈ locW Pl w (delAtr emb lam (S.Lsh c.1 (S.rep c))) := by
   intro E K ι _ _ _ _ _ _ _ n S emb lam h Pl w p _ iL _ x
   classical
   letI : Fintype S.Cl := h.fintypeCl
@@ -141,9 +148,10 @@ theorem GlobalTheory.Mem.Col2.GStep.locW_latOf_iff : ∀ {E K ι : Type} [Field 
     | add y z _ _ hy hz => exact Submodule.add_mem _ hy hz
     | smul t y _ hy => exact Submodule.smul_mem _ t hy
   · intro hall
-    have gen : ∀ (M : Submodule (𝓞 K) (VV K lam)) (y : VV K lam),
-        y ∈ Submodule.span (intW Pl w) (M : Set (VV K lam)) →
-        ∃ s : 𝓞 K, Pl.val w (s : K) = 0 ∧ s • y ∈ M := by
+    have gen
+        : ∀ (M : Submodule (𝓞 K) (VV K lam)) (y : VV K lam),
+          y ∈ Submodule.span (intW Pl w) (M : Set (VV K lam))
+            → ∃ s : 𝓞 K, Pl.val w (s : K) = 0 ∧ s • y ∈ M := by
       intro M y hy
       induction hy using Submodule.span_induction with
       | mem v hv => exact ⟨1, by simp, by rw [smulK]; push_cast; rw [one_smul]; exact hv⟩
@@ -172,10 +180,12 @@ theorem GlobalTheory.Mem.Col2.GStep.locW_latOf_iff : ∀ {E K ι : Type} [Field 
           ring
         rw [this]
         exact Submodule.smul_mem _ a m
-    have key : ∀ c, ∃ s : 𝓞 K, Pl.val w (s : K) = 0 ∧
-        s • x.1 c ∈ delAtr emb lam (S.Lsh c.1 (S.rep c)) := fun c => gen _ _ (hall c)
-    have common : ∀ F : Finset S.Cl, ∃ s : 𝓞 K, Pl.val w (s : K) = 0 ∧
-        ∀ c ∈ F, s • x.1 c ∈ delAtr emb lam (S.Lsh c.1 (S.rep c)) := by
+    have key
+        : ∀ c, ∃ s : 𝓞 K, Pl.val w (s : K) = 0 ∧ s • x.1 c ∈ delAtr emb lam (S.Lsh c.1 (S.rep c)) :=
+      fun c => gen _ _ (hall c)
+    have common
+        : ∀ F : Finset S.Cl, ∃ s : 𝓞 K,
+          Pl.val w (s : K) = 0 ∧ ∀ c ∈ F, s • x.1 c ∈ delAtr emb lam (S.Lsh c.1 (S.rep c)) := by
       intro F
       induction F using Finset.induction_on with
       | empty => exact ⟨1, by simp, by simp⟩
@@ -187,10 +197,12 @@ theorem GlobalTheory.Mem.Col2.GStep.locW_latOf_iff : ∀ {E K ι : Type} [Field 
         rcases Finset.mem_insert.mp hc' with rfl | hc'
         · have e : (s1 * s2) • x.1 c' = s1 • (s2 • x.1 c') := by
             rw [smulK, smulK, smulK, smul_smul]; push_cast; rfl
-          rw [e]; exact Submodule.smul_mem _ s1 m2
+          rw [e]
+          exact Submodule.smul_mem _ s1 m2
         · have e : (s1 * s2) • x.1 c' = s2 • (s1 • x.1 c') := by
             rw [smulK, smulK, smulK, smul_smul]; push_cast; rw [mul_comm]
-          rw [e]; exact Submodule.smul_mem _ s2 (m1 c' hc')
+          rw [e]
+          exact Submodule.smul_mem _ s2 (m1 c' hc')
     obtain ⟨s, hs, hsm⟩ := common Finset.univ
     have hsx : s • x ∈ S.latOf emb lam h (fun c => delAtr emb lam (S.Lsh c.1 (S.rep c))) := by
       intro c

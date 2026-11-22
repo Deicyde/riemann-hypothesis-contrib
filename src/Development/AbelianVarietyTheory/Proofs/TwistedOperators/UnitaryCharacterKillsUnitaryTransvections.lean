@@ -28,15 +28,16 @@ theorem exists_dual (hG : IsHerm σ G) {x : Fin n → E} (hx : x ≠ 0) : ∃ y,
   have h1 : Matrix.vecMul x G ≠ 0 := fun h => hx (Matrix.eq_zero_of_vecMul_eq_zero hG.det_ne h)
   obtain ⟨b, hb⟩ := Function.ne_iff.mp h1
   refine ⟨Pi.single b (σ (Matrix.vecMul x G b)⁻¹), ?_⟩
-  have : hf σ G x (Pi.single b (σ (Matrix.vecMul x G b)⁻¹)) =
-      Matrix.vecMul x G b * (Matrix.vecMul x G b)⁻¹ := by
+  have : hf σ G x (Pi.single b (σ (Matrix.vecMul x G b)⁻¹))
+      = Matrix.vecMul x G b * (Matrix.vecMul x G b)⁻¹ := by
     simp only [hf, Pi.single_apply, apply_ite σ, map_zero, mul_ite, mul_zero, Finset.sum_ite_eq',
       Finset.mem_univ, if_true, hG.invol, ← Finset.sum_mul]
     rfl
   rw [this, mul_inv_cancel₀ hb]
 
-theorem exists_dual_iso [CharZero E] (hG : IsHerm σ G) {x : Fin n → E} (hx : x ≠ 0)
-    (hxx : hf σ G x x = 0) : ∃ y, hf σ G x y = 1 ∧ hf σ G y y = 0 := by
+theorem exists_dual_iso
+    [CharZero E] (hG : IsHerm σ G) {x : Fin n → E} (hx : x ≠ 0) (hxx : hf σ G x x = 0)
+    : ∃ y, hf σ G x y = 1 ∧ hf σ G y y = 0 := by
   obtain ⟨y, hy⟩ := exists_dual hG hx
   have hyx : hf σ G y x = 1 := by rw [← hf_conj σ G hG.invol hG.herm, hy, map_one]
   have hc : σ (-(hf σ G y y / 2)) = -(hf σ G y y / 2) := by
@@ -46,14 +47,16 @@ theorem exists_dual_iso [CharZero E] (hG : IsHerm σ G) {x : Fin n → E} (hx : 
   · simp only [hf_add_left, hf_add_right, hf_smul_left, hf_smul_right, hc, hxx, hy, hyx]
     ring
 
-theorem exists_double [CharZero E] (hG : IsHerm σ G) {x : Fin n → E} (hx : x ≠ 0)
-    (hxx : hf σ G x x = 0) : ∃ γ, IsU σ G γ ∧ γ *ᵥ x = (2 : E) • x := by
+theorem exists_double
+    [CharZero E] (hG : IsHerm σ G) {x : Fin n → E} (hx : x ≠ 0) (hxx : hf σ G x x = 0)
+    : ∃ γ, IsU σ G γ ∧ γ *ᵥ x = (2 : E) • x := by
   obtain ⟨y, hy, hyy⟩ := exists_dual_iso hG hx hxx
   have hyx : hf σ G y x = 1 := by rw [← hf_conj σ G hG.invol hG.herm, hy, map_one]
-  have hc : σ (-(1 / 2)) = -(1 / 2) := by
-    rw [map_neg, map_div₀, map_one, map_ofNat]
-  have hm : ∀ v, (1 + rk σ G x y + (-(1 / 2) : E) • rk σ G y x) *ᵥ v =
-      v + hf σ G v y • x + (-(1 / 2) : E) • hf σ G v x • y := by
+  have hc : σ (-(1 / 2)) = -(1 / 2) := by rw [map_neg, map_div₀, map_one, map_ofNat]
+  have hm
+      : ∀ v,
+        (1 + rk σ G x y + (-(1 / 2) : E) • rk σ G y x) *ᵥ v
+          = v + hf σ G v y • x + (-(1 / 2) : E) • hf σ G v x • y := by
     intro v
     rw [Matrix.add_mulVec, Matrix.add_mulVec, Matrix.one_mulVec, Matrix.smul_mulVec, rk_mulVec,
       rk_mulVec]
@@ -65,7 +68,13 @@ theorem exists_double [CharZero E] (hG : IsHerm σ G) {x : Fin n → E} (hx : x 
     ring
   · rw [hm, hy, hxx, zero_smul, smul_zero, add_zero, one_smul, two_smul]
 
-theorem char_tvGen : ∀ (E : Type) [Field E] [CharZero E] (n : ℕ) (σ : E →+* E) (G : Matrix (Fin n) (Fin n) E), GlobalTheory.UTrans.IsHerm σ G → ∀ (A : Type) [CommGroup A] (X : Matrix (Fin n) (Fin n) E → A), (∀ a b, GlobalTheory.UTrans.IsU σ G a → GlobalTheory.UTrans.IsU σ G b → X (a * b) = X a * X b) → ∀ m ∈ GlobalTheory.UTrans.TvGen σ G, X m = 1 := by
+theorem char_tvGen
+    : ∀ (E : Type) [Field E] [CharZero E] (n : ℕ) (σ : E →+* E) (G : Matrix (Fin n) (Fin n) E),
+      GlobalTheory.UTrans.IsHerm σ G
+        → ∀ (A : Type) [CommGroup A] (X : Matrix (Fin n) (Fin n) E → A),
+          (∀ a b,
+              GlobalTheory.UTrans.IsU σ G a → GlobalTheory.UTrans.IsU σ G b → X (a * b) = X a * X b)
+            → ∀ m ∈ GlobalTheory.UTrans.TvGen σ G, X m = 1 := by
   intro E _ _ n σ G hG A _ X hX
   have hU1 : IsU σ G 1 := fun x y => by simp
   have hX1 : X 1 = 1 := by
@@ -104,7 +113,8 @@ theorem char_tvGen : ∀ (E : Type) [Field E] [CharZero E] (n : ℕ) (σ : E →
         have h4 := congrArg X hc
         rw [hX _ _ hγ h3, hX _ _ (isU_mul σ G _ _ h3 hUt) hγ, hX _ _ h3 hUt, mul_comm (X γ)] at h4
         exact mul_eq_left.mp (mul_right_cancel h4).symm
-    | one => exact ⟨hU1, hX1⟩
+    | one =>
+      exact ⟨hU1, hX1⟩
     | mul a b _ _ ha hb =>
       exact ⟨isU_mul σ G _ _ ha.1 hb.1, by rw [hX _ _ ha.1 hb.1, ha.2, hb.2, mul_one]⟩
   exact fun m hm => (key m hm).2

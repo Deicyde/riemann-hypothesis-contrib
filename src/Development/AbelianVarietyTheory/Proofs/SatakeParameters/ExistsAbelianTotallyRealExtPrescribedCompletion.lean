@@ -17,14 +17,25 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsQ
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.AboveL GlobalTheory.SmGL
 
 namespace GlobalTheory.AbStep
 
-theorem loc_char : ∀ (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] [Algebra F Ω] [IsAlgClosure F Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)) (h : IsPlaceOver A v) (a : Weil h →* (v.adicCompletion F)ˣ), IsLocalArtin h a → ∀ χ : Dec (F := F) A →* ℂˣ, IsOpen (χ.ker : Set (Dec (F := F) A)) → ∃ θ : (v.adicCompletion F)ˣ →* ℂˣ, IsSmoothChar θ ∧ (∃ N : ℕ, 0 < N ∧ θ ^ N = 1) ∧ ∀ σ : Weil h, θ (a σ) = χ (Subgroup.inclusion (Weil_le_Dec h) σ) := by
+theorem loc_char
+    : ∀ (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] [Algebra F Ω] [IsAlgClosure F Ω]
+        (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)) (h : IsPlaceOver A v)
+        (a : Weil h →* (v.adicCompletion F)ˣ),
+      IsLocalArtin h a
+        → ∀ χ : Dec (F := F) A →* ℂˣ,
+          IsOpen (χ.ker : Set (Dec (F := F) A))
+            → ∃ θ : (v.adicCompletion F)ˣ →* ℂˣ,
+              IsSmoothChar θ ∧ (∃ N : ℕ, 0 < N ∧ θ ^ N = 1)
+                ∧ ∀ σ : Weil h, θ (a σ) = χ (Subgroup.inclusion (Weil_le_Dec h) σ) := by
   intro Ω _ F _ _ _ _ A v h a ha χ hχ
   classical
   let ξ : Weil h →* ℂˣ := χ.comp (Subgroup.inclusion (Weil_le_Dec h))
@@ -34,8 +45,9 @@ theorem loc_char : ∀ (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField 
       continuous_subtype_val.subtype_mk _
     exact hχ.preimage hc
   obtain ⟨θ, hθs, hθ⟩ := ha.factor ξ hξ
-  have hfi : χ.ker.FiniteIndex := GlobalTheory.LocVec.finiteIndex_of_isOpen (Dec (F := F) A)
-    (ReciprocityTheory.Gal.isClosed_Dec A).isCompact subset_rfl χ.ker hχ
+  have hfi : χ.ker.FiniteIndex :=
+    GlobalTheory.LocVec.finiteIndex_of_isOpen (Dec (F := F) A)
+      (ReciprocityTheory.Gal.isClosed_Dec A).isCompact subset_rfl χ.ker hχ
   refine ⟨θ, hθs, ⟨χ.ker.index, Nat.pos_of_ne_zero hfi.index_ne_zero, ?_⟩, fun σ => ?_⟩
   · refine MonoidHom.ext fun x => ?_
     obtain ⟨σ, rfl⟩ := ha.surj x
@@ -45,19 +57,27 @@ theorem loc_char : ∀ (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField 
     exact hm
   · exact (DFunLike.congr_fun hθ σ).symm
 
-theorem gal_char : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (art : Ideles F →* Gab F Ω), IsGlobalArtin art → ∀ η : HChar F, (∃ n : ℕ, 0 < n ∧ η.OrderDvd n) → (∀ u : InfinitePlace F, η.locInf u = 1) → ∃ ρ : Gab F Ω →* ℂˣ, IsOpen (ρ.ker : Set (Gab F Ω)) ∧ ∀ x, ρ (art x) = η.1 x := by
+theorem gal_char
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (art : Ideles F →* Gab F Ω),
+      IsGlobalArtin art
+        → ∀ η : HChar F,
+          (∃ n : ℕ, 0 < n ∧ η.OrderDvd n) → (∀ u : InfinitePlace F, η.locInf u = 1)
+            → ∃ ρ : Gab F Ω →* ℂˣ, IsOpen (ρ.ker : Set (Gab F Ω)) ∧ ∀ x, ρ (art x) = η.1 x := by
   intro F Ω _ _ _ _ art ha η hηf _
   obtain ⟨n, hn, hηn⟩ := hηf
   have hpow : ∀ x, η.1 x ^ n = 1 := fun x => congrArg (fun ξ : HChar F => ξ.1 x) hηn
-  have hko : IsOpen (η.1.ker : Set (Ideles F)) := GlobalTheory.HeckeGal.isOpen_ker_of_pow η.1 η.2.1 hn hpow
+  have hko : IsOpen (η.1.ker : Set (Ideles F)) :=
+    GlobalTheory.HeckeGal.isOpen_ker_of_pow η.1 η.2.1 hn hpow
   have hinf : infConn F ≤ η.1.ker := by
     let ι : (InfiniteAdeleRing F)ˣ →* Ideles F :=
       Units.map (MonoidHom.inl (InfiniteAdeleRing F) (FiniteAdeleRing (𝓞 F) F))
     have hιc : Continuous ι := Continuous.units_map _ (continuous_id.prodMk continuous_const)
-    have hO : IsOpen ((η.1.ker.comap ι : Subgroup _) : Set (InfiniteAdeleRing F)ˣ) := hko.preimage hιc
+    have hO : IsOpen ((η.1.ker.comap ι : Subgroup _) : Set (InfiniteAdeleRing F)ˣ) :=
+      hko.preimage hιc
     rintro _ ⟨y, hy, rfl⟩
     exact (IsClopen.connectedComponent_subset ⟨Subgroup.isClosed_of_isOpen _ hO, hO⟩
-      (Subgroup.one_mem _)) hy
+        (Subgroup.one_mem _))
+      hy
   have hker : art.ker ≤ η.1.ker := by
     rw [ha.ker]
     refine Subgroup.topologicalClosure_minimal _ (sup_le ?_ hinf) (η.1.ker.isClosed_of_isOpen hko)
@@ -89,31 +109,36 @@ end GlobalTheory.AbStep
 
 namespace GlobalTheory.AbStep
 
-theorem one_char (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] [Algebra F Ω] [IsAlgClosure F Ω]
+theorem one_char
+    (Ω : Type) [Field Ω]
+    (F : Type) [Field F] [NumberField F] [Algebra F Ω] [IsAlgClosure F Ω]
     (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)) (h : IsPlaceOver A v)
     (χ : Dec (F := F) A →* ℂˣ) (hχ : IsOpen (χ.ker : Set (Dec (F := F) A)))
-    (T : Finset (HeightOneSpectrum (𝓞 F))) (hT : v ∉ T) :
-    ∃ r : G F Ω →* ℂˣ, IsOpen (r.ker : Set (G F Ω)) ∧ (∀ g : Dec (F := F) A, r g = χ g) ∧
-      (∀ (j : Ω →+* ℂ) (c : G F Ω), (∀ x, j (c x) = starRingEnd ℂ (j x)) → r c = 1) ∧
-      ∀ u ∈ T, ∀ A' : ValuationSubring Ω, IsPlaceOver A' u → ∀ g ∈ Dec (F := F) A', r g = 1 := by
+    (T : Finset (HeightOneSpectrum (𝓞 F))) (hT : v ∉ T)
+    : ∃ r : G F Ω →* ℂˣ,
+      IsOpen (r.ker : Set (G F Ω)) ∧ (∀ g : Dec (F := F) A, r g = χ g)
+        ∧ (∀ (j : Ω →+* ℂ) (c : G F Ω), (∀ x, j (c x) = starRingEnd ℂ (j x)) → r c = 1)
+        ∧ ∀ u ∈ T, ∀ A' : ValuationSubring Ω,
+          IsPlaceOver A' u → ∀ g ∈ Dec (F := F) A', r g = 1 := by
   classical
   obtain ⟨art, ha⟩ := GlobalTheory.globalArtinReciprocity_holds F Ω
   obtain ⟨a, haL⟩ := GlobalTheory.localArtinExists_holds F Ω A v h
   obtain ⟨θ, hθs, hθf, hθ⟩ := loc_char Ω F A v h a haL χ hχ
   have hne : ∀ u ∈ T, u ≠ v := fun u hu e => hT (e ▸ hu)
-  obtain ⟨η, hηf, hηi, hηl⟩ := GlobalTheory.DelEps.Twist.exists_hchar_prescribed F (insert v T)
-    (Function.update (fun _ => 1) v θ)
-    (fun w hw => by
-      rcases Finset.mem_insert.1 hw with rfl | hw
-      · rw [Function.update_self]; exact hθs
-      · rw [Function.update_of_ne (hne w hw)]
-        unfold IsSmoothChar
-        simp)
-    (fun w hw => by
-      rcases Finset.mem_insert.1 hw with rfl | hw
-      · rw [Function.update_self]; exact hθf
-      · rw [Function.update_of_ne (hne w hw)]
-        exact ⟨1, one_pos, one_pow _⟩)
+  obtain ⟨η, hηf, hηi, hηl⟩ :=
+    GlobalTheory.DelEps.Twist.exists_hchar_prescribed F (insert v T)
+      (Function.update (fun _ => 1) v θ)
+      (fun w hw => by
+        rcases Finset.mem_insert.1 hw with rfl | hw
+        · rw [Function.update_self]; exact hθs
+        · rw [Function.update_of_ne (hne w hw)]
+          unfold IsSmoothChar
+          simp)
+      (fun w hw => by
+        rcases Finset.mem_insert.1 hw with rfl | hw
+        · rw [Function.update_self]; exact hθf
+        · rw [Function.update_of_ne (hne w hw)]
+          exact ⟨1, one_pos, one_pow _⟩)
   have hηv : η.loc v = θ := by rw [hηl v (Finset.mem_insert_self _ _), Function.update_self]
   have hηT : ∀ u ∈ T, η.loc u = 1 := fun u hu => by
     rw [hηl u (Finset.mem_insert_of_mem hu), Function.update_of_ne (hne u hu)]
@@ -132,8 +157,8 @@ theorem one_char (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] [Al
       have : (1 : Dec (F := F) A) ∈ (χ.ker : Set (Dec (F := F) A)) := χ.ker.one_mem
       rw [← hO] at this
       exact this
-    obtain ⟨L, hLf, hLs⟩ := (krullTopology_mem_nhds_one_iff F Ω _).1
-      ((hro.inter hOo).mem_nhds ⟨r.ker.one_mem, h1⟩)
+    obtain ⟨L, hLf, hLs⟩ :=
+      (krullTopology_mem_nhds_one_iff F Ω _).1 ((hro.inter hOo).mem_nhds ⟨r.ker.one_mem, h1⟩)
     obtain ⟨τ, hτ⟩ := GlobalTheory.ConjWD.exists_weil_eq_on (h := h) g.2 L
     have hfix : (τ : G F Ω)⁻¹ * g ∈ L.fixingSubgroup := fun x => by
       show ((τ : G F Ω)⁻¹ * (g : G F Ω)) x = x
@@ -142,7 +167,9 @@ theorem one_char (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] [Al
       simp
     obtain ⟨hr1, hO1⟩ := hLs hfix
     have hk : (Subgroup.inclusion (Weil_le_Dec h) τ)⁻¹ * g ∈ χ.ker := by
-      have : (Subgroup.inclusion (Weil_le_Dec h) τ)⁻¹ * g ∈ (Subtype.val ⁻¹' O : Set (Dec (F := F) A)) := hO1
+      have : (Subgroup.inclusion (Weil_le_Dec h) τ)⁻¹ * g
+          ∈ (Subtype.val ⁻¹' O : Set (Dec (F := F) A)) :=
+        hO1
       rw [hO] at this
       exact this
     rw [MonoidHom.mem_ker, map_mul, map_inv, inv_mul_eq_one] at hk
@@ -166,7 +193,19 @@ end GlobalTheory.AbStep
 
 namespace GlobalTheory.AbStep
 
-theorem exists_abelian_real_field : ∀ (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] [Algebra F Ω] [IsAlgClosure F Ω] [IsTotallyReal F] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)) (h : IsPlaceOver A v) (V : Subgroup (Dec (F := F) A)), IsOpen (V : Set (Dec (F := F) A)) → commutator (Dec (F := F) A) ≤ V → ∀ T : Finset (HeightOneSpectrum (𝓞 F)), v ∉ T → ∃ F₁ : IntermediateField F Ω, FiniteDimensional F F₁ ∧ IsAbelianGalois F F₁ ∧ (∀ φ : F₁ →+* ℂ, ComplexEmbedding.IsReal φ) ∧ (∀ g : Dec (F := F) A, (g : G F Ω) ∈ F₁.fixingSubgroup ↔ g ∈ V) ∧ ∀ u ∈ T, ∀ A' : ValuationSubring Ω, IsPlaceOver A' u → Dec (F := F) A' ≤ F₁.fixingSubgroup := by
+theorem exists_abelian_real_field
+    : ∀ (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] [Algebra F Ω] [IsAlgClosure F Ω]
+        [IsTotallyReal F] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F))
+        (h : IsPlaceOver A v) (V : Subgroup (Dec (F := F) A)),
+      IsOpen (V : Set (Dec (F := F) A)) → commutator (Dec (F := F) A) ≤ V
+        → ∀ T : Finset (HeightOneSpectrum (𝓞 F)),
+          v ∉ T
+            → ∃ F₁ : IntermediateField F Ω,
+              FiniteDimensional F F₁ ∧ IsAbelianGalois F F₁
+                ∧ (∀ φ : F₁ →+* ℂ, ComplexEmbedding.IsReal φ)
+                ∧ (∀ g : Dec (F := F) A, (g : G F Ω) ∈ F₁.fixingSubgroup ↔ g ∈ V)
+                ∧ ∀ u ∈ T, ∀ A' : ValuationSubring Ω,
+                  IsPlaceOver A' u → Dec (F := F) A' ≤ F₁.fixingSubgroup := by
   intro Ω _ F _ _ _ _ _ A v h V hVo hVc T hvT
   haveI : V.Normal := GlobalTheory.normal_of_commutator_le V hVc
   haveI : V.FiniteIndex := GlobalTheory.LocVec.finiteIndex_of_isOpen (Dec (F := F) A) (ReciprocityTheory.Gal.isClosed_Dec A).isCompact subset_rfl V hVo
@@ -179,16 +218,21 @@ theorem exists_abelian_real_field : ∀ (Ω : Type) [Field Ω] (F : Type) [Field
       have := Subgroup.commutator_mem_commutator (Subgroup.mem_top b⁻¹) (Subgroup.mem_top a⁻¹)
       show _ ∈ ⁅(⊤ : Subgroup (Dec (F := F) A)), ⊤⁆
       simpa [commutatorElement_def, mul_assoc] using this }
-  have hsep : ∀ q : Dec (F := F) A ⧸ V, ∃ ψ : (Dec (F := F) A ⧸ V) →* ℂˣ, q ≠ 1 → ψ q ≠ 1 := fun q => by
+  have hsep
+      : ∀ q : Dec (F := F) A ⧸ V, ∃ ψ : (Dec (F := F) A ⧸ V) →* ℂˣ, q ≠ 1 → ψ q ≠ 1 := fun q => by
     by_cases hq : q = 1
     · exact ⟨1, fun h => (h hq).elim⟩
-    · obtain ⟨ψ, hψ⟩ := CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (Dec (F := F) A ⧸ V) ℂ hq
+    · obtain ⟨ψ, hψ⟩ :=
+        CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (Dec (F := F) A ⧸ V) ℂ hq
       exact ⟨ψ, fun _ => hψ⟩
   choose ψ hψ using hsep
-  have hopen : ∀ q, IsOpen (((ψ q).comp (QuotientGroup.mk' V)).ker : Set (Dec (F := F) A)) := fun q =>
-    Subgroup.isOpen_mono (fun g hg => by
-      rw [MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
-        (QuotientGroup.eq_one_iff g).2 hg, map_one]) hVo
+  have hopen
+      : ∀ q, IsOpen (((ψ q).comp (QuotientGroup.mk' V)).ker : Set (Dec (F := F) A)) := fun q =>
+    Subgroup.isOpen_mono
+      (fun g hg => by
+        rw [MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+          (QuotientGroup.eq_one_iff g).2 hg, map_one])
+      hVo
   choose r hro hrD hrc hrT using fun q => one_char Ω F A v h ((ψ q).comp (QuotientGroup.mk' V)) (hopen q) T hvT
   let φ : G F Ω →* (Dec (F := F) A ⧸ V → ℂˣ) := Pi.monoidHom r
   have hφ : ∀ σ, φ σ = 1 ↔ ∀ q, r q σ = 1 := fun σ => funext_iff
@@ -210,8 +254,9 @@ theorem exists_abelian_real_field : ∀ (Ω : Type) [Field Ω] (F : Type) [Field
     have hj : j.comp (algebraMap L Ω) = φ' := ComplexEmbedding.lift_comp_algebraMap _ _
     have hreal : ComplexEmbedding.IsReal (j.comp (algebraMap F Ω)) := by
       exact IsTotallyReal.complexEmbedding_isReal _
-    obtain ⟨σ, hσ⟩ := ComplexEmbedding.exists_comp_symm_eq_of_comp_eq (k := F) j (ComplexEmbedding.conjugate j) (by
-      rw [ComplexEmbedding.conjugate_comp, ComplexEmbedding.isReal_iff.1 hreal])
+    obtain ⟨σ, hσ⟩ :=
+      ComplexEmbedding.exists_comp_symm_eq_of_comp_eq (k := F) j (ComplexEmbedding.conjugate j)
+        (by rw [ComplexEmbedding.conjugate_comp, ComplexEmbedding.isReal_iff.1 hreal])
     have hc : ∀ x, j (σ.symm x) = starRingEnd ℂ (j x) := fun x => DFunLike.congr_fun hσ x
     have hfix : σ.symm ∈ L.fixingSubgroup := (hmem _).2 fun q => hrc q j σ.symm hc
     rw [ComplexEmbedding.isReal_iff]
@@ -228,7 +273,8 @@ theorem exists_abelian_real_field : ∀ (Ω : Type) [Field Ω] (F : Type) [Field
       have hq : (QuotientGroup.mk' V g) ≠ 1 := fun e => hg ((QuotientGroup.eq_one_iff g).1 e)
       exact hψ _ hq (by rw [← H (QuotientGroup.mk' V g), hrD]; rfl)
     · intro hg q
-      rw [hrD, MonoidHom.comp_apply, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff g).2 hg, map_one]
+      rw [hrD, MonoidHom.comp_apply, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff g).2 hg,
+        map_one]
   · intro u hu A' hA' g hg
     exact (hmem g).2 fun q => hrT q u hu A' hA' g hg
 

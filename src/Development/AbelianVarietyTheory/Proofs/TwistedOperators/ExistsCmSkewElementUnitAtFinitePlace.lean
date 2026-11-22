@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTenso
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
 noncomputable section
@@ -34,16 +36,17 @@ theorem cm_exists_moved (σ : E →ₐ[F] E) (h : IsCMExt F E σ) : ∃ x : E, �
 theorem cm_exists_skew (σ : E →ₐ[F] E) (h : IsCMExt F E σ) : ∃ δ : E, δ ≠ 0 ∧ σ δ = -δ := by
   obtain ⟨x, hx⟩ := cm_exists_moved σ h
   refine ⟨x - σ x, sub_ne_zero.2 (Ne.symm hx), ?_⟩
-  rw [map_sub, cm_sigma_sigma σ h]; ring
+  rw [map_sub, cm_sigma_sigma σ h]
+  ring
 
 end GlobalTheory.CMSkewUnit
 
 namespace GlobalTheory.CMSkewUnit
 
-theorem exists_unit_of_val_eq_one {F : Type} [Field F] [NumberField F] {v : Pl (F := F)} {x : Fv F v} (hx : Valued.v x = 1) :
-    ∃ u : (v.adicCompletionIntegers F)ˣ, ((u : v.adicCompletionIntegers F) : Fv F v) = x := by
-  have hx0 : x ≠ 0 := by
-    intro h0; rw [h0, map_zero] at hx; exact zero_ne_one hx
+theorem exists_unit_of_val_eq_one
+    {F : Type} [Field F] [NumberField F] {v : Pl (F := F)} {x : Fv F v} (hx : Valued.v x = 1)
+    : ∃ u : (v.adicCompletionIntegers F)ˣ, ((u : v.adicCompletionIntegers F) : Fv F v) = x := by
+  have hx0 : x ≠ 0 := by intro h0; rw [h0, map_zero] at hx; exact zero_ne_one hx
   have hmem : x ∈ v.adicCompletionIntegers F :=
     (HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).2 (le_of_eq hx)
   have hmem' : x⁻¹ ∈ v.adicCompletionIntegers F :=
@@ -56,18 +59,25 @@ end GlobalTheory.CMSkewUnit
 
 namespace GlobalTheory.CMSkewUnit
 
-theorem exists_skew_unit_at : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
-    IsCMExt F E σ → ∀ (v : Pl (F := F)) (π : AE F E →+* Fv F v),
-    (∀ a : AF F, π (algebraMap (AF F) (AE F E) a) = evFin F v a) →
-    ∃ δ : E, σ δ = -δ ∧ ∃ u : (v.adicCompletionIntegers F)ˣ,
-      ((u : v.adicCompletionIntegers F) : Fv F v) = π (inclR (F := F) (AF F) δ) := by
+theorem exists_skew_unit_at
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (v : Pl (F := F)) (π : AE F E →+* Fv F v),
+          (∀ a : AF F, π (algebraMap (AF F) (AE F E) a) = evFin F v a)
+            → ∃ δ : E,
+              σ δ = -δ
+                ∧ ∃ u : (v.adicCompletionIntegers F)ˣ,
+                  ((u : v.adicCompletionIntegers F) : Fv F v) = π (inclR (F := F) (AF F) δ) := by
   intro F E _ _ _ _ _ σ h v π hπ
   obtain ⟨δ₀, h0, hs⟩ := cm_exists_skew σ h
   have ht : π (inclR (F := F) (AF F) δ₀) ≠ 0 :=
     (map_ne_zero_iff (π.comp (inclR (F := F) (AF F))) (RingHom.injective _)).2 h0
   have hF : ∀ f : F, π (inclR (F := F) (AF F) (algebraMap F E f)) = algebraMap F (Fv F v) f := by
     intro f
-    have e1 : inclR (F := F) (AF F) (algebraMap F E f) = algebraMap (AF F) (AE F E) (algebraMap F (AF F) f) := by
+    have e1
+        : inclR (F := F) (AF F) (algebraMap F E f)
+          = algebraMap (AF F) (AE F E) (algebraMap F (AF F) f) := by
       rw [← IsScalarTower.algebraMap_apply]
       exact (Algebra.TensorProduct.includeRight (R := F) (A := AF F) (B := E)).commutes f
     rw [e1, hπ, AlgHom.commutes]
@@ -78,8 +88,9 @@ theorem exists_skew_unit_at : ∀ {F E : Type} [Field F] [NumberField F] [Field 
   · rw [map_mul, AlgHom.commutes, hs]; ring
   · apply exists_unit_of_val_eq_one
     rw [map_mul, map_mul, hF, ← ht_def, map_mul]
-    have e2 : Valued.v (algebraMap F (Fv F v) (ϖ ^ WithZero.log (Valued.v t))) =
-        v.valuation F (ϖ ^ WithZero.log (Valued.v t)) :=
+    have e2
+        : Valued.v (algebraMap F (Fv F v) (ϖ ^ WithZero.log (Valued.v t)))
+          = v.valuation F (ϖ ^ WithZero.log (Valued.v t)) :=
       HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v _
     rw [e2, map_zpow₀, hϖ]
     conv_lhs => rw [← WithZero.exp_log hvt]

@@ -22,7 +22,8 @@ theorem cc_mvExp (x : MvPowerSeries σ C) : MvPowerSeries.constantCoeff (mvExp x
   show (∑ k ∈ Finset.range ((0 : σ →₀ ℕ).degree + 1), MvPowerSeries.coeff 0 (x ^ k) / (k.factorial : C)) = 1
   simp
 
-theorem jetAt0_one (G : MvPowerSeries σ C) : jetAt0 (1 : MvPolynomial σ C) G = MvPowerSeries.constantCoeff G := by
+theorem jetAt0_one (G : MvPowerSeries σ C)
+    : jetAt0 (1 : MvPolynomial σ C) G = MvPowerSeries.constantCoeff G := by
   unfold jetAt0
   rw [MvPolynomial.support_one, Finset.sum_singleton]
   simp [mfact]
@@ -31,8 +32,8 @@ end Jet
 
 section Par
 
-theorem odd_sub_val {d : ℕ} [NeZero d] (hd : Even d) (x y : ZMod d) (h : ¬ (Even x.val ↔ Even y.val)) :
-    Odd (y - x).val := by
+theorem odd_sub_val {d : ℕ} [NeZero d] (hd : Even d) (x y : ZMod d) (h : ¬(Even x.val ↔ Even y.val))
+    : Odd (y - x).val := by
   have h2 : 2 ∣ d := hd.two_dvd
   have e : y = x + (y - x) := by ring
   have e1 : y.val = (x.val + (y - x).val) % d := by
@@ -45,27 +46,34 @@ theorem odd_sub_val {d : ℕ} [NeZero d] (hd : Even d) (x y : ZMod d) (h : ¬ (E
 
 end Par
 
-variable {C : Type} [Field C] {V : VF C} {d : ℕ} [NeZero d] {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
+variable
+  {C : Type} [Field C]
+  {V : VF C} {d : ℕ} [NeZero d]
+  {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
   (X : RowData C V d I J) (F : Flag X)
 
-theorem vars_letter {g : Fin 2} {a : ZMod d} {N : ℕ} {Q : MvPolynomial (Fin N × Fin (X.rkF g a)) C} {ρ : Fin N} {w : WV I}
-    (h : (ρ, w) ∈ (MvPolynomial.rename (F.letter g a) Q).vars) : w.1 = g ∧ tyW X.G w = a := by
+theorem vars_letter
+    {g : Fin 2} {a : ZMod d} {N : ℕ} {Q : MvPolynomial (Fin N × Fin (X.rkF g a)) C} {ρ : Fin N}
+    {w : WV I} (h : (ρ, w) ∈ (MvPolynomial.rename (F.letter g a) Q).vars)
+    : w.1 = g ∧ tyW X.G w = a := by
   obtain ⟨x, -, e⟩ := Finset.mem_image.1 (MvPolynomial.vars_rename _ _ h)
   have e2 : (⟨g, F.en g a x.2⟩ : WV I) = w := congrArg Prod.snd e
   subst e2
   exact ⟨rfl, F.en_ty g a x.2⟩
 
-theorem big_of_le_rk (hj : X.j' < X.n) {g : Fin 2} {a : ZMod d} (h : X.n ≤ X.rkF g a) : X.big g a := by
+theorem big_of_le_rk (hj : X.j' < X.n) {g : Fin 2} {a : ZMod d} (h : X.n ≤ X.rkF g a)
+    : X.big g a := by
   by_contra hb
   have := X.rk_small g a hb
   unfold RowData.rkF at h
   omega
 
-theorem big_one_iff (a : ZMod d) : X.big 1 a ↔ ¬ X.big 0 a := by
-  simpa using X.big_compl 0 a
+theorem big_one_iff (a : ZMod d) : X.big 1 a ↔ ¬ X.big 0 a := by simpa using X.big_compl 0 a
 
-theorem alt_odd_of_big (hdich : X.Alt ∨ ∀ a, X.big 0 a) {g : Fin 2} {a a' : ZMod d} (h1 : X.big g a)
-    (h2 : X.big (1 - g) a') : X.Alt ∧ Odd (a' - a).val := by
+theorem alt_odd_of_big
+    (hdich : X.Alt ∨ ∀ a, X.big 0 a)
+    {g : Fin 2} {a a' : ZMod d} (h1 : X.big g a) (h2 : X.big (1 - g) a')
+    : X.Alt ∧ Odd (a' - a).val := by
   have h3 : ¬ X.big g a' := (X.big_compl g a').1 h2
   rcases hdich with hA | hB
   · refine ⟨hA, odd_sub_val hA.1 a a' ?_⟩
@@ -83,8 +91,11 @@ theorem alt_odd_of_big (hdich : X.Alt ∨ ∀ a, X.big 0 a) {g : Fin 2} {a a' : 
     · rw [big_one_iff] at h1
       exact h1 (hB a)
 
-theorem attainsOK_of (hdich : X.Alt ∨ ∀ a, X.big 0 a) (hj : X.j' < X.n) (b : GlobalTheory d) (c : ℝ)
-    (hwt : ∀ g a k, b.wt X g a k ≠ 0 → k ≤ X.rkF g a) (h : b.Attains X F c) : b.AttainsOK X F c := by
+theorem attainsOK_of
+    (hdich : X.Alt ∨ ∀ a, X.big 0 a) (hj : X.j' < X.n)
+    (b : GlobalTheory d) (c : ℝ)
+    (hwt : ∀ g a k, b.wt X g a k ≠ 0 → k ≤ X.rkF g a) (h : b.Attains X F c)
+    : b.AttainsOK X F c := by
   cases b with
   | ch g a u =>
     refine ⟨(GlobalTheory.ch g a u).kind X.n, (rowsOK_iff _ _ _ _).2 ⟨?_, ?_⟩, h⟩
@@ -142,7 +153,8 @@ theorem attainsOK_of (hdich : X.Alt ∨ ∀ a, X.big 0 a) (hj : X.j' < X.n) (b :
       · intro ρ hk
         exact absurd hk (by simp [GlobalTheory.kind])
 
-theorem le_sum_map {α : Type} (l : List α) (f : α → ℕ) {q : α} (hq : q ∈ l) : f q ≤ (l.map f).sum := by
+theorem le_sum_map {α : Type} (l : List α) (f : α → ℕ) {q : α} (hq : q ∈ l)
+    : f q ≤ (l.map f).sum := by
   induction l with
   | nil => exact absurd hq (by simp)
   | cons a l ih =>
@@ -153,7 +165,8 @@ theorem le_sum_map {α : Type} (l : List α) (f : α → ℕ) {q : α} (hq : q �
       omega
 
 variable {X F} in
-theorem rkF_eq_of_big_iff {g g' : Fin 2} {a a' : ZMod d} (h : X.big g a ↔ X.big g' a') : X.rkF g a = X.rkF g' a' := by
+theorem rkF_eq_of_big_iff {g g' : Fin 2} {a a' : ZMod d} (h : X.big g a ↔ X.big g' a')
+    : X.rkF g a = X.rkF g' a' := by
   unfold RowData.rkF
   by_cases hb : X.big g a
   · rw [X.rk_big g a hb, X.rk_big g' a' (h.1 hb)]
@@ -167,12 +180,18 @@ open Formalism.IncomingBounds
 
 section G
 
-variable {C : Type} [Field C] {V : VF C} {d : ℕ} [NeZero d]
-  {Orb : Type} [Fintype Orb] {I J : Orb → Fin 2 → Type} [∀ o g, Fintype (I o g)] [∀ o g, Fintype (J o g)]
-  (X : ∀ o, RowData C V d (I o) (J o)) (F : ∀ o, Flag (X o)) (Z : Finset Orb) (ga : Orb → Fin 2 → ZMod d → ℕ → ℕ)
+variable
+  {C : Type} [Field C]
+  {V : VF C} {d : ℕ} [NeZero d]
+  {Orb : Type} [Fintype Orb]
+  {I J : Orb → Fin 2 → Type} [∀ o g, Fintype (I o g)] [∀ o g, Fintype (J o g)]
+  (X : ∀ o, RowData C V d (I o) (J o)) (F : ∀ o, Flag (X o))
+  (Z : Finset Orb) (ga : Orb → Fin 2 → ZMod d → ℕ → ℕ)
 
-theorem blkAdm (hdich : ∀ o ∈ Z, (X o).Alt ∨ ∀ a, (X o).big 0 a) (hj : ∀ o ∈ Z, (X o).j' < (X o).n)
-    (hga : ∀ o ∈ Z, ∀ g a k, ga o g a k ≠ 0 → k ≤ (X o).rkF g a) : BlockAdmissible X F Z ga := by
+theorem blkAdm
+    (hdich : ∀ o ∈ Z, (X o).Alt ∨ ∀ a, (X o).big 0 a) (hj : ∀ o ∈ Z, (X o).j' < (X o).n)
+    (hga : ∀ o ∈ Z, ∀ g a k, ga o g a k ≠ 0 → k ≤ (X o).rkF g a)
+    : BlockAdmissible X F Z ga := by
   intro L hwt o ho q hq hatt
   refine attainsOK_of _ _ (hdich o ho) (hj o ho) q.1 q.2 (fun g a k hk => hga o ho g a k ?_) hatt
   rw [← hwt o ho g a k]
@@ -187,12 +206,17 @@ theorem zmod_two_add_one_add_one (a : ZMod 2) : a + 1 + 1 = a := by revert a; de
 
 theorem zmod_two_even_succ_iff (a : ZMod 2) : Even (a + 1).val ↔ ¬ Even a.val := by revert a; decide
 
-variable {C : Type} [Field C] {V : VF C}
-  {Orb : Type} [Fintype Orb] {I J : Orb → Fin 2 → Type} [∀ o g, Fintype (I o g)] [∀ o g, Fintype (J o g)]
-  (X : ∀ o, RowData C V 2 (I o) (J o)) (F : ∀ o, Flag (X o)) (gaC : Orb → ZMod 2 → ℕ → ℕ)
+variable
+  {C : Type} [Field C]
+  {V : VF C} {Orb : Type} [Fintype Orb]
+  {I J : Orb → Fin 2 → Type} [∀ o g, Fintype (I o g)] [∀ o g, Fintype (J o g)]
+  (X : ∀ o, RowData C V 2 (I o) (J o)) (F : ∀ o, Flag (X o))
+  (gaC : Orb → ZMod 2 → ℕ → ℕ)
 
-theorem blkAdmC (hA : ∀ o, (X o).Alt) (hj : ∀ o, (X o).j' < (X o).n)
-    (hga : ∀ o s k, gaC o s k ≠ 0 → k ≤ (X o).rkF 0 s) : BlockAdmissibleSelfConjugate X F gaC := by
+theorem blkAdmC
+    (hA : ∀ o, (X o).Alt) (hj : ∀ o, (X o).j' < (X o).n)
+    (hga : ∀ o s k, gaC o s k ≠ 0 → k ≤ (X o).rkF 0 s)
+    : BlockAdmissibleSelfConjugate X F gaC := by
   intro L hwt o q hq hatt
   refine attainsOK_of _ _ (Or.inl (hA o)) (hj o) q.1 q.2 (fun g a k hk => ?_) hatt
   have hg : g = 0 ∨ g = 1 := by fin_cases g <;> simp

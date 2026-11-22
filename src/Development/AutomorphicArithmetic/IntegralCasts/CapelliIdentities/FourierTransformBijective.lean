@@ -133,12 +133,13 @@ private lemma sb_of {κ : Type} [Fintype κ] {f : (κ → K) → ℂ} {e c : K} 
 end
 
 section
-variable {K : Type} [NontriviallyNormedField K] [IsUltrametricDist K] [ProperSpace K]
+variable
+  {K : Type} [NontriviallyNormedField K] [IsUltrametricDist K] [ProperSpace K]
   {κ : Type} [Fintype κ] [MeasurableSpace (κ → K)] [BorelSpace (κ → K)]
-  (μ : Measure (κ → K)) [μ.IsAddHaarMeasure] (ψ : AddChar K ℂ)
+  (μ : Measure (κ → K)) [μ.IsAddHaarMeasure]
+  (ψ : AddChar K ℂ)
 
-private noncomputable def four (f : (κ → K) → ℂ) (y : κ → K) : ℂ :=
-  ∫ x, ψ (dotProduct x y) * f x ∂μ
+private noncomputable def four (f : (κ → K) → ℂ) (y : κ → K) : ℂ := ∫ x, ψ (dotProduct x y) * f x ∂μ
 
 omit [IsUltrametricDist K] [ProperSpace K] in
 private lemma four_transl (f : (κ → K) → ℂ) (a y : κ → K) :
@@ -186,7 +187,6 @@ private lemma four_inv {f : (κ → K) → ℂ} {c : K} (hc : c ≠ 0)
   by_cases hx : ‖x‖ ≤ ‖c‖
   · rw [(cond_pi ψ hd hc u).2 hu x hx, one_mul]
   · rw [h2 x hx, mul_zero]
-
 
 omit hd [ProperSpace K] [MeasurableSpace (κ → K)] [BorelSpace (κ → K)] in
 private lemma ind_inv (r : ℝ) (u : κ → K) (hu : ‖u‖ ≤ r) (x : κ → K) :

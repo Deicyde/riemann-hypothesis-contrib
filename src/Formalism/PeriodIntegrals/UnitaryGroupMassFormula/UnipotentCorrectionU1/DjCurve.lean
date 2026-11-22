@@ -12,7 +12,8 @@ noncomputable section
 
 namespace PI.UnitaryCorollaryDerivatives
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.U
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 

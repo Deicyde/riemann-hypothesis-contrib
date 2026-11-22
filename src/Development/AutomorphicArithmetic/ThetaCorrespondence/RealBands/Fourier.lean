@@ -9,9 +9,11 @@ open MeasureTheory Filter UpperTheory.Lit.Cusp
 open scoped Topology
 
 open scoped FourierTransform in
-theorem UpperTheory.Lit.Cusp.fourier_zero :
-    ∀ u : ℝ → ℂ, Continuous u → Integrable u →
-      (∀ s : ℝ, ∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * u t = 0) → ∀ t, u t = 0 := by
+theorem UpperTheory.Lit.Cusp.fourier_zero
+    : ∀ u : ℝ → ℂ,
+      Continuous u → Integrable u
+        → (∀ s : ℝ, ∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * u t = 0)
+        → ∀ t, u t = 0 := by
   intro u hc hi hz t
   have hF : 𝓕 u = 0 := by
     ext w

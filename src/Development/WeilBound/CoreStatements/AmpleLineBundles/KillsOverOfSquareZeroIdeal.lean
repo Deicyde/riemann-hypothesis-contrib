@@ -9,61 +9,82 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsCocha
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.CompanionTheory.Ar
 open TensorProduct
 
 namespace CoverDenseAlt
 
 section
 
-variable {S : Scheme.{0}} {B : Type} [CommRing B] {b : Sp B ⟶ S} {A A' : Type} [CommRing A] [CommRing A']
+variable
+  {S : Scheme.{0}} {B : Type} [CommRing B]
+  {b : Sp B ⟶ S} {A A' : Type} [CommRing A] [CommRing A']
   {g : B →+* A} {g' : B →+* A'}
 
-noncomputable def tm (b : Sp B ⟶ S) (φ : A →+* A') (h : φ.comp g = g') :
-    Over.mk (spMap g' ≫ b) ⟶ Over.mk (spMap g ≫ b) :=
+noncomputable def tm (b : Sp B ⟶ S) (φ : A →+* A') (h : φ.comp g = g')
+    : Over.mk (spMap g' ≫ b) ⟶ Over.mk (spMap g ≫ b) :=
   Over.homMk (spMap φ) (by
     change spMap φ ≫ spMap g ≫ b = spMap g' ≫ b
     rw [← Category.assoc, spMap_spMap, h])
 
-theorem charVal_tm {X : Type} [AddCommGroup X] (φ : A →+* A') (h : φ.comp g = g')
-    (t : Over.mk (spMap g ≫ b) ⟶ splitTorus S X) (χ : X) : charVal (tm b φ h ≫ t) χ = φ (charVal t χ) :=
+theorem charVal_tm
+    {X : Type} [AddCommGroup X]
+    (φ : A →+* A') (h : φ.comp g = g')
+    (t : Over.mk (spMap g ≫ b) ⟶ splitTorus S X) (χ : X)
+    : charVal (tm b φ h ≫ t) χ = φ (charVal t χ) :=
   TorusModel.charVal_comp φ t _ rfl χ
 
-private theorem one_left_lemma_3 {S : Scheme.{0}} {G : Over S} [GrpObj G] {P Q : Over S} (f : P ⟶ Q) :
-    (1 : P ⟶ G).left = f.left ≫ (1 : Q ⟶ G).left := by
+private theorem one_left_lemma_3 {S : Scheme.{0}} {G : Over S} [GrpObj G] {P Q : Over S} (f : P ⟶ Q)
+    : (1 : P ⟶ G).left = f.left ≫ (1 : Q ⟶ G).left := by
   have : f ≫ (1 : Q ⟶ G) = 1 := by
     rw [Hom.one_def, Hom.one_def, ← Category.assoc, toUnit_unique (f ≫ toUnit Q) (toUnit P)]
   rw [← this]
   rfl
-private theorem charVal_congr_left {S : Scheme.{0}} {X : Type} [AddCommGroup X] {A : Type} [CommRing A]
-    {a a' : Sp A ⟶ S} (t : Over.mk a ⟶ splitTorus S X) (t' : Over.mk a' ⟶ splitTorus S X)
-    (h : t.left = t'.left) (χ : X) : charVal t χ = charVal t' χ := by
+private theorem charVal_congr_left
+    {S : Scheme.{0}} {X : Type} [AddCommGroup X]
+    {A : Type} [CommRing A]
+    {a a' : Sp A ⟶ S}
+    (t : Over.mk a ⟶ splitTorus S X) (t' : Over.mk a' ⟶ splitTorus S X) (h : t.left = t'.left)
+    (χ : X)
+    : charVal t χ = charVal t' χ := by
   unfold charVal
   rw [h]
 
-theorem red {G : Over S} [GrpObj G] {X : Type} [AddCommGroup X] {u : splitTorus S X ⟶ G} {Y : AddSubgroup X}
-    {I : Ideal B} (hk : KillsOver u Y (spMap (Ideal.Quotient.mk I) ≫ b))
-    (t : Over.mk (spMap g ≫ b) ⟶ splitTorus S X) (ht : ∀ y ∈ Y, charVal t y = 1) :
-    spMap (Ideal.Quotient.mk (I.map g)) ≫ (t ≫ u).left =
-      spMap (Ideal.Quotient.mk (I.map g)) ≫ (1 : Over.mk (spMap g ≫ b) ⟶ G).left := by
+theorem red
+    {G : Over S} [GrpObj G]
+    {X : Type} [AddCommGroup X]
+    {u : splitTorus S X ⟶ G} {Y : AddSubgroup X} {I : Ideal B}
+    (hk : KillsOver u Y (spMap (Ideal.Quotient.mk I) ≫ b))
+    (t : Over.mk (spMap g ≫ b) ⟶ splitTorus S X) (ht : ∀ y ∈ Y, charVal t y = 1)
+    : spMap (Ideal.Quotient.mk (I.map g)) ≫ (t ≫ u).left
+      = spMap (Ideal.Quotient.mk (I.map g)) ≫ (1 : Over.mk (spMap g ≫ b) ⟶ G).left := by
   let J := I.map g
   let g0 : B ⧸ I →+* A ⧸ J := Ideal.quotientMap J g Ideal.le_comap_map
-  have hg0 : g0.comp (Ideal.Quotient.mk I) = (Ideal.Quotient.mk J).comp g := Ideal.quotientMap_comp_mk _
-  have w : spMap (Ideal.Quotient.mk J) ≫ spMap g ≫ b = spMap g0 ≫ spMap (Ideal.Quotient.mk I) ≫ b := by
+  have hg0 : g0.comp (Ideal.Quotient.mk I) = (Ideal.Quotient.mk J).comp g :=
+    Ideal.quotientMap_comp_mk _
+  have w
+      : spMap (Ideal.Quotient.mk J) ≫ spMap g ≫ b = spMap g0 ≫ spMap (Ideal.Quotient.mk I) ≫ b := by
     rw [← Category.assoc, ← Category.assoc, spMap_spMap, spMap_spMap, hg0]
   let f : Over.mk (spMap g0 ≫ spMap (Ideal.Quotient.mk I) ≫ b) ⟶ Over.mk (spMap g ≫ b) :=
     Over.homMk (spMap (Ideal.Quotient.mk J)) w
   have hc : ∀ y ∈ Y, charVal (f ≫ t) y = 1 := by
     intro y hy
-    have e0 : (f ≫ t).left = (tm b (Ideal.Quotient.mk J) (rfl : (Ideal.Quotient.mk J).comp g = _) ≫ t).left := by
+    have e0
+        : (f ≫ t).left
+          = (tm b (Ideal.Quotient.mk J) (rfl : (Ideal.Quotient.mk J).comp g = _) ≫ t).left := by
       simp only [Over.comp_left, f, tm, Over.homMk_left]
     have e1 := charVal_congr_left _ _ e0 y
-    have e2 := charVal_tm (b := b) (Ideal.Quotient.mk J) (rfl : (Ideal.Quotient.mk J).comp g = _) t y
+    have e2 :=
+      charVal_tm (b := b) (Ideal.Quotient.mk J) (rfl : (Ideal.Quotient.mk J).comp g = _) t y
     rw [e1, e2, ht y hy, map_one]
   have h2 := hk _ g0 (f ≫ t) hc
-  have hl : ((f ≫ t) ≫ u).left = (1 : Over.mk (spMap g0 ≫ spMap (Ideal.Quotient.mk I) ≫ b) ⟶ G).left := by
+  have hl
+      : ((f ≫ t) ≫ u).left
+        = (1 : Over.mk (spMap g0 ≫ spMap (Ideal.Quotient.mk I) ≫ b) ⟶ G).left := by
     rw [h2]
   rw [one_left_lemma_3 f] at hl
   simp only [f, Over.comp_left, Over.homMk_left, Category.assoc] at hl
@@ -72,47 +93,63 @@ theorem red {G : Over S} [GrpObj G] {X : Type} [AddCommGroup X] {u : splitTorus 
 theorem sq_map {I : Ideal B} (hI : I ^ 2 = ⊥) (g : B →+* A) : (I.map g) ^ 2 = ⊥ := by
   rw [← Ideal.map_pow, hI, Ideal.map_bot]
 
-private theorem isGrpPullback_one_left {S : Scheme.{0}} {B : Type} [CommRing B] {b : Sp B ⟶ S} {A : Type} [CommRing A]
-    {G : Over S} [GrpObj G] (g : B →+* A) :
-    (1 : Over.mk (spMap g ≫ b) ⟶ G).left = spMap g ≫ (1 : Over.mk b ⟶ G).left := by
-  have : (Over.homMk (spMap g) rfl : Over.mk (spMap g ≫ b) ⟶ Over.mk b) ≫ (1 : Over.mk b ⟶ G) = 1 := by
+private theorem isGrpPullback_one_left
+    {S : Scheme.{0}} {B : Type} [CommRing B]
+    {b : Sp B ⟶ S} {A : Type} [CommRing A]
+    {G : Over S} [GrpObj G]
+    (g : B →+* A)
+    : (1 : Over.mk (spMap g ≫ b) ⟶ G).left = spMap g ≫ (1 : Over.mk b ⟶ G).left := by
+  have : (Over.homMk (spMap g) rfl : Over.mk (spMap g ≫ b) ⟶ Over.mk b) ≫ (1 : Over.mk b ⟶ G)
+      = 1 := by
     rw [Hom.one_def, Hom.one_def, ← Category.assoc]
     congr 1
   rw [← this]
   rfl
 
-theorem one_in {G : Over S} [GrpObj G] {W : G.left.Opens} (ho : ⊤ ≤ (1 : Over.mk b ⟶ G).left ⁻¹ᵁ W)
-    (g : B →+* A) : ⊤ ≤ (1 : Over.mk (spMap g ≫ b) ⟶ G).left ⁻¹ᵁ W := by
+theorem one_in
+    {G : Over S} [GrpObj G]
+    {W : G.left.Opens} (ho : ⊤ ≤ (1 : Over.mk b ⟶ G).left ⁻¹ᵁ W)
+    (g : B →+* A)
+    : ⊤ ≤ (1 : Over.mk (spMap g ≫ b) ⟶ G).left ⁻¹ᵁ W := by
   rw [isGrpPullback_one_left]
   have hW : (1 : Over.mk b ⟶ G).left ⁻¹ᵁ W = ⊤ := top_le_iff.mp ho
   rw [Scheme.Hom.comp_preimage, hW]
   simp
 
-private theorem val_eq_of_eq_spMap_comp {Z : Scheme} {A A' : Type} [CommRing A] [CommRing A'] (φ : A →+* A')
-    (z : Sp A ⟶ Z) (z' : Sp A' ⟶ Z) (e : z' = spMap φ ≫ z) (V : Z.Opens) (hz : ⊤ ≤ z ⁻¹ᵁ V)
-    (hz' : ⊤ ≤ z' ⁻¹ᵁ V) (s : Γ(Z, V)) : val z' V hz' s = φ (val z V hz s) := by
+private theorem val_eq_of_eq_spMap_comp
+    {Z : Scheme} {A A' : Type} [CommRing A] [CommRing A']
+    (φ : A →+* A') (z : Sp A ⟶ Z) (z' : Sp A' ⟶ Z) (e : z' = spMap φ ≫ z)
+    (V : Z.Opens) (hz : ⊤ ≤ z ⁻¹ᵁ V) (hz' : ⊤ ≤ z' ⁻¹ᵁ V) (s : Γ(Z, V))
+    : val z' V hz' s = φ (val z V hz s) := by
   subst e
   have h0 : (⊤ : (Sp A').Opens) ≤ spMap φ ⁻¹ᵁ ⊤ := by simp
-  have key : Scheme.Hom.appLE (spMap φ) ⊤ ⊤ h0 ≫ (Scheme.ΓSpecIso (CommRingCat.of A')).hom =
-      (Scheme.ΓSpecIso (CommRingCat.of A)).hom ≫ CommRingCat.ofHom φ := by
+  have key
+      : Scheme.Hom.appLE (spMap φ) ⊤ ⊤ h0 ≫ (Scheme.ΓSpecIso (CommRingCat.of A')).hom
+        = (Scheme.ΓSpecIso (CommRingCat.of A)).hom ≫ CommRingCat.ofHom φ := by
     rw [← Scheme.ΓSpecIso_naturality]
     rfl
   simp only [val]
   rw [← Scheme.Hom.appLE_comp_appLE (spMap φ) z V ⊤ ⊤ hz h0, Category.assoc, key]
   rfl
 
-theorem val_one {G : Over S} [GrpObj G] {W : G.left.Opens} (ho : ⊤ ≤ (1 : Over.mk b ⟶ G).left ⁻¹ᵁ W)
-    (g : B →+* A) (s : Γ(G.left, W)) :
-    val (A := A) (1 : Over.mk (spMap g ≫ b) ⟶ G).left W (one_in ho g) s =
-      g (val (A := B) (1 : Over.mk b ⟶ G).left W ho s) := by
+theorem val_one
+    {G : Over S} [GrpObj G]
+    {W : G.left.Opens} (ho : ⊤ ≤ (1 : Over.mk b ⟶ G).left ⁻¹ᵁ W)
+    (g : B →+* A) (s : Γ(G.left, W))
+    : val (A := A) (1 : Over.mk (spMap g ≫ b) ⟶ G).left W (one_in ho g) s
+      = g (val (A := B) (1 : Over.mk b ⟶ G).left W ho s) := by
   exact val_eq_of_eq_spMap_comp g _ _ (isGrpPullback_one_left g) W ho (one_in ho g) s
 
-variable {G : Over S} [GrpObj G] {X : Type} [AddCommGroup X] {u : splitTorus S X ⟶ G} {Y : AddSubgroup X}
-  {I : Ideal B}
+variable
+  {G : Over S} [GrpObj G]
+  {X : Type} [AddCommGroup X]
+  {u : splitTorus S X ⟶ G} {Y : AddSubgroup X} {I : Ideal B}
 
-theorem pt_in (hI : I ^ 2 = ⊥) (hk : KillsOver u Y (spMap (Ideal.Quotient.mk I) ≫ b)) {W : G.left.Opens}
-    (ho : ⊤ ≤ (1 : Over.mk b ⟶ G).left ⁻¹ᵁ W) (t : Over.mk (spMap g ≫ b) ⟶ splitTorus S X)
-    (ht : ∀ y ∈ Y, charVal t y = 1) : ⊤ ≤ (t ≫ u).left ⁻¹ᵁ W := by
+theorem pt_in
+    (hI : I ^ 2 = ⊥) (hk : KillsOver u Y (spMap (Ideal.Quotient.mk I) ≫ b))
+    {W : G.left.Opens} (ho : ⊤ ≤ (1 : Over.mk b ⟶ G).left ⁻¹ᵁ W)
+    (t : Over.mk (spMap g ≫ b) ⟶ splitTorus S X) (ht : ∀ y ∈ Y, charVal t y = 1)
+    : ⊤ ≤ (t ≫ u).left ⁻¹ᵁ W := by
   have hJ : (I.map g) ^ 2 = ⊥ := sq_map hI g
   have hle : I.map g ≤ nilradical A := by
     intro x hx
@@ -132,14 +169,19 @@ theorem pt_in (hI : I ^ 2 = ⊥) (hk : KillsOver u Y (spMap (Ideal.Quotient.mk I
   rw [← hy]
   exact hy'
 
-theorem val_prim [IsMonHom u] (hI : I ^ 2 = ⊥) (hk : KillsOver u Y (spMap (Ideal.Quotient.mk I) ≫ b))
-    {U : S.Opens} (hU : IsAffineOpen U) (hb : ⊤ ≤ b ⁻¹ᵁ U) {W : G.left.Opens} (hW : IsAffineOpen W)
-    (ho : ⊤ ≤ (1 : Over.mk b ⟶ G).left ⁻¹ᵁ W) (t : Over.mk (spMap g ≫ b) ⟶ splitTorus S X)
-    (hY : ∀ y ∈ Y, charVal t y = 1) (i₁ i₂ Δ : A →+* A') (e₁ : i₁.comp g = g') (e₂ : i₂.comp g = g')
-    (e₃ : Δ.comp g = g') (hΔ : ∀ χ, Δ (charVal t χ) = i₁ (charVal t χ) * i₂ (charVal t χ)) (s : Γ(G.left, W)) :
-    Δ (val (A := A) (t ≫ u).left W (pt_in hI hk ho t hY) s) + g' (val (A := B) (1 : Over.mk b ⟶ G).left W ho s) =
-      i₁ (val (A := A) (t ≫ u).left W (pt_in hI hk ho t hY) s) +
-        i₂ (val (A := A) (t ≫ u).left W (pt_in hI hk ho t hY) s) := by
+theorem val_prim
+    [IsMonHom u]
+    (hI : I ^ 2 = ⊥) (hk : KillsOver u Y (spMap (Ideal.Quotient.mk I) ≫ b))
+    {U : S.Opens} (hU : IsAffineOpen U) (hb : ⊤ ≤ b ⁻¹ᵁ U)
+    {W : G.left.Opens} (hW : IsAffineOpen W) (ho : ⊤ ≤ (1 : Over.mk b ⟶ G).left ⁻¹ᵁ W)
+    (t : Over.mk (spMap g ≫ b) ⟶ splitTorus S X) (hY : ∀ y ∈ Y, charVal t y = 1)
+    (i₁ i₂ Δ : A →+* A') (e₁ : i₁.comp g = g') (e₂ : i₂.comp g = g') (e₃ : Δ.comp g = g')
+    (hΔ : ∀ χ, Δ (charVal t χ) = i₁ (charVal t χ) * i₂ (charVal t χ))
+    (s : Γ(G.left, W))
+    : Δ (val (A := A) (t ≫ u).left W (pt_in hI hk ho t hY) s)
+        + g' (val (A := B) (1 : Over.mk b ⟶ G).left W ho s)
+      = i₁ (val (A := A) (t ≫ u).left W (pt_in hI hk ho t hY) s)
+        + i₂ (val (A := A) (t ≫ u).left W (pt_in hI hk ho t hY) s) := by
   have hJ : (I.map g') ^ 2 = ⊥ := sq_map hI g'
   have hb' : ⊤ ≤ (spMap g' ≫ b) ⁻¹ᵁ U := by
     rw [Scheme.Hom.comp_preimage, top_le_iff.mp hb]
@@ -149,56 +191,69 @@ theorem val_prim [IsMonHom u] (hI : I ^ 2 = ⊥) (hk : KillsOver u Y (spMap (Ide
   have hc : ∀ (φ : A →+* A') (e : φ.comp g = g'), ∀ y ∈ Y, charVal (tm b φ e ≫ t) y = 1 := by
     intro φ e y hy
     rw [charVal_tm, hY y hy, map_one]
-  have hl : ∀ (φ : A →+* A') (e : φ.comp g = g'),
-      ((tm b φ e ≫ t) ≫ u).left = spMap φ ≫ (t ≫ u).left := by
+  have hl
+      : ∀ (φ : A →+* A') (e : φ.comp g = g'),
+        ((tm b φ e ≫ t) ≫ u).left = spMap φ ≫ (t ≫ u).left := by
     intro φ e
     simp only [tm, Over.comp_left, Over.homMk_left, Category.assoc]
-  have hin : ∀ (φ : A →+* A') (e : φ.comp g = g'), ⊤ ≤ ((tm b φ e ≫ t) ≫ u).left ⁻¹ᵁ W :=
-    fun φ e => pt_in hI hk ho _ (hc φ e)
+  have hin : ∀ (φ : A →+* A') (e : φ.comp g = g'), ⊤ ≤ ((tm b φ e ≫ t) ≫ u).left ⁻¹ᵁ W := fun φ e =>
+    pt_in hI hk ho _ (hc φ e)
   have hmul : tm b Δ e₃ ≫ t = (tm b i₁ e₁ ≫ t) * (tm b i₂ e₂ ≫ t) := by
     apply GlobalTheory.CompanionTheory.Ar.TorusModel.charVal_ext
     intro χ
-    rw [GlobalTheory.CompanionTheory.Ar.TorusModel.charVal_mul, charVal_tm, charVal_tm, charVal_tm, hΔ]
+    rw [GlobalTheory.CompanionTheory.Ar.TorusModel.charVal_mul, charVal_tm, charVal_tm, charVal_tm,
+      hΔ]
   have hxy : ((tm b i₁ e₁ ≫ t) ≫ u) * ((tm b i₂ e₂ ≫ t) ≫ u) = (tm b Δ e₃ ≫ t) ≫ u := by
     rw [hmul, MonObj.mul_comp]
-  have hr : ∀ (φ : A →+* A') (e : φ.comp g = g'),
-      spMap (Ideal.Quotient.mk (I.map g')) ≫ ((tm b φ e ≫ t) ≫ u).left =
-        spMap (Ideal.Quotient.mk (I.map g')) ≫ (1 : Over.mk (spMap g' ≫ b) ⟶ G).left :=
+  have hr
+      : ∀ (φ : A →+* A') (e : φ.comp g = g'),
+        spMap (Ideal.Quotient.mk (I.map g')) ≫ ((tm b φ e ≫ t) ≫ u).left
+          = spMap (Ideal.Quotient.mk (I.map g')) ≫ (1 : Over.mk (spMap g' ≫ b) ⟶ G).left :=
     fun φ e => red hk _ (hc φ e)
-  have key := val_add (spMap g' ≫ b) hJ hU hb' hW h1 ((tm b i₁ e₁ ≫ t) ≫ u) ((tm b i₂ e₂ ≫ t) ≫ u)
-    (hr i₁ e₁) (hr i₂ e₂) W (hin i₁ e₁) (hin i₂ e₂) (by rw [hxy]; exact hin Δ e₃) h1 s
+  have key :=
+    val_add (spMap g' ≫ b) hJ hU hb' hW h1 ((tm b i₁ e₁ ≫ t) ≫ u) ((tm b i₂ e₂ ≫ t) ≫ u) (hr i₁ e₁)
+      (hr i₂ e₂) W (hin i₁ e₁) (hin i₂ e₂) (by rw [hxy]; exact hin Δ e₃) h1 s
   have hxl : (((tm b i₁ e₁ ≫ t) ≫ u) * ((tm b i₂ e₂ ≫ t) ≫ u)).left = spMap Δ ≫ (t ≫ u).left := by
     rw [hxy, hl Δ e₃]
   rw [val_comp i₁ (t ≫ u).left W hp (hl i₁ e₁) (hin i₁ e₁) s,
-    val_comp i₂ (t ≫ u).left W hp (hl i₂ e₂) (hin i₂ e₂) s,
-    val_comp Δ (t ≫ u).left W hp hxl _ s, val_one ho g' s] at key
+      val_comp i₂ (t ≫ u).left W hp (hl i₂ e₂) (hin i₂ e₂) s, val_comp Δ (t ≫ u).left W hp hxl _ s,
+      val_one ho g' s]
+    at key
   exact key
 
 end
 
-theorem prim_eq {B M : Type} [CommRing B] [AddCommGroup M] (d : AddMonoidAlgebra B M) (e : B)
-    (h : (Bialgebra.comulAlgHom B (AddMonoidAlgebra B M)) d +
-      algebraMap B (AddMonoidAlgebra B M ⊗[B] AddMonoidAlgebra B M) e =
-      (Algebra.TensorProduct.includeLeft : _ →ₐ[B] AddMonoidAlgebra B M ⊗[B] AddMonoidAlgebra B M) d +
-      (Algebra.TensorProduct.includeRight : _ →ₐ[B] AddMonoidAlgebra B M ⊗[B] AddMonoidAlgebra B M) d) :
-    d = algebraMap B _ e := by
+theorem prim_eq
+    {B M : Type} [CommRing B] [AddCommGroup M]
+    (d : AddMonoidAlgebra B M) (e : B)
+    (h : (Bialgebra.comulAlgHom B (AddMonoidAlgebra B M)) d
+        + algebraMap B (AddMonoidAlgebra B M ⊗[B] AddMonoidAlgebra B M) e
+      = (Algebra.TensorProduct.includeLeft : _ →ₐ[B] AddMonoidAlgebra B M ⊗[B] AddMonoidAlgebra B M)
+          d
+        + (Algebra.TensorProduct.includeRight
+            : _ →ₐ[B] AddMonoidAlgebra B M ⊗[B] AddMonoidAlgebra B M)
+          d)
+    : d = algebraMap B _ e := by
   classical
   let c : M → (AddMonoidAlgebra B M →ₗ[B] B) := fun m =>
     (Finsupp.lapply m).comp (AddMonoidAlgebra.coeffLinearEquiv B).toLinearMap
   let ψ : M → (AddMonoidAlgebra B M ⊗[B] AddMonoidAlgebra B M →ₗ[B] B) := fun m =>
     TensorProduct.lift ((LinearMap.mul B B).compl₁₂ (c m) (c m))
-  have hψ : ∀ m (x y : AddMonoidAlgebra B M), ψ m (x ⊗ₜ y) = x.coeff m * y.coeff m := fun _ _ _ => rfl
-  have hΔ : ∀ m (x : AddMonoidAlgebra B M),
-      ψ m (Bialgebra.comulAlgHom B (AddMonoidAlgebra B M) x) = x.coeff m := by
+  have hψ : ∀ m (x y : AddMonoidAlgebra B M), ψ m (x ⊗ₜ y) = x.coeff m * y.coeff m := fun _ _ _ =>
+    rfl
+  have hΔ
+      : ∀ m (x : AddMonoidAlgebra B M),
+        ψ m (Bialgebra.comulAlgHom B (AddMonoidAlgebra B M) x) = x.coeff m := by
     intro m x
     rw [Bialgebra.comulAlgHom_apply]
     induction x using AddMonoidAlgebra.induction_linear with
     | zero => simp
-    | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy, AddMonoidAlgebra.coeff_add, Finsupp.add_apply]
+    | add x y hx hy =>
+      rw [map_add (f := _), map_add (f := _), hx, hy, AddMonoidAlgebra.coeff_add, Finsupp.add_apply]
     | single a r =>
       rw [AddMonoidAlgebra.comul_single]
-      simp only [CommSemiring.comul_apply, TensorProduct.map_tmul, AddMonoidAlgebra.lsingle_apply, hψ,
-        AddMonoidAlgebra.coeff_single, Finsupp.single_apply]
+      simp only [CommSemiring.comul_apply, TensorProduct.map_tmul, AddMonoidAlgebra.lsingle_apply,
+        hψ, AddMonoidAlgebra.coeff_single, Finsupp.single_apply]
       split_ifs <;> simp
   have h1 : ∀ m, (1 : AddMonoidAlgebra B M).coeff m = if m = 0 then 1 else 0 := by
     intro m
@@ -208,15 +263,22 @@ theorem prim_eq {B M : Type} [CommRing B] [AddCommGroup M] (d : AddMonoidAlgebra
     · exact absurd p.symm q
     · exact absurd q.symm p
     · rfl
-  have hk : ∀ m, d.coeff m + e * ((1 : AddMonoidAlgebra B M).coeff m * (1 : AddMonoidAlgebra B M).coeff m) =
-      d.coeff m * (1 : AddMonoidAlgebra B M).coeff m + (1 : AddMonoidAlgebra B M).coeff m * d.coeff m := by
+  have hk
+      : ∀ m,
+        d.coeff m + e * ((1 : AddMonoidAlgebra B M).coeff m * (1 : AddMonoidAlgebra B M).coeff m)
+          = d.coeff m * (1 : AddMonoidAlgebra B M).coeff m
+            + (1 : AddMonoidAlgebra B M).coeff m * d.coeff m := by
     intro m
     have := congrArg (ψ m) h
     rw [map_add (f := _), map_add (f := _), hΔ, Algebra.TensorProduct.includeLeft_apply,
-      Algebra.TensorProduct.includeRight_apply, hψ, hψ, Algebra.algebraMap_eq_smul_one, map_smul,
-      Algebra.TensorProduct.one_def, hψ, smul_eq_mul] at this
+        Algebra.TensorProduct.includeRight_apply, hψ, hψ, Algebra.algebraMap_eq_smul_one, map_smul,
+        Algebra.TensorProduct.one_def, hψ, smul_eq_mul]
+      at this
     exact this
-  have ha : ∀ m, (algebraMap B (AddMonoidAlgebra B M) e).coeff m = e * (1 : AddMonoidAlgebra B M).coeff m := by
+  have ha
+      : ∀ m,
+        (algebraMap B (AddMonoidAlgebra B M) e).coeff m
+          = e * (1 : AddMonoidAlgebra B M).coeff m := by
     intro m
     rw [Algebra.algebraMap_eq_smul_one]
     rfl
@@ -224,19 +286,27 @@ theorem prim_eq {B M : Type} [CommRing B] [AddCommGroup M] (d : AddMonoidAlgebra
     ext m
     have := hk m
     rw [ha, h1] at *
-    split_ifs at this ⊢ <;> simp at this ⊢ <;> first | linear_combination this | linear_combination -this
+    split_ifs at this ⊢ <;> simp at this ⊢
+      <;> first | linear_combination this | linear_combination -this
   rw [← AddMonoidAlgebra.ofCoeff_coeff d, hc, AddMonoidAlgebra.ofCoeff_coeff]
 
-theorem kills_over_of_square_zero_ideal : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] (X : Type) [AddCommGroup X] (u : splitTorus S X ⟶ G) [IsMonHom u] (Y : AddSubgroup X) (B : Type) [CommRing B] [IsLocalRing B] (b : Sp B ⟶ S) (I : Ideal B), I ^ 2 = ⊥ → KillsOver u Y (spMap (Ideal.Quotient.mk I) ≫ b) → KillsOver u Y b := by
+theorem kills_over_of_square_zero_ideal
+    : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] (X : Type) [AddCommGroup X]
+        (u : splitTorus S X ⟶ G) [IsMonHom u] (Y : AddSubgroup X) (B : Type) [CommRing B]
+        [IsLocalRing B] (b : Sp B ⟶ S) (I : Ideal B),
+      I ^ 2 = ⊥ → KillsOver u Y (spMap (Ideal.Quotient.mk I) ≫ b) → KillsOver u Y b := by
   intro S G _ X _ u _ Y B _ _ b I hI hk A _ g t ht
   obtain ⟨U, hU, hb⟩ := exists_affine b
   obtain ⟨W, hW, ho⟩ := exists_affine (1 : Over.mk b ⟶ G).left
   let M := X ⧸ Y
   let R := AddMonoidAlgebra B M
-  let c0 : Multiplicative X →* Rˣ := MonoidHom.toHomUnits
-    ((AddMonoidAlgebra.of B M).comp (AddMonoidHom.toMultiplicative (QuotientAddGroup.mk' Y)))
-  obtain ⟨t0, ht0⟩ := GlobalTheory.CompanionTheory.Ar.TorusModel.exists_charVal (spMap (algebraMap B R) ≫ b) c0
-  have hv0 : ∀ χ : X, charVal t0 χ = AddMonoidAlgebra.single (QuotientAddGroup.mk χ : M) (1 : B) := by
+  let c0 : Multiplicative X →* Rˣ :=
+    MonoidHom.toHomUnits ((AddMonoidAlgebra.of B M).comp
+      (AddMonoidHom.toMultiplicative (QuotientAddGroup.mk' Y)))
+  obtain ⟨t0, ht0⟩ :=
+    GlobalTheory.CompanionTheory.Ar.TorusModel.exists_charVal (spMap (algebraMap B R) ≫ b) c0
+  have hv0
+      : ∀ χ : X, charVal t0 χ = AddMonoidAlgebra.single (QuotientAddGroup.mk χ : M) (1 : B) := by
     intro χ
     rw [ht0]
     rfl
@@ -247,13 +317,14 @@ theorem kills_over_of_square_zero_ideal : ∀ (S : Scheme.{0}) (G : Over S) [Grp
   have hk0 : t0 ≫ u = 1 := by
     apply Over.OverMorphism.ext
     refine val_ext hW (pt_in hI hk ho t0 hY0) (one_in ho _) (fun s => ?_)
-    have hp := val_prim (g' := algebraMap B (R ⊗[B] R)) hI hk hU hb hW ho t0 hY0
-      (Algebra.TensorProduct.includeLeft : R →ₐ[B] R ⊗[B] R).toRingHom
-      (Algebra.TensorProduct.includeRight : R →ₐ[B] R ⊗[B] R).toRingHom
-      (Bialgebra.comulAlgHom B R).toRingHom
-      (AlgHom.comp_algebraMap (Algebra.TensorProduct.includeLeft : R →ₐ[B] R ⊗[B] R))
-      (AlgHom.comp_algebraMap (Algebra.TensorProduct.includeRight : R →ₐ[B] R ⊗[B] R))
-      (AlgHom.comp_algebraMap (Bialgebra.comulAlgHom B R)) ?_ s
+    have hp :=
+      val_prim (g' := algebraMap B (R ⊗[B] R)) hI hk hU hb hW ho t0 hY0
+        (Algebra.TensorProduct.includeLeft : R →ₐ[B] R ⊗[B] R).toRingHom
+        (Algebra.TensorProduct.includeRight : R →ₐ[B] R ⊗[B] R).toRingHom
+        (Bialgebra.comulAlgHom B R).toRingHom
+        (AlgHom.comp_algebraMap (Algebra.TensorProduct.includeLeft : R →ₐ[B] R ⊗[B] R))
+        (AlgHom.comp_algebraMap (Algebra.TensorProduct.includeRight : R →ₐ[B] R ⊗[B] R))
+        (AlgHom.comp_algebraMap (Bialgebra.comulAlgHom B R)) ?_ s
     · rw [val_one ho _ s]
       exact prim_eq _ _ hp
     · intro χ
@@ -261,18 +332,19 @@ theorem kills_over_of_square_zero_ideal : ∀ (S : Scheme.{0}) (G : Over S) [Grp
       show Bialgebra.comulAlgHom B R (AddMonoidAlgebra.single _ 1) =
         (Algebra.TensorProduct.includeLeft : R →ₐ[B] R ⊗[B] R) (AddMonoidAlgebra.single _ 1) *
           (Algebra.TensorProduct.includeRight : R →ₐ[B] R ⊗[B] R) (AddMonoidAlgebra.single _ 1)
-      rw [Bialgebra.comulAlgHom_apply, AddMonoidAlgebra.comul_single, Algebra.TensorProduct.includeLeft_apply,
-        Algebra.TensorProduct.includeRight_apply, Algebra.TensorProduct.tmul_mul_tmul, _root_.mul_one,
-        _root_.one_mul]
+      rw [Bialgebra.comulAlgHom_apply, AddMonoidAlgebra.comul_single,
+        Algebra.TensorProduct.includeLeft_apply, Algebra.TensorProduct.includeRight_apply,
+        Algebra.TensorProduct.tmul_mul_tmul, _root_.mul_one, _root_.one_mul]
       simp only [CommSemiring.comul_apply, TensorProduct.map_tmul, AddMonoidAlgebra.lsingle_apply]
-  let f : X →+ Additive A :=
-    { toFun := fun x => Additive.ofMul (charVal t x)
-      map_zero' := by
-        rw [GlobalTheory.CompanionTheory.Ar.TorusModel.charVal_zero]
-        rfl
-      map_add' := fun x y => by
-        rw [GlobalTheory.CompanionTheory.Ar.TorusModel.charVal_add]
-        rfl }
+  let f : X →+ Additive A := {
+    toFun := fun x => Additive.ofMul (charVal t x)
+    map_zero' := by
+      rw [GlobalTheory.CompanionTheory.Ar.TorusModel.charVal_zero]
+      rfl
+    map_add' := fun x y => by
+      rw [GlobalTheory.CompanionTheory.Ar.TorusModel.charVal_add]
+      rfl
+  }
   have hle : Y ≤ f.ker := by
     intro y hy
     rw [AddMonoidHom.mem_ker]
@@ -280,14 +352,15 @@ theorem kills_over_of_square_zero_ideal : ∀ (S : Scheme.{0}) (G : Over S) [Grp
     rw [ht y hy]
     rfl
   let q := QuotientAddGroup.lift Y f hle
-  let F : Multiplicative M →* A :=
-    { toFun := fun m => Additive.toMul (q (Multiplicative.toAdd m))
-      map_one' := by
-        rw [toAdd_one, map_zero]
-        rfl
-      map_mul' := fun x y => by
-        rw [toAdd_mul, map_add (f := _)]
-        rfl }
+  let F : Multiplicative M →* A := {
+    toFun := fun m => Additive.toMul (q (Multiplicative.toAdd m))
+    map_one' := by
+      rw [toAdd_one, map_zero]
+      rfl
+    map_mul' := fun x y => by
+      rw [toAdd_mul, map_add (f := _)]
+      rfl
+  }
   let φ : R →+* A := AddMonoidAlgebra.liftNCRingHom g F (fun _ _ => Commute.all _ _)
   have he : φ.comp (algebraMap B R) = g := by
     ext x

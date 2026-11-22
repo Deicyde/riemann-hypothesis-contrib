@@ -10,9 +10,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.TensorRank
 
-theorem rank_piTensorProduct_le_one {α : Type} [Fintype α] (M : α → Type)
-    [∀ a, AddCommGroup (M a)] [∀ a, Module ℂ (M a)]
-    (h : ∀ a, Module.rank ℂ (M a) ≤ 1) : Module.rank ℂ (⨂[ℂ] a, M a) ≤ 1 := by
+theorem rank_piTensorProduct_le_one
+    {α : Type} [Fintype α]
+    (M : α → Type) [∀ a, AddCommGroup (M a)] [∀ a, Module ℂ (M a)]
+    (h : ∀ a, Module.rank ℂ (M a) ≤ 1)
+    : Module.rank ℂ (⨂[ℂ] a, M a) ≤ 1 := by
   choose v₀ hv₀ using fun a => rank_le_one_iff.mp (h a)
   rw [rank_le_one_iff]
   refine ⟨PiTensorProduct.tprod ℂ v₀, fun x => ?_⟩

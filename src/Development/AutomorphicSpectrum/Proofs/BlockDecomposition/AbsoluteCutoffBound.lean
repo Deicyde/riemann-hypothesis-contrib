@@ -14,9 +14,10 @@ namespace GlobalTheory.CompanionTheory.FcCut
 
 open PositivityTheory.RgBcC.Fc
 
-def mulC (a : ℝ → ℂ) (ha : Continuous a) (f : C₀(ℝ, ℂ)) (R : ℝ) (hf : ∀ y, R ≤ |y| → a y * f y = 0) :
-    C₀(ℝ, ℂ) :=
-  ⟨⟨fun y => a y * f y, ha.mul f.continuous⟩, by
+def mulC (a : ℝ → ℂ) (ha : Continuous a) (f : C₀(ℝ, ℂ)) (R : ℝ) (hf : ∀ y, R ≤ |y| → a y * f y = 0)
+    : C₀(ℝ, ℂ) := ⟨
+  ⟨fun y => a y * f y, ha.mul f.continuous⟩,
+  by
     have hK : (Set.Icc (-R) R)ᶜ ∈ cocompact ℝ := isCompact_Icc.compl_mem_cocompact
     refine (tendsto_const_nhds (x := (0 : ℂ))).congr' ?_
     filter_upwards [hK] with y hy
@@ -25,29 +26,40 @@ def mulC (a : ℝ → ℂ) (ha : Continuous a) (f : C₀(ℝ, ℂ)) (R : ℝ) (h
       push_neg at hlt
       exact hy ⟨(abs_lt.mp hlt).1.le, (abs_lt.mp hlt).2.le⟩
     show (0 : ℂ) = a y * f y
-    rw [hf y hR]⟩
+    rw [hf y hR]
+⟩
 
-@[simp] theorem mulC_apply (a : ℝ → ℂ) (ha : Continuous a) (f : C₀(ℝ, ℂ)) (R : ℝ)
-    (hf : ∀ y, R ≤ |y| → a y * f y = 0) (y : ℝ) : mulC a ha f R hf y = a y * f y := rfl
+@[simp]
+theorem mulC_apply
+    (a : ℝ → ℂ) (ha : Continuous a)
+    (f : C₀(ℝ, ℂ)) (R : ℝ) (hf : ∀ y, R ≤ |y| → a y * f y = 0)
+    (y : ℝ)
+    : mulC a ha f R hf y = a y * f y :=
+  rfl
 
 section Core
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {M : Submodule ℂ H} {Ω : M →ₗ[ℂ] M} {T : H →L[ℂ] H}
 
-theorem inner_star_mul (F : FCalc H M Ω T) (x : H) (a b : C₀(ℝ, ℂ)) :
-    ⟪F.Φ (star a * b) x, x⟫_ℂ = ⟪F.Φ b x, F.Φ a x⟫_ℂ := by
-  rw [F.map_mul, F.map_star, ContinuousLinearMap.mul_apply,
-    ContinuousLinearMap.adjoint_inner_left]
+theorem inner_star_mul (F : FCalc H M Ω T) (x : H) (a b : C₀(ℝ, ℂ))
+    : ⟪F.Φ (star a * b) x, x⟫_ℂ = ⟪F.Φ b x, F.Φ a x⟫_ℂ := by
+  rw [F.map_mul, F.map_star, ContinuousLinearMap.mul_apply, ContinuousLinearMap.adjoint_inner_left]
 
-theorem core (F : FCalc H M Ω T) (c : ℝ) (x : H)
+theorem core
+    (F : FCalc H M Ω T) (c : ℝ) (x : H)
     (hyp : ∀ g, ∃ v : M, (v : H) = F.Φ g x ∧ (⟪(Ω v : H), v⟫_ℂ).re ≤ c * ‖(v : H)‖ ^ 2)
-    (f : C₀(ℝ, ℂ)) (δ R : ℝ) (hδ : 0 < δ) (h1 : ∀ y, y ≤ c + δ → f y = 0)
-    (h2 : ∀ y, R ≤ |y| → f y = 0) : F.Φ f x = 0 := by
-  let h := mulC (fun y => (y : ℂ)) Complex.continuous_ofReal f R
-    (fun y hy => by rw [h2 y hy, mul_zero])
-  let r := mulC (fun y => ((Real.sqrt (max (y - c - δ) 0) : ℝ) : ℂ))
-    (Complex.continuous_ofReal.comp (by fun_prop)) f R (fun y hy => by rw [h2 y hy, mul_zero])
+    (f : C₀(ℝ, ℂ)) (δ R : ℝ)
+    (hδ : 0 < δ) (h1 : ∀ y, y ≤ c + δ → f y = 0) (h2 : ∀ y, R ≤ |y| → f y = 0)
+    : F.Φ f x = 0 := by
+  let h :=
+    mulC (fun y => (y : ℂ)) Complex.continuous_ofReal f R (fun y hy => by rw [h2 y hy, mul_zero])
+  let r :=
+    mulC
+      (fun y => ((Real.sqrt (max (y - c - δ) 0) : ℝ) : ℂ))
+      (Complex.continuous_ofReal.comp (by fun_prop)) f R
+      (fun y hy => by rw [h2 y hy, mul_zero])
   obtain ⟨v, hv, hle⟩ := hyp f
   have hΩ : (Ω v : H) = F.Φ h x := F.omega f h (fun y => rfl) x v hv
   have hid : star r * r = star f * h - ((c + δ : ℝ) : ℂ) • (star f * f) := by
@@ -55,22 +67,27 @@ theorem core (F : FCalc H M Ω T) (c : ℝ) (x : H)
     by_cases hy : y ≤ c + δ
     · simp [r, h, h1 y hy]
     · have hpos : 0 ≤ y - c - δ := by linarith [not_le.mp hy]
-      have hs : ((Real.sqrt (y - c - δ) : ℝ) : ℂ) * ((Real.sqrt (y - c - δ) : ℝ) : ℂ)
-          = (y : ℂ) - c - δ := by
+      have hs
+          : ((Real.sqrt (y - c - δ) : ℝ) : ℂ) * ((Real.sqrt (y - c - δ) : ℝ) : ℂ)
+            = (y : ℂ) - c - δ := by
         rw [← Complex.ofReal_mul, Real.mul_self_sqrt hpos]; push_cast; ring
       simp only [r, h, ZeroAtInftyContinuousMap.coe_mul, ZeroAtInftyContinuousMap.coe_star,
-        ZeroAtInftyContinuousMap.coe_sub, ZeroAtInftyContinuousMap.coe_smul, Pi.mul_apply, Pi.star_apply,
-        Pi.sub_apply, Pi.smul_apply, mulC_apply, max_eq_left hpos, star_mul', smul_eq_mul]
+        ZeroAtInftyContinuousMap.coe_sub, ZeroAtInftyContinuousMap.coe_smul, Pi.mul_apply,
+        Pi.star_apply, Pi.sub_apply, Pi.smul_apply, mulC_apply, max_eq_left hpos, star_mul',
+        smul_eq_mul]
       simp only [Complex.star_def, Complex.conj_ofReal]
       push_cast
       linear_combination ((starRingEnd ℂ) (f y) * f y) * hs
-  have e : ((‖F.Φ r x‖ ^ 2 : ℝ) : ℂ) = ⟪(Ω v : H), v⟫_ℂ - ((c + δ : ℝ) : ℂ) * ((‖(v : H)‖ ^ 2 : ℝ) : ℂ) := by
+  have e
+      : ((‖F.Φ r x‖ ^ 2 : ℝ) : ℂ)
+        = ⟪(Ω v : H), v⟫_ℂ - ((c + δ : ℝ) : ℂ) * ((‖(v : H)‖ ^ 2 : ℝ) : ℂ) := by
     have a1 := inner_star_mul F x r r
     have a2 := inner_star_mul F x f h
     have a3 := inner_star_mul F x f f
     rw [hid, map_sub, map_smul, ContinuousLinearMap.sub_apply, ContinuousLinearMap.smul_apply,
-      inner_sub_left, inner_smul_left, a2, a3, Complex.conj_ofReal,
-      inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K] at a1
+        inner_sub_left, inner_smul_left, a2, a3, Complex.conj_ofReal, inner_self_eq_norm_sq_to_K,
+        inner_self_eq_norm_sq_to_K]
+      at a1
     rw [hΩ, hv]
     push_cast
     simpa using a1.symm
@@ -85,10 +102,9 @@ theorem core (F : FCalc H M Ω T) (c : ℝ) (x : H)
   rw [← hv]
   exact norm_eq_zero.mp hv0
 
-theorem approx (c : ℝ) (g : C₀(ℝ, ℂ)) (hg : ∀ y, y ≤ c → g y = 0) (ε : ℝ) (hε : 0 < ε) :
-    ∃ (f : C₀(ℝ, ℂ)) (δ R : ℝ), 0 < δ ∧ (∀ y, y ≤ c + δ → f y = 0) ∧ (∀ y, R ≤ |y| → f y = 0) ∧
-      ‖g - f‖ ≤ 2 * ε := by
-
+theorem approx (c : ℝ) (g : C₀(ℝ, ℂ)) (hg : ∀ y, y ≤ c → g y = 0) (ε : ℝ) (hε : 0 < ε)
+    : ∃ (f : C₀(ℝ, ℂ)) (δ R : ℝ),
+      0 < δ ∧ (∀ y, y ≤ c + δ → f y = 0) ∧ (∀ y, R ≤ |y| → f y = 0) ∧ ‖g - f‖ ≤ 2 * ε := by
   obtain ⟨R, hR⟩ : ∃ R : ℝ, ∀ y, R ≤ |y| → ‖g y‖ ≤ ε := by
     have ht : Tendsto g (cocompact ℝ) (𝓝 0) := g.zero_at_infty'
     have hm : {y | ‖g y‖ < ε} ∈ cocompact ℝ := by
@@ -116,15 +132,17 @@ theorem approx (c : ℝ) (g : C₀(ℝ, ℂ)) (hg : ∀ y, y ≤ c → g y = 0) 
       exact h3.le
   let m : ℝ → ℝ := fun y => min 1 (max 0 (‖g y‖ / ε - 1))
   have hm0 : ∀ y, ‖g y‖ ≤ ε → m y = 0 := fun y hy => by
-    have : ‖g y‖ / ε - 1 ≤ 0 := by
-      rw [sub_nonpos, div_le_one hε]; exact hy
+    have : ‖g y‖ / ε - 1 ≤ 0 := by rw [sub_nonpos, div_le_one hε]; exact hy
     simp only [m, max_eq_left this]
     exact min_eq_right zero_le_one
   have hmc : Continuous m := by
     have := g.continuous
     fun_prop
-  let f := mulC (fun y => (m y : ℂ)) (Complex.continuous_ofReal.comp hmc) g R
-    (fun y hy => by rw [hm0 y (hR y hy)]; simp)
+  let f :=
+    mulC
+      (fun y => (m y : ℂ))
+      (Complex.continuous_ofReal.comp hmc) g R
+      (fun y hy => by rw [hm0 y (hR y hy)]; simp)
   refine ⟨f, δ, R, hδ, fun y hy => ?_, fun y hy => ?_, ?_⟩
   · simp [f, hm0 y (hδc y hy)]
   · simp [f, hm0 y (hR y hy)]
@@ -146,7 +164,9 @@ theorem approx (c : ℝ) (g : C₀(ℝ, ℂ)) (hg : ∀ y, y ≤ c → g y = 0) 
           have : 2 ≤ ‖g y‖ / ε := by rw [le_div_iff₀ hε]; exact hb
           linarith
         exact min_eq_left (h1.trans (le_max_right _ _))
-      rw [this]; simp; positivity
+      rw [this]
+      simp
+      positivity
     · have hgy := (not_le.mp hb).le
       have : 0 ≤ ‖g y‖ := norm_nonneg _
       nlinarith
@@ -163,11 +183,9 @@ theorem absCut : AbsCut := by
     ((F.Φ (g - f)).le_opNorm x).trans
       (mul_le_mul_of_nonneg_right ((F.norm_le _).trans hfg) (norm_nonneg _))
   have hc : 2 * (e / (2 * (‖x‖ + 1))) * ‖x‖ ≤ e := by
-    have : 2 * (e / (2 * (‖x‖ + 1))) * ‖x‖ = e * (‖x‖ / (‖x‖ + 1)) := by
-      field_simp
+    have : 2 * (e / (2 * (‖x‖ + 1))) * ‖x‖ = e * (‖x‖ / (‖x‖ + 1)) := by field_simp
     rw [this]
-    have : ‖x‖ / (‖x‖ + 1) ≤ 1 := by
-      rw [div_le_one hx]; linarith
+    have : ‖x‖ / (‖x‖ + 1) ≤ 1 := by rw [div_le_one hx]; linarith
     nlinarith
   rw [hsplit]
   linarith

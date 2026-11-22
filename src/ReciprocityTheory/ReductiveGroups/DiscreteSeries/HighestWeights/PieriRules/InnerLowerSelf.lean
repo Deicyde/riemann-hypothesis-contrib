@@ -14,11 +14,13 @@ namespace ReciprocityTheory.ChartRestriction.DS.HW
 
 open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7
 
-theorem inner_lower_self {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n : ℕ}
-    {ε : Fin n → Bool} {A : Fin n → Fin n → Module.End ℂ V} {Λ : Fin n → ℝ} {w : V}
-    (hR : Formalism.REAL.KRel ε A) (hU : Formalism.REAL.KUnit ε A) (hw : Formalism.REAL.KHighest ε A Λ w)
-    {a b : Fin n} (hab : a < b) (he : ε a = ε b) :
-    ⟪A b a w, A b a w⟫_ℂ = (((Λ a - Λ b : ℝ)) : ℂ) * ⟪w, w⟫_ℂ := by
+theorem inner_lower_self
+    {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {n : ℕ} {ε : Fin n → Bool} {A : Fin n → Fin n → Module.End ℂ V} {Λ : Fin n → ℝ} {w : V}
+    (hR : Formalism.REAL.KRel ε A) (hU : Formalism.REAL.KUnit ε A)
+    (hw : Formalism.REAL.KHighest ε A Λ w)
+    {a b : Fin n} (hab : a < b) (he : ε a = ε b)
+    : ⟪A b a w, A b a w⟫_ℂ = (((Λ a - Λ b : ℝ)) : ℂ) * ⟪w, w⟫_ℂ := by
   have hba : b ≠ a := ne_of_gt hab
   have hc := hR a b b a he he.symm
   simp only [if_true] at hc
@@ -43,11 +45,10 @@ theorem kType_dom {n : ℕ} {ε : Fin n → Bool} {Λ : Fin n → ℝ} (T : KTyp
   linarith
 
 theorem kTypeIntDom_of
-    (hint : ∀ (n : ℕ) (ε : Fin n → Bool) (Λ : Fin n → ℝ) (_T : KType ε Λ), ∀ a, ∃ m : ℤ, Λ a = m) :
-    KTypeIntDomStatement :=
-  fun n ε Λ T => ⟨hint n ε Λ T, kType_dom T⟩
+    (hint : ∀ (n : ℕ) (ε : Fin n → Bool) (Λ : Fin n → ℝ) (_T : KType ε Λ), ∀ a, ∃ m : ℤ, Λ a = m)
+    : KTypeIntDomStatement := fun n ε Λ T =>
+  ⟨hint n ε Λ T, kType_dom T⟩
 
-theorem kTypeIntDom : KTypeIntDomStatement :=
-  kTypeIntDom_of fun _ _ _ T => kType_int T
+theorem kTypeIntDom : KTypeIntDomStatement := kTypeIntDom_of fun _ _ _ T => kType_int T
 
 end ReciprocityTheory.ChartRestriction.DS.HW

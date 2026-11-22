@@ -12,11 +12,14 @@ namespace GlobalTheory
 open NumberField in
 private theorem exists_integral_generator_common_denom_of_finrank_two
     (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (h : Module.finrank F E = 2) :
-    ∃ θ : 𝓞 E, (θ : E) ∉ Set.range (algebraMap F E) ∧
-      ∃ D : 𝓞 F, D ≠ 0 ∧ ∀ y : 𝓞 E, ∃ u v : 𝓞 F,
-        algebraMap (𝓞 F) (𝓞 E) D * y =
-          algebraMap (𝓞 F) (𝓞 E) u + algebraMap (𝓞 F) (𝓞 E) v * θ := by
+    (h : Module.finrank F E = 2)
+    : ∃ θ : 𝓞 E,
+      (θ : E) ∉ Set.range (algebraMap F E)
+        ∧ ∃ D : 𝓞 F,
+          D ≠ 0
+            ∧ ∀ y : 𝓞 E, ∃ u v : 𝓞 F,
+              algebraMap (𝓞 F) (𝓞 E) D * y
+                = algebraMap (𝓞 F) (𝓞 E) u + algebraMap (𝓞 F) (𝓞 E) v * θ := by
   classical
   obtain ⟨x, hx⟩ : ∃ x : E, x ∉ Set.range (algebraMap F E) := by
     by_contra! hx
@@ -29,8 +32,7 @@ private theorem exists_integral_generator_common_denom_of_finrank_two
     omega
   obtain ⟨n, hn, hnx⟩ := exists_integral_multiples ℤ ℚ ({x} : Finset E)
   have hint : IsIntegral ℤ (n • x) := hnx x (Finset.mem_singleton_self x)
-  obtain ⟨θ, hθx⟩ : ∃ θ : 𝓞 E, (θ : E) = (n : E) * x :=
-    ⟨⟨n • x, hint⟩, by rw [← zsmul_eq_mul]; rfl⟩
+  obtain ⟨θ, hθx⟩ : ∃ θ : 𝓞 E, (θ : E) = (n : E) * x := ⟨⟨n • x, hint⟩, by rw [← zsmul_eq_mul]; rfl⟩
   have hθ : (θ : E) ∉ Set.range (algebraMap F E) := by
     rintro ⟨a, ha⟩
     apply hx
@@ -53,30 +55,33 @@ private theorem exists_integral_generator_common_denom_of_finrank_two
       rw [map_div₀, map_neg]
       field_simp
       linear_combination -hst
-  obtain ⟨b, hb1⟩ : ∃ b : Module.Basis (Fin 2) F E, ⇑b = ![(1 : E), (θ : E)] :=
-    ⟨basisOfLinearIndependentOfCardEqFinrank hli (by rw [h, Fintype.card_fin]),
-      coe_basisOfLinearIndependentOfCardEqFinrank _ _⟩
+  obtain ⟨b, hb1⟩ : ∃ b : Module.Basis (Fin 2) F E, ⇑b = ![(1 : E), (θ : E)] := ⟨
+    basisOfLinearIndependentOfCardEqFinrank hli (by rw [h, Fintype.card_fin]),
+    coe_basisOfLinearIndependentOfCardEqFinrank _ _
+  ⟩
   have hb : ∀ z : E, z = algebraMap F E (b.repr z 0) + algebraMap F E (b.repr z 1) * θ := by
     intro z
     conv_lhs => rw [← b.sum_repr z]
     rw [Fin.sum_univ_two, hb1]
     simp [Algebra.smul_def]
   set B := RingOfIntegers.basis E
-  obtain ⟨d, hd, hdint⟩ := exists_integral_multiples ℤ ℚ
-    (Finset.univ.image fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin 2 =>
-      b.repr (B p.1 : E) p.2)
+  obtain ⟨d, hd, hdint⟩ :=
+    exists_integral_multiples ℤ ℚ
+      (Finset.univ.image fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin 2 =>
+        b.repr (B p.1 : E) p.2)
   have hmem : ∀ i k, IsIntegral ℤ (d • b.repr (B i : E) k) := fun i k =>
     hdint _ (Finset.mem_image_of_mem _ (Finset.mem_univ (i, k)))
   refine ⟨θ, hθ, (d : 𝓞 F), by exact_mod_cast hd, ?_⟩
-  let M : Submodule ℤ (𝓞 E) :=
-    { carrier := {z | ∃ u v : 𝓞 F, z = algebraMap (𝓞 F) (𝓞 E) u + algebraMap (𝓞 F) (𝓞 E) v * θ}
-      add_mem' := by
-        rintro _ _ ⟨u, v, rfl⟩ ⟨u', v', rfl⟩
-        exact ⟨u + u', v + v', by simp only [map_add (f := _)]; ring⟩
-      zero_mem' := ⟨0, 0, by simp⟩
-      smul_mem' := by
-        rintro c _ ⟨u, v, rfl⟩
-        exact ⟨c • u, c • v, by simp only [zsmul_eq_mul, map_mul, map_intCast]; ring⟩ }
+  let M : Submodule ℤ (𝓞 E) := {
+    carrier := {z | ∃ u v : 𝓞 F, z = algebraMap (𝓞 F) (𝓞 E) u + algebraMap (𝓞 F) (𝓞 E) v * θ}
+    add_mem' := by
+      rintro _ _ ⟨u, v, rfl⟩ ⟨u', v', rfl⟩
+      exact ⟨u + u', v + v', by simp only [map_add (f := _)]; ring⟩
+    zero_mem' := ⟨0, 0, by simp⟩
+    smul_mem' := by
+      rintro c _ ⟨u, v, rfl⟩
+      exact ⟨c • u, c • v, by simp only [zsmul_eq_mul, map_mul, map_intCast]; ring⟩
+  }
   have hall : ∀ y : 𝓞 E, algebraMap (𝓞 F) (𝓞 E) (d : 𝓞 F) * y ∈ M := by
     intro y
     have hspan : y ∈ Submodule.span ℤ (Set.range B) := by rw [B.span_eq]; trivial
@@ -86,9 +91,10 @@ private theorem exists_integral_generator_common_denom_of_finrank_two
       refine ⟨⟨_, hmem i 0⟩, ⟨_, hmem i 1⟩, ?_⟩
       rw [RingOfIntegers.ext_iff]
       have e := hb (B i : E)
-      have key : algebraMap F E (d : F) * (B i : E) =
-          algebraMap F E (d • b.repr (B i : E) 0) +
-            algebraMap F E (d • b.repr (B i : E) 1) * θ := by
+      have key
+          : algebraMap F E (d : F) * (B i : E)
+            = algebraMap F E (d • b.repr (B i : E) 0)
+              + algebraMap F E (d • b.repr (B i : E) 1) * θ := by
         simp only [zsmul_eq_mul, map_mul, map_intCast]
         linear_combination (d : E) * e
       exact key
@@ -99,14 +105,17 @@ private theorem exists_integral_generator_common_denom_of_finrank_two
   obtain ⟨u, v, huv⟩ := hall y
   exact ⟨u, v, huv⟩
 
-
 open NumberField in
-theorem _root_.GlobalTheory.quadratic_exists_integral_generator_common_denominator :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-      [Algebra.IsQuadraticExtension F E], ∃ θ : 𝓞 E, (θ : E) ∉ Set.range (algebraMap F E) ∧
-      ∃ D : 𝓞 F, D ≠ 0 ∧ ∀ y : 𝓞 E, ∃ u v : 𝓞 F,
-        algebraMap (𝓞 F) (𝓞 E) D * y =
-          algebraMap (𝓞 F) (𝓞 E) u + algebraMap (𝓞 F) (𝓞 E) v * θ := by
+theorem _root_.GlobalTheory.quadratic_exists_integral_generator_common_denominator
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [Algebra.IsQuadraticExtension F E],
+      ∃ θ : 𝓞 E,
+        (θ : E) ∉ Set.range (algebraMap F E)
+          ∧ ∃ D : 𝓞 F,
+            D ≠ 0
+              ∧ ∀ y : 𝓞 E, ∃ u v : 𝓞 F,
+                algebraMap (𝓞 F) (𝓞 E) D * y
+                  = algebraMap (𝓞 F) (𝓞 E) u + algebraMap (𝓞 F) (𝓞 E) v * θ := by
   intro F E _ _ _ _ _ _
   exact exists_integral_generator_common_denom_of_finrank_two F E
     (Algebra.IsQuadraticExtension.finrank_eq_two F E)

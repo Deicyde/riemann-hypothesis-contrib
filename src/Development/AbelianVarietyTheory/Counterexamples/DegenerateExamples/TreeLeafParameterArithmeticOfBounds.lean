@@ -21,11 +21,14 @@ theorem ga_mono (O : FunData K Df) {C C' : ℝ} (h : C ≤ C') : O.ga C ≤ O.ga
   have h3 : (0 : ℝ) ≤ (O.nr : ℝ) ^ 3 * Real.sqrt (O.Lc : ℝ) := by positivity
   nlinarith [mul_le_mul_of_nonneg_right h h1, mul_le_mul_of_nonneg_right h h2, mul_le_mul_of_nonneg_right h h3]
 
-
 set_option maxHeartbeats 800000 in
-theorem tree_leaf_parameter_arithmetic_of_bounds (O : FunData K Df) (C b : ℝ) (hC : 1 ≤ C) (h1 : leafHypothesesConst O) (h7 : LatticeConstantBound O b)
+theorem tree_leaf_parameter_arithmetic_of_bounds
+    (O : FunData K Df)
+    (C b : ℝ) (hC : 1 ≤ C)
+    (h1 : leafHypothesesConst O) (h7 : LatticeConstantBound O b)
     (hb : (O.m : ℝ) * O.f * (O.N : ℝ) ^ 2 ≤ b) (hN : 80 * O.r ^ 4 ≤ O.N)
-    (hL : 2 * Real.log (2 * C) ≤ Real.log b) : DegreeAndSizeBounds O C b := by
+    (hL : 2 * Real.log (2 * C) ≤ Real.log b)
+    : DegreeAndSizeBounds O C b := by
   obtain ⟨hm2n, hmkn, hm4fn, hfkn⟩ := h1
   have hm2 : (2 : ℝ) ≤ O.m := by exact_mod_cast hm2n
   have hm4f : (O.m : ℝ) ^ 4 ≤ O.f := by exact_mod_cast hm4fn
@@ -74,22 +77,26 @@ theorem tree_leaf_parameter_arithmetic_of_bounds (O : FunData K Df) (C b : ℝ) 
   have hu100 : 100 ≤ u := Real.le_sqrt_of_sq_le (by linarith)
   have hNu : N ≤ u := Real.le_sqrt_of_sq_le (by linarith [sq_nonneg N])
   have hsl : Real.sqrt (O.Lc : ℝ) ≤ u := Real.sqrt_le_sqrt h7
-  have hsm : Real.sqrt m ≤ r + 1 := Real.sqrt_le_iff.mpr ⟨by linarith,
-    le_trans (by linarith) (le_self_pow₀ hn1 two_ne_zero)⟩
+  have hsm : Real.sqrt m ≤ r + 1 :=
+    Real.sqrt_le_iff.mpr ⟨by linarith, le_trans (by linarith) (le_self_pow₀ hn1 two_ne_zero)⟩
   have hP : 0 ≤ C * N ^ 3 := by positivity
   have hP1 : N ^ 3 ≤ C * N ^ 3 := le_mul_of_one_le_left (by positivity) hC
   have hPu : 100 * (C * N ^ 3) ≤ C * N ^ 3 * u := by
     have := mul_le_mul_of_nonneg_left hu100 hP
     linarith
   have hga : (O.ga C : ℝ) + 1 ≤ 2 * (C * N ^ 3 * u) := by
-    have a1 : (⌈C * N ^ 3 + C * (O.nr : ℝ) ^ 7 + C * (O.nr : ℝ) ^ 3 * Real.sqrt (O.Lc : ℝ)⌉₊ : ℝ) + 1 ≤
-        2 * (C * N ^ 3 * u) := by
-      have := Nat.ceil_lt_add_one (a := C * N ^ 3 + C * (O.nr : ℝ) ^ 7 + C * (O.nr : ℝ) ^ 3 * Real.sqrt (O.Lc : ℝ))
-        (by positivity)
+    have a1
+        : (⌈C * N ^ 3 + C * (O.nr : ℝ) ^ 7 + C * (O.nr : ℝ) ^ 3 * Real.sqrt (O.Lc : ℝ)⌉₊ : ℝ) + 1
+          ≤ 2 * (C * N ^ 3 * u) := by
+      have :=
+        Nat.ceil_lt_add_one
+          (a := C * N ^ 3 + C * (O.nr : ℝ) ^ 7 + C * (O.nr : ℝ) ^ 3 * Real.sqrt (O.Lc : ℝ))
+          (by positivity)
       rw [hnr] at this ⊢
       have e1 : C * (r + 1) ^ 7 ≤ C * N ^ 3 := mul_le_mul_of_nonneg_left hn7 (by linarith)
       have e2 : C * (r + 1) ^ 3 * Real.sqrt (O.Lc : ℝ) ≤ C * N ^ 3 * u :=
-        mul_le_mul (mul_le_mul_of_nonneg_left (hn3.trans hN3) (by linarith)) hsl (Real.sqrt_nonneg _) hP
+        mul_le_mul (mul_le_mul_of_nonneg_left (hn3.trans hN3) (by linarith)) hsl
+          (Real.sqrt_nonneg _) hP
       linarith
     have a2 : ((2 * O.N ^ 3 + 2 * O.s + 3 : ℕ) : ℝ) + 1 ≤ 2 * (C * N ^ 3 * u) := by
       push_cast; rw [hs]; linarith
@@ -102,17 +109,24 @@ theorem tree_leaf_parameter_arithmetic_of_bounds (O : FunData K Df) (C b : ℝ) 
       linarith
     unfold FunData.ga
     rw [Nat.cast_max, Nat.cast_max]
-    rcases max_choice (max (⌈C * N ^ 3 + C * (O.nr : ℝ) ^ 7 + C * (O.nr : ℝ) ^ 3 * Real.sqrt (O.Lc : ℝ)⌉₊ : ℝ)
-      ((2 * O.N ^ 3 + 2 * O.s + 3 : ℕ) : ℝ)) (⌈48 * (O.nr : ℝ) ^ 2 * Real.sqrt m⌉₊ : ℝ) with h | h
+    rcases max_choice
+        (max (⌈C * N ^ 3 + C * (O.nr : ℝ) ^ 7 + C * (O.nr : ℝ) ^ 3 * Real.sqrt (O.Lc : ℝ)⌉₊ : ℝ)
+          ((2 * O.N ^ 3 + 2 * O.s + 3 : ℕ) : ℝ))
+        (⌈48 * (O.nr : ℝ) ^ 2 * Real.sqrt m⌉₊ : ℝ)
+      with h | h
     · rw [h]
-      rcases max_choice (⌈C * N ^ 3 + C * (O.nr : ℝ) ^ 7 + C * (O.nr : ℝ) ^ 3 * Real.sqrt (O.Lc : ℝ)⌉₊ : ℝ)
-        ((2 * O.N ^ 3 + 2 * O.s + 3 : ℕ) : ℝ) with h' | h' <;> rw [h'] <;> assumption
+      rcases max_choice
+            (⌈C * N ^ 3 + C * (O.nr : ℝ) ^ 7 + C * (O.nr : ℝ) ^ 3 * Real.sqrt (O.Lc : ℝ)⌉₊ : ℝ)
+            ((2 * O.N ^ 3 + 2 * O.s + 3 : ℕ) : ℝ)
+          with h' | h'
+        <;> rw [h'] <;> assumption
     · rw [h]; exact a3
   have hnpb : O.np ≤ b := by
     have : 2 * m * r ≤ 2 * m * N := mul_le_mul_of_nonneg_left (by linarith) (by linarith)
     have : 2 * m * N ≤ m * N ^ 2 * 16 := by
-      have := mul_le_mul_of_nonneg_left (show (2 : ℝ) ≤ 16 * N by linarith)
-        (mul_nonneg (by linarith : (0:ℝ) ≤ m) (by linarith : (0:ℝ) ≤ N))
+      have :=
+        mul_le_mul_of_nonneg_left (show (2 : ℝ) ≤ 16 * N by linarith)
+          (mul_nonneg (by linarith : (0 : ℝ) ≤ m) (by linarith : (0 : ℝ) ≤ N))
       linarith
     linarith
   have hRp : O.Rp C ≤ C * m * N ^ 3 * b := by
@@ -123,7 +137,8 @@ theorem tree_leaf_parameter_arithmetic_of_bounds (O : FunData K Df) (C b : ℝ) 
     have e2 : 100 * (m * (C * N ^ 3) * u) ≤ C * m * N ^ 3 * b := by
       have t1 := mul_le_mul_of_nonneg_left hu100 hQ
       have t2 : m * (C * N ^ 3) * u * u = C * m * N ^ 3 * b := by
-        calc _ = C * m * N ^ 3 * (u * u) := by ring
+        calc
+          _ = C * m * N ^ 3 * (u * u) := by ring
           _ = _ := by rw [hu2]
       linarith
     have e3 : 4 * b ≤ C * m * N ^ 3 * b := by
@@ -142,21 +157,26 @@ theorem tree_leaf_parameter_arithmetic_of_bounds (O : FunData K Df) (C b : ℝ) 
     have : m * N ^ 3 ≤ b * u := by
       have : m * N ^ 3 = (m * N ^ 2) * N := by ring
       rw [this]
-      exact mul_le_mul (by linarith [mul_nonneg (by linarith : (0:ℝ) ≤ m) (sq_nonneg N)]) hNu (by linarith) (by linarith)
+      exact mul_le_mul (by linarith [mul_nonneg (by linarith : (0:ℝ) ≤ m) (sq_nonneg N)]) hNu
+        (by linarith) (by linarith)
     have h5 : u ^ 5 = b * u * b := by
-      calc _ = (u * u) * u * (u * u) := by ring
+      calc
+        _ = (u * u) * u * (u * u) := by ring
         _ = _ := by rw [hu2]
     rw [h5, mul_assoc C, mul_assoc C]
     exact mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right this (by linarith)) (by linarith)
   have e5 : O.np * O.Rp C ≤ (2 * C) * u ^ 7 := by
     have := mul_le_mul hnpb (hRp.trans e4) hRp0.le (by linarith)
     have h7 : b * (C * u ^ 5) = C * u ^ 7 := by
-      calc _ = (u * u) * (C * u ^ 5) := by rw [hu2]
+      calc
+        _ = (u * u) * (C * u ^ 5) := by rw [hu2]
         _ = _ := by ring
     have : 0 ≤ C * u ^ 7 := by positivity
     linarith
   have e6 := Real.log_le_log (by positivity) e5
-  rw [Real.log_mul (x := 2 * C) (by positivity) (by positivity), Real.log_pow, hu, Real.log_sqrt (by linarith)] at e6
+  rw [Real.log_mul (x := 2 * C) (by positivity) (by positivity), Real.log_pow, hu,
+      Real.log_sqrt (by linarith)]
+    at e6
   push_cast at e6
   linarith
 

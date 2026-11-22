@@ -75,9 +75,10 @@ def subMap (W : X.Opens) : Γ(X, W) →+* sub F α V T W :=
 
 def subFunctor : X.AffineZariskiSiteᵒᵖ ⥤ CommRingCat where
   obj W := CommRingCat.of (sub F α V T W.unop.1)
-  map {W W₁} f := CommRingCat.ofHom
-    ((F.map ((Scheme.AffineZariskiSite.toOpensFunctor X).map f.unop).op).hom.restrict _ _
-      (fun _ hb ↦ res_mem_sub F α V T _ hb))
+  map {W W₁} f :=
+    CommRingCat.ofHom
+      ((F.map ((Scheme.AffineZariskiSite.toOpensFunctor X).map f.unop).op).hom.restrict _ _
+        (fun _ hb ↦ res_mem_sub F α V T _ hb))
   map_id W := by
     ext b
     change (F.map _).hom b.1 = b.1
@@ -95,7 +96,8 @@ def subNat : (Scheme.AffineZariskiSite.toOpensFunctor X).op ⋙ X.presheaf ⟶ s
   app W := CommRingCat.ofHom (subMap F α V T W.unop.1)
   naturality {W W₁} f := by
     ext r
-    exact Subtype.ext congr($(α.naturality ((Scheme.AffineZariskiSite.toOpensFunctor X).map f.unop).op).hom r)
+    exact Subtype.ext
+      congr($(α.naturality ((Scheme.AffineZariskiSite.toOpensFunctor X).map f.unop).op).hom r)
 
 def subIncl : subFunctor F α V T ⟶ (Scheme.AffineZariskiSite.toOpensFunctor X).op ⋙ F where
   app W := CommRingCat.ofHom (sub F α V T W.unop.1).subtype

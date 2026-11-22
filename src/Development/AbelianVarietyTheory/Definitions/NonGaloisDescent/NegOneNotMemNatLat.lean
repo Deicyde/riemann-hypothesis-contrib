@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Zint
 
 noncomputable section
 
-open NumberField IsDedekindDomain MeasureTheory Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.CuspRep
+open NumberField IsDedekindDomain MeasureTheory Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR
+  Formalism.L2.Host GlobalTheory.CuspRep
 
 namespace GlobalTheory.RSJ.Model
 
@@ -25,8 +26,6 @@ theorem secRow_eLast {R : Type*} [CommRing R] : secRow (eLast R a) = 1 := by
     · rw [if_neg h2, if_neg (fun e : i = j => h2 (e ▸ h))]
   · rw [if_neg h]
 
-
-
 omit [NumberField E] [_root_.NumberField.IsTotallyComplex E] in
 theorem secInv_eLast : secInv (eLast (Cinf E) a) = 1 := by
   unfold secInv
@@ -34,26 +33,20 @@ theorem secInv_eLast : secInv (eLast (Cinf E) a) = 1 := by
   · rw [inv_eq_one]; exact Units.ext secRow_eLast
   · rfl
 
-
 omit [_root_.NumberField.IsTotallyComplex E] in
-theorem detPow_mul (x : ℝ) (g h : GA E a) : detPow E a x (g * h) = detPow E a x g * detPow E a x h := by
+theorem detPow_mul (x : ℝ) (g h : GA E a)
+    : detPow E a x (g * h) = detPow E a x g * detPow E a x h := by
   simp [detPow]
-
-
 
 omit [_root_.NumberField.IsTotallyComplex E] in
 theorem detPow_ratGL (x : ℝ) (γ : GL (Fin a) E) : detPow E a x (ratGL E a γ) = 1 := by
-  have h : Matrix.GeneralLinearGroup.det (ratGL E a γ) = diagUnits E (Matrix.GeneralLinearGroup.det γ) :=
+  have h
+      : Matrix.GeneralLinearGroup.det (ratGL E a γ)
+        = diagUnits E (Matrix.GeneralLinearGroup.det γ) :=
     Units.ext (det_map (algebraMap E (Ad E)) γ)
   have h2 := (GlobalTheory.HeckeGal.Model.absPow E x).2.2 (Matrix.GeneralLinearGroup.det γ)
   unfold detPow chiDet
-  rw [MonoidHom.comp_apply, h, h2]; simp
-
-
-
-
-
-
-
+  rw [MonoidHom.comp_apply, h, h2]
+  simp
 
 end GlobalTheory.RSJ.Model

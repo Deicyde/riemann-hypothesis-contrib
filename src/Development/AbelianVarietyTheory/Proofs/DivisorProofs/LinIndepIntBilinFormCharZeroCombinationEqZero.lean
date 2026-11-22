@@ -7,15 +7,18 @@ public import Mathlib
 namespace GlobalTheory
 
 theorem linIndep_intBilinForm_charZero_comb_eq_zero
-    {X : Type} [AddCommGroup X] {m : ℕ} (gam : Fin m → LinearMap.BilinForm ℤ X)
-    (k : Type) [Field k] [CharZero k] (a : Fin m → k) :
-    LinearIndependent ℤ gam → (∀ y z, ∑ i, a i * (gam i y z : k) = 0) → a = 0 := by
+    {X : Type} [AddCommGroup X]
+    {m : ℕ} (gam : Fin m → LinearMap.BilinForm ℤ X)
+    (k : Type) [Field k] [CharZero k]
+    (a : Fin m → k)
+    : LinearIndependent ℤ gam → (∀ y z, ∑ i, a i * (gam i y z : k) = 0) → a = 0 := by
   intro hli hsum
 
-  let L : LinearMap.BilinForm ℤ X →ₗ[ℤ] (X → X → ℚ) :=
-    { toFun := fun B y z => ((B y z : ℤ) : ℚ)
-      map_add' := by intro B C; funext y z; simp
-      map_smul' := by intro n B; funext y z; simp }
+  let L : LinearMap.BilinForm ℤ X →ₗ[ℤ] (X → X → ℚ) := {
+    toFun := fun B y z => ((B y z : ℤ) : ℚ)
+    map_add' := by intro B C; funext y z; simp
+    map_smul' := by intro n B; funext y z; simp
+  }
   have hker : LinearMap.ker L = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro B hB
@@ -23,8 +26,7 @@ theorem linIndep_intBilinForm_charZero_comb_eq_zero
     have := congrFun (congrFun hB y) z
     simpa [L] using this
   have hZ : LinearIndependent ℤ (L ∘ gam) := hli.map' L hker
-  have hQ : LinearIndependent ℚ (L ∘ gam) :=
-    (LinearIndependent.iff_fractionRing ℤ ℚ).mp hZ
+  have hQ : LinearIndependent ℚ (L ∘ gam) := (LinearIndependent.iff_fractionRing ℤ ℚ).mp hZ
   funext j
   by_contra hj
   obtain ⟨ℓ, hℓ⟩ := Module.Projective.exists_dual_ne_zero ℚ (V := k) hj

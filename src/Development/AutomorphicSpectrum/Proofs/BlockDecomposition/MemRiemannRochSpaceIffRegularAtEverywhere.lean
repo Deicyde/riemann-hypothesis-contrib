@@ -12,8 +12,8 @@ namespace GlobalTheory.CompanionTheory.GLFirstBasisOrbit
 
 variable {k : Type} [Field k] {n : ℕ}
 
-theorem mem_gmap {N : ℕ} (g : GL (Fin N) k) (M : Submodule k (Fin N → k)) (x : Fin N → k) :
-    x ∈ gmap g M ↔ (g⁻¹).val *ᵥ x ∈ M := by
+theorem mem_gmap {N : ℕ} (g : GL (Fin N) k) (M : Submodule k (Fin N → k)) (x : Fin N → k)
+    : x ∈ gmap g M ↔ (g⁻¹).val *ᵥ x ∈ M := by
   unfold gmap
   rw [Submodule.mem_map]
   constructor
@@ -26,12 +26,13 @@ theorem mem_gmap {N : ℕ} (g : GL (Fin N) k) (M : Submodule k (Fin N → k)) (x
     rw [Matrix.toLin'_apply, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one,
       Matrix.one_mulVec]
 
-theorem smul_mem_gmap {N : ℕ} (g : GL (Fin N) k) (M : Submodule k (Fin N → k)) (x : Fin N → k) :
-    g.val *ᵥ x ∈ gmap g M ↔ x ∈ M := by
-  rw [mem_gmap, Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
+theorem smul_mem_gmap {N : ℕ} (g : GL (Fin N) k) (M : Submodule k (Fin N → k)) (x : Fin N → k)
+    : g.val *ᵥ x ∈ gmap g M ↔ x ∈ M := by
+  rw [mem_gmap, Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one,
+    Matrix.one_mulVec]
 
-theorem gmap_mul {N : ℕ} (g h : GL (Fin N) k) (M : Submodule k (Fin N → k)) :
-    gmap (g * h) M = gmap g (gmap h M) := by
+theorem gmap_mul {N : ℕ} (g h : GL (Fin N) k) (M : Submodule k (Fin N → k))
+    : gmap (g * h) M = gmap g (gmap h M) := by
   ext x
   rw [mem_gmap, mem_gmap, mem_gmap, Matrix.mulVec_mulVec, ← Units.val_mul, _root_.mul_inv_rev]
 
@@ -49,8 +50,8 @@ def gmapEquiv {N : ℕ} (g : GL (Fin N) k) : Submodule k (Fin N → k) ≃ Submo
   left_inv M := by rw [← gmap_mul, inv_mul_cancel, gmap_one]
   right_inv M := by rw [← gmap_mul, mul_inv_cancel, gmap_one]
 
-theorem finrank_gmap {N : ℕ} (g : GL (Fin N) k) (M : Submodule k (Fin N → k)) :
-    Module.finrank k (gmap g M) = Module.finrank k M := by
+theorem finrank_gmap {N : ℕ} (g : GL (Fin N) k) (M : Submodule k (Fin N → k))
+    : Module.finrank k (gmap g M) = Module.finrank k M := by
   have hinj : Function.Injective (Matrix.toLin' g.val) := by
     intro x y h
     have := congrArg (fun z => (g⁻¹).val *ᵥ z) h
@@ -62,14 +63,14 @@ theorem first_basis_ne_zero : e0 k n ≠ 0 := by
   have := congrFun h 0
   simp [e0] at this
 
-theorem star_e0_dotProduct (x : Fin (n + 1) → k) : e0 k n ⬝ᵥ x = x 0 := by
-  simp [e0]
+theorem star_e0_dotProduct (x : Fin (n + 1) → k) : e0 k n ⬝ᵥ x = x 0 := by simp [e0]
 
-theorem mem_riemannRochSpace_iff_regularAt_everywhere (x : Fin (n + 1) → k) : x ∈ H0 k n ↔ x 0 = 0 := by
+theorem mem_riemannRochSpace_iff_regularAt_everywhere (x : Fin (n + 1) → k)
+    : x ∈ H0 k n ↔ x 0 = 0 := by
   simp [H0]
 
-theorem exists_GL_first_basis_eq (x : Fin (n + 1) → k) (hx : x ≠ 0) :
-    ∃ g : GL (Fin (n + 1)) k, g.val *ᵥ e0 k n = x := by
+theorem exists_GL_first_basis_eq (x : Fin (n + 1) → k) (hx : x ≠ 0)
+    : ∃ g : GL (Fin (n + 1)) k, g.val *ᵥ e0 k n = x := by
   obtain ⟨i, hi⟩ := Function.ne_iff.mp hx
   let A : Matrix (Fin (n + 1)) (Fin (n + 1)) k := (1 : Matrix _ _ k).updateCol i x
   have hA : A.det = x i := by
@@ -81,13 +82,14 @@ theorem exists_GL_first_basis_eq (x : Fin (n + 1) → k) (hx : x ≠ 0) :
     have := Matrix.det_permute' (Equiv.swap 0 i) A
     rw [show G = A.submatrix id (Equiv.swap 0 i) from rfl, this, hA]
     refine mul_ne_zero ?_ hi
-    rcases Int.units_eq_one_or (Equiv.Perm.sign (Equiv.swap (0 : Fin (n + 1)) i)) with h | h <;> rw [h] <;> simp
+    rcases Int.units_eq_one_or (Equiv.Perm.sign (Equiv.swap (0 : Fin (n + 1)) i)) with h | h
+      <;> rw [h] <;> simp
   refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero G hG, ?_⟩
   ext a
   simp [Matrix.GeneralLinearGroup.mkOfDetNeZero, e0, G, A]
 
-theorem exists_gl_cov (a : Fin (n + 1) → k) (ha : a ≠ 0) :
-    ∃ g : GL (Fin (n + 1)) k, ∀ x, a ⬝ᵥ (g.val *ᵥ x) = x 0 := by
+theorem exists_gl_cov (a : Fin (n + 1) → k) (ha : a ≠ 0)
+    : ∃ g : GL (Fin (n + 1)) k, ∀ x, a ⬝ᵥ (g.val *ᵥ x) = x 0 := by
   obtain ⟨h, hh⟩ := exists_GL_first_basis_eq a ha
   have hd : (h.val)ᵀ.det ≠ 0 := by
     rw [Matrix.det_transpose]
@@ -99,15 +101,16 @@ theorem exists_gl_cov (a : Fin (n + 1) → k) (ha : a ≠ 0) :
   rw [Matrix.dotProduct_mulVec, h1, Matrix.vecMul_vecMul, ← Units.val_mul, mul_inv_cancel,
     Units.val_one, Matrix.vecMul_one, star_e0_dotProduct]
 
-theorem mem_GL_image_hyperplane_iff (g : GL (Fin (n + 1)) k) (a : Fin (n + 1) → k)
-    (h : ∀ x, a ⬝ᵥ (g.val *ᵥ x) = x 0) (z : Fin (n + 1) → k) :
-    z ∈ gmap g (H0 k n) ↔ a ⬝ᵥ z = 0 := by
-  rw [mem_gmap, mem_riemannRochSpace_iff_regularAt_everywhere, ← h ((g⁻¹).val *ᵥ z), Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one,
-    Matrix.one_mulVec]
+theorem mem_GL_image_hyperplane_iff
+    (g : GL (Fin (n + 1)) k) (a : Fin (n + 1) → k) (h : ∀ x, a ⬝ᵥ (g.val *ᵥ x) = x 0)
+    (z : Fin (n + 1) → k)
+    : z ∈ gmap g (H0 k n) ↔ a ⬝ᵥ z = 0 := by
+  rw [mem_gmap, mem_riemannRochSpace_iff_regularAt_everywhere, ← h ((g⁻¹).val *ᵥ z),
+    Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
 
-theorem exists_scalar_stabilizer_line (g : GL (Fin (n + 1)) k)
-    (h : gmap g (Submodule.span k {e0 k n}) = Submodule.span k {e0 k n}) :
-    ∃ s : k, s ≠ 0 ∧ g.val *ᵥ e0 k n = s • e0 k n := by
+theorem exists_scalar_stabilizer_line
+    (g : GL (Fin (n + 1)) k) (h : gmap g (Submodule.span k {e0 k n}) = Submodule.span k {e0 k n})
+    : ∃ s : k, s ≠ 0 ∧ g.val *ᵥ e0 k n = s • e0 k n := by
   have h1 : g.val *ᵥ e0 k n ∈ Submodule.span k {e0 k n} := by
     rw [← h, smul_mem_gmap]
     exact Submodule.mem_span_singleton_self _
@@ -116,8 +119,9 @@ theorem exists_scalar_stabilizer_line (g : GL (Fin (n + 1)) k)
   rintro rfl
   have h2 : g.val *ᵥ e0 k n = 0 := by rw [← hs, zero_smul]
   have h3 := congrArg (fun z => (g⁻¹).val *ᵥ z) h2
-  simp only [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec,
-    Matrix.mulVec_zero] at h3
+  simp only [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one,
+      Matrix.one_mulVec, Matrix.mulVec_zero]
+    at h3
   exact first_basis_ne_zero h3
 
 section Lat
@@ -125,7 +129,8 @@ section Lat
 variable {V Γ : Type} [AddCommGroup V] [Module ℂ V] [Group Γ]
 
 def stabV (red : Γ →* GL (Fin (n + 1)) k) (ρ : Γ →* Module.End ℂ V) : Submodule ℂ V where
-  carrier := {y | ∀ γ, gmap (red γ) (Submodule.span k {e0 k n}) = Submodule.span k {e0 k n} → ρ γ y = y}
+  carrier :=
+    {y | ∀ γ, gmap (red γ) (Submodule.span k {e0 k n}) = Submodule.span k {e0 k n} → ρ γ y = y}
   add_mem' := by
     intro a b ha hb γ h
     rw [map_add (f := _), ha γ h, hb γ h]
@@ -136,9 +141,10 @@ def stabV (red : Γ →* GL (Fin (n + 1)) k) (ρ : Γ →* Module.End ℂ V) : S
     intro c a ha γ h
     rw [map_smul, ha γ h]
 
-theorem mem_stabV (red : Γ →* GL (Fin (n + 1)) k) (ρ : Γ →* Module.End ℂ V) (y : V) :
-    y ∈ stabV red ρ ↔
-      ∀ γ, gmap (red γ) (Submodule.span k {e0 k n}) = Submodule.span k {e0 k n} → ρ γ y = y := Iff.rfl
+theorem mem_stabV (red : Γ →* GL (Fin (n + 1)) k) (ρ : Γ →* Module.End ℂ V) (y : V)
+    : y ∈ stabV red ρ
+      ↔ ∀ γ, gmap (red γ) (Submodule.span k {e0 k n}) = Submodule.span k {e0 k n} → ρ γ y = y :=
+  Iff.rfl
 
 variable [Fintype k]
 
@@ -148,7 +154,8 @@ def zx (v : Submodule k (Fin (n + 1) → k) → V) (x : Fin (n + 1) → k) (j : 
 def IsCov (red : Γ →* GL (Fin (n + 1)) k) (gam : (Fin (n + 1) → k) → Γ) : Prop :=
   ∀ a, a ≠ 0 → ∀ x, a ⬝ᵥ ((red (gam a)).val *ᵥ x) = x 0
 
-def uop (ρ : Γ →* Module.End ℂ V) (t : Module.End ℂ V) (gam : (Fin (n + 1) → k) → Γ) : Module.End ℂ V :=
+def uop (ρ : Γ →* Module.End ℂ V) (t : Module.End ℂ V) (gam : (Fin (n + 1) → k) → Γ)
+    : Module.End ℂ V :=
   ∑ a ∈ Finset.univ.filter (fun a : Fin (n + 1) → k => a ⬝ᵥ e0 k n = 1), ρ (gam a) * t
 
 end Lat

@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.ZetaZeroFreeRegion
 
-open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions Finset
+open NumberField Formalism.FrobeniusOrbits Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory Formalism.MainNotions Finset
 open scoped Pointwise ComplexConjugate
 
 open Classical
@@ -24,7 +25,7 @@ abbrev chC (D : D7) : Chr D := D.R.chC
 
 def psC (D : D7) : Chr D := sgnC.comp D.R.chQ
 
-def Unram (D : D7) (p : ℕ) : Prop := p.Prime ∧ ¬ ((p : ℤ) ∣ discr D.host.E)
+def Unram (D : D7) (p : ℕ) : Prop := p.Prime ∧ ¬((p : ℤ) ∣ discr D.host.E)
 
 def InertK (D : D7) (p : ℕ) : Prop :=
   p.Prime ∧ (D.host.cls p = PrimeClass.signal ∨ D.host.cls p = PrimeClass.inertClass)
@@ -52,8 +53,8 @@ def askD (D : D7) (a : ℝ) (w : D.R.GG → ℝ) (τ : D.R.GG) : ℝ :=
   ∑' i : ℕ, if 1 ≤ i then max (a / (D.host.d : ℝ) ^ i - w (rho D τ (gD D i))) 0 else 0
 
 def ASKjt (D : D7) (a : ℝ) (w : D.R.GG → ℝ) (τ : D.R.GG) : ℝ :=
-  (∑' p : ℕ, if InertK D p then 2 * Real.log p * askP D a w τ p else 0) +
-    Real.log D.host.d * askD D a w τ
+  (∑' p : ℕ, if InertK D p then 2 * Real.log p * askP D a w τ p else 0)
+    + Real.log D.host.d * askD D a w τ
 
 def adm5 (D : D7) (s : Scale) (c : ℝ) : Prop :=
   ∀ ψ : Chr D, ∀ y : ℝ, s.X' / 3 ≤ y → ‖Gc D ψ y‖ ≤ y * Real.exp (-(c * s.x ^ (s.eps / 8)))
@@ -61,11 +62,11 @@ def adm5 (D : D7) (s : Scale) (c : ℝ) : Prop :=
 def adm10 (D : D7) : Prop := ∀ ψ : Chr D, ∃ χ, Reads D ψ χ
 
 def SizesAt (D : D7) (s : Scale) (δ : ℝ) : Prop :=
-  s.x ^ (2 + 8 * s.eps - δ) ≤ (D.R.n : ℝ) ∧ (D.R.n : ℝ) ≤ s.x ^ (2 + 8 * s.eps + δ) ∧
-  (s.x * s.delta1) ^ ((1 : ℝ) / 2 - δ) ≤ (D.R.m : ℝ) ∧
-    (D.R.m : ℝ) ≤ (s.x * s.delta1) ^ ((1 : ℝ) / 2 + δ) ∧
-  s.x ^ ((9 : ℝ) / 2 + 10 * s.eps - δ) ≤ (D.R.k : ℝ) ∧
-    (D.R.k : ℝ) ≤ s.x ^ ((9 : ℝ) / 2 + 10 * s.eps + δ)
+  s.x ^ (2 + 8 * s.eps - δ) ≤ (D.R.n : ℝ) ∧ (D.R.n : ℝ) ≤ s.x ^ (2 + 8 * s.eps + δ)
+    ∧ (s.x * s.delta1) ^ ((1 : ℝ) / 2 - δ) ≤ (D.R.m : ℝ)
+    ∧ (D.R.m : ℝ) ≤ (s.x * s.delta1) ^ ((1 : ℝ) / 2 + δ)
+    ∧ s.x ^ ((9 : ℝ) / 2 + 10 * s.eps - δ) ≤ (D.R.k : ℝ)
+    ∧ (D.R.k : ℝ) ≤ s.x ^ ((9 : ℝ) / 2 + 10 * s.eps + δ)
 
 end Formalism.MainNotions.ZetaZeroFreeRegion
 

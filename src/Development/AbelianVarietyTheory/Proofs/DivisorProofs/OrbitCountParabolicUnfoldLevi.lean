@@ -6,20 +6,38 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem orbit_count_parabolic_unfold : ∀ (P M N : Type) [Group P] [Group M] [Group N] (s : M →* P) (π : P →* M) (u : N →* P), (∀ m, π (s m) = m) → Function.Injective u → (∀ p, π p = 1 ↔ ∃ X, u X = p) → ∀ (KP : Subgroup P) (KM : Subgroup M) (L : Subgroup N), (∀ k ∈ KM, s k ∈ KP) → (∀ k ∈ KP, π k ∈ KM) → (∀ X, u X ∈ KP ↔ X ∈ L) → ∀ (TM CM : Subgroup M) (TP CP : Subgroup P), CM ≤ TM → (∀ p, p ∈ TP ↔ ∃ t ∈ TM, s t = p) → (∀ p, p ∈ CP ↔ ∃ t ∈ CM, s t = p) → (∀ q : M, TM ⊓ KM.map (MulAut.conj q).toMonoidHom ≤ CM) → ∀ (q : M) (X : N), Nat.card {x : N ⧸ L // DoubleCoset.mk TP KP (s q * u (Quotient.out x)) = DoubleCoset.mk TP KP (s q * u X)} = (TM.map (MulAut.conj q⁻¹).toMonoidHom ⊓ KM ⊓ KP.comap ((MulAut.conj (u X)⁻¹).toMonoidHom.comp s)).relIndex (TM.map (MulAut.conj q⁻¹).toMonoidHom ⊓ KM) := by
+theorem orbit_count_parabolic_unfold
+    : ∀ (P M N : Type) [Group P] [Group M] [Group N] (s : M →* P) (π : P →* M) (u : N →* P),
+      (∀ m, π (s m) = m) → Function.Injective u → (∀ p, π p = 1 ↔ ∃ X, u X = p)
+        → ∀ (KP : Subgroup P) (KM : Subgroup M) (L : Subgroup N),
+          (∀ k ∈ KM, s k ∈ KP) → (∀ k ∈ KP, π k ∈ KM) → (∀ X, u X ∈ KP ↔ X ∈ L)
+            → ∀ (TM CM : Subgroup M) (TP CP : Subgroup P),
+              CM ≤ TM → (∀ p, p ∈ TP ↔ ∃ t ∈ TM, s t = p) → (∀ p, p ∈ CP ↔ ∃ t ∈ CM, s t = p)
+                → (∀ q : M, TM ⊓ KM.map (MulAut.conj q).toMonoidHom ≤ CM)
+                → ∀ (q : M) (X : N),
+                  Nat.card
+                      {x : N ⧸ L // DoubleCoset.mk TP KP (s q * u (Quotient.out x))
+                        = DoubleCoset.mk TP KP (s q * u X)}
+                    = (TM.map (MulAut.conj q⁻¹).toMonoidHom ⊓ KM
+                        ⊓ KP.comap ((MulAut.conj (u X)⁻¹).toMonoidHom.comp s)).relIndex
+                      (TM.map (MulAut.conj q⁻¹).toMonoidHom ⊓ KM) := by
   intro P M N _ _ _ s π u hπs hu hker KP KM L hsK hπK huK TM CM TP CP _ hTP _ _ q X
   set S : Subgroup M := TM.map (MulAut.conj q⁻¹).toMonoidHom ⊓ KM with hS
   set C : Subgroup M := KP.comap ((MulAut.conj (u X)⁻¹).toMonoidHom.comp s) with hC
   letI : MulAction M (P ⧸ KP) := MulAction.compHom (P ⧸ KP) s
-  have hsmul : ∀ (r : M) (p : P), r • (QuotientGroup.mk p : P ⧸ KP) = QuotientGroup.mk (s r * p) := by
+  have hsmul
+      : ∀ (r : M) (p : P), r • (QuotientGroup.mk p : P ⧸ KP) = QuotientGroup.mk (s r * p) := by
     intro r p; rfl
   have memS : ∀ r : M, r ∈ S ↔ (∃ t ∈ TM, q⁻¹ * t * q = r) ∧ r ∈ KM := by
     intro r
-    simp only [hS, Subgroup.mem_inf, Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply, inv_inv]
+    simp only [hS, Subgroup.mem_inf, Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
+      inv_inv]
   have hπu : ∀ Y, π (u Y) = 1 := fun Y => (hker _).2 ⟨Y, rfl⟩
   set x0 : P ⧸ KP := QuotientGroup.mk (u X) with hx0
-  have key : ∀ Y : N, DoubleCoset.mk TP KP (s q * u Y) = DoubleCoset.mk TP KP (s q * u X) ↔
-      (QuotientGroup.mk (u Y) : P ⧸ KP) ∈ MulAction.orbit S x0 := by
+  have key
+      : ∀ Y : N,
+        DoubleCoset.mk TP KP (s q * u Y) = DoubleCoset.mk TP KP (s q * u X)
+          ↔ (QuotientGroup.mk (u Y) : P ⧸ KP) ∈ MulAction.orbit S x0 := by
     intro Y
     rw [eq_comm, DoubleCoset.eq]
     constructor
@@ -45,21 +63,31 @@ theorem orbit_count_parabolic_unfold : ∀ (P M N : Type) [Group P] [Group M] [G
       refine ⟨s t, (hTP _).2 ⟨t, ht, rfl⟩, _, e, ?_⟩
       simp only [map_mul, map_inv]
       group
-  have hinj : ∀ x y : N ⧸ L, (QuotientGroup.mk (u (Quotient.out x)) : P ⧸ KP) = QuotientGroup.mk (u (Quotient.out y)) → x = y := by
+  have hinj
+      : ∀ x y : N ⧸ L,
+        (QuotientGroup.mk (u (Quotient.out x)) : P ⧸ KP) = QuotientGroup.mk (u (Quotient.out y))
+          → x = y := by
     intro x y h
     rw [QuotientGroup.eq, ← map_inv, ← map_mul, huK] at h
     rw [← Quotient.out_eq' x, ← Quotient.out_eq' y]
     exact (QuotientGroup.eq (s := L)).2 h
-  have hcard : Nat.card {x : N ⧸ L // DoubleCoset.mk TP KP (s q * u (Quotient.out x)) = DoubleCoset.mk TP KP (s q * u X)} = Nat.card (MulAction.orbit S x0) := by
-    refine Nat.card_congr (Equiv.ofBijective (fun x => ⟨QuotientGroup.mk (u (Quotient.out x.1)), (key _).1 x.2⟩) ⟨?_, ?_⟩)
+  have hcard
+      : Nat.card
+          {x : N ⧸ L
+            // DoubleCoset.mk TP KP (s q * u (Quotient.out x)) = DoubleCoset.mk TP KP (s q * u X)}
+        = Nat.card (MulAction.orbit S x0) := by
+    refine Nat.card_congr (Equiv.ofBijective
+      (fun x => ⟨QuotientGroup.mk (u (Quotient.out x.1)), (key _).1 x.2⟩)
+      ⟨?_, ?_⟩)
     · intro x y h
       exact Subtype.ext (hinj _ _ (congrArg Subtype.val h))
     · rintro ⟨y, ⟨⟨r, hr⟩, rfl⟩⟩
-      have hk : π (s r * u X * (s r)⁻¹) = 1 := by
-        rw [map_mul, map_mul, map_inv, hπs, hπu]; group
+      have hk : π (s r * u X * (s r)⁻¹) = 1 := by rw [map_mul, map_mul, map_inv, hπs, hπu]; group
       obtain ⟨Z, hZ⟩ := (hker _).1 hk
       have hrK : (r : M) ∈ KM := ((memS r).1 hr).2
-      have hyo : (QuotientGroup.mk (u (Quotient.out (QuotientGroup.mk Z : N ⧸ L))) : P ⧸ KP) = r • x0 := by
+      have hyo
+          : (QuotientGroup.mk (u (Quotient.out (QuotientGroup.mk Z : N ⧸ L))) : P ⧸ KP)
+            = r • x0 := by
         obtain ⟨l, hl⟩ := QuotientGroup.mk_out_eq_mul L Z
         change _ = r • x0
         rw [hx0, hsmul, hl, QuotientGroup.eq, map_mul, hZ]
@@ -72,10 +100,12 @@ theorem orbit_count_parabolic_unfold : ∀ (P M N : Type) [Group P] [Group M] [G
       · exact Subtype.ext hyo
   have hstab : MulAction.stabilizer S x0 = (S ⊓ C).subgroupOf S := by
     ext ⟨r, hr⟩
-    rw [MulAction.mem_stabilizer_iff, Subgroup.mem_subgroupOf, Subgroup.mem_inf, hC, Subgroup.mem_comap]
+    rw [MulAction.mem_stabilizer_iff, Subgroup.mem_subgroupOf, Subgroup.mem_inf, hC,
+      Subgroup.mem_comap]
     change (r • x0 = x0) ↔ _
     rw [hx0, hsmul, QuotientGroup.eq]
-    simp only [hr, true_and, MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom, Function.comp_apply, MulAut.conj_apply, inv_inv]
+    simp only [hr, true_and, MonoidHom.coe_comp, MulEquiv.coe_toMonoidHom, Function.comp_apply,
+      MulAut.conj_apply, inv_inv]
     rw [← KP.inv_mem_iff]
     constructor <;> intro h <;> convert h using 1 <;> group
   rw [hcard, Subgroup.relIndex, ← hstab, MulAction.index_stabilizer, Nat.card_coe_set_eq]

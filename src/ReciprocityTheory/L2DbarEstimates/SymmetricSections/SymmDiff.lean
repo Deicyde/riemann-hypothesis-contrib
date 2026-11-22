@@ -22,8 +22,9 @@ theorem symmDiff_of_holoSection (hsec : holoSectionStatement.{u}) : symmDiffStat
   have hdiff : ∀ i, DifferentiableAt ℂ (fun v => u (s i v)) w := fun i =>
     hsec n M z u hloc hholo (s i) w ((hcont i).continuousAt hWn)
       (Filter.eventually_of_mem hWn (hzs i))
-  have heq : (fun v => ∑ t ∈ (Finset.univ : Finset (Fin d)).powersetCard k, ∏ i ∈ t, u (s i v))
-      =ᶠ[𝓝 w] fiberSymm n z u k := by
+  have heq
+      : (fun v => ∑ t ∈ (Finset.univ : Finset (Fin d)).powersetCard k, ∏ i ∈ t, u (s i v))
+        =ᶠ[𝓝 w] fiberSymm n z u k := by
     filter_upwards [hWn] with v hv
     rw [fiberSymm, hvals v hv, Finset.esymm_map_val]
   refine DifferentiableAt.congr_of_eventuallyEq ?_ heq.symm

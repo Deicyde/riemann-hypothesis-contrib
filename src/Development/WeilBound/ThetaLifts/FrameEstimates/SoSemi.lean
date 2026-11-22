@@ -9,12 +9,16 @@ noncomputable section
 namespace PositivityTheory.ThKEst
 
 open scoped TensorProduct NNReal ENNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem qht_le {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (g : UA σ J) {γ : UA σ J} (hγ : γ ∈ ratU σ J) : qht g ≤ ht (γ * g) :=
+theorem qht_le {n : ℕ} {J : Matrix (Fin n) (Fin n) E} (g : UA σ J) {γ : UA σ J} (hγ : γ ∈ ratU σ J)
+    : qht g ≤ ht (γ * g) :=
   ciInf_le (OrderBot.bddBelow _) (⟨γ, hγ⟩ : ratU σ J)
 
 theorem psum_self {r : ℕ} (t : Fin r → ℝ) : psum t r = ∑ i, t i :=
@@ -23,8 +27,10 @@ theorem psum_self {r : ℕ} (t : Fin r → ℝ) : psum t r = ∑ i, t i :=
 theorem psum_le {r : ℕ} {t : Fin r → ℝ} (h : t ∈ Cone r) (i : ℕ) : psum t i ≤ ∑ j, t j :=
   Finset.sum_le_sum fun j _ => by split_ifs; exacts [le_rfl, h.2 j]
 
-theorem soSemiU_of (hT : GrpTop) (hE : EpsOf) (hS : SiegelAll) (hQ : SqSo) (hI : LatInv) (hK : LatCpt) (hL : LatFull)
-    (hP : PosWt) : SoSemiU := by
+theorem soSemiU_of
+    (hT : GrpTop) (hE : EpsOf) (hS : SiegelAll) (hQ : SqSo) (hI : LatInv) (hK : LatCpt)
+    (hL : LatFull) (hP : PosWt)
+    : SoSemiU := by
   intro F E _ _ _ _ _ σ B n d X W M χX χW om r s r' s' hp N₀
   have hc := hp.base.cm
   obtain ⟨hJ, -, -⟩ := hE F E σ B hp.base n X r s (Or.inl hp.herm)
@@ -42,7 +48,8 @@ theorem soSemiU_of (hT : GrpTop) (hE : EpsOf) (hS : SiegelAll) (hQ : SqSo) (hI :
   obtain ⟨K₂, h₂⟩ := hN C₁ hC₁
   set K : ℝ := (K₁ * K₂ + 1) * (max C₀ 0 * B₀) ^ N₀ * A ^ (m + D * n) with hKdef
   have hK0 : 0 ≤ K := by positivity
-  refine ⟨NNReal.mk K hK0 • p, (continuous_const.mul hpc : Continuous fun f => K * p f), fun f g h => ?_⟩
+  refine
+    ⟨NNReal.mk K hK0 • p, (continuous_const.mul hpc : Continuous fun f => K * p f), fun f g h => ?_⟩
   obtain ⟨γ, hγ, s₁, hs, κ, hκ, e⟩ := hcov g
   obtain ⟨δ, hδ, t, ht', κ', hκ', e'⟩ := hcov' h
   have hpf : 0 ≤ p f := apply_nonneg p f
@@ -56,18 +63,24 @@ theorem soSemiU_of (hT : GrpTop) (hE : EpsOf) (hS : SiegelAll) (hQ : SqSo) (hI :
     rw [psum_self] at this
     linarith [psum_le ht' fr.r]
   have e1 := hb f g h
-  rw [← hI F E σ hc B.emb n d X.J W.J hJ hJ' C N (fullRank E n d) (by simp) γ hγ δ hδ g h, e, e'] at e1
-  have e2 := e1.trans (mul_le_mul_right ((h₁ _ _ _ κ hκ κ' hκ').trans (mul_le_mul_right (h₂ s₁ hs t ht') _)) _)
+  rw [← hI F E σ hc B.emb n d X.J W.J hJ hJ' C N (fullRank E n d) (by simp) γ hγ δ hδ g h, e, e']
+    at e1
+  have e2 :=
+    e1.trans (mul_le_mul_right ((h₁ _ _ _ κ hκ κ' hκ').trans (mul_le_mul_right (h₂ s₁ hs t ht') _))
+      _)
   set x : ℝ := D * posWt n d s₁ t - m * viol s₁ t with hx
   have e3 : ‖theta om (pureA F f φ) g h‖ ^ 2 ≤ p f ^ 2 * (K₁ * (K₂ * Real.exp x)) := by
-    rw [← ofReal_norm, ← ENNReal.ofReal_pow (norm_nonneg _), ← ENNReal.ofReal_pow hpf, ← ENNReal.ofReal_coe_nnreal,
-      ← ENNReal.ofReal_coe_nnreal (p := K₂), ← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_mul (by positivity),
-      ← ENNReal.ofReal_mul (by positivity)] at e2
+    rw [← ofReal_norm, ← ENNReal.ofReal_pow (norm_nonneg _), ← ENNReal.ofReal_pow hpf,
+        ← ENNReal.ofReal_coe_nnreal, ← ENNReal.ofReal_coe_nnreal (p := K₂),
+        ← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_mul (by positivity),
+        ← ENNReal.ofReal_mul (by positivity)]
+      at e2
     exact (ENNReal.ofReal_le_ofReal_iff (by positivity)).1 e2
   have e4 : ‖theta om (pureA F f φ) g h‖ ≤ p f * ((K₁ * K₂ + 1) * Real.exp (x / 2)) := by
     refine (pow_le_pow_iff_left₀ (norm_nonneg _) (by positivity) two_ne_zero).1 ?_
     refine e3.trans ?_
-    have h5 : Real.exp (x / 2) ^ 2 = Real.exp x := by rw [← Real.exp_nat_mul]; congr 1; push_cast; ring
+    have h5 : Real.exp (x / 2) ^ 2 = Real.exp x := by
+      rw [← Real.exp_nat_mul]; congr 1; push_cast; ring
     have h6 : (0 : ℝ) ≤ K₁ * K₂ := by positivity
     rw [mul_pow, mul_pow, h5, ← mul_assoc (K₁ : ℝ)]
     gcongr
@@ -78,7 +91,8 @@ theorem soSemiU_of (hT : GrpTop) (hE : EpsOf) (hS : SiegelAll) (hQ : SqSo) (hI :
       exact_mod_cast this
     have a2 : (ht (fr.a s₁) : ℝ) ≤ max C₀ 0 * Real.exp (k₀ * S) :=
       (hht s₁ hs).1.trans (by gcongr; exact le_max_left _ _)
-    calc _ ≤ _ := a1
+    calc
+      _ ≤ _ := a1
       _ ≤ max C₀ 0 * Real.exp (k₀ * S) * B₀ := by gcongr
       _ = _ := by ring
   have e6 : x / 2 + N₀ * (k₀ * S) ≤ ((m + D * n : ℕ) : ℝ) * T := by
@@ -93,16 +107,21 @@ theorem soSemiU_of (hT : GrpTop) (hE : EpsOf) (hS : SiegelAll) (hQ : SqSo) (hI :
     rw [hx]
     push_cast
     nlinarith
-  have e7 : Real.exp (((m + D * n : ℕ) : ℝ) * T) ≤ A ^ (m + D * n) * (ht h : ℝ) ^ (k₁ * (m + D * n)) := by
+  have e7
+      : Real.exp (((m + D * n : ℕ) : ℝ) * T)
+        ≤ A ^ (m + D * n) * (ht h : ℝ) ^ (k₁ * (m + D * n)) := by
     rw [Real.exp_nat_mul, pow_mul, ← mul_pow]
     exact pow_le_pow_left₀ (Real.exp_pos _).le (hAk h δ hδ t ht' κ' hκ' e') _
-  calc ‖theta om (pureA F f φ) g h‖ * (qht g : ℝ) ^ N₀
-      ≤ p f * ((K₁ * K₂ + 1) * Real.exp (x / 2)) * (max C₀ 0 * B₀ * Real.exp (k₀ * S)) ^ N₀ := by gcongr
+  calc
+    ‖theta om (pureA F f φ) g h‖ * (qht g : ℝ) ^ N₀
+        ≤ p f * ((K₁ * K₂ + 1) * Real.exp (x / 2)) * (max C₀ 0 * B₀ * Real.exp (k₀ * S)) ^ N₀ := by
+      gcongr
     _ = p f * ((K₁ * K₂ + 1) * (max C₀ 0 * B₀) ^ N₀) * Real.exp (x / 2 + N₀ * (k₀ * S)) := by
-        rw [Real.exp_add, mul_pow _ (Real.exp _), ← Real.exp_nat_mul]; ring
-    _ ≤ p f * ((K₁ * K₂ + 1) * (max C₀ 0 * B₀) ^ N₀) * (A ^ (m + D * n) * (ht h : ℝ) ^ (k₁ * (m + D * n))) := by
-        gcongr
-        exact (Real.exp_le_exp.2 e6).trans e7
+      rw [Real.exp_add, mul_pow _ (Real.exp _), ← Real.exp_nat_mul]; ring
+    _ ≤ p f * ((K₁ * K₂ + 1) * (max C₀ 0 * B₀) ^ N₀)
+        * (A ^ (m + D * n) * (ht h : ℝ) ^ (k₁ * (m + D * n))) := by
+      gcongr
+      exact (Real.exp_le_exp.2 e6).trans e7
     _ = (K * p f) * (ht h : ℝ) ^ (k₁ * (m + D * n)) := by rw [hKdef]; ring
 
 theorem domSoU_of (hE : EpsOf) (hV : FinVolU) (hS : SoSemiU) : DomSoU := by

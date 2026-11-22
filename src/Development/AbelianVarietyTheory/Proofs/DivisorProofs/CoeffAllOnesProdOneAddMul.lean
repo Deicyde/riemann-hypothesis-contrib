@@ -8,11 +8,15 @@ open MvPolynomial
 
 namespace GlobalTheory
 
-theorem coeff_allOnes_prod_one_add_mul {σ : Type} {L : ℕ} (m : Fin L → MvPolynomial σ ℂ)
-    (a : MvPolynomial σ ℂ) :
-    AddMonoidAlgebra.coeff (MvPolynomial.sumAlgEquiv ℂ (Fin L) σ ((∏ i, (1 + MvPolynomial.X (Sum.inl i) *
-        MvPolynomial.rename Sum.inr (m i))) * MvPolynomial.rename Sum.inr a))
-      (Finsupp.equivFunOnFinite.symm fun _ : Fin L => (1 : ℕ)) = (∏ i, m i) * a := by
+theorem coeff_allOnes_prod_one_add_mul
+    {σ : Type} {L : ℕ} (m : Fin L → MvPolynomial σ ℂ) (a : MvPolynomial σ ℂ)
+    : AddMonoidAlgebra.coeff
+        (MvPolynomial.sumAlgEquiv ℂ (Fin L) σ
+          ((∏ i, (1 + MvPolynomial.X (Sum.inl i) *
+             MvPolynomial.rename Sum.inr (m i)))
+            * MvPolynomial.rename Sum.inr a))
+        (Finsupp.equivFunOnFinite.symm fun _ : Fin L => (1 : ℕ))
+      = (∏ i, m i) * a := by
   have hr : ∀ q : MvPolynomial σ ℂ, sumAlgEquiv ℂ (Fin L) σ (rename Sum.inr q) = C q := by
     intro q
     induction q using MvPolynomial.induction_on with
@@ -21,17 +25,21 @@ theorem coeff_allOnes_prod_one_add_mul {σ : Type} {L : ℕ} (m : Fin L → MvPo
     | mul_X p c hp => rw [map_mul, map_mul, hp, rename_X, sumAlgEquiv_X_inr, map_mul]
   have hx : ∀ i : Fin L, sumAlgEquiv ℂ (Fin L) σ (X (Sum.inl i)) = X i := fun i =>
     sumAlgEquiv_X_inl ℂ (Fin L) σ i
-  have cmC : ∀ {τ : Type} (n : τ →₀ ℕ) (p : MvPolynomial τ (MvPolynomial σ ℂ)) (c : MvPolynomial σ ℂ),
-      AddMonoidAlgebra.coeff (p * C c) n = AddMonoidAlgebra.coeff p n * c := by
+  have cmC
+      : ∀ {τ : Type} (n : τ →₀ ℕ) (p : MvPolynomial τ (MvPolynomial σ ℂ)) (c : MvPolynomial σ ℂ),
+        AddMonoidAlgebra.coeff (p * C c) n = AddMonoidAlgebra.coeff p n * c := by
     intro τ n p c; rw [mul_comm, coeff_C_mul, mul_comm]
   set e : Fin L →₀ ℕ := Finsupp.equivFunOnFinite.symm fun _ : Fin L => (1 : ℕ) with he
-  have hmono : ∀ t : Finset (Fin L),
-      AddMonoidAlgebra.coeff (∏ i ∈ t, (X i * C (m i) : MvPolynomial (Fin L) (MvPolynomial σ ℂ))) e =
-        if t = Finset.univ then ∏ i, m i else 0 := by
+  have hmono
+      : ∀ t : Finset (Fin L),
+        AddMonoidAlgebra.coeff (∏ i ∈ t, (X i * C (m i) : MvPolynomial (Fin L) (MvPolynomial σ ℂ)))
+            e
+          = if t = Finset.univ then ∏ i, m i else 0 := by
     intro t
     rw [Finset.prod_mul_distrib, ← map_prod, cmC]
-    have hX : (∏ i ∈ t, (X i : MvPolynomial (Fin L) (MvPolynomial σ ℂ))) =
-        monomial (∑ i ∈ t, Finsupp.single i 1) 1 := by
+    have hX
+        : (∏ i ∈ t, (X i : MvPolynomial (Fin L) (MvPolynomial σ ℂ)))
+          = monomial (∑ i ∈ t, Finsupp.single i 1) 1 := by
       rw [monomial_sum_one]; rfl
     rw [hX, coeff_monomial]
     by_cases ht : t = Finset.univ

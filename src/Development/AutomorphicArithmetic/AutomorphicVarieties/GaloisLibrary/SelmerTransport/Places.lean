@@ -4,17 +4,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base
 
-theorem UpperTheory.V.Base.places :
-    ∀ (k Ω : Type) [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω] (l : ℕ) [Fact l.Prime] (A : ValuationSubring Ω),
-      (A ≠ ⊤ → ∃ v : HeightOneSpectrum (𝓞 k), IsPlaceOver A v) ∧ (A = ⊤ → Ine (F := k) A = ⊥ ∧ ¬ A.valuation (l : Ω) < 1) ∧
-      (∀ v : HeightOneSpectrum (𝓞 k), IsPlaceOver A v → (A.valuation (l : Ω) < 1 ↔ v ∈ Above (F := k) l)) ∧
-      (¬ A.valuation (l : Ω) < 1 → Ine (F := k) A ≤ (cycZ k Ω l).ker) := by
+theorem UpperTheory.V.Base.places
+    : ∀ (k Ω : Type) [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω] (l : ℕ)
+        [Fact l.Prime] (A : ValuationSubring Ω),
+      (A ≠ ⊤ → ∃ v : HeightOneSpectrum (𝓞 k), IsPlaceOver A v)
+        ∧ (A = ⊤ → Ine (F := k) A = ⊥ ∧ ¬ A.valuation (l : Ω) < 1)
+        ∧ (∀ v : HeightOneSpectrum (𝓞 k),
+          IsPlaceOver A v → (A.valuation (l : Ω) < 1 ↔ v ∈ Above (F := k) l))
+        ∧ (¬ A.valuation (l : Ω) < 1 → Ine (F := k) A ≤ (cycZ k Ω l).ker) := by
   intro k Ω _ _ _ _ _ l _ A
   have hint : ∀ z : Ω, IsIntegral ℤ z → A.valuation z ≤ 1 := by
     intro z hz
-    obtain ⟨y, rfl⟩ := (IsIntegrallyClosed.isIntegral_iff (R := A) (K := Ω)).mp (hz.tower_top (A := A))
+    obtain ⟨y, rfl⟩ :=
+      (IsIntegrallyClosed.isIntegral_iff (R := A) (K := Ω)).mp (hz.tower_top (A := A))
     exact A.valuation_le_one y
   have hOk : ∀ x : 𝓞 k, A.valuation (algebraMap k Ω (x : k)) ≤ 1 := fun x =>
     hint _ x.isIntegral_coe.algebraMap
@@ -24,27 +29,26 @@ theorem UpperTheory.V.Base.places :
     by_contra h0
     have h2 : A.valuation y⁻¹ ≤ 1 :=
       (A.valuation_le_one_iff _).mpr (by rw [hA]; exact ValuationSubring.mem_top _)
-    have h3 : A.valuation y * A.valuation y⁻¹ = 1 := by
-      rw [← map_mul, mul_inv_cancel₀ h0, map_one]
-    have h4 : A.valuation y * A.valuation y⁻¹ < 1 :=
-      lt_of_le_of_lt (mul_le_of_le_one_right' h2) hy
+    have h3 : A.valuation y * A.valuation y⁻¹ = 1 := by rw [← map_mul, mul_inv_cancel₀ h0, map_one]
+    have h4 : A.valuation y * A.valuation y⁻¹ < 1 := lt_of_le_of_lt (mul_le_of_le_one_right' h2) hy
     exact absurd h3 (ne_of_lt h4)
   have hlne : (l : Ω) ≠ 0 := by
     rw [← map_natCast (algebraMap k Ω)]
     exact (map_ne_zero _).mpr (Nat.cast_ne_zero.mpr (Fact.out : l.Prime).ne_zero)
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro hA
-    let p : Ideal (𝓞 k) :=
-      { carrier := {x | A.valuation (algebraMap k Ω (x : k)) < 1}
-        add_mem' := by
-          intro a b ha hb
-          simp only [Set.mem_setOf_eq, map_add (f := _)] at *
-          exact lt_of_le_of_lt (A.valuation.map_add _ _) (max_lt ha hb)
-        zero_mem' := by simp
-        smul_mem' := by
-          intro c x hx
-          simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul] at *
-          exact lt_of_le_of_lt (mul_le_of_le_one_left' (hOk c)) hx }
+    let p : Ideal (𝓞 k) := {
+      carrier := {x | A.valuation (algebraMap k Ω (x : k)) < 1}
+      add_mem' := by
+        intro a b ha hb
+        simp only [Set.mem_setOf_eq, map_add (f := _)] at *
+        exact lt_of_le_of_lt (A.valuation.map_add _ _) (max_lt ha hb)
+      zero_mem' := by simp
+      smul_mem' := by
+        intro c x hx
+        simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul] at *
+        exact lt_of_le_of_lt (mul_le_of_le_one_left' (hOk c)) hx
+    }
     have hprime : p.IsPrime := by
       refine ⟨?_, ?_⟩
       · rw [Ne, Ideal.eq_top_iff_one]
@@ -133,15 +137,13 @@ theorem UpperTheory.V.Base.places :
         rw [hws, map_mul]
         exact lt_of_le_of_lt (mul_le_of_le_one_right' (hint s hsI)) (hσ t (hint t htI))
       set c := ∑ j ∈ Finset.range N, ∑ i ∈ Finset.range j, w ^ i with hc
-      have hcI : IsIntegral ℤ c :=
-        IsIntegral.sum _ fun j _ => IsIntegral.sum _ fun i _ => hwI.pow i
+      have hcI : IsIntegral ℤ c := IsIntegral.sum _ fun j _ => IsIntegral.sum _ fun i _ => hwI.pow i
       have hid : (N : Ω) = (1 - w) * c := by
         rw [hc, Finset.mul_sum]
         simp_rw [mul_neg_geom_sum]
         rw [Finset.sum_sub_distrib, geom_sum_eq hw1, hwN, sub_self, zero_div, sub_zero]
         simp
-      have hNv : A.valuation (N : Ω) = 1 := by
-        rw [hNdef, Nat.cast_pow, map_pow, hl1', one_pow]
+      have hNv : A.valuation (N : Ω) = 1 := by rw [hNdef, Nat.cast_pow, map_pow, hl1', one_pow]
       have hlt : A.valuation (N : Ω) < 1 := by
         rw [hid, map_mul, Valuation.map_sub_swap]
         exact lt_of_le_of_lt (mul_le_of_le_one_right' (hint c hcI)) hval

@@ -10,21 +10,25 @@ open Module
 
 namespace GlobalTheory.BadCount
 
-theorem finrank_iInf_ker_semilinear : ∀ (K V ι : Type) [Field K] [AddCommGroup V] [Module ℂ V]
-    [Finite ι] (σ : K →+* ℂ) (N : ℕ) (f : (Fin N → K) →ₛₗ[σ] V),
-    (LinearIndependent ℂ fun k => f (Pi.single k 1)) → Submodule.span ℂ (Set.range f) = ⊤ →
-    ∀ (a : ι → (Fin N → K) →ₗ[K] (Fin N → K)) (a' : ι → V →ₗ[ℂ] V),
-      (∀ i v, a' i (f v) = f (a i v)) →
-      finrank ℂ (⨅ i, LinearMap.ker (a' i) : Submodule ℂ V) =
-        finrank K (⨅ i, LinearMap.ker (a i) : Submodule K (Fin N → K)) := by
+theorem finrank_iInf_ker_semilinear
+    : ∀ (K V ι : Type) [Field K] [AddCommGroup V] [Module ℂ V] [Finite ι] (σ : K →+* ℂ) (N : ℕ)
+        (f : (Fin N → K) →ₛₗ[σ] V),
+      (LinearIndependent ℂ fun k => f (Pi.single k 1)) → Submodule.span ℂ (Set.range f) = ⊤
+        → ∀ (a : ι → (Fin N → K) →ₗ[K] (Fin N → K)) (a' : ι → V →ₗ[ℂ] V),
+          (∀ i v, a' i (f v) = f (a i v))
+            → finrank ℂ (⨅ i, LinearMap.ker (a' i) : Submodule ℂ V)
+              = finrank K (⨅ i, LinearMap.ker (a i) : Submodule K (Fin N → K)) := by
   intro K V ι _ _ _ _ σ N f hli hsp a a' ha
   letI : Algebra K ℂ := σ.toAlgebra
   letI : Module K V := Module.compHom V σ
   haveI : IsScalarTower K ℂ V := ⟨fun k c v => by
     show (σ k * c) • v = σ k • c • v
     rw [mul_smul]⟩
-  let g : (Fin N → K) →ₗ[K] V :=
-    { toFun := f, map_add' := f.map_add, map_smul' := fun k x => f.map_smulₛₗ k x }
+  let g : (Fin N → K) →ₗ[K] V := {
+    toFun := f
+    map_add' := f.map_add
+    map_smul' := fun k x => f.map_smulₛₗ k x
+  }
   have hsp' : Submodule.span ℂ (Set.range fun k => f (Pi.single k 1)) = ⊤ := by
     rw [eq_top_iff, ← hsp, Submodule.span_le]
     rintro _ ⟨x, rfl⟩

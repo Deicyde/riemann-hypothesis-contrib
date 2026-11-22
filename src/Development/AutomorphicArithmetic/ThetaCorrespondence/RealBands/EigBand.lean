@@ -8,12 +8,13 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.RealBands.Is
 open MeasureTheory Filter UpperTheory.Lit.Cusp
 open scoped Topology
 
-theorem UpperTheory.Lit.Cusp.isEig_of_isBand :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-      [SecondCountableTopology G] (N : Set G) (a : ℝ → G) (H : G → ℝ) (h : G → ℂ),
-      IsRay N a H → IsBand N H h → ∀ s : ℝ, ∃ C : ℝ,
-        IsEig N a s C (fun g => ∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * h (g * a t)) ∧
-          ∀ g, Integrable (fun t : ℝ => h (g * a t)) ∧ ∫ t : ℝ, ‖h (g * a t)‖ ≤ C := by
+theorem UpperTheory.Lit.Cusp.isEig_of_isBand
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [SecondCountableTopology G] (N : Set G) (a : ℝ → G) (H : G → ℝ) (h : G → ℂ),
+      IsRay N a H → IsBand N H h
+        → ∀ s : ℝ, ∃ C : ℝ,
+          IsEig N a s C (fun g => ∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * h (g * a t))
+            ∧ ∀ g, Integrable (fun t : ℝ => h (g * a t)) ∧ ∫ t : ℝ, ‖h (g * a t)‖ ≤ C := by
   intro G _ _ _ _ _ _ N a H h hr hb s
   obtain ⟨hc, ⟨B, hB⟩, hN, ⟨R, hR⟩⟩ := hb
   have ha := hr.cont
@@ -48,9 +49,11 @@ theorem UpperTheory.Lit.Cusp.isEig_of_isBand :
     have h1 : max (R - H g - (-R - H g)) 0 ≤ 2 * |R| :=
       max_le (by linarith [le_abs_self R]) (by positivity)
     exact mul_le_mul_of_nonneg_right h1 (abs_nonneg B)
-  have hshift : ∀ g, (∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * h (g * a t)) =
-      Complex.exp (((s * H g : ℝ) : ℂ) * Complex.I) *
-        ∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * h (g * a (t - H g)) := by
+  have hshift
+      : ∀ g,
+        (∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * h (g * a t))
+          = Complex.exp (((s * H g : ℝ) : ℂ) * Complex.I)
+            * ∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * h (g * a (t - H g)) := by
     intro g
     rw [← integral_const_mul]
     conv_lhs => rw [← integral_sub_right_eq_self _ (H g)]
@@ -79,9 +82,11 @@ theorem UpperTheory.Lit.Cusp.isEig_of_isBand :
     · exact (continuous_const.integrableOn_Icc).integrable_indicator measurableSet_Icc
     · exact Eventually.of_forall fun t => by fun_prop
   refine ⟨2 * |R| * |B|, ⟨?_, ?_, ?_, ?_⟩, fun g => ⟨hint g, hbound g⟩⟩
-  · rw [show (fun g => ∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * h (g * a t)) =
-        fun g => Complex.exp (((s * H g : ℝ) : ℂ) * Complex.I) *
-          ∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * h (g * a (t - H g)) from funext hshift]
+  · rw [show (fun g => ∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * h (g * a t))
+        = fun g =>
+          Complex.exp (((s * H g : ℝ) : ℂ) * Complex.I)
+            * ∫ t : ℝ, Complex.exp (-((s * t : ℝ) * Complex.I)) * h (g * a (t - H g)) from
+      funext hshift]
     exact (Complex.continuous_exp.comp (by fun_prop)).mul hΦ
   · intro g
     refine (norm_integral_le_integral_norm _).trans (le_of_eq_of_le ?_ (hbound g))

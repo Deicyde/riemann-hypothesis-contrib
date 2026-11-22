@@ -9,19 +9,23 @@ open Polynomial GlobalTheory.CuspGL Module.Basis
 
 namespace GlobalTheory.CuspGL
 
-
 open Module Module.Basis in
-theorem charpoly_eq_restrict_mul_mapQ {F : Type} [Field F] {V : Type} [AddCommGroup V] [Module F V]
-    [FiniteDimensional F V] (A : Submodule F V) (g : Module.End F V) (hg : ∀ x ∈ A, g x ∈ A) :
-    LinearMap.charpoly g = LinearMap.charpoly (g.restrict hg) *
-      LinearMap.charpoly (A.mapQ A g (fun x hx => hg x hx)) := by
+theorem charpoly_eq_restrict_mul_mapQ
+    {F : Type} [Field F]
+    {V : Type} [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+    (A : Submodule F V) (g : Module.End F V) (hg : ∀ x ∈ A, g x ∈ A)
+    : LinearMap.charpoly g
+      = LinearMap.charpoly (g.restrict hg)
+        * LinearMap.charpoly (A.mapQ A g (fun x hx => hg x hx)) := by
   classical
   let bA := Module.finBasis F A
   let bQ := Module.finBasis F (V ⧸ A)
   let b := sumQuot bA bQ
-  have hmat : LinearMap.toMatrix b b g = Matrix.fromBlocks (LinearMap.toMatrix bA bA (g.restrict hg))
-      (Matrix.of fun i j => b.repr (g (b (Sum.inr j))) (Sum.inl i)) 0
-      (LinearMap.toMatrix bQ bQ (A.mapQ A g (fun x hx => hg x hx))) := by
+  have hmat
+      : LinearMap.toMatrix b b g
+        = Matrix.fromBlocks (LinearMap.toMatrix bA bA (g.restrict hg))
+          (Matrix.of fun i j => b.repr (g (b (Sum.inr j))) (Sum.inl i)) 0
+          (LinearMap.toMatrix bQ bQ (A.mapQ A g (fun x hx => hg x hx))) := by
     ext i j
     rcases i with i | i <;> rcases j with j | j
     · simp only [LinearMap.toMatrix_apply, Matrix.fromBlocks_apply₁₁, b, sumQuot_inl]
@@ -37,11 +41,13 @@ theorem charpoly_eq_restrict_mul_mapQ {F : Type} [Field F] {V : Type} [AddCommGr
   rw [← LinearMap.charpoly_toMatrix g b, hmat, Matrix.charpoly_fromBlocks_zero₂₁,
     LinearMap.charpoly_toMatrix, LinearMap.charpoly_toMatrix]
 
-theorem charpoly_block : ∀ (F : Type) [Field F] (V : Type) [AddCommGroup V] [Module F V] [FiniteDimensional F V]
-    (A : Submodule F V) (g : Module.End F V) (hg : ∀ x ∈ A, g x ∈ A),
-    LinearMap.charpoly g = LinearMap.charpoly (g.restrict hg) *
-      LinearMap.charpoly (A.mapQ A g (fun x hx => hg x hx)) ∧
-    ∀ h ∈ nilRad A, LinearMap.charpoly (g + h) = LinearMap.charpoly g := by
+theorem charpoly_block
+    : ∀ (F : Type) [Field F] (V : Type) [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+        (A : Submodule F V) (g : Module.End F V) (hg : ∀ x ∈ A, g x ∈ A),
+      LinearMap.charpoly g
+          = LinearMap.charpoly (g.restrict hg)
+            * LinearMap.charpoly (A.mapQ A g (fun x hx => hg x hx))
+        ∧ ∀ h ∈ nilRad A, LinearMap.charpoly (g + h) = LinearMap.charpoly g := by
   intro F _ V _ _ _ A g hg
   refine ⟨charpoly_eq_restrict_mul_mapQ A g hg, ?_⟩
   rintro h ⟨himg, hker⟩
@@ -56,6 +62,7 @@ theorem charpoly_block : ∀ (F : Type) [Field F] (V : Type) [AddCommGroup V] [M
     simp only [LinearMap.comp_apply, Submodule.mkQ_apply, Submodule.mapQ_apply]
     rw [Submodule.Quotient.eq]
     simpa [LinearMap.add_apply] using himg x
-  rw [charpoly_eq_restrict_mul_mapQ A (g + h) hgh, charpoly_eq_restrict_mul_mapQ A g hg, hres, hquot]
+  rw [charpoly_eq_restrict_mul_mapQ A (g + h) hgh, charpoly_eq_restrict_mul_mapQ A g hg, hres,
+    hquot]
 
 end GlobalTheory.CuspGL

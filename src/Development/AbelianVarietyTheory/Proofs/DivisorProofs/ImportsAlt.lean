@@ -10,18 +10,22 @@ namespace GlobalTheory.ValuativeQuotient
 
 attribute [local instance] Algebra.TensorProduct.rightAlgebra
 
-theorem main : ∀ (V K B : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field K]
-    [Algebra V K] [IsFractionRing V K] [CommRing B] [Algebra V B] (JK : Ideal (K ⊗[V] B)),
-    ∃! J : Ideal B, Module.Flat V (B ⧸ J) ∧
-      J.map (Algebra.TensorProduct.includeRight : B →ₐ[V] K ⊗[V] B) = JK := by
+theorem main
+    : ∀ (V K B : Type) [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [Algebra V K]
+        [IsFractionRing V K] [CommRing B] [Algebra V B] (JK : Ideal (K ⊗[V] B)),
+      ∃! J : Ideal B, Module.Flat V (B ⧸ J) ∧
+        J.map (Algebra.TensorProduct.includeRight : B →ₐ[V] K ⊗[V] B) = JK := by
   intro V K B _ _ _ _ _ _ _ _ JK
   have hloc := IsLocalization.tensorRight (S := B) K (nonZeroDivisors V)
   set M := Algebra.algebraMapSubmonoid B (nonZeroDivisors V) with hM
-  have hmap : ∀ I : Ideal B,
-      I.map (Algebra.TensorProduct.includeRight : B →ₐ[V] K ⊗[V] B) =
-        I.map (algebraMap B (K ⊗[V] B)) := fun I => rfl
-  have hsmul : ∀ (J : Ideal B) (v : V) (b : B),
-      v • Ideal.Quotient.mk J b = Ideal.Quotient.mk J (algebraMap V B v * b) := by
+  have hmap
+      : ∀ I : Ideal B,
+        I.map (Algebra.TensorProduct.includeRight : B →ₐ[V] K ⊗[V] B)
+          = I.map (algebraMap B (K ⊗[V] B)) := fun I =>
+    rfl
+  have hsmul
+      : ∀ (J : Ideal B) (v : V) (b : B),
+        v • Ideal.Quotient.mk J b = Ideal.Quotient.mk J (algebraMap V B v * b) := by
     intro J v b
     rw [← Algebra.smul_def, ← Ideal.Quotient.mkₐ_eq_mk V, map_smul]
   have hflat : ∀ J : Ideal B, Module.Flat V (B ⧸ J) ↔ ∀ m ∈ M, ∀ b : B, m * b ∈ J → b ∈ J := by
@@ -29,11 +33,15 @@ theorem main : ∀ (V K B : Type) [CommRing V] [IsDomain V] [ValuationRing V] [F
     rw [Module.Flat.flat_iff_torsion_eq_bot_of_isBezout, Submodule.eq_bot_iff]
     constructor
     · rintro h m ⟨v, hv, rfl⟩ b hb
-      have h0 := h (Ideal.Quotient.mk J b) ((Submodule.mem_torsion_iff _).mpr
-        ⟨⟨v, hv⟩, by
-          show v • Ideal.Quotient.mk J b = 0
-          rw [hsmul, Ideal.Quotient.eq_zero_iff_mem]
-          exact hb⟩)
+      have h0 :=
+        h (Ideal.Quotient.mk J b)
+          ((Submodule.mem_torsion_iff _).mpr ⟨
+            ⟨v, hv⟩,
+            by
+              show v • Ideal.Quotient.mk J b = 0
+              rw [hsmul, Ideal.Quotient.eq_zero_iff_mem]
+              exact hb
+          ⟩)
       exact Ideal.Quotient.eq_zero_iff_mem.mp h0
     · intro h x hx
       obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective x

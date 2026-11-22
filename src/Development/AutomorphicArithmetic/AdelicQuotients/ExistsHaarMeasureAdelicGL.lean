@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.LocalGro
 open UpperTheory.ConvolutionTheory.G UpperTheory.ConvolutionTheory.T4
 open MeasureTheory Topology Filter
 
-theorem UpperTheory.exists_haarMeasure_adelicGL :
-    HaarEx := by
+theorem UpperTheory.exists_haarMeasure_adelicGL : HaarEx := by
   unfold HaarEx
   intro V G _ _ _ _ _ _ _ _ Gi _ _ _ _ _ _ _ _ Gv _ _ _ _ _ _ _ _ q p K hR μ μi m hμ hμi hm S
   classical
@@ -20,11 +19,12 @@ theorem UpperTheory.exists_haarMeasure_adelicGL :
   have mf : Measurable (prS q p S) := cf.measurable
   have hs : ∀ h : Gi × ∀ v : S, Gv v, ∃ u ∈ US p K S, prS q p S u = h := by
     rintro ⟨gi, gv⟩
-    obtain ⟨g, h1, h2⟩ := hR.surj gi (fun v => if hv : v ∈ S then gv ⟨v, hv⟩ else 1) (by
-      filter_upwards [S.finite_toSet.compl_mem_cofinite] with v hv
-      have hv' : v ∉ S := by simpa using hv
-      rw [dif_neg hv']
-      exact one_mem _)
+    obtain ⟨g, h1, h2⟩ :=
+      hR.surj gi (fun v => if hv : v ∈ S then gv ⟨v, hv⟩ else 1) (by
+        filter_upwards [S.finite_toSet.compl_mem_cofinite] with v hv
+        have hv' : v ∉ S := by simpa using hv
+        rw [dif_neg hv']
+        exact one_mem _)
     refine ⟨g, ?_, ?_⟩
     · intro v hv
       rw [h2, dif_neg hv]
@@ -77,8 +77,8 @@ theorem UpperTheory.exists_haarMeasure_adelicGL :
   · intro h0
     rw [h0, zero_smul] at e
     have h1 : ν Set.univ = 0 := by rw [e]; rfl
-    rw [hν, Measure.map_apply mf MeasurableSet.univ, Set.preimage_univ,
-      Measure.restrict_apply_univ] at h1
+    rw [hν, Measure.map_apply mf MeasurableSet.univ, Set.preimage_univ, Measure.restrict_apply_univ]
+      at h1
     exact (hR.opnU S).measure_ne_zero μ ⟨1, one_mem _⟩ h1
   · unfold Eul
     rw [← hν]

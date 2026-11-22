@@ -10,8 +10,11 @@ namespace Bl.general_b_fact_left_extra
 
 variable {K : Type*} [Field K] [NumberField K]
 
-theorem goal1 {ι : Type*} (w : FinitePlace K) (t : Finset ι) (a : ι → K) {M : ℝ}
-    (hM : 0 ≤ M) (h : ∀ i ∈ t, w (a i) ≤ M) : w (∑ i ∈ t, a i) ≤ M := by
+theorem goal1
+    {ι : Type*}
+    (w : FinitePlace K) (t : Finset ι) (a : ι → K)
+    {M : ℝ} (hM : 0 ≤ M) (h : ∀ i ∈ t, w (a i) ≤ M)
+    : w (∑ i ∈ t, a i) ≤ M := by
   classical
   induction t using Finset.induction_on with
   | empty => simpa using hM

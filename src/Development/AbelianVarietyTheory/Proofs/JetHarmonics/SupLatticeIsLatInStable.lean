@@ -12,7 +12,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 set_option autoImplicit false
 
-open NumberField IsDedekindDomain AlgebraicGeometry CategoryTheory Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
+open NumberField IsDedekindDomain AlgebraicGeometry CategoryTheory Formalism.BasicNotions
+  Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff SABMap)
 open GlobalTheory.FormTies
 open scoped TensorProduct
@@ -21,18 +23,20 @@ namespace GlobalTheory.FormTies
 
 section General
 
-variable {F : Type} [Field F] {K : Type} [Field K] [NumberField K] [Algebra F K]
-  {C : Type} [AddCommGroup C] [Module F C] [Module (𝓞 F) C] [IsScalarTower (𝓞 F) F C] {n : ℕ}
-
+variable
+  {F : Type} [Field F]
+  {K : Type} [Field K] [NumberField K] [Algebra F K]
+  {C : Type} [AddCommGroup C] [Module F C] [Module (𝓞 F) C] [IsScalarTower (𝓞 F) F C]
+  {n : ℕ}
 
 omit [NumberField K] [Module (𝓞 F) C] [IsScalarTower (𝓞 F) F C] in
-theorem coord_one_tmul_smul (z : (Fin n → K) ≃ₗ[K] K ⊗[F] C) (r : F) (f : C) :
-    z.symm (1 ⊗ₜ[F] (r • f)) = algebraMap F K r • z.symm (1 ⊗ₜ[F] f) := by
+theorem coord_one_tmul_smul (z : (Fin n → K) ≃ₗ[K] K ⊗[F] C) (r : F) (f : C)
+    : z.symm (1 ⊗ₜ[F] (r • f)) = algebraMap F K r • z.symm (1 ⊗ₜ[F] f) := by
   rw [← map_smul, TensorProduct.tmul_smul, TensorProduct.smul_tmul', TensorProduct.smul_tmul',
     Algebra.smul_def, smul_eq_mul]
 
-theorem spanK_span (z : (Fin n → K) ≃ₗ[K] K ⊗[F] C) (s : Set C) :
-    spanK z (Submodule.span (𝓞 F) s : Set C) = spanK z s := by
+theorem spanK_span (z : (Fin n → K) ≃ₗ[K] K ⊗[F] C) (s : Set C)
+    : spanK z (Submodule.span (𝓞 F) s : Set C) = spanK z s := by
   apply le_antisymm
   · refine Submodule.span_le.2 ?_
     rintro _ ⟨f, hf, rfl⟩
@@ -45,20 +49,26 @@ theorem spanK_span (z : (Fin n → K) ≃ₗ[K] K ⊗[F] C) (s : Set C) :
     | smul r x _ hx =>
       have hi : IsIntegral ℤ (algebraMap F K (r : F)) :=
         (RingOfIntegers.isIntegral_coe r).map (algebraMap F K).toIntAlgHom
-      have e : z.symm (1 ⊗ₜ[F] (r • x)) = (⟨algebraMap F K (r : F), hi⟩ : 𝓞 K) • z.symm (1 ⊗ₜ[F] x) := by
+      have e
+          : z.symm (1 ⊗ₜ[F] (r • x))
+            = (⟨algebraMap F K (r : F), hi⟩ : 𝓞 K) • z.symm (1 ⊗ₜ[F] x) := by
         rw [← algebraMap_smul F r x, coord_one_tmul_smul]
         rfl
       simp only [e]
       exact Submodule.smul_mem _ _ hx
   · exact Submodule.span_mono (Set.image_mono Submodule.subset_span)
 
-theorem spanK_isLatIn (z : (Fin n → K) ≃ₗ[K] K ⊗[F] C) (M : Submodule (𝓞 F) C) (hfg : M.FG)
-    (htop : Submodule.span F (M : Set C) = ⊤) : Formalism.EigenvalueLevelCeiling.IsLatIn ⊤ (spanK z (M : Set C)) := by
+theorem spanK_isLatIn
+    (z : (Fin n → K) ≃ₗ[K] K ⊗[F] C)
+    (M : Submodule (𝓞 F) C) (hfg : M.FG) (htop : Submodule.span F (M : Set C) = ⊤)
+    : Formalism.EigenvalueLevelCeiling.IsLatIn ⊤ (spanK z (M : Set C)) := by
   constructor
   · obtain ⟨s, rfl⟩ := hfg
     rw [spanK_span]
     exact Submodule.fg_span (s.finite_toSet.image _)
-  · have h1 : ∀ f : C, z.symm (1 ⊗ₜ[F] f) ∈ Submodule.span K (spanK z (M : Set C) : Set (Fin n → K)) := by
+  · have h1
+        : ∀ f : C,
+          z.symm (1 ⊗ₜ[F] f) ∈ Submodule.span K (spanK z (M : Set C) : Set (Fin n → K)) := by
       intro f
       have hf : f ∈ Submodule.span F (M : Set C) := htop ▸ Submodule.mem_top
       induction hf using Submodule.span_induction with
@@ -86,7 +96,18 @@ theorem spanK_isLatIn (z : (Fin n → K) ≃ₗ[K] K ⊗[F] C) (M : Submodule (�
 
 end General
 
-theorem supLattice_isLatIn_stable : ∀ (D : D7) (B : WeightFamilies.Prov D) (P6 : ModuliIntegralCharts.Prov D) (j : ℕ) (X : WeightAlgebra.PJ D B P6 j) (hinj : Function.Injective D.what₂.OtoLL) (EX : ErrX D) (p : ℕ) (ka wL wF : WeightFamilies.Wt D j) (T : ℕ) (K : Type) [Field K] [NumberField K] [StarRing K] [Algebra B.KO K] (Bs : DefBase K) (Df : DefSide Bs) (S : IndefData Df) (P : Type) [Group P] [Finite P] (oc : OnConst) (O : OnObj S P oc) (v : HeightOneSpectrum (𝓞 K)) (i : Bs.J) (z : (Fin (O.nZ i) → K) ≃ₗ[K] K ⊗[B.KO] B.Cusp j ka) (act : P → B.Cusp j ka → B.Cusp j ka), FormTie X hinj EX p ka wL wF T O v i z act → Submodule.IsFullLattice B.KO (B.Mlat j ka) → (∀ g, ∀ F ∈ B.Mlat j ka, act g F ∈ B.Mlat j ka) → Formalism.EigenvalueLevelCeiling.IsLatIn ⊤ (O.Ms i) ∧ ∀ g : P, (O.Ms i).map ((O.ρ i g).restrictScalars (𝓞 K)) ≤ O.Ms i := by
+theorem supLattice_isLatIn_stable
+    : ∀ (D : D7) (B : WeightFamilies.Prov D) (P6 : ModuliIntegralCharts.Prov D) (j : ℕ)
+        (X : WeightAlgebra.PJ D B P6 j) (hinj : Function.Injective D.what₂.OtoLL) (EX : ErrX D)
+        (p : ℕ) (ka wL wF : WeightFamilies.Wt D j) (T : ℕ) (K : Type) [Field K] [NumberField K]
+        [StarRing K] [Algebra B.KO K] (Bs : DefBase K) (Df : DefSide Bs) (S : IndefData Df)
+        (P : Type) [Group P] [Finite P] (oc : OnConst) (O : OnObj S P oc)
+        (v : HeightOneSpectrum (𝓞 K)) (i : Bs.J)
+        (z : (Fin (O.nZ i) → K) ≃ₗ[K] K ⊗[B.KO] B.Cusp j ka) (act : P → B.Cusp j ka → B.Cusp j ka),
+      FormTie X hinj EX p ka wL wF T O v i z act → Submodule.IsFullLattice B.KO (B.Mlat j ka)
+        → (∀ g, ∀ F ∈ B.Mlat j ka, act g F ∈ B.Mlat j ka)
+        → Formalism.EigenvalueLevelCeiling.IsLatIn ⊤ (O.Ms i)
+          ∧ ∀ g : P, (O.Ms i).map ((O.ρ i g).restrictScalars (𝓞 K)) ≤ O.Ms i := by
   intro D B P6 j X hinj EX p ka wL wF T K _ _ _ _ Bs Df S P _ _ oc O v i z act h hL hact
   rw [h.Ms_eq]
   refine ⟨spanK_isLatIn z _ hL.toIsLattice.fg hL.span_eq_top, fun g => ?_⟩

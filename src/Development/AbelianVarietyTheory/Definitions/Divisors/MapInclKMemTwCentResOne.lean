@@ -13,39 +13,52 @@ namespace GlobalTheory.LKRes.Model
 variable (p : ℕ) [Fact p.Prime] (K : IntermediateField ℚ_[p] (PadicAlgCl p))
 
 theorem sigKQ_inclK (r : ℕ) (a : K) : sigKQ p K r (inclK p K r a) = inclK p K r a := by
-  change Algebra.TensorProduct.map (AlgHom.id ℚ_[p] K) (frobQ p r) (a ⊗ₜ[ℚ_[p]] (1 : Qr p r)) = a ⊗ₜ[ℚ_[p]] (1 : Qr p r)
+  change Algebra.TensorProduct.map (AlgHom.id ℚ_[p] K) (frobQ p r) (a ⊗ₜ[ℚ_[p]] (1 : Qr p r))
+    = a ⊗ₜ[ℚ_[p]] (1 : Qr p r)
   rw [Algebra.TensorProduct.map_tmul, map_one, AlgHom.id_apply]
 
-theorem sigKQ_inclQ (r : ℕ) (b : Qr p r) : sigKQ p K r (inclQ p K r b) = inclQ p K r (frobQ p r b) := by
-  change Algebra.TensorProduct.map (AlgHom.id ℚ_[p] K) (frobQ p r) ((1 : K) ⊗ₜ[ℚ_[p]] b) = (1 : K) ⊗ₜ[ℚ_[p]] frobQ p r b
+theorem sigKQ_inclQ (r : ℕ) (b : Qr p r)
+    : sigKQ p K r (inclQ p K r b) = inclQ p K r (frobQ p r b) := by
+  change Algebra.TensorProduct.map (AlgHom.id ℚ_[p] K) (frobQ p r) ((1 : K) ⊗ₜ[ℚ_[p]] b)
+    = (1 : K) ⊗ₜ[ℚ_[p]] frobQ p r b
   rw [Algebra.TensorProduct.map_tmul, map_one]
 
-theorem frobQ_norm (r : ℕ) (b : Qr p r) : ‖((frobQ p r b : Qr p r) : PadicAlgCl p)‖ = ‖(b : PadicAlgCl p)‖ :=
+theorem frobQ_norm (r : ℕ) (b : Qr p r)
+    : ‖((frobQ p r b : Qr p r) : PadicAlgCl p)‖ = ‖(b : PadicAlgCl p)‖ :=
   norm_map_GK p (Q0 p) (frobK p (Q0 p)) b
 
-theorem frobQ_intR (r : ℕ) (b : Qr p r) (hb : b ∈ GlobalTheory.LKLoc.intR p (Q0 p) r) :
-    frobQ p r b ∈ GlobalTheory.LKLoc.intR p (Q0 p) r := by
+theorem frobQ_intR (r : ℕ) (b : Qr p r) (hb : b ∈ GlobalTheory.LKLoc.intR p (Q0 p) r)
+    : frobQ p r b ∈ GlobalTheory.LKLoc.intR p (Q0 p) r := by
   simp only [GlobalTheory.LKLoc.intR, Subring.mem_comap] at *
   have := (mem_Obar_iff (p := p)).1 hb
   exact (mem_Obar_iff (p := p)).2 (by
     show ‖((frobQ p r b : Qr p r) : PadicAlgCl p)‖ ≤ 1
-    rw [frobQ_norm]; exact this)
+    rw [frobQ_norm]
+    exact this)
 
-theorem sigKQ_intKQ (r : ℕ) (x : KQ p K r) (hx : x ∈ intKQ p K r) : sigKQ p K r x ∈ intKQ p K r := by
+theorem sigKQ_intKQ (r : ℕ) (x : KQ p K r) (hx : x ∈ intKQ p K r)
+    : sigKQ p K r x ∈ intKQ p K r := by
   have : intKQ p K r ≤ (intKQ p K r).comap (sigKQ p K r).toRingHom := by
     refine (Subring.closure_le).2 ?_
     rintro _ (⟨a, rfl⟩ | ⟨b, rfl⟩)
     · simp only [SetLike.mem_coe, Subring.mem_comap, AlgHom.toRingHom_eq_coe, RingHom.coe_coe]
-      rw [sigKQ_inclK]; exact Subring.subset_closure (Or.inl ⟨a, rfl⟩)
+      rw [sigKQ_inclK]
+      exact Subring.subset_closure (Or.inl ⟨a, rfl⟩)
     · simp only [SetLike.mem_coe, Subring.mem_comap, AlgHom.toRingHom_eq_coe, RingHom.coe_coe]
-      rw [sigKQ_inclQ]; exact Subring.subset_closure (Or.inr ⟨⟨_, frobQ_intR p r b.1 b.2⟩, rfl⟩)
+      rw [sigKQ_inclQ]
+      exact Subring.subset_closure (Or.inr ⟨⟨_, frobQ_intR p r b.1 b.2⟩, rfl⟩)
   exact this hx
 
-theorem sigRes_Kres (n r : ℕ) (g : GL (Fin n) (KQ p K r)) (hg : g ∈ Kres p K n r) :
-    sigRes p K n r g ∈ Kres p K n r := by
+theorem sigRes_Kres (n r : ℕ) (g : GL (Fin n) (KQ p K r)) (hg : g ∈ Kres p K n r)
+    : sigRes p K n r g ∈ Kres p K n r := by
   obtain ⟨h, rfl⟩ := hg
-  refine ⟨GeneralLinearGroup.map ((sigKQ p K r).toRingHom.restrict (intKQ p K r) (intKQ p K r)
-    (fun x hx => sigKQ_intKQ p K r x hx)) h, ?_⟩
+  refine ⟨
+    GeneralLinearGroup.map
+      ((sigKQ p K r).toRingHom.restrict (intKQ p K r) (intKQ p K r)
+        (fun x hx => sigKQ_intKQ p K r x hx))
+      h,
+    ?_
+  ⟩
   ext i j
   simp [sigRes, GeneralLinearGroup.map]
 
@@ -59,19 +72,28 @@ theorem mulMap_intKQ (r : ℕ) (x : KQ p K r) (hx : x ∈ intKQ p K r) : ‖mulM
     · simp only [SetLike.mem_coe, Subring.mem_comap, AlgHom.toRingHom_eq_coe, RingHom.coe_coe]
       change (mulMap p K r (a.1 ⊗ₜ[ℚ_[p]] (1 : Qr p r))) ∈ Obar p
       show (a.1 : PadicAlgCl p) * 1 ∈ Obar p
-      rw [mul_one]; exact a.2
+      rw [mul_one]
+      exact a.2
     · simp only [SetLike.mem_coe, Subring.mem_comap, AlgHom.toRingHom_eq_coe, RingHom.coe_coe]
       change (mulMap p K r ((1 : K) ⊗ₜ[ℚ_[p]] b.1)) ∈ Obar p
       show 1 * (b.1 : PadicAlgCl p) ∈ Obar p
-      rw [one_mul]; exact b.2
+      rw [one_mul]
+      exact b.2
   exact (mem_Obar_iff (p := p)).1 (this hx)
 
-theorem sigHT_KHT (m n r : ℕ) (Kw : Fin m → IntermediateField ℚ_[p] (PadicAlgCl p)) (g : GHT p m n r Kw)
-    (hg : g ∈ KHT p m n r Kw) : sigHT p m n r Kw g ∈ KHT p m n r Kw := by
+theorem sigHT_KHT
+    (m n r : ℕ) (Kw : Fin m → IntermediateField ℚ_[p] (PadicAlgCl p)) (g : GHT p m n r Kw)
+    (hg : g ∈ KHT p m n r Kw)
+    : sigHT p m n r Kw g ∈ KHT p m n r Kw := by
   refine ⟨?_, fun i hi => sigRes_Kres p (Kw i) n r _ (hg.2 i hi)⟩
   obtain ⟨h, e⟩ := hg.1
-  refine ⟨GeneralLinearGroup.map ((frobQ p r).toRingHom.restrict (GlobalTheory.LKLoc.intR p (Q0 p) r)
-    (GlobalTheory.LKLoc.intR p (Q0 p) r) (fun x hx => frobQ_intR p r x hx)) h, ?_⟩
+  refine ⟨
+    GeneralLinearGroup.map
+      ((frobQ p r).toRingHom.restrict (GlobalTheory.LKLoc.intR p (Q0 p) r)
+        (GlobalTheory.LKLoc.intR p (Q0 p) r) (fun x hx => frobQ_intR p r x hx))
+      h,
+    ?_
+  ⟩
   show _ = GlobalTheory.LKLoc.sig p (Q0 p) 1 r g.1
   rw [← e]
   ext i j

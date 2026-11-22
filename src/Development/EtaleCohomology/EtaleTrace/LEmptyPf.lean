@@ -9,15 +9,19 @@ open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC
 
 namespace LateralTheory.EtaleTrace.LEmptyPf
 
-theorem sec_subsingleton {R : Type} [CommRing R] (X : Scheme.{0}) [IsEmpty X] (F : Shv R) :
-    Subsingleton (Sec F X) := by
+theorem sec_subsingleton {R : Type} [CommRing R] (X : Scheme.{0}) [IsEmpty X] (F : Shv R)
+    : Subsingleton (Sec F X) := by
   have ht : IsTerminal (F.obj.obj (Opposite.op X)) :=
     Sheaf.isTerminalOfBotCover F X (by exact Scheme.bot_mem_grothendieckTopology X)
   have hz : IsZero (F.obj.obj (Opposite.op X)) := ht.isZero
   exact ModuleCat.subsingleton_of_isZero hz
 
-theorem pos_zero (a5 : A5) {R : Type} [CommRing R] (X : Scheme.{0}) [IsEmpty X] (F : Shv R) (n : ℤ)
-    (hn : 0 < n) (x : H R (sch.obj X) F n) : x = 0 := by
+theorem pos_zero
+    (a5 : A5)
+    {R : Type} [CommRing R]
+    (X : Scheme.{0}) [IsEmpty X]
+    (F : Shv R) (n : ℤ) (hn : 0 < n) (x : H R (sch.obj X) F n)
+    : x = 0 := by
   obtain ⟨Y, f, -, -, hx⟩ := a5 R X F n hn x
   have : IsEmpty Y := Function.isEmpty f.base
   have : IsIso f := isIso_of_isEmpty f

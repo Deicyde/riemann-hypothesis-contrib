@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
@@ -23,19 +25,21 @@ private theorem sqN_eq (N n : ℕ) : sqN N n = if IsSquare n ∧ n.Coprime N the
 
 private theorem isSquare_left {m n : ℕ} (h : m.Coprime n) (hs : IsSquare (m * n)) : IsSquare m := by
   obtain ⟨c, hc⟩ := hs
-  have hu : IsUnit (gcd m n) := by
-    rw [gcd_eq_nat_gcd, h.gcd_eq_one]; exact isUnit_one
+  have hu : IsUnit (gcd m n) := by rw [gcd_eq_nat_gcd, h.gcd_eq_one]; exact isUnit_one
   obtain ⟨d, hd⟩ := exists_eq_pow_of_mul_eq_pow (c := c) (k := 2) hu (by rw [hc, sq])
   exact ⟨d, by rw [hd, sq]⟩
 
-private theorem sqN_mul (N : ℕ) {m n : ℕ} (h : m.Coprime n) :
-    sqN N (m * n) = sqN N m * sqN N n := by
-  have e : (IsSquare (m * n) ∧ (m * n).Coprime N) ↔
-      ((IsSquare m ∧ m.Coprime N) ∧ (IsSquare n ∧ n.Coprime N)) := by
+private theorem sqN_mul (N : ℕ) {m n : ℕ} (h : m.Coprime n)
+    : sqN N (m * n) = sqN N m * sqN N n := by
+  have e
+      : (IsSquare (m * n) ∧ (m * n).Coprime N)
+        ↔ ((IsSquare m ∧ m.Coprime N) ∧ (IsSquare n ∧ n.Coprime N)) := by
     constructor
     · rintro ⟨h1, h2⟩
-      exact ⟨⟨isSquare_left h h1, Nat.Coprime.coprime_mul_right h2⟩,
-        ⟨isSquare_left h.symm (by rwa [mul_comm]), Nat.Coprime.coprime_mul_left h2⟩⟩
+      exact ⟨
+        ⟨isSquare_left h h1, Nat.Coprime.coprime_mul_right h2⟩,
+        ⟨isSquare_left h.symm (by rwa [mul_comm]), Nat.Coprime.coprime_mul_left h2⟩
+      ⟩
     · rintro ⟨⟨h1, h2⟩, h3, h4⟩
       exact ⟨h1.mul h3, Nat.Coprime.mul_left h2 h4⟩
   rw [sqN_eq, sqN_eq, sqN_eq]
@@ -58,9 +62,10 @@ private theorem isSquare_pow_iff {p : ℕ} (hp : p.Prime) (j : ℕ) : IsSquare (
   · rintro ⟨i, rfl⟩
     exact ⟨p ^ i, pow_add p i i⟩
 
-private theorem conv_pow (f g : ℕ → ℂ) {p : ℕ} (hp : p.Prime) (k : ℕ) :
-    LSeries.convolution f g (p ^ k) =
-      PowerSeries.coeff k ((PowerSeries.mk fun i => f (p ^ i)) * PowerSeries.mk fun i => g (p ^ i)) := by
+private theorem conv_pow (f g : ℕ → ℂ) {p : ℕ} (hp : p.Prime) (k : ℕ)
+    : LSeries.convolution f g (p ^ k)
+      = PowerSeries.coeff k
+        ((PowerSeries.mk fun i => f (p ^ i)) * PowerSeries.mk fun i => g (p ^ i)) := by
   rw [LSeries.convolution_def, PowerSeries.coeff_mul]
   simp only [PowerSeries.coeff_mk]
   rw [Nat.sum_divisorsAntidiagonal (fun x y => f x * g y), Nat.sum_divisors_prime_pow hp,
@@ -68,8 +73,8 @@ private theorem conv_pow (f g : ℕ → ℂ) {p : ℕ} (hp : p.Prime) (k : ℕ) 
   refine Finset.sum_congr rfl fun i hi => ?_
   rw [Nat.pow_div (Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)) hp.pos]
 
-private theorem sq_series (N : ℕ) {p : ℕ} (hp : p.Prime) (h : ¬ p ∣ N) :
-    (1 - PowerSeries.X ^ 2) * (PowerSeries.mk fun i => sqN N (p ^ i)) = (1 : PowerSeries ℂ) := by
+private theorem sq_series (N : ℕ) {p : ℕ} (hp : p.Prime) (h : ¬ p ∣ N)
+    : (1 - PowerSeries.X ^ 2) * (PowerSeries.mk fun i => sqN N (p ^ i)) = (1 : PowerSeries ℂ) := by
   have hc : p.Coprime N := (Nat.Prime.coprime_iff_not_dvd hp).2 h
   have hs : ∀ j, sqN N (p ^ j) = if Even j then 1 else 0 := by
     intro j
@@ -83,15 +88,14 @@ private theorem sq_series (N : ℕ) {p : ℕ} (hp : p.Prime) (h : ¬ p ∣ N) :
   rcases k with _ | _ | k
   · simp
   · simp
-  · have e : Even (k + 1 + 1) ↔ Even k := by
-      rw [Nat.even_add_one, Nat.even_add_one, not_not]
+  · have e : Even (k + 1 + 1) ↔ Even k := by rw [Nat.even_add_one, Nat.even_add_one, not_not]
     have e2 : k + 1 + 1 - 2 = k := by omega
-    rw [if_pos (show 2 ≤ k + 1 + 1 by omega), e2, if_neg (show ¬ (k + 1 + 1 = 0) by omega)]
+    rw [if_pos (show 2 ≤ k + 1 + 1 by omega), e2, if_neg (show ¬(k + 1 + 1 = 0) by omega)]
     simp only [e, sub_self]
 
-private theorem isMul_of (f : ℕ → ℂ) (h1 : f 1 = 1)
-    (h : ∀ m n, 0 < m → 0 < n → m.Coprime n → f (m * n) = f m * f n) :
-    (toArithmeticFunction f).IsMultiplicative := by
+private theorem isMul_of
+    (f : ℕ → ℂ) (h1 : f 1 = 1) (h : ∀ m n, 0 < m → 0 < n → m.Coprime n → f (m * n) = f m * f n)
+    : (toArithmeticFunction f).IsMultiplicative := by
   have key : ∀ n, toArithmeticFunction f n = if n = 0 then 0 else f n := fun _ => rfl
   refine ⟨by rw [key, if_neg one_ne_zero, h1], ?_⟩
   intro m n hmn
@@ -103,12 +107,17 @@ private theorem isMul_of (f : ℕ → ℂ) (h1 : f 1 = 1)
   rw [if_neg hm, if_neg hn, if_neg (mul_ne_zero hm hn),
     h m n (Nat.pos_of_ne_zero hm) (Nat.pos_of_ne_zero hn) hmn]
 
-theorem UpperTheory.eq_convolution_squareIndicator_of_euler_factors :
-    ∀ (N : ℕ) (a b : ℕ → ℂ), 0 < N → a 1 = 1 → (∀ m n, m.Coprime n → a (m * n) = a m * a n) →
-          (∀ p k : ℕ, p.Prime → p ∣ N → a (p ^ (k + 1)) = 0) → b 1 = 1 →
-          (∀ m n, 0 < m → 0 < n → m.Coprime n → b (m * n) = b m * b n) → (∀ n, ¬ n.Coprime N → b n = 0) →
-          (∀ p : ℕ, p.Prime → ¬ p ∣ N → (PowerSeries.mk fun k => a (p ^ k)) * (1 - PowerSeries.X ^ 2) = PowerSeries.mk fun k => b (p ^ k)) →
-          ∀ n, n ≠ 0 → a n = LSeries.convolution b (sqN N) n := by
+theorem UpperTheory.eq_convolution_squareIndicator_of_euler_factors
+    : ∀ (N : ℕ) (a b : ℕ → ℂ),
+      0 < N → a 1 = 1 → (∀ m n, m.Coprime n → a (m * n) = a m * a n)
+        → (∀ p k : ℕ, p.Prime → p ∣ N → a (p ^ (k + 1)) = 0) → b 1 = 1
+        → (∀ m n, 0 < m → 0 < n → m.Coprime n → b (m * n) = b m * b n)
+        → (∀ n, ¬ n.Coprime N → b n = 0)
+        → (∀ p : ℕ,
+          p.Prime → ¬ p ∣ N
+            → (PowerSeries.mk fun k => a (p ^ k)) * (1 - PowerSeries.X ^ 2)
+              = PowerSeries.mk fun k => b (p ^ k))
+        → ∀ n, n ≠ 0 → a n = LSeries.convolution b (sqN N) n := by
   intro N a b _ ha1 ham hap hb1 hbm hb0 hps n hn
   have hA := isMul_of a ha1 (fun m n _ _ h => ham m n h)
   have hB := isMul_of b hb1 hbm

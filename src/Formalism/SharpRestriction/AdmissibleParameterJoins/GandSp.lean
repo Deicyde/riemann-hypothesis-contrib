@@ -34,21 +34,27 @@ instance : CharZero (WW p) := by
   · subst h
     exact CharP.charP_to_charZero (WW p)
 
-instance : CharZero (K0 p) := charZero_of_injective_algebraMap (IsFractionRing.injective (WW p) (K0 p))
+instance : CharZero (K0 p) :=
+  charZero_of_injective_algebraMap (IsFractionRing.injective (WW p) (K0 p))
 
-theorem cc_pmap {A B : Type} [CommRing A] [CommRing B] (f : A →+* B) {a : PowerSeries A}
-    (ha : PowerSeries.constantCoeff a = 0) : PowerSeries.constantCoeff (PowerSeries.map f a) = 0 := by
+theorem cc_pmap
+    {A B : Type} [CommRing A] [CommRing B]
+    (f : A →+* B)
+    {a : PowerSeries A} (ha : PowerSeries.constantCoeff a = 0)
+    : PowerSeries.constantCoeff (PowerSeries.map f a) = 0 := by
   rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_map,
     PowerSeries.coeff_zero_eq_constantCoeff_apply, ha, map_zero]
 
-theorem expS_eq_Ex {ι : Type} {f : MvPowerSeries ι (K0 p)} (hf : constantCoeff f = 0) : expS p f = Ex f := by
+theorem expS_eq_Ex {ι : Type} {f : MvPowerSeries ι (K0 p)} (hf : constantCoeff f = 0)
+    : expS p f = Ex f := by
   ext n
   rw [coeff_Ex hf]
   rfl
 
 instance : CharZero ℂ_[p] := charZero_of_injective_algebraMap (algebraMap ℚ_[p] ℂ_[p]).injective
 
-theorem expMv_eq_Ex {ι : Type} {f : MvPowerSeries ι ℂ_[p]} (hf : constantCoeff f = 0) : expMv f = Ex f := by
+theorem expMv_eq_Ex {ι : Type} {f : MvPowerSeries ι ℂ_[p]} (hf : constantCoeff f = 0)
+    : expMv f = Ex f := by
   ext n
   rw [coeff_Ex hf]
   show ∑ k ∈ Finset.range ((n.sum fun _ k => k) + 1),
@@ -56,13 +62,17 @@ theorem expMv_eq_Ex {ι : Type} {f : MvPowerSeries ι ℂ_[p]} (hf : constantCoe
   refine Finset.sum_congr (by rfl) fun k _ => ?_
   exact div_eq_inv_mul (MvPowerSeries.coeff n (f ^ k)) (k.factorial : ℂ_[p])
 
-theorem pmap_map {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (g : B →+* C) (f : A →+* B) (a : PowerSeries A) :
-    PowerSeries.map g (PowerSeries.map f a) = PowerSeries.map (g.comp f) a := by
+theorem pmap_map
+    {A B C : Type} [CommRing A] [CommRing B] [CommRing C]
+    (g : B →+* C) (f : A →+* B) (a : PowerSeries A)
+    : PowerSeries.map g (PowerSeries.map f a) = PowerSeries.map (g.comp f) a := by
   ext n
   simp [PowerSeries.coeff_map]
 
-theorem mmap_map {ι A B C : Type} [CommRing A] [CommRing B] [CommRing C] (g : B →+* C) (f : A →+* B)
-    (a : MvPowerSeries ι A) : map g (map f a) = map (g.comp f) a := by
+theorem mmap_map
+    {ι A B C : Type} [CommRing A] [CommRing B] [CommRing C]
+    (g : B →+* C) (f : A →+* B) (a : MvPowerSeries ι A)
+    : map g (map f a) = map (g.comp f) a := by
   ext n
   simp [MvPowerSeries.coeff_map]
 
@@ -70,26 +80,36 @@ theorem cc_logF : PowerSeries.constantCoeff (logF p) = 0 := by
   rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply]
   simp [logF]
 
-theorem hs2 {τ R : Type} [CommRing R] {a b : MvPowerSeries τ R} (ha : constantCoeff a = 0) (hb : constantCoeff b = 0) :
-    HasSubst (![a, b] : Fin 2 → MvPowerSeries τ R) :=  by
+theorem hs2
+    {τ R : Type} [CommRing R]
+    {a b : MvPowerSeries τ R} (ha : constantCoeff a = 0) (hb : constantCoeff b = 0)
+    : HasSubst (![a, b] : Fin 2 → MvPowerSeries τ R) := by
   first
   | exact MvPowerSeries.hasSubst_of_constantCoeff_zero fun i => by fin_cases i <;> simp [ha, hb]
   | exact ⟨fun i => by fin_cases i <;> simp [ha, hb], fun d => Set.toFinite _⟩
 
 variable {p}
 
-theorem K1core {ι : Type} (Kc : Type) [Field Kc] [Algebra (K0 p) Kc] (Oc : Subring Kc)
+theorem K1core
+    {ι : Type}
+    (Kc : Type) [Field Kc] [Algebra (K0 p) Kc]
+    (Oc : Subring Kc)
     (witt_mem_integers_Cp : ∀ x : WW p, algebraMap (K0 p) Kc (algebraMap (WW p) (K0 p) x) ∈ Oc)
     (iC : Kc →+* ℂ_[p]) (iC_int : ∀ x : Kc, x ∈ Oc ↔ ‖iC x‖ ≤ 1)
-    (th : PowerSeries (WW p)) (th_zero : PowerSeries.constantCoeff th = 0) (th_unit : IsUnit (PowerSeries.coeff 1 th))
+    (th : PowerSeries (WW p))
+    (th_zero : PowerSeries.constantCoeff th = 0) (th_unit : IsUnit (PowerSeries.coeff 1 th))
     (lgE : PowerSeries ℂ_[p])
     (th_log : PowerSeries.subst
-      (PowerSeries.map (iC.comp ((algebraMap (K0 p) Kc).comp (algebraMap (WW p) (K0 p)))) th)
-      (PowerSeries.map (iC.comp (algebraMap (K0 p) Kc)) (logF p)) = lgE)
-    (Ph : MvPowerSeries ι (K0 p)) (hPh : constantCoeff Ph = 0) (Th : MvPowerSeries ι Kc)
-    (hInt : IntegralMv (subst (diagS lgE) (map iC Th) *
-      expMv (subst (diagS lgE) (map (iC.comp (algebraMap (K0 p) Kc)) Ph)))) :
-    ∃ U : MvPowerSeries ι Kc, Th = map (algebraMap (K0 p) Kc) (expS p (-Ph)) * U ∧ IntR Oc (inParamK p Kc U) := by
+        (PowerSeries.map (iC.comp ((algebraMap (K0 p) Kc).comp (algebraMap (WW p) (K0 p)))) th)
+        (PowerSeries.map (iC.comp (algebraMap (K0 p) Kc)) (logF p))
+      = lgE)
+    (Ph : MvPowerSeries ι (K0 p)) (hPh : constantCoeff Ph = 0)
+    (Th : MvPowerSeries ι Kc)
+    (hInt : IntegralMv
+      (subst (diagS lgE) (map iC Th)
+        * expMv (subst (diagS lgE) (map (iC.comp (algebraMap (K0 p) Kc)) Ph))))
+    : ∃ U : MvPowerSeries ι Kc,
+      Th = map (algebraMap (K0 p) Kc) (expS p (-Ph)) * U ∧ IntR Oc (inParamK p Kc U) := by
   classical
   set φ : WW p →+* Kc := (algebraMap (K0 p) Kc).comp (algebraMap (WW p) (K0 p)) with hφ
   set th' : PowerSeries Kc := PowerSeries.map φ th with hth'
@@ -97,7 +117,8 @@ theorem K1core {ι : Type} (Kc : Type) [Field Kc] [Algebra (K0 p) Kc] (Oc : Subr
   have hth'0 : PowerSeries.constantCoeff th' = 0 := cc_pmap φ th_zero
   have hlg0 : PowerSeries.constantCoeff lg = 0 := cc_pmap _ (cc_logF p)
   set ps : PowerSeries (WW p) := th.substInvOfIsUnit th_unit with hps
-  have hps0 : PowerSeries.constantCoeff ps = 0 := PowerSeries.constantCoeff_substInvOfIsUnit th th_unit
+  have hps0 : PowerSeries.constantCoeff ps = 0 :=
+    PowerSeries.constantCoeff_substInvOfIsUnit th th_unit
   have hinv0 : PowerSeries.subst ps th = PowerSeries.X :=
     PowerSeries.subst_substInvOfIsUnit_right th th_zero th_unit
   set ps' : PowerSeries Kc := PowerSeries.map φ ps with hps'
@@ -114,11 +135,15 @@ theorem K1core {ι : Type} (Kc : Type) [Field Kc] [Algebra (K0 p) Kc] (Oc : Subr
     have hs : HasSubst (fun _ : Unit => th') := by
       first
       | exact PowerSeries.HasSubst.of_constantCoeff_zero' hth'0
-      | exact ⟨fun _ => by rw [show MvPowerSeries.constantCoeff th' = 0 from hth'0]; exact IsNilpotent.zero,
-          fun d => Set.toFinite _⟩
+      | exact ⟨
+          fun _ => by
+            rw [show MvPowerSeries.constantCoeff th' = 0 from hth'0]; exact IsNilpotent.zero,
+          fun d => Set.toFinite _
+        ⟩
     exact MvPowerSeries.constantCoeff_subst_eq_zero hs (fun _ => hth'0) hlg0
   have hlgE : PowerSeries.map iC (PowerSeries.subst th' lg) = lgE := by
-    have h1 := PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero' hth'0) (h := iC) lg
+    have h1 :=
+      PowerSeries.map_subst (PowerSeries.HasSubst.of_constantCoeff_zero' hth'0) (h := iC) lg
     refine h1.trans ?_
     rw [← th_log]
     show PowerSeries.subst (PowerSeries.map iC (PowerSeries.map φ th))
@@ -130,18 +155,21 @@ theorem K1core {ι : Type} (Kc : Type) [Field Kc] [Algebra (K0 p) Kc] (Oc : Subr
   have hc : constantCoeff (map (iC.comp (algebraMap (K0 p) Kc)) Ph) = 0 := by
     rw [MvPowerSeries.constantCoeff_map, hPh, map_zero]
   have hc' := MvPowerSeries.constantCoeff_subst_eq_zero (hs_dg hlgE0) (cc_dg hlgE0) hc
-  have hE : subst (diagS lgE) (map (iC.comp (algebraMap (K0 p) Kc)) (expS p Ph)) =
-      expMv (subst (diagS lgE) (map (iC.comp (algebraMap (K0 p) Kc)) Ph)) := by
+  have hE
+      : subst (diagS lgE) (map (iC.comp (algebraMap (K0 p) Kc)) (expS p Ph))
+        = expMv (subst (diagS lgE) (map (iC.comp (algebraMap (K0 p) Kc)) Ph)) := by
     rw [expS_eq_Ex p hPh, map_Ex _ hPh, subst_Ex (hs_dg hlgE0) hc, expMv_eq_Ex p hc']
   refine ⟨map (algebraMap (K0 p) Kc) (expS p Ph) * Th, ?_, ?_⟩
   · have hn : constantCoeff (-Ph) = 0 := by rw [map_neg, hPh, neg_zero]
     rw [← mul_assoc, ← map_mul, expS_eq_Ex p hn, expS_eq_Ex p hPh, Ex_neg_mul hPh, map_one, one_mul]
-  · have hInt' : IntegralMv (subst (diagS lgE) (map iC (map (algebraMap (K0 p) Kc) (expS p Ph) * Th))) := by
+  · have hInt' : IntegralMv (subst (diagS lgE)
+        (map iC (map (algebraMap (K0 p) Kc) (expS p Ph) * Th))) := by
       rw [map_mul, mmap_map, MvPowerSeries.subst_mul (hs_dg hlgE0), hE, mul_comm]
       exact hInt
-    have key : map iC (subst (diagS (PowerSeries.subst th' lg))
-        (map (algebraMap (K0 p) Kc) (expS p Ph) * Th)) =
-        subst (diagS lgE) (map iC (map (algebraMap (K0 p) Kc) (expS p Ph) * Th)) := by
+    have key
+        : map iC
+            (subst (diagS (PowerSeries.subst th' lg)) (map (algebraMap (K0 p) Kc) (expS p Ph) * Th))
+          = subst (diagS lgE) (map iC (map (algebraMap (K0 p) Kc) (expS p Ph) * Th)) := by
       rw [MvPowerSeries.map_subst (hs_dg hlgK0)]
       congr 1
       funext i

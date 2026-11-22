@@ -15,23 +15,39 @@ open ValuativeRel Matrix
 
 namespace GlobalTheory.RankCoinv
 
-theorem mem_lowRank_succ_sup_twistSpan_of_mem_lowRank : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D] (ϖ : kˣ), GlobalTheory.SplitFlip.IsUnif ϖ → ∀ (ν β : kˣ →* ℂˣ), (∀ x, ‖(ν x : ℂ)‖ = 1) → ν ϖ ≠ 1 → ∀ (r : ℕ), r < Fintype.card A → ∀ Φ ∈ (GlobalTheory.RankCoinv.lowRank r : Submodule ℂ (Matrix A D k → ℂ)), Φ ∈ GlobalTheory.RankCoinv.lowRank (r + 1) ⊔ GlobalTheory.RankCoinv.twistSpan ν β := by
+theorem mem_lowRank_succ_sup_twistSpan_of_mem_lowRank
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D] (ϖ : kˣ),
+      GlobalTheory.SplitFlip.IsUnif ϖ
+        → ∀ (ν β : kˣ →* ℂˣ),
+          (∀ x, ‖(ν x : ℂ)‖ = 1) → ν ϖ ≠ 1
+            → ∀ (r : ℕ),
+              r < Fintype.card A
+                → ∀ Φ ∈ (GlobalTheory.RankCoinv.lowRank r : Submodule ℂ (Matrix A D k → ℂ)),
+                  Φ ∈ GlobalTheory.RankCoinv.lowRank (r + 1)
+                    ⊔ GlobalTheory.RankCoinv.twistSpan ν β := by
   intro k _ _ _ _ A D _ _ _ _ ϖ hϖ ν β hν hνϖ r hr Φ hΦ
   obtain ⟨⟨hlc, hcs⟩, hvan⟩ := hΦ
   classical
-
   have hSclosed : IsClosed {X : Matrix A D k | Φ X ≠ 0} := by
     have : {X : Matrix A D k | Φ X ≠ 0} = (Φ ⁻¹' {0})ᶜ := by ext; simp
-    rw [this]; exact (hlc.isOpen_fiber 0).isClosed_compl
+    rw [this]
+    exact (hlc.isOpen_fiber 0).isClosed_compl
   have hScpt : IsCompact {X : Matrix A D k | Φ X ≠ 0} :=
     hcs.isCompact.of_isClosed_subset hSclosed (fun X hX => subset_tsupport Φ hX)
 
   let m₀ : Matrix A D k → ℕ := fun X =>
-    if h : X.rank = r then Classical.choose (GlobalTheory.T.low_rank_box_function_stable k A D ϖ hϖ ν β hν hνϖ r X h hr) else 0
-  have hm₀ : ∀ X : Matrix A D k, ∀ h : X.rank = r, ∀ m ≥ m₀ X, ∀ C ∈ box ϖ X (fun _ => m₀ X),
-      boxFn ϖ C (fun _ => m) ∈ lowRank (r + 1) ⊔ twistSpan ν β := by
+    if h : X.rank = r then
+      Classical.choose (GlobalTheory.T.low_rank_box_function_stable k A D ϖ hϖ ν β hν hνϖ r X h hr)
+    else
+      0
+  have hm₀
+      : ∀ X : Matrix A D k, ∀ h : X.rank = r, ∀ m ≥ m₀ X, ∀ C ∈ box ϖ X (fun _ => m₀ X),
+        boxFn ϖ C (fun _ => m) ∈ lowRank (r + 1) ⊔ twistSpan ν β := by
     intro X h
-    have := Classical.choose_spec (GlobalTheory.T.low_rank_box_function_stable k A D ϖ hϖ ν β hν hνϖ r X h hr)
+    have :=
+      Classical.choose_spec (GlobalTheory.T.low_rank_box_function_stable k A D ϖ hϖ ν β hν hνϖ r X h
+        hr)
     simpa [m₀, h] using this
   let U : Matrix A D k → Set (Matrix A D k) := fun X =>
     if X.rank ≤ r then box ϖ X (fun _ => m₀ X) else {Y | r + 1 ≤ Y.rank}
@@ -40,9 +56,11 @@ theorem mem_lowRank_succ_sup_twistSpan_of_mem_lowRank : ∀ (k : Type) [Field k]
     by_cases h : X.rank ≤ r
     · simp only [U, h, if_true]
       refine (isClopen_box ϖ X _).isOpen.mem_nhds ?_
-      intro i j; simp
+      intro i j
+      simp
     · simp only [U, h, if_false]
-      exact (GlobalTheory.T.isOpen_rank_ge k A D (r + 1)).mem_nhds (by simp only [Set.mem_setOf_eq]; omega)
+      exact (GlobalTheory.T.isOpen_rank_ge k A D (r + 1)).mem_nhds
+        (by simp only [Set.mem_setOf_eq]; omega)
   obtain ⟨t, htS, hcover⟩ := hScpt.elim_nhds_subcover U hU
   obtain ⟨m₁, hm₁⟩ := GlobalTheory.T.schwartz_bruhat_box_decomposition k A D ϖ hϖ Φ ⟨hlc, hcs⟩
   obtain ⟨s, hdec, hconst⟩ := hm₁ (max m₁ (t.sup m₀)) (le_max_left _ _)
@@ -73,8 +91,7 @@ theorem mem_lowRank_succ_sup_twistSpan_of_mem_lowRank : ∀ (k : Type) [Field k]
   · push_neg at hex
     refine Submodule.smul_mem _ _ (Submodule.mem_sup_left ?_)
     refine ⟨boxFn_mem_SB ϖ c _, fun Y hY => ?_⟩
-    have hYn : Y ∉ box ϖ c (fun _ => m) := fun hYb => by
-      have := hex Y hYb; omega
+    have hYn : Y ∉ box ϖ c (fun _ => m) := fun hYb => by have := hex Y hYb; omega
     simp [boxFn, Set.indicator_of_notMem hYn]
 
 end GlobalTheory.RankCoinv

@@ -18,7 +18,10 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ActAApply
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.WeilParts
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.WeilParts
 open scoped TensorProduct Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -34,23 +37,25 @@ theorem continuous_mt (V : HSp D) : Continuous (Formalism.L2.Theta.mt V) :=
 theorem continuous_mt_inv (V : HSp D) : Continuous fun g : GA D V => Formalism.L2.Theta.mt V g⁻¹ :=
   Units.continuous_coe_inv.comp continuous_subtype_val
 
-theorem continuous_actO (S T : HSp D) (x : WO S T) :
-    Continuous fun p : GA D S × GA D T => actO S T p.1 p.2 x := by
-  have h1 : Continuous fun p : GA D S × GA D T => Formalism.L2.Theta.mt T p.2 := (continuous_mt T).comp continuous_snd
-  have h2 : Continuous fun p : GA D S × GA D T => Formalism.L2.Theta.mt S p.1⁻¹ := (continuous_mt_inv S).comp continuous_fst
+theorem continuous_actO (S T : HSp D) (x : WO S T)
+    : Continuous fun p : GA D S × GA D T => actO S T p.1 p.2 x := by
+  have h1 : Continuous fun p : GA D S × GA D T => Formalism.L2.Theta.mt T p.2 :=
+    (continuous_mt T).comp continuous_snd
+  have h2 : Continuous fun p : GA D S × GA D T => Formalism.L2.Theta.mt S p.1⁻¹ :=
+    (continuous_mt_inv S).comp continuous_fst
   exact (h1.matrix_mul continuous_const).matrix_mul h2
 
 theorem actO_one (S T : HSp D) (x : WO S T) : actO S T 1 1 x = x := by
   have h : ∀ V : HSp D, Formalism.L2.Theta.mt V 1 = 1 := fun _ => rfl
   rw [actO, inv_one, h, h, Matrix.one_mul, Matrix.mul_one]
 
-theorem actO_smul {S T : HSp D} (g : GA D S) (h : GA D T) (a : AE D) (x : WO S T) :
-    actO S T g h (a • x) = a • actO S T g h x := by
+theorem actO_smul {S T : HSp D} (g : GA D S) (h : GA D T) (a : AE D) (x : WO S T)
+    : actO S T g h (a • x) = a • actO S T g h x := by
   unfold actO
   rw [Matrix.mul_smul, Matrix.smul_mul]
 
-theorem actO_add {S T : HSp D} (g : GA D S) (h : GA D T) (x y : WO S T) :
-    actO S T g h (x + y) = actO S T g h x + actO S T g h y := by
+theorem actO_add {S T : HSp D} (g : GA D S) (h : GA D T) (x y : WO S T)
+    : actO S T g h (x + y) = actO S T g h x + actO S T g h y := by
   unfold actO
   rw [Matrix.mul_add, Matrix.add_mul]
 
@@ -63,30 +68,41 @@ theorem fin_iff {S T : HSp D} {u : WO S T} : u.map (infPart D) = 0 ↔ realIdem 
     rw [Matrix.smul_apply, smul_eq_mul, RingHom.map_mul, infPart_realIdem, one_mul] at h1
     exact h1.trans (infPart D).map_zero
 
-theorem actO_fin {S T : HSp D} (g : GA D S) (h : GA D T) {u : WO S T} (hu : u.map (infPart D) = 0) :
-    (actO S T g h u).map (infPart D) = 0 := by
+theorem actO_fin {S T : HSp D} (g : GA D S) (h : GA D T) {u : WO S T} (hu : u.map (infPart D) = 0)
+    : (actO S T g h u).map (infPart D) = 0 := by
   rw [fin_iff] at hu ⊢
   rw [← actO_smul, hu, actO, Matrix.mul_zero, Matrix.zero_mul]
 
-theorem continuous_sub_const' {X G : Type} [TopologicalSpace X] [AddCommGroup G] [TopologicalSpace G]
-    [IsTopologicalAddGroup G] {f : X → G} (hf : Continuous f) (x : G) : Continuous fun p => f p - x :=
+theorem continuous_sub_const'
+    {X G : Type}
+    [TopologicalSpace X] [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+    {f : X → G} (hf : Continuous f)
+    (x : G)
+    : Continuous fun p => f p - x :=
   hf.sub continuous_const
 
 theorem sub_nsmul_zero {G : Type} [AddCommGroup G] (x : G) (N : ℕ) : x - x - N • (0 : G) = 0 := by
   rw [sub_self, smul_zero, sub_self]
 
-theorem eventually_move (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
-    (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (hS : IsSelfDualC S ΛS) (hT : IsSelfDualC T ΛT)
-    (x : WO S T) (hx : x.map (infPart D) = 0) (N : ℕ) (hN : 0 < N) :
-    ∀ᶠ p : GA D S × GA D T in 𝓝 1, ∃ l ∈ (latO S T (ΛS : Set (Fin S.rank → D.host.E))
-      (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True), actO S T p.1 p.2 x = x + N • l := by
+theorem eventually_move
+    (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+    (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (hS : IsSelfDualC S ΛS)
+    (hT : IsSelfDualC T ΛT) (x : WO S T) (hx : x.map (infPart D) = 0)
+    (N : ℕ) (hN : 0 < N)
+    : ∀ᶠ p : GA D S × GA D T in 𝓝 1, ∃ l ∈ (latO S T (ΛS : Set (Fin S.rank → D.host.E))
+        (ΛT : Set (Fin T.rank → D.host.E)) fun _ => True), actO S T p.1 p.2 x = x + N • l := by
   have hO := GlobalTheory.LatOpen.isOpen_nsmul_latO D S T ΛS ΛT hS hT N hN
   have hc : Continuous fun p : GA D S × GA D T => actO S T p.1 p.2 x - x :=
     continuous_sub_const' (continuous_actO S T x) x
-  have h1 := (hO.preimage hc).mem_nhds (x := 1) ⟨0, AddSubgroup.zero_mem _, by
-    show (actO S T 1 1 x - x - N • (0 : WO S T)).map (finPart D) = 0
-    rw [actO_one, sub_nsmul_zero]
-    exact Matrix.ext fun _ _ => (finPart D).map_zero⟩
+  have h1 :=
+    (hO.preimage hc).mem_nhds (x := 1) ⟨
+      0,
+      AddSubgroup.zero_mem _,
+      by
+        show (actO S T 1 1 x - x - N • (0 : WO S T)).map (finPart D) = 0
+        rw [actO_one, sub_nsmul_zero]
+        exact Matrix.ext fun _ _ => (finPart D).map_zero
+    ⟩
   filter_upwards [h1] with p hp
   obtain ⟨l, hl, e⟩ := hp
   refine ⟨l, hl, ?_⟩
@@ -96,8 +112,9 @@ theorem eventually_move (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.ra
     have a3 := fin_iff.1 (latO_fin (AddSubgroup.nsmul_mem _ hl N))
     rw [fin_iff, smul_sub, smul_sub, a1, a2, a3, sub_zero, sub_zero]
   have hz : actO S T p.1 p.2 x - x - N • l = 0 :=
-    Matrix.ext fun i j => adele_ext ((congrFun (congrFun hi i) j).trans (infPart D).map_zero.symm)
-      ((congrFun (congrFun e i) j).trans (finPart D).map_zero.symm)
+    Matrix.ext fun i j =>
+      adele_ext ((congrFun (congrFun hi i) j).trans (infPart D).map_zero.symm)
+        ((congrFun (congrFun e i) j).trans (finPart D).map_zero.symm)
   rw [sub_sub, sub_eq_zero] at hz
   exact hz
 

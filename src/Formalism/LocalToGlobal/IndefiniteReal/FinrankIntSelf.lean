@@ -153,8 +153,7 @@ lemma int_eq_zero {T U : Type} [AddCommGroup T] [Module K T] [FiniteDimensional 
   show LinearMap.trace K T (τ g) = LinearMap.trace K U (σ g)
   rw [← hconj, LinearMap.trace_conj']
 
-def eAlg {T : Type} [AddCommGroup T] [Module K T] (τ : Representation K G T) :
-    MonoidAlgebra K G :=
+def eAlg {T : Type} [AddCommGroup T] [Module K T] (τ : Representation K G T) : MonoidAlgebra K G :=
   ∑ x : G, MonoidAlgebra.single x (charOf τ 1 / (Fintype.card G : K) * charOf τ x⁻¹)
 
 lemma asAlg_eAlg {T V : Type} [AddCommGroup T] [Module K T] [AddCommGroup V] [Module K V]
@@ -219,8 +218,10 @@ theorem schur : Schur := by
     haveI := hnt s
     exact_mod_cast (Module.finrank_pos (R := K) (M := T s)).ne'
   have hcard : (Fintype.card G : K) ≠ 0 := by exact_mod_cast Fintype.card_ne_zero
-  have htr : ∀ s t, LinearMap.trace K (T t) (eS (τ s) (τ t)) =
-      (finrank K (T s) : K) * finrank K (Representation.IntertwiningMap (τ s) (τ t)) := by
+  have htr
+      : ∀ s t,
+        LinearMap.trace K (T t) (eS (τ s) (τ t))
+          = (finrank K (T s) : K) * finrank K (Representation.IntertwiningMap (τ s) (τ t)) := by
     intro s t
     rw [trace_eS, sum_char_eq, hdim]
     field_simp
@@ -244,16 +245,21 @@ theorem schur : Schur := by
         (int_eq_zero (τ s) (τ t) (hirr s) (hirr t) hne g).symm⟩
     have h1 := htr s t
     rw [hc, map_smul, LinearMap.trace_id, smul_eq_mul,
-      Module.finrank_zero_of_subsingleton (R := K) (M := Representation.IntertwiningMap (τ s) (τ t)),
-      Nat.cast_zero, mul_zero] at h1
+        Module.finrank_zero_of_subsingleton (R := K)
+          (M := Representation.IntertwiningMap (τ s) (τ t)),
+        Nat.cast_zero, mul_zero]
+      at h1
     have h3 : c = 0 := (mul_eq_zero.1 h1).resolve_right (hpos t)
     rw [hc, h3, zero_smul]
 
 theorem idemE : IdemE := by
   intro K _ _ G _ _ S T _ _ _ τ hgood V _ _ ρ
   obtain ⟨h1, h2, -⟩ := schur K G S T τ hgood
-  have key : ∀ s t, eS (τ s) ρ ∘ₗ eS (τ t) ρ = (charOf (τ s) 1 / (Fintype.card G : K)) •
-      ∑ g : G, LinearMap.trace K (T s) (eS (τ t) (τ s) * τ s g⁻¹) • ρ g := by
+  have key
+      : ∀ s t,
+        eS (τ s) ρ ∘ₗ eS (τ t) ρ
+          = (charOf (τ s) 1 / (Fintype.card G : K))
+            • ∑ g : G, LinearMap.trace K (T s) (eS (τ t) (τ s) * τ s g⁻¹) • ρ g := by
     intro s t
     rw [← Module.End.mul_eq_comp, ← asAlg_eAlg (τ t) ρ, eS_mul_asAlg, asAlg_eAlg]
   refine ⟨fun s => ?_, fun s t hst => ?_⟩
@@ -267,11 +273,16 @@ theorem idemP_of (h : CharFacts) : IdemP := by
   intro K _ _ G _ _ V _ _ _ _ ρ
   have hs' : ∀ (r : 𝓞 K) (v : V), ((r : K)) • v = r • v := fun r v => algebraMap_smul K r v
   have hcard : (Fintype.card G : K) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
-  refine ⟨fun T _ _ _ τ => ⟨fun g => eS_comm τ ρ g,
-    fun H χ => comm_epP ρ (eS τ ρ) (fun g => eS_comm τ ρ g) H χ, fun A hA a ha => ?_⟩,
-    fun H χ => ⟨?_, fun A hA a ha => ?_⟩⟩
-  · have hint : ∀ x : G, IsIntegral ℤ (charOf τ 1 * charOf τ x⁻¹) :=
-      fun x => (h K G T τ 1).1.mul (h K G T τ x⁻¹).1
+  refine ⟨
+    fun T _ _ _ τ => ⟨
+      fun g => eS_comm τ ρ g,
+      fun H χ => comm_epP ρ (eS τ ρ) (fun g => eS_comm τ ρ g) H χ,
+      fun A hA a ha => ?_
+    ⟩,
+    fun H χ => ⟨?_, fun A hA a ha => ?_⟩
+  ⟩
+  · have hint : ∀ x : G, IsIntegral ℤ (charOf τ 1 * charOf τ x⁻¹) := fun x =>
+      (h K G T τ 1).1.mul (h K G T τ x⁻¹).1
     have hd : (Fintype.card G : K) * (charOf τ 1 / (Fintype.card G : K)) = charOf τ 1 := by
       field_simp
     rw [← hs', show ((Fintype.card G : 𝓞 K) : K) = (Fintype.card G : K) by simp, eS,
@@ -287,7 +298,8 @@ theorem idemP_of (h : CharFacts) : IdemP := by
   · have hn : (Nat.card H : K) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
     show epP H χ ρ * epP H χ ρ = epP H χ ρ
     unfold epP
-    exact idem_gen (fun h : H => (((χ h⁻¹ : (𝓞 K)ˣ) : 𝓞 K) : K))
+    exact idem_gen
+      (fun h : H => (((χ h⁻¹ : (𝓞 K)ˣ) : 𝓞 K) : K))
       (fun h k => by simp only [mul_inv_rev, map_mul, Units.val_mul]; ring)
       (ρ.comp H.subtype) hn
   · have hn : (Nat.card H : K) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'

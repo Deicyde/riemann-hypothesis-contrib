@@ -20,13 +20,15 @@ section General
 
 variable {A S M : Type*} [CommRing A] [CommRing S] [Algebra A S] [AddCommGroup M] [Module S M]
 
-theorem isDerOn_mono {B B' : Subalgebra A S} {D : S → M} (h : IsDerOn B D) (hle : B' ≤ B) :
-    IsDerOn B' D :=
-  ⟨fun x hx y hy => h.add x (hle hx) y (hle hy), fun x hx y hy => h.mul x (hle hx) y (hle hy),
-    h.alg⟩
+theorem isDerOn_mono {B B' : Subalgebra A S} {D : S → M} (h : IsDerOn B D) (hle : B' ≤ B)
+    : IsDerOn B' D := ⟨
+  fun x hx y hy => h.add x (hle hx) y (hle hy),
+  fun x hx y hy => h.mul x (hle hx) y (hle hy),
+  h.alg
+⟩
 
-theorem isDerOn_sub {B : Subalgebra A S} {D₁ D₂ : S → M} (h₁ : IsDerOn B D₁) (h₂ : IsDerOn B D₂) :
-    IsDerOn B (fun x => D₁ x - D₂ x) := by
+theorem isDerOn_sub {B : Subalgebra A S} {D₁ D₂ : S → M} (h₁ : IsDerOn B D₁) (h₂ : IsDerOn B D₂)
+    : IsDerOn B (fun x => D₁ x - D₂ x) := by
   refine ⟨?_, ?_, ?_⟩
   · intro x hx y hy
     simp only [h₁.add x hx y hy, h₂.add x hx y hy]
@@ -37,8 +39,9 @@ theorem isDerOn_sub {B : Subalgebra A S} {D₁ D₂ : S → M} (h₁ : IsDerOn B
   · intro a
     simp [h₁.alg a, h₂.alg a]
 
-theorem isDerOn_pow {B : Subalgebra A S} {D : S → M} (h : IsDerOn B D) {x : S} (hx : x ∈ B)
-    {n : ℕ} (hn : 1 ≤ n) : D (x ^ n) = ((n : S) * x ^ (n - 1)) • D x := by
+theorem isDerOn_pow
+    {B : Subalgebra A S} {D : S → M} (h : IsDerOn B D) {x : S} (hx : x ∈ B) {n : ℕ} (hn : 1 ≤ n)
+    : D (x ^ n) = ((n : S) * x ^ (n - 1)) • D x := by
   obtain ⟨k, rfl⟩ : ∃ k, n = k + 1 := ⟨n - 1, by omega⟩
   simp only [Nat.add_sub_cancel]
   induction k with
@@ -77,43 +80,48 @@ theorem towerAlg_le_iSup (T : Tower p Ω) : towerAlg T ≤ ⨆ m, levelAlg T (m 
   · exact le_iSup (fun k => levelAlg T (k + 1)) m (levelAlg_le_succ T m (zS_mem_levelAlg T m))
   · exact le_iSup (fun k => levelAlg T (k + 1)) m (levelAlg_le_succ T m (qS_mem_levelAlg T m))
 
-theorem exists_level (hC : IsClo p Ω) (T : Tower p Ω) (n : ℕ) (hn : 1 ≤ n) :
-    ∃ D : integralClosure (O0 p) Ω → Frac p Ω, IsDerOn (levelAlg T n) D ∧ D (zS T n) = 0 ∧
-      D (qS T n) = Submodule.Quotient.mk (T.qq n / (p : Ω) ^ n) := by
+theorem exists_level (hC : IsClo p Ω) (T : Tower p Ω) (n : ℕ) (hn : 1 ≤ n)
+    : ∃ D : integralClosure (O0 p) Ω → Frac p Ω,
+      IsDerOn (levelAlg T n) D ∧ D (zS T n) = 0
+        ∧ D (qS T n) = Submodule.Quotient.mk (T.qq n / (p : Ω) ^ n) := by
   haveI : CharZero Ω := charZero_of_injective_algebraMap hC.inj
   have hp0 : (p : Ω) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : p.Prime).ne_zero
-  refine GlobalTheory.T.exists_derivation_towerLevelAlgebra_prescribed p Ω hC T n hn (Frac p Ω) 0 _ (smul_zero _) ?_
+  refine GlobalTheory.T.exists_derivation_towerLevelAlgebra_prescribed p Ω hC T n hn (Frac p Ω) 0 _
+    (smul_zero _) ?_
   rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
   refine ⟨algebraMap (O0 p) (integralClosure (O0 p) Ω) (qO p), ?_⟩
   have hpn : p ^ n ≠ 0 := pow_ne_zero _ (Fact.out : p.Prime).ne_zero
   rw [Algebra.linearMap_apply, ← IsScalarTower.algebraMap_apply, Subalgebra.smul_def, smul_eq_mul]
-  have key : (((p : integralClosure (O0 p) Ω) ^ n * qS T n ^ (p ^ n - 1) :
-      integralClosure (O0 p) Ω) : Ω) = (p : Ω) ^ n * T.qq n ^ (p ^ n - 1) := by
+  have key
+      : (((p : integralClosure (O0 p) Ω) ^ n * qS T n ^ (p ^ n - 1) : integralClosure (O0 p) Ω) : Ω)
+        = (p : Ω) ^ n * T.qq n ^ (p ^ n - 1) := by
     simp [qS]
   rw [key, ← GlobalTheory.AlmostEt.qq_pow T n]
   field_simp
   rw [pow_sub_one_mul hpn]
 
-theorem smul_mk_eq (hC : IsClo p Ω) (T : Tower p Ω) (m : ℕ) :
-    ((p : integralClosure (O0 p) Ω) * qS T (m + 1) ^ (p - 1)) •
-        (Submodule.Quotient.mk (T.qq (m + 1) / (p : Ω) ^ (m + 1)) : Frac p Ω) =
-      Submodule.Quotient.mk (T.qq m / (p : Ω) ^ m) := by
+theorem smul_mk_eq (hC : IsClo p Ω) (T : Tower p Ω) (m : ℕ)
+    : ((p : integralClosure (O0 p) Ω) * qS T (m + 1) ^ (p - 1))
+        • (Submodule.Quotient.mk (T.qq (m + 1) / (p : Ω) ^ (m + 1)) : Frac p Ω)
+      = Submodule.Quotient.mk (T.qq m / (p : Ω) ^ m) := by
   haveI : CharZero Ω := charZero_of_injective_algebraMap hC.inj
   have hp0 : (p : Ω) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : p.Prime).ne_zero
   have hpn : p ≠ 0 := (Fact.out : p.Prime).ne_zero
   rw [← Submodule.Quotient.mk_smul]
   congr 1
   rw [Subalgebra.smul_def, smul_eq_mul]
-  have key : (((p : integralClosure (O0 p) Ω) * qS T (m + 1) ^ (p - 1) :
-      integralClosure (O0 p) Ω) : Ω) = (p : Ω) * T.qq (m + 1) ^ (p - 1) := by
+  have key
+      : (((p : integralClosure (O0 p) Ω) * qS T (m + 1) ^ (p - 1) : integralClosure (O0 p) Ω) : Ω)
+        = (p : Ω) * T.qq (m + 1) ^ (p - 1) := by
     simp [qS]
   rw [key, ← T.qpow m, ← pow_sub_one_mul hpn (T.qq (m + 1)), pow_succ]
   field_simp
 
-theorem exists_qDer (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω]
-    (hC : IsClo p Ω) (T : Tower p Ω) :
-    ∃ D : (integralClosure (O0 p) Ω) → Frac p Ω, IsDerOn (towerAlg T) D ∧
-      ∀ m : ℕ, D (zS T m) = 0 ∧ D (qS T m) = Submodule.Quotient.mk (T.qq m / (p : Ω) ^ m) := by
+theorem exists_qDer
+    (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω] (hC : IsClo p Ω) (T : Tower p Ω)
+    : ∃ D : (integralClosure (O0 p) Ω) → Frac p Ω,
+      IsDerOn (towerAlg T) D
+        ∧ ∀ m : ℕ, D (zS T m) = 0 ∧ D (qS T m) = Submodule.Quotient.mk (T.qq m / (p : Ω) ^ m) := by
   have hp1 : 1 ≤ p := (Fact.out : p.Prime).one_lt.le
   choose Dl hDl hz hq using fun m : ℕ => exists_level hC T (m + 1) (by omega)
 
@@ -125,17 +133,24 @@ theorem exists_qDer (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0
   have hcomp : ∀ m, ∀ x ∈ levelAlg T (m + 1), Dl (m + 1) x = Dl m x := by
     intro m x hx
     have hE := isDerOn_sub (isDerOn_mono (hDl (m + 1)) (levelAlg_le_succ T (m + 1))) (hDl m)
-    have hspan := GlobalTheory.T.derivationOn_adjoin_mem_span_image (O0 p) (integralClosure (O0 p) Ω) (Frac p Ω) {zS T (m + 1), qS T (m + 1)}
-      _ hE x hx
-    have h1 : Dl (m + 1) (zS T (m + 1)) - Dl m (zS T (m + 1)) = 0 := by rw [hz' (m + 1), hz m, sub_zero]
-    have h2 : Dl (m + 1) (qS T (m + 1)) - Dl m (qS T (m + 1)) = 0 := by rw [hq' (m + 1), hq m, sub_self]
+    have hspan :=
+      GlobalTheory.T.derivationOn_adjoin_mem_span_image (O0 p) (integralClosure (O0 p) Ω) (Frac p Ω)
+        {zS T (m + 1), qS T (m + 1)} _ hE x hx
+    have h1 : Dl (m + 1) (zS T (m + 1)) - Dl m (zS T (m + 1)) = 0 := by
+      rw [hz' (m + 1), hz m, sub_zero]
+    have h2 : Dl (m + 1) (qS T (m + 1)) - Dl m (qS T (m + 1)) = 0 := by
+      rw [hq' (m + 1), hq m, sub_self]
     simp only [Set.image_insert_eq, Set.image_singleton, h1, h2, Set.insert_eq_of_mem,
-      Set.mem_singleton_iff, Submodule.span_singleton_eq_bot.2 rfl, Submodule.mem_bot] at hspan
+        Set.mem_singleton_iff, Submodule.span_singleton_eq_bot.2 rfl, Submodule.mem_bot]
+      at hspan
     exact sub_eq_zero.1 hspan
   have hmono : Monotone (fun m => levelAlg T (m + 1)) :=
     monotone_nat_of_le_succ fun m => levelAlg_le_succ T (m + 1)
-  obtain ⟨D, hD, hag⟩ := GlobalTheory.T.exists_derivationOn_iSup_of_compatible (O0 p) (integralClosure (O0 p) Ω) (Frac p Ω)
-    (fun m => levelAlg T (m + 1)) hmono Dl hDl hcomp
+  obtain ⟨D, hD, hag⟩ :=
+    GlobalTheory.T.exists_derivationOn_iSup_of_compatible (O0 p) (integralClosure (O0 p) Ω)
+      (Frac p Ω)
+      (fun m => levelAlg T (m + 1))
+      hmono Dl hDl hcomp
   refine ⟨D, isDerOn_mono hD (towerAlg_le_iSup T), fun m => ⟨?_, ?_⟩⟩
   · rw [hag m _ (levelAlg_le_succ T m (zS_mem_levelAlg T m)), hz']
   · rw [hag m _ (levelAlg_le_succ T m (qS_mem_levelAlg T m)), hq']

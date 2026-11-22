@@ -10,27 +10,33 @@ open Finset Classical
 
 namespace Formalism.MainNotions.Pf14
 
-open Formalism.MainNotions.G Formalism.MainNotions.SourceCleaning Formalism.MainNotions.G.WittFrameLocaliserOrders
+open Formalism.MainNotions.G Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.G.WittFrameLocaliserOrders
 
 section Bound
 
 variable (p n' : ℕ) [Fact p.Prime] [NeZero n'] {r : ℕ} (F : Frames n' r)
 
-theorem eDel_apply (j : ℤ) (t : Fin n') : eDel p n' F j t =
-    ∑ l : Fin r, if t = posOf n' (F.fr j l.val) then p ^ (zF F j - F.fr j l.val).toNat else 0 := by
-  simp only [eDel, Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_one,
-    mul_zero]
+theorem eDel_apply (j : ℤ) (t : Fin n')
+    : eDel p n' F j t
+      = ∑ l : Fin r, if t = posOf n' (F.fr j l.val) then p ^ (zF F j - F.fr j l.val).toNat else 0 :=
+  by
+    simp only [eDel, Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite,
+      mul_one, mul_zero]
 
-theorem eD_apply (s : ℤ) (t : Fin n') : eD p n' F s t =
-    ∑ l : Fin r, if t = posOf n' (Arow F s l.val) then p ^ (s - Arow F s l.val).toNat else 0 := by
-  simp only [eD, Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_one,
-    mul_zero]
+theorem eD_apply (s : ℤ) (t : Fin n')
+    : eD p n' F s t
+      = ∑ l : Fin r, if t = posOf n' (Arow F s l.val) then p ^ (s - Arow F s l.val).toNat else 0 :=
+  by
+    simp only [eD, Finset.sum_apply, Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_one,
+      mul_zero]
 
 variable {p n' F} {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ}
 
-theorem del_bound (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G' ≤ n') (k c' : ℕ) (t : Fin n') :
-    ∑ j ∈ Finset.range F.J, (c' * alpha p F k (j : ℤ) + c') * eDel p n' F (j : ℤ) t ≤
-      (c' * (1 + r * k * p ^ G') + c') * p ^ G' := by
+theorem del_bound
+    (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G' ≤ n') (k c' : ℕ) (t : Fin n')
+    : ∑ j ∈ Finset.range F.J, (c' * alpha p F k (j : ℤ) + c') * eDel p n' F (j : ℤ) t
+      ≤ (c' * (1 + r * k * p ^ G') + c') * p ^ G' := by
   classical
   have hV := hF.2.1
   have hp : 0 < p := (Fact.out : p.Prime).pos
@@ -75,10 +81,14 @@ theorem del_bound (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G'
       have e : (j : ℤ) + 1 + ((F.J - j - 1 : ℕ) : ℤ) = F.J := by omega
       rw [e] at h1
       linarith
-  have huniq : ∀ j j' : ℕ, j < F.J → j' < F.J → ∀ l l' : ℕ, l < r → l' < r →
-      posOf n' (F.fr j l) = posOf n' (F.fr j' l') → j = j' ∧ l = l' := by
+  have huniq
+      : ∀ j j' : ℕ,
+        j < F.J → j' < F.J
+          → ∀ l l' : ℕ,
+            l < r → l' < r → posOf n' (F.fr j l) = posOf n' (F.fr j' l') → j = j' ∧ l = l' := by
     intro j j' hj hj' l l' hl hl' h
-    have he := residue_position_injective_window n' (F.fr 0 0) _ _ (hin j hj l hl) (hin j' hj' l' hl') h
+    have he :=
+      residue_position_injective_window n' (F.fr 0 0) _ _ (hin j hj l hl) (hin j' hj' l' hl') h
     rcases lt_trichotomy j j' with h1 | h1 | h1
     · exfalso
       have h2 := rlt j (j' - j - 1) l l' hl hl'
@@ -103,8 +113,9 @@ theorem del_bound (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G'
   by_cases hex : ∃ j0 ∈ Finset.range F.J, ∃ l0 : Fin r, t = posOf n' (F.fr (j0 : ℤ) l0.val)
   · obtain ⟨j0, hj0, l0, ht0⟩ := hex
     have hj0' := Finset.mem_range.1 hj0
-    have hz : ∀ j ∈ Finset.range F.J, j ≠ j0 →
-        (c' * alpha p F k (j : ℤ) + c') * eDel p n' F (j : ℤ) t = 0 := by
+    have hz
+        : ∀ j ∈ Finset.range F.J,
+          j ≠ j0 → (c' * alpha p F k (j : ℤ) + c') * eDel p n' F (j : ℤ) t = 0 := by
       intro j hj hne
       rw [eDel_apply, Finset.sum_eq_zero, mul_zero]
       intro l _
@@ -131,8 +142,9 @@ theorem del_bound (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G'
       have hα : alpha p F k (j0 : ℤ) ≤ 1 + r * k * p ^ G' := by
         simp only [alpha, Qj]
         have h1 : (if (j0 : ℤ) = 0 then 1 else 0) ≤ 1 := by split_ifs <;> omega
-        exact add_le_add h1 (Nat.mul_le_mul (Nat.mul_le_mul_left _ (Nat.sub_le _ _))
-          (le_trans (Nat.sub_le _ _) (Nat.pow_le_pow_right hp hzz)))
+        exact add_le_add h1
+          (Nat.mul_le_mul (Nat.mul_le_mul_left _ (Nat.sub_le _ _))
+            (le_trans (Nat.sub_le _ _) (Nat.pow_le_pow_right hp hzz)))
       exact Nat.add_le_add_right (Nat.mul_le_mul_left c' hα) c'
     · apply Nat.pow_le_pow_right hp
       have g := hF.2.2.1 (j0 : ℤ)
@@ -144,8 +156,9 @@ theorem del_bound (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G'
     refine le_trans (le_of_eq (Finset.sum_eq_zero fun j hj => ?_)) (Nat.zero_le _)
     rw [eDel_apply, Finset.sum_eq_zero (fun l _ => if_neg (hex j hj l)), mul_zero]
 
-private theorem nuRow_le_Sc_add_wSz {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ) {i i' : ℕ} (h : i ≤ i') (h' : i' < r) :
-    F.fr j i ≤ F.fr j i' := by
+private theorem nuRow_le_Sc_add_wSz
+    {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ) {i i' : ℕ} (h : i ≤ i') (h' : i' < r)
+    : F.fr j i ≤ F.fr j i' := by
   obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le h
   induction d with
   | zero => exact le_rfl
@@ -154,8 +167,11 @@ private theorem nuRow_le_Sc_add_wSz {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (
     have h2 := hV.2.2.1 j (i + d) (by omega)
     exact le_trans h1 (le_of_lt h2)
 
-private theorem fr_lt_fr_of_lt_index {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) {j j' : ℤ} (hjj : j < j') {i i' : ℕ}
-    (hi : i < r) (hi' : i' < r) : F.fr j i < F.fr j' i' := by
+private theorem fr_lt_fr_of_lt_index
+    {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁)
+    {j j' : ℤ} (hjj : j < j')
+    {i i' : ℕ} (hi : i < r) (hi' : i' < r)
+    : F.fr j i < F.fr j' i' := by
   have key : ∀ d : ℕ, ∀ i', i' < r → F.fr j i < F.fr (j + 1 + d) i' := by
     intro d
     induction d with
@@ -178,8 +194,9 @@ private theorem fr_lt_fr_of_lt_index {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) 
   subst hd
   exact key d i' hi'
 
-private theorem arow_lt_self_and_sub_lt_of_framesOK (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G' ≤ n')
-    (s : ℤ) (l : ℕ) (hl : l < r) : Arow F s l < s ∧ s - Arow F s l < G' := by
+private theorem arow_lt_self_and_sub_lt_of_framesOK
+    (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G' ≤ n') (s : ℤ) (l : ℕ) (hl : l < r)
+    : Arow F s l < s ∧ s - Arow F s l < G' := by
   classical
   have hV := hF.2.1
   have hstep : ∀ j : ℤ, F.fr j (r - 1) + 1 ≤ F.fr (j + 1) (r - 1) := fun j => by
@@ -203,17 +220,25 @@ private theorem arow_lt_self_and_sub_lt_of_framesOK (hF : FramesOK TT L₁ L₂ 
       rw [e] at this
       push_cast at this ⊢
       linarith
-  obtain ⟨j0, hj0, hmax⟩ := Int.exists_greatest_of_bdd (P := fun z => F.fr z (r - 1) < s)
-    ⟨(s - F.fr 0 (r - 1)).toNat, fun z hz => by
-      rcases le_or_gt 0 z with h0 | h0
-      · have := hup z.toNat
-        rw [Int.toNat_of_nonneg h0] at this
-        omega
-      · omega⟩
-    ⟨-((F.fr 0 (r - 1) - s + 1).toNat : ℤ), by
-      have := hdown (F.fr 0 (r - 1) - s + 1).toNat
-      show F.fr _ (r - 1) < s
-      omega⟩
+  obtain ⟨j0, hj0, hmax⟩ :=
+    Int.exists_greatest_of_bdd
+      (P := fun z => F.fr z (r - 1) < s)
+      ⟨
+        (s - F.fr 0 (r - 1)).toNat,
+        fun z hz => by
+          rcases le_or_gt 0 z with h0 | h0
+          · have := hup z.toNat
+            rw [Int.toNat_of_nonneg h0] at this
+            omega
+          · omega
+      ⟩
+      ⟨
+        -((F.fr 0 (r - 1) - s + 1).toNat : ℤ),
+        by
+          have := hdown (F.fr 0 (r - 1) - s + 1).toNat
+          show F.fr _ (r - 1) < s
+          omega
+      ⟩
   have hj1 : s ≤ F.fr (j0 + 1) (r - 1) := by
     by_contra h
     have := hmax (j0 + 1) (show F.fr (j0 + 1) (r - 1) < s by omega)
@@ -248,7 +273,8 @@ private theorem arow_lt_self_and_sub_lt_of_framesOK (hF : FramesOK TT L₁ L₂ 
     rw [Finset.card_image_of_injOn hinj, Finset.card_range]
   have hpw : (evensBefore F s).Pairwise (· > ·) := evensBefore_pairwise F s
   have hlen : r ≤ (evensBefore F s).length := by
-    calc r = ((Finset.range r).image fun i => F.fr j0 i).card := hcardA.symm
+    calc
+      r = ((Finset.range r).image fun i => F.fr j0 i).card := hcardA.symm
       _ ≤ (evensBefore F s).toFinset.card := by
         apply Finset.card_le_card
         intro a ha
@@ -260,12 +286,14 @@ private theorem arow_lt_self_and_sub_lt_of_framesOK (hF : FramesOK TT L₁ L₂ 
     simp only [Arow]
     exact List.getD_eq_getElem _ _ hl'
   have hyl : (evensBefore F s)[l] < s := by
-    have := (Formalism.MainNotions.G.symbolGeneratorData.dv_ev_mem (F := F) s _).1 (List.getElem_mem hl')
+    have :=
+      (Formalism.MainNotions.G.symbolGeneratorData.dv_ev_mem (F := F) s _).1 (List.getElem_mem hl')
     exact this.1.2
   have hge : F.fr j0 0 ≤ (evensBefore F s)[l] := by
     by_contra hlt
     push_neg at hlt
-    have hsub : ((Finset.range r).image fun i => F.fr j0 i) ⊆ ((evensBefore F s).take l).toFinset := by
+    have hsub
+        : ((Finset.range r).image fun i => F.fr j0 i) ⊆ ((evensBefore F s).take l).toFinset := by
       intro a ha
       obtain ⟨i, hi, rfl⟩ := Finset.mem_image.1 ha
       have hi' := Finset.mem_range.1 hi
@@ -291,13 +319,17 @@ private theorem arow_lt_self_and_sub_lt_of_framesOK (hF : FramesOK TT L₁ L₂ 
   · exact hyl
   · linarith
 
-theorem tops_near (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G' ≤ n')
-    (hI : Formalism.G0.CondIntervals n' (F.TT.map Fin.valEmbedding) G' N₁) (t : Fin n') :
-    (F.TT.filter fun s => ∃ l : Fin r, t = posOf n' (Arow F (s.val : ℤ) l.val)).card ≤ N₁ + 1 := by
+theorem tops_near
+    (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G' ≤ n')
+    (hI : Formalism.G0.CondIntervals n' (F.TT.map Fin.valEmbedding) G' N₁) (t : Fin n')
+    : (F.TT.filter fun s => ∃ l : Fin r, t = posOf n' (Arow F (s.val : ℤ) l.val)).card
+      ≤ N₁ + 1 := by
   classical
   refine le_trans ?_ (Nat.le_succ N₁)
-  have hsub : ((F.TT.filter fun s => ∃ l : Fin r, t = posOf n' (Arow F (s.val : ℤ) l.val)).map
-      Fin.valEmbedding) ⊆ (F.TT.map Fin.valEmbedding) ∩ Formalism.G0.window n' t.val G' := by
+  have hsub
+      : ((F.TT.filter fun s => ∃ l : Fin r, t = posOf n' (Arow F (s.val : ℤ) l.val)).map
+          Fin.valEmbedding)
+        ⊆ (F.TT.map Fin.valEmbedding) ∩ Formalism.G0.window n' t.val G' := by
     intro x hx
     simp only [Finset.mem_map, Finset.mem_filter, Fin.valEmbedding_apply] at hx
     obtain ⟨s, ⟨hs, l, hl⟩, rfl⟩ := hx
@@ -314,29 +346,35 @@ theorem tops_near (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G'
     have hs' : (s.val : ℤ) < n' := by exact_mod_cast s.isLt
     simp only [Formalism.G0.window, Finset.mem_image, Finset.mem_range]
     refine ⟨((s.val : ℤ) - Arow F (s.val : ℤ) l.val).toNat, by omega, ?_⟩
-    have key : (((t.val + ((s.val : ℤ) - Arow F (s.val : ℤ) l.val).toNat : ℕ) : ℤ) % n') = s.val := by
+    have key
+        : (((t.val + ((s.val : ℤ) - Arow F (s.val : ℤ) l.val).toNat : ℕ) : ℤ) % n') = s.val := by
       push_cast
       rw [Int.toNat_of_nonneg (by omega), ht, Int.emod_add_emod]
       rw [show Arow F (s.val : ℤ) l.val + ((s.val : ℤ) - Arow F (s.val : ℤ) l.val) = s.val by ring]
       exact Int.emod_eq_of_lt (by positivity) hs'
     exact_mod_cast key
-  calc _ = _ := (Finset.card_map _).symm
+  calc
+    _ = _ := (Finset.card_map _).symm
     _ ≤ _ := Finset.card_le_card hsub
     _ ≤ N₁ := hI t.val t.isLt
 
-theorem d_bound (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G' ≤ n')
-    (hI : Formalism.G0.CondIntervals n' (F.TT.map Fin.valEmbedding) G' N₁) (mu : ℕ) (t : Fin n') :
-    ∑ s ∈ F.TT, mu * eD p n' F (s.val : ℤ) t ≤ (N₁ + 1) * (mu * (r * p ^ G')) := by
+theorem d_bound
+    (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G' ≤ n')
+    (hI : Formalism.G0.CondIntervals n' (F.TT.map Fin.valEmbedding) G' N₁) (mu : ℕ) (t : Fin n')
+    : ∑ s ∈ F.TT, mu * eD p n' F (s.val : ℤ) t ≤ (N₁ + 1) * (mu * (r * p ^ G')) := by
   classical
   have hp : 0 < p := (Fact.out : p.Prime).pos
-  rw [← Finset.sum_filter_of_ne (p := fun s : Fin n' => ∃ l : Fin r, t = posOf n' (Arow F (s.val : ℤ) l.val))]
+  rw [← Finset.sum_filter_of_ne
+    (p := fun s : Fin n' => ∃ l : Fin r, t = posOf n' (Arow F (s.val : ℤ) l.val))]
   · refine le_trans (Finset.sum_le_card_nsmul _ _ (mu * (r * p ^ G')) ?_) ?_
     · intro s _
       apply Nat.mul_le_mul_left
       rw [eD_apply]
-      calc ∑ l : Fin r, (if t = posOf n' (Arow F (s.val : ℤ) l.val)
-              then p ^ ((s.val : ℤ) - Arow F (s.val : ℤ) l.val).toNat else 0)
-          ≤ ∑ _l : Fin r, p ^ G' := Finset.sum_le_sum fun l _ => by
+      calc
+        ∑ l : Fin r, (if t = posOf n' (Arow F (s.val : ℤ) l.val)
+           then p ^ ((s.val : ℤ) - Arow F (s.val : ℤ) l.val).toNat else 0)
+            ≤ ∑ _l : Fin r, p ^ G' :=
+          Finset.sum_le_sum fun l _ => by
             split_ifs
             · apply Nat.pow_le_pow_right hp
               have := (arow_lt_self_and_sub_lt_of_framesOK hF hr hG (s.val : ℤ) l.val l.isLt).2
@@ -353,8 +391,8 @@ theorem d_bound (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G' �
     intro l _
     exact if_neg (hno l)
 
-theorem eSP_off (hF : FramesOK TT L₁ L₂ N₁ G' F) (k c' Q : ℕ) (t : Fin n') (ht : t ∉ F.TT) :
-    eSP p n' F k c' Q t = 0 := by
+theorem eSP_off (hF : FramesOK TT L₁ L₂ N₁ G' F) (k c' Q : ℕ) (t : Fin n') (ht : t ∉ F.TT)
+    : eSP p n' F k c' Q t = 0 := by
   have hV := hF.2.1
   have h1 : ∀ j : ℤ, eDel p n' F j t = 0 := by
     intro j
@@ -372,15 +410,18 @@ theorem eSP_off (hF : FramesOK TT L₁ L₂ N₁ G' F) (k c' Q : ℕ) (t : Fin n
     Finset.sum_const_zero, add_zero, zero_add]
   exact Finset.sum_eq_zero fun s hs => by rw [h2 s hs, mul_zero]
 
-theorem eSP_le (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G' ≤ n')
-    (hI : Formalism.G0.CondIntervals n' (F.TT.map Fin.valEmbedding) G' N₁) (k c' : ℕ) (t : Fin n') :
-    eSP p n' F k c' (p ^ G') t ≤ (c' * (1 + r * k * p ^ G') + c') * p ^ G' +
-      (N₁ + 1) * (((2 * p ^ G' + 3) * c' + k * p ^ G') * (r * p ^ G')) := by
+theorem eSP_le
+    (hF : FramesOK TT L₁ L₂ N₁ G' F) (hr : 1 ≤ r) (hG : G' ≤ n')
+    (hI : Formalism.G0.CondIntervals n' (F.TT.map Fin.valEmbedding) G' N₁) (k c' : ℕ) (t : Fin n')
+    : eSP p n' F k c' (p ^ G') t
+      ≤ (c' * (1 + r * k * p ^ G') + c') * p ^ G'
+        + (N₁ + 1) * (((2 * p ^ G' + 3) * c' + k * p ^ G') * (r * p ^ G')) := by
   have h1 := del_bound (p := p) hF hr hG k c' t
   have h2 := d_bound (p := p) hF hr hG hI ((2 * p ^ G' + 3) * c' + k * p ^ G') t
-  have e : c' * ∑ j ∈ Finset.range F.J, alpha p F k (j : ℤ) * eDel p n' F (j : ℤ) t +
-      ∑ j ∈ Finset.range F.J, c' * eDel p n' F (j : ℤ) t =
-      ∑ j ∈ Finset.range F.J, (c' * alpha p F k (j : ℤ) + c') * eDel p n' F (j : ℤ) t := by
+  have e
+      : c' * ∑ j ∈ Finset.range F.J, alpha p F k (j : ℤ) * eDel p n' F (j : ℤ) t
+          + ∑ j ∈ Finset.range F.J, c' * eDel p n' F (j : ℤ) t
+        = ∑ j ∈ Finset.range F.J, (c' * alpha p F k (j : ℤ) + c') * eDel p n' F (j : ℤ) t := by
     rw [Finset.mul_sum, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun j _ => by ring
   simp only [eSP, Pi.add_apply, Pi.smul_apply, Finset.sum_apply, smul_eq_mul]

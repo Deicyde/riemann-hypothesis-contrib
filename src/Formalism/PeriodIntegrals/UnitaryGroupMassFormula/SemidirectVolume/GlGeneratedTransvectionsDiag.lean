@@ -12,8 +12,8 @@ namespace PI.VolSemiDirect.W.Cj
 open Matrix
 
 def genSet (A : Type) [CommRing A] (k : ℕ) : Set (GL (Fin k) A) :=
-  {g | ∃ i j c, i ≠ j ∧ (g : Matrix (Fin k) (Fin k) A) = transvection i j c} ∪
-    {g | ∃ d : Fin k → A, (g : Matrix (Fin k) (Fin k) A) = diagonal d}
+  {g | ∃ i j c, i ≠ j ∧ (g : Matrix (Fin k) (Fin k) A) = transvection i j c}
+    ∪ {g | ∃ d : Fin k → A, (g : Matrix (Fin k) (Fin k) A) = diagonal d}
 
 section
 
@@ -22,8 +22,7 @@ variable {A : Type} [CommRing A] {k : ℕ}
 def InG (M : Matrix (Fin k) (Fin k) A) : Prop :=
   ∃ g ∈ Subgroup.closure (genSet A k), (g : Matrix (Fin k) (Fin k) A) = M
 
-theorem inG_one : InG (1 : Matrix (Fin k) (Fin k) A) :=
-  ⟨1, Subgroup.one_mem _, Units.val_one⟩
+theorem inG_one : InG (1 : Matrix (Fin k) (Fin k) A) := ⟨1, Subgroup.one_mem _, Units.val_one⟩
 
 theorem inG_mul {M N : Matrix (Fin k) (Fin k) A} (hM : InG M) (hN : InG N) : InG (M * N) := by
   obtain ⟨g, hg, rfl⟩ := hM
@@ -31,21 +30,25 @@ theorem inG_mul {M N : Matrix (Fin k) (Fin k) A} (hM : InG M) (hN : InG N) : InG
   exact ⟨g * h, Subgroup.mul_mem _ hg hh, Units.val_mul _ _⟩
 
 theorem inG_transvection {i j : Fin k} (hij : i ≠ j) (c : A) : InG (transvection i j c) := by
-  let g : GL (Fin k) A :=
-    ⟨transvection i j c, transvection i j (-c),
-      by rw [transvection_mul_transvection_same i j hij, add_neg_cancel, transvection_zero],
-      by rw [transvection_mul_transvection_same i j hij, neg_add_cancel, transvection_zero]⟩
+  let g : GL (Fin k) A := ⟨
+    transvection i j c,
+    transvection i j (-c),
+    by rw [transvection_mul_transvection_same i j hij, add_neg_cancel, transvection_zero],
+    by rw [transvection_mul_transvection_same i j hij, neg_add_cancel, transvection_zero]
+  ⟩
   exact ⟨g, Subgroup.subset_closure (Or.inl ⟨i, j, c, hij, rfl⟩), rfl⟩
 
 theorem inG_diag (d : Fin k → A) (hd : ∀ i, IsUnit (d i)) : InG (diagonal d) := by
-  let g : GL (Fin k) A :=
-    ⟨diagonal d, diagonal (fun i => ((hd i).unit⁻¹ : Aˣ)),
-      by rw [diagonal_mul_diagonal]; convert diagonal_one with i; exact (hd i).mul_val_inv,
-      by rw [diagonal_mul_diagonal]; convert diagonal_one with i; exact (hd i).val_inv_mul⟩
+  let g : GL (Fin k) A := ⟨
+    diagonal d,
+    diagonal (fun i => ((hd i).unit⁻¹ : Aˣ)),
+    by rw [diagonal_mul_diagonal]; convert diagonal_one with i; exact (hd i).mul_val_inv,
+    by rw [diagonal_mul_diagonal]; convert diagonal_one with i; exact (hd i).val_inv_mul
+  ⟩
   exact ⟨g, Subgroup.subset_closure (Or.inr ⟨d, rfl⟩), rfl⟩
 
-theorem inG_rowT (p : Fin k) (c : Fin k → A) (s : Finset (Fin k)) (hp : p ∉ s) :
-    InG (1 + ∑ i ∈ s, single p i (c i)) := by
+theorem inG_rowT (p : Fin k) (c : Fin k → A) (s : Finset (Fin k)) (hp : p ∉ s)
+    : InG (1 + ∑ i ∈ s, single p i (c i)) := by
   revert hp
   refine Finset.induction_on s (fun _ => ?_) (fun a t ha ih hp => ?_)
   · rw [Finset.sum_empty, add_zero]
@@ -53,8 +56,9 @@ theorem inG_rowT (p : Fin k) (c : Fin k → A) (s : Finset (Fin k)) (hp : p ∉ 
   · have hpa : p ≠ a := fun h => hp (by rw [h]; exact Finset.mem_insert_self a t)
     have hpt : p ∉ t := fun h => hp (Finset.mem_insert_of_mem h)
     rw [Finset.sum_insert ha]
-    have e : (1 : Matrix (Fin k) (Fin k) A) + (single p a (c a) + ∑ i ∈ t, single p i (c i)) =
-        transvection p a (c a) * (1 + ∑ i ∈ t, single p i (c i)) := by
+    have e
+        : (1 : Matrix (Fin k) (Fin k) A) + (single p a (c a) + ∑ i ∈ t, single p i (c i))
+          = transvection p a (c a) * (1 + ∑ i ∈ t, single p i (c i)) := by
       rw [transvection, add_mul, one_mul, mul_add, mul_one, Finset.mul_sum,
         Finset.sum_eq_zero (fun i _ => single_mul_single_of_ne (c a) p a p (Ne.symm hpa) (c i)),
         add_zero]
@@ -62,8 +66,8 @@ theorem inG_rowT (p : Fin k) (c : Fin k → A) (s : Finset (Fin k)) (hp : p ∉ 
     rw [e]
     exact inG_mul (inG_transvection hpa (c a)) (ih hpt)
 
-theorem inG_colT (p : Fin k) (c : Fin k → A) (s : Finset (Fin k)) (hp : p ∉ s) :
-    InG (1 + ∑ i ∈ s, single i p (c i)) := by
+theorem inG_colT (p : Fin k) (c : Fin k → A) (s : Finset (Fin k)) (hp : p ∉ s)
+    : InG (1 + ∑ i ∈ s, single i p (c i)) := by
   revert hp
   refine Finset.induction_on s (fun _ => ?_) (fun a t ha ih hp => ?_)
   · rw [Finset.sum_empty, add_zero]
@@ -71,20 +75,21 @@ theorem inG_colT (p : Fin k) (c : Fin k → A) (s : Finset (Fin k)) (hp : p ∉ 
   · have hpa : p ≠ a := fun h => hp (by rw [h]; exact Finset.mem_insert_self a t)
     have hpt : p ∉ t := fun h => hp (Finset.mem_insert_of_mem h)
     rw [Finset.sum_insert ha]
-    have e : (1 : Matrix (Fin k) (Fin k) A) + (single a p (c a) + ∑ i ∈ t, single i p (c i)) =
-        transvection a p (c a) * (1 + ∑ i ∈ t, single i p (c i)) := by
+    have e
+        : (1 : Matrix (Fin k) (Fin k) A) + (single a p (c a) + ∑ i ∈ t, single i p (c i))
+          = transvection a p (c a) * (1 + ∑ i ∈ t, single i p (c i)) := by
       rw [transvection, add_mul, one_mul, mul_add, mul_one, Finset.mul_sum,
-        Finset.sum_eq_zero (fun i hi => single_mul_single_of_ne (c a) a p i
-          (fun h => hpt (by rw [h]; exact hi)) (c i)),
+        Finset.sum_eq_zero (fun i hi =>
+          single_mul_single_of_ne (c a) a p i (fun h => hpt (by rw [h]; exact hi)) (c i)),
         add_zero]
       abel
     rw [e]
     exact inG_mul (inG_transvection (Ne.symm hpa) (c a)) (ih hpt)
 
-theorem rowT_mul_apply (p : Fin k) (c : Fin k → A) (s : Finset (Fin k))
-    (X : Matrix (Fin k) (Fin k) A) (a b : Fin k) :
-    ((1 + ∑ i ∈ s, single p i (c i)) * X) a b =
-      X a b + if a = p then ∑ i ∈ s, c i * X i b else 0 := by
+theorem rowT_mul_apply
+    (p : Fin k) (c : Fin k → A) (s : Finset (Fin k)) (X : Matrix (Fin k) (Fin k) A) (a b : Fin k)
+    : ((1 + ∑ i ∈ s, single p i (c i)) * X) a b
+      = X a b + if a = p then ∑ i ∈ s, c i * X i b else 0 := by
   rw [add_mul, one_mul, Finset.sum_mul, Matrix.add_apply, Matrix.sum_apply]
   congr 1
   split_ifs with ha
@@ -92,10 +97,9 @@ theorem rowT_mul_apply (p : Fin k) (c : Fin k → A) (s : Finset (Fin k))
     exact Finset.sum_congr rfl (fun i _ => single_mul_apply_same _ _ _ _ _)
   · exact Finset.sum_eq_zero (fun i _ => single_mul_apply_of_ne _ _ _ _ _ ha _)
 
-theorem colT_mul_apply (p : Fin k) (c : Fin k → A) (s : Finset (Fin k))
-    (X : Matrix (Fin k) (Fin k) A) (a b : Fin k) :
-    ((1 + ∑ i ∈ s, single i p (c i)) * X) a b =
-      X a b + if a ∈ s then c a * X p b else 0 := by
+theorem colT_mul_apply
+    (p : Fin k) (c : Fin k → A) (s : Finset (Fin k)) (X : Matrix (Fin k) (Fin k) A) (a b : Fin k)
+    : ((1 + ∑ i ∈ s, single i p (c i)) * X) a b = X a b + if a ∈ s then c a * X p b else 0 := by
   rw [add_mul, one_mul, Finset.sum_mul, Matrix.add_apply, Matrix.sum_apply]
   congr 1
   split_ifs with ha
@@ -105,13 +109,12 @@ theorem colT_mul_apply (p : Fin k) (c : Fin k → A) (s : Finset (Fin k))
       exact single_mul_apply_of_ne _ _ _ _ _ (Ne.symm hia) _
     · intro h
       exact absurd ha h
-  · exact Finset.sum_eq_zero (fun i hi => single_mul_apply_of_ne _ _ _ _ _
-      (fun h => ha (by rw [h]; exact hi)) _)
+  · exact Finset.sum_eq_zero (fun i hi =>
+      single_mul_apply_of_ne _ _ _ _ _ (fun h => ha (by rw [h]; exact hi)) _)
 
-theorem mul_rowT_apply (p : Fin k) (c : Fin k → A) (s : Finset (Fin k))
-    (X : Matrix (Fin k) (Fin k) A) (a b : Fin k) :
-    (X * (1 + ∑ j ∈ s, single p j (c j))) a b =
-      X a b + if b ∈ s then X a p * c b else 0 := by
+theorem mul_rowT_apply
+    (p : Fin k) (c : Fin k → A) (s : Finset (Fin k)) (X : Matrix (Fin k) (Fin k) A) (a b : Fin k)
+    : (X * (1 + ∑ j ∈ s, single p j (c j))) a b = X a b + if b ∈ s then X a p * c b else 0 := by
   rw [mul_add, mul_one, Finset.mul_sum, Matrix.add_apply, Matrix.sum_apply]
   congr 1
   split_ifs with hb
@@ -121,15 +124,17 @@ theorem mul_rowT_apply (p : Fin k) (c : Fin k → A) (s : Finset (Fin k))
       exact mul_single_apply_of_ne _ _ _ _ _ (Ne.symm hjb) _
     · intro h
       exact absurd hb h
-  · exact Finset.sum_eq_zero (fun j hj => mul_single_apply_of_ne _ _ _ _ _
-      (fun h => hb (by rw [h]; exact hj)) _)
+  · exact Finset.sum_eq_zero (fun j hj =>
+      mul_single_apply_of_ne _ _ _ _ _ (fun h => hb (by rw [h]; exact hj)) _)
 
 def Red (m : ℕ) (M : Matrix (Fin k) (Fin k) A) : Prop :=
   ∀ i j : Fin k, (i.val < m ∨ j.val < m) → M i j = (1 : Matrix (Fin k) (Fin k) A) i j
 
-theorem step (hA : HasStableRangeOne A) (m : ℕ) (hm : m < k) (X : GL (Fin k) A)
-    (hX : Red m (X : Matrix (Fin k) (Fin k) A)) :
-    ∃ g ∈ Subgroup.closure (genSet A k), ∃ h ∈ Subgroup.closure (genSet A k),
+theorem step
+    (hA : HasStableRangeOne A)
+    (m : ℕ) (hm : m < k)
+    (X : GL (Fin k) A) (hX : Red m (X : Matrix (Fin k) (Fin k) A))
+    : ∃ g ∈ Subgroup.closure (genSet A k), ∃ h ∈ Subgroup.closure (genSet A k),
       Red (m + 1) ((g * X * h : GL (Fin k) A) : Matrix (Fin k) (Fin k) A) := by
   have nev : ∀ i j : Fin k, i.val ≠ j.val → i ≠ j := fun i j h e => h (congrArg Fin.val e)
   set p : Fin k := ⟨m, hm⟩ with hpdef
@@ -154,13 +159,12 @@ theorem step (hA : HasStableRangeOne A) (m : ℕ) (hm : m < k) (X : GL (Fin k) A
     rw [hX i j (Or.inr hj), Matrix.one_apply_ne hij]
 
   set Y : Matrix (Fin k) (Fin k) A := ((X⁻¹ : GL (Fin k) A) : Matrix (Fin k) (Fin k) A) with hY
-  have hYX : Y * Xm = 1 := by
-    rw [hY, hXm, ← Units.val_mul, inv_mul_cancel, Units.val_one]
+  have hYX : Y * Xm = 1 := by rw [hY, hXm, ← Units.val_mul, inv_mul_cancel, Units.val_one]
   have hsum : Xm p p * Y p p + (∑ i ∈ s, Xm i p * Y p i) * 1 = 1 := by
     have h1 := congrFun (congrFun hYX p) p
     rw [Matrix.mul_apply, Matrix.one_apply_eq] at h1
-    rw [mul_one, ← h1, ← Finset.sum_filter_add_sum_filter_not Finset.univ (fun i : Fin k => m < i.val),
-      add_comm]
+    rw [mul_one, ← h1,
+      ← Finset.sum_filter_add_sum_filter_not Finset.univ (fun i : Fin k => m < i.val), add_comm]
     congr 1
     · exact Finset.sum_congr rfl (fun i _ => mul_comm _ _)
     · rw [Finset.sum_eq_single p]
@@ -176,8 +180,8 @@ theorem step (hA : HasStableRangeOne A) (m : ℕ) (hm : m < k) (X : GL (Fin k) A
   set c1 : Fin k → A := fun i => t * Y p i with hc1
   set R1 : Matrix (Fin k) (Fin k) A := 1 + ∑ i ∈ s, single p i (c1 i) with hR1
   set X1 : Matrix (Fin k) (Fin k) A := R1 * Xm with hX1d
-  have hX1 : ∀ a b, X1 a b = Xm a b + if a = p then ∑ i ∈ s, c1 i * Xm i b else 0 :=
-    fun a b => rowT_mul_apply p c1 s Xm a b
+  have hX1 : ∀ a b, X1 a b = Xm a b + if a = p then ∑ i ∈ s, c1 i * Xm i b else 0 := fun a b =>
+    rowT_mul_apply p c1 s Xm a b
   have hX1pp : X1 p p = Xm p p + t * ∑ i ∈ s, Xm i p * Y p i := by
     rw [hX1, if_pos rfl, Finset.mul_sum]
     congr 1
@@ -202,8 +206,8 @@ theorem step (hA : HasStableRangeOne A) (m : ℕ) (hm : m < k) (X : GL (Fin k) A
   set c2 : Fin k → A := fun i => -(X1 i p * w) with hc2
   set C : Matrix (Fin k) (Fin k) A := 1 + ∑ i ∈ s, single i p (c2 i) with hC
   set X2 : Matrix (Fin k) (Fin k) A := C * X1 with hX2d
-  have hX2 : ∀ a b, X2 a b = X1 a b + if a ∈ s then c2 a * X1 p b else 0 :=
-    fun a b => colT_mul_apply p c2 s X1 a b
+  have hX2 : ∀ a b, X2 a b = X1 a b + if a ∈ s then c2 a * X1 p b else 0 := fun a b =>
+    colT_mul_apply p c2 s X1 a b
   have X2_notin : ∀ a b, a ∉ s → X2 a b = X1 a b := by
     intro a b ha
     rw [hX2, if_neg ha, add_zero]
@@ -220,8 +224,8 @@ theorem step (hA : HasStableRangeOne A) (m : ℕ) (hm : m < k) (X : GL (Fin k) A
   set c3 : Fin k → A := fun j => -(w * X2 p j) with hc3
   set Rr : Matrix (Fin k) (Fin k) A := 1 + ∑ j ∈ s, single p j (c3 j) with hRr
   set X3 : Matrix (Fin k) (Fin k) A := X2 * Rr with hX3d
-  have hX3 : ∀ a b, X3 a b = X2 a b + if b ∈ s then X2 a p * c3 b else 0 :=
-    fun a b => mul_rowT_apply p c3 s X2 a b
+  have hX3 : ∀ a b, X3 a b = X2 a b + if b ∈ s then X2 a p * c3 b else 0 := fun a b =>
+    mul_rowT_apply p c3 s X2 a b
 
   set d : Fin k → A := fun i => if i = p then w else 1 with hdd
   set X4 : Matrix (Fin k) (Fin k) A := diagonal d * X3 with hX4d
@@ -255,8 +259,8 @@ theorem step (hA : HasStableRangeOne A) (m : ℕ) (hm : m < k) (X : GL (Fin k) A
   rcases tri a with ha | ha | ha
   · have hap : a ≠ p := nev a p (by omega)
     have has : a ∉ s := fun h => by have := (mem_s a).1 h; omega
-    rw [dne a hap, one_mul, hX3, X2_notin a p has, X1_ne a p hap, z1 a p ha hap, zero_mul,
-      ite_self, add_zero, X2_notin a b has, X1_ne a b hap]
+    rw [dne a hap, one_mul, hX3, X2_notin a p has, X1_ne a p hap, z1 a p ha hap, zero_mul, ite_self,
+      add_zero, X2_notin a b has, X1_ne a b hap]
     exact hX a b (Or.inl ha)
   · rw [ha, dp]
     rcases tri b with hb | hb | hb
@@ -281,15 +285,17 @@ theorem step (hA : HasStableRangeOne A) (m : ℕ) (hm : m < k) (X : GL (Fin k) A
     · have := (mem_s b).1 hb
       omega
 
-theorem reduce (hA : HasStableRangeOne A) : ∀ n : ℕ, ∀ X : GL (Fin k) A,
-    Red (k - n) (X : Matrix (Fin k) (Fin k) A) → X ∈ Subgroup.closure (genSet A k) := by
+theorem reduce (hA : HasStableRangeOne A)
+    : ∀ n : ℕ, ∀ X : GL (Fin k) A,
+      Red (k - n) (X : Matrix (Fin k) (Fin k) A) → X ∈ Subgroup.closure (genSet A k) := by
   intro n
   induction n with
   | zero =>
     intro X hX
-    have hX1 : X = 1 := Units.ext (Matrix.ext fun i j => by
-      rw [Units.val_one]
-      exact hX i j (Or.inl (by have := i.isLt; omega)))
+    have hX1 : X = 1 :=
+      Units.ext (Matrix.ext fun i j => by
+        rw [Units.val_one]
+        exact hX i j (Or.inl (by have := i.isLt; omega)))
     rw [hX1]
     exact Subgroup.one_mem _
   | succ n ih =>
@@ -305,7 +311,8 @@ theorem reduce (hA : HasStableRangeOne A) : ∀ n : ℕ, ∀ X : GL (Fin k) A,
       have hmem := ih _ hred
       have hX' : X = g⁻¹ * (g * X * h) * h⁻¹ := by group
       rw [hX']
-      exact Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.inv_mem _ hg) hmem) (Subgroup.inv_mem _ hh)
+      exact Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.inv_mem _ hg) hmem)
+        (Subgroup.inv_mem _ hh)
 
 end
 

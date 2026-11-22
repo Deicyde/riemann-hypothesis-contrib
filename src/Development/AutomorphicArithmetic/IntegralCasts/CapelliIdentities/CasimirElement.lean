@@ -4,10 +4,9 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.CasimirElement.casC :
-    {n : ℕ} → (Fin n → ℂ) → ℂ :=
-    fun {n : ℕ} (τ : Fin n → ℂ) ↦
-      ∑ a : Fin n, τ a ^ (2 : ℕ) + ∑ a : Fin n, ∑ b : Fin n, if a < b then τ a - τ b else (0 : ℂ)
+noncomputable def UpperTheory.Reformulated.B.CasimirElement.casC
+    : {n : ℕ} → (Fin n → ℂ) → ℂ := fun {n : ℕ} (τ : Fin n → ℂ) ↦
+  ∑ a : Fin n, τ a ^ (2 : ℕ) + ∑ a : Fin n, ∑ b : Fin n, if a < b then τ a - τ b else (0 : ℂ)
 
 namespace YgaHelp
 
@@ -28,15 +27,18 @@ private lemma inner_right {n : ℕ} (σ : Fin n → ℂ) (b : Fin n) :
 
 end YgaHelp
 
-theorem UpperTheory.Reformulated.B.CasimirElement.main :
-    ∀ {n : ℕ} (σ : Fin n → ℂ),
-      UpperTheory.Reformulated.B.CasimirElement.casC σ =
-        ∑ a : Fin n, σ a ^ (2 : ℕ) + ∑ a : Fin n, σ a * ((↑n : ℂ) - (1 : ℂ) - (2 : ℂ) * (↑(↑a : ℕ) : ℂ)) := by
+theorem UpperTheory.Reformulated.B.CasimirElement.main
+    : ∀ {n : ℕ} (σ : Fin n → ℂ),
+      UpperTheory.Reformulated.B.CasimirElement.casC σ
+        = ∑ a : Fin n, σ a ^ (2 : ℕ)
+          + ∑ a : Fin n, σ a * ((↑n : ℂ) - (1 : ℂ) - (2 : ℂ) * (↑(↑a : ℕ) : ℂ)) := by
   intro n σ
   unfold UpperTheory.Reformulated.B.CasimirElement.casC
   congr 1
-  have hsplit : ∀ a b : Fin n, (if a < b then σ a - σ b else (0 : ℂ)) =
-      (if a < b then σ a else 0) - (if a < b then σ b else 0) := by
+  have hsplit
+      : ∀ a b : Fin n,
+        (if a < b then σ a - σ b else (0 : ℂ))
+          = (if a < b then σ a else 0) - (if a < b then σ b else 0) := by
     intro a b; split_ifs <;> simp
   simp_rw [hsplit, Finset.sum_sub_distrib]
   rw [Finset.sum_comm (f := fun a b => if a < b then σ b else (0 : ℂ))]

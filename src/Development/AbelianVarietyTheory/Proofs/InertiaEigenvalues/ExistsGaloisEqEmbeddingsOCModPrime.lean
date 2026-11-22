@@ -7,15 +7,19 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 noncomputable section
 
 namespace GlobalTheory.EmbTwo
 
-theorem range_eq_of_normal {F E L : Type} [Field F] [Field E] [Algebra F E] [Normal F E] [Field L]
-    [Algebra F L] (φ ψ : E →ₐ[F] L) : φ.fieldRange = ψ.fieldRange := by
+theorem range_eq_of_normal
+    {F E L : Type} [Field F] [Field E] [Algebra F E] [Normal F E] [Field L] [Algebra F L]
+    (φ ψ : E →ₐ[F] L)
+    : φ.fieldRange = ψ.fieldRange := by
   let e : E ≃ₐ[F] ψ.fieldRange := AlgEquiv.ofInjectiveField ψ
   haveI : Normal F ψ.fieldRange := Normal.of_algEquiv e
   have h := AlgHom.fieldRange_of_normal (E := ψ.fieldRange) (φ.comp e.symm.toAlgHom)
@@ -28,27 +32,38 @@ theorem range_eq_of_normal {F E L : Type} [Field F] [Field E] [Algebra F E] [Nor
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem exists_approx (y : OC l) : ∃ (z : OC l) (w : OC l), (∃ z' : Om l, (z : ℂ_[l]) = (z' : ℂ_[l])) ∧
-    y = z + (l : OC l) * w := by
+theorem exists_approx (y : OC l)
+    : ∃ (z : OC l) (w : OC l),
+      (∃ z' : Om l, (z : ℂ_[l]) = (z' : ℂ_[l])) ∧ y = z + (l : OC l) * w := by
   have hl : 0 < ‖((l : ℕ) : ℂ_[l])‖ := norm_pos_iff.2 GlobalTheory.RingBasics.p_ne_zero
-  obtain ⟨z', hz'⟩ := (UniformSpace.Completion.denseRange_coe (α := Om l)).exists_dist_lt (y : ℂ_[l]) hl
+  obtain ⟨z', hz'⟩ :=
+    (UniformSpace.Completion.denseRange_coe (α := Om l)).exists_dist_lt (y : ℂ_[l]) hl
   set w : ℂ_[l] := (y : ℂ_[l]) - (z' : ℂ_[l]) with hw
   have hw1 : ‖w‖ < ‖((l : ℕ) : ℂ_[l])‖ := by rw [hw, ← dist_eq_norm]; exact hz'
-  have hwO : w ∈ 𝓞_ℂ_[l] := (GlobalTheory.RingBasics.mem_OC _).2 (hw1.le.trans GlobalTheory.RingBasics.norm_p_lt.le)
+  have hwO : w ∈ 𝓞_ℂ_[l] :=
+    (GlobalTheory.RingBasics.mem_OC _).2 (hw1.le.trans GlobalTheory.RingBasics.norm_p_lt.le)
   have hzO : (z' : ℂ_[l]) ∈ 𝓞_ℂ_[l] := by
     have : (z' : ℂ_[l]) = (y : ℂ_[l]) - w := by rw [hw]; ring
-    rw [this]; exact Subring.sub_mem _ y.2 hwO
+    rw [this]
+    exact Subring.sub_mem _ y.2 hwO
   have hq : w / ((l : ℕ) : ℂ_[l]) ∈ 𝓞_ℂ_[l] := by
     rw [GlobalTheory.RingBasics.mem_OC, norm_div, div_le_one hl]; exact hw1.le
   refine ⟨⟨_, hzO⟩, ⟨_, hq⟩, ⟨z', rfl⟩, Subtype.ext ?_⟩
   push_cast
-  rw [mul_div_cancel₀ _ GlobalTheory.RingBasics.p_ne_zero, hw]; ring
+  rw [mul_div_cancel₀ _ GlobalTheory.RingBasics.p_ne_zero, hw]
+  ring
 
 end GlobalTheory.EmbTwo
 
-
 open GlobalTheory.EmbTwo in
-theorem GlobalTheory.EmbTwo.exists_gal_eq : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (D : Type) [CommRing D] [IsDomain D] (θ₁ θ₂ : OC l →+* D), Function.Injective θ₁ → Function.Injective θ₂ → (∀ r : ↥(OL K), θ₁ (intToOC K r) = θ₂ (intToOC K r)) → ∃ g : ↥(GK K), (∀ y : OC l, (∃ z : Om l, (y : ℂ_[l]) = (z : ℂ_[l])) → θ₂ y = θ₁ (Per.σO (g : GQ l) y)) ∧ ∀ y : OC l, ((l : ℕ) : D) ∣ θ₂ y - θ₁ (Per.σO (g : GQ l) y) := by
+theorem GlobalTheory.EmbTwo.exists_gal_eq
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (D : Type) [CommRing D] [IsDomain D]
+        (θ₁ θ₂ : OC l →+* D),
+      Function.Injective θ₁ → Function.Injective θ₂
+        → (∀ r : ↥(OL K), θ₁ (intToOC K r) = θ₂ (intToOC K r))
+        → ∃ g : ↥(GK K),
+          (∀ y : OC l, (∃ z : Om l, (y : ℂ_[l]) = (z : ℂ_[l])) → θ₂ y = θ₁ (Per.σO (g : GQ l) y))
+            ∧ ∀ y : OC l, ((l : ℕ) : D) ∣ θ₂ y - θ₁ (Per.σO (g : GQ l) y) := by
   intro l _ K D _ _ θ₁ θ₂ h1 h2 hK
   let F := FractionRing D
   have i1 : Function.Injective ((algebraMap D F).comp θ₁) := (IsFractionRing.injective D F).comp h1
@@ -74,7 +89,8 @@ theorem GlobalTheory.EmbTwo.exists_gal_eq : ∀ (l : ℕ) [Fact l.Prime] (K : Fi
     let s : ↥(OL K) := algebraMap ℤ_[l] ↥(OL K) y
     have hrs : ((r : ↥K.1) : Om l) = ((s : ↥K.1) : Om l) * (x : Om l) := by
       change ((y • x : ↥K.1) : Om l) = _
-      rw [Algebra.smul_def]; rfl
+      rw [Algebra.smul_def]
+      rfl
     have hs0 : ((s : ↥K.1) : Om l) ≠ 0 := by
       intro h0
       apply hy0
@@ -91,7 +107,8 @@ theorem GlobalTheory.EmbTwo.exists_gal_eq : ∀ (l : ℕ) [Fact l.Prime] (K : Fi
   have hR := range_eq_of_normal φ₁ φ₂
   let e₁ : Om l ≃ₐ[↥K.1] φ₁.fieldRange := AlgEquiv.ofInjectiveField φ₁
   have hmem : ∀ z, φ₂ z ∈ φ₁.fieldRange := fun z => hR ▸ ⟨z, rfl⟩
-  let g₀ : Om l →ₐ[↥K.1] Om l := e₁.symm.toAlgHom.comp (φ₂.codRestrict φ₁.fieldRange.toSubalgebra hmem)
+  let g₀ : Om l →ₐ[↥K.1] Om l :=
+    e₁.symm.toAlgHom.comp (φ₂.codRestrict φ₁.fieldRange.toSubalgebra hmem)
   have hg₀ : ∀ z, σ₁ (g₀ z) = σ₂ z := fun z => by
     have := congrArg Subtype.val (e₁.apply_symm_apply ⟨φ₂ z, hmem z⟩)
     exact this
@@ -116,4 +133,5 @@ theorem GlobalTheory.EmbTwo.exists_gal_eq : ∀ (l : ℕ) [Fact l.Prime] (K : Fi
   refine ⟨θ₂ w - θ₁ (Per.σO g w), ?_⟩
   have := c1 z hz
   simp only [map_add (f := _), map_mul, map_natCast]
-  rw [this]; ring
+  rw [this]
+  ring

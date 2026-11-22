@@ -86,10 +86,10 @@ lemma om_shift (s M ε : ℝ) (hM : 0 ≤ M) (hε0 : 0 ≤ ε) (hε1 : ε ≤ 1)
         mul_le_mul F1 F2 (by positivity) (by positivity)
     _ = _ := by rw [Real.rpow_add hA0]; ring
 
-private theorem abs_mul_sub_le_of_sq_eq_one_add_sq (g t s M e r b V : ℝ) (hg : 0 ≤ g) (hV : 0 ≤ V) (ht : |t| ≤ g * V)
-    (hM : 0 ≤ M) (he0 : 0 ≤ e) (he1 : e ≤ 1) (hr0 : 0 < r) (hr2 : r ^ 2 = 1 + g ^ 2)
-    (hb : b = 1 + e * g ^ 2) :
-    |t * (s * r⁻¹ - M * e * r * b⁻¹)| ≤ (|s| + M) * V := by
+private theorem abs_mul_sub_le_of_sq_eq_one_add_sq
+    (g t s M e r b V : ℝ) (hg : 0 ≤ g) (hV : 0 ≤ V) (ht : |t| ≤ g * V) (hM : 0 ≤ M) (he0 : 0 ≤ e)
+    (he1 : e ≤ 1) (hr0 : 0 < r) (hr2 : r ^ 2 = 1 + g ^ 2) (hb : b = 1 + e * g ^ 2)
+    : |t * (s * r⁻¹ - M * e * r * b⁻¹)| ≤ (|s| + M) * V := by
   subst hb
   have hb0 : 0 < 1 + e * g ^ 2 := add_pos_of_pos_of_nonneg one_pos (mul_nonneg he0 (sq_nonneg g))
   have hgr : g ≤ r := by
@@ -97,7 +97,9 @@ private theorem abs_mul_sub_le_of_sq_eq_one_add_sq (g t s M e r b V : ℝ) (hg :
     have hlt := not_le.mp hcon
     nlinarith [mul_lt_mul'' hlt hlt hr0.le hr0.le]
   have hgr' : g * r⁻¹ ≤ 1 := by
-    calc g * r⁻¹ ≤ r * r⁻¹ := mul_le_mul_of_nonneg_right hgr (inv_nonneg.2 hr0.le)
+    calc
+      g * r⁻¹
+        ≤ r * r⁻¹ := mul_le_mul_of_nonneg_right hgr (inv_nonneg.2 hr0.le)
       _ = 1 := mul_inv_cancel₀ hr0.ne'
   have hsq : (g * e * r) ^ 2 ≤ (1 + e * g ^ 2) ^ 2 := by
     have h := mul_nonneg (mul_nonneg he0 (sq_nonneg g)) (by linarith : (0 : ℝ) ≤ 2 - e)
@@ -109,12 +111,16 @@ private theorem abs_mul_sub_le_of_sq_eq_one_add_sq (g t s M e r b V : ℝ) (hg :
     have hlt := not_le.mp hcon
     nlinarith [mul_lt_mul'' hlt hlt hb0.le hb0.le]
   have hgb : g * (e * r * (1 + e * g ^ 2)⁻¹) ≤ 1 := by
-    calc g * (e * r * (1 + e * g ^ 2)⁻¹) = (g * e * r) * (1 + e * g ^ 2)⁻¹ := by ring
+    calc
+      g * (e * r * (1 + e * g ^ 2)⁻¹)
+        = (g * e * r) * (1 + e * g ^ 2)⁻¹ := by ring
       _ ≤ (1 + e * g ^ 2) * (1 + e * g ^ 2)⁻¹ := mul_le_mul_of_nonneg_right hX (inv_nonneg.2 hb0.le)
       _ = 1 := mul_inv_cancel₀ hb0.ne'
   have hpos : 0 ≤ M * e * r * (1 + e * g ^ 2)⁻¹ :=
     mul_nonneg (mul_nonneg (mul_nonneg hM he0) hr0.le) (inv_nonneg.2 hb0.le)
-  have h1 : |s * r⁻¹ - M * e * r * (1 + e * g ^ 2)⁻¹| ≤ |s| * r⁻¹ + M * (e * r * (1 + e * g ^ 2)⁻¹) := by
+  have h1
+      : |s * r⁻¹ - M * e * r * (1 + e * g ^ 2)⁻¹|
+        ≤ |s| * r⁻¹ + M * (e * r * (1 + e * g ^ 2)⁻¹) := by
     have h := norm_sub_le (s * r⁻¹) (M * e * r * (1 + e * g ^ 2)⁻¹)
     simp only [Real.norm_eq_abs] at h
     rw [abs_mul, abs_of_pos (inv_pos.2 hr0), abs_of_nonneg hpos] at h
@@ -123,9 +129,10 @@ private theorem abs_mul_sub_le_of_sq_eq_one_add_sq (g t s M e r b V : ℝ) (hg :
   have hsum : |s| * (g * r⁻¹) + M * (g * (e * r * (1 + e * g ^ 2)⁻¹)) ≤ |s| + M := by
     nlinarith [mul_le_mul_of_nonneg_left hgr' (abs_nonneg s), mul_le_mul_of_nonneg_left hgb hM]
   rw [abs_mul]
-  calc |t| * |s * r⁻¹ - M * e * r * (1 + e * g ^ 2)⁻¹|
-      ≤ (g * V) * (|s| * r⁻¹ + M * (e * r * (1 + e * g ^ 2)⁻¹)) :=
-        mul_le_mul ht h1 (abs_nonneg _) (mul_nonneg hg hV)
+  calc
+    |t| * |s * r⁻¹ - M * e * r * (1 + e * g ^ 2)⁻¹|
+        ≤ (g * V) * (|s| * r⁻¹ + M * (e * r * (1 + e * g ^ 2)⁻¹)) :=
+      mul_le_mul ht h1 (abs_nonneg _) (mul_nonneg hg hV)
     _ = V * (|s| * (g * r⁻¹) + M * (g * (e * r * (1 + e * g ^ 2)⁻¹))) := by ring
     _ ≤ V * (|s| + M) := mul_le_mul_of_nonneg_left hsum hV
     _ = (|s| + M) * V := by ring
@@ -176,67 +183,90 @@ open WD in
 theorem sobolevWeightLipschitz : WeightDiff := by
   intro d s M hM
   have hN0 : 0 ≤ |(s - 1) / 2| + M / 2 := add_nonneg (abs_nonneg _) (by linarith)
-  refine ⟨(|s| + M) * 2 ^ (|(s - 1) / 2| + M / 2), 2 * (|(s - 1) / 2| + M / 2),
-    mul_nonneg (add_nonneg (abs_nonneg s) hM) (Real.rpow_nonneg (by norm_num) _), by linarith, ?_⟩
+  refine ⟨
+    (|s| + M) * 2 ^ (|(s - 1) / 2| + M / 2),
+    2 * (|(s - 1) / 2| + M / 2),
+    mul_nonneg (add_nonneg (abs_nonneg s) hM) (Real.rpow_nonneg (by norm_num) _),
+    by linarith,
+    ?_
+  ⟩
   intro ε hε0 hε1 ξ η
-  have hderiv : ∀ t : ℝ, HasDerivAt (fun t : ℝ => om s M ε (η + t • (ξ - η)))
-      ((2 * inner ℝ (η + t • (ξ - η)) (ξ - η)) * (s / 2) * (1 + ‖η + t • (ξ - η)‖ ^ 2) ^ (s / 2 - 1) *
-          (1 + ε ^ 2 * ‖η + t • (ξ - η)‖ ^ 2) ^ (-(M / 2)) +
-        (1 + ‖η + t • (ξ - η)‖ ^ 2) ^ (s / 2) *
-          ((ε ^ 2 * (2 * inner ℝ (η + t • (ξ - η)) (ξ - η))) * (-(M / 2)) *
-            (1 + ε ^ 2 * ‖η + t • (ξ - η)‖ ^ 2) ^ (-(M / 2) - 1))) t := by
+  have hderiv
+      : ∀ t : ℝ,
+        HasDerivAt
+          (fun t : ℝ => om s M ε (η + t • (ξ - η)))
+          ((2 * inner ℝ (η + t • (ξ - η)) (ξ - η)) * (s / 2)
+              * (1 + ‖η + t • (ξ - η)‖ ^ 2) ^ (s / 2 - 1)
+              * (1 + ε ^ 2 * ‖η + t • (ξ - η)‖ ^ 2) ^ (-(M / 2))
+            + (1 + ‖η + t • (ξ - η)‖ ^ 2) ^ (s / 2)
+              * ((ε ^ 2 * (2 * inner ℝ (η + t • (ξ - η)) (ξ - η))) * (-(M / 2))
+                * (1 + ε ^ 2 * ‖η + t • (ξ - η)‖ ^ 2) ^ (-(M / 2) - 1)))
+          t := by
     intro t
     have hγ : HasDerivAt (fun t : ℝ => η + t • (ξ - η)) (ξ - η) t := by
       have := ((hasDerivAt_id' t).smul_const (ξ - η)).const_add η
       rwa [one_smul] at this
-    have h1 : HasDerivAt (fun t : ℝ => 1 + ‖η + t • (ξ - η)‖ ^ 2)
+    have h1 : HasDerivAt
+        (fun t : ℝ => 1 + ‖η + t • (ξ - η)‖ ^ 2)
         (2 * inner ℝ (η + t • (ξ - η)) (ξ - η)) t :=
       hγ.norm_sq.const_add 1
-    have h2 : HasDerivAt (fun t : ℝ => 1 + ε ^ 2 * ‖η + t • (ξ - η)‖ ^ 2)
+    have h2 : HasDerivAt
+        (fun t : ℝ => 1 + ε ^ 2 * ‖η + t • (ξ - η)‖ ^ 2)
         (ε ^ 2 * (2 * inner ℝ (η + t • (ξ - η)) (ξ - η))) t :=
       (hγ.norm_sq.const_mul (ε ^ 2)).const_add 1
     have hp1 : (1 + ‖η + t • (ξ - η)‖ ^ 2) ≠ 0 := by positivity
     have hp2 : (1 + ε ^ 2 * ‖η + t • (ξ - η)‖ ^ 2) ≠ 0 := by positivity
     exact (h1.rpow_const (Or.inl hp1)).mul (h2.rpow_const (Or.inl hp2))
-  obtain ⟨D, hD⟩ : ∃ D : ℝ → ℝ, ∀ t : ℝ,
-      HasDerivAt (fun t : ℝ => om s M ε (η + t • (ξ - η))) (D t) t ∧
-      |D t| ≤ (|s| + M) * ‖ξ - η‖ * om (s - 1) M ε (η + t • (ξ - η)) :=
+  obtain ⟨D, hD⟩
+      : ∃ D : ℝ → ℝ, ∀ t : ℝ,
+        HasDerivAt (fun t : ℝ => om s M ε (η + t • (ξ - η))) (D t) t
+          ∧ |D t| ≤ (|s| + M) * ‖ξ - η‖ * om (s - 1) M ε (η + t • (ξ - η)) :=
     ⟨_, fun t => ⟨hderiv t, ZetaZeros.D.EllReg.WD.deriv_bound s M ε hM hε0 hε1 _ _⟩⟩
-  have hW : ∀ t ∈ Set.Icc (0 : ℝ) 1, om (s - 1) M ε (η + t • (ξ - η)) ≤
-      (2 * (1 + ‖ξ - η‖ ^ 2)) ^ (|(s - 1) / 2| + M / 2) * om (s - 1) M ε η := by
+  have hW
+      : ∀ t ∈ Set.Icc (0 : ℝ) 1,
+        om (s - 1) M ε (η + t • (ξ - η))
+          ≤ (2 * (1 + ‖ξ - η‖ ^ 2)) ^ (|(s - 1) / 2| + M / 2) * om (s - 1) M ε η := by
     intro t ht
     apply ZetaZeros.D.EllReg.WD.om_shift (s - 1) M ε hM hε0 hε1
     have e : η + t • (ξ - η) - η = t • (ξ - η) := by abel
     rw [e, norm_smul, Real.norm_eq_abs, abs_of_nonneg ht.1]
     exact mul_le_of_le_one_left (norm_nonneg _) ht.2
   have hcoef : 0 ≤ (|s| + M) * ‖ξ - η‖ := mul_nonneg (add_nonneg (abs_nonneg s) hM) (norm_nonneg _)
-  have hbd : ∀ t ∈ Set.Ico (0 : ℝ) 1, ‖D t‖ ≤ (|s| + M) * ‖ξ - η‖ *
-      ((2 * (1 + ‖ξ - η‖ ^ 2)) ^ (|(s - 1) / 2| + M / 2) * om (s - 1) M ε η) := by
+  have hbd
+      : ∀ t ∈ Set.Ico (0 : ℝ) 1,
+        ‖D t‖
+          ≤ (|s| + M) * ‖ξ - η‖
+            * ((2 * (1 + ‖ξ - η‖ ^ 2)) ^ (|(s - 1) / 2| + M / 2) * om (s - 1) M ε η) := by
     intro t ht
     rw [Real.norm_eq_abs]
     exact (hD t).2.trans (mul_le_mul_of_nonneg_left (hW t (Set.Ico_subset_Icc_self ht)) hcoef)
-  have hmvt : ‖om s M ε (η + (1 : ℝ) • (ξ - η)) - om s M ε (η + (0 : ℝ) • (ξ - η))‖ ≤
-      (|s| + M) * ‖ξ - η‖ *
-        ((2 * (1 + ‖ξ - η‖ ^ 2)) ^ (|(s - 1) / 2| + M / 2) * om (s - 1) M ε η) * (1 - 0) :=
-    norm_image_sub_le_of_norm_deriv_le_segment' (fun t _ => (hD t).1.hasDerivWithinAt) hbd 1
-      (Set.right_mem_Icc.2 zero_le_one)
+  have hmvt
+      : ‖om s M ε (η + (1 : ℝ) • (ξ - η)) - om s M ε (η + (0 : ℝ) • (ξ - η))‖
+        ≤ (|s| + M) * ‖ξ - η‖
+          * ((2 * (1 + ‖ξ - η‖ ^ 2)) ^ (|(s - 1) / 2| + M / 2) * om (s - 1) M ε η) * (1 - 0) :=
+    norm_image_sub_le_of_norm_deriv_le_segment'
+      (fun t _ => (hD t).1.hasDerivWithinAt)
+      hbd 1 (Set.right_mem_Icc.2 zero_le_one)
   have e1 : η + (1 : ℝ) • (ξ - η) = ξ := by rw [one_smul]; abel
   have e0 : η + (0 : ℝ) • (ξ - η) = η := by rw [zero_smul, add_zero]
   rw [e1, e0, Real.norm_eq_abs, sub_zero, mul_one] at hmvt
   have hx := norm_nonneg (ξ - η)
-  have hA : (2 * (1 + ‖ξ - η‖ ^ 2)) ^ (|(s - 1) / 2| + M / 2) ≤
-      2 ^ (|(s - 1) / 2| + M / 2) * (1 + ‖ξ - η‖) ^ (2 * (|(s - 1) / 2| + M / 2)) := by
+  have hA
+      : (2 * (1 + ‖ξ - η‖ ^ 2)) ^ (|(s - 1) / 2| + M / 2)
+        ≤ 2 ^ (|(s - 1) / 2| + M / 2) * (1 + ‖ξ - η‖) ^ (2 * (|(s - 1) / 2| + M / 2)) := by
     rw [Real.rpow_mul (by linarith : (0 : ℝ) ≤ 1 + ‖ξ - η‖), Real.rpow_two,
       ← Real.mul_rpow (by norm_num : (0 : ℝ) ≤ 2) (by positivity : (0 : ℝ) ≤ (1 + ‖ξ - η‖) ^ 2)]
     exact Real.rpow_le_rpow (by positivity) (by nlinarith) hN0
   have hW0 : 0 ≤ om (s - 1) M ε η := by unfold om; positivity
-  calc |om s M ε ξ - om s M ε η|
-      ≤ (|s| + M) * ‖ξ - η‖ *
-        ((2 * (1 + ‖ξ - η‖ ^ 2)) ^ (|(s - 1) / 2| + M / 2) * om (s - 1) M ε η) := hmvt
-    _ ≤ (|s| + M) * ‖ξ - η‖ *
-        ((2 ^ (|(s - 1) / 2| + M / 2) * (1 + ‖ξ - η‖) ^ (2 * (|(s - 1) / 2| + M / 2))) *
-          om (s - 1) M ε η) :=
-        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right hA hW0) hcoef
+  calc
+    |om s M ε ξ - om s M ε η|
+        ≤ (|s| + M) * ‖ξ - η‖
+          * ((2 * (1 + ‖ξ - η‖ ^ 2)) ^ (|(s - 1) / 2| + M / 2) * om (s - 1) M ε η) :=
+      hmvt
+    _ ≤ (|s| + M) * ‖ξ - η‖
+        * ((2 ^ (|(s - 1) / 2| + M / 2) * (1 + ‖ξ - η‖) ^ (2 * (|(s - 1) / 2| + M / 2)))
+          * om (s - 1) M ε η) :=
+      mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right hA hW0) hcoef
     _ = _ := by ring
 
 end

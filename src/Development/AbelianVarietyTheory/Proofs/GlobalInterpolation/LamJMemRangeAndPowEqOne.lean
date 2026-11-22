@@ -13,13 +13,14 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem lamJ_mem_range_and_pow_eq_one :
-    ∀ (k K : Type) [Field k] [Field K] (s : K →+* ℂ) (p : ℕ), p.Prime → Nat.card k = p →
-      (∃ ζ : K, IsPrimitiveRoot ζ p) → (∃ ζ : K, IsPrimitiveRoot ζ (p - 1)) →
-      ∀ (n : ℕ) (ψ : AddChar k ℂ) (χ : ℕ → MulChar k ℂ) (a t nb skip : ℕ)
-        (M : Matrix (Fin n) (Fin n) k),
-        (∃ r : K, s r = lamJ ψ χ a t nb skip M) ∧
-          (lamJ ψ χ a t nb skip M ≠ 0 → lamJ ψ χ a t nb skip M ^ (p * (p - 1)) = 1) := by
+theorem lamJ_mem_range_and_pow_eq_one
+    : ∀ (k K : Type) [Field k] [Field K] (s : K →+* ℂ) (p : ℕ),
+      p.Prime → Nat.card k = p → (∃ ζ : K, IsPrimitiveRoot ζ p)
+        → (∃ ζ : K, IsPrimitiveRoot ζ (p - 1))
+        → ∀ (n : ℕ) (ψ : AddChar k ℂ) (χ : ℕ → MulChar k ℂ) (a t nb skip : ℕ)
+            (M : Matrix (Fin n) (Fin n) k),
+          (∃ r : K, s r = lamJ ψ χ a t nb skip M)
+            ∧ (lamJ ψ χ a t nb skip M ≠ 0 → lamJ ψ χ a t nb skip M ^ (p * (p - 1)) = 1) := by
   intro k K _ _ s p hp hk ⟨ζ, hζ⟩ ⟨ξ, hξ⟩ n ψ χ a t nb skip M
   haveI : Finite k := Nat.finite_of_card_ne_zero (by rw [hk]; exact hp.ne_zero)
   letI : Fintype k := Fintype.ofFinite k

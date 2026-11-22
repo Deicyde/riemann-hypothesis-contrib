@@ -51,8 +51,7 @@ private lemma haar_measure_open_subgroup_index {T : Type} [Group T] [Topological
   congr 1
   simp [Subgroup.relIndex, Subgroup.index, Nat.card_eq_fintype_card]
 
-theorem volIdx :
-    UpperTheory.Gal.InertialTypesAlt.L.VolIdx := by
+theorem volIdx : UpperTheory.Gal.InertialTypesAlt.L.VolIdx := by
   intro G _ _ _ _ _ _ T C H hT ν hν hCT hC hHC hH
   haveI := hν
   have eH : {t : T | (t : G) ∈ H} = ((H.subgroupOf T : Subgroup T) : Set T) := rfl

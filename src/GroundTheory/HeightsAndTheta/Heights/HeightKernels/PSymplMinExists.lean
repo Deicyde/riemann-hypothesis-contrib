@@ -22,14 +22,13 @@ theorem qf_smul (G : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) : qf G (c • 
 theorem continuous_qf (G : Matrix ι ι ℝ) : Continuous (qf G) :=
   continuous_id.dotProduct (continuous_const.matrix_mulVec continuous_id)
 
-theorem exists_lower [DecidableEq ι] [Nonempty ι] (G : Matrix ι ι ℝ) (hG : G.PosDef) :
-    ∃ μ : ℝ, 0 < μ ∧ ∀ x : ι → ℝ, μ * ‖x‖ ^ 2 ≤ qf G x := by
+theorem exists_lower [DecidableEq ι] [Nonempty ι] (G : Matrix ι ι ℝ) (hG : G.PosDef)
+    : ∃ μ : ℝ, 0 < μ ∧ ∀ x : ι → ℝ, μ * ‖x‖ ^ 2 ≤ qf G x := by
   obtain ⟨i₀⟩ := ‹Nonempty ι›
   have hpos : ∀ x : ι → ℝ, x ≠ 0 → 0 < qf G x := fun x hx => by
     simpa [qf] using hG.dotProduct_mulVec_pos hx
   have hK : IsCompact (Metric.sphere (0 : ι → ℝ) 1) := isCompact_sphere 0 1
-  have hne : (Metric.sphere (0 : ι → ℝ) 1).Nonempty :=
-    ⟨Pi.single i₀ 1, by simp [Pi.norm_single]⟩
+  have hne : (Metric.sphere (0 : ι → ℝ) 1).Nonempty := ⟨Pi.single i₀ 1, by simp [Pi.norm_single]⟩
   obtain ⟨u, hu, hmin⟩ := hK.exists_isMinOn hne (continuous_qf G).continuousOn
   refine ⟨qf G u, hpos u ?_, fun x => ?_⟩
   · rintro rfl
@@ -41,7 +40,9 @@ theorem exists_lower [DecidableEq ι] [Nonempty ι] (G : Matrix ι ι ℝ) (hG :
       have hy : ‖x‖⁻¹ • x ∈ Metric.sphere (0 : ι → ℝ) 1 := by
         rw [mem_sphere_zero_iff_norm, norm_smul, norm_inv, norm_norm, inv_mul_cancel₀ hn.ne']
       have h1 : qf G u ≤ qf G (‖x‖⁻¹ • x) := isMinOn_iff.mp hmin _ hy
-      calc qf G u * ‖x‖ ^ 2 ≤ qf G (‖x‖⁻¹ • x) * ‖x‖ ^ 2 := by gcongr
+      calc
+        qf G u * ‖x‖ ^ 2
+          ≤ qf G (‖x‖⁻¹ • x) * ‖x‖ ^ 2 := by gcongr
         _ = qf G x := by
           rw [qf_smul]
           field_simp
@@ -72,7 +73,9 @@ theorem SymplMinExists.proof (h1 : SymplQuadDiag.Statement) : SymplMinExists.Sta
           nlinarith
       have hsq2 : |(v i : ℝ)| ^ 2 ≤ ‖intVec v‖ ^ 2 := pow_le_pow_left₀ (abs_nonneg _) hi 2
       rw [le_div_iff₀ hμ]
-      calc |(v i : ℝ)| * μ ≤ μ * ‖intVec v‖ ^ 2 := by nlinarith
+      calc
+        |(v i : ℝ)| * μ
+          ≤ μ * ‖intVec v‖ ^ 2 := by nlinarith
         _ ≤ qf G (intVec v) := hlow _
         _ ≤ M₀ := hq
     have hc : ∀ i, |v i| ≤ R := by

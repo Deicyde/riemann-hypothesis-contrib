@@ -12,8 +12,8 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 
 namespace GlobalTheory.RelDimOfDim
 
-theorem smoothOfRelativeDimension_of_topologicalKrullDim_eq :
-    ∀ (F : Type) [Field F] (X : Scheme.{0}) [IsIntegral X] (q : X ⟶ Sp F) (n : ℕ),
+theorem smoothOfRelativeDimension_of_topologicalKrullDim_eq
+    : ∀ (F : Type) [Field F] (X : Scheme.{0}) [IsIntegral X] (q : X ⟶ Sp F) (n : ℕ),
       Smooth q → topologicalKrullDim X = n → SmoothOfRelativeDimension n q := by
   intro F _ X _ q n hq hn
   have x₀ : X := Classical.arbitrary X

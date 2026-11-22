@@ -10,10 +10,12 @@ open IsLocalRing Polynomial
 
 namespace GlobalTheory.Specialise
 
-theorem sepEtale (R A : Type) [CommRing R] [CommRing A] [Algebra R A] [Algebra.Etale R A]
-    (Q : Ideal R) [Q.IsPrime] (L : Type) [Field L] [Algebra R L] [Algebra Q.ResidueField L]
-    [IsScalarTower R Q.ResidueField L] (f : A →ₐ[R] L) (a : A) :
-    IsSeparable Q.ResidueField (f a) := by
+theorem sepEtale
+    (R A : Type) [CommRing R] [CommRing A] [Algebra R A] [Algebra.Etale R A]
+    (Q : Ideal R) [Q.IsPrime]
+    (L : Type) [Field L] [Algebra R L] [Algebra Q.ResidueField L] [IsScalarTower R Q.ResidueField L]
+    (f : A →ₐ[R] L) (a : A)
+    : IsSeparable Q.ResidueField (f a) := by
   let P : Ideal A := RingHom.ker f
   haveI : P.IsPrime := RingHom.ker_isPrime f
   have hPQ : Q = P.comap (algebraMap R A) := by
@@ -24,34 +26,38 @@ theorem sepEtale (R A : Type) [CommRing R] [CommRing A] [Algebra R A] [Algebra.E
   haveI : P.LiesOver Q := ⟨hPQ⟩
   letI := Localization.AtPrime.algebraOfLiesOver Q P
   have hsep : Algebra.IsSeparable Q.ResidueField P.ResidueField := inferInstance
-  let g : P.ResidueField →ₐ[R] L := Ideal.ResidueField.liftₐ P f le_rfl (fun x hx => by
-    simp only [Submonoid.mem_comap, IsUnit.mem_submonoid_iff]
-    exact isUnit_iff_ne_zero.mpr (fun h => hx h))
+  let g : P.ResidueField →ₐ[R] L :=
+    Ideal.ResidueField.liftₐ P f le_rfl (fun x hx => by
+      simp only [Submonoid.mem_comap, IsUnit.mem_submonoid_iff]
+      exact isUnit_iff_ne_zero.mpr (fun h => hx h))
   have hg : ∀ x : A, g (algebraMap A P.ResidueField x) = f x := fun x =>
     Ideal.ResidueField.liftₐ_algebraMap _ _ _ _ x
-  let g' : P.ResidueField →ₐ[Q.ResidueField] L :=
-    { g.toRingHom with
-      commutes' := by
-        have : g.toRingHom.comp (algebraMap Q.ResidueField P.ResidueField) =
-            algebraMap Q.ResidueField L := by
-          apply Ideal.ResidueField.ringHom_ext
-          ext r
-          simp only [RingHom.comp_apply]
-          rw [← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply,
-            IsScalarTower.algebraMap_apply R A P.ResidueField]
-          exact (hg _).trans (f.commutes r)
-        intro c
-        exact DFunLike.congr_fun this c }
+  let g' : P.ResidueField →ₐ[Q.ResidueField] L := {
+    g.toRingHom with
+    commutes' := by
+      have : g.toRingHom.comp (algebraMap Q.ResidueField P.ResidueField)
+          = algebraMap Q.ResidueField L := by
+        apply Ideal.ResidueField.ringHom_ext
+        ext r
+        simp only [RingHom.comp_apply]
+        rw [← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply,
+          IsScalarTower.algebraMap_apply R A P.ResidueField]
+        exact (hg _).trans (f.commutes r)
+      intro c
+      exact DFunLike.congr_fun this c
+  }
   have h1 : g' (algebraMap A P.ResidueField a) = f a := hg a
   rw [← h1, isSeparable_map_iff g' g'.toRingHom.injective]
   exact Algebra.IsSeparable.isSeparable _ _
 
-theorem specialisation_exists : ∀ (R S O : Type) [CommRing R] [CommRing S] [IsLocalRing S] [CommRing O]
-    [HenselianLocalRing O] [IsSepClosed (IsLocalRing.ResidueField O)] [Algebra R S] [Algebra R O]
-    (Q y : Ideal R) [Q.IsPrime] [y.IsPrime], Q ≤ y →
-    (IsLocalRing.maximalIdeal S).comap (algebraMap R S) = y →
-    (IsLocalRing.maximalIdeal O).comap (algebraMap R O) = Q →
-    Module.Flat R S → GlobalTheory.LocAcyc.LocPiecesEtale R S → Nonempty (S →ₐ[R] O) := by
+theorem specialisation_exists
+    : ∀ (R S O : Type) [CommRing R] [CommRing S] [IsLocalRing S] [CommRing O] [HenselianLocalRing O]
+        [IsSepClosed (IsLocalRing.ResidueField O)] [Algebra R S] [Algebra R O] (Q y : Ideal R)
+        [Q.IsPrime] [y.IsPrime],
+      Q ≤ y → (IsLocalRing.maximalIdeal S).comap (algebraMap R S) = y
+        → (IsLocalRing.maximalIdeal O).comap (algebraMap R O) = Q → Module.Flat R S
+        → GlobalTheory.LocAcyc.LocPiecesEtale R S
+        → Nonempty (S →ₐ[R] O) := by
   intro R S O _ _ _ _ _ _ _ _ Q y _ _ hQy hy hQ _ hpieces
   haveI : Algebra.HasGoingDown R S := Algebra.HasGoingDown.of_flat
   haveI : (maximalIdeal S).LiesOver y := ⟨hy.symm⟩
@@ -71,15 +77,13 @@ theorem specialisation_exists : ∀ (R S O : Type) [CommRing R] [CommRing S] [Is
     obtain ⟨A, _, _, _, q, _, ⟨e⟩⟩ := hloc i
     let F : Localization.AtPrime q →ₐ[R] Q₂.ResidueField :=
       (IsScalarTower.toAlgHom R S Q₂.ResidueField).comp ((Si i).val.comp (e : _ →ₐ[R] _))
-    let f : A →ₐ[R] Q₂.ResidueField :=
-      F.comp (IsScalarTower.toAlgHom R A (Localization.AtPrime q))
+    let f : A →ₐ[R] Q₂.ResidueField := F.comp (IsScalarTower.toAlgHom R A (Localization.AtPrime q))
     obtain ⟨⟨a, t⟩, hat⟩ := IsLocalization.mk'_surjective q.primeCompl (e.symm ⟨s, hi⟩)
     have hs : algebraMap S Q₂.ResidueField s = F (IsLocalization.mk' _ a t) := by
       simp only [F, AlgHom.comp_apply, hat]
       simp
     have hft : f t ≠ 0 := by
-      have : IsUnit (f t) :=
-        (IsLocalization.map_units (Localization.AtPrime q) t).map F
+      have : IsUnit (f t) := (IsLocalization.map_units (Localization.AtPrime q) t).map F
       exact this.ne_zero
     have hmul : F (IsLocalization.mk' _ a t) * f t = f a := by
       simp only [f, AlgHom.comp_apply, IsScalarTower.coe_toAlgHom', ← map_mul,
@@ -87,8 +91,7 @@ theorem specialisation_exists : ∀ (R S O : Type) [CommRing R] [CommRing S] [Is
     have hx : algebraMap S Q₂.ResidueField s = f a * (f t)⁻¹ := by
       rw [hs, eq_mul_inv_iff_mul_eq₀ hft, hmul]
     rw [hx, ← mem_separableClosure_iff]
-    refine mul_mem ?_ (inv_mem ?_) <;> rw [mem_separableClosure_iff] <;>
-      exact sepEtale R A Q _ f _
+    refine mul_mem ?_ (inv_mem ?_) <;> rw [mem_separableClosure_iff] <;> exact sepEtale R A Q _ f _
   haveI : Algebra.IsSeparable Q.ResidueField Q₂.ResidueField := ⟨fun x => by
     obtain ⟨u, v, -, rfl⟩ := IsFractionRing.div_surjective (A := S ⧸ Q₂) x
     obtain ⟨u, rfl⟩ := Ideal.Quotient.mk_surjective u

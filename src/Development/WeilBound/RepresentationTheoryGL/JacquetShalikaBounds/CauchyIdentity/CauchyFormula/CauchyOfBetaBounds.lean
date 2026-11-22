@@ -12,15 +12,16 @@ namespace PositivityTheory.RgJS
 
 namespace CauchyPositivity
 
-theorem exists_pos (A B x : ℝ) (hx : 0 ≤ x) (h : x * A * B < 1) :
-    ∃ δ : ℝ, 0 < δ ∧ x * max A δ * max B δ < 1 := by
+theorem exists_pos (A B x : ℝ) (hx : 0 ≤ x) (h : x * A * B < 1)
+    : ∃ δ : ℝ, 0 < δ ∧ x * max A δ * max B δ < 1 := by
   have hg : Continuous (fun δ : ℝ => x * max A δ * max B δ) := by fun_prop
   have h0 : x * max A 0 * max B 0 < 1 := by
     rcases le_total A 0 with hA | hA
     · rw [max_eq_right hA]; simp
     rcases le_total B 0 with hB | hB
     · rw [max_eq_right hB]; simp
-    rw [max_eq_left hA, max_eq_left hB]; exact h
+    rw [max_eq_left hA, max_eq_left hB]
+    exact h
   have hn : ∀ᶠ δ in nhds (0:ℝ), x * max A δ * max B δ < 1 :=
     (hg.tendsto 0).eventually (gt_mem_nhds h0)
   have hev : ∀ᶠ δ in nhdsWithin (0:ℝ) (Set.Ioi 0), x * max A δ * max B δ < 1 ∧ δ ∈ Set.Ioi (0:ℝ) :=

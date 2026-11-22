@@ -30,14 +30,16 @@ def extendAddHom {K K' : Type} (j : K ↪ K') : (K → ℕ) →+ (K' → ℕ) wh
       simp [j.injective.extend_apply]
     · simp [Function.extend_apply' _ _ _ h]
 
-theorem weight_mapDomain_blockWeight {K K' : Type} [DecidableEq K] [DecidableEq K'] (j : K ↪ K')
-    (ι : K → Type) (ι' : K' → Type) (g : (Σ k, ι k) → (Σ k', ι' k'))
-    (hg : ∀ v, (g v).1 = j v.1) (u : (Σ k, ι k) →₀ ℕ) :
-    Finsupp.weight (blockWeight ι') (Finsupp.mapDomain g u) =
-      Function.extend j (Finsupp.weight (blockWeight ι) u) 0 := by
-  have key : (Finsupp.weight (R := ℕ) (blockWeight ι')).comp
-        (Finsupp.mapDomain.addMonoidHom (M := ℕ) g) =
-      (extendAddHom j).comp (Finsupp.weight (R := ℕ) (blockWeight ι)) := by
+theorem weight_mapDomain_blockWeight
+    {K K' : Type} [DecidableEq K] [DecidableEq K']
+    (j : K ↪ K') (ι : K → Type) (ι' : K' → Type)
+    (g : (Σ k, ι k) → (Σ k', ι' k')) (hg : ∀ v, (g v).1 = j v.1)
+    (u : (Σ k, ι k) →₀ ℕ)
+    : Finsupp.weight (blockWeight ι') (Finsupp.mapDomain g u)
+      = Function.extend j (Finsupp.weight (blockWeight ι) u) 0 := by
+  have key
+      : (Finsupp.weight (R := ℕ) (blockWeight ι')).comp (Finsupp.mapDomain.addMonoidHom (M := ℕ) g)
+        = (extendAddHom j).comp (Finsupp.weight (R := ℕ) (blockWeight ι)) := by
     ext v
     simp only [AddMonoidHom.coe_comp, Function.comp_apply, Finsupp.singleAddHom_apply,
       Finsupp.mapDomain.addMonoidHom_apply, Finsupp.mapDomain_single, Finsupp.weight_single,

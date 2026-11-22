@@ -5,7 +5,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.ExistsFrameT
 
 @[expose] public section
 
-open Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.QrD
+open Matrix Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.QrD
 
 namespace Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
 
@@ -23,8 +24,9 @@ def cvec2 (k r : ℕ) (z e : Fin (2 * r + k + 1) → ℂ) : JJ r ⊕ Unit → Fi
 def cvec2' (k r : ℕ) (z e : Fin (2 * r + k + 1) → ℂ) : JJ r ⊕ Unit → Fin (2 * r + k + 1) → ℂ :=
   Sum.elim (cvec' k r z) (fun _ => e)
 
-theorem sum_unitB {m : ℕ} (Bs : Fin m → Fin (2 * r + k + 1) → ℂ) (B : Matrix (Fin m) (Fin m) ℂ) :
-    colM Bs * B * ((colM Bs)ᴴ * Hpk k r) = ∑ p : Fin m × Fin m, B p.1 p.2 • unitB (Hpk k r) Bs p.1 p.2 := by
+theorem sum_unitB {m : ℕ} (Bs : Fin m → Fin (2 * r + k + 1) → ℂ) (B : Matrix (Fin m) (Fin m) ℂ)
+    : colM Bs * B * ((colM Bs)ᴴ * Hpk k r)
+      = ∑ p : Fin m × Fin m, B p.1 p.2 • unitB (Hpk k r) Bs p.1 p.2 := by
   ext i j
   have hu : ∀ a b, unitB (Hpk k r) Bs a b i j = Bs a i * ∑ q, star (Bs b q) * Hpk k r q j := by
     intro a b
@@ -49,23 +51,32 @@ theorem sum_unitB {m : ℕ} (Bs : Fin m → Fin (2 * r + k + 1) → ℂ) (B : Ma
   intro q _
   ring
 
-theorem stab_exp {z e : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z) (he : inWb k r e)
-    (hez : herm (Hpk k r) e z = 0) (hee : herm (Hpk k r) e e = 1) {Bs : Fin (k - 1) → Fin (2 * r + k + 1) → ℂ}
-    (hB : IsFrameOf k r [z, e] Bs) {h : Mx k r} (hh : h ∈ UWset k r z) (hhe : h *ᵥ e = e) :
-    ∃ B : Matrix (Fin (k - 1)) (Fin (k - 1)) ℂ, Bᴴ = -B ∧
-      NormedSpace.exp (colM Bs * B * ((colM Bs)ᴴ * Hpk k r)) = h := by
+theorem stab_exp
+    {z e : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z) (he : inWb k r e)
+    (hez : herm (Hpk k r) e z = 0) (hee : herm (Hpk k r) e e = 1)
+    {Bs : Fin (k - 1) → Fin (2 * r + k + 1) → ℂ} (hB : IsFrameOf k r [z, e] Bs)
+    {h : Mx k r} (hh : h ∈ UWset k r z) (hhe : h *ᵥ e = e)
+    : ∃ B : Matrix (Fin (k - 1)) (Fin (k - 1)) ℂ,
+      Bᴴ = -B ∧ NormedSpace.exp (colM Bs * B * ((colM Bs)ᴴ * Hpk k r)) = h := by
   have hzz : herm (Hpk k r) z z ≠ 0 := by
     intro e0
     unfold Tz at hT
     rw [e0] at hT
     simp at hT
-  have hBz : IsFrameOf k r [z] Bs := ⟨hB.1, hB.2.1, fun a v hv => hB.2.2 a v (by
-    simp only [List.mem_cons, List.not_mem_nil, or_false] at hv ⊢; exact Or.inl hv)⟩
-  have hE : IsFrameOf k r [z] (fun _ : Fin 1 => e) := ⟨fun _ => he, fun a b => by
-    simp [Subsingleton.elim a b, hee], fun _ v hv => by
-    simp only [List.mem_cons, List.not_mem_nil, or_false] at hv
-    subst hv
-    exact hez⟩
+  have hBz : IsFrameOf k r [z] Bs := ⟨
+    hB.1,
+    hB.2.1,
+    fun a v hv =>
+      hB.2.2 a v (by simp only [List.mem_cons, List.not_mem_nil, or_false] at hv ⊢; exact Or.inl hv)
+  ⟩
+  have hE : IsFrameOf k r [z] (fun _ : Fin 1 => e) := ⟨
+    fun _ => he,
+    fun a b => by simp [Subsingleton.elim a b, hee],
+    fun _ v hv => by
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hv
+      subst hv
+      exact hez
+  ⟩
   have hBe : ∀ a, herm (Hpk k r) (Bs a) e = 0 := fun a => hB.2.2 a e (by simp)
   have hBe' : ∀ a, herm (Hpk k r) e (Bs a) = 0 := fun a => by rw [← Qx2.herm_star, hBe a, star_zero]
   have g1 : (colM Bs)ᴴ * Hpk k r * colM Bs = 1 := by

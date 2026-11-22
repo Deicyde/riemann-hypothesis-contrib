@@ -18,7 +18,7 @@ universe u w
 
 def TildeFinite.Statement : Prop :=
   ∀ (S : Type u) [CommRing S] [IsNoetherianRing S] (Ω : Type w) [Field Ω] [Algebra S Ω] (N : ℕ)
-    (x : Fin (N + 1) → Ω) (M : FinGradedSub (S := S) (x := x) Ω) (i : ℕ) (c : ℤ),
+      (x : Fin (N + 1) → Ω) (M : FinGradedSub (S := S) (x := x) Ω) (i : ℕ) (c : ℤ),
     Module.Finite S ((M.tildeSys c).H i)
 
 end

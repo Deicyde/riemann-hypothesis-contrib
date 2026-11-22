@@ -201,26 +201,34 @@ lemma gen (M : Mdl q) {ω : ℂ_[q]} (hL : IsOK d M.L) (h : M.MChart ω) (n : �
 
 end
 
-theorem exists_normalised_chart : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]), d.Prime → d % 16 = 7 → Split d q → IsOK d M.L → M.MChart ω → ∃ a : ℤ_[q], ‖a‖ = 1 ∧ M.MChart (ω * zc a) ∧ ∀ (n : ℕ) (y : ℂ), Good M.ι d n 1 y → M.ι (kap1 d 1 y) ^ (q ^ n) = 1 ∧ M.At (ω * zc a) (M.ι (kap1 d 1 y)) y := by
+theorem exists_normalised_chart
+    : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω : ℂ_[q]),
+      d.Prime → d % 16 = 7 → Split d q → IsOK d M.L → M.MChart ω
+        → ∃ a : ℤ_[q],
+          ‖a‖ = 1 ∧ M.MChart (ω * zc a)
+            ∧ ∀ (n : ℕ) (y : ℂ),
+              Good M.ι d n 1 y
+                → M.ι (kap1 d 1 y) ^ (q ^ n) = 1 ∧ M.At (ω * zc a) (M.ι (kap1 d 1 y)) y := by
   intro d q hq M ω hd h16 hs hL h
   choose u b hat hc hb using gen hd h16 hs M hL h
-  obtain ⟨-, -, -, hlat, -⟩ := GlobalTheory.T.smallPoint_multiplicativeCoordinate_existsUnique q M ω h
+  obtain ⟨-, -, -, hlat, -⟩ :=
+    GlobalTheory.T.smallPoint_multiplicativeCoordinate_existsUnique q M ω h
   have hq0 : (q : ℂ) ≠ 0 := by exact_mod_cast hq.out.ne_zero
   have hdv : ∀ n, (q : ℤ) ^ n ∣ b (n + 1) - b n := fun n => by
     have h1 := at_pow M h (hat (n + 1)) q
     rw [← map_pow, rt_succ] at h1
     obtain ⟨s, t, hst⟩ := (hL _).1 ((hlat _ _ _ h1).1 (hat n))
-    have : ((u (n + 1) - u n : ℤ) : ℂ) + ((b (n + 1) - b n : ℤ) : ℂ) * wK d =
-        (((q : ℤ) ^ n * s : ℤ) : ℂ) + (((q : ℤ) ^ n * t : ℤ) : ℂ) * wK d := by
+    have : ((u (n + 1) - u n : ℤ) : ℂ) + ((b (n + 1) - b n : ℤ) : ℂ) * wK d
+        = (((q : ℤ) ^ n * s : ℤ) : ℂ) + (((q : ℤ) ^ n * t : ℤ) : ℂ) * wK d := by
       push_cast
-      have e : (q : ℂ) ^ n * s + (q : ℂ) ^ n * t * wK d = (q : ℂ) ^ n * ((s : ℂ) + t * wK d) := by ring
+      have e : (q : ℂ) ^ n * s + (q : ℂ) ^ n * t * wK d = (q : ℂ) ^ n * ((s : ℂ) + t * wK d) := by
+        ring
       rw [e, ← hst]
       field_simp
       ring
     exact ⟨t, (OKArith.coord_unique hd.pos this).2⟩
   set β : ℤ_[q] := PadicInt.ofIntSeq _ (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub b q hdv) with hβ
-  have hβn : ∀ n, PadicInt.toZModPow n β = b n :=
-    PadicInt.toZModPow_ofIntSeq_of_pow_dvd_sub b q hdv
+  have hβn : ∀ n, PadicInt.toZModPow n β = b n := PadicInt.toZModPow_ofIntSeq_of_pow_dvd_sub b q hdv
   have hβu : IsUnit β := by
     by_contra hu
     have h1 : ‖β‖ < 1 := PadicInt.not_isUnit_iff.1 hu
@@ -242,7 +250,8 @@ theorem exists_normalised_chart : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω
   have hrt : rt q n ^ t = rt q n ^ k := by
     have h0 : rt q n ≠ 0 := Complex.exp_ne_zero _
     conv_lhs => rw [← Int.emod_add_mul_ediv t ((q ^ n : ℕ) : ℤ), ← hk]
-    rw [zpow_add₀ h0, zpow_mul, zpow_natCast, zpow_natCast, (rt_prim n).pow_eq_one, one_zpow, mul_one]
+    rw [zpow_add₀ h0, zpow_mul, zpow_natCast, zpow_natCast, (rt_prim n).pow_eq_one, one_zpow,
+      mul_one]
   have hξ : M.ι (rt q n ^ t) ^ (q ^ n) = 1 := by
     rw [hrt, ← map_pow, ← pow_mul, mul_comm, pow_mul, (rt_prim n).pow_eq_one, one_pow, map_one]
   refine ⟨hξ, at_scale M h (k := a.appr n) hξ ?_ ?_⟩
@@ -253,8 +262,8 @@ theorem exists_normalised_chart : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω
     refine (hlat _ _ _ h1).2 ((hL _).2 ?_)
     have hz : (q : ℤ) ^ n ∣ (k * a.appr n : ℕ) * b n - t := by
       have e1 : ((a.appr n : ℕ) : ZMod (q ^ n)) * (b n : ZMod (q ^ n)) = 1 := by
-        rw [← hβn, show ((a.appr n : ℕ) : ZMod (q ^ n)) = PadicInt.toZModPow n a from rfl, ← map_mul, ha,
-          map_one]
+        rw [← hβn, show ((a.appr n : ℕ) : ZMod (q ^ n)) = PadicInt.toZModPow n a from rfl,
+          ← map_mul, ha, map_one]
       have e2 : ((k : ℕ) : ZMod (q ^ n)) = (t : ZMod (q ^ n)) := by
         rw [← Int.cast_natCast, hk, ZMod.intCast_mod]
       have : ((((k * a.appr n : ℕ) : ℤ) * b n - t : ℤ) : ZMod (q ^ n)) = 0 := by
@@ -262,20 +271,24 @@ theorem exists_normalised_chart : ∀ (d q : ℕ) [Fact q.Prime] (M : Mdl q) (ω
         rw [mul_assoc, e1, e2, mul_one, sub_self]
       rw [ZMod.intCast_zmod_eq_zero_iff_dvd] at this
       exact_mod_cast this
-    have h2 := div_ok hd h16 hs M.ι n ((k * a.appr n : ℕ) * u n - s) _ hz (by
-      have e : conj (((((k * a.appr n : ℕ) : ℤ) * u n - s : ℤ) : ℂ) +
-          ((((k * a.appr n : ℕ) : ℤ) * b n - t : ℤ) : ℂ) * wK d) =
-          ((k * a.appr n : ℕ) : ℂ) * conj ((u n : ℂ) + (b n : ℂ) * wK d) +
-            - conj ((s : ℂ) + (t : ℂ) * wK d) := by
-        simp only [OKArith.conj_el]; push_cast; ring
-      rw [e, map_add (f := _), map_neg]
-      refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)
-      · rw [map_mul, map_natCast, norm_mul]
-        exact (mul_le_of_le_one_left (norm_nonneg _) (IsUltrametricDist.norm_natCast_le_one _ _)).trans (hc n)
-      · rw [norm_neg]
-        refine hv.trans ?_
-        have := pow_le (q := q) n (2 * n) (by omega)
-        simpa using this)
+    have h2 :=
+      div_ok hd h16 hs M.ι n ((k * a.appr n : ℕ) * u n - s) _ hz (by
+        have e
+            : conj
+                (((((k * a.appr n : ℕ) : ℤ) * u n - s : ℤ) : ℂ)
+                  + ((((k * a.appr n : ℕ) : ℤ) * b n - t : ℤ) : ℂ) * wK d)
+              = ((k * a.appr n : ℕ) : ℂ) * conj ((u n : ℂ) + (b n : ℂ) * wK d)
+                + - conj ((s : ℂ) + (t : ℂ) * wK d) := by
+          simp only [OKArith.conj_el]; push_cast; ring
+        rw [e, map_add (f := _), map_neg]
+        refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)
+        · rw [map_mul, map_natCast, norm_mul]
+          exact (mul_le_of_le_one_left (norm_nonneg _)
+            (IsUltrametricDist.norm_natCast_le_one _ _)).trans (hc n)
+        · rw [norm_neg]
+          refine hv.trans ?_
+          have := pow_le (q := q) n (2 * n) (by omega)
+          simpa using this)
     convert h2 using 1
     push_cast
     ring

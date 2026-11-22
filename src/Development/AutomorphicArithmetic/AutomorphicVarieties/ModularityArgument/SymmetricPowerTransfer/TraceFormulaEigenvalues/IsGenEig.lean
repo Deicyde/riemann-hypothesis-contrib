@@ -13,7 +13,9 @@ open MulAction
 def gq {H Y : Type} [Group H] [MulAction H Y] (H₀ : Subgroup H) (k : Y → ℂ) : ℂ :=
   ∑ᶠ o : orbitRel.Quotient H Y, k o.out / (H₀.relIndex (stabilizer H o.out) : ℂ)
 
-def gqOn {H G : Type} [Group H] [Group G] (j : H →* G) (H₀ : Subgroup H) (U : Subgroup G) (k : G ⧸ U → ℂ) : ℂ :=
+def gqOn
+    {H G : Type} [Group H] [Group G] (j : H →* G) (H₀ : Subgroup H) (U : Subgroup G) (k : G ⧸ U → ℂ)
+    : ℂ :=
   letI : MulAction H (G ⧸ U) := MulAction.compHom _ j
   gq H₀ k
 
@@ -33,7 +35,8 @@ namespace Base
 variable {Γ G V : Type} [Group Γ] [Group G] [AddCommGroup V] [Module ℂ V] (B : Base Γ G V)
 
 def Forms : Submodule ℂ (G → V) where
-  carrier := {φ | (∀ γ g, φ (B.ι γ * g) = B.W γ (φ g)) ∧ ∀ g (u : B.U), φ (g * u) = (B.ω u : ℂ) • φ g}
+  carrier :=
+    {φ | (∀ γ g, φ (B.ι γ * g) = B.W γ (φ g)) ∧ ∀ g (u : B.U), φ (g * u) = (B.ω u : ℂ) • φ g}
   add_mem' := fun {a b} ha hb => ⟨fun γ g => by simp [ha.1, hb.1], fun g u => by simp [ha.2, hb.2]⟩
   zero_mem' := ⟨fun γ g => by simp, fun g u => by simp⟩
   smul_mem' := fun c a ha => ⟨fun γ g => by simp [ha.1], fun g u => by simp [ha.2, smul_comm c]⟩
@@ -71,8 +74,8 @@ structure IsTest (f : G → ℂ) : Prop where
   right : ∀ (u : B.U) y, f (y * s.θ u) = ((B.ω u)⁻¹ : ℂˣ) * f y
   fin : {x : G ⧸ B.U | f (s.θ x.out) ≠ 0}.Finite
 
-def opF (f : G → ℂ) (φ : G → V) (g : G) : V := ∑ᶠ x : G ⧸ B.U, f (s.θ x.out) • s.Θ (φ (s.θ.symm g * x.out))
-
+def opF (f : G → ℂ) (φ : G → V) (g : G) : V :=
+  ∑ᶠ x : G ⧸ B.U, f (s.θ x.out) • s.Θ (φ (s.θ.symm g * x.out))
 
 open scoped Classical in
 open Classical in
@@ -90,8 +93,11 @@ def Cent (δ : Γ) : Subgroup Γ where
     rintro a b ⟨z, hz, h⟩ ⟨w, hw, h'⟩
     refine ⟨w * z, mul_mem hw hz, ?_⟩
     have hc := Subgroup.mem_center_iff.1 (B.cenΓ hz)
-    calc (a * b)⁻¹ * δ * s.θΓ (a * b) = b⁻¹ * (a⁻¹ * δ * s.θΓ a) * s.θΓ b := by simp [mul_assoc]
-      _ = (b⁻¹ * δ * s.θΓ b) * z := by rw [h, mul_assoc (b⁻¹ * δ) (s.θΓ b) z, hc (s.θΓ b)]; simp only [mul_assoc]
+    calc
+      (a * b)⁻¹ * δ * s.θΓ (a * b)
+        = b⁻¹ * (a⁻¹ * δ * s.θΓ a) * s.θΓ b := by simp [mul_assoc]
+      _ = (b⁻¹ * δ * s.θΓ b) * z := by
+        rw [h, mul_assoc (b⁻¹ * δ) (s.θΓ b) z, hc (s.θΓ b)]; simp only [mul_assoc]
       _ = δ * (w * z) := by rw [h', mul_assoc]
   inv_mem' := by
     rintro a ⟨z, hz, h⟩
@@ -105,29 +111,41 @@ def Cent (δ : Γ) : Subgroup Γ where
 def ker (f : G → ℂ) (δ : Γ) (y : G ⧸ B.U) : ℂ := f (y.out⁻¹ * B.ι δ * s.θ y.out)
 
 def term (f : G → ℂ) (δ : Γ) : ℂ :=
-  LinearMap.trace ℂ V (B.W δ ∘ₗ s.Θ) *
-    gqOn (B.ι.comp (s.Cent δ).subtype) (B.Γ₀.subgroupOf (s.Cent δ)) B.U (s.ker f δ)
+  LinearMap.trace ℂ V (B.W δ ∘ₗ s.Θ)
+    * gqOn (B.ι.comp (s.Cent δ).subtype) (B.Γ₀.subgroupOf (s.Cent δ)) B.U (s.ker f δ)
 
 end Tw
 
 end Base
 
-structure RPG {I : Type} (G : Type) [Group G] (Gv : I → Type) [∀ v, Group (Gv v)] (K : ∀ v, Subgroup (Gv v)) where
+structure RPG
+    {I : Type}
+    (G : Type) [Group G]
+    (Gv : I → Type) [∀ v, Group (Gv v)]
+    (K : ∀ v, Subgroup (Gv v)) where
   p : ∀ v, G →* Gv v
   inj : ∀ g, (∀ v, p v g = 1) → g = 1
   ae : ∀ g, ∀ᶠ v in Filter.cofinite, p v g ∈ K v
   surj : ∀ x : ∀ v, Gv v, (∀ᶠ v in Filter.cofinite, x v ∈ K v) → ∃ g, ∀ v, p v g = x v
 
-def RPG.box {I G : Type} [Group G] {Gv : I → Type} [∀ v, Group (Gv v)] {K : ∀ v, Subgroup (Gv v)} (P : RPG G Gv K)
-    (U : ∀ v, Subgroup (Gv v)) : Subgroup G := ⨅ v, (U v).comap (P.p v)
+def RPG.box
+    {I G : Type} [Group G]
+    {Gv : I → Type} [∀ v, Group (Gv v)]
+    {K : ∀ v, Subgroup (Gv v)} (P : RPG G Gv K)
+    (U : ∀ v, Subgroup (Gv v))
+    : Subgroup G :=
+  ⨅ v, (U v).comap (P.p v)
 
-def FinOrb {T G : Type} [Group T] [Group G] (ι : T →* G) (θ : G →* G) (U : Subgroup G) (f : G → ℂ) (δ : G) : Prop :=
+def FinOrb
+    {T G : Type} [Group T] [Group G] (ι : T →* G) (θ : G →* G) (U : Subgroup G) (f : G → ℂ) (δ : G)
+    : Prop :=
   ∃ S : Finset G, ∀ y, f (y⁻¹ * δ * θ y) ≠ 0 → ∃ t, ∃ s ∈ S, ∃ u ∈ U, y = ι t * s * u
 
 def mass {H T : Type} [Group H] [Group T] (φ : H →* T) (H₀ : Subgroup H) (C : Subgroup T) : ℂ :=
   ((φ.range ⊔ C).index : ℂ) / (H₀.relIndex (C.comap φ) : ℂ)
 
-def IsGenEig {Λ M : Type} [AddCommGroup M] [Module ℂ M] (u : Λ → Module.End ℂ M) (χ : Λ → ℂ) : Prop :=
+def IsGenEig {Λ M : Type} [AddCommGroup M] [Module ℂ M] (u : Λ → Module.End ℂ M) (χ : Λ → ℂ)
+    : Prop :=
   (⨅ a, (u a).maxGenEigenspace (χ a)) ≠ ⊥
 
 end UpperTheory.V.Z.Sym

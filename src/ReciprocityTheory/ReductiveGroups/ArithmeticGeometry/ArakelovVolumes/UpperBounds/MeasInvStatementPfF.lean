@@ -40,14 +40,15 @@ lemma measurableSet_sS : MeasurableSet (sS ι r) := by
   exact MeasurableSet.iInter fun τ => MeasurableSet.iInter fun b =>
     measurable_pi_apply _ (measurableSet_singleton 0).compl
 
-theorem lintegral_lu (g : (Ix ι r → ℂ) → ENNReal) :
-    ∫⁻ v, g v = ∫⁻ w in sS ι r, ENNReal.ofReal (Complex.normSq (jac w)) * g (lu w) := by
+theorem lintegral_lu (g : (Ix ι r → ℂ) → ENNReal)
+    : ∫⁻ v, g v = ∫⁻ w in sS ι r, ENNReal.ofReal (Complex.normSq (jac w)) * g (lu w) := by
   have hae : ∀ᵐ v ∂(volume : Measure (Ix ι r → ℂ)), v ∈ lu '' sS ι r := by
     refine measure_mono_null (fun v hv => ?_) (volume_BC_compl (ι := ι) (r := r))
     exact fun hB => hv (BC_subset_image (ι := ι) (r := r) hB)
   rw [show ∫⁻ v, g v = ∫⁻ v in lu '' sS ι r, g v by rw [Measure.restrict_eq_self_of_ae_mem hae],
     lintegral_image_eq_lintegral_abs_det_fderiv_mul volume measurableSet_sS
-      (fun w _ => (hasFDerivAt_lu w).hasFDerivWithinAt) lu_injOn g]
+      (fun w _ => (hasFDerivAt_lu w).hasFDerivWithinAt)
+      lu_injOn g]
   refine setLIntegral_congr_fun (measurableSet_sS (ι := ι) (r := r)) (fun w _ => ?_)
   rw [det_luD', abs_of_nonneg (Complex.normSq_nonneg _)]
   rfl
@@ -59,7 +60,13 @@ lemma eS_symm_apply (x : LoI ι r → ℂ) (y : UpI ι r → ℂ) (i : Ix ι r) 
     (eS ι r).symm (x, y) i = if h : i.2.2 < i.2.1 then x ⟨i, h⟩ else y ⟨i, h⟩ := rfl
 
 def Nmat (x : LoI ι r → ℂ) (τ : ι) : Matrix (Fin r) (Fin r) ℂ :=
-  Matrix.of fun a b => if h : b < a then x ⟨(τ, a, b), h⟩ else if a = b then 1 else 0
+  Matrix.of fun a b =>
+    if h : b < a then
+      x ⟨(τ, a, b), h⟩
+    else if a = b then
+      1
+    else
+      0
 
 lemma jac_eS (x : LoI ι r → ℂ) (y : UpI ι r → ℂ) : jac ((eS ι r).symm (x, y)) = jacU y := by
   unfold jac jacU
@@ -70,9 +77,10 @@ lemma mem_sS_eS (x : LoI ι r → ℂ) (y : UpI ι r → ℂ) :
     (eS ι r).symm (x, y) ∈ sS ι r ↔ ∀ τ b, y (dI τ b) ≠ 0 := by
   simp [sS, eS_symm_apply, dI]
 
-theorem lintegral_flat {g : (Ix ι r → ℂ) → ENNReal} (hg : Measurable g) :
-    ∫⁻ v, g v = ∫⁻ x, ∫⁻ y, (if ∀ τ b, y (dI τ b) ≠ 0 then
-      ENNReal.ofReal (Complex.normSq (jacU y)) * g (lu ((eS ι r).symm (x, y))) else 0) := by
+theorem lintegral_flat {g : (Ix ι r → ℂ) → ENNReal} (hg : Measurable g)
+    : ∫⁻ v, g v
+      = ∫⁻ x, ∫⁻ y, (if ∀ τ b, y (dI τ b) ≠ 0 then
+        ENNReal.ofReal (Complex.normSq (jacU y)) * g (lu ((eS ι r).symm (x, y))) else 0) := by
   have hmp : MeasurePreserving (eS ι r) volume volume :=
     volume_preserving_piEquivPiSubtypeProd (fun _ : Ix ι r => ℂ) (fun i => i.2.2 < i.2.1)
   set F : (Ix ι r → ℂ) → ENNReal :=

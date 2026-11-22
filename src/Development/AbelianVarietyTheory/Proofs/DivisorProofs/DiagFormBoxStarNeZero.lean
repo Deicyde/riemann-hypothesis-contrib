@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.StarMemAdeli
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.DoublingEv
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.DoublingEv
 
 noncomputable section
 
@@ -23,25 +25,32 @@ open scoped Classical
 
 variable {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
 
-attribute [local instance] GlobalTheory.AdelicUnitaryTop.locallyCompact_finiteAdele
-  GlobalTheory.AdelicUnitaryTop.secondCountable_finiteAdele GlobalTheory.AdelicUnitaryTop.t2Space_finiteAdeleRing_of_numberField
+attribute [local instance]
+  GlobalTheory.AdelicUnitaryTop.locallyCompact_finiteAdele
+  GlobalTheory.AdelicUnitaryTop.secondCountable_finiteAdele
+  GlobalTheory.AdelicUnitaryTop.t2Space_finiteAdeleRing_of_numberField
 
 instance mu_openPos : (mu F κ).IsOpenPosMeasure := by unfold mu; infer_instance
 
-theorem pureA_glue (f : SchwartzMap (κ → mixedEmbedding.mixedSpace F) ℂ) (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ)
-    (p : Vi F κ × Vf F κ) : pureA F f g (glue p) = f (eI F κ p.1) * g p.2 := by
-  change f (fun i => InfiniteAdeleRing.ringEquiv_mixedSpace F (glue p i).1) * g (fun i => (glue p i).2) = _
+theorem pureA_glue
+    (f : SchwartzMap (κ → mixedEmbedding.mixedSpace F) ℂ) (g : (κ → FiniteAdeleRing (𝓞 F) F) → ℂ)
+    (p : Vi F κ × Vf F κ)
+    : pureA F f g (glue p) = f (eI F κ p.1) * g p.2 := by
+  change f (fun i => InfiniteAdeleRing.ringEquiv_mixedSpace F (glue p i).1)
+      * g (fun i => (glue p i).2)
+    = _
   congr 2
   · funext i
     exact (InfiniteAdeleRing.ringEquiv_mixedSpace F).apply_symm_apply _
 
-theorem continuous_glue {φ : (κ → AdeleRing (𝓞 F) F) → ℂ} (hφ : φ ∈ schA F κ) :
-    Continuous fun p : Vi F κ × Vf F κ => φ (glue p) := by
+theorem continuous_glue {φ : (κ → AdeleRing (𝓞 F) F) → ℂ} (hφ : φ ∈ schA F κ)
+    : Continuous fun p : Vi F κ × Vf F κ => φ (glue p) := by
   induction hφ using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨f, g, hg, rfl⟩ := hx
     simp only [pureA_glue]
-    exact (f.continuous.comp ((eI F κ).continuous.comp continuous_fst)).mul (hg.1.continuous.comp continuous_snd)
+    exact (f.continuous.comp ((eI F κ).continuous.comp continuous_fst)).mul
+      (hg.1.continuous.comp continuous_snd)
   | zero => exact continuous_const
   | add x y _ _ hx hy => exact hx.add hy
   | smul c x _ hx => exact continuous_const.mul hx
@@ -59,8 +68,9 @@ theorem glue_shiftOf (x : κ → AF F) : glue (shiftOf x) = x := by
     · rfl
   rw [h0, zero_add]
 
-theorem lDiag_boxFun_star_ne : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (φ : (κ → AF F) → ℂ),
-    φ ∈ schA F κ → φ ≠ 0 → GlobalTheory.DiagForm.lDiag F κ (boxFun φ (star φ)) ≠ 0 := by
+theorem lDiag_boxFun_star_ne
+    : ∀ (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (φ : (κ → AF F) → ℂ),
+      φ ∈ schA F κ → φ ≠ 0 → GlobalTheory.DiagForm.lDiag F κ (boxFun φ (star φ)) ≠ 0 := by
   intro F _ _ κ _ φ hφ hne
   have hs : star φ ∈ schA F κ := GlobalTheory.SchAConj.star_mem_schA F κ φ hφ
   have hb := GlobalTheory.SchwartzBox.boxFun_mem_schA F κ κ φ hφ (star φ) hs
@@ -69,10 +79,10 @@ theorem lDiag_boxFun_star_ne : ∀ (F : Type) [Field F] [NumberField F] (κ : Ty
     funext p
     show φ (Sum.elim (glue p) (glue p) ∘ Sum.inl) * star φ (Sum.elim (glue p) (glue p) ∘ Sum.inr) = _
     rw [Sum.elim_comp_inl, Sum.elim_comp_inr, Pi.star_apply, Complex.star_def, Complex.mul_conj]
-  rw [lDiag, LinearMap.comp_apply, Lext_apply _ hi, e, integral_complex_ofReal, Complex.ofReal_ne_zero]
+  rw [lDiag, LinearMap.comp_apply, Lext_apply _ hi, e, integral_complex_ofReal,
+    Complex.ofReal_ne_zero]
   rw [e] at hi
-  have hr : Integrable (fun p => Complex.normSq (φ (glue p))) (mu F κ) := by
-    simpa using hi.re
+  have hr : Integrable (fun p => Complex.normSq (φ (glue p))) (mu F κ) := by simpa using hi.re
   have hc : Continuous fun p => Complex.normSq (φ (glue p)) :=
     Complex.continuous_normSq.comp (continuous_glue hφ)
   obtain ⟨x, hx⟩ : ∃ x, φ x ≠ 0 := by

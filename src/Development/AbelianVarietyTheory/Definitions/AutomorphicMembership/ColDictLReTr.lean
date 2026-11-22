@@ -10,17 +10,20 @@ noncomputable section
 namespace GlobalTheory.Mem.SRe
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PackageTie2
-  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ColDict Formalism.L2.Forms Formalism.L2.SG.TermOp Formalism.L2.SG.Full
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.PackageTie2
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ColDict Formalism.L2.Forms
+  Formalism.L2.SG.TermOp Formalism.L2.SG.Full
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} (Z : New D)
 
-
 set_option maxHeartbeats 4000000 in
-def reTr {X : HidaSetting D} {u : D.what₂.Word} {F : Forms0 D u} {F' : Forms0 (reD D Z) u} (T : Transport X u F)
-    (hy : F'.cls0.y = F.cls0.y) (he : F'.val0.eY = F.val0.eY) : Transport (reX Z X) u F' where
+def reTr
+    {X : HidaSetting D} {u : D.what₂.Word} {F : Forms0 D u} {F' : Forms0 (reD D Z) u}
+    (T : Transport X u F) (hy : F'.cls0.y = F.cls0.y) (he : F'.val0.eY = F.val0.eY)
+    : Transport (reX Z X) u F' where
   wt := T.wt
   wt_isom := T.wt_isom
   wt_e := T.wt_e
@@ -37,11 +40,12 @@ def reTr {X : HidaSetting D} {u : D.what₂.Word} {F : Forms0 D u} {F' : Forms0 
   J_val := T.J_val
   J_isom := fun c ξ η => by rw [he]; exact T.J_isom c ξ η
 
-
 set_option maxHeartbeats 4000000 in
-theorem colDictL_reTr {X : HidaSetting D} {u : D.what₂.Word} {F : Forms0 D u} {F' : Forms0 (reD D Z) u} (T : Transport X u F)
-    (hy : F'.cls0.y = F.cls0.y) (he : F'.val0.eY = F.val0.eY) (hK : X.LevelSubgroupCharacter) (x : Cu X u hK) :
-    colDictL (reX Z X) (reTr Z T hy he) hK x = colDictL X T hK x := by
+theorem colDictL_reTr
+    {X : HidaSetting D} {u : D.what₂.Word} {F : Forms0 D u} {F' : Forms0 (reD D Z) u}
+    (T : Transport X u F) (hy : F'.cls0.y = F.cls0.y) (he : F'.val0.eY = F.val0.eY)
+    (hK : X.LevelSubgroupCharacter) (x : Cu X u hK)
+    : colDictL (reX Z X) (reTr Z T hy he) hK x = colDictL X T hK x := by
   funext c z
   show T.J (shP X u x.1 (T.hc c)) (F'.val0.eY z) = T.J (shP X u x.1 (T.hc c)) (F.val0.eY z)
   rw [he]

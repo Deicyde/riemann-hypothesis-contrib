@@ -10,8 +10,11 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NormSubL
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
+open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations
+open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
+  GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
 open scoped Classical
 open GlobalTheory.CompanionTheory.LTPer.Tilt
 
@@ -19,8 +22,8 @@ namespace GlobalTheory.CompanionTheory.LTPer.Tilt
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem norm_pow_sub_pow_le {a b : ℂ_[l]} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) (n : ℕ) :
-    ‖a ^ n - b ^ n‖ ≤ ‖a - b‖ := by
+theorem norm_pow_sub_pow_le {a b : ℂ_[l]} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) (n : ℕ)
+    : ‖a ^ n - b ^ n‖ ≤ ‖a - b‖ := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -28,21 +31,23 @@ theorem norm_pow_sub_pow_le {a b : ℂ_[l]} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ �
     rw [e]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ ?_)
     · rw [norm_mul]
-      exact mul_le_of_le_one_left (norm_nonneg _) (by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) ha)
+      exact mul_le_of_le_one_left (norm_nonneg _)
+        (by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) ha)
     · rw [norm_mul]
       exact (mul_le_of_le_one_right (norm_nonneg _) hb).trans ih
 
-theorem norm_pow_prime_sub_le {a b : ℂ_[l]} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) {s : ℝ}
-    (hl : ‖(l : ℂ_[l])‖ ≤ s) (hs : ‖a - b‖ ≤ s) : ‖a ^ l - b ^ l‖ ≤ s * ‖a - b‖ := by
+theorem norm_pow_prime_sub_le
+    {a b : ℂ_[l]} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) {s : ℝ} (hl : ‖(l : ℂ_[l])‖ ≤ s) (hs : ‖a - b‖ ≤ s)
+    : ‖a ^ l - b ^ l‖ ≤ s * ‖a - b‖ := by
   have hs0 : 0 ≤ s := (norm_nonneg _).trans hl
-  have hbp : ∀ n : ℕ, ‖b ^ n‖ ≤ 1 := fun n => by
-    rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hb
-  have hap : ∀ n : ℕ, ‖a ^ n‖ ≤ 1 := fun n => by
-    rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) ha
+  have hbp : ∀ n : ℕ, ‖b ^ n‖ ≤ 1 := fun n => by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) hb
+  have hap : ∀ n : ℕ, ‖a ^ n‖ ≤ 1 := fun n => by rw [norm_pow]; exact pow_le_one₀ (norm_nonneg _) ha
   have e : a ^ l - b ^ l = (∑ i ∈ Finset.range l, a ^ i * b ^ (l - 1 - i)) * (a - b) :=
     (geom_sum₂_mul a b l).symm
-  have e2 : (∑ i ∈ Finset.range l, a ^ i * b ^ (l - 1 - i))
-      = (∑ i ∈ Finset.range l, (a ^ i * b ^ (l - 1 - i) - b ^ (l - 1))) + (l : ℂ_[l]) * b ^ (l - 1) := by
+  have e2
+      : (∑ i ∈ Finset.range l, a ^ i * b ^ (l - 1 - i))
+        = (∑ i ∈ Finset.range l, (a ^ i * b ^ (l - 1 - i) - b ^ (l - 1)))
+          + (l : ℂ_[l]) * b ^ (l - 1) := by
     simp [Finset.sum_sub_distrib]
   have h1 : ‖∑ i ∈ Finset.range l, (a ^ i * b ^ (l - 1 - i) - b ^ (l - 1))‖ ≤ s := by
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg hs0 fun i hi => ?_
@@ -62,9 +67,11 @@ theorem norm_pow_prime_sub_le {a b : ℂ_[l]} (ha : ‖a‖ ≤ 1) (hb : ‖b‖
   rw [e2]
   exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le h1 h2)
 
-theorem norm_pow_prime_pow_sub_le {a b : ℂ_[l]} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) {s : ℝ}
-    (hs1 : s ≤ 1) (hl : ‖(l : ℂ_[l])‖ ≤ s) (hs : ‖a - b‖ ≤ s) (n : ℕ) :
-    ‖a ^ l ^ n - b ^ l ^ n‖ ≤ s ^ n * ‖a - b‖ := by
+theorem norm_pow_prime_pow_sub_le
+    {a b : ℂ_[l]} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1)
+    {s : ℝ} (hs1 : s ≤ 1) (hl : ‖(l : ℂ_[l])‖ ≤ s) (hs : ‖a - b‖ ≤ s)
+    (n : ℕ)
+    : ‖a ^ l ^ n - b ^ l ^ n‖ ≤ s ^ n * ‖a - b‖ := by
   have hs0 : 0 ≤ s := (norm_nonneg _).trans hl
   induction n with
   | zero => simp
@@ -79,26 +86,32 @@ theorem norm_pow_prime_pow_sub_le {a b : ℂ_[l]} (ha : ‖a‖ ≤ 1) (hb : ‖
     rw [pow_succ, mul_comm (s ^ n) s, mul_assoc]
     exact mul_le_mul_of_nonneg_left ih hs0
 
-theorem isClosed_range_finExt (K : FinExt l) :
-    IsClosed (Set.range fun y : ↥K.1 => omC (l := l) (y : Om l)) := by
+theorem isClosed_range_finExt (K : FinExt l)
+    : IsClosed (Set.range fun y : ↥K.1 => omC (l := l) (y : Om l)) := by
   haveI := K.2
   let L : ↥K.1 →ₗ[ℚ_[l]] ℂ_[l] :=
     (IsScalarTower.toAlgHom ℚ_[l] (Om l) ℂ_[l]).toLinearMap ∘ₗ K.1.val.toLinearMap
   have h := Submodule.closed_of_finiteDimensional (LinearMap.range L)
-  have e : (Set.range fun y : ↥K.1 => omC (l := l) (y : Om l)) = (LinearMap.range L : Set ℂ_[l]) := by
+  have e
+      : (Set.range fun y : ↥K.1 => omC (l := l) (y : Om l)) = (LinearMap.range L : Set ℂ_[l]) := by
     ext z
     rfl
   rw [e]
   exact h
 
-theorem exists_int_of_norm_le (K : FinExt l) (y : ↥K.1) (hy : ‖(y : Om l)‖ ≤ 1) :
-    ∃ c : ↥(OL K), (c : ↥K.1) = y :=
-  ⟨(GlobalTheory.CompanionTheory.LTHodge.CharEx.intEquiv K).symm
-    ⟨y, (GlobalTheory.CompanionTheory.LTHodge.CharEx.mem_integer_iff K y).2 hy⟩, rfl⟩
+theorem exists_int_of_norm_le (K : FinExt l) (y : ↥K.1) (hy : ‖(y : Om l)‖ ≤ 1)
+    : ∃ c : ↥(OL K), (c : ↥K.1) = y := ⟨
+  (GlobalTheory.CompanionTheory.LTHodge.CharEx.intEquiv K).symm
+    ⟨y, (GlobalTheory.CompanionTheory.LTHodge.CharEx.mem_integer_iff K y).2 hy⟩,
+  rfl
+⟩
 
-theorem sh_root_near_integer : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (π : ↥(OL K)) (f : ℕ), 0 < f → qOf π = l ^ f →
-    ‖(l : ℂ_[l])‖ ≤ ‖oc K π‖ → ‖oc K π‖ < 1 → π ≠ 0 → ∀ (x : Tl l) (c : ↥(OL K)), x ^ l ^ f = x →
-    ‖sh x - oc K c‖ ≤ ‖oc K π‖ → ∃ c' : ↥(OL K), sh x = oc K (c + π * c') := by
+theorem sh_root_near_integer
+    : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (π : ↥(OL K)) (f : ℕ),
+      0 < f → qOf π = l ^ f → ‖(l : ℂ_[l])‖ ≤ ‖oc K π‖ → ‖oc K π‖ < 1 → π ≠ 0
+        → ∀ (x : Tl l) (c : ↥(OL K)),
+          x ^ l ^ f = x → ‖sh x - oc K c‖ ≤ ‖oc K π‖
+            → ∃ c' : ↥(OL K), sh x = oc K (c + π * c') := by
   intro l _ K π f hf _ hl hπ1 hπ0 x c hx hc
   set s := ‖oc K π‖ with hsdef
   have hs0 : 0 ≤ s := norm_nonneg _
@@ -116,13 +129,12 @@ theorem sh_root_near_integer : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (π :
     have h := norm_pow_prime_pow_sub_le hc1 hζ1 hπ1.le hl hdist (f * m)
     rw [pow_mul, hfix m, ← map_pow] at h
     refine h.trans ?_
-    have h1 : s ^ (f * m) ≤ s ^ m :=
-      pow_le_pow_of_le_one hs0 hπ1.le (Nat.le_mul_of_pos_left m hf)
+    have h1 : s ^ (f * m) ≤ s ^ m := pow_le_pow_of_le_one hs0 hπ1.le (Nat.le_mul_of_pos_left m hf)
     exact (mul_le_of_le_one_right (pow_nonneg hs0 _) (hdist.trans hπ1.le)).trans h1
   have hlim : Filter.Tendsto (fun m : ℕ => oc K (c ^ (l ^ f) ^ m)) Filter.atTop (nhds (sh x)) := by
     rw [tendsto_iff_norm_sub_tendsto_zero]
-    exact squeeze_zero (fun _ => norm_nonneg _) hbound
-      (tendsto_pow_atTop_nhds_zero_of_lt_one hs0 hπ1)
+    exact
+      squeeze_zero (fun _ => norm_nonneg _) hbound (tendsto_pow_atTop_nhds_zero_of_lt_one hs0 hπ1)
   have hmem : sh x ∈ Set.range fun y : ↥K.1 => omC (l := l) (y : Om l) :=
     (isClosed_range_finExt K).mem_of_tendsto hlim
       (Filter.Eventually.of_forall fun m => ⟨((c ^ (l ^ f) ^ m : ↥(OL K)) : ↥K.1), rfl⟩)
@@ -139,8 +151,10 @@ theorem sh_root_near_integer : ∀ {l : ℕ} [Fact l.Prime] (K : FinExt l) (π :
     rw [← this, ← norm_omC, ← hπK]
     exact hc
   have hq : ‖(((y - (c : ↥K.1)) / (π : ↥K.1) : ↥K.1) : Om l)‖ ≤ 1 := by
-    have e : (((y - (c : ↥K.1)) / (π : ↥K.1) : ↥K.1) : Om l)
-        = ((y - (c : ↥K.1) : ↥K.1) : Om l) / ((π : ↥K.1) : Om l) := rfl
+    have e
+        : (((y - (c : ↥K.1)) / (π : ↥K.1) : ↥K.1) : Om l)
+          = ((y - (c : ↥K.1) : ↥K.1) : Om l) / ((π : ↥K.1) : Om l) :=
+      rfl
     rw [e, norm_div]
     exact div_le_one_of_le₀ hnum (norm_nonneg _)
   obtain ⟨c', hc'⟩ := exists_int_of_norm_le K _ hq

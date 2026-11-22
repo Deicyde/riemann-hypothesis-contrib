@@ -9,14 +9,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FactorM
 
 @[expose] public section
 
-open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC ReciprocityTheory.ChartRestriction.T2 GlobalTheory.LocDualInt
+open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC
+  ReciprocityTheory.ChartRestriction.T2 GlobalTheory.LocDualInt
 
 namespace GlobalTheory.PadicH2SeparatedDVR
 
 open GlobalTheory.LocDualInt
 
-theorem discrete_quot {O : Type} [CommRing O] [TopologicalSpace O] [IsTopologicalRing O]
-    (P : Submodule O O) (hP : IsOpen (P : Set O)) : DiscreteTopology (O ⧸ P) := by
+theorem discrete_quot
+    {O : Type} [CommRing O] [TopologicalSpace O] [IsTopologicalRing O]
+    (P : Submodule O O) (hP : IsOpen (P : Set O))
+    : DiscreteTopology (O ⧸ P) := by
   rw [discreteTopology_iff_isOpen_singleton]
   intro q
   obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective P q
@@ -29,20 +32,33 @@ theorem discrete_quot {O : Type} [CommRing O] [TopologicalSpace O] [IsTopologica
   rw [this]
   exact hP.preimage (continuous_sub_right x)
 
-theorem continuous_mk {O : Type} [CommRing O] [TopologicalSpace O] [IsTopologicalRing O]
-    (P : Submodule O O) : Continuous (Submodule.Quotient.mk : O → O ⧸ P) :=
+theorem continuous_mk
+    {O : Type} [CommRing O] [TopologicalSpace O] [IsTopologicalRing O] (P : Submodule O O)
+    : Continuous (Submodule.Quotient.mk : O → O ⧸ P) :=
   (Submodule.isOpenQuotientMap_mkQ P).continuous
 
-theorem d1_mk {O : Type} [CommRing O] {G : Type} [Group G] (ε : G →* Oˣ) (ϖ : O) (n : ℕ)
-    (b : G → O) :
-    d1 (quotRep (twist ε O) ϖ n) (fun g => Submodule.Quotient.mk (b g)) =
-      fun p => Submodule.Quotient.mk (d1 (twist ε O) b p) := by
+theorem d1_mk {O : Type} [CommRing O] {G : Type} [Group G] (ε : G →* Oˣ) (ϖ : O) (n : ℕ) (b : G → O)
+    : d1 (quotRep (twist ε O) ϖ n) (fun g => Submodule.Quotient.mk (b g))
+      = fun p => Submodule.Quotient.mk (d1 (twist ε O) b p) := by
   funext p
   show quotRep (twist ε O) ϖ n p.1 (Submodule.Quotient.mk (b p.2)) - Submodule.Quotient.mk (b (p.1 * p.2))
       + Submodule.Quotient.mk (b p.1) = Submodule.Quotient.mk ((twist ε O) p.1 (b p.2) - b (p.1 * p.2) + b p.1)
   rw [quotRep_mk, Submodule.Quotient.mk_add, Submodule.Quotient.mk_sub]
 
-theorem separated_dvr_second_cohomology_mem : ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O] [IsTopologicalRing O] [CompactSpace O] [T2Space O] {G : Type} [Group G] [TopologicalSpace G] (ε : G →* Oˣ) (ϖ : O), (∀ n : ℕ, IsOpen ((powSub (M := O) ϖ n : Submodule O O) : Set O)) → (∀ U ∈ nhds (0 : O), ∃ n : ℕ, ((powSub (M := O) ϖ n : Submodule O O) : Set O) ⊆ U) → (∀ n : ℕ, (Z1 (quotRep (twist ε O) ϖ n) : Set (G → O ⧸ powSub (M := O) ϖ n)).Finite) → ∀ (w : G × G → O), w ∈ Z2 (twist ε O) → (∀ n : ℕ, ∃ b : G → O ⧸ powSub (M := O) ϖ n, Continuous b ∧ ∀ g h : G, d1 (quotRep (twist ε O) ϖ n) b (g, h) = Submodule.Quotient.mk (w (g, h))) → w ∈ B2 (twist ε O) := by
+theorem separated_dvr_second_cohomology_mem
+    : ∀ {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
+        [IsTopologicalRing O] [CompactSpace O] [T2Space O] {G : Type} [Group G] [TopologicalSpace G]
+        (ε : G →* Oˣ) (ϖ : O),
+      (∀ n : ℕ, IsOpen ((powSub (M := O) ϖ n : Submodule O O) : Set O))
+        → (∀ U ∈ nhds (0 : O), ∃ n : ℕ, ((powSub (M := O) ϖ n : Submodule O O) : Set O) ⊆ U)
+        → (∀ n : ℕ, (Z1 (quotRep (twist ε O) ϖ n) : Set (G → O ⧸ powSub (M := O) ϖ n)).Finite)
+        → ∀ (w : G × G → O),
+          w ∈ Z2 (twist ε O)
+            → (∀ n : ℕ, ∃ b : G → O ⧸ powSub (M := O) ϖ n,
+              Continuous b
+                ∧ ∀ g h : G,
+                  d1 (quotRep (twist ε O) ϖ n) b (g, h) = Submodule.Quotient.mk (w (g, h)))
+            → w ∈ B2 (twist ε O) := by
   intro O _ _ _ _ _ _ _ G _ _ ε ϖ hopen hbasis hfin w hw hmod
   haveI hdisc : ∀ n : ℕ, DiscreteTopology (O ⧸ powSub (M := O) ϖ n) := fun n => discrete_quot _ (hopen n)
   let α : ∀ s : ℕ, Set (G → O ⧸ powSub (M := O) ϖ s) := fun s =>
@@ -64,14 +80,17 @@ theorem separated_dvr_second_cohomology_mem : ∀ {O : Type} [CommRing O] [IsDom
     ⋂ s, ⋂ (_ : s ≤ r), (fun (b : G → O) g =>
       (Submodule.Quotient.mk (b g) : O ⧸ powSub (M := O) ϖ s)) ⁻¹' α s
   have hcl : ∀ r, IsClosed (T r) := fun r =>
-    isClosed_iInter fun s => isClosed_iInter fun _ => (hα s).isClosed.preimage
-      (continuous_pi fun g => (continuous_mk _).comp (continuous_apply g))
+    isClosed_iInter fun s =>
+      isClosed_iInter fun _ =>
+        (hα s).isClosed.preimage
+          (continuous_pi fun g => (continuous_mk _).comp (continuous_apply g))
   have hne : ∀ r, (T r).Nonempty := by
     intro r
     obtain ⟨β, hβc, hβ⟩ := hmod r
     refine ⟨fun g => qlift (β g), Set.mem_iInter₂.2 fun s hs => ⟨?_, ?_⟩⟩
-    · have e : (fun g => (Submodule.Quotient.mk (qlift (β g)) : O ⧸ powSub (M := O) ϖ s)) =
-          fun g => Submodule.factor (powSub_anti (M := O) ϖ hs) (β g) := by
+    · have e
+          : (fun g => (Submodule.Quotient.mk (qlift (β g)) : O ⧸ powSub (M := O) ϖ s))
+            = fun g => Submodule.factor (powSub_anti (M := O) ϖ hs) (β g) := by
         funext g
         conv_rhs => rw [← mk_qlift (β g)]
         rfl
@@ -80,8 +99,10 @@ theorem separated_dvr_second_cohomology_mem : ∀ {O : Type} [CommRing O] [IsDom
       exact (continuous_factor ϖ hs).comp hβc
     · rw [d1_mk]
       funext p
-      have h1 : (Submodule.Quotient.mk (d1 (twist ε O) (fun g => qlift (β g)) p) :
-          O ⧸ powSub (M := O) ϖ r) = Submodule.Quotient.mk (w p) := by
+      have h1
+          : (Submodule.Quotient.mk (d1 (twist ε O) (fun g => qlift (β g)) p)
+              : O ⧸ powSub (M := O) ϖ r)
+            = Submodule.Quotient.mk (w p) := by
         rw [← congrFun (d1_mk ε ϖ r (fun g => qlift (β g))) p]
         have : (fun g => (Submodule.Quotient.mk (qlift (β g)) : O ⧸ powSub (M := O) ϖ r)) = β :=
           funext fun g => mk_qlift _
@@ -91,8 +112,9 @@ theorem separated_dvr_second_cohomology_mem : ∀ {O : Type} [CommRing O] [IsDom
       exact powSub_anti ϖ hs h1
   have hdec : ∀ r, T (r + 1) ⊆ T r := fun r b hb =>
     Set.mem_iInter₂.2 fun s hs => Set.mem_iInter₂.1 hb s (hs.trans (Nat.le_succ r))
-  obtain ⟨b, hb⟩ := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed T hdec hne
-    (hcl 0).isCompact hcl
+  obtain ⟨b, hb⟩ :=
+    IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed T hdec hne (hcl 0).isCompact
+      hcl
   have hb' : ∀ s, (fun g => (Submodule.Quotient.mk (b g) : O ⧸ powSub (M := O) ϖ s)) ∈ α s :=
     fun s => Set.mem_iInter₂.1 (Set.mem_iInter.1 hb s) s le_rfl
   have hbc : Continuous b := by
@@ -102,8 +124,10 @@ theorem separated_dvr_second_cohomology_mem : ∀ {O : Type} [CommRing O] [IsDom
       apply (continuous_add_const (b x)).continuousAt.preimage_mem_nhds
       simpa using hV
     obtain ⟨n, hn⟩ := hbasis _ hW
-    have hloc : {y | (Submodule.Quotient.mk (b y) : O ⧸ powSub (M := O) ϖ n) =
-        Submodule.Quotient.mk (b x)} ∈ nhds x :=
+    have hloc
+        : {y | (Submodule.Quotient.mk (b y) : O ⧸ powSub (M := O) ϖ n) =
+            Submodule.Quotient.mk (b x)}
+          ∈ nhds x :=
       ((isOpen_discrete {(Submodule.Quotient.mk (b x) : O ⧸ powSub (M := O) ϖ n)}).preimage
         (hb' n).1).mem_nhds rfl
     show b ⁻¹' V ∈ nhds x

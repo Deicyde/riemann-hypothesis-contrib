@@ -14,11 +14,13 @@ open GlobalTheory.CompanionTheory.Ar.Crv Module
 
 variable {K : Type} [Field K] (C : ACurve K) (i : C.I)
 
-private theorem H_affine_combination_eq_of_quadratic_relation : ∀ (n : ℕ) {V : Type} [AddCommGroup V] [Module K V]
-    (b : Basis (Fin n) K V) (W : Submodule K V), ∃ (b' : Basis (Fin n) K V) (k : ℕ) (hk : k ≤ n),
-      (∀ x, (∀ q, C.v i (b.repr x q) ≤ 1) ↔ (∀ q, C.v i (b'.repr x q) ≤ 1)) ∧
-      (∀ j : Fin k, b' (Fin.castLE hk j) ∈ W) ∧
-      W ≤ Submodule.span K (Set.range fun j : Fin k => b' (Fin.castLE hk j)) := by
+private theorem H_affine_combination_eq_of_quadratic_relation
+    : ∀ (n : ℕ) {V : Type} [AddCommGroup V] [Module K V] (b : Basis (Fin n) K V)
+        (W : Submodule K V),
+      ∃ (b' : Basis (Fin n) K V) (k : ℕ) (hk : k ≤ n),
+        (∀ x, (∀ q, C.v i (b.repr x q) ≤ 1) ↔ (∀ q, C.v i (b'.repr x q) ≤ 1))
+          ∧ (∀ j : Fin k, b' (Fin.castLE hk j) ∈ W)
+          ∧ W ≤ Submodule.span K (Set.range fun j : Fin k => b' (Fin.castLE hk j)) := by
   intro n
   induction n with
   | zero =>
@@ -37,8 +39,8 @@ private theorem H_affine_combination_eq_of_quadratic_relation : ∀ (n : ℕ) {V
       rw [hW]
       exact bot_le
     obtain ⟨w, hwW, hw0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hW
-    obtain ⟨q, -, hq⟩ := Finset.exists_max_image Finset.univ (fun j => C.v i (b.repr w j))
-      Finset.univ_nonempty
+    obtain ⟨q, -, hq⟩ :=
+      Finset.exists_max_image Finset.univ (fun j => C.v i (b.repr w j)) Finset.univ_nonempty
     have hcq : b.repr w q ≠ 0 := by
       intro h0
       apply hw0
@@ -54,16 +56,16 @@ private theorem H_affine_combination_eq_of_quadratic_relation : ∀ (n : ℕ) {V
     have hrepr_u : ∀ j, b.repr u j = (b.repr w q)⁻¹ * b.repr w j := by
       intro j
       simp [hu]
-    have huq : b.repr u q = 1 := by
-      rw [hrepr_u, inv_mul_cancel₀ hcq]
+    have huq : b.repr u q = 1 := by rw [hrepr_u, inv_mul_cancel₀ hcq]
     have hpos : C.v i (b.repr w q) ≠ 0 := (Valuation.ne_zero_iff _).2 hcq
     have hu1 : ∀ j, C.v i (b.repr u j) ≤ 1 := by
       intro j
-      calc C.v i (b.repr u j) = (C.v i (b.repr w q))⁻¹ * C.v i (b.repr w j) := by
-            rw [hrepr_u, map_mul, map_inv₀]
+      calc
+        C.v i (b.repr u j)
+          = (C.v i (b.repr w q))⁻¹ * C.v i (b.repr w j) := by rw [hrepr_u, map_mul, map_inv₀]
         _ ≤ (C.v i (b.repr w q))⁻¹ * C.v i (b.repr w q) := by
-            gcongr
-            exact hq j (Finset.mem_univ j)
+          gcongr
+          exact hq j (Finset.mem_univ j)
         _ = 1 := inv_mul_cancel₀ hpos
     have hli : LinearIndependent K (b ∘ q.succAbove) :=
       b.linearIndependent.comp _ Fin.succAbove_right_injective
@@ -80,8 +82,10 @@ private theorem H_affine_combination_eq_of_quadratic_relation : ∀ (n : ℕ) {V
         subst hjq
         exact (Finsupp.mem_support_iff.1 hj) h
     let bN : Basis (Fin n) K N := Basis.span hli
-    have hsumN : ∀ c : Fin n → K,
-        ∑ l, c l • b (q.succAbove l) = ∑ p, (Fin.insertNth (α := fun _ => K) q (0 : K) c p) • b p := by
+    have hsumN
+        : ∀ c : Fin n → K,
+          ∑ l, c l • b (q.succAbove l)
+            = ∑ p, (Fin.insertNth (α := fun _ => K) q (0 : K) c p) • b p := by
       intro c
       rw [Fin.sum_univ_succAbove _ q]
       simp
@@ -99,8 +103,9 @@ private theorem H_affine_combination_eq_of_quadratic_relation : ∀ (n : ℕ) {V
     have hli' : ∀ (c : K), ∀ x ∈ N, c • u + x = 0 → c = 0 := by
       intro c x hx h
       have h2 := congrArg (fun z => b.repr z q) h
-      simp only [map_add (f := _), map_smul, Finsupp.add_apply, Finsupp.smul_apply, smul_eq_mul, huq,
-        mul_one, (memN x).1 hx, add_zero, map_zero, Finsupp.coe_zero, Pi.zero_apply] at h2
+      simp only [map_add (f := _), map_smul, Finsupp.add_apply, Finsupp.smul_apply, smul_eq_mul,
+          huq, mul_one, (memN x).1 hx, add_zero, map_zero, Finsupp.coe_zero, Pi.zero_apply]
+        at h2
       exact h2
     have hsp' : ∀ z : V, ∃ c : K, z + c • u ∈ N := by
       intro z
@@ -118,14 +123,16 @@ private theorem H_affine_combination_eq_of_quadratic_relation : ∀ (n : ℕ) {V
       intro x
       rw [memN]
       simp [huq]
-    have hrep : ∀ x, ⇑(b'.repr x) =
-        Fin.cons (b.repr x q) (⇑(bN'.repr ⟨x - b.repr x q • u, hyN x⟩)) := by
+    have hrep
+        : ∀ x, ⇑(b'.repr x) = Fin.cons (b.repr x q) (⇑(bN'.repr ⟨x - b.repr x q • u, hyN x⟩)) := by
       intro x
       have hy' := congrArg Subtype.val (bN'.sum_repr ⟨x - b.repr x q • u, hyN x⟩)
       rw [Submodule.coe_sum] at hy'
       simp only [Submodule.coe_smul] at hy'
-      have hx : x = ∑ p, (Fin.cons (b.repr x q) (⇑(bN'.repr ⟨x - b.repr x q • u, hyN x⟩)) :
-          Fin (n + 1) → K) p • b' p := by
+      have hx
+          : x
+            = ∑ p, (Fin.cons (b.repr x q) (⇑(bN'.repr ⟨x - b.repr x q • u, hyN x⟩)) :
+              Fin (n + 1) → K) p • b' p := by
         rw [Fin.sum_univ_succ]
         simp only [Fin.cons_zero, Fin.cons_succ, hb'0, hb's]
         rw [hy']
@@ -141,8 +148,10 @@ private theorem H_affine_combination_eq_of_quadratic_relation : ∀ (n : ℕ) {V
         intro l
         rw [hrep]
         rfl
-      have hcomp : ∀ l, bN.repr ⟨x - b.repr x q • u, hyN x⟩ l
-          = b.repr x (q.succAbove l) - b.repr x q * b.repr u (q.succAbove l) := by
+      have hcomp
+          : ∀ l,
+            bN.repr ⟨x - b.repr x q • u, hyN x⟩ l
+              = b.repr x (q.succAbove l) - b.repr x q * b.repr u (q.succAbove l) := by
         intro l
         rw [← reprN]
         show b.repr (x - b.repr x q • u) (q.succAbove l) = _
@@ -169,13 +178,17 @@ private theorem H_affine_combination_eq_of_quadratic_relation : ∀ (n : ℕ) {V
         · obtain ⟨l, rfl⟩ := Fin.exists_succAbove_eq hpq
           have hl' := hl l
           rw [hcomp] at hl'
-          have e : b.repr x (q.succAbove l) = (b.repr x (q.succAbove l) - b.repr x q *
-              b.repr u (q.succAbove l)) + b.repr x q * b.repr u (q.succAbove l) := by ring
+          have e
+              : b.repr x (q.succAbove l)
+                = (b.repr x (q.succAbove l) - b.repr x q * b.repr u (q.succAbove l))
+                  + b.repr x q * b.repr u (q.succAbove l) := by
+            ring
           rw [e]
           exact Valuation.map_add_le _ hl' (by rw [map_mul]; exact mul_le_one' ha (hu1 _))
     have hk' : k + 1 ≤ n + 1 := Nat.succ_le_succ hk
     have hc0 : Fin.castLE hk' 0 = 0 := Fin.ext (by simp)
-    have hcs : ∀ l : Fin k, Fin.castLE hk' l.succ = (Fin.castLE hk l).succ := fun l => Fin.ext (by simp)
+    have hcs : ∀ l : Fin k, Fin.castLE hk' l.succ = (Fin.castLE hk l).succ := fun l =>
+      Fin.ext (by simp)
     refine ⟨b', k + 1, hk', latiff, ?_, ?_⟩
     · intro j
       refine Fin.cases ?_ (fun l => ?_) j
@@ -190,13 +203,15 @@ private theorem H_affine_combination_eq_of_quadratic_relation : ∀ (n : ℕ) {V
       have h1 := hspan hy
       have h2 := Submodule.mem_map_of_mem (f := N.subtype) h1
       rw [Submodule.map_span, ← Set.range_comp] at h2
-      have hsub : Set.range (N.subtype ∘ fun j : Fin k => bN' (Fin.castLE hk j)) ⊆
-          Set.range fun j : Fin (k + 1) => b' (Fin.castLE hk' j) := by
+      have hsub
+          : Set.range (N.subtype ∘ fun j : Fin k => bN' (Fin.castLE hk j))
+            ⊆ Set.range fun j : Fin (k + 1) => b' (Fin.castLE hk' j) := by
         rintro _ ⟨l, rfl⟩
         refine ⟨l.succ, ?_⟩
         simp only [hcs, hb's, Function.comp_apply, Submodule.coe_subtype]
-      have h3 : x - b.repr x q • u ∈
-          Submodule.span K (Set.range fun j : Fin (k + 1) => b' (Fin.castLE hk' j)) :=
+      have h3
+          : x - b.repr x q • u
+            ∈ Submodule.span K (Set.range fun j : Fin (k + 1) => b' (Fin.castLE hk' j)) :=
         Submodule.span_mono hsub h2
       have hu' : u ∈ Submodule.span K (Set.range fun j : Fin (k + 1) => b' (Fin.castLE hk' j)) := by
         apply Submodule.subset_span
@@ -206,14 +221,16 @@ private theorem H_affine_combination_eq_of_quadratic_relation : ∀ (n : ℕ) {V
       rw [e]
       exact Submodule.add_mem _ (Submodule.smul_mem _ _ hu') h3
 
-private theorem exists_lat_basis_compatible_quotient {V U : Type} [AddCommGroup V] [Module K V] [AddCommGroup U] [Module K U]
-    {n : ℕ} (b : Basis (Fin n) K V) (L : AddSubgroup V) (h : IsLatOf C i b L) (W : Submodule K V)
-    (g : V →ₗ[K] U) (hg : Function.Surjective g) (hker : ∀ x, g x = 0 ↔ x ∈ W) :
-    ∃ (bW : Basis (Fin (finrank K W)) K W) (bQ : Basis (Fin (finrank K U)) K U)
-      (b' : Basis (Fin (finrank K W + finrank K U)) K V),
-      IsLatOf C i b' L ∧ IsLatOf C i bW (L.comap W.subtype.toAddMonoidHom) ∧
-      IsLatOf C i bQ (L.map g.toAddMonoidHom) ∧ (∀ j, b' (Fin.castAdd _ j) = bW j) ∧
-      ∀ j, g (b' (Fin.natAdd _ j)) = bQ j := by
+private theorem exists_lat_basis_compatible_quotient
+    {V U : Type} [AddCommGroup V] [Module K V] [AddCommGroup U] [Module K U]
+    {n : ℕ} (b : Basis (Fin n) K V)
+    (L : AddSubgroup V) (h : IsLatOf C i b L)
+    (W : Submodule K V) (g : V →ₗ[K] U) (hg : Function.Surjective g) (hker : ∀ x, g x = 0 ↔ x ∈ W)
+    : ∃ (bW : Basis (Fin (finrank K W)) K W) (bQ : Basis (Fin (finrank K U)) K U)
+        (b' : Basis (Fin (finrank K W + finrank K U)) K V),
+      IsLatOf C i b' L ∧ IsLatOf C i bW (L.comap W.subtype.toAddMonoidHom)
+        ∧ IsLatOf C i bQ (L.map g.toAddMonoidHom) ∧ (∀ j, b' (Fin.castAdd _ j) = bW j)
+        ∧ ∀ j, g (b' (Fin.natAdd _ j)) = bQ j := by
   haveI : FiniteDimensional K V := Module.Finite.of_basis b
   obtain ⟨b₀, k, hk, hlat, hmem, hspan⟩ := H_affine_combination_eq_of_quadratic_relation C i n b W
   have hkerW : LinearMap.ker g = W := by
@@ -222,13 +239,15 @@ private theorem exists_lat_basis_compatible_quotient {V U : Type} [AddCommGroup 
   have hrs : finrank K W + finrank K U = n := by
     have h1 := LinearMap.finrank_range_add_finrank_ker g
     rw [LinearMap.range_eq_top.mpr hg, finrank_top, hkerW, Module.finrank_eq_card_basis b,
-      Fintype.card_fin] at h1
+        Fintype.card_fin]
+      at h1
     omega
   have hrk : finrank K W = k := by
     apply le_antisymm
-    · calc finrank K W
-          ≤ finrank K (Submodule.span K (Set.range fun j : Fin k => b₀ (Fin.castLE hk j))) :=
-            Submodule.finrank_mono hspan
+    · calc
+        finrank K W
+            ≤ finrank K (Submodule.span K (Set.range fun j : Fin k => b₀ (Fin.castLE hk j))) :=
+          Submodule.finrank_mono hspan
         _ ≤ Fintype.card (Fin k) := finrank_range_le_card _
         _ = k := Fintype.card_fin k
     · have hli : LinearIndependent K (fun j : Fin k => (⟨b₀ (Fin.castLE hk j), hmem j⟩ : W)) := by
@@ -237,8 +256,9 @@ private theorem exists_lat_basis_compatible_quotient {V U : Type} [AddCommGroup 
       simpa using hli.fintype_card_le_finrank
   let b' : Basis (Fin (finrank K W + finrank K U)) K V := b₀.reindex (finCongr hrs.symm)
   have hlt : ∀ j : Fin (finrank K W), j.val < k := fun j => hrk ▸ j.isLt
-  have hidx : ∀ j : Fin (finrank K W),
-      b' (Fin.castAdd (finrank K U) j) = b₀ (Fin.castLE hk ⟨j.val, hlt j⟩) := by
+  have hidx
+      : ∀ j : Fin (finrank K W),
+        b' (Fin.castAdd (finrank K U) j) = b₀ (Fin.castLE hk ⟨j.val, hlt j⟩) := by
     intro j
     rw [Basis.reindex_apply]
     congr 1
@@ -246,8 +266,10 @@ private theorem exists_lat_basis_compatible_quotient {V U : Type} [AddCommGroup 
     intro j
     rw [hidx]
     exact hmem _
-  have hspanW : W ≤ Submodule.span K
-      (Set.range fun j : Fin (finrank K W) => b' (Fin.castAdd (finrank K U) j)) := by
+  have hspanW
+      : W
+        ≤ Submodule.span K
+          (Set.range fun j : Fin (finrank K W) => b' (Fin.castAdd (finrank K U) j)) := by
     refine hspan.trans (Submodule.span_mono ?_)
     rintro _ ⟨j, rfl⟩
     refine ⟨⟨j.val, by rw [hrk]; exact j.isLt⟩, ?_⟩
@@ -256,8 +278,10 @@ private theorem exists_lat_basis_compatible_quotient {V U : Type} [AddCommGroup 
   have hzero : ∀ x ∈ W, ∀ j : Fin (finrank K U), b'.repr x (Fin.natAdd (finrank K W) j) = 0 := by
     intro x hx j
     have h1 := hspanW hx
-    have e : (Set.range fun j : Fin (finrank K W) => b' (Fin.castAdd (finrank K U) j)) =
-        b' '' Set.range (Fin.castAdd (finrank K U)) := Set.range_comp _ _
+    have e
+        : (Set.range fun j : Fin (finrank K W) => b' (Fin.castAdd (finrank K U) j))
+          = b' '' Set.range (Fin.castAdd (finrank K U)) :=
+      Set.range_comp _ _
     rw [e, b'.mem_span_image] at h1
     by_contra hne
     obtain ⟨l, hl⟩ := h1 (Finsupp.mem_support_iff.2 hne)
@@ -265,8 +289,10 @@ private theorem exists_lat_basis_compatible_quotient {V U : Type} [AddCommGroup 
     simp only [Fin.val_castAdd, Fin.val_natAdd] at hv
     have := l.isLt
     omega
-  have hsplit : ∀ x, x = ∑ j, b'.repr x (Fin.castAdd _ j) • b' (Fin.castAdd _ j) +
-      ∑ j, b'.repr x (Fin.natAdd _ j) • b' (Fin.natAdd _ j) := by
+  have hsplit
+      : ∀ x,
+        x = ∑ j, b'.repr x (Fin.castAdd _ j) • b' (Fin.castAdd _ j)
+          + ∑ j, b'.repr x (Fin.natAdd _ j) • b' (Fin.natAdd _ j) := by
     intro x
     conv_lhs => rw [← b'.sum_repr x]
     rw [Fin.sum_univ_add]
@@ -302,8 +328,10 @@ private theorem exists_lat_basis_compatible_quotient {V U : Type} [AddCommGroup 
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_add (f := _), map_sum, map_sum]
     simp [famQ, hg0]
-  have happ : ∀ c : Fin (finrank K U) → K, ∑ l, c l • b' (Fin.natAdd _ l) =
-      ∑ p, (Fin.append (0 : Fin (finrank K W) → K) c p) • b' p := by
+  have happ
+      : ∀ c : Fin (finrank K U) → K,
+        ∑ l, c l • b' (Fin.natAdd _ l)
+          = ∑ p, (Fin.append (0 : Fin (finrank K W) → K) c p) • b' p := by
     intro c
     rw [Fin.sum_univ_add]
     simp
@@ -385,15 +413,20 @@ private theorem exists_lat_basis_compatible_quotient {V U : Type} [AddCommGroup 
   · rw [hbW]
   · rw [hbQ]
 
-theorem exists_adapted (K : Type) [Field K] (C : ACurve K) (V : Type) [AddCommGroup V] [Module K V]
-    (i : C.I) (n : ℕ) (b : Module.Basis (Fin n) K V) (L : AddSubgroup V) (W : Submodule K V)
-    (h : IsLatOf C i b L) :
-    ∃ (bW : Module.Basis (Fin (Module.finrank K W)) K W)
-      (bQ : Module.Basis (Fin (Module.finrank K (V ⧸ W))) K (V ⧸ W))
-      (b' : Module.Basis (Fin (Module.finrank K W + Module.finrank K (V ⧸ W))) K V),
-      IsLatOf C i b' L ∧ IsLatOf C i bW (L.comap W.subtype.toAddMonoidHom) ∧
-      IsLatOf C i bQ (L.map W.mkQ.toAddMonoidHom) ∧ (∀ j, b' (Fin.castAdd _ j) = bW j) ∧
-      ∀ j, W.mkQ (b' (Fin.natAdd _ j)) = bQ j := by
+theorem exists_adapted
+    (K : Type) [Field K]
+    (C : ACurve K)
+    (V : Type) [AddCommGroup V] [Module K V]
+    (i : C.I)
+    (n : ℕ) (b : Module.Basis (Fin n) K V)
+    (L : AddSubgroup V)
+    (W : Submodule K V) (h : IsLatOf C i b L)
+    : ∃ (bW : Module.Basis (Fin (Module.finrank K W)) K W)
+        (bQ : Module.Basis (Fin (Module.finrank K (V ⧸ W))) K (V ⧸ W))
+        (b' : Module.Basis (Fin (Module.finrank K W + Module.finrank K (V ⧸ W))) K V),
+      IsLatOf C i b' L ∧ IsLatOf C i bW (L.comap W.subtype.toAddMonoidHom)
+        ∧ IsLatOf C i bQ (L.map W.mkQ.toAddMonoidHom) ∧ (∀ j, b' (Fin.castAdd _ j) = bW j)
+        ∧ ∀ j, W.mkQ (b' (Fin.natAdd _ j)) = bQ j := by
   exact exists_lat_basis_compatible_quotient C i b L h W W.mkQ (Submodule.mkQ_surjective W)
     (fun x => Submodule.Quotient.mk_eq_zero W)
 

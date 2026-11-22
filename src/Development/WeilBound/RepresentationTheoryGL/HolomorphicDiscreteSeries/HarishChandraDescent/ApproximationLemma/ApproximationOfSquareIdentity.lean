@@ -15,16 +15,18 @@ open ReciprocityTheory.ChartRestriction.DS
 
 namespace ApproximationSums
 
-variable {n : ℕ} {ε : Fin n → Bool} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {M : Type} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
   {E : Fin n → Fin n → Module.End ℂ M}
 
-theorem split_sum (a : Fin n) (x : M) :
-    ∑ b, ‖E a b x‖ ^ 2 = ∑ b ∈ univ.filter (fun b => ε b = ε a), ‖E a b x‖ ^ 2 +
-      ∑ b ∈ univ.filter (fun b => ε b ≠ ε a), ‖E a b x‖ ^ 2 := by
+theorem split_sum (a : Fin n) (x : M)
+    : ∑ b, ‖E a b x‖ ^ 2
+      = ∑ b ∈ univ.filter (fun b => ε b = ε a), ‖E a b x‖ ^ 2
+        + ∑ b ∈ univ.filter (fun b => ε b ≠ ε a), ‖E a b x‖ ^ 2 := by
   exact (Finset.sum_filter_add_sum_filter_not univ (fun b => ε b = ε a) _).symm
 
-theorem sum_sq_eq (hSq : SqId) (hE : IsGlRep E) (hU : IsInfUnitary ε E) (x : M) :
-    ∑ a, ∑ b, ‖E a b x‖ ^ 2 = 2 * (⟪casimirK ε E x, x⟫_ℂ).re - (⟪casimir E x, x⟫_ℂ).re := by
+theorem sum_sq_eq (hSq : SqId) (hE : IsGlRep E) (hU : IsInfUnitary ε E) (x : M)
+    : ∑ a, ∑ b, ‖E a b x‖ ^ 2 = 2 * (⟪casimirK ε E x, x⟫_ℂ).re - (⟪casimir E x, x⟫_ℂ).re := by
   obtain ⟨h1, h2, -⟩ := hSq n ε M E hE hU x
   rw [Finset.sum_congr rfl fun a _ => split_sum (ε := ε) (E := E) a x, Finset.sum_add_distrib]
   linarith
@@ -53,8 +55,9 @@ theorem approximation_of_square_identity : SqId → Approx := by
     exact Submodule.starProjection_inner_eq_zero (K := F) η w hw
   have hw : 2 • casimirK ε E P - (c : ℂ) • P ∈ F :=
     F.sub_mem (F.nsmul_mem (hKF P hPF) 2) (F.smul_mem _ hPF)
-  have hsplit : 2 • casimirK ε E η - (c : ℂ) • η =
-      (2 • casimirK ε E u - (c : ℂ) • u) + (2 • casimirK ε E P - (c : ℂ) • P) := by
+  have hsplit
+      : 2 • casimirK ε E η - (c : ℂ) • η
+        = (2 • casimirK ε E u - (c : ℂ) • u) + (2 • casimirK ε E P - (c : ℂ) • P) := by
     have he : η = u + P := by simp [hu]
     conv_lhs => rw [he]
     rw [map_add (f := _), smul_add, smul_add]

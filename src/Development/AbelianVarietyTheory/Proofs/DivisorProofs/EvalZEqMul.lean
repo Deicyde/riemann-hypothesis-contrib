@@ -11,8 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc
 
@@ -34,22 +37,39 @@ theorem dim_eq (hn : 2 ≤ n) (hζ : IsUnit ζ) (T : Trait F) : T.A.g = g := by
   exact (smoothOfRelativeDimension_isStableUnderBaseChange _).of_isPullback
     (IsPullback.of_horiz_isIso (fst := hp.isoPullback.inv) (g := 𝟙 _) ⟨by simp⟩) h1
 
-theorem finrank_le (hn : 2 ≤ n) (hζ : IsUnit ζ) (T : Trait F) : Module.finrank ℤ T.D.toPre.X ≤ g := by
-  have hR : AdmBase T.V (maximalIdeal T.V) := ⟨inferInstance, inferInstance, inferInstance, T.complete⟩
+theorem finrank_le (hn : 2 ≤ n) (hζ : IsUnit ζ) (T : Trait F)
+    : Module.finrank ℤ T.D.toPre.X ≤ g := by
+  have hR : AdmBase T.V (maximalIdeal T.V) :=
+    ⟨inferInstance, inferInstance, inferInstance, T.complete⟩
   have h := GlobalTheory.TateUnif.rank_add_dim hR T.semi T.U
   have e := dim_eq hn hζ T
   omega
 
-theorem evalZ_eq_mul : ∀ (g n : ℕ) (o : Type) [CommRing o] (ζ : o), 2 ≤ n → IsUnit ζ → ∀ (F : SFam g n ζ) (T T' : Trait F) (f : T.V →+* T'.V) (fK : FractionRing T.V →+* FractionRing T'.V), Function.Injective f → IsLocalHom f → (∀ a, fK (algebraMap T.V (FractionRing T.V) a) = algebraMap T'.V (FractionRing T'.V) (f a)) → T'.y = spMap fK ≫ T.y → ∀ m : ℕ, Associated (f T.ϖ) (T'.ϖ ^ m) → ∀ φ : InvFun ℤ, IsPolFan id g φ → φ.evalZ T'.β = m * φ.evalZ T.β := by
+theorem evalZ_eq_mul
+    : ∀ (g n : ℕ) (o : Type) [CommRing o] (ζ : o),
+      2 ≤ n → IsUnit ζ
+        → ∀ (F : SFam g n ζ) (T T' : Trait F) (f : T.V →+* T'.V)
+            (fK : FractionRing T.V →+* FractionRing T'.V),
+          Function.Injective f → IsLocalHom f
+            → (∀ a,
+              fK (algebraMap T.V (FractionRing T.V) a) = algebraMap T'.V (FractionRing T'.V) (f a))
+            → T'.y = spMap fK ≫ T.y
+            → ∀ m : ℕ,
+              Associated (f T.ϖ) (T'.ϖ ^ m)
+                → ∀ φ : InvFun ℤ, IsPolFan id g φ → φ.evalZ T'.β = m * φ.evalZ T.β := by
   intro g n o _ ζ hn hζ F T T' f fK hf hl hK hy m hm φ hφ
-  have hB : GlobalTheory.Mum.Base T'.V := ⟨⟨inferInstance, inferInstance, inferInstance, T'.complete⟩, inferInstance⟩
+  have hB : GlobalTheory.Mum.Base T'.V :=
+    ⟨⟨inferInstance, inferInstance, inferInstance, T'.complete⟩, inferInstance⟩
   have hid : spMap (RingHom.id (FractionRing T'.V)) = 𝟙 _ := Spec.map_id _
-  obtain ⟨e, he⟩ := GlobalTheory.T.trait_lattices_iso_forms_proportional_ramification g n o ζ F T T' T'.V f (RingHom.id _) fK (RingHom.id _) hB inferInstance hf
-    Function.injective_id hl inferInstance hK (fun _ => rfl) (by rw [hid, Category.id_comp, hy]) T'.ϖ m 1 T'.irr hm
-    (by rw [pow_one]; rfl)
+  obtain ⟨e, he⟩ :=
+    GlobalTheory.T.trait_lattices_iso_forms_proportional_ramification g n o ζ F T T' T'.V f
+      (RingHom.id _) fK (RingHom.id _) hB inferInstance hf Function.injective_id hl inferInstance hK
+      (fun _ => rfl)
+      (by rw [hid, Category.id_comp, hy]) T'.ϖ m 1 T'.irr hm (by rw [pow_one]; rfl)
   have hon := hφ T.D.toPre.X (finrank_le hn hζ T)
   have hc : toReal T.β ∈ psdCone (bar := (id : ℤ → ℤ)) (X := T.D.toPre.X) :=
-    GlobalTheory.PolFan.TameZ.toReal_mem_psdCone_int (mem_balForms_int.2 T.symm) fun x => by simpa using T.mono.nonneg 0 x
+    GlobalTheory.PolFan.TameZ.toReal_mem_psdCone_int (mem_balForms_int.2 T.symm) fun x => by
+      simpa using T.mono.nonneg 0 x
   rw [← evalR_toReal φ T.β, ← hon.homog _ hc m m.cast_nonneg,
     ← evalZ_pull φ (r := e.toIntLinearEquiv.toLinearMap) e.surjective, ← evalR_toReal]
   congr 1

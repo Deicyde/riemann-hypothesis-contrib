@@ -24,8 +24,10 @@ lemma lt_one_iff_le (g : ℤᵐ⁰) : g < 1 ↔ g ≤ WithZero.exp (-1 : ℤ) :=
 
 section Compl
 
-variable {R : Type} [CommRing R] [IsDedekindDomain R] {L : Type} [Field L] [Algebra R L]
-  [IsFractionRing R L] (w : HeightOneSpectrum R)
+variable
+  {R : Type} [CommRing R] [IsDedekindDomain R]
+  {L : Type} [Field L] [Algebra R L] [IsFractionRing R L]
+  (w : HeightOneSpectrum R)
 
 local notation "Lw" => w.adicCompletion L
 local notation "Ow" => w.adicCompletionIntegers L
@@ -74,8 +76,12 @@ theorem isPrecomplete : IsPrecomplete (IsLocalRing.maximalIdeal Ow) Ow := by
   have hc : Cauchy (map g atTop) := by
     rw [Valued.cauchy_iff]
     refine ⟨map_neBot, fun γ => ?_⟩
-    obtain ⟨n, hn⟩ := exists_pow_lt₀ hπ1 (Units.map (MonoidWithZeroHom.ValueGroup₀.embedding
-      (f := ((Valued.v : Valuation Lw ℤᵐ⁰) : Lw →*₀ ℤᵐ⁰))).toMonoidHom γ)
+    obtain ⟨n, hn⟩ :=
+      exists_pow_lt₀ hπ1
+        (Units.map
+          (MonoidWithZeroHom.ValueGroup₀.embedding
+            (f := ((Valued.v : Valuation Lw ℤᵐ⁰) : Lw →*₀ ℤᵐ⁰))).toMonoidHom
+          γ)
     refine ⟨g '' Set.Ici n, image_mem_map (Ici_mem_atTop n), ?_⟩
     rintro _ ⟨a, ha, rfl⟩ _ ⟨b, hb, rfl⟩
     rw [Valuation.restrict_lt_iff_lt_embedding]
@@ -89,16 +95,22 @@ theorem isPrecomplete : IsPrecomplete (IsLocalRing.maximalIdeal Ow) Ow := by
   obtain ⟨l, hl⟩ := CompleteSpace.complete hc
   have key : ∀ n, Valued.v (g n - l) ≤ Valued.v (π : Lw) ^ n := by
     intro n
-    have hU : {y : Lw | (Valued.v : Valuation Lw ℤᵐ⁰).restrict (y - l) <
-        (Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n)} ∈ 𝓝 l := by
+    have hU
+        : {y : Lw | (Valued.v : Valuation Lw ℤᵐ⁰).restrict (y - l) <
+            (Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n)}
+          ∈ 𝓝 l := by
       rw [Valued.mem_nhds]
-      exact ⟨Units.mk0 ((Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n)) (by simp [hπ0]),
-        subset_rfl⟩
+      exact ⟨
+        Units.mk0 ((Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n)) (by simp [hπ0]),
+        subset_rfl
+      ⟩
     have hm := hl hU
     rw [mem_map, mem_atTop_sets] at hm
     obtain ⟨N, hN⟩ := hm
-    have h1 : (Valued.v : Valuation Lw ℤᵐ⁰).restrict (g (max N n) - l) <
-        (Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n) := hN (max N n) (le_max_left _ _)
+    have h1
+        : (Valued.v : Valuation Lw ℤᵐ⁰).restrict (g (max N n) - l)
+          < (Valued.v : Valuation Lw ℤᵐ⁰).restrict ((π : Lw) ^ n) :=
+      hN (max N n) (le_max_left _ _)
     rw [Valuation.restrict_lt_iff, map_pow] at h1
     have h2 := hf (m := n) (n := max N n) (le_max_right N n)
     have e : g n - l = ((f n - f (max N n) : Ow) : Lw) + (g (max N n) - l) := by
@@ -111,8 +123,10 @@ theorem isPrecomplete : IsPrecomplete (IsLocalRing.maximalIdeal Ow) Ow := by
     exact sub_mem (f 0).2 ((mem_adicCompletionIntegers R L w).2 (by simpa using key 0))
   exact ⟨⟨l, hl1⟩, fun n => key n⟩
 
-theorem isAdicComplete : IsAdicComplete (IsLocalRing.maximalIdeal Ow) Ow :=
-  { toIsHausdorff := inferInstance, toIsPrecomplete := isPrecomplete w }
+theorem isAdicComplete : IsAdicComplete (IsLocalRing.maximalIdeal Ow) Ow := {
+  toIsHausdorff := inferInstance
+  toIsPrecomplete := isPrecomplete w
+}
 
 lemma finite_res [Finite (R ⧸ w.asIdeal)] : Finite (IsLocalRing.ResidueField Ow) := by
   let φ : R →+* IsLocalRing.ResidueField Ow := (IsLocalRing.residue Ow).comp (algebraMap R Ow)
@@ -184,7 +198,6 @@ end Compl
 
 end AdicCompl
 
-
 open AdicCompl in
 theorem locFld : Formalism.L2.PjFree.LocFld := by
   intro K L _ _ _ _ j la
@@ -196,14 +209,19 @@ theorem locFld : Formalism.L2.PjFree.LocFld := by
   have : w.asIdeal.LiesOver la.asIdeal := hQl
   have : Finite (𝓞 L ⧸ w.asIdeal) := w.asIdeal.finiteQuotientOfFreeOfNeBot w.ne_bot
   have : CharZero (adicCompletionIntegers L w) :=
-    charZero_of_injective_algebraMap
-      (FaithfulSMul.algebraMap_injective (𝓞 L) (adicCompletionIntegers L w))
+    charZero_of_injective_algebraMap (FaithfulSMul.algebraMap_injective (𝓞 L)
+      (adicCompletionIntegers L w))
   obtain ⟨e1, he1, h1⟩ := exists_e (L := L) w
   let T : CDVR := { V := adicCompletionIntegers L w, cpl := isAdicComplete w }
   have he2 : la.asIdeal.ramificationIdx' w.asIdeal ≠ 0 :=
     Ideal.IsDedekindDomain.ramificationIdx'_ne_zero_of_liesOver w.asIdeal la.ne_bot
-  refine ⟨T, kMap w, la.asIdeal.ramificationIdx' w.asIdeal * e1,
-    ⟨Nat.mul_pos (Nat.pos_of_ne_zero he2) he1, fun a => ?_⟩, finite_res w⟩
+  refine ⟨
+    T,
+    kMap w,
+    la.asIdeal.ramificationIdx' w.asIdeal * e1,
+    ⟨Nat.mul_pos (Nat.pos_of_ne_zero he2) he1, fun a => ?_⟩,
+    finite_res w
+  ⟩
   show vV (adicCompletionIntegers L w) (kMap w (j a)) = _
   simp only [vV, vLa]
   rw [h1, show j a = algebraMap K L a from rfl, ← valuation_liesOver L la w a,

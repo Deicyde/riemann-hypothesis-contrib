@@ -50,8 +50,7 @@ namespace Misc2
 def conjHom {G : Type*} [Group G] (χ : G →* ℂˣ) : G →* ℂ :=
   (starRingEnd ℂ).toMonoidHom.comp ((Units.coeHom ℂ).comp χ)
 
-def twHom (e : ℕ) (χ : GG e →* ℂˣ) : GG e →* ℂ :=
-  (Units.coeHom ℂ).comp (chC e) * conjHom χ
+def twHom (e : ℕ) (χ : GG e →* ℂˣ) : GG e →* ℂ := (Units.coeHom ℂ).comp (chC e) * conjHom χ
 
 theorem chC_apply (e : ℕ) (g : GG e) : ((chC e g : ℂˣ) : ℂ) = (((g.1.2 : ℤˣ) : ℤ) : ℂ) := rfl
 
@@ -61,7 +60,8 @@ theorem conjHom_eq_one_iff {G : Type*} [Group G] (χ : G →* ℂˣ) : conjHom �
     ext g
     have := DFunLike.congr_fun h g
     simp only [conjHom, MonoidHom.coe_comp, Function.comp_apply, Units.coeHom_apply,
-      RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, MonoidHom.one_apply] at this
+        RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, MonoidHom.one_apply]
+      at this
     have := congrArg (starRingEnd ℂ) this
     simpa using this
   · rintro rfl
@@ -77,8 +77,9 @@ theorem twHom_eq_one_iff (e : ℕ) (χ : GG e →* ℂˣ) : twHom e χ = 1 ↔ �
     ext g
     have := DFunLike.congr_fun h g
     simp only [twHom, conjHom, MonoidHom.mul_apply, MonoidHom.coe_comp, Function.comp_apply,
-      Units.coeHom_apply, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe,
-      MonoidHom.one_apply, chC_apply] at this
+        Units.coeHom_apply, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, MonoidHom.one_apply,
+        chC_apply]
+      at this
     have h2 : starRingEnd ℂ ((χ g : ℂˣ) : ℂ) = (((g.1.2 : ℤˣ) : ℤ) : ℂ) := by
       have := congrArg (fun z => (((g.1.2 : ℤˣ) : ℤ) : ℂ) * z) this
       simp only [← mul_assoc, int_units_sq_C, one_mul, mul_one] at this
@@ -89,8 +90,8 @@ theorem twHom_eq_one_iff (e : ℕ) (χ : GG e →* ℂˣ) : twHom e χ = 1 ↔ �
   · rintro rfl
     ext g
     simp only [twHom, conjHom, MonoidHom.mul_apply, MonoidHom.coe_comp, Function.comp_apply,
-      Units.coeHom_apply, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe,
-      MonoidHom.one_apply, chC_apply]
+      Units.coeHom_apply, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, MonoidHom.one_apply,
+      chC_apply]
     simp [int_units_sq_C]
 
 theorem chC_ne_one (e : ℕ) : chC e ≠ 1 := by
@@ -101,9 +102,11 @@ theorem chC_ne_one (e : ℕ) : chC e ≠ 1 := by
   simp [cc, c0] at h2
   norm_num at h2
 
-theorem card_extended_galois_group (e : ℕ) [Fintype (GG e)] : (Fintype.card (GG e) : ℂ) = 2 ^ (e + 2) := by
+theorem card_extended_galois_group (e : ℕ) [Fintype (GG e)]
+    : (Fintype.card (GG e) : ℂ) = 2 ^ (e + 2) := by
   rw [← Nat.card_eq_fintype_card, (hostGroup e).1]
-  push_cast; rfl
+  push_cast
+  rfl
 
 end Misc2
 
@@ -111,8 +114,10 @@ open Classical in
 theorem hostCharSum : HostCharSum := by
   intro e
   refine ⟨fun χ => ?_, fun g => ?_⟩
-  · have hpt : ∀ g : GG e, 2 * (if g ∉ Psi e then starRingEnd ℂ ((χ g : ℂˣ) : ℂ) else 0) =
-        conjHom χ g - twHom e χ g := by
+  · have hpt
+        : ∀ g : GG e,
+          2 * (if g ∉ Psi e then starRingEnd ℂ ((χ g : ℂˣ) : ℂ) else 0)
+            = conjHom χ g - twHom e χ g := by
       intro g
       simp only [twHom, conjHom, MonoidHom.mul_apply, MonoidHom.coe_comp, Function.comp_apply,
         Units.coeHom_apply, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, chC_apply, mem_Psi_iff]
@@ -120,9 +125,10 @@ theorem hostCharSum : HostCharSum := by
     have hA := sum_hom_units (conjHom χ)
     have hB := sum_hom_units (twHom e χ)
     simp only [conjHom_eq_one_iff, twHom_eq_one_iff, Nat.cast_ite, Nat.cast_zero] at hA hB
-    have hS : 2 * (∑ g ∈ Finset.univ.filter (fun g : GG e => g ∉ Psi e),
-        starRingEnd ℂ ((χ g : ℂˣ) : ℂ)) =
-        (∑ g : GG e, conjHom χ g) - ∑ g : GG e, twHom e χ g := by
+    have hS
+        : 2 * (∑ g ∈ Finset.univ.filter (fun g : GG e => g ∉ Psi e),
+                starRingEnd ℂ ((χ g : ℂˣ) : ℂ))
+          = (∑ g : GG e, conjHom χ g) - ∑ g : GG e, twHom e χ g := by
       rw [Finset.sum_filter, Finset.mul_sum, ← Finset.sum_sub_distrib]
       exact Finset.sum_congr rfl (fun g _ => hpt g)
     rw [hA, hB, card_extended_galois_group] at hS
@@ -134,7 +140,7 @@ theorem hostCharSum : HostCharSum := by
     · linear_combination hS / 2
   · simp only [chD, chQ, MonoidHom.coe_comp, Function.comp_apply, MonoidHom.coe_fst,
       MonoidHom.coe_snd, Prod.ext_iff]
-    rcases Int.units_eq_one_or g.1.1 with h | h <;> rcases Int.units_eq_one_or g.1.2 with h' | h' <;>
-      rw [h, h'] <;> decide
+    rcases Int.units_eq_one_or g.1.1 with h | h <;> rcases Int.units_eq_one_or g.1.2 with h' | h'
+      <;> rw [h, h'] <;> decide
 
 end Formalism.FrobeniusOrbits

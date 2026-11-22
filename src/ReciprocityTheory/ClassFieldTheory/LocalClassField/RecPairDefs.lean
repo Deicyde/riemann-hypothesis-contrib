@@ -16,11 +16,11 @@ noncomputable section
 variable (p : ℕ) [Fact p.Prime] (K L : IntermediateField ℚ_[p] (PadicAlgCl p))
 
 def IsPairClass (a : (kbarT p K).V) (χ : charGrp (GK p K)) (c : Br p K) : Prop :=
-  ∃ (t : GK p K → ℚ) (m : (Fin 2 → GK p K) → ℤ) (z : (kbarT p K).coch.X 2) (hz : (kbarT p K).coch.d 2 z = 0),
-    IsLocallyConstant t ∧ (∀ g, (QuotientAddGroup.mk (t g) : QZ) = χ.1 (Additive.ofMul g)) ∧
-    (∀ g, (m g : ℚ) = t (g 0) + t (g 1) - t (g 0 * g 1)) ∧ (∀ g, z.1 g = m g • a) ∧
-    c = (kbarT p K).coch.cls 2 z hz
-
+  ∃ (t : GK p K → ℚ) (m : (Fin 2 → GK p K) → ℤ) (z : (kbarT p K).coch.X 2)
+      (hz : (kbarT p K).coch.d 2 z = 0),
+    IsLocallyConstant t ∧ (∀ g, (QuotientAddGroup.mk (t g) : QZ) = χ.1 (Additive.ofMul g))
+      ∧ (∀ g, (m g : ℚ) = t (g 0) + t (g 1) - t (g 0 * g 1)) ∧ (∀ g, z.1 g = m g • a)
+      ∧ c = (kbarT p K).coch.cls 2 z hz
 
 open Classical in
 def pairBr (a : Kˣ) (χ : charGrp (GK p K)) : Br p K :=
@@ -28,12 +28,13 @@ def pairBr (a : Kˣ) (χ : charGrp (GK p K)) : Br p K :=
 
 def pairK (a : Kˣ) (χ : charGrp (GK p K)) : QZ := invBr p K (pairBr p K a χ)
 
-
 variable {p K L} in
 def resChar (h : K ≤ L) : charGrp (GK p K) →+ charGrp (GK p L) where
-  toFun χ := ⟨χ.1.comp (MonoidHom.toAdditive (resGK h)),
+  toFun χ := ⟨
+    χ.1.comp (MonoidHom.toAdditive (resGK h)),
     (show IsLocallyConstant fun g : GK p K => χ.1 (Additive.ofMul g) from χ.2).comp_continuous
-      (resGK_continuous h)⟩
+      (resGK_continuous h)
+  ⟩
   map_zero' := rfl
   map_add' _ _ := rfl
 

@@ -6,26 +6,37 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N
 open GlobalTheory.WeilDeligne UpperTheory.V.Af UpperTheory.V.Z.Win
 open scoped Pointwise
 
 namespace UpperTheory.V.Z.Desc.W
 
-private def conjDec {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (A B : ValuationSubring Ω) (γ : G F Ω)
-    (h : γ • A = B) : ↥(Dec (F := F) B) →* ↥(Dec (F := F) A) where
-  toFun u := ⟨γ⁻¹ * u * γ, by
-    have hu := mem_Dec.1 u.2
-    rw [mem_Dec, mul_smul, mul_smul, h, hu, ← h, inv_smul_smul]⟩
+private def conjDec
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    (A B : ValuationSubring Ω) (γ : G F Ω) (h : γ • A = B)
+    : ↥(Dec (F := F) B) →* ↥(Dec (F := F) A) where
+  toFun u := ⟨
+    γ⁻¹ * u * γ,
+    by
+      have hu := mem_Dec.1 u.2
+      rw [mem_Dec, mul_smul, mul_smul, h, hu, ← h, inv_smul_smul]
+  ⟩
   map_one' := Subtype.ext (by simp)
   map_mul' a b := Subtype.ext (by simp only [Subgroup.coe_mul]; group)
 
-private theorem conjDec_coe {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (A B : ValuationSubring Ω)
-    (γ : G F Ω) (h : γ • A = B) (u : ↥(Dec (F := F) B)) :
-    ((conjDec A B γ h u : ↥(Dec (F := F) A)) : G F Ω) = γ⁻¹ * u * γ := rfl
+private theorem conjDec_coe
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    (A B : ValuationSubring Ω) (γ : G F Ω) (h : γ • A = B)
+    (u : ↥(Dec (F := F) B))
+    : ((conjDec A B γ h u : ↥(Dec (F := F) A)) : G F Ω) = γ⁻¹ * u * γ :=
+  rfl
 
-private theorem conjDec_surj {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (A B : ValuationSubring Ω)
-    (γ : G F Ω) (h : γ • A = B) : Function.Surjective (conjDec A B γ h) := by
+private theorem conjDec_surj
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    (A B : ValuationSubring Ω) (γ : G F Ω) (h : γ • A = B)
+    : Function.Surjective (conjDec A B γ h) := by
   intro v
   refine ⟨⟨γ * v * γ⁻¹, ?_⟩, ?_⟩
   · have hv := mem_Dec.1 v.2

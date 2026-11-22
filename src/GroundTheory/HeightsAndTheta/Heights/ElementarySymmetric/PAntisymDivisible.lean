@@ -261,14 +261,14 @@ end Blocks
 
 end AntisymDivisible
 
-
 open AntisymDivisible in
 theorem AntisymDivisible.proof : AntisymDivisible.Statement := by
   intro T _ _ N j P hP hvan
   obtain ⟨hPh, hPa⟩ := hP
 
-  have anti : ∀ (τ : T) (a b : Fin N), a.val < b.val → (b.val < j ∨ j ≤ a.val) →
-      rename (Equiv.swap (τ, a) (τ, b)) P = -P := by
+  have anti
+      : ∀ (τ : T) (a b : Fin N),
+        a.val < b.val → (b.val < j ∨ j ≤ a.val) → rename (Equiv.swap (τ, a) (τ, b)) P = -P := by
     intro τ
     refine block_chain (fun a b => rename (Equiv.swap (τ, a) (τ, b)) P = -P) ?_ ?_
     · intro a b hb hbl
@@ -278,8 +278,8 @@ theorem AntisymDivisible.proof : AntisymDivisible.Statement := by
       have hba : (τ, a) ≠ (τ, b) := by simp [Fin.ext_iff]; omega
       have e := Equiv.swap_apply_apply (Equiv.swap (τ, c) (τ, b)) (τ, a) (τ, c)
       rw [Equiv.swap_apply_of_ne_of_ne hca hba, Equiv.swap_apply_left, Equiv.swap_inv] at e
-      rw [e, Equiv.Perm.coe_mul, Equiv.Perm.coe_mul, ← rename_rename, ← rename_rename,
-        h2, map_neg, h1, neg_neg, h2]
+      rw [e, Equiv.Perm.coe_mul, Equiv.Perm.coe_mul, ← rename_rename, ← rename_rename, h2, map_neg,
+        h1, neg_neg, h2]
 
   set S : Finset (T × Fin N × Fin N) := Finset.univ.filter (fun t => t.2.1 < t.2.2) with hS
   let f : T × Fin N × Fin N → MvPolynomial (T × Fin N) ℝ := fun t => X (t.1, t.2.1) - X (t.1, t.2.2)
@@ -325,8 +325,9 @@ theorem AntisymDivisible.proof : AntisymDivisible.Statement := by
   set l₁ := homogeneousComponent 1 l with hl₁
   have hl₁h : l₁ ∈ homogeneousSubmodule (T × Fin N) ℝ 1 := homogeneousComponent_isHomogeneous 1 l
 
-  have inv : ∀ (τ : T) (a b : Fin N), a.val < b.val → (b.val < j ∨ j ≤ a.val) →
-      rename (Equiv.swap (τ, a) (τ, b)) l₁ = l₁ := by
+  have inv
+      : ∀ (τ : T) (a b : Fin N),
+        a.val < b.val → (b.val < j ∨ j ≤ a.val) → rename (Equiv.swap (τ, a) (τ, b)) l₁ = l₁ := by
     intro τ a b hab hbl
     have h1 := anti τ a b hab hbl
     have h2 := rename_swap_delta (T := T) τ (ne_of_lt hab)
@@ -336,22 +337,25 @@ theorem AntisymDivisible.proof : AntisymDivisible.Statement := by
 
   rw [homogeneousSubmodule_one_eq_span_X, Submodule.mem_span_range_iff_exists_fun] at hl₁h
   obtain ⟨c, hc⟩ := hl₁h
-  have coeff_lin : ∀ (g : T × Fin N → T × Fin N) (u : T × Fin N),
-      AddMonoidAlgebra.coeff (∑ w, c w • (X (g w) : MvPolynomial (T × Fin N) ℝ)) (Finsupp.single u 1) =
-        ∑ w, if g w = u then c w else 0 := by
+  have coeff_lin
+      : ∀ (g : T × Fin N → T × Fin N) (u : T × Fin N),
+        AddMonoidAlgebra.coeff (∑ w, c w • (X (g w) : MvPolynomial (T × Fin N) ℝ))
+            (Finsupp.single u 1)
+          = ∑ w, if g w = u then c w else 0 := by
     intro g u
     simp only [coeff_sum, coeff_smul, coeff_X, Finsupp.single_left_inj one_ne_zero, smul_eq_mul,
       mul_ite, mul_one, mul_zero]
-  have const : ∀ (τ : T) (a b : Fin N), a.val < b.val → (b.val < j ∨ j ≤ a.val) →
-      c (τ, a) = c (τ, b) := by
+  have const
+      : ∀ (τ : T) (a b : Fin N), a.val < b.val → (b.val < j ∨ j ≤ a.val) → c (τ, a) = c (τ, b) := by
     intro τ a b hab hbl
     have h := congrArg (AddMonoidAlgebra.coeff · (Finsupp.single (τ, a) 1)) (inv τ a b hab hbl)
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← hc, map_sum] at h
     simp only [map_smul, rename_X] at h
     rw [coeff_lin, coeff_lin] at h
-    simp only [Equiv.swap_apply_eq_iff, Equiv.swap_apply_left, Finset.sum_ite_eq',
-      Finset.mem_univ, if_true, id] at h
+    simp only [Equiv.swap_apply_eq_iff, Equiv.swap_apply_left, Finset.sum_ite_eq', Finset.mem_univ,
+        if_true, id]
+      at h
     exact h.symm
   refine ⟨l₁, ⟨?_, ?_⟩, hP1⟩
   · exact homogeneousComponent_isHomogeneous 1 l
@@ -376,8 +380,9 @@ theorem AntisymDivisible.proof : AntisymDivisible.Statement := by
         by_cases ha : a.val < j
         · exact Or.inl ha
         · exact Or.inr (by have := mt h2.1 ha; omega)
-    calc ∑ w, c w • X (g w) = ∑ w, c (g w) • (X (g w) : MvPolynomial (T × Fin N) ℝ) := by
-          simp_rw [hcg]
+    calc
+      ∑ w, c w • X (g w)
+        = ∑ w, c (g w) • (X (g w) : MvPolynomial (T × Fin N) ℝ) := by simp_rw [hcg]
       _ = ∑ w, c w • X w := Equiv.sum_comp g (fun w => c w • (X w : MvPolynomial (T × Fin N) ℝ))
 
 end GroundTheory.Heights₂.Heights

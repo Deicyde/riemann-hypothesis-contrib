@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsEtCoord
 
 set_option autoImplicit false
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace GlobalTheory GlobalTheory.DI GlobalTheory.LogDR GlobalTheory.LogPair GlobalTheory.Cartier ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory AlgebraicGeometry TopologicalSpace GlobalTheory GlobalTheory.DI
+  GlobalTheory.LogDR GlobalTheory.LogPair GlobalTheory.Cartier ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.DI.StalkKer
 
@@ -33,14 +35,18 @@ private lemma stalk_hom_eq_zero_of_stalkMap_eq_zero {X Y : Scheme} (π : X ⟶ Y
   rw [← h2, Scheme.stalkClosedPointTo_comp]
   simp [hz]
 
-
 set_option autoImplicit false in
 open CategoryTheory AlgebraicGeometry TopologicalSpace in
-theorem _root_.GlobalTheory.DI.StalkKer.stalkMap_surjective_ker : ∀ (p : ℕ) [Fact p.Prime] (Y X : Scheme.{0})
-    (g : Y ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (ZMod (p ^ 2))) (f : X ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (ZMod p)) (π : X ⟶ Y),
-    IsPullback π f g (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (ZMod.castHom (dvd_pow_self p two_ne_zero) (ZMod p))) →
-    ∀ y : X, Function.Surjective (π.stalkMap y).hom ∧
-      ∀ z, (π.stalkMap y).hom z = 0 ↔ ∃ w, z = p * w := by
+theorem _root_.GlobalTheory.DI.StalkKer.stalkMap_surjective_ker
+    : ∀ (p : ℕ) [Fact p.Prime] (Y X : Scheme.{0})
+        (g : Y ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (ZMod (p ^ 2)))
+        (f : X ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (ZMod p)) (π : X ⟶ Y),
+      IsPullback π f g
+          (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (ZMod.castHom
+            (dvd_pow_self p two_ne_zero) (ZMod p)))
+        → ∀ y : X,
+          Function.Surjective (π.stalkMap y).hom
+            ∧ ∀ z, (π.stalkMap y).hom z = 0 ↔ ∃ w, z = p * w := by
   intro p hp Y X g f π hPB y
   have hci : IsClosedImmersion π :=
     MorphismProperty.of_isPullback (P := @IsClosedImmersion) hPB.flip
@@ -67,9 +73,14 @@ theorem _root_.GlobalTheory.DI.StalkKer.stalkMap_surjective_ker : ∀ (p : ℕ) 
     let q : O ⟶ CommRingCat.of (O ⧸ I) := CommRingCat.ofHom (Ideal.Quotient.mk I)
     haveI : IsLocalHom q.hom := hloc
     let a : Spec (CommRingCat.of (O ⧸ I)) ⟶ Y := Spec.map q ≫ Y.fromSpecStalk (π y)
-    let b : Spec (CommRingCat.of (O ⧸ I)) ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (ZMod p) :=
+    let b
+        : Spec (CommRingCat.of (O ⧸ I))
+          ⟶ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp (ZMod p) :=
       Spec.map (CommRingCat.ofHom (ZMod.castHom (dvd_refl p) (O ⧸ I)))
-    have hcomm : a ≫ g = b ≫ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (ZMod.castHom (dvd_pow_self p two_ne_zero) (ZMod p)) := by
+    have hcomm
+        : a ≫ g
+          = b ≫ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (ZMod.castHom
+            (dvd_pow_self p two_ne_zero) (ZMod p)) := by
       obtain ⟨φ, hφ⟩ := Spec.map_surjective (a ≫ g)
       rw [← hφ]
       change Spec.map φ = Spec.map _ ≫ Spec.map _

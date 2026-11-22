@@ -12,7 +12,8 @@ namespace PositivityTheory.Rg.Sw.Glob.VacU
 
 variable {n : ℕ}
 
-theorem exists_circle_det_ne (W : Matrix (Fin n) (Fin n) ℂ) : ∃ lam : ℂ, ‖lam‖ = 1 ∧ (W + lam • 1).det ≠ 0 := by
+theorem exists_circle_det_ne (W : Matrix (Fin n) (Fin n) ℂ)
+    : ∃ lam : ℂ, ‖lam‖ = 1 ∧ (W + lam • 1).det ≠ 0 := by
   by_contra hcon
   push Not at hcon
   set p := (-W).charpoly with hp
@@ -32,11 +33,11 @@ theorem exists_circle_det_ne (W : Matrix (Fin n) (Fin n) ℂ) : ∃ lam : ℂ, �
     obtain ⟨z, hz⟩ := Complex.exp_eq_exp_iff_exists_int.1 h
     have hre : r k = r k' + z * (2 * Real.pi) := by
       have := congrArg Complex.im hz
-      simpa [Complex.mul_im, Complex.ofReal_im, Complex.ofReal_re, Complex.I_re, Complex.I_im] using this
+      simpa [Complex.mul_im, Complex.ofReal_im, Complex.ofReal_re, Complex.I_re, Complex.I_im] using
+        this
     have hz0 : z = 0 := by
       by_contra hz0
-      have h1 : (1 : ℝ) ≤ |(z : ℝ)| := by
-        rw [← Int.cast_abs]; exact_mod_cast Int.one_le_abs hz0
+      have h1 : (1 : ℝ) ≤ |(z : ℝ)| := by rw [← Int.cast_abs]; exact_mod_cast Int.one_le_abs hz0
       have habs : |(z : ℝ) * (2 * Real.pi)| < 1 := by
         rw [abs_lt]; constructor <;> linarith [hr0 k, hr0 k', hr1 k, hr1 k']
       rw [abs_mul, abs_of_pos (by positivity : (0 : ℝ) < 2 * Real.pi)] at habs
@@ -44,8 +45,7 @@ theorem exists_circle_det_ne (W : Matrix (Fin n) (Fin n) ℂ) : ∃ lam : ℂ, �
     rw [hz0] at hre
     simp only [Int.cast_zero, zero_mul, add_zero, r] at hre
     have hpos : (0 : ℝ) < (n : ℝ) + 1 := by positivity
-    have : (k : ℝ) = k' := by
-      field_simp at hre; linarith
+    have : (k : ℝ) = k' := by field_simp at hre; linarith
     exact Fin.ext (by exact_mod_cast this)
   have hroot : ∀ k, f k ∈ p.roots.toFinset := by
     intro k
@@ -55,27 +55,25 @@ theorem exists_circle_det_ne (W : Matrix (Fin n) (Fin n) ℂ) : ∃ lam : ℂ, �
     rw [Complex.norm_exp]
     simp
   have hcard : (Finset.univ.image f).card ≤ p.roots.toFinset.card :=
-    Finset.card_le_card (fun x hx => by
-      obtain ⟨k, _, rfl⟩ := Finset.mem_image.1 hx; exact hroot k)
+    Finset.card_le_card (fun x hx => by obtain ⟨k, _, rfl⟩ := Finset.mem_image.1 hx; exact hroot k)
   rw [Finset.card_image_of_injective _ hf, Finset.card_univ, Fintype.card_fin] at hcard
   have h1 := (Multiset.toFinset_card_le p.roots).trans (Polynomial.card_roots' p)
-  have h2 : p.natDegree = n := by
-    rw [hp, Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
+  have h2 : p.natDegree = n := by rw [hp, Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
   omega
 
-theorem unitary_diag (W : Matrix (Fin n) (Fin n) ℂ) (hW : Wᴴ * W = 1) :
-    ∃ (P : Matrix (Fin n) (Fin n) ℂ) (w : Fin n → ℂ), Pᴴ * P = 1 ∧ P * Pᴴ = 1 ∧ (∀ j, ‖w j‖ = 1) ∧
-      W = P * diagonal w * Pᴴ := by
+theorem unitary_diag (W : Matrix (Fin n) (Fin n) ℂ) (hW : Wᴴ * W = 1)
+    : ∃ (P : Matrix (Fin n) (Fin n) ℂ) (w : Fin n → ℂ),
+      Pᴴ * P = 1 ∧ P * Pᴴ = 1 ∧ (∀ j, ‖w j‖ = 1) ∧ W = P * diagonal w * Pᴴ := by
   have hW' : W * Wᴴ = 1 := mul_eq_one_comm.1 hW
   obtain ⟨lam, hlam1, hdet⟩ := exists_circle_det_ne W
   have hlam0 : lam ≠ 0 := by intro h; rw [h, norm_zero] at hlam1; exact zero_ne_one hlam1
-  have hconj : starRingEnd ℂ lam * lam = 1 := by
-    rw [Complex.conj_mul', hlam1]; simp
+  have hconj : starRingEnd ℂ lam * lam = 1 := by rw [Complex.conj_mul', hlam1]; simp
   set V' := lam⁻¹ • W with hV'
   have hV'u : V'ᴴ * V' = 1 := by
     rw [hV', Matrix.conjTranspose_smul, Matrix.smul_mul, Matrix.mul_smul, smul_smul, hW]
     rw [RCLike.star_def, map_inv₀]
-    rw [show (starRingEnd ℂ lam)⁻¹ * lam⁻¹ = (starRingEnd ℂ lam * lam)⁻¹ by rw [mul_inv], hconj, inv_one, one_smul]
+    rw [show (starRingEnd ℂ lam)⁻¹ * lam⁻¹ = (starRingEnd ℂ lam * lam)⁻¹ by rw [mul_inv], hconj,
+      inv_one, one_smul]
   set B := 1 + V' with hB
   set A := 1 - V' with hA
   have hBdet : IsUnit B.det := by
@@ -90,20 +88,23 @@ theorem unitary_diag (W : Matrix (Fin n) (Fin n) ℂ) (hW : Wᴴ * W = 1) :
   have hBc : IsUnit Bᴴ.det := by rw [Matrix.det_conjTranspose]; exact hBdet.star
   have hid : Bᴴ * A = -(Aᴴ * B) := by
     rw [hB, hA, Matrix.conjTranspose_add, Matrix.conjTranspose_sub, Matrix.conjTranspose_one]
-    simp only [Matrix.add_mul, Matrix.sub_mul, Matrix.mul_add, Matrix.mul_sub, Matrix.one_mul, Matrix.mul_one, hV'u]
+    simp only [Matrix.add_mul, Matrix.sub_mul, Matrix.mul_add, Matrix.mul_sub, Matrix.one_mul,
+      Matrix.mul_one, hV'u]
     abel
   have hHerm : H.IsHermitian := by
     have hk : Bᴴ * Hᴴ * B = Bᴴ * H * B := by
       have e1 : Bᴴ * Hᴴ = -(Complex.I • Aᴴ) := by
         rw [← Matrix.conjTranspose_mul, hHB, Matrix.conjTranspose_smul]
         simp [RCLike.star_def, Complex.conj_I]
-      rw [e1, Matrix.mul_assoc, hHB, Matrix.neg_mul, Matrix.smul_mul, Matrix.mul_smul, hid, smul_neg]
+      rw [e1, Matrix.mul_assoc, hHB, Matrix.neg_mul, Matrix.smul_mul, Matrix.mul_smul, hid,
+        smul_neg]
     have hk2 : Hᴴ = H := by
       have := congrArg (fun M => (Bᴴ)⁻¹ * M * B⁻¹) hk
-      rwa [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hBc, Matrix.one_mul, Matrix.mul_assoc,
-        Matrix.mul_nonsing_inv _ hBdet, Matrix.mul_one, ← Matrix.mul_assoc, ← Matrix.mul_assoc,
-        Matrix.nonsing_inv_mul _ hBc, Matrix.one_mul, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hBdet,
-        Matrix.mul_one] at this
+      rwa [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hBc, Matrix.one_mul,
+          Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hBdet, Matrix.mul_one, ← Matrix.mul_assoc,
+          ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hBc, Matrix.one_mul, Matrix.mul_assoc,
+          Matrix.mul_nonsing_inv _ hBdet, Matrix.mul_one]
+        at this
     exact hk2
   set U : Matrix (Fin n) (Fin n) ℂ := (hHerm.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) with hU
   set d : Fin n → ℝ := hHerm.eigenvalues with hd
@@ -118,15 +119,20 @@ theorem unitary_diag (W : Matrix (Fin n) (Fin n) ℂ) (hW : Wᴴ * W = 1) :
     intro j h; have := congrArg Complex.im h; simp at this
   set E : Fin n → ℂ := fun j => (Complex.I - (d j : ℂ)) / (Complex.I + (d j : ℂ)) with hE
   have hHdiag : H + Complex.I • 1 = U * diagonal (fun j => ((d j : ℝ) : ℂ) + Complex.I) * Uᴴ := by
-    have e : diagonal (fun j => ((d j : ℝ) : ℂ) + Complex.I) = diagonal (fun j => ((d j : ℝ) : ℂ)) + Complex.I • 1 := by
+    have e
+        : diagonal (fun j => ((d j : ℝ) : ℂ) + Complex.I)
+          = diagonal (fun j => ((d j : ℝ) : ℂ)) + Complex.I • 1 := by
       rw [Matrix.smul_one_eq_diagonal, diagonal_add]
-    rw [e, Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.mul_one, Matrix.smul_mul, hUu', hspec]
+    rw [e, Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.mul_one, Matrix.smul_mul, hUu',
+      hspec]
   have hHI : IsUnit (H + Complex.I • 1).det := by
     rw [isUnit_iff_ne_zero, hHdiag, Matrix.det_mul, Matrix.det_mul, det_diagonal]
     have hU1 : U.det * Uᴴ.det = 1 := by rw [← Matrix.det_mul, hUu', Matrix.det_one]
     intro h0
     have : U.det * Uᴴ.det * ∏ j, (((d j : ℝ) : ℂ) + Complex.I) = 0 := by
-      rw [show U.det * Uᴴ.det * ∏ j, (((d j : ℝ) : ℂ) + Complex.I) = U.det * (∏ j, (((d j : ℝ) : ℂ) + Complex.I)) * Uᴴ.det by ring]
+      rw [show U.det * Uᴴ.det * ∏ j, (((d j : ℝ) : ℂ) + Complex.I)
+          = U.det * (∏ j, (((d j : ℝ) : ℂ) + Complex.I)) * Uᴴ.det by
+        ring]
       exact h0
     rw [hU1, one_mul] at this
     exact (Finset.prod_ne_zero_iff.2 fun j _ => hdI j) this
@@ -140,17 +146,25 @@ theorem unitary_diag (W : Matrix (Fin n) (Fin n) ℂ) (hW : Wᴴ * W = 1) :
     abel
   have hEq2 : (H + Complex.I • 1) * (U * diagonal E * Uᴴ) = Complex.I • 1 - H := by
     rw [hHdiag]
-    have e1 : U * diagonal (fun j => ((d j : ℝ) : ℂ) + Complex.I) * Uᴴ * (U * diagonal E * Uᴴ) =
-        U * (diagonal (fun j => ((d j : ℝ) : ℂ) + Complex.I) * diagonal E) * Uᴴ := by
+    have e1
+        : U * diagonal (fun j => ((d j : ℝ) : ℂ) + Complex.I) * Uᴴ * (U * diagonal E * Uᴴ)
+          = U * (diagonal (fun j => ((d j : ℝ) : ℂ) + Complex.I) * diagonal E) * Uᴴ := by
       simp only [Matrix.mul_assoc]
       rw [← Matrix.mul_assoc Uᴴ U, hUu, Matrix.one_mul]
     rw [e1, diagonal_mul_diagonal]
-    have e2 : (fun j => (((d j : ℝ) : ℂ) + Complex.I) * E j) = fun j => Complex.I - ((d j : ℝ) : ℂ) := by
+    have e2
+        : (fun j => (((d j : ℝ) : ℂ) + Complex.I) * E j)
+          = fun j => Complex.I - ((d j : ℝ) : ℂ) := by
       funext j
       have hdI' : Complex.I + ((d j : ℝ) : ℂ) ≠ 0 := by rw [add_comm]; exact hdI j
-      rw [hE]; simp only; rw [add_comm ((d j : ℝ) : ℂ) Complex.I]; field_simp
+      rw [hE]
+      simp only
+      rw [add_comm ((d j : ℝ) : ℂ) Complex.I]
+      field_simp
     rw [e2, hspec]
-    have e3 : diagonal (fun j => Complex.I - ((d j : ℝ) : ℂ)) = Complex.I • 1 - diagonal (fun j => ((d j : ℝ) : ℂ)) := by
+    have e3
+        : diagonal (fun j => Complex.I - ((d j : ℝ) : ℂ))
+          = Complex.I • 1 - diagonal (fun j => ((d j : ℝ) : ℂ)) := by
       rw [Matrix.smul_one_eq_diagonal, ← diagonal_sub]
     rw [e3, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_smul, Matrix.mul_one, Matrix.smul_mul, hUu']
   have hV'eq : V' = U * diagonal E * Uᴴ := by
@@ -166,10 +180,15 @@ theorem unitary_diag (W : Matrix (Fin n) (Fin n) ℂ) (hW : Wᴴ * W = 1) :
     simp only
     rw [norm_div]
     have h1 : ‖Complex.I - ((d j : ℝ) : ℂ)‖ = ‖Complex.I + ((d j : ℝ) : ℂ)‖ := by
-      rw [← Complex.norm_conj (Complex.I + _)]; simp [Complex.conj_I, Complex.conj_ofReal, ← neg_add']
-      rw [← norm_neg]; congr 1; ring
+      rw [← Complex.norm_conj (Complex.I + _)]
+      simp [Complex.conj_I, Complex.conj_ofReal, ← neg_add']
+      rw [← norm_neg]
+      congr 1
+      ring
     rw [h1, div_self]
-    intro h0; rw [norm_eq_zero] at h0; exact hdI j (by rw [add_comm]; exact h0)
+    intro h0
+    rw [norm_eq_zero] at h0
+    exact hdI j (by rw [add_comm]; exact h0)
   · have : W = lam • V' := by rw [hV', smul_smul, mul_inv_cancel₀ hlam0, one_smul]
     have hd2 : diagonal (fun j => lam * E j) = lam • diagonal E := by
       ext i j; by_cases h : i = j <;> simp [diagonal_apply, h]

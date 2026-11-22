@@ -4,11 +4,12 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.FinrankIntEqFinrankRat.finrank_eq_of_place :
-    ∀ {M V : Type} [inst : AddCommGroup M]
-    [Module.Free ℤ M] [Module.Finite ℤ M] [inst_3 : AddCommGroup V] [inst_4 : _root_.Module ℚ V] (j : M →+ V),
-    Function.Injective (⇑j : M → V) →
-      (∀ (w : V), ∃ (m : ℕ) (u : M), m ≠ (0 : ℕ) ∧ m • w = (j : M → V) u) → Module.finrank ℤ M = Module.finrank ℚ V := by
+theorem UpperTheory.Reformulated.B.FinrankIntEqFinrankRat.finrank_eq_of_place
+    : ∀ {M V : Type} [inst : AddCommGroup M] [Module.Free ℤ M] [Module.Finite ℤ M]
+        [inst_3 : AddCommGroup V] [inst_4 : _root_.Module ℚ V] (j : M →+ V),
+      Function.Injective (⇑j : M → V)
+        → (∀ (w : V), ∃ (m : ℕ) (u : M), m ≠ (0 : ℕ) ∧ m • w = (j : M → V) u)
+        → Module.finrank ℤ M = Module.finrank ℚ V := by
   intro M V _ _ _ _ _ j hj hs
   classical
   let b := Module.Free.chooseBasis ℤ M
@@ -21,7 +22,7 @@ theorem UpperTheory.Reformulated.B.FinrankIntEqFinrankRat.finrank_eq_of_place :
     have hu : j u = ∑ i, (b.repr u i) • j (b i) := by
       conv_lhs => rw [← b.sum_repr u]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_zsmul]
+      simp only [map_sum, map_zsmul]
     rw [hu]
     refine Submodule.sum_mem _ fun i _ => ?_
     exact zsmul_mem (Submodule.subset_span (Set.mem_range_self i)) _

@@ -16,10 +16,12 @@ namespace LatticeIndexLength
 
 section SlopeTestRemainingChoices
 
-theorem length_quot_ne_top {O M : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [AddCommGroup M] [Module O M] [Module.Finite O M]
-    (d : O) (hd : d ≠ 0) (N : Submodule O M) (hN : ∀ m : M, d • m ∈ N) :
-    Module.length O (M ⧸ N) ≠ ⊤ := by
+theorem length_quot_ne_top
+    {O M : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup M] [Module O M]
+    [Module.Finite O M]
+    (d : O) (hd : d ≠ 0)
+    (N : Submodule O M) (hN : ∀ m : M, d • m ∈ N)
+    : Module.length O (M ⧸ N) ≠ ⊤ := by
   let I : Ideal O := Ideal.span {d}
   have hle : I • (⊤ : Submodule O M) ≤ N := by
     rw [Submodule.smul_le]
@@ -41,10 +43,11 @@ theorem length_quot_ne_top {O M : Type} [CommRing O] [IsDomain O] [IsDiscreteVal
     isArtinian_of_surjective_algebraMap (Ideal.Quotient.mk_surjective (I := I))
   exact Module.length_ne_top
 
-theorem length_quotient_tower_add {O X : Type} [CommRing O] [AddCommGroup X] [Module O X]
-    (D E P : Submodule O X) (hDE : D ≤ E) (hEP : E ≤ P) :
-    Module.length O (P ⧸ D.comap P.subtype) =
-      Module.length O (E ⧸ D.comap E.subtype) + Module.length O (P ⧸ E.comap P.subtype) := by
+theorem length_quotient_tower_add
+    {O X : Type} [CommRing O] [AddCommGroup X] [Module O X]
+    (D E P : Submodule O X) (hDE : D ≤ E) (hEP : E ≤ P)
+    : Module.length O (P ⧸ D.comap P.subtype)
+      = Module.length O (E ⧸ D.comap E.subtype) + Module.length O (P ⧸ E.comap P.subtype) := by
   let f : (E ⧸ D.comap E.subtype) →ₗ[O] (P ⧸ D.comap P.subtype) :=
     Submodule.mapQ _ _ (Submodule.inclusion hEP) (by intro x hx; simpa using hx)
   let g : (P ⧸ D.comap P.subtype) →ₗ[O] (P ⧸ E.comap P.subtype) :=
@@ -52,22 +55,27 @@ theorem length_quotient_tower_add {O X : Type} [CommRing O] [AddCommGroup X] [Mo
   apply Module.length_eq_add_of_exact f g
   · rw [← LinearMap.ker_eq_bot, eq_bot_iff]
     intro x hx
-    induction x using Submodule.Quotient.induction_on with | H e => ?_
+    induction x using Submodule.Quotient.induction_on with
+    | H e => ?_
     rw [LinearMap.mem_ker] at hx
     simp only [f, Submodule.mapQ_apply, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap,
-      Submodule.subtype_apply, Submodule.coe_inclusion] at hx
-    rw [Submodule.mem_bot, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap, Submodule.subtype_apply]
+        Submodule.subtype_apply, Submodule.coe_inclusion]
+      at hx
+    rw [Submodule.mem_bot, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap,
+      Submodule.subtype_apply]
     exact hx
   · exact Submodule.factor_surjective _
   · intro y
-    induction y using Submodule.Quotient.induction_on with | H p => ?_
+    induction y using Submodule.Quotient.induction_on with
+    | H p => ?_
     rw [show g (Submodule.Quotient.mk p) = Submodule.Quotient.mk p from Submodule.factor_mk _ p,
       Submodule.Quotient.mk_eq_zero, Submodule.mem_comap, Submodule.subtype_apply]
     constructor
     · intro hp
       exact ⟨Submodule.Quotient.mk ⟨p, hp⟩, rfl⟩
     · rintro ⟨x, hx⟩
-      induction x using Submodule.Quotient.induction_on with | H e => ?_
+      induction x using Submodule.Quotient.induction_on with
+      | H e => ?_
       simp only [f, Submodule.mapQ_apply] at hx
       rw [Submodule.Quotient.eq, Submodule.mem_comap] at hx
       simp only [Submodule.subtype_apply, Submodule.coe_sub, Submodule.coe_inclusion] at hx
@@ -79,15 +87,37 @@ end SlopeTestRemainingChoices
 
 section Sat
 
-variable {O K X : Type} [CommRing O] [IsDomain O] [Field K] [Algebra O K]
-  [IsFractionRing O K] [AddCommGroup X] [Module K X] [Module O X] [IsScalarTower O K X]
+variable
+  {O K X : Type} [CommRing O] [IsDomain O] [Field K] [Algebra O K] [IsFractionRing O K]
+  [AddCommGroup X] [Module K X] [Module O X] [IsScalarTower O K X]
 
-theorem exists_smul_mem_of_span (B : Submodule O X) (hB : Submodule.span K (B : Set X) = ⊤)
-    (x : X) : ∃ d : O, d ≠ 0 ∧ d • x ∈ B := by
-  first | exact Bl.general_b_fact_second''.goal1 .. | (apply Bl.general_b_fact_second''.goal1 <;> assumption) | (intros; apply Bl.general_b_fact_second''.goal1 <;> assumption) | (apply @Bl.general_b_fact_second''.goal1 <;> assumption) | (intros; apply @Bl.general_b_fact_second''.goal1 <;> assumption) | (apply @Bl.general_b_fact_second''.goal1 <;> first | assumption | infer_instance) | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› B hB x | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› B hB | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› B | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› | exact @Bl.general_b_fact_second''.goal1 O K X | exact @Bl.general_b_fact_second''.goal1 O K | exact @Bl.general_b_fact_second''.goal1 O
+theorem exists_smul_mem_of_span (B : Submodule O X) (hB : Submodule.span K (B : Set X) = ⊤) (x : X)
+    : ∃ d : O, d ≠ 0 ∧ d • x ∈ B := by
+  first
+  | exact Bl.general_b_fact_second''.goal1 ..
+  | (apply Bl.general_b_fact_second''.goal1 <;> assumption)
+  | (intros; apply Bl.general_b_fact_second''.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_second''.goal1 <;> assumption)
+  | (intros; apply @Bl.general_b_fact_second''.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_second''.goal1 <;> first | assumption | infer_instance)
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› B hB x
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› B hB
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› B
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_› ‹_›
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_› ‹_›
+  | exact @Bl.general_b_fact_second''.goal1 O K X ‹_›
+  | exact @Bl.general_b_fact_second''.goal1 O K X
+  | exact @Bl.general_b_fact_second''.goal1 O K
+  | exact @Bl.general_b_fact_second''.goal1 O
 
-theorem exists_smul_le (A B : Submodule O X) (hA : A.FG)
-    (hB : Submodule.span K (B : Set X) = ⊤) : ∃ d : O, d ≠ 0 ∧ ∀ a ∈ A, d • a ∈ B := by
+theorem exists_smul_le (A B : Submodule O X) (hA : A.FG) (hB : Submodule.span K (B : Set X) = ⊤)
+    : ∃ d : O, d ≠ 0 ∧ ∀ a ∈ A, d • a ∈ B := by
   classical
   obtain ⟨s, rfl⟩ := hA
   choose f hf0 hf using fun x => exists_smul_mem_of_span (K := K) B hB x
@@ -102,10 +132,10 @@ theorem exists_smul_le (A B : Submodule O X) (hA : A.FG)
     exact B.smul_mem _ (hf x)
   exact h ha
 
-theorem exists_smul_mem_inf_three (P Q₁ Q₂ Q₃ : Submodule O X) (hP : P.FG)
-    (h₁ : Submodule.span K (Q₁ : Set X) = ⊤) (h₂ : Submodule.span K (Q₂ : Set X) = ⊤)
-    (h₃ : Submodule.span K (Q₃ : Set X) = ⊤) :
-    ∃ d : O, d ≠ 0 ∧ ∀ p ∈ P, d • p ∈ Q₁ ⊓ Q₂ ⊓ Q₃ := by
+theorem exists_smul_mem_inf_three
+    (P Q₁ Q₂ Q₃ : Submodule O X) (hP : P.FG) (h₁ : Submodule.span K (Q₁ : Set X) = ⊤)
+    (h₂ : Submodule.span K (Q₂ : Set X) = ⊤) (h₃ : Submodule.span K (Q₃ : Set X) = ⊤)
+    : ∃ d : O, d ≠ 0 ∧ ∀ p ∈ P, d • p ∈ Q₁ ⊓ Q₂ ⊓ Q₃ := by
   obtain ⟨d₁, hd₁, e₁⟩ := exists_smul_le P Q₁ hP h₁
   obtain ⟨d₂, hd₂, e₂⟩ := exists_smul_le P Q₂ hP h₂
   obtain ⟨d₃, hd₃, e₃⟩ := exists_smul_le P Q₃ hP h₃
@@ -119,20 +149,23 @@ end Sat
 
 section Main
 
-theorem len_ne_top {O X : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [AddCommGroup X] [Module O X] (P D : Submodule O X) (hP : P.FG) (d : O) (hd : d ≠ 0)
-    (h : ∀ p ∈ P, d • p ∈ D) : Module.length O (P ⧸ D.comap P.subtype) ≠ ⊤ := by
+theorem len_ne_top
+    {O X : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [AddCommGroup X] [Module O X]
+    (P D : Submodule O X) (hP : P.FG)
+    (d : O) (hd : d ≠ 0) (h : ∀ p ∈ P, d • p ∈ D)
+    : Module.length O (P ⧸ D.comap P.subtype) ≠ ⊤ := by
   have : Module.Finite O P := Module.Finite.iff_fg.2 hP
   refine length_quot_ne_top d hd _ (fun m => ?_)
   rw [Submodule.mem_comap, Submodule.subtype_apply, Submodule.coe_smul]
   exact h m m.2
 
-theorem idx_eq_sub {O X : Type} [CommRing O] [AddCommGroup X] [Module O X]
-    (P Q D : Submodule O X) (hD : D ≤ P ⊓ Q)
-    (hP : Module.length O (P ⧸ D.comap P.subtype) ≠ ⊤)
-    (hQ : Module.length O (Q ⧸ D.comap Q.subtype) ≠ ⊤) :
-    idx O X P Q = ((Module.length O (P ⧸ D.comap P.subtype)).toNat : ℤ) -
-      ((Module.length O (Q ⧸ D.comap Q.subtype)).toNat : ℤ) := by
+theorem idx_eq_sub
+    {O X : Type} [CommRing O] [AddCommGroup X] [Module O X]
+    (P Q D : Submodule O X) (hD : D ≤ P ⊓ Q) (hP : Module.length O (P ⧸ D.comap P.subtype) ≠ ⊤)
+    (hQ : Module.length O (Q ⧸ D.comap Q.subtype) ≠ ⊤)
+    : idx O X P Q
+      = ((Module.length O (P ⧸ D.comap P.subtype)).toNat : ℤ)
+        - ((Module.length O (Q ⧸ D.comap Q.subtype)).toNat : ℤ) := by
   have eP := length_quotient_tower_add D (P ⊓ Q) P hD inf_le_left
   have eQ := length_quotient_tower_add D (P ⊓ Q) Q hD inf_le_right
   have cP : Q.comap P.subtype = (P ⊓ Q).comap P.subtype := by
@@ -176,7 +209,10 @@ theorem lattice_index_add : IdxAdd := by
 
 theorem lattice_has_basis : LatBasis := by
   intro O K X _ _ _ _ _ _ _ _ _ _ _ A hA
-  have : Submodule.IsFullLattice K A := { toIsLattice := Submodule.IsLattice.of_fg K hA.1, span_eq_top := hA.2 }
+  have : Submodule.IsFullLattice K A := {
+    toIsLattice := Submodule.IsLattice.of_fg K hA.1
+    span_eq_top := hA.2
+  }
   have := Submodule.IsLattice.finite K A
   have := Submodule.IsLattice.free K A
   let b := Module.Free.chooseBasis O A

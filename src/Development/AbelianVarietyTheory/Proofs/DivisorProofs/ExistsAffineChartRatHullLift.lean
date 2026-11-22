@@ -9,9 +9,13 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsU
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM
+  GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
 open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -19,8 +23,11 @@ open GlobalTheory.Points
 
 namespace GlobalTheory.UPoinc.ChartAt
 
-theorem isUnit_map_of_ne_zero {o R : Type} [CommRing o] [IsDedekindDomain o] [Algebra.FiniteType ℤ o] [CommRing R]
-    (hR : ∀ n : ℤ, n ≠ 0 → IsUnit (n : R)) (φ : o →+* R) {a : o} (ha : a ≠ 0) : IsUnit (φ a) := by
+theorem isUnit_map_of_ne_zero
+    {o R : Type} [CommRing o] [IsDedekindDomain o] [Algebra.FiniteType ℤ o] [CommRing R]
+    (hR : ∀ n : ℤ, n ≠ 0 → IsUnit (n : R)) (φ : o →+* R)
+    {a : o} (ha : a ≠ 0)
+    : IsUnit (φ a) := by
   by_contra h
   obtain ⟨m, hm, ham⟩ := exists_max_ideal_of_mem_nonunits (mem_nonunits_iff.2 h)
   letI := Ideal.Quotient.field m
@@ -33,7 +40,15 @@ theorem isUnit_map_of_ne_zero {o R : Type} [CommRing o] [IsDedekindDomain o] [Al
   rw [hk] at this
   exact ha this
 
-theorem exists_affine_chart_ratHull_lift : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H), 1 ≤ Dw.p + Dw.q → ∀ (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (cf : Coeff l) (C : UCompact Xo cf) (X : USetup C) (w₀ : X.M.Z), X.π w₀ ∈ Set.range C.i → ∃ (U₀ : X.M.Z.Opens) (u₀ : Sp (ratHull (X.M.ringOn U₀)) ⟶ Xo.XF cf), IsAffineOpen U₀ ∧ w₀ ∈ U₀ ∧ spMap (ratHull (X.M.ringOn U₀)).val.toRingHom ≫ u₀ = X.uΩ := by
+theorem exists_affine_chart_ratHull_lift
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H),
+      1 ≤ Dw.p + Dw.q
+        → ∀ (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (cf : Coeff l) (C : UCompact Xo cf)
+            (X : USetup C) (w₀ : X.M.Z),
+          X.π w₀ ∈ Set.range C.i
+            → ∃ (U₀ : X.M.Z.Opens) (u₀ : Sp (ratHull (X.M.ringOn U₀)) ⟶ Xo.XF cf),
+              IsAffineOpen U₀ ∧ w₀ ∈ U₀
+                ∧ spMap (ratHull (X.M.ringOn U₀)).val.toRingHom ≫ u₀ = X.uΩ := by
   intro E _ _ _ H Dw _ l Xo cf C X w hw
   letI := C.b.toAlgebra
   haveI := C.isFractionRing
@@ -45,7 +60,8 @@ theorem exists_affine_chart_ratHull_lift : ∀ (E : Type) [Field E] [NumberField
     obtain ⟨t, -⟩ := Spec.map_surjective (X.uΩ ≫ pullback.snd _ _)
     exact (RingHom.charZero_iff (R := cf.F) t.hom.injective).1 inferInstance
   haveI : IsPreimmersion (spMap C.b) := IsPreimmersion.of_isLocalization (nonZeroDivisors C.o)
-  have hg : Topology.IsEmbedding (pullback.fst C.z (spMap C.b) :) := (pullback.fst C.z (spMap C.b)).isEmbedding
+  have hg : Topology.IsEmbedding (pullback.fst C.z (spMap C.b) :) :=
+    (pullback.fst C.z (spMap C.b)).isEmbedding
   obtain ⟨V, hV, hVe⟩ := hg.isInducing.isOpen_iff.1 C.iF.isOpenEmbedding.isOpen_range
   have hwV : w ∈ X.π ⁻¹ᵁ ⟨V, hV⟩ := by
     obtain ⟨x, hx⟩ := hw
@@ -60,7 +76,9 @@ theorem exists_affine_chart_ratHull_lift : ∀ (E : Type) [Field E] [NumberField
   let f : Sp (ratHull (X.M.ringOn U)) ⟶ X.M.Z := Spec.map φ ≫ hU.fromSpec
   obtain ⟨ψ, hψ⟩ := Spec.map_surjective (f ≫ X.π ≫ C.z)
   have hu : ∀ a : nonZeroDivisors C.o, IsUnit (ψ.hom a) := fun a =>
-    isUnit_map_of_ne_zero (fun n hn => isUnit_intCast_ratHull _ hn) ψ.hom (nonZeroDivisors.ne_zero a.2)
+    isUnit_map_of_ne_zero
+      (fun n hn => isUnit_intCast_ratHull _ hn)
+      ψ.hom (nonZeroDivisors.ne_zero a.2)
   let χ : cf.F →+* ratHull (X.M.ringOn U) := IsLocalization.lift (M := nonZeroDivisors C.o) hu
   have hχ : (f ≫ X.π) ≫ C.z = spMap χ ≫ spMap C.b := by
     rw [Category.assoc, ← hψ, ← Spec.map_comp, ← CommRingCat.ofHom_comp]
@@ -76,7 +94,8 @@ theorem exists_affine_chart_ratHull_lift : ∀ (E : Type) [Field E] [NumberField
     rw [hU.range_fromSpec] at this
     exact hUV this
   refine ⟨U, IsOpenImmersion.lift C.iF g hrange, hU, hwU, ?_⟩
-  rw [← cancel_mono C.i, Category.assoc, Category.assoc, ← X.comp, UCompact.i, IsOpenImmersion.lift_fac_assoc, hgf]
+  rw [← cancel_mono C.i, Category.assoc, Category.assoc, ← X.comp, UCompact.i,
+    IsOpenImmersion.lift_fac_assoc, hgf]
   have hpt : ⊤ ≤ X.M.pt ⁻¹ᵁ U := X.M.top_le_preimage_pt hne
   have hφ : φ ≫ CommRingCat.ofHom (ratHull (X.M.ringOn U)).val.toRingHom = valMap X.M.pt U hpt := by
     ext a

@@ -76,13 +76,14 @@ private lemma encard_mul_encard_le_isBallFam {G : Type} [AddCommGroup G] {Λ : A
         push_cast
         gcongr
 
-
 set_option autoImplicit false in
 open Filter Topology in
-theorem _root_.GlobalTheory.VolBr.isBallFam_encard_mul_le : ∀ (G : Type) [AddCommGroup G]
-    (Λ : AddSubgroup G) (B : ℝ → Set G), _root_.GlobalTheory.VolBr.IsBallFam Λ B → ∀ n : ℕ, 0 < n →
-    (B n).Finite →
-    (B n).encard * (B (n / 2)).encard ≤ (B 1).encard * (B (n ^ 2 + n / 2)).encard := by
+theorem _root_.GlobalTheory.VolBr.isBallFam_encard_mul_le
+    : ∀ (G : Type) [AddCommGroup G] (Λ : AddSubgroup G) (B : ℝ → Set G),
+      _root_.GlobalTheory.VolBr.IsBallFam Λ B
+        → ∀ n : ℕ,
+          0 < n → (B n).Finite
+            → (B n).encard * (B (n / 2)).encard ≤ (B 1).encard * (B (n ^ 2 + n / 2)).encard := by
   intro G _ Λ B hB n hn hfin
   have hn1 : (1 : ℝ) ≤ n := by exact_mod_cast hn
   have h1 : (B 1).Finite := hfin.subset (isBallFam_mono hB hn1)

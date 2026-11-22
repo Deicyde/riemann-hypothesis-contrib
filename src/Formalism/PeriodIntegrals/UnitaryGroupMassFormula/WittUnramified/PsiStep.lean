@@ -11,11 +11,13 @@ namespace PI.WittUnramWork
 
 open WittVector Finset
 
-variable {p : ℕ} [hp : Fact p.Prime] {W k : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W]
-  [Field k] [CharP k p] [PerfectRing k p]
+variable
+  {p : ℕ} [hp : Fact p.Prime]
+  {W k : Type}
+  [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field k] [CharP k p] [PerfectRing k p]
 
-theorem psi_injective (ψ : W →+* WittVector p k) (hirr : Irreducible (p : W)) :
-    Function.Injective ψ := by
+theorem psi_injective (ψ : W →+* WittVector p k) (hirr : Irreducible (p : W))
+    : Function.Injective ψ := by
   refine (injective_iff_map_eq_zero ψ).2 ?_
   intro x hx
   by_contra hne
@@ -25,9 +27,11 @@ theorem psi_injective (ψ : W →+* WittVector p k) (hirr : Irreducible (p : W))
   rw [map_pow, map_natCast] at h2
   exact pow_ne_zero n (WittVector.p_nonzero p k) h2
 
-theorem psi_step (ψ : W →+* WittVector p k) (res : W →+* k) (hres : Function.Surjective res)
-    (h0 : ∀ x, (ψ x).coeff 0 = res x) (w : WittVector p k) :
-    ∃ a : W, ∃ b : WittVector p k, w = ψ a + (p : WittVector p k) * b := by
+theorem psi_step
+    (ψ : W →+* WittVector p k) (res : W →+* k)
+    (hres : Function.Surjective res) (h0 : ∀ x, (ψ x).coeff 0 = res x)
+    (w : WittVector p k)
+    : ∃ a : W, ∃ b : WittVector p k, w = ψ a + (p : WittVector p k) * b := by
   obtain ⟨a, ha⟩ := hres (w.coeff 0)
   refine ⟨a, ?_⟩
   by_cases hz : w - ψ a = 0
@@ -47,22 +51,29 @@ theorem psi_step (ψ : W →+* WittVector p k) (res : W →+* k) (hres : Functio
     rw [← mul_assoc, ← pow_succ', Nat.sub_add_cancel (Nat.one_le_iff_ne_zero.mpr hm), ← hb]
     ring
 
-theorem psi_surjective (ψ : W →+* WittVector p k) (res : W →+* k) (hres : Function.Surjective res)
-    (h0 : ∀ x, (ψ x).coeff 0 = res x) (hC : IsAdicComplete (Ideal.span {(p : W)}) W) :
-    Function.Surjective ψ := by
+theorem psi_surjective
+    (ψ : W →+* WittVector p k) (res : W →+* k)
+    (hres : Function.Surjective res) (h0 : ∀ x, (ψ x).coeff 0 = res x)
+    (hC : IsAdicComplete (Ideal.span {(p : W)}) W)
+    : Function.Surjective ψ := by
   intro w
   choose A B hAB using psi_step ψ res hres h0
   obtain ⟨r, hr0, hrs⟩ : ∃ r : ℕ → WittVector p k, r 0 = w ∧ ∀ n, r (n + 1) = B (r n) :=
     ⟨fun n => B^[n] w, rfl, fun n => Function.iterate_succ_apply' B n w⟩
-  obtain ⟨s, hs0, hss⟩ : ∃ s : ℕ → W, s 0 = 0 ∧ ∀ n, s (n + 1) = s n + A (r n) * (p : W) ^ n :=
-    ⟨fun n => ∑ i ∈ Finset.range n, A (r i) * (p : W) ^ i, by simp, fun n => Finset.sum_range_succ _ _⟩
+  obtain ⟨s, hs0, hss⟩ : ∃ s : ℕ → W, s 0 = 0 ∧ ∀ n, s (n + 1) = s n + A (r n) * (p : W) ^ n := ⟨
+    fun n => ∑ i ∈ Finset.range n, A (r i) * (p : W) ^ i,
+    by simp,
+    fun n => Finset.sum_range_succ _ _
+  ⟩
   have hinv : ∀ n, w = ψ (s n) + (p : WittVector p k) ^ n * r n := by
     intro n
     induction n with
     | zero => rw [hs0, hr0, map_zero, pow_zero, one_mul, zero_add]
     | succ n ih =>
-      calc w = ψ (s n) + (p : WittVector p k) ^ n * r n := ih
-        _ = ψ (s n) + (p : WittVector p k) ^ n * (ψ (A (r n)) + (p : WittVector p k) * B (r n)) := by
+      calc
+        w = ψ (s n) + (p : WittVector p k) ^ n * r n := ih
+        _ = ψ (s n)
+            + (p : WittVector p k) ^ n * (ψ (A (r n)) + (p : WittVector p k) * B (r n)) := by
           rw [← hAB (r n)]
         _ = ψ (s (n + 1)) + (p : WittVector p k) ^ (n + 1) * r (n + 1) := by
           rw [hss, hrs, map_add (f := _), map_mul, map_pow, map_natCast]
@@ -77,16 +88,19 @@ theorem psi_surjective (ψ : W →+* WittVector p k) (res : W →+* k) (hres : F
   have hI : ∀ n (x : W), x ∈ (Ideal.span {(p : W)} ^ n • ⊤ : Submodule W W) ↔ (p : W) ^ n ∣ x := by
     intro n x
     rw [smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
-  obtain ⟨L, hL⟩ := hC.toIsPrecomplete.prec (f := s) (fun {m n} hmn => by
-    rw [SModEq.sub_mem, hI]
-    exact dvd_sub_comm.mp (hdiv m n hmn))
+  obtain ⟨L, hL⟩ :=
+    hC.toIsPrecomplete.prec (f := s) (fun {m n} hmn => by
+      rw [SModEq.sub_mem, hI]
+      exact dvd_sub_comm.mp (hdiv m n hmn))
   have hw : ∀ n, (p : WittVector p k) ^ n ∣ w - ψ L := by
     intro n
     obtain ⟨c, hc⟩ := (hI n _).1 (SModEq.sub_mem.1 (hL n))
     refine ⟨ψ c + r n, ?_⟩
     have h2 : ψ (s n) - ψ L = (p : WittVector p k) ^ n * ψ c := by
       rw [← map_sub, hc, map_mul, map_pow, map_natCast]
-    calc w - ψ L = ψ (s n) + (p : WittVector p k) ^ n * r n - ψ L := by rw [← hinv n]
+    calc
+      w - ψ L
+        = ψ (s n) + (p : WittVector p k) ^ n * r n - ψ L := by rw [← hinv n]
       _ = (p : WittVector p k) ^ n * (ψ c + r n) := by linear_combination h2
   have hzero : w - ψ L = 0 := by
     by_contra hne
@@ -97,9 +111,7 @@ theorem psi_surjective (ψ : W →+* WittVector p k) (res : W →+* k) (hres : F
     have hbc := mul_left_cancel₀ hp hc
     apply hb0
     rw [hbc]
-    first
-    | rw [WittVector.mul_coeff_zero, WittVector.coeff_p_zero, zero_mul]
-    | simp
+    first | rw [WittVector.mul_coeff_zero, WittVector.coeff_p_zero, zero_mul] | simp
   exact ⟨L, (sub_eq_zero.mp hzero).symm⟩
 
 end PI.WittUnramWork

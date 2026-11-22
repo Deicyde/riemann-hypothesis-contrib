@@ -10,18 +10,23 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsSc
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.BZMir ValuativeRel
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.BZMir
+  ValuativeRel
 open scoped Pointwise
 
 namespace PositivityTheory.RgUd.Form.LeviSmoothness.besselOf
 
-open PositivityTheory.RgUd.Form PositivityTheory.RgUd.Form.ColumnElementGluing PositivityTheory.RgUd.Form.LeviSmoothness
+open PositivityTheory.RgUd.Form PositivityTheory.RgUd.Form.ColumnElementGluing
+  PositivityTheory.RgUd.Form.LeviSmoothness
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem bessel_finite {V : Type} [AddCommGroup V] [Module ℂ V] (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hB : IsPsd B)
-    (u : ℕ → V) (v : V) (hself : ∀ i, B (u i) v = B (u i) (u i)) (horth : ∀ i j, i ≠ j → B (u i) (u j) = 0)
-    (I : ℕ) : ∑ i ∈ Finset.range I, (B (u i) (u i)).re ≤ (B v v).re := by
+theorem bessel_finite
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hB : IsPsd B)
+    (u : ℕ → V) (v : V) (hself : ∀ i, B (u i) v = B (u i) (u i))
+    (horth : ∀ i j, i ≠ j → B (u i) (u j) = 0) (I : ℕ)
+    : ∑ i ∈ Finset.range I, (B (u i) (u i)).re ≤ (B v v).re := by
   set S := ∑ i ∈ Finset.range I, u i with hS
   have h0 := hB.2 (v - S)
   have e1 : B (v - S) (v - S) = B v v - B v S - B S v + B S S := by
@@ -45,10 +50,12 @@ theorem bessel_finite {V : Type} [AddCommGroup V] [Module ℂ V] (B : V →ₗ[�
   simp only [Complex.add_re, Complex.sub_re, Complex.re_sum, Complex.conj_re] at h0
   linarith
 
-theorem isLat_sup {m : ℕ} {A A' : AddSubgroup (Fin (m + 1) → k)} (hA : IsLat A) (hA' : IsLat A') : IsLat (A ⊔ A') := by
+theorem isLat_sup {m : ℕ} {A A' : AddSubgroup (Fin (m + 1) → k)} (hA : IsLat A) (hA' : IsLat A')
+    : IsLat (A ⊔ A') := by
   refine ⟨?_, AddSubgroup.isOpen_mono le_sup_left hA.2⟩
   have hc : IsCompact ((A : Set (Fin (m + 1) → k)) + (A' : Set (Fin (m + 1) → k))) := hA.1.add hA'.1
-  refine hc.of_isClosed_subset (AddSubgroup.isClosed_of_isOpen _ (AddSubgroup.isOpen_mono le_sup_left hA.2)) ?_
+  refine hc.of_isClosed_subset
+    (AddSubgroup.isClosed_of_isOpen _ (AddSubgroup.isOpen_mono le_sup_left hA.2)) ?_
   intro x hx
   obtain ⟨y, hy, w, hw, rfl⟩ := AddSubgroup.mem_sup.1 hx
   exact Set.add_mem_add hy hw
@@ -73,19 +80,24 @@ def Mz (ψ : AddChar k Circle) (m : ℕ) (b : k) : AddSubgroup (Fin (m + 1) → 
     simp only [Set.mem_ofPred_eq] at *
     rw [dotProduct_neg, mul_neg, AddChar.map_neg_eq_inv, hx t ht, inv_one]
 
-theorem isLat_Mz {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1) (m : ℕ) {b : k} (hb : b ≠ 0) :
-    IsLat (Mz ψ m b) :=
+theorem isLat_Mz
+    {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1) (m : ℕ) {b : k} (hb : b ≠ 0)
+    : IsLat (Mz ψ m b) :=
   GlobalTheory.T.character_annihilator_integer_lattice k ψ hψ hψ1 (m + 1) b hb
 
-theorem smul_mem_Mz {ψ : AddChar k Circle} {m : ℕ} {b c : k} (hc : c ∈ 𝒪[k]) {x : Fin (m + 1) → k}
-    (hx : x ∈ Mz ψ m b) : c • x ∈ Mz ψ m b := by
+theorem smul_mem_Mz
+    {ψ : AddChar k Circle} {m : ℕ} {b c : k} (hc : c ∈ 𝒪[k])
+    {x : Fin (m + 1) → k} (hx : x ∈ Mz ψ m b)
+    : c • x ∈ Mz ψ m b := by
   intro t ht
   rw [dotProduct_smul, smul_eq_mul, ← smul_eq_mul c, ← smul_dotProduct]
   exact hx (c • t) fun j => by simpa using mul_mem hc (ht j)
 
-theorem exists_sep {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1) (m : ℕ) {a : k}
-    (ha : valuation k a < 1) :
-    ∃ d : k, ψ d ≠ 1 ∧ ∀ c : k, c ∈ 𝒪[k] → Pi.single (Fin.last m) (c * d) ∈ Mz ψ m a := by
+theorem exists_sep
+    {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1)
+    (m : ℕ)
+    {a : k} (ha : valuation k a < 1)
+    : ∃ d : k, ψ d ≠ 1 ∧ ∀ c : k, c ∈ 𝒪[k] → Pi.single (Fin.last m) (c * d) ∈ Mz ψ m a := by
   obtain ⟨c₀, hc₀⟩ : ∃ c, ψ c ≠ 1 := by
     by_contra hcon
     push Not at hcon
@@ -99,11 +111,13 @@ theorem exists_sep {ψ : AddChar k Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 
   ring
 
 section
-variable {ψ : AddChar k Circle} {m N : ℕ} {h : m + 2 ≤ N} {V : Type} [AddCommGroup V] [Module ℂ V]
+variable
+  {ψ : AddChar k Circle} {m N : ℕ} {h : m + 2 ≤ N} {V : Type} [AddCommGroup V] [Module ℂ V]
   {π : Representation ℂ (GL (Fin N) k) V} {s : ℝ} {B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ}
 
-theorem B_smul_smul {W : Type} [AddCommGroup W] [Module ℂ W] (B : W →ₗ[ℂ] W →ₗ⋆[ℂ] ℂ) (α β : ℂ) (x y : W) :
-    B (α • x) (β • y) = α * (starRingEnd ℂ β * B x y) := by
+theorem B_smul_smul
+    {W : Type} [AddCommGroup W] [Module ℂ W] (B : W →ₗ[ℂ] W →ₗ⋆[ℂ] ℂ) (α β : ℂ) (x y : W)
+    : B (α • x) (β • y) = α * (starRingEnd ℂ β * B x y) := by
   rw [LinearMap.map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ, smul_eq_mul, smul_eq_mul]
 
 theorem nabs_pow (x : kˣ) (n : ℕ) : nabs k (x ^ n) = nabs k x ^ n := by
@@ -111,16 +125,17 @@ theorem nabs_pow (x : kˣ) (n : ℕ) : nabs k (x ^ n) = nabs k x ^ n := by
   | zero => simp [nabs_one]
   | succ n ih => rw [pow_succ, GlobalTheory.SmGL.nabs_mul' k, ih, pow_succ]
 
-theorem B_colEl (hB : Lv ψ h π s B) (y : Fin (m + 1) → k) (a b : V) :
-    B (π (colEl k m N h y) a) (π (colEl k m N h y) b) = B a b := by
-  have hmem : unip k (m + 1) (Multiplicative.ofAdd y) ∈ Mir k (m + 1) := MirU_le_Mir k (m + 1) ⟨_, rfl⟩
+theorem B_colEl (hB : Lv ψ h π s B) (y : Fin (m + 1) → k) (a b : V)
+    : B (π (colEl k m N h y) a) (π (colEl k m N h y) b) = B a b := by
+  have hmem : unip k (m + 1) (Multiplicative.ofAdd y) ∈ Mir k (m + 1) :=
+    MirU_le_Mir k (m + 1) ⟨_, rfl⟩
   have e := hB.mir _ hmem a b
   rw [ColumnElementGluing.det_unip, nabs_one, Real.one_rpow, Complex.ofReal_one, one_mul] at e
   exact e
 
-theorem B_scal (hB : Lv ψ h π s B) (z : kˣ) (i : ℕ) (a b : V) :
-    B (π (scalAt k (m + 1) N (by omega) (z ^ i)) a) (π (scalAt k (m + 1) N (by omega) (z ^ i)) b) =
-      ((nabs k z ^ ((i : ℝ) * (m + 1) * s) : ℝ) : ℂ) * B a b := by
+theorem B_scal (hB : Lv ψ h π s B) (z : kˣ) (i : ℕ) (a b : V)
+    : B (π (scalAt k (m + 1) N (by omega) (z ^ i)) a) (π (scalAt k (m + 1) N (by omega) (z ^ i)) b)
+      = ((nabs k z ^ ((i : ℝ) * (m + 1) * s) : ℝ) : ℂ) * B a b := by
   set g : GL (Fin (m + 1)) k := Units.map (algebraMap k (Matrix (Fin (m + 1)) (Fin (m + 1)) k)).toMonoidHom (z ^ i)
     with hg
   have hmem : glEmb k (m + 1) g ∈ Mir k (m + 1) := glEmb_mem_Mir k (m + 1) g
@@ -133,33 +148,49 @@ theorem B_scal (hB : Lv ψ h π s B) (z : kˣ) (i : ℕ) (a b : V) :
     rw [Algebra.algebraMap_eq_smul_one, Matrix.det_smul, Matrix.det_one, mul_one, Fintype.card_fin]
     push_cast
     rfl
-  rw [hdet, nabs_pow, nabs_pow, ← pow_mul, ← Real.rpow_natCast, ← Real.rpow_mul (nabs_pos' k z).le] at e
+  rw [hdet, nabs_pow, nabs_pow, ← pow_mul, ← Real.rpow_natCast, ← Real.rpow_mul (nabs_pos' k z).le]
+    at e
   show B (π (blkAt k (m + 1) N (by omega) g) a) (π (blkAt k (m + 1) N (by omega) g) b) = _
   rw [e]
   congr 3
   push_cast
   ring
 
-theorem dens_bessel_of (hB : Lv ψ h π s B)
-    (hstab : ∀ (K : Subgroup (GL (Fin (m + 1)) k)), IsOpen (K : Set (GL (Fin (m + 1)) k)) →
-      ∀ {A₀ : AddSubgroup (Fin (m + 1) → k)}, IsLat A₀ →
-      ∃ A₁, IsLat A₁ ∧ A₀ ≤ A₁ ∧ ∀ v w, FixK (by omega) π K v → FixK (by omega) π K w → ∀ A, IsLat A → A₁ ≤ A →
-        ((A₀.relIndex A : ℕ) : ℂ) * B (avg ψ h π (xi0 k m) A v) w =
-          ((A₀.relIndex A₁ : ℕ) : ℂ) * B (avg ψ h π (xi0 k m) A₁ v) w) {A₀ : AddSubgroup (Fin (m + 1) → k)} (hA₀ : IsLat A₀)
-    {B' : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ} (hD : IsDens ψ h π A₀ B B') (z : kˣ) (hz : nabs k z < 1) (v : V) :
-    Summable fun i : ℕ => nabs k z ^ (-((i : ℝ) * (m + 1) * s)) *
-      (B' (π (scalAt k (m + 1) N (by omega) (z ^ i)) v) (π (scalAt k (m + 1) N (by omega) (z ^ i)) v)).re := by
+theorem dens_bessel_of
+    (hB : Lv ψ h π s B)
+    (hstab : ∀ (K : Subgroup (GL (Fin (m + 1)) k)),
+      IsOpen (K : Set (GL (Fin (m + 1)) k))
+        → ∀ {A₀ : AddSubgroup (Fin (m + 1) → k)},
+          IsLat A₀
+            → ∃ A₁,
+              IsLat A₁ ∧ A₀ ≤ A₁
+                ∧ ∀ v w,
+                  FixK (by omega) π K v → FixK (by omega) π K w
+                    → ∀ A,
+                      IsLat A → A₁ ≤ A
+                        → ((A₀.relIndex A : ℕ) : ℂ) * B (avg ψ h π (xi0 k m) A v) w
+                          = ((A₀.relIndex A₁ : ℕ) : ℂ) * B (avg ψ h π (xi0 k m) A₁ v) w)
+    {A₀ : AddSubgroup (Fin (m + 1) → k)} (hA₀ : IsLat A₀)
+    {B' : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ} (hD : IsDens ψ h π A₀ B B')
+    (z : kˣ) (hz : nabs k z < 1)
+    (v : V)
+    : Summable fun i : ℕ =>
+      nabs k z ^ (-((i : ℝ) * (m + 1) * s)) * (B' (π (scalAt k (m + 1) N (by omega) (z ^ i)) v)
+        (π (scalAt k (m + 1) N (by omega) (z ^ i)) v)).re := by
   have h1 : m + 1 ≤ N := by omega
-  let S : Subgroup (GL (Fin N) k) :=
-    { carrier := {g | π g v = v}
-      mul_mem' := fun {a b} (ha : π a v = v) (hb : π b v = v) =>
-        show π (a * b) v = v by rw [map_mul, Module.End.mul_apply, hb, ha]
-      one_mem' := show π 1 v = v by rw [map_one, Module.End.one_apply]
-      inv_mem' := fun {a} (ha : π a v = v) => show π a⁻¹ v = v by
+  let S : Subgroup (GL (Fin N) k) := {
+    carrier := {g | π g v = v}
+    mul_mem' := fun {a b} (ha : π a v = v) (hb : π b v = v) =>
+      show π (a * b) v = v by rw [map_mul, Module.End.mul_apply, hb, ha]
+    one_mem' := show π 1 v = v by rw [map_one, Module.End.one_apply]
+    inv_mem' := fun {a} (ha : π a v = v) =>
+      show π a⁻¹ v = v by
         conv_lhs => rw [← ha]
-        rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply] }
+        rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
+  }
   let K : Subgroup (GL (Fin (m + 1)) k) := S.comap (blkAt k (m + 1) N h1)
-  have hK : IsOpen (K : Set (GL (Fin (m + 1)) k)) := (hB.smooth v).preimage (ColumnElementGluing.continuous_blkAt (m + 1) N h1)
+  have hK : IsOpen (K : Set (GL (Fin (m + 1)) k)) :=
+    (hB.smooth v).preimage (ColumnElementGluing.continuous_blkAt (m + 1) N h1)
   have hvK : FixK h1 π K v := fun g hg => hg
   obtain ⟨A₁, hA₁, -, hst⟩ := hstab K hK hA₀
   have hzv : valuation k (z : k) < 1 := val_lt_one_of_nabs hz
@@ -174,22 +205,27 @@ theorem dens_bessel_of (hB : Lv ψ h π s B)
   have hfix : ∀ i, FixK h1 π K (π (σ i) v) := by
     intro i g hg
     show π (blkAt k (m + 1) N h1 g) (π (scalAt k (m + 1) N h1 (z ^ i)) v) = π (scalAt k (m + 1) N h1 (z ^ i)) v
-    rw [← Module.End.mul_apply, ← map_mul, ← ColumnElementGluing.scalAt_comm_blkAt h1 (z ^ i) g, map_mul, Module.End.mul_apply,
-      hvK g hg]
+    rw [← Module.End.mul_apply, ← map_mul, ← ColumnElementGluing.scalAt_comm_blkAt h1 (z ^ i) g,
+      map_mul, Module.End.mul_apply, hvK g hg]
   let a : ℕ → V := fun i => avg ψ h π (xi0 k m) A (π (σ i) v)
-  have hval : ∀ i, B' (π (σ i) v) (π (σ i) v) = ((A₀.relIndex A : ℕ) : ℂ) * B (a i) (π (σ i) v) := by
+  have hval
+      : ∀ i, B' (π (σ i) v) (π (σ i) v) = ((A₀.relIndex A : ℕ) : ℂ) * B (a i) (π (σ i) v) := by
     intro i
     obtain ⟨A₂, hA₂, -, hv2⟩ := hD (π (σ i) v) (π (σ i) v)
     have hA3 : IsLat (A ⊔ A₂) := isLat_sup hA hA₂
-    rw [hv2 (A ⊔ A₂) hA3 le_sup_right, hst _ _ (hfix i) (hfix i) (A ⊔ A₂) hA3 (h1A.trans le_sup_left),
+    rw [hv2 (A ⊔ A₂) hA3 le_sup_right,
+      hst _ _ (hfix i) (hfix i) (A ⊔ A₂) hA3 (h1A.trans le_sup_left),
       ← hst _ _ (hfix i) (hfix i) A hA h1A]
   let u : ℕ → V := fun i => π (σ i)⁻¹ (a i)
   have hσu : ∀ i, π (σ i) (u i) = a i := fun i => by
     show π (σ i) (π (σ i)⁻¹ (a i)) = a i
     rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
-  have hsc : ∀ i (x y : V), B (π (σ i) x) (π (σ i) y) = ((nabs k z ^ ((i : ℝ) * (m + 1) * s) : ℝ) : ℂ) * B x y :=
+  have hsc
+      : ∀ i (x y : V),
+        B (π (σ i) x) (π (σ i) y) = ((nabs k z ^ ((i : ℝ) * (m + 1) * s) : ℝ) : ℂ) * B x y :=
     fun i x y => B_scal hB z i x y
-  have hcpos : ∀ i : ℕ, 0 < nabs k z ^ ((i : ℝ) * (m + 1) * s) := fun i => Real.rpow_pos_of_pos (nabs_pos' k z) _
+  have hcpos : ∀ i : ℕ, 0 < nabs k z ^ ((i : ℝ) * (m + 1) * s) := fun i =>
+    Real.rpow_pos_of_pos (nabs_pos' k z) _
   have hself : ∀ i, B (u i) v = B (u i) (u i) := by
     intro i
     have e : B (a i) (π (σ i) v) = B (a i) (avg ψ h π (xi0 k m) A (π (σ i) v)) :=
@@ -197,15 +233,19 @@ theorem dens_bessel_of (hB : Lv ψ h π s B)
     change B (a i) (π (σ i) v) = B (a i) (a i) at e
     rw [← hσu i, hsc, hsc] at e
     exact mul_left_cancel₀ (by exact_mod_cast (hcpos i).ne') e
-  have heig : ∀ i (y : Fin (m + 1) → k), ((z ^ i : kˣ) : k) • y ∈ A →
-      π (colEl k m N h y) (u i) = ((ψ (xi0 k m ⬝ᵥ ((z ^ i : kˣ) : k) • y) : Circle) : ℂ) • u i := by
+  have heig
+      : ∀ i (y : Fin (m + 1) → k),
+        ((z ^ i : kˣ) : k) • y ∈ A
+          → π (colEl k m N h y) (u i)
+            = ((ψ (xi0 k m ⬝ᵥ ((z ^ i : kˣ) : k) • y) : Circle) : ℂ) • u i := by
     intro i y hy
     show π (colEl k m N h y) (π (σ i)⁻¹ (a i)) = _ • π (σ i)⁻¹ (a i)
     have hc := ColumnElementGluing.scalAt_conj_colEl h (z ^ i) y
     have hc' : colEl k m N h y * (σ i)⁻¹ = (σ i)⁻¹ * colEl k m N h (((z ^ i : kˣ) : k) • y) := by
       show colEl k m N h y * (scalAt k (m + 1) N h1 (z ^ i))⁻¹ =
         (scalAt k (m + 1) N h1 (z ^ i))⁻¹ * colEl k m N h (((z ^ i : kˣ) : k) • y)
-      rw [← hc]; group
+      rw [← hc]
+      group
     rw [← Module.End.mul_apply, ← map_mul, hc', map_mul, Module.End.mul_apply]
     have e := ColumnElementGluing.avg_eigen ψ h π hB.cont hB.smooth (xi0 k m) A hA (π (σ i) v) _ hy
     change π (colEl k m N h (((z ^ i : kˣ) : k) • y)) (a i) = _ at e
@@ -219,18 +259,18 @@ theorem dens_bessel_of (hB : Lv ψ h π s B)
     have h1z0 : (1 - (z : k) ^ (l + 1)) ≠ 0 := by
       intro e; rw [e, map_zero] at h1z; exact zero_ne_one h1z
     let c : k := (1 - (z : k) ^ (l + 1))⁻¹
-    have hcO : c ∈ 𝒪[k] := (Valuation.mem_integer_iff _ _).2 (by simp only [c, map_inv₀, h1z, inv_one]; exact le_rfl)
+    have hcO : c ∈ 𝒪[k] :=
+      (Valuation.mem_integer_iff _ _).2 (by simp only [c, map_inv₀, h1z, inv_one]; exact le_rfl)
     let w : Fin (m + 1) → k := Pi.single (Fin.last m) (c * d)
     have hwM : w ∈ Mz ψ m (z : k) := hdM c hcO
     let y : Fin (m + 1) → k := (((z ^ i)⁻¹ : kˣ) : k) • w
-    have hy1 : ((z ^ i : kˣ) : k) • y = w := by
-      simp only [y, smul_smul, Units.mul_inv, one_smul]
+    have hy1 : ((z ^ i : kˣ) : k) • y = w := by simp only [y, smul_smul, Units.mul_inv, one_smul]
     have hy2 : ((z ^ (i + (l + 1)) : kˣ) : k) • y = ((z : k) ^ (l + 1)) • w := by
       simp only [y, smul_smul]
       congr 1
       push_cast
-      rw [pow_add, mul_assoc, mul_comm ((z : k) ^ (l + 1)), ← mul_assoc, mul_inv_cancel₀ (pow_ne_zero _ z.ne_zero),
-        one_mul]
+      rw [pow_add, mul_assoc, mul_comm ((z : k) ^ (l + 1)), ← mul_assoc,
+        mul_inv_cancel₀ (pow_ne_zero _ z.ne_zero), one_mul]
     have e1 := heig i y (hy1 ▸ hMA hwM)
     have e2 := heig (i + (l + 1)) y (hy2 ▸ hMA (smul_mem_Mz (pow_mem hzO _) hwM))
     rw [hy1] at e1
@@ -259,22 +299,30 @@ theorem dens_bessel_of (hB : Lv ψ h π s B)
     rcases lt_or_gt_of_ne hij with hl | hl
     · exact horth0 i j hl
     · rw [hB.psd.1 (u j) (u i), horth0 j i hl, map_zero]
-  have hterm : ∀ i : ℕ, nabs k z ^ (-((i : ℝ) * (m + 1) * s)) * (B' (π (σ i) v) (π (σ i) v)).re =
-      (A₀.relIndex A : ℝ) * (B (u i) (u i)).re := by
+  have hterm
+      : ∀ i : ℕ,
+        nabs k z ^ (-((i : ℝ) * (m + 1) * s)) * (B' (π (σ i) v) (π (σ i) v)).re
+          = (A₀.relIndex A : ℝ) * (B (u i) (u i)).re := by
     intro i
     rw [hval i, ← hσu i, hsc i, hself i]
-    rw [show ((A₀.relIndex A : ℕ) : ℂ) * (((nabs k z ^ ((i : ℝ) * (m + 1) * s) : ℝ) : ℂ) * B (u i) (u i)) =
-      (((A₀.relIndex A : ℝ) * nabs k z ^ ((i : ℝ) * (m + 1) * s) : ℝ) : ℂ) * B (u i) (u i) by push_cast; ring]
+    rw [show ((A₀.relIndex A : ℕ) : ℂ)
+          * (((nabs k z ^ ((i : ℝ) * (m + 1) * s) : ℝ) : ℂ) * B (u i) (u i))
+        = (((A₀.relIndex A : ℝ) * nabs k z ^ ((i : ℝ) * (m + 1) * s) : ℝ) : ℂ) * B (u i) (u i) by
+      push_cast; ring]
     rw [Complex.re_ofReal_mul, Real.rpow_neg (nabs_pos' k z).le]
     have := (hcpos i).ne'
     field_simp
-  refine summable_of_sum_range_le (c := (A₀.relIndex A : ℝ) * (B v v).re) (fun i => ?_) (fun I => ?_)
+  refine
+    summable_of_sum_range_le (c := (A₀.relIndex A : ℝ) * (B v v).re) (fun i => ?_) (fun I => ?_)
   · exact le_of_le_of_eq (mul_nonneg (Nat.cast_nonneg _) (hB.psd.2 _)) (hterm i).symm
-  · calc ∑ i ∈ Finset.range I, nabs k z ^ (-((i : ℝ) * (m + 1) * s)) *
-          (B' (π (σ i) v) (π (σ i) v)).re
-        = ∑ i ∈ Finset.range I, (A₀.relIndex A : ℝ) * (B (u i) (u i)).re := Finset.sum_congr rfl fun i _ => hterm i
+  · calc
+      ∑ i ∈ Finset.range I, nabs k z ^ (-((i : ℝ) * (m + 1) * s)) *
+       (B' (π (σ i) v) (π (σ i) v)).re
+          = ∑ i ∈ Finset.range I, (A₀.relIndex A : ℝ) * (B (u i) (u i)).re :=
+        Finset.sum_congr rfl fun i _ => hterm i
       _ = (A₀.relIndex A : ℝ) * ∑ i ∈ Finset.range I, (B (u i) (u i)).re := by rw [Finset.mul_sum]
-      _ ≤ _ := mul_le_mul_of_nonneg_left (bessel_finite B hB.psd u v hself horth I) (Nat.cast_nonneg _)
+      _ ≤ _ :=
+        mul_le_mul_of_nonneg_left (bessel_finite B hB.psd u v hself horth I) (Nat.cast_nonneg _)
 
 end
 

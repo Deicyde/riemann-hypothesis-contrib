@@ -13,22 +13,23 @@ variable {K V : Type} [Group K] [AddCommGroup V] [Module ℂ V] {ρ : Representa
 def supRep (P : Subrepresentation ρ → Prop) : Subrepresentation ρ where
   toSubmodule := ⨆ (S : Subrepresentation ρ) (_ : P S), S.toSubmodule
   apply_mem_toSubmodule k := by
-    have h : (⨆ (S : Subrepresentation ρ) (_ : P S), S.toSubmodule) ≤
-        (⨆ (S : Subrepresentation ρ) (_ : P S), S.toSubmodule).comap (ρ k) := by
+    have h
+        : (⨆ (S : Subrepresentation ρ) (_ : P S), S.toSubmodule)
+          ≤ (⨆ (S : Subrepresentation ρ) (_ : P S), S.toSubmodule).comap (ρ k) := by
       refine iSup₂_le fun S hS x hx => ?_
       exact (le_iSup₂ (f := fun (S : Subrepresentation ρ) (_ : P S) => S.toSubmodule) S hS)
         (S.apply_mem_toSubmodule k hx)
     exact fun v hv => h hv
 
-def imRep (f : V →ₗ[ℂ] V) (hf : ∀ k v, f (ρ k v) = ρ k (f v)) (S : Subrepresentation ρ) :
-    Subrepresentation ρ where
+def imRep (f : V →ₗ[ℂ] V) (hf : ∀ k v, f (ρ k v) = ρ k (f v)) (S : Subrepresentation ρ)
+    : Subrepresentation ρ where
   toSubmodule := S.toSubmodule.map f
   apply_mem_toSubmodule k := by
     rintro _ ⟨s, hs, rfl⟩
     exact ⟨ρ k s, S.apply_mem_toSubmodule k hs, hf k s⟩
 
-def preRep (f : V →ₗ[ℂ] V) (hf : ∀ k v, f (ρ k v) = ρ k (f v)) (S C : Subrepresentation ρ) :
-    Subrepresentation ρ where
+def preRep (f : V →ₗ[ℂ] V) (hf : ∀ k v, f (ρ k v) = ρ k (f v)) (S C : Subrepresentation ρ)
+    : Subrepresentation ρ where
   toSubmodule := S.toSubmodule ⊓ C.toSubmodule.comap f
   apply_mem_toSubmodule k := by
     rintro v ⟨hv1, hv2⟩
@@ -54,10 +55,11 @@ namespace GlobalTheory
 namespace TypeComplement
 variable {K V : Type} [Group K] [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ K V}
 
-theorem imRep_atom (f : V →ₗ[ℂ] V) (hf : ∀ k v, f (ρ k v) = ρ k (f v)) {S : Subrepresentation ρ}
-    (hS : IsAtom S) (hne : ∃ s ∈ S.toSubmodule, f s ≠ 0) :
-    IsAtom (imRep f hf S) ∧
-      Nonempty (S.toRepresentation.Equiv (imRep f hf S).toRepresentation) := by
+theorem imRep_atom
+    (f : V →ₗ[ℂ] V) (hf : ∀ k v, f (ρ k v) = ρ k (f v))
+    {S : Subrepresentation ρ} (hS : IsAtom S) (hne : ∃ s ∈ S.toSubmodule, f s ≠ 0)
+    : IsAtom (imRep f hf S)
+      ∧ Nonempty (S.toRepresentation.Equiv (imRep f hf S).toRepresentation) := by
   obtain ⟨s₀, hs₀, hfs₀⟩ := hne
 
   have hinj : Function.Injective (f ∘ₗ S.toSubmodule.subtype) := by
@@ -110,13 +112,32 @@ end GlobalTheory
 namespace GlobalTheory
 namespace TypeComplement
 
-theorem exists_typeComplement : ∀ (K V : Type) [Group K] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ K V), ρ.IsSemisimpleRepresentation → (∀ X : Subrepresentation ρ, X.toSubmodule = ⨆ (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X), S.toSubmodule) → ∀ X : Subrepresentation ρ, (∀ S₁ S₂ : Subrepresentation ρ, IsAtom S₁ → S₂ ≤ X → Nonempty (S₁.toRepresentation.Equiv S₂.toRepresentation) → S₁ ≤ X) → ∃ Y : Subrepresentation ρ, IsCompl X.toSubmodule Y.toSubmodule ∧ (∀ S₁ S₂ : Subrepresentation ρ, IsAtom S₁ → IsAtom S₂ → S₁ ≤ Y → S₂ ≤ X → IsEmpty (S₁.toRepresentation.Equiv S₂.toRepresentation)) ∧ ∀ T : V →ₗ[ℂ] V, (∀ k v, T (ρ k v) = ρ k (T v)) → (∀ v ∈ X.toSubmodule, T v ∈ X.toSubmodule) ∧ ∀ v ∈ Y.toSubmodule, T v ∈ Y.toSubmodule := by
+theorem exists_typeComplement
+    : ∀ (K V : Type) [Group K] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ K V),
+      ρ.IsSemisimpleRepresentation
+        → (∀ X : Subrepresentation ρ,
+          X.toSubmodule = ⨆ (S : Subrepresentation ρ) (_ : IsAtom S ∧ S ≤ X), S.toSubmodule)
+        → ∀ X : Subrepresentation ρ,
+          (∀ S₁ S₂ : Subrepresentation ρ,
+              IsAtom S₁ → S₂ ≤ X → Nonempty (S₁.toRepresentation.Equiv S₂.toRepresentation)
+                → S₁ ≤ X)
+            → ∃ Y : Subrepresentation ρ,
+              IsCompl X.toSubmodule Y.toSubmodule
+                ∧ (∀ S₁ S₂ : Subrepresentation ρ,
+                  IsAtom S₁ → IsAtom S₂ → S₁ ≤ Y → S₂ ≤ X
+                    → IsEmpty (S₁.toRepresentation.Equiv S₂.toRepresentation))
+                ∧ ∀ T : V →ₗ[ℂ] V,
+                  (∀ k v, T (ρ k v) = ρ k (T v))
+                    → (∀ v ∈ X.toSubmodule, T v ∈ X.toSubmodule)
+                      ∧ ∀ v ∈ Y.toSubmodule, T v ∈ Y.toSubmodule := by
   intro K V _ _ _ ρ hss hsum X hcl
   haveI : ComplementedLattice (Subrepresentation ρ) := hss
   let Y : Subrepresentation ρ := supRep (fun S => IsAtom S ∧ ¬ S ≤ X)
   have hYle : ∀ S : Subrepresentation ρ, IsAtom S → ¬ S ≤ X → S.toSubmodule ≤ Y.toSubmodule :=
-    fun S hA hn => le_iSup₂ (f := fun (S : Subrepresentation ρ) (_ : IsAtom S ∧ ¬ S ≤ X) =>
-      S.toSubmodule) S ⟨hA, hn⟩
+    fun S hA hn =>
+      le_iSup₂
+        (f := fun (S : Subrepresentation ρ) (_ : IsAtom S ∧ ¬ S ≤ X) => S.toSubmodule)
+        S ⟨hA, hn⟩
 
   obtain ⟨Y₀, hY₀⟩ := exists_isCompl X
   have hXY₀ : IsCompl X.toSubmodule Y₀.toSubmodule := by
@@ -135,7 +156,8 @@ theorem exists_typeComplement : ∀ (K V : Type) [Group K] [AddCommGroup V] [Mod
       rw [map_add (f := _), Submodule.projection_apply_of_mem_left _ ha]
       have : p b = 0 := (Submodule.projection_apply_eq_zero_iff hXY₀).mpr hb
       rw [this, add_zero]
-    rw [map_add (f := _), h1 (X.apply_mem_toSubmodule k hx) (Y₀.apply_mem_toSubmodule k hy), h1 hx hy]
+    rw [map_add (f := _), h1 (X.apply_mem_toSubmodule k hx) (Y₀.apply_mem_toSubmodule k hy),
+      h1 hx hy]
 
   have hYY₀ : Y.toSubmodule ≤ Y₀.toSubmodule := by
     refine iSup₂_le fun S ⟨hA, hn⟩ => ?_
@@ -152,15 +174,13 @@ theorem exists_typeComplement : ∀ (K V : Type) [Group K] [AddCommGroup V] [Mod
   have hdisj : X.toSubmodule ⊓ Y.toSubmodule = ⊥ :=
     eq_bot_iff.mpr ((inf_le_inf_left _ hYY₀).trans (disjoint_iff.mp hXY₀.disjoint).le)
   refine ⟨Y, ⟨disjoint_iff.mpr hdisj, codisjoint_iff.mpr ?_⟩, ?_, ?_⟩
-  ·
-    refine eq_top_iff.mpr ?_
+  · refine eq_top_iff.mpr ?_
     show (⊤ : Subrepresentation ρ).toSubmodule ≤ _
     refine (hsum ⊤).le.trans (iSup₂_le fun S ⟨hA, _⟩ => ?_)
     by_cases hSX : S ≤ X
     · exact le_sup_of_le_left hSX
     · exact le_sup_of_le_right (hYle S hA hSX)
-  ·
-    intro S₁ S₂ hS₁ _ hY hX
+  · intro S₁ S₂ hS₁ _ hY hX
     refine ⟨fun e => ?_⟩
     have h₁ : S₁ ≤ X := hcl S₁ S₂ hS₁ hX ⟨e⟩
     apply hS₁.1

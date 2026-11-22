@@ -21,8 +21,11 @@ namespace ReciprocityTheory.ChartRestriction.G.Out.PullGtPf
 
 open Semi Geo.Tor
 
-variable {R R' : Type} [CommRing R] [IsDomain R] [CommRing R'] [IsDomain R'] {I : Ideal R}
-  {I' : Ideal R'} (φ : R →+* R') (hφ : I.map φ ≤ I') (e : ℕ)
+variable
+  {R R' : Type} [CommRing R] [IsDomain R] [CommRing R'] [IsDomain R']
+  {I : Ideal R} {I' : Ideal R'}
+  (φ : R →+* R') (hφ : I.map φ ≤ I')
+  (e : ℕ)
 
 include hφ in
 lemma pow_le : I ^ (e + 1) ≤ (I' ^ (e + 1)).comap φ := by
@@ -46,11 +49,13 @@ lemma sE_thick : sE φ hφ e ≫ thick R I e = thick R' I' e ≫ specOf φ := by
 
 variable {φ hφ e}
 
-def hMap (Y : Over (Spec (CommRingCat.of R))) (Y' : Over (Spec (CommRingCat.of R')))
-    (b : Y' ⟶ (Over.pullback (specOf φ)).obj Y) :
-    (thickObj R' I' e Y').left ⟶ (thickObj R I e Y).left :=
+def hMap
+    (Y : Over (Spec (CommRingCat.of R))) (Y' : Over (Spec (CommRingCat.of R')))
+    (b : Y' ⟶ (Over.pullback (specOf φ)).obj Y)
+    : (thickObj R' I' e Y').left ⟶ (thickObj R I e Y).left :=
   pullback.lift (pullback.fst Y'.hom (thick R' I' e) ≫ b.left ≫ pullback.fst Y.hom (specOf φ))
-    (pullback.snd Y'.hom (thick R' I' e) ≫ sE φ hφ e) (by
+    (pullback.snd Y'.hom (thick R' I' e) ≫ sE φ hφ e)
+    (by
       rw [Category.assoc, Category.assoc, pullback.condition, ← Category.assoc b.left,
         show b.left ≫ pullback.snd Y.hom (specOf φ) = Y'.hom from Over.w b, ← Category.assoc,
         pullback.condition, Category.assoc, Category.assoc, sE_thick])
@@ -149,12 +154,12 @@ end MonHom
 section Q
 
 variable (hφ e)
-variable {D : DegPre R} {D' : DegPre R'} (eB : D'.P.A ≅ (Over.pullback (specOf φ)).obj D.P.A)
+variable
+  {D : DegPre R} {D' : DegPre R'} (eB : D'.P.A ≅ (Over.pullback (specOf φ)).obj D.P.A)
   [IsMonHom eB.hom]
   {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
   {G' : Over (Spec (CommRingCat.of R'))} [GrpObj G'] [IsCommMonObj G']
   (bc : G' ≅ (Over.pullback (specOf φ)).obj G) [IsMonHom bc.hom]
-
 
 variable {e} (g : GtCoord I D e G)
 
@@ -175,10 +180,11 @@ def specψ : splitTorusAff ZU X' ⟶ splitTorusAff ZU X :=
 instance specψ_hom : IsMonHom (specψ xe) :=
   ((bialgSpec ZU).map (CommBialgCat.ofHom (ψB xe)).op).isMonHom_hom
 
-def hT : (splitTorus (Spec (CommRingCat.of (R' ⧸ I' ^ (e + 1)))) X').left ⟶
-    (splitTorus (Spec (CommRingCat.of (R ⧸ I ^ (e + 1)))) X).left :=
-  pullback.lift (pullback.fst _ _ ≫ Spec.map (CommRingCat.ofHom (ψR xe))) (pullback.snd _ _ ≫ sE φ hφ e)
-    (specULiftZIsTerminal.hom_ext _ _)
+def hT
+    : (splitTorus (Spec (CommRingCat.of (R' ⧸ I' ^ (e + 1)))) X').left
+      ⟶ (splitTorus (Spec (CommRingCat.of (R ⧸ I ^ (e + 1)))) X).left :=
+  pullback.lift (pullback.fst _ _ ≫ Spec.map (CommRingCat.ofHom (ψR xe)))
+    (pullback.snd _ _ ≫ sE φ hφ e) (specULiftZIsTerminal.hom_ext _ _)
 
 lemma ψB_left_inv : (ψR xe).comp (ψR xe.symm) = RingHom.id _ := by
   refine RingHom.ext fun x => ?_
@@ -198,10 +204,11 @@ lemma specψ_left : (specψ xe).left = Spec.map (CommRingCat.ofHom (ψR xe)) := 
 
 instance : IsIso (specψ xe).left := by
   rw [specψ_left]
-  have : IsIso (CommRingCat.ofHom (ψR xe)) :=
-    ⟨⟨CommRingCat.ofHom (ψR xe.symm), by
-      rw [← CommRingCat.ofHom_comp, ψB_right_inv]; rfl, by
-      rw [← CommRingCat.ofHom_comp, ψB_left_inv]; rfl⟩⟩
+  have : IsIso (CommRingCat.ofHom (ψR xe)) := ⟨⟨
+    CommRingCat.ofHom (ψR xe.symm),
+    by rw [← CommRingCat.ofHom_comp, ψB_right_inv]; rfl,
+    by rw [← CommRingCat.ofHom_comp, ψB_left_inv]; rfl
+  ⟩⟩
   exact (inferInstance : IsIso (Scheme.Spec.map (CommRingCat.ofHom (ψR xe)).op))
 
 def eψ : splitTorusAff ZU X' ≅ splitTorusAff ZU X :=
@@ -247,11 +254,15 @@ end Unit
 
 section IK
 
-variable (hφ) {D : DegPre R} {D' : DegPre R'} (eB : D'.P.A ≅ (Over.pullback (specOf φ)).obj D.P.A)
-  [IsMonHom eB.hom] (xe : D'.X ≃+ D.X)
+variable
+  (hφ)
+  {D : DegPre R} {D' : DegPre R'} (eB : D'.P.A ≅ (Over.pullback (specOf φ)).obj D.P.A)
+  [IsMonHom eB.hom]
+  (xe : D'.X ≃+ D.X)
   {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
   {G' : Over (Spec (CommRingCat.of R'))} [GrpObj G'] [IsCommMonObj G']
-  (bc : G' ≅ (Over.pullback (specOf φ)).obj G) [IsMonHom bc.hom] {e : ℕ} (g : GtCoord I D e G)
+  (bc : G' ≅ (Over.pullback (specOf φ)).obj G) [IsMonHom bc.hom]
+  {e : ℕ} (g : GtCoord I D e G)
 
 end IK
 

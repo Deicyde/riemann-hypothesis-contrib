@@ -198,8 +198,7 @@ private lemma lip_real (k : ℕ) (hk : 2 ≤ k) (t : ℂ) (ht : t.im = 0) (hj : 
 
 end UpperTheory.V.Sd
 
-theorem UpperTheory.V.Sd.lipschitz :
-    UpperTheory.V.Sd.Lipschitz := by
+theorem UpperTheory.V.Sd.lipschitz : UpperTheory.V.Sd.Lipschitz := by
   intro k hk
   refine ⟨fun x hx => UpperTheory.V.Sd.lk_hasSum k hk x hx, fun t ht hj => ?_⟩
   have hs := (UpperTheory.V.Sd.lip_summable k hk t).hasSum

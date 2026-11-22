@@ -4,8 +4,9 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Yoa4.add_gap_le :
-    ∀ {r : ℕ} {d : Fin r → ℕ}, StrictAnti d → ∀ (k : ℕ) (i j : Fin r), (↑j : ℕ) = (↑i : ℕ) + k → d j + k ≤ d i := by
+theorem UpperTheory.Reformulated.B.Yoa4.add_gap_le
+    : ∀ {r : ℕ} {d : Fin r → ℕ},
+      StrictAnti d → ∀ (k : ℕ) (i j : Fin r), (↑j : ℕ) = (↑i : ℕ) + k → d j + k ≤ d i := by
   intro r d hd k
   induction k with
   | zero =>
@@ -18,8 +19,9 @@ theorem UpperTheory.Reformulated.B.Yoa4.add_gap_le :
     have hj := j.isLt
     have hm : (i : ℕ) + k < r := by omega
     have h1 := ih i ⟨(i : ℕ) + k, hm⟩ rfl
-    have h2 : d j < d ⟨(i : ℕ) + k, hm⟩ := hd (by
-      rw [Fin.lt_def]
-      simp only
-      omega)
+    have h2 : d j < d ⟨(i : ℕ) + k, hm⟩ :=
+      hd (by
+        rw [Fin.lt_def]
+        simp only
+        omega)
     omega

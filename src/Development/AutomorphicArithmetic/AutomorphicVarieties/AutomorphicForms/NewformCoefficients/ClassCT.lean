@@ -74,8 +74,7 @@ private lemma aux2 (k M : ℕ) (hM : 1 ≤ M) (f : CuspForm (Gamma1 M) (k : ℤ)
     rw [intervalIntegral.integral_const_mul]
     exact mul_eq_zero_of_right _ hi
 
-theorem UpperTheory.V.Af.Nf.classCT :
-    UpperTheory.V.Af.Nf.ClassCT := by
+theorem UpperTheory.V.Af.Nf.classCT : UpperTheory.V.Af.Nf.ClassCT := by
   intro k M hM f γ z
   have hne : (toR γ).val.det ≠ 0 := (toR γ).det_ne_zero
   rcases hne.lt_or_gt with h | h

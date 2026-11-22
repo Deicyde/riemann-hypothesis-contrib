@@ -9,18 +9,21 @@ open Module
 
 namespace GlobalTheory.Per.Sen
 
-theorem finrank_span_image_eq_card {L M : Type} [Field L] [AddCommGroup M] [Module L M] {m : ℕ}
-    (d : Fin m → M) (hd : LinearIndependent L d) (p : Fin m → Prop) [DecidablePred p] :
-    Module.finrank L (Submodule.span L (d '' {i | p i})) = (Finset.univ.filter p).card := by
+theorem finrank_span_image_eq_card
+    {L M : Type} [Field L] [AddCommGroup M] [Module L M]
+    {m : ℕ} (d : Fin m → M) (hd : LinearIndependent L d) (p : Fin m → Prop) [DecidablePred p]
+    : Module.finrank L (Submodule.span L (d '' {i | p i})) = (Finset.univ.filter p).card := by
   have h := finrank_span_eq_card (hd.comp (Subtype.val : {i // p i} → Fin m) Subtype.val_injective)
   rw [Fintype.card_subtype] at h
   rw [show d '' {i | p i} = Set.range (d ∘ (Subtype.val : {i // p i} → Fin m)) by
     ext x; simp [Set.mem_image, Set.mem_range]]
   exact h
 
-private theorem exists_eq_of_antitone_le_of_exhaustive {L M : Type} [Field L] [AddCommGroup M] [Module L M]
-    (D : Submodule L M) [FiniteDimensional L D] (A : ℤ → Submodule L M) (hA : Antitone A)
-    (hAD : ∀ a, A a ≤ D) (hex : ∀ x ∈ D, ∃ a, x ∈ A a) : ∃ a, A a = D := by
+private theorem exists_eq_of_antitone_le_of_exhaustive
+    {L M : Type} [Field L] [AddCommGroup M] [Module L M]
+    (D : Submodule L M) [FiniteDimensional L D]
+    (A : ℤ → Submodule L M) (hA : Antitone A) (hAD : ∀ a, A a ≤ D) (hex : ∀ x ∈ D, ∃ a, x ∈ A a)
+    : ∃ a, A a = D := by
   obtain ⟨S, hS⟩ := (Submodule.fg_iff_finiteDimensional D).mpr inferInstance
   have key : ∀ T : Finset M, (T : Set M) ⊆ D → ∃ a, ∀ x ∈ T, x ∈ A a := by
     intro T
@@ -39,13 +42,15 @@ private theorem exists_eq_of_antitone_le_of_exhaustive {L M : Type} [Field L] [A
   rw [← hS, Submodule.span_le]
   exact fun x hx => ha x hx
 
-private theorem exists_adapted_basis_of_finrank_jumps {L M : Type} [Field L] [AddCommGroup M] [Module L M]
-    (r : ℕ) : ∀ (D : Submodule L M) [FiniteDimensional L D] (A : ℤ → Submodule L M)
-    (U : Multiset ℤ), Module.finrank L D = r → Antitone A → (∀ a, A a ≤ D) →
-    (∀ x ∈ D, ∃ a, x ∈ A a) → (∀ x, (∀ a, x ∈ A a) → x = 0) →
-    (∀ a : ℤ, (Module.finrank L (A a) : ℤ) - Module.finrank L (A (a + 1)) = (U.count a : ℤ)) →
-    ∃ (u : Fin r → ℤ) (d : Fin r → M), Finset.univ.val.map u = U ∧ LinearIndependent L d ∧
-      ∀ a, A a = Submodule.span L (d '' {k | a ≤ u k}) := by
+private theorem exists_adapted_basis_of_finrank_jumps
+    {L M : Type} [Field L] [AddCommGroup M] [Module L M] (r : ℕ)
+    : ∀ (D : Submodule L M) [FiniteDimensional L D] (A : ℤ → Submodule L M) (U : Multiset ℤ),
+      Module.finrank L D = r → Antitone A → (∀ a, A a ≤ D) → (∀ x ∈ D, ∃ a, x ∈ A a)
+        → (∀ x, (∀ a, x ∈ A a) → x = 0)
+        → (∀ a : ℤ, (Module.finrank L (A a) : ℤ) - Module.finrank L (A (a + 1)) = (U.count a : ℤ))
+        → ∃ (u : Fin r → ℤ) (d : Fin r → M),
+          Finset.univ.val.map u = U ∧ LinearIndependent L d
+            ∧ ∀ a, A a = Submodule.span L (d '' {k | a ≤ u k}) := by
   induction r with
   | zero =>
     intro D _ A U hr hA hAD hex hsep hU
@@ -59,7 +64,8 @@ private theorem exists_adapted_basis_of_finrank_jumps {L M : Type} [Field L] [Ad
       push_cast at h
       omega
     refine ⟨Fin.elim0, Fin.elim0, by simp [hU0], linearIndependent_empty_type, fun a => ?_⟩
-    rw [hA0 a]; symm
+    rw [hA0 a]
+    symm
     rw [Submodule.span_eq_bot]
     rintro x ⟨k, -, -⟩
     exact k.elim0
@@ -67,18 +73,16 @@ private theorem exists_adapted_basis_of_finrank_jumps {L M : Type} [Field L] [Ad
     intro D _ A U hr hA hAD hex hsep hU
     classical
     obtain ⟨a0, ha0⟩ := exists_eq_of_antitone_le_of_exhaustive D A hA hAD hex
-    have hDne : D ≠ ⊥ := by
-      intro h; rw [h, finrank_bot] at hr; omega
+    have hDne : D ≠ ⊥ := by intro h; rw [h, finrank_bot] at hr; omega
     obtain ⟨w, hwD, hw0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hDne
-    obtain ⟨b, hb⟩ : ∃ b, w ∉ A b := by
-      by_contra h; push Not at h; exact hw0 (hsep w h)
+    obtain ⟨b, hb⟩ : ∃ b, w ∉ A b := by by_contra h; push Not at h; exact hw0 (hsep w h)
     have hbd : ∀ a, A a = D → a < b := by
-      intro a ha; by_contra h; push Not at h
+      intro a ha
+      by_contra h
+      push Not at h
       exact hb (hA h (by rw [ha]; exact hwD))
-    obtain ⟨s, hs, hsmax⟩ :=
-      Int.exists_greatest_of_bdd ⟨b, fun z hz => (hbd z hz).le⟩ ⟨a0, ha0⟩
-    have hBD : A (s + 1) < D :=
-      lt_of_le_of_ne (hAD _) (fun h => by have := hsmax _ h; omega)
+    obtain ⟨s, hs, hsmax⟩ := Int.exists_greatest_of_bdd ⟨b, fun z hz => (hbd z hz).le⟩ ⟨a0, ha0⟩
+    have hBD : A (s + 1) < D := lt_of_le_of_ne (hAD _) (fun h => by have := hsmax _ h; omega)
     obtain ⟨v, hvD, hvB⟩ := SetLike.exists_of_lt hBD
     have hv0 : v ≠ 0 := fun h => hvB (by rw [h]; exact Submodule.zero_mem _)
     obtain ⟨C, hC⟩ := Submodule.exists_isCompl (A (s + 1) ⊔ Submodule.span L {v})
@@ -97,7 +101,9 @@ private theorem exists_adapted_basis_of_finrank_jumps {L M : Type} [Field L] [Ad
         exact Submodule.sub_mem _ (Submodule.mem_sup_right (Submodule.mem_span_singleton_self v))
           (Submodule.mem_sup_left hy)
       have hz0 : z = 0 := (Submodule.disjoint_def.mp hC.disjoint) z hzE hz.1
-      apply hvB; rw [← hyz, hz0, add_zero]; exact hy
+      apply hvB
+      rw [← hyz, hz0, add_zero]
+      exact hy
     have hsup : D' ⊔ Submodule.span L {v} = D := by
       rw [hD', sup_right_comm, ← sup_inf_assoc_of_le _ hED, hC.sup_eq_top, top_inf_eq]
     have hinf : D' ⊓ Submodule.span L {v} = ⊥ := by
@@ -115,16 +121,17 @@ private theorem exists_adapted_basis_of_finrank_jumps {L M : Type} [Field L] [Ad
       have h := Submodule.finrank_sup_add_finrank_inf_eq D' (Submodule.span L {v})
       rw [hsup, hinf, finrank_bot, finrank_span_singleton hv0, hr] at h
       omega
-    have hlow : ∀ a, a ≤ s → A a = D := fun a ha =>
-      le_antisymm (hAD a) (by rw [← hs]; exact hA ha)
+    have hlow : ∀ a, a ≤ s → A a = D := fun a ha => le_antisymm (hAD a) (by rw [← hs]; exact hA ha)
     have hs_mem : 0 < U.count s := by
       have h := hU s
       rw [hs, hr] at h
       have := Submodule.finrank_lt_finrank_of_lt hBD
       rw [hr] at this
       omega
-    have hU' : ∀ a : ℤ, (Module.finrank L ↥(A a ⊓ D') : ℤ) -
-        Module.finrank L ↥(A (a + 1) ⊓ D') = ((U.erase s).count a : ℤ) := by
+    have hU'
+        : ∀ a : ℤ,
+          (Module.finrank L ↥(A a ⊓ D') : ℤ) - Module.finrank L ↥(A (a + 1) ⊓ D')
+            = ((U.erase s).count a : ℤ) := by
       intro a
       rcases lt_trichotomy a s with h | h | h
       · have h0 := hU a
@@ -143,10 +150,16 @@ private theorem exists_adapted_basis_of_finrank_jumps {L M : Type} [Field L] [Ad
           inf_eq_left.mpr ((hA (show s + 1 ≤ a + 1 by omega)).trans hBD'),
           Multiset.count_erase_of_ne h.ne']
         exact hU a
-    obtain ⟨u', d', hu', hd', hspan'⟩ := ih D' (fun a => A a ⊓ D') (U.erase s) hrD'
-      (fun a b h => inf_le_inf_right _ (hA h)) (fun a => inf_le_right)
-      (fun x hx => by obtain ⟨a, ha⟩ := hex x (hD'D hx); exact ⟨a, Submodule.mem_inf.mpr ⟨ha, hx⟩⟩)
-      (fun x hx => hsep x (fun a => (Submodule.mem_inf.mp (hx a)).1)) hU'
+    obtain ⟨u', d', hu', hd', hspan'⟩ :=
+      ih D'
+        (fun a => A a ⊓ D')
+        (U.erase s) hrD'
+        (fun a b h => inf_le_inf_right _ (hA h))
+        (fun a => inf_le_right)
+        (fun x hx => by
+          obtain ⟨a, ha⟩ := hex x (hD'D hx); exact ⟨a, Submodule.mem_inf.mpr ⟨ha, hx⟩⟩)
+        (fun x hx => hsep x (fun a => (Submodule.mem_inf.mp (hx a)).1))
+        hU'
     have hd'D' : ∀ k, d' k ∈ D' := by
       intro k
       have h := hspan' (u' k)
@@ -194,13 +207,15 @@ private theorem exists_adapted_basis_of_finrank_jumps {L M : Type} [Field L] [Ad
           · simp at hk; omega
           · exact ⟨j, by simpa using hk, by simp⟩
 
-theorem adapted_basis_jumps : ∀ {L M : Type} [Field L] [AddCommGroup M] [Module L M]
-    (D : Submodule L M) [FiniteDimensional L D] (A : ℤ → Submodule L M) (U : Multiset ℤ) (r : ℕ),
-    Module.finrank L D = r → Antitone A → (∀ a, A a ≤ D) → (∀ x ∈ D, ∃ a, x ∈ A a) →
-    (∀ x, (∀ a, x ∈ A a) → x = 0) →
-    (∀ a : ℤ, (Module.finrank L (A a) : ℤ) - Module.finrank L (A (a + 1)) = (U.count a : ℤ)) →
-    ∃ (u : Fin r → ℤ) (d : Fin r → M), Finset.univ.val.map u = U ∧ LinearIndependent L d ∧
-      ∀ a, A a = Submodule.span L (d '' {k | a ≤ u k}) := by
+theorem adapted_basis_jumps
+    : ∀ {L M : Type} [Field L] [AddCommGroup M] [Module L M] (D : Submodule L M)
+        [FiniteDimensional L D] (A : ℤ → Submodule L M) (U : Multiset ℤ) (r : ℕ),
+      Module.finrank L D = r → Antitone A → (∀ a, A a ≤ D) → (∀ x ∈ D, ∃ a, x ∈ A a)
+        → (∀ x, (∀ a, x ∈ A a) → x = 0)
+        → (∀ a : ℤ, (Module.finrank L (A a) : ℤ) - Module.finrank L (A (a + 1)) = (U.count a : ℤ))
+        → ∃ (u : Fin r → ℤ) (d : Fin r → M),
+          Finset.univ.val.map u = U ∧ LinearIndependent L d
+            ∧ ∀ a, A a = Submodule.span L (d '' {k | a ≤ u k}) := by
   intro L M _ _ _ D _ A U r hr hA hAD hex hsep hU
   exact exists_adapted_basis_of_finrank_jumps r D A U hr hA hAD hex hsep hU
 

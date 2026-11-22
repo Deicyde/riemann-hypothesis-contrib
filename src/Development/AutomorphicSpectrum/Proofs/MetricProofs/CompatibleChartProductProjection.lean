@@ -8,44 +8,48 @@ public import ReciprocityTheory.AnalyticForms.PotentialTheory.ContDiffAtOfIsPote
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.ChartSwap
 
 variable {e n : ℕ}
 
-theorem continuous_comp_emb (σ : Fin n ↪ Fin e) :
-    Continuous (fun w : Fin e → ℂ => w ∘ σ) :=
+theorem continuous_comp_emb (σ : Fin n ↪ Fin e) : Continuous (fun w : Fin e → ℂ => w ∘ σ) :=
   continuous_pi fun j => continuous_apply (σ j)
 
-theorem analyticAt_comp_emb (σ : Fin n ↪ Fin e) (w : Fin e → ℂ) :
-    AnalyticAt ℂ (fun v : Fin e → ℂ => v ∘ σ) w := by
+theorem analyticAt_comp_emb (σ : Fin n ↪ Fin e) (w : Fin e → ℂ)
+    : AnalyticAt ℂ (fun v : Fin e → ℂ => v ∘ σ) w := by
   rw [analyticAt_pi_iff]
   intro j
   exact (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin e => ℂ) (σ j)).analyticAt w
 
-theorem extend_comp_emb (σ : Fin n ↪ Fin e) (g : Fin n → ℂ) (w : Fin e → ℂ) :
-    Function.extend σ g w ∘ σ = g :=
+theorem extend_comp_emb (σ : Fin n ↪ Fin e) (g : Fin n → ℂ) (w : Fin e → ℂ)
+    : Function.extend σ g w ∘ σ = g :=
   funext fun j => σ.injective.extend_apply g w j
 
-theorem extend_extend_emb (σ : Fin n ↪ Fin e) (g : Fin n → ℂ) (w : Fin e → ℂ) :
-    Function.extend σ (w ∘ σ) (Function.extend σ g w) = w := by
+theorem extend_extend_emb (σ : Fin n ↪ Fin e) (g : Fin n → ℂ) (w : Fin e → ℂ)
+    : Function.extend σ (w ∘ σ) (Function.extend σ g w) = w := by
   funext i
   by_cases h : ∃ j, σ j = i
   · obtain ⟨j, rfl⟩ := h
     exact σ.injective.extend_apply _ _ j
   · rw [Function.extend_apply' _ _ _ h, Function.extend_apply' _ _ _ h]
 
-theorem analyticAt_extend_emb (σ : Fin n ↪ Fin e) {f : (Fin n → ℂ) → Fin n → ℂ} {w : Fin e → ℂ}
-    (hf : AnalyticAt ℂ f (w ∘ σ)) :
-    AnalyticAt ℂ (fun v : Fin e → ℂ => Function.extend σ (f (v ∘ σ)) v) w := by
+theorem analyticAt_extend_emb
+    (σ : Fin n ↪ Fin e) {f : (Fin n → ℂ) → Fin n → ℂ} {w : Fin e → ℂ} (hf : AnalyticAt ℂ f (w ∘ σ))
+    : AnalyticAt ℂ (fun v : Fin e → ℂ => Function.extend σ (f (v ∘ σ)) v) w := by
   rw [analyticAt_pi_iff]
   intro i
   by_cases h : ∃ j, σ j = i
   · obtain ⟨j, rfl⟩ := h
-    have hfun : (fun v : Fin e → ℂ => Function.extend σ (f (v ∘ σ)) v (σ j)) =
-        (fun y : Fin n → ℂ => f y j) ∘ (fun v : Fin e → ℂ => v ∘ σ) := by
+    have hfun
+        : (fun v : Fin e → ℂ => Function.extend σ (f (v ∘ σ)) v (σ j))
+          = (fun y : Fin n → ℂ => f y j) ∘ (fun v : Fin e → ℂ => v ∘ σ) := by
       funext v
       exact σ.injective.extend_apply _ _ j
     rw [hfun]
@@ -56,10 +60,11 @@ theorem analyticAt_extend_emb (σ : Fin n ↪ Fin e) {f : (Fin n → ℂ) → Fi
     rw [hfun]
     exact (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin e => ℂ) i).analyticAt w
 
-noncomputable def extendHomeo (σ : Fin n ↪ Fin e)
+noncomputable def extendHomeo
+    (σ : Fin n ↪ Fin e)
     (τ : OpenPartialHomeomorph (Fin n → ℂ) (Fin n → ℂ))
-    (h₁ : AnalyticOnNhd ℂ τ τ.source) (h₂ : AnalyticOnNhd ℂ τ.symm τ.target) :
-    OpenPartialHomeomorph (Fin e → ℂ) (Fin e → ℂ) where
+    (h₁ : AnalyticOnNhd ℂ τ τ.source) (h₂ : AnalyticOnNhd ℂ τ.symm τ.target)
+    : OpenPartialHomeomorph (Fin e → ℂ) (Fin e → ℂ) where
   toFun w := Function.extend σ (τ (w ∘ σ)) w
   invFun w := Function.extend σ (τ.symm (w ∘ σ)) w
   source := {w | w ∘ σ ∈ τ.source}
@@ -87,11 +92,17 @@ noncomputable def extendHomeo (σ : Fin n ↪ Fin e)
   continuousOn_invFun := fun w hw =>
     (analyticAt_extend_emb σ (h₂ _ hw)).continuousAt.continuousWithinAt
 
-theorem chart_swap :
-    ∀ (e n : ℕ) (X Z : Type) [TopologicalSpace X] [TopologicalSpace Z] (A : FinHolAtlas e X) (Ab : FinHolAtlas n Z) (pr : X → Z) (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (kb : Fin Ab.n) (σ : Fin n ↪ Fin e) (ψb : OpenPartialHomeomorph Z (Fin n → ℂ)), IsCompatChart A ψ → IsCompatChart Ab ψb → (∀ x' ∈ ψ.source, pr x' ∈ (Ab.chart kb).source ∧ ∀ i, Ab.chart kb (pr x') i = ψ x' (σ i)) → ∃ ψ' : OpenPartialHomeomorph X (Fin e → ℂ), IsCompatChart A ψ' ∧ ψ'.source = ψ.source ∩ pr ⁻¹' ψb.source ∧ ∀ y ∈ ψ'.source, ∀ i, ψ' y (σ i) = ψb (pr y) i := by
+theorem chart_swap
+    : ∀ (e n : ℕ) (X Z : Type) [TopologicalSpace X] [TopologicalSpace Z] (A : FinHolAtlas e X)
+        (Ab : FinHolAtlas n Z) (pr : X → Z) (ψ : OpenPartialHomeomorph X (Fin e → ℂ))
+        (kb : Fin Ab.n) (σ : Fin n ↪ Fin e) (ψb : OpenPartialHomeomorph Z (Fin n → ℂ)),
+      IsCompatChart A ψ → IsCompatChart Ab ψb
+        → (∀ x' ∈ ψ.source, pr x' ∈ (Ab.chart kb).source ∧ ∀ i, Ab.chart kb (pr x') i = ψ x' (σ i))
+        → ∃ ψ' : OpenPartialHomeomorph X (Fin e → ℂ),
+          IsCompatChart A ψ' ∧ ψ'.source = ψ.source ∩ pr ⁻¹' ψb.source
+            ∧ ∀ y ∈ ψ'.source, ∀ i, ψ' y (σ i) = ψb (pr y) i := by
   intro e n X Z _ _ A Ab pr ψ kb σ ψb hψ hb hpr
-  have h₁ : AnalyticOnNhd ℂ ((Ab.chart kb).symm.trans ψb)
-      ((Ab.chart kb).symm.trans ψb).source := by
+  have h₁ : AnalyticOnNhd ℂ ((Ab.chart kb).symm.trans ψb) ((Ab.chart kb).symm.trans ψb).source := by
     intro y hy
     exact (hb kb).1 y hy
   have h₂ : AnalyticOnNhd ℂ ((Ab.chart kb).symm.trans ψb).symm
@@ -101,8 +112,7 @@ theorem chart_swap :
   have hcomp : ∀ y ∈ ψ.source, ψ y ∘ σ = Ab.chart kb (pr y) := fun y hy =>
     funext fun i => ((hpr y hy).2 i).symm
   let T := extendHomeo σ ((Ab.chart kb).symm.trans ψb) h₁ h₂
-  have hTan : ∀ w ∈ T.source, AnalyticAt ℂ T w := fun w hw =>
-    analyticAt_extend_emb σ (h₁ _ hw)
+  have hTan : ∀ w ∈ T.source, AnalyticAt ℂ T w := fun w hw => analyticAt_extend_emb σ (h₁ _ hw)
   have hTsan : ∀ w ∈ T.target, AnalyticAt ℂ T.symm w := fun w hw =>
     analyticAt_extend_emb σ (h₂ _ hw)
   have hsrc : (ψ.trans T).source = ψ.source ∩ pr ⁻¹' ψb.source := by

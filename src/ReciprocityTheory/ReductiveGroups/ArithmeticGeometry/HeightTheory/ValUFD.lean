@@ -8,11 +8,12 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 namespace ValUFD
 
-variable {R F : Type*} [CommRing R] [IsDomain R] [UniqueFactorizationMonoid R] [Field F]
-  [Algebra R F] [IsFractionRing R F]
+variable
+  {R F : Type*} [CommRing R] [IsDomain R] [UniqueFactorizationMonoid R] [Field F] [Algebra R F]
+  [IsFractionRing R F]
 
-theorem heightOne_principal (p : Ideal R) [p.IsPrime] (hp : p.height = 1) :
-    ∃ g : R, Prime g ∧ p = Ideal.span {g} := by
+theorem heightOne_principal (p : Ideal R) [p.IsPrime] (hp : p.height = 1)
+    : ∃ g : R, Prime g ∧ p = Ideal.span {g} := by
   have hpr := UniqueFactorizationMonoid.isPrincipal_of_height_eq_one hp
   have hsp : Ideal.span {Submodule.IsPrincipal.generator p} = p :=
     Submodule.IsPrincipal.span_singleton_generator p
@@ -38,9 +39,9 @@ theorem height_span_prime {q : R} (hq : Prime q) : (Ideal.span {q}).height = 1 :
   · rw [Order.one_le_iff_ne_zero, Ne, Ideal.height_eq_zero_iff_eq_bot, Ideal.span_singleton_eq_bot]
     exact hq.ne_zero
 
-theorem loc_dvr (p : Ideal R) [p.IsPrime] (hp : p.height = 1) (g : R) (hg : p = Ideal.span {g}) :
-    IsDiscreteValuationRing (Localization.AtPrime p) ∧
-      Irreducible (algebraMap R (Localization.AtPrime p) g) := by
+theorem loc_dvr (p : Ideal R) [p.IsPrime] (hp : p.height = 1) (g : R) (hg : p = Ideal.span {g})
+    : IsDiscreteValuationRing (Localization.AtPrime p)
+      ∧ Irreducible (algebraMap R (Localization.AtPrime p) g) := by
   set O := Localization.AtPrime p
   have hg0 : g ≠ 0 := by
     rintro rfl
@@ -56,8 +57,7 @@ theorem loc_dvr (p : Ideal R) [p.IsPrime] (hp : p.height = 1) (g : R) (hg : p = 
   have hϖ : Prime (algebraMap R O g) :=
     (Ideal.span_singleton_prime hϖ0).mp (by rw [hspan]; infer_instance)
   have hdvr : IsDiscreteValuationRing O := by
-    refine IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization
-      ⟨_, hϖ.irreducible, ?_⟩
+    refine IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization ⟨_, hϖ.irreducible, ?_⟩
     intro x hx
     obtain ⟨⟨a, s⟩, hxs⟩ := IsLocalization.mk'_surjective p.primeCompl x
     simp only at hxs
@@ -66,7 +66,8 @@ theorem loc_dvr (p : Ideal R) [p.IsPrime] (hp : p.height = 1) (g : R) (hg : p = 
     obtain ⟨n, a', hnd, rfl⟩ := WfDvdMonoid.max_power_factor ha hgp.irreducible
     have ha' : a' ∈ p.primeCompl := by
       show a' ∉ p
-      rw [hg, Ideal.mem_span_singleton]; exact hnd
+      rw [hg, Ideal.mem_span_singleton]
+      exact hnd
     refine ⟨n, ((IsLocalization.AtPrime.isUnit_mk'_iff O p a' s).mpr ha').unit, ?_⟩
     rw [IsUnit.unit_spec, ← map_pow, IsLocalization.mul_mk'_eq_mk'_of_mul]
   exact ⟨hdvr, hϖ.irreducible⟩
@@ -75,8 +76,10 @@ section Factor
 
 variable {gen : Ideal R → R}
 
-theorem gen_prime (hgen : ∀ p : Ideal R, p.IsPrime → p.height = 1 → p = Ideal.span {gen p})
-    {p : Ideal R} (hp : p ∈ {p : Ideal R | p.IsPrime ∧ p.height = 1}) : Prime (gen p) := by
+theorem gen_prime
+    (hgen : ∀ p : Ideal R, p.IsPrime → p.height = 1 → p = Ideal.span {gen p})
+    {p : Ideal R} (hp : p ∈ {p : Ideal R | p.IsPrime ∧ p.height = 1})
+    : Prime (gen p) := by
   obtain ⟨hpp, hh⟩ := hp
   have hg := hgen p hpp hh
   have hne : gen p ≠ 0 := by
@@ -85,9 +88,11 @@ theorem gen_prime (hgen : ∀ p : Ideal R, p.IsPrime → p.height = 1 → p = Id
     rw [hg, h0, Ideal.span_singleton_eq_bot]
   exact (Ideal.span_singleton_prime hne).mp (hg ▸ hpp)
 
-theorem gen_dvd_iff (hgen : ∀ p : Ideal R, p.IsPrime → p.height = 1 → p = Ideal.span {gen p})
-    {p : Ideal R} (hp : p ∈ {p : Ideal R | p.IsPrime ∧ p.height = 1}) {q : R} (hq : Prime q) :
-    gen p ∣ q ↔ p = Ideal.span {q} := by
+theorem gen_dvd_iff
+    (hgen : ∀ p : Ideal R, p.IsPrime → p.height = 1 → p = Ideal.span {gen p})
+    {p : Ideal R} (hp : p ∈ {p : Ideal R | p.IsPrime ∧ p.height = 1})
+    {q : R} (hq : Prime q)
+    : gen p ∣ q ↔ p = Ideal.span {q} := by
   constructor
   · intro h
     rw [hgen p hp.1 hp.2, Ideal.span_singleton_eq_span_singleton]

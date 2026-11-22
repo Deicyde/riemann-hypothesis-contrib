@@ -13,6 +13,8 @@ theorem okpInertG_holds : OkpInertG := integers_inert_prime
 
 theorem inertPrime_holds : InertPrime := isPrime_span_of_jacobi_neg_one
 
-theorem okpInert_holds (D : Formalism.BasicNotions.D7) : Formalism.MainNotions.GL3Theta.okpInert D := okpInert_of okpInertG_holds inertPrime_holds D
+theorem okpInert_holds (D : Formalism.BasicNotions.D7)
+    : Formalism.MainNotions.GL3Theta.okpInert D :=
+  okpInert_of okpInertG_holds inertPrime_holds D
 
 end Formalism.MainNotions.Ext

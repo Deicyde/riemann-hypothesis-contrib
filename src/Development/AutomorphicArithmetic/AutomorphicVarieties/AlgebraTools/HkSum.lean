@@ -10,13 +10,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open MvPolynomial Equiv UpperTheory.V.AlgebraTools.Hk
 
-theorem UpperTheory.V.AlgebraTools.hkSum :
-    ∀ (R : Type) [CommRing R] [IsDomain R] (n : ℕ) (q : R) (H : Type) [Ring H] [Algebra R H] (b : Bern n q H), b.Faithful → ∀ (ι : Type) [Fintype ι] (a c : ι → MvPolynomial (Fin n) R), IsDual a c →
-      ∑ i, b.th (a i) * b.one * b.th (c i) = b.th (NN n q) := by
+theorem UpperTheory.V.AlgebraTools.hkSum
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (n : ℕ) (q : R) (H : Type) [Ring H] [Algebra R H]
+        (b : Bern n q H),
+      b.Faithful
+        → ∀ (ι : Type) [Fintype ι] (a c : ι → MvPolynomial (Fin n) R),
+          IsDual a c → ∑ i, b.th (a i) * b.one * b.th (c i) = b.th (NN n q) := by
   intro R _ _ n q H _ _ b hb ι _ a c hd
   classical
-  let S : H → Prop := fun h => ∃ e : Perm (Fin n) → MvPolynomial (Fin n) R,
-    ∑ u, b.th (e u) * b.T u = h
+  let S : H → Prop := fun h =>
+    ∃ e : Perm (Fin n) → MvPolynomial (Fin n) R, ∑ u, b.th (e u) * b.T u = h
   have S_zero : S 0 := ⟨0, by simp⟩
   have S_add : ∀ h₁ h₂, S h₁ → S h₂ → S (h₁ + h₂) := by
     rintro h₁ h₂ ⟨e₁, rfl⟩ ⟨e₂, rfl⟩
@@ -56,26 +59,31 @@ theorem UpperTheory.V.AlgebraTools.hkSum :
     rw [mul_assoc, Bern.one, Finset.sum_mul]
     exact S_thmul _ _ (S_sum _ _ fun w _ => S_T _ _ (S_th _))
   obtain ⟨e, he⟩ := S_sub _ _ hE (S_th (NN n q))
-  have hx : ∀ x, (∑ i, b.th (a i) * b.one * b.th (c i)) * b.th x * b.one
-      = b.th (NN n q * x) * b.one := by
+  have hx
+      : ∀ x,
+        (∑ i, b.th (a i) * b.one * b.th (c i)) * b.th x * b.one = b.th (NN n q * x) * b.one := by
     intro x
     rw [Finset.sum_mul, Finset.sum_mul]
-    have step : ∀ i, b.th (a i) * b.one * b.th (c i) * b.th x * b.one
-        = b.th (a i * dd (c i * (NN n q * x))) * b.one := by
+    have step
+        : ∀ i,
+          b.th (a i) * b.one * b.th (c i) * b.th x * b.one
+            = b.th (a i * dd (c i * (NN n q * x))) * b.one := by
       intro i
       have hs := UpperTheory.V.AlgebraTools.hkSandwich R n q H b hb (c i * x)
-      calc b.th (a i) * b.one * b.th (c i) * b.th x * b.one
-          = b.th (a i) * (b.one * b.th (c i * x) * b.one) := by
-            rw [map_mul]
-            simp only [mul_assoc]
+      calc
+        b.th (a i) * b.one * b.th (c i) * b.th x * b.one
+            = b.th (a i) * (b.one * b.th (c i * x) * b.one) := by
+          rw [map_mul]
+          simp only [mul_assoc]
         _ = b.th (a i) * (b.th (dd (NN n q * (c i * x))) * b.one) := by rw [hs]
         _ = b.th (a i * dd (c i * (NN n q * x))) * b.one := by
-            rw [map_mul, mul_left_comm (NN n q) (c i) x, mul_assoc]
+          rw [map_mul, mul_left_comm (NN n q) (c i) x, mul_assoc]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl fun i _ => step i, ← Finset.sum_mul, ← map_sum,
+    rw [Finset.sum_congr rfl fun i _ => step i, ← Finset.sum_mul, ← map_sum,
       (UpperTheory.V.AlgebraTools.hkDualExp R n ι a c hd (NN n q * x)).1]
-  have he0 := UpperTheory.V.AlgebraTools.hkFaith R n q H b hb e (fun x => by
-    rw [he, sub_mul, sub_mul, hx x, ← map_mul, sub_self])
+  have he0 :=
+    UpperTheory.V.AlgebraTools.hkFaith R n q H b hb e
+      (fun x => by rw [he, sub_mul, sub_mul, hx x, ← map_mul, sub_self])
   rw [he0] at he
   simp only [Pi.zero_apply, map_zero, zero_mul, Finset.sum_const_zero] at he
   exact (sub_eq_zero.mp he.symm)

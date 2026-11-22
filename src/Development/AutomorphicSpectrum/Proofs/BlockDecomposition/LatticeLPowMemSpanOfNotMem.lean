@@ -14,13 +14,17 @@ open DividedPowers CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.Lat
 
-private theorem exists_sub_iota_mem_of_sub_involution_mem {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B] (f : W →+* B) (ξ : W)
-    (l M : ℕ) (b : B) (hb : b ∈ Lat.sub f ξ l M) : ∃ w : W, f w - b ∈ Lat.IB f ξ := by
+private theorem exists_sub_iota_mem_of_sub_involution_mem
+    {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B]
+    (f : W →+* B) (ξ : W) (l M : ℕ) (b : B) (hb : b ∈ Lat.sub f ξ l M)
+    : ∃ w : W, f w - b ∈ Lat.IB f ξ := by
   have hη : Lat.η f ξ l M ∈ Lat.IB f ξ := by
     rw [Lat.η, Algebra.smul_def]
     exact Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self _)
-  have hle : Lat.sub f ξ l M ≤
-      (((Ideal.Quotient.mk (Lat.IB f ξ)).comp f).range).comap (Ideal.Quotient.mk (Lat.IB f ξ)) := by
+  have hle
+      : Lat.sub f ξ l M
+        ≤ (((Ideal.Quotient.mk (Lat.IB f ξ)).comp f).range).comap
+          (Ideal.Quotient.mk (Lat.IB f ξ)) := by
     show Subring.closure _ ≤ _
     rw [Subring.closure_le]
     rintro y (⟨w, rfl⟩ | ⟨i, rfl⟩)
@@ -37,9 +41,13 @@ private theorem exists_sub_iota_mem_of_sub_involution_mem {W B : Type} [CommRing
   obtain ⟨w, hw⟩ := RingHom.mem_range.1 (Subring.mem_comap.1 (hle hb))
   exact ⟨w, Ideal.Quotient.eq.1 hw⟩
 
-theorem pow_mem_span_sup_I : ∀ {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B] (f : W →+* B) (ξ : W)
-    (l M : ℕ) (m : ℕ), Lat.Hyp f ξ l m → ∀ x : Lat.A f ξ l M, x ∉ Lat.I f ξ l M →
-      ∃ n : ℕ, (l : Lat.A f ξ l M) ^ n ∈ Ideal.span {x} ⊔ Lat.I f ξ l M := by
+theorem pow_mem_span_sup_I
+    : ∀ {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B] (f : W →+* B) (ξ : W) (l M : ℕ)
+        (m : ℕ),
+      Lat.Hyp f ξ l m
+        → ∀ x : Lat.A f ξ l M,
+          x ∉ Lat.I f ξ l M
+            → ∃ n : ℕ, (l : Lat.A f ξ l M) ^ n ∈ Ideal.span {x} ⊔ Lat.I f ξ l M := by
   intro W B _ _ _ f ξ l M m hH x hx
   have hxmem : Lat.ι f ξ l M x ∈ Lat.sub f ξ l M := (show ↥(Lat.sub f ξ l M) from x).2
   obtain ⟨w, hw⟩ := exists_sub_iota_mem_of_sub_involution_mem f ξ l M _ hxmem
@@ -69,14 +77,16 @@ theorem pow_mem_span_sup_I : ∀ {W B : Type} [CommRing W] [CommRing B] [Algebra
     simpa using hc
   obtain ⟨v, hv⟩ := Ideal.mem_span_singleton'.1 hmem
   refine ⟨n, ?_⟩
-  have e : (l : Lat.A f ξ l M) ^ n = Lat.ofW f ξ l M ((l : W) ^ n) := by
-    rw [map_pow, map_natCast]
+  have e : (l : Lat.A f ξ l M) ^ n = Lat.ofW f ξ l M ((l : W) ^ n) := by rw [map_pow, map_natCast]
   rw [e, show (l : W) ^ n = w * u + v * ξ by rw [hv]; ring, map_add (f := _), map_mul, map_mul]
   refine Ideal.add_mem _ ?_ (Ideal.mem_sup_right (Ideal.mul_mem_left _ _ hξI))
-  have e2 : Lat.ofW f ξ l M w * Lat.ofW f ξ l M u =
-      x * Lat.ofW f ξ l M u + (Lat.ofW f ξ l M w - x) * Lat.ofW f ξ l M u := by ring
+  have e2
+      : Lat.ofW f ξ l M w * Lat.ofW f ξ l M u
+        = x * Lat.ofW f ξ l M u + (Lat.ofW f ξ l M w - x) * Lat.ofW f ξ l M u := by
+    ring
   rw [e2]
-  exact Ideal.add_mem _ (Ideal.mem_sup_left (Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self x)))
+  exact Ideal.add_mem _
+    (Ideal.mem_sup_left (Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self x)))
     (Ideal.mem_sup_right (Ideal.mul_mem_right _ _ hxw))
 
 end GlobalTheory.CompanionTheory.Lat

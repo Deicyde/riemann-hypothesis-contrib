@@ -19,24 +19,27 @@ universe u
 
 section SlopeTestRemainingChoices
 
-variable {R : Type u} [CommRing R] {G G' : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [Group G'] [TopologicalSpace G'] [IsTopologicalGroup G']
+variable
+  {R : Type u} [CommRing R]
+  {G G' : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group G']
+  [TopologicalSpace G'] [IsTopologicalGroup G']
 
-theorem lowLES_h0Equiv_pair {M : TRep R G} {M' : TRep R G'} (P : Pair M M') (x : M.H 0) :
-    cohomZeroEquivContinuous M' (P.hom.H 0 x) = P.h0 (cohomZeroEquivContinuous M x) := by
+theorem lowLES_h0Equiv_pair {M : TRep R G} {M' : TRep R G'} (P : Pair M M') (x : M.H 0)
+    : cohomZeroEquivContinuous M' (P.hom.H 0 x) = P.h0 (cohomZeroEquivContinuous M x) := by
   obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ x
 
   exact Subtype.ext (congrArg P.u (congrArg y.1.1 (Subsingleton.elim _ _)))
 
 end SlopeTestRemainingChoices
 
-private theorem exact_of_linearEquiv_conj {R X₁ X₂ X₃ Y₁ Y₂ Y₃ : Type*} [CommRing R]
-    [AddCommGroup X₁] [Module R X₁] [AddCommGroup X₂] [Module R X₂] [AddCommGroup X₃] [Module R X₃]
-    [AddCommGroup Y₁] [Module R Y₁] [AddCommGroup Y₂] [Module R Y₂] [AddCommGroup Y₃] [Module R Y₃]
+private theorem exact_of_linearEquiv_conj
+    {R X₁ X₂ X₃ Y₁ Y₂ Y₃ : Type*} [CommRing R] [AddCommGroup X₁] [Module R X₁] [AddCommGroup X₂]
+    [Module R X₂] [AddCommGroup X₃] [Module R X₃] [AddCommGroup Y₁] [Module R Y₁] [AddCommGroup Y₂]
+    [Module R Y₂] [AddCommGroup Y₃] [Module R Y₃]
     {f : X₁ →ₗ[R] X₂} {g : X₂ →ₗ[R] X₃} {f' : Y₁ →ₗ[R] Y₂} {g' : Y₂ →ₗ[R] Y₃}
     (e₁ : X₁ ≃ₗ[R] Y₁) (e₂ : X₂ ≃ₗ[R] Y₂) (e₃ : X₃ ≃ₗ[R] Y₃)
-    (hf : ∀ x, e₂ (f x) = f' (e₁ x)) (hg : ∀ x, e₃ (g x) = g' (e₂ x))
-    (h : Function.Exact f g) : Function.Exact f' g' := by
+    (hf : ∀ x, e₂ (f x) = f' (e₁ x)) (hg : ∀ x, e₃ (g x) = g' (e₂ x)) (h : Function.Exact f g)
+    : Function.Exact f' g' := by
   intro y
   obtain ⟨x, rfl⟩ := e₂.surjective y
   rw [← hg, LinearEquiv.map_eq_zero_iff, h x]
@@ -49,22 +52,26 @@ private theorem exact_of_linearEquiv_conj {R X₁ X₂ X₃ Y₁ Y₂ Y₃ : Typ
     rw [hf]
     exact hw
 
-private theorem injective_of_linearEquiv_conj {R X₁ X₂ Y₁ Y₂ : Type*} [CommRing R]
-    [AddCommGroup X₁] [Module R X₁] [AddCommGroup X₂] [Module R X₂]
-    [AddCommGroup Y₁] [Module R Y₁] [AddCommGroup Y₂] [Module R Y₂]
-    {f : X₁ →ₗ[R] X₂} {f' : Y₁ →ₗ[R] Y₂} (e₁ : X₁ ≃ₗ[R] Y₁) (e₂ : X₂ ≃ₗ[R] Y₂)
-    (hf : ∀ x, e₂ (f x) = f' (e₁ x)) (h : Function.Injective f) : Function.Injective f' := by
+private theorem injective_of_linearEquiv_conj
+    {R X₁ X₂ Y₁ Y₂ : Type*} [CommRing R] [AddCommGroup X₁] [Module R X₁] [AddCommGroup X₂]
+    [Module R X₂] [AddCommGroup Y₁] [Module R Y₁] [AddCommGroup Y₂] [Module R Y₂]
+    {f : X₁ →ₗ[R] X₂} {f' : Y₁ →ₗ[R] Y₂}
+    (e₁ : X₁ ≃ₗ[R] Y₁) (e₂ : X₂ ≃ₗ[R] Y₂) (hf : ∀ x, e₂ (f x) = f' (e₁ x))
+    (h : Function.Injective f)
+    : Function.Injective f' := by
   intro a b hab
   obtain ⟨x, rfl⟩ := e₁.surjective a
   obtain ⟨z, rfl⟩ := e₁.surjective b
   rw [← hf, ← hf] at hab
   rw [h (e₂.injective hab)]
 
-private theorem surjective_of_linearEquiv_conj {R X₁ X₂ Y₁ Y₂ : Type*} [CommRing R]
-    [AddCommGroup X₁] [Module R X₁] [AddCommGroup X₂] [Module R X₂]
-    [AddCommGroup Y₁] [Module R Y₁] [AddCommGroup Y₂] [Module R Y₂]
-    {f : X₁ →ₗ[R] X₂} {f' : Y₁ →ₗ[R] Y₂} (e₁ : X₁ ≃ₗ[R] Y₁) (e₂ : X₂ ≃ₗ[R] Y₂)
-    (hf : ∀ x, e₂ (f x) = f' (e₁ x)) (h : Function.Surjective f) : Function.Surjective f' := by
+private theorem surjective_of_linearEquiv_conj
+    {R X₁ X₂ Y₁ Y₂ : Type*} [CommRing R] [AddCommGroup X₁] [Module R X₁] [AddCommGroup X₂]
+    [Module R X₂] [AddCommGroup Y₁] [Module R Y₁] [AddCommGroup Y₂] [Module R Y₂]
+    {f : X₁ →ₗ[R] X₂} {f' : Y₁ →ₗ[R] Y₂}
+    (e₁ : X₁ ≃ₗ[R] Y₁) (e₂ : X₂ ≃ₗ[R] Y₂) (hf : ∀ x, e₂ (f x) = f' (e₁ x))
+    (h : Function.Surjective f)
+    : Function.Surjective f' := by
   intro y
   obtain ⟨x, hx⟩ := h (e₂.symm y)
   refine ⟨e₁ x, ?_⟩
@@ -75,39 +82,67 @@ theorem low_degree_long_exact_sequence : LowLESStatement.{u} := by
   have hses := admissibility_holds R G A B C i p hadm
   obtain ⟨⟨δ, hconn, hles⟩, -⟩ := lES_holds R _ _ _ i.hom p.hom hses
 
-  have n0 : ∀ x : C.H 0, h1EquivOfOrderTwo A (δ 0 x) =
-      ((h1EquivOfOrderTwo A).toLinearMap ∘ₗ δ 0 ∘ₗ (cohomZeroEquivContinuous C).symm.toLinearMap) (cohomZeroEquivContinuous C x) := by
+  have n0
+      : ∀ x : C.H 0,
+        h1EquivOfOrderTwo A (δ 0 x)
+          = ((h1EquivOfOrderTwo A).toLinearMap ∘ₗ δ 0
+              ∘ₗ (cohomZeroEquivContinuous C).symm.toLinearMap)
+            (cohomZeroEquivContinuous C x) := by
     intro x
     show h1EquivOfOrderTwo A (δ 0 x) = h1EquivOfOrderTwo A (δ 0 ((cohomZeroEquivContinuous C).symm (cohomZeroEquivContinuous C x)))
     rw [LinearEquiv.symm_apply_apply]
-  have n1 : ∀ x : C.H 1, h2EquivOfOrderTwo A (δ 1 x) =
-      ((h2EquivOfOrderTwo A).toLinearMap ∘ₗ δ 1 ∘ₗ (h1EquivOfOrderTwo C).symm.toLinearMap) (h1EquivOfOrderTwo C x) := by
+  have n1
+      : ∀ x : C.H 1,
+        h2EquivOfOrderTwo A (δ 1 x)
+          = ((h2EquivOfOrderTwo A).toLinearMap ∘ₗ δ 1 ∘ₗ (h1EquivOfOrderTwo C).symm.toLinearMap)
+            (h1EquivOfOrderTwo C x) := by
     intro x
     show h2EquivOfOrderTwo A (δ 1 x) = h2EquivOfOrderTwo A (δ 1 ((h1EquivOfOrderTwo C).symm (h1EquivOfOrderTwo C x)))
     rw [LinearEquiv.symm_apply_apply]
-  refine ⟨(h1EquivOfOrderTwo A).toLinearMap ∘ₗ δ 0 ∘ₗ (cohomZeroEquivContinuous C).symm.toLinearMap,
-    (h2EquivOfOrderTwo A).toLinearMap ∘ₗ δ 1 ∘ₗ (h1EquivOfOrderTwo C).symm.toLinearMap, ?_, ?_,
-    injective_of_linearEquiv_conj (cohomZeroEquivContinuous A) (cohomZeroEquivContinuous B) (fun x => lowLES_h0Equiv_pair i x) hles.inj,
-    exact_of_linearEquiv_conj (cohomZeroEquivContinuous A) (cohomZeroEquivContinuous B) (cohomZeroEquivContinuous C) (fun x => lowLES_h0Equiv_pair i x)
-      (fun x => lowLES_h0Equiv_pair p x) (hles.exB 0),
-    exact_of_linearEquiv_conj (cohomZeroEquivContinuous B) (cohomZeroEquivContinuous C) (h1EquivOfOrderTwo A) (fun x => lowLES_h0Equiv_pair p x)
+  refine ⟨
+    (h1EquivOfOrderTwo A).toLinearMap ∘ₗ δ 0 ∘ₗ (cohomZeroEquivContinuous C).symm.toLinearMap,
+    (h2EquivOfOrderTwo A).toLinearMap ∘ₗ δ 1 ∘ₗ (h1EquivOfOrderTwo C).symm.toLinearMap,
+    ?_,
+    ?_,
+    injective_of_linearEquiv_conj (cohomZeroEquivContinuous A) (cohomZeroEquivContinuous B)
+      (fun x => lowLES_h0Equiv_pair i x)
+      hles.inj,
+    exact_of_linearEquiv_conj (cohomZeroEquivContinuous A) (cohomZeroEquivContinuous B)
+      (cohomZeroEquivContinuous C)
+      (fun x => lowLES_h0Equiv_pair i x)
+      (fun x => lowLES_h0Equiv_pair p x)
+      (hles.exB 0),
+    exact_of_linearEquiv_conj (cohomZeroEquivContinuous B) (cohomZeroEquivContinuous C)
+      (h1EquivOfOrderTwo A)
+      (fun x => lowLES_h0Equiv_pair p x)
       n0 (hles.exC 0),
-    exact_of_linearEquiv_conj (cohomZeroEquivContinuous C) (h1EquivOfOrderTwo A) (h1EquivOfOrderTwo B) n0
-      (fun x => h1Equiv_pair (P := i) (x := x)) (hles.exA 0),
-    exact_of_linearEquiv_conj (h1EquivOfOrderTwo A) (h1EquivOfOrderTwo B) (h1EquivOfOrderTwo C) (fun x => h1Equiv_pair (P := i) (x := x))
-      (fun x => h1Equiv_pair (P := p) (x := x)) (hles.exB 1),
-    exact_of_linearEquiv_conj (h1EquivOfOrderTwo B) (h1EquivOfOrderTwo C) (h2EquivOfOrderTwo A) (fun x => h1Equiv_pair (P := p) (x := x))
+    exact_of_linearEquiv_conj (cohomZeroEquivContinuous C) (h1EquivOfOrderTwo A)
+      (h1EquivOfOrderTwo B) n0
+      (fun x => h1Equiv_pair (P := i) (x := x))
+      (hles.exA 0),
+    exact_of_linearEquiv_conj (h1EquivOfOrderTwo A) (h1EquivOfOrderTwo B) (h1EquivOfOrderTwo C)
+      (fun x => h1Equiv_pair (P := i) (x := x))
+      (fun x => h1Equiv_pair (P := p) (x := x))
+      (hles.exB 1),
+    exact_of_linearEquiv_conj (h1EquivOfOrderTwo B) (h1EquivOfOrderTwo C) (h2EquivOfOrderTwo A)
+      (fun x => h1Equiv_pair (P := p) (x := x))
       n1 (hles.exC 1),
     exact_of_linearEquiv_conj (h1EquivOfOrderTwo C) (h2EquivOfOrderTwo A) (h2EquivOfOrderTwo B) n1
-      (fun x => h2Equiv_pair (P := i) (x := x)) (hles.exA 1),
-    exact_of_linearEquiv_conj (h2EquivOfOrderTwo A) (h2EquivOfOrderTwo B) (h2EquivOfOrderTwo C) (fun x => h2Equiv_pair (P := i) (x := x))
-      (fun x => h2Equiv_pair (P := p) (x := x)) (hles.exB 2),
-    fun hsub => surjective_of_linearEquiv_conj (h2EquivOfOrderTwo B) (h2EquivOfOrderTwo C) (fun x => h2Equiv_pair (P := p) (x := x))
-      (fun y => (hles.exC 2 y).1 (@Subsingleton.elim _ hsub _ _))⟩
-  ·
-    intro c b a hb ha
+      (fun x => h2Equiv_pair (P := i) (x := x))
+      (hles.exA 1),
+    exact_of_linearEquiv_conj (h2EquivOfOrderTwo A) (h2EquivOfOrderTwo B) (h2EquivOfOrderTwo C)
+      (fun x => h2Equiv_pair (P := i) (x := x))
+      (fun x => h2Equiv_pair (P := p) (x := x))
+      (hles.exB 2),
+    fun hsub =>
+      surjective_of_linearEquiv_conj (h2EquivOfOrderTwo B) (h2EquivOfOrderTwo C)
+        (fun x => h2Equiv_pair (P := p) (x := x))
+        (fun y => (hles.exC 2 y).1 (@Subsingleton.elim _ hsub _ _))
+  ⟩
+  · intro c b a hb ha
     let b₀ : B.coch.X 0 := ⟨fun _ => b, continuous_const⟩
-    have hz : A.coch.d 1 ((oneCocyclesEquivFunctions A).symm a).1 = 0 := ((oneCocyclesEquivFunctions A).symm a).2
+    have hz : A.coch.d 1 ((oneCocyclesEquivFunctions A).symm a).1 = 0 :=
+      ((oneCocyclesEquivFunctions A).symm a).2
     have key : B.coch.d 0 b₀ = i.hom.f 1 ((oneCocyclesEquivFunctions A).symm a).1 := by
       apply Subtype.ext
       funext v
@@ -128,10 +163,10 @@ theorem low_degree_long_exact_sequence : LowLESStatement.{u} := by
     show h1EquivOfOrderTwo A (δ 0 ((cohomZeroEquivContinuous C).symm c)) = _
     rw [e₁, hconn 0 b₀ _ hcd hz key]
     exact e₂
-  ·
-    intro c b a hbc hpb hia
+  · intro c b a hbc hpb hia
     let b₁ : B.coch.X 1 := ⟨fun v => b (v 0), hbc.comp (continuous_apply 0)⟩
-    have hz : A.coch.d 2 ((twoCocyclesEquivFunctions A).symm a).1 = 0 := ((twoCocyclesEquivFunctions A).symm a).2
+    have hz : A.coch.d 2 ((twoCocyclesEquivFunctions A).symm a).1 = 0 :=
+      ((twoCocyclesEquivFunctions A).symm a).2
     have key : B.coch.d 1 b₁ = i.hom.f 2 ((twoCocyclesEquivFunctions A).symm a).1 := by
       apply Subtype.ext
       funext v
@@ -143,7 +178,9 @@ theorem low_degree_long_exact_sequence : LowLESStatement.{u} := by
     have hcd : C.coch.d 1 (p.hom.f 1 b₁) = 0 := by
       rw [← p.hom.comm, key]
       exact (hses.exact 2).apply_apply_eq_zero _
-    have e₁ : (h1EquivOfOrderTwo C).symm (Submodule.Quotient.mk c) = C.coch.cls 1 (p.hom.f 1 b₁) hcd := by
+    have e₁
+        : (h1EquivOfOrderTwo C).symm (Submodule.Quotient.mk c)
+          = C.coch.cls 1 (p.hom.f 1 b₁) hcd := by
       rw [LinearEquiv.symm_apply_eq]
       refine congrArg Submodule.Quotient.mk (Subtype.ext (funext fun g => ?_))
       show c.1 g = p.u (b (p.φ g))

@@ -18,13 +18,16 @@ private lemma entry_le {m n : ℕ} (x : Fin m → Fin n → ℂ) (a : Fin m) (j 
 
 end SupNormSqLeSumNormSq
 
-theorem UpperTheory.Reformulated.B.Yhb3.main :
-    ∀ {m n : ℕ} (x : Fin m → Fin n → ℂ), ‖x‖ ^ (2 : ℕ) ≤ ∑ a : Fin m, ∑ j : Fin n, ‖x a j‖ ^ (2 : ℕ) := by
+theorem UpperTheory.Reformulated.B.Yhb3.main
+    : ∀ {m n : ℕ} (x : Fin m → Fin n → ℂ),
+      ‖x‖ ^ (2 : ℕ) ≤ ∑ a : Fin m, ∑ j : Fin n, ‖x a j‖ ^ (2 : ℕ) := by
   intro m n x
   have hS : 0 ≤ ∑ a : Fin m, ∑ j : Fin n, ‖x a j‖ ^ (2 : ℕ) := by positivity
   have h : ‖x‖ ≤ Real.sqrt (∑ a : Fin m, ∑ j : Fin n, ‖x a j‖ ^ (2 : ℕ)) := by
     refine (pi_norm_le_iff_of_nonneg (Real.sqrt_nonneg _)).2 fun a => ?_
-    exact (pi_norm_le_iff_of_nonneg (Real.sqrt_nonneg _)).2 fun j => SupNormSqLeSumNormSq.entry_le x a j
-  calc ‖x‖ ^ (2 : ℕ) ≤ (Real.sqrt (∑ a : Fin m, ∑ j : Fin n, ‖x a j‖ ^ (2 : ℕ))) ^ (2 : ℕ) :=
-        pow_le_pow_left₀ (norm_nonneg _) h 2
+    exact (pi_norm_le_iff_of_nonneg (Real.sqrt_nonneg _)).2 fun j =>
+      SupNormSqLeSumNormSq.entry_le x a j
+  calc
+    ‖x‖ ^ (2 : ℕ) ≤ (Real.sqrt (∑ a : Fin m, ∑ j : Fin n, ‖x a j‖ ^ (2 : ℕ))) ^ (2 : ℕ) :=
+      pow_le_pow_left₀ (norm_nonneg _) h 2
     _ = _ := Real.sq_sqrt hS

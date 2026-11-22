@@ -294,10 +294,14 @@ private lemma isLog_commute {ι : Type} [Fintype ι] [DecidableEq ι] {H A : Mat
     diagonal_mul_diagonal, diagonal_mul_diagonal]
   simp only [mul_comm]
 
-
 open Matrix Polynomial in
 open scoped Kronecker ComplexOrder TensorProduct in
-theorem _root_.GlobalTheory.ClassFin.exists_conj_harm_of_span : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (σ : Type) [Fintype σ] (τ : σ ≃ σ) (g : σ → Matrix ι ι ℂ), (∀ s, g (τ s) * g s = 1) → Submodule.span ℂ (Set.range g) = ⊤ → ∃ P : Matrix ι ι ℂ, IsUnit P.det ∧ _root_.GlobalTheory.ClassFin.Harm (fun s => P * g s * P⁻¹) := by
+theorem _root_.GlobalTheory.ClassFin.exists_conj_harm_of_span
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (σ : Type) [Fintype σ] (τ : σ ≃ σ)
+        (g : σ → Matrix ι ι ℂ),
+      (∀ s, g (τ s) * g s = 1) → Submodule.span ℂ (Set.range g) = ⊤
+        → ∃ P : Matrix ι ι ℂ,
+          IsUnit P.det ∧ _root_.GlobalTheory.ClassFin.Harm (fun s => P * g s * P⁻¹) := by
   intro ι _ _ σ _ τ g hτ hspan
   have hdet : ∀ s, IsUnit (g s).det := fun s => Matrix.isUnit_det_of_left_inverse (hτ s)
   obtain ⟨P, H, hP, hH, hmin⟩ := _root_.GlobalTheory.ClassFin.exists_energy_min ι σ g hdet hspan
@@ -305,26 +309,27 @@ theorem _root_.GlobalTheory.ClassFin.exists_conj_harm_of_span : ∀ (ι : Type) 
   have hPP : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul P hP
   have hPP' : P * P⁻¹ = 1 := Matrix.mul_nonsing_inv P hP
   obtain ⟨h, hh⟩ : ∃ h : σ → Matrix ι ι ℂ, h = fun s => P * g s * P⁻¹ := ⟨_, rfl⟩
-  have hH' : ∀ s, _root_.GlobalTheory.ClassFin.IsLog (H s) ((h s)ᴴ * h s) := by intro s; rw [hh]; exact hH s
+  have hH' : ∀ s, _root_.GlobalTheory.ClassFin.IsLog (H s) ((h s)ᴴ * h s) := by
+    intro s; rw [hh]; exact hH s
   have hτh : ∀ s, h (τ s) * h s = 1 := by
     intro s
     simp only [hh, Matrix.mul_assoc]
-    rw [← Matrix.mul_assoc P⁻¹ P, hPP, Matrix.one_mul, ← Matrix.mul_assoc (g (τ s)), hτ s, Matrix.one_mul, hPP']
+    rw [← Matrix.mul_assoc P⁻¹ P, hPP, Matrix.one_mul, ← Matrix.mul_assoc (g (τ s)), hτ s,
+      Matrix.one_mul, hPP']
   have hhdet : ∀ s, IsUnit (h s).det := fun s => Matrix.isUnit_det_of_left_inverse (hτh s)
   have hinv2 : ∀ s, (h (τ s))⁻¹ = h s := fun s => Matrix.inv_eq_right_inv (hτh s)
   have hhs : ∀ s, h s * (h s)⁻¹ = 1 := fun s => Matrix.mul_nonsing_inv _ (hhdet s)
   have hhs' : ∀ s, (h s)⁻¹ * h s = 1 := fun s => Matrix.nonsing_inv_mul _ (hhdet s)
-  have hconj : ∀ s, -H (τ s) = h s * H s * (h s)⁻¹ := by
+  have hconj : ∀ s, - H (τ s) = h s * H s * (h s)⁻¹ := by
     intro s
-    have hk : IsUnit ((h s)⁻¹).det := by
-      rw [Matrix.det_nonsing_inv]; exact (hhdet s).ringInverse
+    have hk : IsUnit ((h s)⁻¹).det := by rw [Matrix.det_nonsing_inv]; exact (hhdet s).ringInverse
     have := isLog_eq_conj_of_conj (hH' s) (isLog_neg_inv (hH' (τ s))) hk ?_
     · rwa [Matrix.nonsing_inv_nonsing_inv _ (hhdet s)] at this
-    · rw [Matrix.nonsing_inv_nonsing_inv _ (hhdet s), Matrix.mul_inv_rev, hinv2, ← Matrix.conjTranspose_nonsing_inv,
-        hinv2]
+    · rw [Matrix.nonsing_inv_nonsing_inv _ (hhdet s), Matrix.mul_inv_rev, hinv2,
+        ← Matrix.conjTranspose_nonsing_inv, hinv2]
       simp only [Matrix.mul_assoc, hhs, Matrix.mul_one]
   have hHerm : ∀ s, (H s)ᴴ = H s := fun s => isLog_isHermitian (hH' s)
-  have htrτ : ∀ s, Matrix.trace (H (τ s)) = -Matrix.trace (H s) := by
+  have htrτ : ∀ s, Matrix.trace (H (τ s)) = - Matrix.trace (H s) := by
     intro s
     have := congrArg Matrix.trace (hconj s)
     rw [trace_neg, Matrix.mul_assoc, trace_mul_comm, Matrix.mul_assoc, hhs', Matrix.mul_one] at this
@@ -333,15 +338,19 @@ theorem _root_.GlobalTheory.ClassFin.exists_conj_harm_of_span : ∀ (ι : Type) 
   · rw [conjTranspose_sum]
     exact Finset.sum_congr rfl fun s _ => hHerm s
   · rw [trace_sum]
-    have h1 : ∑ s, Matrix.trace (H (τ s)) = ∑ s, Matrix.trace (H s) := Equiv.sum_comp τ (fun s => Matrix.trace (H s))
+    have h1 : ∑ s, Matrix.trace (H (τ s)) = ∑ s, Matrix.trace (H s) :=
+      Equiv.sum_comp τ (fun s => Matrix.trace (H s))
     simp only [htrτ, Finset.sum_neg_distrib] at h1
     linear_combination -h1 / 2
   · intro N hNN
-    have hb := fun s => re_trace_isLog_sq_le_second_order (H s) ((h s)ᴴ * h s)
-      ((h s)ᴴ * (N + Nᴴ) * h s - Nᴴ * ((h s)ᴴ * h s) - (h s)ᴴ * h s * N)
-      ((h s)ᴴ * Nᴴ * N * h s - Nᴴ * ((h s)ᴴ * (N + Nᴴ) * h s) - (h s)ᴴ * (N + Nᴴ) * h s * N + Nᴴ * ((h s)ᴴ * h s) * N)
-      (-(Nᴴ * ((h s)ᴴ * Nᴴ * N * h s)) - (h s)ᴴ * Nᴴ * N * h s * N + Nᴴ * ((h s)ᴴ * (N + Nᴴ) * h s) * N)
-      (Nᴴ * ((h s)ᴴ * Nᴴ * N * h s) * N) (hH' s)
+    have hb := fun s =>
+      re_trace_isLog_sq_le_second_order (H s) ((h s)ᴴ * h s)
+        ((h s)ᴴ * (N + Nᴴ) * h s - Nᴴ * ((h s)ᴴ * h s) - (h s)ᴴ * h s * N)
+        ((h s)ᴴ * Nᴴ * N * h s - Nᴴ * ((h s)ᴴ * (N + Nᴴ) * h s) - (h s)ᴴ * (N + Nᴴ) * h s * N
+          + Nᴴ * ((h s)ᴴ * h s) * N)
+        (-(Nᴴ * ((h s)ᴴ * Nᴴ * N * h s)) - (h s)ᴴ * Nᴴ * N * h s * N
+          + Nᴴ * ((h s)ᴴ * (N + Nᴴ) * h s) * N)
+        (Nᴴ * ((h s)ᴴ * Nᴴ * N * h s) * N) (hH' s)
     choose K ε hε hK using hb
     set ℓ : σ → ℝ := fun s => Complex.re (Matrix.trace (H s * ((h s)ᴴ * h s)⁻¹ *
       ((h s)ᴴ * (N + Nᴴ) * h s - Nᴴ * ((h s)ᴴ * h s) - (h s)ᴴ * h s * N))) with hℓ
@@ -351,7 +360,10 @@ theorem _root_.GlobalTheory.ClassFin.exists_conj_harm_of_span : ∀ (ι : Type) 
     have hε0s : ∀ s, ε0 ≤ ε s := by
       intro s
       have h1 : 1 / ε s ≤ ∑ s, 1 / ε s :=
-        Finset.single_le_sum (f := fun s => 1 / ε s) (fun s _ => (one_div_pos.mpr (hε s)).le) (Finset.mem_univ s)
+        Finset.single_le_sum
+          (f := fun s => 1 / ε s)
+          (fun s _ => (one_div_pos.mpr (hε s)).le)
+          (Finset.mem_univ s)
       rw [hε0_def, div_le_iff₀ (by positivity)]
       have := hε s
       rw [div_le_iff₀ this] at h1
@@ -363,14 +375,19 @@ theorem _root_.GlobalTheory.ClassFin.exists_conj_harm_of_span : ∀ (ι : Type) 
       have hQdet : IsUnit (1 + (t : ℂ) • N).det := Matrix.isUnit_det_of_right_inverse hQQ
       have hQ'det : IsUnit (1 - (t : ℂ) • N).det := Matrix.isUnit_det_of_left_inverse hQQ
       have hP' : IsUnit ((1 + (t : ℂ) • N) * P).det := by rw [Matrix.det_mul]; exact hQdet.mul hP
-      have hinvQP : ((1 + (t : ℂ) • N) * P)⁻¹ = P⁻¹ * (1 - (t : ℂ) • N) := Matrix.inv_eq_right_inv (by
-        rw [Matrix.mul_assoc, ← Matrix.mul_assoc P, hPP', Matrix.one_mul, hQQ])
-      have hconjQ : ∀ s, (1 + (t : ℂ) • N) * P * g s * ((1 + (t : ℂ) • N) * P)⁻¹ =
-          (1 + (t : ℂ) • N) * h s * (1 - (t : ℂ) • N) := by
+      have hinvQP : ((1 + (t : ℂ) • N) * P)⁻¹ = P⁻¹ * (1 - (t : ℂ) • N) :=
+        Matrix.inv_eq_right_inv (by
+          rw [Matrix.mul_assoc, ← Matrix.mul_assoc P, hPP', Matrix.one_mul, hQQ])
+      have hconjQ
+          : ∀ s,
+            (1 + (t : ℂ) • N) * P * g s * ((1 + (t : ℂ) • N) * P)⁻¹
+              = (1 + (t : ℂ) • N) * h s * (1 - (t : ℂ) • N) := by
         intro s; rw [hinvQP, hh]; simp only [Matrix.mul_assoc]
-      have hex : ∀ s, ∃ H'' : Matrix ι ι ℂ, _root_.GlobalTheory.ClassFin.IsLog H''
-          (((1 + (t : ℂ) • N) * P * g s * ((1 + (t : ℂ) • N) * P)⁻¹)ᴴ *
-            ((1 + (t : ℂ) • N) * P * g s * ((1 + (t : ℂ) • N) * P)⁻¹)) := by
+      have hex
+          : ∀ s, ∃ H'' : Matrix ι ι ℂ,
+            _root_.GlobalTheory.ClassFin.IsLog H''
+              (((1 + (t : ℂ) • N) * P * g s * ((1 + (t : ℂ) • N) * P)⁻¹)ᴴ
+                * ((1 + (t : ℂ) • N) * P * g s * ((1 + (t : ℂ) • N) * P)⁻¹)) := by
         intro s
         rw [hconjQ]
         refine _root_.GlobalTheory.ClassFin.exists_isLog_gram ι _ ?_
@@ -378,8 +395,10 @@ theorem _root_.GlobalTheory.ClassFin.exists_conj_harm_of_span : ∀ (ι : Type) 
         exact (hQdet.mul (hhdet s)).mul hQ'det
       choose H'' hH'' using hex
       have hm := hmin ((1 + (t : ℂ) • N) * P) H'' hP' hH''
-      have hbound : ∀ s, Complex.re (Matrix.trace (H'' s * H'' s)) ≤ Complex.re (Matrix.trace (H s * H s)) +
-          t * (2 * ℓ s) + t ^ 2 * K s := by
+      have hbound
+          : ∀ s,
+            Complex.re (Matrix.trace (H'' s * H'' s))
+              ≤ Complex.re (Matrix.trace (H s * H s)) + t * (2 * ℓ s) + t ^ 2 * K s := by
         intro s
         apply hK s t (lt_of_lt_of_le ht (hε0s s))
         have h1 := hH'' s
@@ -389,13 +408,21 @@ theorem _root_.GlobalTheory.ClassFin.exists_conj_harm_of_span : ∀ (ι : Type) 
         rw [he] at h1
         exact h1
       have hsum := Finset.sum_le_sum fun s (_ : s ∈ Finset.univ) => hbound s
-      rw [Finset.sum_add_distrib, Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum] at hsum
-      have hm' : ∑ s, Complex.re (Matrix.trace (H s * H s)) ≤ ∑ s, Complex.re (Matrix.trace (H'' s * H'' s)) := hm
+      rw [Finset.sum_add_distrib, Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum,
+          ← Finset.mul_sum]
+        at hsum
+      have hm'
+          : ∑ s, Complex.re (Matrix.trace (H s * H s))
+            ≤ ∑ s, Complex.re (Matrix.trace (H'' s * H'' s)) :=
+        hm
       linarith
     have hL := eq_zero_of_nonneg_linear_add_quadratic hε0 hlin
-    have hℓs : ∀ s, Matrix.trace (H s * ((h s)ᴴ * h s)⁻¹ *
-        ((h s)ᴴ * (N + Nᴴ) * h s - Nᴴ * ((h s)ᴴ * h s) - (h s)ᴴ * h s * N)) =
-        -Matrix.trace (H (τ s) * (N + Nᴴ)) - Matrix.trace (H s * (N + Nᴴ)) := by
+    have hℓs
+        : ∀ s,
+          Matrix.trace
+              (H s * ((h s)ᴴ * h s)⁻¹
+                * ((h s)ᴴ * (N + Nᴴ) * h s - Nᴴ * ((h s)ᴴ * h s) - (h s)ᴴ * h s * N))
+            = - Matrix.trace (H (τ s) * (N + Nᴴ)) - Matrix.trace (H s * (N + Nᴴ)) := by
       intro s
       have hcdet : IsUnit ((h s)ᴴ).det := by rw [Matrix.det_conjTranspose]; exact (hhdet s).star
       have hAdet : IsUnit ((h s)ᴴ * h s).det := by rw [Matrix.det_mul]; exact hcdet.mul (hhdet s)
@@ -404,23 +431,31 @@ theorem _root_.GlobalTheory.ClassFin.exists_conj_harm_of_span : ∀ (ι : Type) 
       have hA1 : ((h s)ᴴ * h s)⁻¹ * ((h s)ᴴ * h s) = 1 := Matrix.nonsing_inv_mul _ hAdet
       have hA2 : ((h s)ᴴ * h s) * ((h s)ᴴ * h s)⁻¹ = 1 := Matrix.mul_nonsing_inv _ hAdet
       have hcomm := isLog_commute (hH' s)
-      have t1 : Matrix.trace (H s * ((h s)ᴴ * h s)⁻¹ * ((h s)ᴴ * (N + Nᴴ) * h s)) =
-          -Matrix.trace (H (τ s) * (N + Nᴴ)) := by
+      have t1
+          : Matrix.trace (H s * ((h s)ᴴ * h s)⁻¹ * ((h s)ᴴ * (N + Nᴴ) * h s))
+            = - Matrix.trace (H (τ s) * (N + Nᴴ)) := by
         have hτ' : H (τ s) = -(h s * H s * (h s)⁻¹) := by rw [← hconj s, neg_neg]
         rw [hAinv, hτ', Matrix.neg_mul, trace_neg, neg_neg,
-          show H s * ((h s)⁻¹ * ((h s)ᴴ)⁻¹) * ((h s)ᴴ * (N + Nᴴ) * h s) = (H s * (h s)⁻¹ * (N + Nᴴ)) * h s by
+          show H s * ((h s)⁻¹ * ((h s)ᴴ)⁻¹) * ((h s)ᴴ * (N + Nᴴ) * h s)
+              = (H s * (h s)⁻¹ * (N + Nᴴ)) * h s by
             simp only [Matrix.mul_assoc]; rw [← Matrix.mul_assoc ((h s)ᴴ)⁻¹, hc', Matrix.one_mul],
           trace_mul_comm]
         simp only [Matrix.mul_assoc]
-      have t2 : Matrix.trace (H s * ((h s)ᴴ * h s)⁻¹ * (Nᴴ * ((h s)ᴴ * h s))) = Matrix.trace (H s * Nᴴ) := by
+      have t2
+          : Matrix.trace (H s * ((h s)ᴴ * h s)⁻¹ * (Nᴴ * ((h s)ᴴ * h s)))
+            = Matrix.trace (H s * Nᴴ) := by
         rw [← Matrix.mul_assoc, trace_mul_comm, ← Matrix.mul_assoc, ← Matrix.mul_assoc, ← hcomm,
           Matrix.mul_assoc (H s), hA2, Matrix.mul_one]
-      have t3 : Matrix.trace (H s * ((h s)ᴴ * h s)⁻¹ * ((h s)ᴴ * h s * N)) = Matrix.trace (H s * N) := by
+      have t3
+          : Matrix.trace (H s * ((h s)ᴴ * h s)⁻¹ * ((h s)ᴴ * h s * N))
+            = Matrix.trace (H s * N) := by
         rw [Matrix.mul_assoc, ← Matrix.mul_assoc _ _ N, hA1, Matrix.one_mul]
-      rw [Matrix.mul_sub, Matrix.mul_sub, trace_sub, trace_sub, t1, t2, t3, Matrix.mul_add (H s) N Nᴴ, trace_add]
+      rw [Matrix.mul_sub, Matrix.mul_sub, trace_sub, trace_sub, t1, t2, t3,
+        Matrix.mul_add (H s) N Nᴴ, trace_add]
       ring
     have hsumℓ : ∑ s, ℓ s = -2 * Complex.re (Matrix.trace ((∑ s, H s) * (N + Nᴴ))) := by
-      simp only [hℓ, hℓs, Complex.sub_re, Complex.neg_re, Finset.sum_sub_distrib, Finset.sum_neg_distrib]
+      simp only [hℓ, hℓs, Complex.sub_re, Complex.neg_re, Finset.sum_sub_distrib,
+        Finset.sum_neg_distrib]
       have e := Equiv.sum_comp τ (fun s => Complex.re (Matrix.trace (H s * (N + Nᴴ))))
       rw [e, Finset.sum_mul, trace_sum, Complex.re_sum]
       ring

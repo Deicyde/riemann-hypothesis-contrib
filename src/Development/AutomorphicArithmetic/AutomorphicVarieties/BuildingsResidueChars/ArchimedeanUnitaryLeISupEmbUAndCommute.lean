@@ -13,15 +13,14 @@ section
 open GlobalTheory.DefU Matrix
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-private theorem infinite_unitary_generated_by_embeddings (s : Finset (InfinitePlace E)) :
-    ∀ g ∈ infU E n, (∀ w, w ∉ s → evGL w (cInf g) = 1) → g ∈ ⨆ τ : E →+* ℂ, embU n τ := by
+private theorem infinite_unitary_generated_by_embeddings (s : Finset (InfinitePlace E))
+    : ∀ g ∈ infU E n, (∀ w, w ∉ s → evGL w (cInf g) = 1) → g ∈ ⨆ τ : E →+* ℂ, embU n τ := by
   classical
   induction s using Finset.induction_on with
   | empty =>
     intro g hg h
     have h2 : GeneralLinearGroup.map (pFin E) g.1 = 1 := hg
-    have h1 : cInf g = 1 := gl_ext_evGL fun w => by
-      rw [h w (Finset.notMem_empty w), map_one]
+    have h1 : cInf g = 1 := gl_ext_evGL fun w => by rw [h w (Finset.notMem_empty w), map_one]
     have : g = 1 := by
       refine Subtype.ext (ga_ext ?_ ?_)
       · change cInf g = cInf 1
@@ -47,10 +46,19 @@ private theorem infinite_unitary_generated_by_embeddings (s : Finset (InfinitePl
 end
 
 open GlobalTheory.DefU Matrix in
-theorem UpperTheory.archimedeanUnitary_le_iSup_embU_and_commute :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ), infU E n ≤ (⨆ τ : E →+* ℂ, embU n τ) ∧ ∀ τ τ' : E →+* ℂ, InfinitePlace.mk τ ≠ InfinitePlace.mk τ' → ∀ a ∈ embU (E := E) n τ, ∀ b ∈ embU n τ', a * b = b * a := by
+theorem UpperTheory.archimedeanUnitary_le_iSup_embU_and_commute
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ),
+      infU E n ≤ (⨆ τ : E →+* ℂ, embU n τ)
+        ∧ ∀ τ τ' : E →+* ℂ,
+          InfinitePlace.mk τ ≠ InfinitePlace.mk τ'
+            → ∀ a ∈ embU (E := E) n τ, ∀ b ∈ embU n τ', a * b = b * a := by
   intro E _ _ _ n
-  refine ⟨fun g hg => infinite_unitary_generated_by_embeddings Finset.univ g hg fun w hw => (hw (Finset.mem_univ w)).elim, ?_⟩
+  refine ⟨
+    fun g hg =>
+      infinite_unitary_generated_by_embeddings Finset.univ g hg fun w hw =>
+        (hw (Finset.mem_univ w)).elim,
+    ?_
+  ⟩
   intro τ τ' hne a ha b hb
   have h2 : GeneralLinearGroup.map (pFin E) b.1 = 1 := hb.1
   refine Subtype.ext (ga_ext ?_ ?_)

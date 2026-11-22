@@ -7,8 +7,10 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.KappaEndpoints
 @[expose] public section
 
 open scoped Classical ENNReal Pointwise
-open MeasureTheory Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full
-  Formalism.L2.SG.LocWSOf Formalism.MainNotions.S.Cnt Formalism.L2.SG.KappaOffDiagonal Formalism.MainNotions.LatticeGluingRadicals
+open MeasureTheory Matrix NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.LocWSOf Formalism.MainNotions.S.Cnt
+  Formalism.L2.SG.KappaOffDiagonal Formalism.MainNotions.LatticeGluingRadicals
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -17,8 +19,10 @@ namespace GlobalTheory.RowsOrb
 
 variable {D : D7}
 
-theorem eq_zero_of_mem_span_eX (X : HidaSetting D) (w : (VS D).V)
-    (hw : w ∈ Submodule.span D.host.E (Set.range X.eX)) (hf : ∀ b, (VS D).hT (X.fY b) w = 0) : w = 0 := by
+theorem eq_zero_of_mem_span_eX
+    (X : HidaSetting D) (w : (VS D).V)
+    (hw : w ∈ Submodule.span D.host.E (Set.range X.eX)) (hf : ∀ b, (VS D).hT (X.fY b) w = 0)
+    : w = 0 := by
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun D.host.E).1 hw
   have hc : ∀ b, c b = 0 := by
     intro b
@@ -33,7 +37,9 @@ theorem eq_zero_of_mem_span_eX (X : HidaSetting D) (w : (VS D).V)
     exact h
   simp [hc]
 
-theorem pd_hU : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word), GlobalTheory.Mass.PD (GlobalTheory.RowsOrb.hU X u) := by
+theorem pd_hU
+    : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word),
+      GlobalTheory.Mass.PD (GlobalTheory.RowsOrb.hU X u) := by
   intro D X u τ x hx
   have hpos : (GlobalTheory.TypeAsm.F0 X u).PosDefAt τ :=
     Formalism.MainNotions.KappaEndpoints.nf_pos (lf D (X.Fu u)) (GlobalTheory.TypeAsm.tu_ne D u)
@@ -45,7 +51,9 @@ theorem pd_hU : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word), GlobalThe
     intro h
     apply hx
     exact Subtype.ext (Subtype.ext h)
-  have h1 : ∀ a : Fin (D.R.rS + 1), (GlobalTheory.TypeAsm.HV D).B ((GlobalTheory.TypeAsm.F0 X u).e a) w = 0 := by
+  have h1
+      : ∀ a : Fin (D.R.rS + 1),
+        (GlobalTheory.TypeAsm.HV D).B ((GlobalTheory.TypeAsm.F0 X u).e a) w = 0 := by
     intro a
     change (VS D).hT w ((X.Fu u).fvec a) = 0
     induction a using Fin.lastCases with

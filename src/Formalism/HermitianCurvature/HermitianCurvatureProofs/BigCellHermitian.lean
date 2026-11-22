@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.BigCellHermitian
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF Formalism.FourierDecayAlt.P.TwoByOneBlock
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF Formalism.FourierDecayAlt.P.TwoByOneBlock
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -44,11 +45,12 @@ lemma herm_bigCell (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) 
   conv_lhs => rw [← jV_wbPart hz', ← jV_wbPart hz]
   rw [bigCell_mulVec_jV, herm_jV]
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
-theorem gqDom (D : RealPlaceData k r Wp Wq) {q : (Fin r → ℂ) × ℂ} (hq : q ∈ QDom k r D.z D.z') :
-    gq D q ∈ Om k r D.z D.z' := by
+theorem gqDom (D : RealPlaceData k r Wp Wq) {q : (Fin r → ℂ) × ℂ} (hq : q ∈ QDom k r D.z D.z')
+    : gq D q ∈ Om k r D.z D.z' := by
   obtain ⟨hc, hζ⟩ := hq
   have hsec := D.sec.2 q.2 hζ
   have hmin := big_cell_minors_holds k r D.z D.z' q.1 (D.μsec q.2) D.z_mem D.z'_mem
@@ -65,11 +67,13 @@ theorem gqDom (D : RealPlaceData k r Wp Wq) {q : (Fin r → ℂ) × ℂ} (hq : q
     set P := Dmin k r D.z D.z' (bigCell k r q.1 (D.μsec q.2)) ⟨r, by omega⟩ with hP
     have hP0 : P ≠ 0 := by
       have : P = ∏ a : Fin r with a.val < (Fin.last r).val, q.1 a := hr
-      rw [this]; exact Finset.prod_ne_zero_iff.2 fun a _ => hc a
+      rw [this]
+      exact Finset.prod_ne_zero_iff.2 fun a _ => hc a
     have hlast : Dmin k r D.z D.z' (bigCell k r q.1 (D.μsec q.2)) (Fin.last (r + 1)) = q.2 * P := by
       unfold zeta at hz
       rw [← hP] at hz
-      have h2 := div_mul_cancel₀ (Dmin k r D.z D.z' (bigCell k r q.1 (D.μsec q.2)) (Fin.last (r + 1))) hP0
+      have h2 :=
+        div_mul_cancel₀ (Dmin k r D.z D.z' (bigCell k r q.1 (D.μsec q.2)) (Fin.last (r + 1))) hP0
       rw [hz] at h2
       exact h2.symm
     show 0 < Gf k r D.z D.z' (gq D q)
@@ -78,6 +82,7 @@ theorem gqDom (D : RealPlaceData k r Wp Wq) {q : (Fin r → ℂ) × ℂ} (hq : q
     have h1 : 0 < Complex.normSq P := Complex.normSq_pos.2 hP0
     nlinarith
 
-theorem _root_.Formalism.FourierDecayAlt.P.big_cell_domain : GqDom := fun _ _ _ _ _ _ _ _ D _ hq => gqDom D hq
+theorem _root_.Formalism.FourierDecayAlt.P.big_cell_domain : GqDom := fun _ _ _ _ _ _ _ _ D _ hq =>
+  gqDom D hq
 
 end Formalism.FourierDecayAlt.P.BigCellHermitian

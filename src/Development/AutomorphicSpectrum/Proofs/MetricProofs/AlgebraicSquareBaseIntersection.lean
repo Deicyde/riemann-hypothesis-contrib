@@ -10,16 +10,23 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.AlgebraicSquar
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI ReciprocityTheory.ChartRestriction.G.AI.I1
+  ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4
+  GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
+  GroundTheory.Heights₂.Heights.LowerBoundFree
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.SqFirst
 
-theorem isSmoothHerm_of_pull {K K' : Type} [Fintype K] [Fintype K'] {ι : K → Type} {ι' : K' → Type}
-    [∀ k, Fintype (ι k)] [∀ k, Fintype (ι' k)] {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')}
-    {A : HermLine ι} {A' : HermLine ι'} (hb : IsBlockMap κ v) (hA : IsSmoothHerm A)
-    (hp : IsPullHerm κ v A A') : IsSmoothHerm A' := by
+theorem isSmoothHerm_of_pull
+    {K K' : Type} [Fintype K] [Fintype K']
+    {ι : K → Type} {ι' : K' → Type} [∀ k, Fintype (ι k)] [∀ k, Fintype (ι' k)]
+    {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} {A : HermLine ι} {A' : HermLine ι'}
+    (hb : IsBlockMap κ v) (hA : IsSmoothHerm A) (hp : IsPullHerm κ v A A')
+    : IsSmoothHerm A' := by
   have hh : A'.h = A.h ∘ (fun (z' : (Σ k', ι' k') → ℂ) (p : Σ k, ι k) => z' (v p)) := funext hp.2
   unfold IsSmoothHerm
   rw [hh]
@@ -37,9 +44,10 @@ theorem isSmoothHerm_of_pull {K K' : Type} [Fintype K] [Fintype K'] {ι : K → 
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem pull_one_of_base {P : Ideal (MRing ι)} {d : ℕ} {k₀ : K} {xi2 : K → ℤ} (Q : AlgSq P d k₀ xi2)
-    {A : HermLine ι} {A₀ : HermLine Q.ιW} (hb : FromBase k₀ A) (h : IsPullHerm (Q.κ 0) (Q.v 0) A A₀) :
-    IsPullHerm (Q.κ 1) (Q.v 1) A A₀ := by
+theorem pull_one_of_base
+    {P : Ideal (MRing ι)} {d : ℕ} {k₀ : K} {xi2 : K → ℤ} (Q : AlgSq P d k₀ xi2)
+    {A : HermLine ι} {A₀ : HermLine Q.ιW} (hb : FromBase k₀ A) (h : IsPullHerm (Q.κ 0) (Q.v 0) A A₀)
+    : IsPullHerm (Q.κ 1) (Q.v 1) A A₀ := by
   have hκ : ∀ k, k ≠ k₀ → Q.κ 0 k = Q.κ 1 k := fun k hk => by
     obtain ⟨i, -⟩ := Q.arithY.2.1.2.2 k
     have := congrArg Sigma.fst (Q.same ⟨k, i⟩ hk)
@@ -65,48 +73,69 @@ theorem pull_one_of_base {P : Ideal (MRing ι)} {d : ℕ} {k₀ : K} {xi2 : K �
   · rw [h.2]
     exact hb.2 _ _ fun p hp => by rw [Q.same p hp]
 
-theorem swap_nat {V : Type*} {n : ℕ} (I : (Fin n → V) → ℝ) (S : V → Prop)
-    (hI : ∀ L : Fin n → V, (∀ j, S (L j)) → ∀ σ : Equiv.Perm (Fin n), I (L ∘ σ) = I L)
-    (f : ℕ → V) (hf : ∀ j, S (f j)) (a b : ℕ) (ha : a < n) (hb : b < n) :
-    I (fun j => f j) = I (fun j => f (if (j : ℕ) = a then b else if (j : ℕ) = b then a else j)) := by
+theorem swap_nat
+    {V : Type*} {n : ℕ} (I : (Fin n → V) → ℝ) (S : V → Prop)
+    (hI : ∀ L : Fin n → V, (∀ j, S (L j)) → ∀ σ : Equiv.Perm (Fin n), I (L ∘ σ) = I L) (f : ℕ → V)
+    (hf : ∀ j, S (f j))
+    (a b : ℕ) (ha : a < n) (hb : b < n)
+    : I (fun j => f j)
+      = I (fun j =>
+        f
+          (if (j : ℕ) = a then
+             b
+           else if (j : ℕ) = b then
+             a
+           else
+             j)) := by
   rw [← hI (fun j => f j) (fun j => hf j) (Equiv.swap ⟨a, ha⟩ ⟨b, hb⟩)]
   congr 1
   funext j
   simp [Equiv.swap_apply_def, Fin.ext_iff]
   split_ifs <;> rfl
 
-theorem interp_mem {V : Type*} {S : V → Prop} {x₁ x₂ a : V} (h₁ : S x₁) (h₂ : S x₂) (h₃ : S a)
-    (k i j : ℕ) : S (interp k i x₁ x₂ a j) := by
+theorem interp_mem
+    {V : Type*} {S : V → Prop} {x₁ x₂ a : V} (h₁ : S x₁) (h₂ : S x₂) (h₃ : S a) (k i j : ℕ)
+    : S (interp k i x₁ x₂ a j) := by
   unfold interp
   split_ifs <;> assumption
 
-theorem consWord_mem {V : Type*} {S : V → Prop} {x x₁ x₂ a : V} (h₀ : S x) (h₁ : S x₁) (h₂ : S x₂)
-    (h₃ : S a) (k i j : ℕ) : S (consWord k i x x₁ x₂ a j) := by
+theorem consWord_mem
+    {V : Type*} {S : V → Prop} {x x₁ x₂ a : V} (h₀ : S x) (h₁ : S x₁) (h₂ : S x₂) (h₃ : S a)
+    (k i j : ℕ)
+    : S (consWord k i x x₁ x₂ a j) := by
   unfold consWord
   split_ifs <;> assumption
 
-theorem word_mem {V : Type*} {S : V → Prop} {x₁ x₂ a : V} (h₁ : S x₁) (h₂ : S x₂) (h₃ : S a)
-    (D k i : ℕ) (j : Fin D) : S (word D k i x₁ x₂ a j) := by
+theorem word_mem
+    {V : Type*} {S : V → Prop} {x₁ x₂ a : V} (h₁ : S x₁) (h₂ : S x₂) (h₃ : S a)
+    (D k i : ℕ) (j : Fin D)
+    : S (word D k i x₁ x₂ a j) := by
   unfold word
   split_ifs <;> assumption
 
-theorem consWord_left {V : Type*} {D : ℕ} (I : (Fin (D + 2) → V) → ℝ) (S : V → Prop)
+theorem consWord_left
+    {V : Type*} {D : ℕ} (I : (Fin (D + 2) → V) → ℝ) (S : V → Prop)
     (hI : ∀ L : Fin (D + 2) → V, (∀ j, S (L j)) → ∀ σ : Equiv.Perm (Fin (D + 2)), I (L ∘ σ) = I L)
-    (k i : ℕ) (hi : i < k) (hD : 2 * k ≤ D + 1) {x₁ x₂ a : V} (h₁ : S x₁) (h₂ : S x₂) (h₃ : S a) :
-    I (fun j => consWord k i x₁ x₁ x₂ a j) = I (fun j => interp k (i + 1) x₁ x₂ a j) := by
-  rw [swap_nat I S hI (consWord k i x₁ x₁ x₂ a) (consWord_mem h₁ h₁ h₂ h₃ k i) 0 2 (by omega) (by omega)]
+    (k i : ℕ) (hi : i < k) (hD : 2 * k ≤ D + 1)
+    {x₁ x₂ a : V} (h₁ : S x₁) (h₂ : S x₂) (h₃ : S a)
+    : I (fun j => consWord k i x₁ x₁ x₂ a j) = I (fun j => interp k (i + 1) x₁ x₂ a j) := by
+  rw [swap_nat I S hI (consWord k i x₁ x₁ x₂ a) (consWord_mem h₁ h₁ h₂ h₃ k i) 0 2 (by omega)
+    (by omega)]
   congr 1
   funext j
   simp only [consWord, interp]
   split_ifs <;> first | rfl | omega | contradiction
 
-theorem consWord_right {V : Type*} {D : ℕ} (I : (Fin (D + 2) → V) → ℝ) (S : V → Prop)
+theorem consWord_right
+    {V : Type*} {D : ℕ} (I : (Fin (D + 2) → V) → ℝ) (S : V → Prop)
     (hI : ∀ L : Fin (D + 2) → V, (∀ j, S (L j)) → ∀ σ : Equiv.Perm (Fin (D + 2)), I (L ∘ σ) = I L)
-    (k i : ℕ) (hi : i < k) (hD : 2 * k ≤ D + 1) {x₁ x₂ a : V} (h₁ : S x₁) (h₂ : S x₂) (h₃ : S a) :
-    I (fun j => consWord k i x₂ x₁ x₂ a j) = I (fun j => interp k i x₁ x₂ a j) := by
+    (k i : ℕ) (hi : i < k) (hD : 2 * k ≤ D + 1)
+    {x₁ x₂ a : V} (h₁ : S x₁) (h₂ : S x₂) (h₃ : S a)
+    : I (fun j => consWord k i x₂ x₁ x₂ a j) = I (fun j => interp k i x₁ x₂ a j) := by
   rw [swap_nat I S hI (consWord k i x₂ x₁ x₂ a) (consWord_mem h₂ h₁ h₂ h₃ k i) 1 (2 * i + 1)
       (by omega) (by omega),
-    swap_nat I S hI (interp k i x₁ x₂ a) (interp_mem h₁ h₂ h₃ k i) 2 (2 * i + 2) (by omega) (by omega)]
+    swap_nat I S hI (interp k i x₁ x₂ a) (interp_mem h₁ h₂ h₃ k i) 2 (2 * i + 2) (by omega)
+      (by omega)]
   congr 1
   funext j
   simp only [consWord, interp]

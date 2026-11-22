@@ -9,11 +9,13 @@ noncomputable section
 namespace GlobalTheory.EisBL.Borel
 
 open Topology MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.ThK.Dbl
 
-theorem units_borelSpace (M : Type*) [Monoid M] [TopologicalSpace M] [T2Space M] [ContinuousMul M]
-    [LocallyCompactSpace M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] :
-    BorelSpace Mˣ := by
+theorem units_borelSpace
+    (M : Type*) [Monoid M] [TopologicalSpace M] [T2Space M] [ContinuousMul M]
+    [LocallyCompactSpace M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M]
+    : BorelSpace Mˣ := by
   have hce := Units.isClosedEmbedding_embedProduct (α := M)
   haveI : LocallyCompactSpace Mˣ := hce.locallyCompactSpace
   haveI : SecondCountableTopology Mᵐᵒᵖ :=
@@ -40,7 +42,8 @@ theorem units_borelSpace (M : Type*) [Monoid M] [TopologicalSpace M] [T2Space M]
         rwa [← Units.ext hvu]
     rw [key]
     refine ⟨_, MeasurableSet.iUnion fun n => ?_, rfl⟩
-    exact (((isCompact_compactCovering Mˣ n).inter_left hC).image Units.continuous_val).isClosed.measurableSet
+    exact (((isCompact_compactCovering Mˣ n).inter_left hC).image
+      Units.continuous_val).isClosed.measurableSet
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
@@ -50,7 +53,8 @@ instance borelMatAE {ι : Type} [Fintype ι] : BorelSpace (Matrix ι ι (AE F E)
   inferInstanceAs (BorelSpace (ι → ι → AE F E))
 
 instance borelGL {ι : Type} [Fintype ι] [DecidableEq ι] : BorelSpace (GL ι (AE F E)) := by
-  have : LocallyCompactSpace (Matrix ι ι (AE F E)) := inferInstanceAs (LocallyCompactSpace (ι → ι → AE F E))
+  have : LocallyCompactSpace (Matrix ι ι (AE F E)) :=
+    inferInstanceAs (LocallyCompactSpace (ι → ι → AE F E))
   have : SecondCountableTopology (Matrix ι ι (AE F E)) :=
     inferInstanceAs (SecondCountableTopology (ι → ι → AE F E))
   exact units_borelSpace _

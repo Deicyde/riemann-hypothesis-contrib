@@ -5,15 +5,16 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PowSubSu
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 set_option autoImplicit false
 
 namespace GlobalTheory.CompanionTheory.GE
 
-theorem secs_map_arrow {X : Scheme.{0}} {E : X.Modules} (D : Subobject E)
-    (B : Subobject (D : X.Modules)) (V : X.Opens) :
-    secs ((Subobject.map D.arrow).obj B) V = (D.arrow.app V) '' secs B V := by
+theorem secs_map_arrow
+    {X : Scheme.{0}} {E : X.Modules} (D : Subobject E) (B : Subobject (D : X.Modules)) (V : X.Opens)
+    : secs ((Subobject.map D.arrow).obj B) V = (D.arrow.app V) '' secs B V := by
   have hmk : (Subobject.map D.arrow).obj B = Subobject.mk (B.arrow ≫ D.arrow) := by
     conv_lhs => rw [← Subobject.mk_arrow B]
     exact Subobject.map_mk _ _

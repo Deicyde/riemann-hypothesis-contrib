@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.P22
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
 open GlobalTheory.FlagMod (ev frX frVec)
 open GlobalTheory.FlagTan (psiSet HIx VIx TIx IsDef IsVert KSIso)
@@ -20,11 +21,12 @@ set_option autoImplicit false
 
 namespace GlobalTheory.IdealSpread
 
-theorem exists_of_map_eq_span {A R : Type} [CommRing A] [CommRing R] [Algebra A R] (M : Submonoid A)
-    [IsLocalization M R] {J : Ideal A} (hJ : J.FG) (d : A)
-    (h : J.map (algebraMap A R) = Ideal.span {algebraMap A R d}) :
-    ∃ s ∈ M, s * d ∈ J ∧ ∀ j ∈ J, ∃ c, s * j = c * d := by
-
+theorem exists_of_map_eq_span
+    {A R : Type} [CommRing A] [CommRing R] [Algebra A R]
+    (M : Submonoid A) [IsLocalization M R]
+    {J : Ideal A} (hJ : J.FG)
+    (d : A) (h : J.map (algebraMap A R) = Ideal.span {algebraMap A R d})
+    : ∃ s ∈ M, s * d ∈ J ∧ ∀ j ∈ J, ∃ c, s * j = c * d := by
   obtain ⟨s₁, hs₁M, hs₁⟩ : ∃ s₁ ∈ M, s₁ * d ∈ J := by
     have hd : algebraMap A R d ∈ J.map (algebraMap A R) := h ▸ Ideal.subset_span rfl
     obtain ⟨⟨⟨a, ha⟩, m⟩, hm⟩ := (IsLocalization.mem_map_algebraMap_iff M R).1 hd
@@ -46,7 +48,9 @@ theorem exists_of_map_eq_span {A R : Type} [CommRing A] [CommRing R] [Algebra A 
       rw [map_mul, map_mul, ← ham, ← hr]; ring
     obtain ⟨c, hc⟩ := IsLocalization.exists_of_eq (M := M) this
     exact ⟨c * m, M.mul_mem c.2 m.2, c * a, by linear_combination hc⟩
-  have key : ∀ T : Finset A, (∀ g ∈ T, ∃ t ∈ M, ∃ c, t * g = c * d) → ∃ t ∈ M, ∀ g ∈ T, ∃ c, t * g = c * d := by
+  have key
+      : ∀ T : Finset A,
+        (∀ g ∈ T, ∃ t ∈ M, ∃ c, t * g = c * d) → ∃ t ∈ M, ∀ g ∈ T, ∃ c, t * g = c * d := by
     intro T
     induction T using Finset.induction_on with
     | empty => exact fun _ => ⟨1, M.one_mem, by simp⟩
@@ -83,17 +87,27 @@ end GlobalTheory.IdealSpread
 
 namespace GlobalTheory.IdealSpread
 
-theorem ideal_eq_span_of_germ (X : Scheme.{0}) (I : X.IdealSheafData) (U : X.affineOpens) (x₀ : X) (hx : x₀ ∈ U.1)
+theorem ideal_eq_span_of_germ
+    (X : Scheme.{0}) (I : X.IdealSheafData) (U : X.affineOpens) (x₀ : X) (hx : x₀ ∈ U.1)
     (d : Γ(X, U.1)) (hN : IsNoetherianRing Γ(X, U.1))
-    (h : (I.ideal U).map (X.presheaf.germ U.1 x₀ hx).hom = Ideal.span {(X.presheaf.germ U.1 x₀ hx).hom d}) :
-    ∃ s : Γ(X, U.1), x₀ ∈ X.basicOpen s ∧ ∀ t : Γ(X, U.1), X.basicOpen t ≤ X.basicOpen s →
-      I.ideal (X.affineBasicOpen t) = Ideal.span {resG X (X.basicOpen_le t) d} := by
+    (h : (I.ideal U).map (X.presheaf.germ U.1 x₀ hx).hom
+      = Ideal.span {(X.presheaf.germ U.1 x₀ hx).hom d})
+    : ∃ s : Γ(X, U.1),
+      x₀ ∈ X.basicOpen s
+        ∧ ∀ t : Γ(X, U.1),
+          X.basicOpen t ≤ X.basicOpen s
+            → I.ideal (X.affineBasicOpen t) = Ideal.span {resG X (X.basicOpen_le t) d} := by
   letI : Algebra Γ(X, U.1) (X.presheaf.stalk x₀) := (X.presheaf.germ U.1 x₀ hx).hom.toAlgebra
   haveI hL : IsLocalization.AtPrime (X.presheaf.stalk x₀) (U.2.primeIdealOf ⟨x₀, hx⟩).asIdeal :=
     U.2.isLocalization_stalk ⟨x₀, hx⟩
-  obtain ⟨s, hsM, hsd, hsJ⟩ := exists_of_map_eq_span (R := X.presheaf.stalk x₀)
-    (U.2.primeIdealOf ⟨x₀, hx⟩).asIdeal.primeCompl (IsNoetherian.noetherian (I.ideal U)) d h
-  refine ⟨s, (X.mem_basicOpen s x₀ hx).2 (IsLocalization.map_units (X.presheaf.stalk x₀) ⟨s, hsM⟩), fun t ht => ?_⟩
+  obtain ⟨s, hsM, hsd, hsJ⟩ :=
+    exists_of_map_eq_span (R := X.presheaf.stalk x₀) (U.2.primeIdealOf ⟨x₀, hx⟩).asIdeal.primeCompl
+      (IsNoetherian.noetherian (I.ideal U)) d h
+  refine ⟨
+    s,
+    (X.mem_basicOpen s x₀ hx).2 (IsLocalization.map_units (X.presheaf.stalk x₀) ⟨s, hsM⟩),
+    fun t ht => ?_
+  ⟩
   have hu : IsUnit (resG X (X.basicOpen_le t) s) := by
     have h0 : IsUnit (resG X (X.basicOpen_le s) s) := X.toRingedSpace.isUnit_res_basicOpen s
     have h1 := h0.map (resG X ht)

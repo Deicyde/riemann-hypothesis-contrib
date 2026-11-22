@@ -14,17 +14,17 @@ open PI.SqPair Formalism.L2.PairingIndexBounds.Eq.SqG
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {N : ℕ}
 
-theorem scal_sq (ε : 𝓞 E) :
-    (ε : E) • (1 : Matrix (Fin N) (Fin N) E) * (ε : E) • 1 - (ε : E) • 1 =
-      ((ε * (ε - 1) : 𝓞 E) : E) • (1 : Matrix (Fin N) (Fin N) E) := by
+theorem scal_sq (ε : 𝓞 E)
+    : (ε : E) • (1 : Matrix (Fin N) (Fin N) E) * (ε : E) • 1 - (ε : E) • 1
+      = ((ε * (ε - 1) : 𝓞 E) : E) • (1 : Matrix (Fin N) (Fin N) E) := by
   rw [Matrix.smul_mul, Matrix.mul_smul, Matrix.one_mul, smul_smul, ← sub_smul]
   congr 1
   push_cast
   ring
 
-theorem scal_adj (ε : 𝓞 E) :
-    (ε : E) • (1 : Matrix (Fin N) (Fin N) E) + ((ε : E) • (1 : Matrix (Fin N) (Fin N) E))ᴴ - 1 =
-      ((ε + cj E ε - 1 : 𝓞 E) : E) • (1 : Matrix (Fin N) (Fin N) E) := by
+theorem scal_adj (ε : 𝓞 E)
+    : (ε : E) • (1 : Matrix (Fin N) (Fin N) E) + ((ε : E) • (1 : Matrix (Fin N) (Fin N) E))ᴴ - 1
+      = ((ε + cj E ε - 1 : 𝓞 E) : E) • (1 : Matrix (Fin N) (Fin N) E) := by
   have hc0 : ((cj E ε : 𝓞 E) : E) = star (ε : E) := rfl
   have hc : ((ε + cj E ε - 1 : 𝓞 E) : E) = (ε : E) + star (ε : E) - 1 := by
     push_cast
@@ -43,9 +43,11 @@ private lemma smallAt_smul_one_of_dv {Q : Ideal (𝓞 E)} {c a : 𝓞 E} {L : Su
   congr 1
   exact_mod_cast hw
 
-theorem good_scal {Q : Ideal (𝓞 E)} [Q.IsPrime] {c : 𝓞 E} {L' L'' : Submodule (𝓞 E) (Fin N → E)}
-    {ε : 𝓞 E} (h1 : Dv Q c (ε * (ε - 1))) (h2 : Dv Q c (ε + cj E ε - 1)) :
-    Good Q c L' L'' ((ε : E) • (1 : Matrix (Fin N) (Fin N) E)) := by
+theorem good_scal
+    {Q : Ideal (𝓞 E)} [Q.IsPrime]
+    {c : 𝓞 E} {L' L'' : Submodule (𝓞 E) (Fin N → E)} {ε : 𝓞 E}
+    (h1 : Dv Q c (ε * (ε - 1))) (h2 : Dv Q c (ε + cj E ε - 1))
+    : Good Q c L' L'' ((ε : E) • (1 : Matrix (Fin N) (Fin N) E)) := by
   unfold Good
   rw [scal_sq, scal_adj]
   repeat' constructor
@@ -95,7 +97,9 @@ theorem splitPlace_of (hP : PowLoc) : SplitPlace := by
     exact (Q ^ M).neg_mem ha
   have toQ' : ∀ x, x ∈ Q ^ M → cj E x ∈ Q' ^ M := fun x hx => by
     have hle : Q ^ M ≤ Ideal.comap (cj E) (Q' ^ M) := by
-      calc Q ^ M = (Ideal.comap (cj E) Q') ^ M := by rw [hcc]
+      calc
+        Q ^ M
+          = (Ideal.comap (cj E) Q') ^ M := by rw [hcc]
         _ ≤ Ideal.comap (cj E) (Q' ^ M) := Ideal.le_comap_pow _ M
     exact Ideal.mem_comap.mp (hle hx)
   have toQ : ∀ x, x ∈ Q' ^ M → cj E x ∈ Q ^ M := fun x hx => by
@@ -111,7 +115,13 @@ theorem splitPlace_of (hP : PowLoc) : SplitPlace := by
     hK' x (Ideal.pow_le_pow_right (le_max_right K K') hx)
   haveI := hQ.isPrime
   haveI := hQ'.isPrime
-  refine ⟨(b : E) • (1 : Matrix (Fin N) (Fin N) E), pres_integer_smul_one b, pres_integer_smul_one b, ?_, ?_⟩
+  refine ⟨
+    (b : E) • (1 : Matrix (Fin N) (Fin N) E),
+    pres_integer_smul_one b,
+    pres_integer_smul_one b,
+    ?_,
+    ?_
+  ⟩
   · apply good_scal
     · exact dvQ _ (Ideal.mul_mem_left _ b hb1)
     · have hr : b + cj E b - 1 = (b - 1) + cj E b := by ring

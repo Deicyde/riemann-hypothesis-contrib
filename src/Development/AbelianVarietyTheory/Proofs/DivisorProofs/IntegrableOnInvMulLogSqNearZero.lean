@@ -4,7 +4,9 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EndValuedFor
 
 @[expose] public section
 
-open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.GoodTop
+open MeasureTheory Filter Topology GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar
+  GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame
+  GlobalTheory.GoodMetric GlobalTheory.GoodTop
 open ReciprocityTheory.L2DbarEstimates (V)
 open scoped ContDiff Matrix
 
@@ -13,15 +15,15 @@ namespace GlobalTheory.GoodTop
 theorem continuousAt_inv_log_zero : ContinuousAt (fun t : ℝ => (Real.log t)⁻¹) 0 := by
   unfold ContinuousAt
   simp only [Real.log_zero, inv_zero]
-  refine Tendsto.mono_left (x := 𝓝[≠] (0:ℝ) ⊔ pure 0) ?_ (nhdsNE_sup_pure (0:ℝ)).ge
+  refine Tendsto.mono_left (x := 𝓝[≠] (0:ℝ) ⊔ pure 0) ?_ (nhdsNE_sup_pure (0 : ℝ)).ge
   refine Tendsto.sup ?_ ?_
   · exact tendsto_inv_atBot_zero.comp Real.tendsto_log_nhdsNE_zero
   · rw [tendsto_pure_left]
     intro s hs
     simpa using mem_of_mem_nhds hs
 
-theorem integrableOn_inv_mul_log_sq :
-    IntegrableOn (fun t : ℝ => t * (t * |Real.log t|)⁻¹ ^ 2) (Set.Ioc 0 (1 / 2)) := by
+theorem integrableOn_inv_mul_log_sq
+    : IntegrableOn (fun t : ℝ => t * (t * |Real.log t|)⁻¹ ^ 2) (Set.Ioc 0 (1 / 2)) := by
   have hcont : ContinuousOn (fun t : ℝ => -(Real.log t)⁻¹) (Set.Icc 0 (1 / 2)) := by
     intro t ht
     rcases eq_or_lt_of_le ht.1 with h | h

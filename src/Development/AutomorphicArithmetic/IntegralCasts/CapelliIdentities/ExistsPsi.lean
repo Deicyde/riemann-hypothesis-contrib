@@ -4,10 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qi48.exists_psi :
-    ∀ (L T : Type) [inst : Field L] [IsAlgClosed L] [inst_2 : CommRing T]
-    [inst_3 : Algebra L T] [Algebra.FiniteType L T] (m : Ideal T),
-    m.IsMaximal → ∃ (ψ : T →ₐ[L] L), ∀ (x : T), (ψ : T → L) x = (0 : L) ↔ x ∈ m := by
+theorem UpperTheory.Reformulated.B.Qi48.exists_psi
+    : ∀ (L T : Type) [inst : Field L] [IsAlgClosed L] [inst_2 : CommRing T] [inst_3 : Algebra L T]
+        [Algebra.FiniteType L T] (m : Ideal T),
+      m.IsMaximal → ∃ (ψ : T →ₐ[L] L), ∀ (x : T), (ψ : T → L) x = (0 : L) ↔ x ∈ m := by
   intro L T _ _ _ _ _ m hm
   letI : Field (T ⧸ m) := Ideal.Quotient.field m
   haveI : Module.Finite L (T ⧸ m) := finite_of_finite_type_of_isJacobsonRing L (T ⧸ m)

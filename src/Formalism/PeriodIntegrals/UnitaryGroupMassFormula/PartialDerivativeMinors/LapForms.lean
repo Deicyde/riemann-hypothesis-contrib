@@ -203,8 +203,8 @@ lemma sdeg_comm {A : Type} [CommRing A] {ι : Type} (d : ι → Derivation ℤ A
     exact ih _ (hk j)
 
 def RelL (L' : List (ℕ × Fin N1)) (k' : ℕ) (L : List (ℕ × Fin N1)) (k : ℕ) : Prop :=
-  (nzc L' + 1 ≤ nzc L ∧ z0c L' ≤ z0c L ∧ k' ≤ k) ∨
-    (nzc L' ≤ nzc L ∧ z0c L' + 1 ≤ z0c L ∧ k' + 1 ≤ k)
+  (nzc L' + 1 ≤ nzc L ∧ z0c L' ≤ z0c L ∧ k' ≤ k)
+    ∨ (nzc L' ≤ nzc L ∧ z0c L' + 1 ≤ z0c L ∧ k' + 1 ≤ k)
 
 lemma relL_lt {L' : List (ℕ × Fin N1)} {k' : ℕ} {L : List (ℕ × Fin N1)} {k : ℕ} (h : RelL L' k' L k) :
     nzc L' + min (z0c L') k' < nzc L + min (z0c L) k := by
@@ -367,24 +367,28 @@ lemma sum_colLen_le (α : YoungDiagram) : ∑ c : Fin (α.rowLen 0), α.colLen c
 
 theorem pLapForms : PLapForms := by
   intro H _ _ N0 N1 α I t g d n hg hd hn
-  have hF := ms_prod (N0 := N0) t (Finset.univ : Finset (Fin (α.rowLen 0)))
-    (fun c => minorXZ (Lt := Bool × H) N0 N1 (false, t) (α.colLen c) (I c))
-    (fun c => α.colLen c - 1) (fun _ => 1)
-    (fun c _ => minor_mem t _ (colLen_pos α c) (I c))
+  have hF :=
+    ms_prod (N0 := N0) t (Finset.univ : Finset (Fin (α.rowLen 0)))
+      (fun c => minorXZ (Lt := Bool × H) N0 N1 (false, t) (α.colLen c) (I c))
+      (fun c => α.colLen c - 1)
+      (fun _ => 1)
+      (fun c _ => minor_mem t _ (colLen_pos α c) (I c))
   have hsum : ∑ c : Fin (α.rowLen 0), (α.colLen c - 1) + α.rowLen 0 ≤ α.cells.card := by
-    calc ∑ c : Fin (α.rowLen 0), (α.colLen c - 1) + α.rowLen 0
+    calc
+      ∑ c : Fin (α.rowLen 0), (α.colLen c - 1) + α.rowLen 0
         = ∑ c : Fin (α.rowLen 0), (α.colLen c - 1) + ∑ _c : Fin (α.rowLen 0), 1 := by simp
       _ = ∑ c : Fin (α.rowLen 0), (α.colLen c - 1 + 1) := (Finset.sum_add_distrib).symm
       _ = ∑ c : Fin (α.rowLen 0), α.colLen c := by
-          apply Finset.sum_congr rfl
-          intro c _
-          have := colLen_pos α c
-          omega
+        apply Finset.sum_congr rfl
+        intro c _
+        have := colLen_pos α c
+        omega
       _ ≤ α.cells.card := sum_colLen_le α
   have h1 : ∑ _c : Fin (α.rowLen 0), 1 = α.rowLen 0 := by simp
   rw [h1] at hF
-  have key : ∀ x ∈ MS (N0 := N0) t (∑ c : Fin (α.rowLen 0), (α.colLen c - 1)) (α.rowLen 0),
-      (lapT N0 N1 t ^ n) (x * g) = 0 := by
+  have key
+      : ∀ x ∈ MS (N0 := N0) t (∑ c : Fin (α.rowLen 0), (α.colLen c - 1)) (α.rowLen 0),
+        (lapT N0 N1 t ^ n) (x * g) = 0 := by
     intro x hx
     induction hx using Submodule.span_induction with
     | mem x hx =>

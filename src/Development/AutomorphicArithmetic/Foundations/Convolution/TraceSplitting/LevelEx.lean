@@ -11,9 +11,12 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 noncomputable section
 
 open MeasureTheory NumberField IsDedekindDomain Filter
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Global GroundTheory.Global.SemiLocal
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 Formalism.BasicNotions GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory.C
+  UpperTheory.ConvolutionTheory.L1 Formalism.BasicNotions GlobalTheory.PRep GlobalTheory.CuspRep
+  GlobalTheory.SmGL GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 open Formalism.L2.Host UpperTheory.V.Published UpperTheory.CBC
 open scoped Classical
 
@@ -64,14 +67,14 @@ private lemma exists_local_level (μ : Measure (normOneGL (K := K) (n := n))) [�
 
 end UpperTheory.ConvolutionTheory.T
 
-theorem UpperTheory.ConvolutionTheory.T.levelEx :
-    UpperTheory.ConvolutionTheory.T.LevelEx := by
+theorem UpperTheory.ConvolutionTheory.T.levelEx : UpperTheory.ConvolutionTheory.T.LevelEx := by
   intro K _ _ n μ _ V hV S hS
   choose U₀ hU₀ hU₀le hU₀ne using fun w : Pl K => exists_local_level μ V hV w
   let J : ∀ w : Pl K, Subgroup (Gw n w) := fun w =>
     if w ∈ S then U₀ w else GLnLocal.integralGL (w.adicCompletion K) n
   have hJin : ∀ w ∈ S, J w = U₀ w := fun w hw => if_pos hw
-  have hJout : ∀ w, w ∉ S → J w = GLnLocal.integralGL (w.adicCompletion K) n := fun w hw => if_neg hw
+  have hJout : ∀ w, w ∉ S → J w = GLnLocal.integralGL (w.adicCompletion K) n := fun w hw =>
+    if_neg hw
   have hco : ∀ w, CO (J w) := fun w => by
     by_cases hw : w ∈ S
     · rw [hJin w hw]; exact hU₀ w
@@ -87,8 +90,11 @@ theorem UpperTheory.ConvolutionTheory.T.levelEx :
     by_cases hw : w ∈ S
     · rw [hJin w hw]; exact hU₀ne w
     · rw [hJout w hw]; exact hS w hw
-  have hall := typedEx K n μ V hV J (fun _ => 1) (fun w => ⟨hco w, isChr_one _⟩)
-    ((S.finite_toSet.eventually_cofinite_notMem).mono fun w hw => ⟨hJout w hw, rfl⟩) hloc
+  have hall :=
+    typedEx K n μ V hV J
+      (fun _ => 1)
+      (fun w => ⟨hco w, isChr_one _⟩)
+      ((S.finite_toSet.eventually_cofinite_notMem).mono fun w hw => ⟨hJout w hw, rfl⟩) hloc
   refine ⟨J, fun w => ⟨hco w, hle w⟩, fun hb => hall (eq_bot_iff.2 ?_)⟩
   rw [← hb]
   refine le_inf (le_inf inf_le_left ?_) ?_

@@ -17,8 +17,11 @@ namespace GlobalTheory.JSW
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-def kerOp {X : Type} [MeasurableSpace X] (ν : Measure X) (k : X → ℂ) (γ : X → GL (Fin a) (Cinf E)) (F : GA E a → ℂ) :
-    GA E a → ℂ := fun g => ∫ x, k x * F (g * infGL E a (γ x)) ∂ν
+def kerOp
+    {X : Type} [MeasurableSpace X]
+    (ν : Measure X) (k : X → ℂ) (γ : X → GL (Fin a) (Cinf E)) (F : GA E a → ℂ)
+    : GA E a → ℂ := fun g =>
+  ∫ x, k x * F (g * infGL E a (γ x)) ∂ν
 
 structure IsBCC (F : GA E a → ℂ) : Prop where
   cont : Continuous F
@@ -26,16 +29,18 @@ structure IsBCC (F : GA E a → ℂ) : Prop where
   cusp : IsCuspidal F
   left : ∀ γ g, F (ratGL E a γ * g) = F g
 
-
 variable (E a) in
-def lieBasis : Module.Basis (Fin (Module.finrank ℝ (Lie E a))) ℝ (Lie E a) := Module.finBasis ℝ (Lie E a)
-
+def lieBasis : Module.Basis (Fin (Module.finrank ℝ (Lie E a))) ℝ (Lie E a) :=
+  Module.finBasis ℝ (Lie E a)
 
 variable (E a) in
 def lieCoord (i : Fin (Module.finrank ℝ (Lie E a))) : Lie E a →L[ℝ] ℂ :=
   Complex.ofRealCLM.comp (LinearMap.toContinuousLinearMap ((lieBasis E a).coord i))
 
-def adCoef (γ : GL (Fin a) (Cinf E)) (p : Fin (Module.finrank ℝ (Lie E a)) × Fin (Module.finrank ℝ (Lie E a))) : ℂ :=
+def adCoef
+    (γ : GL (Fin a) (Cinf E))
+    (p : Fin (Module.finrank ℝ (Lie E a)) × Fin (Module.finrank ℝ (Lie E a)))
+    : ℂ :=
   lieCoord E a p.1 (toL ((γ⁻¹).val * Matrix.of (lieBasis E a p.2) * γ.val))
 
 theorem sum_lieCoord (X : Lie E a) : ∑ i, ((lieBasis E a).coord i X) • lieBasis E a i = X :=

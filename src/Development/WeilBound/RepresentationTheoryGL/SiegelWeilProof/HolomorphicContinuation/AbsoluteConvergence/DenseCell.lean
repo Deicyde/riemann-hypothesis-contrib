@@ -45,8 +45,8 @@ theorem cont_nbG : Continuous (nbG (n := n)) := by
     refine continuous_pi fun i => continuous_pi fun j => ?_
     rcases i with i | i <;> rcases j with j | j <;> simp <;> fun_prop
 
-theorem nbG_low (l : ℝ) (y : GR n) :
-    (mR (nbG l * y)).toBlocks₂₁ = (l : ℂ) • (mR y).toBlocks₁₁ + (mR y).toBlocks₂₁ := by
+theorem nbG_low (l : ℝ) (y : GR n)
+    : (mR (nbG l * y)).toBlocks₂₁ = (l : ℂ) • (mR y).toBlocks₁₁ + (mR y).toBlocks₂₁ := by
   have hm : mR (nbG l * y) = fromBlocks 1 0 ((l : ℂ) • 1) 1 * mR y := rfl
   rw [hm]
   conv_lhs => rw [← fromBlocks_toBlocks (mR y)]
@@ -88,16 +88,16 @@ theorem det_I (y : GR n) : (Complex.I • (mR y).toBlocks₁₁ + (mR y).toBlock
     ext i
     rcases i with i | i <;> simp
   have hinv : mR y⁻¹ * mR y = 1 := congrArg mR (inv_mul_cancel y)
-  have hv : v = 0 := by
-    rw [← one_mulVec v, ← hinv, ← mulVec_mulVec, hYv0, mulVec_zero]
+  have hv : v = 0 := by rw [← one_mulVec v, ← hinv, ← mulVec_mulVec, hYv0, mulVec_zero]
   apply hx0
   funext i
   exact congrFun hv (Sum.inl i)
 
-theorem finite_bad (y : GR n) :
-    {l : ℝ | ((l : ℂ) • (mR y).toBlocks₁₁ + (mR y).toBlocks₂₁).det = 0}.Finite := by
+theorem finite_bad (y : GR n)
+    : {l : ℝ | ((l : ℂ) • (mR y).toBlocks₁₁ + (mR y).toBlocks₂₁).det = 0}.Finite := by
   let M : Matrix (Fin n) (Fin n) ℂ[X] :=
-    (X : ℂ[X]) • (mR y).toBlocks₁₁.map (Polynomial.C : ℂ →+* ℂ[X]) + (mR y).toBlocks₂₁.map (Polynomial.C : ℂ →+* ℂ[X])
+    (X : ℂ[X]) • (mR y).toBlocks₁₁.map (Polynomial.C : ℂ →+* ℂ[X])
+      + (mR y).toBlocks₂₁.map (Polynomial.C : ℂ →+* ℂ[X])
   let p : ℂ[X] := M.det
   have hev : ∀ z : ℂ, p.eval z = (z • (mR y).toBlocks₁₁ + (mR y).toBlocks₂₁).det := by
     intro z

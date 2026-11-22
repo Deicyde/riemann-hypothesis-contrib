@@ -16,7 +16,14 @@ noncomputable section
 
 universe u
 
-theorem zero (n : ℕ) (Y : Type u) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] (ι : Type*) (La : Type*) [AddCommGroup La] (hNORM : NORMAll.{u} n) : ZEROStatement n Y ι La := by
+theorem zero
+    (n : ℕ)
+    (Y : Type u)
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    (ι : Type*)
+    (La : Type*) [AddCommGroup La]
+    (hNORM : NORMAll.{u} n)
+    : ZEROStatement n Y ι La := by
   intro A L N w w0 s De m Nsec hconn hD hF hDe hwC hN hNC hvan
   obtain ⟨C2, hC2⟩ := hwC
   obtain ⟨C1, hC1⟩ := hNC
@@ -30,19 +37,22 @@ theorem zero (n : ℕ) (Y : Type u) [TopologicalSpace Y] [T2Space Y] [SecondCoun
     have hNd := hN.1 i
     have hwd := hw0.1 i
     simp only [Set.preimage_univ, Set.inter_univ] at hNd hwd
-    have hne : ∀ v ∈ (A.chart i).target ∩ (A.chart i).symm ⁻¹' MS,
-        ((w0 i ∘ (A.chart i).symm) v) ^ m ≠ 0 := fun v hv =>
-      pow_ne_zero _ (ne_zero_of_overlap_ne_zero A L w0 hw0 i (A.pick _) _ ((A.chart i).map_target hv.1)
-        (A.mem_pick _) hv.2.1)
+    have hne
+        : ∀ v ∈ (A.chart i).target ∩ (A.chart i).symm ⁻¹' MS,
+          ((w0 i ∘ (A.chart i).symm) v) ^ m ≠ 0 := fun v hv =>
+      pow_ne_zero _
+        (ne_zero_of_overlap_ne_zero A L w0 hw0 i (A.pick _) _ ((A.chart i).map_target hv.1)
+          (A.mem_pick _) hv.2.1)
     refine ((hNd.mono Set.inter_subset_left).mul
       (((hwd.mono Set.inter_subset_left).pow m).inv hne)).congr (fun v hv => ?_)
     simp only [Function.comp_apply, Uf]
     rw [ratio_pow_chart_independent A L m Nsec w0 hN hw0 (A.pick _) i _ (A.mem_pick _)
-      ((A.chart i).map_target hv.1), div_eq_mul_inv]
+        ((A.chart i).map_target hv.1),
+      div_eq_mul_inv]
     rfl
   let U : Set (V n) := {v : V n | MvPolynomial.eval (fun i => v i) De ≠ 0}
-  have hUo : IsOpen U := isOpen_ne_fun
-    ((MvPolynomial.continuous_eval (p := De)).comp (by fun_prop)) continuous_const
+  have hUo : IsOpen U :=
+    isOpen_ne_fun ((MvPolynomial.continuous_eval (p := De)).comp (by fun_prop)) continuous_const
 
   have key : ∀ x0 : MS, Uf x0 = 0 := by
     intro x0
@@ -50,8 +60,7 @@ theorem zero (n : ℕ) (Y : Type u) [TopologicalSpace Y] [T2Space Y] [SecondCoun
       rw [isOpen_iff_mem_nhds]
       intro x hx
       obtain ⟨e, hxe, -⟩ := hF.localHomeo x
-      have hTo : IsOpen (connectedComponentIn e.target (e x)) :=
-        e.open_target.connectedComponentIn
+      have hTo : IsOpen (connectedComponentIn e.target (e x)) := e.open_target.connectedComponentIn
       have hxT : e x ∈ connectedComponentIn e.target (e x) :=
         mem_connectedComponentIn (e.map_source hxe)
       have hTs : connectedComponentIn e.target (e x) ⊆ e.target := connectedComponentIn_subset _ _
@@ -78,35 +87,42 @@ theorem zero (n : ℕ) (Y : Type u) [TopologicalSpace Y] [T2Space Y] [SecondCoun
       have h2 : IsCompact (Subtype.val ⁻¹' (A.zmap w0 s ⁻¹' K) : Set MS) := by
         rw [Subtype.isCompact_iff, Subtype.image_preimage_coe]
         exact h1
-      have h3 : IsCompact (Subtype.val ⁻¹' (Subtype.val ⁻¹' (A.zmap w0 s ⁻¹' K) : Set MS) :
-          Set (connectedComponent x0)) := by
+      have h3 : IsCompact
+          (Subtype.val ⁻¹' (Subtype.val ⁻¹' (A.zmap w0 s ⁻¹' K) : Set MS)
+            : Set (connectedComponent x0)) := by
         rw [Subtype.isCompact_iff, Subtype.image_preimage_coe, Set.inter_comm]
         exact h2.inter_right isClosed_connectedComponent
       exact h3
     obtain ⟨hcov, hfin⟩ := isCoveringMapOn_of_proper z' U hUo hzU hloc hprop
     have hH' := holo_restrict_open _ _ hHolo (connectedComponent x0) hM'o
-    have hbd : ∀ x : connectedComponent x0, ‖Uf ((x : MS) : Y)‖ ≤
-        Real.sqrt (max C1 0 * |C2| ^ m) * (1 + ‖z' x‖ ^ 2) ^ ((m : ℝ) / 2) := fun x =>
+    have hbd
+        : ∀ x : connectedComponent x0,
+          ‖Uf ((x : MS) : Y)‖
+            ≤ Real.sqrt (max C1 0 * |C2| ^ m) * (1 + ‖z' x‖ ^ 2) ^ ((m : ℝ) / 2) := fun x =>
       norm_section_ratio_le A L m w w0 s Nsec C1 C2 hC1 hC2 _ (x : MS).2.1
-    have hv' : ∀ x : connectedComponent x0, z' x = 0 →
-        VanishesBeyond n z' (fun x : connectedComponent x0 => Uf ((x : MS) : Y)) x m := by
+    have hv'
+        : ∀ x : connectedComponent x0,
+          z' x = 0
+            → VanishesBeyond n z' (fun x : connectedComponent x0 => Uf ((x : MS) : Y)) x m := by
       intro x hx e he hxe k hk
       have hyS : ((x : MS) : Y) ∈ A.zeroSet s := by
         intro k'
         have h := congrArg (fun v : V n => v k') hx
         simp only [z', zmap, PiLp.toLp_apply, PiLp.zero_apply] at h
         exact (div_eq_zero_iff.1 h).resolve_right (x : MS).2.1
-      obtain ⟨C, hC⟩ := vanishing_order_transfer A L m w0 s Nsec hw0 hs hN ((x : MS) : Y) (x : MS).2.1
-        (hF.deriv_ne _ (x : MS).2) (hvan _ hyS)
-        (fun t : connectedComponent x0 => ((t : MS) : Y))
-        (continuous_subtype_val.comp continuous_subtype_val) e he x hxe rfl
+      obtain ⟨C, hC⟩ :=
+        vanishing_order_transfer A L m w0 s Nsec hw0 hs hN ((x : MS) : Y) (x : MS).2.1
+          (hF.deriv_ne _ (x : MS).2) (hvan _ hyS)
+          (fun t : connectedComponent x0 => ((t : MS) : Y))
+          (continuous_subtype_val.comp continuous_subtype_val) e he x hxe rfl
       have hex : z' x = e x := he hxe
       rw [hex]
       exact iteratedFDeriv_eq_zero_of_bound _ e.target (e x) e.open_target (e.map_source hxe)
         (hH' e he) m ⟨C, hC⟩ k hk
-    have hzero := hNORM (connectedComponent x0) z' De
-      (fun x : connectedComponent x0 => Uf ((x : MS) : Y)) (Real.sqrt (max C1 0 * |C2| ^ m)) m
-      hDe hcov hzU hfin ‹_› hH' hbd hv'
+    have hzero :=
+      hNORM (connectedComponent x0) z' De
+        (fun x : connectedComponent x0 => Uf ((x : MS) : Y))
+        (Real.sqrt (max C1 0 * |C2| ^ m)) m hDe hcov hzU hfin ‹_› hH' hbd hv'
     exact congrFun hzero ⟨x0, mem_connectedComponent⟩
 
   intro i y hy
@@ -114,18 +130,20 @@ theorem zero (n : ℕ) (Y : Type u) [TopologicalSpace Y] [T2Space Y] [SecondCoun
     intro y' hy'
     have h := key ⟨y', hy'.2⟩
     simp only [Uf] at h
-    have h0 : Nsec (A.pick y') y' = 0 :=
-      (div_eq_zero_iff.1 h).resolve_right (pow_ne_zero _ hy'.2.1)
+    have h0 : Nsec (A.pick y') y' = 0 := (div_eq_zero_iff.1 h).resolve_right (pow_ne_zero _ hy'.2.1)
     rw [hN.2 i (A.pick y') y' (Set.mem_univ _) hy'.1 (A.mem_pick y'), h0, mul_zero]
   have hcont : ContinuousOn (Nsec i) (A.chart i).source := by
     have hNd := hN.1 i
     simp only [Set.preimage_univ, Set.inter_univ] at hNd
-    refine (hNd.continuousOn.comp (A.chart i).continuousOn (fun y hy => (A.chart i).map_source hy)).congr
-      (fun y hy => ?_)
+    refine
+      (hNd.continuousOn.comp (A.chart i).continuousOn (fun y hy => (A.chart i).map_source hy)).congr
+        (fun y hy => ?_)
     simp [(A.chart i).left_inv hy]
-  have hEq := Set.EqOn.of_subset_closure (f := Nsec i) (g := fun _ => (0 : ℂ)) hzM hcont
-    continuousOn_const Set.inter_subset_left
-    ((dense_Mset A hD hF).open_subset_closure_inter (A.chart i).open_source)
+  have hEq :=
+    Set.EqOn.of_subset_closure (f := Nsec i)
+      (g := fun _ => (0 : ℂ))
+      hzM hcont continuousOn_const Set.inter_subset_left
+      ((dense_Mset A hD hF).open_subset_closure_inter (A.chart i).open_source)
   exact hEq hy
 
 end

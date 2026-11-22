@@ -21,26 +21,26 @@ variable {r : ℕ} {k k' : Type} [CommRing k] [CommRing k']
 def mapGl (φ : k →+* k') (Y : Gl r k) : Gl r k' :=
   (Y.1.map φ, fun i => φ (Y.2.1 i), fun i => φ (Y.2.2.1 i), φ Y.2.2.2)
 
-theorem map_mulVec' (φ : k →+* k') (A : Matrix (Fin r) (Fin r) k) (v : Fin r → k) :
-    (fun i => φ ((A *ᵥ v) i)) = A.map φ *ᵥ fun i => φ (v i) := by
+theorem map_mulVec' (φ : k →+* k') (A : Matrix (Fin r) (Fin r) k) (v : Fin r → k)
+    : (fun i => φ ((A *ᵥ v) i)) = A.map φ *ᵥ fun i => φ (v i) := by
   funext i
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
+  simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
 
-theorem map_vecMul' (φ : k →+* k') (A : Matrix (Fin r) (Fin r) k) (v : Fin r → k) :
-    (fun i => φ ((v ᵥ* A) i)) = (fun i => φ (v i)) ᵥ* A.map φ := by
+theorem map_vecMul' (φ : k →+* k') (A : Matrix (Fin r) (Fin r) k) (v : Fin r → k)
+    : (fun i => φ ((v ᵥ* A) i)) = (fun i => φ (v i)) ᵥ* A.map φ := by
   funext i
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.vecMul, dotProduct, map_sum, map_mul]
+  simp [Matrix.vecMul, dotProduct, map_sum, map_mul]
 
-theorem map_pow' (φ : k →+* k') (A : Matrix (Fin r) (Fin r) k) (i : ℕ) :
-    (A ^ i).map φ = (A.map φ) ^ i := by
+theorem map_pow' (φ : k →+* k') (A : Matrix (Fin r) (Fin r) k) (i : ℕ)
+    : (A ^ i).map φ = (A.map φ) ^ i := by
   induction i with
   | zero => simp [Matrix.map_one]
   | succ m ih => rw [pow_succ, pow_succ, Matrix.map_mul, ih]
 
-theorem mapGl_act (φ : k →+* k') (γ : GL (Fin r) k) (Y : Gl r k) :
-    mapGl φ (act γ Y) = act (Matrix.GeneralLinearGroup.map φ γ) (mapGl φ Y) := by
+theorem mapGl_act (φ : k →+* k') (γ : GL (Fin r) k) (Y : Gl r k)
+    : mapGl φ (act γ Y) = act (Matrix.GeneralLinearGroup.map φ γ) (mapGl φ Y) := by
   simp only [mapGl, act]
   refine Prod.ext ?_ (Prod.ext ?_ (Prod.ext ?_ rfl))
   · simp [Matrix.map_mul, Matrix.GeneralLinearGroup.map]
@@ -53,7 +53,7 @@ theorem mom_mapGl (φ : k →+* k') (Y : Gl r k) (i : ℕ) : mom (mapGl φ Y) i 
   simp only [mom, mapGl]
   rw [← map_pow', ← map_mulVec']
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [dotProduct, map_sum, map_mul]
+  simp [dotProduct, map_sum, map_mul]
 
 theorem inv_mapGl (φ : k →+* k') (Y : Gl r k) : inv (mapGl φ Y) = (inv Y).map φ := by
   simp only [JR.inv, Inv.map, mapGl]
@@ -74,15 +74,17 @@ theorem Bm_mapGl (φ : k →+* k') (Y : Gl r k) : Bm (mapGl φ Y) = (Bm Y).map �
   simp only [Bm, mapGl, Matrix.of_apply, Matrix.map_apply]
   rw [← map_pow', ← map_mulVec']
 
-theorem Inv_map_map {k'' : Type} [CommRing k''] (φ : k →+* k') (ψ : k' →+* k'') (a : Inv r k) :
-    (a.map φ).map ψ = a.map (ψ.comp φ) := rfl
+theorem Inv_map_map {k'' : Type} [CommRing k''] (φ : k →+* k') (ψ : k' →+* k'') (a : Inv r k)
+    : (a.map φ).map ψ = a.map (ψ.comp φ) :=
+  rfl
 
-theorem Inv_map_injective (φ : k →+* k') (h : Function.Injective φ) :
-    Function.Injective (fun a : Inv r k => a.map φ) := by
+theorem Inv_map_injective (φ : k →+* k') (h : Function.Injective φ)
+    : Function.Injective (fun a : Inv r k => a.map φ) := by
   intro a b hab
   simp only [Inv.map, Prod.mk.injEq] at hab
   obtain ⟨h1, h2, h3⟩ := hab
-  exact Prod.ext (funext fun i => h (congrFun h1 i)) (Prod.ext (funext fun i => h (congrFun h2 i)) (h h3))
+  exact Prod.ext (funext fun i => h (congrFun h1 i))
+    (Prod.ext (funext fun i => h (congrFun h2 i)) (h h3))
 
 end Map
 
@@ -93,50 +95,58 @@ def Yb (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ[E] E) :
   (LinearMap.toMatrix e e T, fun i => e.repr v i, fun j => l (e j), 0)
 
 def tw (e : Basis (Fin n) E V) (γ : GL (Fin n) E) : Basis (Fin n) E V :=
-  e.map (LinearEquiv.ofLinear (Matrix.toLin e e (γ⁻¹ : GL (Fin n) E)) (Matrix.toLin e e (γ : Matrix _ _ E))
-    (by rw [← Matrix.toLin_mul]; simp) (by rw [← Matrix.toLin_mul]; simp))
+  e.map (LinearEquiv.ofLinear (Matrix.toLin e e (γ⁻¹ : GL (Fin n) E))
+    (Matrix.toLin e e (γ : Matrix _ _ E)) (by rw [← Matrix.toLin_mul]; simp)
+    (by rw [← Matrix.toLin_mul]; simp))
 
-theorem tw_apply (e : Basis (Fin n) E V) (γ : GL (Fin n) E) (j : Fin n) :
-    tw e γ j = ∑ i, ((γ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j • e i := by
+theorem tw_apply (e : Basis (Fin n) E V) (γ : GL (Fin n) E) (j : Fin n)
+    : tw e γ j = ∑ i, ((γ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j • e i := by
   simp [tw, Matrix.toLin_self]
 
-theorem repr_tw_apply (e : Basis (Fin n) E V) (γ : GL (Fin n) E) (i j : Fin n) :
-    e.repr (tw e γ j) i = ((γ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j := by
+theorem repr_tw_apply (e : Basis (Fin n) E V) (γ : GL (Fin n) E) (i j : Fin n)
+    : e.repr (tw e γ j) i = ((γ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j := by
   rw [tw_apply, Basis.repr_sum_self]
 
-theorem tw_repr (e : Basis (Fin n) E V) (γ : GL (Fin n) E) (y : V) :
-    (fun i => (tw e γ).repr y i) = (γ : Matrix (Fin n) (Fin n) E) *ᵥ fun i => e.repr y i := by
+theorem tw_repr (e : Basis (Fin n) E V) (γ : GL (Fin n) E) (y : V)
+    : (fun i => (tw e γ).repr y i) = (γ : Matrix (Fin n) (Fin n) E) *ᵥ fun i => e.repr y i := by
   funext i
   show e.repr (Matrix.toLin e e (γ : Matrix (Fin n) (Fin n) E) y) i = _
   rw [← LinearMap.toMatrix_mulVec_repr e e, LinearMap.toMatrix_toLin]
 
-theorem toMatrix_tw_left (e : Basis (Fin n) E V) (γ : GL (Fin n) E) :
-    (tw e γ).toMatrix e = (γ : Matrix (Fin n) (Fin n) E) := by
+theorem toMatrix_tw_left (e : Basis (Fin n) E V) (γ : GL (Fin n) E)
+    : (tw e γ).toMatrix e = (γ : Matrix (Fin n) (Fin n) E) := by
   ext i j
   rw [Basis.toMatrix_apply, congrFun (tw_repr e γ (e j)) i]
   simp [Basis.repr_self, Finsupp.single_apply, Matrix.mulVec, dotProduct]
 
-theorem toMatrix_tw_right (e : Basis (Fin n) E V) (γ : GL (Fin n) E) :
-    e.toMatrix (tw e γ) = ((γ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) := by
+theorem toMatrix_tw_right (e : Basis (Fin n) E V) (γ : GL (Fin n) E)
+    : e.toMatrix (tw e γ) = ((γ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) := by
   ext i j
   rw [Basis.toMatrix_apply, repr_tw_apply]
 
 theorem tw_tw (e : Basis (Fin n) E V) (γ δ : GL (Fin n) E) : tw (tw e γ) δ = tw e (δ * γ) := by
-  have key : ∀ (b : Basis (Fin n) E V) (g : GL (Fin n) E) (y : V) (i : Fin n),
-      (tw b g).repr y i = ((g : Matrix (Fin n) (Fin n) E) *ᵥ fun i => b.repr y i) i :=
+  have key
+      : ∀ (b : Basis (Fin n) E V) (g : GL (Fin n) E) (y : V) (i : Fin n),
+        (tw b g).repr y i = ((g : Matrix (Fin n) (Fin n) E) *ᵥ fun i => b.repr y i) i :=
     fun b g y i => congrFun (tw_repr b g y) i
   refine Basis.repr_injective (LinearEquiv.ext fun x => Finsupp.ext fun i => ?_)
   simp only [key, Units.val_mul, Matrix.mulVec_mulVec]
 
 theorem exists_tw (e e' : Basis (Fin n) E V) : ∃ γ : GL (Fin n) E, tw e γ = e' := by
-  refine ⟨⟨e'.toMatrix e, e.toMatrix e', Basis.toMatrix_mul_toMatrix_flip e' e,
-    Basis.toMatrix_mul_toMatrix_flip e e'⟩,
-    Basis.repr_injective (LinearEquiv.ext fun x => Finsupp.ext fun i => ?_)⟩
+  refine ⟨
+    ⟨
+      e'.toMatrix e,
+      e.toMatrix e',
+      Basis.toMatrix_mul_toMatrix_flip e' e,
+      Basis.toMatrix_mul_toMatrix_flip e e'
+    ⟩,
+    Basis.repr_injective (LinearEquiv.ext fun x => Finsupp.ext fun i => ?_)
+  ⟩
   rw [congrFun (tw_repr e _ x) i]
   simp [Basis.toMatrix_mulVec_repr]
 
-theorem Yb_tw (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ[E] E) (γ : GL (Fin n) E) :
-    Yb (tw e γ) T v l = act γ (Yb e T v l) := by
+theorem Yb_tw (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ[E] E) (γ : GL (Fin n) E)
+    : Yb (tw e γ) T v l = act γ (Yb e T v l) := by
   simp only [Yb, act]
   refine Prod.ext ?_ (Prod.ext ?_ (Prod.ext ?_ rfl))
   · simp only
@@ -145,10 +155,10 @@ theorem Yb_tw (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ[
   · exact tw_repr e γ v
   · funext j
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [tw_apply, map_sum, Matrix.vecMul, dotProduct, mul_comm]
+    simp [tw_apply, map_sum, Matrix.vecMul, dotProduct, mul_comm]
 
-theorem vecMul_pow_Yb (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (l : V →ₗ[E] E) (i : ℕ) (j : Fin n) :
-    ((fun j => l (e j)) ᵥ* (LinearMap.toMatrix e e T) ^ i) j = l ((T ^ i) (e j)) := by
+theorem vecMul_pow_Yb (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (l : V →ₗ[E] E) (i : ℕ) (j : Fin n)
+    : ((fun j => l (e j)) ᵥ* (LinearMap.toMatrix e e T) ^ i) j = l ((T ^ i) (e j)) := by
   rw [LinearMap.toMatrix_pow]
   simp only [Matrix.vecMul, dotProduct, LinearMap.toMatrix_apply]
   conv_rhs => rw [← e.sum_repr ((T ^ i) (e j))]
@@ -157,14 +167,14 @@ theorem vecMul_pow_Yb (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (l : V →ₗ[
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, smul_eq_mul, mul_comm]
 
-theorem Cm_Yb (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ[E] E) :
-    Cm (Yb e T v l) = Matrix.of fun i j : Fin n => l ((T ^ (i : ℕ)) (e j)) := by
+theorem Cm_Yb (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ[E] E)
+    : Cm (Yb e T v l) = Matrix.of fun i j : Fin n => l ((T ^ (i : ℕ)) (e j)) := by
   ext i j
   simp only [Cm, Yb, Matrix.of_apply]
   exact vecMul_pow_Yb e T l i j
 
-theorem mom_Yb (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ[E] E) (i : ℕ) :
-    mom (Yb e T v l) i = l ((T ^ i) v) := by
+theorem mom_Yb (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ[E] E) (i : ℕ)
+    : mom (Yb e T v l) i = l ((T ^ i) v) := by
   simp only [mom, Yb]
   rw [LinearMap.toMatrix_pow, LinearMap.toMatrix_mulVec_repr]
   conv_rhs => rw [← e.sum_repr ((T ^ i) v)]
@@ -174,8 +184,9 @@ theorem mom_Yb (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, smul_eq_mul, mul_comm]
 
-theorem inv_Yb [Module.Finite E V] (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ[E] E) :
-    inv (Yb e T v l) = (fun i : Fin n => T.charpoly.coeff i, fun i : Fin n => l ((T ^ (i : ℕ)) v), 0) := by
+theorem inv_Yb [Module.Finite E V] (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ[E] E)
+    : inv (Yb e T v l)
+      = (fun i : Fin n => T.charpoly.coeff i, fun i : Fin n => l ((T ^ (i : ℕ)) v), 0) := by
   simp only [JR.inv]
   refine Prod.ext ?_ (Prod.ext ?_ rfl)
   · funext i
@@ -184,8 +195,8 @@ theorem inv_Yb [Module.Finite E V] (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (
   · funext i
     exact mom_Yb e T v l i
 
-theorem Cm_mul_Bm {k : Type} [CommRing k] (Y : Gl n k) :
-    Cm Y * Bm Y = Matrix.of fun i j : Fin n => mom Y ((i : ℕ) + (j : ℕ)) := by
+theorem Cm_mul_Bm {k : Type} [CommRing k] (Y : Gl n k)
+    : Cm Y * Bm Y = Matrix.of fun i j : Fin n => mom Y ((i : ℕ) + (j : ℕ)) := by
   ext i j
   simp only [Matrix.mul_apply, Cm, Bm, mom, Matrix.of_apply]
   rw [pow_add, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec]
@@ -197,8 +208,8 @@ def lat (e : Basis (Fin n) E V) : Submodule O V := Submodule.span O (Set.range e
 
 variable [IsDomain O] [Module.IsTorsionFree O E]
 
-theorem mem_lat (e : Basis (Fin n) E V) (y : V) :
-    y ∈ lat O e ↔ ∀ i, e.repr y i ∈ (algebraMap O E).range := by
+theorem mem_lat (e : Basis (Fin n) E V) (y : V)
+    : y ∈ lat O e ↔ ∀ i, e.repr y i ∈ (algebraMap O E).range := by
   constructor
   · intro hy
     unfold lat at hy
@@ -210,7 +221,8 @@ theorem mem_lat (e : Basis (Fin n) E V) (y : V) :
       split_ifs
       · exact ⟨1, map_one _⟩
       · exact ⟨0, map_zero _⟩
-    | zero => intro i; exact ⟨0, by simp⟩
+    | zero =>
+      intro i; exact ⟨0, by simp⟩
     | add x z _ _ hx hz =>
       intro i
       rw [map_add (f := _), Finsupp.add_apply]
@@ -232,8 +244,9 @@ theorem span_lat (e : Basis (Fin n) E V) : Submodule.span E (lat O e : Set V) = 
   rw [eq_top_iff, ← e.span_eq]
   exact Submodule.span_mono Submodule.subset_span
 
-theorem lat_stable_iff (e : Basis (Fin n) E V) (T : V →ₗ[E] V) :
-    (∀ y ∈ lat O e, T y ∈ lat O e) ↔ ∀ i j, LinearMap.toMatrix e e T i j ∈ (algebraMap O E).range := by
+theorem lat_stable_iff (e : Basis (Fin n) E V) (T : V →ₗ[E] V)
+    : (∀ y ∈ lat O e, T y ∈ lat O e)
+      ↔ ∀ i j, LinearMap.toMatrix e e T i j ∈ (algebraMap O E).range := by
   constructor
   · intro h i j
     rw [LinearMap.toMatrix_apply]
@@ -245,8 +258,8 @@ theorem lat_stable_iff (e : Basis (Fin n) E V) (T : V →ₗ[E] V) :
     simp only [Matrix.mulVec, dotProduct]
     exact Subring.sum_mem _ fun j _ => Subring.mul_mem _ (h i j) (hy j)
 
-theorem lat_fun_iff (e : Basis (Fin n) E V) (l : V →ₗ[E] E) :
-    (∀ y ∈ lat O e, l y ∈ (algebraMap O E).range) ↔ ∀ j, l (e j) ∈ (algebraMap O E).range := by
+theorem lat_fun_iff (e : Basis (Fin n) E V) (l : V →ₗ[E] E)
+    : (∀ y ∈ lat O e, l y ∈ (algebraMap O E).range) ↔ ∀ j, l (e j) ∈ (algebraMap O E).range := by
   constructor
   · intro h j
     exact h _ (by unfold lat; exact Submodule.subset_span ⟨j, rfl⟩)
@@ -258,9 +271,9 @@ theorem lat_fun_iff (e : Basis (Fin n) E V) (l : V →ₗ[E] E) :
     rw [map_smul, smul_eq_mul]
     exact Subring.mul_mem _ (hy i) (h i)
 
-theorem lat_tw_le_iff (e : Basis (Fin n) E V) (γ : GL (Fin n) E) :
-    lat O (tw e γ) ≤ lat O e ↔
-      ∀ i j, ((γ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j ∈ (algebraMap O E).range := by
+theorem lat_tw_le_iff (e : Basis (Fin n) E V) (γ : GL (Fin n) E)
+    : lat O (tw e γ) ≤ lat O e
+      ↔ ∀ i j, ((γ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j ∈ (algebraMap O E).range := by
   rw [show lat O (tw e γ) = Submodule.span O (Set.range (tw e γ)) from rfl, Submodule.span_le]
   constructor
   · intro h i j
@@ -269,10 +282,12 @@ theorem lat_tw_le_iff (e : Basis (Fin n) E V) (γ : GL (Fin n) E) :
   · rintro h _ ⟨j, rfl⟩
     exact (mem_lat O e _).2 fun i => by rw [repr_tw_apply]; exact h i j
 
-theorem lat_tw_eq_iff (e : Basis (Fin n) E V) (γ δ : GL (Fin n) E) :
-    lat O (tw e δ) = lat O (tw e γ) ↔
-      ∀ i j, ((δ * γ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j ∈ (algebraMap O E).range ∧
-        (((δ * γ⁻¹)⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j ∈ (algebraMap O E).range := by
+theorem lat_tw_eq_iff (e : Basis (Fin n) E V) (γ δ : GL (Fin n) E)
+    : lat O (tw e δ) = lat O (tw e γ)
+      ↔ ∀ i j,
+        ((δ * γ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j ∈ (algebraMap O E).range
+          ∧ (((δ * γ⁻¹)⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j
+            ∈ (algebraMap O E).range := by
   have h1 : tw e δ = tw (tw e γ) (δ * γ⁻¹) := by rw [tw_tw, inv_mul_cancel_right]
   have h2 : tw e γ = tw (tw e δ) (δ * γ⁻¹)⁻¹ := by
     rw [tw_tw, _root_.mul_inv_rev, _root_.inv_inv, mul_assoc, inv_mul_cancel, mul_one]

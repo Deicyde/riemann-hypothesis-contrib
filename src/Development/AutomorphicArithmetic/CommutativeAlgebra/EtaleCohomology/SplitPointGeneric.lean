@@ -47,9 +47,12 @@ private lemma act_ex {U : Type} [CommRing U] (hl : (l : U) ∈ nonZeroDivisors U
   D.univ U hl (w ≫ D.π) (fun j i => w ≫ D.s j (σ j i)) (fun j i => by rw [Category.assoc, D.hs])
     (fun j => split_pt D w σ j)
 
-private def act {U : Type} [CommRing U] (hl : (l : U) ∈ nonZeroDivisors U)
-    (w : Spec (CommRingCat.of U) ⟶ D.W) (σ : ∀ j, Equiv.Perm (Fin (T j).d)) :
-    Spec (CommRingCat.of U) ⟶ D.W := (act_ex D hl w σ).exists.choose
+private def act
+    {U : Type} [CommRing U]
+    (hl : (l : U) ∈ nonZeroDivisors U) (w : Spec (CommRingCat.of U) ⟶ D.W)
+    (σ : ∀ j, Equiv.Perm (Fin (T j).d))
+    : Spec (CommRingCat.of U) ⟶ D.W :=
+  (act_ex D hl w σ).exists.choose
 
 private lemma act_spec {U : Type} [CommRing U] (hl : (l : U) ∈ nonZeroDivisors U)
     (w : Spec (CommRingCat.of U) ⟶ D.W) (σ : ∀ j, Equiv.Perm (Fin (T j).d)) :
@@ -134,28 +137,34 @@ private lemma lift_coi (A : PAlg l) {I : Type} [Fintype I] (e : I → A.U)
   obtain ⟨i1, i2⟩ := hsum Finset.univ
   exact ho _ i1 (by rw [i2, he.complete])
 
-variable {O : Type} [CommRing O] {Y : Scheme.{0}} {q : Y ⟶ Spec (CommRingCat.of O)} {J : Type}
-  {T : J → Corr l Y}
+variable
+  {O : Type} [CommRing O]
+  {Y : Scheme.{0}} {q : Y ⟶ Spec (CommRingCat.of O)} {J : Type} {T : J → Corr l Y}
 
-private def gAct (κ : O →+* OC l) (D : WDat l T) (σ : ∀ j, Equiv.Perm (Fin (T j).d)) :
-    PX (D.π ≫ q) κ ⟶ PX (D.π ≫ q) κ where
-  app A := TypeCat.ofHom fun w => ⟨act D (RL.u_tf A).1 w.1 σ, by
-    rw [← Category.assoc, (act_spec D (RL.u_tf A).1 w.1 σ).1, Category.assoc]
-    exact w.2⟩
+private def gAct (κ : O →+* OC l) (D : WDat l T) (σ : ∀ j, Equiv.Perm (Fin (T j).d))
+    : PX (D.π ≫ q) κ ⟶ PX (D.π ≫ q) κ where
+  app A :=
+    TypeCat.ofHom fun w => ⟨
+      act D (RL.u_tf A).1 w.1 σ,
+      by
+        rw [← Category.assoc, (act_spec D (RL.u_tf A).1 w.1 σ).1, Category.assoc]
+        exact w.2
+    ⟩
   naturality A B f := by
     ext w
     refine Subtype.ext ?_
-    change act D (RL.u_tf B).1 (Spec.map (CommRingCat.ofHom (PAlg.mapU f)) ≫ w.1) σ =
-      Spec.map (CommRingCat.ofHom (PAlg.mapU f)) ≫ act D (RL.u_tf A).1 w.1 σ
+    change act D (RL.u_tf B).1 (Spec.map (CommRingCat.ofHom (PAlg.mapU f)) ≫ w.1) σ
+      = Spec.map (CommRingCat.ofHom (PAlg.mapU f)) ≫ act D (RL.u_tf A).1 w.1 σ
     refine act_eq D _ _ _ σ ?_ fun j i => ?_
     · rw [Category.assoc, (act_spec D (RL.u_tf A).1 w.1 σ).1, Category.assoc]
     · rw [Category.assoc, (act_spec D (RL.u_tf A).1 w.1 σ).2, Category.assoc]
 
 end UpperTheory.Ru.crystallineComparison
 
-open CategoryTheory Limits AlgebraicGeometry CrystallineSemistableComparison UpperTheory.Gal.crystallineComparison UpperTheory.Ru.crystallineComparison in
-theorem UpperTheory.Ru.crystallineComparison.wTrans :
-    UpperTheory.Ru.crystallineComparison.WTrans := by
+open CategoryTheory Limits AlgebraicGeometry CrystallineSemistableComparison
+  UpperTheory.Gal.crystallineComparison UpperTheory.Ru.crystallineComparison in
+theorem UpperTheory.Ru.crystallineComparison.wTrans
+    : UpperTheory.Ru.crystallineComparison.WTrans := by
   intro l _ O _ Y q κ J _ _ T D
   refine ⟨fun σ => gAct κ D σ, ?_, ?_, ?_⟩
   · intro σ
@@ -164,8 +173,10 @@ theorem UpperTheory.Ru.crystallineComparison.wTrans :
     exact (act_spec D (RL.u_tf A).1 w.1 σ).1
   · intro A y
     have hT := testFacts l A.obj A.property
-    have hz : ∀ j, ∃ z : Fin (T j).d → (Spec (CommRingCat.of A.obj.U) ⟶ (T j).Z), (∀ i, z i ≫ (T j).p = y.1) ∧
-        SplitOn (T j).p (awayPt l A.obj.U ≫ y.1) fun i => awayPt l A.obj.U ≫ z i := fun j =>
+    have hz
+        : ∀ j, ∃ z : Fin (T j).d → (Spec (CommRingCat.of A.obj.U) ⟶ (T j).Z),
+          (∀ i, z i ≫ (T j).p = y.1)
+            ∧ SplitOn (T j).p (awayPt l A.obj.U ≫ y.1) fun i => awayPt l A.obj.U ≫ z i := fun j =>
       splitEx l Fact.out Y (T j) A.obj.U hT.1 hT.2.1 hT.2.2.1 y.1
     choose z hz hs using hz
     obtain ⟨w, ⟨hw, -⟩, -⟩ := D.univ A.obj.U hT.1 y.1 z hz hs
@@ -173,11 +184,19 @@ theorem UpperTheory.Ru.crystallineComparison.wTrans :
   · intro A w w' hp
     have hT := testFacts l A.obj A.property
     have hww : w.1 ≫ D.π = w'.1 ≫ D.π := congrArg Subtype.val hp
-    have hperm : ∀ j, ∃ e : Equiv.Perm (Fin (T j).d) → A.obj.U, CompleteOrthogonalIdempotents e ∧
-        ∀ (σ : Equiv.Perm (Fin (T j).d)) (V : Type) [CommRing V] (ρ : A.obj.U →+* V), ρ (e σ) = 1 → ∀ i,
-          Spec.map (CommRingCat.ofHom ρ) ≫ w'.1 ≫ D.s j i = Spec.map (CommRingCat.ofHom ρ) ≫ w.1 ≫ D.s j (σ i) := fun j =>
-      splitPerm l Y (T j) A.obj.U hT.1 hT.2.1 (w.1 ≫ D.π) (fun i => w.1 ≫ D.s j i) (fun i => w'.1 ≫ D.s j i)
-        (fun i => by rw [Category.assoc, D.hs]) (fun i => by rw [Category.assoc, D.hs, hww])
+    have hperm
+        : ∀ j, ∃ e : Equiv.Perm (Fin (T j).d) → A.obj.U,
+          CompleteOrthogonalIdempotents e
+            ∧ ∀ (σ : Equiv.Perm (Fin (T j).d)) (V : Type) [CommRing V] (ρ : A.obj.U →+* V),
+              ρ (e σ) = 1
+                → ∀ i,
+                  Spec.map (CommRingCat.ofHom ρ) ≫ w'.1 ≫ D.s j i
+                    = Spec.map (CommRingCat.ofHom ρ) ≫ w.1 ≫ D.s j (σ i) := fun j =>
+      splitPerm l Y (T j) A.obj.U hT.1 hT.2.1 (w.1 ≫ D.π)
+        (fun i => w.1 ≫ D.s j i)
+        (fun i => w'.1 ≫ D.s j i)
+        (fun i => by rw [Category.assoc, D.hs])
+        (fun i => by rw [Category.assoc, D.hs, hww])
         (split_point_generic D w.1 j) (by rw [hww]; exact split_point_generic D w'.1 j)
     choose e he hE using hperm
     obtain ⟨e₀, he₀, hs⟩ := lift_coi A.obj _ (coi_pi e he)
@@ -194,16 +213,23 @@ theorem UpperTheory.Ru.crystallineComparison.wTrans :
       rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ j), map_mul] at h1
       have h2 : ρ (e j (τ j)) * ρ (e j (τ j)) = ρ (e j (τ j)) := by
         rw [← map_mul, (he j).toOrthogonalIdempotents.idem (τ j)]
-      calc ρ (e j (τ j)) = ρ (e j (τ j)) * (ρ (e j (τ j)) * _) := by rw [h1, mul_one]
+      calc
+        ρ (e j (τ j))
+          = ρ (e j (τ j)) * (ρ (e j (τ j)) * _) := by rw [h1, mul_one]
         _ = _ := by rw [← mul_assoc, h2, h1]
-    have key : ∀ j i, Spec.map (CommRingCat.ofHom ρ) ≫ w'.1 ≫ D.s j i =
-        Spec.map (CommRingCat.ofHom ρ) ≫ w.1 ≫ D.s j (τ j i) := fun j i => hE j (τ j) _ ρ (hρj j) i
-    have hstep : ∀ σ, (gAct κ D σ).app _ ((PX (D.π ≫ q) κ).map (f τ).hom w') =
-        (gAct κ D (τ * σ)).app _ ((PX (D.π ≫ q) κ).map (f τ).hom w) := by
+    have key
+        : ∀ j i,
+          Spec.map (CommRingCat.ofHom ρ) ≫ w'.1 ≫ D.s j i
+            = Spec.map (CommRingCat.ofHom ρ) ≫ w.1 ≫ D.s j (τ j i) := fun j i =>
+      hE j (τ j) _ ρ (hρj j) i
+    have hstep
+        : ∀ σ,
+          (gAct κ D σ).app _ ((PX (D.π ≫ q) κ).map (f τ).hom w')
+            = (gAct κ D (τ * σ)).app _ ((PX (D.π ≫ q) κ).map (f τ).hom w) := by
       intro σ
       refine Subtype.ext ?_
-      change act D (RL.u_tf _).1 (Spec.map (CommRingCat.ofHom ρ) ≫ w'.1) σ =
-        act D (RL.u_tf _).1 (Spec.map (CommRingCat.ofHom ρ) ≫ w.1) (τ * σ)
+      change act D (RL.u_tf _).1 (Spec.map (CommRingCat.ofHom ρ) ≫ w'.1) σ
+        = act D (RL.u_tf _).1 (Spec.map (CommRingCat.ofHom ρ) ≫ w.1) (τ * σ)
       refine act_eq D _ _ _ σ ?_ fun j i => ?_
       · rw [(act_spec D _ _ _).1, Category.assoc, Category.assoc, hww]
       · rw [(act_spec D _ _ _).2]

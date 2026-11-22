@@ -8,8 +8,8 @@ open Finset
 
 namespace PositivityTheory.Rg.Rs.boxvol
 
-theorem sum_range_succ_mul_sub_pred (y : ℕ → ℝ) (n : ℕ) :
-    ∑ r ∈ range (n + 1), (r : ℝ) * (y (r - 1) - y r) = ∑ i ∈ range n, y i - n * y n := by
+theorem sum_range_succ_mul_sub_pred (y : ℕ → ℝ) (n : ℕ)
+    : ∑ r ∈ range (n + 1), (r : ℝ) * (y (r - 1) - y r) = ∑ i ∈ range n, y i - n * y n := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -18,15 +18,16 @@ theorem sum_range_succ_mul_sub_pred (y : ℕ → ℝ) (n : ℕ) :
     push_cast
     ring
 
-theorem sum_range_pairs_sub (y : ℕ → ℝ) (n : ℕ) :
-    ∑ j ∈ range n, ∑ i ∈ range j, (y i - y j)
+theorem sum_range_pairs_sub (y : ℕ → ℝ) (n : ℕ)
+    : ∑ j ∈ range n, ∑ i ∈ range j, (y i - y j)
       = ∑ r ∈ range n, ((r : ℝ) * ((n : ℝ) - r)) * (y (r - 1) - y r) := by
   induction n with
   | zero => simp
   | succ n ih =>
-    have h1 : ∑ r ∈ range (n + 1), ((r : ℝ) * (((n + 1 : ℕ) : ℝ) - r)) * (y (r - 1) - y r)
-        = ∑ r ∈ range (n + 1), ((r : ℝ) * ((n : ℝ) - r)) * (y (r - 1) - y r)
-          + ∑ r ∈ range (n + 1), (r : ℝ) * (y (r - 1) - y r) := by
+    have h1
+        : ∑ r ∈ range (n + 1), ((r : ℝ) * (((n + 1 : ℕ) : ℝ) - r)) * (y (r - 1) - y r)
+          = ∑ r ∈ range (n + 1), ((r : ℝ) * ((n : ℝ) - r)) * (y (r - 1) - y r)
+            + ∑ r ∈ range (n + 1), (r : ℝ) * (y (r - 1) - y r) := by
       rw [← sum_add_distrib]
       refine sum_congr rfl fun r _ => ?_
       push_cast
@@ -35,16 +36,18 @@ theorem sum_range_pairs_sub (y : ℕ → ℝ) (n : ℕ) :
     simp only [sum_sub_distrib, sum_const, card_range, nsmul_eq_mul]
     ring
 
-theorem sum_pairs_sub (n : ℕ) (x : Fin n → ℝ) :
-    ∑ p : {p : Fin n × Fin n // p.1 < p.2}, (x p.1.1 - x p.1.2)
+theorem sum_pairs_sub (n : ℕ) (x : Fin n → ℝ)
+    : ∑ p : {p : Fin n × Fin n // p.1 < p.2}, (x p.1.1 - x p.1.2)
       = ∑ r ∈ Finset.range n, ((r : ℝ) * ((n : ℝ) - r)) *
           (if h : 0 < r ∧ r < n then x ⟨r - 1, by omega⟩ - x ⟨r, h.2⟩ else 0) := by
   set y : ℕ → ℝ := fun k => if h : k < n then x ⟨k, h⟩ else 0 with hy
   have hyx : ∀ i : Fin n, y i = x i := fun i => by simp [hy, i.2]
-  have hL : ∑ p : {p : Fin n × Fin n // p.1 < p.2}, (x p.1.1 - x p.1.2)
-      = ∑ j ∈ range n, ∑ i ∈ range j, (y i - y j) := by
+  have hL
+      : ∑ p : {p : Fin n × Fin n // p.1 < p.2}, (x p.1.1 - x p.1.2)
+        = ∑ j ∈ range n, ∑ i ∈ range j, (y i - y j) := by
     rw [← Finset.sum_subtype (univ.filter fun p : Fin n × Fin n => p.1 < p.2) (by simp)
-      (fun p : Fin n × Fin n => x p.1 - x p.2), Finset.sum_filter, Fintype.sum_prod_type_right,
+        (fun p : Fin n × Fin n => x p.1 - x p.2),
+      Finset.sum_filter, Fintype.sum_prod_type_right,
       ← Fin.sum_univ_eq_sum_range (fun j => ∑ i ∈ range j, (y i - y j)) n]
     refine sum_congr rfl fun j _ => ?_
     have hj : range (j : ℕ) = (range n).filter (· < (j : ℕ)) := by

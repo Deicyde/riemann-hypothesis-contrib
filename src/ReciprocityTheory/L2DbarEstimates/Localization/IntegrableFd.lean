@@ -102,8 +102,10 @@ lemma dop_sb' {n : ℕ} (j k : Fin n) (g : Fin 4 → V n → ℂ) (a b : V n →
 end FlatWeightedEstimates
 
 open FlatWeightedEstimates in
-theorem flatGraph (n : ℕ) (hGraph : B.GraphSt (V n) volume ℝ) (hSmooth : B.SmoothSt (V n) volume)
-    (hSupp : B.SupportSt (V n) volume) (hStd : B.StdSt (V n) volume) : FlatGraphStatement n := by
+theorem flatGraph
+    (n : ℕ) (hGraph : B.GraphSt (V n) volume ℝ) (hSmooth : B.SmoothSt (V n) volume)
+    (hSupp : B.SupportSt (V n) volume) (hStd : B.StdSt (V n) volume)
+    : FlatGraphStatement n := by
   intro Ω K G D S hΩ hK hKΩ hvan hG hD hS hdiv hsb
   obtain ⟨r, hr, hrΩ⟩ := hK.exists_cthickening_subset_open hΩ hKΩ
   refine ⟨Metric.cthickening r K, hK.cthickening, hrΩ, fun δ hδ => ?_⟩
@@ -114,25 +116,31 @@ theorem flatGraph (n : ℕ) (hGraph : B.GraphSt (V n) volume ℝ) (hSmooth : B.S
       (ContinuousLinearMap.proj j : (Fin n → Fin n → ℂ) →L[ℂ] (Fin n → ℂ))).comp_memLp' hS
   have hGl : ∀ j, LocallyIntegrable (fun u => G u j) volume := fun j =>
     (hGj j).locallyIntegrable (by norm_num)
-  have hWD : B.IsWeakD volume (cD n) (vD n)
-      (fun p => fun u => G u (finProdFinEquiv.symm p).1) D := by
+  have hWD
+      : B.IsWeakD volume (cD n) (vD n) (fun p => fun u => G u (finProdFinEquiv.symm p).1) D := by
     refine ⟨fun p => hGl _, hD.locallyIntegrable (by norm_num), fun φ hφ hc => ?_⟩
-    have hI := fun j => int_comb (hGl j) hφ hc (1 / 2) (-Complex.I / 2) (bas n j)
-      (Complex.I • bas n j)
+    have hI := fun j =>
+      int_comb (hGl j) hφ hc (1 / 2) (-Complex.I / 2) (bas n j) (Complex.I • bas n j)
     have e1 := hdiv φ hφ hc
     simp only [wd_eq] at e1
-    rw [integral_finsetSum _ (fun j _ => (hI j).1),
-      Finset.sum_congr rfl (fun j _ => (hI j).2)] at e1
-    have h2 := reindex (n := n) (fun q => ![(1 : ℂ) / 2, -Complex.I / 2] q.2 *
-      ∫ y, G y q.1 * fderiv ℝ φ y (![bas n q.1, Complex.I • bas n q.1] q.2))
-    have h3 : ∑ p, cD n p * ∫ x, (fun u => G u (finProdFinEquiv.symm p).1) x *
-        fderiv ℝ φ x (vD n p) = ∑ j, (1 / 2 * (∫ y, G y j * fderiv ℝ φ y (bas n j)) +
-          -Complex.I / 2 * ∫ y, G y j * fderiv ℝ φ y (Complex.I • bas n j)) :=
+    rw [integral_finsetSum _ (fun j _ => (hI j).1), Finset.sum_congr rfl (fun j _ => (hI j).2)]
+      at e1
+    have h2 :=
+      reindex (n := n) (fun q =>
+        ![(1 : ℂ) / 2, -Complex.I / 2] q.2
+          * ∫ y, G y q.1 * fderiv ℝ φ y (![bas n q.1, Complex.I • bas n q.1] q.2))
+    have h3
+        : ∑ p, cD n p * ∫ x, (fun u => G u (finProdFinEquiv.symm p).1) x *
+            fderiv ℝ φ x (vD n p)
+          = ∑ j, (1 / 2 * (∫ y, G y j * fderiv ℝ φ y (bas n j)) +
+            -Complex.I / 2 * ∫ y, G y j * fderiv ℝ φ y (Complex.I • bas n j)) :=
       h2.trans (Finset.sum_congr rfl fun j _ => by simp)
     rw [h3, e1, neg_neg]
-  have hWS : ∀ j k, B.IsWeakD volume cS (vS n j k)
-      (fun p => ![fun u => G u k, fun u => G u k, fun u => G u j, fun u => G u j] p)
-      (fun u => S u j k) := by
+  have hWS
+      : ∀ j k,
+        B.IsWeakD volume cS (vS n j k)
+          (fun p => ![fun u => G u k, fun u => G u k, fun u => G u j, fun u => G u j] p)
+          (fun u => S u j k) := by
     intro j k
     refine ⟨fun p => ?_, (hSjk j k).locallyIntegrable (by norm_num), fun φ hφ hc => ?_⟩
     · fin_cases p <;> exact hGl _
@@ -147,32 +155,50 @@ theorem flatGraph (n : ℕ) (hGraph : B.GraphSt (V n) volume ℝ) (hSmooth : B.S
     linear_combination e1
   have hKr : ∀ t : ℝ, 0 < t → (B.Kernel.std (V n) volume t).r = t := fun t ht => by
     simp [B.Kernel.std, B.Kernel.ofBump, B.stdBump, ht]
-  have hGD := hGraph (𝓝[>] 0) (fun t => B.Kernel.std (V n) volume t) hStd _ _ _ _ _ hWD
-    (fun p => hGj _) hD
-  have hGS := fun j k => hGraph (𝓝[>] 0) (fun t => B.Kernel.std (V n) volume t) hStd _ _ _ _ _
-    (hWS j k) (fun p => by fin_cases p <;> exact hGj _) (hSjk j k)
-  have T1 : Tendsto (fun t => ∑ j, ∫⁻ y,
-      ‖B.moll (B.Kernel.std (V n) volume t) (fun u => G u j) y - G y j‖ₑ ^ 2) (𝓝[>] 0) (𝓝 0) := by
-    have := tendsto_finsetSum Finset.univ
-      (fun j _ => tendsto_lint _ (hGD.1 (finProdFinEquiv (j, 0))))
+  have hGD :=
+    hGraph (𝓝[>] 0) (fun t => B.Kernel.std (V n) volume t) hStd _ _ _ _ _ hWD (fun p => hGj _) hD
+  have hGS := fun j k =>
+    hGraph (𝓝[>] 0)
+      (fun t => B.Kernel.std (V n) volume t)
+      hStd _ _ _ _ _ (hWS j k)
+      (fun p => by fin_cases p <;> exact hGj _)
+      (hSjk j k)
+  have T1 : Tendsto
+      (fun t =>
+        ∑ j, ∫⁻ y,
+          ‖B.moll (B.Kernel.std (V n) volume t) (fun u => G u j) y - G y j‖ₑ ^ 2)
+      (𝓝[>] 0) (𝓝 0) := by
+    have :=
+      tendsto_finsetSum Finset.univ (fun j _ => tendsto_lint _ (hGD.1 (finProdFinEquiv (j, 0))))
     simpa using this
   have T2 := tendsto_lint _ hGD.2
-  have T3 : Tendsto (fun t => ∑ j, ∑ k, ∫⁻ y, ‖(B.Dop cS (vS n j k)
-      (fun p => B.moll (B.Kernel.std (V n) volume t)
-        (![fun u => G u k, fun u => G u k, fun u => G u j, fun u => G u j] p)) -
-      fun u => S u j k) y‖ₑ ^ 2) (𝓝[>] 0) (𝓝 0) := by
-    have := tendsto_finsetSum Finset.univ (fun j _ => tendsto_finsetSum Finset.univ
-      (fun k _ => tendsto_lint _ (hGS j k).2))
+  have T3 : Tendsto
+      (fun t =>
+        ∑ j, ∑ k, ∫⁻ y, ‖(B.Dop cS (vS n j k)
+          (fun p => B.moll (B.Kernel.std (V n) volume t)
+            (![fun u => G u k, fun u => G u k, fun u => G u j, fun u => G u j] p)) -
+          fun u => S u j k) y‖ₑ ^ 2)
+      (𝓝[>] 0) (𝓝 0) := by
+    have :=
+      tendsto_finsetSum Finset.univ
+        (fun j _ => tendsto_finsetSum Finset.univ (fun k _ => tendsto_lint _ (hGS j k).2))
     simpa using this
   have e4 : ∀ᶠ t in 𝓝[>] (0 : ℝ), 0 < t := self_mem_nhdsWithin
   have e5 : ∀ᶠ t in 𝓝[>] (0 : ℝ), t < r := nhdsWithin_le_nhds (Iio_mem_nhds hr)
-  have ev := (((T1.eventually (gt_mem_nhds hδ)).and (T2.eventually (gt_mem_nhds hδ))).and
-    (T3.eventually (gt_mem_nhds hδ))).and (e4.and e5)
+  have ev :=
+    (((T1.eventually (gt_mem_nhds hδ)).and (T2.eventually (gt_mem_nhds hδ))).and
+      (T3.eventually (gt_mem_nhds hδ))).and (e4.and e5)
   obtain ⟨t, ⟨⟨h1, h2⟩, h3⟩, ht0', htr'⟩ := ev.exists
-  have hmc : ∀ j, ContDiff ℝ ∞ (B.moll (B.Kernel.std (V n) volume t) (fun u => G u j)) :=
-    fun j => hSmooth _ _ (hGl j)
-  refine ⟨fun y => WithLp.toLp 2 (fun j => B.moll (B.Kernel.std (V n) volume t)
-    (fun u => G u j) y), ?_, ?_, ?_, ?_, ?_⟩
+  have hmc : ∀ j, ContDiff ℝ ∞ (B.moll (B.Kernel.std (V n) volume t) (fun u => G u j)) := fun j =>
+    hSmooth _ _ (hGl j)
+  refine ⟨
+    fun y => WithLp.toLp 2 (fun j => B.moll (B.Kernel.std (V n) volume t) (fun u => G u j) y),
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact contDiff_piLp' 2 fun j => hmc j
   · intro y hy
     have hz : ∀ j, B.moll (B.Kernel.std (V n) volume t) (fun u => G u j) y = 0 := by
@@ -195,30 +221,38 @@ theorem flatGraph (n : ℕ) (hGraph : B.GraphSt (V n) volume ℝ) (hSmooth : B.S
     refine (lintegral_congr fun y => ?_).trans (lintegral_finsetSum' _ (fun j _ => ?_))
     · rw [enorm_sq_V]
       rfl
-    · exact ((hmc j).continuous.aestronglyMeasurable.sub
-        (hGj j).aestronglyMeasurable).eNorm.pow_const 2
+    · exact
+        ((hmc j).continuous.aestronglyMeasurable.sub (hGj j).aestronglyMeasurable).eNorm.pow_const 2
   · refine lt_of_le_of_lt (le_of_eq (lintegral_congr fun y => ?_)) h2
-    exact congrArg (fun s => ‖s - D y‖ₑ ^ 2)
+    exact congrArg
+      (fun s => ‖s - D y‖ₑ ^ 2)
       (dop_div (fun j => B.moll (B.Kernel.std (V n) volume t) (fun u => G u j)) y).symm
-  · let Q : Fin n → Fin n → V n → ℝ≥0∞ := fun j k y => ‖(B.Dop cS (vS n j k)
-        (fun p => B.moll (B.Kernel.std (V n) volume t)
-          (![fun u => G u k, fun u => G u k, fun u => G u j, fun u => G u j] p)) -
-        fun u => S u j k) y‖ₑ ^ 2
+  · let Q : Fin n → Fin n → V n → ℝ≥0∞ := fun j k y =>
+      ‖(B.Dop cS (vS n j k)
+          (fun p => B.moll (B.Kernel.std (V n) volume t)
+            (![fun u => G u k, fun u => G u k, fun u => G u j, fun u => G u j] p)) -
+          fun u => S u j k) y‖ₑ
+        ^ 2
     have hmeas : ∀ j k, AEMeasurable (Q j k) volume := fun j k =>
-      ((Finset.measurable_sum _ fun p _ => (measurable_fderiv_apply_const ℝ _ _).const_mul
-        _).aestronglyMeasurable.sub (hSjk j k).aestronglyMeasurable).eNorm.pow_const 2
+      ((Finset.measurable_sum _ fun p _ =>
+          (measurable_fderiv_apply_const ℝ _ _).const_mul _).aestronglyMeasurable.sub
+        (hSjk j k).aestronglyMeasurable).eNorm.pow_const 2
     have hsum : ∫⁻ y, ∑ j, ∑ k, Q j k y = ∑ j, ∑ k, ∫⁻ y, Q j k y := by
       rw [lintegral_finsetSum' _ (fun j _ => Finset.aemeasurable_fun_sum _ fun k _ => hmeas j k)]
       exact Finset.sum_congr rfl fun j _ => lintegral_finsetSum' _ fun k _ => hmeas j k
     refine lt_of_le_of_lt (le_trans (lintegral_mono fun y => ?_) hsum.le) h3
-    have hA : ∀ j k, Q j k y =
-        ‖wdb n j (fun u => B.moll (B.Kernel.std (V n) volume t) (fun u => G u k) u) y -
-          wdb n k (fun u => B.moll (B.Kernel.std (V n) volume t) (fun u => G u j) u) y -
-          S y j k‖ₑ ^ 2 := fun j k => by
+    have hA
+        : ∀ j k,
+          Q j k y
+            = ‖wdb n j (fun u => B.moll (B.Kernel.std (V n) volume t) (fun u => G u k) u) y -
+                wdb n k (fun u => B.moll (B.Kernel.std (V n) volume t) (fun u => G u j) u) y -
+                S y j k‖ₑ
+              ^ 2 := fun j k => by
       simp only [Q]
       rw [Pi.sub_apply, dop_sb' j k _ _ _ rfl rfl rfl rfl y]
       rfl
-    refine le_of_le_of_eq ?_ (Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => hA j k).symm
+    refine le_of_le_of_eq ?_
+      (Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => hA j k).symm
     beta_reduce
     unfold sq2
     refine le_trans (ENNReal.ofReal_le_ofReal (half_le_self (by positivity))) (le_of_eq ?_)

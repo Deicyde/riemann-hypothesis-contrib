@@ -9,8 +9,11 @@ open CategoryTheory Opposite GlobalTheory.EtC
 
 namespace LateralTheory.KummerTheory.ZHomPf
 
-def linOf {M N : Type*} [AddCommGroup M] [AddCommGroup N] [Module (ULift.{1} ℤ) M] [Module (ULift.{1} ℤ) N]
-    (f : M →+ N) : M →ₗ[ULift.{1} ℤ] N where
+def linOf
+    {M N : Type*}
+    [AddCommGroup M] [AddCommGroup N] [Module (ULift.{1} ℤ) M] [Module (ULift.{1} ℤ) N]
+    (f : M →+ N)
+    : M →ₗ[ULift.{1} ℤ] N where
   toFun := f
   map_add' := f.map_add
   map_smul' r x := by

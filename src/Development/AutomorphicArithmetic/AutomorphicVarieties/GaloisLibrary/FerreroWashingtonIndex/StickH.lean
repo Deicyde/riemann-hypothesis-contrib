@@ -6,17 +6,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick UpperTheory.V.FW
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick
+  UpperTheory.V.FW
 open scoped nonZeroDivisors
 
-theorem UpperTheory.V.FW.stickH :
-    ∀ (M c : ℕ) [NeZero M] (L : Type) [Field L] [NumberField L] [IsCyclotomicExtension {M} ℚ L], c.Coprime M → Odd c → 2 < M → (cycRep M L).asAlgebraHom (thetaH M c * (1 - MonoidAlgebra.of ℤ _ (-1 : (ZMod M)ˣ))) = 0 := by
+theorem UpperTheory.V.FW.stickH
+    : ∀ (M c : ℕ) [NeZero M] (L : Type) [Field L] [NumberField L] [IsCyclotomicExtension {M} ℚ L],
+      c.Coprime M → Odd c → 2 < M
+        → (cycRep M L).asAlgebraHom (thetaH M c * (1 - MonoidAlgebra.of ℤ _ (-1 : (ZMod M)ˣ)))
+          = 0 := by
   intro M c _ L _ _ _ hc hodd hM
   set_option synthInstance.maxHeartbeats 100000 in
     rw [(thetaFull M c hc hodd hM).1, map_sum]
   refine LinearMap.ext fun x => ?_
-  simp only [Representation.asAlgebraHom_single, LinearMap.sum_apply,
-    LinearMap.smul_apply, LinearMap.zero_apply]
+  simp only [Representation.asAlgebraHom_single, LinearMap.sum_apply, LinearMap.smul_apply,
+    LinearMap.zero_apply]
   have key : ∀ y : Cl L, ∑ s : (ZMod M)ˣ, gc M c ↑s • (cycRep M L s) (Additive.ofMul y) = 0 := by
     intro y
     simp only [cycRep_apply, ← ofMul_zpow, ← ofMul_prod, clA, ofMul_eq_zero]
@@ -24,8 +29,11 @@ theorem UpperTheory.V.FW.stickH :
     set u : (ZMod M)ˣ := ZMod.unitOfCoprime c hc with hu_def
     set k : ℤ := (((c - 1) / 2 : ℕ) : ℤ) with hk
     refine (Stick.coef M L y).2
-      (fun s => (c : ℤ) * (if s = u⁻¹ then 1 else 0) - (k + 1) * (if s = 1 then 1 else 0)
-        - k * (if s = -1 then 1 else 0)) (fun t => gc M c ↑t) ?_
+      (fun s =>
+        (c : ℤ) * (if s = u⁻¹ then 1 else 0) - (k + 1) * (if s = 1 then 1 else 0)
+          - k * (if s = -1 then 1 else 0))
+      (fun t => gc M c ↑t)
+      ?_
     intro t
     haveI : NeZero (t : ZMod M) := ⟨t.ne_zero⟩
     have hlt := ZMod.val_lt (t : ZMod M)

@@ -6,12 +6,14 @@ public import Mathlib
 
 namespace GlobalTheory.InjectiveOfIntegral
 
-theorem exists_injective_of_isIntegral {A B O C : Type} [CommRing A] [IsDomain A] [CommRing B]
-    [IsDomain B] [CommRing O] [Field C] [IsAlgClosed C] [Algebra O C] (v : Valuation C NNReal)
-    (hv : Valuation.Integers v O) [Algebra A B] [Algebra.IsIntegral A B]
-    (hAB : Function.Injective (algebraMap A B)) (j : A →+* O)
-    (hj : Function.Injective ((algebraMap O C).comp j)) :
-    ∃ j' : B →+* O, Function.Injective ((algebraMap O C).comp j') := by
+theorem exists_injective_of_isIntegral
+    {A B O C : Type} [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [CommRing O] [Field C]
+    [IsAlgClosed C] [Algebra O C]
+    (v : Valuation C NNReal) (hv : Valuation.Integers v O)
+    [Algebra A B] [Algebra.IsIntegral A B]
+    (hAB : Function.Injective (algebraMap A B))
+    (j : A →+* O) (hj : Function.Injective ((algebraMap O C).comp j))
+    : ∃ j' : B →+* O, Function.Injective ((algebraMap O C).comp j') := by
   classical
   let _ : Algebra A C := ((algebraMap O C).comp j).toAlgebra
   let _ : Algebra A O := j.toAlgebra
@@ -22,8 +24,7 @@ theorem exists_injective_of_isIntegral {A B O C : Type} [CommRing A] [IsDomain A
   have : Algebra.IsAlgebraic A B := Algebra.IsIntegral.isAlgebraic
   let ψ : B →ₐ[A] C := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have hker : RingHom.ker (ψ : B →+* C) = ⊥ := by
     apply Ideal.eq_bot_of_comap_eq_bot (R := A)
@@ -37,12 +38,13 @@ theorem exists_injective_of_isIntegral {A B O C : Type} [CommRing A] [IsDomain A
     have hb : IsIntegral A (ψ b) := (Algebra.IsIntegral.isIntegral b).map ψ
     exact hv.mem_of_integral hb.tower_top
   choose g hg using fun b => hv.exists_of_le_one (hint b)
-  let j' : B →+* O :=
-    { toFun := g
-      map_one' := hv.hom_inj (by simp only [hg, map_one])
-      map_mul' := fun x y => hv.hom_inj (by simp only [hg, map_mul])
-      map_zero' := hv.hom_inj (by simp only [hg, map_zero])
-      map_add' := fun x y => hv.hom_inj (by simp only [hg, map_add (f := _)]) }
+  let j' : B →+* O := {
+    toFun := g
+    map_one' := hv.hom_inj (by simp only [hg, map_one])
+    map_mul' := fun x y => hv.hom_inj (by simp only [hg, map_mul])
+    map_zero' := hv.hom_inj (by simp only [hg, map_zero])
+    map_add' := fun x y => hv.hom_inj (by simp only [hg, map_add (f := _)])
+  }
   refine ⟨j', ?_⟩
   have e : (algebraMap O C).comp j' = (ψ : B →+* C) := RingHom.ext hg
   rw [e]

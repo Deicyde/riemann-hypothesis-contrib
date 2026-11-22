@@ -6,16 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.ExistsNe
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem trdeg_eq_of_locally_isStandardSmoothOfRelativeDimension {K B : Type} [Field K]
-    [CommRing B] [IsDomain B] [Algebra K B] {g : ℕ}
-    (h : RingHom.Locally (RingHom.IsStandardSmoothOfRelativeDimension g) (algebraMap K B)) :
-    Algebra.trdeg K B = g := by
+theorem trdeg_eq_of_locally_isStandardSmoothOfRelativeDimension
+    {K B : Type} [Field K] [CommRing B] [IsDomain B] [Algebra K B]
+    {g : ℕ} (h : RingHom.Locally (RingHom.IsStandardSmoothOfRelativeDimension g) (algebraMap K B))
+    : Algebra.trdeg K B = g := by
   obtain ⟨s, hs, hP⟩ := h
   obtain ⟨t, hts, ht⟩ : ∃ t ∈ s, t ≠ 0 := by
     by_contra! hz
@@ -41,8 +43,13 @@ theorem trdeg_eq_of_locally_isStandardSmoothOfRelativeDimension {K B : Type} [Fi
     (faithfulSMul_iff_algebraMap_injective _ _).mpr (algebraMap K B).injective
   rw [← trdeg_eq_of_isAlgebraic_top K B (Localization.Away t), hd2, hdg]
 
-theorem trdeg_eq_of_smoothOfRelativeDimension :
-    ∀ (K : Type) [Field K] (X : Scheme.{0}) [IsIntegral X] (f : X ⟶ Spec (CommRingCat.of K)) (g : ℕ), SmoothOfRelativeDimension g f → ∀ (B : Type) [CommRing B] [Nontrivial B] [Algebra K B] (j : Spec (CommRingCat.of B) ⟶ X), IsOpenImmersion j → j ≫ f = Spec.map (CommRingCat.ofHom (algebraMap K B)) → Algebra.trdeg K B = g := by
+theorem trdeg_eq_of_smoothOfRelativeDimension
+    : ∀ (K : Type) [Field K] (X : Scheme.{0}) [IsIntegral X] (f : X ⟶ Spec (CommRingCat.of K))
+        (g : ℕ),
+      SmoothOfRelativeDimension g f
+        → ∀ (B : Type) [CommRing B] [Nontrivial B] [Algebra K B] (j : Spec (CommRingCat.of B) ⟶ X),
+          IsOpenImmersion j → j ≫ f = Spec.map (CommRingCat.ofHom (algebraMap K B))
+            → Algebra.trdeg K B = g := by
   intro K _ X _ f g hf B _ _ _ j hj hjf
   have : IsIntegral (Spec (CommRingCat.of B)) := isIntegral_of_isOpenImmersion j
   have : IsDomain B := (affine_isIntegral_iff (CommRingCat.of B)).mp this

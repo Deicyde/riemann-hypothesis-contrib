@@ -11,8 +11,9 @@ open scoped nonZeroDivisors
 noncomputable section
 namespace GlobalTheory.DiscClass
 
-theorem G_eq_of_mul (Λ Λ' : PeriodPair) (u : ℂ) (hu : u ≠ 0) (h : ∀ w, u * w ∈ Λ'.lattice ↔ w ∈ Λ.lattice) (k : ℕ) :
-    Λ.G k = u ^ k * Λ'.G k := by
+theorem G_eq_of_mul
+    (Λ Λ' : PeriodPair) (u : ℂ) (hu : u ≠ 0) (h : ∀ w, u * w ∈ Λ'.lattice ↔ w ∈ Λ.lattice) (k : ℕ)
+    : Λ.G k = u ^ k * Λ'.G k := by
   let e : (Λ.lattice : Set ℂ) ≃ (Λ'.lattice : Set ℂ) :=
     (Equiv.mulLeft₀ u hu).subtypeEquiv fun w => by simpa using (h w).symm
   have h2 : ∀ P : PeriodPair, P.G k = ∑' w : (P.lattice : Set ℂ), ((w : ℂ) ^ k)⁻¹ := fun _ => rfl
@@ -21,14 +22,18 @@ theorem G_eq_of_mul (Λ Λ' : PeriodPair) (u : ℂ) (hu : u ≠ 0) (h : ∀ w, u
   have : ((e w : (Λ'.lattice : Set ℂ)) : ℂ) = u * w := rfl
   rw [this, mul_pow, mul_inv, ← mul_assoc, mul_inv_cancel₀ (pow_ne_zero _ hu), one_mul]
 
-theorem latDisc_eq_of_mul (Λ Λ' : PeriodPair) (u : ℂ) (hu : u ≠ 0) (h : ∀ w, u * w ∈ Λ'.lattice ↔ w ∈ Λ.lattice) :
-    latDisc Λ = u ^ 12 * latDisc Λ' := by
-  simp only [latDisc, PeriodPair.g₂, PeriodPair.g₃, G_eq_of_mul Λ Λ' u hu h 4, G_eq_of_mul Λ Λ' u hu h 6]
+theorem latDisc_eq_of_mul
+    (Λ Λ' : PeriodPair) (u : ℂ) (hu : u ≠ 0) (h : ∀ w, u * w ∈ Λ'.lattice ↔ w ∈ Λ.lattice)
+    : latDisc Λ = u ^ 12 * latDisc Λ' := by
+  simp only [latDisc, PeriodPair.g₂, PeriodPair.g₃, G_eq_of_mul Λ Λ' u hu h 4,
+    G_eq_of_mul Λ Λ' u hu h 6]
   ring
 
-theorem abs_norm_eq_norm_sq {K : Type} [Field K] [NumberField K] (φK : K →+* ℂ) (h2 : Module.finrank ℚ K = 2)
-    (hc : (starRingEnd ℂ).comp φK ≠ φK) (x : K) :
-    ((|Algebra.norm ℚ x| : ℚ) : ℝ) = ‖φK x‖ ^ 2 := by
+theorem abs_norm_eq_norm_sq
+    {K : Type} [Field K] [NumberField K]
+    (φK : K →+* ℂ)
+    (h2 : Module.finrank ℚ K = 2) (hc : (starRingEnd ℂ).comp φK ≠ φK) (x : K)
+    : ((|Algebra.norm ℚ x| : ℚ) : ℝ) = ‖φK x‖ ^ 2 := by
   have hcx : (InfinitePlace.mk φK).IsComplex := by
     rw [InfinitePlace.isComplex_mk_iff, ComplexEmbedding.isReal_iff]
     intro e
@@ -46,16 +51,22 @@ theorem abs_norm_eq_norm_sq {K : Type} [Field K] [NumberField K] (φK : K →+* 
   have huniq : ∀ w : InfinitePlace K, w = InfinitePlace.mk φK := fun w =>
     Fintype.card_le_one_iff.1 hcard.le w _
   have hp := InfinitePlace.prod_eq_abs_norm x
-  have e : (∏ w : InfinitePlace K, w x ^ w.mult) = InfinitePlace.mk φK x ^ (InfinitePlace.mk φK).mult := by
+  have e
+      : (∏ w : InfinitePlace K, w x ^ w.mult)
+        = InfinitePlace.mk φK x ^ (InfinitePlace.mk φK).mult := by
     rw [Fintype.prod_eq_single (InfinitePlace.mk φK) fun w hw => absurd (huniq w) hw]
   rw [← hp, e, InfinitePlace.apply, InfinitePlace.mult_isComplex ⟨_, hcx⟩]
 
-theorem nrm_pow_mul_norm_latDisc_eq {K : Type} [Field K] [NumberField K] (φK : K →+* ℂ) (h2 : Module.finrank ℚ K = 2)
-    (hc : (starRingEnd ℂ).comp φK ≠ φK) (𝔞 𝔟 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (Λa Λb : PeriodPair)
-    (ha : IsLatOf φK (𝔞 : FractionalIdeal (𝓞 K)⁰ K) Λa) (hb : IsLatOf φK (𝔟 : FractionalIdeal (𝓞 K)⁰ K) Λb)
-    (hcl : ClassGroup.mk K 𝔞 = ClassGroup.mk K 𝔟) :
-    nrm (𝔞 : FractionalIdeal (𝓞 K)⁰ K) ^ 6 * ‖latDisc Λa‖ = nrm (𝔟 : FractionalIdeal (𝓞 K)⁰ K) ^ 6 * ‖latDisc Λb‖ := by
-
+theorem nrm_pow_mul_norm_latDisc_eq
+    {K : Type} [Field K] [NumberField K]
+    (φK : K →+* ℂ)
+    (h2 : Module.finrank ℚ K = 2) (hc : (starRingEnd ℂ).comp φK ≠ φK)
+    (𝔞 𝔟 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (Λa Λb : PeriodPair)
+    (ha : IsLatOf φK (𝔞 : FractionalIdeal (𝓞 K)⁰ K) Λa)
+    (hb : IsLatOf φK (𝔟 : FractionalIdeal (𝓞 K)⁰ K) Λb)
+    (hcl : ClassGroup.mk K 𝔞 = ClassGroup.mk K 𝔟)
+    : nrm (𝔞 : FractionalIdeal (𝓞 K)⁰ K) ^ 6 * ‖latDisc Λa‖
+      = nrm (𝔟 : FractionalIdeal (𝓞 K)⁰ K) ^ 6 * ‖latDisc Λb‖ := by
   have h1 : ClassGroup.mk K (𝔟 * 𝔞⁻¹) = 1 := by rw [map_mul, map_inv, ← hcl, mul_inv_cancel]
   obtain ⟨c, hcE⟩ := (FractionalIdeal.isPrincipal_iff _).1 (ClassGroup.mk_eq_one_iff.1 h1)
   have hb' : (𝔟 : FractionalIdeal (𝓞 K)⁰ K) = FractionalIdeal.spanSingleton (𝓞 K)⁰ c * 𝔞 := by
@@ -68,7 +79,8 @@ theorem nrm_pow_mul_norm_latDisc_eq {K : Type} [Field K] [NumberField K] (φK : 
 
   have hlat : ∀ w, φK c * w ∈ Λb.lattice ↔ w ∈ Λa.lattice := by
     intro w
-    have eb : φK c * w ∈ Λb.lattice ↔ φK c * w ∈ φK '' ((𝔟 : FractionalIdeal (𝓞 K)⁰ K) : Set K) := by
+    have eb
+        : φK c * w ∈ Λb.lattice ↔ φK c * w ∈ φK '' ((𝔟 : FractionalIdeal (𝓞 K)⁰ K) : Set K) := by
       rw [← hb]; rfl
     have ea : w ∈ Λa.lattice ↔ w ∈ φK '' ((𝔞 : FractionalIdeal (𝓞 K)⁰ K) : Set K) := by
       rw [← ha]; rfl
@@ -88,9 +100,11 @@ theorem nrm_pow_mul_norm_latDisc_eq {K : Type} [Field K] [NumberField K] (φK : 
       exact ⟨y, hy, rfl⟩
   have hD := latDisc_eq_of_mul Λa Λb (φK c) hu hlat
 
-  have hN : nrm (𝔟 : FractionalIdeal (𝓞 K)⁰ K) = ‖φK c‖ ^ 2 * nrm (𝔞 : FractionalIdeal (𝓞 K)⁰ K) := by
+  have hN
+      : nrm (𝔟 : FractionalIdeal (𝓞 K)⁰ K) = ‖φK c‖ ^ 2 * nrm (𝔞 : FractionalIdeal (𝓞 K)⁰ K) := by
     unfold nrm
-    rw [hb', map_mul, FractionalIdeal.absNorm_span_singleton, Rat.cast_mul, abs_norm_eq_norm_sq φK h2 hc c]
+    rw [hb', map_mul, FractionalIdeal.absNorm_span_singleton, Rat.cast_mul,
+      abs_norm_eq_norm_sq φK h2 hc c]
   rw [hN, hD, norm_mul, norm_pow]
   ring
 

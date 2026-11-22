@@ -38,26 +38,31 @@ theorem latDegBasis_holds : LatDegBasisStatement := by
     simp [DK, algebraMap_smul]
   have hNKdet : NK.det = algebraMap (𝓞 K) K M.det := (RingHom.map_det _ M).symm
   have hDKdet : DK.det = algebraMap (𝓞 K) K Dm.det := (RingHom.map_det _ Dm).symm
-  have hgc : ∀ σ : K →+* ℂ, (gramC (H σ) σ (fun j => D • b' j)).det =
-      ((Complex.normSq (σ NK.det) : ℝ) : ℂ) * (gramC (H σ) σ b).det := fun σ => by
+  have hgc
+      : ∀ σ : K →+* ℂ,
+        (gramC (H σ) σ (fun j => D • b' j)).det
+          = ((Complex.normSq (σ NK.det) : ℝ) : ℂ) * (gramC (H σ) σ b).det := fun σ => by
     rw [← hcMK]
     exact det_gramC_comb _ _ _ _
-  have hgc' : ∀ σ : K →+* ℂ, (gramC (H σ) σ (fun j => D • b' j)).det =
-      ((Complex.normSq (σ DK.det) : ℝ) : ℂ) * (gramC (H σ) σ b').det := fun σ => by
+  have hgc'
+      : ∀ σ : K →+* ℂ,
+        (gramC (H σ) σ (fun j => D • b' j)).det
+          = ((Complex.normSq (σ DK.det) : ℝ) : ℂ) * (gramC (H σ) σ b').det := fun σ => by
     rw [← hcDK]
     exact det_gramC_comb _ _ _ _
   have hpos : ∀ σ : K →+* ℂ, 0 < (gramC (H σ) σ b).det.re := fun σ =>
     gramC_det_re_pos (H σ) σ b (hH σ) hbli
   have hpos' : ∀ σ : K →+* ℂ, 0 < (gramC (H σ) σ b').det.re := fun σ =>
     gramC_det_re_pos (H σ) σ b' (hH σ) hb'li
-  have hDmdet : Dm.det ≠ 0 := by
-    simp [Dm, Matrix.det_diagonal, hD]
+  have hDmdet : Dm.det ≠ 0 := by simp [Dm, Matrix.det_diagonal, hD]
   have hinj := FaithfulSMul.algebraMap_injective (𝓞 K) K
   have hDKne : DK.det ≠ 0 := by
     rw [hDKdet, ← map_zero (algebraMap (𝓞 K) K)]
     exact hinj.ne hDmdet
-  have hre : ∀ σ : K →+* ℂ, Complex.normSq (σ NK.det) * (gramC (H σ) σ b).det.re =
-      Complex.normSq (σ DK.det) * (gramC (H σ) σ b').det.re := fun σ => by
+  have hre
+      : ∀ σ : K →+* ℂ,
+        Complex.normSq (σ NK.det) * (gramC (H σ) σ b).det.re
+          = Complex.normSq (σ DK.det) * (gramC (H σ) σ b').det.re := fun σ => by
     have := congrArg Complex.re ((hgc σ).symm.trans (hgc' σ))
     simpa [Complex.re_ofReal_mul] using this
   have hNKne : NK.det ≠ 0 := by
@@ -80,12 +85,13 @@ theorem latDegBasis_holds : LatDegBasisStatement := by
   have hPB : P ≤ B := Submodule.span_le.mpr (Set.range_subset_iff.mpr hbB)
   have hP'B : P' ≤ B := Submodule.span_le.mpr (Set.range_subset_iff.mpr hb'B)
   have hCP : C ≤ P := Submodule.span_le.mpr (Set.range_subset_iff.mpr fun j => hDB _ (hb'B j))
-  have hCP' : C ≤ P' := Submodule.span_le.mpr (Set.range_subset_iff.mpr fun j =>
-    Submodule.smul_mem _ D (Submodule.subset_span ⟨j, rfl⟩))
-  have mul1 := AddSubgroup.relIndex_mul_relIndex C.toAddSubgroup P.toAddSubgroup B.toAddSubgroup
-    hCP hPB
-  have mul2 := AddSubgroup.relIndex_mul_relIndex C.toAddSubgroup P'.toAddSubgroup B.toAddSubgroup
-    hCP' hP'B
+  have hCP' : C ≤ P' :=
+    Submodule.span_le.mpr (Set.range_subset_iff.mpr fun j =>
+      Submodule.smul_mem _ D (Submodule.subset_span ⟨j, rfl⟩))
+  have mul1 :=
+    AddSubgroup.relIndex_mul_relIndex C.toAddSubgroup P.toAddSubgroup B.toAddSubgroup hCP hPB
+  have mul2 :=
+    AddSubgroup.relIndex_mul_relIndex C.toAddSubgroup P'.toAddSubgroup B.toAddSubgroup hCP' hP'B
   have hI := relIndex_span_ne_zero b hbli B hbB D hD hDB
   have e1 : ((Algebra.norm ℤ M.det : ℤ) : ℝ) = ((Algebra.norm ℚ NK.det : ℚ) : ℝ) := by
     have := congrArg (fun q : ℚ => (q : ℝ)) (Algebra.coe_norm_int M.det)
@@ -97,13 +103,15 @@ theorem latDegBasis_holds : LatDegBasisStatement := by
     simp only [Rat.cast_intCast] at this
     rw [hDKdet]
     convert this using 3
-  have hcP : ((C.toAddSubgroup.relIndex P.toAddSubgroup : ℕ) : ℝ) =
-      |((Algebra.norm ℚ NK.det : ℚ) : ℝ)| := by
+  have hcP
+      : ((C.toAddSubgroup.relIndex P.toAddSubgroup : ℕ) : ℝ)
+        = |((Algebra.norm ℚ NK.det : ℚ) : ℝ)| := by
     have := congrArg (fun z : ℤ => (z : ℝ)) hIdx1
     simp only [Int.cast_natCast, Int.cast_abs] at this
     rw [this, e1]
-  have hcP' : ((C.toAddSubgroup.relIndex P'.toAddSubgroup : ℕ) : ℝ) =
-      |((Algebra.norm ℚ DK.det : ℚ) : ℝ)| := by
+  have hcP'
+      : ((C.toAddSubgroup.relIndex P'.toAddSubgroup : ℕ) : ℝ)
+        = |((Algebra.norm ℚ DK.det : ℚ) : ℝ)| := by
     have := congrArg (fun z : ℤ => (z : ℝ)) hIdx2
     simp only [Int.cast_natCast, Int.cast_abs] at this
     rw [this, e2]
@@ -111,10 +119,11 @@ theorem latDegBasis_holds : LatDegBasisStatement := by
     Rat.cast_ne_zero.mpr (Algebra.norm_ne_zero_iff.mpr hNKne)
   have hnD : ((Algebra.norm ℚ DK.det : ℚ) : ℝ) ≠ 0 :=
     Rat.cast_ne_zero.mpr (Algebra.norm_ne_zero_iff.mpr hDKne)
-  have hmulR : ((C.toAddSubgroup.relIndex P.toAddSubgroup : ℕ) : ℝ) *
-      ((P.toAddSubgroup.relIndex B.toAddSubgroup : ℕ) : ℝ) =
-      ((C.toAddSubgroup.relIndex P'.toAddSubgroup : ℕ) : ℝ) *
-      ((P'.toAddSubgroup.relIndex B.toAddSubgroup : ℕ) : ℝ) := by
+  have hmulR
+      : ((C.toAddSubgroup.relIndex P.toAddSubgroup : ℕ) : ℝ)
+          * ((P.toAddSubgroup.relIndex B.toAddSubgroup : ℕ) : ℝ)
+        = ((C.toAddSubgroup.relIndex P'.toAddSubgroup : ℕ) : ℝ)
+          * ((P'.toAddSubgroup.relIndex B.toAddSubgroup : ℕ) : ℝ) := by
     exact_mod_cast mul1.trans mul2.symm
   have hcPne : ((C.toAddSubgroup.relIndex P.toAddSubgroup : ℕ) : ℝ) ≠ 0 := by
     rw [hcP]
@@ -127,21 +136,25 @@ theorem latDegBasis_holds : LatDegBasisStatement := by
     intro h0
     rw [h0, mul_zero] at hmulR
     exact mul_ne_zero hcPne hIne hmulR
-  have hlog : Real.log ((C.toAddSubgroup.relIndex P.toAddSubgroup : ℕ) : ℝ) +
-      Real.log ((P.toAddSubgroup.relIndex B.toAddSubgroup : ℕ) : ℝ) =
-      Real.log ((C.toAddSubgroup.relIndex P'.toAddSubgroup : ℕ) : ℝ) +
-      Real.log ((P'.toAddSubgroup.relIndex B.toAddSubgroup : ℕ) : ℝ) := by
+  have hlog
+      : Real.log ((C.toAddSubgroup.relIndex P.toAddSubgroup : ℕ) : ℝ)
+          + Real.log ((P.toAddSubgroup.relIndex B.toAddSubgroup : ℕ) : ℝ)
+        = Real.log ((C.toAddSubgroup.relIndex P'.toAddSubgroup : ℕ) : ℝ)
+          + Real.log ((P'.toAddSubgroup.relIndex B.toAddSubgroup : ℕ) : ℝ) := by
     rw [← Real.log_mul hcPne hIne, ← Real.log_mul hcP'ne hI'ne, hmulR]
   rw [hcP, hcP'] at hlog
-  have hsum : ∑ σ : K →+* ℂ, (Real.log (Complex.normSq (σ NK.det)) +
-      Real.log (gramC (H σ) σ b).det.re) = ∑ σ : K →+* ℂ, (Real.log (Complex.normSq (σ DK.det)) +
-      Real.log (gramC (H σ) σ b').det.re) := by
+  have hsum
+      : ∑ σ : K →+* ℂ, (Real.log (Complex.normSq (σ NK.det)) +
+          Real.log (gramC (H σ) σ b).det.re)
+        = ∑ σ : K →+* ℂ, (Real.log (Complex.normSq (σ DK.det)) +
+          Real.log (gramC (H σ) σ b').det.re) := by
     refine Finset.sum_congr rfl fun σ _ => ?_
     have h1 : Complex.normSq (σ NK.det) ≠ 0 := (Complex.normSq_pos.mpr (by simpa using hNKne)).ne'
     have h2 : Complex.normSq (σ DK.det) ≠ 0 := (Complex.normSq_pos.mpr (by simpa using hDKne)).ne'
     rw [← Real.log_mul h1 (hpos σ).ne', ← Real.log_mul h2 (hpos' σ).ne', hre σ]
   rw [Finset.sum_add_distrib, Finset.sum_add_distrib, sum_log_normSq _ hNKne,
-    sum_log_normSq _ hDKne] at hsum
+      sum_log_normSq _ hDKne]
+    at hsum
   simp only [latDeg]
   linarith
 

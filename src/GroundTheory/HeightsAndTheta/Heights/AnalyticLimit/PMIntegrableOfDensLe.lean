@@ -32,8 +32,7 @@ theorem MIntegrableOfDensLe.proof : MIntegrableOfDensLe.Statement := by
     by_cases hy : y ∈ W
     · have hpos : 0 < dΨ y := hy.2
       obtain ⟨h0, h1⟩ := hle j y hy.1.1 hy.1.2
-      rw [hqdef, Set.indicator_of_mem hy, Real.norm_eq_abs,
-        abs_of_nonneg (div_nonneg h0 hpos.le)]
+      rw [hqdef, Set.indicator_of_mem hy, Real.norm_eq_abs, abs_of_nonneg (div_nonneg h0 hpos.le)]
       exact (div_le_one hpos).2 h1
     · rw [hqdef, Set.indicator_of_notMem hy, norm_zero]
       exact zero_le_one

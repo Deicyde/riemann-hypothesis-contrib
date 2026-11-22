@@ -12,34 +12,45 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat.RuleVal
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l}
 
-theorem ofAt_left (V : Type) [CommRing V] {G : Over (Sp V)} (f : epsOver V V ⟶ G) :
-    (ofAt V ≫ f).left = f.left := Category.id_comp _
+theorem ofAt_left (V : Type) [CommRing V] {G : Over (Sp V)} (f : epsOver V V ⟶ G)
+    : (ofAt V ≫ f).left = f.left :=
+  Category.id_comp _
 
-theorem toAt_left (V : Type) [CommRing V] {G : Over (Sp V)} (f : epsAt (𝟙 (Sp V)) ⟶ G) :
-    (toAt V ≫ f).left = f.left := Category.id_comp _
+theorem toAt_left (V : Type) [CommRing V] {G : Over (Sp V)} (f : epsAt (𝟙 (Sp V)) ⟶ G)
+    : (toAt V ≫ f).left = f.left :=
+  Category.id_comp _
 
-theorem isIntFrame_of_basis (T : Formalism.L2.Pj.CDVR) (io : c.F →+* T.Fr) (G : SAB H (Sp T.V)) (t' : SAB H (Sp T.Fr))
+theorem isIntFrame_of_basis
+    (T : Formalism.L2.Pj.CDVR) (io : c.F →+* T.Fr) (G : SAB H (Sp T.V)) (t' : SAB H (Sp T.Fr))
     {y' : Sp T.Fr ⟶ Xo.XF c} (m : SABMap t' Xo.univ.t (under y'))
-    (m2 : SABMap t' G (spMap (algebraMap T.V T.Fr))) (τ' : E →+* ℂ) {N n : ℕ} (hn : N = n)
-    (ub : Fin N → (epsOver T.V T.V ⟶ G.G)) (htan : ∀ i, IsTan (ub i))
+    (m2 : SABMap t' G (spMap (algebraMap T.V T.Fr))) (τ' : E →+* ℂ)
+    {N n : ℕ} (hn : N = n) (ub : Fin N → (epsOver T.V T.V ⟶ G.G)) (htan : ∀ i, IsTan (ub i))
     (heig : ∀ i, Formalism.L2.Pj.IsEigV c io G τ' (ub i))
-    (hbas : ∀ w : epsOver T.V T.V ⟶ G.G, IsTan w → Formalism.L2.Pj.IsEigV c io G τ' w →
-      ∃! a : Fin N → T.V, ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsComb ub a w)
+    (hbas : ∀ w : epsOver T.V T.V ⟶ G.G,
+      IsTan w → Formalism.L2.Pj.IsEigV c io G τ' w
+        → ∃! a : Fin N → T.V, ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsComb ub a w)
     (v : Vecs y' n)
-    (hv : ∀ i, ∃ u' : Sp (DualNumber T.Fr) ⟶ t'.G.left, u' ≫ m.φ = (v i).left ∧
-      u' ≫ m2.φ = spMap (Formalism.L2.Pj.dualMap (algebraMap T.V T.Fr)) ≫ (ub (i.cast hn.symm)).left) :
-    IsIntFrame m m2 (io.comp (tauIn c τ')) v := by
+    (hv : ∀ i, ∃ u' : Sp (DualNumber T.Fr) ⟶ t'.G.left,
+      u' ≫ m.φ = (v i).left
+        ∧ u' ≫ m2.φ
+          = spMap (Formalism.L2.Pj.dualMap (algebraMap T.V T.Fr)) ≫ (ub (i.cast hn.symm)).left)
+    : IsIntFrame m m2 (io.comp (tauIn c τ')) v := by
   subst hn
   obtain ⟨σV, hσ⟩ := exists_lift_int T (io.comp (tauIn c τ'))
   have hσa : ∀ a, algebraMap T.V T.Fr (σV a) = io (tauIn c τ' a) := fun a => RingHom.congr_fun hσ a
   have hinj := IsFractionRing.injective T.V T.Fr
-  refine ⟨σV, fun i => ofAt T.V ≫ ub i, hσ, ⟨fun i => ⟨?_, fun a => ?_⟩, fun w hw => ?_⟩, fun a => ?_⟩
+  refine
+    ⟨σV, fun i => ofAt T.V ≫ ub i, hσ, ⟨fun i => ⟨?_, fun a => ?_⟩, fun w hw => ?_⟩, fun a => ?_⟩
   · show _ ≫ (ofAt T.V ≫ ub i).left = _
     rw [ofAt_left, one_left_at]
     exact htan i
@@ -69,19 +80,32 @@ theorem isIntFrame_of_basis (T : Formalism.L2.Pj.CDVR) (io : c.F →+* T.Fr) (G 
     rw [ofAt_left, h2]
     rfl
 
-theorem exists_factor (f : Formalism.L2.Pj.Rul Xo c) {S : Type} [CommRing S] [Algebra c.F S] (y : Formalism.L2.Pj.FrPt Xo c S)
-    (h : Formalism.L2.Pj.FromTest (K := c.F) (fun S _ _ => Formalism.L2.Pj.FrPt Xo c S)
-      (fun φ y z => Formalism.L2.Pj.FrMap φ y z) y) :
-    ∃ (p : Formalism.L2.Pj.TRing c.F) (ψ : p.R →ₐ[c.F] S) (z : Formalism.L2.Pj.FrPt Xo c p.R),
-      Formalism.L2.Pj.FrMap ψ z y ∧ Formalism.L2.Pj.evR Xo c f y = ψ (f p z) :=
-  ⟨_, _, _, h.choose_spec.choose_spec.choose_spec, by
+theorem exists_factor
+    (f : Formalism.L2.Pj.Rul Xo c)
+    {S : Type} [CommRing S] [Algebra c.F S]
+    (y : Formalism.L2.Pj.FrPt Xo c S)
+    (h : Formalism.L2.Pj.FromTest (K := c.F)
+      (fun S _ _ => Formalism.L2.Pj.FrPt Xo c S)
+      (fun φ y z => Formalism.L2.Pj.FrMap φ y z)
+      y)
+    : ∃ (p : Formalism.L2.Pj.TRing c.F) (ψ : p.R →ₐ[c.F] S) (z : Formalism.L2.Pj.FrPt Xo c p.R),
+      Formalism.L2.Pj.FrMap ψ z y ∧ Formalism.L2.Pj.evR Xo c f y = ψ (f p z) := ⟨
+  _,
+  _,
+  _,
+  h.choose_spec.choose_spec.choose_spec,
+  by
     unfold Formalism.L2.Pj.evR Formalism.L2.Pj.evalAt
-    rw [dite_eq_left h]⟩
+    rw [dite_eq_left h]
+⟩
 
-theorem norm_le_one_iff_log_valuation (la : IsDedekindDomain.HeightOneSpectrum (𝓞 c.F)) (a : c.F) (ha : a ≠ 0)
-    {e : ℕ} (he : 0 < e) {ρ r : ℝ} (hρ : ρ < 0) (hr : 0 < r)
-    (h : Real.log r = ((e : ℤ) * Formalism.L2.Pj.vLa la a : ℤ) * ρ) :
-    la.valuation c.F a ≤ 1 ↔ r ≤ 1 := by
+theorem norm_le_one_iff_log_valuation
+    (la : IsDedekindDomain.HeightOneSpectrum (𝓞 c.F))
+    (a : c.F) (ha : a ≠ 0)
+    {e : ℕ} (he : 0 < e)
+    {ρ r : ℝ}
+    (hρ : ρ < 0) (hr : 0 < r) (h : Real.log r = ((e : ℤ) * Formalism.L2.Pj.vLa la a : ℤ) * ρ)
+    : la.valuation c.F a ≤ 1 ↔ r ≤ 1 := by
   have h0 : la.valuation c.F a ≠ 0 := (Valuation.ne_zero_iff _).2 ha
   have c1 : la.valuation c.F a ≤ 1 ↔ 0 ≤ Formalism.L2.Pj.vLa la a := by
     rw [← WithZero.log_le_log h0 one_ne_zero, WithZero.log_one, Formalism.L2.Pj.vLa]
@@ -107,9 +131,40 @@ theorem norm_le_one_iff_log_valuation (la : IsDedekindDomain.HeightOneSpectrum (
 
 end GlobalTheory.CompanionTheory.Ar.Flat.RuleVal
 
-open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat
+open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
+  GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem GlobalTheory.CompanionTheory.Ar.Flat.nval_flat_rule : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (U : Set (Xo.XF c)) (τ : E →+* ℂ) (φ : FrameFn Xo c) (s : Formalism.L2.Pj.Rul Xo c) (t : ∀ p : Nat.Primes, (c.F →+* ℂ_[p]) → ℝ), τ (H.rt : E) = H.rt0 → IsLineFn U τ φ → (∀ (p : Formalism.L2.Pj.TRing c.F) (z : Formalism.L2.Pj.FrPt Xo c p.R) (F : Type) [Field F] (ψ : p.R →+* F) (y : Sp F ⟶ Xo.XF c), under y = spMap ψ ≫ z.x → y ≫ pullback.snd _ _ = spMap (ψ.comp (algebraMap c.F p.R)) → Set.range y ⊆ U → ∀ (v : Vecs y D.p) (w : Vecs y D.q) (hp : D.mult τ = D.p) (hq : D.mult (ComplexEmbedding.conjugate τ) = D.q), (∀ i, (v i).left = spMap (Formalism.L2.Pj.dualMap ψ) ≫ z.u τ (i.cast hp.symm)) → (∀ j, (w j).left = spMap (Formalism.L2.Pj.dualMap ψ) ≫ z.u (ComplexEmbedding.conjugate τ) (j.cast hq.symm)) → ψ (s p z) = φ F y v w) → (∀ p κ, HasFinNorm U τ φ p κ (t p κ)) → ∀ (la : IsDedekindDomain.HeightOneSpectrum (𝓞 c.F)) (T : Formalism.L2.Pj.CDVR) (io : c.F →+* T.Fr) (e : ℕ) (y : Formalism.L2.Pj.IntFr Xo c T io) (y' : Sp T.Fr ⟶ Xo.XF c), Formalism.L2.Pj.OverLa la T.V io e → y.IsAlg → under y' = (letI := io.toAlgebra; y.1.x) → y' ≫ pullback.snd _ _ = spMap io → Set.range y' ⊆ U → ∃ (p : Nat.Primes) (κ : c.F →+* ℂ_[p]), (∀ a : c.F, la.valuation c.F a ≤ 1 ↔ ‖κ a‖ ≤ 1) ∧ ∀ π : c.F, la.valuation c.F π = WithZero.exp (-1 : ℤ) → Formalism.L2.Pj.nval T.V e (Formalism.L2.Pj.evI y s) = ((t p κ / Real.log ‖κ π‖ : ℝ) : EReal) := by
+theorem GlobalTheory.CompanionTheory.Ar.Flat.nval_flat_rule
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (U : Set (Xo.XF c)) (τ : E →+* ℂ) (φ : FrameFn Xo c)
+        (s : Formalism.L2.Pj.Rul Xo c) (t : ∀ p : Nat.Primes, (c.F →+* ℂ_[p]) → ℝ),
+      τ (H.rt : E) = H.rt0 → IsLineFn U τ φ
+        → (∀ (p : Formalism.L2.Pj.TRing c.F) (z : Formalism.L2.Pj.FrPt Xo c p.R) (F : Type)
+            [Field F] (ψ : p.R →+* F) (y : Sp F ⟶ Xo.XF c),
+          under y = spMap ψ ≫ z.x → y ≫ pullback.snd _ _ = spMap (ψ.comp (algebraMap c.F p.R))
+            → Set.range y ⊆ U
+            → ∀ (v : Vecs y D.p) (w : Vecs y D.q) (hp : D.mult τ = D.p)
+                (hq : D.mult (ComplexEmbedding.conjugate τ) = D.q),
+              (∀ i, (v i).left = spMap (Formalism.L2.Pj.dualMap ψ) ≫ z.u τ (i.cast hp.symm))
+                → (∀ j,
+                  (w j).left
+                    = spMap (Formalism.L2.Pj.dualMap ψ)
+                      ≫ z.u (ComplexEmbedding.conjugate τ) (j.cast hq.symm))
+                → ψ (s p z) = φ F y v w)
+        → (∀ p κ, HasFinNorm U τ φ p κ (t p κ))
+        → ∀ (la : IsDedekindDomain.HeightOneSpectrum (𝓞 c.F)) (T : Formalism.L2.Pj.CDVR)
+            (io : c.F →+* T.Fr) (e : ℕ) (y : Formalism.L2.Pj.IntFr Xo c T io)
+            (y' : Sp T.Fr ⟶ Xo.XF c),
+          Formalism.L2.Pj.OverLa la T.V io e → y.IsAlg → under y' = (letI := io.toAlgebra; y.1.x)
+            → y' ≫ pullback.snd _ _ = spMap io → Set.range y' ⊆ U
+            → ∃ (p : Nat.Primes) (κ : c.F →+* ℂ_[p]),
+              (∀ a : c.F, la.valuation c.F a ≤ 1 ↔ ‖κ a‖ ≤ 1)
+                ∧ ∀ π : c.F,
+                  la.valuation c.F π = WithZero.exp (-1 : ℤ)
+                    → Formalism.L2.Pj.nval T.V e (Formalism.L2.Pj.evI y s)
+                      = ((t p κ / Real.log ‖κ π‖ : ℝ) : EReal) := by
   intro E _ _ _ H D l Xo c U τ φ s t hτ hφ hs hN la T io e y y' ho halg hy hyo hyU
   letI := io.toAlgebra
   obtain ⟨p, j, hj⟩ := RuleVal.exists_embed T halg
@@ -121,8 +176,12 @@ theorem GlobalTheory.CompanionTheory.Ar.Flat.nval_flat_rule : ∀ (E : Type) [Fi
   have hq : D.mult (ComplexEmbedding.conjugate τ) = D.q := RuleVal.mult_conj τ hτ
   obtain ⟨v, hv⟩ := RuleVal.exists_vecs y.1 hy τ hp
   obtain ⟨w, hw⟩ := RuleVal.exists_vecs y.1 hy (ComplexEmbedding.conjugate τ) hq
-  have hfr : IsFramed U τ io y' v w :=
-    ⟨hyo, hyU, RuleVal.isEigFrame_of_frPt y.1 hy τ hp v hv, RuleVal.isEigFrame_of_frPt y.1 hy _ hq w hw⟩
+  have hfr : IsFramed U τ io y' v w := ⟨
+    hyo,
+    hyU,
+    RuleVal.isEigFrame_of_frPt y.1 hy τ hp v hv,
+    RuleVal.isEigFrame_of_frPt y.1 hy _ hq w hw
+  ⟩
   have hi1 : IsIntFrame m m2 (io.comp (tauIn c τ)) v :=
     RuleVal.isIntFrame_of_basis T io G t' m m2 τ hp (ub τ) (htan τ) (heig τ) (hbas τ) v fun i => by
       obtain ⟨u', h1, h2⟩ := hlift τ (i.cast hp.symm)
@@ -136,15 +195,18 @@ theorem GlobalTheory.CompanionTheory.Ar.Flat.nval_flat_rule : ∀ (E : Type) [Fi
   have hev : Formalism.L2.Pj.evI y s = φ T.Fr y' v w := by
     obtain ⟨pz, ψ, z, hm', he⟩ := RuleVal.exists_factor s y.1 y.2.1
     have hcomp : ψ.toRingHom.comp (algebraMap c.F pz.R) = io := ψ.comp_algebraMap
-    refine he.trans (hs pz z T.Fr ψ.toRingHom y' (hy.trans hm'.1) (by rw [hcomp]; exact hyo) hyU v w hp hq
-      (fun i => (hv i).trans (hm'.2.1 τ _)) (fun i => (hw i).trans (hm'.2.1 _ _)))
+    refine he.trans (hs pz z T.Fr ψ.toRingHom y' (hy.trans hm'.1) (by rw [hcomp]; exact hyo) hyU v w
+      hp hq
+      (fun i => (hv i).trans (hm'.2.1 τ _))
+      (fun i => (hw i).trans (hm'.2.1 _ _)))
   have hne : φ T.Fr y' v w ≠ 0 := hφ.ne T.Fr io y' v w hfr
   refine ⟨p, j.comp io, fun a => ?_, fun π hπ => ?_⟩
   · by_cases ha : a = 0
     · subst ha
       simp
     have hio : io a ≠ 0 := (map_ne_zero io).2 ha
-    refine RuleVal.norm_le_one_iff_log_valuation la a ha ho.1 hρ (norm_pos_iff.2 ((map_ne_zero j).2 hio)) ?_
+    refine RuleVal.norm_le_one_iff_log_valuation la a ha ho.1 hρ
+      (norm_pos_iff.2 ((map_ne_zero j).2 hio)) ?_
     rw [RingHom.comp_apply, hlog _ hio, ho.2 a]
   · have hπ0 : π ≠ 0 := by
       intro h0

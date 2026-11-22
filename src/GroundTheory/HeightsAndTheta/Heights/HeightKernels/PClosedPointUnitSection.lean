@@ -18,11 +18,10 @@ namespace ClosedPointUnitSectionAlt
 
 variable {T : Type} [Fintype T] {K' : Type} [Field K'] (y : (Σ _ : Unit, T) → K')
 
-
 omit [Fintype T] in
-theorem mem_chartLat_iff {d : ℕ} {g : K'} :
-    g ∈ chartLat y 1 d ↔
-      ∀ t : T, y ⟨(), t⟩ ≠ 0 → g / y ⟨(), t⟩ ^ d ∈ chartRingZ y (fun _ => t) := by
+theorem mem_chartLat_iff {d : ℕ} {g : K'}
+    : g ∈ chartLat y 1 d
+      ↔ ∀ t : T, y ⟨(), t⟩ ≠ 0 → g / y ⟨(), t⟩ ^ d ∈ chartRingZ y (fun _ => t) := by
   have key : ∀ c : Unit → T, c = fun _ => c () := fun c => funext fun u => by cases u; rfl
   show (∀ c : Unit → T, (∀ k, y ⟨k, c k⟩ ≠ 0) →
       g * ∏ k, y ⟨k, c k⟩ ^ (-((d : ℤ) * (1 : Unit → ℤ) k)) ∈ chartRingZ y c) ↔ _
@@ -35,7 +34,6 @@ theorem mem_chartLat_iff {d : ℕ} {g : K'} :
     rw [key c]
     simpa [div_eq_mul_inv, zpow_neg, zpow_natCast] using this
 
-
 omit [Fintype T] in
 theorem coord_mem (u : T) : y ⟨(), u⟩ ∈ chartLat y 1 1 := by
   rw [mem_chartLat_iff]
@@ -43,18 +41,17 @@ theorem coord_mem (u : T) : y ⟨(), u⟩ ∈ chartLat y 1 1 := by
   rw [pow_one]
   exact Algebra.subset_adjoin ⟨⟨(), u⟩, rfl⟩
 
-
 omit [Fintype T] in
-theorem chartLat_mul_mem {a b : ℕ} {g h : K'} (hg : g ∈ chartLat y 1 a) (hh : h ∈ chartLat y 1 b) :
-    g * h ∈ chartLat y 1 (a + b) := by
+theorem chartLat_mul_mem {a b : ℕ} {g h : K'} (hg : g ∈ chartLat y 1 a) (hh : h ∈ chartLat y 1 b)
+    : g * h ∈ chartLat y 1 (a + b) := by
   rw [mem_chartLat_iff] at hg hh ⊢
   intro t ht
   rw [pow_add, mul_div_mul_comm]
   exact Subalgebra.mul_mem _ (hg t ht) (hh t ht)
 
 omit [Fintype T] in
-theorem chartLat_pow_mem {a : ℕ} {g : K'} (hg : g ∈ chartLat y 1 a) (n : ℕ) :
-    g ^ n ∈ chartLat y 1 (a * n) := by
+theorem chartLat_pow_mem {a : ℕ} {g : K'} (hg : g ∈ chartLat y 1 a) (n : ℕ)
+    : g ^ n ∈ chartLat y 1 (a * n) := by
   induction n with
   | zero =>
     rw [mem_chartLat_iff]
@@ -64,10 +61,10 @@ theorem chartLat_pow_mem {a : ℕ} {g : K'} (hg : g ∈ chartLat y 1 a) (n : ℕ
     rw [pow_succ, Nat.mul_succ]
     exact chartLat_mul_mem y ih hg
 
-
 omit [Fintype T] in
-theorem exists_mul_pow_mem_chartLat (t : T) (ht : y ⟨(), t⟩ ≠ 0) {x : K'}
-    (hx : x ∈ chartRingZ y (fun _ => t)) : ∃ k : ℕ, x * y ⟨(), t⟩ ^ k ∈ chartLat y 1 k := by
+theorem exists_mul_pow_mem_chartLat
+    (t : T) (ht : y ⟨(), t⟩ ≠ 0) {x : K'} (hx : x ∈ chartRingZ y (fun _ => t))
+    : ∃ k : ℕ, x * y ⟨(), t⟩ ^ k ∈ chartLat y 1 k := by
   have hpow : ∀ l : ℕ, y ⟨(), t⟩ ^ l ∈ chartLat y 1 l := fun l => by
     simpa only [one_mul] using chartLat_pow_mem y (coord_mem y t) l
   induction hx using Algebra.adjoin_induction with
@@ -86,8 +83,10 @@ theorem exists_mul_pow_mem_chartLat (t : T) (ht : y ⟨(), t⟩ ≠ 0) {x : K'}
     obtain ⟨k, hk⟩ := hx
     obtain ⟨l, hl⟩ := hz
     refine ⟨k + l, ?_⟩
-    have e : (x + z) * y ⟨(), t⟩ ^ (k + l) =
-        x * y ⟨(), t⟩ ^ k * y ⟨(), t⟩ ^ l + z * y ⟨(), t⟩ ^ l * y ⟨(), t⟩ ^ k := by ring
+    have e
+        : (x + z) * y ⟨(), t⟩ ^ (k + l)
+          = x * y ⟨(), t⟩ ^ k * y ⟨(), t⟩ ^ l + z * y ⟨(), t⟩ ^ l * y ⟨(), t⟩ ^ k := by
+      ring
     rw [e]
     have h2 := chartLat_mul_mem y hl (hpow k)
     rw [Nat.add_comm] at h2
@@ -105,60 +104,76 @@ variable [NumberField K']
 def IsUnitAt (P : HeightOneSpectrum (𝓞 K')) (d : ℕ) (g : K') : Prop :=
   ∀ u : T, P.valuation K' (y ⟨(), u⟩) ^ d ≤ P.valuation K' g
 
-theorem exists_max (hy : IsArithVar (mCoordIdeal y) 1) (P : HeightOneSpectrum (𝓞 K')) :
-    ∃ t : T, y ⟨(), t⟩ ≠ 0 ∧ ∀ u, P.valuation K' (y ⟨(), u⟩) ≤ P.valuation K' (y ⟨(), t⟩) := by
+theorem exists_max (hy : IsArithVar (mCoordIdeal y) 1) (P : HeightOneSpectrum (𝓞 K'))
+    : ∃ t : T, y ⟨(), t⟩ ≠ 0 ∧ ∀ u, P.valuation K' (y ⟨(), u⟩) ≤ P.valuation K' (y ⟨(), t⟩) := by
   obtain ⟨t0, ht0⟩ := CurveAffineCharts.exists_chart y hy
-  obtain ⟨t, -, ht⟩ := Finset.exists_max_image Finset.univ (fun u => P.valuation K' (y ⟨(), u⟩))
-    ⟨t0, Finset.mem_univ _⟩
+  obtain ⟨t, -, ht⟩ :=
+    Finset.exists_max_image Finset.univ
+      (fun u => P.valuation K' (y ⟨(), u⟩))
+      ⟨t0, Finset.mem_univ _⟩
   refine ⟨t, fun h0 => ht0 ?_, fun u => ht u (Finset.mem_univ _)⟩
   have h1 := ht t0 (Finset.mem_univ _)
   rw [h0, map_zero] at h1
   exact (Valuation.zero_iff _).mp (le_antisymm h1 zero_le)
 
-
 omit [Fintype T] in
-theorem le_of_mem {P : HeightOneSpectrum (𝓞 K')} {t : T} (ht0 : y ⟨(), t⟩ ≠ 0)
-    (ht : ∀ u, P.valuation K' (y ⟨(), u⟩) ≤ P.valuation K' (y ⟨(), t⟩)) {d : ℕ} {g : K'}
-    (hg : g ∈ chartLat y 1 d) : P.valuation K' g ≤ P.valuation K' (y ⟨(), t⟩) ^ d := by
-  have h1 := CurveAffineCharts.mem_integer_of_mem_chartRingZ y P t ht ((mem_chartLat_iff y).mp hg t ht0)
+theorem le_of_mem
+    {P : HeightOneSpectrum (𝓞 K')} {t : T}
+    (ht0 : y ⟨(), t⟩ ≠ 0) (ht : ∀ u, P.valuation K' (y ⟨(), u⟩) ≤ P.valuation K' (y ⟨(), t⟩))
+    {d : ℕ} {g : K'} (hg : g ∈ chartLat y 1 d)
+    : P.valuation K' g ≤ P.valuation K' (y ⟨(), t⟩) ^ d := by
+  have h1 :=
+    CurveAffineCharts.mem_integer_of_mem_chartRingZ y P t ht ((mem_chartLat_iff y).mp hg t ht0)
   rw [Valuation.mem_integer_iff, map_div₀, map_pow] at h1
-  have hpos : P.valuation K' (y ⟨(), t⟩) ^ d ≠ 0 := pow_ne_zero _ ((Valuation.ne_zero_iff _).mpr ht0)
+  have hpos : P.valuation K' (y ⟨(), t⟩) ^ d ≠ 0 :=
+    pow_ne_zero _ ((Valuation.ne_zero_iff _).mpr ht0)
   exact (div_le_one₀ (zero_lt_iff.mpr hpos)).mp h1
 
 omit [Fintype T] in
-theorem isUnitAt_iff {P : HeightOneSpectrum (𝓞 K')} {t : T}
-    (ht : ∀ u, P.valuation K' (y ⟨(), u⟩) ≤ P.valuation K' (y ⟨(), t⟩)) {d : ℕ} {g : K'} :
-    IsUnitAt y P d g ↔ P.valuation K' (y ⟨(), t⟩) ^ d ≤ P.valuation K' g :=
+theorem isUnitAt_iff
+    {P : HeightOneSpectrum (𝓞 K')} {t : T}
+    (ht : ∀ u, P.valuation K' (y ⟨(), u⟩) ≤ P.valuation K' (y ⟨(), t⟩))
+    {d : ℕ} {g : K'}
+    : IsUnitAt y P d g ↔ P.valuation K' (y ⟨(), t⟩) ^ d ≤ P.valuation K' g :=
   ⟨fun h => h t, fun h u => (pow_le_pow_left' (ht u) d).trans h⟩
 
 omit [Fintype T] in
-theorem IsUnitAt.mul {P : HeightOneSpectrum (𝓞 K')} {a b : ℕ} {g h : K'} (hg : IsUnitAt y P a g)
-    (hh : IsUnitAt y P b h) : IsUnitAt y P (a + b) (g * h) := fun u => by
+theorem IsUnitAt.mul
+    {P : HeightOneSpectrum (𝓞 K')} {a b : ℕ} {g h : K'}
+    (hg : IsUnitAt y P a g) (hh : IsUnitAt y P b h)
+    : IsUnitAt y P (a + b) (g * h) := fun u => by
   rw [pow_add, map_mul]
   exact mul_le_mul' (hg u) (hh u)
 
 omit [Fintype T] in
-theorem IsUnitAt.pow {P : HeightOneSpectrum (𝓞 K')} {a : ℕ} {g : K'} (hg : IsUnitAt y P a g) (n : ℕ) :
-    IsUnitAt y P (a * n) (g ^ n) := fun u => by
+theorem IsUnitAt.pow {P : HeightOneSpectrum (𝓞 K')} {a : ℕ} {g : K'} (hg : IsUnitAt y P a g) (n : ℕ)
+    : IsUnitAt y P (a * n) (g ^ n) := fun u => by
   rw [pow_mul, map_pow]
   exact pow_le_pow_left' (hg u) n
 
-theorem not_isUnitAt_mul (hy : IsArithVar (mCoordIdeal y) 1) {P : HeightOneSpectrum (𝓞 K')} {a b : ℕ}
-    {g h : K'} (hg : ¬IsUnitAt y P a g) (hh : h ∈ chartLat y 1 b) : ¬IsUnitAt y P (a + b) (g * h) := by
+theorem not_isUnitAt_mul
+    (hy : IsArithVar (mCoordIdeal y) 1)
+    {P : HeightOneSpectrum (𝓞 K')} {a b : ℕ} {g h : K'}
+    (hg : ¬ IsUnitAt y P a g) (hh : h ∈ chartLat y 1 b)
+    : ¬ IsUnitAt y P (a + b) (g * h) := by
   obtain ⟨t, ht0, ht⟩ := exists_max y hy P
   rw [isUnitAt_iff y ht, not_le] at hg ⊢
   rw [map_mul, pow_add]
   have hb := le_of_mem y ht0 ht hh
   have hpos : 0 < P.valuation K' (y ⟨(), t⟩) ^ b :=
     zero_lt_iff.mpr (pow_ne_zero _ ((Valuation.ne_zero_iff _).mpr ht0))
-  calc P.valuation K' g * P.valuation K' h ≤ P.valuation K' g * P.valuation K' (y ⟨(), t⟩) ^ b :=
-        mul_le_mul' le_rfl hb
+  calc
+    P.valuation K' g * P.valuation K' h
+      ≤ P.valuation K' g * P.valuation K' (y ⟨(), t⟩) ^ b := mul_le_mul' le_rfl hb
     _ < P.valuation K' (y ⟨(), t⟩) ^ a * P.valuation K' (y ⟨(), t⟩) ^ b :=
-        mul_lt_mul_of_pos_right hg hpos
+      mul_lt_mul_of_pos_right hg hpos
 
-theorem not_isUnitAt_pow (hy : IsArithVar (mCoordIdeal y) 1) {P : HeightOneSpectrum (𝓞 K')} {a : ℕ}
-    {g : K'} (hg : ¬IsUnitAt y P a g) (hga : g ∈ chartLat y 1 a) (n : ℕ) :
-    ¬IsUnitAt y P (a * (n + 1)) (g ^ (n + 1)) := by
+theorem not_isUnitAt_pow
+    (hy : IsArithVar (mCoordIdeal y) 1)
+    {P : HeightOneSpectrum (𝓞 K')} {a : ℕ} {g : K'}
+    (hg : ¬ IsUnitAt y P a g) (hga : g ∈ chartLat y 1 a)
+    (n : ℕ)
+    : ¬ IsUnitAt y P (a * (n + 1)) (g ^ (n + 1)) := by
   induction n with
   | zero => simpa using hg
   | succ n ih =>
@@ -166,17 +181,19 @@ theorem not_isUnitAt_pow (hy : IsArithVar (mCoordIdeal y) 1) {P : HeightOneSpect
     rw [← pow_succ] at this
     convert this using 2
 
-theorem isUnitAt_add (hy : IsArithVar (mCoordIdeal y) 1) {P : HeightOneSpectrum (𝓞 K')} {d : ℕ}
-    {g h : K'} (hg : IsUnitAt y P d g) (hh : ¬IsUnitAt y P d h) : IsUnitAt y P d (g + h) := by
+theorem isUnitAt_add
+    (hy : IsArithVar (mCoordIdeal y) 1)
+    {P : HeightOneSpectrum (𝓞 K')} {d : ℕ} {g h : K'}
+    (hg : IsUnitAt y P d g) (hh : ¬ IsUnitAt y P d h)
+    : IsUnitAt y P d (g + h) := by
   obtain ⟨t, -, ht⟩ := exists_max y hy P
   rw [isUnitAt_iff y ht] at hg hh ⊢
   rw [not_le] at hh
   rwa [Valuation.map_add_eq_of_lt_left _ (hh.trans_le hg)]
 
-
 omit [Fintype T] in
-theorem exists_pow_sub_one (P : HeightOneSpectrum (𝓞 K')) {x : K'} (hx : P.valuation K' x = 1) :
-    ∃ N : ℕ, 1 ≤ N ∧ P.valuation K' (x ^ N - 1) < 1 := by
+theorem exists_pow_sub_one (P : HeightOneSpectrum (𝓞 K')) {x : K'} (hx : P.valuation K' x = 1)
+    : ∃ N : ℕ, 1 ≤ N ∧ P.valuation K' (x ^ N - 1) < 1 := by
   obtain ⟨n, d, hnd⟩ := HeightOneSpectrum.exists_primeCompl_mul_eq_of_integer P x hx.le
   have hd : (d : 𝓞 K') ∉ P.asIdeal := d.2
   have hd1 : P.valuation K' (algebraMap (𝓞 K') K' d) = 1 :=
@@ -191,25 +208,33 @@ theorem exists_pow_sub_one (P : HeightOneSpectrum (𝓞 K')) {x : K'} (hx : P.va
   let _ : Field (𝓞 K' ⧸ P.asIdeal) := Ideal.Quotient.field _
   let _ : Fintype (𝓞 K' ⧸ P.asIdeal) := Fintype.ofFinite _
   have hq : 1 < Fintype.card (𝓞 K' ⧸ P.asIdeal) := Fintype.one_lt_card
-  have hmk : ∀ a : 𝓞 K', a ∉ P.asIdeal →
-      Ideal.Quotient.mk P.asIdeal a ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1) = 1 := fun a ha =>
+  have hmk
+      : ∀ a : 𝓞 K',
+        a ∉ P.asIdeal
+          → Ideal.Quotient.mk P.asIdeal a ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1) = 1 := fun a ha =>
     FiniteField.pow_card_sub_one_eq_one _ (fun h => ha (Ideal.Quotient.eq_zero_iff_mem.mp h))
-  have hmem : (n : 𝓞 K') ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1) -
-      (d : 𝓞 K') ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1) ∈ P.asIdeal := by
+  have hmem
+      : (n : 𝓞 K') ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1)
+          - (d : 𝓞 K') ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1)
+        ∈ P.asIdeal := by
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_pow, map_pow, hmk _ hn, hmk _ hd, sub_self]
   refine ⟨Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1, by omega, ?_⟩
-  have e : x ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1) - 1 =
-      algebraMap (𝓞 K') K' ((n : 𝓞 K') ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1) -
-        (d : 𝓞 K') ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1)) /
-        algebraMap (𝓞 K') K' d ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1) := by
+  have e
+      : x ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1) - 1
+        = algebraMap (𝓞 K') K'
+            ((n : 𝓞 K') ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1)
+              - (d : 𝓞 K') ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1))
+          / algebraMap (𝓞 K') K' d ^ (Fintype.card (𝓞 K' ⧸ P.asIdeal) - 1) := by
     rw [eq_div_iff (pow_ne_zero _ hdK), map_sub, map_pow, map_pow, ← hnd]
     ring
   rw [e, map_div₀, map_pow, hd1, one_pow, div_one]
   exact (HeightOneSpectrum.valuation_lt_one_iff_mem _ _).mpr hmem
 
-theorem exists_sep (hy : IsArithVar (mCoordIdeal y) 1) {P P' : HeightOneSpectrum (𝓞 K')} {d : ℕ}
-    {G : K'} (hG : G ∈ chartLat y 1 d) (h1 : IsUnitAt y P' d G) (h2 : ¬IsUnitAt y P d G) :
-    ∃ (k : ℕ) (h : K'), h ∈ chartLat y 1 k ∧ IsUnitAt y P k h ∧ ¬IsUnitAt y P' k h := by
+theorem exists_sep
+    (hy : IsArithVar (mCoordIdeal y) 1)
+    {P P' : HeightOneSpectrum (𝓞 K')} {d : ℕ} {G : K'}
+    (hG : G ∈ chartLat y 1 d) (h1 : IsUnitAt y P' d G) (h2 : ¬ IsUnitAt y P d G)
+    : ∃ (k : ℕ) (h : K'), h ∈ chartLat y 1 k ∧ IsUnitAt y P k h ∧ ¬ IsUnitAt y P' k h := by
   by_contra H
   push Not at H
   obtain ⟨t, ht0, ht⟩ := exists_max y hy P
@@ -243,11 +268,12 @@ theorem exists_sep (hy : IsArithVar (mCoordIdeal y) 1) {P P' : HeightOneSpectrum
   rw [one_mul] at hlt
   exact absurd hu (not_le.mpr hlt)
 
-theorem exists_avoid (hy : IsArithVar (mCoordIdeal y) 1) (P : HeightOneSpectrum (𝓞 K'))
-    (S : Finset (HeightOneSpectrum (𝓞 K')))
-    (hS : ∀ P' ∈ S, ∃ (k : ℕ) (h : K'), h ∈ chartLat y 1 k ∧ IsUnitAt y P k h ∧ ¬IsUnitAt y P' k h) :
-    ∃ (k : ℕ) (z : K'), 1 ≤ k ∧ z ∈ chartLat y 1 k ∧ IsUnitAt y P k z ∧
-      ∀ P' ∈ S, ¬IsUnitAt y P' k z := by
+theorem exists_avoid
+    (hy : IsArithVar (mCoordIdeal y) 1)
+    (P : HeightOneSpectrum (𝓞 K')) (S : Finset (HeightOneSpectrum (𝓞 K')))
+    (hS : ∀ P' ∈ S, ∃ (k : ℕ) (h : K'), h ∈ chartLat y 1 k ∧ IsUnitAt y P k h ∧ ¬ IsUnitAt y P' k h)
+    : ∃ (k : ℕ) (z : K'),
+      1 ≤ k ∧ z ∈ chartLat y 1 k ∧ IsUnitAt y P k z ∧ ∀ P' ∈ S, ¬ IsUnitAt y P' k z := by
   classical
   induction S using Finset.induction_on with
   | empty =>
@@ -263,8 +289,8 @@ theorem exists_avoid (hy : IsArithVar (mCoordIdeal y) 1) (P : HeightOneSpectrum 
       rwa [mul_comm h z, Nat.add_comm l k] at this
     · exact not_isUnitAt_mul y hy (hzS P' hP') hh
 
-theorem exists_unit_all (hy : IsArithVar (mCoordIdeal y) 1) (S : Finset (HeightOneSpectrum (𝓞 K'))) :
-    ∃ (d : ℕ) (G : K'), 1 ≤ d ∧ G ≠ 0 ∧ G ∈ chartLat y 1 d ∧ ∀ P ∈ S, IsUnitAt y P d G := by
+theorem exists_unit_all (hy : IsArithVar (mCoordIdeal y) 1) (S : Finset (HeightOneSpectrum (𝓞 K')))
+    : ∃ (d : ℕ) (G : K'), 1 ≤ d ∧ G ≠ 0 ∧ G ∈ chartLat y 1 d ∧ ∀ P ∈ S, IsUnitAt y P d G := by
   classical
   induction S using Finset.induction_on with
   | empty =>
@@ -288,7 +314,7 @@ theorem exists_unit_all (hy : IsArithVar (mCoordIdeal y) 1) (S : Finset (HeightO
       have h1 : IsUnitAt y P (d * k) (z ^ d) := by
         rw [Nat.mul_comm]
         exact hzP.pow y d
-      have h2 : ¬IsUnitAt y P (d * k) (G ^ k) := by
+      have h2 : ¬ IsUnitAt y P (d * k) (G ^ k) := by
         obtain ⟨k', rfl⟩ : ∃ k', k = k' + 1 := ⟨k - 1, by omega⟩
         exact not_isUnitAt_pow y hy hu hG k'
       exact isUnitAt_add y hy h1 h2
@@ -302,12 +328,11 @@ theorem exists_unit_all (hy : IsArithVar (mCoordIdeal y) 1) (S : Finset (HeightO
       rcases Finset.mem_insert.mp hP' with rfl | hP'
       · exact hunitP
       · have h1 : IsUnitAt y P' (d * k) (G ^ k) := (hGS P' hP').pow y k
-        have h2 : ¬IsUnitAt y P' (d * k) (z ^ d) := by
+        have h2 : ¬ IsUnitAt y P' (d * k) (z ^ d) := by
           obtain ⟨d', rfl⟩ : ∃ d', d = d' + 1 := ⟨d - 1, by omega⟩
           rw [Nat.mul_comm]
           exact not_isUnitAt_pow y hy (hzS P' hP') hz d'
         exact isUnitAt_add y hy h1 h2
-
 
 omit [Fintype T] [NumberField K'] in
 theorem mem_of_isIntegral (W : ValuationSubring K') {x : K'} (hx : IsIntegral ℤ x) : x ∈ W := by
@@ -316,10 +341,10 @@ theorem mem_of_isIntegral (W : ValuationSubring K') {x : K'} (hx : IsIntegral �
   rw [← hw]
   exact w.2
 
-
 omit [Fintype T] in
-theorem mem_of_forall_prime (W : ValuationSubring K')
-    (hW : ∀ q : ℕ, q.Prime → W.valuation (q : K') = 1) (x : K') : x ∈ W := by
+theorem mem_of_forall_prime
+    (W : ValuationSubring K') (hW : ∀ q : ℕ, q.Prime → W.valuation (q : K') = 1) (x : K')
+    : x ∈ W := by
   have hN : ∀ N : ℕ, N ≠ 0 → W.valuation (N : K') = 1 := by
     intro N
     induction N using Nat.recOnMul with
@@ -329,7 +354,9 @@ theorem mem_of_forall_prime (W : ValuationSubring K')
     | mul a b ha hb =>
       intro h
       rw [Nat.cast_mul, map_mul, ha (left_ne_zero_of_mul h), hb (right_ne_zero_of_mul h), one_mul]
-  obtain ⟨n, hn, hint⟩ := ((IsFractionRing.isAlgebraic_iff ℤ ℚ K').mpr (Algebra.IsAlgebraic.isAlgebraic x)).exists_integral_multiple
+  obtain ⟨n, hn, hint⟩ :=
+    ((IsFractionRing.isAlgebraic_iff ℤ ℚ K').mpr
+      (Algebra.IsAlgebraic.isAlgebraic x)).exists_integral_multiple
   have h1 := mem_of_isIntegral W hint
   rw [zsmul_eq_mul] at h1
   have hv : W.valuation (n : K') = 1 := by
@@ -342,21 +369,26 @@ theorem mem_of_forall_prime (W : ValuationSubring K')
   rw [← W.valuation_le_one_iff] at h1 ⊢
   rwa [map_mul, hv, one_mul] at h1
 
-
 omit [Fintype T] in
-theorem exists_centre (W : ValuationSubring K') {q : ℕ} (hq : q.Prime) (hWq : W.valuation (q : K') < 1) :
-    ∃ P : HeightOneSpectrum (𝓞 K'), (q : 𝓞 K') ∈ P.asIdeal ∧
-      ∀ x : K', P.valuation K' x ≤ 1 → x ∈ W := by
-  have hO : ∀ a : 𝓞 K', (a : K') ∈ W := fun a => mem_of_isIntegral W (RingOfIntegers.isIntegral_coe a)
-  let φ : 𝓞 K' →+* W :=
-    { toFun := fun a => ⟨a, hO a⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
-  have hmem : ∀ a : 𝓞 K', a ∈ Ideal.comap φ (IsLocalRing.maximalIdeal W) ↔ W.valuation (a : K') < 1 :=
-    fun a => by rw [Ideal.mem_comap]; exact W.valuation_lt_one_iff (φ a)
-  have hqmem : (q : 𝓞 K') ∈ Ideal.comap φ (IsLocalRing.maximalIdeal W) := (hmem _).mpr (by simpa using hWq)
+theorem exists_centre
+    (W : ValuationSubring K') {q : ℕ} (hq : q.Prime) (hWq : W.valuation (q : K') < 1)
+    : ∃ P : HeightOneSpectrum (𝓞 K'),
+      (q : 𝓞 K') ∈ P.asIdeal ∧ ∀ x : K', P.valuation K' x ≤ 1 → x ∈ W := by
+  have hO : ∀ a : 𝓞 K', (a : K') ∈ W := fun a =>
+    mem_of_isIntegral W (RingOfIntegers.isIntegral_coe a)
+  let φ : 𝓞 K' →+* W := {
+    toFun := fun a => ⟨a, hO a⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
+  have hmem
+      : ∀ a : 𝓞 K',
+        a ∈ Ideal.comap φ (IsLocalRing.maximalIdeal W) ↔ W.valuation (a : K') < 1 := fun a => by
+    rw [Ideal.mem_comap]; exact W.valuation_lt_one_iff (φ a)
+  have hqmem : (q : 𝓞 K') ∈ Ideal.comap φ (IsLocalRing.maximalIdeal W) :=
+    (hmem _).mpr (by simpa using hWq)
   have hne : Ideal.comap φ (IsLocalRing.maximalIdeal W) ≠ ⊥ := fun h => by
     rw [h, Ideal.mem_bot] at hqmem
     exact hq.ne_zero (by exact_mod_cast hqmem)
@@ -368,11 +400,10 @@ theorem exists_centre (W : ValuationSubring K') {q : ℕ} (hq : q.Prime) (hWq : 
   have : W.valuation (algebraMap (𝓞 K') K' n) ≤ 1 := (W.valuation_le_one_iff _).mpr (hO n)
   rwa [← hnd, map_mul, hd, mul_one] at this
 
-
 omit [Fintype T] [NumberField K'] in
-theorem finite_centres [NumberField K'] (m : Ideal (curveRing y)) (hm : m.IsMaximal) :
-    {P : HeightOneSpectrum (𝓞 K') |
-      ∃ q : ℕ, q.Prime ∧ (q : curveRing y) ∈ m ∧ (q : 𝓞 K') ∈ P.asIdeal}.Finite := by
+theorem finite_centres [NumberField K'] (m : Ideal (curveRing y)) (hm : m.IsMaximal)
+    : {P : HeightOneSpectrum (𝓞 K') |
+        ∃ q : ℕ, q.Prime ∧ (q : curveRing y) ∈ m ∧ (q : 𝓞 K') ∈ P.asIdeal}.Finite := by
   by_cases h : ∃ q0 : ℕ, q0.Prime ∧ (q0 : curveRing y) ∈ m
   · obtain ⟨q0, hq0, hq0m⟩ := h
     have hne : Ideal.span {(q0 : 𝓞 K')} ≠ 0 := by
@@ -421,7 +452,8 @@ theorem ClosedPointUnitSection.proof : ClosedPointUnitSection.Statement := by
     rw [map_pow]
     exact hPu u
   · push Not at hq
-    refine ClosedPointUnitSectionAlt.mem_of_forall_prime W (fun q hq' => le_antisymm ?_ (hq q hq')) _
+    refine
+      ClosedPointUnitSectionAlt.mem_of_forall_prime W (fun q hq' => le_antisymm ?_ (hq q hq')) _
     exact (W.valuation_le_one_iff _).mpr (natCast_mem W q)
 
 end

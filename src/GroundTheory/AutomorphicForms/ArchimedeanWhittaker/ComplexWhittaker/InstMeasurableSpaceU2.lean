@@ -17,9 +17,10 @@ noncomputable def μK : Measure U2 := Measure.haarMeasure ⊤
 
 instance : μK.IsHaarMeasure := Measure.isHaarMeasure_haarMeasure _
 
-instance : IsProbabilityMeasure μK := ⟨by
-  have := Measure.haarMeasure_self (G := U2) (K₀ := ⊤)
-  simpa [μK] using this⟩
+instance : IsProbabilityMeasure μK :=
+  ⟨by
+    have := Measure.haarMeasure_self (G := U2) (K₀ := ⊤)
+    simpa [μK] using this⟩
 
 instance : μK.IsMulRightInvariant := by
   refine ⟨fun g => ?_⟩
@@ -38,16 +39,18 @@ instance : μK.IsInvInvariant := by
     infer_instance
   exact Measure.isHaarMeasure_eq_of_isProbabilityMeasure _ _
 
-theorem integral_mul_left_K {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : U2 → E)
-    (g : U2) : ∫ k, f (g * k) ∂μK = ∫ k, f k ∂μK :=
+theorem integral_mul_left_K
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : U2 → E) (g : U2)
+    : ∫ k, f (g * k) ∂μK = ∫ k, f k ∂μK :=
   integral_mul_left_eq_self f g
 
-theorem integral_mul_right_K {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : U2 → E)
-    (g : U2) : ∫ k, f (k * g) ∂μK = ∫ k, f k ∂μK :=
+theorem integral_mul_right_K
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : U2 → E) (g : U2)
+    : ∫ k, f (k * g) ∂μK = ∫ k, f k ∂μK :=
   integral_mul_right_eq_self f g
 
-theorem integral_inv_K {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : U2 → E) :
-    ∫ k, f k⁻¹ ∂μK = ∫ k, f k ∂μK :=
+theorem integral_inv_K {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] (f : U2 → E)
+    : ∫ k, f k⁻¹ ∂μK = ∫ k, f k ∂μK :=
   integral_inv_eq_self f μK
 
 end GroundTheory.Automorphic.ArchWhittakerC

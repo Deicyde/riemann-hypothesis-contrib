@@ -8,14 +8,17 @@ open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem logDeriv_eq_order_div_add_analytic :
-    ∀ (f : ℂ → ℂ) (p : ℂ), AnalyticAt ℂ f p → (¬ ∀ᶠ s in 𝓝 p, f s = 0) →
-      ∃ g : ℂ → ℂ, AnalyticAt ℂ g p ∧ ∀ᶠ s in 𝓝[≠] p, f s ≠ 0 ∧
-        deriv f s / f s = ((analyticOrderNatAt f p : ℕ) : ℂ) / (s - p) + g s := by
+theorem logDeriv_eq_order_div_add_analytic
+    : ∀ (f : ℂ → ℂ) (p : ℂ),
+      AnalyticAt ℂ f p → (¬ ∀ᶠ s in 𝓝 p, f s = 0)
+        → ∃ g : ℂ → ℂ,
+          AnalyticAt ℂ g p
+            ∧ ∀ᶠ s in 𝓝[≠] p, f s ≠ 0 ∧
+              deriv f s / f s = ((analyticOrderNatAt f p : ℕ) : ℂ) / (s - p) + g s := by
   intro f p hf hne
-  have htop : analyticOrderAt f p ≠ ⊤ := by
-    rw [Ne, analyticOrderAt_eq_top]; exact hne
-  obtain ⟨g, hg, hg0, hfg⟩ := (hf.analyticOrderNatAt_eq_iff htop (n := analyticOrderNatAt f p)).mp rfl
+  have htop : analyticOrderAt f p ≠ ⊤ := by rw [Ne, analyticOrderAt_eq_top]; exact hne
+  obtain ⟨g, hg, hg0, hfg⟩ :=
+    (hf.analyticOrderNatAt_eq_iff htop (n := analyticOrderNatAt f p)).mp rfl
   set m := analyticOrderNatAt f p with hm
   refine ⟨fun s => deriv g s / g s, hg.deriv.div hg hg0, ?_⟩
   have h1 : ∀ᶠ s in 𝓝 p, g s ≠ 0 := hg.continuousAt.eventually_ne hg0
@@ -29,7 +32,8 @@ theorem logDeriv_eq_order_div_add_analytic :
     filter_upwards [hs3] with z hz
     rw [hz, smul_eq_mul]
   have hfs : f s = (s - p) ^ m * g s := hev.eq_of_nhds
-  have hd : HasDerivAt (fun z => (z - p) ^ m * g z)
+  have hd : HasDerivAt
+      (fun z => (z - p) ^ m * g z)
       ((m : ℂ) * (s - p) ^ (m - 1) * 1 * g s + (s - p) ^ m * deriv g s) s :=
     (((hasDerivAt_id s).sub_const p).pow m).mul hs2.differentiableAt.hasDerivAt
   have hdf : deriv f s = (m : ℂ) * (s - p) ^ (m - 1) * 1 * g s + (s - p) ^ m * deriv g s := by

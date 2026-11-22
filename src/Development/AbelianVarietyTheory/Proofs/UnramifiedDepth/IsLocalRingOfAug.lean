@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.TopLeAlgOv
 
 set_option autoImplicit false
 noncomputable section
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AddCurve
@@ -17,8 +20,9 @@ namespace GlobalTheory.StalkJet
 
 variable {k : Type} [Field k]
 
-theorem isLocalRing_of_aug {A : Type} [CommRing A] [Algebra k A] (aug : A →ₐ[k] k) {n : ℕ}
-    (h : RingHom.ker aug ^ n = ⊥) : IsLocalRing A := by
+theorem isLocalRing_of_aug
+    {A : Type} [CommRing A] [Algebra k A] (aug : A →ₐ[k] k) {n : ℕ} (h : RingHom.ker aug ^ n = ⊥)
+    : IsLocalRing A := by
   haveI : Nontrivial A := (aug : A →+* k).domain_nontrivial
   have nil : ∀ a : A, aug a = 0 → IsNilpotent a := fun a ha =>
     ⟨n, by rw [← Ideal.mem_bot, ← h]; exact Ideal.pow_mem_pow ha n⟩
@@ -31,17 +35,21 @@ theorem isLocalRing_of_aug {A : Type} [CommRing A] [Algebra k A] (aug : A →ₐ
     have := h1.isUnit_add_right_of_commute h2 (Commute.all _ _)
     simpa using this
 
-theorem exists_factor {B : Over (Sp k)} (b : B.left) [Algebra k (B.left.presheaf.stalk b)]
+theorem exists_factor
+    {B : Over (Sp k)} (b : B.left) [Algebra k (B.left.presheaf.stalk b)]
     (hb : B.left.fromSpecStalk b ≫ B.hom = spMap (algebraMap k (B.left.presheaf.stalk b)))
-    {A : Type} [CommRing A] [Algebra k A] [IsLocalRing A] (y : algOver k A ⟶ B)
-    (hy : y.left (closedPoint A) = b) :
-    ∃ τ : B.left.presheaf.stalk b →ₐ[k] A, IsLocalHom τ ∧
-      spMap (τ : B.left.presheaf.stalk b →+* A) ≫ B.left.fromSpecStalk b = y.left := by
+    {A : Type} [CommRing A] [Algebra k A] [IsLocalRing A]
+    (y : algOver k A ⟶ B) (hy : y.left (closedPoint A) = b)
+    : ∃ τ : B.left.presheaf.stalk b →ₐ[k] A,
+      IsLocalHom τ
+        ∧ spMap (τ : B.left.presheaf.stalk b →+* A) ≫ B.left.fromSpecStalk b = y.left := by
   subst hy
   have e := Scheme.Spec_stalkClosedPointTo_fromSpecStalk (R := .of A) y.left
   have w : y.left ≫ B.hom = spMap (algebraMap k A) := Over.w y
-  have e2 : CommRingCat.ofHom (algebraMap k (B.left.presheaf.stalk (y.left (closedPoint A)))) ≫
-      Scheme.stalkClosedPointTo (R := .of A) y.left = CommRingCat.ofHom (algebraMap k A) := by
+  have e2
+      : CommRingCat.ofHom (algebraMap k (B.left.presheaf.stalk (y.left (closedPoint A))))
+          ≫ Scheme.stalkClosedPointTo (R := .of A) y.left
+        = CommRingCat.ofHom (algebraMap k A) := by
     apply Spec.map_injective
     rw [Spec.map_comp]
     refine Eq.trans ?_ w

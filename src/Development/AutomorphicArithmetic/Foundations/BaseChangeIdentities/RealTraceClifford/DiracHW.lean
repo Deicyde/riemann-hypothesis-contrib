@@ -14,15 +14,14 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
 private theorem rhoC_true (n : ℕ) : Formalism.REAL.rhoC (fun _ : Fin n => true) = rhoV n := by
   funext a
-  have h1 : (univ.filter fun b : Fin n => a < b ∧ True) = Finset.Ioi a := by
-    ext b; simp
-  have h2 : (univ.filter fun b : Fin n => b < a ∧ True) = Finset.Iio a := by
-    ext b; simp
+  have h1 : (univ.filter fun b : Fin n => a < b ∧ True) = Finset.Ioi a := by ext b; simp
+  have h2 : (univ.filter fun b : Fin n => b < a ∧ True) = Finset.Iio a := by ext b; simp
   have h3 : ((n - 1 - (a : ℕ) : ℕ) : ℝ) = (n : ℝ) - 1 - (a : ℕ) := by
     have := a.2
     rw [Nat.sub_sub, Nat.cast_sub (by omega)]
@@ -35,47 +34,68 @@ private theorem rhoC_true (n : ℕ) : Formalism.REAL.rhoC (fun _ : Fin n => true
 private theorem nsq_eq {n : ℕ} (u : Fin n → ℝ) : Formalism.REAL.nsq u = nsq u := by
   simp [Formalism.REAL.nsq, Formalism.REAL.dot, nsq, sq]
 
-private theorem cas_map {A B : Type} [Ring A] [Ring B] [Algebra ℂ A] [Algebra ℂ B] {n : ℕ} (φ : A →ₐ[ℂ] B)
-    (F : Fin n → Fin n → A) : φ (Cas F) = Cas fun a b => φ (F a b) := by
+private theorem cas_map
+    {A B : Type} [Ring A] [Ring B] [Algebra ℂ A] [Algebra ℂ B]
+    {n : ℕ}
+    (φ : A →ₐ[ℂ] B) (F : Fin n → Fin n → A)
+    : φ (Cas F) = Cas fun a b => φ (F a b) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [Cas, map_sum, map_mul]
+  simp [Cas, map_sum, map_mul]
 
-private theorem spn_map {A B : Type} [Ring A] [Ring B] [Algebra ℂ A] [Algebra ℂ B] {n : ℕ} (φ : A →ₐ[ℂ] B)
-    (c : Fin n → Fin n → A) (a b : Fin n) : φ (spn c a b) = spn (fun a b => φ (c a b)) a b := by
+private theorem spn_map
+    {A B : Type} [Ring A] [Ring B] [Algebra ℂ A] [Algebra ℂ B]
+    {n : ℕ}
+    (φ : A →ₐ[ℂ] B) (c : Fin n → Fin n → A) (a b : Fin n)
+    : φ (spn c a b) = spn (fun a b => φ (c a b)) a b := by
   by_cases h : a = b <;> simp [spn, map_sum, map_sub, map_mul, h]
 
-private theorem gl_map {A B : Type} [Ring A] [Ring B] [Algebra ℂ A] [Algebra ℂ B] {n : ℕ} (φ : A →ₐ[ℂ] B)
-    {F : Fin n → Fin n → A} (h : GlRel F) : GlRel fun a b => φ (F a b) := by
+private theorem gl_map
+    {A B : Type} [Ring A] [Ring B] [Algebra ℂ A] [Algebra ℂ B]
+    {n : ℕ}
+    (φ : A →ₐ[ℂ] B)
+    {F : Fin n → Fin n → A} (h : GlRel F)
+    : GlRel fun a b => φ (F a b) := by
   intro a b c d
   have := congrArg φ (h a b c d)
   simp only [map_sub, map_mul] at this
   rw [this]
   split_ifs <;> simp
 
-private theorem clif_map {A B : Type} [Ring A] [Ring B] [Algebra ℂ A] [Algebra ℂ B] {n : ℕ} (φ : A →ₐ[ℂ] B)
-    {c : Fin n → Fin n → A} (h : Clif c) : Clif fun a b => φ (c a b) := by
+private theorem clif_map
+    {A B : Type} [Ring A] [Ring B] [Algebra ℂ A] [Algebra ℂ B]
+    {n : ℕ}
+    (φ : A →ₐ[ℂ] B)
+    {c : Fin n → Fin n → A} (h : Clif c)
+    : Clif fun a b => φ (c a b) := by
   intro a b d e
   have := congrArg φ (h a b d e)
   simp only [map_add (f := _), map_mul] at this
   rw [this]
   split_ifs <;> simp
 
-private theorem cas_gel {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n : ℕ}
-    (E : Fin n → Fin n → Module.End ℂ V) : Cas E = gelA E 2 := by
+private theorem cas_gel
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V)
+    : Cas E = gelA E 2 := by
   simp [Cas, gelA, epow, Finset.sum_ite_eq]
 
-private theorem cas_bar {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n : ℕ}
-    (E : Fin n → Fin n → Module.End ℂ V) : Cas E = gelA (barF E) 2 := by
+private theorem cas_bar
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V)
+    : Cas E = gelA (barF E) 2 := by
   rw [← cas_gel, Cas, Cas, Finset.sum_comm]
   simp [barF]
 
-private theorem kF_gl {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] {n : ℕ}
-    {E1 E2 : Fin n → Fin n → Module.End ℂ V} (hP : IsPair E1 E2) : GlRel (kF E1 E2) := by
+private theorem kF_gl
+    {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {n : ℕ} {E1 E2 : Fin n → Fin n → Module.End ℂ V} (hP : IsPair E1 E2)
+    : GlRel (kF E1 E2) := by
   intro a b c d
   have e1 := hP.gl1 a b c d
   have e2 := hP.gl2 a b c d
-  have h : (E1 a b + E2 a b) * (E1 c d + E2 c d) - (E1 c d + E2 c d) * (E1 a b + E2 a b) =
-      (E1 a b * E1 c d - E1 c d * E1 a b) + (E2 a b * E2 c d - E2 c d * E2 a b) := by
+  have h
+      : (E1 a b + E2 a b) * (E1 c d + E2 c d) - (E1 c d + E2 c d) * (E1 a b + E2 a b)
+        = (E1 a b * E1 c d - E1 c d * E1 a b) + (E2 a b * E2 c d - E2 c d * E2 a b) := by
     simp only [add_mul, mul_add]
     rw [hP.comm a b c d, hP.comm c d a b]
     abel
@@ -83,9 +103,9 @@ private theorem kF_gl {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V
   rw [h, e1, e2]
   split_ifs <;> abel
 
-private theorem gel_val {n : ℕ} (lam : Fin n → ℤ) (s : Bool) :
-    GlobalTheory.Dec.gelfVal (infOf lam s) 2 =
-      (((nsq fun a => (lam a : ℝ) + rhoV n a) - nsq (rhoV n) : ℝ) : ℂ) := by
+private theorem gel_val {n : ℕ} (lam : Fin n → ℤ) (s : Bool)
+    : GlobalTheory.Dec.gelfVal (infOf lam s) 2
+      = (((nsq fun a => (lam a : ℝ) + rhoV n a) - nsq (rhoV n) : ℝ) : ℂ) := by
   rw [gelf2]
   have : ∀ a, infOf lam s a ^ 2 = ((((lam a : ℝ) + rhoV n a) ^ 2 : ℝ) : ℂ) := by
     intro a
@@ -94,15 +114,20 @@ private theorem gel_val {n : ℕ} (lam : Fin n → ℤ) (s : Bool) :
   push_cast
   rfl
 
-private theorem lsq_eq {n : ℕ} (lam : Fin n → ℤ) :
-    LSq lam = 4 * nsq fun a => (lam a : ℝ) + rhoV n a := by
+private theorem lsq_eq {n : ℕ} (lam : Fin n → ℤ)
+    : LSq lam = 4 * nsq fun a => (lam a : ℝ) + rhoV n a := by
   simp only [LSq, nsq, Finset.mul_sum]
   exact Finset.sum_congr rfl fun a _ => by ring
 
-theorem UpperTheory.RealTr.diracHW :
-    ∀ (n : ℕ) (lam : Fin n → ℤ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (E1 E2 : Fin n → Fin n → Module.End ℂ V),
-      IsPair E1 E2 → LocF (kF E1 E2) → (∀ m (x : V), gelA E1 m x = GlobalTheory.Dec.gelfVal (infOf lam true) m • x) →
-      (∀ m (x : V), gelA (barF E2) m x = GlobalTheory.Dec.gelfVal (infOf lam false) m • x) → ∀ (J : Type) [Fintype J] [DecidableEq J] (c : Fin n → Fin n → Matrix J J ℂ) (η : J → Wt n), ClifMod c η → ∀ κ : Wt n, hw (dg (kF E1 E2) c) κ ≠ ⊥ → LSq lam ≤ nsq (κ + rhoV n) := by
+theorem UpperTheory.RealTr.diracHW
+    : ∀ (n : ℕ) (lam : Fin n → ℤ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+        (E1 E2 : Fin n → Fin n → Module.End ℂ V),
+      IsPair E1 E2 → LocF (kF E1 E2)
+        → (∀ m (x : V), gelA E1 m x = GlobalTheory.Dec.gelfVal (infOf lam true) m • x)
+        → (∀ m (x : V), gelA (barF E2) m x = GlobalTheory.Dec.gelfVal (infOf lam false) m • x)
+        → ∀ (J : Type) [Fintype J] [DecidableEq J] (c : Fin n → Fin n → Matrix J J ℂ)
+            (η : J → Wt n),
+          ClifMod c η → ∀ κ : Wt n, hw (dg (kF E1 E2) c) κ ≠ ⊥ → LSq lam ≤ nsq (κ + rhoV n) := by
   intro n lam V _ _ E1 E2 hP _ h1 h2 J _ _ c η hC κ hκ
   obtain ⟨x, hx, hx0⟩ := (Submodule.ne_bot_iff _).1 hκ
   have hx' : KHighest (fun _ => true) (dg (kF E1 E2) c) κ x := hx
@@ -112,17 +137,18 @@ theorem UpperTheory.RealTr.diracHW :
   let L1 : Fin n → Fin n → Module.End ℂ (Ten J V) := fun a b => lfJ (E1 a b)
   let L2 : Fin n → Fin n → Module.End ℂ (Ten J V) := fun a b => lfJ (E2 a b)
   let C : Fin n → Fin n → Module.End ℂ (Ten J V) := fun a b => φ (c a b)
-  have hD := diracAlg n (Module.End ℂ (Ten J V)) L1 L2 C (gl_map lfJ hP.gl1) (gl_map lfJ hP.gl2)
-    (fun a b d e => by
-      simp only [L1, L2, ← map_mul]
-      rw [hP.comm a b d e])
-    (clif_map φ hC.rel)
-    (fun a b d e => by
-      simp only [L1, L2, C, hφ]
-      exact ⟨hcomm _ _, hcomm _ _⟩)
+  have hD :=
+    diracAlg n (Module.End ℂ (Ten J V)) L1 L2 C (gl_map lfJ hP.gl1) (gl_map lfJ hP.gl2)
+      (fun a b d e => by
+        simp only [L1, L2, ← map_mul]
+        rw [hP.comm a b d e])
+      (clif_map φ hC.rel)
+      (fun a b d e => by
+        simp only [L1, L2, C, hφ]
+        exact ⟨hcomm _ _, hcomm _ _⟩)
   set T : Fin n → Fin n → Module.End ℂ (Ten J V) := fun a b => (L1 a b - L2 a b) * C b a with hTdef
   set D : Module.End ℂ (Ten J V) := ∑ a, ∑ b, T a b with hDdef
-  have hT : ∀ a b (y z : Ten J V), ⟪T a b y, z⟫_ℂ = -⟪y, T b a z⟫_ℂ := by
+  have hT : ∀ a b (y z : Ten J V), ⟪T a b y, z⟫_ℂ = - ⟪y, T b a z⟫_ℂ := by
     intro a b y z
     have hP' : L1 a b - L2 a b = lfJ (pF E1 E2 a b) := by simp [L1, L2, pF, map_sub]
     have hP'' : L1 b a - L2 b a = lfJ (pF E1 E2 b a) := by simp [L1, L2, pF, map_sub]
@@ -135,15 +161,16 @@ theorem UpperTheory.RealTr.diracHW :
     have hc := LinearMap.congr_fun (hcomm (c a b) (pF E1 E2 b a)) z
     simp only [Module.End.mul_apply] at hc
     rw [LinearMap.neg_apply, map_neg, inner_neg_right]
-    exact congrArg (fun w => -⟪y, w⟫_ℂ) hc.symm
-  have hskew : ∀ y z : Ten J V, ⟪D y, z⟫_ℂ = -⟪y, D z⟫_ℂ := by
+    exact congrArg (fun w => - ⟪y, w⟫_ℂ) hc.symm
+  have hskew : ∀ y z : Ten J V, ⟪D y, z⟫_ℂ = - ⟪y, D z⟫_ℂ := by
     intro y z
-    calc ⟪D y, z⟫_ℂ = ∑ a, ∑ b, ⟪T a b y, z⟫_ℂ := by
-          simp [hDdef, LinearMap.sum_apply, sum_inner]
+    calc
+      ⟪D y, z⟫_ℂ
+        = ∑ a, ∑ b, ⟪T a b y, z⟫_ℂ := by simp [hDdef, LinearMap.sum_apply, sum_inner]
       _ = ∑ a, ∑ b, -⟪y, T b a z⟫_ℂ := by simp_rw [hT]
-      _ = -⟪y, D z⟫_ℂ := by
-          rw [Finset.sum_comm]
-          simp [hDdef, LinearMap.sum_apply, inner_sum, Finset.sum_neg_distrib]
+      _ = - ⟪y, D z⟫_ℂ := by
+        rw [Finset.sum_comm]
+        simp [hDdef, LinearMap.sum_apply, inner_sum, Finset.sum_neg_distrib]
   set A0 : ℝ := nsq fun a => (lam a : ℝ) + rhoV n a with hA0
   set R : ℝ := nsq (rhoV n) with hR
   set N : ℝ := nsq (κ + rhoV n) with hN
@@ -174,10 +201,14 @@ theorem UpperTheory.RealTr.diracHW :
     have : spn C a b = mt V (spn c a b) := by rw [← hφ]; exact congrFun (congrFun hspn a) b
     simp only [dg, kF, L1, L2, lfJ, map_add (f := _), this]
   have hc4 : Cas (dg (kF E1 E2) c) x = ((N - R : ℝ) : ℂ) • x := by
-    have h := Formalism.REAL.kCasSpan (Ten J V) n (fun _ => true) (dg (kF E1 E2) c) κ x
-      (Formalism.REAL.glRel_kRel _ _ hUFd.gl) hx' x
-      (Submodule.mem_sInf.2 fun S hS => hS.1)
-    have hk : Formalism.REAL.CasK (fun _ : Fin n => true) (dg (kF E1 E2) c) = Cas (dg (kF E1 E2) c) := by
+    have h :=
+      Formalism.REAL.kCasSpan (Ten J V) n
+        (fun _ => true)
+        (dg (kF E1 E2) c) κ x (Formalism.REAL.glRel_kRel _ _ hUFd.gl) hx' x
+        (Submodule.mem_sInf.2 fun S hS => hS.1)
+    have hk
+        : Formalism.REAL.CasK (fun _ : Fin n => true) (dg (kF E1 E2) c)
+          = Cas (dg (kF E1 E2) c) := by
       simp [Formalism.REAL.CasK, Cas]
     rw [hk] at h
     rw [h, Formalism.REAL.ckv, rhoC_true, nsq_eq, nsq_eq]
@@ -185,7 +216,8 @@ theorem UpperTheory.RealTr.diracHW :
     rw [hdg, hc1, hc2, hc3, two_mul, two_mul] at hD
     have h := LinearMap.congr_fun hD x
     simp only [Module.End.mul_apply, LinearMap.add_apply, LinearMap.sub_apply, LinearMap.smul_apply,
-      Module.End.one_apply, hc4] at h
+        Module.End.one_apply, hc4]
+      at h
     have h' : D (D x) + D (D x) = _ := h
     rw [h', lsq_eq, ← sub_eq_zero]
     simp only [← add_smul, ← sub_smul]

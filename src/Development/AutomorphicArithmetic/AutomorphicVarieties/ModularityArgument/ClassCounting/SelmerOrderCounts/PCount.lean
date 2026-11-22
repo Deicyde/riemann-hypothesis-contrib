@@ -6,8 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.ZK UpperTheory.V.ZK.Ct
 
-private theorem card_tors (W : Type) [AddCommGroup W] [Finite W] (l : ℤ) (s : ℕ) :
-    Nat.card (Submodule.torsionBy ℤ W (l ^ s)) ≤ Nat.card {w : W // l • w = 0} ^ s := by
+private theorem card_tors (W : Type) [AddCommGroup W] [Finite W] (l : ℤ) (s : ℕ)
+    : Nat.card (Submodule.torsionBy ℤ W (l ^ s)) ≤ Nat.card {w : W // l • w = 0} ^ s := by
   induction s with
   | zero => simp
   | succ s ih =>
@@ -26,21 +26,28 @@ private theorem card_tors (W : Type) [AddCommGroup W] [Finite W] (l : ℤ) (s : 
     have h2 : Nat.card (LinearMap.range m) ≤ Nat.card (Submodule.torsionBy ℤ W (l ^ s)) :=
       Nat.card_le_card_of_injective (Submodule.inclusion hr) (Submodule.inclusion_injective hr)
     have h3 : Nat.card (LinearMap.ker m) ≤ Nat.card {w : W // l • w = 0} :=
-      Nat.card_le_card_of_injective (fun k => ⟨((k : T) : W), k.2⟩)
+      Nat.card_le_card_of_injective
+        (fun k => ⟨((k : T) : W), k.2⟩)
         (fun a b hab => by
           have h := congrArg Subtype.val hab
           apply Subtype.ext
           apply Subtype.ext
           exact h)
-    calc Nat.card T = Nat.card (LinearMap.range m) * Nat.card (LinearMap.ker m) := h1
+    calc
+      Nat.card T
+        = Nat.card (LinearMap.range m) * Nat.card (LinearMap.ker m) := h1
       _ ≤ Nat.card (Submodule.torsionBy ℤ W (l ^ s)) * Nat.card {w : W // l • w = 0} :=
-          Nat.mul_le_mul h2 h3
+        Nat.mul_le_mul h2 h3
       _ ≤ Nat.card {w : W // l • w = 0} ^ s * Nat.card {w : W // l • w = 0} :=
-          Nat.mul_le_mul_right _ ih
+        Nat.mul_le_mul_right _ ih
       _ = Nat.card {w : W // l • w = 0} ^ (s + 1) := (pow_succ _ _).symm
 
-theorem UpperTheory.V.ZK.Ct.pCount :
-    ∀ (W Z : Type) [AddCommGroup W] [AddCommGroup Z] [Finite W] (f : W →ₗ[ℤ] Z) (l s g : ℕ) (u : ℤ), l.Prime → ¬(l : ℤ) ∣ u → (∀ w, f w = 0 → (u * (l : ℤ) ^ s) • w = 0) → Nat.card {w : W // (l : ℤ) • w = 0} ≤ l ^ g → l ^ (Nat.card W).factorization l ≤ Nat.card (LinearMap.range f) * l ^ (s * g) := by
+theorem UpperTheory.V.ZK.Ct.pCount
+    : ∀ (W Z : Type) [AddCommGroup W] [AddCommGroup Z] [Finite W] (f : W →ₗ[ℤ] Z) (l s g : ℕ)
+        (u : ℤ),
+      l.Prime → ¬ (l : ℤ) ∣ u → (∀ w, f w = 0 → (u * (l : ℤ) ^ s) • w = 0)
+        → Nat.card {w : W // (l : ℤ) • w = 0} ≤ l ^ g
+        → l ^ (Nat.card W).factorization l ≤ Nat.card (LinearMap.range f) * l ^ (s * g) := by
   intro W Z _ _ _ f l s g u hl hlu hker hW
   haveI := Fact.mk hl
   let K := LinearMap.ker f
@@ -75,16 +82,20 @@ theorem UpperTheory.V.ZK.Ct.pCount :
     rw [hKc, Nat.factorization_mul hRg0 hKg0, Finsupp.add_apply,
       Nat.factorization_eq_zero_of_not_dvd hcop, zero_add]
   have hA : Nat.card (LinearMap.ker gm) ≤ l ^ (s * g) := by
-    calc Nat.card (LinearMap.ker gm) ≤ Nat.card (Submodule.torsionBy ℤ W ((l : ℤ) ^ s)) :=
-          Nat.card_le_card_of_injective
-            (fun a => ⟨((a : K) : W), by
+    calc
+      Nat.card (LinearMap.ker gm) ≤ Nat.card (Submodule.torsionBy ℤ W ((l : ℤ) ^ s)) :=
+        Nat.card_le_card_of_injective
+          (fun a => ⟨
+            ((a : K) : W),
+            by
               rw [Submodule.mem_torsionBy_iff]
-              exact congrArg Subtype.val (LinearMap.mem_ker.1 a.2)⟩)
-            (fun a b hab => by
-              have h := congrArg Subtype.val hab
-              apply Subtype.ext
-              apply Subtype.ext
-              exact h)
+              exact congrArg Subtype.val (LinearMap.mem_ker.1 a.2)
+          ⟩)
+          (fun a b hab => by
+            have h := congrArg Subtype.val hab
+            apply Subtype.ext
+            apply Subtype.ext
+            exact h)
       _ ≤ Nat.card {w : W // (l : ℤ) • w = 0} ^ s := card_tors W l s
       _ ≤ (l ^ g) ^ s := Nat.pow_le_pow_left hW s
       _ = l ^ (s * g) := by rw [← pow_mul, mul_comm]

@@ -145,37 +145,42 @@ theorem eaSize : EaSize := by
   have hT : 0 < 1 - ((S.T : ℝ) ^ S.k)⁻¹ := by linarith
   have hT' : |Real.log (1 - ((S.T : ℝ) ^ S.k)⁻¹)| ≤ 2 / 2 ^ S.k := by
     have := abs_log_one_sub_le t1 (t2.trans t3)
-    calc _ ≤ 2 * ((S.T : ℝ) ^ S.k)⁻¹ := this
+    calc
+      _ ≤ 2 * ((S.T : ℝ) ^ S.k)⁻¹ := this
       _ ≤ 2 * (1 / 2 ^ S.k) := by linarith
       _ = 2 / 2 ^ S.k := by ring
   have hf : (0 : ℝ) ≤ S.f := Nat.cast_nonneg _
   have hA' : |Real.log (∏ M ∈ Ioc S.k S.n, S.Lv M)| ≤ (S.f : ℝ) * (2 / 2 ^ S.k) := by
     rw [Real.log_prod (fun j hj => (hA j hj).ne')]
-    calc |∑ M ∈ Ioc S.k S.n, Real.log (S.Lv M)|
+    calc
+      |∑ M ∈ Ioc S.k S.n, Real.log (S.Lv M)|
         ≤ ∑ M ∈ Ioc S.k S.n, |Real.log (S.Lv M)| := abs_sum_le_sum_abs _ _
       _ ≤ ∑ M ∈ Ioc S.k S.n, (S.f : ℝ) * (2 * (1 / (2 : ℝ) ^ M)) := by
-          apply sum_le_sum
-          intro M hM
-          have hM1 := (mem_Ioc.mp hM).1
-          have h1 := (hL M hM1 (mem_Ioc.mp hM).2).2
-          have h2 := zetaTail M (by omega)
-          calc _ ≤ _ := h1
-            _ ≤ (S.f : ℝ) * (2 / 2 ^ M) := mul_le_mul_of_nonneg_left h2 hf
-            _ = _ := by ring
+        apply sum_le_sum
+        intro M hM
+        have hM1 := (mem_Ioc.mp hM).1
+        have h1 := (hL M hM1 (mem_Ioc.mp hM).2).2
+        have h2 := zetaTail M (by omega)
+        calc
+          _ ≤ _ := h1
+          _ ≤ (S.f : ℝ) * (2 / 2 ^ M) := mul_le_mul_of_nonneg_left h2 hf
+          _ = _ := by ring
       _ = (S.f : ℝ) * (2 * ∑ M ∈ Ioc S.k S.n, 1 / (2 : ℝ) ^ M) := by rw [mul_sum, mul_sum]
       _ ≤ (S.f : ℝ) * (2 * (1 / 2 ^ S.k)) := by
-          have := geom_le S.k S.n
-          apply mul_le_mul_of_nonneg_left _ hf
-          linarith
+        have := geom_le S.k S.n
+        apply mul_le_mul_of_nonneg_left _ hf
+        linarith
       _ = _ := by ring
   have hEa : 0 < S.Ea := by
     unfold SizeData.Ea
     positivity
   refine ⟨hEa, ?_⟩
-  have hlog : Real.log S.Ea = Real.log (∏ M ∈ Ioc S.k S.n, S.Lv M) +
-      ((S.f : ℝ) * Real.log (∏ j ∈ Ioc S.k S.n, (1 - ((S.g1 : ℝ) ^ j)⁻¹)) +
-        (S.f : ℝ) * Real.log (∏ j ∈ Ioc S.k S.n, (1 - ((S.g2 : ℝ) ^ j)⁻¹))) -
-      (S.f : ℝ) * Real.log (1 - ((S.T : ℝ) ^ S.k)⁻¹) := by
+  have hlog
+      : Real.log S.Ea
+        = Real.log (∏ M ∈ Ioc S.k S.n, S.Lv M)
+          + ((S.f : ℝ) * Real.log (∏ j ∈ Ioc S.k S.n, (1 - ((S.g1 : ℝ) ^ j)⁻¹))
+            + (S.f : ℝ) * Real.log (∏ j ∈ Ioc S.k S.n, (1 - ((S.g2 : ℝ) ^ j)⁻¹)))
+          - (S.f : ℝ) * Real.log (1 - ((S.T : ℝ) ^ S.k)⁻¹) := by
     unfold SizeData.Ea
     rw [Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) (by positivity),
       Real.log_mul (by positivity) (by positivity), Real.log_inv, Real.log_pow, Real.log_pow,
@@ -356,8 +361,7 @@ theorem corA_of_propA (hPA : PropA) : CorA := by
     rw [h, div_zero] at hR
     linarith
   have hD : S.Dstar = R * S.du := by rw [hR, div_mul_cancel₀ _ hdu]
-  have hG2e : Real.exp X ^ 2 = Real.exp (2 * X) := by
-    rw [← Real.exp_nat_mul]; norm_num
+  have hG2e : Real.exp X ^ 2 = Real.exp (2 * X) := by rw [← Real.exp_nat_mul]; norm_num
   have hRb : Real.exp (2 * X) / C0 ≤ R ∧ R ≤ Real.exp (2 * X) * C0 := by
     obtain ⟨c1, c2⟩ := hCh
     rw [hG2e, hD] at c1 c2
@@ -365,8 +369,7 @@ theorem corA_of_propA (hPA : PropA) : CorA := by
   have hEab := abs_le.mp (hEa'.trans hf2)
   have hEa2 : S.Ea ≤ 2 := (Real.log_le_log_iff hEa (by norm_num)).mp hEab.2
   have hEa12 : 1 / 2 ≤ S.Ea := by
-    have : Real.log (1 / 2) ≤ Real.log S.Ea := by
-      rw [one_div, Real.log_inv]; exact hEab.1
+    have : Real.log (1 / 2) ≤ Real.log S.Ea := by rw [one_div, Real.log_inv]; exact hEab.1
     exact (Real.log_le_log_iff (by norm_num) hEa).mp this
   rw [hPA'] at hRb
   exact root_bounds hP0 hk1 hC0 hX0 hX8 hEa12 hEa2 hRb.1 hRb.2
@@ -384,8 +387,10 @@ theorem bracketBound : BracketBound := by
     rw [he, hm]
     have : (2 * r + 2) * (2 * r + 2 - 1) = 2 * ((r + 1) * (2 * r + 1)) := by
       have : 2 * r + 2 - 1 = 2 * r + 1 := by omega
-      rw [this]; ring
-    rw [this]; simp
+      rw [this]
+      ring
+    rw [this]
+    simp
   have hmR : (m : ℝ) = 2 * r + 2 := by rw [hm]; push_cast; ring
   have heR : (e : ℝ) = ((r : ℝ) + 1) * (2 * r + 1) := by rw [he2]; push_cast; ring
   have hr0 : (0 : ℝ) ≤ r := Nat.cast_nonneg _
@@ -394,10 +399,13 @@ theorem bracketBound : BracketBound := by
   have hB0 : 0 < B := by rw [hB]; positivity
   have hlogka : Real.log ka = Real.log (2 * Real.pi) - Real.log rd := by
     rw [hka, Real.log_div (by positivity) hrd0.ne']
-  have hlogB : Real.log B = e * (Real.log g + Real.log rd - Real.log (2 * Real.pi)) -
-      ((m : ℝ) - 1) / 2 * Real.log rd := by
-    rw [hB, Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) (by positivity),
-      Real.log_inv, Real.log_pow, Real.log_pow, Real.log_rpow hrd0, hlogka]
+  have hlogB
+      : Real.log B
+        = e * (Real.log g + Real.log rd - Real.log (2 * Real.pi))
+          - ((m : ℝ) - 1) / 2 * Real.log rd := by
+    rw [hB, Real.log_mul (by positivity) (by positivity),
+      Real.log_mul (by positivity) (by positivity), Real.log_inv, Real.log_pow, Real.log_pow,
+      Real.log_rpow hrd0, hlogka]
     ring
   have hl1 : 0 ≤ Real.log rd := Real.log_nonneg hrd
   have hl2 : 0 ≤ Real.log (2 * Real.pi) := Real.log_nonneg h2pi
@@ -416,8 +424,10 @@ theorem bracketBound : BracketBound := by
     have t2 : 0 ≤ ((2 * (r : ℝ) + 2 - 1) / 2) * Real.log rd := by
       apply mul_nonneg _ hl1
       linarith
-    have t3 : 0 ≤ ((2 * (r : ℝ) + 2) ^ 2 / 2 - ((r : ℝ) + 1) * (2 * r + 1)) *
-        (Real.log g + Real.log rd) := by
+    have t3
+        : 0
+          ≤ ((2 * (r : ℝ) + 2) ^ 2 / 2 - ((r : ℝ) + 1) * (2 * r + 1))
+            * (Real.log g + Real.log rd) := by
       apply mul_nonneg
       · nlinarith
       · linarith
@@ -428,8 +438,8 @@ theorem bracketBound : BracketBound := by
     exact Real.one_le_rpow hB1 (by positivity)
   · rw [hom, Real.rpow_def_of_pos hB0]
     apply Real.exp_le_exp.mpr
-    have : (m : ℝ) ^ 2 * (Real.log g + Real.log rd) / (2 * k) =
-        (m : ℝ) ^ 2 * (Real.log g + Real.log rd) / 2 * (1 / k) := by
+    have : (m : ℝ) ^ 2 * (Real.log g + Real.log rd) / (2 * k)
+        = (m : ℝ) ^ 2 * (Real.log g + Real.log rd) / 2 * (1 / k) := by
       field_simp
     rw [this]
     exact mul_le_mul_of_nonneg_right hup (by positivity)
@@ -448,7 +458,8 @@ namespace Formalism.FourierDecayAlt.P
 
 theorem exponent_sizes : Formalism.FourierDecayAlt.Sz.EaSize := Sz2.eaSize
 
-theorem corollary_a_of_proposition_a : Formalism.FourierDecayAlt.Sz.CorA := Sz2.corA_of_propA massRatioFormula
+theorem corollary_a_of_proposition_a : Formalism.FourierDecayAlt.Sz.CorA :=
+  Sz2.corA_of_propA massRatioFormula
 
 theorem bracket_bound_alt : Formalism.FourierDecayAlt.Sz.BracketBound := Sz2.bracketBound
 

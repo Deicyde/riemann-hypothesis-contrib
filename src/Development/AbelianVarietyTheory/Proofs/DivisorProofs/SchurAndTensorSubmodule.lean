@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsFockIPO
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg MvPolynomial
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg
+  MvPolynomial
 
 noncomputable section
 namespace GlobalTheory.IrrTensor
@@ -14,11 +15,12 @@ namespace GlobalTheory.IrrTensor
 section General
 variable {V : Type} [AddCommGroup V] [Module ℂ V] {ι : Type} (A : ι → Module.End ℂ V)
 
-theorem density [Nontrivial V]
+theorem density
+    [Nontrivial V]
     (hirr : ∀ N : Submodule ℂ V, (∀ Z, ∀ y ∈ N, A Z y ∈ N) → N = ⊥ ∨ N = ⊤)
     (hsch : ∀ T : V →ₗ[ℂ] V, (∀ Z, T ∘ₗ A Z = A Z ∘ₗ T) → ∃ c : ℂ, T = c • LinearMap.id)
-    (f : Module.End ℂ V) (s : Finset V) :
-    ∃ r ∈ Algebra.adjoin ℂ (Set.range A), ∀ m ∈ s, f m = r m := by
+    (f : Module.End ℂ V) (s : Finset V)
+    : ∃ r ∈ Algebra.adjoin ℂ (Set.range A), ∀ m ∈ s, f m = r m := by
   let R := Algebra.adjoin ℂ (Set.range A)
   have hA : ∀ Z, A Z ∈ R := fun Z => Algebra.subset_adjoin ⟨Z, rfl⟩
   haveI : IsSimpleModule R V := by
@@ -29,15 +31,16 @@ theorem density [Nontrivial V]
       exact (Submodule.restrictScalars_eq_bot_iff ℂ R V).1 h
     · right
       exact (Submodule.restrictScalars_eq_top_iff ℂ R V).1 h
-  let F : Module.End (Module.End R V) V :=
-    { toFun := f
-      map_add' := f.map_add
-      map_smul' := fun g x => by
-        obtain ⟨c, hc⟩ := hsch (g.restrictScalars ℂ) (fun Z => LinearMap.ext fun y =>
-          g.map_smul (⟨A Z, hA Z⟩ : R) y)
-        have hg : ∀ y, g y = c • y := fun y => LinearMap.congr_fun hc y
-        show f (g x) = g (f x)
-        rw [hg, hg, map_smul] }
+  let F : Module.End (Module.End R V) V := {
+    toFun := f
+    map_add' := f.map_add
+    map_smul' := fun g x => by
+      obtain ⟨c, hc⟩ :=
+        hsch (g.restrictScalars ℂ) (fun Z => LinearMap.ext fun y => g.map_smul (⟨A Z, hA Z⟩ : R) y)
+      have hg : ∀ y, g y = c • y := fun y => LinearMap.congr_fun hc y
+      show f (g x) = g (f x)
+      rw [hg, hg, map_smul]
+  }
   obtain ⟨r, hr⟩ := jacobson_density (R := R) F s
   exact ⟨r.1, r.2, fun m hm => hr m hm⟩
 
@@ -47,26 +50,35 @@ end General
 
 variable {p q : ℕ}
 
-theorem mem_wtSub {V : Type} [AddCommGroup V] [Module ℂ V] {act : Mat p q →ₗ[ℂ] Module.End ℂ V}
-    {μ : Ix p q → ℚ} {v : V} : v ∈ wtSub act μ ↔ ∀ a, act (Eab a a) v = ((μ a : ℚ) : ℂ) • v := by
+theorem mem_wtSub
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {act : Mat p q →ₗ[ℂ] Module.End ℂ V} {μ : Ix p q → ℚ} {v : V}
+    : v ∈ wtSub act μ ↔ ∀ a, act (Eab a a) v = ((μ a : ℚ) : ℂ) • v := by
   simp [wtSub, Submodule.mem_iInf, sub_eq_zero]
 
-theorem root_shift {V : Type} [AddCommGroup V] [Module ℂ V] {act : Mat p q →ₗ[ℂ] Module.End ℂ V}
-    (hl : IsLieAct act) {μ : Ix p q → ℚ} {v : V} (hv : v ∈ wtSub act μ) (a b : Ix p q) :
-    act (Eab a b) v ∈ wtSub act (fun c => μ c + ((if c = a then 1 else 0) - (if c = b then 1 else 0))) := by
+theorem root_shift
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {act : Mat p q →ₗ[ℂ] Module.End ℂ V} (hl : IsLieAct act)
+    {μ : Ix p q → ℚ} {v : V} (hv : v ∈ wtSub act μ)
+    (a b : Ix p q)
+    : act (Eab a b) v
+      ∈ wtSub act (fun c => μ c + ((if c = a then 1 else 0) - (if c = b then 1 else 0))) := by
   rw [mem_wtSub] at hv ⊢
   intro c
   have h := LinearMap.congr_fun (hl (Eab c c) (Eab a b)) v
-  have e : (Eab c c * Eab a b - Eab a b * Eab c c : Mat p q) =
-      (((if c = a then 1 else 0) - (if c = b then 1 else 0) : ℚ) : ℂ) • Eab a b := by
+  have e
+      : (Eab c c * Eab a b - Eab a b * Eab c c : Mat p q)
+        = (((if c = a then 1 else 0) - (if c = b then 1 else 0) : ℚ) : ℂ) • Eab a b := by
     unfold Eab
-    have e1 : (Matrix.single c c 1 * Matrix.single a b 1 : Mat p q) =
-        (if c = a then (1 : ℂ) else 0) • Matrix.single a b 1 := by
+    have e1
+        : (Matrix.single c c 1 * Matrix.single a b 1 : Mat p q)
+          = (if c = a then (1 : ℂ) else 0) • Matrix.single a b 1 := by
       split_ifs with h
       · subst h; simp
       · simp [Matrix.single_mul_single_of_ne, h]
-    have e2 : (Matrix.single a b 1 * Matrix.single c c 1 : Mat p q) =
-        (if c = b then (1 : ℂ) else 0) • Matrix.single a b 1 := by
+    have e2
+        : (Matrix.single a b 1 * Matrix.single c c 1 : Mat p q)
+          = (if c = b then (1 : ℂ) else 0) • Matrix.single a b 1 := by
       split_ifs with h
       · subst h; simp
       · simp [Matrix.single_mul_single_of_ne, Ne.symm h]
@@ -74,7 +86,8 @@ theorem root_shift {V : Type} [AddCommGroup V] [Module ℂ V] {act : Mat p q →
     congr 1
     split_ifs <;> simp
   rw [e, map_smul, LinearMap.smul_apply, LinearMap.sub_apply, Module.End.mul_apply,
-    Module.End.mul_apply, hv c, map_smul, eq_sub_iff_add_eq] at h
+      Module.End.mul_apply, hv c, map_smul, eq_sub_iff_add_eq]
+    at h
   rw [← h, Rat.cast_add, add_smul, add_comm]
 
 theorem exists_highest (M : GKMod p q) [Nontrivial M.V] : ∃ μ v, IsHW M.act μ v := by
@@ -107,13 +120,14 @@ theorem exists_highest (M : GKMod p q) [Nontrivial M.V] : ∃ μ v, IsHW M.act �
     have h1 := Module.End.finite_hasEigenvalue ((M.act H).restrict hH)
     refine (h1.preimage (f := fun x : ℚ => (x : ℂ)) Rat.cast_injective.injOn).subset ?_
     rintro _ ⟨μ, ⟨v, hvU, hv, hv0⟩, rfl⟩
-    refine Module.End.hasEigenvalue_of_hasEigenvector (x := ⟨v, hvU⟩) ⟨?_, fun e => hv0 (congrArg Subtype.val e)⟩
+    refine Module.End.hasEigenvalue_of_hasEigenvector (x := ⟨v, hvU⟩)
+      ⟨?_, fun e => hv0 (congrArg Subtype.val e)⟩
     rw [Module.End.mem_eigenspace_iff]
     apply Subtype.ext
     show M.act H v = ((h μ : ℚ) : ℂ) • v
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [H, h, map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply,
-      mem_wtSub.1 hv, smul_smul, ← Finset.sum_smul]
+      simp only [H, h, map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, mem_wtSub.1 hv,
+        smul_smul, ← Finset.sum_smul]
     push_cast
     rfl
   obtain ⟨_, ⟨μ, ⟨v, hvU, hv, hv0⟩, rfl⟩, hmax⟩ :=
@@ -130,18 +144,22 @@ theorem exists_highest (M : GKMod p q) [Nontrivial M.V] : ∃ μ v, IsHW M.act �
       exact hab
   have := hmax _ ⟨_, ⟨_, hK _ (hKE a b hs) v hvU, root_shift M.lie hv a b, hne⟩, rfl⟩
   simp only [id, h, mul_add, mul_sub, Finset.sum_add_distrib, Finset.sum_sub_distrib, mul_ite,
-    mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true] at this
+      mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    at this
   linarith
 
-theorem schur (M : GKMod p q) (hI : IrrGK M) (hA : AdmGK M) (T : M.V →ₗ[ℂ] M.V)
-    (hT : ∀ Z, T ∘ₗ M.act Z = M.act Z ∘ₗ T) : ∃ c : ℂ, T = c • LinearMap.id := by
+theorem schur
+    (M : GKMod p q) (hI : IrrGK M) (hA : AdmGK M) (T : M.V →ₗ[ℂ] M.V)
+    (hT : ∀ Z, T ∘ₗ M.act Z = M.act Z ∘ₗ T)
+    : ∃ c : ℂ, T = c • LinearMap.id := by
   haveI := hI.1
   obtain ⟨μ, v, hv0, hv⟩ := exists_highest M
   have hf : ∀ Z x, T (M.act Z x) = M.act Z (T x) := fun Z x => LinearMap.congr_fun (hT Z) x
   have hst : ∀ x ∈ hwSub M.act μ, T x ∈ hwSub M.act μ := by
     intro x hx
     simp only [hwSub, wtSub, Submodule.mem_inf, Submodule.mem_iInf, LinearMap.mem_ker,
-      LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply] at hx ⊢
+        LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply]
+      at hx ⊢
     refine ⟨fun c => ?_, fun c d h => ?_⟩
     · rw [← hf, ← map_smul, ← map_sub, hx.1 c, map_zero]
     · rw [← hf, hx.2 c d h, map_zero]
@@ -152,9 +170,11 @@ theorem schur (M : GKMod p q) (hI : IrrGK M) (hA : AdmGK M) (T : M.V →ₗ[ℂ]
   have hx1 : T x = c • (x : M.V) := congrArg Subtype.val hx.apply_eq_smul
   refine ⟨c, ?_⟩
   rcases hI.2 (LinearMap.ker (T - c • LinearMap.id)) (fun Z y hy => by
-    simp only [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply,
-      sub_eq_zero] at hy ⊢
-    rw [hf, hy, map_smul]) with h | h
+      simp only [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply,
+          sub_eq_zero]
+        at hy ⊢
+      rw [hf, hy, map_smul])
+    with h | h
   · exact absurd (Subtype.ext ((Submodule.eq_bot_iff _).1 h x (by simp [hx1]))) hx.2
   · exact sub_eq_zero.1 (LinearMap.ker_eq_top.1 h)
 

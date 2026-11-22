@@ -8,9 +8,18 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem abssum_eigen_lim : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A] [IsAdicComplete (Ideal.span {(l : A)}) A] (φ : A →+* A) (h : ℕ) (w : ℕ → A), (∀ k, φ^[h] (w k) = (l : A) * w k) → ∃ W : A, φ^[h] W = (l : A) * W ∧ ∀ Θ : A →+* ℂ_[l], (∀ a, ‖Θ a‖ ≤ 1) → HasSum (fun k : ℕ => (l : ℂ_[l]) ^ k * Θ (w k)) (Θ W) := by
+theorem abssum_eigen_lim
+    : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A] [IsAdicComplete (Ideal.span {(l : A)}) A]
+        (φ : A →+* A) (h : ℕ) (w : ℕ → A),
+      (∀ k, φ^[h] (w k) = (l : A) * w k)
+        → ∃ W : A,
+          φ^[h] W = (l : A) * W
+            ∧ ∀ Θ : A →+* ℂ_[l],
+              (∀ a, ‖Θ a‖ ≤ 1) → HasSum (fun k : ℕ => (l : ℂ_[l]) ^ k * Θ (w k)) (Θ W) := by
   intro l _ A _ _ φ h w hw
-  have key : ∀ (n : ℕ) (x : A), x ∈ (Ideal.span {(l : A)} ^ n • ⊤ : Submodule A A) ↔ (l : A) ^ n ∣ x := by
+  have key
+      : ∀ (n : ℕ) (x : A),
+        x ∈ (Ideal.span {(l : A)} ^ n • ⊤ : Submodule A A) ↔ (l : A) ^ n ∣ x := by
     intro n x
     rw [smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
   let S : ℕ → A := fun N => ∑ k ∈ Finset.range N, (l : A) ^ k * w k
@@ -21,8 +30,9 @@ theorem abssum_eigen_lim : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A] 
     apply Finset.dvd_sum
     intro k hk
     exact Dvd.dvd.mul_right (pow_dvd_pow _ (Finset.mem_Ico.1 hk).1) _
-  obtain ⟨W, hW⟩ := IsPrecomplete.prec (I := Ideal.span {(l : A)}) (M := A) inferInstance (f := S)
-    (fun {m n} hmn => by rw [SModEq.sub_mem, key]; exact dvd_sub_comm.1 (hS m n hmn))
+  obtain ⟨W, hW⟩ :=
+    IsPrecomplete.prec (I := Ideal.span {(l : A)}) (M := A) inferInstance (f := S)
+      (fun {m n} hmn => by rw [SModEq.sub_mem, key]; exact dvd_sub_comm.1 (hS m n hmn))
   have hWN : ∀ N, ∃ c : A, W = S N + (l : A) ^ N * c := by
     intro N
     have h1 := SModEq.sub_mem.1 (hW N)
@@ -47,7 +57,8 @@ theorem abssum_eigen_lim : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A] 
     exact ⟨(φ ^ h) c - (l : A) * c, by ring⟩
   · intro Θ hΘ
     have hl : ‖(l : ℂ_[l])‖ = (l : ℝ)⁻¹ := by
-      rw [show (l : ℂ_[l]) = (((l : ℚ_[l])) : ℂ_[l]) by simp, PadicComplex.norm_extends', Padic.norm_p]
+      rw [show (l : ℂ_[l]) = (((l : ℚ_[l])) : ℂ_[l]) by simp, PadicComplex.norm_extends',
+        Padic.norm_p]
     have hlt : ‖(l : ℂ_[l])‖ < 1 := by
       rw [hl]
       apply inv_lt_one_of_one_lt₀
@@ -62,13 +73,16 @@ theorem abssum_eigen_lim : ∀ (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A] 
     have hpart : ∀ N, ∑ i ∈ Finset.range N, (l : ℂ_[l]) ^ i * Θ (w i) = Θ (S N) := by
       intro N
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [S, map_sum, map_mul, map_pow, map_natCast]
+      simp [S, map_sum, map_mul, map_pow, map_natCast]
     simp only [hpart]
     rw [tendsto_iff_norm_sub_tendsto_zero]
-    refine squeeze_zero (fun _ => norm_nonneg _) (fun N => ?_)
+    refine squeeze_zero
+      (fun _ => norm_nonneg _)
+      (fun N => ?_)
       (tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) hlt)
     obtain ⟨c, hc⟩ := hWN N
-    rw [hc, map_add (f := _), sub_add_cancel_left, norm_neg, map_mul, map_pow, map_natCast, norm_mul, norm_pow]
+    rw [hc, map_add (f := _), sub_add_cancel_left, norm_neg, map_mul, map_pow, map_natCast,
+      norm_mul, norm_pow]
     exact mul_le_of_le_one_right (by positivity) (hΘ _)
 
 end GlobalTheory

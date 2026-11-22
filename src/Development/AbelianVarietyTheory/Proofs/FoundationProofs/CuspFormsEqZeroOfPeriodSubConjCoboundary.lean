@@ -174,66 +174,103 @@ private lemma eq_zero_of_eichler_conj_slash_relation (Γ : Subgroup SL(2, ℤ)) 
   simp only [Int.cast_zero, zero_mul, zero_add, Int.cast_one, one_pow, one_mul, hT] at he
   exact he.symm
 
-
 open Polynomial UpperHalfPlane in
 open scoped MatrixGroups ModularForm in
 open scoped Manifold in
-theorem _root_.GlobalTheory.HeckeFamilyMatrices.Positivity.eq_zero_of_per_sub_cj_mem : ∀ (N : ℕ) (Γ : Subgroup SL(2, ℤ)) (k : ℕ), 5 ≤ N →
-    Γ ≤ CongruenceSubgroup.Gamma1 N → Γ.FiniteIndex → 3 ≤ k → ∀ (f h : CuspForm Γ (k : ℤ)),
-    _root_.GlobalTheory.HeckeFamilyMatrices.per Γ (k - 2) ⇑f - _root_.GlobalTheory.HeckeFamilyMatrices.cj (_root_.GlobalTheory.HeckeFamilyMatrices.per Γ (k - 2) ⇑h) ∈
-      _root_.GlobalTheory.HeckeFamilyMatrices.B1 Γ (k - 2) → f = 0 ∧ h = 0 := by
+theorem _root_.GlobalTheory.HeckeFamilyMatrices.Positivity.eq_zero_of_per_sub_cj_mem
+    : ∀ (N : ℕ) (Γ : Subgroup SL(2, ℤ)) (k : ℕ),
+      5 ≤ N → Γ ≤ CongruenceSubgroup.Gamma1 N → Γ.FiniteIndex → 3 ≤ k
+        → ∀ (f h : CuspForm Γ (k : ℤ)),
+          _root_.GlobalTheory.HeckeFamilyMatrices.per Γ (k - 2) ⇑f
+                - _root_.GlobalTheory.HeckeFamilyMatrices.cj
+                  (_root_.GlobalTheory.HeckeFamilyMatrices.per Γ (k - 2) ⇑h)
+              ∈ _root_.GlobalTheory.HeckeFamilyMatrices.B1 Γ (k - 2)
+            → f = 0 ∧ h = 0 := by
   intro N Γ k _ _ hΓ hk f h hB
   unfold _root_.GlobalTheory.HeckeFamilyMatrices.B1 at hB
   obtain ⟨⟨q, hq⟩, hqe⟩ := hB
-  have hcoc : ∀ γ : Γ, _root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2) (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ) q - q =
-      _root_.GlobalTheory.HeckeFamilyMatrices.per Γ (k - 2) ⇑f γ -
-        map (starRingEnd ℂ) (_root_.GlobalTheory.HeckeFamilyMatrices.per Γ (k - 2) ⇑h γ) := fun γ => by
+  have hcoc
+      : ∀ γ : Γ,
+        _root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2)
+              (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ) q
+            - q
+          = _root_.GlobalTheory.HeckeFamilyMatrices.per Γ (k - 2) ⇑f γ - map (starRingEnd ℂ)
+            (_root_.GlobalTheory.HeckeFamilyMatrices.per Γ (k - 2) ⇑h γ) := fun γ => by
     have := congrFun hqe γ
     simpa [_root_.GlobalTheory.HeckeFamilyMatrices.cj] using this
-  have hper : ∀ g : CuspForm (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) Γ) k,
-      ∀ (γ : Γ) (τ : ℍ), _root_.GlobalTheory.HeckeFamilyMatrices.per Γ (k - 2) ⇑g γ =
-        _root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2) (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ)
-            (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) g (γ • τ)) -
-          _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) g τ := fun g =>
-    (_root_.GlobalTheory.HeckeFamilyMatrices.PerCoc.per_mem_Z1_and_eq_slP_eichler_sub Γ k (by omega) (CuspForm.toModularFormₗ g)).2
-  have hmemE : ∀ (g : ℍ → ℂ) (τ : ℍ), _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) g τ ∈ ℂ[X]_(k - 2 + 1) :=
-    fun g τ => eichler_mem_degreeLT_succ _ _ _
-  have hconj : ∀ p ∈ ℂ[X]_(k - 2 + 1), ∀ γ : SL(2, ℤ),
-      map (starRingEnd ℂ) (_root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2) (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ) p) =
-        _root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2) (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ) (map (starRingEnd ℂ) p) :=
-    fun p hp γ =>
-      (_root_.GlobalTheory.HeckeFamilyMatrices.SlPAct.polySlash_act (k - 2) (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ) 1 p hp).2.2.2
+  have hper
+      : ∀ g : CuspForm (Subgroup.map (Matrix.SpecialLinearGroup.mapGL ℝ) Γ) k, ∀ (γ : Γ) (τ : ℍ),
+        _root_.GlobalTheory.HeckeFamilyMatrices.per Γ (k - 2) ⇑g γ
+          = _root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2)
+              (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ)
+              (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) g (γ • τ))
+            - _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) g τ := fun g =>
+    (_root_.GlobalTheory.HeckeFamilyMatrices.PerCoc.per_mem_Z1_and_eq_slP_eichler_sub Γ k (by omega)
+      (CuspForm.toModularFormₗ g)).2
+  have hmemE
+      : ∀ (g : ℍ → ℂ) (τ : ℍ),
+        _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) g τ ∈ ℂ[X]_(k - 2 + 1) := fun g τ =>
+    eichler_mem_degreeLT_succ _ _ _
+  have hconj
+      : ∀ p ∈ ℂ[X]_(k - 2 + 1), ∀ γ : SL(2, ℤ),
+        map (starRingEnd ℂ)
+            (_root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2)
+              (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ) p)
+          = _root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2)
+            (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ) (map (starRingEnd ℂ) p) := fun p hp γ =>
+    (_root_.GlobalTheory.HeckeFamilyMatrices.SlPAct.polySlash_act (k - 2)
+      (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ) 1 p hp).2.2.2
   have hcc : ∀ p : ℂ[X], map (starRingEnd ℂ) (map (starRingEnd ℂ) p) = p := fun p => by
     ext n; simp [coeff_map]
   have hk1 : k - 1 = k - 2 + 1 := by omega
-  have rel1 : ∀ (γ : Γ) (τ : ℍ), _root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2) (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ)
-      (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f (γ • τ) -
-        map (starRingEnd ℂ) (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h (γ • τ)) - q) =
-      _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f τ -
-        map (starRingEnd ℂ) (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h τ) - q := by
+  have rel1
+      : ∀ (γ : Γ) (τ : ℍ),
+        _root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2)
+            (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ)
+            (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f (γ • τ)
+              - map (starRingEnd ℂ)
+                (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h (γ • τ))
+              - q)
+          = _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f τ
+            - map (starRingEnd ℂ) (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h τ)
+            - q := by
     intro γ τ
     have h1 := hcoc γ
     rw [hper f γ τ, hper h γ τ, Polynomial.map_sub, hconj _ (hmemE _ _)] at h1
     rw [map_sub, map_sub]
     linear_combination -h1
-  have rel2 : ∀ (γ : Γ) (τ : ℍ), _root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2) (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ)
-      (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h (γ • τ) -
-        map (starRingEnd ℂ) (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f (γ • τ)) - -map (starRingEnd ℂ) q) =
-      _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h τ -
-        map (starRingEnd ℂ) (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f τ) - -map (starRingEnd ℂ) q := by
+  have rel2
+      : ∀ (γ : Γ) (τ : ℍ),
+        _root_.GlobalTheory.HeckeFamilyMatrices.slP (k - 2)
+            (_root_.GlobalTheory.HeckeFamilyMatrices.mat γ)
+            (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h (γ • τ)
+              - map (starRingEnd ℂ)
+                (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f (γ • τ))
+              - - map (starRingEnd ℂ) q)
+          = _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h τ
+            - map (starRingEnd ℂ) (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f τ)
+            - - map (starRingEnd ℂ) q := by
     intro γ τ
     have h2 := congrArg (map (starRingEnd ℂ)) (rel1 γ τ)
     rw [hconj _ (sub_mem (sub_mem (hmemE _ _) (map_conj_mem_degreeLT (hmemE _ _))) hq)] at h2
     simp only [Polynomial.map_sub, hcc] at h2
-    have hneg : _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h (γ • τ) -
-        map (starRingEnd ℂ) (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f (γ • τ)) - -map (starRingEnd ℂ) q =
-        -(map (starRingEnd ℂ) (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f (γ • τ)) -
-          _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h (γ • τ) - map (starRingEnd ℂ) q) := by ring
+    have hneg
+        : _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h (γ • τ)
+            - map (starRingEnd ℂ)
+              (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f (γ • τ))
+            - - map (starRingEnd ℂ) q
+          = -(map (starRingEnd ℂ)
+              (_root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) f (γ • τ))
+            - _root_.GlobalTheory.HeckeFamilyMatrices.eichler (k - 2) h (γ • τ)
+            - map (starRingEnd ℂ) q) := by
+      ring
     rw [hneg, map_neg, h2]
     ring
   have hq' : q ∈ ℂ[X]_(k - 1) := by rw [hk1]; exact hq
-  exact ⟨eq_zero_of_eichler_conj_slash_relation Γ k hΓ hk h f _
-      (neg_mem (map_conj_mem_degreeLT hq')) rel2,
-    eq_zero_of_eichler_conj_slash_relation Γ k hΓ hk f h q hq' rel1⟩
+  exact ⟨
+    eq_zero_of_eichler_conj_slash_relation Γ k hΓ hk h f _ (neg_mem (map_conj_mem_degreeLT hq'))
+      rel2,
+    eq_zero_of_eichler_conj_slash_relation Γ k hΓ hk f h q hq' rel1
+  ⟩
 
 end GlobalTheory.HeckeFamilyMatrices.Positivity

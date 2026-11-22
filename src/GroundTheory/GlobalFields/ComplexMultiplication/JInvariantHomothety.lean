@@ -14,9 +14,10 @@ noncomputable section
 namespace GroundTheory.Global
 namespace Elliptic
 
-theorem G_eq_of_lattice_eq_smul {L L' : PeriodPair} {c : ℂ} (hc : c ≠ 0)
-    (h : (L'.lattice : Set ℂ) = (c * ·) '' L.lattice) (n : ℕ) :
-    L'.G n = (c ^ n)⁻¹ * L.G n := by
+theorem G_eq_of_lattice_eq_smul
+    {L L' : PeriodPair} {c : ℂ} (hc : c ≠ 0) (h : (L'.lattice : Set ℂ) = (c * ·) '' L.lattice)
+    (n : ℕ)
+    : L'.G n = (c ^ n)⁻¹ * L.G n := by
   have hmem : ∀ l ∈ L.lattice, c * l ∈ L'.lattice := fun l hl ↦ by
     have : c * l ∈ (L'.lattice : Set ℂ) := by rw [h]; exact ⟨l, hl, rfl⟩
     exact this
@@ -24,11 +25,12 @@ theorem G_eq_of_lattice_eq_smul {L L' : PeriodPair} {c : ℂ} (hc : c ≠ 0)
     have : l ∈ (c * ·) '' (L.lattice : Set ℂ) := by rw [← h]; exact hl
     obtain ⟨m, hm, rfl⟩ := this
     rwa [inv_mul_cancel_left₀ hc]
-  let e : L.lattice ≃ L'.lattice :=
-    { toFun := fun l ↦ ⟨c * l, hmem _ l.2⟩
-      invFun := fun l ↦ ⟨c⁻¹ * l, hmem' _ l.2⟩
-      left_inv := fun l ↦ by ext; simp [hc]
-      right_inv := fun l ↦ by ext; simp [hc] }
+  let e : L.lattice ≃ L'.lattice := {
+    toFun := fun l ↦ ⟨c * l, hmem _ l.2⟩
+    invFun := fun l ↦ ⟨c⁻¹ * l, hmem' _ l.2⟩
+    left_inv := fun l ↦ by ext; simp [hc]
+    right_inv := fun l ↦ by ext; simp [hc]
+  }
   rw [PeriodPair.G, PeriodPair.G, ← e.tsum_eq, ← tsum_mul_left]
   refine tsum_congr fun l ↦ ?_
   show ((c * (l : ℂ)) ^ n)⁻¹ = (c ^ n)⁻¹ * ((l : ℂ) ^ n)⁻¹
@@ -65,14 +67,14 @@ lemma weierstrassLaurentCoeff_eq_of_G_eq {L L' : PeriodPair} {t : ℂ}
   · have hodd : Odd (2 * n + 1 + 2) := ⟨n + 1, by ring⟩
     simp [weierstrassLaurentCoeff, L'.G_eq_zero_of_odd _ hodd, L.G_eq_zero_of_odd _ hodd]
 
-theorem weierstrassP_eq_of_G_eq {L L' : PeriodPair} {t : ℂ} (ht : t ≠ 0)
-    (hG : ∀ k, 2 ≤ k → L'.G (2 * k) = t ^ (2 * k) * L.G (2 * k)) {z : ℂ} (hz0 : z ≠ 0)
-    (hz' : ∀ l : L'.lattice, (l : ℂ) ≠ 0 → ‖z‖ < ‖(l : ℂ)‖)
-    (hz : ∀ l : L.lattice, (l : ℂ) ≠ 0 → ‖t * z‖ < ‖(l : ℂ)‖) :
-    ℘[L'] z = t ^ 2 * ℘[L] (t * z) := by
-  have hasSum_laurent (P : PeriodPair) (w : ℂ)
-      (hw : ∀ l : P.lattice, (l : ℂ) ≠ 0 → ‖w‖ < ‖(l : ℂ)‖) :
-      HasSum (fun j ↦ weierstrassLaurentCoeff (L := P) j * w ^ j) (℘[P] w - 1 / w ^ 2) := by
+theorem weierstrassP_eq_of_G_eq
+    {L L' : PeriodPair} {t : ℂ}
+    (ht : t ≠ 0) (hG : ∀ k, 2 ≤ k → L'.G (2 * k) = t ^ (2 * k) * L.G (2 * k))
+    {z : ℂ} (hz0 : z ≠ 0) (hz' : ∀ l : L'.lattice, (l : ℂ) ≠ 0 → ‖z‖ < ‖(l : ℂ)‖)
+    (hz : ∀ l : L.lattice, (l : ℂ) ≠ 0 → ‖t * z‖ < ‖(l : ℂ)‖)
+    : ℘[L'] z = t ^ 2 * ℘[L] (t * z) := by
+  have hasSum_laurent (P : PeriodPair) (w : ℂ) (hw : ∀ l : P.lattice, (l : ℂ) ≠ 0 → ‖w‖ < ‖(l : ℂ)‖)
+      : HasSum (fun j ↦ weierstrassLaurentCoeff (L := P) j * w ^ j) (℘[P] w - 1 / w ^ 2) := by
     have h := P.weierstrassPExceptSeries_hasSum 0 w 0 (fun l hl ↦ by simpa using hw l hl)
     rw [weierstrassP_eq_except_zero w, add_sub_cancel_right]
     convert h using 2 with j
@@ -83,23 +85,26 @@ theorem weierstrassP_eq_of_G_eq {L L' : PeriodPair} {t : ℂ} (ht : t ≠ 0)
     · simp [hj, P.lattice.zero_mem, P.sumInvPow_zero]
   have h1 := hasSum_laurent L' z hz'
   have h2 := (hasSum_laurent L (t * z) hz).mul_left (t ^ 2)
-  have h3 : HasSum (fun j ↦ weierstrassLaurentCoeff (L := L') j * z ^ j)
+  have h3 : HasSum
+      (fun j ↦ weierstrassLaurentCoeff (L := L') j * z ^ j)
       (t ^ 2 * (℘[L] (t * z) - 1 / (t * z) ^ 2)) := by
-    have hfun : (fun j ↦ weierstrassLaurentCoeff (L := L') j * z ^ j) =
-        fun j ↦ t ^ 2 * (weierstrassLaurentCoeff (L := L) j * (t * z) ^ j) := by
+    have hfun
+        : (fun j ↦ weierstrassLaurentCoeff (L := L') j * z ^ j)
+          = fun j ↦ t ^ 2 * (weierstrassLaurentCoeff (L := L) j * (t * z) ^ j) := by
       funext j
       rw [weierstrassLaurentCoeff_eq_of_G_eq hG, mul_pow]
       ring
     rw [hfun]
     exact h2
   have e := h1.unique h3
-  have e' : t ^ 2 * (1 / (t * z) ^ 2) = 1 / z ^ 2 := by
-    field_simp
+  have e' : t ^ 2 * (1 / (t * z) ^ 2) = 1 / z ^ 2 := by field_simp
   linear_combination e - e'
 
-theorem mul_mem_lattice_of_G_eq {L L' : PeriodPair} {t : ℂ} (ht : t ≠ 0)
-    (hG : ∀ k, 2 ≤ k → L'.G (2 * k) = t ^ (2 * k) * L.G (2 * k)) {z : ℂ}
-    (hz : z ∈ L'.lattice) : t * z ∈ L.lattice := by
+theorem mul_mem_lattice_of_G_eq
+    {L L' : PeriodPair} {t : ℂ}
+    (ht : t ≠ 0) (hG : ∀ k, 2 ≤ k → L'.G (2 * k) = t ^ (2 * k) * L.G (2 * k))
+    {z : ℂ} (hz : z ∈ L'.lattice)
+    : t * z ∈ L.lattice := by
   obtain ⟨ε', hε', hL'⟩ := exists_pos_le_norm L'
   obtain ⟨ε, hε, hL⟩ := exists_pos_le_norm L
   have htn : 0 < ‖t‖ := norm_pos_iff.2 ht
@@ -110,8 +115,7 @@ theorem mul_mem_lattice_of_G_eq {L L' : PeriodPair} {t : ℂ} (ht : t ≠ 0)
   have hcount : ∀ L₀ : PeriodPair, (L₀.lattice : Set ℂ).Countable := fun L₀ ↦ by
     have : Countable L₀.lattice := L₀.latticeEquivProd.injective.countable
     exact Set.countable_coe_iff.1 this
-  have hScount : S.Countable :=
-    (hcount L').union ((hcount L).preimage (mul_right_injective₀ ht))
+  have hScount : S.Countable := (hcount L').union ((hcount L).preimage (mul_right_injective₀ ht))
   have hSclosed : IsClosed S :=
     L'.isClosed_lattice.union (L.isClosed_lattice.preimage (continuous_const.mul continuous_id))
   have hU : IsPreconnected Sᶜ := by
@@ -132,8 +136,12 @@ theorem mul_mem_lattice_of_G_eq {L L' : PeriodPair} {t : ℂ} (ht : t ≠ 0)
       rw [norm_mul]
       rw [lt_div_iff₀ htn] at this
       linarith
-    refine ⟨?_, weierstrassP_eq_of_G_eq ht hG hw0 (fun l hl ↦ hw1.trans_le (hL' _ l.2 hl))
-      (fun l hl ↦ hw2.trans_le (hL _ l.2 hl))⟩
+    refine ⟨
+      ?_,
+      weierstrassP_eq_of_G_eq ht hG hw0
+        (fun l hl ↦ hw1.trans_le (hL' _ l.2 hl))
+        (fun l hl ↦ hw2.trans_le (hL _ l.2 hl))
+    ⟩
     rintro (h | h)
     · exact absurd (hL' w h hw0) (not_le.2 hw1)
     · exact absurd (hL (t * w) h (mul_ne_zero ht hw0)) (not_le.2 hw2)
@@ -170,9 +178,10 @@ theorem mul_mem_lattice_of_G_eq {L L' : PeriodPair} {t : ℂ} (ht : t ≠ 0)
   rw [← hord] at hnn
   exact absurd hnn (by decide)
 
-theorem lattice_eq_of_G_eq {L L' : PeriodPair} {t : ℂ} (ht : t ≠ 0)
-    (hG : ∀ k, 2 ≤ k → L'.G (2 * k) = t ^ (2 * k) * L.G (2 * k)) :
-    (L'.lattice : Set ℂ) = (t⁻¹ * ·) '' L.lattice := by
+theorem lattice_eq_of_G_eq
+    {L L' : PeriodPair} {t : ℂ}
+    (ht : t ≠ 0) (hG : ∀ k, 2 ≤ k → L'.G (2 * k) = t ^ (2 * k) * L.G (2 * k))
+    : (L'.lattice : Set ℂ) = (t⁻¹ * ·) '' L.lattice := by
   have hG' : ∀ k, 2 ≤ k → L.G (2 * k) = t⁻¹ ^ (2 * k) * L'.G (2 * k) := fun k hk ↦ by
     rw [hG k hk, inv_pow, inv_mul_cancel_left₀ (pow_ne_zero _ ht)]
   ext z
@@ -214,9 +223,9 @@ lemma g₂_g₃_of_variableChange {L L' : PeriodPair} {C : WeierstrassCurve.Vari
   · linear_combination 4 * h4
   · linear_combination 4 * h6
 
-theorem weierstrassCurve_j_eq_iff {L L' : PeriodPair} :
-    (weierstrassCurve L).j = (weierstrassCurve L').j ↔
-      ∃ c : ℂ, c ≠ 0 ∧ (L'.lattice : Set ℂ) = (c * ·) '' L.lattice := by
+theorem weierstrassCurve_j_eq_iff {L L' : PeriodPair}
+    : (weierstrassCurve L).j = (weierstrassCurve L').j
+      ↔ ∃ c : ℂ, c ≠ 0 ∧ (L'.lattice : Set ℂ) = (c * ·) '' L.lattice := by
   constructor
   · intro hj
     obtain ⟨C, hC⟩ := WeierstrassCurve.exists_variableChange_of_j_eq _ _ hj
@@ -234,10 +243,12 @@ theorem weierstrassCurve_j_eq_iff {L L' : PeriodPair} :
     · rw [PeriodPair.g₃, PeriodPair.g₃, hG, inv_pow]
       ring
 
-theorem modularJ_eq_iff (τ τ' : UpperHalfPlane) :
-    modularJ τ = modularJ τ' ↔ ∃ c : ℂ, c ≠ 0 ∧
-      ((latticeOfTau τ').lattice : Set ℂ) = (c * ·) '' (latticeOfTau τ).lattice := by
-  rw [← weierstrassCurve_latticeOfTau_j, ← weierstrassCurve_latticeOfTau_j, weierstrassCurve_j_eq_iff]
+theorem modularJ_eq_iff (τ τ' : UpperHalfPlane)
+    : modularJ τ = modularJ τ'
+      ↔ ∃ c : ℂ,
+        c ≠ 0 ∧ ((latticeOfTau τ').lattice : Set ℂ) = (c * ·) '' (latticeOfTau τ).lattice := by
+  rw [← weierstrassCurve_latticeOfTau_j, ← weierstrassCurve_latticeOfTau_j,
+    weierstrassCurve_j_eq_iff]
 
 end Elliptic
 end GroundTheory.Global

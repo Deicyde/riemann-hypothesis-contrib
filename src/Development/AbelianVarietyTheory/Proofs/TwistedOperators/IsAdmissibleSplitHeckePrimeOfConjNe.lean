@@ -16,28 +16,36 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HeckeLift
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.FWT Formalism.L2.Pj Formalism.IndefR.Datum ReciprocityTheory.ChartRestriction.G.PullbackSections ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.FWT Formalism.L2.Pj
+  Formalism.IndefR.Datum ReciprocityTheory.ChartRestriction.G.PullbackSections
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Formalism.L2.NTheta (IsIdemAt)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 
 namespace GlobalTheory.HeckeGeomSum
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice GlobalTheory.IndefiniteRowSideFullHecke.OrthonormalLatticeThetaValues GlobalTheory.FinTranslate GlobalTheory.HeckeVacuum
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice
+  GlobalTheory.IndefiniteRowSideFullHecke.OrthonormalLatticeThetaValues GlobalTheory.FinTranslate
+  GlobalTheory.HeckeVacuum
 
 section Adelic
 
-variable {D : D7} {S T : HSp D} {ψ : AddChar (AF D.host.F) ℂ} {χS χT : (AE D)ˣ →* Circle}
+variable
+  {D : D7} {S T : HSp D} {ψ : AddChar (AF D.host.F) ℂ} {χS χT : (AE D)ˣ →* Circle}
   {om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ)}
-  {ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)} {ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)}
+  {ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)}
+  {ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)}
 
 theorem psi_ne_zero (ψ : AddChar (AF D.host.F) ℂ) (t : AF D.host.F) : ψ t ≠ 0 := fun h0 => by
   have := AddChar.map_add_eq_mul ψ t (-t)
   rw [add_neg_cancel, AddChar.map_zero_eq_one, h0, zero_mul] at this
   exact one_ne_zero this
 
-theorem heisO_sum' {ι : Type} (s : Finset ι) (w : WO S T) (f : ι → WO S T → ℂ) :
-    heisO ψ S T w (∑ x ∈ s, f x) = ∑ x ∈ s, heisO ψ S T w (f x) := by
+theorem heisO_sum' {ι : Type} (s : Finset ι) (w : WO S T) (f : ι → WO S T → ℂ)
+    : heisO ψ S T w (∑ x ∈ s, f x) = ∑ x ∈ s, heisO ψ S T w (f x) := by
   funext z
   simp only [heisO, Finset.sum_apply, Finset.mul_sum]
 
@@ -48,14 +56,19 @@ theorem om_ne_zero (g : GA D T) {v : WO S T → ℂ} (hv : v ≠ 0) : om (1, g) 
   rw [h, map_zero] at e
   exact hv e.symm
 
-theorem heis_vac_eq (hW : IsWeilDatumO ψ S T χS χT om) (hS : IsSelfDualC S ΛS) (hT : IsSelfDualC T ΛT)
-    {v : WO S T → ℂ} (hf : IsThetaFunO ψ S T v) (hv : IsLatVac (heisO ψ S T) (latO S T ΛS ΛT fun _ => True) v)
-    (hv0 : v ≠ 0) {e : AE D} (he : IsSplitIdem D e) {a : GA D T} {Δ : Finset (WO S T)}
-    (hΔ : IsHalfReps (latO S T ΛS ΛT fun _ => True) e a Δ) {κ : ℂ}
-    (hE : om (1, a) v = κ • ∑ x ∈ Δ, heisO ψ S T x v) {w x : WO S T} (hx : x ∈ Δ)
-    (hw : actO S T 1 a⁻¹ w ∈ latO S T ΛS ΛT fun _ => True) (hwx : w - x ∈ latO S T ΛS ΛT fun _ => True) {χ : ℂ}
-    (hχ : heisO ψ S T w (om (1, a) v) = χ • om (1, a) v) : heisO ψ S T w v = χ • heisO ψ S T x v := by
-  obtain ⟨ε, -, hε⟩ := (GlobalTheory.LatVac.latO_selfDual_approx_sign D ψ S T ΛS ΛT hW.std hS hT).2.2 v hv _ hwx
+theorem heis_vac_eq
+    (hW : IsWeilDatumO ψ S T χS χT om) (hS : IsSelfDualC S ΛS) (hT : IsSelfDualC T ΛT)
+    {v : WO S T → ℂ} (hf : IsThetaFunO ψ S T v)
+    (hv : IsLatVac (heisO ψ S T) (latO S T ΛS ΛT fun _ => True) v) (hv0 : v ≠ 0)
+    {e : AE D} (he : IsSplitIdem D e)
+    {a : GA D T} {Δ : Finset (WO S T)} (hΔ : IsHalfReps (latO S T ΛS ΛT fun _ => True) e a Δ)
+    {κ : ℂ} (hE : om (1, a) v = κ • ∑ x ∈ Δ, heisO ψ S T x v)
+    {w x : WO S T} (hx : x ∈ Δ) (hw : actO S T 1 a⁻¹ w ∈ latO S T ΛS ΛT fun _ => True)
+    (hwx : w - x ∈ latO S T ΛS ΛT fun _ => True)
+    {χ : ℂ} (hχ : heisO ψ S T w (om (1, a) v) = χ • om (1, a) v)
+    : heisO ψ S T w v = χ • heisO ψ S T x v := by
+  obtain ⟨ε, -, hε⟩ :=
+    (GlobalTheory.LatVac.latO_selfDual_approx_sign D ψ S T ΛS ΛT hW.std hS hT).2.2 v hv _ hwx
   have hs := hε v hv
   have hsa : actO S T 1 a⁻¹ (w - x) ∈ latO S T ΛS ΛT fun _ => True := by
     rw [act_sub]; exact sub_mem hw (hΔ.1 x hx).1
@@ -64,12 +77,14 @@ theorem heis_vac_eq (hW : IsWeilDatumO ψ S T χS χT om) (hS : IsSelfDualC S Λ
     congr 1
     rw [Finset.smul_sum]
     refine Finset.sum_congr rfl fun x' hx' => ?_
-    rw [GlobalTheory.SplitScalar.heisO_comm, hs, GlobalTheory.LatVac.heisO_smul, ← Formalism.IndefR.Eqv.symplO_actO S T 1 a⁻¹,
+    rw [GlobalTheory.SplitScalar.heisO_comm, hs, GlobalTheory.LatVac.heisO_smul,
+      ← Formalism.IndefR.Eqv.symplO_actO S T 1 a⁻¹,
       GlobalTheory.LatVac.char_sympl_eq_one hW.std hS hT hsa (hΔ.1 x' hx').1, one_smul]
   have h2 : heisO ψ S T x (om (1, a) v) = om (1, a) v := by
     have := hW.om_heis 1 a (actO S T 1 a⁻¹ x) v hf
-    rw [hv.2 e he _ (hΔ.1 x hx).1 (GlobalTheory.SplitHecke.isHalf_actO _ _ (hΔ.1 x hx).2), ← act_mul, mul_inv_cancel,
-      act_one] at this
+    rw [hv.2 e he _ (hΔ.1 x hx).1 (GlobalTheory.SplitHecke.isHalf_actO _ _ (hΔ.1 x hx).2),
+        ← act_mul, mul_inv_cancel, act_one]
+      at this
     exact this.symm
   have h3 := fun f => GlobalTheory.SplitScalar.heisO_heisO ψ S T x (w - x) f
   simp only [add_sub_cancel] at h3
@@ -80,43 +95,55 @@ theorem heis_vac_eq (hW : IsWeilDatumO ψ S T χS χT om) (hS : IsSelfDualC S Λ
   rw [hs, GlobalTheory.LatVac.heisO_smul, h5, mul_smul] at h6
   exact (smul_right_injective _ (psi_ne_zero ψ _) h6).symm
 
-theorem actO_fin_rat {δ : GA D T} {M : Matrix (Fin T.rank) (Fin T.rank) D.host.E}
-    (hM : Formalism.L2.Theta.mt T δ = M.map (incA D)) (Y : Matrix (Fin T.rank) (Fin S.rank) D.host.E) :
-    actO S T 1 δ (ratW T S Y - realPt S T Y) = ratW T S (M * Y) - realPt S T (M * Y) := by
+theorem actO_fin_rat
+    {δ : GA D T} {M : Matrix (Fin T.rank) (Fin T.rank) D.host.E}
+    (hM : Formalism.L2.Theta.mt T δ = M.map (incA D))
+    (Y : Matrix (Fin T.rank) (Fin S.rank) D.host.E)
+    : actO S T 1 δ (ratW T S Y - realPt S T Y) = ratW T S (M * Y) - realPt S T (M * Y) := by
   rw [act_sub, GlobalTheory.RawLift.Move.actO_one_left, GlobalTheory.RawLift.Move.actO_one_left, hM,
     GlobalTheory.FrameChangeRead.map_incA_mul_realPt]
   congr 1
   exact (Matrix.map_mul (f := incA D)).symm
 
-theorem fin_sub (Y Z : Matrix (Fin T.rank) (Fin S.rank) D.host.E) :
-    ratW T S (Y - Z) - realPt S T (Y - Z) = (ratW T S Y - realPt S T Y) - (ratW T S Z - realPt S T Z) := by
+theorem fin_sub (Y Z : Matrix (Fin T.rank) (Fin S.rank) D.host.E)
+    : ratW T S (Y - Z) - realPt S T (Y - Z)
+      = (ratW T S Y - realPt S T Y) - (ratW T S Z - realPt S T Z) := by
   ext i j
-  simp only [ratW, realPt, Matrix.sub_apply, Matrix.map_apply, Matrix.of_apply, map_sub, TensorProduct.tmul_sub]
+  simp only [ratW, realPt, Matrix.sub_apply, Matrix.map_apply, Matrix.of_apply, map_sub,
+    TensorProduct.tmul_sub]
   abel
 
-theorem fin_neg (Y : Matrix (Fin T.rank) (Fin S.rank) D.host.E) :
-    -(ratW T S (-Y) - realPt S T (-Y)) = ratW T S Y - realPt S T Y := by
+theorem fin_neg (Y : Matrix (Fin T.rank) (Fin S.rank) D.host.E)
+    : -(ratW T S (-Y) - realPt S T (-Y)) = ratW T S Y - realPt S T Y := by
   ext i j
-  simp only [ratW, realPt, Matrix.sub_apply, Matrix.neg_apply, Matrix.map_apply, Matrix.of_apply, map_neg,
-    TensorProduct.tmul_neg]
+  simp only [ratW, realPt, Matrix.sub_apply, Matrix.neg_apply, Matrix.map_apply, Matrix.of_apply,
+    map_neg, TensorProduct.tmul_neg]
   abel
 
-theorem realPt_neg (Y : Matrix (Fin T.rank) (Fin S.rank) D.host.E) : realPt S T (-Y) = -realPt S T Y := by
+theorem realPt_neg (Y : Matrix (Fin T.rank) (Fin S.rank) D.host.E)
+    : realPt S T (-Y) = - realPt S T Y := by
   ext i j
   simp only [realPt, Matrix.neg_apply, Matrix.of_apply, TensorProduct.tmul_neg]
 
-theorem realPt_sub (X Y : Matrix (Fin T.rank) (Fin S.rank) D.host.E) :
-    realPt S T (X - Y) = realPt S T X - realPt S T Y := by
+theorem realPt_sub (X Y : Matrix (Fin T.rank) (Fin S.rank) D.host.E)
+    : realPt S T (X - Y) = realPt S T X - realPt S T Y := by
   ext i j
   simp only [realPt, Matrix.sub_apply, Matrix.of_apply, TensorProduct.tmul_sub]
 
-theorem theta_shift (hW : IsWeilDatumO ψ S T χS χT om) {v : WO S T → ℂ} (hf : IsThetaFunO ψ S T v) (g : GA D T)
-    (X Y ℓ : Matrix (Fin T.rank) (Fin S.rank) D.host.E) {x u : WO S T} (hu : heisO ψ S T u v = v)
-    (hx : x = actO S T 1 g⁻¹ (ratW T S ℓ - realPt S T ℓ) + u) {χ : ℂ}
-    (h : heisO ψ S T (actO S T 1 g⁻¹ (-(ratW T S Y - realPt S T Y))) v = χ • heisO ψ S T x v) :
-    om (1, g) v (realPt S T (X + Y)) = ψ (symplOH S T (realPt S T X) (realPt S T Y)) * χ *
-      (ψ (-(symplOH S T (realPt S T ℓ) (realPt S T (X - ℓ)) +
-          symplOH S T (ratW T S ℓ - realPt S T ℓ) (actO S T 1 g u))) * om (1, g) v (realPt S T (X - ℓ))) := by
+theorem theta_shift
+    (hW : IsWeilDatumO ψ S T χS χT om)
+    {v : WO S T → ℂ} (hf : IsThetaFunO ψ S T v)
+    (g : GA D T)
+    (X Y ℓ : Matrix (Fin T.rank) (Fin S.rank) D.host.E)
+    {x u : WO S T}
+    (hu : heisO ψ S T u v = v) (hx : x = actO S T 1 g⁻¹ (ratW T S ℓ - realPt S T ℓ) + u)
+    {χ : ℂ}
+    (h : heisO ψ S T (actO S T 1 g⁻¹ (-(ratW T S Y - realPt S T Y))) v = χ • heisO ψ S T x v)
+    : om (1, g) v (realPt S T (X + Y))
+      = ψ (symplOH S T (realPt S T X) (realPt S T Y)) * χ
+        * (ψ (-(symplOH S T (realPt S T ℓ) (realPt S T (X - ℓ))
+            + symplOH S T (ratW T S ℓ - realPt S T ℓ) (actO S T 1 g u)))
+          * om (1, g) v (realPt S T (X - ℓ))) := by
   have hΘ := hW.om_pres (1, g) v hf
   have h1 := congrArg (om (1, g)) h
   have hgx : actO S T 1 g x = (ratW T S ℓ - realPt S T ℓ) + actO S T 1 g u := by
@@ -124,20 +151,28 @@ theorem theta_shift (hW : IsWeilDatumO ψ S T χS χT om) {v : WO S T → ℂ} (
     refine (map_add (GlobalTheory.SplitHecke.actAdd S T 1 g) _ _).trans ?_
     change actO S T 1 g (actO S T 1 g⁻¹ _) + actO S T 1 g u = _
     rw [← act_mul, mul_inv_cancel, act_one]
-  rw [map_smul, hW.om_heis _ _ _ _ hf, hW.om_heis _ _ _ _ hf, ← act_mul, mul_inv_cancel, act_one, hgx] at h1
+  rw [map_smul, hW.om_heis _ _ _ _ hf, hW.om_heis _ _ _ _ hf, ← act_mul, mul_inv_cancel, act_one,
+      hgx]
+    at h1
   have h2 : heisO ψ S T (actO S T 1 g u) (om (1, g) v) = om (1, g) v := by
     rw [← hW.om_heis _ _ _ _ hf, hu]
-  have h3 := GlobalTheory.SplitScalar.heisO_heisO ψ S T (ratW T S ℓ - realPt S T ℓ) (actO S T 1 g u) (om (1, g) v)
+  have h3 :=
+    GlobalTheory.SplitScalar.heisO_heisO ψ S T (ratW T S ℓ - realPt S T ℓ) (actO S T 1 g u)
+      (om (1, g) v)
   rw [h2] at h3
   have h4 := GlobalTheory.AHPhase.theta_realPt_add hΘ X (-ℓ)
   rw [fin_neg, ← sub_eq_add_neg, h3, realPt_neg, symplOH_neg_right] at h4
   rw [GlobalTheory.AHPhase.theta_realPt_add hΘ X Y, h1, h4]
   simp only [Pi.smul_apply, smul_eq_mul]
-  have h5 : ψ (-(symplOH S T (realPt S T ℓ) (realPt S T (X - ℓ)) +
-      symplOH S T (ratW T S ℓ - realPt S T ℓ) (actO S T 1 g u))) *
-      (ψ (-symplOH S T (realPt S T X) (realPt S T ℓ)) * ψ (symplOH S T (ratW T S ℓ - realPt S T ℓ) (actO S T 1 g u))) = 1 := by
-    rw [← AddChar.map_add_eq_mul, ← AddChar.map_add_eq_mul, realPt_sub, sub_eq_add_neg (realPt S T X),
-      symplOH_add_right, symplOH_neg_right, symplOH_self, symplOH_skew (S := S) (T := T) (realPt S T X) (realPt S T ℓ)]
+  have h5
+      : ψ (-(symplOH S T (realPt S T ℓ) (realPt S T (X - ℓ))
+            + symplOH S T (ratW T S ℓ - realPt S T ℓ) (actO S T 1 g u)))
+          * (ψ (- symplOH S T (realPt S T X) (realPt S T ℓ))
+            * ψ (symplOH S T (ratW T S ℓ - realPt S T ℓ) (actO S T 1 g u)))
+        = 1 := by
+    rw [← AddChar.map_add_eq_mul, ← AddChar.map_add_eq_mul, realPt_sub,
+      sub_eq_add_neg (realPt S T X), symplOH_add_right, symplOH_neg_right, symplOH_self,
+      symplOH_skew (S := S) (T := T) (realPt S T X) (realPt S T ℓ)]
     convert AddChar.map_zero_eq_one ψ using 2
     ring
   linear_combination (-(ψ (symplOH S T (realPt S T X) (realPt S T Y)) * χ *
@@ -149,34 +184,51 @@ end GlobalTheory.HeckeGeomSum
 
 namespace GlobalTheory.HeckeGeomSum
 
-open NumberField AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AHPhase
+open NumberField AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory
+  MonObj ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AHPhase
 
 section Geo
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {r : ℕ} {U : Unf Xo c σ r}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {r : ℕ}
+  {U : Unf Xo c σ r}
 
-theorem gform {g n : ℕ} {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.IsHermitian) (t₀ θ' : ℂ) (θ : (Fin g → ℂ) → ℂ)
-    (fr : (Fin g → ℂ) → ℂ) (z : Fin g → ℂ) (lam : Fin n → Fin g → ℂ) (χ : Fin n → ℂ) (hχ : ∀ m, χ m ≠ 0)
+theorem gform
+    {g n : ℕ} {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.IsHermitian)
+    (t₀ θ' : ℂ) (θ : (Fin g → ℂ) → ℂ) (fr : (Fin g → ℂ) → ℂ) (z : Fin g → ℂ)
+    (lam : Fin n → Fin g → ℂ)
+    (χ : Fin n → ℂ) (hχ : ∀ m, χ m ≠ 0)
     (hz : fr z ≠ 0)
-    (hfr : ∀ m, fr z = χ m * Complex.exp (Real.pi * hermForm Hm z (lam m) +
-      Real.pi / 2 * hermForm Hm (lam m) (lam m)) * fr (z + lam m))
-    (h : t₀ * θ' * fr z = ∑ m, θ (z + lam m) * fr (z + lam m)) :
-    t₀ * (Complex.exp (-(Real.pi / 2 * hermForm Hm z z)) * θ') =
-      ∑ m, (χ m * Complex.exp (Real.pi * Complex.I * (hermForm Hm z (lam m)).im))⁻¹ *
-        (Complex.exp (-(Real.pi / 2 * hermForm Hm (z + lam m) (z + lam m))) * θ (z + lam m)) := by
+    (hfr : ∀ m,
+      fr z
+        = χ m
+          * Complex.exp
+            (Real.pi * hermForm Hm z (lam m) + Real.pi / 2 * hermForm Hm (lam m) (lam m))
+          * fr (z + lam m))
+    (h : t₀ * θ' * fr z = ∑ m, θ (z + lam m) * fr (z + lam m))
+    : t₀ * (Complex.exp (-(Real.pi / 2 * hermForm Hm z z)) * θ')
+      = ∑ m, (χ m * Complex.exp (Real.pi * Complex.I * (hermForm Hm z (lam m)).im))⁻¹ *
+          (Complex.exp (-(Real.pi / 2 * hermForm Hm (z + lam m) (z + lam m))) * θ (z + lam m)) := by
   apply mul_right_cancel₀ hz
-  rw [show t₀ * (Complex.exp (-(Real.pi / 2 * hermForm Hm z z)) * θ') * fr z =
-    Complex.exp (-(Real.pi / 2 * hermForm Hm z z)) * (t₀ * θ' * fr z) by ring, h, Finset.mul_sum, Finset.sum_mul]
+  rw [show t₀ * (Complex.exp (-(Real.pi / 2 * hermForm Hm z z)) * θ') * fr z
+        = Complex.exp (-(Real.pi / 2 * hermForm Hm z z)) * (t₀ * θ' * fr z) by
+      ring,
+    h, Finset.mul_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun m _ => ?_
   have hs := hermForm_swap hH z (lam m)
-  have hsc : hermForm Hm z (lam m) - star (hermForm Hm z (lam m)) =
-      2 * ((hermForm Hm z (lam m)).im : ℂ) * Complex.I := by
-    rw [show star (hermForm Hm z (lam m)) = (starRingEnd ℂ) (hermForm Hm z (lam m)) from rfl, Complex.sub_conj]
-    push_cast; ring
-  have e : -(↑Real.pi / 2 * hermForm Hm (z + lam m) (z + lam m)) +
-      (↑Real.pi * hermForm Hm z (lam m) + ↑Real.pi / 2 * hermForm Hm (lam m) (lam m)) =
-      ↑Real.pi * Complex.I * ((hermForm Hm z (lam m)).im : ℂ) + -(↑Real.pi / 2 * hermForm Hm z z) := by
+  have hsc
+      : hermForm Hm z (lam m) - star (hermForm Hm z (lam m))
+        = 2 * ((hermForm Hm z (lam m)).im : ℂ) * Complex.I := by
+    rw [show star (hermForm Hm z (lam m)) = (starRingEnd ℂ) (hermForm Hm z (lam m)) from rfl,
+      Complex.sub_conj]
+    push_cast
+    ring
+  have e
+      : -(↑Real.pi / 2 * hermForm Hm (z + lam m) (z + lam m))
+          + (↑Real.pi * hermForm Hm z (lam m) + ↑Real.pi / 2 * hermForm Hm (lam m) (lam m))
+        = ↑Real.pi * Complex.I * ((hermForm Hm z (lam m)).im : ℂ)
+          + -(↑Real.pi / 2 * hermForm Hm z z) := by
     rw [hermForm_add_left, hermForm_add_right, hermForm_add_right, hs]
     linear_combination (↑Real.pi / 2 : ℂ) * hsc
   have e2 := congrArg Complex.exp e
@@ -185,30 +237,42 @@ theorem gform {g n : ℕ} {Hm : Matrix (Fin g) (Fin g) ℂ} (hH : Hm.IsHermitian
   have h2 := Complex.exp_ne_zero (↑Real.pi * Complex.I * ((hermForm Hm z (lam m)).im : ℂ))
   rw [hfr m]
   generalize Complex.exp (-(↑Real.pi / 2 * hermForm Hm (z + lam m) (z + lam m))) = A at e2 ⊢
-  generalize Complex.exp (↑Real.pi * hermForm Hm z (lam m) + ↑Real.pi / 2 * hermForm Hm (lam m) (lam m)) = B at e2 ⊢
+  generalize Complex.exp
+        (↑Real.pi * hermForm Hm z (lam m) + ↑Real.pi / 2 * hermForm Hm (lam m) (lam m))
+      = B
+    at e2 ⊢
   generalize Complex.exp (↑Real.pi * Complex.I * ((hermForm Hm z (lam m)).im : ℂ)) = C at e2 h2 ⊢
   generalize Complex.exp (-(↑Real.pi / 2 * hermForm Hm z z)) = A' at e2 ⊢
   field_simp
   linear_combination (-(θ (z + lam m) * fr (z + lam m))) * e2
 
-
 set_option maxHeartbeats 1000000 in
-theorem geo_sum (hσ : GoodEmb c σ) (hU : IsUnf U) {P : Ideal (𝓞 E)} {p i : ℕ} {k k' : U.Comp} (x : (U.X k).dom)
-    (x' : (U.X k').dom) (hu : ∀ τ' i', ‖dmin (U.X k).Gm x.1 τ' i'‖ = 1) (hu' : ∀ τ' i', ‖dmin (U.X k').Gm x'.1 τ' i'‖ = 1)
-    (C : Subgroup (Over.mk (U.un k x).x ⟶ Xo.univ.t.G)) (z : FrPt Xo c (CAt σ)) (t : Ix Dw → (CAt σ)ˣ)
-    (hA : GlobalTheory.HkFam.admitted l P p) (hK : Xo.univ.t.HeckeKer (Over.mk (U.un k x).x) Dw P p i C)
-    (hz : GlobalTheory.HeckeEx.HkPtC p (U.un k x) C z) (hb : FrBor t (U.un k' x') z) (ht : ∀ j, j ≠ none → t j = 1) :
-    ∃ (W : UnfAt U k x) (Y : UnitAt W) (W' : UnfAt U k' x') (Y' : UnitAt W'),
-      (∀ (j : Fin W'.g) (j' : Fin W.g), (j : ℕ) = j' → W'.e j = W.e j') ∧
-      ((∀ (j₁ j₂ : Fin W'.g) (j₁' j₂' : Fin W.g), (j₁ : ℕ) = j₁' → (j₂ : ℕ) = j₂' → Y'.Hm j₁ j₂ = Y.Hm j₁' j₂') →
-        ∃ v : Fin (Ideal.absNorm P ^ i) → Fin r → E, (∀ m, pv W' (v m) ∈ Set.range W'.Pm) ∧
-          (∀ m m' u', (∀ τ j, perFr (U.X k') x'.1 (v m - v m') τ j = perFr (U.X k) x.1 u' τ j) →
-            pv W u' ∈ Set.range W.Pm → m = m') ∧
-          ∀ (u : Fin r → E) (u' : Fin (Ideal.absNorm P ^ i) → Fin r → E),
-            (∀ m τ j, perFr (U.X k') x'.1 (u + v m) τ j = perFr (U.X k) x.1 (u' m) τ j) →
-            Formalism.L2.PjFree.toC (t none : CAt σ) * ahG Y' (pv W' u) =
-              ∑ m, (Y'.χl (pv W' (v m)) * Complex.exp (Real.pi * Complex.I * (hermForm Y'.Hm (pv W' u) (pv W' (v m))).im))⁻¹ *
-                ahG Y (pv W (u' m))) := by
+theorem geo_sum
+    (hσ : GoodEmb c σ) (hU : IsUnf U)
+    {P : Ideal (𝓞 E)} {p i : ℕ} {k k' : U.Comp}
+    (x : (U.X k).dom) (x' : (U.X k').dom) (hu : ∀ τ' i', ‖dmin (U.X k).Gm x.1 τ' i'‖ = 1)
+    (hu' : ∀ τ' i', ‖dmin (U.X k').Gm x'.1 τ' i'‖ = 1)
+    (C : Subgroup (Over.mk (U.un k x).x ⟶ Xo.univ.t.G))
+    (z : FrPt Xo c (CAt σ)) (t : Ix Dw → (CAt σ)ˣ)
+    (hA : GlobalTheory.HkFam.admitted l P p)
+    (hK : Xo.univ.t.HeckeKer (Over.mk (U.un k x).x) Dw P p i C)
+    (hz : GlobalTheory.HeckeEx.HkPtC p (U.un k x) C z) (hb : FrBor t (U.un k' x') z)
+    (ht : ∀ j, j ≠ none → t j = 1)
+    : ∃ (W : UnfAt U k x) (Y : UnitAt W) (W' : UnfAt U k' x') (Y' : UnitAt W'),
+      (∀ (j : Fin W'.g) (j' : Fin W.g), (j : ℕ) = j' → W'.e j = W.e j')
+        ∧ ((∀ (j₁ j₂ : Fin W'.g) (j₁' j₂' : Fin W.g),
+            (j₁ : ℕ) = j₁' → (j₂ : ℕ) = j₂' → Y'.Hm j₁ j₂ = Y.Hm j₁' j₂')
+          → ∃ v : Fin (Ideal.absNorm P ^ i) → Fin r → E,
+            (∀ m, pv W' (v m) ∈ Set.range W'.Pm)
+              ∧ (∀ m m' u',
+                (∀ τ j, perFr (U.X k') x'.1 (v m - v m') τ j = perFr (U.X k) x.1 u' τ j)
+                  → pv W u' ∈ Set.range W.Pm
+                  → m = m')
+              ∧ ∀ (u : Fin r → E) (u' : Fin (Ideal.absNorm P ^ i) → Fin r → E),
+                (∀ m τ j, perFr (U.X k') x'.1 (u + v m) τ j = perFr (U.X k) x.1 (u' m) τ j)
+                  → Formalism.L2.PjFree.toC (t none : CAt σ) * ahG Y' (pv W' u)
+                    = ∑ m, (Y'.χl (pv W' (v m)) * Complex.exp (Real.pi * Complex.I * (hermForm Y'.Hm (pv W' u) (pv W' (v m))).im))⁻¹ *
+                        ahG Y (pv W (u' m))) := by
   have hU' : Formalism.L2.PjFree.IsUnf (Formalism.L2.PjFree.Unf.ofPj U) := hU
   obtain ⟨_, _, _, _, _, g, e, F, ik, φ, hiso, hpt⟩ := hU
   obtain ⟨Pm, h1, h2, h3, h4, h5⟩ := hpt k x
@@ -218,25 +282,40 @@ theorem geo_sum (hσ : GoodEmb c σ) (hU : IsUnf U) {P : Ideal (𝓞 E)} {p i : 
   obtain ⟨Y⟩ := nonempty_unitAt W hu
   obtain ⟨Y'⟩ := nonempty_unitAt W' hu'
   refine ⟨W, Y, W', Y', fun j j' hj => congrArg e (Fin.ext hj), fun hH => ?_⟩
-  have hHm : Y'.Hm = Y.Hm := by
-    ext j₁ j₂; exact hH j₁ j₂ j₁ j₂ rfl rfl
-  obtain ⟨wm, -, hw2, hw3, hw4⟩ := GlobalTheory.HeckeLiftReps.hecke_lift_reps E H Dw l Xo c σ r (Formalism.L2.PjFree.Unf.ofPj U) hσ hU'
-    P p i k k' x x' C z t hA hK hz hb ht g e F ik Pm Pm' h2 h2' h3 h3' h4 h4' Y.Hm Y.χl Y.fr Y.θ Y.herm Y.pos Y.c1 Y.c2
-    Y.c3 Y.c4 Y.c5 Y.c6 Y.c7 Y'.Hm Y'.χl Y'.fr Y'.θ hHm Y'.herm Y'.pos Y'.c1 Y'.c2 Y'.c3 Y'.c4 Y'.c5 Y'.c6 Y'.c7
+  have hHm : Y'.Hm = Y.Hm := by ext j₁ j₂; exact hH j₁ j₂ j₁ j₂ rfl rfl
+  obtain ⟨wm, -, hw2, hw3, hw4⟩ :=
+    GlobalTheory.HeckeLiftReps.hecke_lift_reps E H Dw l Xo c σ r (Formalism.L2.PjFree.Unf.ofPj U) hσ
+      hU' P p i k k' x x' C z t hA hK hz hb ht g e F ik Pm Pm' h2 h2' h3 h3' h4 h4' Y.Hm Y.χl Y.fr
+      Y.θ Y.herm Y.pos Y.c1 Y.c2 Y.c3 Y.c4 Y.c5 Y.c6 Y.c7 Y'.Hm Y'.χl Y'.fr Y'.θ hHm Y'.herm Y'.pos
+      Y'.c1 Y'.c2 Y'.c3 Y'.c4 Y'.c5 Y'.c6 Y'.c7
   choose β hβ using hw2
   have hv : ∀ m, pv W' (φ k' (β m) : Fin r → E) = Pm' (β m) := fun m => pv_lat W' (β m)
-  have hrel : ∀ u u', (∀ τ j, perFr (U.X k') x'.1 u τ j = perFr (U.X k) x.1 u' τ j) → pv W' u = pv W u' :=
+  have hrel
+      : ∀ u u', (∀ τ j, perFr (U.X k') x'.1 u τ j = perFr (U.X k) x.1 u' τ j) → pv W' u = pv W u' :=
     fun u u' h => funext fun j => h _ _
-  refine ⟨fun m => (φ k' (β m) : Fin r → E), fun m => ⟨β m, (hv m).symm⟩, fun m m' u' hu ⟨a, ha⟩ => ?_, fun u u' hu => ?_⟩
+  refine ⟨
+    fun m => (φ k' (β m) : Fin r → E),
+    fun m => ⟨β m, (hv m).symm⟩,
+    fun m m' u' hu ⟨a, ha⟩ => ?_,
+    fun u u' hu => ?_
+  ⟩
   · refine hw3 m m' a ?_
     rw [hβ, hβ, ← hv, ← hv]
     exact ((map_sub (pvHom W') _ _).symm.trans (hrel _ _ hu)).trans ha.symm
   · have hp0 : (p : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hA.2.2.1.ne_zero
     obtain ⟨j, hj, hs⟩ := hw4 ((p : ℂ)⁻¹ • pv W' u)
     simp only [smul_add, smul_inv_smul₀ hp0, hβ] at hj hs
-    have key := gform Y'.herm _ _ Y.θ (Y'.fr j) (pv W' u) (fun m => Pm' (β m)) (fun m => Y'.χl (Pm' (β m)))
-      (fun m h0 => by have := (Y'.c6 (β m) j 0).1; rw [show Y'.χl (W'.Pm (β m)) = 0 from h0] at this; simp at this)
-      (Y'.c3 j _ hj) (fun m => (Y'.c6 (β m) j _).2 hj) hs
+    have key :=
+      gform Y'.herm _ _ Y.θ (Y'.fr j) (pv W' u)
+        (fun m => Pm' (β m))
+        (fun m => Y'.χl (Pm' (β m)))
+        (fun m h0 => by
+          have := (Y'.c6 (β m) j 0).1
+          rw [show Y'.χl (W'.Pm (β m)) = 0 from h0] at this
+          simp at this)
+        (Y'.c3 j _ hj)
+        (fun m => (Y'.c6 (β m) j _).2 hj)
+        hs
     refine key.trans (Finset.sum_congr rfl fun m _ => ?_)
     have e1 : pv W (u' m) = pv W' u + Pm' (β m) := by
       rw [← hrel _ _ (hu m), ← hv]
@@ -245,11 +324,17 @@ theorem geo_sum (hσ : GoodEmb c σ) (hU : IsUnf U) {P : Ideal (𝓞 E)} {p i : 
 
 end Geo
 
-theorem isAdmissibleSplitHeckePrime_of_conj_ne {D : D7} {Hh : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} (l : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level Hh)
-    (P : Formalism.L2.DIV.Pl D.host.E) (p : ℕ) (hc : Formalism.HermitianLatticesTheory.conjIdeal (K := D.host.E) P.asIdeal ≠ P.asIdeal) (hp : p.Prime)
-    (hpP : (p : 𝓞 D.host.E) ∈ P.asIdeal) (hM : ¬ p ∣ l.M') : GlobalTheory.HkFam.admitted l P.asIdeal p := by
+theorem isAdmissibleSplitHeckePrime_of_conj_ne
+    {D : D7} {Hh : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E}
+    (l : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level Hh) (P : Formalism.L2.DIV.Pl D.host.E)
+    (p : ℕ)
+    (hc : Formalism.HermitianLatticesTheory.conjIdeal (K := D.host.E) P.asIdeal ≠ P.asIdeal)
+    (hp : p.Prime) (hpP : (p : 𝓞 D.host.E) ∈ P.asIdeal) (hM : ¬ p ∣ l.M')
+    : GlobalTheory.HkFam.admitted l P.asIdeal p := by
   refine ⟨P.isMaximal, ?_, hp, hpP, hM⟩
-  have hQ : Formalism.HermitianLatticesTheory.conjIdeal (K := D.host.E) P.asIdeal = P.asIdeal.map (Hh.bar : 𝓞 D.host.E →+* 𝓞 D.host.E) := by
+  have hQ
+      : Formalism.HermitianLatticesTheory.conjIdeal (K := D.host.E) P.asIdeal
+        = P.asIdeal.map (Hh.bar : 𝓞 D.host.E →+* 𝓞 D.host.E) := by
     unfold Formalism.HermitianLatticesTheory.conjIdeal
     rw [Ideal.map]
     congr 1
@@ -279,21 +364,28 @@ end GlobalTheory.HeckeGeomSum
 
 namespace GlobalTheory.HeckeGeomSum
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.OrthonormalLatticeThetaValues GlobalTheory.AHPhase GlobalTheory.HeckeVacuum
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.OrthonormalLatticeThetaValues GlobalTheory.AHPhase
+  GlobalTheory.HeckeVacuum
 
 section Columns
 
 variable {D : D7} {i : Fin D.R.m} {b : Matrix (Fin (Vc D i).rank) (Fin (Vc D i).rank) D.host.E}
 
-theorem exists_colB (hb : IsONLatBasis (Vc D i) b) (V : Fin (Vc D i).rank → Fin D.R.r → D.host.E) :
-    ∃ Y : Matrix (Fin (Wc D i).rank) (Fin (Vc D i).rank) D.host.E, ∀ c, colB b Y c = V c := by
+theorem exists_colB (hb : IsONLatBasis (Vc D i) b) (V : Fin (Vc D i).rank → Fin D.R.r → D.host.E)
+    : ∃ Y : Matrix (Fin (Wc D i).rank) (Fin (Vc D i).rank) D.host.E, ∀ c, colB b Y c = V c := by
   classical
-  refine ⟨Matrix.of fun s j => ∑ c, V c (Fin.cast (rank_Wc i) s) * ∑ k, star (b k c) * (Vc D i).gram k j, fun a => ?_⟩
+  refine ⟨
+    Matrix.of fun s j => ∑ c, V c (Fin.cast (rank_Wc i) s) * ∑ k, star (b k c) * (Vc D i).gram k j,
+    fun a => ?_
+  ⟩
   funext m
   simp only [colB, Matrix.of_apply, Finset.sum_mul]
   rw [Finset.sum_comm]
-  have : ∀ c, ∑ n, (V c (Fin.cast (rank_Wc i) (Fin.cast (rank_Wc i).symm m)) *
-      ∑ k, star (b k c) * (Vc D i).gram k n) * b n a = V c m * if c = a then 1 else 0 := fun c => by
+  have : ∀ c,
+      ∑ n, (V c (Fin.cast (rank_Wc i) (Fin.cast (rank_Wc i).symm m)) *
+          ∑ k, star (b k c) * (Vc D i).gram k n) * b n a
+        = V c m * if c = a then 1 else 0 := fun c => by
     rw [← hb.1 c a, Finset.sum_comm, Finset.mul_sum]
     refine Finset.sum_congr rfl fun n _ => ?_
     rw [mul_assoc, Finset.sum_mul]
@@ -301,23 +393,27 @@ theorem exists_colB (hb : IsONLatBasis (Vc D i) b) (V : Fin (Vc D i).rank → Fi
   simp only [this]
   simp
 
-theorem colB_add (X Y : Matrix (Fin (Wc D i).rank) (Fin (Vc D i).rank) D.host.E) (c : Fin (Vc D i).rank) :
-    colB b (X + Y) c = colB b X c + colB b Y c := by
+theorem colB_add
+    (X Y : Matrix (Fin (Wc D i).rank) (Fin (Vc D i).rank) D.host.E) (c : Fin (Vc D i).rank)
+    : colB b (X + Y) c = colB b X c + colB b Y c := by
   funext m; simp only [colB, Matrix.add_apply, add_mul, Finset.sum_add_distrib, Pi.add_apply]
 
-theorem colB_sub (X Y : Matrix (Fin (Wc D i).rank) (Fin (Vc D i).rank) D.host.E) (c : Fin (Vc D i).rank) :
-    colB b (X - Y) c = colB b X c - colB b Y c := by
+theorem colB_sub
+    (X Y : Matrix (Fin (Wc D i).rank) (Fin (Vc D i).rank) D.host.E) (c : Fin (Vc D i).rank)
+    : colB b (X - Y) c = colB b X c - colB b Y c := by
   funext m; simp only [colB, Matrix.sub_apply, sub_mul, Finset.sum_sub_distrib, Pi.sub_apply]
 
-theorem colB_mul (M : Matrix (Fin (Wc D i).rank) (Fin (Wc D i).rank) D.host.E)
-    (Z : Matrix (Fin (Wc D i).rank) (Fin (Vc D i).rank) D.host.E) (c : Fin (Vc D i).rank) :
-    colB b (M * Z) c = fun m => (M.mulVec fun s => ∑ n, Z s n * b n c) (Fin.cast (rank_Wc i).symm m) := by
+theorem colB_mul
+    (M : Matrix (Fin (Wc D i).rank) (Fin (Wc D i).rank) D.host.E)
+    (Z : Matrix (Fin (Wc D i).rank) (Fin (Vc D i).rank) D.host.E) (c : Fin (Vc D i).rank)
+    : colB b (M * Z) c
+      = fun m => (M.mulVec fun s => ∑ n, Z s n * b n c) (Fin.cast (rank_Wc i).symm m) := by
   funext m
-  simp only [colB, Matrix.mul_apply, Matrix.mulVec, dotProduct, Finset.sum_mul, Finset.mul_sum, mul_assoc]
+  simp only [colB, Matrix.mul_apply, Matrix.mulVec, dotProduct, Finset.sum_mul, Finset.mul_sum,
+    mul_assoc]
   exact Finset.sum_comm
 
 end Columns
-
 
 set_option maxHeartbeats 2000000 in
 set_option synthInstance.maxHeartbeats 400000 in

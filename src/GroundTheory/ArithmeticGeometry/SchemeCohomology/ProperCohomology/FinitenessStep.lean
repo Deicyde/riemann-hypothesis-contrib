@@ -38,17 +38,19 @@ theorem isCoherent_unit (X : Scheme.{u}) : IsCoherent (𝟙_ X.Modules) := by
   intro m _
   have hm : m = (show Γ(X, U) from m) • one := (mul_one (show Γ(X, U) from m)).symm
   rw [hm]
-  exact Submodule.smul_mem _ _ (Submodule.subset_span (Finset.mem_coe.2 (Finset.mem_singleton_self _)))
+  exact Submodule.smul_mem _ _
+    (Submodule.subset_span (Finset.mem_coe.2 (Finset.mem_singleton_self _)))
 
 variable {A : Type u} [CommRing A] [IsNoetherianRing A]
 
 theorem finiteH_step
     (X : Scheme.{u}) [X.Over (Spec (.of A))] [IsProper (X ↘ Spec (.of A))]
     (T : Set X) (hT : IsClosed T)
-    (IH : ∀ T' : Set X, IsClosed T' → T' ⊂ T → ∀ F : X.Modules, IsCoherent F →
-      Scheme.Modules.SupportedIn F T' → FiniteH.{u} A F)
-    (F : X.Modules) (hF : IsCoherent F) (hFT : Scheme.Modules.SupportedIn F T) :
-    FiniteH.{u} A F := by
+    (IH : ∀ T' : Set X,
+      IsClosed T' → T' ⊂ T
+        → ∀ F : X.Modules, IsCoherent F → Scheme.Modules.SupportedIn F T' → FiniteH.{u} A F)
+    (F : X.Modules) (hF : IsCoherent F) (hFT : Scheme.Modules.SupportedIn F T)
+    : FiniteH.{u} A F := by
   have : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian (X ↘ Spec (.of A))
   have : CompactSpace X := QuasiCompact.compactSpace_of_compactSpace (X ↘ Spec (.of A))
   have := hF.1
@@ -79,11 +81,12 @@ theorem finiteH_step
   set ψ : Z' ⟶ X := π ≫ c ≫ j with hψ
   let _ : Z'.Over (Spec (.of A)) := ⟨ψ ≫ (X ↘ Spec (.of A))⟩
   have : ψ.IsOver (Spec (.of A)) := ⟨rfl⟩
-  have : i.IsOver (Spec (.of A)) := ⟨by
-    change i ≫ ProjSpace.toSpecBase A N = (π ≫ c ≫ j) ≫ (X ↘ Spec (.of A))
-    rw [hiπ]
-    simp only [Category.assoc]
-    rfl⟩
+  have : i.IsOver (Spec (.of A)) :=
+    ⟨by
+      change i ≫ ProjSpace.toSpecBase A N = (π ≫ c ≫ j) ≫ (X ↘ Spec (.of A))
+      rw [hiπ]
+      simp only [Category.assoc]
+      rfl⟩
   have hZ'p : IsProper (ψ ≫ (X ↘ Spec (.of A))) := by
     have h : ψ ≫ (X ↘ Spec (.of A)) = i ≫ ProjSpace.toSpecBase A N :=
       (CategoryTheory.comp_over i (Spec (.of A))).symm
@@ -96,8 +99,8 @@ theorem finiteH_step
   set G' := (Scheme.Modules.pullback ψ).obj F
   obtain ⟨n₀, hn₀⟩ := ProjScheme.exists_relativeSerre i ψ G' hG'
   letI : (𝟙_ Z'.Modules).IsQuasicoherent := isQuasicoherent_unit Z'
-  obtain ⟨n₁, hn₁⟩ := ProjScheme.exists_generatingSections_twist i (𝟙_ Z'.Modules)
-    (isCoherent_unit Z')
+  obtain ⟨n₁, hn₁⟩ :=
+    ProjScheme.exists_generatingSections_twist i (𝟙_ Z'.Modules) (isCoherent_unit Z')
   set n := max n₀ n₁
   obtain ⟨σ, hσ⟩ := hn₁ n (le_max_right _ _)
   set L := ProjScheme.twistingSheaf i (n : ℤ)
@@ -117,24 +120,28 @@ theorem finiteH_step
   obtain ⟨k, W', hyW', hbasis⟩ := exists_isBasisOn_generatingSection L hL σL y
   set s : Γ(L, ⊤) := (σL.s k).val (op ⊤)
   set Φ := (Scheme.Modules.pushforward ψ).obj (ProjScheme.twist i G' n)
-  let α : F ⟶ Φ := (Scheme.Modules.pullbackPushforwardAdjunction ψ).unit.app F ≫
-    (Scheme.Modules.pushforward ψ).map (mulSection G' L s)
+  let α : F ⟶ Φ :=
+    (Scheme.Modules.pullbackPushforwardAdjunction ψ).unit.app F
+      ≫ (Scheme.Modules.pushforward ψ).map (mulSection G' L s)
 
   set Wg : Z'.Opens := W' ⊓ π ⁻¹ᵁ (U₁ ⊓ c ⁻¹ᵁ O)
   set Bad : Set X := ψ.base '' (Wg : Set Z')ᶜ ∪ j.base '' (O : Set Z)ᶜ ∪
     (c ≫ j).base '' (U₁ : Set Z₁)ᶜ
   have hBad : IsClosed Bad :=
     ((ψ.isClosedMap _ Wg.isOpen.isClosed_compl).union
-      (j.isClosedMap _ O.isOpen.isClosed_compl)).union
+        (j.isClosedMap _ O.isOpen.isClosed_compl)).union
       ((c ≫ j).isClosedMap _ U₁.isOpen.isClosed_compl)
   obtain ⟨W, hWdef⟩ : ∃ W : X.Opens, (W : Set X) = Badᶜ := ⟨⟨Badᶜ, hBad.isOpen_compl⟩, rfl⟩
   have hcjinj : Function.Injective (c ≫ j).base := (c ≫ j).isClosedEmbedding.injective
   have hjinj : Function.Injective j.base := j.isClosedEmbedding.injective
   have hψy : ψ.base y = (c ≫ j).base (π.base y) := rfl
-  have hyWg : y ∈ Wg := ⟨hyW', by
-    change π.base y ∈ U₁ ⊓ c ⁻¹ᵁ O
-    rw [hyz]
-    exact ⟨hzU, hzO⟩⟩
+  have hyWg : y ∈ Wg := ⟨
+    hyW',
+    by
+      change π.base y ∈ U₁ ⊓ c ⁻¹ᵁ O
+      rw [hyz]
+      exact ⟨hzU, hzO⟩
+  ⟩
   have hxW : ψ.base y ∈ W := by
     change ψ.base y ∈ (W : Set X)
     rw [hWdef]
@@ -171,14 +178,14 @@ theorem finiteH_step
 
   have hπW : IsIso (π ∣_ ((c ≫ j) ⁻¹ᵁ W)) := isIso_morphismRestrict_of_le π hcjW
   have : IsClosedImmersion (ψ ∣_ W) := by
-    have h1 : IsClosedImmersion (π ∣_ ((c ≫ j) ⁻¹ᵁ W)) :=
-      @isClosedImmersion_of_isIso' _ _ _ hπW
+    have h1 : IsClosedImmersion (π ∣_ ((c ≫ j) ⁻¹ᵁ W)) := @isClosedImmersion_of_isIso' _ _ _ hπW
     have h2 : IsClosedImmersion ((c ≫ j) ∣_ W) := inferInstance
     rw [show ψ = π ≫ (c ≫ j) from rfl, morphismRestrict_comp]
     exact @IsClosedImmersion.comp _ _ _ _ _ h1 h2
 
-  have hkill : ∀ V : X.Opens, IsAffineOpen V → V ≤ W → ∀ a : Γ(X, V), ψ.app V a = 0 →
-      ∀ m : Γ(F, V), a • m = 0 := by
+  have hkill
+      : ∀ V : X.Opens,
+        IsAffineOpen V → V ≤ W → ∀ a : Γ(X, V), ψ.app V a = 0 → ∀ m : Γ(F, V), a • m = 0 := by
     intro V _ hVW a ha m
     have hVc : (c ≫ j) ⁻¹ᵁ V ≤ U₁ := (Scheme.Hom.preimage_mono _ hVW).trans hcjW
     have hVj : j ⁻¹ᵁ V ≤ O := (Scheme.Hom.preimage_mono _ hVW).trans hjW
@@ -187,12 +194,16 @@ theorem finiteH_step
     have hja : j.app V a = 0 := by
       apply hcinj
       apply hπinj
-      calc _ = (ψ.app V) a := rfl
+      calc
+        _ = (ψ.app V) a := rfl
         _ = 0 := ha
         _ = _ := by rw [map_zero]; exact (map_zero _).symm
-    obtain ⟨m', rfl⟩ : ∃ m', e.hom.app V m' = m :=
-      ⟨e.inv.app V m, by rw [← ConcreteCategory.comp_apply, ← Scheme.Modules.Hom.comp_app,
-        e.inv_hom_id, Scheme.Modules.Hom.id_app, ConcreteCategory.id_apply]⟩
+    obtain ⟨m', rfl⟩ : ∃ m', e.hom.app V m' = m := ⟨
+      e.inv.app V m,
+      by
+        rw [← ConcreteCategory.comp_apply, ← Scheme.Modules.Hom.comp_app, e.inv_hom_id,
+          Scheme.Modules.Hom.id_app, ConcreteCategory.id_apply]
+    ⟩
     have h0 : a • m' = 0 := by
       rw [smul_pushforward, hja, zero_smul]
       rfl
@@ -206,16 +217,15 @@ theorem finiteH_step
   obtain ⟨hΦcoh, hΦiso⟩ := hn₀ n (le_max_left _ _)
   have hΦ : FiniteH.{u} A Φ := fun p => by
     obtain ⟨e'⟩ := hΦiso p
-    have := ProjScheme.finite_H.{u} i (ProjScheme.twist i G' n)
-      (isCoherent_tensor_of_invertible hG' hL) p
+    have :=
+      ProjScheme.finite_H.{u} i (ProjScheme.twist i G' n) (isCoherent_tensor_of_invertible hG' hL) p
     exact Module.Finite.equiv e'
 
   have hxT : ψ.base y ∈ T := by
     rw [← hST, ← Scheme.IdealSheafData.range_subschemeι]
     exact ⟨c.base (π.base y), rfl⟩
   have hT' : IsClosed (T ∩ (W : Set X)ᶜ) := hT.inter W.isOpen.isClosed_compl
-  have hT'T : T ∩ (W : Set X)ᶜ ⊂ T :=
-    ⟨Set.inter_subset_left, fun h => (h hxT).2 hxW⟩
+  have hT'T : T ∩ (W : Set X)ᶜ ⊂ T := ⟨Set.inter_subset_left, fun h => (h hxT).2 hxW⟩
   have hK : FiniteH.{u} A (kernel α) :=
     have := hΦcoh.1
     IH _ hT' hT'T (kernel α) (isCoherent_kernel α hF)
@@ -227,14 +237,13 @@ theorem finiteH_step
     exact ⟨c.base (π.base y'), rfl⟩
   have hC : FiniteH.{u} A (cokernel α) :=
     IH _ hT' hT'T (cokernel α) (isCoherent_cokernel α hΦcoh)
-      ((hΦT.of_epi (cokernel.π α)).inter (cokernel_supportedIn α W hα) hT
-        W.isOpen.isClosed_compl)
+      ((hΦT.of_epi (cokernel.π α)).inter (cokernel_supportedIn α W hα) hT W.isOpen.isClosed_compl)
   exact FiniteH.of_shortExact₂ (kerCoimSC_shortExact α) hK
     (FiniteH.of_shortExact₁ (coimCokSC_shortExact α) hΦ hC)
 
 theorem finiteH_of_supportedIn
-    (X : Scheme.{u}) [X.Over (Spec (.of A))] [IsProper (X ↘ Spec (.of A))] (T : Closeds X) :
-    ∀ F : X.Modules, IsCoherent F → Scheme.Modules.SupportedIn F T → FiniteH.{u} A F := by
+    (X : Scheme.{u}) [X.Over (Spec (.of A))] [IsProper (X ↘ Spec (.of A))] (T : Closeds X)
+    : ∀ F : X.Modules, IsCoherent F → Scheme.Modules.SupportedIn F T → FiniteH.{u} A F := by
   have : IsLocallyNoetherian X := LocallyOfFiniteType.isLocallyNoetherian (X ↘ Spec (.of A))
   have : CompactSpace X := QuasiCompact.compactSpace_of_compactSpace (X ↘ Spec (.of A))
   have : IsNoetherian X := ⟨⟩

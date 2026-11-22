@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InvariantDer
 
 set_option autoImplicit false
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat GlobalTheory.LawDer
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat GlobalTheory.LawDer
 
 namespace GlobalTheory.LawDer
 
@@ -36,21 +38,24 @@ private lemma iterate_mul_eq_sum_antidiagonal_choose {A : Type} [CommRing A] (D 
     simp only [Function.iterate_succ_apply']
     rw [add_comm]
 
-
 open MvPowerSeries in
 set_option autoImplicit false in
-theorem _root_.GlobalTheory.LawDer.constantCoeff_iterate_invDer_mul : ∀ (p : ℕ) [Fact p.Prime] (R : Type)
-    [CommRing R] (d : ℕ) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) R),
-    (∀ i, constantCoeff (μ i) = 0) →
-    _root_.GlobalTheory.Katz.op μ (fun i => (X i : MvPowerSeries (Fin d) R)) (fun _ => 0) =
-      (fun i => X i) →
-    ∀ (u : Fin d → R) (F G : MvPowerSeries (Fin d) R), constantCoeff F = 0 → constantCoeff G = 0 →
-      ∃ r : R, constantCoeff ((_root_.GlobalTheory.LawDer.invDer μ u)^[p] (F * G)) = p * r := by
+theorem _root_.GlobalTheory.LawDer.constantCoeff_iterate_invDer_mul
+    : ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R] (d : ℕ)
+        (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) R),
+      (∀ i, constantCoeff (μ i) = 0)
+        → _root_.GlobalTheory.Katz.op μ (fun i => (X i : MvPowerSeries (Fin d) R)) (fun _ => 0)
+          = (fun i => X i)
+        → ∀ (u : Fin d → R) (F G : MvPowerSeries (Fin d) R),
+          constantCoeff F = 0 → constantCoeff G = 0
+            → ∃ r : R,
+              constantCoeff ((_root_.GlobalTheory.LawDer.invDer μ u)^[p] (F * G)) = p * r := by
   intro p hp R _ d μ hμ hid u F G hF hG
   have hlin := _root_.GlobalTheory.LawDer.Linear.invDer_linear R d μ hμ u
   set_option synthInstance.maxHeartbeats 100000 in
     rw [iterate_mul_eq_sum_antidiagonal_choose _ hlin.1
-    (_root_.GlobalTheory.LawDer.invDer_mul R d μ hμ hid u), map_sum]
+        (_root_.GlobalTheory.LawDer.invDer_mul R d μ hμ hid u),
+      map_sum]
   refine Finset.dvd_sum fun ij hij => ?_
   rw [Finset.HasAntidiagonal.mem_antidiagonal] at hij
   rw [map_nsmul, map_mul, nsmul_eq_mul]

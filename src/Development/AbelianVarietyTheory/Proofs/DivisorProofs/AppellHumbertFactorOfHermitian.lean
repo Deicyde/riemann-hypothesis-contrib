@@ -16,8 +16,10 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.RealMult
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AmpleHermPos
@@ -69,14 +71,22 @@ lemma eq_zero_of_smul_mem (Λ : Submodule ℤ (Fin g → ℂ)) [DiscreteTopology
   have := PreconnectedSpace.constant inferInstance hc (x := 1) (y := 0)
   simpa using congrArg Subtype.val this
 
-theorem re_form_pos_of_relAmple :
-    ∀ (A : Over (Sp ℂ)) [GrpObj A] [IsCommMonObj A], IsAbelianScheme A → ∀ (L : LB A.left), L.IsLB →
-    Out.RelAmple A L → ∀ (g : ℕ) (u : HolUnif A L g) (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : u.Λ → ℂ),
-      Hm.IsHermitian → (∀ l, ‖χ l‖ = 1) →
-      (∀ (l : u.Λ) i z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i →
-        u.fr i z = χ l * Complex.exp (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))) +
-          Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))) * u.fr i (z + l)) →
-      ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm.mulVec (star z)).re := by
+theorem re_form_pos_of_relAmple
+    : ∀ (A : Over (Sp ℂ)) [GrpObj A] [IsCommMonObj A],
+      IsAbelianScheme A
+        → ∀ (L : LB A.left),
+          L.IsLB → Out.RelAmple A L
+            → ∀ (g : ℕ) (u : HolUnif A L g) (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : u.Λ → ℂ),
+              Hm.IsHermitian → (∀ l, ‖χ l‖ = 1)
+                → (∀ (l : u.Λ) i z,
+                  ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i
+                    → u.fr i z
+                      = χ l
+                        * Complex.exp
+                          (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))
+                            + Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))))
+                        * u.fr i (z + l))
+                → ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm.mulVec (star z)).re := by
   intro A _ _ hA L hL ha g u Hm χ hH hχ hfr
   haveI : Smooth A.hom := hA.smooth
   haveI := isReduced_of_smooth_complex _ A.hom inferInstance
@@ -96,8 +106,10 @@ theorem re_form_pos_of_relAmple :
   have hU : ∀ z, ⊤ ≤ ((u.ex z).left ≫ σ) ⁻¹ᵁ (Out.powOver A L ⊤ N).U (fun _ => ch z) := fun z =>
     le_preimage_mono (u.ex z).left (chart_le L _ σ hσ N fun _ => ch z)
       ((le_preimage_lbPow _ L N fun _ => ch z).2 (hch z))
-  have hval : ∀ i z, valAt' ((u.ex z).left ≫ σ) ((Out.powOver A L ⊤ N).U fun _ => ch z)
-      ((s i).f fun _ => ch z) = θ i z * u.fr (ch z) z ^ N := fun i z =>
+  have hval
+      : ∀ i z,
+        valAt' ((u.ex z).left ≫ σ) ((Out.powOver A L ⊤ N).U fun _ => ch z) ((s i).f fun _ => ch z)
+          = θ i z * u.fr (ch z) z ^ N := fun i z =>
     have k := (le_preimage_lbPow _ L N fun _ => ch z).2 (hch z)
     (hs' i _ _ k).symm.trans (hθfn i _ z k)
   have hfr0 : ∀ z, u.fr (ch z) z ^ N ≠ 0 := fun z => pow_ne_zero _ (u.fr_ne _ _ (hch z))
@@ -111,9 +123,13 @@ theorem re_form_pos_of_relAmple :
 
   set HN : Matrix (Fin g) (Fin g) ℂ := ((N : ℝ) : ℂ) • Hm with hHNdef
   have hHN : HN.IsHermitian := isHermitian_smul hH _
-  have htr : ∀ i (l : u.Λ) z, θ i (z + l) =
-      (χ l ^ N * cexp (Real.pi * (z ⬝ᵥ HN.mulVec (star (l : Fin g → ℂ))) +
-        Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ HN.mulVec (star (l : Fin g → ℂ))))) * θ i z := by
+  have htr
+      : ∀ i (l : u.Λ) z,
+        θ i (z + l)
+          = (χ l ^ N * cexp
+              (Real.pi * (z ⬝ᵥ HN.mulVec (star (l : Fin g → ℂ)))
+                + Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ HN.mulVec (star (l : Fin g → ℂ)))))
+            * θ i z := by
     intro i l z
     have hper : u.ex (z + l) = u.ex z := by rw [u.ex_add, (u.ker l).2 l.2, _root_.mul_one]
     rw [hθper i z (z + l) _ hper fun j hj => hfr l j z hj, form_smul, form_smul, mul_pow,
@@ -125,8 +141,8 @@ theorem re_form_pos_of_relAmple :
 
   obtain ⟨i0, hi0⟩ := hcov' 0
   have hne : θ i0 ≠ 0 := fun h => hi0 (by rw [h]; rfl)
-  obtain ⟨C, hC⟩ := ThetaPositivity.exists_norm_le u.Λ hHN (fun l => χ l ^ N) hχN
-    (hθd i0).continuous (htr i0)
+  obtain ⟨C, hC⟩ :=
+    ThetaPositivity.exists_norm_le u.Λ hHN (fun l => χ l ^ N) hχN (hθd i0).continuous (htr i0)
   have hNpos : (0 : ℝ) < N := Nat.cast_pos.mpr hN
   have hnn : ∀ w : Fin g → ℂ, 0 ≤ (w ⬝ᵥ Hm.mulVec (star w)).re := fun w => by
     by_contra hw
@@ -136,14 +152,16 @@ theorem re_form_pos_of_relAmple :
       exact mul_neg_of_pos_of_neg hNpos hw
     exact hne (ThetaPositivity.eq_zero_of_neg hHN (hθd i0) hC hw')
 
-  have hrval : ∀ i j w, θ i w ≠ 0 →
-      valAt' ((u.ex w).left ≫ σ) (Out.nonzeroLocus (s i)) (r i j) * θ i w = θ j w := by
+  have hrval
+      : ∀ i j w,
+        θ i w ≠ 0
+          → valAt' ((u.ex w).left ≫ σ) (Out.nonzeroLocus (s i)) (r i j) * θ i w = θ j w := by
     intro i j w hw
     have hw' := (hmem i w).2 hw
     have k := (le_preimage_inf _ _ _).2 ⟨hw', hU w⟩
     have k₁ := congrArg (valAt' ((u.ex w).left ≫ σ) _) (hr i j fun _ => ch w)
-    rw [val_mul _ k, val_resG _ _ k, val_resG _ _ k, val_resG _ _ k, hval, hval,
-      ← _root_.mul_assoc] at k₁
+    rw [val_mul _ k, val_resG _ _ k, val_resG _ _ k, val_resG _ _ k, hval, hval, ← _root_.mul_assoc]
+      at k₁
     exact (mul_right_cancel₀ (hfr0 w) k₁).symm
   have hc : ∀ w w', ((u.ex w).left ≫ σ) ≫ (A.hom ∣_ ⊤) = ((u.ex w').left ≫ σ) ≫ (A.hom ∣_ ⊤) := by
     intro w w'
@@ -167,8 +185,10 @@ theorem re_form_pos_of_relAmple :
       | C a =>
         rw [MvPolynomial.eval₂Hom_C]
         exact (val_appLE _ (A.hom ∣_ ⊤) ⊤ _ _ a mt).trans
-          ((congrArg (fun y => valAt' y ⊤ a) (hc _ 0)).trans (val_appLE _ (A.hom ∣_ ⊤) ⊤ _ _ a m0).symm)
-      | add Q Q' h h' => rw [map_add (f := _), val_add _ mt, val_add _ m0, h, h']
+          ((congrArg (fun y => valAt' y ⊤ a) (hc _ 0)).trans
+            (val_appLE _ (A.hom ∣_ ⊤) ⊤ _ _ a m0).symm)
+      | add Q Q' h h' =>
+        rw [map_add (f := _), val_add _ mt, val_add _ m0, h, h']
       | mul_X Q j h =>
         rw [map_mul, val_mul _ mt, val_mul _ m0, h, MvPolynomial.eval₂Hom_X']
         congr 1

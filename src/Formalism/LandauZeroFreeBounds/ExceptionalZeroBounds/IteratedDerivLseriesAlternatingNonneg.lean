@@ -31,19 +31,20 @@ lemma iteratedDeriv_lseries_alternating_nonneg {a : ℕ → ℂ} (ha0 : ∀ n, 0
   have h := LSeries.iteratedDeriv_alternating (a := a) (fun m => ha0 m) (x := 2) hlt n
   simpa using h
 
-theorem lseries_taylor_lower_bound {a : ℕ → ℂ} (ha0 : ∀ n, 0 ≤ a n) (ha1 : a 1 = 1)
-    (habs : LSeries.abscissaOfAbsConv a ≤ 1) {F G : ℂ → ℂ} {lam : ℂ} (hG : Differentiable ℂ G)
-    (hF : ∀ s : ℂ, 1 < s.re → F s = LSeries a s) (hFG : ∀ s : ℂ, s ≠ 1 → F s = G s + lam / (s - 1))
-    {B : ℝ} (hB : ∀ s ∈ Metric.sphere (2 : ℂ) (3 / 2), ‖G s‖ ≤ B) {σ : ℝ} (hσ1 : 7 / 8 ≤ σ)
-    (hσ2 : σ < 1) {M : ℕ} (hM : 1 ≤ M) :
-    1 - ‖lam‖ * (2 - σ) ^ M / (1 - σ) - 4 * B * (3 / 4) ^ M ≤ (F σ).re := by
+theorem lseries_taylor_lower_bound
+    {a : ℕ → ℂ} (ha0 : ∀ n, 0 ≤ a n) (ha1 : a 1 = 1) (habs : LSeries.abscissaOfAbsConv a ≤ 1)
+    {F G : ℂ → ℂ} {lam : ℂ} (hG : Differentiable ℂ G) (hF : ∀ s : ℂ, 1 < s.re → F s = LSeries a s)
+    (hFG : ∀ s : ℂ, s ≠ 1 → F s = G s + lam / (s - 1))
+    {B : ℝ} (hB : ∀ s ∈ Metric.sphere (2 : ℂ) (3 / 2), ‖G s‖ ≤ B)
+    {σ : ℝ} (hσ1 : 7 / 8 ≤ σ) (hσ2 : σ < 1)
+    {M : ℕ} (hM : 1 ≤ M)
+    : 1 - ‖lam‖ * (2 - σ) ^ M / (1 - σ) - 4 * B * (3 / 4) ^ M ≤ (F σ).re := by
   set x : ℝ := 2 - σ with hxdef
   have hx1 : 1 < x := by rw [hxdef]; linarith
   have hx2 : x ≤ 9 / 8 := by rw [hxdef]; linarith
   have hFG' : ∀ s : ℂ, 1 < s.re → LSeries a s = G s + lam * (s - 1)⁻¹ := by
     intro s hs
-    have hs1 : s ≠ 1 := by
-      intro h; rw [h] at hs; simp at hs
+    have hs1 : s ≠ 1 := by intro h; rw [h] at hs; simp at hs
     rw [← hF s hs, hFG s hs1, div_eq_mul_inv]
   have hcoef := iteratedDeriv_lseries_at_two hG hFG'
 
@@ -66,7 +67,8 @@ theorem lseries_taylor_lower_bound {a : ℕ → ℂ} (ha0 : ∀ n, 0 ≤ a n) (h
   have hσx : (σ : ℂ) - 2 = -(x : ℂ) := by rw [hxdef]; push_cast; ring
   have ht : ∀ n, t n = (x : ℂ) ^ n * β n - lam * (x : ℂ) ^ n := by
     intro n
-    have hg : iteratedDeriv n G 2 = iteratedDeriv n (LSeries a) 2 - lam * ((-1) ^ n * (n ! : ℂ)) := by
+    have hg
+        : iteratedDeriv n G 2 = iteratedDeriv n (LSeries a) 2 - lam * ((-1) ^ n * (n ! : ℂ)) := by
       rw [hcoef n]; ring
     have hpow : ((-1 : ℂ) ^ n) * ((-1) ^ n) = 1 := by rw [← mul_pow]; simp
     have hfac : (n ! : ℂ) ≠ 0 := by exact_mod_cast Nat.factorial_ne_zero n
@@ -74,9 +76,11 @@ theorem lseries_taylor_lower_bound {a : ℕ → ℂ} (ha0 : ∀ n, 0 ≤ a n) (h
     have hQ : (n ! : ℂ)⁻¹ * (n ! : ℂ) = 1 := inv_mul_cancel₀ hfac
     linear_combination (-(lam * (x : ℂ) ^ n * ((n ! : ℂ)⁻¹ * (n ! : ℂ)))) * hpow + (-(lam * (x : ℂ) ^ n)) * hQ
 
-  have hfin : ∑ i ∈ Finset.range M, t i =
-      ∑ i ∈ Finset.range M, (x : ℂ) ^ i * β i - lam * (((x : ℂ) ^ M - 1) / ((x : ℂ) - 1)) := by
-    rw [Finset.sum_congr rfl (fun i _ => ht i), Finset.sum_sub_distrib, ← Finset.mul_sum, geom_sum_eq]
+  have hfin
+      : ∑ i ∈ Finset.range M, t i
+        = ∑ i ∈ Finset.range M, (x : ℂ) ^ i * β i - lam * (((x : ℂ) ^ M - 1) / ((x : ℂ) - 1)) := by
+    rw [Finset.sum_congr rfl (fun i _ => ht i), Finset.sum_sub_distrib, ← Finset.mul_sum,
+      geom_sum_eq]
     intro h
     have : x = 1 := by exact_mod_cast h
     linarith
@@ -92,43 +96,56 @@ theorem lseries_taylor_lower_bound {a : ℕ → ℂ} (ha0 : ∀ n, 0 ≤ a n) (h
     exact (one_le_lseries_at_two ha0 ha1 habs).trans h0
 
   have htail : ‖∑' i, t (i + M)‖ ≤ 4 * B * (3 / 4) ^ M := by
-    have hg : HasSum (fun i : ℕ => B * (3 / 4) ^ M * (3 / 4 : ℝ) ^ i) (B * (3 / 4) ^ M * (1 - 3 / 4)⁻¹) :=
+    have hg : HasSum
+        (fun i : ℕ => B * (3 / 4) ^ M * (3 / 4 : ℝ) ^ i)
+        (B * (3 / 4) ^ M * (1 - 3 / 4)⁻¹) :=
       (hasSum_geometric_of_lt_one (by norm_num) (by norm_num)).mul_left _
-    have hle := tsum_of_norm_bounded hg (f := fun i => t (i + M)) (by
-      intro i
-      have hC := Complex.norm_iteratedDeriv_le_of_forall_mem_sphere_norm_le (i + M)
-        (by norm_num : (0 : ℝ) < 3 / 2) hG.diffContOnCl hB
-      have hnorm : ‖t (i + M)‖ = ((i + M) ! : ℝ)⁻¹ * x ^ (i + M) * ‖iteratedDeriv (i + M) G 2‖ := by
-        simp only [htdef, smul_eq_mul, norm_mul, norm_inv, norm_pow, hσx, norm_neg, Complex.norm_real,
-          Complex.norm_natCast]
-        rw [Real.norm_of_nonneg (by linarith)]
-        ring
-      rw [hnorm]
-      have hfac : (0 : ℝ) < ((i + M) ! : ℝ) := by exact_mod_cast Nat.factorial_pos _
-      have hxp : 0 ≤ x ^ (i + M) := pow_nonneg (by linarith) _
-      calc ((i + M) ! : ℝ)⁻¹ * x ^ (i + M) * ‖iteratedDeriv (i + M) G 2‖
-          ≤ ((i + M) ! : ℝ)⁻¹ * x ^ (i + M) * (((i + M) ! : ℝ) * B / (3 / 2) ^ (i + M)) := by
+    have hle :=
+      tsum_of_norm_bounded hg (f := fun i => t (i + M)) (by
+        intro i
+        have hC :=
+          Complex.norm_iteratedDeriv_le_of_forall_mem_sphere_norm_le (i + M)
+            (by norm_num : (0 : ℝ) < 3 / 2) hG.diffContOnCl hB
+        have hnorm
+            : ‖t (i + M)‖ = ((i + M) ! : ℝ)⁻¹ * x ^ (i + M) * ‖iteratedDeriv (i + M) G 2‖ := by
+          simp only [htdef, smul_eq_mul, norm_mul, norm_inv, norm_pow, hσx, norm_neg,
+            Complex.norm_real, Complex.norm_natCast]
+          rw [Real.norm_of_nonneg (by linarith)]
+          ring
+        rw [hnorm]
+        have hfac : (0 : ℝ) < ((i + M) ! : ℝ) := by exact_mod_cast Nat.factorial_pos _
+        have hxp : 0 ≤ x ^ (i + M) := pow_nonneg (by linarith) _
+        calc
+          ((i + M) ! : ℝ)⁻¹ * x ^ (i + M) * ‖iteratedDeriv (i + M) G 2‖
+              ≤ ((i + M) ! : ℝ)⁻¹ * x ^ (i + M) * (((i + M) ! : ℝ) * B / (3 / 2) ^ (i + M)) := by
             gcongr
-        _ = B * (x ^ (i + M) / (3 / 2) ^ (i + M)) := by field_simp
-        _ = B * (x / (3 / 2)) ^ (i + M) := by rw [div_pow x (3 / 2 : ℝ)]
-        _ ≤ B * (3 / 4) ^ (i + M) := by
+          _ = B * (x ^ (i + M) / (3 / 2) ^ (i + M)) := by field_simp
+          _ = B * (x / (3 / 2)) ^ (i + M) := by rw [div_pow x (3 / 2 : ℝ)]
+          _ ≤ B * (3 / 4) ^ (i + M) := by
             have hq : x / (3 / 2) ≤ 3 / 4 := by rw [div_le_iff₀ (by norm_num)]; linarith
             have hq0 : 0 ≤ x / (3 / 2) := by positivity
             exact mul_le_mul_of_nonneg_left (pow_le_pow_left₀ hq0 hq _) hB0
-        _ = B * (3 / 4) ^ M * (3 / 4 : ℝ) ^ i := by rw [pow_add]; ring)
-    calc ‖∑' i, t (i + M)‖ ≤ B * (3 / 4) ^ M * (1 - 3 / 4)⁻¹ := hle
+          _ = B * (3 / 4) ^ M * (3 / 4 : ℝ) ^ i := by rw [pow_add]; ring)
+    calc
+      ‖∑' i, t (i + M)‖
+        ≤ B * (3 / 4) ^ M * (1 - 3 / 4)⁻¹ := hle
       _ = 4 * B * (3 / 4) ^ M := by norm_num; ring
 
   have hσ1' : (σ : ℂ) ≠ 1 := by
-    intro h; have : σ = 1 := by exact_mod_cast h
+    intro h
+    have : σ = 1 := by exact_mod_cast h
     linarith
-  have hkey : F σ = ∑ i ∈ Finset.range M, (x : ℂ) ^ i * β i
-      - lam * (((x ^ M / (x - 1) : ℝ)) : ℂ) + ∑' i, t (i + M) := by
+  have hkey
+      : F σ
+        = ∑ i ∈ Finset.range M, (x : ℂ) ^ i * β i - lam * (((x ^ M / (x - 1) : ℝ)) : ℂ)
+          + ∑' i, t (i + M) := by
     rw [hFG σ hσ1', ← hsplit, hfin]
     have hx1' : (x : ℂ) - 1 ≠ 0 := by
-      intro h; have : x = 1 := by
+      intro h
+      have : x = 1 := by
         have h' : ((x - 1 : ℝ) : ℂ) = 0 := by push_cast; exact h
-        have := Complex.ofReal_eq_zero.mp h'; linarith
+        have := Complex.ofReal_eq_zero.mp h'
+        linarith
       linarith
     have hσc : (σ : ℂ) - 1 = -((x : ℂ) - 1) := by rw [hxdef]; push_cast; ring
     rw [hσc]

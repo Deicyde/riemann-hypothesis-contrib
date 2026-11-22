@@ -7,7 +7,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open Formalism.L2.SG.LocalCountModules.LocCntCommon Formalism.L2.SG.LocalCountModules.LocCnt0LAlg Formalism.L2.SG.LocalCountModules.UnramifiedPairingLinear
+open Formalism.L2.SG.LocalCountModules.LocCntCommon Formalism.L2.SG.LocalCountModules.LocCnt0LAlg
+  Formalism.L2.SG.LocalCountModules.UnramifiedPairingLinear
 
 namespace Formalism.L2.SG.LocalCountModules.UnramifiedPairingAlgebraic
 
@@ -19,11 +20,22 @@ theorem fwdEx : FwdEx := by
   have hΓ' := hθ.2.2
   have sL := fun m => gEquiv_spec O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hΓ' m
   have sR := fun m => gsEquiv_spec O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hΓ m
-  refine ⟨⟨(gEquiv O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hΓ',
-      gsEquiv O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hΓ),
-      ⟨g_b O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hk hΓ hΓ',
-        g_e O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hk hΓ hΓ'⟩, ?_, ?_⟩,
-    fun m => (sL m).1, fun m => (sR m).1⟩
+  refine ⟨
+    ⟨
+      (
+        gEquiv O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hΓ',
+        gsEquiv O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hΓ
+      ),
+      ⟨
+        g_b O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hk hΓ hΓ',
+        g_e O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hk hΓ hΓ'
+      ⟩,
+      ?_,
+      ?_
+    ⟩,
+    fun m => (sL m).1,
+    fun m => (sR m).1
+  ⟩
   · intro y' y₂' h
     have key := (sR (Submodule.Quotient.mk y')).2
     rw [h, lamSQ_mk, lamSQ_mk] at key
@@ -32,7 +44,10 @@ theorem fwdEx : FwdEx := by
     exact fwd_B O cj hcj hO t t' ht ht' hu₁ hu₂ hk hg₁ hg₂ θ hθ
       (gEquiv O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hΓ').toLinearMap
       (gsEquiv O cj hO t t' Z₁ Z₂ θ hu₁ hu₂ hη₁ hη₂ hΓ).toLinearMap
-      (fun m => (sL m).1) (fun m => (sR m).1) (fun m => (sL m).2) (fun m => (sR m).2)
+      (fun m => (sL m).1)
+      (fun m => (sR m).1)
+      (fun m => (sL m).2)
+      (fun m => (sR m).2)
       y y' y₂ y₂' h h'
 
 end Formalism.L2.SG.LocalCountModules.UnramifiedPairingAlgebraic

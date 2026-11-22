@@ -20,13 +20,20 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter Asymptotics
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.Twist
 
 namespace GlobalTheory
 
-theorem interNum_cons_nef_ample_nonneg :
-    ∀ (k : Type) [Field k] [Infinite k] (X : Scheme.{0}) [Algebra k Γ(X, ⊤)], IsProjOver (strHom k (X := X)) → ∀ (d : ℕ) (F : X.Modules) [IsFiniteQC F], suppDim F ≤ (d + 1 : ℕ) → ∀ (N : LB X) (P : Fin d → LB X), IsNef k N → (∀ i, IsAmpleLB (P i)) → 0 ≤ interNum k F (Fin.cons N P : Fin (d + 1) → LB X) := by
+theorem interNum_cons_nef_ample_nonneg
+    : ∀ (k : Type) [Field k] [Infinite k] (X : Scheme.{0}) [Algebra k Γ(X, ⊤)],
+      IsProjOver (strHom k (X := X))
+        → ∀ (d : ℕ) (F : X.Modules) [IsFiniteQC F],
+          suppDim F ≤ (d + 1 : ℕ)
+            → ∀ (N : LB X) (P : Fin d → LB X),
+              IsNef k N → (∀ i, IsAmpleLB (P i))
+                → 0 ≤ interNum k F (Fin.cons N P : Fin (d + 1) → LB X) := by
   intro k _ _ X _ hp d
   have hf := algebraMap_eq_strHom k X
   haveI := isNoetherian_of_isProjOver hp
@@ -35,11 +42,11 @@ theorem interNum_cons_nef_ample_nonneg :
     intro F _ hF N P hN _
     haveI : IsProper (strHom k (X := X)) := (isProper_and_exists_isAmpleLB_of_isProjOver hp).1
     have hN' := (isNef_iff hf).1 hN
-    have e : (Fin.cons N P : Fin (0 + 1) → LB X) = ![N] := by
-      ext i; fin_cases i; rfl
+    have e : (Fin.cons N P : Fin (0 + 1) → LB X) = ![N] := by ext i; fin_cases i; rfl
     rw [e]
     refine SheafCycle.interNum_nonneg_of_interNumRed_nonneg k X hp 1 F (by simpa using hF) ![N]
-      (fun i => by fin_cases i; exact hN'.1) fun Z hZ hd => hN'.2 Z hZ (by simpa using hd)
+      (fun i => by fin_cases i; exact hN'.1)
+      fun Z hZ hd => hN'.2 Z hZ (by simpa using hd)
   | succ d ih =>
     intro F _ hF N P hN hP
     have hPb : ∀ i, (P i).IsLB := fun i => (hP i).isLB
@@ -49,9 +56,11 @@ theorem interNum_cons_nef_ample_nonneg :
     have hQb : ∀ i, (Q i).IsLB := fun i => (hQ i).isLB
     have hPe : P = Fin.cons A Q := (Fin.cons_self_tail P).symm
     have hL : ∀ i, (Fin.cons N P : Fin (d + 2) → LB X) i |>.IsLB := isLB_cons hN.isLB hPb
-    have hsw : (Fin.cons N P : Fin (d + 2) → LB X) ∘ Equiv.swap 0 1 =
-        (Fin.cons A (Fin.cons N Q) : Fin (d + 2) → LB X) := by
-      rw [hPe]; ext i
+    have hsw
+        : (Fin.cons N P : Fin (d + 2) → LB X) ∘ Equiv.swap 0 1
+          = (Fin.cons A (Fin.cons N Q) : Fin (d + 2) → LB X) := by
+      rw [hPe]
+      ext i
       refine Fin.cases ?_ (fun j => ?_) i
       · rfl
       · refine Fin.cases ?_ (fun l => ?_) j
@@ -68,8 +77,9 @@ theorem interNum_cons_nef_ample_nonneg :
     have hNQ : ∀ i, (Fin.cons N Q : Fin (d + 1) → LB X) i |>.IsLB := isLB_cons hN.isLB hQb
     have h0 := ih (cut F hLa s) (suppDim_cut_le _ hLa s hF) N Q hN hQ
     rw [← interNum_cons_eq_interNum_cut hLa s hNQ hfin] at h0
-    have h := hv.interNum_update_of_cls_eq_zsmul (by simp) (isLB_cons (hP 0).isLB hNQ)
-      (0 : Fin (d + 2)) hLa (hP 0).isLB (a : ℤ) (cls_lbZPow (hP 0).isLB a _)
+    have h :=
+      hv.interNum_update_of_cls_eq_zsmul (by simp) (isLB_cons (hP 0).isLB hNQ) (0 : Fin (d + 2)) hLa
+        (hP 0).isLB (a : ℤ) (cls_lbZPow (hP 0).isLB a _)
     simp only [Fin.update_cons_zero] at h
     rw [h] at h0
     exact nonneg_of_mul_nonneg_right h0 (by exact_mod_cast ha)

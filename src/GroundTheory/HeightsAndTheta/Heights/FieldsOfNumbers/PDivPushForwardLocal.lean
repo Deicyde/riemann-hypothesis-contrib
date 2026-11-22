@@ -20,15 +20,20 @@ noncomputable section
 
 universe u
 
-theorem exists_form_not_mem {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} {F : Type u}
-    [Field F] {W : Ideal (MRing ι F)} (hW : IsMultiProjPrime W) (c : K → ℕ) :
-    ∃ h : MRing ι F, IsMultiHomog h c ∧ h ∉ W := by
+theorem exists_form_not_mem
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} {F : Type u} [Field F]
+    {W : Ideal (MRing ι F)} (hW : IsMultiProjPrime W)
+    (c : K → ℕ)
+    : ∃ h : MRing ι F, IsMultiHomog h c ∧ h ∉ W := by
   choose v hv using hW.relevant
   have := hW.isPrime
   refine ⟨∏ k, (X ⟨k, v k⟩ : MRing ι F) ^ c k, ?_, ?_⟩
-  · have hprod := IsWeightedHomogeneous.prod (w := blockWeight ι) Finset.univ
-      (fun k => (X ⟨k, v k⟩ : MRing ι F) ^ c k) (fun k => c k • blockWeight ι ⟨k, v k⟩)
-      (fun k _ => (isWeightedHomogeneous_X F (blockWeight ι) _).pow (c k))
+  · have hprod :=
+      IsWeightedHomogeneous.prod (w := blockWeight ι) Finset.univ
+        (fun k => (X ⟨k, v k⟩ : MRing ι F) ^ c k)
+        (fun k => c k • blockWeight ι ⟨k, v k⟩)
+        (fun k _ => (isWeightedHomogeneous_X F (blockWeight ι) _).pow (c k))
     have hc : (∑ k, c k • blockWeight ι ⟨k, v k⟩) = c := by
       funext k'
       simp [blockWeight, Finset.sum_apply, Pi.single_apply]
@@ -38,10 +43,11 @@ theorem exists_form_not_mem {K : Type} [Fintype K] [DecidableEq K] {ι : K → T
     rintro ⟨k, -, hk⟩
     exact hv k (Ideal.IsPrime.mem_of_pow_mem this _ hk)
 
-theorem DivPushForwardLocal.proof (h1 : DivCycleMinimal.Statement.{u})
-    (h2 : ConeLocalLength.Statement.{u}) (h3 : DegZeroLocalRing.Statement.{u})
-    (h4 : SemilocalFiniteRank.Statement.{u}) (h5 : SemilocalLength.Statement.{u}) :
-    DivPushForwardLocal.Statement.{u} := by
+theorem DivPushForwardLocal.proof
+    (h1 : DivCycleMinimal.Statement.{u}) (h2 : ConeLocalLength.Statement.{u})
+    (h3 : DegZeroLocalRing.Statement.{u}) (h4 : SemilocalFiniteRank.Statement.{u})
+    (h5 : SemilocalLength.Statement.{u})
+    : DivPushForwardLocal.Statement.{u} := by
   intro F _ K K' _ _ _ _ j ι' _ P' hP' n hdim hdimP c a ha haP W hW hWd M hM1 hM0
   have := hP'.isPrime
   have hP := isMultiProjPrime_contractPrime j ι' hP'
@@ -49,25 +55,31 @@ theorem DivPushForwardLocal.proof (h1 : DivCycleMinimal.Statement.{u})
   · have := hW.isPrime
     have hPle : contractPrime j P' ≤ W := le_trans le_sup_left hPW
     obtain ⟨h, hh, hhW⟩ := exists_form_not_mem hW c
-    let α : degZeroLoc (contractPrime j P') {W} := ⟨_, div_mem_degZeroLoc _ _ ha hh
-      (fun hm => hhW (hPle hm)) (fun W₁ h₁ => (Set.mem_singleton_iff.mp h₁) ▸ hhW)⟩
+    let α : degZeroLoc (contractPrime j P') {W} := ⟨
+      _,
+      div_mem_degZeroLoc _ _ ha hh
+        (fun hm => hhW (hPle hm))
+        (fun W₁ h₁ => (Set.mem_singleton_iff.mp h₁) ▸ hhW)
+    ⟩
     have hα0 : α ≠ 0 := by
       intro h0
       have h0' := congrArg Subtype.val h0
-      rcases div_eq_zero_iff.mp h0' with h' | h' <;>
-        rw [IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem] at h'
+      rcases div_eq_zero_iff.mp h0' with h' | h'
+        <;> rw [IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem] at h'
       · exact haP h'
       · exact hhW (hPle h')
     obtain ⟨⟨hNo, hLo⟩, hdA⟩ := h3 F K _ _ hP W hW hPle
     obtain ⟨hfin, htf, hrk⟩ := h4 F K K' j ι' P' hP' n hdim hdimP W hW hWd hPle
-    have key := ReciprocityTheory.ChartRestriction.G.AI.dimOneTorsionFreeFormula _ (degZeroLoc P' (fibrePrimes j P' W)) α
-      (hdA n hdimP hWd) hα0
-    obtain ⟨N, hN, hMN⟩ := h5 F K K' j ι' P' hP' n hdim hdimP c a h ha hh haP W hW hWd hPle hhW
-      M hM1 hM0 α rfl
+    have key :=
+      ReciprocityTheory.ChartRestriction.G.AI.dimOneTorsionFreeFormula _
+        (degZeroLoc P' (fibrePrimes j P' W)) α (hdA n hdimP hWd) hα0
+    obtain ⟨N, hN, hMN⟩ :=
+      h5 F K K' j ι' P' hP' n hdim hdimP c a h ha hh haP W hW hWd hPle hhW M hM1 hM0 α rfl
     obtain ⟨hmin, hfinm⟩ := h1 F K _ _ hP.isPrime n hdimP a haP W hW.isPrime hWd hPW
     have hcone := h2 F K _ _ hP W hW hPle c a h ha hh hhW α rfl
-    have hdc : divCycle (contractPrime j P') a W =
-        ((multAt (contractPrime j P' ⊔ Ideal.span {a}) W).toNat : ℤ) := by
+    have hdc
+        : divCycle (contractPrime j P') a W
+          = ((multAt (contractPrime j P' ⊔ Ideal.span {a}) W).toNat : ℤ) := by
       unfold divCycle
       rw [dite_eq_left ⟨hmin, hW.relevant⟩]
     rw [hMN, hdc]

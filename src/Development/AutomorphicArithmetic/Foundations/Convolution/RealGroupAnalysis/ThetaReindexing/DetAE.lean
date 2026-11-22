@@ -5,17 +5,22 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 
-private theorem det_aE {F : Type} [Field F] [NumberField F] (a : (A F)ˣ) :
-    Matrix.GeneralLinearGroup.det (aE (E := F) a) = a := by
+private theorem det_aE {F : Type} [Field F] [NumberField F] (a : (A F)ˣ)
+    : Matrix.GeneralLinearGroup.det (aE (E := F) a) = a := by
   ext
   simp [aE, Matrix.GeneralLinearGroup.det, Matrix.det_fin_two]
 
-theorem UpperTheory.ConvolutionTheory.R2.D.genE :
-    ∀ (F : Type) [Field F] [NumberField F], Subgroup.closure (Set.range (fun b => gl (nU (F := F) b)) ∪ {gl (wW F)} ∪ Set.range (aE (E := F))) = ⊤ := by
+theorem UpperTheory.ConvolutionTheory.R2.D.genE
+    : ∀ (F : Type) [Field F] [NumberField F],
+      Subgroup.closure
+          (Set.range (fun b => gl (nU (F := F) b)) ∪ {gl (wW F)} ∪ Set.range (aE (E := F)))
+        = ⊤ := by
   intro F _ _
   rw [eq_top_iff]
   intro h _

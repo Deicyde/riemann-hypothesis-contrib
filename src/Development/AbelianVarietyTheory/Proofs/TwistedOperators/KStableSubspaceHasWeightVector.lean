@@ -7,7 +7,8 @@ public import Formalism.RealPlaceAnalysis.StatementB
 
 @[expose] public section
 
-open MeasureTheory Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.FlagMeas GlobalTheory.GKModule GlobalTheory.RealInd GlobalTheory.OpTrace
+open MeasureTheory Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta
+  GlobalTheory.FlagMeas GlobalTheory.GKModule GlobalTheory.RealInd GlobalTheory.OpTrace
 open GlobalTheory.SmoothGlob (lieSet)
 open GlobalTheory.Dec (IsHaarSub HasInfChar UEquiv gelfVal)
 open GlobalTheory.Orb (IsPseudoCoeff ujMat ujRep)
@@ -16,8 +17,10 @@ open scoped InnerProductSpace
 noncomputable section
 namespace GlobalTheory.TorusWtExist
 
-theorem charR_eq_exp (χ : ℝ → ℂ) (hc : Continuous χ) (hm : ∀ s t, χ (s + t) = χ s * χ t)
-    (h0 : χ 0 = 1) (h2 : χ (2 * Real.pi) = 1) : ∃ m : ℤ, ∀ t : ℝ, χ t = Complex.exp (((m * t : ℝ) : ℂ) * Complex.I) := by
+theorem charR_eq_exp
+    (χ : ℝ → ℂ) (hc : Continuous χ) (hm : ∀ s t, χ (s + t) = χ s * χ t) (h0 : χ 0 = 1)
+    (h2 : χ (2 * Real.pi) = 1)
+    : ∃ m : ℤ, ∀ t : ℝ, χ t = Complex.exp (((m * t : ℝ) : ℂ) * Complex.I) := by
   obtain ⟨δ, hδ, hδc⟩ : ∃ δ > 0, ∀ s, |s| ≤ δ → ‖χ s - 1‖ ≤ 1 / 2 := by
     have := Metric.continuous_iff.mp hc 0 (1 / 2) (by norm_num)
     obtain ⟨δ, hδ, h⟩ := this
@@ -26,7 +29,8 @@ theorem charR_eq_exp (χ : ℝ → ℂ) (hc : Continuous χ) (hm : ∀ s t, χ (
     rw [dist_eq_norm, h0] at this
     exact this.le
   set c : ℂ := ∫ s in (0 : ℝ)..δ, χ s with hcdef
-  have hint : ∀ a b : ℝ, IntervalIntegrable χ MeasureTheory.volume a b := fun a b => hc.intervalIntegrable a b
+  have hint : ∀ a b : ℝ, IntervalIntegrable χ MeasureTheory.volume a b := fun a b =>
+    hc.intervalIntegrable a b
   have hc0 : c ≠ 0 := by
     intro h
     have h1 : ‖∫ s in (0 : ℝ)..δ, (χ s - 1)‖ ≤ 1 / 2 * |δ - 0| := by
@@ -35,7 +39,9 @@ theorem charR_eq_exp (χ : ℝ → ℂ) (hc : Continuous χ) (hm : ∀ s t, χ (
       rw [Set.uIoc_of_le hδ.le] at hs
       exact hδc s (by rw [abs_le]; constructor <;> linarith [hs.1, hs.2])
     rw [intervalIntegral.integral_sub (hint 0 δ) intervalIntegrable_const, ← hcdef, h] at h1
-    simp only [intervalIntegral.integral_const, sub_zero, zero_sub, norm_neg, Complex.real_smul, mul_one] at h1
+    simp only [intervalIntegral.integral_const, sub_zero, zero_sub, norm_neg, Complex.real_smul,
+        mul_one]
+      at h1
     rw [Complex.norm_real, Real.norm_eq_abs, abs_of_pos hδ] at h1
     linarith
   set F : ℝ → ℂ := fun u => ∫ s in (0 : ℝ)..u, χ s with hF
@@ -48,7 +54,9 @@ theorem charR_eq_exp (χ : ℝ → ℂ) (hc : Continuous χ) (hm : ∀ s t, χ (
       simp only
       rw [intervalIntegral.integral_interval_sub_left (hint 0 _) (hint 0 _)]
     rw [← h1, hcdef, ← intervalIntegral.integral_const_mul]
-    congr 1; funext s; rw [hm]
+    congr 1
+    funext s
+    rw [hm]
   set a : ℂ := (χ δ - 1) / c with ha
   have hd : ∀ t : ℝ, HasDerivAt χ (χ t * a) t := by
     intro t
@@ -61,18 +69,21 @@ theorem charR_eq_exp (χ : ℝ → ℂ) (hc : Continuous χ) (hm : ∀ s t, χ (
     exact h1
   have hg : ∀ t : ℝ, HasDerivAt (fun t : ℝ => Complex.exp (-(a * t)) * χ t) 0 t := by
     intro t
-    have h1 : HasDerivAt (fun t : ℝ => Complex.exp (-(a * t))) (Complex.exp (-(a * t)) * (-a)) t := by
+    have h1
+        : HasDerivAt (fun t : ℝ => Complex.exp (-(a * t))) (Complex.exp (-(a * t)) * (-a)) t := by
       have : HasDerivAt (fun t : ℝ => -(a * (t : ℂ))) (-a) t := by
         simpa using ((Complex.ofRealCLM.hasDerivAt (x := t)).const_mul a).fun_neg
       exact this.cexp
     have h2 := h1.mul (hd t)
-    have h3 : Complex.exp (-(a * t)) * (-a) * χ t + Complex.exp (-(a * t)) * (χ t * a) = 0 := by ring
+    have h3 : Complex.exp (-(a * t)) * (-a) * χ t + Complex.exp (-(a * t)) * (χ t * a) = 0 := by
+      ring
     rw [h3] at h2
     exact h2
   have hconst : ∀ t : ℝ, Complex.exp (-(a * t)) * χ t = 1 := by
     intro t
     have := is_const_of_deriv_eq_zero (fun t => (hg t).differentiableAt) (fun t => (hg t).deriv) t 0
-    rw [this]; simp [h0]
+    rw [this]
+    simp [h0]
   have hexp : ∀ t : ℝ, χ t = Complex.exp (a * t) := by
     intro t
     have h := hconst t
@@ -88,15 +99,17 @@ theorem charR_eq_exp (χ : ℝ → ℂ) (hc : Continuous χ) (hm : ∀ s t, χ (
       rw [hk]; push_cast; ring
     exact mul_right_cancel₀ hpi this
   refine ⟨k, fun t => ?_⟩
-  rw [hexp, hak]; push_cast; ring_nf
+  rw [hexp, hak]
+  push_cast
+  ring_nf
 
 def dT {n : ℕ} (θ : Fin n → ℝ) : Matrix (Fin n) (Fin n) ℂ :=
   Matrix.diagonal fun a => Complex.exp ((θ a : ℂ) * Complex.I)
 
 theorem dT_mem_Kset {n : ℕ} (ε : Fin n → Bool) (θ : Fin n → ℝ) : dT θ ∈ Formalism.REAL.Kset ε := by
   refine ⟨?_, ?_⟩
-  · rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, dT, Matrix.diagonal_conjTranspose,
-      Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
+  · rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, dT,
+      Matrix.diagonal_conjTranspose, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
     congr 1
     funext a
     simp [← Complex.exp_conj, ← Complex.exp_add]
@@ -105,8 +118,8 @@ theorem dT_mem_Kset {n : ℕ} (ε : Fin n → Bool) (θ : Fin n → ℝ) : dT θ
     funext a
     ring
 
-theorem Kset_sub_UJset {n : ℕ} (ε : Fin n → Bool) :
-    ∀ g ∈ Formalism.REAL.Kset ε, g ∈ Formalism.MainNotions.S.UJset ε := by
+theorem Kset_sub_UJset {n : ℕ} (ε : Fin n → Bool)
+    : ∀ g ∈ Formalism.REAL.Kset ε, g ∈ Formalism.MainNotions.S.UJset ε := by
   rintro g ⟨hu, hc⟩
   show gᴴ * Formalism.REAL.Jm ε * g = Formalism.REAL.Jm ε
   rw [Matrix.mem_unitaryGroup_iff'] at hu
@@ -114,17 +127,26 @@ theorem Kset_sub_UJset {n : ℕ} (ε : Fin n → Bool) :
 
 theorem dT_add {n : ℕ} (θ θ' : Fin n → ℝ) : dT (θ + θ') = dT θ * dT θ' := by
   rw [dT, dT, dT, Matrix.diagonal_mul_diagonal]
-  congr 1; funext a
-  rw [← Complex.exp_add]; congr 1; simp only [Pi.add_apply]; push_cast; ring
+  congr 1
+  funext a
+  rw [← Complex.exp_add]
+  congr 1
+  simp only [Pi.add_apply]
+  push_cast
+  ring
 
 theorem dT_zero {n : ℕ} : dT (0 : Fin n → ℝ) = 1 := by
   rw [dT, ← Matrix.diagonal_one]; congr 1; funext a; simp
 
 theorem dT_two_pi {n : ℕ} (a : Fin n) : dT (Pi.single a (2 * Real.pi)) = 1 := by
-  rw [dT, ← Matrix.diagonal_one]; congr 1; funext b
+  rw [dT, ← Matrix.diagonal_one]
+  congr 1
+  funext b
   by_cases h : b = a
-  · subst h; simp only [Pi.single_eq_same, Pi.one_apply]
-    rw [Complex.exp_eq_one_iff]; exact ⟨1, by push_cast; ring⟩
+  · subst h
+    simp only [Pi.single_eq_same, Pi.one_apply]
+    rw [Complex.exp_eq_one_iff]
+    exact ⟨1, by push_cast; ring⟩
   · simp [Pi.single_eq_of_ne h]
 
 theorem continuous_dT {n : ℕ} : Continuous (dT (n := n)) := by
@@ -132,15 +154,21 @@ theorem continuous_dT {n : ℕ} : Continuous (dT (n := n)) := by
   apply Continuous.matrix_diagonal
   fun_prop
 
-theorem exists_torus_weight_vector : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (ρ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), Formalism.QuantumDeterminants.IsCRepOn (Formalism.MainNotions.S.UJset ε) ρ →
-    (∀ v, ContinuousOn (fun g => ρ g v) (Formalism.MainNotions.S.UJset ε)) → (∀ k ∈ Formalism.REAL.Kset ε, ∀ v, ‖ρ k v‖ = ‖v‖) →
-    ∀ S : Submodule ℂ H, FiniteDimensional ℂ S → Formalism.MainNotions.S.IsKStableOn ε ρ S → S ≠ ⊥ →
-    ∃ (μ : Fin n → ℝ) (v : H), v ∈ S ∧ v ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) ρ μ v := by
+theorem exists_torus_weight_vector
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        (ρ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+      Formalism.QuantumDeterminants.IsCRepOn (Formalism.MainNotions.S.UJset ε) ρ
+        → (∀ v, ContinuousOn (fun g => ρ g v) (Formalism.MainNotions.S.UJset ε))
+        → (∀ k ∈ Formalism.REAL.Kset ε, ∀ v, ‖ρ k v‖ = ‖v‖)
+        → ∀ S : Submodule ℂ H,
+          FiniteDimensional ℂ S → Formalism.MainNotions.S.IsKStableOn ε ρ S → S ≠ ⊥
+            → ∃ (μ : Fin n → ℝ) (v : H),
+              v ∈ S ∧ v ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) ρ μ v := by
   intro n ε H _ _ ρ hrep hcont _ S hfd hstab hne
   classical
   set T : (Fin n → ℝ) → (H →L[ℂ] H) := fun θ => ρ (dT θ) with hT
-  have hmem : ∀ θ, dT θ ∈ Formalism.MainNotions.S.UJset ε := fun θ => Kset_sub_UJset ε _ (dT_mem_Kset ε θ)
+  have hmem : ∀ θ, dT θ ∈ Formalism.MainNotions.S.UJset ε := fun θ =>
+    Kset_sub_UJset ε _ (dT_mem_Kset ε θ)
   have hTadd : ∀ θ θ' v, T (θ + θ') v = T θ (T θ' v) := by
     intro θ θ' v
     simp only [hT, dT_add, hrep.2 _ (hmem θ) _ (hmem θ'), ContinuousLinearMap.comp_apply]
@@ -200,23 +228,26 @@ theorem exists_torus_weight_vector : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Ty
     apply hχeq
     rw [hTadd, hTv θ', map_smul, hTv θ, smul_smul, mul_comm]
   have hχcont : Continuous χ := by
-    have h1 : Continuous fun θ => T θ v :=
-      (hcont v).comp_continuous continuous_dT hmem
+    have h1 : Continuous fun θ => T θ v := (hcont v).comp_continuous continuous_dT hmem
     exact (continuous_const.inner h1).div_const _
   have hχ2 : ∀ a, χ (Pi.single a (2 * Real.pi)) = 1 := by
-    intro a; apply hχeq
+    intro a
+    apply hχeq
     simp only [hT, dT_two_pi, hrep.1, ContinuousLinearMap.one_apply, one_smul]
   have hχ0 : χ 0 = 1 := by
     apply hχeq; simp only [hT, dT_zero, hrep.1, ContinuousLinearMap.one_apply, one_smul]
 
-  have hcoord : ∀ a, ∃ m : ℤ, ∀ t : ℝ, χ (Pi.single a t) = Complex.exp (((m * t : ℝ) : ℂ) * Complex.I) := by
+  have hcoord
+      : ∀ a, ∃ m : ℤ, ∀ t : ℝ, χ (Pi.single a t) = Complex.exp (((m * t : ℝ) : ℂ) * Complex.I) := by
     intro a
     refine charR_eq_exp (fun t => χ (Pi.single a t)) ?_ ?_ ?_ (hχ2 a)
     · exact hχcont.comp (continuous_single (A := fun _ : Fin n => ℝ) a)
     · intro s t; show χ _ = χ _ * χ _; rw [Pi.single_add, hχadd]
     · simp only [Pi.single_zero, hχ0]
   choose m hm using hcoord
-  have hprod : ∀ (s : Finset (Fin n)) (θ : Fin n → ℝ), χ (∑ a ∈ s, Pi.single a (θ a)) = ∏ a ∈ s, χ (Pi.single a (θ a)) := by
+  have hprod
+      : ∀ (s : Finset (Fin n)) (θ : Fin n → ℝ),
+        χ (∑ a ∈ s, Pi.single a (θ a)) = ∏ a ∈ s, χ (Pi.single a (θ a)) := by
     intro s θ
     induction s using Finset.induction_on with
     | empty => simp [hχ0]

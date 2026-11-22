@@ -29,14 +29,15 @@ theorem ParDVRIsDVR.proof : ParDVRIsDVR.Statement := by
     exact hs (by simpa using h 0)
   have hOR : algebraMap (𝓞 K) R = (algebraMap A R).comp C := by
     rw [IsScalarTower.algebraMap_eq (𝓞 K) A R, MvPolynomial.algebraMap_eq]
-  let φ : Rv →+* R := IsLocalization.lift (M := v.asIdeal.primeCompl) (g := algebraMap (𝓞 K) R)
-    fun s => by
+  let φ : Rv →+* R :=
+    IsLocalization.lift (M := v.asIdeal.primeCompl) (g := algebraMap (𝓞 K) R) fun s => by
       rw [hOR, RingHom.comp_apply]
       exact IsLocalization.map_units R (⟨C (s : 𝓞 K), hC s s.2⟩ : (parPrime e n v).primeCompl)
   have hφ : φ.comp (algebraMap (𝓞 K) Rv) = algebraMap (𝓞 K) R := IsLocalization.lift_comp _
   have hmax : maximalIdeal R = (maximalIdeal Rv).map φ := by
     rw [← IsLocalization.AtPrime.map_eq_maximalIdeal (parPrime e n v) R,
-      ← IsLocalization.AtPrime.map_eq_maximalIdeal v.asIdeal Rv, Ideal.map_map, hφ, hOR, ← Ideal.map_map]
+      ← IsLocalization.AtPrime.map_eq_maximalIdeal v.asIdeal Rv, Ideal.map_map, hφ, hOR,
+      ← Ideal.map_map]
     rfl
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible Rv
   have hspan : maximalIdeal R = Ideal.span {φ ϖ} := by
@@ -53,7 +54,7 @@ theorem ParDVRIsDVR.proof : ParDVRIsDVR.Statement := by
     have hinj : Function.Injective (algebraMap A R) :=
       IsLocalization.injective R (Ideal.primeCompl_le_nonZeroDivisors (parPrime e n v))
     exact hx0 (MvPolynomial.C_injective _ _ (hinj (by rw [hmem, map_zero, map_zero])))
-  have hnf : ¬IsField R := fun h => hne (isField_iff_maximalIdeal_eq.mp h)
+  have hnf : ¬ IsField R := fun h => hne (isField_iff_maximalIdeal_eq.mp h)
   exact ((IsDiscreteValuationRing.TFAE R hnf).out 5 1).mp
     (show (maximalIdeal R).IsPrincipal from ⟨⟨φ ϖ, hspan⟩⟩)
 

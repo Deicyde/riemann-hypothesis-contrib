@@ -15,8 +15,8 @@ namespace GlobalTheory.CompanionTheory.LatFG
 section
 variable {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B] (f : W →+* B) (ξ : W) (l M : ℕ)
 
-theorem dpE_eq (i : ℕ) : Lat.dpE f ξ l M i =
-    (((i.factorial : ℚ))⁻¹ * (((l : ℚ) ^ M)⁻¹) ^ i) • f ξ ^ i := by
+theorem dpE_eq (i : ℕ)
+    : Lat.dpE f ξ l M i = (((i.factorial : ℚ))⁻¹ * (((l : ℚ) ^ M)⁻¹) ^ i) • f ξ ^ i := by
   simp only [Lat.dpE, Lat.η, smul_pow, mul_smul]
 
 theorem dpE_mem {k i : ℕ} (h : k ≤ i) : Lat.dpE f ξ l M i ∈ Ideal.span {f ξ ^ k} := by
@@ -28,8 +28,8 @@ variable {f ξ} in
 theorem dpE_eq_zero {m : ℕ} (hn : f ξ ^ m = 0) {i : ℕ} (h : m ≤ i) : Lat.dpE f ξ l M i = 0 := by
   rw [dpE_eq, pow_eq_zero_of_le h hn, smul_zero]
 
-theorem mul_dpE {l : ℕ} (hl : l ≠ 0) (j : ℕ) :
-    f ξ * Lat.dpE f ξ l M j = ((l ^ M * (j + 1) : ℕ) : B) * Lat.dpE f ξ l M (j + 1) := by
+theorem mul_dpE {l : ℕ} (hl : l ≠ 0) (j : ℕ)
+    : f ξ * Lat.dpE f ξ l M j = ((l ^ M * (j + 1) : ℕ) : B) * Lat.dpE f ξ l M (j + 1) := by
   have hl' : ((l : ℚ) ^ M) ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.2 hl)
   have h : f ξ = ((l : ℚ) ^ M) • Lat.η f ξ l M := by
     simp only [Lat.η, smul_smul, mul_inv_cancel₀ hl', one_smul]
@@ -47,8 +47,9 @@ theorem mul_dpE {l : ℕ} (hl : l ≠ 0) (j : ℕ) :
   field_simp
 
 variable {f ξ l M} in
-theorem sum_single {m : ℕ} (hn : f ξ ^ m = 0) (k : ℕ) (a : W) :
-    ∑ i ∈ Finset.range m, f ((Pi.single k a : ℕ → W) i) * Lat.dpE f ξ l M i = f a * Lat.dpE f ξ l M k := by
+theorem sum_single {m : ℕ} (hn : f ξ ^ m = 0) (k : ℕ) (a : W)
+    : ∑ i ∈ Finset.range m, f ((Pi.single k a : ℕ → W) i) * Lat.dpE f ξ l M i
+      = f a * Lat.dpE f ξ l M k := by
   by_cases hk : k < m
   · rw [Finset.sum_eq_single k]
     · simp
@@ -68,28 +69,35 @@ theorem l_ne {m : ℕ} (h : Lat.Hyp f ξ l m) : l ≠ 0 := by
   rintro rfl
   exact h.l0 (by simp)
 
-
 variable {f ξ l} in
-theorem dvd_of_mem {m : ℕ} (h : Lat.Hyp f ξ l m) {j : ℕ} (hj : j < m) {a : W}
-    (hmem : f a * Lat.dpE f ξ l M j ∈ Ideal.span {f ξ ^ (j + 1)}) : ξ ∣ a := by
+theorem dvd_of_mem
+    {m : ℕ} (h : Lat.Hyp f ξ l m)
+    {j : ℕ} (hj : j < m)
+    {a : W} (hmem : f a * Lat.dpE f ξ l M j ∈ Ideal.span {f ξ ^ (j + 1)})
+    : ξ ∣ a := by
   have hl' : ((l : ℚ) ^ M)⁻¹ ≠ 0 := inv_ne_zero (pow_ne_zero _ (Nat.cast_ne_zero.2 (l_ne h)))
   have h2 : ((j.factorial : ℚ))⁻¹ ≠ 0 := inv_ne_zero (by exact_mod_cast j.factorial_ne_zero)
-  have hu : (((j.factorial : ℚ))⁻¹ * (((l : ℚ) ^ M)⁻¹) ^ j) ≠ 0 := mul_ne_zero h2 (pow_ne_zero _ hl')
+  have hu : (((j.factorial : ℚ))⁻¹ * (((l : ℚ) ^ M)⁻¹) ^ j) ≠ 0 :=
+    mul_ne_zero h2 (pow_ne_zero _ hl')
   obtain ⟨b, hb⟩ := Ideal.mem_span_singleton'.1 hmem
   rw [dpE_eq] at hb
   generalize (((j.factorial : ℚ))⁻¹ * (((l : ℚ) ^ M)⁻¹) ^ j) = u at hb hu
   refine h.gr j hj a (u⁻¹ • b) ?_
-  rw [mul_smul_comm, mul_comm (f ξ ^ (j + 1)), hb, mul_smul_comm, smul_smul, inv_mul_cancel₀ hu, one_smul]
-
+  rw [mul_smul_comm, mul_comm (f ξ ^ (j + 1)), hb, mul_smul_comm, smul_smul, inv_mul_cancel₀ hu,
+    one_smul]
 
 variable {f ξ l} in
-theorem exists_coeff {m : ℕ} (h : Lat.Hyp f ξ l m) {x : B} (hx : x ∈ Lat.sub f ξ l M) {r : ℕ}
-    (hr : x ∈ Ideal.span {f ξ ^ r}) (j : ℕ) (hj : j ≤ r) :
-    ∃ c : ℕ → W, (∀ i < j, c i = 0) ∧ x = ∑ i ∈ Finset.range m, f (c i) * Lat.dpE f ξ l M i := by
+theorem exists_coeff
+    {m : ℕ} (h : Lat.Hyp f ξ l m)
+    {x : B} (hx : x ∈ Lat.sub f ξ l M)
+    {r : ℕ} (hr : x ∈ Ideal.span {f ξ ^ r})
+    (j : ℕ) (hj : j ≤ r)
+    : ∃ c : ℕ → W, (∀ i < j, c i = 0) ∧ x = ∑ i ∈ Finset.range m, f (c i) * Lat.dpE f ξ l M i := by
   induction j with
   | zero =>
     obtain ⟨n, c, hc⟩ := (GlobalTheory.T.mem_lattice_sub_iff_sum f ξ l M x).1 hx
-    refine ⟨fun i => if hi : i < n then c ⟨i, hi⟩ else 0, fun i hi => absurd hi (Nat.not_lt_zero i), ?_⟩
+    refine
+      ⟨fun i => if hi : i < n then c ⟨i, hi⟩ else 0, fun i hi => absurd hi (Nat.not_lt_zero i), ?_⟩
     set g : ℕ → B := fun i => f (if hi : i < n then c ⟨i, hi⟩ else 0) * Lat.dpE f ξ l M i with hg
     have h1 : x = ∑ i ∈ Finset.range n, g i := by
       rw [hc, ← Fin.sum_univ_eq_sum_range]
@@ -107,8 +115,8 @@ theorem exists_coeff {m : ℕ} (h : Lat.Hyp f ξ l m) {x : B} (hx : x ∈ Lat.su
   | succ j ih =>
     obtain ⟨c, hc, hxc⟩ := ih (by omega)
     set c' : ℕ → W := c - Pi.single j (c j) with hc'
-    have hsum : ∑ i ∈ Finset.range m, f (c' i) * Lat.dpE f ξ l M i =
-        x - f (c j) * Lat.dpE f ξ l M j := by
+    have hsum
+        : ∑ i ∈ Finset.range m, f (c' i) * Lat.dpE f ξ l M i = x - f (c j) * Lat.dpE f ξ l M j := by
       rw [← sum_single h.nil j (c j), hxc, ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hc', Pi.sub_apply, map_sub, sub_mul]
@@ -117,7 +125,8 @@ theorem exists_coeff {m : ℕ} (h : Lat.Hyp f ξ l m) {x : B} (hx : x ∈ Lat.su
       rcases hi.lt_or_eq with hi | rfl
       · rw [hc', Pi.sub_apply, hc i hi, Pi.single_eq_of_ne hi.ne, sub_zero]
       · rw [hc', Pi.sub_apply, Pi.single_eq_same, sub_self]
-    have hrest : ∑ i ∈ Finset.range m, f (c' i) * Lat.dpE f ξ l M i ∈ Ideal.span {f ξ ^ (j + 1)} := by
+    have hrest
+        : ∑ i ∈ Finset.range m, f (c' i) * Lat.dpE f ξ l M i ∈ Ideal.span {f ξ ^ (j + 1)} := by
       refine Ideal.sum_mem _ fun i _ => ?_
       by_cases hi : i ≤ j
       · rw [hz i hi, map_zero, zero_mul]
@@ -132,7 +141,8 @@ theorem exists_coeff {m : ℕ} (h : Lat.Hyp f ξ l m) {x : B} (hx : x ∈ Lat.su
       by_cases hjm : j < m
       · obtain ⟨d, hd⟩ := dvd_of_mem M h hjm hterm
         refine ⟨d * ((l ^ M * (j + 1) : ℕ) : W), ?_⟩
-        rw [hd, map_mul, map_mul, map_natCast, mul_comm (f ξ), mul_assoc, mul_dpE f ξ M (l_ne h), mul_assoc]
+        rw [hd, map_mul, map_mul, map_natCast, mul_comm (f ξ), mul_assoc, mul_dpE f ξ M (l_ne h),
+          mul_assoc]
       · refine ⟨0, ?_⟩
         rw [dpE_eq_zero l M h.nil (not_lt.1 hjm), map_zero, zero_mul, mul_zero]
     refine ⟨c' + Pi.single (j + 1) e, fun i hi => ?_, ?_⟩
@@ -142,12 +152,15 @@ theorem exists_coeff {m : ℕ} (h : Lat.Hyp f ξ l m) {x : B} (hx : x ∈ Lat.su
 
 end
 
-theorem dividedPowerFiltration_fg : ∀ {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B] (f : W →+* B) (ξ : W) (l M : ℕ) (m : ℕ),
-    Lat.Hyp f ξ l m → ∀ hc : Lat.DPClosed (Lat.ι f ξ l M) (Lat.γB f ξ), ∀ r : ℕ,
-      (pdP (Lat.γ f ξ l M hc) r).FG := by
+theorem dividedPowerFiltration_fg
+    : ∀ {W B : Type} [CommRing W] [CommRing B] [Algebra ℚ B] (f : W →+* B) (ξ : W) (l M : ℕ)
+        (m : ℕ),
+      Lat.Hyp f ξ l m
+        → ∀ hc : Lat.DPClosed (Lat.ι f ξ l M) (Lat.γB f ξ), ∀ r : ℕ,
+          (pdP (Lat.γ f ξ l M hc) r).FG := by
   intro W B _ _ _ f ξ l M m h hc r
-  have key : pdP (Lat.γ f ξ l M hc) r =
-      Ideal.span (Lat.dpA f ξ l M '' (↑(Finset.Ico r m) : Set ℕ)) := by
+  have key
+      : pdP (Lat.γ f ξ l M hc) r = Ideal.span (Lat.dpA f ξ l M '' (↑(Finset.Ico r m) : Set ℕ)) := by
     rw [GlobalTheory.T.lattice_filtration_comap_span_pow f ξ l M m h hc r]
     apply le_antisymm
     · intro x hx

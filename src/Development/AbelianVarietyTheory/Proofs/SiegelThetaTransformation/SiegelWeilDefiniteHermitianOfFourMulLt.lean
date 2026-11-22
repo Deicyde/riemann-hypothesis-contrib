@@ -13,7 +13,9 @@ open scoped ComplexConjugate ComplexOrder Real Classical
 
 namespace GlobalTheory.SW
 
-theorem siegel_weil_definite : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Finset (E →+* ℂ)), IsType Ψ → ∀ (n N : ℕ), Even n → 4 * N < n → SWAt Ψ n N := by
+theorem siegel_weil_definite
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Finset (E →+* ℂ)),
+      IsType Ψ → ∀ (n N : ℕ), Even n → 4 * N < n → SWAt Ψ n N := by
   intro E _ _ _ Ψ hΨ n N hn
   induction N with
   | zero =>

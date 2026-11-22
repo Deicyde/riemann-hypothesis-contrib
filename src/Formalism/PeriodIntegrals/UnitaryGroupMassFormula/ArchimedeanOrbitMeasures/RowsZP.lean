@@ -9,8 +9,11 @@ noncomputable section
 
 namespace PI.AprimeInfW
 
-open MeasureTheory Topology Filter Metric NumberField Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.TypedSets Formalism.L2.SG.Pf.NcReal Formalism.MainNotions.S Formalism.L2.SG.AdBridge
+open MeasureTheory Topology Filter Metric NumberField Formalism.BasicNotions
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.TypedSets Formalism.L2.SG.Pf.NcReal Formalism.MainNotions.S
+  Formalism.L2.SG.AdBridge
 open scoped TensorProduct Matrix
 
 theorem rowsZ_holds : RowsZ := by
@@ -52,7 +55,8 @@ theorem rowsZ_holds : RowsZ := by
   have hfix := (stabInfV_holds X u' hb (c * g * c⁻¹)).1 hmem v b
   have hgv : g v = ⟨Du, hDmem⟩ := Pi.mulSingle_eq_same _ _
   have hm : uMat ((c * g * c⁻¹) v) = uMat (c v) * Dm * uMat (c v)⁻¹ := by
-    simp only [uMat, Pi.mul_apply, Pi.inv_apply, Subgroup.coe_mul, Subgroup.coe_inv, Units.val_mul, hgv]
+    simp only [uMat, Pi.mul_apply, Pi.inv_apply, Subgroup.coe_mul, Subgroup.coe_inv, Units.val_mul,
+      hgv]
     rfl
   have hci : uMat (c v)⁻¹ * uMat (c v) = 1 := by simp [uMat]
   rw [hm] at hfix
@@ -64,8 +68,10 @@ theorem rowsZ_holds : RowsZ := by
     exact h'
   have hx0 : x i0 = 0 := by
     have h1 := congrFun hx i0
-    simp only [Dm, Matrix.mulVec_diagonal, d, ↓reduceIte] at h1
-    calc x i0 = ((-1) * x i0 - x i0) * (-1 / 2) := by ring
+    simp only [Dm, Matrix.mulVec_diagonal, d, ↓ reduceIte] at h1
+    calc
+      x i0
+        = ((-1) * x i0 - x i0) * (-1 / 2) := by ring
       _ = 0 := by rw [h1, sub_self, zero_mul]
   rw [beta_frame_coordinates]
   simp only [Matrix.mul_apply, Matrix.of_apply]

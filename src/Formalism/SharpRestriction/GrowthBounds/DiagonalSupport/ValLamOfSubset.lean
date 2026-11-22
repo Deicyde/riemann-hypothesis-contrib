@@ -17,7 +17,8 @@ section Z
 
 variable {B : Type*} [CommRing B] {σ τ : Type*}
 
-def FinalFormK (k : ℤ) (H : MvPolynomial σ (LaurentPolynomial B)) : Prop := ∀ m, (H.coeff m).coeff k = 0
+def FinalFormK (k : ℤ) (H : MvPolynomial σ (LaurentPolynomial B)) : Prop :=
+  ∀ m, (H.coeff m).coeff k = 0
 
 end Z
 
@@ -25,8 +26,9 @@ section S
 
 variable {R : Type*} [CommRing R] {ι : Type*} {n : ℕ}
 
-theorem notMem_sDegs_iff (LL : Letters ι) (S : Set ι) (j : Fin n) (G : MvPolynomial (ι × Fin n) R) (k : ℤ) :
-    k ∉ sDegs LL S j G ↔ FinalFormK k (twistSub LL S j G) := by
+theorem notMem_sDegs_iff
+    (LL : Letters ι) (S : Set ι) (j : Fin n) (G : MvPolynomial (ι × Fin n) R) (k : ℤ)
+    : k ∉ sDegs LL S j G ↔ FinalFormK k (twistSub LL S j G) := by
   unfold sDegs FinalFormK
   rw [Finset.mem_biUnion]
   constructor
@@ -41,17 +43,21 @@ theorem notMem_sDegs_iff (LL : Letters ι) (S : Set ι) (j : Fin n) (G : MvPolyn
   · rintro h ⟨m, _, hm⟩
     exact (Finsupp.mem_support_iff.1 hm) (h m)
 
-theorem sDegs_subset_of {ι' : Type*} (LL : Letters ι) (S : Set ι) (LL' : Letters ι') (S' : Set ι') (j : Fin n)
+theorem sDegs_subset_of
+    {ι' : Type*} (LL : Letters ι) (S : Set ι) (LL' : Letters ι') (S' : Set ι') (j : Fin n)
     (G : MvPolynomial (ι × Fin n) R) (F : MvPolynomial (ι' × Fin n) R)
-    (h : ∀ k, FinalFormK k (twistSub LL' S' j F) → FinalFormK k (twistSub LL S j G)) : sDegs LL S j G ⊆ sDegs LL' S' j F := by
+    (h : ∀ k, FinalFormK k (twistSub LL' S' j F) → FinalFormK k (twistSub LL S j G))
+    : sDegs LL S j G ⊆ sDegs LL' S' j F := by
   intro k hk
   by_contra hk'
   exact ((notMem_sDegs_iff LL S j G k).2 (h k ((notMem_sDegs_iff LL' S' j F k).1 hk'))) hk
 
-theorem val_lam_of_subset [NeZero n] {ι' : Type*} (LL : Letters ι) (S : Set ι) (LL' : Letters ι') (S' : Set ι')
-    (G : MvPolynomial (ι × Fin n) R) (F : MvPolynomial (ι' × Fin n) R)
-    (h : ∀ j, sDegs LL S j G ⊆ sDegs LL' S' j F) :
-    valS LL' S' F ≤ valS LL S G ∧ lam1S LL S G ≤ lam1S LL' S' F :=
+theorem val_lam_of_subset
+    [NeZero n]
+    {ι' : Type*}
+    (LL : Letters ι) (S : Set ι) (LL' : Letters ι') (S' : Set ι') (G : MvPolynomial (ι × Fin n) R)
+    (F : MvPolynomial (ι' × Fin n) R) (h : ∀ j, sDegs LL S j G ⊆ sDegs LL' S' j F)
+    : valS LL' S' F ≤ valS LL S G ∧ lam1S LL S G ≤ lam1S LL' S' F :=
   ⟨Finset.inf_mono (h _), Finset.sup_mono (h _)⟩
 
 end S

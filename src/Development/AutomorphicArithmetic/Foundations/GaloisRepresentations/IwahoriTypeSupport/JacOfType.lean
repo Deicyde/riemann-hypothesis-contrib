@@ -7,10 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IwahoriNe
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix UpperTheory.Gal.TypesAndIwahori
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix UpperTheory.Gal.TypesAndIwahori
 
-theorem UpperTheory.Gal.TypesAndIwahori.jacOfType :
-    UpperTheory.Gal.TypesAndIwahori.Loc → UpperTheory.Gal.TypesAndIwahori.JacOfType := by
+theorem UpperTheory.Gal.TypesAndIwahori.jacOfType
+    : UpperTheory.Gal.TypesAndIwahori.Loc → UpperTheory.Gal.TypesAndIwahori.JacOfType := by
   intro L k _ _ _ _ N s d e V _ _ π hs hi θ μ hμ ⟨v, hv0, hv⟩
   have hadm : IsAdmissible π := (L.bz k).1 (Fin N) V π hs hi
   have hb := L.mp k N s d e V π hadm
@@ -30,16 +31,24 @@ theorem UpperTheory.Gal.TypesAndIwahori.jacOfType :
   have h0 : (0 : V) ∈ fixed π (proRad k e) := zero_mem _
   refine ⟨Submodule.Quotient.mk v, fun hy => hv0 (hb.injOn hfix h0 ?_), fun x hx => ?_⟩
   · simpa using hy
-  · have h1 : jacU e π x (Submodule.Quotient.mk v) = Submodule.Quotient.mk (π (leviEmb k e x) v) := rfl
+  · have h1 : jacU e π x (Submodule.Quotient.mk v) = Submodule.Quotient.mk (π (leviEmb k e x) v) :=
+      rfl
     have h2 := hv ⟨leviEmb k e x, leviEmb_mem_parahoric e ⟨x, hx⟩⟩
-    have h3 : π (leviEmb k e x) v = ((typeChar e θ ⟨leviEmb k e x, leviEmb_mem_parahoric e ⟨x, hx⟩⟩ : ℂˣ) : ℂ) • v := h2
-    have h4 : ∀ a, ((μ a (GeneralLinearGroup.det (x a)) : ℂˣ) : ℂ) =
-        ((θ a (GeneralLinearGroup.det (redLevi k _ ⟨x, hx⟩ a)) : ℂˣ) : ℂ) := by
+    have h3
+        : π (leviEmb k e x) v
+          = ((typeChar e θ ⟨leviEmb k e x, leviEmb_mem_parahoric e ⟨x, hx⟩⟩ : ℂˣ) : ℂ) • v :=
+      h2
+    have h4
+        : ∀ a,
+          ((μ a (GeneralLinearGroup.det (x a)) : ℂˣ) : ℂ)
+            = ((θ a (GeneralLinearGroup.det (redLevi k _ ⟨x, hx⟩ a)) : ℂˣ) : ℂ) := by
       intro a
       have h5 := (hμ a).detChar_eq ⟨x a, hx a trivial⟩
       rw [redLevi_apply]
       exact congrArg (fun u : ℂˣ => (u : ℂ)) h5
-    have h6 : parahoricProj k e ⟨leviEmb k e x, leviEmb_mem_parahoric e ⟨x, hx⟩⟩ = redLevi k _ ⟨x, hx⟩ :=
+    have h6
+        : parahoricProj k e ⟨leviEmb k e x, leviEmb_mem_parahoric e ⟨x, hx⟩⟩
+          = redLevi k _ ⟨x, hx⟩ :=
       parahoricProj_leviEmb e ⟨x, hx⟩
     rw [h1, h3, typeChar_apply, h6, Units.coe_prod, Submodule.Quotient.mk_smul]
     simp only [h4]

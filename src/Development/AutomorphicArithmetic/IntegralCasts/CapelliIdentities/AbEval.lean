@@ -4,11 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Ra1.ab_eval :
-    ∀ {k X : Type} [inst : Field k] [Inhabited X] (r : ℕ)
-    (H : Submodule k (X → k)),
-    Module.Finite k ↥H →
-      Module.finrank k ↥H ≤ r → ∃ (t : Fin r → X), ∀ φ ∈ H, (∀ (a : Fin r), φ (t a) = (0 : k)) → φ = (0 : X → k) := by
+theorem UpperTheory.Reformulated.B.Ra1.ab_eval
+    : ∀ {k X : Type} [inst : Field k] [Inhabited X] (r : ℕ) (H : Submodule k (X → k)),
+      Module.Finite k ↥H → Module.finrank k ↥H ≤ r
+        → ∃ (t : Fin r → X), ∀ φ ∈ H, (∀ (a : Fin r), φ (t a) = (0 : k)) → φ = (0 : X → k) := by
   intro k X inst _ r
   induction r with
   | zero =>

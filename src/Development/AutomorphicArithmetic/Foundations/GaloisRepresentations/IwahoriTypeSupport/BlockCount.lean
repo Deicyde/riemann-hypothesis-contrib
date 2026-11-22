@@ -5,13 +5,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix UpperTheory.Gal.TypesAndIwahori
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix UpperTheory.Gal.TypesAndIwahori
 
-theorem UpperTheory.Gal.TypesAndIwahori.blockCount :
-    UpperTheory.Gal.TypesAndIwahori.BlockCount := by
+theorem UpperTheory.Gal.TypesAndIwahori.blockCount
+    : UpperTheory.Gal.TypesAndIwahori.BlockCount := by
   intro β N s d hd θ
-  have hsum : Multiset.map (fun i => θ (blockOf d hd i)) Finset.univ.val =
-      ∑ i, ({θ (blockOf d hd i)} : Multiset β) := by
+  have hsum
+      : Multiset.map (fun i => θ (blockOf d hd i)) Finset.univ.val
+        = ∑ i, ({θ (blockOf d hd i)} : Multiset β) := by
     rw [← Multiset.sum_map_singleton (Multiset.map _ _), Multiset.map_map]
     rfl
   rw [hsum, ← (stdBlocks d hd).sum_comp, Fintype.sum_sigma]

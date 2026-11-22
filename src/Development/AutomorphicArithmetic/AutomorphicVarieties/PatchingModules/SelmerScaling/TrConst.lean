@@ -6,11 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem krull_sub {A R : Type} [CommRing A] [IsLocalRing A] [IsNoetherianRing A] [CommRing R] [Algebra A R]
-    (M : Subalgebra A R) [Module.Finite A M] (t : A) (ht : t ∈ maximalIdeal A) (d : R)
-    (h : ∀ j : ℕ, ∃ y ∈ M, d = t ^ j • y) : d = 0 := by
+private theorem krull_sub
+    {A R : Type} [CommRing A] [IsLocalRing A] [IsNoetherianRing A] [CommRing R] [Algebra A R]
+    (M : Subalgebra A R) [Module.Finite A M]
+    (t : A) (ht : t ∈ maximalIdeal A)
+    (d : R) (h : ∀ j : ℕ, ∃ y ∈ M, d = t ^ j • y)
+    : d = 0 := by
   have hI : Ideal.span {t} ≠ ⊤ := fun h1 =>
     (mem_maximalIdeal t).1 ht (Ideal.span_singleton_eq_top.1 h1)
   obtain ⟨y0, hy0, hd0⟩ := h 0
@@ -26,9 +30,11 @@ private theorem krull_sub {A R : Type} [CommRing A] [IsLocalRing A] [IsNoetheria
   rw [key, Submodule.mem_bot] at hmem
   exact congrArg Subtype.val hmem
 
-private theorem f_local {O B K : Type} [CommRing O] [CommRing B] [IsLocalRing B] [Algebra O B] [Field K] [Algebra O K]
-    (hs : Function.Surjective (algebraMap O K)) (f : B →ₐ[O] PowerSeries K) (j : ℕ) (b : B)
-    (hb : b ∈ maximalIdeal B ^ j) : ∃ c, f b = PowerSeries.X ^ j * c := by
+private theorem f_local
+    {O B K : Type} [CommRing O] [CommRing B] [IsLocalRing B] [Algebra O B] [Field K] [Algebra O K]
+    (hs : Function.Surjective (algebraMap O K)) (f : B →ₐ[O] PowerSeries K)
+    (j : ℕ) (b : B) (hb : b ∈ maximalIdeal B ^ j)
+    : ∃ c, f b = PowerSeries.X ^ j * c := by
   set φ : B →+* K := PowerSeries.constantCoeff.comp f.toRingHom with hφdef
   have hφ : Function.Surjective φ := fun k => by
     obtain ⟨o, rfl⟩ := hs k
@@ -49,14 +55,21 @@ private theorem f_local {O B K : Type} [CommRing O] [CommRing B] [IsLocalRing B]
   obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 hfb
   exact ⟨c, by rw [← hc, mul_comm]⟩
 
-theorem UpperTheory.V.Pa.trConst :
-    ∀ (l : ℕ) [Fact l.Prime] (S : Ctx l), ∀ (R : Type) [CommRing R] [Algebra S.F R] (e : R →ₐ[S.F] S.F) (θ : S.U.AA →+* R), S.Test R e θ → (∀ b ∈ pairVals S.u ∪ {b | ∃ j i, b = S.P.U j i ∨ b = S.P.y j i} ∪ {S.P.s}, θ (algebraMap S.B S.U.AA b) = algebraMap S.F R (algebraMap S.x.A S.F (S.P.f b))) → ∀ b : S.Bh, θ (algebraMap S.Bh S.U.AA b) = algebraMap S.F R (S.rF b) := by
+theorem UpperTheory.V.Pa.trConst
+    : ∀ (l : ℕ) [Fact l.Prime] (S : Ctx l),
+      ∀ (R : Type) [CommRing R] [Algebra S.F R] (e : R →ₐ[S.F] S.F) (θ : S.U.AA →+* R),
+        S.Test R e θ
+          → (∀ b ∈ pairVals S.u ∪ {b | ∃ j i, b = S.P.U j i ∨ b = S.P.y j i} ∪ {S.P.s},
+            θ (algebraMap S.B S.U.AA b) = algebraMap S.F R (algebraMap S.x.A S.F (S.P.f b)))
+          → ∀ b : S.Bh, θ (algebraMap S.Bh S.U.AA b) = algebraMap S.F R (S.rF b) := by
   intro l _ S R _ _ e θ hT hgen b
   letI : Algebra S.x.A R := ((algebraMap S.F R).comp (algebraMap S.x.A S.F)).toAlgebra
   haveI : IsScalarTower S.x.A S.F R := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   obtain ⟨M, hMfin, -, -, hMj, -⟩ := trLat l S R e θ hT
-  have htow : ∀ y : S.B, algebraMap S.B S.U.AA y = algebraMap S.Bh S.U.AA (algebraMap S.B S.Bh y) :=
-    fun y => by first | rfl | exact IsScalarTower.algebraMap_apply _ _ _ _
+  have htow
+      : ∀ y : S.B,
+        algebraMap S.B S.U.AA y = algebraMap S.Bh S.U.AA (algebraMap S.B S.Bh y) := fun y => by
+    first | rfl | exact IsScalarTower.algebraMap_apply _ _ _ _
   set ψ1 : S.B →+* R := θ.comp (algebraMap S.B S.U.AA) with hψ1
   set ψ2 : S.B →+* R :=
     (algebraMap S.F R).comp ((algebraMap S.x.A S.F).comp S.P.f.toRingHom) with hψ2
@@ -67,8 +80,11 @@ theorem UpperTheory.V.Pa.trConst :
     rw [ho] at h1
     show θ (algebraMap S.B S.U.AA _) = algebraMap S.F R (algebraMap S.x.A S.F (S.P.f _))
     rw [htow, h1, S.rF_f]
-  have hadj : ∀ a ∈ Algebra.adjoin S.O
-      (pairVals S.u ∪ {b | ∃ j i, b = S.P.U j i ∨ b = S.P.y j i} ∪ {S.P.s}), ψ1 a = ψ2 a := by
+  have hadj
+      : ∀ a
+          ∈ Algebra.adjoin S.O
+            (pairVals S.u ∪ {b | ∃ j i, b = S.P.U j i ∨ b = S.P.y j i} ∪ {S.P.s}),
+        ψ1 a = ψ2 a := by
     intro a ha
     induction ha using Algebra.adjoin_induction with
     | mem y hy => exact hgen y hy
@@ -100,8 +116,7 @@ theorem UpperTheory.V.Pa.trConst :
   obtain ⟨N, hN⟩ := hT.nil
   have hker : ∀ m ∈ maximalIdeal S.Bh, e (θ (algebraMap S.Bh S.U.AA m)) = 0 := by
     intro m hm
-    have hp : S.pr0 (algebraMap S.Bh S.U.AA m) = m := by
-      simpa using ((prAdd l S).2.1 m 0).1
+    have hp : S.pr0 (algebraMap S.Bh S.U.AA m) = m := by simpa using ((prAdd l S).2.1 m 0).1
     rw [hT.res, hp]
     have hm2 : m ∈ RingHom.ker S.rF := by rw [S.rF_ker]; exact hm
     exact (RingHom.mem_ker).1 hm2
@@ -128,14 +143,16 @@ theorem UpperTheory.V.Pa.trConst :
     set u := algebraMap S.x.A S.F (S.P.f s) with hudef
     have hu : u ≠ 0 := fun h0 =>
       hs ((RingHom.mem_ker).2 (IsFractionRing.injective S.x.A S.x.Fr (h0.trans (map_zero _).symm)))
-    have e3 : θ (algebraMap S.Bh S.U.AA m) =
-        algebraMap S.F R (u⁻¹ * algebraMap S.x.A S.F (S.P.f a)) := by
-      calc θ (algebraMap S.Bh S.U.AA m)
-          = algebraMap S.F R (u⁻¹ * u) * θ (algebraMap S.Bh S.U.AA m) := by
-            rw [inv_mul_cancel₀ hu, map_one, one_mul]
+    have e3
+        : θ (algebraMap S.Bh S.U.AA m)
+          = algebraMap S.F R (u⁻¹ * algebraMap S.x.A S.F (S.P.f a)) := by
+      calc
+        θ (algebraMap S.Bh S.U.AA m)
+            = algebraMap S.F R (u⁻¹ * u) * θ (algebraMap S.Bh S.U.AA m) := by
+          rw [inv_mul_cancel₀ hu, map_one, one_mul]
         _ = _ := by
-            rw [map_mul, mul_assoc, map_mul]
-            exact congrArg _ e2
+          rw [map_mul, mul_assoc, map_mul]
+          exact congrArg _ e2
     have e4 := hker m hm
     rw [e3, AlgHom.commutes] at e4
     have e5 : u⁻¹ * algebraMap S.x.A S.F (S.P.f a) = 0 := e4

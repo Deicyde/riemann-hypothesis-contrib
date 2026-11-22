@@ -16,8 +16,10 @@ public import Development.AbelianVarietyTheory.Statements.HyperbolicHypotheses.H
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Frames GlobalTheory.FrameUnif
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.Frames GlobalTheory.FrameUnif
 open scoped Matrix nonZeroDivisors
 
 namespace GlobalTheory.PerBor
@@ -71,17 +73,28 @@ lemma inv_diag {n α : Type*} [Fintype n] [DecidableEq n] [Fintype α] (t : n �
     exact hc (hinj _ _ h3.symm (by omega))
   · simp
 
-noncomputable def moveMat {E : Type} [Field E] {Ψ : Finset (E →+* ℂ)} {r g : ℕ} (q : ℕ) (idx : Fin g ≃ Ψ × Fin r)
-    (b : Frame Ψ r) : Matrix (Fin g) (Fin g) ℂ :=
+noncomputable def moveMat
+    {E : Type} [Field E]
+    {Ψ : Finset (E →+* ℂ)} {r g : ℕ}
+    (q : ℕ) (idx : Fin g ≃ Ψ × Fin r) (b : Frame Ψ r)
+    : Matrix (Fin g) (Fin g) ℂ :=
   open Classical in
-  Matrix.of fun k l => if (idx l).1 = (idx k).1 then
-      (if ((idx k).2 : ℕ) < q then FD.mat b (idx k).1 (idx l).2 (idx k).2
-        else (FD.mat b (idx k).1)⁻¹ (idx k).2 (idx l).2) else 0
+  Matrix.of fun k l =>
+    if (idx l).1 = (idx k).1 then
+      (if ((idx k).2 : ℕ) < q then
+         FD.mat b (idx k).1 (idx l).2 (idx k).2
+       else
+         (FD.mat b (idx k).1)⁻¹ (idx k).2 (idx l).2)
+    else
+      0
 
 section
 
-variable {E : Type} [Field E] {Ψ : Finset (E →+* ℂ)} {r g : ℕ} (q : ℕ) (idx : Fin g ≃ Ψ × Fin r)
-    {b : Frame Ψ r}
+variable
+  {E : Type} [Field E]
+  {Ψ : Finset (E →+* ℂ)} {r g : ℕ}
+  (q : ℕ) (idx : Fin g ≃ Ψ × Fin r)
+  {b : Frame Ψ r}
 
 lemma moveMat_diag (hb : b ∈ Bor Ψ r) (k : Fin g) : moveMat q idx b k k =
     if ((idx k).2 : ℕ) < q then b (idx k).1 (idx k).2 (idx k).2 else (b (idx k).1 (idx k).2 (idx k).2)⁻¹ := by
@@ -143,9 +156,29 @@ end
 
 end GlobalTheory.PerBor
 
-theorem GlobalTheory.per_bor : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (g : ℕ) (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ)) (F : FamilyUnif Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom) (fun j => relab c σ (e j).1)) (r : ℕ) (M : ModelsOf F r), GoodEmb c σ → ModelBase M → NegXi M → ∀ k Pf, IsPerFr e F M k Pf → ∀ x ∈ (M.X k).dom, ∀ b ∈ Bor (M.X k).Ψ r, ∃ h₀ : Matrix (Fin g) (Fin g) ℂ, IsUnit h₀.det ∧ (∀ a, Pf (rmul x b) a = h₀ *ᵥ Pf x a) ∧ (∀ j j', h₀⁻¹ j j' ≠ 0 → (e j).1 = (e j').1 ∧ ((e j).2 : ℕ) ≤ (e j').2) ∧ ‖h₀.det‖ = ∏ j, ‖h₀ j j‖ ∧ ((∀ τ i, ‖b τ i i‖ = 1) → ‖h₀.det‖ = 1) ∧ ∀ (un : ∀ k, (M.X k).dom → FrPt Xo c (CAt σ)) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (t₀ : ℂ), Even n → t₀ ^ 2 * h₀.det = 1 → (∏ j, h₀⁻¹ j j ^ a ((e j).1, (e j).2)) * t₀ ^ n = bchar (laU (unfOf e F M un) a n k) b := by
+theorem GlobalTheory.per_bor
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (g : ℕ)
+        (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ))
+        (F : FamilyUnif Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom)
+          (fun j => relab c σ (e j).1))
+        (r : ℕ) (M : ModelsOf F r),
+      GoodEmb c σ → ModelBase M → NegXi M
+        → ∀ k Pf,
+          IsPerFr e F M k Pf
+            → ∀ x ∈ (M.X k).dom, ∀ b ∈ Bor (M.X k).Ψ r, ∃ h₀ : Matrix (Fin g) (Fin g) ℂ,
+              IsUnit h₀.det ∧ (∀ a, Pf (rmul x b) a = h₀ *ᵥ Pf x a)
+                ∧ (∀ j j', h₀⁻¹ j j' ≠ 0 → (e j).1 = (e j').1 ∧ ((e j).2 : ℕ) ≤ (e j').2)
+                ∧ ‖h₀.det‖ = ∏ j, ‖h₀ j j‖ ∧ ((∀ τ i, ‖b τ i i‖ = 1) → ‖h₀.det‖ = 1)
+                ∧ ∀ (un : ∀ k, (M.X k).dom → FrPt Xo c (CAt σ)) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ)
+                    (t₀ : ℂ),
+                  Even n → t₀ ^ 2 * h₀.det = 1
+                    → (∏ j, h₀⁻¹ j j ^ a ((e j).1, (e j).2)) * t₀ ^ n
+                      = bchar (laU (unfOf e F M un) a n k) b := by
   intro E _ _ _ H Dw l Xo c σ g e F r M hG hB hN k Pf hPf x hx b hb
-  obtain ⟨⟨idx, hty, hcol, hper⟩, hp0, -⟩ := GlobalTheory.T.cmType_letter_frame_column_dictionary E H Dw l Xo c σ g e F r M hG hB hN k
+  obtain ⟨⟨idx, hty, hcol, hper⟩, hp0, -⟩ :=
+    GlobalTheory.T.cmType_letter_frame_column_dictionary E H Dw l Xo c σ g e F r M hG hB hN k
   obtain ⟨hbij, hrt, -, -⟩ := GlobalTheory.Relab.relab_good E H l c σ hG
   have hq : (F.Di k).q = Dw.q := hp0.symm.trans (hB.type k).1
   have hlt : ∀ j, ((idx j).2 : ℕ) < (F.Di k).q → ((e j).2 : ℕ) < (F.Di k).q := by
@@ -161,8 +194,10 @@ theorem GlobalTheory.per_bor : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
     intro j j' h1 h2
     apply e.injective
     refine Sigma.ext h1 ((Fin.heq_ext_iff (by rw [h1])).2 h2)
-  have hs : ∀ j j', PerBor.moveMat (F.Di k).q idx b j j' ≠ 0 →
-      (e j).1 = (e j').1 ∧ ((e j).2 : ℕ) ≤ (e j').2 := by
+  have hs
+      : ∀ j j',
+        PerBor.moveMat (F.Di k).q idx b j j' ≠ 0
+          → (e j).1 = (e j').1 ∧ ((e j).2 : ℕ) ≤ (e j').2 := by
     intro j j' hne
     obtain ⟨h1, h2⟩ := PerBor.moveMat_support _ idx hb j j' hne
     have c1 := hcol j
@@ -194,10 +229,18 @@ theorem GlobalTheory.per_bor : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
     split_ifs
     · exact hbne _ _
     · exact inv_ne_zero (hbne _ _)
-  refine ⟨PerBor.moveMat (F.Di k).q idx b, hu, fun a => ?_, PerBor.inv_support _ _ _ hu hs,
-    by rw [hdet, norm_prod], fun h1 => ?_, fun un a n t₀ hn ht => ?_⟩
+  refine ⟨
+    PerBor.moveMat (F.Di k).q idx b,
+    hu,
+    fun a => ?_,
+    PerBor.inv_support _ _ _ hu hs,
+    by rw [hdet, norm_prod],
+    fun h1 => ?_,
+    fun un a n t₀ hn ht => ?_
+  ⟩
   · exact PerBor.moveMat_mulVec _ idx hb (M.X k).Gm x (M.φ k a : Fin r → E) _ _
-      (fun j => by rw [hPf, hper]) (fun j => by rw [hPf, hper])
+      (fun j => by rw [hPf, hper])
+      (fun j => by rw [hPf, hper])
   · rw [hdet, norm_prod]
     refine Finset.prod_eq_one fun j _ => ?_
     rw [hdiag]
@@ -210,8 +253,9 @@ theorem GlobalTheory.per_bor : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
       exact eq_inv_of_mul_eq_one_left ht
     rw [← two_mul, pow_mul, ht2, ← Finset.prod_pow, ← Finset.prod_mul_distrib]
     unfold bchar
-    refine Eq.trans ?_ (Fintype.prod_prod_type'
-      (fun (τ : (M.X k).Ψ) (i : Fin r) => b τ i i ^ laU (unfOf e F M un) a (2 * m) k τ i))
+    refine Eq.trans ?_
+      (Fintype.prod_prod_type' (fun (τ : (M.X k).Ψ) (i : Fin r) =>
+        b τ i i ^ laU (unfOf e F M un) a (2 * m) k τ i))
     rw [← idx.prod_comp]
     refine Finset.prod_congr rfl fun j _ => ?_
     rw [PerBor.inv_diag _ _ hinj _ hu hs, ← pow_add, hdiag]
@@ -227,7 +271,8 @@ theorem GlobalTheory.per_bor : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
       have := hlt j hj
       have t2 : conjEmb (idx j).1.1 = relab c σ (e j).1 := t1.symm
       rw [if_pos hj, if_neg (by omega), t2, hinv,
-        show (F.Di k).q - 1 - ((idx j).2 : ℕ) = (e j).2 by omega, inv_pow, ← zpow_natCast, ← zpow_neg]
+        show (F.Di k).q - 1 - ((idx j).2 : ℕ) = (e j).2 by omega, inv_pow, ← zpow_natCast,
+        ← zpow_neg]
       congr 1
       push_cast
       ring

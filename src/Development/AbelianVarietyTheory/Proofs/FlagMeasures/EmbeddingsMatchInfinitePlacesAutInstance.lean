@@ -7,19 +7,23 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AutPointRatio
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
 
 namespace GlobalTheory.RadCov.Place
 
-theorem comap_mk_phi (I : AutInst) (v : InfinitePlace I.F) :
-    (InfinitePlace.mk (I.φ v)).comap (algebraMap I.F I.E) = v := by
+theorem comap_mk_phi (I : AutInst) (v : InfinitePlace I.F)
+    : (InfinitePlace.mk (I.φ v)).comap (algebraMap I.F I.E) = v := by
   have h2 : (I.φ v).comp (algebraMap I.F I.E) = v.embedding := RingHom.ext (I.φ_over v)
   rw [InfinitePlace.comap_mk, h2, InfinitePlace.mk_embedding]
 
 theorem placeMatch : ∀ (I : AutInst) (xf : I.Gf), PlaceMatch I.φ I.P (frm I (1, xf)) := by
   intro I xf
   have hb := GlobalTheory.Count.FrameMajorant.comap_bijective I
-  refine ⟨⟨fun v v' h => ?_, fun w => ⟨w.comap (algebraMap I.F I.E), hb.1 (comap_mk_phi I _)⟩⟩, fun v => ?_⟩
+  refine ⟨
+    ⟨fun v v' h => ?_, fun w => ⟨w.comap (algebraMap I.F I.E), hb.1 (comap_mk_phi I _)⟩⟩,
+    fun v => ?_
+  ⟩
   · have h' : InfinitePlace.mk (I.φ v) = InfinitePlace.mk (I.φ v') := h
     rw [← comap_mk_phi I v, h', comap_mk_phi]
   · have he := GlobalTheory.PointEquivariance.embedding_eq I (InfinitePlace.mk (I.φ v))

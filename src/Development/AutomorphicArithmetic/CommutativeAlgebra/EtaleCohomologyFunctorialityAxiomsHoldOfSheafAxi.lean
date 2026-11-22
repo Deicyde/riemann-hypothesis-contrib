@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.Bijectiv
 
 open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
-private theorem exists_algHom_of_etale (k B : Type) [Field k] [IsSepClosed k] [CommRing B]
-    [Nontrivial B] [Algebra k B] [Algebra.Etale k B] : Nonempty (B →ₐ[k] k) := by
+private theorem exists_algHom_of_etale
+    (k B : Type)
+    [Field k] [IsSepClosed k] [CommRing B] [Nontrivial B] [Algebra k B] [Algebra.Etale k B]
+    : Nonempty (B →ₐ[k] k) := by
   obtain ⟨I, _, Ai, _, _, e, hA⟩ := (Algebra.Etale.iff_exists_algEquiv_prod k B).mp inferInstance
   have hI : Nonempty I := by
     by_contra h
@@ -19,13 +21,15 @@ private theorem exists_algHom_of_etale (k B : Type) [Field k] [IsSepClosed k] [C
   obtain ⟨i⟩ := hI
   haveI := (hA i).1
   haveI := (hA i).2
-  let u : k ≃ₐ[k] Ai i := AlgEquiv.ofBijective (Algebra.ofId k (Ai i))
-    ⟨(algebraMap k (Ai i)).injective, IsSepClosed.algebraMap_surjective k (Ai i)⟩
+  let u : k ≃ₐ[k] Ai i :=
+    AlgEquiv.ofBijective (Algebra.ofId k (Ai i))
+      ⟨(algebraMap k (Ai i)).injective, IsSepClosed.algebraMap_surjective k (Ai i)⟩
   exact ⟨(u.symm.toAlgHom.comp (Pi.evalAlgHom k Ai i)).comp e.toAlgHom⟩
 
-private theorem exists_section_of_etale_field {k : Type} [Field k] [IsSepClosed k] {P : Scheme.{0}}
-    (q : P ⟶ Spec (CommRingCat.of k)) [Etale q] [Surjective q] :
-    ∃ g : Spec (CommRingCat.of k) ⟶ P, g ≫ q = 𝟙 _ := by
+private theorem exists_section_of_etale_field
+    {k : Type} [Field k] [IsSepClosed k]
+    {P : Scheme.{0}} (q : P ⟶ Spec (CommRingCat.of k)) [Etale q] [Surjective q]
+    : ∃ g : Spec (CommRingCat.of k) ⟶ P, g ≫ q = 𝟙 _ := by
   obtain ⟨x0⟩ : Nonempty (Spec (CommRingCat.of k)) := inferInstance
   obtain ⟨p, -⟩ := q.surjective x0
   let U := P.affineOpenCover
@@ -52,9 +56,10 @@ private theorem exists_section_of_etale_field {k : Type} [Field k] [IsSepClosed 
   ext c
   exact ψ.commutes c
 
-private theorem exists_section_of_etale_henselian (A : Type) [CommRing A] [HenselianLocalRing A]
-    [IsSepClosed (IsLocalRing.ResidueField A)] {Y : Scheme.{0}} (f : Y ⟶ Spec (CommRingCat.of A))
-    [Etale f] [Surjective f] : ∃ s : Spec (CommRingCat.of A) ⟶ Y, s ≫ f = 𝟙 _ := by
+private theorem exists_section_of_etale_henselian
+    (A : Type) [CommRing A] [HenselianLocalRing A] [IsSepClosed (IsLocalRing.ResidueField A)]
+    {Y : Scheme.{0}} (f : Y ⟶ Spec (CommRingCat.of A)) [Etale f] [Surjective f]
+    : ∃ s : Spec (CommRingCat.of A) ⟶ Y, s ≫ f = 𝟙 _ := by
   let κ := IsLocalRing.ResidueField A
   let i : Spec (CommRingCat.of κ) ⟶ Spec (CommRingCat.of A) :=
     Spec.map (CommRingCat.ofHom (IsLocalRing.residue A))
@@ -66,16 +71,18 @@ private theorem exists_section_of_etale_henselian (A : Type) [CommRing A] [Hense
   obtain ⟨⟨s, hs⟩, _⟩ := hb.2 ⟨σ ≫ pullback.fst f i, hg⟩
   exact ⟨s, hs⟩
 
-theorem UpperTheory.etaleCohomology_functorialityAxioms_hold_of_sheafAxioms :
-    GlobalTheory.EtC.B2 := by
+theorem UpperTheory.etaleCohomology_functorialityAxioms_hold_of_sheafAxioms
+    : GlobalTheory.EtC.B2 := by
   intro R _ A _ hA F n hn
   obtain ⟨hHen, hSep⟩ := hA
   refine ⟨fun x y => ?_⟩
   have key : ∀ z : H R (sp A) F n, z = 0 := by
     intro z
-    obtain ⟨Y, f, hE, hS, hz⟩ := GlobalTheory.T.positiveDegreeClasses_die_on_etaleCover R (Spec (CommRingCat.of A)) F n hn z
+    obtain ⟨Y, f, hE, hS, hz⟩ :=
+      GlobalTheory.T.positiveDegreeClasses_die_on_etaleCover R (Spec (CommRingCat.of A)) F n hn z
     obtain ⟨s, hs⟩ := exists_section_of_etale_henselian A f
-    calc z = pull R (𝟙 _) F n z := (pull_id R _ F n z).symm
+    calc
+      z = pull R (𝟙 _) F n z := (pull_id R _ F n z).symm
       _ = pull R (sch.map (s ≫ f)) F n z := by rw [hs, CategoryTheory.Functor.map_id]
       _ = pull R (sch.map s) F n (pull R (sch.map f) F n z) := by
         rw [CategoryTheory.Functor.map_comp, pull_comp]

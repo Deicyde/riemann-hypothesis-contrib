@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
 private lemma realForm_eq_zero {E : Type} [Field E] [NumberField E] {P : Type} [Fintype P] (g : P → (E →+* ℂ))
@@ -66,8 +67,7 @@ private lemma realForm_eq_zero {E : Type} [Field E] [NumberField E] {P : Type} [
   · have h4 := congrArg Complex.im h1'
     simpa using h4
 
-theorem UpperTheory.Gal.W2.Seed.pRealIso :
-    TraceType → RealIso := by
+theorem UpperTheory.Gal.W2.Seed.pRealIso : TraceType → RealIso := by
   intro hT E _ _ _ A n
   classical
   obtain ⟨-, -, hpl, him⟩ := hT E A
@@ -94,19 +94,21 @@ theorem UpperTheory.Gal.W2.Seed.pRealIso :
   have hL : ∀ x, L (1 ⊗ₜ x) = F x := by
     have hcomp : (L.restrictScalars ℤ) ∘ₗ TensorProduct.mk ℤ ℝ (Fin n → 𝓞 E) 1 = F := by
       refine bZ.ext fun k => ?_
-      have hk : ((L.restrictScalars ℤ) ∘ₗ TensorProduct.mk ℤ ℝ (Fin n → 𝓞 E) 1) (bZ k) =
-          L (b1 k) := by
+      have hk
+          : ((L.restrictScalars ℤ) ∘ₗ TensorProduct.mk ℤ ℝ (Fin n → 𝓞 E) 1) (bZ k) = L (b1 k) := by
         rw [Algebra.TensorProduct.basis_apply]
         rfl
       rw [hk, Module.Basis.constr_basis]
     intro x
     exact LinearMap.congr_fun hcomp x
-  have dec : ∀ (φ : Module.Dual ℝ (Phi A × Fin n → ℂ)) p (w : ℂ),
-      φ (Pi.single p w) = w.re * φ (Pi.single p 1) + w.im * φ (Pi.single p Complex.I) := by
+  have dec
+      : ∀ (φ : Module.Dual ℝ (Phi A × Fin n → ℂ)) p (w : ℂ),
+        φ (Pi.single p w) = w.re * φ (Pi.single p 1) + w.im * φ (Pi.single p Complex.I) := by
     intro φ p w
-    have hw : (Pi.single p w : Phi A × Fin n → ℂ) =
-        w.re • (Pi.single p (1 : ℂ) : Phi A × Fin n → ℂ) +
-          w.im • (Pi.single p Complex.I : Phi A × Fin n → ℂ) := by
+    have hw
+        : (Pi.single p w : Phi A × Fin n → ℂ)
+          = w.re • (Pi.single p (1 : ℂ) : Phi A × Fin n → ℂ)
+            + w.im • (Pi.single p Complex.I : Phi A × Fin n → ℂ) := by
       ext q
       by_cases hq : q = p
       · subst hq
@@ -144,8 +146,9 @@ theorem UpperTheory.Gal.W2.Seed.pRealIso :
       have hm : φ (L y) ∈ (LinearMap.range L).map φ := ⟨L y, ⟨y, rfl⟩, rfl⟩
       rw [hφ] at hm
       exact (Submodule.mem_bot ℝ).mp hm
-    have huv : ∀ i : Fin n, ∀ τ : Phi A,
-        φ (Pi.single (τ, i) 1) = 0 ∧ φ (Pi.single (τ, i) Complex.I) = 0 := by
+    have huv
+        : ∀ i : Fin n, ∀ τ : Phi A,
+          φ (Pi.single (τ, i) 1) = 0 ∧ φ (Pi.single (τ, i) Complex.I) = 0 := by
       intro i
       refine realForm_eq_zero (fun τ : Phi A => τ.1) hg _ _ fun x => ?_
       have h1 := hvan (1 ⊗ₜ Pi.single i x)
@@ -173,16 +176,18 @@ theorem UpperTheory.Gal.W2.Seed.pRealIso :
     obtain ⟨τ, i⟩ := p
     rw [dec, (huv i τ).1, (huv i τ).2]
     simp
-  have hdim : Module.finrank ℝ (ℝ ⊗[ℤ] (Fin n → 𝓞 E)) =
-      Module.finrank ℝ (Phi A × Fin n → ℂ) := by
+  have hdim : Module.finrank ℝ (ℝ ⊗[ℤ] (Fin n → 𝓞 E)) = Module.finrank ℝ (Phi A × Fin n → ℂ) := by
     rw [Module.finrank_eq_card_basis b1,
       Module.finrank_eq_card_basis (Pi.basis fun _ : Phi A × Fin n => Complex.basisOneI)]
     simp only [Fintype.card_sigma, Finset.sum_const, Finset.card_univ, smul_eq_mul,
       Fintype.card_fin, Fintype.card_prod]
     rw [← Module.finrank_eq_card_chooseBasisIndex, RingOfIntegers.rank, ← hrank, hcardPhi]
     ring
-  refine ⟨LinearEquiv.ofBijective L
-    ⟨(LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim).mpr hsurj, hsurj⟩, ?_⟩
+  refine ⟨
+    LinearEquiv.ofBijective L
+      ⟨(LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim).mpr hsurj, hsurj⟩,
+    ?_
+  ⟩
   intro x τ i
   show L (1 ⊗ₜ x) (τ, i) = _
   rw [hL]

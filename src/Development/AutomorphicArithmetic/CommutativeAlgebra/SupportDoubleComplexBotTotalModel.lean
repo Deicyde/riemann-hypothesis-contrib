@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleCochain
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC LateralTheory.CohomologicalPurity LateralTheory.CohomologicalPurity.TubeCut UpperTheory.Et.Prd
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC LateralTheory.CohomologicalPurity LateralTheory.CohomologicalPurity.TubeCut
+  UpperTheory.Et.Prd
 
 namespace UpperTheory.ConstantCochains
 
@@ -18,28 +20,33 @@ private theorem map_id' {p : ℕ} {U : Scheme.{0}} (z : Sx E p U) : Sx.map (𝟙
 
 private def cst {U : Scheme.{0}} {a b : ℤ} (e : a = b) (v : Sec (K.X a) U) : Sec (K.X b) U := e ▸ v
 
-private theorem res_cst {V U : Scheme.{0}} (g : V ⟶ U) {a b : ℤ} (e : a = b) (v : Sec (K.X a) U) :
-    Sec.res g (cst e v) = cst e (Sec.res g v) := by
+private theorem res_cst {V U : Scheme.{0}} (g : V ⟶ U) {a b : ℤ} (e : a = b) (v : Sec (K.X a) U)
+    : Sec.res g (cst e v) = cst e (Sec.res g v) := by
   subst e; rfl
 
-private theorem cst_fam (x : (famDC (Sub.bot E) K 0).Tot) (p : ℕ) (U : Scheme.{0}) (z : Sx E p U)
-    {s t : ℤ} (e : t = s) (e' : t + 0 = s + 0) :
-    (show Fam (Sub.bot E) p (K.X (s + 0)) from x p s).1 U z =
-      cst e' ((show Fam (Sub.bot E) p (K.X (t + 0)) from x p t).1 U z) := by
+private theorem cst_fam
+    (x : (famDC (Sub.bot E) K 0).Tot)
+    (p : ℕ) (U : Scheme.{0}) (z : Sx E p U)
+    {s t : ℤ} (e : t = s) (e' : t + 0 = s + 0)
+    : (show Fam (Sub.bot E) p (K.X (s + 0)) from x p s).1 U z
+      = cst e' ((show Fam (Sub.bot E) p (K.X (t + 0)) from x p t).1 U z) := by
   subst e; rfl
 
-private theorem exists_cochain (n : ℤ) (x : (famDC (Sub.bot E) K 0).Tot) :
-    ∃ γ : Cochain ((chains R).obj E) K n, Comp (𝟙 E) γ x := by
+private theorem exists_cochain (n : ℤ) (x : (famDC (Sub.bot E) K 0).Tot)
+    : ∃ γ : Cochain ((chains R).obj E) K n, Comp (𝟙 E) γ x := by
   let a : ∀ (p : ℕ) (s : ℤ), -(p : ℤ) + n = s → ∀ U : Scheme.{0}, Sx E p U → Sec (K.X s) U :=
     fun p s _ U z => cst (add_zero s) ((x p s).1 U z)
-  have ha : ∀ p s h (V U : Scheme.{0}) (g : V ⟶ U) (z : Sx E p U),
-      Sec.res g (a p s h U z) = a p s h V (z.res g) := by
+  have ha
+      : ∀ p s h (V U : Scheme.{0}) (g : V ⟶ U) (z : Sx E p U),
+        Sec.res g (a p s h U z) = a p s h V (z.res g) := by
     intro p s h V U g z
     exact (res_cst g _ _).trans (congrArg (cst (add_zero s)) ((x p s).2.1 V U g z))
-  have components : ∀ (i j : ℤ) (hij : i + n = j), ∃ φ : ((chains R).obj E).X i ⟶ K.X j,
-      ∀ (p : ℕ) (hp : i = -(p : ℤ)) U z,
-        Sec.map ((chainsXIso R E p).inv ≫ eqToHom (congrArg ((chains R).obj E).X hp.symm) ≫ φ)
-          (freeGen R _ U z) = a p j (hp ▸ hij) U z := by
+  have components
+      : ∀ (i j : ℤ) (hij : i + n = j), ∃ φ : ((chains R).obj E).X i ⟶ K.X j,
+        ∀ (p : ℕ) (hp : i = -(p : ℤ)) U z,
+          Sec.map ((chainsXIso R E p).inv ≫ eqToHom (congrArg ((chains R).obj E).X hp.symm) ≫ φ)
+              (freeGen R _ U z)
+            = a p j (hp ▸ hij) U z := by
     intro i j hij
     by_cases hi : i ≤ 0
     · obtain ⟨k, rfl⟩ : ∃ k : ℕ, i = -(k : ℤ) := ⟨(-i).toNat, by omega⟩
@@ -61,10 +68,13 @@ private theorem exists_cochain (n : ℤ) (x : (famDC (Sub.bot E) K 0).Tot) :
   rw [map_id', hγ]
   exact cst_fam x p U z (add_zero s) (add_zero (s + 0))
 
-private theorem eq_zero_of_comp {N : ℤ} (γ : Cochain ((chains R).obj E) K N)
-    (h : Comp (𝟙 E) γ (0 : (famDC (Sub.bot E) K 0).Tot)) : γ = 0 := by
-  have hext : ∀ α β : Cochain ((chains R).obj E) K N,
-      (∀ p s h U z, ev α p s h U z = ev β p s h U z) → α = β := by
+private theorem eq_zero_of_comp
+    {N : ℤ}
+    (γ : Cochain ((chains R).obj E) K N) (h : Comp (𝟙 E) γ (0 : (famDC (Sub.bot E) K 0).Tot))
+    : γ = 0 := by
+  have hext
+      : ∀ α β : Cochain ((chains R).obj E) K N,
+        (∀ p s h U z, ev α p s h U z = ev β p s h U z) → α = β := by
     intro α β H
     ext p s hs : 1
     by_cases hp : p ≤ 0
@@ -81,22 +91,33 @@ private theorem eq_zero_of_comp {N : ℤ} (γ : Cochain ((chains R).obj E) K N)
   simp [ev]
   rfl
 
-private theorem eq_of_comp {N : ℤ} (γ γ' : Cochain ((chains R).obj E) K N)
-    (x : (famDC (Sub.bot E) K 0).Tot) (h : Comp (𝟙 E) γ x) (h' : Comp (𝟙 E) γ' x) : γ = γ' := by
-  have h2 := (UpperTheory.supportDoubleComplex_total_represents_vanishing_cochain R (𝟙 E) (Sub.bot E) K 0 N N (add_zero N)).2.2.2.1 γ γ' x x h h'
+private theorem eq_of_comp
+    {N : ℤ} (γ γ' : Cochain ((chains R).obj E) K N)
+    (x : (famDC (Sub.bot E) K 0).Tot) (h : Comp (𝟙 E) γ x) (h' : Comp (𝟙 E) γ' x)
+    : γ = γ' := by
+  have h2 :=
+    (UpperTheory.supportDoubleComplex_total_represents_vanishing_cochain R (𝟙 E) (Sub.bot E) K 0 N N
+      (add_zero N)).2.2.2.1 γ γ' x x h h'
   rw [sub_self] at h2
   exact sub_eq_zero.1 (eq_zero_of_comp _ h2)
 
 end UpperTheory.ConstantCochains
 
 open UpperTheory.ConstantCochains in
-theorem UpperTheory.supportDoubleComplex_bot_totalModel :
-    ∀ (R : Type) [CommRing R] (E : Spc) (K : Cx R) (n : ℤ), TModel (famDC (Sub.bot E) K 0) n (HRel (E := E) (K := K) (n := n)) := by
+theorem UpperTheory.supportDoubleComplex_bot_totalModel
+    : ∀ (R : Type) [CommRing R] (E : Spc) (K : Cx R) (n : ℤ),
+      TModel (famDC (Sub.bot E) K 0) n (HRel (E := E) (K := K) (n := n)) := by
   intro R _ E K n
   obtain ⟨k, rfl⟩ : ∃ k, n = k + 1 := ⟨n - 1, by omega⟩
-  have Ik := UpperTheory.supportDoubleComplex_total_represents_vanishing_cochain R (𝟙 E) (Sub.bot E) K 0 k k (add_zero k)
-  have I1 := UpperTheory.supportDoubleComplex_total_represents_vanishing_cochain R (𝟙 E) (Sub.bot E) K 0 (k + 1) (k + 1) (add_zero _)
-  have I2 := UpperTheory.supportDoubleComplex_total_represents_vanishing_cochain R (𝟙 E) (Sub.bot E) K 0 (k + 1 + 1) (k + 1 + 1) (add_zero _)
+  have Ik :=
+    UpperTheory.supportDoubleComplex_total_represents_vanishing_cochain R (𝟙 E) (Sub.bot E) K 0 k k
+      (add_zero k)
+  have I1 :=
+    UpperTheory.supportDoubleComplex_total_represents_vanishing_cochain R (𝟙 E) (Sub.bot E) K 0
+      (k + 1) (k + 1) (add_zero _)
+  have I2 :=
+    UpperTheory.supportDoubleComplex_total_represents_vanishing_cochain R (𝟙 E) (Sub.bot E) K 0
+      (k + 1 + 1) (k + 1 + 1) (add_zero _)
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro x hx hD
     obtain ⟨γ, hγ⟩ := exists_cochain (k + 1) x

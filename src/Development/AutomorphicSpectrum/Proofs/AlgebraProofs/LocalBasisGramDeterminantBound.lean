@@ -27,7 +27,9 @@ def locRing (ℓ : Nat.Primes) : Subring E where
     refine ⟨n * m, a * b, fun h => ?_, ?_⟩
     · rcases (Nat.Prime.dvd_mul ℓ.2).1 h with h | h
       exacts [hn h, hm h]
-    · rw [Nat.cast_mul, show ((a * b : 𝓞 E) : E) = (a : E) * (b : E) from map_mul (algebraMap (𝓞 E) E) a b, ← ha, ← hb]
+    · rw [Nat.cast_mul,
+        show ((a * b : 𝓞 E) : E) = (a : E) * (b : E) from map_mul (algebraMap (𝓞 E) E) a b, ← ha,
+        ← hb]
       ring
   one_mem' := ⟨1, 1, by simpa using ℓ.2.one_lt.ne', by simp⟩
   add_mem' := by
@@ -35,8 +37,10 @@ def locRing (ℓ : Nat.Primes) : Subring E where
     refine ⟨n * m, (m : 𝓞 E) * a + (n : 𝓞 E) * b, fun h => ?_, ?_⟩
     · rcases (Nat.Prime.dvd_mul ℓ.2).1 h with h | h
       exacts [hn h, hm h]
-    · rw [Nat.cast_mul, show (((m : 𝓞 E) * a + (n : 𝓞 E) * b : 𝓞 E) : E) = (m : E) * (a : E) + (n : E) * (b : E) by
-        simp [map_add (f := _), map_mul (algebraMap (𝓞 E) E)], ← ha, ← hb]
+    · rw [Nat.cast_mul,
+        show (((m : 𝓞 E) * a + (n : 𝓞 E) * b : 𝓞 E) : E) = (m : E) * (a : E) + (n : E) * (b : E) by
+          simp [map_add (f := _), map_mul (algebraMap (𝓞 E) E)],
+        ← ha, ← hb]
       ring
   zero_mem' := ⟨1, 0, by simpa using ℓ.2.one_lt.ne', by simp⟩
   neg_mem' := by
@@ -50,8 +54,8 @@ variable {E}
 theorem coe_mem_locRing (ℓ : Nat.Primes) (a : 𝓞 E) : (a : E) ∈ locRing E ℓ :=
   ⟨1, a, by simpa using ℓ.2.one_lt.ne', by simp⟩
 
-theorem inv_natCast_mem_locRing {ℓ : Nat.Primes} {n : ℕ} (hn : ¬ (ℓ : ℕ) ∣ n) :
-    ((n : E))⁻¹ ∈ locRing E ℓ := by
+theorem inv_natCast_mem_locRing {ℓ : Nat.Primes} {n : ℕ} (hn : ¬ (ℓ : ℕ) ∣ n)
+    : ((n : E))⁻¹ ∈ locRing E ℓ := by
   have h0 : (n : E) ≠ 0 := by
     rintro h
     exact hn (by simp [Nat.cast_eq_zero.1 h])
@@ -59,54 +63,65 @@ theorem inv_natCast_mem_locRing {ℓ : Nat.Primes} {n : ℕ} (hn : ¬ (ℓ : ℕ
 
 variable (E)
 
-def conjLoc [IsCMField E] (ℓ : Nat.Primes) (x : locRing E ℓ) : locRing E ℓ :=
-  ⟨IsCMField.complexConj E (x : E), by
+def conjLoc [IsCMField E] (ℓ : Nat.Primes) (x : locRing E ℓ) : locRing E ℓ := ⟨
+  IsCMField.complexConj E (x : E),
+  by
     obtain ⟨n, a, hn, ha⟩ := x.2
     refine ⟨n, ⟨IsCMField.complexConj E (a : E), ?_⟩, hn, ?_⟩
     · exact (a.2).map (IsCMField.complexConj E)
-    · rw [show ((n : E)) = IsCMField.complexConj E (n : E) from (map_natCast _ n).symm, ← map_mul, ha]
-      rfl⟩
+    · rw [show ((n : E)) = IsCMField.complexConj E (n : E) from (map_natCast _ n).symm, ← map_mul,
+        ha]
+      rfl
+⟩
 
 instance instStarLocRing [IsCMField E] (ℓ : Nat.Primes) : StarRing (locRing E ℓ) where
   star := conjLoc E ℓ
   star_involutive x := Subtype.ext (IsCMField.complexConj_apply_apply E (x : E))
-  star_mul x y := Subtype.ext (by
-    change IsCMField.complexConj E ((x : E) * (y : E)) =
-      IsCMField.complexConj E (y : E) * IsCMField.complexConj E (x : E)
-    rw [map_mul, mul_comm])
+  star_mul x y :=
+    Subtype.ext (by
+      change IsCMField.complexConj E ((x : E) * (y : E))
+        = IsCMField.complexConj E (y : E) * IsCMField.complexConj E (x : E)
+      rw [map_mul, mul_comm])
   star_add x y := Subtype.ext (map_add (IsCMField.complexConj E) (x : E) (y : E))
 
 variable {E}
 
-@[simp] theorem coe_star_locRing [IsCMField E] {ℓ : Nat.Primes} (x : locRing E ℓ) :
-    ((star x : locRing E ℓ) : E) = IsCMField.complexConj E (x : E) := rfl
+@[simp]
+theorem coe_star_locRing [IsCMField E] {ℓ : Nat.Primes} (x : locRing E ℓ)
+    : ((star x : locRing E ℓ) : E) = IsCMField.complexConj E (x : E) :=
+  rfl
 
 def ofInt (ℓ : Nat.Primes) : 𝓞 E →+* locRing E ℓ :=
   (algebraMap (𝓞 E) E).codRestrict (locRing E ℓ) (coe_mem_locRing ℓ)
 
-theorem isUnit_natCast_loc {ℓ : Nat.Primes} {n : ℕ} (hn : ¬ (ℓ : ℕ) ∣ n) :
-    IsUnit ((n : locRing E ℓ)) := by
+theorem isUnit_natCast_loc {ℓ : Nat.Primes} {n : ℕ} (hn : ¬ (ℓ : ℕ) ∣ n)
+    : IsUnit ((n : locRing E ℓ)) := by
   have h0 : (n : E) ≠ 0 := fun h => hn (by simp [Nat.cast_eq_zero.1 h])
-  refine IsUnit.of_mul_eq_one (⟨(n : E)⁻¹, inv_natCast_mem_locRing hn⟩ : locRing E ℓ) (Subtype.ext ?_)
+  refine IsUnit.of_mul_eq_one (⟨(n : E)⁻¹, inv_natCast_mem_locRing hn⟩ : locRing E ℓ)
+    (Subtype.ext ?_)
   simp [h0]
 
-theorem exists_natCast_mul_eq {ℓ : Nat.Primes} (x : locRing E ℓ) :
-    ∃ (n : ℕ) (a : 𝓞 E), ¬ (ℓ : ℕ) ∣ n ∧ (n : locRing E ℓ) * x = ofInt ℓ a := by
+theorem exists_natCast_mul_eq {ℓ : Nat.Primes} (x : locRing E ℓ)
+    : ∃ (n : ℕ) (a : 𝓞 E), ¬ (ℓ : ℕ) ∣ n ∧ (n : locRing E ℓ) * x = ofInt ℓ a := by
   obtain ⟨n, a, hn, ha⟩ := x.2
   exact ⟨n, a, hn, Subtype.ext (by simpa [ofInt, RingOfIntegers.coe_eq_algebraMap] using ha)⟩
 
-theorem comap_injective {ℓ : Nat.Primes} {m m' : Ideal (locRing E ℓ)} (hm' : m'.IsPrime) (hm : m.IsPrime)
-    (h : m.comap (ofInt ℓ) = m'.comap (ofInt ℓ)) : m ≤ m' := by
+theorem comap_injective
+    {ℓ : Nat.Primes} {m m' : Ideal (locRing E ℓ)}
+    (hm' : m'.IsPrime) (hm : m.IsPrime) (h : m.comap (ofInt ℓ) = m'.comap (ofInt ℓ))
+    : m ≤ m' := by
   intro x hx
   obtain ⟨n, a, hn, e⟩ := exists_natCast_mul_eq x
   have h1 : a ∈ m.comap (ofInt ℓ) := by
     rw [Ideal.mem_comap, ← e]
     exact m.mul_mem_left _ hx
   rw [h, Ideal.mem_comap, ← e] at h1
-  exact (hm'.mem_or_mem h1).resolve_left fun h2 => hm'.ne_top (Ideal.eq_top_of_isUnit_mem _ h2 (isUnit_natCast_loc hn))
+  exact (hm'.mem_or_mem h1).resolve_left fun h2 =>
+    hm'.ne_top (Ideal.eq_top_of_isUnit_mem _ h2 (isUnit_natCast_loc hn))
 
-theorem natCast_mem_comap {ℓ : Nat.Primes} {m : Ideal (locRing E ℓ)} (hm : m.IsPrime)
-    (h0 : m.comap (ofInt ℓ) ≠ ⊥) : ((ℓ : ℕ) : 𝓞 E) ∈ m.comap (ofInt ℓ) := by
+theorem natCast_mem_comap
+    {ℓ : Nat.Primes} {m : Ideal (locRing E ℓ)} (hm : m.IsPrime) (h0 : m.comap (ofInt ℓ) ≠ ⊥)
+    : ((ℓ : ℕ) : 𝓞 E) ∈ m.comap (ofInt ℓ) := by
   haveI : (m.comap (ofInt ℓ)).IsPrime := Ideal.comap_isPrime _ _
   set P := m.comap (ofInt ℓ) with hP
   have hN : Ideal.absNorm P ≠ 0 := fun h => h0 (Ideal.absNorm_eq_zero_iff.1 h)
@@ -121,14 +136,20 @@ theorem natCast_mem_comap {ℓ : Nat.Primes} {m : Ideal (locRing E ℓ)} (hm : m
 
 theorem finite_maxSpec (ℓ : Nat.Primes) : Finite (MaximalSpectrum (locRing E ℓ)) := by
   classical
-  have hℓ : Ideal.span {((ℓ : ℕ) : 𝓞 E)} ≠ 0 := by
-    simpa using ℓ.2.ne_zero
+  have hℓ : Ideal.span {((ℓ : ℕ) : 𝓞 E)} ≠ 0 := by simpa using ℓ.2.ne_zero
   haveI : Fintype {P : Ideal (𝓞 E) // P ∣ Ideal.span {((ℓ : ℕ) : 𝓞 E)}} :=
     UniqueFactorizationMonoid.fintypeSubtypeDvd _ hℓ
-  let f : MaximalSpectrum (locRing E ℓ) → Option {P : Ideal (𝓞 E) // P ∣ Ideal.span {((ℓ : ℕ) : 𝓞 E)}} :=
-    fun m => if h : m.asIdeal.comap (ofInt ℓ) = ⊥ then none else
-      some ⟨m.asIdeal.comap (ofInt ℓ), Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2
-        (natCast_mem_comap m.isMaximal.isPrime h))⟩
+  let f
+      : MaximalSpectrum (locRing E ℓ)
+        → Option {P : Ideal (𝓞 E) // P ∣ Ideal.span {((ℓ : ℕ) : 𝓞 E)}} := fun m =>
+    if h : m.asIdeal.comap (ofInt ℓ) = ⊥ then
+      none
+    else
+      some ⟨
+        m.asIdeal.comap (ofInt ℓ),
+        Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2
+          (natCast_mem_comap m.isMaximal.isPrime h))
+      ⟩
   refine Finite.of_injective f fun m m' e => ?_
   have hc : m.asIdeal.comap (ofInt ℓ) = m'.asIdeal.comap (ofInt ℓ) := by
     by_cases h : m.asIdeal.comap (ofInt ℓ) = ⊥ <;> by_cases h' : m'.asIdeal.comap (ofInt ℓ) = ⊥
@@ -145,8 +166,9 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 variable [IsCMField E]
 
-theorem exists_sub_star_notMem (H : Host E) (ℓ : Nat.Primes) (m : Ideal (locRing E ℓ)) (hm : m.IsMaximal) :
-    ∃ a : locRing E ℓ, a - star a ∉ m := by
+theorem exists_sub_star_notMem
+    (H : Host E) (ℓ : Nat.Primes) (m : Ideal (locRing E ℓ)) (hm : m.IsMaximal)
+    : ∃ a : locRing E ℓ, a - star a ∉ m := by
   haveI : (m.comap (ofInt ℓ)).IsPrime := Ideal.comap_isPrime _ _
   have key : ∃ a : 𝓞 E, a - H.bar a ∉ m.comap (ofInt ℓ) := by
     by_cases h0 : m.comap (ofInt ℓ) = ⊥
@@ -156,7 +178,8 @@ theorem exists_sub_star_notMem (H : Host E) (ℓ : Nat.Primes) (m : Ideal (locRi
       rw [h0, Ideal.mem_bot]
       intro h
       exact ha (h ▸ M.zero_mem)
-    · exact GlobalTheory.T.exists_not_mem_sub_conj E H.bar H.bar_eq H.unram _ (Ideal.IsPrime.isMaximal inferInstance h0)
+    · exact GlobalTheory.T.exists_not_mem_sub_conj E H.bar H.bar_eq H.unram _
+        (Ideal.IsPrime.isMaximal inferInstance h0)
   obtain ⟨a, ha⟩ := key
   refine ⟨ofInt ℓ a, fun h => ha ?_⟩
   rw [Ideal.mem_comap, map_sub]
@@ -173,22 +196,27 @@ theorem sesq_zero_right (D : Datum H) (y : D.La) : sesq D y 0 = 0 := by
   have := (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.2.2.1 0 y 0
   simpa using this
 
-theorem sesq_sum_left (D : Datum H) {ι : Type} (s : Finset ι) (a : ι → 𝓞 E) (x : ι → D.La) (y : D.La) :
-    sesq D (∑ i ∈ s, a i • x i) y = ∑ i ∈ s, (a i : E) * sesq D (x i) y := by
+theorem sesq_sum_left
+    (D : Datum H) {ι : Type} (s : Finset ι) (a : ι → 𝓞 E) (x : ι → D.La) (y : D.La)
+    : sesq D (∑ i ∈ s, a i • x i) y = ∑ i ∈ s, (a i : E) * sesq D (x i) y := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [sesq_zero_left]
   | insert i s hi ih =>
-    rw [Finset.sum_insert hi, Finset.sum_insert hi, (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.1, ih,
+    rw [Finset.sum_insert hi, Finset.sum_insert hi,
+      (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.1, ih,
       (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.2.1]
 
-theorem sesq_sum_right (D : Datum H) {ι : Type} (s : Finset ι) (a : ι → 𝓞 E) (x : ι → D.La) (y : D.La) :
-    sesq D y (∑ i ∈ s, a i • x i) = ∑ i ∈ s, IsCMField.complexConj E (a i : E) * sesq D y (x i) := by
+theorem sesq_sum_right
+    (D : Datum H) {ι : Type} (s : Finset ι) (a : ι → 𝓞 E) (x : ι → D.La) (y : D.La)
+    : sesq D y (∑ i ∈ s, a i • x i)
+      = ∑ i ∈ s, IsCMField.complexConj E (a i : E) * sesq D y (x i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [sesq_zero_right]
   | insert i s hi ih =>
-    rw [Finset.sum_insert hi, Finset.sum_insert hi, (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.1, ih,
+    rw [Finset.sum_insert hi, Finset.sum_insert hi,
+      (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.1, ih,
       (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.2.2.1]
 
 theorem eq_zero_of_sesq_eq_zero (D : Datum H) (y : D.La) (h : ∀ z, sesq D y z = 0) : y = 0 := by
@@ -199,8 +227,11 @@ theorem eq_zero_of_sesq_eq_zero (D : Datum H) (y : D.La) (h : ∀ z, sesq D y z 
   rw [one_smul, h z] at this
   simpa using this.symm
 
-theorem gram_det_ne_zero (D : Datum H) {I : Type} [Fintype I] [DecidableEq I] (x : I → D.La) (ℓ : ℕ)
-    (hℓ : ℓ.Prime) (hx : IsLocBasis (𝓞 E) ℓ x) : (gramE D x).det ≠ 0 := by
+theorem gram_det_ne_zero
+    (D : Datum H)
+    {I : Type} [Fintype I] [DecidableEq I]
+    (x : I → D.La) (ℓ : ℕ) (hℓ : ℓ.Prime) (hx : IsLocBasis (𝓞 E) ℓ x)
+    : (gramE D x).det ≠ 0 := by
   intro h
   obtain ⟨v, hv, hv0⟩ := Matrix.exists_vecMul_eq_zero_iff.2 h
   obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors (𝓞 E)) v
@@ -226,12 +257,16 @@ theorem gram_det_ne_zero (D : Datum H) {I : Type} [Fintype I] [DecidableEq I] (x
     induction hw using Submodule.span_induction with
     | mem w hw => obtain ⟨n, rfl⟩ := hw; exact h1 n
     | zero => exact sesq_zero_right D y
-    | add u w _ _ hu hw => rw [(GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.1, hu, hw, add_zero]
-    | smul a w _ hw => rw [(GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.2.2.1, hw, mul_zero]
+    | add u w _ _ hu hw =>
+      rw [(GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.1, hu, hw, add_zero]
+    | smul a w _ hw =>
+      rw [(GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.2.2.1, hw, mul_zero]
   have h3 : y = 0 := by
     refine eq_zero_of_sesq_eq_zero D y fun z => ?_
     have := h2 _ (hspan z)
-    rw [← Nat.cast_smul_eq_nsmul (𝓞 E), (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.2.2.1] at this
+    rw [← Nat.cast_smul_eq_nsmul (𝓞 E),
+        (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.2.2.1]
+      at this
     simpa [hN0] using this
   have h4 := Fintype.linearIndependent_iff.1 hli c h3
   apply hv
@@ -247,8 +282,8 @@ section Norm
 theorem norm_le_one {ℓ : Nat.Primes} (x : locRing E ℓ) (j : E →+* ℂ_[ℓ]) : ‖j (x : E)‖ ≤ 1 :=
   (GlobalTheory.T.padic_integral_iff_denominator E ℓ (x : E)).2 x.2 j
 
-theorem norm_eq_one_of_isUnit {ℓ : Nat.Primes} {u : locRing E ℓ} (hu : IsUnit u) (j : E →+* ℂ_[ℓ]) :
-    ‖j (u : E)‖ = 1 := by
+theorem norm_eq_one_of_isUnit {ℓ : Nat.Primes} {u : locRing E ℓ} (hu : IsUnit u) (j : E →+* ℂ_[ℓ])
+    : ‖j (u : E)‖ = 1 := by
   obtain ⟨v, hv⟩ := hu.exists_right_inv
   have h1 : ‖j (u : E)‖ * ‖j (v : E)‖ = 1 := by
     rw [← norm_mul, ← map_mul, ← Subring.coe_mul, hv]
@@ -257,14 +292,16 @@ theorem norm_eq_one_of_isUnit {ℓ : Nat.Primes} {u : locRing E ℓ} (hu : IsUni
   have h3 := norm_le_one v j
   nlinarith [norm_nonneg (j (u : E)), norm_nonneg (j (v : E))]
 
-theorem isUnit_of_norm_eq_one {ℓ : Nat.Primes} (u : locRing E ℓ) (h0 : (u : E) ≠ 0)
-    (h : ∀ j : E →+* ℂ_[ℓ], ‖j (u : E)‖ = 1) : IsUnit u := by
-  have h1 : (u : E)⁻¹ ∈ locRing E ℓ := (GlobalTheory.T.padic_integral_iff_denominator E ℓ _).1 fun j => by
-    rw [map_inv₀, norm_inv, h j, inv_one]
+theorem isUnit_of_norm_eq_one
+    {ℓ : Nat.Primes} (u : locRing E ℓ) (h0 : (u : E) ≠ 0) (h : ∀ j : E →+* ℂ_[ℓ], ‖j (u : E)‖ = 1)
+    : IsUnit u := by
+  have h1 : (u : E)⁻¹ ∈ locRing E ℓ :=
+    (GlobalTheory.T.padic_integral_iff_denominator E ℓ _).1 fun j => by
+      rw [map_inv₀, norm_inv, h j, inv_one]
   exact IsUnit.of_mul_eq_one (⟨_, h1⟩ : locRing E ℓ) (Subtype.ext (by simp [h0]))
 
-theorem exists_common_denom {ℓ : Nat.Primes} {ι : Type} [Fintype ι] (f : ι → locRing E ℓ) :
-    ∃ (N : ℕ) (a : ι → 𝓞 E), ¬ (ℓ : ℕ) ∣ N ∧ ∀ i, (N : E) * f i = a i := by
+theorem exists_common_denom {ℓ : Nat.Primes} {ι : Type} [Fintype ι] (f : ι → locRing E ℓ)
+    : ∃ (N : ℕ) (a : ι → 𝓞 E), ¬ (ℓ : ℕ) ∣ N ∧ ∀ i, (N : E) * f i = a i := by
   classical
   choose n a hn ha using fun i => (f i).2
   refine ⟨∏ i, n i, fun i => ((∏ k ∈ Finset.univ.erase i, n k : ℕ) : 𝓞 E) * a i, ?_, fun i => ?_⟩
@@ -280,8 +317,11 @@ theorem exists_common_denom {ℓ : Nat.Primes} {ι : Type} [Fintype ι] (f : ι 
         · exact hn i hd
         · exact ih hd
     exact hprod Finset.univ h
-  · rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ i), show (((∏ k ∈ Finset.univ.erase i, n k : ℕ) : 𝓞 E) * a i : 𝓞 E).val = ((∏ k ∈ Finset.univ.erase i, n k : ℕ) : E) * (a i : E) by
-      simp [RingOfIntegers.coe_eq_algebraMap] , ← ha i]
+  · rw [← Finset.mul_prod_erase _ _ (Finset.mem_univ i),
+      show (((∏ k ∈ Finset.univ.erase i, n k : ℕ) : 𝓞 E) * a i : 𝓞 E).val
+          = ((∏ k ∈ Finset.univ.erase i, n k : ℕ) : E) * (a i : E) by
+        simp [RingOfIntegers.coe_eq_algebraMap],
+      ← ha i]
     push_cast
     ring
 
@@ -289,10 +329,14 @@ end Norm
 
 section Comb
 
-theorem isLocBasis_comb {O M : Type} [CommRing O] [IsDomain O] [AddCommGroup M] [Module O M] {ι : Type} [Fintype ι]
-    [DecidableEq ι] {x : ι → M} {ℓ : ℕ} (hℓ : ℓ.Prime) (A B : Matrix ι ι O) (N : ℕ) (hN : ¬ ℓ ∣ N) (hN0 : (N : O) ≠ 0)
-    (hBA : B * A = (N : O) • (1 : Matrix ι ι O)) (hx : IsLocBasis O ℓ x) :
-    IsLocBasis O ℓ (fun a => ∑ k, A a k • x k) := by
+theorem isLocBasis_comb
+    {O M : Type} [CommRing O] [IsDomain O] [AddCommGroup M] [Module O M]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {x : ι → M} {ℓ : ℕ} (hℓ : ℓ.Prime)
+    (A B : Matrix ι ι O) (N : ℕ)
+    (hN : ¬ ℓ ∣ N) (hN0 : (N : O) ≠ 0) (hBA : B * A = (N : O) • (1 : Matrix ι ι O))
+    (hx : IsLocBasis O ℓ x)
+    : IsLocBasis O ℓ (fun a => ∑ k, A a k • x k) := by
   obtain ⟨hli, n, hn, hspan⟩ := hx
   have hdet : A.det ≠ 0 := by
     intro h
@@ -326,7 +370,9 @@ theorem isLocBasis_comb {O M : Type} [CommRing O] [IsDomain O] [AddCommGroup M] 
         simp [ite_smul, ← Nat.cast_smul_eq_nsmul O]
       rw [h2]
       exact Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
-    have h4 : ∀ w ∈ Submodule.span O (Set.range x), N • w ∈ Submodule.span O (Set.range fun a => ∑ k, A a k • x k) := by
+    have h4
+        : ∀ w ∈ Submodule.span O (Set.range x),
+          N • w ∈ Submodule.span O (Set.range fun a => ∑ k, A a k • x k) := by
       intro w hw
       induction hw using Submodule.span_induction with
       | mem w hw => obtain ⟨k, rfl⟩ := hw; exact h1 k
@@ -344,16 +390,18 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor Matrix
 
 variable [IsCMField E]
 
-theorem exists_diag_basis (H : Host E) (D : Datum H) (n : ℕ) (hn : n = D.p + D.q) (ℓ : Nat.Primes) :
-    ∃ (x : Fin n → D.La) (δ : 𝓞 E), IsLocBasis (𝓞 E) ℓ x ∧ (δ : E) ≠ 0 ∧
-      (∀ j : E →+* ℂ_[ℓ], Real.log ‖j (δ : E)‖ =
-        logIdeal (j.comp (algebraMap (𝓞 E) E)) (differentIdeal ℤ (𝓞 E))) ∧
-      (∀ a b, a ≠ b → sesq D (x a) (x b) = 0) ∧
-      ∀ a, ∃ u : locRing E ℓ, IsUnit u ∧ (δ : E) * sesq D (x a) (x a) = u := by
+theorem exists_diag_basis (H : Host E) (D : Datum H) (n : ℕ) (hn : n = D.p + D.q) (ℓ : Nat.Primes)
+    : ∃ (x : Fin n → D.La) (δ : 𝓞 E),
+      IsLocBasis (𝓞 E) ℓ x ∧ (δ : E) ≠ 0
+        ∧ (∀ j : E →+* ℂ_[ℓ],
+          Real.log ‖j (δ : E)‖ = logIdeal (j.comp (algebraMap (𝓞 E) E)) (differentIdeal ℤ (𝓞 E)))
+        ∧ (∀ a b, a ≠ b → sesq D (x a) (x b) = 0)
+        ∧ ∀ a, ∃ u : locRing E ℓ, IsUnit u ∧ (δ : E) * sesq D (x a) (x a) = u := by
   haveI := finite_maxSpec (E := E) ℓ
   haveI := D.fin
   haveI := D.proj
-  obtain ⟨x, hx⟩ := GlobalTheory.T.exists_local_basis' E D.La (Fin n) (ℓ : ℕ) ℓ.2 (by simp [D.rank, hn])
+  obtain ⟨x, hx⟩ :=
+    GlobalTheory.T.exists_local_basis' E D.La (Fin n) (ℓ : ℕ) ℓ.2 (by simp [D.rank, hn])
   obtain ⟨δ, hδ, hδ0, hδc, hδj⟩ := GlobalTheory.T.exists_real_different_generator E H.unram ℓ
   have hδE : (δ : E) ≠ 0 := by exact_mod_cast hδ0
   have hint := (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.2.2.2.2 δ hδ
@@ -365,8 +413,8 @@ theorem exists_diag_basis (H : Host E) (D : Datum H) (n : ℕ) (hn : n = D.p + D
   have hGc : ∀ a b, ((G a b : locRing E ℓ) : E) = (δ : E) * sesq D (x a) (x b) := fun _ _ => rfl
   have hG : Gᴴ = -G := by
     ext a b
-    rw [Matrix.conjTranspose_apply, Matrix.neg_apply, coe_star_locRing, hGc, Subring.coe_neg, hGc, map_mul, hδc,
-      (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.2.2.2.1 (x b) (x a)]
+    rw [Matrix.conjTranspose_apply, Matrix.neg_apply, coe_star_locRing, hGc, Subring.coe_neg, hGc,
+      map_mul, hδc, (GlobalTheory.T.sesq_sesquilinear_skew_hermitian E H D).2.2.2.2.2.1 (x b) (x a)]
     ring
   have hGdet : ((G.det : locRing E ℓ) : E) = (δ : E) ^ n * (gramE D x).det := by
     have h1 : (locRing E ℓ).subtype.mapMatrix G = (δ : E) • gramE D x := by
@@ -377,7 +425,8 @@ theorem exists_diag_basis (H : Host E) (D : Datum H) (n : ℕ) (hn : n = D.p + D
     exact h2
   have hd0 := gram_det_ne_zero D x ℓ ℓ.2 hx
   have hGu : IsUnit G.det := by
-    refine isUnit_of_norm_eq_one _ (by rw [hGdet]; exact mul_ne_zero (pow_ne_zero _ hδE) hd0) fun j => ?_
+    refine isUnit_of_norm_eq_one _ (by rw [hGdet]; exact mul_ne_zero (pow_ne_zero _ hδE) hd0)
+      fun j => ?_
     have h1 := GlobalTheory.T.gram_determinant_log_different E H D (Fin n) x ℓ hx j
     have h2 := hδj j
     have h3 : 0 < ‖j (δ : E)‖ := norm_pos_iff.2 ((map_ne_zero j).2 hδE)
@@ -386,7 +435,8 @@ theorem exists_diag_basis (H : Host E) (D : Datum H) (n : ℕ) (hn : n = D.p + D
     refine Real.eq_one_of_pos_of_log_eq_zero (by positivity) ?_
     rw [Real.log_mul (by positivity) h4.ne', Real.log_pow, h1, h2, Fintype.card_fin]
     ring
-  obtain ⟨T, hTu, hTd⟩ := GlobalTheory.T.skew_hermitian_diagonalizable _ n G hG hGu (exists_sub_star_notMem H ℓ)
+  obtain ⟨T, hTu, hTd⟩ :=
+    GlobalTheory.T.skew_hermitian_diagonalizable _ n G hG hGu (exists_sub_star_notMem H ℓ)
   obtain ⟨N, A, hN, hA⟩ := exists_common_denom (ι := Fin n × Fin n) (fun q => T q.1 q.2)
   obtain ⟨N', B, hN', hB⟩ := exists_common_denom (ι := Fin n × Fin n) (fun q => T⁻¹ q.1 q.2)
   have hN0 : (N : E) ≠ 0 := fun h => hN (by simp [Nat.cast_eq_zero.1 h])
@@ -396,7 +446,9 @@ theorem exists_diag_basis (H : Host E) (D : Datum H) (n : ℕ) (hn : n = D.p + D
   have hinv : T⁻¹ * T = 1 := Matrix.nonsing_inv_mul T hTu
   have hBA : Bm * Am = (((N' * N : ℕ)) : 𝓞 E) • (1 : Matrix (Fin n) (Fin n) (𝓞 E)) := by
     ext a b
-    have h1 : (((T⁻¹ * T) a b : locRing E ℓ) : E) = ∑ k, ((T⁻¹ a k : locRing E ℓ) : E) * (T k b : E) := by
+    have h1
+        : (((T⁻¹ * T) a b : locRing E ℓ) : E)
+          = ∑ k, ((T⁻¹ a k : locRing E ℓ) : E) * (T k b : E) := by
       rw [Matrix.mul_apply]
       simp
     rw [hinv] at h1
@@ -405,8 +457,9 @@ theorem exists_diag_basis (H : Host E) (D : Datum H) (n : ℕ) (hn : n = D.p + D
       simp [Bm, Am, RingOfIntegers.coe_eq_algebraMap]
     rw [h2]
     simp only [← hA, ← hB]
-    have h3 : ∑ k, ((N' : E) * ((T⁻¹ a k : locRing E ℓ) : E)) * ((N : E) * (T k b : E)) =
-        (N' : E) * N * ∑ k, ((T⁻¹ a k : locRing E ℓ) : E) * (T k b : E) := by
+    have h3
+        : ∑ k, ((N' : E) * ((T⁻¹ a k : locRing E ℓ) : E)) * ((N : E) * (T k b : E))
+          = (N' : E) * N * ∑ k, ((T⁻¹ a k : locRing E ℓ) : E) * (T k b : E) := by
       rw [Finset.mul_sum]
       exact Finset.sum_congr rfl fun _ _ => by ring
     rw [h3, ← h1]
@@ -426,12 +479,17 @@ theorem exists_diag_basis (H : Host E) (D : Datum H) (n : ℕ) (hn : n = D.p + D
   have hx' := isLocBasis_comb ℓ.2 Am Bm (N' * N) hNN hNN0 hBA hx
   set x' : Fin n → D.La := fun a => ∑ k, Am a k • x k with hx'def
   set W := T * G * Tᴴ with hW
-  have hconjN : ∀ a b, IsCMField.complexConj E ((Am a b : 𝓞 E) : E) =
-      (N : E) * IsCMField.complexConj E ((T a b : locRing E ℓ) : E) := fun a b => by
+  have hconjN
+      : ∀ a b,
+        IsCMField.complexConj E ((Am a b : 𝓞 E) : E)
+          = (N : E) * IsCMField.complexConj E ((T a b : locRing E ℓ) : E) := fun a b => by
     have : ((Am a b : 𝓞 E) : E) = (N : E) * (T a b : E) := (hA (a, b)).symm
     rw [this, map_mul, map_natCast]
-  have hWc : ∀ a b, (W a b : E) = ∑ l, (∑ k, (T a k : E) * ((δ : E) * sesq D (x k) (x l))) *
-      IsCMField.complexConj E ((T b l : locRing E ℓ) : E) := by
+  have hWc
+      : ∀ a b,
+        (W a b : E)
+          = ∑ l, (∑ k, (T a k : E) * ((δ : E) * sesq D (x k) (x l))) *
+            IsCMField.complexConj E ((T b l : locRing E ℓ) : E) := by
     intro a b
     rw [hW, Matrix.mul_apply]
     simp [Matrix.mul_apply, hGc]
@@ -456,8 +514,15 @@ theorem exists_diag_basis (H : Host E) (D : Datum H) (n : ℕ) (hn : n = D.p + D
       rfl
     rw [h1] at hdetW
     exact isUnit_of_dvd_unit (Finset.dvd_prod_of_mem (fun i => W i i) (Finset.mem_univ a)) hdetW
-  refine ⟨x', δ, hx', hδE, hδj, fun a b hab => ?_, fun a => ⟨(N : locRing E ℓ) ^ 2 * W a a,
-    ((isUnit_natCast_loc hN).pow 2).mul (hWu a), ?_⟩⟩
+  refine ⟨
+    x',
+    δ,
+    hx',
+    hδE,
+    hδj,
+    fun a b hab => ?_,
+    fun a => ⟨(N : locRing E ℓ) ^ 2 * W a a, ((isUnit_natCast_loc hN).pow 2).mul (hWu a), ?_⟩
+  ⟩
   · have h1 := key a b
     rw [show (W a b) = 0 from hTd hab] at h1
     simpa [hδE] using h1
@@ -468,16 +533,22 @@ end Main
 
 section Target
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Matrix GlobalTheory GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
 open scoped ComplexOrder
 
-theorem exists_locBasis_first_unimodular :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (p q : ℕ) (ℓ : Nat.Primes),
-      p + q = D.p + D.q → ∃ x : Fin p ⊕ Fin q → D.La, IsLocBasis (𝓞 E) ℓ x ∧ (gramE D (x ∘ Sum.inl)).det ≠ 0 ∧
-        ∀ j : E →+* ℂ_[ℓ], Real.log ‖j (gramE D (x ∘ Sum.inl)).det‖ =
-          -(p : ℝ) * logIdeal (j.comp (algebraMap (𝓞 E) E)) (differentIdeal ℤ (𝓞 E)) := by
+theorem exists_locBasis_first_unimodular
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (p q : ℕ)
+        (ℓ : Nat.Primes),
+      p + q = D.p + D.q
+        → ∃ x : Fin p ⊕ Fin q → D.La,
+          IsLocBasis (𝓞 E) ℓ x ∧ (gramE D (x ∘ Sum.inl)).det ≠ 0
+            ∧ ∀ j : E →+* ℂ_[ℓ],
+              Real.log ‖j (gramE D (x ∘ Sum.inl)).det‖
+                = -(p : ℝ) * logIdeal (j.comp (algebraMap (𝓞 E) E)) (differentIdeal ℤ (𝓞 E)) := by
   intro E _ _ _ H D p q ℓ hpq
   obtain ⟨x, δ, hx, hδ0, hδj, hoff, hdiag⟩ := exists_diag_basis H D (p + q) hpq ℓ
   let e : Fin p ⊕ Fin q ≃ Fin (p + q) := finSumFinEquiv
@@ -495,7 +566,9 @@ theorem exists_locBasis_first_unimodular :
     intro h
     have h1 : (u : E) = 0 := by rw [← e1]; simp [s] at h; simp [h]
     exact hu.ne_zero (Subtype.ext h1)
-  have hsj : ∀ (j : E →+* ℂ_[ℓ]) a, Real.log ‖j (s a)‖ = -logIdeal (j.comp (algebraMap (𝓞 E) E)) (differentIdeal ℤ (𝓞 E)) := by
+  have hsj
+      : ∀ (j : E →+* ℂ_[ℓ]) a,
+        Real.log ‖j (s a)‖ = - logIdeal (j.comp (algebraMap (𝓞 E) E)) (differentIdeal ℤ (𝓞 E)) := by
     intro j a
     obtain ⟨u, hu, e1⟩ := hdiag (e (.inl a))
     have h1 := norm_eq_one_of_isUnit hu j

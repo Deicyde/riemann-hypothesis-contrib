@@ -28,8 +28,7 @@ private lemma UpperTheory.Gal.crystallineComparison.inter_map {F G B L U V : Typ
   | tmul u b => simp [hf g u]
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-theorem UpperTheory.Gal.crystallineComparison.dinvExact_of :
-    DinvExact := by
+theorem UpperTheory.Gal.crystallineComparison.dinvExact_of : DinvExact := by
   intro F G B _ _ _ _ σ L _ _ U V W _ _ _ _ _ _ _ _ _ _ _ _ ρU ρV ρW i p hi hp hinj hex hfin
   have hI : Function.Injective (AlgebraTensorModule.map i (LinearMap.id : B →ₗ[F] B)) := by
     have h := Module.Flat.rTensor_preserves_injective_linearMap (M := B) (i.restrictScalars F) hinj
@@ -40,14 +39,19 @@ theorem UpperTheory.Gal.crystallineComparison.dinvExact_of :
   have hE : Function.Exact (AlgebraTensorModule.map i (LinearMap.id : B →ₗ[F] B))
       (AlgebraTensorModule.map p (LinearMap.id : B →ₗ[F] B)) := by
     have h := Module.Flat.rTensor_exact (f := i.restrictScalars F) (g := p.restrictScalars F) B hex
-    have e1 : (AlgebraTensorModule.map i (LinearMap.id : B →ₗ[F] B) : U ⊗[F] B → V ⊗[F] B) =
-        LinearMap.rTensor B (i.restrictScalars F) := funext (map_id_eq_rTensor i)
-    have e2 : (AlgebraTensorModule.map p (LinearMap.id : B →ₗ[F] B) : V ⊗[F] B → W ⊗[F] B) =
-        LinearMap.rTensor B (p.restrictScalars F) := funext (map_id_eq_rTensor p)
+    have e1
+        : (AlgebraTensorModule.map i (LinearMap.id : B →ₗ[F] B) : U ⊗[F] B → V ⊗[F] B)
+          = LinearMap.rTensor B (i.restrictScalars F) :=
+      funext (map_id_eq_rTensor i)
+    have e2
+        : (AlgebraTensorModule.map p (LinearMap.id : B →ₗ[F] B) : V ⊗[F] B → W ⊗[F] B)
+          = LinearMap.rTensor B (p.restrictScalars F) :=
+      funext (map_id_eq_rTensor p)
     rw [e1, e2]
     exact h
-  have key : (Dinv σ ρU).map (AlgebraTensorModule.map i (LinearMap.id : B →ₗ[F] B)) =
-      Dinv σ ρV ⊓ LinearMap.ker (AlgebraTensorModule.map p (LinearMap.id : B →ₗ[F] B)) := by
+  have key
+      : (Dinv σ ρU).map (AlgebraTensorModule.map i (LinearMap.id : B →ₗ[F] B))
+        = Dinv σ ρV ⊓ LinearMap.ker (AlgebraTensorModule.map p (LinearMap.id : B →ₗ[F] B)) := by
     ext y
     constructor
     · rintro ⟨x, hx, rfl⟩
@@ -63,12 +67,15 @@ theorem UpperTheory.Gal.crystallineComparison.dinvExact_of :
   · rintro _ ⟨x, hx, rfl⟩
     refine (mem_Dinv σ).2 fun g => ?_
     rw [← inter_map σ hp, (mem_Dinv σ).1 hx g]
-  · have h1 := LinearMap.finrank_range_add_finrank_ker
-      ((AlgebraTensorModule.map p (LinearMap.id : B →ₗ[F] B)).domRestrict (Dinv σ ρV))
+  · have h1 :=
+      LinearMap.finrank_range_add_finrank_ker
+        ((AlgebraTensorModule.map p (LinearMap.id : B →ₗ[F] B)).domRestrict (Dinv σ ρV))
     rw [LinearMap.range_domRestrict, LinearMap.ker_domRestrict] at h1
-    have h2 : finrank L (Submodule.comap (Dinv σ ρV).subtype
-        (LinearMap.ker (AlgebraTensorModule.map p (LinearMap.id : B →ₗ[F] B)))) =
-        finrank L (Dinv σ ρU) := by
+    have h2
+        : finrank L
+            (Submodule.comap (Dinv σ ρV).subtype
+              (LinearMap.ker (AlgebraTensorModule.map p (LinearMap.id : B →ₗ[F] B))))
+          = finrank L (Dinv σ ρU) := by
       rw [← Submodule.finrank_map_subtype_eq, Submodule.map_comap_subtype, ← key]
       exact (LinearEquiv.finrank_eq (Submodule.equivMapOfInjective _ hI _)).symm
     rw [h2] at h1

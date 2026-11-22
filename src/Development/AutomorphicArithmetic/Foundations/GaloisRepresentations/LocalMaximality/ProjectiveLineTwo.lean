@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.productCup_of_system.ProjectiveLineTwo
@@ -54,47 +55,56 @@ private lemma inter_card {β κ : Type} [LinearOrder β] [LinearOrder κ] [Finty
 end UpperTheory.Gal.productCup_of_system.ProjectiveLineTwo
 
 open UpperTheory.Gal.productCup_of_system.ProjectiveLineTwo in
-theorem UpperTheory.Gal.productCup_of_system.localTwo_of_gl2 :
-    FiltrationCocycleLiftCriterion → ColQEx → WdUni → L2 := by
+theorem UpperTheory.Gal.productCup_of_system.localTwo_of_gl2
+    : FiltrationCocycleLiftCriterion → ColQEx → WdUni → L2 := by
   intro hG hC hU β κ E _ _ _ _ _ _ A w d n hW hK c0 hZ hB
   classical
   obtain ⟨Q, hQ⟩ : ∃ Q, Q = Finset.univ.map (inrE : κ ↪o β ⊕ₗ κ).toEmbedding := ⟨_, rfl⟩
   have hQex : QEx A w Q d := by rw [hQ]; exact hC β κ E A w d hK
-  have hcap : ∀ s : Finset (β ⊕ₗ κ), (s ∩ Q).card = (rgt s).card := fun s => by rw [hQ]; exact inter_card s
+  have hcap : ∀ s : Finset (β ⊕ₗ κ), (s ∩ Q).card = (rgt s).card := fun s => by
+    rw [hQ]; exact inter_card s
   have hinl : ∀ i : β, (inlE i : β ⊕ₗ κ) ∉ Q := fun i => by simp [hQ, inlE, inrE]
   have hinr : ∀ l : κ, (inrE l : β ⊕ₗ κ) ∈ Q := fun l => by simp [hQ]
   have hl : ∀ (b : Finset β) (L : Finset κ), lft (uni b L) = b := fun b L => (hU β κ E w 0 b L).2.1
-  have hr : ∀ (b : Finset β) (L : Finset κ), rgt (uni b L) = L := fun b L => (hU β κ E w 0 b L).2.2.1
-  have hcd : ∀ (b : Finset β) (L : Finset κ), (uni b L).card = b.card + L.card :=
-    fun b L => (hU β κ E w 0 b L).2.2.2.1
+  have hr : ∀ (b : Finset β) (L : Finset κ), rgt (uni b L) = L := fun b L =>
+    (hU β κ E w 0 b L).2.2.1
+  have hcd : ∀ (b : Finset β) (L : Finset κ), (uni b L).card = b.card + L.card := fun b L =>
+    (hU β κ E w 0 b L).2.2.2.1
   have hs : ∀ s : Finset (β ⊕ₗ κ), uni (lft s) (rgt s) = s := (hU β κ E w 0 ∅ ∅).2.2.2.2
   have hsc : ∀ s : Finset (β ⊕ₗ κ), s.card = (lft s).card + (rgt s).card := fun s => by
     conv_lhs => rw [← hs s]
     exact hcd _ _
-  have wdQ : ∀ (c : Finset (β ⊕ₗ κ) → E) (b : Finset β) (L : Finset κ), wd (wOn Q w) c (uni b L) =
-      ((-1 : ℤ) ^ b.card) • wd (fun l => w (inrE l)) (fun L' => c (uni b L')) L := by
+  have wdQ
+      : ∀ (c : Finset (β ⊕ₗ κ) → E) (b : Finset β) (L : Finset κ),
+        wd (wOn Q w) c (uni b L)
+          = ((-1 : ℤ) ^ b.card) • wd (fun l => w (inrE l)) (fun L' => c (uni b L')) L := by
     intro c b L
     rw [(hU β κ E (wOn Q w) c b L).1]
     have h1 : (fun i => wOn Q w (inlE i)) = fun _ => (0 : Module.End ℂ E) := by
       funext i; simp [wOn, hinl]
-    have h2 : (fun l => wOn Q w (inrE l)) = fun l => w (inrE l) := by
-      funext l; simp [wOn, hinr]
+    have h2 : (fun l => wOn Q w (inrE l)) = fun l => w (inrE l) := by funext l; simp [wOn, hinr]
     rw [h1, h2, wd_zero', zero_add]
-  have wdQc : ∀ (c : Finset (β ⊕ₗ κ) → E) (b : Finset β) (L : Finset κ), wd (wOn Qᶜ w) c (uni b L) =
-      wd (fun i => w (inlE i)) (fun b' => c (uni b' L)) b := by
+  have wdQc
+      : ∀ (c : Finset (β ⊕ₗ κ) → E) (b : Finset β) (L : Finset κ),
+        wd (wOn Qᶜ w) c (uni b L) = wd (fun i => w (inlE i)) (fun b' => c (uni b' L)) b := by
     intro c b L
     rw [(hU β κ E (wOn Qᶜ w) c b L).1]
-    have h1 : (fun i => wOn Qᶜ w (inlE i)) = fun i => w (inlE i) := by
-      funext i; simp [wOn, hinl]
+    have h1 : (fun i => wOn Qᶜ w (inlE i)) = fun i => w (inlE i) := by funext i; simp [wOn, hinl]
     have h2 : (fun l => wOn Qᶜ w (inrE l)) = fun _ => (0 : Module.End ℂ E) := by
       funext l; simp [wOn, hinr]
     rw [h1, h2, wd_zero', smul_zero, add_zero]
-  have hc0 : ∀ (b : Finset β) (L : Finset κ), (b.card : ℤ) = n - d → (L.card : ℤ) ≠ d → c0 b L = 0 :=
+  have hc0
+      : ∀ (b : Finset β) (L : Finset κ), (b.card : ℤ) = n - d → (L.card : ℤ) ≠ d → c0 b L = 0 :=
     fun b L hb hL => val_zero (Submodule.mem_inf.1 (hZ b hb)).1 L hL
-  have hc0m : ∀ (b : Finset β) (L : Finset κ), (b.card : ℤ) = n - d → (L.card : ℤ) = d → c0 b L ∈ A (uni b L) :=
-    fun b L hb hL => val_mem (Submodule.mem_inf.1 (hZ b hb)).1 L hL
-  let c' : Finset (β ⊕ₗ κ) → E := fun s => if ((lft s).card : ℤ) = n - d then c0 (lft s) (rgt s) else 0
-  have hcu : ∀ (b : Finset β) (L : Finset κ), c' (uni b L) = if (b.card : ℤ) = n - d then c0 b L else 0 := by
+  have hc0m
+      : ∀ (b : Finset β) (L : Finset κ),
+        (b.card : ℤ) = n - d → (L.card : ℤ) = d → c0 b L ∈ A (uni b L) := fun b L hb hL =>
+    val_mem (Submodule.mem_inf.1 (hZ b hb)).1 L hL
+  let c' : Finset (β ⊕ₗ κ) → E := fun s =>
+    if ((lft s).card : ℤ) = n - d then c0 (lft s) (rgt s) else 0
+  have hcu
+      : ∀ (b : Finset β) (L : Finset κ),
+        c' (uni b L) = if (b.card : ℤ) = n - d then c0 b L else 0 := by
     intro b L; simp only [c', hl, hr]
   have hc'C : c' ∈ (acx A w).C n := by
     rw [mem_acxC]
@@ -128,13 +138,18 @@ theorem UpperTheory.Gal.productCup_of_system.localTwo_of_gl2 :
     · simp only [if_pos hb]
       have h0 : wd (fun l => w (inrE l)) (c0 b) = 0 := (Submodule.mem_inf.1 (hZ b hb)).2
       have h1 : (fun L' => c0 b L') = c0 b := rfl
-      rw [h1, h0]; simp
+      rw [h1, h0]
+      simp
     · simp only [if_neg hb]
       have h1 : (fun _ : Finset κ => (0 : E)) = 0 := rfl
-      rw [h1, map_zero]; simp
-  have hy : ∀ b : Finset β, ∃ y : Finset κ → E, (b.card : ℤ) = n - d + 1 →
-      y ∈ (colA A w b).C (d - 1) ∧
-        wd (fun l => w (inrE l)) y = fun L => wd (fun i => w (inlE i)) (fun b' => c0 b' L) b := by
+      rw [h1, map_zero]
+      simp
+  have hy
+      : ∀ b : Finset β, ∃ y : Finset κ → E,
+        (b.card : ℤ) = n - d + 1
+          → y ∈ (colA A w b).C (d - 1)
+            ∧ wd (fun l => w (inrE l)) y
+              = fun L => wd (fun i => w (inlE i)) (fun b' => c0 b' L) b := by
     intro b
     by_cases hb : (b.card : ℤ) = n - d + 1
     · obtain ⟨y, hy1, hy2⟩ := hB b hb
@@ -143,13 +158,18 @@ theorem UpperTheory.Gal.productCup_of_system.localTwo_of_gl2 :
   choose yb hyb using hy
   let y : Finset (β ⊕ₗ κ) → E := fun s =>
     if ((lft s).card : ℤ) = n - d + 1 then ((-1 : ℤ) ^ (lft s).card) • yb (lft s) (rgt s) else 0
-  have hyu : ∀ (b : Finset β) (L : Finset κ), y (uni b L) =
-      if (b.card : ℤ) = n - d + 1 then ((-1 : ℤ) ^ b.card) • yb b L else 0 := by
+  have hyu
+      : ∀ (b : Finset β) (L : Finset κ),
+        y (uni b L) = if (b.card : ℤ) = n - d + 1 then ((-1 : ℤ) ^ b.card) • yb b L else 0 := by
     intro b L; simp only [y, hl, hr]
-  have hyz : ∀ (b : Finset β) (L : Finset κ), (b.card : ℤ) = n - d + 1 → (L.card : ℤ) ≠ d - 1 → yb b L = 0 :=
-    fun b L hb hL => val_zero (hyb b hb).1 L hL
-  have hym : ∀ (b : Finset β) (L : Finset κ), (b.card : ℤ) = n - d + 1 → (L.card : ℤ) = d - 1 →
-      yb b L ∈ A (uni b L) := fun b L hb hL => val_mem (hyb b hb).1 L hL
+  have hyz
+      : ∀ (b : Finset β) (L : Finset κ),
+        (b.card : ℤ) = n - d + 1 → (L.card : ℤ) ≠ d - 1 → yb b L = 0 := fun b L hb hL =>
+    val_zero (hyb b hb).1 L hL
+  have hym
+      : ∀ (b : Finset β) (L : Finset κ),
+        (b.card : ℤ) = n - d + 1 → (L.card : ℤ) = d - 1 → yb b L ∈ A (uni b L) := fun b L hb hL =>
+    val_mem (hyb b hb).1 L hL
   have hyC : y ∈ (acx A w).C n := by
     rw [mem_acxC]
     intro s
@@ -188,11 +208,12 @@ theorem UpperTheory.Gal.productCup_of_system.localTwo_of_gl2 :
       rw [Finset.card_erase_of_mem hi]
       have : 0 < b.card := Finset.card_pos.2 ⟨i, hi⟩
       omega
-    · have h1 : (fun L' => y (uni b L')) = 0 := by
-        funext L'; rw [hyu, if_neg hb]; rfl
+    · have h1 : (fun L' => y (uni b L')) = 0 := by funext L'; rw [hyu, if_neg hb]; rfl
       rw [h1, map_zero, Pi.zero_apply, smul_zero]
       symm
-      have h2 : wd (fun i => w (inlE i)) (fun b' => c' (uni b' L)) b = wd (fun i => w (inlE i)) 0 b := by
+      have h2
+          : wd (fun i => w (inlE i)) (fun b' => c' (uni b' L)) b
+            = wd (fun i => w (inlE i)) 0 b := by
         refine wd_congr' _ _ _ _ fun i hi => ?_
         rw [hcu, if_neg, Pi.zero_apply]
         rw [Finset.card_erase_of_mem hi]
@@ -203,12 +224,13 @@ theorem UpperTheory.Gal.productCup_of_system.localTwo_of_gl2 :
   have hcC : c ∈ (acx A w).C n := (Submodule.mem_inf.1 hcZ).1
   have hlev : ∀ (b : Finset β) (L : Finset κ), d ≤ (L.card : ℤ) → c (uni b L) = c' (uni b L) := by
     intro b L hL
-    have := hcl (uni b L) (by
-      intro h
-      beta_reduce at h
-      have h' : (((uni b L ∩ Q).card : ℕ) : ℤ) < d := by convert h
-      rw [hcap, hr] at h'
-      omega)
+    have :=
+      hcl (uni b L) (by
+        intro h
+        beta_reduce at h
+        have h' : (((uni b L ∩ Q).card : ℕ) : ℤ) < d := by convert h
+        rw [hcap, hr] at h'
+        omega)
     exact sub_eq_zero.1 this
   refine ⟨c, hcZ, ?_, ?_⟩
   · intro b hb

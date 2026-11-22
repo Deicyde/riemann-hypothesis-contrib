@@ -22,21 +22,23 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Pub.CxPosMeas
 
-open MvPolynomial MeasureTheory Metric Filter Topology ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar.Pub.CxInt
-  GlobalTheory.CompanionTheory.Ar.Pub.CxComp
+open MvPolynomial MeasureTheory Metric Filter Topology ReciprocityTheory.ChartRestriction.G.Geo
+  GlobalTheory.CompanionTheory.Ar.Pub.CxInt GlobalTheory.CompanionTheory.Ar.Pub.CxComp
 open ReciprocityTheory.AnForm.R (conePts)
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {e : ℕ}
 
-def setSecSet (S : Set ((Σ k, ι k) → ℂ)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
-    (B : Set (Fin e → ℂ)) : Set ((Fin e → ℂ) → ((k : K) → ι k) → ℂ) :=
+def setSecSet
+    (S : Set ((Σ k, ι k) → ℂ)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    (B : Set (Fin e → ℂ))
+    : Set ((Fin e → ℂ) → ((k : K) → ι k) → ℂ) :=
   {G | (∀ y ∉ B, G y = 0) ∧ DifferentiableOn ℂ G B ∧ ∀ y ∈ B, G y ∈ setFibre S Ψ y}
 
-theorem setCoincide_null {S : Set ((Σ k, ι k) → ℂ)}
-    {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {c : Fin e → ℂ} {r : ℝ}
-    {G G' : (Fin e → ℂ) → ((k : K) → ι k) → ℂ} (hG : G ∈ setSecSet S Ψ (ball c r))
-    (hG' : G' ∈ setSecSet S Ψ (ball c r)) (hne : G ≠ G') :
-    volume {y | y ∈ ball c r ∧ G y = G' y} = 0 := by
+theorem setCoincide_null
+    {S : Set ((Σ k, ι k) → ℂ)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {c : Fin e → ℂ}
+    {r : ℝ} {G G' : (Fin e → ℂ) → ((k : K) → ι k) → ℂ}
+    (hG : G ∈ setSecSet S Ψ (ball c r)) (hG' : G' ∈ setSecSet S Ψ (ball c r)) (hne : G ≠ G')
+    : volume {y | y ∈ ball c r ∧ G y = G' y} = 0 := by
   obtain ⟨y0, hy0⟩ := Function.ne_iff.mp hne
   have hy0B : y0 ∈ ball c r := by
     by_contra h
@@ -45,56 +47,69 @@ theorem setCoincide_null {S : Set ((Σ k, ι k) → ℂ)}
   have hd : DifferentiableOn ℂ (fun y => G y v - G' y v) (ball c r) :=
     (differentiableOn_pi.mp hG.2.1 v).sub (differentiableOn_pi.mp hG'.2.1 v)
   have han := osgood e _ _ isOpen_ball hd
-  refine measure_mono_null ?_ (ReciprocityTheory.AnForm.volume_zero_set_of_analyticOnNhd isOpen_ball
-    (convex_ball c r).isPreconnected han ⟨y0, hy0B, sub_ne_zero.mpr hv⟩)
+  refine measure_mono_null ?_
+    (ReciprocityTheory.AnForm.volume_zero_set_of_analyticOnNhd isOpen_ball
+      (convex_ball c r).isPreconnected han ⟨y0, hy0B, sub_ne_zero.mpr hv⟩)
   rintro y ⟨hyB, hy⟩
   exact ⟨hyB, by simp [hy]⟩
 
-theorem setSecSet_finite {S : Set ((Σ k, ι k) → ℂ)}
-    {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hfin : ∀ y, (setFibre S Ψ y).Finite)
-    (c : Fin e → ℂ) {r : ℝ} (hr : 0 < r) : (setSecSet S Ψ (ball c r)).Finite := by
+theorem setSecSet_finite
+    {S : Set ((Σ k, ι k) → ℂ)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
+    (hfin : ∀ y, (setFibre S Ψ y).Finite)
+    (c : Fin e → ℂ)
+    {r : ℝ} (hr : 0 < r)
+    : (setSecSet S Ψ (ball c r)).Finite := by
   by_contra hinf
   let f := Set.Infinite.natEmbedding _ hinf
   set N : Set (Fin e → ℂ) := ⋃ i : ℕ, ⋃ j : ℕ, ⋃ (_ : i ≠ j),
     {y | y ∈ ball c r ∧ (f i : (Fin e → ℂ) → ((k : K) → ι k) → ℂ) y = (f j : (Fin e → ℂ) → ((k : K) → ι k) → ℂ) y}
   have hN : volume N = 0 := by
-    refine measure_iUnion_null fun i => measure_iUnion_null fun j => measure_iUnion_null fun hij => ?_
+    refine measure_iUnion_null fun i =>
+      measure_iUnion_null fun j => measure_iUnion_null fun hij => ?_
     refine setCoincide_null (f i).2 (f j).2 fun h => hij (f.injective (Subtype.ext h))
   have hpos : 0 < volume (ball c r) := measure_ball_pos volume c hr
   obtain ⟨y, hyB, hyN⟩ : ∃ y ∈ ball c r, y ∉ N := by
     by_contra h
     push Not at h
     exact hpos.ne' (measure_mono_null h hN)
-  refine (hfin y).not_infinite (Set.infinite_of_injective_forall_mem (f := fun n =>
-    (f n : (Fin e → ℂ) → ((k : K) → ι k) → ℂ) y) ?_ fun n => (f n).2.2.2 y hyB)
+  refine (hfin y).not_infinite
+    (Set.infinite_of_injective_forall_mem
+      (f := fun n => (f n : (Fin e → ℂ) → ((k : K) → ι k) → ℂ) y)
+      ?_
+      fun n => (f n).2.2.2 y hyB)
   intro i j hij
   by_contra h
   exact hyN (Set.mem_iUnion.mpr ⟨i, Set.mem_iUnion.mpr ⟨j, Set.mem_iUnion.mpr ⟨h, hyB, hij⟩⟩⟩)
 
-def setBadSet (S : Set ((Σ k, ι k) → ℂ)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) :
-    Set (Fin e → ℂ) :=
+def setBadSet (S : Set ((Σ k, ι k) → ℂ)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    : Set (Fin e → ℂ) :=
   {y | ∃ w γ γ', IsSetSheet S Ψ y w γ ∧ IsSetSheet S Ψ y w γ' ∧
     ¬ ((fun y' => segre (γ y')) =ᶠ[𝓝 y] fun y' => segre (γ' y'))}
 
-theorem mem_setSecSet_of_sheet {S : Set ((Σ k, ι k) → ℂ)}
-    {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {B : Set (Fin e → ℂ)}
-    {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ}
-    (h : ∀ y' ∈ B, DifferentiableAt ℂ γ y' ∧ γ y' ∈ S ∧ Ψ (segre (γ y')) = Fin.cons 1 y') :
-    B.indicator (fun y' => segre (γ y')) ∈ setSecSet S Ψ B := by
+theorem mem_setSecSet_of_sheet
+    {S : Set ((Σ k, ι k) → ℂ)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
+    {B : Set (Fin e → ℂ)} {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ}
+    (h : ∀ y' ∈ B, DifferentiableAt ℂ γ y' ∧ γ y' ∈ S ∧ Ψ (segre (γ y')) = Fin.cons 1 y')
+    : B.indicator (fun y' => segre (γ y')) ∈ setSecSet S Ψ B := by
   refine ⟨fun y hy => Set.indicator_of_notMem hy _, ?_, fun y hy => ?_⟩
-  · refine DifferentiableOn.congr (f := fun y' => segre (γ y')) ?_ fun y hy => Set.indicator_of_mem hy _
+  · refine
+      DifferentiableOn.congr (f := fun y' => segre (γ y')) ?_ fun y hy => Set.indicator_of_mem hy _
     exact fun y hy => (segre_differentiableAt (h y hy).1).differentiableWithinAt
   · rw [Set.indicator_of_mem hy]
     exact ⟨γ y, (h y hy).2.1, rfl, (h y hy).2.2⟩
 
-theorem setBadSet_null {S : Set ((Σ k, ι k) → ℂ)}
-    {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hfin : ∀ y, (setFibre S Ψ y).Finite) :
-    volume (setBadSet S Ψ) = 0 := by
+theorem setBadSet_null
+    {S : Set ((Σ k, ι k) → ℂ)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
+    (hfin : ∀ y, (setFibre S Ψ y).Finite)
+    : volume (setBadSet S Ψ) = 0 := by
   obtain ⟨D, hDc, hDd⟩ := TopologicalSpace.exists_countable_dense (Fin e → ℂ)
   have hρ : ∀ n : ℕ, (0 : ℝ) < 1 / (n + 1) := fun n => by positivity
-  refine measure_mono_null (t := ⋃ d ∈ D, ⋃ n : ℕ,
-      ⋃ G ∈ setSecSet S Ψ (ball d (1 / (n + 1))), ⋃ G' ∈ setSecSet S Ψ (ball d (1 / (n + 1))),
-        ⋃ (_ : G ≠ G'), {y | y ∈ ball d (1 / (n + 1)) ∧ G y = G' y}) ?_ ?_
+  refine measure_mono_null
+    (t :=
+      ⋃ d ∈ D, ⋃ n : ℕ,
+        ⋃ G ∈ setSecSet S Ψ (ball d (1 / (n + 1))), ⋃ G' ∈ setSecSet S Ψ (ball d (1 / (n + 1))),
+          ⋃ (_ : G ≠ G'), {y | y ∈ ball d (1 / (n + 1)) ∧ G y = G' y})
+    ?_ ?_
   · rintro y ⟨w, γ, γ', h1, h2, hne⟩
     obtain ⟨ε, hε, hball⟩ := Metric.eventually_nhds_iff_ball.mp (h1.2.and h2.2)
     obtain ⟨n, hn⟩ := exists_nat_one_div_lt (half_pos hε)
@@ -106,15 +121,26 @@ theorem setBadSet_null {S : Set ((Σ k, ι k) → ℂ)}
     have hBsub : B ⊆ ball y ε := by
       intro y' hy'
       rw [mem_ball] at hy' hdy ⊢
-      calc dist y' y ≤ dist y' d + dist d y := dist_triangle _ _ _
+      calc
+        dist y' y
+          ≤ dist y' d + dist d y := dist_triangle _ _ _
         _ < 1 / ((n : ℝ) + 1) + 1 / ((n : ℝ) + 1) := add_lt_add hy' hdy
         _ < ε := by linarith
-    have hG := mem_setSecSet_of_sheet (S := S) (Ψ := Ψ) (B := B) (γ := γ) fun y' hy' =>
-      (hball y' (hBsub hy')).1
-    have hG' := mem_setSecSet_of_sheet (S := S) (Ψ := Ψ) (B := B) (γ := γ') fun y' hy' =>
-      (hball y' (hBsub hy')).2
-    refine Set.mem_iUnion₂.mpr ⟨d, hdD, Set.mem_iUnion.mpr ⟨n, Set.mem_iUnion₂.mpr ⟨_, hG,
-      Set.mem_iUnion₂.mpr ⟨_, hG', Set.mem_iUnion.mpr ⟨fun heq => hne ?_, hyB, ?_⟩⟩⟩⟩⟩
+    have hG :=
+      mem_setSecSet_of_sheet (S := S) (Ψ := Ψ) (B := B) (γ := γ) fun y' hy' =>
+        (hball y' (hBsub hy')).1
+    have hG' :=
+      mem_setSecSet_of_sheet (S := S) (Ψ := Ψ) (B := B) (γ := γ') fun y' hy' =>
+        (hball y' (hBsub hy')).2
+    refine Set.mem_iUnion₂.mpr ⟨
+      d,
+      hdD,
+      Set.mem_iUnion.mpr ⟨
+        n,
+        Set.mem_iUnion₂.mpr
+          ⟨_, hG, Set.mem_iUnion₂.mpr ⟨_, hG', Set.mem_iUnion.mpr ⟨fun heq => hne ?_, hyB, ?_⟩⟩⟩
+      ⟩
+    ⟩
     · filter_upwards [isOpen_ball.mem_nhds hyB] with y' hy'
       have := congrFun heq y'
       rwa [Set.indicator_of_mem hy', Set.indicator_of_mem hy'] at this
@@ -126,20 +152,22 @@ theorem setBadSet_null {S : Set ((Σ k, ι k) → ℂ)}
     refine (measure_biUnion_null_iff hfinS.countable).mpr fun G' hG' => ?_
     exact measure_iUnion_null fun hne => setCoincide_null hG hG' hne
 
-theorem setSheet_analyticAt {S : Set ((Σ k, ι k) → ℂ)}
-    {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {y : Fin e → ℂ}
-    {w : ((k : K) → ι k) → ℂ} {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} (h : IsSetSheet S Ψ y w γ) :
-    AnalyticAt ℂ γ y := by
+theorem setSheet_analyticAt
+    {S : Set ((Σ k, ι k) → ℂ)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {y : Fin e → ℂ}
+    {w : ((k : K) → ι k) → ℂ} {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} (h : IsSetSheet S Ψ y w γ)
+    : AnalyticAt ℂ γ y := by
   obtain ⟨ε, hε, hb⟩ := Metric.eventually_nhds_iff_ball.mp h.2
   refine analyticAt_pi_iff.mpr fun p => ?_
-  exact osgood e _ _ isOpen_ball (fun y' hy' =>
-    (differentiableAt_pi.mp (hb y' hy').1 p).differentiableWithinAt) y (mem_ball_self hε)
+  exact osgood e _ _ isOpen_ball
+    (fun y' hy' => (differentiableAt_pi.mp (hb y' hy').1 p).differentiableWithinAt)
+    y (mem_ball_self hε)
 
-theorem maDensity_eq_of_segre {L : Fin e → HermLine ι} (hL : ∀ j, IsSmoothHerm (L j))
+theorem maDensity_eq_of_segre
+    {L : Fin e → HermLine ι} (hL : ∀ j, IsSmoothHerm (L j))
     {γ γ' : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {y : Fin e → ℂ}
     (hγ : AnalyticAt ℂ γ y) (hγ' : AnalyticAt ℂ γ' y) (hy : ∀ k, ∃ i, γ y ⟨k, i⟩ ≠ 0)
-    (hseg : (fun y' => segre (γ y')) =ᶠ[𝓝 y] fun y' => segre (γ' y')) :
-    maDensity (fun j y' => pot L j (γ y')) y = maDensity (fun j y' => pot L j (γ' y')) y := by
+    (hseg : (fun y' => segre (γ y')) =ᶠ[𝓝 y] fun y' => segre (γ' y'))
+    : maDensity (fun j y' => pot L j (γ y')) y = maDensity (fun j y' => pot L j (γ' y')) y := by
   have hs : IsSectionOn (⊥ : Ideal (MRing ι))
       (HermLine.ofWeight (fun _ => (1 : ℝ)) (fun _ _ _ => rfl)) 1 := by
     refine ⟨0, fun k => by simp [HermLine.ofWeight], fun m hm k => ?_, ?_⟩
@@ -148,17 +176,21 @@ theorem maDensity_eq_of_segre {L : Fin e → HermLine ι} (hL : ∀ j, IsSmoothH
       simp
     · simp
   have h := density_eq hL hs hγ hγ' hy hseg
-  have h1 : ∀ z, logNorm (HermLine.ofWeight (fun _ : (Σ k, ι k) → ℂ => (1 : ℝ)) (fun _ _ _ => rfl)) 1 z = 1 := by
+  have h1
+      : ∀ z,
+        logNorm (HermLine.ofWeight (fun _ : (Σ k, ι k) → ℂ => (1 : ℝ)) (fun _ _ _ => rfl)) 1 z
+          = 1 := by
     intro z
     simp [logNorm, HermLine.ofWeight, Real.exp_neg, Real.log_exp]
   simpa only [h1, one_mul] using h
 
-theorem setSheetIndep {S : Set ((Σ k, ι k) → ℂ)} (hS : ∀ z ∈ S, ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
+theorem setSheetIndep
+    {S : Set ((Σ k, ι k) → ℂ)} (hS : ∀ z ∈ S, ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
     {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hfin : ∀ y, (setFibre S Ψ y).Finite)
-    {L : Fin e → HermLine ι} (hL : ∀ j, IsSmoothHerm (L j)) :
-    ∀ᵐ y : Fin e → ℂ, ∀ (w : ((k : K) → ι k) → ℂ) (γ γ' : (Fin e → ℂ) → (Σ k, ι k) → ℂ),
-      IsSetSheet S Ψ y w γ → IsSetSheet S Ψ y w γ' →
-      maDensity (fun j y' => pot L j (γ y')) y = maDensity (fun j y' => pot L j (γ' y')) y := by
+    {L : Fin e → HermLine ι} (hL : ∀ j, IsSmoothHerm (L j))
+    : ∀ᵐ y : Fin e → ℂ, ∀ (w : ((k : K) → ι k) → ℂ) (γ γ' : (Fin e → ℂ) → (Σ k, ι k) → ℂ),
+        IsSetSheet S Ψ y w γ → IsSetSheet S Ψ y w γ' →
+        maDensity (fun j y' => pot L j (γ y')) y = maDensity (fun j y' => pot L j (γ' y')) y := by
   refine ae_iff.mpr (measure_mono_null (fun y hy => ?_) (setBadSet_null hfin))
   simp only [Set.mem_ofPred_eq, not_forall] at hy
   obtain ⟨w, γ, γ', h1, h2, hne⟩ := hy
@@ -166,13 +198,14 @@ theorem setSheetIndep {S : Set ((Σ k, ι k) → ℂ)} (hS : ∀ z ∈ S, ∀ k,
   exact maDensity_eq_of_segre hL (setSheet_analyticAt h1) (setSheet_analyticAt h2)
     (hS _ h1.2.self_of_nhds.2.1) hseg
 
-theorem exists_setLift_family {S : Set ((Σ k, ι k) → ℂ)}
-    {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hfin : ∀ y, (setFibre S Ψ y).Finite) :
-    ∃ (B : ℕ → Set (Fin e → ℂ)) (γ : ℕ → (Fin e → ℂ) → (Σ k, ι k) → ℂ),
-      (∀ m, IsOpen (B m)) ∧
-      (∀ m, ∀ y ∈ B m, DifferentiableAt ℂ (γ m) y ∧ γ m y ∈ S ∧
-        Ψ (segre (γ m y)) = Fin.cons 1 y) ∧
-      ∀ y w γ', IsSetSheet S Ψ y w γ' → ∃ m, y ∈ B m ∧ segre (γ m y) = w := by
+theorem exists_setLift_family
+    {S : Set ((Σ k, ι k) → ℂ)} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
+    (hfin : ∀ y, (setFibre S Ψ y).Finite)
+    : ∃ (B : ℕ → Set (Fin e → ℂ)) (γ : ℕ → (Fin e → ℂ) → (Σ k, ι k) → ℂ),
+      (∀ m, IsOpen (B m))
+        ∧ (∀ m, ∀ y ∈ B m,
+          DifferentiableAt ℂ (γ m) y ∧ γ m y ∈ S ∧ Ψ (segre (γ m y)) = Fin.cons 1 y)
+        ∧ ∀ y w γ', IsSetSheet S Ψ y w γ' → ∃ m, y ∈ B m ∧ segre (γ m y) = w := by
   classical
   obtain ⟨D, hDc, hDd⟩ := TopologicalSpace.exists_countable_dense (Fin e → ℂ)
   have hρ : ∀ n : ℕ, (0 : ℝ) < 1 / (n + 1) := fun n => by positivity
@@ -182,8 +215,8 @@ theorem exists_setLift_family {S : Set ((Σ k, ι k) → ℂ)}
     (setSecSet_finite hfin (p.1 : Fin e → ℂ) (hρ p.2)).countable.to_subtype
   let T := Σ p : D × ℕ, setSecSet S Ψ (Bl p)
   let Lift : T → ((Fin e → ℂ) → (Σ k, ι k) → ℂ) → Prop := fun t γ =>
-    ∀ y ∈ Bl t.1, DifferentiableAt ℂ γ y ∧ γ y ∈ S ∧
-      segre (γ y) = (t.2 : (Fin e → ℂ) → ((k : K) → ι k) → ℂ) y
+    ∀ y ∈ Bl t.1,
+      DifferentiableAt ℂ γ y ∧ γ y ∈ S ∧ segre (γ y) = (t.2 : (Fin e → ℂ) → ((k : K) → ι k) → ℂ) y
   let Bo : Option T → Set (Fin e → ℂ) := fun o =>
     o.elim ∅ fun t => if ∃ γ, Lift t γ then Bl t.1 else ∅
   let γo : Option T → (Fin e → ℂ) → (Σ k, ι k) → ℂ := fun o =>
@@ -200,8 +233,9 @@ theorem exists_setLift_family {S : Set ((Σ k, ι k) → ℂ)}
       split_ifs
       · exact isOpen_ball
       · exact isOpen_empty
-  have hlift : ∀ o, ∀ y ∈ Bo o, DifferentiableAt ℂ (γo o) y ∧ γo o y ∈ S ∧
-      Ψ (segre (γo o y)) = Fin.cons 1 y := by
+  have hlift
+      : ∀ o, ∀ y ∈ Bo o,
+        DifferentiableAt ℂ (γo o) y ∧ γo o y ∈ S ∧ Ψ (segre (γo o y)) = Fin.cons 1 y := by
     rintro (_ | t) y hy
     · exact absurd hy (Set.notMem_empty y)
     · rw [hBsome] at hy
@@ -213,8 +247,13 @@ theorem exists_setLift_family {S : Set ((Σ k, ι k) → ℂ)}
         obtain ⟨z, -, -, hΨ⟩ := hfib y hy
         rw [h3, hΨ]
       · exact absurd hy (Set.notMem_empty y)
-  refine ⟨fun m => Bo (f m), fun m => γo (f m), fun m => hBo (f m), fun m => hlift (f m),
-    fun y w γ' hγ' => ?_⟩
+  refine ⟨
+    fun m => Bo (f m),
+    fun m => γo (f m),
+    fun m => hBo (f m),
+    fun m => hlift (f m),
+    fun y w γ' hγ' => ?_
+  ⟩
   · obtain ⟨ε, hε, hball⟩ := Metric.eventually_nhds_iff_ball.mp hγ'.2
     obtain ⟨n, hn⟩ := exists_nat_one_div_lt (half_pos hε)
     obtain ⟨d, hdy, hdD⟩ := Metric.dense_iff.mp hDd y _ (hρ n)
@@ -227,14 +266,23 @@ theorem exists_setLift_family {S : Set ((Σ k, ι k) → ℂ)}
       intro y' hy'
       have hy'' : dist y' d < 1 / ((n : ℝ) + 1) := hy'
       rw [mem_ball] at hdy ⊢
-      calc dist y' y ≤ dist y' d + dist d y := dist_triangle _ _ _
+      calc
+        dist y' y
+          ≤ dist y' d + dist d y := dist_triangle _ _ _
         _ < 1 / ((n : ℝ) + 1) + 1 / ((n : ℝ) + 1) := add_lt_add hy'' hdy
         _ < ε := by linarith
-    have hG := mem_setSecSet_of_sheet (S := S) (Ψ := Ψ) (B := Bl p) (γ := γ') fun y' hy' =>
-      hball y' (hBsub hy')
+    have hG :=
+      mem_setSecSet_of_sheet (S := S) (Ψ := Ψ) (B := Bl p) (γ := γ') fun y' hy' =>
+        hball y' (hBsub hy')
     let t : T := ⟨p, _, hG⟩
-    have hL : ∃ γ, Lift t γ := ⟨γ', fun y' hy' => ⟨(hball y' (hBsub hy')).1,
-      (hball y' (hBsub hy')).2.1, by simp only [t]; rw [Set.indicator_of_mem hy']⟩⟩
+    have hL : ∃ γ, Lift t γ := ⟨
+      γ',
+      fun y' hy' => ⟨
+        (hball y' (hBsub hy')).1,
+        (hball y' (hBsub hy')).2.1,
+        by simp only [t]; rw [Set.indicator_of_mem hy']
+      ⟩
+    ⟩
     obtain ⟨m, hm⟩ := hf (some t)
     refine ⟨m, ?_, ?_⟩
     · show y ∈ Bo (f m)
@@ -245,13 +293,13 @@ theorem exists_setLift_family {S : Set ((Σ k, ι k) → ℂ)}
       simp only [t]
       rw [Set.indicator_of_mem hyB, hγ'.1]
 
-theorem cxPosDens_aemeasurable_of_finite {S : Set ((Σ k, ι k) → ℂ)}
-    (hS : ∀ z ∈ S, ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
+theorem cxPosDens_aemeasurable_of_finite
+    {S : Set ((Σ k, ι k) → ℂ)} (hS : ∀ z ∈ S, ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
     {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} (hfin : ∀ y, (setFibre S Ψ y).Finite)
-    {L : Fin e → HermLine ι} (hL : ∀ j, IsSmoothHerm (L j)) {g : ((Σ k, ι k) → ℂ) → ℝ}
-    (hg : Measurable g)
-    (hdeg : ∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ), (∀ k, c k ≠ 0) → g (fun p => c p.1 * z p) = g z) :
-    AEMeasurable (cxPosDens S Ψ (pot L) g) := by
+    {L : Fin e → HermLine ι} (hL : ∀ j, IsSmoothHerm (L j))
+    {g : ((Σ k, ι k) → ℂ) → ℝ} (hg : Measurable g)
+    (hdeg : ∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ), (∀ k, c k ≠ 0) → g (fun p => c p.1 * z p) = g z)
+    : AEMeasurable (cxPosDens S Ψ (pot L) g) := by
   classical
   obtain ⟨B, γ, hBo, hlift, hcov⟩ := exists_setLift_family (S := S) (Ψ := Ψ) hfin
 
@@ -266,8 +314,7 @@ theorem cxPosDens_aemeasurable_of_finite {S : Set ((Σ k, ι k) → ℂ)}
     continuous_pi fun i => continuous_finsetProd _ fun k _ => continuous_apply _
   set σ : ℕ → (Fin e → ℂ) → ((k : K) → ι k) → ℂ := fun m =>
     (B m).piecewise (fun y => segre (γ m y)) 0 with hσdef
-  have hσB : ∀ m, ∀ y ∈ B m, σ m y = segre (γ m y) := fun m y hy =>
-    Set.piecewise_eq_of_mem _ _ _ hy
+  have hσB : ∀ m, ∀ y ∈ B m, σ m y = segre (γ m y) := fun m y hy => Set.piecewise_eq_of_mem _ _ _ hy
   have hσm : ∀ m, Measurable (σ m) := fun m =>
     (hseg.comp_continuousOn (hγc m)).measurable_piecewise continuousOn_const (hBo m).measurableSet
 
@@ -277,10 +324,11 @@ theorem cxPosDens_aemeasurable_of_finite {S : Set ((Σ k, ι k) → ℂ)}
   set dens : ℕ → (Fin e → ℂ) → ℝ := fun m y =>
     max (g (γt m y) * maDensity (fun j y' => pot L j (γ m y')) y) 0 with hddef
   have hdm : ∀ m, Measurable (dens m) := fun m =>
-    ((hg.comp (hγtm m)).mul (GroundTheory.Heights₂.Heights.PtsSumMeasurable.measurable_maDensity _)).max
-      measurable_const
-  have hdens : ∀ m, ∀ y ∈ B m,
-      dens m y = max (g (γ m y) * maDensity (fun j y' => pot L j (γ m y')) y) 0 := by
+    ((hg.comp (hγtm m)).mul
+      (GroundTheory.Heights₂.Heights.PtsSumMeasurable.measurable_maDensity _)).max measurable_const
+  have hdens
+      : ∀ m, ∀ y ∈ B m,
+        dens m y = max (g (γ m y) * maDensity (fun j y' => pot L j (γ m y')) y) 0 := by
     intro m y hy
     simp only [hddef, hγtdef, Set.piecewise_eq_of_mem _ _ _ hy]
   set T : ℕ → Set (Fin e → ℂ) := fun m =>
@@ -291,16 +339,21 @@ theorem cxPosDens_aemeasurable_of_finite {S : Set ((Σ k, ι k) → ℂ)}
       ext y
       simp [hTdef, imp_iff_not_or]
     rw [this]
-    exact (hBo m).measurableSet.inter (Finset.measurableSet_biInter _ fun m' _ =>
-      ((hBo m').measurableSet.inter (measurableSet_eq_fun (hσm m') (hσm m))).compl)
+    exact (hBo m).measurableSet.inter
+      (Finset.measurableSet_biInter _ fun m' _ =>
+        ((hBo m').measurableSet.inter (measurableSet_eq_fun (hσm m') (hσm m))).compl)
   set f : ℕ → (Fin e → ℂ) → ℝ := fun m => (T m).indicator (dens m) with hfdef
   have hfm : ∀ m, Measurable (f m) := fun m => (hdm m).indicator (hTm m)
   have key : AEStronglyMeasurable (cxPosDens S Ψ (pot L) g) volume := by
-    have hpp : cxPosDens S Ψ (pot L) g =
-        fun y => ∑ᶠ w ∈ setFibre S Ψ y, max (setSheetDensity S Ψ (pot L) g y w) 0 := rfl
+    have hpp
+        : cxPosDens S Ψ (pot L) g
+          = fun y => ∑ᶠ w ∈ setFibre S Ψ y, max (setSheetDensity S Ψ (pot L) g y w) 0 :=
+      rfl
     rw [hpp]
-    refine aestronglyMeasurable_of_tendsto_ae atTop (f := fun N y => ∑ m ∈ Finset.range N, f m y)
-      (fun N => (Finset.measurable_sum _ fun m _ => hfm m).aestronglyMeasurable) ?_
+    refine aestronglyMeasurable_of_tendsto_ae atTop
+      (f := fun N y => ∑ m ∈ Finset.range N, f m y)
+      (fun N => (Finset.measurable_sum _ fun m _ => hfm m).aestronglyMeasurable)
+      ?_
     filter_upwards [hind] with y hy
     have hterm : ∀ m, y ∈ T m → f m y = max (setSheetDensity S Ψ (pot L) g y (σ m y)) 0 := by
       intro m hm
@@ -314,8 +367,7 @@ theorem cxPosDens_aemeasurable_of_finite {S : Set ((Σ k, ι k) → ℂ)}
       rw [dite_eq_left hex, hy _ _ _ hex.choose_spec hsh]
 
       choose i0 hi0 using hO m hm.1
-      have hs : segre (γ m y) = segre (hex.choose y) := by
-        rw [hex.choose_spec.1, hσB m y hm.1]
+      have hs : segre (γ m y) = segre (hex.choose y) := by rw [hex.choose_spec.1, hσB m y hm.1]
       obtain ⟨hc', hrel⟩ := eq_bsmul_of_segre_eq i0 hi0 hs
       have hgy : g (hex.choose y) = g (γ m y) := by
         rw [hrel]
@@ -335,9 +387,11 @@ theorem cxPosDens_aemeasurable_of_finite {S : Set ((Σ k, ι k) → ℂ)}
         · rw [hfdef]
           simp only
           rw [Set.indicator_of_notMem hm]
-    have hev : ∀ w ∈ (hfin y).toFinset, ∀ᶠ N in atTop,
-        max (setSheetDensity S Ψ (pot L) g y w) 0 =
-          ∑ m ∈ Finset.range N, if σ m y = w then f m y else 0 := by
+    have hev
+        : ∀ w ∈ (hfin y).toFinset,
+          ∀ᶠ N in atTop,
+            max (setSheetDensity S Ψ (pot L) g y w) 0 =
+              ∑ m ∈ Finset.range N, if σ m y = w then f m y else 0 := by
       intro w _
       by_cases hex : ∃ γ', IsSetSheet S Ψ y w γ'
       · obtain ⟨γ', hγ'⟩ := hex
@@ -375,8 +429,9 @@ theorem cxPosDens_aemeasurable_of_finite {S : Set ((Σ k, ι k) → ℂ)}
             simp only
             rw [Set.indicator_of_notMem hmT]
         · rfl
-    have hsum : ∑ᶠ w ∈ setFibre S Ψ y, max (setSheetDensity S Ψ (pot L) g y w) 0 =
-        ∑ w ∈ (hfin y).toFinset, max (setSheetDensity S Ψ (pot L) g y w) 0 :=
+    have hsum
+        : ∑ᶠ w ∈ setFibre S Ψ y, max (setSheetDensity S Ψ (pot L) g y w) 0
+          = ∑ w ∈ (hfin y).toFinset, max (setSheetDensity S Ψ (pot L) g y w) 0 :=
       finsum_mem_eq_finite_toFinset_sum _ (hfin y)
     refine tendsto_const_nhds.congr' ?_
     filter_upwards [(eventually_all_finset _).2 hev] with N hN
@@ -384,13 +439,15 @@ theorem cxPosDens_aemeasurable_of_finite {S : Set ((Σ k, ι k) → ℂ)}
     exact Finset.sum_congr rfl fun m _ => hfy m
   exact key.aemeasurable
 
-theorem cxPosDens_aemeasurable : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
-    (Q : Ideal (MRingOver ℂ ι)) (e : ℕ) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
-    (L : Fin e → HermLine ι) (g : ((Σ k, ι k) → ℂ) → ℝ),
-    IsCxVar Q e → IsSetGoodProj (conePts Q) Ψ → (∀ j, IsSmoothHerm (L j)) → Measurable g →
-    (∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ), (∀ k, c k ≠ 0) → g (fun p => c p.1 * z p) = g z) →
-    AEMeasurable (cxPosDens (conePts Q) Ψ (pot L) g) := by
+theorem cxPosDens_aemeasurable
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Q : Ideal (MRingOver ℂ ι))
+        (e : ℕ) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (L : Fin e → HermLine ι)
+        (g : ((Σ k, ι k) → ℂ) → ℝ),
+      IsCxVar Q e → IsSetGoodProj (conePts Q) Ψ → (∀ j, IsSmoothHerm (L j)) → Measurable g
+        → (∀ (c : K → ℂ) (z : (Σ k, ι k) → ℂ), (∀ k, c k ≠ 0) → g (fun p => c p.1 * z p) = g z)
+        → AEMeasurable (cxPosDens (conePts Q) Ψ (pot L) g) := by
   intro K _ ι _ Q e Ψ L g hQ hΨ hL hg hdeg
-  exact cxPosDens_aemeasurable_of_finite (by exact fun z hz => hz.1) (GlobalTheory.CompanionTheory.Ar.Pub.CxFib.setFibre_finite K ι Q e Ψ hQ hΨ) hL hg hdeg
+  exact cxPosDens_aemeasurable_of_finite (by exact fun z hz => hz.1)
+    (GlobalTheory.CompanionTheory.Ar.Pub.CxFib.setFibre_finite K ι Q e Ψ hQ hΨ) hL hg hdeg
 
 end GlobalTheory.CompanionTheory.Ar.Pub.CxPosMeas

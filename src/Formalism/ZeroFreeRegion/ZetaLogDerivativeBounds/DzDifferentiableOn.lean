@@ -13,8 +13,8 @@ namespace Formalism.ZF
 namespace ComplexPowerDifferenceIntegral
 
 def dz (s : ℂ) (n : ℕ) : ℂ :=
-  (((n : ℝ) + 1 : ℝ) : ℂ) ^ (1 - s) - ((((n : ℝ) + 1) + 1 : ℝ) : ℂ) ^ (1 - s) -
-    (s - 1) * ((((n : ℝ) + 1) + 1 : ℝ) : ℂ) ^ (-s)
+  (((n : ℝ) + 1 : ℝ) : ℂ) ^ (1 - s) - ((((n : ℝ) + 1) + 1 : ℝ) : ℂ) ^ (1 - s)
+    - (s - 1) * ((((n : ℝ) + 1) + 1 : ℝ) : ℂ) ^ (-s)
 
 def Dz (s : ℂ) : ℂ := ∑' n, dz s n
 

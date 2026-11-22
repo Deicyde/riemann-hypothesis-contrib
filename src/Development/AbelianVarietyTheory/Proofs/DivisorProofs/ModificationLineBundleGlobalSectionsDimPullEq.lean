@@ -10,12 +10,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNormal
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open GlobalTheory GlobalTheory.CechPic
 open GlobalTheory.ThickeningDetermines (secIdeal)
 open scoped TensorProduct
-open NumberField Formalism.L2.Pj Formalism.BasicNotions GlobalTheory.Vanishing GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.HSApp
+open NumberField Formalism.L2.Pj Formalism.BasicNotions GlobalTheory.Vanishing GlobalTheory.Adelic
+  GlobalTheory.CompHS GlobalTheory.HSApp
 open GlobalTheory.AllWt (wtOf cuspOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag)
@@ -28,16 +30,19 @@ namespace GlobalTheory.ModifSections
 
 open Opposite
 
-theorem isIntegral_of_iso_comp {A B C E : CommRingCat.{0}} (i : A ⟶ B) (f : B ⟶ C) (m : C ⟶ E) [IsIso i]
-    [IsIso m] (h : (i ≫ f ≫ m).hom.IsIntegral) : f.hom.IsIntegral := by
+theorem isIntegral_of_iso_comp
+    {A B C E : CommRingCat.{0}} (i : A ⟶ B) (f : B ⟶ C) (m : C ⟶ E) [IsIso i] [IsIso m]
+    (h : (i ≫ f ≫ m).hom.IsIntegral)
+    : f.hom.IsIntegral := by
   have e : f = inv i ≫ (i ≫ f ≫ m) ≫ inv m := by simp
   rw [e, CommRingCat.hom_comp, CommRingCat.hom_comp]
   refine RingHom.IsIntegral.trans _ _ ?_ (RingHom.IsIntegral.trans _ _ h ?_)
   · exact RingHom.isIntegral_of_surjective _ (ConcreteCategory.bijective_of_isIso (inv i)).2
   · exact RingHom.isIntegral_of_surjective _ (ConcreteCategory.bijective_of_isIso (inv m)).2
 
-theorem isIntegral_app {Z₁ Z₂ : Scheme.{0}} (ρ : Z₁ ⟶ Z₂) [UniversallyClosed ρ]
-    (V : Z₂.Opens) (hV : IsAffineOpen V) : (ρ.app V).hom.IsIntegral := by
+theorem isIntegral_app
+    {Z₁ Z₂ : Scheme.{0}} (ρ : Z₁ ⟶ Z₂) [UniversallyClosed ρ] (V : Z₂.Opens) (hV : IsAffineOpen V)
+    : (ρ.app V).hom.IsIntegral := by
   have : IsAffine V.toScheme := hV
   have h := isIntegral_appTop_of_universallyClosed (ρ ∣_ V)
   rw [morphismRestrict_appTop] at h
@@ -48,16 +53,20 @@ theorem isIntegral_app {Z₁ Z₂ : Scheme.{0}} (ρ : Z₁ ⟶ Z₂) [Universall
     subst q; rw [eqToHom_refl]; infer_instance
   exact @isIntegral_of_iso_comp _ _ _ _ _ _ _ (hi _) (hi _) h
 
-theorem isNormalScheme_of_smooth {k : Type} [Field k] {Y : Scheme.{0}} (p : Y ⟶ Sp k) [Smooth p] :
-    GlobalTheory.IsNormalScheme Y :=
-  (GlobalTheory.isNormalScheme_iff Y).2 (GlobalTheory.forall_isDomain_and_isIntegrallyClosed_stalk_of_smooth p
-    ((GlobalTheory.isNormalScheme_iff _).1 inferInstance))
+theorem isNormalScheme_of_smooth {k : Type} [Field k] {Y : Scheme.{0}} (p : Y ⟶ Sp k) [Smooth p]
+    : GlobalTheory.IsNormalScheme Y :=
+  (GlobalTheory.isNormalScheme_iff Y).2
+    (GlobalTheory.forall_isDomain_and_isIntegrallyClosed_stalk_of_smooth p
+      ((GlobalTheory.isNormalScheme_iff _).1 inferInstance))
 
-theorem exists_germ_eq {Y : Scheme.{0}} [IsIntegral Y] [GlobalTheory.IsNormalScheme Y] (y : Y) (hy : y = genericPoint Y)
-    (V : Y.Opens) (hyV : y ∈ V) (t : Y.presheaf.stalk y)
-    (h : ∀ x ∈ V, ∃ (W : Y.Opens) (hW : y ∈ W), x ∈ W ∧ W ≤ V ∧
-      (Y.presheaf.germ W y hW).hom.IsIntegralElem t) :
-    ∃ a : Γ(Y, V), Y.presheaf.germ V y hyV a = t := by
+theorem exists_germ_eq
+    {Y : Scheme.{0}} [IsIntegral Y] [GlobalTheory.IsNormalScheme Y]
+    (y : Y) (hy : y = genericPoint Y)
+    (V : Y.Opens) (hyV : y ∈ V)
+    (t : Y.presheaf.stalk y)
+    (h : ∀ x ∈ V, ∃ (W : Y.Opens) (hW : y ∈ W),
+      x ∈ W ∧ W ≤ V ∧ (Y.presheaf.germ W y hW).hom.IsIntegralElem t)
+    : ∃ a : Γ(Y, V), Y.presheaf.germ V y hyV a = t := by
   subst hy
   have : Nonempty V := ⟨⟨_, hyV⟩⟩
   refine GlobalTheory.IsNormalScheme.exists_germToFunctionField_eq_of_locally V t fun x hx => ?_
@@ -67,9 +76,12 @@ theorem exists_germ_eq {Y : Scheme.{0}} [IsIntegral Y] [GlobalTheory.IsNormalSch
   obtain ⟨s, hs⟩ := (IsIntegrallyClosedIn.isIntegral_iff (R := Γ(Y, W)) (A := Y.functionField)).1 hi
   exact ⟨W, hne, s, hxW, hWV, hs⟩
 
-theorem isoOver_top {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] [GlobalTheory.IsNormalScheme Y]
-    (σ : X ⟶ Y) [UniversallyClosed σ] (U : Y.Opens) [IsIso (σ ∣_ U)]
-    (hU : ((σ ⁻¹ᵁ U : X.Opens) : Set X).Nonempty) : IsoOver σ ⊤ := by
+theorem isoOver_top
+    {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] [GlobalTheory.IsNormalScheme Y]
+    (σ : X ⟶ Y) [UniversallyClosed σ]
+    (U : Y.Opens) [IsIso (σ ∣_ U)]
+    (hU : ((σ ⁻¹ᵁ U : X.Opens) : Set X).Nonempty)
+    : IsoOver σ ⊤ := by
   intro V _
   have hηU : genericPoint X ∈ σ ⁻¹ᵁ U :=
     ((genericPoint_spec X).mem_open_set_iff (σ ⁻¹ᵁ U).isOpen).2 (by simpa using hU)
@@ -97,31 +109,43 @@ theorem isoOver_top {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] [GlobalTheo
     apply hSb.1
     rw [Scheme.Hom.germ_stalkMap_apply, Scheme.Hom.germ_stalkMap_apply, e]
   obtain ⟨t, ht⟩ := hSb.2 (X.presheaf.germ (σ ⁻¹ᵁ V) (genericPoint X) hyV b)
-  obtain ⟨a, ha⟩ := exists_germ_eq (σ (genericPoint X)) hgen V hyV t fun y hy => by
-    obtain ⟨_, ⟨W, hW, rfl⟩, hyW, hWV⟩ := Y.isBasis_affineOpens.exists_subset_of_mem_open hy V.isOpen
-    have hWV' : W ≤ V := hWV
-    have hηW : σ (genericPoint X) ∈ W := hmem W ⟨y, hyW⟩
-    refine ⟨W, hηW, hyW, hWV', ?_⟩
-    have hi := isIntegral_app σ W hW (X.presheaf.map (homOfLE (σ.preimage_mono hWV')).op b)
-    have h2 := RingHom.IsIntegralElem.map hi (X.presheaf.germ (σ ⁻¹ᵁ W) (genericPoint X) hηW).hom
-    have e1 : (X.presheaf.germ (σ ⁻¹ᵁ W) (genericPoint X) hηW).hom.comp (σ.app W).hom =
-        (σ.stalkMap (genericPoint X)).hom.comp (Y.presheaf.germ W (σ (genericPoint X)) hηW).hom :=
-      RingHom.ext fun a => (Scheme.Hom.germ_stalkMap_apply σ W _ hηW a).symm
-    have e2 : X.presheaf.germ (σ ⁻¹ᵁ W) (genericPoint X) hηW
-        (X.presheaf.map (homOfLE (σ.preimage_mono hWV')).op b) = σ.stalkMap (genericPoint X) t := by
-      exact (X.presheaf.germ_res_apply (homOfLE (σ.preimage_mono hWV')) _ hηW b).trans ht.symm
-    rw [e1, e2] at h2
-    have h3 := RingHom.IsIntegralElem.map h2 (inv (σ.stalkMap (genericPoint X))).hom
-    have e3 : (inv (σ.stalkMap (genericPoint X))).hom.comp (σ.stalkMap (genericPoint X)).hom =
-        RingHom.id _ := by
-      rw [← CommRingCat.hom_comp, IsIso.hom_inv_id]; rfl
-    rwa [← RingHom.comp_assoc, e3, RingHom.id_comp, ← RingHom.comp_apply, e3, RingHom.id_apply] at h3
+  obtain ⟨a, ha⟩ :=
+    exists_germ_eq (σ (genericPoint X)) hgen V hyV t fun y hy => by
+      obtain ⟨_, ⟨W, hW, rfl⟩, hyW, hWV⟩ :=
+        Y.isBasis_affineOpens.exists_subset_of_mem_open hy V.isOpen
+      have hWV' : W ≤ V := hWV
+      have hηW : σ (genericPoint X) ∈ W := hmem W ⟨y, hyW⟩
+      refine ⟨W, hηW, hyW, hWV', ?_⟩
+      have hi := isIntegral_app σ W hW (X.presheaf.map (homOfLE (σ.preimage_mono hWV')).op b)
+      have h2 := RingHom.IsIntegralElem.map hi (X.presheaf.germ (σ ⁻¹ᵁ W) (genericPoint X) hηW).hom
+      have e1
+          : (X.presheaf.germ (σ ⁻¹ᵁ W) (genericPoint X) hηW).hom.comp (σ.app W).hom
+            = (σ.stalkMap (genericPoint X)).hom.comp
+              (Y.presheaf.germ W (σ (genericPoint X)) hηW).hom :=
+        RingHom.ext fun a => (Scheme.Hom.germ_stalkMap_apply σ W _ hηW a).symm
+      have e2
+          : X.presheaf.germ (σ ⁻¹ᵁ W) (genericPoint X) hηW
+              (X.presheaf.map (homOfLE (σ.preimage_mono hWV')).op b)
+            = σ.stalkMap (genericPoint X) t := by
+        exact (X.presheaf.germ_res_apply (homOfLE (σ.preimage_mono hWV')) _ hηW b).trans ht.symm
+      rw [e1, e2] at h2
+      have h3 := RingHom.IsIntegralElem.map h2 (inv (σ.stalkMap (genericPoint X))).hom
+      have e3
+          : (inv (σ.stalkMap (genericPoint X))).hom.comp (σ.stalkMap (genericPoint X)).hom
+            = RingHom.id _ := by
+        rw [← CommRingCat.hom_comp, IsIso.hom_inv_id]; rfl
+      rwa [← RingHom.comp_assoc, e3, RingHom.id_comp, ← RingHom.comp_apply, e3, RingHom.id_apply] at
+        h3
   refine ⟨a, germ_injective_of_isIntegral X (genericPoint X) hyV ?_⟩
   rw [← Scheme.Hom.germ_stalkMap_apply, ha, ht]
 
-theorem modification_lineBundleGlobalSectionsDim_pull_eq : ∀ (k : Type) [Field k] (Y : Scheme.{0}) [IsIntegral Y] (p : Y ⟶ Sp k) (U : Y.Opens) (D : ℕ),
-    SmoothOfRelativeDimension D p → IsProjOver p → ∀ (M : Modif p U D) [IsIntegral M.X] (B : LB Y), B.IsLB →
-    letI := algebraΓOfHom p; letI := algebraΓOfHom M.str; lbH0 k (B.pull M.σ) = lbH0 k B := by
+theorem modification_lineBundleGlobalSectionsDim_pull_eq
+    : ∀ (k : Type) [Field k] (Y : Scheme.{0}) [IsIntegral Y] (p : Y ⟶ Sp k) (U : Y.Opens) (D : ℕ),
+      SmoothOfRelativeDimension D p → IsProjOver p
+        → ∀ (M : Modif p U D) [IsIntegral M.X] (B : LB Y),
+          B.IsLB
+            → letI := algebraΓOfHom p
+              letI := algebraΓOfHom M.str; lbH0 k (B.pull M.σ) = lbH0 k B := by
   intro k _ Y _ p U D hs hp M _ B hB
   haveI := hs
   haveI : Smooth p := SmoothOfRelativeDimension.smooth D p

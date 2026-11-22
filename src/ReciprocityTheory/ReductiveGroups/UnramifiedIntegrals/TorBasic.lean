@@ -21,7 +21,7 @@ open Formalism.L2.Th1.A (shortW)
 variable {l : ℕ} [Fact l.Prime] {g2 g3 : ℂ_[l]}
 
 theorem good_norm_two (h : GoodPair l g2 g3) : ‖(2 : ℂ_[l])‖ = 1 := by
-  have hl : ¬ (l ∣ 2) := by
+  have hl : ¬(l ∣ 2) := by
     intro hd
     have h1 := Nat.le_of_dvd (by norm_num) hd
     have h2 := h.five
@@ -42,7 +42,8 @@ theorem good_norm_two (h : GoodPair l g2 g3) : ‖(2 : ℂ_[l])‖ = 1 := by
 theorem good_norm_four (h : GoodPair l g2 g3) : ‖(4 : ℂ_[l])‖ = 1 := by
   rw [show (4 : ℂ_[l]) = 2 * 2 by norm_num, norm_mul, good_norm_two h, mul_one]
 
-theorem good_model (h : GoodPair l g2 g3) : IntegralModel (shortW g2 g3) ∧ ‖(shortW g2 g3).Δ‖ = 1 := by
+theorem good_model (h : GoodPair l g2 g3)
+    : IntegralModel (shortW g2 g3) ∧ ‖(shortW g2 g3).Δ‖ = 1 := by
   have h4 := good_norm_four h
   refine ⟨?_, ?_⟩
   · unfold IntegralModel shortW
@@ -59,21 +60,25 @@ theorem good_int (h : GoodPair l g2 g3) : IntCurve (shortW g2 g3) := by
   have hΔ := (good_model h).2
   unfold IntCurve
   simp only [shortW] at hΔ ⊢
-  simp only [norm_zero, zero_le_one, norm_neg, norm_div, h4, div_one, true_and, h.norm2,
-    h.norm3, and_self, hΔ]
+  simp only [norm_zero, zero_le_one, norm_neg, norm_div, h4, div_one, true_and, h.norm2, h.norm3,
+    and_self, hΔ]
 
-theorem good_coeff (h : GoodPair l g2 g3) : CoeffSub (MaximalUnramifiedExtension l) (shortW g2 g3) := by
+theorem good_coeff (h : GoodPair l g2 g3)
+    : CoeffSub (MaximalUnramifiedExtension l) (shortW g2 g3) := by
   have h4 : (4 : ℂ_[l]) ∈ MaximalUnramifiedExtension l := by
     first
     | exact ofNat_mem (MaximalUnramifiedExtension l) 4
-    | (have h4' := natCast_mem (MaximalUnramifiedExtension l) 4
-       exact_mod_cast h4')
+    | (
+        have h4' := natCast_mem (MaximalUnramifiedExtension l) 4
+        exact_mod_cast h4'
+      )
   unfold CoeffSub shortW
-  exact ⟨zero_mem _, zero_mem _, zero_mem _, div_mem (neg_mem h.mem2) h4,
-    div_mem (neg_mem h.mem3) h4⟩
+  exact
+    ⟨zero_mem _, zero_mem _, zero_mem _, div_mem (neg_mem h.mem2) h4, div_mem (neg_mem h.mem3) h4⟩
 
-theorem integral_of_not_mem_formalGroup (h : GoodPair l g2 g3) (P : (shortW g2 g3).toAffine.Point) (hP : ¬ InFormalGroupPoints P) :
-    P ≠ 0 ∧ ‖px _ P‖ ≤ 1 ∧ ‖py _ P‖ ≤ 1 := by
+theorem integral_of_not_mem_formalGroup
+    (h : GoodPair l g2 g3) (P : (shortW g2 g3).toAffine.Point) (hP : ¬ InFormalGroupPoints P)
+    : P ≠ 0 ∧ ‖px _ P‖ ≤ 1 ∧ ‖py _ P‖ ≤ 1 := by
   unfold InFormalGroupPoints at hP
   cases P with
   | zero => exact absurd trivial hP
@@ -102,18 +107,23 @@ theorem integral_of_not_mem_formalGroup (h : GoodPair l g2 g3) (P : (shortW g2 g
     · show ‖y‖ ≤ 1
       nlinarith [norm_nonneg y]
 
-theorem torsion_not_mem_formalGroup (h : GoodPair l g2 g3) (P : (shortW g2 g3).toAffine.Point) (N : ℕ) (hN : ¬ l ∣ N)
-    (hNP : N • P = 0) (hP0 : P ≠ 0) : ¬ InFormalGroupPoints P := fun hE => by
+theorem torsion_not_mem_formalGroup
+    (h : GoodPair l g2 g3)
+    (P : (shortW g2 g3).toAffine.Point) (N : ℕ) (hN : ¬ l ∣ N) (hNP : N • P = 0)
+    (hP0 : P ≠ 0)
+    : ¬ InFormalGroupPoints P := fun hE => by
   have hn := norm_natCast_Cl_of_not_dvd (l := l) hN
-  obtain ⟨m, rfl⟩ : ∃ m, N = m + 1 :=
-    Nat.exists_eq_succ_of_ne_zero (by rintro rfl; simp at hn)
+  obtain ⟨m, rfl⟩ : ∃ m, N = m + 1 := Nat.exists_eq_succ_of_ne_zero (by rintro rfl; simp at hn)
   have hmul := (FormalGroupPointsTorsion.mulz (good_model h).1 P hE hP0 m).2
   rw [hNP, Affine.Point.zero_def] at hmul
   simp only [FormalGroupPointsTorsion.zf, zero_sub, norm_neg, norm_mul, hn, one_mul] at hmul
   exact lt_irrefl _ hmul
 
-theorem not_mem_formalGroup_sub (h : GoodPair l g2 g3) (P D : (shortW g2 g3).toAffine.Point) (hP : ¬ InFormalGroupPoints P)
-    (hD : InFormalGroupPoints D) : ¬ InFormalGroupPoints (P - D) := fun hE => by
+theorem not_mem_formalGroup_sub
+    (h : GoodPair l g2 g3)
+    (P D : (shortW g2 g3).toAffine.Point)
+    (hP : ¬ InFormalGroupPoints P) (hD : InFormalGroupPoints D)
+    : ¬ InFormalGroupPoints (P - D) := fun hE => by
   have hadd : InFormalGroupPoints (P - D + D) := by
     generalize P - D = E at hE ⊢
     cases E with
@@ -133,13 +143,20 @@ theorem not_mem_formalGroup_sub (h : GoodPair l g2 g3) (P D : (shortW g2 g3).toA
           exact FormalGroupPointsSubgroup.addX_norm _ (good_model h).1 h₁.1 h₂.1 hxy hE hD
   exact hP (by simpa only [sub_add_cancel] using hadd)
 
-theorem tor_y_unit (h : GoodPair l g2 g3) (P : (shortW g2 g3).toAffine.Point) (N : ℕ) (hN : ¬ l ∣ N)
-    (hNP : N • P = 0) (h2 : P + P ≠ 0) : ‖py _ P‖ = 1 := by
+theorem tor_y_unit
+    (h : GoodPair l g2 g3)
+    (P : (shortW g2 g3).toAffine.Point) (N : ℕ) (hN : ¬ l ∣ N) (hNP : N • P = 0)
+    (h2 : P + P ≠ 0)
+    : ‖py _ P‖ = 1 := by
   have hP0 : P ≠ 0 := fun h0 => h2 (by rw [h0, add_zero])
-  obtain ⟨-, hx, hy⟩ := integral_of_not_mem_formalGroup h P (torsion_not_mem_formalGroup h P N hN hNP hP0)
+  obtain ⟨-, hx, hy⟩ :=
+    integral_of_not_mem_formalGroup h P (torsion_not_mem_formalGroup h P N hN hNP hP0)
   have hN2 : N • (P + P) = 0 := by rw [smul_add, hNP, add_zero]
-  obtain ⟨-, hx2, -⟩ := integral_of_not_mem_formalGroup h (P + P) (torsion_not_mem_formalGroup h (P + P) N hN hN2 h2)
-  have hu := Formalism.L2.Th1.E.UnitPsi2_of Formalism.L2.Th1.E.nonsingular_norm ℂ_[l] _ (good_int h) P hP0 h2 hx hy hx2
+  obtain ⟨-, hx2, -⟩ :=
+    integral_of_not_mem_formalGroup h (P + P) (torsion_not_mem_formalGroup h (P + P) N hN hN2 h2)
+  have hu :=
+    Formalism.L2.Th1.E.UnitPsi2_of Formalism.L2.Th1.E.nonsingular_norm ℂ_[l] _ (good_int h) P hP0 h2
+      hx hy hx2
   have he : Formalism.L2.Th1.E.psi2 (shortW g2 g3) P = 2 * py _ P := by
     simp [Formalism.L2.Th1.E.psi2, shortW]
   rw [he, norm_mul, good_norm_two h, one_mul] at hu

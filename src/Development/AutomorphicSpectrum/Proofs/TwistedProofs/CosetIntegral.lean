@@ -27,8 +27,7 @@ theorem cosetIntegral : CosetIntegral := by
     rw [hC_eq]
     exact hK.preimage (continuous_const_mul _)
   have hC_meas : ∀ x, MeasurableSet (C x) := fun x => (hC_open x).measurableSet
-  have hC_one : ∀ x, μ (C x) = 1 := fun x => by
-    rw [hC_eq, measure_preimage_mul, hμK]
+  have hC_one : ∀ x, μ (C x) = 1 := fun x => by rw [hC_eq, measure_preimage_mul, hμK]
   have hF_on : ∀ x, Set.EqOn F (fun _ => f x) (C x) := by
     intro x g hg
     simp only [hC_def, Set.mem_preimage, Set.mem_singleton_iff] at hg
@@ -43,14 +42,16 @@ theorem cosetIntegral : CosetIntegral := by
   have hs_int : ∀ i, IntegrableOn F (s i) μ := by
     intro i
     refine (integrableOn_const (by rw [hC_one]; exact ENNReal.one_ne_top)).congr_fun
-      (fun g hg => (hF_on i hg).symm) (hs_meas i)
+      (fun g hg => (hF_on i hg).symm)
+      (hs_meas i)
   have hs_val : ∀ i, ∫ g in s i, F g ∂μ = f i := by
     intro i
     rw [setIntegral_congr_fun (hs_meas i) (hF_on i), setIntegral_const]
     simp [Measure.real, hs_def, hC_one]
   have hs_norm : ∀ i, ∫ g in s i, ‖F g‖ ∂μ = ‖f i‖ := by
     intro i
-    rw [setIntegral_congr_fun (hs_meas i) (fun g hg => congrArg norm (hF_on i hg)), setIntegral_const]
+    rw [setIntegral_congr_fun (hs_meas i) (fun g hg => congrArg norm (hF_on i hg)),
+      setIntegral_const]
     simp [Measure.real, hs_def, hC_one]
   have hU : IntegrableOn F (⋃ i, s i) μ := by
     refine integrableOn_iUnion_of_summable_integral_norm hs_int ?_

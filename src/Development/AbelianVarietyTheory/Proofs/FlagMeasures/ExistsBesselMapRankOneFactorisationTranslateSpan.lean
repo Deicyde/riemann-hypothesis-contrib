@@ -16,13 +16,14 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.SgInf.BeRankOne
 
-theorem exists_rankOne_of_hermitian_nonneg_operatorKernel {H Wp : Type*} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp]
+theorem exists_rankOne_of_hermitian_nonneg_operatorKernel
+    {H Wp : Type*} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [CompleteSpace Wp]
     (V : Set H) (B : H → H → (Wp →L[ℂ] Wp)) (l₀ : H → Wp)
     (hc : ∀ v ∈ V, ∀ ξ : Wp, ∃ c : ℂ, ∀ u ∈ V, B u v ξ = c • l₀ u)
     (hadj : ∀ u ∈ V, ∀ v ∈ V, ContinuousLinearMap.adjoint (B u v) = B v u)
     (hpos : ∀ v ∈ V, ∀ ξ : Wp, 0 ≤ (⟪ξ, B v v ξ⟫_ℂ).re ∧ (⟪ξ, B v v ξ⟫_ℂ).im = 0)
-    (hne : ∃ u ∈ V, ∃ v ∈ V, ∃ ξ : Wp, B u v ξ ≠ 0) :
-    ∃ t : ℂ, (∃ u ∈ V, t • l₀ u ≠ 0) ∧ ∀ u ∈ V, ∀ v ∈ V, B u v = rk1 (t • l₀ u) (t • l₀ v) := by
+    (hne : ∃ u ∈ V, ∃ v ∈ V, ∃ ξ : Wp, B u v ξ ≠ 0)
+    : ∃ t : ℂ, (∃ u ∈ V, t • l₀ u ≠ 0) ∧ ∀ u ∈ V, ∀ v ∈ V, B u v = rk1 (t • l₀ u) (t • l₀ v) := by
   classical
   obtain ⟨u₁, hu₁, v₁, hv₁, ξ₁, hne₁⟩ := hne
   choose! cf hcf using hc
@@ -81,10 +82,13 @@ theorem exists_rankOne_of_hermitian_nonneg_operatorKernel {H Wp : Type*} [Normed
   congr 1
   rw [mul_right_comm, ht]
 
-theorem isBesselMapSm_smul {k r : ℕ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    {Wp : Type*} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] {z : Fin (2 * r + k + 1) → ℂ}
-    {ψ : Mat k r → ℂ} {σ : Mat k r → (H →L[ℂ] H)} {π : Mat k r → (Wp →L[ℂ] Wp)} {l : H → Wp}
-    (hl : IsBesselMapSm z ψ σ π l) (t : ℂ) : IsBesselMapSm z ψ σ π (fun u => t • l u) := by
+theorem isBesselMapSm_smul
+    {k r : ℕ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {Wp : Type*} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp]
+    {z : Fin (2 * r + k + 1) → ℂ} {ψ : Mat k r → ℂ} {σ : Mat k r → (H →L[ℂ] H)}
+    {π : Mat k r → (Wp →L[ℂ] Wp)} {l : H → Wp} (hl : IsBesselMapSm z ψ σ π l)
+    (t : ℂ)
+    : IsBesselMapSm z ψ σ π (fun u => t • l u) := by
   unfold Formalism.MainNotions.S.IsBesselMapSm Formalism.MainNotions.S.IsCWCont at *
   obtain ⟨hadd, hsm, heq, C, Ws, hWs, hb⟩ := hl
   refine ⟨?_, ?_, ?_, ‖t‖ * C, Ws, hWs, ?_⟩
@@ -104,24 +108,35 @@ theorem isBesselMapSm_smul {k r : ℕ} {H : Type*} [NormedAddCommGroup H] [Inner
 
 end GlobalTheory.SgInf.BeRankOne
 
-theorem GlobalTheory.SgInf.exists_isEll_DD : ∀ (k r : ℕ) {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp] [CompleteSpace Wp] (σ : Mat k r → (H →L[ℂ] H)) (w : H) (a : ℝ) (μG : Measure (Mt k r)) (d : ℝ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (π : Mat k r → (Wp →L[ℂ] Wp)) (μS : Measure (Mt k r)) , Std σ w a μG d → Side z π μS → IsSmoothVec σ w → MultOne z (psiGen k r z c) σ π → ∀ ν : Measure (Mt k r), IsQuotMeas μG μS ν → NonVan z (psiGen k r z c) σ π w μG ν → ∃ l : H → Wp, IsEll z (psiGen k r z c) π μS σ (DD σ w) l := by
+theorem GlobalTheory.SgInf.exists_isEll_DD
+    : ∀ (k r : ℕ) {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+        {Wp : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+        [CompleteSpace Wp] (σ : Mat k r → (H →L[ℂ] H)) (w : H) (a : ℝ) (μG : Measure (Mt k r))
+        (d : ℝ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (π : Mat k r → (Wp →L[ℂ] Wp))
+        (μS : Measure (Mt k r)),
+      Std σ w a μG d → Side z π μS → IsSmoothVec σ w → MultOne z (psiGen k r z c) σ π
+        → ∀ ν : Measure (Mt k r),
+          IsQuotMeas μG μS ν → NonVan z (psiGen k r z c) σ π w μG ν
+            → ∃ l : H → Wp, IsEll z (psiGen k r z c) π μS σ (DD σ w) l := by
   intro k r H _ _ _ Wp _ _ _ _ σ w a μG d z c π μS hStd hSide hsm hM1 ν hq hNV
   obtain ⟨-, hU, -, -, hHG, -, -, hDec, -⟩ := id hStd
   obtain ⟨-, -, -, hHS, -⟩ := id hSide
   obtain ⟨hinv, -, hDV, -, hVsm⟩ := GlobalTheory.T.smooth_vectors_dense_invariant k r σ w hU
-  have hsmDD : ∀ v ∈ DD σ w, v ∈ smoothVecs (k := k) (r := r) σ :=
-    fun v hv => (hVsm hsm).1 v (hDV hv)
+  have hsmDD : ∀ v ∈ DD σ w, v ∈ smoothVecs (k := k) (r := r) σ := fun v hv =>
+    (hVsm hsm).1 v (hDV hv)
   have hae := GlobalTheory.SgInf.WUnfold.ae_mem_GG hHG hHS hq
 
-  have hne : ∃ u ∈ (DD σ w : Set H), ∃ v ∈ (DD σ w : Set H), ∃ ξ : Wp,
-      be (psiGen k r z c) π μS σ u v ξ ≠ 0 := by
+  have hne
+      : ∃ u ∈ (DD σ w : Set H), ∃ v ∈ (DD σ w : Set H), ∃ ξ : Wp,
+        be (psiGen k r z c) π μS σ u v ξ ≠ 0 := by
     by_contra hz
     push Not at hz
     obtain ⟨W, hWG, hWν, hWeq, hWfin, hWne, hWfix⟩ := hNV
     have hW0 : ∀ y ∈ GG k r, W y = 0 := by
       intro y hy
       rw [← hWfix y hy,
-        (GlobalTheory.T.bessel_functional_standard_side k r σ w a μG d z c π μS hStd hSide ν hq W hWG hWν hWeq hWfin y hy).2,
+        (GlobalTheory.T.bessel_functional_standard_side k r σ w a μG d z c π μS hStd hSide ν hq W
+          hWG hWν hWeq hWfin y hy).2,
         integral_eq_zero_of_ae, smul_zero]
       filter_upwards [hae] with g hg
       exact hz _ (mem_DD σ w hy) _ (mem_DD σ w hg) _
@@ -131,12 +146,17 @@ theorem GlobalTheory.SgInf.exists_isEll_DD : ∀ (k r : ℕ) {H : Type} [NormedA
     filter_upwards [hae] with x hx
     simp [hW0 _ hx]
   obtain ⟨u₁, hu₁, v₁, hv₁, ξ₁, hne₁⟩ := hne
-  obtain ⟨l₀, hB₀, hl₀⟩ := GlobalTheory.T.exists_continuous_besselMap_smoothVectors k r σ w a μG d z c π μS hStd hSide hsm v₁ hv₁ ξ₁
+  obtain ⟨l₀, hB₀, hl₀⟩ :=
+    GlobalTheory.T.exists_continuous_besselMap_smoothVectors k r σ w a μG d z c π μS hStd hSide hsm
+      v₁ hv₁ ξ₁
 
-  have hcol : ∀ v ∈ (DD σ w : Set H), ∀ ξ : Wp, ∃ b : ℂ, ∀ u ∈ (DD σ w : Set H),
-      be (psiGen k r z c) π μS σ u v ξ = b • l₀ u := by
+  have hcol
+      : ∀ v ∈ (DD σ w : Set H), ∀ ξ : Wp, ∃ b : ℂ, ∀ u ∈ (DD σ w : Set H),
+        be (psiGen k r z c) π μS σ u v ξ = b • l₀ u := by
     intro v hv ξ
-    obtain ⟨l, hB, hl⟩ := GlobalTheory.T.exists_continuous_besselMap_smoothVectors k r σ w a μG d z c π μS hStd hSide hsm v hv ξ
+    obtain ⟨l, hB, hl⟩ :=
+      GlobalTheory.T.exists_continuous_besselMap_smoothVectors k r σ w a μG d z c π μS hStd hSide
+        hsm v hv ξ
     obtain ⟨b, hb | hb⟩ := hM1 l l₀ hB hB₀
     · exact ⟨b, fun u hu => by rw [← hl u hu]; exact hb u (hsmDD u hu)⟩
     · have hb0 : b ≠ 0 := by
@@ -145,14 +165,18 @@ theorem GlobalTheory.SgInf.exists_isEll_DD : ∀ (k r : ℕ) {H : Type} [NormedA
         rw [← hl₀ u₁ hu₁, hb u₁ (hsmDD u₁ hu₁), zero_smul]
       refine ⟨b⁻¹, fun u hu => ?_⟩
       rw [← hl u hu, hb u (hsmDD u hu), inv_smul_smul₀ hb0]
-  obtain ⟨t, ⟨u₂, hu₂, hne₂⟩, hrk⟩ := GlobalTheory.SgInf.BeRankOne.exists_rankOne_of_hermitian_nonneg_operatorKernel (DD σ w : Set H)
-    (be (psiGen k r z c) π μS σ) l₀ hcol
-    (fun u hu v hv =>
-      (GlobalTheory.T.besselForm_converges_equivariant_hermitian k r σ w a μG d z c π μS hStd hSide (DD σ w : Set H) hinv hDec u hu v hv).2.2.1)
-    (fun v hv ξ => by
-      have h := GlobalTheory.T.norm_identity_besselCoefficient_quotient k r σ w a μG d z c π μS hStd hSide ν hq v hv v hv v hv ξ
-      exact ⟨h.2.2.2.2.1, h.2.2.2.2.2⟩)
-    ⟨u₁, hu₁, v₁, hv₁, ξ₁, hne₁⟩
+  obtain ⟨t, ⟨u₂, hu₂, hne₂⟩, hrk⟩ :=
+    GlobalTheory.SgInf.BeRankOne.exists_rankOne_of_hermitian_nonneg_operatorKernel (DD σ w : Set H)
+      (be (psiGen k r z c) π μS σ) l₀ hcol
+      (fun u hu v hv =>
+        (GlobalTheory.T.besselForm_converges_equivariant_hermitian k r σ w a μG d z c π μS hStd
+          hSide (DD σ w : Set H) hinv hDec u hu v hv).2.2.1)
+      (fun v hv ξ => by
+        have h :=
+          GlobalTheory.T.norm_identity_besselCoefficient_quotient k r σ w a μG d z c π μS hStd hSide
+            ν hq v hv v hv v hv ξ
+        exact ⟨h.2.2.2.2.1, h.2.2.2.2.2⟩)
+      ⟨u₁, hu₁, v₁, hv₁, ξ₁, hne₁⟩
   refine ⟨fun u => t • l₀ u, ?_⟩
   unfold GlobalTheory.SgInf.IsEll
   exact ⟨GlobalTheory.SgInf.BeRankOne.isBesselMapSm_smul hB₀ t, ⟨u₂, hu₂, hne₂⟩, hrk⟩

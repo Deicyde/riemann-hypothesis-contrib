@@ -9,7 +9,8 @@ noncomputable section
 
 namespace PositivityTheory.SiegelWeilFormula.GFac
 
-open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain MeasureTheory GlobalTheory.Cont PositivityTheory.PfSWUS.Loc PositivityTheory.Rg.Sw Filter
+open HeckeCharacterZeroLocus.SiegelWeilU NumberField IsDedekindDomain MeasureTheory
+  GlobalTheory.Cont PositivityTheory.PfSWUS.Loc PositivityTheory.Rg.Sw Filter
 open PositivityTheory.SiegelWeilFormula.Gen
 open GlobalTheory.CompanionTheory.SiegelND.Coef (hermInf hermFin hermV latH intH)
 open scoped TensorProduct Matrix
@@ -19,19 +20,22 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algeb
 theorem evalV_apply (v : HeightOneSpectrum (𝓞 F)) (a : Af F) : evalV F v a = a v := rfl
 
 open Classical in
-theorem evalV_singleV_same (v : HeightOneSpectrum (𝓞 F)) (y : Fv F v) : evalV F v (singleV F v y) = y := by
+theorem evalV_singleV_same (v : HeightOneSpectrum (𝓞 F)) (y : Fv F v)
+    : evalV F v (singleV F v y) = y := by
   rw [evalV_apply]
   unfold singleV
   exact RestrictedProduct.single_eq_same _ _ _
 
 open Classical in
-theorem evalV_singleV_ne {v w : HeightOneSpectrum (𝓞 F)} (h : w ≠ v) (y : Fv F v) : evalV F w (singleV F v y) = 0 := by
+theorem evalV_singleV_ne {v w : HeightOneSpectrum (𝓞 F)} (h : w ≠ v) (y : Fv F v)
+    : evalV F w (singleV F v y) = 0 := by
   rw [evalV_apply]
   unfold singleV
   exact RestrictedProduct.single_eq_of_ne _ _ h
 
-theorem addChar_sum {A M ι : Type} [AddCommMonoid A] [CommMonoid M] (ψ : AddChar A M) (s : Finset ι) (f : ι → A) :
-    ψ (∑ i ∈ s, f i) = ∏ i ∈ s, ψ (f i) := by
+theorem addChar_sum
+    {A M ι : Type} [AddCommMonoid A] [CommMonoid M] (ψ : AddChar A M) (s : Finset ι) (f : ι → A)
+    : ψ (∑ i ∈ s, f i) = ∏ i ∈ s, ψ (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -44,26 +48,31 @@ theorem fstA_pairA (x : Ainf F) (y : Af F) : fstA F (pairA F x y) = x := rfl
 
 theorem sndA_pairA (x : Ainf F) (y : Af F) : sndA F (pairA F x y) = y := rfl
 
-theorem psi_split (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ) :
-    ∃ S₀ : Finset (HeightOneSpectrum (𝓞 F)), ∀ S, S₀ ⊆ S → ∀ x : AF F,
-      (∀ v, v ∉ S → evalV F v (sndA F x) ∈ v.adicCompletionIntegers F) →
-      ψ x = psiInf F ψ (fstA F x) * ∏ v ∈ S, psiV F ψ v (evalV F v (sndA F x)) := by
+theorem psi_split (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ)
+    : ∃ S₀ : Finset (HeightOneSpectrum (𝓞 F)), ∀ S,
+      S₀ ⊆ S
+        → ∀ x : AF F,
+          (∀ v, v ∉ S → evalV F v (sndA F x) ∈ v.adicCompletionIntegers F)
+            → ψ x = psiInf F ψ (fstA F x) * ∏ v ∈ S, psiV F ψ v (evalV F v (sndA F x)) := by
   classical
   obtain ⟨ξ, hξ⟩ := GlobalTheory.CompanionTheory.AdeleDual.exists_eq_adelicChar_mul ψ hψ.1 hψ.2.2.1
-  have hfin : {v : HeightOneSpectrum (𝓞 F) | ¬ algebraMap F (Fv F v) ξ ∈ v.adicCompletionIntegers F}.Finite :=
+  have hfin
+      : {v : HeightOneSpectrum (𝓞 F) | ¬ algebraMap F (Fv F v) ξ ∈ v.adicCompletionIntegers F}.Finite :=
     Filter.eventually_cofinite.1 (GlobalTheory.CompanionTheory.SiegelND.Coef.Lim.ev_rat ξ)
   refine ⟨hfin.toFinset, fun S hS x hx => ?_⟩
   set xf : Af F := sndA F x with hxf
   set r : Af F := xf - ∑ v ∈ S, singleV F v (evalV F v xf) with hr
-  have hdec : x = pairA F (fstA F x) 0 + ∑ v ∈ S, pairA F 0 (singleV F v (evalV F v xf)) + pairA F 0 r := by
+  have hdec
+      : x
+        = pairA F (fstA F x) 0 + ∑ v ∈ S, pairA F 0 (singleV F v (evalV F v xf)) + pairA F 0 r := by
     refine AF_ext ?_ ?_
     set_option synthInstance.maxHeartbeats 100000 in
       · rw [map_add (f := _), map_add (f := _), map_sum, fstA_pairA, fstA_pairA]
         simp only [fstA_pairA, Finset.sum_const_zero, add_zero]
     set_option synthInstance.maxHeartbeats 100000 in
-      · rw [map_add (f := _), map_add (f := _), map_sum, sndA_pairA, sndA_pairA]
-        simp only [sndA_pairA, hr, hxf]
-        abel
+    · rw [map_add (f := _), map_add (f := _), map_sum, sndA_pairA, sndA_pairA]
+      simp only [sndA_pairA, hr, hxf]
+      abel
   have hrv : ∀ v, evalV F v r = if v ∈ S then 0 else evalV F v xf := by
     intro v
     set_option synthInstance.maxHeartbeats 100000 in
@@ -100,7 +109,10 @@ theorem psi_split (ψ : AddChar (AF F) ℂ) (hψ : IsCharAF F ψ) :
       GroundTheory.Global.mem_invDifferentAdeles.mpr hmem
     rw [GroundTheory.Global.adelicChar_of_mem_invDifferentAdeles hm2]
     simp [pairA]
-  have h1 : ψ x = ψ (pairA F (fstA F x) 0 + ∑ v ∈ S, pairA F 0 (singleV F v (evalV F v xf)) + pairA F 0 r) :=
+  have h1
+      : ψ x
+        = ψ
+          (pairA F (fstA F x) 0 + ∑ v ∈ S, pairA F 0 (singleV F v (evalV F v xf)) + pairA F 0 r) :=
     congrArg ψ hdec
   rw [h1, AddChar.map_add_eq_mul, AddChar.map_add_eq_mul, addChar_sum, hr1, mul_one]
   rfl

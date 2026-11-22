@@ -9,12 +9,13 @@ namespace UpperTheory.V.Z.Tf.GlobalTraceComparison
 
 section Core
 
-variable {X : Type} [TopologicalSpace X] [CompactSpace X] {B : Type} [CommRing B] [StarRing B]
-  [Algebra ℂ B] [StarModule ℂ B] (Φ : B →⋆ₐ[ℂ] C(X, ℂ)) (A : StarSubalgebra ℂ B)
-  (p : A →⋆ₐ[ℂ] ℂ)
+variable
+  {X : Type} [TopologicalSpace X] [CompactSpace X]
+  {B : Type} [CommRing B] [StarRing B] [Algebra ℂ B] [StarModule ℂ B]
+  (Φ : B →⋆ₐ[ℂ] C(X, ℂ))
+  (A : StarSubalgebra ℂ B) (p : A →⋆ₐ[ℂ] ℂ)
 
-private def Nn (c : A) : Prop :=
-  p c = 0 ∧ ∀ χ, (Φ (c : B) χ).im = 0 ∧ 0 ≤ (Φ (c : B) χ).re
+private def Nn (c : A) : Prop := p c = 0 ∧ ∀ χ, (Φ (c : B) χ).im = 0 ∧ 0 ≤ (Φ (c : B) χ).re
 
 private lemma nn_add {c d : A} (hc : Nn Φ A p c) (hd : Nn Φ A p d) : Nn Φ A p (c + d) := by
   refine ⟨by simp [hc.1, hd.1], fun χ => ?_⟩
@@ -105,11 +106,12 @@ end Core
 
 section Rep
 
-private theorem exists_rep {B : Type} [CommRing B] [StarRing B] [Algebra ℂ B] [StarModule ℂ B]
+private theorem exists_rep
+    {B : Type} [CommRing B] [StarRing B] [Algebra ℂ B] [StarModule ℂ B]
     {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    (R : B →⋆ₐ[ℂ] (H →L[ℂ] H)) :
-    ∃ (X : Type) (_ : TopologicalSpace X) (_ : CompactSpace X) (Φ : B →⋆ₐ[ℂ] C(X, ℂ)),
-      ∀ y, ‖Φ y‖ = ‖R y‖ := by
+    (R : B →⋆ₐ[ℂ] (H →L[ℂ] H))
+    : ∃ (X : Type) (_ : TopologicalSpace X) (_ : CompactSpace X) (Φ : B →⋆ₐ[ℂ] C(X, ℂ)), ∀ y,
+      ‖Φ y‖ = ‖R y‖ := by
   let S : StarSubalgebra ℂ (H →L[ℂ] H) := R.range
   have hcomm : ∀ u v : S, u * v = v * u := by
     rintro ⟨_, y, rfl⟩ ⟨_, z, rfl⟩
@@ -132,20 +134,25 @@ end Rep
 
 section Peak
 
-variable {X : Type} [TopologicalSpace X] [CompactSpace X] {B : Type} [CommRing B] [StarRing B]
-  [Algebra ℂ B] [StarModule ℂ B] (Φ : B →⋆ₐ[ℂ] C(X, ℂ)) (A : StarSubalgebra ℂ B)
-  (p : A →⋆ₐ[ℂ] ℂ)
+variable
+  {X : Type} [TopologicalSpace X] [CompactSpace X]
+  {B : Type} [CommRing B] [StarRing B] [Algebra ℂ B] [StarModule ℂ B]
+  (Φ : B →⋆ₐ[ℂ] C(X, ℂ))
+  (A : StarSubalgebra ℂ B) (p : A →⋆ₐ[ℂ] ℂ)
 
-private theorem core (a₀ : A) (x : B) {ρ : ℝ} (ha : p a₀ = 1) (hρ : 0 < ρ)
-    (h : ∀ χ, (∀ a : A, Φ (a : B) χ = p a) → ‖Φ x χ‖ < ρ) :
-    ∃ g : A, p g = 1 ∧ ‖Φ (x * (g * a₀ : A))‖ < ρ := by
+private theorem core
+    (a₀ : A) (x : B)
+    {ρ : ℝ}
+    (ha : p a₀ = 1) (hρ : 0 < ρ) (h : ∀ χ, (∀ a : A, Φ (a : B) χ = p a) → ‖Φ x χ‖ < ρ)
+    : ∃ g : A, p g = 1 ∧ ‖Φ (x * (g * a₀ : A))‖ < ρ := by
   obtain ⟨ρ', h0, h1, hg⟩ := exists_gap Φ A p x hρ h
   have hKc : IsCompact {χ : X | ρ' ≤ ‖Φ x χ‖} :=
     (isClosed_le continuous_const (continuous_norm.comp (map_continuous _))).isCompact
-  obtain ⟨c, hc, δ, hδ, hcK⟩ := exists_sep Φ A p hKc (fun χ hχ => by
-    by_contra hne
-    push_neg at hne
-    exact absurd (hg χ hne) (not_lt.2 hχ))
+  obtain ⟨c, hc, δ, hδ, hcK⟩ :=
+    exists_sep Φ A p hKc (fun χ hχ => by
+      by_contra hne
+      push_neg at hne
+      exact absurd (hg χ hne) (not_lt.2 hχ))
   obtain ⟨b, hbdef⟩ : ∃ b : A, b = a₀ - 1 := ⟨_, rfl⟩
   have hb : p b = 0 := by rw [hbdef, map_sub, map_one, ha, sub_self]
   have hbχ : ∀ χ, Φ (b : B) χ = Φ (a₀ : B) χ - 1 := fun χ => by simp [hbdef]
@@ -214,13 +221,14 @@ private theorem core (a₀ : A) (x : B) {ρ : ℝ} (ha : p a₀ = 1) (hρ : 0 < 
       linarith
     have hx := ContinuousMap.norm_coe_le_norm (Φ x) χ
     have ha' := ContinuousMap.norm_coe_le_norm (Φ (a₀ : B)) χ
-    calc ‖Φ x χ‖ * (‖Φ (g : B) χ‖ * ‖Φ (a₀ : B) χ‖)
+    calc
+      ‖Φ x χ‖ * (‖Φ (g : B) χ‖ * ‖Φ (a₀ : B) χ‖)
         ≤ ‖Φ x‖ * (θ ^ n * ‖Φ (a₀ : B)‖) := by gcongr
       _ = ‖Φ x‖ * ‖Φ (a₀ : B)‖ * θ ^ n := by ring
       _ ≤ L * θ ^ n := by
-          have : 0 ≤ θ ^ n := pow_nonneg hθ0.le n
-          rw [hLdef]
-          nlinarith
+        have : 0 ≤ θ ^ n := pow_nonneg hθ0.le n
+        rw [hLdef]
+        nlinarith
       _ < ρ := hn'
   · push_neg at hcase
     have hc0 := (hc.2 χ).2
@@ -247,7 +255,8 @@ private theorem core (a₀ : A) (x : B) {ρ : ℝ} (ha : p a₀ = 1) (hρ : 0 < 
     have hg1 : ‖Φ (g : B) χ‖ ≤ 1 := by
       rw [hgn]
       exact pow_le_one₀ h1t h2t
-    calc ‖Φ x χ‖ * (‖Φ (g : B) χ‖ * ‖Φ (a₀ : B) χ‖)
+    calc
+      ‖Φ x χ‖ * (‖Φ (g : B) χ‖ * ‖Φ (a₀ : B) χ‖)
         ≤ ‖Φ x χ‖ * (1 * (1 + ε)) := by gcongr
       _ < ρ' * (1 * (1 + ε)) := mul_lt_mul_of_pos_right hxl (by positivity)
       _ = ρ := by rw [one_mul, hρε]
@@ -256,13 +265,14 @@ end Peak
 
 end UpperTheory.V.Z.Tf.GlobalTraceComparison
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.peak :
-    UpperTheory.V.Z.Tf.GlobalTraceComparison.Peak := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.peak
+    : UpperTheory.V.Z.Tf.GlobalTraceComparison.Peak := by
   intro B _ _ _ _ H _ _ _ R A p a₀ x ρ ha hρ h
   obtain ⟨X, _, _, Φ, hΦ⟩ := UpperTheory.V.Z.Tf.GlobalTraceComparison.exists_rep R
-  obtain ⟨g, hg, hn⟩ := UpperTheory.V.Z.Tf.GlobalTraceComparison.core Φ A p a₀ x ha hρ (fun χ hχ => by
-    let s : B →⋆ₐ[ℂ] ℂ := (ContinuousMap.evalStarAlgHom ℂ ℂ χ).comp Φ
-    refine h s (fun y => ?_) hχ
-    rw [← hΦ y]
-    exact ContinuousMap.norm_coe_le_norm (Φ y) χ)
+  obtain ⟨g, hg, hn⟩ :=
+    UpperTheory.V.Z.Tf.GlobalTraceComparison.core Φ A p a₀ x ha hρ (fun χ hχ => by
+      let s : B →⋆ₐ[ℂ] ℂ := (ContinuousMap.evalStarAlgHom ℂ ℂ χ).comp Φ
+      refine h s (fun y => ?_) hχ
+      rw [← hΦ y]
+      exact ContinuousMap.norm_coe_le_norm (Φ y) χ)
   exact ⟨g, hg, by rw [← hΦ]; exact hn⟩

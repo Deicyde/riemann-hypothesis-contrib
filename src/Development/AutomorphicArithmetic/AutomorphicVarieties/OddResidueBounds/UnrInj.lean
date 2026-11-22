@@ -14,10 +14,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.OddResidueB
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5 UpperTheory.V.Odd
 
-private theorem unrInj_smul {l : ℕ} [Fact l.Prime] {u : ℤ_[l]ˣ} (hu : u ∈ KStar.TotallyRealRoots.princ l 1) {x : QZ l}
-    (hx : (l : ℤ_[l]) • x = 0) : (u : ℤ_[l]) • x = x := by
+private theorem unrInj_smul
+    {l : ℕ} [Fact l.Prime]
+    {u : ℤ_[l]ˣ} (hu : u ∈ KStar.TotallyRealRoots.princ l 1)
+    {x : QZ l} (hx : (l : ℤ_[l]) • x = 0)
+    : (u : ℤ_[l]) • x = x := by
   obtain ⟨ι, hinj, hrange, hsmul⟩ := UpperTheory.V.Kum.zmodToQZ l 1
   have hmem : x ∈ Set.range ι := (hrange x).2 (by simpa using hx)
   obtain ⟨a, rfl⟩ := hmem
@@ -27,10 +32,12 @@ private theorem unrInj_smul {l : ℕ} [Fact l.Prime] {u : ℤ_[l]ˣ} (hu : u ∈
     exact congrArg Units.val h
   rw [← hsmul, hu', one_mul]
 
-
 set_option maxHeartbeats 400000 in
-theorem UpperTheory.V.Odd.unrInj :
-    ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (D : LData E Ω l) (e : ℤ), ∃ f : Submodule.torsionBy ℤ_[l] (H1 (qzTw D e)) (l : ℤ_[l]) → UnrHom (Fn E Ω l 1) Ω l, Function.Injective f := by
+theorem UpperTheory.V.Odd.unrInj
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ)
+        [Fact l.Prime] (D : LData E Ω l) (e : ℤ),
+      ∃ f : Submodule.torsionBy ℤ_[l] (H1 (qzTw D e)) (l : ℤ_[l]) → UnrHom (Fn E Ω l 1) Ω l,
+        Function.Injective f := by
   intro E Ω _ _ _ _ _ l _ D e
   classical
   obtain ⟨ι, hinj, hrange, -⟩ := UpperTheory.V.Kum.zmodToQZ l 1
@@ -38,13 +45,24 @@ theorem UpperTheory.V.Odd.unrInj :
   haveI hcyc := (UpperTheory.V.Kum.fnCyc E Ω l 1).1
   have hgal : galOf E (Fn E Ω l 1) Ω = levU l (galOf E E Ω) 1 :=
     UpperTheory.V.Kum.galOfCyc E Ω l 1 E (Fn E Ω l 1)
-  have key : ∀ z : Z1 (qzTw D e), (∀ g, (l : ℤ_[l]) • (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) g = 0) →
-      ∃ φ : UnrHom (Fn E Ω l 1) Ω l, ∀ σ,
-        ι (eq1.symm (φ.1 σ)) = (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω σ)) := by
+  have key
+      : ∀ z : Z1 (qzTw D e),
+        (∀ g, (l : ℤ_[l]) • (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) g = 0)
+          → ∃ φ : UnrHom (Fn E Ω l 1) Ω l, ∀ σ,
+            ι (eq1.symm (φ.1 σ))
+              = (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (toGS Ω
+                (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω σ)) := by
     intro z hz
     have hzc : Continuous (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) := z.2.1
-    have hzco : ∀ g h, (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (g * h) = (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) g + (qzTw D e g) ((z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) h) := z.2.2
-    let w : G (Fn E Ω l 1) Ω → QZ l := fun σ => (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω σ))
+    have hzco
+        : ∀ g h,
+          (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (g * h)
+            = (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) g
+              + (qzTw D e g) ((z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) h) :=
+      z.2.2
+    let w : G (Fn E Ω l 1) Ω → QZ l := fun σ =>
+      (z : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (toGS Ω
+        (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω σ))
     have hwt : ∀ σ, w σ ∈ Set.range ι := fun σ => (hrange _).2 (by simpa using hz _)
     let φ : G (Fn E Ω l 1) Ω → ZMod l := fun σ => eq1 (Function.invFun ι (w σ))
     have hφ : ∀ σ, ι (eq1.symm (φ σ)) = w σ := by
@@ -59,13 +77,18 @@ theorem UpperTheory.V.Odd.unrInj :
       simpa using congrArg eq1 h3
     have hmul : ∀ a b, w (a * b) = w a + w b := by
       intro a b
-      have hg := hzco (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω a)) (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω b))
-      have h1 : (qzTw D e) (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω a)) = qzG E Ω l e (galEmb E (Fn E Ω l 1) Ω a) := by
+      have hg :=
+        hzco (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω a))
+          (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω b))
+      have h1
+          : (qzTw D e) (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω a))
+            = qzG E Ω l e (galEmb E (Fn E Ω l 1) Ω a) := by
         rw [← qzTw_comp_toGS D e]
         rfl
       have hm := galEmb_mem E (Fn E Ω l 1) Ω a
       rw [hgal] at hm
-      have hu : (cycZ E Ω l (galEmb E (Fn E Ω l 1) Ω a)) ^ (-e) ∈ KStar.TotallyRealRoots.princ l 1 :=
+      have hu
+          : (cycZ E Ω l (galEmb E (Fn E Ω l 1) Ω a)) ^ (-e) ∈ KStar.TotallyRealRoots.princ l 1 :=
         Subgroup.zpow_mem (KStar.TotallyRealRoots.princ l 1) (Subgroup.mem_comap.1 hm.2) _
       rw [h1, qzG_apply, unrInj_smul hu (by simpa using hz _), ← map_mul, ← map_mul] at hg
       exact hg
@@ -106,8 +129,12 @@ theorem UpperTheory.V.Odd.unrInj :
   choose φf hφf using fun x => key (zf x) (hzf x).2
   refine ⟨φf, ?_⟩
   intro x y hxy
-  have hv : ∀ σ, (zf x : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω σ)) =
-      (zf y : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (toGS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω σ)) := by
+  have hv
+      : ∀ σ,
+        (zf x : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (toGS Ω
+            (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω σ))
+          = (zf y : GS Ω (↑D.S : Set (HeightOneSpectrum (𝓞 E))) → QZ l) (toGS Ω
+            (↑D.S : Set (HeightOneSpectrum (𝓞 E))) (galEmb E (Fn E Ω l 1) Ω σ)) := by
     intro σ
     rw [← hφf x σ, ← hφf y σ, hxy]
   apply Subtype.ext

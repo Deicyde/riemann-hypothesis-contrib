@@ -6,12 +6,14 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.PowEqO
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host
+  GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top NumberField
+  IsDedekindDomain
 
 namespace GlobalTheory.Mem.Top.TamePow
 
-theorem four_mul_root_lt {m k g : ℝ} (hm : 2 ≤ m) (hk : m + 3 ≤ k) (hg : k ^ 8 ≤ g) :
-    4 * m * g ^ ((1 : ℝ) / 4) < g - 1 := by
+theorem four_mul_root_lt {m k g : ℝ} (hm : 2 ≤ m) (hk : m + 3 ≤ k) (hg : k ^ 8 ≤ g)
+    : 4 * m * g ^ ((1 : ℝ) / 4) < g - 1 := by
   have hk5 : (5 : ℝ) ≤ k := by linarith
   have hg0 : 0 ≤ g := le_trans (by positivity) hg
   set t := g ^ ((1 : ℝ) / 4) with ht
@@ -37,8 +39,8 @@ theorem four_mul_root_lt {m k g : ℝ} (hm : 2 ≤ m) (hk : m + 3 ≤ k) (hg : k
     nlinarith
   linarith
 
-theorem bound_of_over (K : Ctx) (B : Pre) (h : K.Over B) (i : Fin 2) :
-    4 * (B.R.m : ℝ) * (B.host.g i : ℝ) ^ ((1 : ℝ) / 4) < (B.host.g i : ℝ) - 1 := by
+theorem bound_of_over (K : Ctx) (B : Pre) (h : K.Over B) (i : Fin 2)
+    : 4 * (B.R.m : ℝ) * (B.host.g i : ℝ) ^ ((1 : ℝ) / 4) < (B.host.g i : ℝ) - 1 := by
   obtain ⟨sp, hT, hY, hA, hV, hz, rfl, -⟩ := h
   show 4 * (K.P.R.m : ℝ) * (K.P.H.g i : ℝ) ^ ((1 : ℝ) / 4) < (K.P.H.g i : ℝ) - 1
   have hr : RankVal K.s K.P.R := K.ok.rank
@@ -100,18 +102,32 @@ theorem bound_of_over (K : Ctx) (B : Pre) (h : K.Over B) (i : Fin 2) :
     linarith
   have hmain := four_mul_root_lt (le_max_left 2 (K.P.R.m : ℝ)) hM (hg i).1
   have ht : (0 : ℝ) ≤ (K.P.H.g i : ℝ) ^ ((1 : ℝ) / 4) := Real.rpow_nonneg (by positivity) _
-  have hle : 4 * (K.P.R.m : ℝ) * (K.P.H.g i : ℝ) ^ ((1 : ℝ) / 4) ≤
-      4 * max 2 (K.P.R.m : ℝ) * (K.P.H.g i : ℝ) ^ ((1 : ℝ) / 4) := by
+  have hle
+      : 4 * (K.P.R.m : ℝ) * (K.P.H.g i : ℝ) ^ ((1 : ℝ) / 4)
+        ≤ 4 * max 2 (K.P.R.m : ℝ) * (K.P.H.g i : ℝ) ^ ((1 : ℝ) / 4) := by
     have : (K.P.R.m : ℝ) ≤ max 2 (K.P.R.m : ℝ) := le_max_right _ _
     nlinarith
   linarith
 
-theorem tame_of_pow : Ev fun K => ∀ X : Stages, K.Over X.B.toPre → (∀ (k : Fin 2) (v : X.N.nd.PlG k), ∃ w : (ZMod (X.B.host.g k))ˣ, orderOf w = X.B.host.g k - 1 ∧ ∀ j : Fin X.B.R.m, X.N.nd.chiT k v j = w ^ (2 * (j.1 + 1))) → ∀ (k : Fin 2) (v : X.toD7.nd.PlG k), haveI : Fact (X.toD7.host.g k).Prime := ⟨X.toD7.host.g_prime k⟩; DC.TameDistinct X.toD7.R.r (X.toD7.host.g k) (X.toD7.nd.chiT k v) := by
-  have key : ∀ K : Ctx, ∀ X : Stages, K.Over X.B.toPre → (∀ (k : Fin 2) (v : X.N.nd.PlG k),
-      ∃ w : (ZMod (X.B.host.g k))ˣ, orderOf w = X.B.host.g k - 1 ∧
-        ∀ j : Fin X.B.R.m, X.N.nd.chiT k v j = w ^ (2 * (j.1 + 1))) →
-      ∀ (k : Fin 2) (v : X.toD7.nd.PlG k), haveI : Fact (X.toD7.host.g k).Prime := ⟨X.toD7.host.g_prime k⟩;
-        DC.TameDistinct X.toD7.R.r (X.toD7.host.g k) (X.toD7.nd.chiT k v) := by
+theorem tame_of_pow
+    : Ev fun K =>
+      ∀ X : Stages,
+        K.Over X.B.toPre
+          → (∀ (k : Fin 2) (v : X.N.nd.PlG k), ∃ w : (ZMod (X.B.host.g k))ˣ,
+            orderOf w = X.B.host.g k - 1
+              ∧ ∀ j : Fin X.B.R.m, X.N.nd.chiT k v j = w ^ (2 * (j.1 + 1)))
+          → ∀ (k : Fin 2) (v : X.toD7.nd.PlG k),
+            haveI : Fact (X.toD7.host.g k).Prime := ⟨X.toD7.host.g_prime k⟩
+            DC.TameDistinct X.toD7.R.r (X.toD7.host.g k) (X.toD7.nd.chiT k v) := by
+  have key
+      : ∀ K : Ctx, ∀ X : Stages,
+        K.Over X.B.toPre
+          → (∀ (k : Fin 2) (v : X.N.nd.PlG k), ∃ w : (ZMod (X.B.host.g k))ˣ,
+            orderOf w = X.B.host.g k - 1
+              ∧ ∀ j : Fin X.B.R.m, X.N.nd.chiT k v j = w ^ (2 * (j.1 + 1)))
+          → ∀ (k : Fin 2) (v : X.toD7.nd.PlG k),
+            haveI : Fact (X.toD7.host.g k).Prime := ⟨X.toD7.host.g_prime k⟩
+            DC.TameDistinct X.toD7.R.r (X.toD7.host.g k) (X.toD7.nd.chiT k v) := by
     intro K X hO hpow k v
     obtain ⟨w, hw, hchi⟩ := hpow k v
     have hb := bound_of_over K X.B.toPre hO k
@@ -124,7 +140,8 @@ theorem tame_of_pow : Ev fun K => ∀ X : Stages, K.Over X.B.toPre → (∀ (k :
       | (unfold Formalism.MainNotions.Ranks.r; omega)
     have e : X.toD7.nd.chiT k v = fun j : Fin X.B.R.m => w ^ (2 * (j.1 + 1)) := funext hchi
     haveI : Fact (X.toD7.host.g k).Prime := ⟨X.toD7.host.g_prime k⟩
-    have h := GlobalTheory.EX.DC.TameGen.tameDistinct_gen X.toD7.R.r (X.toD7.host.g k) X.B.R.m w hw hb hr
+    have h :=
+      GlobalTheory.EX.DC.TameGen.tameDistinct_gen X.toD7.R.r (X.toD7.host.g k) X.B.R.m w hw hb hr
     rw [e]
     exact h
   unfold Ev

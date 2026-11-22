@@ -8,8 +8,8 @@ open Finset
 
 namespace LevelTowerAlt
 
-theorem log_div_pred_le (p B : ℕ) (hB : 2 ≤ B) (h : B < p) :
-    Real.log (p : ℝ) / ((p : ℝ) - 1) ≤ 3 * Real.log B / B := by
+theorem log_div_pred_le (p B : ℕ) (hB : 2 ≤ B) (h : B < p)
+    : Real.log (p : ℝ) / ((p : ℝ) - 1) ≤ 3 * Real.log B / B := by
   have hB2 : (2 : ℝ) ≤ B := by exact_mod_cast hB
   have hBp : (B : ℝ) + 1 ≤ p := by exact_mod_cast h
   have hB0 : (0 : ℝ) < B := by linarith
@@ -29,7 +29,12 @@ theorem log_div_pred_le (p B : ℕ) (hB : 2 ≤ B) (h : B < p) :
   have h4 := mul_le_mul_of_nonneg_right hlogB.le h3
   nlinarith
 
-theorem sum_log_prime_ratio_le : ∃ C : ℝ, 0 ≤ C ∧ ∀ (S S₀ : Finset ℕ) (B : ℕ), 2 ≤ B → (∀ p ∈ S, p.Prime ∧ (p ≤ B ∨ p ∈ S₀)) → S₀.card ≤ B → ∑ p ∈ S, Real.log (p : ℝ) / ((p : ℝ) - 1) ≤ C * Real.log B := by
+theorem sum_log_prime_ratio_le
+    : ∃ C : ℝ,
+      0 ≤ C
+        ∧ ∀ (S S₀ : Finset ℕ) (B : ℕ),
+          2 ≤ B → (∀ p ∈ S, p.Prime ∧ (p ≤ B ∨ p ∈ S₀)) → S₀.card ≤ B
+            → ∑ p ∈ S, Real.log (p : ℝ) / ((p : ℝ) - 1) ≤ C * Real.log B := by
   refine ⟨8, by norm_num, fun S S₀ B hB hS hcard => ?_⟩
   have hB2 : (2 : ℝ) ≤ B := by exact_mod_cast hB
   have hB0 : (0 : ℝ) < B := by linarith
@@ -59,8 +64,9 @@ theorem sum_log_prime_ratio_le : ∃ C : ℝ, 0 ≤ C ∧ ∀ (S S₀ : Finset �
       rw [Finset.mem_filter] at hp
       exact LevelTowerAlt.log_div_pred_le p B hB (not_le.1 hp.2)
     · rw [nsmul_eq_mul]
-      calc _ ≤ (B : ℝ) * (3 * Real.log B / B) :=
-            mul_le_mul_of_nonneg_right hc (div_nonneg (by linarith) hB0.le)
+      calc
+        _ ≤ (B : ℝ) * (3 * Real.log B / B) :=
+          mul_le_mul_of_nonneg_right hc (div_nonneg (by linarith) hB0.le)
         _ = 3 * Real.log B := by field_simp
   linarith
 

@@ -22,22 +22,26 @@ attribute [local instance 100] LieRing.ofAssociativeRing
 
 variable {K : Type*} [Field K] [NumberField K] {n : ℕ}
 
-theorem finiteDimensional_of_map_subtype_le {V : Type*} [AddCommGroup V] [Module ℂ V]
-    {U : Submodule ℂ V} (R : Submodule ℂ U) {S : Submodule ℂ V} [FiniteDimensional ℂ S]
-    (h : R.map U.subtype ≤ S) : FiniteDimensional ℂ R := by
+theorem finiteDimensional_of_map_subtype_le
+    {V : Type*} [AddCommGroup V] [Module ℂ V]
+    {U : Submodule ℂ V} (R : Submodule ℂ U)
+    {S : Submodule ℂ V} [FiniteDimensional ℂ S]
+    (h : R.map U.subtype ≤ S)
+    : FiniteDimensional ℂ R := by
   have : FiniteDimensional ℂ (R.map U.subtype) := Submodule.finiteDimensional_of_le h
   exact Module.Finite.equiv (Submodule.equivMapOfInjective _ U.injective_subtype R).symm
 
-theorem isAdmissible_cuspSubmodule (U : Submodule ℂ (cuspForms K n))
-    (hρ : ∀ X, ∀ φ ∈ U, (gkModuleCusp K n).ρ X φ ∈ U) (hσ : ∀ k, ∀ φ ∈ U, (gkModuleCusp K n).σ k φ ∈ U)
-    (hτ : ∀ g, ∀ φ ∈ U, finRepCusp K n g φ ∈ U)
-    (hirr : (cuspSubmodule K n U hρ hσ hτ).IsIrreducible) :
-    (cuspSubmodule K n U hρ hσ hτ).IsAdmissible := by
+theorem isAdmissible_cuspSubmodule
+    (U : Submodule ℂ (cuspForms K n)) (hρ : ∀ X, ∀ φ ∈ U, (gkModuleCusp K n).ρ X φ ∈ U)
+    (hσ : ∀ k, ∀ φ ∈ U, (gkModuleCusp K n).σ k φ ∈ U) (hτ : ∀ g, ∀ φ ∈ U, finRepCusp K n g φ ∈ U)
+    (hirr : (cuspSubmodule K n U hρ hσ hτ).IsIrreducible)
+    : (cuspSubmodule K n U hρ hσ hτ).IsAdmissible := by
   set Mx := cuspSubmodule K n U hρ hσ hτ with hMx
 
   refine ⟨fun v => ?_, fun H hHc hHo c hc => ?_⟩
-  · obtain ⟨W, -, hW⟩ := AutomorphicForm.exists_openSubgroup_rightInvariant
-      (v : cuspForms K n).2.1.isSmooth (v : cuspForms K n).2.1.isKFinite
+  · obtain ⟨W, -, hW⟩ :=
+      AutomorphicForm.exists_openSubgroup_rightInvariant (v : cuspForms K n).2.1.isSmooth
+        (v : cuspForms K n).2.1.isKFinite
     refine Subgroup.isOpen_mono (H₁ := W.toSubgroup) (fun u hu => ?_) W.isOpen
     show Mx.τ u v = v
     apply Subtype.ext
@@ -47,8 +51,12 @@ theorem isAdmissible_cuspSubmodule (U : Submodule ℂ (cuspForms K n))
 
   obtain ⟨d, b, ε, hε, horth, hskew⟩ := exists_archCartanBasis (K := K) (n := n)
   have hε2 : ∀ i, ε i * ε i = 1 := fun i => by rcases hε i with e | e <;> rw [e] <;> norm_num
-  have hK : ∀ i, ε i = -1 → ∀ t : ℝ,
-      (isExpLieAlgebra K n).expG (t • (isExpLieAlgebra K n).ofLie (b i)) ∈ archCompact K n := by
+  have hK
+      : ∀ i,
+        ε i = -1
+          → ∀ t : ℝ,
+            (isExpLieAlgebra K n).expG (t • (isExpLieAlgebra K n).ofLie (b i))
+              ∈ archCompact K n := by
     intro i hi t
     refine expG_mem_archCompact_of_skew _ ?_
     have h := hskew i hi
@@ -57,8 +65,8 @@ theorem isAdmissible_cuspSubmodule (U : Submodule ℂ (cuspForms K n))
     rw [Matrix.conjTranspose_smul, star_trivial, h, smul_neg]
 
   obtain ⟨ω, hω⟩ := exists_casimir_eq_smul U hρ hσ hτ hirr b ε hε2 horth
-  obtain ⟨lam, hlam⟩ := exists_lieActionCusp_eq_smul U hρ hσ hτ hirr (centralZ K n) lie_centralZ
-    Ad_centralZ
+  obtain ⟨lam, hlam⟩ :=
+    exists_lieActionCusp_eq_smul U hρ hσ hτ hirr (centralZ K n) lie_centralZ Ad_centralZ
 
   obtain ⟨q, hqm, hqd, hq⟩ :=
     exists_aeval_eq_zero_of_mem_isotypic Mx.gk (lapZ b ε) (lapZ_mem b ε hε hK) hc
@@ -99,10 +107,14 @@ theorem isAdmissible_cuspSubmodule (U : Submodule ℂ (cuspForms K n))
       sub_eq_zero]
     exact hlam _ (kProj Mx.gk.isKFinite hc (w : U)).2
   · rw [LinearMap.mem_ker, LinearMap.sub_apply, Module.End.one_apply, sub_eq_zero]
-    have hcomm : ∀ k, Mx.τ (u : AdelicGLn.FiniteAdelicGL K n) * Mx.gk.σ k =
-        Mx.gk.σ k * Mx.τ (u : AdelicGLn.FiniteAdelicGL K n) := fun k => (Mx.comm_σ k _).symm
-    have hfix : Mx.τ (u : AdelicGLn.FiniteAdelicGL K n) (kProj Mx.gk.isKFinite hc (w : U)) =
-        kProj Mx.gk.isKFinite hc (w : U) := by
+    have hcomm
+        : ∀ k,
+          Mx.τ (u : AdelicGLn.FiniteAdelicGL K n) * Mx.gk.σ k
+            = Mx.gk.σ k * Mx.τ (u : AdelicGLn.FiniteAdelicGL K n) := fun k =>
+      (Mx.comm_σ k _).symm
+    have hfix
+        : Mx.τ (u : AdelicGLn.FiniteAdelicGL K n) (kProj Mx.gk.isKFinite hc (w : U))
+          = kProj Mx.gk.isKFinite hc (w : U) := by
       rw [← kProj_comm Mx.gk.isKFinite hc hcomm]
       congr 1
       exact w.2 _ hu

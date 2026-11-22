@@ -8,8 +8,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -51,10 +53,12 @@ private lemma res_res_eq {Z : Scheme.{0}} {U V V' W : Z.Opens} (h₁ : V ≤ U) 
     (h₄ : W ≤ V') (x : Γ(Z, U)ˣ) : res h₂ (res h₁ x) = res h₄ (res h₃ x) := by
   rw [ReciprocityTheory.ChartRestriction.G.DVR.res_res', ReciprocityTheory.ChartRestriction.G.DVR.res_res']
 
-theorem isGen_boxGen {X X' Y : Scheme.{0}} (L : LB X) {J K : Type} [Fintype J] [Fintype K]
+theorem isGen_boxGen
+    {X X' Y : Scheme.{0}} (L : LB X)
+    {J K : Type} [Fintype J] [Fintype K]
     (F : J → (X' ⟶ X)) (φ : K → (Y ⟶ X')) (ε : K → ℤ)
-    (t : ∀ i, LB.Gen (LB.LinComb (L.pull (F i)) φ ε)) (ht : ∀ i, (t i).IsGen) :
-    (GeneratorPullback.boxGen L F φ ε t).IsGen := by
+    (t : ∀ i, LB.Gen (LB.LinComb (L.pull (F i)) φ ε)) (ht : ∀ i, (t i).IsGen)
+    : (GeneratorPullback.boxGen L F φ ε t).IsGen := by
   intro a b
   have hg : ((LB.LinComb L F (fun _ => 1)).LinComb φ ε).g a b = _ := lcg_linComb_eq_prod L F φ ε a b
   rw [hg]
@@ -68,8 +72,9 @@ theorem isGen_boxGen {X X' Y : Scheme.{0}} (L : LB X) {J K : Type} [Fintype J] [
         (∏ i, res (V := LB.wchart (LB.LinComb L F (fun _ => 1)) φ b) _ ((t i).s fun k _ => b k i))
   simp only [map_prod, ← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun i _ => ?_
-  have e := (congrArg (res (boxGen_overlap_le L F φ a b i))
-    ((ht i) (fun k _ => a k i) (fun k _ => b k i))).trans (map_mul _ _ _)
+  have e :=
+    (congrArg (res (boxGen_overlap_le L F φ a b i))
+      ((ht i) (fun k _ => a k i) (fun k _ => b k i))).trans (map_mul _ _ _)
   refine (res_res_eq _ _ _ _ _).trans (e.trans ?_)
   congr 1
   exact res_res_eq _ _ _ _ _
@@ -82,7 +87,11 @@ theorem boxRigIsGen (S : Scheme.{0}) : BoxRigIsGenSt (S := S) := by
   intro G' G _ _ _ _ j p L r hL hr
   refine isGen_boxGen _ _ _ _ _ (fun i => ?_)
   have := p.hom i
-  exact LBxP.isGen_pullAlong L (p.pr i).left (𝟙 _) (fun _ : PUnit => eSec G)
-    (fun _ => 1) (fun _ => eSec G') (fun _ => (CubeMap.ofHom (p.pr i)).e_comm) r hr
+  exact LBxP.isGen_pullAlong L (p.pr i).left (𝟙 _)
+    (fun _ : PUnit => eSec G)
+    (fun _ => 1)
+    (fun _ => eSec G')
+    (fun _ => (CubeMap.ofHom (p.pr i)).e_comm)
+    r hr
 
 end GlobalTheory

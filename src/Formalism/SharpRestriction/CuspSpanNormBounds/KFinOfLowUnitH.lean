@@ -16,15 +16,21 @@ open scoped InnerProductSpace ENNReal
 
 namespace Formalism.MainNotions.KFiniteLowUnitary
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.BasicNotions Formalism.MainNotions.OnePlaceEstimates Formalism.MainNotions.TheoremBConstants Formalism.MainNotions.DiscreteSeriesInnerProducts Formalism.MainNotions.CayleySignature Formalism.MainNotions.S.UnitaryLevelOperators
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB
+  Formalism.BasicNotions Formalism.MainNotions.OnePlaceEstimates
+  Formalism.MainNotions.TheoremBConstants Formalism.MainNotions.DiscreteSeriesInnerProducts
+  Formalism.MainNotions.CayleySignature Formalism.MainNotions.S.UnitaryLevelOperators
 
 section Low
 
 variable {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-theorem conj_mem_Kset' {ε : Fin (2 * r + k + 1) → Bool} {P : Mat k r} (hP : IsCayleyU k r ε P) {g : Mat k r}
-    (hg : g ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) (hgu : g ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ) :
-    P * g * P⁻¹ ∈ Formalism.REAL.Kset ε := by
+theorem conj_mem_Kset'
+    {ε : Fin (2 * r + k + 1) → Bool} {P : Mat k r} (hP : IsCayleyU k r ε P)
+    {g : Mat k r}
+    (hg : g ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r))
+    (hgu : g ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ)
+    : P * g * P⁻¹ ∈ Formalism.REAL.Kset ε := by
   have hPu := hP.2
   have hPs : star P * P = 1 := Matrix.mem_unitaryGroup_iff'.1 hPu
   have hPs' : P * star P = 1 := Matrix.mem_unitaryGroup_iff.1 hPu
@@ -32,33 +38,47 @@ theorem conj_mem_Kset' {ε : Fin (2 * r + k + 1) → Bool} {P : Mat k r} (hP : I
   have hgs : g * star g = 1 := Matrix.mem_unitaryGroup_iff.1 hgu
   have hcay : star P * Formalism.REAL.Jm ε * P = Formalism.QuantumDeterminants.Hpk k r := by
     rw [Matrix.star_eq_conjTranspose]; exact hP.1.2
-  have hg' : star g * Formalism.QuantumDeterminants.Hpk k r * g = Formalism.QuantumDeterminants.Hpk k r := by
+  have hg'
+      : star g * Formalism.QuantumDeterminants.Hpk k r * g
+        = Formalism.QuantumDeterminants.Hpk k r := by
     rw [Matrix.star_eq_conjTranspose]; exact hg
 
-  have hcomm : Formalism.QuantumDeterminants.Hpk k r * g = g * Formalism.QuantumDeterminants.Hpk k r := by
-    calc Formalism.QuantumDeterminants.Hpk k r * g = (g * star g) * Formalism.QuantumDeterminants.Hpk k r * g := by rw [hgs, Matrix.one_mul]
-      _ = g * (star g * Formalism.QuantumDeterminants.Hpk k r * g) := by simp only [Matrix.mul_assoc]
+  have hcomm
+      : Formalism.QuantumDeterminants.Hpk k r * g = g * Formalism.QuantumDeterminants.Hpk k r := by
+    calc
+      Formalism.QuantumDeterminants.Hpk k r * g
+        = (g * star g) * Formalism.QuantumDeterminants.Hpk k r * g := by rw [hgs, Matrix.one_mul]
+      _ = g * (star g * Formalism.QuantumDeterminants.Hpk k r * g) := by
+        simp only [Matrix.mul_assoc]
       _ = g * Formalism.QuantumDeterminants.Hpk k r := by rw [hg']
 
   have hJ : Formalism.REAL.Jm ε = P * Formalism.QuantumDeterminants.Hpk k r * star P := by
     rw [← hcay]
-    calc Formalism.REAL.Jm ε = (P * star P) * Formalism.REAL.Jm ε * (P * star P) := by
-          rw [hPs', Matrix.one_mul, Matrix.mul_one]
+    calc
+      Formalism.REAL.Jm ε = (P * star P) * Formalism.REAL.Jm ε * (P * star P) := by
+        rw [hPs', Matrix.one_mul, Matrix.mul_one]
       _ = P * (star P * Formalism.REAL.Jm ε * P) * star P := by simp only [Matrix.mul_assoc]
   refine ⟨?_, ?_⟩
   · rw [hinv]
-    exact Submonoid.mul_mem _ (Submonoid.mul_mem _ hPu hgu) (Matrix.mem_unitaryGroup_iff.2 (by rw [star_star]; exact hPs))
+    exact Submonoid.mul_mem _ (Submonoid.mul_mem _ hPu hgu)
+      (Matrix.mem_unitaryGroup_iff.2 (by rw [star_star]; exact hPs))
   · rw [hinv, hJ]
-    calc P * g * star P * (P * Formalism.QuantumDeterminants.Hpk k r * star P)
-        = P * g * (star P * P) * Formalism.QuantumDeterminants.Hpk k r * star P := by simp only [Matrix.mul_assoc]
-      _ = P * (g * Formalism.QuantumDeterminants.Hpk k r) * star P := by rw [hPs, Matrix.mul_one]; simp only [Matrix.mul_assoc]
+    calc
+      P * g * star P * (P * Formalism.QuantumDeterminants.Hpk k r * star P)
+          = P * g * (star P * P) * Formalism.QuantumDeterminants.Hpk k r * star P := by
+        simp only [Matrix.mul_assoc]
+      _ = P * (g * Formalism.QuantumDeterminants.Hpk k r) * star P := by
+        rw [hPs, Matrix.mul_one]; simp only [Matrix.mul_assoc]
       _ = P * (Formalism.QuantumDeterminants.Hpk k r * g) * star P := by rw [hcomm]
       _ = P * Formalism.QuantumDeterminants.Hpk k r * (star P * P) * g * star P := by
-          rw [hPs, Matrix.mul_one]; simp only [Matrix.mul_assoc]
-      _ = P * Formalism.QuantumDeterminants.Hpk k r * star P * (P * g * star P) := by simp only [Matrix.mul_assoc]
+        rw [hPs, Matrix.mul_one]; simp only [Matrix.mul_assoc]
+      _ = P * Formalism.QuantumDeterminants.Hpk k r * star P * (P * g * star P) := by
+        simp only [Matrix.mul_assoc]
 
-theorem kFin_of_lowUnitH' {ε : Fin (2 * r + k + 1) → Bool} {lam : Fin (2 * r + k + 1) → ℝ}
-    {σ : Mat k r → (H →L[ℂ] H)} {w : H} (hw : IsLowUnitH k r ε lam σ w) : IsKFinHpk (k := k) (r := r) σ w := by
+theorem kFin_of_lowUnitH'
+    {ε : Fin (2 * r + k + 1) → Bool} {lam : Fin (2 * r + k + 1) → ℝ} {σ : Mat k r → (H →L[ℂ] H)}
+    {w : H} (hw : IsLowUnitH k r ε lam σ w)
+    : IsKFinHpk (k := k) (r := r) σ w := by
   obtain ⟨P, hP, -, hmem⟩ := hw
   have hPd : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det P).1 hP.1.1
   have key : ∀ g : Mat k r, P⁻¹ * (P * g * P⁻¹) * P = g := fun g => by
@@ -66,8 +86,7 @@ theorem kFin_of_lowUnitH' {ε : Fin (2 * r + k + 1) → Bool} {lam : Fin (2 * r 
     rw [← Matrix.mul_assoc, Matrix.nonsing_inv_mul P hPd, Matrix.one_mul]
   set ρ : Mat k r → (H →L[ℂ] H) := fun g => σ (P⁻¹ * g * P) with hρ
   set Sset := {S : Submodule ℂ H | IsKTypeOf ε ρ (Formalism.QuantumDeterminants.lowK ε lam) S} with hSset
-  have hmem' : w ∈ ⨆ S : Sset, (S : Submodule ℂ H) := by
-    rw [← sSup_eq_iSup']; exact hmem
+  have hmem' : w ∈ ⨆ S : Sset, (S : Submodule ℂ H) := by rw [← sSup_eq_iSup']; exact hmem
   obtain ⟨s, hs⟩ := Submodule.mem_iSup_iff_exists_finset.1 hmem'
   have : ∀ S : Sset, FiniteDimensional ℂ (S : Submodule ℂ H) := fun S => S.2.1
   refine ⟨s.sup fun S : Sset => (S : Submodule ℂ H), ?_, ?_, ?_⟩

@@ -16,23 +16,35 @@ open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR
 
 namespace UnitZ
 
-def locSub {S L : Type} [CommRing S] [Field L] (φ : S →+* L) (W : Ideal S) [hW : W.IsPrime] : Subring L where
+def locSub {S L : Type} [CommRing S] [Field L] (φ : S →+* L) (W : Ideal S) [hW : W.IsPrime]
+    : Subring L where
   carrier := {x | ∃ a s, s ∉ W ∧ x * φ s = φ a}
   mul_mem' := by
     rintro x y ⟨a, s, hs, h⟩ ⟨b, t, ht, h'⟩
-    exact ⟨a * b, s * t, fun e => (hW.mem_or_mem e).elim hs ht, by rw [map_mul, map_mul, ← h, ← h']; ring⟩
+    exact ⟨
+      a * b,
+      s * t,
+      fun e => (hW.mem_or_mem e).elim hs ht,
+      by rw [map_mul, map_mul, ← h, ← h']; ring
+    ⟩
   one_mem' := ⟨1, 1, (Ideal.ne_top_iff_one W).1 hW.ne_top, by simp⟩
   add_mem' := by
     rintro x y ⟨a, s, hs, h⟩ ⟨b, t, ht, h'⟩
-    exact ⟨a * t + b * s, s * t, fun e => (hW.mem_or_mem e).elim hs ht, by
-      rw [map_add (f := _), map_mul, map_mul, map_mul, ← h, ← h']; ring⟩
+    exact ⟨
+      a * t + b * s,
+      s * t,
+      fun e => (hW.mem_or_mem e).elim hs ht,
+      by rw [map_add (f := _), map_mul, map_mul, map_mul, ← h, ← h']; ring
+    ⟩
   zero_mem' := ⟨0, 1, (Ideal.ne_top_iff_one W).1 hW.ne_top, by simp⟩
   neg_mem' := by
     rintro x ⟨a, s, hs, h⟩
     exact ⟨-a, s, hs, by rw [map_neg, ← h]; ring⟩
 
-private theorem isIntegral_of_mem_all_valuationSubrings {L : Type} [Field L] (A : Subring L) (x : L)
-    (h : ∀ V : ValuationSubring L, A ≤ V.toSubring → x ∈ V) : IsIntegral A x := by
+private theorem isIntegral_of_mem_all_valuationSubrings
+    {L : Type} [Field L]
+    (A : Subring L) (x : L) (h : ∀ V : ValuationSubring L, A ≤ V.toSubring → x ∈ V)
+    : IsIntegral A x := by
   obtain rfl | hx0 := eq_or_ne x 0
   · exact isIntegral_zero
   have hxi : x⁻¹ ≠ 0 := inv_ne_zero hx0
@@ -43,8 +55,9 @@ private theorem isIntegral_of_mem_all_valuationSubrings {L : Type} [Field L] (A 
   have hne : Ideal.span {xinv} ≠ ⊤ := by
     intro eq
     apply hni
-    obtain ⟨p, hp, hpx⟩ := Algebra.exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top
-      (x⁻¹) (⊥ : Ideal A) bot_ne_top (top_unique <| eq.ge.trans le_add_self)
+    obtain ⟨p, hp, hpx⟩ :=
+      Algebra.exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top (x⁻¹) (⊥ : Ideal A)
+        bot_ne_top (top_unique <| eq.ge.trans le_add_self)
     refine ⟨p, by simpa [Polynomial.Monic, sub_eq_zero] using hp, ?_⟩
     simpa [Polynomial.aeval_def] using hpx
   obtain ⟨V, hAV, hV⟩ := Ideal.image_subset_nonunits_valuationSubring _ hne
@@ -52,17 +65,24 @@ private theorem isIntegral_of_mem_all_valuationSubrings {L : Type} [Field L] (A 
   have hBV : A ≤ V.toSubring := fun a ha => hAV (B.algebraMap_mem ⟨a, ha⟩)
   exact ((V.inv_mem_nonunits_iff.mp h1).resolve_left hx0) (h V hBV)
 
-theorem exists_rel {S L : Type} [CommRing S] [Field L] (φ : S →+* L) (W : Ideal S) [hW : W.IsPrime]
-    (hk : ∀ s, s ∉ W → φ s ≠ 0) (f g : S) (hg : φ g ≠ 0)
-    (h : ∀ V : ValuationSubring L, (∀ a, φ a ∈ V) → (∀ s, s ∉ W → (φ s)⁻¹ ∈ V) → φ f / φ g ∈ V) :
-    ∃ N : ℕ, ∀ m : ℕ, ∃ s r, s ∉ W ∧ φ (s * (g ^ N * f ^ m)) = φ (r * g ^ m) := by
+theorem exists_rel
+    {S L : Type} [CommRing S] [Field L]
+    (φ : S →+* L)
+    (W : Ideal S) [hW : W.IsPrime]
+    (hk : ∀ s, s ∉ W → φ s ≠ 0)
+    (f g : S) (hg : φ g ≠ 0)
+    (h : ∀ V : ValuationSubring L, (∀ a, φ a ∈ V) → (∀ s, s ∉ W → (φ s)⁻¹ ∈ V) → φ f / φ g ∈ V)
+    : ∃ N : ℕ, ∀ m : ℕ, ∃ s r, s ∉ W ∧ φ (s * (g ^ N * f ^ m)) = φ (r * g ^ m) := by
   classical
   set A := locSub φ W with hA
   have h1W : (1 : S) ∉ W := (Ideal.ne_top_iff_one W).1 hW.ne_top
   have himg : ∀ a, φ a ∈ A := fun a => ⟨a, 1, h1W, by simp⟩
   set x := φ f / φ g with hx
-  have hint : IsIntegral A x := isIntegral_of_mem_all_valuationSubrings A x fun V hV =>
-    h V (fun a => hV (himg a)) fun s hs => hV ⟨1, s, hs, by rw [map_one]; exact inv_mul_cancel₀ (hk s hs)⟩
+  have hint : IsIntegral A x :=
+    isIntegral_of_mem_all_valuationSubrings A x fun V hV =>
+      h V
+        (fun a => hV (himg a))
+        fun s hs => hV ⟨1, s, hs, by rw [map_one]; exact inv_mul_cancel₀ (hk s hs)⟩
   obtain ⟨p, hpm, hpx⟩ := hint
   have hpx' : Polynomial.aeval x p = 0 := by rwa [Polynomial.aeval_def]
   set n := p.natDegree with hn
@@ -102,25 +122,36 @@ section Div
 variable {k : Type} [Field k] {K : Type} [Fintype K] {ι : K → Type} [∀ b, Fintype (ι b)]
 
 omit [Fintype K] [∀ b, Fintype (ι b)] in
-theorem divCycle_nonneg (P : Ideal (MRing ι k)) (f : MRing ι k) (W : Ideal (MRing ι k)) : 0 ≤ divCycle P f W := by
+theorem divCycle_nonneg (P : Ideal (MRing ι k)) (f : MRing ι k) (W : Ideal (MRing ι k))
+    : 0 ≤ divCycle P f W := by
   unfold divCycle
   split_ifs
   · exact Int.natCast_nonneg _
   · exact le_rfl
 
-theorem divCycle_pow (P : Ideal (MRing ι k)) (hP : P.IsPrime) (f : MRing ι k) (hf : f ∉ P) (W : Ideal (MRing ι k)) (m : ℕ) :
-    divCycle P (f ^ m) W = m * divCycle P f W := by
+theorem divCycle_pow
+    (P : Ideal (MRing ι k)) (hP : P.IsPrime)
+    (f : MRing ι k) (hf : f ∉ P)
+    (W : Ideal (MRing ι k)) (m : ℕ)
+    : divCycle P (f ^ m) W = m * divCycle P f W := by
   induction m with
   | zero => simp [divCycle_one]
   | succ m ih =>
-    rw [pow_succ, DivCycleMul.proof k K ι P _ _ hP (fun h => hf (hP.mem_of_pow_mem _ h)) hf, Pi.add_apply, ih]
-    push_cast; ring
+    rw [pow_succ, DivCycleMul.proof k K ι P _ _ hP (fun h => hf (hP.mem_of_pow_mem _ h)) hf,
+      Pi.add_apply, ih]
+    push_cast
+    ring
 
-theorem divCycle_le (P : Ideal (MRing ι k)) (hP : P.IsPrime) (f g : MRing ι k) (hf : f ∉ P) (hg : g ∉ P)
-    (W : Ideal (MRing ι k)) (hW : W.IsPrime) (hPW : P ≤ W) (N : ℕ)
-    (h : ∀ m : ℕ, ∃ s r, s ∉ W ∧ s * (g ^ N * f ^ m) - r * g ^ m ∈ P) : divCycle P g W ≤ divCycle P f W := by
-  have hdiv : ∀ x y : MRing ι k, x ∉ P → y ∉ P →
-      divCycle P (x * y) W = divCycle P x W + divCycle P y W := fun x y hx hy => by
+theorem divCycle_le
+    (P : Ideal (MRing ι k)) (hP : P.IsPrime)
+    (f g : MRing ι k) (hf : f ∉ P) (hg : g ∉ P)
+    (W : Ideal (MRing ι k)) (hW : W.IsPrime) (hPW : P ≤ W)
+    (N : ℕ) (h : ∀ m : ℕ, ∃ s r, s ∉ W ∧ s * (g ^ N * f ^ m) - r * g ^ m ∈ P)
+    : divCycle P g W ≤ divCycle P f W := by
+  have hdiv
+      : ∀ x y : MRing ι k,
+        x ∉ P → y ∉ P
+          → divCycle P (x * y) W = divCycle P x W + divCycle P y W := fun x y hx hy => by
     rw [congrFun (DivCycleMul.proof k K ι P x y hP hx hy) W, Pi.add_apply]
   have hpow : ∀ (x : MRing ι k) (n : ℕ), x ∉ P → x ^ n ∉ P := fun x n hx hxn =>
     hx (hP.mem_of_pow_mem _ hxn)
@@ -142,8 +173,9 @@ theorem divCycle_le (P : Ideal (MRing ι k)) (hP : P.IsPrime) (f g : MRing ι k)
   have h1W : (1 : MRing ι k) ∉ W := (Ideal.ne_top_iff_one W).1 hW.ne_top
   have heq : divCycle P (g ^ N * f ^ M) W = divCycle P (r * g ^ M) W :=
     divCycle_eq_of_mul_sub_mem hs h1W (by simpa using hm)
-  rw [hdiv _ _ (hpow g N hg) (hpow f M hf), hdiv _ _ hrP (hpow g M hg),
-    divCycle_pow P hP g hg W N, divCycle_pow P hP f hf W M, divCycle_pow P hP g hg W M] at heq
+  rw [hdiv _ _ (hpow g N hg) (hpow f M hf), hdiv _ _ hrP (hpow g M hg), divCycle_pow P hP g hg W N,
+      divCycle_pow P hP f hf W M, divCycle_pow P hP g hg W M]
+    at heq
   have hr0 := divCycle_nonneg P r W
   have hle := Int.self_le_toNat (N * divCycle P g W)
   have hMc : (M : ℤ) = ((N * divCycle P g W).toNat : ℤ) + 1 := by rw [hM]; push_cast; ring
@@ -155,20 +187,25 @@ end Div
 
 section Rep
 
-variable {k : Type} [Field k] {Ω : Type} [Field Ω] [Algebra k Ω] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
-  [∀ b, Fintype (ι b)]
+variable
+  {k : Type} [Field k]
+  {Ω : Type} [Field Ω] [Algebra k Ω]
+  {K : Type} [Fintype K] [DecidableEq K]
+  {ι : K → Type} [∀ b, Fintype (ι b)]
 
 omit [Fintype K] [∀ b, Fintype (ι b)] in
 theorem homog_X (p : Σ b, ι b) : IsMultiHomog (X p : MRing ι k) (Pi.single p.1 1) :=
   isWeightedHomogeneous_X k (blockWeight ι) p
 
-theorem rep_of_mem (y : (Σ b, ι b) → Ω) {t : Ω} (ht : t ∈ fnField k y) :
-    ∃ (d : K → ℕ) (F G : MRing ι k), IsMultiHomog F d ∧ IsMultiHomog G d ∧ aeval y G ≠ 0 ∧ t * aeval y G = aeval y F := by
+theorem rep_of_mem (y : (Σ b, ι b) → Ω) {t : Ω} (ht : t ∈ fnField k y)
+    : ∃ (d : K → ℕ) (F G : MRing ι k),
+      IsMultiHomog F d ∧ IsMultiHomog G d ∧ aeval y G ≠ 0 ∧ t * aeval y G = aeval y F := by
   classical
-  let Q : Ω → Prop := fun t => ∃ (d : K → ℕ) (F G : MRing ι k), IsMultiHomog F d ∧ IsMultiHomog G d ∧
-    aeval y G ≠ 0 ∧ t * aeval y G = aeval y F
-  have hzero : Q 0 := ⟨0, 0, 1, isWeightedHomogeneous_zero k _ _, isWeightedHomogeneous_one k _,
-    by simp, by simp⟩
+  let Q : Ω → Prop := fun t =>
+    ∃ (d : K → ℕ) (F G : MRing ι k),
+      IsMultiHomog F d ∧ IsMultiHomog G d ∧ aeval y G ≠ 0 ∧ t * aeval y G = aeval y F
+  have hzero : Q 0 :=
+    ⟨0, 0, 1, isWeightedHomogeneous_zero k _ _, isWeightedHomogeneous_one k _, by simp, by simp⟩
   change Q t
   unfold fnField at ht
   refine IntermediateField.adjoin_induction k (motive := fun t _ => Q t) ?_ ?_ ?_ ?_ ?_ ht
@@ -180,12 +217,25 @@ theorem rep_of_mem (y : (Σ b, ι b) → Ω) {t : Ω} (ht : t ∈ fnField k y) :
         exact homog_X q
       · simp [div_mul_cancel₀ _ hq]
   · intro c
-    exact ⟨0, C c, 1, isWeightedHomogeneous_C _ _, isWeightedHomogeneous_one k _, by simp,
-      by simp [aeval_C]⟩
+    exact ⟨
+      0,
+      C c,
+      1,
+      isWeightedHomogeneous_C _ _,
+      isWeightedHomogeneous_one k _,
+      by simp,
+      by simp [aeval_C]
+    ⟩
   · rintro a b - - ⟨d1, F1, G1, hF1, hG1, hG1ne, h1⟩ ⟨d2, F2, G2, hF2, hG2, hG2ne, h2⟩
-    refine ⟨d1 + d2, F1 * G2 + F2 * G1, G1 * G2, IsWeightedHomogeneous.add
-      (IsWeightedHomogeneous.mul hF1 hG2) ?_, IsWeightedHomogeneous.mul hG1 hG2,
-      by simpa using mul_ne_zero hG1ne hG2ne, ?_⟩
+    refine ⟨
+      d1 + d2,
+      F1 * G2 + F2 * G1,
+      G1 * G2,
+      IsWeightedHomogeneous.add (IsWeightedHomogeneous.mul hF1 hG2) ?_,
+      IsWeightedHomogeneous.mul hG1 hG2,
+      by simpa using mul_ne_zero hG1ne hG2ne,
+      ?_
+    ⟩
     · rw [add_comm d1 d2]
       exact IsWeightedHomogeneous.mul hF2 hG1
     · simp only [map_add (f := _), map_mul]
@@ -200,21 +250,34 @@ theorem rep_of_mem (y : (Σ b, ι b) → Ω) {t : Ω} (ht : t ∈ fnField k y) :
       rw [← h]
       field_simp
   · rintro a b - - ⟨d1, F1, G1, hF1, hG1, hG1ne, h1⟩ ⟨d2, F2, G2, hF2, hG2, hG2ne, h2⟩
-    refine ⟨d1 + d2, F1 * F2, G1 * G2, IsWeightedHomogeneous.mul hF1 hF2,
-      IsWeightedHomogeneous.mul hG1 hG2, by simpa using mul_ne_zero hG1ne hG2ne, ?_⟩
+    refine ⟨
+      d1 + d2,
+      F1 * F2,
+      G1 * G2,
+      IsWeightedHomogeneous.mul hF1 hF2,
+      IsWeightedHomogeneous.mul hG1 hG2,
+      by simpa using mul_ne_zero hG1ne hG2ne,
+      ?_
+    ⟩
     simp only [map_mul]
     linear_combination (b * aeval y G2) * h1 + aeval y F1 * h2
 
-theorem homog_mono (c : ∀ b, ι b) (e : K → ℕ) : IsMultiHomog (∏ b, (X ⟨b, c b⟩ : MRing ι k) ^ e b) e := by
-  have h := IsWeightedHomogeneous.prod (w := blockWeight ι) Finset.univ (fun b => (X ⟨b, c b⟩ : MRing ι k) ^ e b)
-    (fun b => e b • (Pi.single b 1 : K → ℕ)) fun b _ => IsWeightedHomogeneous.pow (homog_X ⟨b, c b⟩) (e b)
+theorem homog_mono (c : ∀ b, ι b) (e : K → ℕ)
+    : IsMultiHomog (∏ b, (X ⟨b, c b⟩ : MRing ι k) ^ e b) e := by
+  have h :=
+    IsWeightedHomogeneous.prod (w := blockWeight ι) Finset.univ
+      (fun b => (X ⟨b, c b⟩ : MRing ι k) ^ e b)
+      (fun b => e b • (Pi.single b 1 : K → ℕ))
+      fun b _ => IsWeightedHomogeneous.pow (homog_X ⟨b, c b⟩) (e b)
   have e1 : ∑ b, e b • (Pi.single b 1 : K → ℕ) = e := by
     funext j; simp [Finset.sum_apply, Pi.single_apply]
   rwa [e1] at h
 
-theorem exists_section (y : (Σ b, ι b) → Ω) (hy : ∀ b, ∃ i, y ⟨b, i⟩ ≠ 0) (htop : fnField k y = ⊤) (b : K → ℤ) (ρ : Ω) :
-    ∃ (bf bg : K → ℕ) (f g : MRing ι k), IsMultiHomog f bf ∧ IsMultiHomog g bg ∧ aeval y g ≠ 0 ∧
-      ρ * aeval y g = aeval y f ∧ (fun j => (bf j : ℤ) - bg j) = b := by
+theorem exists_section
+    (y : (Σ b, ι b) → Ω) (hy : ∀ b, ∃ i, y ⟨b, i⟩ ≠ 0) (htop : fnField k y = ⊤) (b : K → ℤ) (ρ : Ω)
+    : ∃ (bf bg : K → ℕ) (f g : MRing ι k),
+      IsMultiHomog f bf ∧ IsMultiHomog g bg ∧ aeval y g ≠ 0 ∧ ρ * aeval y g = aeval y f
+        ∧ (fun j => (bf j : ℤ) - bg j) = b := by
   classical
   obtain ⟨c, hc⟩ : ∃ c : ∀ j, ι j, ∀ j, y ⟨j, c j⟩ ≠ 0 :=
     ⟨fun j => (hy j).choose, fun j => (hy j).choose_spec⟩
@@ -232,8 +295,17 @@ theorem exists_section (y : (Σ b, ι b) → Ω) (hy : ∀ b, ∃ i, y ⟨b, i�
     rw [htop]
     exact IntermediateField.mem_top
   obtain ⟨d, F, G, hF, hG, hGne, h⟩ := rep_of_mem y hmem
-  refine ⟨d + ep, d + em, F * Mp, G * Mm, IsWeightedHomogeneous.mul hF (homog_mono (k := k) c ep),
-    IsWeightedHomogeneous.mul hG (homog_mono (k := k) c em), ?_, ?_, ?_⟩
+  refine ⟨
+    d + ep,
+    d + em,
+    F * Mp,
+    G * Mm,
+    IsWeightedHomogeneous.mul hF (homog_mono (k := k) c ep),
+    IsWeightedHomogeneous.mul hG (homog_mono (k := k) c em),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [map_mul]
     exact mul_ne_zero hGne hMmne
   · rw [map_mul, map_mul, ← h]
@@ -244,8 +316,11 @@ theorem exists_section (y : (Σ b, ι b) → Ω) (hy : ∀ b, ∃ i, y ⟨b, i�
     omega
 
 omit [DecidableEq K] in
-theorem vdeg_chart (O : ValuationSubring Ω) (y : (Σ b, ι b) → Ω) (c : ∀ b, ι b) (hc : ∀ b, y ⟨b, c b⟩ ≠ 0)
-    (h : ∀ b i, y ⟨b, i⟩ / y ⟨b, c b⟩ ∈ O) (a : K → ℤ) : vdeg O y a = O.valuation (∏ b, y ⟨b, c b⟩ ^ a b) := by
+theorem vdeg_chart
+    (O : ValuationSubring Ω) (y : (Σ b, ι b) → Ω) (c : ∀ b, ι b)
+    (hc : ∀ b, y ⟨b, c b⟩ ≠ 0) (h : ∀ b i, y ⟨b, i⟩ / y ⟨b, c b⟩ ∈ O)
+    (a : K → ℤ)
+    : vdeg O y a = O.valuation (∏ b, y ⟨b, c b⟩ ^ a b) := by
   unfold vdeg
   rw [map_prod]
   refine Finset.prod_congr rfl fun b _ => ?_
@@ -254,9 +329,9 @@ theorem vdeg_chart (O : ValuationSubring Ω) (y : (Σ b, ι b) → Ω) (c : ∀ 
   apply le_antisymm
   · refine Finset.sup_le fun i _ => ?_
     have h1 := (O.valuation_le_one_iff _).2 (h b i)
-    calc O.valuation (y ⟨b, i⟩)
-        = O.valuation (y ⟨b, i⟩ / y ⟨b, c b⟩) * O.valuation (y ⟨b, c b⟩) := by
-          rw [← map_mul, div_mul_cancel₀ _ (hc b)]
+    calc
+      O.valuation (y ⟨b, i⟩) = O.valuation (y ⟨b, i⟩ / y ⟨b, c b⟩) * O.valuation (y ⟨b, c b⟩) := by
+        rw [← map_mul, div_mul_cancel₀ _ (hc b)]
       _ ≤ 1 * O.valuation (y ⟨b, c b⟩) := by gcongr
       _ = O.valuation (y ⟨b, c b⟩) := one_mul _
   · exact Finset.le_sup (f := fun i => O.valuation (y ⟨b, i⟩)) (Finset.mem_univ (c b))
@@ -265,8 +340,9 @@ end Rep
 
 end UnitZ
 
-private theorem zpow_mem_valuationSubring_of_unit {L : Type} [Field L] (V : ValuationSubring L) (x : L) (h1 : x ∈ V)
-    (h2 : x⁻¹ ∈ V) (z : ℤ) : x ^ z ∈ V := by
+private theorem zpow_mem_valuationSubring_of_unit
+    {L : Type} [Field L] (V : ValuationSubring L) (x : L) (h1 : x ∈ V) (h2 : x⁻¹ ∈ V) (z : ℤ)
+    : x ^ z ∈ V := by
   cases z with
   | ofNat n =>
     rw [Int.ofNat_eq_coe, zpow_natCast]
@@ -298,13 +374,12 @@ theorem unitZero : PtDim → UnitZero := by
     rw [hPdef, pointIdeal, RingHom.mem_ker]
     change algebraMap (MvPolynomial K Ω) L (pointConeMap k y s) = 0 ↔ _
     exact ⟨fun h => hinj (h.trans (map_zero _).symm), fun h => by rw [h, map_zero]⟩
-  have hφeq : ∀ s t, φ s = φ t → s - t ∈ P := fun s t h =>
-    (hφ0 _).1 (by rw [map_sub, h, sub_self])
+  have hφeq : ∀ s t, φ s = φ t → s - t ∈ P := fun s t h => (hφ0 _).1 (by rw [map_sub, h, sub_self])
   have hψ : ∀ z, ψ z = 0 ↔ z = 0 := fun z =>
     map_eq_zero_iff ψ (hinj.comp (MvPolynomial.C_injective _ _))
   have hT : ∀ j, T j ≠ 0 := fun j h => MvPolynomial.X_ne_zero j (hinj (h.trans (map_zero _).symm))
-  have hφhom : ∀ (h : MRing ι k) (d : K → ℕ), IsMultiHomog h d →
-      φ h = ψ (aeval y h) * ∏ j, T j ^ d j := by
+  have hφhom
+      : ∀ (h : MRing ι k) (d : K → ℕ), IsMultiHomog h d → φ h = ψ (aeval y h) * ∏ j, T j ^ d j := by
     intro h d hh
     change algebraMap (MvPolynomial K Ω) L (pointConeMap k y h) = _
     rw [GenericProjClosureDivisor.pointConeMap_of_homog y hh, map_mul, map_prod]
@@ -312,8 +387,8 @@ theorem unitZero : PtDim → UnitZero := by
     rfl
   have hφX : ∀ p : (Σ j, ι j), φ (X p) = ψ (y p) * T p.1 := by
     intro p
-    change algebraMap (MvPolynomial K Ω) L (pointConeMap k y (X p)) =
-      algebraMap (MvPolynomial K Ω) L (C (y p)) * algebraMap (MvPolynomial K Ω) L (X p.1)
+    change algebraMap (MvPolynomial K Ω) L (pointConeMap k y (X p))
+      = algebraMap (MvPolynomial K Ω) L (C (y p)) * algebraMap (MvPolynomial K Ω) L (X p.1)
     rw [← map_mul]
     congr 1
     simp [pointConeMap]
@@ -326,17 +401,19 @@ theorem unitZero : PtDim → UnitZero := by
     · exact (Finset.prod_ne_zero_iff.2 fun j _ => pow_ne_zero _ (hT j)) h1
   have hfP := hφne f bf hf hfne
   have hgP := hφne g bg hg hgne
-  have hcut := GroundTheory.Heights₂.Heights.FieldNumbers.CutRational.full k K ι P hMP n hrel bf bg f g hf hg
-    hfP hgP a
-  have hunit : ∀ (W : Ideal (MRing ι k)) [W.IsPrime], P ≤ W → IsRelevant W →
-      ∀ V : ValuationSubring L, (∀ s, φ s ∈ V) → (∀ s, s ∉ W → (φ s)⁻¹ ∈ V) →
-        φ f / φ g ∈ V ∧ φ g / φ f ∈ V := by
+  have hcut :=
+    GroundTheory.Heights₂.Heights.FieldNumbers.CutRational.full k K ι P hMP n hrel bf bg f g hf hg
+      hfP hgP a
+  have hunit
+      : ∀ (W : Ideal (MRing ι k)) [W.IsPrime],
+        P ≤ W → IsRelevant W
+          → ∀ V : ValuationSubring L,
+            (∀ s, φ s ∈ V) → (∀ s, s ∉ W → (φ s)⁻¹ ∈ V) → φ f / φ g ∈ V ∧ φ g / φ f ∈ V := by
     intro W _ hPW hWr V hVS hVinv
     have hWr' : ∀ j, ∃ i, (X ⟨j, i⟩ : MRing ι k) ∉ W := hWr
     choose c hc using hWr'
     have hk : ∀ s, s ∉ W → φ s ≠ 0 := fun s hs h0 => hs (hPW ((hφ0 s).1 h0))
-    have hyc : ∀ j, y ⟨j, c j⟩ ≠ 0 := fun j h0 =>
-      hk _ (hc j) (by rw [hφX, h0, map_zero, zero_mul])
+    have hyc : ∀ j, y ⟨j, c j⟩ ≠ 0 := fun j h0 => hk _ (hc j) (by rw [hφX, h0, map_zero, zero_mul])
     let O := V.comap ψ
     have hdiv : ∀ j i, y ⟨j, i⟩ / y ⟨j, c j⟩ ∈ O := by
       intro j i
@@ -350,8 +427,8 @@ theorem unitZero : PtDim → UnitZero := by
       intro x
       change ψ (algebraMap k Ω x) ∈ V
       have e : ψ (algebraMap k Ω x) = φ (C x) := by
-        change algebraMap (MvPolynomial K Ω) L (C (algebraMap k Ω x)) =
-          algebraMap (MvPolynomial K Ω) L (pointConeMap k y (C x))
+        change algebraMap (MvPolynomial K Ω) L (C (algebraMap k Ω x))
+          = algebraMap (MvPolynomial K Ω) L (pointConeMap k y (C x))
         congr 1
         simp [pointConeMap, MvPolynomial.algebraMap_eq]
       rw [e]
@@ -365,8 +442,7 @@ theorem unitZero : PtDim → UnitZero := by
       rw [map_div₀, ← hv']
       exact div_self ((Valuation.ne_zero_iff _).2 hY)
     have hwO : ψ (ρ / Y) ∈ V := (O.valuation_le_one_iff _).1 hw1.le
-    have hwO' : ψ ((ρ / Y)⁻¹) ∈ V :=
-      (O.valuation_le_one_iff _).1 (by rw [map_inv₀, hw1, inv_one])
+    have hwO' : ψ ((ρ / Y)⁻¹) ∈ V := (O.valuation_le_one_iff _).1 (by rw [map_inv₀, hw1, inv_one])
     have he1 : ∀ j, φ (X ⟨j, c j⟩) ∈ V := fun j => hVS _
     have he2 : ∀ j, (φ (X ⟨j, c j⟩))⁻¹ ∈ V := fun j => hVinv _ (hc j)
     have hb' : ∀ j, b j = (bf j : ℤ) - bg j := fun j => (congrFun hb j).symm
@@ -391,10 +467,12 @@ theorem unitZero : PtDim → UnitZero := by
       simp [inv_zpow]
     constructor
     · rw [hprod]
-      exact mul_mem hwO (prod_mem fun j _ => zpow_mem_valuationSubring_of_unit V _ (he1 j) (he2 j) _)
+      exact mul_mem hwO
+        (prod_mem fun j _ => zpow_mem_valuationSubring_of_unit V _ (he1 j) (he2 j) _)
     · rw [hprod']
-      exact mul_mem hwO' (prod_mem fun j _ =>
-        zpow_mem_valuationSubring_of_unit V _ (he2 j) (by rw [inv_inv]; exact he1 j) _)
+      exact mul_mem hwO'
+        (prod_mem fun j _ =>
+          zpow_mem_valuationSubring_of_unit V _ (he2 j) (by rw [inv_inv]; exact he1 j) _)
   have hzero : ∀ W, divCycle P f W = divCycle P g W := by
     intro W
     by_cases hW : W.IsPrime ∧ P ≤ W ∧ IsRelevant W
@@ -403,16 +481,16 @@ theorem unitZero : PtDim → UnitZero := by
       have hk : ∀ s, s ∉ W → φ s ≠ 0 := fun s hs h0 => hs (hPW ((hφ0 s).1 h0))
       have hφf : φ f ≠ 0 := fun h0 => hfP ((hφ0 f).1 h0)
       have hφg : φ g ≠ 0 := fun h0 => hgP ((hφ0 g).1 h0)
-      obtain ⟨N1, h1⟩ := exists_rel φ W hk f g hφg fun V hV1 hV2 =>
-        (hunit W hPW hWr V hV1 hV2).1
-      obtain ⟨N2, h2⟩ := exists_rel φ W hk g f hφf fun V hV1 hV2 =>
-        (hunit W hPW hWr V hV1 hV2).2
-      have l1 := divCycle_le P hP f g hfP hgP W hWp hPW N1 fun m => by
-        obtain ⟨s, r, hs, e⟩ := h1 m
-        exact ⟨s, r, hs, hφeq _ _ e⟩
-      have l2 := divCycle_le P hP g f hgP hfP W hWp hPW N2 fun m => by
-        obtain ⟨s, r, hs, e⟩ := h2 m
-        exact ⟨s, r, hs, hφeq _ _ e⟩
+      obtain ⟨N1, h1⟩ := exists_rel φ W hk f g hφg fun V hV1 hV2 => (hunit W hPW hWr V hV1 hV2).1
+      obtain ⟨N2, h2⟩ := exists_rel φ W hk g f hφf fun V hV1 hV2 => (hunit W hPW hWr V hV1 hV2).2
+      have l1 :=
+        divCycle_le P hP f g hfP hgP W hWp hPW N1 fun m => by
+          obtain ⟨s, r, hs, e⟩ := h1 m
+          exact ⟨s, r, hs, hφeq _ _ e⟩
+      have l2 :=
+        divCycle_le P hP g f hgP hfP W hWp hPW N2 fun m => by
+          obtain ⟨s, r, hs, e⟩ := h2 m
+          exact ⟨s, r, hs, hφeq _ _ e⟩
       omega
     · have e1 : divCycle P f W = 0 := by
         by_contra hne

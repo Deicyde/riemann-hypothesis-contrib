@@ -42,16 +42,19 @@ lemma fu_of_finrank_one (F : Type) [Field F] [NumberField F] (h : Module.finrank
     Algebra.FormallyUnramified ℤ (𝓞 F) :=
   Algebra.FormallyUnramified.of_surjective (Algebra.ofId ℤ (𝓞 F)) (surj_of_finrank_one F h)
 
-theorem main (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (hU : ∀ w : HeightOneSpectrum (𝓞 E), Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield E)) w.asIdeal) :
-    Nontrivial (InfinitePlace E) := by
+theorem main
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (hU
+      : ∀ w : HeightOneSpectrum (𝓞 E), Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield E)) w.asIdeal)
+    : Nontrivial (InfinitePlace E) := by
   by_contra hnt
   rw [not_nontrivial_iff_subsingleton] at hnt
   have hF := finrank_real_eq_one E hnt
   have : Algebra.FormallyUnramified ℤ (𝓞 (maximalRealSubfield E)) := fu_of_finrank_one _ hF
   have hunr : ∀ w : HeightOneSpectrum (𝓞 E), Algebra.IsUnramifiedAt ℤ w.asIdeal := fun w => by
     have := hU w
-    exact Algebra.FormallyUnramified.comp ℤ (𝓞 (maximalRealSubfield E)) (Localization.AtPrime w.asIdeal)
+    exact Algebra.FormallyUnramified.comp ℤ (𝓞 (maximalRealSubfield E))
+      (Localization.AtPrime w.asIdeal)
   have htop : differentIdeal ℤ (𝓞 E) = ⊤ := by
     by_contra hne
     obtain ⟨P, hPmax, hle⟩ := Ideal.exists_le_maximal _ hne

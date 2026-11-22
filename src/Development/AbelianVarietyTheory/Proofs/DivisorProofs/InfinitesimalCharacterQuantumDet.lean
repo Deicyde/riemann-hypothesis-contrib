@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.PosPa
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.WignerGL GlobalTheory.WigAlg Formalism.REAL
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.WignerGL
+  GlobalTheory.WigAlg Formalism.REAL
 open scoped TensorProduct
 
 noncomputable section
@@ -32,26 +33,34 @@ theorem Eop_mem (π : CuspSub E a) (τ : E →+* ℂ) (i j : Fin a) : Eop τ i j
   have h : ∀ X, lie E a X ∈ keep π := fun X φ hφ => π.stable (.lie X) φ hφ
   exact (keep π).smul_mem ((keep π).sub_mem (h _) ((keep π).smul_mem (h _) _)) _
 
-theorem res_Eop (π : CuspSub E a) (τ : E →+* ℂ) (i j : Fin a) :
-    res π ⟨Eop τ i j, Eop_mem π τ i j⟩ = cx τ (lieOp π) i j := by
+theorem res_Eop (π : CuspSub E a) (τ : E →+* ℂ) (i j : Fin a)
+    : res π ⟨Eop τ i j, Eop_mem π τ i j⟩ = cx τ (lieOp π) i j := by
   refine LinearMap.ext fun φ => Subtype.ext ?_
   rfl
 
 end GlobalTheory.WigCap
 
-
 open GlobalTheory.WigCap in
-theorem GlobalTheory.capelli_cuspSub : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (π : CuspSub E a) (τ : E →+* ℂ) (χ : Fin a → ℂ), π.HasInfChar τ (Multiset.map χ Finset.univ.val) → GlRel (cx τ (lieOp π)) ∧ ∀ u : ℂ, qdet (cx τ (lieOp π)) (u + ((a : ℂ) - 1) / 2) = algebraMap ℂ _ (∏ s, (u + χ s)) := by
+theorem GlobalTheory.capelli_cuspSub
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+        (π : CuspSub E a) (τ : E →+* ℂ) (χ : Fin a → ℂ),
+      π.HasInfChar τ (Multiset.map χ Finset.univ.val)
+        → GlRel (cx τ (lieOp π))
+          ∧ ∀ u : ℂ,
+            qdet (cx τ (lieOp π)) (u + ((a : ℂ) - 1) / 2) = algebraMap ℂ _ (∏ s, (u + χ s)) := by
   intro E _ _ _ a π τ χ hχ
   let X : Fin a → Fin a → keep π := fun i j => ⟨Eop τ i j, Eop_mem π τ i j⟩
-  have hX : (fun i j => res π (X i j)) = cx τ (lieOp π) := funext fun i => funext fun j => res_Eop π τ i j
+  have hX : (fun i j => res π (X i j)) = cx τ (lieOp π) :=
+    funext fun i => funext fun j => res_Eop π τ i j
   have hval : (fun i j => (keep π).val (X i j)) = Eop τ := rfl
   constructor
   · intro i j k l
     have h := glRel_Eop (a := a) τ i j k l
     rw [← hX]
     simp only
-    have h2 : X i j * X k l - X k l * X i j = (if j = k then X i l else 0) - (if l = i then X k j else 0) := by
+    have h2
+        : X i j * X k l - X k l * X i j
+          = (if j = k then X i l else 0) - (if l = i then X k j else 0) := by
       apply Subtype.ext
       simp only [Subalgebra.coe_sub, Subalgebra.coe_mul]
       rw [h]

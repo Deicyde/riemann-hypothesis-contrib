@@ -8,12 +8,26 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Bij
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift GlobalTheory.LiftSys GlobalTheory.Published
+open CategoryTheory AlgebraicGeometry KaehlerDifferential DividedPowers
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.DeRham GlobalTheory.SqLift
+  GlobalTheory.LiftSys GlobalTheory.Published
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.LiftSys
 
-theorem exists_semilinear_lift_of_projective : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (π : R →+* R₀), Function.Surjective π → ∀ (P : Type) [AddCommGroup P] [Module R₀ P], Module.Projective R₀ P → ∀ (M M' : Type) [AddCommGroup M] [Module R M] [AddCommGroup M'] [Module R M'] (W : Submodule R M), (∀ r, π r = 0 → ∀ m ∈ W, r • m = 0) → ∀ (q : M →ₗ[R] M') (v : P →+ M'), (∀ r w, v (π r • w) = r • v w) → (∀ w, ∃ m ∈ W, q m = v w) → ∃ u : P →+ M, (∀ r w, u (π r • w) = r • u w) ∧ (∀ w, u w ∈ W) ∧ ∀ w, q (u w) = v w := by
+theorem exists_semilinear_lift_of_projective
+    : ∀ (R R₀ : Type) [CommRing R] [CommRing R₀] (π : R →+* R₀),
+      Function.Surjective π
+        → ∀ (P : Type) [AddCommGroup P] [Module R₀ P],
+          Module.Projective R₀ P
+            → ∀ (M M' : Type) [AddCommGroup M] [Module R M] [AddCommGroup M'] [Module R M']
+                (W : Submodule R M),
+              (∀ r, π r = 0 → ∀ m ∈ W, r • m = 0)
+                → ∀ (q : M →ₗ[R] M') (v : P →+ M'),
+                  (∀ r w, v (π r • w) = r • v w) → (∀ w, ∃ m ∈ W, q m = v w)
+                    → ∃ u : P →+ M,
+                      (∀ r w, u (π r • w) = r • u w) ∧ (∀ w, u w ∈ W) ∧ ∀ w, q (u w) = v w := by
   intro R R₀ _ _ π hπ P _ _ hP M M' _ _ _ _ W hW q v hv hq
   classical
   choose m hmW hmq using hq
@@ -22,10 +36,11 @@ theorem exists_semilinear_lift_of_projective : ∀ (R R₀ : Type) [CommRing R] 
     intro r s x hx h
     have := hW (r - s) (by rw [map_sub, h, sub_self]) x hx
     rwa [sub_smul, sub_eq_zero] at this
-  let f : P → R₀ →+ M := fun w => AddMonoidHom.mk' (fun c => σ c • m w) (by
-    intro a b
-    rw [← add_smul]
-    exact key _ _ _ (hmW w) (by rw [map_add (f := _), hσ, hσ, hσ]))
+  let f : P → R₀ →+ M := fun w =>
+    AddMonoidHom.mk' (fun c => σ c • m w) (by
+      intro a b
+      rw [← add_smul]
+      exact key _ _ _ (hmW w) (by rw [map_add (f := _), hσ, hσ, hσ]))
   have hf : ∀ w c, f w c = σ c • m w := fun _ _ => rfl
   let g : (P →₀ R₀) →+ M := Finsupp.liftAddHom f
   have hg : ∀ w c, g (Finsupp.single w c) = σ c • m w := by
@@ -49,7 +64,8 @@ theorem exists_semilinear_lift_of_projective : ∀ (R R₀ : Type) [CommRing R] 
     intro x
     induction x using Finsupp.induction_linear with
     | zero => simp
-    | add a b ha hb => rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), ha, hb]
+    | add a b ha hb =>
+      rw [map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _), ha, hb]
     | single w c =>
       rw [hg, Finsupp.linearCombination_single, map_smul, hmq, ← hv, hσ]
       rfl

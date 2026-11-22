@@ -7,10 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
 
-theorem UpperTheory.V.Ws.Po.finExt :
-    ∀ (K : Type) [Field K] [IsAlgClosed K] (V : ValuationSubring K) (A B : Type) [CommRing A] [IsDomain A] [CommRing B] [IsDomain B]
-      (φ : A →+* B) (f : A →+* V), Function.Injective φ → φ.Finite → Function.Injective f →
-      ∃ (y : B →+* V) (s : Finset K), y.comp φ = f ∧ ∀ b, (y b : K) ∈ Subfield.closure (Set.range (V.subtype.comp f) ∪ s) := by
+theorem UpperTheory.V.Ws.Po.finExt
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] (V : ValuationSubring K) (A B : Type) [CommRing A]
+        [IsDomain A] [CommRing B] [IsDomain B] (φ : A →+* B) (f : A →+* V),
+      Function.Injective φ → φ.Finite → Function.Injective f
+        → ∃ (y : B →+* V) (s : Finset K),
+          y.comp φ = f ∧ ∀ b, (y b : K) ∈ Subfield.closure (Set.range (V.subtype.comp f) ∪ s) := by
   intro K _ _ V A B _ _ _ _ φ f hφ hfin hf
   classical
   letI : Algebra A B := φ.toAlgebra
@@ -24,8 +26,7 @@ theorem UpperTheory.V.Ws.Po.finExt :
   haveI : Algebra.IsAlgebraic A B := inferInstance
   let y₀ : B →ₐ[A] K := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have hmem : ∀ b, y₀ b ∈ V := by
     intro b

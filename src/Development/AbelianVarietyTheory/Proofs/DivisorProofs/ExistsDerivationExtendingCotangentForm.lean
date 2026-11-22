@@ -8,10 +8,12 @@ open IsLocalRing
 
 namespace GlobalTheory.ConormalDer
 
-theorem exists_derivation_cotangent (R B : Type) [CommRing R] [CommRing B] [IsLocalRing B]
-    [Algebra R B] [Algebra.FormallySmooth R (ResidueField B)] :
-    ∃ D : B →ₗ[R] CotangentSpace B, (∀ a b, D (a * b) = a • D b + b • D a) ∧
-      ∀ t : maximalIdeal B, D t = (maximalIdeal B).toCotangent t := by
+theorem exists_derivation_cotangent
+    (R B : Type) [CommRing R] [CommRing B] [IsLocalRing B] [Algebra R B]
+    [Algebra.FormallySmooth R (ResidueField B)]
+    : ∃ D : B →ₗ[R] CotangentSpace B,
+      (∀ a b, D (a * b) = a • D b + b • D a)
+        ∧ ∀ t : maximalIdeal B, D t = (maximalIdeal B).toCotangent t := by
   set m := maximalIdeal B with hm
   let π : (B ⧸ m ^ 2) →ₐ[R] ResidueField B :=
     Ideal.Quotient.liftₐ (m ^ 2) (IsScalarTower.toAlgHom R B (ResidueField B)) fun a ha =>
@@ -28,18 +30,20 @@ theorem exists_derivation_cotangent (R B : Type) [CommRing R] [CommRing B] [IsLo
     rw [Ideal.zero_eq_bot, eq_bot_iff, ← m.cotangentIdeal_square]
     exact Ideal.pow_right_mono (fun z hz => hker z hz) 2
   let s := Algebra.FormallySmooth.liftOfSurjective (AlgHom.id R (ResidueField B)) π hsurj hnil
-  have hs : ∀ y, π (s y) = y := fun y =>
-    Algebra.FormallySmooth.liftOfSurjective_apply _ _ _ _ y
+  have hs : ∀ y, π (s y) = y := fun y => Algebra.FormallySmooth.liftOfSurjective_apply _ _ _ _ y
   have hmem : ∀ a, Ideal.Quotient.mk _ a - s (residue B a) ∈ m.cotangentIdeal := fun a =>
     hker _ (by rw [map_sub, hs, hπ, sub_self])
   let D : B → CotangentSpace B := fun a => m.cotangentEquivIdeal.symm ⟨_, hmem a⟩
-  have hD : ∀ a, m.cotangentToQuotientSquare (D a) = Ideal.Quotient.mk _ a - s (residue B a) :=
-    fun a => by
-      rw [← Ideal.cotangentEquivIdeal_apply]
-      simp only [D, LinearEquiv.apply_symm_apply]
+  have hD
+      : ∀ a,
+        m.cotangentToQuotientSquare (D a) = Ideal.Quotient.mk _ a - s (residue B a) := fun a => by
+    rw [← Ideal.cotangentEquivIdeal_apply]
+    simp only [D, LinearEquiv.apply_symm_apply]
   have hinj := m.cotangentToQuotientSquare_injective
-  have hsq : ∀ a b, (Ideal.Quotient.mk _ a - s (residue B a)) *
-      (Ideal.Quotient.mk _ b - s (residue B b)) = 0 := fun a b => by
+  have hsq
+      : ∀ a b,
+        (Ideal.Quotient.mk _ a - s (residue B a)) * (Ideal.Quotient.mk _ b - s (residue B b))
+          = 0 := fun a b => by
     have := Ideal.mul_mem_mul (hmem a) (hmem b)
     rwa [← pow_two, m.cotangentIdeal_square, Ideal.mem_bot] at this
   have hsm : ∀ (a : B) (z : B ⧸ m ^ 2), a • z = Ideal.Quotient.mk _ a * z := fun a z =>
@@ -63,8 +67,8 @@ theorem exists_derivation_cotangent (R B : Type) [CommRing R] [CommRing B] [IsLo
     rw [hD, (residue_eq_zero_iff _).2 t.2, map_zero, sub_zero, Ideal.toCotangent_to_quotient_square]
     rfl
 
-theorem formallySmooth_of_charZero (F K : Type) [Field F] [CharZero F] [Field K] [Algebra F K] :
-    Algebra.FormallySmooth F K := by
+theorem formallySmooth_of_charZero (F K : Type) [Field F] [CharZero F] [Field K] [Algebra F K]
+    : Algebra.FormallySmooth F K := by
   obtain ⟨s, hs⟩ := exists_isTranscendenceBasis F K
   haveI := hs.isAlgebraic_field
   haveI : CharZero K := charZero_of_injective_algebraMap (algebraMap F K).injective
@@ -74,10 +78,10 @@ theorem formallySmooth_of_charZero (F K : Type) [Field F] [CharZero F] [Field K]
     Algebra.IsAlgebraic.isSeparable_of_perfectField
   exact Algebra.FormallySmooth.of_algebraicIndependent_of_isSeparable hs.1
 
-theorem formallySmooth_residueField (R B : Type) [CommRing R] [IsDomain R] [Algebra ℚ R]
-    [CommRing B] [IsLocalRing B] [Algebra R B]
-    (hu : ∀ r : R, r ≠ 0 → IsUnit (algebraMap R B r)) :
-    Algebra.FormallySmooth R (ResidueField B) := by
+theorem formallySmooth_residueField
+    (R B : Type) [CommRing R] [IsDomain R] [Algebra ℚ R] [CommRing B] [IsLocalRing B] [Algebra R B]
+    (hu : ∀ r : R, r ≠ 0 → IsUnit (algebraMap R B r))
+    : Algebra.FormallySmooth R (ResidueField B) := by
   let K := FractionRing R
   have hu' : ∀ c : nonZeroDivisors R, IsUnit (algebraMap R B c) := fun c =>
     hu c (nonZeroDivisors.ne_zero c.2)
@@ -93,18 +97,24 @@ theorem formallySmooth_residueField (R B : Type) [CommRing R] [IsDomain R] [Alge
   haveI : Algebra.FormallyEtale R K := .of_isLocalization (nonZeroDivisors R)
   exact .comp R K (ResidueField B)
 
-theorem exists_derivation_extending :
-    ∀ (R B : Type) [CommRing R] [IsDomain R] [Algebra ℚ R] [CommRing B] [IsLocalRing B] [Algebra R B], (∀ r : R, r ≠ 0 → IsUnit (algebraMap R B r)) → ∀ (lam : CotangentSpace B →ₗ[ResidueField B] ResidueField B), ∃ δ : Derivation R B (ResidueField B), ∀ y (hy : y ∈ maximalIdeal B), δ y = lam ((maximalIdeal B).toCotangent ⟨y, hy⟩) := by
+theorem exists_derivation_extending
+    : ∀ (R B : Type) [CommRing R] [IsDomain R] [Algebra ℚ R] [CommRing B] [IsLocalRing B]
+        [Algebra R B],
+      (∀ r : R, r ≠ 0 → IsUnit (algebraMap R B r))
+        → ∀ (lam : CotangentSpace B →ₗ[ResidueField B] ResidueField B),
+          ∃ δ : Derivation R B (ResidueField B), ∀ y (hy : y ∈ maximalIdeal B),
+            δ y = lam ((maximalIdeal B).toCotangent ⟨y, hy⟩) := by
   intro R B _ _ _ _ _ _ hu lam
   haveI := formallySmooth_residueField R B hu
   obtain ⟨D, hmul, hD⟩ := exists_derivation_cotangent R B
   have hsm : ∀ (a : B) (v : CotangentSpace B), lam (a • v) = a • lam v := fun a v => by
     rw [← algebraMap_smul (ResidueField B) a v, map_smul, algebraMap_smul]
-  let L : B →ₗ[R] ResidueField B :=
-    { toFun := fun a => lam (D a)
-      map_add' := fun a b => by rw [map_add (f := _), map_add (f := _)]
-      map_smul' := fun c a => by
-        rw [RingHom.id_apply, map_smul, ← algebraMap_smul B c (D a), hsm, algebraMap_smul] }
+  let L : B →ₗ[R] ResidueField B := {
+    toFun := fun a => lam (D a)
+    map_add' := fun a b => by rw [map_add (f := _), map_add (f := _)]
+    map_smul' := fun c a => by
+      rw [RingHom.id_apply, map_smul, ← algebraMap_smul B c (D a), hsm, algebraMap_smul]
+  }
   refine ⟨Derivation.mk' L fun a b => ?_, fun y hy => ?_⟩
   · change lam (D (a * b)) = a • lam (D b) + b • lam (D a)
     rw [hmul, map_add (f := _), hsm, hsm]

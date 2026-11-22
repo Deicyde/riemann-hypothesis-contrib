@@ -45,39 +45,38 @@ theorem u7F3 : FrobeniusLengthBoundStatement := by
       simp [h1, Matrix.one_apply]
     have hθ : thetaL U τ l = (p : R) • thetaL U τ w' := by
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hl_sum, map_sum,
-        Finset.sum_eq_single τ (fun i _ hi => theta_kill U hi l) (by simp), hw', map_smul]
+      rw [← hl_sum, map_sum, Finset.sum_eq_single τ (fun i _ hi => theta_kill U hi l) (by simp),
+        hw', map_smul]
     rw [hθ]
     exact redP_pP ((mem_pP _).2 ⟨_, rfl⟩)
-  have hsx : ∀ d : Ix g → R,
-      sumX D d = ∑ k, d k • (⟨xL D k, D.x_mem k⟩ : augIdeal H.AA.carrier) := by
+  have hsx
+      : ∀ d : Ix g → R, sumX D d = ∑ k, d k • (⟨xL D k, D.x_mem k⟩ : augIdeal H.AA.carrier) := by
     intro d
     apply Subtype.ext
     simp [sumX]
-  let π : (blockL D τ ⧸ N.comap (blockL D τ).subtype) →ₗ[R]
-      (Fin (U.r τ) → R ⧸ Ideal.span {(p : R)}) :=
-    (N.comap (blockL D τ).subtype).liftQ
-      (thetaQ U τ ∘ₗ H.φ ∘ₗ sumX D ∘ₗ (blockL D τ).subtype) (by
-        intro c hc
-        rw [Submodule.mem_comap, Submodule.subtype_apply] at hc
-        obtain ⟨f, hf, hfc⟩ := hNsq _ hc
-        obtain ⟨c', hc', hsub⟩ := sub_lin_mem_sq hv D hdet hbasis (hsqle hf)
-        have hcc : c' = (c : Ix g → R) := funext fun k => hinj ((hc' k).trans (hfc k).symm)
-        rw [hcc] at hsub
-        have hmem : sumX D (c : Ix g → R) ∈ LinearMap.ker H.φ := by
-          rw [H.cotangent_ker_eq, Submodule.mem_comap, Submodule.subtype_apply]
-          have h2 := Submodule.sub_mem _ hf hsub
-          rw [sub_sub_cancel] at h2
-          simpa [sumX] using h2
-        rw [LinearMap.mem_ker] at hmem ⊢
-        simp only [LinearMap.comp_apply, Submodule.subtype_apply, hmem, map_zero])
+  let π
+      : (blockL D τ ⧸ N.comap (blockL D τ).subtype) →ₗ[R]
+        (Fin (U.r τ) → R ⧸ Ideal.span {(p : R)}) :=
+    (N.comap (blockL D τ).subtype).liftQ (thetaQ U τ ∘ₗ H.φ ∘ₗ sumX D ∘ₗ (blockL D τ).subtype) (by
+      intro c hc
+      rw [Submodule.mem_comap, Submodule.subtype_apply] at hc
+      obtain ⟨f, hf, hfc⟩ := hNsq _ hc
+      obtain ⟨c', hc', hsub⟩ := sub_lin_mem_sq hv D hdet hbasis (hsqle hf)
+      have hcc : c' = (c : Ix g → R) := funext fun k => hinj ((hc' k).trans (hfc k).symm)
+      rw [hcc] at hsub
+      have hmem : sumX D (c : Ix g → R) ∈ LinearMap.ker H.φ := by
+        rw [H.cotangent_ker_eq, Submodule.mem_comap, Submodule.subtype_apply]
+        have h2 := Submodule.sub_mem _ hf hsub
+        rw [sub_sub_cancel] at h2
+        simpa [sumX] using h2
+      rw [LinearMap.mem_ker] at hmem ⊢
+      simp only [LinearMap.comp_apply, Submodule.subtype_apply, hmem, map_zero])
   have hsurj : Function.Surjective π := by
     intro w
     obtain ⟨y, rfl⟩ := thetaQ_surj U τ w
     obtain ⟨f, rfl⟩ := H.cotangent_surjective y
     obtain ⟨c0, -, hsub0⟩ := sub_lin_mem_sq hv D hdet hbasis f.2
-    let c : blockL D τ :=
-      ⟨fun k => if D.κ k = τ then c0 k else 0, fun k hk => by simp [hk]⟩
+    let c : blockL D τ := ⟨fun k => if D.κ k = τ then c0 k else 0, fun k hk => by simp [hk]⟩
     refine ⟨Submodule.Quotient.mk c, ?_⟩
     change thetaQ U τ (H.φ (sumX D (c : Ix g → R))) = thetaQ U τ (H.φ f)
     have hf0 : H.φ f = H.φ (sumX D c0) := by

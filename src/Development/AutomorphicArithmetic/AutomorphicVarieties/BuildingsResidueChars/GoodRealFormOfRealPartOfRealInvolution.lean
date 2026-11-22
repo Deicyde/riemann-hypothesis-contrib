@@ -6,18 +6,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 @[expose] public section
 
 open NumberField UpperTheory.V UpperTheory.V.KT UpperTheory.V.Af.BA in
-theorem UpperTheory.good_real_form_of_real_part_of_real_involution :
-    UpperTheory.V.Af.BA.RePart → UpperTheory.V.Af.BA.ReInv → UpperTheory.V.Af.BA.GoodRe := by
+theorem UpperTheory.good_real_form_of_real_part_of_real_involution
+    : UpperTheory.V.Af.BA.RePart → UpperTheory.V.Af.BA.ReInv → UpperTheory.V.Af.BA.GoodRe := by
   intro hRP hRI L _ _ _ N σ hσ
   have G := UpperTheory.V.KT.good L N
   have hqc : ∀ (y : NZ L N) (k : HS L N), qc L N y k = q k (y : Lat L N) := fun y k => by
     simp [qc, ev_apply]
-  have hpoly : ∀ h : HR L N, h ∈ ConeExtensionAcyclic.poly (qr L N) → (h : HS L N) ∈ ConeExtensionAcyclic.poly (qc L N) :=
-    fun h hh y => by
-      have := hh y
-      rw [qr_apply] at this
-      rw [hqc]
-      exact this
+  have hpoly
+      : ∀ h : HR L N,
+        h ∈ ConeExtensionAcyclic.poly (qr L N)
+          → (h : HS L N) ∈ ConeExtensionAcyclic.poly (qc L N) := fun h hh y => by
+    have := hh y
+    rw [qr_apply] at this
+    rw [hqc]
+    exact this
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro h hh
     obtain ⟨S, hS, hev⟩ := G.locFin _ (hpoly h hh)

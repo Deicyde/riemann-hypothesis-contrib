@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValue
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.IndefiniteRowSideFullHecke.FibreFramesOnModels
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.IndefiniteRowSideFullHecke.FibreFramesOnModels
 open GlobalTheory.KeyUnitModels
 open GlobalTheory.LocM (KeyAt)
 open GlobalTheory.FlagMod (GChart ev tau tau_le le_preimage_comp)
@@ -15,28 +17,31 @@ open scoped LaurentSeries
 
 namespace GlobalTheory.ValLocal
 
-theorem exists_dvd_away {A : Type} [CommRing A] [IsDedekindDomain A] (q : Ideal A) [q.IsPrime] (a b : A) (hb : b ≠ 0) :
-    ∃ s r : A, s ∉ q ∧ (s * a = r * b ∨ s * b = r * a) := by
+theorem exists_dvd_away
+    {A : Type} [CommRing A] [IsDedekindDomain A] (q : Ideal A) [q.IsPrime] (a b : A) (hb : b ≠ 0)
+    : ∃ s r : A, s ∉ q ∧ (s * a = r * b ∨ s * b = r * a) := by
   by_cases hq : q = ⊥
   · exact ⟨b, a, by simpa [hq] using hb, Or.inl (mul_comm _ _)⟩
   haveI := IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain A hq (Localization.AtPrime q)
   have hinj : Function.Injective (algebraMap A (Localization.AtPrime q)) :=
     IsLocalization.injective _ q.primeCompl_le_nonZeroDivisors
-  have key : ∀ (u v : A) (z : Localization.AtPrime q), algebraMap A _ u * z = algebraMap A _ v →
-      ∃ s r : A, s ∉ q ∧ s * v = r * u := by
+  have key
+      : ∀ (u v : A) (z : Localization.AtPrime q),
+        algebraMap A _ u * z = algebraMap A _ v → ∃ s r : A, s ∉ q ∧ s * v = r * u := by
     intro u v z hz
     obtain ⟨⟨r, s⟩, hrs⟩ := IsLocalization.surj q.primeCompl z
     refine ⟨s, r, s.2, hinj ?_⟩
     rw [map_mul, map_mul, ← hz, ← hrs]
     ring
-  obtain ⟨z, hz | hz⟩ := ValuationRing.cond (algebraMap A (Localization.AtPrime q) a) (algebraMap A _ b)
+  obtain ⟨z, hz | hz⟩ :=
+    ValuationRing.cond (algebraMap A (Localization.AtPrime q) a) (algebraMap A _ b)
   · obtain ⟨s, r, hs, h⟩ := key a b z hz
     exact ⟨s, r, hs, Or.inr h⟩
   · obtain ⟨s, r, hs, h⟩ := key b a z hz
     exact ⟨s, r, hs, Or.inl h⟩
 
-theorem exists_integral_frac {F : Type} [Field F] [NumberField F] (W : ValuationSubring F) (x : W) :
-    ∃ a s : W, IsIntegral ℤ (a : F) ∧ IsIntegral ℤ (s : F) ∧ IsUnit s ∧ x * s = a := by
+theorem exists_integral_frac {F : Type} [Field F] [NumberField F] (W : ValuationSubring F) (x : W)
+    : ∃ a s : W, IsIntegral ℤ (a : F) ∧ IsIntegral ℤ (s : F) ∧ IsUnit s ∧ x * s = a := by
   have hmem : ∀ y : 𝓞 F, (y : F) ∈ W := fun y => by
     have h : IsIntegral W (y : F) := y.isIntegral_coe.tower_top
     obtain ⟨z, hz⟩ := IsIntegrallyClosed.algebraMap_eq_of_integral h
@@ -68,11 +73,21 @@ theorem exists_integral_frac {F : Type} [Field F] [NumberField F] (W : Valuation
       apply mul_right_cancel₀ hbF
       rw [h', ← hxb]
       ring
-    exact ⟨φ s, φ r, s.isIntegral_coe, r.isIntegral_coe,
-      isUnit_of_mul_isUnit_right (hxr ▸ hunit s hs), hxr⟩
+    exact ⟨
+      φ s,
+      φ r,
+      s.isIntegral_coe,
+      r.isIntegral_coe,
+      isUnit_of_mul_isUnit_right (hxr ▸ hunit s hs),
+      hxr
+    ⟩
 
-theorem preimmersion_flat :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F), IsBaseRing β → ∀ (W : ValuationSubring c.F) (b : O →+* W), W.subtype.comp b = β → IsPreimmersion (spMap b) ∧ Flat (spMap b) := by
+theorem preimmersion_flat
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (c : Coeff l)
+        (O : Type) [CommRing O] (β : O →+* c.F),
+      IsBaseRing β
+        → ∀ (W : ValuationSubring c.F) (b : O →+* W),
+          W.subtype.comp b = β → IsPreimmersion (spMap b) ∧ Flat (spMap b) := by
   intro E _ _ _ H l c O _ β hβ W b hb
   haveI := c.fin
   haveI : NumberField c.F := {}

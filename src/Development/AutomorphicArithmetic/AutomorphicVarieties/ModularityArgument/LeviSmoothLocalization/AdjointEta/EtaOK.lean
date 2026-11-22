@@ -7,8 +7,10 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.CuspidalContinui
 
 noncomputable section
 
-open NumberField IsDedekindDomain Polynomial Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.LocGL GlobalTheory.SplitWeil GlobalTheory.SmGL
-open UpperTheory.V.Z.Gam UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter GlobalTheory.HenQ UpperTheory.V.Z.Inf
+open NumberField IsDedekindDomain Polynomial Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.LocGL GlobalTheory.SplitWeil GlobalTheory.SmGL
+open UpperTheory.V.Z.Gam UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter GlobalTheory.HenQ
+  UpperTheory.V.Z.Inf
 open GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.LocalField
 open GroundTheory.Automorphic.GodementSection (localChar)
 open Ad3P.DihedralUnramifiedPlaces (toH)

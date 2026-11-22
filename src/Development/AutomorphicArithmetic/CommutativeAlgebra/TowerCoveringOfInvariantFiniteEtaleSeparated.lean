@@ -9,8 +9,11 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open GlobalTheory.GalV (HTower Splits)
 open UpperTheory.Gal.crystallineComparison.Mod (Std TjD TjE KSOKE)
 open scoped TensorProduct
@@ -23,7 +26,8 @@ section Lat
 
 variable {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} {L : Link D G}
 
-private theorem conj_mem {N : ℕ} {k u : G.GAf} (hk : k ∈ L.KN 1) (hu : u ∈ L.KN N) : k * u * k⁻¹ ∈ L.KN N := by
+private theorem conj_mem {N : ℕ} {k u : G.GAf} (hk : k ∈ L.KN 1) (hu : u ∈ L.KN N)
+    : k * u * k⁻¹ ∈ L.KN N := by
   have key : ∀ u : G.GAf, L.CongOne N u → L.CongOne N (k * u * k⁻¹) := by
     intro u hu v hv
     obtain ⟨w, hw, e⟩ := hu _ (integ_of_mem (inv_mem hk) v hv)
@@ -38,19 +42,23 @@ private theorem conj_mem {N : ℕ} {k u : G.GAf} (hk : k ∈ L.KN 1) (hu : u ∈
   rw [this]
   exact key _ hu.2
 
-private theorem mulF_nat (n : ℕ) (y : 𝓞 D.F) {v : AfP p ⊗[ℚ] VQ D} (hv : v ∈ LaHat D) :
-    mulF D ((n : 𝓞 D.F) * y) v = n • mulF D y v ∧ mulF D y v ∈ LaHat D := by
+private theorem mulF_nat (n : ℕ) (y : 𝓞 D.F) {v : AfP p ⊗[ℚ] VQ D} (hv : v ∈ LaHat D)
+    : mulF D ((n : 𝓞 D.F) * y) v = n • mulF D y v ∧ mulF D y v ∈ LaHat D := by
   induction hv using AddSubgroup.closure_induction with
   | mem z hz =>
     obtain ⟨a, x, ha, rfl⟩ := hz
-    have e : ∀ c : 𝓞 D.F, mulF D c (a ⊗ₜ ((1 : ℚ) ⊗ₜ x)) = a ⊗ₜ ((1 : ℚ) ⊗ₜ (algebraMap (𝓞 D.F) D.O c • x)) := by
+    have e
+        : ∀ c : 𝓞 D.F,
+          mulF D c (a ⊗ₜ ((1 : ℚ) ⊗ₜ x)) = a ⊗ₜ ((1 : ℚ) ⊗ₜ (algebraMap (𝓞 D.F) D.O c • x)) := by
       intro c
       simp only [mulF, actQ, LinearMap.baseChange_tmul, DistribSMul.toLinearMap_apply]
     refine ⟨?_, ?_⟩
-    · rw [e, e, map_mul, map_natCast, mul_smul, Nat.cast_smul_eq_nsmul, TensorProduct.tmul_smul, TensorProduct.tmul_smul]
+    · rw [e, e, map_mul, map_natCast, mul_smul, Nat.cast_smul_eq_nsmul, TensorProduct.tmul_smul,
+        TensorProduct.tmul_smul]
     · rw [e]
       exact AddSubgroup.subset_closure ⟨a, _, ha, rfl⟩
-  | zero => simp
+  | zero =>
+    simp
   | add v w _ _ hv hw =>
     refine ⟨?_, ?_⟩
     · simp only [map_add, hv.1, hw.1, smul_add]
@@ -60,14 +68,17 @@ private theorem mulF_nat (n : ℕ) (y : 𝓞 D.F) {v : AfP p ⊗[ℚ] VQ D} (hv 
     · rw [map_neg, map_neg, hx.1, smul_neg]
     · rw [map_neg]; exact neg_mem hx.2
 
-private theorem idHat_le {N₀ : ℕ} {𝔞 : Ideal (𝓞 D.F)} {z : AfP p ⊗[ℚ] VQ D}
-    (hz : z ∈ idHat D (Ideal.span {(N₀ : 𝓞 D.F)} * 𝔞)) : ∃ w ∈ LaHat D, z = N₀ • w := by
+private theorem idHat_le
+    {N₀ : ℕ} {𝔞 : Ideal (𝓞 D.F)} {z : AfP p ⊗[ℚ] VQ D}
+    (hz : z ∈ idHat D (Ideal.span {(N₀ : 𝓞 D.F)} * 𝔞))
+    : ∃ w ∈ LaHat D, z = N₀ • w := by
   induction hz using AddSubgroup.closure_induction with
   | mem z hz =>
     obtain ⟨x, hx, v, hv, rfl⟩ := hz
     obtain ⟨y, -, rfl⟩ := Ideal.mem_span_singleton_mul.1 hx
     exact ⟨_, (mulF_nat N₀ y hv).2, (mulF_nat N₀ y hv).1⟩
-  | zero => exact ⟨0, zero_mem _, by simp⟩
+  | zero =>
+    exact ⟨0, zero_mem _, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨a, ha, rfl⟩ := hx
     obtain ⟨b, hb, rfl⟩ := hy
@@ -76,8 +87,10 @@ private theorem idHat_le {N₀ : ℕ} {𝔞 : Ideal (𝓞 D.F)} {z : AfP p ⊗[�
     obtain ⟨a, ha, rfl⟩ := hx
     exact ⟨-a, neg_mem ha, by rw [smul_neg]⟩
 
-private theorem lev_le {N₀ : ℕ} {𝔞 : Ideal (𝓞 D.F)} {K₀ : Subgroup G.GAf}
-    (h : IsLev L (Ideal.span {(N₀ : 𝓞 D.F)} * 𝔞) K₀) : K₀ ≤ L.KN N₀ := by
+private theorem lev_le
+    {N₀ : ℕ} {𝔞 : Ideal (𝓞 D.F)} {K₀ : Subgroup G.GAf}
+    (h : IsLev L (Ideal.span {(N₀ : 𝓞 D.F)} * 𝔞) K₀)
+    : K₀ ≤ L.KN N₀ := by
   have key : ∀ g ∈ K₀, L.CongOne N₀ g := by
     intro g hg v hv
     obtain ⟨w, hw, e⟩ := idHat_le (((h g).1 hg).2 v hv)
@@ -97,29 +110,29 @@ private structure Dat (X : UpperTheory.Gal.G3.Tower B Γ) (i : X.ι) (K₀ : Sub
 
 variable {X : UpperTheory.Gal.G3.Tower B Γ} {i : X.ι} {K₀ : Subgroup Γ}
 
-private def trK (d : Dat X i K₀) (x : K₀) : X.Z i ⟶ X.Z i :=
-  X.tr i i x (d.mem _ x.2) (d.nrm _ x.2)
+private def trK (d : Dat X i K₀) (x : K₀) : X.Z i ⟶ X.Z i := X.tr i i x (d.mem _ x.2) (d.nrm _ x.2)
 
 private theorem trK_mul (d : Dat X i K₀) (x y : K₀) : trK d x ≫ trK d y = trK d (y * x) :=
-  X.tr_mul i i i x y (d.mem _ x.2) (d.nrm _ x.2) (d.mem _ y.2) (d.nrm _ y.2)
-    (d.mem _ (y * x).2) (d.nrm _ (y * x).2)
+  X.tr_mul i i i x y (d.mem _ x.2) (d.nrm _ x.2) (d.mem _ y.2) (d.nrm _ y.2) (d.mem _ (y * x).2)
+    (d.nrm _ (y * x).2)
 
-private theorem trK_self (d : Dat X i K₀) (x : K₀) (hx : (x : Γ) ∈ X.K i) :
-    trK d x = 𝟙 _ := X.tr_self _ _ _ _ hx
+private theorem trK_self (d : Dat X i K₀) (x : K₀) (hx : (x : Γ) ∈ X.K i) : trK d x = 𝟙 _ :=
+  X.tr_self _ _ _ _ hx
 
-private theorem trK_mk (d : Dat X i K₀) {x y : K₀}
-    (h : (x : K₀ ⧸ (X.K i).subgroupOf K₀) = y) : trK d x = trK d y := by
+private theorem trK_mk (d : Dat X i K₀) {x y : K₀} (h : (x : K₀ ⧸ (X.K i).subgroupOf K₀) = y)
+    : trK d x = trK d y := by
   have hu : ((x⁻¹ * y : K₀) : Γ) ∈ X.K i := Subgroup.mem_subgroupOf.1 (QuotientGroup.eq.1 h)
-  calc trK d x = trK d (x⁻¹ * y) ≫ trK d x := by rw [trK_self d _ hu, Category.id_comp]
+  calc
+    trK d x
+      = trK d (x⁻¹ * y) ≫ trK d x := by rw [trK_self d _ hu, Category.id_comp]
     _ = trK d y := by rw [trK_mul, mul_inv_cancel_left]
 
 variable [((X.K i).subgroupOf K₀).Normal]
 
-private def act (d : Dat X i K₀) (δ : K₀ ⧸ (X.K i).subgroupOf K₀) : X.Z i ⟶ X.Z i :=
-  trK d (δ⁻¹).out
+private def act (d : Dat X i K₀) (δ : K₀ ⧸ (X.K i).subgroupOf K₀) : X.Z i ⟶ X.Z i := trK d (δ⁻¹).out
 
-private theorem act_mk (d : Dat X i K₀) (u : K₀) :
-    act d (((u⁻¹ : K₀) : K₀ ⧸ (X.K i).subgroupOf K₀)) = trK d u :=
+private theorem act_mk (d : Dat X i K₀) (u : K₀)
+    : act d (((u⁻¹ : K₀) : K₀ ⧸ (X.K i).subgroupOf K₀)) = trK d u :=
   trK_mk d (by rw [QuotientGroup.out_eq', ← QuotientGroup.mk_inv, inv_inv])
 
 private theorem act_one (d : Dat X i K₀) : act d 1 = 𝟙 _ := by
@@ -128,55 +141,71 @@ private theorem act_one (d : Dat X i K₀) : act d 1 = 𝟙 _ := by
   rw [h]
   exact trK_self d _ (one_mem _)
 
-private theorem act_mul (d : Dat X i K₀) (g h : K₀ ⧸ (X.K i).subgroupOf K₀) :
-    act d (g * h) = act d g ≫ act d h := by
+private theorem act_mul (d : Dat X i K₀) (g h : K₀ ⧸ (X.K i).subgroupOf K₀)
+    : act d (g * h) = act d g ≫ act d h := by
   rw [act, act, act, trK_mul]
   refine trK_mk d ?_
-  rw [QuotientGroup.out_eq', QuotientGroup.mk_mul, QuotientGroup.out_eq', QuotientGroup.out_eq', mul_inv_rev]
+  rw [QuotientGroup.out_eq', QuotientGroup.mk_mul, QuotientGroup.out_eq', QuotientGroup.out_eq',
+    mul_inv_rev]
 
-private theorem act_q (d : Dat X i K₀) (δ : K₀ ⧸ (X.K i).subgroupOf K₀) :
-    act d δ ≫ X.q i = X.q i :=
+private theorem act_q (d : Dat X i K₀) (δ : K₀ ⧸ (X.K i).subgroupOf K₀) : act d δ ≫ X.q i = X.q i :=
   let x := (δ⁻¹).out
   X.tr_q i i x (d.mem _ x.2) (d.nrm _ x.2)
 
-private theorem act_inj (d : Dat X i K₀) {j : X.ι} (hj : K₀ ≤ X.K j) (Ω : Type) [Field Ω] [IsAlgClosed Ω]
-    (z : UpperTheory.Gal.G3.sp Ω ⟶ X.Z i) (δ δ' : K₀ ⧸ (X.K i).subgroupOf K₀) (h : z ≫ act d δ = z ≫ act d δ') : δ = δ' := by
+private theorem act_inj
+    (d : Dat X i K₀)
+    {j : X.ι} (hj : K₀ ≤ X.K j)
+    (Ω : Type) [Field Ω] [IsAlgClosed Ω]
+    (z : UpperTheory.Gal.G3.sp Ω ⟶ X.Z i) (δ δ' : K₀ ⧸ (X.K i).subgroupOf K₀)
+    (h : z ≫ act d δ = z ≫ act d δ')
+    : δ = δ' := by
   have h' : z ≫ trK d (δ⁻¹).out = z ≫ trK d (δ'⁻¹).out := h
   set x := (δ⁻¹).out with hx
   set y := (δ'⁻¹).out with hy
   have e : z ≫ trK d (x⁻¹ * y) = z := by
     rw [← trK_mul, ← Category.assoc, ← h', Category.assoc, trK_mul, inv_mul_cancel,
       trK_self d _ (one_mem _), Category.comp_id]
-  have hm : ((x⁻¹ * y : K₀) : Γ) ∈ X.K i :=
-    X.free i j (d.le.trans hj) _ (hj (x⁻¹ * y).2) _ _ Ω z e
-  have hq : (x : K₀ ⧸ (X.K i).subgroupOf K₀) = y := QuotientGroup.eq.2 (Subgroup.mem_subgroupOf.2 hm)
+  have hm : ((x⁻¹ * y : K₀) : Γ) ∈ X.K i := X.free i j (d.le.trans hj) _ (hj (x⁻¹ * y).2) _ _ Ω z e
+  have hq : (x : K₀ ⧸ (X.K i).subgroupOf K₀) = y :=
+    QuotientGroup.eq.2 (Subgroup.mem_subgroupOf.2 hm)
   rw [hx, hy, QuotientGroup.out_eq', QuotientGroup.out_eq'] at hq
   exact inv_injective hq
 
 omit [((X.K i).subgroupOf K₀).Normal] in
-private theorem fin_quot (d : Dat X i K₀) {j : X.ι} (hj : K₀ ≤ X.K j) :
-    Finite (K₀ ⧸ (X.K i).subgroupOf K₀) := by
+private theorem fin_quot (d : Dat X i K₀) {j : X.ι} (hj : K₀ ≤ X.K j)
+    : Finite (K₀ ⧸ (X.K i).subgroupOf K₀) := by
   have h := X.idx i j
   rw [← Subgroup.relIndex_mul_relIndex _ _ _ d.le hj] at h
   have : ((X.K i).subgroupOf K₀).FiniteIndex := ⟨left_ne_zero_of_mul h⟩
   exact Subgroup.finite_quotient_of_finiteIndex
 
-private theorem tr_step (X : UpperTheory.Gal.G3.Tower B Γ) {i M : X.ι} (hM : M = i) {h x c : Γ} (e : h = x) (hc : c ∈ X.K i)
-    (a₁ b₁ a₂ b₂ a₃ b₃) :
-    X.tr M i (h * c) a₁ b₁ = X.tr M i 1 a₂ b₂ ≫ X.tr i i x a₃ b₃ := by
+private theorem tr_step
+    (X : UpperTheory.Gal.G3.Tower B Γ)
+    {i M : X.ι} (hM : M = i)
+    {h x c : Γ} (e : h = x) (hc : c ∈ X.K i)
+    (a₁ b₁ a₂ b₂ a₃ b₃)
+    : X.tr M i (h * c) a₁ b₁ = X.tr M i 1 a₂ b₂ ≫ X.tr i i x a₃ b₃ := by
   subst hM e
-  have h1 := X.tr_mul M M M c h (X.K_le _ _ hc) (fun u hu => mul_mem (mul_mem hc hu) (inv_mem hc)) a₃ b₃ a₁ b₁
+  have h1 :=
+    X.tr_mul M M M c h (X.K_le _ _ hc)
+      (fun u hu => mul_mem (mul_mem hc hu) (inv_mem hc))
+      a₃ b₃ a₁ b₁
   rw [← h1, X.tr_self _ _ _ _ hc, X.tr_self _ _ _ _ (one_mem _)]
 
-private theorem tr_iso (X : UpperTheory.Gal.G3.Tower B Γ) {i M : X.ι} (hM : M = i) (a b) : IsIso (X.tr M i 1 a b) := by
+private theorem tr_iso (X : UpperTheory.Gal.G3.Tower B Γ) {i M : X.ι} (hM : M = i) (a b)
+    : IsIso (X.tr M i 1 a b) := by
   subst hM
   rw [X.tr_self _ _ _ _ (one_mem _)]
   infer_instance
 
 end Tw
 
-private theorem isIso_desc {C : Type*} [Category C] {I : Type} [Subsingleton I] [Nonempty I] {Y Z : C}
-    [HasCoproduct fun _ : I => Y] (f : I → (Y ⟶ Z)) (hf : ∀ i, IsIso (f i)) : IsIso (Sigma.desc f) := by
+private theorem isIso_desc
+    {C : Type*} [Category C]
+    {I : Type} [Subsingleton I] [Nonempty I]
+    {Y Z : C} [HasCoproduct fun _ : I => Y]
+    (f : I → (Y ⟶ Z)) (hf : ∀ i, IsIso (f i))
+    : IsIso (Sigma.desc f) := by
   let i₀ : I := Classical.arbitrary I
   haveI := hf i₀
   refine ⟨inv (f i₀) ≫ Sigma.ι (fun _ : I => Y) i₀, ?_, ?_⟩
@@ -188,17 +217,20 @@ private theorem isIso_desc {C : Type*} [Category C] {I : Type} [Subsingleton I] 
 end UpperTheory.TraceConjugationCover
 
 open UpperTheory.TraceConjugationCover in
-theorem UpperTheory.tower_covering_of_invariant_finiteEtale_separated :
-    PiInv → PiFet → PiSep → SplitOf → KSCover := by
-  intro hInv hFet hSep hSplit p _ D G L E _ _ gb w q _ r 𝔴 𝔫 S k T K₀ hLev N c a hNum C hNK J A _ g θ hDeck
+theorem UpperTheory.tower_covering_of_invariant_finiteEtale_separated
+    : PiInv → PiFet → PiSep → SplitOf → KSCover := by
+  intro hInv hFet hSep hSplit p _ D G L E _ _ gb w q _ r 𝔴 𝔫 S k T K₀ hLev N c a hNum C hNK J A _ g
+    θ hDeck
   have hK₀ : K₀ ≤ L.KN S.N₀ := by
     have h := hLev
     rw [S.lev] at h
     exact lev_le h
   have hK₁ : K₀ ≤ L.KN 1 := fun x hx => ((hLev x).1 hx).1
-  have hd : Dat T.X (T.lev N) K₀ :=
-    ⟨by rw [T.K_eq]; exact hNK, fun k hk => (T.Δ_eq _).2 (integ_of_mem (hK₁ hk)),
-      fun k hk u hu => by rw [T.K_eq] at hu ⊢; exact conj_mem (hK₁ hk) hu⟩
+  have hd : Dat T.X (T.lev N) K₀ := ⟨
+    by rw [T.K_eq]; exact hNK,
+    fun k hk => (T.Δ_eq _).2 (integ_of_mem (hK₁ hk)),
+    fun k hk u hu => by rw [T.K_eq] at hu ⊢; exact conj_mem (hK₁ hk) hu
+  ⟩
   have hj : K₀ ≤ T.X.K (T.lev ⟨S.N₀, S.std.three, S.cop⟩) := by rw [T.K_eq]; exact hK₀
   haveI hn : ((T.X.K (T.lev N)).subgroupOf K₀).Normal :=
     ⟨fun u hu k => Subgroup.mem_subgroupOf.2 (by simpa using hd.nrm k k.2 u (Subgroup.mem_subgroupOf.1 hu))⟩
@@ -207,26 +239,36 @@ theorem UpperTheory.tower_covering_of_invariant_finiteEtale_separated :
   haveI := hf
   haveI := he
   obtain ⟨d, hdim⟩ := S.dim k
-  obtain ⟨C', hC'⟩ : ∃ C' : S.Cl (T.M N).univ (c * 1) (((1 : ℕ) : 𝓞 D.F) * a), S.pi T C' = S.pi T C := by
-    have : ∀ (c' : ℕ) (a' : 𝓞 D.F), c' = c → a' = a → ∃ C' : S.Cl (T.M N).univ c' a', S.pi T C' = S.pi T C := by
+  obtain ⟨C', hC'⟩
+      : ∃ C' : S.Cl (T.M N).univ (c * 1) (((1 : ℕ) : 𝓞 D.F) * a), S.pi T C' = S.pi T C := by
+    have : ∀ (c' : ℕ) (a' : 𝓞 D.F),
+        c' = c → a' = a → ∃ C' : S.Cl (T.M N).univ c' a', S.pi T C' = S.pi T C := by
       rintro _ _ rfl rfl
       exact ⟨C, rfl⟩
     exact this _ _ (_root_.mul_one c) (by simp)
   have hinv : ∀ δ, act hd δ ≫ S.pi T C = S.pi T C := fun δ => by
-    have := hInv p D G L E gb w q r 𝔴 𝔫 S k T K₀ hLev N N 1 c a (_root_.mul_one _).symm hNum C' C
-      (δ⁻¹).out.1 (δ⁻¹).out.2 (hd.mem _ (δ⁻¹).out.2) (hd.nrm _ (δ⁻¹).out.2)
+    have :=
+      hInv p D G L E gb w q r 𝔴 𝔫 S k T K₀ hLev N N 1 c a (_root_.mul_one _).symm hNum C' C
+        (δ⁻¹).out.1 (δ⁻¹).out.2 (hd.mem _ (δ⁻¹).out.2) (hd.nrm _ (δ⁻¹).out.2)
     rw [hC'] at this
     exact this
-  have hfst : pullback.lift (S.pi T C) (T.X.q (T.lev N)) e ≫ pullback.fst _ _ = S.pi T C := pullback.lift_fst _ _ e
-  have hsnd : pullback.lift (S.pi T C) (T.X.q (T.lev N)) e ≫ pullback.snd _ _ = T.X.q (T.lev N) := pullback.lift_snd _ _ e
-  have ha : ∀ δ, act hd δ ≫ pullback.lift (S.pi T C) (T.X.q (T.lev N)) e = pullback.lift (S.pi T C) (T.X.q (T.lev N)) e := by
+  have hfst : pullback.lift (S.pi T C) (T.X.q (T.lev N)) e ≫ pullback.fst _ _ = S.pi T C :=
+    pullback.lift_fst _ _ e
+  have hsnd : pullback.lift (S.pi T C) (T.X.q (T.lev N)) e ≫ pullback.snd _ _ = T.X.q (T.lev N) :=
+    pullback.lift_snd _ _ e
+  have ha
+      : ∀ δ,
+        act hd δ ≫ pullback.lift (S.pi T C) (T.X.q (T.lev N)) e
+          = pullback.lift (S.pi T C) (T.X.q (T.lev N)) e := by
     intro δ
     refine pullback.hom_ext ?_ ?_
     · rw [Category.assoc, hfst]; exact hinv δ
     · rw [Category.assoc, hsnd]; exact act_q hd δ
-  have hsep : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (z z' : Sp Ω ⟶ T.X.Z (T.lev N)),
-      z ≫ pullback.lift (S.pi T C) (T.X.q (T.lev N)) e = z' ≫ pullback.lift (S.pi T C) (T.X.q (T.lev N)) e →
-      ∃! δ, z' = z ≫ act hd δ := by
+  have hsep
+      : ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (z z' : Sp Ω ⟶ T.X.Z (T.lev N)),
+        z ≫ pullback.lift (S.pi T C) (T.X.q (T.lev N)) e
+            = z' ≫ pullback.lift (S.pi T C) (T.X.q (T.lev N)) e
+          → ∃! δ, z' = z ≫ act hd δ := by
     intro Ω _ _ z z' h
     have h' : z ≫ S.pi T C = z' ≫ S.pi T C := by
       have h2 := congrArg (· ≫ pullback.fst _ _) h
@@ -237,8 +279,9 @@ theorem UpperTheory.tower_covering_of_invariant_finiteEtale_separated :
       rw [act_mk]
       exact e'
     exact ⟨_, hz, fun δ' hδ' => act_inj hd hj Ω z _ _ (hδ'.symm.trans hz)⟩
-  have hfix : ∀ δ : K₀ ⧸ (T.X.K (T.lev N)).subgroupOf K₀, ∃ j, IsIso ((T.tower N g).s j) ∧
-      (T.tower N g).t j = (T.tower N g).s j ≫ act hd δ ∧ θ j = 1 := by
+  have hfix
+      : ∀ δ : K₀ ⧸ (T.X.K (T.lev N)).subgroupOf K₀, ∃ j,
+        IsIso ((T.tower N g).s j) ∧ (T.tower N g).t j = (T.tower N g).s j ≫ act hd δ ∧ θ j = 1 := by
     intro δ
     obtain ⟨j, hK, hM, hh, hθ⟩ := hDeck _ (δ⁻¹).out.2
     have hM' : T.lev (g j).M = T.lev N := by rw [hM]
@@ -256,13 +299,17 @@ theorem UpperTheory.tower_covering_of_invariant_finiteEtale_separated :
       have hb : ∀ u ∈ T.X.K (T.lev (g j).M), 1 * u * 1⁻¹ ∈ T.X.K (T.lev N) := fun u hu => by
         rw [T.K_eq] at hu ⊢
         simpa using KN_anti (g j).dvd hu
-      have hs : Sigma.ι (fun _ : (g j).I => T.X.Z (T.lev (g j).M)) c ≫ (T.tower N g).s j =
-          T.X.tr _ _ 1 (one_mem _) hb := Sigma.ι_comp_desc _ c
+      have hs
+          : Sigma.ι (fun _ : (g j).I => T.X.Z (T.lev (g j).M)) c ≫ (T.tower N g).s j
+            = T.X.tr _ _ 1 (one_mem _) hb :=
+        Sigma.ι_comp_desc _ c
       refine (Sigma.ι_comp_desc _ c).trans ?_
-      refine (tr_step T.X hM' hh (hmem _) _ _ (one_mem _) hb (hd.mem _ (δ⁻¹).out.2) (hd.nrm _ (δ⁻¹).out.2)).trans ?_
+      refine (tr_step T.X hM' hh (hmem _) _ _ (one_mem _) hb (hd.mem _ (δ⁻¹).out.2)
+        (hd.nrm _ (δ⁻¹).out.2)).trans ?_
       exact (congrArg (· ≫ act hd δ) hs).symm.trans (Category.assoc _ _ _)
-  have hspl := hSplit (T.X.Z (T.lev N)) _ (pullback.lift (S.pi T C) (T.X.q (T.lev N)) e)
-    (K₀ ⧸ (T.X.K (T.lev N)).subgroupOf K₀) (act hd) ha hsep
+  have hspl :=
+    hSplit (T.X.Z (T.lev N)) _ (pullback.lift (S.pi T C) (T.X.q (T.lev N)) e)
+      (K₀ ⧸ (T.X.K (T.lev N)).subgroupOf K₀) (act hd) ha hsep
   exact ⟨{
     smooth := SmoothOfRelativeDimension.smooth d _
     proj := S.proj k
@@ -275,6 +322,7 @@ theorem UpperTheory.tower_covering_of_invariant_finiteEtale_separated :
     mul := act_mul hd
     spl := hspl
     fix := hfix
-    dim := ⟨d, hdim⟩ }⟩
+    dim := ⟨d, hdim⟩
+  }⟩
 
 end

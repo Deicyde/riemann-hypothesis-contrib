@@ -13,31 +13,36 @@ namespace Formalism.L2.GlobalTheoryTheory.FiltrationBoundaryCriterion.CompactFix
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-private theorem exists_basis_mem_intOE :
-    ∃ n : ℕ, ∃ b : Module.Basis (Fin n) F E, ∀ i, b i ∈ intOE E := by
+private theorem exists_basis_mem_intOE
+    : ∃ n : ℕ, ∃ b : Module.Basis (Fin n) F E, ∀ i, b i ∈ intOE E := by
   classical
   let c := Module.finBasis F E
   obtain ⟨y, hy0, hy⟩ := exists_integral_multiples ℤ ℚ (Finset.univ.image c)
   have hyF : IsUnit ((y : ℤ) : F) := (Int.cast_ne_zero.mpr hy0).isUnit
   refine ⟨_, c.isUnitSMul (w := fun _ => ((y : ℤ) : F)) (fun _ => hyF), fun i => ?_⟩
   rw [Module.Basis.isUnitSMul_apply, Int.cast_smul_eq_zsmul F]
-  exact ⟨⟨_, (mem_integralClosure_iff ℤ E).mpr (hy _ (Finset.mem_image_of_mem c (Finset.mem_univ i)))⟩, rfl⟩
+  exact ⟨
+    ⟨_, (mem_integralClosure_iff ℤ E).mpr (hy _ (Finset.mem_image_of_mem c (Finset.mem_univ i)))⟩,
+    rfl
+  ⟩
 
-private theorem exists_int_ne_zero_mul_repr_mem_range {n : ℕ} (b : Module.Basis (Fin n) F E) :
-    ∃ y : ℤ, y ≠ 0 ∧ ∀ e ∈ intOE E, ∀ i, (y : F) * b.repr e i ∈ (algebraMap (𝓞 F) F).range := by
+private theorem exists_int_ne_zero_mul_repr_mem_range {n : ℕ} (b : Module.Basis (Fin n) F E)
+    : ∃ y : ℤ, y ≠ 0 ∧ ∀ e ∈ intOE E, ∀ i, (y : F) * b.repr e i ∈ (algebraMap (𝓞 F) F).range := by
   classical
   let g := NumberField.RingOfIntegers.basis E
-  obtain ⟨y, hy0, hy⟩ := exists_integral_multiples ℤ ℚ
-    (Finset.univ.image (fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin n =>
-      b.repr (algebraMap (𝓞 E) E (g p.1)) p.2))
+  obtain ⟨y, hy0, hy⟩ :=
+    exists_integral_multiples ℤ ℚ
+      (Finset.univ.image (fun p : Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin n =>
+        b.repr (algebraMap (𝓞 E) E (g p.1)) p.2))
   refine ⟨y, hy0, ?_⟩
   rintro _ ⟨z, rfl⟩ i
   have hz : algebraMap (𝓞 E) E z = ∑ j, g.repr z j • algebraMap (𝓞 E) E (g j) := by
     conv_lhs => rw [← g.sum_repr z]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_zsmul]
-  have key : (y : F) * b.repr (algebraMap (𝓞 E) E z) i
-      = ∑ j, g.repr z j • ((y : F) * b.repr (algebraMap (𝓞 E) E (g j)) i) := by
+    simp only [map_sum, map_zsmul]
+  have key
+      : (y : F) * b.repr (algebraMap (𝓞 E) E z) i
+        = ∑ j, g.repr z j • ((y : F) * b.repr (algebraMap (𝓞 E) E (g j)) i) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hz, map_sum, Finsupp.finsetSum_apply, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -50,9 +55,9 @@ private theorem exists_int_ne_zero_mul_repr_mem_range {n : ℕ} (b : Module.Basi
     exact h
   exact ⟨⟨_, (mem_integralClosure_iff ℤ F).mpr h2⟩, rfl⟩
 
-theorem exists_den_of_incl (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] :
-    ∃ D : 𝓞 F, D ≠ 0 ∧ ∀ e : E, inclE (F := F) (AF F) e ∈ SS F E → (D : F) • e ∈ intOE E := by
+theorem exists_den_of_incl
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    : ∃ D : 𝓞 F, D ≠ 0 ∧ ∀ e : E, inclE (F := F) (AF F) e ∈ SS F E → (D : F) • e ∈ intOE E := by
   obtain ⟨n, b, hb⟩ := exists_basis_mem_intOE (F := F) (E := E)
   obtain ⟨y, hy0, hy⟩ := exists_int_ne_zero_mul_repr_mem_range b
   have hyF : ((y : 𝓞 F) : F) = (y : F) := by
@@ -64,8 +69,9 @@ theorem exists_den_of_incl (F E : Type) [Field F] [NumberField F] [Field E] [Num
   have hc : ∀ i, (y : F) * b.repr e i ∈ (algebraMap (𝓞 F) F).range := by
     intro i
     have h := coord_mem_of_mem_SS b (y : 𝓞 F) (by rw [hyF]; exact hy) he i
-    rw [hyF, show inclE (F := F) (AF F) e = e ⊗ₜ[F] (1 : AF F) from rfl, coord_tmul,
-      smul_smul, ← Algebra.algebraMap_eq_smul_one] at h
+    rw [hyF, show inclE (F := F) (AF F) e = e ⊗ₜ[F] (1 : AF F) from rfl, coord_tmul, smul_smul,
+        ← Algebra.algebraMap_eq_smul_one]
+      at h
     exact mem_range_of_mem_intAd _ h
   rw [hyF, ← b.sum_repr e, Finset.smul_sum]
   refine sum_mem fun i _ => ?_
@@ -73,11 +79,14 @@ theorem exists_den_of_incl (F E : Type) [Field F] [NumberField F] [Field E] [Num
   obtain ⟨r, hr⟩ := hc i
   rw [← hr, Algebra.smul_def]
   refine mul_mem ?_ (hb i)
-  exact ⟨⟨_, (mem_integralClosure_iff ℤ E).mpr ((r.isIntegral_coe).map (IsScalarTower.toAlgHom ℤ F E))⟩, rfl⟩
+  exact ⟨
+    ⟨_, (mem_integralClosure_iff ℤ E).mpr ((r.isIntegral_coe).map (IsScalarTower.toAlgHom ℤ F E))⟩,
+    rfl
+  ⟩
 
-theorem exists_den_of_isCompact :
-    letI := tensTop (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)
-    ∀ C : Set (AE F E), IsCompact C → ∃ d : 𝓞 F, d ≠ 0 ∧ ∀ x ∈ C, (d : F) • x ∈ SS F E := by
+theorem exists_den_of_isCompact
+    : letI := tensTop (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)
+      ∀ C : Set (AE F E), IsCompact C → ∃ d : 𝓞 F, d ≠ 0 ∧ ∀ x ∈ C, (d : F) • x ∈ SS F E := by
   classical
   letI := tensTop (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)
   intro C hC
@@ -100,32 +109,40 @@ theorem exists_den_of_isCompact :
     · have h' := congrArg (algebraMap (𝓞 F) F) h
       rw [map_intCast, map_zero] at h'
       exact_mod_cast h'
-    · have e : algebraMap (𝓞 F) F (y : 𝓞 F) • a
-          = algebraMap F (AF F) (algebraMap (𝓞 F) F (y : 𝓞 F)) * (a - algebraMap F (AF F) u)
-            + algebraMap F (AF F) (algebraMap (𝓞 F) F m) := by
+    · have e
+          : algebraMap (𝓞 F) F (y : 𝓞 F) • a
+            = algebraMap F (AF F) (algebraMap (𝓞 F) F (y : 𝓞 F)) * (a - algebraMap F (AF F) u)
+              + algebraMap F (AF F) (algebraMap (𝓞 F) F m) := by
         rw [hm, map_intCast, Algebra.smul_def, map_mul]
         ring
       rw [e]
       exact add_mem (mul_mem (algebraMap_mem_intAd _) hu) (algebraMap_mem_intAd m)
-  have den : ∀ K : Set (AF F), IsCompact K →
-      ∃ d : 𝓞 F, d ≠ 0 ∧ ∀ a ∈ K, algebraMap (𝓞 F) F d • a ∈ intAd F := by
+  have den
+      : ∀ K : Set (AF F),
+        IsCompact K → ∃ d : 𝓞 F, d ≠ 0 ∧ ∀ a ∈ K, algebraMap (𝓞 F) F d • a ∈ intAd F := by
     intro K hK
     choose dp hdp0 hdp using pt
-    obtain ⟨t, ht⟩ := hK.elim_finite_subcover
-      (fun a : AF F => (fun z => z - a) ⁻¹' (intAd F : Set (AF F)))
-      (fun a => (isOpen_intAd (F := F)).preimage (continuous_id.sub continuous_const))
-      (fun z _ => Set.mem_iUnion.mpr ⟨z, by
-        show z - z ∈ intAd F
-        rw [sub_self]
-        exact zero_mem _⟩)
+    obtain ⟨t, ht⟩ :=
+      hK.elim_finite_subcover
+        (fun a : AF F => (fun z => z - a) ⁻¹' (intAd F : Set (AF F)))
+        (fun a => (isOpen_intAd (F := F)).preimage (continuous_id.sub continuous_const))
+        (fun z _ =>
+          Set.mem_iUnion.mpr ⟨
+            z,
+            by
+              show z - z ∈ intAd F
+              rw [sub_self]
+              exact zero_mem _
+          ⟩)
     refine ⟨∏ c ∈ t, dp c, Finset.prod_ne_zero_iff.mpr fun c _ => hdp0 c, fun z hz => ?_⟩
     have hz' := ht hz
     simp only [Set.mem_iUnion, Set.mem_preimage, SetLike.mem_coe] at hz'
     obtain ⟨c, hct, hzc⟩ := hz'
     rw [← Finset.mul_prod_erase t dp hct]
-    have e : algebraMap (𝓞 F) F (dp c * ∏ c' ∈ t.erase c, dp c') • z
-        = algebraMap (𝓞 F) F (dp c * ∏ c' ∈ t.erase c, dp c') • (z - c)
-          + algebraMap (𝓞 F) F (∏ c' ∈ t.erase c, dp c') • (algebraMap (𝓞 F) F (dp c) • c) := by
+    have e
+        : algebraMap (𝓞 F) F (dp c * ∏ c' ∈ t.erase c, dp c') • z
+          = algebraMap (𝓞 F) F (dp c * ∏ c' ∈ t.erase c, dp c') • (z - c)
+            + algebraMap (𝓞 F) F (∏ c' ∈ t.erase c, dp c') • (algebraMap (𝓞 F) F (dp c) • c) := by
       rw [map_mul, mul_comm]
       simp only [smul_sub, mul_smul]
       abel

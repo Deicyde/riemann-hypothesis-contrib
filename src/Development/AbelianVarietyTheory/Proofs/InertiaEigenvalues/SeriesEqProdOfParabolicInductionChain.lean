@@ -7,12 +7,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SeriesI
 
 @[expose] public section
 
-open Polynomial GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.GLp.Supp GlobalTheory.SerSys GlobalTheory.TypeLeaf Formalism.BasicNotions Formalism.MainNotions.N Formalism.MainNotions.ArithmeticCylinders
+open Polynomial GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.GLp.Supp GlobalTheory.SerSys
+  GlobalTheory.TypeLeaf Formalism.BasicNotions Formalism.MainNotions.N
+  Formalism.MainNotions.ArithmeticCylinders
 open scoped Classical
 
 namespace GlobalTheory.SerSys
 
-theorem has_prod_of_inInd : ∀ (g : ℕ) [Fact g.Prime] (S : Sys g) (π : GLRep g) (L : List (GLRep g)), InInd π L → ∀ F, Has S π.2.ρ F → ∃ fs : List (ZMod g)[X], List.Forall₂ (fun (ρ : GLRep g) f => Has S ρ.2.ρ f) L fs ∧ F = fs.prod := by
+theorem has_prod_of_inInd
+    : ∀ (g : ℕ) [Fact g.Prime] (S : Sys g) (π : GLRep g) (L : List (GLRep g)),
+      InInd π L
+        → ∀ F,
+          Has S π.2.ρ F
+            → ∃ fs : List (ZMod g)[X],
+              List.Forall₂ (fun (ρ : GLRep g) f => Has S ρ.2.ρ f) L fs ∧ F = fs.prod := by
   intro g _ S π L hL
   induction hL with
   | nil π h0 _ =>
@@ -31,7 +39,8 @@ theorem has_prod_of_inInd : ∀ (g : ℕ) [Fact g.Prime] (S : Sys g) (π : GLRep
   | cons π σ ρ L hπ _ _ hmap ih =>
     intro F hF
     obtain ⟨f, f', hf, hf', rfl⟩ :=
-      GlobalTheory.T.seriesIdempotent_mul_of_maps_to_parabolicInduction g S π.1 σ.1 ρ.1 _ π.2.ρ _ _ σ.2.ρ ρ.2.ρ hπ hmap F hF
+      GlobalTheory.T.seriesIdempotent_mul_of_maps_to_parabolicInduction g S π.1 σ.1 ρ.1 _ π.2.ρ _ _
+        σ.2.ρ ρ.2.ρ hπ hmap F hF
     obtain ⟨fs, hfs, rfl⟩ := ih f hf
     exact ⟨f' :: fs, List.Forall₂.cons hf' hfs, by simp [mul_comm]⟩
 

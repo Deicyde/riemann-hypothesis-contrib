@@ -9,9 +9,10 @@ open Polynomial
 
 namespace LateralTheory.E.LMonicPf
 
-theorem map_mk_eq_X_pow {A : Type} [CommRing A] (I : Ideal A) (p : A[X]) (hp : p.Monic)
-    (h : ∀ i ≠ p.natDegree, p.coeff i ∈ I) :
-    p.map (Ideal.Quotient.mk I) = X ^ p.natDegree := by
+theorem map_mk_eq_X_pow
+    {A : Type} [CommRing A]
+    (I : Ideal A) (p : A[X]) (hp : p.Monic) (h : ∀ i ≠ p.natDegree, p.coeff i ∈ I)
+    : p.map (Ideal.Quotient.mk I) = X ^ p.natDegree := by
   ext i
   rw [coeff_map, coeff_X_pow]
   split_ifs with hi
@@ -23,8 +24,8 @@ theorem LMonic_of : LateralTheory.E.HensIdemCut.LMonic := by
   cases subsingleton_or_nontrivial A
   · have : Subsingleton B := by
       refine ⟨fun x y => ?_⟩
-      rw [← mul_one x, ← mul_one y, ← map_one φ, Subsingleton.elim (1 : A) 0, map_zero,
-        mul_zero, mul_zero]
+      rw [← mul_one x, ← mul_one y, ← map_one φ, Subsingleton.elim (1 : A) 0, map_zero, mul_zero,
+        mul_zero]
     exact ⟨0, 1, monic_one, Subsingleton.elim _ _, by simp⟩
   let := φ.toAlgebra
   have : Algebra.IsIntegral A B := ⟨hφ⟩

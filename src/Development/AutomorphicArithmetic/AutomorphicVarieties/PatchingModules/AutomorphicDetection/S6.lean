@@ -30,7 +30,8 @@ theorem s6 : S6 := by
     have h3 : (2 : Bh) ∈ RingHom.ker (algebraMap Bh (FractionRing x.A)) := by rw [hk']; exact hn
     rw [RingHom.mem_ker, map_ofNat] at h3
     have h4 : (2 : x.K) = 0 := by
-      have h5 : (algebraMap x.A (FractionRing x.A)).comp (PowerSeries.C (R := x.K)) 2 = 0 := by rw [map_ofNat]; exact h3
+      have h5 : (algebraMap x.A (FractionRing x.A)).comp (PowerSeries.C (R := x.K)) 2 = 0 := by
+        rw [map_ofNat]; exact h3
       exact (map_eq_zero _).1 h5
     have h6 : IsUnit (2 : ℤ_[l]) := by
       rw [PadicInt.isUnit_iff]
@@ -43,8 +44,9 @@ theorem s6 : S6 := by
     exact not_isUnit_zero h8
   have hst := hat_st P hr H
   have hrg := hat_range P hs H
-  obtain ⟨U, hx, hrk⟩ := idem x.a H.DE H.T H.r x.a_pos x.a_le h2 H.ch H.tr hk' (hat_chi P hr H) hst
-    fun Z hZ => (hrg Z).1 hZ
+  obtain ⟨U, hx, hrk⟩ :=
+    idem x.a H.DE H.T H.r x.a_pos x.a_le h2 H.ch H.tr hk' (hat_chi P hr H) hst fun Z hZ =>
+      (hrg Z).1 hZ
   have hg : Nonempty (GrAlg H.T n x.a H.r U.ep) := by
     rcases x.a_le.lt_or_eq with ha | ha
     · exact gr_E x.a H.T H.r U x.a_pos ha hk' hst hx fun y => (hrg _).2 ⟨y, rfl⟩

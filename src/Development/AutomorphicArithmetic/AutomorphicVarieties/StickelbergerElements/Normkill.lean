@@ -9,26 +9,30 @@ public import Mathlib.RingTheory.Ideal.Norm.RelNorm
 
 open NumberField UpperTheory.V UpperTheory.V.Kum UpperTheory.V.Stick UpperTheory.V.Stk
 
-private theorem absNorm_map_equiv {C : Type} [Field C] [NumberField C] (e : 𝓞 C ≃+* 𝓞 C) (I : Ideal (𝓞 C)) :
-    Ideal.absNorm (I.map e) = Ideal.absNorm I := by
+private theorem absNorm_map_equiv
+    {C : Type} [Field C] [NumberField C] (e : 𝓞 C ≃+* 𝓞 C) (I : Ideal (𝓞 C))
+    : Ideal.absNorm (I.map e) = Ideal.absNorm I := by
   rw [Ideal.absNorm_apply, Ideal.absNorm_apply, Submodule.cardQuot_apply, Submodule.cardQuot_apply]
   exact (Nat.card_congr (Ideal.quotientEquiv I (I.map e) e rfl).toEquiv).symm
 
-private theorem prod_conj {C : Type} [Field C] [NumberField C] [IsGalois ℚ C] (I : Ideal (𝓞 C)) (hI : I ≠ ⊥) :
-    ∏ g : Gal(C/ℚ), I.map (RingOfIntegers.mapRingEquiv g.toRingEquiv) =
-      (Ideal.relNorm ℤ I).map (algebraMap ℤ (𝓞 C)) := by
-  have hle : (Ideal.relNorm ℤ I).map (algebraMap ℤ (𝓞 C)) ≤
-      ∏ g : Gal(C/ℚ), I.map (RingOfIntegers.mapRingEquiv g.toRingEquiv) := by
+private theorem prod_conj
+    {C : Type} [Field C] [NumberField C] [IsGalois ℚ C] (I : Ideal (𝓞 C)) (hI : I ≠ ⊥)
+    : ∏ g : Gal(C/ℚ), I.map (RingOfIntegers.mapRingEquiv g.toRingEquiv)
+      = (Ideal.relNorm ℤ I).map (algebraMap ℤ (𝓞 C)) := by
+  have hle
+      : (Ideal.relNorm ℤ I).map (algebraMap ℤ (𝓞 C))
+        ≤ ∏ g : Gal(C/ℚ), I.map (RingOfIntegers.mapRingEquiv g.toRingEquiv) := by
     rw [Ideal.map_le_iff_le_comap, Ideal.relNorm_apply, Ideal.span_le]
     rintro _ ⟨x, hx, rfl⟩
-    have h1 : algebraMap ℤ (𝓞 C) (Algebra.intNorm ℤ (𝓞 C) x) =
-        ∏ g : Gal(C/ℚ), RingOfIntegers.mapRingEquiv g.toRingEquiv x := by
+    have h1
+        : algebraMap ℤ (𝓞 C) (Algebra.intNorm ℤ (𝓞 C) x)
+          = ∏ g : Gal(C/ℚ), RingOfIntegers.mapRingEquiv g.toRingEquiv x := by
       apply IsFractionRing.injective (𝓞 C) C
       rw [← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply ℤ ℚ C,
         Algebra.algebraMap_intNorm (L := C), Algebra.norm_eq_prod_automorphisms, map_prod]
       rfl
-    change algebraMap ℤ (𝓞 C) (Algebra.intNorm ℤ (𝓞 C) x) ∈
-      (∏ g : Gal(C/ℚ), I.map (RingOfIntegers.mapRingEquiv g.toRingEquiv) : Ideal (𝓞 C))
+    change algebraMap ℤ (𝓞 C) (Algebra.intNorm ℤ (𝓞 C) x)
+      ∈ (∏ g : Gal(C/ℚ), I.map (RingOfIntegers.mapRingEquiv g.toRingEquiv) : Ideal (𝓞 C))
     rw [h1]
     exact Ideal.prod_mem_prod fun g _ => Ideal.mem_map_of_mem _ hx
   obtain ⟨J, hJ⟩ := Ideal.dvd_iff_le.2 hle
@@ -41,8 +45,8 @@ private theorem prod_conj {C : Type} [Field C] [NumberField C] [IsGalois ℚ C] 
   have hJ1 : Ideal.absNorm J = 1 := (mul_left_cancel₀ h0 ((mul_one _).trans hn)).symm
   rw [hJ, Ideal.absNorm_eq_one_iff.1 hJ1, Ideal.mul_top]
 
-theorem UpperTheory.V.Stk.prod_galois_classGroup_map_eq_one :
-    ∀ (C : Type) [Field C] [NumberField C] [IsGalois ℚ C] (c : ClassGroup (𝓞 C)),
+theorem UpperTheory.V.Stk.prod_galois_classGroup_map_eq_one
+    : ∀ (C : Type) [Field C] [NumberField C] [IsGalois ℚ C] (c : ClassGroup (𝓞 C)),
       ∏ g : Gal(C/ℚ), clMap g.toRingEquiv c = 1 := by
   intro C _ _ _ c
   obtain ⟨I, rfl⟩ := ClassGroup.mk0_surjective c

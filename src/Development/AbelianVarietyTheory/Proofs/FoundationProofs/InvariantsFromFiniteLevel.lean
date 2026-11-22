@@ -62,10 +62,10 @@ namespace GlobalTheory.K5.FinLevel
 
 variable {p : ℕ} [Fact p.Prime] {Ω : Type} [Field Ω] [Algebra (O0 p) Ω]
 
-theorem sum_fixed (H : Subgroup (Gal p Ω)) (E : Finset (Gal p Ω)) (y₀ x : Ω)
-    (hEH : ∀ g ∈ E, g ∈ H)
-    (huniq : ∀ h ∈ H, ∃! g, g ∈ E ∧ h y₀ = g y₀ ∧ ∀ s ∈ ({x} : Finset Ω), h s = g s) :
-    ∀ h ∈ H, h (∑ g ∈ E, g (y₀ * x)) = ∑ g ∈ E, g (y₀ * x) := by
+theorem sum_fixed
+    (H : Subgroup (Gal p Ω)) (E : Finset (Gal p Ω)) (y₀ x : Ω) (hEH : ∀ g ∈ E, g ∈ H)
+    (huniq : ∀ h ∈ H, ∃! g, g ∈ E ∧ h y₀ = g y₀ ∧ ∀ s ∈ ({x} : Finset Ω), h s = g s)
+    : ∀ h ∈ H, h (∑ g ∈ E, g (y₀ * x)) = ∑ g ∈ E, g (y₀ * x) := by
   classical
   simp only [Finset.mem_singleton, forall_eq] at huniq
   let rep : Gal p Ω → Gal p Ω := fun a => if ha : a ∈ H then (huniq a ha).exists.choose else 1
@@ -81,8 +81,12 @@ theorem sum_fixed (H : Subgroup (Gal p Ω)) (E : Finset (Gal p Ω)) (y₀ x : Ω
     rw [map_sum]
   have hmem : ∀ g ∈ E, h * g ∈ H := fun g hg => H.mul_mem hh (hEH g hg)
   have hmem' : ∀ g ∈ E, h⁻¹ * g ∈ H := fun g hg => H.mul_mem (H.inv_mem hh) (hEH g hg)
-  refine Finset.sum_bij' (fun g _ => rep (h * g)) (fun g _ => rep (h⁻¹ * g))
-    (fun g hg => (hrep _ (hmem g hg)).1) (fun g hg => (hrep _ (hmem' g hg)).1) ?_ ?_ ?_
+  refine Finset.sum_bij'
+    (fun g _ => rep (h * g))
+    (fun g _ => rep (h⁻¹ * g))
+    (fun g hg => (hrep _ (hmem g hg)).1)
+    (fun g hg => (hrep _ (hmem' g hg)).1)
+    ?_ ?_ ?_
   · intro g hg
     obtain ⟨_, h1, h2⟩ := hrep _ (hmem g hg)
     refine hun _ (hmem' _ (hrep _ (hmem g hg)).1) g hg ?_ ?_

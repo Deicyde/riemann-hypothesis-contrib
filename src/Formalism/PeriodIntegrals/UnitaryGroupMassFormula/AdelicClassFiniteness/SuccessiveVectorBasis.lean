@@ -32,12 +32,16 @@ theorem successive_vector_basis : SvBasis := by
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [← Int.cast_smul_eq_zsmul ℚ]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
-  have hstab : ∀ c : E, ∀ v ∈ Submodule.span ℚ (Set.range e0), c • v ∈ Submodule.span ℚ (Set.range e0) := by
+  have hstab
+      : ∀ c : E, ∀ v ∈ Submodule.span ℚ (Set.range e0),
+        c • v ∈ Submodule.span ℚ (Set.range e0) := by
     intro c v hv
     induction hv using Submodule.span_induction with
     | mem v hv =>
       obtain ⟨i, rfl⟩ := hv
-      obtain ⟨y, hy0, hyi⟩ := IsAlgebraic.exists_integral_multiple ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).2 (Algebra.IsAlgebraic.isAlgebraic c))
+      obtain ⟨y, hy0, hyi⟩ :=
+        IsAlgebraic.exists_integral_multiple ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).2
+          (Algebra.IsAlgebraic.isAlgebraic c))
       let α : 𝓞 E := ⟨y • c, hyi⟩
       have hαv : α • e0 i ∈ M := M.smul_mem α (b i).2
       have hyQ : (y : ℚ) ≠ 0 := Int.cast_ne_zero.2 hy0
@@ -56,10 +60,12 @@ theorem successive_vector_basis : SvBasis := by
     | add x y _ _ hx hy => rw [smul_add]; exact Submodule.add_mem _ hx hy
     | smul q x _ hx => rw [smul_comm]; exact Submodule.smul_mem _ _ hx
   have hspanQ : Submodule.span ℚ (Set.range e0) = ⊤ := by
-    let W : Submodule E (Fin m → E) :=
-      { toAddSubmonoid := (Submodule.span ℚ (Set.range e0)).toAddSubmonoid
-        smul_mem' := fun c v hv => hstab c v hv }
-    have hle : Submodule.span E (M : Set (Fin m → E)) ≤ W := Submodule.span_le.2 fun x hx => hmemM x hx
+    let W : Submodule E (Fin m → E) := {
+      toAddSubmonoid := (Submodule.span ℚ (Set.range e0)).toAddSubmonoid
+      smul_mem' := fun c v hv => hstab c v hv
+    }
+    have hle : Submodule.span E (M : Set (Fin m → E)) ≤ W :=
+      Submodule.span_le.2 fun x hx => hmemM x hx
     rw [hspan] at hle
     rw [eq_top_iff]
     intro v _
@@ -69,7 +75,8 @@ theorem successive_vector_basis : SvBasis := by
   have hcard : Fintype.card (Module.Free.ChooseBasisIndex ℤ M') = m * Module.finrank ℚ E := by
     rw [← Module.finrank_eq_card_basis B, Module.finrank_pi_fintype]
     simp
-  let σ : Fin (m * Module.finrank ℚ E) ≃ Module.Free.ChooseBasisIndex ℤ M' := (Fintype.equivFinOfCardEq hcard).symm
+  let σ : Fin (m * Module.finrank ℚ E) ≃ Module.Free.ChooseBasisIndex ℤ M' :=
+    (Fintype.equivFinOfCardEq hcard).symm
   refine ⟨e0 ∘ σ, hliQ.comp σ σ.injective, fun i => (b (σ i)).2, fun x hx => ?_⟩
   refine ⟨fun i => b.repr ⟨x, hx⟩ (σ i), ?_⟩
   conv_lhs => rw [hrep x hx]

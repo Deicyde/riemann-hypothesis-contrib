@@ -13,27 +13,34 @@ open scoped TensorProduct
 
 namespace GlobalTheory.ClosureHartogs
 
-theorem closure_hart : ∀ (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R] [IsNoetherianRing R],
-    GlobalTheory.GoodEtale.Hart A R R →
-    Function.Injective (algebraMap R (GlobalTheory.LocAcyc.GenFib A R)) →
-    ∀ (D : Type) [CommRing D] [Algebra (GlobalTheory.LocAcyc.GenFib A R) D]
-      (τ : D →ₗ[GlobalTheory.LocAcyc.GenFib A R] GlobalTheory.LocAcyc.GenFib A R),
-      (∀ c ∈ GlobalTheory.KeyOriginNoeth.closure A R D, ∃ r : R, algebraMap R _ r = τ c) →
-    ∀ (a₀ : A), a₀ ≠ 0 → ∀ (n : ℕ) (x y : Fin n → D),
-      (∀ i, y i ∈ GlobalTheory.KeyOriginNoeth.closure A R D) →
-      (∀ d : D, ∑ i, x i * algebraMap _ D (τ (y i * d)) =
-        GlobalTheory.KeyOriginNoeth.baseHom A R D (algebraMap A R a₀) * d) →
-    letI := GlobalTheory.KeyOriginNoeth.closureAlg A R D;
-    GlobalTheory.GoodEtale.Hart A R (GlobalTheory.KeyOriginNoeth.closure A R D) := by
+theorem closure_hart
+    : ∀ (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [Algebra A R] [IsNoetherianRing R],
+      GlobalTheory.GoodEtale.Hart A R R
+        → Function.Injective (algebraMap R (GlobalTheory.LocAcyc.GenFib A R))
+        → ∀ (D : Type) [CommRing D] [Algebra (GlobalTheory.LocAcyc.GenFib A R) D]
+            (τ : D →ₗ[GlobalTheory.LocAcyc.GenFib A R] GlobalTheory.LocAcyc.GenFib A R),
+          (∀ c ∈ GlobalTheory.KeyOriginNoeth.closure A R D, ∃ r : R, algebraMap R _ r = τ c)
+            → ∀ (a₀ : A),
+              a₀ ≠ 0
+                → ∀ (n : ℕ) (x y : Fin n → D),
+                  (∀ i, y i ∈ GlobalTheory.KeyOriginNoeth.closure A R D)
+                    → (∀ d : D,
+                      ∑ i, x i * algebraMap _ D (τ (y i * d))
+                        = GlobalTheory.KeyOriginNoeth.baseHom A R D (algebraMap A R a₀) * d)
+                    → letI := GlobalTheory.KeyOriginNoeth.closureAlg A R D
+                      GlobalTheory.GoodEtale.Hart A R
+                        (GlobalTheory.KeyOriginNoeth.closure A R D) := by
   intro A R _ _ _ _ _ hHR hinj D _ _ τ hτC a₀ ha₀ n x y hy hid
   set F := GlobalTheory.LocAcyc.GenFib A R
   set C := GlobalTheory.KeyOriginNoeth.closure A R D
   letI : Algebra R D := (GlobalTheory.KeyOriginNoeth.baseHom A R D).toAlgebra
   letI := GlobalTheory.KeyOriginNoeth.closureAlg A R D
-  have hbase : ∀ r : R, GlobalTheory.KeyOriginNoeth.baseHom A R D r = algebraMap F D (algebraMap R F r) :=
+  have hbase
+      : ∀ r : R, GlobalTheory.KeyOriginNoeth.baseHom A R D r = algebraMap F D (algebraMap R F r) :=
     fun r => rfl
   have hmemC : ∀ z : D, z ∈ C ↔ IsIntegral R z := fun z => Iff.rfl
-  have hsmulC : ∀ (r : R) (c : C), ((r • c : C) : D) = GlobalTheory.KeyOriginNoeth.baseHom A R D r * c :=
+  have hsmulC
+      : ∀ (r : R) (c : C), ((r • c : C) : D) = GlobalTheory.KeyOriginNoeth.baseHom A R D r * c :=
     fun r c => rfl
   have hτm : ∀ (f : F) (w : D), τ (algebraMap F D f * w) = f * τ w := by
     intro f w; rw [← Algebra.smul_def, τ.map_smul, smul_eq_mul]
@@ -41,26 +48,31 @@ theorem closure_hart : ∀ (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [
   have hunit : ∀ a : A, a ≠ 0 → IsUnit (algebraMap R F (algebraMap A R a)) := by
     intro a ha
     exact IsLocalization.map_units F
-      (⟨algebraMap A R a, Algebra.mem_algebraMapSubmonoid_of_mem (⟨a, mem_nonZeroDivisors_of_ne_zero ha⟩ :
-        nonZeroDivisors A)⟩ : Algebra.algebraMapSubmonoid R (nonZeroDivisors A))
+      (⟨
+         algebraMap A R a,
+         Algebra.mem_algebraMapSubmonoid_of_mem
+           (⟨a, mem_nonZeroDivisors_of_ne_zero ha⟩ : nonZeroDivisors A)
+       ⟩
+        : Algebra.algebraMapSubmonoid R (nonZeroDivisors A))
 
-  let N : Submodule R D :=
-    { carrier := {d | ∀ z ∈ C, ∃ r : R, algebraMap R F r = τ (d * z)}
-      add_mem' := by
-        intro d₁ d₂ h₁ h₂ z hz
-        obtain ⟨r₁, e₁⟩ := h₁ z hz
-        obtain ⟨r₂, e₂⟩ := h₂ z hz
-        exact ⟨r₁ + r₂, by rw [map_add (f := _), e₁, e₂, add_mul, map_add (f := _)]⟩
-      zero_mem' := by
-        intro z _
-        exact ⟨0, by simp⟩
-      smul_mem' := by
-        intro r d h z hz
-        obtain ⟨r₁, e₁⟩ := h z hz
-        refine ⟨r * r₁, ?_⟩
-        rw [Algebra.smul_def, mul_assoc]
-        change _ = τ (algebraMap F D (algebraMap R F r) * (d * z))
-        rw [hτm, ← e₁, map_mul] }
+  let N : Submodule R D := {
+    carrier := {d | ∀ z ∈ C, ∃ r : R, algebraMap R F r = τ (d * z)}
+    add_mem' := by
+      intro d₁ d₂ h₁ h₂ z hz
+      obtain ⟨r₁, e₁⟩ := h₁ z hz
+      obtain ⟨r₂, e₂⟩ := h₂ z hz
+      exact ⟨r₁ + r₂, by rw [map_add (f := _), e₁, e₂, add_mul, map_add (f := _)]⟩
+    zero_mem' := by
+      intro z _
+      exact ⟨0, by simp⟩
+    smul_mem' := by
+      intro r d h z hz
+      obtain ⟨r₁, e₁⟩ := h z hz
+      refine ⟨r * r₁, ?_⟩
+      rw [Algebra.smul_def, mul_assoc]
+      change _ = τ (algebraMap F D (algebraMap R F r) * (d * z))
+      rw [hτm, ← e₁, map_mul]
+  }
   have hmemN : ∀ d, d ∈ N ↔ ∀ z ∈ C, ∃ r : R, algebraMap R F r = τ (d * z) := fun d => Iff.rfl
   have h1N : (1 : D) ∈ N := by
     intro z hz
@@ -77,8 +89,10 @@ theorem closure_hart : ∀ (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [
     choose r hr using hr
     have hd' : d = ∑ i, r i • (algebraMap F D (↑c₀⁻¹ : F) * x i) := by
       have h := hid d
-      have h2 : d = algebraMap F D (↑c₀⁻¹ : F) *
-          (GlobalTheory.KeyOriginNoeth.baseHom A R D (algebraMap A R a₀) * d) := by
+      have h2
+          : d
+            = algebraMap F D (↑c₀⁻¹ : F)
+              * (GlobalTheory.KeyOriginNoeth.baseHom A R D (algebraMap A R a₀) * d) := by
         rw [hbase, ← mul_assoc, ← map_mul, ← hc₀, Units.inv_mul, map_one, one_mul]
       rw [h2, ← h, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
@@ -113,8 +127,7 @@ theorem closure_hart : ∀ (A R : Type) [CommRing A] [IsDomain A] [CommRing R] [
       linear_combination (d * z) * hv
     obtain ⟨r'', e''⟩ := hdiv
     refine ⟨r'', ?_⟩
-    have : ξ * d * z = algebraMap F D (↑c⁻¹ : F) * (d * ((m : D) * z)) := by
-      rw [hξ]; ring
+    have : ξ * d * z = algebraMap F D (↑c⁻¹ : F) * (d * ((m : D) * z)) := by rw [hξ]; ring
     rw [this, hτm, ← e₀, e'', smul_eq_mul, map_mul, ← hc, ← mul_assoc, Units.inv_mul, one_mul]
   have hpow : ∀ k : ℕ, ξ ^ k ∈ N := by
     intro k

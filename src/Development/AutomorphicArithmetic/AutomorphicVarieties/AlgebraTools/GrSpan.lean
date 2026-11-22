@@ -9,9 +9,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-private theorem grSpan_mem {Λ : Type} [CommRing Λ] {σ : Type} (d : σ → ℕ)
-    (J : Ideal (MvPowerSeries σ Λ)) (T : Finset σ) (hJ : ∀ s, MvPowerSeries.X s ^ d s ∈ J) :
-    ∀ g : MvPowerSeries σ Λ,
+private theorem grSpan_mem
+    {Λ : Type} [CommRing Λ]
+    {σ : Type} (d : σ → ℕ) (J : Ideal (MvPowerSeries σ Λ)) (T : Finset σ)
+    (hJ : ∀ s, MvPowerSeries.X s ^ d s ∈ J)
+    : ∀ g : MvPowerSeries σ Λ,
       (∀ n : σ →₀ ℕ, (∀ s ∈ T, n s < d s) → MvPowerSeries.coeff n g = 0) → g ∈ J := by
   classical
   induction T using Finset.induction_on with
@@ -48,25 +50,34 @@ private theorem grSpan_mem {Λ : Type} [CommRing Λ] {σ : Type} (d : σ → ℕ
         · exact hn s hs'
     · rfl
 
-private theorem grSpan_prod {Λ : Type} [CommRing Λ] {σ : Type} [Fintype σ] (a : σ → ℕ) :
-    (∏ s, MvPowerSeries.X s ^ a s : MvPowerSeries σ Λ) =
-      MvPowerSeries.monomial (Finsupp.equivFunOnFinite.symm a) 1 := by
+private theorem grSpan_prod {Λ : Type} [CommRing Λ] {σ : Type} [Fintype σ] (a : σ → ℕ)
+    : (∏ s, MvPowerSeries.X s ^ a s : MvPowerSeries σ Λ)
+      = MvPowerSeries.monomial (Finsupp.equivFunOnFinite.symm a) 1 := by
   classical
   simp_rw [MvPowerSeries.X_pow_eq]
   rw [Finsupp.equivFunOnFinite_symm_eq_sum]
   induction (Finset.univ : Finset σ) using Finset.induction_on with
   | empty => simp
   | insert x t hx ih =>
-    rw [Finset.prod_insert hx, Finset.sum_insert hx, ih, MvPowerSeries.monomial_mul_monomial, one_mul]
+    rw [Finset.prod_insert hx, Finset.sum_insert hx, ih, MvPowerSeries.monomial_mul_monomial,
+      one_mul]
 
-private theorem grSpan_small {Λ : Type} [CommRing Λ] {σ : Type} [Fintype σ] [DecidableEq σ]
-    (d : σ → ℕ) (f : MvPowerSeries σ Λ) (n : σ →₀ ℕ) (hn : ∀ s, n s < d s) :
-    MvPowerSeries.coeff n (f - ∑ α : (∀ s, Fin (d s)),
-      MvPowerSeries.coeff (Finsupp.equivFunOnFinite.symm fun s => (α s : ℕ)) f •
-        (∏ s, MvPowerSeries.X s ^ (α s : ℕ) : MvPowerSeries σ Λ)) = 0 := by
+private theorem grSpan_small
+    {Λ : Type} [CommRing Λ]
+    {σ : Type} [Fintype σ] [DecidableEq σ]
+    (d : σ → ℕ)
+    (f : MvPowerSeries σ Λ)
+    (n : σ →₀ ℕ) (hn : ∀ s, n s < d s)
+    : MvPowerSeries.coeff n
+        (f
+          - ∑ α : (∀ s, Fin (d s)),
+            MvPowerSeries.coeff (Finsupp.equivFunOnFinite.symm fun s => (α s : ℕ)) f •
+              (∏ s, MvPowerSeries.X s ^ (α s : ℕ) : MvPowerSeries σ Λ))
+      = 0 := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sub, map_sum, sub_eq_zero]
-  simp only [grSpan_prod, map_smul, MvPowerSeries.coeff_monomial, smul_eq_mul, mul_ite, mul_one, mul_zero]
+  simp only [grSpan_prod, map_smul, MvPowerSeries.coeff_monomial, smul_eq_mul, mul_ite, mul_one,
+    mul_zero]
   rw [Finset.sum_eq_single (fun s => ⟨n s, hn s⟩ : ∀ s, Fin (d s))]
   · simp [Finsupp.equivFunOnFinite_symm_coe]
   · intro β _ hβ
@@ -78,11 +89,17 @@ private theorem grSpan_small {Λ : Type} [CommRing Λ] {σ : Type} [Fintype σ] 
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem UpperTheory.V.AlgebraTools.mvPowerSeries_span_monomials :
-    ∀ (Λ : Type) [CommRing Λ] [IsLocalRing Λ] [IsNoetherianRing Λ] [IsAdicComplete (IsLocalRing.maximalIdeal Λ) Λ] (σ : Type) [Fintype σ] (d : σ → ℕ) (w : σ → MvPowerSeries σ Λ),
-      (∀ s, w s - MvPowerSeries.X s ^ d s ∈ (IsLocalRing.maximalIdeal Λ).map (MvPowerSeries.C : Λ →+* MvPowerSeries σ Λ)) →
-      Submodule.span Λ (Set.range fun α : (∀ s, Fin (d s)) =>
-        Ideal.Quotient.mk (Ideal.span (Set.range w)) (∏ s, MvPowerSeries.X s ^ (α s : ℕ))) = ⊤ := by
+theorem UpperTheory.V.AlgebraTools.mvPowerSeries_span_monomials
+    : ∀ (Λ : Type) [CommRing Λ] [IsLocalRing Λ] [IsNoetherianRing Λ]
+        [IsAdicComplete (IsLocalRing.maximalIdeal Λ) Λ] (σ : Type) [Fintype σ] (d : σ → ℕ)
+        (w : σ → MvPowerSeries σ Λ),
+      (∀ s,
+          w s - MvPowerSeries.X s ^ d s
+            ∈ (IsLocalRing.maximalIdeal Λ).map (MvPowerSeries.C : Λ →+* MvPowerSeries σ Λ))
+        → Submodule.span Λ
+            (Set.range fun α : (∀ s, Fin (d s)) =>
+              Ideal.Quotient.mk (Ideal.span (Set.range w)) (∏ s, MvPowerSeries.X s ^ (α s : ℕ)))
+          = ⊤ := by
   intro Λ _ _ _ _ σ _ d w hw
   classical
   set m := IsLocalRing.maximalIdeal Λ with hm
@@ -106,46 +123,56 @@ theorem UpperTheory.V.AlgebraTools.mvPowerSeries_span_monomials :
   haveI : IsHausdorff m (MvPowerSeries σ Λ ⧸ Ideal.span (Set.range w)) :=
     IsHausdorff.of_map (S := MvPowerSeries σ Λ)
       (J := m.map (algebraMap Λ (MvPowerSeries σ Λ))) (hIJ := le_rfl)
-  obtain ⟨hnak, -⟩ := UpperTheory.V.abelian₂.nakayama Λ m (MvPowerSeries σ Λ ⧸ Ideal.span (Set.range w))
+  obtain ⟨hnak, -⟩ :=
+    UpperTheory.V.abelian₂.nakayama Λ m (MvPowerSeries σ Λ ⧸ Ideal.span (Set.range w))
   rw [← (Fintype.equivFin (∀ s, Fin (d s))).symm.surjective.range_comp]
   apply hnak
   rw [(Fintype.equivFin (∀ s, Fin (d s))).symm.surjective.range_comp, eq_top_iff]
   rintro x -
   obtain ⟨f, rfl⟩ := Ideal.Quotient.mk_surjective x
-  have hJ : ∀ s, MvPowerSeries.X s ^ d s ∈
-      Ideal.span (Set.range w) ⊔ m.map (MvPowerSeries.C : Λ →+* MvPowerSeries σ Λ) := fun s => by
+  have hJ
+      : ∀ s,
+        MvPowerSeries.X s ^ d s
+          ∈ Ideal.span (Set.range w)
+            ⊔ m.map (MvPowerSeries.C : Λ →+* MvPowerSeries σ Λ) := fun s => by
     have h1 : w s ∈ Ideal.span (Set.range w) ⊔ m.map (MvPowerSeries.C : Λ →+* MvPowerSeries σ Λ) :=
       Ideal.mem_sup_left (Ideal.subset_span ⟨s, rfl⟩)
-    have h2 : w s - MvPowerSeries.X s ^ d s ∈
-        Ideal.span (Set.range w) ⊔ m.map (MvPowerSeries.C : Λ →+* MvPowerSeries σ Λ) :=
+    have h2
+        : w s - MvPowerSeries.X s ^ d s
+          ∈ Ideal.span (Set.range w) ⊔ m.map (MvPowerSeries.C : Λ →+* MvPowerSeries σ Λ) :=
       Ideal.mem_sup_right (hw s)
     simpa using Ideal.sub_mem _ h1 h2
-  have hmem := grSpan_mem d _ Finset.univ hJ _
-    (fun n hn => grSpan_small d f n (fun s => hn s (Finset.mem_univ s)))
+  have hmem :=
+    grSpan_mem d _ Finset.univ hJ _
+      (fun n hn => grSpan_small d f n (fun s => hn s (Finset.mem_univ s)))
   obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.1 hmem
   have hab' := hab.symm
   rw [sub_eq_iff_eq_add] at hab'
   rw [hab', map_add (f := _), map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.2 ha, zero_add]
   refine Submodule.add_mem _ (Submodule.mem_sup_right ?_) (Submodule.mem_sup_left ?_)
-  · have h1 : Ideal.Quotient.mk (Ideal.span (Set.range w)) b ∈
-        ((m.map (algebraMap Λ (MvPowerSeries σ Λ))) • ⊤ :
-          Submodule (MvPowerSeries σ Λ) (MvPowerSeries σ Λ ⧸ Ideal.span (Set.range w))) := by
-      have e : Ideal.Quotient.mk (Ideal.span (Set.range w)) b =
-          b • Ideal.Quotient.mk (Ideal.span (Set.range w)) 1 := by
+  · have h1
+        : Ideal.Quotient.mk (Ideal.span (Set.range w)) b
+          ∈ ((m.map (algebraMap Λ (MvPowerSeries σ Λ))) • ⊤
+            : Submodule (MvPowerSeries σ Λ) (MvPowerSeries σ Λ ⧸ Ideal.span (Set.range w))) := by
+      have e
+          : Ideal.Quotient.mk (Ideal.span (Set.range w)) b
+            = b • Ideal.Quotient.mk (Ideal.span (Set.range w)) 1 := by
         rw [map_one, Algebra.smul_def, mul_one, Ideal.Quotient.algebraMap_eq]
       rw [e]
       exact Submodule.smul_mem_smul hb Submodule.mem_top
-    have h2 := Submodule.restrictScalars_map_smul_eq m
-      (⊤ : Submodule (MvPowerSeries σ Λ) (MvPowerSeries σ Λ ⧸ Ideal.span (Set.range w)))
+    have h2 :=
+      Submodule.restrictScalars_map_smul_eq m
+        (⊤ : Submodule (MvPowerSeries σ Λ) (MvPowerSeries σ Λ ⧸ Ideal.span (Set.range w)))
     rw [Submodule.restrictScalars_top] at h2
     rw [← h2, Submodule.restrictScalars_mem]
     exact h1
   · set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     refine Submodule.sum_mem _ fun α _ => ?_
-    have e := map_smul (Ideal.Quotient.mkₐ Λ (Ideal.span (Set.range w)))
-      (MvPowerSeries.coeff (Finsupp.equivFunOnFinite.symm fun s => (α s : ℕ)) f)
-      (∏ s, MvPowerSeries.X s ^ (α s : ℕ))
+    have e :=
+      map_smul (Ideal.Quotient.mkₐ Λ (Ideal.span (Set.range w)))
+        (MvPowerSeries.coeff (Finsupp.equivFunOnFinite.symm fun s => (α s : ℕ)) f)
+        (∏ s, MvPowerSeries.X s ^ (α s : ℕ))
     rw [Ideal.Quotient.mkₐ_eq_mk] at e
     rw [e]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨α, rfl⟩)

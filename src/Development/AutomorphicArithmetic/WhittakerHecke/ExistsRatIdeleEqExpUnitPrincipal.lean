@@ -6,7 +6,9 @@ public import GroundTheory.GlobalFields.IdeleGroups.Rational
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical ENNReal NNReal
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
@@ -38,16 +40,18 @@ private lemma val_eq_one {w : IdeleGroup ℚ} (hw : w ∈ IdeleGroup.standardOpe
   have := mul_le_mul' (le_refl (Valued.v (((w : A ℚ)).2 v))) a2
   rwa [hm, mul_one] at this
 
-theorem UpperTheory.exists_rat_idele_eq_exp_unit_principal :
-    ∀ x : IdeleGroup ℚ, ∃ (t : ℝ) (u : IdeleGroup ℚ) (α : ℚˣ), u ∈ UU ∧ x = Un.cov t u α := by
+theorem UpperTheory.exists_rat_idele_eq_exp_unit_principal
+    : ∀ x : IdeleGroup ℚ, ∃ (t : ℝ) (u : IdeleGroup ℚ) (α : ℚˣ), u ∈ UU ∧ x = Un.cov t u α := by
   intro x
   have hx : x ∈ RationalIdeles.positiveSubgroup ⊔ (IdeleGroup.diagonal ℚ).range := by
     rw [RationalIdeles.positiveSubgroup_sup_diagonal_range]
     exact Subgroup.mem_top x
   obtain ⟨w, hw, _, ⟨a, rfl⟩, rfl⟩ := Subgroup.mem_sup.1 hx
   obtain ⟨hw1, hw2⟩ := RationalIdeles.mem_positiveSubgroup.1 hw
-  have het : Real.exp (Real.log (RationalIdeles.realPart w : ℝ) / 2) *
-      Real.exp (Real.log (RationalIdeles.realPart w : ℝ) / 2) = (RationalIdeles.realPart w : ℝ) := by
+  have het
+      : Real.exp (Real.log (RationalIdeles.realPart w : ℝ) / 2)
+          * Real.exp (Real.log (RationalIdeles.realPart w : ℝ) / 2)
+        = (RationalIdeles.realPart w : ℝ) := by
     rw [← Real.exp_add, add_halves, Real.exp_log hw2]
   obtain ⟨t, ht⟩ : ∃ t : ℝ, Real.exp t * Real.exp t = (RationalIdeles.realPart w : ℝ) := ⟨_, het⟩
   have hy : Real.exp t ≠ 0 := (Real.exp_pos t).ne'
@@ -73,8 +77,10 @@ theorem UpperTheory.exists_rat_idele_eq_exp_unit_principal :
       congrArg (fun z : A ℚ => z.1) (Units.inv_mul P)
     rw [hP1] at e
     exact e
-  · have e : H.cp v (((P⁻¹ * w : IdeleGroup ℚ) : A ℚ)) =
-        (((P⁻¹ : IdeleGroup ℚ) : A ℚ)).2 v * ((w : A ℚ)).2 v := rfl
+  · have e
+        : H.cp v (((P⁻¹ * w : IdeleGroup ℚ) : A ℚ))
+          = (((P⁻¹ : IdeleGroup ℚ) : A ℚ)).2 v * ((w : A ℚ)).2 v :=
+      rfl
     rw [e, hPi]
     change Valued.v ((1 : v.adicCompletion ℚ) * ((w : A ℚ)).2 v) = 1
     rw [one_mul]

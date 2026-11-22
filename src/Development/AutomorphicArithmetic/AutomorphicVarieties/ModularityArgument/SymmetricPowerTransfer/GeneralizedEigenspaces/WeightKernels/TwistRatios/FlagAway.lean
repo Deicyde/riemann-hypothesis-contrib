@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
+open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL
+  GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 open UpperTheory.V.W (Plc Lp)
 open scoped Matrix
@@ -20,22 +22,27 @@ variable {k : Type} [Field k]
 
 local notation "M2" => Matrix (Fin 2) (Fin 2) k
 
-private theorem tri_exists [IsAlgClosed k] (M : GL (Fin 2) k) :
-    ∃ Q : GL (Fin 2) k, ((Q * M * Q⁻¹ : GL (Fin 2) k) : M2) 1 0 = 0 := by
+private theorem tri_exists [IsAlgClosed k] (M : GL (Fin 2) k)
+    : ∃ Q : GL (Fin 2) k, ((Q * M * Q⁻¹ : GL (Fin 2) k) : M2) 1 0 = 0 := by
   obtain ⟨μ, hμ⟩ := Module.End.exists_eigenvalue (Matrix.toLin' (M : M2))
   obtain ⟨v, hv⟩ := hμ.exists_hasEigenvector
-  have hMv : (M : M2).mulVec v = μ • v := by
-    simpa [Matrix.toLin'_apply] using hv.apply_eq_smul
+  have hMv : (M : M2).mulVec v = μ • v := by simpa [Matrix.toLin'_apply] using hv.apply_eq_smul
   have hv0 : v ≠ 0 := hv.2
   obtain ⟨R, hR⟩ : ∃ R : GL (Fin 2) k, ∀ i, (R : M2) i 0 = v i := by
     by_cases h0 : v 0 = 0
     · have h1 : v 1 ≠ 0 := fun h1 => hv0 (by ext i; fin_cases i <;> simp [h0, h1])
-      refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero !![v 0, 1; v 1, 0]
-        (by simp [Matrix.det_fin_two, h1]), ?_⟩
+      refine ⟨
+        Matrix.GeneralLinearGroup.mkOfDetNeZero !![v 0, 1; v 1, 0]
+          (by simp [Matrix.det_fin_two, h1]),
+        ?_
+      ⟩
       intro i
       fin_cases i <;> simp [Matrix.GeneralLinearGroup.mkOfDetNeZero]
-    · refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero !![v 0, 0; v 1, 1]
-        (by simp [Matrix.det_fin_two, h0]), ?_⟩
+    · refine ⟨
+        Matrix.GeneralLinearGroup.mkOfDetNeZero !![v 0, 0; v 1, 1]
+          (by simp [Matrix.det_fin_two, h0]),
+        ?_
+      ⟩
       intro i
       fin_cases i <;> simp [Matrix.GeneralLinearGroup.mkOfDetNeZero]
   refine ⟨R⁻¹, ?_⟩

@@ -119,8 +119,7 @@ theorem change_of_variables_integral_of : ChangeIntegral.{u} := by
   have hr : C.r ∈ unitBall K := by
     rw [memB]
     rcases (IsUltrametricDist.norm_natCast_le_one K 2).lt_or_eq with h2lt | h2eq
-    ·
-      have h3n : ‖(3 : K)‖ = 1 := by
+    · have h3n : ‖(3 : K)‖ = 1 := by
         have h3le : ‖(3 : K)‖ ≤ 1 := by exact_mod_cast IsUltrametricDist.norm_natCast_le_one K 3
         have : ‖(1 : K)‖ ≤ max ‖(3 : K)‖ ‖(2 : K)‖ := by
           have := IsUltrametricDist.norm_add_le_max (3 : K) (-2)
@@ -134,21 +133,25 @@ theorem change_of_variables_integral_of : ChangeIntegral.{u} := by
         · linarith
       have e8 := WeierstrassCurve.variableChange_b₈ W C
       rw [← hW'def] at e8
-      have key : (3 : K) * C.r ^ 4 + W.b₂ * C.r ^ 3 + (3 * W.b₄) * C.r ^ 2 + (3 * W.b₆) * C.r
-          + (W.b₈ - u ^ 8 * W'.b₈) = 0 := by
+      have key
+          : (3 : K) * C.r ^ 4 + W.b₂ * C.r ^ 3 + (3 * W.b₄) * C.r ^ 2 + (3 * W.b₆) * C.r
+              + (W.b₈ - u ^ 8 * W'.b₈)
+            = 0 := by
         linear_combination (-u ^ 8) * e8 - (W.b₈ + 3 * C.r * W.b₆ + 3 * C.r ^ 2 * W.b₄
           + C.r ^ 3 * W.b₂ + 3 * C.r ^ 4) * hvu8
       exact root4 h3n (memB.1 hb2) (memB.1 (S.mul_mem (ofNatB 3) hb4))
         (memB.1 (S.mul_mem (ofNatB 3) hb6))
         (memB.1 (S.sub_mem hb8 (S.mul_mem (S.pow_mem hu' 8) hb8'))) key
-    ·
-      have h4n : ‖(4 : K)‖ = 1 := by
+    · have h4n : ‖(4 : K)‖ = 1 := by
         have : (4 : K) = 2 * 2 := by norm_num
-        rw [this, norm_mul]; push_cast at h2eq; rw [h2eq]; norm_num
+        rw [this, norm_mul]
+        push_cast at h2eq
+        rw [h2eq]
+        norm_num
       have e6 := WeierstrassCurve.variableChange_b₆ W C
       rw [← hW'def] at e6
-      have key : (4 : K) * C.r ^ 3 + W.b₂ * C.r ^ 2 + (2 * W.b₄) * C.r
-          + (W.b₆ - u ^ 6 * W'.b₆) = 0 := by
+      have key
+          : (4 : K) * C.r ^ 3 + W.b₂ * C.r ^ 2 + (2 * W.b₄) * C.r + (W.b₆ - u ^ 6 * W'.b₆) = 0 := by
         linear_combination (-u ^ 6) * e6 - (W.b₆ + 2 * C.r * W.b₄ + C.r ^ 2 * W.b₂
           + 4 * C.r ^ 3) * hvu6
       exact root3 h4n (memB.1 hb2) (memB.1 (S.mul_mem (ofNatB 2) hb4))
@@ -164,10 +167,16 @@ theorem change_of_variables_integral_of : ChangeIntegral.{u} := by
     exact memB.2 (root2 (memB.1 h1) (memB.1 hconst) key)
 
   have ht : C.t ∈ unitBall K := by
-    have e6 : W'.a₆ = v ^ 6 * (W.a₆ + C.r * W.a₄ + C.r ^ 2 * W.a₂ + C.r ^ 3 - C.t * W.a₃
-        - C.t ^ 2 - C.r * C.t * W.a₁) := rfl
-    have key : C.t ^ 2 + (W.a₃ + C.r * W.a₁) * C.t
-        + (-(W.a₆ + C.r * W.a₄ + C.r ^ 2 * W.a₂ + C.r ^ 3) + u ^ 6 * W'.a₆) = 0 := by
+    have e6
+        : W'.a₆
+          = v ^ 6
+            * (W.a₆ + C.r * W.a₄ + C.r ^ 2 * W.a₂ + C.r ^ 3 - C.t * W.a₃ - C.t ^ 2
+              - C.r * C.t * W.a₁) :=
+      rfl
+    have key
+        : C.t ^ 2 + (W.a₃ + C.r * W.a₁) * C.t
+            + (-(W.a₆ + C.r * W.a₄ + C.r ^ 2 * W.a₂ + C.r ^ 3) + u ^ 6 * W'.a₆)
+          = 0 := by
       linear_combination u ^ 6 * e6 + (W.a₆ + C.r * W.a₄ + C.r ^ 2 * W.a₂ + C.r ^ 3 - C.t * W.a₃
         - C.t ^ 2 - C.r * C.t * W.a₁) * hvu6
     have hsum : W.a₆ + C.r * W.a₄ + C.r ^ 2 * W.a₂ + C.r ^ 3 ∈ S :=
@@ -183,6 +192,7 @@ namespace Formalism.ELL
 
 universe v
 
-theorem change_of_variables_integral : ChangeIntegral.{v} := Formalism.ELL.RootExponentBounds.change_of_variables_integral_of
+theorem change_of_variables_integral : ChangeIntegral.{v} :=
+  Formalism.ELL.RootExponentBounds.change_of_variables_integral_of
 
 end Formalism.ELL

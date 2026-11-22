@@ -15,21 +15,21 @@ open ReciprocityTheory.ChartRestriction.DS.S7
 
 variable {n : ℕ}
 
-theorem pmat_smul {ε : Fin n → Bool} (c : ℝ) (z : PCoord ε → ℂ) :
-    pmat (c • z) = (c : ℂ) • pmat z := by
+theorem pmat_smul {ε : Fin n → Bool} (c : ℝ) (z : PCoord ε → ℂ)
+    : pmat (c • z) = (c : ℂ) • pmat z := by
   ext a b
   simp only [pmat, Pi.smul_apply, Matrix.smul_apply]
   split_ifs <;> simp [Complex.real_smul]
 
-theorem hs_pmat_smul {ε : Fin n → Bool} (c : ℝ) (z : PCoord ε → ℂ) :
-    hs (pmat (c • z)) = c ^ 2 * hs (pmat z) := by
+theorem hs_pmat_smul {ε : Fin n → Bool} (c : ℝ) (z : PCoord ε → ℂ)
+    : hs (pmat (c • z)) = c ^ 2 * hs (pmat z) := by
   rw [hs_pmat, hs_pmat, Finset.mul_sum, Finset.mul_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun ab _ => ?_
   rw [Pi.smul_apply, norm_smul, Real.norm_eq_abs, mul_pow, sq_abs]
   ring
 
-theorem hs_half_le_quadratic {ε : Fin n → Bool} (z : PCoord ε → ℂ) :
-    hs (pmat z) / 2 ≤ Qf (0 : Fin n → ℝ) z := by
+theorem hs_half_le_quadratic {ε : Fin n → Bool} (z : PCoord ε → ℂ)
+    : hs (pmat z) / 2 ≤ Qf (0 : Fin n → ℝ) z := by
   have e : hs (pmat z) / 2 = ∑ ab, ‖z ab‖ ^ 2 := by rw [hs_pmat]; ring
   rw [e, Qf]
   refine Finset.sum_le_sum fun ab _ => ?_
@@ -37,23 +37,24 @@ theorem hs_half_le_quadratic {ε : Fin n → Bool} (z : PCoord ε → ℂ) :
   have hw : 1 ≤ wab (0 : Fin n → ℝ) ab.1.1 ab.1.2 := by simp only [wab, Pi.zero_apply]; linarith
   exact le_mul_of_one_le_left (by positivity) hw
 
-theorem hs_eighth_le_of_small {ε : Fin n → Bool} (z : PCoord ε → ℂ) (h : rhoP z ≤ 1 / 2) :
-    hs (pmat z) / 8 ≤ Ph (0 : Fin n → ℝ) (pmat z) := by
+theorem hs_eighth_le_of_small {ε : Fin n → Bool} (z : PCoord ε → ℂ) (h : rhoP z ≤ 1 / 2)
+    : hs (pmat z) / 8 ≤ Ph (0 : Fin n → ℝ) (pmat z) := by
   have hA : Antitone (0 : Fin n → ℝ) := fun _ _ _ => le_rfl
   have h1 := ph_lower hA z h (by norm_num : (1 / 2 : ℝ) ≤ 1)
   have h2 := hs_half_le_quadratic z
   linarith
 
-theorem potential_lower_min {ε : Fin n → Bool} (z : PCoord ε → ℂ) :
-    1 / 16 * min (hs (pmat z)) (Real.sqrt (hs (pmat z)) / Real.sqrt (2 * (q0 ε : ℝ))) ≤
-      Ph (0 : Fin n → ℝ) (pmat z) := by
+theorem potential_lower_min {ε : Fin n → Bool} (z : PCoord ε → ℂ)
+    : 1 / 16 * min (hs (pmat z)) (Real.sqrt (hs (pmat z)) / Real.sqrt (2 * (q0 ε : ℝ)))
+      ≤ Ph (0 : Fin n → ℝ) (pmat z) := by
   have hA : Antitone (0 : Fin n → ℝ) := fun _ _ _ => le_rfl
   have hH0 : 0 ≤ hs (pmat z) := by rw [hs_pmat]; positivity
   have hP0 := ph_nonneg hA z
   rcases Nat.eq_zero_or_pos (q0 ε) with hq | hq
   · have e : min (hs (pmat z)) (Real.sqrt (hs (pmat z)) / Real.sqrt (2 * (q0 ε : ℝ))) = 0 := by
       rw [hq]; simp [hH0]
-    rw [e]; linarith
+    rw [e]
+    linarith
   · set c := Real.sqrt (2 * (q0 ε : ℝ)) with hc
     have hq1 : (1 : ℝ) ≤ (q0 ε : ℝ) := by exact_mod_cast hq
     have hc0 : 0 < c := Real.sqrt_pos.mpr (by linarith)
@@ -69,7 +70,8 @@ theorem potential_lower_min {ε : Fin n → Bool} (z : PCoord ε → ℂ) :
       have hrp : 0 < r := by
         by_contra h0
         have : r = 0 := le_antisymm (not_lt.mp h0) hr0
-        rw [this, mul_zero] at hsm; linarith
+        rw [this, mul_zero] at hsm
+        linarith
       set t := 2 * c * r with ht
       have ht1 : 1 ≤ t := by rw [ht]; linarith
       have ht0 : 0 < t := by linarith

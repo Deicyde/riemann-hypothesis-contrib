@@ -8,7 +8,8 @@ public import ReciprocityTheory.AnalyticForms.RegularLocalRings.Monomial
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
 open GlobalTheory.FlagMod (ev frX frVec)
 open GlobalTheory.FlagTan (psiSet HIx VIx TIx IsDef IsVert KSIso)
@@ -19,18 +20,18 @@ open scoped Classical
 
 namespace GlobalTheory
 
-theorem dvd_derivation_of_mem_span_prod_params :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsRegularLocalRing R] (m : ℕ)
-      (r : Fin m → R), ReciprocityTheory.AnForm.R.FinalTheorems.Rsp R m r → ∀ (J : Finset (Fin m))
-      (D : Derivation ℤ R R), D (∏ j ∈ J, r j) ∈ Ideal.span {∏ j ∈ J, r j} →
-      ∀ j ∈ J, r j ∣ D (r j) := by
+theorem dvd_derivation_of_mem_span_prod_params
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsRegularLocalRing R] (m : ℕ)
+        (r : Fin m → R),
+      ReciprocityTheory.AnForm.R.FinalTheorems.Rsp R m r
+        → ∀ (J : Finset (Fin m)) (D : Derivation ℤ R R),
+          D (∏ j ∈ J, r j) ∈ Ideal.span {∏ j ∈ J, r j} → ∀ j ∈ J, r j ∣ D (r j) := by
   intro R _ _ _ _ m r hrsp J D hD j hj
   have hprime : ∀ i, Prime (r i) :=
     ReciprocityTheory.AnForm.R.prime_of_regular_params r hrsp.1 hrsp.2
   have hnass : ∀ i k, i ≠ k → ¬ Associated (r i) (r k) :=
     (ReciprocityTheory.AnForm.R.regular_params_spec r hrsp.1 hrsp.2).2
-  have hsplit : ∏ i ∈ J, r i = r j * ∏ i ∈ J.erase j, r i :=
-    (Finset.mul_prod_erase J r hj).symm
+  have hsplit : ∏ i ∈ J, r i = r j * ∏ i ∈ J.erase j, r i := (Finset.mul_prod_erase J r hj).symm
   have hdvdD : r j ∣ D (∏ i ∈ J, r i) := by
     have h1 : (∏ i ∈ J, r i) ∣ D (∏ i ∈ J, r i) := Ideal.mem_span_singleton.mp hD
     exact (hsplit ▸ dvd_mul_right (r j) _ : r j ∣ ∏ i ∈ J, r i).trans h1

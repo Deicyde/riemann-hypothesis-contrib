@@ -11,8 +11,7 @@ open scoped ENNReal NNReal MatrixGroups
 
 namespace GlobalTheory.CompanionTheory.SW.GaussOne
 
-noncomputable def beta (τ : ℂ) (e : ℝ) : ℂ :=
-  (τ.im : ℂ) - Complex.I * (τ.re : ℂ) * (e : ℂ)
+noncomputable def beta (τ : ℂ) (e : ℝ) : ℂ := (τ.im : ℂ) - Complex.I * (τ.re : ℂ) * (e : ℂ)
 
 lemma beta_re (τ : ℂ) {e : ℝ} : (beta τ e).re = τ.im := by
   simp [beta]

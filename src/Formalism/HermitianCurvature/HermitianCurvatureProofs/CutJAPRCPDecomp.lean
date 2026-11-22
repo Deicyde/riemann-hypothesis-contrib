@@ -5,12 +5,14 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJAPRCPDec
 
 @[expose] public section
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q NumberField
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q NumberField
 open scoped ComplexConjugate Matrix
 
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Rep.Core.TC.PR.CP.Dc
 
-open Formalism.FourierDecayAlt.P.B2x3 Formalism.FourierDecayAlt.P.SettingConstruction Formalism.FourierDecayAlt.P.TheSec Formalism.FourierDecayAlt.B2
+open Formalism.FourierDecayAlt.P.B2x3 Formalism.FourierDecayAlt.P.SettingConstruction
+  Formalism.FourierDecayAlt.P.TheSec Formalism.FourierDecayAlt.B2
 
 noncomputable section
 
@@ -92,7 +94,8 @@ end Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Rep.Core.TC.PR.CP.Dc
 
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Rep.Core.TC.PR.CP
 
-open Formalism.FourierDecayAlt.P.B2x3 Formalism.FourierDecayAlt.P.SettingConstruction Formalism.FourierDecayAlt.P.TheSec Formalism.FourierDecayAlt.B2 Dc
+open Formalism.FourierDecayAlt.P.B2x3 Formalism.FourierDecayAlt.P.SettingConstruction
+  Formalism.FourierDecayAlt.P.TheSec Formalism.FourierDecayAlt.B2 Dc
 
 noncomputable section
 
@@ -108,12 +111,26 @@ theorem radial_decomposition_holds : Decomp := by
   set gb := gB k (wbPart k r z') T' with hgb
   have iA : ga⁻¹ * ga = 1 := unit_inv_mul hA
   have iB : gb⁻¹ * gb = 1 := unit_inv_mul hB
-  obtain ⟨C₁, C₂, β₁, β₂, c1, c2, c3, c4, c5⟩ := dec_all (T := T) (T' := T') h0 hT hT' (gb * Su k a b * gb⁻¹)
+  obtain ⟨C₁, C₂, β₁, β₂, c1, c2, c3, c4, c5⟩ :=
+    dec_all (T := T) (T' := T') h0 hT hT' (gb * Su k a b * gb⁻¹)
   let e := Fintype.equivFin (Fin (k + 1) × Fin (k + 1))
-  refine ⟨_, _, fun t => e0 k r (gb⁻¹ * LS k (e.symm t) * gb), fun t ζ => C₁ ζ (e.symm t).1 (e.symm t).2,
-    fun t => e0 k r (ga * LS k (e.symm t) * ga⁻¹), fun t ζ => C₂ ζ (e.symm t).1 (e.symm t).2, β₁, β₂,
-    fun t => gwc_right k r z' hz' hT' _ (inL_LS _), fun t => gwc_left k r z hz hT _ (inL_LS _),
-    fun t => c1.1 _ _, fun t => c2.1 _ _, c3, c4, fun ζ hζ => ?_⟩
+  refine ⟨
+    _,
+    _,
+    fun t => e0 k r (gb⁻¹ * LS k (e.symm t) * gb),
+    fun t ζ => C₁ ζ (e.symm t).1 (e.symm t).2,
+    fun t => e0 k r (ga * LS k (e.symm t) * ga⁻¹),
+    fun t ζ => C₂ ζ (e.symm t).1 (e.symm t).2,
+    β₁,
+    β₂,
+    fun t => gwc_right k r z' hz' hT' _ (inL_LS _),
+    fun t => gwc_left k r z hz hT _ (inL_LS _),
+    fun t => c1.1 _ _,
+    fun t => c2.1 _ _,
+    c3,
+    c4,
+    fun ζ hζ => ?_
+  ⟩
   have hν := nuI_mul (k := k) h0 hT hT' hζ
   set ν := nu k (wZ T T' ζ) (sZ T T' ζ) with hνd
   set νi := nuI k T T' ζ with hνi
@@ -121,17 +138,25 @@ theorem radial_decomposition_holds : Decomp := by
   have hinv : (mu0 k r z z' ζ)⁻¹ = embWb k r (gb⁻¹ * νi * ga⁻¹) := by
     apply Matrix.inv_eq_left_inv
     rw [hmu, ← emb_mul]
-    have : gb⁻¹ * νi * ga⁻¹ * (ga * ν * gb) = gb⁻¹ * (νi * ((ga⁻¹ * ga) * ν)) * gb := by simp only [Matrix.mul_assoc]
+    have : gb⁻¹ * νi * ga⁻¹ * (ga * ν * gb) = gb⁻¹ * (νi * ((ga⁻¹ * ga) * ν)) * gb := by
+      simp only [Matrix.mul_assoc]
     rw [this, iA, Matrix.one_mul, hν, Matrix.mul_one, iB, emb_one]
-  have s1 : ∑ t, C₁ ζ (e.symm t).1 (e.symm t).2 • e0 k r (gb⁻¹ * LS k (e.symm t) * gb) = e0 k r (gb⁻¹ * C₁ ζ * gb) := by
+  have s1
+      : ∑ t, C₁ ζ (e.symm t).1 (e.symm t).2 • e0 k r (gb⁻¹ * LS k (e.symm t) * gb)
+        = e0 k r (gb⁻¹ * C₁ ζ * gb) := by
     rw [embed_conj_finset_sum, sum_LS e _ (c1.2 ζ)]
-  have s2 : ∑ t, C₂ ζ (e.symm t).1 (e.symm t).2 • e0 k r (ga * LS k (e.symm t) * ga⁻¹) = e0 k r (ga * C₂ ζ * ga⁻¹) := by
+  have s2
+      : ∑ t, C₂ ζ (e.symm t).1 (e.symm t).2 • e0 k r (ga * LS k (e.symm t) * ga⁻¹)
+        = e0 k r (ga * C₂ ζ * ga⁻¹) := by
     rw [embed_conj_finset_sum, sum_LS e _ (c2.2 ζ)]
-  have s3 : (mu0 k r z z' ζ)⁻¹ * e0 k r (ga * C₂ ζ * ga⁻¹) * mu0 k r z z' ζ = e0 k r (gb⁻¹ * (νi * C₂ ζ * ν) * gb) := by
+  have s3
+      : (mu0 k r z z' ζ)⁻¹ * e0 k r (ga * C₂ ζ * ga⁻¹) * mu0 k r z z' ζ
+        = e0 k r (gb⁻¹ * (νi * C₂ ζ * ν) * gb) := by
     rw [hinv, hmu, block_embedding_mul_embed, embed_mul_block_embedding]
     congr 1
-    have : gb⁻¹ * νi * ga⁻¹ * (ga * C₂ ζ * ga⁻¹) * (ga * ν * gb) =
-        gb⁻¹ * (νi * ((ga⁻¹ * ga) * C₂ ζ * (ga⁻¹ * ga)) * ν) * gb := by simp only [Matrix.mul_assoc]
+    have : gb⁻¹ * νi * ga⁻¹ * (ga * C₂ ζ * ga⁻¹) * (ga * ν * gb)
+        = gb⁻¹ * (νi * ((ga⁻¹ * ga) * C₂ ζ * (ga⁻¹ * ga)) * ν) * gb := by
+      simp only [Matrix.mul_assoc]
     rw [this, iA, Matrix.one_mul, Matrix.mul_one]
   have s4 : etaZ k r z z' ζ = e0 k r (gb⁻¹ * H1 k T T' ζ * gb) := by
     unfold etaZ
@@ -150,9 +175,11 @@ theorem radial_decomposition_holds : Decomp := by
       intro D; simp only [Matrix.mul_assoc]
     rw [this, iA, Matrix.one_mul]
   have s6 : Su k a b = gb⁻¹ * (gb * Su k a b * gb⁻¹) * gb := by
-    have : gb⁻¹ * (gb * Su k a b * gb⁻¹) * gb = (gb⁻¹ * gb) * Su k a b * (gb⁻¹ * gb) := by simp only [Matrix.mul_assoc]
+    have : gb⁻¹ * (gb * Su k a b * gb⁻¹) * gb = (gb⁻¹ * gb) * Su k a b * (gb⁻¹ * gb) := by
+      simp only [Matrix.mul_assoc]
     rw [this, iB, Matrix.one_mul, Matrix.mul_one]
-  rw [s1, s2, s3, s4, s5, single_wI, s6, c5 ζ hζ, ← embed_smul, ← embed_smul, ← embed_add, ← embed_add, ← embed_add]
+  rw [s1, s2, s3, s4, s5, single_wI, s6, c5 ζ hζ, ← embed_smul, ← embed_smul, ← embed_add,
+    ← embed_add, ← embed_add]
   congr 1
   simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul]
   rfl

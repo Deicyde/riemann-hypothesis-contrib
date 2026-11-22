@@ -27,14 +27,16 @@ theorem twZrPr_inX (x : Fin n → k) : twZrPr (c := c) (Loc.inX k n c x) = x := 
 def twZrMap (g : (Fin n → k) →ₗ[k] (Fin n → k)) : (Fin (n + c) → k) →ₗ[k] (Fin (n + c) → k) :=
   Loc.inX k n c ∘ₗ g ∘ₗ twZrPr + (LinearMap.id - Loc.inX k n c ∘ₗ twZrPr)
 
-theorem twZrMap_apply (g : (Fin n → k) →ₗ[k] (Fin n → k)) (v : Fin (n + c) → k) :
-    twZrMap g v = Loc.inX k n c (g (twZrPr v)) + (v - Loc.inX k n c (twZrPr v)) := rfl
+theorem twZrMap_apply (g : (Fin n → k) →ₗ[k] (Fin n → k)) (v : Fin (n + c) → k)
+    : twZrMap g v = Loc.inX k n c (g (twZrPr v)) + (v - Loc.inX k n c (twZrPr v)) :=
+  rfl
 
-theorem twZrPr_map (g : (Fin n → k) →ₗ[k] (Fin n → k)) (v : Fin (n + c) → k) : twZrPr (twZrMap g v) = g (twZrPr v) := by
+theorem twZrPr_map (g : (Fin n → k) →ₗ[k] (Fin n → k)) (v : Fin (n + c) → k)
+    : twZrPr (twZrMap g v) = g (twZrPr v) := by
   rw [twZrMap_apply, map_add (f := _), map_sub, twZrPr_inX, twZrPr_inX, sub_self, add_zero]
 
-theorem twZrMap_comp (g g' : (Fin n → k) →ₗ[k] (Fin n → k)) (v : Fin (n + c) → k) :
-    twZrMap g (twZrMap g' v) = twZrMap (g ∘ₗ g') v := by
+theorem twZrMap_comp (g g' : (Fin n → k) →ₗ[k] (Fin n → k)) (v : Fin (n + c) → k)
+    : twZrMap g (twZrMap g' v) = twZrMap (g ∘ₗ g') v := by
   rw [twZrMap_apply, twZrPr_map, twZrMap_apply, twZrMap_apply]
   show _ = Loc.inX k n c (g (g' (twZrPr v))) + _
   abel
@@ -56,14 +58,16 @@ def twZrExt (g : (Fin n → k) ≃ₗ[k] (Fin n → k)) : (Fin (n + c) → k) �
       have : g.symm.toLinearMap ∘ₗ g.toLinearMap = LinearMap.id := by ext; simp
       rw [this, twZrMap_id])
 
-theorem twZrExt_apply (g : (Fin n → k) ≃ₗ[k] (Fin n → k)) (v : Fin (n + c) → k) :
-    twZrExt (c := c) g v = twZrMap g.toLinearMap v := rfl
+theorem twZrExt_apply (g : (Fin n → k) ≃ₗ[k] (Fin n → k)) (v : Fin (n + c) → k)
+    : twZrExt (c := c) g v = twZrMap g.toLinearMap v :=
+  rfl
 
-theorem twZrExt_inv_apply (g : (Fin n → k) ≃ₗ[k] (Fin n → k)) (v : Fin (n + c) → k) :
-    (twZrExt (c := c) g)⁻¹ v = twZrMap g.symm.toLinearMap v := rfl
+theorem twZrExt_inv_apply (g : (Fin n → k) ≃ₗ[k] (Fin n → k)) (v : Fin (n + c) → k)
+    : (twZrExt (c := c) g)⁻¹ v = twZrMap g.symm.toLinearMap v :=
+  rfl
 
-theorem twZrExt_inX (g : (Fin n → k) ≃ₗ[k] (Fin n → k)) (x : Fin n → k) :
-    twZrExt (c := c) g (Loc.inX k n c x) = Loc.inX k n c (g x) := by
+theorem twZrExt_inX (g : (Fin n → k) ≃ₗ[k] (Fin n → k)) (x : Fin n → k)
+    : twZrExt (c := c) g (Loc.inX k n c x) = Loc.inX k n c (g x) := by
   rw [twZrExt_apply, twZrMap_apply, twZrPr_inX, sub_self, add_zero]
   rfl
 
@@ -80,16 +84,20 @@ theorem twZrPr_eN (i : ℕ) (hi : n ≤ i) : twZrPr (c := c) (Loc.eN k (n + c) i
   have : ¬ (l : ℕ) = i := by have := l.2; omega
   simp [this]
 
-theorem twZrMap_R1cond (g : (Fin n → k) →ₗ[k] (Fin n → k)) (r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k))
-    (hr : ∀ v, r v = twZrMap g v) : Loc.R1cond k n c r := by
+theorem twZrMap_R1cond
+    (g : (Fin n → k) →ₗ[k] (Fin n → k)) (r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k))
+    (hr : ∀ v, r v = twZrMap g v)
+    : Loc.R1cond k n c r := by
   refine ⟨fun i v hv => ?_, ?_, fun i => ?_⟩
   · rw [hr, twZrMap_apply]
     exact add_mem (twZr_inX_mem_Ufl _ i) (sub_mem hv (twZr_inX_mem_Ufl _ i))
   · rw [hr, twZrMap_apply, twZrPr_eN n le_rfl, map_zero, map_zero, sub_zero, zero_add]
-  · rw [hr, twZrMap_apply, twZrPr_eN (n + i) (by omega), map_zero, map_zero, sub_zero, zero_add, sub_self]
+  · rw [hr, twZrMap_apply, twZrPr_eN (n + i) (by omega), map_zero, map_zero, sub_zero, zero_add,
+      sub_self]
     exact zero_mem _
 
-theorem zeroExtension_mem_R1 (g : (Fin n → k) ≃ₗ[k] (Fin n → k)) : twZrExt (c := c) g ∈ Loc.R1 k n c :=
+theorem zeroExtension_mem_R1 (g : (Fin n → k) ≃ₗ[k] (Fin n → k))
+    : twZrExt (c := c) g ∈ Loc.R1 k n c :=
   ⟨twZrMap_R1cond _ _ (twZrExt_apply g), twZrMap_R1cond _ _ (twZrExt_inv_apply g)⟩
 
 end TwZr
@@ -98,8 +106,8 @@ section TwZrLat
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {n c : ℕ}
 
-theorem twZrMap_coord (g : (Fin n → E) →ₗ[E] (Fin n → E)) (v : Fin (n + c) → E) (l : Fin (n + c)) :
-    twZrMap g v l = if h : l.1 < n then g (twZrPr v) ⟨l.1, h⟩ else v l := by
+theorem twZrMap_coord (g : (Fin n → E) →ₗ[E] (Fin n → E)) (v : Fin (n + c) → E) (l : Fin (n + c))
+    : twZrMap g v l = if h : l.1 < n then g (twZrPr v) ⟨l.1, h⟩ else v l := by
   rw [twZrMap_apply]
   show Loc.inX E n c _ l + (v l - Loc.inX E n c _ l) = _
   rw [ciInX_apply, ciInX_apply]
@@ -111,9 +119,11 @@ theorem twZrMap_coord (g : (Fin n → E) →ₗ[E] (Fin n → E)) (v : Fin (n + 
     ring
   · ring
 
-theorem twZrExt_stab (P : HeightOneSpectrum (𝓞 E)) (M : Submodule (𝓞 E) (Sp E (n + c)))
-    (hM : ∀ v, v ∈ M ↔ ∀ l, IntAt P (v l)) {g : Sp E n ≃ₗ[E] Sp E n} (hg : g ∈ GLint E n P) :
-    twZrExt (c := c) g ∈ stabL E (n + c) M := by
+theorem twZrExt_stab
+    (P : HeightOneSpectrum (𝓞 E)) (M : Submodule (𝓞 E) (Sp E (n + c)))
+    (hM : ∀ v, v ∈ M ↔ ∀ l, IntAt P (v l))
+    {g : Sp E n ≃ₗ[E] Sp E n} (hg : g ∈ GLint E n P)
+    : twZrExt (c := c) g ∈ stabL E (n + c) M := by
   intro v
   rw [hM, hM]
   have hgv := hg (twZrPr v)
@@ -121,10 +131,12 @@ theorem twZrExt_stab (P : HeightOneSpectrum (𝓞 E)) (M : Submodule (𝓞 E) (S
   constructor
   · intro h l
     by_cases hl : l.1 < n
-    · have := (hgv.1 fun i => by
-        have h1 := h (Fin.castAdd c i)
-        rw [twZrExt_apply, twZrMap_coord, dite_eq_left (by simp)] at h1
-        exact h1) ⟨l.1, hl⟩
+    · have :=
+        (hgv.1 fun i => by
+            have h1 := h (Fin.castAdd c i)
+            rw [twZrExt_apply, twZrMap_coord, dite_eq_left (by simp)] at h1
+            exact h1)
+          ⟨l.1, hl⟩
       exact this
     · have h1 := h l
       rwa [twZrExt_apply, twZrMap_coord, dite_eq_right hl] at h1
@@ -138,27 +150,31 @@ end TwZrLat
 
 section TwZrQ
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} {Ch : Chars X Pr R.m}
-  {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ}
-  {mu : Tup X.F X.E X.K S} {cst : LocCst X (rowSG Pr sel mu)}
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks} {Ch : Chars X Pr R.m}
+  {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ} {mu : Tup X.F X.E X.K S}
+  {cst : LocCst X (rowSG Pr sel mu)}
 
 theorem rank_zero_eq_k : R.N 0 = R.k := by unfold Ranks.N; simp
 
-theorem twZr_parL (P : HeightOneSpectrum (𝓞 X.E)) (v : Sp X.E (R.N 0 + cOf R 0)) :
-    v ∈ LocE.parL P (qOf P) (R.k + 0) (R.N 0) (cOf R 0) ↔ ∀ l, IntAt P (v l) := by
+theorem twZr_parL (P : HeightOneSpectrum (𝓞 X.E)) (v : Sp X.E (R.N 0 + cOf R 0))
+    : v ∈ LocE.parL P (qOf P) (R.k + 0) (R.N 0) (cOf R 0) ↔ ∀ l, IntAt P (v l) := by
   unfold LocE.parL
   rw [ciMem_sclLat]
   have hN := rank_zero_eq_k (R := R)
   refine forall_congr' fun l => ?_
   rw [if_neg (by omega), zpow_zero, inv_one, one_mul]
 
-theorem zeroExtension_mem_parahoric_zero {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∉ Pr.vGs) (sharp : Bool) {g : Sp X.E (R.N 0) ≃ₗ[X.E] Sp X.E (R.N 0)}
-    (hg : g ∈ GLint X.E (R.N 0) P) : twZrExt (c := cOf R 0) g ∈ Jat (Pr := Pr) (R := R) sharp 0 P := by
+theorem zeroExtension_mem_parahoric_zero
+    {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∉ Pr.vGs)
+    (sharp : Bool)
+    {g : Sp X.E (R.N 0) ≃ₗ[X.E] Sp X.E (R.N 0)} (hg : g ∈ GLint X.E (R.N 0) P)
+    : twZrExt (c := cOf R 0) g ∈ Jat (Pr := Pr) (R := R) sharp 0 P := by
   rw [twJat_Q sharp 0 hP]
   exact ⟨twZrExt_stab P _ (fun v => ciMem_stdAt P v) hg, twZrExt_stab P _ (twZr_parL P) hg⟩
 
-theorem twZr_grp {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∉ Pr.vGs) (sharp : Bool) :
-    GLint X.E (R.N 0) P ≤ prCat (Pr := Pr) (R := R) sharp 0 P 1 := by
+theorem twZr_grp {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∉ Pr.vGs) (sharp : Bool)
+    : GLint X.E (R.N 0) P ≤ prCat (Pr := Pr) (R := R) sharp 0 P 1 := by
   intro g hg
   refine ⟨twZrExt (c := cOf R 0) g, ⟨zeroExtension_mem_R1 g, ?_⟩, twZrExt_inX g⟩
   show (MulAut.conj (1 : AutY X R 0)⁻¹) (twZrExt (c := cOf R 0) g) ∈ Jat (Pr := Pr) (R := R) sharp 0 P
@@ -172,8 +188,11 @@ theorem twZr_eN_mem (P : HeightOneSpectrum (𝓞 X.E)) (N i : ℕ) : Loc.eN X.E 
   · exact ciIntAt_one
   · exact ciIntAt_zero
 
-theorem twZr_chr (hc : cst.Ok) (P : rowSG Pr sel mu) (hP : P.1 ∉ Pr.vGs) (r : AutY X R 0)
-    (hr : r ∈ Loc.Cbe (Jat (Pr := Pr) cst.sharp 0 P.1) 1) : chiInv Ch sel mu cst 0 P 1 r = 1 := by
+theorem twZr_chr
+    (hc : cst.Ok)
+    (P : rowSG Pr sel mu) (hP : P.1 ∉ Pr.vGs)
+    (r : AutY X R 0) (hr : r ∈ Loc.Cbe (Jat (Pr := Pr) cst.sharp 0 P.1) 1)
+    : chiInv Ch sel mu cst 0 P 1 r = 1 := by
   have hrJ : r ∈ Jat (Pr := Pr) (R := R) cst.sharp 0 P.1 := by
     have := hr.2
     simpa [MulAut.conj_apply] using this

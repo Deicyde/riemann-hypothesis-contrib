@@ -14,9 +14,11 @@ namespace ReciprocityTheory.ChartRestriction.G.TB.SCPf
 
 variable {k : Type} [CommRing k] {ι : Type} [Fintype ι]
 
-theorem sum_side {M : Type} [AddCommMonoid M] (s : ι → Bool) (g : ι → ι → M)
-    (hg : ∀ l l', g l l' ≠ 0 → s l = true ∧ s l' = false) :
-    ∑ l, ∑ l', g l l' = ∑ i, ∑ j, g ((sideE s).symm (Sum.inl i)) ((sideE s).symm (Sum.inr j)) := by
+theorem sum_side
+    {M : Type} [AddCommMonoid M]
+    (s : ι → Bool) (g : ι → ι → M) (hg : ∀ l l', g l l' ≠ 0 → s l = true ∧ s l' = false)
+    : ∑ l, ∑ l', g l l'
+      = ∑ i, ∑ j, g ((sideE s).symm (Sum.inl i)) ((sideE s).symm (Sum.inr j)) := by
   have h1 : ∀ l, ∑ l', g l l' = ∑ j, g l ((sideE s).symm (Sum.inr j)) := by
     intro l
     rw [← Equiv.sum_comp (sideE s).symm (g l), Fintype.sum_sum_type]
@@ -38,16 +40,22 @@ theorem sum_side {M : Type} [AddCommMonoid M] (s : ι → Bool) (g : ι → ι �
     simp at h2
   rw [h3, add_zero]
 
-abbrev kapE (s : ι → Bool) (κ : ι → ι → k) (i : Fin (Fintype.card {l // s l = true}))
-    (j : Fin (Fintype.card {l // ¬ s l = true})) : k :=
+abbrev kapE
+    (s : ι → Bool)
+    (κ : ι → ι → k) (i : Fin (Fintype.card {l // s l = true}))
+    (j : Fin (Fintype.card {l // ¬ s l = true}))
+    : k :=
   κ ((sideE s).symm (Sum.inl i)) ((sideE s).symm (Sum.inr j))
 
-theorem delta_rename (s : ι → Bool) (κ : ι → ι → k) (hκ : ∀ l l', κ l l' ≠ 0 → s l = true ∧ s l' = false)
-    (P : MvPolynomial ι k) :
-    PI.WickFormula.delta (kapE s κ) (rename (sideE s) P) = rename (sideE s) (secondOrder k κ P) := by
-  have hd : ∀ (x : Fin (Fintype.card {l // s l = true}) ⊕ Fin (Fintype.card {l // ¬ s l = true}))
-      (Q : MvPolynomial ι k),
-      pderiv x (rename (sideE s) Q) = rename (sideE s) (pderiv ((sideE s).symm x) Q) := by
+theorem delta_rename
+    (s : ι → Bool) (κ : ι → ι → k) (hκ : ∀ l l', κ l l' ≠ 0 → s l = true ∧ s l' = false)
+    (P : MvPolynomial ι k)
+    : PI.WickFormula.delta (kapE s κ) (rename (sideE s) P)
+      = rename (sideE s) (secondOrder k κ P) := by
+  have hd
+      : ∀ (x : Fin (Fintype.card {l // s l = true}) ⊕ Fin (Fintype.card {l // ¬ s l = true}))
+          (Q : MvPolynomial ι k),
+        pderiv x (rename (sideE s) Q) = rename (sideE s) (pderiv ((sideE s).symm x) Q) := by
     intro x Q
     conv_lhs => rw [← (sideE s).apply_symm_apply x]
     exact pderiv_rename (sideE s).injective _ _
@@ -64,10 +72,11 @@ theorem delta_rename (s : ι → Bool) (κ : ι → ι → k) (hκ : ∀ l l', �
     apply hne
     rw [h0, map_zero, zero_mul]
 
-theorem delta_pow_rename (s : ι → Bool) (κ : ι → ι → k)
-    (hκ : ∀ l l', κ l l' ≠ 0 → s l = true ∧ s l' = false) (n : ℕ) (P : MvPolynomial ι k) :
-    (PI.WickFormula.delta (kapE s κ) ^ n) (rename (sideE s) P) =
-      rename (sideE s) ((secondOrder k κ)^[n] P) := by
+theorem delta_pow_rename
+    (s : ι → Bool) (κ : ι → ι → k) (hκ : ∀ l l', κ l l' ≠ 0 → s l = true ∧ s l' = false)
+    (n : ℕ) (P : MvPolynomial ι k)
+    : (PI.WickFormula.delta (kapE s κ) ^ n) (rename (sideE s) P)
+      = rename (sideE s) ((secondOrder k κ)^[n] P) := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -77,17 +86,21 @@ section Van
 
 variable {π : Type} [Fintype π] [DecidableEq π]
 
-theorem pairMin_step (c : ι → π) (s : ι → Bool) (n : ι →₀ ℕ) (l l' : ι) (hc : c l = c l')
-    (hs : s l = true) (hs' : s l' = false) :
-    pairMin c s (n + Finsupp.single l 1 + Finsupp.single l' 1) = pairMin c s n + 1 := by
-  have key : ∀ q : π,
-      min (∑ x ∈ Finset.univ.filter (fun x => c x = q ∧ s x = true),
-          (n + Finsupp.single l 1 + Finsupp.single l' 1 : ι →₀ ℕ) x)
-        (∑ x ∈ Finset.univ.filter (fun x => c x = q ∧ s x = false),
-          (n + Finsupp.single l 1 + Finsupp.single l' 1 : ι →₀ ℕ) x) =
-      min (∑ x ∈ Finset.univ.filter (fun x => c x = q ∧ s x = true), n x)
-        (∑ x ∈ Finset.univ.filter (fun x => c x = q ∧ s x = false), n x) +
-        if c l = q then 1 else 0 := by
+theorem pairMin_step
+    (c : ι → π) (s : ι → Bool)
+    (n : ι →₀ ℕ)
+    (l l' : ι) (hc : c l = c l') (hs : s l = true) (hs' : s l' = false)
+    : pairMin c s (n + Finsupp.single l 1 + Finsupp.single l' 1) = pairMin c s n + 1 := by
+  have key
+      : ∀ q : π,
+        min
+            (∑ x ∈ Finset.univ.filter (fun x => c x = q ∧ s x = true),
+              (n + Finsupp.single l 1 + Finsupp.single l' 1 : ι →₀ ℕ) x)
+            (∑ x ∈ Finset.univ.filter (fun x => c x = q ∧ s x = false),
+              (n + Finsupp.single l 1 + Finsupp.single l' 1 : ι →₀ ℕ) x)
+          = min (∑ x ∈ Finset.univ.filter (fun x => c x = q ∧ s x = true), n x)
+              (∑ x ∈ Finset.univ.filter (fun x => c x = q ∧ s x = false), n x)
+            + if c l = q then 1 else 0 := by
     intro q
     classical
     simp only [Finsupp.add_apply, Finset.sum_add_distrib, Finsupp.single_apply, Finset.sum_ite_eq,
@@ -103,13 +116,16 @@ theorem pairMin_step (c : ι → π) (s : ι → Bool) (n : ι →₀ ℕ) (l l'
   rw [Finset.sum_congr rfl (fun q _ => key q), Finset.sum_add_distrib, Finset.sum_ite_eq]
   simp
 
-theorem secondOrder_support (c : ι → π) (s : ι → Bool) (κ : ι → ι → k)
-    (hκ : ∀ l l', κ l l' ≠ 0 → c l = c l' ∧ s l = true ∧ s l' = false) (Q : MvPolynomial ι k) (p j : ℕ)
-    (hQ : ∀ n ∈ Q.support, pairMin c s n + j ≤ p) :
-    ∀ n ∈ (secondOrder k κ Q).support, pairMin c s n + (j + 1) ≤ p := by
+theorem secondOrder_support
+    (c : ι → π) (s : ι → Bool) (κ : ι → ι → k)
+    (hκ : ∀ l l', κ l l' ≠ 0 → c l = c l' ∧ s l = true ∧ s l' = false)
+    (Q : MvPolynomial ι k) (p j : ℕ) (hQ : ∀ n ∈ Q.support, pairMin c s n + j ≤ p)
+    : ∀ n ∈ (secondOrder k κ Q).support, pairMin c s n + (j + 1) ≤ p := by
   intro n hn
   rw [MvPolynomial.mem_support_iff] at hn
-  have h1 : AddMonoidAlgebra.coeff (secondOrder k κ Q) n = ∑ l, ∑ l', κ l l' * AddMonoidAlgebra.coeff (pderiv l (pderiv l' Q)) n := by
+  have h1
+      : AddMonoidAlgebra.coeff (secondOrder k κ Q) n
+        = ∑ l, ∑ l', κ l l' * AddMonoidAlgebra.coeff (pderiv l (pderiv l' Q)) n := by
     rw [show secondOrder k κ Q = ∑ l, ∑ l', C (κ l l') * pderiv l (pderiv l' Q) from rfl]
     simp only [MvPolynomial.coeff_sum, MvPolynomial.coeff_C_mul]
   rw [h1] at hn
@@ -128,10 +144,12 @@ theorem secondOrder_support (c : ι → π) (s : ι → Bool) (κ : ι → ι �
   rw [pairMin_step c s n l l' hcl hsl hsl'] at h2
   omega
 
-theorem secondOrder_iterate_eq_zero (c : ι → π) (s : ι → Bool) (κ : ι → ι → k)
-    (hκ : ∀ l l', κ l l' ≠ 0 → c l = c l' ∧ s l = true ∧ s l' = false) (P : MvPolynomial ι k) (e : ℕ)
-    (hP : ∀ n ∈ P.support, pairMin c s n ≤ e) (j : ℕ) (hj : e < j) :
-    (secondOrder k κ)^[j] P = 0 := by
+theorem secondOrder_iterate_eq_zero
+    (c : ι → π) (s : ι → Bool) (κ : ι → ι → k)
+    (hκ : ∀ l l', κ l l' ≠ 0 → c l = c l' ∧ s l = true ∧ s l' = false)
+    (P : MvPolynomial ι k) (e : ℕ) (hP : ∀ n ∈ P.support, pairMin c s n ≤ e)
+    (j : ℕ) (hj : e < j)
+    : (secondOrder k κ)^[j] P = 0 := by
   have h : ∀ t, ∀ n ∈ ((secondOrder k κ)^[t] P).support, pairMin c s n + t ≤ e := by
     intro t
     induction t with

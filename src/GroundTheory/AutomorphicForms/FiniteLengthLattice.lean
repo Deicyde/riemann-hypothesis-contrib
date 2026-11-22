@@ -19,9 +19,9 @@ def HasFiniteLength (ρ : Representation ℂ G V) : Prop :=
 
 variable {ρ : Representation ℂ G V}
 
-theorem hasFiniteLength_iff :
-    HasFiniteLength ρ ↔
-      WellFoundedLT (Subrepresentation ρ) ∧ WellFoundedGT (Subrepresentation ρ) := by
+theorem hasFiniteLength_iff
+    : HasFiniteLength ρ
+      ↔ WellFoundedLT (Subrepresentation ρ) ∧ WellFoundedGT (Subrepresentation ρ) := by
   rw [HasFiniteLength, isFiniteLength_iff_isNoetherian_isArtinian, isNoetherian_iff, IsArtinian]
   let e := Subrepresentation.subrepresentationSubmoduleOrderIso (ρ := ρ)
   constructor
@@ -30,17 +30,19 @@ theorem hasFiniteLength_iff :
   · rintro ⟨h1, h2⟩
     exact ⟨e.symm.strictMono.wellFoundedGT, e.symm.strictMono.wellFoundedLT⟩
 
-theorem HasFiniteLength.wellFoundedLT (h : HasFiniteLength ρ) :
-    WellFoundedLT (Subrepresentation ρ) :=
+theorem HasFiniteLength.wellFoundedLT (h : HasFiniteLength ρ)
+    : WellFoundedLT (Subrepresentation ρ) :=
   (hasFiniteLength_iff.1 h).1
 
-theorem HasFiniteLength.wellFoundedGT (h : HasFiniteLength ρ) :
-    WellFoundedGT (Subrepresentation ρ) :=
+theorem HasFiniteLength.wellFoundedGT (h : HasFiniteLength ρ)
+    : WellFoundedGT (Subrepresentation ρ) :=
   (hasFiniteLength_iff.1 h).2
 
-theorem hasFiniteLength_of_strictMono {ι : Type*} [Finite ι] {α : ι → Type*}
-    [∀ i, PartialOrder (α i)] [∀ i, WellFoundedLT (α i)] [∀ i, WellFoundedGT (α i)]
-    (Λ : Subrepresentation ρ → ∀ i, α i) (hΛ : StrictMono Λ) : HasFiniteLength ρ := by
+theorem hasFiniteLength_of_strictMono
+    {ι : Type*} [Finite ι]
+    {α : ι → Type*} [∀ i, PartialOrder (α i)] [∀ i, WellFoundedLT (α i)] [∀ i, WellFoundedGT (α i)]
+    (Λ : Subrepresentation ρ → ∀ i, α i) (hΛ : StrictMono Λ)
+    : HasFiniteLength ρ := by
   rw [hasFiniteLength_iff]
   refine ⟨hΛ.wellFoundedLT, ?_⟩
   have h1 : WellFoundedLT (∀ i, (α i)ᵒᵈ) := Pi.wellFoundedLT
@@ -61,15 +63,16 @@ section MapComap
 
 variable {W : Type*} [AddCommGroup W] [Module ℂ W] {σ : Representation ℂ G W}
 
-def subrepMap (f : Representation.IntertwiningMap ρ σ) (A : Subrepresentation ρ) :
-    Subrepresentation σ where
+def subrepMap (f : Representation.IntertwiningMap ρ σ) (A : Subrepresentation ρ)
+    : Subrepresentation σ where
   toSubmodule := A.toSubmodule.map f.toLinearMap
   apply_mem_toSubmodule g := by
     rintro _ ⟨x, hx, rfl⟩
-    exact ⟨ρ g x, A.apply_mem_toSubmodule g hx, Representation.IntertwiningMap.isIntertwining _ _ f g x⟩
+    exact
+      ⟨ρ g x, A.apply_mem_toSubmodule g hx, Representation.IntertwiningMap.isIntertwining _ _ f g x⟩
 
-def subrepComap (f : Representation.IntertwiningMap ρ σ) (B : Subrepresentation σ) :
-    Subrepresentation ρ where
+def subrepComap (f : Representation.IntertwiningMap ρ σ) (B : Subrepresentation σ)
+    : Subrepresentation ρ where
   toSubmodule := B.toSubmodule.comap f.toLinearMap
   apply_mem_toSubmodule g x hx := by
     show f (ρ g x) ∈ B.toSubmodule
@@ -82,12 +85,15 @@ theorem subrepMap_mono (f : Representation.IntertwiningMap ρ σ) : Monotone (su
 theorem subrepComap_mono (f : Representation.IntertwiningMap ρ σ) : Monotone (subrepComap f) :=
   fun _ _ h _ hx => h hx
 
-theorem hasFiniteLength_of_injective (f : Representation.IntertwiningMap ρ σ)
-    (hf : Injective f) (hσ : HasFiniteLength σ) : HasFiniteLength ρ := by
+theorem hasFiniteLength_of_injective
+    (f : Representation.IntertwiningMap ρ σ) (hf : Injective f) (hσ : HasFiniteLength σ)
+    : HasFiniteLength ρ := by
   have := hσ.wellFoundedLT
   have := hσ.wellFoundedGT
-  refine hasFiniteLength_of_strictMono (ι := Unit) (α := fun _ => Subrepresentation σ)
-    (fun A _ => subrepMap f A) fun A B hAB => ?_
+  refine hasFiniteLength_of_strictMono (ι := Unit)
+    (α := fun _ => Subrepresentation σ)
+    (fun A _ => subrepMap f A)
+    fun A B hAB => ?_
   refine lt_of_le_of_ne (fun _ => subrepMap_mono f hAB.le) fun h => hAB.ne ?_
   have h1 := congrFun h ()
   refine le_antisymm hAB.le fun x hx => ?_
@@ -98,12 +104,15 @@ theorem hasFiniteLength_of_injective (f : Representation.IntertwiningMap ρ σ)
   rw [← hf hyx]
   exact hy
 
-theorem hasFiniteLength_of_surjective (f : Representation.IntertwiningMap ρ σ)
-    (hf : Surjective f) (hρ : HasFiniteLength ρ) : HasFiniteLength σ := by
+theorem hasFiniteLength_of_surjective
+    (f : Representation.IntertwiningMap ρ σ) (hf : Surjective f) (hρ : HasFiniteLength ρ)
+    : HasFiniteLength σ := by
   have := hρ.wellFoundedLT
   have := hρ.wellFoundedGT
-  refine hasFiniteLength_of_strictMono (ι := Unit) (α := fun _ => Subrepresentation ρ)
-    (fun B _ => subrepComap f B) fun A B hAB => ?_
+  refine hasFiniteLength_of_strictMono (ι := Unit)
+    (α := fun _ => Subrepresentation ρ)
+    (fun B _ => subrepComap f B)
+    fun A B hAB => ?_
   refine lt_of_le_of_ne (fun _ => subrepComap_mono f hAB.le) fun h => hAB.ne ?_
   have h1 := congrFun h ()
   refine le_antisymm hAB.le fun y hy => ?_
@@ -116,23 +125,28 @@ end MapComap
 
 section Filtration
 
-theorem hasFiniteLength_of_filtration {k : ℕ} (Vf : ℕ → Submodule ℂ V)
-    (hV : ∀ i (g : G), Vf i ≤ (Vf i).comap (ρ g)) (h0 : Vf 0 = ⊥) (hk : Vf k = ⊤)
+theorem hasFiniteLength_of_filtration
+    {k : ℕ} (Vf : ℕ → Submodule ℂ V) (hV : ∀ i (g : G), Vf i ≤ (Vf i).comap (ρ g)) (h0 : Vf 0 = ⊥)
+    (hk : Vf k = ⊤)
     {W : Fin k → Type*} [∀ j, AddCommGroup (W j)] [∀ j, Module ℂ (W j)]
     (σ : ∀ j, Representation ℂ G (W j))
-    (Ψ : ∀ j : Fin k, Representation.IntertwiningMap (ρ.subrepresentation (Vf (j + 1)) (hV (j + 1)))
-      (σ j))
-    (hΨ : ∀ (j : Fin k) x, Ψ j x = 0 ↔ (x : V) ∈ Vf j) (hσ : ∀ j, HasFiniteLength (σ j)) :
-    HasFiniteLength ρ := by
+    (Ψ : ∀ j : Fin k,
+      Representation.IntertwiningMap (ρ.subrepresentation (Vf (j + 1)) (hV (j + 1))) (σ j))
+    (hΨ : ∀ (j : Fin k) x, Ψ j x = 0 ↔ (x : V) ∈ Vf j) (hσ : ∀ j, HasFiniteLength (σ j))
+    : HasFiniteLength ρ := by
   classical
   have := fun j => (hσ j).wellFoundedLT
   have := fun j => (hσ j).wellFoundedGT
 
-  let cut : ∀ j : Fin k, Subrepresentation ρ →
-      Subrepresentation (ρ.subrepresentation (Vf (j + 1)) (hV (j + 1))) := fun j A =>
+  let cut
+      : ∀ j : Fin k,
+        Subrepresentation ρ
+          → Subrepresentation (ρ.subrepresentation (Vf (j + 1)) (hV (j + 1))) := fun j A =>
     ⟨A.toSubmodule.comap (Vf (j + 1)).subtype, fun g x hx => A.apply_mem_toSubmodule g hx⟩
-  refine hasFiniteLength_of_strictMono (α := fun j => Subrepresentation (σ j))
-    (fun A j => subrepMap (Ψ j) (cut j A)) fun A B hAB => ?_
+  refine hasFiniteLength_of_strictMono
+    (α := fun j => Subrepresentation (σ j))
+    (fun A j => subrepMap (Ψ j) (cut j A))
+    fun A B hAB => ?_
   have hmono' : ∀ j, subrepMap (Ψ j) (cut j A) ≤ subrepMap (Ψ j) (cut j B) := fun j =>
     subrepMap_mono _ (fun x hx => hAB.le hx)
   rw [Pi.lt_def]
@@ -166,16 +180,16 @@ theorem hasFiniteLength_of_filtration {k : ℕ} (Vf : ℕ → Submodule ℂ V)
   refine ⟨⟨j₀, hj₀k⟩, lt_of_le_of_ne (hmono' _) fun heq => hxA ?_⟩
   have hmem : Ψ ⟨j₀, hj₀k⟩ ⟨x, hxV⟩ ∈ subrepMap (Ψ ⟨j₀, hj₀k⟩) (cut ⟨j₀, hj₀k⟩ B) :=
     ⟨⟨x, hxV⟩, hxB, rfl⟩
-  have heq' : subrepMap (Ψ ⟨j₀, hj₀k⟩) (cut ⟨j₀, hj₀k⟩ A) =
-      subrepMap (Ψ ⟨j₀, hj₀k⟩) (cut ⟨j₀, hj₀k⟩ B) := heq
+  have heq'
+      : subrepMap (Ψ ⟨j₀, hj₀k⟩) (cut ⟨j₀, hj₀k⟩ A) = subrepMap (Ψ ⟨j₀, hj₀k⟩) (cut ⟨j₀, hj₀k⟩ B) :=
+    heq
   rw [← heq'] at hmem
   obtain ⟨y, hyA, hyx⟩ := hmem
   have hyx' : Ψ ⟨j₀, hj₀k⟩ y = Ψ ⟨j₀, hj₀k⟩ ⟨x, hxV⟩ := hyx
   have hd : Ψ ⟨j₀, hj₀k⟩ (⟨x, hxV⟩ - y) = 0 := by rw [map_sub, hyx', sub_self]
   rw [hΨ] at hd
   have hyA' : (y : V) ∈ A := hyA
-  have hdB : ((⟨x, hxV⟩ - y : Vf (j₀ + 1)) : V) ∈ B :=
-    B.toSubmodule.sub_mem hxB (hAB.le hyA')
+  have hdB : ((⟨x, hxV⟩ - y : Vf (j₀ + 1)) : V) ∈ B := B.toSubmodule.sub_mem hxB (hAB.le hyA')
   have := hbelow _ hdB hd
   have hx' : x = ((⟨x, hxV⟩ - y : Vf (j₀ + 1)) : V) + y := by simp
   rw [hx']

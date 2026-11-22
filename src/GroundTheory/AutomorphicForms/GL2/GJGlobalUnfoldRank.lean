@@ -21,16 +21,18 @@ def U0 : Submodule K (Fin n → K) := by
 
 variable {k}
 
-theorem single_mem_U0 {j : Fin n} (hj : (j : ℕ) < k) (c : K) : (Pi.single j c : Fin n → K) ∈ U0 k := by
+theorem single_mem_U0 {j : Fin n} (hj : (j : ℕ) < k) (c : K)
+    : (Pi.single j c : Fin n → K) ∈ U0 k := by
   intro i hi
   rw [Pi.single_apply, if_neg (by rintro rfl; omega)]
 
 theorem finrank_U0 (hk : k ≤ n) : finrank K (U0 (K := K) (n := n) k) = k := by
   classical
-  let f : (Fin k → K) →ₗ[K] (Fin n → K) :=
-    { toFun := fun w i => if h : (i : ℕ) < k then w ⟨i, h⟩ else 0
-      map_add' := fun a b => by funext i; by_cases h : (i : ℕ) < k <;> simp [h]
-      map_smul' := fun c a => by funext i; by_cases h : (i : ℕ) < k <;> simp [h] }
+  let f : (Fin k → K) →ₗ[K] (Fin n → K) := {
+    toFun := fun w i => if h : (i : ℕ) < k then w ⟨i, h⟩ else 0
+    map_add' := fun a b => by funext i; by_cases h : (i : ℕ) < k <;> simp [h]
+    map_smul' := fun c a => by funext i; by_cases h : (i : ℕ) < k <;> simp [h]
+  }
   have hinj : Injective f := by
     intro a b hab
     funext j
@@ -51,8 +53,8 @@ theorem finrank_U0 (hk : k ≤ n) : finrank K (U0 (K := K) (n := n) k) = k := by
 def IsBlockUpper (k : ℕ) (M : Matrix (Fin n) (Fin n) K) : Prop :=
   ∀ i j : Fin n, k ≤ (i : ℕ) → (j : ℕ) < k → M i j = 0
 
-theorem isBlockUpper_iff {M : Matrix (Fin n) (Fin n) K} :
-    IsBlockUpper k M ↔ ∀ v ∈ U0 k, M.mulVec v ∈ U0 k := by
+theorem isBlockUpper_iff {M : Matrix (Fin n) (Fin n) K}
+    : IsBlockUpper k M ↔ ∀ v ∈ U0 k, M.mulVec v ∈ U0 k := by
   classical
   constructor
   · intro hM v hv i hi
@@ -65,11 +67,11 @@ theorem isBlockUpper_iff {M : Matrix (Fin n) (Fin n) K} :
     have := h _ (single_mem_U0 hj 1) i hi
     simpa [Matrix.mulVec_single_one] using this
 
-
 variable (k) in
 def parabolic (k : ℕ) : Subgroup (GL (Fin n) K) where
-  carrier := {γ | IsBlockUpper k (γ : Matrix (Fin n) (Fin n) K) ∧
-    IsBlockUpper k ((γ⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)}
+  carrier :=
+    {γ | IsBlockUpper k (γ : Matrix (Fin n) (Fin n) K) ∧
+      IsBlockUpper k ((γ⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)}
   mul_mem' := by
     rintro a b ⟨ha1, ha2⟩ ⟨hb1, hb2⟩
     rw [isBlockUpper_iff] at ha1 ha2 hb1 hb2
@@ -79,37 +81,37 @@ def parabolic (k : ℕ) : Subgroup (GL (Fin n) K) where
     · rw [mul_inv_rev, Units.val_mul, ← Matrix.mulVec_mulVec]
       exact hb2 _ (ha2 v hv)
   one_mem' := by
-    refine ⟨fun i j hi hj => ?_, fun i j hi hj => ?_⟩ <;>
-    · simp only [inv_one, Units.val_one]
-      rw [Matrix.one_apply, if_neg (by intro h; subst h; omega)]
+    refine ⟨fun i j hi hj => ?_, fun i j hi hj => ?_⟩
+      <;> · simp only [inv_one, Units.val_one]
+            rw [Matrix.one_apply, if_neg (by intro h; subst h; omega)]
   inv_mem' := by
     rintro a ⟨h1, h2⟩
     exact ⟨h2, by simpa using h1⟩
 
-theorem mulVec_mem_U0_iff {p : GL (Fin n) K} (hp : p ∈ parabolic k) (v : Fin n → K) :
-    (p : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k ↔ v ∈ U0 k := by
+theorem mulVec_mem_U0_iff {p : GL (Fin n) K} (hp : p ∈ parabolic k) (v : Fin n → K)
+    : (p : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k ↔ v ∈ U0 k := by
   constructor
   · intro h
     have := (isBlockUpper_iff.1 hp.2) _ h
-    rwa [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one,
-      Matrix.one_mulVec] at this
+    rwa [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec] at
+      this
   · exact fun h => isBlockUpper_iff.1 hp.1 v h
 
-def kerM (Z : Matrix (Fin n) (Fin n) K) : Submodule K (Fin n → K) :=
-  LinearMap.ker Z.mulVecLin
+def kerM (Z : Matrix (Fin n) (Fin n) K) : Submodule K (Fin n → K) := LinearMap.ker Z.mulVecLin
 
 theorem mem_kerM {Z : Matrix (Fin n) (Fin n) K} {v : Fin n → K} : v ∈ kerM Z ↔ Z.mulVec v = 0 :=
   Iff.rfl
 
-theorem kerM_mul (Z : Matrix (Fin n) (Fin n) K) (γ : GL (Fin n) K) (v : Fin n → K) :
-    v ∈ kerM (Z * (γ : Matrix (Fin n) (Fin n) K)) ↔ (γ : Matrix (Fin n) (Fin n) K).mulVec v ∈ kerM Z := by
+theorem kerM_mul (Z : Matrix (Fin n) (Fin n) K) (γ : GL (Fin n) K) (v : Fin n → K)
+    : v ∈ kerM (Z * (γ : Matrix (Fin n) (Fin n) K))
+      ↔ (γ : Matrix (Fin n) (Fin n) K).mulVec v ∈ kerM Z := by
   rw [mem_kerM, mem_kerM, ← Matrix.mulVec_mulVec]
 
 theorem rank_add_finrank_kerM (Z : Matrix (Fin n) (Fin n) K) : Z.rank + finrank K (kerM Z) = n := by
   rw [Matrix.rank, kerM, LinearMap.finrank_range_add_finrank_ker, finrank_fin_fun]
 
-theorem U0_le_kerM_iff {Z : Matrix (Fin n) (Fin n) K} :
-    U0 k ≤ kerM Z ↔ ∀ i j : Fin n, (j : ℕ) < k → Z i j = 0 := by
+theorem U0_le_kerM_iff {Z : Matrix (Fin n) (Fin n) K}
+    : U0 k ≤ kerM Z ↔ ∀ i j : Fin n, (j : ℕ) < k → Z i j = 0 := by
   classical
   constructor
   · intro h i j hj
@@ -124,7 +126,6 @@ theorem U0_le_kerM_iff {Z : Matrix (Fin n) (Fin n) K} :
     by_cases hj : (j : ℕ) < k
     · rw [h i j hj, zero_mul]
     · rw [hv j (not_lt.1 hj), mul_zero]
-
 
 variable (k) in
 def R (k : ℕ) : Set (Matrix (Fin n) (Fin n) K) :=
@@ -142,8 +143,8 @@ theorem mem_R_iff (hk : k ≤ n) {Z : Matrix (Fin n) (Fin n) K} : Z ∈ R k ↔ 
     rw [h, finrank_U0 hk] at hsum
     omega
 
-theorem exists_GL_map_eq (hk : k ≤ n) {W : Submodule K (Fin n → K)} (hW : finrank K W = k) :
-    ∃ δ : GL (Fin n) K, ∀ v, v ∈ W ↔ (δ : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k := by
+theorem exists_GL_map_eq (hk : k ≤ n) {W : Submodule K (Fin n → K)} (hW : finrank K W = k)
+    : ∃ δ : GL (Fin n) K, ∀ v, v ∈ W ↔ (δ : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k := by
   obtain ⟨C, hC⟩ := W.exists_isCompl
   obtain ⟨C', hC'⟩ := (U0 (K := K) (n := n) k).exists_isCompl
   have h1 : finrank K W = finrank K (U0 (K := K) (n := n) k) := by rw [hW, finrank_U0 hk]
@@ -152,13 +153,14 @@ theorem exists_GL_map_eq (hk : k ≤ n) {W : Submodule K (Fin n → K)} (hW : fi
     have b := Submodule.finrank_add_eq_of_isCompl hC'
     omega
   let e : (Fin n → K) ≃ₗ[K] (Fin n → K) :=
-    (Submodule.prodEquivOfIsCompl W C hC).symm ≪≫ₗ
-      ((LinearEquiv.ofFinrankEq W (U0 k) h1).prodCongr (LinearEquiv.ofFinrankEq C C' h2)) ≪≫ₗ
-      Submodule.prodEquivOfIsCompl (U0 k) C' hC'
+    (Submodule.prodEquivOfIsCompl W C hC).symm
+      ≪≫ₗ ((LinearEquiv.ofFinrankEq W (U0 k) h1).prodCongr (LinearEquiv.ofFinrankEq C C' h2))
+      ≪≫ₗ Submodule.prodEquivOfIsCompl (U0 k) C' hC'
   have he : ∀ v, v ∈ W ↔ e v ∈ U0 k := by
     intro v
     obtain ⟨⟨w, c⟩, rfl⟩ := (Submodule.prodEquivOfIsCompl W C hC).surjective v
-    simp only [e, LinearEquiv.trans_apply, LinearEquiv.symm_apply_apply, LinearEquiv.prodCongr_apply]
+    simp only [e, LinearEquiv.trans_apply, LinearEquiv.symm_apply_apply,
+      LinearEquiv.prodCongr_apply]
     simp only [Submodule.coe_prodEquivOfIsCompl']
     constructor
     · intro hv
@@ -188,55 +190,66 @@ theorem exists_GL_map_eq (hk : k ≤ n) {W : Submodule K (Fin n → K)} (hW : fi
   let B := LinearMap.toMatrix' (e.symm : (Fin n → K) →ₗ[K] (Fin n → K))
   have hAB : A * B = 1 := by
     simp only [A, B, ← LinearMap.toMatrix'_comp]
-    rw [show ((e : (Fin n → K) →ₗ[K] (Fin n → K)).comp (e.symm : (Fin n → K) →ₗ[K] (Fin n → K))) =
-      LinearMap.id from by ext; simp]
+    rw [show ((e : (Fin n → K) →ₗ[K] (Fin n → K)).comp (e.symm : (Fin n → K) →ₗ[K] (Fin n → K)))
+        = LinearMap.id from by
+      ext; simp]
     exact LinearMap.toMatrix'_id
   have hBA : B * A = 1 := by
     simp only [A, B, ← LinearMap.toMatrix'_comp]
-    rw [show ((e.symm : (Fin n → K) →ₗ[K] (Fin n → K)).comp (e : (Fin n → K) →ₗ[K] (Fin n → K))) =
-      LinearMap.id from by ext; simp]
+    rw [show ((e.symm : (Fin n → K) →ₗ[K] (Fin n → K)).comp (e : (Fin n → K) →ₗ[K] (Fin n → K)))
+        = LinearMap.id from by
+      ext; simp]
     exact LinearMap.toMatrix'_id
   refine ⟨⟨A, B, hAB, hBA⟩, fun v => ?_⟩
   show v ∈ W ↔ A.mulVec v ∈ U0 k
   rw [LinearMap.toMatrix'_mulVec]
   exact he v
 
-theorem rank_mul_GL (Z : Matrix (Fin n) (Fin n) K) (γ : GL (Fin n) K) :
-    (Z * (γ : Matrix (Fin n) (Fin n) K)).rank = Z.rank :=
+theorem rank_mul_GL (Z : Matrix (Fin n) (Fin n) K) (γ : GL (Fin n) K)
+    : (Z * (γ : Matrix (Fin n) (Fin n) K)).rank = Z.rank :=
   Matrix.rank_mul_eq_left_of_isUnit_det _ _ (Matrix.isUnits_det_units γ)
 
-
 variable (k) in
-def mulMap (k : ℕ) (S : Set (GL (Fin n) K)) (x : S × R (K := K) (n := n) k) :
-    {ξ : Matrix (Fin n) (Fin n) K // ξ.rank = n - k} :=
+def mulMap (k : ℕ) (S : Set (GL (Fin n) K)) (x : S × R (K := K) (n := n) k)
+    : {ξ : Matrix (Fin n) (Fin n) K // ξ.rank = n - k} :=
   ⟨x.2.1 * ((x.1 : GL (Fin n) K) : Matrix (Fin n) (Fin n) K), by rw [rank_mul_GL]; exact x.2.2.2⟩
 
-theorem bijective_mulMap (hk : k ≤ n) {S : Set (GL (Fin n) K)}
-    (hS : ∀ γ₀ : GL (Fin n) K, ∃! p : parabolic (K := K) (n := n) k, (p : GL (Fin n) K) * γ₀ ∈ S) :
-    Bijective (mulMap k S) := by
+theorem bijective_mulMap
+    (hk : k ≤ n)
+    {S : Set (GL (Fin n) K)}
+    (hS : ∀ γ₀ : GL (Fin n) K, ∃! p : parabolic (K := K) (n := n) k, (p : GL (Fin n) K) * γ₀ ∈ S)
+    : Bijective (mulMap k S) := by
   constructor
   · rintro ⟨⟨γ, hγ⟩, ⟨Z, hZ⟩⟩ ⟨⟨γ', hγ'⟩, ⟨Z', hZ'⟩⟩ h
     have hξ : Z * (γ : Matrix (Fin n) (Fin n) K) = Z' * (γ' : Matrix (Fin n) (Fin n) K) :=
       congrArg Subtype.val h
     have hZk := (mem_R_iff hk).1 hZ
     have hZk' := (mem_R_iff hk).1 hZ'
-    have hker : ∀ v, (γ : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k ↔
-        (γ' : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k := by
+    have hker
+        : ∀ v,
+          (γ : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k
+            ↔ (γ' : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k := by
       intro v
-      have e1 : (γ : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k ↔
-          v ∈ kerM (Z * (γ : Matrix (Fin n) (Fin n) K)) := by rw [kerM_mul, hZk]
-      have e2 : (γ' : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k ↔
-          v ∈ kerM (Z' * (γ' : Matrix (Fin n) (Fin n) K)) := by rw [kerM_mul, hZk']
+      have e1
+          : (γ : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k
+            ↔ v ∈ kerM (Z * (γ : Matrix (Fin n) (Fin n) K)) := by
+        rw [kerM_mul, hZk]
+      have e2
+          : (γ' : Matrix (Fin n) (Fin n) K).mulVec v ∈ U0 k
+            ↔ v ∈ kerM (Z' * (γ' : Matrix (Fin n) (Fin n) K)) := by
+        rw [kerM_mul, hZk']
       rw [e1, e2, hξ]
     have hp : γ' * γ⁻¹ ∈ parabolic k := by
       refine ⟨isBlockUpper_iff.2 fun v hv => ?_, isBlockUpper_iff.2 fun v hv => ?_⟩
       · have := (hker (((γ⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).mulVec v)).1
         rw [Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec,
-          Matrix.mulVec_mulVec, ← Units.val_mul] at this
+            Matrix.mulVec_mulVec, ← Units.val_mul]
+          at this
         exact this hv
       · have := (hker (((γ'⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).mulVec v)).2
         rw [Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec,
-          Matrix.mulVec_mulVec, ← Units.val_mul] at this
+            Matrix.mulVec_mulVec, ← Units.val_mul]
+          at this
         rw [mul_inv_rev, inv_inv]
         exact this hv
     obtain ⟨p₀, -, hp₀⟩ := hS γ
@@ -256,9 +269,16 @@ theorem bijective_mulMap (hk : k ≤ n) {S : Set (GL (Fin n) K)}
       omega
     obtain ⟨δ, hδ⟩ := exists_GL_map_eq hk hW
     obtain ⟨p, hp, -⟩ := hS δ
-    refine ⟨(⟨(p : GL (Fin n) K) * δ, hp⟩,
-      ⟨ξ * ((((p : GL (Fin n) K) * δ)⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K),
-        (mem_R_iff hk).2 ?_⟩), ?_⟩
+    refine ⟨
+      (
+        ⟨(p : GL (Fin n) K) * δ, hp⟩,
+        ⟨
+          ξ * ((((p : GL (Fin n) K) * δ)⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K),
+          (mem_R_iff hk).2 ?_
+        ⟩
+      ),
+      ?_
+    ⟩
     · ext v
       rw [kerM_mul, hδ, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_rev, ← mul_assoc,
         mul_inv_cancel, one_mul, mulVec_mem_U0_iff (inv_mem p.2)]

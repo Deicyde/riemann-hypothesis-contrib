@@ -27,26 +27,28 @@ theorem lw_cast_succ (l d : ℕ) (s : ZMod d) : ((lw l s : ℤ) : ZMod (l + 1)) 
       Odd.neg_one_pow (Nat.odd_iff.mpr (by omega))]
     ring
 
-theorem succ_dvd_total {l d : ℕ} (hl : 1 ≤ l) (hd : Even d) {ι : Type*} (n : ι →₀ ℕ)
-    (f : ι → ZMod d)
-    (h : ((l ^ d - 1 : ℕ) : ℤ) ∣ ∑ x ∈ n.support, (n x : ℤ) * lw l (f x)) :
-    ((l + 1 : ℕ) : ℤ) ∣ ∑ x ∈ n.support, (n x : ℤ) := by
+theorem succ_dvd_total
+    {l d : ℕ} (hl : 1 ≤ l) (hd : Even d)
+    {ι : Type*} (n : ι →₀ ℕ) (f : ι → ZMod d)
+    (h : ((l ^ d - 1 : ℕ) : ℤ) ∣ ∑ x ∈ n.support, (n x : ℤ) * lw l (f x))
+    : ((l + 1 : ℕ) : ℤ) ∣ ∑ x ∈ n.support, (n x : ℤ) := by
   have hl' : ((l : ℕ) : ZMod (l + 1)) = -1 := by
     have h : ((l + 1 : ℕ) : ZMod (l + 1)) = 0 := ZMod.natCast_self _
     rw [Nat.cast_add, Nat.cast_one] at h
     linear_combination h
   have h1 : ((l ^ d - 1 : ℕ) : ZMod (l + 1)) = 0 := by
-    rw [Nat.cast_sub (Nat.one_le_pow _ _ (by omega)), Nat.cast_pow, hl', hd.neg_one_pow, Nat.cast_one,
-      sub_self]
+    rw [Nat.cast_sub (Nat.one_le_pow _ _ (by omega)), Nat.cast_pow, hl', hd.neg_one_pow,
+      Nat.cast_one, sub_self]
   obtain ⟨c, hc⟩ := h
   rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]
   have h2 := congrArg (fun z : ℤ => (z : ZMod (l + 1))) hc
-  simp only [Int.cast_mul, Int.cast_sum, Int.cast_natCast, lw_cast_succ, mul_one, h1, zero_mul] at h2
+  simp only [Int.cast_mul, Int.cast_sum, Int.cast_natCast, lw_cast_succ, mul_one, h1, zero_mul]
+    at h2
   rw [Int.cast_sum]
   simpa only [Int.cast_natCast] using h2
 
-theorem dot_const_wt {ι : Type*} (n : ι →₀ ℕ) (c : ℝ) :
-    dot n (fun _ => c) = (∑ x ∈ n.support, (n x : ℝ)) * c := by
+theorem dot_const_wt {ι : Type*} (n : ι →₀ ℕ) (c : ℝ)
+    : dot n (fun _ => c) = (∑ x ∈ n.support, (n x : ℝ)) * c := by
   simp only [dot, Finsupp.sum, Finset.sum_mul]
 
 theorem weightQuantization : Quant.{u} := by
@@ -102,8 +104,9 @@ theorem weightQuantization : Quant.{u} := by
   have e3 : ((l : ℝ) + 1) * m * ρ = q * m := by linear_combination m * e1
   linarith
 
-private theorem cancel_lemma {d : ℕ} {s s' : ZMod d} {a i : ℕ}
-    (h : s + ((a + i : ℕ) : ZMod d) = s' + (a : ZMod d)) : s + (i : ZMod d) = s' := by
+private theorem cancel_lemma
+    {d : ℕ} {s s' : ZMod d} {a i : ℕ} (h : s + ((a + i : ℕ) : ZMod d) = s' + (a : ZMod d))
+    : s + (i : ZMod d) = s' := by
   rw [Nat.cast_add] at h
   linear_combination h
 
@@ -115,8 +118,10 @@ private theorem odd_of_odd_self_add_add {a i : ℕ} (h : Odd (a + (a + i))) : Od
   obtain ⟨k, hk⟩ := h
   exact ⟨k - a, by omega⟩
 
-private theorem exists_dTop_eq_le_of_odd_of_mem {d : ℕ} [NeZero d] {TT : Finset (ZMod d)} {s : ZMod d} {i : ℕ} (hi : Odd i)
-    (hm : s + (i : ZMod d) ∈ TT) : ∃ e : ℕ, dTop d TT s = e ∧ e ≤ i := by
+private theorem exists_dTop_eq_le_of_odd_of_mem
+    {d : ℕ} [NeZero d]
+    {TT : Finset (ZMod d)} {s : ZMod d} {i : ℕ} (hi : Odd i) (hm : s + (i : ZMod d) ∈ TT)
+    : ∃ e : ℕ, dTop d TT s = e ∧ e ≤ i := by
   have hle : dTop d TT s ≤ (i : ℕ∞) := by
     unfold dTop
     exact iInf₂_le i ⟨hi, hm⟩
@@ -140,9 +145,12 @@ theorem dualRadiiInequalities : ThmARadii := by
       have hD := hdual s i hi
       rw [hs] at hD
       have hb : (1 : ℝ) ≤ (l : ℝ) ^ β := one_le_pow₀ hL
-      calc (1 : ℝ) ≤ (l : ℝ) ^ β := hb
+      calc
+        (1 : ℝ)
+          ≤ (l : ℝ) ^ β := hb
         _ = (l : ℝ) ^ β * 1 := (mul_one _).symm
-        _ ≤ (l : ℝ) ^ β * ((l : ℝ) ^ i * sig s + sig s') := mul_le_mul_of_nonneg_left hD (by positivity)
+        _ ≤ (l : ℝ) ^ β * ((l : ℝ) ^ i * sig s + sig s') :=
+          mul_le_mul_of_nonneg_left hD (by positivity)
         _ = (l : ℝ) ^ β * (l : ℝ) ^ i * sig s + (l : ℝ) ^ β * sig s' := by ring
         _ ≤ (l : ℝ) ^ β * (l : ℝ) ^ i * τ + (l : ℝ) ^ β * τ' :=
           add_le_add (mul_le_mul_of_nonneg_left hτ (by positivity))
@@ -154,9 +162,12 @@ theorem dualRadiiInequalities : ThmARadii := by
       have hD := hdual s' i hi
       rw [hs] at hD
       have hb : (1 : ℝ) ≤ (l : ℝ) ^ α := one_le_pow₀ hL
-      calc (1 : ℝ) ≤ (l : ℝ) ^ α := hb
+      calc
+        (1 : ℝ)
+          ≤ (l : ℝ) ^ α := hb
         _ = (l : ℝ) ^ α * 1 := (mul_one _).symm
-        _ ≤ (l : ℝ) ^ α * ((l : ℝ) ^ i * sig s' + sig s) := mul_le_mul_of_nonneg_left hD (by positivity)
+        _ ≤ (l : ℝ) ^ α * ((l : ℝ) ^ i * sig s' + sig s) :=
+          mul_le_mul_of_nonneg_left hD (by positivity)
         _ = (l : ℝ) ^ α * sig s + (l : ℝ) ^ α * (l : ℝ) ^ i * sig s' := by ring
         _ ≤ (l : ℝ) ^ α * τ + (l : ℝ) ^ α * (l : ℝ) ^ i * τ' :=
           add_le_add (mul_le_mul_of_nonneg_left hτ (by positivity))
@@ -188,7 +199,8 @@ theorem dualRadiiInequalities : ThmARadii := by
       have h1 : (l : ℝ) ^ (β + i) * ((l : ℝ) ^ e)⁻¹ ≤ (l : ℝ) ^ (β + i) * eps s :=
         mul_le_mul_of_nonneg_left hε (by positivity)
       have h2 : (l : ℝ) ^ β ≤ (l : ℝ) ^ (β + i) * ((l : ℝ) ^ e)⁻¹ := by
-        rw [pow_add, mul_assoc, le_mul_iff_one_le_right (by positivity), le_mul_inv_iff₀ hpe, one_mul]
+        rw [pow_add, mul_assoc, le_mul_iff_one_le_right (by positivity), le_mul_inv_iff₀ hpe,
+          one_mul]
         exact hei'
       have hb : (1 : ℝ) ≤ (l : ℝ) ^ β := one_le_pow₀ hL
       have h3 : 0 ≤ (l : ℝ) ^ β * eps s' := mul_nonneg (by positivity) (heps s')
@@ -203,7 +215,8 @@ theorem dualRadiiInequalities : ThmARadii := by
       have h1 : (l : ℝ) ^ (α + i) * ((l : ℝ) ^ e)⁻¹ ≤ (l : ℝ) ^ (α + i) * eps s' :=
         mul_le_mul_of_nonneg_left hε (by positivity)
       have h2 : (l : ℝ) ^ α ≤ (l : ℝ) ^ (α + i) * ((l : ℝ) ^ e)⁻¹ := by
-        rw [pow_add, mul_assoc, le_mul_iff_one_le_right (by positivity), le_mul_inv_iff₀ hpe, one_mul]
+        rw [pow_add, mul_assoc, le_mul_iff_one_le_right (by positivity), le_mul_inv_iff₀ hpe,
+          one_mul]
         exact hei'
       have hb : (1 : ℝ) ≤ (l : ℝ) ^ α := one_le_pow₀ hL
       have h3 : 0 ≤ (l : ℝ) ^ α * eps s := mul_nonneg (by positivity) (heps s)

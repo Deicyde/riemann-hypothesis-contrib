@@ -12,31 +12,35 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.EqOfMapEqO
 @[expose] public section
 
 open scoped BigOperators
-open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj GlobalTheory.RowLaw ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj
+  GlobalTheory.RowLaw ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 namespace GlobalTheory.TeichSeq
 
-theorem frob_iter {O k : Type} [CommRing O] [CommRing k] {d : ℕ} (l : ℕ)
-    (φ : ZMod d → (O →+* k)) (h : ∀ a x, φ (a + 1) x = φ a x ^ l) (a : ZMod d) (x : O) (n : ℕ) :
-    φ (a + n) x = φ a x ^ l ^ n := by
+theorem frob_iter
+    {O k : Type} [CommRing O] [CommRing k]
+    {d : ℕ} (l : ℕ) (φ : ZMod d → (O →+* k)) (h : ∀ a x, φ (a + 1) x = φ a x ^ l)
+    (a : ZMod d) (x : O) (n : ℕ)
+    : φ (a + n) x = φ a x ^ l ^ n := by
   induction n with
   | zero => simp
   | succ n ih => rw [Nat.cast_succ, ← add_assoc, h, ih, ← pow_mul, pow_succ]
 
-theorem exists_separating {O k : Type} [CommRing O] [CommRing k] [IsDomain k] {d : ℕ} [NeZero d]
-    (l : ℕ) (hl : 1 < l) (φ : ZMod d → (O →+* k)) (h : ∀ a x, φ (a + 1) x = φ a x ^ l)
-    (hs : ∀ a a', a ≠ a' → ∃ x, φ a x ≠ φ a' x) :
-    ∃ x, (∀ a, φ a x ≠ 0) ∧ Function.Injective (fun a => φ a x) := by
+theorem exists_separating
+    {O k : Type} [CommRing O] [CommRing k] [IsDomain k]
+    {d : ℕ} [NeZero d]
+    (l : ℕ) (hl : 1 < l)
+    (φ : ZMod d → (O →+* k))
+    (h : ∀ a x, φ (a + 1) x = φ a x ^ l) (hs : ∀ a a', a ≠ a' → ∃ x, φ a x ≠ φ a' x)
+    : ∃ x, (∀ a, φ a x ≠ 0) ∧ Function.Injective (fun a => φ a x) := by
   classical
   have hq : 1 < l ^ d := Nat.one_lt_pow (NeZero.ne d) hl
-  have hper : ∀ x, φ 0 x ^ l ^ d = φ 0 x := fun x => by
-    rw [← frob_iter l φ h]; simp
-  have hval : ∀ a x, φ a x = φ 0 x ^ l ^ a.val := fun a x => by
-    rw [← frob_iter l φ h]; simp
+  have hper : ∀ x, φ 0 x ^ l ^ d = φ 0 x := fun x => by rw [← frob_iter l φ h]; simp
+  have hval : ∀ a x, φ a x = φ 0 x ^ l ^ a.val := fun a x => by rw [← frob_iter l φ h]; simp
   have hfin : ((φ 0).range : Set k).Finite := by
     have hne : (Polynomial.X ^ l ^ d - Polynomial.X : Polynomial k) ≠ 0 :=
-      (Polynomial.monic_X_pow_sub (by
-        rw [Polynomial.degree_X]; exact_mod_cast hq)).ne_zero
+      (Polynomial.monic_X_pow_sub (by rw [Polynomial.degree_X]; exact_mod_cast hq)).ne_zero
     refine (Polynomial.finite_setOf_isRoot hne).subset ?_
     rintro _ ⟨x, rfl⟩
     simp [hper]
@@ -44,7 +48,8 @@ theorem exists_separating {O k : Type} [CommRing O] [CommRing k] [IsDomain k] {d
   obtain ⟨g, hg⟩ := IsCyclic.exists_monoid_generator (α := ((φ 0).range)ˣ)
   obtain ⟨x, hx⟩ := (g : (φ 0).range).2
   have hx0 : φ 0 x ≠ 0 := by
-    rw [hx]; intro h0
+    rw [hx]
+    intro h0
     exact g.ne_zero (Subtype.ext h0)
   refine ⟨x, fun a => by rw [hval]; exact pow_ne_zero _ hx0, fun a a' haa => ?_⟩
   by_contra hne
@@ -55,8 +60,8 @@ theorem exists_separating {O k : Type} [CommRing O] [CommRing k] [IsDomain k] {d
   by_cases hy0 : φ 0 y = 0
   · rw [hy0, zero_pow (by positivity), zero_pow (by positivity)]
   · have hu : IsUnit (⟨φ 0 y, y, rfl⟩ : (φ 0).range) :=
-      ((Finite.isField_of_domain _).mul_inv_cancel
-        (fun h0 => hy0 (congrArg Subtype.val h0))).elim fun b hb => IsUnit.of_mul_eq_one b hb
+      ((Finite.isField_of_domain _).mul_inv_cancel (fun h0 => hy0 (congrArg Subtype.val h0))).elim
+        fun b hb => IsUnit.of_mul_eq_one b hb
     obtain ⟨u, hu⟩ := hu
     obtain ⟨m, hm⟩ := hg u
     have : φ 0 y = φ 0 x ^ m := by
@@ -66,16 +71,30 @@ theorem exists_separating {O k : Type} [CommRing O] [CommRing k] [IsDomain k] {d
       simpa using this.symm
     rw [this, ← pow_mul, ← pow_mul, mul_comm m, mul_comm m, pow_mul, pow_mul, haa]
 
-theorem root_eq {R k : Type} [CommRing R] [IsDomain R] [CommRing k] [IsDomain k] (π : R →+* k)
-    {N : ℕ} (hN : (N : k) ≠ 0) {u w : R} (hu : u ^ N = 1) (hw : w ^ N = 1) (h : π u = π w) :
-    u = w := by
+theorem root_eq
+    {R k : Type} [CommRing R] [IsDomain R] [CommRing k] [IsDomain k]
+    (π : R →+* k)
+    {N : ℕ} (hN : (N : k) ≠ 0)
+    {u w : R} (hu : u ^ N = 1) (hw : w ^ N = 1) (h : π u = π w)
+    : u = w := by
   first
-  | (rename_i h_2 h_3 h_4 h_5; revert R k h_2 h_3 h_4 h_5 π N hN u w hu hw h; exact @_root_.GlobalTheory.RootsOfUnityInjective.eq_of_map_eq_of_pow_eq_one)
+  | (
+      rename_i h_2 h_3 h_4 h_5
+      revert R k h_2 h_3 h_4 h_5 π N hN u w hu hw h
+      exact @_root_.GlobalTheory.RootsOfUnityInjective.eq_of_map_eq_of_pow_eq_one
+    )
   | exact @_root_.GlobalTheory.RootsOfUnityInjective.eq_of_map_eq_of_pow_eq_one
   | exact _root_.GlobalTheory.RootsOfUnityInjective.eq_of_map_eq_of_pow_eq_one
   | (apply _root_.GlobalTheory.RootsOfUnityInjective.eq_of_map_eq_of_pow_eq_one <;> assumption)
-  | (intros; apply _root_.GlobalTheory.RootsOfUnityInjective.eq_of_map_eq_of_pow_eq_one <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.RootsOfUnityInjective.eq_of_map_eq_of_pow_eq_one <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply _root_.GlobalTheory.RootsOfUnityInjective.eq_of_map_eq_of_pow_eq_one <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.RootsOfUnityInjective.eq_of_map_eq_of_pow_eq_one
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.RootsOfUnityInjective.eq_of_map_eq_of_pow_eq_one ..)
 
 variable {C : Type} [Field C] (V : VF C)
@@ -131,8 +150,8 @@ theorem ge_l_pow (n : ℕ) : V.Ge n ((V.l : C) ^ n) := by
   | zero => simpa using VF.Ge.one
   | succ n ih => rw [pow_succ]; push_cast; exact ih.mul VF.ge_l
 
-theorem ge_pow_sub {u w : C} (hu : V.Ge 0 u) (hw : V.Ge 0 w) {t : ℝ} (h : V.Ge t (u - w)) (m : ℕ) :
-    V.Ge t (u ^ m - w ^ m) := by
+theorem ge_pow_sub {u w : C} (hu : V.Ge 0 u) (hw : V.Ge 0 w) {t : ℝ} (h : V.Ge t (u - w)) (m : ℕ)
+    : V.Ge t (u ^ m - w ^ m) := by
   rw [← (Commute.all u w).geom_sum₂_mul m]
   exact VF.Ge.mul_int (VF.Ge.sum fun i _ => (hu.pow _).mul_int (hw.pow _)) h
 
@@ -143,9 +162,20 @@ end GlobalTheory.TeichSeq
 
 namespace GlobalTheory
 
-
 open TeichSeq in
-theorem exists_teichmueller_sequence : ∀ (C : Type) [Field C] [CharZero C] (V : VF C), (∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n)) → ∀ (O : Type) [CommRing O] (d : ℕ) [NeZero d] (em : ZMod d → (O →+* C)), (∀ a x, V.Ge 0 (em a x)) → (∀ a x, V.MM (em (a + 1) x - em a x ^ V.l)) → (∀ a a' : ZMod d, a ≠ a' → ∃ x, V.v (em a x - em a' x) = 0) → (∃ ε : O, (∃ y, ε * ε - ε = (V.l : O) * y) ∧ (∀ a, V.MM (em a ε - 1)) ∧ ∀ x : O, (∀ a, V.MM (em a x)) → ∃ y, ε * x = (V.l : O) * y) → ∃ (N : ℕ) (ζ : ZMod d → C) (s : ℕ → O), V.v (N : C) = 0 ∧ (∀ a, ζ a ^ N = 1) ∧ Function.Injective ζ ∧ (∀ a, ζ (a + 1) = ζ a ^ V.l) ∧ (∀ n, ∃ y, s (n + 1) - s n = (V.l : O) ^ n * y) ∧ ∀ (a : ZMod d) (K : ℕ), ∃ n0, ∀ n ≥ n0, V.Ge K (ζ a - em a (s n)) := by
+theorem exists_teichmueller_sequence
+    : ∀ (C : Type) [Field C] [CharZero C] (V : VF C),
+      (∀ s : ℕ → C, (∀ n : ℕ, V.Ge n (s (n + 1) - s n)) → ∃ x, ∀ n : ℕ, V.Ge n (x - s n))
+        → ∀ (O : Type) [CommRing O] (d : ℕ) [NeZero d] (em : ZMod d → (O →+* C)),
+          (∀ a x, V.Ge 0 (em a x)) → (∀ a x, V.MM (em (a + 1) x - em a x ^ V.l))
+            → (∀ a a' : ZMod d, a ≠ a' → ∃ x, V.v (em a x - em a' x) = 0)
+            → (∃ ε : O,
+              (∃ y, ε * ε - ε = (V.l : O) * y) ∧ (∀ a, V.MM (em a ε - 1))
+                ∧ ∀ x : O, (∀ a, V.MM (em a x)) → ∃ y, ε * x = (V.l : O) * y)
+            → ∃ (N : ℕ) (ζ : ZMod d → C) (s : ℕ → O),
+              V.v (N : C) = 0 ∧ (∀ a, ζ a ^ N = 1) ∧ Function.Injective ζ
+                ∧ (∀ a, ζ (a + 1) = ζ a ^ V.l) ∧ (∀ n, ∃ y, s (n + 1) - s n = (V.l : O) ^ n * y)
+                ∧ ∀ (a : ZMod d) (K : ℕ), ∃ n0, ∀ n ≥ n0, V.Ge K (ζ a - em a (s n)) := by
   intro C _ _ V hcomp O _ d _ em hint hfrob hsep ⟨ε, ⟨y0, hε2⟩, hε1, hεP⟩
   have hl : 1 < V.l := V.l_prime.one_lt
   let π : intRing V →+* intRing V ⧸ maxId V := Ideal.Quotient.mk _
@@ -165,8 +195,7 @@ theorem exists_teichmueller_sequence : ∀ (C : Type) [Field C] [CharZero C] (V 
   obtain ⟨x, hx0, hxinj⟩ := exists_separating V.l hl φ hφ hs
   set q := V.l ^ d with hqdef
   have hq : 1 < q := Nat.one_lt_pow (NeZero.ne d) hl
-  have hper : ∀ a y, φ a y ^ q = φ a y := fun a y => by
-    rw [← frob_iter V.l φ hφ]; simp
+  have hper : ∀ a y, φ a y ^ q = φ a y := fun a y => by rw [← frob_iter V.l φ hφ]; simp
   have hφε : ∀ a, φ a ε = 1 := fun a => (hπ (e a ε) 1).2 (hε1 a)
   have hεpow : ∀ n, (V.l : O) ∣ ε ^ (n + 1) - ε := fun n => by
     induction n with
@@ -178,9 +207,10 @@ theorem exists_teichmueller_sequence : ∀ (C : Type) [Field C] [CharZero C] (V 
   have hz : (V.l : O) ∣ (ε * x) ^ q - ε * x := by
     have h1 : (V.l : O) ∣ ε * (x ^ q - x) := by
       refine hεP _ fun a => ?_
-      have := (hπ (e a (x ^ q)) (e a x)).1 (by
-        show φ a (x ^ q) = φ a x
-        rw [map_pow, hper])
+      have :=
+        (hπ (e a (x ^ q)) (e a x)).1 (by
+          show φ a (x ^ q) = φ a x
+          rw [map_pow, hper])
       rw [map_sub]
       exact this
     have h2 := hεpow (q - 1)
@@ -212,7 +242,8 @@ theorem exists_teichmueller_sequence : ∀ (C : Type) [Field C] [CharZero C] (V 
   let Z : ZMod d → intRing V := fun a => ⟨ζ a, hζint a⟩
   have hZ : ∀ a, π (Z a) = φ a x := fun a => by
     have h1 : π (Z a) = φ a (s 1) :=
-      (hπ (Z a) (e a (s 1))).2 (mm_of_ge_one V (by have := hζ a 1; rw [Nat.cast_one] at this; exact this))
+      (hπ (Z a) (e a (s 1))).2
+        (mm_of_ge_one V (by have := hζ a 1; rw [Nat.cast_one] at this; exact this))
     rw [h1, hsS, map_pow, hper]
     simp [s, hφε]
   have hζq : ∀ a, ζ a ^ q = ζ a := fun a => by
@@ -224,8 +255,7 @@ theorem exists_teichmueller_sequence : ∀ (C : Type) [Field C] [CharZero C] (V 
     have := h1.sub h2
     simpa using this
   have hζN : ∀ a, ζ a ^ (q - 1) = 1 := fun a => by
-    have h0 : ζ a ≠ 0 := fun h => hx0 a (by
-      rw [← hZ, show Z a = 0 from Subtype.ext h, map_zero])
+    have h0 : ζ a ≠ 0 := fun h => hx0 a (by rw [← hZ, show Z a = 0 from Subtype.ext h, map_zero])
     apply mul_right_cancel₀ h0
     rw [← pow_succ, Nat.sub_add_cancel hq.le, hζq, one_mul]
   have hl0 : (V.l : intRing V ⧸ maxId V) = 0 := by
@@ -244,9 +274,9 @@ theorem exists_teichmueller_sequence : ∀ (C : Type) [Field C] [CharZero C] (V 
     rw [← hZ, ← hZ, show Z a = Z a' from Subtype.ext h]
   · intro a
     have hZN : ∀ a, Z a ^ (q - 1) = 1 := fun a => Subtype.ext (hζN a)
-    have := root_eq π hN (hZN (a + 1)) (u := Z (a + 1)) (w := Z a ^ V.l)
-      (by rw [← pow_mul, mul_comm, pow_mul, hZN, one_pow])
-      (by rw [map_pow, hZ, hZ, hφ])
+    have :=
+      root_eq π hN (hZN (a + 1)) (u := Z (a + 1)) (w := Z a ^ V.l)
+        (by rw [← pow_mul, mul_comm, pow_mul, hZN, one_pow]) (by rw [map_pow, hZ, hZ, hφ])
     exact congrArg Subtype.val this
   · intro a K
     exact ⟨K, fun n hn => (hζ a n).mono (by exact_mod_cast hn)⟩

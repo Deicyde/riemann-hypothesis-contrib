@@ -4,8 +4,9 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem UpperTheory.algebraic_over_finite_field_integral (k L : Type) [Field k] [Finite k] [Field L] [Algebra k L]
-    (y : L) (h : IsAlgebraic k y) : IsIntegral ℤ y := by
+private theorem UpperTheory.algebraic_over_finite_field_integral
+    (k L : Type) [Field k] [Finite k] [Field L] [Algebra k L] (y : L) (h : IsAlgebraic k y)
+    : IsIntegral ℤ y := by
   have hi : IsIntegral k y := h.isIntegral
   haveI : FiniteDimensional k (IntermediateField.adjoin k {y}) := IntermediateField.adjoin.finiteDimensional hi
   haveI : Finite (IntermediateField.adjoin k {y}) := Module.finite_of_finite k
@@ -24,8 +25,13 @@ private theorem UpperTheory.algebraic_over_finite_field_integral (k L : Type) [F
     · simp [hpow]
 
 open Polynomial in
-theorem UpperTheory.residue_isIntegral_of_algebraic_over_dvr :
-    ∀ (A K : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [Finite (IsLocalRing.ResidueField A)] [Field K] (V : ValuationSubring K) (f : A →+* V), Function.Injective f → IsLocalHom f → ∀ x : V, (∃ p : Polynomial A, p ≠ 0 ∧ p.eval₂ (V.subtype.comp f) x = 0) → IsIntegral ℤ (IsLocalRing.residue V x) := by
+theorem UpperTheory.residue_isIntegral_of_algebraic_over_dvr
+    : ∀ (A K : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
+        [Finite (IsLocalRing.ResidueField A)] [Field K] (V : ValuationSubring K) (f : A →+* V),
+      Function.Injective f → IsLocalHom f
+        → ∀ x : V,
+          (∃ p : Polynomial A, p ≠ 0 ∧ p.eval₂ (V.subtype.comp f) x = 0)
+            → IsIntegral ℤ (IsLocalRing.residue V x) := by
   intro A K _ _ _ _ _ V f hf _ x hx
   classical
   obtain ⟨p, hp0, hpx⟩ := hx
@@ -61,9 +67,12 @@ theorem UpperTheory.residue_isIntegral_of_algebraic_over_dvr :
   have halg : IsAlgebraic (IsLocalRing.ResidueField A) (IsLocalRing.residue V x) := by
     refine ⟨q.map (IsLocalRing.residue A), hqbar, ?_⟩
     rw [Polynomial.aeval_def, Polynomial.eval₂_map]
-    have e : (algebraMap (IsLocalRing.ResidueField A) (IsLocalRing.ResidueField V)).comp (IsLocalRing.residue A) =
-        (IsLocalRing.residue V).comp f := by
+    have e
+        : (algebraMap (IsLocalRing.ResidueField A) (IsLocalRing.ResidueField V)).comp
+            (IsLocalRing.residue A)
+          = (IsLocalRing.residue V).comp f := by
       ext a
       exact IsLocalRing.ResidueField.map_residue f a
     rw [e, ← Polynomial.hom_eval₂, hqx, map_zero]
-  exact UpperTheory.algebraic_over_finite_field_integral (IsLocalRing.ResidueField A) (IsLocalRing.ResidueField V) _ halg
+  exact UpperTheory.algebraic_over_finite_field_integral (IsLocalRing.ResidueField A)
+    (IsLocalRing.ResidueField V) _ halg

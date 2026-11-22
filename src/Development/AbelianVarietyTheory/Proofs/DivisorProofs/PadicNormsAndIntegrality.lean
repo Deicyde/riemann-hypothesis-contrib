@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsEmb
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.IntAwayP
@@ -17,28 +18,37 @@ theorem norm_self_padicAlgCl (p : ℕ) [Fact p.Prime] : ‖(p : PadicAlgCl p)‖
   rw [map_natCast] at this
   rw [this, Padic.norm_p]
 
-theorem norm_prime_padicAlgCl_of_ne (ℓ p : ℕ) [hℓ : Fact ℓ.Prime] (hp : p.Prime) (h : ℓ ≠ p) :
-    ‖(p : PadicAlgCl ℓ)‖ = 1 := by
+theorem norm_prime_padicAlgCl_of_ne (ℓ p : ℕ) [hℓ : Fact ℓ.Prime] (hp : p.Prime) (h : ℓ ≠ p)
+    : ‖(p : PadicAlgCl ℓ)‖ = 1 := by
   have h1 := PadicAlgCl.norm_extends ℓ (p : ℚ_[ℓ])
   rw [map_natCast] at h1
   rw [h1]
-  have h2 : ‖(p : ℤ_[ℓ])‖ = 1 := (PadicInt.norm_natCast_eq_one_iff).2 ((Nat.coprime_primes hℓ.out hp).2 h)
+  have h2 : ‖(p : ℤ_[ℓ])‖ = 1 :=
+    (PadicInt.norm_natCast_eq_one_iff).2 ((Nat.coprime_primes hℓ.out hp).2 h)
   rw [← h2, PadicInt.norm_def]
   simp
 
-theorem isIntegral_of_pow_mul (K : Type) [Field K] [NumberField K] (p : ℕ) [hp : Fact p.Prime]
+theorem isIntegral_of_pow_mul
+    (K : Type) [Field K] [NumberField K]
+    (p : ℕ) [hp : Fact p.Prime]
     (z : K) (N : ℕ) (hN : IsIntegral ℤ ((p : K) ^ N * z))
-    (h : ∀ φ : K →+* PadicAlgCl p, ‖φ z‖ ≤ 1) : IsIntegral ℤ z := by
+    (h : ∀ φ : K →+* PadicAlgCl p, ‖φ z‖ ≤ 1)
+    : IsIntegral ℤ z := by
   refine GlobalTheory.isIntegral_of_forall_padicAlgCl_norm_le_one K z fun q _ τ => ?_
   by_cases hq : q = p
   · subst hq; exact h τ
   · have h1 : ‖τ ((p : K) ^ N * z)‖ ≤ 1 :=
       GlobalTheory.norm_le_one_of_isIntegral_int (hN.map τ.toIntAlgHom)
     rw [map_mul, map_pow, map_natCast, norm_mul, norm_pow,
-      norm_prime_padicAlgCl_of_ne q p hp.out hq, one_pow, one_mul] at h1
+        norm_prime_padicAlgCl_of_ne q p hp.out hq, one_pow, one_mul]
+      at h1
     exact h1
 
-theorem exists_pow_mul_isIntegral : ∀ (K : Type) [Field K] [NumberField K] (p : ℕ) [Fact p.Prime] (B : ℝ), ∃ m₀ : ℕ, ∀ (c : K) (D : ℕ), (∃ m : ℕ, IsIntegral ℤ ((p : K) ^ m * D * c)) → (∀ φ : K →+* PadicAlgCl p, ‖φ c‖ ≤ B) → IsIntegral ℤ ((p : K) ^ m₀ * D * c) := by
+theorem exists_pow_mul_isIntegral
+    : ∀ (K : Type) [Field K] [NumberField K] (p : ℕ) [Fact p.Prime] (B : ℝ), ∃ m₀ : ℕ,
+      ∀ (c : K) (D : ℕ),
+        (∃ m : ℕ, IsIntegral ℤ ((p : K) ^ m * D * c)) → (∀ φ : K →+* PadicAlgCl p, ‖φ c‖ ≤ B)
+          → IsIntegral ℤ ((p : K) ^ m₀ * D * c) := by
   intro K _ _ p _ B
   have hp1 : (1 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).one_lt
   obtain ⟨m₀, hm₀⟩ := pow_unbounded_of_one_lt B hp1

@@ -12,17 +12,23 @@ open scoped BigOperators
 namespace Formalism.L2.Th1.D
 
 open Formalism.DworkPowerSeriesWeights (Integral mvExp)
-open Formalism.InvariantFactorPaths.G7 (lgF at1 Simeq DivAB d1 swap2 in3 cob UnrOK IsLawOfLog frobVar)
+open Formalism.InvariantFactorPaths.G7
+  (lgF at1 Simeq DivAB d1 swap2 in3 cob UnrOK IsLawOfLog frobVar)
 
 namespace TraceNormBounds
 
-theorem poly_id (l : ℕ) (hl : l.Prime) : ∃ Q : Polynomial ℤ,
-    (Polynomial.X ^ l - Polynomial.X - ∏ n ∈ Finset.range l,
-      (Polynomial.X - ((n : ℕ) : Polynomial ℤ)) : Polynomial ℤ) = Polynomial.C (l : ℤ) * Q := by
+theorem poly_id (l : ℕ) (hl : l.Prime)
+    : ∃ Q : Polynomial ℤ,
+      (Polynomial.X ^ l - Polynomial.X
+            - ∏ n ∈ Finset.range l,
+              (Polynomial.X - ((n : ℕ) : Polynomial ℤ))
+          : Polynomial ℤ)
+        = Polynomial.C (l : ℤ) * Q := by
   have : Fact l.Prime := ⟨hl⟩
   have : NeZero l := ⟨hl.ne_zero⟩
-  have hprod : ∏ a : ZMod l, (Polynomial.X - Polynomial.C a) =
-      (Polynomial.X ^ l - Polynomial.X : Polynomial (ZMod l)) := by
+  have hprod
+      : ∏ a : ZMod l, (Polynomial.X - Polynomial.C a)
+        = (Polynomial.X ^ l - Polynomial.X : Polynomial (ZMod l)) := by
     have hr := FiniteField.roots_X_pow_card_sub_X (ZMod l)
     rw [ZMod.card] at hr
     have hdeg := Polynomial.natDegree_X_pow_sub_X (R := (ZMod l)) hl.one_lt
@@ -30,27 +36,36 @@ theorem poly_id (l : ℕ) (hl : l.Prime) : ∃ Q : Polynomial ℤ,
       apply Polynomial.monic_X_pow_sub
       rw [Polynomial.degree_X]
       exact_mod_cast hl.one_lt
-    have h := Polynomial.prod_multiset_X_sub_C_of_monic_of_roots_card_eq hmon
-      (by rw [hr, hdeg]; simp)
+    have h :=
+      Polynomial.prod_multiset_X_sub_C_of_monic_of_roots_card_eq hmon (by rw [hr, hdeg]; simp)
     rw [hr] at h
     exact h
-  have hrange : ∏ n ∈ Finset.range l, (Polynomial.X - ((n : ℕ) : Polynomial (ZMod l))) =
-      ∏ a : ZMod l, (Polynomial.X - Polynomial.C a) := by
-    refine Finset.prod_bij (fun n _ => ((n : ℕ) : ZMod l)) (fun _ _ => Finset.mem_univ _) ?_ ?_
+  have hrange
+      : ∏ n ∈ Finset.range l, (Polynomial.X - ((n : ℕ) : Polynomial (ZMod l)))
+        = ∏ a : ZMod l, (Polynomial.X - Polynomial.C a) := by
+    refine Finset.prod_bij
+      (fun n _ => ((n : ℕ) : ZMod l))
+      (fun _ _ => Finset.mem_univ _)
+      ?_ ?_
       (fun _ _ => by rw [map_natCast])
     · intro a ha b hb hab
       have := congrArg ZMod.val hab
       rwa [ZMod.val_natCast_of_lt (Finset.mem_range.1 ha),
-        ZMod.val_natCast_of_lt (Finset.mem_range.1 hb)] at this
+          ZMod.val_natCast_of_lt (Finset.mem_range.1 hb)]
+        at this
     · intro b _
       exact ⟨b.val, Finset.mem_range.2 (ZMod.val_lt b), by simp⟩
   change Polynomial.C (l : ℤ) ∣ _
   rw [Polynomial.C_dvd_iff_dvd_coeff]
   intro i
   rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]
-  have hmap : Polynomial.map (Int.castRingHom (ZMod l))
-      (Polynomial.X ^ l - Polynomial.X - ∏ n ∈ Finset.range l,
-        (Polynomial.X - ((n : ℕ) : Polynomial ℤ)) : Polynomial ℤ) = 0 := by
+  have hmap
+      : Polynomial.map (Int.castRingHom (ZMod l))
+          (Polynomial.X ^ l - Polynomial.X
+              - ∏ n ∈ Finset.range l,
+                (Polynomial.X - ((n : ℕ) : Polynomial ℤ))
+            : Polynomial ℤ)
+        = 0 := by
     rw [Polynomial.map_sub, Polynomial.map_sub, Polynomial.map_pow, Polynomial.map_X,
       Polynomial.map_prod]
     simp only [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_natCast]
@@ -87,8 +102,8 @@ private lemma int_lemma_3 (z : ℤ) : ‖(z : K)‖ ≤ 1 := by
   · rw [Int.cast_neg, norm_neg]
     exact_mod_cast norm_natCast_le_one_kummer_theta_logarithms n
 
-theorem norm_eval_le (Q : Polynomial ℤ) {x : K} (hx : ‖x‖ ≤ 1) :
-    ‖Polynomial.eval₂ (Int.castRingHom K) x Q‖ ≤ 1 := by
+theorem norm_eval_le (Q : Polynomial ℤ) {x : K} (hx : ‖x‖ ≤ 1)
+    : ‖Polynomial.eval₂ (Int.castRingHom K) x Q‖ ≤ 1 := by
   rw [Polynomial.eval₂_eq_sum_range]
   apply norm_finset_sum_le_one_of_norm_le_one
   intro i _
@@ -97,18 +112,16 @@ theorem norm_eval_le (Q : Polynomial ℤ) {x : K} (hx : ‖x‖ ≤ 1) :
     exact int_lemma_3 _
   have hp : ‖x ^ i‖ ≤ 1 := by
     rw [norm_pow]
-    first
-    | exact pow_le_one₀ (norm_nonneg _) hx
-    | exact pow_le_one _ (norm_nonneg _) hx
+    first | exact pow_le_one₀ (norm_nonneg _) hx | exact pow_le_one _ (norm_nonneg _) hx
   rw [norm_mul]
   first
   | exact mul_le_one₀ hc (norm_nonneg _) hp
   | exact mul_le_one' hc hp
   | nlinarith [norm_nonneg ((Int.castRingHom K) (Q.coeff i)), norm_nonneg (x ^ i)]
 
-theorem norm_le_inv_of_lt_one {l : ℕ} (hl : 1 < l)
-    (hval : ∀ a : K, a ≠ 0 → ∃ k : ℤ, ‖a‖ = (l : ℝ) ^ k) {y : K} (hy : ‖y‖ < 1) :
-    ‖y‖ ≤ (l : ℝ)⁻¹ := by
+theorem norm_le_inv_of_lt_one
+    {l : ℕ} (hl : 1 < l) (hval : ∀ a : K, a ≠ 0 → ∃ k : ℤ, ‖a‖ = (l : ℝ) ^ k) {y : K} (hy : ‖y‖ < 1)
+    : ‖y‖ ≤ (l : ℝ)⁻¹ := by
   rcases eq_or_ne y 0 with rfl | hy0
   · simp
   obtain ⟨k, hk⟩ := hval y hy0
@@ -118,14 +131,10 @@ theorem norm_le_inv_of_lt_one {l : ℕ} (hl : 1 < l)
     by_contra hc
     push_neg at hc
     have h1 : (1 : ℝ) ≤ (l : ℝ) ^ k := by
-      first
-      | exact one_le_zpow₀ hl'.le hc
-      | exact one_le_zpow_of_nonneg₀ hl'.le hc
+      first | exact one_le_zpow₀ hl'.le hc | exact one_le_zpow_of_nonneg₀ hl'.le hc
     linarith
   have h2 : (l : ℝ) ^ k ≤ (l : ℝ) ^ (-1 : ℤ) := by
-    first
-    | exact zpow_le_zpow_right₀ hl'.le (by omega)
-    | exact zpow_le_of_le hl'.le (by omega)
+    first | exact zpow_le_zpow_right₀ hl'.le (by omega) | exact zpow_le_of_le hl'.le (by omega)
   simpa using h2
 
 end Normed
@@ -171,9 +180,11 @@ theorem fixed_is_limit : FixedIsLimit := by
     obtain ⟨Q, hQ⟩ := poly_id l hp
     have hev := congrArg (Polynomial.eval₂ (Int.castRingHom K) x) hQ
     rw [Polynomial.eval₂_sub, Polynomial.eval₂_sub, Polynomial.eval₂_pow, Polynomial.eval₂_X,
-      Polynomial.eval₂_mul, Polynomial.eval₂_C, Polynomial.eval₂_finsetProd] at hev
+        Polynomial.eval₂_mul, Polynomial.eval₂_C, Polynomial.eval₂_finsetProd]
+      at hev
     simp only [Polynomial.eval₂_sub, Polynomial.eval₂_X, Polynomial.eval₂_natCast, eq_intCast,
-      Int.cast_natCast] at hev
+        Int.cast_natCast]
+      at hev
     have h1 : ‖x ^ l - x‖ ≤ (l : ℝ)⁻¹ := by
       have := hσ x hx
       rwa [hfix, norm_sub_rev] at this
@@ -181,8 +192,9 @@ theorem fixed_is_limit : FixedIsLimit := by
       rw [norm_mul, hpn]
       exact mul_le_of_le_one_right (by positivity) (norm_eval_le Q hx)
     have h3 : ‖∏ n ∈ Finset.range l, (x - (n : K))‖ ≤ (l : ℝ)⁻¹ := by
-      have e : ∏ n ∈ Finset.range l, (x - (n : K)) =
-          (x ^ l - x) - (l : K) * Polynomial.eval₂ (Int.castRingHom K) x Q := by
+      have e
+          : ∏ n ∈ Finset.range l, (x - (n : K))
+            = (x ^ l - x) - (l : K) * Polynomial.eval₂ (Int.castRingHom K) x Q := by
         rw [← hev]; ring
       rw [e, sub_eq_add_neg]
       exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le h1 (by rwa [norm_neg]))
@@ -194,8 +206,12 @@ theorem fixed_is_limit : FixedIsLimit := by
       exact absurd (norm_le_inv_of_lt_one hp.one_lt hval (not_le.1 hlt)) (not_le.2 (hc n))
     have h5 : (1 : ℝ) ≤ ‖∏ n ∈ Finset.range l, (x - (n : K))‖ := by
       rw [norm_prod]
-      have := Finset.prod_le_prod₀ (s := Finset.range l) (f := fun _ => (1 : ℝ))
-        (g := fun n : ℕ => ‖x - (n : K)‖) (fun _ _ => zero_le_one) h4
+      have :=
+        Finset.prod_le_prod₀ (s := Finset.range l)
+          (f := fun _ => (1 : ℝ))
+          (g := fun n : ℕ => ‖x - (n : K)‖)
+          (fun _ _ => zero_le_one)
+          h4
       simpa using this
     linarith
   intro x hx hfix k
@@ -205,7 +221,9 @@ theorem fixed_is_limit : FixedIsLimit := by
     obtain ⟨n0, hn0⟩ := step x hx hfix
     have hy : ‖(x - n0) / (l : K)‖ ≤ 1 := by
       rw [norm_div, hpn, div_inv_eq_mul]
-      calc ‖x - n0‖ * l ≤ (l : ℝ)⁻¹ * l := by gcongr
+      calc
+        ‖x - n0‖ * l
+          ≤ (l : ℝ)⁻¹ * l := by gcongr
         _ = 1 := inv_mul_cancel₀ hl0
     have hyf : σ ((x - n0) / (l : K)) = (x - n0) / (l : K) := by
       rw [map_div₀, map_sub, map_natCast, map_natCast, hfix]
@@ -230,9 +248,11 @@ theorem simeq_fixed : SimeqFixed := by
   rw [sub_zero, hD K τ l σ hp hpn hσ _ h0']
   have hcf := (hD K τ l σ hp hpn hσ f h0).1 hI
   intro n
-  have he : frobVar l (MvPowerSeries.map σ (MvPowerSeries.C c * f)) -
-      MvPowerSeries.C (l : K) * (MvPowerSeries.C c * f) =
-      MvPowerSeries.C c * (frobVar l (MvPowerSeries.map σ f) - MvPowerSeries.C (l : K) * f) := by
+  have he
+      : frobVar l (MvPowerSeries.map σ (MvPowerSeries.C c * f))
+          - MvPowerSeries.C (l : K) * (MvPowerSeries.C c * f)
+        = MvPowerSeries.C c
+          * (frobVar l (MvPowerSeries.map σ f) - MvPowerSeries.C (l : K) * f) := by
     rw [map_mul, MvPowerSeries.map_C, hfix, Formalism.InvariantFactorPaths.G7.frobVar_eq_expand hp0,
       Formalism.InvariantFactorPaths.G7.frobVar_eq_expand hp0, map_mul, MvPowerSeries.expand_C]
     ring
@@ -256,13 +276,19 @@ theorem simeq_closed : SimeqClosed := by
   refine ⟨by rwa [sub_zero], ?_⟩
   rw [sub_zero, hD K τ l σ hp hpn hσ _ hg0]
   intro n
-  have hk : ∀ k, ‖MvPowerSeries.coeff n (frobVar l (MvPowerSeries.map σ (f k)) -
-      MvPowerSeries.C (l : K) * f k)‖ ≤ (l : ℝ)⁻¹ := fun k =>
+  have hk
+      : ∀ k,
+        ‖MvPowerSeries.coeff n (frobVar l (MvPowerSeries.map σ (f k)) -
+            MvPowerSeries.C (l : K) * f k)‖
+          ≤ (l : ℝ)⁻¹ := fun k =>
     (hD K τ l σ hp hpn hσ _ (hf0 k)).1 (by have := (hf k).2; rwa [sub_zero] at this) n
-  have hT : Filter.Tendsto (fun k => MvPowerSeries.coeff n (frobVar l (MvPowerSeries.map σ (f k)) -
-      MvPowerSeries.C (l : K) * f k)) Filter.atTop
-      (nhds (MvPowerSeries.coeff n (frobVar l (MvPowerSeries.map σ g) -
-        MvPowerSeries.C (l : K) * g))) := by
+  have hT : Filter.Tendsto
+      (fun k =>
+        MvPowerSeries.coeff n
+          (frobVar l (MvPowerSeries.map σ (f k)) - MvPowerSeries.C (l : K) * f k))
+      Filter.atTop
+      (nhds (MvPowerSeries.coeff n
+        (frobVar l (MvPowerSeries.map σ g) - MvPowerSeries.C (l : K) * g))) := by
     simp only [map_sub, MvPowerSeries.coeff_C_mul]
     refine Filter.Tendsto.sub ?_ ((hlim n).const_mul _)
     by_cases hd : ∀ i, l ∣ n i

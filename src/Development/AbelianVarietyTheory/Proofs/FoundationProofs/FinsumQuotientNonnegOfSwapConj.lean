@@ -6,18 +6,20 @@ public import Formalism.PairingDivisors.StatementH
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory
 
-theorem sum_nonneg_of_swap_conj_fintype (Q : Type) [AddCommGroup Q] [Fintype Q] (ψ : Q → ℂ)
-    (P S L : Q →+ Q) (hL : Function.Injective L)
-    (hP : ∀ x, P (P x) = P x) (hS : ∀ x, S (S x) = x)
-    (hSP : ∀ x, S (P x) = S x - P (S x)) (hLP : ∀ x, L (P x) = P (L x))
+theorem sum_nonneg_of_swap_conj_fintype
+    (Q : Type) [AddCommGroup Q] [Fintype Q]
+    (ψ : Q → ℂ) (P S L : Q →+ Q) (hL : Function.Injective L) (hP : ∀ x, P (P x) = P x)
+    (hS : ∀ x, S (S x) = x) (hSP : ∀ x, S (P x) = S x - P (S x)) (hLP : ∀ x, L (P x) = P (L x))
     (hψ : ∀ x, ψ x = ψ (P x) * ψ (x - P x)) (hψS : ∀ x, ψ (S x) = ψ x)
-    (hψL : ∀ x, ψ (L x) = (starRingEnd ℂ) (ψ x)) :
-    ∃ r : ℝ, 0 ≤ r ∧ ∑ q : Q, ψ q = (r : ℂ) := by
+    (hψL : ∀ x, ψ (L x) = (starRingEnd ℂ) (ψ x))
+    : ∃ r : ℝ, 0 ≤ r ∧ ∑ q : Q, ψ q = (r : ℂ) := by
   set A : Finset Q := Finset.univ.filter (fun x => P x = x) with hA
   set A' : Finset Q := Finset.univ.filter (fun x => P x = 0) with hA'
   have mA : ∀ x, x ∈ A ↔ P x = x := by intro x; simp [hA]
@@ -78,8 +80,14 @@ theorem sum_nonneg_of_swap_conj_fintype (Q : Type) [AddCommGroup Q] [Fintype Q] 
   push_cast
   rfl
 
-theorem finsum_quotient_nonneg_of_swap_conj :
-    ∀ (G : Type) [AddCommGroup G] (B : AddSubgroup G) [Finite (G ⧸ B)] (φ : G → ℂ) (P S L : G →+ G), (∀ x, ∀ w ∈ B, φ (x + w) = φ x) → (∀ w ∈ B, P w ∈ B ∧ S w ∈ B) → (∀ x, L x ∈ B ↔ x ∈ B) → (∀ x, P (P x) = P x) → (∀ x, S (S x) = x) → (∀ x, S (P x) = S x - P (S x)) → (∀ x, L (P x) = P (L x)) → (∀ x, φ x = φ (P x) * φ (x - P x)) → (∀ x, φ (S x) = φ x) → (∀ x, φ (L x) = (starRingEnd ℂ) (φ x)) → ∃ r : ℝ, 0 ≤ r ∧ ∑ᶠ q : G ⧸ B, φ q.out = (r : ℂ) := by
+theorem finsum_quotient_nonneg_of_swap_conj
+    : ∀ (G : Type) [AddCommGroup G] (B : AddSubgroup G) [Finite (G ⧸ B)] (φ : G → ℂ)
+        (P S L : G →+ G),
+      (∀ x, ∀ w ∈ B, φ (x + w) = φ x) → (∀ w ∈ B, P w ∈ B ∧ S w ∈ B) → (∀ x, L x ∈ B ↔ x ∈ B)
+        → (∀ x, P (P x) = P x) → (∀ x, S (S x) = x) → (∀ x, S (P x) = S x - P (S x))
+        → (∀ x, L (P x) = P (L x)) → (∀ x, φ x = φ (P x) * φ (x - P x)) → (∀ x, φ (S x) = φ x)
+        → (∀ x, φ (L x) = (starRingEnd ℂ) (φ x))
+        → ∃ r : ℝ, 0 ≤ r ∧ ∑ᶠ q : G ⧸ B, φ q.out = (r : ℂ) := by
   intro G _ B _ φ P S L hper hB hLB hP hS hSP hLP hφ hφS hφL
   haveI : Fintype (G ⧸ B) := Fintype.ofFinite _
   have hout : ∀ x : G, φ (QuotientAddGroup.mk x : G ⧸ B).out = φ x := by
@@ -106,13 +114,6 @@ theorem finsum_quotient_nonneg_of_swap_conj :
     induction q using QuotientAddGroup.induction_on with
     | H x =>
       simp only [eP, eS, eL, ← QuotientAddGroup.mk_sub, hout]
-      first
-        | rw [hP]
-        | rw [hS]
-        | rw [hSP]
-        | rw [hLP]
-        | exact hφ x
-        | exact hφS x
-        | exact hφL x
+      first | rw [hP] | rw [hS] | rw [hSP] | rw [hLP] | exact hφ x | exact hφS x | exact hφL x
 
 end GlobalTheory

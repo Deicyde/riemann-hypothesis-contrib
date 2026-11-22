@@ -13,7 +13,8 @@ namespace Formalism.L2.SG.Pf.Carrier
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar instCM
 
-structure CarrierIn {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word) : Type 1 where
+structure CarrierIn {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u u' : D.what₂.Word)
+    : Type 1 where
   Wp : InfinitePlace D.host.E → Type
   Wq : InfinitePlace D.host.E → Type
   [pN : ∀ x, NormedAddCommGroup (Wp x)]
@@ -35,15 +36,21 @@ structure CarrierIn {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u 
   grid1 : Fin nf → Finset ℝ
   hv : G.v = Formalism.FourierDecayAlt.S6.rd D.host.E / 2
   T : ∀ j : Fin nf, Formalism.FourierDecayAlt.D.LevTower G.k G.r (Wp (pl j)) (Wq (pl j))
-  hT : ∀ j, Formalism.QuantumDeterminants.Tz G.k G.r (T j).base.z = ((D.mem u).A.T : ℝ) ∧
-    Formalism.QuantumDeterminants.Tz G.k G.r (T j).base.z' = ((D.mem u').A.T : ℝ)
+  hT
+    : ∀ j,
+      Formalism.QuantumDeterminants.Tz G.k G.r (T j).base.z = ((D.mem u).A.T : ℝ)
+        ∧ Formalism.QuantumDeterminants.Tz G.k G.r (T j).base.z' = ((D.mem u').A.T : ℝ)
   fc : ∀ j : Fin nf, Formalism.FourierDecayAlt.B.Mat G.k G.r → (Wq (pl j) →L[ℂ] Wp (pl j))
   χ : ℝ → ℝ
   sg : Fin nf → ℂ
   ν' : Fin nf → Fin (2 * G.r + G.k + 1) → ℂ
   m₀ : Fin nf → Formalism.FourierDecayAlt.B.Mat G.k G.r
-  top : ∀ j : Fin nf, (Formalism.FourierDecayAlt.B.Mat G.k G.r → (Wq (pl j) →L[ℂ] Wp (pl j))) → List Formalism.FourierDecayAlt.C.Letter →
-    Formalism.FourierDecayAlt.C.LPt → Formalism.FourierDecayAlt.C.LPt → ℂ
+  top
+    : ∀ j : Fin nf,
+      (Formalism.FourierDecayAlt.B.Mat G.k G.r → (Wq (pl j) →L[ℂ] Wp (pl j)))
+        → List Formalism.FourierDecayAlt.C.Letter → Formalism.FourierDecayAlt.C.LPt
+        → Formalism.FourierDecayAlt.C.LPt
+        → ℂ
   A₀ : ℝ
   τ : Fin nf ≃ InfinitePlace X.B.I.F
   Q : ∀ _ : InfinitePlace X.B.I.F, Matrix (Fin X.B.I.n) (Fin (2 * G.r + G.k + 1)) ℂ
@@ -69,19 +76,33 @@ def sOf (I : CarrierIn X u u') : Formalism.FourierDecayAlt.C.HidaSetting D.host.
   l := I.l
   grid := I.grid
   grid1 := I.grid1
-  pd := fun j => Formalism.FourierDecayAlt.D.componentFamilySetting_ofSetting (I.T j) (I.fc j) I.χ (I.sg j) (I.ν' j) (I.m₀ j) (I.top j)
-    ((I.G.g1 * I.G.g2 : ℕ) : ℝ) (Formalism.FourierDecayAlt.S6.rd D.host.E) 1
+  pd := fun j =>
+    Formalism.FourierDecayAlt.D.componentFamilySetting_ofSetting (I.T j) (I.fc j) I.χ (I.sg j)
+      (I.ν' j) (I.m₀ j) (I.top j) ((I.G.g1 * I.G.g2 : ℕ) : ℝ)
+      (Formalism.FourierDecayAlt.S6.rd D.host.E) 1
   hv := I.hv
   hT := I.hT
 
-structure ModelsFor {Wp Wq : InfinitePlace D.host.E → Type} [∀ x, NormedAddCommGroup (Wp x)]
-    [∀ x, InnerProductSpace ℂ (Wp x)] [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
+structure ModelsFor
+    {Wp Wq : InfinitePlace D.host.E → Type}
+    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
+    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)]
     (S : Formalism.FourierDecayAlt.C.HidaSetting D.host.E Wp Wq) where
-  L : ∀ v : Fin S.f, Formalism.FourierDecayAlt.R.LevelData (Formalism.FourierDecayAlt.MA.A (Formalism.FourierDecayAlt.D.parOf S v)
-    (Formalism.FourierDecayAlt.MA.DQ (Formalism.FourierDecayAlt.D.parOf S v))) (Formalism.FourierDecayAlt.D.parOf S v).r
-  j : ∀ v : Fin S.f, Formalism.FourierDecayAlt.M.Ty (Formalism.FourierDecayAlt.D.parOf S v) →
-    Formalism.FourierDecayAlt.MA.SmQ (Formalism.FourierDecayAlt.D.parOf S v).r (Formalism.FourierDecayAlt.D.parOf S v).TT
-  lam : ∀ v : Fin S.f, Fin ((Formalism.FourierDecayAlt.D.parOf S v).k + 2 * (Formalism.FourierDecayAlt.D.parOf S v).r + 1) → ℝ
+  L : ∀ v : Fin S.f,
+    Formalism.FourierDecayAlt.R.LevelData
+      (Formalism.FourierDecayAlt.MA.A (Formalism.FourierDecayAlt.D.parOf S v)
+        (Formalism.FourierDecayAlt.MA.DQ (Formalism.FourierDecayAlt.D.parOf S v)))
+      (Formalism.FourierDecayAlt.D.parOf S v).r
+  j : ∀ v : Fin S.f,
+    Formalism.FourierDecayAlt.M.Ty (Formalism.FourierDecayAlt.D.parOf S v)
+      → Formalism.FourierDecayAlt.MA.SmQ (Formalism.FourierDecayAlt.D.parOf S v).r
+        (Formalism.FourierDecayAlt.D.parOf S v).TT
+  lam
+    : ∀ v : Fin S.f,
+      Fin
+          ((Formalism.FourierDecayAlt.D.parOf S v).k + 2 * (Formalism.FourierDecayAlt.D.parOf S v).r
+            + 1)
+        → ℝ
   c : Formalism.FourierDecayAlt.LE.Cut
   Cm : Fin S.f → ℝ
   σ : Fin S.f → ℝ

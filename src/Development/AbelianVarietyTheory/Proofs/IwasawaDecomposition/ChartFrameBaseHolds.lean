@@ -12,22 +12,34 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsIsL
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.LocM.FrameBase
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
 
-theorem lieBasis_iff {X : Scheme.{0}} (t : SAB H X) {S : Type} [CommRing S] (x : Sp S ⟶ X) (G' : Over (Sp S)) [GrpObj G']
-    (φ : G'.left ⟶ t.G.left) (hp : IsGrpPullback G' t.G x φ) :
-    (∀ w : (Sp (DualNumber S) ⟶ t.G.left), IsTanAtG t x w → ∃ v : epsR S ⟶ G', v.left ≫ φ = w) ∧
-    ∀ (n : ℕ) (v : Fin n → (epsR S ⟶ G')), IsLieBasis v ↔ ((∀ i, IsTanAtG t x ((v i).left ≫ φ)) ∧
-      ∀ w, IsTanAtG t x w → ∃! a : Fin n → S, IsCombAtG t x (fun i => (v i).left ≫ φ) a w) := by
-  let up : ∀ w : Sp (DualNumber S) ⟶ t.G.left,
-      w ≫ t.G.hom = spMap (algebraMap S (DualNumber S)) ≫ x → (epsR S ⟶ G') :=
-    fun w h => Over.homMk (hp.1.lift w _ h) (hp.1.lift_snd _ _ _)
+theorem lieBasis_iff
+    {X : Scheme.{0}} (t : SAB H X)
+    {S : Type} [CommRing S]
+    (x : Sp S ⟶ X)
+    (G' : Over (Sp S)) [GrpObj G']
+    (φ : G'.left ⟶ t.G.left) (hp : IsGrpPullback G' t.G x φ)
+    : (∀ w : (Sp (DualNumber S) ⟶ t.G.left), IsTanAtG t x w → ∃ v : epsR S ⟶ G', v.left ≫ φ = w)
+      ∧ ∀ (n : ℕ) (v : Fin n → (epsR S ⟶ G')),
+        IsLieBasis v
+          ↔ ((∀ i, IsTanAtG t x ((v i).left ≫ φ))
+            ∧ ∀ w,
+              IsTanAtG t x w → ∃! a : Fin n → S, IsCombAtG t x (fun i => (v i).left ≫ φ) a w) := by
+  let up
+      : ∀ w : Sp (DualNumber S) ⟶ t.G.left,
+        w ≫ t.G.hom = spMap (algebraMap S (DualNumber S)) ≫ x → (epsR S ⟶ G') := fun w h =>
+    Over.homMk (hp.1.lift w _ h) (hp.1.lift_snd _ _ _)
   have hup : ∀ w h, (up w h).left ≫ φ = w := fun w h => hp.1.lift_fst _ _ _
   have inj : ∀ {T : Over (Sp S)} {u v : T ⟶ G'}, u.left ≫ φ = v.left ≫ φ → u = v := fun h =>
     Over.OverMorphism.ext (hp.1.hom_ext h ((Over.w _).trans (Over.w _).symm))
@@ -37,8 +49,12 @@ theorem lieBasis_iff {X : Scheme.{0}} (t : SAB H X) {S : Type} [CommRing S] (x :
     have e₁ : (1 : 𝟙_ (Over (Sp S)) ⟶ G') = η[G'] := by rw [Hom.one_def]; simp
     rw [← e₁, one]
     exact congrArg (· ≫ (η[t.G]).left) (Category.id_comp x)
-  have zs : spMap (TrivSqZeroExt.fstHom S S S).toRingHom ≫ spMap (algebraMap S (DualNumber S)) = 𝟙 _ := by
-    have e : (TrivSqZeroExt.fstHom S S S).toRingHom.comp (algebraMap S (DualNumber S)) = RingHom.id S := by
+  have zs
+      : spMap (TrivSqZeroExt.fstHom S S S).toRingHom ≫ spMap (algebraMap S (DualNumber S))
+        = 𝟙 _ := by
+    have e
+        : (TrivSqZeroExt.fstHom S S S).toRingHom.comp (algebraMap S (DualNumber S))
+          = RingHom.id S := by
       ext s; simp
     simp only [spMap]
     rw [← Spec.map_comp, ← CommRingCat.ofHom_comp, e]
@@ -50,17 +66,29 @@ theorem lieBasis_iff {X : Scheme.{0}} (t : SAB H X) {S : Type} [CommRing S] (x :
     · refine (Category.assoc _ _ _).trans ?_
       rw [Over.w w, Over.w η[G']]
       exact zs
-  have pr : ∀ {n} (u : Fin n → (epsR S ⟶ G')), (List.ofFn u).prod.left ≫ φ =
-      (List.ofFn fun i => (pushPt hp.1.w (u i) : tEpsG x ⟶ t.G)).prod.left := fun u =>
-    congrArg (fun q => q.left) ((map_list_prod (pushHom hp (epsR S)) _).trans (by rw [List.map_ofFn]; rfl))
-  have comb : ∀ {n} (c : Fin n → S) (v : Fin n → (epsR S ⟶ G')) w,
-      IsLieComb c v w ↔ IsCombAtG t x (fun i => (v i).left ≫ φ) c (w.left ≫ φ) := fun c v w => by
+  have pr
+      : ∀ {n} (u : Fin n → (epsR S ⟶ G')),
+        (List.ofFn u).prod.left ≫ φ
+          = (List.ofFn fun i => (pushPt hp.1.w (u i) : tEpsG x ⟶ t.G)).prod.left := fun u =>
+    congrArg
+      (fun q => q.left)
+      ((map_list_prod (pushHom hp (epsR S)) _).trans (by rw [List.map_ofFn]; rfl))
+  have comb
+      : ∀ {n} (c : Fin n → S) (v : Fin n → (epsR S ⟶ G')) w,
+        IsLieComb c v w ↔ IsCombAtG t x (fun i => (v i).left ≫ φ) c (w.left ≫ φ) := fun c v w => by
     constructor
     · rintro ⟨u, hu, rfl⟩
-      exact ⟨fun i => pushPt hp.1.w (u i), fun i => (congrArg (· ≫ φ) (hu i)).trans (Category.assoc _ _ _), (pr u).symm⟩
+      exact ⟨
+        fun i => pushPt hp.1.w (u i),
+        fun i => (congrArg (· ≫ φ) (hu i)).trans (Category.assoc _ _ _),
+        (pr u).symm
+      ⟩
     · rintro ⟨u, hu, hw⟩
-      refine ⟨fun i => up (u i).left (Over.w _), fun i => hp.1.hom_ext ?_ ?_,
-        inj (hw.symm.trans (Eq.trans ?_ (pr _).symm))⟩
+      refine ⟨
+        fun i => up (u i).left (Over.w _),
+        fun i => hp.1.hom_ext ?_ ?_,
+        inj (hw.symm.trans (Eq.trans ?_ (pr _).symm))
+      ⟩
       · exact (hup _ _).trans ((hu i).trans (Category.assoc _ _ _).symm)
       · refine (Over.w (up (u i).left (Over.w _))).trans (Eq.trans ?_ (Category.assoc _ _ _).symm)
         refine Eq.trans ?_ (congrArg (spMap (epsScaleR (c i)) ≫ ·) (Over.w (v i))).symm
@@ -68,8 +96,13 @@ theorem lieBasis_iff {X : Scheme.{0}} (t : SAB H X) {S : Type} [CommRing S] (x :
       · have : u = fun i => (pushPt hp.1.w (up (u i).left (Over.w _)) : tEpsG x ⟶ t.G) :=
           funext fun i => Over.OverMorphism.ext (hup (u i).left (Over.w _)).symm
         exact congrArg (fun q : _ → (tEpsG x ⟶ t.G) => (List.ofFn q).prod.left) this
-  refine ⟨fun w hw => ⟨up w hw.1, hup _ _⟩, fun n v => ⟨fun hB => ⟨fun i => (tan _).1 (hB.1 i), fun w hw => ?_⟩,
-    fun hB => ⟨fun i => (tan _).2 (hB.1 i), fun w hw => ?_⟩⟩⟩
+  refine ⟨
+    fun w hw => ⟨up w hw.1, hup _ _⟩,
+    fun n v => ⟨
+      fun hB => ⟨fun i => (tan _).1 (hB.1 i), fun w hw => ?_⟩,
+      fun hB => ⟨fun i => (tan _).2 (hB.1 i), fun w hw => ?_⟩
+    ⟩
+  ⟩
   · have h := hB.2 (up w hw.1) ((tan _).2 (by rw [hup]; exact hw))
     simp only [comb, hup] at h
     exact h
@@ -77,12 +110,17 @@ theorem lieBasis_iff {X : Scheme.{0}} (t : SAB H X) {S : Type} [CommRing S] (x :
     simp only [comb]
     exact h
 
-theorem tanBasis_baseChange {X : Scheme.{0}} (t : SAB H X) {S T : Type} [CommRing S] [CommRing T] (φ : S →+* T)
-    (x : Sp S ⟶ X) (n : ℕ) (v : Fin n → (Sp (DualNumber S) ⟶ t.G.left)) (hv : ∀ i, IsTanAtG t x (v i))
-    (hv' : ∀ w, IsTanAtG t x w → ∃! a : Fin n → S, IsCombAtG t x v a w) :
-    (∀ i, IsTanAtG t (spMap φ ≫ x) (spMap (dualMap φ) ≫ v i)) ∧
-      ∀ w, IsTanAtG t (spMap φ ≫ x) w →
-        ∃! a : Fin n → T, IsCombAtG t (spMap φ ≫ x) (fun i => spMap (dualMap φ) ≫ v i) a w := by
+theorem tanBasis_baseChange
+    {X : Scheme.{0}} (t : SAB H X)
+    {S T : Type} [CommRing S] [CommRing T]
+    (φ : S →+* T)
+    (x : Sp S ⟶ X) (n : ℕ) (v : Fin n → (Sp (DualNumber S) ⟶ t.G.left))
+    (hv : ∀ i, IsTanAtG t x (v i))
+    (hv' : ∀ w, IsTanAtG t x w → ∃! a : Fin n → S, IsCombAtG t x v a w)
+    : (∀ i, IsTanAtG t (spMap φ ≫ x) (spMap (dualMap φ) ≫ v i))
+      ∧ ∀ w,
+        IsTanAtG t (spMap φ ≫ x) w
+          → ∃! a : Fin n → T, IsCombAtG t (spMap φ ≫ x) (fun i => spMap (dualMap φ) ≫ v i) a w := by
   have := t.semi.comm
   have := t.semi.smooth
   have h₁ := isGrpPullback_pullback t.G x
@@ -94,15 +132,18 @@ theorem tanBasis_baseChange {X : Scheme.{0}} (t : SAB H X) {S T : Type} [CommRin
   obtain ⟨a₁, b₁⟩ := lieBasis_iff t x _ _ h₁
   obtain ⟨-, b₃⟩ := lieBasis_iff t _ _ _ h₃
   choose u hu using fun i => a₁ (v i) (hv i)
-  have hb : IsLieBasis u := (b₁ n u).2 ⟨fun i => by rw [hu]; exact hv i, by rw [funext hu]; exact hv'⟩
+  have hb : IsLieBasis u :=
+    (b₁ n u).2 ⟨fun i => by rw [hu]; exact hv i, by rw [funext hu]; exact hv'⟩
   have hs : Smooth ((Over.pullback x).obj t.G).hom :=
     inferInstanceAs (Smooth (pullback.snd t.G.hom x))
   obtain ⟨u', hb', hu'⟩ := GlobalTheory.exists_isLieBasis_baseChange S T φ _ _ _ h₂ hs n u hb
-  have e : Chart.dualMapR φ = dualMap φ := by
-    ext a <;> rfl
+  have e : Chart.dualMapR φ = dualMap φ := by ext a <;> rfl
   have key := (b₃ n u').1 hb'
-  have e' : ∀ i, (u' i).left ≫ pullback.fst ((Over.pullback x).obj t.G).hom (spMap φ) ≫ pullback.fst t.G.hom x =
-      spMap (dualMap φ) ≫ v i := fun i => by
+  have e'
+      : ∀ i,
+        (u' i).left ≫ pullback.fst ((Over.pullback x).obj t.G).hom (spMap φ)
+            ≫ pullback.fst t.G.hom x
+          = spMap (dualMap φ) ≫ v i := fun i => by
     rw [← Category.assoc, hu', e, Category.assoc, hu]
   refine ⟨fun i => e' i ▸ key.1 i, ?_⟩
   rw [← funext e']

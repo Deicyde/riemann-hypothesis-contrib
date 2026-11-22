@@ -17,19 +17,19 @@ variable {R B : Type} [CommRing R] [CommRing B] [Algebra R B] {D : ℕ}
 
 private def shear (u : Fin D → B) : MvPolynomial (Fin D) B ≃ₐ[B] MvPolynomial (Fin D) B :=
   AlgEquiv.ofAlgHom (MvPolynomial.aeval fun k => MvPolynomial.X k - MvPolynomial.C (u k))
-    (MvPolynomial.aeval fun k => MvPolynomial.X k + MvPolynomial.C (u k))
-    (by ext k; simp) (by ext k; simp)
+    (MvPolynomial.aeval fun k => MvPolynomial.X k + MvPolynomial.C (u k)) (by ext k; simp)
+    (by ext k; simp)
 
-private theorem shear_X (u : Fin D → B) (k : Fin D) :
-    shear u (MvPolynomial.X k) = MvPolynomial.X k - MvPolynomial.C (u k) := by
+private theorem shear_X (u : Fin D → B) (k : Fin D)
+    : shear u (MvPolynomial.X k) = MvPolynomial.X k - MvPolynomial.C (u k) := by
   simp [shear]
 
 private theorem shear_C (u : Fin D → B) (b : B) : shear u (MvPolynomial.C b) = MvPolynomial.C b :=
   (shear u).commutes b
 
-private theorem etale_diff (u : Fin D → B)
-    (h : (MvPolynomial.aeval u : MvPolynomial (Fin D) R →ₐ[R] B).toRingHom.Etale) :
-    (MvPolynomial.eval₂Hom (Algebra.TensorProduct.includeLeftRingHom : B →+* B ⊗[R] B)
+private theorem etale_diff
+    (u : Fin D → B) (h : (MvPolynomial.aeval u : MvPolynomial (Fin D) R →ₐ[R] B).toRingHom.Etale)
+    : (MvPolynomial.eval₂Hom (Algebra.TensorProduct.includeLeftRingHom : B →+* B ⊗[R] B)
       (fun k => (1 : B) ⊗ₜ[R] u k - u k ⊗ₜ[R] (1 : B))).Etale := by
   classical
   letI algA : Algebra (MvPolynomial (Fin D) R) B := (MvPolynomial.aeval u).toRingHom.toAlgebra
@@ -45,8 +45,9 @@ private theorem etale_diff (u : Fin D → B)
       (fun k => u k ⊗ₜ[R] (1 : B))
   letI algPT : Algebra (MvPolynomial (Fin D) B) (B ⊗[R] B) := hm.toAlgebra
   have t2 : IsScalarTower (MvPolynomial (Fin D) R) B (B ⊗[R] B) := inferInstance
-  have hcomp : (algebraMap (MvPolynomial (Fin D) R) (B ⊗[R] B)) =
-      hm.comp (MvPolynomial.map (algebraMap R B)) := by
+  have hcomp
+      : (algebraMap (MvPolynomial (Fin D) R) (B ⊗[R] B))
+        = hm.comp (MvPolynomial.map (algebraMap R B)) := by
     apply MvPolynomial.ringHom_ext
     · intro r
       simp [hm, Algebra.TensorProduct.algebraMap_apply, RingHom.algebraMap_toAlgebra,
@@ -61,7 +62,8 @@ private theorem etale_diff (u : Fin D → B)
   have hf : IsBaseChange (MvPolynomial (Fin D) R)
       (IsScalarTower.toAlgHom R B (MvPolynomial (Fin D) B)).toLinearMap :=
     (inferInstance : Algebra.IsPushout R (MvPolynomial (Fin D) R) B (MvPolynomial (Fin D) B)).out
-  have hpush : Algebra.IsPushout (MvPolynomial (Fin D) R) B (MvPolynomial (Fin D) B) (B ⊗[R] B) := by
+  have hpush
+      : Algebra.IsPushout (MvPolynomial (Fin D) R) B (MvPolynomial (Fin D) B) (B ⊗[R] B) := by
     constructor
     refine IsBaseChange.of_comp (T := B) hf ?_
     convert TensorProduct.isBaseChange R B B using 1
@@ -70,38 +72,42 @@ private theorem etale_diff (u : Fin D → B)
   have hE : hm.Etale :=
     RingHom.Etale.isStableUnderBaseChange (MvPolynomial (Fin D) R) B (MvPolynomial (Fin D) B)
       (B ⊗[R] B) h
-  have heq : MvPolynomial.eval₂Hom (Algebra.TensorProduct.includeLeftRingHom : B →+* B ⊗[R] B)
-      (fun k => (1 : B) ⊗ₜ[R] u k - u k ⊗ₜ[R] (1 : B)) =
-      (Algebra.TensorProduct.comm R B B).toAlgHom.toRingHom.comp
-        (hm.comp (shear u).toAlgHom.toRingHom) := by
+  have heq
+      : MvPolynomial.eval₂Hom (Algebra.TensorProduct.includeLeftRingHom : B →+* B ⊗[R] B)
+          (fun k => (1 : B) ⊗ₜ[R] u k - u k ⊗ₜ[R] (1 : B))
+        = (Algebra.TensorProduct.comm R B B).toAlgHom.toRingHom.comp
+          (hm.comp (shear u).toAlgHom.toRingHom) := by
     apply MvPolynomial.ringHom_ext
     · intro b
       simp [hm, shear_C]
     · intro i
       simp [hm, shear_X]
   rw [heq]
-  refine RingHom.Etale.stableUnderComposition _ _ ?_ (RingHom.Etale.of_bijective
-    (Algebra.TensorProduct.comm R B B).bijective)
-  exact RingHom.Etale.stableUnderComposition _ _ (RingHom.Etale.of_bijective
-    (shear u).bijective) hE
+  refine RingHom.Etale.stableUnderComposition _ _ ?_
+    (RingHom.Etale.of_bijective (Algebra.TensorProduct.comm R B B).bijective)
+  exact RingHom.Etale.stableUnderComposition _ _ (RingHom.Etale.of_bijective (shear u).bijective) hE
 end Alg
 
 section Geo
 variable {R : Type} [CommRing R]
 
-private theorem fromSpec_hom (Z : Sch R) {U : Z.left.Opens} (hU : IsAffineOpen U) :
-    (show Spec (CommRingCat.of (Sec Z U)) ⟶ Z.left from hU.fromSpec) ≫ Z.hom =
-      Spec.map (CommRingCat.ofHom (algebraMap R (Sec Z U))) := by
-  have e := IsAffineOpen.SpecMap_appLE_fromSpec Z.hom (isAffineOpen_top (Spec (CommRingCat.of R))) hU
-    (by simp)
+private theorem fromSpec_hom (Z : Sch R) {U : Z.left.Opens} (hU : IsAffineOpen U)
+    : (show Spec (CommRingCat.of (Sec Z U)) ⟶ Z.left from hU.fromSpec) ≫ Z.hom
+      = Spec.map (CommRingCat.ofHom (algebraMap R (Sec Z U))) := by
+  have e :=
+    IsAffineOpen.SpecMap_appLE_fromSpec Z.hom (isAffineOpen_top (Spec (CommRingCat.of R))) hU
+      (by simp)
   rw [IsAffineOpen.fromSpec_top, Scheme.isoSpec_Spec_inv, ← Spec.map_comp] at e
   show hU.fromSpec ≫ Z.hom = _
   rw [← e]
   rfl
 
-private theorem etale_prod (Z : Sch R) {U : Z.left.Opens} (hU : IsAffineOpen U) {N : (XX Z).left.Opens}
-    (hN : IsAffineOpen N) (h1 : N ≤ (p1 Z).left ⁻¹ᵁ U) (h2 : N ≤ (p2 Z).left ⁻¹ᵁ U) :
-    (Algebra.TensorProduct.productMap (secMap (p1 Z) h1) (secMap (p2 Z) h2)).toRingHom.Etale := by
+private theorem etale_prod
+    (Z : Sch R)
+    {U : Z.left.Opens} (hU : IsAffineOpen U)
+    {N : (XX Z).left.Opens}
+    (hN : IsAffineOpen N) (h1 : N ≤ (p1 Z).left ⁻¹ᵁ U) (h2 : N ≤ (p2 Z).left ⁻¹ᵁ U)
+    : (Algebra.TensorProduct.productMap (secMap (p1 Z) h1) (secMap (p2 Z) h2)).toRingHom.Etale := by
   let sA : Spec (CommRingCat.of (Sec Z U)) ⟶ Spec (CommRingCat.of R) :=
     Spec.map (CommRingCat.ofHom (algebraMap R (Sec Z U)))
   let a : Spec (CommRingCat.of (Sec Z U)) ⟶ Z.left := hU.fromSpec
@@ -148,7 +154,8 @@ private theorem etale_prod (Z : Sch R) {U : Z.left.Opens} (hU : IsAffineOpen U) 
       ext x
       simp [φ, secMap]
       rfl
-  have key' : Spec.map (CommRingCat.ofHom φ) = g' ≫ (pullbackSpecIso R (Sec Z U) (Sec Z U)).hom := by
+  have key'
+      : Spec.map (CommRingCat.ofHom φ) = g' ≫ (pullbackSpecIso R (Sec Z U) (Sec Z U)).hom := by
     rw [← key, Category.assoc, Iso.inv_hom_id, Category.comp_id]
   have hE : Etale (Spec.map (CommRingCat.ofHom φ)) := by rw [key']; infer_instance
   exact (HasRingHomProperty.Spec_iff (P := @Etale)).mp hE

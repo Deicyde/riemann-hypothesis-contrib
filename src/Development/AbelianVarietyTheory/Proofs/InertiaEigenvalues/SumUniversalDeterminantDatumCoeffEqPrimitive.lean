@@ -10,13 +10,17 @@ open Matrix GlobalTheory.ExportSeries
 
 namespace GlobalTheory.ExportSeries
 
-theorem sum_univCoef_eq_prim : ∀ (k C : Type) [Field k] [Finite k] [AddCommGroup C] [Fintype C] (r n : ℕ), r ≤ n →
-    ∀ (β : DetBases k r n) (κ : kˣ →* Multiplicative C) (y : Matrix (Fin r) (Fin n) k), ∑ c, univCoef β κ c y = prim y := by
+theorem sum_univCoef_eq_prim
+    : ∀ (k C : Type) [Field k] [Finite k] [AddCommGroup C] [Fintype C] (r n : ℕ),
+      r ≤ n
+        → ∀ (β : DetBases k r n) (κ : kˣ →* Multiplicative C) (y : Matrix (Fin r) (Fin n) k),
+          ∑ c, univCoef β κ c y = prim y := by
   intro k C _ _ _ _ r n hrn β κ y
   classical
   letI := Fintype.ofFinite (Planes k r n)
 
-  have hterm : ∀ U : Planes k r n, ∑ c, (univTerm β κ y U).coeff c = if Compl U.1 y then 1 else 0 := by
+  have hterm
+      : ∀ U : Planes k r n, ∑ c, (univTerm β κ y U).coeff c = if Compl U.1 y then 1 else 0 := by
     intro U
     unfold univTerm
     by_cases h : Compl U.1 y
@@ -24,11 +28,14 @@ theorem sum_univCoef_eq_prim : ∀ (k C : Type) [Field k] [Finite k] [AddCommGro
       simp [AddMonoidAlgebra.coeff_single, Finsupp.single_apply]
     · rw [dite_eq_right h, if_neg h]
       simp
-  have hsum : ∑ c, univCoef β κ c y = ((Nat.card k : ℚ) ^ (r * (n - r)))⁻¹ *
-      (Nat.card {U : Planes k r n // Compl U.1 y} : ℚ) := by
-    simp only [univCoef, univ, AddMonoidAlgebra.coeff_smul, Finsupp.smul_apply, smul_eq_mul, AddMonoidAlgebra.coeff_sum,
-      Finsupp.finsetSum_apply]
-    rw [← Finset.mul_sum, Finset.sum_comm, Finset.sum_congr rfl fun U _ => hterm U, Finset.sum_boole]
+  have hsum
+      : ∑ c, univCoef β κ c y
+        = ((Nat.card k : ℚ) ^ (r * (n - r)))⁻¹
+          * (Nat.card {U : Planes k r n // Compl U.1 y} : ℚ) := by
+    simp only [univCoef, univ, AddMonoidAlgebra.coeff_smul, Finsupp.smul_apply, smul_eq_mul,
+      AddMonoidAlgebra.coeff_sum, Finsupp.finsetSum_apply]
+    rw [← Finset.mul_sum, Finset.sum_comm, Finset.sum_congr rfl fun U _ => hterm U,
+      Finset.sum_boole]
     congr 2
     rw [Nat.card_eq_fintype_card (α := {U : Planes k r n // Compl U.1 y}), Fintype.card_subtype]
   rw [hsum]
@@ -40,8 +47,9 @@ theorem sum_univCoef_eq_prim : ∀ (k C : Type) [Field k] [Finite k] [AddCommGro
     have := finrank_range_le_card (R := k) y.row
     rw [Fintype.card_fin] at this
     exact this
-  have hcard : Nat.card {U : Planes k r (r + t) // Compl U.1 y} =
-      Nat.card {U : Submodule k (Fin (r + t) → k) // Module.finrank k U = t ∧ R ⊔ U = ⊤} := by
+  have hcard
+      : Nat.card {U : Planes k r (r + t) // Compl U.1 y}
+        = Nat.card {U : Submodule k (Fin (r + t) → k) // Module.finrank k U = t ∧ R ⊔ U = ⊤} := by
     refine Nat.card_congr ((Equiv.subtypeSubtypeEquivSubtypeInter _ (fun U => Compl U y)).trans
       (Equiv.subtypeEquivRight fun U => ?_))
     simp only [Compl, hR]

@@ -7,19 +7,22 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.GrSplitField
 
-theorem exists_step {K B : Type} [Field K] [CommRing B] [Algebra K B] {I : Ideal B}
-    (γ : DividedPowers I) (i : ℕ) :
-    ∃ C : Submodule K B, (∀ n ∈ C, n ∈ pdP γ i) ∧ (∀ n ∈ C, n ∈ pdP γ (i + 1) → n = 0) ∧
-      ∀ x ∈ pdP γ i, ∃ n ∈ C, x - n ∈ pdP γ (i + 1) := by
-  have hQ : (pdP γ (i + 1)).restrictScalars K ≤ (pdP γ i).restrictScalars K :=
-    fun x hx => (Ideal.span_mono fun _ ⟨l, hl, hr, hz⟩ => ⟨l, hl, (Nat.le_succ i).trans hr, hz⟩ :
-      pdP γ (i + 1) ≤ pdP γ i) hx
-  obtain ⟨c, hc⟩ := exists_isCompl
-    (⟨(pdP γ (i + 1)).restrictScalars K, hQ⟩ : Set.Iic ((pdP γ i).restrictScalars K))
+theorem exists_step
+    {K B : Type} [Field K] [CommRing B] [Algebra K B] {I : Ideal B} (γ : DividedPowers I) (i : ℕ)
+    : ∃ C : Submodule K B,
+      (∀ n ∈ C, n ∈ pdP γ i) ∧ (∀ n ∈ C, n ∈ pdP γ (i + 1) → n = 0)
+        ∧ ∀ x ∈ pdP γ i, ∃ n ∈ C, x - n ∈ pdP γ (i + 1) := by
+  have hQ : (pdP γ (i + 1)).restrictScalars K ≤ (pdP γ i).restrictScalars K := fun x hx =>
+    (Ideal.span_mono fun _ ⟨l, hl, hr, hz⟩ => ⟨l, hl, (Nat.le_succ i).trans hr, hz⟩
+        : pdP γ (i + 1) ≤ pdP γ i)
+      hx
+  obtain ⟨c, hc⟩ :=
+    exists_isCompl (⟨(pdP γ (i + 1)).restrictScalars K, hQ⟩ : Set.Iic ((pdP γ i).restrictScalars K))
   have hinf : (pdP γ (i + 1)).restrictScalars K ⊓ c.1 = ⊥ := congrArg Subtype.val hc.inf_eq_bot
   have hsup : (pdP γ (i + 1)).restrictScalars K ⊔ c.1 = (pdP γ i).restrictScalars K :=
     congrArg Subtype.val hc.sup_eq_top
@@ -33,8 +36,10 @@ theorem exists_step {K B : Type} [Field K] [CommRing B] [Algebra K B] {I : Ideal
     obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 hx'
     exact ⟨z, hz, by simpa using hy⟩
 
-theorem nonempty_grSplit : ∀ {K B : Type} [Field K] [CommRing B] [Algebra K B] {I : Ideal B} (γ : DividedPowers I) (m : ℕ),
-    pdP γ m = ⊥ → Nonempty (GrSplit K γ m) := by
+theorem nonempty_grSplit
+    : ∀ {K B : Type} [Field K] [CommRing B] [Algebra K B] {I : Ideal B} (γ : DividedPowers I)
+        (m : ℕ),
+      pdP γ m = ⊥ → Nonempty (GrSplit K γ m) := by
   intro K B _ _ _ I γ m hm
   choose C hC₁ hC₂ hC₃ using fun i : ℕ => exists_step (K := K) γ i
   exact ⟨{
@@ -45,6 +50,7 @@ theorem nonempty_grSplit : ∀ {K B : Type} [Field K] [CommRing B] [Algebra K B]
     surj := fun i x hx => by
       obtain ⟨n, hn, h⟩ := hC₃ i x hx
       exact ⟨⟨n, hn⟩, h⟩
-    nil := hm }⟩
+    nil := hm
+  }⟩
 
 end GlobalTheory.CompanionTheory.GrSplitField

@@ -11,24 +11,26 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GalStarCo
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.ConjCurve
 
-theorem exists_span_eq_mul {R : Type*} [CommRing R] [IsDedekindDomain R]
-    (J K : Ideal R) (hJ : J ≠ ⊥) (hK : K ≠ ⊥) :
-    ∃ (a : R) (A : Ideal R), a ≠ 0 ∧ Ideal.span {a} = J * A ∧ K ⊔ A = ⊤ := by
+theorem exists_span_eq_mul
+    {R : Type*} [CommRing R] [IsDedekindDomain R] (J K : Ideal R) (hJ : J ≠ ⊥) (hK : K ≠ ⊥)
+    : ∃ (a : R) (A : Ideal R), a ≠ 0 ∧ Ideal.span {a} = J * A ∧ K ⊔ A = ⊤ := by
   by_cases hKt : K = ⊤
   · obtain ⟨a, haJ, ha⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hJ
     obtain ⟨A, hA⟩ : J ∣ Ideal.span {a} :=
       Ideal.dvd_iff_le.mpr ((Ideal.span_singleton_le_iff_mem _).mpr haJ)
     refine ⟨a, A, ha, hA, ?_⟩
     rw [hKt, top_sup_eq]
-  · obtain ⟨a, ha⟩ := IsDedekindDomain.exists_sup_span_eq (I := J * K) (J := J)
-      Ideal.mul_le_left (mul_ne_zero hJ hK)
-    obtain ⟨A, hA⟩ : J ∣ Ideal.span {a} :=
-      Ideal.dvd_iff_le.mpr (le_sup_right.trans ha.le)
+  · obtain ⟨a, ha⟩ :=
+      IsDedekindDomain.exists_sup_span_eq (I := J * K) (J := J) Ideal.mul_le_left
+        (mul_ne_zero hJ hK)
+    obtain ⟨A, hA⟩ : J ∣ Ideal.span {a} := Ideal.dvd_iff_le.mpr (le_sup_right.trans ha.le)
     have hsup : K ⊔ A = ⊤ := by
       apply mul_left_cancel₀ (a := J) hJ
       rw [Ideal.mul_sup, ← hA, ha, Ideal.mul_top]
@@ -39,10 +41,10 @@ theorem exists_span_eq_mul {R : Type*} [CommRing R] [IsDedekindDomain R]
     rw [hA0, sup_bot_eq] at hsup
     exact hKt hsup
 
-theorem exists_equiv_comaximal {R : Type*} [CommRing R] [IsDedekindDomain R]
-    (I K : Ideal R) (hI : I ≠ ⊥) (hK : K ≠ ⊥) :
-    ∃ (a a' : R) (B : Ideal R), a ≠ 0 ∧ a' ≠ 0 ∧ B ≠ ⊥ ∧ K ⊔ B = ⊤ ∧
-      Ideal.span {a} * B = Ideal.span {a'} * I := by
+theorem exists_equiv_comaximal
+    {R : Type*} [CommRing R] [IsDedekindDomain R] (I K : Ideal R) (hI : I ≠ ⊥) (hK : K ≠ ⊥)
+    : ∃ (a a' : R) (B : Ideal R),
+      a ≠ 0 ∧ a' ≠ 0 ∧ B ≠ ⊥ ∧ K ⊔ B = ⊤ ∧ Ideal.span {a} * B = Ideal.span {a'} * I := by
   obtain ⟨a, A, ha, hA, -⟩ := exists_span_eq_mul I K hI hK
   have hA0 : A ≠ ⊥ := by
     rintro rfl
@@ -55,8 +57,11 @@ theorem exists_equiv_comaximal {R : Type*} [CommRing R] [IsDedekindDomain R]
     exact ha' hB
   · rw [hA, hB]; ring
 
-theorem coprime_absNorm {K : Type*} [Field K] [NumberField K] (B : Ideal (𝓞 K)) (hB : B ≠ ⊥) (N : ℕ)
-    (h : Ideal.span {(N : 𝓞 K)} ⊔ B = ⊤) : Nat.Coprime (Ideal.absNorm B) N := by
+theorem coprime_absNorm
+    {K : Type*} [Field K] [NumberField K]
+    (B : Ideal (𝓞 K)) (hB : B ≠ ⊥)
+    (N : ℕ) (h : Ideal.span {(N : 𝓞 K)} ⊔ B = ⊤)
+    : Nat.Coprime (Ideal.absNorm B) N := by
   apply Nat.Coprime.symm
   apply Nat.coprime_of_dvd
   intro p hp hpN hpB
@@ -64,45 +69,48 @@ theorem coprime_absNorm {K : Type*} [Field K] [NumberField K] (B : Ideal (𝓞 K
   haveI : Finite (𝓞 K ⧸ B) := Ideal.finiteQuotientOfFreeOfNeBot B hB
   rw [Ideal.absNorm_apply, Submodule.cardQuot_apply] at hpB
   obtain ⟨x, hx⟩ := exists_prime_addOrderOf_dvd_card' (G := 𝓞 K ⧸ B) p hpB
-  have hN : N • x = 0 := by
-    rw [← addOrderOf_dvd_iff_nsmul_eq_zero, hx]; exact hpN
+  have hN : N • x = 0 := by rw [← addOrderOf_dvd_iff_nsmul_eq_zero, hx]; exact hpN
   have h1 : (1 : 𝓞 K) ∈ Ideal.span {(N : 𝓞 K)} ⊔ B := by rw [h]; trivial
   obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.mp h1
   obtain ⟨u, rfl⟩ := Ideal.mem_span_singleton'.mp hy
   have h2 : Ideal.Quotient.mk B u * (N : 𝓞 K ⧸ B) = 1 := by
     have := congrArg (Ideal.Quotient.mk B) hyz
-    rw [map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.mpr hz, add_zero, map_mul, map_natCast, map_one] at this
+    rw [map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.mpr hz, add_zero, map_mul, map_natCast,
+        map_one]
+      at this
     exact this
-  have hx0 : x = 0 := by
-    rw [← one_mul x, ← h2, mul_assoc, ← nsmul_eq_mul, hN, mul_zero]
+  have hx0 : x = 0 := by rw [← one_mul x, ← h2, mul_assoc, ← nsmul_eq_mul, hN, mul_zero]
   rw [hx0, addOrderOf_zero] at hx
   exact hp.one_lt.ne hx
 
-theorem exists_ideal {R : Type*} [CommRing R] (f : R →+* ℂ) (Λ : AddSubgroup ℂ) (w₁ w₂ : ℂ)
-    (hw : w₁ ≠ 0) (hΛ : ∀ z, z ∈ Λ ↔ ∃ m n : ℤ, m * w₁ + n * w₂ = z)
-    (hst : ∀ r : R, ∀ z ∈ Λ, f r * z ∈ Λ) (s : R) (hs : ∀ a : ℤ, f s ≠ a) :
-    ∃ (I : Ideal R) (δ : ℂ), I ≠ ⊥ ∧ δ ≠ 0 ∧ ∀ z, z ∈ Λ ↔ ∃ c ∈ I, z = δ * f c := by
+theorem exists_ideal
+    {R : Type*} [CommRing R]
+    (f : R →+* ℂ)
+    (Λ : AddSubgroup ℂ) (w₁ w₂ : ℂ) (hw : w₁ ≠ 0) (hΛ : ∀ z, z ∈ Λ ↔ ∃ m n : ℤ, m * w₁ + n * w₂ = z)
+    (hst : ∀ r : R, ∀ z ∈ Λ, f r * z ∈ Λ)
+    (s : R) (hs : ∀ a : ℤ, f s ≠ a)
+    : ∃ (I : Ideal R) (δ : ℂ), I ≠ ⊥ ∧ δ ≠ 0 ∧ ∀ z, z ∈ Λ ↔ ∃ c ∈ I, z = δ * f c := by
   have h1 : w₁ ∈ Λ := (hΛ _).mpr ⟨1, 0, by simp⟩
   obtain ⟨a, b, hab⟩ := (hΛ _).mp (hst s _ h1)
   have hb : (b : ℂ) ≠ 0 := by
     intro hb
     rw [hb, zero_mul, add_zero] at hab
     exact hs a (mul_right_cancel₀ hw hab).symm
-  let I : Ideal R :=
-    { carrier := {r | w₁ / b * f r ∈ Λ}
-      add_mem' := fun {x y} hx hy => by
-        simp only [Set.mem_setOf_eq, map_add (f := _), mul_add] at *
-        exact Λ.add_mem hx hy
-      zero_mem' := by simp
-      smul_mem' := fun c x hx => by
-        simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul] at *
-        have := hst c _ hx
-        rwa [mul_left_comm] at this }
+  let I : Ideal R := {
+    carrier := {r | w₁ / b * f r ∈ Λ}
+    add_mem' := fun {x y} hx hy => by
+      simp only [Set.mem_setOf_eq, map_add (f := _), mul_add] at *
+      exact Λ.add_mem hx hy
+    zero_mem' := by simp
+    smul_mem' := fun c x hx => by
+      simp only [Set.mem_setOf_eq, smul_eq_mul, map_mul] at *
+      have := hst c _ hx
+      rwa [mul_left_comm] at this
+  }
   have hI : ∀ r, r ∈ I ↔ w₁ / b * f r ∈ Λ := fun r => Iff.rfl
   refine ⟨I, w₁ / b, ?_, div_ne_zero hw hb, fun z => ⟨fun hz => ?_, ?_⟩⟩
   · intro h0
-    have : (b : R) ∈ I := by
-      rw [hI, map_intCast, div_mul_cancel₀ _ hb]; exact h1
+    have : (b : R) ∈ I := by rw [hI, map_intCast, div_mul_cancel₀ _ hb]; exact h1
     rw [h0, Ideal.mem_bot] at this
     apply hb
     rw [← map_intCast f b, this, map_zero]
@@ -115,12 +123,11 @@ theorem exists_ideal {R : Type*} [CommRing R] (f : R →+* ℂ) (Λ : AddSubgrou
   · rintro ⟨c, hc, rfl⟩
     exact (hI _).mp hc
 
-theorem eisG_smul (Λ Λ' : AddSubgroup ℂ) (δ : ℂ) (hδ : δ ≠ 0) (h : ∀ z, δ * z ∈ Λ' ↔ z ∈ Λ) (k : ℕ) :
-    eisG Λ k = δ ^ (2 * k) * eisG Λ' k := by
+theorem eisG_smul (Λ Λ' : AddSubgroup ℂ) (δ : ℂ) (hδ : δ ≠ 0) (h : ∀ z, δ * z ∈ Λ' ↔ z ∈ Λ) (k : ℕ)
+    : eisG Λ k = δ ^ (2 * k) * eisG Λ' k := by
   unfold eisG
   let e : {w : ℂ // w ∈ Λ ∧ w ≠ 0} ≃ {w : ℂ // w ∈ Λ' ∧ w ≠ 0} :=
-    (Equiv.mulLeft₀ δ hδ).subtypeEquiv fun w => by
-      simp [h, hδ]
+    (Equiv.mulLeft₀ δ hδ).subtypeEquiv fun w => by simp [h, hδ]
   rw [← e.tsum_eq, ← tsum_mul_left]
   congr 1
   ext w
@@ -129,8 +136,8 @@ theorem eisG_smul (Λ Λ' : AddSubgroup ℂ) (δ : ℂ) (hδ : δ ≠ 0) (h : �
   have := w.2.2
   field_simp
 
-theorem discr_smul (Λ Λ' : AddSubgroup ℂ) (δ : ℂ) (hδ : δ ≠ 0) (h : ∀ z, δ * z ∈ Λ' ↔ z ∈ Λ) :
-    TaylorLogMetric.discr Λ = δ ^ 12 * TaylorLogMetric.discr Λ' := by
+theorem discr_smul (Λ Λ' : AddSubgroup ℂ) (δ : ℂ) (hδ : δ ≠ 0) (h : ∀ z, δ * z ∈ Λ' ↔ z ∈ Λ)
+    : TaylorLogMetric.discr Λ = δ ^ 12 * TaylorLogMetric.discr Λ' := by
   unfold TaylorLogMetric.discr g2 g3
   rw [eisG_smul Λ Λ' δ hδ h 2, eisG_smul Λ Λ' δ hδ h 3]
   ring
@@ -142,8 +149,8 @@ theorem embK_injective (D : D7) : Function.Injective (embK D) := fun _ _ h =>
   IsFractionRing.injective (𝓞 D.host.K) D.host.K
     (D.host.K.val.toRingHom.injective (D.host.φ₀.injective h))
 
-theorem mem_lamOf (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ z : ℂ) :
-    z ∈ lamOf D cc δ ↔ ∃ c ∈ cc, z = δ * embK D c := by
+theorem mem_lamOf (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ z : ℂ)
+    : z ∈ lamOf D cc δ ↔ ∃ c ∈ cc, z = δ * embK D c := by
   constructor
   · intro hz
     induction hz using AddSubgroup.closure_induction with
@@ -177,19 +184,21 @@ theorem exists_not_int (D : D7) : ∃ s : 𝓞 D.host.K, ∀ a : ℤ, embK D s �
   have hd : (0 : ℤ) < D.host.d := by exact_mod_cast D.host.hyp.2.1.pos
   nlinarith [sq_nonneg a]
 
-theorem exists_crv (D : D7) (Λ : AddSubgroup ℂ) (w₁ w₂ : ℂ)
-    (hw : w₁ ≠ 0) (hΛ : ∀ z, z ∈ Λ ↔ ∃ m n : ℤ, m * w₁ + n * w₂ = z)
-    (hst : ∀ r, ∀ z ∈ Λ, embK D r * z ∈ Λ) (hd : TaylorLogMetric.discr Λ = 1) (n : ℕ) (hn : 0 < n) :
-    ∃ (cc' : Ideal (𝓞 D.host.K)) (δ' : ℂ), Crv D cc' δ' ∧ Nat.Coprime (Ideal.absNorm cc') n ∧
-      Λ = lamOf D cc' δ' := by
+theorem exists_crv
+    (D : D7)
+    (Λ : AddSubgroup ℂ) (w₁ w₂ : ℂ) (hw : w₁ ≠ 0) (hΛ : ∀ z, z ∈ Λ ↔ ∃ m n : ℤ, m * w₁ + n * w₂ = z)
+    (hst : ∀ r, ∀ z ∈ Λ, embK D r * z ∈ Λ) (hd : TaylorLogMetric.discr Λ = 1)
+    (n : ℕ) (hn : 0 < n)
+    : ∃ (cc' : Ideal (𝓞 D.host.K)) (δ' : ℂ),
+      Crv D cc' δ' ∧ Nat.Coprime (Ideal.absNorm cc') n ∧ Λ = lamOf D cc' δ' := by
   obtain ⟨s, hs⟩ := exists_not_int D
   obtain ⟨I, δ, hI, hδ, hmem⟩ := exists_ideal (embK D) Λ w₁ w₂ hw hΛ hst s hs
   have hN : 2 * D.host.d * n ≠ 0 := by
     have := D.host.hyp.2.1.pos
     positivity
-  obtain ⟨a, a', B, ha, ha', hB, hsup, hEq⟩ := exists_equiv_comaximal I
-    (Ideal.span {((2 * D.host.d * n : ℕ) : 𝓞 D.host.K)}) hI
-    (by rw [Ne, Ideal.span_singleton_eq_bot]; exact Nat.cast_ne_zero.mpr hN)
+  obtain ⟨a, a', B, ha, ha', hB, hsup, hEq⟩ :=
+    exists_equiv_comaximal I (Ideal.span {((2 * D.host.d * n : ℕ) : 𝓞 D.host.K)}) hI
+      (by rw [Ne, Ideal.span_singleton_eq_bot]; exact Nat.cast_ne_zero.mpr hN)
   have hco := coprime_absNorm B hB _ hsup
   have hfa : embK D a ≠ 0 := (map_ne_zero_iff _ (embK_injective D)).mpr ha
   have hfa' : embK D a' ≠ 0 := (map_ne_zero_iff _ (embK_injective D)).mpr ha'
@@ -219,8 +228,13 @@ theorem exists_crv (D : D7) (Λ : AddSubgroup ℂ) (w₁ w₂ : ℂ)
       rw [hδ']
       field_simp
       linear_combination -this
-  refine ⟨B, δ', ⟨⟨hB, Nat.Coprime.coprime_mul_right_right hco⟩, ?_⟩,
-    Nat.Coprime.coprime_mul_left_right hco, hL⟩
+  refine ⟨
+    B,
+    δ',
+    ⟨⟨hB, Nat.Coprime.coprime_mul_right_right hco⟩, ?_⟩,
+    Nat.Coprime.coprime_mul_left_right hco,
+    hL
+  ⟩
   unfold IsDiscriminantTwelfthRootOfIdealLattice
   rw [discr_smul (lamOf D B 1) Λ δ' hδ0, hd, mul_one]
   intro z
@@ -233,27 +247,40 @@ theorem exists_crv (D : D7) (Λ : AddSubgroup ℂ) (w₁ w₂ : ℂ)
 
 theorem galCurve_holds : ∀ D : D7, galCurve D := by
   intro D cc δ hc M ρ hK h2 h3 n hn
-  obtain ⟨⟨w₁, w₂, hli, hcl⟩, -, hdisc, -, hO⟩ := GlobalTheory.T.idealPeriodLattice_of_curveDatum D (GlobalTheory.T.inducedType_thetaGenusOne_permutes D).1 cc δ hc
-  have hstar := (GlobalTheory.T.galStar_complexMultiplication_points D cc δ hc M ρ hK h2 h3).2.2.2.2.1
+  obtain ⟨⟨w₁, w₂, hli, hcl⟩, -, hdisc, -, hO⟩ :=
+    GlobalTheory.T.idealPeriodLattice_of_curveDatum D
+      (GlobalTheory.T.inducedType_thetaGenusOne_permutes D).1 cc δ hc
+  have hstar :=
+    (GlobalTheory.T.galStar_complexMultiplication_points D cc δ hc M ρ hK h2 h3).2.2.2.2.1
   set Λ := lamOf D cc δ with hΛ
   let L : PeriodPair := ⟨w₁, w₂, hli⟩
   have hL : ∀ z, z ∈ Λ ↔ z ∈ L.lattice := by
     intro z
     rw [hcl, AddSubgroup.mem_closure_pair, PeriodPair.mem_lattice]
     simp [L]
-  have hρ : (ρ (TaylorLogMetric.liftM M (g2 Λ))) ^ 3 - 27 * (ρ (TaylorLogMetric.liftM M (g3 Λ))) ^ 2 = 1 := by
-    have : (TaylorLogMetric.liftM M (g2 Λ)) ^ 3 - 27 * (TaylorLogMetric.liftM M (g3 Λ)) ^ 2 = 1 := by
+  have hρ
+      : (ρ (TaylorLogMetric.liftM M (g2 Λ))) ^ 3 - 27 * (ρ (TaylorLogMetric.liftM M (g3 Λ))) ^ 2
+        = 1 := by
+    have : (TaylorLogMetric.liftM M (g2 Λ)) ^ 3 - 27 * (TaylorLogMetric.liftM M (g3 Λ)) ^ 2
+        = 1 := by
       apply Subtype.ext
       unfold TaylorLogMetric.liftM
       rw [dite_eq_left h2, dite_eq_left h3]
       exact hdisc
     have h := congrArg ρ this
     simpa [map_ofNat] using h
-  obtain ⟨L', hL2, hL3⟩ := (GlobalTheory.T.latticeInvariants_periodPair_dictionary L Λ hL).2.2.2.2.2.2 _ _ (by rw [hρ]; exact one_ne_zero)
-  have hP := GlobalTheory.T.latticeInvariants_periodPair_dictionary L' L'.lattice.toAddSubgroup (fun z => Iff.rfl)
-  have hspec : g2 (lamConj M ρ Λ) = ρ (TaylorLogMetric.liftM M (g2 Λ)) ∧ g3 (lamConj M ρ Λ) = ρ (TaylorLogMetric.liftM M (g3 Λ)) :=
-    Classical.epsilon_spec (p := fun Λ' : AddSubgroup ℂ =>
-      g2 Λ' = ρ (TaylorLogMetric.liftM M (g2 Λ)) ∧ g3 Λ' = ρ (TaylorLogMetric.liftM M (g3 Λ)))
+  obtain ⟨L', hL2, hL3⟩ :=
+    (GlobalTheory.T.latticeInvariants_periodPair_dictionary L Λ hL).2.2.2.2.2.2 _ _
+      (by rw [hρ]; exact one_ne_zero)
+  have hP :=
+    GlobalTheory.T.latticeInvariants_periodPair_dictionary L' L'.lattice.toAddSubgroup
+      (fun z => Iff.rfl)
+  have hspec
+      : g2 (lamConj M ρ Λ) = ρ (TaylorLogMetric.liftM M (g2 Λ))
+        ∧ g3 (lamConj M ρ Λ) = ρ (TaylorLogMetric.liftM M (g3 Λ)) :=
+    Classical.epsilon_spec
+      (p := fun Λ' : AddSubgroup ℂ =>
+        g2 Λ' = ρ (TaylorLogMetric.liftM M (g2 Λ)) ∧ g3 Λ' = ρ (TaylorLogMetric.liftM M (g3 Λ)))
       ⟨L'.lattice.toAddSubgroup, hP.1.trans hL2, hP.2.1.trans hL3⟩
   have hEq : lamConj M ρ Λ = L'.lattice.toAddSubgroup :=
     hP.2.2.2.2.2.1 _ (hspec.1.trans (hP.1.trans hL2).symm) (hspec.2.trans (hP.2.1.trans hL3).symm)

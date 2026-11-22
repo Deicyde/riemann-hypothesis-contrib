@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
+  GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 open GlobalTheory.Desc
 
@@ -25,10 +28,16 @@ def genClasses (X : Scheme.{0}) : AddSubmonoid (Pic X) where
     rintro _ _ ⟨A, hA, gA, rfl⟩ ⟨B, hB, gB, rfl⟩
     exact ⟨tens A B, isLB_tens hA hB, AmpleModelPos.isGenerated_tens gA gB, cls_tens hA hB _⟩
 
-theorem isAmpleLB_of_lbPow_lbIso_linComb : ∀ (X : Scheme.{0}) (L M : LB X), IsAmpleLB M → L.IsLB →
-    ∀ (N a₀ r : ℕ) (a : Fin r → ℕ) (β : Fin r → (X ⟶ X)), 1 ≤ N → 1 ≤ a₀ →
-    LBIso (lbPow L N) (LB.LinComb M (K := Option (Fin r)) (fun o => o.elim (𝟙 X) fun i => β i)
-      fun o => o.elim (a₀ : ℤ) fun i => (a i : ℤ)) → IsAmpleLB L := by
+theorem isAmpleLB_of_lbPow_lbIso_linComb
+    : ∀ (X : Scheme.{0}) (L M : LB X),
+      IsAmpleLB M → L.IsLB
+        → ∀ (N a₀ r : ℕ) (a : Fin r → ℕ) (β : Fin r → (X ⟶ X)),
+          1 ≤ N → 1 ≤ a₀
+            → LBIso (lbPow L N)
+              (LB.LinComb M (K := Option (Fin r))
+                (fun o => o.elim (𝟙 X) fun i => β i)
+                fun o => o.elim (a₀ : ℤ) fun i => (a i : ℤ))
+            → IsAmpleLB L := by
   intro X L M hM hL N a₀ r a β hN ha₀ H
   obtain ⟨k, hk, gk⟩ := hM.exists_isGenerated_pow
   have hMk := isLB_lbPow hM.isLB k
@@ -41,11 +50,15 @@ theorem isAmpleLB_of_lbPow_lbIso_linComb : ∀ (X : Scheme.{0}) (L M : LB X), Is
   have hLN := isLB_lbPow hL (N * k)
   have hMa := isLB_lbPow hM.isLB (a₀ * k)
   have hAmp : IsAmpleLB (lbPow M (a₀ * k)) :=
-    (isAmpleLB_pow_iff hM.isLB (Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (by omega) (by omega)))).2 hM
+    (isAmpleLB_pow_iff hM.isLB (Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (by omega) (by omega)))).2
+      hM
   have h₁ := LB.isLB_div hLN hMa
   have h₂ := LB.isLB_div h₁ hA
-  have hLpow : IsAmpleLB (lbPow L (N * k)) := hAmp.tensor_isGenerated gA hLN ((cls_eq_zero_iff h₂).1 ?_)
-  · exact (isAmpleLB_pow_iff hL (Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (by omega) (by omega)))).1 hLpow
+  have hLpow : IsAmpleLB (lbPow L (N * k)) :=
+    hAmp.tensor_isGenerated gA hLN ((cls_eq_zero_iff h₂).1 ?_)
+  · exact
+      (isAmpleLB_pow_iff hL (Nat.one_le_iff_ne_zero.2 (Nat.mul_ne_zero (by omega) (by omega)))).1
+        hLpow
   have hE := (cls_eq_iff (isLB_lbPow hL N) (LB.isLB_linComb hM.isLB _ _)).2 H
   rw [cls_lbPow hL, cls_linComb hM.isLB, Fintype.sum_option] at hE
   rw [cls_div h₁ hA, cls_div hLN hMa, hAc, hc, cls_lbPow hL, cls_lbPow hM.isLB, cls_lbPow hM.isLB]

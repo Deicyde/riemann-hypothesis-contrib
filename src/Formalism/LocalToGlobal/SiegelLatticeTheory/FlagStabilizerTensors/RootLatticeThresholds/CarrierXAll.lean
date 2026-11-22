@@ -46,9 +46,10 @@ namespace Formalism.L2.SG.Pf.CarrierXAll
 
 open Formalism.FourierDecayAlt
 
-theorem lenI_big (CDel Cb Cq : ℝ) (hCDel : 4 < CDel) (hCb : 0 < Cb) :
-    ∃ k0 : ℕ, ∀ {ι : Type} [Fintype ι] (G : Sz.Glob ι) (bb : ℝ), k0 ≤ G.k → G.Hyp bb CDel Cb →
-      Cq * ((G.k : ℝ) * ((G.r : ℝ) + 1) ^ 3 + ((G.r : ℝ) + 1) ^ 4) ≤ G.lenI := by
+theorem lenI_big (CDel Cb Cq : ℝ) (hCDel : 4 < CDel) (hCb : 0 < Cb)
+    : ∃ k0 : ℕ, ∀ {ι : Type} [Fintype ι] (G : Sz.Glob ι) (bb : ℝ),
+      k0 ≤ G.k → G.Hyp bb CDel Cb
+        → Cq * ((G.k : ℝ) * ((G.r : ℝ) + 1) ^ 3 + ((G.r : ℝ) + 1) ^ 4) ≤ G.lenI := by
   set M0 : ℝ := 4 * |Cq| + 5 with hM0
   refine ⟨⌈Real.exp (M0 / Cb)⌉₊ + 2, ?_⟩
   intro ι _ G bb hk hH
@@ -68,7 +69,8 @@ theorem lenI_big (CDel Cb Cq : ℝ) (hCDel : 4 < CDel) (hCb : 0 < Cb) :
 
   have hkexp : Real.exp (M0 / Cb) ≤ (G.k : ℝ) := by
     have h1 : Real.exp (M0 / Cb) ≤ (⌈Real.exp (M0 / Cb)⌉₊ : ℝ) := Nat.le_ceil _
-    have h2 : ((⌈Real.exp (M0 / Cb)⌉₊ : ℕ) : ℝ) ≤ (G.k : ℝ) := by exact_mod_cast (by omega : ⌈Real.exp (M0 / Cb)⌉₊ ≤ G.k)
+    have h2 : ((⌈Real.exp (M0 / Cb)⌉₊ : ℕ) : ℝ) ≤ (G.k : ℝ) := by
+      exact_mod_cast (by omega : ⌈Real.exp (M0 / Cb)⌉₊ ≤ G.k)
     linarith
   have hlogk : M0 / Cb ≤ Real.log (G.k : ℝ) := by
     rw [← Real.exp_le_exp, Real.exp_log hkpos]; exact hkexp
@@ -109,27 +111,35 @@ theorem lenI_big (CDel Cb Cq : ℝ) (hCDel : 4 < CDel) (hCb : 0 < Cb) :
   have hXM' : X ^ 4 * M0 ≤ (X * M0) ^ 4 := by
     have : M0 ≤ M0 ^ 4 := by
       have : (1 : ℝ) ≤ M0 := by linarith
-      calc M0 = M0 ^ 1 := (pow_one _).symm
+      calc
+        M0
+          = M0 ^ 1 := (pow_one _).symm
         _ ≤ M0 ^ 4 := pow_le_pow_right₀ this (by norm_num)
-    calc X ^ 4 * M0 ≤ X ^ 4 * M0 ^ 4 := mul_le_mul_of_nonneg_left this (by positivity)
+    calc
+      X ^ 4 * M0
+        ≤ X ^ 4 * M0 ^ 4 := mul_le_mul_of_nonneg_left this (by positivity)
       _ = (X * M0) ^ 4 := by ring
   have hDX : X ^ 4 * M0 ≤ G.Del := by linarith
 
   have hp1 : (G.k : ℝ) * ((G.r : ℝ) + 1) ^ 3 ≤ X ^ 4 := by
     have hr1 : (1 : ℝ) ≤ (G.r : ℝ) + 1 := by linarith
     have a : (G.k : ℝ) ≤ (G.k : ℝ) ^ 4 := by
-      calc (G.k : ℝ) = (G.k : ℝ) ^ 1 := (pow_one _).symm
+      calc
+        (G.k : ℝ)
+          = (G.k : ℝ) ^ 1 := (pow_one _).symm
         _ ≤ (G.k : ℝ) ^ 4 := pow_le_pow_right₀ (by linarith) (by norm_num)
     have b : ((G.r : ℝ) + 1) ^ 3 ≤ ((G.r : ℝ) + 1) ^ 4 := pow_le_pow_right₀ hr1 (by norm_num)
-    rw [hX, mul_pow]; exact mul_le_mul a b (by positivity) (by positivity)
+    rw [hX, mul_pow]
+    exact mul_le_mul a b (by positivity) (by positivity)
   have hp2 : ((G.r : ℝ) + 1) ^ 4 ≤ X ^ 4 := by
     have : (G.r : ℝ) + 1 ≤ X := by rw [hX]; nlinarith
     exact pow_le_pow_left₀ (by linarith) this 4
   have hP0 : 0 ≤ (G.k : ℝ) * ((G.r : ℝ) + 1) ^ 3 + ((G.r : ℝ) + 1) ^ 4 := by positivity
   have hCq : Cq * ((G.k : ℝ) * ((G.r : ℝ) + 1) ^ 3 + ((G.r : ℝ) + 1) ^ 4) ≤ |Cq| * (2 * X ^ 4) := by
-    calc Cq * ((G.k : ℝ) * ((G.r : ℝ) + 1) ^ 3 + ((G.r : ℝ) + 1) ^ 4)
-        ≤ |Cq| * ((G.k : ℝ) * ((G.r : ℝ) + 1) ^ 3 + ((G.r : ℝ) + 1) ^ 4) :=
-          mul_le_mul_of_nonneg_right (le_abs_self _) hP0
+    calc
+      Cq * ((G.k : ℝ) * ((G.r : ℝ) + 1) ^ 3 + ((G.r : ℝ) + 1) ^ 4)
+          ≤ |Cq| * ((G.k : ℝ) * ((G.r : ℝ) + 1) ^ 3 + ((G.r : ℝ) + 1) ^ 4) :=
+        mul_le_mul_of_nonneg_right (le_abs_self _) hP0
       _ ≤ |Cq| * (2 * X ^ 4) := mul_le_mul_of_nonneg_left (by linarith) (abs_nonneg _)
   have hX4 : 1 ≤ X ^ 4 := one_le_pow₀ hX1
   unfold Sz.Glob.lenI
@@ -147,23 +157,27 @@ namespace Formalism.L2.SG.Pf.CarrierXAll
 open Formalism.FourierDecayAlt Formalism.QuantumDeterminants
 open scoped Matrix
 
-theorem herm_mulVec {n : ℕ} {H g : Matrix (Fin n) (Fin n) ℂ} (hg : gᴴ * H * g = H) (v w : Fin n → ℂ) :
-    herm H (g *ᵥ v) (g *ᵥ w) = herm H v w := by
+theorem herm_mulVec {n : ℕ} {H g : Matrix (Fin n) (Fin n) ℂ} (hg : gᴴ * H * g = H) (v w : Fin n → ℂ)
+    : herm H (g *ᵥ v) (g *ᵥ w) = herm H v w := by
   unfold herm
-  rw [Matrix.star_mulVec, Matrix.mulVec_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, ← Matrix.mul_assoc, hg]
+  rw [Matrix.star_mulVec, Matrix.mulVec_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec,
+    ← Matrix.mul_assoc, hg]
 
-theorem frameVec_facts {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] (Bs : B.RealPlaceData k r Wp Wq) (ν' : Fin (2 * r + k + 1) → ℂ) (m₀ : B.Mat k r)
-    (hF : D.IsBaseFrame Bs ν' m₀) (hT : 0 < Tz k r Bs.z) (hT' : 0 < Tz k r Bs.z') :
-    inWb k r (m₀ *ᵥ ν') ∧ herm (Hpk k r) (m₀ *ᵥ ν') Bs.z = 0 ∧ herm (Hpk k r) (m₀ *ᵥ ν') (m₀ *ᵥ ν') = 1 := by
+theorem frameVec_facts
+    {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+    (Bs : B.RealPlaceData k r Wp Wq) (ν' : Fin (2 * r + k + 1) → ℂ) (m₀ : B.Mat k r)
+    (hF : D.IsBaseFrame Bs ν' m₀)
+    (hT : 0 < Tz k r Bs.z) (hT' : 0 < Tz k r Bs.z')
+    : inWb k r (m₀ *ᵥ ν') ∧ herm (Hpk k r) (m₀ *ᵥ ν') Bs.z = 0
+      ∧ herm (Hpk k r) (m₀ *ᵥ ν') (m₀ *ᵥ ν') = 1 := by
   obtain ⟨hw, hz, hn, hm, hmz⟩ := hF
   have hU : m₀ᴴ * Hpk k r * m₀ = Hpk k r := hm.1
   refine ⟨Formalism.FourierDecayAlt.P.Qx8.inWb_mulVec hm hw, ?_, by rw [herm_mulVec hU]; exact hn⟩
   have h0 : herm (Hpk k r) (m₀ *ᵥ ν') (m₀ *ᵥ Bs.z') = 0 := by rw [herm_mulVec hU]; exact hz
   rw [hmz] at h0
   set c : ℂ := ((√(Tz k r Bs.z' / Tz k r Bs.z) : ℝ) : ℂ) with hc
-  have hc0 : c ≠ 0 := by
-    rw [hc]; exact_mod_cast (Real.sqrt_pos.mpr (div_pos hT' hT)).ne'
+  have hc0 : c ≠ 0 := by rw [hc]; exact_mod_cast (Real.sqrt_pos.mpr (div_pos hT' hT)).ne'
   have e : herm (Hpk k r) (m₀ *ᵥ ν') (c • Bs.z) = star c * herm (Hpk k r) (m₀ *ᵥ ν') Bs.z := by
     unfold herm
     rw [star_smul, smul_dotProduct, smul_eq_mul]
@@ -172,11 +186,13 @@ theorem frameVec_facts {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [Inner
   · exact absurd (star_eq_zero.mp h) hc0
   · exact h
 
-theorem typeProj_nonempty (hTP : Top.TypeProjExists) {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (P : M.Par)
-    (Bs : B.RealPlaceData P.k P.r Wp Wq) (ν' : Fin (2 * P.r + P.k + 1) → ℂ) (m₀ : B.Mat P.k P.r)
-    (hP : Q.IsPlace P Bs.z Bs.z' Bs.π Bs.π') (hF : D.IsBaseFrame Bs ν' m₀) :
-    Nonempty (Top.TypeProj P Bs.π Bs.z (m₀ *ᵥ ν')) := by
+theorem typeProj_nonempty
+    (hTP : Top.TypeProjExists)
+    {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+    (P : M.Par) (Bs : B.RealPlaceData P.k P.r Wp Wq) (ν' : Fin (2 * P.r + P.k + 1) → ℂ)
+    (m₀ : B.Mat P.k P.r) (hP : Q.IsPlace P Bs.z Bs.z' Bs.π Bs.π') (hF : D.IsBaseFrame Bs ν' m₀)
+    : Nonempty (Top.TypeProj P Bs.π Bs.z (m₀ *ᵥ ν')) := by
   obtain ⟨hOK, hz, hz', hTz, hTz', hty, hty'⟩ := hP
   have hT : 0 < Tz P.k P.r Bs.z := by rw [hTz]; exact hOK.T_pos
   have hT' : 0 < Tz P.k P.r Bs.z' := by rw [hTz']; exact hOK.T'_pos
@@ -192,45 +208,64 @@ open scoped Matrix
 
 namespace Formalism.L2.SG.Pf.CarrierXAll
 
-open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT
+open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built
+  Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar instCM
 
 variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) {θ : ℝ} (C : Choice X θ)
 
-def ParNumsE (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ) : Prop :=
-  ∀ v, (∀ i ∈ Finset.Icc 1 (parE e u u' de de' v).k, ∃ n : ℤ, (parE e u u' de de' v).u i - (parE e u u' de de' v).u 1 = n) ∧
-    (∀ i ∈ Finset.Icc 1 (parE e u u' de de' v).k, ∃ n : ℤ, (parE e u u' de de' v).u' i - (parE e u u' de de' v).u 1 = n) ∧
-    ∀ i ∈ Finset.Icc 1 ((parE e u u' de de' v).k - 1), (parE e u u' de de' v).lo i ≤ (parE e u u' de de' v).hi i
+def ParNumsE (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ)
+    : Prop :=
+  ∀ v,
+    (∀ i ∈ Finset.Icc 1 (parE e u u' de de' v).k, ∃ n : ℤ,
+        (parE e u u' de de' v).u i - (parE e u u' de de' v).u 1 = n)
+      ∧ (∀ i ∈ Finset.Icc 1 (parE e u u' de de' v).k, ∃ n : ℤ,
+        (parE e u u' de de' v).u' i - (parE e u u' de de' v).u 1 = n)
+      ∧ ∀ i ∈ Finset.Icc 1 ((parE e u u' de de' v).k - 1),
+        (parE e u u' de de' v).lo i ≤ (parE e u u' de de' v).hi i
 
-theorem parNumsE_of (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ)
+theorem parNumsE_of
+    (u u' : D.what₂.Word)
+    (e : InfinitePlace D.host.E ≃ D.what₂.Tau)
+    (de de' : ℕ → ℝ)
     (h5 : ∀ (w : D.what₂.Word) τ, ¬ IsTop D τ → uOne D w τ D.R.k = vOne D τ (D.R.k - 1) - 1 / 2)
-    (hde : de = Formalism.MainNotions.BridgeLemma.deOf D u) (hde' : de' = Formalism.MainNotions.BridgeLemma.deOf D u') :
-    ParNumsE (D := D) u u' e de de' := by
+    (hde : de = Formalism.MainNotions.BridgeLemma.deOf D u)
+    (hde' : de' = Formalism.MainNotions.BridgeLemma.deOf D u')
+    : ParNumsE (D := D) u u' e de de' := by
   intro v
   set τ := e (plE D v) with hτ
-  have hu : ∀ (w : D.what₂.Word) (dw : ℕ → ℝ), dw = Formalism.MainNotions.BridgeLemma.deOf D w → ∀ i, 1 ≤ i → i ≤ D.R.k →
-      ((Formalism.L2.SG.SpectralTiesReal.gOf D e).place (plE D v)).u dw i = uOne D w τ i := by
+  have hu
+      : ∀ (w : D.what₂.Word) (dw : ℕ → ℝ),
+        dw = Formalism.MainNotions.BridgeLemma.deOf D w
+          → ∀ i,
+            1 ≤ i → i ≤ D.R.k
+              → ((Formalism.L2.SG.SpectralTiesReal.gOf D e).place (plE D v)).u dw i
+                = uOne D w τ i := by
     intro w dw hdw i h1 h2
     rw [Formalism.L2.SG.Pf.SzHypOf.gOf_place, hdw]
     exact Formalism.MainNotions.BridgeLemma.cfg_u D w τ (h5 w τ) i h1 h2
-  have hsucc : ∀ (w : D.what₂.Word) (j : ℕ) (hj : j < D.R.k), uOne D w τ (j + 1) = (((D.hcW w τ).u ⟨j, hj⟩ : ℚ) : ℝ) :=
-    fun w j hj => Formalism.MainNotions.BridgeLemma.uOne_succ D w τ j hj
+  have hsucc
+      : ∀ (w : D.what₂.Word) (j : ℕ) (hj : j < D.R.k),
+        uOne D w τ (j + 1) = (((D.hcW w τ).u ⟨j, hj⟩ : ℚ) : ℝ) := fun w j hj =>
+    Formalism.MainNotions.BridgeLemma.uOne_succ D w τ j hj
   have hk : (parE e u u' de de' v).k = D.R.k := rfl
-  have hpu : ∀ i, 1 ≤ i → i ≤ D.R.k →
-      (parE e u u' de de' v).u i = uOne D u τ i :=
-    fun i h1 h2 => hu u de hde i h1 h2
-  have hpu' : ∀ i, 1 ≤ i → i ≤ D.R.k →
-      (parE e u u' de de' v).u' i = uOne D u' τ i :=
-    fun i h1 h2 => hu u' de' hde' i h1 h2
-  have hint : ∀ (w : D.what₂.Word) (i : ℕ), 1 ≤ i → i ≤ D.R.k → ∃ n : ℤ, uOne D w τ i - uOne D u τ 1 = n := by
+  have hpu : ∀ i, 1 ≤ i → i ≤ D.R.k → (parE e u u' de de' v).u i = uOne D u τ i := fun i h1 h2 =>
+    hu u de hde i h1 h2
+  have hpu' : ∀ i, 1 ≤ i → i ≤ D.R.k → (parE e u u' de de' v).u' i = uOne D u' τ i := fun i h1 h2 =>
+    hu u' de' hde' i h1 h2
+  have hint
+      : ∀ (w : D.what₂.Word) (i : ℕ),
+        1 ≤ i → i ≤ D.R.k → ∃ n : ℤ, uOne D w τ i - uOne D u τ 1 = n := by
     intro w i h1 h2
     obtain ⟨j, rfl⟩ : ∃ j, i = j + 1 := ⟨i - 1, by omega⟩
     rw [hsucc w j (by omega), show (1 : ℕ) = 0 + 1 from rfl, hsucc u 0 (by omega)]
     obtain ⟨z1, hz1⟩ := (D.hcW w τ).u_half ⟨j, by omega⟩
     obtain ⟨z2, hz2⟩ := (D.hcW u τ).u_half ⟨0, by omega⟩
     refine ⟨z1 - z2, ?_⟩
-    rw [hz1, hz2]; push_cast; ring
+    rw [hz1, hz2]
+    push_cast
+    ring
   refine ⟨fun i hi => ?_, fun i hi => ?_, fun i hi => ?_⟩
   · obtain ⟨h1, h2⟩ := Finset.mem_Icc.mp hi
     rw [hpu i h1 h2, hpu 1 le_rfl (by omega)]
@@ -241,9 +276,11 @@ theorem parNumsE_of (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.wh
   · obtain ⟨h1, h2⟩ := Finset.mem_Icc.mp hi
     have hk1 : i + 1 ≤ D.R.k := by omega
     unfold Formalism.FourierDecayAlt.M.Par.lo Formalism.FourierDecayAlt.M.Par.hi
-    rw [hpu (i + 1) (by omega) hk1, hpu i h1 (by omega), hpu' (i + 1) (by omega) hk1, hpu' i h1 (by omega)]
+    rw [hpu (i + 1) (by omega) hk1, hpu i h1 (by omega), hpu' (i + 1) (by omega) hk1,
+      hpu' i h1 (by omega)]
     obtain ⟨j, rfl⟩ : ∃ j, i = j + 1 := ⟨i - 1, by omega⟩
-    rw [hsucc u (j + 1) (by omega), hsucc u j (by omega), hsucc u' (j + 1) (by omega), hsucc u' j (by omega)]
+    rw [hsucc u (j + 1) (by omega), hsucc u j (by omega), hsucc u' (j + 1) (by omega),
+      hsucc u' j (by omega)]
     have hvj : j < D.R.k - 1 := by omega
     set vv := (D.hcW u τ).v ⟨j, hvj⟩ with hvv
     have hvv' : (D.hcW u' τ).v ⟨j, hvj⟩ = vv := by rw [hvv, D.hcW_v, D.hcW_v]
@@ -264,33 +301,49 @@ theorem parNumsE_of (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.wh
       have h := (Rat.cast_le (K := ℝ)).mpr b1; push_cast at h; linarith
     have c4 : (vv : ℝ) + 1 / 2 ≤ (((D.hcW u' τ).u ⟨j, by omega⟩ : ℚ) : ℝ) := by
       have h := (Rat.cast_le (K := ℝ)).mpr b2; push_cast at h; linarith
-    have := max_le (by linarith : (((D.hcW u τ).u ⟨j + 1, by omega⟩ : ℚ) : ℝ) ≤ (vv : ℝ) - 1 / 2)
-      (by linarith : (((D.hcW u' τ).u ⟨j + 1, by omega⟩ : ℚ) : ℝ) ≤ (vv : ℝ) - 1 / 2)
-    have := le_min (by linarith : (vv : ℝ) + 1 / 2 ≤ (((D.hcW u τ).u ⟨j, by omega⟩ : ℚ) : ℝ))
-      (by linarith : (vv : ℝ) + 1 / 2 ≤ (((D.hcW u' τ).u ⟨j, by omega⟩ : ℚ) : ℝ))
+    have :=
+      max_le (by linarith : (((D.hcW u τ).u ⟨j + 1, by omega⟩ : ℚ) : ℝ) ≤ (vv : ℝ) - 1 / 2)
+        (by linarith : (((D.hcW u' τ).u ⟨j + 1, by omega⟩ : ℚ) : ℝ) ≤ (vv : ℝ) - 1 / 2)
+    have :=
+      le_min (by linarith : (vv : ℝ) + 1 / 2 ≤ (((D.hcW u τ).u ⟨j, by omega⟩ : ℚ) : ℝ))
+        (by linarith : (vv : ℝ) + 1 / 2 ≤ (((D.hcW u' τ).u ⟨j, by omega⟩ : ℚ) : ℝ))
     linarith
 
-def TypesE (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ) : Prop :=
-  ∀ v, Formalism.FourierDecayAlt.Q.IsType D.R.k D.R.rS (towersOf X C u u' e v).base.z (towersOf X C u u' e v).base.π
-      (parE e u u' de de' v).u ∧
-    Formalism.FourierDecayAlt.Q.IsType D.R.k D.R.rS (towersOf X C u u' e v).base.z' (towersOf X C u u' e v).base.π'
-      (parE e u u' de de' v).u'
+def TypesE (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ)
+    : Prop :=
+  ∀ v,
+    Formalism.FourierDecayAlt.Q.IsType D.R.k D.R.rS (towersOf X C u u' e v).base.z
+        (towersOf X C u u' e v).base.π (parE e u u' de de' v).u
+      ∧ Formalism.FourierDecayAlt.Q.IsType D.R.k D.R.rS (towersOf X C u u' e v).base.z'
+        (towersOf X C u u' e v).base.π' (parE e u u' de de' v).u'
 
-theorem typesE_of (hcap : CapFromHC) (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ)
+theorem typesE_of
+    (hcap : CapFromHC)
+    (u u' : D.what₂.Word)
+    (e : InfinitePlace D.host.E ≃ D.what₂.Tau)
+    (de de' : ℕ → ℝ)
     (h5 : ∀ (w : D.what₂.Word) τ, ¬ IsTop D τ → uOne D w τ D.R.k = vOne D τ (D.R.k - 1) - 1 / 2)
-    (hde : de = Formalism.MainNotions.BridgeLemma.deOf D u) (hde' : de' = Formalism.MainNotions.BridgeLemma.deOf D u') :
-    TypesE X C u u' e de de' := by
+    (hde : de = Formalism.MainNotions.BridgeLemma.deOf D u)
+    (hde' : de' = Formalism.MainNotions.BridgeLemma.deOf D u')
+    : TypesE X C u u' e de de' := by
   intro v
   set τ := e (plE D v) with hτ
   have hpl : X.pl (tauE X e v) = τ := by
     show X.pl (X.pl.symm (e (plE D v))) = _
     rw [Equiv.apply_symm_apply]
-  have hu : ∀ (w : D.what₂.Word) (dw : ℕ → ℝ), dw = Formalism.MainNotions.BridgeLemma.deOf D w → ∀ i ∈ Finset.Icc 1 D.R.k,
-      ((Formalism.L2.SG.SpectralTiesReal.gOf D e).place (plE D v)).u dw i =
-        if h : i - 1 < D.R.k then (((D.hcW w (X.pl (tauE X e v))).u ⟨i - 1, h⟩ : ℚ) : ℝ) else 0 := by
+  have hu
+      : ∀ (w : D.what₂.Word) (dw : ℕ → ℝ),
+        dw = Formalism.MainNotions.BridgeLemma.deOf D w
+          → ∀ i ∈ Finset.Icc 1 D.R.k,
+            ((Formalism.L2.SG.SpectralTiesReal.gOf D e).place (plE D v)).u dw i
+              = if h : i - 1 < D.R.k then
+                  (((D.hcW w (X.pl (tauE X e v))).u ⟨i - 1, h⟩ : ℚ) : ℝ)
+                else
+                  0 := by
     intro w dw hdw i hi
     obtain ⟨h1, h2⟩ := Finset.mem_Icc.mp hi
-    rw [Formalism.L2.SG.Pf.SzHypOf.gOf_place, hdw, Formalism.MainNotions.BridgeLemma.cfg_u D w τ (h5 w τ) i h1 h2,
+    rw [Formalism.L2.SG.Pf.SzHypOf.gOf_place, hdw,
+      Formalism.MainNotions.BridgeLemma.cfg_u D w τ (h5 w τ) i h1 h2,
       dite_eq_left (by omega : i - 1 < D.R.k), hpl]
     obtain ⟨j, rfl⟩ : ∃ j, i = j + 1 := ⟨i - 1, by omega⟩
     rw [Formalism.MainNotions.BridgeLemma.uOne_succ D w τ j (by omega)]
@@ -299,59 +352,99 @@ theorem typesE_of (hcap : CapFromHC) (u u' : D.what₂.Word) (e : InfinitePlace 
   constructor
   · show Formalism.FourierDecayAlt.Q.IsType D.R.k D.R.rS (towersOf X C u u' e v).base.z (towersOf X C u u' e v).base.π _
     rw [hb]
-    exact isType_of_hc hcap (zc_spec X C u _).1 (zc_pos X C u _) (πc_type X C u _) (πc_rep X C u _) _
-      (hu u de hde)
+    exact isType_of_hc hcap (zc_spec X C u _).1 (zc_pos X C u _) (πc_type X C u _) (πc_rep X C u _)
+      _ (hu u de hde)
   · show Formalism.FourierDecayAlt.Q.IsType D.R.k D.R.rS (towersOf X C u u' e v).base.z' (towersOf X C u u' e v).base.π' _
     rw [hb]
-    exact isType_of_hc hcap (zc_spec X C u' _).1 (zc_pos X C u' _) (πc_type X C u' _) (πc_rep X C u' _) _
-      (hu u' de' hde')
+    exact isType_of_hc hcap (zc_spec X C u' _).1 (zc_pos X C u' _) (πc_type X C u' _)
+      (πc_rep X C u' _) _ (hu u' de' hde')
 
-theorem isPlaceE (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ)
-    (hN : ParNumsE (D := D) u u' e de de') (hty : TypesE X C u u' e de de') (j : Fin (nfE D)) :
-    Formalism.FourierDecayAlt.Q.IsPlace (parE e u u' de de' j) (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
-      (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π' := by
+theorem isPlaceE
+    (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ)
+    (hN : ParNumsE (D := D) u u' e de de') (hty : TypesE X C u u' e de de')
+    (j : Fin (nfE D))
+    : Formalism.FourierDecayAlt.Q.IsPlace (parE e u u' de de' j) (towersOf X C u u' e j).base.z
+      (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π
+      (towersOf X C u u' e j).base.π' := by
   obtain ⟨h1, h2, h3⟩ := hN j
   have hT := Tz_towersOf_base_eq_T X C u u' e j
-  refine ⟨⟨(towersOf X C u u' e j).base.k_pos, ?_, ?_, h1, h2, h3⟩, (towersOf X C u u' e j).base.z_mem,
-    (towersOf X C u u' e j).base.z'_mem, hT.1, hT.2, (hty j).1, (hty j).2⟩
+  refine ⟨
+    ⟨(towersOf X C u u' e j).base.k_pos, ?_, ?_, h1, h2, h3⟩,
+    (towersOf X C u u' e j).base.z_mem,
+    (towersOf X C u u' e j).base.z'_mem,
+    hT.1,
+    hT.2,
+    (hty j).1,
+    (hty j).2
+  ⟩
   · show (0 : ℝ) < (D.mem u).A.T
-    rw [← hT.1]; exact (towersOf X C u u' e j).base.T_pos
+    rw [← hT.1]
+    exact (towersOf X C u u' e j).base.T_pos
   · show (0 : ℝ) < (D.mem u').A.T
-    rw [← hT.2]; exact (towersOf X C u u' e j).base.T'_pos
+    rw [← hT.2]
+    exact (towersOf X C u u' e j).base.T'_pos
 
-theorem framesE (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k)
-    (j : Fin (nfE D)) :
-    Formalism.FourierDecayAlt.D.IsBaseFrame (towersOf X C u u' e j).base (nuE X C u' e i0' j) (m0E X C u u' e j) := by
+theorem framesE
+    (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau)
+    (i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k) (j : Fin (nfE D))
+    : Formalism.FourierDecayAlt.D.IsBaseFrame (towersOf X C u u' e j).base (nuE X C u' e i0' j)
+      (m0E X C u u' e j) := by
   rw [towersOf_base]
-  exact Formalism.L2.SG.Pf.CarrierBase.isBaseFrame_of X u u' (tauE X e j) rfl (isTransp_Qcs X C (tauE X e j)) _ rfl rfl _
+  exact Formalism.L2.SG.Pf.CarrierBase.isBaseFrame_of X u u' (tauE X e j) rfl
+    (isTransp_Qcs X C (tauE X e j)) _ rfl rfl _
 
-def tpOf (hTP : Formalism.FourierDecayAlt.Top.TypeProjExists) (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ)
-    (i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k) (hN : ParNumsE (D := D) u u' e de de') (hty : TypesE X C u u' e de de')
-    (j : Fin (nfE D)) :
-    Formalism.FourierDecayAlt.Top.TypeProj (parE e u u' de de' j) (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.z
-      (m0E X C u u' e j *ᵥ nuE X C u' e i0' j) :=
-  Classical.choice (typeProj_nonempty hTP (parE e u u' de de' j) (towersOf X C u u' e j).base (nuE X C u' e i0' j)
-    (m0E X C u u' e j) (isPlaceE X C u u' e de de' hN hty j) (framesE X C u u' e i0' j))
+def tpOf
+    (hTP : Formalism.FourierDecayAlt.Top.TypeProjExists)
+    (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ)
+    (i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k) (hN : ParNumsE (D := D) u u' e de de')
+    (hty : TypesE X C u u' e de de') (j : Fin (nfE D))
+    : Formalism.FourierDecayAlt.Top.TypeProj (parE e u u' de de' j) (towersOf X C u u' e j).base.π
+      (towersOf X C u u' e j).base.z (m0E X C u u' e j *ᵥ nuE X C u' e i0' j) :=
+  Classical.choice (typeProj_nonempty hTP (parE e u u' de de' j) (towersOf X C u u' e j).base
+    (nuE X C u' e i0' j) (m0E X C u u' e j) (isPlaceE X C u u' e de de' hN hty j)
+    (framesE X C u u' e i0' j))
 
-theorem parNums_ITc (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (he : PlaceTie X e)
-    (hv : D.host.v = Formalism.FourierDecayAlt.S6.rd D.host.E / 2) (CA : ℝ) (de de' : ℕ → ℝ) (l : ℕ)
-    (grid : Fin (nfE D) → ℕ → Finset ℝ) (grid1 : Fin (nfE D) → Finset ℝ)
-    (fc : ∀ j : Fin (nfE D), Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS → (X.Vloc u' (tauE X e j) →L[ℂ] X.Vloc u (tauE X e j)))
-    (c : Formalism.FourierDecayAlt.LE.Cut) (i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k)
-    (Θ : ∀ j : Fin (nfE D), Formalism.FourierDecayAlt.Top.TopLift D.R.k D.R.rS (X.Vloc u (tauE X e j)) (X.Vloc u' (tauE X e j)))
-    (TP : ∀ j : Fin (nfE D), Formalism.FourierDecayAlt.Top.TypeProj (parE e u u' de de' j) (towersOf X C u u' e j).base.π
-      (towersOf X C u u' e j).base.z (m0E X C u u' e j *ᵥ nuE X C u' e i0' j)) (A₀ : ℝ)
-    (h : ParNumsE (D := D) u u' e de de') : ParNums (ITc X C u u' e he hv CA de de' l grid grid1 fc c i0' Θ TP A₀) := h
+theorem parNums_ITc
+    (u u' : D.what₂.Word)
+    (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (he : PlaceTie X e)
+    (hv : D.host.v = Formalism.FourierDecayAlt.S6.rd D.host.E / 2) (CA : ℝ)
+    (de de' : ℕ → ℝ)
+    (l : ℕ) (grid : Fin (nfE D) → ℕ → Finset ℝ) (grid1 : Fin (nfE D) → Finset ℝ)
+    (fc : ∀ j : Fin (nfE D),
+      Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS
+        → (X.Vloc u' (tauE X e j) →L[ℂ] X.Vloc u (tauE X e j)))
+    (c : Formalism.FourierDecayAlt.LE.Cut)
+    (i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k)
+    (Θ : ∀ j : Fin (nfE D),
+      Formalism.FourierDecayAlt.Top.TopLift D.R.k D.R.rS (X.Vloc u (tauE X e j))
+        (X.Vloc u' (tauE X e j)))
+    (TP : ∀ j : Fin (nfE D),
+      Formalism.FourierDecayAlt.Top.TypeProj (parE e u u' de de' j) (towersOf X C u u' e j).base.π
+        (towersOf X C u u' e j).base.z (m0E X C u u' e j *ᵥ nuE X C u' e i0' j))
+    (A₀ : ℝ) (h : ParNumsE (D := D) u u' e de de')
+    : ParNums (ITc X C u u' e he hv CA de de' l grid grid1 fc c i0' Θ TP A₀) :=
+  h
 
-theorem types_ITc (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (he : PlaceTie X e)
-    (hv : D.host.v = Formalism.FourierDecayAlt.S6.rd D.host.E / 2) (CA : ℝ) (de de' : ℕ → ℝ) (l : ℕ)
-    (grid : Fin (nfE D) → ℕ → Finset ℝ) (grid1 : Fin (nfE D) → Finset ℝ)
-    (fc : ∀ j : Fin (nfE D), Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS → (X.Vloc u' (tauE X e j) →L[ℂ] X.Vloc u (tauE X e j)))
-    (c : Formalism.FourierDecayAlt.LE.Cut) (i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k)
-    (Θ : ∀ j : Fin (nfE D), Formalism.FourierDecayAlt.Top.TopLift D.R.k D.R.rS (X.Vloc u (tauE X e j)) (X.Vloc u' (tauE X e j)))
-    (TP : ∀ j : Fin (nfE D), Formalism.FourierDecayAlt.Top.TypeProj (parE e u u' de de' j) (towersOf X C u u' e j).base.π
-      (towersOf X C u u' e j).base.z (m0E X C u u' e j *ᵥ nuE X C u' e i0' j)) (A₀ : ℝ)
-    (h : TypesE X C u u' e de de') : Types (ITc X C u u' e he hv CA de de' l grid grid1 fc c i0' Θ TP A₀) := h
+theorem types_ITc
+    (u u' : D.what₂.Word)
+    (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (he : PlaceTie X e)
+    (hv : D.host.v = Formalism.FourierDecayAlt.S6.rd D.host.E / 2) (CA : ℝ)
+    (de de' : ℕ → ℝ)
+    (l : ℕ) (grid : Fin (nfE D) → ℕ → Finset ℝ) (grid1 : Fin (nfE D) → Finset ℝ)
+    (fc : ∀ j : Fin (nfE D),
+      Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS
+        → (X.Vloc u' (tauE X e j) →L[ℂ] X.Vloc u (tauE X e j)))
+    (c : Formalism.FourierDecayAlt.LE.Cut)
+    (i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k)
+    (Θ : ∀ j : Fin (nfE D),
+      Formalism.FourierDecayAlt.Top.TopLift D.R.k D.R.rS (X.Vloc u (tauE X e j))
+        (X.Vloc u' (tauE X e j)))
+    (TP : ∀ j : Fin (nfE D),
+      Formalism.FourierDecayAlt.Top.TypeProj (parE e u u' de de' j) (towersOf X C u u' e j).base.π
+        (towersOf X C u u' e j).base.z (m0E X C u u' e j *ᵥ nuE X C u' e i0' j))
+    (A₀ : ℝ) (h : TypesE X C u u' e de de')
+    : Types (ITc X C u u' e he hv CA de de' l grid grid1 fc c i0' Θ TP A₀) :=
+  h
 
 end Formalism.L2.SG.Pf.CarrierXAll
 
@@ -362,23 +455,31 @@ open scoped Matrix
 
 namespace Formalism.L2.SG.Pf.CarrierXAll
 
-open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT Formalism.L2.SG.RealObj
+open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built
+  Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT Formalism.L2.SG.RealObj
 open Formalism.L2.SG.Pf.Carrier.CarPinVt
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar instCM
 
-theorem cut_len {D : D7} {X : Formalism.L2.SG.HidaSetting.HidaSetting D} {u u' : D.what₂.Word} (I : CarrierIn X u u') (v : Fin I.nf) :
-    (sOf I).cutHi v - (sOf I).cutLo v = I.G.Del / 2 - 5 / 2 := by
+theorem cut_len
+    {D : D7} {X : Formalism.L2.SG.HidaSetting.HidaSetting D} {u u' : D.what₂.Word}
+    (I : CarrierIn X u u') (v : Fin I.nf)
+    : (sOf I).cutHi v - (sOf I).cutLo v = I.G.Del / 2 - 5 / 2 := by
   unfold Formalism.FourierDecayAlt.C.HidaSetting.cutHi Formalism.FourierDecayAlt.C.HidaSetting.cutLo
   have : ((sOf I).G.place ((sOf I).pl v)).Del = I.G.Del := rfl
-  rw [this]; ring
+  rw [this]
+  ring
 
 variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) {θ : ℝ} (C : Choice X θ)
 
-def Ce : ℝ := (Formalism.FourierDecayAlt.P.energy_of_built_setting Formalism.FourierDecayAlt.P.beta_cutoff_limit).choose
+def Ce : ℝ :=
+  (Formalism.FourierDecayAlt.P.energy_of_built_setting
+    Formalism.FourierDecayAlt.P.beta_cutoff_limit).choose
 
-def fourierDecayLevelZeroConst : ℝ := (Formalism.FourierDecayAlt.P.lemma_E_of_model Formalism.FourierDecayAlt.P.lemma_E_of_residue Formalism.FourierDecayAlt.P.level_zero_holds
-  Formalism.FourierDecayAlt.P.good_of_admissible Formalism.FourierDecayAlt.P.lemma_model).choose
+def fourierDecayLevelZeroConst : ℝ :=
+  (Formalism.FourierDecayAlt.P.lemma_E_of_model Formalism.FourierDecayAlt.P.lemma_E_of_residue
+    Formalism.FourierDecayAlt.P.level_zero_holds Formalism.FourierDecayAlt.P.good_of_admissible
+    Formalism.FourierDecayAlt.P.lemma_model).choose
 
 theorem carrierDataBuilt_of_towers (Cb Cc C₆ : ℝ) (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (he : PlaceTie X e)
     (hv : D.host.v = Formalism.FourierDecayAlt.S6.rd D.host.E / 2) (CA : ℝ) (de de' : ℕ → ℝ) (l : ℕ)
@@ -505,44 +606,69 @@ open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.Carri
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem fcT_smooth {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) {θ : ℝ} (C : Choice X θ)
-    (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (u u' : D.what₂.Word)
-    (a b : ∀ j : Fin (nfE D), X.B.H (tauE X e j)) (ξ : ∀ j : Fin (nfE D), X.Vloc u (tauE X e j))
-    (ξ' : ∀ j : Fin (nfE D), X.Vloc u' (tauE X e j)) (cc : Fin (nfE D) → ℂ) (j : Fin (nfE D))
+theorem fcT_smooth
+    {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+    {θ : ℝ} (C : Choice X θ)
+    (e : InfinitePlace D.host.E ≃ D.what₂.Tau)
+    (u u' : D.what₂.Word)
+    (a b : ∀ j : Fin (nfE D), X.B.H (tauE X e j))
+    (ξ : ∀ j : Fin (nfE D), X.Vloc u (tauE X e j)) (ξ' : ∀ j : Fin (nfE D), X.Vloc u' (tauE X e j))
+    (cc : Fin (nfE D) → ℂ)
+    (j : Fin (nfE D))
     (hkb : PI.UpqRep.IsKFinHpk (k := D.R.k) (r := D.R.rS)
-      (sigB X (C.Q (e (plE D j))) (C.Qi (e (plE D j))) (e (plE D j))) (b j)) :
-    Formalism.FourierDecayAlt.B.CkOn ⊤ (Formalism.FourierDecayAlt.B.GV D.R.k D.R.rS) (fcT X C e u u' a b ξ ξ' cc j) := by
+      (sigB X (C.Q (e (plE D j))) (C.Qi (e (plE D j))) (e (plE D j))) (b j))
+    : Formalism.FourierDecayAlt.B.CkOn ⊤ (Formalism.FourierDecayAlt.B.GV D.R.k D.R.rS)
+      (fcT X C e u u' a b ξ ξ' cc j) := by
   have hsmv : Formalism.MainNotions.S.IsSmoothVec (k := D.R.k) (r := D.R.rS)
       (sigB X (C.Q (e (plE D j))) (C.Qi (e (plE D j))) (e (plE D j))) (b j) :=
-    Formalism.L2.SG.LitS.kFinSmooth_pi Formalism.L2.SG.Pf.k_finite_smooth D.R.k D.R.rS (epsSH D.R) (lamD D (e (plE D j))) _
-      (sigB X (C.Q (e (plE D j))) (C.Qi (e (plE D j))) (e (plE D j))) (Formalism.MainNotions.S.Inh.amp_isHCParam_lamD D _)
-      (Formalism.L2.SG.Pf.dsTr C (e (plE D j))) (b j) hkb
-  have hcf := Formalism.L2.SG.Pf.CoefDecay.ss_cf hsmv (a j) (Formalism.L2.SG.Pf.CoefDecay.rk1 (ξ j) (ξ' j))
+    Formalism.L2.SG.LitS.kFinSmooth_pi Formalism.L2.SG.Pf.k_finite_smooth D.R.k D.R.rS (epsSH D.R)
+      (lamD D (e (plE D j))) _ (sigB X (C.Q (e (plE D j))) (C.Qi (e (plE D j))) (e (plE D j)))
+      (Formalism.MainNotions.S.Inh.amp_isHCParam_lamD D _) (Formalism.L2.SG.Pf.dsTr C (e (plE D j)))
+      (b j) hkb
+  have hcf :=
+    Formalism.L2.SG.Pf.CoefDecay.ss_cf hsmv (a j) (Formalism.L2.SG.Pf.CoefDecay.rk1 (ξ j) (ξ' j))
   have hμ := Formalism.L2.SG.Pf.muT_ne D
   set t := torS (muT D) D.R.k D.R.rS with ht
   set t' := torS (muT D)⁻¹ D.R.k D.R.rS with ht'
-  have hfun : ∀ g, fcT X C e u u' a b ξ ξ' cc j g = cc j • Formalism.L2.SG.Pf.CoefDecay.cf
-      (sigB X (C.Q (e (plE D j))) (C.Qi (e (plE D j))) (e (plE D j))) (a j) (b j)
-      (Formalism.L2.SG.Pf.CoefDecay.rk1 (ξ j) (ξ' j)) (t * g * t') := by
+  have hfun
+      : ∀ g,
+        fcT X C e u u' a b ξ ξ' cc j g
+          = cc j • Formalism.L2.SG.Pf.CoefDecay.cf
+            (sigB X (C.Q (e (plE D j))) (C.Qi (e (plE D j))) (e (plE D j))) (a j) (b j)
+            (Formalism.L2.SG.Pf.CoefDecay.rk1 (ξ j) (ξ' j)) (t * g * t') := by
     intro g
     show cc j • Formalism.MainNotions.S.Pv.BetaCut.coefM _ (a j) (b j) (ξ j) (ξ' j) (t * g * t') = _
     congr 1
     ext x
-    simp only [Formalism.MainNotions.S.Pv.BetaCut.coefM, Formalism.L2.SG.Pf.CoefDecay.cf, Formalism.L2.SG.Pf.CoefDecay.rk1,
-      ContinuousLinearMap.smulRight_apply, _root_.smul_apply]
+    simp only [Formalism.MainNotions.S.Pv.BetaCut.coefM, Formalism.L2.SG.Pf.CoefDecay.cf,
+      Formalism.L2.SG.Pf.CoefDecay.rk1, ContinuousLinearMap.smulRight_apply, _root_.smul_apply]
     exact smul_comm _ _ _
-  let Lφ : Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS →ₗ[ℝ] Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS :=
-    { toFun := fun g => t * g * t'
+  let Lφ
+      : Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS →ₗ[ℝ] Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS :=
+    {
+      toFun := fun g => t * g * t'
       map_add' := fun x y => by simp only [Matrix.mul_add, Matrix.add_mul]
-      map_smul' := fun c x => by simp only [RingHom.id_apply, Matrix.mul_smul, Matrix.smul_mul] }
+      map_smul' := fun c x => by simp only [RingHom.id_apply, Matrix.mul_smul, Matrix.smul_mul]
+    }
   have hφ : ContDiff ℝ ⊤ (fun g : Formalism.FourierDecayAlt.B.Mat D.R.k D.R.rS => t * g * t') :=
     (LinearMap.toContinuousLinearMap Lφ).contDiff
   intro g₀ hg₀
-  have hmem : ∀ g ∈ Formalism.FourierDecayAlt.B.GV D.R.k D.R.rS, t * g * t' ∈ Formalism.FourierDecayAlt.B.GV D.R.k D.R.rS := fun g hg =>
-    Formalism.L2.SG.RealObj.EnergyIntTor.UH_mul (Formalism.L2.SG.RealObj.EnergyIntTor.UH_mul
-      (Formalism.L2.SG.RealObj.EnergyIntTor.tor_mem_UH hμ) hg) (Formalism.L2.SG.RealObj.EnergyIntTor.tor_mem_UH (inv_ne_zero hμ))
+  have hmem
+      : ∀ g ∈ Formalism.FourierDecayAlt.B.GV D.R.k D.R.rS,
+        t * g * t' ∈ Formalism.FourierDecayAlt.B.GV D.R.k D.R.rS := fun g hg =>
+    Formalism.L2.SG.RealObj.EnergyIntTor.UH_mul
+      (Formalism.L2.SG.RealObj.EnergyIntTor.UH_mul
+        (Formalism.L2.SG.RealObj.EnergyIntTor.tor_mem_UH hμ) hg)
+      (Formalism.L2.SG.RealObj.EnergyIntTor.tor_mem_UH (inv_ne_zero hμ))
   obtain ⟨U, F, hU, h0, hF, hE⟩ := hcf _ (hmem g₀ hg₀)
-  refine ⟨(fun g => t * g * t') ⁻¹' U, fun g => cc j • F (t * g * t'), hU.preimage hφ.continuous, h0, ?_, ?_⟩
+  refine ⟨
+    (fun g => t * g * t') ⁻¹' U,
+    fun g => cc j • F (t * g * t'),
+    hU.preimage hφ.continuous,
+    h0,
+    ?_,
+    ?_
+  ⟩
   · exact (hF.comp (hφ.of_le le_top).contDiffOn (fun g hg => hg)).const_smul (cc j)
   · intro g hgU hgG
     rw [hfun g, hE _ hgU (hmem g hgG)]
@@ -551,36 +677,58 @@ end Formalism.L2.SG.Pf.CarrierXAll
 
 namespace Formalism.L2.SG.Pf.CarrierXAll
 
-open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT Formalism.L2.SG.RealObj
+open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built
+  Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT Formalism.L2.SG.RealObj
 open Formalism.L2.SG.Pf.Carrier.CarPinVt
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar instCM
 
 theorem host_v (D : D7) : D.host.v = Formalism.FourierDecayAlt.S6.rd D.host.E / 2 := by
-  unfold Formalism.BasicNotions.Host.v Formalism.BasicNotions.Host.rdE Formalism.FourierDecayAlt.S6.rd
+  unfold Formalism.BasicNotions.Host.v Formalism.BasicNotions.Host.rdE
+    Formalism.FourierDecayAlt.S6.rd
   rw [Int.cast_abs, one_div]
 
-theorem gapOK_mono {k r : ℕ} {h h' : ℝ} (hg : Formalism.FourierDecayAlt.ThreeDimData.GapOK k r h) (hh : h ≤ h') : Formalism.FourierDecayAlt.ThreeDimData.GapOK k r h' := by
+theorem gapOK_mono
+    {k r : ℕ} {h h' : ℝ} (hg : Formalism.FourierDecayAlt.ThreeDimData.GapOK k r h) (hh : h ≤ h')
+    : Formalism.FourierDecayAlt.ThreeDimData.GapOK k r h' := by
   obtain ⟨h1, h2, h3, h4⟩ := hg
-  have ha : Formalism.FourierDecayAlt.ThreeDimData.aOf r h ≤ Formalism.FourierDecayAlt.ThreeDimData.aOf r h' := by
+  have ha
+      : Formalism.FourierDecayAlt.ThreeDimData.aOf r h
+        ≤ Formalism.FourierDecayAlt.ThreeDimData.aOf r h' := by
     unfold Formalism.FourierDecayAlt.ThreeDimData.aOf
     exact div_le_div_of_nonneg_right hh (by positivity)
   exact ⟨h1, by linarith, by linarith, by linarith⟩
 
-def XLeafAt {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) {θ : ℝ} (C : Choice X θ) (u u' : D.what₂.Word)
-    (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (he : PlaceTie X e) (hv : D.host.v = Formalism.FourierDecayAlt.S6.rd D.host.E / 2) (CA : ℝ)
-    (de de' : ℕ → ℝ) (l : ℕ) (i0 i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k) (sc : ℝ) (FdN FdN' : Set X.B.I.Ginf)
-    (νq : X.B.I.Ginf → Measure X.B.I.Ginf) (jn : ℝ)
-    (a b : ∀ j : Fin (nfE D), X.B.H (tauE X e j)) (ξ : ∀ j : Fin (nfE D), X.Vloc u (tauE X e j))
-    (ξ' : ∀ j : Fin (nfE D), X.Vloc u' (tauE X e j)) (cc : Fin (nfE D) → ℂ) : Prop :=
-  (∀ j, PI.UpqRep.IsKFinHpk (k := D.R.k) (r := D.R.rS)
-      (sigB X (C.Q (e (plE D j))) (C.Qi (e (plE D j))) (e (plE D j))) (a j)) ∧
-  (∀ j, PI.UpqRep.IsKFinHpk (k := D.R.k) (r := D.R.rS)
-      (sigB X (C.Q (e (plE D j))) (C.Qi (e (plE D j))) (e (plE D j))) (b j)) ∧
-  ∀ (Θ : ∀ j : Fin (nfE D), Formalism.FourierDecayAlt.Top.TopLift D.R.k D.R.rS (X.Vloc u (tauE X e j)) (X.Vloc u' (tauE X e j)))
-    (TP : ∀ j : Fin (nfE D), Formalism.FourierDecayAlt.Top.TypeProj (parE e u u' de de' j) (towersOf X C u u' e j).base.π
-      (towersOf X C u u' e j).base.z (m0E X C u u' e j *ᵥ nuE X C u' e i0' j)) (A₀ : ℝ),
-    Formalism.L2.SG.Pf.Carrier.JointPin.PinCov (CarrierOf (ITc X C u u' e he hv CA de de' l (gridT e l) (grid1T e l) (fcT X C e u u' a b ξ ξ' cc) cutStd i0' Θ TP A₀) (modelsOf (ITc X C u u' e he hv CA de de' l (gridT e l) (grid1T e l) (fcT X C e u u' a b ξ ξ' cc) cutStd i0' Θ TP A₀)))
+def XLeafAt
+    {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+    {θ : ℝ} (C : Choice X θ)
+    (u u' : D.what₂.Word)
+    (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (he : PlaceTie X e)
+    (hv : D.host.v = Formalism.FourierDecayAlt.S6.rd D.host.E / 2) (CA : ℝ) (de de' : ℕ → ℝ) (l : ℕ)
+    (i0 i0' : ∀ _ : InfinitePlace X.B.I.F, Fin D.R.k) (sc : ℝ) (FdN FdN' : Set X.B.I.Ginf)
+    (νq : X.B.I.Ginf → Measure X.B.I.Ginf) (jn : ℝ) (a b : ∀ j : Fin (nfE D), X.B.H (tauE X e j))
+    (ξ : ∀ j : Fin (nfE D), X.Vloc u (tauE X e j)) (ξ' : ∀ j : Fin (nfE D), X.Vloc u' (tauE X e j))
+    (cc : Fin (nfE D) → ℂ)
+    : Prop :=
+  (∀ j,
+      PI.UpqRep.IsKFinHpk (k := D.R.k) (r := D.R.rS)
+        (sigB X (C.Q (e (plE D j))) (C.Qi (e (plE D j))) (e (plE D j))) (a j))
+    ∧ (∀ j,
+      PI.UpqRep.IsKFinHpk (k := D.R.k) (r := D.R.rS)
+        (sigB X (C.Q (e (plE D j))) (C.Qi (e (plE D j))) (e (plE D j))) (b j))
+    ∧ ∀ (Θ : ∀ j : Fin (nfE D),
+        Formalism.FourierDecayAlt.Top.TopLift D.R.k D.R.rS (X.Vloc u (tauE X e j))
+          (X.Vloc u' (tauE X e j)))
+        (TP : ∀ j : Fin (nfE D),
+          Formalism.FourierDecayAlt.Top.TypeProj (parE e u u' de de' j)
+            (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.z
+            (m0E X C u u' e j *ᵥ nuE X C u' e i0' j))
+        (A₀ : ℝ),
+      Formalism.L2.SG.Pf.Carrier.JointPin.PinCov (CarrierOf
+        (ITc X C u u' e he hv CA de de' l (gridT e l) (grid1T e l) (fcT X C e u u' a b ξ ξ' cc)
+          cutStd i0' Θ TP A₀)
+        (modelsOf (ITc X C u u' e he hv CA de de' l (gridT e l) (grid1T e l)
+          (fcT X C e u u' a b ξ ξ' cc) cutStd i0' Θ TP A₀)))
 
 end Formalism.L2.SG.Pf.CarrierXAll
 
@@ -591,7 +739,8 @@ open scoped Matrix
 
 namespace Formalism.L2.SG.Pf.CarrierXAll
 
-open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT Formalism.L2.SG.RealObj
+open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built
+  Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT Formalism.L2.SG.RealObj
 open Formalism.L2.SG.Pf.Carrier.CarPinVt
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar instCM
@@ -600,56 +749,100 @@ def Cd : ℝ := exists_Cc_data.choose
 
 def LiftAt3 (Cb : ℝ) : Prop :=
   ∀ (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (P : Formalism.FourierDecayAlt.M.Par)
-    (Bs : Formalism.FourierDecayAlt.B.RealPlaceData P.k P.r Wp Wq) (X : Formalism.FourierDecayAlt.Q.ActualOps P.k P.r Bs.z Bs.z' Bs.π Bs.π')
-    (μ : Measure (Formalism.QuantumDeterminants.Mt P.k P.r))
-    (L : Formalism.FourierDecayAlt.R.LevelData (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')) P.r)
-    (st : Formalism.FourierDecayAlt.Fr.Start (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π'))) (l0 : ℕ), 1 ≤ l0 → l0 ≤ P.k →
-    Formalism.FourierDecayAlt.P5.IsData P Bs.z Bs.z' Bs.π Bs.π' X μ L st l0 →
-      ∃ Θ : Formalism.FourierDecayAlt.Top.TopLift P.k P.r Wp Wq, Formalism.FourierDecayAlt.KB.IsTopLift2 P l0 Bs L st Θ ∧ Formalism.FourierDecayAlt.KB.InDDplus2 P l0 Bs Cb Θ
+      [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+      (P : Formalism.FourierDecayAlt.M.Par)
+      (Bs : Formalism.FourierDecayAlt.B.RealPlaceData P.k P.r Wp Wq)
+      (X : Formalism.FourierDecayAlt.Q.ActualOps P.k P.r Bs.z Bs.z' Bs.π Bs.π')
+      (μ : Measure (Formalism.QuantumDeterminants.Mt P.k P.r))
+      (L : Formalism.FourierDecayAlt.R.LevelData
+        (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp P.k P.r Bs.z Bs.z' Bs.π
+          Bs.π'))
+        P.r)
+      (st : Formalism.FourierDecayAlt.Fr.Start (Formalism.FourierDecayAlt.Q.Pr
+        (Formalism.FourierDecayAlt.Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')))
+      (l0 : ℕ),
+    1 ≤ l0 → l0 ≤ P.k → Formalism.FourierDecayAlt.P5.IsData P Bs.z Bs.z' Bs.π Bs.π' X μ L st l0
+      → ∃ Θ : Formalism.FourierDecayAlt.Top.TopLift P.k P.r Wp Wq,
+        Formalism.FourierDecayAlt.KB.IsTopLift2 P l0 Bs L st Θ
+          ∧ Formalism.FourierDecayAlt.KB.InDDplus2 P l0 Bs Cb Θ
 
-theorem lift_compact_test_towers (Cb : ℝ) (hL : LiftAt3 Cb) {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) {θ : ℝ} (C : Choice X θ)
-    (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ) (l : ℕ) (hl2 : l + 2 ≤ D.R.k)
+theorem lift_compact_test_towers
+    (Cb : ℝ) (hL : LiftAt3 Cb)
+    {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+    {θ : ℝ} (C : Choice X θ)
+    (u u' : D.what₂.Word) (e : InfinitePlace D.host.E ≃ D.what₂.Tau) (de de' : ℕ → ℝ) (l : ℕ)
+    (hl2 : l + 2 ≤ D.R.k)
     (hdat : ∀ j : Fin (nfE D),
-      ∃ (Xo : Formalism.FourierDecayAlt.Q.ActualOps D.R.k D.R.rS (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
-          (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π')
-        (μ : Measure (Formalism.QuantumDeterminants.Mt D.R.k D.R.rS))
-        (L : Formalism.FourierDecayAlt.R.LevelData (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS (towersOf X C u u' e j).base.z
-          (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π')) D.R.rS)
-        (st : Formalism.FourierDecayAlt.Fr.Start (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS (towersOf X C u u' e j).base.z
-          (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π'))),
-        Formalism.FourierDecayAlt.P5.IsData (parE e u u' de de' j) (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
-          (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π' Xo μ L st (l + 1)) :
-    ∃ Θ : ∀ j : Fin (nfE D), Formalism.FourierDecayAlt.Top.TopLift D.R.k D.R.rS (X.Vloc u (tauE X e j)) (X.Vloc u' (tauE X e j)),
+      ∃ (Xo : Formalism.FourierDecayAlt.Q.ActualOps D.R.k D.R.rS (towersOf X C u u' e j).base.z
+          (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π
+          (towersOf X C u u' e j).base.π')
+          (μ : Measure (Formalism.QuantumDeterminants.Mt D.R.k D.R.rS))
+          (L : Formalism.FourierDecayAlt.R.LevelData
+            (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS
+              (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
+              (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π'))
+            D.R.rS)
+          (st : Formalism.FourierDecayAlt.Fr.Start (Formalism.FourierDecayAlt.Q.Pr
+            (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS (towersOf X C u u' e j).base.z
+              (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π
+              (towersOf X C u u' e j).base.π'))),
+        Formalism.FourierDecayAlt.P5.IsData (parE e u u' de de' j) (towersOf X C u u' e j).base.z
+          (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π
+          (towersOf X C u u' e j).base.π' Xo μ L st (l + 1))
+    : ∃ Θ : ∀ j : Fin (nfE D),
+        Formalism.FourierDecayAlt.Top.TopLift D.R.k D.R.rS (X.Vloc u (tauE X e j))
+          (X.Vloc u' (tauE X e j)),
       (∀ j : Fin (nfE D),
-        ∃ (Xo : Formalism.FourierDecayAlt.Q.ActualOps D.R.k D.R.rS (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
-            (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π')
-          (μ : Measure (Formalism.QuantumDeterminants.Mt D.R.k D.R.rS))
-          (L : Formalism.FourierDecayAlt.R.LevelData (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS (towersOf X C u u' e j).base.z
-            (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π')) D.R.rS)
-          (st : Formalism.FourierDecayAlt.Fr.Start (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS (towersOf X C u u' e j).base.z
-            (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π'))),
-          Formalism.FourierDecayAlt.P5.IsData (parE e u u' de de' j) (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
-            (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π' Xo μ L st (l + 1) ∧
-          Formalism.FourierDecayAlt.KB.IsTopLift2 (parE e u u' de de' j) (l + 1) (towersOf X C u u' e j).base L st (Θ j)) ∧
-      ∀ j : Fin (nfE D),
-        Formalism.FourierDecayAlt.KB.InDDplus2 (parE e u u' de de' j) (l + 1) (towersOf X C u u' e j).base Cb (Θ j) := by
-  have key : ∀ j : Fin (nfE D), ∃ Θj : Formalism.FourierDecayAlt.Top.TopLift D.R.k D.R.rS (X.Vloc u (tauE X e j)) (X.Vloc u' (tauE X e j)),
-      (∃ (Xo : Formalism.FourierDecayAlt.Q.ActualOps D.R.k D.R.rS (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
-            (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π')
-          (μ : Measure (Formalism.QuantumDeterminants.Mt D.R.k D.R.rS))
-          (L : Formalism.FourierDecayAlt.R.LevelData (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS (towersOf X C u u' e j).base.z
-            (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π')) D.R.rS)
-          (st : Formalism.FourierDecayAlt.Fr.Start (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS (towersOf X C u u' e j).base.z
-            (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π'))),
-          Formalism.FourierDecayAlt.P5.IsData (parE e u u' de de' j) (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
-            (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π' Xo μ L st (l + 1) ∧
-          Formalism.FourierDecayAlt.KB.IsTopLift2 (parE e u u' de de' j) (l + 1) (towersOf X C u u' e j).base L st Θj) ∧
-        Formalism.FourierDecayAlt.KB.InDDplus2 (parE e u u' de de' j) (l + 1) (towersOf X C u u' e j).base Cb Θj := by
+          ∃ (Xo : Formalism.FourierDecayAlt.Q.ActualOps D.R.k D.R.rS (towersOf X C u u' e j).base.z
+              (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π
+              (towersOf X C u u' e j).base.π')
+              (μ : Measure (Formalism.QuantumDeterminants.Mt D.R.k D.R.rS))
+              (L : Formalism.FourierDecayAlt.R.LevelData
+                (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS
+                  (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
+                  (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π'))
+                D.R.rS)
+              (st : Formalism.FourierDecayAlt.Fr.Start (Formalism.FourierDecayAlt.Q.Pr
+                (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS (towersOf X C u u' e j).base.z
+                  (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π
+                  (towersOf X C u u' e j).base.π'))),
+            Formalism.FourierDecayAlt.P5.IsData (parE e u u' de de' j)
+                (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
+                (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π' Xo μ L st (l + 1)
+              ∧ Formalism.FourierDecayAlt.KB.IsTopLift2 (parE e u u' de de' j) (l + 1)
+                (towersOf X C u u' e j).base L st (Θ j))
+        ∧ ∀ j : Fin (nfE D),
+          Formalism.FourierDecayAlt.KB.InDDplus2 (parE e u u' de de' j) (l + 1)
+            (towersOf X C u u' e j).base Cb (Θ j) := by
+  have key
+      : ∀ j : Fin (nfE D),
+        ∃ Θj : Formalism.FourierDecayAlt.Top.TopLift D.R.k D.R.rS (X.Vloc u (tauE X e j))
+            (X.Vloc u' (tauE X e j)),
+          (∃ (Xo : Formalism.FourierDecayAlt.Q.ActualOps D.R.k D.R.rS (towersOf X C u u' e j).base.z
+                (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π
+                (towersOf X C u u' e j).base.π')
+                (μ : Measure (Formalism.QuantumDeterminants.Mt D.R.k D.R.rS))
+                (L : Formalism.FourierDecayAlt.R.LevelData
+                  (Formalism.FourierDecayAlt.Q.Pr (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS
+                    (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
+                    (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π'))
+                  D.R.rS)
+                (st : Formalism.FourierDecayAlt.Fr.Start (Formalism.FourierDecayAlt.Q.Pr
+                  (Formalism.FourierDecayAlt.Q.RadSp D.R.k D.R.rS (towersOf X C u u' e j).base.z
+                    (towersOf X C u u' e j).base.z' (towersOf X C u u' e j).base.π
+                    (towersOf X C u u' e j).base.π'))),
+              Formalism.FourierDecayAlt.P5.IsData (parE e u u' de de' j)
+                  (towersOf X C u u' e j).base.z (towersOf X C u u' e j).base.z'
+                  (towersOf X C u u' e j).base.π (towersOf X C u u' e j).base.π' Xo μ L st (l + 1)
+                ∧ Formalism.FourierDecayAlt.KB.IsTopLift2 (parE e u u' de de' j) (l + 1)
+                  (towersOf X C u u' e j).base L st Θj)
+            ∧ Formalism.FourierDecayAlt.KB.InDDplus2 (parE e u u' de de' j) (l + 1)
+              (towersOf X C u u' e j).base Cb Θj := by
     intro j
     obtain ⟨Xo, μ, L, st, hD⟩ := hdat j
-    obtain ⟨Θj, h1, h2⟩ := hL _ _ (parE e u u' de de' j) (towersOf X C u u' e j).base Xo μ L st (l + 1) (by omega)
-      (show l + 1 ≤ D.R.k by omega) hD
+    obtain ⟨Θj, h1, h2⟩ :=
+      hL _ _ (parE e u u' de de' j) (towersOf X C u u' e j).base Xo μ L st (l + 1) (by omega)
+        (show l + 1 ≤ D.R.k by omega) hD
     exact ⟨Θj, ⟨Xo, μ, L, st, hD, h1⟩, h2⟩
   choose Θ hΘ using key
   exact ⟨Θ, fun j => (hΘ j).1, fun j => (hΘ j).2⟩
@@ -658,13 +851,14 @@ theorem liftAt3_exists : ∃ Cb : ℝ, LiftAt3 Cb := by
   obtain ⟨Cb, -, h⟩ := Formalism.FourierDecayAlt.P.top_lift_exists
   exact ⟨Cb, h⟩
 
-def liftId {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] : Formalism.FourierDecayAlt.Top.TopLift k r Wp Wq where
+def liftId
+    {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+    [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+    : Formalism.FourierDecayAlt.Top.TopLift k r Wp Wq where
   Θ _ _ F := F
   nil _ _ := rfl
 
 variable {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) {θ : ℝ} (C : Choice X θ)
-
 
 variable [Fact Formalism.L2.SG.Pf.CarrierT.CoefCapAll] in
 theorem carrierDataBuilt_of_hyp (Cb : ℝ) (hLift : LiftAt3 Cb) (hCap : CapFromHC) {large₂ : SizeData₂ D} {C' Cl Cg cb Cu cT CT : ℝ}
@@ -768,18 +962,25 @@ open scoped Matrix
 
 namespace Formalism.L2.SG.Pf.CarrierXAll
 
-open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT Formalism.L2.SG.RealObj
-open Formalism.FourierDecayAlt Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2 Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups
+open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built
+  Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT Formalism.L2.SG.RealObj
+open Formalism.FourierDecayAlt Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full
+  Formalism.L2.SG.PackageTie2 Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups
 open Formalism.L2.SG.AdBridge Formalism.L2.SG.DataInst Formalism.L2.SG.SpectralTiesReal
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar instCM
 
-theorem polys (k r : ℕ) :
-    (k : ℝ) * ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) * ((r : ℝ) + 1) ^ 2 + ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) ^ 2 * ((r : ℝ) + 1) ^ 2 +
-        ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) ^ 3 ≤ 8400 * ((k : ℝ) * ((r : ℝ) + 1) ^ 3 + ((r : ℝ) + 1) ^ 4) ∧
-    (k : ℝ) * ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) * ((r : ℝ) + 1) ^ 2 + ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) ^ 2 * ((r : ℝ) + 1) ^ 2 ≤
-        8400 * ((k : ℝ) * ((r : ℝ) + 1) ^ 3 + ((r : ℝ) + 1) ^ 4) ∧
-    6 * ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) ^ 3 + 6 * ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) ≤ 48120 * ((k : ℝ) * ((r : ℝ) + 1) ^ 3 + ((r : ℝ) + 1) ^ 4) := by
+theorem polys (k r : ℕ)
+    : (k : ℝ) * ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) * ((r : ℝ) + 1) ^ 2
+          + ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) ^ 2 * ((r : ℝ) + 1) ^ 2
+          + ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) ^ 3
+        ≤ 8400 * ((k : ℝ) * ((r : ℝ) + 1) ^ 3 + ((r : ℝ) + 1) ^ 4)
+      ∧ (k : ℝ) * ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) * ((r : ℝ) + 1) ^ 2
+          + ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) ^ 2 * ((r : ℝ) + 1) ^ 2
+        ≤ 8400 * ((k : ℝ) * ((r : ℝ) + 1) ^ 3 + ((r : ℝ) + 1) ^ 4)
+      ∧ 6 * ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) ^ 3
+          + 6 * ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ)
+        ≤ 48120 * ((k : ℝ) * ((r : ℝ) + 1) ^ 3 + ((r : ℝ) + 1) ^ 4) := by
   have hN : ((4 * Formalism.FourierDecayAlt.C.Kst * (r + 1) : ℕ) : ℝ) = 20 * ((r : ℝ) + 1) := by
     unfold Formalism.FourierDecayAlt.C.Kst; push_cast; ring
   rw [hN]
@@ -788,18 +989,29 @@ theorem polys (k r : ℕ) :
   have hk : (0 : ℝ) ≤ k := Nat.cast_nonneg _
   have h34 : x ^ 3 ≤ x ^ 4 := pow_le_pow_right₀ hx1 (by norm_num)
   have h14 : x ≤ x ^ 4 := by
-    calc x = x ^ 1 := (pow_one x).symm
+    calc
+      x = x ^ 1 := (pow_one x).symm
       _ ≤ x ^ 4 := pow_le_pow_right₀ hx1 (by norm_num)
   have hkx : 0 ≤ (k : ℝ) * x ^ 3 := by positivity
   refine ⟨?_, ?_, ?_⟩
-  · have e : (k : ℝ) * (20 * x) * x ^ 2 + (20 * x) ^ 2 * x ^ 2 + (20 * x) ^ 3 = 20 * ((k : ℝ) * x ^ 3) + 400 * x ^ 4 + 8000 * x ^ 3 := by ring
-    rw [e]; nlinarith
-  · have e : (k : ℝ) * (20 * x) * x ^ 2 + (20 * x) ^ 2 * x ^ 2 = 20 * ((k : ℝ) * x ^ 3) + 400 * x ^ 4 := by ring
-    rw [e]; nlinarith
+  · have e
+        : (k : ℝ) * (20 * x) * x ^ 2 + (20 * x) ^ 2 * x ^ 2 + (20 * x) ^ 3
+          = 20 * ((k : ℝ) * x ^ 3) + 400 * x ^ 4 + 8000 * x ^ 3 := by
+      ring
+    rw [e]
+    nlinarith
+  · have e
+        : (k : ℝ) * (20 * x) * x ^ 2 + (20 * x) ^ 2 * x ^ 2
+          = 20 * ((k : ℝ) * x ^ 3) + 400 * x ^ 4 := by
+      ring
+    rw [e]
+    nlinarith
   · have e : 6 * (20 * x) ^ 3 + 6 * (20 * x) = 48000 * x ^ 3 + 120 * x := by ring
-    rw [e]; nlinarith
+    rw [e]
+    nlinarith
 
-theorem scale_le {c P Q B : ℝ} (hP0 : 0 ≤ P) (hP : P ≤ 8400 * Q) (hB : 8400 * |c| * Q ≤ B) : c * P ≤ B := by
+theorem scale_le {c P Q B : ℝ} (hP0 : 0 ≤ P) (hP : P ≤ 8400 * Q) (hB : 8400 * |c| * Q ≤ B)
+    : c * P ≤ B := by
   have h1 : c * P ≤ |c| * P := mul_le_mul_of_nonneg_right (le_abs_self c) hP0
   have h2 : |c| * P ≤ |c| * (8400 * Q) := mul_le_mul_of_nonneg_left hP (abs_nonneg c)
   linarith
@@ -813,8 +1025,10 @@ open scoped Matrix
 
 namespace Formalism.L2.SG.Pf.CarrierXAll
 
-open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT Formalism.L2.SG.RealObj
-open Formalism.FourierDecayAlt Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.PackageTie2 Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups
+open Formalism.L2.SG.Pf.Carrier Formalism.L2.SG.Pf.BaseOf Formalism.L2.SG.Pf.Built
+  Formalism.L2.SG.LocWSOf Formalism.L2.SG.Pf.CarrierT Formalism.L2.SG.RealObj
+open Formalism.FourierDecayAlt Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full
+  Formalism.L2.SG.PackageTie2 Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups
 open Formalism.L2.SG.AdBridge Formalism.L2.SG.DataInst Formalism.L2.SG.SpectralTiesReal
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar instCM

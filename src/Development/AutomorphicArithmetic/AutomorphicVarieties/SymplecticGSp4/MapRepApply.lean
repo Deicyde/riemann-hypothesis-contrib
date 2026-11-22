@@ -76,11 +76,15 @@ section Rep
 
 variable {H : Type} [Group H]
 
-def mapRep {n : Type} [Fintype n] [DecidableEq n] (f : R →+* R') (r : H →* Matrix n n R) : H →* Matrix n n R' :=
+def mapRep {n : Type} [Fintype n] [DecidableEq n] (f : R →+* R') (r : H →* Matrix n n R)
+    : H →* Matrix n n R' :=
   (f.mapMatrix : Matrix n n R →+* Matrix n n R').toMonoidHom.comp r
 
-@[simp] theorem mapRep_apply {n : Type} [Fintype n] [DecidableEq n] (f : R →+* R') (r : H →* Matrix n n R) (g : H) (i j : n) :
-    mapRep f r g i j = f (r g i j) := rfl
+@[simp]
+theorem mapRep_apply
+    {n : Type} [Fintype n] [DecidableEq n] (f : R →+* R') (r : H →* Matrix n n R) (g : H) (i j : n)
+    : mapRep f r g i j = f (r g i j) :=
+  rfl
 
 def diagRep (χ : Fin 4 → H →* Rˣ) : H →* M4 R where
   toFun g := Matrix.diagonal fun i => (χ i g : R)
@@ -90,7 +94,8 @@ def diagRep (χ : Fin 4 → H →* Rˣ) : H →* M4 R where
 def mono (r : H →* M4 R) (w : ℤ × ℤ) : Set R :=
   {x | ∃ L : List (H × Fin 4 × Fin 4), (L.map fun a => wt a.2.1 a.2.2).sum = w ∧ x = (L.map fun a => r a.1 a.2.1 a.2.2).prod}
 
-def Irr {n : Type} [Fintype n] [DecidableEq n] (r : H →* Matrix n n R) : Prop := Submodule.span R (Set.range r) = ⊤
+def Irr {n : Type} [Fintype n] [DecidableEq n] (r : H →* Matrix n n R) : Prop :=
+  Submodule.span R (Set.range r) = ⊤
 
 def Ge (r : H →* M4 R) (i j : Fin 4) : Prop := ∃ g, r g i j ≠ 0
 
@@ -102,8 +107,13 @@ def IsConj4 (r r' : H →* M4 R) : Prop := ∃ u : (M4 R)ˣ, ∀ g, r' g = u * r
 
 structure Ord (I : Subgroup H) (ps : Fin 4 → H → R) (s₀ : H) (r : H →* M4 R) : Prop where
   charpoly : (r s₀).charpoly = ∏ j, (Polynomial.X - C (ps j s₀))
-  stable : ∀ g i j, i < j → prj (fun a => ps a s₀) (r s₀) j * r g * prj (fun a => ps a s₀) (r s₀) i = 0
-  inert : ∀ s ∈ I, ∀ i, prj (fun a => ps a s₀) (r s₀) i * (r s - ps i s • (1 : M4 R)) * prj (fun a => ps a s₀) (r s₀) i = 0
+  stable
+    : ∀ g i j, i < j → prj (fun a => ps a s₀) (r s₀) j * r g * prj (fun a => ps a s₀) (r s₀) i = 0
+  inert
+    : ∀ s ∈ I, ∀ i,
+      prj (fun a => ps a s₀) (r s₀) i * (r s - ps i s • (1 : M4 R))
+          * prj (fun a => ps a s₀) (r s₀) i
+        = 0
 
 end Rep
 

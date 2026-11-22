@@ -8,15 +8,16 @@ open IsDedekindDomain NumberField
 
 namespace GlobalTheory
 
-theorem locBasis_of_bounded {F : Type} [Field F] [NumberField F] (p : HeightOneSpectrum (𝓞 F))
-    (d : ℕ) (M : Set (Fin d → F)) (h0 : (0 : Fin d → F) ∈ M)
-    (hadd : ∀ x ∈ M, ∀ y ∈ M, x + y ∈ M)
-    (hsmul : ∀ a : F, p.valuation F a ≤ 1 → ∀ x ∈ M, a • x ∈ M)
-    (hstd : ∀ i, Pi.single i 1 ∈ M)
-    (hbd : ∃ D : F, D ≠ 0 ∧ ∀ x ∈ M, ∀ i, p.valuation F (D * x i) ≤ 1) :
-    ∃ (m : ℕ) (b : Fin m → Fin d → F), (∀ k, b k ∈ M) ∧
-      (∀ x ∈ M, ∃ a : Fin m → F, (∀ k, p.valuation F (a k) ≤ 1) ∧ x = ∑ k, a k • b k) ∧
-      LinearIndependent F b := by
+theorem locBasis_of_bounded
+    {F : Type} [Field F] [NumberField F]
+    (p : HeightOneSpectrum (𝓞 F)) (d : ℕ) (M : Set (Fin d → F))
+    (h0 : (0 : Fin d → F) ∈ M) (hadd : ∀ x ∈ M, ∀ y ∈ M, x + y ∈ M)
+    (hsmul : ∀ a : F, p.valuation F a ≤ 1 → ∀ x ∈ M, a • x ∈ M) (hstd : ∀ i, Pi.single i 1 ∈ M)
+    (hbd : ∃ D : F, D ≠ 0 ∧ ∀ x ∈ M, ∀ i, p.valuation F (D * x i) ≤ 1)
+    : ∃ (m : ℕ) (b : Fin m → Fin d → F),
+      (∀ k, b k ∈ M)
+        ∧ (∀ x ∈ M, ∃ a : Fin m → F, (∀ k, p.valuation F (a k) ≤ 1) ∧ x = ∑ k, a k • b k)
+        ∧ LinearIndependent F b := by
   obtain ⟨D, hD, hDM⟩ := hbd
   set A : ValuationSubring F := p.valuationSubringAtPrime F with hA
   haveI : IsDiscreteValuationRing A :=
@@ -25,18 +26,19 @@ theorem locBasis_of_bounded {F : Type} [Field F] [NumberField F] (p : HeightOneS
     intro a
     rw [hA, HeightOneSpectrum.valuationSubringAtPrime_eq_valuationSubring,
       Valuation.mem_valuationSubring_iff]
-  let M' : Submodule A (Fin d → F) :=
-    { carrier := M
-      add_mem' := fun {x y} hx hy => hadd x hx y hy
-      zero_mem' := h0
-      smul_mem' := fun c x hx => by
-        have : c • x = (c : F) • x := rfl
-        rw [this]
-        exact hsmul _ ((memA _).1 c.2) x hx }
+  let M' : Submodule A (Fin d → F) := {
+    carrier := M
+    add_mem' := fun {x y} hx hy => hadd x hx y hy
+    zero_mem' := h0
+    smul_mem' := fun c x hx => by
+      have : c • x = (c : F) • x := rfl
+      rw [this]
+      exact hsmul _ ((memA _).1 c.2) x hx
+  }
   let e : Fin d → Fin d → F := fun i => D⁻¹ • Pi.single i 1
   have heF : LinearIndependent F e := by
-    have h1 := (Pi.basisFun F (Fin d)).linearIndependent.units_smul
-      (fun _ => Units.mk0 D⁻¹ (inv_ne_zero hD))
+    have h1 :=
+      (Pi.basisFun F (Fin d)).linearIndependent.units_smul (fun _ => Units.mk0 D⁻¹ (inv_ne_zero hD))
     convert h1 using 1
     ext i j
     simp [e, Pi.basisFun_apply]

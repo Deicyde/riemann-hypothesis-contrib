@@ -18,8 +18,8 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.GaloisO
 namespace GlobalTheory.SS.MaxUnr
 open IsLocalRing Polynomial
 
-theorem pow_pow_mul_eq {M : Type*} [Monoid M] {q f : ℕ} {x : M} (h : x ^ q ^ f = x) (g : ℕ) :
-    x ^ q ^ (f * g) = x := by
+theorem pow_pow_mul_eq {M : Type*} [Monoid M] {q f : ℕ} {x : M} (h : x ^ q ^ f = x) (g : ℕ)
+    : x ^ q ^ (f * g) = x := by
   induction g with
   | zero => simp
   | succ g ih => rw [Nat.mul_succ, pow_add, pow_mul, ih, h]
@@ -29,51 +29,60 @@ def Teich (q : ℕ) (S : Type*) [Monoid S] : Set S := {t | ∃ f, 1 ≤ f ∧ t 
 section
 variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
 
-theorem one_lt_card [Finite (ResidueField V)] : 1 < Nat.card (ResidueField V) :=
-  Finite.one_lt_card
+theorem one_lt_card [Finite (ResidueField V)] : 1 < Nat.card (ResidueField V) := Finite.one_lt_card
 
-theorem isIntegral_of_teich {q : ℕ} (hq : 1 < q) {S : Type*} [CommRing S] [Algebra V S] {t : S}
-    (ht : t ∈ Teich q S) : IsIntegral V t := by
+theorem isIntegral_of_teich
+    {q : ℕ} (hq : 1 < q) {S : Type*} [CommRing S] [Algebra V S] {t : S} (ht : t ∈ Teich q S)
+    : IsIntegral V t := by
   obtain ⟨f, hf, h⟩ := ht
   refine ⟨X ^ q ^ f - X, monic_X_pow_sub ?_, by simp [h]⟩
   refine lt_of_le_of_lt degree_X_le ?_
   exact_mod_cast Nat.one_lt_pow (by omega) hq
 
-theorem isLocalRing_of_isIntegral [IsAdicComplete (maximalIdeal V) V] (S : Type*) [CommRing S]
-    [IsDomain S] [Algebra V S] [Algebra.IsIntegral V S] : IsLocalRing S := by
+theorem isLocalRing_of_isIntegral
+    [IsAdicComplete (maximalIdeal V) V]
+    (S : Type*) [CommRing S] [IsDomain S] [Algebra V S] [Algebra.IsIntegral V S]
+    : IsLocalRing S := by
   refine IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun a => ?_
   have : Module.Finite V (Algebra.adjoin V {a}) :=
     Algebra.finite_adjoin_simple_of_isIntegral (Algebra.IsIntegral.isIntegral a)
-  have := ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.isLocalRing_finite_domain (R := V) (Algebra.adjoin V {a})
+  have :=
+    ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.isLocalRing_finite_domain
+      (R := V) (Algebra.adjoin V {a})
   rcases IsLocalRing.isUnit_or_isUnit_one_sub_self
-    (⟨a, Algebra.self_mem_adjoin_singleton V a⟩ : Algebra.adjoin V {a}) with h | h
+      (⟨a, Algebra.self_mem_adjoin_singleton V a⟩ : Algebra.adjoin V {a})
+    with h | h
   · exact Or.inl (h.map (Algebra.adjoin V {a}).val)
   · exact Or.inr (by simpa using h.map (Algebra.adjoin V {a}).val)
 
-theorem isLocalHom_of_injective {S S' : Type*} [CommRing S] [CommRing S'] [Algebra V S] [Algebra V S']
-    [Algebra.IsIntegral V S'] (g : S →ₐ[V] S') (hg : Function.Injective g) :
-    IsLocalHom g.toRingHom := by
+theorem isLocalHom_of_injective
+    {S S' : Type*} [CommRing S] [CommRing S'] [Algebra V S] [Algebra V S'] [Algebra.IsIntegral V S']
+    (g : S →ₐ[V] S') (hg : Function.Injective g)
+    : IsLocalHom g.toRingHom := by
   refine RingHom.IsIntegral.isLocalHom (fun x => ?_) hg
   let := g.toRingHom.toAlgebra
   have : IsScalarTower V S S' := .of_algebraMap_eq fun v => (g.commutes v).symm
   exact (Algebra.IsIntegral.isIntegral (R := V) x).tower_top (A := S)
 
-theorem exists_prime [Finite (ResidueField V)] : ∃ p n : ℕ, p.Prime ∧ (p : V) ∈ maximalIdeal V ∧
-    Nat.card (ResidueField V) = p ^ n := by
+theorem exists_prime [Finite (ResidueField V)]
+    : ∃ p n : ℕ, p.Prime ∧ (p : V) ∈ maximalIdeal V ∧ Nat.card (ResidueField V) = p ^ n := by
   have := Fintype.ofFinite (ResidueField V)
   obtain ⟨p, hp, n, hp', h⟩ := FiniteField.card' (ResidueField V)
   refine ⟨p, n, hp', ?_, by rw [Nat.card_eq_fintype_card, h]⟩
   rw [← residue_eq_zero_iff, map_natCast, CharP.cast_eq_zero]
 
-theorem pow_card_sub_mem [Finite (ResidueField V)] (v : V) :
-    v ^ Nat.card (ResidueField V) - v ∈ maximalIdeal V := by
+theorem pow_card_sub_mem [Finite (ResidueField V)] (v : V)
+    : v ^ Nat.card (ResidueField V) - v ∈ maximalIdeal V := by
   have := Fintype.ofFinite (ResidueField V)
-  rw [← residue_eq_zero_iff, map_sub, map_pow, Nat.card_eq_fintype_card, FiniteField.pow_card, sub_self]
+  rw [← residue_eq_zero_iff, map_sub, map_pow, Nat.card_eq_fintype_card, FiniteField.pow_card,
+    sub_self]
 
-theorem teich_of_mem_adjoin [Finite (ResidueField V)] {Q : Type*} [CommRing Q] [Algebra V Q]
-    (h0 : ∀ v ∈ maximalIdeal V, algebraMap V Q v = 0) {x : Q}
-    (hx : x ∈ Algebra.adjoin V (Teich (Nat.card (ResidueField V)) Q)) :
-    x ∈ Teich (Nat.card (ResidueField V)) Q := by
+theorem teich_of_mem_adjoin
+    [Finite (ResidueField V)]
+    {Q : Type*} [CommRing Q] [Algebra V Q]
+    (h0 : ∀ v ∈ maximalIdeal V, algebraMap V Q v = 0)
+    {x : Q} (hx : x ∈ Algebra.adjoin V (Teich (Nat.card (ResidueField V)) Q))
+    : x ∈ Teich (Nat.card (ResidueField V)) Q := by
   rcases subsingleton_or_nontrivial Q with _ | _
   · exact ⟨1, le_rfl, Subsingleton.elim _ _⟩
   obtain ⟨p, n, hp, hpm, hq⟩ := exists_prime (V := V)
@@ -103,17 +112,22 @@ theorem teich_of_mem_adjoin [Finite (ResidueField V)] {Q : Type*} [CommRing Q] [
     rw [mul_comm] at h2
     rw [mul_pow, pow_pow_mul_eq hx g, h2]
 
-theorem isIntegral_of_gen [Finite (ResidueField V)] {S : Type*} [CommRing S] [Algebra V S]
-    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤) : Algebra.IsIntegral V S := by
+theorem isIntegral_of_gen
+    [Finite (ResidueField V)]
+    {S : Type*} [CommRing S] [Algebra V S]
+    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤)
+    : Algebra.IsIntegral V S := by
   refine ⟨fun x => ?_⟩
   have : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) ≤ integralClosure V S :=
     Algebra.adjoin_le fun t ht => isIntegral_of_teich one_lt_card ht
   exact this (hS ▸ Algebra.mem_top)
 
-theorem teich_quot_of_gen [Finite (ResidueField V)] {S : Type*} [CommRing S] [Algebra V S]
-    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤) (I : Ideal S)
-    (hI : (maximalIdeal V).map (algebraMap V S) ≤ I) (x : S ⧸ I) :
-    x ∈ Teich (Nat.card (ResidueField V)) (S ⧸ I) := by
+theorem teich_quot_of_gen
+    [Finite (ResidueField V)]
+    {S : Type*} [CommRing S] [Algebra V S]
+    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤)
+    (I : Ideal S) (hI : (maximalIdeal V).map (algebraMap V S) ≤ I) (x : S ⧸ I)
+    : x ∈ Teich (Nat.card (ResidueField V)) (S ⧸ I) := by
   refine teich_of_mem_adjoin (fun v hv => ?_) ?_
   · exact Ideal.Quotient.eq_zero_iff_mem.2 (hI (Ideal.mem_map_of_mem _ hv))
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
@@ -124,10 +138,11 @@ theorem teich_quot_of_gen [Finite (ResidueField V)] {S : Type*} [CommRing S] [Al
   rintro _ ⟨t, ⟨f, hf, ht⟩, rfl⟩
   exact ⟨f, hf, by rw [← map_pow, ht]⟩
 
-theorem maximalIdeal_of_gen [Finite (ResidueField V)] {S : Type*} [CommRing S] [Algebra V S]
-    [IsLocalRing S] [IsLocalHom (algebraMap V S)]
-    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤) :
-    (maximalIdeal V).map (algebraMap V S) = maximalIdeal S := by
+theorem maximalIdeal_of_gen
+    [Finite (ResidueField V)]
+    {S : Type*} [CommRing S] [Algebra V S] [IsLocalRing S] [IsLocalHom (algebraMap V S)]
+    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤)
+    : (maximalIdeal V).map (algebraMap V S) = maximalIdeal S := by
   refine le_antisymm (Ideal.map_le_iff_le_comap.2 fun v hv => map_nonunit _ v hv) fun x hx => ?_
   obtain ⟨f, hf, h⟩ := teich_quot_of_gen hS _ le_rfl (Ideal.Quotient.mk _ x)
   rw [← map_pow, Ideal.Quotient.eq] at h
@@ -140,17 +155,19 @@ theorem maximalIdeal_of_gen [Finite (ResidueField V)] {S : Type*} [CommRing S] [
   rw [e, ← hN]
   exact neg_mem h
 
-theorem gen_adjoin {q : ℕ} {S : Type*} [CommRing S] [Algebra V S] {T : Set S} (hT : T ⊆ Teich q S) :
-    Algebra.adjoin V (Teich q (Algebra.adjoin V T)) = ⊤ := by
+theorem gen_adjoin {q : ℕ} {S : Type*} [CommRing S] [Algebra V S] {T : Set S} (hT : T ⊆ Teich q S)
+    : Algebra.adjoin V (Teich q (Algebra.adjoin V T)) = ⊤ := by
   rw [eq_top_iff, ← Algebra.adjoin_adjoin_coe_preimage (R := V) (s := T)]
   refine Algebra.adjoin_mono fun t ht => ?_
   obtain ⟨f, hf, h⟩ := hT ht
   exact ⟨f, hf, Subtype.ext h⟩
 
-theorem dvr_of_gen [Finite (ResidueField V)] {S : Type*} [CommRing S] [IsDomain S] [Algebra V S]
-    [FaithfulSMul V S] [IsLocalRing S] [Module.Finite V S]
-    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤) :
-    IsDiscreteValuationRing S := by
+theorem dvr_of_gen
+    [Finite (ResidueField V)]
+    {S : Type*}
+    [CommRing S] [IsDomain S] [Algebra V S] [FaithfulSMul V S] [IsLocalRing S] [Module.Finite V S]
+    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤)
+    : IsDiscreteValuationRing S := by
   have : IsLocalHom (algebraMap V S) :=
     isLocalHom_of_injective (Algebra.ofId V S) (FaithfulSMul.algebraMap_injective V S)
   have : IsNoetherianRing S := IsNoetherianRing.of_finite V S
@@ -158,24 +175,29 @@ theorem dvr_of_gen [Finite (ResidueField V)] {S : Type*} [CommRing S] [IsDomain 
   have hm := maximalIdeal_of_gen hS
   rw [hπ.maximalIdeal_eq, Ideal.map_span, Set.image_singleton] at hm
   have hnf : ¬ IsField S := by
-    rw [isField_iff_maximalIdeal_eq, ← hm, Ideal.span_singleton_eq_bot, map_eq_zero_iff _ (FaithfulSMul.algebraMap_injective V S)]
+    rw [isField_iff_maximalIdeal_eq, ← hm, Ideal.span_singleton_eq_bot,
+      map_eq_zero_iff _ (FaithfulSMul.algebraMap_injective V S)]
     exact hπ.ne_zero
-  exact ((IsDiscreteValuationRing.TFAE S hnf).out 1 5).2 (show (maximalIdeal S).IsPrincipal from ⟨⟨_, hm.symm⟩⟩)
+  exact ((IsDiscreteValuationRing.TFAE S hnf).out 1 5).2
+    (show (maximalIdeal S).IsPrincipal from ⟨⟨_, hm.symm⟩⟩)
 end
 
 section
-variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+variable
+  {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
   [IsAdicComplete (maximalIdeal V) V] [Finite (ResidueField V)]
 
-omit [IsDomain V] [IsDiscreteValuationRing V] [IsAdicComplete (maximalIdeal V) V] [Finite (ResidueField V)] in
-theorem exists_level {q : ℕ} {S : Type*} [CommRing S] [Algebra V S] {x : S}
-    (hx : x ∈ Algebra.adjoin V (Teich q S)) :
-    ∃ f, 1 ≤ f ∧ ∀ g, x ∈ Algebra.adjoin V {t : S | t ^ q ^ (f * g) = t} := by
+omit [IsDomain V] [IsDiscreteValuationRing V] [IsAdicComplete (maximalIdeal V) V]
+  [Finite (ResidueField V)] in
+theorem exists_level
+    {q : ℕ} {S : Type*} [CommRing S] [Algebra V S] {x : S} (hx : x ∈ Algebra.adjoin V (Teich q S))
+    : ∃ f, 1 ≤ f ∧ ∀ g, x ∈ Algebra.adjoin V {t : S | t ^ q ^ (f * g) = t} := by
   induction hx using Algebra.adjoin_induction with
   | mem x hx =>
     obtain ⟨f, hf, h⟩ := hx
     exact ⟨f, hf, fun g => Algebra.subset_adjoin (pow_pow_mul_eq h g)⟩
-  | algebraMap v => exact ⟨1, le_rfl, fun g => Subalgebra.algebraMap_mem _ v⟩
+  | algebraMap v =>
+    exact ⟨1, le_rfl, fun g => Subalgebra.algebraMap_mem _ v⟩
   | add x y _ _ hx hy =>
     obtain ⟨f, hf, hx⟩ := hx
     obtain ⟨g, hg, hy⟩ := hy
@@ -189,12 +211,13 @@ theorem exists_level {q : ℕ} {S : Type*} [CommRing S] [Algebra V S] {x : S}
     · rw [mul_assoc]; exact hx _
     · rw [mul_comm f g, mul_assoc]; exact hy _
 
-theorem exists_stage {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [FaithfulSMul V S]
-    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤) (s : Finset S) :
-    ∃ (W : Subalgebra V S) (_ : IsDiscreteValuationRing W), (↑s : Set S) ⊆ W ∧
-      IsAdicComplete (maximalIdeal W) W ∧ Module.Finite V W ∧ IsLocalHom W.val.toRingHom ∧
-      (maximalIdeal V).map (algebraMap V W) = maximalIdeal W ∧
-      ∃ f, 1 ≤ f ∧ W = Algebra.adjoin V {t : S | t ^ Nat.card (ResidueField V) ^ f = t} := by
+theorem exists_stage
+    {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [FaithfulSMul V S]
+    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤) (s : Finset S)
+    : ∃ (W : Subalgebra V S) (_ : IsDiscreteValuationRing W),
+      (↑s : Set S) ⊆ W ∧ IsAdicComplete (maximalIdeal W) W ∧ Module.Finite V W
+        ∧ IsLocalHom W.val.toRingHom ∧ (maximalIdeal V).map (algebraMap V W) = maximalIdeal W
+        ∧ ∃ f, 1 ≤ f ∧ W = Algebra.adjoin V {t : S | t ^ Nat.card (ResidueField V) ^ f = t} := by
   classical
   set q := Nat.card (ResidueField V) with hq
   have hI := isIntegral_of_gen hS
@@ -214,22 +237,37 @@ theorem exists_stage {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [Faithfu
     Algebra.finite_adjoin_of_finite_of_isIntegral hfin fun x _ => Algebra.IsIntegral.isIntegral x
   have hloc : IsLocalRing W := isLocalRing_of_isIntegral (V := V) W
   have hg : Algebra.adjoin V (Teich q W) = ⊤ := gen_adjoin hT
-  have hfa : FaithfulSMul V W := (faithfulSMul_iff_algebraMap_injective V W).2 fun a b h =>
-    FaithfulSMul.algebraMap_injective V S (congrArg Subtype.val h)
+  have hfa : FaithfulSMul V W :=
+    (faithfulSMul_iff_algebraMap_injective V W).2 fun a b h =>
+      FaithfulSMul.algebraMap_injective V S (congrArg Subtype.val h)
   have : IsLocalHom (algebraMap V W) :=
     isLocalHom_of_injective (Algebra.ofId V W) (FaithfulSMul.algebraMap_injective V W)
   have hm := maximalIdeal_of_gen hg
-  have hc := ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.isAdicComplete_finite_algebra (R := V) W
+  have hc :=
+    ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.isAdicComplete_finite_algebra
+      (R := V) W
   rw [hm] at hc
-  refine ⟨W, dvr_of_gen hg, fun x hx => ?_, hc, hWfin,
-    isLocalHom_of_injective W.val Subtype.val_injective, hm, f, hf, rfl⟩
+  refine ⟨
+    W,
+    dvr_of_gen hg,
+    fun x hx => ?_,
+    hc,
+    hWfin,
+    isLocalHom_of_injective W.val Subtype.val_injective,
+    hm,
+    f,
+    hf,
+    rfl
+  ⟩
   obtain ⟨g, hg⟩ : F x ∣ f := Finset.dvd_prod_of_mem F hx
   rw [hW, hg]
   exact hF' x g
 
-theorem irreducible_of_gen {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [FaithfulSMul V S]
-    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤) {π : V} (hπ : Irreducible π) :
-    Irreducible (algebraMap V S π) := by
+theorem irreducible_of_gen
+    {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [FaithfulSMul V S]
+    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤)
+    {π : V} (hπ : Irreducible π)
+    : Irreducible (algebraMap V S π) := by
   have hI := isIntegral_of_gen hS
   have hloc : IsLocalRing S := isLocalRing_of_isIntegral (V := V) S
   have : IsLocalHom (algebraMap V S) :=
@@ -240,11 +278,13 @@ theorem irreducible_of_gen {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [F
     rw [Ne, map_eq_zero_iff _ (FaithfulSMul.algebraMap_injective V S)]
     exact hπ.ne_zero
   refine Prime.irreducible ((Ideal.span_singleton_prime h0).1 ?_)
-  rw [hm]; infer_instance
+  rw [hm]
+  infer_instance
 
-theorem dvr_of_gen' {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [FaithfulSMul V S]
-    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤) :
-    IsDiscreteValuationRing S := by
+theorem dvr_of_gen'
+    {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [FaithfulSMul V S]
+    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤)
+    : IsDiscreteValuationRing S := by
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible V
   refine IsDiscreteValuationRing.ofHasUnitMulPowIrreducibleFactorization
     ⟨_, irreducible_of_gen hS hπ, fun {x} hx => ?_⟩
@@ -253,13 +293,16 @@ theorem dvr_of_gen' {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [Faithful
   rw [hπ.maximalIdeal_eq, Ideal.map_span, Set.image_singleton] at hm
   have hi : Irreducible (algebraMap V W π) :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer _).2 hm.symm
-  obtain ⟨n, hn⟩ := IsDiscreteValuationRing.associated_pow_irreducible (x := (⟨x, hxW⟩ : W))
-    (fun h => hx (congrArg Subtype.val h)) hi
+  obtain ⟨n, hn⟩ :=
+    IsDiscreteValuationRing.associated_pow_irreducible (x := (⟨x, hxW⟩ : W))
+      (fun h => hx (congrArg Subtype.val h))
+      hi
   exact ⟨n, by simpa using (hn.map W.val).symm⟩
 
-theorem henselian_of_gen {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [FaithfulSMul V S]
-    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤) :
-    HenselianLocalRing S := by
+theorem henselian_of_gen
+    {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [FaithfulSMul V S]
+    (hS : Algebra.adjoin V (Teich (Nat.card (ResidueField V)) S) = ⊤)
+    : HenselianLocalRing S := by
   classical
   have hI := isIntegral_of_gen hS
   have hloc : IsLocalRing S := isLocalRing_of_isIntegral (V := V) S
@@ -274,21 +317,25 @@ theorem henselian_of_gen {S : Type} [CommRing S] [IsDomain S] [Algebra V S] [Fai
     · exact ⟨0, by simp [h]⟩
     · exact ⟨⟨P.coeff n, hs (by simp [coeff_mem_coeffs h])⟩, rfl⟩
   obtain ⟨P', rfl, -, hP'⟩ := lifts_and_natDegree_eq_and_monic hlift hP
-  have e : ∀ Q : W[X], (Q.map W.val.toRingHom).eval a = W.val.toRingHom (Q.eval ⟨a, haW⟩) := fun Q =>
-    eval_map_apply (p := Q) W.val.toRingHom ⟨a, haW⟩
+  have e : ∀ Q : W[X], (Q.map W.val.toRingHom).eval a = W.val.toRingHom (Q.eval ⟨a, haW⟩) :=
+    fun Q => eval_map_apply (p := Q) W.val.toRingHom ⟨a, haW⟩
   rw [derivative_map, e] at h2
   rw [e] at h1
-  obtain ⟨b, hb, hb'⟩ := HenselianLocalRing.is_henselian P' hP' ⟨a, haW⟩
-    (fun h => h1 (h.map _)) (isUnit_of_map_unit _ _ h2)
+  obtain ⟨b, hb, hb'⟩ :=
+    HenselianLocalRing.is_henselian P' hP' ⟨a, haW⟩
+      (fun h => h1 (h.map _))
+      (isUnit_of_map_unit _ _ h2)
   exact ⟨b, hb.map (f := W.val.toRingHom), map_nonunit W.val.toRingHom _ hb'⟩
 end
 
 section
 variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Finite (ResidueField V)]
 
-theorem teich_inj {S : Type*} [CommRing S] [IsLocalRing S] [Algebra V S] [IsLocalHom (algebraMap V S)]
+theorem teich_inj
+    {S : Type*} [CommRing S] [IsLocalRing S] [Algebra V S] [IsLocalHom (algebraMap V S)]
     {t u : S} (ht : t ∈ Teich (Nat.card (ResidueField V)) S)
-    (hu : u ∈ Teich (Nat.card (ResidueField V)) S) (h : t - u ∈ maximalIdeal S) : t = u := by
+    (hu : u ∈ Teich (Nat.card (ResidueField V)) S) (h : t - u ∈ maximalIdeal S)
+    : t = u := by
   obtain ⟨f, hf, ht⟩ := ht
   obtain ⟨g, hg, hu⟩ := hu
   have h1 := pow_pow_mul_eq ht g
@@ -318,9 +365,11 @@ theorem teich_inj {S : Type*} [CommRing S] [IsLocalRing S] [Algebra V S] [IsLoca
   have h6 := isUnit_one_sub_self_of_mem_nonunits _ h4
   rw [← sub_eq_zero, ← h6.mul_right_eq_zero, sub_mul, h3, one_mul, sub_self]
 
-theorem residue_teich {S : Type*} [CommRing S] [IsLocalRing S] [Algebra V S]
-    [IsLocalHom (algebraMap V S)] [Algebra.IsIntegral V S] (a : S) :
-    ∃ f, 1 ≤ f ∧ a ^ Nat.card (ResidueField V) ^ f - a ∈ maximalIdeal S := by
+theorem residue_teich
+    {S : Type*} [CommRing S] [IsLocalRing S] [Algebra V S] [IsLocalHom (algebraMap V S)]
+    [Algebra.IsIntegral V S]
+    (a : S)
+    : ∃ f, 1 ≤ f ∧ a ^ Nat.card (ResidueField V) ^ f - a ∈ maximalIdeal S := by
   have hc : IsIntegral (ResidueField V) (residue S a) := by
     have : IsIntegral V (residue S a) :=
       (Algebra.IsIntegral.isIntegral (R := V) a).map (IsScalarTower.toAlgHom V S (ResidueField S))
@@ -342,8 +391,8 @@ theorem faithful_sub (R : Subalgebra V Ω) : FaithfulSMul V R :=
   (faithfulSMul_iff_algebraMap_injective V R).2 fun _ _ h =>
     FaithfulSMul.algebraMap_injective V Ω (congrArg Subtype.val h)
 
-theorem exists_teich [IsLocalRing (integralClosure V Ω)] (a : integralClosure V Ω) :
-    ∃ t ∈ Teich (Nat.card (ResidueField V)) (integralClosure V Ω),
+theorem exists_teich [IsLocalRing (integralClosure V Ω)] (a : integralClosure V Ω)
+    : ∃ t ∈ Teich (Nat.card (ResidueField V)) (integralClosure V Ω),
       a - t ∈ maximalIdeal (integralClosure V Ω) := by
   have := faithful_sub (integralClosure V Ω)
   have : IsLocalHom (algebraMap V (integralClosure V Ω)) :=
@@ -359,26 +408,31 @@ theorem exists_teich [IsLocalRing (integralClosure V Ω)] (a : integralClosure V
     have hb' := isRoot_of_mem_roots hb
     have : b ∈ Teich q Ω := ⟨f, hf, by simpa [sub_eq_zero] using hb'⟩
     exact ⟨⟨b, isIntegral_of_teich one_lt_card this⟩, rfl⟩
-  have h1 : (X ^ q ^ f - X : (integralClosure V Ω)[X]).eval a ∈ maximalIdeal (integralClosure V Ω) := by
+  have h1
+      : (X ^ q ^ f - X : (integralClosure V Ω)[X]).eval a ∈ maximalIdeal (integralClosure V Ω) := by
     simpa using h
   rw [hs.eval_eq_prod_roots_of_monic hm] at h1
   obtain ⟨c, hc, hcm⟩ := (Ideal.IsPrime.multiset_prod_mem_iff_exists_mem inferInstance _).1 h1
   obtain ⟨t, ht, rfl⟩ := Multiset.mem_map.1 hc
   exact ⟨t, ⟨f, hf, by simpa [sub_eq_zero] using isRoot_of_mem_roots ht⟩, hcm⟩
 
-theorem isAlgClosed_residue [IsLocalRing (integralClosure V Ω)]
-    [IsLocalRing (Algebra.adjoin V (Teich (Nat.card (ResidueField V)) Ω))] :
-    IsAlgClosed (ResidueField (Algebra.adjoin V (Teich (Nat.card (ResidueField V)) Ω))) := by
+theorem isAlgClosed_residue
+    [IsLocalRing (integralClosure V Ω)]
+    [IsLocalRing (Algebra.adjoin V (Teich (Nat.card (ResidueField V)) Ω))]
+    : IsAlgClosed (ResidueField (Algebra.adjoin V (Teich (Nat.card (ResidueField V)) Ω))) := by
   set R := Algebra.adjoin V (Teich (Nat.card (ResidueField V)) Ω) with hR
   have hRI : Algebra.IsIntegral V R := isIntegral_of_gen (gen_adjoin subset_rfl)
-  have hle : R ≤ integralClosure V Ω := Algebra.adjoin_le fun t ht => isIntegral_of_teich one_lt_card ht
+  have hle : R ≤ integralClosure V Ω :=
+    Algebra.adjoin_le fun t ht => isIntegral_of_teich one_lt_card ht
   refine IsAlgClosed.of_exists_root _ fun p hp hi => ?_
-  obtain ⟨P, hP, hd, hPm⟩ := lifts_and_natDegree_eq_and_monic (f := residue R)
-    (p := p) (map_surjective _ residue_surjective _) hp
+  obtain ⟨P, hP, hd, hPm⟩ :=
+    lifts_and_natDegree_eq_and_monic (f := residue R) (p := p)
+      (map_surjective _ residue_surjective _) hp
   have hdeg : P.degree ≠ 0 := by
     have := hi.natDegree_pos
     exact (natDegree_pos_iff_degree_pos.1 (by omega)).ne'
-  obtain ⟨α, hα⟩ := IsAlgClosed.exists_aeval_eq_zero_of_injective Ω (R := R) Subtype.val_injective P hdeg
+  obtain ⟨α, hα⟩ :=
+    IsAlgClosed.exists_aeval_eq_zero_of_injective Ω (R := R) Subtype.val_injective P hdeg
   have hαi : IsIntegral V α := isIntegral_trans (A := R) α ⟨P, hPm, hα⟩
   obtain ⟨t, ⟨f, hf, ht⟩, hαt⟩ := exists_teich (⟨α, hαi⟩ : integralClosure V Ω)
   let t' : R := ⟨t, Algebra.subset_adjoin ⟨f, hf, congrArg Subtype.val ht⟩⟩
@@ -396,11 +450,15 @@ theorem isAlgClosed_residue [IsLocalRing (integralClosure V Ω)]
   exact fun hu => h1 (hu.map ι)
 end
 
-theorem exists_fractionField {V : Type} (K : Type) {Ω : Type} (R : Type) [CommRing V] [IsDomain V] [Field K] [Algebra V K] [IsFractionRing V K]
-    [Field Ω] [Algebra K Ω] [Algebra V Ω] [IsScalarTower V K Ω] [CommRing R] [IsDomain R] [Algebra V R]
-    [Algebra R Ω] [IsScalarTower V R Ω] [FaithfulSMul V R] [FaithfulSMul R Ω] :
-    ∃ (F : Type) (_ : Field F) (_ : Algebra R F) (_ : IsFractionRing R F) (_ : Algebra F Ω)
-      (_ : Algebra K F), IsScalarTower R F Ω ∧ IsScalarTower K F Ω := by
+theorem exists_fractionField
+    {V : Type}
+    (K : Type)
+    {Ω : Type} (R : Type) [CommRing V] [IsDomain V] [Field K] [Algebra V K] [IsFractionRing V K]
+    [Field Ω] [Algebra K Ω] [Algebra V Ω] [IsScalarTower V K Ω] [CommRing R] [IsDomain R]
+    [Algebra V R] [Algebra R Ω] [IsScalarTower V R Ω] [FaithfulSMul V R] [FaithfulSMul R Ω]
+    : ∃ (F : Type) (_ : Field F) (_ : Algebra R F) (_ : IsFractionRing R F) (_ : Algebra F Ω)
+        (_ : Algebra K F),
+      IsScalarTower R F Ω ∧ IsScalarTower K F Ω := by
   let F := FractionRing R
   let _ : Algebra F Ω := FractionRing.liftAlgebra R Ω
   have : IsScalarTower R F Ω := FractionRing.isScalarTower_liftAlgebra R Ω
@@ -415,14 +473,79 @@ theorem exists_fractionField {V : Type} (K : Type) {Ω : Type} (R : Type) [CommR
     ← IsScalarTower.algebraMap_apply V K Ω, ← IsScalarTower.algebraMap_apply V R Ω]
 
 open GlobalTheory.SS in
-theorem main_of (hT : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [Field K] [CharZero K] [Algebra R K], SH R K → ∀ (π : R), Irreducible π → ∀ (l : ℕ), l.Prime → IsUnit (l : R) → ∀ (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω], (∀ L : IntermediateField K Ω, FiniteDimensional K L → Normal K L → IsPGroup l (L ≃ₐ[K] L) → ∃ (m : ℕ) (ρ : Ω), ρ ^ l ^ m = algebraMap K Ω (algebraMap R K π) ∧ L ≤ IntermediateField.adjoin K {ρ}) ∧ (∀ (m : ℕ) (ζ : Ω), ζ ^ l ^ m = 1 → ζ ∈ Set.range (algebraMap K Ω)) ∧ ∃ σ : Ω ≃ₐ[K] Ω, ∀ (m : ℕ) (ρ : Ω), ρ ^ l ^ m = algebraMap K Ω (algebraMap R K π) → ∃ ζ, IsPrimitiveRoot ζ (l ^ m) ∧ σ ρ = ζ * ρ) (hA : ∀ (K K' Ω : Type) [Field K] [Field K'] [Field Ω] [Algebra K K'] [Algebra K' Ω] [Algebra K Ω] [IsScalarTower K K' Ω] (l : ℕ) (L : IntermediateField K Ω), FiniteDimensional K L → Normal K L → IsPGroup l (L ≃ₐ[K] L) → FiniteDimensional K' (IntermediateField.adjoin K' (L : Set Ω)) ∧ Normal K' (IntermediateField.adjoin K' (L : Set Ω)) ∧ IsPGroup l (IntermediateField.adjoin K' (L : Set Ω) ≃ₐ[K'] IntermediateField.adjoin K' (L : Set Ω))) (hB : ∀ (F Ω : Type) [Field F] [CharZero F] [Field Ω] [Algebra F Ω] (n q : ℕ) (ρ ζ : Ω) (c : F) (σ : Ω ≃ₐ[F] Ω) (φ : Ω →+* Ω), 0 < n → ρ ^ n = algebraMap F Ω c → φ (algebraMap F Ω c) = algebraMap F Ω c → (∀ a : F, φ (algebraMap F Ω a) ∈ Set.range (algebraMap F Ω)) → (∀ ξ : Ω, ξ ^ n = 1 → ξ ∈ Set.range (algebraMap F Ω)) → IsPrimitiveRoot ζ n → σ ρ = ζ * ρ → φ ζ = ζ ^ q → ∀ x ∈ IntermediateField.adjoin F ({ρ} : Set Ω), φ (σ x) = (σ ^ q) (φ x) ∧ (σ x = x → x ∈ Set.range (algebraMap F Ω))) (hC : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [CharZero K] [Algebra V K] [IsFractionRing V K], Finite (IsLocalRing.ResidueField V) → ∀ (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] [Algebra V Ω] [IsScalarTower V K Ω] [IsLocalRing (integralClosure V Ω)], ∃ φ : Ω ≃ₐ[K] Ω, ∀ x : integralClosure V Ω, ∃ y : integralClosure V Ω, (y : Ω) = φ x ∧ y - x ^ Nat.card (IsLocalRing.ResidueField V) ∈ IsLocalRing.maximalIdeal (integralClosure V Ω)) :
-    ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [Field K] [CharZero K] [Algebra V K] [IsFractionRing V K], Finite (IsLocalRing.ResidueField V) → ∀ (l : ℕ), l.Prime → IsUnit (l : V) → ∀ (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] [Algebra V Ω] [IsScalarTower V K Ω] (q : ℕ), q = Nat.card (IsLocalRing.ResidueField V) → ∃ (R : Subalgebra V Ω) (_ : IsLocalRing R) (σ φ : Ω ≃ₐ[K] Ω), SH R (FractionRing R) ∧ IsLocalHom (algebraMap V R) ∧ (∀ c : IsLocalRing.ResidueField R, ∃ m, 1 ≤ m ∧ c ^ (q ^ m) = c) ∧ (∀ s : Finset R, ∃ (W : Subalgebra V R) (_ : IsDiscreteValuationRing W), (↑s : Set R) ⊆ W ∧ IsAdicComplete (IsLocalRing.maximalIdeal W) W ∧ Module.Finite V W ∧ IsLocalHom W.val.toRingHom ∧ ∃ f, 1 ≤ f ∧ ∀ x ∈ W, (φ ^ f) ((x : R) : Ω) = x) ∧ (∀ x ∈ R, σ x = x) ∧ (∀ x : R, ∃ y : R, (y : Ω) = φ x ∧ y - x ^ q ∈ IsLocalRing.maximalIdeal R) ∧ (∀ (m : ℕ) (ζ : Ω), ζ ^ l ^ m = 1 → σ ζ = ζ ∧ φ ζ = ζ ^ q) ∧ ∀ L : IntermediateField K Ω, FiniteDimensional K L → Normal K L → IsPGroup l (L ≃ₐ[K] L) → ∀ x ∈ L, φ (σ x) = (σ ^ q) (φ x) ∧ (σ x = x → ∃ a ∈ R, ∃ b ∈ R, b ≠ 0 ∧ x * b = a) := by
+theorem main_of
+    (hT : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [Field K] [CharZero K]
+        [Algebra R K],
+      SH R K
+        → ∀ (π : R),
+          Irreducible π
+            → ∀ (l : ℕ),
+              l.Prime → IsUnit (l : R)
+                → ∀ (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω],
+                  (∀ L : IntermediateField K Ω,
+                      FiniteDimensional K L → Normal K L → IsPGroup l (L ≃ₐ[K] L)
+                        → ∃ (m : ℕ) (ρ : Ω),
+                          ρ ^ l ^ m = algebraMap K Ω (algebraMap R K π)
+                            ∧ L ≤ IntermediateField.adjoin K {ρ})
+                    ∧ (∀ (m : ℕ) (ζ : Ω), ζ ^ l ^ m = 1 → ζ ∈ Set.range (algebraMap K Ω))
+                    ∧ ∃ σ : Ω ≃ₐ[K] Ω, ∀ (m : ℕ) (ρ : Ω),
+                      ρ ^ l ^ m = algebraMap K Ω (algebraMap R K π)
+                        → ∃ ζ, IsPrimitiveRoot ζ (l ^ m) ∧ σ ρ = ζ * ρ)
+    (hA : ∀ (K K' Ω : Type) [Field K] [Field K'] [Field Ω] [Algebra K K'] [Algebra K' Ω]
+        [Algebra K Ω] [IsScalarTower K K' Ω] (l : ℕ) (L : IntermediateField K Ω),
+      FiniteDimensional K L → Normal K L → IsPGroup l (L ≃ₐ[K] L)
+        → FiniteDimensional K' (IntermediateField.adjoin K' (L : Set Ω))
+          ∧ Normal K' (IntermediateField.adjoin K' (L : Set Ω))
+          ∧ IsPGroup l
+            (IntermediateField.adjoin K' (L : Set Ω) ≃ₐ[K'] IntermediateField.adjoin K' (L : Set Ω)))
+    (hB : ∀ (F Ω : Type) [Field F] [CharZero F] [Field Ω] [Algebra F Ω] (n q : ℕ) (ρ ζ : Ω) (c : F)
+        (σ : Ω ≃ₐ[F] Ω) (φ : Ω →+* Ω),
+      0 < n → ρ ^ n = algebraMap F Ω c → φ (algebraMap F Ω c) = algebraMap F Ω c
+        → (∀ a : F, φ (algebraMap F Ω a) ∈ Set.range (algebraMap F Ω))
+        → (∀ ξ : Ω, ξ ^ n = 1 → ξ ∈ Set.range (algebraMap F Ω)) → IsPrimitiveRoot ζ n → σ ρ = ζ * ρ
+        → φ ζ = ζ ^ q
+        → ∀ x ∈ IntermediateField.adjoin F ({ρ} : Set Ω),
+          φ (σ x) = (σ ^ q) (φ x) ∧ (σ x = x → x ∈ Set.range (algebraMap F Ω)))
+    (hC : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K]
+        [CharZero K] [Algebra V K] [IsFractionRing V K],
+      Finite (IsLocalRing.ResidueField V)
+        → ∀ (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] [Algebra V Ω]
+            [IsScalarTower V K Ω] [IsLocalRing (integralClosure V Ω)],
+          ∃ φ : Ω ≃ₐ[K] Ω, ∀ x : integralClosure V Ω, ∃ y : integralClosure V Ω,
+            (y : Ω) = φ x
+              ∧ y - x ^ Nat.card (IsLocalRing.ResidueField V)
+                ∈ IsLocalRing.maximalIdeal (integralClosure V Ω))
+    : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+        [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [Field K] [CharZero K] [Algebra V K]
+        [IsFractionRing V K],
+      Finite (IsLocalRing.ResidueField V)
+        → ∀ (l : ℕ),
+          l.Prime → IsUnit (l : V)
+            → ∀ (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] [Algebra V Ω]
+                [IsScalarTower V K Ω] (q : ℕ),
+              q = Nat.card (IsLocalRing.ResidueField V)
+                → ∃ (R : Subalgebra V Ω) (_ : IsLocalRing R) (σ φ : Ω ≃ₐ[K] Ω),
+                  SH R (FractionRing R) ∧ IsLocalHom (algebraMap V R)
+                    ∧ (∀ c : IsLocalRing.ResidueField R, ∃ m, 1 ≤ m ∧ c ^ (q ^ m) = c)
+                    ∧ (∀ s : Finset R, ∃ (W : Subalgebra V R) (_ : IsDiscreteValuationRing W),
+                      (↑s : Set R) ⊆ W ∧ IsAdicComplete (IsLocalRing.maximalIdeal W) W
+                        ∧ Module.Finite V W ∧ IsLocalHom W.val.toRingHom
+                        ∧ ∃ f, 1 ≤ f ∧ ∀ x ∈ W, (φ ^ f) ((x : R) : Ω) = x)
+                    ∧ (∀ x ∈ R, σ x = x)
+                    ∧ (∀ x : R, ∃ y : R, (y : Ω) = φ x ∧ y - x ^ q ∈ IsLocalRing.maximalIdeal R)
+                    ∧ (∀ (m : ℕ) (ζ : Ω), ζ ^ l ^ m = 1 → σ ζ = ζ ∧ φ ζ = ζ ^ q)
+                    ∧ ∀ L : IntermediateField K Ω,
+                      FiniteDimensional K L → Normal K L → IsPGroup l (L ≃ₐ[K] L)
+                        → ∀ x ∈ L,
+                          φ (σ x) = (σ ^ q) (φ x)
+                            ∧ (σ x = x → ∃ a ∈ R, ∃ b ∈ R, b ≠ 0 ∧ x * b = a) := by
   intro V K _ _ _ _ _ _ _ _ hfin l hl hlu Ω _ _ _ _ _ q hq
   subst hq
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed K
-  have : FaithfulSMul V Ω := (faithfulSMul_iff_algebraMap_injective V Ω).2 (by
-    rw [IsScalarTower.algebraMap_eq V K Ω]
-    exact (algebraMap K Ω).injective.comp (IsFractionRing.injective V K))
+  have : FaithfulSMul V Ω :=
+    (faithfulSMul_iff_algebraMap_injective V Ω).2 (by
+      rw [IsScalarTower.algebraMap_eq V K Ω]
+      exact (algebraMap K Ω).injective.comp (IsFractionRing.injective V K))
   have hAloc : IsLocalRing (integralClosure V Ω) := isLocalRing_of_isIntegral (V := V) _
   obtain ⟨φ, hφ⟩ := hC V K hfin Ω
   set q := Nat.card (ResidueField V) with hq
@@ -431,7 +554,8 @@ theorem main_of (hT : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
   set R := Algebra.adjoin V (Teich q Ω) with hR
   have hg : Algebra.adjoin V (Teich q R) = ⊤ := gen_adjoin subset_rfl
   have hRI : Algebra.IsIntegral V R := isIntegral_of_gen hg
-  have hle : R ≤ integralClosure V Ω := Algebra.adjoin_le fun t ht => isIntegral_of_teich one_lt_card ht
+  have hle : R ≤ integralClosure V Ω :=
+    Algebra.adjoin_le fun t ht => isIntegral_of_teich one_lt_card ht
   have := faithful_sub R
   have := faithful_sub (integralClosure V Ω)
   have hRloc : IsLocalRing R := isLocalRing_of_isIntegral (V := V) _
@@ -445,11 +569,17 @@ theorem main_of (hT : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
   have hφT : ∀ t ∈ Teich q Ω, φ t = t ^ q := by
     rintro t ⟨f, hf, ht⟩
     obtain ⟨y, hy, hy'⟩ := hφ ⟨t, isIntegral_of_teich one_lt_card ⟨f, hf, ht⟩⟩
-    have := teich_inj (V := V) ⟨f, hf, Subtype.ext (by
-        rw [Subalgebra.coe_pow, hy, ← map_pow]; exact congrArg φ ht)⟩
-      ⟨f, hf, Subtype.ext (by
-        rw [Subalgebra.coe_pow, Subalgebra.coe_pow, ← pow_mul, mul_comm, pow_mul]
-        exact congrArg (· ^ q) ht)⟩ hy'
+    have :=
+      teich_inj (V := V)
+        ⟨f, hf, Subtype.ext (by rw [Subalgebra.coe_pow, hy, ← map_pow]; exact congrArg φ ht)⟩
+        ⟨
+          f,
+          hf,
+          Subtype.ext (by
+            rw [Subalgebra.coe_pow, Subalgebra.coe_pow, ← pow_mul, mul_comm, pow_mul]
+            exact congrArg (· ^ q) ht)
+        ⟩
+        hy'
     exact hy.symm.trans (congrArg Subtype.val this)
   have hTq : ∀ t ∈ Teich q Ω, ∀ n, t ^ n ∈ Teich q Ω := by
     rintro t ⟨f, hf, ht⟩ n
@@ -482,15 +612,28 @@ theorem main_of (hT : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
   obtain ⟨F, _, _, hF, _, _, _, _⟩ := exists_fractionField (V := V) (Ω := Ω) K R
   have : CharZero F := charZero_of_injective_algebraMap (algebraMap K F).injective
   have : IsAlgClosure F Ω := ⟨inferInstance, Algebra.IsAlgebraic.tower_top (K := K) F⟩
-  obtain ⟨hT1, hT2, σ, hσ⟩ := hT R F ⟨hSH.1, hSH.2.1, hSH.2.2.1, hF⟩ _ (irreducible_of_gen hg hπ) l hl
-    (by simpa using hlu.map (algebraMap V R)) Ω
+  obtain ⟨hT1, hT2, σ, hσ⟩ :=
+    hT R F ⟨hSH.1, hSH.2.1, hSH.2.2.1, hF⟩ _ (irreducible_of_gen hg hπ) l hl
+      (by simpa using hlu.map (algebraMap V R)) Ω
   have hRF : ∀ x : R, algebraMap F Ω (algebraMap R F x) = x := fun x =>
     (IsScalarTower.algebraMap_apply R F Ω x).symm
   have hσR : ∀ x ∈ R, σ x = x := fun x hx => by
     have := σ.commutes (algebraMap R F ⟨x, hx⟩)
     rwa [hRF] at this
-  refine ⟨R, hRloc, σ.restrictScalars K, φ, hSH, hVR, fun c => ?_, fun s => ?_, hσR, fun x => ?_,
-    fun m ζ h => ⟨hσR ζ (Algebra.subset_adjoin (hζ m ζ h)), hφT ζ (hζ m ζ h)⟩, ?_⟩
+  refine ⟨
+    R,
+    hRloc,
+    σ.restrictScalars K,
+    φ,
+    hSH,
+    hVR,
+    fun c => ?_,
+    fun s => ?_,
+    hσR,
+    fun x => ?_,
+    fun m ζ h => ⟨hσR ζ (Algebra.subset_adjoin (hζ m ζ h)), hφT ζ (hζ m ζ h)⟩,
+    ?_
+  ⟩
   · exact teich_quot_of_gen hg (maximalIdeal R) (maximalIdeal_of_gen hg).le c
   · obtain ⟨W, hW, h1, h2, h3, h4, -, f, hf, hWf⟩ := exists_stage hg s
     refine ⟨W, hW, h1, h2, h3, h4, f, hf, fun x hx => ?_⟩
@@ -517,19 +660,21 @@ theorem main_of (hT : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
     have hfrac : ∀ a : F, ∃ u v : R, v ≠ 0 ∧ algebraMap F Ω a = (u : Ω) / v := fun a => by
       obtain ⟨u, v, hv, rfl⟩ := IsFractionRing.div_surjective (A := R) a
       exact ⟨u, v, nonZeroDivisors.ne_zero hv, by rw [map_div₀, hRF, hRF]⟩
-    obtain ⟨b1, b2⟩ := hB F Ω (l ^ m) q ρ ζ _ σ (φ : Ω →+* Ω) (pow_pos hl.pos m) hρ
-      (by rw [hRF]; exact hφV π)
-      (fun a => by
-        obtain ⟨u, v, -, h⟩ := hfrac a
-        refine ⟨algebraMap R F ⟨φ u, hφR u u.2⟩ / algebraMap R F ⟨φ v, hφR v v.2⟩, ?_⟩
-        rw [h, map_div₀, map_div₀, hRF, hRF]; rfl)
-      (hT2 m) hζp hσρ (hφT ζ (hζ m ζ hζp.pow_eq_one)) x
-      (hL (IntermediateField.subset_adjoin F _ hx))
+    obtain ⟨b1, b2⟩ :=
+      hB F Ω (l ^ m) q ρ ζ _ σ (φ : Ω →+* Ω) (pow_pos hl.pos m) hρ (by rw [hRF]; exact hφV π)
+        (fun a => by
+          obtain ⟨u, v, -, h⟩ := hfrac a
+          refine ⟨algebraMap R F ⟨φ u, hφR u u.2⟩ / algebraMap R F ⟨φ v, hφR v v.2⟩, ?_⟩
+          rw [h, map_div₀, map_div₀, hRF, hRF]
+          rfl)
+        (hT2 m) hζp hσρ (hφT ζ (hζ m ζ hζp.pow_eq_one)) x
+        (hL (IntermediateField.subset_adjoin F _ hx))
     refine ⟨b1.trans ?_, fun h => ?_⟩
     · have : ∀ (n : ℕ) (y : Ω), (σ ^ n) y = (σ.restrictScalars K ^ n) y := fun n => by
         induction n with
         | zero => intro y; rfl
-        | succ n ih => intro y; rw [pow_succ, pow_succ, AlgEquiv.mul_apply, AlgEquiv.mul_apply, ih]; rfl
+        | succ n ih =>
+          intro y; rw [pow_succ, pow_succ, AlgEquiv.mul_apply, AlgEquiv.mul_apply, ih]; rfl
       exact this _ _
     · obtain ⟨a, rfl⟩ := b2 h
       obtain ⟨u, v, hv, h⟩ := hfrac a
@@ -538,8 +683,32 @@ theorem main_of (hT : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
 
 end GlobalTheory.SS.MaxUnr
 
-
 open GlobalTheory.SS in
-theorem GlobalTheory.SS.exists_maxUnramified_frobenius_tame : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [Field K] [CharZero K] [Algebra V K] [IsFractionRing V K], Finite (IsLocalRing.ResidueField V) → ∀ (l : ℕ), l.Prime → IsUnit (l : V) → ∀ (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] [Algebra V Ω] [IsScalarTower V K Ω] (q : ℕ), q = Nat.card (IsLocalRing.ResidueField V) → ∃ (R : Subalgebra V Ω) (_ : IsLocalRing R) (σ φ : Ω ≃ₐ[K] Ω), SH R (FractionRing R) ∧ IsLocalHom (algebraMap V R) ∧ (∀ c : IsLocalRing.ResidueField R, ∃ m, 1 ≤ m ∧ c ^ (q ^ m) = c) ∧ (∀ s : Finset R, ∃ (W : Subalgebra V R) (_ : IsDiscreteValuationRing W), (↑s : Set R) ⊆ W ∧ IsAdicComplete (IsLocalRing.maximalIdeal W) W ∧ Module.Finite V W ∧ IsLocalHom W.val.toRingHom ∧ ∃ f, 1 ≤ f ∧ ∀ x ∈ W, (φ ^ f) ((x : R) : Ω) = x) ∧ (∀ x ∈ R, σ x = x) ∧ (∀ x : R, ∃ y : R, (y : Ω) = φ x ∧ y - x ^ q ∈ IsLocalRing.maximalIdeal R) ∧ (∀ (m : ℕ) (ζ : Ω), ζ ^ l ^ m = 1 → σ ζ = ζ ∧ φ ζ = ζ ^ q) ∧ ∀ L : IntermediateField K Ω, FiniteDimensional K L → Normal K L → IsPGroup l (L ≃ₐ[K] L) → ∀ x ∈ L, φ (σ x) = (σ ^ q) (φ x) ∧ (σ x = x → ∃ a ∈ R, ∃ b ∈ R, b ≠ 0 ∧ x * b = a) :=
-  GlobalTheory.SS.MaxUnr.main_of GlobalTheory.TameKummer.galois_of_prime_power_degree GlobalTheory.compositum_finite_normal_isPGroup
+theorem GlobalTheory.SS.exists_maxUnramified_frobenius_tame
+    : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+        [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [Field K] [CharZero K] [Algebra V K]
+        [IsFractionRing V K],
+      Finite (IsLocalRing.ResidueField V)
+        → ∀ (l : ℕ),
+          l.Prime → IsUnit (l : V)
+            → ∀ (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] [Algebra V Ω]
+                [IsScalarTower V K Ω] (q : ℕ),
+              q = Nat.card (IsLocalRing.ResidueField V)
+                → ∃ (R : Subalgebra V Ω) (_ : IsLocalRing R) (σ φ : Ω ≃ₐ[K] Ω),
+                  SH R (FractionRing R) ∧ IsLocalHom (algebraMap V R)
+                    ∧ (∀ c : IsLocalRing.ResidueField R, ∃ m, 1 ≤ m ∧ c ^ (q ^ m) = c)
+                    ∧ (∀ s : Finset R, ∃ (W : Subalgebra V R) (_ : IsDiscreteValuationRing W),
+                      (↑s : Set R) ⊆ W ∧ IsAdicComplete (IsLocalRing.maximalIdeal W) W
+                        ∧ Module.Finite V W ∧ IsLocalHom W.val.toRingHom
+                        ∧ ∃ f, 1 ≤ f ∧ ∀ x ∈ W, (φ ^ f) ((x : R) : Ω) = x)
+                    ∧ (∀ x ∈ R, σ x = x)
+                    ∧ (∀ x : R, ∃ y : R, (y : Ω) = φ x ∧ y - x ^ q ∈ IsLocalRing.maximalIdeal R)
+                    ∧ (∀ (m : ℕ) (ζ : Ω), ζ ^ l ^ m = 1 → σ ζ = ζ ∧ φ ζ = ζ ^ q)
+                    ∧ ∀ L : IntermediateField K Ω,
+                      FiniteDimensional K L → Normal K L → IsPGroup l (L ≃ₐ[K] L)
+                        → ∀ x ∈ L,
+                          φ (σ x) = (σ ^ q) (φ x)
+                            ∧ (σ x = x → ∃ a ∈ R, ∃ b ∈ R, b ≠ 0 ∧ x * b = a) :=
+  GlobalTheory.SS.MaxUnr.main_of GlobalTheory.TameKummer.galois_of_prime_power_degree
+    GlobalTheory.compositum_finite_normal_isPGroup
     GlobalTheory.kummer_twist_relation_and_fixed_field GlobalTheory.exists_arithFrobenius_absGalois

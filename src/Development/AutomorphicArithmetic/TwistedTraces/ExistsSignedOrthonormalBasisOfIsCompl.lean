@@ -5,27 +5,39 @@ public import GroundTheory.AutomorphicForms.HarishChandraRegularity.CartanBasis
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C Polynomial Topology
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C Polynomial Topology
 
-theorem UpperTheory.exists_signed_orthonormal_basis_of_isCompl :
-    ∀ (V : Type) [AddCommGroup V] [Module ℝ V] [FiniteDimensional ℝ V] (B : LinearMap.BilinForm ℝ V) (k p : Submodule ℝ V), IsCompl k p → (∀ X Y, B X Y = B Y X) → (∀ X ∈ k, X ≠ 0 → B X X < 0) → (∀ X ∈ p, X ≠ 0 → 0 < B X X) → (∀ X ∈ k, ∀ Y ∈ p, B X Y = 0) → ∃ (d : ℕ) (b : Module.Basis (Fin d) ℝ V) (ε : Fin d → ℝ), (∀ i, ε i = 1 ∨ ε i = -1) ∧ (∀ i j, B (b i) (b j) = if i = j then ε i else 0) ∧ ∀ i, ε i = -1 → b i ∈ k := by
+theorem UpperTheory.exists_signed_orthonormal_basis_of_isCompl
+    : ∀ (V : Type) [AddCommGroup V] [Module ℝ V] [FiniteDimensional ℝ V]
+        (B : LinearMap.BilinForm ℝ V) (k p : Submodule ℝ V),
+      IsCompl k p → (∀ X Y, B X Y = B Y X) → (∀ X ∈ k, X ≠ 0 → B X X < 0)
+        → (∀ X ∈ p, X ≠ 0 → 0 < B X X) → (∀ X ∈ k, ∀ Y ∈ p, B X Y = 0)
+        → ∃ (d : ℕ) (b : Module.Basis (Fin d) ℝ V) (ε : Fin d → ℝ),
+          (∀ i, ε i = 1 ∨ ε i = -1) ∧ (∀ i j, B (b i) (b j) = if i = j then ε i else 0)
+            ∧ ∀ i, ε i = -1 → b i ∈ k := by
   intro V _ _ _ B k p hc hsymm hneg hpos hzero
   classical
-  obtain ⟨bk, hbk⟩ := exists_signed_basis (B.restrict k)
-    (fun x y => hsymm (x : V) y) (s := -1)
-    (by norm_num) (fun v hv => by
-      have h0 : (v : V) ≠ 0 := fun e => hv (Subtype.ext e)
-      have := hneg v v.2 h0
-      change 0 < _ * B (v : V) v
-      linarith)
-  obtain ⟨bp, hbp⟩ := exists_signed_basis (B.restrict p)
-    (fun x y => hsymm (x : V) y) (s := 1)
-    (by norm_num) (fun v hv => by
-      have h0 : (v : V) ≠ 0 := fun e => hv (Subtype.ext e)
-      have := hpos v v.2 h0
-      change 0 < _ * B (v : V) v
-      linarith)
+  obtain ⟨bk, hbk⟩ :=
+    exists_signed_basis (B.restrict k)
+      (fun x y => hsymm (x : V) y)
+      (s := -1) (by norm_num)
+      (fun v hv => by
+        have h0 : (v : V) ≠ 0 := fun e => hv (Subtype.ext e)
+        have := hneg v v.2 h0
+        change 0 < _ * B (v : V) v
+        linarith)
+  obtain ⟨bp, hbp⟩ :=
+    exists_signed_basis (B.restrict p)
+      (fun x y => hsymm (x : V) y)
+      (s := 1) (by norm_num)
+      (fun v hv => by
+        have h0 : (v : V) ≠ 0 := fun e => hv (Subtype.ext e)
+        have := hpos v v.2 h0
+        change 0 < _ * B (v : V) v
+        linarith)
   set e := Submodule.prodEquivOfIsCompl k p hc
   set b0 := (bk.prod bp).map e
   set f : Fin (Module.finrank ℝ k) ⊕ Fin (Module.finrank ℝ p) → V :=

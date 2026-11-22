@@ -19,8 +19,9 @@ namespace TopNMixedExpand
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem prod_norm_zpow_comb {c : K → ℂ} (hc : ∀ k, c k ≠ 0) (a b : K → ℤ) (q p : ℕ) :
-    (∏ k, ‖c k‖ ^ ((q : ℤ) • a + (p : ℤ) • b) k) = (∏ k, ‖c k‖ ^ a k) ^ q * (∏ k, ‖c k‖ ^ b k) ^ p := by
+theorem prod_norm_zpow_comb {c : K → ℂ} (hc : ∀ k, c k ≠ 0) (a b : K → ℤ) (q p : ℕ)
+    : (∏ k, ‖c k‖ ^ ((q : ℤ) • a + (p : ℤ) • b) k)
+      = (∏ k, ‖c k‖ ^ a k) ^ q * (∏ k, ‖c k‖ ^ b k) ^ p := by
   rw [← Finset.prod_pow, ← Finset.prod_pow, ← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun k _ => ?_
   have h0 : ‖c k‖ ≠ 0 := norm_ne_zero_iff.mpr (hc k)
@@ -28,15 +29,17 @@ theorem prod_norm_zpow_comb {c : K → ℂ} (hc : ∀ k, c k ≠ 0) (a b : K →
   rw [zpow_add₀ h0, show (q : ℤ) * a k = a k * q by ring, show (p : ℤ) * b k = b k * p by ring,
     zpow_mul, zpow_mul, zpow_natCast, zpow_natCast]
 
-variable {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+variable
+  {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ]
+  {Ω : Type} [Field Ω] [Algebra ℚ Ω]
   {E : Ψ → Type} [∀ τ, AddCommGroup (E τ)] [∀ τ, Module Ω (E τ)]
   {D : ComponentData II Ψ K ι Ω E} {O Lt : Type} [CommRing O] [AddCommGroup Lt] [Module O Lt]
 
-
 omit [DecidableEq Ψ] in
-theorem NbarQ_h_eq (X : ComponentSetting D O Lt) (B p q : ℕ) (t : ℝ)
-    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal D.y)) :
-    (X.NbarQ B p q t).h z = (muReg X.H X.S B t).h z ^ q * D.A'.h z ^ p := by
+theorem NbarQ_h_eq
+    (X : ComponentSetting D O Lt) (B p q : ℕ) (t : ℝ)
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal D.y))
+    : (X.NbarQ B p q t).h z = (muReg X.H X.S B t).h z ^ q * D.A'.h z ^ p := by
   obtain ⟨c, hc, hzc⟩ := exists_eq_smul_orbitRep z
   have hz0 := hz.1
   have hw0 := TopNPoly.orbitRep_blocks hz0
@@ -47,20 +50,26 @@ theorem NbarQ_h_eq (X : ComponentSetting D O Lt) (B p q : ℕ) (t : ℝ)
     have hp : z p = c p.1 * orbitRep z p := congrFun hzc p
     rw [hp, ← mul_assoc, inv_mul_cancel₀ (hc _), one_mul]
   have hvf : 0 < ∏ p' ∈ D.SB B, D.vertFactor p' (orbitRep z) :=
-    Finset.prod_pos fun p' hp' => VertFactorPos.proof II Ψ K ι Ω E D p' (Finset.mem_filter.1 hp').1 _ hwP
+    Finset.prod_pos fun p' hp' =>
+      VertFactorPos.proof II Ψ K ι Ω E D p' (Finset.mem_filter.1 hp').1 _ hwP
   have hG0 : 0 < X.S.ref.h (orbitRep z) * Real.exp (X.S.regWeight t (X.M.proj (orbitRep z))) :=
     mul_pos (X.S.ref.pos _ hw0) (Real.exp_pos _)
-  have hreg : (X.S.regLine t).h (orbitRep z) =
-      X.S.ref.h (orbitRep z) * Real.exp (X.S.regWeight t (X.M.proj (orbitRep z))) :=
+  have hreg
+      : (X.S.regLine t).h (orbitRep z)
+        = X.S.ref.h (orbitRep z) * Real.exp (X.S.regWeight t (X.M.proj (orbitRep z))) :=
     TopNPoly.hermOfFun_h_orbitRep hz0 hG0
-  have hM : (muReg X.H X.S B t).h z = (∏ k, ‖c k‖ ^ muTwDeg X.H B k) *
-      ((X.S.regLine t).h (orbitRep z) * ∏ p' ∈ D.SB B, D.vertFactor p' (orbitRep z)) := by
+  have hM
+      : (muReg X.H X.S B t).h z
+        = (∏ k, ‖c k‖ ^ muTwDeg X.H B k)
+          * ((X.S.regLine t).h (orbitRep z) * ∏ p' ∈ D.SB B, D.vertFactor p' (orbitRep z)) := by
     unfold muReg
     rw [smoothRep_h _ hz]
     exact TopNPoly.hermOfFun_h_smul hc hzc hz0 (by rw [hreg]; exact mul_pos hG0 hvf)
-  have hN : (X.NbarQ B p q t).h z = (∏ k, ‖c k‖ ^ ((q : ℤ) • muTwDeg X.H B + (p : ℤ) • D.a') k) *
-      ((X.S.ref.h (orbitRep z) * Real.exp (X.S.regWeight t (X.M.proj (orbitRep z)))) ^ q *
-        (∏ p' ∈ D.SB B, D.vertFactor p' (orbitRep z)) ^ q * D.A'.h (orbitRep z) ^ p) := by
+  have hN
+      : (X.NbarQ B p q t).h z
+        = (∏ k, ‖c k‖ ^ ((q : ℤ) • muTwDeg X.H B + (p : ℤ) • D.a') k)
+          * ((X.S.ref.h (orbitRep z) * Real.exp (X.S.regWeight t (X.M.proj (orbitRep z)))) ^ q
+            * (∏ p' ∈ D.SB B, D.vertFactor p' (orbitRep z)) ^ q * D.A'.h (orbitRep z) ^ p) := by
     unfold ComponentSetting.NbarQ
     rw [smoothRep_h _ hz]
     exact TopNPoly.hermOfFun_h_smul hc hzc hz0
@@ -73,10 +82,10 @@ theorem NbarQ_h_eq (X : ComponentSetting D O Lt) (B p q : ℕ) (t : ℝ)
 
 end TopNMixedExpand
 
-
 open TopNMixedExpand in
-theorem TopNMixedExpand.proof (hIso : HilbertSamuel.IsomInvariance.Statement) (hS : MuRegSmooth.Statement) :
-    TopNMixedExpand.Statement := by
+theorem TopNMixedExpand.proof
+    (hIso : HilbertSamuel.IsomInvariance.Statement) (hS : MuRegSmooth.Statement)
+    : TopNMixedExpand.Statement := by
   intro II Ψ _ _ K _ ι _ Ω _ _ E _ _ D O Lt _ _ _ X B p q hII hp hpq
   have hP : IsArithVar (mCoordIdeal D.y) (D.n + 1) := D.arith
   have hA : IsSmoothHerm D.A' := D.A'_pos.1
@@ -102,14 +111,33 @@ theorem TopNMixedExpand.proof (hIso : HilbertSamuel.IsomInvariance.Statement) (h
     · rw [hagree z hz]; unfold ComponentSetting.NbarQ; rw [smoothRep_h _ hz]
   have hne : (1 : MRing ι) ∉ mCoordIdeal D.y := fun h =>
     hP.2.1.1.ne_top ((Ideal.eq_top_iff_one _).2 h)
-  have hiso : ∀ j : Fin (D.n + 1), HilbertSamuel.IsIsometricOn (mCoordIdeal D.y)
-      ((fun _ => X.NbarQ B p q t) j) ((fun _ => Z) j) := fun _ =>
-    ⟨1, 1, 0, 0, by simpa using isMultiHomog_C_zero (ι := ι) 1, by simpa using isMultiHomog_C_zero (ι := ι) 1,
-      hne, hne, fun k => by simp [hdeg], rfl, fun z hz => by simp [hagree z hz]⟩
-  have hI := hIso K ι (II K ι) (hII K ι) (mCoordIdeal D.y) (D.n + 1) (fun _ => X.NbarQ B p q t) (fun _ => Z) hP
-    (fun _ => hN) (fun _ => hZ) hiso
-  have hE := (HilbertSamuel.ZCombExpand.proof K ι (II K ι) (hII K ι) (mCoordIdeal D.y) (D.n + 1)
-    (muReg X.H X.S B t) D.A' q p hP ht hA).1
+  have hiso
+      : ∀ j : Fin (D.n + 1),
+        HilbertSamuel.IsIsometricOn (mCoordIdeal D.y) ((fun _ => X.NbarQ B p q t) j)
+          ((fun _ => Z) j) := fun _ => ⟨
+    1,
+    1,
+    0,
+    0,
+    by simpa using isMultiHomog_C_zero (ι := ι) 1,
+    by simpa using isMultiHomog_C_zero (ι := ι) 1,
+    hne,
+    hne,
+    fun k => by simp [hdeg],
+    rfl,
+    fun z hz => by simp [hagree z hz]
+  ⟩
+  have hI :=
+    hIso K ι (II K ι) (hII K ι) (mCoordIdeal D.y) (D.n + 1)
+      (fun _ => X.NbarQ B p q t)
+      (fun _ => Z)
+      hP
+      (fun _ => hN)
+      (fun _ => hZ)
+      hiso
+  have hE :=
+    (HilbertSamuel.ZCombExpand.proof K ι (II K ι) (hII K ι) (mCoordIdeal D.y) (D.n + 1)
+      (muReg X.H X.S B t) D.A' q p hP ht hA).1
   show II K ι (mCoordIdeal D.y) (D.n + 1) (fun _ => X.NbarQ B p q t) / (q : ℝ) ^ (D.n + 1) = _
   rw [hI, hE, Finset.sum_div, ← Finset.sum_range_reflect]
   refine Finset.sum_congr rfl fun k hk => ?_

@@ -14,8 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsL
 
 set_option autoImplicit false
 open CategoryTheory AlgebraicGeometry Limits TopologicalSpace MvPolynomial MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.Points GlobalTheory.ChartGlue
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts
+  GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.Points GlobalTheory.ChartGlue
 open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace
 open ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
 open GlobalTheory.CompanionTheory.MPDict GlobalTheory.CompanionTheory.MixZ
@@ -30,13 +32,16 @@ open GlobalTheory.CompanionTheory.MPDict.Onto GlobalTheory.CompanionTheory.MPDic
 
 variable {m : ℕ} {n : Fin (m + 1) → ℕ}
 
-theorem point_eq_pt {N : ℕ} (t : Fin (N + 1) → ℂ) (ht : t ≠ 0) (hu : Ideal.span (Set.range t) = ⊤) :
-    GlobalTheory.TuplePoint.point ℤ t ht = GlobalTheory.ProjSpace.pt (Int.castRingHom ℂ) t hu := by
+theorem point_eq_pt {N : ℕ} (t : Fin (N + 1) → ℂ) (ht : t ≠ 0) (hu : Ideal.span (Set.range t) = ⊤)
+    : GlobalTheory.TuplePoint.point ℤ t ht
+      = GlobalTheory.ProjSpace.pt (Int.castRingHom ℂ) t hu := by
   unfold GlobalTheory.TuplePoint.point GlobalTheory.ProjSpace.pt
   congr 1
 
-theorem le_mCoordIdeal_of_mem_mcPts {P : Ideal (Geo.MRing (Bk n))} (hP : Geo.IsMultiHomogIdeal P)
-    {z : (Σ k, Bk n k) → ℂ} (hz : z ∈ mcPts P) : P ≤ Geo.mCoordIdeal z := by
+theorem le_mCoordIdeal_of_mem_mcPts
+    {P : Ideal (Geo.MRing (Bk n))} (hP : Geo.IsMultiHomogIdeal P)
+    {z : (Σ k, Bk n k) → ℂ} (hz : z ∈ mcPts P)
+    : P ≤ Geo.mCoordIdeal z := by
   obtain ⟨S, hS, hPS⟩ := hP
   have h0 := hz.2
   rw [hPS, Ideal.span_le]
@@ -46,11 +51,13 @@ theorem le_mCoordIdeal_of_mem_mcPts {P : Ideal (Geo.MRing (Bk n))} (hP : Geo.IsM
     have := h0 f (hPS ▸ Ideal.subset_span hf)
     rw [MvPolynomial.aeval_def, MvPolynomial.eval₂_eq_eval_map]
     simpa using this
-  rw [SetLike.mem_coe, Geo.mCoordIdeal, RingHom.mem_ker, mConeMap_of_isMultiHomog _ ha, e, C_0, mul_zero]
+  rw [SetLike.mem_coe, Geo.mCoordIdeal, RingHom.mem_ker, mConeMap_of_isMultiHomog _ ha, e, C_0,
+    mul_zero]
 
-theorem ptIdeal_of_isUnder {z : (Σ k, Bk n k) → ℂ} (hz' : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
-    {w : CxPts (mpStr ℤ m n) σ₀} (H : IsUnder w z) :
-    ptIdeal (w.1 (IsLocalRing.closedPoint ℂ)) = Geo.mCoordIdeal z := by
+theorem ptIdeal_of_isUnder
+    {z : (Σ k, Bk n k) → ℂ} (hz' : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
+    {w : CxPts (mpStr ℤ m n) σ₀} (H : IsUnder w z)
+    : ptIdeal (w.1 (IsLocalRing.closedPoint ℂ)) = Geo.mCoordIdeal z := by
   have ht := blockVec_ne_zero hz'
   have hu : ∀ k, Ideal.span (Set.range fun i : Bk n k => z ⟨k, i⟩) = ⊤ := fun k => by
     obtain ⟨i, hi⟩ := hz' k
@@ -65,23 +72,31 @@ theorem ptIdeal_of_isUnder {z : (Σ k, Bk n k) → ℂ} (hz' : ∀ k, ∃ i, z �
   let θ : ℂ →+* (Sp ℂ).residueField p :=
     ((Sp ℂ).evaluation ⊤ p trivial).hom.comp (Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv.hom
   let ρ : (MP ℤ m n).residueField x →+* (Sp ℂ).residueField p := (g.residueFieldMap p).hom
-  have key : ∀ (k : Fin (m + 1)) (j : Bk n k),
-      θ (z ⟨k, ptChart x k⟩) * ρ (ptCoord x ⟨k, j⟩) = θ (z ⟨k, j⟩) := by
+  have key
+      : ∀ (k : Fin (m + 1)) (j : Bk n k),
+        θ (z ⟨k, ptChart x k⟩) * ρ (ptCoord x ⟨k, j⟩) = θ (z ⟨k, j⟩) := by
     intro k j
     have hx : g p ∈ blockChart n k (ptChart x k) := mem_ptChart x k
     have hW : g ⁻¹ᵁ blockChart n k (ptChart x k) ≤ a k ⁻¹ᵁ chart ℤ (n k) (ptChart x k) := by
       rw [← hg k]
       exact le_of_eq rfl
-    have e1 : ρ (ptCoord x ⟨k, j⟩) = ((Sp ℂ).evaluation _ p hx).hom
-        (pullRatio (a k) (g ⁻¹ᵁ blockChart n k (ptChart x k)) (ptChart x k) hW j) := by
+    have e1
+        : ρ (ptCoord x ⟨k, j⟩)
+          = ((Sp ℂ).evaluation _ p hx).hom
+            (pullRatio (a k) (g ⁻¹ᵁ blockChart n k (ptChart x k)) (ptChart x k) hW j) := by
       refine (Scheme.evaluation_naturality_apply g p hx _).trans ?_
       refine congrArg _ ?_
-      have := appLE_pullRatio (φ := prB n k) (W := blockChart n k (ptChart x k)) (i := ptChart x k)
-        (hi := le_rfl) (j := j) g (T := g ⁻¹ᵁ blockChart n k (ptChart x k)) le_rfl
+      have :=
+        appLE_pullRatio (φ := prB n k) (W := blockChart n k (ptChart x k)) (i := ptChart x k)
+          (hi := le_rfl) (j := j) g (T := g ⁻¹ᵁ blockChart n k (ptChart x k)) le_rfl
       exact this.trans (pullRatio_of_eq (hg k) _ _)
-    have e2 := pullRatio_pt_mul (Int.castRingHom ℂ) (fun i : Bk n k => z ⟨k, i⟩) (hu k)
-      (W := g ⁻¹ᵁ blockChart n k (ptChart x k)) (ptChart x k) j hW
-    have e3 : ∀ b : ℂ, ((Sp ℂ).evaluation _ p hx).hom (fnOn (g ⁻¹ᵁ blockChart n k (ptChart x k)) b) = θ b :=
+    have e2 :=
+      pullRatio_pt_mul (Int.castRingHom ℂ)
+        (fun i : Bk n k => z ⟨k, i⟩)
+        (hu k) (W := g ⁻¹ᵁ blockChart n k (ptChart x k)) (ptChart x k) j hW
+    have e3
+        : ∀ b : ℂ,
+          ((Sp ℂ).evaluation _ p hx).hom (fnOn (g ⁻¹ᵁ blockChart n k (ptChart x k)) b) = θ b :=
       fun b => evaluation_resG' le_top p hx _
     have := congrArg ((Sp ℂ).evaluation _ p hx).hom e2
     rw [map_mul, e3, e3] at this
@@ -104,9 +119,11 @@ theorem ptIdeal_of_isUnder {z : (Σ k, Bk n k) → ℂ} (hz' : ∀ k, ∃ i, z �
   obtain ⟨k, j⟩ := q
   exact key k j
 
-theorem exists_cxPt_of_mem_mcPts : ∀ (m : ℕ) (n : Fin (m + 1) → ℕ) (X : Scheme.{0}) [IsIntegral X] (i : X ⟶ MP ℤ m n) [IsClosedImmersion i]
-    (z : (Σ k, Bk n k) → ℂ), z ∈ mcPts (ptIdeal (i (genericPoint X))) →
-    ∃ y : GlobalTheory.CxPts (i ≫ mpStr ℤ m n) σ₀, IsUnder (PtsOver.map i rfl _ y) z := by
+theorem exists_cxPt_of_mem_mcPts
+    : ∀ (m : ℕ) (n : Fin (m + 1) → ℕ) (X : Scheme.{0}) [IsIntegral X] (i : X ⟶ MP ℤ m n)
+        [IsClosedImmersion i] (z : (Σ k, Bk n k) → ℂ),
+      z ∈ mcPts (ptIdeal (i (genericPoint X)))
+        → ∃ y : GlobalTheory.CxPts (i ≫ mpStr ℤ m n) σ₀, IsUnder (PtsOver.map i rfl _ y) z := by
   intro m n X _ i _ z hz
   obtain ⟨w, hw, -⟩ := existsUnique_isUnder m n z hz.1
   have hP : ptIdeal (i (genericPoint X)) ≤ ptIdeal (w.1 (IsLocalRing.closedPoint ℂ)) := by
@@ -116,10 +133,14 @@ theorem exists_cxPt_of_mem_mcPts : ∀ (m : ℕ) (n : Fin (m + 1) → ℕ) (X : 
   have hr : w.1 (IsLocalRing.closedPoint ℂ) ∈ Set.range i :=
     hs.mem_closed i.isClosedEmbedding.isClosed_range ⟨_, rfl⟩
   have : Subsingleton (Sp ℂ) := inferInstanceAs (Subsingleton (PrimeSpectrum ℂ))
-  obtain ⟨f, hf⟩ := GlobalTheory.exists_lift_closedImmersion_of_dense i w.1 Set.univ dense_univ
-    fun q _ => by rwa [Subsingleton.elim q (IsLocalRing.closedPoint ℂ)]
+  obtain ⟨f, hf⟩ :=
+    GlobalTheory.exists_lift_closedImmersion_of_dense i w.1 Set.univ dense_univ fun q _ => by
+      rwa [Subsingleton.elim q (IsLocalRing.closedPoint ℂ)]
   refine ⟨⟨f, by rw [← Category.assoc, hf]; exact w.2⟩, ?_⟩
-  have e : PtsOver.map i rfl _ (⟨f, by rw [← Category.assoc, hf]; exact w.2⟩ : GlobalTheory.CxPts (i ≫ mpStr ℤ m n) σ₀) = w :=
+  have e
+      : PtsOver.map i rfl _
+          (⟨f, by rw [← Category.assoc, hf]; exact w.2⟩ : GlobalTheory.CxPts (i ≫ mpStr ℤ m n) σ₀)
+        = w :=
     Subtype.ext hf
   rw [e]
   exact hw

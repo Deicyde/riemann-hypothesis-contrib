@@ -11,7 +11,9 @@ noncomputable section
 
 namespace GlobalTheory.CuspAlgComparison
 
-open Formalism.BasicNotions Formalism.FrobeniusOrbits Formalism.MainNotions NumberField GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.IndefiniteRowSideFullHecke.TotallyPositiveExponents
+open Formalism.BasicNotions Formalism.FrobeniusOrbits Formalism.MainNotions NumberField
+  GlobalTheory.IndefiniteRowSideFullHecke
+  GlobalTheory.IndefiniteRowSideFullHecke.TotallyPositiveExponents
 open Matrix hiding vec
 open scoped ComplexOrder
 
@@ -19,16 +21,15 @@ section Host
 
 variable {R : Ranks} (H : Host R)
 
-theorem tau_injective : Function.Injective (tau H) := fun _ _ h =>
-  Subtype.ext ((factEmb R H).1.1 h)
+theorem tau_injective : Function.Injective (tau H) := fun _ _ h => Subtype.ext ((factEmb R H).1.1 h)
 
 theorem tau_sqrt (τ : Pl R) : tau H τ H.sqrtMinusD = Complex.I * (Real.sqrt H.d : ℂ) :=
   ((factEmb R H).2 _).2 τ.2
 
 theorem sqrt_d_pos : 0 < Real.sqrt H.d := Real.sqrt_pos.2 (by exact_mod_cast H.hyp.2.1.pos)
 
-theorem emb_cases (σ : H.E →+* ℂ) :
-    ∃ τ : Pl R, σ = tau H τ ∨ σ = (starRingEnd ℂ).comp (tau H τ) := by
+theorem emb_cases (σ : H.E →+* ℂ)
+    : ∃ τ : Pl R, σ = tau H τ ∨ σ = (starRingEnd ℂ).comp (tau H τ) := by
   obtain ⟨g, rfl⟩ := (factEmb R H).1.2 σ
   by_cases hg : g ∈ R.Psi
   · exact ⟨⟨g, hg⟩, Or.inl rfl⟩
@@ -53,7 +54,6 @@ end Host
 section Forms
 
 variable {R : Ranks} {H : Host R} {n : ℕ}
-
 
 end Forms
 

@@ -10,13 +10,22 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Exists
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.FrobeniusOrbits Formalism.L2.Host Formalism.L2.NT Formalism.L2.TwC Formalism.L2.NC NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.FrobeniusOrbits Formalism.L2.Host
+  Formalism.L2.NT Formalism.L2.TwC Formalism.L2.NC NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting
 
 noncomputable section
 
 namespace GlobalTheory.TameKummerInertia
 
-theorem unram_of_fixed : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (L : IntermediateField E Ω) [FiniteDimensional E L] [IsGalois E L] [NumberField L] (K : IntermediateField E L) [NumberField K] (Q : Ideal (𝓞 L)) [Q.IsPrime], (∀ x : 𝓞 L, x ∈ Q ↔ A.valuation (((x : L) : Ω)) < 1) → (∀ σ ∈ Ine (F := E) A, ∀ y : K, σ (((y : L) : Ω)) = ((y : L) : Ω)) → (Q.under (𝓞 K)).ramificationIdx (𝓞 E) = 1 := by
+theorem unram_of_fixed
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (L : IntermediateField E Ω) [FiniteDimensional E L] [IsGalois E L]
+        [NumberField L] (K : IntermediateField E L) [NumberField K] (Q : Ideal (𝓞 L)) [Q.IsPrime],
+      (∀ x : 𝓞 L, x ∈ Q ↔ A.valuation (((x : L) : Ω)) < 1)
+        → (∀ σ ∈ Ine (F := E) A, ∀ y : K, σ (((y : L) : Ω)) = ((y : L) : Ω))
+        → (Q.under (𝓞 K)).ramificationIdx (𝓞 E) = 1 := by
   intro E Ω _ _ _ _ _ A L _ _ _ K _ Q _ hQ hfix
   rw [GlobalTheory.UnramCompositum.ramificationIdx_eq_one_iff_fix E K L Q]
   intro τ hτ y
@@ -27,8 +36,10 @@ theorem unram_of_fixed : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] 
     intro a
     have := (hQ _).1 (hτ a)
     simpa [hsm] using this
-  have hlift : ∀ x : L, A.valuation (algebraMap L Ω x) ≤ 1 →
-      A.valuation (algebraMap L Ω (τ x) - algebraMap L Ω x) < 1 := by
+  have hlift
+      : ∀ x : L,
+        A.valuation (algebraMap L Ω x) ≤ 1
+          → A.valuation (algebraMap L Ω (τ x) - algebraMap L Ω x) < 1 := by
     intro x hx
     obtain ⟨s, t, hs, e⟩ := GlobalTheory.CMRam.exists_den_field (algebraMap L Ω) A (x := x) hx
     have hτs : A.valuation (algebraMap L Ω (τ (s : L))) = 1 := by
@@ -37,19 +48,32 @@ theorem unram_of_fixed : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] 
       · by_contra hlt
         push Not at hlt
         have h2 : A.valuation (algebraMap L Ω (s : L)) < 1 := by
-          have e2 : algebraMap L Ω (s : L) = algebraMap L Ω (τ (s : L)) - (algebraMap L Ω (τ (s : L)) - algebraMap L Ω (s : L)) := by ring
-          rw [e2]; exact Valuation.map_sub_lt _ hlt (hτ' s)
-        rw [hs] at h2; exact lt_irrefl _ h2
+          have e2
+              : algebraMap L Ω (s : L)
+                = algebraMap L Ω (τ (s : L))
+                  - (algebraMap L Ω (τ (s : L)) - algebraMap L Ω (s : L)) := by
+            ring
+          rw [e2]
+          exact Valuation.map_sub_lt _ hlt (hτ' s)
+        rw [hs] at h2
+        exact lt_irrefl _ h2
     have he' : τ (s : L) * τ x = τ (t : L) := by rw [← map_mul, e]
-    have key : algebraMap L Ω (τ (s : L)) * (algebraMap L Ω (τ x) - algebraMap L Ω x) =
-        (algebraMap L Ω (τ (t : L)) - algebraMap L Ω (t : L)) + algebraMap L Ω x * (algebraMap L Ω (s : L) - algebraMap L Ω (τ (s : L))) := by
+    have key
+        : algebraMap L Ω (τ (s : L)) * (algebraMap L Ω (τ x) - algebraMap L Ω x)
+          = (algebraMap L Ω (τ (t : L)) - algebraMap L Ω (t : L))
+            + algebraMap L Ω x * (algebraMap L Ω (s : L) - algebraMap L Ω (τ (s : L))) := by
       rw [← he', ← e]; simp only [map_mul]; ring
-    have hv : A.valuation (algebraMap L Ω (τ (s : L)) * (algebraMap L Ω (τ x) - algebraMap L Ω x)) < 1 := by
+    have hv
+        : A.valuation (algebraMap L Ω (τ (s : L)) * (algebraMap L Ω (τ x) - algebraMap L Ω x))
+          < 1 := by
       rw [key]
       refine Valuation.map_add_lt _ (hτ' t) ?_
       rw [Valuation.map_mul, Valuation.map_sub_swap]
-      calc A.valuation (algebraMap L Ω x) * A.valuation (algebraMap L Ω (τ (s : L)) - algebraMap L Ω (s : L))
-          ≤ 1 * A.valuation (algebraMap L Ω (τ (s : L)) - algebraMap L Ω (s : L)) := mul_le_mul_left hx _
+      calc
+        A.valuation (algebraMap L Ω x)
+              * A.valuation (algebraMap L Ω (τ (s : L)) - algebraMap L Ω (s : L))
+            ≤ 1 * A.valuation (algebraMap L Ω (τ (s : L)) - algebraMap L Ω (s : L)) :=
+          mul_le_mul_left hx _
         _ < 1 := by rw [one_mul]; exact hτ' s
     rwa [Valuation.map_mul, hτs, one_mul] at hv
   obtain ⟨σ, hσ, hσx⟩ := GlobalTheory.InertiaLift.exists_mem_Ine_lift A L τ hlift
@@ -58,7 +82,13 @@ theorem unram_of_fixed : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] 
   have h2 := hfix σ hσ y
   exact (h1.symm.trans h2 : _)
 
-theorem index_one_root : ∀ (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] [Algebra E K] (v : HeightOneSpectrum (𝓞 E)) (P : Ideal (𝓞 K)) [P.IsPrime], P.under (𝓞 E) = v.asIdeal → P.ramificationIdx (𝓞 E) = 1 → ∀ (g : ℕ), ((g : ℕ) : 𝓞 E) ∈ v.asIdeal → ((g : ℕ) : 𝓞 E) ∉ v.asIdeal ^ 2 → ∀ (k : ℕ) (Z : K), Z ^ k = ((g : ℕ) : K) → k ≤ 1 := by
+theorem index_one_root
+    : ∀ (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] [Algebra E K]
+        (v : HeightOneSpectrum (𝓞 E)) (P : Ideal (𝓞 K)) [P.IsPrime],
+      P.under (𝓞 E) = v.asIdeal → P.ramificationIdx (𝓞 E) = 1
+        → ∀ (g : ℕ),
+          ((g : ℕ) : 𝓞 E) ∈ v.asIdeal → ((g : ℕ) : 𝓞 E) ∉ v.asIdeal ^ 2
+            → ∀ (k : ℕ) (Z : K), Z ^ k = ((g : ℕ) : K) → k ≤ 1 := by
   intro E K _ _ _ _ _ v P _ hPv he g hgv hgv2 k Z hZ
   by_contra hk
   push Not at hk
@@ -89,13 +119,13 @@ theorem index_one_root : ∀ (E K : Type) [Field E] [NumberField E] [Field K] [N
   obtain ⟨J, hJ⟩ : v.asIdeal ∣ Ideal.span {((g : ℕ) : 𝓞 E)} :=
     Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hgv)
   have hJv : ¬ J ≤ v.asIdeal := by
-    intro hle; apply hgv2
+    intro hle
+    apply hgv2
     have : Ideal.span {((g : ℕ) : 𝓞 E)} ≤ v.asIdeal ^ 2 := by
       rw [hJ, pow_two]; exact Ideal.mul_mono_right hle
     exact this (Ideal.mem_span_singleton_self _)
   obtain ⟨j, hjJ, hjv⟩ := Set.not_subset.1 hJv
-  have hjP : algebraMap (𝓞 E) (𝓞 K) j ∉ P := by
-    intro h; apply hjv; rw [← hPv]; exact h
+  have hjP : algebraMap (𝓞 E) (𝓞 K) j ∉ P := by intro h; apply hjv; rw [← hPv]; exact h
   haveI hPmax : P.IsMaximal := Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := 𝓞 E) P
     (by rw [hPv]; exact v.isMaximal)
   have hrad : (P ^ 2).radical = P := by rw [Ideal.radical_pow _ two_ne_zero, hPmax.isPrime.radical]
@@ -111,7 +141,16 @@ theorem index_one_root : ∀ (E K : Type) [Field E] [NumberField E] [Field K] [N
   · exact h
   · exfalso; rw [Submodule.colon_univ, hrad] at h; exact hjP h
 
-theorem tame_kummer_surj : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 E)), IsPlaceOver (F := E) A v → ∀ (g : ℕ) [Fact g.Prime], ((g : ℕ) : 𝓞 E) ∈ v.asIdeal → ((g : ℕ) : 𝓞 E) ∉ v.asIdeal ^ 2 → ∀ (m : ℕ), 0 < m → ¬ g ∣ m → ∀ Y μ : Ω, Y ^ m = ((g : ℕ) : Ω) → μ ^ m = 1 → ∃ σ ∈ Ine (F := E) A, σ Y = μ * Y := by
+theorem tame_kummer_surj
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 E)),
+      IsPlaceOver (F := E) A v
+        → ∀ (g : ℕ) [Fact g.Prime],
+          ((g : ℕ) : 𝓞 E) ∈ v.asIdeal → ((g : ℕ) : 𝓞 E) ∉ v.asIdeal ^ 2
+            → ∀ (m : ℕ),
+              0 < m → ¬ g ∣ m
+                → ∀ Y μ : Ω,
+                  Y ^ m = ((g : ℕ) : Ω) → μ ^ m = 1 → ∃ σ ∈ Ine (F := E) A, σ Y = μ * Y := by
   intro E Ω _ _ _ _ _ A v hA g _ hgv hgv2 m hm hgm Y μ hY hμ
   have hgp : g.Prime := Fact.out
   have hg := GlobalTheory.TameCoupledEx.val_g_lt A v hA hgv
@@ -122,19 +161,18 @@ theorem tame_kummer_surj : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω
   have hY0 : Y ≠ 0 := GlobalTheory.TameCoupledEx.ne_zero_of_pow_eq hgp hm hY
   have hpow : ∀ σ : G E Ω, (σ Y / Y) ^ m = 1 := fun σ => tameQuot_pow σ hg0 hY
   have hne : ∀ σ : G E Ω, σ Y / Y ≠ 0 := fun σ => div_ne_zero (by simpa using hY0) hY0
-  let χ : Ine (F := E) A →* rootsOfUnity m Ω :=
-    { toFun := fun σ => ⟨Units.mk0 (σ.1 Y / Y) (hne σ.1), by
-        rw [mem_rootsOfUnity]; ext; simp [hpow]⟩
-      map_one' := by ext; simp [hY0]
-      map_mul' := fun σ τ => by
-        ext
-        simp only [Subgroup.coe_mul, Units.val_mk0, Subgroup.coe_mul, Units.val_mul]
-        exact GlobalTheory.TameCoupledEx.ratio_mul hgp hg σ.2 τ.1 hm hgm hY }
+  let χ : Ine (F := E) A →* rootsOfUnity m Ω := {
+    toFun := fun σ => ⟨Units.mk0 (σ.1 Y / Y) (hne σ.1), by rw [mem_rootsOfUnity]; ext; simp [hpow]⟩
+    map_one' := by ext; simp [hY0]
+    map_mul' := fun σ τ => by
+      ext
+      simp only [Subgroup.coe_mul, Units.val_mk0, Subgroup.coe_mul, Units.val_mul]
+      exact GlobalTheory.TameCoupledEx.ratio_mul hgp hg σ.2 τ.1 hm hgm hY
+  }
   have hχ : ∀ σ, (((χ σ : rootsOfUnity m Ω) : Ωˣ) : Ω) = σ.1 Y / Y := fun σ => rfl
   obtain ⟨⟨c, σ0, hσ0⟩, hc⟩ := IsCyclic.exists_generator (α := χ.range)
   set d := orderOf c with hd
-  have hcm : c ^ m = 1 := by
-    ext; simpa [← hσ0, hχ] using hpow σ0.1
+  have hcm : c ^ m = 1 := by ext; simpa [← hσ0, hχ] using hpow σ0.1
   have hdm : d ∣ m := orderOf_dvd_of_pow_eq_one hcm
   have hd0 : 0 < d := Nat.pos_of_dvd_of_pos hdm hm
   have hall : ∀ σ : G E Ω, σ ∈ Ine (F := E) A → (σ Y / Y) ^ d = 1 := by
@@ -143,7 +181,8 @@ theorem tame_kummer_surj : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω
     have h1 : (χ ⟨σ, hσ⟩) ^ d = 1 := by
       have := congrArg Subtype.val hj
       simp only [Subgroup.coe_zpow] at this
-      rw [← this, ← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hd, pow_orderOf_eq_one, one_zpow]
+      rw [← this, ← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hd,
+        pow_orderOf_eq_one, one_zpow]
     have h2 := congrArg (fun u : rootsOfUnity m Ω => ((u : Ωˣ) : Ω)) h1
     simpa [hχ] using h2
   set Z := Y ^ d with hZ
@@ -159,12 +198,15 @@ theorem tame_kummer_surj : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω
     haveI : FiniteDimensional E (IntermediateField.adjoin E {Z}) := IntermediateField.adjoin.finiteDimensional hZi
     set L := IntermediateField.normalClosure E (IntermediateField.adjoin E {Z}) Ω with hLdef
     haveI : NumberField L := NumberField.of_module_finite E L
-    have hZL : Z ∈ L := IntermediateField.le_normalClosure _ (IntermediateField.mem_adjoin_simple_self E Z)
+    have hZL : Z ∈ L :=
+      IntermediateField.le_normalClosure _ (IntermediateField.mem_adjoin_simple_self E Z)
     set Z' : L := ⟨Z, hZL⟩ with hZ'
     set K : IntermediateField E L := IntermediateField.adjoin E {Z'} with hK
     haveI : NumberField K := NumberField.of_module_finite E K
-    let f : 𝓞 L →+* A := ((algebraMap L Ω).comp (algebraMap (𝓞 L) L)).codRestrict A.toSubring
-      (fun x => ReciprocityTheory.Gal.mem_of_isIntegral_int A ((x.isIntegral_coe.map (IsScalarTower.toAlgHom ℤ L Ω))))
+    let f : 𝓞 L →+* A :=
+      ((algebraMap L Ω).comp (algebraMap (𝓞 L) L)).codRestrict A.toSubring (fun x =>
+        ReciprocityTheory.Gal.mem_of_isIntegral_int A
+          ((x.isIntegral_coe.map (IsScalarTower.toAlgHom ℤ L Ω))))
     set Q : Ideal (𝓞 L) := (IsLocalRing.maximalIdeal A).comap f with hQ
     haveI : Q.IsPrime := Ideal.comap_isPrime f _
     have hQmem : ∀ x : 𝓞 L, x ∈ Q ↔ A.valuation (((x : L) : Ω)) < 1 := fun x =>
@@ -172,7 +214,9 @@ theorem tame_kummer_surj : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω
     have hfixK : ∀ σ ∈ Ine (F := E) A, ∀ y : K, σ (((y : L) : Ω)) = ((y : L) : Ω) := by
       intro σ hσ y
       have hle : K.toSubalgebra ≤ AlgHom.equalizer ((σ : Ω →ₐ[E] Ω).comp L.val) L.val := by
-        rw [hK, IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (Algebra.IsAlgebraic.isAlgebraic Z')]
+        rw [hK,
+          IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic
+            (Algebra.IsAlgebraic.isAlgebraic Z')]
         refine Algebra.adjoin_le ?_
         rintro _ rfl
         exact hZfix σ hσ
@@ -184,17 +228,21 @@ theorem tame_kummer_surj : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω
       rfl
     set Z'' : K := ⟨Z', IntermediateField.mem_adjoin_simple_self E Z'⟩ with hZ''
     have hZ''n : Z'' ^ n = ((g : ℕ) : K) := by
-      apply Subtype.ext; apply Subtype.ext
+      apply Subtype.ext
+      apply Subtype.ext
       simpa using hZn
     exact index_one_root E K v (Q.under (𝓞 K)) hunder e1 g hgv hgv2 n Z'' hZ''n
   have hdm' : d = m := by
-    have hn0 : 0 < n := Nat.pos_of_ne_zero (by rintro h; rw [h, mul_zero] at hnd; exact hm.ne' hnd.symm)
+    have hn0 : 0 < n :=
+      Nat.pos_of_ne_zero (by rintro h; rw [h, mul_zero] at hnd; exact hm.ne' hnd.symm)
     have : n = 1 := le_antisymm hn1 hn0
-    rw [this, mul_one] at hnd; exact hnd
+    rw [this, mul_one] at hnd
+    exact hnd
   have hprim : IsPrimitiveRoot (σ0.1 Y / Y) m := by
     have h1 : orderOf (σ0.1 Y / Y) = m := by
       rw [← hχ, orderOf_units, Subgroup.orderOf_coe, hσ0, ← hd, hdm']
-    rw [← h1]; exact IsPrimitiveRoot.orderOf _
+    rw [← h1]
+    exact IsPrimitiveRoot.orderOf _
   obtain ⟨i, -, hi⟩ := hprim.eq_pow_of_pow_eq_one hμ
   refine ⟨σ0.1 ^ i, pow_mem σ0.2 i, ?_⟩
   have := GlobalTheory.TameCoupledEx.ratio_pow hgp hg σ0.2 hm hgm hY i

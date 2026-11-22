@@ -21,13 +21,23 @@ theorem inR_const (E : Subring ℂ) (c : ℂ) (hc : c ∈ E) : InR E fun _ => c 
   have h := GlobalTheory.QFam.QAllSubring.const (R := E) (N := 1) hc
   simpa only [pow_zero, one_mul] using h
 
-theorem lv_lift {E : Subring ℂ} {f : ℍ → ℂ} {N w : ℕ} (N₂ : ℕ) (hN₂ : 0 < N₂) (w' : ℕ) (hw : w ≤ w')
-    (hN : 0 < N) (h : Lv E N w f) : Lv E (N * N₂) w' f :=
-  GlobalTheory.T.lv_mono_of_dvd_of_le E N (N * N₂) w w' f (Nat.mul_pos hN hN₂) (dvd_mul_right N N₂) hw h
+theorem lv_lift
+    {E : Subring ℂ} {f : ℍ → ℂ} {N w : ℕ}
+    (N₂ : ℕ) (hN₂ : 0 < N₂)
+    (w' : ℕ) (hw : w ≤ w')
+    (hN : 0 < N) (h : Lv E N w f)
+    : Lv E (N * N₂) w' f :=
+  GlobalTheory.T.lv_mono_of_dvd_of_le E N (N * N₂) w w' f (Nat.mul_pos hN hN₂) (dvd_mul_right N N₂)
+    hw h
 
-theorem lv_lift' {E : Subring ℂ} {f : ℍ → ℂ} {N w : ℕ} (N₁ : ℕ) (hN₁ : 0 < N₁) (w' : ℕ) (hw : w ≤ w')
-    (hN : 0 < N) (h : Lv E N w f) : Lv E (N₁ * N) w' f :=
-  GlobalTheory.T.lv_mono_of_dvd_of_le E N (N₁ * N) w w' f (Nat.mul_pos hN₁ hN) (dvd_mul_left N N₁) hw h
+theorem lv_lift'
+    {E : Subring ℂ} {f : ℍ → ℂ} {N w : ℕ}
+    (N₁ : ℕ) (hN₁ : 0 < N₁)
+    (w' : ℕ) (hw : w ≤ w')
+    (hN : 0 < N) (h : Lv E N w f)
+    : Lv E (N₁ * N) w' f :=
+  GlobalTheory.T.lv_mono_of_dvd_of_le E N (N₁ * N) w w' f (Nat.mul_pos hN₁ hN) (dvd_mul_left N N₁)
+    hw h
 
 theorem inR_add {E : Subring ℂ} {f g : ℍ → ℂ} (hf : InR E f) (hg : InR E g) : InR E (f + g) := by
   obtain ⟨N₁, w₁, hN₁, hf⟩ := hf
@@ -38,7 +48,8 @@ theorem inR_add {E : Subring ℂ} {f g : ℍ → ℂ} (hf : InR E f) (hg : InR E
   · simp only [Pi.add_apply, hf'.1 γ hγ τ, hg'.1 γ hγ τ]
   · have h := GlobalTheory.QFam.QAllSubring.add (hf'.2 γ) (hg'.2 γ)
     refine (congrArg (QAll (· ∈ E) (N₁ * N₂)) (funext fun τ => ?_)).mp h
-    simp only [Pi.add_apply]; ring
+    simp only [Pi.add_apply]
+    ring
 
 theorem inR_mul {E : Subring ℂ} {f g : ℍ → ℂ} (hf : InR E f) (hg : InR E g) : InR E (f * g) := by
   obtain ⟨N₁, w₁, hN₁, hf⟩ := hf
@@ -49,15 +60,19 @@ theorem inR_mul {E : Subring ℂ} {f g : ℍ → ℂ} (hf : InR E f) (hg : InR E
   · simp only [Pi.mul_apply, hf'.1 γ hγ τ, hg'.1 γ hγ τ]
   · have h := GlobalTheory.QFam.QAllSubring.mul (hf'.2 γ) (hg'.2 γ)
     refine (congrArg (QAll (· ∈ E) (N₁ * N₂)) (funext fun τ => ?_)).mp h
-    simp only [Pi.mul_apply]; ring
+    simp only [Pi.mul_apply]
+    ring
 
 theorem inR_neg {E : Subring ℂ} {f : ℍ → ℂ} (hf : InR E f) : InR E (-f) := by
   obtain ⟨N, w, hN, hf⟩ := hf
   refine ⟨N, w, hN, fun γ hγ τ => ?_, fun γ => ?_⟩
   · simp only [Pi.neg_apply, hf.1 γ hγ τ]
-  · have h := GlobalTheory.QFam.QAllSubring.sub (GlobalTheory.QFam.QAllSubring.const (R := E) (N := N) E.zero_mem) (hf.2 γ)
+  · have h :=
+      GlobalTheory.QFam.QAllSubring.sub
+        (GlobalTheory.QFam.QAllSubring.const (R := E) (N := N) E.zero_mem) (hf.2 γ)
     refine (congrArg (QAll (· ∈ E) N) (funext fun τ => ?_)).mp h
-    simp only [Pi.neg_apply]; ring
+    simp only [Pi.neg_apply]
+    ring
 
 def inRSubring (E : Subring ℂ) : Subring (ℍ → ℂ) where
   carrier := {f | InR E f}
@@ -69,10 +84,12 @@ def inRSubring (E : Subring ℂ) : Subring (ℍ → ℂ) where
 
 end GlobalTheory.FN.RingMem
 
-theorem GlobalTheory.FN.mem_ring_iff_inR :
-    ∀ E : Subring ℂ, (∀ f : ℍ → ℂ, f ∈ GlobalTheory.FN.ring E ↔ InR E f) ∧ ∀ c ∈ E, InR E fun _ => c := by
+theorem GlobalTheory.FN.mem_ring_iff_inR
+    : ∀ E : Subring ℂ,
+      (∀ f : ℍ → ℂ, f ∈ GlobalTheory.FN.ring E ↔ InR E f) ∧ ∀ c ∈ E, InR E fun _ => c := by
   intro E
-  refine ⟨fun f => ⟨fun h => ?_, mem_ring_of_inR⟩, fun c hc => GlobalTheory.FN.RingMem.inR_const E c hc⟩
+  refine
+    ⟨fun f => ⟨fun h => ?_, mem_ring_of_inR⟩, fun c hc => GlobalTheory.FN.RingMem.inR_const E c hc⟩
   have hle : GlobalTheory.FN.ring E ≤ GlobalTheory.FN.RingMem.inRSubring E :=
     (Subring.closure_le).mpr fun g hg => hg
   exact hle h

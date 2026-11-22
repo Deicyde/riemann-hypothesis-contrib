@@ -18,10 +18,12 @@ noncomputable section
 
 universe u
 
-theorem DivCycleMinimal.ringKrullDim_eq {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
-    [∀ k, Fintype (ι k)] {F : Type u} [Field F] (Q : Ideal (MRing ι F)) (m : ℕ)
-    (h : relDim Q = (m : ℕ)) :
-    ringKrullDim (MRing ι F ⧸ Q) = ((m + Fintype.card K : ℕ) : WithBot ℕ∞) := by
+theorem DivCycleMinimal.ringKrullDim_eq
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {F : Type u} [Field F]
+    (Q : Ideal (MRing ι F)) (m : ℕ) (h : relDim Q = (m : ℕ))
+    : ringKrullDim (MRing ι F ⧸ Q) = ((m + Fintype.card K : ℕ) : WithBot ℕ∞) := by
   obtain ⟨d, hd⟩ : ∃ d : ℕ, ringKrullDim (MRing ι F ⧸ Q) = d := by
     have h2 := PFContracted.ringKrullDim_lt_top Q
     cases hc : ringKrullDim (MRing ι F ⧸ Q) with
@@ -50,11 +52,14 @@ theorem DivCycleMinimal.proof : DivCycleMinimal.Statement.{u} := by
     by_contra hWQ
     obtain ⟨f, hfW, hfQ⟩ := Set.not_subset.mp hWQ
     have h1 := PFContracted.ringKrullDim_add_one_le (P := Q) (Q := W) hQW hfQ hfW
-    have h2 := PFContracted.ringKrullDim_add_one_le (P := P) (Q := Q) (le_sup_left.trans hJQ) ha
-      (hJQ (Ideal.mem_sup_right (Ideal.mem_span_singleton_self a)))
+    have h2 :=
+      PFContracted.ringKrullDim_add_one_le (P := P) (Q := Q) (le_sup_left.trans hJQ) ha
+        (hJQ (Ideal.mem_sup_right (Ideal.mem_span_singleton_self a)))
     have h3 := (add_le_add h1 (le_refl 1)).trans h2
-    rw [DivCycleMinimal.ringKrullDim_eq W n hWn, DivCycleMinimal.ringKrullDim_eq P (n + 1) hPn] at h3
-    have h4 : (((n + Fintype.card K + 1 + 1 : ℕ)) : WithBot ℕ∞) ≤ ((n + 1 + Fintype.card K : ℕ)) := by
+    rw [DivCycleMinimal.ringKrullDim_eq W n hWn, DivCycleMinimal.ringKrullDim_eq P (n + 1) hPn]
+      at h3
+    have h4
+        : (((n + Fintype.card K + 1 + 1 : ℕ)) : WithBot ℕ∞) ≤ ((n + 1 + Fintype.card K : ℕ)) := by
       simpa only [Nat.cast_add, Nat.cast_one] using h3
     have h5 := WithBot.coe_le_coe.mp h4
     have h6 := ENat.natCast_le_natCast.mp h5

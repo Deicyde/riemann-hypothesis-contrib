@@ -8,8 +8,9 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.EtaleCohomolo
 noncomputable section
 open IsLocalRing UpperTheory.Et
 
-private theorem one_add_mul_idem_pow {S : Type} [CommRing S] {e : S} (he : IsIdempotentElem e)
-    (c : S) (n : ℕ) : (1 + c * e) ^ n = 1 + ((1 + c) ^ n - 1) * e := by
+private theorem one_add_mul_idem_pow
+    {S : Type} [CommRing S] {e : S} (he : IsIdempotentElem e) (c : S) (n : ℕ)
+    : (1 + c * e) ^ n = 1 + ((1 + c) ^ n - 1) * e := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -17,20 +18,26 @@ private theorem one_add_mul_idem_pow {S : Type} [CommRing S] {e : S} (he : IsIde
     rw [pow_succ, ih, pow_succ]
     linear_combination (((1 + c) ^ n - 1) * c) * h2
 
-theorem UpperTheory.roots_of_unity_eq_locallyConstant_powers_spectrum :
-    ∀ (S : Type) [CommRing S] (q : ℕ) [NeZero q] (ζ : S), GoodRoot q ζ →
-      (∀ g : LocallyConstant (PrimeSpectrum S) (ZMod q), ∃ w : S, w ^ q = 1 ∧ ∀ p : PrimeSpectrum S, w - ζ ^ (g p).val ∈ p.asIdeal) ∧
-      (∀ w : S, w ^ q = 1 → ∃ g : LocallyConstant (PrimeSpectrum S) (ZMod q), ∀ p : PrimeSpectrum S, w - ζ ^ (g p).val ∈ p.asIdeal) ∧
-      ∀ (a b : ZMod q) (p : PrimeSpectrum S), ζ ^ a.val - ζ ^ b.val ∈ p.asIdeal → a = b := by
+theorem UpperTheory.roots_of_unity_eq_locallyConstant_powers_spectrum
+    : ∀ (S : Type) [CommRing S] (q : ℕ) [NeZero q] (ζ : S),
+      GoodRoot q ζ
+        → (∀ g : LocallyConstant (PrimeSpectrum S) (ZMod q), ∃ w : S,
+            w ^ q = 1 ∧ ∀ p : PrimeSpectrum S, w - ζ ^ (g p).val ∈ p.asIdeal)
+          ∧ (∀ w : S,
+            w ^ q = 1
+              → ∃ g : LocallyConstant (PrimeSpectrum S) (ZMod q), ∀ p : PrimeSpectrum S,
+                w - ζ ^ (g p).val ∈ p.asIdeal)
+          ∧ ∀ (a b : ZMod q) (p : PrimeSpectrum S), ζ ^ a.val - ζ ^ b.val ∈ p.asIdeal → a = b := by
   intro S _ q _ ζ hζ
   obtain ⟨hq1, hunit, hsplit⟩ := hζ
-  have notmem : ∀ (a b : ZMod q) (p : PrimeSpectrum S), a ≠ b →
-      ζ ^ a.val - ζ ^ b.val ∉ p.asIdeal := by
+  have notmem
+      : ∀ (a b : ZMod q) (p : PrimeSpectrum S), a ≠ b → ζ ^ a.val - ζ ^ b.val ∉ p.asIdeal := by
     intro a b p hab hmem
     exact p.isPrime.ne_top (Ideal.eq_top_of_isUnit_mem _ hmem (hunit a b hab))
   refine ⟨fun g => ?_, fun w hw => ?_, fun a b p h => ?_⟩
-  · have hfib : ∀ a : ZMod q, ∃ e : S, IsIdempotentElem e ∧
-        ∀ p : PrimeSpectrum S, (g p = a ↔ e ∉ p.asIdeal) := by
+  · have hfib
+        : ∀ a : ZMod q, ∃ e : S,
+          IsIdempotentElem e ∧ ∀ p : PrimeSpectrum S, (g p = a ↔ e ∉ p.asIdeal) := by
       intro a
       obtain ⟨e, he, hs⟩ := PrimeSpectrum.isClopen_iff.1 (g.isLocallyConstant.isClopen_fiber a)
       refine ⟨e, he, fun p => ?_⟩
@@ -78,8 +85,9 @@ theorem UpperTheory.roots_of_unity_eq_locallyConstant_powers_spectrum :
       refine ⟨(a : ZMod q), ?_⟩
       rwa [ZMod.val_natCast, Nat.mod_eq_of_lt (Finset.mem_range.1 ha)]
     choose g0 hg0 using hex
-    have hiff : ∀ (p : PrimeSpectrum S) (a : ZMod q),
-        g0 p = a ↔ ∀ b, b ≠ a → w - ζ ^ b.val ∉ p.asIdeal := by
+    have hiff
+        : ∀ (p : PrimeSpectrum S) (a : ZMod q),
+          g0 p = a ↔ ∀ b, b ≠ a → w - ζ ^ b.val ∉ p.asIdeal := by
       intro p a
       constructor
       · rintro rfl b hb hmem
@@ -93,13 +101,15 @@ theorem UpperTheory.roots_of_unity_eq_locallyConstant_powers_spectrum :
     refine ⟨⟨g0, ?_⟩, hg0⟩
     rw [IsLocallyConstant.iff_isOpen_fiber]
     intro a
-    have hset : g0 ⁻¹' {a} = ⋂ b : ZMod q, ⋂ (_ : b ≠ a),
-        (PrimeSpectrum.basicOpen (w - ζ ^ b.val) : Set (PrimeSpectrum S)) := by
+    have hset
+        : g0 ⁻¹' {a}
+          = ⋂ b : ZMod q, ⋂ (_ : b ≠ a),
+            (PrimeSpectrum.basicOpen (w - ζ ^ b.val) : Set (PrimeSpectrum S)) := by
       ext p
       simp [hiff, PrimeSpectrum.mem_basicOpen]
     rw [hset]
-    exact isOpen_iInter_of_finite fun b => isOpen_iInter_of_finite fun _ =>
-      (PrimeSpectrum.basicOpen _).isOpen
+    exact isOpen_iInter_of_finite fun b =>
+      isOpen_iInter_of_finite fun _ => (PrimeSpectrum.basicOpen _).isOpen
   · by_contra hab
     exact notmem a b p hab h
 

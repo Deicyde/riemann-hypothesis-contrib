@@ -11,10 +11,13 @@ namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
 open MvPolynomial
 
-theorem component_mul_multiHomog {R : Type*} [CommRing R] {K : Type} [DecidableEq K]
-    {ι : K → Type} (y f : MRing ι R) (b s : K → ℕ) (hf : IsMultiHomog f s) :
-    weightedHomogeneousComponent (blockWeight ι) b y * f =
-      weightedHomogeneousComponent (blockWeight ι) (b + s) (y * f) := by
+theorem component_mul_multiHomog
+    {R : Type*} [CommRing R]
+    {K : Type} [DecidableEq K]
+    {ι : K → Type} (y f : MRing ι R)
+    (b s : K → ℕ) (hf : IsMultiHomog f s)
+    : weightedHomogeneousComponent (blockWeight ι) b y * f
+      = weightedHomogeneousComponent (blockWeight ι) (b + s) (y * f) := by
   classical
   ext d
   rw [coeff_weightedHomogeneousComponent, coeff_mul, coeff_mul]

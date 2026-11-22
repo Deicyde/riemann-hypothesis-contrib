@@ -16,9 +16,11 @@ section Sat
 variable {Ω : Type*} [Field Ω] {E : Type*} [AddCommGroup E] [Module Ω E]
 variable {S : Type*} [SetLike S Ω] [SubringClass S Ω]
 
-theorem exists_sum_mul_pow_eq_one (A : S) {k : ℕ} (f c : Fin k → Ω) (hf : ∀ l, f l ∈ A)
-    (hc : ∀ l, c l ∈ A) (h1 : ∑ l, c l * f l = 1) (N : ℕ) :
-    ∃ d : Fin k → Ω, (∀ l, d l ∈ A) ∧ ∑ l, d l * f l ^ N = 1 := by
+theorem exists_sum_mul_pow_eq_one
+    (A : S)
+    {k : ℕ} (f c : Fin k → Ω) (hf : ∀ l, f l ∈ A) (hc : ∀ l, c l ∈ A) (h1 : ∑ l, c l * f l = 1)
+    (N : ℕ)
+    : ∃ d : Fin k → Ω, (∀ l, d l ∈ A) ∧ ∑ l, d l * f l ^ N = 1 := by
   let f' : Fin k → A := fun l => ⟨f l, hf l⟩
   have hspan : Ideal.span (Set.range f') = ⊤ := by
     rw [Ideal.eq_top_iff_one]
@@ -41,14 +43,19 @@ section Gens
 variable {Ω : Type*} [Field Ω] {E : Type*} [AddCommGroup E] [Module Ω E]
 variable {R : Type*} [CommRing R] [Algebra R Ω] {τ : Type*} {x : τ → Ω} {r : ℕ}
 
-theorem chartBundle_pow_smul_mem (B : ChartBundle R x r E) {i : τ} {a : Ω}
-    (ha : a ∈ chartRing R x i) (m : ℕ) {e : E} (he : e ∈ B.lat i) : a ^ m • e ∈ B.lat i :=
+theorem chartBundle_pow_smul_mem
+    (B : ChartBundle R x r E)
+    {i : τ} {a : Ω} (ha : a ∈ chartRing R x i)
+    (m : ℕ)
+    {e : E} (he : e ∈ B.lat i)
+    : a ^ m • e ∈ B.lat i :=
   B.stable i _ (pow_mem ha m) e he
 
-theorem chartBundle_exists_gens (B : ChartBundle R x r E) {i : τ} (hi : x i ≠ 0) :
-    ∃ (k : ℕ) (G : Fin k × Fin r → E), (∀ j, G j ∈ B.lat i) ∧
-      ∀ e ∈ B.lat i, ∃ β : Fin k × Fin r → Ω, (∀ j, β j ∈ chartRing R x i) ∧
-        e = ∑ j, β j • G j := by
+theorem chartBundle_exists_gens (B : ChartBundle R x r E) {i : τ} (hi : x i ≠ 0)
+    : ∃ (k : ℕ) (G : Fin k × Fin r → E),
+      (∀ j, G j ∈ B.lat i)
+        ∧ ∀ e ∈ B.lat i, ∃ β : Fin k × Fin r → Ω,
+          (∀ j, β j ∈ chartRing R x i) ∧ e = ∑ j, β j • G j := by
   classical
   obtain ⟨k, f, c, hf, hc, hsum, hb⟩ := B.frame i hi
   choose b _ _ hiff using hb
@@ -64,13 +71,16 @@ theorem chartBundle_exists_gens (B : ChartBundle R x r E) {i : τ} (hi : x i ≠
   have hle : ∀ l q, n l q ≤ n₀ := fun l q =>
     Finset.le_sup (f := fun lq : Fin k × Fin r => n lq.1 lq.2) (Finset.mem_univ (l, q))
   refine ⟨k, fun lq => f lq.1 ^ n₀ • b lq.1 lq.2, fun lq => ?_, fun e he => ?_⟩
-  · have : f lq.1 ^ n₀ • b lq.1 lq.2 = f lq.1 ^ (n₀ - n lq.1 lq.2) • f lq.1 ^ n lq.1 lq.2 • b lq.1 lq.2 := by
+  · have : f lq.1 ^ n₀ • b lq.1 lq.2
+        = f lq.1 ^ (n₀ - n lq.1 lq.2) • f lq.1 ^ n lq.1 lq.2 • b lq.1 lq.2 := by
       rw [smul_smul, pow_sub_mul_pow _ (hle _ _)]
     show f lq.1 ^ n₀ • b lq.1 lq.2 ∈ B.lat i
     rw [this]
     exact chartBundle_pow_smul_mem B (hf _) _ (hn _ _)
-  · have hco : ∀ l, ∃ a : Fin r → Ω, (∀ q, ∃ n : ℕ, f l ^ n * a q ∈ chartRing R x i) ∧
-        e = ∑ q, a q • b l q := fun l => (hiff l e).1 ⟨0, by simpa using he⟩
+  · have hco
+        : ∀ l, ∃ a : Fin r → Ω,
+          (∀ q, ∃ n : ℕ, f l ^ n * a q ∈ chartRing R x i) ∧ e = ∑ q, a q • b l q := fun l =>
+      (hiff l e).1 ⟨0, by simpa using he⟩
     choose a ha he' using hco
     choose m hm using ha
     set M := Finset.univ.sup fun lq : Fin k × Fin r => m lq.1 lq.2 with hM
@@ -82,7 +92,8 @@ theorem chartBundle_exists_gens (B : ChartBundle R x r E) {i : τ} (hi : x i ≠
     obtain ⟨d, hd, hd1⟩ := exists_sum_mul_pow_eq_one (chartRing R x i) f c hf hc hsum (M + n₀)
     refine ⟨fun lq => d lq.1 * (f lq.1 ^ M * a lq.1 lq.2), fun lq => mul_mem (hd _) (hfa _ _), ?_⟩
     rw [Fintype.sum_prod_type]
-    calc e = (∑ l, d l * f l ^ (M + n₀)) • e := by rw [hd1, one_smul]
+    calc
+      e = (∑ l, d l * f l ^ (M + n₀)) • e := by rw [hd1, one_smul]
       _ = ∑ l, d l • (f l ^ (M + n₀) • e) := by
         rw [Finset.sum_smul]; exact Finset.sum_congr rfl fun l _ => by rw [mul_smul]
       _ = ∑ l, ∑ q, (d l * (f l ^ M * a l q)) • f l ^ n₀ • b l q := by

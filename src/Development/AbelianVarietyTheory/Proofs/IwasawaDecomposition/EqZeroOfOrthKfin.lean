@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CoefExtendsHo
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
+open MeasureTheory Matrix Filter Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta
+  GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
 open scoped InnerProductSpace Topology
 
 noncomputable section
@@ -86,17 +87,19 @@ lemma kfin_conjEntry (i j : Fin n) : KFinFun ε (fun k => star (toMK k i j)) := 
 
 def finAlg (ε : Fin n → Bool) : StarSubalgebra ℂ C(KG ε, ℂ) where
   carrier := {p | KFinFun ε p ∧ KFinFun ε (star p : C(KG ε, ℂ))}
-  mul_mem' := fun {p q} hp hq => ⟨kfin_mul hp.1 hq.1, by
-    rw [star_mul']; exact kfin_mul hp.2 hq.2⟩
-  add_mem' := fun {p q} hp hq => ⟨kfin_add hp.1 hq.1, by
-    rw [star_add]; exact kfin_add hp.2 hq.2⟩
-  algebraMap_mem' := fun c => ⟨by
-    have : ((algebraMap ℂ C(KG ε, ℂ) c : C(KG ε, ℂ)) : KG ε → ℂ) = fun _ => c := by
-      funext k; simp
-    rw [this]; exact kfin_const c, by
-    have : ((star (algebraMap ℂ C(KG ε, ℂ) c) : C(KG ε, ℂ)) : KG ε → ℂ) = fun _ => star c := by
-      funext k; simp
-    rw [this]; exact kfin_const _⟩
+  mul_mem' := fun {p q} hp hq => ⟨kfin_mul hp.1 hq.1, by rw [star_mul']; exact kfin_mul hp.2 hq.2⟩
+  add_mem' := fun {p q} hp hq => ⟨kfin_add hp.1 hq.1, by rw [star_add]; exact kfin_add hp.2 hq.2⟩
+  algebraMap_mem' := fun c => ⟨
+    by
+      have : ((algebraMap ℂ C(KG ε, ℂ) c : C(KG ε, ℂ)) : KG ε → ℂ) = fun _ => c := by funext k; simp
+      rw [this]
+      exact kfin_const c,
+    by
+      have : ((star (algebraMap ℂ C(KG ε, ℂ) c) : C(KG ε, ℂ)) : KG ε → ℂ) = fun _ => star c := by
+        funext k; simp
+      rw [this]
+      exact kfin_const _
+  ⟩
   star_mem' := fun {p} hp => ⟨hp.2, by rw [star_star]; exact hp.1⟩
 
 lemma finAlg_dense (ε : Fin n → Bool) : (finAlg ε).topologicalClosure = ⊤ := by

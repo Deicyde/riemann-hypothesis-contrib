@@ -8,27 +8,257 @@ public import Formalism.SizeWindowBrackets.ChainSlopeWindows.OneLeThresholdMulPo
 namespace Formalism.LFunctionChainParameters.SmallOrderPrimeLosses
 
 open Finset Classical
-open Formalism.LFunctionChainParameters.DeficitSplitLemmas Formalism.LFunctionChainParameters.LErr Formalism.LFunctionChainParameters.PrimeWindowSizeBounds
+open Formalism.LFunctionChainParameters.DeficitSplitLemmas Formalism.LFunctionChainParameters.LErr
+  Formalism.LFunctionChainParameters.PrimeWindowSizeBounds
 
 theorem discriminant_windows_iff : WindowsDIff := by
   intro P e K
   constructor
-  · rintro ⟨hε, hε1, he, hK, nx, nE, kx, kE, N0, NE, t0, tE, px, pE, La0, Laz, r0, rE, Sc0, ScS, η0, ηS,
-      ρ0, ρx, th0, thx, x_sq_le_threshold, dx, C0, CK, Co0, CoK, Y1, YX, bo0, bosb⟩
+  · rintro ⟨
+      hε,
+      hε1,
+      he,
+      hK,
+      nx,
+      nE,
+      kx,
+      kE,
+      N0,
+      NE,
+      t0,
+      tE,
+      px,
+      pE,
+      La0,
+      Laz,
+      r0,
+      rE,
+      Sc0,
+      ScS,
+      η0,
+      ηS,
+      ρ0,
+      ρx,
+      th0,
+      thx,
+      x_sq_le_threshold,
+      dx,
+      C0,
+      CK,
+      Co0,
+      CoK,
+      Y1,
+      YX,
+      bo0,
+      bosb
+    ⟩
     have h0 : (0 : ℝ) ≤ (P.x ^ 2)⁻¹ := inv_nonneg.2 (sq_nonneg _)
     have hβ : (0 : ℝ) ≤ K * (P.x ^ 2)⁻¹ := mul_nonneg (by linarith) h0
-    exact ⟨hε, hε1, he, hK, nx, nE, kx, kE, N0, NE, t0, tE, px, pE, La0, Laz, r0, rE, Sc0, ScS, η0, ηS,
-      ρ0, ρx, th0, thx, x_sq_le_threshold, dx, C0, CK, le_refl (0 : ℝ), hβ, Co0, CoK, Y1, YX, le_refl (0 : ℝ), h0, bo0, bosb⟩
-  · rintro ⟨hε, hε1, he, hK, nx, nE, kx, kE, N0, NE, t0, tE, px, pE, La0, Laz, r0, rE, Sc0, ScS, η0, ηS,
-      ρ0, ρx, th0, thx, x_sq_le_threshold, dx, C0, CK, -, -, Co0, CoK, Y1, YX, -, -, bo0, bosb⟩
-    exact ⟨hε, hε1, he, hK, nx, nE, kx, kE, N0, NE, t0, tE, px, pE, La0, Laz, r0, rE, Sc0, ScS, η0, ηS,
-      ρ0, ρx, th0, thx, x_sq_le_threshold, dx, C0, CK, Co0, CoK, Y1, YX, bo0, bosb⟩
+    exact ⟨
+      hε,
+      hε1,
+      he,
+      hK,
+      nx,
+      nE,
+      kx,
+      kE,
+      N0,
+      NE,
+      t0,
+      tE,
+      px,
+      pE,
+      La0,
+      Laz,
+      r0,
+      rE,
+      Sc0,
+      ScS,
+      η0,
+      ηS,
+      ρ0,
+      ρx,
+      th0,
+      thx,
+      x_sq_le_threshold,
+      dx,
+      C0,
+      CK,
+      le_refl (0 : ℝ),
+      hβ,
+      Co0,
+      CoK,
+      Y1,
+      YX,
+      le_refl (0 : ℝ),
+      h0,
+      bo0,
+      bosb
+    ⟩
+  · rintro ⟨
+      hε,
+      hε1,
+      he,
+      hK,
+      nx,
+      nE,
+      kx,
+      kE,
+      N0,
+      NE,
+      t0,
+      tE,
+      px,
+      pE,
+      La0,
+      Laz,
+      r0,
+      rE,
+      Sc0,
+      ScS,
+      η0,
+      ηS,
+      ρ0,
+      ρx,
+      th0,
+      thx,
+      x_sq_le_threshold,
+      dx,
+      C0,
+      CK,
+      -,
+      -,
+      Co0,
+      CoK,
+      Y1,
+      YX,
+      -,
+      -,
+      bo0,
+      bosb
+    ⟩
+    exact ⟨
+      hε,
+      hε1,
+      he,
+      hK,
+      nx,
+      nE,
+      kx,
+      kE,
+      N0,
+      NE,
+      t0,
+      tE,
+      px,
+      pE,
+      La0,
+      Laz,
+      r0,
+      rE,
+      Sc0,
+      ScS,
+      η0,
+      ηS,
+      ρ0,
+      ρx,
+      th0,
+      thx,
+      x_sq_le_threshold,
+      dx,
+      C0,
+      CK,
+      Co0,
+      CoK,
+      Y1,
+      YX,
+      bo0,
+      bosb
+    ⟩
 
 theorem discriminant_windows_of : WindowsDOf := by
-  rintro P e K ⟨hε, hε1, he, hK, nx, nE, kx, kE, N0, NE, t0, tE, px, pE, La0, Laz, r0, rE, Sc0, ScS, η0, ηS,
-    ρ0, ρx, th0, thx, x_sq_le_threshold, dx, C0, CK, -, -, Co0, CoK, Y1, YX, -, -, bo0, bosb⟩
-  exact ⟨hε, hε1, he, hK, nx, nE, kx, kE, N0, NE, t0, tE, px, pE, La0, Laz, r0, rE, Sc0, ScS, η0, ηS,
-    ρ0, ρx, th0, thx, x_sq_le_threshold, dx, C0, CK, Co0, CoK, Y1, YX, bo0, bosb⟩
+  rintro P e K
+    ⟨
+      hε,
+      hε1,
+      he,
+      hK,
+      nx,
+      nE,
+      kx,
+      kE,
+      N0,
+      NE,
+      t0,
+      tE,
+      px,
+      pE,
+      La0,
+      Laz,
+      r0,
+      rE,
+      Sc0,
+      ScS,
+      η0,
+      ηS,
+      ρ0,
+      ρx,
+      th0,
+      thx,
+      x_sq_le_threshold,
+      dx,
+      C0,
+      CK,
+      -,
+      -,
+      Co0,
+      CoK,
+      Y1,
+      YX,
+      -,
+      -,
+      bo0,
+      bosb
+    ⟩
+  exact ⟨
+    hε,
+    hε1,
+    he,
+    hK,
+    nx,
+    nE,
+    kx,
+    kE,
+    N0,
+    NE,
+    t0,
+    tE,
+    px,
+    pE,
+    La0,
+    Laz,
+    r0,
+    rE,
+    Sc0,
+    ScS,
+    η0,
+    ηS,
+    ρ0,
+    ρx,
+    th0,
+    thx,
+    x_sq_le_threshold,
+    dx,
+    C0,
+    CK,
+    Co0,
+    CoK,
+    Y1,
+    YX,
+    bo0,
+    bosb
+  ⟩
 
 lemma logdiv_nonneg (p : ℕ) : 0 ≤ Real.log (p : ℝ) / (p : ℝ) :=
   div_nonneg (Real.log_natCast_nonneg p) (Nat.cast_nonneg p)
@@ -38,11 +268,12 @@ theorem out_discriminant_bound : OutD := by
   have hco : ∀ p : ℕ, 0 ≤ 4 * m * a * (Real.log p / p) := fun p => by
     have := logdiv_nonneg p
     positivity
-  have h1 : ∑ p ∈ Ps.filter (fun p => cl p = PClass.served),
-      4 * m * a * (Real.log p / p) * ((TT \ TTp p).card : ℝ) ≤
-      ∑ p ∈ Ps.filter (fun p => cl p = PClass.served),
-        (if p ∈ PR then 4 * m * a * (Real.log p / p) * ((TT.filter fun t => BAD p t).card : ℝ)
-          else 0) := by
+  have h1
+      : ∑ p ∈ Ps.filter (fun p => cl p = PClass.served),
+          4 * m * a * (Real.log p / p) * ((TT \ TTp p).card : ℝ)
+        ≤ ∑ p ∈ Ps.filter (fun p => cl p = PClass.served),
+            (if p ∈ PR then 4 * m * a * (Real.log p / p) * ((TT.filter fun t => BAD p t).card : ℝ)
+              else 0) := by
     refine Finset.sum_le_sum (fun p hp => ?_)
     rw [Finset.mem_filter] at hp
     have hb := hBad p hp.1 hp.2
@@ -59,17 +290,21 @@ theorem out_discriminant_bound : OutD := by
         rw [Finset.eq_empty_iff_forall_notMem]
         intro t ht
         exact hps (hb t ht).1
-      rw [hemp]; simp
-  have h2 : ∑ p ∈ Ps.filter (fun p => cl p = PClass.served),
-        (if p ∈ PR then 4 * m * a * (Real.log p / p) * ((TT.filter fun t => BAD p t).card : ℝ)
-          else 0) ≤
-      ∑ p ∈ PR, 4 * m * a * (Real.log p / p) * ((TT.filter fun t => BAD p t).card : ℝ) := by
+      rw [hemp]
+      simp
+  have h2
+      : ∑ p ∈ Ps.filter (fun p => cl p = PClass.served),
+          (if p ∈ PR then 4 * m * a * (Real.log p / p) * ((TT.filter fun t => BAD p t).card : ℝ)
+            else 0)
+        ≤ ∑ p ∈ PR, 4 * m * a * (Real.log p / p) * ((TT.filter fun t => BAD p t).card : ℝ) := by
     rw [← Finset.sum_filter]
-    refine Finset.sum_le_sum_of_subset_of_nonneg ?_ (fun p _ _ => mul_nonneg (hco p) (Nat.cast_nonneg _))
+    refine Finset.sum_le_sum_of_subset_of_nonneg ?_
+      (fun p _ _ => mul_nonneg (hco p) (Nat.cast_nonneg _))
     intro p hp
     exact (Finset.mem_filter.1 hp).2
-  have h3 : ∑ p ∈ PR, 4 * m * a * (Real.log p / p) * ((TT.filter fun t => BAD p t).card : ℝ) =
-      4 * a * m * badPrimeLogWeightedCount PR TT BAD := by
+  have h3
+      : ∑ p ∈ PR, 4 * m * a * (Real.log p / p) * ((TT.filter fun t => BAD p t).card : ℝ)
+        = 4 * a * m * badPrimeLogWeightedCount PR TT BAD := by
     unfold badPrimeLogWeightedCount
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl (fun p _ => by ring)
@@ -81,8 +316,9 @@ theorem second_discriminant_bound : SecondD := by
   intro Ps cand cl Sig θ m T a R hm hT ha hSig hW hcl
   have h1 := second_term_le Ps cand cl Sig θ m T a hm hT ha hcl
   have hc : 0 ≤ 2 * a * m * T := by positivity
-  have h2 : ∑ p ∈ cand, (if θ < Sig p then 4 * (m * T * a) * Real.log p / p else 0) ≤
-      2 * a * m * T * lhsW cand θ Sig := by
+  have h2
+      : ∑ p ∈ cand, (if θ < Sig p then 4 * (m * T * a) * Real.log p / p else 0)
+        ≤ 2 * a * m * T * lhsW cand θ Sig := by
     unfold lhsW
     rw [Finset.mul_sum]
     refine Finset.sum_le_sum (fun p hp => ?_)
@@ -90,9 +326,13 @@ theorem second_discriminant_bound : SecondD := by
     have hs := hSig p hp
     have h0 : 0 ≤ 2 * a * m * T * (Real.log p / p * (4 * Sig p)) := by positivity
     split_ifs
-    · have e : 2 * a * m * T * (Real.log p / p * (2 + 4 * Sig p)) =
-          4 * (m * T * a) * Real.log p / p + 2 * a * m * T * (Real.log p / p * (4 * Sig p)) := by ring
-      rw [e]; linarith
+    · have e
+          : 2 * a * m * T * (Real.log p / p * (2 + 4 * Sig p))
+            = 4 * (m * T * a) * Real.log p / p
+              + 2 * a * m * T * (Real.log p / p * (4 * Sig p)) := by
+        ring
+      rw [e]
+      linarith
     · rw [zero_add]; exact h0
   have h3 := mul_le_mul_of_nonneg_left hW hc
   linarith
@@ -108,10 +348,13 @@ theorem io_discriminant_bound : IoD := by
     have hl := logdiv_nonneg p
     have hi : (0 : ℝ) ≤ (if θ < Sig p then (2 : ℝ) else 0) := by split_ifs <;> norm_num
     have h0 : 0 ≤ a * m * T * (Real.log p / p * (if θ < Sig p then (2 : ℝ) else 0)) := by positivity
-    have e : a * m * T * (Real.log p / p * ((if θ < Sig p then (2 : ℝ) else 0) + 4 * Sig p)) =
-        Real.log p * (2 * Sig p * (2 * (m * T * a) / p)) +
-          a * m * T * (Real.log p / p * (if θ < Sig p then (2 : ℝ) else 0)) := by ring
-    rw [e]; linarith
+    have e
+        : a * m * T * (Real.log p / p * ((if θ < Sig p then (2 : ℝ) else 0) + 4 * Sig p))
+          = Real.log p * (2 * Sig p * (2 * (m * T * a) / p))
+            + a * m * T * (Real.log p / p * (if θ < Sig p then (2 : ℝ) else 0)) := by
+      ring
+    rw [e]
+    linarith
   have h3 := mul_le_mul_of_nonneg_left hW hc
   linarith
 
@@ -233,7 +476,8 @@ theorem joint_discriminant_bound : LossBoundsUnderSizeWindows := by
   obtain ⟨Cord, h0, h⟩ := joint_core
   refine ⟨Cord, h0, ?_⟩
   intro P e K hC hW hL ι κ τ U Ps cand PR J TT BAD Sig io D hS
-  exact (h (clr P) e K hC ((discriminant_windows_iff P e K).1 hW) hL ι κ τ U Ps cand PR J TT BAD Sig io D hS).2
+  exact (h (clr P) e K hC ((discriminant_windows_iff P e K).1 hW) hL ι κ τ U Ps cand PR J TT BAD Sig
+    io D hS).2
 
 theorem joint_discriminant_eventually : LossBoundsEventually := by
   obtain ⟨Cord, h0, h⟩ := joint_discriminant_bound

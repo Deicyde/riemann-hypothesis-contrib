@@ -16,14 +16,18 @@ variable {k : Type} [Field k] [CharZero k] {n : ℕ}
 
 def SS (a : Matrix (Fin n) (Fin n) k) : Prop := Module.End.IsSemisimple (Matrix.toLin' a)
 
-theorem toLinAlgEquiv'_eq (a : Matrix (Fin n) (Fin n) k) : Matrix.toLinAlgEquiv' a = Matrix.toLin' a := rfl
+theorem toLinAlgEquiv'_eq (a : Matrix (Fin n) (Fin n) k)
+    : Matrix.toLinAlgEquiv' a = Matrix.toLin' a :=
+  rfl
 
-theorem ss_add {a b : Matrix (Fin n) (Fin n) k} (h : Commute a b) (ha : SS a) (hb : SS b) : SS (a + b) := by
+theorem ss_add {a b : Matrix (Fin n) (Fin n) k} (h : Commute a b) (ha : SS a) (hb : SS b)
+    : SS (a + b) := by
   unfold SS
   rw [← toLinAlgEquiv'_eq, map_add (f := _)]
   exact Module.End.IsSemisimple.add_of_commute (h.map Matrix.toLinAlgEquiv') ha hb
 
-theorem ss_mul {a b : Matrix (Fin n) (Fin n) k} (h : Commute a b) (ha : SS a) (hb : SS b) : SS (a * b) := by
+theorem ss_mul {a b : Matrix (Fin n) (Fin n) k} (h : Commute a b) (ha : SS a) (hb : SS b)
+    : SS (a * b) := by
   unfold SS
   rw [← toLinAlgEquiv'_eq, map_mul]
   exact Module.End.IsSemisimple.mul_of_commute (h.map Matrix.toLinAlgEquiv') ha hb
@@ -35,11 +39,15 @@ theorem ss_algebraMap (c : k) : SS (algebraMap k (Matrix (Fin n) (Fin n) k) c) :
     (Polynomial.irreducible_X_sub_C c).squarefree ?_
   simp
 
-theorem ss_of_mem {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} (hZ : CR Z) {z : Matrix (Fin n) (Fin n) k}
-    (hz : z ∈ Z) : SS z := by
-  obtain ⟨nn, hnn, ss, -, hnil, hsss, hsum⟩ := Module.End.exists_isNilpotent_isSemisimple (K := k) (f := Matrix.toLin' z)
-  have hmap : Algebra.adjoin k {Matrix.toLin' z} =
-      (Algebra.adjoin k {z}).map (Matrix.toLinAlgEquiv' (R := k) (n := Fin n)).toAlgHom := by
+theorem ss_of_mem
+    {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} (hZ : CR Z)
+    {z : Matrix (Fin n) (Fin n) k} (hz : z ∈ Z)
+    : SS z := by
+  obtain ⟨nn, hnn, ss, -, hnil, hsss, hsum⟩ :=
+    Module.End.exists_isNilpotent_isSemisimple (K := k) (f := Matrix.toLin' z)
+  have hmap
+      : Algebra.adjoin k {Matrix.toLin' z}
+        = (Algebra.adjoin k {z}).map (Matrix.toLinAlgEquiv' (R := k) (n := Fin n)).toAlgHom := by
     rw [← Algebra.adjoin_image, Set.image_singleton]
     rfl
   rw [hmap] at hnn
@@ -68,9 +76,11 @@ theorem conj_of (hiso : IsoOfTrace k) : Conj k := by
   have hcomm : ∀ a ∈ S, ∀ b ∈ S, a * b = b * a := by
     rintro a (⟨z, hz, rfl⟩ | ha) b (⟨w, hw, rfl⟩ | hb)
     · simp [hZ.1 z hz w hw]
-    · rw [Set.mem_singleton_iff] at hb; subst hb
+    · rw [Set.mem_singleton_iff] at hb
+      subst hb
       simp [hs z hz, hs' z hz]
-    · rw [Set.mem_singleton_iff] at ha; subst ha
+    · rw [Set.mem_singleton_iff] at ha
+      subst ha
       simp [hs w hw, hs' w hw]
     · rw [Set.mem_singleton_iff] at ha hb; subst ha; subst hb; rfl
   set R := Algebra.adjoin k S with hRdef
@@ -89,13 +99,16 @@ theorem conj_of (hiso : IsoOfTrace k) : Conj k := by
       rcases hx with ⟨z, hz, rfl⟩ | hx
       · exact ⟨ss_of_mem hZ hz, ss_of_mem hZ hz⟩
       · rw [Set.mem_singleton_iff] at hx; subst hx; exact ⟨hss, hss'⟩
-    | algebraMap c => exact ⟨ss_algebraMap c, ss_algebraMap c⟩
+    | algebraMap c =>
+      exact ⟨ss_algebraMap c, ss_algebraMap c⟩
     | add x y hx hy ihx ihy =>
       have h := hRc x hx y hy
-      exact ⟨ss_add (h.map (RingHom.fst _ _)) ihx.1 ihy.1, ss_add (h.map (RingHom.snd _ _)) ihx.2 ihy.2⟩
+      exact
+        ⟨ss_add (h.map (RingHom.fst _ _)) ihx.1 ihy.1, ss_add (h.map (RingHom.snd _ _)) ihx.2 ihy.2⟩
     | mul x y hx hy ihx ihy =>
       have h := hRc x hx y hy
-      exact ⟨ss_mul (h.map (RingHom.fst _ _)) ihx.1 ihy.1, ss_mul (h.map (RingHom.snd _ _)) ihx.2 ihy.2⟩
+      exact
+        ⟨ss_mul (h.map (RingHom.fst _ _)) ihx.1 ihy.1, ss_mul (h.map (RingHom.snd _ _)) ihx.2 ihy.2⟩
 
   let f : Z →+* Matrix (Fin n) (Fin n) k := Z.val.toRingHom
   have hform : ∀ x ∈ R, ∃ P : Z[X], x = (P.eval₂ f s, P.eval₂ f s') := by
@@ -143,9 +156,11 @@ theorem conj_of (hiso : IsoOfTrace k) : Conj k := by
     (Matrix.toLinAlgEquiv' (R := k) (n := Fin n)).toAlgHom.comp ((AlgHom.fst k _ _).comp R.val)
   let ρ' : R →ₐ[k] Module.End k (Fin n → k) :=
     (Matrix.toLinAlgEquiv' (R := k) (n := Fin n)).toAlgHom.comp ((AlgHom.snd k _ _).comp R.val)
-  have hρ : ∀ r : R, ρ r = Matrix.toLin' (r : Matrix (Fin n) (Fin n) k × Matrix (Fin n) (Fin n) k).1 :=
+  have hρ
+      : ∀ r : R, ρ r = Matrix.toLin' (r : Matrix (Fin n) (Fin n) k × Matrix (Fin n) (Fin n) k).1 :=
     fun r => rfl
-  have hρ' : ∀ r : R, ρ' r = Matrix.toLin' (r : Matrix (Fin n) (Fin n) k × Matrix (Fin n) (Fin n) k).2 :=
+  have hρ'
+      : ∀ r : R, ρ' r = Matrix.toLin' (r : Matrix (Fin n) (Fin n) k × Matrix (Fin n) (Fin n) k).2 :=
     fun r => rfl
   have htrace : ∀ r, LinearMap.trace k _ (ρ r) = LinearMap.trace k _ (ρ' r) := by
     intro r
@@ -171,15 +186,17 @@ theorem conj_of (hiso : IsoOfTrace k) : Conj k := by
 
   have hint : ∀ x ∈ R, A * x.1 = x.2 * A := by
     intro x hx
-    have hc : (φ : (Fin n → k) →ₗ[k] (Fin n → k)).comp (Matrix.toLin' x.1) =
-        (Matrix.toLin' x.2).comp (φ : (Fin n → k) →ₗ[k] (Fin n → k)) := by
+    have hc
+        : (φ : (Fin n → k) →ₗ[k] (Fin n → k)).comp (Matrix.toLin' x.1)
+          = (Matrix.toLin' x.2).comp (φ : (Fin n → k) →ₗ[k] (Fin n → k)) := by
       refine LinearMap.ext fun v => ?_
       have := hφ ⟨x, hx⟩ v
       rw [hρ, hρ'] at this
       simpa using this
     have := congrArg LinearMap.toMatrix' hc
     rw [LinearMap.toMatrix'_comp, LinearMap.toMatrix'_comp, LinearMap.toMatrix'_toLin',
-      LinearMap.toMatrix'_toLin'] at this
+        LinearMap.toMatrix'_toLin']
+      at this
     exact this
   refine ⟨g, fun a ha => ?_, ?_⟩
   · have := hint (a, a) (Algebra.subset_adjoin (Or.inl ⟨a, ha, rfl⟩))

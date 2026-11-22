@@ -9,9 +9,11 @@ public import ReciprocityTheory.AnalyticForms.RegularLocalRings.ClosureFromSpecM
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 set_option autoImplicit false
 
@@ -19,23 +21,38 @@ namespace GlobalTheory.RegParPrime
 
 open ReciprocityTheory.AnForm.R.IrreducibleComponentPreimages
 
-theorem exists_mul_eq_of_mem_span {A : Type} [CommRing A] [IsDomain A] (p : Ideal A) [p.IsPrime]
-    (R : Type) [CommRing R] [Algebra A R] [IsLocalization.AtPrime R p] {b x : A}
-    (h : algebraMap A R x ∈ Ideal.span {algebraMap A R b}) : ∃ t ∉ p, ∃ s, t * x = s * b := by
+theorem exists_mul_eq_of_mem_span
+    {A : Type} [CommRing A] [IsDomain A]
+    (p : Ideal A) [p.IsPrime]
+    (R : Type) [CommRing R] [Algebra A R] [IsLocalization.AtPrime R p]
+    {b x : A} (h : algebraMap A R x ∈ Ideal.span {algebraMap A R b})
+    : ∃ t ∉ p, ∃ s, t * x = s * b := by
   obtain ⟨r, hr⟩ := Ideal.mem_span_singleton'.1 h
   obtain ⟨⟨s, t⟩, rfl⟩ := IsLocalization.mk'_surjective p.primeCompl (S := R) r
   refine ⟨t, t.2, s, ?_⟩
   apply IsLocalization.injective R (M := p.primeCompl) (Ideal.primeCompl_le_nonZeroDivisors p)
   rw [map_mul, map_mul, ← hr, ← mul_assoc, IsLocalization.mk'_spec']
 
-theorem exists_primeDivisors_of_regularParams : ∀ (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (y : Y) (U : Y.Opens) (hy : y ∈ U) (c : ℕ) (a : Fin c → Γ(Y, U)), IsRegularLocalRing (Y.presheaf.stalk y) → FinalTheorems.Rsp (Y.presheaf.stalk y) c (fun i => Y.presheaf.germ U y hy (a i)) → ∃ (w : Fin c → Y) (u : Fin c → Y.functionFieldˣ), Function.Injective w ∧ ∀ j, (u j : Y.functionField) = fnOf U (gen_mem hy) (a j) ∧ w j ⤳ y ∧ Order.coheight (w j) = 1 ∧ w j ∉ Y.basicOpen (a j) ∧ Scheme.ord (u j : Y.functionField) (w j) = 1 ∧ ∀ v, v ⤳ y → Order.coheight v = 1 → v ≠ w j → v ∈ Y.basicOpen (a j) := by
+theorem exists_primeDivisors_of_regularParams
+    : ∀ (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (y : Y) (U : Y.Opens) (hy : y ∈ U)
+        (c : ℕ) (a : Fin c → Γ(Y, U)),
+      IsRegularLocalRing (Y.presheaf.stalk y)
+        → FinalTheorems.Rsp (Y.presheaf.stalk y) c (fun i => Y.presheaf.germ U y hy (a i))
+        → ∃ (w : Fin c → Y) (u : Fin c → Y.functionFieldˣ),
+          Function.Injective w
+            ∧ ∀ j,
+              (u j : Y.functionField) = fnOf U (gen_mem hy) (a j) ∧ w j ⤳ y
+                ∧ Order.coheight (w j) = 1 ∧ w j ∉ Y.basicOpen (a j)
+                ∧ Scheme.ord (u j : Y.functionField) (w j) = 1
+                ∧ ∀ v, v ⤳ y → Order.coheight v = 1 → v ≠ w j → v ∈ Y.basicOpen (a j) := by
   intro Y _ _ y U hy c a hreg hrsp
   obtain ⟨V, hV, hyV, hVU⟩ := exists_isAffineOpen_mem_and_subset hy
   have hVU' : V ≤ U := hVU
   let b : Fin c → Γ(Y, V) := fun i => resG Y hVU' (a i)
   have hgerm : ∀ i, Y.presheaf.germ V y hyV (b i) = Y.presheaf.germ U y hy (a i) := fun i =>
     Y.presheaf.germ_res_apply (homOfLE hVU') y hyV (a i)
-  have hrsp' : FinalTheorems.Rsp (Y.presheaf.stalk y) c (fun i => Y.presheaf.germ V y hyV (b i)) := by
+  have hrsp'
+      : FinalTheorems.Rsp (Y.presheaf.stalk y) c (fun i => Y.presheaf.germ V y hyV (b i)) := by
     simpa only [hgerm] using hrsp
   haveI := hreg
   obtain ⟨q, hq⟩ := exists_parPrimes hV hyV b hrsp'
@@ -59,8 +76,9 @@ theorem exists_primeDivisors_of_regularParams : ∀ (Y : Scheme.{0}) [IsIntegral
     have hmin : (q j).asIdeal ∈ (Ideal.span {b j}).minimalPrimes := by
       refine ⟨⟨(q j).2, (Ideal.span_singleton_le_iff_mem _).2 (hq.2.1 j)⟩, ?_⟩
       rintro Q ⟨hQp, hQb⟩ hQle
-      exact (hq.2.2.1 j ⟨Q, hQp⟩ (le_trans (show (⟨Q, hQp⟩ : PrimeSpectrum Γ(Y, V)) ≤ q j from hQle)
-        (hq.1 j))).mp (hQb (Ideal.mem_span_singleton_self _))
+      exact (hq.2.2.1 j ⟨Q, hQp⟩
+          (le_trans (show (⟨Q, hQp⟩ : PrimeSpectrum Γ(Y, V)) ≤ q j from hQle) (hq.1 j))).mp
+        (hQb (Ideal.mem_span_singleton_self _))
     refine le_antisymm (Ideal.height_le_one_of_isPrincipal_of_mem_minimalPrimes _ _ hmin) ?_
     refine ENat.one_le_iff_ne_zero.2 fun h0 => hb0 j ?_
     have hmin0 := Ideal.height_eq_zero_iff.1 h0
@@ -73,14 +91,16 @@ theorem exists_primeDivisors_of_regularParams : ∀ (Y : Scheme.{0}) [IsIntegral
     intro j
     letI := Y.presheaf.algebra_section_stalk (⟨w j, hwV j⟩ : V)
     haveI := hV.isLocalization_stalk ⟨w j, hwV j⟩
-    have := IsLocalization.AtPrime.ringKrullDim_eq_height (hV.primeIdealOf ⟨w j, hwV j⟩).asIdeal
-      (Y.presheaf.stalk (w j))
+    have :=
+      IsLocalization.AtPrime.ringKrullDim_eq_height (hV.primeIdealOf ⟨w j, hwV j⟩).asIdeal
+        (Y.presheaf.stalk (w j))
     rw [ringKrullDim_stalk_eq_coheight, hpw, hq1] at this
     exact_mod_cast this
   refine ⟨w, fun j => Units.mk0 _ (ha0 j), ?_, fun j => ?_⟩
   · intro i j h
-    have key : ∀ {z z' : Y} (hz : z ∈ V) (hz' : z' ∈ V), z = z' →
-        hV.primeIdealOf ⟨z, hz⟩ = hV.primeIdealOf ⟨z', hz'⟩ := by
+    have key
+        : ∀ {z z' : Y} (hz : z ∈ V) (hz' : z' ∈ V),
+          z = z' → hV.primeIdealOf ⟨z, hz⟩ = hV.primeIdealOf ⟨z', hz'⟩ := by
       rintro z z' hz hz' rfl
       rfl
     have h2 : q i = q j := (hpw i).symm.trans ((key (hwV i) (hwV j) h).trans (hpw j))
@@ -92,19 +112,25 @@ theorem exists_primeDivisors_of_regularParams : ∀ (Y : Scheme.{0}) [IsIntegral
     exact h1 (hq.2.1 j)
   refine ⟨rfl, fromSpec_specializes hq j, hcoh j, ?_, ?_, ?_⟩
   · intro h'
-    exact hwb ((Y.basicOpen_res (a j) (homOfLE hVU').op).symm ▸ ⟨hwV j, h'⟩ : w j ∈ Y.basicOpen (b j))
+    exact hwb
+      ((Y.basicOpen_res (a j) (homOfLE hVU').op).symm ▸ ⟨hwV j, h'⟩ : w j ∈ Y.basicOpen (b j))
   · letI := Y.presheaf.algebra_section_stalk (⟨w j, hwV j⟩ : V)
     haveI hloc0 := hV.isLocalization_stalk ⟨w j, hwV j⟩
     haveI hloc : IsLocalization.AtPrime (Y.presheaf.stalk (w j)) (q j).asIdeal := by
       rw [← hpw j]; exact hloc0
-    have hgalg : Y.presheaf.germ V (w j) (hwV j) (b j) = algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) (b j) := rfl
+    have hgalg
+        : Y.presheaf.germ V (w j) (hwV j) (b j)
+          = algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) (b j) :=
+      rfl
     have hg0 : Y.presheaf.germ V (w j) (hwV j) (b j) ≠ 0 := fun h0 =>
       ha0 j (by rw [hfn, ← algebraMap_germ (hwV j), h0, map_zero])
-    have hmax : Ideal.span {Y.presheaf.germ V (w j) (hwV j) (b j)} =
-        IsLocalRing.maximalIdeal (Y.presheaf.stalk (w j)) := by
+    have hmax
+        : Ideal.span {Y.presheaf.germ V (w j) (hwV j) (b j)}
+          = IsLocalRing.maximalIdeal (Y.presheaf.stalk (w j)) := by
       refine le_antisymm ?_ ?_
       · rw [Ideal.span_singleton_le_iff_mem,
-          ← IsLocalization.AtPrime.map_eq_maximalIdeal (q j).asIdeal (Y.presheaf.stalk (w j)), hgalg]
+          ← IsLocalization.AtPrime.map_eq_maximalIdeal (q j).asIdeal (Y.presheaf.stalk (w j)),
+          hgalg]
         exact Ideal.mem_map_of_mem _ (hq.2.1 j)
       · rw [← IsLocalization.AtPrime.map_eq_maximalIdeal (q j).asIdeal (Y.presheaf.stalk (w j)),
           Ideal.map_le_iff_le_comap]
@@ -114,30 +140,39 @@ theorem exists_primeDivisors_of_regularParams : ∀ (Y : Scheme.{0}) [IsIntegral
         haveI := hV.isLocalization_stalk ⟨y, hyV⟩
         haveI : (Ideal.span {Y.presheaf.germ V y hyV (b j)}).IsPrime :=
           (Ideal.span_singleton_prime (hprime j).ne_zero).2 (hprime j)
-        let P : Ideal Γ(Y, V) := Ideal.comap (algebraMap Γ(Y, V) (Y.presheaf.stalk y))
-          (Ideal.span {Y.presheaf.germ V y hyV (b j)})
+        let P : Ideal Γ(Y, V) :=
+          Ideal.comap (algebraMap Γ(Y, V) (Y.presheaf.stalk y))
+            (Ideal.span {Y.presheaf.germ V y hyV (b j)})
         have hPp : P.IsPrime := Ideal.IsPrime.comap _
         have hPle : P ≤ (hV.primeIdealOf ⟨y, hyV⟩).asIdeal := by
           intro z hz
-          have hz' : algebraMap Γ(Y, V) (Y.presheaf.stalk y) z ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk y) :=
+          have hz'
+              : algebraMap Γ(Y, V) (Y.presheaf.stalk y) z
+                ∈ IsLocalRing.maximalIdeal (Y.presheaf.stalk y) :=
             (Ideal.span_singleton_le_iff_mem _).2
               ((IsLocalRing.mem_maximalIdeal _).2 (hprime j).not_unit) hz
           exact (IsLocalization.AtPrime.to_map_mem_maximal_iff (Y.presheaf.stalk y)
             (hV.primeIdealOf ⟨y, hyV⟩).asIdeal z).1 hz'
         have hbP : b j ∈ P := Ideal.mem_span_singleton_self _
         have hqP : q j ≤ ⟨P, hPp⟩ := (hq.2.2.1 j ⟨P, hPp⟩ hPle).mp hbP
-        obtain ⟨t, ht, s, hts⟩ := exists_mul_eq_of_mem_span (hV.primeIdealOf ⟨y, hyV⟩).asIdeal
-          (Y.presheaf.stalk y) (hqP hx)
+        obtain ⟨t, ht, s, hts⟩ :=
+          exists_mul_eq_of_mem_span (hV.primeIdealOf ⟨y, hyV⟩).asIdeal (Y.presheaf.stalk y) (hqP hx)
         have htq : t ∉ (q j).asIdeal := fun h => ht (hq.1 j h)
         have hu : IsUnit (algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) t) :=
           IsLocalization.map_units (Y.presheaf.stalk (w j)) (⟨t, htq⟩ : (q j).asIdeal.primeCompl)
-        have e : algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) t * algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) x =
-            algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) s * algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) (b j) := by
+        have e
+            : algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) t
+                * algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) x
+              = algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) s
+                * algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) (b j) := by
           rw [← map_mul, ← map_mul, hts]
-        refine Ideal.mem_span_singleton'.2 ⟨↑hu.unit⁻¹ * algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) s, ?_⟩
+        refine Ideal.mem_span_singleton'.2
+          ⟨↑hu.unit⁻¹ * algebraMap Γ(Y, V) (Y.presheaf.stalk (w j)) s, ?_⟩
         rw [hgalg, mul_assoc, ← e, ← mul_assoc, hu.val_inv_mul, one_mul]
-    have hlen : Module.length (Y.presheaf.stalk (w j))
-        (Y.presheaf.stalk (w j) ⧸ Ideal.span {Y.presheaf.germ V (w j) (hwV j) (b j)}) = 1 := by
+    have hlen
+        : Module.length (Y.presheaf.stalk (w j))
+            (Y.presheaf.stalk (w j) ⧸ Ideal.span {Y.presheaf.germ V (w j) (hwV j) (b j)})
+          = 1 := by
       rw [hmax, Module.length_eq_one_iff, isSimpleModule_iff_isCoatom]
       exact Ideal.isMaximal_def.1 (IsLocalRing.maximalIdeal.isMaximal _)
     show Scheme.ord (fnOf U (gen_mem hy) (a j)) (w j) = 1
@@ -159,8 +194,9 @@ theorem exists_primeDivisors_of_regularParams : ∀ (Y : Scheme.{0}) [IsIntegral
     have hQv1 : (hV.primeIdealOf ⟨v, hvV⟩).asIdeal.height = 1 := by
       letI := Y.presheaf.algebra_section_stalk (⟨v, hvV⟩ : V)
       haveI := hV.isLocalization_stalk ⟨v, hvV⟩
-      have := IsLocalization.AtPrime.ringKrullDim_eq_height (hV.primeIdealOf ⟨v, hvV⟩).asIdeal
-        (Y.presheaf.stalk v)
+      have :=
+        IsLocalization.AtPrime.ringKrullDim_eq_height (hV.primeIdealOf ⟨v, hvV⟩).asIdeal
+          (Y.presheaf.stalk v)
       rw [ringKrullDim_stalk_eq_coheight, hv1] at this
       exact_mod_cast this.symm
     have heq : q j = hV.primeIdealOf ⟨v, hvV⟩ := by

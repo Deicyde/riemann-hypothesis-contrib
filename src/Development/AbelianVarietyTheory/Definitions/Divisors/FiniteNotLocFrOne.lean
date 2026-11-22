@@ -28,21 +28,29 @@ noncomputable section
 
 namespace GlobalTheory.DefPt.Model
 
-open CategoryTheory NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.Pj GlobalTheory.DualWeyl GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.Frames
-  GlobalTheory.CompHt ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+open CategoryTheory NumberField IsDedekindDomain Module Formalism.BasicNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.Pj GlobalTheory.DualWeyl
+  GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.Frames GlobalTheory.CompHt
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
 open scoped Matrix Classical
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
-
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l}
 
 open scoped ComplexOrder in
-theorem posDef_of_isMetric {σ : c.F →+* ℂ} {y : FrPt Xo c (CAt σ)} {N : ℝ} {Gr : Mats Dw ℂ}
-    (h : GlobalTheory.LamT.IsMetric y N Gr) (b : E →+* ℂ) : (Gr b).PosDef := by
+theorem posDef_of_isMetric
+    {σ : c.F →+* ℂ} {y : FrPt Xo c (CAt σ)} {N : ℝ} {Gr : Mats Dw ℂ}
+    (h : GlobalTheory.LamT.IsMetric y N Gr)
+    (b : E →+* ℂ)
+    : (Gr b).PosDef := by
   obtain ⟨Φ, u, Hm, χ, θ, Fd, w, W, -, hA, -, -, -, -, h7, h8⟩ := h
-  obtain ⟨-, -, -, -, -, t2, -⟩ := GlobalTheory.AHWeil.tangent_and_weil_of_isAH GlobalTheory.thetaUnifAV_all Φ.key.P _ u Hm χ hA
+  obtain ⟨-, -, -, -, -, t2, -⟩ :=
+    GlobalTheory.AHWeil.tangent_and_weil_of_isAH GlobalTheory.thetaUnifAV_all Φ.key.P _ u Hm χ hA
   obtain ⟨l1, l2⟩ := GlobalTheory.MetricChange.lift_comb Φ.m.cart
-  obtain ⟨M, _, _, v, ρ, -, htan, hcomb, -, -⟩ := GlobalTheory.T.exists_tangent_module_universal_group E H Dw l Xo (CAt σ) y.x
+  obtain ⟨M, _, _, v, ρ, -, htan, hcomb, -, -⟩ :=
+    GlobalTheory.T.exists_tangent_module_universal_group E H Dw l Xo (CAt σ) y.x
   choose β hβ using fun i => (htan (y.u b i)).1 (y.tan b i)
   have hu : y.u b = fun i => v (β i) := funext fun i => (hβ i).symm
   have hw : y.u b = fun i => (w b i).left ≫ Φ.m.φ := funext fun i => (h7 b i).1.symm
@@ -54,7 +62,10 @@ theorem posDef_of_isMetric {σ : c.F →+* ℂ} {y : FrPt Xo c (CAt σ)} {N : �
     have h1 : IsCombAt y.x (y.u b) (S := CAt σ) d (v (∑ j, (show CAt σ from d j) • β j)) := by
       rw [hu]; exact (hcomb _ β d _).2 rfl
     obtain ⟨w', e1, e2⟩ := l2 _ d (w b) _ (hw ▸ h1)
-    have h2 := (GlobalTheory.LamT.existsUnique_isDiff_and_linear Φ.key u).2 _ (w b) (W b) d w' ht (fun j => (h7 b j).2) e2
+    have h2 :=
+      (GlobalTheory.LamT.existsUnique_isDiff_and_linear Φ.key u).2 _ (w b) (W b) d w' ht
+        (fun j => (h7 b j).2)
+        e2
     have h3 : ∑ j, d j • W b j = W b i := by
       simp only [d, Pi.add_apply, add_smul, Finset.sum_add_distrib, hcf, add_zero]
       simp [Pi.single_apply]
@@ -73,12 +84,15 @@ theorem posDef_of_isMetric {σ : c.F →+* ℂ} {y : FrPt Xo c (CAt σ)} {N : �
   ext i k
   exact h8 b i k
 
-theorem exists_archFr (hr : 1 ≤ Dw.p + Dw.q) (y₀ : FrPt Xo c c.F) (σ : c.F →+* ℂ) : ∃ N X, ArchFr y₀ σ N X := by
-  obtain ⟨z₀, hz₀⟩ := GlobalTheory.Frames.FramedBaseChange.exists_frMap GlobalTheory.lawsFieldsSeparately.2.1 E H Dw l Xo c c.F (CAt σ)
-    (Algebra.ofId _ _) y₀
+theorem exists_archFr (hr : 1 ≤ Dw.p + Dw.q) (y₀ : FrPt Xo c c.F) (σ : c.F →+* ℂ)
+    : ∃ N X, ArchFr y₀ σ N X := by
+  obtain ⟨z₀, hz₀⟩ :=
+    GlobalTheory.Frames.FramedBaseChange.exists_frMap GlobalTheory.lawsFieldsSeparately.2.1 E H Dw l
+      Xo c c.F (CAt σ) (Algebra.ofId _ _) y₀
   obtain ⟨N, Gr, h⟩ := GlobalTheory.MetricTest.exists_isMetric hr z₀
   choose X hX hX' using fun b => GlobalTheory.HolDS.exists_congr_one_of_posDef (posDef_of_isMetric h b)
-  refine ⟨N, X, GlobalTheory.MetricTest.pos_of_isMetric h, fun τ => (hX τ).ne_zero, fun z y hz hy => ?_⟩
+  refine
+    ⟨N, X, GlobalTheory.MetricTest.pos_of_isMetric h, fun τ => (hX τ).ne_zero, fun z y hz hy => ?_⟩
   obtain rfl := (frMap_unique_refl_iff E H Dw l Xo c _ _ _ y₀).1 _ _ hz hz₀
   have := GlobalTheory.MetricChange.isMetric_frChg E H Dw l Xo c σ z y N Gr X 1 one_ne_zero hy h
   simpa [hX'] using this
@@ -88,12 +102,16 @@ section Dense
 def DenseIn {K : Type} [Field K] (T : CDVR) (io : K →+* T.Fr) : Prop :=
   ∀ (x : T.Fr) (d : T.V), d ≠ 0 → ∃ (k : K) (h : T.V), x = io k + algebraMap T.V T.Fr (d * h)
 
-theorem denseIn_of_residue {K : Type} [Field K] (T : CDVR) (io : K →+* T.Fr) (π : T.V) (hπ : Irreducible π) (p : K)
-    (hp : algebraMap T.V T.Fr π = io p)
-    (h1 : ∀ v : T.V, ∃ (k : K) (h : T.V), algebraMap T.V T.Fr v = io k + algebraMap T.V T.Fr (π * h)) :
-    DenseIn T io := by
-  have h2 : ∀ (m : ℕ) (v : T.V), ∃ (k : K) (h : T.V),
-      algebraMap T.V T.Fr v = io k + algebraMap T.V T.Fr (π ^ m * h) := by
+theorem denseIn_of_residue
+    {K : Type} [Field K]
+    (T : CDVR) (io : K →+* T.Fr) (π : T.V) (hπ : Irreducible π)
+    (p : K) (hp : algebraMap T.V T.Fr π = io p)
+    (h1
+      : ∀ v : T.V, ∃ (k : K) (h : T.V), algebraMap T.V T.Fr v = io k + algebraMap T.V T.Fr (π * h))
+    : DenseIn T io := by
+  have h2
+      : ∀ (m : ℕ) (v : T.V), ∃ (k : K) (h : T.V),
+        algebraMap T.V T.Fr v = io k + algebraMap T.V T.Fr (π ^ m * h) := by
     intro m
     induction m with
     | zero => exact fun v => ⟨0, v, by simp⟩
@@ -122,13 +140,19 @@ theorem denseIn_of_residue {K : Type} [Field K] (T : CDVR) (io : K →+* T.Fr) (
   field_simp
   linear_combination (algebraMap T.V T.Fr u) * e - (algebraMap T.V T.Fr v) * hu
 
-theorem denseIn_of_initial {K : Type} [Field K] [NumberField K] (w : HeightOneSpectrum (𝓞 K)) (T₀ : CDVR)
-    (io₀ : K →+* T₀.Fr)
-    (hini : ∀ (T : CDVR) (io : K →+* T.Fr) (e : ℕ), OverLa w T.V io e → ∃ (g : T₀.V →+* T.V) (χ : T₀.Fr →+* T.Fr),
-      IsLocalHom g ∧ χ.comp io₀ = io ∧ χ.comp (algebraMap T₀.V T₀.Fr) = (algebraMap T.V T.Fr).comp g ∧
-        ∀ ϖ : T₀.V, Irreducible ϖ → vV (K' := T.Fr) T.V (algebraMap T.V T.Fr (g ϖ)) = e) : DenseIn T₀ io₀ := by
-  obtain ⟨hdvr, -⟩ := isDiscreteValuationRing_and_finite_residueField_valuationSubringAtPrime K w
-    (Ring.HasFiniteQuotients.finiteQuotient w.ne_bot)
+theorem denseIn_of_initial
+    {K : Type} [Field K] [NumberField K]
+    (w : HeightOneSpectrum (𝓞 K)) (T₀ : CDVR) (io₀ : K →+* T₀.Fr)
+    (hini : ∀ (T : CDVR) (io : K →+* T.Fr) (e : ℕ),
+      OverLa w T.V io e
+        → ∃ (g : T₀.V →+* T.V) (χ : T₀.Fr →+* T.Fr),
+          IsLocalHom g ∧ χ.comp io₀ = io
+            ∧ χ.comp (algebraMap T₀.V T₀.Fr) = (algebraMap T.V T.Fr).comp g
+            ∧ ∀ ϖ : T₀.V, Irreducible ϖ → vV (K' := T.Fr) T.V (algebraMap T.V T.Fr (g ϖ)) = e)
+    : DenseIn T₀ io₀ := by
+  obtain ⟨hdvr, -⟩ :=
+    isDiscreteValuationRing_and_finite_residueField_valuationSubringAtPrime K w
+      (Ring.HasFiniteQuotients.finiteQuotient w.ne_bot)
   let O := w.valuationSubringAtPrime K
   let V := AdicCompletion (IsLocalRing.maximalIdeal O) O
   have hinj0 : Function.Injective (algebraMap O V) := algebraMap_adicCompletion_injective_of_dvr O
@@ -141,20 +165,23 @@ theorem denseIn_of_initial {K : Type} [Field K] [NumberField K] (w : HeightOneSp
     (IsFractionRing.lift_algebraMap hinj x).symm
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible O
   have hπV : Irreducible (algebraMap O V π) := irreducible_algebraMap_adicCompletion_of_dvr hπ
-  have ho : OverLa w T.V io 1 := GlobalTheory.PlaceCompletion.overLa_one_of_irreducible io (algebraMap O V) hio hπ hπV
-  have hD : DenseIn T io := denseIn_of_residue T io _ hπV π (hio π) fun v => by
-    obtain ⟨r, hr⟩ := (AdicCompletion.residueField_map_bijective O).2 (IsLocalRing.residue V v)
-    obtain ⟨o, rfl⟩ := IsLocalRing.residue_surjective r
-    have h1 : v - algebraMap O V o ∈ IsLocalRing.maximalIdeal V := by
-      rw [← IsLocalRing.residue_eq_zero_iff, map_sub, ← hr, sub_eq_zero]
-      rfl
-    rw [hπV.maximalIdeal_eq, Ideal.mem_span_singleton] at h1
-    obtain ⟨h, e⟩ := h1
-    refine ⟨o, h, ?_⟩
-    have e' : v = algebraMap O V o + algebraMap O V π * h := by rw [← e]; ring
-    exact (congrArg (algebraMap V (FractionRing V)) e').trans (by rw [map_add (f := _), hio])
+  have ho : OverLa w T.V io 1 :=
+    GlobalTheory.PlaceCompletion.overLa_one_of_irreducible io (algebraMap O V) hio hπ hπV
+  have hD : DenseIn T io :=
+    denseIn_of_residue T io _ hπV π (hio π) fun v => by
+      obtain ⟨r, hr⟩ := (AdicCompletion.residueField_map_bijective O).2 (IsLocalRing.residue V v)
+      obtain ⟨o, rfl⟩ := IsLocalRing.residue_surjective r
+      have h1 : v - algebraMap O V o ∈ IsLocalRing.maximalIdeal V := by
+        rw [← IsLocalRing.residue_eq_zero_iff, map_sub, ← hr, sub_eq_zero]
+        rfl
+      rw [hπV.maximalIdeal_eq, Ideal.mem_span_singleton] at h1
+      obtain ⟨h, e⟩ := h1
+      refine ⟨o, h, ?_⟩
+      have e' : v = algebraMap O V o + algebraMap O V π * h := by rw [← e]; ring
+      exact (congrArg (algebraMap V (FractionRing V)) e').trans (by rw [map_add (f := _), hio])
   obtain ⟨g, χ, -, h1, h2, h3⟩ := hini T io 1 ho
-  have h2' : ∀ a, χ (algebraMap T₀.V T₀.Fr a) = algebraMap T.V T.Fr (g a) := fun a => RingHom.congr_fun h2 a
+  have h2' : ∀ a, χ (algebraMap T₀.V T₀.Fr a) = algebraMap T.V T.Fr (g a) := fun a =>
+    RingHom.congr_fun h2 a
   intro x d hd
   have hd0 : algebraMap T₀.V T₀.Fr d ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective _ _)).2 hd
   have hgd : g d ≠ 0 := fun h => (map_ne_zero χ).2 hd0 (by rw [h2', h, map_zero])
@@ -167,7 +194,9 @@ theorem denseIn_of_initial {K : Type} [Field K] [NumberField K] (w : HeightOneSp
   have e4 : 0 ≤ vV T.V (algebraMap T.V T.Fr h) := by
     by_cases h0 : algebraMap T.V T.Fr h = 0
     · simp [h0, vV]
-    · have := (WithZero.log_le_log (valV_ne_zero h0) one_ne_zero).2 (GlobalTheory.PlaceCompletion.valV_algebraMap_le_one h)
+    · have :=
+        (WithZero.log_le_log (valV_ne_zero h0) one_ne_zero).2
+          (GlobalTheory.PlaceCompletion.valV_algebraMap_le_one h)
       simp only [vV]
       rw [WithZero.log_one] at this
       omega
@@ -178,12 +207,16 @@ theorem denseIn_of_initial {K : Type} [Field K] [NumberField K] (w : HeightOneSp
   field_simp
   ring
 
-theorem DenseIn.matrix {K : Type} [Field K] {T : CDVR} {io : K →+* T.Fr} (hD : DenseIn T io) {n : Type} [Fintype n]
-    [DecidableEq n] (g : Matrix n n T.Fr) (hg : g.det ≠ 0) :
-    ∃ (B : Matrix n n K) (Y : Matrix n n T.V), B.det ≠ 0 ∧ IsUnit Y.det ∧
-      g = B.map io * Y.map (algebraMap T.V T.Fr) := by
-  obtain ⟨d₀, hd₀⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors T.V)
-    fun p : n × n => g⁻¹ p.1 p.2
+theorem DenseIn.matrix
+    {K : Type} [Field K]
+    {T : CDVR} {io : K →+* T.Fr} (hD : DenseIn T io)
+    {n : Type} [Fintype n] [DecidableEq n]
+    (g : Matrix n n T.Fr) (hg : g.det ≠ 0)
+    : ∃ (B : Matrix n n K) (Y : Matrix n n T.V),
+      B.det ≠ 0 ∧ IsUnit Y.det ∧ g = B.map io * Y.map (algebraMap T.V T.Fr) := by
+  obtain ⟨d₀, hd₀⟩ :=
+    IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors T.V) fun p : n × n =>
+      g⁻¹ p.1 p.2
   choose A hA using hd₀
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible T.V
   choose B h hB using fun i j => hD (g i j) (π * d₀) (mul_ne_zero hπ.ne_zero (nonZeroDivisors.ne_zero d₀.2))
@@ -201,14 +234,17 @@ theorem DenseIn.matrix {K : Type} [Field K] {T : CDVR} {io : K →+* T.Fr} (hD :
     rw [this]
     simp
   have e1 : (Matrix.of B).map io = g * Y'.map (algebraMap T.V T.Fr) := by
-    have e2 : Y'.map (algebraMap T.V T.Fr) = 1 - algebraMap T.V T.Fr π •
-        (A'.map (algebraMap T.V T.Fr) * (Matrix.of h).map (algebraMap T.V T.Fr)) := by
+    have e2
+        : Y'.map (algebraMap T.V T.Fr)
+          = 1
+            - algebraMap T.V T.Fr π
+              • (A'.map (algebraMap T.V T.Fr) * (Matrix.of h).map (algebraMap T.V T.Fr)) := by
       rw [← Matrix.map_mul]
       ext i j
-      simp only [Y', Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul, map_sub, map_mul,
-        Matrix.one_apply, apply_ite (algebraMap T.V T.Fr), map_one, map_zero]
-    rw [e2, hA', Matrix.mul_sub, Matrix.mul_one, Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_smul, ← Matrix.mul_assoc,
-      Matrix.mul_nonsing_inv _ hg.isUnit, Matrix.one_mul]
+      simp only [Y', Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul, map_sub,
+        map_mul, Matrix.one_apply, apply_ite (algebraMap T.V T.Fr), map_one, map_zero]
+    rw [e2, hA', Matrix.mul_sub, Matrix.mul_one, Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_smul,
+      ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hg.isUnit, Matrix.one_mul]
     ext i j
     simp only [Matrix.map_apply, Matrix.of_apply, Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul]
     rw [hB i j]
@@ -216,21 +252,26 @@ theorem DenseIn.matrix {K : Type} [Field K] {T : CDVR} {io : K →+* T.Fr} (hD :
     ring
   refine ⟨Matrix.of B, Y'⁻¹, fun h0 => ?_, Matrix.isUnit_nonsing_inv_det _ hY, ?_⟩
   · have e3 := congrArg Matrix.det e1
-    rw [Matrix.det_mul, ← RingHom.mapMatrix_apply, ← RingHom.map_det, h0, map_zero, ← RingHom.mapMatrix_apply,
-      ← RingHom.map_det] at e3
+    rw [Matrix.det_mul, ← RingHom.mapMatrix_apply, ← RingHom.map_det, h0, map_zero,
+        ← RingHom.mapMatrix_apply, ← RingHom.map_det]
+      at e3
     exact mul_ne_zero hg (hY.map _).ne_zero e3.symm
   · rw [e1, Matrix.mul_assoc, ← Matrix.map_mul, Matrix.mul_nonsing_inv _ hY]
     simp
 
 end Dense
 
-theorem frChg_of_integral (T : CDVR) (io : c.F →+* T.Fr) : letI := io.toAlgebra
-    ∀ y y' : FrPt Xo c T.Fr, Integral T io y → Integral T io y' → y'.x = y.x →
-      ∃ (A : Mats Dw T.V) (u : T.Vˣ), (∀ τ, IsUnit (A τ).det) ∧
-        FrChg (fun τ => (A τ).map (algebraMap T.V T.Fr)) (algebraMap T.V T.Fr u) y y' := by
+theorem frChg_of_integral (T : CDVR) (io : c.F →+* T.Fr)
+    : letI := io.toAlgebra
+      ∀ y y' : FrPt Xo c T.Fr,
+        Integral T io y → Integral T io y' → y'.x = y.x
+          → ∃ (A : Mats Dw T.V) (u : T.Vˣ),
+            (∀ τ, IsUnit (A τ).det)
+              ∧ FrChg (fun τ => (A τ).map (algebraMap T.V T.Fr)) (algebraMap T.V T.Fr u) y y' := by
   letI := io.toAlgebra
   intro y y' hy hy' hx
-  have hA := allTest_of_secBaseChange GlobalTheory.abelianSchemeLaws_all.1.secBaseChange E H Dw l Xo c T.Fr
+  have hA :=
+    allTest_of_secBaseChange GlobalTheory.abelianSchemeLaws_all.1.secBaseChange E H Dw l Xo c T.Fr
   obtain ⟨h1, h2⟩ := intLatU_holds E H Dw l Xo c T io ⟨y, hA y, hy⟩ ⟨y', hA y', hy'⟩ hx
   choose A hAu hAc using h1
   obtain ⟨g, a, -, hc⟩ := (frChg_exists_unique E H Dw l Xo c T.Fr y y').1 hx
@@ -238,26 +279,35 @@ theorem frChg_of_integral (T : CDVR) (io : c.F →+* T.Fr) : letI := io.toAlgebr
   have hid : spMap (RingHom.id T.Fr) = 𝟙 _ := by simp [spMap]
   have hv := h2 a pm p1 (p2.trans (by rw [hid]; exact Category.comp_id _)) p3
   obtain ⟨u, hu⟩ := GlobalTheory.PlaceCompletion.exists_algebraMap_eq_of_valV_le_one hv.le
-  obtain ⟨u, rfl⟩ := GlobalTheory.Reg.GenInt.isUnit_of_vV T u (hu ▸ a.ne_zero) (by rw [hu]; simp [vV, hv])
+  obtain ⟨u, rfl⟩ :=
+    GlobalTheory.Reg.GenInt.isUnit_of_vV T u (hu ▸ a.ne_zero) (by rw [hu]; simp [vV, hv])
   exact ⟨A, u, hAu, hx, hAc, hu ▸ hc.2.2⟩
 
-theorem exists_integral (hr : 1 ≤ Dw.p + Dw.q) (hg : ∀ p : ℕ, p.Prime → l.GoodAt p) (y₀ : FrPt Xo c c.F)
-    (w : HeightOneSpectrum (𝓞 c.F)) (T : CDVR) (io : c.F →+* T.Fr) (e : ℕ) (ho : OverLa w T.V io e) :
-    letI := io.toAlgebra
-    ∃ y z : FrPt Xo c T.Fr, Integral T io y ∧ FrMap (Algebra.ofId c.F T.Fr) y₀ z ∧ y.x = z.x := by
+theorem exists_integral
+    (hr : 1 ≤ Dw.p + Dw.q) (hg : ∀ p : ℕ, p.Prime → l.GoodAt p) (y₀ : FrPt Xo c c.F)
+    (w : HeightOneSpectrum (𝓞 c.F))
+    (T : CDVR) (io : c.F →+* T.Fr)
+    (e : ℕ) (ho : OverLa w T.V io e)
+    : letI := io.toAlgebra
+      ∃ y z : FrPt Xo c T.Fr, Integral T io y ∧ FrMap (Algebra.ofId c.F T.Fr) y₀ z ∧ y.x = z.x := by
   have hB := GlobalTheory.abelianSchemeLaws_all.1.secBaseChange
   have hT := GlobalTheory.abelianSchemeLaws_all.2.secTwist
   obtain ⟨O, _, β, Y, -, hY, hb⟩ :=
-    modelAtSt_of_good GlobalTheory.partI_closed GlobalTheory.Moduli.moduli_scheme_exists E H Dw l Xo c hr hg w
+    modelAtSt_of_good GlobalTheory.partI_closed GlobalTheory.Moduli.moduli_scheme_exists E H Dw l Xo
+      c hr hg w
   obtain ⟨b₀, hb₀⟩ := hb T io e ho
   letI := io.toAlgebra
   obtain ⟨z₀, hz₀⟩ :=
-    GlobalTheory.Frames.FramedBaseChange.exists_frMap hB E H Dw l Xo c c.F T.Fr (Algebra.ofId c.F T.Fr) y₀
-  obtain ⟨y₁, t, hbor⟩ := intFr_of_model (GlobalTheory.intFrames_of_laws hB hT E H Dw l Xo c) T io Y hY b₀ hb₀ z₀
+    GlobalTheory.Frames.FramedBaseChange.exists_frMap hB E H Dw l Xo c c.F T.Fr
+      (Algebra.ofId c.F T.Fr) y₀
+  obtain ⟨y₁, t, hbor⟩ :=
+    intFr_of_model (GlobalTheory.intFrames_of_laws hB hT E H Dw l Xo c) T io Y hY b₀ hb₀ z₀
   exact ⟨y₁.1, z₀, y₁.2.2, hz₀, hbor.1⟩
 
-theorem exists_locFr (hr : 1 ≤ Dw.p + Dw.q) (hg : ∀ p : ℕ, p.Prime → l.GoodAt p) (y₀ : FrPt Xo c c.F)
-    (w : HeightOneSpectrum (𝓞 c.F)) : ∃ a B, LocFr y₀ w a B := by
+theorem exists_locFr
+    (hr : 1 ≤ Dw.p + Dw.q) (hg : ∀ p : ℕ, p.Prime → l.GoodAt p) (y₀ : FrPt Xo c c.F)
+    (w : HeightOneSpectrum (𝓞 c.F))
+    : ∃ a B, LocFr y₀ w a B := by
   have hB := GlobalTheory.abelianSchemeLaws_all.1.secBaseChange
   obtain ⟨T₀, io₀, ho₀, -, hini⟩ := GlobalTheory.PlaceCompletion.exists_initial_completion c.F w
   have hD := denseIn_of_initial w T₀ io₀ hini
@@ -267,19 +317,25 @@ theorem exists_locFr (hr : 1 ≤ Dw.p + Dw.q) (hg : ∀ p : ℕ, p.Prime → l.G
   choose B Y₁ hB0 hY₁ hBY using fun τ => hD.matrix (g₁ τ)ᵀ (by rw [Matrix.det_transpose]; exact (hg₁ τ).ne_zero)
   obtain ⟨a, u₁, ha, hu₁, hau⟩ := hD.matrix (Matrix.of fun _ _ : Unit => (a₁ : T₀.Fr)) (by simp)
   rw [Matrix.det_unique] at ha hu₁
-  have hau' : (a₁ : T₀.Fr) = io₀ (a default default) * algebraMap T₀.V T₀.Fr (u₁ default default) := by
+  have hau'
+      : (a₁ : T₀.Fr) = io₀ (a default default) * algebraMap T₀.V T₀.Fr (u₁ default default) := by
     simpa [Matrix.mul_apply] using congrFun (congrFun hau default) default
   refine ⟨a default default, B, ha, hB0, fun T io e ho => ?_⟩
   obtain ⟨φ, χ, -, hio, hχ, -⟩ := hini T io e ho
   subst hio
   letI := (χ.comp io₀).toAlgebra
   intro y z hy hz hx
-  have hχ' : ∀ s, χ (algebraMap T₀.V T₀.Fr s) = algebraMap T.V T.Fr (φ s) := fun s => RingHom.congr_fun hχ s
+  have hχ' : ∀ s, χ (algebraMap T₀.V T₀.Fr s) = algebraMap T.V T.Fr (φ s) := fun s =>
+    RingHom.congr_fun hχ s
   let ψ : T₀.Fr →ₐ[c.F] T.Fr := { χ with commutes' := fun _ => rfl }
-  obtain ⟨y₂, hy₂⟩ := GlobalTheory.Frames.FramedBaseChange.exists_frMap hB E H Dw l Xo c T₀.Fr T.Fr ψ y₁
+  obtain ⟨y₂, hy₂⟩ :=
+    GlobalTheory.Frames.FramedBaseChange.exists_frMap hB E H Dw l Xo c T₀.Fr T.Fr ψ y₁
   have hi₂ : Integral T (χ.comp io₀) y₂ :=
-    GlobalTheory.PlaceInt.Ext.integral_of_frMap T₀ T io₀ χ φ (fun s => (hχ' s).symm) ψ y₁ y₂ rfl hy₂ hy₁
-  obtain ⟨z', hz'⟩ := GlobalTheory.Frames.FramedBaseChange.exists_frMap hB E H Dw l Xo c T₀.Fr T.Fr ψ z₀
+    GlobalTheory.PlaceInt.Ext.integral_of_frMap T₀ T io₀ χ φ
+      (fun s => (hχ' s).symm)
+      ψ y₁ y₂ rfl hy₂ hy₁
+  obtain ⟨z', hz'⟩ :=
+    GlobalTheory.Frames.FramedBaseChange.exists_frMap hB E H Dw l Xo c T₀.Fr T.Fr ψ z₀
   have hzz : z' = z := by
     have h1 := Formalism.L2.Pj.frMap_trans (Xo := Xo) (c := c) _ _ _ _ ψ y₀ z₀ z' hz₀ hz'
     have h2 : ψ.comp (Algebra.ofId c.F T₀.Fr) = Algebra.ofId c.F T.Fr := Subsingleton.elim _ _
@@ -295,8 +351,12 @@ theorem exists_locFr (hr : 1 ≤ Dw.p + Dw.q) (hg : ∀ p : ℕ, p.Prime → l.G
     exact ((hY₁ τ).map φ).mul (hA τ)
   · convert h4 using 1
     · funext τ
-      have e1 : (g₁ τ).map ψ = ((B τ).map (χ.comp io₀) * ((Y₁ τ).map φ).map (algebraMap T.V T.Fr))ᵀ := by
-        have e2 : ((g₁ τ)ᵀ).map χ = (B τ).map (χ.comp io₀) * ((Y₁ τ).map φ).map (algebraMap T.V T.Fr) := by
+      have e1
+          : (g₁ τ).map ψ
+            = ((B τ).map (χ.comp io₀) * ((Y₁ τ).map φ).map (algebraMap T.V T.Fr))ᵀ := by
+        have e2
+            : ((g₁ τ)ᵀ).map χ
+              = (B τ).map (χ.comp io₀) * ((Y₁ τ).map φ).map (algebraMap T.V T.Fr) := by
           rw [hBY τ, Matrix.map_mul, Matrix.map_map, Matrix.map_map, Matrix.map_map]
           congr 2
           exact funext hχ'
@@ -308,8 +368,9 @@ theorem exists_locFr (hr : 1 ≤ Dw.p + Dw.q) (hg : ∀ p : ℕ, p.Prime → l.G
       rw [e3, hau', map_mul χ, hχ', ← hu₂, Units.val_mul, map_mul, RingHom.comp_apply]
       ring
 
-theorem finite_not_locFr_one (hq : Dw.q = 0) (hp : 1 ≤ Dw.p) (hg : ∀ p : ℕ, p.Prime → l.GoodAt p) (y₀ : FrPt Xo c c.F) :
-    {w | ¬ LocFr y₀ w 1 1}.Finite := by
+theorem finite_not_locFr_one
+    (hq : Dw.q = 0) (hp : 1 ≤ Dw.p) (hg : ∀ p : ℕ, p.Prime → l.GoodAt p) (y₀ : FrPt Xo c c.F)
+    : {w | ¬ LocFr y₀ w 1 1}.Finite := by
   obtain ⟨S, hS, h⟩ := exists_finset_integral_of_definite E H Dw l Xo c hq hp hg y₀
   refine (S.finite_toSet.biUnion fun s hs => finite_vAdd (hS s hs)).subset fun w hw => ?_
   by_contra hn
@@ -317,9 +378,12 @@ theorem finite_not_locFr_one (hq : Dw.q = 0) (hp : 1 ≤ Dw.p) (hg : ∀ p : ℕ
   refine hw ⟨one_ne_zero, fun τ => by simp, fun T io e ho => ?_⟩
   letI := io.toAlgebra
   intro y z hy hz hx
-  have hz' := h T io (fun s hs => by
-    have h0 : vLa w s = 0 := by exact_mod_cast hn s hs
-    rw [ho.2, h0, mul_zero]) z hz
+  have hz' :=
+    h T io
+      (fun s hs => by
+        have h0 : vLa w s = 0 := by exact_mod_cast hn s hs
+        rw [ho.2, h0, mul_zero])
+      z hz
   obtain ⟨A, u, hA, hc⟩ := frChg_of_integral T io z y hz' hy hx
   refine ⟨fun τ => (A τ)ᵀ, u, fun τ => by rw [Matrix.det_transpose]; exact hA τ, ?_⟩
   convert (preTransparency := .reducible) hc using 1
@@ -339,12 +403,25 @@ theorem nonempty_ptData (h : DefCase U ξ) (Z : Comp Xo c) : Nonempty (PtData Z)
       exact ⟨a, B, hl, fun h' => absurd h' hw⟩
   choose a B hl hl' using key
   choose N X hX using exists_archFr hr y₀
-  exact ⟨⟨y₀, h1, h2, a, B, hl, (finite_not_locFr_one h.q h.p h.good y₀).subset fun w hw h' => hw (hl' w h'), N, X, hX⟩⟩
+  exact ⟨⟨
+    y₀,
+    h1,
+    h2,
+    a,
+    B,
+    hl,
+    (finite_not_locFr_one h.q h.p h.good y₀).subset fun w hw h' => hw (hl' w h'),
+    N,
+    X,
+    hX
+  ⟩⟩
 
-theorem nonempty_ptData_all : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
-    (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (r : ℕ) (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (ξ : ℝ),
-    DefCase U ξ → ∀ Z : Comp Xo c, Nonempty (PtData Z) :=
-  fun _ _ _ _ _ _ _ _ _ _ _ _ h Z => nonempty_ptData h Z
+theorem nonempty_ptData_all
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (r : ℕ) (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r) (ξ : ℝ),
+      DefCase U ξ → ∀ Z : Comp Xo c, Nonempty (PtData Z) := fun _ _ _ _ _ _ _ _ _ _ _ _ h Z =>
+  nonempty_ptData h Z
 
 end GlobalTheory.DefPt.Model
 

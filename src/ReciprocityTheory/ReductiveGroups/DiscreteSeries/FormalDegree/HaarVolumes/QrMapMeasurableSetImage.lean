@@ -155,32 +155,42 @@ theorem qrMap_injOn : Set.InjOn (qrMap (N := N)) (Set.univ ×ˢ triPos N) := by
   rw [hk']
 
 private theorem qrMap_measurableSet_image_lemma (N : ℕ) : PolishSpace (UNgrp N) := by
-  obtain ⟨C, hC, hmem⟩ : ∃ C : Set (Fin N → Fin N → ℂ), IsClosed C ∧
-      ∀ Z, Z ∈ C ↔ (Matrix.of Z)ᴴ * Matrix.of Z = 1 :=
-    ⟨{Z | (Matrix.of Z)ᴴ * Matrix.of Z = 1},
-      isClosed_eq ((continuous_id : Continuous fun Z : Fin N → Fin N → ℂ => Matrix.of Z).matrix_conjTranspose.matrix_mul
-        (continuous_id : Continuous fun Z : Fin N → Fin N → ℂ => Matrix.of Z)) continuous_const,
-      fun Z => Iff.rfl⟩
+  obtain ⟨C, hC, hmem⟩
+      : ∃ C : Set (Fin N → Fin N → ℂ),
+        IsClosed C ∧ ∀ Z, Z ∈ C ↔ (Matrix.of Z)ᴴ * Matrix.of Z = 1 := ⟨
+    {Z | (Matrix.of Z)ᴴ * Matrix.of Z = 1},
+    isClosed_eq
+      ((continuous_id
+          : Continuous fun Z : Fin N → Fin N → ℂ => Matrix.of Z).matrix_conjTranspose.matrix_mul
+        (continuous_id : Continuous fun Z : Fin N → Fin N → ℂ => Matrix.of Z))
+      continuous_const,
+    fun Z => Iff.rfl
+  ⟩
   haveI : PolishSpace C := hC.polishSpace
   have hCt : Continuous (fun Z : C => (Z : Fin N → Fin N → ℂ)) := continuous_subtype_val
-  let e : UNgrp N ≃ₜ C :=
-    { toFun := fun k => ⟨Matrix.of.symm (toM k), (hmem _).2 (qrA_unitary k)⟩
-      invFun := fun Z => ⟨⟨Matrix.of Z.1, (Matrix.of Z.1)ᴴ, mul_eq_one_comm.1 ((hmem _).1 Z.2),
-          (hmem _).1 Z.2⟩, by
+  let e : UNgrp N ≃ₜ C := {
+    toFun := fun k => ⟨Matrix.of.symm (toM k), (hmem _).2 (qrA_unitary k)⟩
+    invFun := fun Z => ⟨
+      ⟨Matrix.of Z.1, (Matrix.of Z.1)ᴴ, mul_eq_one_comm.1 ((hmem _).1 Z.2), (hmem _).1 Z.2⟩,
+      by
         show (Matrix.of Z.1)ᴴ * Jm (fun _ : Fin N => true) * Matrix.of Z.1 = Jm (fun _ : Fin N => true)
         rw [qrA_Jm_one, Matrix.mul_one]
-        exact (hmem _).1 Z.2⟩
-      left_inv := fun k => Subtype.ext (Units.ext rfl)
-      right_inv := fun Z => rfl
-      continuous_toFun := continuous_induced_rng.2
-        (Units.continuous_val.comp continuous_subtype_val :
-          Continuous fun k : UNgrp N => ((k : (Matrix (Fin N) (Fin N) ℂ)ˣ) : Matrix (Fin N) (Fin N) ℂ))
-      continuous_invFun := continuous_induced_rng.2 (Units.continuous_iff.2
-        ⟨hCt, hCt.matrix_conjTranspose⟩) }
+        exact (hmem _).1 Z.2
+    ⟩
+    left_inv := fun k => Subtype.ext (Units.ext rfl)
+    right_inv := fun Z => rfl
+    continuous_toFun :=
+      continuous_induced_rng.2
+        (Units.continuous_val.comp continuous_subtype_val : Continuous fun k : UNgrp N =>
+          ((k : (Matrix (Fin N) (Fin N) ℂ)ˣ) : Matrix (Fin N) (Fin N) ℂ))
+    continuous_invFun :=
+      continuous_induced_rng.2 (Units.continuous_iff.2 ⟨hCt, hCt.matrix_conjTranspose⟩)
+  }
   exact e.isClosedEmbedding.polishSpace
 
-theorem qrMap_measurableSet_image (S : Set (UNgrp N × TriCo N)) (hS : MeasurableSet S)
-    (hS0 : S ⊆ Set.univ ×ˢ triPos N) : MeasurableSet (qrMap '' S) := by
+theorem qrMap_measurableSet_image
+    (S : Set (UNgrp N × TriCo N)) (hS : MeasurableSet S) (hS0 : S ⊆ Set.univ ×ˢ triPos N)
+    : MeasurableSet (qrMap '' S) := by
   haveI : PolishSpace (UNgrp N) := qrMap_measurableSet_image_lemma N
   exact hS.image_of_continuousOn_injOn qrMap_continuous.continuousOn (qrMap_injOn.mono hS0)
 
@@ -268,8 +278,8 @@ lemma qrA_exists (Z : Matrix (Fin N) (Fin N) ℂ) (hZ : Z.det ≠ 0) :
     ring
   exact ⟨Q, triCoOf R, hQ, ht, by rw [hupR]; exact hQR⟩
 
-theorem qrMap_image :
-    qrMap '' (Set.univ ×ˢ triPos N) = {Z : Fin N → Fin N → ℂ | (Matrix.of Z).det ≠ 0} := by
+theorem qrMap_image
+    : qrMap '' (Set.univ ×ˢ triPos N) = {Z : Fin N → Fin N → ℂ | (Matrix.of Z).det ≠ 0} := by
   ext Z
   constructor
   · rintro ⟨⟨k, t⟩, ⟨-, ht⟩, rfl⟩

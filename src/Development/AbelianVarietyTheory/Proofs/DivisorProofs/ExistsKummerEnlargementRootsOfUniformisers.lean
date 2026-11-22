@@ -20,9 +20,11 @@ namespace GlobalTheory.KummerEnlarge
 
 open GlobalTheory.NormalApprox
 
-theorem height_comap_eq_one_of_goingDown {A B : Type} [CommRing A] [IsDomain A] [CommRing B]
-    [Algebra A B] [Algebra.HasGoingDown A B] (Q : Ideal B) [Q.IsPrime] (hQ : Q.height = 1)
-    (hne : Q.comap (algebraMap A B) ≠ ⊥) : (Q.comap (algebraMap A B)).height = 1 := by
+theorem height_comap_eq_one_of_goingDown
+    {A B : Type} [CommRing A] [IsDomain A] [CommRing B] [Algebra A B] [Algebra.HasGoingDown A B]
+    (Q : Ideal B) [Q.IsPrime]
+    (hQ : Q.height = 1) (hne : Q.comap (algebraMap A B) ≠ ⊥)
+    : (Q.comap (algebraMap A B)).height = 1 := by
   set p : Ideal A := Q.comap (algebraMap A B) with hp
   haveI : p.IsPrime := Ideal.comap_isPrime _ Q
   haveI : Q.LiesOver p := ⟨rfl⟩
@@ -37,8 +39,8 @@ theorem height_comap_eq_one_of_goingDown {A B : Type} [CommRing A] [IsDomain A] 
     obtain ⟨P₁, hP₁Q, hP₁, hP₁o⟩ := Ideal.exists_ideal_lt_liesOver_of_lt (p := r) (q := p) Q hrp
     haveI := hP₁
     haveI : (⊥ : Ideal A).IsPrime := Ideal.isPrime_bot
-    obtain ⟨P₀, hP₀P₁, hP₀, -⟩ := Ideal.exists_ideal_lt_liesOver_of_lt (p := ⊥) (q := r) P₁
-      (bot_lt_iff_ne_bot.mpr hr0)
+    obtain ⟨P₀, hP₀P₁, hP₀, -⟩ :=
+      Ideal.exists_ideal_lt_liesOver_of_lt (p := ⊥) (q := r) P₁ (bot_lt_iff_ne_bot.mpr hr0)
     haveI := hP₀
     have h1 := Ideal.height_add_one_le_of_lt_of_isPrime hP₀P₁
     have h2 := Ideal.height_add_one_le_of_lt_of_isPrime hP₁Q
@@ -50,9 +52,10 @@ theorem height_comap_eq_one_of_goingDown {A B : Type} [CommRing A] [IsDomain A] 
     have := Ideal.height_add_one_le_of_lt_of_isPrime (bot_lt_iff_ne_bot.mpr hne)
     simpa using this
 
-theorem exists_uniformiser (A : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A]
-    [IsIntegrallyClosed A] (p : Ideal A) :
-    ∃ π : A, ∀ [p.IsPrime], p.height = 1 → Irreducible (algebraMap A (Localization.AtPrime p) π) := by
+theorem exists_uniformiser
+    (A : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A] (p : Ideal A)
+    : ∃ π : A, ∀ [p.IsPrime],
+      p.height = 1 → Irreducible (algebraMap A (Localization.AtPrime p) π) := by
   by_cases h : p.IsPrime ∧ p.height = 1
   · obtain ⟨hp, h1⟩ := h
     haveI := GlobalTheory.localizationAtPrime_isDiscreteValuationRing_of_height_eq_one A p h1
@@ -60,7 +63,8 @@ theorem exists_uniformiser (A : Type) [CommRing A] [IsDomain A] [IsNoetherianRin
     obtain ⟨⟨x, s⟩, hxs⟩ := IsLocalization.surj p.primeCompl ϖ
     refine ⟨x, fun _ => ?_⟩
     have hu : IsUnit (algebraMap A (Localization.AtPrime p) s) := IsLocalization.map_units _ s
-    have e : algebraMap A (Localization.AtPrime p) x = ϖ * algebraMap A (Localization.AtPrime p) s :=
+    have e
+        : algebraMap A (Localization.AtPrime p) x = ϖ * algebraMap A (Localization.AtPrime p) s :=
       hxs.symm
     rw [e]
     exact (irreducible_mul_isUnit hu).mpr hϖ
@@ -72,37 +76,50 @@ namespace GlobalTheory.KummerEnlarge
 
 open GlobalTheory.NormalApprox
 
-theorem exists_kummer_enlargement : ∀ (T : Type) [CommRing T] [IsDomain T] [IsLocalRing T], GlobalTheory.LocAcyc.AbsIntClosed T →
-    ∀ (q : ℕ), 0 < q → IsUnit (q : T) →
-    ∀ (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A] [IsIntegrallyClosed A]
-      [Algebra.EssFiniteType ℤ A] (i : A →+* T), Function.Injective i → IsLocalHom i →
-    ∀ a : A, a ≠ 0 →
-    ∃ (A₁ : Type) (_ : CommRing A₁) (_ : IsDomain A₁) (_ : IsLocalRing A₁) (_ : IsNoetherianRing A₁)
-      (_ : IsIntegrallyClosed A₁) (_ : Algebra.EssFiniteType ℤ A₁) (f : A →+* A₁) (i₁ : A₁ →+* T),
-      Function.Injective f ∧ Function.Injective i₁ ∧ IsLocalHom i₁ ∧ i₁.comp f = i ∧
-      ∀ (p₁ : Ideal A₁) [p₁.IsPrime], p₁.height = 1 → f a ∈ p₁ →
-        (p₁.comap f).height = 1 ∧
-        ∃ π : A, Irreducible (algebraMap A (Localization.AtPrime (p₁.comap f)) π) ∧
-          ∃ y : A₁, y ^ q = f π := by
+theorem exists_kummer_enlargement
+    : ∀ (T : Type) [CommRing T] [IsDomain T] [IsLocalRing T],
+      GlobalTheory.LocAcyc.AbsIntClosed T
+        → ∀ (q : ℕ),
+          0 < q → IsUnit (q : T)
+            → ∀ (A : Type) [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A]
+                [IsIntegrallyClosed A] [Algebra.EssFiniteType ℤ A] (i : A →+* T),
+              Function.Injective i → IsLocalHom i
+                → ∀ a : A,
+                  a ≠ 0
+                    → ∃ (A₁ : Type) (_ : CommRing A₁) (_ : IsDomain A₁) (_ : IsLocalRing A₁)
+                        (_ : IsNoetherianRing A₁) (_ : IsIntegrallyClosed A₁)
+                        (_ : Algebra.EssFiniteType ℤ A₁) (f : A →+* A₁) (i₁ : A₁ →+* T),
+                      Function.Injective f ∧ Function.Injective i₁ ∧ IsLocalHom i₁ ∧ i₁.comp f = i
+                        ∧ ∀ (p₁ : Ideal A₁) [p₁.IsPrime],
+                          p₁.height = 1 → f a ∈ p₁
+                            → (p₁.comap f).height = 1
+                              ∧ ∃ π : A,
+                                Irreducible (algebraMap A (Localization.AtPrime (p₁.comap f)) π)
+                                  ∧ ∃ y : A₁, y ^ q = f π := by
   intro T _ _ _ hT q hq hqT A _ _ _ _ _ _ i hi hloc a ha
   classical
   haveI : IsIntegrallyClosed T := GlobalTheory.VertUnitsNoeth.isIntegrallyClosed_of_absIntClosed' T hT
   choose π hπ using exists_uniformiser A
   have hy : ∀ p : Ideal A, ∃ y : T, y ^ q = i (π p) := by
     intro p
-    obtain ⟨y, hy⟩ := hT (X ^ q - C (i (π p))) (monic_X_pow_sub_C _ hq.ne')
-      (by rw [natDegree_X_pow_sub_C _]; exact hq)
+    obtain ⟨y, hy⟩ :=
+      hT (X ^ q - C (i (π p))) (monic_X_pow_sub_C _ hq.ne')
+        (by rw [natDegree_X_pow_sub_C _]; exact hq)
     refine ⟨y, ?_⟩
     simpa [sub_eq_zero] using hy
   choose y hy using hy
   have hfin := Ideal.finite_minimalPrimes_of_isNoetherianRing A (Ideal.span {a})
   set S : Finset T := (Algebra.EssFiniteType.finset ℤ A).image i ∪ hfin.toFinset.image y with hS
 
-  have hgen : ∀ z ∈ Algebra.adjoin ℤ ((Algebra.EssFiniteType.finset ℤ A : Finset A) : Set A),
-      i z ∈ gen S := by
+  have hgen
+      : ∀ z ∈ Algebra.adjoin ℤ ((Algebra.EssFiniteType.finset ℤ A : Finset A) : Set A),
+        i z ∈ gen S := by
     intro z hz
-    have h2 : i.toIntAlgHom z ∈ (Algebra.adjoin ℤ ((Algebra.EssFiniteType.finset ℤ A : Finset A) : Set A)).map
-        i.toIntAlgHom := Subalgebra.mem_map.mpr ⟨z, hz, rfl⟩
+    have h2
+        : i.toIntAlgHom z
+          ∈ (Algebra.adjoin ℤ ((Algebra.EssFiniteType.finset ℤ A : Finset A) : Set A)).map
+            i.toIntAlgHom :=
+      Subalgebra.mem_map.mpr ⟨z, hz, rfl⟩
     rw [AlgHom.map_adjoin] at h2
     refine Algebra.adjoin_mono ?_ h2
     rintro t ⟨u, hu, rfl⟩
@@ -127,9 +144,22 @@ theorem exists_kummer_enlargement : ∀ (T : Type) [CommRing T] [IsDomain T] [Is
   haveI : IsIntegrallyClosed (loc S) :=
     isIntegrallyClosed_of_isLocalization (loc S) (unitsIn S) (unitsIn_le S)
   haveI : IsLocalRing (loc S) := loc_isLocalRing S
-  refine ⟨loc S, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance,
-    GlobalTheory.VertUnitsNoeth.essFiniteType_loc S, f, (loc S).subtype, hfinj, Subtype.val_injective,
-    ⟨fun x hx => isUnit_of_isUnit_coe S x hx⟩, RingHom.ext fun _ => rfl, ?_⟩
+  refine ⟨
+    loc S,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    GlobalTheory.VertUnitsNoeth.essFiniteType_loc S,
+    f,
+    (loc S).subtype,
+    hfinj,
+    Subtype.val_injective,
+    ⟨fun x hx => isUnit_of_isUnit_coe S x hx⟩,
+    RingHom.ext fun _ => rfl,
+    ?_
+  ⟩
   intro p₁ _ hp₁ hfa
   letI : Algebra A (loc S) := f.toAlgebra
   letI : Algebra A T := i.toAlgebra

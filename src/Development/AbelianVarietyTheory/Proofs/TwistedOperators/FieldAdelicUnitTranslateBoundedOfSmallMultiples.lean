@@ -11,8 +11,8 @@ open scoped TensorProduct
 
 namespace GlobalTheory.RegSS
 
-theorem fieldUnitBounded_of_packing (hP : NormOnePacking) (hT : TensorLattice) :
-    FieldUnitBounded := by
+theorem fieldUnitBounded_of_packing (hP : NormOnePacking) (hT : TensorLattice)
+    : FieldUnitBounded := by
   unfold FieldUnitBounded
   intro F B _ _ _ _ _ τ hB hτ
 
@@ -42,14 +42,14 @@ theorem fieldUnitBounded_of_packing (hP : NormOnePacking) (hT : TensorLattice) :
     refine Function.Surjective.countable (f := fun b : B => (⟨ι b, b, rfl⟩ : Λ)) ?_
     rintro ⟨y, b, rfl⟩
     exact ⟨b, rfl⟩
-  have hcoc : ∃ C' : Set (B ⊗[F] AdeleRing (𝓞 F) F), IsCompact C' ∧
-      ∀ x, ∃ l ∈ Λ, x - l ∈ C' := by
+  have hcoc : ∃ C' : Set (B ⊗[F] AdeleRing (𝓞 F) F), IsCompact C' ∧ ∀ x, ∃ l ∈ Λ, x - l ∈ C' := by
     refine ⟨C, hC, fun x => ?_⟩
     obtain ⟨β, hβ⟩ := hcov x
     exact ⟨ι β, ⟨β, rfl⟩, hβ⟩
 
-  obtain ⟨D, hD, hDu⟩ := hP (B ⊗[F] AdeleRing (𝓞 F) F) (sigR τ (AdeleRing (𝓞 F) F))
-    (continuous_sigR τ (AdeleRing (𝓞 F) F)) (sigR_sigR hτ (AdeleRing (𝓞 F) F)) Λ hΛ hcoc
+  obtain ⟨D, hD, hDu⟩ :=
+    hP (B ⊗[F] AdeleRing (𝓞 F) F) (sigR τ (AdeleRing (𝓞 F) F))
+      (continuous_sigR τ (AdeleRing (𝓞 F) F)) (sigR_sigR hτ (AdeleRing (𝓞 F) F)) Λ hΛ hcoc
   refine ⟨D, hD, fun u hu => ?_⟩
   obtain ⟨β, ⟨b, rfl⟩, hβ0, huβ⟩ := hDu u hu
 

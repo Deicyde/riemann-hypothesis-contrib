@@ -25,27 +25,31 @@ theorem mulN_eq_pow (G : Over S) [GrpObj G] (n : ℕ) : mulN G n = 𝟙 G ^ n :=
 theorem isMonHom_mulN (G : Over S) [GrpObj G] [IsCommMonObj G] (n : ℕ) : IsMonHom (mulN G n) := by
   constructor
   · rw [MulUnramified.comp_mulN, one_eq_one, one_pow]
-  · simp only [MulUnramified.comp_mulN, MonObj.mul_eq_mul, MonObj.comp_mul,
-      tensorHom_fst, tensorHom_snd, mul_pow]
+  · simp only [MulUnramified.comp_mulN, MonObj.mul_eq_mul, MonObj.comp_mul, tensorHom_fst,
+      tensorHom_snd, mul_pow]
 
-theorem pullback_map_mulN {S' : Scheme.{0}} (p : S' ⟶ S) (G : Over S) [GrpObj G] (n : ℕ) :
-    (Over.pullback p).map (mulN G n) = mulN ((Over.pullback p).obj G) n := by
+theorem pullback_map_mulN {S' : Scheme.{0}} (p : S' ⟶ S) (G : Over S) [GrpObj G] (n : ℕ)
+    : (Over.pullback p).map (mulN G n) = mulN ((Over.pullback p).obj G) n := by
   rw [mulN_eq_pow, mulN_eq_pow, ← (Over.pullback p).map_id]
   exact map_pow (Over.pullback p).homMonoidHom _ _
 
-theorem isPullback_torsion (G : Over S) [GrpObj G] (n : ℕ) :
-    IsPullback (torsion.ι G n).left (torsion G n).hom (mulN G n).left η[G].left := by
+theorem isPullback_torsion (G : Over S) [GrpObj G] (n : ℕ)
+    : IsPullback (torsion.ι G n).left (torsion G n).hom (mulN G n).left η[G].left := by
   have h := (IsPullback.of_hasPullback (mulN G n) (η : 𝟙_ (Over S) ⟶ G)).map (Over.forget S)
   have e : (pullback.snd (mulN G n) (η : 𝟙_ (Over S) ⟶ G)).left = (torsion G n).hom :=
     (Category.comp_id _).symm.trans (Over.w (pullback.snd (mulN G n) (η : 𝟙_ (Over S) ⟶ G)))
   exact e ▸ h
 
-theorem isUnit_natCast_sections {R : Type} [CommRing R] {n : ℕ} (hn : IsUnit (n : R)) :
-    IsUnit (n : Γ(Sp R, ⊤)) := by
+theorem isUnit_natCast_sections {R : Type} [CommRing R] {n : ℕ} (hn : IsUnit (n : R))
+    : IsUnit (n : Γ(Sp R, ⊤)) := by
   simpa using hn.map (Scheme.ΓSpecIso (.of R)).inv.hom
 
-theorem flat_mulN_field (k : Type) [Field k] (G : Over (Sp k)) [GrpObj G] [IsCommMonObj G] (n : ℕ)
-    (hn : IsUnit (n : k)) (hG : LocallyOfFiniteType G.hom) : Flat (mulN G n).left := by
+theorem flat_mulN_field
+    (k : Type) [Field k]
+    (G : Over (Sp k)) [GrpObj G] [IsCommMonObj G]
+    (n : ℕ) (hn : IsUnit (n : k))
+    (hG : LocallyOfFiniteType G.hom)
+    : Flat (mulN G n).left := by
   refine flat_of_flat_fieldBaseChange k (AlgebraicClosure k) (algebraMap _ _) G G _ ?_
   rw [pullback_map_mulN]
   refine flat_of_formallyUnramified_grpEnd _ _ _ ?_ (isMonHom_mulN _ n)
@@ -53,21 +57,25 @@ theorem flat_mulN_field (k : Type) [Field k] (G : Over (Sp k)) [GrpObj G] [IsCom
   · exact inferInstanceAs (LocallyOfFiniteType (pullback.snd G.hom _))
   · simpa using hn.map (algebraMap k (AlgebraicClosure k))
 
-theorem flat_pullback_mulN {T k : Type} [CommRing T] [Field k] (σ : T →+* k) (G : Over (Sp T))
-    [GrpObj G] [IsCommMonObj G] (n : ℕ) (hn : IsUnit (n : T)) (hG : LocallyOfFiniteType G.hom) :
-    Flat ((Over.pullback (spMap σ)).map (mulN G n)).left := by
+theorem flat_pullback_mulN
+    {T k : Type} [CommRing T] [Field k]
+    (σ : T →+* k)
+    (G : Over (Sp T)) [GrpObj G] [IsCommMonObj G]
+    (n : ℕ) (hn : IsUnit (n : T))
+    (hG : LocallyOfFiniteType G.hom)
+    : Flat ((Over.pullback (spMap σ)).map (mulN G n)).left := by
   rw [pullback_map_mulN]
   refine flat_mulN_field k _ n (by simpa using hn.map σ) ?_
   exact inferInstanceAs (LocallyOfFiniteType (pullback.snd G.hom _))
 
 end MulEtaleDvr
 
-
 open MulEtaleDvr in
-theorem etale_mulN_torsion_dvr :
-    ∀ (T : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] (G : Over (Sp T)) [GrpObj G]
-      [IsCommMonObj G] (n : ℕ), IsUnit (n : T) → Flat G.hom → LocallyOfFiniteType G.hom →
-      Etale (mulN G n).left ∧ Etale (torsion G n).hom := by
+theorem etale_mulN_torsion_dvr
+    : ∀ (T : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] (G : Over (Sp T))
+        [GrpObj G] [IsCommMonObj G] (n : ℕ),
+      IsUnit (n : T) → Flat G.hom → LocallyOfFiniteType G.hom
+        → Etale (mulN G n).left ∧ Etale (torsion G n).hom := by
   intro T _ _ _ G _ _ n hn hf hG
   have h1 : Flat (mulN G n).left :=
     flat_of_flat_fibres_dvr T (FractionRing T) G G _ hf hf hG hG

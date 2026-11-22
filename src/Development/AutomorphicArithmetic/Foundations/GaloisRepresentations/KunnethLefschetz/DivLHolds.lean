@@ -12,21 +12,30 @@ open scoped TensorProduct
 
 namespace UpperTheory.Gal.KunnethLefschetz
 
-private theorem pbc {l : ℕ} [Fact l.Prime] {Z Y X : Scheme.{0}} (f : Z ⟶ Y) (g : Y ⟶ X) (n : ℤ) (x : V l X n) :
-    pb l (f ≫ g) n x = pb l f n (pb l g n x) := by
+private theorem pbc
+    {l : ℕ} [Fact l.Prime] {Z Y X : Scheme.{0}} (f : Z ⟶ Y) (g : Y ⟶ X) (n : ℤ) (x : V l X n)
+    : pb l (f ≫ g) n x = pb l f n (pb l g n x) := by
   rw [LateralTheory.EtaleTrace.pb_comp]; rfl
 
-private theorem powV_pull {l : ℕ} [Fact l.Prime] (R : Ring l) {Y X : Scheme.{0}} (f : Y ⟶ X) (hu : IsUnit (l : Γ(X, ⊤)))
-    (x : V l X 2) (j : ℕ) : pb l f _ (powV l x j) = powV l (pb l f 2 x) j := by
+private theorem powV_pull
+    {l : ℕ} [Fact l.Prime]
+    (R : Ring l)
+    {Y X : Scheme.{0}} (f : Y ⟶ X) (hu : IsUnit (l : Γ(X, ⊤))) (x : V l X 2)
+    (j : ℕ)
+    : pb l f _ (powV l x j) = powV l (pb l f 2 x) j := by
   induction j with
   | zero => exact R.one_nat f hu
   | succ j ih =>
     change pb l f _ (cupV l X _ (powV l x j) x) = cupV l Y _ (powV l (pb l f 2 x) j) (pb l f 2 x)
     rw [R.nat, ih]
 
-private theorem pull_onto {l : ℕ} [Fact l.Prime] (R : Ring l) {E W X : Scheme.{0}} (i : E ⟶ W) (s : W ⟶ X)
-    (hu : IsUnit (l : Γ(W, ⊤))) (e : V l W 2) (hP : PBQ l (i ≫ s) (pb l i 2 e)) (n : ℤ) (b : V l E n) :
-    ∃ m, pb l i n m = b := by
+private theorem pull_onto
+    {l : ℕ} [Fact l.Prime]
+    (R : Ring l)
+    {E W X : Scheme.{0}} (i : E ⟶ W) (s : W ⟶ X) (hu : IsUnit (l : Γ(W, ⊤))) (e : V l W 2)
+    (hP : PBQ l (i ≫ s) (pb l i 2 e))
+    (n : ℤ) (b : V l E n)
+    : ∃ m, pb l i n m = b := by
   have hle : (⊤ : Submodule ℚ_[l] (V l E n)) ≤ LinearMap.range (pb l i n) := by
     rw [← hP.span n, Submodule.span_le]
     rintro z ⟨j, a, h, u, rfl⟩
@@ -34,24 +43,31 @@ private theorem pull_onto {l : ℕ} [Fact l.Prime] (R : Ring l) {E W X : Scheme.
     rw [R.nat, pbc, powV_pull R i hu]
   exact hle (Submodule.mem_top (x := b))
 
-private theorem unit_eq {l : ℕ} [Fact l.Prime] (R : Ring l) {E W X : Scheme.{0}} (i : E ⟶ W) (s : W ⟶ X)
-    (uX : IsUnit (l : Γ(X, ⊤))) (uE : IsUnit (l : Γ(E, ⊤))) (e ε : V l W 2) (u0 a v : _)
-    (he : e = cupV l W (zero_add 2) (pb l s 0 u0) ε)
+private theorem unit_eq
+    {l : ℕ} [Fact l.Prime]
+    (R : Ring l)
+    {E W X : Scheme.{0}}
+    (i : E ⟶ W) (s : W ⟶ X) (uX : IsUnit (l : Γ(X, ⊤))) (uE : IsUnit (l : Γ(E, ⊤))) (e ε : V l W 2)
+    (u0 a v : _) (he : e = cupV l W (zero_add 2) (pb l s 0 u0) ε)
     (hP : PBQ l (i ≫ s) (pb l i 2 e))
-    (hav : pb l i 2 ε = pb l (i ≫ s) 2 a + cupV l E (zero_add 2) (pb l (i ≫ s) 0 v) (pb l i 2 e)) :
-    cupV l X (add_zero 0) v u0 = oneV l X := by
+    (hav : pb l i 2 ε = pb l (i ≫ s) 2 a + cupV l E (zero_add 2) (pb l (i ≫ s) 0 v) (pb l i 2 e))
+    : cupV l X (add_zero 0) v u0 = oneV l X := by
   set ξ := pb l i 2 e with hξdef
   have h0 : ξ = cupV l E (zero_add 2) (pb l (i ≫ s) 0 u0) (pb l i 2 ε) := by
     rw [hξdef, he, R.nat, pbc]
-  have h1 : ξ = pb l (i ≫ s) 2 (cupV l X (zero_add 2) u0 a)
-      + cupV l E (zero_add 2) (pb l (i ≫ s) 0 (cupV l X (add_zero 0) u0 v)) ξ := by
+  have h1
+      : ξ
+        = pb l (i ≫ s) 2 (cupV l X (zero_add 2) u0 a)
+          + cupV l E (zero_add 2) (pb l (i ≫ s) 0 (cupV l X (add_zero 0) u0 v)) ξ := by
     conv_lhs => rw [h0, hav]
     rw [map_add (f := _), ← R.nat,
       ← R.assoc E 0 0 2 0 2 2 (add_zero 0) (zero_add 2) (zero_add 2) (zero_add 2), ← R.nat]
   have h2 : cupV l E (zero_add 2) (pb l (i ≫ s) 0 (oneV l X)) ξ = ξ := by
     rw [R.one_nat _ uX, R.one_mul E uE]
-  have h3 : pb l (i ≫ s) 2 (cupV l X (zero_add 2) u0 a)
-      + cupV l E (zero_add 2) (pb l (i ≫ s) 0 (cupV l X (add_zero 0) u0 v - oneV l X)) ξ = 0 := by
+  have h3
+      : pb l (i ≫ s) 2 (cupV l X (zero_add 2) u0 a)
+          + cupV l E (zero_add 2) (pb l (i ≫ s) 0 (cupV l X (add_zero 0) u0 v - oneV l X)) ξ
+        = 0 := by
     rw [map_sub, map_sub, LinearMap.sub_apply, h2, ← add_sub_assoc, ← h1, sub_self]
   have h4 := hP.indep _ _ h3
   rw [sub_eq_zero] at h4
@@ -84,7 +100,7 @@ theorem divL_holds : DivL := by
   have hz' : z = cupV l W hn2 m' ε := by
     rw [← hb, ← hε, ← G.proj hpair (add_zero n) hnw h02 hn2, R.mul_one E uE]
   refine ⟨cupV l W (zero_add n) (pb l s 0 v) m', ?_⟩
-  rw [hz', ← R.assoc W 2 0 n 2 n w (add_zero 2) h (zero_add n) h, hε',
-    R.comm W n 2 w hn2 h, Int.negOnePow_even _ ⟨n, by ring⟩, one_smul]
+  rw [hz', ← R.assoc W 2 0 n 2 n w (add_zero 2) h (zero_add n) h, hε', R.comm W n 2 w hn2 h,
+    Int.negOnePow_even _ ⟨n, by ring⟩, one_smul]
 
 end UpperTheory.Gal.KunnethLefschetz

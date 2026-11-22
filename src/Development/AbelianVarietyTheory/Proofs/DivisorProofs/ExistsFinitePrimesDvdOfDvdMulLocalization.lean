@@ -6,14 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem localizedModule_mk_quotient_eq_zero_iff_dvd {R : Type} [CommRing R] (M : Submonoid R)
-    (s c : R) :
-    LocalizedModule.mkLinearMap M (R ⧸ Ideal.span {s}) (Ideal.Quotient.mk _ c) = 0 ↔
-      algebraMap R (Localization M) s ∣ algebraMap R (Localization M) c := by
+theorem localizedModule_mk_quotient_eq_zero_iff_dvd
+    {R : Type} [CommRing R] (M : Submonoid R) (s c : R)
+    : LocalizedModule.mkLinearMap M (R ⧸ Ideal.span {s}) (Ideal.Quotient.mk _ c) = 0
+      ↔ algebraMap R (Localization M) s ∣ algebraMap R (Localization M) c := by
   rw [IsLocalizedModule.eq_zero_iff M, ← Ideal.mem_span_singleton, ← Set.image_singleton,
     ← Ideal.map_span, IsLocalization.algebraMap_mem_map_algebraMap_iff M]
-  have key : ∀ m : R, m • (Ideal.Quotient.mk (Ideal.span {s}) c) = 0 ↔
-      m * c ∈ Ideal.span {s} := by
+  have key : ∀ m : R, m • (Ideal.Quotient.mk (Ideal.span {s}) c) = 0 ↔ m * c ∈ Ideal.span {s} := by
     intro m
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_mul]
     rfl
@@ -23,11 +22,21 @@ theorem localizedModule_mk_quotient_eq_zero_iff_dvd {R : Type} [CommRing R] (M :
   · rintro ⟨m, hm, h⟩
     exact ⟨⟨m, hm⟩, (key m).2 h⟩
 
-theorem exists_finite_primes_dvd_of_dvd_mul_localization :
-    ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] (s : R), s ≠ 0 → ∃ S : Set (PrimeSpectrum R), S.Finite ∧ ∀ (P : PrimeSpectrum R) (τ g : Localization.AtPrime P.asIdeal), (∀ Q ∈ S, Q ≤ P → τ ∉ Q.asIdeal.map (algebraMap R (Localization.AtPrime P.asIdeal))) → algebraMap R _ s ∣ g * τ → algebraMap R _ s ∣ g := by
+theorem exists_finite_primes_dvd_of_dvd_mul_localization
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] (s : R),
+      s ≠ 0
+        → ∃ S : Set (PrimeSpectrum R),
+          S.Finite
+            ∧ ∀ (P : PrimeSpectrum R) (τ g : Localization.AtPrime P.asIdeal),
+              (∀ Q ∈ S, Q ≤ P → τ ∉ Q.asIdeal.map (algebraMap R (Localization.AtPrime P.asIdeal)))
+                → algebraMap R _ s ∣ g * τ
+                → algebraMap R _ s ∣ g := by
   intro R _ _ _ s _
-  refine ⟨PrimeSpectrum.asIdeal ⁻¹' associatedPrimes R (R ⧸ Ideal.span {s}),
-    (associatedPrimes.finite R _).preimage (fun _ _ _ _ h => PrimeSpectrum.ext h), ?_⟩
+  refine ⟨
+    PrimeSpectrum.asIdeal ⁻¹' associatedPrimes R (R ⧸ Ideal.span {s}),
+    (associatedPrimes.finite R _).preimage (fun _ _ _ _ h => PrimeSpectrum.ext h),
+    ?_
+  ⟩
   intro P τ g hτ hd
   obtain ⟨a, v, rfl⟩ := IsLocalization.exists_mk'_eq P.asIdeal.primeCompl τ
   obtain ⟨b, u, rfl⟩ := IsLocalization.exists_mk'_eq P.asIdeal.primeCompl g
@@ -51,8 +60,9 @@ theorem exists_finite_primes_dvd_of_dvd_mul_localization :
     rw [Submodule.mem_colon_singleton, Submodule.mem_bot, algebraMap_smul, ← map_smul, ← hax,
       map_mul]
     rfl
-  have hQ : q.comap (algebraMap R (Localization P.asIdeal.primeCompl)) ∈
-      associatedPrimes R (R ⧸ Ideal.span {s}) :=
+  have hQ
+      : q.comap (algebraMap R (Localization P.asIdeal.primeCompl))
+        ∈ associatedPrimes R (R ⧸ Ideal.span {s}) :=
     Module.associatedPrimes.comap_mem_associatedPrimes_of_mem_associatedPrimes_of_isLocalizedModule_of_fg
       P.asIdeal.primeCompl (LocalizedModule.mkLinearMap P.asIdeal.primeCompl _) q hq
       (IsNoetherian.noetherian _)

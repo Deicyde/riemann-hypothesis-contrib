@@ -19,7 +19,7 @@ theorem volU_pos' (M : ℕ) : 0 < volU M := by
   unfold volU
   exact Finset.prod_pos fun i _ => by positivity
 
-theorem volU_skMat_conjTranspose (x : UCo N) : (skMat x)ᴴ = -skMat x := by
+theorem volU_skMat_conjTranspose (x : UCo N) : (skMat x)ᴴ = - skMat x := by
   ext a b
   simp only [conjTranspose_apply, Matrix.neg_apply, skMat]
   rcases lt_trichotomy a b with h | rfl | h
@@ -27,12 +27,11 @@ theorem volU_skMat_conjTranspose (x : UCo N) : (skMat x)ᴴ = -skMat x := by
   · simp
   · simp [h.ne, h.ne', h, not_lt.2 h.le]
 
-theorem volU_exp_inUJ (x : UCo N) :
-    inUJ (fun _ : Fin N => true) (NormedSpace.exp (skMat x)) := by
+theorem volU_exp_inUJ (x : UCo N) : inUJ (fun _ : Fin N => true) (NormedSpace.exp (skMat x)) := by
   have hJ : Jm (fun _ : Fin N => true) = 1 := by simp [Jm]
   unfold inUJ
   rw [hJ, Matrix.mul_one, ← Matrix.exp_conjTranspose, volU_skMat_conjTranspose,
-    ← Matrix.exp_add_of_commute (-skMat x) (skMat x) (Commute.refl (skMat x)).neg_left,
+    ← Matrix.exp_add_of_commute (- skMat x) (skMat x) (Commute.refl (skMat x)).neg_left,
     neg_add_cancel, NormedSpace.exp_zero]
 
 theorem volU_continuous_skMat : Continuous (skMat (N := N)) := by
@@ -58,8 +57,8 @@ theorem volU_skMat_zero : skMat (0 : UCo N) = 0 := by
   ext a b
   simp [skMat]
 
-theorem volU_exp_injOn : ∃ δ > 0, Set.InjOn (fun x : UCo N => NormedSpace.exp (skMat x))
-    (Metric.ball 0 δ) := by
+theorem volU_exp_injOn
+    : ∃ δ > 0, Set.InjOn (fun x : UCo N => NormedSpace.exp (skMat x)) (Metric.ball 0 δ) := by
   obtain ⟨ℓ, -, -, hℓ⟩ := lcA_exists_log (n := N)
   have hc : Tendsto (skMat (N := N)) (𝓝 0) (𝓝 0) := by
     have := (volU_continuous_skMat (N := N)).tendsto 0
@@ -80,8 +79,7 @@ theorem volU_upMat_add (t : TriCo N) : upMat (t + volUOne N) = 1 + upMat t := by
     simp [upMat, volUOne, add_comm]
   · simp [upMat, volUOne, h]
 
-theorem volU_qrWt_one : qrWt (volUOne N) = 1 := by
-  simp [qrWt, volUOne]
+theorem volU_qrWt_one : qrWt (volUOne N) = 1 := by simp [qrWt, volUOne]
 
 theorem volU_continuous_qrWt : Continuous (qrWt (N := N)) :=
   continuous_finsetProd _ fun j _ => ((continuous_apply j).comp continuous_fst).pow _
@@ -89,8 +87,7 @@ theorem volU_continuous_qrWt : Continuous (qrWt (N := N)) :=
 theorem volU_ball_sub_triPos {ρ : ℝ} (hρ : ρ ≤ 1) : Metric.ball (volUOne N) ρ ⊆ triPos N := by
   intro t ht j
   rw [Metric.mem_ball, dist_eq_norm] at ht
-  have h1 : ‖(t - volUOne N).1 j‖ ≤ ‖t - volUOne N‖ :=
-    (norm_le_pi_norm _ j).trans (norm_fst_le _)
+  have h1 : ‖(t - volUOne N).1 j‖ ≤ ‖t - volUOne N‖ := (norm_le_pi_norm _ j).trans (norm_fst_le _)
   have h2 : (t - volUOne N).1 j = t.1 j - 1 := by simp [volUOne]
   rw [h2, Real.norm_eq_abs] at h1
   linarith [neg_le_abs (t.1 j - 1)]

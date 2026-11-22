@@ -9,9 +9,9 @@ open NumberField MeasureTheory GlobalTheory.CuspRep
 
 namespace GlobalTheory
 
-theorem finiteDim_functions_detected_by_finset (K : Type) (W : Submodule ℂ (K → ℂ))
-    (hW : FiniteDimensional ℂ W) :
-    ∃ s : Finset K, ∀ w ∈ W, (∀ k ∈ s, w k = 0) → w = 0 := by
+theorem finiteDim_functions_detected_by_finset
+    (K : Type) (W : Submodule ℂ (K → ℂ)) (hW : FiniteDimensional ℂ W)
+    : ∃ s : Finset K, ∀ w ∈ W, (∀ k ∈ s, w k = 0) → w = 0 := by
   classical
   haveI := hW
   let N : Finset K → Submodule ℂ (K → ℂ) := fun s =>
@@ -21,8 +21,8 @@ theorem finiteDim_functions_detected_by_finset (K : Type) (W : Submodule ℂ (K 
     simp [N, Submodule.mem_iInf]
   have hex : ∃ n, ∃ s : Finset K, Module.finrank ℂ (N s) = n := ⟨_, ∅, rfl⟩
   obtain ⟨s0, hs0⟩ := Nat.find_spec hex
-  have hmin : ∀ s : Finset K, Nat.find hex ≤ Module.finrank ℂ (N s) :=
-    fun s => Nat.find_min' hex ⟨s, rfl⟩
+  have hmin : ∀ s : Finset K, Nat.find hex ≤ Module.finrank ℂ (N s) := fun s =>
+    Nat.find_min' hex ⟨s, rfl⟩
   have hfin : ∀ s, FiniteDimensional ℂ (N s) := fun s =>
     Submodule.finiteDimensional_of_le (inf_le_left)
   refine ⟨s0, fun w hw hvan => ?_⟩

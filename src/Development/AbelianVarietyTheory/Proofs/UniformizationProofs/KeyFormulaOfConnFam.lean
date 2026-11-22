@@ -28,8 +28,10 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.IsDomainTen
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyPow GlobalTheory.KeyKa
@@ -38,8 +40,19 @@ namespace GlobalTheory
 
 theorem keyFormula_of_connFam : GlobalTheory.KeyKa.ConnFam → KeyFormula := fun hF =>
   have hL := GlobalTheory.T.abelianScheme_laws_unconditional.1
-  have hR := GlobalTheory.KeyTop.exists_keyRule_charHalf hL GlobalTheory.T.theta_uniformisation_complex_abelian_varieties GlobalTheory.ThetaInversion.inversion (GlobalTheory.phHolo_of_phKoecher GlobalTheory.phKoecher) GlobalTheory.torusAlgebraic_holds
-  GlobalTheory.KeyRoot.keyFormula_of_families GlobalTheory.T.theta_uniformisation_complex_abelian_varieties hL.polBaseChange (GlobalTheory.T.keyData_descend_countable_subrings hL).1 hR
-    (GlobalTheory.ThetaFrameSpec.value_specialises hL GlobalTheory.T.theta_uniformisation_complex_abelian_varieties GlobalTheory.ThetaInversion.inversion hR (GlobalTheory.ThetaEquiv.val_equivariant hL GlobalTheory.T.theta_uniformisation_complex_abelian_varieties GlobalTheory.ThetaInversion.inversion hR hF))
+  have hR :=
+    GlobalTheory.KeyTop.exists_keyRule_charHalf hL
+      GlobalTheory.T.theta_uniformisation_complex_abelian_varieties
+      GlobalTheory.ThetaInversion.inversion
+      (GlobalTheory.phHolo_of_phKoecher GlobalTheory.phKoecher) GlobalTheory.torusAlgebraic_holds
+  GlobalTheory.KeyRoot.keyFormula_of_families
+    GlobalTheory.T.theta_uniformisation_complex_abelian_varieties hL.polBaseChange
+    (GlobalTheory.T.keyData_descend_countable_subrings hL).1 hR
+    (GlobalTheory.ThetaFrameSpec.value_specialises hL
+      GlobalTheory.T.theta_uniformisation_complex_abelian_varieties
+      GlobalTheory.ThetaInversion.inversion hR
+      (GlobalTheory.ThetaEquiv.val_equivariant hL
+        GlobalTheory.T.theta_uniformisation_complex_abelian_varieties
+        GlobalTheory.ThetaInversion.inversion hR hF))
 
 end GlobalTheory

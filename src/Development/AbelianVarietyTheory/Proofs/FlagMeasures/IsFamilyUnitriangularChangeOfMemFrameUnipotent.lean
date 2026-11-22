@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.GlobS
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc GlobalTheory.Unfold GlobalTheory.LocOver GlobalTheory.GenMass
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+  GlobalTheory.LocOver GlobalTheory.GenMass
 open scoped Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
@@ -105,8 +107,10 @@ lemma Lowers.tri {f : Fin m → W} {n : W ≃ₗ[K] W} (h : Lowers f n) : Tri K 
 
 end Gen
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E]
-  [TopologicalSpace E] [MeasurableSpace E] {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+  {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
 
 lemma Fj_le_flag {H : HermSp M V} {r : ℕ} (Fr : FrameD H r) (j : ℕ) : Fr.Fj j ≤ flag E Fr.f j := by
   apply Submodule.span_mono
@@ -140,8 +144,8 @@ lemma lowers_of_mem_NSet {H : HermSp M V} {r : ℕ} (Fr : FrameD H r) {n : V ≃
     exact Fj_le_flag Fr _ (h1 (a.val + 1) a.isLt (Fr.e a)
       (Submodule.subset_span ⟨a, Nat.lt_succ_self _, rfl⟩))
 
-theorem tri_of_mem_N (H : HermSp M V) {r : ℕ} (Fr : FrameD H r) :
-    ∀ n ∈ Fr.N, Tri E Fr.f (fun b => n (Fr.f b)) := by
+theorem tri_of_mem_N (H : HermSp M V) {r : ℕ} (Fr : FrameD H r)
+    : ∀ n ∈ Fr.N, Tri E Fr.f (fun b => n (Fr.f b)) := by
   intro n hn
   apply Lowers.tri
   induction hn using Subgroup.closure_induction with

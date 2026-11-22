@@ -7,15 +7,26 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocDict
+open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocDict
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory
 
-theorem longElt_invT_involution : ∀ (R : Type) [CommRing R] (n : ℕ) (g : GL (Fin n) R), longElt n R * GlobalTheory.CuspRep.invT n R (longElt n R * GlobalTheory.CuspRep.invT n R g * longElt n R) * longElt n R = g := by
+theorem longElt_invT_involution
+    : ∀ (R : Type) [CommRing R] (n : ℕ) (g : GL (Fin n) R),
+      longElt n R
+          * GlobalTheory.CuspRep.invT n R
+            (longElt n R * GlobalTheory.CuspRep.invT n R g * longElt n R)
+          * longElt n R
+        = g := by
   intro R _ n g
   have hw : longElt n R * longElt n R = 1 := Units.ext (antidiag_mul_self n R)
-  have hii : ∀ h : GL (Fin n) R, GlobalTheory.CuspRep.invT n R (GlobalTheory.CuspRep.invT n R h) = h := fun h => by
+  have hii
+      : ∀ h : GL (Fin n) R,
+        GlobalTheory.CuspRep.invT n R (GlobalTheory.CuspRep.invT n R h) = h := fun h => by
     apply Units.ext
     show (h.valᵀ)ᵀ = h.val
     exact Matrix.transpose_transpose _

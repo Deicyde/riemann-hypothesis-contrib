@@ -13,7 +13,8 @@ open MvPolynomial
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
 section LD
 
@@ -28,18 +29,20 @@ theorem lamd_eZ_per (e : Fin X.F.J → Fin r → ℕ) (j m : ℤ) : X.eZ e (j + 
     simp
   · rfl
 
-theorem lamd_nz_per {L₁ N₁ : ℕ} (hV : X.F.Valid L₁ N₁) (la : Fin n' → Fin (r + K) → ℕ) (j x m : ℤ) :
-    X.nz p K la (j + m * X.F.J) (x + m * n') = X.nz p K la j x := by
+theorem lamd_nz_per {L₁ N₁ : ℕ} (hV : X.F.Valid L₁ N₁) (la : Fin n' → Fin (r + K) → ℕ) (j x m : ℤ)
+    : X.nz p K la (j + m * X.F.J) (x + m * n') = X.nz p K la j x := by
   unfold Dat.nz
   have hpos : posOf n' (x + m * (n' : ℤ)) = posOf n' x := by
     ext
     simp [posOf]
   rw [hpos, sum_Pz_per X p K hV j x m]
 
-theorem bfam_at_w_letter_eq {L₁ N₁ : ℕ} (hV : X.F.Valid L₁ N₁) (la : Fin n' → Fin (r + K) → ℕ)
-    (e : Fin X.F.J → Fin r → ℕ) (j : ℤ) (i : ℕ) (hi : i < r) :
-    X.bfam p K la e j (X.F.fr (j - 1) i) =
-      (X.nz p K la (j - 1) (X.F.fr (j - 1) i) - X.eZ e (j - 1) ⟨i, hi⟩) / X.Qc p K (j - 1) := by
+theorem bfam_at_w_letter_eq
+    {L₁ N₁ : ℕ} (hV : X.F.Valid L₁ N₁)
+    (la : Fin n' → Fin (r + K) → ℕ) (e : Fin X.F.J → Fin r → ℕ) (j : ℤ)
+    (i : ℕ) (hi : i < r)
+    : X.bfam p K la e j (X.F.fr (j - 1) i)
+      = (X.nz p K la (j - 1) (X.F.fr (j - 1) i) - X.eZ e (j - 1) ⟨i, hi⟩) / X.Qc p K (j - 1) := by
   have hmono : ∀ (k : ℤ) (a b : ℕ), a < b → b < r → X.F.fr k a < X.F.fr k b := by
     intro k a b hab hb
     induction b with
@@ -87,8 +90,11 @@ theorem bfam_at_w_letter_eq {L₁ N₁ : ℕ} (hV : X.F.Valid L₁ N₁) (la : F
 
 end LD
 
-theorem lamd_Bw_pos {p n' r K : ℕ} [NeZero n'] [NeZero r] [NeZero K] {X : Dat n' r} (hX : X.Hyp p K)
-    (hLa : 1088 ≤ X.CLa) (hk : 1088 ≤ X.Ck) (j y : ℤ) (hy : y ∈ X.F.letters j) : 1 ≤ X.Bw p K j y := by
+theorem lamd_Bw_pos
+    {p n' r K : ℕ} [NeZero n'] [NeZero r] [NeZero K]
+    {X : Dat n' r} (hX : X.Hyp p K) (hLa : 1088 ≤ X.CLa) (hk : 1088 ≤ X.Ck)
+    (j y : ℤ) (hy : y ∈ X.F.letters j)
+    : 1 ≤ X.Bw p K j y := by
   have h := sum_aP hX hLa hk j y hy
   have hp := hX.prime.pos
   have hPpos : 0 < p ^ (X.F.dist j y + X.Rj p K j) := pow_pos hp _
@@ -106,19 +112,26 @@ theorem lamd_Bw_pos {p n' r K : ℕ} [NeZero n'] [NeZero r] [NeZero K] {X : Dat 
     have hK' : (0 : ℝ) ≤ K := Nat.cast_nonneg _
     nlinarith
   have hPr : (0 : ℝ) < ((p ^ (X.F.dist j y + X.Rj p K j) : ℕ) : ℝ) := by exact_mod_cast hPpos
-  have hreal : ((r + K + r + 2 : ℕ) : ℝ) * ((p ^ (X.F.dist j y + X.Rj p K j) : ℕ) : ℝ) ≤
-      (X.a' p K (posOf n' y) : ℝ) := by
-    have e1 : ((p ^ (X.F.dist j y + X.Rj p K j) : ℕ) : ℝ) = (p : ℝ) ^ (X.F.dist j y + X.Rj p K j) := by
+  have hreal
+      : ((r + K + r + 2 : ℕ) : ℝ) * ((p ^ (X.F.dist j y + X.Rj p K j) : ℕ) : ℝ)
+        ≤ (X.a' p K (posOf n' y) : ℝ) := by
+    have e1
+        : ((p ^ (X.F.dist j y + X.Rj p K j) : ℕ) : ℝ) = (p : ℝ) ^ (X.F.dist j y + X.Rj p K j) := by
       push_cast; rfl
     rw [e1] at hPr ⊢
     have hk0 : (0 : ℝ) ≤ (Dat.k (r := r) K) ^ 2 := sq_nonneg _
-    calc ((r + K + r + 2 : ℕ) : ℝ) * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j)
-        ≤ 36 / 5 * (Dat.k (r := r) K) ^ 2 * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j) :=
-          mul_le_mul_of_nonneg_right hk2 hPr.le
-      _ ≤ 36 / 5 * (Dat.k (r := r) K) ^ 2 * (X.Y * (X.Ns : ℝ)) * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j) := by
-          have := mul_le_mul_of_nonneg_left hYN (by positivity : (0 : ℝ) ≤ 36 / 5 * (Dat.k (r := r) K) ^ 2)
-          nlinarith
-      _ = 36 / 5 * (X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j)) := by ring
+    calc
+      ((r + K + r + 2 : ℕ) : ℝ) * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j)
+          ≤ 36 / 5 * (Dat.k (r := r) K) ^ 2 * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j) :=
+        mul_le_mul_of_nonneg_right hk2 hPr.le
+      _ ≤ 36 / 5 * (Dat.k (r := r) K) ^ 2 * (X.Y * (X.Ns : ℝ))
+          * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j) := by
+        have :=
+          mul_le_mul_of_nonneg_left hYN (by positivity : (0 : ℝ) ≤ 36 / 5 * (Dat.k (r := r) K) ^ 2)
+        nlinarith
+      _ = 36 / 5
+          * (X.Y * Dat.k (r := r) K ^ 2 * (X.Ns : ℝ) * (p : ℝ) ^ (X.F.dist j y + X.Rj p K j)) := by
+        ring
       _ ≤ _ := h
   have hnat : (r + K + r + 2) * p ^ (X.F.dist j y + X.Rj p K j) ≤ X.a' p K (posOf n' y) := by
     exact_mod_cast hreal
@@ -133,8 +146,13 @@ theorem restLamDeg : RestLamDeg 1088 := by
   have hV := hX.valid
   have hr : 0 < r := NeZero.pos r
   have hG := restLamGeo 1088 p n' r K X hX hLa hk
-  have hlaS : ∀ t, (∑ c, la t c ≤ X.a' p K t) ∧ ∀ j : ℤ, ∀ x ∈ X.toLate j, posOf n' x = t →
-      (∀ c, la t c < X.Pz p K j x) ∧ (∑ c, la t c) % X.Pz p K j x = X.a' p K t % X.Pz p K j x := fun t =>
+  have hlaS
+      : ∀ t,
+        (∑ c, la t c ≤ X.a' p K t)
+          ∧ ∀ j : ℤ, ∀ x ∈ X.toLate j,
+            posOf n' x = t
+              → (∀ c, la t c < X.Pz p K j x)
+                ∧ (∑ c, la t c) % X.Pz p K j x = X.a' p K t % X.Pz p K j x := fun t =>
     (Finset.mem_filter.mp (Fintype.mem_piFinset.mp hla t)).2
   refine ⟨?_, ?_⟩
   · intro j x hx hW c
@@ -143,8 +161,10 @@ theorem restLamDeg : RestLamDeg 1088 := by
   · intro m hm t
     have hok : ∀ j v, m j v ≠ 0 → v ∈ okVars X.F K (j.val : ℤ) := fun j => (hm j).1
     have hdeg : ∀ j x, ∑ c, m j (x, c) = X.bfam p K la e (j.val : ℤ) x := fun j => (hm j).2.1
-    have hsplit : ∑ c : Fin (r + K), (Dat.lamL K la + ∑ j, imgMon (X.lamG K j) (X.lamE p K j) (m j)) (t, c) =
-        ∑ c, la t c + ∑ c : Fin (r + K), (∑ j, imgMon (X.lamG K j) (X.lamE p K j) (m j)) (t, c) := by
+    have hsplit
+        : ∑ c : Fin (r + K), (Dat.lamL K la + ∑ j, imgMon (X.lamG K j) (X.lamE p K j) (m j)) (t, c)
+          = ∑ c, la t c
+            + ∑ c : Fin (r + K), (∑ j, imgMon (X.lamG K j) (X.lamE p K j) (m j)) (t, c) := by
       rw [← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun c _ => ?_
       rw [Finsupp.add_apply]
@@ -154,9 +174,10 @@ theorem restLamDeg : RestLamDeg 1088 := by
     · obtain ⟨j0, x0, hx0, rfl⟩ := hG.EX t ht
       rw [Finset.sum_congr rfl fun c _ => lam_eval X p K hG m hok j0 x0 hx0 c, ← Finset.mul_sum,
         Finset.sum_add_distrib, hdeg j0 x0, ← Finset.mul_sum]
-      have hWs : ∑ c, segmentWeightExponent X K m (posOf n' x0) c =
-          ∑ j : Fin X.F.J, ∑ x ∈ (X.F.letters (j.val : ℤ)).filter fun x => X.F.IsW (j.val : ℤ) x,
-            if posOf n' x = posOf n' x0 then X.bfam p K la e (j.val : ℤ) x else 0 := by
+      have hWs
+          : ∑ c, segmentWeightExponent X K m (posOf n' x0) c
+            = ∑ j : Fin X.F.J, ∑ x ∈ (X.F.letters (j.val : ℤ)).filter fun x => X.F.IsW (j.val : ℤ) x,
+                if posOf n' x = posOf n' x0 then X.bfam p K la e (j.val : ℤ) x else 0 := by
         unfold segmentWeightExponent
         rw [Finset.sum_comm]
         refine Finset.sum_congr rfl fun j _ => ?_
@@ -170,18 +191,23 @@ theorem restLamDeg : RestLamDeg 1088 := by
       obtain ⟨hl1, hl2, hl3, hl4⟩ := sum_late_mem hx0
       obtain ⟨hs1, hs2⟩ := hlaS (posOf n' x0)
       obtain ⟨-, hs3⟩ := hs2 (j0.val : ℤ) x0 hx0 rfl
-      have hPnz : X.Pz p K (j0.val : ℤ) x0 * X.nz p K la (j0.val : ℤ) x0 =
-          X.a' p K (posOf n' x0) - ∑ c, la (posOf n' x0) c := by
+      have hPnz
+          : X.Pz p K (j0.val : ℤ) x0 * X.nz p K la (j0.val : ℤ) x0
+            = X.a' p K (posOf n' x0) - ∑ c, la (posOf n' x0) c := by
         unfold Dat.nz
         exact Nat.mul_div_cancel' (Nat.dvd_of_mod_eq_zero (Nat.sub_mod_eq_zero_of_mod_eq hs3.symm))
-      have hkey : X.bfam p K la e (j0.val : ℤ) x0 + X.Qc p K (j0.val : ℤ) *
-          (∑ j : Fin X.F.J, ∑ x ∈ (X.F.letters (j.val : ℤ)).filter fun x => X.F.IsW (j.val : ℤ) x,
-            if posOf n' x = posOf n' x0 then X.bfam p K la e (j.val : ℤ) x else 0) =
-          X.nz p K la (j0.val : ℤ) x0 := by
+      have hkey
+          : X.bfam p K la e (j0.val : ℤ) x0
+              + X.Qc p K (j0.val : ℤ)
+                * (∑ j : Fin X.F.J, ∑ x ∈ (X.F.letters (j.val : ℤ)).filter fun x => X.F.IsW (j.val : ℤ) x,
+                    if posOf n' x = posOf n' x0 then X.bfam p K la e (j.val : ℤ) x else 0)
+            = X.nz p K la (j0.val : ℤ) x0 := by
         by_cases h0 : X.F.fr (j0.val : ℤ) 0 ≤ x0
-        · obtain ⟨i0, hi0, rfl⟩ := comb_frame_top X.F hV (j0.val : ℤ) x0 hl4 h0 (r - 1) (by omega) hl3
-          obtain ⟨j1, mm, hj1⟩ : ∃ (j1 : Fin X.F.J) (mm : ℤ),
-              (j1.val : ℤ) - 1 = (j0.val : ℤ) + mm * (X.F.J : ℤ) := by
+        · obtain ⟨i0, hi0, rfl⟩ :=
+            comb_frame_top X.F hV (j0.val : ℤ) x0 hl4 h0 (r - 1) (by omega) hl3
+          obtain ⟨j1, mm, hj1⟩
+              : ∃ (j1 : Fin X.F.J) (mm : ℤ),
+                (j1.val : ℤ) - 1 = (j0.val : ℤ) + mm * (X.F.J : ℤ) := by
             have hj0 := j0.isLt
             by_cases h : j0.val + 1 < X.F.J
             · exact ⟨⟨j0.val + 1, h⟩, 0, by push_cast; ring⟩
@@ -190,21 +216,27 @@ theorem restLamDeg : RestLamDeg 1088 := by
                 have : X.F.J = j0.val + 1 := by omega
                 exact_mod_cast this
               push_cast
-              rw [hJ']; ring
+              rw [hJ']
+              ring
           have hx1eq : X.F.fr ((j1.val : ℤ) - 1) i0 = X.F.fr (j0.val : ℤ) i0 + mm * n' := by
             rw [hj1]; exact fr_add_mul_period hV (j0.val : ℤ) i0 mm
-          have hx1l : X.F.fr ((j1.val : ℤ) - 1) i0 ∈ X.F.letters (j1.val : ℤ) := TE.frp_mem hV (j1.val : ℤ) i0 hi0
+          have hx1l : X.F.fr ((j1.val : ℤ) - 1) i0 ∈ X.F.letters (j1.val : ℤ) :=
+            TE.frp_mem hV (j1.val : ℤ) i0 hi0
           have hx1W : X.F.IsW (j1.val : ℤ) (X.F.fr ((j1.val : ℤ) - 1) i0) :=
             TE.fr_le hV ((j1.val : ℤ) - 1) i0 (r - 1) (by omega) (by omega)
-          have hx1p : posOf n' (X.F.fr ((j1.val : ℤ) - 1) i0) = posOf n' (X.F.fr (j0.val : ℤ) i0) := by
+          have hx1p
+              : posOf n' (X.F.fr ((j1.val : ℤ) - 1) i0) = posOf n' (X.F.fr (j0.val : ℤ) i0) := by
             rw [hx1eq, sum_posOf_per]
-          have hval : X.bfam p K la e (j1.val : ℤ) (X.F.fr ((j1.val : ℤ) - 1) i0) =
-              (X.nz p K la (j0.val : ℤ) (X.F.fr (j0.val : ℤ) i0) - e j0 ⟨i0, hi0⟩) / X.Qc p K (j0.val : ℤ) := by
-            rw [bfam_at_w_letter_eq X p K hV la e (j1.val : ℤ) i0 hi0, hx1eq, hj1, lamd_nz_per X p K hV, lamd_eZ_per,
-              sum_Qc_per X p K hV, sum_eZ_val]
-          have hsum : (∑ j : Fin X.F.J, ∑ x ∈ (X.F.letters (j.val : ℤ)).filter fun x => X.F.IsW (j.val : ℤ) x,
-              if posOf n' x = posOf n' (X.F.fr (j0.val : ℤ) i0) then X.bfam p K la e (j.val : ℤ) x else 0) =
-              X.bfam p K la e (j1.val : ℤ) (X.F.fr ((j1.val : ℤ) - 1) i0) := by
+          have hval
+              : X.bfam p K la e (j1.val : ℤ) (X.F.fr ((j1.val : ℤ) - 1) i0)
+                = (X.nz p K la (j0.val : ℤ) (X.F.fr (j0.val : ℤ) i0) - e j0 ⟨i0, hi0⟩)
+                  / X.Qc p K (j0.val : ℤ) := by
+            rw [bfam_at_w_letter_eq X p K hV la e (j1.val : ℤ) i0 hi0, hx1eq, hj1,
+              lamd_nz_per X p K hV, lamd_eZ_per, sum_Qc_per X p K hV, sum_eZ_val]
+          have hsum
+              : (∑ j : Fin X.F.J, ∑ x ∈ (X.F.letters (j.val : ℤ)).filter fun x => X.F.IsW (j.val : ℤ) x,
+                  if posOf n' x = posOf n' (X.F.fr (j0.val : ℤ) i0) then X.bfam p K la e (j.val : ℤ) x else 0)
+                = X.bfam p K la e (j1.val : ℤ) (X.F.fr ((j1.val : ℤ) - 1) i0) := by
             rw [Finset.sum_eq_single j1]
             · rw [Finset.sum_eq_single (X.F.fr ((j1.val : ℤ) - 1) i0)]
               · rw [if_pos hx1p]
@@ -223,28 +255,39 @@ theorem restLamDeg : RestLamDeg 1088 := by
               exact hne (hG.U2 j j1 x hxl hxW _ hx1l hx1W (h.trans hx1p.symm)).1
             · intro h; exact absurd (Finset.mem_univ _) h
           rw [hsum, hval, restLamTau p n' r K X hX la e j0 ⟨i0, hi0⟩]
-          have hEE := (Finset.mem_filter.mp
-            (Fintype.mem_piFinset.mp (Fintype.mem_piFinset.mp he j0) ⟨i0, hi0⟩)).2
+          have hEE :=
+            (Finset.mem_filter.mp (Fintype.mem_piFinset.mp (Fintype.mem_piFinset.mp he j0)
+              ⟨i0, hi0⟩)).2
           have hpad := (restPad p n' r K X hX hLa hk la hla e he (j1.val : ℤ)).1 _ hx1l hx1W
           have hBw := lamd_Bw_pos hX hLa hk (j1.val : ℤ) _ hx1l
           rw [hval] at hpad
-          have hpos : 1 ≤ (X.nz p K la (j0.val : ℤ) (X.F.fr (j0.val : ℤ) i0) - e j0 ⟨i0, hi0⟩) /
-              X.Qc p K (j0.val : ℤ) := by
-            have : (1 : ℤ) ≤ (((X.nz p K la (j0.val : ℤ) (X.F.fr (j0.val : ℤ) i0) - e j0 ⟨i0, hi0⟩) /
-              X.Qc p K (j0.val : ℤ) : ℕ) : ℤ) := le_trans hBw hpad
+          have hpos
+              : 1
+                ≤ (X.nz p K la (j0.val : ℤ) (X.F.fr (j0.val : ℤ) i0) - e j0 ⟨i0, hi0⟩)
+                  / X.Qc p K (j0.val : ℤ) := by
+            have : (1 : ℤ)
+                ≤ (((X.nz p K la (j0.val : ℤ) (X.F.fr (j0.val : ℤ) i0) - e j0 ⟨i0, hi0⟩)
+                      / X.Qc p K (j0.val : ℤ)
+                    : ℕ)
+                  : ℤ) :=
+              le_trans hBw hpad
             exact_mod_cast this
           have hle : e j0 ⟨i0, hi0⟩ ≤ X.nz p K la (j0.val : ℤ) (X.F.fr (j0.val : ℤ) i0) := by
             by_contra hlt
-            have hz : X.nz p K la (j0.val : ℤ) (X.F.fr (j0.val : ℤ) i0) - e j0 ⟨i0, hi0⟩ = 0 := by omega
+            have hz : X.nz p K la (j0.val : ℤ) (X.F.fr (j0.val : ℤ) i0) - e j0 ⟨i0, hi0⟩ = 0 := by
+              omega
             rw [hz, Nat.zero_div] at hpos
             omega
-          have hdvd : X.Qc p K (j0.val : ℤ) ∣
-              X.nz p K la (j0.val : ℤ) (X.F.fr (j0.val : ℤ) i0) - e j0 ⟨i0, hi0⟩ :=
+          have hdvd
+              : X.Qc p K (j0.val : ℤ)
+                ∣ X.nz p K la (j0.val : ℤ) (X.F.fr (j0.val : ℤ) i0) - e j0 ⟨i0, hi0⟩ :=
             Nat.dvd_of_mod_eq_zero (Nat.sub_mod_eq_zero_of_mod_eq hEE.symm)
           rw [Nat.mul_div_cancel' hdvd]
           omega
-        · have hz : (∑ j : Fin X.F.J, ∑ x ∈ (X.F.letters (j.val : ℤ)).filter fun x => X.F.IsW (j.val : ℤ) x,
-              if posOf n' x = posOf n' x0 then X.bfam p K la e (j.val : ℤ) x else 0) = 0 := by
+        · have hz
+              : (∑ j : Fin X.F.J, ∑ x ∈ (X.F.letters (j.val : ℤ)).filter fun x => X.F.IsW (j.val : ℤ) x,
+                  if posOf n' x = posOf n' x0 then X.bfam p K la e (j.val : ℤ) x else 0)
+                = 0 := by
             refine Finset.sum_eq_zero fun j _ => Finset.sum_eq_zero fun x hx => ?_
             obtain ⟨hxl, hxW⟩ := Finset.mem_filter.mp hx
             rw [if_neg]

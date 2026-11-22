@@ -9,20 +9,25 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.PlainTorE
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC
+  GlobalTheory.SmGL GlobalTheory.SplitWeil
 open GlobalTheory.PRep UpperTheory.V.Af UpperTheory.V.Z.Win UpperTheory.Zero.LLC
 
 open scoped commutatorElement
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.V.Z.Desc.W.typeGd :
-    UpperTheory.V.Z.Desc.W.TypeGd := by
+theorem UpperTheory.V.Z.Desc.W.typeGd : UpperTheory.V.Z.Desc.W.TypeGd := by
   intro E Ω _ _ _ _ _ n w A h σ rc hrc χ ⟨b, hb, hN, hχ⟩
   have hm : (rc (algNorm σ)).mono0 := hb ▸ (WD.monodromyZero_ofWeilDeligneRepClass_iff b).2 hN
   have hT : UpperTheory.Zero.LLC.Toral (algNorm σ) := by
-    refine UpperTheory.Zero.LLC.abConv E Ω A w h rc hrc (algNorm σ) (fun j : Fin n => (χ j).comp (Weil h).subtype) fun t => ?_
+    refine UpperTheory.Zero.LLC.abConv E Ω A w h rc hrc (algNorm σ)
+      (fun j : Fin n => (χ j).comp (Weil h).subtype)
+      fun t => ?_
     rw [← hb, WD.charPol_mk, hχ t, Matrix.charpoly_toLin', Matrix.charpoly_diagonal]
     rfl
   obtain ⟨a, ha, ε, L⟩ := _root_.UpperTheory.V.Z.Win.toV' hrc
@@ -46,7 +51,9 @@ theorem UpperTheory.V.Z.Desc.W.typeGd :
       simp [hc1]
     have hc : Multiset.card s = (algNorm σ).1 := by
       have h2 := hs.sum_fst
-      rw [Multiset.map_congr rfl hch, Multiset.map_const', Multiset.sum_replicate, Fintype.card_fin] at h2
+      rw [Multiset.map_congr rfl hch, Multiset.map_const', Multiset.sum_replicate, Fintype.card_fin]
+        at h2
       simpa using h2
     show WD.charPol _ _ = _
-    rw [L.supp _ s hs, L.dim, Multiset.map_congr rfl h1, Multiset.map_const', Multiset.prod_replicate, hc]
+    rw [L.supp _ s hs, L.dim, Multiset.map_congr rfl h1, Multiset.map_const',
+      Multiset.prod_replicate, hc]

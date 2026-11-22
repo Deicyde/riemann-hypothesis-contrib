@@ -16,8 +16,8 @@ open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.GJMat
 open scoped Classical ENNReal NNReal Pointwise
 open UpperTheory.ConvolutionTheory.R2
 
-theorem UpperTheory.ConvolutionTheory.R2.measEx :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F], St.MeasEx F := by
+theorem UpperTheory.ConvolutionTheory.R2.measEx
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F], St.MeasEx F := by
   intro F _ _ _
   obtain ⟨hK, hKc⟩ := M.kkCpt F
   obtain ⟨hB, e, he⟩ := M.borHomeo F
@@ -41,17 +41,29 @@ theorem UpperTheory.ConvolutionTheory.R2.measEx :
   haveI : LocallyCompactSpace (M.Bor F) := hB.locallyCompactSpace
   haveI : SecondCountableTopology (M.Bor F) := TopologicalSpace.Subtype.secondCountableTopology _
   haveI : SecondCountableTopology (M.Ks F) := TopologicalSpace.Subtype.secondCountableTopology _
-  refine ⟨⟨μ, μK.map Subtype.val, D, hμ, M.unimod F μ,
-    (Measure.isProbabilityMeasure_map_iff measurable_subtype_coe.aemeasurable).2 hp, hK ▸ hsupp,
+  refine ⟨⟨
+    μ,
+    μK.map Subtype.val,
+    D,
+    hμ,
+    M.unimod F μ,
+    (Measure.isProbabilityMeasure_map_iff measurable_subtype_coe.aemeasurable).2 hp,
+    hK ▸ hsupp,
     fun k hk => hl k (by rw [← SetLike.mem_coe, ← hK]; exact hk),
-    fun k hk => hr k (by rw [← SetLike.mem_coe, ← hK]; exact hk), fun u hu => ?_, hD,
-    IsFundamentalDomain.mk' hD.nullMeasurableSet hDu⟩⟩
+    fun k hk => hr k (by rw [← SetLike.mem_coe, ← hK]; exact hk),
+    fun u hu => ?_,
+    hD,
+    IsFundamentalDomain.mk' hD.nullMeasurableSet hDu
+  ⟩⟩
   have hm : Measurable fun p : M.Bor F × G1 F => u ((p.1 : G1 F) * p.2) :=
     hu.comp ((continuous_subtype_val.comp continuous_fst).mul continuous_snd).measurable
-  have h1 : ∀ k : G1 F, ∫⁻ a : IdeleGroup F, ∫⁻ b, u (nU b * mD a * k) * ENNReal.ofReal ((ab a)⁻¹ ^ 2) ∂(adeleMeasure F) ∂(ideleMeasure F) =
-      ∫⁻ s : M.Bor F, u ((s : G1 F) * k) ∂μS := fun k =>
+  have h1
+      : ∀ k : G1 F,
+        ∫⁻ a : IdeleGroup F, ∫⁻ b, u (nU b * mD a * k) * ENNReal.ofReal ((ab a)⁻¹ ^ 2) ∂(adeleMeasure F) ∂(ideleMeasure F)
+          = ∫⁻ s : M.Bor F, u ((s : G1 F) * k) ∂μS := fun k =>
     (hSi (fun g => u (g * k)) (hu.comp (measurable_mul_const k))).symm
   simp only [h1]
-  rw [lintegral_map hm.lintegral_prod_left' measurable_subtype_coe, lintegral_smul_measure, hint u hu, smul_eq_mul,
-    ← mul_assoc, ENNReal.inv_mul_cancel hc' ENNReal.coe_ne_top, one_mul]
-  exact lintegral_lintegral_swap (hm.comp (measurable_fst.prodMk (measurable_subtype_coe.comp measurable_snd))).aemeasurable
+  rw [lintegral_map hm.lintegral_prod_left' measurable_subtype_coe, lintegral_smul_measure,
+    hint u hu, smul_eq_mul, ← mul_assoc, ENNReal.inv_mul_cancel hc' ENNReal.coe_ne_top, one_mul]
+  exact lintegral_lintegral_swap (hm.comp (measurable_fst.prodMk (measurable_subtype_coe.comp
+    measurable_snd))).aemeasurable

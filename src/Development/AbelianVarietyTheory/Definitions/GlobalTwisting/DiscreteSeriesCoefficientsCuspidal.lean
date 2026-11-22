@@ -294,7 +294,6 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Geometric
 
 namespace GlobalTheory.Fc.S0
 
-
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
 structure ArithmeticGeometryHyps : Prop where
@@ -505,7 +504,9 @@ structure ArithmeticGeometryHyps : Prop where
   depthZeroTypeInertia : GlobalTheory.Published.DepthZeroTypeInertia
   weilSiegelOneVector : GlobalTheory.Published.WeilSiegelOneVector
   weylDimensionGL : GlobalTheory.Published.WeylDimensionGL
-  unitaryFiniteCovolume : ∀ (E : Type) [Field E] [NumberField E] [NumberField.IsCMField E], GlobalTheory.Published.UnitaryFiniteCovolume E
+  unitaryFiniteCovolume
+    : ∀ (E : Type) [Field E] [NumberField E] [NumberField.IsCMField E],
+      GlobalTheory.Published.UnitaryFiniteCovolume E
   chebotarevOpenNormal : GlobalTheory.Published.ChebotarevOpenNormal
   discreteSeriesFormalDegree : GlobalTheory.Published.DiscreteSeriesFormalDegree
   casselmanWallachAdm : GlobalTheory.Published.CasselmanWallachAdm

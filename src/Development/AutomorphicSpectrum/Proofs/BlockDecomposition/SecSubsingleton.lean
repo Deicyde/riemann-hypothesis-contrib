@@ -6,12 +6,14 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison
+  CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
 
 namespace GlobalTheory.CompanionTheory.TwZeroGen
 
-theorem sec_subsingleton (hLc : LcCover) (V : Scheme.{0}) [IsEmpty V] {R : Type} [CommRing R] (G : Shv R) :
-    Subsingleton (Sec G V) := by
+theorem sec_subsingleton
+    (hLc : LcCover) (V : Scheme.{0}) [IsEmpty V] {R : Type} [CommRing R] (G : Shv R)
+    : Subsingleton (Sec G V) := by
   let f : LocallyConstant V Empty :=
     ⟨isEmptyElim, fun s => by rw [Set.eq_empty_of_isEmpty (isEmptyElim ⁻¹' s)]; exact isOpen_empty⟩
   obtain ⟨W, j, -, -, -, hG⟩ := hLc V Empty f
@@ -19,8 +21,10 @@ theorem sec_subsingleton (hLc : LcCover) (V : Scheme.{0}) [IsEmpty V] {R : Type}
   intro a b
   exact (hG R G (fun e => e.elim)).unique (fun e => e.elim) (fun e => e.elim)
 
-private theorem twGen_zero_eq_of_eq_pow {q : ℕ} {V : Scheme.{0}} (η θ : Prim q ↑(V.presheaf.obj (op ⊤)))
-    (b : (ZMod q)ˣ) (h : η.1 = θ.1 ^ (b : ZMod q).val) : twGen 0 η = twGen 0 θ := by
+private theorem twGen_zero_eq_of_eq_pow
+    {q : ℕ} {V : Scheme.{0}}
+    (η θ : Prim q ↑(V.presheaf.obj (op ⊤))) (b : (ZMod q)ˣ) (h : η.1 = θ.1 ^ (b : ZMod q).val)
+    : twGen 0 η = twGen 0 θ := by
   unfold twGen
   congr 1
   refine (Submodule.Quotient.eq _).2 (Submodule.subset_span ⟨θ, η, b, h, ?_⟩)

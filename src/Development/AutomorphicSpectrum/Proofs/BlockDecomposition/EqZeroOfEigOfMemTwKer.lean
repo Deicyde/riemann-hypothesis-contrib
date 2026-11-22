@@ -12,17 +12,20 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Miraboli
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.BZPhiPG
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.BZPhiPG
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.BZPhiPG.LocO
 
 open MeasureTheory GlobalTheory.CompanionTheory.TwistedAverage GlobalTheory.CompanionTheory.Rodier
 
-theorem eq_zero_of_eig_of_mem_twKer {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ G V} (hρ : IsSmooth ρ) {L : Subgroup G}
-    (hL : IsCompact (L : Set G)) (θ : L →* ℂˣ) (hθ : IsOpen (θ.ker : Set L)) {x : V}
-    (hx : x ∈ twKer ρ L θ) (he : ∀ l : L, ρ (l : G) x = (θ l : ℂ) • x) : x = 0 := by
+theorem eq_zero_of_eig_of_mem_twKer
+    {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+    {ρ : Representation ℂ G V} (hρ : IsSmooth ρ)
+    {L : Subgroup G} (hL : IsCompact (L : Set G)) (θ : L →* ℂˣ) (hθ : IsOpen (θ.ker : Set L))
+    {x : V} (hx : x ∈ twKer ρ L θ) (he : ∀ l : L, ρ (l : G) x = (θ l : ℂ) • x)
+    : x = 0 := by
   classical
   obtain ⟨M, hM, hs⟩ := exists_sum_eq_zero hρ hL θ hθ hx
   haveI : M.FiniteIndex := hM
@@ -39,87 +42,110 @@ theorem eq_zero_of_eig_of_mem_twKer {G V : Type} [Group G] [TopologicalSpace G] 
   · exact absurd h0 (Nat.cast_ne_zero.2 Fintype.card_ne_zero)
   · exact h0
 
-theorem isSmooth_cInd {G Z : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup Z] [Module ℂ Z] (H : Subgroup G) (σ : Representation ℂ H Z) : IsSmooth (cInd H σ) := by
+theorem isSmooth_cInd
+    {G Z : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup Z] [Module ℂ Z]
+    (H : Subgroup G) (σ : Representation ℂ H Z)
+    : IsSmooth (cInd H σ) := by
   intro f
   have h : {g : G | cInd H σ g f = f} = {g : G | ind H σ g f.1.1 = f.1.1} := by
     ext g
-    exact ⟨fun h => congrArg (fun x : cIndSpace H σ => x.1.1) h, fun h => Subtype.ext (Subtype.ext h)⟩
+    exact
+      ⟨fun h => congrArg (fun x : cIndSpace H σ => x.1.1) h, fun h => Subtype.ext (Subtype.ext h)⟩
   rw [h]
   exact f.1.2
 
-def evL {G Z : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup Z] [Module ℂ Z] (H : Subgroup G) (σ : Representation ℂ H Z) (x : G) : cIndSpace H σ →ₗ[ℂ] Z :=
-  (LinearMap.proj x) ∘ₗ (indSpace H σ).subtype ∘ₗ (smoothPart (ind H σ)).subtype ∘ₗ (cIndSpace H σ).subtype
+def evL
+    {G Z : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup Z] [Module ℂ Z]
+    (H : Subgroup G) (σ : Representation ℂ H Z)
+    (x : G)
+    : cIndSpace H σ →ₗ[ℂ] Z :=
+  (LinearMap.proj x) ∘ₗ (indSpace H σ).subtype ∘ₗ (smoothPart (ind H σ)).subtype
+    ∘ₗ (cIndSpace H σ).subtype
 
-theorem avgVanish_of_fibre {G Z Γ A : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup Z] [Module ℂ Z] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
-    [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A] [MeasurableSpace A] [BorelSpace A]
+theorem avgVanish_of_fibre
+    {G Z Γ A : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup Z]
+    [Module ℂ Z] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [AddCommGroup A]
+    [TopologicalSpace A] [IsTopologicalAddGroup A] [MeasurableSpace A] [BorelSpace A]
     (μ : Measure A) [μ.IsAddHaarMeasure]
-    (H : Subgroup G) (σ : Representation ℂ H Z) (U : Subgroup G) (θ : U →* ℂˣ)
+    (H : Subgroup G) (σ : Representation ℂ H Z)
+    (U : Subgroup G) (θ : U →* ℂˣ)
     (ρ₁ : Representation ℂ Γ Z) (hρ₁ : IsSmooth ρ₁)
     (C : Subgroup Γ) (hC : IsCompact (C : Set Γ)) (χ : C →* ℂˣ) (hχ : IsOpen (χ.ker : Set C))
     (c : C → H) (hc : ∀ (b : C) (w : Z), σ (c b) w = ρ₁ (b : Γ) w)
     (e : A → G) (he : ∀ a a', e (a + a') = e a * e a')
     (hce : ∀ (b : C) (a : A), ((c b : H) : G) * e a = e a * ((c b : H) : G))
-    (y : G) (D : Set A) (hD0 : (0 : A) ∈ D) (hDs : ∀ a a', a ∈ D → a' ∈ D → a - a' ∈ D)
-    (hDc : IsCompact D) (hDo : IsOpen D)
-    (L : Subgroup G) (hLU : L ≤ U) (hLc : IsCompact (L : Set G))
-    (hθ : IsOpen ((θ.comp (Subgroup.inclusion hLU)).ker : Set L))
-    (hL1 : ∀ l : L, ∃ (b : C) (a : A), a ∈ D ∧ y * (l : G) * y⁻¹ = ((c b : H) : G) * e a ∧
-      θ (Subgroup.inclusion hLU l) = χ b)
-    (hL2 : ∀ b : C, ∃ l : L, y * (l : G) * y⁻¹ = ((c b : H) : G) ∧ θ (Subgroup.inclusion hLU l) = χ b)
+    (y : G)
+    (D : Set A) (hD0 : (0 : A) ∈ D) (hDs : ∀ a a', a ∈ D → a' ∈ D → a - a' ∈ D) (hDc : IsCompact D)
+    (hDo : IsOpen D)
+    (L : Subgroup G) (hLU : L ≤ U)
+    (hLc : IsCompact (L : Set G)) (hθ : IsOpen ((θ.comp (Subgroup.inclusion hLU)).ker : Set L))
+    (hL1 : ∀ l : L, ∃ (b : C) (a : A),
+      a ∈ D ∧ y * (l : G) * y⁻¹ = ((c b : H) : G) * e a ∧ θ (Subgroup.inclusion hLU l) = χ b)
+    (hL2
+      : ∀ b : C, ∃ l : L, y * (l : G) * y⁻¹ = ((c b : H) : G) ∧ θ (Subgroup.inclusion hLU l) = χ b)
     (hL3 : ∀ a ∈ D, ∃ l : L, y * (l : G) * y⁻¹ = e a ∧ θ (Subgroup.inclusion hLU l) = 1)
     (hU : ∀ u ∈ U, ∃ h ∈ H, ∃ a : A, y * u * y⁻¹ = h * e a)
-    (hfib : ∀ f' : cIndSpace H σ, IsLocallyConstant (fun a => evL H σ (e a * y) f') ∧
-      HasCompactSupport (fun a => evL H σ (e a * y) f'))
+    (hfib : ∀ f' : cIndSpace H σ,
+      IsLocallyConstant (fun a => evL H σ (e a * y) f')
+        ∧ HasCompactSupport (fun a => evL H σ (e a * y) f'))
     (f : cIndSpace H σ) (hsupp : ∀ a, evL H σ (e a * y) f ≠ 0 → a ∈ D)
-    (hz : smInt μ (fun a => evL H σ (e a * y) f) ∈ twKer ρ₁ C χ) :
-    AvgVanish H σ U θ f y := by
+    (hz : smInt μ (fun a => evL H σ (e a * y) f) ∈ twKer ρ₁ C χ)
+    : AvgVanish H σ U θ f y := by
   classical
-  have hev : ∀ (x l : G) (f' : cIndSpace H σ), evL H σ x (cInd H σ l f') = evL H σ (x * l) f' := fun _ _ _ => rfl
-  have hleft : ∀ (h : H) (x : G) (f' : cIndSpace H σ), evL H σ ((h : G) * x) f' = σ h (evL H σ x f') :=
+  have hev : ∀ (x l : G) (f' : cIndSpace H σ), evL H σ x (cInd H σ l f') = evL H σ (x * l) f' :=
+    fun _ _ _ => rfl
+  have hleft
+      : ∀ (h : H) (x : G) (f' : cIndSpace H σ), evL H σ ((h : G) * x) f' = σ h (evL H σ x f') :=
     fun h x f' => f'.1.1.2 h x
   have he0 : e 0 = 1 := by
     have := he 0 0
     rw [add_zero] at this
     exact (mul_eq_left.1 this.symm)
   set θL : L →* ℂˣ := θ.comp (Subgroup.inclusion hLU) with hθL
-  obtain ⟨ι, _, r, c₀, h1, h2⟩ := GlobalTheory.CompanionTheory.TwAvgInd.exists_finite_average (cInd H σ) (isSmooth_cInd H σ) hLc θL hθ f
+  obtain ⟨ι, _, r, c₀, h1, h2⟩ :=
+    GlobalTheory.CompanionTheory.TwAvgInd.exists_finite_average (cInd H σ) (isSmooth_cInd H σ) hLc
+      θL hθ f
   obtain ⟨g, hg⟩ : ∃ g : cIndSpace H σ, g = c₀ • ∑ i, twOrbit (cInd H σ) L θL f (r i) := ⟨_, rfl⟩
   rw [← hg] at h1
   simp only [← hg] at h2
 
-  let T : cIndSpace H σ →ₗ[ℂ] Z :=
-    { toFun := fun f' => smInt μ (fun a => evL H σ (e a * y) f')
-      map_add' := fun f₁ f₂ => by
-        have := SmIntEl.smInt_add μ (hfib f₁).1 (hfib f₁).2 (hfib f₂).1 (hfib f₂).2
-        rw [← this]
-        congr 1
-      map_smul' := fun s f' => by
-        have := SmIntEl.smInt_linear μ (s • (LinearMap.id : Z →ₗ[ℂ] Z)) (hfib f').1 (hfib f').2
-        simp only [LinearMap.smul_apply, LinearMap.id_apply, RingHom.id_apply] at this ⊢
-        rw [← this]
-        congr 1 }
+  let T : cIndSpace H σ →ₗ[ℂ] Z := {
+    toFun := fun f' => smInt μ (fun a => evL H σ (e a * y) f')
+    map_add' := fun f₁ f₂ => by
+      have := SmIntEl.smInt_add μ (hfib f₁).1 (hfib f₁).2 (hfib f₂).1 (hfib f₂).2
+      rw [← this]
+      congr 1
+    map_smul' := fun s f' => by
+      have := SmIntEl.smInt_linear μ (s • (LinearMap.id : Z →ₗ[ℂ] Z)) (hfib f').1 (hfib f').2
+      simp only [LinearMap.smul_apply, LinearMap.id_apply, RingHom.id_apply] at this ⊢
+      rw [← this]
+      congr 1
+  }
   have hTdef : ∀ f', T f' = smInt μ (fun a => evL H σ (e a * y) f') := fun _ => rfl
-  have hpoint : ∀ (l : G) (b : C) (a₁ a : A), y * l * y⁻¹ = ((c b : H) : G) * e a₁ →
-      e a * y * l = ((c b : H) : G) * (e (a₁ + a) * y) := by
+  have hpoint
+      : ∀ (l : G) (b : C) (a₁ a : A),
+        y * l * y⁻¹ = ((c b : H) : G) * e a₁
+          → e a * y * l = ((c b : H) : G) * (e (a₁ + a) * y) := by
     intro l b a₁ a h
     have h' : y * l = ((c b : H) : G) * e a₁ * y := by rw [← h]; group
     have h2 : e (a₁ + a) = e a * e a₁ := by rw [add_comm, he]
     rw [mul_assoc, h', h2]
     simp only [← mul_assoc]
     rw [← hce b a]
-  have hTl : ∀ (l : G) (b : C) (a₁ : A), y * l * y⁻¹ = ((c b : H) : G) * e a₁ → ∀ f',
-      T (cInd H σ l f') = ρ₁ (b : Γ) (T f') := by
+  have hTl
+      : ∀ (l : G) (b : C) (a₁ : A),
+        y * l * y⁻¹ = ((c b : H) : G) * e a₁ → ∀ f', T (cInd H σ l f') = ρ₁ (b : Γ) (T f') := by
     intro l b a₁ hl f'
     set φ : A → Z := fun a => evL H σ (e a * y) f' with hφ
-    have hfun : (fun a => evL H σ (e a * y) (cInd H σ l f')) = (ρ₁ (b : Γ)) ∘ (φ ∘ (fun a => a₁ + a)) := by
+    have hfun
+        : (fun a => evL H σ (e a * y) (cInd H σ l f'))
+          = (ρ₁ (b : Γ)) ∘ (φ ∘ (fun a => a₁ + a)) := by
       funext a
       rw [hev, hpoint l b a₁ a hl, hleft, hc]
       rfl
     have hl₂ : IsLocallyConstant (φ ∘ fun a => a₁ + a) := (hfib f').1.comp_continuous (by fun_prop)
-    have hc₂ : HasCompactSupport (φ ∘ fun a => a₁ + a) := (hfib f').2.comp_homeomorph (Homeomorph.addLeft a₁)
+    have hc₂ : HasCompactSupport (φ ∘ fun a => a₁ + a) :=
+      (hfib f').2.comp_homeomorph (Homeomorph.addLeft a₁)
     rw [hTdef, hfun, SmIntEl.smInt_linear μ _ hl₂ hc₂,
       SmIntEl.smInt_comp_measurePreserving μ (measurePreserving_add_left μ a₁) (hfib f').1]
     rfl
@@ -164,7 +190,7 @@ theorem avgVanish_of_fibre {G Z Γ A : Type} [Group G] [TopologicalSpace G] [IsT
         rwa [add_sub_cancel_left] at this
       rw [this, map_zero, smul_zero]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [hg, map_smul, map_sum, Finset.sum_eq_zero fun i _ => hz0 i, smul_zero]
+    rw [hg, map_smul, map_sum, Finset.sum_eq_zero fun i _ => hz0 i, smul_zero]
 
   have hper : ∀ a ∈ D, evL H σ (e a * y) g = evL H σ (e 0 * y) g := by
     intro a ha

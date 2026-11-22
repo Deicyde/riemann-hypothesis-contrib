@@ -9,9 +9,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SplitDetOfSp
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues Polynomial
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -20,14 +23,19 @@ noncomputable section
 
 namespace GlobalTheory.Hk3.DualHecke
 
-theorem comp_C_mul_X_dualPoly {K : Type} [Field K] (t u : K) (R : K[X]) :
-    (Formalism.L2.DIV.dualPoly t R).comp (C u * X) = Formalism.L2.DIV.dualPoly (t * u) R := by
+theorem comp_C_mul_X_dualPoly {K : Type} [Field K] (t u : K) (R : K[X])
+    : (Formalism.L2.DIV.dualPoly t R).comp (C u * X) = Formalism.L2.DIV.dualPoly (t * u) R := by
   unfold Formalism.L2.DIV.dualPoly
   rw [mul_comp, C_comp, comp_assoc, mul_comp, C_comp, X_comp, C_mul]
   congr 2
   ring
 
-theorem dualPoly_heckePolyOf_comp : ∀ (K : Type) [Field K] (n q : ℕ) (a b : ℕ → K) (s s' : K), (q : K) ≠ 0 → s ≠ 0 → 0 < n → a 0 = 1 → (∀ j, j ≤ n → b j * a n = a (n - j)) → dualPoly (s * s' * (q : K) ^ (n - 1)) ((Formalism.L2.Col.heckePolyOf n q b).comp (C s * X)) = (Formalism.L2.Col.heckePolyOf n q a).comp (C s' * X) := by
+theorem dualPoly_heckePolyOf_comp
+    : ∀ (K : Type) [Field K] (n q : ℕ) (a b : ℕ → K) (s s' : K),
+      (q : K) ≠ 0 → s ≠ 0 → 0 < n → a 0 = 1 → (∀ j, j ≤ n → b j * a n = a (n - j))
+        → dualPoly (s * s' * (q : K) ^ (n - 1))
+            ((Formalism.L2.Col.heckePolyOf n q b).comp (C s * X))
+          = (Formalism.L2.Col.heckePolyOf n q a).comp (C s' * X) := by
   intro K _ n q a b s s' hq hs hn h0 h
   have han : a n ≠ 0 := by
     intro h1
@@ -47,9 +55,11 @@ theorem dualPoly_heckePolyOf_comp : ∀ (K : Type) [Field K] (n q : ℕ) (a b : 
     rw [Nat.sub_sub_self hk] at e
     rw [← e]
     linear_combination b (n - k) * hbn
-  have H := GlobalTheory.PartsCompare.heckePolyOf_dual (n := n) (q := q) hq (a := b) (b := a) hb0 hdual
-  have hc := GlobalTheory.PartsCompare.dualPoly_comp (inv_ne_zero hs) (s * s' * (q : K) ^ (n - 1))
-    (Formalism.L2.Col.heckePolyOf n q b)
+  have H :=
+    GlobalTheory.PartsCompare.heckePolyOf_dual (n := n) (q := q) hq (a := b) (b := a) hb0 hdual
+  have hc :=
+    GlobalTheory.PartsCompare.dualPoly_comp (inv_ne_zero hs) (s * s' * (q : K) ^ (n - 1))
+      (Formalism.L2.Col.heckePolyOf n q b)
   rw [inv_inv] at hc
   rw [hc, H, comp_C_mul_X_dualPoly]
   congr 1

@@ -10,10 +10,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.IsCplAt.regular :
-    ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (p : Ideal R) [p.IsPrime] (B : Type) [CommRing B] [IsLocalRing B]
-      [Algebra R B], IsCplAt R p B → IsRegularLocalRing (Localization.AtPrime p) →
-      IsRegularLocalRing B ∧ ringKrullDim B = ringKrullDim (Localization.AtPrime p) := by
+theorem UpperTheory.V.AlgebraTools.IsCplAt.regular
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (p : Ideal R) [p.IsPrime] (B : Type)
+        [CommRing B] [IsLocalRing B] [Algebra R B],
+      IsCplAt R p B → IsRegularLocalRing (Localization.AtPrime p)
+        → IsRegularLocalRing B ∧ ringKrullDim B = ringKrullDim (Localization.AtPrime p) := by
   intro R _ _ p _ B _ _ _ hB hT
   obtain ⟨e⟩ := IsCplAt.nonempty_algEquiv R p B (CplAt R p) hB (isCplAt_cplAt R p)
   have hC : IsRegularLocalRing (CplAt R p) :=

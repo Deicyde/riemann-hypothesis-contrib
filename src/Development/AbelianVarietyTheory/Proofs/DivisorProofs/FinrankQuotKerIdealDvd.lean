@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.WittOnFalse
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.AV GlobalTheory.AV.AbVar
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.AV GlobalTheory.AV.AbVar
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.DeRham (spOver spOver_comp)
 open scoped CategoryTheory.MonObj
@@ -24,15 +25,18 @@ namespace GlobalTheory.AV.KerPart
 
 variable {k : Type} [Field k] {A B : AbVar k}
 
-def KerPow (f : A ⟶ B) (c : ℕ) (H : Type) [CommRing H] [Algebra k H] (i : ptOver k H ⟶ A.X) : Prop :=
-  (i ≫ f.hom = 1 ∧ i ^ c = 1) ∧
-    ∀ (R : Type) [CommRing R] [Algebra k R] (x : ptOver k R ⟶ A.X), x ≫ f.hom = 1 → x ^ c = 1 →
-      ∃! φ : H →ₐ[k] R, spMap φ.toRingHom ≫ i.left = x.left
+def KerPow (f : A ⟶ B) (c : ℕ) (H : Type) [CommRing H] [Algebra k H] (i : ptOver k H ⟶ A.X)
+    : Prop :=
+  (i ≫ f.hom = 1 ∧ i ^ c = 1)
+    ∧ ∀ (R : Type) [CommRing R] [Algebra k R] (x : ptOver k R ⟶ A.X),
+      x ≫ f.hom = 1 → x ^ c = 1 → ∃! φ : H →ₐ[k] R, spMap φ.toRingHom ≫ i.left = x.left
 
-theorem finrank_eq_of_kerPow {f : A ⟶ B} {c c' : ℕ} {H H' : Type} [CommRing H] [Algebra k H] [CommRing H']
-    [Algebra k H'] {i : ptOver k H ⟶ A.X} {i' : ptOver k H' ⟶ A.X} (h : KerPow f c H i) (h' : KerPow f c' H' i')
-    (e : ∀ (R : Type) [CommRing R] [Algebra k R] (x : ptOver k R ⟶ A.X), x ≫ f.hom = 1 → (x ^ c = 1 ↔ x ^ c' = 1)) :
-    Module.finrank k H = Module.finrank k H' := by
+theorem finrank_eq_of_kerPow
+    {f : A ⟶ B} {c c' : ℕ} {H H' : Type} [CommRing H] [Algebra k H] [CommRing H'] [Algebra k H']
+    {i : ptOver k H ⟶ A.X} {i' : ptOver k H' ⟶ A.X} (h : KerPow f c H i) (h' : KerPow f c' H' i')
+    (e : ∀ (R : Type) [CommRing R] [Algebra k R] (x : ptOver k R ⟶ A.X),
+      x ≫ f.hom = 1 → (x ^ c = 1 ↔ x ^ c' = 1))
+    : Module.finrank k H = Module.finrank k H' := by
   obtain ⟨φ, hφ, -⟩ := h.2 H' i' h'.1.1 ((e H' i' h'.1.1).2 h'.1.2)
   obtain ⟨ψ, hψ, -⟩ := h'.2 H i h.1.1 ((e H i h.1.1).1 h.1.2)
   have h1 : ψ.comp φ = AlgHom.id k H := by
@@ -53,8 +57,10 @@ theorem finrank_eq_of_kerPow {f : A ⟶ B} {c c' : ℕ} {H H' : Type} [CommRing 
       rw [Cris.spMap_id, Category.id_comp]
   exact (AlgEquiv.ofAlgHom φ ψ h2 h1).toLinearEquiv.finrank_eq
 
-theorem pow_eq_one_of_comp {f : A ⟶ B} {g : B ⟶ A} {N : ℕ} (h : f ≫ g = N • 𝟙 A) {T : Over (Sp k)}
-    (x : T ⟶ A.X) (hx : x ≫ f.hom = 1) : x ^ N = 1 := by
+theorem pow_eq_one_of_comp
+    {f : A ⟶ B} {g : B ⟶ A} {N : ℕ} (h : f ≫ g = N • 𝟙 A)
+    {T : Over (Sp k)} (x : T ⟶ A.X) (hx : x ≫ f.hom = 1)
+    : x ^ N = 1 := by
   have e := congrArg (fun u : A ⟶ A => x ≫ u.hom) h
   simp only [comp_hom, nsmul_hom, id_hom] at e
   rw [← Category.assoc, hx, MonObj.one_comp, MonObj.comp_pow, Category.comp_id] at e
@@ -62,13 +68,15 @@ theorem pow_eq_one_of_comp {f : A ⟶ B} {g : B ⟶ A} {N : ℕ} (h : f ≫ g = 
 
 section Tower
 
-variable {p : ℕ} {G H : PDivGroup p k} (t : G.TorsionTower A.X) (t' : H.TorsionTower B.X) (f : A ⟶ B) (n : ℕ)
+variable
+  {p : ℕ} {G H : PDivGroup p k} (t : G.TorsionTower A.X) (t' : H.TorsionTower B.X)
+  (f : A ⟶ B) (n : ℕ)
 
 def kerPt : ptOver k (G.A n ⧸ kerIdeal ((t.map t' f.hom).app n)) ⟶ A.X :=
   spOver (Ideal.Quotient.mkₐ k (kerIdeal ((t.map t' f.hom).app n))) ≫ t.y n
 
-theorem comp_eq_one_iff {R : Type} [CommRing R] [Algebra k R] (φ : G.A n →ₐ[k] R) :
-    (spOver φ ≫ t.y n) ≫ f.hom = 1 ↔ kerIdeal ((t.map t' f.hom).app n) ≤ RingHom.ker φ := by
+theorem comp_eq_one_iff {R : Type} [CommRing R] [Algebra k R] (φ : G.A n →ₐ[k] R)
+    : (spOver φ ≫ t.y n) ≫ f.hom = 1 ↔ kerIdeal ((t.map t' f.hom).app n) ≤ RingHom.ker φ := by
   let u : H.A n →ₐ[k] G.A n := (t.map t' f.hom).app n
   have hu : spOver u ≫ t'.y n = t.y n ≫ f.hom := t.map_y t' f.hom n
   rw [Category.assoc, ← hu, ← Category.assoc, spOver_comp, t'.eq_one_iff]
@@ -96,8 +104,8 @@ theorem kerPow_kerPt : KerPow f (p ^ n) _ (kerPt t t' f n) := by
 
 end Tower
 
-theorem finrank_quot_kerIdeal_dvd {p : ℕ} {G H : PDivGroup p k} (φ : G ⟶ H) (n : ℕ) :
-    Module.finrank k (G.A n ⧸ kerIdeal (φ.app n)) ∣ p ^ (n * G.height) := by
+theorem finrank_quot_kerIdeal_dvd {p : ℕ} {G H : PDivGroup p k} (φ : G ⟶ H) (n : ℕ)
+    : Module.finrank k (G.A n ⧸ kerIdeal (φ.app n)) ∣ p ^ (n * G.height) := by
   have h := finrank_eq_ker_mul_range k (G.A n) (H.A n) (φ.app n)
   have h2 : Module.finrank k (G.A n) = p ^ (n * G.height) := by
     have h3 := G.fibreDim_eq n ⟨⊥, Ideal.isPrime_bot⟩

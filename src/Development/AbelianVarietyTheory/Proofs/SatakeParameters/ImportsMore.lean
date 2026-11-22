@@ -6,8 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.ClosedSubgroupCriterion
 
-theorem main : ∀ {n j : ℕ} (a : Fin n → ℤ), Antitone a → (∀ (i : Fin n), a i = (0 : ℤ) ∨ a i = (1 : ℤ)) →
-    Finset.card {i : Fin n | a i = (1 : ℤ)} = j → ∀ (i : Fin n), a i = (1 : ℤ) ↔ (↑i : ℕ) < j := by
+theorem main
+    : ∀ {n j : ℕ} (a : Fin n → ℤ),
+      Antitone a → (∀ (i : Fin n), a i = (0 : ℤ) ∨ a i = (1 : ℤ))
+        → Finset.card {i : Fin n | a i = (1 : ℤ)} = j
+        → ∀ (i : Fin n), a i = (1 : ℤ) ↔ (↑i : ℕ) < j := by
   intro n j a ha h01 hj i
   constructor
   · intro hi
@@ -34,7 +37,8 @@ theorem main : ∀ {n j : ℕ} (a : Fin n → ℤ), Antitone a → (∀ (i : Fin
         by_contra hle
         push_neg at hle
         have := ha hle
-        rw [h, hk] at this; norm_num at this
+        rw [h, hk] at this
+        norm_num at this
       have := Finset.card_le_card hsub
       rw [Fin.card_Iio, hj] at this
       omega

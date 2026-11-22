@@ -15,9 +15,11 @@ open MvPolynomial
 
 noncomputable section
 
-theorem exists_relComps_of_mem_incidence_field {F : Type*} [Field F] {n k : ℕ}
-    {J : Ideal (MvPolynomial (Fin n) F)} {v : Fin k × Fin n → AlgebraicClosure F}
-    (hv : v ∈ incidence J k) : ∃ W ∈ relComps J, v ∈ incidence W k := by
+theorem exists_relComps_of_mem_incidence_field
+    {F : Type*} [Field F]
+    {n k : ℕ} {J : Ideal (MvPolynomial (Fin n) F)} {v : Fin k × Fin n → AlgebraicClosure F}
+    (hv : v ∈ incidence J k)
+    : ∃ W ∈ relComps J, v ∈ incidence W k := by
   obtain ⟨x, hx0, hxJ, hxv⟩ := hv
   have hP : (RingHom.ker (aeval x : MvPolynomial (Fin n) F →ₐ[F] AlgebraicClosure F)).IsPrime :=
     RingHom.ker_isPrime _
@@ -33,15 +35,17 @@ theorem exists_relComps_of_mem_incidence_field {F : Type*} [Field F] {n k : ℕ}
     exact hrel ⟨j, hj⟩
   simpa using RingHom.mem_ker.mp (hWP hj)
 
-theorem SpecFirstNeField.proof (h₁ : ConeDimOfChowForm.Statement) (h₂ : ConeDimComponent.Statement)
-    (h₃ : ChowFormExists.Statement) (h₄ : IncidenceZeroLocus.Statement) :
-    SpecFirstNeField.Statement := by
+theorem SpecFirstNeField.proof
+    (h₁ : ConeDimOfChowForm.Statement) (h₂ : ConeDimComponent.Statement)
+    (h₃ : ChowFormExists.Statement) (h₄ : IncidenceZeroLocus.Statement)
+    : SpecFirstNeField.Statement := by
   classical
   intro F _ n e I f u hI hf hu h0
   have hdim := h₁ F n (e + 1) I f hI hf
 
-  have hG : ∀ W : Ideal (MvPolynomial (Fin n) F), ∃ g : MvPolynomial (Fin e × Fin n) F,
-      g ≠ 0 ∧ (W ∈ relComps (I ⊔ Ideal.span {linForm u}) → IsChowForm W e g) := by
+  have hG
+      : ∀ W : Ideal (MvPolynomial (Fin n) F), ∃ g : MvPolynomial (Fin e × Fin n) F,
+        g ≠ 0 ∧ (W ∈ relComps (I ⊔ Ideal.span {linForm u}) → IsChowForm W e g) := by
     intro W
     by_cases hW : W ∈ relComps (I ⊔ Ideal.span {linForm u})
     · obtain ⟨hWp, hWd⟩ := h₂ F n e I W u hI hdim hu hW
@@ -53,8 +57,11 @@ theorem SpecFirstNeField.proof (h₁ : ConeDimOfChowForm.Statement) (h₂ : Cone
   have hprod : ∀ v : Fin e × Fin n → AlgebraicClosure F, aeval v (∏ W ∈ S, G W) = 0 := by
     intro v
     let w : Fin (e + 1) × Fin n → AlgebraicClosure F := fun ij =>
-      Fin.cases (motive := fun _ => AlgebraicClosure F) (algebraMap F _ (u ij.2))
-        (fun i => v (i, ij.2)) ij.1
+      Fin.cases
+        (motive := fun _ => AlgebraicClosure F)
+        (algebraMap F _ (u ij.2))
+        (fun i => v (i, ij.2))
+        ij.1
     have hw : aeval w f = 0 := by
       have hs : aeval v (specFirst f u) = aeval w f := by
         have hfun : (fun ij => aeval v (specFirstVar u ij)) = w := by
@@ -76,8 +83,7 @@ theorem SpecFirstNeField.proof (h₁ : ConeDimOfChowForm.Statement) (h₂ : Cone
       refine ⟨y, hy0, fun g hg => ?_, fun i => by simpa [w] using hyw i.succ⟩
       obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp hg
       obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hb
-      have hu0 : aeval y (linForm u) = 0 := by
-        simpa [w, linForm] using hyw 0
+      have hu0 : aeval y (linForm u) = 0 := by simpa [w, linForm] using hyw 0
       rw [map_add (f := _), map_mul, hu0, mul_zero, add_zero, hyI a ha]
     obtain ⟨W, hW, hvW⟩ := exists_relComps_of_mem_incidence_field hvJ
     rw [map_prod]

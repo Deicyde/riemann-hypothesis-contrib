@@ -9,18 +9,21 @@ public import GroundTheory.AutomorphicForms.MeasuresGL
 
 noncomputable section
 
-open GroundTheory.Automorphic GroundTheory.Automorphic.ContragredientTranspose GroundTheory.Automorphic.Whittaker MeasureTheory
+open GroundTheory.Automorphic GroundTheory.Automorphic.ContragredientTranspose
+  GroundTheory.Automorphic.Whittaker MeasureTheory
 
 namespace PositivityTheory.PfBern.Unit
 
 section Gen
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [T2Space G] [TotallyDisconnectedSpace G] [MeasurableSpace G] [BorelSpace G]
   {V : Type} [AddCommGroup V] [Module ℂ V]
 
 theorem exists_testProj : ∃ Pr : (G → ℂ) →ₗ[ℂ] testFn G, ∀ f : testFn G, Pr f = f := by
-  obtain ⟨Pr, hPr⟩ := LinearMap.exists_leftInverse_of_injective (testFn G).subtype (Submodule.ker_subtype _)
+  obtain ⟨Pr, hPr⟩ :=
+    LinearMap.exists_leftInverse_of_injective (testFn G).subtype (Submodule.ker_subtype _)
   exact ⟨Pr, fun f => LinearMap.congr_fun hPr f⟩
 
 end Gen

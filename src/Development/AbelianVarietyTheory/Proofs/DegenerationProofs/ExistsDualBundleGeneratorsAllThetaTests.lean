@@ -10,7 +10,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 
 noncomputable section
@@ -20,17 +21,20 @@ section Specialise
 
 variable {o Ω K J : Type} [CommRing o] [Field Ω] [Algebra o Ω] [Field K] [Fintype J]
 
-theorem map_dotProduct_of_mem {B : Subalgebra o Ω} {f : Ω → K} (φ : B →+* K) (hf : ∀ x : B, φ x = f x)
-    {u v : J → Ω} (hu : ∀ j, u j ∈ B) (hv : ∀ j, v j ∈ B) :
-    f (u ⬝ᵥ v) = (fun j => f (u j)) ⬝ᵥ fun j => f (v j) := by
-  have h : u ⬝ᵥ v = ((∑ j, (⟨u j, hu j⟩ : B) * ⟨v j, hv j⟩ : B) : Ω) := by
-    simp [dotProduct]
+theorem map_dotProduct_of_mem
+    {B : Subalgebra o Ω} {f : Ω → K} (φ : B →+* K) (hf : ∀ x : B, φ x = f x)
+    {u v : J → Ω} (hu : ∀ j, u j ∈ B) (hv : ∀ j, v j ∈ B)
+    : f (u ⬝ᵥ v) = (fun j => f (u j)) ⬝ᵥ fun j => f (v j) := by
+  have h : u ⬝ᵥ v = ((∑ j, (⟨u j, hu j⟩ : B) * ⟨v j, hv j⟩ : B) : Ω) := by simp [dotProduct]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [h, ← hf, map_sum]
   exact Finset.sum_congr rfl fun j _ => by rw [map_mul, hf, hf]
 
-theorem dotProduct_mem_of_mem_span {σ : Type} [SetLike σ K] [SubringClass σ K] (O : σ) {s : Set (J → K)} {w v : J → K}
-    (hs : ∀ x ∈ s, w ⬝ᵥ x ∈ O) (hv : v ∈ Submodule.span O s) : w ⬝ᵥ v ∈ O := by
+theorem dotProduct_mem_of_mem_span
+    {σ : Type} [SetLike σ K] [SubringClass σ K]
+    (O : σ)
+    {s : Set (J → K)} {w v : J → K} (hs : ∀ x ∈ s, w ⬝ᵥ x ∈ O) (hv : v ∈ Submodule.span O s)
+    : w ⬝ᵥ v ∈ O := by
   induction hv using Submodule.span_induction with
   | mem x hx => exact hs x hx
   | zero => simp
@@ -40,12 +44,14 @@ theorem dotProduct_mem_of_mem_span {σ : Type} [SetLike σ K] [SubringClass σ K
     rw [this]
     exact mul_mem c.2 hx
 
-
 omit [Fintype J] in
-theorem map_mem_span_of_mem_span {A B : Subalgebra o Ω} (hAB : A ≤ B) {f : Ω → K} (φ : B →+* K)
-    (hf : ∀ x : B, φ x = f x) (O : ValuationSubring K) (hO : ∀ x ∈ A, f x ∈ O) {I : Type} {g : I → J → Ω}
-    (hg : ∀ k j, g k j ∈ B) {v : J → Ω} (hv : v ∈ Submodule.span A (Set.range g)) :
-    (∀ j, v j ∈ B) ∧ (fun j => f (v j)) ∈ Submodule.span O (Set.range fun k j => f (g k j)) := by
+theorem map_mem_span_of_mem_span
+    {A B : Subalgebra o Ω} (hAB : A ≤ B)
+    {f : Ω → K} (φ : B →+* K) (hf : ∀ x : B, φ x = f x)
+    (O : ValuationSubring K) (hO : ∀ x ∈ A, f x ∈ O)
+    {I : Type} {g : I → J → Ω} (hg : ∀ k j, g k j ∈ B)
+    {v : J → Ω} (hv : v ∈ Submodule.span A (Set.range g))
+    : (∀ j, v j ∈ B) ∧ (fun j => f (v j)) ∈ Submodule.span O (Set.range fun k j => f (g k j)) := by
   induction hv using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨k, rfl⟩ := hx
@@ -58,25 +64,33 @@ theorem map_mem_span_of_mem_span {A B : Subalgebra o Ω} (hAB : A ≤ B) {f : Ω
     exact zero_mem _
   | add x y _ _ hx hy =>
     refine ⟨fun j => add_mem (hx.1 j) (hy.1 j), ?_⟩
-    have : (fun j => f ((x + y) j)) = (fun j => f (x j)) + fun j => f (y j) := funext fun j =>
-      (hf (⟨_, hx.1 j⟩ + ⟨_, hy.1 j⟩)).symm.trans (by rw [map_add (f := _), hf, hf]; rfl)
+    have : (fun j => f ((x + y) j)) = (fun j => f (x j)) + fun j => f (y j) :=
+      funext fun j =>
+        (hf (⟨_, hx.1 j⟩ + ⟨_, hy.1 j⟩)).symm.trans (by rw [map_add (f := _), hf, hf]; rfl)
     rw [this]
     exact add_mem hx.2 hy.2
   | smul c x _ hx =>
     refine ⟨fun j => mul_mem (hAB c.2) (hx.1 j), ?_⟩
-    have : (fun j => f ((c • x) j)) = (⟨f c, hO c c.2⟩ : O) • fun j => f (x j) := funext fun j =>
-      (hf (⟨_, hAB c.2⟩ * ⟨_, hx.1 j⟩)).symm.trans (by rw [map_mul, hf, hf]; rfl)
+    have : (fun j => f ((c • x) j)) = (⟨f c, hO c c.2⟩ : O) • fun j => f (x j) :=
+      funext fun j => (hf (⟨_, hAB c.2⟩ * ⟨_, hx.1 j⟩)).symm.trans (by rw [map_mul, hf, hf]; rfl)
     rw [this]
     exact Submodule.smul_mem _ _ hx.2
 
-theorem mem_span_map_iff_forall_dotProduct_mem [DecidableEq J] {A B : Subalgebra o Ω} (hAB : A ≤ B) {f : Ω → K}
-    (φ : B →+* K) (hf : ∀ x : B, φ x = f x) (O : ValuationSubring K) (hO : ∀ x ∈ A, f x ∈ O) {I : Type}
-    {g : I → J → Ω} (hg : ∀ k j, g k j ∈ B) (b : Matrix J J Ω)
-    (hb : Submodule.span B (Set.range b) = Submodule.span B (Set.range fun i => Pi.single i (1 : Ω)))
-    (H : ∀ w : J → Ω, w ∈ Submodule.span A (Set.range g) ↔ ∀ v ∈ Submodule.span A (Set.range b), w ⬝ᵥ v ∈ A)
-    (w : J → K) :
-    w ∈ Submodule.span O (Set.range fun k j => f (g k j)) ↔
-      ∀ v ∈ Submodule.span O ((fun (v : J → Ω) j => f (v j)) '' (Submodule.span A (Set.range b))), w ⬝ᵥ v ∈ O := by
+theorem mem_span_map_iff_forall_dotProduct_mem
+    [DecidableEq J]
+    {A B : Subalgebra o Ω} (hAB : A ≤ B)
+    {f : Ω → K} (φ : B →+* K) (hf : ∀ x : B, φ x = f x)
+    (O : ValuationSubring K) (hO : ∀ x ∈ A, f x ∈ O)
+    {I : Type} {g : I → J → Ω} (hg : ∀ k j, g k j ∈ B)
+    (b : Matrix J J Ω)
+    (hb
+      : Submodule.span B (Set.range b) = Submodule.span B (Set.range fun i => Pi.single i (1 : Ω)))
+    (H : ∀ w : J → Ω,
+      w ∈ Submodule.span A (Set.range g) ↔ ∀ v ∈ Submodule.span A (Set.range b), w ⬝ᵥ v ∈ A)
+    (w : J → K)
+    : w ∈ Submodule.span O (Set.range fun k j => f (g k j))
+      ↔ ∀ v ∈ Submodule.span O ((fun (v : J → Ω) j => f (v j)) '' (Submodule.span A (Set.range b))),
+        w ⬝ᵥ v ∈ O := by
   have hbB : ∀ i j, b i j ∈ B := fun i j => by
     have h : b i ∈ Submodule.span B (Set.range fun i => (Pi.single i (1 : Ω) : J → Ω)) :=
       hb ▸ Submodule.subset_span ⟨i, rfl⟩
@@ -90,7 +104,8 @@ theorem mem_span_map_iff_forall_dotProduct_mem [DecidableEq J] {A B : Subalgebra
     rw [dotProduct_comm]
     refine dotProduct_mem_of_mem_span O ?_ hw
     rintro _ ⟨k, rfl⟩
-    rw [dotProduct_comm, ← map_dotProduct_of_mem φ hf (hg k) (map_mem_span_of_mem_span hAB φ hf O hO hbB hx).1]
+    rw [dotProduct_comm,
+      ← map_dotProduct_of_mem φ hf (hg k) (map_mem_span_of_mem_span hAB φ hf O hO hbB hx).1]
     exact hO _ ((H _).1 (Submodule.subset_span ⟨k, rfl⟩) x hx)
   · intro hw
     have h1 : ∀ i, ∃ c : J → B, ∑ l, HSMul.hSMul (c l) (b l) = (Pi.single i 1 : J → Ω) := fun i =>
@@ -100,20 +115,26 @@ theorem mem_span_map_iff_forall_dotProduct_mem [DecidableEq J] {A B : Subalgebra
     have hd : d * b = 1 := by
       ext i j
       have := congrFun (hc i) j
-      simpa [Matrix.mul_apply, d, Finset.sum_apply, Subalgebra.smul_def, Matrix.one_apply, Pi.single_apply,
-        eq_comm] using this
+      simpa [Matrix.mul_apply, d, Finset.sum_apply, Subalgebra.smul_def, Matrix.one_apply,
+          Pi.single_apply, eq_comm]
+        using this
     have hd' : b * d = 1 := mul_eq_one_comm.1 hd
-    have h2 : ∀ i, (fun j => d j i) ∈ Submodule.span A (Set.range g) := fun i => (H _).2 fun v hv => by
-      refine dotProduct_mem_of_mem_span A ?_ hv
-      rintro _ ⟨l, rfl⟩
-      have : (fun j => d j i) ⬝ᵥ b l = (b * d) l i := dotProduct_comm _ _
-      rw [this, hd', Matrix.one_apply]
-      split_ifs
-      exacts [one_mem A, zero_mem A]
+    have h2 : ∀ i, (fun j => d j i) ∈ Submodule.span A (Set.range g) := fun i =>
+      (H _).2 fun v hv => by
+        refine dotProduct_mem_of_mem_span A ?_ hv
+        rintro _ ⟨l, rfl⟩
+        have : (fun j => d j i) ⬝ᵥ b l = (b * d) l i := dotProduct_comm _ _
+        rw [this, hd', Matrix.one_apply]
+        split_ifs
+        exacts [one_mem A, zero_mem A]
     have h3 : ∀ i, w ⬝ᵥ (fun j => f (b i j)) ∈ O := fun i =>
       hw _ (Submodule.subset_span ⟨b i, Submodule.subset_span ⟨i, rfl⟩, rfl⟩)
     have h4 : ∀ j l, ∑ i, f (d j i) * f (b i l) = if j = l then 1 else 0 := fun j l => by
-      have h := map_dotProduct_of_mem φ hf (u := d j) (v := fun i => b i l) (fun i => (c j i).2) (fun i => hbB i l)
+      have h :=
+        map_dotProduct_of_mem φ hf (u := d j)
+          (v := fun i => b i l)
+          (fun i => (c j i).2)
+          (fun i => hbB i l)
       have h' : d j ⬝ᵥ (fun i => b i l) = (d * b) j l := rfl
       rw [h', hd, Matrix.one_apply] at h
       refine h.symm.trans ?_
@@ -121,7 +142,9 @@ theorem mem_span_map_iff_forall_dotProduct_mem [DecidableEq J] {A B : Subalgebra
       exacts [(hf 1).symm.trans (map_one φ), (hf 0).symm.trans (map_zero φ)]
     have h5 : w = ∑ i, (⟨_, h3 i⟩ : O) • fun j => f (d j i) := by
       funext j
-      have : ∀ i, ((⟨_, h3 i⟩ : O) • fun j => f (d j i)) j = ∑ l, w l * (f (d j i) * f (b i l)) := fun i => by
+      have : ∀ i,
+          ((⟨_, h3 i⟩ : O) • fun j => f (d j i)) j
+            = ∑ l, w l * (f (d j i) * f (b i l)) := fun i => by
         show (w ⬝ᵥ (fun j => f (b i j))) * f (d j i) = _
         rw [dotProduct, Finset.sum_mul]
         exact Finset.sum_congr rfl fun l _ => by ring
@@ -132,13 +155,15 @@ theorem mem_span_map_iff_forall_dotProduct_mem [DecidableEq J] {A B : Subalgebra
     exact Submodule.sum_mem _ fun i _ =>
       Submodule.smul_mem _ _ (map_mem_span_of_mem_span hAB φ hf O hO hg (h2 i)).2
 
-
 omit [Fintype J] in
-theorem mem_span_iff_div_mem_span (O : ValuationSubring K) {I : Type} (G : I → J → K) {u : K} (hu : u ≠ 0)
-    (w : J → K) :
-    w ∈ Submodule.span O (Set.range G) ↔ u⁻¹ • w ∈ Submodule.span O (Set.range fun k j => G k j / u) := by
-  have key : ∀ (G : I → J → K) (s : K) (w : J → K), w ∈ Submodule.span O (Set.range G) →
-      s • w ∈ Submodule.span O (Set.range fun k => s • G k) := fun G s w hw => by
+theorem mem_span_iff_div_mem_span
+    (O : ValuationSubring K) {I : Type} (G : I → J → K) {u : K} (hu : u ≠ 0) (w : J → K)
+    : w ∈ Submodule.span O (Set.range G)
+      ↔ u⁻¹ • w ∈ Submodule.span O (Set.range fun k j => G k j / u) := by
+  have key
+      : ∀ (G : I → J → K) (s : K) (w : J → K),
+        w ∈ Submodule.span O (Set.range G)
+          → s • w ∈ Submodule.span O (Set.range fun k => s • G k) := fun G s w hw => by
     have := Submodule.mem_map_of_mem (f := (LinearMap.lsmul K (J → K) s).restrictScalars O) hw
     rwa [Submodule.map_span, ← Set.range_comp] at this
   have e : (fun k j => G k j / u) = fun k => u⁻¹ • G k := by
@@ -150,11 +175,37 @@ theorem mem_span_iff_div_mem_span (O : ValuationSubring K) {I : Type} (G : I →
 
 end Specialise
 
-theorem exists_generators_at_all_tests : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω) (M : RatModel o Ω) (U₀ : M.Z.Opens) (EE : M.Lat S.J) (n a : ℕ) (GG₀ : Fin n → S.J → S.R), S.Over₀ M U₀ → IsAffineOpen U₀ → (∀ (z : M.Z) (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z) (y₀ : S.R →+* PadicAlgCl p) (τ : S.Test p y₀), M.Cen U₀ z y → S.At M y y₀ → (∀ x, x ∈ S.supI M z ↔ ‖M.val (gPt p ≫ y) (S.th x)‖ = τ.δ) ∧ S.HH M z = τ.yy.ker) → S.IsEE M U₀ EE → (∀ z : M.Z, ∀ x₀ ∈ S.supI M z, ∀ w : S.J → Ω, w ∈ Submodule.span (M.O z) (Set.range fun k j => (GG₀ k j : Ω) / S.th x₀ ^ a) ↔ ∀ v ∈ EE.E z, w ⬝ᵥ v ∈ M.O z) → ∃ (R' : Subalgebra o Ω) (hR : S.R ≤ R') (GG : Fin n → S.J → R'), R'.FG ∧ (∀ k j, (GG k j : Ω) = GG₀ k j) ∧ (∀ (p : ℕ) [Fact p.Prime] (y' : R' →+* PadicAlgCl p) (τ : S.Test p (y'.comp (Subalgebra.inclusion hR).toRingHom)), (∀ b : o, ‖y' (algebraMap o R' b)‖ ≤ 1) → ∀ w : S.J → PadicAlgCl p, w ∈ Submodule.span (OO p) (Set.range fun k j => y' (GG k j)) ↔ ∀ v ∈ τ.E, ‖w ⬝ᵥ v‖ ≤ τ.δ ^ a) := by
+theorem exists_generators_at_all_tests
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω)
+        (M : RatModel o Ω) (U₀ : M.Z.Opens) (EE : M.Lat S.J) (n a : ℕ) (GG₀ : Fin n → S.J → S.R),
+      S.Over₀ M U₀ → IsAffineOpen U₀
+        → (∀ (z : M.Z) (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z) (y₀ : S.R →+* PadicAlgCl p)
+            (τ : S.Test p y₀),
+          M.Cen U₀ z y → S.At M y y₀
+            → (∀ x, x ∈ S.supI M z ↔ ‖M.val (gPt p ≫ y) (S.th x)‖ = τ.δ) ∧ S.HH M z = τ.yy.ker)
+        → S.IsEE M U₀ EE
+        → (∀ z : M.Z, ∀ x₀ ∈ S.supI M z, ∀ w : S.J → Ω,
+          w ∈ Submodule.span (M.O z) (Set.range fun k j => (GG₀ k j : Ω) / S.th x₀ ^ a)
+            ↔ ∀ v ∈ EE.E z, w ⬝ᵥ v ∈ M.O z)
+        → ∃ (R' : Subalgebra o Ω) (hR : S.R ≤ R') (GG : Fin n → S.J → R'),
+          R'.FG ∧ (∀ k j, (GG k j : Ω) = GG₀ k j)
+            ∧ (∀ (p : ℕ) [Fact p.Prime] (y' : R' →+* PadicAlgCl p)
+                (τ : S.Test p (y'.comp (Subalgebra.inclusion hR).toRingHom)),
+              (∀ b : o, ‖y' (algebraMap o R' b)‖ ≤ 1)
+                → ∀ w : S.J → PadicAlgCl p,
+                  w ∈ Submodule.span (OO p) (Set.range fun k j => y' (GG k j))
+                    ↔ ∀ v ∈ τ.E, ‖w ⬝ᵥ v‖ ≤ τ.δ ^ a) := by
   intro o Ω _ _ _ _ S M U₀ EE n a GG₀ hO hU hsupp hEE hgen
-  refine ⟨M.ringOn U₀, hO.le, fun k j => ⟨GG₀ k j, hO.le (GG₀ k j).2⟩, RatModel.fg_ringOn hU hO.ne,
-    fun _ _ => rfl, fun p _ y' τ hy' w => ?_⟩
-  obtain ⟨z, y, hz, hv⟩ := RatModel.exists_cen_of_ringHom o Ω M U₀ (projProper _ _ _ hO.proj) hU hO.ne p y' hy'
+  refine ⟨
+    M.ringOn U₀,
+    hO.le,
+    fun k j => ⟨GG₀ k j, hO.le (GG₀ k j).2⟩,
+    RatModel.fg_ringOn hU hO.ne,
+    fun _ _ => rfl,
+    fun p _ y' τ hy' w => ?_
+  ⟩
+  obtain ⟨z, y, hz, hv⟩ :=
+    RatModel.exists_cen_of_ringHom o Ω M U₀ (projProper _ _ _ hO.proj) hU hO.ne p y' hy'
   have hAt : S.At M y (y'.comp (Subalgebra.inclusion hO.le).toRingHom) := fun r => hv ⟨r, hO.le r.2⟩
   obtain ⟨x₀, hx₀⟩ := hO.div z
   have hδ := ((hsupp z p y _ τ hz hAt).1 x₀).1 hx₀
@@ -172,13 +223,17 @@ theorem exists_generators_at_all_tests : ∀ (o Ω : Type) [CommRing o] [Field �
   have H := hgen z x₀ hx₀
   have hE := hEE.2 z p y _ τ hz hAt
   rw [hb z hzV] at H hE
-  have key := mem_span_map_iff_forall_dotProduct_mem (RatModel.O_le_of_specializes hξ) φ (fun _ => rfl) (OO p)
-    (fun x hx => (mem_OO_iff _).2 (RatModel.norm_val_le_one hz.1 hx)) hg b
-    ((hb ξ (hξ.mem_open V.isOpen hzV)).symm.trans (hEE.1 ξ hξU)) H
+  have key :=
+    mem_span_map_iff_forall_dotProduct_mem (RatModel.O_le_of_specializes hξ) φ
+      (fun _ => rfl)
+      (OO p)
+      (fun x hx => (mem_OO_iff _).2 (RatModel.norm_val_le_one hz.1 hx))
+      hg b ((hb ξ (hξ.mem_open V.isOpen hzV)).symm.trans (hEE.1 ξ hξU)) H
   set u := M.val (gPt p ≫ y) (S.th x₀) with hu
   have hu0 : u ^ a ≠ 0 := pow_ne_zero _ (norm_pos_iff.1 (hδ ▸ τ.δ_pos))
-  have e : (fun k j => y' ⟨GG₀ k j, hO.le (GG₀ k j).2⟩ / u ^ a) =
-      fun k j => M.val (gPt p ≫ y) ((GG₀ k j : Ω) / S.th x₀ ^ a) := by
+  have e
+      : (fun k j => y' ⟨GG₀ k j, hO.le (GG₀ k j).2⟩ / u ^ a)
+        = fun k j => M.val (gPt p ≫ y) ((GG₀ k j : Ω) / S.th x₀ ^ a) := by
     funext k j
     rw [div_eq_iff hu0, hv]
     have h := map_mul φ ⟨_, hg k j⟩ (⟨_, ht⟩ ^ a)

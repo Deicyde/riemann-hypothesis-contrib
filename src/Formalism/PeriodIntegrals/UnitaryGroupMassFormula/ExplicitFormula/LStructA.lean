@@ -37,34 +37,48 @@ lemma logDeriv_local {f : ℂ → ℂ} {ρ : ℂ} (hf : AnalyticAt ℂ f ρ)
   beta_reduce
   ring
 
-theorem exists_regular_part {f : ℂ → ℂ} {K : Set ℂ} (hf : AnalyticOnNhd ℂ f K) (Z : Finset ℂ)
-    (hZ0 : ∀ ρ ∈ Z, f ρ = 0) (hK : ∀ s ∈ K, f s = 0 → s ∈ Z)
-    (hfin : ∀ ρ ∈ K, analyticOrderAt f ρ ≠ ⊤) :
-    ∃ H : ℂ → ℂ, AnalyticOnNhd ℂ H K ∧ ∀ s ∈ K, f s ≠ 0 →
-      logDeriv f s = H s + ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (s - ρ) := by
+theorem exists_regular_part
+    {f : ℂ → ℂ} {K : Set ℂ} (hf : AnalyticOnNhd ℂ f K)
+    (Z : Finset ℂ) (hZ0 : ∀ ρ ∈ Z, f ρ = 0) (hK : ∀ s ∈ K, f s = 0 → s ∈ Z)
+    (hfin : ∀ ρ ∈ K, analyticOrderAt f ρ ≠ ⊤)
+    : ∃ H : ℂ → ℂ,
+      AnalyticOnNhd ℂ H K
+        ∧ ∀ s ∈ K,
+          f s ≠ 0 → logDeriv f s = H s + ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (s - ρ) := by
   classical
-  have hloc : ∀ ρ, ρ ∈ K → ∃ k : ℂ → ℂ, AnalyticAt ℂ k ρ ∧ ∀ᶠ s in 𝓝[≠] ρ, f s ≠ 0 ∧
-      logDeriv f s = (analyticOrderNatAt f ρ : ℂ) / (s - ρ) + k s :=
-    fun ρ hρ => logDeriv_local (hf ρ hρ) (hfin ρ hρ)
+  have hloc
+      : ∀ ρ,
+        ρ ∈ K
+          → ∃ k : ℂ → ℂ,
+            AnalyticAt ℂ k ρ
+              ∧ ∀ᶠ s in 𝓝[≠] ρ, f s ≠ 0 ∧
+                logDeriv f s = (analyticOrderNatAt f ρ : ℂ) / (s - ρ) + k s := fun ρ hρ =>
+    logDeriv_local (hf ρ hρ) (hfin ρ hρ)
   choose! k hk hkev using hloc
-  have hsumA : ∀ (W : Finset ℂ) (s0 : ℂ), s0 ∉ W →
-      AnalyticAt ℂ (fun s => ∑ ρ ∈ W, (analyticOrderNatAt f ρ : ℂ) / (s - ρ)) s0 := by
+  have hsumA
+      : ∀ (W : Finset ℂ) (s0 : ℂ),
+        s0 ∉ W → AnalyticAt ℂ (fun s => ∑ ρ ∈ W, (analyticOrderNatAt f ρ : ℂ) / (s - ρ)) s0 := by
     intro W s0 hW
-    have h := Finset.analyticAt_sum (𝕜 := ℂ) (c := s0) W
-      (f := fun ρ (s : ℂ) => (analyticOrderNatAt f ρ : ℂ) / (s - ρ))
-      (fun ρ hρ => analyticAt_const.div (analyticAt_id.sub analyticAt_const)
-        (sub_ne_zero.2 fun h => hW (h ▸ hρ)))
+    have h :=
+      Finset.analyticAt_sum (𝕜 := ℂ) (c := s0) W
+        (f := fun ρ (s : ℂ) => (analyticOrderNatAt f ρ : ℂ) / (s - ρ))
+        (fun ρ hρ =>
+          analyticAt_const.div (analyticAt_id.sub analyticAt_const)
+            (sub_ne_zero.2 fun h => hW (h ▸ hρ)))
     convert h using 1
     ext s
     simp [Finset.sum_apply]
-  let H : ℂ → ℂ := fun s => if s ∈ Z ∧ s ∈ K then
+  let H : ℂ → ℂ := fun s =>
+    if s ∈ Z ∧ s ∈ K then
       k s s - ∑ ρ ∈ Z.erase s, (analyticOrderNatAt f ρ : ℂ) / (s - ρ)
-    else logDeriv f s - ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (s - ρ)
+    else
+      logDeriv f s - ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (s - ρ)
   refine ⟨H, ?_, ?_⟩
   · intro s0 hs0
     by_cases hz : s0 ∈ Z
     · have hRa : AnalyticAt ℂ
-          (fun s => k s0 s - ∑ ρ ∈ Z.erase s0, (analyticOrderNatAt f ρ : ℂ) / (s - ρ)) s0 :=
+          (fun s => k s0 s - ∑ ρ ∈ Z.erase s0, (analyticOrderNatAt f ρ : ℂ) / (s - ρ))
+          s0 :=
         (hk s0 hs0).sub (hsumA _ s0 (by simp))
       have h1 := hkev s0 hs0
       rw [eventually_nhdsWithin_iff] at h1
@@ -83,7 +97,9 @@ theorem exists_regular_part {f : ℂ → ℂ} {K : Set ℂ} (hf : AnalyticOnNhd 
     · have hf0 : f s0 ≠ 0 := fun h => hz (hK s0 hs0 h)
       have h2 : ∀ᶠ s in 𝓝 s0, s ∉ Z :=
         Z.finite_toSet.isClosed.isOpen_compl.mem_nhds (by simpa using hz)
-      have hA : AnalyticAt ℂ (fun s => logDeriv f s - ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (s - ρ)) s0 := by
+      have hA : AnalyticAt ℂ
+          (fun s => logDeriv f s - ∑ ρ ∈ Z, (analyticOrderNatAt f ρ : ℂ) / (s - ρ))
+          s0 := by
         refine AnalyticAt.sub ?_ (hsumA Z s0 hz)
         have e : logDeriv f = fun s => deriv f s / f s := funext fun s => logDeriv_apply f s
         rw [e]

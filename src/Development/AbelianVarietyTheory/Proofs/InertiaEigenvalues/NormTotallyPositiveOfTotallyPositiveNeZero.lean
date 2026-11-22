@@ -10,17 +10,20 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem norm_pos_of_totallyPositive (E E' : Type) [Field E] [NumberField E] [Field E']
-    [NumberField E'] [Algebra E E'] (a : E') (ha : a ≠ 0) (hpos : ∀ φ : E' →+* ℝ, 0 < φ a)
-    (φ : E →+* ℝ) : 0 < φ (Algebra.norm E a) := by
+theorem norm_pos_of_totallyPositive
+    (E E' : Type) [Field E] [NumberField E] [Field E'] [NumberField E'] [Algebra E E']
+    (a : E') (ha : a ≠ 0) (hpos : ∀ φ : E' →+* ℝ, 0 < φ a)
+    (φ : E →+* ℝ)
+    : 0 < φ (Algebra.norm E a) := by
   letI : Algebra E ℂ := (Complex.ofRealHom.comp φ).toAlgebra
   have hmap : ∀ x, algebraMap E ℂ x = ((φ x : ℝ) : ℂ) := fun x => rfl
   have key := Algebra.norm_eq_prod_embeddings E ℂ a
-  let g : (E' →ₐ[E] ℂ) → (E' →ₐ[E] ℂ) := fun σ =>
-    { (starRingEnd ℂ).comp σ.toRingHom with
-      commutes' := fun x => by
-        show (starRingEnd ℂ) (σ (algebraMap E E' x)) = algebraMap E ℂ x
-        rw [σ.commutes, hmap, Complex.conj_ofReal] }
+  let g : (E' →ₐ[E] ℂ) → (E' →ₐ[E] ℂ) := fun σ => {
+    (starRingEnd ℂ).comp σ.toRingHom with
+    commutes' := fun x => by
+      show (starRingEnd ℂ) (σ (algebraMap E E' x)) = algebraMap E ℂ x
+      rw [σ.commutes, hmap, Complex.conj_ofReal]
+  }
   have hg : ∀ σ x, g σ x = (starRingEnd ℂ) (σ x) := fun σ x => rfl
   have hne : ∀ σ : E' →ₐ[E] ℂ, σ a ≠ 0 := fun σ => (map_ne_zero σ).2 ha
   have hnorm : ∀ σ : E' →ₐ[E] ℂ, ((‖σ a‖ : ℝ) : ℂ) ≠ 0 := fun σ => by
@@ -28,9 +31,10 @@ theorem norm_pos_of_totallyPositive (E E' : Type) [Field E] [NumberField E] [Fie
   have h1 : ∏ σ : E' →ₐ[E] ℂ, σ a / ((‖σ a‖ : ℝ) : ℂ) = 1 := by
     refine Finset.prod_involution (fun σ _ => g σ) ?_ ?_ (fun _ _ => Finset.mem_univ _) ?_
     · intro σ _
-      rw [hg, Complex.norm_conj, div_mul_div_comm, Complex.mul_conj, div_eq_one_iff_eq
-        (mul_ne_zero (hnorm σ) (hnorm σ)), Complex.normSq_eq_norm_sq]
-      push_cast; ring
+      rw [hg, Complex.norm_conj, div_mul_div_comm, Complex.mul_conj,
+        div_eq_one_iff_eq (mul_ne_zero (hnorm σ) (hnorm σ)), Complex.normSq_eq_norm_sq]
+      push_cast
+      ring
     · intro σ _ hf hgs
       apply hf
       have hreal : ComplexEmbedding.IsReal σ.toRingHom := by
@@ -50,7 +54,9 @@ theorem norm_pos_of_totallyPositive (E E' : Type) [Field E] [NumberField E] [Fie
   rw [h1, hmap] at key
   have hr : φ (Algebra.norm E a) = ∏ σ : E' →ₐ[E] ℂ, ‖σ a‖ := by
     apply Complex.ofReal_injective
-    rw [key]; push_cast; rfl
+    rw [key]
+    push_cast
+    rfl
   rw [hr]
   exact Finset.prod_pos fun σ _ => norm_pos_iff.2 (hne σ)
 

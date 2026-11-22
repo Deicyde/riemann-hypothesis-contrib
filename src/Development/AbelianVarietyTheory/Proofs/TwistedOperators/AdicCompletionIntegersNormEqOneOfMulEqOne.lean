@@ -6,12 +6,16 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.T2SpaceTe
 
 @[expose] public section
 
-open MeasureTheory Topology Matrix NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.ModuLR
+open MeasureTheory Topology Matrix NumberField IsDedekindDomain
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.ModuLR
 open scoped NNReal ENNReal TensorProduct
 
 namespace GlobalTheory
 
-theorem adicCompletionIntegers_norm_eq_one_of_mul_eq_one (F : Type) [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F)) (x y : v.adicCompletionIntegers F) (h : x * y = 1) : ‖(x : Fv F v)‖ = 1 := by
+theorem adicCompletionIntegers_norm_eq_one_of_mul_eq_one
+    (F : Type) [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F)) (x y : v.adicCompletionIntegers F) (h : x * y = 1)
+    : ‖(x : Fv F v)‖ = 1 := by
   have hx : ‖(x : Fv F v)‖ ≤ 1 := (Valued.toNormedField.norm_le_one_iff).mpr x.2
   have hy : ‖(y : Fv F v)‖ ≤ 1 := (Valued.toNormedField.norm_le_one_iff).mpr y.2
   have hxy : ‖(x : Fv F v)‖ * ‖(y : Fv F v)‖ = 1 := by

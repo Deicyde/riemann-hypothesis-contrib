@@ -17,21 +17,24 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.AdjointEnd
 noncomputable section
 
 open scoped BigOperators
-open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj GlobalTheory.RowLaw ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj
+  GlobalTheory.RowLaw ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 namespace GlobalTheory.RowLaw.PureTypical
 
 variable {C : Type} [Field C]
 
-theorem tyS_smul {l : ℕ} (hl : 2 ≤ l) (c : C) (a : ℕ → C) : tyS l (fun s => c * a s) = c • tyS l a := by
+theorem tyS_smul {l : ℕ} (hl : 2 ≤ l) (c : C) (a : ℕ → C)
+    : tyS l (fun s => c * a s) = c • tyS l a := by
   apply tyS_eq hl
   · intro s
     rw [PowerSeries.coeff_smul, coeff_tyS_pow hl, smul_eq_mul]
   · intro m hm
     rw [PowerSeries.coeff_smul, coeff_tyS_of_ne a m hm, smul_zero]
 
-theorem tyS_sum {l : ℕ} (hl : 2 ≤ l) {ι : Type} (S : Finset ι) (a : ι → ℕ → C) :
-    tyS l (fun s => ∑ i ∈ S, a i s) = ∑ i ∈ S, tyS l (a i) := by
+theorem tyS_sum {l : ℕ} (hl : 2 ≤ l) {ι : Type} (S : Finset ι) (a : ι → ℕ → C)
+    : tyS l (fun s => ∑ i ∈ S, a i s) = ∑ i ∈ S, tyS l (a i) := by
   apply tyS_eq hl
   · intro s
     set_option synthInstance.maxHeartbeats 100000 in
@@ -42,8 +45,8 @@ theorem tyS_sum {l : ℕ} (hl : 2 ≤ l) {ι : Type} (S : Finset ι) (a : ι →
       rw [map_sum]
     exact Finset.sum_eq_zero fun i _ => coeff_tyS_of_ne _ m hm
 
-theorem tyS_rescale {l : ℕ} (hl : 2 ≤ l) (c : C) (a : ℕ → C) :
-    tyS l (fun s => c ^ (l ^ s) * a s) = PowerSeries.rescale c (tyS l a) := by
+theorem tyS_rescale {l : ℕ} (hl : 2 ≤ l) (c : C) (a : ℕ → C)
+    : tyS l (fun s => c ^ (l ^ s) * a s) = PowerSeries.rescale c (tyS l a) := by
   apply tyS_eq hl
   · intro s
     rw [PowerSeries.coeff_rescale, coeff_tyS_pow hl]
@@ -68,8 +71,9 @@ theorem ge_of_pow_eq_one (V : VF C) {N : ℕ} (hN : N ≠ 0) {z : C} (hz : z ^ N
       · exact h
     rw [this]
 
-theorem mean_pow {N : ℕ} (hN : (N : C) ≠ 0) {z y : C} (hz : z ^ N = 1) (hy : y ^ N = 1) [Decidable (z = y)] :
-    (N : C)⁻¹ * ∑ k ∈ Finset.range N, (z * y⁻¹) ^ k = if z = y then 1 else 0 := by
+theorem mean_pow
+    {N : ℕ} (hN : (N : C) ≠ 0) {z y : C} (hz : z ^ N = 1) (hy : y ^ N = 1) [Decidable (z = y)]
+    : (N : C)⁻¹ * ∑ k ∈ Finset.range N, (z * y⁻¹) ^ k = if z = y then 1 else 0 := by
   have hN0 : N ≠ 0 := by rintro rfl; simp at hN
   have hy0 : y ≠ 0 := by rintro rfl; rw [zero_pow hN0] at hy; exact zero_ne_one hy
   split_ifs with h
@@ -83,21 +87,27 @@ theorem mean_pow {N : ℕ} (hN : (N : C) ≠ 0) {z y : C} (hz : z ^ N = 1) (hy :
 
 variable {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ]
 
-def emb (X : RawChart C d I κ) (l : ℕ) (g : Fin 2) (b : ℕ → I g → C) (e : ℕ → JJ I g → C) :
-    (κ → PowerSeries C) × (JJ I g → PowerSeries C) :=
+def emb (X : RawChart C d I κ) (l : ℕ) (g : Fin 2) (b : ℕ → I g → C) (e : ℕ → JJ I g → C)
+    : (κ → PowerSeries C) × (JJ I g → PowerSeries C) :=
   (fun i => tyS l fun s => ∑ c, X.u g c i * b s c, fun q => tyS l fun s => e s q)
 
-theorem emb_add (X : RawChart C d I κ) {l : ℕ} (hl : 2 ≤ l) (g : Fin 2) (b b' : ℕ → I g → C)
-    (e e' : ℕ → JJ I g → C) :
-    emb X l g (fun s c => b s c + b' s c) (fun s q => e s q + e' s q) = emb X l g b e + emb X l g b' e' := by
+theorem emb_add
+    (X : RawChart C d I κ)
+    {l : ℕ} (hl : 2 ≤ l)
+    (g : Fin 2) (b b' : ℕ → I g → C) (e e' : ℕ → JJ I g → C)
+    : emb X l g (fun s c => b s c + b' s c) (fun s q => e s q + e' s q)
+      = emb X l g b e + emb X l g b' e' := by
   refine Prod.ext (funext fun i => ?_) (funext fun q => ?_)
   · simp only [emb, Prod.fst_add, Pi.add_apply, mul_add, Finset.sum_add_distrib]
     exact tyS_add hl _ _
   · exact tyS_add hl _ _
 
-theorem emb_smul (X : RawChart C d I κ) {l : ℕ} (hl : 2 ≤ l) (g : Fin 2) (r : C) (b : ℕ → I g → C)
-    (e : ℕ → JJ I g → C) :
-    emb X l g (fun s c => r * b s c) (fun s q => r * e s q) = r • emb X l g b e := by
+theorem emb_smul
+    (X : RawChart C d I κ)
+    {l : ℕ} (hl : 2 ≤ l)
+    (g : Fin 2)
+    (r : C) (b : ℕ → I g → C) (e : ℕ → JJ I g → C)
+    : emb X l g (fun s c => r * b s c) (fun s q => r * e s q) = r • emb X l g b e := by
   refine Prod.ext (funext fun i => ?_) (funext fun q => ?_)
   · simp only [emb, Prod.smul_fst, Pi.smul_apply]
     rw [← tyS_smul hl]
@@ -107,8 +117,8 @@ theorem emb_smul (X : RawChart C d I κ) {l : ℕ} (hl : 2 ≤ l) (g : Fin 2) (r
     exact Finset.sum_congr rfl fun c _ => by ring
   · exact tyS_smul hl _ _
 
-theorem emb_zero (X : RawChart C d I κ) (l : ℕ) (g : Fin 2) :
-    emb X l g (fun _ _ => 0) (fun _ _ => 0) = 0 := by
+theorem emb_zero (X : RawChart C d I κ) (l : ℕ) (g : Fin 2)
+    : emb X l g (fun _ _ => 0) (fun _ _ => 0) = 0 := by
   refine Prod.ext (funext fun i => ?_) (funext fun q => ?_)
   · simp only [emb, mul_zero, Finset.sum_const_zero]
     exact tyS_zero
@@ -118,9 +128,11 @@ section Main
 
 variable [NeZero d] {X : RawChart C d I κ} {V : VF C}
 
-theorem exists_start (hR : RLaw X V) (hP : HasProj X V) (g : Fin 2) (w : I g → C) (hw : ∀ c, V.Ge 0 (w c)) :
-    ∃ (b : ℕ → I g → C) (e : ℕ → JJ I g → C), emb X V.l g b e ∈ Cv X V g ∧ b 0 = w ∧
-      ∀ q, e 0 q = -∑ c, X.sg1 (X.u g c) (X.u (1 - g) q) * w c := by
+theorem exists_start
+    (hR : RLaw X V) (hP : HasProj X V) (g : Fin 2) (w : I g → C) (hw : ∀ c, V.Ge 0 (w c))
+    : ∃ (b : ℕ → I g → C) (e : ℕ → JJ I g → C),
+      emb X V.l g b e ∈ Cv X V g ∧ b 0 = w
+        ∧ ∀ q, e 0 q = - ∑ c, X.sg1 (X.u g c) (X.u (1 - g) q) * w c := by
   classical
   obtain ⟨M, h01, h10, hfix, -, hspan⟩ := hP
   have hEnd : IsEnd X V (M g) (M (1 - g)) := by
@@ -149,26 +161,44 @@ theorem exists_start (hR : RLaw X V) (hP : HasProj X V) (g : Fin 2) (w : I g →
   have hlg0 : ∀ i, MvPowerSeries.constantCoeff (X.lg i) = 0 := fun i => by
     rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, hR.lin i 0 (by simp),
       MvPowerSeries.coeff_zero_eq_constantCoeff_apply, MvPowerSeries.constantCoeff_X]
-  have hlg1 : ∀ i j, MvPowerSeries.coeff (Finsupp.single j 1) (X.lg i) = if j = i then 1 else 0 := fun i j => by
+  have hlg1
+      : ∀ i j,
+        MvPowerSeries.coeff (Finsupp.single j 1) (X.lg i) = if j = i then 1 else 0 := fun i j => by
     rw [hR.lin i _ (by rw [Finsupp.degree_single]), MvPowerSeries.coeff_X]
     by_cases hji : j = i
     · rw [hji, if_pos rfl, if_pos rfl]
     · rw [if_neg hji, if_neg]
       intro h
       exact hji (Finsupp.single_left_injective one_ne_zero h)
-  have h0 : ((fun i => alongCv γ (X.lg i), fun q => 0 - alongCv γ (X.sg (X.u (1 - g) q))) :
-      (κ → PowerSeries C) × (JJ I g → PowerSeries C)) ∈ Cv X V g :=
-    ⟨γ, fun _ => 0, hγcv, fun _ => ⟨map_zero _, fun n => by rw [map_zero]; exact VF.Ge.zero 0⟩,
-      fun _ => rfl, fun _ => rfl⟩
-  have h1 := GlobalTheory.T.adjointEndPair_mem_gaugedCurveLogarithms C V d I κ X hR g (M g) (M (1 - g)) (fun _ => 1) hEnd (fun _ => VF.Ge.one)
-    (fun q => by rw [one_smul]; exact hfix (1 - g) q) _ h0
+  have h0
+      : ((fun i => alongCv γ (X.lg i), fun q => 0 - alongCv γ (X.sg (X.u (1 - g) q)))
+          : (κ → PowerSeries C) × (JJ I g → PowerSeries C))
+        ∈ Cv X V g := ⟨
+    γ,
+    fun _ => 0,
+    hγcv,
+    fun _ => ⟨map_zero _, fun n => by rw [map_zero]; exact VF.Ge.zero 0⟩,
+    fun _ => rfl,
+    fun _ => rfl
+  ⟩
+  have h1 :=
+    GlobalTheory.T.adjointEndPair_mem_gaugedCurveLogarithms C V d I κ X hR g (M g) (M (1 - g))
+      (fun _ => 1)
+      hEnd
+      (fun _ => VF.Ge.one)
+      (fun q => by rw [one_smul]; exact hfix (1 - g) q)
+      _ h0
   have h2 := GlobalTheory.T.powExponentPart_mem_gaugedCurveLogarithms C V d I κ X hR g _ h1
   have hA1 : ∀ i, PowerSeries.coeff 1 (alongCv γ (X.lg i)) = v i := by
     intro i
     rw [coeff_alongCv_low le_rfl hγ0 (hlg0 i)]
     simp [hlg1, hγ1]
-  have hb : ∀ s : ℕ, ∃ b : I g → C, (s = 0 → b = w) ∧
-      ∀ i, ∑ j, M g i j * PowerSeries.coeff (V.l ^ s) (alongCv γ (X.lg j)) = ∑ c, X.u g c i * b c := by
+  have hb
+      : ∀ s : ℕ, ∃ b : I g → C,
+        (s = 0 → b = w)
+          ∧ ∀ i,
+            ∑ j, M g i j * PowerSeries.coeff (V.l ^ s) (alongCv γ (X.lg j))
+              = ∑ c, X.u g c i * b c := by
     intro s
     by_cases hs : s = 0
     · subst hs
@@ -186,7 +216,13 @@ theorem exists_start (hR : RLaw X V) (hP : HasProj X V) (g : Fin 2) (w : I g →
       rw [this]
       exact Finset.sum_congr rfl fun c _ => mul_comm _ _
   choose b hb0 hb1 using hb
-  refine ⟨b, fun s q => -PowerSeries.coeff (V.l ^ s) (alongCv γ (X.sg (X.u (1 - g) q))), ?_, hb0 0 rfl, ?_⟩
+  refine ⟨
+    b,
+    fun s q => - PowerSeries.coeff (V.l ^ s) (alongCv γ (X.sg (X.u (1 - g) q))),
+    ?_,
+    hb0 0 rfl,
+    ?_
+  ⟩
   · convert h2 using 1
     refine Prod.ext (funext fun i => ?_) (funext fun q => ?_)
     set_option synthInstance.maxHeartbeats 100000 in
@@ -200,14 +236,20 @@ theorem exists_start (hR : RLaw X V) (hP : HasProj X V) (g : Fin 2) (w : I g →
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun i _ => by ring
 
-theorem pure_mem (hR : RLaw X V) {g : Fin 2} (hT : HasTeich X V g) (a : ZMod d) {b : ℕ → I g → C}
-    {e : ℕ → JJ I g → C} (h : emb X V.l g b e ∈ Cv X V g) :
-    emb X V.l g (fun s c => if X.ty g c = a + s then b s c else 0)
-      (fun s q => if X.ty (1 - g) q = a + s then e s q else 0) ∈ Cv X V g := by
+theorem pure_mem
+    (hR : RLaw X V)
+    {g : Fin 2} (hT : HasTeich X V g)
+    (a : ZMod d)
+    {b : ℕ → I g → C} {e : ℕ → JJ I g → C} (h : emb X V.l g b e ∈ Cv X V g)
+    : emb X V.l g
+        (fun s c => if X.ty g c = a + s then b s c else 0)
+        (fun s q => if X.ty (1 - g) q = a + s then e s q else 0)
+      ∈ Cv X V g := by
   classical
   have hl := V.l_prime.two_le
   obtain ⟨N, ζ, M, M', hN, hζN, hinj, hζl, hEnd, hM, hM'⟩ := hT
-  obtain ⟨hzero, hadd, -, hres⟩ := GlobalTheory.T.gaugedFormalGroupCurveLogarithms_addSubgroup_rescale C V d I κ X hR g
+  obtain ⟨hzero, hadd, -, hres⟩ :=
+    GlobalTheory.T.gaugedFormalGroupCurveLogarithms_addSubgroup_rescale C V d I κ X hR g
   have hNC : (N : C) ≠ 0 := by
     intro h0
     rw [h0, V.v.map_zero] at hN
@@ -218,13 +260,21 @@ theorem pure_mem (hR : RLaw X V) {g : Fin 2} (hT : HasTeich X V g) (a : ZMod d) 
     induction s with
     | zero => simp
     | succ s ih => rw [pow_succ, pow_mul, ih, Nat.cast_succ, ← add_assoc, hζl]
-  have hstep : ∀ (b : ℕ → I g → C) (e : ℕ → JJ I g → C), emb X V.l g b e ∈ Cv X V g →
-      emb X V.l g (fun s c => (ζ (X.ty g c) * (ζ (a + s))⁻¹) * b s c)
-        (fun s q => (ζ (X.ty (1 - g) q) * (ζ (a + s))⁻¹) * e s q) ∈ Cv X V g := by
+  have hstep
+      : ∀ (b : ℕ → I g → C) (e : ℕ → JJ I g → C),
+        emb X V.l g b e ∈ Cv X V g
+          → emb X V.l g
+              (fun s c => (ζ (X.ty g c) * (ζ (a + s))⁻¹) * b s c)
+              (fun s q => (ζ (X.ty (1 - g) q) * (ζ (a + s))⁻¹) * e s q)
+            ∈ Cv X V g := by
     intro b e h
     have h1 := hres (ζ a)⁻¹ (ge_of_pow_eq_one V hN0 (by rw [inv_pow, hζN, inv_one])) _ h
-    have h2 := GlobalTheory.T.adjointEndPair_mem_gaugedCurveLogarithms C V d I κ X hR g M M' (fun q => ζ (X.ty (1 - g) q)) hEnd
-      (fun q => ge_of_pow_eq_one V hN0 (hζN _)) hM' _ h1
+    have h2 :=
+      GlobalTheory.T.adjointEndPair_mem_gaugedCurveLogarithms C V d I κ X hR g M M'
+        (fun q => ζ (X.ty (1 - g) q))
+        hEnd
+        (fun q => ge_of_pow_eq_one V hN0 (hζN _))
+        hM' _ h1
     convert h2 using 1
     refine Prod.ext (funext fun i => ?_) (funext fun q => ?_)
     · simp only [emb, ← tyS_rescale hl, ← tyS_smul hl]
@@ -236,23 +286,31 @@ theorem pure_mem (hR : RLaw X V) {g : Fin 2} (hT : HasTeich X V g) (a : ZMod d) 
       refine Finset.sum_congr rfl fun c _ => ?_
       have := congrFun (hM c) i
       simp only [Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul] at this
-      calc X.u g c i * (ζ (X.ty g c) * (ζ (a + s))⁻¹ * b s c)
+      calc
+        X.u g c i * (ζ (X.ty g c) * (ζ (a + s))⁻¹ * b s c)
           = (ζ (X.ty g c) * X.u g c i) * ((ζ (a + s))⁻¹ * b s c) := by ring
         _ = _ := by
           rw [← this, Finset.sum_mul]
           exact Finset.sum_congr rfl fun j _ => by ring
     · simp only [emb, ← tyS_rescale hl, ← tyS_smul hl, inv_pow, hζs, mul_assoc]
-  have hpow : ∀ k : ℕ, emb X V.l g (fun s c => (ζ (X.ty g c) * (ζ (a + s))⁻¹) ^ k * b s c)
-        (fun s q => (ζ (X.ty (1 - g) q) * (ζ (a + s))⁻¹) ^ k * e s q) ∈ Cv X V g := by
+  have hpow
+      : ∀ k : ℕ,
+        emb X V.l g
+            (fun s c => (ζ (X.ty g c) * (ζ (a + s))⁻¹) ^ k * b s c)
+            (fun s q => (ζ (X.ty (1 - g) q) * (ζ (a + s))⁻¹) ^ k * e s q)
+          ∈ Cv X V g := by
     intro k
     induction k with
     | zero => simpa using h
     | succ k ih =>
       have := hstep _ _ ih
       simpa only [pow_succ', mul_assoc] using this
-  have hsum : ∀ n : ℕ, emb X V.l g
-      (fun s c => (∑ k ∈ Finset.range n, (ζ (X.ty g c) * (ζ (a + s))⁻¹) ^ k) * b s c)
-      (fun s q => (∑ k ∈ Finset.range n, (ζ (X.ty (1 - g) q) * (ζ (a + s))⁻¹) ^ k) * e s q) ∈ Cv X V g := by
+  have hsum
+      : ∀ n : ℕ,
+        emb X V.l g
+            (fun s c => (∑ k ∈ Finset.range n, (ζ (X.ty g c) * (ζ (a + s))⁻¹) ^ k) * b s c)
+            (fun s q => (∑ k ∈ Finset.range n, (ζ (X.ty (1 - g) q) * (ζ (a + s))⁻¹) ^ k) * e s q)
+          ∈ Cv X V g := by
     intro n
     induction n with
     | zero =>
@@ -264,7 +322,8 @@ theorem pure_mem (hR : RLaw X V) {g : Fin 2} (hT : HasTeich X V g) (a : ZMod d) 
       exact hadd _ ih _ (hpow n)
   have hdiv := GlobalTheory.T.curveLogarithms_inv_natCast_smul_mem C V d I κ X hR g N hN _ (hsum N)
   rw [← emb_smul X hl] at hdiv
-  simp only [← mul_assoc, mean_pow hNC (hζN _) (hζN _), hinj.eq_iff, ite_mul, one_mul, zero_mul] at hdiv
+  simp only [← mul_assoc, mean_pow hNC (hζN _) (hζN _), hinj.eq_iff, ite_mul, one_mul, zero_mul]
+    at hdiv
   exact hdiv
 
 end Main
@@ -273,9 +332,17 @@ end GlobalTheory.RowLaw.PureTypical
 
 namespace GlobalTheory.RowLaw
 
-
 open PureTypical in
-theorem exists_pure_typical : ∀ (C : Type) [Field C] (V : VF C) (d : ℕ) [NeZero d] (I : Fin 2 → Type) [∀ g, Fintype (I g)] (κ : Type) [Fintype κ] (X : RawChart C d I κ), RLaw X V → HasProj X V → ∀ g, HasTeich X V g → ∀ (a : ZMod d) (w : I g → C), (∀ c, V.Ge 0 (w c)) → (∀ c, X.tyC g (Sum.inl c) ≠ a → w c = 0) → ∃ x ∈ X.TySet V g, x 0 = Sum.elim w 0 ∧ ∀ (i : ℕ) n, X.tyC g n ≠ a + i → x i n = 0 := by
+theorem exists_pure_typical
+    : ∀ (C : Type) [Field C] (V : VF C) (d : ℕ) [NeZero d] (I : Fin 2 → Type) [∀ g, Fintype (I g)]
+        (κ : Type) [Fintype κ] (X : RawChart C d I κ),
+      RLaw X V → HasProj X V
+        → ∀ g,
+          HasTeich X V g
+            → ∀ (a : ZMod d) (w : I g → C),
+              (∀ c, V.Ge 0 (w c)) → (∀ c, X.tyC g (Sum.inl c) ≠ a → w c = 0)
+                → ∃ x ∈ X.TySet V g,
+                  x 0 = Sum.elim w 0 ∧ ∀ (i : ℕ) n, X.tyC g n ≠ a + i → x i n = 0 := by
   intro C _ V d _ I _ κ _ X hR hP g hT a w hw hwa
   classical
   have hl := V.l_prime.two_le
@@ -290,9 +357,15 @@ theorem exists_pure_typical : ∀ (C : Type) [Field C] (V : VF C) (d : ℕ) [NeZ
     split_ifs with h
     · rfl
     · exact (hwa' c h).symm
-  refine ⟨fun s => Sum.elim (b' s) fun q => e' s q +
-    ∑ c, if X.ty g c = X.ty (1 - g) q then X.sg1 (X.u g c) (X.u (1 - g) q) * b' s c else 0,
-    ⟨γ, lam, hγ, hlam, fun i => ?_, fun q => ?_⟩, ?_, ?_⟩
+  refine ⟨
+    fun s =>
+      Sum.elim (b' s) fun q =>
+        e' s q
+          + ∑ c, if X.ty g c = X.ty (1 - g) q then X.sg1 (X.u g c) (X.u (1 - g) q) * b' s c else 0,
+    ⟨γ, lam, hγ, hlam, fun i => ?_, fun q => ?_⟩,
+    ?_,
+    ?_
+  ⟩
   · rw [h1 i]
     simp only [emb, Sum.elim_inl, ← tyS_smul hl]
     exact tyS_sum hl _ _

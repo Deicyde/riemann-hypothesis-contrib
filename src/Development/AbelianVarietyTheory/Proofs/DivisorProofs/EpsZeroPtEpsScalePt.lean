@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GrpObjTangen
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.GrpTangentPt
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.GrpTangentPt
 
 noncomputable section
 
@@ -76,15 +77,19 @@ lemma Tan.hom_sum {I : Type} (s : Finset I) (v : I → Tan x G) : (∑ i ∈ s, 
   exact congrArg Additive.toMul this
 
 instance : Module k (Tan x G) where
-  smul c v := Tan.mk (epsScalePt x c ≫ v.hom) (by
-    change epsZeroPt x ≫ _ = 1
-    rw [epsZeroPt_epsScalePt_assoc]; exact v.hom_mem)
-  one_smul v := Tan.ext (by
-    change epsScalePt x 1 ≫ v.hom = _
-    rw [epsScalePt_one, Category.id_comp])
-  mul_smul a b v := Tan.ext (by
-    change epsScalePt x (a * b) ≫ v.hom = epsScalePt x a ≫ epsScalePt x b ≫ v.hom
-    rw [← Category.assoc, epsScalePt_mul])
+  smul c v :=
+    Tan.mk (epsScalePt x c ≫ v.hom) (by
+      change epsZeroPt x ≫ _ = 1
+      rw [epsZeroPt_epsScalePt_assoc]
+      exact v.hom_mem)
+  one_smul v :=
+    Tan.ext (by
+      change epsScalePt x 1 ≫ v.hom = _
+      rw [epsScalePt_one, Category.id_comp])
+  mul_smul a b v :=
+    Tan.ext (by
+      change epsScalePt x (a * b) ≫ v.hom = epsScalePt x a ≫ epsScalePt x b ≫ v.hom
+      rw [← Category.assoc, epsScalePt_mul])
   smul_zero c := Tan.ext (comp_one _)
   smul_add c v w := Tan.ext (comp_mul _ _ _)
   add_smul a b v := Tan.ext (epsScalePt_add_comp x a b ((mem_tanSub_iff x G _).mp v.hom_mem))
@@ -93,9 +98,10 @@ instance : Module k (Tan x G) where
 @[simp] lemma Tan.hom_smul (c : k) (v : Tan x G) : (c • v).hom = epsScalePt x c ≫ v.hom := rfl
 
 def Tan.map (f : G ⟶ G) [IsMonHom f] : Tan x G →ₗ[k] Tan x G where
-  toFun v := Tan.mk (v.hom ≫ f) (by
-    change epsZeroPt x ≫ _ = 1
-    rw [← Category.assoc, v.hom_mem, one_comp])
+  toFun v :=
+    Tan.mk (v.hom ≫ f) (by
+      change epsZeroPt x ≫ _ = 1
+      rw [← Category.assoc, v.hom_mem, one_comp])
   map_add' v w := Tan.ext (mul_comp _ _ _)
   map_smul' c v := Tan.ext (Category.assoc _ _ _)
 

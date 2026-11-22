@@ -19,12 +19,13 @@ theorem etSpan_holds : ETSpanStatement := by
   have hdec : ∀ a : Y, ∃ x ∈ X, ∃ t : Y, a = x + R' • t := by
     intro a
     obtain ⟨u, hu, t, rfl⟩ := hgen a
-    have hspan : Submodule.span (𝓞 E) (Set.range y) ≤
-        X ⊔ LinearMap.range (R' • LinearMap.id : Y →ₗ[𝓞 E] Y) := by
+    have hspan
+        : Submodule.span (𝓞 E) (Set.range y)
+          ≤ X ⊔ LinearMap.range (R' • LinearMap.id : Y →ₗ[𝓞 E] Y) := by
       rw [Submodule.span_le]
       rintro _ ⟨b, rfl⟩
       rw [SetLike.mem_coe, Submodule.mem_sup]
-      refine ⟨y b + R' • z b, Submodule.subset_span ⟨b, rfl⟩, R' • (-z b), ⟨-z b, rfl⟩, ?_⟩
+      refine ⟨y b + R' • z b, Submodule.subset_span ⟨b, rfl⟩, R' • (- z b), ⟨- z b, rfl⟩, ?_⟩
       rw [smul_neg, add_neg_cancel_right]
     obtain ⟨x, hx, w, ⟨t', rfl⟩, rfl⟩ := Submodule.mem_sup.1 (hspan hu)
     refine ⟨x, hx, t' + t, ?_⟩
@@ -39,7 +40,8 @@ theorem etSpan_holds : ETSpanStatement := by
     obtain ⟨x, hx, t, rfl⟩ := hdec b
     have hx' : Submodule.Quotient.mk (p := Xz) x = 0 :=
       (Submodule.Quotient.mk_eq_zero Xz).2 ((Submodule.restrictScalars_mem ℤ X x).2 hx)
-    rw [Submodule.Quotient.mk_add, hx', zero_add, Submodule.Quotient.mk_smul, ← Nat.cast_smul_eq_nsmul ℤ]
+    rw [Submodule.Quotient.mk_add, hx', zero_add, Submodule.Quotient.mk_smul,
+      ← Nat.cast_smul_eq_nsmul ℤ]
     exact Submodule.smul_mem_smul (Ideal.mem_span_singleton_self _) Submodule.mem_top
   obtain ⟨s, hs1, hs⟩ := Submodule.exists_sub_one_mem_and_smul_eq_zero_of_fg_of_le_smul I ⊤ hfg hle
   have hs0 : s ≠ 0 := by

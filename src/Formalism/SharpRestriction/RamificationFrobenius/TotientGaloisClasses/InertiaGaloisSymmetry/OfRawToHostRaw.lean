@@ -12,7 +12,8 @@ namespace Formalism.HC
 
 theorem HostRaw.der {φ : Frame} (H : HostRaw φ) : HostDer H :=
   have C := Der.hostCore H
-  { art_surj := C.art_surj
+  {
+    art_surj := C.art_surj
     cm := C.cm
     conj_iff := C.conj_iff
     finrank_E := C.finrank_E
@@ -41,7 +42,8 @@ theorem HostRaw.der {φ : Frame} (H : HostRaw φ) : HostDer H :=
     rd_ge := Der.rd_ge H C
     rd_le := Der.rd_le H
     rd_sq_ge := Der.rd_sq_ge H C
-    norm_mu := Der.norm_mu H C }
+    norm_mu := Der.norm_mu H C
+  }
 
 def HostAx.ofRaw {φ : Frame} (H : HostRaw φ) : HostAx φ := ⟨H, H.der⟩
 

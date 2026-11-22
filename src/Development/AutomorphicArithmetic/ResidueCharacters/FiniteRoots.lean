@@ -18,17 +18,24 @@ theorem finite_roots {M : ℕ} (hM : 0 < M) : {x : Om l | x ^ M = 1}.Finite := b
   refine (Polynomial.nthRoots M (1 : Om l)).toFinset.finite_toSet.subset fun x hx => ?_
   simpa [Polynomial.mem_nthRoots hM] using hx
 
-def Kc (l : ℕ) [Fact l.Prime] (M : ℕ) (hM : 0 < M) : FinExt l :=
-  ⟨IntermediateField.adjoin ℚ_[l] {x : Om l | x ^ M = 1}, by
+def Kc (l : ℕ) [Fact l.Prime] (M : ℕ) (hM : 0 < M) : FinExt l := ⟨
+  IntermediateField.adjoin ℚ_[l] {x : Om l | x ^ M = 1},
+  by
     haveI := (finite_roots (l := l) hM).to_subtype
-    exact IntermediateField.finiteDimensional_adjoin fun x _ => Algebra.IsIntegral.isIntegral x⟩
+    exact IntermediateField.finiteDimensional_adjoin fun x _ => Algebra.IsIntegral.isIntegral x
+⟩
 
-theorem map_mem {M : ℕ} (hM : 0 < M) (S : IntermediateField ℚ_[l] (Om l)) (hS : ∀ x : Om l, x ^ M = 1 → x ∈ S)
-    (σ : Om l →ₐ[ℚ_[l]] Om l) (x : Om l) (hx : x ∈ (Kc l M hM).1) : σ x ∈ S := by
-  have key : (Kc l M hM).1 ≤ S.comap σ := IntermediateField.adjoin_le_iff.2 fun y hy => by
-    refine hS _ ?_
-    have hy' : y ^ M = 1 := hy
-    rw [← map_pow, hy', map_one]
+theorem map_mem
+    {M : ℕ} (hM : 0 < M)
+    (S : IntermediateField ℚ_[l] (Om l)) (hS : ∀ x : Om l, x ^ M = 1 → x ∈ S)
+    (σ : Om l →ₐ[ℚ_[l]] Om l)
+    (x : Om l) (hx : x ∈ (Kc l M hM).1)
+    : σ x ∈ S := by
+  have key : (Kc l M hM).1 ≤ S.comap σ :=
+    IntermediateField.adjoin_le_iff.2 fun y hy => by
+      refine hS _ ?_
+      have hy' : y ^ M = 1 := hy
+      rw [← map_pow, hy', map_one]
   exact key hx
 
 theorem finrank_le {M : ℕ} (hM : 0 < M) : Module.finrank ℚ_[l] ↥(Kc l M hM).1 ≤ M := by
@@ -45,8 +52,8 @@ theorem finrank_le {M : ℕ} (hM : 0 < M) : Module.finrank ℚ_[l] ↥(Kc l M hM
   have := natDegree_le_of_dvd (minpoly.dvd ℚ_[l] z (p := X ^ M - C 1) (by simp [hz.pow_eq_one])) hne
   rwa [natDegree_X_pow_sub_C _] at this
 
-theorem Ks_eq {M M' s : ℕ} (hM : 0 < M) (hM' : M = l ^ s * M') (hl : ¬ l ∣ M') :
-    Ks (Kc l M hM) s = (Kc l M hM).1 := by
+theorem Ks_eq {M M' s : ℕ} (hM : 0 < M) (hM' : M = l ^ s * M') (hl : ¬ l ∣ M')
+    : Ks (Kc l M hM) s = (Kc l M hM).1 := by
   have hM'0 : 0 < M' := Nat.pos_of_ne_zero (by rintro rfl; simp at hl)
   apply le_antisymm
   · refine sup_le inf_le_left (IntermediateField.adjoin.mono _ _ _ fun x hx => ?_)
@@ -55,7 +62,8 @@ theorem Ks_eq {M M' s : ℕ} (hM : 0 < M) (hM' : M = l ^ s * M') (hl : ¬ l ∣ 
     rw [hM', pow_mul, hx', one_pow]
   · refine IntermediateField.adjoin_le_iff.2 fun x hx => ?_
     have hx' : x ^ M = 1 := hx
-    have hcop : Nat.Coprime (l ^ s) M' := Nat.Coprime.pow_left _ ((Nat.Prime.coprime_iff_not_dvd Fact.out).2 hl)
+    have hcop : Nat.Coprime (l ^ s) M' :=
+      Nat.Coprime.pow_left _ ((Nat.Prime.coprime_iff_not_dvd Fact.out).2 hl)
     have h0 : x ≠ 0 := by
       rintro rfl
       rw [zero_pow hM.ne'] at hx'
@@ -66,7 +74,8 @@ theorem Ks_eq {M M' s : ℕ} (hM : 0 < M) (hM' : M = l ^ s * M') (hl : ¬ l ∣ 
       rw [← zpow_natCast, ← zpow_natCast, ← zpow_mul, ← zpow_mul, ← zpow_add₀ h0, ← hb]; simp
     have hxK : x ∈ (Kc l M hM).1 := IntermediateField.subset_adjoin _ _ hx
     have h1 : x ^ (l ^ s) ∈ Ks (Kc l M hM) s := by
-      refine (le_sup_left : K0 _ ≤ _) ⟨pow_mem hxK _, IntermediateField.subset_adjoin _ _ ⟨M', hM'0, hl, ?_⟩⟩
+      refine (le_sup_left : K0 _ ≤ _)
+        ⟨pow_mem hxK _, IntermediateField.subset_adjoin _ _ ⟨M', hM'0, hl, ?_⟩⟩
       rw [← pow_mul, ← hM', hx']
     have h2 : x ^ M' ∈ Ks (Kc l M hM) s := by
       refine (le_sup_right : _ ≤ Ks _ s) (IntermediateField.subset_adjoin _ _ ?_)
@@ -78,17 +87,19 @@ theorem Ks_eq {M M' s : ℕ} (hM : 0 < M) (hM' : M = l ^ s * M') (hl : ¬ l ∣ 
 
 theorem lcm_pos {N : ℕ} (hN : 0 < N) : 0 < Nat.lcm l N := Nat.lcm_pos (Fact.out : l.Prime).pos hN
 
-theorem Ks_lcm {N : ℕ} (hN : 0 < N) :
-    Ks (Kc l (Nat.lcm l N) (lcm_pos hN)) (max 1 (N.factorization l)) = (Kc l (Nat.lcm l N) (lcm_pos hN)).1 := by
+theorem Ks_lcm {N : ℕ} (hN : 0 < N)
+    : Ks (Kc l (Nat.lcm l N) (lcm_pos hN)) (max 1 (N.factorization l))
+      = (Kc l (Nat.lcm l N) (lcm_pos hN)).1 := by
   have hp : l.Prime := Fact.out
   have hf : (Nat.lcm l N).factorization l = max 1 (N.factorization l) := by
     rw [Nat.factorization_lcm hp.ne_zero hN.ne', Finsupp.sup_apply, hp.factorization_self]
   refine Ks_eq (M' := ordCompl[l] (Nat.lcm l N)) _ ?_ (Nat.not_dvd_ordCompl hp (lcm_pos hN).ne')
   rw [← hf, Nat.ordProj_mul_ordCompl_eq_self]
 
-theorem good_lcm' {N : ℕ} (hN : 0 < N) (h2 : l = 2 → 4 ∣ N) (LL : FinExt l)
-    (hLL : ∀ x : Om l, x ^ Nat.lcm l N = 1 → x ∈ LL.1) :
-    Good (Kc l (Nat.lcm l N) (lcm_pos hN)) (max 1 (N.factorization l)) LL := by
+theorem good_lcm'
+    {N : ℕ} (hN : 0 < N) (h2 : l = 2 → 4 ∣ N)
+    (LL : FinExt l) (hLL : ∀ x : Om l, x ^ Nat.lcm l N = 1 → x ∈ LL.1)
+    : Good (Kc l (Nat.lcm l N) (lcm_pos hN)) (max 1 (N.factorization l)) LL := by
   refine ⟨le_max_left _ _, fun e => le_max_of_le_right ?_, (Ks_lcm hN).ge, fun τ x => ?_⟩
   · exact ((Fact.out : l.Prime).pow_dvd_iff_le_factorization hN.ne').1 (by rw [e]; exact h2 e)
   · have e2 : τ.liftNormal (Om l) (x : Om l) = τ x := AlgHom.liftNormal_commutes τ (Om l) x
@@ -105,8 +116,9 @@ theorem GK_normal {M : ℕ} (hM : 0 < M) : (GK (Kc l M hM)).Normal := by
   rw [hn _ h1]
   exact g.apply_symm_apply x
 
-theorem val_index_le {N : ℕ} (hN : 0 < N) (d : ℕ) :
-    padicValNat l (Module.finrank ℚ_[l] ↥(Kc l (Nat.lcm l N) (lcm_pos hN)).1 / d) ≤ Nat.log l N + 1 := by
+theorem val_index_le {N : ℕ} (hN : 0 < N) (d : ℕ)
+    : padicValNat l (Module.finrank ℚ_[l] ↥(Kc l (Nat.lcm l N) (lcm_pos hN)).1 / d)
+      ≤ Nat.log l N + 1 := by
   have hp : l.Prime := Fact.out
   rw [Nat.padicValNat_def]
   refine (multiplicity_le_nat_log _).trans ?_

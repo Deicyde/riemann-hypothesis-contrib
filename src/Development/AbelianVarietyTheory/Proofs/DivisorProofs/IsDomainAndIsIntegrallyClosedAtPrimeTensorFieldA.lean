@@ -9,12 +9,13 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem isDomain_and_isIntegrallyClosed_atPrime_of_ringEquiv {D C : Type*} [CommRing D]
-    [CommRing C] (e : D ≃+* C)
+theorem isDomain_and_isIntegrallyClosed_atPrime_of_ringEquiv
+    {D C : Type*} [CommRing D] [CommRing C]
+    (e : D ≃+* C)
     (h : ∀ (q : Ideal D) [q.IsPrime],
       IsDomain (Localization.AtPrime q) ∧ IsIntegrallyClosed (Localization.AtPrime q))
-    (q : Ideal C) [hq : q.IsPrime] :
-    IsDomain (Localization.AtPrime q) ∧ IsIntegrallyClosed (Localization.AtPrime q) := by
+    (q : Ideal C) [hq : q.IsPrime]
+    : IsDomain (Localization.AtPrime q) ∧ IsIntegrallyClosed (Localization.AtPrime q) := by
   let q' : Ideal D := q.comap (e : D →+* C)
   haveI : q'.IsPrime := Ideal.comap_isPrime _ _
   have H : q'.primeCompl.map e.toMonoidHom = q.primeCompl := by
@@ -35,17 +36,15 @@ end GlobalTheory
 
 namespace GlobalTheory
 
-
 open Algebra.TensorProduct in
-theorem exists_finset_mem_range_map_val {F A K : Type*} [Field F] [CommRing A] [Algebra F A]
-    [Field K] [Algebra F K] (x : A ⊗[F] K) :
-    ∃ T : Finset K, ∀ R : Subalgebra F K, (↑T : Set K) ⊆ (R : Set K) →
-      x ∈ (Algebra.TensorProduct.map (AlgHom.id F A) R.val).range := by
+theorem exists_finset_mem_range_map_val
+    {F A K : Type*} [Field F] [CommRing A] [Algebra F A] [Field K] [Algebra F K] (x : A ⊗[F] K)
+    : ∃ T : Finset K, ∀ R : Subalgebra F K,
+      (↑T : Set K) ⊆ (R : Set K) → x ∈ (Algebra.TensorProduct.map (AlgHom.id F A) R.val).range := by
   classical
   induction x using TensorProduct.induction_on with
   | zero => exact ⟨∅, fun R _ ↦ Subalgebra.zero_mem _⟩
-  | tmul a k =>
-    refine ⟨{k}, fun R hR ↦ ⟨a ⊗ₜ ⟨k, hR (by simp)⟩, by simp⟩⟩
+  | tmul a k => refine ⟨{k}, fun R hR ↦ ⟨a ⊗ₜ ⟨k, hR (by simp)⟩, by simp⟩⟩
   | add x y hx hy =>
     obtain ⟨T₁, h₁⟩ := hx
     obtain ⟨T₂, h₂⟩ := hy
@@ -55,17 +54,19 @@ theorem exists_finset_mem_range_map_val {F A K : Type*} [Field F] [CommRing A] [
 
 theorem isDomain_and_isIntegrallyClosed_atPrime_tensor_field
     (hL1 : ∀ (F K : Type) [Field F] [CharZero F] [Field K] [Algebra F K] (s : Finset K),
-      ∃ R : Subalgebra F K, (↑s : Set K) ⊆ (R : Set K) ∧ Algebra.Smooth F R)
+      ∃ R : Subalgebra F K,
+        (↑s : Set K) ⊆ (R : Set K) ∧ Algebra.Smooth F R)
     (hL2 : ∀ (B : Type) [CommRing B] (Q : Ideal B) [Q.IsPrime],
-      (∀ s : Finset B, ∃ C : Subring B, (↑s : Set B) ⊆ (C : Set B) ∧
-        ∀ (q : Ideal C) [q.IsPrime],
-          IsDomain (Localization.AtPrime q) ∧ IsIntegrallyClosed (Localization.AtPrime q)) →
-        IsDomain (Localization.AtPrime Q) ∧ IsIntegrallyClosed (Localization.AtPrime Q)) :
-    ∀ (F K A : Type) [Field F] [CharZero F] [Field K] [Algebra F K] [CommRing A] [Algebra F A],
+      (∀ s : Finset B, ∃ C : Subring B,
+          (↑s : Set B) ⊆ (C : Set B)
+            ∧ ∀ (q : Ideal C) [q.IsPrime],
+              IsDomain (Localization.AtPrime q) ∧ IsIntegrallyClosed (Localization.AtPrime q))
+        → IsDomain (Localization.AtPrime Q) ∧ IsIntegrallyClosed (Localization.AtPrime Q))
+    : ∀ (F K A : Type) [Field F] [CharZero F] [Field K] [Algebra F K] [CommRing A] [Algebra F A],
       (∀ (P : Ideal A) [P.IsPrime],
-        IsDomain (Localization.AtPrime P) ∧ IsIntegrallyClosed (Localization.AtPrime P)) →
-      ∀ (Q : Ideal (TensorProduct F A K)) [Q.IsPrime],
-        IsDomain (Localization.AtPrime Q) ∧ IsIntegrallyClosed (Localization.AtPrime Q) := by
+          IsDomain (Localization.AtPrime P) ∧ IsIntegrallyClosed (Localization.AtPrime P))
+        → ∀ (Q : Ideal (TensorProduct F A K)) [Q.IsPrime],
+          IsDomain (Localization.AtPrime Q) ∧ IsIntegrallyClosed (Localization.AtPrime Q) := by
   intro F K A _ _ _ _ _ _ hA Q _
   classical
   refine hL2 (TensorProduct F A K) Q fun s ↦ ?_

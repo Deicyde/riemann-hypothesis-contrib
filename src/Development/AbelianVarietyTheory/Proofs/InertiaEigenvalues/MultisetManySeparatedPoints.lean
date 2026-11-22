@@ -9,7 +9,12 @@ open Classical
 
 namespace GlobalTheory
 
-theorem multiset_many_separated_points : ∀ (K : Type) [NormedAddCommGroup K] (s : Multiset K) (ρ : ℝ) (A B : ℕ), 0 ≤ ρ → 0 < B → A * B ≤ Multiset.card s → (∀ W ∈ s, Multiset.card (s.filter fun z => ‖z - W‖ ≤ ρ) ≤ B) → ∃ Z : Finset K, A ≤ Z.card ∧ (∀ W ∈ Z, W ∈ s) ∧ ∀ W ∈ Z, ∀ W' ∈ Z, W ≠ W' → ρ < ‖W - W'‖ := by
+theorem multiset_many_separated_points
+    : ∀ (K : Type) [NormedAddCommGroup K] (s : Multiset K) (ρ : ℝ) (A B : ℕ),
+      0 ≤ ρ → 0 < B → A * B ≤ Multiset.card s
+        → (∀ W ∈ s, Multiset.card (s.filter fun z => ‖z - W‖ ≤ ρ) ≤ B)
+        → ∃ Z : Finset K,
+          A ≤ Z.card ∧ (∀ W ∈ Z, W ∈ s) ∧ ∀ W ∈ Z, ∀ W' ∈ Z, W ≠ W' → ρ < ‖W - W'‖ := by
   intro K _ s ρ A B hρ hB hAB hball
   set S := s.toFinset.powerset.filter
     (fun Z : Finset K => ∀ W ∈ Z, ∀ W' ∈ Z, W ≠ W' → ρ < ‖W - W'‖) with hS
@@ -46,18 +51,22 @@ theorem multiset_many_separated_points : ∀ (K : Type) [NormedAddCommGroup K] (
     rw [Multiset.count_sum']
     by_cases ha : a ∈ s
     · obtain ⟨W, hW, hd⟩ := hcov a ha
-      calc Multiset.count a s = Multiset.count a (s.filter (fun z => ‖z - W‖ ≤ ρ)) := by
-            rw [Multiset.count_filter_of_pos (p := fun z => ‖z - W‖ ≤ ρ) hd]
-        _ ≤ _ := Finset.single_le_sum
+      calc
+        Multiset.count a s = Multiset.count a (s.filter (fun z => ‖z - W‖ ≤ ρ)) := by
+          rw [Multiset.count_filter_of_pos (p := fun z => ‖z - W‖ ≤ ρ) hd]
+        _ ≤ _ :=
+          Finset.single_le_sum
             (f := fun W => Multiset.count a (s.filter (fun z => ‖z - W‖ ≤ ρ)))
-            (fun _ _ => Nat.zero_le _) hW
+            (fun _ _ => Nat.zero_le _)
+            hW
     · rw [Multiset.count_eq_zero_of_notMem ha]; exact Nat.zero_le _
   have hcard : Multiset.card s ≤ Z.card * B := by
-    calc Multiset.card s ≤ Multiset.card (∑ W ∈ Z, s.filter (fun z => ‖z - W‖ ≤ ρ)) :=
-          Multiset.card_le_card hle
+    calc
+      Multiset.card s
+        ≤ Multiset.card (∑ W ∈ Z, s.filter (fun z => ‖z - W‖ ≤ ρ)) := Multiset.card_le_card hle
       _ = ∑ W ∈ Z, Multiset.card (s.filter (fun z => ‖z - W‖ ≤ ρ)) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp [map_sum]
+        set_option synthInstance.maxHeartbeats 100000 in
+        simp [map_sum]
       _ ≤ ∑ W ∈ Z, B := Finset.sum_le_sum fun W hW => hball W (hZs W hW)
       _ = Z.card * B := by simp
   exact ⟨Z, Nat.le_of_mul_le_mul_right (hAB.trans hcard) hB, hZs, hZsep⟩

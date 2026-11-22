@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped Pointwise TensorProduct InnerProductSpace ComplexOrder
@@ -26,7 +28,8 @@ def RatIn (f : T → ℂ) : Prop := ∀ t, f t ≠ 0 ∧ ∃ y : Lˣ, σ y = f t
 
 variable {σ t₀}
 
-theorem RatIn.mul {f g : T → ℂ} (hf : RatIn σ t₀ f) (hg : RatIn σ t₀ g) : RatIn σ t₀ fun t => f t * g t := by
+theorem RatIn.mul {f g : T → ℂ} (hf : RatIn σ t₀ f) (hg : RatIn σ t₀ g)
+    : RatIn σ t₀ fun t => f t * g t := by
   intro t
   obtain ⟨hf0, y, hy⟩ := hf t
   obtain ⟨hg0, z, hz⟩ := hg t
@@ -50,9 +53,11 @@ theorem ratIn_of_unit {f : T → ℂ} (h : ∀ t, ∃ y : Lˣ, σ y = f t) : Rat
   refine ⟨hy ▸ (map_ne_zero σ).2 y.ne_zero, y * y₀⁻¹, ?_⟩
   rw [Units.val_mul, map_mul, map_units_inv, hy, hy₀, div_eq_mul_inv]
 
-theorem RatIn.of_mul {f g u : T → ℂ} (hg : RatIn σ t₀ g) (hu : RatIn σ t₀ u) (h : ∀ t, f t * u t = g t) : RatIn σ t₀ f := by
-
-  have e : f = fun t => g t * (u t)⁻¹ := funext fun t => by rw [← h t, mul_inv_cancel_right₀ (hu t).1]
+theorem RatIn.of_mul
+    {f g u : T → ℂ} (hg : RatIn σ t₀ g) (hu : RatIn σ t₀ u) (h : ∀ t, f t * u t = g t)
+    : RatIn σ t₀ f := by
+  have e : f = fun t => g t * (u t)⁻¹ :=
+    funext fun t => by rw [← h t, mul_inv_cancel_right₀ (hu t).1]
   rw [e]
   exact hg.mul hu.inv
 
@@ -62,17 +67,18 @@ variable {D : D7}
 
 section Factor
 
-variable {T : Type} {A A' WW : HSp D} (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D)
+variable
+  {T : Type} {A A' WW : HSp D} (X : Tri T A A' WW) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D)
 
 def Factor (lam : T → ℂ) : Prop :=
-  (∀ t, lam t ≠ 0) ∧
-    ∃ (Pi : ModuleCat.{0} ℂ) (p : PolF D WW.rank A.rank →ₗ[ℂ] Pi) (p' : PolF D WW.rank A'.rank →ₗ[ℂ] Pi)
-      (J : T → (Pi →ₗ[ℂ] (GA D WW → ℂ))),
-      Function.Surjective p ∧ (∀ t, Function.Injective (J t)) ∧
-      (∀ t P h, IntegrableOn (X.ker ψ θ t P h) X.fd X.m) ∧
-      (∀ t P, X.I ψ θ t P = lam t • J t (p P)) ∧
-      (∀ t P', (∀ h, IntegrableOn (X.ker' ψ θ t P' h) X.fd' X.m') → X.I' ψ θ t P' = J t (p' P')) ∧
-      ∃ P', p' P' ≠ 0 ∧ ∀ t h, IntegrableOn (X.ker' ψ θ t P' h) X.fd' X.m'
+  (∀ t, lam t ≠ 0)
+    ∧ ∃ (Pi : ModuleCat.{0} ℂ) (p : PolF D WW.rank A.rank →ₗ[ℂ] Pi)
+        (p' : PolF D WW.rank A'.rank →ₗ[ℂ] Pi) (J : T → (Pi →ₗ[ℂ] (GA D WW → ℂ))),
+      Function.Surjective p ∧ (∀ t, Function.Injective (J t))
+        ∧ (∀ t P h, IntegrableOn (X.ker ψ θ t P h) X.fd X.m)
+        ∧ (∀ t P, X.I ψ θ t P = lam t • J t (p P))
+        ∧ (∀ t P', (∀ h, IntegrableOn (X.ker' ψ θ t P' h) X.fd' X.m') → X.I' ψ θ t P' = J t (p' P'))
+        ∧ ∃ P', p' P' ≠ 0 ∧ ∀ t h, IntegrableOn (X.ker' ψ θ t P' h) X.fd' X.m'
 
 variable {X ψ θ}
 
@@ -82,7 +88,12 @@ theorem Factor.isConst [Nonempty T] {lam : T → ℂ} (h : Factor X ψ θ lam) :
 
   obtain ⟨P, hPP⟩ := hp (p' P')
   unfold Tri.IsConst
-  refine ⟨⟨Classical.arbitrary T, hlam _⟩, P, P', fun t => ⟨fun h => ⟨hint t P h, hint' t h⟩, ?_, fun h => ?_⟩⟩
+  refine ⟨
+    ⟨Classical.arbitrary T, hlam _⟩,
+    P,
+    P',
+    fun t => ⟨fun h => ⟨hint t P h, hint' t h⟩, ?_, fun h => ?_⟩
+  ⟩
   · by_contra hcon
     push_neg at hcon
     apply hP'
@@ -93,7 +104,8 @@ theorem Factor.isConst [Nonempty T] {lam : T → ℂ} (h : Factor X ψ θ lam) :
   · rw [hI t P, hI' t P' (hint' t), hPP]
     rfl
 
-theorem Factor.eq_mul {lam c : T → ℂ} (h : Factor X ψ θ lam) (hc : X.IsConst ψ θ c) : ∃ κ : ℂ, κ ≠ 0 ∧ ∀ t, c t = κ * lam t := by
+theorem Factor.eq_mul {lam c : T → ℂ} (h : Factor X ψ θ lam) (hc : X.IsConst ψ θ c)
+    : ∃ κ : ℂ, κ ≠ 0 ∧ ∀ t, c t = κ * lam t := by
   unfold Factor at h
   unfold Tri.IsConst at hc
   obtain ⟨hlam, Pi, p, p', J, -, hJ, -, hI, hI', -⟩ := h
@@ -122,10 +134,14 @@ theorem Factor.eq_mul {lam c : T → ℂ} (h : Factor X ψ θ lam) (hc : X.IsCon
 
 end Factor
 
-variable {G₀ : Type} [Group G₀] [Fintype G₀] {Pl0 T : Type} {Fam : FamIn D.what₂.LL G₀ Pl0 T D.R.m}
-  {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] {R : RealDat D Fam Ks}
+variable
+  {G₀ : Type} [Group G₀] [Fintype G₀]
+  {Pl0 T : Type} {Fam : FamIn D.what₂.LL G₀ Pl0 T D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+  {R : RealDat D Fam Ks}
 
-def NegIdx (V : HSp D) (q : ℕ) : Prop := ∀ τ, Formalism.UG.HasSignature (gramAt D V τ) (V.rank - q) q
+def NegIdx (V : HSp D) (q : ℕ) : Prop :=
+  ∀ τ, Formalism.UG.HasSignature (gramAt D V τ) (V.rank - q) q
 
 end GlobalTheory.ConstRatio
 

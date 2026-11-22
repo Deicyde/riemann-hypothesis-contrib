@@ -11,12 +11,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Monodro
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 
 namespace GlobalTheory.PMon
 
 theorem matThm_holds : MatThm :=
-  GlobalTheory.T.padicMonodromyMatrixForm_of_induction_cases GlobalTheory.T.deRham_iff_framed_galois_representation GlobalTheory.T.lubinTateTwistTotalWeightZero_proof GlobalTheory.T.weightZero_potentiallySemistable_of_sen_theorem GlobalTheory.T.potentially_semistable_reducible_unramified_split GlobalTheory.T.monodromy_irreducible_elementary_weightModification
+  GlobalTheory.T.padicMonodromyMatrixForm_of_induction_cases
+    GlobalTheory.T.deRham_iff_framed_galois_representation
+    GlobalTheory.T.lubinTateTwistTotalWeightZero_proof
+    GlobalTheory.T.weightZero_potentiallySemistable_of_sen_theorem
+    GlobalTheory.T.potentially_semistable_reducible_unramified_split
+    GlobalTheory.T.monodromy_irreducible_elementary_weightModification
 
 end GlobalTheory.PMon

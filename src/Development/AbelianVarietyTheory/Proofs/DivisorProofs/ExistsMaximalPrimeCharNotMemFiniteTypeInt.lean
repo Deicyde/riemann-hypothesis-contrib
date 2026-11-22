@@ -20,7 +20,9 @@ theorem isJacobsonRing_integers : IsJacobsonRing ℤ := by
   · have := Ring.DimensionLEOne.maximalOfPrime h hP
     exact Ideal.jacobson_eq_self_of_isMaximal
 
-theorem closedPt_of_finiteType_int : ∀ (R : Type) [CommRing R] [IsDomain R] [Algebra.FiniteType ℤ R] (f : R), f ≠ 0 → ∃ M : Ideal R, M.IsMaximal ∧ f ∉ M ∧ ∃ p : ℕ, p.Prime ∧ (p : R) ∈ M := by
+theorem closedPt_of_finiteType_int
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [Algebra.FiniteType ℤ R] (f : R),
+      f ≠ 0 → ∃ M : Ideal R, M.IsMaximal ∧ f ∉ M ∧ ∃ p : ℕ, p.Prime ∧ (p : R) ∈ M := by
   intro R _ _ _ f hf
   haveI := isJacobsonRing_integers
   let S := Localization.Away f

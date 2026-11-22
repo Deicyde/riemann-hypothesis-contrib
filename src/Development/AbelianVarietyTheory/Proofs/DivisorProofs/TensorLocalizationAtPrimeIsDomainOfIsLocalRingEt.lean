@@ -11,11 +11,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem tensor_localization_atPrime_isDomain_of_isLocalRing_etale :
-    ∀ (P R E : Type) [CommRing P] [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [Algebra P R]
-      [CommRing E] [Algebra P E] [Algebra.Etale P E] (Q : Ideal E) [Q.IsPrime],
-      IsLocalRing (TensorProduct P R (Localization.AtPrime Q)) →
-        IsDomain (TensorProduct P R (Localization.AtPrime Q)) := by
+theorem tensor_localization_atPrime_isDomain_of_isLocalRing_etale
+    : ∀ (P R E : Type) [CommRing P] [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [Algebra P R]
+        [CommRing E] [Algebra P E] [Algebra.Etale P E] (Q : Ideal E) [Q.IsPrime],
+      IsLocalRing (TensorProduct P R (Localization.AtPrime Q))
+        → IsDomain (TensorProduct P R (Localization.AtPrime Q)) := by
   intro P R E _ _ _ _ _ _ _ _ Q _ hloc
   letI : Algebra (R ⊗[P] E) (R ⊗[P] Localization.AtPrime Q) :=
     (Algebra.TensorProduct.map (AlgHom.id P R)
@@ -28,11 +28,12 @@ theorem tensor_localization_atPrime_isDomain_of_isLocalRing_etale :
     (maximalIdeal (R ⊗[P] Localization.AtPrime Q)).comap
       (algebraMap (R ⊗[P] E) (R ⊗[P] Localization.AtPrime Q))
   haveI : 𝔭.IsPrime := Ideal.comap_isPrime _ _
-  have hle : Q.primeCompl.map (Algebra.TensorProduct.includeRight (R := P) (A := R)) ≤
-      𝔭.primeCompl := by
+  have hle
+      : Q.primeCompl.map (Algebra.TensorProduct.includeRight (R := P) (A := R)) ≤ 𝔭.primeCompl := by
     intro x hx
-    have hu := IsLocalization.map_units (R ⊗[P] Localization.AtPrime Q)
-      (⟨x, hx⟩ : Q.primeCompl.map (Algebra.TensorProduct.includeRight (R := P) (A := R)))
+    have hu :=
+      IsLocalization.map_units (R ⊗[P] Localization.AtPrime Q)
+        (⟨x, hx⟩ : Q.primeCompl.map (Algebra.TensorProduct.includeRight (R := P) (A := R)))
     intro h
     exact ((mem_maximalIdeal _).mp (Ideal.mem_comap.mp h)) hu
   haveI : IsLocalization 𝔭.primeCompl (R ⊗[P] Localization.AtPrime Q) :=

@@ -9,27 +9,35 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GermGenPtInj
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.TieVB
 
 variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
 
-noncomputable def secVal (ξ : Spec (CommRingCat.of Ω) ⟶ X) (U : X.Opens) (h : genPt ξ ∈ U) : Γ(X, U) →+* Ω :=
+noncomputable def secVal (ξ : Spec (CommRingCat.of Ω) ⟶ X) (U : X.Opens) (h : genPt ξ ∈ U)
+    : Γ(X, U) →+* Ω :=
   (X.presheaf.germ U (genPt ξ) h ≫ Scheme.stalkClosedPointTo ξ).hom
 
-theorem genMap_germ (U : X.Opens) (h : genPt ξ ∈ U) (q : Cpt ξ) (hq : q.1 ∈ U) (t : Γ(X, U)) :
-    genMap ξ q (X.presheaf.germ U q.1 hq t) = secVal ξ U h t := by
-  have e : X.presheaf.germ U q.1 hq ≫ X.presheaf.stalkSpecializes q.2 = X.presheaf.germ U (genPt ξ) h :=
+theorem genMap_germ (U : X.Opens) (h : genPt ξ ∈ U) (q : Cpt ξ) (hq : q.1 ∈ U) (t : Γ(X, U))
+    : genMap ξ q (X.presheaf.germ U q.1 hq t) = secVal ξ U h t := by
+  have e
+      : X.presheaf.germ U q.1 hq ≫ X.presheaf.stalkSpecializes q.2
+        = X.presheaf.germ U (genPt ξ) h :=
     TopCat.Presheaf.germ_stalkSpecializes X.presheaf hq q.2
-  have e2 : X.presheaf.germ U q.1 hq ≫ (X.presheaf.stalkSpecializes q.2 ≫ Scheme.stalkClosedPointTo ξ) =
-      X.presheaf.germ U (genPt ξ) h ≫ Scheme.stalkClosedPointTo ξ :=
+  have e2
+      : X.presheaf.germ U q.1 hq ≫ (X.presheaf.stalkSpecializes q.2 ≫ Scheme.stalkClosedPointTo ξ)
+        = X.presheaf.germ U (genPt ξ) h ≫ Scheme.stalkClosedPointTo ξ :=
     (Category.assoc _ _ _).symm.trans (congrArg (· ≫ Scheme.stalkClosedPointTo ξ) e)
   exact congrArg (fun f => f.hom t) e2
 
-theorem isUnit_iff_unitAt {q : Cpt ξ} (hi : Function.Injective (genMap ξ q)) (s : X.presheaf.stalk q.1) :
-    IsUnit s ↔ unitAt ξ q (genMap ξ q s) := by
+theorem isUnit_iff_unitAt
+    {q : Cpt ξ} (hi : Function.Injective (genMap ξ q)) (s : X.presheaf.stalk q.1)
+    : IsUnit s ↔ unitAt ξ q (genMap ξ q s) := by
   constructor
   · intro hs
     have hu := hs.map (genMap ξ q)
@@ -43,16 +51,19 @@ theorem isUnit_iff_unitAt {q : Cpt ξ} (hi : Function.Injective (genMap ξ q)) (
     have : s * s' = 1 := hi (by rw [map_mul, hs', map_one, mul_inv_cancel₀ h0])
     exact IsUnit.of_mul_eq_one _ this
 
-theorem mem_basicOpen_iff (hg : IsCptGen ξ) (U : X.Opens) (h : genPt ξ ∈ U) (q : Cpt ξ) (hq : q.1 ∈ U)
-    (t : Γ(X, U)) : q.1 ∈ X.basicOpen t ↔ unitAt ξ q (secVal ξ U h t) := by
+theorem mem_basicOpen_iff
+    (hg : IsCptGen ξ) (U : X.Opens) (h : genPt ξ ∈ U) (q : Cpt ξ) (hq : q.1 ∈ U) (t : Γ(X, U))
+    : q.1 ∈ X.basicOpen t ↔ unitAt ξ q (secVal ξ U h t) := by
   rw [Scheme.mem_basicOpen X t q.1 hq, isUnit_iff_unitAt (hg.inj q), genMap_germ U h q hq]
 
-theorem unitAt_mul {p : Cpt ξ} {s t : Ω} (hs : unitAt ξ p s) (ht : unitAt ξ p t) : unitAt ξ p (s * t) :=
+theorem unitAt_mul {p : Cpt ξ} {s t : Ω} (hs : unitAt ξ p s) (ht : unitAt ξ p t)
+    : unitAt ξ p (s * t) :=
   ⟨mul_ne_zero hs.1 ht.1, mul_mem hs.2.1 ht.2.1, by rw [mul_inv]; exact mul_mem hs.2.2 ht.2.2⟩
 
 theorem unitAt_one (p : Cpt ξ) : unitAt ξ p 1 := ⟨one_ne_zero, one_mem _, by simp [one_mem]⟩
 
-theorem regAt_genPt (hg : IsCptGen ξ) (a : Ω) : a ∈ regAt ξ (⟨genPt ξ, specializes_rfl⟩ : Cpt ξ) := by
+theorem regAt_genPt (hg : IsCptGen ξ) (a : Ω)
+    : a ∈ regAt ξ (⟨genPt ξ, specializes_rfl⟩ : Cpt ξ) := by
   obtain ⟨s, rfl⟩ := hg.bij.2 a
   refine ⟨s, ?_⟩
   unfold genMap
@@ -64,11 +75,12 @@ section Chart
 
 variable {o : Type} [CommRing o] [Algebra o Ω] {κ : Type} {x : κ → Ω}
 
-theorem exists_chart (hT : CoordTie o ξ x) {c : κ} (hc : x c ≠ 0) :
-    ∃ (U : X.Opens) (h : genPt ξ ∈ U), IsAffineOpen U ∧ (∀ q : Cpt ξ, q.1 ∈ U ↔ InChart ξ x c q) ∧
-      (∀ q : X, q ∈ U → genPt ξ ⤳ q) ∧
-      Function.Injective (secVal ξ U h) ∧
-      ∀ a : Ω, a ∈ Algebra.adjoin o (Set.range fun j => x j / x c) ↔ a ∈ (secVal ξ U h).range := by
+theorem exists_chart (hT : CoordTie o ξ x) {c : κ} (hc : x c ≠ 0)
+    : ∃ (U : X.Opens) (h : genPt ξ ∈ U),
+      IsAffineOpen U ∧ (∀ q : Cpt ξ, q.1 ∈ U ↔ InChart ξ x c q) ∧ (∀ q : X, q ∈ U → genPt ξ ⤳ q)
+        ∧ Function.Injective (secVal ξ U h)
+        ∧ ∀ a : Ω,
+          a ∈ Algebra.adjoin o (Set.range fun j => x j / x c) ↔ a ∈ (secVal ξ U h).range := by
   obtain ⟨U, hU, hmem⟩ := hT.affine c hc
   have h : genPt ξ ∈ U := (hmem _).2 ⟨specializes_rfl, hc, fun c' => regAt_genPt hT.gen _⟩
   have hsp : ∀ q : X, q ∈ U → genPt ξ ⤳ q := fun q hq => by
@@ -82,8 +94,9 @@ theorem exists_chart (hT : CoordTie o ξ x) {c : κ} (hc : x c ≠ 0) :
   refine Iff.trans ?_ (hran a).symm
   exact forall_congr' fun q => (by rw [hUq q])
 
-theorem exists_point (hT : CoordTie o ξ x) {c : κ} (hc : x c ≠ 0) (P : Ideal (chartRing o x c)) (hP : P.IsPrime) :
-    ∃ p : Cpt ξ, InChart ξ x c p ∧ ∀ s : chartRing o x c, s ∈ P ↔ ¬ unitAt ξ p s := by
+theorem exists_point
+    (hT : CoordTie o ξ x) {c : κ} (hc : x c ≠ 0) (P : Ideal (chartRing o x c)) (hP : P.IsPrime)
+    : ∃ p : Cpt ξ, InChart ξ x c p ∧ ∀ s : chartRing o x c, s ∈ P ↔ ¬ unitAt ξ p s := by
   obtain ⟨U, h, hU, hUq, hsp, -, hran⟩ := exists_chart hT hc
   let φ : Γ(X, U) →+* chartRing o x c :=
     (secVal ξ U h).codRestrict (chartRing o x c) fun t => (hran _).2 ⟨t, rfl⟩
@@ -103,16 +116,19 @@ theorem exists_point (hT : CoordTie o ξ x) {c : κ} (hc : x c ≠ 0) (P : Ideal
   have h3 : (s : Ω) = secVal ξ U h t := ht.symm
   rw [h3, ← h2, key, hst, Ideal.mem_comap, not_not]
 
-theorem exists_den (hT : CoordTie o ξ x) {c : κ} {p : Cpt ξ} (hp : InChart ξ x c p) {a : Ω}
-    (ha : a ∈ regAt ξ p) : ∃ s ∈ chartRing o x c, unitAt ξ p s ∧ s * a ∈ chartRing o x c :=
+theorem exists_den
+    (hT : CoordTie o ξ x) {c : κ} {p : Cpt ξ} (hp : InChart ξ x c p) {a : Ω} (ha : a ∈ regAt ξ p)
+    : ∃ s ∈ chartRing o x c, unitAt ξ p s ∧ s * a ∈ chartRing o x c :=
   (GlobalTheory.T.regAt_iff_chart_localization X Ω ξ o κ x hT c p hp a).1 ha
 
 variable {E : Type} [AddCommGroup E] [Module Ω E]
 
-theorem exists_den_span (hT : CoordTie o ξ x) {c : κ} {p : Cpt ξ} (hp : InChart ξ x c p) (M : AddSubgroup E)
-    (hM : ∀ a ∈ chartRing o x c, ∀ e ∈ M, a • e ∈ M) {e : E}
-    (he : e ∈ Submodule.span (regAt ξ p) (M : Set E)) :
-    ∃ s ∈ chartRing o x c, unitAt ξ p s ∧ s • e ∈ M := by
+theorem exists_den_span
+    (hT : CoordTie o ξ x)
+    {c : κ} {p : Cpt ξ} (hp : InChart ξ x c p)
+    (M : AddSubgroup E) (hM : ∀ a ∈ chartRing o x c, ∀ e ∈ M, a • e ∈ M)
+    {e : E} (he : e ∈ Submodule.span (regAt ξ p) (M : Set E))
+    : ∃ s ∈ chartRing o x c, unitAt ξ p s ∧ s • e ∈ M := by
   induction he using Submodule.span_induction with
   | mem v hv => exact ⟨1, one_mem _, unitAt_one p, by simpa using hv⟩
   | zero => exact ⟨1, one_mem _, unitAt_one p, by simp⟩

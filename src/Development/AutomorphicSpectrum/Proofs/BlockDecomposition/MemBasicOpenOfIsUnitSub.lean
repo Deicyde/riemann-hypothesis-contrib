@@ -7,12 +7,15 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory AlgebraicGeometry Opposite CrystallineSemistableComparison
+  CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
 
 namespace GlobalTheory.CompanionTheory.RootPowLC
 
-theorem mem_basicOpen_prod {U : Scheme.{0}} {ι : Type} (t : Finset ι) (s : ι → Γ(U, ⊤)) (u : U)
-    (h : ∀ a ∈ t, u ∈ U.basicOpen (s a)) : u ∈ U.basicOpen (∏ a ∈ t, s a) := by
+theorem mem_basicOpen_prod
+    {U : Scheme.{0}} {ι : Type}
+    (t : Finset ι) (s : ι → Γ(U, ⊤)) (u : U) (h : ∀ a ∈ t, u ∈ U.basicOpen (s a))
+    : u ∈ U.basicOpen (∏ a ∈ t, s a) := by
   classical
   induction t using Finset.induction_on with
   | empty =>
@@ -22,16 +25,18 @@ theorem mem_basicOpen_prod {U : Scheme.{0}} {ι : Type} (t : Finset ι) (s : ι 
     rw [Finset.prod_insert ha, Scheme.basicOpen_mul]
     exact ⟨h a (Finset.mem_insert_self a t), ih fun b hb => h b (Finset.mem_insert_of_mem hb)⟩
 
-theorem exists_notMem_basicOpen {U : Scheme.{0}} {ι : Type} (t : Finset ι) (s : ι → Γ(U, ⊤))
-    (h : ∏ a ∈ t, s a = 0) (u : U) : ∃ a ∈ t, u ∉ U.basicOpen (s a) := by
+theorem exists_notMem_basicOpen
+    {U : Scheme.{0}} {ι : Type} (t : Finset ι) (s : ι → Γ(U, ⊤)) (h : ∏ a ∈ t, s a = 0) (u : U)
+    : ∃ a ∈ t, u ∉ U.basicOpen (s a) := by
   by_contra hc
   push_neg at hc
   have hm := mem_basicOpen_prod t s u hc
   rw [h, Scheme.basicOpen_zero] at hm
   exact hm
 
-theorem mem_basicOpen_of_isUnit_sub {U : Scheme.{0}} (x y : Γ(U, ⊤)) (h : IsUnit (x - y)) (u : U)
-    (hx : u ∉ U.basicOpen x) : u ∈ U.basicOpen y := by
+theorem mem_basicOpen_of_isUnit_sub
+    {U : Scheme.{0}} (x y : Γ(U, ⊤)) (h : IsUnit (x - y)) (u : U) (hx : u ∉ U.basicOpen x)
+    : u ∈ U.basicOpen y := by
   rw [Scheme.mem_basicOpen_top] at hx ⊢
   have h1 : IsUnit (U.presheaf.germ ⊤ u trivial (x - y)) := h.map _
   rw [map_sub, sub_eq_add_neg] at h1
@@ -39,28 +44,33 @@ theorem mem_basicOpen_of_isUnit_sub {U : Scheme.{0}} (x y : Γ(U, ⊤)) (h : IsU
   · exact absurd h2 hx
   · simpa using h2.neg
 
-theorem isUnit_appTop_of_mem {V U : Scheme.{0}} (g : V ⟶ U) (x : Γ(U, ⊤))
-    (h : ∀ v : V, g v ∈ U.basicOpen x) : IsUnit (g.appTop.hom x) := by
+theorem isUnit_appTop_of_mem
+    {V U : Scheme.{0}} (g : V ⟶ U) (x : Γ(U, ⊤)) (h : ∀ v : V, g v ∈ U.basicOpen x)
+    : IsUnit (g.appTop.hom x) := by
   refine RingedSpace.isUnit_of_isUnit_germ V.toRingedSpace ⊤ _ fun v _ => ?_
-  have e : V.basicOpen (g.appTop.hom x) = g ⁻¹ᵁ U.basicOpen x := (Scheme.preimage_basicOpen g x).symm
+  have e : V.basicOpen (g.appTop.hom x) = g ⁻¹ᵁ U.basicOpen x :=
+    (Scheme.preimage_basicOpen g x).symm
   have hv : v ∈ V.basicOpen (g.appTop.hom x) := by
     rw [e]
     exact h v
   exact (Scheme.mem_basicOpen_top V (g.appTop.hom x) v).1 hv
 
-theorem exists_isPow (hP : PrimAlg) (q : ℕ) [NeZero q] (U : Scheme.{0}) (ζ : Prim q Γ(U, ⊤))
-    (r : Γ(U, ⊤)) (hr : r ^ q = 1) :
-    ∃ f : LocallyConstant U (ZMod q), IsPow ζ f r ∧
-      ∀ (u : U) (a : ZMod q), u ∉ U.basicOpen (r - ζ.1 ^ a.val) → f u = a := by
+theorem exists_isPow
+    (hP : PrimAlg)
+    (q : ℕ) [NeZero q]
+    (U : Scheme.{0}) (ζ : Prim q Γ(U, ⊤)) (r : Γ(U, ⊤)) (hr : r ^ q = 1)
+    : ∃ f : LocallyConstant U (ZMod q),
+      IsPow ζ f r ∧ ∀ (u : U) (a : ZMod q), u ∉ U.basicOpen (r - ζ.1 ^ a.val) → f u = a := by
   classical
-  have hprod : ∏ a : ZMod q, (r - ζ.1 ^ a.val) = 0 := by
-    rw [← (hP q _ ζ).2.2.1 r, hr, sub_self]
+  have hprod : ∏ a : ZMod q, (r - ζ.1 ^ a.val) = 0 := by rw [← (hP q _ ζ).2.2.1 r, hr, sub_self]
   have hex : ∀ u : U, ∃ a : ZMod q, u ∉ U.basicOpen (r - ζ.1 ^ a.val) := by
     intro u
-    obtain ⟨a, -, ha⟩ := exists_notMem_basicOpen Finset.univ (fun a : ZMod q => r - ζ.1 ^ a.val) hprod u
+    obtain ⟨a, -, ha⟩ :=
+      exists_notMem_basicOpen Finset.univ (fun a : ZMod q => r - ζ.1 ^ a.val) hprod u
     exact ⟨a, ha⟩
-  have huniq : ∀ (u : U) (a b : ZMod q), a ≠ b → u ∉ U.basicOpen (r - ζ.1 ^ a.val) →
-      u ∈ U.basicOpen (r - ζ.1 ^ b.val) := by
+  have huniq
+      : ∀ (u : U) (a b : ZMod q),
+        a ≠ b → u ∉ U.basicOpen (r - ζ.1 ^ a.val) → u ∈ U.basicOpen (r - ζ.1 ^ b.val) := by
     intro u a b hab ha
     apply mem_basicOpen_of_isUnit_sub _ _ _ u ha
     have hd : (r - ζ.1 ^ a.val) - (r - ζ.1 ^ b.val) = ζ.1 ^ b.val - ζ.1 ^ a.val := by ring
@@ -82,19 +92,22 @@ theorem exists_isPow (hP : PrimAlg) (q : ℕ) [NeZero q] (U : Scheme.{0}) (ζ : 
   have hloc : IsLocallyConstant f0 := by
     rw [IsLocallyConstant.iff_isOpen_fiber]
     intro a
-    have hfib : f0 ⁻¹' {a} = ⋂ b ∈ (Finset.univ.erase a : Finset (ZMod q)), (U.basicOpen (r - ζ.1 ^ b.val) : Set U) := by
-      ext u
-      simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_iInter, Finset.mem_erase, Finset.mem_univ,
-        and_true, SetLike.mem_coe]
-      rw [hf0_iff]
-      constructor
-      · intro ha b hb
-        exact huniq u a b (Ne.symm hb) ha
-      · intro h ha
-        obtain ⟨a', ha'⟩ := hex u
-        by_cases heq : a' = a
-        · exact ha' (heq ▸ ha)
-        · exact ha' (h a' heq)
+    have hfib
+        : f0 ⁻¹' {a}
+          = ⋂ b ∈ (Finset.univ.erase a : Finset (ZMod q)), (U.basicOpen (r - ζ.1 ^ b.val) : Set U) :=
+      by
+        ext u
+        simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_iInter, Finset.mem_erase,
+          Finset.mem_univ, and_true, SetLike.mem_coe]
+        rw [hf0_iff]
+        constructor
+        · intro ha b hb
+          exact huniq u a b (Ne.symm hb) ha
+        · intro h ha
+          obtain ⟨a', ha'⟩ := hex u
+          by_cases heq : a' = a
+          · exact ha' (heq ▸ ha)
+          · exact ha' (h a' heq)
     rw [hfib]
     exact isOpen_biInter_finset fun b _ => (U.basicOpen (r - ζ.1 ^ b.val)).isOpen
   refine ⟨⟨f0, hloc⟩, ?_, fun u a ha => (hf0_iff u a).mpr ha⟩
@@ -115,7 +128,8 @@ theorem exists_isPow (hP : PrimAlg) (q : ℕ) [NeZero q] (U : Scheme.{0}) (ζ : 
   show g.appTop.hom r = (g.appTop.hom ζ.1) ^ a.val
   exact sub_eq_zero.mp h0
 
-theorem rootPow : CrystallineSemistableComparison.E.PrimAlg → CrystallineSemistableComparison.E.RootPow := by
+theorem rootPow
+    : CrystallineSemistableComparison.E.PrimAlg → CrystallineSemistableComparison.E.RootPow := by
   intro hP q _ U ζ
   refine ⟨fun r hr => ?_, fun ξ => ?_⟩
   · obtain ⟨f, hf, -⟩ := exists_isPow hP q U ζ r hr
@@ -125,8 +139,8 @@ theorem rootPow : CrystallineSemistableComparison.E.PrimAlg → CrystallineSemis
     refine ⟨f, hf, fun u => ?_⟩
     have hprod : ∏ a : ZMod q, (ξ.1 - ζ.1 ^ a.val) = 0 := by
       rw [← (hP q _ ζ).2.2.1 ξ.1, hξq, sub_self]
-    obtain ⟨a, -, ha⟩ := exists_notMem_basicOpen Finset.univ
-      (fun a : ZMod q => ξ.1 - ζ.1 ^ a.val) hprod u
+    obtain ⟨a, -, ha⟩ :=
+      exists_notMem_basicOpen Finset.univ (fun a : ZMod q => ξ.1 - ζ.1 ^ a.val) hprod u
     rw [hloc u a ha]
     by_contra hna
     set m := a.val with hm

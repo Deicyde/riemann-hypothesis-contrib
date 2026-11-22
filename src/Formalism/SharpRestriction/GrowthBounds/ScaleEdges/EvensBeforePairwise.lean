@@ -8,10 +8,14 @@ noncomputable section
 
 namespace Formalism.MainNotions.Pf14
 
-open Formalism.MainNotions.G Formalism.MainNotions.SourceCleaning Formalism.MainNotions.G.WittFrameLocaliserOrders
+open Formalism.MainNotions.G Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.G.WittFrameLocaliserOrders
 
-theorem getElem_ge_of_many (D : List ℤ) (hD : D.Pairwise (· > ·)) (T : Finset ℤ) (b : ℤ)
-    (hT : ∀ z ∈ T, z ∈ D ∧ b ≤ z) (l : ℕ) (hl : l < T.card) (hlen : l < D.length) : b ≤ D[l] := by
+theorem getElem_ge_of_many
+    (D : List ℤ) (hD : D.Pairwise (· > ·))
+    (T : Finset ℤ) (b : ℤ) (hT : ∀ z ∈ T, z ∈ D ∧ b ≤ z)
+    (l : ℕ) (hl : l < T.card) (hlen : l < D.length)
+    : b ≤ D[l] := by
   by_contra hlt
   push_neg at hlt
   have hsub : T ⊆ (D.take l).toFinset := by
@@ -39,14 +43,15 @@ section Fr
 
 variable {n' r : ℕ} [NeZero n']
 
-theorem fr_mono' {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ) : ∀ i, i < r → F.fr j 0 ≤ F.fr j i := by
+theorem fr_mono' {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ)
+    : ∀ i, i < r → F.fr j 0 ≤ F.fr j i := by
   intro i hi
   induction i with
   | zero => exact le_rfl
   | succ i ih => exact le_trans (ih (by omega)) (le_of_lt (hV.2.2.1 j i hi))
 
-theorem fr_lt {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ) :
-    ∀ k i, i < k → k < r → F.fr j i < F.fr j k := by
+theorem fr_lt {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : ℤ)
+    : ∀ k i, i < k → k < r → F.fr j i < F.fr j k := by
   intro k i hik hk
   induction k with
   | zero => omega
@@ -56,8 +61,8 @@ theorem fr_lt {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (j : 
     · subst h
       exact hV.2.2.1 j i hk
 
-theorem seg_of {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (hr : 1 ≤ r) (s : ℤ) :
-    ∃ j : ℤ, F.fr (j - 1) (r - 1) < s ∧ s ≤ F.fr j (r - 1) := by
+theorem seg_of {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (hr : 1 ≤ r) (s : ℤ)
+    : ∃ j : ℤ, F.fr (j - 1) (r - 1) < s ∧ s ≤ F.fr j (r - 1) := by
   classical
   have hn : (1 : ℤ) ≤ (n' : ℤ) := by
     have : n' ≠ 0 := NeZero.ne n'
@@ -93,7 +98,8 @@ theorem seg_of {F : Frames n' r} {L₁ N₁ : ℕ} (hV : F.Valid L₁ N₁) (hr 
     have h1 := hdown (F.fr 0 (r - 1) - s + 1).toNat
     by_contra hlt
     push_neg at hlt
-    have h2 : F.fr j (r - 1) < F.fr (-(((F.fr 0 (r - 1) - s + 1).toNat : ℤ) * F.J)) (r - 1) := hmono hlt
+    have h2 : F.fr j (r - 1) < F.fr (-(((F.fr 0 (r - 1) - s + 1).toNat : ℤ) * F.J)) (r - 1) :=
+      hmono hlt
     omega
   obtain ⟨j, hj, hmin⟩ := Int.exists_least_of_bdd hB hP
   refine ⟨j, ?_, hj⟩
@@ -107,8 +113,11 @@ theorem evensBefore_pairwise (F : Frames n' r) (s : ℤ) : (evensBefore F s).Pai
   rw [List.pairwise_reverse]
   exact (Finset.sortedLT_sort _).pairwise
 
-theorem arow_near {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ} {F : Frames n' r} (hF : FramesOK TT L₁ L₂ N₁ G' F)
-    (hr : 1 ≤ r) (hG : G' ≤ n') (s : ℤ) (l : ℕ) (hl : l < r) : (s - Arow F s l).toNat ≤ G' := by
+theorem arow_near
+    {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ} {F : Frames n' r} (hF : FramesOK TT L₁ L₂ N₁ G' F)
+    (hr : 1 ≤ r) (hG : G' ≤ n') (s : ℤ)
+    (l : ℕ) (hl : l < r)
+    : (s - Arow F s l).toNat ≤ G' := by
   obtain ⟨-, hV, hG', -, -⟩ := hF
   obtain ⟨j, hj1, hj2⟩ := seg_of hV hr s
   unfold Arow
@@ -132,7 +141,8 @@ theorem arow_near {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ} {F : Frames n
         have h2 := hG' j
         have h3 := hV.2.2.2.2.1 (j - 1) i hi
         refine ⟨?_, by omega⟩
-        simp only [evensBefore, List.mem_reverse, Finset.mem_sort, Finset.mem_filter, Finset.mem_Ico]
+        simp only [evensBefore, List.mem_reverse, Finset.mem_sort, Finset.mem_filter,
+          Finset.mem_Ico]
         exact ⟨⟨by omega, by omega⟩, h3.1, h3.2⟩
       · rw [Finset.card_image_of_injOn]
         · simpa using hl
@@ -149,9 +159,13 @@ theorem arow_near {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ} {F : Frames n
   · rw [List.getD_eq_default _ _ (by omega)]
     simp
 
-theorem twist_of {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ} {F : Frames n' r} (hF : FramesOK TT L₁ L₂ N₁ G' F)
-    (hr : 1 ≤ r) (hG : G' ≤ n') (p : ℕ) (hp : 1 ≤ p) : TwistBound p F (p ^ G') := by
-  refine ⟨fun j => ?_, fun s _ l hl => Nat.pow_le_pow_right (by omega) (arow_near hF hr hG s.val l hl)⟩
+theorem twist_of
+    {TT : Finset (Fin n')} {L₁ L₂ N₁ G' : ℕ} {F : Frames n' r} (hF : FramesOK TT L₁ L₂ N₁ G' F)
+    (hr : 1 ≤ r) (hG : G' ≤ n')
+    (p : ℕ) (hp : 1 ≤ p)
+    : TwistBound p F (p ^ G') := by
+  refine
+    ⟨fun j => ?_, fun s _ l hl => Nat.pow_le_pow_right (by omega) (arow_near hF hr hG s.val l hl)⟩
   unfold Qj zF
   apply Nat.pow_le_pow_right (by omega)
   have h1 := hF.2.2.1 (j + 1)

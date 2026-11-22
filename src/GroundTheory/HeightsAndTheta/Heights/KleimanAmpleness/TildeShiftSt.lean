@@ -18,8 +18,8 @@ universe u v w
 
 def TildeShift.Statement : Prop :=
   ∀ (S : Type u) [CommRing S] (Ω : Type w) [Field Ω] [Algebra S Ω] (N : ℕ) (x : Fin (N + 1) → Ω)
-    (E : Type v) [AddCommGroup E] [Module Ω E] [Module S E] [IsScalarTower S Ω E]
-    (M : FinGradedSub (S := S) (x := x) E) (c : ℤ),
+      (E : Type v) [AddCommGroup E] [Module Ω E] [Module S E] [IsScalarTower S Ω E]
+      (M : FinGradedSub (S := S) (x := x) E) (c : ℤ),
     M.tildeSys c = (M.tildeSys 0).twist (twistSys S x c)
 
 end

@@ -5,19 +5,31 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsRootSe
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount
 open scoped TensorProduct Classical
 
 namespace GlobalTheory
 
-theorem similitude_eigvec_orthogonal : ∀ {n : ℕ} (h g : Matrix (Fin n) (Fin n) ℂ) (c : ℝ) (Z : GL (Fin n) ℂ) (lam : Fin n → ℂ), h.IsHermitian → h.det ≠ 0 → c ≠ 0 → gᴴ * h * g = (c : ℂ) • h → Function.Injective lam → (∀ i, ‖lam i‖ ^ 2 = c) → g * (Z : Matrix (Fin n) (Fin n) ℂ) = (Z : Matrix (Fin n) (Fin n) ℂ) * Matrix.diagonal lam → ∃ d : Fin n → ℝ, (∀ i, d i ≠ 0) ∧ (Z : Matrix (Fin n) (Fin n) ℂ)ᴴ * h * (Z : Matrix (Fin n) (Fin n) ℂ) = Matrix.diagonal (fun i => (d i : ℂ)) := by
+theorem similitude_eigvec_orthogonal
+    : ∀ {n : ℕ} (h g : Matrix (Fin n) (Fin n) ℂ) (c : ℝ) (Z : GL (Fin n) ℂ) (lam : Fin n → ℂ),
+      h.IsHermitian → h.det ≠ 0 → c ≠ 0 → gᴴ * h * g = (c : ℂ) • h → Function.Injective lam
+        → (∀ i, ‖lam i‖ ^ 2 = c)
+        → g * (Z : Matrix (Fin n) (Fin n) ℂ) = (Z : Matrix (Fin n) (Fin n) ℂ) * Matrix.diagonal lam
+        → ∃ d : Fin n → ℝ,
+          (∀ i, d i ≠ 0)
+            ∧ (Z : Matrix (Fin n) (Fin n) ℂ)ᴴ * h * (Z : Matrix (Fin n) (Fin n) ℂ)
+              = Matrix.diagonal (fun i => (d i : ℂ)) := by
   intro n h g c Z lam hh hdet hc hg hinj hnorm hgZ
   set M : Matrix (Fin n) (Fin n) ℂ := (Z : Matrix (Fin n) (Fin n) ℂ) with hM
   set H : Matrix (Fin n) (Fin n) ℂ := Mᴴ * h * M with hH
   have hHherm : H.IsHermitian := by
-    simp only [hH, IsHermitian, conjTranspose_mul, conjTranspose_conjTranspose, hh.eq, Matrix.mul_assoc]
+    simp only [hH, IsHermitian, conjTranspose_mul, conjTranspose_conjTranspose, hh.eq,
+      Matrix.mul_assoc]
   have key : (Matrix.diagonal lam)ᴴ * H * Matrix.diagonal lam = (c : ℂ) • H := by
-    have e1 : (M * Matrix.diagonal lam)ᴴ * h * (M * Matrix.diagonal lam) = (Matrix.diagonal lam)ᴴ * H * Matrix.diagonal lam := by
+    have e1
+        : (M * Matrix.diagonal lam)ᴴ * h * (M * Matrix.diagonal lam)
+          = (Matrix.diagonal lam)ᴴ * H * Matrix.diagonal lam := by
       simp only [hH, conjTranspose_mul, Matrix.mul_assoc]
     rw [← e1, ← hgZ]
     simp only [hH, conjTranspose_mul, Matrix.mul_assoc]

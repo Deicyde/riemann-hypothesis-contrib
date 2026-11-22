@@ -9,12 +9,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CotangentDim
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory.PDivGroup
 
-theorem finite_omega_of_eq_zero {p : ℕ} {K : Type} [Field K] (h : (p : K) = 0)
-    (G : PDivGroup p K) : Module.Finite K G.omega := by
+theorem finite_omega_of_eq_zero {p : ℕ} {K : Type} [Field K] (h : (p : K) = 0) (G : PDivGroup p K)
+    : Module.Finite K G.omega := by
   haveI : Module.Finite K (Cot K (G.A 1)) :=
     Module.Finite.of_surjective (AugCot.d (counitAlgHom K (G.A 1))) (AugCot.d_surjective _)
   exact Module.Finite.equiv (LinearEquiv.ofBijective _ (G.omegaLevel_one_bijective h)).symm

@@ -14,23 +14,39 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 namespace GalTw
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.GLq
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.GalCut GlobalTheory.RoadU GlobalTheory.AboveL
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.GLq
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.GalCut
+  GlobalTheory.RoadU GlobalTheory.AboveL
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
 
 namespace GlobalTheory.RoadU.UnlinkedChars
 
-theorem rc_unlinked_chars : UpperTheory.Gal.ToralGalois.Inq → ∀ (Ω : Type) [Field Ω] (E : Type) [Field E] [NumberField E] [Algebra E Ω] [IsAlgClosure E Ω] (w : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω) (h : IsPlaceOver A w), ∀ (a : Weil h →* (w.adicCompletion E)ˣ) (ha : IsLocalArtin h a) (rc : IrrGL (k := w.adicCompletion E) → WD h), UpperTheory.Zero.LLC.LawsT a ha rc → ∀ (x : IrrGL (k := w.adicCompletion E)) (n : ℕ), ∀ (ξ : Fin n → ((w.adicCompletion E)ˣ →* ℂˣ)) (hξ : ∀ j, IsSmoothChar (ξ j)), HasSupport x.rep (chars ξ hξ) → Unlinked (chars ξ hξ) → (rc x).mono0 ∧ ∀ g : Weil h, (rc x).charPol g = ∏ j, (X - C ((ξ j (a g) : ℂˣ) : ℂ)) := by
+theorem rc_unlinked_chars
+    : UpperTheory.Gal.ToralGalois.Inq
+      → ∀ (Ω : Type) [Field Ω] (E : Type) [Field E] [NumberField E] [Algebra E Ω] [IsAlgClosure E Ω]
+          (w : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω) (h : IsPlaceOver A w),
+        ∀ (a : Weil h →* (w.adicCompletion E)ˣ) (ha : IsLocalArtin h a)
+            (rc : IrrGL (k := w.adicCompletion E) → WD h),
+          UpperTheory.Zero.LLC.LawsT a ha rc
+            → ∀ (x : IrrGL (k := w.adicCompletion E)) (n : ℕ),
+              ∀ (ξ : Fin n → ((w.adicCompletion E)ˣ →* ℂˣ)) (hξ : ∀ j, IsSmoothChar (ξ j)),
+                HasSupport x.rep (chars ξ hξ) → Unlinked (chars ξ hξ)
+                  → (rc x).mono0
+                    ∧ ∀ g : Weil h, (rc x).charPol g = ∏ j, (X - C ((ξ j (a g) : ℂˣ) : ℂ)) := by
   intro hI Ω _ E _ _ _ _ w A h a ha rc H x n ξ hξ hs hu
   haveI : CharZero (w.adicCompletion E) := charZero_of_injective_algebraMap (algebraMap E _).injective
   obtain ⟨𝔪, hm⟩ := hI.exh (w.adicCompletion E) x
-  have hs' : HasSupport x.rep (msupp 𝔪) := GlobalTheory.LocGL.hasSupport_msupp_of_isL hI.zel _ 𝔪 x hm
+  have hs' : HasSupport x.rep (msupp 𝔪) :=
+    GlobalTheory.LocGL.hasSupport_msupp_of_isL hI.zel _ 𝔪 x hm
   have he : chars ξ hξ = msupp 𝔪 :=
-    GlobalTheory.LocGL.SupportUnique.hasSupport_unique GlobalTheory.RecT.geometricLemma_holds GlobalTheory.bernsteinZelevinskyFiniteness_holds
-      hI.zel _ x _ _ hs hs'
+    GlobalTheory.LocGL.SupportUnique.hasSupport_unique GlobalTheory.RecT.geometricLemma_holds
+      GlobalTheory.bernsteinZelevinskyFiniteness_holds hI.zel _ x _ _ hs hs'
   have hL := H.langlands 𝔪.toList x (by rw [Multiset.coe_toList]; exact hm)
   have hmem : ∀ Δ ∈ 𝔪, ∀ i : Fin Δ.len, Δ.term i ∈ chars ξ hξ := fun Δ hΔ i => by
     rw [he, msupp]
@@ -45,7 +61,8 @@ theorem rc_unlinked_chars : UpperTheory.Gal.ToralGalois.Inq → ∀ (Ω : Type) 
     norm_num
   have hms : ∀ Δ ∈ 𝔪, Δ.ms = {Δ.first} := by
     intro Δ hΔ
-    have e : Δ = Segment.single Δ.first Δ.isCusp_first := Segment.ext_first rfl (by rw [hlen Δ hΔ]; rfl)
+    have e : Δ = Segment.single Δ.first Δ.isCusp_first :=
+      Segment.ext_first rfl (by rw [hlen Δ hΔ]; rfl)
     rw [e, Segment.ms_single]
     rfl
   have hsupp : msupp 𝔪 = 𝔪.map Segment.first := by
@@ -64,14 +81,17 @@ theorem rc_unlinked_chars : UpperTheory.Gal.ToralGalois.Inq → ∀ (Ω : Type) 
     rw [hlen Δ (Multiset.mem_toList.1 hΔ)]
     simp only [Nat.cast_one, sub_self, zero_div]
     exact (GlobalTheory.WeilDeligne.charPol_lpTw_lpChar_lpSp E Ω A w h _).1
-  have hpol1 : ∀ j (g : Weil h), (rc (IrrGL.ofChar (ξ j) (hξ j))).charPol g = X - C ((ξ j (a g) : ℂˣ) : ℂ) := by
+  have hpol1
+      : ∀ j (g : Weil h),
+        (rc (IrrGL.ofChar (ξ j) (hξ j))).charPol g = X - C ((ξ j (a g) : ℂˣ) : ℂ) := by
     intro j g
     rw [H.one, WD.lpOfChar, WD.charPol_mk, WDRep.ofChars_ρ, charpoly_diagEnd]
     simp
   refine ⟨?_, fun g => ?_⟩
   · rw [hsum]
-    have key : ∀ L : List (Segment (w.adicCompletion E)), (∀ Δ ∈ L, Δ ∈ 𝔪) →
-        (sumList (L.map fun Δ => rc Δ.first)).mono0 := by
+    have key
+        : ∀ L : List (Segment (w.adicCompletion E)),
+          (∀ Δ ∈ L, Δ ∈ 𝔪) → (sumList (L.map fun Δ => rc Δ.first)).mono0 := by
       intro L
       induction L with
       | nil =>
@@ -88,10 +108,13 @@ theorem rc_unlinked_chars : UpperTheory.Gal.ToralGalois.Inq → ∀ (Ω : Type) 
         exact WD.mono0_of_lpDim_eq_one (by rw [H.dim]; rfl)
     exact key _ fun Δ hΔ => Multiset.mem_toList.1 hΔ
   · rw [hsum, GlobalTheory.LocLanglands.CuspExt.charPol_sumList, List.map_map]
-    have r1 : (∏ j, (X - C ((ξ j (a g) : ℂˣ) : ℂ))) = ((chars ξ hξ).map fun y => (rc y).charPol g).prod := by
+    have r1
+        : (∏ j, (X - C ((ξ j (a g) : ℂˣ) : ℂ)))
+          = ((chars ξ hξ).map fun y => (rc y).charPol g).prod := by
       rw [chars, Multiset.map_map, Finset.prod_eq_multiset_prod]
       exact congrArg Multiset.prod (Multiset.map_congr rfl fun j _ => (hpol1 j g).symm)
-    rw [r1, he, hsupp, Multiset.map_map, ← Multiset.prod_coe, ← Multiset.map_coe, Multiset.coe_toList]
+    rw [r1, he, hsupp, Multiset.map_map, ← Multiset.prod_coe, ← Multiset.map_coe,
+      Multiset.coe_toList]
     rfl
 
 end GlobalTheory.RoadU.UnlinkedChars

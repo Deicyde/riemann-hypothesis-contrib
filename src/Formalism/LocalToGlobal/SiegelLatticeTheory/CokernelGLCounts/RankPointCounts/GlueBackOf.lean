@@ -20,26 +20,33 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
 def GramMM (M : Model F E) (r n : ℕ) : Prop :=
-  ∀ (V : Type) [AddCommGroup V] [Module E V] (H : HermSp M V), Module.finrank E V = n →
-  ∀ (t₁ : Term V M r) (f₂ f₂' : Fin (r + 1) → V)
-    (φ : H.Wb t₁.f ≃ₗ[E] H.Wb f₂) (φ' : H.Wb t₁.f' ≃ₗ[E] H.Wb f₂'), LocalCountHypotheses H t₁ f₂ f₂' φ φ' →
-    IsUnit (H.Dl f₂ f₂' (r + 1)) → IsUnit (H.gram (H.MMfam (⟨⊥, f₂, f₂', t₁.T, t₁.T'⟩ : Term V M r))).det
+  ∀ (V : Type) [AddCommGroup V] [Module E V] (H : HermSp M V),
+    Module.finrank E V = n
+      → ∀ (t₁ : Term V M r) (f₂ f₂' : Fin (r + 1) → V) (φ : H.Wb t₁.f ≃ₗ[E] H.Wb f₂)
+          (φ' : H.Wb t₁.f' ≃ₗ[E] H.Wb f₂'),
+        LocalCountHypotheses H t₁ f₂ f₂' φ φ' → IsUnit (H.Dl f₂ f₂' (r + 1))
+          → IsUnit (H.gram (H.MMfam (⟨⊥, f₂, f₂', t₁.T, t₁.T'⟩ : Term V M r))).det
 
 def ThFG (M : Model F E) (r : ℕ) : Prop :=
-  ∀ (V : Type) [AddCommGroup V] [Module E V] (H : HermSp M V) (t : Term V M r), H.IsGeneric t → (ThL H t).FG
+  ∀ (V : Type) [AddCommGroup V] [Module E V] (H : HermSp M V) (t : Term V M r),
+    H.IsGeneric t → (ThL H t).FG
 
 def ThSpan (M : Model F E) (r : ℕ) : Prop :=
-  ∀ (V : Type) [AddCommGroup V] [Module E V] (H : HermSp M V) (t : Term V M r), H.IsGeneric t →
-    Submodule.span E (ThL H t : Set V) = H.W0 t.f t.f'
+  ∀ (V : Type) [AddCommGroup V] [Module E V] (H : HermSp M V) (t : Term V M r),
+    H.IsGeneric t → Submodule.span E (ThL H t : Set V) = H.W0 t.f t.f'
 
 set_option maxHeartbeats 800000 in
-theorem glueBack_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n) (hE : GlueEta M r) (hV : GlueConv M r)
-    (hP : GenOfPrim M r n) (hG : GramMM M r n) (hFG : ThFG M r) (hS : ThSpan M r) : GlueBack M r n := by
+theorem glueBack_of
+    (M : Model F E) (r n : ℕ)
+    (hM : M.OK) (hC : CorrIso M r n) (hE : GlueEta M r) (hV : GlueConv M r) (hP : GenOfPrim M r n)
+    (hG : GramMM M r n) (hFG : ThFG M r) (hS : ThSpan M r)
+    : GlueBack M r n := by
   intro V _ _ H hn t₁ f₂ f₂' φ φ' hT hDl hMM θ hθ
   let t₀ : Term V M r := { abelian₂ := ⊥, f := f₂, f' := f₂', T := t₁.T, T' := t₁.T' }
-  have memS : ∀ (t : Term V M r) (N : Submodule M.L.O V) (w : V),
-      w ∈ ThSharp H t N ↔ (w ∈ H.W0 t.f t.f' ∧ ∀ n ∈ N, H.h w n ∈ M.L.O) :=
-    fun _ _ _ => Iff.rfl
+  have memS
+      : ∀ (t : Term V M r) (N : Submodule M.L.O V) (w : V),
+        w ∈ ThSharp H t N ↔ (w ∈ H.W0 t.f t.f' ∧ ∀ n ∈ N, H.h w n ∈ M.L.O) := fun _ _ _ =>
+    Iff.rfl
   have memL : ∀ (t : Term V M r) (w : V), w ∈ ThL H t ↔ (w ∈ t.abelian₂ ∧ w ∈ H.W0 t.f t.f') :=
     fun _ _ => Iff.rfl
   have hG₁ : H.IsGeneric t₁ := by
@@ -50,15 +57,17 @@ theorem glueBack_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n)
     exact h
   obtain ⟨ψ, hψh, hψC⟩ := hC V H hn t₁ f₂ f₂' φ φ' hT hDl
   obtain ⟨η₁, hη₁a, hη₁b⟩ := hE hM V H t₁ hG₁
-  let g : ThL H t₁ →ₗ[M.L.O] V :=
-    { toFun := fun x => (ψ ⟨x, ((memL _ _).1 x.2).2⟩ : V)
-      map_add' := fun a b => by
-        have h := congrArg Subtype.val
+  let g : ThL H t₁ →ₗ[M.L.O] V := {
+    toFun := fun x => (ψ ⟨x, ((memL _ _).1 x.2).2⟩ : V)
+    map_add' := fun a b => by
+      have h :=
+        congrArg Subtype.val
           (map_add ψ ⟨(a : V), ((memL _ _).1 a.2).2⟩ ⟨(b : V), ((memL _ _).1 b.2).2⟩)
-        exact h
-      map_smul' := fun c a => by
-        have h := congrArg Subtype.val (map_smul ψ (c : E) ⟨(a : V), ((memL _ _).1 a.2).2⟩)
-        exact h }
+      exact h
+    map_smul' := fun c a => by
+      have h := congrArg Subtype.val (map_smul ψ (c : E) ⟨(a : V), ((memL _ _).1 a.2).2⟩)
+      exact h
+  }
   have hg : ∀ y : ThL H t₁, g y = (ψ ⟨y, ((memL _ _).1 y.2).2⟩ : V) := fun _ => rfl
   obtain ⟨N₂, hN₂⟩ : ∃ N : Submodule M.L.O V, N = Submodule.map g ⊤ := ⟨_, rfl⟩
   have memN : ∀ v : V, v ∈ N₂ ↔ ∃ y, g y = v := by
@@ -76,16 +85,18 @@ theorem glueBack_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n)
       have h2 : (y : V) = x := congrArg Subtype.val (ψ.injective (Subtype.ext hy))
       rw [← h2]
       exact ((memL _ _).1 y.2).1
-  have fwd : ∀ (w : V) (hw : w ∈ ThSharp H t₁ (ThL H t₁)),
-      (ψ ⟨w, ((memS _ _ _).1 hw).1⟩ : V) ∈ ThSharp H t₀ N₂ := by
+  have fwd
+      : ∀ (w : V) (hw : w ∈ ThSharp H t₁ (ThL H t₁)),
+        (ψ ⟨w, ((memS _ _ _).1 hw).1⟩ : V) ∈ ThSharp H t₀ N₂ := by
     intro w hw
     refine (memS _ _ _).2 ⟨(ψ _).2, ?_⟩
     intro n hn'
     obtain ⟨y, rfl⟩ := (memN _).1 hn'
     rw [hg, hψh]
     exact ((memS _ _ _).1 hw).2 _ y.2
-  have bwd : ∀ (w : V) (hw : w ∈ ThSharp H t₀ N₂),
-      (ψ.symm ⟨w, ((memS _ _ _).1 hw).1⟩ : V) ∈ ThSharp H t₁ (ThL H t₁) := by
+  have bwd
+      : ∀ (w : V) (hw : w ∈ ThSharp H t₀ N₂),
+        (ψ.symm ⟨w, ((memS _ _ _).1 hw).1⟩ : V) ∈ ThSharp H t₁ (ThL H t₁) := by
     intro w hw
     refine (memS _ _ _).2 ⟨(ψ.symm _).2, ?_⟩
     intro n hn'
@@ -94,31 +105,34 @@ theorem glueBack_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n)
     simp only [LinearEquiv.apply_symm_apply] at h2
     rw [← h2]
     exact ((memS _ _ _).1 hw).2 _ ((memN _).2 ⟨⟨n, hn'⟩, rfl⟩)
-  let e : ThSharp H t₁ (ThL H t₁) ≃ₗ[M.L.O] ThSharp H t₀ N₂ :=
-    { toFun := fun w => ⟨_, fwd w.1 w.2⟩
-      invFun := fun w => ⟨_, bwd w.1 w.2⟩
-      map_add' := by
-        intro a b
-        apply Subtype.ext
-        have h := congrArg Subtype.val
+  let e : ThSharp H t₁ (ThL H t₁) ≃ₗ[M.L.O] ThSharp H t₀ N₂ := {
+    toFun := fun w => ⟨_, fwd w.1 w.2⟩
+    invFun := fun w => ⟨_, bwd w.1 w.2⟩
+    map_add' := by
+      intro a b
+      apply Subtype.ext
+      have h :=
+        congrArg Subtype.val
           (map_add ψ ⟨(a : V), ((memS _ _ _).1 a.2).1⟩ ⟨(b : V), ((memS _ _ _).1 b.2).1⟩)
-        exact h
-      map_smul' := by
-        intro c a
-        apply Subtype.ext
-        have h := congrArg Subtype.val (map_smul ψ (c : E) ⟨(a : V), ((memS _ _ _).1 a.2).1⟩)
-        exact h
-      left_inv := by
-        intro a
-        apply Subtype.ext
-        simp
-      right_inv := by
-        intro a
-        apply Subtype.ext
-        simp }
-  have hPQ : Submodule.map (e : ThSharp H t₁ (ThL H t₁) →ₗ[M.L.O] ThSharp H t₀ N₂)
-      (Submodule.comap (ThSharp H t₁ (ThL H t₁)).subtype (ThL H t₁)) =
-      Submodule.comap (ThSharp H t₀ N₂).subtype N₂ := by
+      exact h
+    map_smul' := by
+      intro c a
+      apply Subtype.ext
+      have h := congrArg Subtype.val (map_smul ψ (c : E) ⟨(a : V), ((memS _ _ _).1 a.2).1⟩)
+      exact h
+    left_inv := by
+      intro a
+      apply Subtype.ext
+      simp
+    right_inv := by
+      intro a
+      apply Subtype.ext
+      simp
+  }
+  have hPQ
+      : Submodule.map (e : ThSharp H t₁ (ThL H t₁) →ₗ[M.L.O] ThSharp H t₀ N₂)
+          (Submodule.comap (ThSharp H t₁ (ThL H t₁)).subtype (ThL H t₁))
+        = Submodule.comap (ThSharp H t₀ N₂).subtype N₂ := by
     ext x
     simp only [Submodule.mem_map, Submodule.mem_comap, Submodule.subtype_apply]
     constructor
@@ -141,7 +155,8 @@ theorem glueBack_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n)
     exact ⟨w, hw.symm⟩
   have hh : ∀ a b : ThSharp H t₀ N₂, H.h (e.symm a : V) (e.symm b : V) = H.h a b := by
     intro a b
-    have h := hψh (ψ.symm ⟨(a : V), ((memS _ _ _).1 a.2).1⟩) (ψ.symm ⟨(b : V), ((memS _ _ _).1 b.2).1⟩)
+    have h :=
+      hψh (ψ.symm ⟨(a : V), ((memS _ _ _).1 a.2).1⟩) (ψ.symm ⟨(b : V), ((memS _ _ _).1 b.2).1⟩)
     simp only [LinearEquiv.apply_symm_apply] at h
     exact h.symm
   let η : DDt H t₀ ≃ₗ[M.L.O] DDW H t₀ N₂ := (θ.symm.trans η₁).trans κ
@@ -163,8 +178,9 @@ theorem glueBack_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n)
       have hu : ((ψ.symm ⟨v, hv⟩ : H.W0 t₁.f t₁.f') : V) ∈ Submodule.span E (ThL H t₁ : Set V) := by
         rw [hS1]
         exact (ψ.symm _).2
-      have main : ∀ (x : V) (hx : x ∈ Submodule.span E (ThL H t₁ : Set V)),
-          ∀ h : x ∈ H.W0 t₁.f t₁.f', (ψ ⟨x, h⟩ : V) ∈ Submodule.span E (N₂ : Set V) := by
+      have main
+          : ∀ (x : V) (hx : x ∈ Submodule.span E (ThL H t₁ : Set V)), ∀ h : x ∈ H.W0 t₁.f t₁.f',
+            (ψ ⟨x, h⟩ : V) ∈ Submodule.span E (N₂ : Set V) := by
         intro x hx
         induction hx using Submodule.span_induction with
         | mem x hx =>
@@ -202,9 +218,10 @@ theorem glueBack_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n)
     obtain ⟨b, rfl⟩ := (memN y).1 hy
     rw [hg, hg, hψh]
     exact (hsd _).1 ((memL _ _).1 a.2).1 _ ((memL _ _).1 b.2).1
-  have hpair : ∀ (m m' : MMsharp H t₀) (w w' : ThSharp H t₀ N₂),
-      η (ddMk H t₀ m) = dwMk H t₀ N₂ w → η (ddMk H t₀ m') = dwMk H t₀ N₂ w' →
-      H.h m m' + H.h w w' ∈ M.L.O := by
+  have hpair
+      : ∀ (m m' : MMsharp H t₀) (w w' : ThSharp H t₀ N₂),
+        η (ddMk H t₀ m) = dwMk H t₀ N₂ w → η (ddMk H t₀ m') = dwMk H t₀ N₂ w'
+          → H.h m m' + H.h w w' ∈ M.L.O := by
     intro m m' w w' hw hw'
     obtain ⟨x, hx⟩ := Submodule.Quotient.mk_surjective _ (θ.symm (ddMk H t₀ m))
     obtain ⟨x', hx'⟩ := Submodule.Quotient.mk_surjective _ (θ.symm (ddMk H t₀ m'))
@@ -231,8 +248,7 @@ theorem glueBack_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n)
     convert a3 using 1
     ring
   have hGr := hG V H hn t₁ f₂ f₂' φ φ' hT hDl
-  obtain ⟨Λ, ⟨hsd2, hprim, hcap, hη⟩, -⟩ :=
-    hV hM V H t₀ hGr hMM N₂ hle hfg hspan hint η hpair
+  obtain ⟨Λ, ⟨hsd2, hprim, hcap, hη⟩, -⟩ := hV hM V H t₀ hGr hMM N₂ hle hfg hspan hint η hpair
   have hgen := hP hM V H hn t₁ f₂ f₂' φ φ' hT hDl Λ hsd2 hprim
   have hthc : ThCond H t₁ t₀ Λ φ φ' := by
     intro n₁ n₂ hc

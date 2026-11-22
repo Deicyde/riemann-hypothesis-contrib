@@ -18,13 +18,14 @@ universe u
 
 section VC
 
-variable {F : Type u} [Field F] [IsAlgClosed F] [DecidableEq F]
-  {E E' E₁ E₁' : WeierstrassCurve F} [E.IsElliptic] [E'.IsElliptic] [E₁.IsElliptic]
-  [E₁'.IsElliptic]
+variable
+  {F : Type u} [Field F] [IsAlgClosed F] [DecidableEq F]
+  {E E' E₁ E₁' : WeierstrassCurve F} [E.IsElliptic] [E'.IsElliptic] [E₁.IsElliptic] [E₁'.IsElliptic]
 
-theorem homConstSet_vc_pair (C C' : VariableChange F) (h : C • E = E₁) (h' : C' • E' = E₁') :
-    ∃ c : F, c ≠ 0 ∧ (homConstSet E₁ E₁' : Set F) = (c * ·) '' homConstSet E E' ∧
-      (homConstSet E₁' E₁ : Set F) = (c⁻¹ * ·) '' homConstSet E' E := by
+theorem homConstSet_vc_pair (C C' : VariableChange F) (h : C • E = E₁) (h' : C' • E' = E₁')
+    : ∃ c : F,
+      c ≠ 0 ∧ (homConstSet E₁ E₁' : Set F) = (c * ·) '' homConstSet E E'
+        ∧ (homConstSet E₁' E₁ : Set F) = (c⁻¹ * ·) '' homConstSet E' E := by
   set Q := vcHom C⁻¹ (inv_smul_eq_of_smul_eq C h)
   set R := vcHom C' h'
   set Q' := vcHom C h
@@ -64,18 +65,19 @@ end VC
 
 section Invariant
 
-variable {F : Type u} [Field F] [IsAlgClosed F] [DecidableEq F]
+variable
+  {F : Type u} [Field F] [IsAlgClosed F] [DecidableEq F]
   {E E' E'' : WeierstrassCurve F} [E.IsElliptic] [E'.IsElliptic] [E''.IsElliptic]
 
-theorem invConst_comp (ψ : Isogeny E' E'') (φ : Isogeny E E') :
-    invConst (ψ.comp φ) = invConst ψ * invConst φ := by
+theorem invConst_comp (ψ : Isogeny E' E'') (φ : Isogeny E E')
+    : invConst (ψ.comp φ) = invConst ψ * invConst φ := by
   rw [← homConst_toHom, ← Isogeny.homComp_toHom, homConst_homComp, homConst_toHom, homConst_toHom]
 
 theorem invConst_mem_homConstSet (φ : Isogeny E E') : invConst φ ∈ homConstSet E E' :=
   mem_homConstSet.2 ⟨φ.toHom, homConst_toHom φ⟩
 
-theorem invConst_dualOver_mul (φ : Isogeny E E') :
-    invConst (dualOver φ) * invConst φ = φ.degree := by
+theorem invConst_dualOver_mul (φ : Isogeny E E')
+    : invConst (dualOver φ) * invConst φ = φ.degree := by
   rw [← invConst_comp, dualOver_comp, invConst_mulIsogeny]
   push_cast
   rfl
@@ -94,8 +96,9 @@ section Lattice
 
 variable {K : Type*} [Field K] [NumberField K] (σ₀ : K →+* ℂ)
 
-theorem idealLattice_one_mul_lattice (L : PeriodPair) (hL : periodLatticeEnd L = cmRingOfEmbedding σ₀) :
-    idealLattice σ₀ 1 * L.lattice = L.lattice := by
+theorem idealLattice_one_mul_lattice
+    (L : PeriodPair) (hL : periodLatticeEnd L = cmRingOfEmbedding σ₀)
+    : idealLattice σ₀ 1 * L.lattice = L.lattice := by
   apply le_antisymm
   · rw [Submodule.mul_le]
     intro m hm l hl
@@ -110,10 +113,12 @@ theorem idealLattice_one_mul_lattice (L : PeriodPair) (hL : periodLatticeEnd L =
 
 variable (hK : finrank ℚ K = 2) [_root_.NumberField.IsTotallyComplex K]
 
-theorem homConstSet_pair_of_smul {E E' : CMCurve K} {𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ}
-    (h : (ellMulAction σ₀ hK).smul (ClassGroup.mk K 𝔞) E.toEll = E'.toEll) :
-    ∃ c : ℂ, c ≠ 0 ∧ (homConstSet E.curve E'.curve : Set ℂ) = (c * ·) '' idealLattice σ₀ ↑𝔞⁻¹ ∧
-      (homConstSet E'.curve E.curve : Set ℂ) = (c⁻¹ * ·) '' idealLattice σ₀ ↑𝔞 := by
+theorem homConstSet_pair_of_smul
+    {E E' : CMCurve K} {𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ}
+    (h : (ellMulAction σ₀ hK).smul (ClassGroup.mk K 𝔞) E.toEll = E'.toEll)
+    : ∃ c : ℂ,
+      c ≠ 0 ∧ (homConstSet E.curve E'.curve : Set ℂ) = (c * ·) '' idealLattice σ₀ ↑𝔞⁻¹
+        ∧ (homConstSet E'.curve E.curve : Set ℂ) = (c⁻¹ * ·) '' idealLattice σ₀ ↑𝔞 := by
   obtain ⟨L, C, hL, hC, hE⟩ := E.exists_lattice σ₀ hK
   obtain ⟨L', hL'lat, hL'⟩ := exists_lattice_mul σ₀ hK L hL 𝔞
   have h1 := classGroup_smul_ellOf σ₀ hK L L' hL hL' 𝔞 hL'lat
@@ -125,17 +130,17 @@ theorem homConstSet_pair_of_smul {E E' : CMCurve K} {𝔞 : (FractionalIdeal (�
   obtain ⟨d, hd, hset, hset'⟩ := homConstSet_vc_pair C C' hC hC''
   rw [homConstSet_weierstrassCurve, latticeHom_eq_idealLattice σ₀ hK L L' hL 𝔞⁻¹ hL'lat] at hset
   have hLL : L.lattice = idealLattice σ₀ ↑𝔞 * L'.lattice := by
-    rw [hL'lat, ← mul_assoc, ← idealLattice_mul, Units.mul_inv, idealLattice_one_mul_lattice σ₀ L hL]
+    rw [hL'lat, ← mul_assoc, ← idealLattice_mul, Units.mul_inv,
+      idealLattice_one_mul_lattice σ₀ L hL]
   rw [homConstSet_weierstrassCurve, latticeHom_eq_idealLattice σ₀ hK L' L hL' 𝔞 hLL] at hset'
   exact ⟨d⁻¹, inv_ne_zero hd, eq_image_mul_inv hd hset, eq_image_mul_inv (inv_ne_zero hd) hset'⟩
 
-
 include hK in
-theorem homConstSet_symm {E E' : CMCurve K} {𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ} {b : ℂ} (hb : b ≠ 0)
-    (hset : (homConstSet E.curve E'.curve : Set ℂ) = (b * ·) '' idealLattice σ₀ ↑𝔞⁻¹) :
-    (homConstSet E'.curve E.curve : Set ℂ) = (b⁻¹ * ·) '' idealLattice σ₀ ↑𝔞 := by
-  obtain ⟨c, hc, h1, h2⟩ :=
-    homConstSet_pair_of_smul σ₀ hK (smul_toEll_of_homConstSet σ₀ hK hb hset)
+theorem homConstSet_symm
+    {E E' : CMCurve K} {𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ} {b : ℂ}
+    (hb : b ≠ 0) (hset : (homConstSet E.curve E'.curve : Set ℂ) = (b * ·) '' idealLattice σ₀ ↑𝔞⁻¹)
+    : (homConstSet E'.curve E.curve : Set ℂ) = (b⁻¹ * ·) '' idealLattice σ₀ ↑𝔞 := by
+  obtain ⟨c, hc, h1, h2⟩ := homConstSet_pair_of_smul σ₀ hK (smul_toEll_of_homConstSet σ₀ hK hb hset)
 
   have e : (idealLattice σ₀ ↑𝔞⁻¹ : Set ℂ) = ((c⁻¹ * b) * ·) '' idealLattice σ₀ ↑𝔞⁻¹ := by
     rw [← image_mul_image_mul, ← hset, h1, image_mul_image_mul, inv_mul_cancel₀ hc]
@@ -146,13 +151,14 @@ theorem homConstSet_symm {E E' : CMCurve K} {𝔞 : (FractionalIdeal (𝓞 K)⁰
     rw [mul_assoc, Units.mul_inv, mul_one]
   rw [← idealLattice_mul, hmul] at e'
   rw [h2]
-  calc (c⁻¹ * ·) '' (idealLattice σ₀ ↑𝔞 : Set ℂ)
-      = (c⁻¹ * ·) '' (((c⁻¹ * b)⁻¹ * ·) '' (idealLattice σ₀ ↑𝔞 : Set ℂ)) := by
-        rw [← eq_image_mul_inv (mul_ne_zero (inv_ne_zero hc) hb) e']
+  calc
+    (c⁻¹ * ·) '' (idealLattice σ₀ ↑𝔞 : Set ℂ)
+        = (c⁻¹ * ·) '' (((c⁻¹ * b)⁻¹ * ·) '' (idealLattice σ₀ ↑𝔞 : Set ℂ)) := by
+      rw [← eq_image_mul_inv (mul_ne_zero (inv_ne_zero hc) hb) e']
     _ = (b⁻¹ * ·) '' (idealLattice σ₀ ↑𝔞 : Set ℂ) := by
-        rw [image_mul_image_mul]
-        congr 2
-        field_simp
+      rw [image_mul_image_mul]
+      congr 2
+      field_simp
 
 end Lattice
 
@@ -163,23 +169,24 @@ variable {K : Type*} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K))
 def primeUnit : (FractionalIdeal (𝓞 K)⁰ K)ˣ :=
   Units.mk0 (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K) (FractionalIdeal.coeIdeal_ne_zero.2 v.ne_bot)
 
-theorem primeUnit_val : ((primeUnit v : (FractionalIdeal (𝓞 K)⁰ K)ˣ) : FractionalIdeal (𝓞 K)⁰ K) =
-    v.asIdeal :=
+theorem primeUnit_val
+    : ((primeUnit v : (FractionalIdeal (𝓞 K)⁰ K)ˣ) : FractionalIdeal (𝓞 K)⁰ K) = v.asIdeal :=
   rfl
 
-theorem primeUnit_inv_val :
-    (((primeUnit v)⁻¹ : (FractionalIdeal (𝓞 K)⁰ K)ˣ) : FractionalIdeal (𝓞 K)⁰ K) =
-      (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K)⁻¹ := by
+theorem primeUnit_inv_val
+    : (((primeUnit v)⁻¹ : (FractionalIdeal (𝓞 K)⁰ K)ˣ) : FractionalIdeal (𝓞 K)⁰ K)
+      = (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K)⁻¹ := by
   rw [Units.val_inv_eq_inv_val, primeUnit_val]
 
-theorem classGroup_mk_primeUnit :
-    ClassGroup.mk K (primeUnit v) =
-      ClassGroup.mk0 ⟨v.asIdeal, mem_nonZeroDivisors_of_ne_zero v.ne_bot⟩ := by
+theorem classGroup_mk_primeUnit
+    : ClassGroup.mk K (primeUnit v)
+      = ClassGroup.mk0 ⟨v.asIdeal, mem_nonZeroDivisors_of_ne_zero v.ne_bot⟩ := by
   rw [← ClassGroup.mk_mk0 K]
   rfl
 
-theorem absNorm_dvd_of_natCast_mem (hv : (Ideal.absNorm v.asIdeal).Prime) {n : ℕ}
-    (hn : (n : 𝓞 K) ∈ v.asIdeal) : Ideal.absNorm v.asIdeal ∣ n := by
+theorem absNorm_dvd_of_natCast_mem
+    (hv : (Ideal.absNorm v.asIdeal).Prime) {n : ℕ} (hn : (n : 𝓞 K) ∈ v.asIdeal)
+    : Ideal.absNorm v.asIdeal ∣ n := by
   by_contra h
   have hcop : Nat.Coprime (Ideal.absNorm v.asIdeal) n := (Nat.Prime.coprime_iff_not_dvd hv).2 h
   obtain ⟨a, b, hab⟩ := Nat.isCoprime_iff_coprime.2 hcop
@@ -191,15 +198,16 @@ theorem absNorm_dvd_of_natCast_mem (hv : (Ideal.absNorm v.asIdeal).Prime) {n : �
     exact v.asIdeal.add_mem (v.asIdeal.mul_mem_left _ hp) (v.asIdeal.mul_mem_left _ hn)
   exact v.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h1)
 
-theorem inv_absNorm_notMem_inv (hK : finrank ℚ K = 2) (hv : (Ideal.absNorm v.asIdeal).Prime) :
-    ((Ideal.absNorm v.asIdeal : K))⁻¹ ∉ (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K)⁻¹ := by
+theorem inv_absNorm_notMem_inv (hK : finrank ℚ K = 2) (hv : (Ideal.absNorm v.asIdeal).Prime)
+    : ((Ideal.absNorm v.asIdeal : K))⁻¹ ∉ (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K)⁻¹ := by
   set p := Ideal.absNorm v.asIdeal with hpdef
   intro hmem
   have hp0 : (p : K) ≠ 0 := Nat.cast_ne_zero.2 hv.ne_zero
   have hle : v.asIdeal ≤ Ideal.span {(p : 𝓞 K)} := by
     intro y hy
-    have h1 := (FractionalIdeal.mem_inv_iff (FractionalIdeal.coeIdeal_ne_zero.2 v.ne_bot)).1 hmem
-      (algebraMap (𝓞 K) K y) (FractionalIdeal.mem_coeIdeal_of_mem _ hy)
+    have h1 :=
+      (FractionalIdeal.mem_inv_iff (FractionalIdeal.coeIdeal_ne_zero.2 v.ne_bot)).1 hmem
+        (algebraMap (𝓞 K) K y) (FractionalIdeal.mem_coeIdeal_of_mem _ hy)
     obtain ⟨z, hz⟩ := (FractionalIdeal.mem_one_iff _).1 h1
     rw [Ideal.mem_span_singleton']
     refine ⟨z, IsFractionRing.injective (𝓞 K) K ?_⟩
@@ -219,30 +227,34 @@ end Prime
 
 section Degree
 
-variable {K : Type*} [Field K] [NumberField K] (σ₀ : K →+* ℂ) (hK : finrank ℚ K = 2)
+variable
+  {K : Type*} [Field K] [NumberField K]
+  (σ₀ : K →+* ℂ) (hK : finrank ℚ K = 2)
   [_root_.NumberField.IsTotallyComplex K]
 
-
 include hK in
-theorem degree_eq_absNorm {E E' : CMCurve K} (v : HeightOneSpectrum (𝓞 K))
-    (hv : (Ideal.absNorm v.asIdeal).Prime) (φ : Isogeny E.curve E'.curve)
-    (hφ : (homConstSet E.curve E'.curve : Set ℂ) =
-      (invConst φ * ·) '' idealLattice σ₀ (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K)⁻¹) :
-    φ.degree = Ideal.absNorm v.asIdeal := by
+theorem degree_eq_absNorm
+    {E E' : CMCurve K}
+    (v : HeightOneSpectrum (𝓞 K)) (hv : (Ideal.absNorm v.asIdeal).Prime)
+    (φ : Isogeny E.curve E'.curve)
+    (hφ : (homConstSet E.curve E'.curve : Set ℂ)
+      = (invConst φ * ·) '' idealLattice σ₀ (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K)⁻¹)
+    : φ.degree = Ideal.absNorm v.asIdeal := by
   classical
   set p := Ideal.absNorm v.asIdeal with hpdef
   set c := invConst φ with hcdef
   have hc : c ≠ 0 := invConst_ne_zero φ
   have hp0 : (p : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hv.ne_zero
-  have hφu : (homConstSet E.curve E'.curve : Set ℂ) =
-      (c * ·) '' idealLattice σ₀ ↑(primeUnit v)⁻¹ := by
+  have hφu
+      : (homConstSet E.curve E'.curve : Set ℂ) = (c * ·) '' idealLattice σ₀ ↑(primeUnit v)⁻¹ := by
     rw [primeUnit_inv_val]; exact hφ
   have hsym := homConstSet_symm σ₀ hK hc hφu
   rw [primeUnit_val] at hsym
 
   have hpmem : (p : ℂ) ∈ idealLattice σ₀ (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K) := by
     have hx : ((p : K)) ∈ (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K) := by
-      have := FractionalIdeal.mem_coeIdeal_of_mem (S := (𝓞 K)⁰) (P := K) (Ideal.absNorm_mem v.asIdeal)
+      have :=
+        FractionalIdeal.mem_coeIdeal_of_mem (S := (𝓞 K)⁰) (P := K) (Ideal.absNorm_mem v.asIdeal)
       simpa using this
     simpa using map_mem_idealLattice σ₀ hx
   have hν : c⁻¹ * p ∈ homConstSet E'.curve E.curve := by
@@ -259,7 +271,9 @@ theorem degree_eq_absNorm {E E' : CMCurve K} (v : HeightOneSpectrum (𝓞 K))
 
   have hpz : (p : ℤ) ≠ 0 := by exact_mod_cast hv.ne_zero
   have hcomp : ν.comp φ = mulIsogeny E.curve p hpz := by
-    have h1 : endConst E.curve (ν.comp φ).toHom = endConst E.curve (mulIsogeny E.curve p hpz).toHom := by
+    have h1
+        : endConst E.curve (ν.comp φ).toHom
+          = endConst E.curve (mulIsogeny E.curve p hpz).toHom := by
       rw [endConst_apply, endConst_apply, homConst_toHom, homConst_toHom, invConst_comp, hνc,
         invConst_mulIsogeny]
       field_simp
@@ -317,13 +331,15 @@ theorem degree_eq_absNorm {E E' : CMCurve K} (v : HeightOneSpectrum (𝓞 K))
     rw [σ₀.injective hx'] at hx
     exact inv_absNorm_notMem_inv v hK hv hx
 
-
 include hK in
-theorem exists_isogeny_homConstSet_eq {E E' : CMCurve K} (v : HeightOneSpectrum (𝓞 K))
+theorem exists_isogeny_homConstSet_eq
+    {E E' : CMCurve K} (v : HeightOneSpectrum (𝓞 K))
     (h : (ellMulAction σ₀ hK).smul
-      (ClassGroup.mk0 ⟨v.asIdeal, mem_nonZeroDivisors_of_ne_zero v.ne_bot⟩) E.toEll = E'.toEll) :
-    ∃ φ : Isogeny E.curve E'.curve, (homConstSet E.curve E'.curve : Set ℂ) =
-      (invConst φ * ·) '' idealLattice σ₀ (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K)⁻¹ := by
+        (ClassGroup.mk0 ⟨v.asIdeal, mem_nonZeroDivisors_of_ne_zero v.ne_bot⟩) E.toEll
+      = E'.toEll)
+    : ∃ φ : Isogeny E.curve E'.curve,
+      (homConstSet E.curve E'.curve : Set ℂ)
+        = (invConst φ * ·) '' idealLattice σ₀ (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K)⁻¹ := by
   classical
   rw [← classGroup_mk_primeUnit] at h
   obtain ⟨c, hc, hset⟩ := homConstSet_of_smul σ₀ hK h
@@ -331,8 +347,7 @@ theorem exists_isogeny_homConstSet_eq {E E' : CMCurve K} (v : HeightOneSpectrum 
   have h1 : (1 : ℂ) ∈ idealLattice σ₀ (v.asIdeal : FractionalIdeal (𝓞 K)⁰ K)⁻¹ := by
     simpa using map_mem_idealLattice σ₀ (FractionalIdeal.one_mem_inv_coe_ideal v.ne_bot)
   have hcmem : c ∈ homConstSet E.curve E'.curve := by
-    have h' : c ∈ (homConstSet E.curve E'.curve : Set ℂ) := by
-      rw [hset]; exact ⟨1, h1, mul_one c⟩
+    have h' : c ∈ (homConstSet E.curve E'.curve : Set ℂ) := by rw [hset]; exact ⟨1, h1, mul_one c⟩
     exact h'
   obtain ⟨Q, hQ⟩ := mem_homConstSet.1 hcmem
   have hQ0 : Q ≠ 0 := by

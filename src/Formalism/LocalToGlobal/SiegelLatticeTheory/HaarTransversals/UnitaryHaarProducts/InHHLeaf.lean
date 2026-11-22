@@ -9,7 +9,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedVolumeStatements
 
 noncomputable section
 
-open MeasureTheory Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.PoincareInHH.Cut
+open MeasureTheory Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.PoincareInHH.Cut
 
 namespace Formalism.L2.SG.Pf
 
@@ -21,8 +22,9 @@ theorem fundBridge_holds : FundBridge X := by
   haveI := Formalism.L2.SG.Count.muA_isHaar X.B.I X.B.μf
   show IsFundamentalDomain (Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I) X.B.fund (X.B.I.muA X.B.μf)
   obtain ⟨hmeas, hcov, hdisj⟩ := X.B.fund_spec
-  refine IsFundamentalDomain.mk'' hmeas.nullMeasurableSet
-    (Filter.Eventually.of_forall fun y => ?_) (fun g hg => ?_) (fun g => ?_)
+  refine IsFundamentalDomain.mk'' hmeas.nullMeasurableSet (Filter.Eventually.of_forall fun y => ?_)
+    (fun g hg => ?_)
+    (fun g => ?_)
   · obtain ⟨γ, hγ, hy⟩ := hcov y
     exact ⟨⟨γ, hγ⟩, hy⟩
   · have hg' : (g : X.B.I.GA) ≠ 1 := fun h => hg (Subtype.ext h)
@@ -33,11 +35,14 @@ theorem pserMeas_holds (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter) : Ps
   intro hPM T Dt hDt hsum
   classical
   have hG : (Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I : Set X.B.I.GA).Countable :=
-    Set.countable_coe_iff.mp (by exact (inferInstance : Countable (Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I)))
+    Set.countable_coe_iff.mp (by
+      exact (inferInstance : Countable (Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I)))
   have hc : Dt.Countable := Set.Countable.mono hDt.1 hG
   haveI : Countable Dt := hc.to_subtype
   refine measurable_of_tendsto_metrizable' (Filter.atTop : Filter (Finset Dt))
-    (f := fun (s : Finset Dt) x => ∑ δ ∈ s, Ph X u hK T ((δ : X.B.I.GA) * x)) (fun s => ?_) ?_
+    (f := fun (s : Finset Dt) x => ∑ δ ∈ s, Ph X u hK T ((δ : X.B.I.GA) * x))
+    (fun s => ?_)
+    ?_
   · exact Finset.measurable_sum s fun δ _ => (hPM T).comp (measurable_const_mul _)
   · refine tendsto_pi_nhds.mpr fun x => ?_
     exact (Summable.of_norm (hsum x)).hasSum
@@ -47,17 +52,25 @@ namespace InHHLeaf
 open MeasureTheory Set Formalism.MainNotions.LeviCoordinates
 open scoped ENNReal InnerProductSpace
 
-variable {G H : Type*} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
+variable
+  {G H : Type*} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
   {μ : Measure G} [SigmaFinite μ] [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
-  {Γ : Subgroup G} [Countable Γ] {D : Set G} [MeasurableSpace H] {ν : Measure H} [SigmaFinite ν]
+  {Γ : Subgroup G} [Countable Γ]
+  {D : Set G} [MeasurableSpace H]
+  {ν : Measure H} [SigmaFinite ν]
 
-theorem step_sub (h : rr_FD μ Γ D) (ι : H → G) (hι : Measurable ι) {φ : H → ℂ} (hφm : Measurable φ)
+theorem step_sub
+    (h : rr_FD μ Γ D)
+    (ι : H → G) (hι : Measurable ι)
+    {φ : H → ℂ} (hφm : Measurable φ)
     {r : G → G} (hrm : Measurable r) (hr : ∀ y, ∃ γ ∈ Γ, r y = γ * y ∧ γ * y ∈ D)
     {R : G → (Lp ℂ 2 (μ.restrict D) →L[ℂ] Lp ℂ 2 (μ.restrict D))} (hR : rr_IsReg μ Γ D R)
-    (T : Lp ℂ 2 (μ.restrict D) →L[ℂ] Lp ℂ 2 (μ.restrict D)) (hφ : Integrable φ ν)
-    (hT : ∀ u v : Lp ℂ 2 (μ.restrict D), ⟪u, T v⟫_ℂ = ∫ k, φ k * ⟪u, R (ι k) v⟫_ℂ ∂ν) (f : Lp ℂ 2 (μ.restrict D))
-    (f0 : G → ℂ) (hf0m : Measurable f0) (hf0 : (f : G → ℂ) =ᵐ[μ.restrict D] f0) :
-    ((T f : Lp ℂ 2 (μ.restrict D)) : G → ℂ) =ᵐ[μ.restrict D] fun x => ∫ k, φ k * f0 (r (x * ι k)) ∂ν := by
+    (T : Lp ℂ 2 (μ.restrict D) →L[ℂ] Lp ℂ 2 (μ.restrict D))
+    (hφ : Integrable φ ν)
+    (hT : ∀ u v : Lp ℂ 2 (μ.restrict D), ⟪u, T v⟫_ℂ = ∫ k, φ k * ⟪u, R (ι k) v⟫_ℂ ∂ν)
+    (f : Lp ℂ 2 (μ.restrict D)) (f0 : G → ℂ)
+    (hf0m : Measurable f0) (hf0 : (f : G → ℂ) =ᵐ[μ.restrict D] f0)
+    : ((T f : Lp ℂ 2 (μ.restrict D)) : G → ℂ) =ᵐ[μ.restrict D] fun x => ∫ k, φ k * f0 (r (x * ι k)) ∂ν := by
   set Φ : H × G → ℂ := fun p => φ p.1 * f0 (r (p.2 * ι p.1)) with hΦ
   have hΦm : StronglyMeasurable Φ :=
     ((hφm.comp measurable_fst).stronglyMeasurable).mul
@@ -65,9 +78,12 @@ theorem step_sub (h : rr_FD μ Γ D) (ι : H → G) (hι : Measurable ι) {φ : 
   have hsq : ∫⁻ y in D, ‖f0 y‖ₑ ^ 2 ∂μ ≠ ∞ := by
     have e : ∫⁻ y in D, ‖(f : G → ℂ) y‖ₑ ^ 2 ∂μ = ∫⁻ y in D, ‖f0 y‖ₑ ^ 2 ∂μ :=
       lintegral_congr_ae (hf0.mono fun x hx => by simp only [hx])
-    rw [← e]; exact rrkb_sq_fin f
-  have hInt : ∀ s, MeasurableSet s → (μ.restrict D) s < ∞ →
-      Integrable Φ (ν.prod ((μ.restrict D).restrict s)) := by
+    rw [← e]
+    exact rrkb_sq_fin f
+  have hInt
+      : ∀ s,
+        MeasurableSet s → (μ.restrict D) s < ∞
+          → Integrable Φ (ν.prod ((μ.restrict D).restrict s)) := by
     intro s hs hfin
     refine ⟨hΦm.aestronglyMeasurable, ?_⟩
     rw [hasFiniteIntegral_iff_enorm, lintegral_prod _ hΦm.enorm.aemeasurable]
@@ -80,15 +96,18 @@ theorem step_sub (h : rr_FD μ Γ D) (ι : H → G) (hι : Measurable ι) {φ : 
       simp only [hΦ, enorm_mul]
       rw [lintegral_const_mul _ hm1]
       refine mul_le_mul' le_rfl ?_
-      calc ∫⁻ x, ‖f0 (r (x * ι g))‖ₑ ∂((μ.restrict D).restrict s)
-          ≤ ∫⁻ x, (1 + ‖f0 (r (x * ι g))‖ₑ ^ 2) ∂((μ.restrict D).restrict s) :=
-            lintegral_mono fun x => rrkb_le_one_add_sq _
+      calc
+        ∫⁻ x, ‖f0 (r (x * ι g))‖ₑ ∂((μ.restrict D).restrict s)
+            ≤ ∫⁻ x, (1 + ‖f0 (r (x * ι g))‖ₑ ^ 2) ∂((μ.restrict D).restrict s) :=
+          lintegral_mono fun x => rrkb_le_one_add_sq _
         _ = (μ.restrict D) s + ∫⁻ x, ‖f0 (r (x * ι g))‖ₑ ^ 2 ∂((μ.restrict D).restrict s) := by
-            rw [lintegral_add_left measurable_const, lintegral_one, Measure.restrict_apply_univ]
+          rw [lintegral_add_left measurable_const, lintegral_one, Measure.restrict_apply_univ]
         _ ≤ (μ.restrict D) s + ∫⁻ x in D, ‖f0 (r (x * ι g))‖ₑ ^ 2 ∂μ :=
-            add_le_add le_rfl (lintegral_mono' Measure.restrict_le_self le_rfl)
+          add_le_add le_rfl (lintegral_mono' Measure.restrict_le_self le_rfl)
         _ = C := by rw [rrkb_lint h hr (ι g) (F := fun y => ‖f0 y‖ₑ ^ 2) (hf0m.enorm.pow_const 2)]
-    calc ∫⁻ g, ∫⁻ x, ‖Φ (g, x)‖ₑ ∂((μ.restrict D).restrict s) ∂ν ≤ ∫⁻ g, ‖φ g‖ₑ * C ∂ν := lintegral_mono hb
+    calc
+      ∫⁻ g, ∫⁻ x, ‖Φ (g, x)‖ₑ ∂((μ.restrict D).restrict s) ∂ν
+        ≤ ∫⁻ g, ‖φ g‖ₑ * C ∂ν := lintegral_mono hb
       _ = (∫⁻ g, ‖φ g‖ₑ ∂ν) * C := lintegral_mul_const _ hφm.enorm
       _ < ∞ := ENNReal.mul_lt_top hφ.2 (lt_top_iff_ne_top.2 hCfin)
   refine ae_eq_of_forall_setIntegral_eq_of_sigmaFinite ?_ ?_ ?_
@@ -98,14 +117,17 @@ theorem step_sub (h : rr_FD μ Γ D) (ι : H → G) (hι : Measurable ι) {φ : 
     exact (hInt s hs hfin).integral_prod_right
   · intro s hs hfin
     rw [← L2.inner_indicatorConstLp_one (𝕜 := ℂ) hs hfin.ne (T f), hT]
-    have e : ∀ g, ⟪indicatorConstLp 2 hs hfin.ne (1 : ℂ), R (ι g) f⟫_ℂ =
-        ∫ x in s, f0 (r (x * ι g)) ∂(μ.restrict D) := by
+    have e
+        : ∀ g,
+          ⟪indicatorConstLp 2 hs hfin.ne (1 : ℂ), R (ι g) f⟫_ℂ
+            = ∫ x in s, f0 (r (x * ι g)) ∂(μ.restrict D) := by
       intro g
       rw [L2.inner_indicatorConstLp_one]
       refine integral_congr_ae (ae_restrict_of_ae ?_)
       have hmap := rr_map h (ι g)
-      have h3 : (fun x => (f : G → ℂ) (rr_rep (Γ : Set G) D (x * ι g))) =ᵐ[μ.restrict D]
-          fun x => f0 (rr_rep (Γ : Set G) D (x * ι g)) := by
+      have h3
+          : (fun x => (f : G → ℂ) (rr_rep (Γ : Set G) D (x * ι g))) =ᵐ[μ.restrict D]
+            fun x => f0 (rr_rep (Γ : Set G) D (x * ι g)) := by
         show ∀ᵐ x ∂(μ.restrict D), (f : G → ℂ) (rr_rep (Γ : Set G) D (x * ι g)) = f0 (rr_rep (Γ : Set G) D (x * ι g))
         refine ae_of_ae_map (p := fun y => (f : G → ℂ) y = f0 y) hmap.1 ?_
         rw [hmap.2]
@@ -113,8 +135,10 @@ theorem step_sub (h : rr_FD μ Γ D) (ι : H → G) (hι : Measurable ι) {φ : 
       filter_upwards [hR (ι g) f, h3, ae_restrict_of_ae (s := D) (rr_rep_ae_eq h hr (ι g))] with x a1 a2 a3
       rw [a1, a2, a3]
     simp only [e]
-    have hsw := integral_integral_swap (f := fun g x => φ g * f0 (r (x * ι g))) (μ := ν)
-      (ν := (μ.restrict D).restrict s) (hInt s hs hfin)
+    have hsw :=
+      integral_integral_swap
+        (f := fun g x => φ g * f0 (r (x * ι g)))
+        (μ := ν) (ν := (μ.restrict D).restrict s) (hInt s hs hfin)
     rw [← hsw]
     refine integral_congr_ae (Filter.Eventually.of_forall fun g => ?_)
     exact (integral_const_mul _ _).symm
@@ -126,17 +150,23 @@ namespace InHHLeaf
 open MeasureTheory Set Formalism.MainNotions.LeviCoordinates
 open scoped ENNReal InnerProductSpace
 
-variable {G H : Type*} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
+variable
+  {G H : Type*} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
   {μ : Measure G} [SigmaFinite μ] [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
-  {Γ : Subgroup G} [Countable Γ] {D : Set G} [MeasurableSpace H] {ν : Measure H} [SigmaFinite ν]
+  {Γ : Subgroup G} [Countable Γ]
+  {D : Set G} [MeasurableSpace H]
+  {ν : Measure H} [SigmaFinite ν]
 
-theorem fix_of (h : rr_FD μ Γ D) (ι : H → G) (hι : Measurable ι) {φ : H → ℂ} (hφ : Integrable φ ν)
+theorem fix_of
+    (h : rr_FD μ Γ D)
+    (ι : H → G) (hι : Measurable ι)
+    {φ : H → ℂ} (hφ : Integrable φ ν)
     {R : G → (Lp ℂ 2 (μ.restrict D) →L[ℂ] Lp ℂ 2 (μ.restrict D))} (hR : rr_IsReg μ Γ D R)
     (T : Lp ℂ 2 (μ.restrict D) →L[ℂ] Lp ℂ 2 (μ.restrict D))
     (hT : ∀ u v : Lp ℂ 2 (μ.restrict D), ⟪u, T v⟫_ℂ = ∫ k, φ k * ⟪u, R (ι k) v⟫_ℂ ∂ν)
     (f0 : G → ℂ) (hf0m : Measurable f0) (hinv : ∀ γ ∈ Γ, ∀ y, f0 (γ * y) = f0 y)
-    (hm : MemLp f0 2 (μ.restrict D)) (hfix : ∀ᵐ y ∂μ, ∫ k, φ k * f0 (y * ι k) ∂ν = f0 y) :
-    T (hm.toLp f0) = hm.toLp f0 := by
+    (hm : MemLp f0 2 (μ.restrict D)) (hfix : ∀ᵐ y ∂μ, ∫ k, φ k * f0 (y * ι k) ∂ν = f0 y)
+    : T (hm.toLp f0) = hm.toLp f0 := by
   set φ' := hφ.1.aemeasurable.mk φ with hφ'
   have hφ'm : Measurable φ' := hφ.1.aemeasurable.measurable_mk
   have hφφ' : φ =ᵐ[ν] φ' := hφ.1.aemeasurable.ae_eq_mk
@@ -179,9 +209,10 @@ theorem idempotent_fixes_invariant_L2 : IdempotentFixesInvariantL2 X := by
   have := rr_muA_sigmaFinite X.B.I X.B.μf
   have := rr_muA_left X.B.I X.B.μf
   have := rr_muA_right X.B.I X.B.μf
-  exact InHHLeaf.fix_of (rr_FD_of X.B.I X.B.μf X.B.fund X.B.fund_spec) (fun g => ((1 : X.B.I.Ginf), g))
-    (measurable_const.prodMk measurable_id) X.B.Re_spec.1 (rr_IsReg_of X.B.I X.B.μf X.B.fund X.B.R X.B.R_spec)
-    X.B.Re X.B.Re_spec.2 f hf hinv hm hfix
+  exact InHHLeaf.fix_of (rr_FD_of X.B.I X.B.μf X.B.fund X.B.fund_spec)
+    (fun g => ((1 : X.B.I.Ginf), g))
+    (measurable_const.prodMk measurable_id) X.B.Re_spec.1
+    (rr_IsReg_of X.B.I X.B.μf X.B.fund X.B.R X.B.R_spec) X.B.Re X.B.Re_spec.2 f hf hinv hm hfix
 
 theorem regular_fixes_invariant_L2 : ArchimedeanConvolutionFixesInvariantL2 X := by
   intro f hf hinv hm hPI hfix
@@ -192,7 +223,8 @@ theorem regular_fixes_invariant_L2 : ArchimedeanConvolutionFixesInvariantL2 X :=
   have := rr_muA_sigmaFinite X.B.I X.B.μf
   have := rr_muA_left X.B.I X.B.μf
   have := rr_muA_right X.B.I X.B.μf
-  exact InHHLeaf.fix_of (rr_FD_of X.B.I X.B.μf X.B.fund X.B.fund_spec) (fun y => (y, (1 : X.B.I.Gf)))
+  exact InHHLeaf.fix_of (rr_FD_of X.B.I X.B.μf X.B.fund X.B.fund_spec)
+    (fun y => (y, (1 : X.B.I.Gf)))
     (measurable_id.prodMk measurable_const) hPI (rr_IsReg_of X.B.I X.B.μf X.B.fund X.B.R X.B.R_spec)
     X.Rph X.Rph_spec f hf hinv hm hfix
 
@@ -205,16 +237,22 @@ open scoped ENNReal Pointwise
 
 section Unfold
 
-variable {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
+variable
+  {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
   {μ : Measure G} [SigmaFinite μ] [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
-  {Γ : Subgroup G} [Countable Γ] {D : Set G}
+  {Γ : Subgroup G} [Countable Γ]
+  {D : Set G}
 
-theorem poincE_left_inv (S : Subgroup G) (Dt : Set G) (hD : FoldBound.IsRightTransversal Γ S Dt)
-    (f : G → ℝ≥0∞) (hinv : ∀ s ∈ S, ∀ y, f (s * y) = f y) (γ : G) (hγ : γ ∈ Γ) (x : G) :
-    ∑' δ : Dt, f ((δ : G) * (γ * x)) = ∑' δ : Dt, f ((δ : G) * x) := by
+theorem poincE_left_inv
+    (S : Subgroup G) (Dt : Set G) (hD : FoldBound.IsRightTransversal Γ S Dt)
+    (f : G → ℝ≥0∞) (hinv : ∀ s ∈ S, ∀ y, f (s * y) = f y)
+    (γ : G) (hγ : γ ∈ Γ)
+    (x : G)
+    : ∑' δ : Dt, f ((δ : G) * (γ * x)) = ∑' δ : Dt, f ((δ : G) * x) := by
   classical
-  have key : ∀ (a : G), a ∈ Γ → ∀ p q : S × Dt, ((p.1 : G) * (p.2 : G)) = a →
-      ((q.1 : G) * (q.2 : G)) = a → p = q :=
+  have key
+      : ∀ (a : G),
+        a ∈ Γ → ∀ p q : S × Dt, ((p.1 : G) * (p.2 : G)) = a → ((q.1 : G) * (q.2 : G)) = a → p = q :=
     fun a ha p q hp hq => (hD.2 a ha).unique hp hq
   have hex : ∀ δ : Dt, ∃! p : S × Dt, ((p.1 : G) * (p.2 : G)) = (δ : G) * γ := fun δ =>
     hD.2 _ (Γ.mul_mem (hD.1 δ.2) hγ)
@@ -240,18 +278,22 @@ theorem poincE_left_inv (S : Subgroup G) (Dt : Set G) (hD : FoldBound.IsRightTra
       have hd : (d : G) = p.1 * p.2 * γ := by rw [hp]; group
       rw [hd, Subgroup.coe_inv]
       group
-  calc ∑' δ : Dt, f ((δ : G) * (γ * x)) = ∑' δ : Dt, f (((φ δ).2 : G) * x) := by
-        refine tsum_congr fun δ => ?_
-        rw [← mul_assoc, ← hφ δ, mul_assoc]
-        exact hinv _ (φ δ).1.2 _
+  calc
+    ∑' δ : Dt, f ((δ : G) * (γ * x)) = ∑' δ : Dt, f (((φ δ).2 : G) * x) := by
+      refine tsum_congr fun δ => ?_
+      rw [← mul_assoc, ← hφ δ, mul_assoc]
+      exact hinv _ (φ δ).1.2 _
     _ = ∑' d : Dt, f ((d : G) * x) :=
-        (Equiv.ofBijective _ ⟨hinj, hsurj⟩).tsum_eq (fun d : Dt => f ((d : G) * x))
+      (Equiv.ofBijective _ ⟨hinj, hsurj⟩).tsum_eq (fun d : Dt => f ((d : G) * x))
 
 theorem img_mul (δ : G) (A : Set G) : (fun y => δ * y) '' A = (fun y => δ⁻¹ * y) ⁻¹' A := by
   exact Set.image_mul_left
 
-theorem rr_FD_union (h : rr_FD μ Γ D) (S : Subgroup G) (hS : S ≤ Γ) (Dt : Set G)
-    (hD : FoldBound.IsRightTransversal Γ S Dt) (hDc : Dt.Countable) : rr_FD μ S (⋃ δ ∈ Dt, (fun y => δ * y) '' D) := by
+theorem rr_FD_union
+    (h : rr_FD μ Γ D)
+    (S : Subgroup G) (hS : S ≤ Γ)
+    (Dt : Set G) (hD : FoldBound.IsRightTransversal Γ S Dt) (hDc : Dt.Countable)
+    : rr_FD μ S (⋃ δ ∈ Dt, (fun y => δ * y) '' D) := by
   classical
   have hsΓ : ∀ s ∈ S, s ∈ Γ := fun s hs => hS hs
   refine ⟨?_, ?_, ?_⟩
@@ -268,8 +310,11 @@ theorem rr_FD_union (h : rr_FD μ Γ D) (S : Subgroup G) (hS : S ≤ Γ) (Dt : S
     rw [hδe]
     group
   · intro s hs hs1
-    refine measure_mono_null (t := ⋃ δ ∈ Dt, ⋃ δ' ∈ Dt,
-      (fun y => δ' * y) '' ((fun y => (δ'⁻¹ * s * δ) * y) '' D ∩ D)) ?_ ?_
+    refine measure_mono_null
+      (t :=
+        ⋃ δ ∈ Dt, ⋃ δ' ∈ Dt,
+          (fun y => δ' * y) '' ((fun y => (δ'⁻¹ * s * δ) * y) '' D ∩ D))
+      ?_ ?_
     · rintro x ⟨⟨u, hu, rfl⟩, hx⟩
       obtain ⟨δ, hδ, d, hd, rfl⟩ := Set.mem_iUnion₂.mp hu
       obtain ⟨δ', hδ', d', hd', hx'⟩ := Set.mem_iUnion₂.mp hx
@@ -279,7 +324,8 @@ theorem rr_FD_union (h : rr_FD μ Γ D) (S : Subgroup G) (hS : S ≤ Γ) (Dt : S
       have hd'e : d' = δ'⁻¹ * (s * (δ * d)) := by rw [← hx'']; group
       rw [hd'e]
       group
-    · refine (measure_biUnion_null_iff hDc).mpr fun δ hδ => (measure_biUnion_null_iff hDc).mpr fun δ' hδ' => ?_
+    · refine (measure_biUnion_null_iff hDc).mpr fun δ hδ =>
+        (measure_biUnion_null_iff hDc).mpr fun δ' hδ' => ?_
       rw [img_mul δ', measure_preimage_mul]
       have hΓ : δ'⁻¹ * s * δ ∈ Γ :=
         Γ.mul_mem (Γ.mul_mem (Γ.inv_mem (hD.1 hδ')) (hsΓ s hs)) (hD.1 hδ)
@@ -287,10 +333,13 @@ theorem rr_FD_union (h : rr_FD μ Γ D) (S : Subgroup G) (hS : S ≤ Γ) (Dt : S
       intro h1
       apply hs1
       have hsδ : s * δ = δ' := by
-        calc s * δ = δ' * (δ'⁻¹ * s * δ) := by group
+        calc
+          s * δ
+            = δ' * (δ'⁻¹ * s * δ) := by group
           _ = δ' := by rw [h1, mul_one]
-      have huq := (hD.2 δ' (hD.1 hδ')).unique (y₁ := ((⟨s, hs⟩ : S), (⟨δ, hδ⟩ : Dt)))
-        (y₂ := ((1 : S), (⟨δ', hδ'⟩ : Dt))) hsδ (by simp)
+      have huq :=
+        (hD.2 δ' (hD.1 hδ')).unique (y₁ := ((⟨s, hs⟩ : S), (⟨δ, hδ⟩ : Dt)))
+          (y₂ := ((1 : S), (⟨δ', hδ'⟩ : Dt))) hsδ (by simp)
       have := congrArg (fun p : S × Dt => (p.1 : G)) huq
       simpa using this
 
@@ -305,25 +354,32 @@ open scoped ENNReal Pointwise
 
 section Unfold2
 
-variable {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
+variable
+  {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul₂ G] [MeasurableInv G]
   {μ : Measure G} [SigmaFinite μ] [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
-  {Γ : Subgroup G} [Countable Γ] {D : Set G}
+  {Γ : Subgroup G} [Countable Γ]
+  {D : Set G}
 
 private theorem isFundamentalDomain_of_rr_FD (h : rr_FD μ Γ D) : IsFundamentalDomain Γ D μ := by
-  refine IsFundamentalDomain.mk'' h.meas.nullMeasurableSet
-    (Filter.Eventually.of_forall fun y => ?_) (fun g hg => ?_) (fun g => ?_)
+  refine IsFundamentalDomain.mk'' h.meas.nullMeasurableSet (Filter.Eventually.of_forall fun y => ?_)
+    (fun g hg => ?_)
+    (fun g => ?_)
   · obtain ⟨γ, hγ, hy⟩ := h.cov y
     exact ⟨⟨γ, hγ⟩, hy⟩
   · have hg' : (g : G) ≠ 1 := fun h' => hg (Subtype.ext h')
     exact h.disj g g.2 hg'
   · exact (measurePreserving_mul_left μ (g : G)).quasiMeasurePreserving
 
-theorem unfold_lint (h : rr_FD μ Γ D) (S : Subgroup G) (hS : S ≤ Γ) (Dt : Set G)
-    (hD : FoldBound.IsRightTransversal Γ S Dt) (Fs : Set G) (hFs : IsFundamentalDomain S Fs μ)
-    (f : G → ℝ≥0∞) (hf : Measurable f) (hinv : ∀ s ∈ S, ∀ y, f (s * y) = f y) :
-    ∫⁻ y in D, ∑' δ : Dt, f ((δ : G) * y) ∂μ = ∫⁻ y in Fs, f y ∂μ := by
+theorem unfold_lint
+    (h : rr_FD μ Γ D)
+    (S : Subgroup G) (hS : S ≤ Γ)
+    (Dt : Set G) (hD : FoldBound.IsRightTransversal Γ S Dt)
+    (Fs : Set G) (hFs : IsFundamentalDomain S Fs μ)
+    (f : G → ℝ≥0∞) (hf : Measurable f) (hinv : ∀ s ∈ S, ∀ y, f (s * y) = f y)
+    : ∫⁻ y in D, ∑' δ : Dt, f ((δ : G) * y) ∂μ = ∫⁻ y in Fs, f y ∂μ := by
   classical
-  have hΓc : (Γ : Set G).Countable := Set.countable_coe_iff.mp (by exact (inferInstance : Countable Γ))
+  have hΓc : (Γ : Set G).Countable :=
+    Set.countable_coe_iff.mp (by exact (inferInstance : Countable Γ))
   have hDc : Dt.Countable := Set.Countable.mono hD.1 hΓc
   haveI : Countable Dt := hDc.to_subtype
   haveI : Countable S := Function.Injective.countable (Subgroup.inclusion_injective hS)
@@ -336,11 +392,13 @@ theorem unfold_lint (h : rr_FD μ Γ D) (S : Subgroup G) (hS : S ≤ Γ) (Dt : S
       exact ⟨⟨δ, hδ⟩, hx⟩
     · rintro ⟨⟨δ, hδ⟩, hx⟩
       exact ⟨δ, hδ, hx⟩
-  have hm : ∀ δ : Dt, AEMeasurable (fun y => f ((δ : G) * y)) (μ.restrict D) :=
-    fun δ => (hf.comp (measurable_const_mul _)).aemeasurable
-  rw [← hU.setLIntegral_eq hFs f (fun g x => hinv g g.2 x), hUeq, lintegral_tsum hm, lintegral_iUnion₀ ?_ ?_ f]
+  have hm : ∀ δ : Dt, AEMeasurable (fun y => f ((δ : G) * y)) (μ.restrict D) := fun δ =>
+    (hf.comp (measurable_const_mul _)).aemeasurable
+  rw [← hU.setLIntegral_eq hFs f (fun g x => hinv g g.2 x), hUeq, lintegral_tsum hm,
+    lintegral_iUnion₀ ?_ ?_ f]
   · refine tsum_congr fun δ => ?_
-    exact (measurePreserving_mul_left μ (δ : G)).setLIntegral_comp_emb (measurableEmbedding_mulLeft _) f D
+    exact (measurePreserving_mul_left μ (δ : G)).setLIntegral_comp_emb
+      (measurableEmbedding_mulLeft _) f D
   · intro δ
     rw [img_mul]
     exact (h.meas.preimage (measurable_const_mul _)).nullMeasurableSet
@@ -351,7 +409,9 @@ theorem unfold_lint (h : rr_FD μ Γ D) (S : Subgroup G) (hS : S ≤ Γ) (Dt : S
     have h1 : (δ' : G)⁻¹ * δ ≠ 1 := by
       intro e
       apply hne'
-      calc (δ : G) = δ' * ((δ' : G)⁻¹ * δ) := by group
+      calc
+        (δ : G)
+          = δ' * ((δ' : G)⁻¹ * δ) := by group
         _ = δ' := by rw [e, mul_one]
     refine measure_mono_null
       (t := (fun y => (δ' : G) * y) '' ((fun y => ((δ' : G)⁻¹ * δ) * y) '' D ∩ D)) ?_ ?_
@@ -376,14 +436,16 @@ open scoped ENNReal
 
 variable {D : D7} (X : HidaSetting D)
 
-theorem one_le_mult {G : Type*} [Group G] (Γ : Subgroup G) (Ω : Set G) (h1 : (1 : G) ∈ Ω) (x : G) :
-    1 ≤ Formalism.L2.SG.FoldBound.mult Γ Ω x := by
+theorem one_le_mult {G : Type*} [Group G] (Γ : Subgroup G) (Ω : Set G) (h1 : (1 : G) ∈ Ω) (x : G)
+    : 1 ≤ Formalism.L2.SG.FoldBound.mult Γ Ω x := by
   unfold Formalism.L2.SG.FoldBound.mult
   refine le_trans ?_ (le_iSup _ x)
   have hmem : (1 : Γ) ∈ ({γ : Γ | x⁻¹ * ((γ : G) * x) ∈ Ω} : Set Γ) := by simpa using h1
   have h1' : (1 : ℕ∞) ≤ ({γ : Γ | x⁻¹ * ((γ : G) * x) ∈ Ω} : Set Γ).encard :=
     Set.one_le_encard_iff_nonempty.mpr ⟨1, hmem⟩
-  calc (1 : ℝ≥0∞) = ((1 : ℕ∞) : ℝ≥0∞) := by simp
+  calc
+    (1 : ℝ≥0∞)
+      = ((1 : ℕ∞) : ℝ≥0∞) := by simp
     _ ≤ _ := ENat.toENNReal_le.mpr h1'
 
 theorem pserRph_holds (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter) : PserRph X u hK := by
@@ -416,7 +478,9 @@ theorem pserRph_holds (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter) : Pse
     refine lt_of_le_of_lt ?_ ((hT T).2 Ω₀ hc Fs hFs)
     unfold Formalism.L2.SG.PoincareSeriesSquareIntegrable.multiplicityLIntegral
     refine lintegral_mono fun y => ?_
-    calc f y = 1 * ‖Ph X u hK T y‖ₑ := by rw [one_mul]
+    calc
+      f y
+        = 1 * ‖Ph X u hK T y‖ₑ := by rw [one_mul]
       _ ≤ _ := mul_le_mul' (one_le_mult _ _ h1 y) le_rfl
 
   set φ' := hPI.1.aemeasurable.mk X.ph with hφ'
@@ -425,13 +489,16 @@ theorem pserRph_holds (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter) : Pse
   set ι : X.B.I.Ginf → X.B.I.GA := fun z => (z, (1 : X.B.I.Gf)) with hι
   have hιm : Measurable ι := measurable_id.prodMk measurable_const
   set K : X.B.I.GA × X.B.I.Ginf → ℝ≥0∞ := fun p => ‖φ' p.2‖ₑ * F (p.1 * ι p.2) with hKdef
-  have hKm : Measurable K := (hφ'm.comp measurable_snd).enorm.mul (hFm.comp (measurable_fst.mul (hιm.comp measurable_snd)))
+  have hKm : Measurable K :=
+    (hφ'm.comp measurable_snd).enorm.mul (hFm.comp (measurable_fst.mul (hιm.comp measurable_snd)))
   set J : X.B.I.GA → ℝ≥0∞ := fun y => ∫⁻ z, K (y, z) ∂(Formalism.L2.SG.ProjRows.muInf X.B.I) with hJdef
   have hJm : Measurable J := hKm.lintegral_prod_right'
   have hJint : ∫⁻ y in X.B.fund, J y ∂(X.B.I.muA X.B.μf) < ⊤ := by
     rw [hJdef, lintegral_lintegral_swap (f := fun y z => K (y, z)) hKm.aemeasurable]
-    have e1 : ∀ z, ∫⁻ y in X.B.fund, K (y, z) ∂(X.B.I.muA X.B.μf) =
-        ‖φ' z‖ₑ * ∫⁻ y in X.B.fund, F y ∂(X.B.I.muA X.B.μf) := by
+    have e1
+        : ∀ z,
+          ∫⁻ y in X.B.fund, K (y, z) ∂(X.B.I.muA X.B.μf)
+            = ‖φ' z‖ₑ * ∫⁻ y in X.B.fund, F y ∂(X.B.I.muA X.B.μf) := by
       intro z
       simp only [hKdef]
       rw [lintegral_const_mul (f := fun y => F (y * ι z)) _ (hFm.comp (measurable_mul_const _))]
@@ -444,8 +511,7 @@ theorem pserRph_holds (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter) : Pse
     rw [lintegral_mul_const _ hφ'm.enorm]
     refine ENNReal.mul_lt_top ?_ hC
     exact (hPI.congr hφφ').2
-  have hJae : ∀ᵐ y ∂((X.B.I.muA X.B.μf).restrict X.B.fund), J y < ⊤ :=
-    ae_lt_top hJm hJint.ne
+  have hJae : ∀ᵐ y ∂((X.B.I.muA X.B.μf).restrict X.B.fund), J y < ⊤ := ae_lt_top hJm hJint.ne
   have hJinv : ∀ γ ∈ rr_GF X.B.I, ∀ y, J (γ * y) = J y := by
     intro γ hγ y
     simp only [hJdef, hKdef, mul_assoc, hFinv γ hγ]
@@ -459,19 +525,25 @@ theorem pserRph_holds (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter) : Pse
       obtain ⟨γ, hγ, hyD⟩ := hFD.cov y
       refine Set.mem_iUnion.2 ⟨⟨γ, hγ⟩, γ * y, ⟨?_, hyD⟩, by simp⟩
       show ¬ J (γ * y) < ⊤
-      rw [hJinv γ hγ]; exact hy
+      rw [hJinv γ hγ]
+      exact hy
     refine measure_mono_null hsub (measure_iUnion_null fun γ => ?_)
     rw [InHHLeaf.img_mul, measure_preimage_mul]
     exact hBD
   filter_upwards [hJall] with y hy
   unfold Pser Formalism.L2.SG.PoincareSeriesSquareIntegrable.poinc
-  have hmeas : ∀ δ : Dt, AEStronglyMeasurable
-      (fun z => X.ph z * Ph X u hK T ((δ : X.B.I.GA) * (y * (z, 1)))) (Formalism.L2.SG.ProjRows.muInf X.B.I) := by
+  have hmeas
+      : ∀ δ : Dt,
+        AEStronglyMeasurable
+          (fun z => X.ph z * Ph X u hK T ((δ : X.B.I.GA) * (y * (z, 1))))
+          (Formalism.L2.SG.ProjRows.muInf X.B.I) := by
     intro δ
     have := ((hPP T).2.2.2 ((δ : X.B.I.GA) * y)).1
     simpa [mul_assoc] using this.1
-  have hsum : ∑' δ : Dt, ∫⁻ z, ‖X.ph z * Ph X u hK T ((δ : X.B.I.GA) * (y * (z, 1)))‖ₑ
-      ∂(Formalism.L2.SG.ProjRows.muInf X.B.I) ≠ ⊤ := by
+  have hsum
+      : ∑' δ : Dt, ∫⁻ z, ‖X.ph z * Ph X u hK T ((δ : X.B.I.GA) * (y * (z, 1)))‖ₑ
+          ∂(Formalism.L2.SG.ProjRows.muInf X.B.I)
+        ≠ ⊤ := by
     rw [← lintegral_tsum fun δ => (hmeas δ).enorm]
     refine ne_of_lt (lt_of_le_of_lt (le_of_eq ?_) hy)
     simp only [hJdef, hKdef, hFdef, hfdef]

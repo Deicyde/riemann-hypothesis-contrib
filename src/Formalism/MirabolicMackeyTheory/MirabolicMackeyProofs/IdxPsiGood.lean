@@ -12,20 +12,22 @@ namespace Formalism.EigenvalueLevelCeiling
 
 open Formalism.DivisionValues
 
-theorem mem_sc {K : Type} [Field K] {Z : Type} [AddCommGroup Z] [Module K Z]
-    [Module (𝓞 K) Z] [IsScalarTower (𝓞 K) K Z] (a : K) (A : Submodule (𝓞 K) Z) (x : Z) :
-    x ∈ sc a A ↔ ∃ y ∈ A, a • y = x := by
+theorem mem_sc
+    {K : Type} [Field K]
+    {Z : Type} [AddCommGroup Z] [Module K Z] [Module (𝓞 K) Z] [IsScalarTower (𝓞 K) K Z]
+    (a : K) (A : Submodule (𝓞 K) Z) (x : Z)
+    : x ∈ sc a A ↔ ∃ y ∈ A, a • y = x := by
   unfold sc
   rw [Submodule.mem_map]
   rfl
 
-theorem idxPsiGood_of (hMono : IdxMono) (hSc : IdxScaleIn) (hCut : IdxCutLe) (hInt : LatInter) :
-    IdxPsiGood := by
+theorem idxPsiGood_of (hMono : IdxMono) (hSc : IdxScaleIn) (hCut : IdxCutLe) (hInt : LatInter)
+    : IdxPsiGood := by
   unfold IdxPsiGood
-  intro K _ _ _ Z _ _ _ _ _ w Zψ V₀ M Th ThK Th0 hM hTh hThK hThM hTh0fg hTh0Z σ hσ hThσ u hu
-    hucut a E r ha hE hr δ hδ hδi
-  have hcc : ∀ (W W' : Submodule K Z) (A : Submodule (𝓞 K) Z), W' ≤ W →
-      cut W' (cut W A) = cut W' A := by
+  intro K _ _ _ Z _ _ _ _ _ w Zψ V₀ M Th ThK Th0 hM hTh hThK hThM hTh0fg hTh0Z σ hσ hThσ u hu hucut
+    a E r ha hE hr δ hδ hδi
+  have hcc
+      : ∀ (W W' : Submodule K Z) (A : Submodule (𝓞 K) Z), W' ≤ W → cut W' (cut W A) = cut W' A := by
     intro W W' A hWW
     ext x
     simp only [cut, Submodule.mem_inf, Submodule.restrictScalars_mem]
@@ -97,8 +99,8 @@ theorem idxPsiGood_of (hMono : IdxMono) (hSc : IdxScaleIn) (hCut : IdxCutLe) (hI
       simp only [cut, Submodule.mem_inf, Submodule.restrictScalars_mem]
       exact ⟨hk, hkψ⟩
     exact ⟨hucut ((mem_sc _ _ _).2 ⟨k, hkc, rfl⟩), V₀.smul_mem _ hkV⟩
-  have hmono := hMono K Z w L (cut L M) (sc (u : K) (sc (a * σ⁻¹) (cut L N))) (cut V₀ Th0)
-    hX hB2.1 hT hle2
+  have hmono :=
+    hMono K Z w L (cut L M) (sc (u : K) (sc (a * σ⁻¹) (cut L N))) (cut V₀ Th0) hX hB2.1 hT hle2
   have hNMψ : cut Zψ N ≤ cut Zψ M := by
     unfold cut
     exact inf_le_inf_right _ hNM
@@ -108,15 +110,19 @@ theorem idxPsiGood_of (hMono : IdxMono) (hSc : IdxScaleIn) (hCut : IdxCutLe) (hI
     rw [ValuationRepresentative.vw_mul w a σ⁻¹ ha (inv_ne_zero hσ),
       ValuationRepresentative.vw_inv w σ, hE, sub_eq_add_neg]
   rw [hB2.2, hB1.2, hv] at hmono
-  have h1 : (δ : ℝ) * (lix w (cut Zψ M) (cut Zψ N) : ℝ) ≤
-      (lix w M N : ℝ) + (finrank K Z : ℝ) * (vw w (u : K) : ℝ) := by
+  have h1
+      : (δ : ℝ) * (lix w (cut Zψ M) (cut Zψ N) : ℝ)
+        ≤ (lix w M N : ℝ) + (finrank K Z : ℝ) * (vw w (u : K) : ℝ) := by
     exact_mod_cast hδi
-  have hJ : (lix w (cut Zψ M) (cut Zψ N) : ℝ) ≤
-      (r + (finrank K Z : ℝ) * (vw w (u : K) : ℝ)) / (δ : ℝ) := by
+  have hJ
+      : (lix w (cut Zψ M) (cut Zψ N) : ℝ)
+        ≤ (r + (finrank K Z : ℝ) * (vw w (u : K) : ℝ)) / (δ : ℝ) := by
     rw [le_div_iff₀ (by exact_mod_cast hδ)]
     linarith
-  have hm : (lix w (cut L M) (cut V₀ Th0) : ℝ) ≤ (lix w (cut L M) (cut L N) : ℝ) +
-      (finrank K L : ℝ) * ((E : ℝ) - (vw w σ : ℝ)) + (finrank K L : ℝ) * (vw w (u : K) : ℝ) := by
+  have hm
+      : (lix w (cut L M) (cut V₀ Th0) : ℝ)
+        ≤ (lix w (cut L M) (cut L N) : ℝ) + (finrank K L : ℝ) * ((E : ℝ) - (vw w σ : ℝ))
+          + (finrank K L : ℝ) * (vw w (u : K) : ℝ) := by
     exact_mod_cast hmono
   have hc2 : (lix w (cut L M) (cut L N) : ℝ) ≤ lix w (cut Zψ M) (cut Zψ N) := by
     exact_mod_cast hcut2

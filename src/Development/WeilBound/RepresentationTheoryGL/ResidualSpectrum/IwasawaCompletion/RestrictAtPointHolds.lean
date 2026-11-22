@@ -35,16 +35,17 @@ theorem restrictAtPoint_holds : RestrictAtPoint := by
   have hx : x = xo * locGL E N w xw := by simp [xo]
   let Lf : X → ((∀ i, GA E (n i)) → ℂ) := fun v m =>
     (F.1 v).1 (leviEmb (Ad E) (stdBlocks n h) m * (infGL E N (Unitary.toUnits k) * finGL E N xo))
-  let L : X →ₗ[ℂ] ((∀ i, GA E (n i)) → ℂ) :=
-    { toFun := Lf
-      map_add' := fun v v' => by
-        funext m
-        simp only [Lf, map_add (f := _)]
-        rfl
-      map_smul' := fun z v => by
-        funext m
-        simp only [Lf, map_smul]
-        rfl }
+  let L : X →ₗ[ℂ] ((∀ i, GA E (n i)) → ℂ) := {
+    toFun := Lf
+    map_add' := fun v v' => by
+      funext m
+      simp only [Lf, map_add (f := _)]
+      rfl
+    map_smul' := fun z v => by
+      funext m
+      simp only [Lf, map_smul]
+      rfl
+  }
   refine ⟨L, fun v => (F.2.1 v).2.2.2 k xo, ?_, ?_⟩
   · intro h0
     apply hg0
@@ -57,20 +58,23 @@ theorem restrictAtPoint_holds : RestrictAtPoint := by
     simpa only [mul_assoc] using h1
   · intro p v
     funext m
-    have hemb (g : Levi (w.adicCompletion E) (fun i => Fin (n i))) :
-        leviEmb _ (stdBlocks n h) g ∈ parab (w.adicCompletion E) (stdBlocks n h) := by
+    have hemb (g : Levi (w.adicCompletion E) (fun i => Fin (n i)))
+        : leviEmb _ (stdBlocks n h) g ∈ parab (w.adicCompletion E) (stdBlocks n h) := by
       apply mem_parab_iff.2
       intro a b i j hab
       letI : DecidableEq (Fin c) := Classical.typeDecidableEq _
       simp [leviEmb]
       exact Matrix.blockDiagonal'_apply_ne _ _ _ hab.ne'
-    let Lp : parab (w.adicCompletion E) (stdBlocks n h) :=
-      ⟨leviEmb _ _ (leviProj _ _ p), hemb _⟩
-    have hdec : ∃ up ∈ unipRad (w.adicCompletion E) (stdBlocks n h),
-        (p : GL (Fin N) (w.adicCompletion E)) =
-          leviEmb _ (stdBlocks n h) (leviProj _ (stdBlocks n h) p) * up := by
-      refine ⟨((Lp⁻¹ * p : parab (w.adicCompletion E) (stdBlocks n h)) : GL _ _),
-        (coe_mem_unipRad _ _).2 ?_, ?_⟩
+    let Lp : parab (w.adicCompletion E) (stdBlocks n h) := ⟨leviEmb _ _ (leviProj _ _ p), hemb _⟩
+    have hdec
+        : ∃ up ∈ unipRad (w.adicCompletion E) (stdBlocks n h),
+          (p : GL (Fin N) (w.adicCompletion E))
+            = leviEmb _ (stdBlocks n h) (leviProj _ (stdBlocks n h) p) * up := by
+      refine ⟨
+        ((Lp⁻¹ * p : parab (w.adicCompletion E) (stdBlocks n h)) : GL _ _),
+        (coe_mem_unipRad _ _).2 ?_,
+        ?_
+      ⟩
       · rw [map_mul, map_inv]
         have hproj : leviProj _ (stdBlocks n h) Lp = leviProj _ (stdBlocks n h) p := by
           funext a
@@ -85,15 +89,18 @@ theorem restrictAtPoint_holds : RestrictAtPoint := by
     change (F.1 v).1 (_ * finGL E N (locGL E N w (p : GL (Fin N) (w.adicCompletion E)))) = _
     let M' : ∀ i, GA E (n i) := fun i =>
       finGL E (n i) (locGL E (n i) w (leviProj (w.adicCompletion E) (stdBlocks n h) p i))
-    have hq : finGL E N (locGL E N w p) =
-        leviEmb (Ad E) (stdBlocks n h) M' * finGL E N (locGL E N w up) := by
+    have hq
+        : finGL E N (locGL E N w p)
+          = leviEmb (Ad E) (stdBlocks n h) M' * finGL E N (locGL E N w up) := by
       rw [hp, map_mul, map_mul]
       congr 1
       exact iota_leviEmb h _
     have hu' : finGL E N (locGL E N w up) ∈ unipRad (Ad E) (stdBlocks n h) := iota_mem_unipRad h hup
-    have hcomm : infGL E N (Unitary.toUnits k) * finGL E N xo * finGL E N (locGL E N w p) =
-        finGL E N (locGL E N w p) * (infGL E N (Unitary.toUnits k) * finGL E N xo) := by
-      rw [mul_assoc, ← map_mul (finGL E N) xo, ← locGL_commute w xo _ hxo, map_mul, ← mul_assoc, infGL_comm, mul_assoc]
+    have hcomm
+        : infGL E N (Unitary.toUnits k) * finGL E N xo * finGL E N (locGL E N w p)
+          = finGL E N (locGL E N w p) * (infGL E N (Unitary.toUnits k) * finGL E N xo) := by
+      rw [mul_assoc, ← map_mul (finGL E N) xo, ← locGL_commute w xo _ hxo, map_mul, ← mul_assoc,
+        infGL_comm, mul_assoc]
     have key : ∀ a b c' d : GA E N, a * (b * c' * d) = (a * b * c' * (a * b)⁻¹) * (a * b * d) := by
       intros
       group
@@ -104,9 +111,10 @@ theorem restrictAtPoint_holds : RestrictAtPoint := by
       letI : DecidableEq (Fin c) := Classical.typeDecidableEq _
       simp [leviEmb]
       exact Matrix.blockDiagonal'_apply_ne _ _ _ hab.ne'
-    have hconj : leviEmb (Ad E) (stdBlocks n h) (m * M') *
-        finGL E N (locGL E N w up) * (leviEmb (Ad E) (stdBlocks n h) (m * M'))⁻¹ ∈
-        unipRad (Ad E) (stdBlocks n h) := by
+    have hconj
+        : leviEmb (Ad E) (stdBlocks n h) (m * M') * finGL E N (locGL E N w up)
+            * (leviEmb (Ad E) (stdBlocks n h) (m * M'))⁻¹
+          ∈ unipRad (Ad E) (stdBlocks n h) := by
       obtain ⟨U, hU, hUeq⟩ := Subgroup.mem_map.1 hu'
       let P : parab (Ad E) (stdBlocks n h) := ⟨_, hpar⟩
       let V : parab (Ad E) (stdBlocks n h) := U

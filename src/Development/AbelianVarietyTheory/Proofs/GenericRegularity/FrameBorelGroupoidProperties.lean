@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsCombAtG
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Reg GlobalTheory.Frames
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Reg GlobalTheory.Frames
 
 namespace GlobalTheory.Reg.BorelGroupoid
 
@@ -20,8 +22,9 @@ section Tri
 
 variable {S : Type} [CommRing S] {n : ℕ}
 
-theorem lower_mul (A B : Matrix (Fin n) (Fin n) S) (hA : ∀ i j, i < j → A i j = 0)
-    (hB : ∀ i j, i < j → B i j = 0) : ∀ i j, i < j → (A * B) i j = 0 := by
+theorem lower_mul
+    (A B : Matrix (Fin n) (Fin n) S) (hA : ∀ i j, i < j → A i j = 0) (hB : ∀ i j, i < j → B i j = 0)
+    : ∀ i j, i < j → (A * B) i j = 0 := by
   intro i j hij
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_zero fun k _ => ?_
@@ -29,16 +32,19 @@ theorem lower_mul (A B : Matrix (Fin n) (Fin n) S) (hA : ∀ i j, i < j → A i 
   · rw [hA i k hk, zero_mul]
   · rw [hB k j (lt_of_le_of_lt (not_lt.mp hk) hij), mul_zero]
 
-theorem lower_mul_diag (A B : Matrix (Fin n) (Fin n) S) (hA : ∀ i j, i < j → A i j = 0)
-    (hB : ∀ i j, i < j → B i j = 0) (i : Fin n) : (A * B) i i = A i i * B i i := by
+theorem lower_mul_diag
+    (A B : Matrix (Fin n) (Fin n) S) (hA : ∀ i j, i < j → A i j = 0) (hB : ∀ i j, i < j → B i j = 0)
+    (i : Fin n)
+    : (A * B) i i = A i i * B i i := by
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_single i (fun k _ hk => ?_) (fun h => absurd (Finset.mem_univ i) h)
   rcases lt_or_gt_of_ne hk with h | h
   · rw [hB k i h, mul_zero]
   · rw [hA i k h, zero_mul]
 
-theorem lower_of_mul_eq_one (A B : Matrix (Fin n) (Fin n) S) (hA : ∀ i j, i < j → A i j = 0)
-    (hB : B * A = 1) : ∀ i j, i < j → B i j = 0 := by
+theorem lower_of_mul_eq_one
+    (A B : Matrix (Fin n) (Fin n) S) (hA : ∀ i j, i < j → A i j = 0) (hB : B * A = 1)
+    : ∀ i j, i < j → B i j = 0 := by
   have h : A.BlockTriangular OrderDual.toDual := fun i j hij => hA i j hij
   have hd : IsUnit A.det := Matrix.isUnit_det_of_left_inverse hB
   letI := Matrix.invertibleOfIsUnitDet A hd
@@ -50,7 +56,8 @@ end Tri
 
 section Geo
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 variable {Xo : Moduli Dw l} {c : Coeff l} {S : Type} [CommRing S] [Algebra c.F S]
 
 theorem chg_refl (y : FrPt Xo c S) : FrChg (fun _ => 1) 1 y y := by
@@ -64,9 +71,10 @@ theorem chg_refl (y : FrPt Xo c S) : FrChg (fun _ => 1) 1 y y := by
     exact h
   · rw [Model.scal_one, _root_.one_mul]
 
-theorem chg_comp {g g' : ∀ τ : E →+* ℂ, Matrix (Fin (Dw.mult τ)) (Fin (Dw.mult τ)) S} {a a' : S}
-    {y y' y'' : FrPt Xo c S} (h : FrChg g a y y') (h' : FrChg g' a' y' y'') :
-    FrChg (fun τ => g' τ * g τ) (a' * a) y y'' := by
+theorem chg_comp
+    {g g' : ∀ τ : E →+* ℂ, Matrix (Fin (Dw.mult τ)) (Fin (Dw.mult τ)) S} {a a' : S}
+    {y y' y'' : FrPt Xo c S} (h : FrChg g a y y') (h' : FrChg g' a' y' y'')
+    : FrChg (fun τ => g' τ * g τ) (a' * a) y y'' := by
   obtain ⟨hx, hc, hs⟩ := h
   obtain ⟨hx', hc', hs'⟩ := h'
   obtain ⟨x', xo', u', t', e', b', s', gen'⟩ := y'
@@ -75,8 +83,11 @@ theorem chg_comp {g g' : ∀ τ : E →+* ℂ, Matrix (Fin (Dw.mult τ)) (Fin (D
   subst hx'
   subst hx
   refine ⟨rfl, fun τ i => ?_, (Model.secBC_id_iff _ _ _ _).2 fun i => ?_⟩
-  · have h := GlobalTheory.TangentLinear.isCombAt_mulVec E H Dw l Xo S y.x (y.u τ) (y.tan τ) (u' τ) (g τ).transpose
-      (g' τ i) (u'' τ i) (fun k => hc τ k) (hc' τ i)
+  · have h :=
+      GlobalTheory.TangentLinear.isCombAt_mulVec E H Dw l Xo S y.x (y.u τ) (y.tan τ) (u' τ)
+        (g τ).transpose (g' τ i) (u'' τ i)
+        (fun k => hc τ k)
+        (hc' τ i)
     have e : (g τ).transpose.mulVec (g' τ i) = (g' τ * g τ) i := by
       funext j
       simp only [Matrix.mulVec, dotProduct, Matrix.transpose_apply, Matrix.mul_apply]
@@ -90,7 +101,15 @@ theorem chg_comp {g g' : ∀ τ : E →+* ℂ, Matrix (Fin (Dw.mult τ)) (Fin (D
 
 end Geo
 
-theorem frBor_groupoid : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), ∀ (S : Type) [CommRing S] [Algebra c.F S], (∀ y : FrPt Xo c S, FrBor 1 y y) ∧ (∀ (t t' : Ix Dw → Sˣ) (y y' y'' : FrPt Xo c S), FrBor t y y' → FrBor t' y' y'' → FrBor (t * t') y y'') ∧ (∀ (t : Ix Dw → Sˣ) (y y' : FrPt Xo c S), FrBor t y y' → FrBor t⁻¹ y' y) ∧ ∀ (t t' : Ix Dw → Sˣ) (y y' : FrPt Xo c S), FrBor t y y' → FrBor t' y y' → t = t' := by
+theorem frBor_groupoid
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l),
+      ∀ (S : Type) [CommRing S] [Algebra c.F S],
+        (∀ y : FrPt Xo c S, FrBor 1 y y)
+          ∧ (∀ (t t' : Ix Dw → Sˣ) (y y' y'' : FrPt Xo c S),
+            FrBor t y y' → FrBor t' y' y'' → FrBor (t * t') y y'')
+          ∧ (∀ (t : Ix Dw → Sˣ) (y y' : FrPt Xo c S), FrBor t y y' → FrBor t⁻¹ y' y)
+          ∧ ∀ (t t' : Ix Dw → Sˣ) (y y' : FrPt Xo c S), FrBor t y y' → FrBor t' y y' → t = t' := by
   intro E _ _ _ H Dw l Xo c S _ _
   refine ⟨fun y => ?_, fun t t' y y' y'' h h' => ?_, fun t y y' h => ?_, fun t t' y y' h h' => ?_⟩
   · refine (Model.frBor_iff _ _ _).2 ⟨fun _ => 1, fun τ i => ?_, fun τ i j hij => ?_, chg_refl y⟩
@@ -98,8 +117,8 @@ theorem frBor_groupoid : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] 
     · exact Matrix.one_apply_ne hij.ne
   · obtain ⟨g, hd, hz, hc⟩ := (Model.frBor_iff _ _ _).1 h
     obtain ⟨g', hd', hz', hc'⟩ := (Model.frBor_iff _ _ _).1 h'
-    refine (Model.frBor_iff _ _ _).2 ⟨fun τ => g' τ * g τ, fun τ i => ?_,
-      fun τ => lower_mul _ _ (hz' τ) (hz τ), ?_⟩
+    refine (Model.frBor_iff _ _ _).2
+      ⟨fun τ => g' τ * g τ, fun τ i => ?_, fun τ => lower_mul _ _ (hz' τ) (hz τ), ?_⟩
     · show (g' τ * g τ) i i = _
       rw [lower_mul_diag _ _ (hz' τ) (hz τ), hd, hd', Pi.mul_apply, Units.val_mul, _root_.mul_comm]
     · rw [Pi.mul_apply, Units.val_mul, _root_.mul_comm]

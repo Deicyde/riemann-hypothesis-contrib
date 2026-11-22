@@ -9,11 +9,8 @@ noncomputable section
 namespace GlobalTheory.CompanionTheory.FinHeis
 
 structure Sys (X M : Type) [AddCommGroup X] [AddCommGroup M] [Module ℂ M] where
-
   c : X → X → ℂ
-
   rho : X → M →ₗ[ℂ] M
-
   B : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ
   c_add_left : ∀ x x' y, c (x + x') y = c x y * c x' y
   c_add_right : ∀ x y y', c x (y + y') = c x y * c x y'
@@ -46,7 +43,8 @@ def abelian₂ (al : X → ℂ) (Γ' Γ : AddSubgroup X) (φ : M) : M :=
 
 def ip : M →ₗ[ℂ] M →ₗ⋆[ℂ] ℂ := S.B.flip
 
-@[simp] theorem ip_apply (u v : M) : ip S u v = S.B v u := rfl
+@[simp]
+theorem ip_apply (u v : M) : ip S u v = S.B v u := rfl
 
 theorem ip_smul_left (a : ℂ) (u v : M) : ip S (a • u) v = a * ip S u v := by simp
 

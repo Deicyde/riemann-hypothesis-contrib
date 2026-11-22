@@ -5,7 +5,8 @@ public import Formalism.FormalDegreeBessel.FormalDegreeRatio.GBasic
 
 @[expose] public section
 
-open Matrix Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C2 Formalism.QuantumDeterminants.GBasic
+open Matrix Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C2
+  Formalism.QuantumDeterminants.GBasic
 
 noncomputable section
 
@@ -13,8 +14,12 @@ namespace PI.StabSplit.FixW
 
 def uOf (k r : ℕ) (g : B.Mat k r) : B.Mat k r :=
   Matrix.of fun i j =>
-    if (r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k) then g i j
-    else if i = j then 1 else 0
+    if (r ≤ i.val ∧ i.val ≤ r + k) ∧ (r ≤ j.val ∧ j.val ≤ r + k) then
+      g i j
+    else if i = j then
+      1
+    else
+      0
 
 lemma uOf_out_col {k r : ℕ} (g : B.Mat k r) (i j : Fin (2 * r + k + 1))
     (hj : j.val < r ∨ r + k < j.val) : uOf k r g i j = if i = j then 1 else 0 := by
@@ -148,8 +153,13 @@ lemma uOf_UW {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {g 
   · exact uOf_fix_out g _ (Or.inl (by simp [eI]))
   · exact uOf_fix_out g _ (Or.inr (by simp [esI]; omega))
 
-def yv (k r : ℕ) (g : B.Mat k r) (j : Fin (2 * r + k + 1)) : Fin (2 * r + k + 1) → ℂ :=
-  fun i => if i.val < r then g i j else if i = j then 1 else 0
+def yv (k r : ℕ) (g : B.Mat k r) (j : Fin (2 * r + k + 1)) : Fin (2 * r + k + 1) → ℂ := fun i =>
+  if i.val < r then
+    g i j
+  else if i = j then
+    1
+  else
+    0
 
 lemma uOf_yv {k r : ℕ} {z : Fin (2 * r + k + 1) → ℂ} {g : B.Mat k r} (hg : g ∈ FixSet k r z)
     (j : Fin (2 * r + k + 1)) (hj : j.val ≤ r + k) : uOf k r g *ᵥ yv k r g j = fun i => g i j := by
@@ -207,16 +217,18 @@ theorem fixed_point_subgroup : FixSub := by
       have hy := congrFun (uOf_yv hg (eI k r a) (by omega)) i
       have hc : ((uOf k r g)⁻¹ * g) i (eI k r a) = yv k r g (eI k r a) i := by
         rw [← congrFun (mulVec_bvec ((uOf k r g)⁻¹ * g) (eI k r a)) i, ← mulVec_mulVec,
-          mulVec_bvec g, ← uOf_yv hg (eI k r a) (by omega), mulVec_mulVec,
-          nonsing_inv_mul _ hdet, one_mulVec]
-      rw [hc]; simp only [yv]
+          mulVec_bvec g, ← uOf_yv hg (eI k r a) (by omega), mulVec_mulVec, nonsing_inv_mul _ hdet,
+          one_mulVec]
+      rw [hc]
+      simp only [yv]
       by_cases hir : i.val < r
       · rw [if_pos hir, fix_col hg _ e i]
       · rw [if_neg hir]
     · have hc : ((uOf k r g)⁻¹ * g) i j = yv k r g j i := by
-        rw [← congrFun (mulVec_bvec ((uOf k r g)⁻¹ * g) j) i, ← mulVec_mulVec,
-          mulVec_bvec g, ← uOf_yv hg j h2, mulVec_mulVec, nonsing_inv_mul _ hdet, one_mulVec]
-      rw [hc]; simp only [yv, if_neg (show ¬ i.val < r by omega)]
+        rw [← congrFun (mulVec_bvec ((uOf k r g)⁻¹ * g) j) i, ← mulVec_mulVec, mulVec_bvec g,
+          ← uOf_yv hg j h2, mulVec_mulVec, nonsing_inv_mul _ hdet, one_mulVec]
+      rw [hc]
+      simp only [yv, if_neg (show ¬ i.val < r by omega)]
   · rw [← Matrix.mul_assoc, mul_nonsing_inv _ hdet, Matrix.one_mul]
 
 end PI.StabSplit.FixW

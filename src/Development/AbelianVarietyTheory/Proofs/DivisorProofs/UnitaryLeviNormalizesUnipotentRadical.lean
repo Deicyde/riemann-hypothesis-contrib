@@ -10,10 +10,12 @@ open Formalism.UG GlobalTheory.SatakeWeyl
 
 namespace GlobalTheory.SatakeWeyl
 
-theorem levi_mul_rad_apply {L : Type} [Field L] {σ : L →+* L} {n : ℕ} {β : Fin n → ℕ} {m u : GU σ n}
-    (hm : ∀ i j, β i ≠ β j → mat m i j = 0)
-    (hu : ∀ i j, β j ≤ β i → mat u i j = (1 : Matrix (Fin n) (Fin n) L) i j) {i l : Fin n} (h : β l ≤ β i) :
-    mat (m * u) i l = mat m i l := by
+theorem levi_mul_rad_apply
+    {L : Type} [Field L]
+    {σ : L →+* L} {n : ℕ} {β : Fin n → ℕ} {m u : GU σ n} (hm : ∀ i j, β i ≠ β j → mat m i j = 0)
+    (hu : ∀ i j, β j ≤ β i → mat u i j = (1 : Matrix (Fin n) (Fin n) L) i j)
+    {i l : Fin n} (h : β l ≤ β i)
+    : mat (m * u) i l = mat m i l := by
   rw [mat_mul, Matrix.mul_apply]
   have key : ∀ k, mat m i k * mat u k l = mat m i k * (1 : Matrix (Fin n) (Fin n) L) k l := by
     intro k

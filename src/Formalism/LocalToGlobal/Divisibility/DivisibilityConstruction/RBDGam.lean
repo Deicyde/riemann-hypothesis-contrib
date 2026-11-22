@@ -14,15 +14,20 @@ open Formalism.L2.DIV
 
 variable {D : D7}
 
-theorem log_card_le_unit_exponent {G : Type} [Fintype G] (L : SizeData₂ D) (hSG : SizeG L) (hSC : SizeCond L) (Del h0 : ℕ) (Nc : ℝ)
-    (hNc : 0 ≤ Nc) (hc : Fintype.card G = D.what₂.restRowsFiniteGroupCard) :
-    Real.log (Fintype.card G : ℝ) ≤ 2 * (ofRecord D L Del h0).unitE Nc := by
+theorem log_card_le_unit_exponent
+    {G : Type} [Fintype G]
+    (L : SizeData₂ D) (hSG : SizeG L) (hSC : SizeCond L)
+    (Del h0 : ℕ)
+    (Nc : ℝ) (hNc : 0 ≤ Nc)
+    (hc : Fintype.card G = D.what₂.restRowsFiniteGroupCard)
+    : Real.log (Fintype.card G : ℝ) ≤ 2 * (ofRecord D L Del h0).unitE Nc := by
   have hx1 : 1 ≤ L.sc.x := le_of_lt L.sc.one_lt_alt
   have hX1 : (1 : ℝ) ≤ L.sc.x ^ L.sc.eps := Real.one_le_rpow hx1 L.sc.eps_pos.le
   have hX0 : (0 : ℝ) ≤ L.sc.x ^ L.sc.eps := by linarith
   have hg0 : (0 : ℝ) < D.host.g 0 := by exact_mod_cast (D.host.g_prime 0).pos
-  have hlam : Real.log (Fintype.card G : ℝ) ≤
-      2 * (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * Real.log (2 * (D.host.g 0 : ℝ)) := by
+  have hlam
+      : Real.log (Fintype.card G : ℝ)
+        ≤ 2 * (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * Real.log (2 * (D.host.g 0 : ℝ)) := by
     have h := GZeroLogBound D (D.host.g 0 : ℝ) (fun i => (hSG i 0).2.1)
     rw [hc]
     exact h
@@ -50,13 +55,13 @@ theorem log_card_le_unit_exponent {G : Type} [Fintype G] (L : SizeData₂ D) (hS
   have hXX : (0 : ℝ) ≤ X * X := mul_nonneg hX0 hX0
   have h2XX : (0 : ℝ) ≤ 2 * (X * X) := by positivity
   have hbm : L.sc.b ≤ (D.R.m : ℝ) * L.sc.b := by nlinarith
-  calc Real.log (Fintype.card G : ℝ)
-      ≤ 2 * (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * (2 * (X * X)) := by
-        refine hlam.trans (mul_le_mul_of_nonneg_left hlg ?_)
-        positivity
+  calc
+    Real.log (Fintype.card G : ℝ) ≤ 2 * (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 * (2 * (X * X)) := by
+      refine hlam.trans (mul_le_mul_of_nonneg_left hlg ?_)
+      positivity
     _ = (D.R.f : ℝ) * (2 * (D.R.r : ℝ) ^ 2) * (2 * (X * X)) := by ring
     _ ≤ (D.R.f : ℝ) * ((D.R.m : ℝ) * L.sc.b) * (2 * (X * X)) := by
-        exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left (hr.trans hbm) hf0) h2XX
+      exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left (hr.trans hbm) hf0) h2XX
     _ = 2 * (X * ((D.R.f : ℝ) * D.R.m * L.sc.b * X + 0)) := by ring
     _ ≤ 2 * (X * ((D.R.f : ℝ) * D.R.m * L.sc.b * X + Nc)) := by gcongr
 
@@ -66,15 +71,20 @@ private theorem four_n_le_cond (D : D7) : 4 * D.R.n ≤ D.host.QS * D.host.q * D
   haveI : NeZero (D.host.QS * D.host.q * D.host.d) := ⟨hN⟩
   have h1 : Nat.card D.R.toFrame.GG ≤ Nat.card (ZMod (D.host.QS * D.host.q * D.host.d))ˣ :=
     Nat.card_le_card_of_surjective _ D.host.der.art_surj
-  have h2 : Nat.card (ZMod (D.host.QS * D.host.q * D.host.d))ˣ ≤ Nat.card (ZMod (D.host.QS * D.host.q * D.host.d)) :=
+  have h2
+      : Nat.card (ZMod (D.host.QS * D.host.q * D.host.d))ˣ
+        ≤ Nat.card (ZMod (D.host.QS * D.host.q * D.host.d)) :=
     Nat.card_le_card_of_injective _ Units.val_injective
   rw [Nat.card_zmod] at h2
   rw [D.R.toFrame.natCard_GG] at h1
   exact h1.trans h2
 
-theorem log_DGam_le (L : SizeData₂ D) (hSC : SizeCond L) (C : ℝ) (hC : 0 ≤ C) (hF : FactDGam D C) (u : D.what₂.Word)
-    (Del h0 : ℕ) (Nc : ℝ) (hNc : 0 ≤ Nc) :
-    Real.log ((D.mem u).C.DGam : ℝ) ≤ 9 * C * (ofRecord D L Del h0).unitE Nc := by
+theorem log_DGam_le
+    (L : SizeData₂ D) (hSC : SizeCond L)
+    (C : ℝ) (hC : 0 ≤ C) (hF : FactDGam D C)
+    (u : D.what₂.Word) (Del h0 : ℕ)
+    (Nc : ℝ) (hNc : 0 ≤ Nc)
+    : Real.log ((D.mem u).C.DGam : ℝ) ≤ 9 * C * (ofRecord D L Del h0).unitE Nc := by
   have h := hF u
   have hx1 : 1 ≤ L.sc.x := le_of_lt L.sc.one_lt_alt
   have hX1 : (1 : ℝ) ≤ L.sc.x ^ L.sc.eps := Real.one_le_rpow hx1 L.sc.eps_pos.le
@@ -123,7 +133,8 @@ theorem log_DGam_le (L : SizeData₂ D) (hSC : SizeCond L) (C : ℝ) (hC : 0 ≤
     have e1 : a ≤ szCond L ^ 36 * (3 * (D.R.t : ℝ) ^ 150) := by
       have h1 : (D.R.N D.R.m : ℝ) ≤ 3 * (D.R.t : ℝ) ^ 150 := by linarith
       have h2 : (0 : ℝ) ≤ (D.R.N D.R.m : ℝ) := by linarith
-      calc a = (D.R.f : ℝ) * (D.R.N D.R.m : ℝ) := rfl
+      calc
+        a = (D.R.f : ℝ) * (D.R.N D.R.m : ℝ) := rfl
         _ ≤ szCond L ^ 36 * (3 * (D.R.t : ℝ) ^ 150) :=
           mul_le_mul (hfc.trans h36) h1 h2 (by positivity)
     nlinarith
@@ -161,27 +172,41 @@ theorem log_DGam_le (L : SizeData₂ D) (hSC : SizeCond L) (C : ℝ) (hC : 0 ≤
     have e1 : L.sc.b * 1 ≤ L.sc.b * ((D.R.f : ℝ) * D.R.m * X) := mul_le_mul_of_nonneg_left hfmX hb0
     have e2 : L.sc.b * X ≤ ((D.R.f : ℝ) * D.R.m * L.sc.b * X) * X := by
       have := mul_le_mul_of_nonneg_right e1 hX0
-      have e3 : L.sc.b * ((D.R.f : ℝ) * D.R.m * X) * X = ((D.R.f : ℝ) * D.R.m * L.sc.b * X) * X := by ring
+      have e3
+          : L.sc.b * ((D.R.f : ℝ) * D.R.m * X) * X = ((D.R.f : ℝ) * D.R.m * L.sc.b * X) * X := by
+        ring
       linarith
     have e4 : (0 : ℝ) ≤ X * Nc := mul_nonneg hX0 hNc
-    have e5 : X * ((D.R.f : ℝ) * D.R.m * L.sc.b * X + Nc) = ((D.R.f : ℝ) * D.R.m * L.sc.b * X) * X + X * Nc := by ring
+    have e5
+        : X * ((D.R.f : ℝ) * D.R.m * L.sc.b * X + Nc)
+          = ((D.R.f : ℝ) * D.R.m * L.sc.b * X) * X + X * Nc := by
+      ring
     linarith
   have hh : Real.log ((D.mem u).C.DGam : ℝ) ≤ C * (a * Real.log a) := by
-    have : C * (D.R.f : ℝ) * (D.R.N D.R.m : ℝ) * Real.log ((D.R.f : ℝ) * (D.R.N D.R.m : ℝ)) = C * (a * Real.log a) := by
+    have : C * (D.R.f : ℝ) * (D.R.N D.R.m : ℝ) * Real.log ((D.R.f : ℝ) * (D.R.N D.R.m : ℝ))
+        = C * (a * Real.log a) := by
       rw [ha]; ring
     linarith [h, this.le, this.ge]
-  calc Real.log ((D.mem u).C.DGam : ℝ) ≤ C * (a * Real.log a) := hh
+  calc
+    Real.log ((D.mem u).C.DGam : ℝ)
+      ≤ C * (a * Real.log a) := hh
     _ ≤ C * (9 * (L.sc.b * X)) := mul_le_mul_of_nonneg_left hkey hC
     _ ≤ C * (9 * (X * ((D.R.f : ℝ) * D.R.m * L.sc.b * X + Nc))) := by gcongr
     _ = 9 * C * (X * ((D.R.f : ℝ) * D.R.m * L.sc.b * X + Nc)) := by ring
 
-theorem dGamSize_record {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {m : ℕ} (A : FamIn D.what₂.LL G Pl0 T m)
-    (P0 : Subgroup G) (ψ0 : P0 →* D.what₂.LLˣ) (hT : Finite T) (L : SizeData₂ D) (hSG : SizeG L) (hSC : SizeCond L)
-    (Del h0 : ℕ) (Nc : ℝ) (hNc : 0 ≤ Nc) (hc : Fintype.card G = D.what₂.restRowsFiniteGroupCard) (u0 : D.what₂.Word)
-    (hGam : ∀ j t c, Fintype.card ((A.fam.L j t).S.Gam c) ∣ (D.mem u0).C.DGam)
-    (C : ℝ) (hC : 0 ≤ C) (hF : FactDGam D C) (s : ℕ) (cs : ℝ)
-    (hs : Real.log (s : ℝ) ≤ cs * (ofRecord D L Del h0).unitE Nc) :
-    DGamSize A P0 ψ0 (ofRecord D L Del h0) Nc hT s (2 + 9 * C + cs) := by
+theorem dGamSize_record
+    {G : Type} [Group G] [Fintype G]
+    {Pl0 T : Type} {m : ℕ} (A : FamIn D.what₂.LL G Pl0 T m)
+    (P0 : Subgroup G) (ψ0 : P0 →* D.what₂.LLˣ)
+    (hT : Finite T)
+    (L : SizeData₂ D) (hSG : SizeG L) (hSC : SizeCond L)
+    (Del h0 : ℕ)
+    (Nc : ℝ) (hNc : 0 ≤ Nc)
+    (hc : Fintype.card G = D.what₂.restRowsFiniteGroupCard)
+    (u0 : D.what₂.Word) (hGam : ∀ j t c, Fintype.card ((A.fam.L j t).S.Gam c) ∣ (D.mem u0).C.DGam)
+    (C : ℝ) (hC : 0 ≤ C) (hF : FactDGam D C)
+    (s : ℕ) (cs : ℝ) (hs : Real.log (s : ℝ) ≤ cs * (ofRecord D L Del h0).unitE Nc)
+    : DGamSize A P0 ψ0 (ofRecord D L Del h0) Nc hT s (2 + 9 * C + cs) := by
   unfold DGamSize
   have hdvd : dgOf A P0 ψ0 hT ∣ Fintype.card G * (D.mem u0).C.DGam := by
     unfold dgOf
@@ -199,23 +224,33 @@ theorem dGamSize_record {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {m : ℕ
   have hle : (dgOf A P0 ψ0 hT : ℝ) ≤ (Fintype.card G : ℝ) * ((D.mem u0).C.DGam : ℝ) := by
     exact_mod_cast Nat.le_of_dvd hpos hdvd
   have hdg : (0 : ℝ) < (dgOf A P0 ψ0 hT : ℝ) := by exact_mod_cast dgOf_pos A P0 ψ0 hT
-  have hlog : Real.log (dgOf A P0 ψ0 hT : ℝ) ≤ Real.log (Fintype.card G : ℝ) + Real.log ((D.mem u0).C.DGam : ℝ) := by
+  have hlog
+      : Real.log (dgOf A P0 ψ0 hT : ℝ)
+        ≤ Real.log (Fintype.card G : ℝ) + Real.log ((D.mem u0).C.DGam : ℝ) := by
     rw [← Real.log_mul (by exact_mod_cast hG.ne') (by exact_mod_cast hD.ne')]
     exact Real.log_le_log hdg hle
   have h1 := log_card_le_unit_exponent (G := G) L hSG hSC Del h0 Nc hNc hc
   have h2 := log_DGam_le L hSC C hC hF u0 Del h0 Nc hNc
-  have e : (2 + 9 * C + cs) * (ofRecord D L Del h0).unitE Nc =
-      2 * (ofRecord D L Del h0).unitE Nc + 9 * C * (ofRecord D L Del h0).unitE Nc + cs * (ofRecord D L Del h0).unitE Nc := by
+  have e
+      : (2 + 9 * C + cs) * (ofRecord D L Del h0).unitE Nc
+        = 2 * (ofRecord D L Del h0).unitE Nc + 9 * C * (ofRecord D L Del h0).unitE Nc
+          + cs * (ofRecord D L Del h0).unitE Nc := by
     ring
   rw [e]
   linarith
 
-theorem dGamSize_record_one {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {m : ℕ} (A : FamIn D.what₂.LL G Pl0 T m)
-    (P0 : Subgroup G) (ψ0 : P0 →* D.what₂.LLˣ) (hT : Finite T) (L : SizeData₂ D) (hSG : SizeG L) (hSC : SizeCond L)
-    (Del h0 : ℕ) (Nc : ℝ) (hNc : 0 ≤ Nc) (hc : Fintype.card G = D.what₂.restRowsFiniteGroupCard) (u0 : D.what₂.Word)
-    (hGam : ∀ j t c, Fintype.card ((A.fam.L j t).S.Gam c) ∣ (D.mem u0).C.DGam)
-    (C : ℝ) (hC : 0 ≤ C) (hF : FactDGam D C) :
-    DGamSize A P0 ψ0 (ofRecord D L Del h0) Nc hT 1 (2 + 9 * C) := by
+theorem dGamSize_record_one
+    {G : Type} [Group G] [Fintype G]
+    {Pl0 T : Type} {m : ℕ} (A : FamIn D.what₂.LL G Pl0 T m)
+    (P0 : Subgroup G) (ψ0 : P0 →* D.what₂.LLˣ)
+    (hT : Finite T)
+    (L : SizeData₂ D) (hSG : SizeG L) (hSC : SizeCond L)
+    (Del h0 : ℕ)
+    (Nc : ℝ) (hNc : 0 ≤ Nc)
+    (hc : Fintype.card G = D.what₂.restRowsFiniteGroupCard)
+    (u0 : D.what₂.Word) (hGam : ∀ j t c, Fintype.card ((A.fam.L j t).S.Gam c) ∣ (D.mem u0).C.DGam)
+    (C : ℝ) (hC : 0 ≤ C) (hF : FactDGam D C)
+    : DGamSize A P0 ψ0 (ofRecord D L Del h0) Nc hT 1 (2 + 9 * C) := by
   have h := dGamSize_record A P0 ψ0 hT L hSG hSC Del h0 Nc hNc hc u0 hGam C hC hF 1 0 (by simp)
   rw [add_zero] at h
   exact h

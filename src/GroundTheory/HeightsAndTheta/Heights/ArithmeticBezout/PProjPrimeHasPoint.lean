@@ -18,8 +18,8 @@ theorem ProjPrimeHasPoint.proof : ProjPrimeHasPoint.Statement := by
   by_contra hcon
   push Not at hcon
   apply hj
-  have hmem : (X j : MvPolynomial (Fin n) F) ∈
-      vanishingIdeal F (zeroLocus (AlgebraicClosure F) W) := by
+  have hmem
+      : (X j : MvPolynomial (Fin n) F) ∈ vanishingIdeal F (zeroLocus (AlgebraicClosure F) W) := by
     intro x hx
     by_cases hx0 : x = 0
     · subst hx0

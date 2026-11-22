@@ -22,22 +22,26 @@ def tv (a b : m → R) (h : b ⬝ᵥ a = 0) : GL m R where
   val := 1 + vecMulVec a b
   inv := 1 - vecMulVec a b
   val_inv := by
-    rw [mul_sub, mul_one, add_mul, one_mul, vecMulVec_mul_vecMulVec, h, zero_smul, vecMulVec_zero']; abel
+    rw [mul_sub, mul_one, add_mul, one_mul, vecMulVec_mul_vecMulVec, h, zero_smul, vecMulVec_zero']
+    abel
   inv_val := by
-    rw [sub_mul, one_mul, mul_add, mul_one, vecMulVec_mul_vecMulVec, h, zero_smul, vecMulVec_zero']; abel
+    rw [sub_mul, one_mul, mul_add, mul_one, vecMulVec_mul_vecMulVec, h, zero_smul, vecMulVec_zero']
+    abel
 
-theorem tv_mulVec (a b : m → R) (h : b ⬝ᵥ a = 0) (v : m → R) :
-    ((tv a b h : GL m R) : Matrix m m R) *ᵥ v = v + (b ⬝ᵥ v) • a := by
+theorem tv_mulVec (a b : m → R) (h : b ⬝ᵥ a = 0) (v : m → R)
+    : ((tv a b h : GL m R) : Matrix m m R) *ᵥ v = v + (b ⬝ᵥ v) • a := by
   change (1 + vecMulVec a b) *ᵥ v = _
   rw [add_mulVec, one_mulVec, vecMulVec_mulVec, op_smul_eq_smul]
 
-theorem vecMul_tv_inv (a b : m → R) (h : b ⬝ᵥ a = 0) (f : m → R) :
-    f ᵥ* (((tv a b h)⁻¹ : GL m R) : Matrix m m R) = f - (f ⬝ᵥ a) • b := by
+theorem vecMul_tv_inv (a b : m → R) (h : b ⬝ᵥ a = 0) (f : m → R)
+    : f ᵥ* (((tv a b h)⁻¹ : GL m R) : Matrix m m R) = f - (f ⬝ᵥ a) • b := by
   change f ᵥ* (1 - vecMulVec a b) = _
   rw [vecMul_sub, vecMul_one, vecMul_vecMulVec]
 
-theorem reach_trans {v w u : m → R} (h1 : ∃ g : GL m R, (g : Matrix m m R) *ᵥ v = w)
-    (h2 : ∃ g : GL m R, (g : Matrix m m R) *ᵥ w = u) : ∃ g : GL m R, (g : Matrix m m R) *ᵥ v = u := by
+theorem reach_trans
+    {v w u : m → R} (h1 : ∃ g : GL m R, (g : Matrix m m R) *ᵥ v = w)
+    (h2 : ∃ g : GL m R, (g : Matrix m m R) *ᵥ w = u)
+    : ∃ g : GL m R, (g : Matrix m m R) *ᵥ v = u := by
   obtain ⟨g1, hg1⟩ := h1
   obtain ⟨g2, hg2⟩ := h2
   refine ⟨g2 * g1, ?_⟩
@@ -45,17 +49,18 @@ theorem reach_trans {v w u : m → R} (h1 : ∃ g : GL m R, (g : Matrix m m R) *
 
 variable {n : ℕ}
 
-theorem reach_of_last_one (u : Fin (n + 1) → R) (hu : u (Fin.last n) = 1) :
-    ∃ g : GL (Fin (n + 1)) R, (g : Matrix (Fin (n + 1)) (Fin (n + 1)) R) *ᵥ u = Pi.single (Fin.last n) 1 := by
+theorem reach_of_last_one (u : Fin (n + 1) → R) (hu : u (Fin.last n) = 1)
+    : ∃ g : GL (Fin (n + 1)) R,
+      (g : Matrix (Fin (n + 1)) (Fin (n + 1)) R) *ᵥ u = Pi.single (Fin.last n) 1 := by
   refine ⟨tv (Pi.single (Fin.last n) 1 - u) (Pi.single (Fin.last n) 1) ?_, ?_⟩
   · rw [single_dotProduct, Pi.sub_apply, Pi.single_eq_same, hu]
     ring
   · rw [tv_mulVec, single_dotProduct, hu, one_mul, one_smul]
     abel
 
-theorem reach_last_one (w : Fin (n + 1) → R) (c : Fin n → R)
-    (hc : ∑ i, c i * w i.castSucc = 1) :
-    ∃ g : GL (Fin (n + 1)) R, ((g : Matrix (Fin (n + 1)) (Fin (n + 1)) R) *ᵥ w) (Fin.last n) = 1 := by
+theorem reach_last_one (w : Fin (n + 1) → R) (c : Fin n → R) (hc : ∑ i, c i * w i.castSucc = 1)
+    : ∃ g : GL (Fin (n + 1)) R,
+      ((g : Matrix (Fin (n + 1)) (Fin (n + 1)) R) *ᵥ w) (Fin.last n) = 1 := by
   obtain ⟨c', hc'⟩ : ∃ c' : Fin (n + 1) → R, c' = Fin.snoc c 0 := ⟨_, rfl⟩
   have hcl : c' (Fin.last n) = 0 := by simp [hc']
   have hcw : c' ⬝ᵥ w = 1 := by
@@ -67,9 +72,10 @@ theorem reach_last_one (w : Fin (n + 1) → R) (c : Fin n → R)
     simp only [smul_eq_mul]
     ring
 
-theorem reach_first_unimod {s : ℕ} (hS : StableRangeLe R s) (hn : s ≤ n) (v f : Fin (n + 1) → R)
-    (hfv : f ⬝ᵥ v = 1) :
-    ∃ g : GL (Fin (n + 1)) R, ∃ c : Fin n → R, ∑ i, c i * ((g : Matrix (Fin (n + 1)) (Fin (n + 1)) R) *ᵥ v) i.castSucc = 1 := by
+theorem reach_first_unimod
+    {s : ℕ} (hS : StableRangeLe R s) (hn : s ≤ n) (v f : Fin (n + 1) → R) (hfv : f ⬝ᵥ v = 1)
+    : ∃ g : GL (Fin (n + 1)) R, ∃ c : Fin n → R,
+      ∑ i, c i * ((g : Matrix (Fin (n + 1)) (Fin (n + 1)) R) *ᵥ v) i.castSucc = 1 := by
   have hU : Unimodular R v := by
     unfold Unimodular
     rw [Ideal.eq_top_iff_one, ← hfv, Ideal.mem_span_range_iff_exists_fun]
@@ -88,7 +94,17 @@ theorem reach_first_unimod {s : ℕ} (hS : StableRangeLe R s) (hn : s ≤ n) (v 
   simp only [ha, Fin.snoc_castSucc]
   ring
 
-theorem main : ∀ (R : Type) [CommRing R] (s : ℕ), StableRangeLe R s → ∀ (n : ℕ), s ≤ n → ∀ v f : Fin (n + 1) → R, f ⬝ᵥ v = 1 → ∃ g : GL (Fin (n + 1)) R, (g : Matrix (Fin (n + 1)) (Fin (n + 1)) R) *ᵥ v = Pi.single (Fin.last n) 1 ∧ f ᵥ* ((g⁻¹ : GL (Fin (n + 1)) R) : Matrix (Fin (n + 1)) (Fin (n + 1)) R) = Pi.single (Fin.last n) 1 := by
+theorem main
+    : ∀ (R : Type) [CommRing R] (s : ℕ),
+      StableRangeLe R s
+        → ∀ (n : ℕ),
+          s ≤ n
+            → ∀ v f : Fin (n + 1) → R,
+              f ⬝ᵥ v = 1
+                → ∃ g : GL (Fin (n + 1)) R,
+                  (g : Matrix (Fin (n + 1)) (Fin (n + 1)) R) *ᵥ v = Pi.single (Fin.last n) 1
+                    ∧ f ᵥ* ((g⁻¹ : GL (Fin (n + 1)) R) : Matrix (Fin (n + 1)) (Fin (n + 1)) R)
+                      = Pi.single (Fin.last n) 1 := by
   intro R _ s hS n hn v f hfv
   obtain ⟨g1, c, hc⟩ := reach_first_unimod hS hn v f hfv
   obtain ⟨g2, hg2⟩ := reach_last_one _ c hc
@@ -117,7 +133,17 @@ end
 
 section
 open GlobalTheory.SeqCx Matrix UpperTheory.V.KL
-theorem _root_.GlobalTheory.T.exists_GL_moving_unimodular_pair_to_last_basis : ∀ (R : Type) [CommRing R] (s : ℕ), StableRangeLe R s → ∀ (n : ℕ), s ≤ n → ∀ v f : Fin (n + 1) → R, f ⬝ᵥ v = 1 → ∃ g : GL (Fin (n + 1)) R, (g : Matrix (Fin (n + 1)) (Fin (n + 1)) R) *ᵥ v = Pi.single (Fin.last n) 1 ∧ f ᵥ* ((g⁻¹ : GL (Fin (n + 1)) R) : Matrix (Fin (n + 1)) (Fin (n + 1)) R) = Pi.single (Fin.last n) 1 := by
+theorem _root_.GlobalTheory.T.exists_GL_moving_unimodular_pair_to_last_basis
+    : ∀ (R : Type) [CommRing R] (s : ℕ),
+      StableRangeLe R s
+        → ∀ (n : ℕ),
+          s ≤ n
+            → ∀ v f : Fin (n + 1) → R,
+              f ⬝ᵥ v = 1
+                → ∃ g : GL (Fin (n + 1)) R,
+                  (g : Matrix (Fin (n + 1)) (Fin (n + 1)) R) *ᵥ v = Pi.single (Fin.last n) 1
+                    ∧ f ᵥ* ((g⁻¹ : GL (Fin (n + 1)) R) : Matrix (Fin (n + 1)) (Fin (n + 1)) R)
+                      = Pi.single (Fin.last n) 1 := by
   first
   | exact @GlobalTheory.UnimodTransvect.main
   | exact @GlobalTheory.UnimodTransvect.reach_first_unimod

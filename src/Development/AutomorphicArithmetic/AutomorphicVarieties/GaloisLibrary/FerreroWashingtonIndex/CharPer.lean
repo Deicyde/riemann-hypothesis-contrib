@@ -6,8 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-theorem UpperTheory.V.FW.charPer :
-    ∀ (l : ℕ) [Fact l.Prime] (f n : ℕ) [NeZero (f * l ^ n)] (k : Type) [Field k] [CharP k l] (χ : (ZMod (f * l ^ n))ˣ →* kˣ) (s : ZMod (f * l ^ n)), f.Coprime l → 1 ≤ n → MulChar.ofUnitHom χ (s + ((f * l : ℕ) : ZMod (f * l ^ n))) = MulChar.ofUnitHom χ s := by
+theorem UpperTheory.V.FW.charPer
+    : ∀ (l : ℕ) [Fact l.Prime] (f n : ℕ) [NeZero (f * l ^ n)] (k : Type) [Field k] [CharP k l]
+        (χ : (ZMod (f * l ^ n))ˣ →* kˣ) (s : ZMod (f * l ^ n)),
+      f.Coprime l → 1 ≤ n
+        → MulChar.ofUnitHom χ (s + ((f * l : ℕ) : ZMod (f * l ^ n))) = MulChar.ofUnitHom χ s := by
   intro l hl f n _ k _ _ χ s hf hn
   set M : ZMod (f * l ^ n) := ((f * l : ℕ) : ZMod (f * l ^ n)) with hM
   have hnil : IsNilpotent M := by
@@ -31,7 +34,8 @@ theorem UpperTheory.V.FW.charPer :
     push_cast
     rw [ZMod.natCast_zmod_val]
   have hdvd : ((f * l ^ n : ℕ) : ℤ) ∣ (1 + (f : ℤ) * l * t) ^ (l ^ (n - 1)) - 1 := by
-    have h1 : ((l : ℕ) : ℤ) ^ (n - 1 + 1) ∣ (1 + (f : ℤ) * l * t) ^ (l ^ (n - 1)) - 1 ^ (l ^ (n - 1)) :=
+    have h1
+        : ((l : ℕ) : ℤ) ^ (n - 1 + 1) ∣ (1 + (f : ℤ) * l * t) ^ (l ^ (n - 1)) - 1 ^ (l ^ (n - 1)) :=
       dvd_sub_pow_of_dvd_sub (by simp only [add_sub_cancel_left]; exact ⟨f * t, by ring⟩) _
     rw [Nat.sub_add_cancel hn, one_pow] at h1
     have h2 : (f : ℤ) ∣ (1 + (f : ℤ) * l * t) ^ (l ^ (n - 1)) - 1 := by
@@ -49,8 +53,7 @@ theorem UpperTheory.V.FW.charPer :
     push_cast at h0 ⊢
     linear_combination h0
   have hcw : MulChar.ofUnitHom χ w = 1 := by
-    have hp : (MulChar.ofUnitHom χ w) ^ (l ^ (n - 1)) = 1 := by
-      rw [← map_pow, hwpow, map_one]
+    have hp : (MulChar.ofUnitHom χ w) ^ (l ^ (n - 1)) = 1 := by rw [← map_pow, hwpow, map_one]
     have : (MulChar.ofUnitHom χ w - 1) ^ (l ^ (n - 1)) = 0 := by
       rw [sub_pow_char_pow, hp, one_pow, sub_self]
     exact sub_eq_zero.mp ((pow_eq_zero_iff (pow_ne_zero _ hl.out.ne_zero)).mp this)

@@ -22,11 +22,13 @@ theorem LeafMLev_of : LeafMLev := by
     (PreservesPushout.iso F P.hom P.hom).symm
   refine ⟨a, b, ?_⟩
   rw [← Iso.inv_comp_eq]
-  change (pushout.congrHom rfl hc).inv ≫ (PreservesPushout.iso F P'.hom (P'.hom ≫ φ.right)).hom ≫ F.map (gM φ) ≫
-    (PreservesPushout.iso F P.hom P.hom).inv = gM ((lev n).map φ)
+  change (pushout.congrHom rfl hc).inv ≫ (PreservesPushout.iso F P'.hom (P'.hom ≫ φ.right)).hom
+      ≫ F.map (gM φ) ≫ (PreservesPushout.iso F P.hom P.hom).inv
+    = gM ((lev n).map φ)
   apply pushout.hom_ext
   · rw [pushout.congrHom_inv, pushout.inl_desc_assoc, Category.id_comp]
-    erw [PreservesPushout.inl_iso_hom_assoc, ← F.map_comp_assoc, pushout.inl_desc, pushout.inl_desc, F.map_comp_assoc]
+    erw [PreservesPushout.inl_iso_hom_assoc, ← F.map_comp_assoc, pushout.inl_desc, pushout.inl_desc,
+      F.map_comp_assoc]
     erw [PreservesPushout.inl_iso_inv]
     rfl
   · rw [pushout.congrHom_inv, pushout.inr_desc_assoc, Category.id_comp]

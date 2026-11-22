@@ -12,16 +12,22 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory
 
-private theorem rpow_neg_half_height_product_eq (s : Finset ℕ) (r : ℕ) (m : ℕ → ℕ) {a b c : ℝ} {δ : ℕ → ℝ}
-    (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hδ : ∀ l ∈ s, 0 < δ l) :
-    (a * (b⁻¹ ^ (2 * r * (r + 1)) * c / a ^ (2 * (r + 1))) * ∏ l ∈ s, (b⁻¹ ^ m l * δ l) ^ 2) ^ (-(1 / 2 : ℝ)) =
-      a ^ ((2 * r + 1 : ℝ) / 2) * b ^ ((r * (r + 1) + ∑ l ∈ s, m l : ℕ) : ℝ) * c ^ (-(1 / 2 : ℝ)) *
-        ∏ l ∈ s, (δ l)⁻¹ := by
+private theorem rpow_neg_half_height_product_eq
+    (s : Finset ℕ)
+    (r : ℕ) (m : ℕ → ℕ)
+    {a b c : ℝ} {δ : ℕ → ℝ} (ha : 0 < a) (hb : 0 < b) (hc : 0 < c) (hδ : ∀ l ∈ s, 0 < δ l)
+    : (a * (b⁻¹ ^ (2 * r * (r + 1)) * c / a ^ (2 * (r + 1))) * ∏ l ∈ s, (b⁻¹ ^ m l * δ l) ^ 2)
+        ^ (-(1 / 2 : ℝ))
+      = a ^ ((2 * r + 1 : ℝ) / 2) * b ^ ((r * (r + 1) + ∑ l ∈ s, m l : ℕ) : ℝ) * c ^ (-(1 / 2 : ℝ))
+        * ∏ l ∈ s, (δ l)⁻¹ := by
   have hD : 0 < ∏ l ∈ s, δ l := Finset.prod_pos hδ
   rw [Finset.prod_pow, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum, Finset.prod_inv_distrib]
   generalize ∏ l ∈ s, δ l = D at hD ⊢
   generalize ∑ l ∈ s, m l = N
-  have hY : 0 < a ^ ((2 * r + 1 : ℝ) / 2) * b ^ ((r * (r + 1) + N : ℕ) : ℝ) * c ^ (-(1 / 2 : ℝ)) * D⁻¹ := by
+  have hY
+      : 0
+        < a ^ ((2 * r + 1 : ℝ) / 2) * b ^ ((r * (r + 1) + N : ℕ) : ℝ) * c ^ (-(1 / 2 : ℝ))
+          * D⁻¹ := by
     positivity
   have e1 : (a ^ ((2 * r + 1 : ℝ) / 2)) ^ 2 = a ^ (((2 * r + 1 : ℕ)) : ℝ) := by
     rw [← Real.rpow_natCast, ← Real.rpow_mul ha.le]
@@ -35,8 +41,10 @@ private theorem rpow_neg_half_height_product_eq (s : Finset ℕ) (r : ℕ) (m : 
   have e3 : (c ^ (-(1 / 2 : ℝ))) ^ 2 = c⁻¹ := by
     rw [← Real.rpow_natCast, ← Real.rpow_mul hc.le]
     norm_num [Real.rpow_neg_one]
-  have hX : a * (b⁻¹ ^ (2 * r * (r + 1)) * c / a ^ (2 * (r + 1))) * (b⁻¹ ^ N * D) ^ 2 =
-      ((a ^ ((2 * r + 1 : ℝ) / 2) * b ^ ((r * (r + 1) + N : ℕ) : ℝ) * c ^ (-(1 / 2 : ℝ)) * D⁻¹) ^ 2)⁻¹ := by
+  have hX
+      : a * (b⁻¹ ^ (2 * r * (r + 1)) * c / a ^ (2 * (r + 1))) * (b⁻¹ ^ N * D) ^ 2
+        = ((a ^ ((2 * r + 1 : ℝ) / 2) * b ^ ((r * (r + 1) + N : ℕ) : ℝ) * c ^ (-(1 / 2 : ℝ)) * D⁻¹)
+          ^ 2)⁻¹ := by
     simp only [mul_pow]
     rw [e1, e2, e3, Real.rpow_natCast]
     have := ha.ne'
@@ -49,7 +57,23 @@ private theorem rpow_neg_half_height_product_eq (s : Finset ℕ) (r : ℕ) (m : 
   rw [hX, Real.inv_rpow (by positivity), ← Real.rpow_natCast, ← Real.rpow_mul hY.le]
   norm_num [Real.rpow_neg_one]
 
-theorem local_height_scaling : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ) (P : LocNG.FPair H r), P.Gv ≠ 0 → ∀ (e : F), e ≠ 0 → ∀ (G : E) (d : ℕ → E), P.Gv = algebraMap F E (e⁻¹ ^ (2 * r * (r + 1))) * G → (∀ l ∈ P.ends, P.Dm l = algebraMap F E (e⁻¹ ^ (l * (2 * r + 1 - l))) * d l) → (P.PrimeTo → P.Hp = 1) ∧ P.Hp = M.modK (algebraMap F E (LocNG.theta M)) ^ ((2 * r + 1 : ℝ) / 2) * M.modK (algebraMap F E e) ^ ((r * (r + 1) + ∑ l ∈ P.ends, l * (2 * r + 1 - l) : ℕ) : ℝ) * M.modK G ^ (-(1 / 2 : ℝ)) * ∏ l ∈ P.ends, (M.modK (d l))⁻¹ := by
+theorem local_height_scaling
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ) (P : LocNG.FPair H r),
+          P.Gv ≠ 0
+            → ∀ (e : F),
+              e ≠ 0
+                → ∀ (G : E) (d : ℕ → E),
+                  P.Gv = algebraMap F E (e⁻¹ ^ (2 * r * (r + 1))) * G
+                    → (∀ l ∈ P.ends, P.Dm l = algebraMap F E (e⁻¹ ^ (l * (2 * r + 1 - l))) * d l)
+                    → (P.PrimeTo → P.Hp = 1)
+                      ∧ P.Hp
+                        = M.modK (algebraMap F E (LocNG.theta M)) ^ ((2 * r + 1 : ℝ) / 2)
+                          * M.modK (algebraMap F E e)
+                            ^ ((r * (r + 1) + ∑ l ∈ P.ends, l * (2 * r + 1 - l) : ℕ) : ℝ)
+                          * M.modK G ^ (-(1 / 2 : ℝ)) * ∏ l ∈ P.ends, (M.modK (d l))⁻¹ := by
   intro F _ _ _ E _ _ _ _ M hOK V _ _ H r P hGv0 e he G d hG hD
   obtain ⟨hmul, hpc, hone⟩ := T.localModel_modulus_properties_on_units M hOK
   have hA1 : M.modK 1 = 1 := hone 1 M.L.O.one_mem ⟨1, M.L.O.one_mem, one_mul 1⟩
@@ -92,10 +116,12 @@ theorem local_height_scaling : ∀ {F : Type} [Field F] [ValuativeRel F] [Topolo
       rw [hdg]
       exact (isUnit_one.neg.pow _).mul hGvu
     exact isUnit_of_mul_isUnit_left h1
-  have hAdet : M.modK (H.gram P.MMgen).det * M.modK (algebraMap F E (LocNG.theta M)) ^ (2 * (r + 1)) =
-      M.modK P.Gv := by
+  have hAdet
+      : M.modK (H.gram P.MMgen).det * M.modK (algebraMap F E (LocNG.theta M)) ^ (2 * (r + 1))
+        = M.modK P.Gv := by
     have h1 := congrArg M.modK hdg
-    rw [hmul _ _ hdu (hθu.pow _), hpow _ hθu, hmul _ _ (isUnit_one.neg.pow _) hGvu, hneg, one_mul] at h1
+    rw [hmul _ _ hdu (hθu.pow _), hpow _ hθu, hmul _ _ (isUnit_one.neg.pow _) hGvu, hneg, one_mul]
+      at h1
     exact h1
   have hGu : IsUnit G := isUnit_of_mul_isUnit_right (by rw [← hG]; exact hGvu)
   have hAGv : M.modK P.Gv = (M.modK (algebraMap F E e))⁻¹ ^ (2 * r * (r + 1)) * M.modK G := by
@@ -106,8 +132,10 @@ theorem local_height_scaling : ∀ {F : Type} [Field F] [ValuativeRel F] [Topolo
     exact hl.2.2
   have hdu' : ∀ l ∈ P.ends, IsUnit (d l) := fun l hl =>
     isUnit_of_mul_isUnit_right (by rw [← hD l hl]; exact hDu l hl)
-  have hAD : ∀ l ∈ P.ends, M.modK (P.Dm l * M.L.cj (P.Dm l)) =
-      ((M.modK (algebraMap F E e))⁻¹ ^ (l * (2 * r + 1 - l)) * M.modK (d l)) ^ 2 := by
+  have hAD
+      : ∀ l ∈ P.ends,
+        M.modK (P.Dm l * M.L.cj (P.Dm l))
+          = ((M.modK (algebraMap F E e))⁻¹ ^ (l * (2 * r + 1 - l)) * M.modK (d l)) ^ 2 := by
     intro l hl
     rw [hmul _ _ (hDu l hl) ((hDu l hl).map M.L.cj), (hpc _ (hDu l hl)).2, ← sq, hD l hl, map_pow,
       hmul _ _ (haei.pow _) (hdu' l hl), hpow _ haei, hAei]
@@ -115,8 +143,10 @@ theorem local_height_scaling : ∀ {F : Type} [Field F] [ValuativeRel F] [Topolo
   have hb : 0 < M.modK (algebraMap F E e) := (hpc _ hae).1
   have hc : 0 < M.modK G := (hpc _ hGu).1
   have hδ : ∀ l ∈ P.ends, 0 < M.modK (d l) := fun l hl => (hpc _ (hdu' l hl)).1
-  have hAdet' : M.modK (H.gram P.MMgen).det = (M.modK (algebraMap F E e))⁻¹ ^ (2 * r * (r + 1)) *
-      M.modK G / M.modK (algebraMap F E (LocNG.theta M)) ^ (2 * (r + 1)) := by
+  have hAdet'
+      : M.modK (H.gram P.MMgen).det
+        = (M.modK (algebraMap F E e))⁻¹ ^ (2 * r * (r + 1)) * M.modK G
+          / M.modK (algebraMap F E (LocNG.theta M)) ^ (2 * (r + 1)) := by
     rw [← hAGv, ← hAdet, mul_div_cancel_right₀ _ (pow_ne_zero _ ha.ne')]
   refine ⟨fun hp => ?_, ?_⟩
   · obtain ⟨hs, hGo, hDo⟩ := hp

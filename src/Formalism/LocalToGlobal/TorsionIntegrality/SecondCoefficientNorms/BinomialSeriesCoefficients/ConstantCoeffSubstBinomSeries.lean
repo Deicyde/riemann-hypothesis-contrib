@@ -23,8 +23,7 @@ theorem binom_succ (z : K) (n : ℕ) : ((n : K) + 1) * binom z (n + 1) = (z - n)
   push_cast
   field_simp
 
-theorem binom_pascal (z : K) (k : ℕ) :
-    binom (z + 1) (k + 1) = binom z (k + 1) + binom z k := by
+theorem binom_pascal (z : K) (k : ℕ) : binom (z + 1) (k + 1) = binom z (k + 1) + binom z k := by
   unfold binom
   rw [Finset.prod_range_succ' (fun i : ℕ => z + 1 - (i : K)),
     Finset.prod_range_succ (fun i : ℕ => z - (i : K)), Nat.factorial_succ]
@@ -44,8 +43,9 @@ theorem binom_zero_succ (k : ℕ) : binom (0 : K) (k + 1) = 0 := by
 
 def binomSeries (z : K) : PowerSeries K := PowerSeries.mk (binom z)
 
-theorem binomSeries_ode (z : K) :
-    (1 + PowerSeries.X) * PowerSeries.derivative (R := K) (binomSeries z) = z • binomSeries z := by
+theorem binomSeries_ode (z : K)
+    : (1 + PowerSeries.X) * PowerSeries.derivative (R := K) (binomSeries z)
+      = z • binomSeries z := by
   ext n
   rw [add_mul, one_mul, map_add (f := _), PowerSeries.coeff_derivative, PowerSeries.coeff_smul]
   cases n with
@@ -61,21 +61,23 @@ theorem binomSeries_ode (z : K) :
     push_cast at h ⊢
     linear_combination h
 
-theorem constantCoeff_subst_binomSeries (z : K) {g : MvPowerSeries σ K}
-    (hg : MvPowerSeries.constantCoeff g = 0) :
-    MvPowerSeries.constantCoeff (PowerSeries.subst g (binomSeries z)) = 1 := by
-  have h := IntegralMvPolynomialLemmas.coeff_subst_congr (g := binomSeries z) (h := PowerSeries.C (1 : K)) hg 0
-    (fun k hk => by
-      have : k = 0 := by simpa using hk
-      subst this
-      simp [binomSeries, binom_zero])
+theorem constantCoeff_subst_binomSeries
+    (z : K) {g : MvPowerSeries σ K} (hg : MvPowerSeries.constantCoeff g = 0)
+    : MvPowerSeries.constantCoeff (PowerSeries.subst g (binomSeries z)) = 1 := by
+  have h :=
+    IntegralMvPolynomialLemmas.coeff_subst_congr (g := binomSeries z) (h := PowerSeries.C (1 : K))
+      hg 0
+      (fun k hk => by
+        have : k = 0 := by simpa using hk
+        subst this
+        simp [binomSeries, binom_zero])
   rw [PowerSeries.subst_C] at h
   rw [← MvPowerSeries.coeff_zero_eq_constantCoeff_apply, h]
   simp
 
-theorem subst_binomSeries_eq_mvExp (z : K) {f : MvPowerSeries σ K}
-    (hf : MvPowerSeries.constantCoeff f = 0) :
-    PowerSeries.subst (mvExp f - 1) (binomSeries z) = mvExp (z • f) := by
+theorem subst_binomSeries_eq_mvExp
+    (z : K) {f : MvPowerSeries σ K} (hf : MvPowerSeries.constantCoeff f = 0)
+    : PowerSeries.subst (mvExp f - 1) (binomSeries z) = mvExp (z • f) := by
   have hg : MvPowerSeries.constantCoeff (mvExp f - 1) = 0 := by
     rw [map_sub, constantCoeff_mvExp hf, map_one, sub_self]
   have hs : PowerSeries.HasSubst (mvExp f - 1) := hasSubst_of_cc hg
@@ -83,20 +85,24 @@ theorem subst_binomSeries_eq_mvExp (z : K) {f : MvPowerSeries σ K}
     rw [MvPowerSeries.smul_eq_C_mul, map_mul, hf, mul_zero]
   have hnzf : MvPowerSeries.constantCoeff (-(z • f)) = 0 := by rw [map_neg, hzf, neg_zero]
   set B := PowerSeries.subst (mvExp f - 1) (binomSeries z) with hB
-  have hode : mvExp f * PowerSeries.subst (mvExp f - 1) (PowerSeries.derivative (R := K) (binomSeries z))
-      = z • B := by
+  have hode
+      : mvExp f * PowerSeries.subst (mvExp f - 1) (PowerSeries.derivative (R := K) (binomSeries z))
+        = z • B := by
     have h := congrArg (PowerSeries.subst (mvExp f - 1)) (binomSeries_ode z)
     rw [PowerSeries.subst_mul hs, PowerSeries.subst_add hs, PowerSeries.subst_X hs,
-      PowerSeries.subst_smul hs, ← PowerSeries.coe_substAlgHom hs, map_one,
-      PowerSeries.coe_substAlgHom hs] at h
+        PowerSeries.subst_smul hs, ← PowerSeries.coe_substAlgHom hs, map_one,
+        PowerSeries.coe_substAlgHom hs]
+      at h
     rw [hB, ← h]
     ring
-  have hd : ∀ i, MvPowerSeries.pderiv (R := K) i B =
-      MvPowerSeries.C z * MvPowerSeries.pderiv (R := K) i f * B := by
+  have hd
+      : ∀ i,
+        MvPowerSeries.pderiv (R := K) i B
+          = MvPowerSeries.C z * MvPowerSeries.pderiv (R := K) i f * B := by
     intro i
     apply (isUnit_mvExp hf).mul_left_cancel
-    rw [hB, IntegralMvPolynomialLemmas.pderiv_subst _ hg, ← mul_assoc, hode, map_sub, MvPowerSeries.pderiv_one, sub_zero,
-      pderiv_mvExp hf, MvPowerSeries.smul_eq_C_mul]
+    rw [hB, IntegralMvPolynomialLemmas.pderiv_subst _ hg, ← mul_assoc, hode, map_sub,
+      MvPowerSeries.pderiv_one, sub_zero, pderiv_mvExp hf, MvPowerSeries.smul_eq_C_mul]
     ring
   have key : B * mvExp (-(z • f)) = 1 := by
     refine MvPowerSeries.pderiv.ext (fun i => ?_) ?_
@@ -106,7 +112,8 @@ theorem subst_binomSeries_eq_mvExp (z : K) {f : MvPowerSeries σ K}
       ring
     · rw [map_mul, constantCoeff_mvExp hnzf, hB, constantCoeff_subst_binomSeries z hg, map_one,
         mul_one]
-  calc B = B * (mvExp (-(z • f)) * mvExp (z • f)) := by rw [mvExp_neg hzf, mul_one]
+  calc
+    B = B * (mvExp (-(z • f)) * mvExp (z • f)) := by rw [mvExp_neg hzf, mul_one]
     _ = mvExp (z • f) := by rw [← mul_assoc, key, one_mul]
 
 theorem expIntegralBinomial' : LGBinom := by
@@ -136,8 +143,9 @@ theorem intBinomialScalar' : IntBinomScalar := by
       have h := binom_pascal (((-(m : ℤ) - 1 : ℤ)) : K) k
       have e : (((-(m : ℤ) - 1 : ℤ)) : K) + 1 = ((-(m : ℤ) : ℤ) : K) := by push_cast; ring
       rw [e] at h
-      have h2 : binom (((-(m : ℤ) - 1 : ℤ)) : K) (k + 1) =
-          binom ((-(m : ℤ) : ℤ) : K) (k + 1) - binom (((-(m : ℤ) - 1 : ℤ)) : K) k := by
+      have h2
+          : binom (((-(m : ℤ) - 1 : ℤ)) : K) (k + 1)
+            = binom ((-(m : ℤ) : ℤ) : K) (k + 1) - binom (((-(m : ℤ) - 1 : ℤ)) : K) k := by
         rw [h]; ring
       rw [h2]
       exact R.sub_mem hm (ih _)

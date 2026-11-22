@@ -8,8 +8,13 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem invariant_derivation_exists :
-    ∀ (k A : Type) [CommRing k] [CommRing A] [Algebra k A] (ε : A →ₐ[k] k) (Δ : A →ₐ[k] A ⊗[k] A), ((∀ a : A, TensorProduct.lid k A (LinearMap.rTensor A ε.toLinearMap (Δ a)) = a) ∧ (∀ a : A, TensorProduct.rid k A (LinearMap.lTensor A ε.toLinearMap (Δ a)) = a)) → ∀ l : A →ₗ[k] k, (∀ a b, l (a * b) = ε a * l b + ε b * l a) → ∃ D : Derivation k A A, ∀ a, ε (D a) = l a := by
+theorem invariant_derivation_exists
+    : ∀ (k A : Type) [CommRing k] [CommRing A] [Algebra k A] (ε : A →ₐ[k] k) (Δ : A →ₐ[k] A ⊗[k] A),
+      ((∀ a : A, TensorProduct.lid k A (LinearMap.rTensor A ε.toLinearMap (Δ a)) = a)
+          ∧ (∀ a : A, TensorProduct.rid k A (LinearMap.lTensor A ε.toLinearMap (Δ a)) = a))
+        → ∀ l : A →ₗ[k] k,
+          (∀ a b, l (a * b) = ε a * l b + ε b * l a)
+            → ∃ D : Derivation k A A, ∀ a, ε (D a) = l a := by
   intro k A _ _ _ ε Δ hε l hl
   obtain ⟨h1, h2⟩ := hε
   let F : A ⊗[k] A →ₗ[k] A := (TensorProduct.rid k A).toLinearMap ∘ₗ LinearMap.lTensor A l
@@ -35,18 +40,21 @@ theorem invariant_derivation_exists :
       rw [add_mul, map_add (f := _), ih₁, ih₂, map_add (f := _), map_add (f := _)]
       ring
   have hEΔ : ∀ a, E (Δ a) = a := fun a => h2 a
-  have hεF : ∀ x : A ⊗[k] A,
-      ε (F x) = l (TensorProduct.lid k A (LinearMap.rTensor A ε.toLinearMap x)) := by
+  have hεF
+      : ∀ x : A ⊗[k] A,
+        ε (F x) = l (TensorProduct.lid k A (LinearMap.rTensor A ε.toLinearMap x)) := by
     intro x
     induction x using TensorProduct.induction_on with
     | zero => simp
     | tmul a b =>
       rw [hF]
       simp [mul_comm]
-    | add x₁ x₂ ih₁ ih₂ => rw [map_add (f := _), map_add (f := _), ih₁, ih₂, map_add (f := _), map_add (f := _), map_add (f := _)]
+    | add x₁ x₂ ih₁ ih₂ =>
+      rw [map_add (f := _), map_add (f := _), ih₁, ih₂, map_add (f := _), map_add (f := _),
+        map_add (f := _)]
   refine ⟨Derivation.mk' (F ∘ₗ Δ.toLinearMap) (fun a b => ?_), fun a => ?_⟩
-  · simp only [LinearMap.coe_comp, Function.comp_apply, AlgHom.toLinearMap_apply, map_mul,
-      key, hEΔ, smul_eq_mul]
+  · simp only [LinearMap.coe_comp, Function.comp_apply, AlgHom.toLinearMap_apply, map_mul, key, hEΔ,
+      smul_eq_mul]
   · show ε (F (Δ a)) = l a
     rw [hεF, h1]
 

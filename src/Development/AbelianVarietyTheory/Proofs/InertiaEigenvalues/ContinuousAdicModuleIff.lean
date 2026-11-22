@@ -5,7 +5,8 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.LocalSituation
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation
 open Topology Filter
 
 namespace GlobalTheory
@@ -17,15 +18,21 @@ private lemma mem_span_pow_smul_iff_exists_pow_smul {R : Type} [CommRing R] (a :
     Submodule.mem_smul_pointwise_iff_exists]
   simp [eq_comm]
 
-theorem continuous_adicModule_iff {R : Type} [CommRing R] (a : R) {M : Type} [AddCommGroup M]
-    [Module R M] {G : Type} [TopologicalSpace G] (f : G → M) :
-    @Continuous G M _ ((Ideal.span {a}).adicModuleTopology M) f ↔
-      ∀ (g : G) (n : ℕ), ∀ᶠ h in 𝓝 g, ∃ y : M, f h - f g = a ^ n • y := by
+theorem continuous_adicModule_iff
+    {R : Type} [CommRing R]
+    (a : R)
+    {M : Type} [AddCommGroup M] [Module R M]
+    {G : Type} [TopologicalSpace G]
+    (f : G → M)
+    : @Continuous G M _ ((Ideal.span {a}).adicModuleTopology M) f
+      ↔ ∀ (g : G) (n : ℕ), ∀ᶠ h in 𝓝 g, ∃ y : M, f h - f g = a ^ n • y := by
   let _ : TopologicalSpace R := (Ideal.span {a}).ringFilterBasis.topology
   let _ : TopologicalSpace M := (Ideal.span {a}).adicModuleTopology M
-  have hB : ∀ y : M, (𝓝 y).HasBasis
-      (fun V : Set M => ∃ n : ℕ, V = ↑((Ideal.span {a}) ^ n • (⊤ : Submodule R M)))
-      (fun V => (fun z => y + z) '' V) := fun y =>
+  have hB
+      : ∀ y : M,
+        (𝓝 y).HasBasis
+          (fun V : Set M => ∃ n : ℕ, V = ↑((Ideal.span {a}) ^ n • (⊤ : Submodule R M)))
+          (fun V => (fun z => y + z) '' V) := fun y =>
     ((Ideal.span {a}).ringFilterBasis.moduleFilterBasis
       ((Ideal.span {a}).adic_module_basis M)).toAddGroupFilterBasis.nhds_hasBasis y
   rw [continuous_iff_continuousAt]
@@ -39,8 +46,13 @@ theorem continuous_adicModule_iff {R : Type} [CommRing R] (a : R) {M : Type} [Ad
   · obtain ⟨n, rfl⟩ := hV
     filter_upwards [H n] with h hh
     obtain ⟨y, hy⟩ := hh
-    exact ⟨a ^ n • y, (mem_span_pow_smul_iff_exists_pow_smul a n _).2 ⟨y, rfl⟩, by
-      show f g + a ^ n • y = f h
-      rw [← hy]; abel⟩
+    exact ⟨
+      a ^ n • y,
+      (mem_span_pow_smul_iff_exists_pow_smul a n _).2 ⟨y, rfl⟩,
+      by
+        show f g + a ^ n • y = f h
+        rw [← hy]
+        abel
+    ⟩
 
 end GlobalTheory

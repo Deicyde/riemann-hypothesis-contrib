@@ -14,12 +14,28 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegralAtSe
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 namespace GlobalTheory.SemilinearModel
 
-theorem unit_section_semilinear : ∀ (W K' : Type) [CommRing W] [IsDomain W] [Field K'] [Algebra W K'] [IsFractionRing W K'] (G : Over (Sp W)) [GrpObj G], IsAbelianScheme G → ∀ (σ : K' →+* K') (τ : W →+* W) (φ : G.left ⟶ G.left) (ρ : pullback G.hom (spMap (algebraMap W K')) ⟶ pullback G.hom (spMap (algebraMap W K'))), (∀ x : W, σ (algebraMap W K' x) = algebraMap W K' (τ x)) → φ ≫ G.hom = G.hom ≫ spMap τ → pullback.fst G.hom (spMap (algebraMap W K')) ≫ φ = ρ ≫ pullback.fst G.hom (spMap (algebraMap W K')) → ∀ (e₀ : Sp W ⟶ G.left), e₀ ≫ G.hom = 𝟙 _ → ∀ x : Sp K' ⟶ pullback G.hom (spMap (algebraMap W K')), x ≫ pullback.fst G.hom (spMap (algebraMap W K')) = spMap (algebraMap W K') ≫ e₀ → x ≫ ρ = spMap σ ≫ x → e₀ ≫ φ = spMap τ ≫ e₀ := by
+theorem unit_section_semilinear
+    : ∀ (W K' : Type) [CommRing W] [IsDomain W] [Field K'] [Algebra W K'] [IsFractionRing W K']
+        (G : Over (Sp W)) [GrpObj G],
+      IsAbelianScheme G
+        → ∀ (σ : K' →+* K') (τ : W →+* W) (φ : G.left ⟶ G.left)
+            (ρ : pullback G.hom (spMap (algebraMap W K'))
+              ⟶ pullback G.hom (spMap (algebraMap W K'))),
+          (∀ x : W, σ (algebraMap W K' x) = algebraMap W K' (τ x)) → φ ≫ G.hom = G.hom ≫ spMap τ
+            → pullback.fst G.hom (spMap (algebraMap W K')) ≫ φ
+              = ρ ≫ pullback.fst G.hom (spMap (algebraMap W K'))
+            → ∀ (e₀ : Sp W ⟶ G.left),
+              e₀ ≫ G.hom = 𝟙 _
+                → ∀ x : Sp K' ⟶ pullback G.hom (spMap (algebraMap W K')),
+                  x ≫ pullback.fst G.hom (spMap (algebraMap W K')) = spMap (algebraMap W K') ≫ e₀
+                    → x ≫ ρ = spMap σ ≫ x
+                    → e₀ ≫ φ = spMap τ ≫ e₀ := by
   intro W K' _ _ _ _ _ G _ hG σ τ φ ρ hστ hφ hρ e₀ he x hx hxρ
   haveI := hG.proper
   have hj : spMap σ ≫ spMap (algebraMap W K') = spMap (algebraMap W K') ≫ spMap τ := by
@@ -35,5 +51,6 @@ theorem unit_section_semilinear : ∀ (W K' : Type) [CommRing W] [IsDomain W] [F
     exact this
   refine ext_of_isDominant_of_isSeparated G.hom ?_ (spMap (algebraMap W K')) ?_
   · rw [Category.assoc, hφ, ← Category.assoc, he, Category.assoc, he]; simp
-  · rw [← Category.assoc, ← hx, Category.assoc, hρ, ← Category.assoc, hxρ, Category.assoc, hx, ← Category.assoc, hj, Category.assoc]
+  · rw [← Category.assoc, ← hx, Category.assoc, hρ, ← Category.assoc, hxρ, Category.assoc, hx,
+      ← Category.assoc, hj, Category.assoc]
 end GlobalTheory.SemilinearModel

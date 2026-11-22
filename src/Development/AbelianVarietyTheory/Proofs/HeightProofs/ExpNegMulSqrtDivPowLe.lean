@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exp_neg_mul_sqrt_div_pow_le (a : ℝ) (D : ℕ) (ha : 0 < a) :
-    ∃ C : ℝ, ∀ m : ℕ, Real.exp (-(a * m * ((m : ℝ) + 1) ^ (-(1 / 2 : ℝ)))) /
-      (((m : ℝ) + 1) ^ (-(1 / 2 : ℝ))) ^ D ≤ C * Real.sqrt (((m : ℝ) + 1) ^ (-(1 / 2 : ℝ))) := by
+theorem exp_neg_mul_sqrt_div_pow_le (a : ℝ) (D : ℕ) (ha : 0 < a)
+    : ∃ C : ℝ, ∀ m : ℕ,
+      Real.exp (-(a * m * ((m : ℝ) + 1) ^ (-(1 / 2 : ℝ)))) / (((m : ℝ) + 1) ^ (-(1 / 2 : ℝ))) ^ D
+        ≤ C * Real.sqrt (((m : ℝ) + 1) ^ (-(1 / 2 : ℝ))) := by
   refine ⟨Real.exp a * ((D + 1).factorial : ℝ) / a ^ (D + 1), fun m => ?_⟩
   set s : ℝ := (m : ℝ) + 1 with hs
   have hs1 : 1 ≤ s := by rw [hs]; have := m.cast_nonneg (α := ℝ); linarith
@@ -19,10 +20,13 @@ theorem exp_neg_mul_sqrt_div_pow_le (a : ℝ) (D : ℕ) (ha : 0 < a) :
   have hx2 : x ^ 2 * s = 1 := by
     rw [hxdef, ← Real.rpow_natCast, ← Real.rpow_mul hs0.le]
     norm_num
-    rw [Real.rpow_neg_one]; field_simp
+    rw [Real.rpow_neg_one]
+    field_simp
   have hmx : (m : ℝ) * x = x⁻¹ - x := by
     have : (m : ℝ) = s - 1 := by rw [hs]; ring
-    rw [this]; field_simp; nlinarith [hx2]
+    rw [this]
+    field_simp
+    nlinarith [hx2]
   set n := D + 1 with hn
   have hK : 0 < Real.exp a * (n.factorial : ℝ) / a ^ n := by positivity
 
@@ -39,17 +43,20 @@ theorem exp_neg_mul_sqrt_div_pow_le (a : ℝ) (D : ℕ) (ha : 0 < a) :
   have h2 : Real.exp (-(a * m * x)) / x ^ D ≤ Real.exp a * (n.factorial : ℝ) / a ^ n * x := by
     rw [div_le_iff₀ (by positivity)]
     rw [div_pow, div_div, mul_div_assoc', div_le_iff₀ (by positivity)] at h1
-    have e : Real.exp a * (n.factorial : ℝ) / a ^ n * x * x ^ D
-        = Real.exp a * (x ^ n * n.factorial) / a ^ n := by
+    have e
+        : Real.exp a * (n.factorial : ℝ) / a ^ n * x * x ^ D
+          = Real.exp a * (x ^ n * n.factorial) / a ^ n := by
       rw [hn, pow_succ]; ring
     rw [e, le_div_iff₀ (by positivity)]
     nlinarith [h1]
 
   have hxs : x ≤ Real.sqrt x := by
-    calc x = Real.sqrt (x ^ 2) := (Real.sqrt_sq hx0.le).symm
+    calc
+      x = Real.sqrt (x ^ 2) := (Real.sqrt_sq hx0.le).symm
       _ ≤ Real.sqrt x := Real.sqrt_le_sqrt (by nlinarith)
-  calc Real.exp (-(a * m * x)) / x ^ D ≤ Real.exp a * (n.factorial : ℝ) / a ^ n * x := h2
-    _ ≤ Real.exp a * (n.factorial : ℝ) / a ^ n * Real.sqrt x :=
-      mul_le_mul_of_nonneg_left hxs hK.le
+  calc
+    Real.exp (-(a * m * x)) / x ^ D
+      ≤ Real.exp a * (n.factorial : ℝ) / a ^ n * x := h2
+    _ ≤ Real.exp a * (n.factorial : ℝ) / a ^ n * Real.sqrt x := mul_le_mul_of_nonneg_left hxs hK.le
 
 end GlobalTheory

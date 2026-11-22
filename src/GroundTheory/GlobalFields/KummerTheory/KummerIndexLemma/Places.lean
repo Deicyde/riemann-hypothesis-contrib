@@ -19,33 +19,33 @@ variable {K : Type*} [Field K] [NumberField K]
 def unitsPowAt (p : ℕ) (T : Finset (HeightOneSpectrum (𝓞 K))) : Subgroup Kˣ :=
   ⨅ v ∈ T, unitsPowIn K p (v.adicCompletion K)
 
-theorem mem_unitsPowAt {p : ℕ} {T : Finset (HeightOneSpectrum (𝓞 K))} {x : Kˣ} :
-    x ∈ unitsPowAt p T ↔ ∀ v ∈ T, x ∈ unitsPowIn K p (v.adicCompletion K) := by
+theorem mem_unitsPowAt {p : ℕ} {T : Finset (HeightOneSpectrum (𝓞 K))} {x : Kˣ}
+    : x ∈ unitsPowAt p T ↔ ∀ v ∈ T, x ∈ unitsPowIn K p (v.adicCompletion K) := by
   simp only [unitsPowAt, Subgroup.mem_iInf]
 
 theorem unitsPowAt_empty (p : ℕ) : unitsPowAt (K := K) p ∅ = ⊤ := by
   ext x
   simp [mem_unitsPowAt]
 
-theorem unitsPowAt_insert [DecidableEq (HeightOneSpectrum (𝓞 K))] (p : ℕ)
-    (v : HeightOneSpectrum (𝓞 K)) (T : Finset (HeightOneSpectrum (𝓞 K))) :
-    unitsPowAt p (insert v T) = unitsPowIn K p (v.adicCompletion K) ⊓ unitsPowAt p T := by
+theorem unitsPowAt_insert
+    [DecidableEq (HeightOneSpectrum (𝓞 K))]
+    (p : ℕ) (v : HeightOneSpectrum (𝓞 K)) (T : Finset (HeightOneSpectrum (𝓞 K)))
+    : unitsPowAt p (insert v T) = unitsPowIn K p (v.adicCompletion K) ⊓ unitsPowAt p T := by
   ext x
   simp only [mem_unitsPowAt, Finset.mem_insert, forall_eq_or_imp, Subgroup.mem_inf]
 
-theorem unitsPow_le_unitsPowAt (p : ℕ) (T : Finset (HeightOneSpectrum (𝓞 K))) :
-    unitsPow K p ≤ unitsPowAt p T := fun _ hx ↦
+theorem unitsPow_le_unitsPowAt (p : ℕ) (T : Finset (HeightOneSpectrum (𝓞 K)))
+    : unitsPow K p ≤ unitsPowAt p T := fun _ hx ↦
   mem_unitsPowAt.2 fun _ _ ↦ unitsPow_le_unitsPowIn K p _ hx
 
 variable {p : ℕ} [Fact p.Prime] [HasEnoughRootsOfUnity K p]
 
-theorem exists_localClass_eq (S T : Finset (HeightOneSpectrum (𝓞 K))) (hST : Disjoint S T)
-    (hpT : ∀ v ∈ T, (p : 𝓞 K) ∉ v.asIdeal)
-    (hidx : (unitsPowAt p T).relIndex ((S : Set (HeightOneSpectrum (𝓞 K))).unit K) =
-      p ^ T.card)
-    (z : ∀ v : HeightOneSpectrum (𝓞 K), (v.adicCompletion K)ˣ)
-    (hz : ∀ v ∈ T, z v ∈ localUnits v) :
-    ∃ δ ∈ (S : Set (HeightOneSpectrum (𝓞 K))).unit K, ∀ v ∈ T,
+theorem exists_localClass_eq
+    (S T : Finset (HeightOneSpectrum (𝓞 K)))
+    (hST : Disjoint S T) (hpT : ∀ v ∈ T, (p : 𝓞 K) ∉ v.asIdeal)
+    (hidx : (unitsPowAt p T).relIndex ((S : Set (HeightOneSpectrum (𝓞 K))).unit K) = p ^ T.card)
+    (z : ∀ v : HeightOneSpectrum (𝓞 K), (v.adicCompletion K)ˣ) (hz : ∀ v ∈ T, z v ∈ localUnits v)
+    : ∃ δ ∈ (S : Set (HeightOneSpectrum (𝓞 K))).unit K, ∀ v ∈ T,
       localClass v p δ = QuotientGroup.mk (z v) := by
   classical
   set Δ := (S : Set (HeightOneSpectrum (𝓞 K))).unit K
@@ -69,8 +69,7 @@ theorem exists_localClass_eq (S T : Finset (HeightOneSpectrum (𝓞 K))) (hST : 
     Subgroup.pi Set.univ fun v ↦ localUnitClasses v.1 p
   have hU : Nat.card U = p ^ T.card := by
     have e : U ≃ ∀ v : T, localUnitClasses v.1 p :=
-      (Equiv.subtypeEquivRight fun f ↦ by simp [U, Subgroup.mem_pi]).trans
-        (Equiv.subtypePiEquivPi)
+      (Equiv.subtypeEquivRight fun f ↦ by simp [U, Subgroup.mem_pi]).trans (Equiv.subtypePiEquivPi)
     rw [Nat.card_congr e, Nat.card_pi,
       Finset.prod_congr rfl fun v _ ↦ natCard_localUnitClasses v.1 p (hpT v.1 v.2),
       Finset.prod_const, Finset.card_univ, Fintype.card_coe]
@@ -80,12 +79,15 @@ theorem exists_localClass_eq (S T : Finset (HeightOneSpectrum (𝓞 K))) (hST : 
     rintro _ ⟨δ, rfl⟩
     rw [Subgroup.mem_pi]
     intro v _
-    exact localClass_mem_localUnitClasses v.1 p (Set.unit_valuation_eq_one (S := (S : Set (HeightOneSpectrum (𝓞 K)))) (K := K) δ (hvS v.1 v.2))
-  have : Finite U := Nat.finite_of_card_ne_zero (by
-    rw [hU]; exact pow_ne_zero _ (Fact.out : p.Prime).ne_zero)
+    exact localClass_mem_localUnitClasses v.1 p
+      (Set.unit_valuation_eq_one (S := (S : Set (HeightOneSpectrum (𝓞 K)))) (K := K) δ
+        (hvS v.1 v.2))
+  have : Finite U :=
+    Nat.finite_of_card_ne_zero (by rw [hU]; exact pow_ne_zero _ (Fact.out : p.Prime).ne_zero)
   have heq : ψ.range = U := Subgroup.eq_of_le_of_card_ge hle (by rw [hU, hrange])
-  have hf : (fun v : T ↦ (QuotientGroup.mk (z v.1) : UnitsModPow (v.1.adicCompletion K) p)) ∈
-      ψ.range := by
+  have hf
+      : (fun v : T ↦ (QuotientGroup.mk (z v.1) : UnitsModPow (v.1.adicCompletion K) p))
+        ∈ ψ.range := by
     rw [heq, Subgroup.mem_pi]
     intro v _
     exact Subgroup.mem_map_of_mem _ (hz v.1 v.2)
@@ -97,17 +99,16 @@ universe u
 
 variable {K : Type u} [Field K] [NumberField K] [HasEnoughRootsOfUnity K p]
 
-
 omit [Fact p.Prime] [HasEnoughRootsOfUnity K p] in
-theorem valuation_eq_one_of_mem_unit {S : Set (HeightOneSpectrum (𝓞 K))} {x : Kˣ}
-    (hx : x ∈ S.unit K) {v : HeightOneSpectrum (𝓞 K)} (hv : v ∉ S) :
-    v.valuation K (x : K) = 1 :=
+theorem valuation_eq_one_of_mem_unit
+    {S : Set (HeightOneSpectrum (𝓞 K))} {x : Kˣ} (hx : x ∈ S.unit K)
+    {v : HeightOneSpectrum (𝓞 K)} (hv : v ∉ S)
+    : v.valuation K (x : K) = 1 :=
   Set.unit_valuation_eq_one (S := S) (K := K) ⟨x, hx⟩ hv
 
-
 omit [HasEnoughRootsOfUnity K p] in
-theorem relIndex_unitsPow_sUnit_ne_zero (S : Finset (HeightOneSpectrum (𝓞 K))) :
-    (unitsPow K p).relIndex ((S : Set (HeightOneSpectrum (𝓞 K))).unit K) ≠ 0 := by
+theorem relIndex_unitsPow_sUnit_ne_zero (S : Finset (HeightOneSpectrum (𝓞 K)))
+    : (unitsPow K p).relIndex ((S : Set (HeightOneSpectrum (𝓞 K))).unit K) ≠ 0 := by
   set Δ := (S : Set (HeightOneSpectrum (𝓞 K))).unit K
   have hfi := Subgroup.finiteIndex_range_powMonoidHom_of_fg Δ (Fact.out : p.Prime).ne_zero
   have hle : (powMonoidHom p : Δ →* Δ).range ≤ (unitsPow K p).subgroupOf Δ := by
@@ -117,24 +118,26 @@ theorem relIndex_unitsPow_sUnit_ne_zero (S : Finset (HeightOneSpectrum (𝓞 K))
   exact fun h ↦ hfi.index_ne_zero (Nat.eq_zero_of_zero_dvd (h ▸ Subgroup.index_dvd_of_le hle))
 
 theorem _root_.GroundTheory.Global.FirstInequality.exists_place_relIndex_unitsPowAt_insert
-    (hFI : FirstInequality.{u}) [DecidableEq (HeightOneSpectrum (𝓞 K))]
-    (S : Finset (HeightOneSpectrum (𝓞 K)))
-    (hpS : ∀ v, (p : 𝓞 K) ∈ v.asIdeal → v ∈ S) {a : Kˣ}
-    (ha : a ∈ (S : Set (HeightOneSpectrum (𝓞 K))).unit K) {T : Finset (HeightOneSpectrum (𝓞 K))}
-    (hidx : (unitsPowAt p T).relIndex ((S : Set (HeightOneSpectrum (𝓞 K))).unit K) =
-      p ^ T.card)
+    (hFI : FirstInequality.{u})
+    [DecidableEq (HeightOneSpectrum (𝓞 K))]
+    (S : Finset (HeightOneSpectrum (𝓞 K))) (hpS : ∀ v, (p : 𝓞 K) ∈ v.asIdeal → v ∈ S)
+    {a : Kˣ} (ha : a ∈ (S : Set (HeightOneSpectrum (𝓞 K))).unit K)
+    {T : Finset (HeightOneSpectrum (𝓞 K))}
+    (hidx : (unitsPowAt p T).relIndex ((S : Set (HeightOneSpectrum (𝓞 K))).unit K) = p ^ T.card)
     {x : Kˣ} (hxΔ : x ∈ (S : Set (HeightOneSpectrum (𝓞 K))).unit K) (hxT : x ∈ unitsPowAt p T)
-    (hxa : x ∉ radicalGroup K p a) :
-    ∃ v, v ∉ S ∧ v ∉ T ∧ a ∈ unitsPowIn K p (v.adicCompletion K) ∧
-      (unitsPowAt p (insert v T)).relIndex ((S : Set (HeightOneSpectrum (𝓞 K))).unit K) =
-        p ^ (T.card + 1) := by
+    (hxa : x ∉ radicalGroup K p a)
+    : ∃ v,
+      v ∉ S ∧ v ∉ T ∧ a ∈ unitsPowIn K p (v.adicCompletion K)
+        ∧ (unitsPowAt p (insert v T)).relIndex ((S : Set (HeightOneSpectrum (𝓞 K))).unit K)
+          = p ^ (T.card + 1) := by
   set Δ := (S : Set (HeightOneSpectrum (𝓞 K))).unit K
   have hfin : ((S : Set (HeightOneSpectrum (𝓞 K))) ∪ T).Finite :=
     (S.finite_toSet).union T.finite_toSet
-  obtain ⟨v, hv, hav, hxv⟩ := hFI.exists_place_mem_unitsPowIn_not_mem hxa hfin
-    (fun v hv ↦ Or.inl (hpS v hv))
-    (fun v hv ↦ valuation_eq_one_of_mem_unit ha (fun h ↦ hv (Or.inl h)))
-    (fun v hv ↦ valuation_eq_one_of_mem_unit hxΔ (fun h ↦ hv (Or.inl h)))
+  obtain ⟨v, hv, hav, hxv⟩ :=
+    hFI.exists_place_mem_unitsPowIn_not_mem hxa hfin
+      (fun v hv ↦ Or.inl (hpS v hv))
+      (fun v hv ↦ valuation_eq_one_of_mem_unit ha (fun h ↦ hv (Or.inl h)))
+      (fun v hv ↦ valuation_eq_one_of_mem_unit hxΔ (fun h ↦ hv (Or.inl h)))
   have hvS : v ∉ S := fun h ↦ hv (Or.inl h)
   have hvT : v ∉ T := fun h ↦ hv (Or.inr h)
   refine ⟨v, hvS, hvT, hav, ?_⟩
@@ -158,21 +161,22 @@ theorem _root_.GroundTheory.Global.FirstInequality.exists_place_relIndex_unitsPo
   · exact hp
 
 theorem _root_.GroundTheory.Global.FirstInequality.exists_places_unitsPowAt
-    (hFI : FirstInequality.{u}) (S : Finset (HeightOneSpectrum (𝓞 K)))
-    (hpS : ∀ v, (p : 𝓞 K) ∈ v.asIdeal → v ∈ S) {a : Kˣ}
-    (ha : a ∈ (S : Set (HeightOneSpectrum (𝓞 K))).unit K) :
-    ∃ T : Finset (HeightOneSpectrum (𝓞 K)), Disjoint S T ∧
-      (∀ v ∈ T, a ∈ unitsPowIn K p (v.adicCompletion K)) ∧
-      (unitsPowAt p T).relIndex ((S : Set (HeightOneSpectrum (𝓞 K))).unit K) = p ^ T.card ∧
-      ∀ x ∈ (S : Set (HeightOneSpectrum (𝓞 K))).unit K, x ∈ unitsPowAt p T →
-        x ∈ radicalGroup K p a := by
+    (hFI : FirstInequality.{u})
+    (S : Finset (HeightOneSpectrum (𝓞 K))) (hpS : ∀ v, (p : 𝓞 K) ∈ v.asIdeal → v ∈ S)
+    {a : Kˣ} (ha : a ∈ (S : Set (HeightOneSpectrum (𝓞 K))).unit K)
+    : ∃ T : Finset (HeightOneSpectrum (𝓞 K)),
+      Disjoint S T ∧ (∀ v ∈ T, a ∈ unitsPowIn K p (v.adicCompletion K))
+        ∧ (unitsPowAt p T).relIndex ((S : Set (HeightOneSpectrum (𝓞 K))).unit K) = p ^ T.card
+        ∧ ∀ x ∈ (S : Set (HeightOneSpectrum (𝓞 K))).unit K,
+          x ∈ unitsPowAt p T → x ∈ radicalGroup K p a := by
   classical
   set Δ := (S : Set (HeightOneSpectrum (𝓞 K))).unit K
-  let Good : Finset (HeightOneSpectrum (𝓞 K)) → Prop := fun T ↦ Disjoint S T ∧
-    (∀ v ∈ T, a ∈ unitsPowIn K p (v.adicCompletion K)) ∧
-    (unitsPowAt p T).relIndex Δ = p ^ T.card
-  have key : ∀ n : ℕ, ∃ T, Good T ∧
-      (n ≤ T.card ∨ ∀ x ∈ Δ, x ∈ unitsPowAt p T → x ∈ radicalGroup K p a) := by
+  let Good : Finset (HeightOneSpectrum (𝓞 K)) → Prop := fun T ↦
+    Disjoint S T ∧ (∀ v ∈ T, a ∈ unitsPowIn K p (v.adicCompletion K))
+      ∧ (unitsPowAt p T).relIndex Δ = p ^ T.card
+  have key
+      : ∀ n : ℕ, ∃ T,
+        Good T ∧ (n ≤ T.card ∨ ∀ x ∈ Δ, x ∈ unitsPowAt p T → x ∈ radicalGroup K p a) := by
     intro n
     induction n with
     | zero =>

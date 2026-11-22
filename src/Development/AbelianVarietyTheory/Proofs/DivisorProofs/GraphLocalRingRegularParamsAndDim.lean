@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TrdegComplex
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -22,7 +24,9 @@ noncomputable section
 
 namespace GlobalTheory.DiagLoc
 
-theorem ennreal_volume_ratio_step_cancel (d : WithBot ℕ∞) (m n : ℕ) (hd : d + m = ((n + m : ℕ) : WithBot ℕ∞)) : d = n := by
+theorem ennreal_volume_ratio_step_cancel
+    (d : WithBot ℕ∞) (m n : ℕ) (hd : d + m = ((n + m : ℕ) : WithBot ℕ∞))
+    : d = n := by
   induction d using WithBot.recBotCoe with
   | bot =>
     exfalso
@@ -34,28 +38,35 @@ theorem ennreal_volume_ratio_step_cancel (d : WithBot ℕ∞) (m n : ℕ) (hd : 
     subst h2
     rfl
 
-theorem isLocModel_top {K : Type} [Field K] [Algebra ℂ K] [Algebra.EssFiniteType ℂ K] :
-    IsLocModel (algebraMap ℂ K) (⊤ : Subring K) :=
-  { const_mem := fun _ => Subring.mem_top _
-    isLocalRing := (Subring.topEquiv (R := K)).symm.isLocalRing
-    essFiniteType := by
-      let e := (Subring.topEquiv (R := K)).symm
-      exact RingHom.EssFiniteType.comp (RingHom.essFiniteType_algebraMap.mpr inferInstance)
-        (RingHom.FiniteType.of_surjective e.toRingHom e.surjective).essFiniteType
-    frac := fun f => ⟨f, Subring.mem_top _, 1, Subring.mem_top _, one_ne_zero, mul_one f⟩ }
+theorem isLocModel_top {K : Type} [Field K] [Algebra ℂ K] [Algebra.EssFiniteType ℂ K]
+    : IsLocModel (algebraMap ℂ K) (⊤ : Subring K) := {
+  const_mem := fun _ => Subring.mem_top _
+  isLocalRing := (Subring.topEquiv (R := K)).symm.isLocalRing
+  essFiniteType := by
+    let e := (Subring.topEquiv (R := K)).symm
+    exact RingHom.EssFiniteType.comp (RingHom.essFiniteType_algebraMap.mpr inferInstance)
+      (RingHom.FiniteType.of_surjective e.toRingHom e.surjective).essFiniteType
+  frac := fun f => ⟨f, Subring.mem_top _, 1, Subring.mem_top _, one_ne_zero, mul_one f⟩
+}
 
-variable {K κ' : Type} [Field K] [Field κ'] [Algebra ℂ K] [Algebra ℂ κ']
+variable
+  {K κ' : Type} [Field K] [Field κ'] [Algebra ℂ K] [Algebra ℂ κ']
   (L : Type) [Field L] [Algebra (K ⊗[ℂ] κ') L] [IsFractionRing (K ⊗[ℂ] κ') L]
 
-theorem maximalIdeal_eq_span (σ : K →ₐ[ℂ] κ') (n : ℕ) (x : Fin n → K)
-    [Algebra.EssFiniteType ℂ K] (hx : TrBasis (algebraMap ℂ K) x) :
-    IsLocalRing.maximalIdeal (loc L σ) =
-      Ideal.span (Set.range fun i => toLoc L σ (x i ⊗ₜ[ℂ] 1 - 1 ⊗ₜ[ℂ] σ (x i))) := by
-  obtain ⟨e, he1, he⟩ := GlobalTheory.FieldPair.exists_mul_ker_mem_span_trBasis_diff n x σ (⊤ : Subring K) hx
-    isLocModel_top
+theorem maximalIdeal_eq_span
+    (σ : K →ₐ[ℂ] κ')
+    (n : ℕ) (x : Fin n → K)
+    [Algebra.EssFiniteType ℂ K]
+    (hx : TrBasis (algebraMap ℂ K) x)
+    : IsLocalRing.maximalIdeal (loc L σ)
+      = Ideal.span (Set.range fun i => toLoc L σ (x i ⊗ₜ[ℂ] 1 - 1 ⊗ₜ[ℂ] σ (x i))) := by
+  obtain ⟨e, he1, he⟩ :=
+    GlobalTheory.FieldPair.exists_mul_ker_mem_span_trBasis_diff n x σ (⊤ : Subring K) hx
+      isLocModel_top
   haveI hP : (RingHom.ker (Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ'))).IsPrime :=
     RingHom.ker_isPrime _
-  have heP : e ∈ (RingHom.ker (Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ'))).primeCompl := by
+  have heP
+      : e ∈ (RingHom.ker (Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ'))).primeCompl := by
     rw [Ideal.mem_primeCompl_iff]
     intro h
     rw [RingHom.mem_ker] at h
@@ -75,13 +86,15 @@ theorem maximalIdeal_eq_span (σ : K →ₐ[ℂ] κ') (n : ℕ) (x : Fin n → K
   · rw [Ideal.map_le_iff_le_comap]
     intro a ha
     rw [Ideal.mem_comap]
-    obtain ⟨u, hu⟩ := IsLocalization.map_units
-      (M := (RingHom.ker (Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ'))).primeCompl)
-      (S := ↥(loc L σ)) ⟨e, heP⟩
+    obtain ⟨u, hu⟩ :=
+      IsLocalization.map_units
+        (M := (RingHom.ker (Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ'))).primeCompl)
+        (S := ↥(loc L σ)) ⟨e, heP⟩
     have h1 := Ideal.mem_map_of_mem (algebraMap (K ⊗[ℂ] κ') ↥(loc L σ)) (he a ha)
     rw [Ideal.map_span, ← Set.range_comp] at h1
-    have h2 : algebraMap (K ⊗[ℂ] κ') ↥(loc L σ) a =
-        ((u⁻¹ : (↥(loc L σ))ˣ) : ↥(loc L σ)) * algebraMap (K ⊗[ℂ] κ') ↥(loc L σ) (e * a) := by
+    have h2
+        : algebraMap (K ⊗[ℂ] κ') ↥(loc L σ) a
+          = ((u⁻¹ : (↥(loc L σ))ˣ) : ↥(loc L σ)) * algebraMap (K ⊗[ℂ] κ') ↥(loc L σ) (e * a) := by
       rw [map_mul, show algebraMap (K ⊗[ℂ] κ') ↥(loc L σ) e = (u : ↥(loc L σ)) from hu.symm,
         ← mul_assoc, Units.inv_mul, one_mul]
     rw [h2]
@@ -92,9 +105,12 @@ theorem maximalIdeal_eq_span (σ : K →ₐ[ℂ] κ') (n : ℕ) (x : Fin n → K
     rw [RingHom.mem_ker]
     simp
 
-theorem ringKrullDim_loc (σ : K →ₐ[ℂ] κ') (n : ℕ) (x : Fin n → K)
-    [Algebra.EssFiniteType ℂ K] [Algebra.EssFiniteType ℂ κ'] (hx : TrBasis (algebraMap ℂ K) x) :
-    ringKrullDim (loc L σ) = n := by
+theorem ringKrullDim_loc
+    (σ : K →ₐ[ℂ] κ')
+    (n : ℕ) (x : Fin n → K)
+    [Algebra.EssFiniteType ℂ K] [Algebra.EssFiniteType ℂ κ']
+    (hx : TrBasis (algebraMap ℂ K) x)
+    : ringKrullDim (loc L σ) = n := by
   haveI hP : (RingHom.ker (Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ'))).IsPrime := RingHom.ker_isPrime _
   haveI : IsDomain (K ⊗[ℂ] κ') :=
     Function.Injective.isDomain (algebraMap (K ⊗[ℂ] κ') L) (IsFractionRing.injective (K ⊗[ℂ] κ') L)
@@ -109,8 +125,10 @@ theorem ringKrullDim_loc (σ : K →ₐ[ℂ] κ') (n : ℕ) (x : Fin n → K)
   haveI : Algebra.EssFiniteType (K ⊗[ℂ] κ') ↥(loc L σ) :=
     Algebra.EssFiniteType.of_isLocalization _ (RingHom.ker (Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ'))).primeCompl
   haveI : Algebra.EssFiniteType ℂ ↥(loc L σ) := Algebra.EssFiniteType.comp ℂ (K ⊗[ℂ] κ') ↥(loc L σ)
-  have hg : ∀ y : (RingHom.ker (Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ'))).primeCompl,
-      IsUnit ((Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ')).toRingHom (y : K ⊗[ℂ] κ')) := by
+  have hg
+      : ∀ y : (RingHom.ker (Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ'))).primeCompl,
+        IsUnit ((Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ')).toRingHom
+          (y : K ⊗[ℂ] κ')) := by
     intro y
     rw [isUnit_iff_ne_zero]
     intro h
@@ -119,18 +137,18 @@ theorem ringKrullDim_loc (σ : K →ₐ[ℂ] κ') (n : ℕ) (x : Fin n → K)
   haveI : IsScalarTower ℂ ↥(loc L σ) κ' := IsScalarTower.of_algebraMap_eq fun c =>
     ((IsLocalization.lift_eq hg (algebraMap ℂ (K ⊗[ℂ] κ') c)).trans
       ((Algebra.TensorProduct.productMap σ (AlgHom.id ℂ κ')).commutes c)).symm
-  have hsurj : Function.Surjective (algebraMap ↥(loc L σ) κ') := fun b =>
-    ⟨algebraMap (K ⊗[ℂ] κ') ↥(loc L σ) (1 ⊗ₜ b), by
+  have hsurj : Function.Surjective (algebraMap ↥(loc L σ) κ') := fun b => ⟨
+    algebraMap (K ⊗[ℂ] κ') ↥(loc L σ) (1 ⊗ₜ b),
+    by
       show IsLocalization.lift hg _ = b
       rw [IsLocalization.lift_eq]
-      simp⟩
+      simp
+  ⟩
   have hx' : IsTranscendenceBasis ℂ x := by
     unfold TrBasis at hx
     rwa [toAlgebra_algebraMap] at hx
-  have hK : Algebra.trdeg ℂ K = n := by
-    rw [← hx'.cardinalMk_eq_trdeg, Cardinal.mk_fin]
-  have hfin : Algebra.trdeg ℂ κ' < Cardinal.aleph0 := by
-    exact trdeg_lt_aleph0 ℂ κ'
+  have hK : Algebra.trdeg ℂ K = n := by rw [← hx'.cardinalMk_eq_trdeg, Cardinal.mk_fin]
+  have hfin : Algebra.trdeg ℂ κ' < Cardinal.aleph0 := by exact trdeg_lt_aleph0 ℂ κ'
   have hm : Algebra.trdeg ℂ κ' = ((Algebra.trdeg ℂ κ').toNat : Cardinal) :=
     (Cardinal.cast_toNat_of_lt_aleph0 hfin).symm
   haveI : FaithfulSMul ℂ K :=
@@ -151,15 +169,18 @@ theorem ringKrullDim_loc (σ : K →ₐ[ℂ] κ') (n : ℕ) (x : Fin n → K)
     push_cast
     rfl
   exact ennreal_volume_ratio_step_cancel _ _ _
-    (GlobalTheory.LocModelDim.ringKrullDim_add_trdeg (k := ℂ) (R := ↥(loc L σ)) (Ω := κ') hsurj hm hR)
+    (GlobalTheory.LocModelDim.ringKrullDim_add_trdeg (k := ℂ) (R := ↥(loc L σ)) (Ω := κ') hsurj hm
+      hR)
 
-theorem maximalIdeal_eq_span_and_ringKrullDim : ∀ {K κ' L : Type} [Field K] [Field κ'] [Field L] [Algebra ℂ K]
-  [Algebra ℂ κ'] [Algebra ℂ L] [Algebra (K ⊗[ℂ] κ') L] [IsScalarTower ℂ (K ⊗[ℂ] κ') L]
-  [IsFractionRing (K ⊗[ℂ] κ') L] (σ : K →ₐ[ℂ] κ') (n : ℕ) (x : Fin n → K),
-  Algebra.EssFiniteType ℂ K → Algebra.EssFiniteType ℂ κ' → TrBasis (algebraMap ℂ K) x →
-  IsLocalRing.maximalIdeal (GlobalTheory.DiagLoc.loc L σ) =
-      Ideal.span (Set.range fun i => GlobalTheory.DiagLoc.toLoc L σ (x i ⊗ₜ[ℂ] 1 - 1 ⊗ₜ[ℂ] σ (x i))) ∧
-    ringKrullDim (GlobalTheory.DiagLoc.loc L σ) = n := by
+theorem maximalIdeal_eq_span_and_ringKrullDim
+    : ∀ {K κ' L : Type} [Field K] [Field κ'] [Field L] [Algebra ℂ K] [Algebra ℂ κ'] [Algebra ℂ L]
+        [Algebra (K ⊗[ℂ] κ') L] [IsScalarTower ℂ (K ⊗[ℂ] κ') L] [IsFractionRing (K ⊗[ℂ] κ') L]
+        (σ : K →ₐ[ℂ] κ') (n : ℕ) (x : Fin n → K),
+      Algebra.EssFiniteType ℂ K → Algebra.EssFiniteType ℂ κ' → TrBasis (algebraMap ℂ K) x
+        → IsLocalRing.maximalIdeal (GlobalTheory.DiagLoc.loc L σ)
+            = Ideal.span (Set.range fun i =>
+              GlobalTheory.DiagLoc.toLoc L σ (x i ⊗ₜ[ℂ] 1 - 1 ⊗ₜ[ℂ] σ (x i)))
+          ∧ ringKrullDim (GlobalTheory.DiagLoc.loc L σ) = n := by
   intro K κ' L _ _ _ _ _ _ _ _ _ σ n x hK hκ hx
   exact ⟨maximalIdeal_eq_span L σ n x hx, ringKrullDim_loc L σ n x hx⟩
 

@@ -8,8 +8,11 @@ open Polynomial
 
 namespace GlobalTheory.SepCharpoly
 
-theorem charpoly_dvd_pow_of_aeval_eq_zero {R : Type*} [CommRing R] {n : Type*} [Fintype n] [DecidableEq n]
-    (M : Matrix n n R) (p : R[X]) (hp : aeval M p = 0) : M.charpoly ∣ p ^ Fintype.card n := by
+theorem charpoly_dvd_pow_of_aeval_eq_zero
+    {R : Type*} [CommRing R]
+    {n : Type*} [Fintype n] [DecidableEq n]
+    (M : Matrix n n R) (p : R[X]) (hp : aeval M p = 0)
+    : M.charpoly ∣ p ^ Fintype.card n := by
   set a : Matrix n n R[X] := algebraMap R[X] (Matrix n n R[X]) X with ha_def
   set b : Matrix n n R[X] := (Algebra.ofId R R[X]).mapMatrix M with hb_def
   have hab : Commute a b := Algebra.commutes X b
@@ -22,22 +25,23 @@ theorem charpoly_dvd_pow_of_aeval_eq_zero {R : Type*} [CommRing R] {n : Type*} [
       exact ⟨H1 + H2, by rw [mul_add, h1, h2, map_add (f := _), map_add (f := _)]; abel⟩
     | monomial k c =>
       refine ⟨algebraMap R (Matrix n n R[X]) c * ∑ i ∈ Finset.range k, a ^ i * b ^ (k - 1 - i), ?_⟩
-      rw [aeval_monomial, aeval_monomial, ← mul_assoc, ← Algebra.commutes, mul_assoc, hab.mul_geom_sum₂,
-        mul_sub]
+      rw [aeval_monomial, aeval_monomial, ← mul_assoc, ← Algebra.commutes, mul_assoc,
+        hab.mul_geom_sum₂, mul_sub]
   obtain ⟨H, hH⟩ := key p
-  have hb : aeval b p = 0 := by
-    rw [hb_def, aeval_algHom_apply, hp, map_zero]
+  have hb : aeval b p = 0 := by rw [hb_def, aeval_algHom_apply, hp, map_zero]
   have ha : aeval a p = algebraMap R[X] (Matrix n n R[X]) p := by
     rw [ha_def, aeval_algebraMap_apply, aeval_X_left_apply]
   have hch : (a - b).det = M.charpoly := rfl
   refine ⟨H.det, ?_⟩
-  rw [← hch, ← Matrix.det_mul, hH, hb, sub_zero, ha, Matrix.algebraMap_eq_diagonal, Matrix.det_diagonal]
+  rw [← hch, ← Matrix.det_mul, hH, hb, sub_zero, ha, Matrix.algebraMap_eq_diagonal,
+    Matrix.det_diagonal]
   simp
 
-theorem not_separable_charpoly : ∀ (F L C : Type) [Field F] [Field L] [Algebra F L] [Ring C] [Algebra F C]
-    [FiniteDimensional F C] (n : ℕ) (ι : C →ₐ[F] Matrix (Fin n) (Fin n) L) (y : C),
-    ((minpoly F y).natDegree < n ∨ ((minpoly F y).natDegree = n ∧ ¬ (minpoly F y).Separable)) →
-      ¬ (ι y).charpoly.Separable := by
+theorem not_separable_charpoly
+    : ∀ (F L C : Type) [Field F] [Field L] [Algebra F L] [Ring C] [Algebra F C]
+        [FiniteDimensional F C] (n : ℕ) (ι : C →ₐ[F] Matrix (Fin n) (Fin n) L) (y : C),
+      ((minpoly F y).natDegree < n ∨ ((minpoly F y).natDegree = n ∧ ¬(minpoly F y).Separable))
+        → ¬(ι y).charpoly.Separable := by
   intro F L C _ _ _ _ _ _ n ι y h hc
   have hyi : IsIntegral F y := IsIntegral.of_finite F y
   have hpm : (minpoly F y).Monic := minpoly.monic hyi
@@ -51,7 +55,8 @@ theorem not_separable_charpoly : ∀ (F L C : Type) [Field F] [Field L] [Algebra
   have hmm : ((minpoly F y).map (algebraMap F L)).Monic := hpm.map _
   have hdc : (ι y).charpoly.natDegree = n := by
     rw [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
-  have hdm : ((minpoly F y).map (algebraMap F L)).natDegree = (minpoly F y).natDegree := natDegree_map _
+  have hdm : ((minpoly F y).map (algebraMap F L)).natDegree = (minpoly F y).natDegree :=
+    natDegree_map _
   rcases h with h | ⟨h, hns⟩
   · have := natDegree_le_of_dvd h5 hmm.ne_zero
     omega

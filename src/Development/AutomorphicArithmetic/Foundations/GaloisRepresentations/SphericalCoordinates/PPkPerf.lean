@@ -4,8 +4,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
@@ -263,8 +266,7 @@ end SlopeTestRemainingChoices
 
 end UpperTheory.Gal.W2
 
-theorem UpperTheory.Gal.W2.pkPerf_of :
-    UpperTheory.Gal.W2.MemDual → UpperTheory.Gal.W2.PkPerf := by
+theorem UpperTheory.Gal.W2.pkPerf_of : UpperTheory.Gal.W2.MemDual → UpperTheory.Gal.W2.PkPerf := by
   intro hMD p _ D G L β A g s hs M hM x
   obtain ⟨d, hd0, hdual⟩ := hMD p G
   have hn : ‖(s : ℚ_[p])‖ = ‖((g.1⁻¹ : ℚ_[p]ˣ) : ℚ_[p])‖ := by

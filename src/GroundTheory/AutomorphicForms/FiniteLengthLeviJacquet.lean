@@ -19,13 +19,15 @@ open Matrix Iwasawa GLnLocal Topology MeasureTheory Measure
 
 universe u
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ}
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
 
-theorem sqrtModularLeviPar_of_mem_unipotentRadical {β γ δ : Fin n → ℕ} (q : leviPar F n β γ)
-    (hq : (q : GL (Fin n) F) ∈ unipotentRadical F n δ) : sqrtModularLeviPar F n β γ q = 1 := by
-  obtain ⟨e, he⟩ := exists_unipotentCompactG_of_isCompact (γ := δ)
-    (isCompact_singleton (x := (q : GL (Fin n) F))) (by simpa using hq)
+theorem sqrtModularLeviPar_of_mem_unipotentRadical
+    {β γ δ : Fin n → ℕ} (q : leviPar F n β γ) (hq : (q : GL (Fin n) F) ∈ unipotentRadical F n δ)
+    : sqrtModularLeviPar F n β γ q = 1 := by
+  obtain ⟨e, he⟩ :=
+    exists_unipotentCompactG_of_isCompact (γ := δ) (isCompact_singleton (x := (q : GL (Fin n) F)))
+      (by simpa using hq)
   have hk : rankTorus F n δ e * q * (rankTorus F n δ e)⁻¹ ∈ integralGL F n :=
     (mem_unipotentCompactG.1 (he rfl)).2
   have ht : rankTorus F n δ e ∈ leviPar F n β γ :=
@@ -36,22 +38,24 @@ theorem sqrtModularLeviPar_of_mem_unipotentRadical {β γ δ : Fin n → ℕ} (q
     show ((NNReal.sqrt (modularCharacter (⟨_, hkL⟩ : leviPar F n β γ)) : ℝ) : ℂ) = 1
     rw [modularCharacter_leviPar_eq_one_of_mem_integralGL _ hk]
     simp
-  have : q = ⟨_, ht⟩⁻¹ * ⟨_, hkL⟩ * ⟨_, ht⟩ := Subtype.ext (by
-    simp only [Subgroup.coe_mul, Subgroup.coe_inv]
-    group)
+  have : q = ⟨_, ht⟩⁻¹ * ⟨_, hkL⟩ * ⟨_, ht⟩ :=
+    Subtype.ext (by
+      simp only [Subgroup.coe_mul, Subgroup.coe_inv]
+      group)
   rw [this, map_mul, map_mul, h1, mul_one, ← map_mul, inv_mul_cancel, map_one]
 
 section Stages
 
-variable {β γ δ : Fin n → ℕ} {U : Type*} [AddCommGroup U] [Module ℂ U]
+variable
+  {β γ δ : Fin n → ℕ} {U : Type*} [AddCommGroup U] [Module ℂ U]
   {ρ : Representation ℂ (levi F n β) U}
 
-theorem mk_mk_apply_of_mem_leviUnipotent (h : Refines β γ) (hγδ : Refines γ δ)
-    (u : leviUnipotent F n β δ) (w : U) :
-    Representation.Coinvariants.mk ((leviJacquetRep h ρ).comp (leviUnipotent F n γ δ).subtype)
+theorem mk_mk_apply_of_mem_leviUnipotent
+    (h : Refines β γ) (hγδ : Refines γ δ) (u : leviUnipotent F n β δ) (w : U)
+    : Representation.Coinvariants.mk ((leviJacquetRep h ρ).comp (leviUnipotent F n γ δ).subtype)
         (Representation.Coinvariants.mk (ρ.comp (leviUnipotent F n β γ).subtype)
-          (ρ (u : levi F n β) w)) =
-      Representation.Coinvariants.mk _ (Representation.Coinvariants.mk _ w) := by
+          (ρ (u : levi F n β) w))
+      = Representation.Coinvariants.mk _ (Representation.Coinvariants.mk _ w) := by
   have huN : ((u : levi F n β) : GL (Fin n) F) ∈ unipotentRadical F n δ :=
     Subgroup.mem_subgroupOf.1 u.2
   obtain ⟨huP, hu1⟩ := mem_unipotentRadical.1 huN
@@ -68,46 +72,53 @@ theorem mk_mk_apply_of_mem_leviUnipotent (h : Refines β γ) (hγδ : Refines γ
       exact hu1 i j hij
   have hn' := leviProj_inv_mul_mem p
   set n' : levi F n β := (h.leviIncl F m)⁻¹ * (u : levi F n β)
-  have hcoe : ((n' : levi F n β) : GL (Fin n) F) =
-      (((leviIncl m)⁻¹ * p : blockUpper F n γ) : GL (Fin n) F) := by
+  have hcoe
+      : ((n' : levi F n β) : GL (Fin n) F)
+        = (((leviIncl m)⁻¹ * p : blockUpper F n γ) : GL (Fin n) F) := by
     simp only [n', Subgroup.coe_mul, Subgroup.coe_inv, Refines.coe_leviIncl, leviIncl_coe]
     rfl
   have hn'N : ((n' : levi F n β) : GL (Fin n) F) ∈ unipotentRadical F n γ := by
     rw [hcoe]
     exact hn'
   have hu : (u : levi F n β) = h.leviIncl F m * n' := by simp [n']
-  have hn'w : Representation.Coinvariants.mk (ρ.comp (leviUnipotent F n β γ).subtype) (ρ n' w) =
-      Representation.Coinvariants.mk _ w :=
+  have hn'w
+      : Representation.Coinvariants.mk (ρ.comp (leviUnipotent F n β γ).subtype) (ρ n' w)
+        = Representation.Coinvariants.mk _ w :=
     Representation.Coinvariants.mk_self_apply (ρ.comp (leviUnipotent F n β γ).subtype)
       ⟨n', Subgroup.mem_subgroupOf.2 hn'N⟩ w
   have hsq : sqrtModularLeviPar F n β γ (h.leviToLeviPar F m) = 1 :=
     sqrtModularLeviPar_of_mem_unipotentRadical _ hmN
   have e1 : ρ (u : levi F n β) w = ρ (h.leviIncl F m) (ρ n' w) := by
     rw [hu, map_mul ρ, Module.End.mul_apply]
-  have key : Representation.Coinvariants.mk (ρ.comp (leviUnipotent F n β γ).subtype)
-      (ρ (u : levi F n β) w) =
-      leviJacquetRep h ρ m (Representation.Coinvariants.mk _ w) :=
-    calc _ = Representation.Coinvariants.mk (ρ.comp (leviUnipotent F n β γ).subtype)
-          (ρ (h.leviIncl F m) (ρ n' w)) := congrArg _ e1
-      _ = sqrtModularLeviPar F n β γ (h.leviToLeviPar F m) •
-          leviJacquetRep h ρ m (Representation.Coinvariants.mk _ (ρ n' w)) :=
+  have key
+      : Representation.Coinvariants.mk (ρ.comp (leviUnipotent F n β γ).subtype)
+          (ρ (u : levi F n β) w)
+        = leviJacquetRep h ρ m (Representation.Coinvariants.mk _ w) :=
+    calc
+      _ = Representation.Coinvariants.mk (ρ.comp (leviUnipotent F n β γ).subtype)
+          (ρ (h.leviIncl F m) (ρ n' w)) :=
+        congrArg _ e1
+      _ = sqrtModularLeviPar F n β γ (h.leviToLeviPar F m)
+          • leviJacquetRep h ρ m (Representation.Coinvariants.mk _ (ρ n' w)) :=
         mk_leviIncl_apply ρ h m _
       _ = leviJacquetRep h ρ m (Representation.Coinvariants.mk _ w) :=
         (congrArg (· • leviJacquetRep h ρ m (Representation.Coinvariants.mk _ (ρ n' w))) hsq).trans
           ((one_smul ℂ _).trans (congrArg (leviJacquetRep h ρ m) hn'w))
-  exact (congrArg _ key).trans (Representation.Coinvariants.mk_self_apply
-    ((leviJacquetRep h ρ).comp (leviUnipotent F n γ δ).subtype)
-    ⟨m, Subgroup.mem_subgroupOf.2 hmN⟩ _)
+  exact (congrArg _ key).trans
+    (Representation.Coinvariants.mk_self_apply
+      ((leviJacquetRep h ρ).comp (leviUnipotent F n γ δ).subtype) ⟨m, Subgroup.mem_subgroupOf.2 hmN⟩
+      _)
 
-theorem subsingleton_coinvariants_leviJacquetRep (h : Refines β γ) (hγδ : Refines γ δ)
-    (hs : Subsingleton (LeviJacquetModule β δ ρ)) :
-    Subsingleton (Representation.Coinvariants
-      ((leviJacquetRep h ρ).comp (leviUnipotent F n γ δ).subtype)) := by
+theorem subsingleton_coinvariants_leviJacquetRep
+    (h : Refines β γ) (hγδ : Refines γ δ) (hs : Subsingleton (LeviJacquetModule β δ ρ))
+    : Subsingleton (Representation.Coinvariants ((leviJacquetRep h ρ).comp
+      (leviUnipotent F n γ δ).subtype)) := by
   set q' := Representation.Coinvariants.mk
     ((leviJacquetRep h ρ).comp (leviUnipotent F n γ δ).subtype)
   set q := Representation.Coinvariants.mk (ρ.comp (leviUnipotent F n β γ).subtype)
-  have hker : Representation.Coinvariants.ker (ρ.comp (leviUnipotent F n β δ).subtype) ≤
-      LinearMap.ker (q' ∘ₗ q) := by
+  have hker
+      : Representation.Coinvariants.ker (ρ.comp (leviUnipotent F n β δ).subtype)
+        ≤ LinearMap.ker (q' ∘ₗ q) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨⟨u, w⟩, rfl⟩
     show q' (q (ρ (u : levi F n β) w - w)) = 0
@@ -131,9 +142,9 @@ section Generation
 
 variable {β γ : Fin n → ℕ}
 
-theorem exists_leviPar_mul_integral (h : Refines β γ) (g : levi F n β) :
-    ∃ q : leviPar F n β γ, ∃ k : levi F n β, (k : GL (Fin n) F) ∈ integralGL F n ∧
-      (g : GL (Fin n) F) = q * k := by
+theorem exists_leviPar_mul_integral (h : Refines β γ) (g : levi F n β)
+    : ∃ q : leviPar F n β γ, ∃ k : levi F n β,
+      (k : GL (Fin n) F) ∈ integralGL F n ∧ (g : GL (Fin n) F) = q * k := by
   obtain ⟨p, hp, k, hk, hg⟩ := exists_blockUpper_mul_integralGL' (β := γ) (g : GL (Fin n) F)
   have hpβ : p ∈ blockUpper F n β := h.blockUpper_le F hp
   have hkβ : k ∈ blockUpper F n β := by
@@ -157,9 +168,10 @@ theorem exists_leviPar_mul_integral (h : Refines β γ) (g : levi F n β) :
 
 variable {U : Type*} [AddCommGroup U] [Module ℂ U] {ρ : Representation ℂ (levi F n β) U}
 
-theorem exists_finset_span_leviJacquetRep (h : Refines β γ) (hρ : IsSmooth ρ) {v : U}
-    (hv : Submodule.span ℂ (Set.range fun g : levi F n β => ρ g v) = ⊤) :
-    ∃ S : Finset (LeviJacquetModule β γ ρ),
+theorem exists_finset_span_leviJacquetRep
+    (h : Refines β γ) (hρ : IsSmooth ρ)
+    {v : U} (hv : Submodule.span ℂ (Set.range fun g : levi F n β => ρ g v) = ⊤)
+    : ∃ S : Finset (LeviJacquetModule β γ ρ),
       Submodule.span ℂ {x | ∃ m, ∃ s ∈ S, x = leviJacquetRep h ρ m s} = ⊤ := by
   classical
   obtain ⟨m₀, hm₀⟩ := exists_congruence_fixed hρ v
@@ -192,8 +204,8 @@ theorem exists_finset_span_leviJacquetRep (h : Refines β γ) (hρ : IsSmooth ρ
     obtain ⟨r, hr, hrv⟩ := hR k (Subgroup.mem_subgroupOf.2 hk)
     set pγ : blockUpper F n γ := ⟨qq, qq.2.2⟩
     set m := leviProj F n γ pγ
-    have hn : ((pγ * (leviIncl m)⁻¹ : blockUpper F n γ) : GL (Fin n) F) ∈
-        unipotentRadical F n γ := by
+    have hn
+        : ((pγ * (leviIncl m)⁻¹ : blockUpper F n γ) : GL (Fin n) F) ∈ unipotentRadical F n γ := by
       rw [mem_unipotentRadical_iff_leviProj, map_mul, map_inv, leviProj_leviIncl, mul_inv_cancel]
     have hnβ : ((pγ * (leviIncl m)⁻¹ : blockUpper F n γ) : GL (Fin n) F) ∈ levi F n β := by
       simp only [Subgroup.coe_mul, Subgroup.coe_inv, leviIncl_coe]
@@ -209,12 +221,13 @@ theorem exists_finset_span_leviJacquetRep (h : Refines β γ) (hρ : IsSmooth ρ
         ⟨n', Subgroup.mem_subgroupOf.2 hn⟩ x
     have e1 : ρ g v = ρ n' (ρ (h.leviIncl F m) (ρ r v)) := by
       rw [hgeq, map_mul ρ, map_mul ρ, Module.End.mul_apply, Module.End.mul_apply, hrv]
-    have e2 : q (ρ g v) = sqrtModularLeviPar F n β γ (h.leviToLeviPar F m) •
-        leviJacquetRep h ρ m (q (ρ r v)) :=
+    have e2
+        : q (ρ g v)
+          = sqrtModularLeviPar F n β γ (h.leviToLeviPar F m) • leviJacquetRep h ρ m (q (ρ r v)) :=
       (congrArg q e1).trans ((hn'v _).trans (mk_leviIncl_apply ρ h m _))
     rw [e2]
-    exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨m, q (ρ r v),
-      Finset.mem_image_of_mem _ hr, rfl⟩)
+    exact Submodule.smul_mem _ _
+      (Submodule.subset_span ⟨m, q (ρ r v), Finset.mem_image_of_mem _ hr, rfl⟩)
   rw [eq_top_iff]
   intro x _
   obtain ⟨y, rfl⟩ := Representation.Coinvariants.mk_surjective _ x
@@ -234,14 +247,12 @@ section Embedding
 
 variable {β : Fin n → ℕ}
 
-theorem Refines.trans {β γ δ : Fin n → ℕ} (h₁ : Refines β γ) (h₂ : Refines γ δ) :
-    Refines β δ :=
+theorem Refines.trans {β γ δ : Fin n → ℕ} (h₁ : Refines β γ) (h₂ : Refines γ δ) : Refines β δ :=
   fun i j h => h₂ i j (h₁ i j h)
 
-
 omit [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] in
-theorem eq_one_of_mem_leviUnipotent_self (u : leviUnipotent F n β β) :
-    ((u : levi F n β) : GL (Fin n) F) = 1 := by
+theorem eq_one_of_mem_leviUnipotent_self (u : leviUnipotent F n β β)
+    : ((u : levi F n β) : GL (Fin n) F) = 1 := by
   have hu := mem_unipotentRadical.1 (Subgroup.mem_subgroupOf.1 u.2)
   have hl := mem_levi.1 (u : levi F n β).2
   apply Units.ext
@@ -250,11 +261,10 @@ theorem eq_one_of_mem_leviUnipotent_self (u : leviUnipotent F n β β) :
   · exact hu.2 i j hij
   · rw [hl i j hij, Units.val_one, one_apply_ne fun e => hij (by rw [e])]
 
-
 omit [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] in
-theorem nontrivial_leviJacquetModule_self {U : Type*} [AddCommGroup U] [Module ℂ U]
-    [Nontrivial U] (ρ : Representation ℂ (levi F n β) U) :
-    Nontrivial (LeviJacquetModule β β ρ) := by
+theorem nontrivial_leviJacquetModule_self
+    {U : Type*} [AddCommGroup U] [Module ℂ U] [Nontrivial U] (ρ : Representation ℂ (levi F n β) U)
+    : Nontrivial (LeviJacquetModule β β ρ) := by
   obtain ⟨v, hv⟩ := exists_ne (0 : U)
   refine ⟨⟨Representation.Coinvariants.mk _ v, 0, fun h => hv ?_⟩⟩
   have hmem := (Representation.Coinvariants.mk_eq_zero _).1 h
@@ -265,27 +275,32 @@ theorem nontrivial_leviJacquetModule_self {U : Type*} [AddCommGroup U] [Module �
     simp [hu]
   exact (Submodule.mem_bot ℂ).1 (hle hmem)
 
-
 set_option maxHeartbeats 1000000 in
-theorem exists_embedding_leviParabolicInd {U : Type u} [AddCommGroup U] [Module ℂ U]
-    {ρ : Representation ℂ (levi F n β) U} [ρ.IsIrreducible] (hρ : IsSmooth ρ) :
-    ∃ (γ : Fin n → ℕ) (_ : Refines β γ) (W : Type u) (_ : AddCommGroup W) (_ : Module ℂ W)
-      (τ : Representation ℂ (levi F n γ) W), τ.IsIrreducible ∧ IsSmooth τ ∧ IsCuspidal τ ∧
-        ∃ Φ : Representation.IntertwiningMap ρ (leviParabolicInd F n β γ τ), Function.Injective Φ := by
+theorem exists_embedding_leviParabolicInd
+    {U : Type u} [AddCommGroup U] [Module ℂ U]
+    {ρ : Representation ℂ (levi F n β) U} [ρ.IsIrreducible]
+    (hρ : IsSmooth ρ)
+    : ∃ (γ : Fin n → ℕ) (_ : Refines β γ) (W : Type u) (_ : AddCommGroup W) (_ : Module ℂ W)
+        (τ : Representation ℂ (levi F n γ) W),
+      τ.IsIrreducible ∧ IsSmooth τ ∧ IsCuspidal τ
+        ∧ ∃ Φ : Representation.IntertwiningMap ρ (leviParabolicInd F n β γ τ),
+          Function.Injective Φ := by
   classical
   obtain ⟨v, hv0⟩ := exists_ne_zero_of_isIrreducible (ρ := ρ)
   have : Nontrivial U := ⟨⟨v, 0, hv0⟩⟩
   have hspan := span_range_eq_top_of_isIrreducible (ρ := ρ) hv0
 
-  let P : ℕ → Prop := fun k => ∃ γ : Fin n → ℕ, Refines β γ ∧ (Finset.univ.image γ).card = k ∧
-    Nontrivial (LeviJacquetModule β γ ρ)
+  let P : ℕ → Prop := fun k =>
+    ∃ γ : Fin n → ℕ,
+      Refines β γ ∧ (Finset.univ.image γ).card = k ∧ Nontrivial (LeviJacquetModule β γ ρ)
   have hbound : ∀ γ : Fin n → ℕ, (Finset.univ.image γ).card ≤ n := fun γ =>
     (Finset.card_image_le).trans (by simp)
   have hP0 : P (Finset.univ.image β).card :=
     ⟨β, Refines.refl β, rfl, nontrivial_leviJacquetModule_self ρ⟩
   obtain ⟨γ, hγ, hγcard, hγnt⟩ := Nat.findGreatest_spec (hbound _) hP0
-  have hfinest : ∀ δ : Fin n → ℕ, (∃ i j, γ i = γ j ∧ δ i ≠ δ j) →
-      Subsingleton (LeviJacquetModule β (refineFun γ δ) ρ) := by
+  have hfinest
+      : ∀ δ : Fin n → ℕ,
+        (∃ i j, γ i = γ j ∧ δ i ≠ δ j) → Subsingleton (LeviJacquetModule β (refineFun γ δ) ρ) := by
     intro δ hδ
     have hlt := card_image_lt_refineFun hδ
     rw [hγcard] at hlt

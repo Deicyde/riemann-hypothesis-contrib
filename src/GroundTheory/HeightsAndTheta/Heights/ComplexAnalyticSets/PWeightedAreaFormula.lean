@@ -30,12 +30,15 @@ theorem WeightedAreaFormula.proof : WeightedAreaFormula.Statement := by
 
   have hZ : μ (f '' {x ∈ A | (fderiv ℝ f x).det = 0}) = 0 :=
     addHaar_image_eq_zero_of_det_fderivWithin_eq_zero μ
-      (fun x hx => (hder x hx.1).hasFDerivWithinAt) (fun x hx => hx.2)
+      (fun x hx => (hder x hx.1).hasFDerivWithinAt)
+      (fun x hx => hx.2)
 
   let r : (E →L[ℝ] E) → ℝ≥0 := fun L => (‖L.inverse‖₊ + 1)⁻¹
   obtain ⟨t, L, htd, htm, hcov, happ, hL⟩ :=
     exists_partition_approximatesLinearOn_of_hasFDerivWithinAt f B (fderiv ℝ f)
-      (fun x hx => (hder x hx.1).hasFDerivWithinAt) r (fun _ => inv_ne_zero (by positivity))
+      (fun x hx => (hder x hx.1).hasFDerivWithinAt)
+      r
+      (fun _ => inv_ne_zero (by positivity))
   set P : ℕ → Set E := fun n => B ∩ t n with hPdef
   have hPm : ∀ n, MeasurableSet (P n) := fun n => hBm.inter (htm n)
   have hPd : Pairwise (Disjoint on P) := fun m n hmn =>
@@ -67,8 +70,7 @@ theorem WeightedAreaFormula.proof : WeightedAreaFormula.Statement := by
       apply hz
       simpa using congrArg (fun T : E →L[ℝ] E => T (e z)) h0
     exact (inv_lt_inv₀ (by positivity) hpos).2 (lt_add_one _)
-  have hBU : B = ⋃ n, P n := by
-    rw [← inter_iUnion]; exact (inter_eq_left.2 hcov).symm
+  have hBU : B = ⋃ n, P n := by rw [← inter_iUnion]; exact (inter_eq_left.2 hcov).symm
   have himg : ∀ n, MeasurableSet (f '' P n) := fun n =>
     measurable_image_of_fderivWithin (hPm n) (hderP n) (hinj n)
 
@@ -79,18 +81,23 @@ theorem WeightedAreaFormula.proof : WeightedAreaFormula.Statement := by
   have hFint : ∀ n, Integrable (F n) μ := fun n =>
     (integrable_indicator_iff (himg n)).2
       ((integrableOn_image_iff_integrableOn_abs_det_fderiv_smul μ (hPm n) (hderP n) (hinj n)
-        (g n)).2 ((hint.mono_set (hPA n)).congr_fun
-          (fun x hx => by simp only [smul_eq_mul, hgP n x hx]) (hPm n)))
+          (g n)).2
+        ((hint.mono_set (hPA n)).congr_fun
+          (fun x hx => by simp only [smul_eq_mul, hgP n x hx])
+          (hPm n)))
   have hFint_eq : ∀ n, ∫ y, F n y ∂μ = ∫ x in P n, |(fderiv ℝ f x).det| * H x ∂μ := fun n => by
-    calc ∫ y, F n y ∂μ = ∫ y in f '' P n, g n y ∂μ := integral_indicator (himg n)
+    calc
+      ∫ y, F n y ∂μ
+        = ∫ y in f '' P n, g n y ∂μ := integral_indicator (himg n)
       _ = ∫ x in P n, |(fderiv ℝ f x).det| • g n (f x) ∂μ :=
         integral_image_eq_integral_abs_det_fderiv_smul μ (hPm n) (hderP n) (hinj n) (g n)
       _ = ∫ x in P n, |(fderiv ℝ f x).det| * H x ∂μ :=
         setIntegral_congr_fun (hPm n) fun x hx => by simp only [smul_eq_mul, hgP n x hx]
-  have hFlint : ∀ n, ∫⁻ y, ‖F n y‖ₑ ∂μ = ∫⁻ x in P n, ‖|(fderiv ℝ f x).det| * H x‖ₑ ∂μ :=
-    fun n => by
-    calc ∫⁻ y, ‖F n y‖ₑ ∂μ = ∫⁻ y, (f '' P n).indicator (fun z => ‖g n z‖ₑ) y ∂μ :=
-          lintegral_congr fun y => enorm_indicator_eq_indicator_enorm (g n) y
+  have hFlint
+      : ∀ n, ∫⁻ y, ‖F n y‖ₑ ∂μ = ∫⁻ x in P n, ‖|(fderiv ℝ f x).det| * H x‖ₑ ∂μ := fun n => by
+    calc
+      ∫⁻ y, ‖F n y‖ₑ ∂μ = ∫⁻ y, (f '' P n).indicator (fun z => ‖g n z‖ₑ) y ∂μ :=
+        lintegral_congr fun y => enorm_indicator_eq_indicator_enorm (g n) y
       _ = ∫⁻ y in f '' P n, ‖g n y‖ₑ ∂μ := lintegral_indicator (himg n) _
       _ = ∫⁻ x in P n, ENNReal.ofReal |(fderiv ℝ f x).det| * ‖g n (f x)‖ₑ ∂μ :=
         lintegral_image_eq_lintegral_abs_det_fderiv_mul μ (hPm n) (hderP n) (hinj n)
@@ -108,7 +115,8 @@ theorem WeightedAreaFormula.proof : WeightedAreaFormula.Statement := by
     by_contra hne
     refine Set.disjoint_left.1 (hPd hne) (invFunOn_mem hm) ?_
     simp only at hmn
-    rw [hmn]; exact invFunOn_mem hn
+    rw [hmn]
+    exact invFunOn_mem hn
   have hT : ∀ y, {n | y ∈ f '' P n}.Finite := by
     intro y
     refine Set.Finite.of_finite_image ((hfin y).subset ?_) (hinjT y)
@@ -121,8 +129,7 @@ theorem WeightedAreaFormula.proof : WeightedAreaFormula.Statement := by
 
   have hae : ∀ᵐ y ∂μ, ∑' n, F n y = ∑ᶠ x ∈ {x | x ∈ A ∧ f x = y}, H x := by
     filter_upwards [measure_eq_zero_iff_ae_notMem.1 hZ] with y hy
-    have hbij : BijOn (fun n => invFunOn f (P n) y) {n | y ∈ f '' P n}
-        {x | x ∈ A ∧ f x = y} := by
+    have hbij : BijOn (fun n => invFunOn f (P n) y) {n | y ∈ f '' P n} {x | x ∈ A ∧ f x = y} := by
       refine ⟨fun n hn => ⟨hPA n (invFunOn_mem hn), invFunOn_eq hn⟩, hinjT y, ?_⟩
       rintro x ⟨hxA, hxy⟩
       have hxB : x ∈ B := ⟨hxA, fun hd => hy ⟨x, ⟨hxA, hd⟩, hxy⟩⟩
@@ -132,8 +139,7 @@ theorem WeightedAreaFormula.proof : WeightedAreaFormula.Statement := by
       exact ⟨n, hyn, hinj n (invFunOn_mem hyn) hxP ((invFunOn_eq hyn).trans hxy.symm)⟩
     rw [(hsum y).tsum_eq]
     change _ = ∑ᶠ (x : E) (_ : x ∈ {x | x ∈ A ∧ f x = y}), H x
-    rw [← finsum_mem_eq_of_bijOn _ hbij
-      (f := fun n => H (invFunOn f (P n) y)) (fun n _ => rfl),
+    rw [← finsum_mem_eq_of_bijOn _ hbij (f := fun n => H (invFunOn f (P n) y)) (fun n _ => rfl),
       finsum_mem_eq_finite_toFinset_sum _ (hT y)]
     exact Finset.sum_congr rfl fun n hn =>
       indicator_of_mem (s := f '' P n) ((hT y).mem_toFinset.1 hn) (g n)
@@ -144,18 +150,17 @@ theorem WeightedAreaFormula.proof : WeightedAreaFormula.Statement := by
       (ae_of_all _ fun y => (hsum y).summable.hasSum.tendsto_sum_nat)
   have hGfin : HasFiniteIntegral (fun y => ∑' n, F n y) μ := by
     rw [hasFiniteIntegral_iff_enorm]
-    calc ∫⁻ y, ‖∑' n, F n y‖ₑ ∂μ ≤ ∫⁻ y, ∑' n, ‖F n y‖ₑ ∂μ := by
-          refine lintegral_mono fun y => ?_
-          rw [(hsum y).tsum_eq]
-          exact (enorm_sum_le _ _).trans (ENNReal.sum_le_tsum _)
+    calc
+      ∫⁻ y, ‖∑' n, F n y‖ₑ ∂μ ≤ ∫⁻ y, ∑' n, ‖F n y‖ₑ ∂μ := by
+        refine lintegral_mono fun y => ?_
+        rw [(hsum y).tsum_eq]
+        exact (enorm_sum_le _ _).trans (ENNReal.sum_le_tsum _)
       _ = ∑' n, ∫⁻ y, ‖F n y‖ₑ ∂μ := lintegral_tsum fun n => (hFint n).1.enorm
       _ < ∞ := hsumlint.lt_top
 
-  have hIA : ∫ x in A, |(fderiv ℝ f x).det| * H x ∂μ =
-      ∫ x in B, |(fderiv ℝ f x).det| * H x ∂μ :=
+  have hIA : ∫ x in A, |(fderiv ℝ f x).det| * H x ∂μ = ∫ x in B, |(fderiv ℝ f x).det| * H x ∂μ :=
     setIntegral_eq_of_subset_of_forall_sdiff_eq_zero hA.measurableSet hBA fun x hx => by
-      have h0 : (fderiv ℝ f x).det = 0 := by
-        by_contra h; exact hx.2 ⟨hx.1, h⟩
+      have h0 : (fderiv ℝ f x).det = 0 := by by_contra h; exact hx.2 ⟨hx.1, h⟩
       simp [h0]
   have hBint : IntegrableOn (fun x => |(fderiv ℝ f x).det| * H x) (⋃ n, P n) μ := by
     rw [← hBU]; exact hint.mono_set hBA

@@ -6,22 +6,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-private theorem latCls_core {O K : Type} [CommRing O] [Field K] [Algebra O K] {τ : K} (e₁ e₂ : Etau K τ)
-    (hd : e₁.re * e₂.im - e₁.im * e₂.re ≠ 0) (hn : QuadraticAlgebra.norm e₁ ≠ 0)
+private theorem latCls_core
+    {O K : Type} [CommRing O] [Field K] [Algebra O K]
+    {τ : K}
+    (e₁ e₂ : Etau K τ) (hd : e₁.re * e₂.im - e₁.im * e₂.re ≠ 0) (hn : QuadraticAlgebra.norm e₁ ≠ 0)
     (hb : QuadraticAlgebra.trace (e₂ * star e₁) / QuadraticAlgebra.norm e₁ ∈ (algebraMap O K).range)
-    (hc : QuadraticAlgebra.norm e₂ / QuadraticAlgebra.norm e₁ ∈ (algebraMap O K).range) :
-    ∃ (y : (Etau K τ)ˣ) (x : Etau K τ), x.im ≠ 0 ∧ QuadraticAlgebra.trace x ∈ (algebraMap O K).range ∧
-    QuadraticAlgebra.norm x ∈ (algebraMap O K).range ∧
-    ((Submodule.span O {e₁, e₂} : Submodule O (Etau K τ)) : Set (Etau K τ)) =
-      ((y : Etau K τ) * ·) '' (Submodule.span O {1, x} : Submodule O (Etau K τ)) := by
+    (hc : QuadraticAlgebra.norm e₂ / QuadraticAlgebra.norm e₁ ∈ (algebraMap O K).range)
+    : ∃ (y : (Etau K τ)ˣ) (x : Etau K τ),
+      x.im ≠ 0 ∧ QuadraticAlgebra.trace x ∈ (algebraMap O K).range
+        ∧ QuadraticAlgebra.norm x ∈ (algebraMap O K).range
+        ∧ ((Submodule.span O {e₁, e₂} : Submodule O (Etau K τ)) : Set (Etau K τ))
+          = ((y : Etau K τ) * ·) '' (Submodule.span O {1, x} : Submodule O (Etau K τ)) := by
   have hu : IsUnit e₁ := QuadraticAlgebra.isUnit_iff_norm_isUnit.2 (isUnit_iff_ne_zero.2 hn)
   have hinv : (↑hu.unit⁻¹ : Etau K τ) = (QuadraticAlgebra.norm e₁)⁻¹ • star e₁ := by
     apply Units.inv_eq_of_mul_eq_one_right
     rw [IsUnit.unit_spec, mul_smul_comm, ← QuadraticAlgebra.algebraMap_norm_eq_mul_star,
       Algebra.smul_def, ← map_mul, inv_mul_cancel₀ hn, map_one]
   have hone : e₁ * (↑hu.unit⁻¹ : Etau K τ) = 1 := by
-    rw [hinv, mul_smul_comm, ← QuadraticAlgebra.algebraMap_norm_eq_mul_star,
-      Algebra.smul_def, ← map_mul, inv_mul_cancel₀ hn, map_one]
+    rw [hinv, mul_smul_comm, ← QuadraticAlgebra.algebraMap_norm_eq_mul_star, Algebra.smul_def,
+      ← map_mul, inv_mul_cancel₀ hn, map_one]
   have hnu : QuadraticAlgebra.norm (↑hu.unit⁻¹ : Etau K τ) = (QuadraticAlgebra.norm e₁)⁻¹ := by
     apply eq_inv_of_mul_eq_one_right
     rw [← map_mul, hone, map_one]
@@ -37,20 +40,25 @@ private theorem latCls_core {O K : Type} [CommRing O] [Field K] [Algebra O K] {�
     exact hb
   · rw [map_mul, hnu, mul_comm, ← div_eq_mul_inv]
     exact hc
-  · have key : ((↑hu.unit : Etau K τ) * ·) '' ((Submodule.span O {1, ↑hu.unit⁻¹ * e₂} :
-        Submodule O (Etau K τ)) : Set (Etau K τ)) =
-        (((Submodule.span O {1, ↑hu.unit⁻¹ * e₂} : Submodule O (Etau K τ)).map
-          (LinearMap.mulLeft O (↑hu.unit : Etau K τ))) : Set (Etau K τ)) := by
+  · have key
+        : ((↑hu.unit : Etau K τ) * ·)
+            '' ((Submodule.span O {1, ↑hu.unit⁻¹ * e₂} : Submodule O (Etau K τ)) : Set (Etau K τ))
+          = (((Submodule.span O {1, ↑hu.unit⁻¹ * e₂} : Submodule O (Etau K τ)).map
+              (LinearMap.mulLeft O (↑hu.unit : Etau K τ)))
+            : Set (Etau K τ)) := by
       rw [Submodule.map_coe]
       rfl
     rw [key, Submodule.map_span, Set.image_pair]
     simp only [LinearMap.mulLeft_apply, IsUnit.unit_spec, mul_one]
     rw [← mul_assoc, hone, one_mul]
 
-private theorem latCls_basis {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
-    [IsFractionRing O K] {τ : K} (S : Set (Etau K τ)) (hS : IsLat O τ S) :
-    ∃ e₁ e₂ : Etau K τ, e₁.re * e₂.im - e₁.im * e₂.re ≠ 0 ∧
-      S = (Submodule.span O {e₁, e₂} : Submodule O (Etau K τ)) := by
+private theorem latCls_basis
+    {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+    [IsFractionRing O K]
+    {τ : K} (S : Set (Etau K τ)) (hS : IsLat O τ S)
+    : ∃ e₁ e₂ : Etau K τ,
+      e₁.re * e₂.im - e₁.im * e₂.re ≠ 0
+        ∧ S = (Submodule.span O {e₁, e₂} : Submodule O (Etau K τ)) := by
   obtain ⟨s, rfl⟩ := hS.fg
   have hspan := hS.span
   set M : Submodule O (Etau K τ) := Submodule.span O (s : Set (Etau K τ)) with hM
@@ -67,7 +75,8 @@ private theorem latCls_basis {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteV
   have htop : ⊤ ≤ Submodule.span K (Set.range f) := by
     rw [← hspan, Submodule.span_le]
     intro z hz
-    have hz' : z ∈ ((Submodule.span O (Set.range f) : Submodule O (Etau K τ)) : Set (Etau K τ)) := by
+    have hz'
+        : z ∈ ((Submodule.span O (Set.range f) : Submodule O (Etau K τ)) : Set (Etau K τ)) := by
       rw [← hMf]
       exact hz
     exact Submodule.span_subset_span O K _ hz'
@@ -92,34 +101,38 @@ private theorem latCls_basis {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteV
       exact hliK.comp e e.injective
     rw [LinearIndependent.pair_iff] at hli2
     intro h0
-    have h1 := hli2 (f (e 1)).im (-(f (e 0)).im) (by
-      refine QuadraticAlgebra.ext ?_ ?_
-      · simp only [QuadraticAlgebra.re_add, QuadraticAlgebra.re_smul, smul_eq_mul,
-          QuadraticAlgebra.re_zero]
-        linear_combination h0
-      · simp only [QuadraticAlgebra.im_add, QuadraticAlgebra.im_smul, smul_eq_mul,
-          QuadraticAlgebra.im_zero]
-        ring)
-    have h2 := hli2 (f (e 1)).re (-(f (e 0)).re) (by
-      refine QuadraticAlgebra.ext ?_ ?_
-      · simp only [QuadraticAlgebra.re_add, QuadraticAlgebra.re_smul, smul_eq_mul,
-          QuadraticAlgebra.re_zero]
-        ring
-      · simp only [QuadraticAlgebra.im_add, QuadraticAlgebra.im_smul, smul_eq_mul,
-          QuadraticAlgebra.im_zero]
-        rw [h1.1, neg_eq_zero.1 h1.2]
-        ring)
-    have hz : f (e 0) = 0 :=
-      QuadraticAlgebra.ext (neg_eq_zero.1 h2.2) (neg_eq_zero.1 h1.2)
+    have h1 :=
+      hli2 (f (e 1)).im (-(f (e 0)).im) (by
+        refine QuadraticAlgebra.ext ?_ ?_
+        · simp only [QuadraticAlgebra.re_add, QuadraticAlgebra.re_smul, smul_eq_mul,
+            QuadraticAlgebra.re_zero]
+          linear_combination h0
+        · simp only [QuadraticAlgebra.im_add, QuadraticAlgebra.im_smul, smul_eq_mul,
+            QuadraticAlgebra.im_zero]
+          ring)
+    have h2 :=
+      hli2 (f (e 1)).re (-(f (e 0)).re) (by
+        refine QuadraticAlgebra.ext ?_ ?_
+        · simp only [QuadraticAlgebra.re_add, QuadraticAlgebra.re_smul, smul_eq_mul,
+            QuadraticAlgebra.re_zero]
+          ring
+        · simp only [QuadraticAlgebra.im_add, QuadraticAlgebra.im_smul, smul_eq_mul,
+            QuadraticAlgebra.im_zero]
+          rw [h1.1, neg_eq_zero.1 h1.2]
+          ring)
+    have hz : f (e 0) = 0 := QuadraticAlgebra.ext (neg_eq_zero.1 h2.2) (neg_eq_zero.1 h1.2)
     exact hliK.ne_zero (e 0) hz
   · rw [← hR, ← hMf]
 
 set_option maxHeartbeats 400000 in
-private theorem latCls_val {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
-    [IsFractionRing O K] (a b c : K) (h : b ^ 2 - 4 * a * c ≠ 0) :
-    (a ≠ 0 ∧ b / a ∈ (algebraMap O K).range ∧ c / a ∈ (algebraMap O K).range) ∨
-    (c ≠ 0 ∧ b / c ∈ (algebraMap O K).range ∧ a / c ∈ (algebraMap O K).range) ∨
-    (a + b + c ≠ 0 ∧ (b + 2 * c) / (a + b + c) ∈ (algebraMap O K).range ∧ c / (a + b + c) ∈ (algebraMap O K).range) := by
+private theorem latCls_val
+    {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+    [IsFractionRing O K]
+    (a b c : K) (h : b ^ 2 - 4 * a * c ≠ 0)
+    : (a ≠ 0 ∧ b / a ∈ (algebraMap O K).range ∧ c / a ∈ (algebraMap O K).range)
+      ∨ (c ≠ 0 ∧ b / c ∈ (algebraMap O K).range ∧ a / c ∈ (algebraMap O K).range)
+      ∨ (a + b + c ≠ 0 ∧ (b + 2 * c) / (a + b + c) ∈ (algebraMap O K).range
+        ∧ c / (a + b + c) ∈ (algebraMap O K).range) := by
   have hR : ∀ x : K, x ∈ (algebraMap O K).range ↔ ValuationRing.valuation O K x ≤ 1 := by
     intro x
     rw [← ValuationRing.range_algebraMap_eq, Valuation.mem_integer_iff]
@@ -133,7 +146,7 @@ private theorem latCls_val {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteVal
     subst hy
     rw [map_zero] at hxy
     exact (v.zero_iff).1 (le_antisymm hxy zero_le')
-  have hne : ¬ (a = 0 ∧ b = 0 ∧ c = 0) := by
+  have hne : ¬(a = 0 ∧ b = 0 ∧ c = 0) := by
     rintro ⟨rfl, rfl, rfl⟩
     simp at h
   by_cases hA : v b ≤ v a ∧ v c ≤ v a
@@ -141,10 +154,12 @@ private theorem latCls_val {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteVal
     have ha : a ≠ 0 := fun ha => hne ⟨ha, hz _ _ hA.1 ha, hz _ _ hA.2 ha⟩
     exact ⟨ha, (hdiv _ _ ha).2 hA.1, (hdiv _ _ ha).2 hA.2⟩
   by_cases hC : v b ≤ v c ∧ v a ≤ v c
-  · right; left
+  · right
+    left
     have hc : c ≠ 0 := fun hc => hne ⟨hz _ _ hC.2 hc, hz _ _ hC.1 hc, hc⟩
     exact ⟨hc, (hdiv _ _ hc).2 hC.1, (hdiv _ _ hc).2 hC.2⟩
-  right; right
+  right
+  right
   have hab : v a < v b := by
     by_contra hba
     push_neg at hba
@@ -174,16 +189,26 @@ private theorem latCls_val {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteVal
   rw [map_mul]
   exact (mul_le_of_le_one_left' h2).trans hcb.le
 
-theorem UpperTheory.V.Z.Sym.Loc.latCls :
-    ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] (Δ τ : K), IsLoc O Δ → τ ^ 2 - 4 ≠ 0 →
-    ∀ S : Set (Etau K τ), IsLat O τ S → ∃ (y : (Etau K τ)ˣ) (x : Etau K τ), x.im ≠ 0 ∧ QuadraticAlgebra.trace x ∈ (algebraMap O K).range ∧
-    QuadraticAlgebra.norm x ∈ (algebraMap O K).range ∧ S = ((y : Etau K τ) * ·) '' (Submodule.span O {1, x} : Submodule O (Etau K τ)) := by
+theorem UpperTheory.V.Z.Sym.Loc.latCls
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+        (Δ τ : K),
+      IsLoc O Δ → τ ^ 2 - 4 ≠ 0
+        → ∀ S : Set (Etau K τ),
+          IsLat O τ S
+            → ∃ (y : (Etau K τ)ˣ) (x : Etau K τ),
+              x.im ≠ 0 ∧ QuadraticAlgebra.trace x ∈ (algebraMap O K).range
+                ∧ QuadraticAlgebra.norm x ∈ (algebraMap O K).range
+                ∧ S
+                  = ((y : Etau K τ) * ·) '' (Submodule.span O {1, x} : Submodule O (Etau K τ)) := by
   intro O K _ _ _ _ _ Δ τ hL hτ S hS
   haveI := hL.frac
   obtain ⟨e₁, e₂, hd, rfl⟩ := latCls_basis S hS
-  have hdisc : (trace (e₂ * star e₁)) ^ 2 - 4 * QuadraticAlgebra.norm e₁ * QuadraticAlgebra.norm e₂ ≠ 0 := by
-    have e : (trace (e₂ * star e₁)) ^ 2 - 4 * QuadraticAlgebra.norm e₁ * QuadraticAlgebra.norm e₂ =
-        (τ ^ 2 - 4) * (e₁.re * e₂.im - e₁.im * e₂.re) ^ 2 := by
+  have hdisc
+      : (trace (e₂ * star e₁)) ^ 2 - 4 * QuadraticAlgebra.norm e₁ * QuadraticAlgebra.norm e₂
+        ≠ 0 := by
+    have e
+        : (trace (e₂ * star e₁)) ^ 2 - 4 * QuadraticAlgebra.norm e₁ * QuadraticAlgebra.norm e₂
+          = (τ ^ 2 - 4) * (e₁.re * e₂.im - e₁.im * e₂.re) ^ 2 := by
       simp only [QuadraticAlgebra.norm_def, QuadraticAlgebra.trace_def, QuadraticAlgebra.re_mul,
         QuadraticAlgebra.im_mul, QuadraticAlgebra.re_star, QuadraticAlgebra.im_star]
       ring
@@ -192,8 +217,8 @@ theorem UpperTheory.V.Z.Sym.Loc.latCls :
   rcases latCls_val (O := O) _ _ _ hdisc with ⟨ha, hb, hc⟩ | ⟨hc0, hb, ha⟩ | ⟨hs, hb, hc⟩
   · exact latCls_core e₁ e₂ hd ha hb hc
   · have ht : trace (e₁ * star e₂) = trace (e₂ * star e₁) := by
-      simp only [QuadraticAlgebra.trace_def, QuadraticAlgebra.re_mul,
-        QuadraticAlgebra.im_mul, QuadraticAlgebra.re_star, QuadraticAlgebra.im_star]
+      simp only [QuadraticAlgebra.trace_def, QuadraticAlgebra.re_mul, QuadraticAlgebra.im_mul,
+        QuadraticAlgebra.re_star, QuadraticAlgebra.im_star]
       ring
     have hd' : e₂.re * e₁.im - e₂.im * e₁.re ≠ 0 := by
       intro h0
@@ -202,13 +227,15 @@ theorem UpperTheory.V.Z.Sym.Loc.latCls :
     obtain ⟨y, x, h1, h2, h3, h4⟩ := latCls_core (O := O) e₂ e₁ hd' hc0 (by rw [ht]; exact hb) ha
     refine ⟨y, x, h1, h2, h3, ?_⟩
     rw [← h4, Set.pair_comm]
-  · have hn : QuadraticAlgebra.norm (e₁ + e₂) =
-        QuadraticAlgebra.norm e₁ + trace (e₂ * star e₁) + QuadraticAlgebra.norm e₂ := by
+  · have hn
+        : QuadraticAlgebra.norm (e₁ + e₂)
+          = QuadraticAlgebra.norm e₁ + trace (e₂ * star e₁) + QuadraticAlgebra.norm e₂ := by
       simp only [QuadraticAlgebra.norm_def, QuadraticAlgebra.trace_def, QuadraticAlgebra.re_mul,
         QuadraticAlgebra.im_mul, QuadraticAlgebra.re_star, QuadraticAlgebra.im_star,
         QuadraticAlgebra.re_add, QuadraticAlgebra.im_add]
       ring
-    have ht : trace (e₂ * star (e₁ + e₂)) = trace (e₂ * star e₁) + 2 * QuadraticAlgebra.norm e₂ := by
+    have ht
+        : trace (e₂ * star (e₁ + e₂)) = trace (e₂ * star e₁) + 2 * QuadraticAlgebra.norm e₂ := by
       simp only [QuadraticAlgebra.norm_def, QuadraticAlgebra.trace_def, QuadraticAlgebra.re_mul,
         QuadraticAlgebra.im_mul, QuadraticAlgebra.re_star, QuadraticAlgebra.im_star,
         QuadraticAlgebra.re_add, QuadraticAlgebra.im_add]
@@ -218,8 +245,9 @@ theorem UpperTheory.V.Z.Sym.Loc.latCls :
       apply hd
       simp only [QuadraticAlgebra.re_add, QuadraticAlgebra.im_add] at h0
       linear_combination h0
-    obtain ⟨y, x, h1, h2, h3, h4⟩ := latCls_core (O := O) (e₁ + e₂) e₂ hd' (by rw [hn]; exact hs)
-      (by rw [ht, hn]; exact hb) (by rw [hn]; exact hc)
+    obtain ⟨y, x, h1, h2, h3, h4⟩ :=
+      latCls_core (O := O) (e₁ + e₂) e₂ hd' (by rw [hn]; exact hs) (by rw [ht, hn]; exact hb)
+        (by rw [hn]; exact hc)
     refine ⟨y, x, h1, h2, h3, ?_⟩
     rw [← h4]
     congr 1
@@ -229,14 +257,16 @@ theorem UpperTheory.V.Z.Sym.Loc.latCls :
       rcases hz with rfl | hz
       · have : z = (z + e₂) - e₂ := by abel
         rw [this]
-        exact Submodule.sub_mem _ (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))
+        exact Submodule.sub_mem _ (Submodule.subset_span (by simp))
+          (Submodule.subset_span (by simp))
       · rw [Set.mem_singleton_iff] at hz
         subst hz
         exact Submodule.subset_span (by simp)
     · rw [Submodule.span_le]
       intro z hz
       rcases hz with rfl | hz
-      · exact Submodule.add_mem _ (Submodule.subset_span (by simp)) (Submodule.subset_span (by simp))
+      · exact Submodule.add_mem _ (Submodule.subset_span (by simp))
+          (Submodule.subset_span (by simp))
       · rw [Set.mem_singleton_iff] at hz
         subst hz
         exact Submodule.subset_span (by simp)

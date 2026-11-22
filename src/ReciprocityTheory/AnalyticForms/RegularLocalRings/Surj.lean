@@ -18,9 +18,9 @@ namespace WData
 
 variable (w : WData P D hP)
 
-theorem surj' (hD : IsMultiHomogIdeal D) (z : (Σ k, ι k) → ℂ) (hz : z ∈ conePts P)
-    (hzD : z ∉ conePts D) :
-    ∃ c, ∃ x ∈ w.src c, SameOrbit (fun q => eval (w.coord c x) (w.lift c q)) z := by
+theorem surj'
+    (hD : IsMultiHomogIdeal D) (z : (Σ k, ι k) → ℂ) (hz : z ∈ conePts P) (hzD : z ∉ conePts D)
+    : ∃ c, ∃ x ∈ w.src c, SameOrbit (fun q => eval (w.coord c x) (w.lift c q)) z := by
   have := w.isIso_off
   obtain ⟨p, hzp, -⟩ := exists_chart z hz.1
   have hzc : ∀ h ∈ chartIdeal P p, eval (affCoord p z) h = 0 :=
@@ -31,8 +31,9 @@ theorem surj' (hD : IsMultiHomogIdeal D) (z : (Σ k, ι k) → ℂ) (hz : z ∈ 
     have h1 := (mem_projB_iff_val hD p y hy hyc).1 hB
     rw [funext hyv] at h1
     exact hzD ((mem_conePts_iff_affCoord hD p z hzp).2 h1)
-  obtain ⟨x, ⟨hxc, -⟩, hxy⟩ := (bijOn_closedPoints_of_isIso (sW := w.π ≫ toSpecC hP)
-    (sX := toSpecC hP) w.π rfl (projBCompl P D hP)).2.2 ⟨hyc, hyB⟩
+  obtain ⟨x, ⟨hxc, -⟩, hxy⟩ :=
+    (bijOn_closedPoints_of_isIso (sW := w.π ≫ toSpecC hP) (sX := toSpecC hP) w.π rfl
+      (projBCompl P D hP)).2.2 ⟨hyc, hyB⟩
   subst hxy
   have hxp : x ∈ w.π ⁻¹ᵁ (chartOpen hP p).1 := hy
   rw [← w.iSup_pres p] at hxp
@@ -45,10 +46,15 @@ theorem surj' (hD : IsMultiHomogIdeal D) (z : (Σ k, ι k) → ℂ) (hz : z ∈ 
   rw [hl]
   exact sameOrbit_symm' (sameOrbit_affCoord p z hzp)
 
-theorem inj' (hD : IsMultiHomogIdeal D) (c c' : w.Idx) (x : w.M) (hx : x ∈ w.src c) (x' : w.M)
-    (hx' : x' ∈ w.src c') (hxD : (fun q => eval (w.coord c x) (w.lift c q)) ∉ conePts D)
-    (ho : SameOrbit (fun q => eval (w.coord c x) (w.lift c q))
-      (fun q => eval (w.coord c' x') (w.lift c' q))) : x = x' := by
+theorem inj'
+    (hD : IsMultiHomogIdeal D)
+    (c c' : w.Idx) (x : w.M) (hx : x ∈ w.src c)
+    (x' : w.M) (hx' : x' ∈ w.src c')
+    (hxD : (fun q => eval (w.coord c x) (w.lift c q)) ∉ conePts D)
+    (ho : SameOrbit
+      (fun q => eval (w.coord c x) (w.lift c q))
+      (fun q => eval (w.coord c' x') (w.lift c' q)))
+    : x = x' := by
   have := w.isIso_off
   obtain ⟨a, ha0, ha⟩ := ho
   have hxc : w.π.base x.1 ∈ (chartOpen hP c.1).1 := w.le_pres c.1 c.2 hx
@@ -64,10 +70,10 @@ theorem inj' (hD : IsMultiHomogIdeal D) (c c' : w.Idx) (x : w.M) (hx : x ∈ w.s
       (w.isClosed_image c' x' hx') fun q => ?_
     rw [w.val_chartCoord c x hx c.1 hxc q, w.val_chartCoord c' x' hx' c.1 hpx' q,
       affCoord_eq_of_sameOrbit c.1 ⟨a, ha0, ha⟩]
-  have hxU : w.π.base x.1 ∈ projBCompl P D hP :=
-    fun h => hxD ((w.mem_projB_iff_lift hD c x hx).1 h)
-  have hbij := bijOn_closedPoints_of_isIso (sW := w.π ≫ toSpecC hP) (sX := toSpecC hP) w.π rfl
-    (projBCompl P D hP)
+  have hxU : w.π.base x.1 ∈ projBCompl P D hP := fun h => hxD ((w.mem_projB_iff_lift hD c x hx).1 h)
+  have hbij :=
+    bijOn_closedPoints_of_isIso (sW := w.π ≫ toSpecC hP) (sX := toSpecC hP) w.π rfl
+      (projBCompl P D hP)
   exact Subtype.ext (hbij.injOn ⟨x.2, hxU⟩ ⟨x'.2, heq ▸ hxU⟩ heq)
 
 end WData

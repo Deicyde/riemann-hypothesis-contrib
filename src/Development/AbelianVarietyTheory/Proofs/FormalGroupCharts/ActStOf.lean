@@ -7,15 +7,23 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscrim
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj MvPowerSeries
-open ReciprocityTheory.ChartRestriction.G.Chart ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB ReciprocityTheory.ChartRestriction.G.TB.WickVanishing GlobalTheory.JetSer
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  MvPowerSeries
+open ReciprocityTheory.ChartRestriction.G.Chart ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.TB ReciprocityTheory.ChartRestriction.G.TB.WickVanishing
+  GlobalTheory.JetSer
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ChartAction
 
-theorem rep_unique (hR : RepSt) {R : Type} [CommRing R] {G : Over (Spec (CommRingCat.of R))} [GrpObj G] {d : ℕ}
-    {x : Fam G (Fin d)} (hx : IsUnivChart G d x) {κ : Type} [Finite κ] {a b : Fin d → MvPowerSeries κ R}
-    {y z : Fam G κ} (ha : Rep x a y) (hb : Rep x b z) (h : y = z) : a = b := by
+theorem rep_unique
+    (hR : RepSt)
+    {R : Type} [CommRing R]
+    {G : Over (Spec (CommRingCat.of R))} [GrpObj G]
+    {d : ℕ} {x : Fam G (Fin d)} (hx : IsUnivChart G d x)
+    {κ : Type} [Finite κ]
+    {a b : Fin d → MvPowerSeries κ R} {y z : Fam G κ} (ha : Rep x a y) (hb : Rep x b z) (h : y = z)
+    : a = b := by
   subst h
   obtain ⟨-, h2, h3, -⟩ := hR R G d x hx κ
   exact (h2 y (h3 a y ha)).unique ha hb

@@ -17,10 +17,12 @@ universe u
 
 def DegZeroLocDim.Statement : Prop :=
   ∀ (F : Type u) [Field F] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type)
-    [∀ k, Fintype (ι k)] (P : Ideal (MRing ι F)) (hP : IsMultiProjPrime P)
-    (W : Ideal (MRing ι F)), IsMultiProjPrime W → P ≤ W →
-    haveI := hP.isPrime
-    ringKrullDim (degZeroLoc P {W}) + ringKrullDim (MRing ι F ⧸ W) = ringKrullDim (MRing ι F ⧸ P)
+      [∀ k, Fintype (ι k)] (P : Ideal (MRing ι F)) (hP : IsMultiProjPrime P)
+      (W : Ideal (MRing ι F)),
+    IsMultiProjPrime W → P ≤ W
+      → haveI := hP.isPrime
+        ringKrullDim (degZeroLoc P {W}) + ringKrullDim (MRing ι F ⧸ W)
+          = ringKrullDim (MRing ι F ⧸ P)
 
 end
 

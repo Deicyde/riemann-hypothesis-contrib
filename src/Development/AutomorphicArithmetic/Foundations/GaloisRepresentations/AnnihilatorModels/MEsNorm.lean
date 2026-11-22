@@ -13,18 +13,45 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.FiniteFlatCov
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.esNorm_of (hG : UpperTheory.Gal.crystallineComparison.Mod.EsGen) : UpperTheory.Gal.crystallineComparison.Mod.EsNorm := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.esNorm_of
+    (hG : UpperTheory.Gal.crystallineComparison.Mod.EsGen)
+    : UpperTheory.Gal.crystallineComparison.Mod.EsNorm := by
   intro p _ D R _ _ _ _ b N h3 hcop hp r w j c hw hu hj hc hm M
-  obtain ⟨Y₀, s₀, t₀, gs, gt, o₀, o₀', ms₀, mt₀, ψ₀, hst₀, hgs, hgt, hfgs, hegs, hfgt, hegt, hiso₀, htj₀, huniv₀⟩ :=
+  obtain ⟨
+      Y₀,
+      s₀,
+      t₀,
+      gs,
+      gt,
+      o₀,
+      o₀',
+      ms₀,
+      mt₀,
+      ψ₀,
+      hst₀,
+      hgs,
+      hgt,
+      hfgs,
+      hegs,
+      hfgt,
+      hegt,
+      hiso₀,
+      htj₀,
+      huniv₀
+    ⟩ :=
     hG p D R b N h3 hcop hp r w j c hw hu hj hc hm M
   obtain ⟨Y, s, i, hio, hid, hi, hfs, hnorm, hflat, hnoeth, hext⟩ :=
     NormCover.exists_finite_normal_model p D R b N hp M Y₀ s₀ gs hfgs hegs hgs
-  obtain ⟨t, hit, ht, hft⟩ := GlobalTheory.ExtT.exists_finite_extension p D R b N h3 hcop hp r w j c hw hu hj hc hm M
-    Y₀ s₀ t₀ gs gt o₀ o₀' ms₀ mt₀ ψ₀ hst₀ hgs hgt hfgs hegs hfgt hegt hiso₀ htj₀ Y s i hio hid hi hfs hnorm hflat
-    hnoeth hext
+  obtain ⟨t, hit, ht, hft⟩ :=
+    GlobalTheory.ExtT.exists_finite_extension p D R b N h3 hcop hp r w j c hw hu hj hc hm M Y₀ s₀ t₀
+      gs gt o₀ o₀' ms₀ mt₀ ψ₀ hst₀ hgs hgt hfgs hegs hfgt hegt hiso₀ htj₀ Y s i hio hid hi hfs hnorm
+      hflat hnoeth hext
   have hred : AlgebraicGeometry.IsReduced Y :=
     isReduced_normalModel_of_generic p D R b N hp M Y₀ s₀ gs hgs hegs Y s i hio hi hflat hext
   have hdom : ∀ y : Y, IsDomain (Y.presheaf.stalk y) := fun y => by
@@ -35,13 +62,14 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.esNorm_of (hG : UpperTheory.Ga
     let I : Ideal A := Ideal.span {a}
     let J : Ideal A := I ⊔ I.annihilator
     -- The sum of an ideal and its annihilator is faithful in a reduced ring.
-    have : FaithfulSMul A J := Module.annihilator_eq_bot.mp <| by
-      change J.annihilator = ⊥
-      rw [show J = I ⊔ I.annihilator from rfl, Submodule.annihilator_sup, eq_bot_iff]
-      intro z hz
-      have hzz : z * z = 0 := Submodule.mem_annihilator.mp hz.2 z hz.1
-      have hz0 : z = 0 := IsNilpotent.eq_zero ⟨2, by simpa only [pow_two] using hzz⟩
-      simpa using hz0
+    have : FaithfulSMul A J :=
+      Module.annihilator_eq_bot.mp <| by
+        change J.annihilator = ⊥
+        rw [show J = I ⊔ I.annihilator from rfl, Submodule.annihilator_sup, eq_bot_iff]
+        intro z hz
+        have hzz : z * z = 0 := Submodule.mem_annihilator.mp hz.2 z hz.1
+        have hz0 : z = 0 := IsNilpotent.eq_zero ⟨2, by simpa only [pow_two] using hzz⟩
+        simpa using hz0
     obtain ⟨s, hs, hreg⟩ := Ideal.nonempty_inter_nonZeroDivisors_of_faithfulSMul (I := J)
     obtain ⟨u, v, hv, rfl⟩ := Ideal.mem_span_singleton_sup.mp hs
     have hva : v * a = 0 := Submodule.mem_annihilator.mp hv a (Ideal.mem_span_singleton_self a)
@@ -58,7 +86,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.esNorm_of (hG : UpperTheory.Ga
       apply hu.mul_right_cancel
       have hmul : f (u * a) * f (u * a + v) = f (u * a) * f (u * a) := by
         rw [← map_mul, ← map_mul, mul_add, mul_assoc u a v, mul_comm a v, hva, mul_zero, add_zero]
-      calc e * e * f (u * a + v) * f (u * a + v)
+      calc
+        e * e * f (u * a + v) * f (u * a + v)
           = (e * f (u * a + v)) * (e * f (u * a + v)) := by ring
         _ = f (u * a) * f (u * a) := by rw [he]
         _ = f (u * a) * f (u * a + v) := hmul.symm
@@ -88,9 +117,10 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.esNorm_of (hG : UpperTheory.Ga
   subst hit
   obtain ⟨m, -⟩ := GlobalTheory.HTSympCover.exists_objMap_cancel_φ ms₀ ms
   obtain ⟨m', -⟩ := GlobalTheory.HTSympCover.exists_objMap_cancel_φ mt₀ mt
-  obtain ⟨ψ, hiso, hcomm⟩ := PIsogExt.exists_isPIsog_extend p D R b N h3 hcop j c hc Y₀ Y i _ _ hio hid hnoeth
-    hnorm hdom o o' o₀ o₀' m m' ψ₀ hiso₀
+  obtain ⟨ψ, hiso, hcomm⟩ :=
+    PIsogExt.exists_isPIsog_extend p D R b N h3 hcop j c hc Y₀ Y i _ _ hio hid hnoeth hnorm hdom o
+      o' o₀ o₀' m m' ψ₀ hiso₀
   refine ⟨Y, s, t, o, o', ms, mt, ψ, ht.symm, hfs, hft, hnorm, hflat, hiso, ?_, ?_⟩
   · exact isTj_of_objMap_factor p D R b N r w j Y₀ Y i _ _ o o' o₀ o₀' m m' ψ₀ ψ hcomm hext htj₀
-  · exact existsUnique_of_openImmersion p D R b N h3 hcop r w j c M Y₀ Y i (i ≫ s) s _ _ o o' o₀ o₀' m m'
-      ψ₀ ψ hio rfl hcomm hext huniv₀
+  · exact existsUnique_of_openImmersion p D R b N h3 hcop r w j c M Y₀ Y i (i ≫ s) s _ _ o o' o₀ o₀'
+      m m' ψ₀ ψ hio rfl hcomm hext huniv₀

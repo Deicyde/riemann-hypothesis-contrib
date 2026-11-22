@@ -13,7 +13,7 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume
 namespace PI.VolStabS
 
 theorem restrProd_holds : RestrProd :=
-  restrProd_of rpAbs_holds rpFib_holds rpGlue_holds RestrProdG.rpGram_holds
-    RestrProdA.rpTail_holds RestrProdA.latCofin_holds
+  restrProd_of rpAbs_holds rpFib_holds rpGlue_holds RestrProdG.rpGram_holds RestrProdA.rpTail_holds
+    RestrProdA.latCofin_holds
 
 end PI.VolStabS

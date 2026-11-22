@@ -17,7 +17,9 @@ namespace PositivityTheory.Lit1.GEN.W_killed_c
 
 section Infl
 
-variable {G : Type} [Group G] [TopologicalSpace G] (Q : OpenSubgroup G) [(Q : Subgroup G).Normal]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  (Q : OpenSubgroup G) [(Q : Subgroup G).Normal]
   {l : ℕ} {X : Type} [AddCommGroup X] [Module (ZMod l) X]
 
 def inflHom (ρ : Representation (ZMod l) (G ⧸ (Q : Subgroup G)) X) : G →* AddMonoid.End X where
@@ -28,23 +30,29 @@ def inflHom (ρ : Representation (ZMod l) (G ⧸ (Q : Subgroup G)) X) : G →* A
 abbrev infl (ρ : Representation (ZMod l) (G ⧸ (Q : Subgroup G)) X) : Rep.{0} (ULift.{0} ℤ) G :=
   Rep.of (intRep.{0} (inflHom Q ρ))
 
-theorem infl_apply (ρ : Representation (ZMod l) (G ⧸ (Q : Subgroup G)) X) (g : G) (x : X) :
-    (infl Q ρ).ρ g x = ρ (QuotientGroup.mk g) x := rfl
+theorem infl_apply (ρ : Representation (ZMod l) (G ⧸ (Q : Subgroup G)) X) (g : G) (x : X)
+    : (infl Q ρ).ρ g x = ρ (QuotientGroup.mk g) x :=
+  rfl
 
-theorem finite_infl [Finite X] (ρ : Representation (ZMod l) (G ⧸ (Q : Subgroup G)) X) :
-    Finite (infl Q ρ) := ‹Finite X›
+theorem finite_infl [Finite X] (ρ : Representation (ZMod l) (G ⧸ (Q : Subgroup G)) X)
+    : Finite (infl Q ρ) :=
+  ‹Finite X›
 
-theorem isDiscreteRep_infl [IsTopologicalGroup G] (ρ : Representation (ZMod l) (G ⧸ (Q : Subgroup G)) X) :
-    IsDiscreteRep (infl Q ρ) :=
-  ⟨fun a => Subgroup.isOpen_mono (H₁ := (Q : Subgroup G)) (fun q hq => by
-      show (infl Q ρ).ρ q a = a
-      rw [infl_apply, (QuotientGroup.eq_one_iff q).2 hq, map_one]
-      rfl) Q.isOpen⟩
+theorem isDiscreteRep_infl
+    [IsTopologicalGroup G] (ρ : Representation (ZMod l) (G ⧸ (Q : Subgroup G)) X)
+    : IsDiscreteRep (infl Q ρ) :=
+  ⟨fun a =>
+    Subgroup.isOpen_mono (H₁ := (Q : Subgroup G))
+      (fun q hq => by
+        show (infl Q ρ).ρ q a = a
+        rw [infl_apply, (QuotientGroup.eq_one_iff q).2 hq, map_one]
+        rfl)
+      Q.isOpen⟩
 
 end Infl
 
-theorem rat_eq_one_of_padicValRat {q : ℚ} (hq : 0 < q) (h : ∀ p : ℕ, p.Prime → padicValRat p q = 0) :
-    q = 1 := by
+theorem rat_eq_one_of_padicValRat {q : ℚ} (hq : 0 < q) (h : ∀ p : ℕ, p.Prime → padicValRat p q = 0)
+    : q = 1 := by
   have hval : ∀ p : ℕ, p.Prime → multiplicity p q.num.natAbs = multiplicity p q.den := by
     intro p hp
     have := h p hp
@@ -78,9 +86,11 @@ theorem rat_eq_one_of_padicValRat {q : ℚ} (hq : 0 < q) (h : ∀ p : ℕ, p.Pri
     omega
   exact Rat.ext h3 h2
 
-theorem shortExact_of_fun {k G : Type} [CommRing k] [Group G] (T : ShortComplex (Rep.{0} k G))
-    (h1 : Function.Injective T.f.hom) (h2 : ∀ y, T.g.hom y = 0 → ∃ x, T.f.hom x = y)
-    (h3 : Function.Surjective T.g.hom) : T.ShortExact := by
+theorem shortExact_of_fun
+    {k G : Type} [CommRing k] [Group G]
+    (T : ShortComplex (Rep.{0} k G)) (h1 : Function.Injective T.f.hom)
+    (h2 : ∀ y, T.g.hom y = 0 → ∃ x, T.f.hom x = y) (h3 : Function.Surjective T.g.hom)
+    : T.ShortExact := by
   refine ShortComplex.ShortExact.mk' ?_ ((Rep.mono_iff_injective _).2 h1)
     ((Rep.epi_iff_surjective _).2 h3)
   rw [← ShortComplex.exact_map_iff_of_faithful _ (forget₂ (Rep.{0} k G) (ModuleCat.{0} k)),
@@ -89,13 +99,16 @@ theorem shortExact_of_fun {k G : Type} [CommRing k] [Group G] (T : ShortComplex 
 
 section Artin
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (Q : OpenSubgroup G)
-  [(Q : Subgroup G).Normal] (l : ℕ) [Fact l.Prime]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+  (Q : OpenSubgroup G) [(Q : Subgroup G).Normal]
+  (l : ℕ) [Fact l.Prime]
   (χ : (A : Rep.{0} (ULift.{0} ℤ) G) → [IsDiscreteRep A] → ℚ)
 
 def MultKilled : Prop :=
   ∀ (T : ShortComplex (Rep.{0} (ULift.{0} ℤ) G)) [IsDiscreteRep T.X₁] [IsDiscreteRep T.X₂]
-    [IsDiscreteRep T.X₃] [Finite T.X₂], T.ShortExact → (∀ m : T.X₂, l • m = 0) → χ T.X₂ = χ T.X₁ * χ T.X₃
+      [IsDiscreteRep T.X₃] [Finite T.X₂],
+    T.ShortExact → (∀ m : T.X₂, l • m = 0) → χ T.X₂ = χ T.X₁ * χ T.X₃
 
 def PosKilled : Prop :=
   ∀ (A : Rep.{0} (ULift.{0} ℤ) G) [IsDiscreteRep A] [Finite A], (∀ m : A, l • m = 0) → 0 < χ A
@@ -104,18 +117,25 @@ variable {l χ}
 
 attribute [local instance] isDiscreteRep_infl finite_infl
 
-theorem nsmul_eq_zero_of_zmod {X : Type} [AddCommGroup X] [Module (ZMod l) X] (x : X) : l • x = 0 := by
+theorem nsmul_eq_zero_of_zmod {X : Type} [AddCommGroup X] [Module (ZMod l) X] (x : X)
+    : l • x = 0 := by
   rw [← Nat.cast_smul_eq_nsmul (ZMod l), ZMod.natCast_self, zero_smul]
 
-noncomputable def valFun (hmult : MultKilled l χ) (hpos : PosKilled l χ) (p : ℕ) [Fact p.Prime] :
-    AdditiveFunction.{0} l (G ⧸ (Q : Subgroup G)) where
+noncomputable def valFun (hmult : MultKilled l χ) (hpos : PosKilled l χ) (p : ℕ) [Fact p.Prime]
+    : AdditiveFunction.{0} l (G ⧸ (Q : Subgroup G)) where
   toFun X _ _ _ ρ := padicValRat p (χ (infl Q ρ))
   additive := by
     intro X₁ X₂ X₃ _ _ _ _ _ _ _ _ _ ρ₁ ρ₂ ρ₃ f g hf hg hinj hfg hs
-    let F : infl Q ρ₁ ⟶ infl Q ρ₂ := Rep.ofHom ⟨uliftLinearOfAddHom f.toAddMonoidHom,
-      fun γ => LinearMap.ext fun x => hf.isIntertwining (QuotientGroup.mk γ) x⟩
-    let Gm : infl Q ρ₂ ⟶ infl Q ρ₃ := Rep.ofHom ⟨uliftLinearOfAddHom g.toAddMonoidHom,
-      fun γ => LinearMap.ext fun x => hg.isIntertwining (QuotientGroup.mk γ) x⟩
+    let F : infl Q ρ₁ ⟶ infl Q ρ₂ :=
+      Rep.ofHom ⟨
+        uliftLinearOfAddHom f.toAddMonoidHom,
+        fun γ => LinearMap.ext fun x => hf.isIntertwining (QuotientGroup.mk γ) x
+      ⟩
+    let Gm : infl Q ρ₂ ⟶ infl Q ρ₃ :=
+      Rep.ofHom ⟨
+        uliftLinearOfAddHom g.toAddMonoidHom,
+        fun γ => LinearMap.ext fun x => hg.isIntertwining (QuotientGroup.mk γ) x
+      ⟩
     have hzero : F ≫ Gm = 0 := by
       ext x
       exact (hfg (f x)).2 ⟨x, rfl⟩
@@ -130,12 +150,14 @@ noncomputable def valFun (hmult : MultKilled l χ) (hpos : PosKilled l χ) (p : 
     rw [hm]
     exact padicValRat.mul h1.ne' h3.ne'
 
-theorem eq_one_of_forall_isCyclic (hmult : MultKilled l χ) (hpos : PosKilled l χ)
-    [Finite (G ⧸ (Q : Subgroup G))] {X : Type} [AddCommGroup X] [Module (ZMod l) X] [Finite X]
+theorem eq_one_of_forall_isCyclic
+    (hmult : MultKilled l χ) (hpos : PosKilled l χ)
+    [Finite (G ⧸ (Q : Subgroup G))]
+    {X : Type} [AddCommGroup X] [Module (ZMod l) X] [Finite X]
     (ρ : Representation (ZMod l) (G ⧸ (Q : Subgroup G)) X)
-    (h : ∀ D : Subgroup (G ⧸ (Q : Subgroup G)), IsCyclic D →
-      χ (infl Q (funRep ((G ⧸ (Q : Subgroup G)) ⧸ D) ρ)) = 1) :
-    χ (infl Q ρ) = 1 := by
+    (h : ∀ D : Subgroup (G ⧸ (Q : Subgroup G)),
+      IsCyclic D → χ (infl Q (funRep ((G ⧸ (Q : Subgroup G)) ⧸ D) ρ)) = 1)
+    : χ (infl Q ρ) = 1 := by
   apply rat_eq_one_of_padicValRat (hpos _ (fun m => nsmul_eq_zero_of_zmod (l := l) (X := X) m))
   intro p hp
   haveI : Fact p.Prime := ⟨hp⟩
@@ -148,36 +170,47 @@ end Artin
 
 section GSAux
 
-theorem exists_card_eq_pow' {ℓ : ℕ} [Fact ℓ.Prime] {X : Type*} [AddCommGroup X] [Finite X]
-    (h : ∀ m : X, ℓ • m = 0) : ∃ n : ℕ, Nat.card X = ℓ ^ n := by
-  have hp : IsPGroup ℓ (Multiplicative X) := fun g => ⟨1, by
-    show Multiplicative.toAdd (g ^ (ℓ ^ 1)) = Multiplicative.toAdd 1
-    rw [toAdd_pow, pow_one]; exact h _⟩
+theorem exists_card_eq_pow'
+    {ℓ : ℕ} [Fact ℓ.Prime] {X : Type*} [AddCommGroup X] [Finite X] (h : ∀ m : X, ℓ • m = 0)
+    : ∃ n : ℕ, Nat.card X = ℓ ^ n := by
+  have hp : IsPGroup ℓ (Multiplicative X) := fun g => ⟨
+    1,
+    by
+      show Multiplicative.toAdd (g ^ (ℓ ^ 1)) = Multiplicative.toAdd 1
+      rw [toAdd_pow, pow_one]
+      exact h _
+  ⟩
   obtain ⟨n, hn⟩ := hp.exists_card_eq
   exact ⟨n, by rw [← hn]; rfl⟩
 
-theorem ratio_shortExact_l' (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
-    (hS : S.Finite) (hSl : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
+theorem ratio_shortExact_l'
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1))) (hS : S.Finite)
+    (hSl : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
     (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal},
-        AlgebraicClosure ℚ →ₐ[K.1] AlgebraicClosure v.1.Completion)
+      AlgebraicClosure ℚ →ₐ[K.1] AlgebraicClosure v.1.Completion)
     (T : ShortComplex (Rep.{0} (ULift.{0} ℤ) (galUnramifiedOutside K.1 (AlgebraicClosure ℚ) S)))
     (hT : T.ShortExact) [IsDiscreteRep T.X₁] [IsDiscreteRep T.X₂] [IsDiscreteRep T.X₃] [Finite T.X₂]
-    (hl : ∃ r : ℕ, ∀ m : T.X₂, (ℓ ^ r) • m = 0) :
-    haveI : Finite S := hS
-    gsEulerRatio S T.X₂ ιr = gsEulerRatio S T.X₁ ιr * gsEulerRatio S T.X₃ ιr :=
+    (hl : ∃ r : ℕ, ∀ m : T.X₂, (ℓ ^ r) • m = 0)
+    : haveI : Finite S := hS
+      gsEulerRatio S T.X₂ ιr = gsEulerRatio S T.X₁ ιr * gsEulerRatio S T.X₃ ιr :=
   PositivityTheory.Lit1.GEN.ratio_shortExact_l ℓ K S hS hSl ιr T hT hl
 
-theorem gs_multKilled (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
+theorem gs_multKilled
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
     (hS : S.Finite) (hSl : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
-    (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion) :
-    MultKilled ℓ (fun A [IsDiscreteRep A] => gsEulerRatio S A ιr) := by
+    (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion)
+    : MultKilled ℓ (fun A [IsDiscreteRep A] => gsEulerRatio S A ιr) := by
   intro T _ _ _ _ hT hl
   exact ratio_shortExact_l' ℓ K S hS hSl ιr T hT ⟨1, by simpa using hl⟩
 
-theorem gs_posKilled (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
+theorem gs_posKilled
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
     (hS : S.Finite) (hSl : ∀ v : HeightOneSpectrum (𝓞 K.1), ((ℓ : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S)
-    (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion) :
-    PosKilled ℓ (fun A [IsDiscreteRep A] => gsEulerRatio S A ιr) := by
+    (ιr : ∀ v : {v : InfinitePlace K.1 // v.IsReal}, ℚ̄ →ₐ[K.1] AlgebraicClosure v.1.Completion)
+    : PosKilled ℓ (fun A [IsDiscreteRep A] => gsEulerRatio S A ιr) := by
   intro A _ _ hA
   classical
   have : Finite S := hS
@@ -193,7 +226,8 @@ theorem gs_posKilled (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set 
     have hCard : (0 : ℚ) < Nat.card (cohomology A q) := by exact_mod_cast Nat.card_pos
     exact zpow_pos hCard _
   have hCard : (0 : ℚ) < Nat.card A := by exact_mod_cast Nat.card_pos
-  have hReal : (0 : ℚ) < ∏ v : {v : InfinitePlace K.1 // v.IsReal}, (gsRealH0Card S A ιr v : ℚ) := by
+  have hReal
+      : (0 : ℚ) < ∏ v : {v : InfinitePlace K.1 // v.IsReal}, (gsRealH0Card S A ιr v : ℚ) := by
     refine Finset.prod_pos fun v _ => ?_
     let B := Rep.res (gsRealFamily S ιr v).toMonoidHom A
     have : Finite B := inferInstanceAs (Finite A)
@@ -202,7 +236,6 @@ theorem gs_posKilled (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set 
     exact_mod_cast Nat.card_pos
   unfold gsEulerRatio
   convert div_pos (mul_pos hEuler (pow_pos hCard (Fintype.card (InfinitePlace K.1)))) hReal
-
 
 set_option maxHeartbeats 1000000 in
 theorem exists_field_of_cyclic (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
@@ -246,12 +279,15 @@ theorem exists_field_of_cyclic (ℓ : ℕ) [Fact ℓ.Prime] (K : FiniteSubfield)
   let e := (QuotientGroup.quotientMulEquivOfEq hk).symm.trans (QuotientGroup.quotientKerEquivOfSurjective φ hsurj)
   exact isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
 
-theorem finite_quot_gs (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
+theorem finite_quot_gs
+    (K : FiniteSubfield) (S : Set (HeightOneSpectrum (𝓞 K.1)))
     (L : FiniteSubfield) [Fact (K ≤ L)]
-    (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S) :
-    Finite (galUnramifiedOutside K.1 ℚ̄ S ⧸ (gsOpenSubgroup S hL : Subgroup (galUnramifiedOutside K.1 ℚ̄ S))) := by
-  haveI := finiteIndex_gsOpenSubgroup S hL
-  exact Subgroup.finite_quotient_of_finiteIndex
+    (hL : ∀ x : L.1, algebraMap L.1 ℚ̄ x ∈ maxUnramifiedOutside K.1 ℚ̄ S)
+    : Finite
+      (galUnramifiedOutside K.1 ℚ̄ S ⧸ (gsOpenSubgroup S hL : Subgroup (galUnramifiedOutside K.1 ℚ̄ S))) :=
+  by
+    haveI := finiteIndex_gsOpenSubgroup S hL
+    exact Subgroup.finite_quotient_of_finiteIndex
 
 end GSAux
 

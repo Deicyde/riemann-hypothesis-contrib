@@ -16,9 +16,15 @@ theorem LeafColUniv_of : LeafColUniv := by
   have hnat : ∀ {j k : Δ.J} (e : j ⟶ k), (χ k).comp (Δ.D.map e).hom = χ j := fun {j k} e => by
     apply hχu j
     rw [RingHom.comp_assoc, Δ.nat e, hχ k]
-  let cB : Cocone Δ.D := ⟨CommRingCat.of B, ⟨fun j => CommRingCat.ofHom (χ j), fun j k e => by
-    apply CommRingCat.hom_ext
-    simpa using hnat e⟩⟩
+  let cB : Cocone Δ.D := ⟨
+    CommRingCat.of B,
+    ⟨
+      fun j => CommRingCat.ofHom (χ j),
+      fun j k e => by
+        apply CommRingCat.hom_ext
+        simpa using hnat e
+    ⟩
+  ⟩
   let d := hc.desc cB
   have hfac : ∀ j, d.hom.comp (Δ.leg c j) = χ j := fun j => by
     have := hc.fac cB j
@@ -30,10 +36,11 @@ theorem LeafColUniv_of : LeafColUniv := by
   · have h2 : ∀ j, χ'.comp (Δ.leg c j) = χ j := fun j => by
       apply hχu j
       rw [RingHom.comp_assoc, hη j, h']
-    have : CommRingCat.ofHom χ' = d := hc.hom_ext fun j => by
-      apply CommRingCat.hom_ext
-      change χ'.comp (Δ.leg c j) = d.hom.comp (Δ.leg c j)
-      rw [h2, hfac]
+    have : CommRingCat.ofHom χ' = d :=
+      hc.hom_ext fun j => by
+        apply CommRingCat.hom_ext
+        change χ'.comp (Δ.leg c j) = d.hom.comp (Δ.leg c j)
+        rw [h2, hfac]
     rw [← this]
     rfl
 

@@ -11,25 +11,34 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsNoe
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH GlobalTheory.Poinc
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.ZH GlobalTheory.Poinc
 
 namespace GlobalTheory.Izumi
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω)
 
-theorem norm_val_add_le {U : Set M.Z} {x : M.Z} {p : ℕ} [Fact p.Prime] {y : Sp (OO p) ⟶ M.Z} (hy : M.Cen U x y)
-    (F G : M.O x) :
-    ‖M.val (gPt p ≫ y) ((F + G : M.O x) : Ω)‖ ≤ max ‖M.val (gPt p ≫ y) (F : Ω)‖ ‖M.val (gPt p ≫ y) (G : Ω)‖ := by
+theorem norm_val_add_le
+    {U : Set M.Z} {x : M.Z} {p : ℕ} [Fact p.Prime]
+    {y : Sp (OO p) ⟶ M.Z} (hy : M.Cen U x y)
+    (F G : M.O x)
+    : ‖M.val (gPt p ≫ y) ((F + G : M.O x) : Ω)‖
+      ≤ max ‖M.val (gPt p ≫ y) (F : Ω)‖ ‖M.val (gPt p ≫ y) (G : Ω)‖ := by
   rw [Subalgebra.coe_add, RatModel.val_add (RatModel.gPt_specializes hy.1) F.2 G.2]
   exact IsUltrametricDist.norm_add_le_max _ _
 
-theorem norm_val_mul_le {U : Set M.Z} {x : M.Z} {p : ℕ} [Fact p.Prime] {y : Sp (OO p) ⟶ M.Z} (hy : M.Cen U x y)
-    (c F : M.O x) : ‖M.val (gPt p ≫ y) ((c * F : M.O x) : Ω)‖ ≤ ‖M.val (gPt p ≫ y) (F : Ω)‖ := by
+theorem norm_val_mul_le
+    {U : Set M.Z} {x : M.Z} {p : ℕ} [Fact p.Prime]
+    {y : Sp (OO p) ⟶ M.Z} (hy : M.Cen U x y)
+    (c F : M.O x)
+    : ‖M.val (gPt p ≫ y) ((c * F : M.O x) : Ω)‖ ≤ ‖M.val (gPt p ≫ y) (F : Ω)‖ := by
   rw [Subalgebra.coe_mul, RatModel.val_mul (RatModel.gPt_specializes hy.1) c.2 F.2, norm_mul]
   exact mul_le_of_le_one_left (norm_nonneg _) (hy.norm_val_le_one c.2)
 
 def smallIdeal (U : M.Z.Opens) (x : M.Z) (f : Ω) (N : ℕ) : Ideal (M.O x) where
-  carrier := {F | ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z), M.Cen U x y →
+  carrier :=
+    {F | ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z), M.Cen U x y →
       ‖M.val (gPt p ≫ y) F‖ ≤ ‖M.val (gPt p ≫ y) f‖ ∨
         ∃ h, NonUnitAt M x h ∧ ‖M.val (gPt p ≫ y) F‖ ≤ ‖M.val (gPt p ≫ y) h‖ ^ N}
   zero_mem' := by
@@ -59,20 +68,24 @@ def smallIdeal (U : M.Z.Opens) (x : M.Z) (f : Ω) (N : ℕ) : Ideal (M.O x) wher
 
 variable {M}
 
-theorem mem_smallIdeal {U : M.Z.Opens} {x : M.Z} {f : Ω} {N : ℕ} {F : M.O x} :
-    F ∈ smallIdeal M U x f N ↔ ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z), M.Cen U x y →
-      ‖M.val (gPt p ≫ y) F‖ ≤ ‖M.val (gPt p ≫ y) f‖ ∨
-        ∃ h, NonUnitAt M x h ∧ ‖M.val (gPt p ≫ y) F‖ ≤ ‖M.val (gPt p ≫ y) h‖ ^ N := Iff.rfl
+theorem mem_smallIdeal {U : M.Z.Opens} {x : M.Z} {f : Ω} {N : ℕ} {F : M.O x}
+    : F ∈ smallIdeal M U x f N
+      ↔ ∀ (p : ℕ) [Fact p.Prime] (y : Sp (OO p) ⟶ M.Z),
+        M.Cen U x y
+          → ‖M.val (gPt p ≫ y) F‖ ≤ ‖M.val (gPt p ≫ y) f‖
+            ∨ ∃ h, NonUnitAt M x h ∧ ‖M.val (gPt p ≫ y) F‖ ≤ ‖M.val (gPt p ≫ y) h‖ ^ N :=
+  Iff.rfl
 
 theorem smallIdeal_antitone (U : M.Z.Opens) (x : M.Z) (f : Ω) : Antitone (smallIdeal M U x f) := by
   intro N N' hN F hF p _ y hy
   rcases hF p y hy with h' | ⟨k, hk, h'⟩
   · exact Or.inl h'
-  · refine Or.inr ⟨k, hk, h'.trans (pow_le_pow_of_le_one (norm_nonneg _) (hy.norm_val_le_one hk.1) hN)⟩
+  · refine Or.inr
+      ⟨k, hk, h'.trans (pow_le_pow_of_le_one (norm_nonneg _) (hy.norm_val_le_one hk.1) hN)⟩
 
-theorem self_mem_smallIdeal (U : M.Z.Opens) {x : M.Z} {f : Ω} (hf : f ∈ M.O x) (N : ℕ) :
-    (⟨f, hf⟩ : M.O x) ∈ smallIdeal M U x f N :=
-  fun _ _ _ _ => Or.inl le_rfl
+theorem self_mem_smallIdeal (U : M.Z.Opens) {x : M.Z} {f : Ω} (hf : f ∈ M.O x) (N : ℕ)
+    : (⟨f, hf⟩ : M.O x) ∈ smallIdeal M U x f N := fun _ _ _ _ =>
+  Or.inl le_rfl
 
 end GlobalTheory.Izumi
 
@@ -80,11 +93,14 @@ namespace GlobalTheory.Izumi
 
 open IsLocalRing
 
-theorem exists_le_span_sup_pow (A : Type) [CommRing A] [IsLocalRing A] [IsNoetherianRing A] (K : ℕ → Ideal A)
-    (f : A) (hK : Antitone K) (hf : ∀ N, f ∈ K N)
-    (h : ⨅ N, (K N).map (algebraMap A (AdicCompletion (maximalIdeal A) A)) ≤
-      Ideal.span {algebraMap A (AdicCompletion (maximalIdeal A) A) f}) (e : ℕ) :
-    ∃ N, K N ≤ Ideal.span {f} ⊔ maximalIdeal A ^ e := by
+theorem exists_le_span_sup_pow
+    (A : Type) [CommRing A] [IsLocalRing A] [IsNoetherianRing A]
+    (K : ℕ → Ideal A) (f : A)
+    (hK : Antitone K) (hf : ∀ N, f ∈ K N)
+    (h : ⨅ N, (K N).map (algebraMap A (AdicCompletion (maximalIdeal A) A))
+      ≤ Ideal.span {algebraMap A (AdicCompletion (maximalIdeal A) A) f})
+    (e : ℕ)
+    : ∃ N, K N ≤ Ideal.span {f} ⊔ maximalIdeal A ^ e := by
   set B := AdicCompletion (maximalIdeal A) A
   set φ := algebraMap A B
   have : IsNoetherianRing B := GlobalTheory.AdicNoeth.isNoetherianRing_adicCompletion A _
@@ -110,12 +126,15 @@ theorem exists_le_span_sup_pow (A : Type) [CommRing A] [IsLocalRing A] [IsNoethe
     have := h hb
     simp only [Submodule.mem_bot, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
     exact this
-  obtain ⟨N, hN⟩ := GlobalTheory.Chevalley.exists_le_maximalIdeal_pow_smul_of_directed B (B ⧸ I) ℕ L
-    inferInstance hL h0 e
+  obtain ⟨N, hN⟩ :=
+    GlobalTheory.Chevalley.exists_le_maximalIdeal_pow_smul_of_directed B (B ⧸ I) ℕ L inferInstance
+      hL h0 e
   refine ⟨N, fun a ha => ?_⟩
   have h1 : I.mkQ (φ a) ∈ maximalIdeal B ^ e • (⊤ : Submodule B (B ⧸ I)) :=
     hN (Submodule.mem_map_of_mem (Ideal.mem_map_of_mem φ ha))
-  have h2 : maximalIdeal B ^ e • (⊤ : Submodule B (B ⧸ I)) = Submodule.map I.mkQ (maximalIdeal B ^ e) := by
+  have h2
+      : maximalIdeal B ^ e • (⊤ : Submodule B (B ⧸ I))
+        = Submodule.map I.mkQ (maximalIdeal B ^ e) := by
     have h4 : maximalIdeal B ^ e • (⊤ : Submodule B B) = maximalIdeal B ^ e := by
       rw [Ideal.smul_eq_mul, Ideal.mul_top]
     rw [← Submodule.range_mkQ I, ← Submodule.map_top, ← Submodule.map_smul'', h4]
@@ -137,6 +156,7 @@ theorem exists_le_span_sup_pow (A : Type) [CommRing A] [IsLocalRing A] [IsNoethe
   rw [map_add (f := _), map_mul, ht0, add_zero, hψ, hψ, ← hc', ← map_mul, Ideal.Quotient.eq] at h3
   have : a = c' * f + (a - c' * f) := by ring
   rw [this]
-  exact Submodule.add_mem_sup (Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self f)) (by rw [← neg_sub]; exact neg_mem h3)
+  exact Submodule.add_mem_sup (Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self f))
+    (by rw [← neg_sub]; exact neg_mem h3)
 
 end GlobalTheory.Izumi

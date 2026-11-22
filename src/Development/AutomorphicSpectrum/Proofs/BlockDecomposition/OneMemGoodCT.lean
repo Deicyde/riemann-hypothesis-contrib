@@ -17,16 +17,19 @@ abbrev lev (R : Type) [CommRing R] (r s : ℕ) : GL (Fin r) R × GL (Fin s) R �
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {r s : ℕ}
 
-def goodCT (L : Subgroup (GL (Fin (r + s)) (Af E))) {W : Type} [AddCommGroup W] [Module ℂ W]
-    (ρ : Representation ℂ (Kinf E (r + s)) W) (J : Set (Module.End ℂ (Sm E (r + s)))) :
-    Submodule ℂ (Sm E (r + s)) where
-  carrier := {F | (∀ (x : BlockIx (r + s) r → Ad E) (g : GA E (r + s)), F.1 (unip x * g) = F.1 g) ∧
-    (∀ (γ : GL (Fin r) E × GL (Fin s) E) (g : GA E (r + s)),
-      F.1 (lev (Ad E) r s (ratGL E r γ.1, ratGL E s γ.2) * g) = F.1 g) ∧
-    (∀ k ∈ L, finRep E (r + s) k F = F) ∧
-    (∀ g : GA E (r + s), (fun k : Kinf E (r + s) => (cptRep E (r + s) k F).1 g) ∈ GlobalTheory.Published.AutFin.coeffSpan ρ) ∧
-    (∀ g : GA E (r + s), ∃ (C : ℝ) (N : ℕ), ∀ y, ‖F.1 (g * infGL E (r + s) y)‖ ≤ C * height y ^ N) ∧
-    ∀ z ∈ J, z F = 0}
+def goodCT
+    (L : Subgroup (GL (Fin (r + s)) (Af E)))
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    (ρ : Representation ℂ (Kinf E (r + s)) W) (J : Set (Module.End ℂ (Sm E (r + s))))
+    : Submodule ℂ (Sm E (r + s)) where
+  carrier :=
+    {F | (∀ (x : BlockIx (r + s) r → Ad E) (g : GA E (r + s)), F.1 (unip x * g) = F.1 g) ∧
+      (∀ (γ : GL (Fin r) E × GL (Fin s) E) (g : GA E (r + s)),
+        F.1 (lev (Ad E) r s (ratGL E r γ.1, ratGL E s γ.2) * g) = F.1 g) ∧
+      (∀ k ∈ L, finRep E (r + s) k F = F) ∧
+      (∀ g : GA E (r + s), (fun k : Kinf E (r + s) => (cptRep E (r + s) k F).1 g) ∈ GlobalTheory.Published.AutFin.coeffSpan ρ) ∧
+      (∀ g : GA E (r + s), ∃ (C : ℝ) (N : ℕ), ∀ y, ‖F.1 (g * infGL E (r + s) y)‖ ≤ C * height y ^ N) ∧
+      ∀ z ∈ J, z F = 0}
   add_mem' := by
     rintro F G ⟨a1, a2, a3, a4, a5, a6⟩ ⟨b1, b2, b3, b4, b5, b6⟩
     refine ⟨fun x g => ?_, fun γ g => ?_, fun k hk => ?_, fun g => ?_, fun g => ?_, fun z hz => ?_⟩
@@ -56,8 +59,14 @@ def goodCT (L : Subgroup (GL (Fin (r + s)) (Af E))) {W : Type} [AddCommGroup W] 
           (mul_le_mul_of_nonneg_left e2 (abs_nonneg _))
     · rw [map_add (f := _), a6 z hz, b6 z hz, add_zero]
   zero_mem' := by
-    refine ⟨fun x g => rfl, fun γ g => rfl, fun k _ => map_zero _, fun g => ?_, fun g => ⟨0, 0, fun y => ?_⟩,
-      fun z _ => map_zero z⟩
+    refine ⟨
+      fun x g => rfl,
+      fun γ g => rfl,
+      fun k _ => map_zero _,
+      fun g => ?_,
+      fun g => ⟨0, 0, fun y => ?_⟩,
+      fun z _ => map_zero z
+    ⟩
     · convert (GlobalTheory.Published.AutFin.coeffSpan ρ).zero_mem using 1
       funext k
       simp

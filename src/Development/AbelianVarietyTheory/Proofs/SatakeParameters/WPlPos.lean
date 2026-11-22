@@ -13,7 +13,11 @@ open Formalism.MainNotions Formalism.BasicNotions Formalism.MainNotions.G Classi
 
 namespace GlobalTheory.Ggeo
 
-theorem wPl_pos : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ i : Fm.Ix x, ∀ j < (Fm.D x i).R.m, ∀ (z : Bool × HH (Fm.D x i)), 0 < wPl (Fm.D x i) (j + 1) z := by
+theorem wPl_pos
+    : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0,
+      Fm.x1 < x
+        → ∀ i : Fm.Ix x, ∀ j < (Fm.D x i).R.m, ∀ (z : Bool × HH (Fm.D x i)),
+          0 < wPl (Fm.D x i) (j + 1) z := by
   intro eps Fm
   obtain ⟨x0, h0⟩ := GlobalTheory.ShNums.size_rel Fm
   obtain ⟨y0, h1⟩ := GlobalTheory.Ggeo.wPl_windows Fm

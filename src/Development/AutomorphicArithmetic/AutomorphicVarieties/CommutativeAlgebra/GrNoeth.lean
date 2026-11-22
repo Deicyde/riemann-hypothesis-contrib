@@ -9,8 +9,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-theorem UpperTheory.V.Alg.gr_noeth :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [DecidableEq X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (W : WPres O X R), (∀ s, W.z s ∈ maximalIdeal R) → IsNoetherianRing W.A ∧ Algebra.FiniteType (W.gr 0) W.A ∧ ∀ j, ∃ s : Finset W.A, (∀ a ∈ s, a ∈ W.gr j) ∧ W.gr j = W.gr 0 * Submodule.span O (s : Set W.A) := by
+theorem UpperTheory.V.Alg.gr_noeth
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+        [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X]
+        [Module.Finite ℤ X] [DecidableEq X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R]
+        (W : WPres O X R),
+      (∀ s, W.z s ∈ maximalIdeal R)
+        → IsNoetherianRing W.A ∧ Algebra.FiniteType (W.gr 0) W.A
+          ∧ ∀ j, ∃ s : Finset W.A,
+            (∀ a ∈ s, a ∈ W.gr j) ∧ W.gr j = W.gr 0 * Submodule.span O (s : Set W.A) := by
   intro O _ _ _ _ X _ _ _ _ R _ _ _ W hz
   classical
   haveI := W.fin
@@ -61,13 +68,12 @@ theorem UpperTheory.V.Alg.gr_noeth :
     have ha' : (a : R) ∈ W.part j := ha
     obtain ⟨f, hf, hfa⟩ := Submodule.mem_map.mp ha'
     obtain ⟨b, hb, hfb⟩ := hμ f (fun n hn => hf n hn)
-    let bA : (W.σ →₀ ℕ) → W.A := fun m =>
-      ⟨W.π (b m), W.part_le_A (Submodule.mem_map_of_mem (hb m))⟩
+    let bA : (W.σ →₀ ℕ) → W.A := fun m => ⟨W.π (b m), W.part_le_A (Submodule.mem_map_of_mem (hb m))⟩
     have hsum : a = ∑ m ∈ μ, bA m * mA m := by
       apply Subtype.ext
       rw [← hfa]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [hfb, map_sum, map_mul, bA, mA]
+      simp [hfb, map_sum, map_mul, bA, mA]
     rw [hsum]
     refine Submodule.sum_mem _ fun m hm => Submodule.mul_mem_mul ?_ ?_
     · show (W.π (b m) : R) ∈ W.part 0

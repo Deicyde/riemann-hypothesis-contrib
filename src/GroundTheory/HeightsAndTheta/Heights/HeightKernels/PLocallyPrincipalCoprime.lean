@@ -13,19 +13,26 @@ namespace LocallyPrincipalCoprimeAlt
 
 variable {L : Type} [Field L]
 
-theorem finite_maximal_of_ne_zero [CharZero L] (B : Subring L) [Module.Finite ℤ B] {s : B} (hs : s ≠ 0) :
-    Set.Finite {m : Ideal B | m.IsMaximal ∧ s ∈ m} := by
+theorem finite_maximal_of_ne_zero
+    [CharZero L] (B : Subring L) [Module.Finite ℤ B] {s : B} (hs : s ≠ 0)
+    : Set.Finite {m : Ideal B | m.IsMaximal ∧ s ∈ m} := by
   have : Module.Free ℤ B := Module.free_of_finite_type_torsion_free'
   have hI : Ideal.span {s} ≠ ⊥ := by simpa [Ideal.span_singleton_eq_bot] using hs
   have : Finite (B ⧸ Ideal.span {s}) := Ideal.finiteQuotientOfFreeOfNeBot _ hI
-  refine Set.Finite.of_finite_image (f := fun m : Ideal B => Ideal.Quotient.mk (Ideal.span {s}) '' (m : Set B))
+  refine Set.Finite.of_finite_image
+    (f := fun m : Ideal B => Ideal.Quotient.mk (Ideal.span {s}) '' (m : Set B))
     (Set.toFinite _) ?_
-  have key : ∀ m m' : Ideal B, s ∈ m' →
-      Ideal.Quotient.mk (Ideal.span {s}) '' (m : Set B) = Ideal.Quotient.mk (Ideal.span {s}) '' (m' : Set B) →
-      m ≤ m' := by
+  have key
+      : ∀ m m' : Ideal B,
+        s ∈ m'
+          → Ideal.Quotient.mk (Ideal.span {s}) '' (m : Set B)
+            = Ideal.Quotient.mk (Ideal.span {s}) '' (m' : Set B)
+          → m ≤ m' := by
     intro m m' hs' h x hx
-    obtain ⟨y, hy, hxy⟩ : Ideal.Quotient.mk (Ideal.span {s}) x ∈
-        Ideal.Quotient.mk (Ideal.span {s}) '' (m' : Set B) := h ▸ ⟨x, hx, rfl⟩
+    obtain ⟨y, hy, hxy⟩
+        : Ideal.Quotient.mk (Ideal.span {s}) x
+          ∈ Ideal.Quotient.mk (Ideal.span {s}) '' (m' : Set B) :=
+      h ▸ ⟨x, hx, rfl⟩
     have hd : x - y ∈ Ideal.span {s} := Ideal.Quotient.eq.mp hxy.symm
     have hle : Ideal.span {s} ≤ m' := (Ideal.span_singleton_le_iff_mem _).mpr hs'
     have := m'.add_mem (hle hd) hy
@@ -33,9 +40,11 @@ theorem finite_maximal_of_ne_zero [CharZero L] (B : Subring L) [Module.Finite �
   intro m hm m' hm' h
   exact le_antisymm (key m m' hm'.2 h) (key m' m hm.2 h.symm)
 
-theorem mem_span_of_local {B : Subring L} {M : AddSubgroup L} {ι : Type} {a : ι → L}
+theorem mem_span_of_local
+    {B : Subring L} {M : AddSubgroup L} {ι : Type} {a : ι → L}
     (hloc : ∀ m : Ideal B, m.IsMaximal → ∃ i, ∀ z ∈ M, ∃ b c : B, b ∉ m ∧ (b : L) * z = c * a i)
-    {z : L} (hz : z ∈ M) : z ∈ Submodule.span B (Set.range a) := by
+    {z : L} (hz : z ∈ M)
+    : z ∈ Submodule.span B (Set.range a) := by
   set S := Submodule.span B (Set.range a)
   by_contra hzS
   have hJ : S.colon {z} ≠ ⊤ := by
@@ -48,12 +57,15 @@ theorem mem_span_of_local {B : Subring L} {M : AddSubgroup L} {ι : Type} {a : �
   obtain ⟨b, c, hbm, hbc⟩ := hi z hz
   apply hbm
   apply hJm
-  have e : b • z = c • a i := by rw [Subring.smul_def, Subring.smul_def, smul_eq_mul, smul_eq_mul, hbc]
+  have e : b • z = c • a i := by
+    rw [Subring.smul_def, Subring.smul_def, smul_eq_mul, smul_eq_mul, hbc]
   rw [Submodule.mem_colon_singleton, e]
   exact S.smul_mem c (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem ne_zero_of_local {B : Subring L} {M : AddSubgroup L} {ι : Type} {a : ι → L} {m : Ideal B} {i : ι}
-    (hi : ∀ z ∈ M, ∃ b c : B, b ∉ m ∧ (b : L) * z = c * a i) (hM : M ≠ ⊥) : a i ≠ 0 := by
+theorem ne_zero_of_local
+    {B : Subring L} {M : AddSubgroup L} {ι : Type} {a : ι → L} {m : Ideal B} {i : ι}
+    (hi : ∀ z ∈ M, ∃ b c : B, b ∉ m ∧ (b : L) * z = c * a i) (hM : M ≠ ⊥)
+    : a i ≠ 0 := by
   obtain ⟨z, hzM, hz0⟩ : ∃ z ∈ M, z ≠ 0 := by
     by_contra h
     push Not at h
@@ -64,11 +76,13 @@ theorem ne_zero_of_local {B : Subring L} {M : AddSubgroup L} {ι : Type} {a : ι
   rw [ha, mul_zero] at hbc
   exact mul_ne_zero hb hz0 hbc
 
-theorem exists_local_mult {B : Subring L} {M : AddSubgroup L} {ι : Type} [Fintype ι] {a : ι → L}
-    (haM : ∀ i, a i ∈ M)
+theorem exists_local_mult
+    {B : Subring L} {M : AddSubgroup L} {ι : Type} [Fintype ι]
+    {a : ι → L} (haM : ∀ i, a i ∈ M)
     (hloc : ∀ m : Ideal B, m.IsMaximal → ∃ i, ∀ z ∈ M, ∃ b c : B, b ∉ m ∧ (b : L) * z = c * a i)
-    (hM : M ≠ ⊥) (m : Ideal B) (hm : m.IsMaximal) :
-    ∃ (g : L) (i : ι), (∀ z ∈ M, g * z ∈ B) ∧ ∃ y : B, (y : L) = g * a i ∧ y ∉ m := by
+    (hM : M ≠ ⊥)
+    (m : Ideal B) (hm : m.IsMaximal)
+    : ∃ (g : L) (i : ι), (∀ z ∈ M, g * z ∈ B) ∧ ∃ y : B, (y : L) = g * a i ∧ y ∉ m := by
   obtain ⟨i, hi⟩ := hloc m hm
   have hai := ne_zero_of_local hi hM
   set P := Submodule.span B {a i}
@@ -78,7 +92,8 @@ theorem exists_local_mult {B : Subring L} {M : AddSubgroup L} {ι : Type} [Finty
     obtain ⟨b, c, hbm, hbc⟩ := hi (a j) (haM j)
     apply hbm
     apply hj
-    have e : b • a j = c • a i := by rw [Subring.smul_def, Subring.smul_def, smul_eq_mul, smul_eq_mul, hbc]
+    have e : b • a j = c • a i := by
+      rw [Subring.smul_def, Subring.smul_def, smul_eq_mul, smul_eq_mul, hbc]
     rw [Submodule.mem_colon_singleton, e]
     exact Submodule.mem_span_singleton.mpr ⟨c, rfl⟩
   obtain ⟨t, htK, htm⟩ := IsConcreteLE.not_le_iff_exists.mp hK
@@ -88,8 +103,9 @@ theorem exists_local_mult {B : Subring L} {M : AddSubgroup L} {ι : Type} [Finty
   have hle : Submodule.span B (Set.range a) ≤ P.comap (t • LinearMap.id) := by
     rw [Submodule.span_le]
     rintro _ ⟨j, rfl⟩
-    have := Submodule.mem_colon_singleton.mp
-      ((Finset.inf_le (f := fun j => P.colon {a j}) (Finset.mem_univ j)) htK)
+    have :=
+      Submodule.mem_colon_singleton.mp
+        ((Finset.inf_le (f := fun j => P.colon {a j}) (Finset.mem_univ j)) htK)
     simpa using this
   have htz : t • z ∈ P := by simpa using hle hzN
   obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.mp htz
@@ -100,16 +116,13 @@ theorem exists_local_mult {B : Subring L} {M : AddSubgroup L} {ι : Type} [Finty
   rw [this]
   exact c.2
 
-
 open scoped Classical in
 open Classical in
 noncomputable def toB (B : Subring L) (x : L) : B := if h : x ∈ B then ⟨x, h⟩ else 0
 
-theorem coe_toB {B : Subring L} {x : L} (h : x ∈ B) : (toB B x : L) = x := by
-  simp [toB, h]
+theorem coe_toB {B : Subring L} {x : L} (h : x ∈ B) : (toB B x : L) = x := by simp [toB, h]
 
 end LocallyPrincipalCoprimeAlt
-
 
 open LocallyPrincipalCoprimeAlt in
 theorem LocallyPrincipalCoprime.proof : LocallyPrincipalCoprime.Statement := by
@@ -145,9 +158,11 @@ theorem LocallyPrincipalCoprime.proof : LocallyPrincipalCoprime.Statement := by
   have hγm : ∀ m ∈ S, ∀ h : γ * a (idx m) ∈ B, (⟨_, h⟩ : B) ∉ m := by
     intro m hmS h hin
     have hmS' := (memS m).mp hmS
-    have hw : (⟨_, h⟩ : B) = s * toB B (g m₀ * a (idx m)) +
-        (e m * toB B (g m * a (idx m)) +
-          ∑ m' ∈ S.erase m, e m' * toB B (g m' * a (idx m))) := by
+    have hw
+        : (⟨_, h⟩ : B)
+          = s * toB B (g m₀ * a (idx m))
+            + (e m * toB B (g m * a (idx m))
+              + ∑ m' ∈ S.erase m, e m' * toB B (g m' * a (idx m))) := by
       rw [Finset.add_sum_erase S (fun m' => e m' * toB B (g m' * a (idx m))) hmS]
       apply Subtype.ext
       push_cast
@@ -171,11 +186,10 @@ theorem LocallyPrincipalCoprime.proof : LocallyPrincipalCoprime.Statement := by
     rcases hmS'.1.isPrime.mem_or_mem h3 with h4 | h4
     · exact hem m hmS h4
     · exact hym m hmS'.1 h4
-  have hy0 : (y m₀ : L) ≠ 0 := fun h0 => hym m₀ hm₀ (by rw [show y m₀ = 0 from Subtype.ext h0]; exact m₀.zero_mem)
-  have ha0 : a (idx m₀) ≠ 0 := by
-    intro h0; apply hy0; rw [hy m₀ hm₀, h0, mul_zero]
-  have hg0 : g m₀ ≠ 0 := by
-    intro h0; apply hy0; rw [hy m₀ hm₀, h0, zero_mul]
+  have hy0 : (y m₀ : L) ≠ 0 := fun h0 =>
+    hym m₀ hm₀ (by rw [show y m₀ = 0 from Subtype.ext h0]; exact m₀.zero_mem)
+  have ha0 : a (idx m₀) ≠ 0 := by intro h0; apply hy0; rw [hy m₀ hm₀, h0, mul_zero]
+  have hg0 : g m₀ ≠ 0 := by intro h0; apply hy0; rw [hy m₀ hm₀, h0, zero_mul]
   have hγ : γ ≠ 0 := by
     intro h0
     rcases S.eq_empty_or_nonempty with hE | ⟨m, hmS⟩
@@ -185,18 +199,20 @@ theorem LocallyPrincipalCoprime.proof : LocallyPrincipalCoprime.Statement := by
     · have h : γ * a (idx m) ∈ B := by rw [h0, zero_mul]; exact B.zero_mem
       apply hγm m hmS h
       have : (⟨_, h⟩ : B) = 0 := Subtype.ext (by simp [h0])
-      rw [this]; exact m.zero_mem
+      rw [this]
+      exact m.zero_mem
   obtain ⟨c₀, hc₀B, hc₀, hc₀a⟩ := hden (idx m₀)
   set a₀ := a (idx m₀)
-  let I : Ideal B :=
-    { carrier := {w | (w : L) * γ⁻¹ ∈ M}
-      add_mem' := fun {u v} hu hv => by
-        simp only [Set.mem_ofPred_eq, Subring.coe_add, add_mul] at hu hv ⊢
-        exact M.add_mem hu hv
-      zero_mem' := by simp [M.zero_mem]
-      smul_mem' := fun c u hu => by
-        simp only [Set.mem_ofPred_eq, smul_eq_mul, Subring.coe_mul, mul_assoc] at hu ⊢
-        exact hBM c c.2 _ hu }
+  let I : Ideal B := {
+    carrier := {w | (w : L) * γ⁻¹ ∈ M}
+    add_mem' := fun {u v} hu hv => by
+      simp only [Set.mem_ofPred_eq, Subring.coe_add, add_mul] at hu hv ⊢
+      exact M.add_mem hu hv
+    zero_mem' := by simp [M.zero_mem]
+    smul_mem' := fun c u hu => by
+      simp only [Set.mem_ofPred_eq, smul_eq_mul, Subring.coe_mul, mul_assoc] at hu ⊢
+      exact hBM c c.2 _ hu
+  }
   have memI : ∀ w : B, w ∈ I ↔ (w : L) * γ⁻¹ ∈ M := fun w => Iff.rfl
   refine ⟨⟨γ * a₀ * c₀, B.mul_mem (hγM _ (haM _)) hc₀B⟩, ⟨c₀ * a₀, hc₀a⟩, I, ?_, ?_, ?_, ?_⟩
   · intro h
@@ -212,7 +228,8 @@ theorem LocallyPrincipalCoprime.proof : LocallyPrincipalCoprime.Statement := by
     have hmem : (⟨_, hγM _ (haM (idx m))⟩ : B) ∈ I := by
       rw [memI]
       have : γ * a (idx m) * γ⁻¹ = a (idx m) := by field_simp
-      rw [this]; exact haM _
+      rw [this]
+      exact haM _
     exact hγm m hmS _ (hle (Ideal.mem_sup_left hmem))
   · intro x
     constructor
@@ -220,7 +237,8 @@ theorem LocallyPrincipalCoprime.proof : LocallyPrincipalCoprime.Statement := by
       refine ⟨⟨γ * x, hγM x hx⟩, ?_, ?_⟩
       · rw [memI]
         have : γ * x * γ⁻¹ = x := by field_simp
-        rw [this]; exact hx
+        rw [this]
+        exact hx
       · show γ * a₀ * c₀ * x = c₀ * a₀ * (γ * x)
         ring
     · rintro ⟨w, hwI, hxw⟩

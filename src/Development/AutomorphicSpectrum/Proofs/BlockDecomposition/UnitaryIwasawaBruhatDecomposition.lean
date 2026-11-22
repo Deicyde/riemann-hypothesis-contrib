@@ -8,7 +8,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemIwUIf
 
 @[expose] public section
 
-open GlobalTheory.PRep Formalism.UG GlobalTheory.LFun PositivityTheory.SphericalProduct GlobalTheory.CompanionTheory.SatPow
+open GlobalTheory.PRep Formalism.UG GlobalTheory.LFun PositivityTheory.SphericalProduct
+  GlobalTheory.CompanionTheory.SatPow
 
 noncomputable section
 
@@ -18,10 +19,11 @@ section Mat
 
 variable {L : Type} [Field L] {σ : L →+* L} {n : ℕ}
 
-abbrev mat (g : GU σ n) : Matrix (Fin n) (Fin n) L := ((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
+abbrev mat (g : GU σ n) : Matrix (Fin n) (Fin n) L :=
+  ((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
 
-theorem mat_mul_apply (g h : GU σ n) (i j : Fin n) :
-    mat (g * h) i j = ∑ l, mat g i l * mat h l j := by
+theorem mat_mul_apply (g h : GU σ n) (i j : Fin n)
+    : mat (g * h) i j = ∑ l, mat g i l * mat h l j := by
   show ((mat g) * (mat h)) i j = _
   rw [Matrix.mul_apply]
 
@@ -32,21 +34,21 @@ theorem mat_one_apply (i j : Fin n) : mat (1 : GU σ n) i j = if i = j then 1 el
 theorem mat_inv_apply (g : GU σ n) (i j : Fin n) : mat g⁻¹ i j = σ (mat g j.rev i.rev) :=
   (GlobalTheory.LGrp.mem_GU_iff σ n g.1).1 g.2 i j
 
-theorem sum_mul_inv (g : GU σ n) (i j : Fin n) :
-    ∑ l, mat g i l * mat g⁻¹ l j = if i = j then 1 else 0 := by
+theorem sum_mul_inv (g : GU σ n) (i j : Fin n)
+    : ∑ l, mat g i l * mat g⁻¹ l j = if i = j then 1 else 0 := by
   rw [← mat_mul_apply, mul_inv_cancel, mat_one_apply]
 
-theorem sum_inv_mul (g : GU σ n) (i j : Fin n) :
-    ∑ l, mat g⁻¹ i l * mat g l j = if i = j then 1 else 0 := by
+theorem sum_inv_mul (g : GU σ n) (i j : Fin n)
+    : ∑ l, mat g⁻¹ i l * mat g l j = if i = j then 1 else 0 := by
   rw [← mat_mul_apply, inv_mul_cancel, mat_one_apply]
 
-theorem row_form (g : GU σ n) (i j : Fin n) :
-    ∑ l, mat g i l * σ (mat g j.rev l.rev) = if i = j then 1 else 0 := by
+theorem row_form (g : GU σ n) (i j : Fin n)
+    : ∑ l, mat g i l * σ (mat g j.rev l.rev) = if i = j then 1 else 0 := by
   rw [← sum_mul_inv g i j]
   exact Finset.sum_congr rfl fun l _ => by rw [mat_inv_apply]
 
-theorem row_isotropic (g : GU σ n) {a : Fin n} (ha : a ≠ a.rev) :
-    ∑ l, mat g a l * σ (mat g a l.rev) = 0 := by
+theorem row_isotropic (g : GU σ n) {a : Fin n} (ha : a ≠ a.rev)
+    : ∑ l, mat g a l * σ (mat g a l.rev) = 0 := by
   have h := row_form g a a.rev
   rwa [if_neg ha, Fin.rev_rev] at h
 
@@ -56,42 +58,62 @@ theorem row_ne_zero (g : GU σ n) (a : Fin n) : ∃ j, mat g a j ≠ 0 := by
   have := sum_mul_inv g a a
   simp [h] at this
 
-theorem exists_GU (T S : Matrix (Fin n) (Fin n) L) (h : T * S = 1)
-    (hS : ∀ i j, S i j = σ (T j.rev i.rev)) : ∃ g : GU σ n, mat g = T :=
+theorem exists_GU
+    (T S : Matrix (Fin n) (Fin n) L) (h : T * S = 1) (hS : ∀ i j, S i j = σ (T j.rev i.rev))
+    : ∃ g : GU σ n, mat g = T :=
   ⟨⟨⟨T, S, h, mul_eq_one_comm.1 h⟩, (GlobalTheory.LGrp.mem_GU_iff σ n _).2 fun i j => hS i j⟩, rfl⟩
 
-def trU (g : GU σ n) : GU σ n :=
-  ⟨⟨(mat g).transpose, (mat g⁻¹).transpose,
-    by rw [← Matrix.transpose_mul]
-       show (mat (g⁻¹ * g)).transpose = 1
-       rw [inv_mul_cancel]; exact Matrix.transpose_one,
-    by rw [← Matrix.transpose_mul]
-       show (mat (g * g⁻¹)).transpose = 1
-       rw [mul_inv_cancel]; exact Matrix.transpose_one⟩,
-   (GlobalTheory.LGrp.mem_GU_iff σ n _).2 fun i j => mat_inv_apply g j i⟩
+def trU (g : GU σ n) : GU σ n := ⟨
+  ⟨
+    (mat g).transpose,
+    (mat g⁻¹).transpose,
+    by
+      rw [← Matrix.transpose_mul]
+      show (mat (g⁻¹ * g)).transpose = 1
+      rw [inv_mul_cancel]
+      exact Matrix.transpose_one,
+    by
+      rw [← Matrix.transpose_mul]
+      show (mat (g * g⁻¹)).transpose = 1
+      rw [mul_inv_cancel]
+      exact Matrix.transpose_one
+  ⟩,
+  (GlobalTheory.LGrp.mem_GU_iff σ n _).2 fun i j => mat_inv_apply g j i
+⟩
 
-theorem trU_trU (g : GU σ n) : trU (trU g) = g := by
-  apply Subtype.ext; apply Units.ext; rfl
+theorem trU_trU (g : GU σ n) : trU (trU g) = g := by apply Subtype.ext; apply Units.ext; rfl
 
 theorem trU_mul (g h : GU σ n) : trU (g * h) = trU h * trU g := by
-  apply Subtype.ext; apply Units.ext
+  apply Subtype.ext
+  apply Units.ext
   show (mat g * mat h).transpose = (mat h).transpose * (mat g).transpose
   rw [Matrix.transpose_mul]
 
 theorem trU_one : trU (1 : GU σ n) = 1 := by
-  apply Subtype.ext; apply Units.ext
+  apply Subtype.ext
+  apply Units.ext
   exact Matrix.transpose_one
 
 def eichM (σ : L →+* L) (p : Fin n) (z : Fin n → L) : Matrix (Fin n) (Fin n) L := fun i j =>
-  if i = p then z j
-  else if j = p.rev then (if i = p.rev then 1 else - σ (z i.rev))
-  else if i = j then 1 else 0
+  if i = p then
+    z j
+  else if j = p.rev then
+    (if i = p.rev then 1 else - σ (z i.rev))
+  else if i = j then
+    1
+  else
+    0
 
-theorem eich_dual (hσ : ∀ x, σ (σ x) = x) (p : Fin n) (z : Fin n → L) (i j : Fin n) :
-    σ (eichM σ p z j.rev i.rev) =
-      if j = p.rev then σ (z i.rev)
-      else if i = p then (if j = p then 1 else - z j)
-      else if i = j then 1 else 0 := by
+theorem eich_dual (hσ : ∀ x, σ (σ x) = x) (p : Fin n) (z : Fin n → L) (i j : Fin n)
+    : σ (eichM σ p z j.rev i.rev)
+      = if j = p.rev then
+          σ (z i.rev)
+        else if i = p then
+          (if j = p then 1 else - z j)
+        else if i = j then
+          1
+        else
+          0 := by
   unfold eichM
   by_cases hj : j = p.rev
   · subst hj; simp
@@ -110,8 +132,11 @@ theorem eich_dual (hσ : ∀ x, σ (σ x) = x) (p : Fin n) (z : Fin n → L) (i 
       · have h3 : ¬ j.rev = i.rev := fun h => hij (Fin.rev_injective h).symm
         simp [h3, hij]
 
-theorem exists_eich (hσ : ∀ x, σ (σ x) = x) {p : Fin n} (hp : p ≠ p.rev) {z : Fin n → L} (hz : z p = 1)
-    (hiso : ∑ c, z c * σ (z c.rev) = 0) : ∃ T : GU σ n, mat T = eichM σ p z := by
+theorem exists_eich
+    (hσ : ∀ x, σ (σ x) = x)
+    {p : Fin n} (hp : p ≠ p.rev)
+    {z : Fin n → L} (hz : z p = 1) (hiso : ∑ c, z c * σ (z c.rev) = 0)
+    : ∃ T : GU σ n, mat T = eichM σ p z := by
   refine exists_GU _ (Matrix.of fun i j => σ (eichM σ p z j.rev i.rev)) ?_ fun _ _ => rfl
   ext i k
   rw [Matrix.mul_apply, Matrix.one_apply]
@@ -129,8 +154,15 @@ theorem exists_eich (hσ : ∀ x, σ (σ x) = x) {p : Fin n} (hp : p ≠ p.rev) 
         · simp [hz]
         · intro j _ hj; simp [hj]
         · simp
-      · have e : ∀ j, z j * (if j = i then (if k = i then 1 else - z k) else if j = k then 1 else 0) =
-            (if j = i then z i * (- z k) else 0) + (if j = k then z k else 0) := by
+      · have e
+            : ∀ j,
+              z j * (if j = i then
+                       (if k = i then 1 else - z k)
+                     else if j = k then
+                       1
+                     else
+                       0)
+                = (if j = i then z i * (- z k) else 0) + (if j = k then z k else 0) := by
           intro j
           by_cases h1 : j = i
           · subst h1; simp [hki, Ne.symm hki]
@@ -139,8 +171,11 @@ theorem exists_eich (hσ : ∀ x, σ (σ x) = x) {p : Fin n} (hp : p ≠ p.rev) 
             · simp [h1, h2]
         simp only [e, Finset.sum_add_distrib]
         simp [hz, Ne.symm hki]
-  · have e : ∀ j, eichM σ p z i j = (if i = j then 1 else 0) +
-        (if j = p.rev then (if i = p.rev then 0 else - σ (z i.rev)) else 0) := by
+  · have e
+        : ∀ j,
+          eichM σ p z i j
+            = (if i = j then 1 else 0)
+              + (if j = p.rev then (if i = p.rev then 0 else - σ (z i.rev)) else 0) := by
       intro j
       unfold eichM
       rw [if_neg hi]
@@ -152,8 +187,8 @@ theorem exists_eich (hσ : ∀ x, σ (σ x) = x) {p : Fin n} (hp : p ≠ p.rev) 
       · simp [h1]
     simp only [e, add_mul, Finset.sum_add_distrib]
     have hpr : p.rev ≠ p := Ne.symm hp
-    simp only [ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ, if_true, if_neg hpr,
-      Fin.rev_rev, hz, map_one]
+    simp only [ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.sum_ite_eq', Finset.mem_univ,
+      if_true, if_neg hpr, Fin.rev_rev, hz, map_one]
     by_cases hk : k = p.rev
     · subst hk
       by_cases hi' : i = p.rev
@@ -161,22 +196,24 @@ theorem exists_eich (hσ : ∀ x, σ (σ x) = x) {p : Fin n} (hp : p ≠ p.rev) 
       · simp [hi', hi]
     · simp [hk, hi, Ne.symm hk]
 
-theorem eich_row_pivot (σ : L →+* L) (p : Fin n) (z : Fin n → L) (j : Fin n) : eichM σ p z p j = z j := by
+theorem eich_row_pivot (σ : L →+* L) (p : Fin n) (z : Fin n → L) (j : Fin n)
+    : eichM σ p z p j = z j := by
   simp [eichM]
 
-theorem eich_col_pivot (σ : L →+* L) {p : Fin n} (hp : p ≠ p.rev) {z : Fin n → L} (hz : z p = 1) (i : Fin n) :
-    eichM σ p z i p = if i = p then 1 else 0 := by
+theorem eich_col_pivot
+    (σ : L →+* L) {p : Fin n} (hp : p ≠ p.rev) {z : Fin n → L} (hz : z p = 1) (i : Fin n)
+    : eichM σ p z i p = if i = p then 1 else 0 := by
   unfold eichM
   by_cases hi : i = p
   · subst hi; simp [hz]
   · simp [hi, hp]
 
-theorem eich_fix (σ : L →+* L) {p c : Fin n} {z : Fin n → L} (hz : z p = 1) (hc : z c = 0) (hc' : z c.rev = 0) :
-    (∀ j, eichM σ p z c j = if c = j then 1 else 0) ∧ (∀ i, eichM σ p z i c = if i = c then 1 else 0) := by
-  have h1 : c ≠ p := by
-    rintro rfl; rw [hz] at hc; exact one_ne_zero hc
-  have h2 : c ≠ p.rev := by
-    rintro rfl; rw [Fin.rev_rev, hz] at hc'; exact one_ne_zero hc'
+theorem eich_fix
+    (σ : L →+* L) {p c : Fin n} {z : Fin n → L} (hz : z p = 1) (hc : z c = 0) (hc' : z c.rev = 0)
+    : (∀ j, eichM σ p z c j = if c = j then 1 else 0)
+      ∧ (∀ i, eichM σ p z i c = if i = c then 1 else 0) := by
+  have h1 : c ≠ p := by rintro rfl; rw [hz] at hc; exact one_ne_zero hc
+  have h2 : c ≠ p.rev := by rintro rfl; rw [Fin.rev_rev, hz] at hc'; exact one_ne_zero hc'
   constructor
   · intro j
     unfold eichM
@@ -190,8 +227,11 @@ theorem eich_fix (σ : L →+* L) {p c : Fin n} {z : Fin n → L} (hz : z p = 1)
     · subst hi; simp [hc, Ne.symm h1]
     · simp [hi, h2]
 
-theorem eich_lower (σ : L →+* L) {p : Fin n} {z : Fin n → L} (hz : ∀ c, p < c → z c = 0) {i j : Fin n} (hij : i < j) :
-    eichM σ p z i j = 0 := by
+theorem eich_lower
+    (σ : L →+* L)
+    {p : Fin n} {z : Fin n → L} (hz : ∀ c, p < c → z c = 0)
+    {i j : Fin n} (hij : i < j)
+    : eichM σ p z i j = 0 := by
   unfold eichM
   by_cases hi : i = p
   · subst hi; rw [if_pos rfl]; exact hz j hij
@@ -201,9 +241,11 @@ theorem eich_lower (σ : L →+* L) {p : Fin n} {z : Fin n → L} (hz : ∀ c, p
       rw [if_pos rfl, if_neg hij.ne, hz i.rev (Fin.lt_rev_iff.2 hij), map_zero, neg_zero]
     · rw [if_neg hj, if_neg hij.ne]
 
-theorem inv_fix {T : GU σ n} {c : Fin n} (hr : ∀ j, mat T c j = if c = j then 1 else 0)
-    (hc : ∀ i, mat T i c = if i = c then 1 else 0) :
-    (∀ j, mat T⁻¹ c j = if c = j then 1 else 0) ∧ (∀ i, mat T⁻¹ i c = if i = c then 1 else 0) := by
+theorem inv_fix
+    {T : GU σ n} {c : Fin n}
+    (hr : ∀ j, mat T c j = if c = j then 1 else 0) (hc : ∀ i, mat T i c = if i = c then 1 else 0)
+    : (∀ j, mat T⁻¹ c j = if c = j then 1 else 0)
+      ∧ (∀ i, mat T⁻¹ i c = if i = c then 1 else 0) := by
   constructor
   · intro j
     rw [← sum_mul_inv T c j]
@@ -218,9 +260,10 @@ def IsoAt (M : Matrix (Fin n) (Fin n) L) (a c : Fin n) : Prop :=
 theorem IsoAt.trU {g : GU σ n} {a c : Fin n} (h : IsoAt (mat g) a c) : IsoAt (mat (trU g)) c a :=
   ⟨h.1, h.2.2, h.2.1⟩
 
-theorem IsoAt.mul_fix {g S : GU σ n} {a c : Fin n} (h : IsoAt (mat g) a c)
-    (hr : ∀ j, mat S c j = if c = j then 1 else 0) (hc : ∀ i, mat S i c = if i = c then 1 else 0) :
-    IsoAt (mat (g * S)) a c := by
+theorem IsoAt.mul_fix
+    {g S : GU σ n} {a c : Fin n} (h : IsoAt (mat g) a c)
+    (hr : ∀ j, mat S c j = if c = j then 1 else 0) (hc : ∀ i, mat S i c = if i = c then 1 else 0)
+    : IsoAt (mat (g * S)) a c := by
   have e1 : ∀ j, mat (g * S) a j = mat g a c * (if c = j then 1 else 0) := by
     intro j
     rw [mat_mul_apply, Finset.sum_eq_single c, hr]
@@ -235,7 +278,8 @@ theorem IsoAt.mul_fix {g S : GU σ n} {a c : Fin n} (h : IsoAt (mat g) a c)
   · rw [e1, if_neg (Ne.symm hj), mul_zero]
   · rw [e2, h.2.2 i hi]
 
-theorem IsoAt.rev {g : GU σ n} {a c : Fin n} (h : IsoAt (mat g) a c) : IsoAt (mat g) a.rev c.rev := by
+theorem IsoAt.rev {g : GU σ n} {a c : Fin n} (h : IsoAt (mat g) a c)
+    : IsoAt (mat g) a.rev c.rev := by
   have e1 : ∀ y, mat g⁻¹ y a * mat g a c = if y = c then 1 else 0 := by
     intro y
     rw [← sum_inv_mul g y c, Finset.sum_eq_single a]
@@ -246,10 +290,8 @@ theorem IsoAt.rev {g : GU σ n} {a c : Fin n} (h : IsoAt (mat g) a c) : IsoAt (m
     rw [← sum_mul_inv g a x, Finset.sum_eq_single c]
     · intro l _ hl; rw [h.2.1 l hl, zero_mul]
     · simp
-  have e3 : ∀ j, σ (mat g a.rev j) = mat g⁻¹ j.rev a := by
-    intro j; rw [mat_inv_apply, Fin.rev_rev]
-  have e4 : ∀ i, σ (mat g i c.rev) = mat g⁻¹ c i.rev := by
-    intro i; rw [mat_inv_apply, Fin.rev_rev]
+  have e3 : ∀ j, σ (mat g a.rev j) = mat g⁻¹ j.rev a := by intro j; rw [mat_inv_apply, Fin.rev_rev]
+  have e4 : ∀ i, σ (mat g i c.rev) = mat g⁻¹ c i.rev := by intro i; rw [mat_inv_apply, Fin.rev_rev]
   refine ⟨fun h0 => ?_, fun j hj => ?_, fun i hi => ?_⟩
   · have h1 := e3 c.rev
     rw [Fin.rev_rev, h0, map_zero] at h1
@@ -269,8 +311,9 @@ theorem IsoAt.rev {g : GU σ n} {a c : Fin n} (h : IsoAt (mat g) a c) : IsoAt (m
     rw [← e4] at h3
     exact (map_eq_zero σ).1 h3
 
-theorem clear_row {h T : GU σ n} {a p : Fin n} {u : L} (hrow : ∀ l, mat h a l = u * mat T p l) (j : Fin n) :
-    mat (h * T⁻¹) a j = if p = j then u else 0 := by
+theorem clear_row
+    {h T : GU σ n} {a p : Fin n} {u : L} (hrow : ∀ l, mat h a l = u * mat T p l) (j : Fin n)
+    : mat (h * T⁻¹) a j = if p = j then u else 0 := by
   rw [mat_mul_apply]
   simp only [hrow, mul_assoc]
   rw [← Finset.mul_sum, sum_mul_inv]
@@ -279,8 +322,8 @@ theorem clear_row {h T : GU σ n} {a p : Fin n} {u : L} (hrow : ∀ l, mat h a l
 def RedU (g : GU σ n) (k : ℕ) : Prop :=
   ∀ b : Fin n, (b.val < k ∨ n ≤ b.val + k) → ∃ c, IsoAt (mat g) b c
 
-theorem iso_last (g : GU σ n) (a : Fin n) (h : ∀ b, b ≠ a → ∃ c, IsoAt (mat g) b c) :
-    ∃ c, IsoAt (mat g) a c := by
+theorem iso_last (g : GU σ n) (a : Fin n) (h : ∀ b, b ≠ a → ∃ c, IsoAt (mat g) b c)
+    : ∃ c, IsoAt (mat g) a c := by
   have hcol : ∀ c, mat g a c ≠ 0 → ∀ i, i ≠ a → mat g i c = 0 := by
     intro c hc i hi
     obtain ⟨d, hd⟩ := h i hi
@@ -303,8 +346,8 @@ theorem iso_last (g : GU σ n) (a : Fin n) (h : ∀ b, b ≠ a → ∃ c, IsoAt 
   rw [h3, zero_mul] at h2
   exact zero_ne_one h2
 
-theorem mono_end (g : GU σ n) (h : ∀ a, ∃ c, IsoAt (mat g) a c) :
-    ∃ (d w : GU σ n) (π : Equiv.Perm (Fin n)), IsBorelU d ∧ IsPermW w π ∧ g = d * w := by
+theorem mono_end (g : GU σ n) (h : ∀ a, ∃ c, IsoAt (mat g) a c)
+    : ∃ (d w : GU σ n) (π : Equiv.Perm (Fin n)), IsBorelU d ∧ IsPermW w π ∧ g = d * w := by
   choose f hf using h
   have hinj : Function.Injective f := by
     intro a b hab
@@ -318,23 +361,25 @@ theorem mono_end (g : GU σ n) (h : ∀ a, ∃ c, IsoAt (mat g) a c) :
     exact (hf a).rev.1 ((hf a.rev).2.1 _ (Ne.symm hne))
   let π : Equiv.Perm (Fin n) := Equiv.ofBijective f (Finite.injective_iff_bijective.1 hinj)
   have hπ : ∀ a, π a = f a := fun _ => rfl
-  obtain ⟨w, hw⟩ := exists_GU (σ := σ) (Matrix.of fun a c => if c = f a then 1 else 0)
-    (Matrix.of fun i j => σ (if i.rev = f j.rev then 1 else 0)) (by
-      ext i k
-      rw [Matrix.mul_apply, Matrix.one_apply]
-      simp only [Matrix.of_apply]
-      rw [Finset.sum_eq_single (f i)]
-      · have : (f i).rev.rev = f i := Fin.rev_rev _
-        simp only [if_true, one_mul, hrev k, Fin.rev_injective.eq_iff, hinj.eq_iff]
-        by_cases hik : i = k
-        · simp [hik]
-        · simp [hik, Ne.symm hik]
-      · intro j _ hj; simp [hj]
-      · simp) (by
-      intro i j
-      simp)
-  have hw' : ∀ a c, mat w a c = if c = f a then 1 else 0 := by
-    intro a c; rw [hw]; rfl
+  obtain ⟨w, hw⟩ :=
+    exists_GU (σ := σ) (Matrix.of fun a c => if c = f a then 1 else 0)
+      (Matrix.of fun i j => σ (if i.rev = f j.rev then 1 else 0))
+      (by
+        ext i k
+        rw [Matrix.mul_apply, Matrix.one_apply]
+        simp only [Matrix.of_apply]
+        rw [Finset.sum_eq_single (f i)]
+        · have : (f i).rev.rev = f i := Fin.rev_rev _
+          simp only [if_true, one_mul, hrev k, Fin.rev_injective.eq_iff, hinj.eq_iff]
+          by_cases hik : i = k
+          · simp [hik]
+          · simp [hik, Ne.symm hik]
+        · intro j _ hj; simp [hj]
+        · simp)
+      (by
+        intro i j
+        simp)
+  have hw' : ∀ a c, mat w a c = if c = f a then 1 else 0 := by intro a c; rw [hw]; rfl
   refine ⟨g * w⁻¹, w, π, ?_, fun a c => hw' a c, by simp⟩
   intro i j hji
   show mat (g * w⁻¹) i j = 0
@@ -360,13 +405,16 @@ theorem val_div_lt {x u : L} (hu : u ≠ 0) (h : Valued.v x < Valued.v u) : Valu
   rw [map_div₀]
   exact (div_lt_one₀ (zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 hu))).2 h
 
-theorem exists_pivot (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (x : Fin n → L) (hx : ∃ c, x c ≠ 0)
-    (hiso : ∑ c, x c * σ (x c.rev) = 0) :
-    ∃ p, x p ≠ 0 ∧ p ≠ p.rev ∧ (∀ c, Valued.v (x c) ≤ Valued.v (x p)) ∧
-      ∀ c, c < p → Valued.v (x c) < Valued.v (x p) := by
+theorem exists_pivot
+    (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
+    (x : Fin n → L) (hx : ∃ c, x c ≠ 0) (hiso : ∑ c, x c * σ (x c.rev) = 0)
+    : ∃ p,
+      x p ≠ 0 ∧ p ≠ p.rev ∧ (∀ c, Valued.v (x c) ≤ Valued.v (x p))
+        ∧ ∀ c, c < p → Valued.v (x c) < Valued.v (x p) := by
   classical
   obtain ⟨c0, hc0⟩ := hx
-  obtain ⟨m, -, hm⟩ := Finset.exists_max_image Finset.univ (fun c => Valued.v (x c)) ⟨c0, Finset.mem_univ _⟩
+  obtain ⟨m, -, hm⟩ :=
+    Finset.exists_max_image Finset.univ (fun c => Valued.v (x c)) ⟨c0, Finset.mem_univ _⟩
   let P : Finset (Fin n) := Finset.univ.filter (fun c => Valued.v (x c) = Valued.v (x m))
   have hP : P.Nonempty := ⟨m, by simp [P]⟩
   obtain ⟨p, hpdef⟩ : ∃ p, p = P.min' hP := ⟨_, rfl⟩
@@ -376,8 +424,7 @@ theorem exists_pivot (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (x : Fin n →
   have hlt : ∀ c, c < p → Valued.v (x c) < Valued.v (x p) := by
     intro c hc
     refine lt_of_le_of_ne (hmax c) fun h => ?_
-    have : p ≤ c := by
-      rw [hpdef]; exact P.min'_le c (by simp [P, h, hpP])
+    have : p ≤ c := by rw [hpdef]; exact P.min'_le c (by simp [P, h, hpP])
     exact absurd hc (not_lt.2 this)
   have hne : x p ≠ 0 := by
     intro h0
@@ -387,11 +434,13 @@ theorem exists_pivot (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (x : Fin n →
   refine ⟨p, hne, fun hp => ?_, hmax, hlt⟩
   have hM : 0 < Valued.v (x p) := zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 hne)
   have hMM : Valued.v (x p) * Valued.v (x p) ≠ 0 := mul_ne_zero hM.ne' hM.ne'
-  have hstrict : ∀ A B : WithZero (Multiplicative ℤ), A < Valued.v (x p) → B ≤ Valued.v (x p) →
-      A * B < Valued.v (x p) * Valued.v (x p) := fun A B hA hB =>
-    lt_of_le_of_lt (mul_le_mul' le_rfl hB) (mul_lt_mul_of_pos_right hA hM)
-  have hrest : Valued.v (∑ c ∈ Finset.univ.erase p, x c * σ (x c.rev)) <
-      Valued.v (x p) * Valued.v (x p) := by
+  have hstrict
+      : ∀ A B : WithZero (Multiplicative ℤ),
+        A < Valued.v (x p) → B ≤ Valued.v (x p) → A * B < Valued.v (x p) * Valued.v (x p) :=
+    fun A B hA hB => lt_of_le_of_lt (mul_le_mul' le_rfl hB) (mul_lt_mul_of_pos_right hA hM)
+  have hrest
+      : Valued.v (∑ c ∈ Finset.univ.erase p, x c * σ (x c.rev))
+        < Valued.v (x p) * Valued.v (x p) := by
     refine Valuation.map_sum_lt _ hMM fun c hc => ?_
     rw [map_mul, hσv]
     rcases lt_or_gt_of_ne (Finset.ne_of_mem_erase hc) with h | h
@@ -402,13 +451,14 @@ theorem exists_pivot (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (x : Fin n →
       rw [mul_comm]
       exact hstrict _ _ (hlt _ h') (hmax _)
   rw [← Finset.add_sum_erase _ _ (Finset.mem_univ p), ← hp] at hiso
-  have e : x p * σ (x p) = - ∑ c ∈ Finset.univ.erase p, x c * σ (x c.rev) := eq_neg_of_add_eq_zero_left hiso
+  have e : x p * σ (x p) = - ∑ c ∈ Finset.univ.erase p, x c * σ (x c.rev) :=
+    eq_neg_of_add_eq_zero_left hiso
   have h2 : Valued.v (x p * σ (x p)) = Valued.v (x p) * Valued.v (x p) := by rw [map_mul, hσv]
   rw [e, Valuation.map_neg] at h2
   exact hrest.ne h2
 
-theorem iso_scale {u : L} (hu : u ≠ 0) {x : Fin n → L} (h : ∑ c, x c * σ (x c.rev) = 0) :
-    ∑ c, (x c / u) * σ (x c.rev / u) = 0 := by
+theorem iso_scale {u : L} (hu : u ≠ 0) {x : Fin n → L} (h : ∑ c, x c * σ (x c.rev) = 0)
+    : ∑ c, (x c / u) * σ (x c.rev / u) = 0 := by
   have hsu : σ u ≠ 0 := (map_ne_zero σ).2 hu
   have e : ∀ c, (x c / u) * σ (x c.rev / u) = (u * σ u)⁻¹ * (x c * σ (x c.rev)) := by
     intro c
@@ -416,9 +466,11 @@ theorem iso_scale {u : L} (hu : u ≠ 0) {x : Fin n → L} (h : ∑ c, x c * σ 
     field_simp
   simp only [e, ← Finset.mul_sum, h, mul_zero]
 
-theorem eich_mem_iw (hσv : ∀ x, Valued.v (σ x) = Valued.v x) {p : Fin n} {z : Fin n → L} {T : GU σ n}
-    (hT : mat T = eichM σ p z) (h1 : ∀ c, Valued.v (z c) ≤ 1) (h2 : ∀ c, c < p → Valued.v (z c) < 1) :
-    T ∈ IwU σ n := by
+theorem eich_mem_iw
+    (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
+    {p : Fin n} {z : Fin n → L} {T : GU σ n}
+    (hT : mat T = eichM σ p z) (h1 : ∀ c, Valued.v (z c) ≤ 1) (h2 : ∀ c, c < p → Valued.v (z c) < 1)
+    : T ∈ IwU σ n := by
   refine (mem_iwU_iff hσv T).2 ⟨fun i j => ?_, fun i j hji => ?_⟩
   · show Valued.v (mat T i j) ≤ 1
     rw [hT]
@@ -442,9 +494,11 @@ theorem eich_mem_iw (hσv : ∀ x, Valued.v (σ x) = Valued.v x) {p : Fin n} {z 
       · rw [if_neg hj, if_neg hji.ne']
         simp
 
-theorem step (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (g : GU σ n) {k : ℕ}
-    (hk : 2 * k + 1 < n) (hr : RedU g k) :
-    ∃ b i g' : GU σ n, IsBorelU b ∧ i ∈ IwU σ n ∧ g = b * g' * i ∧ RedU g' (k + 1) := by
+theorem step
+    (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x)
+    (g : GU σ n)
+    {k : ℕ} (hk : 2 * k + 1 < n) (hr : RedU g k)
+    : ∃ b i g' : GU σ n, IsBorelU b ∧ i ∈ IwU σ n ∧ g = b * g' * i ∧ RedU g' (k + 1) := by
   classical
   obtain ⟨a, hav⟩ : ∃ a : Fin n, a.val = n - 1 - k := ⟨⟨n - 1 - k, by omega⟩, rfl⟩
   have ha : a ≠ a.rev := by
@@ -460,28 +514,30 @@ theorem step (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Value
     have := b.isLt
     rw [Fin.val_rev]
     omega
-  obtain ⟨p, hxp, hp, hmax, hlt⟩ := exists_pivot hσv (mat g a) (row_ne_zero g a) (row_isotropic g ha)
+  obtain ⟨p, hxp, hp, hmax, hlt⟩ :=
+    exists_pivot hσv (mat g a) (row_ne_zero g a) (row_isotropic g ha)
   obtain ⟨u, hu⟩ : ∃ u, u = mat g a p := ⟨_, rfl⟩
   rw [← hu] at hxp
   rw [← hu] at hmax hlt
   obtain ⟨z, hz⟩ : ∃ z : Fin n → L, z = fun c => mat g a c / u := ⟨_, rfl⟩
   have hzp : z p = 1 := by rw [hz]; show mat g a p / u = 1; rw [← hu]; exact div_self hxp
-  have hziso : ∑ c, z c * σ (z c.rev) = 0 := by
-    rw [hz]; exact iso_scale hxp (row_isotropic g ha)
+  have hziso : ∑ c, z c * σ (z c.rev) = 0 := by rw [hz]; exact iso_scale hxp (row_isotropic g ha)
   obtain ⟨T, hT⟩ := exists_eich hσ hp hzp hziso
-  have hTI : T ∈ IwU σ n := eich_mem_iw hσv hT (fun c => by rw [hz]; exact val_div_le hxp (hmax c))
-    (fun c hc => by rw [hz]; exact val_div_lt hxp (hlt c hc))
+  have hTI : T ∈ IwU σ n :=
+    eich_mem_iw hσv hT
+      (fun c => by rw [hz]; exact val_div_le hxp (hmax c))
+      (fun c hc => by rw [hz]; exact val_div_lt hxp (hlt c hc))
   have hrow1 : ∀ l, mat g a l = u * mat T p l := by
     intro l
     rw [hT, eich_row_pivot, hz]
     show mat g a l = u * (mat g a l / u)
     field_simp
   obtain ⟨g₁, hg₁⟩ : ∃ g₁, g₁ = g * T⁻¹ := ⟨_, rfl⟩
-  have h1 : ∀ j, mat g₁ a j = if p = j then u else 0 := by
-    rw [hg₁]; exact clear_row hrow1
-  have hfin : ∀ b c, (b.val < k ∨ n ≤ b.val + k) → IsoAt (mat g) b c →
-      mat g a c = 0 ∧ mat g a c.rev = 0 := fun b c hb hbc =>
-    ⟨hbc.2.2 a (hfinA b hb), hbc.rev.2.2 a (hfinA b.rev (hfinR b hb))⟩
+  have h1 : ∀ j, mat g₁ a j = if p = j then u else 0 := by rw [hg₁]; exact clear_row hrow1
+  have hfin
+      : ∀ b c,
+        (b.val < k ∨ n ≤ b.val + k) → IsoAt (mat g) b c → mat g a c = 0 ∧ mat g a c.rev = 0 :=
+    fun b c hb hbc => ⟨hbc.2.2 a (hfinA b hb), hbc.rev.2.2 a (hfinA b.rev (hfinR b hb))⟩
   have hpne : ∀ b c, (b.val < k ∨ n ≤ b.val + k) → IsoAt (mat g) b c → p ≠ c := by
     rintro b c hb hbc rfl
     exact hxp (hu.trans (hfin b p hb hbc).1)
@@ -513,8 +569,7 @@ theorem step (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Value
     show mat G p l = u * (mat G p l / u)
     field_simp
   obtain ⟨G₂, hG₂⟩ : ∃ G₂, G₂ = G * T'⁻¹ := ⟨_, rfl⟩
-  have h2 : ∀ j, mat G₂ p j = if a = j then u else 0 := by
-    rw [hG₂]; exact clear_row hrow2
+  have h2 : ∀ j, mat G₂ p j = if a = j then u else 0 := by rw [hG₂]; exact clear_row hrow2
   have hinvcol : ∀ i, mat T'⁻¹ i a = if i = a then 1 else 0 := by
     intro i
     rw [← sum_inv_mul T' i a]
@@ -562,8 +617,10 @@ theorem step (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Value
       · exact ⟨p, hIso⟩
       · exact ⟨p.rev, hIso.rev⟩
 
-theorem reduce (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (g : GU σ n) (k : ℕ)
-    (hk : 2 * k ≤ n) : ∃ b i g' : GU σ n, IsBorelU b ∧ i ∈ IwU σ n ∧ g = b * g' * i ∧ RedU g' k := by
+theorem reduce
+    (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (g : GU σ n)
+    (k : ℕ) (hk : 2 * k ≤ n)
+    : ∃ b i g' : GU σ n, IsBorelU b ∧ i ∈ IwU σ n ∧ g = b * g' * i ∧ RedU g' k := by
   induction k with
   | zero =>
     refine ⟨1, 1, g, Formalism.UG.P.fSatake_borel_one, one_mem _, by simp, fun b hb => ?_⟩
@@ -578,9 +635,11 @@ theorem reduce (hσ : ∀ x, σ (σ x) = x) (hσv : ∀ x, Valued.v (σ x) = Val
 
 end Val
 
-theorem bruhat_iwasawa : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (σ : L →+* L) (n : ℕ),
-    (∀ x, σ (σ x) = x) → (∀ x, Valued.v (σ x) = Valued.v x) → ∀ g : GU σ n,
-    ∃ (b w i : GU σ n) (π : Equiv.Perm (Fin n)), IsBorelU b ∧ IsPermW w π ∧ i ∈ IwU σ n ∧ g = b * w * i := by
+theorem bruhat_iwasawa
+    : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (σ : L →+* L) (n : ℕ),
+      (∀ x, σ (σ x) = x) → (∀ x, Valued.v (σ x) = Valued.v x)
+        → ∀ g : GU σ n, ∃ (b w i : GU σ n) (π : Equiv.Perm (Fin n)),
+          IsBorelU b ∧ IsPermW w π ∧ i ∈ IwU σ n ∧ g = b * w * i := by
   intro L _ _ σ n hσ hσv g
   obtain ⟨b, i, g', hb, hi, e, hr⟩ := reduce hσ hσv g (n / 2) (by omega)
   have hall : ∀ a, ∃ c, IsoAt (mat g') a c := by

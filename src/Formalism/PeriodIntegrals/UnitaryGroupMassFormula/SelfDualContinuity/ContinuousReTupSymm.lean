@@ -15,7 +15,8 @@ noncomputable section
 
 namespace PI.SelfDualBridge.W
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField
+  IsDedekindDomain
 open PI.OmFibreUniq PI.OmFibreUniq.W PI.OmFibreUniq.W.Sd PI.OmFibreUniq.W.SdAbs
 open PI.VolStabSW PI.VolStabSW.SdUniqW PI.VolStabSW.SdDualW PI.AdicCompletionValuation
 open scoped TensorProduct
@@ -24,10 +25,12 @@ section Transport
 
 variable {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
 
-theorem dualAt_of_equiv {V V' : Type} [AddCommGroup V] [TopologicalSpace V] [AddCommGroup V']
-    [TopologicalSpace V'] (e : V ≃+ V') (he : Continuous e) (hes : Continuous e.symm)
-    (B : V → V → Fv F v) (B' : V' → V' → Fv F v) (hB : ∀ x y, B x y = B' (e x) (e y))
-    (h : DualAt v B') : DualAt v B := by
+theorem dualAt_of_equiv
+    {V V' : Type} [AddCommGroup V] [TopologicalSpace V] [AddCommGroup V'] [TopologicalSpace V']
+    (e : V ≃+ V') (he : Continuous e) (hes : Continuous e.symm)
+    (B : V → V → Fv F v) (B' : V' → V' → Fv F v)
+    (hB : ∀ x y, B x y = B' (e x) (e y)) (h : DualAt v B')
+    : DualAt v B := by
   unfold DualAt at h ⊢
   obtain ⟨L', hc, ho, hs, hK⟩ := h
   refine ⟨L'.comap e.toAddMonoidHom, ?_, ?_, ?_, ?_⟩
@@ -60,14 +63,15 @@ end Transport
 
 section Third
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   (v : HeightOneSpectrum (𝓞 F))
 
 def trP (ι : Type) [Fintype ι] (x y : ι → Fv F v ⊗[F] E) : Fv F v :=
   ∑ i, Algebra.trace (Fv F v) (Fv F v ⊗[F] E) (x i * y i)
 
-def reTup (ι : Type) [Fintype ι] :
-    (ι → Fv F v ⊗[F] E) ≃+ (Fin (Fintype.card ι) → Fin 1 → Fv F v ⊗[F] E) where
+def reTup (ι : Type) [Fintype ι]
+    : (ι → Fv F v ⊗[F] E) ≃+ (Fin (Fintype.card ι) → Fin 1 → Fv F v ⊗[F] E) where
   toFun x p _ := x ((Fintype.equivFin ι).symm p)
   invFun X i := X (Fintype.equivFin ι i) 0
   left_inv x := by funext i; simp
@@ -77,8 +81,10 @@ def reTup (ι : Type) [Fintype ι] :
     simp
   map_add' _ _ := rfl
 
-theorem reTup_apply (ι : Type) [Fintype ι] (x : ι → Fv F v ⊗[F] E) (p : Fin (Fintype.card ι))
-    (k : Fin 1) : reTup v ι x p k = x ((Fintype.equivFin ι).symm p) := rfl
+theorem reTup_apply
+    (ι : Type) [Fintype ι] (x : ι → Fv F v ⊗[F] E) (p : Fin (Fintype.card ι)) (k : Fin 1)
+    : reTup v ι x p k = x ((Fintype.equivFin ι).symm p) :=
+  rfl
 
 theorem continuous_reTup (ι : Type) [Fintype ι] : Continuous (reTup (E := E) v ι) := by
   refine continuous_pi fun p => continuous_pi fun k => ?_
@@ -93,17 +99,18 @@ theorem continuous_reTup_symm (ι : Type) [Fintype ι] : Continuous (reTup (E :=
 theorem sigR_id (z : Fv F v ⊗[F] E) : sigR (Fv F v) (AlgHom.id F E) z = z := by
   first
   | simp [sigR]
-  | (induction z using TensorProduct.induction_on with
+  | (
+      induction z using TensorProduct.induction_on with
       | zero => simp
       | tmul a b => simp [sigR, Algebra.TensorProduct.map_tmul]
-      | add x y hx hy => rw [map_add (f := _), hx, hy])
+      | add x y hx hy => rw [map_add (f := _), hx, hy]
+    )
 
-theorem JR_one : JR (F := F) (Fv F v) (1 : Matrix (Fin 1) (Fin 1) E) = 1 := by
-  simp [JR]
+theorem JR_one : JR (F := F) (Fv F v) (1 : Matrix (Fin 1) (Fin 1) E) = 1 := by simp [JR]
 
-theorem localTracePairing_eq_realBilinearForm (ι : Type) [Fintype ι] (x y : ι → Fv F v ⊗[F] E) :
-    trP v ι x y = BR (Fv F v) (AlgHom.id F E) (1 : Matrix (Fin 1) (Fin 1) E)
-      (reTup v ι x) (reTup v ι y) := by
+theorem localTracePairing_eq_realBilinearForm (ι : Type) [Fintype ι] (x y : ι → Fv F v ⊗[F] E)
+    : trP v ι x y
+      = BR (Fv F v) (AlgHom.id F E) (1 : Matrix (Fin 1) (Fin 1) E) (reTup v ι x) (reTup v ι y) := by
   unfold BR trP
   have h1 : ∀ u w : Fin 1 → Fv F v ⊗[F] E, hR (Fv F v) (AlgHom.id F E) 1 u w = u 0 * w 0 := by
     intro u w
@@ -112,21 +119,21 @@ theorem localTracePairing_eq_realBilinearForm (ι : Type) [Fintype ι] (x y : ι
   exact (Equiv.sum_comp (Fintype.equivFin ι).symm
     (fun i => Algebra.trace (Fv F v) (Fv F v ⊗[F] E) (x i * y i))).symm
 
-theorem localTracePairing_add_left (ι : Type) [Fintype ι] (x x' y : ι → Fv F v ⊗[F] E) :
-    trP v ι (x + x') y = trP v ι x y + trP v ι x' y := by
+theorem localTracePairing_add_left (ι : Type) [Fintype ι] (x x' y : ι → Fv F v ⊗[F] E)
+    : trP v ι (x + x') y = trP v ι x y + trP v ι x' y := by
   simp [trP, add_mul, map_add (f := _), Finset.sum_add_distrib]
 
-theorem localTracePairing_smul_left (ι : Type) [Fintype ι] (c : Fv F v) (x y : ι → Fv F v ⊗[F] E) :
-    trP v ι (c • x) y = c * trP v ι x y := by
+theorem localTracePairing_smul_left (ι : Type) [Fintype ι] (c : Fv F v) (x y : ι → Fv F v ⊗[F] E)
+    : trP v ι (c • x) y = c * trP v ι x y := by
   simp [trP, smul_mul_assoc, map_smul, Finset.mul_sum]
 
-theorem localTracePairing_comm (ι : Type) [Fintype ι] (x y : ι → Fv F v ⊗[F] E) :
-    trP v ι x y = trP v ι y x := by
+theorem localTracePairing_comm (ι : Type) [Fintype ι] (x y : ι → Fv F v ⊗[F] E)
+    : trP v ι x y = trP v ι y x := by
   unfold trP
   exact Finset.sum_congr rfl fun i _ => by rw [mul_comm]
 
-theorem continuous_localTracePairing (ι : Type) [Fintype ι] :
-    Continuous (fun p : (ι → Fv F v ⊗[F] E) × (ι → Fv F v ⊗[F] E) => trP v ι p.1 p.2) := by
+theorem continuous_localTracePairing (ι : Type) [Fintype ι]
+    : Continuous (fun p : (ι → Fv F v ⊗[F] E) × (ι → Fv F v ⊗[F] E) => trP v ι p.1 p.2) := by
   have htr : Continuous (Algebra.trace (Fv F v) (Fv F v ⊗[F] E)) := by
     first
     | exact IsModuleTopology.continuous_of_linearMap _
@@ -141,23 +148,31 @@ theorem dualAt_trP (ι : Type) [Fintype ι] : DualAt v (trP (E := E) v ι) :=
     (dualAt_alt v (Module.finBasis F E) (AlgHom.id F E) (1 : Matrix (Fin 1) (Fin 1) E)
       (nondeg_BR v (AlgHom.id F E) (fun _ => rfl) (1 : Matrix (Fin 1) (Fin 1) E) (by simp)))
 
-theorem sd_trP (ψ0 : Fv F v → ℂ) (hψc : Continuous ψ0) (hψa : ∀ r s, ψ0 (r + s) = ψ0 r * ψ0 s)
-    (hψn : ∀ r, ‖ψ0 r‖ = 1) (hnt : ∃ y, ψ0 y ≠ 1) (ι : Type) [Fintype ι] :
-    ∃ μ : Measure (ι → Fv F v ⊗[F] E), SelfDual μ (fun x y => ψ0 (trP v ι x y)) :=
-  exists_selfDual_measure v (trP v ι) ψ0 hψc hψa hψn hnt (localTracePairing_add_left v ι) (localTracePairing_smul_left v ι) (localTracePairing_comm v ι)
+theorem sd_trP
+    (ψ0 : Fv F v → ℂ) (hψc : Continuous ψ0) (hψa : ∀ r s, ψ0 (r + s) = ψ0 r * ψ0 s)
+    (hψn : ∀ r, ‖ψ0 r‖ = 1) (hnt : ∃ y, ψ0 y ≠ 1)
+    (ι : Type) [Fintype ι]
+    : ∃ μ : Measure (ι → Fv F v ⊗[F] E), SelfDual μ (fun x y => ψ0 (trP v ι x y)) :=
+  exists_selfDual_measure v (trP v ι) ψ0 hψc hψa hψn hnt (localTracePairing_add_left v ι)
+    (localTracePairing_smul_left v ι) (localTracePairing_comm v ι)
     (continuous_localTracePairing v ι) (dualAt_trP v ι)
 
 end Third
 
-theorem sdExists_of_sdEx (h0 : PI.OmFibreUniq.W.SdEx) {F E : Type} [Field F] [NumberField F]
-    [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
-    (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (a : ℕ) (ι : Type) [Fintype ι] :
-    PI.SelfDualBridge.SdExists σ J ψ v a ι := by
+theorem sdExists_of_sdEx
+    (h0 : PI.OmFibreUniq.W.SdEx)
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+    (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (a : ℕ)
+    (ι : Type) [Fintype ι]
+    : PI.SelfDualBridge.SdExists σ J ψ v a ι := by
   intro hS
   obtain ⟨hCM, hJ, hψ, hstd⟩ := hS
   obtain ⟨h1, h2⟩ := h0 σ J ψ v a ⟨hCM, hJ, hψ, hstd⟩
   refine ⟨h1, h2, ?_⟩
-  exact sd_trP v (psiV F ψ v) (continuous_psiV ψ hψ.1 v) (psiV_add ψ v) (fun r => hψ.2.1 _)
+  exact sd_trP v (psiV F ψ v) (continuous_psiV ψ hψ.1 v) (psiV_add ψ v)
+    (fun r => hψ.2.1 _)
     (additive_character_nontrivial ψ v hψ hstd hCM.1) ι
 
 end PI.SelfDualBridge.W

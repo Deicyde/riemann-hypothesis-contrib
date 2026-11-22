@@ -21,47 +21,61 @@ open Formalism.UG Formalism.UG.P
 
 abbrev AA (I : Formalism.MainNotions.S.AutInst) : Type := I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F
 
-abbrev SS (I : Formalism.MainNotions.S.AutInst) : Subring (AA I) := Formalism.MainNotions.S.IntAf I.F I.E
+abbrev SS (I : Formalism.MainNotions.S.AutInst) : Subring (AA I) :=
+  Formalism.MainNotions.S.IntAf I.F I.E
 
-abbrev iA (I : Formalism.MainNotions.S.AutInst) : I.E →+* AA I := Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F)
+abbrev iA (I : Formalism.MainNotions.S.AutInst) : I.E →+* AA I :=
+  Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F)
 
-theorem sig_eq (I : Formalism.MainNotions.S.AutInst) :
-    ((I.cm.sig : I.E →ₐ[I.F] I.E) : I.E →+* I.E) = starRingEnd I.E := rfl
+theorem sig_eq (I : Formalism.MainNotions.S.AutInst)
+    : ((I.cm.sig : I.E →ₐ[I.F] I.E) : I.E →+* I.E) = starRingEnd I.E :=
+  rfl
 
-theorem mem_latSet (I : Formalism.MainNotions.S.AutInst) (y : I.GA) (u : Fin I.n → I.E) :
-    u ∈ PI.LatCountG.latSet I y ↔
-      (((y.2 : GL (Fin I.n) (AA I))⁻¹ : GL (Fin I.n) (AA I)) : Matrix (Fin I.n) (Fin I.n) (AA I)) *ᵥ
-        (fun i => iA I (u i)) ∈ latS (F := I.F) (Formalism.MainNotions.S.Af I.F) (SS I) I.L := by
+theorem mem_latSet (I : Formalism.MainNotions.S.AutInst) (y : I.GA) (u : Fin I.n → I.E)
+    : u ∈ PI.LatCountG.latSet I y
+      ↔ (((y.2 : GL (Fin I.n) (AA I))⁻¹ : GL (Fin I.n) (AA I)) : Matrix (Fin I.n) (Fin I.n) (AA I))
+          *ᵥ (fun i => iA I (u i))
+        ∈ latS (F := I.F) (Formalism.MainNotions.S.Af I.F) (SS I) I.L := by
   unfold PI.LatCountG.latSet
   rw [Set.mem_ofPred_eq, PI.UnitaryGroupMassFormula.LSC.LatIs.lamAf_eq I]
   rfl
 
-theorem hform_smul_right {A : Type} [CommRing A] {n : Type} [Fintype n] (τ : A →+* A)
-    (J : Matrix n n A) (a : A) (w x : n → A) : hform τ J w (a • x) = a * hform τ J w x := by
+theorem hform_smul_right
+    {A : Type} [CommRing A]
+    {n : Type} [Fintype n]
+    (τ : A →+* A) (J : Matrix n n A) (a : A) (w x : n → A)
+    : hform τ J w (a • x) = a * hform τ J w x := by
   unfold hform
   simp only [Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem hform_add_right {A : Type} [CommRing A] {n : Type} [Fintype n] (τ : A →+* A)
-    (J : Matrix n n A) (w x x' : n → A) : hform τ J w (x + x') = hform τ J w x + hform τ J w x' := by
+theorem hform_add_right
+    {A : Type} [CommRing A] {n : Type} [Fintype n] (τ : A →+* A) (J : Matrix n n A) (w x x' : n → A)
+    : hform τ J w (x + x') = hform τ J w x + hform τ J w x' := by
   unfold hform
   simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
-theorem hform_sub_right {A : Type} [CommRing A] {n : Type} [Fintype n] (τ : A →+* A)
-    (J : Matrix n n A) (w x x' : n → A) : hform τ J w (x - x') = hform τ J w x - hform τ J w x' := by
+theorem hform_sub_right
+    {A : Type} [CommRing A] {n : Type} [Fintype n] (τ : A →+* A) (J : Matrix n n A) (w x x' : n → A)
+    : hform τ J w (x - x') = hform τ J w x - hform τ J w x' := by
   unfold hform
   simp only [Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
 
-theorem hform_zero_right {A : Type} [CommRing A] {n : Type} [Fintype n] (τ : A →+* A)
-    (J : Matrix n n A) (w : n → A) : hform τ J w 0 = 0 := by
+theorem hform_zero_right
+    {A : Type} [CommRing A] {n : Type} [Fintype n] (τ : A →+* A) (J : Matrix n n A) (w : n → A)
+    : hform τ J w 0 = 0 := by
   unfold hform
   simp
 
-theorem pair_int (I : Formalism.MainNotions.S.AutInst) (w : Fin I.n → I.E) (hw : w ∈ I.L)
-    (x : Fin I.n → AA I) (hx : x ∈ latS (F := I.F) (Formalism.MainNotions.S.Af I.F) (SS I) I.L) :
-    hform (sigR I.cm.sig (Formalism.MainNotions.S.Af I.F)) (I.J.map (iA I)) (fun i => iA I (w i)) x ∈ SS I := by
-  have hσ (e : I.E) :
-      sigR I.cm.sig (Formalism.MainNotions.S.Af I.F) (iA I e) = iA I (starRingEnd I.E e) := by
+theorem pair_int
+    (I : Formalism.MainNotions.S.AutInst) (w : Fin I.n → I.E) (hw : w ∈ I.L) (x : Fin I.n → AA I)
+    (hx : x ∈ latS (F := I.F) (Formalism.MainNotions.S.Af I.F) (SS I) I.L)
+    : hform (sigR I.cm.sig (Formalism.MainNotions.S.Af I.F)) (I.J.map (iA I))
+        (fun i => iA I (w i))
+        x
+      ∈ SS I := by
+  have hσ (e : I.E)
+      : sigR I.cm.sig (Formalism.MainNotions.S.Af I.F) (iA I e) = iA I (starRingEnd I.E e) := by
     rw [← sig_eq I]
     simp [iA, sigR, inclE]
   unfold latS at hx
@@ -69,10 +83,11 @@ theorem pair_int (I : Formalism.MainNotions.S.AutInst) (w : Fin I.n → I.E) (hw
   | mem x h =>
     obtain ⟨l, hl, rfl⟩ := h
     obtain ⟨b, hb⟩ := (I.L_dual l).mp hl w hw
-    have hpair :
-        hform (sigR I.cm.sig (Formalism.MainNotions.S.Af I.F)) (I.J.map (iA I))
-          (fun i => iA I (w i)) (fun i => iA I (l i)) =
-        iA I (hform (starRingEnd I.E) I.J w l) := by
+    have hpair
+        : hform (sigR I.cm.sig (Formalism.MainNotions.S.Af I.F)) (I.J.map (iA I))
+            (fun i => iA I (w i))
+            (fun i => iA I (l i))
+          = iA I (hform (starRingEnd I.E) I.J w l) := by
       simp only [hform, hσ, Matrix.map_apply, map_sum, map_mul]
     rw [hpair, ← hb]
     exact levelaf_tmul_mem b (one_mem (intAd I.F))
@@ -102,11 +117,10 @@ theorem dual_lattice_inclusion : DualIncl := by
   have hU : cT σ G * J * G = J := y.2.2
   have hGH : G * H = 1 := Units.mul_inv g
   have hHG : H * G = 1 := Units.inv_mul g
-  have hmem (v : Fin I.n → I.E) : v ∈ PI.LatCountG.latSet I y ↔ H *ᵥ embed v ∈ L :=
-    mem_latSet I y v
+  have hmem (v : Fin I.n → I.E) : v ∈ PI.LatCountG.latSet I y ↔ H *ᵥ embed v ∈ L := mem_latSet I y v
   have hC (a : 𝓞 I.F) : iA I (algebraMap (𝓞 I.F) I.E a) = C a := by
-    change (algebraMap (𝓞 I.F) I.E a) ⊗ₜ[I.F] (1 : Formalism.MainNotions.S.Af I.F) =
-      (1 : I.E) ⊗ₜ[I.F] algebraMap (𝓞 I.F) (Formalism.MainNotions.S.Af I.F) a
+    change (algebraMap (𝓞 I.F) I.E a) ⊗ₜ[I.F] (1 : Formalism.MainNotions.S.Af I.F)
+      = (1 : I.E) ⊗ₜ[I.F] algebraMap (𝓞 I.F) (Formalism.MainNotions.S.Af I.F) a
     rw [IsScalarTower.algebraMap_apply (𝓞 I.F) I.F I.E,
       IsScalarTower.algebraMap_apply (𝓞 I.F) I.F (Formalism.MainNotions.S.Af I.F),
       Algebra.algebraMap_eq_smul_one (A := I.E), TensorProduct.smul_tmul,
@@ -124,12 +138,11 @@ theorem dual_lattice_inclusion : DualIncl := by
       exact hint _ ((RingOfIntegers.isIntegral_coe b).map (starRingEnd I.E).toIntAlgHom)
     · change σ ((1 : I.E) ⊗ₜ[I.F] a) ∈ SS I
       simpa [σ, sigR] using levelaf_tmul_mem (E := I.E) 1 ha
-  have hpair (v w : Fin I.n → I.E) :
-      hform σ J (embed v) (embed w) = iA I (hf I v w) := by
+  have hpair (v w : Fin I.n → I.E) : hform σ J (embed v) (embed w) = iA I (hf I v w) := by
     simp only [hf, hform, J, embed, hσ, Matrix.map_apply, map_sum, map_mul]
 
-  have happ (a : 𝓞 I.F) (ha : a ≠ 0) (s : AA I) (hs : s ∈ SS I) :
-      ∃ e : I.E, IsIntegral ℤ e ∧ ∃ t ∈ SS I, s = iA I e + C a * t := by
+  have happ (a : 𝓞 I.F) (ha : a ≠ 0) (s : AA I) (hs : s ∈ SS I)
+      : ∃ e : I.E, IsIntegral ℤ e ∧ ∃ t ∈ SS I, s = iA I e + C a * t := by
     refine Subring.closure_induction
       (p := fun s _ => ∃ e : I.E, IsIntegral ℤ e ∧ ∃ t ∈ SS I, s = iA I e + C a * t)
       ?_ ?_ ?_ ?_ ?_ ?_ hs
@@ -155,16 +168,15 @@ theorem dual_lattice_inclusion : DualIncl := by
           (mul_mem (mul_mem (levelafC_mem a) hv) hw)
       · rw [map_mul]
         ring
-  have happrox (a : 𝓞 I.F) (ha : a ≠ 0) (x : Fin I.n → AA I) :
-      ∃ v : Fin I.n → I.E, ∃ t : Fin I.n → AA I, (∀ i, t i ∈ SS I) ∧
-        x = embed v + (fun i => C a * t i) := by
+  have happrox (a : 𝓞 I.F) (ha : a ≠ 0) (x : Fin I.n → AA I)
+      : ∃ v : Fin I.n → I.E, ∃ t : Fin I.n → AA I,
+        (∀ i, t i ∈ SS I) ∧ x = embed v + (fun i => C a * t i) := by
     have hcoord (i : Fin I.n) : ∃ v : I.E, ∃ t ∈ SS I, x i = iA I v + C a * t := by
       obtain ⟨d, hd, hdx⟩ := levelaf_denom (F := I.F) (x i)
       obtain ⟨e, -, t, ht, hx⟩ := happ (d * a) (mul_ne_zero hd ha) (C d * x i) hdx
       let r := algebraMap (𝓞 I.F) I.E d
       have hr : r ≠ 0 := adelstab_algebraMap_ne_zero d hd
-      have hunit : iA I r⁻¹ * C d = 1 := by
-        rw [← hC, ← map_mul, inv_mul_cancel₀ hr, map_one]
+      have hunit : iA I r⁻¹ * C d = 1 := by rw [← hC, ← map_mul, inv_mul_cancel₀ hr, map_one]
       refine ⟨r⁻¹ * e, t, ht, ?_⟩
       change C d * x i = iA I e + levelafC I.E (d * a) * t at hx
       rw [levelafC_mul] at hx
@@ -177,20 +189,18 @@ theorem dual_lattice_inclusion : DualIncl := by
   obtain ⟨m, hm, hsingle⟩ := csGlob_single I.L I.L_span
   let c : 𝓞 I.F := m
   have hc : c ≠ 0 := Int.cast_ne_zero.2 hm
-  have hembed_single (i : Fin I.n) (a : I.E) :
-      embed (Pi.single i a) = Pi.single i (iA I a) := by
+  have hembed_single (i : Fin I.n) (a : I.E) : embed (Pi.single i a) = Pi.single i (iA I a) := by
     funext j
     by_cases h : j = i <;> simp [embed, h]
-  have hsingle_sum (a : AA I) (t : Fin I.n → AA I) (ht : ∀ i, t i ∈ SS I) :
-      (fun i => a * t i) = ∑ k, (⟨t k, ht k⟩ : SS I) • Pi.single k a := by
+  have hsingle_sum (a : AA I) (t : Fin I.n → AA I) (ht : ∀ i, t i ∈ SS I)
+      : (fun i => a * t i) = ∑ k, (⟨t k, ht k⟩ : SS I) • Pi.single k a := by
     funext i
     rw [Finset.sum_apply, Finset.sum_eq_single i]
     · rw [Pi.smul_apply, Pi.single_eq_same, Subring.smul_def, smul_eq_mul, mul_comm]
     · intro k _ hki
       simp [Ne.symm hki]
     · exact fun hi => (hi (Finset.mem_univ i)).elim
-  have hlower (t : Fin I.n → AA I) (ht : ∀ i, t i ∈ SS I) :
-      (fun i => C c * t i) ∈ L := by
+  have hlower (t : Fin I.n → AA I) (ht : ∀ i, t i ∈ SS I) : (fun i => C c * t i) ∈ L := by
     rw [hsingle_sum (C c) t ht]
     refine sum_mem fun k _ => L.smul_mem _ ?_
     have hk : Pi.single k (C c) = embed (Pi.single k (m : I.E)) := by
@@ -204,10 +214,9 @@ theorem dual_lattice_inclusion : DualIncl := by
     change (M i j : AA I) = (b : AA I) * H i j at hij
     rw [← show (b : AA I) = C d from hb, ← hij]
     exact (M i j).2
-  have hsmall (t : Fin I.n → AA I) (ht : ∀ i, t i ∈ SS I) :
-      H *ᵥ (fun i => C (c * d) * t i) ∈ L := by
-    have heq : H *ᵥ (fun i => C (c * d) * t i) =
-        fun i => C c * ∑ j, (C d * H i j) * t j := by
+  have hsmall (t : Fin I.n → AA I) (ht : ∀ i, t i ∈ SS I)
+      : H *ᵥ (fun i => C (c * d) * t i) ∈ L := by
+    have heq : H *ᵥ (fun i => C (c * d) * t i) = fun i => C c * ∑ j, (C d * H i j) * t j := by
       funext i
       simp only [mulVec, dotProduct, C, levelafC_mul, Finset.mul_sum]
       exact Finset.sum_congr rfl fun j _ => by ring
@@ -223,18 +232,17 @@ theorem dual_lattice_inclusion : DualIncl := by
       exact sub_mem hw (hsmall t ht)
     have hbasis (k : Fin I.n) : Pi.single k (C (c * d)) ∈ P := by
       let r := algebraMap (𝓞 I.F) I.E (c * d)
-      have hr : embed (Pi.single k r) = Pi.single k (C (c * d)) := by
-        rw [hembed_single, hC]
+      have hr : embed (Pi.single k r) = Pi.single k (C (c * d)) := by rw [hembed_single, hC]
       rw [← hr]
       apply Submodule.subset_span
       refine ⟨_, (hmem _).2 ?_, rfl⟩
-      have hscale : (fun i => C (c * d) * (Pi.single k 1 : Fin I.n → AA I) i) =
-          Pi.single k (C (c * d)) := by
+      have hscale
+          : (fun i => C (c * d) * (Pi.single k 1 : Fin I.n → AA I) i)
+            = Pi.single k (C (c * d)) := by
         funext i
         by_cases h : i = k <;> simp [h]
       rw [hr, ← hscale]
-      exact hsmall (Pi.single k 1) fun i => by
-        by_cases h : i = k <;> simp [h]
+      exact hsmall (Pi.single k 1) fun i => by by_cases h : i = k <;> simp [h]
     rw [hv, hsingle_sum _ t ht]
     exact add_mem (Submodule.subset_span ⟨v, hvlat, rfl⟩)
       (sum_mem fun k _ => P.smul_mem _ (hbasis k))
@@ -265,8 +273,8 @@ theorem dual_lattice_inclusion : DualIncl := by
   have hdiagonal (e : I.E) (he : iA I e ∈ SS I) : IsIntegral ℤ e := by
     let T : AA I →ₗ[I.F] Formalism.MainNotions.S.Af I.F :=
       (TensorProduct.lid I.F _).toLinearMap ∘ₗ (Algebra.trace I.F I.E).rTensor _
-    have hT (x : I.E) (a : Formalism.MainNotions.S.Af I.F) :
-        T (x ⊗ₜ[I.F] a) = algebraMap I.F _ (Algebra.trace I.F I.E x) * a := by
+    have hT (x : I.E) (a : Formalism.MainNotions.S.Af I.F)
+        : T (x ⊗ₜ[I.F] a) = algebraMap I.F _ (Algebra.trace I.F I.E x) * a := by
       simp only [T, LinearMap.comp_apply, LinearMap.rTensor_tmul, LinearEquiv.coe_coe,
         TensorProduct.lid_tmul, Algebra.smul_def]
     have hTint (s : AA I) (hs : s ∈ SS I) : T s ∈ intAd I.F := by
@@ -278,28 +286,30 @@ theorem dual_lattice_inclusion : DualIncl := by
       obtain ⟨a, ha⟩ := adelstab_trace_int (F := I.F) (B j)
       rw [← ha, ← IsScalarTower.algebraMap_apply]
       exact mul_mem (levelaf_int_mem a) (hr j)
-    let N : Submodule (𝓞 I.F) I.E :=
-      { carrier := {x | iA I x ∈ SS I}
-        add_mem' := fun {x y} hx hy => by
-          change iA I (x + y) ∈ SS I
-          rw [map_add]
-          exact add_mem hx hy
-        zero_mem' := by
-          change iA I 0 ∈ SS I
-          rw [map_zero]
-          exact zero_mem _
-        smul_mem' := fun a x hx => by
-          change iA I (a • x) ∈ SS I
-          rw [Algebra.smul_def, map_mul, hC]
-          exact mul_mem (levelafC_mem a) hx }
+    let N : Submodule (𝓞 I.F) I.E := {
+      carrier := {x | iA I x ∈ SS I}
+      add_mem' := fun {x y} hx hy => by
+        change iA I (x + y) ∈ SS I
+        rw [map_add]
+        exact add_mem hx hy
+      zero_mem' := by
+        change iA I 0 ∈ SS I
+        rw [map_zero]
+        exact zero_mem _
+      smul_mem' := fun a x hx => by
+        change iA I (a • x) ∈ SS I
+        rw [Algebra.smul_def, map_mul, hC]
+        exact mul_mem (levelafC_mem a) hx
+    }
     let β := Module.finBasis I.F I.E
     obtain ⟨q, hq, -, hqint⟩ := sf_den (fun i => β i)
     let β' := (Algebra.traceForm I.F I.E).dualBasis (traceForm_nondegenerate I.F I.E) β
     let W := Submodule.span (𝓞 I.F) (Set.range fun i => q⁻¹ * β' i)
     have hle : N ≤ W := by
       intro x hx
-      have htrace (b : 𝓞 I.E) :
-          Algebra.trace I.F I.E (x * algebraMap (𝓞 I.E) I.E b) ∈ (algebraMap (𝓞 I.F) I.F).range := by
+      have htrace (b : 𝓞 I.E)
+          : Algebra.trace I.F I.E (x * algebraMap (𝓞 I.E) I.E b)
+            ∈ (algebraMap (𝓞 I.F) I.F).range := by
         have hprod : iA I (x * algebraMap (𝓞 I.E) I.E b) ∈ SS I := by
           rw [map_mul]
           exact mul_mem hx (hint _ (RingOfIntegers.isIntegral_coe b))
@@ -338,7 +348,8 @@ theorem dual_lattice_inclusion : DualIncl := by
     have hwL : embed w ∈ L := Submodule.subset_span ⟨w, hw, rfl⟩
     have h : IsIntegral ℤ (hf I w v) := by
       apply hdiagonal
-      rw [← hpair, show embed v = z - (fun i => C c * t i) from eq_sub_of_add_eq hv.symm, hform_sub_right]
+      rw [← hpair, show embed v = z - (fun i => C c * t i) from eq_sub_of_add_eq hv.symm,
+        hform_sub_right]
       exact sub_mem (hdual _ hwL) (pair_int I w hw _ htL)
     exact ⟨⟨_, h⟩, rfl⟩
   apply (hmem u).2

@@ -9,8 +9,11 @@ open GlobalTheory.UnitLemma Polynomial
 
 namespace GlobalTheory.UnitLemma
 
-theorem finite_quot_span_of_ne_zero (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Finite (IsLocalRing.ResidueField O)] (c : O) (hc : c ≠ 0) : Finite (O ⧸ Ideal.span {c}) := by
+theorem finite_quot_span_of_ne_zero
+    (O : Type)
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Finite (IsLocalRing.ResidueField O)]
+    (c : O) (hc : c ≠ 0)
+    : Finite (O ⧸ Ideal.span {c}) := by
   haveI : Finite (O ⧸ IsLocalRing.maximalIdeal O) :=
     inferInstanceAs (Finite (IsLocalRing.ResidueField O))
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
@@ -21,9 +24,9 @@ theorem finite_quot_span_of_ne_zero (O : Type) [CommRing O] [IsDomain O] [IsDisc
   rw [h1]
   exact Ideal.finite_quotient_pow (IsNoetherian.noetherian _) n
 
-theorem finite_between_mulLat (K : UQ) (B : InvAlg K) (L : Submodule K.O B.A) (hL : IsLat K.O K.E L)
-    (c : K.O) (hc : c ≠ 0) :
-    {M : Submodule K.O B.A | mulLat K.O (algebraMap K.O B.A c) L ≤ M ∧ M ≤ L}.Finite := by
+theorem finite_between_mulLat
+    (K : UQ) (B : InvAlg K) (L : Submodule K.O B.A) (hL : IsLat K.O K.E L) (c : K.O) (hc : c ≠ 0)
+    : {M : Submodule K.O B.A | mulLat K.O (algebraMap K.O B.A c) L ≤ M ∧ M ≤ L}.Finite := by
   haveI := finite_quot_span_of_ne_zero K.O c hc
   haveI : Module.Finite K.O L := Module.Finite.iff_fg.mpr hL.1
   have hfg : (⊤ : Submodule K.O L).FG := Module.Finite.fg_top
@@ -32,7 +35,9 @@ theorem finite_between_mulLat (K : UQ) (B : InvAlg K) (L : Submodule K.O B.A) (h
   haveI : Finite (Submodule K.O (L ⧸ S)) :=
     Finite.of_injective (fun P : Submodule K.O (L ⧸ S) => (P : Set (L ⧸ S))) SetLike.coe_injective
   let f : Submodule K.O B.A → Submodule K.O (L ⧸ S) := fun M => (M.comap L.subtype).map S.mkQ
-  have hSle : ∀ M : Submodule K.O B.A, mulLat K.O (algebraMap K.O B.A c) L ≤ M → S ≤ M.comap L.subtype := by
+  have hSle
+      : ∀ M : Submodule K.O B.A,
+        mulLat K.O (algebraMap K.O B.A c) L ≤ M → S ≤ M.comap L.subtype := by
     intro M hM
     rw [hS, Submodule.smul_le]
     intro r hr x _
@@ -50,6 +55,7 @@ theorem finite_between_mulLat (K : UQ) (B : InvAlg K) (L : Submodule K.O B.A) (h
     rwa [sup_eq_right.2 (hSle M₁ h₁.1), sup_eq_right.2 (hSle M₂ h₂.1)] at this
   have e2 := congrArg (Submodule.map L.subtype) e1
   rwa [Submodule.map_comap_subtype, Submodule.map_comap_subtype, inf_eq_right.2 h₁.2,
-    inf_eq_right.2 h₂.2] at e2
+      inf_eq_right.2 h₂.2]
+    at e2
 
 end GlobalTheory.UnitLemma

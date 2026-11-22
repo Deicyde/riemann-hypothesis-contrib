@@ -6,18 +6,21 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.SameZeroScheme
 
-theorem res_res {X : Scheme.{0}} {U V W : X.Opens} (h₁ : V ≤ U) (h₂ : W ≤ V) (a : Γ(X, U)) :
-    resG X h₂ (resG X h₁ a) = resG X (h₂.trans h₁) a := by
+theorem res_res {X : Scheme.{0}} {U V W : X.Opens} (h₁ : V ≤ U) (h₂ : W ≤ V) (a : Γ(X, U))
+    : resG X h₂ (resG X h₁ a) = resG X (h₂.trans h₁) a := by
   change (X.presheaf.map (homOfLE h₁).op ≫ X.presheaf.map (homOfLE h₂).op).hom a = _
   rw [← X.presheaf.map_comp]
   rfl
 
-theorem top_le_preimage {Y : Scheme.{0}} {U V : Y.Opens} (hU : IsAffineOpen U) (h : U ≤ V)
-    {A : CommRingCat.{0}} (φ : Γ(Y, U) ⟶ A) : ⊤ ≤ (Spec.map φ ≫ hU.fromSpec) ⁻¹ᵁ V := by
+theorem top_le_preimage
+    {Y : Scheme.{0}} {U V : Y.Opens} (hU : IsAffineOpen U) (h : U ≤ V)
+    {A : CommRingCat.{0}} (φ : Γ(Y, U) ⟶ A)
+    : ⊤ ≤ (Spec.map φ ≫ hU.fromSpec) ⁻¹ᵁ V := by
   intro x _
   apply h
   have : hU.fromSpec (Spec.map φ x) ∈ Set.range hU.fromSpec := ⟨_, rfl⟩
@@ -25,29 +28,30 @@ theorem top_le_preimage {Y : Scheme.{0}} {U V : Y.Opens} (hU : IsAffineOpen U) (
   exact this
 
 set_option backward.isDefEq.respectTransparency false in
-theorem appLE_spec {Y : Scheme.{0}} {U V : Y.Opens} (hU : IsAffineOpen U) (h : U ≤ V)
-    {A : CommRingCat.{0}} (φ : Γ(Y, U) ⟶ A) :
-    (Spec.map φ ≫ hU.fromSpec).appLE V ⊤ (top_le_preimage hU h φ) =
-      Y.presheaf.map (homOfLE h).op ≫ φ ≫ (Scheme.ΓSpecIso A).inv := by
+theorem appLE_spec
+    {Y : Scheme.{0}} {U V : Y.Opens} (hU : IsAffineOpen U) (h : U ≤ V)
+    {A : CommRingCat.{0}} (φ : Γ(Y, U) ⟶ A)
+    : (Spec.map φ ≫ hU.fromSpec).appLE V ⊤ (top_le_preimage hU h φ)
+      = Y.presheaf.map (homOfLE h).op ≫ φ ≫ (Scheme.ΓSpecIso A).inv := by
   have h1 : ⊤ ≤ hU.fromSpec ⁻¹ᵁ V := by
     rw [← hU.fromSpec_preimage_self]
     exact fun x hx => h hx
   rw [← Scheme.Hom.appLE_comp_appLE (Spec.map φ) hU.fromSpec V ⊤ ⊤ h1 le_top,
     Scheme.ΓSpecIso_inv_naturality]
-  have e1 : hU.fromSpec.appLE V ⊤ h1 =
-      Y.presheaf.map (homOfLE h).op ≫ (Scheme.ΓSpecIso Γ(Y, U)).inv := by
+  have e1
+      : hU.fromSpec.appLE V ⊤ h1
+        = Y.presheaf.map (homOfLE h).op ≫ (Scheme.ΓSpecIso Γ(Y, U)).inv := by
     rw [Scheme.Hom.appLE, hU.fromSpec_app_of_le V h, Category.assoc, Category.assoc,
       ← Functor.map_comp]
     congr 1
-  have e2 : (Spec.map φ).appLE ⊤ ⊤ le_top = (Spec.map φ).appTop :=
-    (Scheme.Hom.app_eq_appLE _).symm
+  have e2 : (Spec.map φ).appLE ⊤ ⊤ le_top = (Spec.map φ).appTop := (Scheme.Hom.app_eq_appLE _).symm
   rw [e1, e2, Category.assoc]
 
-theorem dvd_on_affine {Y : Scheme.{0}} {U V : Y.Opens} (hU : IsAffineOpen U) (h : U ≤ V)
-    (a b : Γ(Y, V))
+theorem dvd_on_affine
+    {Y : Scheme.{0}} {U V : Y.Opens} (hU : IsAffineOpen U) (h : U ≤ V) (a b : Γ(Y, V))
     (H : ∀ (T : Scheme.{0}) (t : T ⟶ Y) (h : ⊤ ≤ t ⁻¹ᵁ V),
-      (t.appLE V ⊤ h).hom a = 0 → (t.appLE V ⊤ h).hom b = 0) :
-    resG Y h a ∣ resG Y h b := by
+      (t.appLE V ⊤ h).hom a = 0 → (t.appLE V ⊤ h).hom b = 0)
+    : resG Y h a ∣ resG Y h b := by
   let I : Ideal Γ(Y, U) := Ideal.span {resG Y h a}
   let φ : Γ(Y, U) ⟶ CommRingCat.of (Γ(Y, U) ⧸ I) := CommRingCat.ofHom (Ideal.Quotient.mk I)
   have key := H _ _ (top_le_preimage hU h φ)
@@ -56,19 +60,22 @@ theorem dvd_on_affine {Y : Scheme.{0}} {U V : Y.Opens} (hU : IsAffineOpen U) (h 
     (Scheme.ΓSpecIso (CommRingCat.of (Γ(Y, U) ⧸ I))).commRingCatIsoToRingEquiv.symm.injective
   have ha : Ideal.Quotient.mk I (resG Y h a) = 0 :=
     Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self _)
-  have hb := key (by
-    change (Scheme.ΓSpecIso (CommRingCat.of (Γ(Y, U) ⧸ I))).inv.hom
-      (Ideal.Quotient.mk I (resG Y h a)) = 0
-    rw [ha]; exact map_zero _)
-  have hb' : Ideal.Quotient.mk I (resG Y h b) = 0 :=
-    hinj (hb.trans (map_zero _).symm)
+  have hb :=
+    key (by
+      change (Scheme.ΓSpecIso (CommRingCat.of (Γ(Y, U) ⧸ I))).inv.hom
+          (Ideal.Quotient.mk I (resG Y h a))
+        = 0
+      rw [ha]
+      exact map_zero _)
+  have hb' : Ideal.Quotient.mk I (resG Y h b) = 0 := hinj (hb.trans (map_zero _).symm)
   exact Ideal.mem_span_singleton.1 (Ideal.Quotient.eq_zero_iff_mem.1 hb')
 
-theorem exists_unit_mul (Y : Scheme.{0}) (V : Y.Opens) (a b : Γ(Y, V))
+theorem exists_unit_mul
+    (Y : Scheme.{0}) (V : Y.Opens) (a b : Γ(Y, V))
     (ha : ∀ (V' : Y.Opens) (h : V' ≤ V), resG Y h a ∈ nonZeroDivisors Γ(Y, V'))
     (H : ∀ (T : Scheme.{0}) (t : T ⟶ Y) (h : ⊤ ≤ t ⁻¹ᵁ V),
-      (t.appLE V ⊤ h).hom a = 0 ↔ (t.appLE V ⊤ h).hom b = 0) :
-    ∃ c : Γ(Y, V)ˣ, b = (c : Γ(Y, V)) * a := by
+      (t.appLE V ⊤ h).hom a = 0 ↔ (t.appLE V ⊤ h).hom b = 0)
+    : ∃ c : Γ(Y, V)ˣ, b = (c : Γ(Y, V)) * a := by
   let J := {U : Y.Opens // IsAffineOpen U ∧ U ≤ V}
   let W : J → Y.Opens := fun i => i.1
   have hW : ∀ i, W i ≤ V := fun i => i.2.2

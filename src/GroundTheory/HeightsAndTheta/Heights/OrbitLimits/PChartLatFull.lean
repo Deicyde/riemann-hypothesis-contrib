@@ -30,7 +30,8 @@ def ratSat [CharZero Ω] (R : Subalgebra ℤ Ω) : Subalgebra ℚ Ω where
   add_mem' := by
     rintro t u ⟨n, hn, ht⟩ ⟨m, hm, hu⟩
     refine ⟨n * m, Nat.mul_pos hn hm, ?_⟩
-    have : ((n * m : ℕ) : Ω) * (t + u) = (m : Ω) * ((n : Ω) * t) + (n : Ω) * ((m : Ω) * u) := by push_cast; ring
+    have : ((n * m : ℕ) : Ω) * (t + u) = (m : Ω) * ((n : Ω) * t) + (n : Ω) * ((m : Ω) * u) := by
+      push_cast; ring
     rw [this]
     exact R.add_mem (R.mul_mem (R.natCast_mem m) ht) (R.mul_mem (R.natCast_mem n) hu)
   zero_mem' := ⟨1, one_pos, by simp⟩
@@ -43,8 +44,12 @@ def ratSat [CharZero Ω] (R : Subalgebra ℤ Ω) : Subalgebra ℚ Ω where
     rw [this]
     exact R.intCast_mem _
 
-theorem exists_nat_mul_mem [NumberField Ω] {y : (Σ k, ι k) → Ω} (hy : Birational y) (c : ∀ k, ι k)
-    (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) (t : Ω) : ∃ n : ℕ, 0 < n ∧ (n : Ω) * t ∈ chartRingZ y c := by
+theorem exists_nat_mul_mem
+    [NumberField Ω]
+    {y : (Σ k, ι k) → Ω} (hy : Birational y)
+    (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0)
+    (t : Ω)
+    : ∃ n : ℕ, 0 < n ∧ (n : Ω) * t ∈ chartRingZ y c := by
   obtain ⟨d, g, h, hg, hh, hh0, hgt⟩ := hy t
   have hX : ∏ k, y ⟨k, c k⟩ ^ d k ≠ 0 := Finset.prod_ne_zero_iff.mpr fun k _ => pow_ne_zero _ (hc k)
   have hG : aeval y g / ∏ k, y ⟨k, c k⟩ ^ d k ∈ ratSat (chartRingZ y c) :=
@@ -55,8 +60,8 @@ theorem exists_nat_mul_mem [NumberField Ω] {y : (Σ k, ι k) → Ω} (hy : Bira
     Subalgebra.inv_mem_of_algebraic (A := ratSat (chartRingZ y c)) (x := ⟨_, hH⟩)
       (Algebra.IsAlgebraic.isAlgebraic _)
   have ht : t = (aeval y g / ∏ k, y ⟨k, c k⟩ ^ d k) * (aeval y h / ∏ k, y ⟨k, c k⟩ ^ d k)⁻¹ := by
-    rw [hgt, inv_div, div_mul_div_comm, mul_comm (∏ k, y ⟨k, c k⟩ ^ d k), mul_assoc,
-      mul_div_assoc, div_self (mul_ne_zero hh0 hX), mul_one]
+    rw [hgt, inv_div, div_mul_div_comm, mul_comm (∏ k, y ⟨k, c k⟩ ^ d k), mul_assoc, mul_div_assoc,
+      div_self (mul_ne_zero hh0 hX), mul_one]
   have := (ratSat (chartRingZ y c)).mul_mem hG hinv
   rw [← ht] at this
   exact this
@@ -82,7 +87,8 @@ theorem ChartLatFull.proof : ChartLatFull.Statement := by
     simp only [N, dif_pos hc]
     exact (ChartLatFull.exists_nat_mul_mem hy c hc (t c)).choose_spec.2
   obtain ⟨m, hm⟩ := Finset.dvd_prod_of_mem N (Finset.mem_univ c)
-  have : ((∏ c, N c : ℕ) : Ω) * s * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * a k)) = (m : Ω) * ((N c : Ω) * t c) := by
+  have : ((∏ c, N c : ℕ) : Ω) * s * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * a k))
+      = (m : Ω) * ((N c : Ω) * t c) := by
     rw [hm]; push_cast; simp only [t]; ring
   rw [this]
   exact (chartRingZ y c).mul_mem ((chartRingZ y c).natCast_mem m) hN

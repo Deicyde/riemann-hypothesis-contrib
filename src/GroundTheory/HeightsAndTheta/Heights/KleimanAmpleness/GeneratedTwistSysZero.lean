@@ -17,19 +17,22 @@ universe u w
 
 def GraphClosed.Statement : Prop :=
   ∀ (k : Type u) [Field k] (Ω : Type w) [Field Ω] [Algebra k Ω] (N : ℕ) (x : Fin (N + 1) → Ω)
-    (G H : LineBundle k x), G.toSubSystem.Generated → IsVeryAmple H.toSubSystem →
-    IsVeryAmple (G.toSubSystem.twist H.toSubSystem)
+      (G H : LineBundle k x),
+    G.toSubSystem.Generated → IsVeryAmple H.toSubSystem
+      → IsVeryAmple (G.toSubSystem.twist H.toSubSystem)
 
 def PointGenerated.Statement : Prop :=
   ∀ (k : Type u) [Field k] (Ω : Type w) [Field Ω] [Algebra k Ω] (N : ℕ) (x : Fin (N + 1) → Ω)
-    (Q : LineBundle k x), IsSubvar x (primeOf (S := k) x) 0 → Q.toSubSystem.Generated
+      (Q : LineBundle k x),
+    IsSubvar x (primeOf (S := k) x) 0 → Q.toSubSystem.Generated
 
 section Hypotheses
 
 variable (k : Type u) [Field k]
 
-theorem generated_twistSys_zero' {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-    {x : Fin (N + 1) → Ω} : (twistSys S x 0).Generated := by
+theorem generated_twistSys_zero'
+    {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ} {x : Fin (N + 1) → Ω}
+    : (twistSys S x 0).Generated := by
   have h1 : (1 : Ω) ∈ (twistSys S x 0).secs := by
     rw [SubSystem.secs, Submodule.mem_iInf]
     intro I

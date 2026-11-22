@@ -11,11 +11,12 @@ namespace GlobalTheory
 
 open Filter Topology
 
-theorem tendsto_tsum_coeff_mul_pow_zero (a : ℕ → ℂ) (q₀ : ℂ) (hq₀ : q₀ ≠ 0)
-    (hs : Summable (fun m : ℕ => a m * q₀ ^ m)) :
-    Tendsto (fun q : ℂ => ∑' m : ℕ, a m * q ^ m) (𝓝 0) (𝓝 (a 0)) := by
-  have hlim : Tendsto (fun q : ℂ => ∑' m : ℕ, a m * q ^ m) (𝓝 0)
-      (𝓝 (∑' m : ℕ, if m = 0 then a 0 else 0)) := by
+theorem tendsto_tsum_coeff_mul_pow_zero
+    (a : ℕ → ℂ) (q₀ : ℂ) (hq₀ : q₀ ≠ 0) (hs : Summable (fun m : ℕ => a m * q₀ ^ m))
+    : Tendsto (fun q : ℂ => ∑' m : ℕ, a m * q ^ m) (𝓝 0) (𝓝 (a 0)) := by
+  have hlim : Tendsto
+      (fun q : ℂ => ∑' m : ℕ, a m * q ^ m)
+      (𝓝 0) (𝓝 (∑' m : ℕ, if m = 0 then a 0 else 0)) := by
     refine tendsto_tsum_of_dominated_convergence (bound := fun m => ‖a m * q₀ ^ m‖) hs.norm ?_ ?_
     · intro m
       have hc : Continuous (fun q : ℂ => a m * q ^ m) := by fun_prop
@@ -34,11 +35,17 @@ theorem tendsto_tsum_coeff_mul_pow_zero (a : ℕ → ℂ) (q₀ : ℂ) (hq₀ : 
       gcongr
   simpa using hlim
 
-theorem det_bounded_eTwoPi : ∀ (g : ℕ) (A : Matrix (Fin g) (Fin g) (PowerSeries ℂ)) (w₀ : ℂ),
-    IsUnit A.det → (∀ i j, Summable (fun m : ℕ => PowerSeries.coeff m (A i j) * eTwoPi w₀ ^ m)) →
-    ∃ T' C : ℝ, 0 < C ∧ ∀ w : ℂ, T' < w.im →
-      C⁻¹ ≤ ‖(Matrix.of fun i j => ∑' m : ℕ, PowerSeries.coeff m (A i j) * eTwoPi w ^ m).det‖ ∧
-      ‖(Matrix.of fun i j => ∑' m : ℕ, PowerSeries.coeff m (A i j) * eTwoPi w ^ m).det‖ ≤ C := by
+theorem det_bounded_eTwoPi
+    : ∀ (g : ℕ) (A : Matrix (Fin g) (Fin g) (PowerSeries ℂ)) (w₀ : ℂ),
+      IsUnit A.det → (∀ i j, Summable (fun m : ℕ => PowerSeries.coeff m (A i j) * eTwoPi w₀ ^ m))
+        → ∃ T' C : ℝ,
+          0 < C
+            ∧ ∀ w : ℂ,
+              T' < w.im
+                → C⁻¹
+                    ≤ ‖(Matrix.of fun i j => ∑' m : ℕ, PowerSeries.coeff m (A i j) * eTwoPi w ^ m).det‖
+                  ∧ ‖(Matrix.of fun i j => ∑' m : ℕ, PowerSeries.coeff m (A i j) * eTwoPi w ^ m).det‖
+                    ≤ C := by
   intro g A w₀ hdet hsum
   have hq₀ : eTwoPi w₀ ≠ 0 := Complex.exp_ne_zero _
   set d₀ : ℂ := (A.map (PowerSeries.constantCoeff (R := ℂ))).det with hd₀
@@ -49,20 +56,26 @@ theorem det_bounded_eTwoPi : ∀ (g : ℕ) (A : Matrix (Fin g) (Fin g) (PowerSer
     rw [hd₀eq]
     exact (hdet.map (PowerSeries.constantCoeff (R := ℂ))).ne_zero
   have hmat : Tendsto
-      (fun q : ℂ => (Matrix.of fun i j => ∑' m : ℕ, PowerSeries.coeff m (A i j) * q ^ m :
-        Matrix (Fin g) (Fin g) ℂ)) (𝓝 0) (𝓝 (A.map (PowerSeries.constantCoeff (R := ℂ)))) := by
+      (fun q : ℂ =>
+        (Matrix.of fun i j => ∑' m : ℕ, PowerSeries.coeff m (A i j) * q ^ m
+          : Matrix (Fin g) (Fin g) ℂ))
+      (𝓝 0) (𝓝 (A.map (PowerSeries.constantCoeff (R := ℂ)))) := by
     refine tendsto_pi_nhds.mpr fun i => tendsto_pi_nhds.mpr fun j => ?_
-    have h := tendsto_tsum_coeff_mul_pow_zero (fun m => PowerSeries.coeff m (A i j))
-      (eTwoPi w₀) hq₀ (hsum i j)
+    have h :=
+      tendsto_tsum_coeff_mul_pow_zero
+        (fun m => PowerSeries.coeff m (A i j))
+        (eTwoPi w₀) hq₀ (hsum i j)
     simpa using h
   have hdetlim : Tendsto
-      (fun q : ℂ => (Matrix.of fun i j => ∑' m : ℕ, PowerSeries.coeff m (A i j) * q ^ m :
-        Matrix (Fin g) (Fin g) ℂ).det) (𝓝 0) (𝓝 d₀) :=
+      (fun q : ℂ =>
+        (Matrix.of fun i j => ∑' m : ℕ, PowerSeries.coeff m (A i j) * q ^ m
+          : Matrix (Fin g) (Fin g) ℂ).det)
+      (𝓝 0) (𝓝 d₀) :=
     ((continuous_id.matrix_det).tendsto _).comp hmat
   have hdpos : 0 < ‖d₀‖ := norm_pos_iff.mpr hd₀ne
-  obtain ⟨ε, hε, hball⟩ := Metric.eventually_nhds_iff.mp
-    (Metric.tendsto_nhds.mp hdetlim (‖d₀‖ / 2) (by positivity))
-  refine ⟨-Real.log ε / (2 * Real.pi), 2 / ‖d₀‖ + 3 * ‖d₀‖ / 2 + 1, by positivity, ?_⟩
+  obtain ⟨ε, hε, hball⟩ :=
+    Metric.eventually_nhds_iff.mp (Metric.tendsto_nhds.mp hdetlim (‖d₀‖ / 2) (by positivity))
+  refine ⟨- Real.log ε / (2 * Real.pi), 2 / ‖d₀‖ + 3 * ‖d₀‖ / 2 + 1, by positivity, ?_⟩
   intro w hw
   have hpi : 0 < 2 * Real.pi := by positivity
   have hnorm : ‖eTwoPi w‖ < ε := by

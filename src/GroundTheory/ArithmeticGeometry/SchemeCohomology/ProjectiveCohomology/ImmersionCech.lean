@@ -18,12 +18,11 @@ noncomputable section
 
 section Transport
 
-variable {Y X : TopCat.{u}} {κ : Type w} {P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}}
+variable
+  {Y X : TopCat.{u}} {κ : Type w} {P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}}
   {P' : (Opens Y)ᵒᵖ ⥤ AddCommGrpCat.{u}}
-  (φ : Opens Y → Opens X) (hφ : Monotone φ)
-  (e : ∀ W, P'.obj (op W) ≃+ P.obj (op (φ W)))
-  (he : ∀ {V W : Opens Y} (h : V ≤ W) (x : P'.obj (op W)),
-    e V (res P' h x) = res P (hφ h) (e W x))
+  (φ : Opens Y → Opens X) (hφ : Monotone φ) (e : ∀ W, P'.obj (op W) ≃+ P.obj (op (φ W)))
+  (he : ∀ {V W : Opens Y} (h : V ≤ W) (x : P'.obj (op W)), e V (res P' h x) = res P (hφ h) (e W x))
   (U : κ → Opens Y) (hinter : ∀ {n : ℕ} (i : Fin (n + 1) → κ), φ (inter U i) = inter (φ ∘ U) i)
 
 def transE (n : ℕ) : Cochain P' U n →+ Cochain P (φ ∘ U) n where
@@ -91,27 +90,27 @@ def transCocycles (n : ℕ) : cocycles P' U n →+ cocycles P (φ ∘ U) n :=
     rw [← transE_d φ hφ e he U hinter, (mem_cocycles σ.1).1 σ.2, map_zero]
 
 def transCocycles' (n : ℕ) : cocycles P (φ ∘ U) n →+ cocycles P' U n :=
-  AddMonoidHom.codRestrict ((transE' φ e U hinter n).comp (cocycles P (φ ∘ U) n).subtype) _
-    fun σ => by
+  AddMonoidHom.codRestrict ((transE' φ e U hinter n).comp (cocycles P (φ ∘ U) n).subtype) _ fun σ =>
+    by
       rw [mem_cocycles]
       change d P' U n (transE' φ e U hinter n σ.1) = 0
       rw [← transE'_d φ hφ e he U hinter, (mem_cocycles σ.1).1 σ.2, map_zero]
 
 def cechHTransport (n : ℕ) : cechH P' U n ≃+ cechH P (φ ∘ U) n where
-  toFun := QuotientAddGroup.map _ _ (transCocycles φ hφ e he U hinter n) fun σ hσ => by
-    rw [AddSubgroup.mem_comap, AddSubgroup.mem_addSubgroupOf]
-    exact transE_mem_coboundaries φ hφ e he U hinter (AddSubgroup.mem_addSubgroupOf.1 hσ)
-  invFun := QuotientAddGroup.map _ _ (transCocycles' φ hφ e he U hinter n) fun σ hσ => by
-    rw [AddSubgroup.mem_comap, AddSubgroup.mem_addSubgroupOf]
-    exact transE'_mem_coboundaries φ hφ e he U hinter (AddSubgroup.mem_addSubgroupOf.1 hσ)
+  toFun :=
+    QuotientAddGroup.map _ _ (transCocycles φ hφ e he U hinter n) fun σ hσ => by
+      rw [AddSubgroup.mem_comap, AddSubgroup.mem_addSubgroupOf]
+      exact transE_mem_coboundaries φ hφ e he U hinter (AddSubgroup.mem_addSubgroupOf.1 hσ)
+  invFun :=
+    QuotientAddGroup.map _ _ (transCocycles' φ hφ e he U hinter n) fun σ hσ => by
+      rw [AddSubgroup.mem_comap, AddSubgroup.mem_addSubgroupOf]
+      exact transE'_mem_coboundaries φ hφ e he U hinter (AddSubgroup.mem_addSubgroupOf.1 hσ)
   left_inv x := by
     obtain ⟨σ, hσ, rfl⟩ := exists_cls x
-    exact cls_congr U (transE'_transE φ e U hinter n σ)
-      (by rw [transE'_transE]; exact hσ) hσ
+    exact cls_congr U (transE'_transE φ e U hinter n σ) (by rw [transE'_transE]; exact hσ) hσ
   right_inv x := by
     obtain ⟨σ, hσ, rfl⟩ := exists_cls x
-    exact cls_congr (φ ∘ U) (transE_transE' φ e U hinter n σ)
-      (by rw [transE_transE']; exact hσ) hσ
+    exact cls_congr (φ ∘ U) (transE_transE' φ e U hinter n σ) (by rw [transE_transE']; exact hσ) hσ
   map_add' := map_add _
 
 lemma cechHTransport_cls {n : ℕ} (σ : Cochain P' U n) (hσ : d P' U n σ = 0) :
@@ -142,12 +141,18 @@ lemma preimage_inter {κ : Type w} (U : κ → Y.Opens) {n : ℕ} (t : Fin n →
   rw [mem_inter_iff, mem_inter_iff]
   rfl
 
-def cechHPushforwardEquiv (F : X.Modules) {κ : Type w} (U : κ → Y.Opens) (n : ℕ) :
-    cechH (modulesAb ((Scheme.Modules.pushforward i).obj F)).obj U n ≃+
-      cechH (modulesAb F).obj (fun j => i ⁻¹ᵁ U j) n :=
-  cechHTransport (P := (modulesAb F).obj) (P' := (modulesAb ((Scheme.Modules.pushforward i).obj F)).obj)
-    (fun W => i ⁻¹ᵁ W) (Opens.map i.base).monotone (fun _ => AddEquiv.refl _) (fun _ _ => rfl) U
-    (fun t => preimage_inter i U t) n
+def cechHPushforwardEquiv (F : X.Modules) {κ : Type w} (U : κ → Y.Opens) (n : ℕ)
+    : cechH (modulesAb ((Scheme.Modules.pushforward i).obj F)).obj U n
+      ≃+ cechH (modulesAb F).obj (fun j => i ⁻¹ᵁ U j) n :=
+  cechHTransport (P := (modulesAb F).obj)
+    (P' := (modulesAb ((Scheme.Modules.pushforward i).obj F)).obj)
+    (fun W => i ⁻¹ᵁ W)
+    (Opens.map i.base).monotone
+    (fun _ => AddEquiv.refl _)
+    (fun _ _ => rfl)
+    U
+    (fun t => preimage_inter i U t)
+    n
 
 lemma cechHPushforwardEquiv_naturality (F : X.Modules) {κ : Type w} (U : κ → Y.Opens) (n : ℕ)
     (α' : (modulesAb ((Scheme.Modules.pushforward i).obj F)).obj ⟶
@@ -163,11 +168,11 @@ lemma cechHPushforwardEquiv_naturality (F : X.Modules) {κ : Type w} (U : κ →
     (fun W => i ⁻¹ᵁ W) (Opens.map i.base).monotone (fun _ => AddEquiv.refl _) (fun _ _ => rfl) U
     (fun t => preimage_inter i U t) α' α hα n x
 
-variable (A : Type u) [CommRing A] [X.Over (Spec (.of A))] [Y.Over (Spec (.of A))]
-  [i.IsOver (Spec (.of A))]
+variable
+  (A : Type u)
+  [CommRing A] [X.Over (Spec (.of A))] [Y.Over (Spec (.of A))] [i.IsOver (Spec (.of A))]
 
 attribute [local instance] algebraOfOver
-
 
 include i in
 lemma algebraMap_eq_appTop (a : A) :
@@ -185,9 +190,9 @@ lemma smulHom_pushforward_app (F : X.Modules) (a : A) (W : Y.Opens)
   rw [algebraMap_eq_appTop i A a, restrictTop, restrictTop, app_resO]
   rfl
 
-def cechHPushforwardLinearEquiv (F : X.Modules) {κ : Type w} (U : κ → Y.Opens) (n : ℕ) :
-    cechH (modulesAb ((Scheme.Modules.pushforward i).obj F)).obj U n ≃ₗ[A]
-      cechH (modulesAb F).obj (fun j => i ⁻¹ᵁ U j) n :=
+def cechHPushforwardLinearEquiv (F : X.Modules) {κ : Type w} (U : κ → Y.Opens) (n : ℕ)
+    : cechH (modulesAb ((Scheme.Modules.pushforward i).obj F)).obj U n ≃ₗ[A]
+        cechH (modulesAb F).obj (fun j => i ⁻¹ᵁ U j) n :=
   (cechHPushforwardEquiv i F U n).toLinearEquiv fun a x =>
     cechHPushforwardEquiv_naturality i F U n _ _ (fun W x => smulHom_pushforward_app i A F a W x) x
 

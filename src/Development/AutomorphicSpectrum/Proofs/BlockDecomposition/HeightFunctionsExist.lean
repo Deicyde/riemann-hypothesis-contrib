@@ -11,17 +11,24 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Sie
 noncomputable section
 
 open scoped Matrix NNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.Core.Rk.SWLaw GlobalTheory.Core.Rk.SW GlobalTheory.StdUnn
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.Core.Rk.SWLaw GlobalTheory.Core.Rk.SW GlobalTheory.StdUnn
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.HtEx
 
-theorem continuous_of_decomp {Γ X : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [TopologicalSpace X]
-    {Q : Subgroup Γ} (hQ : IsClosed (Q : Set Γ)) {C : Set Γ} (hC : IsCompact C) (H : Γ → X) (δ : Q → X)
-    (hδ : Continuous δ) (hI : ∀ g, ∃ p ∈ Q, ∃ k ∈ C, g = p * k)
-    (hH : ∀ (p : Q), ∀ k ∈ C, H ((p : Γ) * k) = δ p) : Continuous H := by
+theorem continuous_of_decomp
+    {Γ X : Type*} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [TopologicalSpace X]
+    {Q : Subgroup Γ} (hQ : IsClosed (Q : Set Γ))
+    {C : Set Γ} (hC : IsCompact C)
+    (H : Γ → X)
+    (δ : Q → X) (hδ : Continuous δ)
+    (hI : ∀ g, ∃ p ∈ Q, ∃ k ∈ C, g = p * k) (hH : ∀ (p : Q), ∀ k ∈ C, H ((p : Γ) * k) = δ p)
+    : Continuous H := by
   rw [continuous_iff_isClosed]
   intro F hF
   have hQF : IsClosed ((Subtype.val : Q → Γ) '' (δ ⁻¹' F)) :=
@@ -57,22 +64,26 @@ theorem absA_pos (u : (AE D)ˣ) : 0 < absA D u := by
   have h : absA D u * absA D u⁻¹ = 1 := by rw [← map_mul, mul_inv_cancel, map_one]
   exact pos_iff_ne_zero.mpr (left_ne_zero_of_mul_eq_one h)
 
-theorem delta_eq {p : G D n} (hp : p ∈ P D n) {a : GL (Fin n) (AE D)} (ha : blkA (mat p) = a.1) :
-    delta (⟨p, hp⟩ : P D n) = absA D (Matrix.GeneralLinearGroup.det a) := by
+theorem delta_eq {p : G D n} (hp : p ∈ P D n) {a : GL (Fin n) (AE D)} (ha : blkA (mat p) = a.1)
+    : delta (⟨p, hp⟩ : P D n) = absA D (Matrix.GeneralLinearGroup.det a) := by
   have hl : HeightExists.leviBlock (D := D) (n := n) (⟨p, hp⟩ : P D n) = a := by
     ext1
     exact ha
   show absA D (Matrix.GeneralLinearGroup.det (HeightExists.leviBlock (D := D) (n := n) (⟨p, hp⟩ : P D n))) = _
   rw [hl]
 
-theorem height_eq {H : G D n → ℝ≥0} (hH : IsHeight H) (p : P D n) {k : G D n} (hk : k ∈ K D n) :
-    H ((p : G D n) * k) = delta p := by
+theorem height_eq {H : G D n → ℝ≥0} (hH : IsHeight H) (p : P D n) {k : G D n} (hk : k ∈ K D n)
+    : H ((p : G D n) * k) = delta p := by
   obtain ⟨a, ha⟩ := LeftInvSect.exists_blkA p.2
   rw [hH p p.2 a ha k hk, ← delta_eq p.2 ha]
 
 theorem isHt_of_isHeight {H : G D n → ℝ≥0} (hH : IsHeight H) : PositivityTheory.Rg.Rsw.IsHt H := by
-  refine ⟨continuous_of_decomp HeightExists.isClosed_P HeightExists.isCompact_K H delta continuous_delta
-    (Iwasawa.exists_mul D n) (fun p k hk => height_eq hH p hk), ?_, ?_⟩
+  refine ⟨
+    continuous_of_decomp HeightExists.isClosed_P HeightExists.isCompact_K H delta continuous_delta
+      (Iwasawa.exists_mul D n) (fun p k hk => height_eq hH p hk),
+    ?_,
+    ?_
+  ⟩
   · intro g
     obtain ⟨p, hp, k, hk, rfl⟩ := Iwasawa.exists_mul D n g
     rw [height_eq hH ⟨p, hp⟩ hk]

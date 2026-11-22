@@ -9,25 +9,29 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.FrobeniusPowerSeries
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.ArcLiftingSetup
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.ArcLiftingSetup
 open scoped TensorProduct
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {PD : PeriodData G Qp K₀ K B BdR}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {PD : PeriodData G Qp K₀ K B BdR}
 
-theorem filV_sep {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    (z : V ⊗[Qp] BdR) (hz : ∀ a : ℤ, z ∈ FilV PD (LL := LL) (V := V) a) : z = 0 := by
+theorem filV_sep
+    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+    (z : V ⊗[Qp] BdR) (hz : ∀ a : ℤ, z ∈ FilV PD (LL := LL) (V := V) a)
+    : z = 0 := by
   classical
   let bV := Module.Free.chooseBasis Qp V
   let E := TensorProduct.equivFinsuppOfBasisLeft (N := BdR) bV
-  have hco : ∀ (a : ℤ) (w : V ⊗[Qp] BdR), w ∈ FilV PD (LL := LL) (V := V) a →
-      ∀ j, E w j ∈ PD.Fil a := by
+  have hco
+      : ∀ (a : ℤ) (w : V ⊗[Qp] BdR), w ∈ FilV PD (LL := LL) (V := V) a → ∀ j, E w j ∈ PD.Fil a := by
     intro a w hw
     obtain ⟨y, rfl⟩ := hw
     induction y using TensorProduct.induction_on with
@@ -47,10 +51,11 @@ theorem filV_sep {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScal
     exact PD.Fil_sep _ fun a => hco a z (hz a) j
   simpa using congrArg E.symm h0
 
-theorem filS_top (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.LiftingTheory.CaseA W) (A : ArcP n)
-    (T : LocLat G Qp LL O) (hW : Win W A T) (a : ZMod n) (s : ℕ) (u : ℤ)
-    (hu : ∀ x ∈ (A.ty (a - (s : ZMod n))).win A.G₀ A.S A.η, x < u) :
-    FilS W T a s u = ⊥ := by
+theorem filS_top
+    (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.LiftingTheory.CaseA W)
+    (A : ArcP n) (T : LocLat G Qp LL O) (hW : Win W A T)
+    (a : ZMod n) (s : ℕ) (u : ℤ) (hu : ∀ x ∈ (A.ty (a - (s : ZMod n))).win A.G₀ A.S A.η, x < u)
+    : FilS W T a s u = ⊥ := by
   classical
   rw [eq_bot_iff]
   rintro y ⟨x, hx, rfl⟩
@@ -63,8 +68,7 @@ theorem filS_top (W : LocWach PD LL O v n) (hcase : Formalism.MainNotions.Liftin
   have hez : ∀ z : K₀, e z = algebraMap K₀ K z := fun z => rfl
   have hover : ∀ z : K₀, τ (algebraMap K₀ K z) = W.emb i z := by
     intro z
-    have : e.symm (algebraMap K₀ K z) = z := by
-      rw [← hez, AlgEquiv.symm_apply_apply]
+    have : e.symm (algebraMap K₀ K z) = z := by rw [← hez, AlgEquiv.symm_apply_apply]
     show W.emb i (e.symm (algebraMap K₀ K z)) = W.emb i z
     rw [this]
   have hOver : Formalism.MainNotions.LiftingTheory.Over W τ i := by

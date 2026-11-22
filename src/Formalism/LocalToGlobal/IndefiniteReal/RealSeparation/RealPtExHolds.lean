@@ -7,7 +7,9 @@ public import Formalism.LocalToGlobal.IndefiniteReal.FockTheta.ConjPurelyImagina
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Fock.DRho Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Fock.DRho Matrix
 
 namespace Formalism.IndefR.Mi
 
@@ -15,8 +17,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem isRealPtO_iff {θ : InfFam D} (hθ : IsInfFam θ) {m n : ℕ} (z : RPt D m n) (w : Mx D m n) :
-    IsRealPtO θ z w ↔ w = Lb D m n z := by
+theorem isRealPtO_iff {θ : InfFam D} (hθ : IsInfFam θ) {m n : ℕ} (z : RPt D m n) (w : Mx D m n)
+    : IsRealPtO θ z w ↔ w = Lb D m n z := by
   have e := Formalism.IndefR.Eqv.eq_thetaC D hθ
   subst e
   constructor

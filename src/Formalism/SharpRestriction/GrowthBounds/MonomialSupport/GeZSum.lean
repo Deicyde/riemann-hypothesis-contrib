@@ -13,7 +13,8 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.LetterSubstitution
 
-open Formalism.MainNotions.G Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideWords Formalism.MainNotions.Proposition5Numerics Formalism.MainNotions.PairMembershipBlocks
+open Formalism.MainNotions.G Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideWords
+  Formalism.MainNotions.Proposition5Numerics Formalism.MainNotions.PairMembershipBlocks
 
 theorem valNN : ValNN := by
   intro R _ _ ι n _ LL S F hF
@@ -27,7 +28,9 @@ theorem valNN : ValNN := by
   induction hmem using Algebra.adjoin_induction with
   | mem x hx =>
     obtain ⟨v, hv, rfl⟩ := hx
-    have h1 := Formalism.MainNotions.TestSideWords.TwistedFiltration.G2.valS_X_mul_of LL S (1 : MvPolynomial (ι × Fin n) R) v hv
+    have h1 :=
+      Formalism.MainNotions.TestSideWords.TwistedFiltration.G2.valS_X_mul_of LL S
+        (1 : MvPolynomial (ι × Fin n) R) v hv
     rw [mul_one] at h1
     refine le_trans ?_ h1
     have := valS_C_nnR (n := n) LL S (1 : R)
@@ -37,13 +40,17 @@ theorem valNN : ValNN := by
   | add x y _ _ hx hy =>
     exact le_trans (le_min hx hy) (Formalism.MainNotions.G.GLWeightTheory.mul_valS_add LL S x y)
   | mul x y _ _ hx hy =>
-    exact le_trans (add_nonneg hx hy) (Formalism.MainNotions.G.GLWeightTheory.flt_valS_mul_ge LL S x y)
+    exact le_trans (add_nonneg hx hy)
+      (Formalism.MainNotions.G.GLWeightTheory.flt_valS_mul_ge LL S x y)
 
 theorem homDec : HomDec := by
   intro R _ ι n F
   refine ⟨F.support.image (fun mo => multideg mo), ?_⟩
-  have key := Finset.sum_fiberwise_of_maps_to (s := F.support) (t := F.support.image fun mo => multideg mo)
-    (g := fun mo => multideg mo) (fun mo hmo => Finset.mem_image_of_mem _ hmo) (fun mo => monomial mo (F.coeff mo))
+  have key :=
+    Finset.sum_fiberwise_of_maps_to (s := F.support) (t := F.support.image fun mo => multideg mo)
+      (g := fun mo => multideg mo)
+      (fun mo hmo => Finset.mem_image_of_mem _ hmo)
+      (fun mo => monomial mo (F.coeff mo))
   rw [F.support_sum_monomial_coeff] at key
   conv_lhs => rw [← key]
   refine Finset.sum_congr rfl (fun δ _ => ?_)

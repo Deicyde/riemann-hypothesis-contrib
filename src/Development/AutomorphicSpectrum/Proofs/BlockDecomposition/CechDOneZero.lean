@@ -23,7 +23,8 @@ def one0 : Co A 0 := fun s => (1 : A.obj (s.obj (Fin.last 0)))
 
 theorem cech_d_one_zero : CH.d (CH.modF A) 0 (one0 A) = 0 := by
   funext s
-  change ∑ i : Fin 2, (-1 : ℤ) ^ (i : ℕ) • (A.map (GlobalTheory.CatH.toLast i s)).hom 1 = (0 : A.obj _)
+  change ∑ i : Fin 2, (-1 : ℤ) ^ (i : ℕ) • (A.map (GlobalTheory.CatH.toLast i s)).hom 1
+    = (0 : A.obj _)
   rw [Fin.sum_univ_two, map_one, map_one]
   simp
 

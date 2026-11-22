@@ -5,11 +5,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PublishedTh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Two
 open scoped Classical
 
-theorem UpperTheory.V.Ws.rank_le_of_card_le_pow_card_field :
-    ∀ (k W : Type) [Field k] [Finite k] [AddCommGroup W] [Module k W] (n : ℕ), CardLe W (Nat.card k ^ n) → Module.rank k W ≤ n := by
+theorem UpperTheory.V.Ws.rank_le_of_card_le_pow_card_field
+    : ∀ (k W : Type) [Field k] [Finite k] [AddCommGroup W] [Module k W] (n : ℕ),
+      CardLe W (Nat.card k ^ n) → Module.rank k W ≤ n := by
   intro k W _ _ _ _ n hW
   obtain ⟨hfin, hle⟩ := hW
   haveI := hfin

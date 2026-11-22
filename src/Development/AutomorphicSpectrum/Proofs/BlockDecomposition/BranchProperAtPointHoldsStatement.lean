@@ -15,5 +15,10 @@ public import GroundTheory.HeightsAndTheta.Heights.ComplexAnalyticSets.StSmallSe
 @[expose] public section
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.branch_proper_at_point_holds : GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets.BranchProperAtPoint.Statement := by
-  first | exact @GlobalTheory.CompanionTheory.Ar.Branch.branchProperAtPoint | exact GlobalTheory.CompanionTheory.Ar.Branch.branchProperAtPoint | (intros; apply GlobalTheory.CompanionTheory.Ar.Branch.branchProperAtPoint <;> assumption)
+theorem _root_.GlobalTheory.T.branch_proper_at_point_holds
+    : GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets.BranchProperAtPoint.Statement :=
+  by
+    first
+    | exact @GlobalTheory.CompanionTheory.Ar.Branch.branchProperAtPoint
+    | exact GlobalTheory.CompanionTheory.Ar.Branch.branchProperAtPoint
+    | (intros; apply GlobalTheory.CompanionTheory.Ar.Branch.branchProperAtPoint <;> assumption)

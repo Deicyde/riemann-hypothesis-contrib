@@ -6,8 +6,17 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_unit_norm_of_selfDual_hermitian_lattice :
-    ∀ (K V : Type) [Field K] [CharZero K] [AddCommGroup V] [Module K V] (σ : K →+* K) (h : V →ₗ[K] V →ₛₗ[σ] K) (p d : ℕ) (θ : K) (O : Subring K) (L : AddSubgroup V), p.Prime → d.Prime → θ ^ 2 = -(d : K) → σ θ = -θ → (∀ x : K, ∃ a b : ℚ, x = (a : K) + (b : K) * θ) → (∀ x ∈ O, σ x ∈ O) → (1 + θ) / 2 ∈ O → (∀ r : ℚ, (r : K) ∈ O ↔ padicNorm p r ≤ 1) → (∀ x y : V, h y x = σ (h x y)) → (∀ x : V, h x x = 0 → x = 0) → (∀ a ∈ O, ∀ x ∈ L, a • x ∈ L) → (∀ x ∈ L, ∀ y ∈ L, h x y ∈ O) → (∀ x : V, ∃ m : ℕ, (p : K) ^ m • x ∈ L) → ∀ W : Submodule K V, (∀ x ∈ W, (∀ y ∈ L, y ∈ W → h x y ∈ O) → x ∈ L) → (∃ x ∈ W, x ≠ 0) → ∃ y ∈ L, y ∈ W ∧ ∃ u : ℚ, h y y = (u : K) ∧ padicNorm p u = 1 := by
+theorem exists_unit_norm_of_selfDual_hermitian_lattice
+    : ∀ (K V : Type) [Field K] [CharZero K] [AddCommGroup V] [Module K V] (σ : K →+* K)
+        (h : V →ₗ[K] V →ₛₗ[σ] K) (p d : ℕ) (θ : K) (O : Subring K) (L : AddSubgroup V),
+      p.Prime → d.Prime → θ ^ 2 = -(d : K) → σ θ = -θ
+        → (∀ x : K, ∃ a b : ℚ, x = (a : K) + (b : K) * θ) → (∀ x ∈ O, σ x ∈ O) → (1 + θ) / 2 ∈ O
+        → (∀ r : ℚ, (r : K) ∈ O ↔ padicNorm p r ≤ 1) → (∀ x y : V, h y x = σ (h x y))
+        → (∀ x : V, h x x = 0 → x = 0) → (∀ a ∈ O, ∀ x ∈ L, a • x ∈ L)
+        → (∀ x ∈ L, ∀ y ∈ L, h x y ∈ O) → (∀ x : V, ∃ m : ℕ, (p : K) ^ m • x ∈ L)
+        → ∀ W : Submodule K V,
+          (∀ x ∈ W, (∀ y ∈ L, y ∈ W → h x y ∈ O) → x ∈ L) → (∃ x ∈ W, x ≠ 0)
+            → ∃ y ∈ L, y ∈ W ∧ ∃ u : ℚ, h y y = (u : K) ∧ padicNorm p u = 1 := by
   intro K V _ _ _ _ σ h p d θ O L hp hd hθ hσθ hK _ hω hO hherm hdef hL hLO hscale W hW hne
   haveI : Fact p.Prime := ⟨hp⟩
   have hpK : (p : K) ≠ 0 := by exact_mod_cast hp.ne_zero
@@ -50,8 +59,9 @@ theorem exists_unit_norm_of_selfDual_hermitian_lattice :
     simpa using h3
   have htr : ∀ x ∈ L, x ∈ W → ∀ y ∈ L, y ∈ W → (h x y + σ (h x y)) / p ∈ O := by
     intro x hx hxW y hy hyW
-    have h1 := O.sub_mem (O.sub_mem (hdiv _ (L.add_mem hx hy) (W.add_mem hxW hyW)) (hdiv x hx hxW))
-      (hdiv y hy hyW)
+    have h1 :=
+      O.sub_mem (O.sub_mem (hdiv _ (L.add_mem hx hy) (W.add_mem hxW hyW)) (hdiv x hx hxW))
+        (hdiv y hy hyW)
     convert h1 using 1
     simp only [map_add (f := _), LinearMap.add_apply]
     rw [← hherm x y]
@@ -64,8 +74,8 @@ theorem exists_unit_norm_of_selfDual_hermitian_lattice :
     have r2 := htr _ (hL _ hω x hx) (W.smul_mem _ hxW) y hy hyW
     have h1 := O.add_mem r2 (O.mul_mem (O.sub_mem hω O.one_mem) r1)
     convert h1 using 1
-    simp only [map_smul, LinearMap.smul_apply, smul_eq_mul, map_mul, map_div₀, map_add (f := _), map_one,
-      hσθ, map_ofNat]
+    simp only [map_smul, LinearMap.smul_apply, smul_eq_mul, map_mul, map_div₀, map_add (f := _),
+      map_one, hσθ, map_ofNat]
     field_simp
     ring
   obtain ⟨x, hxW, hx0⟩ := hne
@@ -84,8 +94,7 @@ theorem exists_unit_norm_of_selfDual_hermitian_lattice :
   have hu0 : u ≠ 0 := by
     rintro rfl
     exact hx00 (hdef _ (by simpa using hu))
-  have hupos : 0 < padicNorm p u :=
-    lt_of_le_of_ne (padicNorm.nonneg _) (padicNorm.nonzero hu0).symm
+  have hupos : 0 < padicNorm p u := lt_of_le_of_ne (padicNorm.nonneg _) (padicNorm.nonzero hu0).symm
   have hnd : (p : ℚ)⁻¹ ≤ padicNorm p (d : ℚ) := by
     by_cases hpd : p = d
     · rw [← hpd, hnp]
@@ -94,7 +103,9 @@ theorem exists_unit_norm_of_selfDual_hermitian_lattice :
       exact inv_le_one_of_one_le₀ hp1.le
   have hc : (p : ℚ) ≤ padicNorm p ((d : ℚ) / (p * p)) := by
     rw [padicNorm.div, padicNorm.mul, hnp, le_div_iff₀ (by positivity)]
-    calc (p : ℚ) * ((p : ℚ)⁻¹ * (p : ℚ)⁻¹) = (p : ℚ)⁻¹ := by field_simp
+    calc
+      (p : ℚ) * ((p : ℚ)⁻¹ * (p : ℚ)⁻¹)
+        = (p : ℚ)⁻¹ := by field_simp
       _ ≤ _ := hnd
   have hpow : ∀ (q : ℚ) (k : ℕ), padicNorm p (q ^ k) = padicNorm p q ^ k := by
     intro q k
@@ -104,7 +115,8 @@ theorem exists_unit_norm_of_selfDual_hermitian_lattice :
   have hbound : ∀ k : ℕ, (p : ℚ) ^ k * padicNorm p u ≤ 1 := by
     intro k
     have h1 := hLO _ (hiter k) _ (hiter k)
-    have h2 : h ((θ / p) ^ k • x0) ((θ / p) ^ k • x0) = ((((d : ℚ) / (p * p)) ^ k * u : ℚ) : K) := by
+    have h2
+        : h ((θ / p) ^ k • x0) ((θ / p) ^ k • x0) = ((((d : ℚ) / (p * p)) ^ k * u : ℚ) : K) := by
       rw [h.map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ, hu, smul_eq_mul, smul_eq_mul,
         map_pow, map_div₀, hσθ, map_natCast, ← mul_assoc, ← mul_pow]
       push_cast

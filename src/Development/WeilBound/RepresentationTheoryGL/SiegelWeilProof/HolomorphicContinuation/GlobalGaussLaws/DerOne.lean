@@ -7,6 +7,7 @@ public import Development.WeilBound.RepresentationTheoryGL.SiegelWeilProof.Holom
 
 namespace PositivityTheory.Rg.Sw.Glob
 
-theorem derivOne (h : GlobalTheory.Published.WeilThetaConvergence) : DerivOne := derivOne_of h curveSt
+theorem derivOne (h : GlobalTheory.Published.WeilThetaConvergence) : DerivOne :=
+  derivOne_of h curveSt
 
 end PositivityTheory.Rg.Sw.Glob

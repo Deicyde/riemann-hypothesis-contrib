@@ -10,7 +10,9 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH GlobalTheory.Cartier GlobalTheory.FlagBundle
+open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH GlobalTheory.Cartier
+  GlobalTheory.FlagBundle
 open TopologicalSpace Opposite
 
 namespace GlobalTheory.BoundaryDivisor
@@ -24,14 +26,14 @@ variable {Y : Scheme.{0}} [IsIntegral Y] (j : Y ⟶ X) [IsOpenImmersion j]
 def pull (y : Y) : X.presheaf.stalk (j y) →+* Y.functionField :=
   (algebraMap (Y.presheaf.stalk y) Y.functionField).comp (j.stalkMap y).hom
 
-
 set_option autoImplicit false in
 open AlgebraicGeometry CategoryTheory in
 open TopologicalSpace Opposite in
 variable {X : Scheme.{0}} in
 variable {Y : Scheme.{0}} [IsIntegral Y] (j : Y ⟶ X) [IsOpenImmersion j] in
 omit [IsIntegral Y] in
-theorem _root_.GlobalTheory.BoundaryDivisor.stalkMap_bijective (y : Y) : Function.Bijective (j.stalkMap y).hom :=
+theorem _root_.GlobalTheory.BoundaryDivisor.stalkMap_bijective (y : Y)
+    : Function.Bijective (j.stalkMap y).hom :=
   ConcreteCategory.bijective_of_isIso _
 
 end Pull
@@ -155,25 +157,29 @@ private lemma exists_eq_mul_of_pow_eq_mul_germ (T : Closeds X) (U : X.affineOpen
     (X.presheaf.map i₁.op s) hvan
   exact ⟨c, by rw [← hc, X.presheaf.germ_res_apply]⟩
 
-
 set_option autoImplicit false in
 open AlgebraicGeometry CategoryTheory in
 open TopologicalSpace Opposite in
 variable {X : Scheme.{0}} in
-theorem _root_.GlobalTheory.BoundaryDivisor.exists_reduced_cartierDiv :
-    ∀ (X Y : Scheme.{0}) [IsIntegral Y] (j : Y ⟶ X) [IsOpenImmersion j]
-      (T : TopologicalSpace.Closeds X), _root_.ReciprocityTheory.AnForm.R.FinalTheorems.Snc (Scheme.IdealSheafData.vanishingIdeal T) →
-      j (genericPoint Y) ∉ T → ∃ D : _root_.GlobalTheory.Cartier.CartierDiv Y, D.Eff ∧
-        (∀ y, y ∈ D.supp ↔ j y ∈ T) ∧
-        ∀ (y : Y) (g : Y.functionFieldˣ), D.IsEqn y g →
-          ∀ (f : Y.functionField) (n : ℕ), _root_.GlobalTheory.Cartier.RegAt y f →
-            _root_.GlobalTheory.Cartier.RegAt y (f ^ n / g) →
-              _root_.GlobalTheory.Cartier.RegAt y (f / g) := by
+theorem _root_.GlobalTheory.BoundaryDivisor.exists_reduced_cartierDiv
+    : ∀ (X Y : Scheme.{0}) [IsIntegral Y] (j : Y ⟶ X) [IsOpenImmersion j]
+        (T : TopologicalSpace.Closeds X),
+      _root_.ReciprocityTheory.AnForm.R.FinalTheorems.Snc (Scheme.IdealSheafData.vanishingIdeal T)
+        → j (genericPoint Y) ∉ T
+        → ∃ D : _root_.GlobalTheory.Cartier.CartierDiv Y,
+          D.Eff ∧ (∀ y, y ∈ D.supp ↔ j y ∈ T)
+            ∧ ∀ (y : Y) (g : Y.functionFieldˣ),
+              D.IsEqn y g
+                → ∀ (f : Y.functionField) (n : ℕ),
+                  _root_.GlobalTheory.Cartier.RegAt y f
+                    → _root_.GlobalTheory.Cartier.RegAt y (f ^ n / g)
+                    → _root_.GlobalTheory.Cartier.RegAt y (f / g) := by
   intro X Y _ j _ T hS hη
   have hS' := hS
   unfold _root_.ReciprocityTheory.AnForm.R.FinalTheorems.Snc at hS'
-  have hchart : ∀ y : Y, ∃ (U : X.affineOpens) (_ : j y ∈ (U : X.Opens)) (h : Γ(X, U)),
-      (Scheme.IdealSheafData.vanishingIdeal T).ideal U = Ideal.span {h} := by
+  have hchart
+      : ∀ y : Y, ∃ (U : X.affineOpens) (_ : j y ∈ (U : X.Opens)) (h : Γ(X, U)),
+        (Scheme.IdealSheafData.vanishingIdeal T).ideal U = Ideal.span {h} := by
     intro y
     obtain ⟨_, U, hU, n, f, J, _, hJ⟩ := hS' (j y)
     exact ⟨U, hU, _, hJ⟩
@@ -181,7 +187,10 @@ theorem _root_.GlobalTheory.BoundaryDivisor.exists_reduced_cartierDiv :
   have hinj : ∀ y, Function.Injective (_root_.GlobalTheory.BoundaryDivisor.pull j y) := fun y =>
     (IsFractionRing.injective (Y.presheaf.stalk y) Y.functionField).comp
       (_root_.GlobalTheory.BoundaryDivisor.stalkMap_bijective j y).1
-  have hne : ∀ y, _root_.GlobalTheory.BoundaryDivisor.pull j y (X.presheaf.germ (U y) (j y) (hU y) (h y)) ≠ 0 := by
+  have hne
+      : ∀ y,
+        _root_.GlobalTheory.BoundaryDivisor.pull j y (X.presheaf.germ (U y) (j y) (hU y) (h y))
+          ≠ 0 := by
     intro y h0
     have hηU : j (genericPoint Y) ∈ (U y : X.Opens) :=
       ((genericPoint_spec Y).mem_open_set_iff (j ⁻¹ᵁ (U y : X.Opens)).isOpen).2
@@ -191,27 +200,41 @@ theorem _root_.GlobalTheory.BoundaryDivisor.exists_reduced_cartierDiv :
     have h2 := (mem_closed_iff_not_isUnit_germ T (U y) (h y) (hI y) _ hηU).not.1 hη
     rw [not_not, h1] at h2
     exact not_isUnit_zero h2
-  obtain ⟨g, hg⟩ : ∃ g : Y → Y.functionFieldˣ, ∀ y, (g y : Y.functionField) =
-      _root_.GlobalTheory.BoundaryDivisor.pull j y (X.presheaf.germ (U y) (j y) (hU y) (h y)) :=
+  obtain ⟨g, hg⟩
+      : ∃ g : Y → Y.functionFieldˣ, ∀ y,
+        (g y : Y.functionField)
+          = _root_.GlobalTheory.BoundaryDivisor.pull j y
+            (X.presheaf.germ (U y) (j y) (hU y) (h y)) :=
     ⟨fun y => Units.mk0 _ (hne y), fun y => rfl⟩
-  have hunit : ∀ (y z : Y) (hz : j z ∈ (U y : X.Opens)),
-      _root_.GlobalTheory.Cartier.UnitAt z ((g y : Y.functionField) / g z) := by
+  have hunit
+      : ∀ (y z : Y) (hz : j z ∈ (U y : X.Opens)),
+        _root_.GlobalTheory.Cartier.UnitAt z ((g y : Y.functionField) / g z) := by
     intro y z hz
-    obtain ⟨c, hc⟩ := exists_germ_eq_mul_of_not_isUnit_on_closed T (U z) (h z) (hI z) (j z) (hU z) (U y) hz
-      (h y) (fun w hw hwT => (mem_closed_iff_not_isUnit_germ T (U y) (h y) (hI y) w hw).1 hwT)
-    obtain ⟨d, hd⟩ := exists_germ_eq_mul_of_not_isUnit_on_closed T (U y) (h y) (hI y) (j z) hz (U z) (hU z)
-      (h z) (fun w hw hwT => (mem_closed_iff_not_isUnit_germ T (U z) (h z) (hI z) w hw).1 hwT)
-    have gy : (g y : Y.functionField) =
-        _root_.GlobalTheory.BoundaryDivisor.pull j z (X.presheaf.germ (U y) (j z) hz (h y)) := by
+    obtain ⟨c, hc⟩ :=
+      exists_germ_eq_mul_of_not_isUnit_on_closed T (U z) (h z) (hI z) (j z) (hU z) (U y) hz (h y)
+        (fun w hw hwT => (mem_closed_iff_not_isUnit_germ T (U y) (h y) (hI y) w hw).1 hwT)
+    obtain ⟨d, hd⟩ :=
+      exists_germ_eq_mul_of_not_isUnit_on_closed T (U y) (h y) (hI y) (j z) hz (U z) (hU z) (h z)
+        (fun w hw hwT => (mem_closed_iff_not_isUnit_germ T (U z) (h z) (hI z) w hw).1 hwT)
+    have gy
+        : (g y : Y.functionField)
+          = _root_.GlobalTheory.BoundaryDivisor.pull j z
+            (X.presheaf.germ (U y) (j z) hz (h y)) := by
       rw [hg y]
       exact pull_germ_eq_pull_germ j _ _ y z (hU y) hz
     have hcz : (g y : Y.functionField) = _root_.GlobalTheory.BoundaryDivisor.pull j z c * g z := by
       rw [gy, hg z, hc, map_mul]
     have hdz : (g z : Y.functionField) = _root_.GlobalTheory.BoundaryDivisor.pull j z d * g y := by
       rw [gy, hg z, hd, map_mul]
-    have hcd : _root_.GlobalTheory.BoundaryDivisor.pull j z c * _root_.GlobalTheory.BoundaryDivisor.pull j z d = 1 := by
-      have e : (_root_.GlobalTheory.BoundaryDivisor.pull j z c * _root_.GlobalTheory.BoundaryDivisor.pull j z d) *
-          (g y : Y.functionField) = 1 * g y := by
+    have hcd
+        : _root_.GlobalTheory.BoundaryDivisor.pull j z c
+            * _root_.GlobalTheory.BoundaryDivisor.pull j z d
+          = 1 := by
+      have e
+          : (_root_.GlobalTheory.BoundaryDivisor.pull j z c
+                * _root_.GlobalTheory.BoundaryDivisor.pull j z d)
+              * (g y : Y.functionField)
+            = 1 * g y := by
         rw [one_mul, mul_assoc, ← hdz, ← hcz]
       exact mul_right_cancel₀ (g y).ne_zero e
     rw [hcz, mul_div_cancel_right₀ _ (g z).ne_zero]
@@ -220,7 +243,8 @@ theorem _root_.GlobalTheory.BoundaryDivisor.exists_reduced_cartierDiv :
     apply IsFractionRing.injective (Y.presheaf.stalk z) Y.functionField
     rw [map_mul, map_one]
     exact hcd
-  let F : (y : Y) → _root_.GlobalTheory.Cartier.Germ y := fun y => _root_.GlobalTheory.Cartier.germOf y (g y)
+  let F : (y : Y) → _root_.GlobalTheory.Cartier.Germ y := fun y =>
+    _root_.GlobalTheory.Cartier.germOf y (g y)
   have hF : F ∈ _root_.GlobalTheory.Cartier.cartierGroup Y := by
     unfold _root_.GlobalTheory.Cartier.cartierGroup
     intro y
@@ -232,8 +256,10 @@ theorem _root_.GlobalTheory.BoundaryDivisor.exists_reduced_cartierDiv :
     intro y
     unfold _root_.GlobalTheory.Cartier.RegAt
     exact ⟨_, (hg y).symm⟩
-  have hsupp : ∀ y, _root_.GlobalTheory.Cartier.UnitAt y (1 / (g y : Y.functionField)) ↔
-      IsUnit (X.presheaf.germ (U y) (j y) (hU y) (h y)) := by
+  have hsupp
+      : ∀ y,
+        _root_.GlobalTheory.Cartier.UnitAt y (1 / (g y : Y.functionField))
+          ↔ IsUnit (X.presheaf.germ (U y) (j y) (hU y) (h y)) := by
     intro y
     have bij := _root_.GlobalTheory.BoundaryDivisor.stalkMap_bijective j y
     unfold _root_.GlobalTheory.Cartier.UnitAt
@@ -262,8 +288,7 @@ theorem _root_.GlobalTheory.BoundaryDivisor.exists_reduced_cartierDiv :
   · intro y g' hg' f n hf hfn
     have hu := ((hDeq y).iff_unitAt).1 hg'
     have hr1 : _root_.GlobalTheory.Cartier.RegAt y (f ^ n / g y) := by
-      have e : f ^ n / (g y : Y.functionField) =
-          (f ^ n / g') * ((g' : Y.functionField) / g y) := by
+      have e : f ^ n / (g y : Y.functionField) = (f ^ n / g') * ((g' : Y.functionField) / g y) := by
         rw [div_mul_div_cancel₀ g'.ne_zero]
       rw [e]
       exact hfn.mul hu.regAt
@@ -279,13 +304,14 @@ theorem _root_.GlobalTheory.BoundaryDivisor.exists_reduced_cartierDiv :
       have key : a' ^ n = b' * X.presheaf.germ (U y) (j y) (hU y) (h y) := by
         apply hinj y
         rw [map_pow, map_mul, ha', hb', ← hg y, div_mul_cancel₀ _ (g y).ne_zero]
-      obtain ⟨c, hc⟩ := exists_eq_mul_of_pow_eq_mul_germ T (U y) (h y) (hI y) (j y) (hU y) a' b' n key
+      obtain ⟨c, hc⟩ :=
+        exists_eq_mul_of_pow_eq_mul_germ T (U y) (h y) (hI y) (j y) (hU y) a' b' n key
       refine ⟨(j.stalkMap y).hom c, ?_⟩
       show _root_.GlobalTheory.BoundaryDivisor.pull j y c = f / g y
       rw [← ha', hc, map_mul, ← hg y, mul_div_cancel_right₀ _ (g y).ne_zero]
     have hinv : _root_.GlobalTheory.Cartier.RegAt y ((g y : Y.functionField) / g') := by
-      have := ((_root_.GlobalTheory.Cartier.unitAt_iff
-        (div_ne_zero g'.ne_zero (g y).ne_zero)).1 hu).2
+      have :=
+        ((_root_.GlobalTheory.Cartier.unitAt_iff (div_ne_zero g'.ne_zero (g y).ne_zero)).1 hu).2
       rwa [inv_div] at this
     have e : f / (g' : Y.functionField) = f / g y * ((g y : Y.functionField) / g') := by
       rw [div_mul_div_cancel₀ (g y).ne_zero]

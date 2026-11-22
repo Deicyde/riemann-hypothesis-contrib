@@ -7,7 +7,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA Formalism.L2.SG.LocalCountModules.LocCntCommon
+open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA
+  Formalism.L2.SG.LocalCountModules.LocCntCommon
 
 namespace Formalism.L2.SG.LocalCountModules.UnitaryGroupMassFormula.LocCntUG
 
@@ -15,19 +16,24 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 variable {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
 
-theorem dl_full (H : HermSp M V) {r : ℕ} (f f' : Fin (r + 1) → V) :
-    H.Dl f f' (r + 1) = (H.Zhat f f').det := by
+theorem dl_full (H : HermSp M V) {r : ℕ} (f f' : Fin (r + 1) → V)
+    : H.Dl f f' (r + 1) = (H.Zhat f f').det := by
   unfold HermSp.Dl
   rw [dite_eq_left le_rfl]
   rfl
 
-theorem locCntUG_of (h1 : Formalism.MainNotions.ThinScalesBound.AllLoc (fun M => ∀ r n, ThetaMbeG M r n)) : Formalism.L2.SG.LocalCountModules.LocCntUG.LocCntUG := by
-  intro F _ _ _ E _ _ _ _ M hOK r n hmode V _ _ H hn t₁ f₂ f₂' φ φ' hyp hD Y₁ Y₂ be₁ be₂ al₁ al₂ eY eb
+theorem locCntUG_of
+    (h1 : Formalism.MainNotions.ThinScalesBound.AllLoc (fun M => ∀ r n, ThetaMbeG M r n))
+    : Formalism.L2.SG.LocalCountModules.LocCntUG.LocCntUG := by
+  intro F _ _ _ E _ _ _ _ M hOK r n hmode V _ _ H hn t₁ f₂ f₂' φ φ' hyp hD Y₁ Y₂ be₁ be₂ al₁ al₂ eY
+    eb
   obtain ⟨g, hs⟩ := Option.isSome_iff_exists.1 hmode
   have hg := hyp.1
   have hT := (hg.1.2.2.2.2.2 g hs).2.1
-  have hF₁ : Formalism.MainNotions.ThinScalesBound.FrameK H t₁.f t₁.T := ⟨hg.1.2.1.2.1, hg.1.2.1.2.2.1⟩
-  have hF₁' : Formalism.MainNotions.ThinScalesBound.FrameK H t₁.f' t₁.T' := ⟨hg.1.2.2.1.2.1, hg.1.2.2.1.2.2.1⟩
+  have hF₁ : Formalism.MainNotions.ThinScalesBound.FrameK H t₁.f t₁.T :=
+    ⟨hg.1.2.1.2.1, hg.1.2.1.2.2.1⟩
+  have hF₁' : Formalism.MainNotions.ThinScalesBound.FrameK H t₁.f' t₁.T' :=
+    ⟨hg.1.2.2.1.2.1, hg.1.2.2.1.2.2.1⟩
   have hMM₁ : MMInt H t₁ := by
     have hle : MMo H t₁ ≤ t₁.abelian₂ := Submodule.span_le.2 (by rintro _ ⟨i, rfl⟩; exact hg.2.1 i)
     intro m hm m' hm'
@@ -44,55 +50,68 @@ theorem locCntUG_of (h1 : Formalism.MainNotions.ThinScalesBound.AllLoc (fun M =>
     ext a b; exact (eY a b).2.symm
   have hu₁ : IsUnit (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det := by rw [hY₁]; exact Y₁.unit
   have hu₂ : IsUnit (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det := by rw [hY₂]; exact Y₂.unit
-  have hrelZh : ((H.Zhat t₁.f t₁.f').submatrix Fin.castSucc Fin.castSucc).det * (H.Zhat f₂ f₂').det =
-      ((H.Zhat f₂ f₂').submatrix Fin.castSucc Fin.castSucc).det * (H.Zhat t₁.f t₁.f').det := by
+  have hrelZh
+      : ((H.Zhat t₁.f t₁.f').submatrix Fin.castSucc Fin.castSucc).det * (H.Zhat f₂ f₂').det
+        = ((H.Zhat f₂ f₂').submatrix Fin.castSucc Fin.castSucc).det * (H.Zhat t₁.f t₁.f').det := by
     rw [← dl_eq_det, ← dl_eq_det, ← dl_full, ← dl_full]
     exact hyp.2.2.2.1.2.2.2.2.2
-  have hrel : (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * ZZ₂.det =
-      (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det * ZZ₁.det :=
+  have hrel
+      : (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * ZZ₂.det
+        = (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det * ZZ₁.det :=
     det_rel_split hs _ _ _ _ hrelZh
 
   let u : E := ZZ₁.det * ↑(hu₁.unit⁻¹)
   obtain ⟨a₀, ha₀⟩ := exists_unit_shift g u
   let x : M.R := ⟨algebraMap F E a₀, alg_mem_R hs a₀⟩
-  have hmapZ : ∀ Z : Matrix (Fin (r + 1)) (Fin (r + 1)) M.R,
-      (Z + cornerM r x).map M.R.subtype = Z.map M.R.subtype + cornerM r (algebraMap F E a₀) := by
-    intro Z; ext i j
+  have hmapZ
+      : ∀ Z : Matrix (Fin (r + 1)) (Fin (r + 1)) M.R,
+        (Z + cornerM r x).map M.R.subtype = Z.map M.R.subtype + cornerM r (algebraMap F E a₀) := by
+    intro Z
+    ext i j
     simp only [Matrix.map_apply, Matrix.add_apply, cornerM, Matrix.of_apply]
     split_ifs <;> simp [x]
   have hd₁ : ZZ₁.det = (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * u := by
     simp only [u]
     rw [mul_comm, mul_assoc, IsUnit.val_inv_mul, mul_one]
   have hd₂ : ZZ₂.det = (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det * u := by
-    have hh : (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * ↑(hu₁.unit⁻¹) = 1 := IsUnit.mul_val_inv hu₁
+    have hh : (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * ↑(hu₁.unit⁻¹) = 1 :=
+      IsUnit.mul_val_inv hu₁
     simp only [u]
-    calc ZZ₂.det = ZZ₂.det * ((ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * ↑(hu₁.unit⁻¹)) := by rw [hh, mul_one]
+    calc
+      ZZ₂.det = ZZ₂.det * ((ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * ↑(hu₁.unit⁻¹)) := by
+        rw [hh, mul_one]
       _ = ((ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * ZZ₂.det) * ↑(hu₁.unit⁻¹) := by ring
       _ = _ := by rw [hrel]; ring
   have unit₁ : IsUnit ((Z₁ + cornerM r x).map M.R.subtype).det := by
     rw [hmapZ, e₁, det_add_cornerM, hd₁]
-    have : (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * u +
-        algebraMap F E a₀ * (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det =
-        (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * (u + algebraMap F E a₀) := by ring
-    rw [this]; exact hu₁.mul ha₀
+    have : (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * u
+          + algebraMap F E a₀ * (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det
+        = (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det * (u + algebraMap F E a₀) := by
+      ring
+    rw [this]
+    exact hu₁.mul ha₀
   let W₁ : M.Mat (r + 1) := ⟨Z₁ + cornerM r x, unit₁⟩
   have eY₁ : ∀ a b : Fin r, Y₁.Z a b = W₁.Z a.castSucc b.castSucc := fun a b => by
     have : W₁.Z a.castSucc b.castSucc = Z₁ a.castSucc b.castSucc := by
       simp [W₁, cornerM_castSucc_left]
-    rw [this]; exact Subtype.ext (eY a b).1
+    rw [this]
+    exact Subtype.ext (eY a b).1
   have ebe₁ : ∀ a : Fin r, be₁ a = W₁.Z a.castSucc (Fin.last r) := fun a => by
     have : W₁.Z a.castSucc (Fin.last r) = Z₁ a.castSucc (Fin.last r) := by
       simp [W₁, cornerM_castSucc_left]
-    rw [this]; exact Subtype.ext (eb a).1
+    rw [this]
+    exact Subtype.ext (eb a).1
   have eal₁ : ∀ a : Fin r, al₁ a = W₁.Z (Fin.last r) a.castSucc := fun a => by
     have : W₁.Z (Fin.last r) a.castSucc = Z₁ (Fin.last r) a.castSucc := by
       simp [W₁, cornerM_castSucc_right]
-    rw [this]; exact Subtype.ext (eb a).2.2.1
+    rw [this]
+    exact Subtype.ext (eb a).2.2.1
   have hhdW₁ : headDet M W₁.Z = (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det := by
     show (((Z₁ + cornerM r x).map M.R.subtype).submatrix Fin.castSucc Fin.castSucc).det = _
     rw [hmapZ, e₁, head_add_cornerM]
-  have hdetW₁ : (W₁.Z.map M.R.subtype).det =
-      ZZ₁.det + algebraMap F E a₀ * (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det := by
+  have hdetW₁
+      : (W₁.Z.map M.R.subtype).det
+        = ZZ₁.det + algebraMap F E a₀ * (ZZ₁.submatrix Fin.castSucc Fin.castSucc).det := by
     show ((Z₁ + cornerM r x).map M.R.subtype).det = _
     rw [hmapZ, e₁, det_add_cornerM]
   by_cases hint : ∀ a b, ZZ₂ a b ∈ M.R
@@ -100,34 +119,43 @@ theorem locCntUG_of (h1 : Formalism.MainNotions.ThinScalesBound.AllLoc (fun M =>
     have e₂ : Z₂.map M.R.subtype = ZZ₂ := by ext a b; rfl
     have unit₂ : IsUnit ((Z₂ + cornerM r x).map M.R.subtype).det := by
       rw [hmapZ, e₂, det_add_cornerM, hd₂]
-      have : (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det * u +
-          algebraMap F E a₀ * (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det =
-          (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det * (u + algebraMap F E a₀) := by ring
-      rw [this]; exact hu₂.mul ha₀
+      have : (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det * u
+            + algebraMap F E a₀ * (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det
+          = (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det * (u + algebraMap F E a₀) := by
+        ring
+      rw [this]
+      exact hu₂.mul ha₀
     let W₂ : M.Mat (r + 1) := ⟨Z₂ + cornerM r x, unit₂⟩
     have hu₂' : IsUnit (headDet M Z₂) := by
       show IsUnit ((Z₂.map M.R.subtype).submatrix Fin.castSucc Fin.castSucc).det
-      rw [e₂]; exact hu₂
-    rw [h1 F E M hOK r n hmode V H hn t₁ f₂ f₂' φ φ' hyp hD Z₁ Z₂ e₁ e₂ hu₂', ← card_isoMbe_shift Z₁ Z₂ x]
-    refine Formalism.L2.SG.LocalCountModules.UnitaryGroupMassFormula.LocCntUL.mbeU_holds M r W₁ W₂ Y₁ Y₂ be₁ be₂ al₁ al₂ ?_ ?_ ?_
+      rw [e₂]
+      exact hu₂
+    rw [h1 F E M hOK r n hmode V H hn t₁ f₂ f₂' φ φ' hyp hD Z₁ Z₂ e₁ e₂ hu₂',
+      ← card_isoMbe_shift Z₁ Z₂ x]
+    refine Formalism.L2.SG.LocalCountModules.UnitaryGroupMassFormula.LocCntUL.mbeU_holds M r W₁ W₂
+      Y₁ Y₂ be₁ be₂ al₁ al₂ ?_ ?_ ?_
     · intro a b
       refine ⟨eY₁ a b, ?_⟩
       have : W₂.Z a.castSucc b.castSucc = Z₂ a.castSucc b.castSucc := by
         simp [W₂, cornerM_castSucc_left]
-      rw [this]; exact Subtype.ext (eY a b).2
+      rw [this]
+      exact Subtype.ext (eY a b).2
     · intro a
       refine ⟨ebe₁ a, ?_, eal₁ a, ?_⟩
       · have : W₂.Z a.castSucc (Fin.last r) = Z₂ a.castSucc (Fin.last r) := by
           simp [W₂, cornerM_castSucc_left]
-        rw [this]; exact Subtype.ext (eb a).2.1
+        rw [this]
+        exact Subtype.ext (eb a).2.1
       · have : W₂.Z (Fin.last r) a.castSucc = Z₂ (Fin.last r) a.castSucc := by
           simp [W₂, cornerM_castSucc_right]
-        rw [this]; exact Subtype.ext (eb a).2.2.2
+        rw [this]
+        exact Subtype.ext (eb a).2.2.2
     · have hhdW₂ : headDet M W₂.Z = (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det := by
         show (((Z₂ + cornerM r x).map M.R.subtype).submatrix Fin.castSucc Fin.castSucc).det = _
         rw [hmapZ, e₂, head_add_cornerM]
-      have hdetW₂ : (W₂.Z.map M.R.subtype).det =
-          ZZ₂.det + algebraMap F E a₀ * (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det := by
+      have hdetW₂
+          : (W₂.Z.map M.R.subtype).det
+            = ZZ₂.det + algebraMap F E a₀ * (ZZ₂.submatrix Fin.castSucc Fin.castSucc).det := by
         show ((Z₂ + cornerM r x).map M.R.subtype).det = _
         rw [hmapZ, e₂, det_add_cornerM]
       rw [hhdW₁, hhdW₂, hdetW₁, hdetW₂]

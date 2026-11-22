@@ -4,7 +4,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
 
 private lemma dim_succ_le {A : Type} [CommRing A] {P Q : Ideal A} [P.IsPrime] (h : P < Q) :
     ringKrullDim (A ⧸ Q) + 1 ≤ ringKrullDim (A ⧸ P) := by
@@ -42,13 +44,18 @@ private lemma exists_sep {A : Type} [CommRing A] [IsNoetherianRing A] {J Z₀ : 
   have : Z₁ ∈ s := Finset.mem_erase.mpr ⟨hne, hfin.mem_toFinset.mpr h₁⟩
   exact (Finset.inf_le (f := id) this) he
 
-theorem UpperTheory.V.J.denseOf :
-    ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (B₀ B : Type) [CommRing B₀] [IsNoetherianRing B₀] [Algebra c.O B₀] [CommRing B] [Algebra c.O B]
-        (φ : B₀ →ₐ[c.O] B) (J : Ideal B₀) (D : ℕ) (Gd : (B₀ →ₐ[c.O] Qbar l) → Prop), Function.Surjective φ →
-        (∀ Z ∈ J.minimalPrimes, ringKrullDim (B₀ ⧸ Z) = (D : WithBot ℕ∞)) →
-        (∀ b : B₀, (∀ x : B₀ →ₐ[c.O] Qbar l, J ≤ RingHom.ker x → Gd x → x b = 0) → b ∈ J) →
-        ∀ Z : Ideal B, Z.IsPrime → J.map φ ≤ Z → ringKrullDim (B ⧸ Z) ≤ (D : WithBot ℕ∞) ∧
-          (ringKrullDim (B ⧸ Z) = (D : WithBot ℕ∞) → ∀ b ∉ Z, ∃ y : B →ₐ[c.O] Qbar l, Z ≤ RingHom.ker y ∧ Gd (y.comp φ) ∧ y b ≠ 0) := by
+theorem UpperTheory.V.J.denseOf
+    : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (B₀ B : Type) [CommRing B₀] [IsNoetherianRing B₀]
+        [Algebra c.O B₀] [CommRing B] [Algebra c.O B] (φ : B₀ →ₐ[c.O] B) (J : Ideal B₀) (D : ℕ)
+        (Gd : (B₀ →ₐ[c.O] Qbar l) → Prop),
+      Function.Surjective φ → (∀ Z ∈ J.minimalPrimes, ringKrullDim (B₀ ⧸ Z) = (D : WithBot ℕ∞))
+        → (∀ b : B₀, (∀ x : B₀ →ₐ[c.O] Qbar l, J ≤ RingHom.ker x → Gd x → x b = 0) → b ∈ J)
+        → ∀ Z : Ideal B,
+          Z.IsPrime → J.map φ ≤ Z
+            → ringKrullDim (B ⧸ Z) ≤ (D : WithBot ℕ∞)
+              ∧ (ringKrullDim (B ⧸ Z) = (D : WithBot ℕ∞)
+                → ∀ b ∉ Z, ∃ y : B →ₐ[c.O] Qbar l,
+                  Z ≤ RingHom.ker y ∧ Gd (y.comp φ) ∧ y b ≠ 0) := by
   intro l _ c B₀ B _ _ _ _ _ φ J D Gd hφ hdim hdense Z hZ hJZ
   have hJZ' : J ≤ Z.comap φ := Ideal.map_le_iff_le_comap.mp hJZ
   haveI hZ' : (Z.comap φ).IsPrime := Ideal.comap_isPrime φ Z
@@ -64,7 +71,8 @@ theorem UpperTheory.V.J.denseOf :
     exact (ringKrullDim_eq_of_ringEquiv (RingHom.quotientKerEquivOfSurjective hψ)).symm
   have hle : ringKrullDim (B ⧸ Z) ≤ (D : WithBot ℕ∞) := by
     rw [hde, ← hdim Z₀ hZ₀]
-    exact ringKrullDim_le_of_surjective (Ideal.Quotient.factor hZ₀le) (Ideal.Quotient.factor_surjective hZ₀le)
+    exact ringKrullDim_le_of_surjective (Ideal.Quotient.factor hZ₀le)
+      (Ideal.Quotient.factor_surjective hZ₀le)
   refine ⟨hle, fun hD b hb => ?_⟩
   have hZeq : Z₀ = Z.comap φ := by
     by_contra hne
@@ -79,8 +87,7 @@ theorem UpperTheory.V.J.denseOf :
   obtain ⟨b', rfl⟩ := hφ b
   have hb' : b' ∉ Z₀ := by rw [hZeq]; exact hb
   obtain ⟨e, he, hesep⟩ := exists_sep hZ₀
-  have hbe : b' * e ∉ J := fun hm =>
-    (hp₀.mem_or_mem (hZ₀.1.2 hm)).elim hb' he
+  have hbe : b' * e ∉ J := fun hm => (hp₀.mem_or_mem (hZ₀.1.2 hm)).elim hb' he
   have hx : ∃ x : B₀ →ₐ[c.O] Qbar l, J ≤ RingHom.ker x ∧ Gd x ∧ x (b' * e) ≠ 0 := by
     by_contra hno
     refine hbe (hdense _ fun x h1 h2 => ?_)
@@ -99,9 +106,11 @@ theorem UpperTheory.V.J.denseOf :
     hZx (by
       have : φ a = 0 := ha
       show φ a ∈ Z
-      rw [this]; exact Z.zero_mem)
-  let y : B →ₐ[c.O] Qbar l := (Ideal.Quotient.liftₐ (RingHom.ker φ) x (fun a ha => hkφ ha)).comp
-    (Ideal.quotientKerAlgEquivOfSurjective hφ).symm.toAlgHom
+      rw [this]
+      exact Z.zero_mem)
+  let y : B →ₐ[c.O] Qbar l :=
+    (Ideal.Quotient.liftₐ (RingHom.ker φ) x (fun a ha => hkφ ha)).comp
+      (Ideal.quotientKerAlgEquivOfSurjective hφ).symm.toAlgHom
   have hy : ∀ a, y (φ a) = x a := by
     intro a
     have e1 : (Ideal.quotientKerAlgEquivOfSurjective hφ).symm (φ a) = Ideal.Quotient.mk _ a :=

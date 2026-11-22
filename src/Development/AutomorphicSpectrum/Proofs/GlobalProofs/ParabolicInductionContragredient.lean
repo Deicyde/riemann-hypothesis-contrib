@@ -8,8 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Induction
 
 namespace GlobalTheory.CompanionTheory.Glob
 
-theorem inductionContragredient : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k], GlobalTheory.SmGL.InductionContragredient k :=
+theorem inductionContragredient
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      GlobalTheory.SmGL.InductionContragredient k :=
   GlobalTheory.SmGL.IndDual.inductionContragredient
 
 end GlobalTheory.CompanionTheory.Glob

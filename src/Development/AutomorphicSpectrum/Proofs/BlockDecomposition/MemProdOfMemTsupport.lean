@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteEllipt
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -27,12 +28,13 @@ theorem continuous_nrmL (hU : Unr E) (n : ℕ) (w : Pl E) : Continuous (nrmL n w
     rw [e]
     exact continuous_id.mul ht
 
-theorem isClosed_KGL (hU : Unr E) (n : ℕ) (w : Pl E) :
-    IsClosed (GlobalTheory.LFun.KGL w (n := n) : Set (GLw n w)) :=
+theorem isClosed_KGL (hU : Unr E) (n : ℕ) (w : Pl E)
+    : IsClosed (GlobalTheory.LFun.KGL w (n := n) : Set (GLw n w)) :=
   (ThBasic.twist_basic E hU n w).2.2.2.2.2.1.isClosed
 
-theorem nrmL_mem_KGL (hU : Unr E) (n : ℕ) (w : Pl E) {y : GLw n w} (hy : y ∈ GlobalTheory.LFun.KGL w (n := n)) :
-    nrmL n w y ∈ GlobalTheory.LFun.KGL w (n := n) := by
+theorem nrmL_mem_KGL
+    (hU : Unr E) (n : ℕ) (w : Pl E) {y : GLw n w} (hy : y ∈ GlobalTheory.LFun.KGL w (n := n))
+    : nrmL n w y ∈ GlobalTheory.LFun.KGL w (n := n) := by
   have ht := ThBasic.thL_mem_KGL hU n w y hy
   unfold nrmL
   unfold thL at ht
@@ -40,11 +42,17 @@ theorem nrmL_mem_KGL (hU : Unr E) (n : ℕ) (w : Pl E) {y : GLw n w} (hy : y ∈
   · exact hy
   · exact mul_mem hy ht
 
-theorem mem_prod_of_mem_tsupport (hU : Unr E) (a b : ℕ) (w : Pl E) {y : GLw a w × GLw b w}
-    (hy : y ∈ tsupport ((((GlobalTheory.LFun.KGL w (n := a)).prod (GlobalTheory.LFun.KGL w (n := b))) : Set (GLw a w × GLw b w)).indicator
-      (1 : GLw a w × GLw b w → ℂ))) :
-    y.1 ∈ GlobalTheory.LFun.KGL w (n := a) ∧ y.2 ∈ GlobalTheory.LFun.KGL w (n := b) := by
-  have hcl : IsClosed (((GlobalTheory.LFun.KGL w (n := a)).prod (GlobalTheory.LFun.KGL w (n := b))) : Set (GLw a w × GLw b w)) := by
+theorem mem_prod_of_mem_tsupport
+    (hU : Unr E)
+    (a b : ℕ) (w : Pl E)
+    {y : GLw a w × GLw b w}
+    (hy : y ∈ tsupport
+      ((((GlobalTheory.LFun.KGL w (n := a)).prod (GlobalTheory.LFun.KGL w (n := b)))
+        : Set (GLw a w × GLw b w)).indicator (1 : GLw a w × GLw b w → ℂ)))
+    : y.1 ∈ GlobalTheory.LFun.KGL w (n := a) ∧ y.2 ∈ GlobalTheory.LFun.KGL w (n := b) := by
+  have hcl : IsClosed
+      (((GlobalTheory.LFun.KGL w (n := a)).prod (GlobalTheory.LFun.KGL w (n := b)))
+        : Set (GLw a w × GLw b w)) := by
     rw [Subgroup.coe_prod]
     exact (isClosed_KGL hU a w).prod (isClosed_KGL hU b w)
   have h := closure_minimal Set.support_indicator_subset hcl hy

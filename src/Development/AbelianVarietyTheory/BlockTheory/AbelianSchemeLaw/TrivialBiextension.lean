@@ -20,8 +20,8 @@ variable {S : Scheme.{u}} (G : Over S) [GrpObj G]
 
 def lawε : ULift.{u} (Fin 3) → ℤ := fun k => ![1, -1, -1] k.down
 
-def lamφ : ULift.{u} (Finset (Fin 2)) → ((G2 G).left ⟶ G.left) :=
-  fun I => (psum G (x2 G) I.down).left
+def lamφ : ULift.{u} (Finset (Fin 2)) → ((G2 G).left ⟶ G.left) := fun I =>
+  (psum G (x2 G) I.down).left
 
 def lamε : ULift.{u} (Finset (Fin 2)) → ℤ := fun I => (-1) ^ (2 - I.down.card)
 

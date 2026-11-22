@@ -10,15 +10,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFr
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 
 namespace GlobalTheory.Ord2.AuxiliaryInertOddPrime
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
 
-theorem fix_root {l : ℕ} [Fact l.Prime] {s : G ℚ Ω} (hs : s ∈ (cycBar ℚ Ω l).ker) {n : ℕ} {x : Ω}
-    (hx : x ^ (l ^ n) = 1) : s x = x := by
+theorem fix_root
+    {l : ℕ} [Fact l.Prime]
+    {s : G ℚ Ω} (hs : s ∈ (cycBar ℚ Ω l).ker)
+    {n : ℕ} {x : Ω} (hx : x ^ (l ^ n) = 1)
+    : s x = x := by
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have h1 : cycZ ℚ Ω l s = 1 := by
     have h := congrArg Units.val (MonoidHom.mem_ker.1 hs)
@@ -36,9 +41,12 @@ theorem fix_root {l : ℕ} [Fact l.Prime] {s : G ℚ Ω} (hs : s ∈ (cycBar ℚ
   rw [h4, Units.val_one, map_one, ZMod.val_one_eq_one_mod, ← pow_eq_pow_mod 1 hx, pow_one] at h2
   exact h2
 
-theorem comm_apply {l : ℕ} [Fact l.Prime] {n : ℕ} {a : Ω} (ha : ∀ g : G ℚ Ω, g a = a)
-    {s t : G ℚ Ω} (hs : s ∈ (cycBar ℚ Ω l).ker) (ht : t ∈ (cycBar ℚ Ω l).ker) {y : Ω}
-    (hy : y ^ (l ^ n) = a) : s (t y) = t (s y) := by
+theorem comm_apply
+    {l : ℕ} [Fact l.Prime]
+    {n : ℕ} {a : Ω} (ha : ∀ g : G ℚ Ω, g a = a)
+    {s t : G ℚ Ω} (hs : s ∈ (cycBar ℚ Ω l).ker) (ht : t ∈ (cycBar ℚ Ω l).ker)
+    {y : Ω} (hy : y ^ (l ^ n) = a)
+    : s (t y) = t (s y) := by
   by_cases h0 : y = 0
   · simp [h0]
   have key : ∀ g : G ℚ Ω, (g y / y) ^ (l ^ n) = 1 := fun g => by
@@ -51,11 +59,16 @@ theorem comm_apply {l : ℕ} [Fact l.Prime] {n : ℕ} {a : Ω} (ha : ∀ g : G �
   rw [et, es, map_mul, map_mul, fix_root hs hdr, fix_root ht hcr, es, et]
   ring
 
-theorem comm_fix {l : ℕ} [Fact l.Prime] {n : ℕ} {a : Ω} (ha : ∀ g : G ℚ Ω, g a = a) {σ : G ℚ Ω}
-    (hσ : σ ∈ ⁅(cycBar ℚ Ω l).ker, (cycBar ℚ Ω l).ker⁆) {y : Ω} (hy : y ^ (l ^ n) = a) : σ y = y := by
+theorem comm_fix
+    {l : ℕ} [Fact l.Prime]
+    {n : ℕ} {a : Ω} (ha : ∀ g : G ℚ Ω, g a = a)
+    {σ : G ℚ Ω} (hσ : σ ∈ ⁅(cycBar ℚ Ω l).ker, (cycBar ℚ Ω l).ker⁆)
+    {y : Ω} (hy : y ^ (l ^ n) = a)
+    : σ y = y := by
   let K : Subgroup (G ℚ Ω) := ⨅ z : {z : Ω // z ^ (l ^ n) = a}, MulAction.stabilizer (G ℚ Ω) (z : Ω)
   have hK : ∀ g, g ∈ K ↔ ∀ z : Ω, z ^ (l ^ n) = a → g z = z := fun g => by
-    simp only [K, Subgroup.mem_iInf, MulAction.mem_stabilizer_iff, AlgEquiv.smul_def, Subtype.forall]
+    simp only [K, Subgroup.mem_iInf, MulAction.mem_stabilizer_iff, AlgEquiv.smul_def,
+      Subtype.forall]
   have hle : ⁅(cycBar ℚ Ω l).ker, (cycBar ℚ Ω l).ker⁆ ≤ K := by
     rw [Subgroup.commutator_le]
     intro s hs t ht
@@ -63,8 +76,8 @@ theorem comm_fix {l : ℕ} [Fact l.Prime] {n : ℕ} {a : Ω} (ha : ∀ g : G ℚ
     intro z hz
     have hz' : ((t * s)⁻¹ z) ^ (l ^ n) = a := by rw [← map_pow, hz, ha]
     have e : s * t * s⁻¹ * t⁻¹ = (s * t) * (t * s)⁻¹ := by group
-    rw [commutatorElement_def, e, AlgEquiv.mul_apply, AlgEquiv.mul_apply, comm_apply ha hs ht hz', ← AlgEquiv.mul_apply,
-      ← AlgEquiv.mul_apply, mul_inv_cancel, AlgEquiv.one_apply]
+    rw [commutatorElement_def, e, AlgEquiv.mul_apply, AlgEquiv.mul_apply, comm_apply ha hs ht hz',
+      ← AlgEquiv.mul_apply, ← AlgEquiv.mul_apply, mul_inv_cancel, AlgEquiv.one_apply]
   exact (hK σ).1 (hle hσ) y hy
 
 theorem isOpen_stab (x : Ω) : IsOpen {τ : G ℚ Ω | τ x = x} := by
@@ -72,17 +85,21 @@ theorem isOpen_stab (x : Ω) : IsOpen {τ : G ℚ Ω | τ x = x} := by
   have hx : IsIntegral ℚ x := (Algebra.IsAlgebraic.isAlgebraic x).isIntegral
   haveI : FiniteDimensional ℚ (IntermediateField.adjoin ℚ {x}) := IntermediateField.adjoin.finiteDimensional hx
   have h := IntermediateField.fixingSubgroup_isOpen (IntermediateField.adjoin ℚ {x})
-  have hle : (IntermediateField.adjoin ℚ {x}).fixingSubgroup ≤ MulAction.stabilizer (G ℚ Ω) x := fun g hg => by
+  have hle
+      : (IntermediateField.adjoin ℚ {x}).fixingSubgroup
+        ≤ MulAction.stabilizer (G ℚ Ω) x := fun g hg => by
     rw [MulAction.mem_stabilizer_iff, AlgEquiv.smul_def]
-    exact (IntermediateField.mem_fixingSubgroup_iff _ _).1 hg x (IntermediateField.mem_adjoin_simple_self ℚ x)
+    exact (IntermediateField.mem_fixingSubgroup_iff _ _).1 hg x
+      (IntermediateField.mem_adjoin_simple_self ℚ x)
   have e : {τ : G ℚ Ω | τ x = x} = (MulAction.stabilizer (G ℚ Ω) x : Set (G ℚ Ω)) := by
     ext τ; simp [MulAction.mem_stabilizer_iff, AlgEquiv.smul_def]
   rw [e]
   exact Subgroup.isOpen_mono hle h
 
-theorem root_mod {B : ValuationSubring Ω} {p m N : ℕ} (hp : p.Prime) (hpB : B.valuation (p : Ω) < 1) (hm : m ≠ 0)
-    {α : Ω} (hα : α ^ m = (N : Ω)) (hfr : B.valuation α ≤ 1 → B.valuation (α - α ^ p) < 1) :
-    ∃ x : ZMod p, x ^ m = (N : ZMod p) := by
+theorem root_mod
+    {B : ValuationSubring Ω} {p m N : ℕ} (hp : p.Prime) (hpB : B.valuation (p : Ω) < 1) (hm : m ≠ 0)
+    {α : Ω} (hα : α ^ m = (N : Ω)) (hfr : B.valuation α ≤ 1 → B.valuation (α - α ^ p) < 1)
+    : ∃ x : ZMod p, x ^ m = (N : ZMod p) := by
   classical
   haveI : Fact p.Prime := ⟨hp⟩
   have hαle : B.valuation α ≤ 1 := by
@@ -105,23 +122,31 @@ theorem root_mod {B : ValuationSubring Ω} {p m N : ℕ} (hp : p.Prime) (hpB : B
     exact this.symm
   have hP : (Polynomial.X ^ p - Polynomial.X : Polynomial (IsLocalRing.ResidueField B)) ≠ 0 :=
     Polynomial.X_pow_sub_X_ne_zero hp.one_lt
-  have hsub : Finset.univ.image φ ⊆
-      (Polynomial.X ^ p - Polynomial.X : Polynomial (IsLocalRing.ResidueField B)).roots.toFinset := by
+  have hsub
+      : Finset.univ.image φ
+        ⊆ (Polynomial.X ^ p - Polynomial.X
+          : Polynomial (IsLocalRing.ResidueField B)).roots.toFinset := by
     intro y hy
     obtain ⟨b, -, rfl⟩ := Finset.mem_image.1 hy
     rw [Multiset.mem_toFinset, Polynomial.mem_roots hP, Polynomial.IsRoot.def, Polynomial.eval_sub,
       Polynomial.eval_pow, Polynomial.eval_X, ← map_pow, ZMod.pow_card, sub_self]
-  have hcard : (Polynomial.X ^ p - Polynomial.X : Polynomial (IsLocalRing.ResidueField B)).roots.toFinset.card ≤
-      (Finset.univ.image φ).card := by
+  have hcard
+      : (Polynomial.X ^ p - Polynomial.X
+          : Polynomial (IsLocalRing.ResidueField B)).roots.toFinset.card
+        ≤ (Finset.univ.image φ).card := by
     rw [Finset.card_image_of_injective _ hφ, Finset.card_univ, ZMod.card]
-    calc _ ≤ Multiset.card (Polynomial.X ^ p - Polynomial.X : Polynomial (IsLocalRing.ResidueField B)).roots :=
-          Multiset.toFinset_card_le _
+    calc
+      _ ≤ Multiset.card
+          (Polynomial.X ^ p - Polynomial.X : Polynomial (IsLocalRing.ResidueField B)).roots :=
+        Multiset.toFinset_card_le _
       _ ≤ (Polynomial.X ^ p - Polynomial.X : Polynomial (IsLocalRing.ResidueField B)).natDegree :=
-          Polynomial.card_roots' _
+        Polynomial.card_roots' _
       _ = p := Polynomial.natDegree_X_pow_sub_X hp.one_lt
   have heq := Finset.eq_of_subset_of_card_le hsub hcard
-  have hrmem : IsLocalRing.residue B a ∈
-      (Polynomial.X ^ p - Polynomial.X : Polynomial (IsLocalRing.ResidueField B)).roots.toFinset := by
+  have hrmem
+      : IsLocalRing.residue B a
+        ∈ (Polynomial.X ^ p - Polynomial.X
+          : Polynomial (IsLocalRing.ResidueField B)).roots.toFinset := by
     rw [Multiset.mem_toFinset, Polynomial.mem_roots hP, Polynomial.IsRoot.def, Polynomial.eval_sub,
       Polynomial.eval_pow, Polynomial.eval_X, hr, sub_self]
   rw [← heq] at hrmem
@@ -162,8 +187,11 @@ theorem normV_prime' (v : Pl) : (normV v).Prime := by
     rw [h3] at hc
     exact Or.inl (Nat.eq_of_mul_eq_mul_right (by omega) (hc.symm.trans (one_mul _).symm))
 
-theorem val_natCast_lt_one_iff {Ω : Type} [Field Ω] [Algebra ℚ Ω] {A : ValuationSubring Ω} {w : Pl}
-    (h : IsPlaceOver A w) (n : ℕ) : A.valuation (n : Ω) < 1 ↔ normV w ∣ n := by
+theorem val_natCast_lt_one_iff
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {A : ValuationSubring Ω} {w : Pl} (h : IsPlaceOver A w)
+    (n : ℕ)
+    : A.valuation (n : Ω) < 1 ↔ normV w ∣ n := by
   rw [← natCast_mem_iff, ← h]
   simp
 
@@ -171,11 +199,14 @@ end GlobalTheory.Ord2.AuxiliaryInertOddPrime
 
 namespace GlobalTheory.Ord2.AuxiliaryInertOddPrime
 
-theorem exists_odd_prime_gt_two_bounds : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (n : ℕ)
-    (S S' : Finset Pl) (U : Subgroup (G ℚ Ω)) (σ : G ℚ Ω), IsOpen (U : Set (G ℚ Ω)) →
-    σ ∈ ⁅(cycBar ℚ Ω l).ker, (cycBar ℚ Ω l).ker⁆ → ∃ (w : Pl) (B : ValuationSubring Ω) (τ : G ℚ Ω),
-      w ∉ S ∧ w ∉ S' ∧ IsPlaceOver B w ∧ IsFrob B (normV w) τ ∧ τ ∈ Dec (F := ℚ) B ∧ σ⁻¹ * τ ∈ U ∧
-      l ^ n ∣ normV w - 1 ∧ ∀ v ∈ S, ∃ x : ZMod (normV w), x ^ (l ^ n) = (normV v : ZMod (normV w)) := by
+theorem exists_odd_prime_gt_two_bounds
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (n : ℕ)
+        (S S' : Finset Pl) (U : Subgroup (G ℚ Ω)) (σ : G ℚ Ω),
+      IsOpen (U : Set (G ℚ Ω)) → σ ∈ ⁅(cycBar ℚ Ω l).ker, (cycBar ℚ Ω l).ker⁆
+        → ∃ (w : Pl) (B : ValuationSubring Ω) (τ : G ℚ Ω),
+          w ∉ S ∧ w ∉ S' ∧ IsPlaceOver B w ∧ IsFrob B (normV w) τ ∧ τ ∈ Dec (F := ℚ) B ∧ σ⁻¹ * τ ∈ U
+            ∧ l ^ n ∣ normV w - 1
+            ∧ ∀ v ∈ S, ∃ x : ZMod (normV w), x ^ (l ^ n) = (normV v : ZMod (normV w)) := by
   intro l hl Ω _ _ _ n S S' U σ hU hσ
   classical
   haveI hΩ : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
@@ -183,15 +214,17 @@ theorem exists_odd_prime_gt_two_bounds : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type
   have hm : 0 < l ^ n := pow_pos hl.out.pos n
   obtain ⟨ζ, hζ⟩ : ∃ ζ : Ω, IsPrimitiveRoot ζ (l ^ n) := by
     haveI : NeZero ((l ^ n : ℕ) : Ω) := ⟨Nat.cast_ne_zero.2 hm.ne'⟩
-    obtain ⟨z, hz⟩ := IsAlgClosed.exists_root (Polynomial.cyclotomic (l ^ n) Ω)
-      (Polynomial.degree_cyclotomic_pos _ Ω hm).ne'
+    obtain ⟨z, hz⟩ :=
+      IsAlgClosed.exists_root (Polynomial.cyclotomic (l ^ n) Ω)
+        (Polynomial.degree_cyclotomic_pos _ Ω hm).ne'
     exact ⟨z, Polynomial.isRoot_cyclotomic_iff.1 hz⟩
-  have hα : ∀ v : Pl, ∃ α : Ω, α ^ (l ^ n) = (normV v : Ω) := fun v => IsAlgClosed.exists_pow_nat_eq _ hm
+  have hα : ∀ v : Pl, ∃ α : Ω, α ^ (l ^ n) = (normV v : Ω) := fun v =>
+    IsAlgClosed.exists_pow_nat_eq _ hm
   choose α hα using hα
   let T : Finset Ω := insert ζ (S.image α)
   let O : Set (G ℚ Ω) := {τ | σ⁻¹ * τ ∈ U} ∩ ⋂ x ∈ T, {τ | τ x = x}
-  have hO : IsOpen O := (hU.preimage (continuous_const_mul σ⁻¹)).inter
-    (isOpen_biInter_finset fun x _ => isOpen_stab x)
+  have hO : IsOpen O :=
+    (hU.preimage (continuous_const_mul σ⁻¹)).inter (isOpen_biInter_finset fun x _ => isOpen_stab x)
   have hσker : σ ∈ (cycBar ℚ Ω l).ker := Subgroup.commutator_le_left _ _ hσ
   have hσO : σ ∈ O := by
     refine ⟨by simp [U.one_mem], Set.mem_iInter₂.2 fun x hx => ?_⟩
@@ -202,9 +235,13 @@ theorem exists_odd_prime_gt_two_bounds : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type
   have hl0 : Ideal.span {((l : ℕ) : 𝓞 ℚ)} ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]
     exact Nat.cast_ne_zero.2 hl.out.ne_zero
-  have hTfin : ((S : Set Pl) ∪ (S' : Set Pl) ∪ {v : Pl | v.asIdeal ∣ Ideal.span {((l : ℕ) : 𝓞 ℚ)}}).Finite :=
+  have hTfin
+      : ((S : Set Pl) ∪ (S' : Set Pl)
+        ∪ {v : Pl | v.asIdeal ∣ Ideal.span {((l : ℕ) : 𝓞 ℚ)}}).Finite :=
     ((S.finite_toSet).union (S'.finite_toSet)).union (Ideal.finite_factors hl0)
-  have hdense := GlobalTheory.Published.ChebotarevDegreeOne.dense (F := ℚ) (Ω := Ω) GlobalTheory.Published.chebotarevDegreeOne' hTfin
+  have hdense :=
+    GlobalTheory.Published.ChebotarevDegreeOne.dense (F := ℚ) (Ω := Ω)
+      GlobalTheory.Published.chebotarevDegreeOne' hTfin
   obtain ⟨τ, hτO, w, hwT, -, B, hB, hτ⟩ := hdense.inter_open_nonempty O hO ⟨σ, hσO⟩
   simp only [Set.mem_union, Finset.mem_coe, Set.mem_setOf_eq, not_or] at hwT
   obtain ⟨⟨hwS, hwS'⟩, hwl⟩ := hwT
@@ -215,9 +252,11 @@ theorem exists_odd_prime_gt_two_bounds : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type
   have hpB : B.valuation ((normV w : ℕ) : Ω) < 1 := (val_natCast_lt_one_iff hB _).2 dvd_rfl
   have hlB : ¬ B.valuation ((l : ℕ) : Ω) < 1 := fun h => hlw ((hB _).1 (by simpa using h))
   have hnot : ¬ B.valuation ((l ^ n : ℕ) : Ω) < 1 := fun h =>
-    hlB ((val_natCast_lt_one_iff hB l).2 (hp.dvd_of_dvd_pow ((val_natCast_lt_one_iff hB (l ^ n)).1 h)))
+    hlB ((val_natCast_lt_one_iff hB l).2
+      (hp.dvd_of_dvd_pow ((val_natCast_lt_one_iff hB (l ^ n)).1 h)))
   have hpows := (ML.placeBasic Ω).2.2.2.2.2.2.1 B (normV w) (l ^ n) τ hτ hnot
-  have h1 : ζ ^ normV w = ζ := (hpows ζ hζ.pow_eq_one).symm.trans (hfix ζ (Finset.mem_insert_self _ _))
+  have h1 : ζ ^ normV w = ζ :=
+    (hpows ζ hζ.pow_eq_one).symm.trans (hfix ζ (Finset.mem_insert_self _ _))
   have h2 : ζ ^ (normV w - 1) = 1 := by
     have hz : ζ ≠ 0 := hζ.ne_zero hm.ne'
     refine mul_right_cancel₀ hz ?_

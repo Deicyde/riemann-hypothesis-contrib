@@ -5,12 +5,15 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 @[expose] public section
 
-open Matrix MeasureTheory PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D4 PositivityTheory.Rg.Tf.Loc
+open Matrix MeasureTheory PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D4
+  PositivityTheory.Rg.Tf.Loc
 
 namespace GlobalTheory.CompanionTheory.NilChangeVar
 
-theorem eq_zero_of_commute_of_separable {n : ℕ} (γ X : Matrix (Fin n) (Fin n) ℂ)
-    (hs : γ.charpoly.Separable) (hc : γ * X = X * γ) (hX : X * X * X = 0) : X = 0 := by
+theorem eq_zero_of_commute_of_separable
+    {n : ℕ} (γ X : Matrix (Fin n) (Fin n) ℂ) (hs : γ.charpoly.Separable) (hc : γ * X = X * γ)
+    (hX : X * X * X = 0)
+    : X = 0 := by
   classical
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · exact Subsingleton.elim _ _
@@ -23,7 +26,8 @@ theorem eq_zero_of_commute_of_separable {n : ℕ} (γ X : Matrix (Fin n) (Fin n)
   have hnd : γ.charpoly.roots.Nodup := Polynomial.nodup_roots hs
   have hcard : γ.charpoly.roots.toFinset.card = n := by
     rw [Multiset.toFinset_card_of_nodup hnd,
-      ← (IsAlgClosed.splits γ.charpoly).natDegree_eq_card_roots, Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
+      ← (IsAlgClosed.splits γ.charpoly).natDegree_eq_card_roots, Matrix.charpoly_natDegree_eq_dim,
+      Fintype.card_fin]
   haveI : Nonempty γ.charpoly.roots.toFinset := (Finset.card_pos.1 (by rw [hcard]; exact hn)).to_subtype
   have hev : ∀ μ : γ.charpoly.roots.toFinset, ∃ v, T.HasEigenvector (μ : ℂ) v := fun μ => by
     have hroot : γ.charpoly.IsRoot (μ : ℂ) := by
@@ -34,16 +38,16 @@ theorem eq_zero_of_commute_of_separable {n : ℕ} (γ X : Matrix (Fin n) (Fin n)
     exact this.exists_hasEigenvector
   choose v hv using hev
   have li : LinearIndependent ℂ v :=
-    Module.End.eigenvectors_linearIndependent' T (fun μ : γ.charpoly.roots.toFinset => (μ : ℂ))
+    Module.End.eigenvectors_linearIndependent' T
+      (fun μ : γ.charpoly.roots.toFinset => (μ : ℂ))
       Subtype.val_injective v hv
   let b := basisOfLinearIndependentOfCardEqFinrank li (by simp [hcard])
   have hb : ∀ i, b i = v i := fun i => by simp [b]
-  have hTb : ∀ i, T (b i) = (i : ℂ) • b i := fun i => by
-    rw [hb]; exact (hv i).apply_eq_smul
+  have hTb : ∀ i, T (b i) = (i : ℂ) • b i := fun i => by rw [hb]; exact (hv i).apply_eq_smul
   have hrepr : ∀ w j, b.repr (T w) j = (j : ℂ) * b.repr w j := fun w j => by
     conv_lhs => rw [← b.sum_repr w]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, hTb, Finsupp.single_apply, Finset.sum_ite_eq', mul_comm]
+    simp [map_sum, hTb, Finsupp.single_apply, Finset.sum_ite_eq', mul_comm]
   have hdiag : ∀ i j, j ≠ i → b.repr (R (b i)) j = 0 := fun i j hji => by
     have h1 := hrepr (R (b i)) j
     rw [hTR, hTb, map_smul, map_smul] at h1
@@ -59,7 +63,8 @@ theorem eq_zero_of_commute_of_separable {n : ℕ} (γ X : Matrix (Fin n) (Fin n)
   have hR0 : ∀ i, R (b i) = 0 := fun i => by
     set a := b.repr (R (b i)) i with ha
     have h3 := hR3 (b i)
-    rw [hRb i, ← ha, map_smul, hRb i, ← ha, map_smul, map_smul, hRb i, ← ha, smul_smul, smul_smul] at h3
+    rw [hRb i, ← ha, map_smul, hRb i, ← ha, map_smul, map_smul, hRb i, ← ha, smul_smul, smul_smul]
+      at h3
     have hbi : b i ≠ 0 := b.ne_zero i
     have : a * (a * a) = 0 := by simpa [hbi] using h3
     have ha0 : a = 0 := by simpa using this
@@ -69,19 +74,22 @@ theorem eq_zero_of_commute_of_separable {n : ℕ} (γ X : Matrix (Fin n) (Fin n)
 
 section Measure
 
-variable {E : Type*} [AddCommGroup E] [Module ℝ E] [TopologicalSpace E] [IsTopologicalAddGroup E]
+variable
+  {E : Type*} [AddCommGroup E] [Module ℝ E] [TopologicalSpace E] [IsTopologicalAddGroup E]
   [ContinuousSMul ℝ E] [T2Space E] [FiniteDimensional ℝ E]
 
-theorem exists_coords (F : Submodule ℝ E) : ∃ (a b : ℕ) (e : ((Fin a → ℝ) × (Fin b → ℝ)) ≃L[ℝ] E),
-    ∀ p, e p ∈ F ↔ p.1 = 0 := by
+theorem exists_coords (F : Submodule ℝ E)
+    : ∃ (a b : ℕ) (e : ((Fin a → ℝ) × (Fin b → ℝ)) ≃L[ℝ] E), ∀ p, e p ∈ F ↔ p.1 = 0 := by
   obtain ⟨C, hC⟩ := Submodule.exists_isCompl F
   let e₀ : ((Fin (Module.finrank ℝ C) → ℝ) × (Fin (Module.finrank ℝ F) → ℝ)) ≃ₗ[ℝ] E :=
     (LinearEquiv.prodComm ℝ _ _).trans
-    (((Module.finBasis ℝ F).equivFun.symm.prodCongr (Module.finBasis ℝ C).equivFun.symm).trans
-      (Submodule.prodEquivOfIsCompl F C hC))
+      (((Module.finBasis ℝ F).equivFun.symm.prodCongr (Module.finBasis ℝ C).equivFun.symm).trans
+        (Submodule.prodEquivOfIsCompl F C hC))
   refine ⟨_, _, e₀.toContinuousLinearEquiv, fun p => ?_⟩
-  have h0 : (e₀.toContinuousLinearEquiv p) = (((Module.finBasis ℝ F).equivFun.symm p.2 : F) : E) +
-      (((Module.finBasis ℝ C).equivFun.symm p.1 : C) : E) := by
+  have h0
+      : (e₀.toContinuousLinearEquiv p)
+        = (((Module.finBasis ℝ F).equivFun.symm p.2 : F) : E)
+          + (((Module.finBasis ℝ C).equivFun.symm p.1 : C) : E) := by
     change e₀ p = _
     simp only [e₀, LinearEquiv.trans_apply, LinearEquiv.prodCongr_apply, LinearEquiv.prodComm_apply,
       Submodule.coe_prodEquivOfIsCompl', Prod.fst_swap, Prod.snd_swap]
@@ -96,14 +104,17 @@ theorem exists_coords (F : Submodule ℝ E) : ∃ (a b : ℕ) (e : ((Fin a → �
 
 variable [MeasurableSpace E] [BorelSpace E]
 
-theorem map_shear (ν : Measure E) [ν.IsAddHaarMeasure] (F : Submodule ℝ E) (P : E → E) (hc : Continuous P)
-    (hF : ∀ x, P x ∈ F) (hinv : ∀ x, ∀ y ∈ F, P (x + y) = P x) :
-    Measure.map (fun x => x + P x) ν = ν := by
+theorem map_shear
+    (ν : Measure E) [ν.IsAddHaarMeasure]
+    (F : Submodule ℝ E) (P : E → E)
+    (hc : Continuous P) (hF : ∀ x, P x ∈ F) (hinv : ∀ x, ∀ y ∈ F, P (x + y) = P x)
+    : Measure.map (fun x => x + P x) ν = ν := by
   obtain ⟨a, b, e, he⟩ := exists_coords F
   have hF0 : ∀ z, e (0, z) ∈ F := fun z => (he _).2 rfl
   let g : (Fin a → ℝ) → (Fin b → ℝ) := fun y => (e.symm (P (e (y, 0)))).2
-  have hgc : Continuous g := continuous_snd.comp
-    (e.symm.continuous.comp (hc.comp (e.continuous.comp (continuous_id.prodMk continuous_const))))
+  have hgc : Continuous g :=
+    continuous_snd.comp (e.symm.continuous.comp (hc.comp (e.continuous.comp (continuous_id.prodMk
+      continuous_const))))
   have hg0 : ∀ y, (e.symm (P (e (y, 0)))).1 = 0 := fun y => by
     have := hF (e (y, 0))
     rw [← e.apply_symm_apply (P (e (y, 0))), he] at this
@@ -116,9 +127,12 @@ theorem map_shear (ν : Measure E) [ν.IsAddHaarMeasure] (F : Submodule ℝ E) (
     · simp [hg0]
     · simp [g]
   let sh : (Fin a → ℝ) × (Fin b → ℝ) → (Fin a → ℝ) × (Fin b → ℝ) := fun p => (p.1, p.2 + g p.1)
-  let μ₀ : Measure ((Fin a → ℝ) × (Fin b → ℝ)) := (Measure.addHaar : Measure (Fin a → ℝ)).prod (Measure.addHaar : Measure (Fin b → ℝ))
+  let μ₀ : Measure ((Fin a → ℝ) × (Fin b → ℝ)) :=
+    (Measure.addHaar : Measure (Fin a → ℝ)).prod (Measure.addHaar : Measure (Fin b → ℝ))
   have hmp : MeasurePreserving sh μ₀ μ₀ := by
-    refine (MeasurePreserving.id _).skew_product (g := fun y z => z + g y) ?_ (Filter.Eventually.of_forall fun y => ?_)
+    refine (MeasurePreserving.id _).skew_product
+      (g := fun y z => z + g y)
+      ?_ (Filter.Eventually.of_forall fun y => ?_)
     · exact (continuous_snd.add (hgc.comp continuous_fst)).measurable
     · exact (measurePreserving_add_right _ (g y)).map_eq
   have hshc : Continuous sh := continuous_fst.prodMk (continuous_snd.add (hgc.comp continuous_fst))
@@ -130,32 +144,40 @@ theorem map_shear (ν : Measure E) [ν.IsAddHaarMeasure] (F : Submodule ℝ E) (
     Measure.isAddLeftInvariant_eq_smul _ _
   have hmap : Measure.map sh (Measure.map e.symm ν) = Measure.map e.symm ν := by
     rw [hc1, Measure.map_smul _ hshc.measurable.aemeasurable, hmp.map_eq]
-  have hfun : (fun x => x + P x) = e ∘ sh ∘ e.symm := funext fun x => by
-    have := hshear (e.symm x)
-    simp only [e.apply_symm_apply] at this
-    simp only [Function.comp_apply, sh]
-    rw [← this, e.apply_symm_apply]
-  rw [hfun, ← Measure.map_map hem (hshc.measurable.comp hes), ← Measure.map_map hshc.measurable hes, hmap,
-    Measure.map_map hem hes]
+  have hfun : (fun x => x + P x) = e ∘ sh ∘ e.symm :=
+    funext fun x => by
+      have := hshear (e.symm x)
+      simp only [e.apply_symm_apply] at this
+      simp only [Function.comp_apply, sh]
+      rw [← this, e.apply_symm_apply]
+  rw [hfun, ← Measure.map_map hem (hshc.measurable.comp hes), ← Measure.map_map hshc.measurable hes,
+    hmap, Measure.map_map hem hes]
   simp
 
-theorem map_linear (ν : Measure E) [ν.IsAddHaarMeasure] (L : E ≃ₗ[ℝ] E) :
-    ∃ c : NNReal, c ≠ 0 ∧ Measure.map L ν = c • ν := by
-  let e : E ≃L[ℝ] (Fin (Module.finrank ℝ E) → ℝ) := (Module.finBasis ℝ E).equivFun.toContinuousLinearEquiv
+theorem map_linear (ν : Measure E) [ν.IsAddHaarMeasure] (L : E ≃ₗ[ℝ] E)
+    : ∃ c : NNReal, c ≠ 0 ∧ Measure.map L ν = c • ν := by
+  let e : E ≃L[ℝ] (Fin (Module.finrank ℝ E) → ℝ) :=
+    (Module.finBasis ℝ E).equivFun.toContinuousLinearEquiv
   haveI : LocallyCompactSpace E := e.toHomeomorph.isClosedEmbedding.locallyCompactSpace
   haveI : SecondCountableTopology E := e.toHomeomorph.isEmbedding.secondCountableTopology
   let L' : E ≃L[ℝ] E := L.toContinuousLinearEquiv
   haveI : (Measure.map L' ν).IsAddHaarMeasure := L'.isAddHaarMeasure_map ν
-  refine ⟨Measure.addHaarScalarFactor (Measure.map L' ν) ν,
-    (Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure _ _).ne', ?_⟩
+  refine ⟨
+    Measure.addHaarScalarFactor (Measure.map L' ν) ν,
+    (Measure.addHaarScalarFactor_pos_of_isAddHaarMeasure _ _).ne',
+    ?_
+  ⟩
   exact Measure.isAddLeftInvariant_eq_smul (Measure.map L' ν) ν
 
-theorem exists_homeo_map_eq_smul (ν : Measure E) [ν.IsAddHaarMeasure] (F : Submodule ℝ E) (L : E ≃ₗ[ℝ] E)
-    (hL : ∀ y ∈ F, L y ∈ F) (Q : E → E) (hc : Continuous Q) (hF : ∀ x, Q x ∈ F)
-    (hinv : ∀ x, ∀ y ∈ F, Q (x + y) = Q x) :
-    ∃ (Φ : E ≃ₜ E) (c : NNReal), c ≠ 0 ∧ (∀ x, Φ x = L x + Q x) ∧ Measure.map Φ ν = c • ν := by
+theorem exists_homeo_map_eq_smul
+    (ν : Measure E) [ν.IsAddHaarMeasure]
+    (F : Submodule ℝ E) (L : E ≃ₗ[ℝ] E) (hL : ∀ y ∈ F, L y ∈ F)
+    (Q : E → E) (hc : Continuous Q) (hF : ∀ x, Q x ∈ F) (hinv : ∀ x, ∀ y ∈ F, Q (x + y) = Q x)
+    : ∃ (Φ : E ≃ₜ E) (c : NNReal), c ≠ 0 ∧ (∀ x, Φ x = L x + Q x) ∧ Measure.map Φ ν = c • ν := by
   have hmapF : F.map (L : E →ₗ[ℝ] E) = F :=
-    Submodule.eq_of_le_of_finrank_eq (fun _ ⟨y, hy, h⟩ => h ▸ hL y hy) (LinearEquiv.finrank_map_eq L F)
+    Submodule.eq_of_le_of_finrank_eq
+      (fun _ ⟨y, hy, h⟩ => h ▸ hL y hy)
+      (LinearEquiv.finrank_map_eq L F)
   have hL' : ∀ y ∈ F, L.symm y ∈ F := fun y hy => by
     rw [← hmapF] at hy
     obtain ⟨z, hz, rfl⟩ := hy
@@ -168,26 +190,27 @@ theorem exists_homeo_map_eq_smul (ν : Measure E) [ν.IsAddHaarMeasure] (F : Sub
   have hPF : ∀ x, P x ∈ F := fun x => hF _
   have hPinv : ∀ x, ∀ y ∈ F, P (x + y) = P x := fun x y hy => by
     simp only [P, map_add (f := _)]; exact hinv _ _ (hL' y hy)
-  let Φ : E ≃ₜ E :=
-    { toFun := fun x => L x + Q x
-      invFun := fun z => L.symm (z - P z)
-      left_inv := fun x => by
-        have h1 : P (L x + Q x) = Q x := by
-          simp only [P, map_add (f := _), LinearEquiv.symm_apply_apply]
-          exact hinv _ _ (hL' _ (hF x))
-        simp [h1]
-      right_inv := fun z => by
-        have h1 : Q (L.symm (z - P z)) = P z := by
-          change P (z - P z) = P z
-          rw [sub_eq_add_neg]; exact hPinv _ _ (F.neg_mem (hPF z))
-        change L (L.symm (z - P z)) + Q (L.symm (z - P z)) = z
-        rw [h1, LinearEquiv.apply_symm_apply, sub_add_cancel]
-      continuous_toFun := hLc.add hc
-      continuous_invFun := hLsc.comp (continuous_id.sub hPc) }
+  let Φ : E ≃ₜ E := {
+    toFun := fun x => L x + Q x
+    invFun := fun z => L.symm (z - P z)
+    left_inv := fun x => by
+      have h1 : P (L x + Q x) = Q x := by
+        simp only [P, map_add (f := _), LinearEquiv.symm_apply_apply]
+        exact hinv _ _ (hL' _ (hF x))
+      simp [h1]
+    right_inv := fun z => by
+      have h1 : Q (L.symm (z - P z)) = P z := by
+        change P (z - P z) = P z
+        rw [sub_eq_add_neg]
+        exact hPinv _ _ (F.neg_mem (hPF z))
+      change L (L.symm (z - P z)) + Q (L.symm (z - P z)) = z
+      rw [h1, LinearEquiv.apply_symm_apply, sub_add_cancel]
+    continuous_toFun := hLc.add hc
+    continuous_invFun := hLsc.comp (continuous_id.sub hPc)
+  }
   obtain ⟨c, hc0, hcL⟩ := map_linear ν L
   refine ⟨Φ, c, hc0, fun _ => rfl, ?_⟩
-  have hfun : (Φ : E → E) = (fun x => x + P x) ∘ L := funext fun x => by
-    simp [Φ, P]
+  have hfun : (Φ : E → E) = (fun x => x + P x) ∘ L := funext fun x => by simp [Φ, P]
   have hs : Continuous fun x => x + P x := continuous_id.add hPc
   rw [hfun, ← Measure.map_map hs.measurable hLc.measurable, hcL,
     Measure.map_smul _ hs.measurable.aemeasurable, map_shear ν F P hPc hPF hPinv]
@@ -204,8 +227,7 @@ local notation "Mx" => Matrix (Fin n) (Fin n) ℂ
 def slin (d : GL (Fin n) ℂ) (X : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ :=
   -(d.val * Xᴴ * (d⁻¹ : GL (Fin n) ℂ).val)
 
-theorem theta_val (g : GL (Fin n) ℂ) :
-    (thetaR cj n g).val = ((g⁻¹ : GL (Fin n) ℂ).val)ᴴ := by
+theorem theta_val (g : GL (Fin n) ℂ) : (thetaR cj n g).val = ((g⁻¹ : GL (Fin n) ℂ).val)ᴴ := by
   ext i j
   simp [thetaR_val, Matrix.conjTranspose_apply]
 
@@ -214,14 +236,14 @@ theorem eq_zero_of_mulVec {M : Mx} (h : ∀ y, M *ᵥ y = 0) : M = 0 := by
   refine LinearMap.ext fun y => ?_
   simpa using h y
 
-theorem sum_adj (X : Mx) (x w : Fin n → ℂ) :
-    ∑ i, cj (x i) * (Xᴴ *ᵥ w) i = ∑ i, cj ((X *ᵥ x) i) * w i := by
+theorem sum_adj (X : Mx) (x w : Fin n → ℂ)
+    : ∑ i, cj (x i) * (Xᴴ *ᵥ w) i = ∑ i, cj ((X *ᵥ x) i) * w i := by
   have h1 : (star x) ⬝ᵥ (Xᴴ *ᵥ w) = (star (X *ᵥ x)) ⬝ᵥ w := by
     rw [Matrix.dotProduct_mulVec, Matrix.star_mulVec]
   simpa [dotProduct] using h1
 
-theorem mem_perpD (d : GL (Fin n) ℂ) (W : Submodule ℂ (Fin n → ℂ)) (y : Fin n → ℂ) :
-    y ∈ perpD cj d W ↔ (d⁻¹ : GL (Fin n) ℂ).val *ᵥ y ∈ perp cj W := by
+theorem mem_perpD (d : GL (Fin n) ℂ) (W : Submodule ℂ (Fin n → ℂ)) (y : Fin n → ℂ)
+    : y ∈ perpD cj d W ↔ (d⁻¹ : GL (Fin n) ℂ).val *ᵥ y ∈ perp cj W := by
   have hdi : (d⁻¹ : GL (Fin n) ℂ).val * d.val = 1 := by simp
   have hid : d.val * (d⁻¹ : GL (Fin n) ℂ).val = 1 := by simp
   constructor
@@ -244,15 +266,18 @@ theorem perpD_top (d : GL (Fin n) ℂ) : perpD cj d ⊤ = ⊥ := by
     exact dotProduct_star_self_eq_zero.1 h4
   have hid : d.val * (d⁻¹ : GL (Fin n) ℂ).val = 1 := by simp
   have : y = d.val *ᵥ w := by simp [hw, Matrix.mulVec_mulVec, hid]
-  rw [this, h3]; simp
+  rw [this, h3]
+  simp
 
-theorem slin_mulVec_mem (d : GL (Fin n) ℂ) (A B : Submodule ℂ (Fin n → ℂ)) (X : Mx)
-    (hX : ∀ x ∈ A, X *ᵥ x ∈ B) (y : Fin n → ℂ) (hy : y ∈ perpD cj d B) :
-    slin d X *ᵥ y ∈ perpD cj d A := by
+theorem slin_mulVec_mem
+    (d : GL (Fin n) ℂ)
+    (A B : Submodule ℂ (Fin n → ℂ)) (X : Mx) (hX : ∀ x ∈ A, X *ᵥ x ∈ B)
+    (y : Fin n → ℂ) (hy : y ∈ perpD cj d B)
+    : slin d X *ᵥ y ∈ perpD cj d A := by
   rw [mem_perpD] at hy ⊢
   have hdi : (d⁻¹ : GL (Fin n) ℂ).val * d.val = 1 := by simp
-  have h1 : (d⁻¹ : GL (Fin n) ℂ).val *ᵥ (slin d X *ᵥ y) =
-      -(Xᴴ *ᵥ ((d⁻¹ : GL (Fin n) ℂ).val *ᵥ y)) := by
+  have h1
+      : (d⁻¹ : GL (Fin n) ℂ).val *ᵥ (slin d X *ᵥ y) = -(Xᴴ *ᵥ ((d⁻¹ : GL (Fin n) ℂ).val *ᵥ y)) := by
     simp only [slin, Matrix.mulVec_mulVec, Matrix.neg_mulVec, Matrix.mulVec_neg]
     rw [← mul_assoc, ← mul_assoc, hdi, one_mul]
   rw [h1]
@@ -265,52 +290,59 @@ variable {W₁ W₂ : Submodule ℂ (Fin n → ℂ)}
 def nilrad2 (W₁ W₂ : Submodule ℂ (Fin n → ℂ)) : Submodule ℝ (nilrad W₁ W₂) where
   carrier := {X | (∀ y, X.1 *ᵥ y ∈ W₁) ∧ ∀ y ∈ W₂, X.1 *ᵥ y = 0}
   zero_mem' := by simp
-  add_mem' := fun {a b} ha hb => ⟨fun y => by
-      simpa [Matrix.add_mulVec] using W₁.add_mem (ha.1 y) (hb.1 y),
-    fun y hy => by simp [Matrix.add_mulVec, ha.2 y hy, hb.2 y hy]⟩
-  smul_mem' := fun c a ha => ⟨fun y => by
+  add_mem' := fun {a b} ha hb => ⟨
+    fun y => by simpa [Matrix.add_mulVec] using W₁.add_mem (ha.1 y) (hb.1 y),
+    fun y hy => by simp [Matrix.add_mulVec, ha.2 y hy, hb.2 y hy]
+  ⟩
+  smul_mem' := fun c a ha => ⟨
+    fun y => by
       have h := W₁.smul_mem ((c : ℝ) : ℂ) (ha.1 y)
-      have e : (c • a).1 *ᵥ y = ((c : ℝ) : ℂ) • (a.1 *ᵥ y) := by
-        rw [← Matrix.smul_mulVec]; congr 1
-      rw [e]; exact h,
+      have e : (c • a).1 *ᵥ y = ((c : ℝ) : ℂ) • (a.1 *ᵥ y) := by rw [← Matrix.smul_mulVec]; congr 1
+      rw [e]
+      exact h,
     fun y hy => by
-      have e : (c • a).1 *ᵥ y = ((c : ℝ) : ℂ) • (a.1 *ᵥ y) := by
-        rw [← Matrix.smul_mulVec]; congr 1
-      rw [e, ha.2 y hy, smul_zero]⟩
+      have e : (c • a).1 *ᵥ y = ((c : ℝ) : ℂ) • (a.1 *ᵥ y) := by rw [← Matrix.smul_mulVec]; congr 1
+      rw [e, ha.2 y hy, smul_zero]
+  ⟩
 
-theorem slin_mem (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁) {X : Mx}
-    (hX : X ∈ nilrad W₁ W₂) : slin d X ∈ nilrad W₁ W₂ := by
+theorem slin_mem
+    (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁)
+    {X : Mx} (hX : X ∈ nilrad W₁ W₂)
+    : slin d X ∈ nilrad W₁ W₂ := by
   refine ⟨fun y => ?_, fun y hy => ?_, fun y hy => ?_⟩
   · rw [← h1]
     refine slin_mulVec_mem d W₁ ⊥ X (fun x hx => ?_) y (by rw [perpD_bot]; trivial)
-    rw [hX.2.2 x hx]; exact Submodule.zero_mem _
+    rw [hX.2.2 x hx]
+    exact Submodule.zero_mem _
   · rw [← h2]
     exact slin_mulVec_mem d W₂ W₁ X hX.2.1 y (by rw [h1]; exact hy)
   · have := slin_mulVec_mem d ⊤ W₂ X (fun x _ => hX.1 x) y (by rw [h2]; exact hy)
     rw [perpD_top] at this
     simpa using this
 
-theorem semilinear_term_nilradical_mem (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁) {X : Mx}
-    (hX : ∀ y, X *ᵥ y ∈ W₁) (hX' : ∀ y ∈ W₂, X *ᵥ y = 0) :
-    (∀ y, slin d X *ᵥ y ∈ W₁) ∧ ∀ y ∈ W₂, slin d X *ᵥ y = 0 := by
+theorem semilinear_term_nilradical_mem
+    (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁)
+    {X : Mx} (hX : ∀ y, X *ᵥ y ∈ W₁) (hX' : ∀ y ∈ W₂, X *ᵥ y = 0)
+    : (∀ y, slin d X *ᵥ y ∈ W₁) ∧ ∀ y ∈ W₂, slin d X *ᵥ y = 0 := by
   refine ⟨fun y => ?_, fun y hy => ?_⟩
   · rw [← h2]
     refine slin_mulVec_mem d W₂ ⊥ X (fun x hx => ?_) y (by rw [perpD_bot]; trivial)
-    rw [hX' x hx]; exact Submodule.zero_mem _
+    rw [hX' x hx]
+    exact Submodule.zero_mem _
   · have := slin_mulVec_mem d ⊤ W₁ X (fun x _ => hX x) y (by rw [h1]; exact hy)
     rw [perpD_top] at this
     simpa using this
 
-theorem slin_slin (d : GL (Fin n) ℂ) (X : Mx) :
-    slin d (slin d X) = (d * thetaR cj n d).val * X * (d * thetaR cj n d)⁻¹.val := by
+theorem slin_slin (d : GL (Fin n) ℂ) (X : Mx)
+    : slin d (slin d X) = (d * thetaR cj n d).val * X * (d * thetaR cj n d)⁻¹.val := by
   have e1 : (d * thetaR cj n d)⁻¹.val = (d.val)ᴴ * (d⁻¹ : GL (Fin n) ℂ).val := by
     rw [_root_.mul_inv_rev, ← map_inv, Units.val_mul, theta_val, inv_inv]
   simp only [slin, Units.val_mul, theta_val, e1, Matrix.conjTranspose_neg, Matrix.conjTranspose_mul,
     Matrix.conjTranspose_conjTranspose, neg_mul, mul_neg, neg_neg]
   simp only [mul_assoc]
 
-theorem nil_mul_mem {A B : Mx} (hA : A ∈ nilrad W₁ W₂) (hB : B ∈ nilrad W₁ W₂) :
-    (∀ y, (A * B) *ᵥ y ∈ W₁) ∧ ∀ y ∈ W₂, (A * B) *ᵥ y = 0 := by
+theorem nil_mul_mem {A B : Mx} (hA : A ∈ nilrad W₁ W₂) (hB : B ∈ nilrad W₁ W₂)
+    : (∀ y, (A * B) *ᵥ y ∈ W₁) ∧ ∀ y ∈ W₂, (A * B) *ᵥ y = 0 := by
   refine ⟨fun y => ?_, fun y hy => ?_⟩
   · rw [← Matrix.mulVec_mulVec]; exact hA.2.1 _ (hB.1 y)
   · rw [← Matrix.mulVec_mulVec]; exact hA.2.2 _ (hB.2.1 y hy)
@@ -321,8 +353,8 @@ theorem nil_mul_two {A B : Mx} (hA : A ∈ nilrad W₁ W₂) (hB : ∀ y, B *ᵥ
 theorem two_mul_nil {A B : Mx} (hA : ∀ y ∈ W₂, A *ᵥ y = 0) (hB : B ∈ nilrad W₁ W₂) : A * B = 0 :=
   eq_zero_of_mulVec fun y => by rw [← Matrix.mulVec_mulVec]; exact hA _ (hB.1 y)
 
-theorem two_mem (hle : W₁ ≤ W₂) {A : Mx} (hA : ∀ y, A *ᵥ y ∈ W₁) (hA' : ∀ y ∈ W₂, A *ᵥ y = 0) :
-    A ∈ nilrad W₁ W₂ :=
+theorem two_mem (hle : W₁ ≤ W₂) {A : Mx} (hA : ∀ y, A *ᵥ y ∈ W₁) (hA' : ∀ y ∈ W₂, A *ᵥ y = 0)
+    : A ∈ nilrad W₁ W₂ :=
   ⟨fun y => hle (hA y), fun y _ => hA y, fun y hy => hA' y (hle hy)⟩
 
 end Nil
@@ -339,17 +371,19 @@ instance : ContinuousSMul ℝ (nilrad W₁ W₂) :=
 
 instance : FiniteDimensional ℝ (nilrad W₁ W₂) := Module.Finite.trans ℂ (nilrad W₁ W₂)
 
-def slinN (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁) :
-    nilrad W₁ W₂ →ₗ[ℝ] nilrad W₁ W₂ where
+def slinN (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁)
+    : nilrad W₁ W₂ →ₗ[ℝ] nilrad W₁ W₂ where
   toFun X := ⟨slin d X.1, slin_mem d h1 h2 X.2⟩
   map_add' X Y := Subtype.ext (by simp [slin, Matrix.conjTranspose_add, mul_add, add_mul]; abel)
-  map_smul' c X := Subtype.ext (by
-    have e : (c • X.1)ᴴ = c • (X.1)ᴴ := by ext i j; simp [Matrix.conjTranspose_apply]
-    simp [slin, e])
+  map_smul' c X :=
+    Subtype.ext (by
+      have e : (c • X.1)ᴴ = c • (X.1)ᴴ := by ext i j; simp [Matrix.conjTranspose_apply]
+      simp [slin, e])
 
-theorem slinN_injective (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁)
-    (hreg : (d * thetaR cj n d).val.charpoly.Separable) :
-    Function.Injective (slinN d h1 h2 - LinearMap.id : nilrad W₁ W₂ →ₗ[ℝ] nilrad W₁ W₂) := by
+theorem slinN_injective
+    (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁)
+    (hreg : (d * thetaR cj n d).val.charpoly.Separable)
+    : Function.Injective (slinN d h1 h2 - LinearMap.id : nilrad W₁ W₂ →ₗ[ℝ] nilrad W₁ W₂) := by
   refine (injective_iff_map_eq_zero _).2 fun X hX => ?_
   have hS : slin d X.1 = X.1 := by
     have := congrArg Subtype.val hX
@@ -359,16 +393,18 @@ theorem slinN_injective (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 :
     rw [hS, hS] at e
     conv_rhs => rw [e]
     simp [mul_assoc]
-  have h3 : X.1 * X.1 * X.1 = 0 := eq_zero_of_mulVec fun y => by
-    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
-    exact X.2.2.2 _ (X.2.2.1 _ (X.2.1 y))
+  have h3 : X.1 * X.1 * X.1 = 0 :=
+    eq_zero_of_mulVec fun y => by
+      rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
+      exact X.2.2.2 _ (X.2.2.1 _ (X.2.1 y))
   exact Subtype.ext (eq_zero_of_commute_of_separable _ _ hreg hc h3)
 
 def quad (d : GL (Fin n) ℂ) (X : Mx) : Mx := slin d X * slin d X - X * slin d X + X * X
 
-theorem quadratic_term_nilradical_mem (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁) {X : Mx}
-    (hX : X ∈ nilrad W₁ W₂) :
-    (∀ y, quad d X *ᵥ y ∈ W₁) ∧ ∀ y ∈ W₂, quad d X *ᵥ y = 0 := by
+theorem quadratic_term_nilradical_mem
+    (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁)
+    {X : Mx} (hX : X ∈ nilrad W₁ W₂)
+    : (∀ y, quad d X *ᵥ y ∈ W₁) ∧ ∀ y ∈ W₂, quad d X *ᵥ y = 0 := by
   have hS := slin_mem d h1 h2 hX
   have a := nil_mul_mem hS hS
   have b := nil_mul_mem hX hS
@@ -379,9 +415,11 @@ theorem quadratic_term_nilradical_mem (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁
   · simp only [quad, Matrix.add_mulVec, Matrix.sub_mulVec, a.2 y hy, b.2 y hy, c.2 y hy]
     simp
 
-theorem quad_add (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁) {X Y : Mx}
-    (hX : X ∈ nilrad W₁ W₂) (hle : W₁ ≤ W₂) (hY : ∀ y, Y *ᵥ y ∈ W₁) (hY' : ∀ y ∈ W₂, Y *ᵥ y = 0) :
-    quad d (X + Y) = quad d X := by
+theorem quad_add
+    (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁)
+    {X Y : Mx} (hX : X ∈ nilrad W₁ W₂)
+    (hle : W₁ ≤ W₂) (hY : ∀ y, Y *ᵥ y ∈ W₁) (hY' : ∀ y ∈ W₂, Y *ᵥ y = 0)
+    : quad d (X + Y) = quad d X := by
   obtain ⟨hT, hT'⟩ := semilinear_term_nilradical_mem d h1 h2 hY hY'
   have hS := slin_mem d h1 h2 hX
   have hadd : slin d (X + Y) = slin d X + slin d Y := by
@@ -399,26 +437,32 @@ theorem quad_add (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD 
 
 theorem continuous_slin (d : GL (Fin n) ℂ) : Continuous (slin d) := by
   unfold slin
-  exact ((continuous_const.matrix_mul continuous_id.matrix_conjTranspose).matrix_mul continuous_const).neg
+  exact ((continuous_const.matrix_mul continuous_id.matrix_conjTranspose).matrix_mul
+    continuous_const).neg
 
 theorem continuous_quad (d : GL (Fin n) ℂ) : Continuous (quad d) := by
   have h := continuous_slin d
   unfold quad
-  exact ((h.matrix_mul h).sub (continuous_id.matrix_mul h)).add (continuous_id.matrix_mul continuous_id)
+  exact ((h.matrix_mul h).sub (continuous_id.matrix_mul h)).add
+    (continuous_id.matrix_mul continuous_id)
 
-theorem twist_val (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁)
-    (u : GL (Fin n) ℂ) (X : Mx) (hX : X ∈ nilrad W₁ W₂) (hu : u.val = 1 + X) :
-    u.val * (1 + (slin d X - X + quad d X)) = (d * thetaR cj n u * d⁻¹).val := by
+theorem twist_val
+    (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD cj d W₂ = W₁)
+    (u : GL (Fin n) ℂ) (X : Mx) (hX : X ∈ nilrad W₁ W₂) (hu : u.val = 1 + X)
+    : u.val * (1 + (slin d X - X + quad d X)) = (d * thetaR cj n u * d⁻¹).val := by
   have hS := slin_mem d h1 h2 hX
-  have h3 : X * X * X = 0 := eq_zero_of_mulVec fun y => by
-    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
-    exact hX.2.2 _ (hX.2.1 _ (hX.1 y))
-  have h4 : X * X * slin d X = 0 := eq_zero_of_mulVec fun y => by
-    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
-    exact hX.2.2 _ (hX.2.1 _ (hS.1 y))
-  have h5 : X * slin d X * slin d X = 0 := eq_zero_of_mulVec fun y => by
-    rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
-    exact hX.2.2 _ (hS.2.1 _ (hS.1 y))
+  have h3 : X * X * X = 0 :=
+    eq_zero_of_mulVec fun y => by
+      rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
+      exact hX.2.2 _ (hX.2.1 _ (hX.1 y))
+  have h4 : X * X * slin d X = 0 :=
+    eq_zero_of_mulVec fun y => by
+      rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
+      exact hX.2.2 _ (hX.2.1 _ (hS.1 y))
+  have h5 : X * slin d X * slin d X = 0 :=
+    eq_zero_of_mulVec fun y => by
+      rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
+      exact hX.2.2 _ (hS.2.1 _ (hS.1 y))
   have hinv : (u⁻¹ : GL (Fin n) ℂ).val = 1 - X + X * X := by
     refine Units.inv_eq_of_mul_eq_one_right ?_
     have : (1 + X) * (1 - X + X * X) = 1 + X * X * X := by noncomm_ring
@@ -427,22 +471,25 @@ theorem twist_val (d : GL (Fin n) ℂ) (h1 : perpD cj d W₁ = W₂) (h2 : perpD
   have hdi : (d⁻¹ : GL (Fin n) ℂ).val * d.val = 1 := by simp
   have hSS : slin d X * slin d X = d.val * (Xᴴ * Xᴴ) * (d⁻¹ : GL (Fin n) ℂ).val := by
     simp only [slin, neg_mul, mul_neg, neg_neg]
-    calc d.val * Xᴴ * (d⁻¹ : GL (Fin n) ℂ).val * (d.val * Xᴴ * (d⁻¹ : GL (Fin n) ℂ).val)
-        = d.val * Xᴴ * ((d⁻¹ : GL (Fin n) ℂ).val * d.val) * Xᴴ * (d⁻¹ : GL (Fin n) ℂ).val := by
-          simp only [mul_assoc]
+    calc
+      d.val * Xᴴ * (d⁻¹ : GL (Fin n) ℂ).val * (d.val * Xᴴ * (d⁻¹ : GL (Fin n) ℂ).val)
+          = d.val * Xᴴ * ((d⁻¹ : GL (Fin n) ℂ).val * d.val) * Xᴴ * (d⁻¹ : GL (Fin n) ℂ).val := by
+        simp only [mul_assoc]
       _ = _ := by rw [hdi]; simp only [mul_one, mul_assoc]
   have hR : (d * thetaR cj n u * d⁻¹).val = 1 + slin d X + slin d X * slin d X := by
     rw [Units.val_mul, Units.val_mul, theta_val, hinv, hSS]
     simp only [Matrix.conjTranspose_add, Matrix.conjTranspose_sub, Matrix.conjTranspose_one,
       Matrix.conjTranspose_mul, slin]
-    have : d.val * (1 - Xᴴ + Xᴴ * Xᴴ) * (d⁻¹ : GL (Fin n) ℂ).val =
-        d.val * (d⁻¹ : GL (Fin n) ℂ).val - d.val * Xᴴ * (d⁻¹ : GL (Fin n) ℂ).val +
-          d.val * (Xᴴ * Xᴴ) * (d⁻¹ : GL (Fin n) ℂ).val := by noncomm_ring
+    have : d.val * (1 - Xᴴ + Xᴴ * Xᴴ) * (d⁻¹ : GL (Fin n) ℂ).val
+        = d.val * (d⁻¹ : GL (Fin n) ℂ).val - d.val * Xᴴ * (d⁻¹ : GL (Fin n) ℂ).val
+          + d.val * (Xᴴ * Xᴴ) * (d⁻¹ : GL (Fin n) ℂ).val := by
+      noncomm_ring
     rw [this, hid]
     abel
   rw [hR, hu]
-  have : (1 + X) * (1 + (slin d X - X + quad d X)) = 1 + slin d X + slin d X * slin d X +
-      (X * slin d X * slin d X - X * X * slin d X + X * X * X) := by
+  have : (1 + X) * (1 + (slin d X - X + quad d X))
+      = 1 + slin d X + slin d X * slin d X
+        + (X * slin d X * slin d X - X * X * slin d X + X * X * X) := by
     simp only [quad]; noncomm_ring
   rw [this, h3, h4, h5]
   simp

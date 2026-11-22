@@ -15,10 +15,15 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.Cha
 
 noncomputable section
 
-theorem mCoordIdeal_eq_ker_multiConeMap {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {Φ : Type} [Field Φ] (c : (Σ k, ι k) → Φ) : mCoordIdeal c = RingHom.ker (T.multiConeMap c) := by
+theorem mCoordIdeal_eq_ker_multiConeMap
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {Φ : Type} [Field Φ]
+    (c : (Σ k, ι k) → Φ)
+    : mCoordIdeal c = RingHom.ker (T.multiConeMap c) := by
   have h : (mConeMap c : MRing ι →+* MvPolynomial K Φ) = T.multiConeMap c :=
-    MvPolynomial.ringHom_ext (fun r => by simp [T.multiConeMap, mConeMap])
+    MvPolynomial.ringHom_ext
+      (fun r => by simp [T.multiConeMap, mConeMap])
       (fun p => by simp [T.multiConeMap, mConeMap])
   rw [mCoordIdeal, ← h]
   rfl

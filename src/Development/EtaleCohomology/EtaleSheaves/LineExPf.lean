@@ -49,9 +49,15 @@ lemma projective_line_over_integers_isProper : IsProper (terminal.from P1) := by
 
 theorem LineEx_of : LateralTheory.E.ChowLCut.LineEx := by
   intro S
-  refine ⟨pullback (terminal.from P1) (terminal.from S), pullback.snd _ _, ?_, pullback.fst _ _,
-    IsPullback.of_hasPullback _ _⟩
-  exact MorphismProperty.of_isPullback (IsPullback.of_hasPullback _ _) projective_line_over_integers_isProper
+  refine ⟨
+    pullback (terminal.from P1) (terminal.from S),
+    pullback.snd _ _,
+    ?_,
+    pullback.fst _ _,
+    IsPullback.of_hasPullback _ _
+  ⟩
+  exact MorphismProperty.of_isPullback (IsPullback.of_hasPullback _ _)
+    projective_line_over_integers_isProper
 
 end LateralTheory.E.LineExPf
 

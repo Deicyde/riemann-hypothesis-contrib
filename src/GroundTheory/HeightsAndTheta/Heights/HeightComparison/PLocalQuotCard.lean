@@ -17,8 +17,8 @@ open NumberField IsLocalRing
 theorem LocalQuotCard.proof : LocalQuotCard.Statement := by
   intro L _ _ O hft _ m _ f hf
   have : IsNoetherianRing O := Algebra.FiniteType.isNoetherianRing ℤ O
-  have hO : Ring.KrullDimLE 1 O := Ring.KrullDimLE.mk₁' fun q hq0 hq ↦
-    SubringPrimeMaximal.proof L O q hq hq0
+  have hO : Ring.KrullDimLE 1 O :=
+    Ring.KrullDimLE.mk₁' fun q hq0 hq ↦ SubringPrimeMaximal.proof L O q hq hq0
   let R := Localization.AtPrime m
   have : Ring.KrullDimLE 1 R := by
     rw [Ring.krullDimLE_iff, IsLocalization.AtPrime.ringKrullDim_eq_height m R]
@@ -27,7 +27,9 @@ theorem LocalQuotCard.proof : LocalQuotCard.Statement := by
     intro h
     apply hf
     exact IsLocalization.injective R m.primeCompl_le_nonZeroDivisors (by simpa using h)
-  have hspan : Ideal.span {algebraMap O R f} = LinearMap.range (LinearMap.lsmul R R (algebraMap O R f)) := by
+  have hspan
+      : Ideal.span {algebraMap O R f}
+        = LinearMap.range (LinearMap.lsmul R R (algebraMap O R f)) := by
     ext z
     simp [Ideal.mem_span_singleton', LinearMap.mem_range, mul_comm]
   have hfin : Module.length R (R ⧸ Ideal.span {algebraMap O R f}) ≠ ⊤ := by

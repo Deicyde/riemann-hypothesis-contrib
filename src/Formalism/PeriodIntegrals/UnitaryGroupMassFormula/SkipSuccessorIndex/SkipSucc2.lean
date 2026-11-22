@@ -6,8 +6,8 @@ public import Formalism.PeriodIntegrals.QmSkip
 
 namespace PI.QmSkipWork
 
-theorem val_succAbove {n : ℕ} (p : Fin (n + 1)) (k : Fin n) :
-    (p.succAbove k).val = if k.val < p.val then k.val else k.val + 1 := by
+theorem val_succAbove {n : ℕ} (p : Fin (n + 1)) (k : Fin n)
+    : (p.succAbove k).val = if k.val < p.val then k.val else k.val + 1 := by
   by_cases h : k.val < p.val
   · rw [if_pos h, Fin.succAbove_of_castSucc_lt p k (by simpa [Fin.lt_def] using h)]
     simp

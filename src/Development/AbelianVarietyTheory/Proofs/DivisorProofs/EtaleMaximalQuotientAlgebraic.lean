@@ -9,13 +9,16 @@ namespace GlobalTheory
 
 namespace FracAlgEtale
 
-theorem exists_isAlgebraic_ratFunc_of_ringHom (k B : Type) [Field k] [CommRing B]
-    [IsDedekindDomain B] [Algebra k B] [Algebra.FiniteType k B] (hB : ¬ IsField B) (f : B)
-    (hf : f ≠ 0) (A' : Type) [CommRing A'] [Algebra B A'] [Algebra.Etale B A'] (R : Type)
-    [CommRing R] [Algebra A' R] [IsLocalization.Away (algebraMap B A' f) R] (Q : Type)
-    [CommRing Q] [Algebra R Q] [IsFractionRing R Q] (K : Type) [Field K] (π : Q →+* K)
-    (hπ : Function.Surjective π) :
-    ∃ _ : Algebra (RatFunc k) K, Algebra.IsAlgebraic (RatFunc k) K := by
+theorem exists_isAlgebraic_ratFunc_of_ringHom
+    (k B : Type) [Field k] [CommRing B] [IsDedekindDomain B] [Algebra k B] [Algebra.FiniteType k B]
+    (hB : ¬ IsField B)
+    (f : B) (hf : f ≠ 0)
+    (A' : Type) [CommRing A'] [Algebra B A'] [Algebra.Etale B A']
+    (R : Type) [CommRing R] [Algebra A' R] [IsLocalization.Away (algebraMap B A' f) R]
+    (Q : Type) [CommRing Q] [Algebra R Q] [IsFractionRing R Q]
+    (K : Type) [Field K]
+    (π : Q →+* K) (hπ : Function.Surjective π)
+    : ∃ _ : Algebra (RatFunc k) K, Algebra.IsAlgebraic (RatFunc k) K := by
   let ι : R →+* Q := algebraMap R Q
   letI : Algebra B R := ((algebraMap A' R).comp (algebraMap B A')).toAlgebra
   haveI : IsScalarTower B A' R := IsScalarTower.of_algebraMap_eq fun _ => rfl
@@ -74,8 +77,7 @@ theorem exists_isAlgebraic_ratFunc_of_ringHom (k B : Type) [Field k] [CommRing B
     intro z
     obtain ⟨q, rfl⟩ := hπ z
     obtain ⟨⟨x, s⟩, hq⟩ := IsLocalization.surj (nonZeroDivisors R) q
-    have hq' : π q * π (ι s) = π (ι x) := by
-      rw [← map_mul]; exact congrArg π hq
+    have hq' : π q * π (ι s) = π (ι x) := by rw [← map_mul]; exact congrArg π hq
     have : π q = π (ι x) * (π (ι s))⁻¹ := (eq_mul_inv_iff_mul_eq₀ (hunitR _ s.2).ne_zero).2 hq'
     rw [this]
     exact (hR x).mul (hR s).inv
@@ -87,7 +89,18 @@ theorem exists_isAlgebraic_ratFunc_of_ringHom (k B : Type) [Field k] [CommRing B
   haveI : IsScalarTower (RatFunc k) F K := IsScalarTower.of_algebraMap_eq fun _ => rfl
   exact ⟨algK, Algebra.IsAlgebraic.trans (RatFunc k) F K⟩
 
-theorem exists_isAlgebraic_ratFunc_residue : ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDedekindDomain B] [Algebra k B] [Algebra.FiniteType k B], ¬ IsField B → ∀ (f : B), f ≠ 0 → ∀ (A' : Type) [CommRing A'] [Algebra B A'] [Algebra.Etale B A'] (M : MaximalSpectrum (FractionRing (Localization.Away (algebraMap B A' f)))), ∃ _ : Algebra (RatFunc k) (FractionRing (Localization.Away (algebraMap B A' f)) ⧸ M.asIdeal), Algebra.IsAlgebraic (RatFunc k) (FractionRing (Localization.Away (algebraMap B A' f)) ⧸ M.asIdeal) := by
+theorem exists_isAlgebraic_ratFunc_residue
+    : ∀ (k B : Type) [Field k] [IsAlgClosed k] [CommRing B] [IsDedekindDomain B] [Algebra k B]
+        [Algebra.FiniteType k B],
+      ¬ IsField B
+        → ∀ (f : B),
+          f ≠ 0
+            → ∀ (A' : Type) [CommRing A'] [Algebra B A'] [Algebra.Etale B A']
+                (M : MaximalSpectrum (FractionRing (Localization.Away (algebraMap B A' f)))),
+              ∃ _ : Algebra (RatFunc k)
+                  (FractionRing (Localization.Away (algebraMap B A' f)) ⧸ M.asIdeal),
+                Algebra.IsAlgebraic (RatFunc k)
+                  (FractionRing (Localization.Away (algebraMap B A' f)) ⧸ M.asIdeal) := by
   intro k B _ _ _ _ _ _ hB f hf A' _ _ _ M
   haveI : M.asIdeal.IsMaximal := M.isMaximal
   letI : Field (FractionRing (Localization.Away (algebraMap B A' f)) ⧸ M.asIdeal) :=

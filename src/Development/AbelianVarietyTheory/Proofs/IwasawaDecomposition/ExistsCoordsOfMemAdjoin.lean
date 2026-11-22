@@ -16,9 +16,11 @@ namespace GlobalTheory.CoordsOfMemAdjoin
 
 open IntermediateField
 
-theorem exists_coords_of_mem_adjoin {F : Type*} [Field F] [Algebra ℚ F] {s : F} {c : ℚ}
-    (hs : s ^ 2 = algebraMap ℚ F c) {x : F} (hx : x ∈ ℚ⟮s⟯) :
-    ∃ a b : ℚ, x = algebraMap ℚ F a + algebraMap ℚ F b * s := by
+theorem exists_coords_of_mem_adjoin
+    {F : Type*} [Field F] [Algebra ℚ F]
+    {s : F} {c : ℚ} (hs : s ^ 2 = algebraMap ℚ F c)
+    {x : F} (hx : x ∈ ℚ⟮s⟯)
+    : ∃ a b : ℚ, x = algebraMap ℚ F a + algebraMap ℚ F b * s := by
   have hint : IsIntegral ℚ s := by
     apply IsIntegral.of_pow (n := 2) (by norm_num)
     rw [hs]
@@ -32,7 +34,8 @@ theorem exists_coords_of_mem_adjoin {F : Type*} [Field F] [Algebra ℚ F] {s : F
     refine ⟨0, 1, ?_⟩
     rw [Set.mem_singleton_iff.mp hy]
     simp
-  | algebraMap r => exact ⟨r, 0, by simp⟩
+  | algebraMap r =>
+    exact ⟨r, 0, by simp⟩
   | add y z _ _ hy hz =>
     obtain ⟨a, b, rfl⟩ := hy
     obtain ⟨a', b', rfl⟩ := hz
@@ -46,8 +49,9 @@ theorem exists_coords_of_mem_adjoin {F : Type*} [Field F] [Algebra ℚ F] {s : F
     simp only [map_add (f := _), map_mul, ← hs]
     ring
 
-theorem exists_rat_coords {R : Formalism.BasicNotions.Ranks} (H : Formalism.BasicNotions.Host R) {x : H.E} (hx : x ∈ H.K) :
-    ∃ a b : ℚ, x = (a : H.E) + (b : H.E) * H.sqrtMinusD := by
+theorem exists_rat_coords
+    {R : Formalism.BasicNotions.Ranks} (H : Formalism.BasicNotions.Host R) {x : H.E} (hx : x ∈ H.K)
+    : ∃ a b : ℚ, x = (a : H.E) + (b : H.E) * H.sqrtMinusD := by
   have hb : H.sqd ^ 2 = -(H.d : H.E) := H.sqd_sq
   have hs : H.sqrtMinusD ^ 2 = algebraMap ℚ H.E (-(H.d : ℚ)) := by
     rw [map_neg, map_natCast]

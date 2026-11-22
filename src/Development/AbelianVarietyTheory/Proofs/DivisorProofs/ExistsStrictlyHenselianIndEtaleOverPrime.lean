@@ -9,23 +9,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIndEtaleOf
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 noncomputable section
 
 namespace GlobalTheory.StrictHensPrime
 
-theorem exists_sh_indEt (A : Type) [CommRing A] (p : Ideal A) [p.IsPrime] :
-    ∃ (O : Type) (_ : CommRing O) (_ : Algebra A O) (_ : IsLocalRing O), SH O ∧ IndEt A O ∧
-      (IsLocalRing.maximalIdeal O).comap (algebraMap A O) = p := by
+theorem exists_sh_indEt (A : Type) [CommRing A] (p : Ideal A) [p.IsPrime]
+    : ∃ (O : Type) (_ : CommRing O) (_ : Algebra A O) (_ : IsLocalRing O),
+      SH O ∧ IndEt A O ∧ (IsLocalRing.maximalIdeal O).comap (algebraMap A O) = p := by
   classical
   obtain ⟨S, _, _, hH, hloc, hsep, -, -, -, ι, _, _, _, Si, hmono, hcov, hSi⟩ :=
     GlobalTheory.exists_strictHenselisation (Localization.AtPrime p)
       (SeparableClosure (IsLocalRing.ResidueField (Localization.AtPrime p)))
-  let _ : Algebra A S := ((algebraMap (Localization.AtPrime p) S).comp
-    (algebraMap A (Localization.AtPrime p))).toAlgebra
-  have _ : IsScalarTower A (Localization.AtPrime p) S := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
-  have hI : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap (Localization.AtPrime p) S) := by
+  let _ : Algebra A S :=
+    ((algebraMap (Localization.AtPrime p) S).comp (algebraMap A (Localization.AtPrime p))).toAlgebra
+  have _ : IsScalarTower A (Localization.AtPrime p) S :=
+    IsScalarTower.of_algebraMap_eq (fun _ => rfl)
+  have hI : GlobalTheory.IndefiniteRowSideFullHecke.ProjectiveSpaceOverSpec.IsIndEtale (algebraMap
+      (Localization.AtPrime p) S) := by
     refine GlobalTheory.StrictHensUnion.indEtale_of_directed_union _ S ι Si hmono hcov fun i => ?_
     obtain ⟨B, _, _, _, q, _, ⟨e⟩⟩ := hSi i
     exact GlobalTheory.StrictHensUnion.indEtale_of_algEquiv e

@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.TwoMulEqOfIsT
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
 open scoped CategoryTheory.Obj
 open GlobalTheory GlobalTheory.CM
 
@@ -15,19 +17,21 @@ namespace GlobalTheory.CM.SelfDualDatum
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem exists_enum (H : Host E) : ∃ (g : ℕ) (ty : Fin g → (E →+* ℂ)), IsTypeFn H 1 0 ty ∧
-    ∀ i, ty i (H.rt : E) = H.rt0 := by
+theorem exists_enum (H : Host E)
+    : ∃ (g : ℕ) (ty : Fin g → (E →+* ℂ)), IsTypeFn H 1 0 ty ∧ ∀ i, ty i (H.rt : E) = H.rt0 := by
   classical
   let e := (Fintype.equivFin {τ : E →+* ℂ // τ (H.rt : E) = H.rt0}).symm
   refine ⟨_, fun i => (e i).1, fun τ => ⟨fun h => ?_, fun h => ?_⟩, fun i => (e i).2⟩
   · rw [Nat.card_eq_one_iff_unique]
-    exact ⟨⟨fun a b => Subtype.ext (e.injective (Subtype.ext (a.2.trans b.2.symm)))⟩,
-      ⟨⟨e.symm ⟨τ, h⟩, by simp⟩⟩⟩
+    exact ⟨
+      ⟨fun a b => Subtype.ext (e.injective (Subtype.ext (a.2.trans b.2.symm)))⟩,
+      ⟨⟨e.symm ⟨τ, h⟩, by simp⟩⟩
+    ⟩
   · haveI : IsEmpty {i // (e i).1 = τ} := ⟨fun a => h (a.2 ▸ (e a.1).2)⟩
     simp
 
-theorem trace_eq (H : Host E) {g : ℕ} {ty : Fin g → (E →+* ℂ)} (hty : IsTypeFn H 1 0 ty) (a : E) :
-    ((Algebra.trace ℚ E a : ℚ) : ℝ) = 2 * (∑ i, ty i a).re := by
+theorem trace_eq (H : Host E) {g : ℕ} {ty : Fin g → (E →+* ℂ)} (hty : IsTypeFn H 1 0 ty) (a : E)
+    : ((Algebra.trace ℚ E a : ℚ) : ℝ) = 2 * (∑ i, ty i a).re := by
   classical
   let e := (Fintype.equivFin (E →+* ℂ)).symm
   have he : IsTypeFn H 1 1 e := fun τ => by
@@ -38,7 +42,8 @@ theorem trace_eq (H : Host E) {g : ℕ} {ty : Fin g → (E →+* ℂ)} (hty : Is
   have h1 := PeriodNonempty.sum_type H hty a
   have h2 := PeriodNonempty.sum_type H he a
   have h3 : ((Algebra.trace ℚ E a : ℚ) : ℂ) = ∑ i, e i a := by
-    rw [← eq_ratCast (algebraMap ℚ ℂ), trace_eq_sum_embeddings (E := ℂ), Equiv.sum_comp e (fun τ => τ a)]
+    rw [← eq_ratCast (algebraMap ℚ ℂ), trace_eq_sum_embeddings (E := ℂ),
+      Equiv.sum_comp e (fun τ => τ a)]
     exact (Equiv.sum_comp (RingHom.equivRatAlgHom E ℂ) (fun σ => σ a)).symm
   simp only [Nat.cast_one, _root_.one_mul, Nat.cast_zero, zero_mul, add_zero] at h1 h2
   set_option synthInstance.maxHeartbeats 100000 in
@@ -47,71 +52,89 @@ theorem trace_eq (H : Host E) {g : ℕ} {ty : Fin g → (E →+* ℂ)} (hty : Is
   simp only [Complex.add_re, Complex.conj_re, Complex.ratCast_re] at this
   linarith
 
-theorem exists_form (𝔄 : Submodule (𝓞 E) E) (ξ : E) (hξ0 : ξ ≠ 0)
-    (hdual : ∀ x : E, (∀ y ∈ 𝔄, ∃ n : ℤ, Algebra.trace ℚ E (ξ * x * IsCMField.complexConj E y) = n) ↔ x ∈ 𝔄) :
-    ∃ EF : LinearMap.BilinForm ℤ 𝔄, Function.Bijective EF ∧
-      ∀ x y : 𝔄, (EF x y : ℚ) = Algebra.trace ℚ E (ξ * (x : E) * IsCMField.complexConj E (y : E)) := by
+theorem exists_form
+    (𝔄 : Submodule (𝓞 E) E) (ξ : E) (hξ0 : ξ ≠ 0)
+    (hdual : ∀ x : E,
+      (∀ y ∈ 𝔄, ∃ n : ℤ, Algebra.trace ℚ E (ξ * x * IsCMField.complexConj E y) = n) ↔ x ∈ 𝔄)
+    : ∃ EF : LinearMap.BilinForm ℤ 𝔄,
+      Function.Bijective EF
+        ∧ ∀ x y : 𝔄,
+          (EF x y : ℚ) = Algebra.trace ℚ E (ξ * (x : E) * IsCMField.complexConj E (y : E)) := by
   choose f hf using fun x y : 𝔄 => (hdual x).2 x.2 y y.2
-  let EF : LinearMap.BilinForm ℤ 𝔄 := LinearMap.mk₂ ℤ f
-    (fun x x' y => by
-      apply Int.cast_injective (α := ℚ)
-      rw [Int.cast_add, ← hf, ← hf, ← hf, Submodule.coe_add, mul_add, add_mul, map_add (f := _)])
-    (fun c x y => by
-      apply Int.cast_injective (α := ℚ)
-      rw [smul_eq_mul, Int.cast_mul c, ← hf, ← hf, ← zsmul_eq_mul _ c, ← map_zsmul]
-      congr 1
-      simp
-      ring)
-    (fun x y y' => by
-      apply Int.cast_injective (α := ℚ)
-      rw [Int.cast_add, ← hf, ← hf, ← hf, Submodule.coe_add, map_add (f := _), mul_add, map_add (f := _)])
-    (fun c x y => by
-      apply Int.cast_injective (α := ℚ)
-      rw [smul_eq_mul, Int.cast_mul c, ← hf, ← hf, ← zsmul_eq_mul _ c, ← map_zsmul]
-      congr 1
-      simp
-      ring)
-  have hEF : ∀ x y : 𝔄, (EF x y : ℚ) = Algebra.trace ℚ E (ξ * (x : E) * IsCMField.complexConj E (y : E)) :=
+  let EF : LinearMap.BilinForm ℤ 𝔄 :=
+    LinearMap.mk₂ ℤ f
+      (fun x x' y => by
+        apply Int.cast_injective (α := ℚ)
+        rw [Int.cast_add, ← hf, ← hf, ← hf, Submodule.coe_add, mul_add, add_mul, map_add (f := _)])
+      (fun c x y => by
+        apply Int.cast_injective (α := ℚ)
+        rw [smul_eq_mul, Int.cast_mul c, ← hf, ← hf, ← zsmul_eq_mul _ c, ← map_zsmul]
+        congr 1
+        simp
+        ring)
+      (fun x y y' => by
+        apply Int.cast_injective (α := ℚ)
+        rw [Int.cast_add, ← hf, ← hf, ← hf, Submodule.coe_add, map_add (f := _), mul_add,
+          map_add (f := _)])
+      (fun c x y => by
+        apply Int.cast_injective (α := ℚ)
+        rw [smul_eq_mul, Int.cast_mul c, ← hf, ← hf, ← zsmul_eq_mul _ c, ← map_zsmul]
+        congr 1
+        simp
+        ring)
+  have hEF
+      : ∀ x y : 𝔄,
+        (EF x y : ℚ) = Algebra.trace ℚ E (ξ * (x : E) * IsCMField.complexConj E (y : E)) :=
     fun x y => (hf x y).symm
   refine ⟨EF, ⟨(injective_iff_map_eq_zero _).2 fun x hx => ?_, fun φ => ?_⟩, hEF⟩
   · by_contra h0
     have hx0 : (x : E) ≠ 0 := fun h => h0 (Subtype.ext h)
-    have hz : ∀ a : 𝓞 E, Algebra.trace ℚ E (ξ * x * IsCMField.complexConj E x * IsCMField.complexConj E a) = 0 :=
-      fun a => by
-        have := hEF x (a • x)
-        rw [hx, Submodule.coe_smul, Algebra.smul_def, map_mul (IsCMField.complexConj E)] at this
-        simp only [LinearMap.zero_apply, Int.cast_zero] at this
-        rw [this]
-        congr 1
-        simp only [RingOfIntegers.coe_eq_algebraMap]
-        ring
-    have hall : ∀ z : E, Algebra.trace ℚ E (ξ * x * IsCMField.complexConj E x * IsCMField.complexConj E z) = 0 :=
-      fun z => by
-        obtain ⟨n, hn, hi⟩ := exists_integral_multiples ℤ ℚ {z}
-        have := hz ⟨n • z, hi z (by simp)⟩
-        change Algebra.trace ℚ E (_ * IsCMField.complexConj E (n • z)) = 0 at this
-        rw [map_zsmul, mul_smul_comm, map_zsmul] at this
-        exact (smul_eq_zero.1 this).resolve_left hn
-    have := (traceForm_nondegenerate ℚ E).1 (ξ * x * IsCMField.complexConj E x) fun z => by
-      simpa [Algebra.traceForm_apply] using hall (IsCMField.complexConj E z)
+    have hz
+        : ∀ a : 𝓞 E,
+          Algebra.trace ℚ E (ξ * x * IsCMField.complexConj E x * IsCMField.complexConj E a)
+            = 0 := fun a => by
+      have := hEF x (a • x)
+      rw [hx, Submodule.coe_smul, Algebra.smul_def, map_mul (IsCMField.complexConj E)] at this
+      simp only [LinearMap.zero_apply, Int.cast_zero] at this
+      rw [this]
+      congr 1
+      simp only [RingOfIntegers.coe_eq_algebraMap]
+      ring
+    have hall
+        : ∀ z : E,
+          Algebra.trace ℚ E (ξ * x * IsCMField.complexConj E x * IsCMField.complexConj E z)
+            = 0 := fun z => by
+      obtain ⟨n, hn, hi⟩ := exists_integral_multiples ℤ ℚ {z}
+      have := hz ⟨n • z, hi z (by simp)⟩
+      change Algebra.trace ℚ E (_ * IsCMField.complexConj E (n • z)) = 0 at this
+      rw [map_zsmul, mul_smul_comm, map_zsmul] at this
+      exact (smul_eq_zero.1 this).resolve_left hn
+    have :=
+      (traceForm_nondegenerate ℚ E).1 (ξ * x * IsCMField.complexConj E x) fun z => by
+        simpa [Algebra.traceForm_apply] using hall (IsCMField.complexConj E z)
     simp [hξ0, hx0] at this
-  · obtain ⟨g, hg⟩ := (Module.Baer.of_divisible ℚ).extension_property_addMonoidHom
-      𝔄.subtype.toAddMonoidHom 𝔄.subtype_injective ((Int.castAddHom ℚ).comp φ.toAddMonoidHom)
+  · obtain ⟨g, hg⟩ :=
+      (Module.Baer.of_divisible ℚ).extension_property_addMonoidHom 𝔄.subtype.toAddMonoidHom
+        𝔄.subtype_injective ((Int.castAddHom ℚ).comp φ.toAddMonoidHom)
     have hg' : ∀ x : 𝔄, g x = φ x := fun x => DFunLike.congr_fun hg x
-    obtain ⟨z, hz⟩ := ((Algebra.traceForm ℚ E).toDual (traceForm_nondegenerate ℚ E)).surjective
-      (g.comp (IsCMField.complexConj E : E →+* E).toAddMonoidHom).toRatLinearMap
-    have hz' : ∀ y : E, Algebra.trace ℚ E (ξ * (z / ξ) * IsCMField.complexConj E y) = g y := fun y => by
+    obtain ⟨z, hz⟩ :=
+      ((Algebra.traceForm ℚ E).toDual (traceForm_nondegenerate ℚ E)).surjective
+        (g.comp (IsCMField.complexConj E : E →+* E).toAddMonoidHom).toRatLinearMap
+    have hz'
+        : ∀ y : E, Algebra.trace ℚ E (ξ * (z / ξ) * IsCMField.complexConj E y) = g y := fun y => by
       have := LinearMap.congr_fun hz (IsCMField.complexConj E y)
       rw [mul_div_cancel₀ _ hξ0]
       exact this.trans (by simp)
-    refine ⟨⟨_, (hdual _).1 fun y hy => ⟨φ ⟨y, hy⟩, (hz' y).trans (hg' ⟨y, hy⟩)⟩⟩, LinearMap.ext fun y => ?_⟩
+    refine ⟨
+      ⟨_, (hdual _).1 fun y hy => ⟨φ ⟨y, hy⟩, (hz' y).trans (hg' ⟨y, hy⟩)⟩⟩,
+      LinearMap.ext fun y => ?_
+    ⟩
     apply Int.cast_injective (α := ℚ)
     rw [hEF, hz', hg']
 
-
 omit [IsCMField E] in
-theorem finrank_int (𝔄 : Submodule (𝓞 E) E) (hfg : 𝔄.FG) (hne : 𝔄 ≠ ⊥) :
-    Module.finrank ℤ 𝔄 = Module.finrank ℚ E := by
+theorem finrank_int (𝔄 : Submodule (𝓞 E) E) (hfg : 𝔄.FG) (hne : 𝔄 ≠ ⊥)
+    : Module.finrank ℤ 𝔄 = Module.finrank ℚ E := by
   obtain ⟨N, hN, ψ, hψ⟩ := PrincipalDatum.exists_clear 𝔄 hfg
   have hNE : (N : E) ≠ 0 := by exact_mod_cast hN
   have hinj : Function.Injective ψ := fun x y h => by
@@ -126,7 +149,18 @@ theorem finrank_int (𝔄 : Submodule (𝓞 E) E) (hfg : 𝔄.FG) (hne : 𝔄 �
       (f := (LinearMap.toSpanSingleton (𝓞 E) 𝔄 ⟨x₀, hx₀⟩).restrictScalars ℤ) ?_)
   exact smul_left_injective (𝓞 E) (m := (⟨x₀, hx₀⟩ : 𝔄)) (by simpa using h0)
 
-theorem exists_datum : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (𝔄 : Submodule (𝓞 E) E) (ξ : E), 𝔄.FG → 𝔄 ≠ ⊥ → IsCMField.complexConj E ξ = -ξ → (∀ τ : E →+* ℂ, τ (H.rt : E) = H.rt0 → (τ ξ).im < 0) → (∀ x : E, (∀ y ∈ 𝔄, ∃ n : ℤ, Algebra.trace ℚ E (ξ * x * IsCMField.complexConj E y) = n) ↔ x ∈ 𝔄) → ∃ (D : Datum H) (e : D.La ≃ₗ[𝓞 E] 𝔄), D.p = 1 ∧ D.q = 0 ∧ ∀ x y, ((D.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ * (e x : E) * IsCMField.complexConj E (e y : E)) := by
+theorem exists_datum
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (𝔄 : Submodule (𝓞 E) E)
+        (ξ : E),
+      𝔄.FG → 𝔄 ≠ ⊥ → IsCMField.complexConj E ξ = -ξ
+        → (∀ τ : E →+* ℂ, τ (H.rt : E) = H.rt0 → (τ ξ).im < 0)
+        → (∀ x : E,
+          (∀ y ∈ 𝔄, ∃ n : ℤ, Algebra.trace ℚ E (ξ * x * IsCMField.complexConj E y) = n) ↔ x ∈ 𝔄)
+        → ∃ (D : Datum H) (e : D.La ≃ₗ[𝓞 E] 𝔄),
+          D.p = 1 ∧ D.q = 0
+            ∧ ∀ x y,
+              ((D.EF x y : ℤ) : ℚ)
+                = Algebra.trace ℚ E (ξ * (e x : E) * IsCMField.complexConj E (e y : E)) := by
   intro E _ _ _ H 𝔄 ξ hfg hne hξ hneg hdual
   classical
   obtain ⟨g, ty, hty, hrt⟩ := exists_enum H
@@ -142,19 +176,23 @@ theorem exists_datum : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H
     have := congrArg Complex.re h
     simp only [Complex.neg_re, Complex.conj_re] at this
     linarith
-  let P : 𝔄 →+ (Fin g → ℂ) :=
-    { toFun := fun x i => ty i (x : E)
-      map_zero' := by funext i; simp
-      map_add' := fun x y => by funext i; simp }
+  let P : 𝔄 →+ (Fin g → ℂ) := {
+    toFun := fun x i => ty i (x : E)
+    map_zero' := by funext i; simp
+    map_add' := fun x y => by funext i; simp
+  }
   have hP : ∀ x i, P x i = ty i (x : E) := fun _ _ => rfl
   let Hm : Matrix (Fin g) (Fin g) ℂ := Matrix.diagonal fun i => ((-2 * (ty i ξ).im : ℝ) : ℂ)
-  have hHm : ∀ z w, hermForm Hm z w = ∑ i, ((-2 * (ty i ξ).im : ℝ) : ℂ) * (z i * starRingEnd ℂ (w i)) :=
-    fun z w => by
-      simp only [hermForm, Hm, dotProduct, Matrix.mulVec_diagonal, Pi.star_apply]
-      exact Finset.sum_congr rfl fun i _ => by rw [mul_left_comm]; rfl
-  have hH : Hm.IsHermitian := Matrix.isHermitian_diagonal_of_self_adjoint _ (by
-    funext i
-    exact Complex.conj_ofReal _)
+  have hHm
+      : ∀ z w,
+        hermForm Hm z w
+          = ∑ i, ((-2 * (ty i ξ).im : ℝ) : ℂ) * (z i * starRingEnd ℂ (w i)) := fun z w => by
+    simp only [hermForm, Hm, dotProduct, Matrix.mulVec_diagonal, Pi.star_apply]
+    exact Finset.sum_congr rfl fun i _ => by rw [mul_left_comm]; rfl
+  have hH : Hm.IsHermitian :=
+    Matrix.isHermitian_diagonal_of_self_adjoint _ (by
+      funext i
+      exact Complex.conj_ofReal _)
   have hpos : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re := fun z hz => by
     rw [hHm, Complex.re_sum]
     obtain ⟨j, hj⟩ := Function.ne_iff.1 hz
@@ -212,19 +250,19 @@ theorem exists_datum : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H
     have h := Real.finrank_eq_int_finrank_of_discrete (s := Set.range P) (by rw [hz]; exact hdisc)
     apply Submodule.eq_top_of_finrank_eq
     rw [Set.finrank, Set.finrank, hz, LinearMap.finrank_range_of_inj (f := P.toIntLinearMap) hinj,
-      finrank_int 𝔄 hfg hne] at h
+        finrank_int 𝔄 hfg hne]
+      at h
     rw [h, ← Module.finrank_mul_finrank ℝ ℂ, Complex.finrank_real_complex, Module.finrank_fin_fun]
     omega
   have hadj : ∀ (a : 𝓞 E) x y, EF (a • x) y = EF x (H.bar a • y) := fun a x y => by
     apply Int.cast_injective (α := ℚ)
     rw [hEF, hEF, Submodule.coe_smul, Submodule.coe_smul, Algebra.smul_def, Algebra.smul_def,
-      map_mul (IsCMField.complexConj E),
-      ← RingOfIntegers.coe_eq_algebraMap, ← RingOfIntegers.coe_eq_algebraMap, H.bar_eq,
-      IsCMField.complexConj_apply_apply]
+      map_mul (IsCMField.complexConj E), ← RingOfIntegers.coe_eq_algebraMap,
+      ← RingOfIntegers.coe_eq_algebraMap, H.bar_eq, IsCMField.complexConj_apply_apply]
     congr 1
     ring
-  obtain ⟨D, e, hp, hq, he⟩ := PeriodDatum.exists_datum E H 𝔄 EF 1 0 g ty P Hm hty hbij hadj hlin hinj hdisc
-    hspan hH hpos him
+  obtain ⟨D, e, hp, hq, he⟩ :=
+    PeriodDatum.exists_datum E H 𝔄 EF 1 0 g ty P Hm hty hbij hadj hlin hinj hdisc hspan hH hpos him
   exact ⟨D, e, hp, hq, fun x y => by rw [he, hEF]⟩
 
 end GlobalTheory.CM.SelfDualDatum

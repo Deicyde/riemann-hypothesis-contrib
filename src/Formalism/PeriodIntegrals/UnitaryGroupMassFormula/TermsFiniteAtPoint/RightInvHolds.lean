@@ -15,8 +15,10 @@ open Formalism.MainNotions.S Matrix
 
 theorem rowsDep_holds : RowsDep := by
   intro E _ r Z u hu hdep
-  have hcast : ∀ (h : r ≤ r + 1) (c : Fin r), Fin.castLE h c = Fin.castSucc c := fun h c => Fin.ext rfl
-  have hcast1 : ∀ (h : r + 1 ≤ r + 1) (c : Fin (r + 1)), Fin.castLE h c = c := fun h c => Fin.ext rfl
+  have hcast : ∀ (h : r ≤ r + 1) (c : Fin r), Fin.castLE h c = Fin.castSucc c := fun h c =>
+    Fin.ext rfl
+  have hcast1 : ∀ (h : r + 1 ≤ r + 1) (c : Fin (r + 1)), Fin.castLE h c = c := fun h c =>
+    Fin.ext rfl
   constructor
   · unfold leadMinorE
     rw [dite_eq_left le_rfl, ← Matrix.exists_vecMul_eq_zero_iff]
@@ -62,7 +64,9 @@ theorem rightInv_holds : RightInv := by
     rw [LinearMap.range_eq_top.2 hsurj, finrank_top] at h1
     simp at h1
     omega
-  obtain ⟨v0, hv0⟩ := Module.finrank_pos_iff_exists_ne_zero.1 (by omega : 0 < Module.finrank E (LinearMap.ker (Matrix.mulVecLin β)))
+  obtain ⟨v0, hv0⟩ :=
+    Module.finrank_pos_iff_exists_ne_zero.1
+      (by omega : 0 < Module.finrank E (LinearMap.ker (Matrix.mulVecLin β)))
   have hspan := (finrank_eq_one_iff_of_nonzero' v0 hv0).1 hker
   set vv : Fin (r + 1) → E := (v0 : Fin (r + 1) → E) with hvv
   have hvv0 : vv ≠ 0 := fun h => hv0 (Subtype.ext h)
@@ -101,8 +105,7 @@ theorem rightInv_holds : RightInv := by
       funext a
       simp only [hy, Matrix.mulVec_sum, Matrix.mulVec_smul, hx'f]
       simp [Matrix.mulVec, dotProduct, Pi.single_apply, Finset.sum_apply]
-    have hyj : y j = 0 := by
-      simp [hy, Finset.sum_apply, hx'j]
+    have hyj : y j = 0 := by simp [hy, Finset.sum_apply, hx'j]
     have hmem : Pi.single k 1 - y ∈ LinearMap.ker (Matrix.mulVecLin β) := by
       rw [LinearMap.mem_ker, Matrix.mulVecLin_apply, Matrix.mulVec_sub, hyf, sub_self]
     obtain ⟨t, ht⟩ := hspan ⟨_, hmem⟩

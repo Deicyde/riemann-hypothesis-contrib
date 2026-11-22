@@ -7,7 +7,8 @@ public import Formalism.FormalDegreeBessel.FormalDegreeRatio.GBasic
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 noncomputable section
@@ -118,14 +119,20 @@ lemma dst_inv_continuousOn [Nonempty n] (x : n → ℂ) (f : ι → n → ℂ) (
   rw [div_le_iff₀ hg1, mul_comm]
   exact hg2
 
-theorem lenA_continuousOn : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ), Formalism.QuantumDeterminants.inWb k r z →
-    0 < Formalism.QuantumDeterminants.Tz k r z → ∀ a, ContinuousOn (fun g => lenA k r z g a) (GG k r) := by
+theorem lenA_continuousOn
+    : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ),
+      Formalism.QuantumDeterminants.inWb k r z → 0 < Formalism.QuantumDeterminants.Tz k r z
+        → ∀ a, ContinuousOn (fun g => lenA k r z g a) (GG k r) := by
   intro k r z _ _ a
 
   have hsub : GG k r ⊆ {g : Mx k r | IsUnit g.det} := by
     intro g hg
-    have h1 : gᴴ * Formalism.QuantumDeterminants.Hpk k r * g = Formalism.QuantumDeterminants.Hpk k r := hg
-    have hdet : (Formalism.QuantumDeterminants.Hpk k r).det * (Formalism.QuantumDeterminants.Hpk k r).det = 1 := by
+    have h1
+        : gᴴ * Formalism.QuantumDeterminants.Hpk k r * g = Formalism.QuantumDeterminants.Hpk k r :=
+      hg
+    have hdet
+        : (Formalism.QuantumDeterminants.Hpk k r).det * (Formalism.QuantumDeterminants.Hpk k r).det
+          = 1 := by
       rw [← Matrix.det_mul, Formalism.QuantumDeterminants.GBasic.Hpk_sq, Matrix.det_one]
     have h2 := congrArg Matrix.det h1
     rw [Matrix.det_mul, Matrix.det_mul] at h2
@@ -135,6 +142,7 @@ theorem lenA_continuousOn : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ), F
     rw [h0, mul_zero] at h2
     rw [← h2, mul_zero] at hdet
     exact zero_ne_one hdet
-  exact (dst_inv_continuousOn (Formalism.QuantumDeterminants.fvec k r z a) (Formalism.QuantumDeterminants.fvec k r z) {b | b < a}).mono hsub
+  exact (dst_inv_continuousOn (Formalism.QuantumDeterminants.fvec k r z a)
+    (Formalism.QuantumDeterminants.fvec k r z) {b | b < a}).mono hsub
 
 end GlobalTheory.LengthCont

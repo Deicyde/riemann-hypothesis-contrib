@@ -11,9 +11,10 @@ open GlobalTheory.LocAcyc GlobalTheory.KeyOriginNoeth GlobalTheory.KeyOriginBC
 
 namespace GlobalTheory.EtaleNormalLoc
 
-theorem isIntegrallyClosedIn_localization (S : Type) [CommRing S] [IsDomain S]
-    [IsIntegrallyClosed S] (M : Submonoid S) (hM : M ≤ nonZeroDivisors S) :
-    IsIntegrallyClosedIn S (Localization M) := by
+theorem isIntegrallyClosedIn_localization
+    (S : Type) [CommRing S] [IsDomain S] [IsIntegrallyClosed S]
+    (M : Submonoid S) (hM : M ≤ nonZeroDivisors S)
+    : IsIntegrallyClosedIn S (Localization M) := by
   let K := FractionRing S
   letI : Algebra (Localization M) K :=
     IsLocalization.localizationAlgebraOfSubmonoidLe (Localization M) K M _ hM
@@ -29,11 +30,14 @@ theorem isIntegrallyClosedIn_localization (S : Type) [CommRing S] [IsDomain S]
   · obtain ⟨y, hy⟩ := IsIntegrallyClosed.algebraMap_eq_of_integral (hx.algebraMap (B := K))
     exact ⟨y, hK (by rw [← hy, IsScalarTower.algebraMap_apply S (Localization M) K])⟩
 
-theorem etale_integrallyClosed_localization : ∀ (S E : Type) [CommRing S] [IsDomain S] [IsIntegrallyClosed S]
-    [CommRing E] [Algebra S E] [Algebra.Etale S E] (M : Submonoid S), M ≤ nonZeroDivisors S →
-    Function.Injective (algebraMap E (Localization (Algebra.algebraMapSubmonoid E M))) ∧
-    ∀ x : Localization (Algebra.algebraMapSubmonoid E M), IsIntegral S x →
-      x ∈ (algebraMap E (Localization (Algebra.algebraMapSubmonoid E M))).range := by
+theorem etale_integrallyClosed_localization
+    : ∀ (S E : Type) [CommRing S] [IsDomain S] [IsIntegrallyClosed S] [CommRing E] [Algebra S E]
+        [Algebra.Etale S E] (M : Submonoid S),
+      M ≤ nonZeroDivisors S
+        → Function.Injective (algebraMap E (Localization (Algebra.algebraMapSubmonoid E M)))
+          ∧ ∀ x : Localization (Algebra.algebraMapSubmonoid E M),
+            IsIntegral S x
+              → x ∈ (algebraMap E (Localization (Algebra.algebraMapSubmonoid E M))).range := by
   intro S E _ _ _ _ _ _ M hM
   have hle : Algebra.algebraMapSubmonoid E M ≤ nonZeroDivisors E := by
     rintro _ ⟨m, hm, rfl⟩
@@ -58,11 +62,13 @@ theorem etale_integrallyClosed_localization : ∀ (S E : Type) [CommRing S] [IsD
   have hic := isIntegrallyClosedIn_localization S M hM
   have htS : IsIntegral S (e.symm x) := hx.map (e.symm.toAlgHom.restrictScalars S)
   have htE : IsIntegral E (e.symm x) := htS.tower_top
-  obtain ⟨y, hy⟩ := (TensorProduct.toIntegralClosure_bijective_of_smooth
-    (R := S) (S := E) (B := SM)).2 ⟨e.symm x, htE⟩
+  obtain ⟨y, hy⟩ :=
+    (TensorProduct.toIntegralClosure_bijective_of_smooth (R := S) (S := E) (B := SM)).2
+      ⟨e.symm x, htE⟩
   have hy' : (TensorProduct.toIntegralClosure S E SM y : T) = e.symm x := congrArg Subtype.val hy
-  have key : ∀ y : E ⊗[S] integralClosure S SM, ∃ b : E,
-      (TensorProduct.toIntegralClosure S E SM y : T) = b ⊗ₜ[S] (1 : SM) := by
+  have key
+      : ∀ y : E ⊗[S] integralClosure S SM, ∃ b : E,
+        (TensorProduct.toIntegralClosure S E SM y : T) = b ⊗ₜ[S] (1 : SM) := by
     intro y
     induction y with
     | tmul b c =>
@@ -76,8 +82,7 @@ theorem etale_integrallyClosed_localization : ∀ (S E : Type) [CommRing S] [IsD
       exact ⟨a + b, by rw [map_add (f := _), Subalgebra.coe_add, ha, hb, TensorProduct.add_tmul]⟩
   obtain ⟨b, hb⟩ := key y
   refine ⟨b, ?_⟩
-  have : e.symm x = algebraMap E T b := by
-    rw [← hy', hb]; rfl
+  have : e.symm x = algebraMap E T b := by rw [← hy', hb]; rfl
   rw [← e.apply_symm_apply x, this, AlgEquiv.commutes]
 
 end GlobalTheory.EtaleNormalLoc

@@ -14,14 +14,17 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt
-  GlobalTheory.FlatLine GlobalTheory.CompHt GlobalTheory.FlatCore Filter Topology
+open NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.CompHt GlobalTheory.FlatCore Filter Topology
 
 namespace GlobalTheory.FlatCore
 
-theorem exists_ringHom_ne_zero_of_not_isNilpotent {K R : Type} [Field K] [CommRing R] [Algebra K R]
-    [Algebra.FiniteType K R] (σ : K →+* ℂ) {b : R} (hb : ¬ IsNilpotent b) :
-    ∃ φ : R →+* ℂ, φ.comp (algebraMap K R) = σ ∧ φ b ≠ 0 := by
+theorem exists_ringHom_ne_zero_of_not_isNilpotent
+    {K R : Type} [Field K] [CommRing R] [Algebra K R] [Algebra.FiniteType K R]
+    (σ : K →+* ℂ)
+    {b : R} (hb : ¬ IsNilpotent b)
+    : ∃ φ : R →+* ℂ, φ.comp (algebraMap K R) = σ ∧ φ b ≠ 0 := by
   haveI hJ : IsJacobsonRing R := isJacobsonRing_of_finiteType (A := K)
   have hrad : b ∉ (⊥ : Ideal R).jacobson := by
     rw [← Ideal.radical_eq_jacobson]
@@ -39,8 +42,7 @@ theorem exists_ringHom_ne_zero_of_not_isNilpotent {K R : Type} [Field K] [CommRi
   letI : Algebra K ℂ := σ.toAlgebra
   let ψ : (R ⧸ m) →ₐ[K] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨ψ.toRingHom.comp (Ideal.Quotient.mk m), ?_, ?_⟩
   · ext a
@@ -51,18 +53,22 @@ theorem exists_ringHom_ne_zero_of_not_isNilpotent {K R : Type} [Field K] [CommRi
     rw [map_ne_zero_iff ψ ψ.toRingHom.injective]
     exact fun h => hbm (Ideal.Quotient.eq_zero_iff_mem.1 h)
 
-theorem differentiableOn_of_mem_holSub {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} {C : Type}
-    {X : C → Data E r} {la : ∀ k, Wt (X k).Ψ r} {P : FDSec X} (hP : P ∈ holSub X la) (k : C) :
-    DifferentiableOn ℂ (P k) (X k).dom := by
+theorem differentiableOn_of_mem_holSub
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ} {C : Type} {X : C → Data E r} {la : ∀ k, Wt (X k).Ψ r} {P : FDSec X}
+    (hP : P ∈ holSub X la) (k : C)
+    : DifferentiableOn ℂ (P k) (X k).dom := by
   induction hP using Submodule.span_induction with
   | mem P h => exact (h k).1.1.1
   | zero => exact differentiableOn_const 0
   | add P Q _ _ hP hQ => exact hP.add hQ
   | smul a P _ hP => exact hP.const_smul a
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ} {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {x : ℝ}
-  {Z : Comp Xo c} {G : WTZ E} {f : Rul Xo c}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ}
+  {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ r} {x : ℝ} {Z : Comp Xo c} {G : WTZ E} {f : Rul Xo c}
 
 theorem genVal_ne_zero_of_mem_cuspOn (hf : f ∈ cuspOn U Z G) (hf0 : f ≠ 0) : genVal Z f ≠ 0 := by
   have hG : GenFrEx Xo c := (GlobalTheory.Reg.genFrEx_and_genFromTest E H Dw l Xo c).1
@@ -72,8 +78,10 @@ theorem genVal_ne_zero_of_mem_cuspOn (hf : f ∈ cuspOn U Z G) (hf0 : f ≠ 0) :
   · rw [hZ]; exact h0
   · rw [genVal_apply hG]; exact evC_eq_zero hG hZ (Submodule.mem_inf.1 hf).2
 
-theorem idem_mul_eq_zero_of_mul_eq_zero (hf : f ∈ cuspOn U Z G) (hf0 : f ≠ 0) {e' : Ix Dw → ℤ} {s : Rul Xo c}
-    (hs : s ∈ secZ Xo c e') (hsf : s * f = 0) : idem Z * s = 0 := by
+theorem idem_mul_eq_zero_of_mul_eq_zero
+    (hf : f ∈ cuspOn U Z G) (hf0 : f ≠ 0)
+    {e' : Ix Dw → ℤ} {s : Rul Xo c} (hs : s ∈ secZ Xo c e') (hsf : s * f = 0)
+    : idem Z * s = 0 := by
   have hG : GenFrEx Xo c := (GlobalTheory.Reg.genFrEx_and_genFromTest E H Dw l Xo c).1
   have h1 : genVal Z s = 0 := by
     have h2 := congrArg (genVal Z) hsf

@@ -4,17 +4,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LabRange
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM
+  GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
 open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc
 open GlobalTheory.Points
 attribute [local instance] Over.cartesianMonoidalCategory
 namespace GlobalTheory.UPoinc.ChartAt
 
-theorem spec_ext_of_isFractionRing {A K T : Type} [CommRing A] [IsDomain A] [Field K] [Algebra A K] [IsFractionRing A K]
-    [CommRing T] (h₁ h₂ : Sp T ⟶ Sp K) (e : h₁ ≫ spMap (algebraMap A K) = h₂ ≫ spMap (algebraMap A K)) : h₁ = h₂ := by
+theorem spec_ext_of_isFractionRing
+    {A K T : Type}
+    [CommRing A] [IsDomain A] [Field K] [Algebra A K] [IsFractionRing A K] [CommRing T]
+    (h₁ h₂ : Sp T ⟶ Sp K) (e : h₁ ≫ spMap (algebraMap A K) = h₂ ≫ spMap (algebraMap A K))
+    : h₁ = h₂ := by
   obtain ⟨g₁, rfl⟩ := Spec.map_surjective h₁
   obtain ⟨g₂, rfl⟩ := Spec.map_surjective h₂
   rw [spMap, ← Spec.map_comp, ← Spec.map_comp] at e
@@ -23,9 +30,12 @@ theorem spec_ext_of_isFractionRing {A K T : Type} [CommRing A] [IsDomain A] [Fie
   ext1
   exact IsLocalization.ringHom_ext (nonZeroDivisors A) e'
 
-theorem exists_int_dvd {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H}
-    {l : Geo.Tor.Level H} {Xo : Moduli Dw l} {cf : Coeff l} (C : UCompact Xo cf) {a : C.o} (ha : a ≠ 0) :
-    ∃ n : ℤ, n ≠ 0 ∧ a ∣ (n : C.o) := by
+theorem exists_int_dvd
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : Host E} {Dw : Datum H} {l : Geo.Tor.Level H} {Xo : Moduli Dw l} {cf : Coeff l}
+    (C : UCompact Xo cf)
+    {a : C.o} (ha : a ≠ 0)
+    : ∃ n : ℤ, n ≠ 0 ∧ a ∣ (n : C.o) := by
   haveI := C.ded
   have h1 : IsAlgebraic ℚ (C.b a) := Algebra.IsAlgebraic.isAlgebraic _
   have h2 : IsAlgebraic ℤ (C.b a) := (IsFractionRing.isAlgebraic_iff ℤ ℚ cf.F).2 h1
@@ -40,7 +50,13 @@ end GlobalTheory.UPoinc.ChartAt
 
 namespace GlobalTheory.UPoinc.ChartAt
 
-theorem exists_affine_chart_ratLift : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (cf : Coeff l) (C : UCompact Xo cf) (X : USetup C) (w : X.M.Z), X.π w ∈ Set.range C.i → ∃ (U₀ : X.M.Z.Opens) (u₀ : Sp (ratHull (X.M.ringOn U₀)) ⟶ Xo.XF cf), IsAffineOpen U₀ ∧ w ∈ U₀ ∧ spMap (ratHull (X.M.ringOn U₀)).val.toRingHom ≫ u₀ = X.uΩ := by
+theorem exists_affine_chart_ratLift
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (cf : Coeff l) (C : UCompact Xo cf) (X : USetup C)
+        (w : X.M.Z),
+      X.π w ∈ Set.range C.i
+        → ∃ (U₀ : X.M.Z.Opens) (u₀ : Sp (ratHull (X.M.ringOn U₀)) ⟶ Xo.XF cf),
+          IsAffineOpen U₀ ∧ w ∈ U₀ ∧ spMap (ratHull (X.M.ringOn U₀)).val.toRingHom ≫ u₀ = X.uΩ := by
   intro E _ _ _ H Dw l Xo cf C X w hw
   haveI := X.ar.char
   haveI := C.iF_open
@@ -104,8 +120,9 @@ theorem exists_affine_chart_ratLift : ∀ (E : Type) [Field E] [NumberField E] [
   apply pullback.hom_ext
   · rw [Category.assoc, pullback.lift_fst, hfst]
     simp only [UCompact.i, Category.assoc]
-  · have key : spMap (ratHull R₀).val.toRingHom ≫ g' ≫ pullback.snd C.z (spMap C.b) ≫ spMap C.b =
-        X.uΩ ≫ C.iF ≫ pullback.snd C.z (spMap C.b) ≫ spMap C.b := by
+  · have key
+        : spMap (ratHull R₀).val.toRingHom ≫ g' ≫ pullback.snd C.z (spMap C.b) ≫ spMap C.b
+          = X.uΩ ≫ C.iF ≫ pullback.snd C.z (spMap C.b) ≫ spMap C.b := by
       rw [← pullback.condition, ← Category.assoc g', pullback.lift_fst, reassoc_of% hfst]
       simp only [UCompact.i, Category.assoc]
     exact spec_ext_of_isFractionRing (A := C.o) _ _ (by simpa only [Category.assoc] using key)

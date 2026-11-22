@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
 section Dual
 
@@ -33,7 +34,8 @@ private theorem dm_adj (A B : M4 k) : adj (dm A B) = dm (adj A) (adj B) := by
   · simp [dm, adj_apply]
   · simp [dm, adj_apply, mul_comm]
 
-private theorem dm_zero {A B : M4 k} {i j : Fin 4} (hA : A i j = 0) (hB : B i j = 0) : dm A B i j = 0 := by
+private theorem dm_zero {A B : M4 k} {i j : Fin 4} (hA : A i j = 0) (hB : B i j = 0)
+    : dm A B i j = 0 := by
   simp [dm, hA, hB]
 
 private theorem dm_inj {A B A' B' : M4 k} (h : dm A B = dm A' B') : B = B' := by
@@ -41,15 +43,16 @@ private theorem dm_inj {A B A' B' : M4 k} (h : dm A B = dm A' B') : B = B' := by
   have := congrArg (fun M => (M i j).snd) h
   simpa [dm] using this
 
-private theorem dm_gsp {ν : k} {ν' : DualNumber k} (h1 : ν'.fst = ν) (h2 : ν'.snd = 0) {A X : M4 k}
-    (hA : IsGSp ν A) (hX : X ∈ sp4 k) : IsGSp ν' (dm A (X * A)) := by
+private theorem dm_gsp
+    {ν : k} {ν' : DualNumber k} (h1 : ν'.fst = ν) (h2 : ν'.snd = 0)
+    {A X : M4 k} (hA : IsGSp ν A) (hX : X ∈ sp4 k)
+    : IsGSp ν' (dm A (X * A)) := by
   have hXa : adj X = -X := hX
   have hA' : adj A * A = ν • 1 := hA
   have hadj : adj (X * A) = -(adj A * X) := by rw [(grp k).1, hXa, mul_neg]
   unfold IsGSp
   rw [dm_adj, dm_mul, hadj, hA']
-  have h0 : adj A * (X * A) + -(adj A * X) * A = 0 := by
-    rw [neg_mul, ← mul_assoc, add_neg_cancel]
+  have h0 : adj A * (X * A) + -(adj A * X) * A = 0 := by rw [neg_mul, ← mul_assoc, add_neg_cancel]
   rw [h0]
   ext i j <;> by_cases hij : i = j <;> simp [dm, Matrix.one_apply, hij, h1, h2]
 
@@ -64,12 +67,12 @@ private theorem mul_adj {n : M4 k} (h : IsGSp 1 n) : n * adj n = 1 := by
   have h' : adj n * n = 1 := by simpa [IsGSp] using h
   exact mul_eq_one_comm.mp h'
 
-private theorem dm_low {n Y : M4 k} (hn : IsLow n) (hY : Y ∈ sp4 k) (h : ∀ i j, i ≤ j → (adj n * Y * n) i j = 0) :
-    IsLow (dm n (-Y * n)) := by
+private theorem dm_low
+    {n Y : M4 k} (hn : IsLow n) (hY : Y ∈ sp4 k) (h : ∀ i j, i ≤ j → (adj n * Y * n) i j = 0)
+    : IsLow (dm n (-Y * n)) := by
   have key : ∀ i j, i ≤ j → (Y * n) i j = 0 := by
     intro i j hij
-    have e : Y * n = n * (adj n * Y * n) := by
-      rw [← mul_assoc, ← mul_assoc, mul_adj hn.1, one_mul]
+    have e : Y * n = n * (adj n * Y * n) := by rw [← mul_assoc, ← mul_assoc, mul_adj hn.1, one_mul]
     rw [e, Matrix.mul_apply]
     refine Finset.sum_eq_zero fun l _ => ?_
     rcases lt_or_ge i l with hl | hl
@@ -86,23 +89,27 @@ private theorem dm_low {n Y : M4 k} (hn : IsLow n) (hY : Y ∈ sp4 k) (h : ∀ i
     · simp [dm, hn.2.2 i j hij]
     · simp [dm, neg_mul, key i j hij.le]
 
-private theorem dm_flag {n r r' X Y : M4 k} (hn : IsGSp 1 n) (hY : Y ∈ sp4 k) (hr : r' * r = 1)
-    (h1 : IsUp (adj n * r * n)) (h2 : IsUp (adj n * (X - (r * Y * r' - Y)) * n)) :
-    IsUp (adj (dm n (-Y * n)) * dm r (X * r) * dm n (-Y * n)) := by
+private theorem dm_flag
+    {n r r' X Y : M4 k} (hn : IsGSp 1 n) (hY : Y ∈ sp4 k) (hr : r' * r = 1)
+    (h1 : IsUp (adj n * r * n)) (h2 : IsUp (adj n * (X - (r * Y * r' - Y)) * n))
+    : IsUp (adj (dm n (-Y * n)) * dm r (X * r) * dm n (-Y * n)) := by
   have hnn : n * adj n = 1 := mul_adj hn
   have hY' : adj (-Y) = Y := by
     have : adj (-Y) = - -Y := Submodule.neg_mem _ hY
     rw [this, neg_neg]
   have hadjY : adj (-Y * n) = adj n * Y := by rw [(grp k).1, hY']
   rw [dm_adj, hadjY, dm_mul, dm_mul]
-  have e1 : (adj n * (X - (r * Y * r' - Y)) * n) * (adj n * r * n)
-      = adj n * ((X - (r * Y * r' - Y)) * r) * n := by
-    calc _ = adj n * (X - (r * Y * r' - Y)) * (n * adj n) * r * n := by simp only [mul_assoc]
+  have e1
+      : (adj n * (X - (r * Y * r' - Y)) * n) * (adj n * r * n)
+        = adj n * ((X - (r * Y * r' - Y)) * r) * n := by
+    calc
+      _ = adj n * (X - (r * Y * r' - Y)) * (n * adj n) * r * n := by simp only [mul_assoc]
       _ = _ := by rw [hnn, mul_one]; simp only [mul_assoc]
   have e2 : (X - (r * Y * r' - Y)) * r = X * r - r * Y * (r' * r) + Y * r := by noncomm_ring
   rw [e2, hr, mul_one] at e1
-  have e : adj n * r * (-Y * n) + (adj n * (X * r) + adj n * Y * r) * n
-      = (adj n * (X - (r * Y * r' - Y)) * n) * (adj n * r * n) := by
+  have e
+      : adj n * r * (-Y * n) + (adj n * (X * r) + adj n * Y * r) * n
+        = (adj n * (X - (r * Y * r' - Y)) * n) * (adj n * r * n) := by
     rw [e1]; noncomm_ring
   intro i j hij
   apply dm_zero
@@ -110,36 +117,45 @@ private theorem dm_flag {n r r' X Y : M4 k} (hn : IsGSp 1 n) (hY : Y ∈ sp4 k) 
   · rw [e]
     exact up_mul h2 h1 i j hij
 
-private def dRep {Γ : Type} [Group Γ] (r : Γ →* M4 k) (X : Γ → M4 k)
-    (h : ∀ s t, X (s * t) = X s + r s * X t * r s⁻¹) : Γ →* M4 (DualNumber k) where
+private def dRep
+    {Γ : Type} [Group Γ]
+    (r : Γ →* M4 k) (X : Γ → M4 k) (h : ∀ s t, X (s * t) = X s + r s * X t * r s⁻¹)
+    : Γ →* M4 (DualNumber k) where
   toFun g := dm (r g) (X g * r g)
   map_one' := by
     have := h 1 1
     simp only [mul_one, inv_one, map_one, one_mul, left_eq_add] at this
     rw [this, map_one, zero_mul, dm_one]
   map_mul' s t := by
-    rw [dm_mul, h, map_mul, add_mul, mul_assoc (r s * X t), ← mul_assoc (r s⁻¹), ← map_mul r s⁻¹, inv_mul_cancel, map_one,
-      one_mul, add_comm, mul_assoc, mul_assoc]
+    rw [dm_mul, h, map_mul, add_mul, mul_assoc (r s * X t), ← mul_assoc (r s⁻¹), ← map_mul r s⁻¹,
+      inv_mul_cancel, map_one, one_mul, add_comm, mul_assoc, mul_assoc]
 
 end Dual
 
-private theorem res_dual (Λ : Type) [CommRing Λ] [IsLocalRing Λ] [IsCO Λ (DualNumber (ResidueField Λ))]
-    (x : DualNumber (ResidueField Λ)) : res Λ (DualNumber (ResidueField Λ)) x = x.fst := by
+private theorem res_dual
+    (Λ : Type) [CommRing Λ] [IsLocalRing Λ] [IsCO Λ (DualNumber (ResidueField Λ))]
+    (x : DualNumber (ResidueField Λ))
+    : res Λ (DualNumber (ResidueField Λ)) x = x.fst := by
   obtain ⟨a, ha⟩ := IsLocalRing.residue_surjective x.fst
-  have hal : algebraMap Λ (DualNumber (ResidueField Λ)) a = TrivSqZeroExt.inl (IsLocalRing.residue Λ a) := rfl
+  have hal
+      : algebraMap Λ (DualNumber (ResidueField Λ)) a
+        = TrivSqZeroExt.inl (IsLocalRing.residue Λ a) :=
+    rfl
   have hx : x = algebraMap Λ (DualNumber (ResidueField Λ)) a + TrivSqZeroExt.inr x.snd := by
     rw [hal]
     ext
     · simp [ha]
     · simp
   have hn : res Λ (DualNumber (ResidueField Λ)) (TrivSqZeroExt.inr x.snd) = 0 := by
-    rw [res_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, TrivSqZeroExt.isUnit_iff_isUnit_fst]
+    rw [res_eq_zero_iff, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
+      TrivSqZeroExt.isUnit_iff_isUnit_fst]
     simp
   rw [hx, map_add (f := _), hn, add_zero, AlgHom.commutes, hal]
   simp [ha]
 
-private theorem lc_mat {Γ k : Type} [TopologicalSpace Γ] {f : Γ → M4 k} (h : ∀ i j, IsLocallyConstant fun g => f g i j) :
-    IsLocallyConstant f := by
+private theorem lc_mat
+    {Γ k : Type} [TopologicalSpace Γ] {f : Γ → M4 k} (h : ∀ i j, IsLocallyConstant fun g => f g i j)
+    : IsLocallyConstant f := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
   have hev : ∀ᶠ y in nhds x, ∀ i j, f y i j = f x i j := by
@@ -150,8 +166,27 @@ private theorem lc_mat {Γ k : Type} [TopologicalSpace Γ] {f : Γ → M4 k} (h 
   ext i j
   exact hy i j
 
-theorem UpperTheory.V.Ws.X1.tanInj :
-    ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (Φ : Fr O Γ) (l : ℕ) [Fact l.Prime] {Λ : Type} [CommRing Λ] [IsDomain Λ] [IsDiscreteValuationRing Λ] [IsAdicComplete (maximalIdeal Λ) Λ] [Finite (ResidueField Λ)] (a : O →+* Λ), Φ.Std l a → (∀ v, Φ.Mu v = ∅) → ∀ {Γb : Type} [Group Γb] [TopologicalSpace Γb] [IsTopologicalGroup Γb] [T2Space Γb] (π : Γ →* Γb), Φ.Quo π → ∀ c : PD Φ.ι Γ (ResidueField Λ), Φ.IsRes ((residue Λ).comp a) c → ∀ (R : Type) [CommRing R] [Algebra Λ R] [IsCO Λ R] (P : PD Φ.ι Γ R), Φ.IsDef a c P → ∀ (rb : Γb →* M4 (ResidueField Λ)) (hb : ∀ g, ∃ x, IsGSp x (rb g)), rb.comp π = c.r → ∃ f : TanC (Φ.loc π) (adSp rb hb) (fun v => bor (c.n v)) (fun v => nil (c.n v)) (π Φ.g0) (tor (ResidueField Λ)) → (R →ₐ[Λ] DualNumber (ResidueField Λ)), Function.Injective f := by
+theorem UpperTheory.V.Ws.X1.tanInj
+    : ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] [TotallyDisconnectedSpace Γ] (Φ : Fr O Γ) (l : ℕ) [Fact l.Prime] {Λ : Type}
+        [CommRing Λ] [IsDomain Λ] [IsDiscreteValuationRing Λ] [IsAdicComplete (maximalIdeal Λ) Λ]
+        [Finite (ResidueField Λ)] (a : O →+* Λ),
+      Φ.Std l a → (∀ v, Φ.Mu v = ∅)
+        → ∀ {Γb : Type} [Group Γb] [TopologicalSpace Γb] [IsTopologicalGroup Γb] [T2Space Γb]
+            (π : Γ →* Γb),
+          Φ.Quo π
+            → ∀ c : PD Φ.ι Γ (ResidueField Λ),
+              Φ.IsRes ((residue Λ).comp a) c
+                → ∀ (R : Type) [CommRing R] [Algebra Λ R] [IsCO Λ R] (P : PD Φ.ι Γ R),
+                  Φ.IsDef a c P
+                    → ∀ (rb : Γb →* M4 (ResidueField Λ)) (hb : ∀ g, ∃ x, IsGSp x (rb g)),
+                      rb.comp π = c.r
+                        → ∃ f : TanC (Φ.loc π) (adSp rb hb)
+                              (fun v => bor (c.n v))
+                              (fun v => nil (c.n v))
+                              (π Φ.g0) (tor (ResidueField Λ))
+                            → (R →ₐ[Λ] DualNumber (ResidueField Λ)),
+                          Function.Injective f := by
   intro O Γ _ _ _ _ _ _ Φ l _ Λ _ _ _ _ _ a hstd hmu Γb _ _ _ _ π hquo c hc R _ _ _ P hdef rb hb hrb
   haveI : IsCO Λ (DualNumber (ResidueField Λ)) := (co_res Λ).2
   have hrbg : ∀ g, rb (π g) = c.r g := fun g => by rw [← hrb]; rfl
@@ -159,9 +194,11 @@ theorem UpperTheory.V.Ws.X1.tanInj :
     (tor (ResidueField Λ)) with hT
   have memZ : ∀ x : T, x.1 ∈ UpperTheory.V.Fr.Z1C (Φ.loc π) (adSp rb hb) (fun v => bor (c.n v)) :=
     fun x => (Submodule.mem_inf.mp x.2).1
-  have memP : ∀ x : T, x.1 ∈ (Submodule.comap (LinearMap.proj (π Φ.g0)) (tor (ResidueField Λ))).prod
-      (Submodule.pi Set.univ (fun v => nil (c.n v))) :=
-    fun x => (Submodule.mem_inf.mp x.2).2
+  have memP
+      : ∀ x : T,
+        x.1 ∈ (Submodule.comap (LinearMap.proj (π Φ.g0)) (tor (ResidueField Λ))).prod
+          (Submodule.pi Set.univ (fun v => nil (c.n v))) := fun x =>
+    (Submodule.mem_inf.mp x.2).2
   have hcoc : ∀ x : T, ∀ s t, (x.1.1 (s * t)).1 = (x.1.1 s).1 + rb s * (x.1.1 t).1 * rb s⁻¹ :=
     fun x s t => congrArg Subtype.val ((memZ x).2.1 s t)
   let P' : T → PD Φ.ι Γ (DualNumber (ResidueField Λ)) := fun x =>
@@ -204,7 +241,9 @@ theorem UpperTheory.V.Ws.X1.tanInj :
       rw [hr']
       have hZ3 := hZ.2.2 v ⟨s, hs⟩
       have hr1 : rb (π s)⁻¹ * c.r s = 1 := by rw [← hrbg, ← map_mul, inv_mul_cancel, map_one]
-      have h2 : IsUp (adj (c.n v) * ((x.1.1 (π s)).1 - (c.r s * (x.1.2 v).1 * rb (π s)⁻¹ - (x.1.2 v).1)) * c.n v) := by
+      have h2 : IsUp
+          (adj (c.n v) * ((x.1.1 (π s)).1 - (c.r s * (x.1.2 v).1 * rb (π s)⁻¹ - (x.1.2 v).1))
+            * c.n v) := by
         rw [← hrbg s]
         exact hZ3
       exact dm_flag (hc.pair.low v).1 (x.1.2 v).2 hr1 (hc.pair.flag v s hs) h2
@@ -219,8 +258,9 @@ theorem UpperTheory.V.Ws.X1.tanInj :
         lc_mat fun i j => IsLocallyConstant.desc _ _ (hc.cont i j 1) hinj
       have hX : IsLocallyConstant fun g => (x.1.1 (π g)).1 :=
         (hZ.1.comp Subtype.val).comp_continuous hquo.cont
-      have hall := IsLocallyConstant.comp₂ hcr hX
-        (fun A B => Ideal.Quotient.mk ((maximalIdeal (DualNumber (ResidueField Λ))) ^ N) (dm A (B * A) i j))
+      have hall :=
+        IsLocallyConstant.comp₂ hcr hX (fun A B =>
+          Ideal.Quotient.mk ((maximalIdeal (DualNumber (ResidueField Λ))) ^ N) (dm A (B * A) i j))
       show IsLocallyConstant fun g => Ideal.Quotient.mk _ ((P' x).r g i j)
       simp only [hr']
       exact hall
@@ -246,15 +286,18 @@ theorem UpperTheory.V.Ws.X1.tanInj :
     rw [hr', hr'] at e1
     have e2 := dm_inj e1
     have hinv : c.r g * rb (π g)⁻¹ = 1 := by rw [← hrbg, ← map_mul, mul_inv_cancel, map_one]
-    calc (x.1.1 (π g)).1 = (x.1.1 (π g)).1 * c.r g * rb (π g)⁻¹ := by rw [mul_assoc, hinv, mul_one]
+    calc
+      (x.1.1 (π g)).1
+        = (x.1.1 (π g)).1 * c.r g * rb (π g)⁻¹ := by rw [mul_assoc, hinv, mul_one]
       _ = (y.1.1 (π g)).1 * c.r g * rb (π g)⁻¹ := by rw [e2]
       _ = (y.1.1 (π g)).1 := by rw [mul_assoc, hinv, mul_one]
   · funext v
     apply Subtype.ext
     have e2 := dm_inj (congrFun hn v)
     have hinv : c.n v * adj (c.n v) = 1 := mul_adj (hc.pair.low v).1
-    have e3 : (x.1.2 v).1 * c.n v = (y.1.2 v).1 * c.n v := by
-      simpa only [neg_mul, neg_inj] using e2
-    calc (x.1.2 v).1 = (x.1.2 v).1 * c.n v * adj (c.n v) := by rw [mul_assoc, hinv, mul_one]
+    have e3 : (x.1.2 v).1 * c.n v = (y.1.2 v).1 * c.n v := by simpa only [neg_mul, neg_inj] using e2
+    calc
+      (x.1.2 v).1
+        = (x.1.2 v).1 * c.n v * adj (c.n v) := by rw [mul_assoc, hinv, mul_one]
       _ = (y.1.2 v).1 * c.n v * adj (c.n v) := by rw [e3]
       _ = (y.1.2 v).1 := by rw [mul_assoc, hinv, mul_one]

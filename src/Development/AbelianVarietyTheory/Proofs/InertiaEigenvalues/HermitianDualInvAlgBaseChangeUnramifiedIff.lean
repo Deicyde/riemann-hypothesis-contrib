@@ -15,8 +15,8 @@ namespace GlobalTheory.UnitLemma.Unr.Dual
 
 open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Unr
 
-theorem val_mul (K : UQ) {x y : K.E} (hx : x ≠ 0) (hy : y ≠ 0) :
-    val K.O (x * y) = val K.O x + val K.O y := by
+theorem val_mul (K : UQ) {x y : K.E} (hx : x ≠ 0) (hy : y ≠ 0)
+    : val K.O (x * y) = val K.O x + val K.O y := by
   unfold val
   rw [map_mul, WithZero.log_mul (by simpa using hx) (by simpa using hy)]
   ring
@@ -34,10 +34,12 @@ theorem deg_pos {K K' : UQ} {d : ℕ} {φ : K.E →+* K'.E} (hU : IsUnrExt K K' 
     omega
   · exact h
 
-theorem herm_eq_trace {K K' : UQ} {d : ℕ} {φ : K.E →+* K'.E} (hU : IsUnrExt K K' d φ) (B : InvAlg K)
-    (ψ : K'.E →+* B.A) (hψ : ∀ e, ψ (φ e) = algebraMap K.E B.A e) (hσ : ∀ e, B.σ (ψ e) = ψ (K'.c e))
-    (x y z : B.A) :
-    B.herm x y z = @Algebra.trace K.E K'.E _ _ φ.toAlgebra ((overExt φ B ψ hψ hσ).herm x y z) := by
+theorem herm_eq_trace
+    {K K' : UQ} {d : ℕ} {φ : K.E →+* K'.E}
+    (hU : IsUnrExt K K' d φ) (B : InvAlg K) (ψ : K'.E →+* B.A)
+    (hψ : ∀ e, ψ (φ e) = algebraMap K.E B.A e) (hσ : ∀ e, B.σ (ψ e) = ψ (K'.c e)) (x y z : B.A)
+    : B.herm x y z
+      = @Algebra.trace K.E K'.E _ _ φ.toAlgebra ((overExt φ B ψ hψ hσ).herm x y z) := by
   letI : Algebra K.E K'.E := φ.toAlgebra
   letI : Algebra K'.E B.A := ψ.toAlgebra
   haveI : IsScalarTower K.E K'.E B.A := IsScalarTower.of_algebraMap_eq fun e => (hψ e).symm
@@ -47,24 +49,32 @@ theorem herm_eq_trace {K K' : UQ} {d : ℕ} {φ : K.E →+* K'.E} (hU : IsUnrExt
   show Algebra.trace K.E B.A (x * y * B.σ z) = Algebra.trace K.E K'.E (Algebra.trace K'.E B.A (x * y * B.σ z))
   exact (Algebra.trace_trace _).symm
 
-theorem herm_smul {K K' : UQ} {φ : K.E →+* K'.E} (B : InvAlg K)
-    (ψ : K'.E →+* B.A) (hψ : ∀ e, ψ (φ e) = algebraMap K.E B.A e) (hσ : ∀ e, B.σ (ψ e) = ψ (K'.c e))
-    (x y z : B.A) (m : K'.E) (y₀ : K'.O) (hcm : K'.c (algebraMap K'.O K'.E y₀) = m) :
-    (overExt φ B ψ hψ hσ).herm x y (y₀ • (show (overExt φ B ψ hψ hσ).A from z)) =
-      m * (overExt φ B ψ hψ hσ).herm x y z := by
+theorem herm_smul
+    {K K' : UQ} {φ : K.E →+* K'.E} (B : InvAlg K) (ψ : K'.E →+* B.A)
+    (hψ : ∀ e, ψ (φ e) = algebraMap K.E B.A e) (hσ : ∀ e, B.σ (ψ e) = ψ (K'.c e)) (x y z : B.A)
+    (m : K'.E) (y₀ : K'.O) (hcm : K'.c (algebraMap K'.O K'.E y₀) = m)
+    : (overExt φ B ψ hψ hσ).herm x y (y₀ • (show (overExt φ B ψ hψ hσ).A from z))
+      = m * (overExt φ B ψ hψ hσ).herm x y z := by
   letI : Algebra K'.E B.A := ψ.toAlgebra
-  have hs : B.σ (ψ (algebraMap K'.O K'.E y₀) * z) = ψ m * B.σ z := by
-    rw [map_mul, hσ, hcm]
+  have hs : B.σ (ψ (algebraMap K'.O K'.E y₀) * z) = ψ m * B.σ z := by rw [map_mul, hσ, hcm]
   show Algebra.trace K'.E B.A (x * y * B.σ (ψ (algebraMap K'.O K'.E y₀) * z)) =
     m * Algebra.trace K'.E B.A (x * y * B.σ z)
-  rw [hs, show x * y * (ψ m * B.σ z) = m • (x * y * B.σ z) by
-    rw [Algebra.smul_def]; show _ = ψ m * _; ring, LinearMap.map_smul, smul_eq_mul]
+  rw [hs,
+    show x * y * (ψ m * B.σ z) = m • (x * y * B.σ z) by
+      rw [Algebra.smul_def]; show _ = ψ m * _; ring,
+    LinearMap.map_smul, smul_eq_mul]
 
 end GlobalTheory.UnitLemma.Unr.Dual
 
-
 open GlobalTheory.UnitLemma GlobalTheory.UnitLemma.Unr GlobalTheory.UnitLemma.Unr.Dual in
-theorem GlobalTheory.UnitLemma.Unr.dual_iff : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsUnrExt K K' d φ → ∀ (B : InvAlg K) (ψ : K'.E →+* B.A) (hψ : ∀ e, ψ (φ e) = algebraMap K.E B.A e) (hσ : ∀ e, B.σ (ψ e) = ψ (K'.c e)) (L : Submodule K'.O (overExt φ B ψ hψ hσ).A) (x y : B.A), (∀ z ∈ L, (overExt φ B ψ hψ hσ).herm x y z ∈ (algebraMap K'.O K'.E).range) ↔ (∀ z ∈ L, B.herm x y z ∈ (algebraMap K.O K.E).range) := by
+theorem GlobalTheory.UnitLemma.Unr.dual_iff
+    : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E),
+      IsUnrExt K K' d φ
+        → ∀ (B : InvAlg K) (ψ : K'.E →+* B.A) (hψ : ∀ e, ψ (φ e) = algebraMap K.E B.A e)
+            (hσ : ∀ e, B.σ (ψ e) = ψ (K'.c e)) (L : Submodule K'.O (overExt φ B ψ hψ hσ).A)
+            (x y : B.A),
+          (∀ z ∈ L, (overExt φ B ψ hψ hσ).herm x y z ∈ (algebraMap K'.O K'.E).range)
+            ↔ (∀ z ∈ L, B.herm x y z ∈ (algebraMap K.O K.E).range) := by
   intro K K' d φ hU B ψ hψ hσ L x y
   letI : Algebra K.E K'.E := φ.toAlgebra
   have hT : ∀ z, B.herm x y z = Algebra.trace K.E K'.E ((overExt φ B ψ hψ hσ).herm x y z) :=
@@ -74,7 +84,9 @@ theorem GlobalTheory.UnitLemma.Unr.dual_iff : ∀ (K K' : UQ) (d : ℕ) (φ : K.
     obtain ⟨b, hb⟩ := h z hz
     obtain ⟨a, ha⟩ := GlobalTheory.T.exists_integral_trace_unramifiedQuadraticLocalExt K K' d φ hU b
     refine ⟨a, ?_⟩
-    calc algebraMap K.O K.E a = Algebra.trace K.E K'.E (algebraMap K'.O K'.E b) := ha.symm
+    calc
+      algebraMap K.O K.E a
+        = Algebra.trace K.E K'.E (algebraMap K'.O K'.E b) := ha.symm
       _ = Algebra.trace K.E K'.E ((overExt φ B ψ hψ hσ).herm x y z) := by rw [hb]
       _ = B.herm x y z := (hT z).symm
   · intro h z₀ hz₀
@@ -87,7 +99,8 @@ theorem GlobalTheory.UnitLemma.Unr.dual_iff : ∀ (K K' : UQ) (d : ℕ) (φ : K.
     have hw0 : (overExt φ B ψ hψ hσ).herm x y z₀ ≠ 0 := by
       intro h0
       exact hw ⟨0, by rw [h0, map_zero]⟩
-    obtain ⟨u, a, ha, hua⟩ := GlobalTheory.T.exists_unit_trace_unramifiedInvolutionFieldExt K K' d φ hU
+    obtain ⟨u, a, ha, hua⟩ :=
+      GlobalTheory.T.exists_unit_trace_unramifiedInvolutionFieldExt K K' d φ hU
     obtain ⟨π, hπ⟩ := (IsDiscreteValuationRing.maximalIdeal K.O).valuation_exists_uniformizer K.E
     have hπv : val K.O π = 1 := by
       unfold val
@@ -125,5 +138,7 @@ theorem GlobalTheory.UnitLemma.Unr.dual_iff : ∀ (K K' : UQ) (d : ℕ) (φ : K.
       rw [Ne, ← map_zero (algebraMap K.O K.E), (IsFractionRing.injective K.O K.E).eq_iff]
       exact ha.ne_zero
     have h1 := val_algebraMap_nonneg K b
-    rw [hb', val_mul K (inv_ne_zero hπ0) ha0, val_inv, hπv, GlobalTheory.UnitLemma.Orbit.val_unit a ha] at h1
+    rw [hb', val_mul K (inv_ne_zero hπ0) ha0, val_inv, hπv,
+        GlobalTheory.UnitLemma.Orbit.val_unit a ha]
+      at h1
     omega

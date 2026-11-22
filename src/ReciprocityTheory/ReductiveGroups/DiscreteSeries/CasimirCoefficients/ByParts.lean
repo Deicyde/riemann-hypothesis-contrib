@@ -18,11 +18,13 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-theorem kByParts {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
-    (ε : Fin n → Bool) (F D : KG ε → E) {Z : Matrix (Fin n) (Fin n) ℂ} (hZ : inK ε Z) (γ : ℝ → KG ε)
-    (hγ : ∀ t, toMK (γ t) = NormedSpace.exp ((t : ℂ) • Z)) (hF : Continuous F) (hD : Continuous D)
-    (hder : ∀ k, HasDerivAt (fun t => F (k * γ t)) (D k) 0) :
-    ∫ k, D k ∂(muK ε) = 0 := by
+theorem kByParts
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+    (ε : Fin n → Bool) (F D : KG ε → E)
+    {Z : Matrix (Fin n) (Fin n) ℂ} (hZ : inK ε Z)
+    (γ : ℝ → KG ε) (hγ : ∀ t, toMK (γ t) = NormedSpace.exp ((t : ℂ) • Z))
+    (hF : Continuous F) (hD : Continuous D) (hder : ∀ k, HasDerivAt (fun t => F (k * γ t)) (D k) 0)
+    : ∫ k, D k ∂(muK ε) = 0 := by
   haveI := muK_rightInvariant ε
   haveI := compactSpace_KG ε
   obtain ⟨γ', -, hγ', hadd'⟩ := exists_oneParam ε hZ
@@ -57,17 +59,21 @@ theorem kByParts {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [Complete
   have hFm : ∀ t, Continuous fun k : KG ε => F (k * γ t) := fun t =>
     hF.comp (continuous_mul_const _)
   have hDm : Continuous fun k : KG ε => D (k * γ 0) := hD.comp (continuous_mul_const _)
-  have key := hasDerivAt_integral_of_dominated_loc_of_deriv_le (μ := muK ε)
-    (F := fun t k => F (k * γ t)) (F' := fun t k => D (k * γ t)) (x₀ := (0 : ℝ))
-    (bound := fun _ => C) (s := Set.univ) Filter.univ_mem
-    (Filter.Eventually.of_forall fun t =>
-      ((hFm t).stronglyMeasurable_of_hasCompactSupport (isClosed_tsupport _).isCompact).aestronglyMeasurable)
-    ((hFm 0).integrable_of_hasCompactSupport (isClosed_tsupport _).isCompact)
-    ((hDm.stronglyMeasurable_of_hasCompactSupport (isClosed_tsupport _).isCompact).aestronglyMeasurable)
-    (ae_of_all _ fun k t _ => hC _) (integrable_const C)
-    (ae_of_all _ fun k t _ => hderiv k t)
-  have key2 : HasDerivAt (fun t => ∫ k, F (k * γ t) ∂(muK ε)) (∫ k, D (k * γ 0) ∂(muK ε)) 0 :=
-    key.2
+  have key :=
+    hasDerivAt_integral_of_dominated_loc_of_deriv_le (μ := muK ε)
+      (F := fun t k => F (k * γ t))
+      (F' := fun t k => D (k * γ t))
+      (x₀ := (0 : ℝ))
+      (bound := fun _ => C)
+      (s := Set.univ) Filter.univ_mem
+      (Filter.Eventually.of_forall fun t =>
+        ((hFm t).stronglyMeasurable_of_hasCompactSupport
+          (isClosed_tsupport _).isCompact).aestronglyMeasurable)
+      ((hFm 0).integrable_of_hasCompactSupport (isClosed_tsupport _).isCompact)
+      ((hDm.stronglyMeasurable_of_hasCompactSupport (isClosed_tsupport
+        _).isCompact).aestronglyMeasurable)
+      (ae_of_all _ fun k t _ => hC _) (integrable_const C) (ae_of_all _ fun k t _ => hderiv k t)
+  have key2 : HasDerivAt (fun t => ∫ k, F (k * γ t) ∂(muK ε)) (∫ k, D (k * γ 0) ∂(muK ε)) 0 := key.2
   have hconst : (fun t => ∫ k, F (k * γ t) ∂(muK ε)) = fun _ => ∫ k, F k ∂(muK ε) := by
     funext t
     exact integral_mul_right_eq_self (fun k => F k) (γ t)

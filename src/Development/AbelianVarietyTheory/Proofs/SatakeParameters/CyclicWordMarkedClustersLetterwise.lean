@@ -8,13 +8,20 @@ public import Formalism.SharpRestriction.ParConsts
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW.Rec
 
-theorem clusters_letterwise : ∀ {n : ℕ} (th : ZMod n → Prop) (j : ℕ), Clusters th j → ∀ t, th t →
-    (∀ k : ℕ, 1 ≤ k → k ≤ j → ¬ th (t - k)) ∨
-      ∃ d : ℕ, 1 ≤ d ∧ d ≤ j ∧ th (t - d) ∧ ∀ k : ℕ, 1 ≤ k → k ≤ d + j → k ≠ d → ¬ th (t - k) := by
+theorem clusters_letterwise
+    : ∀ {n : ℕ} (th : ZMod n → Prop) (j : ℕ),
+      Clusters th j
+        → ∀ t,
+          th t
+            → (∀ k : ℕ, 1 ≤ k → k ≤ j → ¬ th (t - k))
+              ∨ ∃ d : ℕ,
+                1 ≤ d ∧ d ≤ j ∧ th (t - d) ∧ ∀ k : ℕ, 1 ≤ k → k ≤ d + j → k ≠ d → ¬ th (t - k) := by
   intro n th j hC t ht
   obtain ⟨F, sp, hF, huniq⟩ := hC
   obtain ⟨x, ⟨hxF, hxt⟩, -⟩ := huniq t ht
@@ -26,7 +33,8 @@ theorem clusters_letterwise : ∀ {n : ℕ} (th : ZMod n → Prop) (j : ℕ), Cl
       rw [hsp0, Nat.cast_zero, add_zero]
       exact hbefore
     · right
-      refine ⟨sp x, Nat.one_le_iff_ne_zero.2 hsp0, hspj, by simpa using hthx, fun k hk1 hk2 hkd => ?_⟩
+      refine
+        ⟨sp x, Nat.one_le_iff_ne_zero.2 hsp0, hspj, by simpa using hthx, fun k hk1 hk2 hkd => ?_⟩
       rcases lt_or_gt_of_ne hkd with hlt | hgt
       · have e : x + (sp x : ZMod n) - k = x + ((sp x - k : ℕ) : ZMod n) := by
           rw [Nat.cast_sub hlt.le]

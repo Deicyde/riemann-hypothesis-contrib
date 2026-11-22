@@ -13,7 +13,6 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.AntidiagMulD
 namespace Formalism.FourierDecayAlt.P
 
 theorem one_level_inequality_split_by_size : Formalism.FourierDecayAlt.TB.OneLevel :=
-  levelInequalityOfSteps splitByLastSize schurRecursion_true diagStep
-    singleBlockStep longBlockStep
+  levelInequalityOfSteps splitByLastSize schurRecursion_true diagStep singleBlockStep longBlockStep
 
 end Formalism.FourierDecayAlt.P

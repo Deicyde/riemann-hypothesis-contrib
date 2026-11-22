@@ -7,16 +7,28 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SecClass
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 open GlobalTheory.EtC.KumCoker in
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.kummer_cokernel_to_multiplicativeGroup_bijective : ∀ (q : ℕ) [NeZero q] (κ : (restr (Int.castRingHom (ZMod q))).obj (tw q 1) ⟶ Gm) (h0 : κ ≫ ((q : ℤ) • 𝟙 Gm) = 0),
-  (∀ (U : Scheme.{0}), IsUnit (q : Γ(U, ⊤)) → ∀ b : Sec Gm U, Sec.map ((q : ℤ) • 𝟙 Gm) b = 0 → ∃ a, Sec.map κ a = b) →
-  (∀ (U : Scheme.{0}), IsUnit (q : Γ(U, ⊤)) → ∀ b : Sec Gm U, Loc U fun V g => ∃ c : Sec Gm V, Sec.map ((q : ℤ) • 𝟙 Gm) c = Sec.res g b) →
-  ∀ (U : Scheme.{0}), IsUnit (q : Γ(U, ⊤)) → Function.Bijective (Sec.map (cokernel.desc κ ((q : ℤ) • 𝟙 Gm) h0) (U := U)) := by
+theorem _root_.GlobalTheory.T.kummer_cokernel_to_multiplicativeGroup_bijective
+    : ∀ (q : ℕ) [NeZero q] (κ : (restr (Int.castRingHom (ZMod q))).obj (tw q 1) ⟶ Gm)
+        (h0 : κ ≫ ((q : ℤ) • 𝟙 Gm) = 0),
+      (∀ (U : Scheme.{0}),
+          IsUnit (q : Γ(U, ⊤))
+            → ∀ b : Sec Gm U, Sec.map ((q : ℤ) • 𝟙 Gm) b = 0 → ∃ a, Sec.map κ a = b)
+        → (∀ (U : Scheme.{0}),
+          IsUnit (q : Γ(U, ⊤))
+            → ∀ b : Sec Gm U,
+              Loc U fun V g => ∃ c : Sec Gm V, Sec.map ((q : ℤ) • 𝟙 Gm) c = Sec.res g b)
+        → ∀ (U : Scheme.{0}),
+          IsUnit (q : Γ(U, ⊤))
+            → Function.Bijective (Sec.map (cokernel.desc κ ((q : ℤ) • 𝟙 Gm) h0) (U := U)) := by
   intro q _ κ h0 H1 H2
   set qb := cokernel.desc κ ((q : ℤ) • 𝟙 Gm) h0 with hqb
-  have key : ∀ {V : Scheme.{0}} (b : Sec Gm V), Sec.map qb (Sec.map (cokernel.π κ) b) = Sec.map ((q : ℤ) • 𝟙 Gm) b := by
+  have key
+      : ∀ {V : Scheme.{0}} (b : Sec Gm V),
+        Sec.map qb (Sec.map (cokernel.π κ) b) = Sec.map ((q : ℤ) • 𝟙 Gm) b := by
     intro V b
     rw [← sec_map_comp, hqb, cokernel.π_desc]
   have hls : Sheaf.IsLocallySurjective (cokernel.π κ) :=
@@ -29,21 +41,21 @@ theorem _root_.GlobalTheory.T.kummer_cokernel_to_multiplicativeGroup_bijective :
     refine ⟨_, Presheaf.imageSieve_mem Scheme.etaleTopology (cokernel.π κ).hom c, fun V g hg => ?_⟩
     obtain ⟨b, hb⟩ := hg
     have hb' : Sec.map (cokernel.π κ) b = Sec.res g c := hb
-    have hz : Sec.map ((q : ℤ) • 𝟙 Gm) b = 0 := by
-      rw [← key, hb', ← sec_nat, hc', sec_res_zero]
+    have hz : Sec.map ((q : ℤ) • 𝟙 Gm) b = 0 := by rw [← key, hb', ← sec_nat, hc', sec_res_zero]
     obtain ⟨a, rfl⟩ := H1 V (unit_res hU g) b hz
     rw [← hb', ← sec_map_comp, cokernel.condition, sec_map_zero]
   intro U hU
   refine ⟨inj U hU, fun b => ?_⟩
   obtain ⟨S, hS, hP⟩ := H2 U hU b
   choose c hc using hP
-  let x : Presieve.FamilyOfElements ((cokernel κ).obj ⋙ forget (ModuleCat.{1} (ULift.{1} ℤ))) S.arrows :=
-    fun V g hg => Sec.map (cokernel.π κ) (c V g hg)
+  let x : Presieve.FamilyOfElements ((cokernel κ).obj ⋙ forget (ModuleCat.{1} (ULift.{1} ℤ)))
+      S.arrows := fun V g hg =>
+    Sec.map (cokernel.π κ) (c V g hg)
   have hx : x.Compatible := by
     intro Y₁ Y₂ Z f₁ f₂ g₁ g₂ hg₁ hg₂ w
     apply inj Z (unit_res hU (f₁ ≫ g₁))
-    change Sec.map qb (Sec.res f₁ (Sec.map (cokernel.π κ) (c _ g₁ hg₁))) =
-      Sec.map qb (Sec.res f₂ (Sec.map (cokernel.π κ) (c _ g₂ hg₂)))
+    change Sec.map qb (Sec.res f₁ (Sec.map (cokernel.π κ) (c _ g₁ hg₁)))
+      = Sec.map qb (Sec.res f₂ (Sec.map (cokernel.π κ) (c _ g₂ hg₂)))
     rw [← sec_nat, ← sec_nat, key, key, hc, hc, sec_res_comp, sec_res_comp, w]
   obtain ⟨t, ht, -⟩ := isSheaf_forget (cokernel κ) S hS x hx
   refine ⟨t, sub_eq_zero.1 (sec_eq_zero Gm _ ⟨S, hS, fun V g hg => ?_⟩)⟩

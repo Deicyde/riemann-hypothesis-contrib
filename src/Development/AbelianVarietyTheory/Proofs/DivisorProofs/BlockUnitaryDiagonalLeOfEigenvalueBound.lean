@@ -12,10 +12,12 @@ open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.RealLift Global
 
 namespace GlobalTheory.HoweR
 
-theorem re_inner_apply_le_of_eigen {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-    [FiniteDimensional ℂ E] {T : E →ₗ[ℂ] E} (hT : T.IsSymmetric) (R : ℝ)
-    (hR : ∀ (x : ℝ) (v : E), v ≠ 0 → T v = (x : ℂ) • v → x ≤ R) (y : E) :
-    (inner ℂ y (T y)).re ≤ R * (inner ℂ y y).re := by
+theorem re_inner_apply_le_of_eigen
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+    {T : E →ₗ[ℂ] E} (hT : T.IsSymmetric)
+    (R : ℝ) (hR : ∀ (x : ℝ) (v : E), v ≠ 0 → T v = (x : ℂ) • v → x ≤ R)
+    (y : E)
+    : (inner ℂ y (T y)).re ≤ R * (inner ℂ y y).re := by
   have hn : Module.finrank ℂ E = Module.finrank ℂ E := rfl
   set b := hT.eigenvectorBasis hn
   set ev := hT.eigenvalues hn
@@ -25,13 +27,14 @@ theorem re_inner_apply_le_of_eigen {E : Type*} [NormedAddCommGroup E] [InnerProd
     intro i
     rw [← inner_conj_symm (b i) y, Complex.norm_conj]
     first
-      | (rw [Complex.mul_conj']; push_cast; rfl)
-      | (rw [mul_comm, Complex.conj_mul']; push_cast; rfl)
+    | (rw [Complex.mul_conj']; push_cast; rfl)
+    | (rw [mul_comm, Complex.conj_mul']; push_cast; rfl)
   have h1 : inner ℂ y (T y) = ∑ i, ((ev i * ‖inner ℂ (b i) y‖ ^ 2 : ℝ) : ℂ) := by
     rw [← b.sum_inner_mul_inner y (T y)]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [← hT (b i) y, hb i, inner_smul_left, Complex.conj_ofReal, mul_left_comm, h3 i]
-    push_cast; ring
+    push_cast
+    ring
   have h2 : inner ℂ y y = ∑ i, ((‖inner ℂ (b i) y‖ ^ 2 : ℝ) : ℂ) := by
     rw [← b.sum_inner_mul_inner y y]
     exact Finset.sum_congr rfl fun i _ => h3 i
@@ -50,17 +53,22 @@ def blockSub (s : ι → Bool) (U : Submodule ℂ M) : Submodule ℂ (ι → M) 
   zero_mem' c := ⟨U.zero_mem, fun _ => rfl⟩
   smul_mem' r x hx c := ⟨U.smul_mem r (hx c).1, fun h => by simp [(hx c).2 h]⟩
 
-def blockOp (s : ι → Bool) (F : ι → ι → Module.End ℂ M) (U : Submodule ℂ M)
-    (hst : ∀ a b, s a = s b → ∀ u ∈ U, F a b u ∈ U) : blockSub s U →ₗ[ℂ] blockSub s U where
-  toFun y := ⟨fun a => if s a = true then ∑ b, F a b (y.1 b) else 0, fun c => by
-    refine ⟨?_, fun h => by simp [h]⟩
-    show (if s c = true then ∑ b, F c b (y.1 b) else 0) ∈ U
-    split_ifs with hc
-    · refine U.sum_mem fun b _ => ?_
-      by_cases hb : s b = true
-      · exact hst c b (hc.trans hb.symm) _ (y.2 b).1
-      · rw [(y.2 b).2 (by simpa using hb), map_zero]; exact U.zero_mem
-    · exact U.zero_mem⟩
+def blockOp
+    (s : ι → Bool) (F : ι → ι → Module.End ℂ M) (U : Submodule ℂ M)
+    (hst : ∀ a b, s a = s b → ∀ u ∈ U, F a b u ∈ U)
+    : blockSub s U →ₗ[ℂ] blockSub s U where
+  toFun y := ⟨
+    fun a => if s a = true then ∑ b, F a b (y.1 b) else 0,
+    fun c => by
+      refine ⟨?_, fun h => by simp [h]⟩
+      show (if s c = true then ∑ b, F c b (y.1 b) else 0) ∈ U
+      split_ifs with hc
+      · refine U.sum_mem fun b _ => ?_
+        by_cases hb : s b = true
+        · exact hst c b (hc.trans hb.symm) _ (y.2 b).1
+        · rw [(y.2 b).2 (by simpa using hb), map_zero]; exact U.zero_mem
+      · exact U.zero_mem
+  ⟩
   map_add' y z := by
     ext a
     simp only [Submodule.coe_add, Pi.add_apply, map_add (f := _), Finset.sum_add_distrib]
@@ -70,13 +78,18 @@ def blockOp (s : ι → Bool) (F : ι → ι → Module.End ℂ M) (U : Submodul
     simp only [Submodule.coe_smul, Pi.smul_apply, map_smul, RingHom.id_apply]
     split_ifs <;> simp [Finset.smul_sum]
 
-theorem blockOp_apply (s : ι → Bool) (F : ι → ι → Module.End ℂ M) (U : Submodule ℂ M)
-    (hst : ∀ a b, s a = s b → ∀ u ∈ U, F a b u ∈ U) (y : blockSub s U) (a : ι) :
-    (blockOp s F U hst y : ι → M) a = if s a = true then ∑ b, F a b (y.1 b) else 0 := rfl
+theorem blockOp_apply
+    (s : ι → Bool) (F : ι → ι → Module.End ℂ M) (U : Submodule ℂ M)
+    (hst : ∀ a b, s a = s b → ∀ u ∈ U, F a b u ∈ U) (y : blockSub s U)
+    (a : ι)
+    : (blockOp s F U hst y : ι → M) a = if s a = true then ∑ b, F a b (y.1 b) else 0 :=
+  rfl
 
-def blockCore (s : ι → Bool) (U : Submodule ℂ M) (ip : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ)
-    (hsym : ∀ x ∈ U, ∀ y ∈ U, star (ip x y) = ip y x) (hpos : ∀ x ∈ U, x ≠ 0 → 0 < (ip x x).re) :
-    InnerProductSpace.Core ℂ (blockSub s U) where
+def blockCore
+    (s : ι → Bool)
+    (U : Submodule ℂ M) (ip : M →ₗ⋆[ℂ] M →ₗ[ℂ] ℂ)
+    (hsym : ∀ x ∈ U, ∀ y ∈ U, star (ip x y) = ip y x) (hpos : ∀ x ∈ U, x ≠ 0 → 0 < (ip x x).re)
+    : InnerProductSpace.Core ℂ (blockSub s U) where
   inner y z := ∑ c, ip (y.1 c) (z.1 c)
   conj_inner_symm y z := by
     set_option synthInstance.maxHeartbeats 100000 in
@@ -103,7 +116,16 @@ def blockCore (s : ι → Bool) (U : Submodule ℂ M) (ip : M →ₗ⋆[ℂ] M �
 
 end Block
 
-theorem re_diag_le_of_eigen_bound : ∀ (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M] (s : ι → Bool) (F : ι → ι → Module.End ℂ M), ∀ (U : Submodule ℂ M) (R : ℝ), UnitOn s F U → (∀ (x : ℝ) (y : ι → M), y ≠ 0 → (∀ a, y a ∈ U) → (∀ a, s a = false → y a = 0) → (∀ a, s a = true → ∑ b, F a b (y b) = (x : ℂ) • y a) → x ≤ R) → ∀ a, s a = true → ∀ u ∈ U, u ≠ 0 → ∀ m : ℂ, F a a u = m • u → m.re ≤ R := by
+theorem re_diag_le_of_eigen_bound
+    : ∀ (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M] (s : ι → Bool)
+        (F : ι → ι → Module.End ℂ M),
+      ∀ (U : Submodule ℂ M) (R : ℝ),
+        UnitOn s F U
+          → (∀ (x : ℝ) (y : ι → M),
+            y ≠ 0 → (∀ a, y a ∈ U) → (∀ a, s a = false → y a = 0)
+              → (∀ a, s a = true → ∑ b, F a b (y b) = (x : ℂ) • y a)
+              → x ≤ R)
+          → ∀ a, s a = true → ∀ u ∈ U, u ≠ 0 → ∀ m : ℂ, F a a u = m • u → m.re ≤ R := by
   intro ι M _ _ _ _ s F U R hU hR a ha u hu hu0 m hm
   obtain ⟨hfd, hst, ip, hsym, hpos, hadj⟩ := hU
   let cd := blockCore s U ip hsym hpos
@@ -118,9 +140,10 @@ theorem re_diag_le_of_eigen_bound : ∀ (ι M : Type) [Fintype ι] [DecidableEq 
     exact Module.Finite.of_injective e
       (fun y z h => Subtype.ext (funext fun c => congrArg Subtype.val (congrFun h c)))
   have hinner : ∀ y z : blockSub s U, inner ℂ y z = ∑ c, ip (y.1 c) (z.1 c) := fun _ _ => rfl
-  have key : ∀ (y z : blockSub s U) (c b : ι),
-      ip (if s c = true then F c b (y.1 b) else 0) (z.1 c) =
-        ip (y.1 b) (if s b = true then F b c (z.1 c) else 0) := by
+  have key
+      : ∀ (y z : blockSub s U) (c b : ι),
+        ip (if s c = true then F c b (y.1 b) else 0) (z.1 c)
+          = ip (y.1 b) (if s b = true then F b c (z.1 c) else 0) := by
     intro y z c b
     by_cases hc : s c = true
     · by_cases hb : s b = true
@@ -134,17 +157,25 @@ theorem re_diag_le_of_eigen_bound : ∀ (ι M : Type) [Fintype ι] [DecidableEq 
     intro y z
     rw [hinner, hinner]
     simp only [blockOp_apply]
-    have e1 : ∀ c, ip (if s c = true then ∑ b, F c b (y.1 b) else 0) (z.1 c) =
-        ∑ b, ip (if s c = true then F c b (y.1 b) else 0) (z.1 c) := by
+    have e1
+        : ∀ c,
+          ip (if s c = true then ∑ b, F c b (y.1 b) else 0) (z.1 c)
+            = ∑ b, ip (if s c = true then F c b (y.1 b) else 0) (z.1 c) := by
       intro c; split_ifs <;> simp [map_sum]
-    have e2 : ∀ b, ip (y.1 b) (if s b = true then ∑ c, F b c (z.1 c) else 0) =
-        ∑ c, ip (y.1 b) (if s b = true then F b c (z.1 c) else 0) := by
+    have e2
+        : ∀ b,
+          ip (y.1 b) (if s b = true then ∑ c, F b c (z.1 c) else 0)
+            = ∑ c, ip (y.1 b) (if s b = true then F b c (z.1 c) else 0) := by
       intro b; split_ifs <;> simp [map_sum]
     simp only [e1, e2, key]
     exact Finset.sum_comm
   have hR' : ∀ (x : ℝ) (v : blockSub s U), v ≠ 0 → blockOp s F U hst v = (x : ℂ) • v → x ≤ R := by
     intro x v hv hTv
-    refine hR x v.1 (fun h => hv (Subtype.ext h)) (fun c => (v.2 c).1) (fun c => (v.2 c).2) fun c hc => ?_
+    refine hR x v.1
+      (fun h => hv (Subtype.ext h))
+      (fun c => (v.2 c).1)
+      (fun c => (v.2 c).2)
+      fun c hc => ?_
     have := congrFun (congrArg Subtype.val hTv) c
     rw [blockOp_apply, if_pos hc] at this
     exact this

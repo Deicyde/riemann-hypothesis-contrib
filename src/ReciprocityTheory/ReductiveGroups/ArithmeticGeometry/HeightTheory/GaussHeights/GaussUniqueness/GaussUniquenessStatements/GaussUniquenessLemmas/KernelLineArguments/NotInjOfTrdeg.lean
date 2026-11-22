@@ -8,10 +8,13 @@ namespace GaussValuationUniqueness
 
 open ReciprocityTheory.ChartRestriction.G.T0
 
-theorem not_inj_of_trdeg {F E : Type} [Field F] [Field E] [Algebra F E] {D N : ℕ} (S : Set E)
+theorem not_inj_of_trdeg
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    {D N : ℕ}
+    (S : Set E)
     (j0 : Fin (N + 1)) (ρ : Fin N → IntermediateField.adjoin F S) (hD : 1 ≤ D)
-    (htr : Algebra.trdeg F (IntermediateField.adjoin F S) = ((D - 1 : ℕ) : Cardinal)) :
-    ¬ Function.Injective (MvPolynomial.aeval (R := F) (imgR (D := D) j0 ρ)) := by
+    (htr : Algebra.trdeg F (IntermediateField.adjoin F S) = ((D - 1 : ℕ) : Cardinal))
+    : ¬ Function.Injective (MvPolynomial.aeval (R := F) (imgR (D := D) j0 ρ)) := by
   intro hinj
   have hai : AlgebraicIndependent F (imgR (D := D) j0 ρ) := hinj
   have h1 := hai.cardinalMk_le_trdeg
@@ -29,13 +32,14 @@ theorem not_inj_of_trdeg {F E : Type} [Field F] [Field E] [Algebra F E] {D N : �
 
 section Tr
 
-variable {K : Type} [Field K] {Ω : Type} [Field Ω] [Algebra K Ω] {D N : ℕ}
-  (v : AddValuation Ω (WithTop ℤ))
+variable
+  {K : Type} [Field K] {Ω : Type} [Field Ω] [Algebra K Ω] {D N : ℕ} (v : AddValuation Ω (WithTop ℤ))
 
-noncomputable def gK (hv : IsTrivOn K v) :
-    K →+* IsLocalRing.ResidueField ((vRing v).comap (algebraMap K Ω)) :=
-  (IsLocalRing.residue _).comp ((RingHom.id K).codRestrict ((vRing v).comap (algebraMap K Ω))
-    (fun x => by rw [ValuationSubring.mem_comap]; exact alg_mem v hv x))
+noncomputable def gK (hv : IsTrivOn K v)
+    : K →+* IsLocalRing.ResidueField ((vRing v).comap (algebraMap K Ω)) :=
+  (IsLocalRing.residue _).comp
+    ((RingHom.id K).codRestrict ((vRing v).comap (algebraMap K Ω))
+      (fun x => by rw [ValuationSubring.mem_comap]; exact alg_mem v hv x))
 
 theorem gK_surj (hv : IsTrivOn K v) : Function.Surjective (gK v hv) := by
   intro y

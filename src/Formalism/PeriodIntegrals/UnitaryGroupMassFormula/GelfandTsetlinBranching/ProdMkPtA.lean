@@ -17,32 +17,39 @@ variable {n : ℕ}
 def mStarA (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) : Fin (n + 1) × Fin (n + 1) →₀ ℕ :=
   Finsupp.equivFunOnFinite.symm fun v =>
     Fin.lastCases (Fin.lastCases (ν (Fin.last n)) (fun k => ν (Fin.castSucc k) - kap k) v.2)
-      (fun a => Fin.lastCases 0 (fun k => if k = a then kap a else 0) v.2) v.1
+      (fun a => Fin.lastCases 0 (fun k => if k = a then kap a else 0) v.2)
+      v.1
 
-@[simp] theorem mStarA_cc (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (a k : Fin n) :
-    mStarA kap ν (Fin.castSucc a, Fin.castSucc k) = if k = a then kap a else 0 := by
+@[simp]
+theorem mStarA_cc (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (a k : Fin n)
+    : mStarA kap ν (Fin.castSucc a, Fin.castSucc k) = if k = a then kap a else 0 := by
   simp [mStarA]
 
-@[simp] theorem mStarA_cl (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (a : Fin n) :
-    mStarA kap ν (Fin.castSucc a, Fin.last n) = 0 := by
+@[simp]
+theorem mStarA_cl (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (a : Fin n)
+    : mStarA kap ν (Fin.castSucc a, Fin.last n) = 0 := by
   simp [mStarA]
 
-@[simp] theorem mStarA_lc (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (k : Fin n) :
-    mStarA kap ν (Fin.last n, Fin.castSucc k) = ν (Fin.castSucc k) - kap k := by
+@[simp]
+theorem mStarA_lc (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (k : Fin n)
+    : mStarA kap ν (Fin.last n, Fin.castSucc k) = ν (Fin.castSucc k) - kap k := by
   simp [mStarA]
 
-@[simp] theorem mStarA_ll (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) :
-    mStarA kap ν (Fin.last n, Fin.last n) = ν (Fin.last n) := by
+@[simp]
+theorem mStarA_ll (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ)
+    : mStarA kap ν (Fin.last n, Fin.last n) = ν (Fin.last n) := by
   simp [mStarA]
 
 def IsDPtA (x : Fin (n + 1) × Fin (n + 1) → ℂ) : Prop :=
   ∀ a j : Fin (n + 1), a.val < n → a ≠ j → x (a, j) = 0
 
-theorem mono_eq_A (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (g : MvPolynomial (Fin (n + 1) × Fin (n + 1)) ℂ)
+theorem mono_eq_A
+    (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (g : MvPolynomial (Fin (n + 1) × Fin (n + 1)) ℂ)
     (hcol : IsWeightedHomogeneous (colW (n + 1) (n + 1)) g ν)
     (hrow : ∀ m ∈ g.support, ∀ a : Fin n, ∑ s, m (Fin.castSucc a, s) = kap a)
-    (x : Fin (n + 1) × Fin (n + 1) → ℂ) (hx : IsDPtA x) (m : Fin (n + 1) × Fin (n + 1) →₀ ℕ)
-    (hm : m ∈ g.support) (hne : ∏ v, x v ^ m v ≠ 0) : m = mStarA kap ν := by
+    (x : Fin (n + 1) × Fin (n + 1) → ℂ) (hx : IsDPtA x)
+    (m : Fin (n + 1) × Fin (n + 1) →₀ ℕ) (hm : m ∈ g.support) (hne : ∏ v, x v ^ m v ≠ 0)
+    : m = mStarA kap ν := by
   have hz : ∀ v, x v = 0 → m v = 0 := by
     intro v hv
     by_contra h
@@ -64,8 +71,9 @@ theorem mono_eq_A (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (g : MvPolyno
     induction s using Fin.lastCases with
     | last =>
       have h := hcolsum (Fin.last n)
-      rw [Fin.sum_univ_castSucc, Finset.sum_eq_zero (fun a _ => htop a _ (Fin.castSucc_lt_last a).ne'),
-        zero_add] at h
+      rw [Fin.sum_univ_castSucc,
+          Finset.sum_eq_zero (fun a _ => htop a _ (Fin.castSucc_lt_last a).ne'), zero_add]
+        at h
       rw [mStarA_ll, h]
     | cast k =>
       have h := hcolsum (Fin.castSucc k)
@@ -88,11 +96,12 @@ theorem mono_eq_A (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (g : MvPolyno
         exact hdiag k
       · exact htop a _ (fun e => hka (Fin.castSucc_injective _ e))
 
-theorem eval_D_A (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (g : MvPolynomial (Fin (n + 1) × Fin (n + 1)) ℂ)
+theorem eval_D_A
+    (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (g : MvPolynomial (Fin (n + 1) × Fin (n + 1)) ℂ)
     (hcol : IsWeightedHomogeneous (colW (n + 1) (n + 1)) g ν)
     (hrow : ∀ m ∈ g.support, ∀ a : Fin n, ∑ s, m (Fin.castSucc a, s) = kap a)
-    (x : Fin (n + 1) × Fin (n + 1) → ℂ) (hx : IsDPtA x) :
-    eval x g = AddMonoidAlgebra.coeff g (mStarA kap ν) * ∏ v, x v ^ (mStarA kap ν) v := by
+    (x : Fin (n + 1) × Fin (n + 1) → ℂ) (hx : IsDPtA x)
+    : eval x g = AddMonoidAlgebra.coeff g (mStarA kap ν) * ∏ v, x v ^ (mStarA kap ν) v := by
   rw [MvPolynomial.eval_eq']
   by_cases hs : mStarA kap ν ∈ g.support
   · rw [Finset.sum_eq_single (mStarA kap ν)]
@@ -111,13 +120,15 @@ theorem eval_D_A (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (g : MvPolynom
     have hprod : ∏ v, x v ^ m v ≠ 0 := fun h0 => hz (by rw [h0, mul_zero])
     exact hs (mono_eq_A kap ν g hcol hrow x hx m hm hprod ▸ hm)
 
-def kapA (lam : DomWeight (n + 1)) (mu : DomWeight n) (a : Fin n) : ℕ := (mu.w a - lam.detShift).toNat
+def kapA (lam : DomWeight (n + 1)) (mu : DomWeight n) (a : Fin n) : ℕ :=
+  (mu.w a - lam.detShift).toNat
 
-theorem props_A (lam : DomWeight (n + 1)) (mu : DomWeight n) (f : MvPolynomial (Fin (n + 1) × Fin (n + 1)) ℂ)
-    (hf : f ∈ nablaSq ℂ (n + 1) lam) (hfix : IsFixedW rfl lam mu f) :
-    IsWeightedHomogeneous (colW (n + 1) (n + 1)) f lam.natW ∧ RInvA (fun x => eval x f) ∧
-      lhwline_CInv (fun x => eval x f) ∧
-      ∀ m ∈ f.support, ∀ a : Fin n, ∑ s, m (Fin.castSucc a, s) = kapA lam mu a := by
+theorem props_A
+    (lam : DomWeight (n + 1)) (mu : DomWeight n) (f : MvPolynomial (Fin (n + 1) × Fin (n + 1)) ℂ)
+    (hf : f ∈ nablaSq ℂ (n + 1) lam) (hfix : IsFixedW rfl lam mu f)
+    : IsWeightedHomogeneous (colW (n + 1) (n + 1)) f lam.natW ∧ RInvA (fun x => eval x f)
+      ∧ lhwline_CInv (fun x => eval x f)
+      ∧ ∀ m ∈ f.support, ∀ a : Fin n, ∑ s, m (Fin.castSucc a, s) = kapA lam mu a := by
   refine ⟨(lsat_mem_dualWeyl.mp hf).1, ?_, ?_, ?_⟩
   · intro x a b t hab hb
     have ha : a.val < n := lt_trans hab hb
@@ -126,14 +137,15 @@ theorem props_A (lam : DomWeight (n + 1)) (mu : DomWeight n) (f : MvPolynomial (
     simp only
     rw [h1, h2]
     exact fixed_rowOp_A lam mu f hfix _ _ (by rw [Fin.lt_def] at hab ⊢; exact hab) t x
-  · exact lhwline_CInv_of f (fun l j hlj c => ((dualWeylPoint ℂ (n + 1) (n + 1) lam.natW f).mp hf).2 l j hlj c)
+  · exact lhwline_CInv_of f
+      (fun l j hlj c => ((dualWeylPoint ℂ (n + 1) (n + 1) lam.natW f).mp hf).2 l j hlj c)
   · intro m hm a
     have := fixed_rowDeg_A lam mu f hfix m hm a
     unfold kapA
     omega
 
-def mkPtA (dv : Fin n → ℂ) (z : Fin (n + 1) → ℂ) : Fin (n + 1) × Fin (n + 1) → ℂ :=
-  fun v => Fin.lastCases (z v.2) (fun a => Fin.lastCases 0 (fun k => if k = a then dv a else 0) v.2) v.1
+def mkPtA (dv : Fin n → ℂ) (z : Fin (n + 1) → ℂ) : Fin (n + 1) × Fin (n + 1) → ℂ := fun v =>
+  Fin.lastCases (z v.2) (fun a => Fin.lastCases 0 (fun k => if k = a then dv a else 0) v.2) v.1
 
 theorem mkPtA_D (dv : Fin n → ℂ) (z : Fin (n + 1) → ℂ) : IsDPtA (mkPtA dv z) := by
   intro a j ha hne
@@ -146,12 +158,14 @@ theorem mkPtA_D (dv : Fin n → ℂ) (z : Fin (n + 1) → ℂ) : IsDPtA (mkPtA d
     rintro rfl
     exact hne rfl
 
-theorem prod_mkPtA (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (dv : Fin n → ℂ) (z : Fin (n + 1) → ℂ) :
-    ∏ v, mkPtA dv z v ^ (mStarA kap ν) v =
-      (∏ a, dv a ^ kap a) * (∏ k : Fin n, z (Fin.castSucc k) ^ (ν (Fin.castSucc k) - kap k)) *
-        z (Fin.last n) ^ ν (Fin.last n) := by
-  have hpw : ∀ a' k : Fin n, (if k = a' then dv a' else 0) ^ (if k = a' then kap a' else 0) =
-      if k = a' then dv a' ^ kap a' else 1 := by
+theorem prod_mkPtA (kap : Fin n → ℕ) (ν : Fin (n + 1) → ℕ) (dv : Fin n → ℂ) (z : Fin (n + 1) → ℂ)
+    : ∏ v, mkPtA dv z v ^ (mStarA kap ν) v
+      = (∏ a, dv a ^ kap a) * (∏ k : Fin n, z (Fin.castSucc k) ^ (ν (Fin.castSucc k) - kap k))
+        * z (Fin.last n) ^ ν (Fin.last n) := by
+  have hpw
+      : ∀ a' k : Fin n,
+        (if k = a' then dv a' else 0) ^ (if k = a' then kap a' else 0)
+          = if k = a' then dv a' ^ kap a' else 1 := by
     intro a' k
     split_ifs <;> simp
   rw [Fintype.prod_prod_type]

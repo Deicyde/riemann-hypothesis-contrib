@@ -13,26 +13,31 @@ open Polynomial
 
 variable {p : ℕ} [hp : Fact p.Prime] {Ω : Type} [Field Ω] [Algebra (O0 p) Ω]
 
-theorem isClosed_eval_mem {K : Type*} [Field K] [Algebra K Ω] [Algebra.IsIntegral K Ω]
-    (x : Ω) (s : Set Ω) : IsClosed {σ : Ω ≃ₐ[K] Ω | σ x ∈ s} := by
+theorem isClosed_eval_mem
+    {K : Type*} [Field K] [Algebra K Ω] [Algebra.IsIntegral K Ω] (x : Ω) (s : Set Ω)
+    : IsClosed {σ : Ω ≃ₐ[K] Ω | σ x ∈ s} := by
   rw [← isOpen_compl_iff, isOpen_iff_forall_mem_open]
   intro σ hσ
-  refine ⟨(fun τ => σ⁻¹ * τ) ⁻¹' (MulAction.stabilizer (Ω ≃ₐ[K] Ω) x : Set (Ω ≃ₐ[K] Ω)), ?_,
-    (stabilizer_isOpen_of_isIntegral x).preimage (by fun_prop), ?_⟩
+  refine ⟨
+    (fun τ => σ⁻¹ * τ) ⁻¹' (MulAction.stabilizer (Ω ≃ₐ[K] Ω) x : Set (Ω ≃ₐ[K] Ω)),
+    ?_,
+    (stabilizer_isOpen_of_isIntegral x).preimage (by fun_prop),
+    ?_
+  ⟩
   · intro τ hτ
     have h : σ.symm (τ x) = x := hτ
     have h' : τ x = σ x := by rw [← σ.symm_apply_eq.1 h]
     simpa [h'] using hσ
   · simp
 
-theorem exists_of_seq (h : IsClo p Ω) (P : ℕ → Ω → Set Ω)
-    (hP : ∀ n, ∃ σ : Gal p Ω, ∀ m ≤ n, ∀ x, σ x ∈ P m x) :
-    ∃ σ : Gal p Ω, ∀ n x, σ x ∈ P n x := by
+theorem exists_of_seq
+    (h : IsClo p Ω) (P : ℕ → Ω → Set Ω) (hP : ∀ n, ∃ σ : Gal p Ω, ∀ m ≤ n, ∀ x, σ x ∈ P m x)
+    : ∃ σ : Gal p Ω, ∀ n x, σ x ∈ P n x := by
   classical
   let K := FractionRing (O0 p)
   letI : Algebra K Ω := (IsFractionRing.lift h.inj).toAlgebra
-  have hK : ∀ a : O0 p, algebraMap K Ω (algebraMap (O0 p) K a) = algebraMap (O0 p) Ω a :=
-    fun a => IsFractionRing.lift_algebraMap h.inj a
+  have hK : ∀ a : O0 p, algebraMap K Ω (algebraMap (O0 p) K a) = algebraMap (O0 p) Ω a := fun a =>
+    IsFractionRing.lift_algebraMap h.inj a
   haveI : IsScalarTower (O0 p) K Ω := IsScalarTower.of_algebraMap_eq (fun a => (hK a).symm)
   haveI : IsAlgClosed Ω := h.clo
   haveI : Algebra.IsAlgebraic (O0 p) Ω := h.alg
@@ -54,17 +59,17 @@ theorem exists_of_seq (h : IsClo p Ω) (P : ℕ → Ω → Set Ω)
   have hφ : ∀ σ x, φ σ x = σ x := fun _ _ => rfl
   let G : ℕ → Set (Ω ≃ₐ[K] Ω) := fun n => {τ | ∀ m ≤ n, ∀ x, τ x ∈ P m x}
   have hcl : ∀ n, IsClosed (G n) := fun n => by
-    have e : G n = ⋂ m, ⋂ (_ : m ≤ n), ⋂ x, {τ : Ω ≃ₐ[K] Ω | τ x ∈ P m x} := by
-      ext τ; simp [G]
+    have e : G n = ⋂ m, ⋂ (_ : m ≤ n), ⋂ x, {τ : Ω ≃ₐ[K] Ω | τ x ∈ P m x} := by ext τ; simp [G]
     rw [e]
-    exact isClosed_iInter fun m => isClosed_iInter fun _ => isClosed_iInter fun x =>
-      isClosed_eval_mem x _
+    exact isClosed_iInter fun m =>
+      isClosed_iInter fun _ => isClosed_iInter fun x => isClosed_eval_mem x _
   have hdec : ∀ n, G (n + 1) ⊆ G n := fun n τ hτ m hm x => hτ m (hm.trans n.le_succ) x
   have hne : ∀ n, (G n).Nonempty := fun n => by
     obtain ⟨σ, hσ⟩ := hP n
     exact ⟨φ σ, fun m hm x => by rw [hφ]; exact hσ m hm x⟩
-  obtain ⟨τ, hτ⟩ := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed G hdec hne
-    (hcl 0).isCompact hcl
+  obtain ⟨τ, hτ⟩ :=
+    IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed G hdec hne (hcl 0).isCompact
+      hcl
   rw [Set.mem_iInter] at hτ
   exact ⟨τ.restrictScalars (O0 p), fun n x => hτ n n le_rfl x⟩
 
@@ -90,11 +95,15 @@ theorem qq_pow_sub (T : Tower p Ω) {n m : ℕ} (h : n ≤ m) : T.qq m ^ p ^ (m 
   | zero => simp
   | succ k ih => rw [← add_assoc, pow_succ', pow_mul, T.qpow, ih]
 
-theorem ggeo_apply {g : Gal p Ω} (hg : g ∈ Ggeo (p := p) Ω) {x : Ω} (hx : IsAlgZp (p := p) x) : g x = x := hg x hx
+theorem ggeo_apply {g : Gal p Ω} (hg : g ∈ Ggeo (p := p) Ω) {x : Ω} (hx : IsAlgZp (p := p) x)
+    : g x = x :=
+  hg x hx
 
-theorem tau_pow_qq (T : Tower p Ω) {τ : Gal p Ω} (hτ : τ ∈ Ggeo (p := p) Ω)
-    (hτq : ∀ n, τ (T.qq n) = T.ζ n * T.qq n) (n s : ℕ) :
-    (τ ^ s) (T.qq n) = T.ζ n ^ s * T.qq n := by
+theorem tau_pow_qq
+    (T : Tower p Ω)
+    {τ : Gal p Ω} (hτ : τ ∈ Ggeo (p := p) Ω) (hτq : ∀ n, τ (T.qq n) = T.ζ n * T.qq n)
+    (n s : ℕ)
+    : (τ ^ s) (T.qq n) = T.ζ n ^ s * T.qq n := by
   induction s with
   | zero => simp
   | succ s ih =>
@@ -102,11 +111,15 @@ theorem tau_pow_qq (T : Tower p Ω) {τ : Gal p Ω} (hτ : τ ∈ Ggeo (p := p) 
       ggeo_apply ((Ggeo (p := p) Ω).pow_mem hτ s) (isAlgZp_zeta T n), pow_succ]
     ring
 
-theorem dense_tau_pow_mul (p : ℕ) [Fact p.Prime] (_hp2 : p ≠ 2) (Ω : Type) [Field Ω]
-    [Algebra (O0 p) Ω] (hΩ : IsClo p Ω) (T : Tower p Ω) (τ : Gal p Ω) (hτ : τ ∈ Ggeo (p := p) Ω)
-    (hτq : ∀ n, τ (T.qq n) = T.ζ n * T.qq n) :
-    ∀ g ∈ Ggeo (p := p) Ω, ∀ S : Finset Ω, ∃ s : ℕ, ∃ h ∈ Ggeo (p := p) Ω ⊓ ⨅ n, Gn T n,
-      ∀ x ∈ S, (τ ^ s * h) x = g x := by
+theorem dense_tau_pow_mul
+    (p : ℕ) [Fact p.Prime]
+    (_hp2 : p ≠ 2)
+    (Ω : Type) [Field Ω] [Algebra (O0 p) Ω]
+    (hΩ : IsClo p Ω)
+    (T : Tower p Ω) (τ : Gal p Ω)
+    (hτ : τ ∈ Ggeo (p := p) Ω) (hτq : ∀ n, τ (T.qq n) = T.ζ n * T.qq n)
+    : ∀ g ∈ Ggeo (p := p) Ω, ∀ S : Finset Ω, ∃ s : ℕ, ∃ h ∈ Ggeo (p := p) Ω ⊓ ⨅ n, Gn T n, ∀ x ∈ S,
+      (τ ^ s * h) x = g x := by
   classical
   intro g hg S
   have hs : ∀ n, ∃ s : ℕ, (τ ^ s) (T.qq n) = g (T.qq n) := by

@@ -10,23 +10,28 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.WeilDeligne.SpSummand GlobalTheory.WeilDeligne.SpUnique in
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.perm_of_weilDeligne_special_decomposition_eq :
-    ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-      (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w)
-      (l l' : List (WD h × ℕ)),
-      (∀ p ∈ l, IsIrrWD p.1) → (∀ p ∈ l', IsIrrWD p.1) →
-      sumList (l.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp (h := h) (p.2 + 1)))) =
-        sumList (l'.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp (h := h) (p.2 + 1)))) →
-      l.Perm l' := by
+theorem _root_.GlobalTheory.T.perm_of_weilDeligne_special_decomposition_eq
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w)
+        (l l' : List (WD h × ℕ)),
+      (∀ p ∈ l, IsIrrWD p.1) → (∀ p ∈ l', IsIrrWD p.1)
+        → sumList (l.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp (h := h) (p.2 + 1))))
+          = sumList (l'.map (fun p : WD h × ℕ => p.1.lpChar (WD.lpSp (h := h) (p.2 + 1))))
+        → l.Perm l' := by
   intro E Ω _ _ _ _ _ A w h l l'
   classical
   let F : WD h × ℕ → WD h := fun p => p.1.lpChar (WD.lpSp (h := h) (p.2 + 1))
-  suffices H : ∀ n (l l' : List (WD h × ℕ)), l.length = n → (∀ p ∈ l, IsIrrWD p.1) →
-      (∀ p ∈ l', IsIrrWD p.1) → sumList (l.map F) = sumList (l'.map F) → l.Perm l' from
+  suffices H
+      : ∀ n (l l' : List (WD h × ℕ)),
+        l.length = n → (∀ p ∈ l, IsIrrWD p.1) → (∀ p ∈ l', IsIrrWD p.1)
+          → sumList (l.map F) = sumList (l'.map F)
+          → l.Perm l' from
     H _ l l' rfl
   intro n
   induction n with
@@ -56,8 +61,9 @@ theorem _root_.GlobalTheory.T.perm_of_weilDeligne_special_decomposition_eq :
       rintro rfl
       simp at hn
     obtain ⟨⟨y, k⟩, hp, hmax⟩ : ∃ p ∈ l, ∀ q ∈ l, q.2 ≤ p.2 := by
-      obtain ⟨p, hp, hmax⟩ := l.toFinset.exists_max_image Prod.snd
-        (by obtain ⟨x, hx⟩ := List.exists_mem_of_ne_nil l hne; exact ⟨x, List.mem_toFinset.2 hx⟩)
+      obtain ⟨p, hp, hmax⟩ :=
+        l.toFinset.exists_max_image Prod.snd
+          (by obtain ⟨x, hx⟩ := List.exists_mem_of_ne_nil l hne; exact ⟨x, List.mem_toFinset.2 hx⟩)
       exact ⟨p, List.mem_toFinset.1 hp, fun q hq => hmax q (List.mem_toFinset.2 hq)⟩
     obtain ⟨m, a, rfl, ha⟩ := hl _ hp
 
@@ -97,6 +103,9 @@ theorem _root_.GlobalTheory.T.perm_of_weilDeligne_special_decomposition_eq :
     have hlen : (l.erase p).length = n := by
       rw [List.length_erase_of_mem hp, hn]
       rfl
-    have := ih (l.erase p) (l'.erase p) hlen (fun q hq => hl q (List.mem_of_mem_erase hq))
-      (fun q hq => hl' q (List.mem_of_mem_erase hq)) hc
+    have :=
+      ih (l.erase p) (l'.erase p) hlen
+        (fun q hq => hl q (List.mem_of_mem_erase hq))
+        (fun q hq => hl' q (List.mem_of_mem_erase hq))
+        hc
     exact ((List.perm_cons_erase hp).trans (this.cons p)).trans (List.perm_cons_erase hp').symm

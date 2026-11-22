@@ -8,14 +8,18 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
+  Formalism.MainNotions.ElementDenominator.CongruenceModules
 
 theorem normA_holds {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K LL : FinExt l) : normA P K LL := by
   intro T₁ T₂ F r S η m h up b hA hJ
   unfold Formalism.MainNotions.ElementDenominator.HypA at hA
   obtain ⟨hc1, hc2, hon, _, hj1, hηb, hsum, hjh, hposition⟩ := hA
-  have hT1 : ∀ τ, JumpsInV (P.PD K) T₁.ρ τ
-      (deep (up τ) (min (b τ) (h + 1)) S ∪ Set.Icc (-((min η h : ℕ) : ℤ)) (min η h : ℕ)) := by
+  have hT1
+      : ∀ τ,
+        JumpsInV (P.PD K) T₁.ρ τ
+          (deep (up τ) (min (b τ) (h + 1)) S ∪ Set.Icc (-((min η h : ℕ) : ℤ)) (min η h : ℕ)) := by
     intro τ a ha
     have ha1 := hj1 τ a ha
     have hah := hjh τ a ha
@@ -30,8 +34,18 @@ theorem normA_holds {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K LL : FinExt l) 
       omega
   have hj2h : ∀ τ, JumpsInV (P.PD K) T₂.ρ τ (Set.Icc (-(h : ℤ)) h) := fun τ => hJ τ _ (hjh τ)
   refine ⟨min η h, h + S + 1, fun τ => min (b τ) (h + 1), min_le_left _ _, le_rfl, ?_⟩
-  refine ⟨hc1, hc2, hon, hT1, fun τ => hJ τ _ (hT1 τ), fun τ => ?_, fun τ => ?_, by omega,
-    fun τ => ?_, hposition⟩
+  refine ⟨
+    hc1,
+    hc2,
+    hon,
+    hT1,
+    fun τ => hJ τ _ (hT1 τ),
+    fun τ => ?_,
+    fun τ => ?_,
+    by omega,
+    fun τ => ?_,
+    hposition
+  ⟩
   · have := hηb τ
     show min η h < min (b τ) (h + 1)
     omega

@@ -20,8 +20,10 @@ private lemma ev_uniq (f : Module.End K V) {μ ν : K} {v : V} (hv : v ≠ 0)
   have hd := Module.End.disjoint_genEigenspace f hne ⊤ ⊤
   exact hv ((Submodule.disjoint_def.1 hd) v h1 h2)
 
-private theorem ev_add_lemma {X Y : Module.End K V} (hc : Commute X Y) {v : V} {k l : ℕ}
-    (hk : (X ^ k) v = 0) (hl : (Y ^ l) v = 0) : ((X + Y) ^ (k + l)) v = 0 := by
+private theorem ev_add_lemma
+    {X Y : Module.End K V} (hc : Commute X Y)
+    {v : V} {k l : ℕ} (hk : (X ^ k) v = 0) (hl : (Y ^ l) v = 0)
+    : ((X + Y) ^ (k + l)) v = 0 := by
   rw [hc.add_pow, LinearMap.sum_apply]
   apply Finset.sum_eq_zero
   intro m _
@@ -125,8 +127,7 @@ end
 
 end UpperTheory.V.J
 
-theorem UpperTheory.V.J.muGe :
-    UpperTheory.V.J.MuGe := by
+theorem UpperTheory.V.J.muGe : UpperTheory.V.J.MuGe := by
   intro O Λ B K _ _ _ _ _ _ _ _ _ lam J M _ _ _ _ _ h x t hsep
   letI : Algebra Λ K := (x.comp lam).toAlgebra
   have actAdd : ∀ a b : B, actL lam M h.hs (a + b) = actL lam M h.hs a + actL lam M h.hs b :=
@@ -153,14 +154,17 @@ theorem UpperTheory.V.J.muGe :
     | zero => simp
     | tmul k m =>
       show k ⊗ₜ[Λ] (lam l • m) = x (lam l) • (k ⊗ₜ[Λ] m)
-      rw [← h.hs, ← TensorProduct.smul_tmul, TensorProduct.smul_tmul', smul_eq_mul, Algebra.smul_def]
+      rw [← h.hs, ← TensorProduct.smul_tmul, TensorProduct.smul_tmul', smul_eq_mul,
+        Algebra.smul_def]
       rfl
     | add z w hz hw => rw [map_add (f := _), map_add (f := _), hz, hw]
   have Fann : ∀ a ∈ Module.annihilator B M, F a = 0 := fun a ha => by
     have h0 : actL lam M h.hs a = 0 := LinearMap.ext fun m => (Module.mem_annihilator.1 ha) m
     simp only [F, h0, LinearMap.baseChange_zero]
-  have key : rootMultiplicity (x t) (Polynomial.map (↑(x.comp lam) : Λ →+* K)
-      (LinearMap.charpoly (actL lam M h.hs t))) = Module.finrank K ((F t).maxGenEigenspace (x t)) := by
+  have key
+      : rootMultiplicity (x t)
+          (Polynomial.map (↑(x.comp lam) : Λ →+* K) (LinearMap.charpoly (actL lam M h.hs t)))
+        = Module.finrank K ((F t).maxGenEigenspace (x t)) := by
     rw [LinearMap.finrank_maxGenEigenspace_eq, LinearMap.charpoly_baseChange]
     rfl
   refine (le_of_eq key).trans ?_
@@ -168,23 +172,26 @@ theorem UpperTheory.V.J.muGe :
   apply Submodule.finrank_mono
   refine le_joint F (fun a b => Fcomm a b) x t ?_
   intro χ v hv hall hχt
-  have uniq : ∀ a μ, v ∈ (F a).maxGenEigenspace μ → μ = χ a := fun a μ hμ => ev_uniq (F a) hv hμ (hall a)
-  have χlam : ∀ l, χ (lam l) = x (lam l) := fun l => (uniq _ _ (by rw [Flam]; exact ev_scal _ v)).symm
-  let x' : B →ₐ[O] K :=
-    { toFun := χ
-      map_one' := by
-        have e := χlam 1
-        rwa [map_one, map_one] at e
-      map_mul' := fun a b =>
-        (uniq (a * b) (χ a * χ b) (by rw [Fmul]; exact ev_mul (Fcomm a b) (hall a) (hall b))).symm
-      map_zero' := by
-        have e := χlam 0
-        rwa [map_zero, map_zero] at e
-      map_add' := fun a b =>
-        (uniq (a + b) (χ a + χ b) (by rw [Fadd]; exact ev_add (Fcomm a b) (hall a) (hall b))).symm
-      commutes' := fun c => by
-        show χ (algebraMap O B c) = algebraMap O K c
-        rw [← lam.commutes c, χlam, lam.commutes c, x.commutes c] }
+  have uniq : ∀ a μ, v ∈ (F a).maxGenEigenspace μ → μ = χ a := fun a μ hμ =>
+    ev_uniq (F a) hv hμ (hall a)
+  have χlam : ∀ l, χ (lam l) = x (lam l) := fun l =>
+    (uniq _ _ (by rw [Flam]; exact ev_scal _ v)).symm
+  let x' : B →ₐ[O] K := {
+    toFun := χ
+    map_one' := by
+      have e := χlam 1
+      rwa [map_one, map_one] at e
+    map_mul' := fun a b =>
+      (uniq (a * b) (χ a * χ b) (by rw [Fmul]; exact ev_mul (Fcomm a b) (hall a) (hall b))).symm
+    map_zero' := by
+      have e := χlam 0
+      rwa [map_zero, map_zero] at e
+    map_add' := fun a b =>
+      (uniq (a + b) (χ a + χ b) (by rw [Fadd]; exact ev_add (Fcomm a b) (hall a) (hall b))).symm
+    commutes' := fun c => by
+      show χ (algebraMap O B c) = algebraMap O K c
+      rw [← lam.commutes c, χlam, lam.commutes c, x.commutes c]
+  }
   have hJ : J ≤ RingHom.ker x' := by
     intro j hj
     rw [RingHom.mem_ker]

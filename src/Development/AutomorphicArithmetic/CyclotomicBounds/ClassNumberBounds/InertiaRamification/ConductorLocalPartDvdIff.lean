@@ -54,9 +54,9 @@ private lemma localUnits_proj (x : (ZMod N)ˣ)
   · rw [crt_fst]; rfl
   · rw [crt_snd]; exact (congrArg Units.val hx).symm
 
-theorem localUnits_spec :
-    Function.Injective (localUnits N l) ∧ (localUnits N l).range = inertiaUnits N l ∧
-      ∀ u, ZMod.unitsMap (Nat.ordProj_dvd N l) (localUnits N l u) = u := by
+theorem localUnits_spec
+    : Function.Injective (localUnits N l) ∧ (localUnits N l).range = inertiaUnits N l
+      ∧ ∀ u, ZMod.unitsMap (Nat.ordProj_dvd N l) (localUnits N l u) = u := by
   refine ⟨Function.LeftInverse.injective (proj_localUnits l), ?_, proj_localUnits l⟩
   ext x
   constructor
@@ -122,17 +122,17 @@ private lemma conductor_localPart_dvd_iff (ψ : DirichletCharacter ℂ N) (t : �
     rw [← Nat.ordProj_mul_ordCompl_eq_self ψ.conductor l]
     exact Nat.mul_dvd_mul (pow_dvd_pow l h) (Nat.ordCompl_dvd_ordCompl_of_dvd hcN l)
 
-theorem localPart_eq_one_iff (ψ : DirichletCharacter ℂ N) :
-    (localPart N l ψ = 1 ↔ ∀ u ∈ inertiaUnits N l, ψ (u : ZMod N) = 1) ∧
-      (localPart N l ψ = 1 ↔ ¬ l ∣ ψ.conductor) := by
+theorem localPart_eq_one_iff (ψ : DirichletCharacter ℂ N)
+    : (localPart N l ψ = 1 ↔ ∀ u ∈ inertiaUnits N l, ψ (u : ZMod N) = 1)
+      ∧ (localPart N l ψ = 1 ↔ ¬ l ∣ ψ.conductor) := by
   have hl : l.Prime := Fact.out
   have : NeZero (ordProj[l] N) := ⟨(Nat.ordProj_pos N l).ne'⟩
   constructor
   · rw [← (localUnits_spec l).2.1]
     constructor
     · rintro h _ ⟨u, rfl⟩
-      have := congrArg (fun χ : DirichletCharacter ℂ (ordProj[l] N) =>
-        χ (u : ZMod (ordProj[l] N))) h
+      have :=
+        congrArg (fun χ : DirichletCharacter ℂ (ordProj[l] N) => χ (u : ZMod (ordProj[l] N))) h
       simpa [localPart] using this
     · intro h
       ext u

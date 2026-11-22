@@ -14,9 +14,10 @@ namespace GroundTheory.Heights₂.Heights
 
 namespace HadamardGramBound
 
-theorem det_gram_le_prod_norm_sq {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
-    {n : ℕ} (w : Fin n → V) (hw : LinearIndependent ℝ w) :
-    (Matrix.gram ℝ w).det ≤ ∏ i, ‖w i‖ ^ 2 := by
+theorem det_gram_le_prod_norm_sq
+    {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
+    {n : ℕ} (w : Fin n → V) (hw : LinearIndependent ℝ w)
+    : (Matrix.gram ℝ w).det ≤ ∏ i, ‖w i‖ ^ 2 := by
   set K := Submodule.span ℝ (Set.range w)
   have hK : Module.finrank ℝ K = Fintype.card (Fin n) := finrank_span_eq_card hw
   have : FiniteDimensional ℝ K := FiniteDimensional.span_of_finite ℝ (Set.finite_range w)

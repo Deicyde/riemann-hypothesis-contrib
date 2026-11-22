@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.InnerRepK
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.Dec.FormF
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.Dec.FormF
 open scoped InnerProductSpace ComplexOrder
 
 namespace GlobalTheory.PsiBound
@@ -123,8 +124,10 @@ lemma weighted_bound {α : Type*} [MeasurableSpace α] (μ : Measure α) (d : �
 
 section Tau
 
-variable {n : ℕ} {ε : Fin n → Bool} {abelian₂ : Fin n → ℝ} {W : Type} [NormedAddCommGroup W]
-  [InnerProductSpace ℂ W] {τ : Matrix (Fin n) (Fin n) ℂ → (W →L[ℂ] W)} {w : W}
+variable
+  {n : ℕ} {ε : Fin n → Bool} {abelian₂ : Fin n → ℝ} {W : Type}
+  [NormedAddCommGroup W] [InnerProductSpace ℂ W]
+  {τ : Matrix (Fin n) (Fin n) ℂ → (W →L[ℂ] W)} {w : W}
 
 lemma isURepOn_of_isTau (h : IsTau ε abelian₂ τ w) : IsURepOn (Kset ε) τ := by
   obtain ⟨hW, hrep, hdiff, hadj, -⟩ := h

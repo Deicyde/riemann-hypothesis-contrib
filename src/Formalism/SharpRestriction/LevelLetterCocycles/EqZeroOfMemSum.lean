@@ -10,29 +10,33 @@ noncomputable section
 
 namespace Formalism.MainNotions.RamifiedCoefficientChains.S9.Hodge
 
-open Module Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct
+open Module Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct
 
 section Comp
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    (ρ : Representation LL G V)
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+  (ρ : Representation LL G V)
 
-theorem mulVdR_of_mem {τ : K →ₐ[Qp] LL} {y : V ⊗[Qp] BdR} (hy : y ∈ DdRE PD ρ τ) (c : K) :
-    mulVdR (K := K) (BdR := BdR) (V := V) (LL := LL) c y = τ c • y := by
+theorem mulVdR_of_mem {τ : K →ₐ[Qp] LL} {y : V ⊗[Qp] BdR} (hy : y ∈ DdRE PD ρ τ) (c : K)
+    : mulVdR (K := K) (BdR := BdR) (V := V) (LL := LL) c y = τ c • y := by
   have h := (Submodule.mem_iInf _).mp (Submodule.mem_inf.mp hy).2 c
-  rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply, sub_eq_zero] at h
+  rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply, sub_eq_zero]
+    at h
   exact h
 
-theorem eq_zero_of_mem_sum (τ : K →ₐ[Qp] LL) :
-    ∀ (s : Finset (K →ₐ[Qp] LL)), τ ∉ s → ∀ y ∈ DdRE PD ρ τ,
-      y ∈ ⨆ τ' ∈ s, DdRE PD ρ τ' → y = 0 := by
+theorem eq_zero_of_mem_sum (τ : K →ₐ[Qp] LL)
+    : ∀ (s : Finset (K →ₐ[Qp] LL)),
+      τ ∉ s → ∀ y ∈ DdRE PD ρ τ, y ∈ ⨆ τ' ∈ s, DdRE PD ρ τ' → y = 0 := by
   classical
   intro s
   induction s using Finset.induction_on with
@@ -70,9 +74,11 @@ theorem eq_zero_of_mem_sum (τ : K →ₐ[Qp] LL) :
     have h2 := ih hτs _ (Submodule.smul_mem _ _ hyτ) h1
     exact (smul_eq_zero.mp h2).resolve_left (sub_ne_zero.mpr hc)
 
-theorem mem_of_mem_filC (τ : K →ₐ[Qp] LL) (F : Submodule LL (V ⊗[Qp] BdR)) (hF : F ≤ DdRE PD ρ τ)
-    {x : V ⊗[Qp] BdR} (hx : x ∈ DdRE PD ρ τ)
-    (h : x ∈ F ⊔ ⨆ (τ' : K →ₐ[Qp] LL) (_ : τ' ≠ τ), DdRE PD ρ τ') : x ∈ F := by
+theorem mem_of_mem_filC
+    (τ : K →ₐ[Qp] LL) (F : Submodule LL (V ⊗[Qp] BdR)) (hF : F ≤ DdRE PD ρ τ)
+    {x : V ⊗[Qp] BdR}
+    (hx : x ∈ DdRE PD ρ τ) (h : x ∈ F ⊔ ⨆ (τ' : K →ₐ[Qp] LL) (_ : τ' ≠ τ), DdRE PD ρ τ')
+    : x ∈ F := by
   classical
   obtain ⟨f, hf, z, hz, hfz⟩ := Submodule.mem_sup.mp h
   obtain ⟨s, hs⟩ := Submodule.mem_iSup_iff_exists_finset.mp hz
@@ -87,8 +93,10 @@ theorem mem_of_mem_filC (τ : K →ₐ[Qp] LL) (F : Submodule LL (V ⊗[Qp] BdR)
   rw [← hfz, hz0, add_zero]
   exact hf
 
-theorem fildR_eq_bot (τ : K →ₐ[Qp] LL) [FiniteDimensional LL ↥(DdRE PD ρ τ)] (b : ℤ)
-    (hj : JumpsInV PD ρ τ (Set.Iic (-b))) : ∀ a : ℤ, -b < a → FildR PD ρ τ a = ⊥ := by
+theorem fildR_eq_bot
+    (τ : K →ₐ[Qp] LL) [FiniteDimensional LL ↥(DdRE PD ρ τ)]
+    (b : ℤ) (hj : JumpsInV PD ρ τ (Set.Iic (-b)))
+    : ∀ a : ℤ, -b < a → FildR PD ρ τ a = ⊥ := by
   intro a ha
   obtain ⟨hi, hhi⟩ := Formalism.MainNotions.N.Pv.LocalLengthBound.rk_fildR_hi (PD := PD) (ρ := ρ) τ
   have hstep : ∀ c : ℤ, -b < c → FildR PD ρ τ c = FildR PD ρ τ (c + 1) := by

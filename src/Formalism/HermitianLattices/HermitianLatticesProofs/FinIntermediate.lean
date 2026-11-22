@@ -18,8 +18,10 @@ theorem finIntermediate : FinIntermediate := by
       SetLike.coe_injective
   refine Set.Finite.of_finite_image (f := f) (Set.toFinite _) ?_
   intro M hM N hN hMN
-  have key : ∀ M : AddSubgroup W, P ≤ M → M ≤ Q →
-      (f M).comap (QuotientAddGroup.mk' (P.addSubgroupOf Q)) = M.addSubgroupOf Q := by
+  have key
+      : ∀ M : AddSubgroup W,
+        P ≤ M → M ≤ Q
+          → (f M).comap (QuotientAddGroup.mk' (P.addSubgroupOf Q)) = M.addSubgroupOf Q := by
     intro M hPM _
     simp only [f]
     rw [AddSubgroup.comap_map_eq, QuotientAddGroup.ker_mk']

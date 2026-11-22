@@ -41,8 +41,8 @@ theorem pmat_inP {ε : Fin n → Bool} (z : PCoord ε → ℂ) : inP ε (pmat z)
   rw [(pmat_isHermitian z).eq, h2]
   simp
 
-theorem pmat_coords {ε : Fin n → Bool} (X : Matrix (Fin n) (Fin n) ℂ) (hX : inP ε X) :
-    pmat (fun ab : PCoord ε => X ab.1.1 ab.1.2) = X := by
+theorem pmat_coords {ε : Fin n → Bool} (X : Matrix (Fin n) (Fin n) ℂ) (hX : inP ε X)
+    : pmat (fun ab : PCoord ε => X ab.1.1 ab.1.2) = X := by
   obtain ⟨hG, hJ⟩ := hX
   unfold inG at hG
   have hent : ∀ a b, X a b * (if ε b then 1 else -1) = -((if ε a then 1 else -1) * X a b) := by
@@ -53,11 +53,8 @@ theorem pmat_coords {ε : Fin n → Bool} (X : Matrix (Fin n) (Fin n) ℂ) (hX :
     intro a b hab
     have h := hent a b
     rw [hab] at h
-    cases hb : ε b <;> simp [hb] at h <;>
-      first
-        | exact h
-        | linear_combination h / 2
-        | linear_combination (-1 / 2 : ℂ) * h
+    cases hb : ε b <;> simp [hb] at h
+      <;> first | exact h | linear_combination h / 2 | linear_combination (-1 / 2 : ℂ) * h
   have hJJ : Jm ε * Jm ε = 1 := by
     unfold Jm
     rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
@@ -68,7 +65,9 @@ theorem pmat_coords {ε : Fin n → Bool} (X : Matrix (Fin n) (Fin n) ℂ) (hX :
     have h1 : Xᴴ * Jm ε = X * Jm ε := by
       rw [hJ]
       exact eq_neg_of_add_eq_zero_left hG
-    calc Xᴴ = Xᴴ * Jm ε * Jm ε := by rw [mul_assoc, hJJ, mul_one]
+    calc
+      Xᴴ
+        = Xᴴ * Jm ε * Jm ε := by rw [mul_assoc, hJJ, mul_one]
       _ = X * Jm ε * Jm ε := by rw [h1]
       _ = X := by rw [mul_assoc, hJJ, mul_one]
   ext a b
@@ -145,15 +144,18 @@ theorem sum_pev {ε : Fin n → Bool} (z : PCoord ε → ℂ) : ∑ a, pev z a =
 theorem card_PCoord (ε : Fin n → Bool) : Fintype.card (PCoord ε) = pOf ε * qOf ε := by
   classical
   rw [Fintype.card_subtype, pOf, qOf, ← Finset.card_product]
-  refine Finset.card_nbij' (fun ab => if ε ab.1 then ab else (ab.2, ab.1))
-    (fun xy => (max xy.1 xy.2, min xy.1 xy.2)) ?_ ?_ ?_ ?_
+  refine Finset.card_nbij'
+    (fun ab => if ε ab.1 then ab else (ab.2, ab.1))
+    (fun xy => (max xy.1 xy.2, min xy.1 xy.2))
+    ?_ ?_ ?_ ?_
   · rintro ⟨a, b⟩ h
     simp only [Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq] at h
     obtain ⟨hba, hne⟩ := h
     cases ha : ε a <;> cases hb : ε b <;> simp_all
   · rintro ⟨x, y⟩ h
     simp only [Finset.coe_product, Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_prod,
-      Set.mem_setOf_eq] at h
+        Set.mem_setOf_eq]
+      at h
     obtain ⟨hx, hy⟩ := h
     have hxy : x ≠ y := by
       intro e
@@ -175,7 +177,8 @@ theorem card_PCoord (ε : Fin n → Bool) : Fintype.card (PCoord ε) = pOf ε * 
       rw [max_eq_left hba.le, min_eq_right hba.le]
   · rintro ⟨x, y⟩ h
     simp only [Finset.coe_product, Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_prod,
-      Set.mem_setOf_eq] at h
+        Set.mem_setOf_eq]
+      at h
     obtain ⟨hx, hy⟩ := h
     have hxy : x ≠ y := by
       intro e

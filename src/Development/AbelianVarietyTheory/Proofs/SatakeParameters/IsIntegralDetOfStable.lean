@@ -6,18 +6,24 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MulVSubRi
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 Formalism.L2.Ker GlobalTheory.RatEqui
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.StandardLatticesGL3 Formalism.L2.Ker GlobalTheory.RatEqui
 
 namespace GlobalTheory.DetStab
 
-theorem isIntegral_det_of_stable {R E : Type} [CommRing R] [IsNoetherianRing R] [Field E] [Algebra R E] {n : ℕ}
+theorem isIntegral_det_of_stable
+    {R E : Type} [CommRing R] [IsNoetherianRing R] [Field E] [Algebra R E]
+    {n : ℕ}
     (L : Submodule R (Fin n → E)) (hfg : L.FG) (hsp : Submodule.span E (L : Set (Fin n → E)) = ⊤)
-    (γ : Matrix (Fin n) (Fin n) E) (hγ : ∀ v ∈ L, γ.mulVec v ∈ L) : IsIntegral R γ.det := by
+    (γ : Matrix (Fin n) (Fin n) E) (hγ : ∀ v ∈ L, γ.mulVec v ∈ L)
+    : IsIntegral R γ.det := by
   classical
-  let N : Submodule R E := Submodule.span R {x | ∃ w : Fin n → L, x = (Matrix.of fun i => (w i : Fin n → E)).det}
+  let N : Submodule R E :=
+    Submodule.span R {x | ∃ w : Fin n → L, x = (Matrix.of fun i => (w i : Fin n → E)).det}
   let M : Submodule R E := ⨆ j : Fin n, L.map (LinearMap.proj j : (Fin n → E) →ₗ[R] E)
   have hM : M.FG := Submodule.fg_iSup _ fun j => hfg.map (LinearMap.proj j : (Fin n → E) →ₗ[R] E)
-  have hprod : ∀ (s : Finset (Fin n)) (f : Fin n → E), (∀ i, f i ∈ M) → ∏ i ∈ s, f i ∈ M ^ s.card := by
+  have hprod
+      : ∀ (s : Finset (Fin n)) (f : Fin n → E), (∀ i, f i ∈ M) → ∏ i ∈ s, f i ∈ M ^ s.card := by
     intro s f hf
     induction s using Finset.induction_on with
     | empty =>
@@ -38,7 +44,10 @@ theorem isIntegral_det_of_stable {R E : Type} [CommRing R] [IsNoetherianRing R] 
   have hne : N ≠ ⊥ := by
     intro h
     have h0 : (Matrix.detRowAlternating (n := Fin n) (R := E)).toMultilinearMap = 0 := by
-      refine MultilinearMap.ext_of_span_eq_top (g := fun _ (x : L) => (x : Fin n → E)) (fun _ => ?_) fun w => ?_
+      refine MultilinearMap.ext_of_span_eq_top
+        (g := fun _ (x : L) => (x : Fin n → E))
+        (fun _ => ?_)
+        fun w => ?_
       · rw [← hsp]; congr 1; exact Subtype.range_coe
       · have : (Matrix.of fun i => (w i : Fin n → E)).det ∈ N := Submodule.subset_span ⟨w, rfl⟩
         rw [h] at this
@@ -59,9 +68,11 @@ theorem isIntegral_det_of_stable {R E : Type} [CommRing R] [IsNoetherianRing R] 
   | add x y _ _ hx hy => rw [smul_add]; exact N.add_mem hx hy
   | smul r x _ hx => rw [smul_comm]; exact N.smul_mem r hx
 
-theorem prod_emb_det_eq_one (D : D7) (χ : IdE D → ℂ) (hχ : IsChi D χ) (n : ℕ)
-    (L : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) (hL : SD D L) (γ : Matrix (Fin n) (Fin n) D.host.E)
-    (hu : γ * adj D γ = 1) (hs : ∀ v, v ∈ L ↔ γ.mulVec v ∈ L) : ∏ τ, embT D τ γ.det = 1 := by
+theorem prod_emb_det_eq_one
+    (D : D7) (χ : IdE D → ℂ) (hχ : IsChi D χ)
+    (n : ℕ) (L : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) (hL : SD D L)
+    (γ : Matrix (Fin n) (Fin n) D.host.E) (hu : γ * adj D γ = 1) (hs : ∀ v, v ∈ L ↔ γ.mulVec v ∈ L)
+    : ∏ τ, embT D τ γ.det = 1 := by
   letI := D.host.cmStar
   obtain ⟨hfg, hsp, -⟩ := hL
   have hstar : ∀ x : D.host.E, star x = D.host.conj x := by
@@ -79,11 +90,13 @@ theorem prod_emb_det_eq_one (D : D7) (χ : IdE D → ℂ) (hχ : IsChi D χ) (n 
     rw [Unitary.mem_iff, hstar, ← hadj]
     exact ⟨by rw [mul_comm, hd], hd⟩
   have i1 := isIntegral_det_of_stable L hfg hsp γ fun v hv => (hs v).1 hv
-  have i2 := isIntegral_det_of_stable L hfg hsp (adj D γ) fun v hv => (hs _).2 (by
-    rw [Matrix.mulVec_mulVec, hu, Matrix.one_mulVec]; exact hv)
+  have i2 :=
+    isIntegral_det_of_stable L hfg hsp (adj D γ) fun v hv =>
+      (hs _).2 (by rw [Matrix.mulVec_mulVec, hu, Matrix.one_mulVec]; exact hv)
   obtain ⟨a, ha⟩ := (IsIntegrallyClosed.isIntegral_iff (R := 𝓞 D.host.E)).1 i1
   obtain ⟨b, hb⟩ := (IsIntegrallyClosed.isIntegral_iff (R := 𝓞 D.host.E)).1 i2
-  have hspan : Submodule.span (𝓞 D.host.E) {γ.det} = Submodule.span (𝓞 D.host.E) {(1 : D.host.E)} := by
+  have hspan
+      : Submodule.span (𝓞 D.host.E) {γ.det} = Submodule.span (𝓞 D.host.E) {(1 : D.host.E)} := by
     apply le_antisymm
     · rw [Submodule.span_singleton_le_iff_mem, Submodule.mem_span_singleton]
       exact ⟨a, by rw [Algebra.smul_def, ha, mul_one]⟩

@@ -12,32 +12,35 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SiegelPrePull
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZM GlobalTheory.SiegLev GlobalTheory.SiegelTor
 open scoped CategoryTheory.Obj
 
 noncomputable section
 namespace GlobalTheory.SiegelTangent
 
-theorem cycAway_dualNumber_factor {n : ℕ} (hn : n ≠ 0) (K : Type) [Field K] (β : cycAway n →+* DualNumber K) :
-    ∃ β₀ : cycAway n →+* K, β = (algebraMap K (DualNumber K)).comp β₀ := by
+theorem cycAway_dualNumber_factor
+    {n : ℕ} (hn : n ≠ 0) (K : Type) [Field K] (β : cycAway n →+* DualNumber K)
+    : ∃ β₀ : cycAway n →+* K, β = (algebraMap K (DualNumber K)).comp β₀ := by
   let π : DualNumber K →+* K := (TrivSqZeroExt.fstHom K K K).toRingHom
   have hnK : (n : K) ≠ 0 := by
     have := ((isUnit_natCast hn).map (π.comp β)).ne_zero
     simpa using this
-  let S : Subring (cycAway n) :=
-    { carrier := {x | TrivSqZeroExt.snd (β x) = 0}
-      mul_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq, map_mul, TrivSqZeroExt.snd_mul] at *
-        simp [ha, hb]
-      one_mem' := by simp
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq, map_add (f := _), TrivSqZeroExt.snd_add] at *
-        simp [ha, hb]
-      zero_mem' := by simp
-      neg_mem' := fun {a} ha => by
-        simp only [Set.mem_setOf_eq, map_neg, TrivSqZeroExt.snd_neg] at *
-        simp [ha] }
+  let S : Subring (cycAway n) := {
+    carrier := {x | TrivSqZeroExt.snd (β x) = 0}
+    mul_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq, map_mul, TrivSqZeroExt.snd_mul] at *
+      simp [ha, hb]
+    one_mem' := by simp
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq, map_add (f := _), TrivSqZeroExt.snd_add] at *
+      simp [ha, hb]
+    zero_mem' := by simp
+    neg_mem' := fun {a} ha => by
+      simp only [Set.mem_setOf_eq, map_neg, TrivSqZeroExt.snd_neg] at *
+      simp [ha]
+  }
   have hζ : zetaAway n ∈ S := by
     have hz : zetaAway n ^ n = 1 := Subtype.ext (Complex.isPrimitiveRoot_exp n hn).pow_eq_one
     have h1 : β (zetaAway n) ^ n = 1 := by rw [← map_pow, hz, map_one]
@@ -62,7 +65,8 @@ theorem cycAway_dualNumber_factor {n : ℕ} (hn : n ≠ 0) (K : Type) [Field K] 
     have h1 : (n : DualNumber K) * β u = 1 := by rw [← map_natCast β, ← map_mul, hu, map_one]
     have h2 := congrArg TrivSqZeroExt.snd h1
     simp only [TrivSqZeroExt.snd_mul, TrivSqZeroExt.snd_one, TrivSqZeroExt.fst_natCast,
-      TrivSqZeroExt.snd_natCast, smul_zero, add_zero, smul_eq_mul] at h2
+        TrivSqZeroExt.snd_natCast, smul_zero, add_zero, smul_eq_mul]
+      at h2
     show TrivSqZeroExt.snd (β u) = 0
     rcases mul_eq_zero.1 h2 with h | h
     · exact absurd h hnK
@@ -84,35 +88,48 @@ theorem cycAway_dualNumber_factor {n : ℕ} (hn : n ≠ 0) (K : Type) [Field K] 
   · rfl
   · exact (hall x).trans (TrivSqZeroExt.snd_inl _ _).symm
 
-theorem classified_dualNumber : ∀ (g n : ℕ), 1 ≤ g → 3 ≤ n → Odd n → ∀ F : SFam g n (zetaAway n), ∀ (K : Type) [Field K]
-    (β : cycAway n →+* DualNumber K) (c : SiegPre g n (zetaAway n) (spMap β)), c.Principal →
-    ∃ f : Sp (DualNumber K) ⟶ F.X, f ≫ F.s = spMap β ∧ SiegPB c F.univ f := by
+theorem classified_dualNumber
+    : ∀ (g n : ℕ),
+      1 ≤ g → 3 ≤ n → Odd n
+        → ∀ F : SFam g n (zetaAway n),
+          ∀ (K : Type) [Field K] (β : cycAway n →+* DualNumber K)
+              (c : SiegPre g n (zetaAway n) (spMap β)),
+            c.Principal → ∃ f : Sp (DualNumber K) ⟶ F.X, f ≫ F.s = spMap β ∧ SiegPB c F.univ f := by
   intro g n hg hn hodd F K _ β c hc
   have hn0 : n ≠ 0 := by omega
   obtain ⟨β₀, rfl⟩ := cycAway_dualNumber_factor hn0 K β
   let L := AlgebraicClosure K
-  obtain ⟨ψ, h1, -, hfl, hsurj⟩ := GlobalTheory.DualOpen.dualNumber_map_flat_surjective K L (algebraMap K L)
-  have hff : ψ.FaithfullyFlat := (flat_and_surjective_SpecMap_iff (CommRingCat.ofHom ψ)).1 ⟨hfl, hsurj⟩
+  obtain ⟨ψ, h1, -, hfl, hsurj⟩ :=
+    GlobalTheory.DualOpen.dualNumber_map_flat_surjective K L (algebraMap K L)
+  have hff : ψ.FaithfullyFlat :=
+    (flat_and_surjective_SpecMap_iff (CommRingCat.ofHom ψ)).1 ⟨hfl, hsurj⟩
   letI : Algebra (DualNumber K) (DualNumber L) := ψ.toAlgebra
   haveI : Module.FaithfullyFlat (DualNumber K) (DualNumber L) := RingHom.faithfullyFlat_algebraMap_iff.1 hff
-  refine GlobalTheory.T.siegelFamily_classified_of_faithfullyFlat g n hg hn hodd F (DualNumber K) (DualNumber L) _ c hc ?_
+  refine GlobalTheory.T.siegelFamily_classified_of_faithfullyFlat g n hg hn hodd F (DualNumber K)
+    (DualNumber L) _ c hc ?_
   intro c' hc'
   have hp : c'.Principal := by
-    refine (GlobalTheory.SiegelRingChange.siegPre_pull_ringChange g n (cycAway n) (cycAway n) (zetaAway n) (zetaAway n)
-      (RingHom.id _) _ _ (spMap ((algebraMap K (DualNumber K)).comp β₀))
-      (spMap ((algebraMap (DualNumber K) (DualNumber L)).comp ((algebraMap K (DualNumber K)).comp β₀)))
+    refine (GlobalTheory.SiegelRingChange.siegPre_pull_ringChange g n (cycAway n) (cycAway n)
+      (zetaAway n) (zetaAway n) (RingHom.id _) _ _ (spMap ((algebraMap K (DualNumber K)).comp β₀))
+      (spMap ((algebraMap (DualNumber K) (DualNumber L)).comp
+        ((algebraMap K (DualNumber K)).comp β₀)))
       (spMap (algebraMap (DualNumber K) (DualNumber L))) rfl ?_).2.1 c c' hc' hc
     rw [GlobalTheory.SiegelRingChange.spMap_comp']
     simp [spMap]
-  have e : (algebraMap (DualNumber K) (DualNumber L)).comp ((algebraMap K (DualNumber K)).comp β₀) =
-      (algebraMap L (DualNumber L)).comp ((algebraMap K L).comp β₀) := by
+  have e
+      : (algebraMap (DualNumber K) (DualNumber L)).comp ((algebraMap K (DualNumber K)).comp β₀)
+        = (algebraMap L (DualNumber L)).comp ((algebraMap K L).comp β₀) := by
     rw [← RingHom.comp_assoc, ← RingHom.comp_assoc]
     exact congrArg (fun q => q.comp β₀) h1
-  have key : ∀ b : cycAway n →+* DualNumber L, b = (algebraMap L (DualNumber L)).comp ((algebraMap K L).comp β₀) →
-      ∀ c' : SiegPre g n (zetaAway n) (spMap b), c'.Principal →
-      ∃ f : Sp (DualNumber L) ⟶ F.X, f ≫ F.s = spMap b ∧ SiegPB c' F.univ f := by
+  have key
+      : ∀ b : cycAway n →+* DualNumber L,
+        b = (algebraMap L (DualNumber L)).comp ((algebraMap K L).comp β₀)
+          → ∀ c' : SiegPre g n (zetaAway n) (spMap b),
+            c'.Principal
+              → ∃ f : Sp (DualNumber L) ⟶ F.X, f ≫ F.s = spMap b ∧ SiegPB c' F.univ f := by
     rintro b rfl c' hc'
-    exact GlobalTheory.T.siegel_point_lifts_to_dual_numbers g n hg hn hodd F L ((algebraMap K L).comp β₀) c' hc'
+    exact GlobalTheory.T.siegel_point_lifts_to_dual_numbers g n hg hn hodd F L
+      ((algebraMap K L).comp β₀) c' hc'
   exact key _ e c' hp
 
 end GlobalTheory.SiegelTangent

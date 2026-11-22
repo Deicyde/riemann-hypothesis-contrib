@@ -12,8 +12,9 @@ open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.G.GLWeigh
 
 section Dual
 
-variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {p : ℕ}
-  {V : Type} [AddCommGroup V] [Module (KK O) V] [Module O V] [IsScalarTower O (KK O) V]
+variable
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {p : ℕ} {V : Type} [AddCommGroup V] [Module (KK O) V] [Module O V] [IsScalarTower O (KK O) V]
 
 theorem vLE_ne_zero' {κ : KK O} {D : ℝ} (h : vLE p κ D) : κ ≠ 0 := by
   rintro rfl
@@ -24,14 +25,16 @@ theorem vLE_ne_zero' {κ : KK O} {D : ℝ} (h : vLE p κ D) : κ ≠ 0 := by
 theorem nv_irr' {w : O} (hw : Irreducible w) : dvrOrderNat w = 1 := by
   simp [dvrOrderNat, IsDiscreteValuationRing.addVal_uniformizer hw]
 
-theorem vK_int_form (x : KK O) (hx : x ≠ 0) : ∃ k : ℤ, vK p x = (((k : ℚ) / (ramE p O : ℚ) : ℚ) : WithTop ℚ) := by
+theorem vK_int_form (x : KK O) (hx : x ≠ 0)
+    : ∃ k : ℤ, vK p x = (((k : ℚ) / (ramE p O : ℚ) : ℚ) : WithTop ℚ) := by
   unfold vK ordW
   rw [if_neg hx]
   exact ⟨_, rfl⟩
 
-theorem vK_le_zero_of_not_int (S : UniformizedDVR p O) (a : KK O)
-    (h : ¬ (0 : WithTop ℚ) ≤ vK p (a * (algebraMap O (KK O) S.w)⁻¹)) :
-    ∃ q : ℚ, vK p a = (q : WithTop ℚ) ∧ q ≤ 0 := by
+theorem vK_le_zero_of_not_int
+    (S : UniformizedDVR p O) (a : KK O)
+    (h : ¬ (0 : WithTop ℚ) ≤ vK p (a * (algebraMap O (KK O) S.w)⁻¹))
+    : ∃ q : ℚ, vK p a = (q : WithTop ℚ) ∧ q ≤ 0 := by
   have hw0 : S.w ≠ 0 := S.w_irr.ne_zero
   have hw0' : algebraMap O (KK O) S.w ≠ 0 :=
     (map_ne_zero_iff _ (IsFractionRing.injective O (KK O))).2 hw0
@@ -44,8 +47,8 @@ theorem vK_le_zero_of_not_int (S : UniformizedDVR p O) (a : KK O)
     rw [zero_mul, valuation_zero_alt]
     exact le_top
   obtain ⟨k, hk⟩ := vK_int_form a ha
-  have hwinv : vK p ((algebraMap O (KK O) S.w)⁻¹) =
-      (((-1 : ℚ) / (ramE p O : ℚ) : ℚ) : WithTop ℚ) := by
+  have hwinv
+      : vK p ((algebraMap O (KK O) S.w)⁻¹) = (((-1 : ℚ) / (ramE p O : ℚ) : ℚ) : WithTop ℚ) := by
     rw [valuation_eq_of_fraction p _ 1 S.w one_ne_zero hw0 (by rw [inv_mul_cancel₀ hw0', map_one]),
       nv_irr' S.w_irr]
     simp [dvrOrderNat]
@@ -64,9 +67,12 @@ theorem vK_le_zero_of_not_int (S : UniformizedDVR p O) (a : KK O)
   have h5 : (k : ℚ) ≤ 0 := by exact_mod_cast (by omega : k ≤ 0)
   exact div_nonpos_of_nonpos_of_nonneg h5 hepos.le
 
-theorem be_sum_left (be : V → V → KK O) (hsm : ∀ (a : KK O) (u v : V), be (a • u) v = a * be u v)
-    (hadd : ∀ u u' v, be (u + u') v = be u v + be u' v) {n : ℕ} (a : Fin n → KK O) (x : Fin n → V) (v : V) :
-    be (∑ i, a i • x i) v = ∑ i, a i * be (x i) v := by
+theorem be_sum_left
+    (be : V → V → KK O) (hsm : ∀ (a : KK O) (u v : V), be (a • u) v = a * be u v)
+    (hadd : ∀ u u' v, be (u + u') v = be u v + be u' v)
+    {n : ℕ} (a : Fin n → KK O) (x : Fin n → V)
+    (v : V)
+    : be (∑ i, a i • x i) v = ∑ i, a i * be (x i) v := by
   classical
   have h0 : be 0 v = 0 := by
     have := hsm 0 0 v
@@ -75,12 +81,15 @@ theorem be_sum_left (be : V → V → KK O) (hsm : ∀ (a : KK O) (u v : V), be 
   | empty => simp [h0]
   | insert i s hi ih => rw [Finset.sum_insert hi, Finset.sum_insert hi, hadd, hsm, ih]
 
-theorem goodSub_of_dual (S : UniformizedDVR p O) (be : V → V → KK O)
-    (hsm : ∀ (a : KK O) (u v : V), be (a • u) v = a * be u v)
+theorem goodSub_of_dual
+    (S : UniformizedDVR p O)
+    (be : V → V → KK O) (hsm : ∀ (a : KK O) (u v : V), be (a • u) v = a * be u v)
     (hadd : ∀ u u' v, be (u + u') v = be u v + be u' v)
-    (L : Submodule O V) {n : ℕ} (x y : Fin n → V) (hx : ∀ i, x i ∈ L) (hy : ∀ i, y i ∈ L)
-    (c : KK O) (hxy : ∀ i j, be (x i) (y j) = if i = j then c else 0) (D : ℝ) (hc : vLE p c D) :
-    ∃ L₂ : Submodule O V, GoodSub p be L L₂ D ∧ n ≤ Module.finrank O L₂ := by
+    (L : Submodule O V)
+    {n : ℕ} (x y : Fin n → V) (hx : ∀ i, x i ∈ L) (hy : ∀ i, y i ∈ L)
+    (c : KK O) (hxy : ∀ i j, be (x i) (y j) = if i = j then c else 0)
+    (D : ℝ) (hc : vLE p c D)
+    : ∃ L₂ : Submodule O V, GoodSub p be L L₂ D ∧ n ≤ Module.finrank O L₂ := by
   classical
   have hc0 : c ≠ 0 := vLE_ne_zero' hc
   have hw0 : S.w ≠ 0 := S.w_irr.ne_zero
@@ -93,8 +102,9 @@ theorem goodSub_of_dual (S : UniformizedDVR p O) (be : V → V → KK O)
     intro t j
     rw [be_sum_left be hsm hadd t x (y j)]
     simp [hxy]
-  have hspan : ∀ s : Fin n → O,
-      (∑ i, s i • x i) ∈ (Submodule.span (KK O) (Set.range x)).restrictScalars O := by
+  have hspan
+      : ∀ s : Fin n → O,
+        (∑ i, s i • x i) ∈ (Submodule.span (KK O) (Set.range x)).restrictScalars O := by
     intro s
     rw [Submodule.restrictScalars_mem]
     refine Submodule.sum_mem _ fun i _ => ?_
@@ -146,21 +156,30 @@ theorem goodSub_of_dual (S : UniformizedDVR p O) (be : V → V → KK O)
       exact (mul_eq_zero.1 this.symm).resolve_right hc0
     have hliO : LinearIndependent O x := (LinearIndependent.iff_fractionRing O (KK O)).2 hli
     let f : Fin n → (L ⊓ (Submodule.span (KK O) (Set.range x)).restrictScalars O : Submodule O V) :=
-      fun i => ⟨x i, Submodule.mem_inf.2 ⟨hx i, by
-        rw [Submodule.restrictScalars_mem]
-        exact Submodule.subset_span ⟨i, rfl⟩⟩⟩
+      fun i => ⟨
+        x i,
+        Submodule.mem_inf.2 ⟨
+          hx i,
+          by
+            rw [Submodule.restrictScalars_mem]
+            exact Submodule.subset_span ⟨i, rfl⟩
+        ⟩
+      ⟩
     have hf : LinearIndependent O f :=
-      LinearIndependent.of_comp (L ⊓ (Submodule.span (KK O) (Set.range x)).restrictScalars O).subtype hliO
-    let φ : (L ⊓ (Submodule.span (KK O) (Set.range x)).restrictScalars O : Submodule O V) →ₗ[O]
-        (Fin n → KK O) :=
-      { toFun := fun u j => be u (y j)
-        map_add' := fun u u' => by
-          funext j
-          exact hadd _ _ _
-        map_smul' := fun o u => by
-          funext j
-          simp only [Submodule.coe_smul, RingHom.id_apply, Pi.smul_apply]
-          rw [← algebraMap_smul (KK O) o (u : V), hsm, Algebra.smul_def] }
+      LinearIndependent.of_comp
+        (L ⊓ (Submodule.span (KK O) (Set.range x)).restrictScalars O).subtype hliO
+    let φ
+        : (L ⊓ (Submodule.span (KK O) (Set.range x)).restrictScalars O : Submodule O V) →ₗ[O]
+          (Fin n → KK O) := {
+      toFun := fun u j => be u (y j)
+      map_add' := fun u u' => by
+        funext j
+        exact hadd _ _ _
+      map_smul' := fun o u => by
+        funext j
+        simp only [Submodule.coe_smul, RingHom.id_apply, Pi.smul_apply]
+        rw [← algebraMap_smul (KK O) o (u : V), hsm, Algebra.smul_def]
+    }
     have hφ : Function.Injective φ := by
       rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
       intro u hu
@@ -177,16 +196,20 @@ theorem goodSub_of_dual (S : UniformizedDVR p O) (be : V → V → KK O)
       ext
       rw [← ht]
       simp [ht0]
-    have hup : Module.rank O (L ⊓ (Submodule.span (KK O) (Set.range x)).restrictScalars O :
-        Submodule O V) ≤ n := by
-      calc Module.rank O (L ⊓ (Submodule.span (KK O) (Set.range x)).restrictScalars O :
-            Submodule O V)
+    have hup
+        : Module.rank O
+            (L ⊓ (Submodule.span (KK O) (Set.range x)).restrictScalars O : Submodule O V)
+          ≤ n := by
+      calc
+        Module.rank O (L ⊓ (Submodule.span (KK O) (Set.range x)).restrictScalars O : Submodule O V)
           ≤ Module.rank O (Fin n → KK O) := LinearMap.rank_le_of_injective φ hφ
         _ = Module.rank (KK O) (Fin n → KK O) :=
           (IsFractionRing.rank_right_eq (R := O) (S := KK O) (N := Fin n → KK O)).symm
         _ = n := by simp
-    have hlow : (n : Cardinal) ≤ Module.rank O
-        (L ⊓ (Submodule.span (KK O) (Set.range x)).restrictScalars O : Submodule O V) := by
+    have hlow
+        : (n : Cardinal)
+          ≤ Module.rank O
+            (L ⊓ (Submodule.span (KK O) (Set.range x)).restrictScalars O : Submodule O V) := by
       simpa using hf.cardinal_le_rank
     rw [Module.finrank_eq_of_rank_eq (le_antisymm hup hlow)]
 

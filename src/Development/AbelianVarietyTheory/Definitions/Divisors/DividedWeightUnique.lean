@@ -8,36 +8,25 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsLimDeg
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.L2.Indef.Tree NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions Formalism.L2.Indef.Tree
+  NumberField
 
 noncomputable section
 
 namespace GlobalTheory.MeanTop
 
 structure Wts (ι : Type) (N : ℕ) where
-
   kc : ℕ
-
   p : ℕ
-
   T : ℕ
-
   Dd : ℕ
-
   c0 : ℤ
-
   h0 : ℤ
-
   S : ℝ
-
   eta : ℝ
-
   b : ℝ
-
   w : ι → ℝ
-
   u : ι → Fin N → ℤ
-
   u1 : ι → Fin N → ℤ
 
 namespace Wts
@@ -49,9 +38,13 @@ def u' : ι → Fin N → ℤ := fun τ i => if (i : ℕ) < W.p then W.u1 τ i e
 def g : ℝ := (W.h0 : ℝ) / (4 * W.T)
 
 def IsDiv : Prop :=
-  ∀ τ, (∀ a : Fin N, (a : ℕ) + 1 = W.kc → W.u1 τ a = 0) ∧ ∀ a b : Fin N, (b : ℕ) = a + 1 →
-    W.u1 τ a - W.u1 τ b =
-      (W.u τ a - W.u τ b + if (b : ℕ) = W.p then -W.c0 - (2 * (N : ℤ) - 2) else 2) / ((W.T : ℤ) + W.Dd + 1)
+  ∀ τ,
+    (∀ a : Fin N, (a : ℕ) + 1 = W.kc → W.u1 τ a = 0)
+      ∧ ∀ a b : Fin N,
+        (b : ℕ) = a + 1
+          → W.u1 τ a - W.u1 τ b
+            = (W.u τ a - W.u τ b + if (b : ℕ) = W.p then -W.c0 - (2 * (N : ℤ) - 2) else 2)
+              / ((W.T : ℤ) + W.Dd + 1)
 
 structure Hyp : Prop where
   kc_pos : 1 ≤ W.kc
@@ -65,9 +58,13 @@ structure Hyp : Prop where
   h3node : ∀ τ (a : Fin N), W.kc ≤ (a : ℕ) → |(W.u τ a : ℝ) + W.w τ| ≤ W.eta + W.S + N
   h3cloud : ∀ τ (a : Fin N), (a : ℕ) < W.kc → 0 ≤ W.u τ a ∧ (W.u τ a : ℝ) ≤ W.S
   h3w : ∀ τ, 4 * ((W.eta + W.S + N) + W.S + W.c0 + 2 * N) + 20 * N * W.T ≤ W.w τ
-  h4 : ∀ τ (a b : Fin N), (b : ℕ) = a + 1 →
-    ((b : ℕ) ≠ W.p → ((W.T : ℤ) + W.Dd + 2) * ((W.T : ℤ) + W.Dd + 2 + 2 * N) ≤ W.u τ a - W.u τ b + 2) ∧
-    (W.kc ≤ (a : ℕ) → W.h0 - 1 ≤ W.u τ a - W.u τ b) ∧ ((b : ℕ) = W.p → W.h0 ≤ W.u τ a - W.u τ b)
+  h4
+    : ∀ τ (a b : Fin N),
+      (b : ℕ) = a + 1
+        → ((b : ℕ) ≠ W.p
+            → ((W.T : ℤ) + W.Dd + 2) * ((W.T : ℤ) + W.Dd + 2 + 2 * N) ≤ W.u τ a - W.u τ b + 2)
+          ∧ (W.kc ≤ (a : ℕ) → W.h0 - 1 ≤ W.u τ a - W.u τ b)
+          ∧ ((b : ℕ) = W.p → W.h0 ≤ W.u τ a - W.u τ b)
   h5 : ∀ τ a, |(W.u τ a : ℝ)| + W.c0 + 4 * N ≤ 2 * W.b
 
 end Wts
@@ -76,32 +73,29 @@ def l1 {ι : Type} [Fintype ι] {N : ℕ} (v : ι → Fin N → ℤ) : ℝ := �
 
 def reWt {ι : Type} {N : ℕ} (v : ι → Fin N → ℤ) : ι → Fin N → ℝ := fun τ i => (v τ i : ℝ)
 
-def vDiff (D : D7) (p : ℕ) : ℝ := (padicValNat p (WeightThresholdDefs.dE D) : ℝ) / (Module.finrank ℚ D.host.E : ℝ)
+def vDiff (D : D7) (p : ℕ) : ℝ :=
+  (padicValNat p (WeightThresholdDefs.dE D) : ℝ) / (Module.finrank ℚ D.host.E : ℝ)
 
 structure Shifts where
-
   Pe : Finset ℕ
-
   e : ℕ → ℝ
-
   C7 : ℝ
-
   Pa : ℝ
-
   Pinf : ℝ
-
   PPe : ℝ
-
   XW : ℝ
 
-variable {D : D7} (Y : ShimX D.what₂.Tau) {K : Type} [Field K] [NumberField K] [StarRing K] {P : SlopeBoundParameters}
+variable
+  {D : D7} (Y : ShimX D.what₂.Tau)
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {P : SlopeBoundParameters}
 
 def bZero (W : Wts D.what₂.Tau Y.N) : ℝ := WeightThresholdDefs.bigB0 Y (reWt W.u') W.g
 
 def totalShift (W : Wts D.what₂.Tau Y.N) (A : Shifts) : ℝ :=
-  (∑ p ∈ A.Pe, A.e p * Real.log p) +
-    (∑ p ∈ GlobalTheory.FlagAr.setB Y (bZero Y W), (WeightThresholdDefs.cP p + A.C7 * vDiff D p) * (l1 W.u' + A.Pa) * Real.log p) +
-    (l1 W.u1 + 6 * A.Pinf) / 2
+  (∑ p ∈ A.Pe, A.e p * Real.log p)
+    + (∑ p ∈ GlobalTheory.FlagAr.setB Y (bZero Y W), (WeightThresholdDefs.cP p + A.C7 * vDiff D p) * (l1 W.u' + A.Pa) * Real.log p)
+    + (l1 W.u1 + 6 * A.Pinf) / 2
 
 end GlobalTheory.MeanTop
 
@@ -120,14 +114,19 @@ def wts (ι : Type) (N kc p T Dd c0 G V : ℕ) (b : ℝ) : Wts ι N where
   eta := 2 * N + c0
   b := b
   w := fun _ => ((T : ℝ) + Dd + 1) * V
-  u := fun _ i => (((T : ℤ) + Dd + 1) * G - 1) * ((kc : ℤ) - 1 - (i : ℕ)) -
-    (if kc ≤ (i : ℕ) then ((T : ℤ) + Dd + 1) * V else 0) - (if p ≤ (i : ℕ) then 2 * (N : ℤ) + c0 else 0)
+  u := fun _ i =>
+    (((T : ℤ) + Dd + 1) * G - 1) * ((kc : ℤ) - 1 - (i : ℕ))
+      - (if kc ≤ (i : ℕ) then ((T : ℤ) + Dd + 1) * V else 0)
+      - (if p ≤ (i : ℕ) then 2 * (N : ℤ) + c0 else 0)
   u1 := fun _ i => (G : ℤ) * ((kc : ℤ) - 1 - (i : ℕ)) - (if kc ≤ (i : ℕ) then (V : ℤ) else 0)
 
-theorem dividedWeight_unique {ι : Type} {N : ℕ} (W : Wts ι N) (v : ι → Fin N → ℤ) (hk : 1 ≤ W.kc) (hN : W.kc ≤ N) (h : W.IsDiv)
-    (h' : Wts.IsDiv { W with u1 := v }) : v = W.u1 := by
+theorem dividedWeight_unique
+    {ι : Type} {N : ℕ} (W : Wts ι N) (v : ι → Fin N → ℤ) (hk : 1 ≤ W.kc) (hN : W.kc ≤ N)
+    (h : W.IsDiv) (h' : Wts.IsDiv { W with u1 := v })
+    : v = W.u1 := by
   funext τ
-  have step : ∀ a c : Fin N, (c : ℕ) = a + 1 → v τ a - W.u1 τ a = v τ c - W.u1 τ c := fun a c hc => by
+  have step
+      : ∀ a c : Fin N, (c : ℕ) = a + 1 → v τ a - W.u1 τ a = v τ c - W.u1 τ c := fun a c hc => by
     have e1 := (h τ).2 a c hc
     have e2 := (h' τ).2 a c hc
     simp only at e2

@@ -7,16 +7,19 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.Admissi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem isIso_of_etale_of_surjective_of_universallyInjective :
-    ∀ (X Z : Scheme.{0}) (h : X ⟶ Z), Etale h → Surjective h → UniversallyInjective h → IsIso h := by
+theorem isIso_of_etale_of_surjective_of_universallyInjective
+    : ∀ (X Z : Scheme.{0}) (h : X ⟶ Z),
+      Etale h → Surjective h → UniversallyInjective h → IsIso h := by
   intro X Z h het hs hui
   have hd : Surjective (pullback.diagonal h) := (UniversallyInjective.iff_diagonal h).1 hui
   have : IsIso (pullback.diagonal h) :=

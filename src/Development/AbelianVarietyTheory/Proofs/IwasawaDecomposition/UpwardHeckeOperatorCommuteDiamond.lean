@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Adeli
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.L2.Forms Formalism.UG Formalism.L2.GlobalTheoryTheory.LocalLatticeBases NumberField IsDedekindDomain Matrix GlobalTheory.LevelHecke
+open Formalism.BasicNotions Formalism.L2.Forms Formalism.UG
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases NumberField IsDedekindDomain Matrix
+  GlobalTheory.LevelHecke
 open scoped TensorProduct
 
 namespace GlobalTheory.LevelHecke.UpDia
@@ -14,8 +16,11 @@ namespace GlobalTheory.LevelHecke.UpDia
 section Local
 variable {R V k : Type} [CommRing R] [AddCommGroup V] [Module R V] [Field k]
 
-theorem inc_dil {res : R →+* k} (hs : Function.Surjective res) {t : R} {p q : Pr R V k} (hp : p.Ok res)
-    (h : Pr.Inc res t p q) {a : k} (ha : a ≠ 0) : Pr.Inc res t (p.dil a) (q.dil a) := by
+theorem inc_dil
+    {res : R →+* k} (hs : Function.Surjective res)
+    {t : R} {p q : Pr R V k} (hp : p.Ok res) (h : Pr.Inc res t p q)
+    {a : k} (ha : a ≠ 0)
+    : Pr.Inc res t (p.dil a) (q.dil a) := by
   obtain ⟨h1, h2, e, h3, h4⟩ := h
   obtain ⟨b, hb⟩ := hs a⁻¹
   have he : e ∈ q.L := by
@@ -46,16 +51,32 @@ def dilEquiv {a : k} (ha : a ≠ 0) : Pr R V k ≃ Pr R V k where
 
 end Local
 
-theorem atV_conj {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {v : HeightOneSpectrum (𝓞 F)} {η : GA σ J}
-    (h : AtV v η) (δ : GA σ J) : AtV v (δ⁻¹ * η * δ) := by
+theorem atV_conj
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E} {v : HeightOneSpectrum (𝓞 F)}
+    {η : GA σ J} (h : AtV v η) (δ : GA σ J)
+    : AtV v (δ⁻¹ * η * δ) := by
   intro v' hv'
   have h1 := h v' hv'
   simp only [Subgroup.coe_mul, Subgroup.coe_inv, map_mul, map_inv, h1, mul_one, inv_mul_cancel]
 
-theorem upAd_dia : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (T f : ℕ) (bad : Set (HeightOneSpectrum (𝓞 F))) (ι : Type) [Fintype ι] (S : StepLevel F E σ J T f bad) (emb : ι → E →+* ℂ) (v : HeightOneSpectrum (𝓞 F)) (hv : (T : 𝓞 F) ∈ v.asIdeal) (k : Type) [Field k] (p : GA σ J → Pr (𝓞 E) (Fin n → E) k), v ∉ bad → PMap S v hv p → ∀ (res : 𝓞 E →+* k) (t : 𝓞 E), Function.Surjective res → (∀ x, (p x).Ok res) → ∀ g ∈ AdFun S emb, ∀ (v' : HeightOneSpectrum (𝓞 F)) (hv' : (T : 𝓞 F) ∈ v'.asIdeal) (a : ℤ) (δ : GA σ J), v' ∉ bad → (v' = v → (a : k) ≠ 0) → IsDia S v' hv' a δ → ∀ x, upAd res t v p (fun y => g (y * δ)) x = upAd res t v p g (x * δ) := by
-  intro F E _ _ _ _ _ σ n J T f bad ι _ S emb v hv k _ p hb hP res t hs hok g hg v' hv' a δ hb' ha hδ x
-  obtain ⟨h1, h2, h3⟩ := GlobalTheory.T.adelicForm_values_near_point_spec F E σ n J T f bad ι S emb v hv k p hb hP g hg
+theorem upAd_dia
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (T f : ℕ)
+        (bad : Set (HeightOneSpectrum (𝓞 F))) (ι : Type) [Fintype ι] (S : StepLevel F E σ J T f bad)
+        (emb : ι → E →+* ℂ) (v : HeightOneSpectrum (𝓞 F)) (hv : (T : 𝓞 F) ∈ v.asIdeal) (k : Type)
+        [Field k] (p : GA σ J → Pr (𝓞 E) (Fin n → E) k),
+      v ∉ bad → PMap S v hv p
+        → ∀ (res : 𝓞 E →+* k) (t : 𝓞 E),
+          Function.Surjective res → (∀ x, (p x).Ok res)
+            → ∀ g ∈ AdFun S emb,
+              ∀ (v' : HeightOneSpectrum (𝓞 F)) (hv' : (T : 𝓞 F) ∈ v'.asIdeal) (a : ℤ) (δ : GA σ J),
+                v' ∉ bad → (v' = v → (a : k) ≠ 0) → IsDia S v' hv' a δ
+                  → ∀ x, upAd res t v p (fun y => g (y * δ)) x = upAd res t v p g (x * δ) := by
+  intro F E _ _ _ _ _ σ n J T f bad ι _ S emb v hv k _ p hb hP res t hs hok g hg v' hv' a δ hb' ha
+    hδ x
+  obtain ⟨h1, h2, h3⟩ :=
+    GlobalTheory.T.adelicForm_values_near_point_spec F E σ n J T f bad ι S emb v hv k p hb hP g hg
   by_cases hvv : v' = v
   · subst hvv
     have ha' := ha rfl
@@ -69,8 +90,8 @@ theorem upAd_dia : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberF
       have := inc_dil hs ((hok x).dil ha') hq (inv_ne_zero ha')
       rw [Pr.dil_dil, inv_mul_cancel₀ ha', Pr.dil_one] at this
       exact this
-  · have hp : ∀ y, p (y * δ) = p y := fun y => (hP.2.1 y δ).2 (by
-      rw [hδ.1 v (Ne.symm hvv)]; exact one_mem _)
+  · have hp : ∀ y, p (y * δ) = p y := fun y =>
+      (hP.2.1 y δ).2 (by rw [hδ.1 v (Ne.symm hvv)]; exact one_mem _)
     have key : valAt v p (fun y => g (y * δ)) x = valAt v p g (x * δ) := by
       funext q
       by_cases h : ∃ η, AtV v η ∧ p (x * η) = q

@@ -14,8 +14,8 @@ open ReciprocityTheory.ChartRestriction.DS.S7
 
 variable {n : ℕ}
 
-def kdPr (ε : Fin n → Bool) (s : Bool) (ij : {ab : Fin (kdC ε s) × Fin (kdC ε s) // ab.2 < ab.1}) :
-    KPair ε :=
+def kdPr (ε : Fin n → Bool) (s : Bool) (ij : {ab : Fin (kdC ε s) × Fin (kdC ε s) // ab.2 < ab.1})
+    : KPair ε :=
   ⟨(kdE ε s ij.1.1, kdE ε s ij.1.2), (kdE ε s).lt_iff_lt.2 ij.2, by rw [ε_kdE ε s, ε_kdE ε s]⟩
 
 def kdCoS (ε : Fin n → Bool) (w : KCo ε) (s : Bool) : UCo (kdC ε s) :=
@@ -79,11 +79,13 @@ def kdIx (ε : Fin n → Bool) : Fin (pOf ε) ⊕ Fin (qOf ε) ≃ Fin n :=
       · have h1 := ε_kdE ε true i
         have h2 := ε_kdE ε false j
         have h' : kdE ε true i = kdE ε false j := h
-        rw [h', h2] at h1; exact absurd h1 (by decide)
+        rw [h', h2] at h1
+        exact absurd h1 (by decide)
       · have h1 := ε_kdE ε false i
         have h2 := ε_kdE ε true j
         have h' : kdE ε false i = kdE ε true j := h
-        rw [h', h2] at h1; exact absurd h1 (by decide)
+        rw [h', h2] at h1
+        exact absurd h1 (by decide)
       · exact congrArg Sum.inr ((kdE ε false).injective h)
     · intro a
       cases h : ε a
@@ -108,9 +110,10 @@ lemma kdPr_surj (ε : Fin n → Bool) (x : KPair ε) : ∃ ij, kdPr ε (ε x.1.1
   show (kdE ε (ε a) i, kdE ε (ε a) j) = (a, b)
   rw [hi, hj]
 
-def kdPx (ε : Fin n → Bool) :
-    {ab : Fin (pOf ε) × Fin (pOf ε) // ab.2 < ab.1} ⊕ {ab : Fin (qOf ε) × Fin (qOf ε) // ab.2 < ab.1} ≃
-      KPair ε :=
+def kdPx (ε : Fin n → Bool)
+    : {ab : Fin (pOf ε) × Fin (pOf ε) // ab.2 < ab.1}
+        ⊕ {ab : Fin (qOf ε) × Fin (qOf ε) // ab.2 < ab.1}
+      ≃ KPair ε :=
   Equiv.ofBijective (Sum.elim (kdPr ε true) (kdPr ε false)) (by
     constructor
     · rintro (i | i) (j | j) h
@@ -118,11 +121,13 @@ def kdPx (ε : Fin n → Bool) :
       · have h1 := ε_kdE ε true i.1.1
         have h2 := ε_kdE ε false j.1.1
         have h' : kdE ε true i.1.1 = kdE ε false j.1.1 := congrArg (fun z : KPair ε => z.1.1) h
-        rw [h', h2] at h1; exact absurd h1 (by decide)
+        rw [h', h2] at h1
+        exact absurd h1 (by decide)
       · have h1 := ε_kdE ε false i.1.1
         have h2 := ε_kdE ε true j.1.1
         have h' : kdE ε false i.1.1 = kdE ε true j.1.1 := congrArg (fun z : KPair ε => z.1.1) h
-        rw [h', h2] at h1; exact absurd h1 (by decide)
+        rw [h', h2] at h1
+        exact absurd h1 (by decide)
       · exact congrArg Sum.inr (kdPr_inj ε false h)
     · intro x
       obtain ⟨ij, hij⟩ := kdPr_surj ε x
@@ -131,12 +136,14 @@ def kdPx (ε : Fin n → Bool) :
       · intro ij hij; exact ⟨Sum.inr ij, hij⟩
       · intro ij hij; exact ⟨Sum.inl ij, hij⟩)
 
-def kdRe (α β γ δ : Type*) [MeasurableSpace α] [MeasurableSpace β] [MeasurableSpace γ]
-    [MeasurableSpace δ] : ((α × β) × (γ × δ)) ≃ᵐ ((α × γ) × (β × δ)) :=
+def kdRe
+    (α β γ δ : Type*)
+    [MeasurableSpace α] [MeasurableSpace β] [MeasurableSpace γ] [MeasurableSpace δ]
+    : ((α × β) × (γ × δ)) ≃ᵐ ((α × γ) × (β × δ)) :=
   (MeasurableEquiv.prodAssoc.trans (MeasurableEquiv.prodCongr (MeasurableEquiv.refl α)
-    ((MeasurableEquiv.prodAssoc.symm.trans
-      (MeasurableEquiv.prodCongr MeasurableEquiv.prodComm (MeasurableEquiv.refl δ))).trans
-        MeasurableEquiv.prodAssoc))).trans MeasurableEquiv.prodAssoc.symm
+      ((MeasurableEquiv.prodAssoc.symm.trans (MeasurableEquiv.prodCongr MeasurableEquiv.prodComm
+        (MeasurableEquiv.refl δ))).trans MeasurableEquiv.prodAssoc))).trans
+    MeasurableEquiv.prodAssoc.symm
 
 private lemma measurePreserving_prodAssoc_volume {X Y Z : Type*} [MeasureSpace X] [MeasureSpace Y] [MeasureSpace Z]
     [SigmaFinite (volume : Measure X)] [SigmaFinite (volume : Measure Y)]
@@ -158,12 +165,15 @@ lemma kdRe_mp {α β γ δ : Type*} [MeasureSpace α] [MeasureSpace β] [Measure
       (measurePreserving_prodAssoc_volume.comp ((measurePreserving_prodComm_volume.prod (MeasurePreserving.id volume)).comp
         (MeasurePreserving.symm _ measurePreserving_prodAssoc_volume)))).comp measurePreserving_prodAssoc_volume)
 
-def realCoordinatesSplitBySign (ε : Fin n → Bool) : (Fin n → ℝ) ≃ᵐ (Fin (pOf ε) → ℝ) × (Fin (qOf ε) → ℝ) :=
+def realCoordinatesSplitBySign (ε : Fin n → Bool)
+    : (Fin n → ℝ) ≃ᵐ (Fin (pOf ε) → ℝ) × (Fin (qOf ε) → ℝ) :=
   (MeasurableEquiv.piCongrLeft (fun _ : Fin n => ℝ) (kdIx ε)).symm.trans
     (MeasurableEquiv.sumPiEquivProdPi (fun _ : Fin (pOf ε) ⊕ Fin (qOf ε) => ℝ))
 
-def complexCoordinatesSplitBySign (ε : Fin n → Bool) : (KPair ε → ℂ) ≃ᵐ
-    ({ab : Fin (pOf ε) × Fin (pOf ε) // ab.2 < ab.1} → ℂ) × ({ab : Fin (qOf ε) × Fin (qOf ε) // ab.2 < ab.1} → ℂ) :=
+def complexCoordinatesSplitBySign (ε : Fin n → Bool)
+    : (KPair ε → ℂ)
+      ≃ᵐ ({ab : Fin (pOf ε) × Fin (pOf ε) // ab.2 < ab.1} → ℂ)
+        × ({ab : Fin (qOf ε) × Fin (qOf ε) // ab.2 < ab.1} → ℂ) :=
   (MeasurableEquiv.piCongrLeft (fun _ : KPair ε => ℂ) (kdPx ε)).symm.trans
     (MeasurableEquiv.sumPiEquivProdPi (fun _ => ℂ))
 

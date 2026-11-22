@@ -85,18 +85,17 @@ end OnePole
 
 open OnePole AnalyticIdentityTheoremsZetaFacts
 
-theorem ellipticOnePole_of (hN : EllipticNoPole) (hE : EllipticEntire) (hq : ZetaQuasi)
-    (hL : Legendre) : EllipticOnePole := by
+theorem ellipticOnePole_of
+    (hN : EllipticNoPole) (hE : EllipticEntire) (hq : ZetaQuasi) (hL : Legendre)
+    : EllipticOnePole := by
   intro L f p hmer hper hord hp
   obtain ⟨r, k, hk, hfk⟩ := simple_local (hmer p) hp
   set g : ℂ → ℂ := fun w => f w - r * wZeta L (w - p) with hg
 
-  have hB : ∀ z, 0 ≤ meromorphicOrderAt f z →
-      ∃ B : ℂ → ℂ, AnalyticAt ℂ B z ∧ f =ᶠ[𝓝[≠] z] B := by
+  have hB : ∀ z, 0 ≤ meromorphicOrderAt f z → ∃ B : ℂ → ℂ, AnalyticAt ℂ B z ∧ f =ᶠ[𝓝[≠] z] B := by
     intro z hz
     cases h : meromorphicOrderAt f z with
-    | top =>
-      exact ⟨fun _ => 0, analyticAt_const, meromorphicOrderAt_eq_top_iff.1 h⟩
+    | top => exact ⟨fun _ => 0, analyticAt_const, meromorphicOrderAt_eq_top_iff.1 h⟩
     | coe n =>
       obtain ⟨B, hBa, -, hfB⟩ := (meromorphicOrderAt_eq_int_iff (hmer z)).1 h
       have hn : 0 ≤ n := by rw [h] at hz; exact_mod_cast hz
@@ -163,7 +162,9 @@ theorem ellipticOnePole_of (hN : EllipticNoPole) (hE : EllipticEntire) (hq : Zet
 
   have hGq : ∀ ω ∈ L.lattice, ∀ w, G (w + ω) = G w - r * wEta L ω := by
     intro ω hω w
-    refine eq_of_eventuallyEq_nhdsNE (g₁ := fun y => G (y + ω)) (g₂ := fun y => G y - r * wEta L ω)
+    refine eq_of_eventuallyEq_nhdsNE
+      (g₁ := fun y => G (y + ω))
+      (g₂ := fun y => G y - r * wEta L ω)
       (hGd.continuous.comp (continuous_add_const ω)).continuousAt
       (hGd.continuous.sub continuous_const).continuousAt ?_
     filter_upwards [(tendsto_add_nhdsNE w ω).eventually (hgG (w + ω)), hgG w,
@@ -200,7 +201,8 @@ theorem ellipticOnePole_of (hN : EllipticNoPole) (hE : EllipticEntire) (hq : Zet
     have e2 := hGq L.ω₂ L.ω₂_mem_lattice 0
     rw [zero_add, hlin L.ω₁] at e1
     rw [zero_add, hlin L.ω₂] at e2
-    have hs : (if 0 < (L.ω₂ / L.ω₁).im then (1 : ℂ) else -1) * (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by
+    have hs
+        : (if 0 < (L.ω₂ / L.ω₁).im then (1 : ℂ) else -1) * (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by
       apply mul_ne_zero
       · split_ifs <;> norm_num
       · simp [Real.pi_ne_zero, Complex.I_ne_zero]

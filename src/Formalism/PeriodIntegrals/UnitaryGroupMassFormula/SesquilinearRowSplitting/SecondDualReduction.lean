@@ -13,12 +13,16 @@ section Gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] (S : HSpace E)
 
-theorem mem_dual_iff' (Λ : Submodule (𝓞 E) S.V) (x : S.V) :
-    x ∈ Formalism.HermitianLatticesTheory.dual S.hT Λ ↔ ∀ y ∈ Λ, ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = S.hT y x := by
-  simp [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_one]
+theorem mem_dual_iff' (Λ : Submodule (𝓞 E) S.V) (x : S.V)
+    : x ∈ Formalism.HermitianLatticesTheory.dual S.hT Λ
+      ↔ ∀ y ∈ Λ, ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = S.hT y x := by
+  simp [Formalism.HermitianLatticesTheory.dual, Formalism.E.hdual, Submodule.mem_iInf,
+    Submodule.mem_one]
 
-theorem pair_int {Λ : Submodule (𝓞 E) S.V} (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) {x y : S.V}
-    (hx : x ∈ Λ) (hy : y ∈ Λ) : ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = S.hT y x := by
+theorem pair_int
+    {Λ : Submodule (𝓞 E) S.V} (hU : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ)
+    {x y : S.V} (hx : x ∈ Λ) (hy : y ∈ Λ)
+    : ∃ o : 𝓞 E, algebraMap (𝓞 E) E o = S.hT y x := by
   have hx' : x ∈ Formalism.HermitianLatticesTheory.dual S.hT Λ := by
     rw [show Formalism.HermitianLatticesTheory.dual S.hT Λ = Λ from hU]
     exact hx
@@ -88,7 +92,9 @@ theorem assembly_reduction : AsmStep := by
     · intro l hl
       have hPmem : (∑ a, S.hT (f a) l • F0.e a) ∈ Formalism.L2.SG.Saturated.latSpan aa F0.e :=
         Submodule.sum_mem _ (fun a _ => Submodule.subset_span ⟨a, _, hF.2.2 a l hl, rfl⟩)
-      have hQmem : (∑ b, S.hT (F0.e b) l • f b) ∈ Formalism.L2.SG.Saturated.latSpan (fun a => (aa a)⁻¹) f :=
+      have hQmem
+          : (∑ b, S.hT (F0.e b) l • f b)
+            ∈ Formalism.L2.SG.Saturated.latSpan (fun a => (aa a)⁻¹) f :=
         Submodule.sum_mem _ (fun b _ => Submodule.subset_span ⟨b, _, hE b l hl, rfl⟩)
       have hμ : l - (∑ a, S.hT (f a) l • F0.e a) - (∑ b, S.hT (F0.e b) l • f b) ∈ L := by
         rw [hmemL]
@@ -96,10 +102,13 @@ theorem assembly_reduction : AsmStep := by
         set_option synthInstance.maxHeartbeats 100000 in
           · simp [map_sum, F0.e_iso, hF.1, Finset.sum_ite_eq]
         set_option synthInstance.maxHeartbeats 100000 in
-          · simp [map_sum, hfe, hiso, Finset.sum_ite_eq']
-      have hsplit : l = (∑ a, S.hT (f a) l • F0.e a) +
-          (l - (∑ a, S.hT (f a) l • F0.e a) - (∑ b, S.hT (F0.e b) l • f b)) +
-          (∑ b, S.hT (F0.e b) l • f b) := by abel
+        · simp [map_sum, hfe, hiso, Finset.sum_ite_eq']
+      have hsplit
+          : l
+            = (∑ a, S.hT (f a) l • F0.e a)
+              + (l - (∑ a, S.hT (f a) l • F0.e a) - (∑ b, S.hT (F0.e b) l • f b))
+              + (∑ b, S.hT (F0.e b) l • f b) := by
+        abel
       rw [hsplit]
       exact Submodule.add_mem_sup (Submodule.add_mem_sup hPmem hμ) hQmem
     · exact sup_le (sup_le hXle (fun x hx => ((hmemL x).1 hx).1)) hYle

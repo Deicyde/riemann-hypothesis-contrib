@@ -9,9 +9,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Trivial
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RawLift
@@ -22,24 +25,34 @@ noncomputable section
 namespace GlobalTheory.RawLift.Eu
 
 section
-variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m}
-  {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+variable
+  {D : D7} {G : Type} [Group G] [Fintype G]
+  {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
 
-theorem lx_eq_of_rep_rel {R : RealDat D A Ks} {i : Fin D.R.m} {v : HeightOneSpectrum (𝓞 D.host.F)} {x y : LX R i v}
-    (h : (rep x)⁻¹ * rep y ∈ levW R i) : x = y := by
+theorem lx_eq_of_rep_rel
+    {R : RealDat D A Ks} {i : Fin D.R.m} {v : HeightOneSpectrum (𝓞 D.host.F)} {x y : LX R i v}
+    (h : (rep x)⁻¹ * rep y ∈ levW R i)
+    : x = y := by
   have : (Quotient.mk _ (Quotient.out x) : LX R i v) = Quotient.mk _ (Quotient.out y) := by
     apply Quotient.sound
-    change ((QuotientGroup.leftRel (levW R i)).comap (Subtype.val : locSet R i v → GA D (Wc D i))) _ _
+    change ((QuotientGroup.leftRel (levW R i)).comap (Subtype.val : locSet R i v → GA D (Wc D i))) _
+      _
     rw [Setoid.comap_rel, QuotientGroup.leftRel_apply]
     exact h
   exact (Quotient.out_eq x).symm.trans (this.trans (Quotient.out_eq y))
 
-theorem rep_notMem_levW {R : RealDat D A Ks} {i : Fin D.R.m} {v : HeightOneSpectrum (𝓞 D.host.F)} {x : LX R i v}
-    (hx : x ≠ lx0 R i v) : rep x ∉ levW R i := fun h =>
-  hx (lx_eq_of_rep_rel ((levW R i).mul_mem ((levW R i).inv_mem h) (trivial_level_coset_representative_mem_level R i v)))
+theorem rep_notMem_levW
+    {R : RealDat D A Ks} {i : Fin D.R.m} {v : HeightOneSpectrum (𝓞 D.host.F)} {x : LX R i v}
+    (hx : x ≠ lx0 R i v)
+    : rep x ∉ levW R i := fun h =>
+  hx (lx_eq_of_rep_rel ((levW R i).mul_mem ((levW R i).inv_mem h)
+    (trivial_level_coset_representative_mem_level R i v)))
 
-theorem rep_suppF {R : RealDat D A Ks} {i : Fin D.R.m} {v : HeightOneSpectrum (𝓞 D.host.F)} (x : LX R i v) :
-    SuppF (Wc D i) (fid D v) (rep x) := (Quotient.out x).2.2
+theorem rep_suppF
+    {R : RealDat D A Ks} {i : Fin D.R.m} {v : HeightOneSpectrum (𝓞 D.host.F)} (x : LX R i v)
+    : SuppF (Wc D i) (fid D v) (rep x) :=
+  (Quotient.out x).2.2
 
 theorem eq_one_of_suppF_zero {V : HSp D} {g : GA D V} (h : SuppF V 0 g) : g = 1 := by
   have e : Formalism.L2.Theta.mt V g = Formalism.L2.Theta.mt V 1 := by
@@ -52,7 +65,18 @@ theorem eq_one_of_suppF_zero {V : HSp D} {g : GA D V} (h : SuppF V 0 g) : g = 1 
 
 end
 
-theorem acoef_small : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T : Type) (A : FamIn D.what₂.LL G Pl0 T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks), ∀ i t, LocSmall R i t → ∀ (μ : Measure (WO (Vc D i) (Wc D i))) (𝓕 : Set (WO (Vc D i) (Wc D i))), IsCovolOne (ratL (Wc D i) (Vc D i)) μ 𝓕 → ∃ s : HeightOneSpectrum (𝓞 D.host.F) → ℝ, Summable s ∧ (∀ v, s v < 1) ∧ ∀ v (C : Finset (Eu.LX R i v)), Eu.lx0 R i v ∉ C → ∑ x ∈ C, ‖Eu.acoef R i t μ 𝓕 v x‖ ≤ s v := by
+theorem acoef_small
+    : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T : Type)
+        (A : FamIn D.what₂.LL G Pl0 T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] (R : RealDat D A Ks),
+      ∀ i t,
+        LocSmall R i t
+          → ∀ (μ : Measure (WO (Vc D i) (Wc D i))) (𝓕 : Set (WO (Vc D i) (Wc D i))),
+            IsCovolOne (ratL (Wc D i) (Vc D i)) μ 𝓕
+              → ∃ s : HeightOneSpectrum (𝓞 D.host.F) → ℝ,
+                Summable s ∧ (∀ v, s v < 1)
+                  ∧ ∀ v (C : Finset (Eu.LX R i v)),
+                    Eu.lx0 R i v ∉ C → ∑ x ∈ C, ‖Eu.acoef R i t μ 𝓕 v x‖ ≤ s v := by
   intro D G _ _ Pl0 T A Ks _ _ _ R i t hLS μ 𝓕 hμ
   obtain ⟨s, hs, hs1, hb⟩ := hLS μ 𝓕 hμ
   refine ⟨fun v => max (s v) 0, ?_, fun v => max_lt (hs1 v) one_pos, ?_⟩

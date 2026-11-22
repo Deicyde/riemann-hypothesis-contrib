@@ -14,16 +14,20 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
 open scoped Classical
 
 section SlopeTestRemainingChoices
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F]
+  [_root_.NumberField.IsTotallyComplex E]
 
-private theorem top_GL (E : Type) [Field E] [NumberField E] :
-    LocallyCompactSpace (GL (Fin 2) (Cinf E)) ∧ FirstCountableTopology (GL (Fin 2) (Cinf E)) := by
+private theorem top_GL (E : Type) [Field E] [NumberField E]
+    : LocallyCompactSpace (GL (Fin 2) (Cinf E)) ∧ FirstCountableTopology (GL (Fin 2) (Cinf E)) := by
   haveI : LocallyCompactSpace (Matrix (Fin 2) (Fin 2) (Cinf E)) :=
     inferInstanceAs (LocallyCompactSpace (Fin 2 → Fin 2 → Cinf E))
   haveI : FirstCountableTopology (Matrix (Fin 2) (Fin 2) (Cinf E)) :=
@@ -33,39 +37,44 @@ private theorem top_GL (E : Type) [Field E] [NumberField E] :
   have h := Units.isClosedEmbedding_embedProduct (α := Matrix (Fin 2) (Fin 2) (Cinf E))
   exact ⟨h.locallyCompactSpace, h.isEmbedding.isInducing.firstCountableTopology⟩
 
-private theorem om_L {D : Dat F E} (W : Weil D) (g : G1 F) (h : GL (Fin 2) (A E))
-    (hh : nu F h = 1) (φ : S4 F) : W.Om g (W.L h φ) = W.L h (W.Om g φ) := by
+private theorem om_L
+    {D : Dat F E} (W : Weil D) (g : G1 F) (h : GL (Fin 2) (A E)) (hh : nu F h = 1) (φ : S4 F)
+    : W.Om g (W.L h φ) = W.L h (W.Om g φ) := by
   have e := congrArg (fun T : Module.End ℂ (S4 F) => T φ) (W.comm h g)
   simp only [Module.End.mul_apply, hh] at e
   rw [e, UpperTheory.ConvolutionTheory.R2.M.cD_one]
 
-private theorem term_cont (D : Dat F E) (W : Weil D) (Ψ : S4 F) (v : V4 F) :
-    Continuous fun y : GL (Fin 2) (Cinf E) => (W.L (infGL E 2 y) Ψ).1 v := by
+private theorem term_cont (D : Dat F E) (W : Weil D) (Ψ : S4 F) (v : V4 F)
+    : Continuous fun y : GL (Fin 2) (Cinf E) => (W.L (infGL E 2 y) Ψ).1 v := by
   obtain ⟨ρ, hρ, hact, hnu, hinf, -⟩ := actCont F E D
   have hΨ := (wtBound F Ψ).1
-  have e : (fun y : GL (Fin 2) (Cinf E) => (W.L (infGL E 2 y) Ψ).1 v) = fun y =>
-      (((ab (nu F (infGL E 2 y)))⁻¹ : ℝ) : ℂ) * Ψ.1 ((ρ (infGL E 2 y)⁻¹).val *ᵥ v) := by
+  have e
+      : (fun y : GL (Fin 2) (Cinf E) => (W.L (infGL E 2 y) Ψ).1 v)
+        = fun y =>
+          (((ab (nu F (infGL E 2 y)))⁻¹ : ℝ) : ℂ) * Ψ.1 ((ρ (infGL E 2 y)⁻¹).val *ᵥ v) := by
     funext y
     rw [W.L_apply, hact]
   rw [e]
   refine Continuous.mul ?_ ?_
-  · exact Complex.continuous_ofReal.comp
-      ((continuous_ab.comp (hnu.comp hinf)).inv₀ fun _ => (ab_pos _).ne')
+  · exact Complex.continuous_ofReal.comp ((continuous_ab.comp (hnu.comp hinf)).inv₀ fun _ =>
+      (ab_pos _).ne')
   · refine hΨ.comp ?_
     have h1 : Continuous fun y : GL (Fin 2) (Cinf E) => ρ (infGL E 2 y)⁻¹ :=
       hρ.comp (continuous_inv.comp hinf)
     exact (Units.continuous_val.comp h1).matrix_mulVec continuous_const
 
-private theorem th_cont (D : Dat F E) (W : Weil D) (Ψ : S4 F) (S : Set (GL (Fin 2) (Cinf E)))
-    (hS : IsCompact S) : ContinuousOn (fun y => Th (W.L (infGL E 2 y) Ψ).1) S := by
+private theorem th_cont
+    (D : Dat F E) (W : Weil D) (Ψ : S4 F) (S : Set (GL (Fin 2) (Cinf E))) (hS : IsCompact S)
+    : ContinuousOn (fun y => Th (W.L (infGL E 2 y) Ψ).1) S := by
   obtain ⟨n, hn⟩ := wtSum F
   obtain ⟨ρ, -, -, -, hinf, -⟩ := actCont F E D
-  obtain ⟨K, hK, hb⟩ := lDom F E D W Unit Set.univ (fun _ => Ψ) (wtBound F Ψ).2
-    (infGL E 2 '' S) (hS.image hinf)
+  obtain ⟨K, hK, hb⟩ :=
+    lDom F E D W Unit Set.univ (fun _ => Ψ) (wtBound F Ψ).2 (infGL E 2 '' S) (hS.image hinf)
   obtain ⟨B, hB⟩ := hb n
   obtain ⟨C, hC⟩ := hn K hK 1 one_pos
   obtain ⟨hs, -⟩ := hC 1 (by rw [ab_one])
-  have e : (fun ξ : Fin 4 → F => wt K n (sc (1 : (A F)ˣ) ξ)) = fun ξ => wt K n fun i => rt (ξ i) := by
+  have e
+      : (fun ξ : Fin 4 → F => wt K n (sc (1 : (A F)ˣ) ξ)) = fun ξ => wt K n fun i => rt (ξ i) := by
     funext ξ
     congr 1
     funext i
@@ -79,8 +88,11 @@ private theorem th_cont (D : Dat F E) (W : Weil D) (Ψ : S4 F) (S : Set (GL (Fin
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.ConvolutionTheory.R2.Ff.contOne :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D) (M : Meas F) (π : TR.CuspSub F 2), ContOne W M π := by
+theorem UpperTheory.ConvolutionTheory.R2.Ff.contOne
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D)
+        (M : Meas F) (π : TR.CuspSub F 2),
+      ContOne W M π := by
   intro F E _ _ _ _ _ _ _ D W M π f hf φ hφ y₀ hy₀
   obtain ⟨ρ, -, -, hnu, hinf, -⟩ := actCont F E D
   obtain ⟨hlc, hfc⟩ := top_GL E
@@ -91,15 +103,17 @@ theorem UpperTheory.ConvolutionTheory.R2.Ff.contOne :
   have hC' := hS.inter_right hcl
   obtain ⟨B, hB⟩ := thBoundH F E D W π f hf φ hφ 1 {1} isCompact_singleton _ hC' (fun y hy => hy.2)
   haveI : IsFiniteMeasure (M.μ.restrict M.D) := ⟨by simpa using vol F M⟩
-  have key : ContinuousWithinAt (fun y : GL (Fin 2) (Cinf E) =>
-      ∫ g, f.1 (gl g) * Th (W.Om g (W.L (infGL E 2 y) φ)).1 ∂(M.μ.restrict M.D))
+  have key : ContinuousWithinAt
+      (fun y : GL (Fin 2) (Cinf E) =>
+        ∫ g, f.1 (gl g) * Th (W.Om g (W.L (infGL E 2 y) φ)).1 ∂(M.μ.restrict M.D))
       {y | UpperTheory.ConvolutionTheory.R2.Ff.One F y} y₀ := by
     refine continuousWithinAt_of_dominated (bound := fun _ => B) ?_ ?_ (integrable_const _) ?_
     · filter_upwards with y
       exact ((hfcont.comp continuous_gl).measurable.mul
         (thMeas F E D W (W.L (infGL E 2 y) φ)).1).aestronglyMeasurable
-    · have hev : ∀ᶠ y in 𝓝[{y | UpperTheory.ConvolutionTheory.R2.Ff.One F y}] y₀,
-          y ∈ S ∩ {y | UpperTheory.ConvolutionTheory.R2.Ff.One F y} :=
+    · have hev
+          : ∀ᶠ y in 𝓝[{y | UpperTheory.ConvolutionTheory.R2.Ff.One F y}] y₀,
+            y ∈ S ∩ {y | UpperTheory.ConvolutionTheory.R2.Ff.One F y} :=
         inter_mem (mem_nhdsWithin_of_mem_nhds hSmem) self_mem_nhdsWithin
       filter_upwards [hev] with y hy
       refine ae_of_all _ fun g => ?_
@@ -107,7 +121,8 @@ theorem UpperTheory.ConvolutionTheory.R2.Ff.contOne :
     · refine ae_of_all _ fun g => ?_
       have h1 : ContinuousAt (fun y => Th (W.L (infGL E 2 y) (W.Om g φ)).1) y₀ :=
         (th_cont D W (W.Om g φ) S hS).continuousAt hSmem
-      have h2 : ContinuousWithinAt (fun y => Th (W.Om g (W.L (infGL E 2 y) φ)).1)
+      have h2 : ContinuousWithinAt
+          (fun y => Th (W.Om g (W.L (infGL E 2 y) φ)).1)
           {y | UpperTheory.ConvolutionTheory.R2.Ff.One F y} y₀ :=
         h1.continuousWithinAt.congr (fun y hy => by rw [om_L W g _ hy]) (by rw [om_L W g _ hy₀])
       exact continuousWithinAt_const.mul h2

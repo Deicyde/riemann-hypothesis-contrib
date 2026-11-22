@@ -11,12 +11,13 @@ open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Metric
 
-theorem bdry_snc_chart :
-    ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : FinHolAtlas e X) (L : LocPot X)
-      (s : X → X → ℂ) (nb : ℕ) (m : Fin nb → ℕ) (W : Fin nb → Set X),
-      IsSection A L s → IsSNC A L s m W → ∀ x,
-        ∃ ψ : OpenPartialHomeomorph X (Fin e → ℂ), IsCompatChart A ψ ∧ x ∈ ψ.source ∧
-          ∃ S : Finset (Fin e), ∀ y ∈ ψ.source, (y ∈ bdry s ↔ ∃ i ∈ S, ψ y i = 0) := by
+theorem bdry_snc_chart
+    : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : FinHolAtlas e X) (L : LocPot X) (s : X → X → ℂ)
+        (nb : ℕ) (m : Fin nb → ℕ) (W : Fin nb → Set X),
+      IsSection A L s → IsSNC A L s m W
+        → ∀ x, ∃ ψ : OpenPartialHomeomorph X (Fin e → ℂ),
+          IsCompatChart A ψ ∧ x ∈ ψ.source
+            ∧ ∃ S : Finset (Fin e), ∀ y ∈ ψ.source, (y ∈ bdry s ↔ ∃ i ∈ S, ψ y i = 0) := by
   classical
   intro e X _ A L s nb m W hs hsnc x
   obtain ⟨ψ, hψ, hx, hsub, σ, -, -, u, -, hu, hfac⟩ := hsnc x
@@ -24,8 +25,8 @@ theorem bdry_snc_chart :
   intro y hy
   have hglue := hs.2 x y y ⟨hsub hy, L.mem_U y⟩
   have hzero : s y y = 0 ↔ s x y = 0 := by
-    have e1 : Real.exp (-L.φ x y) ≠ 0 := (Real.exp_pos _).ne'
-    have e2 : Real.exp (-L.φ y y) ≠ 0 := (Real.exp_pos _).ne'
+    have e1 : Real.exp (- L.φ x y) ≠ 0 := (Real.exp_pos _).ne'
+    have e2 : Real.exp (- L.φ y y) ≠ 0 := (Real.exp_pos _).ne'
     constructor
     · intro h
       rw [h, norm_zero, zero_mul] at hglue

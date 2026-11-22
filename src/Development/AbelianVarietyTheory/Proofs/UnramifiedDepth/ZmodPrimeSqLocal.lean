@@ -11,11 +11,15 @@ open IsLocalRing ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Be2 TrivSqZeroExt
 
 namespace GlobalTheory.WModel
 
-def mkL (R : Type) [CommRing R] [IsLocalRing R] : LAlg ℤ :=
-  { carrier := R, alg := Ring.toIntAlgebra R }
+def mkL (R : Type) [CommRing R] [IsLocalRing R] : LAlg ℤ := {
+  carrier := R
+  alg := Ring.toIntAlgebra R
+}
 
-def mkH {R S : Type} [CommRing R] [IsLocalRing R] [CommRing S] [IsLocalRing S] (f : R →+* S)
-    (hf : Function.Surjective f) : LHom (mkL R) (mkL S) :=
+def mkH
+    {R S : Type} [CommRing R] [IsLocalRing R] [CommRing S] [IsLocalRing S]
+    (f : R →+* S) (hf : Function.Surjective f)
+    : LHom (mkL R) (mkL S) :=
   ⟨f.toIntAlgHom, TowerExample.isLocalHom_of_surj _ hf⟩
 
 instance dualLocal (A : Type) [CommRing A] [IsLocalRing A] : IsLocalRing (DualNumber A) := by
@@ -126,8 +130,7 @@ lemma red_sec (a : ZMod p) : red p (sec p a) = a := by
 
 def teich : ZMod p →* ZMod (p ^ 2) where
   toFun a := sec p a ^ p
-  map_one' := by
-    rw [pow_congr p _ 1 (by rw [red_sec, map_one]), one_pow]
+  map_one' := by rw [pow_congr p _ 1 (by rw [red_sec, map_one]), one_pow]
   map_mul' a b := by
     rw [← mul_pow]
     exact pow_congr p _ _ (by rw [map_mul, red_sec, red_sec, red_sec])
@@ -197,22 +200,30 @@ def tower : ATowerL ℤ p where
   O := mkL (ZMod (p ^ 2))
   R' := lev' p
   R := lev p
-  π | 0 => mkH (fstR _) (fstR_surj _)
+  π
+    | 0 => mkH (fstR _) (fstR_surj _)
     | _ + 1 => mkH (fstR _) (fstR_surj _)
-  q | 0 => mkH (red p) (red_surj p)
+  q
+    | 0 => mkH (red p) (red_surj p)
     | _ + 1 => LHom.id _
-  ξ | 0 => (DualNumber.eps : DualNumber (ZMod p))
+  ξ
+    | 0 => (DualNumber.eps : DualNumber (ZMod p))
     | _ + 1 => (DualNumber.eps : DualNumber (ZMod (p ^ 2)))
-  surj | 0 => fstR_surj _
-       | _ + 1 => fstR_surj _
-  ker_eq | 0 => ker_fstR _
-         | _ + 1 => ker_fstR _
-  ξ_sq | 0 => DualNumber.eps_mul_eps (R := ZMod p)
-       | _ + 1 => DualNumber.eps_mul_eps (R := ZMod (p ^ 2))
-  ann | 0 => ann_eps _
-      | _ + 1 => ann_eps _
-  char | 0 => char_D (ZMod p) _ (by simp)
-       | n + 1 => char_D (ZMod (p ^ 2)) _ (pk p n)
+  surj
+    | 0 => fstR_surj _
+    | _ + 1 => fstR_surj _
+  ker_eq
+    | 0 => ker_fstR _
+    | _ + 1 => ker_fstR _
+  ξ_sq
+    | 0 => DualNumber.eps_mul_eps (R := ZMod p)
+    | _ + 1 => DualNumber.eps_mul_eps (R := ZMod (p ^ 2))
+  ann
+    | 0 => ann_eps _
+    | _ + 1 => ann_eps _
+  char
+    | 0 => char_D (ZMod p) _ (by simp)
+    | n + 1 => char_D (ZMod (p ^ 2)) _ (pk p n)
   sep a ha := ha 1
   c := 0
   cp _ := 0
@@ -221,27 +232,35 @@ def tower : ATowerL ℤ p where
   zh_pow _ := by rw [Units.val_one, one_pow, zero_mul, add_zero]
   ζ _ := 1
   ζ_spec _ := (map_one _).trans (map_one _).symm
-  r' | 0 => mkH (mapD (red p)) (mapD_surj _ (red_surj p))
-     | _ + 1 => LHom.id _
-  r | 0 => mkH (red p) (red_surj p)
+  r'
+    | 0 => mkH (mapD (red p)) (mapD_surj _ (red_surj p))
     | _ + 1 => LHom.id _
-  r_π | 0 => fun x => by
-          change red p (fst x) = fst (inl (red p (fst x)) + inr (red p (snd x)) : DualNumber (ZMod p))
-          simp
-      | _ + 1 => fun _ => rfl
-  r_q | 0 => fun _ => rfl
-      | _ + 1 => fun _ => rfl
-  r'_ξ | 0 => by
-          change mapD (red p) DualNumber.eps = DualNumber.eps
-          ext <;> simp [mapD]
-       | _ + 1 => rfl
-  complete x hx := ⟨x 1, fun n => by
-    cases n with
-    | zero => exact hx 0
-    | succ n =>
-      induction n with
-      | zero => rfl
-      | succ n ih => exact ih.trans (hx (n + 1)).symm⟩
+  r
+    | 0 => mkH (red p) (red_surj p)
+    | _ + 1 => LHom.id _
+  r_π
+    | 0 => fun x => by
+      change red p (fst x) = fst (inl (red p (fst x)) + inr (red p (snd x)) : DualNumber (ZMod p))
+      simp
+    | _ + 1 => fun _ => rfl
+  r_q
+    | 0 => fun _ => rfl
+    | _ + 1 => fun _ => rfl
+  r'_ξ
+    | 0 => by
+      change mapD (red p) DualNumber.eps = DualNumber.eps
+      ext <;> simp [mapD]
+    | _ + 1 => rfl
+  complete x hx := ⟨
+    x 1,
+    fun n => by
+      cases n with
+      | zero => exact hx 0
+      | succ n =>
+        induction n with
+        | zero => rfl
+        | succ n ih => exact ih.trans (hx (n + 1)).symm
+  ⟩
 
 def wModel : WData (tower p) (mkL (ZMod p)) where
   W := mkL (ZMod (p ^ 2))
@@ -261,12 +280,15 @@ def wModel : WData (tower p) (mkL (ZMod p)) where
     rw [map_add (f := _), map_mul, map_natCast, ZMod.natCast_self, zero_mul, add_zero]
   b := 1
   ξ_img := by
-    change fst (DualNumber.eps : DualNumber (ZMod (p ^ 2))) + (p : ZMod (p ^ 2)) * snd (DualNumber.eps : DualNumber (ZMod (p ^ 2))) = (p : ZMod (p ^ 2)) * 1
+    change fst (DualNumber.eps : DualNumber (ZMod (p ^ 2)))
+        + (p : ZMod (p ^ 2)) * snd (DualNumber.eps : DualNumber (ZMod (p ^ 2)))
+      = (p : ZMod (p ^ 2)) * 1
     simp
   Rb := ZMod p
   T := teich p
   decomp (w : ZMod (p ^ 2)) := by
-    obtain ⟨c, hc⟩ := (red_eq_zero p (w - teich p (red p w))).1 (by rw [map_sub, red_teich, sub_self])
+    obtain ⟨c, hc⟩ :=
+      (red_eq_zero p (w - teich p (red p w))).1 (by rw [map_sub, red_teich, sub_self])
     exact ⟨red p w, c, sub_eq_iff_eq_add'.1 hc⟩
   witt_add := witt_add p
   T_kill c h := by

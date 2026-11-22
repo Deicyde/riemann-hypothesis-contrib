@@ -6,11 +6,13 @@ public import Development.AutomorphicArithmetic.PAdicLatticeApproximation.PLatti
 @[expose] public section
 
 open NumberField
-open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo UpperTheory.Gal.W2.Wit
+open GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes
+  GlobalTheory.LKMid GlobalTheory.LKGeo UpperTheory.Gal.W2.Wit
 open scoped TensorProduct
 
-theorem UpperTheory.exists_lattice_approx_mod_n_completedLattice :
-    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (X : UpperTheory.Gal.W2.Wit.Sys D) (n : ℕ), 0 < n → n.Coprime p → ∀ a : D.La, ∃ u ∈ X.lat, ∃ e ∈ LaHat D, X.r u = inAf D a + n • e := by
+theorem UpperTheory.exists_lattice_approx_mod_n_completedLattice
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (X : UpperTheory.Gal.W2.Wit.Sys D) (n : ℕ),
+      0 < n → n.Coprime p → ∀ a : D.La, ∃ u ∈ X.lat, ∃ e ∈ LaHat D, X.r u = inAf D a + n • e := by
   intro p hp D X n hn hnp a
   obtain ⟨w, e₀, he₀, h⟩ := X.dense n hn (inAf D a)
   rw [← X.r_apply] at h

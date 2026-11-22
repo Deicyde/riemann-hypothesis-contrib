@@ -18,20 +18,28 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FNExpD
 
-theorem hasQ_DD_int : HasQ 1 DD fun n => ((PowerSeries.coeff n ReciprocityTheory.ChartRestriction.L1.dZ : ℤ) : ℂ) := by
+theorem hasQ_DD_int
+    : HasQ 1 DD fun n =>
+      ((PowerSeries.coeff n ReciprocityTheory.ChartRestriction.L1.dZ : ℤ) : ℂ) := by
   rw [hasQ_iff]
   intro τ
   have := ReciprocityTheory.ChartRestriction.L1.isMF_DD.hasSum τ
   rw [← ReciprocityTheory.ChartRestriction.L1.dC_eq] at this
-  simpa [ReciprocityTheory.ChartRestriction.L1.qm, ReciprocityTheory.ChartRestriction.L1.dC, PowerSeries.coeff_map] using this
+  simpa [ReciprocityTheory.ChartRestriction.L1.qm, ReciprocityTheory.ChartRestriction.L1.dC,
+      PowerSeries.coeff_map]
+    using this
 
-theorem expD : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ), ∃ h : HahnSeries ℚ Ω, IsExp ε DD h ∧ h ≠ 0 ∧
-    h.leadingCoeff = 1 ∧ ∀ r : ℚ, ∃ n : ℤ, h.coeff r = n := by
+theorem expD
+    : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ), ∃ h : HahnSeries ℚ Ω,
+      IsExp ε DD h ∧ h ≠ 0 ∧ h.leadingCoeff = 1 ∧ ∀ r : ℚ, ∃ n : ℤ, h.coeff r = n := by
   intro Ω _ ε
-  have hD : HasQ 1 DD fun n => ε ((PowerSeries.coeff n ReciprocityTheory.ChartRestriction.L1.dZ : ℤ) : Ω) := by
+  have hD : HasQ 1 DD fun n =>
+      ε ((PowerSeries.coeff n ReciprocityTheory.ChartRestriction.L1.dZ : ℤ) : Ω) := by
     simpa only [map_intCast] using hasQ_DD_int
-  obtain ⟨h, hexp, hk, hz⟩ := GlobalTheory.T.exists_hahnSeries_isExp_of_hasQ Ω ε 1 DD
-    (fun n => ((PowerSeries.coeff n ReciprocityTheory.ChartRestriction.L1.dZ : ℤ) : Ω)) one_pos hD
+  obtain ⟨h, hexp, hk, hz⟩ :=
+    GlobalTheory.T.exists_hahnSeries_isExp_of_hasQ Ω ε 1 DD
+      (fun n => ((PowerSeries.coeff n ReciprocityTheory.ChartRestriction.L1.dZ : ℤ) : Ω))
+      one_pos hD
   have h1 : h.coeff 1 = 1 := by
     have := hk 1
     simpa [ReciprocityTheory.ChartRestriction.L1.dZ_coeff_one] using this

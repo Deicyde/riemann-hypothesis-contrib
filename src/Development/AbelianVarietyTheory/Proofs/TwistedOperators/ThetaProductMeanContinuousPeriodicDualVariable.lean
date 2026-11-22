@@ -10,7 +10,10 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.GinfCS
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField
+  Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -19,35 +22,48 @@ namespace GlobalTheory.TwistThetaMean
 
 variable {D : D7}
 
-theorem isoPart_add (V W : HSp D) {r : ℕ} (C : Matrix (Fin V.rank) (Fin r) D.host.E) (a b : Mx D W.rank r) :
-    isoPart V W C (a + b) = isoPart V W C a + isoPart V W C b :=
+theorem isoPart_add
+    (V W : HSp D) {r : ℕ} (C : Matrix (Fin V.rank) (Fin r) D.host.E) (a b : Mx D W.rank r)
+    : isoPart V W C (a + b) = isoPart V W C a + isoPart V W C b :=
   Matrix.add_mul _ _ _
 
-theorem isoPart_rat (V W : HSp D) {r : ℕ} (C : Matrix (Fin V.rank) (Fin r) D.host.E) {γ : Mx D W.rank r}
-    (hγ : γ ∈ ratMx D W.rank r) : isoPart V W C γ ∈ ratL W V := by
+theorem isoPart_rat
+    (V W : HSp D)
+    {r : ℕ} (C : Matrix (Fin V.rank) (Fin r) D.host.E)
+    {γ : Mx D W.rank r} (hγ : γ ∈ ratMx D W.rank r)
+    : isoPart V W C γ ∈ ratL W V := by
   obtain ⟨g, rfl⟩ := hγ
   refine ⟨g * (adj D C * V.gram), ?_⟩
   show (g * (adj D C * V.gram)).map (incA D) = g.map (incA D) * (adj D C * V.gram).map (incA D)
   exact Matrix.map_mul
 
-theorem isoPart_continuous (V W : HSp D) {r : ℕ} (C : Matrix (Fin V.rank) (Fin r) D.host.E) :
-    Continuous (isoPart V W C) :=
+theorem isoPart_continuous (V W : HSp D) {r : ℕ} (C : Matrix (Fin V.rank) (Fin r) D.host.E)
+    : Continuous (isoPart V W C) :=
   continuous_id.matrix_mul continuous_const
 
-theorem midPart_continuous (V V' W : HSp D) (B : Matrix (Fin V.rank) (Fin V'.rank) D.host.E) :
-    Continuous (midPart V V' W B) :=
+theorem midPart_continuous (V V' W : HSp D) (B : Matrix (Fin V.rank) (Fin V'.rank) D.host.E)
+    : Continuous (midPart V V' W B) :=
   continuous_id.matrix_mul continuous_const
 
 end GlobalTheory.TwistThetaMean
 
 namespace GlobalTheory.TwistThetaMean
 
-theorem integral_continuous_of_bounded {X Y : Type*} [TopologicalSpace X] [FirstCountableTopology X]
-    [TopologicalSpace Y] [MeasurableSpace Y] [OpensMeasurableSpace Y] (ν : Measure Y) [IsFiniteMeasure ν]
-    (k : X × Y → ℂ) (hk : Continuous k) (b : ℝ) (hb : ∀ q, ‖k q‖ ≤ b) :
-    Continuous (fun p => ∫ y, k (p, y) ∂ν) ∧ ∀ p, ‖∫ y, k (p, y) ∂ν‖ ≤ b * ν.real Set.univ := by
-  refine ⟨continuous_of_dominated (bound := fun _ => b) (fun p => ?_) (fun p => ?_) (integrable_const _) ?_,
-    fun p => norm_integral_le_of_norm_le_const (Filter.Eventually.of_forall fun y => hb _)⟩
+theorem integral_continuous_of_bounded
+    {X Y : Type*} [TopologicalSpace X] [FirstCountableTopology X] [TopologicalSpace Y]
+    [MeasurableSpace Y] [OpensMeasurableSpace Y]
+    (ν : Measure Y) [IsFiniteMeasure ν]
+    (k : X × Y → ℂ) (hk : Continuous k)
+    (b : ℝ) (hb : ∀ q, ‖k q‖ ≤ b)
+    : Continuous (fun p => ∫ y, k (p, y) ∂ν) ∧ ∀ p, ‖∫ y, k (p, y) ∂ν‖ ≤ b * ν.real Set.univ := by
+  refine ⟨
+    continuous_of_dominated
+      (bound := fun _ => b)
+      (fun p => ?_)
+      (fun p => ?_)
+      (integrable_const _) ?_,
+    fun p => norm_integral_le_of_norm_le_const (Filter.Eventually.of_forall fun y => hb _)
+  ⟩
   · exact (hk.comp (Continuous.prodMk_right p)).aestronglyMeasurable
   · exact Filter.Eventually.of_forall fun y => hb _
   · exact Filter.Eventually.of_forall fun y => hk.comp (Continuous.prodMk_left y)
@@ -55,7 +71,6 @@ theorem integral_continuous_of_bounded {X Y : Type*} [TopologicalSpace X] [First
 end GlobalTheory.TwistThetaMean
 
 namespace GlobalTheory.TwistThetaMean
-
 
 open TopologicalSpace in
 theorem mean_continuous_periodic : ∀ (D : D7) (V V' W : HSp D) (r : ℕ) (C : Matrix (Fin V.rank) (Fin r) D.host.E) (B : Matrix (Fin V.rank) (Fin V'.rank) D.host.E), IsIsoSplit V V' C B → ∀ C' : Matrix (Fin V.rank) (Fin r) D.host.E, adj D C * V.gram * C' = 1 → adj D C' * V.gram * C' = 0 → adj D C' * V.gram * B = 0 → ∀ (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (μ : Measure (Mx D W.rank r)) (𝓨 : Set (Mx D W.rank r)), IsCovolOne (ratMx D W.rank r) μ 𝓨 → ∀ (μ' : Measure (WO V' W)) (𝓕' : Set (WO V' W)), μ'.IsAddHaarMeasure → IsAddFundamentalDomain (ratL W V') 𝓕' μ' → ∀ P G, IsThetaFunO ψ V W P → IsThetaFunO ψ V W G → Continuous (fun t : Mx D W.rank r => ∫ y' in 𝓨, ∫ x in 𝓕', P (isoPart V W C' t + isoPart V W C y' + midPart V V' W B x) * star (G (isoPart V W C' t + isoPart V W C y' + midPart V V' W B x)) ∂μ' ∂μ) ∧ ∀ γ ∈ ratMx D W.rank r, ∀ t : Mx D W.rank r, (∫ y' in 𝓨, ∫ x in 𝓕', P (isoPart V W C' (γ + t) + isoPart V W C y' + midPart V V' W B x) * star (G (isoPart V W C' (γ + t) + isoPart V W C y' + midPart V V' W B x)) ∂μ' ∂μ) = ∫ y' in 𝓨, ∫ x in 𝓕', P (isoPart V W C' t + isoPart V W C y' + midPart V V' W B x) * star (G (isoPart V W C' t + isoPart V W C y' + midPart V V' W B x)) ∂μ' ∂μ := by

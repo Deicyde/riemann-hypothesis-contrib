@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DegreeZeroSe
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace GlobalTheory.EtC
 
@@ -30,8 +31,14 @@ theorem etale_cohomology_vanishing_negative_degree_zero : A9 := by
     have : a = b := Cocycle.ext (by rw [hz a.1, hz b.1])
     rw [this]
   · let f : ∀ X : Scheme.{0}, Sec F X →+ H R (sch.obj X) F 0 := fun X =>
-      AddMonoidHom.mk' (secClass F (X := X)) (GlobalTheory.T.degreeZeroSectionClass_properties R F X).2.2.1
-    refine ⟨fun X => AddEquiv.ofBijective (f X) (GlobalTheory.T.degreeZeroSectionClass_properties R F X).2.1, ?_, ?_⟩
+      AddMonoidHom.mk' (secClass F (X := X))
+        (GlobalTheory.T.degreeZeroSectionClass_properties R F X).2.2.1
+    refine ⟨
+      fun X =>
+        AddEquiv.ofBijective (f X) (GlobalTheory.T.degreeZeroSectionClass_properties R F X).2.1,
+      ?_,
+      ?_
+    ⟩
     · intro Y X g s
       exact (GlobalTheory.T.degreeZeroSectionClass_properties R F X).2.2.2.1 g s
     · intro X s

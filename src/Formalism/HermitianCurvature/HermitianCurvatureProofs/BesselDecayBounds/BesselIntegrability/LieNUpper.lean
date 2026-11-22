@@ -12,13 +12,13 @@ namespace Formalism.MainNotions.GrowthW
 
 open Formalism.QuantumDeterminants
 
-theorem hpk_col_f {k r : ℕ} (l j : Fin (2 * r + k + 1)) (hj : r + k < j.val) :
-    Hpk k r l j = if l.val + j.val = 2 * r + k then 1 else 0 := by
+theorem hpk_col_f {k r : ℕ} (l j : Fin (2 * r + k + 1)) (hj : r + k < j.val)
+    : Hpk k r l j = if l.val + j.val = 2 * r + k then 1 else 0 := by
   unfold Hpk
   split_ifs <;> first | rfl | (exfalso; omega) | (simp_all; omega) | simp_all | omega
 
-theorem hpk_row_e {k r : ℕ} (p l : Fin (2 * r + k + 1)) (hp : p.val < r) :
-    Hpk k r p l = if p.val + l.val = 2 * r + k then 1 else 0 := by
+theorem hpk_row_e {k r : ℕ} (p l : Fin (2 * r + k + 1)) (hp : p.val < r)
+    : Hpk k r p l = if p.val + l.val = 2 * r + k then 1 else 0 := by
   unfold Hpk
   split_ifs <;> first | rfl | (exfalso; omega) | (simp_all; omega) | simp_all | omega
 
@@ -43,14 +43,20 @@ theorem lieNUpper : LieNUpper := by
     · rw [hpk_col_f _ _ hj2, if_pos (by omega), mul_one]
     · intro l _ hl
       rw [hpk_col_f _ _ hj2, if_neg, mul_zero]
-      intro h; apply hl; ext; omega
+      intro h
+      apply hl
+      ext
+      omega
     · simp
   have s2 : ∑ l, Hpk k r p l * X l j = X i j := by
     rw [Finset.sum_eq_single i]
     · rw [hpk_row_e _ _ (by omega), if_pos (by omega), one_mul]
     · intro l _ hl
       rw [hpk_row_e _ _ (by omega), if_neg, zero_mul]
-      intro h; apply hl; ext; omega
+      intro h
+      apply hl
+      ext
+      omega
     · simp
   have hz : X b p = 0 := hA1 ⟨p.val, by omega⟩ b (by simp only; omega)
   rw [s1, s2, hz, star_zero, zero_add] at e

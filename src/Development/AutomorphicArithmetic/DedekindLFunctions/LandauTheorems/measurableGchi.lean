@@ -10,8 +10,8 @@ noncomputable section
 
 namespace Deduction
 
-theorem measurable_Gchi_floor (g : ℕ → ℝ → ℂ) (hg : ∀ k, Measurable (g k)) :
-    Measurable (fun y : ℝ => g ⌊y⌋₊ y) := by
+theorem measurable_Gchi_floor (g : ℕ → ℝ → ℂ) (hg : ∀ k, Measurable (g k))
+    : Measurable (fun y : ℝ => g ⌊y⌋₊ y) := by
   have h : Measurable fun p : ℝ × ℕ => g p.2 p.1 :=
     measurable_from_prod_countable_left fun k => hg k
   exact h.comp (measurable_id.prodMk Nat.measurable_floor)
@@ -19,8 +19,10 @@ theorem measurable_Gchi_floor (g : ℕ → ℝ → ℂ) (hg : ∀ k, Measurable 
 theorem measurable_Gchi_ramp (f : ℕ → ℂ) : Measurable (ramp f) := by
   unfold ramp
   refine measurable_Gchi_floor
-    (fun k y => ∑ n ∈ Finset.range (k + 1),
-      (ArithmeticFunction.vonMangoldt n : ℂ) * f n * ((max (y / n - 1) 0 : ℝ) : ℂ)) ?_
+    (fun k y =>
+      ∑ n ∈ Finset.range (k + 1),
+        (ArithmeticFunction.vonMangoldt n : ℂ) * f n * ((max (y / n - 1) 0 : ℝ) : ℂ))
+    ?_
   intro k
   refine Finset.measurable_sum _ fun n _ => ?_
   fun_prop

@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsLif
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 
 namespace GlobalTheory.SS
@@ -20,8 +21,8 @@ namespace GlobalTheory.SS
 section
 variable {R K : Type} [CommRing R] [Field K] [Algebra R K] {A A' : Over (Sp K)}
 
-theorem Model.isPullback_j (M : Model R A) :
-    IsPullback M.j A.hom M.Y.hom (spMap (algebraMap R K)) := by
+theorem Model.isPullback_j (M : Model R A)
+    : IsPullback M.j A.hom M.Y.hom (spMap (algebraMap R K)) := by
   refine IsPullback.of_iso (IsPullback.of_hasPullback M.Y.hom (spMap (algebraMap R K)))
     ((Over.forget _).mapIso M.e) (Iso.refl _) (Iso.refl _) (Iso.refl _) ?_ ?_ (by simp) (by simp)
   · have : M.e.hom.left ≫ M.e.inv.left = 𝟙 _ := by rw [← Over.comp_left, M.e.hom_inv_id]; rfl
@@ -39,29 +40,35 @@ theorem Model.dominant_j (M : Model R A) : IsSchemeTheoreticallyDominant M.j := 
   have := M.smooth
   exact IsSchemeTheoreticallyDominant.of_isPullback M.isPullback_j.flip
 
-theorem Model.hom_ext_of_flat (M : Model R A) {P X : Scheme.{0}} (p : P ⟶ M.Y.left) [Flat p]
-    (s : X ⟶ Sp R) [IsSeparated s] {a b : P ⟶ X} (hab : a ≫ s = b ≫ s)
-    (h : pullback.fst p M.j ≫ a = pullback.fst p M.j ≫ b) : a = b := by
+theorem Model.hom_ext_of_flat
+    (M : Model R A)
+    {P X : Scheme.{0}} (p : P ⟶ M.Y.left) [Flat p]
+    (s : X ⟶ Sp R) [IsSeparated s]
+    {a b : P ⟶ X} (hab : a ≫ s = b ≫ s) (h : pullback.fst p M.j ≫ a = pullback.fst p M.j ≫ b)
+    : a = b := by
   have := M.dominant_j
   have := M.quasiCompact_j
   have : IsSchemeTheoreticallyDominant (pullback.fst p M.j) :=
     IsSchemeTheoreticallyDominant.of_isPullback (IsPullback.of_hasPullback p M.j).flip
   have : IsSeparated (Over.mk s).hom := ‹_›
-  have := over_ext_of_schemeTheoreticallyDominant (Y := Over.mk (a ≫ s)) (X := Over.mk s)
-    (pullback.fst p M.j) (a := Over.homMk a rfl) (b := Over.homMk b hab.symm) h
+  have :=
+    over_ext_of_schemeTheoreticallyDominant (Y := Over.mk (a ≫ s)) (X := Over.mk s)
+      (pullback.fst p M.j) (a := Over.homMk a rfl) (b := Over.homMk b hab.symm) h
   exact congr(($this).left)
 
-
 omit [IsDomain R] [IsFractionRing R K] in
-theorem Extends.comp_eq {M : Model R A} {N : Model R A'} {f : A ⟶ A'} {U : M.Y.left.Opens}
-    {g : U.toScheme ⟶ N.Y.left} (h : Extends M N f U g) {W : Scheme.{0}} (u : W ⟶ U.toScheme)
-    (v : W ⟶ A.left) (e : u ≫ U.ι = v ≫ M.j) : u ≫ g = v ≫ f.left ≫ N.j := by
+theorem Extends.comp_eq
+    {M : Model R A} {N : Model R A'} {f : A ⟶ A'} {U : M.Y.left.Opens} {g : U.toScheme ⟶ N.Y.left}
+    (h : Extends M N f U g)
+    {W : Scheme.{0}} (u : W ⟶ U.toScheme) (v : W ⟶ A.left) (e : u ≫ U.ι = v ≫ M.j)
+    : u ≫ g = v ≫ f.left ≫ N.j := by
   have P := isPullback_morphismRestrict M.j U
   rw [← P.lift_fst u v e, Category.assoc, h.2, P.lift_snd_assoc]
 
-theorem exists_glue (M : Model R A) (N : Model R A') (f : A ⟶ A') (U : M.Y.left → M.Y.left.Opens)
-    (g : ∀ y, (U y).toScheme ⟶ N.Y.left) (hU : ∀ y, y ∈ U y) (hg : ∀ y, Extends M N f (U y) (g y)) :
-    ∃ G : M.Y ⟶ N.Y, M.j ≫ G.left = f.left ≫ N.j ∧ ∀ y, (U y).ι ≫ G.left = g y := by
+theorem exists_glue
+    (M : Model R A) (N : Model R A') (f : A ⟶ A') (U : M.Y.left → M.Y.left.Opens)
+    (g : ∀ y, (U y).toScheme ⟶ N.Y.left) (hU : ∀ y, y ∈ U y) (hg : ∀ y, Extends M N f (U y) (g y))
+    : ∃ G : M.Y ⟶ N.Y, M.j ≫ G.left = f.left ≫ N.j ∧ ∀ y, (U y).ι ≫ G.left = g y := by
   have := N.sep
   have hc : TopologicalSpace.IsOpenCover U := by
     rw [TopologicalSpace.IsOpenCover, eq_top_iff]
@@ -86,8 +93,9 @@ theorem exists_glue (M : Model R A) (N : Model R A') (f : A ⟶ A') (U : M.Y.lef
     rw [pullback.condition_assoc, hG]
     exact (hg y).comp_eq _ _ pullback.condition.symm
 
-theorem ext_unique (M : Model R A) (N : Model R A') {a b : M.Y ⟶ N.Y}
-    (h : M.j ≫ a.left = M.j ≫ b.left) : a = b := by
+theorem ext_unique
+    (M : Model R A) (N : Model R A') {a b : M.Y ⟶ N.Y} (h : M.j ≫ a.left = M.j ≫ b.left)
+    : a = b := by
   have := M.dominant_j
   have := N.sep
   exact over_ext_of_schemeTheoreticallyDominant M.j h
@@ -96,7 +104,9 @@ end
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
-variable {R K : Type} [CommRing R] [Field K] [Algebra R K] {A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)} in
+variable
+  {R K : Type} [CommRing R] [Field K] [Algebra R K]
+  {A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)} in
 private lemma isPullback_model_j_spMap_algebraMap (M : _root_.GlobalTheory.SS.Model R A) :
     IsPullback M.j A.hom M.Y.hom (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap R K)) := by
   have h := IsPullback.of_hasPullback M.Y.hom (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap R K))
@@ -108,7 +118,9 @@ private lemma isPullback_model_j_spMap_algebraMap (M : _root_.GlobalTheory.SS.Mo
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
-variable {R K : Type} [CommRing R] [Field K] [Algebra R K] {A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)} in
+variable
+  {R K : Type} [CommRing R] [Field K] [Algebra R K]
+  {A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)} in
 private lemma eq_of_openImmersion_of_eq_on_genericFibre [IsDomain R] [IsFractionRing R K]
     (M : _root_.GlobalTheory.SS.Model R A)
     (N : _root_.GlobalTheory.SS.Model R A') {W : Scheme} (i : W ⟶ M.Y.left)
@@ -130,7 +142,9 @@ private lemma eq_of_openImmersion_of_eq_on_genericFibre [IsDomain R] [IsFraction
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
-variable {R K : Type} [CommRing R] [Field K] [Algebra R K] {A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)} in
+variable
+  {R K : Type} [CommRing R] [Field K] [Algebra R K]
+  {A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)} in
 private lemma comp_eq_of_extends_of_genericFibre_comm {M : _root_.GlobalTheory.SS.Model R A}
     {N : _root_.GlobalTheory.SS.Model R A'} {f : A ⟶ A'} {U : M.Y.left.Opens}
     {g : (U : Scheme) ⟶ N.Y.left} (hg : _root_.GlobalTheory.SS.Extends M N f U g)
@@ -140,17 +154,19 @@ private lemma comp_eq_of_extends_of_genericFibre_comm {M : _root_.GlobalTheory.S
   have h2 := hg.2
   rw [← hP.lift_fst t s hts.symm, Category.assoc, h2, ← Category.assoc, hP.lift_snd]
 
-
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
-variable {R K : Type} [CommRing R] [Field K] [Algebra R K] {A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)} in
-theorem _root_.GlobalTheory.SS.existsUnique_extension_of_forall_defAt :
-    ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
-      [IsFractionRing R K] (A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)) (M : _root_.GlobalTheory.SS.Model R A)
-      (N : _root_.GlobalTheory.SS.Model R A') (f : A ⟶ A'),
-      (∀ y, _root_.GlobalTheory.SS.DefAt M N f y) →
-        ∃! g : M.Y ⟶ N.Y,
-          M.j ≫ g.left = f.left ≫ N.j := by
+variable
+  {R K : Type} [CommRing R] [Field K] [Algebra R K]
+  {A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)} in
+theorem _root_.GlobalTheory.SS.existsUnique_extension_of_forall_defAt
+    : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+        [IsFractionRing R K]
+        (A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K))
+        (M : _root_.GlobalTheory.SS.Model R A) (N : _root_.GlobalTheory.SS.Model R A') (f : A ⟶ A'),
+      (∀ y, _root_.GlobalTheory.SS.DefAt M N f y)
+        → ∃! g : M.Y ⟶ N.Y,
+            M.j ≫ g.left = f.left ≫ N.j := by
   intro R K _ _ _ _ _ _ A A' M N f hdef
   choose U g hyU hg using hdef
   have hcov : TopologicalSpace.IsOpenCover U := by
@@ -159,19 +175,20 @@ theorem _root_.GlobalTheory.SS.existsUnique_extension_of_forall_defAt :
     exact TopologicalSpace.Opens.mem_iSup.mpr ⟨y, hyU y⟩
   have key : ∀ x y, pullback.fst (U x).ι (U y).ι ≫ g x = pullback.snd (U x).ι (U y).ι ≫ g y := by
     intro x y
-    refine eq_of_openImmersion_of_eq_on_genericFibre M N (pullback.fst (U x).ι (U y).ι ≫ (U x).ι)
-      _ _ ?_ ?_ ?_
+    refine eq_of_openImmersion_of_eq_on_genericFibre M N (pullback.fst (U x).ι (U y).ι ≫ (U x).ι) _
+      _ ?_ ?_ ?_
     · simp only [Category.assoc, (hg x).1]
     · simp only [Category.assoc, (hg y).1]
       rw [← Category.assoc, ← pullback.condition, Category.assoc]
-    · have e1 := comp_eq_of_extends_of_genericFibre_comm (hg x)
-        (pullback.snd M.j (pullback.fst (U x).ι (U y).ι ≫ (U x).ι) ≫
-          pullback.fst _ _)
-        (pullback.fst _ _) (by rw [Category.assoc]; exact pullback.condition)
-      have e2 := comp_eq_of_extends_of_genericFibre_comm (hg y)
-        (pullback.snd M.j (pullback.fst (U x).ι (U y).ι ≫ (U x).ι) ≫
-          pullback.snd _ _)
-        (pullback.fst _ _) (by rw [Category.assoc, ← pullback.condition]; exact pullback.condition)
+    · have e1 :=
+        comp_eq_of_extends_of_genericFibre_comm (hg x)
+          (pullback.snd M.j (pullback.fst (U x).ι (U y).ι ≫ (U x).ι) ≫ pullback.fst _ _)
+          (pullback.fst _ _) (by rw [Category.assoc]; exact pullback.condition)
+      have e2 :=
+        comp_eq_of_extends_of_genericFibre_comm (hg y)
+          (pullback.snd M.j (pullback.fst (U x).ι (U y).ι ≫ (U x).ι) ≫ pullback.snd _ _)
+          (pullback.fst _ _)
+          (by rw [Category.assoc, ← pullback.condition]; exact pullback.condition)
       simp only [Category.assoc] at e1 e2
       rw [e1, e2]
   let 𝒰 := M.Y.left.openCoverOfIsOpenCover U hcov
@@ -193,11 +210,14 @@ theorem _root_.GlobalTheory.SS.existsUnique_extension_of_forall_defAt :
       intro a _
       exact TopologicalSpace.Opens.mem_iSup.mpr ⟨M.j a, hyU _⟩
     refine (A.left.openCoverOfIsOpenCover _ hcovA).hom_ext _ _ fun y => ?_
-    change (M.j ⁻¹ᵁ U y).ι ≫ M.j ≫ G =
-      (M.j ⁻¹ᵁ U y).ι ≫ f.left ≫ N.j
+    change (M.j ⁻¹ᵁ U y).ι ≫ M.j ≫ G = (M.j ⁻¹ᵁ U y).ι ≫ f.left ≫ N.j
     rw [← Category.assoc, ← morphismRestrict_ι, Category.assoc]
     exact (M.j ∣_ U y ≫= hG y).trans (hg y).2
-  exact ⟨Over.homMk G hw, hex, fun g' hg' =>
-    _root_.GlobalTheory.over_ext_of_schemeTheoreticallyDominant M.j (hg'.trans hex.symm)⟩
+  exact ⟨
+    Over.homMk G hw,
+    hex,
+    fun g' hg' =>
+      _root_.GlobalTheory.over_ext_of_schemeTheoreticallyDominant M.j (hg'.trans hex.symm)
+  ⟩
 
 end GlobalTheory.SS

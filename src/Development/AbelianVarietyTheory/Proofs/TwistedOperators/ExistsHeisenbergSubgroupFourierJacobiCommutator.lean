@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RootExcha
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
 
 noncomputable section
 namespace GlobalTheory.RootEx.HeisenbergSubgroup
@@ -51,22 +52,24 @@ theorem zM_mul_row (u : n → k) (t : k) : zM c p t * ExchangeSupport.rowM c p u
   split_ifs with h₁ h₂ <;> first | (exfalso; omega) | simp
 
 omit [DecidableEq n] in
-theorem row_mul_col (u β : n → k) :
-    ExchangeSupport.rowM c p u * ExchangeSupport.colM c (p + 1) β = zM c p (u ⬝ᵥ β) := by
+theorem row_mul_col (u β : n → k)
+    : ExchangeSupport.rowM c p u * ExchangeSupport.colM c (p + 1) β = zM c p (u ⬝ᵥ β) := by
   ext l i
   simp only [Matrix.mul_apply, ExchangeSupport.rowM, ExchangeSupport.colM, zM, Matrix.of_apply]
   by_cases hl : l.val + 1 = p <;> by_cases hi : i.val + 1 = p + 1 <;> simp [hl, hi, dotProduct]
 
 omit [Fintype n] [DecidableEq n] in
-theorem row_add (u w : n → k) : ExchangeSupport.rowM c p (u + w) =
-    ExchangeSupport.rowM c p u + ExchangeSupport.rowM c p w := by
+theorem row_add (u w : n → k)
+    : ExchangeSupport.rowM c p (u + w)
+      = ExchangeSupport.rowM c p u + ExchangeSupport.rowM c p w := by
   ext l s
   simp only [ExchangeSupport.rowM, Matrix.of_apply, Matrix.add_apply, Pi.add_apply]
   split_ifs <;> simp
 
 omit [Fintype n] [DecidableEq n] in
-theorem col_add (u w : n → k) : ExchangeSupport.colM c p (u + w) =
-    ExchangeSupport.colM c p u + ExchangeSupport.colM c p w := by
+theorem col_add (u w : n → k)
+    : ExchangeSupport.colM c p (u + w)
+      = ExchangeSupport.colM c p u + ExchangeSupport.colM c p w := by
   ext r i
   simp only [ExchangeSupport.colM, Matrix.of_apply, Matrix.add_apply, Pi.add_apply]
   split_ifs <;> simp
@@ -81,8 +84,8 @@ theorem col_zero : ExchangeSupport.colM c p (0 : n → k) = 0 := by
   ext r i
   simp [ExchangeSupport.colM]
 
-theorem hM_mul (u β u' β' : n → k) (t t' : k) :
-    hM c p u β t * hM c p u' β' t' = hM c p (u + u') (β + β') (t + t' + u ⬝ᵥ β') := by
+theorem hM_mul (u β u' β' : n → k) (t t' : k)
+    : hM c p u β t * hM c p u' β' t' = hM c p (u + u') (β + β') (t + t' + u ⬝ᵥ β') := by
   simp only [hM, Matrix.fromBlocks_multiply]
   congr 1
   · rw [ExchangeSupport.colM_mul_rowM, Matrix.one_mul, add_zero]
@@ -107,13 +110,13 @@ theorem cenM_eq (t : k) : cenM n c p t = hM c p 0 0 t := by
   rw [hM, row_zero, col_zero]
   rfl
 
-theorem prod_eq (u β : n → k) (t : k) :
-    (rowE c p u).val * (colE c (p + 1) β).val * cenM n c p t = hM c p u β (u ⬝ᵥ β + t) := by
+theorem prod_eq (u β : n → k) (t : k)
+    : (rowE c p u).val * (colE c (p + 1) β).val * cenM n c p t = hM c p u β (u ⬝ᵥ β + t) := by
   rw [rowE_eq, colE_eq, cenM_eq, hM_mul, hM_mul]
   simp only [add_zero, zero_add, dotProduct_zero]
 
-def Heisenberg₂ (k : Type) [Field k] (n : Type) [Fintype n] [DecidableEq n] (c p : ℕ) :
-    Subgroup (GL (n ⊕ Fin c) k) where
+def Heisenberg₂ (k : Type) [Field k] (n : Type) [Fintype n] [DecidableEq n] (c p : ℕ)
+    : Subgroup (GL (n ⊕ Fin c) k) where
   carrier := {g | ∃ (u β : n → k) (t : k), g.val = hM c p u β t}
   one_mem' := ⟨0, 0, 0, hM_zero.symm⟩
   mul_mem' := by
@@ -125,8 +128,8 @@ def Heisenberg₂ (k : Type) [Field k] (n : Type) [Fintype n] [DecidableEq n] (c
     rw [hg, hM_mul, ← hM_zero (p := p)]
     simp
 
-theorem mem_N_of_val {g : GL (n ⊕ Fin c) k} {β : n → k} {t : k} (hg : g.val = hM c p 0 β t) :
-    g ∈ N k n c p := by
+theorem mem_N_of_val {g : GL (n ⊕ Fin c) k} {β : n → k} {t : k} (hg : g.val = hM c p 0 β t)
+    : g ∈ N k n c p := by
   show g ∈ Subgroup.closure {g | InN p g}
   refine Subgroup.subset_closure ?_
   intro r s hrs
@@ -161,8 +164,7 @@ theorem heis_le : Heisenberg₂ k n c p ≤ NFJ k n c p := by
   rintro g ⟨u, β, t, hg⟩
   have hinv : rowE c p u * rowE c p (-u) = 1 := by
     rw [← ExchangeSupport.rowE_add, add_neg_cancel, ExchangeSupport.rowE_zero]
-  have hsplit : g = rowE c p u * (rowE c p (-u) * g) := by
-    rw [← mul_assoc, hinv, one_mul]
+  have hsplit : g = rowE c p u * (rowE c p (-u) * g) := by rw [← mul_assoc, hinv, one_mul]
   have hrest : rowE c p (-u) * g ∈ N k n c p := by
     refine mem_N_of_val (β := β) (t := t - u ⬝ᵥ β) ?_
     rw [Units.val_mul, hg, rowE_eq, hM_mul]
@@ -174,7 +176,18 @@ theorem heis_le : Heisenberg₂ k n c p ≤ NFJ k n c p := by
 
 end
 
-theorem heisenberg_subgroup : ∀ (k : Type) [Field k] (n : Type) [Fintype n] [DecidableEq n] (c ρ : ℕ) (_ : 1 ≤ ρ) (_ : ρ < c), (∃ H : Subgroup (GL (n ⊕ Fin c) k), H ≤ NFJ k n c ρ ∧ ∀ g, g ∈ H ↔ ∃ (u β : n → k) (t : k), g.val = (rowE c ρ u).val * (colE c (ρ + 1) β).val * cenM n c ρ t) ∧ ∀ u β₀ : n → k, (rowE c ρ u * colE c (ρ + 1) β₀).val = cenM n c ρ (u ⬝ᵥ β₀) * (colE c (ρ + 1) β₀ * rowE c ρ u).val := by
+theorem heisenberg_subgroup
+    : ∀ (k : Type) [Field k] (n : Type) [Fintype n] [DecidableEq n] (c ρ : ℕ) (_ : 1 ≤ ρ)
+        (_ : ρ < c),
+      (∃ H : Subgroup (GL (n ⊕ Fin c) k),
+          H ≤ NFJ k n c ρ
+            ∧ ∀ g,
+              g ∈ H
+                ↔ ∃ (u β : n → k) (t : k),
+                  g.val = (rowE c ρ u).val * (colE c (ρ + 1) β).val * cenM n c ρ t)
+        ∧ ∀ u β₀ : n → k,
+          (rowE c ρ u * colE c (ρ + 1) β₀).val
+            = cenM n c ρ (u ⬝ᵥ β₀) * (colE c (ρ + 1) β₀ * rowE c ρ u).val := by
   intro k _ n _ _ c ρ _ _
   refine ⟨⟨Heisenberg₂ k n c ρ, heis_le, fun g => ?_⟩, fun u β₀ => ?_⟩
   · constructor

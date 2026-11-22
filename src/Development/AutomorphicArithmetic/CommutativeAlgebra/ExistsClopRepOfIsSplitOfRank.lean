@@ -32,8 +32,11 @@ private lemma rep_empty {S : Scheme.{0}} (G : Over S) (hG : IsEmpty G.left) :
     ext
     simpa using Over.w y
 
-theorem UpperTheory.exists_clopRep_of_isSplitOfRank :
-    ∀ {S : Scheme.{0}} (G : Over S) (n : ℕ), GlobalTheory.FinEt.IsSplitOfRank G.hom n → ∃ (Y : Over S) (U : (Y ⊗ G).left.Opens), UpperTheory.RepresentationRank.Rep G Y U ∧ IsFinite Y.hom ∧ Etale Y.hom := by
+theorem UpperTheory.exists_clopRep_of_isSplitOfRank
+    : ∀ {S : Scheme.{0}} (G : Over S) (n : ℕ),
+      GlobalTheory.FinEt.IsSplitOfRank G.hom n
+        → ∃ (Y : Over S) (U : (Y ⊗ G).left.Opens),
+          UpperTheory.RepresentationRank.Rep G Y U ∧ IsFinite Y.hom ∧ Etale Y.hom := by
   intro S G n
   induction n generalizing G with
   | zero =>
@@ -49,7 +52,9 @@ theorem UpperTheory.exists_clopRep_of_isSplitOfRank :
     obtain ⟨σ, hσ, V, hσp, hrange, hV⟩ := h.exists_of_succ
     obtain ⟨Y₁, U₁, hR₁, hf₁, he₁⟩ := UpperTheory.exists_clopRep_trivial S
     obtain ⟨Y₂, U₂, hR₂, hf₂, he₂⟩ := ih (Over.mk (V.ι ≫ G.hom)) hV
-    obtain ⟨U, hU⟩ := UpperTheory.exists_clopRep_of_disjoint_open_cover G (Over.mk (𝟙 S)) (Over.mk (V.ι ≫ G.hom)) Y₁ Y₂
-      (Over.homMk σ hσp) (Over.homMk V.ι rfl) U₁ U₂ hσ (show IsOpenImmersion V.ι from inferInstance)
-      (show Set.range σ = (Set.range V.ι)ᶜ by rw [hrange, compl_compl]) hR₁ hR₂
+    obtain ⟨U, hU⟩ :=
+      UpperTheory.exists_clopRep_of_disjoint_open_cover G (Over.mk (𝟙 S)) (Over.mk (V.ι ≫ G.hom)) Y₁
+        Y₂ (Over.homMk σ hσp) (Over.homMk V.ι rfl) U₁ U₂ hσ
+        (show IsOpenImmersion V.ι from inferInstance)
+        (show Set.range σ = (Set.range V.ι)ᶜ by rw [hrange, compl_compl]) hR₁ hR₂
     exact ⟨Y₁ ⊗ Y₂, U, hU, tensor_fe Y₁ Y₂ hf₁ he₁ hf₂ he₂⟩

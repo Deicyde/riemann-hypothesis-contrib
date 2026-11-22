@@ -4,7 +4,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp
+  Matrix IsLocalRing
 open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
 
 private lemma corG_sum_log (n : ℤ) (hn : n ≠ 0) (Ls : Finset Nat.Primes) :
@@ -38,8 +40,7 @@ private lemma corG_sum_log (n : ℤ) (hn : n ≠ 0) (Ls : Finset Nat.Primes) :
         (Real.log_prod (fun l hl => (hpos l hl).ne')).symm
     _ ≤ Real.log |(n : ℝ)| := Real.log_le_log (Finset.prod_pos hpos) hP
 
-theorem UpperTheory.V.U3.corGK :
-    PropGK → CorGK := by
+theorem UpperTheory.V.U3.corGK : PropGK → CorGK := by
   intro hP K _ _
   obtain ⟨c₅, A, hK⟩ := hP K
   refine ⟨c₅, A, ?_⟩
@@ -55,8 +56,11 @@ theorem UpperTheory.V.U3.corGK :
     exact h.e_pos
   obtain ⟨n, hn, hb, h⟩ := hK e N H p he hp hd
   obtain ⟨n', hn', hb', h'⟩ := hK e N H p' he hp' hd'
-  have key : ∀ l ∈ Ls, (∀ ψ ∈ orb (c l) H, Vlen Ω (c l) e ψ ≠ ⊤) ∧
-      ∑ ψ ∈ orb (c l) H, Vn Ω (c l) e ψ ≤ 2 * (padicValInt l n : ℝ) + 2 * (padicValInt l n' : ℝ) := by
+  have key
+      : ∀ l ∈ Ls,
+        (∀ ψ ∈ orb (c l) H, Vlen Ω (c l) e ψ ≠ ⊤)
+          ∧ ∑ ψ ∈ orb (c l) H, Vn Ω (c l) e ψ
+            ≤ 2 * (padicValInt l n : ℝ) + 2 * (padicValInt l n' : ℝ) := by
     intro l hl
     have a1 : (0 : ℝ) ≤ (padicValInt l n : ℝ) := Nat.cast_nonneg _
     have a2 : (0 : ℝ) ≤ (padicValInt l n' : ℝ) := Nat.cast_nonneg _
@@ -69,9 +73,12 @@ theorem UpperTheory.V.U3.corGK :
   refine ⟨fun l hl => (key l hl).1, ?_⟩
   have s1 := corG_sum_log n hn Ls
   have s2 := corG_sum_log n' hn' Ls
-  calc _ ≤ ∑ l ∈ Ls, Real.log (l : ℕ) * (2 * (padicValInt l n : ℝ) + 2 * (padicValInt l n' : ℝ)) :=
-        Finset.sum_le_sum fun l hl => mul_le_mul_of_nonneg_left (key l hl).2 (Real.log_natCast_nonneg _)
-    _ = 2 * ∑ l ∈ Ls, Real.log (l : ℕ) * (padicValInt l n : ℝ) + 2 * ∑ l ∈ Ls, Real.log (l : ℕ) * (padicValInt l n' : ℝ) := by
-        rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
-        exact Finset.sum_congr rfl fun l _ => by ring
+  calc
+    _ ≤ ∑ l ∈ Ls, Real.log (l : ℕ) * (2 * (padicValInt l n : ℝ) + 2 * (padicValInt l n' : ℝ)) :=
+      Finset.sum_le_sum fun l hl =>
+        mul_le_mul_of_nonneg_left (key l hl).2 (Real.log_natCast_nonneg _)
+    _ = 2 * ∑ l ∈ Ls, Real.log (l : ℕ) * (padicValInt l n : ℝ)
+        + 2 * ∑ l ∈ Ls, Real.log (l : ℕ) * (padicValInt l n' : ℝ) := by
+      rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
+      exact Finset.sum_congr rfl fun l _ => by ring
     _ ≤ _ := by nlinarith

@@ -25,12 +25,17 @@ section Fields
 
 open Polynomial IntermediateField
 
-theorem natDegree_minpoly_eq {L F Ω : Type*} [Field L] [Field F] [Field Ω] [Algebra L F] [Algebra F Ω]
-    [Algebra L Ω] [IsScalarTower L F Ω] (hLF : ∀ x : F, IsIntegral L x → x ∈ (algebraMap L F).range)
-    {θ : Ω} (hθ : IsIntegral L θ) : (minpoly F θ).natDegree = (minpoly L θ).natDegree := by
+theorem natDegree_minpoly_eq
+    {L F Ω : Type*}
+    [Field L] [Field F] [Field Ω] [Algebra L F] [Algebra F Ω] [Algebra L Ω] [IsScalarTower L F Ω]
+    (hLF : ∀ x : F, IsIntegral L x → x ∈ (algebraMap L F).range)
+    {θ : Ω} (hθ : IsIntegral L θ)
+    : (minpoly F θ).natDegree = (minpoly L θ).natDegree := by
   have hF : IsIntegral F θ := hθ.tower_top
-  have hd : minpoly F θ ∣ (minpoly L θ).map (algebraMap L F) := minpoly.dvd_map_of_isScalarTower L F θ
-  have h1 := integralClosure.mem_lifts_of_monic_of_dvd_map F (minpoly.monic hθ) (minpoly.monic hF) hd
+  have hd : minpoly F θ ∣ (minpoly L θ).map (algebraMap L F) :=
+    minpoly.dvd_map_of_isScalarTower L F θ
+  have h1 :=
+    integralClosure.mem_lifts_of_monic_of_dvd_map F (minpoly.monic hθ) (minpoly.monic hF) hd
   have h2 : minpoly F θ ∈ lifts (algebraMap L F) := by
     rw [lifts_iff_coeff_lifts] at h1 ⊢
     intro n
@@ -45,15 +50,21 @@ theorem natDegree_minpoly_eq {L F Ω : Type*} [Field L] [Field F] [Field Ω] [Al
     refine natDegree_le_of_dvd (minpoly.dvd L θ ?_) hm.ne_zero
     rw [← aeval_map_algebraMap F, hq, minpoly.aeval]
 
-theorem mem_of_isIntegral {L F Ω : Type*} [Field L] [CharZero L] [Field F] [Field Ω] [Algebra L F] [Algebra F Ω]
-    [Algebra L Ω] [IsScalarTower L F Ω] (hLF : ∀ x : F, IsIntegral L x → x ∈ (algebraMap L F).range)
-    (M : IntermediateField L Ω) [FiniteDimensional L M] (hgen : adjoin F (M : Set Ω) = ⊤)
-    {a : Ω} (ha : IsIntegral L a) : a ∈ M := by
+theorem mem_of_isIntegral
+    {L F Ω : Type*} [Field L] [CharZero L] [Field F] [Field Ω] [Algebra L F] [Algebra F Ω]
+    [Algebra L Ω] [IsScalarTower L F Ω]
+    (hLF : ∀ x : F, IsIntegral L x → x ∈ (algebraMap L F).range)
+    (M : IntermediateField L Ω) [FiniteDimensional L M]
+    (hgen : adjoin F (M : Set Ω) = ⊤)
+    {a : Ω} (ha : IsIntegral L a)
+    : a ∈ M := by
   haveI : FiniteDimensional L L⟮a⟯ := adjoin.finiteDimensional ha
   let N : IntermediateField L Ω := M ⊔ L⟮a⟯
   haveI : FiniteDimensional L N := inferInstance
-  have prim : ∀ P : IntermediateField L Ω, FiniteDimensional L P → ∃ θ : Ω, IsIntegral L θ ∧ L⟮θ⟯ = P ∧
-      Module.finrank L P = Module.finrank F F⟮θ⟯ := by
+  have prim
+      : ∀ P : IntermediateField L Ω,
+        FiniteDimensional L P
+          → ∃ θ : Ω, IsIntegral L θ ∧ L⟮θ⟯ = P ∧ Module.finrank L P = Module.finrank F F⟮θ⟯ := by
     intro P _
     obtain ⟨θ, hθ⟩ := Field.exists_primitive_element L P
     have hi : IsIntegral L (θ : Ω) := (Algebra.IsIntegral.isIntegral (R := L) θ).map P.val
@@ -77,14 +88,17 @@ theorem mem_of_isIntegral {L F Ω : Type*} [Field L] [CharZero L] [Field F] [Fie
   rw [this]
   exact (le_sup_right : L⟮a⟯ ≤ N) (mem_adjoin_simple_self L a)
 
-theorem mem_range_of_isIntegral {F K Ω : Type*} [Field F] [CharZero F] [Field K] [CharZero K] [Field Ω] [CharZero Ω]
-    [FiniteDimensional ℚ K] (φ : F →+* Ω) (ψ : K →+* Ω)
-    (hgen : ∀ S : Subfield Ω, (∀ x, φ x ∈ S) → (∀ y, ψ y ∈ S) → S = ⊤)
-    (hal : ∀ x : F, IsIntegral ℚ x → φ x ∈ ψ.range) {a : Ω} (ha : IsIntegral ℚ a) : a ∈ ψ.range := by
+theorem mem_range_of_isIntegral
+    {F K Ω : Type*}
+    [Field F] [CharZero F] [Field K] [CharZero K] [Field Ω] [CharZero Ω] [FiniteDimensional ℚ K]
+    (φ : F →+* Ω) (ψ : K →+* Ω) (hgen : ∀ S : Subfield Ω, (∀ x, φ x ∈ S) → (∀ y, ψ y ∈ S) → S = ⊤)
+    (hal : ∀ x : F, IsIntegral ℚ x → φ x ∈ ψ.range)
+    {a : Ω} (ha : IsIntegral ℚ a)
+    : a ∈ ψ.range := by
   letI : Algebra F Ω := φ.toAlgebra
   let L := algebraicClosure ℚ F
-  let M : IntermediateField L Ω := ψ.fieldRange.toIntermediateField fun x =>
-    hal x (mem_algebraicClosure_iff'.1 x.2)
+  let M : IntermediateField L Ω :=
+    ψ.fieldRange.toIntermediateField fun x => hal x (mem_algebraicClosure_iff'.1 x.2)
   haveI : FiniteDimensional ℚ M := by
     let g : K →ₗ[ℚ] M := (ψ.rangeRestrictField : K →+* M).toRatAlgHom.toLinearMap
     exact Module.Finite.of_surjective g ψ.rangeRestrictField_bijective.2
@@ -92,22 +106,30 @@ theorem mem_range_of_isIntegral {F K Ω : Type*} [Field F] [CharZero F] [Field K
   haveI : Algebra.IsIntegral ℚ L := (algebraicClosure.isAlgebraic ℚ F).isIntegral
   refine mem_of_isIntegral (L := L) (F := F) (fun x hx => ?_) M ?_ ha.tower_top
   · exact ⟨⟨x, mem_algebraicClosure_iff'.2 (isIntegral_trans x hx)⟩, rfl⟩
-  · have := hgen (adjoin F (M : Set Ω)).toSubfield (fun x => (adjoin F (M : Set Ω)).algebraMap_mem x)
-      (fun y => subset_adjoin F _ ⟨y, rfl⟩)
+  · have :=
+      hgen (adjoin F (M : Set Ω)).toSubfield
+        (fun x => (adjoin F (M : Set Ω)).algebraMap_mem x)
+        (fun y => subset_adjoin F _ ⟨y, rfl⟩)
     exact IntermediateField.toSubfield_injective this
 
-theorem mem_range_of_isAlgebraic_ratFun {K σ : Type*} [Field K] (a : FractionRing (MvPolynomial σ K))
-    (ha : IsAlgebraic K a) : a ∈ (algebraMap K (FractionRing (MvPolynomial σ K))).range := by
-  obtain ⟨b, rfl⟩ := IsIntegrallyClosed.isIntegral_iff.mp (ha.isIntegral.tower_top (A := MvPolynomial σ K))
-  have hb : IsIntegral K b := (isIntegral_algebraMap_iff ).mp ha.isIntegral
+theorem mem_range_of_isAlgebraic_ratFun
+    {K σ : Type*} [Field K] (a : FractionRing (MvPolynomial σ K)) (ha : IsAlgebraic K a)
+    : a ∈ (algebraMap K (FractionRing (MvPolynomial σ K))).range := by
+  obtain ⟨b, rfl⟩ :=
+    IsIntegrallyClosed.isIntegral_iff.mp (ha.isIntegral.tower_top (A := MvPolynomial σ K))
+  have hb : IsIntegral K b := (isIntegral_algebraMap_iff).mp ha.isIntegral
   by_cases h0 : b = 0
   · exact ⟨0, by simp [h0]⟩
   obtain ⟨r, -, rfl⟩ := MvPolynomial.isUnit_iff_eq_C_of_isReduced.1 (hb.isUnit h0)
   exact ⟨r, IsScalarTower.algebraMap_apply K (MvPolynomial σ K) _ r⟩
 
-theorem exists_finset_roots (F : Type*) [Field F] [CharZero F] [Algebra.EssFiniteType ℚ F] :
-    ∃ s : Finset ℂ, (∀ z ∈ s, IsAlgebraic ℚ z) ∧ ∀ K : IntermediateField ℚ ℂ, (∀ z ∈ s, z ∈ K) →
-      ∀ (Ω : Type) [Field Ω] (φ : F →+* Ω) (ψ : K →+* Ω) (x : F), IsIntegral ℚ x → φ x ∈ ψ.range := by
+theorem exists_finset_roots (F : Type*) [Field F] [CharZero F] [Algebra.EssFiniteType ℚ F]
+    : ∃ s : Finset ℂ,
+      (∀ z ∈ s, IsAlgebraic ℚ z)
+        ∧ ∀ K : IntermediateField ℚ ℂ,
+          (∀ z ∈ s, z ∈ K)
+            → ∀ (Ω : Type) [Field Ω] (φ : F →+* Ω) (ψ : K →+* Ω) (x : F),
+              IsIntegral ℚ x → φ x ∈ ψ.range := by
   classical
   let L := algebraicClosure ℚ F
   haveI : FiniteDimensional ℚ L := finiteDimensional_algebraicClosure_of_essFiniteType ℚ F
@@ -120,14 +142,16 @@ theorem exists_finset_roots (F : Type*) [Field F] [CharZero F] [Algebra.EssFinit
   haveI : CharZero Ω := charZero_of_injective_ringHom φ.injective
   letI : Algebra K Ω := ψ.toAlgebra
   have hs : (p.map (algebraMap ℚ K)).Splits :=
-    IntermediateField.splits_of_splits (IsAlgClosed.splits _) fun z hz => hK z (by
-      rw [Multiset.mem_toFinset]
-      exact Finset.mem_coe.1 hz |> Multiset.mem_toFinset.1)
+    IntermediateField.splits_of_splits (IsAlgClosed.splits _) fun z hz =>
+      hK z (by
+        rw [Multiset.mem_toFinset]
+        exact Finset.mem_coe.1 hz |> Multiset.mem_toFinset.1)
   let g : L →ₐ[ℚ] Ω := (φ.comp L.val.toRingHom).toRatAlgHom
   have hr : g θ ∈ ψ.range := by
     refine hs.mem_range_of_isRoot (S := Ω) ((minpoly.monic hi).map _).ne_zero ?_
     change (Polynomial.map _ _).IsRoot _
-    rw [Polynomial.map_map, Subsingleton.elim (RingHom.comp _ _) (algebraMap ℚ Ω), IsRoot.def, eval_map_algebraMap, aeval_algHom_apply, minpoly.aeval, map_zero]
+    rw [Polynomial.map_map, Subsingleton.elim (RingHom.comp _ _) (algebraMap ℚ Ω), IsRoot.def,
+      eval_map_algebraMap, aeval_algHom_apply, minpoly.aeval, map_zero]
   have hle : (⊤ : IntermediateField ℚ L) ≤ (ψ.toRatAlgHom.fieldRange).comap g := by
     rw [← hθ, adjoin_simple_le_iff]
     exact hr
@@ -139,20 +163,26 @@ section Schemes
 
 open AlgebraicGeometry CategoryTheory Limits
 
-theorem residueField_generated {k K : CommRingCat.{0}} {X : Scheme.{0}} (s : X ⟶ Spec k) (i : k ⟶ K)
+theorem residueField_generated
+    {k K : CommRingCat.{0}} {X : Scheme.{0}} (s : X ⟶ Spec k) (i : k ⟶ K)
     (x : ↥(pullback s (Spec.map i))) (S : Subfield ((pullback s (Spec.map i)).residueField x))
     (h1 : ∀ a, ((pullback.fst s (Spec.map i)).residueFieldMap x).hom a ∈ S)
-    (h2 : ∀ a, (Spec.preimage ((pullback s (Spec.map i)).fromSpecResidueField x ≫ pullback.snd _ _)).hom a ∈ S) :
-    S = ⊤ := by
+    (h2 : ∀ a,
+      (Spec.preimage ((pullback s (Spec.map i)).fromSpecResidueField x ≫ pullback.snd _ _)).hom a
+        ∈ S)
+    : S = ⊤ := by
   let P := pullback s (Spec.map i)
   let φ : X.residueField (pullback.fst s (Spec.map i) x) ⟶ CommRingCat.of S :=
     CommRingCat.ofHom (((pullback.fst s (Spec.map i)).residueFieldMap x).hom.codRestrict S h1)
   let ψ : K ⟶ CommRingCat.of S :=
-    CommRingCat.ofHom ((Spec.preimage (P.fromSpecResidueField x ≫ pullback.snd _ _)).hom.codRestrict S h2)
+    CommRingCat.ofHom ((Spec.preimage (P.fromSpecResidueField x ≫ pullback.snd _ _)).hom.codRestrict
+      S h2)
   let j : CommRingCat.of S ⟶ P.residueField x := CommRingCat.ofHom S.subtype
   have e1 : φ ≫ j = (pullback.fst s (Spec.map i)).residueFieldMap x := rfl
   have e2 : ψ ≫ j = Spec.preimage (P.fromSpecResidueField x ≫ pullback.snd _ _) := rfl
-  have f1 : Spec.map j ≫ Spec.map φ ≫ X.fromSpecResidueField _ = P.fromSpecResidueField x ≫ pullback.fst _ _ := by
+  have f1
+      : Spec.map j ≫ Spec.map φ ≫ X.fromSpecResidueField _
+        = P.fromSpecResidueField x ≫ pullback.fst _ _ := by
     rw [← Spec.map_comp_assoc, e1, Scheme.Hom.SpecMap_residueFieldMap_fromSpecResidueField]
   have f2 : Spec.map j ≫ Spec.map ψ = P.fromSpecResidueField x ≫ pullback.snd _ _ := by
     rw [← Spec.map_comp, e2, Spec.map_preimage]
@@ -180,10 +210,15 @@ theorem flat_of_field {A B : Type} [Field A] [CommRing B] (f : A →+* B) : f.Fl
   letI := f.toAlgebra
   exact (inferInstance : Module.Flat A B)
 
-theorem apply_mem_genericPoints {X Y : Scheme.{0}} (f : X ⟶ Y) [Flat f] (Z : Set X)
-    (hZ : Z ∈ irreducibleComponents X) : f (hZ.1 : IsIrreducible Z).genericPoint ∈ genericPoints Y := by
-  have hg := (hZ.1 : IsIrreducible Z).isGenericPoint_genericPoint (isClosed_of_mem_irreducibleComponents Z hZ)
-  have hx : ∀ y : X, y ⤳ (hZ.1 : IsIrreducible Z).genericPoint → y = (hZ.1 : IsIrreducible Z).genericPoint := by
+theorem apply_mem_genericPoints
+    {X Y : Scheme.{0}} (f : X ⟶ Y) [Flat f] (Z : Set X) (hZ : Z ∈ irreducibleComponents X)
+    : f (hZ.1 : IsIrreducible Z).genericPoint ∈ genericPoints Y := by
+  have hg :=
+    (hZ.1 : IsIrreducible Z).isGenericPoint_genericPoint
+      (isClosed_of_mem_irreducibleComponents Z hZ)
+  have hx
+      : ∀ y : X,
+        y ⤳ (hZ.1 : IsIrreducible Z).genericPoint → y = (hZ.1 : IsIrreducible Z).genericPoint := by
     intro y hy
     have h1 : Z ⊆ closure {y} := by
       rw [← hg.def]
@@ -201,9 +236,18 @@ theorem apply_mem_genericPoints {X Y : Scheme.{0}} (f : X ⟶ Y) [Flat f] (Z : S
 end Schemes
 
 open AlgebraicGeometry CategoryTheory Limits
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.FrameNorm GlobalTheory.Reg
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.FrameNorm
+  GlobalTheory.Reg
 
-theorem compNe_and_exists_fnAlgClosed : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), 1 ≤ Dw.p + Dw.q → CompNe Xo c ∧ ∃ c' : Coeff l, c.F ≤ c'.F ∧ ∀ c'' : Coeff l, c'.F ≤ c''.F → FnAlgClosed (Xo := Xo) (c := c'') := by
+theorem compNe_and_exists_fnAlgClosed
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l),
+      1 ≤ Dw.p + Dw.q
+        → CompNe Xo c
+          ∧ ∃ c' : Coeff l,
+            c.F ≤ c'.F ∧ ∀ c'' : Coeff l, c'.F ≤ c''.F → FnAlgClosed (Xo := Xo) (c := c'') := by
   intro E _ _ _ H Dw l Xo c h1
   refine ⟨(GlobalTheory.Exist.comp_nonempty_finite_genFr_trdeg E H Dw l Xo c h1).1, ?_⟩
   classical
@@ -221,21 +265,29 @@ theorem compNe_and_exists_fnAlgClosed : ∀ (E : Type) [Field E] [NumberField E]
   have hchar : ∀ x : Xo.X, CharZero (Xo.X.residueField x) := fun x =>
     charZero_of_injective_ringHom (R := KA l)
       (Spec.preimage (Xo.X.fromSpecResidueField x ≫ Xo.s)).hom.injective
-  have key : ∀ x : Xo.X, ∃ s : Finset ℂ, (∀ z ∈ s, IsAlgebraic ℚ z) ∧ ∀ K : IntermediateField ℚ ℂ, (∀ z ∈ s, z ∈ K) →
-      ∀ (Ω : Type) [Field Ω] (φ : Xo.X.residueField x →+* Ω) (ψ : K →+* Ω) (a : Xo.X.residueField x),
-        IsIntegral ℚ a → φ a ∈ ψ.range := by
+  have key
+      : ∀ x : Xo.X, ∃ s : Finset ℂ,
+        (∀ z ∈ s, IsAlgebraic ℚ z)
+          ∧ ∀ K : IntermediateField ℚ ℂ,
+            (∀ z ∈ s, z ∈ K)
+              → ∀ (Ω : Type) [Field Ω] (φ : Xo.X.residueField x →+* Ω) (ψ : K →+* Ω)
+                  (a : Xo.X.residueField x),
+                IsIntegral ℚ a → φ a ∈ ψ.range := by
     intro x
     letI : Algebra (KA l) (Xo.X.residueField x) :=
       (Spec.preimage (Xo.X.fromSpecResidueField x ≫ Xo.s)).hom.toAlgebra
     have hess : (Spec.preimage (Xo.X.fromSpecResidueField x ≫ Xo.s)).hom.EssFiniteType := by
-      have e : Spec.preimage (Xo.X.fromSpecResidueField x ≫ Xo.s) =
-          Spec.preimage ((Sp (KA l)).fromSpecResidueField (Xo.s x)) ≫ Xo.s.residueFieldMap x := by
+      have e
+          : Spec.preimage (Xo.X.fromSpecResidueField x ≫ Xo.s)
+            = Spec.preimage ((Sp (KA l)).fromSpecResidueField (Xo.s x))
+              ≫ Xo.s.residueFieldMap x := by
         rw [← Spec.map_inj]
         simp
       rw [e, CommRingCat.hom_comp]
       refine RingHom.EssFiniteType.comp ?_ (LocallyOfFiniteType.stalkMap Xo.s x).residueFieldMap
       refine (RingHom.FiniteType.of_surjective _ ?_).essFiniteType
-      have : SurjectiveOnStalks (Spec.map (Spec.preimage ((Sp (KA l)).fromSpecResidueField (Xo.s x)))) := by
+      have : SurjectiveOnStalks (Spec.map (Spec.preimage ((Sp (KA l)).fromSpecResidueField
+          (Xo.s x)))) := by
         rw [Spec.map_preimage]; infer_instance
       exact RingHom.surjectiveOnStalks_iff_of_isLocalHom.1 (SurjectiveOnStalks.Spec_iff.1 this)
     haveI : Algebra.EssFiniteType (KA l) (Xo.X.residueField x) := hess
@@ -243,14 +295,15 @@ theorem compNe_and_exists_fnAlgClosed : ∀ (E : Type) [Field E] [NumberField E]
     exact exists_finset_roots _
   choose s hs hK using key
   let b := Module.finBasis ℚ c.F
-  obtain ⟨c', hc'⟩ := exists_coeff_containing E H l
-    (hfin.toFinset.biUnion s ∪ Finset.univ.image fun j => (b j : ℂ)) (by
-    intro z hz
-    rcases Finset.mem_union.1 hz with h | h
-    · obtain ⟨x, -, hx⟩ := Finset.mem_biUnion.1 h
-      exact hs x z hx
-    · obtain ⟨j, -, rfl⟩ := Finset.mem_image.1 h
-      exact ((Algebra.IsIntegral.isIntegral (R := ℚ) (b j)).map c.F.val).isAlgebraic)
+  obtain ⟨c', hc'⟩ :=
+    exists_coeff_containing E H l (hfin.toFinset.biUnion s ∪ Finset.univ.image fun j => (b j : ℂ))
+      (by
+        intro z hz
+        rcases Finset.mem_union.1 hz with h | h
+        · obtain ⟨x, -, hx⟩ := Finset.mem_biUnion.1 h
+          exact hs x z hx
+        · obtain ⟨j, -, rfl⟩ := Finset.mem_image.1 h
+          exact ((Algebra.IsIntegral.isIntegral (R := ℚ) (b j)).map c.F.val).isAlgebraic)
   refine ⟨c', fun z hz => ?_, fun c'' hle Z a ha => ?_⟩
   · have e := congrArg c.F.val (b.sum_repr ⟨z, hz⟩)
     set_option synthInstance.maxHeartbeats 100000 in
@@ -263,7 +316,7 @@ theorem compNe_and_exists_fnAlgClosed : ∀ (E : Type) [Field E] [NumberField E]
       (hc' _ (Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ j))))
   have := c''.fin
   obtain ⟨r, rfl⟩ := mem_range_of_isAlgebraic_ratFun a (ha.tower_top (kap Z))
-  have hr : IsIntegral c''.F r := (isIntegral_algebraMap_iff ).1 ha.isIntegral
+  have hr : IsIntegral c''.F r := (isIntegral_algebraMap_iff).1 ha.isIntegral
   haveI : CharZero (kap Z) := charZero_of_injective_algebraMap (algebraMap c''.F (kap Z)).injective
   have hr' : IsIntegral ℚ r := isIntegral_trans r hr
   let p : Xo.XF c'' ⟶ Xo.X := pullback.fst _ _
@@ -271,10 +324,15 @@ theorem compNe_and_exists_fnAlgClosed : ∀ (E : Type) [Field E] [NumberField E]
     refine (HasRingHomProperty.Spec_iff (P := @Flat)).2 ?_
     exact flat_of_field _
   have hp : p (genPt Z) ∈ genericPoints Xo.X := apply_mem_genericPoints p Z.1 Z.2
-  obtain ⟨k, hk⟩ := mem_range_of_isIntegral (p.residueFieldMap (genPt Z)).hom (algebraMap c''.F (kap Z))
-    (fun S h₁ h₂ => residueField_generated Xo.s _ (genPt Z) S h₁ h₂)
-    (hK _ c''.F (fun z hz => hle (hc' z (Finset.mem_union_left _
-      (Finset.mem_biUnion.2 ⟨_, hfin.mem_toFinset.2 hp, hz⟩)))) _ _ _) hr'
+  obtain ⟨k, hk⟩ :=
+    mem_range_of_isIntegral (p.residueFieldMap (genPt Z)).hom (algebraMap c''.F (kap Z))
+      (fun S h₁ h₂ => residueField_generated Xo.s _ (genPt Z) S h₁ h₂)
+      (hK _ c''.F
+        (fun z hz =>
+          hle (hc' z
+            (Finset.mem_union_left _ (Finset.mem_biUnion.2 ⟨_, hfin.mem_toFinset.2 hp, hz⟩))))
+        _ _ _)
+      hr'
   exact ⟨k, by rw [← hk, ← IsScalarTower.algebraMap_apply]⟩
 
 end GlobalTheory.GeomIrr

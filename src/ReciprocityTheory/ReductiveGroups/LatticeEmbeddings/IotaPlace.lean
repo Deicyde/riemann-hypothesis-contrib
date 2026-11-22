@@ -10,36 +10,41 @@ open NumberField IsDedekindDomain
 
 namespace ReciprocityTheory.ChartRestriction.B3.IotaPl
 
-theorem norm_le_one_of_isIntegral_int {p : ℕ} [Fact p.Prime] {x : ℂ_[p]} (hx : IsIntegral ℤ x) :
-    ‖x‖ ≤ 1 := by
+theorem norm_le_one_of_isIntegral_int {p : ℕ} [Fact p.Prime] {x : ℂ_[p]} (hx : IsIntegral ℤ x)
+    : ‖x‖ ≤ 1 := by
   by_contra hlt
   push_neg at hlt
   obtain ⟨f, hf, hfx⟩ := hx
   set n := f.natDegree with hn
   have hsum := hf.as_sum
   rw [hsum, Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_finsetSum] at hfx
-  have key : x ^ n = -∑ i ∈ Finset.range n,
-      Polynomial.eval₂ (algebraMap ℤ ℂ_[p]) x (Polynomial.C (f.coeff i) * Polynomial.X ^ i) := by
-    rw [eq_neg_iff_add_eq_zero]
-    exact hfx
+  have key
+      : x ^ n
+        = - ∑ i ∈ Finset.range n,
+          Polynomial.eval₂ (algebraMap ℤ ℂ_[p]) x (Polynomial.C (f.coeff i) * Polynomial.X ^ i) :=
+    by
+      rw [eq_neg_iff_add_eq_zero]
+      exact hfx
   have hx1 : 1 ≤ ‖x‖ := hlt.le
-  have bound : ‖∑ i ∈ Finset.range n,
-      Polynomial.eval₂ (algebraMap ℤ ℂ_[p]) x (Polynomial.C (f.coeff i) * Polynomial.X ^ i)‖ ≤
-        ‖x‖ ^ (n - 1) := by
+  have bound
+      : ‖∑ i ∈ Finset.range n,
+          Polynomial.eval₂ (algebraMap ℤ ℂ_[p]) x (Polynomial.C (f.coeff i) * Polynomial.X ^ i)‖
+        ≤ ‖x‖ ^ (n - 1) := by
     apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity)
     intro i hi
     rw [Polynomial.eval₂_mul, Polynomial.eval₂_C, Polynomial.eval₂_X_pow, norm_mul, norm_pow]
     have hc : ‖(algebraMap ℤ ℂ_[p]) (f.coeff i)‖ ≤ 1 := by
       have h := IsUltrametricDist.norm_intCast_le_one ℂ_[p] (f.coeff i)
       first
-        | (simpa using h)
-        | (rw [algebraMap_int_eq, eq_intCast]; exact h)
-        | (convert h using 2; exact (algebraMap ℤ ℂ_[p]).eq_intCast _)
+      | (simpa using h)
+      | (rw [algebraMap_int_eq, eq_intCast]; exact h)
+      | (convert h using 2; exact (algebraMap ℤ ℂ_[p]).eq_intCast _)
     have hi' : i ≤ n - 1 := by
       have := Finset.mem_range.mp hi
       omega
-    calc ‖(algebraMap ℤ ℂ_[p]) (f.coeff i)‖ * ‖x‖ ^ i ≤ 1 * ‖x‖ ^ (n - 1) :=
-          mul_le_mul hc (pow_le_pow_right₀ hx1 hi') (by positivity) zero_le_one
+    calc
+      ‖(algebraMap ℤ ℂ_[p]) (f.coeff i)‖ * ‖x‖ ^ i
+        ≤ 1 * ‖x‖ ^ (n - 1) := mul_le_mul hc (pow_le_pow_right₀ hx1 hi') (by positivity) zero_le_one
       _ = ‖x‖ ^ (n - 1) := one_mul _
   have h2 : ‖x‖ ^ n ≤ ‖x‖ ^ (n - 1) := by
     rw [← norm_pow, key, norm_neg]
@@ -94,15 +99,17 @@ theorem smallIdeal_isPrime (ι : K →+* ℂ_[p]) : (smallIdeal ι).IsPrime := b
     nlinarith [norm_int_le ι a, norm_int_le ι b]
 
 theorem norm_p_lt_one : ‖(p : ℂ_[p])‖ < 1 := by
-  have e : (p : ℂ_[p]) = (((algebraMap ℚ_[p] (PadicAlgCl p)) (p : ℚ_[p]) : PadicAlgCl p) : ℂ_[p]) := by
-    first
-      | simp
-      | (rw [map_natCast]; exact (map_natCast UniformSpace.Completion.coeRingHom p).symm)
+  have e
+      : (p : ℂ_[p]) = (((algebraMap ℚ_[p] (PadicAlgCl p)) (p : ℚ_[p]) : PadicAlgCl p) : ℂ_[p]) := by
+    first | simp | (rw [map_natCast]; exact (map_natCast UniformSpace.Completion.coeRingHom p).symm)
   rw [e, PadicComplex.norm_extends, PadicAlgCl.norm_extends]
   first
-    | exact Padic.norm_p_lt_one
-    | (rw [Padic.norm_p]; exact inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : p.Prime).one_lt))
-    | (rw [padicNormE.norm_p]; exact inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : p.Prime).one_lt))
+  | exact Padic.norm_p_lt_one
+  | (rw [Padic.norm_p]; exact inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : p.Prime).one_lt))
+  | (
+      rw [padicNormE.norm_p]
+      exact inv_lt_one_of_one_lt₀ (by exact_mod_cast (Fact.out : p.Prime).one_lt)
+    )
 
 end ReciprocityTheory.ChartRestriction.B3.IotaPl
 

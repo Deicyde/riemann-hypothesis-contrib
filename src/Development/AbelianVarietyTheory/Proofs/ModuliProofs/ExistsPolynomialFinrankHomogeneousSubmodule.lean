@@ -41,15 +41,17 @@ private lemma cast_choose_eq_eval_descPochhammer (m e : ℕ) (hm : 1 ≤ m) :
   push_cast
   field_simp
 
-theorem _root_.GlobalTheory.exists_polynomial_finrank_homogeneousSubmodule :
-    ∀ (σ : Type) [Finite σ] [Nonempty σ], ∃ Q : Polynomial ℚ, ∀ (K : Type) [Field K] (e : ℕ),
-      ((Module.finrank K ↥(MvPolynomial.homogeneousSubmodule σ K e) : ℕ) : ℚ) =
-        Q.eval (e : ℚ) := by
+theorem _root_.GlobalTheory.exists_polynomial_finrank_homogeneousSubmodule
+    : ∀ (σ : Type) [Finite σ] [Nonempty σ], ∃ Q : Polynomial ℚ, ∀ (K : Type) [Field K] (e : ℕ),
+      ((Module.finrank K ↥(MvPolynomial.homogeneousSubmodule σ K e) : ℕ) : ℚ) = Q.eval (e : ℚ) := by
   intro σ _ _
   have := Fintype.ofFinite σ
-  refine ⟨Polynomial.C (1 / ((Fintype.card σ - 1).factorial : ℚ)) *
-    (descPochhammer ℚ (Fintype.card σ - 1)).comp
-      (Polynomial.X + Polynomial.C ((Fintype.card σ - 1 : ℕ) : ℚ)), fun K _ e => ?_⟩
+  refine ⟨
+    Polynomial.C (1 / ((Fintype.card σ - 1).factorial : ℚ))
+      * (descPochhammer ℚ (Fintype.card σ - 1)).comp
+        (Polynomial.X + Polynomial.C ((Fintype.card σ - 1 : ℕ) : ℚ)),
+    fun K _ e => ?_
+  ⟩
   rw [finrank_homogeneousSubmodule_eq_choose σ K e]
   exact cast_choose_eq_eval_descPochhammer _ e Fintype.card_pos
 

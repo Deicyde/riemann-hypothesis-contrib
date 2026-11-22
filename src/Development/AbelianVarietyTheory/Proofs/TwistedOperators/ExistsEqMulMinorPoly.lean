@@ -9,8 +9,8 @@ open MvPolynomial GlobalTheory.Capelli Formalism.BasicNotions.TH GlobalTheory.Jo
 
 namespace GlobalTheory.JointHarm
 
-theorem sum_Ici_sub_succ {n : ℕ} (α : ℕ → ℕ) (hα : Antitone α) (h0 : α n = 0) (a : Fin n) :
-    ∑ i ∈ Finset.Ici a, (α (i : ℕ) - α ((i : ℕ) + 1)) = α a := by
+theorem sum_Ici_sub_succ {n : ℕ} (α : ℕ → ℕ) (hα : Antitone α) (h0 : α n = 0) (a : Fin n)
+    : ∑ i ∈ Finset.Ici a, (α (i : ℕ) - α ((i : ℕ) + 1)) = α a := by
   have key : ∀ k, ∑ i ∈ Finset.Ico (a : ℕ) (a + k), (α i - α (i + 1)) + α (a + k) = α a := by
     intro k
     induction k with
@@ -35,10 +35,12 @@ theorem sum_Ici_sub_succ {n : ℕ} (α : ℕ → ℕ) (hα : Antitone α) (h0 : 
   · intro _ _
     rfl
 
-theorem exists_eq_mul_minorPoly (σ : Type) [DecidableEq σ] (p r : ℕ) (z : Fin p × Fin r → σ)
-    (hz : Function.Injective z) (α : ℕ → ℕ) (hα : Antitone α) (h0 : ∀ i, min p r ≤ i → α i = 0)
-    (P : MvPolynomial σ ℂ) (hP : BlockHW z α P) :
-    ∃ Q : MvPolynomial σ ℂ, (∀ w, z w ∉ Q.vars) ∧ P = Q * minorPoly z α := by
+theorem exists_eq_mul_minorPoly
+    (σ : Type) [DecidableEq σ]
+    (p r : ℕ) (z : Fin p × Fin r → σ) (hz : Function.Injective z)
+    (α : ℕ → ℕ) (hα : Antitone α) (h0 : ∀ i, min p r ≤ i → α i = 0)
+    (P : MvPolynomial σ ℂ) (hP : BlockHW z α P)
+    : ∃ Q : MvPolynomial σ ℂ, (∀ w, z w ∉ Q.vars) ∧ P = Q * minorPoly z α := by
   by_cases hP0 : P = 0
   · exact ⟨0, by simp, by simp [hP0]⟩
   obtain ⟨hru, hcu, hrw, hcw⟩ := hP
@@ -62,28 +64,37 @@ theorem exists_eq_mul_minorPoly (σ : Type) [DecidableEq σ] (p r : ℕ) (z : Fi
     have h1 := hcol k m hm
     rw [h0 k (not_lt.1 fun h' => hk ⟨⟨k, h'⟩, rfl⟩), Finset.sum_eq_zero_iff] at h1
     exact Finsupp.mem_support_iff.1 hv (h1 a (Finset.mem_univ _))
-  obtain ⟨Q, hQ, hPQ⟩ := eq_mul_prod_minors (fun w : Fin (min p r) × Fin (min p r) =>
-      z (e w.1, f w.2)) (hz.comp (hei.prodMap hfi)) P (fun i => α i - α (i + 1))
-    (fun a m hm => by
-      rw [sum_Ici_sub_succ α hα (h0 _ le_rfl)]
-      refine Eq.trans ?_ (hrow (e a) m hm)
-      refine Fintype.sum_of_injective f hfi _ _ (fun k hk => ?_) fun _ => rfl
-      by_contra h1
-      exact hvf _ k hk ((mem_vars_iff_mem_support _).2 ⟨m, hm, Finsupp.mem_support_iff.2 h1⟩))
-    (fun i j hij => by
-      have h₁ := (rowOp_apply _ _ _ _).symm.trans (hru (e i) (e j) hij)
-      refine ((rowAdd_invariant_iff (fun k => z (e i, f k)) (fun k => z (e j, f k))
-        (fun k l h => hfi (by simpa using hz h))
-        (fun k l h => hij.ne (hei (congrArg Prod.fst (hz h)))) P).out 3 2).1 (Eq.trans ?_ h₁)
-      refine Fintype.sum_of_injective f hfi _ _ (fun k hk => ?_) fun _ => rfl
-      rw [pderiv_eq_zero_of_notMem_vars (hvf _ k hk), mul_zero])
-    (fun i j hij => by
-      have h₁ := (colOp_apply _ _ _ _).symm.trans (hcu (f i) (f j) hij)
-      refine ((rowAdd_invariant_iff (fun k => z (e k, f i)) (fun k => z (e k, f j))
-        (fun k l h => hei (by simpa using hz h))
-        (fun k l h => hij.ne (hfi (congrArg Prod.snd (hz h)))) P).out 3 2).1 (Eq.trans ?_ h₁)
-      refine Fintype.sum_of_injective e hei _ _ (fun k hk => ?_) fun _ => rfl
-      rw [pderiv_eq_zero_of_notMem_vars (hve k _ hk), mul_zero])
+  obtain ⟨Q, hQ, hPQ⟩ :=
+    eq_mul_prod_minors
+      (fun w : Fin (min p r) × Fin (min p r) => z (e w.1, f w.2))
+      (hz.comp (hei.prodMap hfi)) P
+      (fun i => α i - α (i + 1))
+      (fun a m hm => by
+        rw [sum_Ici_sub_succ α hα (h0 _ le_rfl)]
+        refine Eq.trans ?_ (hrow (e a) m hm)
+        refine Fintype.sum_of_injective f hfi _ _ (fun k hk => ?_) fun _ => rfl
+        by_contra h1
+        exact hvf _ k hk ((mem_vars_iff_mem_support _).2 ⟨m, hm, Finsupp.mem_support_iff.2 h1⟩))
+      (fun i j hij => by
+        have h₁ := (rowOp_apply _ _ _ _).symm.trans (hru (e i) (e j) hij)
+        refine ((rowAdd_invariant_iff
+          (fun k => z (e i, f k))
+          (fun k => z (e j, f k))
+          (fun k l h => hfi (by simpa using hz h))
+          (fun k l h => hij.ne (hei (congrArg Prod.fst (hz h))))
+          P).out 3 2).1 (Eq.trans ?_ h₁)
+        refine Fintype.sum_of_injective f hfi _ _ (fun k hk => ?_) fun _ => rfl
+        rw [pderiv_eq_zero_of_notMem_vars (hvf _ k hk), mul_zero])
+      (fun i j hij => by
+        have h₁ := (colOp_apply _ _ _ _).symm.trans (hcu (f i) (f j) hij)
+        refine ((rowAdd_invariant_iff
+          (fun k => z (e k, f i))
+          (fun k => z (e k, f j))
+          (fun k l h => hei (by simpa using hz h))
+          (fun k l h => hij.ne (hfi (congrArg Prod.snd (hz h))))
+          P).out 3 2).1 (Eq.trans ?_ h₁)
+        refine Fintype.sum_of_injective e hei _ _ (fun k hk => ?_) fun _ => rfl
+        rw [pderiv_eq_zero_of_notMem_vars (hve k _ hk), mul_zero])
   have hPQ' : P = Q * minorPoly z α := hPQ
   refine ⟨Q, ?_, hPQ'⟩
   have hsub : ∀ s ∈ Q.vars, s ∈ P.vars := by

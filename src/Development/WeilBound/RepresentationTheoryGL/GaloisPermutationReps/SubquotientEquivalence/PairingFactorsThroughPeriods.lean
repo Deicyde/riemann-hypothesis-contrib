@@ -9,7 +9,8 @@ noncomputable section
 
 open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
 
 namespace PositivityTheory.Rg.DzCount
 
@@ -24,14 +25,16 @@ theorem per_mul {q n : ℕ} {z : ℂ} (h : z ^ q ^ n = z) (k : ℕ) : z ^ q ^ (n
   | zero => simp
   | succ k ih => rw [Nat.mul_succ, pow_add, pow_mul, ih, h]
 
-theorem per_inj {q n : ℕ} {z : ℂ} (hz : ExactPer q n z) {a b : ℕ} (ha : a < n) (hb : b < n)
-    (h : z ^ q ^ a = z ^ q ^ b) : a = b := by
+theorem per_inj
+    {q n : ℕ} {z : ℂ} (hz : ExactPer q n z)
+    {a b : ℕ} (ha : a < n) (hb : b < n) (h : z ^ q ^ a = z ^ q ^ b)
+    : a = b := by
   have key : ∀ a b : ℕ, a < b → b < n → z ^ q ^ a = z ^ q ^ b → False := by
     intro a b hab hbn h
     apply hz.2.2 (b - a) (by omega) (by omega)
     have h1 : (z ^ q ^ a) ^ q ^ (n - a) = (z ^ q ^ b) ^ q ^ (n - a) := by rw [h]
-    rw [← pow_mul, ← pow_mul, ← pow_add, ← pow_add, Nat.add_sub_cancel' (by omega : a ≤ n),
-      hz.2.1] at h1
+    rw [← pow_mul, ← pow_mul, ← pow_add, ← pow_add, Nat.add_sub_cancel' (by omega : a ≤ n), hz.2.1]
+      at h1
     have h2 : b + (n - a) = n + (b - a) := by omega
     rw [h2, pow_add, pow_mul, hz.2.1] at h1
     exact h1.symm
@@ -40,16 +43,22 @@ theorem per_inj {q n : ℕ} {z : ℂ} (hz : ExactPer q n z) {a b : ℕ} (ha : a 
   · exact hab
   · exact (key b a hab ha h.symm).elim
 
-theorem pow_apply_eig {V : Type} [AddCommGroup V] [Module ℂ V] (M : Module.End ℂ V) {v : V} {c : ℂ}
-    (hv : M v = c • v) (k : ℕ) : (M ^ k) v = c ^ k • v := by
+theorem pow_apply_eig
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (M : Module.End ℂ V)
+    {v : V} {c : ℂ} (hv : M v = c • v)
+    (k : ℕ)
+    : (M ^ k) v = c ^ k • v := by
   induction k with
   | zero => simp
-  | succ k ih =>
-    rw [pow_succ' M k, Module.End.mul_apply, ih, map_smul, hv, smul_smul, pow_succ c k]
+  | succ k ih => rw [pow_succ' M k, Module.End.mul_apply, ih, map_smul, hv, smul_smul, pow_succ c k]
 
-theorem eig_G {V : Type} [AddCommGroup V] [Module ℂ V] {q : ℕ} (M G : Module.End ℂ V)
-    (hMG : M * G = G * M ^ q) {v : V} {c : ℂ} (hv : M v = c • v) (k : ℕ) :
-    M ((G ^ k) v) = c ^ q ^ k • (G ^ k) v := by
+theorem eig_G
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {q : ℕ} (M G : Module.End ℂ V) (hMG : M * G = G * M ^ q)
+    {v : V} {c : ℂ} (hv : M v = c • v)
+    (k : ℕ)
+    : M ((G ^ k) v) = c ^ q ^ k • (G ^ k) v := by
   induction k with
   | zero => simpa using hv
   | succ k ih =>
@@ -58,35 +67,37 @@ theorem eig_G {V : Type} [AddCommGroup V] [Module ℂ V] {q : ℕ} (M G : Module
     rw [pow_succ' G k, Module.End.mul_apply, h1, pow_apply_eig M ih q, map_smul, ← pow_mul,
       ← pow_succ]
 
-theorem basis_side {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
-    {q m : ℕ} (M G : Module.End ℂ V) (hG : IsUnit G) (hMG : M * G = G * M ^ q) {z : ℂ}
-    (hz : ExactPer q (m + 1) z) (hr : Module.finrank ℂ V = m + 1) {v : V} (hv0 : v ≠ 0)
-    (hv : M v = z • v) :
-    ∃ b : Module.Basis (Fin (m + 1)) ℂ V, (∀ j : Fin (m + 1), M (b j) = z ^ q ^ (j : ℕ) • b j) ∧
-      (∀ k : Fin m, G (b k.castSucc) = b k.succ) ∧
-      ∃ μ : ℂ, μ ≠ 0 ∧ G (b (Fin.last m)) = μ • b 0 := by
+theorem basis_side
+    {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    {q m : ℕ} (M G : Module.End ℂ V) (hG : IsUnit G) (hMG : M * G = G * M ^ q)
+    {z : ℂ} (hz : ExactPer q (m + 1) z)
+    (hr : Module.finrank ℂ V = m + 1)
+    {v : V} (hv0 : v ≠ 0) (hv : M v = z • v)
+    : ∃ b : Module.Basis (Fin (m + 1)) ℂ V,
+      (∀ j : Fin (m + 1), M (b j) = z ^ q ^ (j : ℕ) • b j)
+        ∧ (∀ k : Fin m, G (b k.castSucc) = b k.succ)
+        ∧ ∃ μ : ℂ, μ ≠ 0 ∧ G (b (Fin.last m)) = μ • b 0 := by
   have hGinj : ∀ k : ℕ, Function.Injective (G ^ k) := fun k =>
     ((Module.End.isUnit_iff _).mp (hG.pow k)).injective
   obtain ⟨f, hf⟩ : ∃ f : Fin (m + 1) → V, ∀ j, f j = (G ^ (j : ℕ)) v := ⟨_, fun _ => rfl⟩
   have hMf : ∀ j : Fin (m + 1), M (f j) = z ^ q ^ (j : ℕ) • f j := fun j => by
     rw [hf]; exact eig_G M G hMG hv j
-  have hfne : ∀ j, f j ≠ 0 := fun j h =>
-    hv0 (hGinj (j : ℕ) (by rw [map_zero, ← hf]; exact h))
-  have hinj : Function.Injective (fun j : Fin (m + 1) => z ^ q ^ (j : ℕ)) :=
-    fun a b h => Fin.ext (per_inj hz a.2 b.2 h)
+  have hfne : ∀ j, f j ≠ 0 := fun j h => hv0 (hGinj (j : ℕ) (by rw [map_zero, ← hf]; exact h))
+  have hinj : Function.Injective (fun j : Fin (m + 1) => z ^ q ^ (j : ℕ)) := fun a b h =>
+    Fin.ext (per_inj hz a.2 b.2 h)
   have hli : LinearIndependent ℂ f :=
     Module.End.eigenvectors_linearIndependent' M _ hinj f
       (fun j => ⟨Module.End.mem_eigenspace_iff.mpr (hMf j), hfne j⟩)
-  obtain ⟨b, hb⟩ : ∃ b : Module.Basis (Fin (m + 1)) ℂ V, ∀ j, b j = f j :=
-    ⟨basisOfLinearIndependentOfCardEqFinrank hli (by rw [Fintype.card_fin, hr]),
-      fun j => congrFun (coe_basisOfLinearIndependentOfCardEqFinrank hli _) j⟩
+  obtain ⟨b, hb⟩ : ∃ b : Module.Basis (Fin (m + 1)) ℂ V, ∀ j, b j = f j := ⟨
+    basisOfLinearIndependentOfCardEqFinrank hli (by rw [Fintype.card_fin, hr]),
+    fun j => congrFun (coe_basisOfLinearIndependentOfCardEqFinrank hli _) j
+  ⟩
   refine ⟨b, fun j => by rw [hb]; exact hMf j, fun k => ?_, ?_⟩
   · rw [hb, hb, hf, hf, Fin.val_succ, Fin.coe_castSucc, pow_succ', Module.End.mul_apply]
   · obtain ⟨x, hxdef⟩ : ∃ x, x = G (b (Fin.last m)) := ⟨_, rfl⟩
     have hxG : x = (G ^ (m + 1)) v := by
       rw [hxdef, hb, hf, Fin.val_last, pow_succ', Module.End.mul_apply]
-    have hx : M x = z • x := by
-      rw [hxG, eig_G M G hMG hv, hz.2.1]
+    have hx : M x = z • x := by rw [hxG, eig_G M G hMG hv, hz.2.1]
     obtain ⟨c, hcdef⟩ : ∃ c, c = b.repr x := ⟨_, rfl⟩
     have hsum : x = ∑ j, c j • b j := by rw [hcdef]; exact (b.sum_repr x).symm
     have hcoef : ∀ j, c j * z ^ q ^ (j : ℕ) = z * c j := by
@@ -148,13 +159,12 @@ theorem st1b : St1b := by
   obtain ⟨b, hbM, hbG, μ, hμ, hbl⟩ :=
     basis_side M G hG hMG hz hr hv.2 (Module.End.mem_eigenspace_iff.mp hv.1)
   obtain ⟨b', hbM', hbG', μ', hμ', hbl'⟩ :=
-    basis_side M' G' hG' hMG' hz hr'
-      (fun h => hv1.2 (hG'inj _ (by rw [map_zero]; exact h))) hw
+    basis_side M' G' hG' hMG' hz hr' (fun h => hv1.2 (hG'inj _ (by rw [map_zero]; exact h))) hw
   obtain ⟨T, hT⟩ : ∃ T : V ≃ₗ[ℂ] V', ∀ j, T (b j) = b' j :=
     ⟨b.equiv b' (Equiv.refl _), fun j => by simp⟩
   have hTs : ∀ j, T.symm (b' j) = b j := fun j => by rw [← hT j, LinearEquiv.symm_apply_apply]
-  obtain ⟨G'', hG''⟩ : ∃ G'' : Module.End ℂ V,
-      G'' = T.symm.toLinearMap ∘ₗ G' ∘ₗ T.toLinearMap := ⟨_, rfl⟩
+  obtain ⟨G'', hG''⟩ : ∃ G'' : Module.End ℂ V, G'' = T.symm.toLinearMap ∘ₗ G' ∘ₗ T.toLinearMap :=
+    ⟨_, rfl⟩
   have hdet'' : LinearMap.det G'' = LinearMap.det G' := by
     rw [hG'']
     have h := LinearMap.det_conj G' T.symm

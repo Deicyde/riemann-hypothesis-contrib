@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CellMulSimpl
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -26,8 +27,8 @@ abbrev starOfInv (σ : L →+* L) (h : ∀ x, σ (σ x) = x) : StarRing L where
   star_mul x y := by rw [map_mul]; exact mul_comm _ _
   star_add := map_add σ
 
-theorem finrank_fixF (σ : L →+* L) (h : ∀ x, σ (σ x) = x) (hne : ∃ x, σ x ≠ x) :
-    Module.finrank (fixF σ) L = 2 := by
+theorem finrank_fixF (σ : L →+* L) (h : ∀ x, σ (σ x) = x) (hne : ∃ x, σ x ≠ x)
+    : Module.finrank (fixF σ) L = 2 := by
   obtain ⟨x₀, hx₀⟩ := hne
   have hd : x₀ - σ x₀ ≠ 0 := sub_ne_zero.2 (Ne.symm hx₀)
   have hli : LinearIndependent (fixF σ) ![(1 : L), x₀] := by
@@ -49,7 +50,8 @@ theorem finrank_fixF (σ : L →+* L) (h : ∀ x, σ (σ x) = x) (hne : ∃ x, �
     intro y _
     set b := (y - σ y) / (x₀ - σ x₀) with hbdef
     have hb : σ b = b := by
-      rw [hbdef, map_div₀, map_sub, map_sub, h, h, ← neg_sub y (σ y), ← neg_sub x₀ (σ x₀), neg_div_neg_eq]
+      rw [hbdef, map_div₀, map_sub, map_sub, h, h, ← neg_sub y (σ y), ← neg_sub x₀ (σ x₀),
+        neg_div_neg_eq]
     set a := y - b * x₀ with hadef
     have hbm : b * (x₀ - σ x₀) = y - σ y := div_mul_cancel₀ _ hd
     have ha : σ a = a := by
@@ -58,7 +60,8 @@ theorem finrank_fixF (σ : L →+* L) (h : ∀ x, σ (σ x) = x) (hne : ∃ x, �
     have hy : y = (⟨a, ha⟩ : fixF σ) • (1 : L) + (⟨b, hb⟩ : fixF σ) • x₀ := by
       rw [Algebra.smul_def, Algebra.smul_def]
       change y = a * 1 + b * x₀
-      rw [hadef]; ring
+      rw [hadef]
+      ring
     rw [hy]
     exact Submodule.add_mem _ (Submodule.smul_mem _ _ (Submodule.subset_span ⟨0, rfl⟩))
       (Submodule.smul_mem _ _ (Submodule.subset_span ⟨1, rfl⟩))
@@ -67,12 +70,19 @@ theorem finrank_fixF (σ : L →+* L) (h : ∀ x, σ (σ x) = x) (hne : ∃ x, �
 
 end Fixed
 
-theorem eq_twCent_mul_KGL : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ (n : ℕ) (w : Pl E), ¬ IsSplitAt w →
-    ∀ y g : GLw n w, y ∈ GlobalTheory.LFun.KGL w (n := n) →
-    (∃ u v : (w.adicCompletion E)[X], (∀ i, u.coeff i ∈ w.adicCompletionIntegers E) ∧
-      (∀ i, v.coeff i ∈ w.adicCompletionIntegers E) ∧
-      u * (nrmL n w y).val.charpoly + v * derivative (nrmL n w y).val.charpoly = 1) →
-    g⁻¹ * y * thL n w g ∈ GlobalTheory.LFun.KGL w (n := n) → ∃ t ∈ twCent (thL n w) y, ∃ k ∈ GlobalTheory.LFun.KGL w (n := n), g = t * k := by
+theorem eq_twCent_mul_KGL
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E
+        → ∀ (n : ℕ) (w : Pl E),
+          ¬ IsSplitAt w
+            → ∀ y g : GLw n w,
+              y ∈ GlobalTheory.LFun.KGL w (n := n)
+                → (∃ u v : (w.adicCompletion E)[X],
+                  (∀ i, u.coeff i ∈ w.adicCompletionIntegers E)
+                    ∧ (∀ i, v.coeff i ∈ w.adicCompletionIntegers E)
+                    ∧ u * (nrmL n w y).val.charpoly + v * derivative (nrmL n w y).val.charpoly = 1)
+                → g⁻¹ * y * thL n w g ∈ GlobalTheory.LFun.KGL w (n := n)
+                → ∃ t ∈ twCent (thL n w) y, ∃ k ∈ GlobalTheory.LFun.KGL w (n := n), g = t * k := by
   intro E _ _ _ hU n w hs y g hy hbez hyg
   obtain ⟨hc, hinv, hval, hns, -⟩ := GlobalTheory.ConjAtPlace.main E hU w
   obtain ⟨-, ⟨ϖ, q, hϖ, -⟩, -⟩ := hns hs
@@ -80,11 +90,11 @@ theorem eq_twCent_mul_KGL : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
   letI : NontriviallyNormedField (w.adicCompletion E) :=
     Valued.toNontriviallyNormedField _ (WithZero (Multiplicative ℤ))
   letI : StarRing (w.adicCompletion E) := starOfInv (cj w) hinv
-  have hle1 : ∀ x : w.adicCompletion E, ‖x‖ ≤ 1 ↔ Valued.v x ≤ 1 := fun x => Valued.toNormedField.norm_le_one_iff
+  have hle1 : ∀ x : w.adicCompletion E, ‖x‖ ≤ 1 ↔ Valued.v x ≤ 1 := fun x =>
+    Valued.toNormedField.norm_le_one_iff
   have hneq : ∀ x y : w.adicCompletion E, Valued.v x = Valued.v y → ‖x‖ = ‖y‖ := fun x y h =>
     le_antisymm (Valued.toNormedField.norm_le_iff.2 h.le) (Valued.toNormedField.norm_le_iff.2 h.ge)
-  have hϖ0 : ϖ ≠ 0 := by
-    intro h0; rw [h0, map_zero] at hϖv; exact WithZero.zero_ne_coe hϖv
+  have hϖ0 : ϖ ≠ 0 := by intro h0; rw [h0, map_zero] at hϖv; exact WithZero.zero_ne_coe hϖv
   have hϖi : cj w ϖ⁻¹ = ϖ⁻¹ := by rw [map_inv₀, hϖf]
   have hϖn : 1 < ‖ϖ⁻¹‖ := by
     rw [Valued.toNormedField.one_lt_norm_iff, map_inv₀, hϖv]
@@ -123,24 +133,30 @@ theorem eq_twCent_mul_KGL : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
   have hnr : (nrmL n w y).val = GlobalTheory.Tw.nrm y.val := by
     rw [nrmL, if_neg hs, Units.val_mul, hcs, thetaGL_val]; rfl
 
-  have hmem (O : Subring (w.adicCompletion E)) (h : GLw n w) :
-      h ∈ GLint (Fin n) O ↔
-        (∀ i j, h.val i j ∈ O) ∧ ∀ i j, (h⁻¹).val i j ∈ O := by
+  have hmem (O : Subring (w.adicCompletion E)) (h : GLw n w)
+      : h ∈ GLint (Fin n) O ↔ (∀ i j, h.val i j ∈ O) ∧ ∀ i j, (h⁻¹).val i j ∈ O := by
     have hi : Function.Injective fun A : Matrix (Fin n) (Fin n) O => A.map O.subtype :=
       Matrix.map_injective Subtype.val_injective
     constructor
     · rintro ⟨y, rfl⟩
       exact ⟨fun i j => (y.1 i j).2, fun i j => ((y⁻¹).1 i j).2⟩
     · rintro ⟨h1, h2⟩
-      refine ⟨⟨Matrix.of fun i j => ⟨_, h1 i j⟩, Matrix.of fun i j => ⟨_, h2 i j⟩, hi ?_, hi ?_⟩, Units.ext rfl⟩
+      refine ⟨
+        ⟨Matrix.of fun i j => ⟨_, h1 i j⟩, Matrix.of fun i j => ⟨_, h2 i j⟩, hi ?_, hi ?_⟩,
+        Units.ext rfl
+      ⟩
       · simp only [Matrix.map_mul, Matrix.map_one _ (map_zero _) (map_one _)]
         exact h.mul_inv
       · simp only [Matrix.map_mul, Matrix.map_one _ (map_zero _) (map_one _)]
         exact h.inv_mul
-  have hint : ∀ h : GLw n w, h ∈ GlobalTheory.LFun.KGL w (n := n) → (∀ i j, ‖h.val i j‖ ≤ 1) ∧ ‖h.val.det‖ = 1 := by
+  have hint
+      : ∀ h : GLw n w,
+        h ∈ GlobalTheory.LFun.KGL w (n := n) → (∀ i j, ‖h.val i j‖ ≤ 1) ∧ ‖h.val.det‖ = 1 := by
     intro h hh
     obtain ⟨h1, h2⟩ := (hmem (Ov E w) h).1 hh
-    have hdet : ∀ M : Matrix (Fin n) (Fin n) (w.adicCompletion E), (∀ i j, M i j ∈ Ov E w) → M.det ∈ Ov E w := by
+    have hdet
+        : ∀ M : Matrix (Fin n) (Fin n) (w.adicCompletion E),
+          (∀ i j, M i j ∈ Ov E w) → M.det ∈ Ov E w := by
       intro M hM
       let M₀ : Matrix (Fin n) (Fin n) (Ov E w) := fun i j => ⟨M i j, hM i j⟩
       have hM₀ : M = (Ov E w).subtype.mapMatrix M₀ := by ext i j; rfl
@@ -149,10 +165,13 @@ theorem eq_twCent_mul_KGL : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     have d1 : ‖h.val.det‖ ≤ 1 := (hle1 _).2 (hdet _ h1)
     have d2 : ‖(h⁻¹).val.det‖ ≤ 1 := (hle1 _).2 (hdet _ h2)
     have hprod : ‖h.val.det‖ * ‖(h⁻¹).val.det‖ = 1 := by
-      rw [← norm_mul, ← Matrix.det_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.det_one, norm_one]
+      rw [← norm_mul, ← Matrix.det_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+        Matrix.det_one, norm_one]
     refine ⟨fun i j => (hle1 _).2 (h1 i j), ?_⟩
     nlinarith [norm_nonneg h.val.det, norm_nonneg (h⁻¹).val.det]
-  have hintR : ∀ h : GLw n w, (∀ i j, ‖h.val i j‖ ≤ 1) → ‖h.val.det‖ = 1 → h ∈ GlobalTheory.LFun.KGL w (n := n) := by
+  have hintR
+      : ∀ h : GLw n w,
+        (∀ i j, ‖h.val i j‖ ≤ 1) → ‖h.val.det‖ = 1 → h ∈ GlobalTheory.LFun.KGL w (n := n) := by
     intro h h1 h2
     refine (hmem (Ov E w) h).2 ⟨fun i j => (hle1 _).1 (h1 i j), fun i j => ?_⟩
     rw [Matrix.coe_units_inv]
@@ -163,9 +182,10 @@ theorem eq_twCent_mul_KGL : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     rw [Units.val_mul, Units.val_mul, hth, Matrix.coe_units_inv]; rfl
   obtain ⟨u, v, hu, hv, huv⟩ := hbez
   rw [hnr] at huv
-  obtain ⟨t, ⟨htu, htc⟩, k, hk1, hk2, hx⟩ := GlobalTheory.TwIntegral.integral_twConj_mem_cent_mul (fixF (cj w)) (w.adicCompletion E) n
-    y.val g.val hy1 hy2 ⟨u, v, fun i => (hle1 _).2 (hu i), fun i => (hle1 _).2 (hv i), huv⟩ g.isUnit
-    (by rw [htw]; exact hg1) (by rw [htw]; exact hg2)
+  obtain ⟨t, ⟨htu, htc⟩, k, hk1, hk2, hx⟩ :=
+    GlobalTheory.TwIntegral.integral_twConj_mem_cent_mul (fixF (cj w)) (w.adicCompletion E) n y.val
+      g.val hy1 hy2 ⟨u, v, fun i => (hle1 _).2 (hu i), fun i => (hle1 _).2 (hv i), huv⟩ g.isUnit
+      (by rw [htw]; exact hg1) (by rw [htw]; exact hg2)
   have hku : IsUnit k := GlobalTheory.TwIntegral.isUnit_of_norm_det hk2
   refine ⟨htu.unit, ?_, hku.unit, hintR _ (by simpa using hk1) (by simpa using hk2), Units.ext ?_⟩
   · show htu.unit * y = y * thL n w htu.unit

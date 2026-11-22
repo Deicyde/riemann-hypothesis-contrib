@@ -13,13 +13,14 @@ noncomputable section
 
 section Spaces
 
-variable {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
   [Algebra.IsQuadraticExtension F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
 variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 def LatticePointsBelowFinite.Statement (h : HermitianForm F E W) (v : Basis ι E W) : Prop :=
-  ∀ (M : Majorant h v) (La : AddSubgroup W) (g : archUnitary h v) (t : ℝ), IsLattice E La →
-    {x : W | x ∈ La ∧ M.len (invApply g (vecAt v x)) < t}.Finite
+  ∀ (M : Majorant h v) (La : AddSubgroup W) (g : archUnitary h v) (t : ℝ),
+    IsLattice E La → {x : W | x ∈ La ∧ M.len (invApply g (vecAt v x)) < t}.Finite
 
 end Spaces
 

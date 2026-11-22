@@ -11,12 +11,13 @@ noncomputable section
 namespace GlobalTheory.CompanionTheory.EisDict
 
 open scoped TensorProduct NNReal Matrix NumberField.AdeleRing
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
 open GlobalTheory.Doubling (absE)
 open PositivityTheory.RgEis
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-
 
 variable (F E) in
 def sec : (Af F ⊗[F] E) →+ AE F E :=
@@ -24,7 +25,8 @@ def sec : (Af F ⊗[F] E) →+ AE F E :=
 
 theorem sec_tmul (a : Af F) (x : E) : sec F E (a ⊗ₜ[F] x) = ((0, a) : AF F) ⊗ₜ[F] x := rfl
 
-theorem sec_finPart (z : AE F E) : sec F E (HeckeCharacterZeroLocus.ThmBIn.finPart F E z) = finOne F • z := by
+theorem sec_finPart (z : AE F E)
+    : sec F E (HeckeCharacterZeroLocus.ThmBIn.finPart F E z) = finOne F • z := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy, smul_add]
@@ -38,19 +40,22 @@ theorem sec_finPart (z : AE F E) : sec F E (HeckeCharacterZeroLocus.ThmBIn.finPa
     · change a.2 = 1 * a.2
       simp
 
-theorem finPart_finOne_smul (z : AE F E) :
-    HeckeCharacterZeroLocus.ThmBIn.finPart F E (finOne F • z) = HeckeCharacterZeroLocus.ThmBIn.finPart F E z := by
+theorem finPart_finOne_smul (z : AE F E)
+    : HeckeCharacterZeroLocus.ThmBIn.finPart F E (finOne F • z)
+      = HeckeCharacterZeroLocus.ThmBIn.finPart F E z := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | add x y hx hy => rw [smul_add, map_add (f := _), map_add (f := _), hx, hy]
   | tmul a x =>
     rw [TensorProduct.smul_tmul']
-    change HeckeCharacterZeroLocus.ThmBIn.sndA F (finOne F • a) ⊗ₜ[F] x = HeckeCharacterZeroLocus.ThmBIn.sndA F a ⊗ₜ[F] x
+    change HeckeCharacterZeroLocus.ThmBIn.sndA F (finOne F • a) ⊗ₜ[F] x
+      = HeckeCharacterZeroLocus.ThmBIn.sndA F a ⊗ₜ[F] x
     congr 1
     change 1 * a.2 = a.2
     simp
 
-theorem sec_mem {y : Af F ⊗[F] E} (hy : y ∈ HeckeCharacterZeroLocus.ThmBIn.intAE F E) : sec F E y ∈ intHat F E := by
+theorem sec_mem {y : Af F ⊗[F] E} (hy : y ∈ HeckeCharacterZeroLocus.ThmBIn.intAE F E)
+    : sec F E y ∈ intHat F E := by
   induction hy using AddSubgroup.closure_induction with
   | mem y h =>
     obtain ⟨a, ha, x, rfl⟩ := h
@@ -64,11 +69,13 @@ theorem sec_mem {y : Af F ⊗[F] E} (hy : y ∈ HeckeCharacterZeroLocus.ThmBIn.i
   | add x y _ _ hx hy => simpa using (intHat F E).add_mem hx hy
   | neg x _ hx => simpa using (intHat F E).neg_mem hx
 
-theorem finPart_mem {z : AE F E} (hz : z ∈ intHat F E) : HeckeCharacterZeroLocus.ThmBIn.finPart F E z ∈ HeckeCharacterZeroLocus.ThmBIn.intAE F E := by
+theorem finPart_mem {z : AE F E} (hz : z ∈ intHat F E)
+    : HeckeCharacterZeroLocus.ThmBIn.finPart F E z ∈ HeckeCharacterZeroLocus.ThmBIn.intAE F E := by
   induction hz using AddSubgroup.closure_induction with
   | mem z h =>
     obtain ⟨a, -, ha, o, rfl⟩ := h
-    refine AddSubgroup.subset_closure ⟨HeckeCharacterZeroLocus.ThmBIn.sndA F a, fun v => ha v, o, ?_⟩
+    refine AddSubgroup.subset_closure
+      ⟨HeckeCharacterZeroLocus.ThmBIn.sndA F a, fun v => ha v, o, ?_⟩
     change HeckeCharacterZeroLocus.ThmBIn.finPart F E (a • ((1 : AF F) ⊗ₜ[F] (o : E))) = _
     rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one]
     rfl
@@ -76,8 +83,10 @@ theorem finPart_mem {z : AE F E} (hz : z ∈ intHat F E) : HeckeCharacterZeroLoc
   | add x y _ _ hx hy => simpa using (HeckeCharacterZeroLocus.ThmBIn.intAE F E).add_mem hx hy
   | neg x _ hx => simpa using (HeckeCharacterZeroLocus.ThmBIn.intAE F E).neg_mem hx
 
-theorem mem_intAd_iff (z : AE F E) :
-    eqv F E z ∈ intAd E ↔ HeckeCharacterZeroLocus.ThmBIn.finPart F E z ∈ HeckeCharacterZeroLocus.ThmBIn.intAE F E := by
+theorem mem_intAd_iff (z : AE F E)
+    : eqv F E z ∈ intAd E
+      ↔ HeckeCharacterZeroLocus.ThmBIn.finPart F E z
+        ∈ HeckeCharacterZeroLocus.ThmBIn.intAE F E := by
   rw [GroundTheory.BlockD.ThmBHecke.mem_intAE_iff, ← GroundTheory.BlockD.ThmBHecke.adeleEquiv_snd,
     GroundTheory.Global.mem_integralFiniteAdeles]
   simp only [intAd, Subring.mem_iInf, Subring.mem_comap]
@@ -85,8 +94,13 @@ theorem mem_intAd_iff (z : AE F E) :
 
 theorem dict : Dict := by
   intro F E _ _ _ _ _
-  refine ⟨GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv, GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv_symm,
-    GroundTheory.BlockD.ThmBHecke.adeleEquiv_incA, fun z => ?_, fun x => ?_⟩
+  refine ⟨
+    GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv,
+    GroundTheory.BlockD.ThmBHecke.continuous_adeleEquiv_symm,
+    GroundTheory.BlockD.ThmBHecke.adeleEquiv_incA,
+    fun z => ?_,
+    fun x => ?_
+  ⟩
   · rw [mem_intAd_iff]
     refine ⟨fun h => ?_, fun h => ?_⟩
     · rw [← sec_finPart]

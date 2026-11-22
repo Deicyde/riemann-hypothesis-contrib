@@ -10,8 +10,12 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemMu
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.SeeSaw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.SeeSaw
 open scoped TensorProduct ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,8 +25,10 @@ namespace GlobalTheory.SeeSaw
 
 open scoped ComplexOrder
 
-theorem sig_eq_of_definite {n : ℕ} {G : Matrix (Fin n) (Fin n) ℂ} (hG : G.PosDef ∨ (-G).PosDef) {p q : ℕ}
-    (h : Formalism.UG.HasSignature G p q) : (p, q) = (n, 0) ∨ (p, q) = (0, n) := by
+theorem sig_eq_of_definite
+    {n : ℕ} {G : Matrix (Fin n) (Fin n) ℂ} (hG : G.PosDef ∨ (-G).PosDef)
+    {p q : ℕ} (h : Formalism.UG.HasSignature G p q)
+    : (p, q) = (n, 0) ∨ (p, q) = (0, n) := by
   rcases hG with hG | hG
   · exact Or.inl (GlobalTheory.DefLiftMult.sig_of_posDef hG h)
   · right
@@ -56,7 +62,7 @@ theorem isDefinite_of_defSp {D : D7} {A : HSp D} (x : DefSp A) (hx : x.Is) : A.I
         ext i j
         rfl
       rw [e] at hs
-      have hd : ((gramAt D A τ)ᴴᵀ).PosDef ∨ (-(gramAt D A τ)ᴴᵀ).PosDef := by
+      have hd : ((gramAt D A τ)ᴴᵀ).PosDef ∨ (- (gramAt D A τ)ᴴᵀ).PosDef := by
         rcases hτ τ with h | h
         · exact Or.inl h.conjTranspose.transpose
         · right
@@ -67,7 +73,8 @@ theorem isDefinite_of_defSp {D : D7} {A : HSp D} (x : DefSp A) (hx : x.Is) : A.I
   · exact Or.inl (Prod.ext h1 h2)
   · exact Or.inr (Prod.ext h1 h2)
 
-theorem isCompact_ginfC_of_defSp : ∀ (D : D7) (A : HSp D) (x : DefSp A), x.Is → IsCompact (GinfC A : Set (GA D A)) :=
+theorem isCompact_ginfC_of_defSp
+    : ∀ (D : D7) (A : HSp D) (x : DefSp A), x.Is → IsCompact (GinfC A : Set (GA D A)) :=
   fun _ _ x hx => Formalism.IndefR.Eqv.isCompact_GinfC hx.sig (isDefinite_of_defSp x hx)
 
 end GlobalTheory.SeeSaw

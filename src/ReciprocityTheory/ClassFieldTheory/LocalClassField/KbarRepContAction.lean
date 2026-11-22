@@ -21,16 +21,24 @@ theorem kbarRep_contAction : ReciprocityTheory.Gal.ContAction (kbarRep p K) := b
   intro x
   rw [isOpen_iff_mem_nhds]
   intro g0 hg0
-  have hop := stabilizer_isOpen_of_isIntegral (K := K) (L := PadicAlgCl p)
-    (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p)
-  have hn : (fun g : GK p K => g0⁻¹ * g) ⁻¹' (MulAction.stabilizer (GK p K)
-      (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p) : Set (GK p K)) ∈ nhds g0 :=
+  have hop :=
+    stabilizer_isOpen_of_isIntegral (K := K) (L := PadicAlgCl p)
+      (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p)
+  have hn
+      : (fun g : GK p K => g0⁻¹ * g)
+          ⁻¹' (MulAction.stabilizer (GK p K)
+              (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p)
+            : Set (GK p K))
+        ∈ nhds g0 :=
     (hop.preimage (continuous_const.mul continuous_id)).mem_nhds (by simp)
   filter_upwards [hn] with g hg
-  have hg' : (g0⁻¹ * g) (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p)
-      = (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p) := hg
-  have hgg : g (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p)
-      = g0 (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p) := by
+  have hg'
+      : (g0⁻¹ * g) (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p)
+        = (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p) :=
+    hg
+  have hgg
+      : g (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p)
+        = g0 (((Additive.toMul (α := (PadicAlgCl p)ˣ) y : (PadicAlgCl p)ˣ)) : PadicAlgCl p) := by
     have := congrArg g0 hg'
     rw [AlgEquiv.mul_apply] at this
     rw [← this]

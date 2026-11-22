@@ -6,13 +6,15 @@ public import Mathlib
 
 namespace PositivityTheory.Lord
 
-theorem hasProd_compl_finset {ι : Type*} [DecidableEq ι] (f g : ι → ℂ) (a : ℂ) (T S : Finset ι) (hST : S ⊆ T)
-    (hg : HasProd g a) (hg0 : ∀ v ∈ T, g v ≠ 0) (hfg : ∀ v, v ∉ T → f v = g v) :
-    HasProd (fun v : {v // v ∉ S} => f v) (a * (∏ v ∈ T, (g v)⁻¹) * ∏ v ∈ T \ S, f v) := by
+theorem hasProd_compl_finset
+    {ι : Type*} [DecidableEq ι]
+    (f g : ι → ℂ) (a : ℂ)
+    (T S : Finset ι) (hST : S ⊆ T)
+    (hg : HasProd g a) (hg0 : ∀ v ∈ T, g v ≠ 0) (hfg : ∀ v, v ∉ T → f v = g v)
+    : HasProd (fun v : {v // v ∉ S} => f v) (a * (∏ v ∈ T, (g v)⁻¹) * ∏ v ∈ T \ S, f v) := by
   let F : ι → ℂ := Set.mulIndicator {v | v ∉ S} f
   let k : ι → ℂ := fun v => if v ∈ T then (g v)⁻¹ * F v else 1
-  have hkT : HasProd k (∏ v ∈ T, k v) :=
-    hasProd_prod_of_ne_finset_one (fun v hv => if_neg hv)
+  have hkT : HasProd k (∏ v ∈ T, k v) := hasProd_prod_of_ne_finset_one (fun v hv => if_neg hv)
   have hgk : ∀ v, g v * k v = F v := by
     intro v
     by_cases hv : v ∈ T

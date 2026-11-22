@@ -27,10 +27,12 @@ open Classical
 
 variable {X : Fields} {Pr : Primes X}
 
-theorem conjP_vGs (hX : X.Ok) (hPr : Pr.Ok) {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ Pr.vGs) :
-    HeckeExHost.conjPrime₂ P ≠ P ∧ HeckeExHost.conjPrime₂ P ∉ Pr.vGs := by
-  have hmem : ∀ j, P ∈ Pr.vG j → X.conjO (Pr.piG j) ∈ P.asIdeal := fun j h => ChainCounts.mem_of_mem_divs h
-  have hcomap : ∀ y : 𝓞 X.E, y ∈ (HeckeExHost.conjPrime₂ P).asIdeal ↔ X.conjO y ∈ P.asIdeal := fun y => Iff.rfl
+theorem conjP_vGs (hX : X.Ok) (hPr : Pr.Ok) {P : HeightOneSpectrum (𝓞 X.E)} (hP : P ∈ Pr.vGs)
+    : HeckeExHost.conjPrime₂ P ≠ P ∧ HeckeExHost.conjPrime₂ P ∉ Pr.vGs := by
+  have hmem : ∀ j, P ∈ Pr.vG j → X.conjO (Pr.piG j) ∈ P.asIdeal := fun j h =>
+    ChainCounts.mem_of_mem_divs h
+  have hcomap : ∀ y : 𝓞 X.E, y ∈ (HeckeExHost.conjPrime₂ P).asIdeal ↔ X.conjO y ∈ P.asIdeal :=
+    fun y => Iff.rfl
   have hcop : ∀ j, Pr.piG j ∈ P.asIdeal → X.conjO (Pr.piG j) ∈ P.asIdeal → False := by
     intro j h1 h2
     obtain ⟨a, b, hab⟩ := hPr.piG_cop j
@@ -66,7 +68,8 @@ theorem conjP_vGs (hX : X.Ok) (hPr : Pr.Ok) {P : HeightOneSpectrum (𝓞 X.E)} (
         rcases key j i hij with ⟨h0, h1'⟩ | ⟨h0, h1'⟩
         · rw [h0, h1']; exact hPr.g_ne
         · rw [h0, h1']; exact hPr.g_ne.symm
-      have hcopZ : Nat.Coprime (Pr.g j) (Pr.g i) := (Nat.coprime_primes (hPr.g_prime j) (hPr.g_prime i)).2 hne
+      have hcopZ : Nat.Coprime (Pr.g j) (Pr.g i) :=
+        (Nat.coprime_primes (hPr.g_prime j) (hPr.g_prime i)).2 hne
       obtain ⟨a, b, hab⟩ : ∃ a b : ℤ, a * (Pr.g j : ℤ) + b * (Pr.g i : ℤ) = 1 := by
         refine ⟨Nat.gcdA (Pr.g j) (Pr.g i), Nat.gcdB (Pr.g j) (Pr.g i), ?_⟩
         have := Nat.gcd_eq_gcd_ab (Pr.g j) (Pr.g i)
@@ -75,7 +78,9 @@ theorem conjP_vGs (hX : X.Ok) (hPr : Pr.Ok) {P : HeightOneSpectrum (𝓞 X.E)} (
         linarith
       apply P.isPrime.ne_top
       rw [Ideal.eq_top_iff_one]
-      have e : (1 : 𝓞 X.E) = (a : 𝓞 X.E) * ((Pr.g j : ℕ) : 𝓞 X.E) + (b : 𝓞 X.E) * ((Pr.g i : ℕ) : 𝓞 X.E) := by
+      have e
+          : (1 : 𝓞 X.E)
+            = (a : 𝓞 X.E) * ((Pr.g j : ℕ) : 𝓞 X.E) + (b : 𝓞 X.E) * ((Pr.g i : ℕ) : 𝓞 X.E) := by
         have := congrArg (fun z : ℤ => (z : 𝓞 X.E)) hab
         push_cast at this
         exact this.symm

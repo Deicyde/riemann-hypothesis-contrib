@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Definitions.AbelianSchemeLaws.Fir
 
 set_option autoImplicit false
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 noncomputable section
 namespace GlobalTheory.IndefiniteRowSideFullHecke.FirstOrderRigidityLevel
@@ -36,10 +38,13 @@ section Norm
 variable {K : Type} [Field K] (P : PolAV (Sp K))
 
 def HasTrace (ψ : P.A ⟶ P.A) (t : ℤ) : Prop :=
-  ∀ M : ℕ, (M : K) ≠ 0 → ∀ y : Fin (2 * P.g) → (baseOver (Sp K) ⟶ P.A), (∀ i, y i ^ M = 1) →
-    (∀ z : baseOver (Sp K) ⟶ P.A, z ^ M = 1 → ∃ c : Fin (2 * P.g) → ℕ, linComb y c = z) →
-    ∀ B : Matrix (Fin (2 * P.g)) (Fin (2 * P.g)) ℕ,
-      (∀ i, y i ≫ ψ = linComb y fun l => B l i) → ((B.trace : ℕ) : ZMod M) = (t : ZMod M)
+  ∀ M : ℕ,
+    (M : K) ≠ 0
+      → ∀ y : Fin (2 * P.g) → (baseOver (Sp K) ⟶ P.A),
+        (∀ i, y i ^ M = 1)
+          → (∀ z : baseOver (Sp K) ⟶ P.A, z ^ M = 1 → ∃ c : Fin (2 * P.g) → ℕ, linComb y c = z)
+          → ∀ B : Matrix (Fin (2 * P.g)) (Fin (2 * P.g)) ℕ,
+            (∀ i, y i ≫ ψ = linComb y fun l => B l i) → ((B.trace : ℕ) : ZMod M) = (t : ZMod M)
 
 end Norm
 

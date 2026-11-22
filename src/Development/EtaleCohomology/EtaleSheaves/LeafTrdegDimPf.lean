@@ -9,14 +9,17 @@ namespace LateralTheory.E.LeafTrdegDimPf
 
 open Algebra
 
-theorem trdeg_le_card (k F : Type) [Field k] [Field F] [Algebra k F] (s : Finset F)
-    (h : Algebra.IsAlgebraic (IntermediateField.adjoin k (s : Set F)) F) :
-    Algebra.trdeg k F ≤ (s.card : Cardinal) := by
+theorem trdeg_le_card
+    (k F : Type) [Field k] [Field F] [Algebra k F]
+    (s : Finset F) (h : Algebra.IsAlgebraic (IntermediateField.adjoin k (s : Set F)) F)
+    : Algebra.trdeg k F ≤ (s.card : Cardinal) := by
   have : Algebra.IsAlgebraic (Algebra.adjoin k (s : Set F)) F :=
     ⟨fun x => IntermediateField.isAlgebraic_adjoin_iff.1 (h.isAlgebraic x)⟩
   obtain ⟨t, hts, hb⟩ := exists_isTranscendenceBasis_subset (R := k) (A := F) (s : Set F)
   rw [← hb.cardinalMk_eq_trdeg]
-  calc Cardinal.mk t ≤ Cardinal.mk (s : Set F) := Cardinal.mk_le_mk_of_subset hts
+  calc
+    Cardinal.mk t
+      ≤ Cardinal.mk (s : Set F) := Cardinal.mk_le_mk_of_subset hts
     _ = (s.card : Cardinal) := by simp
 
 theorem LeafTrdegDim_of : LateralTheory.E.LeafCurveVCut.LeafTrdegDim := by

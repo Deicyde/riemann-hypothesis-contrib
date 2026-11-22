@@ -19,16 +19,21 @@ theorem gMat_add {ε : Fin n → Bool} (s t : GCo ε) : gMat (s + t) = gMat s + 
   ext a b
   simp only [gMat, Matrix.add_apply]
   simp only [kMat, pmat, Prod.fst_add, Prod.snd_add, Pi.add_apply]
-  split_ifs <;> (try simp only [Complex.ofReal_add, star_add, mul_add, neg_add, add_zero]) <;>
-    (try ring)
+  split_ifs <;> (try simp only [Complex.ofReal_add, star_add, mul_add, neg_add, add_zero])
+    <;> (try ring)
 
-theorem gMat_smul {ε : Fin n → Bool} (c : ℝ) (s : GCo ε) : gMat (c • s) = (RingHom.id ℝ c) • gMat s := by
+theorem gMat_smul {ε : Fin n → Bool} (c : ℝ) (s : GCo ε)
+    : gMat (c • s) = (RingHom.id ℝ c) • gMat s := by
   ext a b
   simp only [gMat, RingHom.id_apply, Matrix.add_apply, Matrix.smul_apply]
   simp only [kMat, pmat, Prod.smul_fst, Prod.smul_snd, Pi.smul_apply]
-  split_ifs <;> (try simp only [Complex.real_smul, Complex.ofReal_mul, star_mul', Complex.star_def,
-    Complex.conj_ofReal, smul_add, smul_zero, smul_neg, add_zero, mul_neg]) <;>
-    (try simp only [smul_eq_mul, Complex.ofReal_mul]) <;> (try ring_nf)
+  split_ifs
+    <;> (
+      try
+        simp only [Complex.real_smul, Complex.ofReal_mul, star_mul', Complex.star_def,
+          Complex.conj_ofReal, smul_add, smul_zero, smul_neg, add_zero, mul_neg]
+    )
+    <;> (try simp only [smul_eq_mul, Complex.ofReal_mul]) <;> (try ring_nf)
 
 def gL (ε : Fin n → Bool) : GCo ε →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ where
   toFun := gMat
@@ -53,11 +58,14 @@ section Normed
 
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
 
-theorem exp_inUJ_small (ε : Fin n → Bool) : ∀ᶠ Z in 𝓝 (0 : Matrix (Fin n) (Fin n) ℂ),
-    inUJ ε (NormedSpace.exp Z) → inG ε Z := by
+theorem exp_inUJ_small (ε : Fin n → Bool)
+    : ∀ᶠ Z in 𝓝 (0 : Matrix (Fin n) (Fin n) ℂ),
+      inUJ ε (NormedSpace.exp Z) → inG ε Z := by
   unfold inG
-  have hd : HasStrictFDerivAt (NormedSpace.exp : Matrix (Fin n) (Fin n) ℂ → Matrix (Fin n) (Fin n) ℂ)
-      (1 : Matrix (Fin n) (Fin n) ℂ →L[ℂ] Matrix (Fin n) (Fin n) ℂ) 0 := hasStrictFDerivAt_exp_zero
+  have hd
+      : HasStrictFDerivAt (NormedSpace.exp : Matrix (Fin n) (Fin n) ℂ → Matrix (Fin n) (Fin n) ℂ)
+        (1 : Matrix (Fin n) (Fin n) ℂ →L[ℂ] Matrix (Fin n) (Fin n) ℂ) 0 :=
+    hasStrictFDerivAt_exp_zero
   obtain ⟨s, hs, hap⟩ := hd.approximates_deriv_on_nhds (c := 1 / 2) (Or.inr (by norm_num))
 
   have hinj : ∀ x ∈ s, ∀ y ∈ s, NormedSpace.exp x = NormedSpace.exp y → x = y := by
@@ -86,16 +94,18 @@ theorem exp_inUJ_small (ε : Fin n → Bool) : ∀ᶠ Z in 𝓝 (0 : Matrix (Fin
   unfold inUJ at hU
   have hE : NormedSpace.exp (Jm ε * Zᴴ * Jm ε) = NormedSpace.exp (-Z) := by
     have hL : Jm ε * (NormedSpace.exp Z)ᴴ * Jm ε * NormedSpace.exp Z = 1 := by
-      calc Jm ε * (NormedSpace.exp Z)ᴴ * Jm ε * NormedSpace.exp Z
-          = Jm ε * ((NormedSpace.exp Z)ᴴ * Jm ε * NormedSpace.exp Z) := by
-            simp only [Matrix.mul_assoc]
+      calc
+        Jm ε * (NormedSpace.exp Z)ᴴ * Jm ε * NormedSpace.exp Z
+            = Jm ε * ((NormedSpace.exp Z)ᴴ * Jm ε * NormedSpace.exp Z) := by
+          simp only [Matrix.mul_assoc]
         _ = 1 := by rw [hU, hJJ]
     rw [show Jm ε * Zᴴ * Jm ε = Jm ε * Zᴴ * (Jm ε)⁻¹ by rw [hJi], Matrix.exp_conj _ _ hJu, hJi,
       Matrix.exp_conjTranspose, Matrix.exp_neg]
     exact (Matrix.inv_eq_left_inv hL).symm
   have hZ := hinj _ h1 _ h2 hE
-  calc Zᴴ * Jm ε + Jm ε * Z = Jm ε * (Jm ε * Zᴴ * Jm ε) + Jm ε * Z := by
-        simp only [← Matrix.mul_assoc, hJJ, Matrix.one_mul]
+  calc
+    Zᴴ * Jm ε + Jm ε * Z = Jm ε * (Jm ε * Zᴴ * Jm ε) + Jm ε * Z := by
+      simp only [← Matrix.mul_assoc, hJJ, Matrix.one_mul]
     _ = 0 := by rw [hZ, Matrix.mul_neg, neg_add_cancel]
 
 def ujChart (ε : Fin n → Bool) : Chart (gV ε) (UJ ε) where

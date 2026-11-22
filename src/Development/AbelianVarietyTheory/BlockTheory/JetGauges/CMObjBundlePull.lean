@@ -13,9 +13,11 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.CMObjBundlePull
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
 open IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.L2.LamCM
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.L2.LamCM
 
 section Lie
 
@@ -52,39 +54,27 @@ def psi (H : Host E) : Set (E →+* ℂ) := {τ | τ (H.rt : E) = H.rt0}
 def psiBar (H : Host E) : Set (E →+* ℂ) := {τ | τ (H.rt : E) = -H.rt0}
 
 structure CMObj (c : Coeff l) (p q : ℕ) : Type 1 where
-
   K : Type
   [field : Field K]
   [numberField : NumberField K]
   [alg : Algebra c.F K]
-
   B : Out.PolAV (Sp (𝓞 K))
-
   AP : Out.PolAV (Sp (𝓞 K))
-
   AC : Out.PolAV (Sp (𝓞 K))
   ιB : Out.RingAct B.A (𝓞 E)
   ιP : Out.RingAct AP.A (𝓞 E)
   ιC : Out.RingAct AC.A (𝓞 E)
-
   φP : Fin p → (AP.A ⟶ B.A)
   φP_hom : ∀ j, IsMonHom (φP j)
   φP_lin : ∀ j a, ιP.act a ≫ φP j = φP j ≫ ιB.act a
-
   φC : Fin q → (AC.A ⟶ B.A)
   φC_hom : ∀ j, IsMonHom (φC j)
   φC_lin : ∀ j a, ιC.act a ≫ φC j = φC j ≫ ιB.act a
-
   hP : Fin p → 𝓞 E
-
   hC : Fin q → 𝓞 E
-
   ηP : psi H → (epsAt (genPt K) ⟶ AP.A)
-
   ηC : psiBar H → (epsAt (genPt K) ⟶ AC.A)
-
   ℓP : psi H → MLine K
-
   ℓC : psiBar H → MLine K
 
 attribute [instance] CMObj.field CMObj.numberField CMObj.alg

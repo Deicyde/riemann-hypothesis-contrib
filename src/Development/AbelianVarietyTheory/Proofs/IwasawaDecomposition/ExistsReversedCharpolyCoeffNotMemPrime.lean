@@ -10,10 +10,13 @@ open CategoryTheory Polynomial GlobalTheory.NormalDescent
 
 namespace GlobalTheory.NormalDescent
 
-theorem exists_normCoeff_not_mem {A B : Type} [CommRing A] [IsDomain A] [IsIntegrallyClosed A] [CommRing B]
-    (φ : A →+* B) (hφ : φ.Finite) (b : B) (hQ₀ : ∃ Q : Ideal B, Q.IsPrime ∧ Q.comap φ = ⊥)
-    (p : Ideal A) (hp : p.IsPrime) (hb : ∀ Q : Ideal B, Q.IsPrime → Q.comap φ = p → b ∉ Q) :
-    ∃ k, 1 ≤ k ∧ normCoeff φ hφ b k ∉ p := by
+theorem exists_normCoeff_not_mem
+    {A B : Type} [CommRing A] [IsDomain A] [IsIntegrallyClosed A] [CommRing B]
+    (φ : A →+* B) (hφ : φ.Finite)
+    (b : B)
+    (hQ₀ : ∃ Q : Ideal B, Q.IsPrime ∧ Q.comap φ = ⊥)
+    (p : Ideal A) (hp : p.IsPrime) (hb : ∀ Q : Ideal B, Q.IsPrime → Q.comap φ = p → b ∉ Q)
+    : ∃ k, 1 ≤ k ∧ normCoeff φ hφ b k ∉ p := by
   classical
   letI := φ.toAlgebra
   haveI : Module.Finite A B := hφ
@@ -35,8 +38,8 @@ theorem exists_normCoeff_not_mem {A B : Type} [CommRing A] [IsDomain A] [IsInteg
     intro j hj
     have hk : 1 ≤ P.natDegree - j := by omega
     have hrev : (charK φ hφ K b).reverse.coeff (P.natDegree - j) = algebraMap A K (P.coeff j) := by
-      rw [coeff_reverse, hdeg, revAt_le (by omega), show P.natDegree - (P.natDegree - j) = j by omega,
-        ← hP, coeff_map]
+      rw [coeff_reverse, hdeg, revAt_le (by omega),
+        show P.natDegree - (P.natDegree - j) = j by omega, ← hP, coeff_map]
     have hex : ∃ a : A, algebraMap A K a = (charK φ hφ K b).reverse.coeff (P.natDegree - j) :=
       ⟨P.coeff j, hrev.symm⟩
     have := algebraMap_normCoeff φ hφ b _ hex
@@ -52,7 +55,9 @@ theorem exists_normCoeff_not_mem {A B : Type} [CommRing A] [IsDomain A] [IsInteg
       rw [← Polynomial.aeval_algHom_apply]; exact h
     have h3 := LinearMap.congr_fun h2 1
     simpa using h3
-  have hker : Algebra.TensorProduct.includeRight (R := A) (A := K) (B := B) (Polynomial.aeval b P) = 0 := by
+  have hker
+      : Algebra.TensorProduct.includeRight (R := A) (A := K) (B := B) (Polynomial.aeval b P)
+        = 0 := by
     rw [← Polynomial.aeval_algHom_apply, Algebra.TensorProduct.includeRight_apply,
       ← Polynomial.aeval_map_algebraMap K, hP]
     exact hCH
@@ -62,8 +67,7 @@ theorem exists_normCoeff_not_mem {A B : Type} [CommRing A] [IsDomain A] [IsInteg
     intro a ha
     obtain ⟨Q₀, hQ₀p, hQ₀c⟩ := hQ₀
     have ha' : (1 : K) ⊗ₜ[A] (algebraMap A B a) = 0 := ha
-    have := (IsLocalizedModule.eq_zero_iff (nonZeroDivisors A)
-      (TensorProduct.mk A K B 1)).1 ha'
+    have := (IsLocalizedModule.eq_zero_iff (nonZeroDivisors A) (TensorProduct.mk A K B 1)).1 ha'
     obtain ⟨⟨s, hs⟩, hs0⟩ := this
     have hs0' : φ (s * a) = 0 := by
       rw [map_mul]; simpa [Algebra.smul_def, RingHom.algebraMap_toAlgebra] using hs0
@@ -74,7 +78,8 @@ theorem exists_normCoeff_not_mem {A B : Type} [CommRing A] [IsDomain A] [IsInteg
       rcases mul_eq_zero.1 hmem with h | h
       · exact absurd h hs'
       · exact h
-    rw [this]; exact p.zero_mem
+    rw [this]
+    exact p.zero_mem
   haveI : Algebra.IsIntegral A B := inferInstance
   obtain ⟨Q, hQI, hQp, hQc⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (S := B) p I hI
   have hPQ : Polynomial.aeval b P ∈ Q := hQI (by simpa [I, RingHom.mem_ker] using hker)
@@ -88,7 +93,8 @@ theorem exists_normCoeff_not_mem {A B : Type} [CommRing A] [IsDomain A] [IsInteg
     refine Q.mul_mem_right _ ?_
     have : P.coeff j ∈ Q.comap (algebraMap A B) := by
       change P.coeff j ∈ Ideal.under A Q
-      rw [hQc]; exact hcoeff j (Finset.mem_range.1 hj)
+      rw [hQc]
+      exact hcoeff j (Finset.mem_range.1 hj)
     exact this
   exact hb Q hQp hQc (hQp.mem_of_pow_mem _ hbd)
 

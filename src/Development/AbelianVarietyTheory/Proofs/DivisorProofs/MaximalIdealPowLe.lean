@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.C
 
 set_option autoImplicit false
 noncomputable section
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (RingAct)
 open scoped CategoryTheory.Obj NumberField
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -19,24 +21,32 @@ open GlobalTheory.IwLevel
 
 namespace GlobalTheory.KerIdeal
 
-theorem maximalIdeal_pow_le : ∀ (k : Type) [Field k] [IsAlgClosed k] (A B : Over (Sp k)) [GrpObj A] [IsCommMonObj A] [GrpObj B]
-    [IsCommMonObj B] (π : A ⟶ B) (d : ℕ), IsAbelianScheme A → IsAbelianScheme B → IsMonHom π → IsIsogDeg π d →
-    ∀ x₀ : A.left, x₀ ∈ Set.range (η[A]).left.base → ∀ J : Ideal (A.left.presheaf.stalk x₀),
-    (∀ (R' : Type) [CommRing R'] (ψ : A.left.presheaf.stalk x₀ →+* R'),
-      (∃ z : Sp R' ⟶ Sp k, z ≫ (η[B]).left = (Spec.map (CommRingCat.ofHom ψ) ≫ A.left.fromSpecStalk x₀) ≫ π.left) ↔
-        J ≤ RingHom.ker ψ) →
-    ∃ M : ℕ, IsLocalRing.maximalIdeal (A.left.presheaf.stalk x₀) ^ M ≤ J := by
+theorem maximalIdeal_pow_le
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (A B : Over (Sp k)) [GrpObj A] [IsCommMonObj A]
+        [GrpObj B] [IsCommMonObj B] (π : A ⟶ B) (d : ℕ),
+      IsAbelianScheme A → IsAbelianScheme B → IsMonHom π → IsIsogDeg π d
+        → ∀ x₀ : A.left,
+          x₀ ∈ Set.range (η[A]).left.base
+            → ∀ J : Ideal (A.left.presheaf.stalk x₀),
+              (∀ (R' : Type) [CommRing R'] (ψ : A.left.presheaf.stalk x₀ →+* R'),
+                  (∃ z : Sp R' ⟶ Sp k,
+                      z ≫ (η[B]).left
+                        = (Spec.map (CommRingCat.ofHom ψ) ≫ A.left.fromSpecStalk x₀) ≫ π.left)
+                    ↔ J ≤ RingHom.ker ψ)
+                → ∃ M : ℕ, IsLocalRing.maximalIdeal (A.left.presheaf.stalk x₀) ^ M ≤ J := by
   intro k _ _ A B _ _ _ _ π d hA hB hπ hiso x₀ hx₀ J hJ
   have := hA.smooth
   have : IsLocallyNoetherian A.left := LocallyOfFiniteType.isLocallyNoetherian A.hom
   have := hiso.fin
   obtain ⟨s, rfl⟩ := hx₀
-  have key : ∀ P : Ideal (A.left.presheaf.stalk ((η[A]).left.base s)), P.IsPrime → J ≤ P →
-      P = IsLocalRing.maximalIdeal _ := by
+  have key
+      : ∀ P : Ideal (A.left.presheaf.stalk ((η[A]).left.base s)),
+        P.IsPrime → J ≤ P → P = IsLocalRing.maximalIdeal _ := by
     intro P hP hJP
     haveI := hP
-    obtain ⟨z, hz⟩ := (hJ (A.left.presheaf.stalk ((η[A]).left.base s) ⧸ P) (Ideal.Quotient.mk P)).2
-      (by rw [Ideal.mk_ker]; exact hJP)
+    obtain ⟨z, hz⟩ :=
+      (hJ (A.left.presheaf.stalk ((η[A]).left.base s) ⧸ P) (Ideal.Quotient.mk P)).2
+        (by rw [Ideal.mk_ker]; exact hJP)
     let q : Sp (A.left.presheaf.stalk ((η[A]).left.base s) ⧸ P) := ⟨⊥, Ideal.isPrime_bot⟩
     set g := Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk P)) with hg
     have hgq : g q = ⟨P, hP⟩ := by

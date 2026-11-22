@@ -8,18 +8,27 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsBas
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3
+open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
+  GlobalTheory.Mem.R3
 
 namespace GlobalTheory.Mem.RatDatRExp
 
-theorem chi_val_small {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m}
-    {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks)
-    (hL : R.toLevCh.Is A.μ0) (hV : GlobalTheory.RealGeo.ValKs R) (i : Fin D.R.m) (PP : Pl D.host.E) (hP : PP ∈ R.Pg)
-    (u : (kP PP)ˣ) :
-    ∃ y : Ks, ((R.chi ((i : ℕ) + 1) PP u : ℂˣ) : ℂ) = D.what₂.embLL (algebraMap Ks D.what₂.LL y) := by
+theorem chi_val_small
+    {D : D7} {G : Type} [Group G] [Fintype G]
+    {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type}
+    [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+    (R : RealDat D A Ks) (hL : R.toLevCh.Is A.μ0) (hV : GlobalTheory.RealGeo.ValKs R)
+    (i : Fin D.R.m)
+    (PP : Pl D.host.E) (hP : PP ∈ R.Pg) (u : (kP PP)ˣ)
+    : ∃ y : Ks,
+      ((R.chi ((i : ℕ) + 1) PP u : ℂˣ) : ℂ) = D.what₂.embLL (algebraMap Ks D.what₂.LL y) := by
   obtain ⟨a, ha⟩ := Ideal.Quotient.mk_surjective (u : kP PP)
   have ha0 : (a : D.host.E) ≠ 0 := by
     intro h
@@ -43,7 +52,17 @@ end GlobalTheory.Mem.RatDatRExp
 
 namespace GlobalTheory.Mem.RatDatRExp
 
-theorem rhoStab_chiInLL0 : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type) (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) (C : Formalism.L2.Pj.CoreJ D) [Algebra C.Q.c.F D.what₂.LL] (R : RealDat3 D A3 C.Q.c.F) (F : Face3 D A3) (cG : G0 R.Pg D.R.r ≃* G0g D.nd) (g : GlobalTheory.RealGeo.GeoHalf C R.toRealDat fun _ => 1) (kKs : C.Q.c.F →+* ↥D.LL0) (hk : ∀ x, ((kKs x : ↥D.LL0) : D.what₂.LL) = algebraMap C.Q.c.F D.what₂.LL x), Pins R F cG → GlobalTheory.RealGeo.InGeo g → ∀ j, 1 ≤ j → j ≤ D.R.m → NX.RhoStab (NX.ratDatR R cG kKs hk) j ∧ NX.ChiInLL0 (NX.ratDatR R cG kKs hk) j := by
+theorem rhoStab_chiInLL0
+    : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type)
+        (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) (C : Formalism.L2.Pj.CoreJ D)
+        [Algebra C.Q.c.F D.what₂.LL] (R : RealDat3 D A3 C.Q.c.F) (F : Face3 D A3)
+        (cG : G0 R.Pg D.R.r ≃* G0g D.nd) (g : GlobalTheory.RealGeo.GeoHalf C R.toRealDat fun _ => 1)
+        (kKs : C.Q.c.F →+* ↥D.LL0)
+        (hk : ∀ x, ((kKs x : ↥D.LL0) : D.what₂.LL) = algebraMap C.Q.c.F D.what₂.LL x),
+      Pins R F cG → GlobalTheory.RealGeo.InGeo g
+        → ∀ j,
+          1 ≤ j → j ≤ D.R.m
+            → NX.RhoStab (NX.ratDatR R cG kKs hk) j ∧ NX.ChiInLL0 (NX.ratDatR R cG kKs hk) j := by
   intro D G _ _ Pl0 I0 T A3 C _ R F cG B kKs hk hP _ j _ _
   refine ⟨?_, ?_⟩
   · intro g0 x hx
@@ -61,9 +80,11 @@ theorem rhoStab_chiInLL0 : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0
     have hL := hP.char.base.lev
     have hW := hP.char.base.grp.chiW
     have hV := hP.keep.valKs
-    have hy : ∀ PP : R.Pg, ∃ y : C.Q.c.F,
-        ((R.chi ((NX.idxOf D j : ℕ) + 1) PP.1 (Matrix.GeneralLinearGroup.det (R.eG g0 PP)) : ℂˣ) : ℂ) =
-          D.what₂.embLL (algebraMap C.Q.c.F D.what₂.LL y) := fun PP =>
+    have hy
+        : ∀ PP : R.Pg, ∃ y : C.Q.c.F,
+          ((R.chi ((NX.idxOf D j : ℕ) + 1) PP.1 (Matrix.GeneralLinearGroup.det (R.eG g0 PP)) : ℂˣ)
+              : ℂ)
+            = D.what₂.embLL (algebraMap C.Q.c.F D.what₂.LL y) := fun PP =>
       chi_val_small R.toRealDat hL hV (NX.idxOf D j) PP.1 PP.2 _
     choose y hy using hy
     have h1 := hW (NX.idxOf D j) g0

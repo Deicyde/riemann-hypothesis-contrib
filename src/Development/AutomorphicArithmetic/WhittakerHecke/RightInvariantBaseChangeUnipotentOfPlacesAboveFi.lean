@@ -7,7 +7,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
@@ -78,33 +80,50 @@ private lemma fin_over {E : Type} [Field E] [NumberField E] (v : H.P ℚ) :
   rintro _ ⟨w, hw, rfl⟩
   exact ⟨w.isPrime, (AdeleBaseChange.below_eq_iff _ _).1 hw⟩
 
-theorem UpperTheory.right_invariant_baseChangeUnipotent_of_places_above_fixed :
-    ∀ (E : Type) [Field E] [NumberField E] (D : Dat ℚ E) (φ : GL (Fin 2) (A E) → ℂ) (v : H.P ℚ), H.Gd D.δ v → (∀ w : H.P E, w.under (𝓞 ℚ) = v → H.Fix w φ) → ∀ c : H.Kv v, H.IsInt c → ∀ g, φ (g * Xg.nu D (H.sg v c)) = φ g := by
+theorem UpperTheory.right_invariant_baseChangeUnipotent_of_places_above_fixed
+    : ∀ (E : Type) [Field E] [NumberField E] (D : Dat ℚ E) (φ : GL (Fin 2) (A E) → ℂ) (v : H.P ℚ),
+      H.Gd D.δ v → (∀ w : H.P E, w.under (𝓞 ℚ) = v → H.Fix w φ)
+        → ∀ c : H.Kv v, H.IsInt c → ∀ g, φ (g * Xg.nu D (H.sg v c)) = φ g := by
   intro E _ _ D φ v hG hF c hc g
   obtain ⟨-, -, hcp, -, -, -, -, hs, -, -⟩ := H.sgLaws ℚ v
   have hz : D.mkE 0 (H.sg v c) = AdeleBaseChange.adeleMap ℚ E (H.sg v c) * rt D.θ := by
     rw [Dat.mkE, map_zero, zero_add]
-  have hoff : ∀ w : H.P E, AdeleBaseChange.below ℚ w ≠ v → H.cp w (D.mkE 0 (H.sg v c)) = 0 := fun w hw => by
+  have hoff
+      : ∀ w : H.P E,
+        AdeleBaseChange.below ℚ w ≠ v → H.cp w (D.mkE 0 (H.sg v c)) = 0 := fun w hw => by
     have h : H.cp w (AdeleBaseChange.adeleMap ℚ E (H.sg v c)) = 0 := by
-      change SemiLocal.completionMap (AdeleBaseChange.below ℚ w) w ((H.sg v c).2 (AdeleBaseChange.below ℚ w)) = 0
+      change SemiLocal.completionMap (AdeleBaseChange.below ℚ w) w
+          ((H.sg v c).2 (AdeleBaseChange.below ℚ w))
+        = 0
       rw [(hs c).2 _ hw, map_zero]
     rw [hz, map_mul, h, zero_mul]
   change φ (g * gl (nU (D.mkE 0 (H.sg v c)))) = φ g
-  refine fix_sum φ (fin_over (E := E) v).toFinset (fun w hw => hF w ((fin_over v).mem_toFinset.1 hw)) _ ?_
-    (fun w hw => hoff w fun h => hw ((fin_over v).mem_toFinset.2 h)) (fun w => ?_) g
+  refine fix_sum φ (fin_over (E := E) v).toFinset
+    (fun w hw => hF w ((fin_over v).mem_toFinset.1 hw))
+    _ ?_
+    (fun w hw => hoff w fun h => hw ((fin_over v).mem_toFinset.2 h))
+    (fun w => ?_)
+    g
   · rw [hz]
     change InfinitePlace.infiniteAdeleRingMap (H.sg v c).1 * _ = 0
     rw [(hs c).1, map_zero, zero_mul]
   · by_cases hw : AdeleBaseChange.below ℚ w = v
     · subst hw
-      have hk : ∀ x : H.Kv (AdeleBaseChange.below ℚ w), Valued.v x ≤ 1 →
-          Valued.v (SemiLocal.completionMap (AdeleBaseChange.below ℚ w) w x) ≤ 1 := fun x hx => by
+      have hk
+          : ∀ x : H.Kv (AdeleBaseChange.below ℚ w),
+            Valued.v x ≤ 1
+              → Valued.v (SemiLocal.completionMap (AdeleBaseChange.below ℚ w) w x)
+                ≤ 1 := fun x hx => by
         rw [SemiLocal.valued_completionMap]
         exact pow_le_one' hx _
-      have h1 : H.cp w (AdeleBaseChange.adeleMap ℚ E (H.sg _ c)) = SemiLocal.completionMap (AdeleBaseChange.below ℚ w) w c :=
+      have h1
+          : H.cp w (AdeleBaseChange.adeleMap ℚ E (H.sg _ c))
+            = SemiLocal.completionMap (AdeleBaseChange.below ℚ w) w c :=
         congrArg (SemiLocal.completionMap (AdeleBaseChange.below ℚ w) w) (hcp c)
-      have h2 : H.cp w (rt D.θ) ^ 2 =
-          SemiLocal.completionMap (AdeleBaseChange.below ℚ w) w (D.δ : H.Kv (AdeleBaseChange.below ℚ w)) := by
+      have h2
+          : H.cp w (rt D.θ) ^ 2
+            = SemiLocal.completionMap (AdeleBaseChange.below ℚ w) w
+              (D.δ : H.Kv (AdeleBaseChange.below ℚ w)) := by
         rw [← map_pow, ← map_pow, D.sq]
         have a := eq_ratCast (((H.cp w).comp (algebraMap E (A E))).comp (algebraMap ℚ E)) D.δ
         rw [map_ratCast]

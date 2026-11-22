@@ -139,7 +139,8 @@ lemma scal (μ : Fin n → ℤ) (hμ : IsMu lam μ) (B : Matrix (Fin n) (Fin n) 
   rw [e]
   ring
 
-def Ssum (T : KType ε Λ) (μ : Fin n → ℤ) (x A : Matrix (Fin n) (Fin n) ℂ) (k : KG ε) : T.V →L[ℂ] T.V :=
+def Ssum (T : KType ε Λ) (μ : Fin n → ℤ) (x A : Matrix (Fin n) (Fin n) ℂ) (k : KG ε)
+    : T.V →L[ℂ] T.V :=
   ∑ a, ∑ b ∈ univ.filter (fun b => ε b = ε a ∧ b ≠ a),
     (if b < a then (1 : ℂ) else -1) • InfKA.Ek T μ x (InfKA.entryCLM a b) A (Matrix.single a b 1) k
 
@@ -270,13 +271,17 @@ lemma pt (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsMu lam μ) {
 
 end InfKH
 
-theorem psM_inf_herm (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : IsMu lam μ) {x : Matrix (Fin n) (Fin n) ℂ}
-    (hx : x.PosDef) {A : Matrix (Fin n) (Fin n) ℂ} (hA : IsBlock ε A) (hAh : Aᴴ = A) :
-    fderiv ℂ (psM T μ) x (A * x + x * A) = -(T.dτ A * psM T μ x + psM T μ x * T.dτ A) := by
+theorem psM_inf_herm
+    (T : KType ε (lowK ε lam))
+    (μ : Fin n → ℤ) (hμ : IsMu lam μ)
+    {x : Matrix (Fin n) (Fin n) ℂ} (hx : x.PosDef)
+    {A : Matrix (Fin n) (Fin n) ℂ} (hA : IsBlock ε A) (hAh : Aᴴ = A)
+    : fderiv ℂ (psM T μ) x (A * x + x * A) = -(T.dτ A * psM T μ x + psM T μ x * T.dτ A) := by
   have := compactSpace_KG ε
   obtain ⟨U, -, hPU, -, -, hder⟩ := psM_holo T μ
   rw [hder x (hPU hx)]
-  have hGI : Integrable (Gint T μ x) (muK ε) := InfKA.integrable_of_cont (InfKA.continuous_Gint T μ hx)
+  have hGI : Integrable (Gint T μ x) (muK ε) :=
+    InfKA.integrable_of_cont (InfKA.continuous_Gint T μ hx)
   have hL : ∫ k, T.dτ A * Gint T μ x k ∂(muK ε) = T.dτ A * ∫ k, Gint T μ x k ∂(muK ε) :=
     (ContinuousLinearMap.mul ℂ (T.V →L[ℂ] T.V) (T.dτ A)).integral_comp_comm hGI
   have hR : ∫ k, Gint T μ x k * T.dτ A ∂(muK ε) = (∫ k, Gint T μ x k ∂(muK ε)) * T.dτ A :=
@@ -286,11 +291,15 @@ theorem psM_inf_herm (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ) (hμ : Is
   have hRI : Integrable (fun k => Gint T μ x k * T.dτ A) (muK ε) :=
     ((ContinuousLinearMap.mul ℂ (T.V →L[ℂ] T.V)).flip (T.dτ A)).integrable_comp hGI
   obtain ⟨hSI, hS0⟩ := InfKH.integral_Ssum T μ hx A
-  have hLR : Integrable (fun k => T.dτ A * Gint T μ x k + Gint T μ x k * T.dτ A) (muK ε) := hLI.add hRI
+  have hLR : Integrable (fun k => T.dτ A * Gint T μ x k + Gint T μ x k * T.dτ A) (muK ε) :=
+    hLI.add hRI
   rw [integral_congr_ae (Filter.Eventually.of_forall (InfKH.pt T μ hμ hx hA hAh)),
     integral_sub hSI hLR, hS0, zero_sub, integral_add hLI hRI, hL, hR]
-  have hps : psM T μ x = ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ)) •
-      ∫ k, Gint T μ x k ∂(muK ε) := rfl
+  have hps
+      : psM T μ x
+        = ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ))
+          • ∫ k, Gint T μ x k ∂(muK ε) :=
+    rfl
   rw [hps]
   simp only [smul_neg, smul_add, mul_smul_comm, smul_mul_assoc]
 

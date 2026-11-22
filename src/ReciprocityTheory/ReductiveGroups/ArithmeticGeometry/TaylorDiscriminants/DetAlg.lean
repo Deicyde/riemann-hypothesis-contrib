@@ -7,10 +7,13 @@ public import Mathlib
 namespace ReciprocityTheory.ChartRestriction.G.TB
 
 def DetAlgSt : Prop :=
-  ∀ (K : Type) [Field K] (n : ℕ) (I : Ideal (MvPolynomial (Fin n) K)), I.IsRadical →
-    ∀ r : MvPolynomial (Fin n) K ⧸ I,
-      (∀ (L : Type) [Field L] [Algebra K L] [FiniteDimensional K L]
-        (φ : (MvPolynomial (Fin n) K ⧸ I) →ₐ[K] L), φ r = 0) → r = 0
+  ∀ (K : Type) [Field K] (n : ℕ) (I : Ideal (MvPolynomial (Fin n) K)),
+    I.IsRadical
+      → ∀ r : MvPolynomial (Fin n) K ⧸ I,
+        (∀ (L : Type) [Field L] [Algebra K L] [FiniteDimensional K L]
+              (φ : (MvPolynomial (Fin n) K ⧸ I) →ₐ[K] L),
+            φ r = 0)
+          → r = 0
 
 theorem detAlg_holds : DetAlgSt := by
   intro K _ n I hI r hr

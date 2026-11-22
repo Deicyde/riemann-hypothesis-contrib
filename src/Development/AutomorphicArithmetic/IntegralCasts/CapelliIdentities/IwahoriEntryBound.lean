@@ -4,22 +4,25 @@ public import Mathlib
 
 @[expose] public section
 
-open scoped IntermediateField TensorProduct Matrix Pointwise NumberField Topology ContDiff NNReal ENNReal Polynomial DirectSum BigOperators InnerProductSpace Manifold
+open scoped IntermediateField TensorProduct Matrix Pointwise NumberField Topology ContDiff NNReal
+  ENNReal Polynomial DirectSum BigOperators InnerProductSpace Manifold
 
-noncomputable def UpperTheory.Reformulated.B.IwahoriEntryBound.latK :
-    (L : Type) → [inst : Field L] → [Valued L (WithZero (Multiplicative ℤ))] → (n : ℕ) → ℕ → Set (Fin n → L) :=
-    fun (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (n k : ℕ) ↦
-      {x : Fin n → L |
-        ∀ (i : Fin n),
-          if (↑i : ℕ) < k then (Valued.v : L → WithZero (Multiplicative ℤ)) (x i) ≤ (1 : WithZero (Multiplicative ℤ))
-          else (Valued.v : L → WithZero (Multiplicative ℤ)) (x i) < (1 : WithZero (Multiplicative ℤ))}
+noncomputable def UpperTheory.Reformulated.B.IwahoriEntryBound.latK
+    : (L : Type) → [inst : Field L] → [Valued L (WithZero (Multiplicative ℤ))] → (n : ℕ) → ℕ
+      → Set
+        (Fin n → L) := fun (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (n k : ℕ) ↦
+  {x : Fin n → L |
+    ∀ (i : Fin n),
+      if (↑i : ℕ) < k then (Valued.v : L → WithZero (Multiplicative ℤ)) (x i) ≤ (1 : WithZero (Multiplicative ℤ))
+      else (Valued.v : L → WithZero (Multiplicative ℤ)) (x i) < (1 : WithZero (Multiplicative ℤ))}
 
-noncomputable def UpperTheory.Reformulated.B.IwahoriEntryBound.IwGL :
-    (L : Type) → [inst : Field L] → [Valued L (WithZero (Multiplicative ℤ))] → (n : ℕ) → Subgroup (GL (Fin n) L) :=
-    fun (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (n : ℕ) ↦
-      ⨅ (k : Fin (n + (1 : ℕ))),
-        Subgroup.comap Matrix.GeneralLinearGroup.toLin.toMonoidHom
-          (MulAction.stabilizer (LinearMap.GeneralLinearGroup L (Fin n → L)) (UpperTheory.Reformulated.B.IwahoriEntryBound.latK L n (↑k : ℕ)))
+noncomputable def UpperTheory.Reformulated.B.IwahoriEntryBound.IwGL
+    : (L : Type) → [inst : Field L] → [Valued L (WithZero (Multiplicative ℤ))] → (n : ℕ)
+      → Subgroup (GL (Fin n)
+        L) := fun (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (n : ℕ) ↦
+  ⨅ (k : Fin (n + (1 : ℕ))),
+    Subgroup.comap Matrix.GeneralLinearGroup.toLin.toMonoidHom
+      (MulAction.stabilizer (LinearMap.GeneralLinearGroup L (Fin n → L)) (UpperTheory.Reformulated.B.IwahoriEntryBound.latK L n (↑k : ℕ)))
 
 namespace UpperTheory.Reformulated.B.IwahoriEntryBound.Helpers
 
@@ -60,36 +63,42 @@ private lemma entry_bound {L : Type} [Field L] [Valued L (WithZero (Multiplicati
 end UpperTheory.Reformulated.B.IwahoriEntryBound.Helpers
 
 open UpperTheory.Reformulated.B.IwahoriEntryBound.Helpers in
-theorem UpperTheory.Reformulated.B.IwahoriEntryBound.main :
-    ∀ {L : Type} [inst : Field L] [inst_1 : Valued L (WithZero (Multiplicative ℤ))] {n : ℕ} {g : GL (Fin n) L},
-      g ∈ UpperTheory.Reformulated.B.IwahoriEntryBound.IwGL L n →
-        ∀ (i : Fin n),
-          (Valued.v : L → WithZero (Multiplicative ℤ)) ((↑g : Matrix (Fin n) (Fin n) L) i i) =
-            (1 : WithZero (Multiplicative ℤ)) := by
+theorem UpperTheory.Reformulated.B.IwahoriEntryBound.main
+    : ∀ {L : Type} [inst : Field L] [inst_1 : Valued L (WithZero (Multiplicative ℤ))] {n : ℕ}
+        {g : GL (Fin n) L},
+      g ∈ UpperTheory.Reformulated.B.IwahoriEntryBound.IwGL L n
+        → ∀ (i : Fin n),
+          (Valued.v : L → WithZero (Multiplicative ℤ)) ((↑g : Matrix (Fin n) (Fin n) L) i i)
+            = (1 : WithZero (Multiplicative ℤ)) := by
   intro L _ _ n g hg i
   classical
   have hg' : g⁻¹ ∈ UpperTheory.Reformulated.B.IwahoriEntryBound.IwGL L n := inv_mem hg
-  have hprod : ((g⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) * (g : Matrix (Fin n) (Fin n) L) = 1 := by
+  have hprod
+      : ((g⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) * (g : Matrix (Fin n) (Fin n) L) = 1 := by
     rw [← Units.val_mul, inv_mul_cancel, Units.val_one]
   have hii := congrFun (congrFun hprod i) i
   rw [Matrix.mul_apply, Matrix.one_apply_eq, ← Finset.add_sum_erase _ _ (Finset.mem_univ i)] at hii
   set a := ((g⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i * (g : Matrix (Fin n) (Fin n) L) i i with ha
-  have hrest : Valued.v (∑ j ∈ Finset.univ.erase i,
-      ((g⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j * (g : Matrix (Fin n) (Fin n) L) j i) < 1 := by
+  have hrest
+      : Valued.v
+          (∑ j ∈ Finset.univ.erase i,
+            ((g⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j * (g : Matrix (Fin n) (Fin n) L) j i)
+        < 1 := by
     apply Valuation.map_sum_lt _ one_ne_zero
     intro j hj
     have hne : j ≠ i := Finset.ne_of_mem_erase hj
     rw [Valuation.map_mul]
     rcases lt_or_gt_of_ne (Fin.val_ne_of_ne hne) with hlt | hlt
-    ·
-      have h1 := (entry_bound hg' i j).2 hlt
+    · have h1 := (entry_bound hg' i j).2 hlt
       have h2 := (entry_bound hg j i).1
-      calc _ ≤ Valued.v (((g⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j) * 1 := by gcongr
+      calc
+        _ ≤ Valued.v (((g⁻¹ : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j) * 1 := by gcongr
         _ = _ := mul_one _
         _ < 1 := h1
     · have h1 := (entry_bound hg' i j).1
       have h2 := (entry_bound hg j i).2 hlt
-      calc _ ≤ 1 * Valued.v ((g : Matrix (Fin n) (Fin n) L) j i) := by gcongr
+      calc
+        _ ≤ 1 * Valued.v ((g : Matrix (Fin n) (Fin n) L) j i) := by gcongr
         _ = _ := one_mul _
         _ < 1 := h2
   have hva : 1 ≤ Valued.v a := by
@@ -101,7 +110,9 @@ theorem UpperTheory.Reformulated.B.IwahoriEntryBound.main :
   have hgi := (entry_bound hg i i).1
   have hinv := (entry_bound hg' i i).1
   apply le_antisymm hgi
-  calc (1 : WithZero (Multiplicative ℤ)) ≤ Valued.v a := hva
+  calc
+    (1 : WithZero (Multiplicative ℤ))
+      ≤ Valued.v a := hva
     _ = _ := Valuation.map_mul _ _ _
     _ ≤ 1 * Valued.v ((g : Matrix (Fin n) (Fin n) L) i i) := by gcongr
     _ = _ := one_mul _

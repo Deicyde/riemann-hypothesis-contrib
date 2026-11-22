@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIsoToBidua
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent)
 open GlobalTheory.SqZeroPt GlobalTheory.PDivGroup GlobalTheory.DeRham
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -17,10 +18,12 @@ noncomputable section
 
 namespace GlobalTheory.FramesFGP
 
-theorem finite_projective_top {O : Type} [CommRing O] (F : (Sp O).Modules)
+theorem finite_projective_top
+    {O : Type} [CommRing O]
+    (F : (Sp O).Modules)
     (h : ∀ x : Sp O, ∃ (U : (Sp O).Opens) (n : ℕ) (s : Fin n → Γ(F, U)),
-      x ∈ U ∧ GlobalTheory.VB.IsFrame s) :
-    Module.Finite Γ(Sp O, ⊤) Γ(F, ⊤) ∧ Module.Projective Γ(Sp O, ⊤) Γ(F, ⊤) := by
+      x ∈ U ∧ GlobalTheory.VB.IsFrame s)
+    : Module.Finite Γ(Sp O, ⊤) Γ(F, ⊤) ∧ Module.Projective Γ(Sp O, ⊤) Γ(F, ⊤) := by
   haveI : F.IsQuasicoherent := GlobalTheory.OmegaGlobal.isQuasicoherent_of_frames h
   choose U n e hx he using h
   have hU := isAffineOpen_top (Sp O)
@@ -33,7 +36,8 @@ theorem finite_projective_top {O : Type} [CommRing O] (F : (Sp O).Modules)
   haveI (g : s) := hU.isLocalization_basicOpen g.1
   haveI (g : s) := GlobalTheory.QCoh.isLocalizedModule_resBasicOpen F hU g.1
   let b (g : s) : Module.Basis (Fin (n g.2.choose)) Γ(Sp O, (Sp O).basicOpen g.1)
-      Γ(F, (Sp O).basicOpen g.1) := (he g.2.choose).basis g.2.choose_spec
+      Γ(F, (Sp O).basicOpen g.1) :=
+    (he g.2.choose).basis g.2.choose_spec
   haveI (g : s) : Module.Free Γ(Sp O, (Sp O).basicOpen g.1) Γ(F, (Sp O).basicOpen g.1) :=
     .of_basis (b g)
   haveI (g : s) : Module.Finite Γ(Sp O, (Sp O).basicOpen g.1) Γ(F, (Sp O).basicOpen g.1) :=
@@ -55,9 +59,11 @@ theorem finite_projective_top {O : Type} [CommRing O] (F : (Sp O).Modules)
 
 end GlobalTheory.FramesFGP
 
-theorem GlobalTheory.FramesFGP.finite_projective_wmod : ∀ (O : Type) [CommRing O] (A : Over (Sp O)) [GrpObj A],
-    (∀ x : Sp O, ∃ (U : (Sp O).Opens) (n : ℕ) (s : Fin n → Γ(GlobalTheory.LieVB.omega A, U)),
-      x ∈ U ∧ GlobalTheory.VB.IsFrame s) → Module.Finite O (Wmod A) ∧ Module.Projective O (Wmod A) := by
+theorem GlobalTheory.FramesFGP.finite_projective_wmod
+    : ∀ (O : Type) [CommRing O] (A : Over (Sp O)) [GrpObj A],
+      (∀ x : Sp O, ∃ (U : (Sp O).Opens) (n : ℕ) (s : Fin n → Γ(GlobalTheory.LieVB.omega A, U)),
+          x ∈ U ∧ GlobalTheory.VB.IsFrame s)
+        → Module.Finite O (Wmod A) ∧ Module.Projective O (Wmod A) := by
   intro O _ A _ h
   obtain ⟨h1, h2⟩ := GlobalTheory.FramesFGP.finite_projective_top (GlobalTheory.LieVB.omega A) h
   letI : Module Γ(Sp O, ⊤) (Wmod A) := inferInstanceAs (Module Γ(Sp O, ⊤) Γ(GlobalTheory.LieVB.omega A, ⊤))
@@ -74,16 +80,17 @@ theorem GlobalTheory.FramesFGP.finite_projective_wmod : ∀ (O : Type) [CommRing
   haveI : RingHomInvPair (E.symm : Γ(Sp O, ⊤) →+* O) (E : O →+* Γ(Sp O, ⊤)) :=
     ⟨RingHom.ext E.apply_symm_apply, RingHom.ext E.symm_apply_apply⟩
   haveI : RingHomInvPair (E : O →+* Γ(Sp O, ⊤)) (E.symm : Γ(Sp O, ⊤) →+* O) := .symm _ _
-  let e : Wmod A ≃ₛₗ[(E.symm : Γ(Sp O, ⊤) →+* O)] Wmod A :=
-    { toFun := id
-      invFun := id
-      map_add' := fun _ _ => rfl
-      map_smul' := fun r m => by
-        change r • m = GlobalTheory.LieVB.cst O (E.symm r) • m
-        congr 1
-        exact (E.apply_symm_apply r).symm
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl }
+  let e : Wmod A ≃ₛₗ[(E.symm : Γ(Sp O, ⊤) →+* O)] Wmod A := {
+    toFun := id
+    invFun := id
+    map_add' := fun _ _ => rfl
+    map_smul' := fun r m => by
+      change r • m = GlobalTheory.LieVB.cst O (E.symm r) • m
+      congr 1
+      exact (E.apply_symm_apply r).symm
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+  }
   exact Module.Projective.of_equiv e
 
 end

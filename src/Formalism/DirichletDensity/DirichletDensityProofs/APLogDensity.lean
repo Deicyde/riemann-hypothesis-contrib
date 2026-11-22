@@ -102,7 +102,6 @@ lemma apld_prime_part_eq (a : ZMod q) (x : ℝ) (n : ℕ) :
 
 end Formalism.HF.P
 
-
 open Formalism.HF.P in
 theorem Formalism.HF.apLogDensity : Formalism.HF.APLogDensity := by
   intro N _ a ha
@@ -131,33 +130,39 @@ theorem Formalism.HF.apLogDensity : Formalism.HF.APLogDensity := by
   set B := ∑' n : ℕ, (if n.Prime then 0 else residueClass a n) / n with hBdef
   have hQle : ∀ x : ℝ, 1 < x → ∑' n, Q x n ≤ B := fun x hx =>
     (hQs x hx).tsum_le_tsum (fun n => apld_nonprime_le a hx.le n) hB
-  have hsplit : ∀ x : ℝ, 1 < x →
-      (x - 1) * (LFunctionResidueClassAux a x).re + (N.totient : ℝ)⁻¹ - (x - 1) * ∑' n, Q x n =
-      (x - 1) * (∑' n : ℕ, {p : ℕ | p.Prime ∧ p ∈ {p : ℕ | (p : ZMod N) = a}}.indicator
-        (fun m : ℕ => Real.log m / (m : ℝ) ^ x) n) := by
+  have hsplit
+      : ∀ x : ℝ,
+        1 < x
+          → (x - 1) * (LFunctionResidueClassAux a x).re + (N.totient : ℝ)⁻¹ - (x - 1) * ∑' n, Q x n
+            = (x - 1)
+              * (∑' n : ℕ, {p : ℕ | p.Prime ∧ p ∈ {p : ℕ | (p : ZMod N) = a}}.indicator
+                  (fun m : ℕ => Real.log m / (m : ℝ) ^ x) n) := by
     intro x hx
     have hsum : ∑' n, residueClass a n / (n : ℝ) ^ x = ∑' n, P x n + ∑' n, Q x n := by
       rw [← (hPs x hx).tsum_add (hQs x hx)]
       exact tsum_congr (hPQ x)
-    have hPind : ∑' n, P x n = ∑' n : ℕ, {p : ℕ | p.Prime ∧ p ∈ {p : ℕ | (p : ZMod N) = a}}.indicator
-        (fun m : ℕ => Real.log m / (m : ℝ) ^ x) n :=
+    have hPind
+        : ∑' n, P x n
+          = ∑' n : ℕ, {p : ℕ | p.Prime ∧ p ∈ {p : ℕ | (p : ZMod N) = a}}.indicator
+            (fun m : ℕ => Real.log m / (m : ℝ) ^ x) n :=
       tsum_congr (fun n => apld_prime_part_eq a x n)
     have hT := apld_tsum_residueClass_eq ha hx
     have hx1 : x - 1 ≠ 0 := sub_ne_zero.2 hx.ne'
     rw [← hPind]
-    have : ∑' n, P x n = (LFunctionResidueClassAux a x).re + (N.totient : ℝ)⁻¹ / (x - 1) - ∑' n, Q x n := by
+    have : ∑' n, P x n
+        = (LFunctionResidueClassAux a x).re + (N.totient : ℝ)⁻¹ / (x - 1) - ∑' n, Q x n := by
       linarith
     rw [this]
     field_simp
   have h1 : Tendsto (fun x : ℝ => (x - 1) * (LFunctionResidueClassAux a x).re) (𝓝[>] 1) (𝓝 0) :=
     residue_class_l_function_tendsto a
   have hlin : Tendsto (fun x : ℝ ↦ x - 1) (𝓝[>] 1) (𝓝 0) := by
-    have : Tendsto (fun x : ℝ ↦ x - 1) (𝓝 1) (𝓝 (1 - 1)) := (continuous_id.sub continuous_const).tendsto 1
+    have : Tendsto (fun x : ℝ ↦ x - 1) (𝓝 1) (𝓝 (1 - 1)) :=
+      (continuous_id.sub continuous_const).tendsto 1
     rw [sub_self] at this
     exact this.mono_left nhdsWithin_le_nhds
   have h3 : Tendsto (fun x : ℝ => (x - 1) * ∑' n, Q x n) (𝓝[>] 1) (𝓝 0) := by
-    have hup : Tendsto (fun x : ℝ => (x - 1) * B) (𝓝[>] 1) (𝓝 0) := by
-      simpa using hlin.mul_const B
+    have hup : Tendsto (fun x : ℝ => (x - 1) * B) (𝓝[>] 1) (𝓝 0) := by simpa using hlin.mul_const B
     refine squeeze_zero' ?_ ?_ hup
     · filter_upwards [self_mem_nhdsWithin] with x hx
       exact mul_nonneg (sub_nonneg.2 (le_of_lt hx)) (tsum_nonneg (hQnn x))

@@ -13,8 +13,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ComplexSets Filter Topology
 
-theorem BranchInCurveComponent.proof (h₁ : BranchInComponent.Statement) :
-    BranchInCurveComponent.Statement := by
+theorem BranchInCurveComponent.proof (h₁ : BranchInComponent.Statement)
+    : BranchInCurveComponent.Statement := by
   intro n I q c hdim
   obtain ⟨J, hJ, hmaps⟩ := h₁ n I 1 q c
   have hJp : J.IsPrime := hJ.1.1
@@ -37,7 +37,8 @@ theorem BranchInCurveComponent.proof (h₁ : BranchInComponent.Statement) :
       | top =>
         exfalso
         simp only [not_le.2 (show ((n : ℕ) : WithBot ℕ∞) < ((⊤ : ℕ∞) : WithBot ℕ∞) from
-          WithBot.coe_lt_coe.2 (ENat.natCast_lt_top n))] at hle
+            WithBot.coe_lt_coe.2 (ENat.natCast_lt_top n))]
+          at hle
       | coe e => exact ⟨e, rfl⟩
   have he1 : (e : WithBot ℕ∞) ≤ 1 := by
     rw [← LocalDimDomain.proof n e J hJp he q hq, ← hdim]
@@ -52,7 +53,8 @@ theorem BranchInCurveComponent.proof (h₁ : BranchInComponent.Statement) :
         (RingHom.ker_ne_top _) fun f hf ↦ RingHom.mem_ker.2 (hq f hf)
     have hr := c.radius_pos
     have ht : (fun _ ↦ ((c.radius / 2 : ℝ) : ℂ)) ∈ Metric.ball (0 : Fin 1 → ℂ) c.radius := by
-      rw [mem_ball_zero_iff, pi_norm_const, Complex.norm_real, Real.norm_eq_abs, abs_of_pos (half_pos hr)]
+      rw [mem_ball_zero_iff, pi_norm_const, Complex.norm_real, Real.norm_eq_abs,
+        abs_of_pos (half_pos hr)]
       linarith
     have hct : c.toFun (fun _ ↦ ((c.radius / 2 : ℝ) : ℂ)) = c.toFun 0 := by
       rw [c.map_zero]

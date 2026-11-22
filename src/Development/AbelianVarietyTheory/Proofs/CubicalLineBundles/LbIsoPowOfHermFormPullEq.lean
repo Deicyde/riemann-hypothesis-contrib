@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaFamilyOrigin.AppLESur
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 noncomputable section
 
@@ -150,26 +152,26 @@ lemma exists_generating_sections (P : Out.PolAV (Sp ℂ)) :
 
 end PullIso
 
-
 open PullIso CubeValues SymmetricSemicharacter in
-theorem lbIso_pow_of_hermForm_pull_eq :
-    ∀ (P P' : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (u' : HolUnif P'.A P'.L P'.g)
-    (Hm : Matrix (Fin P.g) (Fin P.g) ℂ) (χ : u.Λ → ℂ) (Hm' : Matrix (Fin P'.g) (Fin P'.g) ℂ) (χ' : u'.Λ → ℂ),
-  u.IsAH Hm χ → u'.IsAH Hm' χ' →
-  (∀ (k : ℕ) θ, u.IsThetaFn Hm χ k θ → ∃! s, u.IsFnPow k s θ) →
-  (∀ (k : ℕ) s, ∃! θ, u'.IsThetaFn Hm' χ' k θ ∧ u'.IsFnPow k s θ) →
-  ∀ (F : (Fin P.g → ℂ) →ₗ[ℂ] (Fin P'.g → ℂ)) (n : ℕ), (∀ l ∈ u.Λ, F l ∈ u'.Λ) →
-  (∀ z w, hermForm Hm' (F z) (F w) = (n : ℂ) * hermForm Hm z w) → ∀ f : P.A ⟶ P'.A, (∀ z, u'.ex (F z) = u.ex z ≫ f) →
-  ∃ N : ℕ, 1 ≤ N ∧ LBIso (lbPow (P'.L.pull f.left) N) (lbPow P.L (N * n)) := by
+theorem lbIso_pow_of_hermForm_pull_eq
+    : ∀ (P P' : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (u' : HolUnif P'.A P'.L P'.g)
+        (Hm : Matrix (Fin P.g) (Fin P.g) ℂ) (χ : u.Λ → ℂ) (Hm' : Matrix (Fin P'.g) (Fin P'.g) ℂ)
+        (χ' : u'.Λ → ℂ),
+      u.IsAH Hm χ → u'.IsAH Hm' χ' → (∀ (k : ℕ) θ, u.IsThetaFn Hm χ k θ → ∃! s, u.IsFnPow k s θ)
+        → (∀ (k : ℕ) s, ∃! θ, u'.IsThetaFn Hm' χ' k θ ∧ u'.IsFnPow k s θ)
+        → ∀ (F : (Fin P.g → ℂ) →ₗ[ℂ] (Fin P'.g → ℂ)) (n : ℕ),
+          (∀ l ∈ u.Λ, F l ∈ u'.Λ) → (∀ z w, hermForm Hm' (F z) (F w) = (n : ℂ) * hermForm Hm z w)
+            → ∀ f : P.A ⟶ P'.A,
+              (∀ z, u'.ex (F z) = u.ex z ≫ f)
+                → ∃ N : ℕ, 1 ≤ N ∧ LBIso (lbPow (P'.L.pull f.left) N) (lbPow P.L (N * n)) := by
   intro P P' u u' Hm χ Hm' χ' hu hu' hsec hfn F n hΛ hH f hF
   obtain ⟨N, hN, m, s, hcov⟩ := exists_generating_sections P'
-  have hFl : ∀ z, (u'.ex (F z)).left = (u.ex z).left ≫ f.left := fun z => by
-    rw [hF, Over.comp_left]
+  have hFl : ∀ z, (u'.ex (F z)).left = (u.ex z).left ≫ f.left := fun z => by rw [hF, Over.comp_left]
   have hFd : Differentiable ℂ F := (LinearMap.toContinuousLinearMap F).differentiable
   choose θ hθ using fun i => (hfn N (s i)).exists
   have hθ0 : ∀ z, ∃ i, θ i z ≠ 0 := fun z => by
-    obtain ⟨i, hi⟩ := exists_of_iSup (u'.ex z).left (fun i => Out.nonzeroLocus (s i))
-      (by rw [hcov]; exact le_rfl)
+    obtain ⟨i, hi⟩ :=
+      exists_of_iSup (u'.ex z).left (fun i => Out.nonzeroLocus (s i)) (by rw [hcov]; exact le_rfl)
     obtain ⟨k, hk⟩ := exists_of_iSup (u'.ex z).left _ hi
     have h1 := ((valueRules _ (u'.ex z).left).2.2.2.2.1 _ _).1 hk
     rw [(hθ i).2 k z fun y hy => P'.A.left.basicOpen_le _ (hk hy)] at h1
@@ -179,8 +181,9 @@ theorem lbIso_pow_of_hermForm_pull_eq :
     have h1 := (hθ i).1.2 ⟨F l, hΛ l l.2⟩ (F z)
     have c1 := semicharacter_sq_eq_one_of_symmetric P u Hm χ hu l
     have c2 := semicharacter_sq_eq_one_of_symmetric P' u' Hm' χ' hu' ⟨F l, hΛ l l.2⟩
-    have e : Complex.exp (Real.pi * (n * hermForm Hm z l) + Real.pi / 2 * (n * hermForm Hm l l)) =
-        Complex.exp (Real.pi * hermForm Hm z l + Real.pi / 2 * hermForm Hm l l) ^ n := by
+    have e
+        : Complex.exp (Real.pi * (n * hermForm Hm z l) + Real.pi / 2 * (n * hermForm Hm l l))
+          = Complex.exp (Real.pi * hermForm Hm z l + Real.pi / 2 * hermForm Hm l l) ^ n := by
       rw [← Complex.exp_nat_mul]
       congr 1
       ring
@@ -201,39 +204,58 @@ theorem lbIso_pow_of_hermForm_pull_eq :
   have he : ∀ x : Sp ℂ ⟶ P.A.left, x ≫ P.A.hom = 𝟙 _ → ∃ z, (u.ex z).left = x := fun x hx => by
     obtain ⟨z, hz⟩ := u.ex_onto (Over.homMk x hx)
     exact ⟨z, congrArg (fun φ => φ.left) hz⟩
-  have hK : ∀ (K : (lbPow (P'.L.pull f.left) (2 * N)).ι) z,
-      ⊤ ≤ (u.ex z).left ⁻¹ᵁ (lbPow (P'.L.pull f.left) (2 * N)).U K →
-      ⊤ ≤ (u'.ex (F z)).left ⁻¹ᵁ P'.L.U (K PUnit.unit PUnit.unit) := fun K z hz => by
+  have hK
+      : ∀ (K : (lbPow (P'.L.pull f.left) (2 * N)).ι) z,
+        ⊤ ≤ (u.ex z).left ⁻¹ᵁ (lbPow (P'.L.pull f.left) (2 * N)).U K
+          → ⊤ ≤ (u'.ex (F z)).left ⁻¹ᵁ P'.L.U (K PUnit.unit PUnit.unit) := fun K z hz => by
     rw [hFl]
     exact (pull_chart_iff _ _ _ _).1 ((pow_chart_iff _ _ _ _).1 hz)
-  refine ⟨2 * N, by omega, lbIso_of_frames P.A.hom (fun z => (u.ex z).left) he _ _
-    (fun J z => u.fr (J PUnit.unit) z ^ (2 * N * n))
-    (fun K z => u'.fr (K PUnit.unit PUnit.unit) (F z) ^ (2 * N))
-    (fun J z hz => pow_ne_zero _ (u.fr_ne _ _ ((pow_chart_iff _ _ _ _).1 hz)))
-    (fun K z hz => pow_ne_zero _ (u'.fr_ne _ _ (hK K z hz)))
-    (fun J J' z hz hz' => ?_) (fun K K' z hz hz' => ?_) (fun J K => ?_)⟩
-  · rw [val_pow_g _ _ _ _ _ hz hz', ← mul_pow, ← u.fr_compat _ _ _ ((le_preimage_inf _ _ _).2
-      ⟨(pow_chart_iff _ _ _ _).1 hz, (pow_chart_iff _ _ _ _).1 hz'⟩)]
-  · rw [val_pow_g _ _ _ _ _ hz hz', val_pull_g _ _ _ _ _ ((pow_chart_iff _ _ _ _).1 hz)
-      ((pow_chart_iff _ _ _ _).1 hz'), ← hFl, ← mul_pow, ← u'.fr_compat _ _ _
-      ((le_preimage_inf _ _ _).2 ⟨hK K z hz, hK K' z hz'⟩)]
-  · have le : (lbPow P.L (2 * N * n)).U J ⊓ (lbPow (P'.L.pull f.left) (2 * N)).U K ≤
-        f.left ⁻¹ᵁ (lbPow P'.L N).U (K PUnit.unit) := fun y hy =>
+  refine ⟨
+    2 * N,
+    by omega,
+    lbIso_of_frames P.A.hom
+      (fun z => (u.ex z).left)
+      he _ _
+      (fun J z => u.fr (J PUnit.unit) z ^ (2 * N * n))
+      (fun K z => u'.fr (K PUnit.unit PUnit.unit) (F z) ^ (2 * N))
+      (fun J z hz => pow_ne_zero _ (u.fr_ne _ _ ((pow_chart_iff _ _ _ _).1 hz)))
+      (fun K z hz => pow_ne_zero _ (u'.fr_ne _ _ (hK K z hz)))
+      (fun J J' z hz hz' => ?_)
+      (fun K K' z hz hz' => ?_)
+      (fun J K => ?_)
+  ⟩
+  · rw [val_pow_g _ _ _ _ _ hz hz', ← mul_pow,
+      ← u.fr_compat _ _ _
+        ((le_preimage_inf _ _ _).2 ⟨(pow_chart_iff _ _ _ _).1 hz, (pow_chart_iff _ _ _ _).1 hz'⟩)]
+  · rw [val_pow_g _ _ _ _ _ hz hz',
+      val_pull_g _ _ _ _ _ ((pow_chart_iff _ _ _ _).1 hz) ((pow_chart_iff _ _ _ _).1 hz'), ← hFl,
+      ← mul_pow, ← u'.fr_compat _ _ _ ((le_preimage_inf _ _ _).2 ⟨hK K z hz, hK K' z hz'⟩)]
+  · have le
+        : (lbPow P.L (2 * N * n)).U J ⊓ (lbPow (P'.L.pull f.left) (2 * N)).U K
+          ≤ f.left ⁻¹ᵁ (lbPow P'.L N).U (K PUnit.unit) := fun y hy =>
       Set.mem_iInter.2 fun _ => Set.mem_iInter.1 (Set.mem_iInter.1 hy.2 PUnit.unit) PUnit.unit
     let σ := fun i => resG _ le ((f.left.app _).hom ((s i).f (K PUnit.unit)))
-    have hσ : ∀ i z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ ((lbPow P.L (2 * N * n)).U J ⊓
-        (lbPow (P'.L.pull f.left) (2 * N)).U K) → valAt' (u.ex z).left _ (σ i * σ i) =
-        θ i (F z) ^ 2 * u'.fr (K PUnit.unit PUnit.unit) (F z) ^ (2 * N) := fun i z hz => by
-      have h1 : valAt' (u.ex z).left _ (σ i) =
-          θ i (F z) * u'.fr (K PUnit.unit PUnit.unit) (F z) ^ N := by
+    have hσ
+        : ∀ i z,
+          ⊤ ≤ (u.ex z).left
+              ⁻¹ᵁ ((lbPow P.L (2 * N * n)).U J ⊓ (lbPow (P'.L.pull f.left) (2 * N)).U K)
+            → valAt' (u.ex z).left _ (σ i * σ i)
+              = θ i (F z) ^ 2 * u'.fr (K PUnit.unit PUnit.unit) (F z) ^ (2 * N) := fun i z hz => by
+      have h1
+          : valAt' (u.ex z).left _ (σ i)
+            = θ i (F z) * u'.fr (K PUnit.unit PUnit.unit) (F z) ^ N := by
         refine (val_resG _ le hz _).trans
           (((valueRules _ (u.ex z).left).2.2.2.1 _ f.left _ _).trans ?_)
         rw [← hFl]
         exact (hθ i).2 _ _ ((pow_chart_iff _ _ _ _).2 (hK K z ((le_preimage_inf _ _ _).1 hz).2))
       rw [val_mul _ hz, h1]
       ring
-    refine exists_of_local_quotient P.A.hom (fun z => (u.ex z).left) he _ _
-      (fun i => resG _ inf_le_left ((t i).f J)) (fun i => σ i * σ i) (fun z hz => ?_)
+    refine exists_of_local_quotient P.A.hom
+      (fun z => (u.ex z).left)
+      he _ _
+      (fun i => resG _ inf_le_left ((t i).f J))
+      (fun i => σ i * σ i)
+      (fun z hz => ?_)
       (fun i z hz => ?_)
     · obtain ⟨i, hi⟩ := hθ0 (F z)
       refine ⟨i, ?_⟩

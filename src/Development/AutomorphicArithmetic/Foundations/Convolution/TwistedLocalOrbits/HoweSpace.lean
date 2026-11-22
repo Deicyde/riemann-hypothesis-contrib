@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 
 namespace UpperTheory.ConvolutionTheory.Loc
 
@@ -19,11 +20,13 @@ variable {E : Type} [Field E] {n : ℕ}
 
 def sg (σ : E ≃+* E) : GL (Fin n) E →* GL (Fin n) E := GeneralLinearGroup.map (σ : E →+* E)
 
-def nrm (σ : E ≃+* E) (q : ℕ) (δ : GL (Fin n) E) : GL (Fin n) E := ((List.range q).map fun i => (sg σ)^[i] δ).prod
+def nrm (σ : E ≃+* E) (q : ℕ) (δ : GL (Fin n) E) : GL (Fin n) E :=
+  ((List.range q).map fun i => (sg σ)^[i] δ).prod
 
 end Alg
 
-variable {E : Type} [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] {n : ℕ}
+variable
+  {E : Type} [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] {n : ℕ}
 
 def Isom (σ : E ≃+* E) : Prop := ∀ x, valuation E (σ x) = valuation E x
 
@@ -46,7 +49,9 @@ def howeSet (n : ℕ) (ϖ : Eˣ) (a c : ℤ) : Set (GL (Fin n) E) :=
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-def howeSpace (π : Representation ℂ (GL (Fin n) E) V) (ψ : AddChar E Circle) (S : Set (GL (Fin n) E)) : Submodule ℂ V where
+def howeSpace
+    (π : Representation ℂ (GL (Fin n) E) V) (ψ : AddChar E Circle) (S : Set (GL (Fin n) E))
+    : Submodule ℂ V where
   carrier := {v | ∀ x ∈ S, π x v = (ψ (GlobalTheory.Whittaker.superDiag x) : ℂ) • v}
   add_mem' := by
     intro a b ha hb x hx

@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Algebra
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult GlobalTheory.Published GlobalTheory.SegmentRepModel Zc
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult GlobalTheory.Published GlobalTheory.SegmentRepModel Zc
 open CompanionTheory.Pf1.SegRepC.SegTwo
 
 namespace CompanionTheory.RgGu.SRC
@@ -23,15 +24,22 @@ namespace SrRev
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem transfer {N : ℕ} {v w : Fin 2 → IrrGL (k := k)} (h : v = w) (hv : ∑ a, (v a).1 = N) {W : Type}
-    [AddCommGroup W] [Module ℂ W] {ω : Representation ℂ (GL (Fin N) k) W} (f : ω.IntertwiningMap (prodIrr v hv)) :
-    ∃ (hw : ∑ a, (w a).1 = N) (f' : ω.IntertwiningMap (prodIrr w hw)),
-      (Function.Injective f → Function.Injective f') ∧ (Function.Surjective f' → Function.Surjective f) := by
+theorem transfer
+    {N : ℕ} {v w : Fin 2 → IrrGL (k := k)} (h : v = w) (hv : ∑ a, (v a).1 = N)
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    {ω : Representation ℂ (GL (Fin N) k) W} (f : ω.IntertwiningMap (prodIrr v hv))
+    : ∃ (hw : ∑ a, (w a).1 = N) (f' : ω.IntertwiningMap (prodIrr w hw)),
+      (Function.Injective f → Function.Injective f')
+        ∧ (Function.Surjective f' → Function.Surjective f) := by
   subst h
   exact ⟨hv, f, id, id⟩
 
-theorem jmc {h N : ℕ} {x x' : Fin h → IrrGL (k := k)} (e : x = x') (hd : ∑ a, (x a).1 = N) (hd' : ∑ a, (x' a).1 = N)
-    {V : Type} [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V) : jm x hd π = jm x' hd' π := by
+theorem jmc
+    {h N : ℕ} {x x' : Fin h → IrrGL (k := k)}
+    (e : x = x') (hd : ∑ a, (x a).1 = N) (hd' : ∑ a, (x' a).1 = N)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ (GL (Fin N) k) V)
+    : jm x hd π = jm x' hd' π := by
   subst e
   rfl
 
@@ -41,22 +49,23 @@ open SrRev
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1000000 in
-theorem jhMult_rev_jac_sub (hG : GeometricLemma) (hR : RhoNuRhoReducible) {d : ℕ} (hd : 0 < d)
-    (σ : IrrRep (GL (Fin d) k)) (hσ : IsCuspidal σ.ρ)
+theorem jhMult_rev_jac_sub
+    (hG : GeometricLemma) (hR : RhoNuRhoReducible)
+    {d : ℕ} (hd : 0 < d) (σ : IrrRep (GL (Fin d) k)) (hσ : IsCuspidal σ.ρ)
     (S : Subrepresentation (multiProd (consecBlocks 2 d) (segTerm σ.ρ 2)))
     (hS : S.toRepresentation.IsIrreducible)
-    (h1 : jhMult (piTensor (segTerm σ.ρ 2)) (jac (consecBlocks 2 d) S.toRepresentation) = 1) :
-    jhMult (revTensor σ) (jac (consecBlocks 2 d) S.toRepresentation) = 0 := by
+    (h1 : jhMult (piTensor (segTerm σ.ρ 2)) (jac (consecBlocks 2 d) S.toRepresentation) = 1)
+    : jhMult (revTensor σ) (jac (consecBlocks 2 d) S.toRepresentation) = 0 := by
   by_contra h2
   have hA := GlobalTheory.CompanionTheory.BZCuspPair.irrAdm
   let x : IrrGL (k := k) := IrrGL.of σ.ρ σ.smooth σ.irr
   have hx : x.IsCusp := ⟨hd, isCuspidal_of_equiv (IrrGL.equivOf σ.ρ σ.smooth σ.irr) hσ⟩
   let u : Fin 2 → IrrGL (k := k) := fun a => x.nu ((a : ℕ) : ℂ)
   have hu1 : ∀ a, (u a).1 = d := fun _ => rfl
-  have hu : ∑ a, (u a).1 = 2 * d := by simp only [hu1, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul]
+  have hu : ∑ a, (u a).1 = 2 * d := by
+    simp only [hu1, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul]
   have hu' : ∑ a, (u (Fin.rev a)).1 = 2 * d := by
     simp only [hu1, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul]
   have he : stdBlocks (fun a => (u a).1) hu = consecBlocks 2 d := by
@@ -111,8 +120,9 @@ theorem jhMult_rev_jac_sub (hG : GeometricLemma) (hR : RhoNuRhoReducible) {d : �
     intro h
     have h0 : x.nu ((0 : ℕ) : ℂ) = x.nu ((1 : ℕ) : ℂ) := by simpa using h
     exact absurd ((GlobalTheory.LocGL.IrrGL.nu_natCast_inj hd).1 h0) (by decide)
-  have hsurj := GlobalTheory.CompanionTheory.CuspPairSub.surjective_of_jm hA hx (hx.nu 1) hnx hw hw' f' (hf' hf)
-    (by rw [← jmc hux hu hw]; exact j1) (by rw [← jmc hux' hu' hw']; exact j2)
+  have hsurj :=
+    GlobalTheory.CompanionTheory.CuspPairSub.surjective_of_jm hA hx (hx.nu 1) hnx hw hw' f' (hf' hf)
+      (by rw [← jmc hux hu hw]; exact j1) (by rw [← jmc hux' hu' hw']; exact j2)
   have hsf := hs' hsurj
   have hι : Function.Surjective ι := by
     intro v

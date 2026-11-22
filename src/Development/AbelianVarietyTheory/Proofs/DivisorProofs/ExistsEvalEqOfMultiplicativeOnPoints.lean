@@ -81,9 +81,17 @@ private lemma sum_sum_mul_sub_mul_mul_eq_zero_of_sum_mul_eq {C ι : Type} [Field
     · exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
   rw [e1, h, sub_self]
 
-
 open scoped TensorProduct in
-theorem _root_.GlobalTheory.exists_eval_eq_of_multiplicative_on_points : ∀ (O C A : Type) [CommRing O] [IsDomain O] [Field C] [IsAlgClosed C] [Algebra O C] [IsFractionRing O C] [IsIntegrallyClosed O] [CommRing A] [Algebra O A] [Module.Finite O A] [Module.Free O A], IsReduced (C ⊗[O] A) → ∀ (Δ : A →ₐ[O] A ⊗[O] A) (ε : A →ₐ[O] O) (κ : (A →ₐ[O] C) → C), (∀ x y : A →ₐ[O] C, κ ((Algebra.TensorProduct.lift x y (fun _ _ => Commute.all _ _)).comp Δ) = κ x * κ y) → κ ((Algebra.ofId O C).comp ε) = 1 → ∃ b : A, ∀ x : A →ₐ[O] C, x b = κ x := by
+theorem _root_.GlobalTheory.exists_eval_eq_of_multiplicative_on_points
+    : ∀ (O C A : Type) [CommRing O] [IsDomain O] [Field C] [IsAlgClosed C] [Algebra O C]
+        [IsFractionRing O C] [IsIntegrallyClosed O] [CommRing A] [Algebra O A] [Module.Finite O A]
+        [Module.Free O A],
+      IsReduced (C ⊗[O] A)
+        → ∀ (Δ : A →ₐ[O] A ⊗[O] A) (ε : A →ₐ[O] O) (κ : (A →ₐ[O] C) → C),
+          (∀ x y : A →ₐ[O] C,
+              κ ((Algebra.TensorProduct.lift x y (fun _ _ => Commute.all _ _)).comp Δ) = κ x * κ y)
+            → κ ((Algebra.ofId O C).comp ε) = 1
+            → ∃ b : A, ∀ x : A →ₐ[O] C, x b = κ x := by
   intro O C A _ _ _ _ _ _ _ _ _ _ _ hred Δ ε κ hmul _
   classical
   let e := Module.Free.chooseBasis O A
@@ -97,13 +105,15 @@ theorem _root_.GlobalTheory.exists_eval_eq_of_multiplicative_on_points : ∀ (O 
     intro x
     ext a
     simp [res, ext]
-  have hevC : ∀ (z : C ⊗[O] A →ₐ[C] C) (a : Module.Free.ChooseBasisIndex O A → C),
-      z (∑ i, a i • eC i) = ∑ i, a i * res z (e i) := by
+  have hevC
+      : ∀ (z : C ⊗[O] A →ₐ[C] C) (a : Module.Free.ChooseBasisIndex O A → C),
+        z (∑ i, a i • eC i) = ∑ i, a i * res z (e i) := by
     intro z a
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [eC, res, map_sum, Algebra.TensorProduct.basis_apply]
-  have hcoord : ∀ a : Module.Free.ChooseBasisIndex O A → C,
-      (∀ x : A →ₐ[O] C, ∑ i, a i * x (e i) = 0) → a = 0 := by
+    simp [eC, res, map_sum, Algebra.TensorProduct.basis_apply]
+  have hcoord
+      : ∀ a : Module.Free.ChooseBasisIndex O A → C,
+        (∀ x : A →ₐ[O] C, ∑ i, a i * x (e i) = 0) → a = 0 := by
     intro a ha
     have hv : ∑ i, a i • eC i = 0 := by
       refine eq_zero_of_forall_algHom_apply_eq_zero_of_isReduced (C := C) _ fun z => ?_
@@ -130,30 +140,45 @@ theorem _root_.GlobalTheory.exists_eval_eq_of_multiplicative_on_points : ∀ (O 
     rw [← h1]
     conv_lhs => rw [← eC.sum_repr b']
     rw [hevC, hres]
-  let m : Module.Free.ChooseBasisIndex O A → Module.Free.ChooseBasisIndex O A →
-      Module.Free.ChooseBasisIndex O A → O := fun k i j => (e.tensorProduct e).repr (Δ (e k)) (i, j)
-  have hprod : ∀ (x y : A →ₐ[O] C) k,
-      (Algebra.TensorProduct.lift x y (fun _ _ => Commute.all _ _)) (Δ (e k)) =
-        ∑ i, ∑ j, algebraMap O C (m k i j) * (x (e i) * y (e j)) := by
+  let m
+      : Module.Free.ChooseBasisIndex O A → Module.Free.ChooseBasisIndex O A
+        → Module.Free.ChooseBasisIndex O A
+        → O := fun k i j =>
+    (e.tensorProduct e).repr (Δ (e k)) (i, j)
+  have hprod
+      : ∀ (x y : A →ₐ[O] C) k,
+        (Algebra.TensorProduct.lift x y (fun _ _ => Commute.all _ _)) (Δ (e k))
+          = ∑ i, ∑ j, algebraMap O C (m k i j) * (x (e i) * y (e j)) := by
     intro x y k
     conv_lhs => rw [← (e.tensorProduct e).sum_repr (Δ (e k))]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Module.Basis.tensorProduct_apply,
-      Algebra.smul_def, Fintype.sum_prod_type, map_mul, AlgHom.commutes,
-      Algebra.TensorProduct.lift_tmul, m]
-  have key : ∀ x y : A →ₐ[O] C, ∑ j, (∑ i, (∑ k, c k * algebraMap O C (m k i j) - c i * c j) *
-      x (e i)) * y (e j) = 0 := by
+    simp only [map_sum, map_smul, Module.Basis.tensorProduct_apply, Algebra.smul_def,
+      Fintype.sum_prod_type, map_mul, AlgHom.commutes, Algebra.TensorProduct.lift_tmul, m]
+  have key
+      : ∀ x y : A →ₐ[O] C,
+        ∑ j, (∑ i, (∑ k, c k * algebraMap O C (m k i j) - c i * c j) *
+            x (e i)) * y (e j)
+          = 0 := by
     intro x y
     have h := hmul x y
     simp only [hval, AlgHom.comp_apply, hprod] at h
-    exact sum_sum_mul_sub_mul_mul_eq_zero_of_sum_mul_eq c (fun i => x (e i)) (fun j => y (e j))
-      (fun k i j => algebraMap O C (m k i j)) h
+    exact sum_sum_mul_sub_mul_mul_eq_zero_of_sum_mul_eq c
+      (fun i => x (e i))
+      (fun j => y (e j))
+      (fun k i j => algebraMap O C (m k i j))
+      h
   have hrel : ∀ i j, c i * c j = ∑ k, c k * algebraMap O C (m k i j) := by
-    have h1 : ∀ j, ∀ x : A →ₐ[O] C,
-        ∑ i, (∑ k, c k * algebraMap O C (m k i j) - c i * c j) * x (e i) = 0 := by
+    have h1
+        : ∀ j, ∀ x : A →ₐ[O] C,
+          ∑ i, (∑ k, c k * algebraMap O C (m k i j) - c i * c j) * x (e i) = 0 := by
       intro j x
-      exact congrFun (hcoord (fun j => ∑ i, (∑ k, c k * algebraMap O C (m k i j) - c i * c j) *
-        x (e i)) (key x)) j
+      exact congrFun
+        (hcoord
+          (fun j =>
+            ∑ i, (∑ k, c k * algebraMap O C (m k i j) - c i * c j) *
+              x (e i))
+          (key x))
+        j
     intro i j
     have h2 := congrFun (hcoord (fun i => ∑ k, c k * algebraMap O C (m k i j) - c i * c j) (h1 j)) i
     exact (sub_eq_zero.mp h2).symm
@@ -174,8 +199,7 @@ theorem _root_.GlobalTheory.exists_eval_eq_of_multiplicative_on_points : ∀ (O 
       refine Submodule.sum_mem _ fun k _ => ?_
       rw [mul_comm, ← Algebra.smul_def]
       exact Submodule.smul_mem _ _ (hcM k)
-  let S : Subalgebra O C :=
-    M.toSubalgebra hoM fun u v hu hv => hMM (Submodule.mul_mem_mul hu hv)
+  let S : Subalgebra O C := M.toSubalgebra hoM fun u v hu hv => hMM (Submodule.mul_mem_mul hu hv)
   have hfg : (Subalgebra.toSubmodule S).FG := Submodule.fg_span ((Set.finite_range c).insert 1)
   have hint : ∀ i, ∃ o : O, algebraMap O C o = c i := fun i =>
     IsIntegrallyClosed.isIntegral_iff.mp (IsIntegral.of_mem_of_fg S hfg _ (hcM i))

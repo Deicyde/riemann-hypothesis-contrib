@@ -8,10 +8,12 @@ open scoped NNReal TensorProduct
 
 namespace GlobalTheory
 
-theorem valuation_map_algEquiv_eq_of_le_one_iff_isIntegral (R Ω : Type) [CommRing R] [Nontrivial R]
-    [Field Ω] [Algebra R Ω] [Algebra.IsAlgebraic R Ω]
-    (hinj : Function.Injective (algebraMap R Ω)) (v : Valuation Ω ℝ≥0)
-    (hv : ∀ x : Ω, v x ≤ 1 ↔ IsIntegral R x) (g : Ω ≃ₐ[R] Ω) (x : Ω) : v (g x) = v x := by
+theorem valuation_map_algEquiv_eq_of_le_one_iff_isIntegral
+    (R Ω : Type) [CommRing R] [Nontrivial R] [Field Ω] [Algebra R Ω] [Algebra.IsAlgebraic R Ω]
+    (hinj : Function.Injective (algebraMap R Ω))
+    (v : Valuation Ω ℝ≥0) (hv : ∀ x : Ω, v x ≤ 1 ↔ IsIntegral R x)
+    (g : Ω ≃ₐ[R] Ω) (x : Ω)
+    : v (g x) = v x := by
   have hle : ∀ a b : Ω, v (g a) ≤ v (g b) ↔ v a ≤ v b := by
     intro a b
     by_cases hb : b = 0
@@ -29,8 +31,7 @@ theorem valuation_map_algEquiv_eq_of_le_one_iff_isIntegral (R Ω : Type) [CommRi
     rw [← not_le, ← not_le, hle]
   obtain ⟨k, l, hkl, heq⟩ : ∃ k l : ℕ, k < l ∧ (g ^ k) x = (g ^ l) x := by
     obtain ⟨p, hp0, hpx⟩ := Algebra.IsAlgebraic.isAlgebraic (R := R) x
-    have hmap : p.map (algebraMap R Ω) ≠ 0 := by
-      rwa [Ne, Polynomial.map_eq_zero_iff hinj]
+    have hmap : p.map (algebraMap R Ω) ≠ 0 := by rwa [Ne, Polynomial.map_eq_zero_iff hinj]
     have hsub : Set.range (fun k : ℕ => (g ^ k) x) ⊆ p.rootSet Ω := by
       rintro _ ⟨k, rfl⟩
       rw [Polynomial.mem_rootSet']

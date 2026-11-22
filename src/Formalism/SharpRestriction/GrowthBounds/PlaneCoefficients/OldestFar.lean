@@ -10,15 +10,18 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.PairMembershipBlocks.Ar
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords Formalism.MainNotions.Proposition5Numerics
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData
+  Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
+  Formalism.MainNotions.Proposition5Numerics
 open Formalism.MainNotions.G.WittFrameLocaliserOrders Formalism.MainNotions.G.symbolGeneratorData
 
 section Geo
 
 variable {n' r : ℕ} [NeZero n'] {Fr : Frames n' r} {L₁ N₁ : ℕ}
 
-theorem filt_card (j : ℤ) (l : ℕ) (_hl : l < (Fr.LLset j).card) :
-    ((Fr.LLset j).filter (· ≤ llPos Fr j l)).card ≤ l + 1 := by
+theorem filt_card (j : ℤ) (l : ℕ) (_hl : l < (Fr.LLset j).card)
+    : ((Fr.LLset j).filter (· ≤ llPos Fr j l)).card ≤ l + 1 := by
   classical
   set s := (Fr.LLset j).sort (· ≤ ·) with hs
   have hlen : s.length = (Fr.LLset j).card := Finset.length_sort _
@@ -43,12 +46,14 @@ theorem filt_card (j : ℤ) (l : ℕ) (_hl : l < (Fr.LLset j).card) :
       omega
     rw [List.mem_iff_getElem]
     exact ⟨k, by simp; omega, by simp⟩
-  calc ((Fr.LLset j).filter (· ≤ llPos Fr j l)).card ≤ (s.take (l + 1)).toFinset.card :=
-        Finset.card_le_card hsub
+  calc
+    ((Fr.LLset j).filter (· ≤ llPos Fr j l)).card
+      ≤ (s.take (l + 1)).toFinset.card := Finset.card_le_card hsub
     _ ≤ (s.take (l + 1)).length := List.toFinset_card_le _
     _ ≤ l + 1 := by simp
 
-theorem first_gap (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j : ℤ) : Fr.fr (j - 1) (r - 1) + L₁ < llPos Fr j 0 := by
+theorem first_gap (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j : ℤ)
+    : Fr.fr (j - 1) (r - 1) + L₁ < llPos Fr j 0 := by
   classical
   obtain ⟨-, -, hinc, hsep, hmem, -, hLL, -, -⟩ := hV
   have hcard : 0 < (Fr.LLset j).card := by have := (hLL j).1; omega
@@ -83,7 +88,10 @@ theorem first_gap (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j : ℤ) : Fr.fr (j 
   have hyl : Fr.fr (j - 1) (r - 1) ∈ Fr.letters j := by
     unfold Frames.letters
     rw [Finset.mem_filter, Finset.mem_Icc]
-    exact ⟨⟨hmono _ _ (by omega), hsep'.le.trans (hmono _ _ (by omega))⟩, (hmem (j - 1) (r - 1) (by omega)).1⟩
+    exact ⟨
+      ⟨hmono _ _ (by omega), hsep'.le.trans (hmono _ _ (by omega))⟩,
+      (hmem (j - 1) (r - 1) (by omega)).1
+    ⟩
   have hfin := hgap _ hyl hxI.1.1 ?_
   · omega
   intro z hz hzx
@@ -96,21 +104,24 @@ theorem first_gap (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j : ℤ) : Fr.fr (j 
   rw [Finset.mem_filter, Finset.mem_Ioo]
   exact ⟨⟨hzy, hzx.trans hxI.1.2⟩, hz.2⟩
 
-private theorem llPos_mem_LLset (j : ℤ) (l : ℕ) (hl : l < (Fr.LLset j).card) :
-    llPos Fr j l ∈ Fr.LLset j := by
+private theorem llPos_mem_LLset (j : ℤ) (l : ℕ) (hl : l < (Fr.LLset j).card)
+    : llPos Fr j l ∈ Fr.LLset j := by
   unfold llPos
   rw [List.getD_eq_getElem _ _ (by rw [Finset.length_sort]; exact hl)]
   exact (Finset.mem_sort _).mp (List.getElem_mem _)
 
-private theorem llPos_injOn (j : ℤ) (a b : ℕ) (ha : a < (Fr.LLset j).card)
-    (hb : b < (Fr.LLset j).card) (h : llPos Fr j a = llPos Fr j b) : a = b := by
+private theorem llPos_injOn
+    (j : ℤ) (a b : ℕ)
+    (ha : a < (Fr.LLset j).card) (hb : b < (Fr.LLset j).card) (h : llPos Fr j a = llPos Fr j b)
+    : a = b := by
   unfold llPos at h
   rw [List.getD_eq_getElem _ _ (by rw [Finset.length_sort]; exact ha),
-    List.getD_eq_getElem _ _ (by rw [Finset.length_sort]; exact hb)] at h
+      List.getD_eq_getElem _ _ (by rw [Finset.length_sort]; exact hb)]
+    at h
   exact (List.Nodup.getElem_inj_iff (Finset.sort_nodup _ _)).mp h
 
-private theorem llPos_zero_le_of_mem (j : ℤ) (hc : 0 < (Fr.LLset j).card) :
-    ∀ z ∈ Fr.LLset j, llPos Fr j 0 ≤ z := by
+private theorem llPos_zero_le_of_mem (j : ℤ) (hc : 0 < (Fr.LLset j).card)
+    : ∀ z ∈ Fr.LLset j, llPos Fr j 0 ≤ z := by
   classical
   intro z hz
   by_contra hzx
@@ -127,9 +138,9 @@ private theorem llPos_zero_le_of_mem (j : ℤ) (hc : 0 < (Fr.LLset j).card) :
   rw [Finset.card_pair hzx.ne] at h2
   omega
 
-private theorem lt_sort_getD_of_le_card_filter_gt (S : Finset ℤ) (c : ℤ) (k : ℕ) (hk : 1 ≤ k)
-    (h : k ≤ (S.filter (c < ·)).card) :
-    c < (S.sort (· ≤ ·)).getD ((S.sort (· ≤ ·)).length - k) 0 := by
+private theorem lt_sort_getD_of_le_card_filter_gt
+    (S : Finset ℤ) (c : ℤ) (k : ℕ) (hk : 1 ≤ k) (h : k ≤ (S.filter (c < ·)).card)
+    : c < (S.sort (· ≤ ·)).getD ((S.sort (· ≤ ·)).length - k) 0 := by
   classical
   set s := S.sort (· ≤ ·) with hs
   have hlen : s.length = S.card := Finset.length_sort _
@@ -162,14 +173,14 @@ private theorem lt_sort_getD_of_le_card_filter_gt (S : Finset ℤ) (c : ℤ) (k 
   simp at h2
   omega
 
-private theorem fr_zero_le_fr_of_valid (hV : Fr.Valid L₁ N₁) (k : ℤ) (i : ℕ) (hi : i < r) :
-    Fr.fr k 0 ≤ Fr.fr k i := by
+private theorem fr_zero_le_fr_of_valid (hV : Fr.Valid L₁ N₁) (k : ℤ) (i : ℕ) (hi : i < r)
+    : Fr.fr k 0 ≤ Fr.fr k i := by
   induction i with
   | zero => exact le_rfl
   | succ i ih => exact (ih (by omega)).trans (hV.2.2.1 k i hi).le
 
-theorem oldest_far (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j : ℤ) (i : ℕ) (hi : i < r) :
-    Fr.fr (j - 1) (r - 1) + L₁ < Fr.oldest j (Fr.fr j i) := by
+theorem oldest_far (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j : ℤ) (i : ℕ) (hi : i < r)
+    : Fr.fr (j - 1) (r - 1) + L₁ < Fr.oldest j (Fr.fr j i) := by
   classical
   have hfg := first_gap hV hr j
   have hcard : r ≤ (Fr.LLset j).card := (hV.2.2.2.2.2.2.1 j).1
@@ -178,15 +189,18 @@ theorem oldest_far (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (j : ℤ) (i : ℕ) 
     rwa [sub_add_cancel] at h
   dsimp only [Frames.oldest]
   apply lt_sort_getD_of_le_card_filter_gt _ _ r hr
-  have hsub : (Finset.range r).image (llPos Fr j) ⊆
-      ({z ∈ Fr.letters j | Even z ∧ z < Fr.fr j i}).filter (Fr.fr (j - 1) (r - 1) + L₁ < ·) := by
+  have hsub
+      : (Finset.range r).image (llPos Fr j)
+        ⊆ ({z ∈ Fr.letters j | Even z ∧ z < Fr.fr j i}).filter
+          (Fr.fr (j - 1) (r - 1) + L₁ < ·) := by
     intro z hz
     rw [Finset.mem_image] at hz
     obtain ⟨l, hl, rfl⟩ := hz
     rw [Finset.mem_range] at hl
     have hm := llPos_mem_LLset (Fr := Fr) j l (by omega)
-    have hev := ((hV.2.2.2.2.2.2.1 j).2.1 _ hm
-      (Or.inl (le_trans (filt_card (Fr := Fr) j l (by omega)) (by omega)))).1
+    have hev :=
+      ((hV.2.2.2.2.2.2.1 j).2.1 _ hm
+        (Or.inl (le_trans (filt_card (Fr := Fr) j l (by omega)) (by omega)))).1
     have h0 := llPos_zero_le_of_mem (Fr := Fr) j (by omega) _ hm
     have hmI := hm
     unfold Frames.LLset at hmI
@@ -208,16 +222,24 @@ end Geo
 
 section Deg
 
-variable {n' r K m : ℕ} [NeZero n'] (Fr : Frames n' r) (p : ℕ) (hk : m + 1 = r + K) {J : ℕ} [NeZero J]
-  (nL : ZMod J → ℕ) {L₁ N₁ : ℕ}
+variable
+  {n' r K m : ℕ} [NeZero n']
+  (Fr : Frames n' r) (p : ℕ) (hk : m + 1 = r + K)
+  {J : ℕ} [NeZero J]
+  (nL : ZMod J → ℕ)
+  {L₁ N₁ : ℕ}
 
-theorem deg_le (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card)
-    (d : Fin n' → ℕ) (l : Fin n' × Fin (r + K) →₀ ℕ) (hl : IsLabel p Fr l) (ga : TV n' (m + 1) →₀ ℕ)
-    (hga : PlaneEven r ga) (dPl dNo : TL J nL r → ℕ) (rho : TL J nL r × Fin (r + K) → ℕ)
+theorem deg_le
+    (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr.LLset (segZ j)).card)
+    (d : Fin n' → ℕ)
+    (l : Fin n' × Fin (r + K) →₀ ℕ) (hl : IsLabel p Fr l)
+    (ga : TV n' (m + 1) →₀ ℕ) (hga : PlaneEven r ga)
+    (dPl dNo : TL J nL r → ℕ) (rho : TL J nL r × Fin (r + K) → ℕ)
     (hb : BlockDeg Fr p nL (fun t => d t + topDeg ga t) rho dPl dNo)
-    (hlow : InLow Fr p hk nL rho (l.mapDomain (castV hk) + ga)) (x : TL J nL r) :
-    lowP Fr p x * (dPl x - multideg (plMon Fr p hk nL (l.mapDomain (castV hk) + ga)) x) ≤
-      d (posOf n' (posTL Fr x)) := by
+    (hlow : InLow Fr p hk nL rho (l.mapDomain (castV hk) + ga))
+    (x : TL J nL r)
+    : lowP Fr p x * (dPl x - multideg (plMon Fr p hk nL (l.mapDomain (castV hk) + ga)) x)
+      ≤ d (posOf n' (posTL Fr x)) := by
   classical
   set t := posOf n' (posTL Fr x) with ht
   set P := lowP Fr p x with hP
@@ -225,13 +247,16 @@ theorem deg_le (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr
   have hB := hb x
   simp only at hB
   rw [← hP, ← ht] at hB
-  have hsplit : ∑ c : Fin (r + K), rho (x, c) =
-      ∑ a : Fin r, rho (x, Fin.castAdd K a) + ∑ b : Fin K, rho (x, Fin.natAdd r b) :=
+  have hsplit
+      : ∑ c : Fin (r + K), rho (x, c)
+        = ∑ a : Fin r, rho (x, Fin.castAdd K a) + ∑ b : Fin K, rho (x, Fin.natAdd r b) :=
     Fin.sum_univ_add _
   have htop : topDeg ga t = ∑ a : Fin r, ga (TestSideWords.plVar Fr hk nL x a) := by
     unfold topDeg
-    rw [Fintype.sum_equiv (finCongr hk) (fun c => ga (t, c))
-      (fun c => ga (t, Fin.cast hk.symm c)) (by intro c; simp)]
+    rw [Fintype.sum_equiv (finCongr hk)
+      (fun c => ga (t, c))
+      (fun c => ga (t, Fin.cast hk.symm c))
+      (by intro c; simp)]
     rw [Fin.sum_univ_add]
     have hz : ∑ b : Fin K, ga (t, Fin.cast hk.symm (Fin.natAdd r b)) = 0 := by
       apply Finset.sum_eq_zero
@@ -241,11 +266,15 @@ theorem deg_le (hV : Fr.Valid L₁ N₁) (hr : 1 ≤ r) (hnL : ∀ j, nL j = (Fr
       simp at h1
     rw [hz, add_zero]
     rfl
-  have hM : multideg (plMon Fr p hk nL mo) x = ∑ a : Fin r, mo (TestSideWords.plVar Fr hk nL x a) / P := by
+  have hM
+      : multideg (plMon Fr p hk nL mo) x
+        = ∑ a : Fin r, mo (TestSideWords.plVar Fr hk nL x a) / P := by
     unfold multideg plMon
     simp [hP]
-  have hle : ∑ a : Fin r, ga (TestSideWords.plVar Fr hk nL x a) ≤
-      P * ∑ a : Fin r, mo (TestSideWords.plVar Fr hk nL x a) / P + ∑ a : Fin r, rho (x, Fin.castAdd K a) := by
+  have hle
+      : ∑ a : Fin r, ga (TestSideWords.plVar Fr hk nL x a)
+        ≤ P * ∑ a : Fin r, mo (TestSideWords.plVar Fr hk nL x a) / P
+          + ∑ a : Fin r, rho (x, Fin.castAdd K a) := by
     rw [Finset.mul_sum, ← Finset.sum_add_distrib]
     apply Finset.sum_le_sum
     intro a _

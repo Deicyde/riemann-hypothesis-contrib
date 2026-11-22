@@ -12,30 +12,38 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsL
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory.LevelSpread
 
-theorem exists_closed_eq {S : Scheme.{0}} {Z A : Over S} [IsSeparated A.hom] (u u' : Z ⟶ A) :
-    ∃ C : Set Z.left, IsClosed C ∧ ∀ (K : Type) [Field K] (x : Sp K ⟶ S) (h : Over.mk x ⟶ Z),
-      h ≫ u = h ≫ u' ↔ Set.range h.left ⊆ C := by
+theorem exists_closed_eq {S : Scheme.{0}} {Z A : Over S} [IsSeparated A.hom] (u u' : Z ⟶ A)
+    : ∃ C : Set Z.left,
+      IsClosed C
+        ∧ ∀ (K : Type) [Field K] (x : Sp K ⟶ S) (h : Over.mk x ⟶ Z),
+          h ≫ u = h ≫ u' ↔ Set.range h.left ⊆ C := by
   have : IsClosedImmersion (equalizer.ι u u').left := inferInstance
-  refine ⟨Set.range (equalizer.ι u u').left, (Scheme.Hom.isClosedEmbedding _).isClosed_range,
-    fun K _ x h => ⟨fun e => ?_, fun e => ?_⟩⟩
+  refine ⟨
+    Set.range (equalizer.ι u u').left,
+    (Scheme.Hom.isClosedEmbedding _).isClosed_range,
+    fun K _ x h => ⟨fun e => ?_, fun e => ?_⟩
+  ⟩
   · rintro _ ⟨p, rfl⟩
     refine ⟨(equalizer.lift h e).left p, ?_⟩
     rw [← Scheme.Hom.comp_apply, ← Over.comp_left, equalizer.lift_ι]
   · have : IsReduced (Over.mk x).left := inferInstanceAs (IsReduced (Sp K))
-    obtain ⟨f, hf⟩ := exists_lift_closedImmersion_of_dense (equalizer.ι u u').left h.left Set.univ dense_univ
-      fun p _ => e ⟨p, rfl⟩
+    obtain ⟨f, hf⟩ :=
+      exists_lift_closedImmersion_of_dense (equalizer.ι u u').left h.left Set.univ dense_univ
+        fun p _ => e ⟨p, rfl⟩
     apply Over.OverMorphism.ext
-    rw [Over.comp_left, Over.comp_left, ← hf, Category.assoc, Category.assoc, ← Over.comp_left, ← Over.comp_left,
-      equalizer.condition]
+    rw [Over.comp_left, Over.comp_left, ← hf, Category.assoc, Category.assoc, ← Over.comp_left,
+      ← Over.comp_left, equalizer.condition]
 
-theorem appTop_eq_zero_iff {Z : Scheme.{0}} (f : Γ(Z, ⊤)) {K : Type} [Field K] (h : Sp K ⟶ Z) :
-    h.appTop.hom f = 0 ↔ Set.range h ⊆ (Z.basicOpen f : Set Z)ᶜ := by
+theorem appTop_eq_zero_iff {Z : Scheme.{0}} (f : Γ(Z, ⊤)) {K : Type} [Field K] (h : Sp K ⟶ Z)
+    : h.appTop.hom f = 0 ↔ Set.range h ⊆ (Z.basicOpen f : Set Z)ᶜ := by
   rw [← basicOpen_eq_bot_iff, ← Scheme.preimage_basicOpen_top, eq_bot_iff]
   constructor
   · rintro e _ ⟨p, rfl⟩ hp
@@ -43,9 +51,12 @@ theorem appTop_eq_zero_iff {Z : Scheme.{0}} (f : Γ(Z, ⊤)) {K : Type} [Field K
   · intro e p hp
     exact e ⟨p, rfl⟩ hp
 
-theorem map_fnOn_apply {L k : Type} [CommRing L] [CommRing k] {T : Scheme.{0}} (g : T ⟶ Sp L) (h : Sp k ⟶ T)
-    (β : L →+* k) (e : h ≫ g = spMap β) (c : L) :
-    h.appTop.hom (LevCover.fnOn g c) = (Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom (β c) := by
+theorem map_fnOn_apply
+    {L k : Type} [CommRing L] [CommRing k]
+    {T : Scheme.{0}} (g : T ⟶ Sp L) (h : Sp k ⟶ T)
+    (β : L →+* k) (e : h ≫ g = spMap β)
+    (c : L)
+    : h.appTop.hom (LevCover.fnOn g c) = (Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom (β c) := by
   have h1 : (h ≫ g).appTop = g.appTop ≫ h.appTop := Scheme.Hom.comp_appTop _ _
   have h2 := Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom β)
   have h3 := congrArg (fun φ => φ.hom c) h2
@@ -57,10 +68,15 @@ theorem exists_unitOn {K : Type} [CommRing K] (c : Γ(Sp K, ⊤)ˣ) : ∃ ζ : K
   refine ⟨Units.map (Scheme.ΓSpecIso (CommRingCat.of K)).hom.hom.toMonoidHom c, Units.ext ?_⟩
   exact ((Scheme.ΓSpecIso (CommRingCat.of K)).hom_inv_id_apply c).symm
 
-theorem pow_eq_iff {L K : Type} [CommRing L] [Field K] {T : Scheme.{0}} (g : T ⟶ Sp L) (h : Sp K ⟶ T)
-    (β : L →+* K) (e : h ≫ g = spMap β) (z : L) (c : Γ(T, ⊤)ˣ) (ζ : Kˣ) (m : ℕ)
-    (hc : Units.map h.appTop.hom.toMonoidHom c = unitOn ζ) :
-    (ζ : K) ^ m = β z ↔ Set.range h ⊆ (T.basicOpen ((c : Γ(T, ⊤)) ^ m - LevCover.fnOn g z) : Set T)ᶜ := by
+theorem pow_eq_iff
+    {L K : Type} [CommRing L] [Field K]
+    {T : Scheme.{0}} (g : T ⟶ Sp L) (h : Sp K ⟶ T)
+    (β : L →+* K) (e : h ≫ g = spMap β)
+    (z : L)
+    (c : Γ(T, ⊤)ˣ) (ζ : Kˣ)
+    (m : ℕ) (hc : Units.map h.appTop.hom.toMonoidHom c = unitOn ζ)
+    : (ζ : K) ^ m = β z
+      ↔ Set.range h ⊆ (T.basicOpen ((c : Γ(T, ⊤)) ^ m - LevCover.fnOn g z) : Set T)ᶜ := by
   have h1 : h.appTop.hom c = (Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom ζ := congrArg Units.val hc
   rw [← appTop_eq_zero_iff, map_sub, map_pow, h1, map_fnOn_apply g h β e, ← map_pow, sub_eq_zero]
   exact ((Scheme.ΓSpecIso (CommRingCat.of K)).symm.commRingCatIsoToRingEquiv.injective.eq_iff).symm

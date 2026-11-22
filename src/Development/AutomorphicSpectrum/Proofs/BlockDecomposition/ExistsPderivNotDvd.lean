@@ -10,8 +10,9 @@ set_option backward.isDefEq.respectTransparency false
 namespace GlobalTheory.CompanionTheory.TraceJac
 
 open MvPolynomial in
-theorem exists_pderiv_not_dvd {K σ : Type*} [Field K] [CharZero K] (π : MvPolynomial σ K)
-    (hπ : Prime π) : ∃ j, ¬ π ∣ pderiv j π := by
+theorem exists_pderiv_not_dvd
+    {K σ : Type*} [Field K] [CharZero K] (π : MvPolynomial σ K) (hπ : Prime π)
+    : ∃ j, ¬ π ∣ pderiv j π := by
   classical
   have hT : π.totalDegree ≠ 0 := by
     intro h
@@ -22,8 +23,7 @@ theorem exists_pderiv_not_dvd {K σ : Type*} [Field K] [CharZero K] (π : MvPoly
     · apply hπ.not_isUnit
       rw [hC]
       exact (IsUnit.mk0 _ ha).map C
-  have h1 : ¬ ∀ m ∈ π.support, ∀ x, m x = 0 := by
-    rwa [← totalDegree_eq_zero_iff]
+  have h1 : ¬ ∀ m ∈ π.support, ∀ x, m x = 0 := by rwa [← totalDegree_eq_zero_iff]
   push Not at h1
   obtain ⟨m, hm, j, hj⟩ := h1
   refine ⟨j, fun hd => ?_⟩
@@ -56,18 +56,22 @@ theorem exists_pderiv_not_dvd {K σ : Type*} [Field K] [CharZero K] (π : MvPoly
           rw [coeff_pderiv, h6, zero_mul]
         have := le_totalDegree h5
         rwa [Finsupp.sum_add_index' (by simp) (by simp), Finsupp.sum_single_index rfl] at this
-      obtain ⟨s, hs, hs'⟩ : ∃ s ∈ (pderiv j π).support, (pderiv j π).totalDegree = s.sum (fun _ e => e) := by
+      obtain ⟨s, hs, hs'⟩
+          : ∃ s ∈ (pderiv j π).support, (pderiv j π).totalDegree = s.sum (fun _ e => e) := by
         rw [totalDegree]
-        obtain ⟨s, hs, hs'⟩ := Finset.exists_mem_eq_sup _ (support_nonempty.2 hne) (fun s : σ →₀ ℕ => s.sum fun _ e => e)
+        obtain ⟨s, hs, hs'⟩ :=
+          Finset.exists_mem_eq_sup _ (support_nonempty.2 hne) (fun s : σ →₀ ℕ => s.sum fun _ e => e)
         exact ⟨s, hs, hs'⟩
-      rw [hs']; exact h4 s hs
+      rw [hs']
+      exact h4 s hs
     omega
   omega
 
-theorem finite_frac {A B F L : Type*} [CommRing A] [IsDomain A] [CommRing B] [IsDomain B]
-    [Algebra A B] [Module.Finite A B] [Field F] [Field L] [Algebra A F] [IsFractionRing A F]
-    [Algebra B L] [IsFractionRing B L] [Algebra F L] [Algebra A L] [IsScalarTower A F L]
-    [IsScalarTower A B L] : FiniteDimensional F L := by
+theorem finite_frac
+    {A B F L : Type*} [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [Algebra A B]
+    [Module.Finite A B] [Field F] [Field L] [Algebra A F] [IsFractionRing A F] [Algebra B L]
+    [IsFractionRing B L] [Algebra F L] [Algebra A L] [IsScalarTower A F L] [IsScalarTower A B L]
+    : FiniteDimensional F L := by
   classical
   obtain ⟨T, hT⟩ := (Module.Finite.fg_top : (⊤ : Submodule A B).FG)
   let W := IntermediateField.adjoin F ((T.image (algebraMap B L) : Finset L) : Set L)
@@ -87,8 +91,10 @@ theorem finite_frac {A B F L : Type*} [CommRing A] [IsDomain A] [CommRing B] [Is
       refine IntermediateField.subset_adjoin _ _ ?_
       simp only [Finset.coe_image]
       exact ⟨s, hs, rfl⟩
-    | zero => simp
-    | add a b _ _ ha hb => rw [map_add (f := _)]; exact W.add_mem ha hb
+    | zero =>
+      simp
+    | add a b _ _ ha hb =>
+      rw [map_add (f := _)]; exact W.add_mem ha hb
     | smul r a _ ha =>
       have h1 : algebraMap B L (r • a) = algebraMap F L (algebraMap A F r) * algebraMap B L a := by
         rw [Algebra.smul_def, map_mul, ← IsScalarTower.algebraMap_apply,
@@ -100,16 +106,18 @@ theorem finite_frac {A B F L : Type*} [CommRing A] [IsDomain A] [CommRing B] [Is
     intro x _
     obtain ⟨a, s, -, rfl⟩ := IsFractionRing.div_surjective (A := B) x
     exact W.div_mem (hB a) (hB s)
-  have key : ∀ W' : IntermediateField F L, FiniteDimensional F W' → W' = ⊤ →
-      FiniteDimensional F L := by
+  have key
+      : ∀ W' : IntermediateField F L, FiniteDimensional F W' → W' = ⊤ → FiniteDimensional F L := by
     rintro _ h rfl
     exact (IntermediateField.topEquiv (F := F) (E := L)).toLinearEquiv.finiteDimensional
   exact key W inferInstance hW
 
 open Polynomial in
-theorem integral_of_range {A R L : Type*} [CommRing A] [CommRing R] [Field L] [Algebra A L]
-    [Algebra R L] (hr : ∀ a : A, algebraMap A L a ∈ (algebraMap R L).range) (x : L)
-    (h : IsIntegral A x) : IsIntegral R x := by
+theorem integral_of_range
+    {A R L : Type*} [CommRing A] [CommRing R] [Field L] [Algebra A L] [Algebra R L]
+    (hr : ∀ a : A, algebraMap A L a ∈ (algebraMap R L).range)
+    (x : L) (h : IsIntegral A x)
+    : IsIntegral R x := by
   obtain ⟨p, hp, h0⟩ := h
   have hl : p.map (algebraMap A L) ∈ Polynomial.lifts (algebraMap R L) := by
     rw [Polynomial.lifts_iff_coeff_lifts]
@@ -125,23 +133,27 @@ end GlobalTheory.CompanionTheory.TraceJac
 
 namespace GlobalTheory.CompanionTheory.TraceJac
 
-theorem at_prime_abs {P L F R n : Type*} [CommRing P] [IsDomain P] [IsNoetherianRing P] [Field L]
-    [Field F] [CommRing R] [Algebra P R] [Algebra P F] [Algebra P L] [Algebra R F]
-    [IsScalarTower P R F] [Algebra F L] [Algebra R L] [IsScalarTower R F L] [IsScalarTower P R L]
-    [IsFractionRing P F] [FiniteDimensional F L] [Algebra.IsSeparable F L] [Fintype n]
-    [DecidableEq n] (π : P) (hπ : Prime π) (p : Ideal P) [p.IsPrime] (hp : p = Ideal.span {π})
-    [IsLocalization.AtPrime R p] (E : n → Derivation ℤ L L)
-    (hE : ∀ k f, ∃ f', E k (algebraMap P L f) = algebraMap P L f') (j : n) (fj : P)
-    (hfj : E j (algebraMap P L π) = algebraMap P L fj) (hj : ¬ π ∣ fj)
+theorem at_prime_abs
+    {P L F R n : Type*} [CommRing P] [IsDomain P] [IsNoetherianRing P] [Field L] [Field F]
+    [CommRing R] [Algebra P R] [Algebra P F] [Algebra P L] [Algebra R F] [IsScalarTower P R F]
+    [Algebra F L] [Algebra R L] [IsScalarTower R F L] [IsScalarTower P R L] [IsFractionRing P F]
+    [FiniteDimensional F L] [Algebra.IsSeparable F L] [Fintype n] [DecidableEq n]
+    (π : P) (hπ : Prime π)
+    (p : Ideal P) [p.IsPrime]
+    (hp : p = Ideal.span {π})
+    [IsLocalization.AtPrime R p]
+    (E : n → Derivation ℤ L L) (hE : ∀ k f, ∃ f', E k (algebraMap P L f) = algebraMap P L f')
+    (j : n) (fj : P) (hfj : E j (algebraMap P L π) = algebraMap P L fj) (hj : ¬ π ∣ fj)
     (hnat : ∀ m : ℕ, m ≠ 0 → IsUnit (m : R))
-    (c : L) (hc : IsIntegral R c) (b : n → L) (hb : ∀ l, IsIntegral R (b l)) :
-    ∃ f s : P, ¬ π ∣ s ∧
-      algebraMap P F s * Algebra.trace F L (c * (Matrix.of fun k l => E k (b l)).det) =
-        algebraMap P F f := by
+    (c : L) (hc : IsIntegral R c)
+    (b : n → L) (hb : ∀ l, IsIntegral R (b l))
+    : ∃ f s : P,
+      ¬ π ∣ s
+        ∧ algebraMap P F s * Algebra.trace F L (c * (Matrix.of fun k l => E k (b l)).det)
+          = algebraMap P F f := by
   classical
   have hmem : ∀ s, s ∈ p ↔ π ∣ s := fun s => by rw [hp, Ideal.mem_span_singleton]
-  have hmemM : ∀ s, s ∈ p.primeCompl ↔ ¬ π ∣ s := fun s => by
-    rw [Ideal.mem_primeCompl_iff, hmem]
+  have hmemM : ∀ s, s ∈ p.primeCompl ↔ ¬ π ∣ s := fun s => by rw [Ideal.mem_primeCompl_iff, hmem]
   haveI : IsDomain R := IsLocalization.isDomain_of_le_nonZeroDivisors R
     p.primeCompl_le_nonZeroDivisors
   haveI : IsNoetherianRing R := IsLocalization.isNoetherianRing p.primeCompl R inferInstance
@@ -175,21 +187,20 @@ theorem at_prime_abs {P L F R n : Type*} [CommRing P] [IsDomain P] [IsNoetherian
     obtain ⟨s1, hs1⟩ := hE k (s : P)
     refine ⟨(algebraMap P R f1 - IsLocalization.mk' R f s * algebraMap P R s1) * w, ?_⟩
     set x := algebraMap R L (IsLocalization.mk' R f s) with hx
-    have h2 : x * algebraMap P L s = algebraMap P L f := by
-      rw [hx, ← hρP, ← hρP, ← map_mul, h1]
-    have h3 : algebraMap P L s * algebraMap R L w = 1 := by
-      rw [← hρP, ← map_mul, hw, map_one]
+    have h2 : x * algebraMap P L s = algebraMap P L f := by rw [hx, ← hρP, ← hρP, ← map_mul, h1]
+    have h3 : algebraMap P L s * algebraMap R L w = 1 := by rw [← hρP, ← map_mul, hw, map_one]
     have h4 := congrArg (E k) h2
     rw [Derivation.leibniz, hf1, hs1] at h4
     simp only [smul_eq_mul] at h4
     rw [map_mul, map_sub, map_mul, hρP, hρP, ← hx, ← h4]
     linear_combination (-E k x) * h3
   obtain ⟨u, hu⟩ := IsLocalization.map_units R (⟨fj, (hmemM _).2 hj⟩ : p.primeCompl)
-  obtain ⟨r, hr⟩ := trace_jac_dvr (F := F) hnat E hR (algebraMap P R π) hirr j u
-    (by rw [hρP, hfj, hu, hρP]) c hc b hb
+  obtain ⟨r, hr⟩ :=
+    trace_jac_dvr (F := F) hnat E hR (algebraMap P R π) hirr j u (by rw [hρP, hfj, hu, hρP]) c hc b
+      hb
   obtain ⟨f, s, rfl⟩ := IsLocalization.exists_mk'_eq p.primeCompl r
   refine ⟨f, s, (hmemM _).1 s.2, ?_⟩
-  rw [← hr, IsScalarTower.algebraMap_apply P R F, IsScalarTower.algebraMap_apply P R F f,
-    ← map_mul, mul_comm, IsLocalization.mk'_spec]
+  rw [← hr, IsScalarTower.algebraMap_apply P R F, IsScalarTower.algebraMap_apply P R F f, ← map_mul,
+    mul_comm, IsLocalization.mk'_spec]
 
 end GlobalTheory.CompanionTheory.TraceJac

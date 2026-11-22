@@ -9,11 +9,13 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
   {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
 namespace Data
@@ -22,50 +24,63 @@ variable (d : Data K ι Ω WT A)
 
 abbrev PolyRingPositiveRowsBase : Type := MvPolynomial {v : TVar d.D d.N // v.1 ≠ 0} K
 
-abbrev PolyRingPositiveRowsOmega (c : ι) : Type := MvPolynomial ({i : Fin (d.D + 1) // i ≠ 0} × Fin d.N) (Ω c)
+abbrev PolyRingPositiveRowsOmega (c : ι) : Type :=
+  MvPolynomial ({i : Fin (d.D + 1) // i ≠ 0} × Fin d.N) (Ω c)
 
 abbrev FracFieldPositiveRowsBase : Type := FractionRing d.PolyRingPositiveRowsBase
 
 abbrev FracFieldPositiveRowsOmega (c : ι) : Type := FractionRing (d.PolyRingPositiveRowsOmega c)
 
-noncomputable def eLX4 : KTf K d.D d.N ≃+* FractionRing (MvPolynomial (Fin (d.N + 1)) d.FracFieldPositiveRowsBase) :=
+noncomputable def eLX4
+    : KTf K d.D d.N ≃+* FractionRing (MvPolynomial (Fin (d.N + 1)) d.FracFieldPositiveRowsBase) :=
   letI := (FractionFieldVariableLift.toFracY d.PolyRingPositiveRowsBase (Fin (d.N + 1))).toAlgebra
-  haveI := FractionFieldVariableLift.isFractionRing_toFracY (A := d.PolyRingPositiveRowsBase) (σ := Fin (d.N + 1))
+  haveI :=
+    FractionFieldVariableLift.isFractionRing_toFracY (A := d.PolyRingPositiveRowsBase)
+      (σ := Fin (d.N + 1))
   IsFractionRing.ringEquivOfRingEquiv (FractionFieldVariableLift.hL K d.D d.N)
 
-noncomputable def eEX4 (c : ι) : OmS (Ω c) d.D d.N ≃+* FractionRing (MvPolynomial (Fin (d.N + 1)) (d.FracFieldPositiveRowsOmega c)) :=
-  letI := (FractionFieldVariableLift.toFracY (d.PolyRingPositiveRowsOmega c) (Fin (d.N + 1))).toAlgebra
-  haveI := FractionFieldVariableLift.isFractionRing_toFracY (A := d.PolyRingPositiveRowsOmega c) (σ := Fin (d.N + 1))
+noncomputable def eEX4 (c : ι)
+    : OmS (Ω c) d.D d.N
+      ≃+* FractionRing (MvPolynomial (Fin (d.N + 1)) (d.FracFieldPositiveRowsOmega c)) :=
+  letI :=
+    (FractionFieldVariableLift.toFracY (d.PolyRingPositiveRowsOmega c) (Fin (d.N + 1))).toAlgebra
+  haveI :=
+    FractionFieldVariableLift.isFractionRing_toFracY (A := d.PolyRingPositiveRowsOmega c)
+      (σ := Fin (d.N + 1))
   IsFractionRing.ringEquivOfRingEquiv (FractionFieldVariableLift.hE (Ω c) d.D d.N (d.jc c))
 
-theorem eLX4_algebraMap (P : KTp K d.D d.N) :
-    d.eLX4 (algebraMap (KTp K d.D d.N) (KTf K d.D d.N) P) =
-      FractionFieldVariableLift.toFracY d.PolyRingPositiveRowsBase (Fin (d.N + 1)) (FractionFieldVariableLift.hL K d.D d.N P) := by
+theorem eLX4_algebraMap (P : KTp K d.D d.N)
+    : d.eLX4 (algebraMap (KTp K d.D d.N) (KTf K d.D d.N) P)
+      = FractionFieldVariableLift.toFracY d.PolyRingPositiveRowsBase (Fin (d.N + 1))
+        (FractionFieldVariableLift.hL K d.D d.N P) := by
   letI := (FractionFieldVariableLift.toFracY d.PolyRingPositiveRowsBase (Fin (d.N + 1))).toAlgebra
   haveI := FractionFieldVariableLift.isFractionRing_toFracY (A := d.PolyRingPositiveRowsBase) (σ := Fin (d.N + 1))
   exact IsFractionRing.ringEquivOfRingEquiv_algebraMap (FractionFieldVariableLift.hL K d.D d.N) P
 
-theorem eEX4_algebraMap (c : ι) (P : MvPolynomial (SVar d.D d.N) (Ω c)) :
-    d.eEX4 c (algebraMap (MvPolynomial (SVar d.D d.N) (Ω c)) (OmS (Ω c) d.D d.N) P) =
-      FractionFieldVariableLift.toFracY (d.PolyRingPositiveRowsOmega c) (Fin (d.N + 1)) (FractionFieldVariableLift.hE (Ω c) d.D d.N (d.jc c) P) := by
+theorem eEX4_algebraMap (c : ι) (P : MvPolynomial (SVar d.D d.N) (Ω c))
+    : d.eEX4 c (algebraMap (MvPolynomial (SVar d.D d.N) (Ω c)) (OmS (Ω c) d.D d.N) P)
+      = FractionFieldVariableLift.toFracY (d.PolyRingPositiveRowsOmega c) (Fin (d.N + 1))
+        (FractionFieldVariableLift.hE (Ω c) d.D d.N (d.jc c) P) := by
   letI := (FractionFieldVariableLift.toFracY (d.PolyRingPositiveRowsOmega c) (Fin (d.N + 1))).toAlgebra
   haveI := FractionFieldVariableLift.isFractionRing_toFracY (A := d.PolyRingPositiveRowsOmega c) (σ := Fin (d.N + 1))
-  exact IsFractionRing.ringEquivOfRingEquiv_algebraMap (FractionFieldVariableLift.hE (Ω c) d.D d.N (d.jc c)) P
+  exact IsFractionRing.ringEquivOfRingEquiv_algebraMap
+    (FractionFieldVariableLift.hE (Ω c) d.D d.N (d.jc c)) P
 
 noncomputable def psiE (c : ι) : d.PolyRingPositiveRowsBase →+* d.FracFieldPositiveRowsOmega c :=
-  (algebraMap (d.PolyRingPositiveRowsOmega c) (d.FracFieldPositiveRowsOmega c)).comp (d.offBaseSubstitution c).toRingHom
+  (algebraMap (d.PolyRingPositiveRowsOmega c) (d.FracFieldPositiveRowsOmega c)).comp
+    (d.offBaseSubstitution c).toRingHom
 
-private theorem sumRingEquiv_X_inl' (R S₁ S₂ : Type) [CommSemiring R] (b : S₁) :
-    MvPolynomial.sumRingEquiv R S₁ S₂ (MvPolynomial.X (Sum.inl b)) = MvPolynomial.X b :=
+private theorem sumRingEquiv_X_inl' (R S₁ S₂ : Type) [CommSemiring R] (b : S₁)
+    : MvPolynomial.sumRingEquiv R S₁ S₂ (MvPolynomial.X (Sum.inl b)) = MvPolynomial.X b :=
   MvPolynomial.sumRingEquiv_X_inl R S₁ S₂ b
 
-private theorem sumRingEquiv_X_inr' (R S₁ S₂ : Type) [CommSemiring R] (q : S₂) :
-    MvPolynomial.sumRingEquiv R S₁ S₂ (MvPolynomial.X (Sum.inr q)) =
-      MvPolynomial.C (MvPolynomial.X q) :=
+private theorem sumRingEquiv_X_inr' (R S₁ S₂ : Type) [CommSemiring R] (q : S₂)
+    : MvPolynomial.sumRingEquiv R S₁ S₂ (MvPolynomial.X (Sum.inr q))
+      = MvPolynomial.C (MvPolynomial.X q) :=
   MvPolynomial.sumRingEquiv_X_inr R S₁ S₂ q
 
-private theorem sumRingEquiv_C' (R S₁ S₂ : Type) [CommSemiring R] (a : R) :
-    MvPolynomial.sumRingEquiv R S₁ S₂ (MvPolynomial.C a) = MvPolynomial.C (MvPolynomial.C a) :=
+private theorem sumRingEquiv_C' (R S₁ S₂ : Type) [CommSemiring R] (a : R)
+    : MvPolynomial.sumRingEquiv R S₁ S₂ (MvPolynomial.C a) = MvPolynomial.C (MvPolynomial.C a) :=
   MvPolynomial.sumRingEquiv_C R S₁ S₂ a
 
 theorem compat0 (c : ι) (P : KTp K d.D d.N) :
@@ -141,37 +156,50 @@ theorem compat0 (c : ι) (P : KTp K d.D d.N) :
   exact RingHom.congr_fun key P
 
 theorem psiE_injective (h : d.S1) (c : ι) : Function.Injective (d.psiE c) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro p hp
   have e := d.compat0 c ((FractionFieldVariableLift.hL K d.D d.N).symm (MvPolynomial.C p))
   rw [RingEquiv.apply_symm_apply, MvPolynomial.map_C, hp, map_zero, map_zero] at e
   have e2 := (RingEquiv.map_eq_zero_iff (d.eEX4 c)).mp e
   have e3 := h c (e2.trans (map_zero (d.sH c)).symm)
   have e4 : (MvPolynomial.C p : MvPolynomial (Fin (d.N + 1)) d.PolyRingPositiveRowsBase) = 0 := by
-    rw [← RingEquiv.apply_symm_apply (FractionFieldVariableLift.hL K d.D d.N) (MvPolynomial.C p), e3, map_zero]
+    rw [← RingEquiv.apply_symm_apply (FractionFieldVariableLift.hL K d.D d.N) (MvPolynomial.C p),
+      e3, map_zero]
   exact MvPolynomial.C_eq_zero.mp e4
 
-noncomputable def algLE (h : d.S1) (c : ι) : Algebra d.FracFieldPositiveRowsBase (d.FracFieldPositiveRowsOmega c) :=
-  (IsFractionRing.lift (A := d.PolyRingPositiveRowsBase) (K := d.FracFieldPositiveRowsBase) (d.psiE_injective h c)).toAlgebra
+noncomputable def algLE (h : d.S1) (c : ι)
+    : Algebra d.FracFieldPositiveRowsBase (d.FracFieldPositiveRowsOmega c) :=
+  (IsFractionRing.lift (A := d.PolyRingPositiveRowsBase) (K := d.FracFieldPositiveRowsBase)
+    (d.psiE_injective h c)).toAlgebra
 
-theorem algLE_algebraMap (h : d.S1) (c : ι) (p : d.PolyRingPositiveRowsBase) :
-    letI := d.algLE h c;
-    algebraMap d.FracFieldPositiveRowsBase (d.FracFieldPositiveRowsOmega c) (algebraMap d.PolyRingPositiveRowsBase d.FracFieldPositiveRowsBase p) = d.psiE c p := IsFractionRing.lift_algebraMap (d.psiE_injective h c) p
+theorem algLE_algebraMap (h : d.S1) (c : ι) (p : d.PolyRingPositiveRowsBase)
+    : letI := d.algLE h c
+      algebraMap d.FracFieldPositiveRowsBase (d.FracFieldPositiveRowsOmega c)
+          (algebraMap d.PolyRingPositiveRowsBase d.FracFieldPositiveRowsBase p)
+        = d.psiE c p :=
+  IsFractionRing.lift_algebraMap (d.psiE_injective h c) p
 
-theorem fieldEquiv_compat_liftY (h : d.S1) (c : ι) (q : KTf K d.D d.N) :
-    letI := d.algLE h c;
-    d.eEX4 c (d.KTtoS h c q) = VariableBasisExtension.liftY (L := d.FracFieldPositiveRowsBase) (E := d.FracFieldPositiveRowsOmega c) (σ := Fin (d.N + 1)) (d.eLX4 q) := by
+theorem fieldEquiv_compat_liftY (h : d.S1) (c : ι) (q : KTf K d.D d.N)
+    : letI := d.algLE h c
+      d.eEX4 c (d.KTtoS h c q)
+        = VariableBasisExtension.liftY (L := d.FracFieldPositiveRowsBase)
+          (E := d.FracFieldPositiveRowsOmega c) (σ := Fin (d.N + 1)) (d.eLX4 q) := by
   obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := KTp K d.D d.N) q
   simp only [map_div₀]
   congr 1
   all_goals
-    rw [show ∀ P : KTp K d.D d.N, d.KTtoS h c (algebraMap (KTp K d.D d.N) (KTf K d.D d.N) P) =
-      d.sH c P from fun P => IsFractionRing.lift_algebraMap _ _]
+    rw [show ∀ P : KTp K d.D d.N,
+        d.KTtoS h c (algebraMap (KTp K d.D d.N) (KTf K d.D d.N) P) = d.sH c P from fun P =>
+      IsFractionRing.lift_algebraMap _ _]
     rw [d.compat0 c, d.eLX4_algebraMap]
     unfold FractionFieldVariableLift.toFracY VariableBasisExtension.liftY
-    rw [RingHom.comp_apply, IsFractionRing.lift_algebraMap, RingHom.comp_apply, MvPolynomial.map_map]
-    rw [show (@algebraMap d.FracFieldPositiveRowsBase (d.FracFieldPositiveRowsOmega c) _ _ (d.algLE h c)).comp (algebraMap d.PolyRingPositiveRowsBase d.FracFieldPositiveRowsBase) =
-      d.psiE c from RingHom.ext fun p => d.algLE_algebraMap h c p]
+    rw [RingHom.comp_apply, IsFractionRing.lift_algebraMap, RingHom.comp_apply,
+      MvPolynomial.map_map]
+    rw [show (@algebraMap d.FracFieldPositiveRowsBase (d.FracFieldPositiveRowsOmega c) _ _
+          (d.algLE h c)).comp (algebraMap d.PolyRingPositiveRowsBase d.FracFieldPositiveRowsBase)
+        = d.psiE c from
+      RingHom.ext fun p => d.algLE_algebraMap h c p]
 
 end Data
 

@@ -14,11 +14,10 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.HalfDepthValuations
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.MainNotions.DIV.Cons
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  Formalism.MainNotions.DIV.Cons
 
 variable {D : D7}
-
-
 
 section Rec
 

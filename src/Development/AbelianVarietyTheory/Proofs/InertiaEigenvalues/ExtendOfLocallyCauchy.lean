@@ -12,7 +12,13 @@ open Filter Topology
 
 namespace GlobalTheory.Cong
 
-theorem extend_of_locallyCauchy : ∀ (l : ℕ) [Fact l.Prime] (Γ J : Type) [TopologicalSpace Γ] (x : J → Γ), DenseRange x → ∀ (θ : J → PadicAlgCl l) (L : IntermediateField ℚ_[l] (PadicAlgCl l)), FiniteDimensional ℚ_[l] L → (∀ j, θ j ∈ L) → (∀ ε : ℝ, 0 < ε → ∀ g : Γ, ∃ V ∈ nhds g, ∀ i j, x i ∈ V → x j ∈ V → ‖θ i - θ j‖ ≤ ε) → ∃ T : Γ → PadicAlgCl l, Continuous T ∧ ∀ j, T (x j) = θ j := by
+theorem extend_of_locallyCauchy
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ J : Type) [TopologicalSpace Γ] (x : J → Γ),
+      DenseRange x
+        → ∀ (θ : J → PadicAlgCl l) (L : IntermediateField ℚ_[l] (PadicAlgCl l)),
+          FiniteDimensional ℚ_[l] L → (∀ j, θ j ∈ L)
+            → (∀ ε : ℝ, 0 < ε → ∀ g : Γ, ∃ V ∈ nhds g, ∀ i j, x i ∈ V → x j ∈ V → ‖θ i - θ j‖ ≤ ε)
+            → ∃ T : Γ → PadicAlgCl l, Continuous T ∧ ∀ j, T (x j) = θ j := by
   intro l _ Γ J _ x hx θ L hL hθL hC
   have hLc : IsComplete (L : Set (PadicAlgCl l)) := by
     haveI : FiniteDimensional ℚ_[l] (Subalgebra.toSubmodule L.toSubalgebra) := hL
@@ -47,7 +53,8 @@ theorem extend_of_locallyCauchy : ∀ (l : ℕ) [Fact l.Prime] (Γ J : Type) [To
     have hV' : V ∈ 𝓝 g' := mem_interior_iff_mem_nhds.1 hg'
     haveI : (comap x (𝓝 g')).NeBot := hnb g'
     haveI : (comap x (𝓝 g)).NeBot := hnb g
-    have hlim : Tendsto (fun p : J × J => dist (θ p.1) (θ p.2))
+    have hlim : Tendsto
+        (fun p : J × J => dist (θ p.1) (θ p.2))
         (comap x (𝓝 g') ×ˢ comap x (𝓝 g)) (𝓝 (dist (T g') (T g))) :=
       ((hT g').comp tendsto_fst).dist ((hT g).comp tendsto_snd)
     have hev : ∀ᶠ p : J × J in comap x (𝓝 g') ×ˢ comap x (𝓝 g), dist (θ p.1) (θ p.2) ≤ ε / 2 := by

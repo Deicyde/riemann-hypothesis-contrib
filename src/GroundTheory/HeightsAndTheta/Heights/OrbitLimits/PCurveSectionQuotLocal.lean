@@ -10,22 +10,28 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  GroundTheory.Heights₂.Heights.HilbertSamuel.LiftBirationalAmple
 
 noncomputable section
 
 namespace CurveSectionQuotientLocal
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {Ω : Type} [Field Ω]
   (y : (Σ k, ι k) → Ω)
 
-theorem chart_mem_curveSectionMod (c : ∀ k, ι k) (d : K → ℕ) :
-    ∏ k, y ⟨k, c k⟩ ^ d k ∈ curveSectionMod y (fun k => (d k : ℤ)) := by
+theorem chart_mem_curveSectionMod (c : ∀ k, ι k) (d : K → ℕ)
+    : ∏ k, y ⟨k, c k⟩ ^ d k ∈ curveSectionMod y (fun k => (d k : ℤ)) := by
   classical
   show _ ∈ chartLat y _ 1
-  have h := chartLat_prod (y := y) Finset.univ (fun k => y ⟨k, c k⟩ ^ d k)
-    (fun k => d k • (Pi.single k 1 : K → ℤ))
-    (fun k _ => chartLat_pow (chartLat_var (y := y) ⟨k, c k⟩) (d k))
+  have h :=
+    chartLat_prod (y := y) Finset.univ
+      (fun k => y ⟨k, c k⟩ ^ d k)
+      (fun k => d k • (Pi.single k 1 : K → ℤ))
+      (fun k _ => chartLat_pow (chartLat_var (y := y) ⟨k, c k⟩) (d k))
   convert h using 2
   funext j
   rw [Finset.sum_apply, Finset.sum_eq_single j]
@@ -34,12 +40,13 @@ theorem chart_mem_curveSectionMod (c : ∀ k, ι k) (d : K → ℕ) :
     simp [Ne.symm hk]
   · simp
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem exists_mul_mem_of_mem_chartRingZ (m : Ideal (curveRing y)) (hm : m.IsPrime) (c : ∀ k, ι k)
+theorem exists_mul_mem_of_mem_chartRingZ
+    (m : Ideal (curveRing y)) (hm : m.IsPrime)
+    (c : ∀ k, ι k)
     (h : ∀ p : Σ k, ι k, ∃ a b : curveRing y, b ∉ m ∧ (b : Ω) * (y p / y ⟨p.1, c p.1⟩) = a)
-    {z : Ω} (hz : z ∈ chartRingZ y c) :
-    ∃ a b : curveRing y, b ∉ m ∧ (b : Ω) * z = a := by
+    {z : Ω} (hz : z ∈ chartRingZ y c)
+    : ∃ a b : curveRing y, b ∉ m ∧ (b : Ω) * z = a := by
   induction hz using Algebra.adjoin_induction with
   | mem x hx =>
     obtain ⟨p, rfl⟩ := hx
@@ -64,7 +71,6 @@ theorem exists_mul_mem_of_mem_chartRingZ (m : Ideal (curveRing y)) (hm : m.IsPri
 
 end CurveSectionQuotientLocal
 
-
 open CurveSectionQuotientLocal in
 theorem CurveSectionQuotLocal.proof : CurveSectionQuotLocal.Statement := by
   intro K _ ι _ Ω _ y s d _hy _hs _hsP m c hm hc hrat a b hb hba
@@ -84,7 +90,8 @@ theorem CurveSectionQuotLocal.proof : CurveSectionQuotLocal.Statement := by
   have hle : Ideal.span {a} ≤ LinearMap.ker φ := by
     rw [Ideal.span_singleton_le_iff_mem, LinearMap.mem_ker, hφ0]
     exact ⟨b, hba⟩
-  let ψ : (curveRing y ⧸ Ideal.span {a}) →ₗ[curveRing y] curveSectionQuot y (fun k => (d k : ℤ)) x :=
+  let ψ
+      : (curveRing y ⧸ Ideal.span {a}) →ₗ[curveRing y] curveSectionQuot y (fun k => (d k : ℤ)) x :=
     (Ideal.span {a}).liftQ φ hle
 
   have hker : ∀ q, ψ q = 0 → b • q = 0 := by
@@ -99,8 +106,9 @@ theorem CurveSectionQuotLocal.proof : CurveSectionQuotLocal.Statement := by
     rw [mul_assoc, ← hba, mul_assoc, ← hγ]
     ring
 
-  have hsurj0 : ∀ n : curveSectionMod y (fun k => (d k : ℤ)),
-      ∃ r : curveRing y, r ∉ m ∧ ∃ β : curveRing y, r • n = β • e := by
+  have hsurj0
+      : ∀ n : curveSectionMod y (fun k => (d k : ℤ)), ∃ r : curveRing y,
+        r ∉ m ∧ ∃ β : curveRing y, r • n = β • e := by
     intro n
     have hn : (n : Ω) ∈ chartLat y (fun k => (d k : ℤ)) 1 := n.2
     have hnc : (n : Ω) * e₀⁻¹ ∈ chartRingZ y c := by
@@ -117,12 +125,14 @@ theorem CurveSectionQuotLocal.proof : CurveSectionQuotLocal.Statement := by
     field_simp
 
   let S := m.primeCompl
-  let Φ := IsLocalizedModule.map S (LocalizedModule.mkLinearMap S (curveRing y ⧸ Ideal.span {a}))
-    (LocalizedModule.mkLinearMap S (curveSectionQuot y (fun k => (d k : ℤ)) x)) ψ
-  have hΦ : ∀ q (r : S), Φ (LocalizedModule.mk q r) = LocalizedModule.mk (ψ q) r :=
-    fun q r => IsLocalizedModule.map_LocalizedModules S _ q r
+  let Φ :=
+    IsLocalizedModule.map S (LocalizedModule.mkLinearMap S (curveRing y ⧸ Ideal.span {a}))
+      (LocalizedModule.mkLinearMap S (curveSectionQuot y (fun k => (d k : ℤ)) x)) ψ
+  have hΦ : ∀ q (r : S), Φ (LocalizedModule.mk q r) = LocalizedModule.mk (ψ q) r := fun q r =>
+    IsLocalizedModule.map_LocalizedModules S _ q r
   have hinj : Function.Injective Φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro z
     refine LocalizedModule.induction_on (β := fun z => Φ z = 0 → z = 0) (fun q r hz => ?_) z
     rw [hΦ, ← LocalizedModule.zero_mk r, LocalizedModule.mk_eq] at hz
@@ -147,8 +157,9 @@ theorem CurveSectionQuotLocal.proof : CurveSectionQuotLocal.Statement := by
     rw [hψ, ← hβ, Submodule.Quotient.mk_smul]
     exact LocalizedModule.mk_cancel_common_left ⟨r', hr'⟩ r _
   have := hm
-  let E := (LinearEquiv.ofBijective Φ ⟨hinj, hsurj⟩).extendScalarsOfIsLocalization S
-    (Localization.AtPrime m)
+  let E :=
+    (LinearEquiv.ofBijective Φ ⟨hinj, hsurj⟩).extendScalarsOfIsLocalization S
+      (Localization.AtPrime m)
   unfold locLen
   rw [dite_eq_left hm, dite_eq_left hm, E.length_eq]
 

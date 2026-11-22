@@ -6,13 +6,24 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.AutomorphicEvaluation Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ConcreteSettingExists MeasureTheory NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.SRe
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
+  Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.AutomorphicEvaluation
+  Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned
+  Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ConcreteSettingExists MeasureTheory
+  NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.SRe
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.SymChar
 
-theorem hA_symVec_sub_ite_mem_wInt : ∀ (D : D7) (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) (k : Fin 2), ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ w.asIdeal → ∀ (a : Fin D.R.rS) (j : Fin D.R.r), hA X.B.I (X.f0 a) (GlobalTheory.Mem.SymFrame.symVec X w j) - (if j = GlobalTheory.Mem.SymChar.Resid.posE D a then 1 else 0) ∈ GlobalTheory.Mem.SymChar.wInt X w := by
+theorem hA_symVec_sub_ite_mem_wInt
+    : ∀ (D : D7) (X : HidaSetting D) (w : HeightOneSpectrum (𝓞 D.host.E)) (k : Fin 2),
+      ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ w.asIdeal
+        → ∀ (a : Fin D.R.rS) (j : Fin D.R.r),
+          hA X.B.I (X.f0 a) (GlobalTheory.Mem.SymFrame.symVec X w j)
+              - (if j = GlobalTheory.Mem.SymChar.Resid.posE D a then 1 else 0)
+            ∈ GlobalTheory.Mem.SymChar.wInt X w := by
   intro D X w k hg a j
   have hW : ∀ i, ZMod' X.B.I X.B.g (hA X.B.I (X.f0 a) (GlobalTheory.Mem.SymFrame.epsW X w i)) := by
     intro i
@@ -26,14 +37,18 @@ theorem hA_symVec_sub_ite_mem_wInt : ∀ (D : D7) (X : HidaSetting D) (w : Heigh
   unfold GlobalTheory.Mem.SymFrame.symVec GlobalTheory.SeeConjRead.flagV
   by_cases h1 : j.1 < D.R.rS
   · rw [dite_eq_left h1]
-    have h := Formalism.L2.SG.Pf.unitaryCongruence.Z_sig X.B.I X.B.g (X.gramIntegral ⟨j.1, h1⟩ a).2.2
+    have h :=
+      Formalism.L2.SG.Pf.unitaryCongruence.Z_sig X.B.I X.B.g (X.gramIntegral ⟨j.1, h1⟩ a).2.2
     rw [map_sub, ← Formalism.L2.SG.Pf.unitaryCongruence.hA_symm] at h
     by_cases e : j = GlobalTheory.Mem.SymChar.Resid.posE D a
     · rw [if_pos e]
-      rwa [if_pos (Fin.ext (by have := congrArg Fin.val e; simp only at this ⊢; omega)), map_one] at h
+      rwa [if_pos (Fin.ext (by have := congrArg Fin.val e; simp only at this ⊢; omega)), map_one] at
+        h
     · rw [if_neg e]
-      rwa [if_neg (fun h' => e (Fin.ext (by have := congrArg Fin.val h'; simp only at this; omega))),
-        map_zero] at h
+      rwa [if_neg (fun h' =>
+            e (Fin.ext (by have := congrArg Fin.val h'; simp only at this; omega))),
+          map_zero]
+        at h
   rw [dite_eq_right h1]
   have hne : ¬ j = GlobalTheory.Mem.SymChar.Resid.posE D a := fun e => by
     have := congrArg Fin.val e; rw [hpos] at this; omega

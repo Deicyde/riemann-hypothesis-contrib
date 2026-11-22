@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open Finset MvPolynomial UpperTheory.Gal.Schur
 
-theorem UpperTheory.Gal.Schur.denseOff :
-    DenseOff := by
+theorem UpperTheory.Gal.Schur.denseOff : DenseOff := by
   intro K σ _ D hD Q hQ P hP
   have hPQ : P * Q = 0 := by
     apply hD

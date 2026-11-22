@@ -6,13 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocalTwistCo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.G3
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  PositivityTheory.Rg.BcB.G3
 open scoped Classical TensorProduct
 
 namespace PositivityTheory.Rg.BcB.G3.FinCl2P
 
-theorem rel_of_eqvGen {G : Type} [Group G] (θ : G →* G) {x y : G}
-    (h : Relation.EqvGen (fun x y : G => ∃ g, y = g⁻¹ * x * θ g) x y) : ∃ g, y = g⁻¹ * x * θ g := by
+theorem rel_of_eqvGen
+    {G : Type} [Group G]
+    (θ : G →* G)
+    {x y : G} (h : Relation.EqvGen (fun x y : G => ∃ g, y = g⁻¹ * x * θ g) x y)
+    : ∃ g, y = g⁻¹ * x * θ g := by
   induction h with
   | rel a b hab => exact hab
   | refl a => exact ⟨1, by simp⟩
@@ -24,19 +29,22 @@ theorem rel_of_eqvGen {G : Type} [Group G] (θ : G →* G) {x y : G}
     obtain ⟨k, rfl⟩ := ih2
     exact ⟨g * k, by rw [map_mul]; group⟩
 
-theorem twConj_of_mk_eq {G : Type} [Group G] {θ : G →* G} {x y : G}
-    (h : (Quot.mk _ x : TwCl θ) = Quot.mk _ y) : ∃ g, y = g⁻¹ * x * θ g :=
+theorem twConj_of_mk_eq
+    {G : Type} [Group G] {θ : G →* G} {x y : G} (h : (Quot.mk _ x : TwCl θ) = Quot.mk _ y)
+    : ∃ g, y = g⁻¹ * x * θ g :=
   rel_of_eqvGen θ (Quot.eqvGen_exact h)
 
-theorem rep_mk {G : Type} [Group G] {θ : G →* G} (y : G) :
-    ∃ g, TwCl.rep (Quot.mk _ y : TwCl θ) = g⁻¹ * y * θ g :=
+theorem rep_mk {G : Type} [Group G] {θ : G →* G} (y : G)
+    : ∃ g, TwCl.rep (Quot.mk _ y : TwCl θ) = g⁻¹ * y * θ g :=
   twConj_of_mk_eq (θ := θ) (Quot.out_eq (Quot.mk _ y : TwCl θ)).symm
 
-theorem charpoly_rep_mk {E : Type} [Field E] [NumberField E] [IsCMField E] (hU : Unr E) (n : ℕ) (w : Pl E)
-    (y : GLw n w) : (nrmL n w (TwCl.rep (Quot.mk _ y : TwCl (thL n w)))).val.charpoly = (nrmL n w y).val.charpoly := by
+theorem charpoly_rep_mk
+    {E : Type} [Field E] [NumberField E] [IsCMField E] (hU : Unr E) (n : ℕ) (w : Pl E) (y : GLw n w)
+    : (nrmL n w (TwCl.rep (Quot.mk _ y : TwCl (thL n w)))).val.charpoly
+      = (nrmL n w y).val.charpoly := by
   obtain ⟨g, hg⟩ := rep_mk (θ := thL n w) y
-  rw [hg, GlobalTheory.BCT.ThBasic.nrmL_twist hU n w g y, Units.val_mul, Units.val_mul, Matrix.coe_units_inv,
-    Matrix.charpoly_units_conj']
+  rw [hg, GlobalTheory.BCT.ThBasic.nrmL_twist hU n w g y, Units.val_mul, Units.val_mul,
+    Matrix.coe_units_inv, Matrix.charpoly_units_conj']
 
 end PositivityTheory.Rg.BcB.G3.FinCl2P
 
@@ -44,7 +52,8 @@ open PositivityTheory.Rg.BcB.G3.FinCl2P in
 theorem PositivityTheory.Rg.BcB.G3.finCl2_pf : FinCl2 := by
   intro E _ _ _ hU a b w Q₁ Q₂ h₁ h₂
   set θ := (thL a w).prodMap (thL b w) with hθ
-  let f : TwCl θ → TwCl (thL a w) × TwCl (thL b w) := fun l => (Quot.mk _ l.rep.1, Quot.mk _ l.rep.2)
+  let f : TwCl θ → TwCl (thL a w) × TwCl (thL b w) := fun l =>
+    (Quot.mk _ l.rep.1, Quot.mk _ l.rep.2)
   have hinj : Function.Injective f := by
     intro l l' hll'
     obtain ⟨g₁, hg₁⟩ := twConj_of_mk_eq (congrArg Prod.fst hll')

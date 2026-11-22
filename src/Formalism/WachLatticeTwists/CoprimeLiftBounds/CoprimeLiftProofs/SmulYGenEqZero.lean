@@ -15,10 +15,13 @@ open Formalism.NG
 section SlopeTestRemainingChoices
 variable {O : Type*} [CommRing O] {G : Type*} [Group G] {M : Type*} [AddCommGroup M] [Module O M]
 
-def cobZ (ρ : Representation O G M) (v : M) : coZ1s ρ :=
-  ⟨coD0 ρ v, fun g h => by
+def cobZ (ρ : Representation O G M) (v : M) : coZ1s ρ := ⟨
+  coD0 ρ v,
+  fun g h => by
     show ρ (g * h) v - v = (ρ g v - v) + ρ g (ρ h v - v)
-    rw [map_mul, map_sub, Module.End.mul_apply]; abel⟩
+    rw [map_mul, map_sub, Module.End.mul_apply]
+    abel
+⟩
 
 lemma mkQ_cobZ (ρ : Representation O G M) (v : M) :
     (Submodule.mkQ ((coB1 ρ).comap (coZ1s ρ).subtype) (cobZ ρ v) : H1z ρ) = 0 := by
@@ -71,7 +74,7 @@ theorem colChiC : StatColChiC := by
       coZ1s (resRep (uRep O (M := M) r χ) (D l))) : D l → M) ∈
     LinearMap.range (coD0 (resRep (uRep O (M := M) r χ) (D l)))
   rw [LinearMap.mem_range]
-  refine ⟨-φ (nuGen r χ E e₁ δ D j Kc k0 l), ?_⟩
+  refine ⟨- φ (nuGen r χ E e₁ δ D j Kc k0 l), ?_⟩
   funext g
   show uElt r χ (g : G) • -φ (nuGen r χ E e₁ δ D j Kc k0 l) - -φ (nuGen r χ E e₁ δ D j Kc k0 l) =
     φ (yGen r χ E e₁ δ D j Kc k0 (g : G))
@@ -85,12 +88,16 @@ theorem colChiOne : StatColChiOne := by
   intro O _ A T' G _ _ _ _ M _ _ _ _ r χ E e₁ δ δO ι _ D j Kc k0 ℓ e' u hu he hE hδ hk φ l
   obtain ⟨hnu, hsig, _, hy⟩ := rel A T' G M r χ E e₁ δ ι D j Kc k0 φ l
   have hs : ∀ a, φ (sigGen r χ E e₁ δ D j Kc k0 l a) = 0 := fun a => by rw [← hsig a, he]
-  have h2 : ∀ g ∈ D l, φ (yGen r χ E e₁ δ D j Kc k0 g) =
-      (δO * δO * (ℓ : O) ^ e' l * u l g) • φ (sigmaZeroColumnGenerator r χ E e₁ δ D j Kc k0 l) := by
+  have h2
+      : ∀ g ∈ D l,
+        φ (yGen r χ E e₁ δ D j Kc k0 g)
+          = (δO * δO * (ℓ : O) ^ e' l * u l g)
+            • φ (sigmaZeroColumnGenerator r χ E e₁ δ D j Kc k0 l) := by
     intro g hg
     have h := hy g hg
     simp only [hs, smul_zero, Finset.sum_const_zero, zero_add, hu, sub_self, add_zero, hk l g hg,
-      hδ] at h
+        hδ]
+      at h
     rw [h, smul_smul]
     congr 1
     ring
@@ -100,8 +107,11 @@ theorem colChiOne : StatColChiOne := by
       (restrictCocycles1 (uRep O (M := M) r χ) (D l) (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ))) =
     (0 : H1z (resRep (resRep (uRep O (M := M) r χ) (D l)) I))
   rw [Submodule.Quotient.mk_eq_zero]
-  have hz : restrictCocycles1 (resRep (uRep O (M := M) r χ) (D l)) I
-      (restrictCocycles1 (uRep O (M := M) r χ) (D l) (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ)) = 0 := by
+  have hz
+      : restrictCocycles1 (resRep (uRep O (M := M) r χ) (D l)) I
+          (restrictCocycles1 (uRep O (M := M) r χ) (D l)
+            (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ))
+        = 0 := by
     apply Subtype.ext
     funext g
     show φ (yGen r χ E e₁ δ D j Kc k0 ((g : D l) : G)) = 0
@@ -122,12 +132,14 @@ theorem unrOutside : StatUnrOutside := by
       (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ)) =
     (0 : H1z (resRep (uRep O (M := M) r χ) I))
   rw [Submodule.Quotient.mk_eq_zero]
-  have hz : restrictCocycles1 (uRep O (M := M) r χ) I (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ) = 0 := by
+  have hz
+      : restrictCocycles1 (uRep O (M := M) r χ) I (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ)
+        = 0 := by
     apply Subtype.ext
     funext g
     show φ (yGen r χ E e₁ δ D j Kc k0 (g : G)) = 0
-    have h0 := smul_yGen_eq_zero r χ E e₁ δ D j Kc k0 (1 : A) (g : G)
-      (by rw [one_mul]; exact hy g g.2)
+    have h0 :=
+      smul_yGen_eq_zero r χ E e₁ δ D j Kc k0 (1 : A) (g : G) (by rw [one_mul]; exact hy g g.2)
     rw [one_smul] at h0
     rw [h0, map_zero]
   rw [hz]
@@ -139,15 +151,18 @@ theorem unrS : StatUnrS := by
     intro g hg
     obtain ⟨a, ha, hinj⟩ := hI g hg
     apply hinj
-    rw [← map_smul, smul_yGen_eq_zero r χ E e₁ δ D j Kc k0 a g
-      (by rw [ycoc_eq, mul_smul_comm, ha, smul_zero]), map_zero]
+    rw [← map_smul,
+      smul_yGen_eq_zero r χ E e₁ δ D j Kc k0 a g (by rw [ycoc_eq, mul_smul_comm, ha, smul_zero]),
+      map_zero]
   refine ⟨hy0, ?_⟩
   apply LinearMap.mem_ker.mpr
   show Submodule.Quotient.mk (restrictCocycles1 (uRep O (M := M) r χ) I
       (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ)) =
     (0 : H1z (resRep (uRep O (M := M) r χ) I))
   rw [Submodule.Quotient.mk_eq_zero]
-  have hz : restrictCocycles1 (uRep O (M := M) r χ) I (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ) = 0 := by
+  have hz
+      : restrictCocycles1 (uRep O (M := M) r χ) I (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ)
+        = 0 := by
     apply Subtype.ext
     funext g
     show φ (yGen r χ E e₁ δ D j Kc k0 (g : G)) = 0

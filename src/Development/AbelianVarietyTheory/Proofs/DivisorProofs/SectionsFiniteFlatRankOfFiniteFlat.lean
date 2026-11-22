@@ -8,18 +8,20 @@ open AlgebraicGeometry CategoryTheory CategoryTheory.Limits
 
 namespace GlobalTheory
 
-theorem isPullback_fromSpec_app_preimage_of_affine {X T : Scheme.{0}} (p : X ⟶ T) {U : T.Opens}
-    (hU : IsAffineOpen U) (hV : IsAffineOpen (p ⁻¹ᵁ U)) :
-    IsPullback hV.fromSpec (Spec.map (p.app U)) p hU.fromSpec :=
-  (IsOpenImmersion.isPullback _ _ _ _ (by
-    rw [Scheme.Hom.app_eq_appLE, IsAffineOpen.SpecMap_appLE_fromSpec p hU hV]) (by simp)).flip
+theorem isPullback_fromSpec_app_preimage_of_affine
+    {X T : Scheme.{0}} (p : X ⟶ T) {U : T.Opens} (hU : IsAffineOpen U) (hV : IsAffineOpen (p ⁻¹ᵁ U))
+    : IsPullback hV.fromSpec (Spec.map (p.app U)) p hU.fromSpec :=
+  (IsOpenImmersion.isPullback _ _ _ _
+    (by rw [Scheme.Hom.app_eq_appLE, IsAffineOpen.SpecMap_appLE_fromSpec p hU hV]) (by simp)).flip
 
-theorem sections_finite_flat_rank_of_finite_flat :
-    ∀ (X T : Scheme.{0}) (p : X ⟶ T) [IsFinite p] [Flat p] (r : ℕ), (∀ t, p.finrank t = r) →
-      ∀ (U : T.Opens), IsAffineOpen U →
-        letI := (p.app U).hom.toAlgebra;
-        Module.Finite Γ(T, U) Γ(X, p ⁻¹ᵁ U) ∧ Module.Flat Γ(T, U) Γ(X, p ⁻¹ᵁ U) ∧
-          ∀ q : PrimeSpectrum Γ(T, U), Module.rankAtStalk Γ(X, p ⁻¹ᵁ U) q = r := by
+theorem sections_finite_flat_rank_of_finite_flat
+    : ∀ (X T : Scheme.{0}) (p : X ⟶ T) [IsFinite p] [Flat p] (r : ℕ),
+      (∀ t, p.finrank t = r)
+        → ∀ (U : T.Opens),
+          IsAffineOpen U
+            → letI := (p.app U).hom.toAlgebra
+              Module.Finite Γ(T, U) Γ(X, p ⁻¹ᵁ U) ∧ Module.Flat Γ(T, U) Γ(X, p ⁻¹ᵁ U)
+                ∧ ∀ q : PrimeSpectrum Γ(T, U), Module.rankAtStalk Γ(X, p ⁻¹ᵁ U) q = r := by
   intro X T p _ _ r hr U hU
   have hV : IsAffineOpen (p ⁻¹ᵁ U) := hU.preimage p
   have hpb := isPullback_fromSpec_app_preimage_of_affine p hU hV

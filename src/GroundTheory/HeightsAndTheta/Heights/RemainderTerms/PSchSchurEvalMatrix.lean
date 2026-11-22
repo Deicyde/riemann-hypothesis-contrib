@@ -14,10 +14,10 @@ open MvPolynomial Finset
 
 noncomputable section
 
-theorem SchSchurEvalMatrix.aeval_completeSymmetric (h1 : SchCompleteAtRootsOfUnity.Statement)
-    (N k : ℕ) (hk : 1 ≤ k) (hkN : k ≤ N) (d : ℤ) :
-    aeval (rootOfUnityPoint N k) (completeSymmetric (Fin N) d) =
-      if 0 ≤ d ∧ (k : ℤ) ∣ d then 1 else 0 := by
+theorem SchSchurEvalMatrix.aeval_completeSymmetric
+    (h1 : SchCompleteAtRootsOfUnity.Statement) (N k : ℕ) (hk : 1 ≤ k) (hkN : k ≤ N) (d : ℤ)
+    : aeval (rootOfUnityPoint N k) (completeSymmetric (Fin N) d)
+      = if 0 ≤ d ∧ (k : ℤ) ∣ d then 1 else 0 := by
   unfold completeSymmetric
   by_cases h0 : 0 ≤ d
   · rw [if_pos h0, h1 N k d.toNat hk hkN]
@@ -28,8 +28,8 @@ theorem SchSchurEvalMatrix.aeval_completeSymmetric (h1 : SchCompleteAtRootsOfUni
     · rw [if_neg (fun h => hd (hdiv.mp h)), if_neg (fun h => hd h.2)]
   · rw [if_neg h0, map_zero, if_neg (fun h => h0 h.1)]
 
-theorem SchSchurEvalMatrix.proof (h1 : SchCompleteAtRootsOfUnity.Statement) :
-    SchSchurEvalMatrix.Statement := by
+theorem SchSchurEvalMatrix.proof (h1 : SchCompleteAtRootsOfUnity.Statement)
+    : SchSchurEvalMatrix.Statement := by
   intro N k r nu hk hkN
   unfold schur
   rw [AlgHom.map_det]

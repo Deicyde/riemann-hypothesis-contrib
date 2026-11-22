@@ -37,8 +37,12 @@ private lemma avg_indep (Pa : Parts C) {K : Coef C} (hK : Pa.Add K) {Q P : C ⥤
   change (K.map (S.f s)).hom _ = (K.map (S.f s)).hom _
   rw [sum_transport, sum_transport, hm s]
 
-private def lift (Pa : Parts C) {Q P : C ⥤ Type} {p : Q ⟶ P} {I : Type} [Fintype I]
-    {g : I → (Q ⟶ Q)} (h : Pa.LocTrans p g) (A : C) (y : P.obj A) : Q.obj A :=
+private def lift
+    (Pa : Parts C)
+    {Q P : C ⥤ Type} {p : Q ⟶ P} {I : Type} [Fintype I]
+    {g : I → (Q ⟶ Q)} (h : Pa.LocTrans p g)
+    (A : C) (y : P.obj A)
+    : Q.obj A :=
   Classical.choose ((show ∀ A, Function.Surjective (p.app A) from h.2.1) A y)
 
 private lemma lift_spec (Pa : Parts C) {Q P : C ⥤ Type} {p : Q ⟶ P} {I : Type} [Fintype I]
@@ -46,18 +50,25 @@ private lemma lift_spec (Pa : Parts C) {Q P : C ⥤ Type} {p : Q ⟶ P} {I : Typ
     p.app A (lift Pa h A y) = y :=
   Classical.choose_spec ((show ∀ A, Function.Surjective (p.app A) from h.2.1) A y)
 
-private def avg (Pa : Parts C) {K : Coef C} (hK : Pa.Add K) {Q P : C ⥤ Type} {p : Q ⟶ P}
-    {I : Type} [Fintype I] {g : I → (Q ⟶ Q)} (h : Pa.LocTrans p g) (c : Sec Q K) : Sec P K :=
-  ⟨fun A y => ∑ i, c.1 A ((g i).app A (lift Pa h A y)), by
+private def avg
+    (Pa : Parts C)
+    {K : Coef C} (hK : Pa.Add K)
+    {Q P : C ⥤ Type} {p : Q ⟶ P} {I : Type} [Fintype I]
+    {g : I → (Q ⟶ Q)} (h : Pa.LocTrans p g)
+    (c : Sec Q K)
+    : Sec P K := ⟨
+  fun A y => ∑ i, c.1 A ((g i).app A (lift Pa h A y)),
+  by
     intro A B φ y
     have hw : p.app B (Q.map φ (lift Pa h A y)) = p.app B (lift Pa h B (P.map φ y)) := by
       rw [lift_spec, NatTrans.naturality_apply p φ, lift_spec]
-    change (K.map φ).hom (∑ i, c.1 A ((g i).app A (lift Pa h A y))) =
-      ∑ i, c.1 B ((g i).app B (lift Pa h B (P.map φ y)))
+    change (K.map φ).hom (∑ i, c.1 A ((g i).app A (lift Pa h A y)))
+      = ∑ i, c.1 B ((g i).app B (lift Pa h B (P.map φ y)))
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← avg_indep Pa hK h c hw, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    rw [sec_nat c φ, ← NatTrans.naturality_apply (g i) φ]⟩
+    rw [sec_nat c φ, ← NatTrans.naturality_apply (g i) φ]
+⟩
 
 private lemma avg_apply (Pa : Parts C) {K : Coef C} (hK : Pa.Add K) {Q P : C ⥤ Type} {p : Q ⟶ P}
     {I : Type} [Fintype I] {g : I → (Q ⟶ Q)} (h : Pa.LocTrans p g) (c : Sec Q K) (A : C)
@@ -120,8 +131,8 @@ private lemma step (Pa : Parts C) (T : Theory C) {Q P : C ⥤ Type} (p : Q ⟶ P
 end UpperTheory.Ru.crystallineComparison
 
 open CategoryTheory CategoryTheory.Limits UpperTheory.Ru.crystallineComparison in
-theorem UpperTheory.Ru.crystallineComparison.locAvg :
-    UpperTheory.Ru.crystallineComparison.LocAvg := by
+theorem UpperTheory.Ru.crystallineComparison.locAvg
+    : UpperTheory.Ru.crystallineComparison.LocAvg := by
   intro C _ Pa T F hF Q P p I _ g h j
   induction j generalizing F with
   | zero =>
@@ -138,14 +149,16 @@ theorem UpperTheory.Ru.crystallineComparison.locAvg :
   | succ j ih =>
     intro x hx
     obtain ⟨K, ι, hm, hi, hK⟩ := emb C Pa F hF
-    have hS : (ShortComplex.mk ι (cokernel.π ι) (cokernel.condition ι)).ShortExact :=
-      { exact := ShortComplex.exact_cokernel ι, mono_f := hm, epi_g := inferInstance }
+    have hS : (ShortComplex.mk ι (cokernel.π ι) (cokernel.condition ι)).ShortExact := {
+      exact := ShortComplex.exact_cokernel ι
+      mono_f := hm
+      epi_g := inferInstance
+    }
     have hL : Pa.Add (cokernel ι) := quotAdd C Pa _ hS hF hK
     refine step Pa T p _ _ hS hi j ?_ x hx
     intro x' k hk
     cases j with
-    | zero =>
-      exact zero_case Pa T hK hL h _ x' k hk
+    | zero => exact zero_case Pa T hK hL h _ x' k hk
     | succ j =>
       have hk0 : k = 0 := (T.inj Q K hi j).elim _ _
       rw [hk0, map_zero] at hk

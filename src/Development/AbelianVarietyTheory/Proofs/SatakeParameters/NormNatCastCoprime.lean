@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.TauPlBije
 
 @[expose] public section
 
-open Formalism.MainNotions.G Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric NumberField
+open Formalism.MainNotions.G Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric NumberField
 
 noncomputable section
 
@@ -21,33 +22,41 @@ variable {E : Type} [Field E] [StarRing E] {N : ℕ}
 
 theorem stdH_eq (x y : Fin N → E) : stdH E N x y = star x ⬝ᵥ y := rfl
 
-theorem stdH_mulVec (γ : Matrix.unitaryGroup (Fin N) E) (x y : Fin N → E) :
-    stdH E N ((γ : Matrix (Fin N) (Fin N) E).mulVec x) ((γ : Matrix (Fin N) (Fin N) E).mulVec y) = stdH E N x y := by
+theorem stdH_mulVec (γ : Matrix.unitaryGroup (Fin N) E) (x y : Fin N → E)
+    : stdH E N ((γ : Matrix (Fin N) (Fin N) E).mulVec x) ((γ : Matrix (Fin N) (Fin N) E).mulVec y)
+      = stdH E N x y := by
   have h : (γ : Matrix (Fin N) (Fin N) E).conjTranspose * (γ : Matrix (Fin N) (Fin N) E) = 1 :=
     Matrix.mem_unitaryGroup_iff'.1 γ.2
-  rw [stdH_eq, stdH_eq, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, h, Matrix.one_mulVec]
+  rw [stdH_eq, stdH_eq, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, h,
+    Matrix.one_mulVec]
 
-theorem mulVec_surjective (γ : Matrix.unitaryGroup (Fin N) E) :
-    Function.Surjective (γ : Matrix (Fin N) (Fin N) E).mulVec := by
+theorem mulVec_surjective (γ : Matrix.unitaryGroup (Fin N) E)
+    : Function.Surjective (γ : Matrix (Fin N) (Fin N) E).mulVec := by
   intro y
   have h : (γ : Matrix (Fin N) (Fin N) E) * star (γ : Matrix (Fin N) (Fin N) E) = 1 :=
     Matrix.mem_unitaryGroup_iff.1 γ.2
-  exact ⟨(star (γ : Matrix (Fin N) (Fin N) E)).mulVec y, by rw [Matrix.mulVec_mulVec, h, Matrix.one_mulVec]⟩
+  exact ⟨
+    (star (γ : Matrix (Fin N) (Fin N) E)).mulVec y,
+    by rw [Matrix.mulVec_mulVec, h, Matrix.one_mulVec]
+  ⟩
 
 variable [NumberField E]
 
-theorem mem_smulLat (γ : Matrix (Fin N) (Fin N) E) (L : Submodule (𝓞 E) (Fin N → E)) (y : Fin N → E) :
-    y ∈ SDLat.smulLat γ L ↔ ∃ x ∈ L, γ.mulVec x = y := by
+theorem mem_smulLat (γ : Matrix (Fin N) (Fin N) E) (L : Submodule (𝓞 E) (Fin N → E)) (y : Fin N → E)
+    : y ∈ SDLat.smulLat γ L ↔ ∃ x ∈ L, γ.mulVec x = y := by
   unfold SDLat.smulLat
   rw [Submodule.mem_map]
   rfl
 
-theorem isSDLat_smulLat (γ : Matrix.unitaryGroup (Fin N) E) {L : Submodule (𝓞 E) (Fin N → E)} (hL : IsSDLat E N L) :
-    IsSDLat E N (SDLat.smulLat (γ : Matrix (Fin N) (Fin N) E) L) := by
+theorem isSDLat_smulLat
+    (γ : Matrix.unitaryGroup (Fin N) E) {L : Submodule (𝓞 E) (Fin N → E)} (hL : IsSDLat E N L)
+    : IsSDLat E N (SDLat.smulLat (γ : Matrix (Fin N) (Fin N) E) L) := by
   obtain ⟨h1, h2, h3⟩ := hL
   refine ⟨h1.map _, ?_, fun y => ?_⟩
-  · have e : (SDLat.smulLat (γ : Matrix (Fin N) (Fin N) E) L : Set (Fin N → E)) =
-        (Matrix.toLin' (γ : Matrix (Fin N) (Fin N) E)) '' (L : Set (Fin N → E)) := rfl
+  · have e
+        : (SDLat.smulLat (γ : Matrix (Fin N) (Fin N) E) L : Set (Fin N → E))
+          = (Matrix.toLin' (γ : Matrix (Fin N) (Fin N) E)) '' (L : Set (Fin N → E)) :=
+      rfl
     rw [e, ← Submodule.map_span, h2, Submodule.map_top, LinearMap.range_eq_top]
     exact mulVec_surjective γ
   · obtain ⟨y, rfl⟩ := mulVec_surjective γ y

@@ -11,20 +11,34 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Wei
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.SiegJoin GlobalTheory.TChart
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.SiegJoin
+  GlobalTheory.TChart
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.WeilDomain
 
-theorem appTop_spMap_inv {A B : Type} [CommRing A] [CommRing B] (g : A →+* B) (a : A) :
-    (spMap g).appTop.hom ((Scheme.ΓSpecIso (CommRingCat.of A)).inv.hom a) =
-      (Scheme.ΓSpecIso (CommRingCat.of B)).inv.hom (g a) :=
+theorem appTop_spMap_inv {A B : Type} [CommRing A] [CommRing B] (g : A →+* B) (a : A)
+    : (spMap g).appTop.hom ((Scheme.ΓSpecIso (CommRingCat.of A)).inv.hom a)
+      = (Scheme.ΓSpecIso (CommRingCat.of B)).inv.hom (g a) :=
   (congrArg (fun q => q.hom a) (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom g))).symm
 
-theorem weilIs_of_fractionField : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (P : PolAV (Sp R)) (W L : Type) [CommRing W] [IsDomain W] [Field L] [Algebra W L] [IsFractionRing W L] (f : R →+* W) (e : Over.mk (spMap ((algebraMap W L).comp f)) ⟶ Over.mk (spMap f)), e.left = spMap (algebraMap W L) → ∀ (n : ℕ) (x y : Over.mk (spMap f) ⟶ P.A), x ^ n = 1 → y ^ n = 1 → ∀ (w : Wˣ), Out.WeilIs P.A P.L n (e ≫ x) (e ≫ y) (unitOn (Units.map (algebraMap W L).toMonoidHom w)) → Out.WeilIs P.A P.L n x y (unitOn w) := by
+theorem weilIs_of_fractionField
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (P : PolAV (Sp R)) (W L : Type) [CommRing W]
+        [IsDomain W] [Field L] [Algebra W L] [IsFractionRing W L] (f : R →+* W)
+        (e : Over.mk (spMap ((algebraMap W L).comp f)) ⟶ Over.mk (spMap f)),
+      e.left = spMap (algebraMap W L)
+        → ∀ (n : ℕ) (x y : Over.mk (spMap f) ⟶ P.A),
+          x ^ n = 1 → y ^ n = 1
+            → ∀ (w : Wˣ),
+              Out.WeilIs P.A P.L n (e ≫ x) (e ≫ y)
+                  (unitOn (Units.map (algebraMap W L).toMonoidHom w))
+                → Out.WeilIs P.A P.L n x y (unitOn w) := by
   intro R _ _ P W L _ _ _ _ _ f e he n x y hx hy w H
   have hL := (GlobalTheory.firstFiveLaws).1
   obtain ⟨c, hc, -⟩ := (hL.weil _ P n (Over.mk (spMap f))).1 x y hx hy

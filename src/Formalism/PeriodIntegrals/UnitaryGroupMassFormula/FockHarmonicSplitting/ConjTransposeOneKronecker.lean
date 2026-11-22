@@ -40,20 +40,26 @@ lemma omE_apply_of_ne {l l' : Ln p q r s} (h : l ≠ l') (P : Pol p q r s) :
     omE l l' P = raiB l (lowB l' P) := by
   rw [FockH1Action.omE, if_neg h, add_zero]; rfl
 
-private theorem raiB_apply_eq_X_mul_of_linePos {m : FockH1Action.Ln p q r s} (h : FockH1Action.linePos m = true)
-    (P : FockH1Action.Pol p q r s) : FockH1Action.raiB m P = X m * P := by
+private theorem raiB_apply_eq_X_mul_of_linePos
+    {m : FockH1Action.Ln p q r s} (h : FockH1Action.linePos m = true) (P : FockH1Action.Pol p q r s)
+    : FockH1Action.raiB m P = X m * P := by
   rw [FockH1Action.raiB, if_pos h]; rfl
 
-private theorem raiB_apply_eq_neg_pderiv_of_not_linePos {m : FockH1Action.Ln p q r s} (h : FockH1Action.linePos m = false)
-    (P : FockH1Action.Pol p q r s) : FockH1Action.raiB m P = -(pderiv m P) := by
+private theorem raiB_apply_eq_neg_pderiv_of_not_linePos
+    {m : FockH1Action.Ln p q r s} (h : FockH1Action.linePos m = false)
+    (P : FockH1Action.Pol p q r s)
+    : FockH1Action.raiB m P = -(pderiv m P) := by
   rw [FockH1Action.raiB, if_neg (by simp [h])]; rfl
 
-private theorem lowB_apply_eq_pderiv_of_linePos {m : FockH1Action.Ln p q r s} (h : FockH1Action.linePos m = true)
-    (P : FockH1Action.Pol p q r s) : FockH1Action.lowB m P = pderiv m P := by
+private theorem lowB_apply_eq_pderiv_of_linePos
+    {m : FockH1Action.Ln p q r s} (h : FockH1Action.linePos m = true) (P : FockH1Action.Pol p q r s)
+    : FockH1Action.lowB m P = pderiv m P := by
   rw [FockH1Action.lowB, if_pos h]; rfl
 
-private theorem lowB_apply_eq_X_mul_of_not_linePos {m : FockH1Action.Ln p q r s} (h : FockH1Action.linePos m = false)
-    (P : FockH1Action.Pol p q r s) : FockH1Action.lowB m P = X m * P := by
+private theorem lowB_apply_eq_X_mul_of_not_linePos
+    {m : FockH1Action.Ln p q r s} (h : FockH1Action.linePos m = false)
+    (P : FockH1Action.Pol p q r s)
+    : FockH1Action.lowB m P = X m * P := by
   rw [FockH1Action.lowB, if_neg (by simp [h])]; rfl
 
 lemma omE_adj {l l' : Ln p q r s} (h : linePos l ≠ linePos l') (P Q : Pol p q r s) :
@@ -147,14 +153,12 @@ lemma conjTranspose_one_kronecker (Z : Mat r s) :
   · subst hab; simp
   · rw [Matrix.one_apply_ne hab, Matrix.one_apply_ne (Ne.symm hab)]; simp
 
-theorem fockAct1_adj {Z : Mat p q} (hZ : IsPC Z) (P Q : Pol p q r s) :
-    fockInner (fockAct1 p q r s Z P) Q = - fockInner P (fockAct1 p q r s Zᴴ Q) := by
-  rw [fockAct1_eq, fockAct1_eq,
-    omAct_adj _ (mixed1 hZ), conjTranspose_kronecker_one]
+theorem fockAct1_adj {Z : Mat p q} (hZ : IsPC Z) (P Q : Pol p q r s)
+    : fockInner (fockAct1 p q r s Z P) Q = - fockInner P (fockAct1 p q r s Zᴴ Q) := by
+  rw [fockAct1_eq, fockAct1_eq, omAct_adj _ (mixed1 hZ), conjTranspose_kronecker_one]
 
-theorem fockAct2_adj {Z : Mat r s} (hZ : IsPC Z) (P Q : Pol p q r s) :
-    fockInner (fockAct2 p q r s Z P) Q = - fockInner P (fockAct2 p q r s Zᴴ Q) := by
-  rw [fockAct2_eq, fockAct2_eq,
-    omAct_adj _ (mixed2 hZ), conjTranspose_one_kronecker]
+theorem fockAct2_adj {Z : Mat r s} (hZ : IsPC Z) (P Q : Pol p q r s)
+    : fockInner (fockAct2 p q r s Z P) Q = - fockInner P (fockAct2 p q r s Zᴴ Q) := by
+  rw [fockAct2_eq, fockAct2_eq, omAct_adj _ (mixed2 hZ), conjTranspose_one_kronecker]
 
 end PI.FHS

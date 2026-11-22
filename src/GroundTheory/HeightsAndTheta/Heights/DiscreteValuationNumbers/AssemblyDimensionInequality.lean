@@ -31,7 +31,6 @@ theorem DimensionInequality.full : DimensionInequality.Statement.{u, v} :=
 theorem ReesAlgebraDim.full : ReesAlgebraDim.Statement.{u} :=
   ReesAlgebraDim.proof DimensionInequality.full.{u, u}
 
-theorem BlowUpModel.full : BlowUpModel.Statement.{u} :=
-  BlowUpModel.proof ReesAlgebraDim.full.{u}
+theorem BlowUpModel.full : BlowUpModel.Statement.{u} := BlowUpModel.proof ReesAlgebraDim.full.{u}
 
 end GroundTheory.Heights₂.Heights.NumbersDVR

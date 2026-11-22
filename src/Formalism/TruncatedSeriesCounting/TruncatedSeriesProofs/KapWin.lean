@@ -41,37 +41,40 @@ theorem kappa_window_bound : KapWin := by
     rw [Finset.card_eq_sum_ones]
     refine h.trans (Finset.sum_le_sum fun k _ => ?_)
     rw [← Finset.card_eq_sum_ones]
-    calc (S.filter (fun i => i ∈ W k)).card ≤ (W k).card := by
-          apply Finset.card_le_card
-          intro i hi
-          exact (Finset.mem_filter.mp hi).2
+    calc
+      (S.filter (fun i => i ∈ W k)).card ≤ (W k).card := by
+        apply Finset.card_le_card
+        intro i hi
+        exact (Finset.mem_filter.mp hi).2
       _ = L k := by simp [hWdef]
-  have hsumv : ((∑ i ∈ S, padicValInt ℓ i : ℕ) : ℝ) ≤
-      ∑ k, ((L k : ℝ) / ((ℓ : ℝ) - 1) + Real.logb ℓ D) := by
-    calc ((∑ i ∈ S, padicValInt ℓ i : ℕ) : ℝ)
-        ≤ ((∑ k, ∑ i ∈ S.filter (fun i => i ∈ W k), padicValInt ℓ i : ℕ) : ℝ) := by
-          exact_mod_cast sum_le_sum_cover W S hcov (fun i => padicValInt ℓ i)
-      _ = ∑ k, ((∑ i ∈ S.filter (fun i => i ∈ W k), padicValInt ℓ i : ℕ) : ℝ) := by
-          push_cast; rfl
+  have hsumv
+      : ((∑ i ∈ S, padicValInt ℓ i : ℕ) : ℝ)
+        ≤ ∑ k, ((L k : ℝ) / ((ℓ : ℝ) - 1) + Real.logb ℓ D) := by
+    calc
+      ((∑ i ∈ S, padicValInt ℓ i : ℕ) : ℝ)
+          ≤ ((∑ k, ∑ i ∈ S.filter (fun i => i ∈ W k), padicValInt ℓ i : ℕ) : ℝ) := by
+        exact_mod_cast sum_le_sum_cover W S hcov (fun i => padicValInt ℓ i)
+      _ = ∑ k, ((∑ i ∈ S.filter (fun i => i ∈ W k), padicValInt ℓ i : ℕ) : ℝ) := by push_cast; rfl
       _ ≤ ∑ k, ((L k : ℝ) / ((ℓ : ℝ) - 1) + Real.logb ℓ D) := by
-          refine Finset.sum_le_sum fun k _ => ?_
-          refine Formalism.WindowSums.arc_WindowSum ℓ (a k) (L k) D _ ?_ ?_ ?_
-          · intro i hi
-            exact (Finset.mem_filter.mp hi).2
-          · intro h0
-            have := (Finset.mem_filter.mp h0).1
-            simp [hSdef] at this
-          · intro i hi
-            exact hD i (Finset.mem_of_mem_erase (Finset.mem_filter.mp hi).1)
-  have hsplit : ∑ i ∈ S, (1 + ell + padicValInt ℓ i) =
-      S.card * (1 + ell) + ∑ i ∈ S, padicValInt ℓ i := by
+        refine Finset.sum_le_sum fun k _ => ?_
+        refine Formalism.WindowSums.arc_WindowSum ℓ (a k) (L k) D _ ?_ ?_ ?_
+        · intro i hi
+          exact (Finset.mem_filter.mp hi).2
+        · intro h0
+          have := (Finset.mem_filter.mp h0).1
+          simp [hSdef] at this
+        · intro i hi
+          exact hD i (Finset.mem_of_mem_erase (Finset.mem_filter.mp hi).1)
+  have hsplit
+      : ∑ i ∈ S, (1 + ell + padicValInt ℓ i) = S.card * (1 + ell) + ∑ i ∈ S, padicValInt ℓ i := by
     rw [Finset.sum_add_distrib, Finset.sum_const, smul_eq_mul]
   rw [hsplit]
   have hcardR : (S.card : ℝ) ≤ ((∑ k, L k : ℕ) : ℝ) := by exact_mod_cast hcard
   have hmul : (S.card : ℝ) * (1 + ell) ≤ ((∑ k, L k : ℕ) : ℝ) * (1 + ell) :=
     mul_le_mul_of_nonneg_right hcardR (by positivity)
-  have hgoal : ((S.card * (1 + ell) + ∑ i ∈ S, padicValInt ℓ i + ell : ℕ) : ℝ) =
-      (S.card : ℝ) * (1 + ell) + ((∑ i ∈ S, padicValInt ℓ i : ℕ) : ℝ) + ell := by
+  have hgoal
+      : ((S.card * (1 + ell) + ∑ i ∈ S, padicValInt ℓ i + ell : ℕ) : ℝ)
+        = (S.card : ℝ) * (1 + ell) + ((∑ i ∈ S, padicValInt ℓ i : ℕ) : ℝ) + ell := by
     push_cast; ring
   rw [hgoal]
   linarith

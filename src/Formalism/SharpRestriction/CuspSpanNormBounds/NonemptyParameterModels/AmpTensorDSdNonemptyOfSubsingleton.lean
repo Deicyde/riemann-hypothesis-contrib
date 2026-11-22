@@ -15,27 +15,30 @@ namespace Formalism.MainNotions.S.Inh
 
 section
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.ThB
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.ThB
 
-theorem amp_lamS_lo (R : Ranks) (P : HCParam R) (i : Fin R.r) (h : i.val < R.k - 1) :
-    lamS R P i = (P.v ⟨i.val, h⟩ : ℝ) := by
+theorem amp_lamS_lo (R : Ranks) (P : HCParam R) (i : Fin R.r) (h : i.val < R.k - 1)
+    : lamS R P i = (P.v ⟨i.val, h⟩ : ℝ) := by
   unfold lamS
   rw [dite_eq_left h]
 
-theorem amp_lamS_hi (R : Ranks) (P : HCParam R) (i : Fin R.r) (h : ¬ i.val < R.k - 1)
-    (h' : i.val - (R.k - 1) < R.m) : lamS R P i = -(P.b ⟨i.val - (R.k - 1), h'⟩ : ℝ) := by
+theorem amp_lamS_hi
+    (R : Ranks) (P : HCParam R) (i : Fin R.r) (h : ¬ i.val < R.k - 1) (h' : i.val - (R.k - 1) < R.m)
+    : lamS R P i = -(P.b ⟨i.val - (R.k - 1), h'⟩ : ℝ) := by
   unfold lamS
   rw [dite_eq_right h, dite_eq_left h']
 
-theorem amp_b_lt (R : Ranks) (P : HCParam R) (j : ℕ) (h : j + 1 < R.m) :
-    P.b ⟨j, by omega⟩ < P.b ⟨j + 1, h⟩ := by
+theorem amp_b_lt (R : Ranks) (P : HCParam R) (j : ℕ) (h : j + 1 < R.m)
+    : P.b ⟨j, by omega⟩ < P.b ⟨j + 1, h⟩ := by
   have h1 : ((R.t : ℚ) + 3) / 2 ≤ P.e ⟨j, by omega⟩ - P.b ⟨j, by omega⟩ := P.gap_be ⟨j, by omega⟩
   have h2 : ((R.t : ℚ) + 3) / 2 ≤ P.b ⟨j + 1, h⟩ - P.e ⟨j, by omega⟩ := P.gap_eb ⟨j, by omega⟩ h
   have ht : (0 : ℚ) ≤ (R.t : ℚ) := Nat.cast_nonneg _
   linarith
 
-private theorem strictAnti_of_succ_lt' (n : ℕ) (f : Fin n → ℝ)
-    (hf : ∀ (i : ℕ) (h : i + 1 < n), f ⟨i + 1, h⟩ < f ⟨i, by omega⟩) : StrictAnti f := by
+private theorem strictAnti_of_succ_lt'
+    (n : ℕ) (f : Fin n → ℝ) (hf : ∀ (i : ℕ) (h : i + 1 < n), f ⟨i + 1, h⟩ < f ⟨i, by omega⟩)
+    : StrictAnti f := by
   intro a b hab
   obtain ⟨a, ha⟩ := a
   obtain ⟨b, hb⟩ := b
@@ -71,7 +74,7 @@ private theorem strictAnti_lamS (R : Ranks) (P : HCParam R) : StrictAnti (lamS R
       have k1 := P.u_last_gt (by omega) (by omega)
       have k2' : P.u ⟨i + 1, by omega⟩ < P.v ⟨i, h2⟩ := P.v_gt_u ⟨i, h2⟩
       rw [e2] at k2'
-      have key : -P.b ⟨i + 1 - (R.k - 1), by omega⟩ < P.v ⟨i, h2⟩ := by
+      have key : - P.b ⟨i + 1 - (R.k - 1), by omega⟩ < P.v ⟨i, h2⟩ := by
         rw [e1]
         exact lt_trans k1 k2'
       exact_mod_cast key
@@ -104,7 +107,8 @@ theorem amp_isHCParam_lamSH (R : Ranks) (P : HCParam R) : IsHCParam (lamSH R P) 
   push_cast
   linarith [hz, hk]
 
-theorem amp_isHCParam_lamD (D : D7) (τ : D.what₂.Tau) : IsHCParam (lamD D τ) := amp_isHCParam_lamSH D.R (D.hc τ)
+theorem amp_isHCParam_lamD (D : D7) (τ : D.what₂.Tau) : IsHCParam (lamD D τ) :=
+  amp_isHCParam_lamSH D.R (D.hc τ)
 
 end
 

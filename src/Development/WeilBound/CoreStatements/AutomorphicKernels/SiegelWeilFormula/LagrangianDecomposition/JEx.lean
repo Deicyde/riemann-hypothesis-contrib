@@ -7,8 +7,11 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.Ald
 
@@ -27,11 +30,15 @@ theorem jEx : JEx := by
   have h1 : Continuous fun g : G2 σ Y => g.1.1 := Units.continuous_val.comp continuous_subtype_val
   have hv : Continuous fun g : G2 σ Y => (jHom d h b g).1 := by
     simp only [jHom_val, inFrame_eq]
-    exact (continuous_const.matrix_mul ((((continuous_const.matrix_mul h1).matrix_mul continuous_const).matrix_fromBlocks
-      continuous_const continuous_const continuous_const).matrix_submatrix _ _)).matrix_mul continuous_const
+    exact (continuous_const.matrix_mul
+        ((((continuous_const.matrix_mul h1).matrix_mul continuous_const).matrix_fromBlocks
+          continuous_const continuous_const continuous_const).matrix_submatrix _ _)).matrix_mul
+      continuous_const
   have hc : Continuous (jHom d h (Y := Y) b) := by
     refine Units.continuous_iff.2 ⟨hv, ?_⟩
-    have e : (fun g : G2 σ Y => ((jHom d h b g)⁻¹ : GL _ _).1) = fun g : G2 σ Y => (jHom d h b g⁻¹).1 :=
+    have e
+        : (fun g : G2 σ Y => ((jHom d h b g)⁻¹ : GL _ _).1)
+          = fun g : G2 σ Y => (jHom d h b g⁻¹).1 :=
       funext fun g => by rw [map_inv]
     rw [e]
     exact hv.comp continuous_inv

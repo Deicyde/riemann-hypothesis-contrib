@@ -6,7 +6,8 @@ public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
 open GlobalTheory.PRep (IsAdmissible)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -32,8 +33,11 @@ theorem compSt : CompSt := by
       have hT' : (π g').comp T ∈ homIn δ.π ρ ⊤ := by
         refine mem_homIn_top.2 fun h y => ?_
         have hc : Commute (embArch D.sp.cm.sig V.gram w h) g' := commute_embArch _ _ h hg'
-        have e1 : π g' (π (embArch D.sp.cm.sig V.gram w h) (T y)) = π (embArch D.sp.cm.sig V.gram w h) (π g' (T y)) := by
-          rw [← ContinuousLinearMap.mul_apply, ← ContinuousLinearMap.mul_apply, ← map_mul, ← map_mul, hc.eq]
+        have e1
+            : π g' (π (embArch D.sp.cm.sig V.gram w h) (T y))
+              = π (embArch D.sp.cm.sig V.gram w h) (π g' (T y)) := by
+          rw [← ContinuousLinearMap.mul_apply, ← ContinuousLinearMap.mul_apply, ← map_mul,
+            ← map_mul, hc.eq]
         simp only [ContinuousLinearMap.comp_apply]
         rw [(mem_homIn_top.1 hT) h y]
         exact e1
@@ -43,8 +47,7 @@ theorem compSt : CompSt := by
     refine ⟨hP.1, fun g v hv => ?_⟩
     set x := projArch D.sp.cm.sig V.gram w g
     set g' : GA D V := (embArch D.sp.cm.sig V.gram w x)⁻¹ * g
-    have hg' : projArch D.sp.cm.sig V.gram w g' = 1 := by
-      simp [g', x, map_mul, map_inv]
+    have hg' : projArch D.sp.cm.sig V.gram w g' = 1 := by simp [g', x, map_mul, map_inv]
     have hg : g = embArch D.sp.cm.sig V.gram w x * g' := by simp [g']
     rw [hg, map_mul, ContinuousLinearMap.mul_apply]
     exact hP.2 x _ (hcomm g' hg' v hv)

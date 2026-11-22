@@ -7,38 +7,42 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem cor_mul {K : Type} [CommRing K] (A B : Matrix (Fin 3) (Fin 3) K) (h0 : A 0 1 = 0) (h2 : A 2 1 = 0) :
-    (A * B).submatrix cor cor = A.submatrix cor cor * B.submatrix cor cor := by
+private theorem cor_mul
+    {K : Type} [CommRing K] (A B : Matrix (Fin 3) (Fin 3) K) (h0 : A 0 1 = 0) (h2 : A 2 1 = 0)
+    : (A * B).submatrix cor cor = A.submatrix cor cor * B.submatrix cor cor := by
   ext i j
   simp only [Matrix.submatrix_apply, Matrix.mul_apply, Fin.sum_univ_three, Fin.sum_univ_two]
   fin_cases i <;> fin_cases j <;> simp [cor, h0, h2]
 
-private theorem mid_mul' {K : Type} [CommRing K] (A B : Matrix (Fin 3) (Fin 3) K) (h0 : B 0 1 = 0) (h2 : B 2 1 = 0) :
-    (A * B) 1 1 = A 1 1 * B 1 1 := by
+private theorem mid_mul'
+    {K : Type} [CommRing K] (A B : Matrix (Fin 3) (Fin 3) K) (h0 : B 0 1 = 0) (h2 : B 2 1 = 0)
+    : (A * B) 1 1 = A 1 1 * B 1 1 := by
   simp [Matrix.mul_apply, Fin.sum_univ_three, h0, h2]
 
-private theorem cor_one' {K : Type} [CommRing K] :
-    (1 : Matrix (Fin 3) (Fin 3) K).submatrix cor cor = 1 :=
+private theorem cor_one' {K : Type} [CommRing K]
+    : (1 : Matrix (Fin 3) (Fin 3) K).submatrix cor cor = 1 :=
   Matrix.submatrix_one _ (by decide)
 
-private theorem cor_sub {K : Type} [CommRing K] (A : Matrix (Fin 3) (Fin 3) K) (t : K) :
-    (A - t • (1 : Matrix (Fin 3) (Fin 3) K)).submatrix cor cor = A.submatrix cor cor - t • 1 := by
+private theorem cor_sub {K : Type} [CommRing K] (A : Matrix (Fin 3) (Fin 3) K) (t : K)
+    : (A - t • (1 : Matrix (Fin 3) (Fin 3) K)).submatrix cor cor = A.submatrix cor cor - t • 1 := by
   simp [Matrix.submatrix_sub, Matrix.submatrix_smul, cor_one']
 
-private theorem cor_J {K : Type} [CommRing K] (A : Matrix (Fin 3) (Fin 3) K) :
-    (Jmat (R := K) 3 * Aᵀ * Jmat (R := K) 3).submatrix cor cor =
-      Jmat (R := K) 2 * (A.submatrix cor cor)ᵀ * Jmat (R := K) 2 := by
+private theorem cor_J {K : Type} [CommRing K] (A : Matrix (Fin 3) (Fin 3) K)
+    : (Jmat (R := K) 3 * Aᵀ * Jmat (R := K) 3).submatrix cor cor
+      = Jmat (R := K) 2 * (A.submatrix cor cor)ᵀ * Jmat (R := K) 2 := by
   ext i j
-  simp only [Matrix.submatrix_apply, Matrix.mul_apply, Matrix.transpose_apply, Fin.sum_univ_three, Fin.sum_univ_two]
+  simp only [Matrix.submatrix_apply, Matrix.mul_apply, Matrix.transpose_apply, Fin.sum_univ_three,
+    Fin.sum_univ_two]
   fin_cases i <;> fin_cases j <;> simp [Jmat, cor, Fin.rev]
 
-private theorem ordProd_three {H K : Type} [CommRing K] (r : H → Matrix (Fin 3) (Fin 3) K) (ψ : Fin 3 → H → K)
-    (x y z : H) : ordProd r ψ ![x, y, z] =
-      (r x - ψ 0 x • 1) * (r y - ψ 1 y • 1) * (r z - ψ 2 z • 1) := by
+private theorem ordProd_three
+    {H K : Type} [CommRing K] (r : H → Matrix (Fin 3) (Fin 3) K) (ψ : Fin 3 → H → K) (x y z : H)
+    : ordProd r ψ ![x, y, z] = (r x - ψ 0 x • 1) * (r y - ψ 1 y • 1) * (r z - ψ 2 z • 1) := by
   simp [ordProd, List.ofFn_succ, mul_assoc]
 
-private theorem ordProd_two {H K : Type} [CommRing K] (r : H → Matrix (Fin 2) (Fin 2) K) (ψ : Fin 2 → H → K)
-    (g : Fin 2 → H) : ordProd r ψ g = (r (g 0) - ψ 0 (g 0) • 1) * (r (g 1) - ψ 1 (g 1) • 1) := by
+private theorem ordProd_two
+    {H K : Type} [CommRing K] (r : H → Matrix (Fin 2) (Fin 2) K) (ψ : Fin 2 → H → K) (g : Fin 2 → H)
+    : ordProd r ψ g = (r (g 0) - ψ 0 (g 0) • 1) * (r (g 1) - ψ 1 (g 1) • 1) := by
   simp [ordProd, List.ofFn_succ]
 
 theorem UpperTheory.V.Fr.exists_frobenius_corner :

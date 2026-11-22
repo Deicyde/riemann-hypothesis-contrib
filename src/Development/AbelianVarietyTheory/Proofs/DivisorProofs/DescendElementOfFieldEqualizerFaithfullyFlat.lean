@@ -11,21 +11,24 @@ namespace GlobalTheory.SymDesc
 
 variable {R R₁ : Type} [CommRing R] [IsDomain R] [CommRing R₁] [Algebra R R₁]
 
-theorem injective_quotient (Q : Ideal R₁) (hQ : Q.comap (algebraMap R R₁) = ⊥) :
-    Function.Injective (algebraMap R (R₁ ⧸ Q)) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem injective_quotient (Q : Ideal R₁) (hQ : Q.comap (algebraMap R R₁) = ⊥)
+    : Function.Injective (algebraMap R (R₁ ⧸ Q)) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro r hr
   have : r ∈ Q.comap (algebraMap R R₁) := by
     rw [Ideal.mem_comap, ← Ideal.Quotient.eq_zero_iff_mem, Ideal.Quotient.mk_algebraMap]
     exact hr
   rwa [hQ, Ideal.mem_bot] at this
 
-theorem exists_sub_mem_of_under_eq_bot [IsIntegrallyClosed R] [CharZero R]
-    [Algebra.IsIntegral R R₁] (s : R₁)
+theorem exists_sub_mem_of_under_eq_bot
+    [IsIntegrallyClosed R] [CharZero R] [Algebra.IsIntegral R R₁]
+    (s : R₁)
     (hs : ∀ (K : Type) [Field K] (i₁ i₂ : R₁ →+* K),
       i₁.comp (algebraMap R R₁) = i₂.comp (algebraMap R R₁) → i₁ s = i₂ s)
-    (Q : Ideal R₁) [Q.IsPrime] (hQ : Q.comap (algebraMap R R₁) = ⊥) :
-    ∃ e : R, s - algebraMap R R₁ e ∈ Q := by
+    (Q : Ideal R₁) [Q.IsPrime]
+    (hQ : Q.comap (algebraMap R R₁) = ⊥)
+    : ∃ e : R, s - algebraMap R R₁ e ∈ Q := by
   classical
   let A := R₁ ⧸ Q
   let K₀ := FractionRing A
@@ -49,12 +52,15 @@ theorem exists_sub_mem_of_under_eq_bot [IsIntegrallyClosed R] [CharZero R]
       first | rfl | exact Ideal.Quotient.mk_algebraMap _ _ | simp [A]
     simp only [π, RingHom.comp_apply]
     rw [hq, ← IsScalarTower.algebraMap_apply R A K₀, ← IsScalarTower.algebraMap_apply R F K₀]
-  obtain ⟨e', he'⟩ := GlobalTheory.mem_range_of_forall_algHom_eq F K₀ inferInstance (π s) (by
-    intro Ω _ _ φ₁ φ₂
-    have h := hs Ω (φ₁.toRingHom.comp π) (φ₂.toRingHom.comp π) (by
-      ext r
-      simp only [RingHom.comp_apply, hπ, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, AlgHom.commutes])
-    simpa using h)
+  obtain ⟨e', he'⟩ :=
+    GlobalTheory.mem_range_of_forall_algHom_eq F K₀ inferInstance (π s) (by
+      intro Ω _ _ φ₁ φ₂
+      have h :=
+        hs Ω (φ₁.toRingHom.comp π) (φ₂.toRingHom.comp π) (by
+          ext r
+          simp only [RingHom.comp_apply, hπ, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+            AlgHom.commutes])
+      simpa using h)
   have hint : IsIntegral R (π s) := by
     have h1 : IsIntegral R (Ideal.Quotient.mk Q s) := Algebra.IsIntegral.isIntegral _
     exact h1.map (IsScalarTower.toAlgHom R A K₀)
@@ -66,16 +72,18 @@ theorem exists_sub_mem_of_under_eq_bot [IsIntegrallyClosed R] [CharZero R]
   rw [← Ideal.Quotient.eq_zero_iff_mem]
   apply IsFractionRing.injective A K₀
   rw [map_zero]
-  have h : π (s - algebraMap R R₁ y) = 0 := by
-    rw [RingHom.map_sub, hπ, hy, he', sub_self]
+  have h : π (s - algebraMap R R₁ y) = 0 := by rw [RingHom.map_sub, hπ, hy, he', sub_self]
   exact h
 
-theorem eq_of_sub_mem [Algebra.IsIntegral R R₁] (s : R₁)
+theorem eq_of_sub_mem
+    [Algebra.IsIntegral R R₁]
+    (s : R₁)
     (hs : ∀ (K : Type) [Field K] (i₁ i₂ : R₁ →+* K),
       i₁.comp (algebraMap R R₁) = i₂.comp (algebraMap R R₁) → i₁ s = i₂ s)
-    (Q Q' : Ideal R₁) [Q.IsPrime] [Q'.IsPrime] (hQ : Q.comap (algebraMap R R₁) = ⊥)
-    (hQ' : Q'.comap (algebraMap R R₁) = ⊥) (e e' : R) (he : s - algebraMap R R₁ e ∈ Q)
-    (he' : s - algebraMap R R₁ e' ∈ Q') : e = e' := by
+    (Q Q' : Ideal R₁) [Q.IsPrime] [Q'.IsPrime]
+    (hQ : Q.comap (algebraMap R R₁) = ⊥) (hQ' : Q'.comap (algebraMap R R₁) = ⊥)
+    (e e' : R) (he : s - algebraMap R R₁ e ∈ Q) (he' : s - algebraMap R R₁ e' ∈ Q')
+    : e = e' := by
   classical
   let F := FractionRing R
   let M := AlgebraicClosure F
@@ -85,8 +93,10 @@ theorem eq_of_sub_mem [Algebra.IsIntegral R R₁] (s : R₁)
   haveI : FaithfulSMul R M := (faithfulSMul_iff_algebraMap_injective R M).2 hRM
   haveI : Module.IsTorsionFree R M := by
     rw [Module.isTorsionFree_iff_algebraMap_injective]; exact hRM
-  have key : ∀ (P : Ideal R₁) [P.IsPrime], P.comap (algebraMap R R₁) = ⊥ →
-      ∃ j : R₁ →+* M, j.comp (algebraMap R R₁) = algebraMap R M ∧ ∀ x ∈ P, j x = 0 := by
+  have key
+      : ∀ (P : Ideal R₁) [P.IsPrime],
+        P.comap (algebraMap R R₁) = ⊥
+          → ∃ j : R₁ →+* M, j.comp (algebraMap R R₁) = algebraMap R M ∧ ∀ x ∈ P, j x = 0 := by
     intro P _ hP
     have hRA : Function.Injective (algebraMap R (R₁ ⧸ P)) := injective_quotient P hP
     haveI : FaithfulSMul R (R₁ ⧸ P) := (faithfulSMul_iff_algebraMap_injective R _).2 hRA
@@ -95,8 +105,7 @@ theorem eq_of_sub_mem [Algebra.IsIntegral R R₁] (s : R₁)
     haveI : Algebra.IsAlgebraic R (R₁ ⧸ P) := Algebra.IsIntegral.isAlgebraic
     let l : (R₁ ⧸ P) →ₐ[R] M := (by
       refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-      solve_by_elim* (maxDepth := 2) only [*,
-        @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
         @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
     refine ⟨l.toRingHom.comp (Ideal.Quotient.mk P), ?_, fun x hx => ?_⟩
     · ext r
@@ -120,11 +129,14 @@ end GlobalTheory.SymDesc
 
 namespace GlobalTheory
 
-theorem exists_eq_algebraMap_of_forall_ringHom_eq : ∀ (R R₁ : Type) [CommRing R] [IsDomain R]
-    [IsIntegrallyClosed R] [CharZero R] [CommRing R₁] [Algebra R R₁], Module.Finite R R₁ →
-    Module.FaithfullyFlat R R₁ → ∀ s : R₁, (∀ (K : Type) [Field K] (i₁ i₂ : R₁ →+* K),
-      i₁.comp (algebraMap R R₁) = i₂.comp (algebraMap R R₁) → i₁ s = i₂ s) →
-    ∃ e : R, ∀ (K : Type) [Field K] (i₁ : R₁ →+* K), i₁ s = i₁ (algebraMap R R₁ e) := by
+theorem exists_eq_algebraMap_of_forall_ringHom_eq
+    : ∀ (R R₁ : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [CharZero R] [CommRing R₁]
+        [Algebra R R₁],
+      Module.Finite R R₁ → Module.FaithfullyFlat R R₁
+        → ∀ s : R₁,
+          (∀ (K : Type) [Field K] (i₁ i₂ : R₁ →+* K),
+              i₁.comp (algebraMap R R₁) = i₂.comp (algebraMap R R₁) → i₁ s = i₂ s)
+            → ∃ e : R, ∀ (K : Type) [Field K] (i₁ : R₁ →+* K), i₁ s = i₁ (algebraMap R R₁ e) := by
   intro R R₁ _ _ _ _ _ _ hfin hff s hs
   haveI := hfin
   haveI := hff

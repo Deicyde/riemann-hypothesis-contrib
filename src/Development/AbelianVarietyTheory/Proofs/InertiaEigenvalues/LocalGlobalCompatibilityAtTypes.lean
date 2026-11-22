@@ -12,16 +12,22 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemZp
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Module
 
 namespace GlobalTheory.WildSetSQ
 
-theorem char_eq_one_of_wild {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-    (A : ValuationSubring Ω) {O : Type} [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [TopologicalSpace O]
-    [IsTopologicalRing O] (had : IsAdic (IsLocalRing.maximalIdeal O)) (χ : G E Ω →* Oˣ)
-    (hχ : Continuous fun g => ((χ g : Oˣ) : O)) (σ : G E Ω)
-    (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1) (m : ℕ) (hm : ¬ A.valuation (m : Ω) < 1)
-    (h : χ σ ^ m = 1) : χ σ = 1 := by
+theorem char_eq_one_of_wild
+    {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (A : ValuationSubring Ω)
+    {O : Type}
+    [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [TopologicalSpace O] [IsTopologicalRing O]
+    (had : IsAdic (IsLocalRing.maximalIdeal O))
+    (χ : G E Ω →* Oˣ) (hχ : Continuous fun g => ((χ g : Oˣ) : O))
+    (σ : G E Ω) (hσ : ∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1)
+    (m : ℕ) (hm : ¬ A.valuation (m : Ω) < 1) (h : χ σ ^ m = 1)
+    : χ σ = 1 := by
   have key : ∀ M : ℕ, ((χ σ : Oˣ) : O) - 1 ∈ IsLocalRing.maximalIdeal O ^ M := by
     intro M
     let H : Subgroup (G E Ω) :=
@@ -31,8 +37,10 @@ theorem char_eq_one_of_wild {E Ω : Type} [Field E] [NumberField E] [Field Ω] [
       rw [← Ideal.Quotient.eq, map_one, MonoidHom.mem_ker, Units.ext_iff]
       rfl
     have ho : IsOpen (H : Set (G E Ω)) := by
-      have e : (H : Set (G E Ω)) = (fun g => ((χ g : Oˣ) : O) - 1) ⁻¹'
-          ((IsLocalRing.maximalIdeal O ^ M : Ideal O) : Set O) := by
+      have e
+          : (H : Set (G E Ω))
+            = (fun g => ((χ g : Oˣ) : O) - 1)
+              ⁻¹' ((IsLocalRing.maximalIdeal O ^ M : Ideal O) : Set O) := by
         ext g
         exact hH g
       rw [e]

@@ -17,15 +17,17 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-theorem adjoint_clm (lam : Fin n → ℤ) (U : Matrix (Ix n lam) (Ix n lam) ℂ) :
-    ContinuousLinearMap.adjoint (clm lam U) = clm lam (star U) := by
+theorem adjoint_clm (lam : Fin n → ℤ) (U : Matrix (Ix n lam) (Ix n lam) ℂ)
+    : ContinuousLinearMap.adjoint (clm lam U) = clm lam (star U) := by
   unfold clm
   rw [← ContinuousLinearMap.star_eq_adjoint]
   exact (map_star toEuclideanCLM U).symm
 
-theorem gram_comm (hF : MatrixFrechetDerivativeAtZeroLaws) (lam : Fin n → ℤ) (U : Matrix (Ix n lam) (Ix n lam) ℂ)
-    (hU : U ∈ Matrix.unitaryGroup (Ix n lam) ℂ) (hc : ∀ k : UK n, U * fr0 lam k.1 = fr0 lam k.1 * U) :
-    clm lam U * sqQ lam = sqQ lam * clm lam U := by
+theorem gram_comm
+    (hF : MatrixFrechetDerivativeAtZeroLaws)
+    (lam : Fin n → ℤ) (U : Matrix (Ix n lam) (Ix n lam) ℂ)
+    (hU : U ∈ Matrix.unitaryGroup (Ix n lam) ℂ) (hc : ∀ k : UK n, U * fr0 lam k.1 = fr0 lam k.1 * U)
+    : clm lam U * sqQ lam = sqQ lam * clm lam U := by
   have hm : ∀ P Q : Matrix (Ix n lam) (Ix n lam) ℂ, clm lam P * clm lam Q = clm lam (P * Q) :=
     fun P Q => (map_mul toEuclideanCLM P Q).symm
   have hu1 : star U * U = 1 := Unitary.star_mul_self_of_mem hU
@@ -33,10 +35,11 @@ theorem gram_comm (hF : MatrixFrechetDerivativeAtZeroLaws) (lam : Fin n → ℤ)
   have hpt : ∀ k : UK n, clm lam U * Fk lam k = Fk lam k * clm lam U := by
     intro k
     set X := fr0 lam k.1
-    have hs : star X * star U = star U * star X := by
-      rw [← star_mul, ← star_mul, hc k]
+    have hs : star X * star U = star U * star X := by rw [← star_mul, ← star_mul, hc k]
     have hx : U * star X = star X * U := by
-      calc U * star X = U * star X * (star U * U) := by rw [hu1, mul_one]
+      calc
+        U * star X
+          = U * star X * (star U * U) := by rw [hu1, mul_one]
         _ = U * (star X * star U) * U := by simp only [mul_assoc]
         _ = U * (star U * star X) * U := by rw [hs]
         _ = star X * U := by rw [← mul_assoc U, hu2, one_mul]
@@ -58,10 +61,12 @@ theorem gram_comm (hF : MatrixFrechetDerivativeAtZeroLaws) (lam : Fin n → ℤ)
     simp only [hpt]
   exact (Commute.cfcₙ_nnreal hG _).symm.eq
 
-theorem gram_nonneg (hF : MatrixFrechetDerivativeAtZeroLaws) (lam : Fin n → ℤ) : 0 ≤ gramQ (n := n) lam :=
+theorem gram_nonneg (hF : MatrixFrechetDerivativeAtZeroLaws) (lam : Fin n → ℤ)
+    : 0 ≤ gramQ (n := n) lam :=
   ContinuousLinearMap.nonneg_iff_isPositive.mpr (gram_isPositive hF lam)
 
-theorem gram_strictPos (hF : MatrixFrechetDerivativeAtZeroLaws) (lam : Fin n → ℤ) : IsStrictlyPositive (gramQ (n := n) lam) := by
+theorem gram_strictPos (hF : MatrixFrechetDerivativeAtZeroLaws) (lam : Fin n → ℤ)
+    : IsStrictlyPositive (gramQ (n := n) lam) := by
   exact ⟨gram_nonneg hF lam, gram_isUnit hF lam⟩
 
 end PositivityTheory.RgBcC.CxeAvg

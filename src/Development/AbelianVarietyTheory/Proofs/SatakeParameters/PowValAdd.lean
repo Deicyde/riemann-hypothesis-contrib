@@ -18,10 +18,13 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsSup
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU GlobalTheory.PRep
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
+  GlobalTheory.PRep
 
 noncomputable section
 
@@ -36,11 +39,12 @@ def zchar {N : ℕ} [NeZero N] (ζ : ℂˣ) (hζ : ζ ^ N = 1) : Multiplicative 
     simp only [toAdd_mul]
     rw [ZMod.val_add, ← pow_add, ← pow_eq_pow_mod _ hζ]
 
-theorem zchar_apply {N : ℕ} [NeZero N] (ζ : ℂˣ) (hζ : ζ ^ N = 1) (x : Multiplicative (ZMod N)) :
-    zchar ζ hζ x = ζ ^ (Multiplicative.toAdd x).val := rfl
+theorem zchar_apply {N : ℕ} [NeZero N] (ζ : ℂˣ) (hζ : ζ ^ N = 1) (x : Multiplicative (ZMod N))
+    : zchar ζ hζ x = ζ ^ (Multiplicative.toAdd x).val :=
+  rfl
 
-theorem sum_roots {N : ℕ} {ζ : ℂ} (hζ : IsPrimitiveRoot ζ N) (k : ℕ) (hk : k < N) :
-    ∑ i : Fin N, (ζ ^ (i : ℕ)) ^ k = if k = 0 then (N : ℂ) else 0 := by
+theorem sum_roots {N : ℕ} {ζ : ℂ} (hζ : IsPrimitiveRoot ζ N) (k : ℕ) (hk : k < N)
+    : ∑ i : Fin N, (ζ ^ (i : ℕ)) ^ k = if k = 0 then (N : ℂ) else 0 := by
   rw [Fin.sum_univ_eq_sum_range (fun i => (ζ ^ i) ^ k)]
   simp_rw [← pow_mul, mul_comm _ k, pow_mul]
   split_ifs with h
@@ -57,32 +61,40 @@ def stab (W : Wt E n) (f : algForms W) : Subgroup (UA E n) where
     rw [inv_mul_cancel_right] at this
     exact this.symm
 
-theorem stab_level (W : Wt E n) (f : algForms W) (C : Subgroup (UA E n)) (hC : C ≤ finU (E := E) (n := n))
-    (hc : IsCompact (C : Set (UA E n))) (ho : ∃ N : Set (UA E n), IsOpen N ∧ 1 ∈ N ∧ N ∩ finU (E := E) (n := n) ⊆ C) :
-    IsCompact ((C ⊓ stab W f : Subgroup (UA E n)) : Set (UA E n)) ∧
-      ∃ N : Set (UA E n), IsOpen N ∧ 1 ∈ N ∧ N ∩ finU (E := E) (n := n) ⊆ (C ⊓ stab W f : Subgroup (UA E n)) := by
+theorem stab_level
+    (W : Wt E n) (f : algForms W)
+    (C : Subgroup (UA E n)) (hC : C ≤ finU (E := E) (n := n)) (hc : IsCompact (C : Set (UA E n)))
+    (ho : ∃ N : Set (UA E n), IsOpen N ∧ 1 ∈ N ∧ N ∩ finU (E := E) (n := n) ⊆ C)
+    : IsCompact ((C ⊓ stab W f : Subgroup (UA E n)) : Set (UA E n))
+      ∧ ∃ N : Set (UA E n),
+        IsOpen N ∧ 1 ∈ N ∧ N ∩ finU (E := E) (n := n) ⊆ (C ⊓ stab W f : Subgroup (UA E n)) := by
   obtain ⟨N₁, hN₁, h1, hN₁C⟩ := ho
   have hsm := isSmooth_algRep W f
   obtain ⟨t, ht, hte⟩ := isOpen_induced_iff.1 hsm
   have hfix : ∀ x (hx : x ∈ finU (E := E) (n := n)), x ∈ t → x ∈ stab W f := by
     intro x hx hxt v g
-    have : (⟨x, hx⟩ : finU (E := E) (n := n)) ∈ {k : finU (E := E) (n := n) | algRep W k f = f} := by rw [← hte]; exact hxt
+    have : (⟨x, hx⟩ : finU (E := E) (n := n))
+        ∈ {k : finU (E := E) (n := n) | algRep W k f = f} := by
+      rw [← hte]; exact hxt
     exact congrArg (fun F : algForms W => F.1 v g) this
   have h1t : (1 : UA E n) ∈ t := by
     have : (1 : finU (E := E) (n := n)) ∈ {k : finU (E := E) (n := n) | algRep W k f = f} := by simp
-    rw [← hte] at this; exact this
-  have hN : N₁ ∩ t ∩ finU (E := E) (n := n) ⊆ (C ⊓ stab W f : Subgroup (UA E n)) := fun x ⟨⟨hx1, hxt⟩, hxf⟩ =>
-    ⟨hN₁C ⟨hx1, hxf⟩, hfix x hxf hxt⟩
+    rw [← hte] at this
+    exact this
+  have hN : N₁ ∩ t ∩ finU (E := E) (n := n) ⊆ (C ⊓ stab W f : Subgroup (UA E n)) :=
+    fun x ⟨⟨hx1, hxt⟩, hxf⟩ => ⟨hN₁C ⟨hx1, hxf⟩, hfix x hxf hxt⟩
   refine ⟨?_, N₁ ∩ t, hN₁.inter ht, ⟨h1, h1t⟩, hN⟩
   haveI : CompactSpace C := isCompact_iff_compactSpace.1 hc
   have hHo : IsOpen (((C ⊓ stab W f).subgroupOf C : Subgroup C) : Set C) := by
-    refine Subgroup.isOpen_of_mem_nhds _ (g := 1) (Filter.mem_of_superset
-      (((hN₁.inter ht).preimage continuous_subtype_val).mem_nhds ⟨h1, h1t⟩) ?_)
+    refine Subgroup.isOpen_of_mem_nhds _ (g := 1)
+      (Filter.mem_of_superset (((hN₁.inter ht).preimage continuous_subtype_val).mem_nhds ⟨h1, h1t⟩)
+        ?_)
     intro x hx
     exact Subgroup.mem_subgroupOf.2 (hN ⟨hx, hC x.2⟩)
   have hHc := Subtype.isCompact_iff.1 (Subgroup.isClosed_of_isOpen _ hHo).isCompact
   convert hHc using 1
-  ext x; constructor
+  ext x
+  constructor
   · intro hx; exact ⟨⟨x, hx.1⟩, Subgroup.mem_subgroupOf.2 hx, rfl⟩
   · rintro ⟨y, hy, rfl⟩; exact Subgroup.mem_subgroupOf.1 hy
 

@@ -8,9 +8,11 @@ namespace GlobalTheory.NatCastMemOfPrimeDvdNorm
 
 open NumberField IsDedekindDomain
 
-theorem natCast_mem_of_prime_dvd_absNorm {K : Type} [Field K] [NumberField K]
-    (w : HeightOneSpectrum (RingOfIntegers K)) {q : ℕ} (hq : Nat.Prime q)
-    (hd : q ∣ Ideal.absNorm w.asIdeal) : (q : RingOfIntegers K) ∈ w.asIdeal := by
+theorem natCast_mem_of_prime_dvd_absNorm
+    {K : Type} [Field K] [NumberField K]
+    (w : HeightOneSpectrum (RingOfIntegers K))
+    {q : ℕ} (hq : Nat.Prime q) (hd : q ∣ Ideal.absNorm w.asIdeal)
+    : (q : RingOfIntegers K) ∈ w.asIdeal := by
   haveI : Fact q.Prime := ⟨hq⟩
   haveI : w.asIdeal.IsPrime := w.isPrime
   haveI : Finite (RingOfIntegers K ⧸ w.asIdeal) :=

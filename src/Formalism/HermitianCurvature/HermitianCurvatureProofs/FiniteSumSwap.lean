@@ -6,18 +6,20 @@ public import Formalism.HermitianCurvature.ThetaExistenceInductiveFromPieces
 
 noncomputable section
 
-open Matrix Formalism.DoubleCosetMeasures Formalism.FourierDecayAlt.A5 Formalism.FourierDecayAlt.A6 Filter Topology
+open Matrix Formalism.DoubleCosetMeasures Formalism.FourierDecayAlt.A5 Formalism.FourierDecayAlt.A6
+  Filter Topology
 open scoped ComplexConjugate
 
 namespace Formalism.FourierDecayAlt.P.FiniteSumSwap
 
-theorem finsum_swap {I J : Type} (P : I → Prop) [DecidablePred P] (T : J → Prop) [DecidablePred T]
-    (hP : {q | P q}.Finite) (hT : {z | T z}.Finite) (a : ℂ) (g : J → ℂ) (F : J → I → ℂ)
-    (e : I → ℂ) :
-    ∑ᶠ q : I, (if P q then a * ∑ᶠ z : J, (if T z then g z * F z q else 0) else 0) * e q =
-      a * ∑ᶠ z : J, (if T z then g z * ∑ᶠ q : I, (if P q then F z q else 0) * e q else 0) := by
-  have h1 : ∀ f : I → ℂ, ∑ᶠ q : I, (if P q then f q else 0) * e q =
-      ∑ q ∈ hP.toFinset, f q * e q := by
+theorem finsum_swap
+    {I J : Type} (P : I → Prop) [DecidablePred P]
+    (T : J → Prop) [DecidablePred T]
+    (hP : {q | P q}.Finite) (hT : {z | T z}.Finite) (a : ℂ) (g : J → ℂ) (F : J → I → ℂ) (e : I → ℂ)
+    : ∑ᶠ q : I, (if P q then a * ∑ᶠ z : J, (if T z then g z * F z q else 0) else 0) * e q
+      = a * ∑ᶠ z : J, (if T z then g z * ∑ᶠ q : I, (if P q then F z q else 0) * e q else 0) := by
+  have h1
+      : ∀ f : I → ℂ, ∑ᶠ q : I, (if P q then f q else 0) * e q = ∑ q ∈ hP.toFinset, f q * e q := by
     intro f
     rw [finsum_eq_sum_of_support_subset (s := hP.toFinset)]
     · refine Finset.sum_congr rfl fun q hq => ?_

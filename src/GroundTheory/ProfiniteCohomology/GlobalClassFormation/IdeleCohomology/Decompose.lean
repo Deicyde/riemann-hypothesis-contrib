@@ -13,14 +13,16 @@ open CategoryTheory Limits
 
 universe u
 
-variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [DiscreteTopology G]
+variable
+  {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [DiscreteTopology G]
   {ι : Type*} {P : Rep.{u} k G} {A : ι → Rep.{u} k G}
 
-theorem eq_sum_cohomologyMap_of_pi [DecidableEq ι] (p : ∀ i, P ⟶ A i)
-    (hp : Function.Bijective fun (x : P) (i : ι) => (p i).hom x) (e : ∀ i, A i ⟶ P)
-    (hep : ∀ i, e i ≫ p i = 𝟙 _) (hep' : ∀ i j, i ≠ j → e i ≫ p j = 0) (T : Finset ι) (n : ℕ)
-    (hT : ∀ i ∉ T, IsZero (cohomology (A i) n)) (y : cohomology P n) :
-    y = ∑ i ∈ T, (cohomologyMap (e i) n).hom ((cohomologyMap (p i) n).hom y) := by
+theorem eq_sum_cohomologyMap_of_pi
+    [DecidableEq ι]
+    (p : ∀ i, P ⟶ A i) (hp : Function.Bijective fun (x : P) (i : ι) => (p i).hom x)
+    (e : ∀ i, A i ⟶ P) (hep : ∀ i, e i ≫ p i = 𝟙 _) (hep' : ∀ i j, i ≠ j → e i ≫ p j = 0)
+    (T : Finset ι) (n : ℕ) (hT : ∀ i ∉ T, IsZero (cohomology (A i) n)) (y : cohomology P n)
+    : y = ∑ i ∈ T, (cohomologyMap (e i) n).hom ((cohomologyMap (p i) n).hom y) := by
   apply (cohomology_pi_bijective p hp n).1
   funext j
   set_option synthInstance.maxHeartbeats 100000 in

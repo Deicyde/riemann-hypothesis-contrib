@@ -13,32 +13,38 @@ namespace GlobalTheory.AlgWtHW.LowerTransv
 
 open Polynomial
 
-def tGL {n : ℕ} (i j : Fin n) (h : i ≠ j) (s : ℂ) : GL (Fin n) ℂ :=
-  ⟨transvection i j s, transvection i j (-s),
-    by rw [transvection_mul_transvection_same i j h, add_neg_cancel, transvection_zero],
-    by rw [transvection_mul_transvection_same i j h, neg_add_cancel, transvection_zero]⟩
+def tGL {n : ℕ} (i j : Fin n) (h : i ≠ j) (s : ℂ) : GL (Fin n) ℂ := ⟨
+  transvection i j s,
+  transvection i j (-s),
+  by rw [transvection_mul_transvection_same i j h, add_neg_cancel, transvection_zero],
+  by rw [transvection_mul_transvection_same i j h, neg_add_cancel, transvection_zero]
+⟩
 
-theorem inv_val {n : ℕ} {i j : Fin n} (h : i ≠ j) (s : ℂ) (T : GL (Fin n) ℂ)
-    (hT : T.val = transvection i j s) : (T⁻¹).val = transvection i j (-s) := by
+theorem inv_val
+    {n : ℕ} {i j : Fin n} (h : i ≠ j) (s : ℂ) (T : GL (Fin n) ℂ) (hT : T.val = transvection i j s)
+    : (T⁻¹).val = transvection i j (-s) := by
   have e : T = tGL i j h s := Units.ext hT
   subst e
   rfl
 
-theorem eval_evalRingHom {σ : Type} (g : σ → ℂ[X]) (Q : MvPolynomial σ ℂ) (s : ℂ) :
-    (MvPolynomial.aeval g Q).eval s = MvPolynomial.eval (fun v => (g v).eval s) Q := by
+theorem eval_evalRingHom {σ : Type} (g : σ → ℂ[X]) (Q : MvPolynomial σ ℂ) (s : ℂ)
+    : (MvPolynomial.aeval g Q).eval s = MvPolynomial.eval (fun v => (g v).eval s) Q := by
   rw [MvPolynomial.aeval_def, ← Polynomial.coe_evalRingHom, MvPolynomial.eval₂_comp_left]
-  have : (Polynomial.evalRingHom s).comp (algebraMap ℂ ℂ[X]) = RingHom.id ℂ := by
-    ext; simp
+  have : (Polynomial.evalRingHom s).comp (algebraMap ℂ ℂ[X]) = RingHom.id ℂ := by ext; simp
   rw [this]
   rfl
 
-theorem expand {n : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι] (Φ : GL (Fin n) ℂ → Matrix ι ι ℂ)
-    (hΦ : IsPolyRep Φ) {i j : Fin n} (h : i ≠ j) (w : ι → ℂ) :
-    ∃ q : ι → ℂ[X], ∀ (s : ℂ) (T : GL (Fin n) ℂ), T.val = transvection i j s →
-      Φ T *ᵥ w = fun a => (q a).eval s := by
+theorem expand
+    {n : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
+    (Φ : GL (Fin n) ℂ → Matrix ι ι ℂ) (hΦ : IsPolyRep Φ)
+    {i j : Fin n} (h : i ≠ j)
+    (w : ι → ℂ)
+    : ∃ q : ι → ℂ[X], ∀ (s : ℂ) (T : GL (Fin n) ℂ),
+      T.val = transvection i j s → Φ T *ᵥ w = fun a => (q a).eval s := by
   choose Q hQ using hΦ.poly
   let g : (Fin n × Fin n) ⊕ (Fin n × Fin n) → ℂ[X] :=
-    Sum.elim (fun p => (transvection i j (X : ℂ[X])) p.1 p.2)
+    Sum.elim
+      (fun p => (transvection i j (X : ℂ[X])) p.1 p.2)
       (fun p => (transvection i j (-X : ℂ[X])) p.1 p.2)
   refine ⟨fun a => ∑ b, MvPolynomial.aeval g (Q a b) * C (w b), ?_⟩
   intro s T hT
@@ -53,8 +59,8 @@ theorem expand {n : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι] (Φ : GL (Fin
   · simp only [g, Sum.elim_inl, hT, transvection, Matrix.add_apply, Matrix.one_apply,
       Matrix.single_apply]
     split_ifs <;> simp
-  · simp only [g, Sum.elim_inr, inv_val h s T hT, transvection, Matrix.add_apply,
-      Matrix.one_apply, Matrix.single_apply]
+  · simp only [g, Sum.elim_inr, inv_val h s T hT, transvection, Matrix.add_apply, Matrix.one_apply,
+      Matrix.single_apply]
     split_ifs <;> simp
 
 end GlobalTheory.AlgWtHW.LowerTransv
@@ -63,23 +69,22 @@ namespace GlobalTheory.AlgWtHW.LowerTransv
 
 open Polynomial
 
-theorem diagonal_eq_of_isDiag {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsDiag) :
-    A = diagonal (fun m => A m m) := by
+theorem diagonal_eq_of_isDiag {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsDiag)
+    : A = diagonal (fun m => A m m) := by
   ext a b
   by_cases hab : a = b
   · subst hab; simp
   · simp [diagonal_apply_ne _ hab, hA hab]
 
-theorem diag_ne_zero {n : ℕ} (D : GL (Fin n) ℂ) (hD : D.val.IsDiag) (m : Fin n) :
-    D.val m m ≠ 0 := by
-  have hdet : (D.val).det ≠ 0 :=
-    ((Matrix.isUnit_iff_isUnit_det _).mp D.isUnit).ne_zero
+theorem diag_ne_zero {n : ℕ} (D : GL (Fin n) ℂ) (hD : D.val.IsDiag) (m : Fin n)
+    : D.val m m ≠ 0 := by
+  have hdet : (D.val).det ≠ 0 := ((Matrix.isUnit_iff_isUnit_det _).mp D.isUnit).ne_zero
   rw [diagonal_eq_of_isDiag _ hD, det_diagonal] at hdet
   exact (Finset.prod_ne_zero_iff.mp hdet) m (Finset.mem_univ _)
 
-theorem diagonal_mul_transvection {n : ℕ} {i j : Fin n} (h : i ≠ j) (d : Fin n → ℂ)
-    (hdj : d j ≠ 0) (s : ℂ) :
-    diagonal d * transvection i j s = transvection i j (s * (d i / d j)) * diagonal d := by
+theorem diagonal_mul_transvection
+    {n : ℕ} {i j : Fin n} (h : i ≠ j) (d : Fin n → ℂ) (hdj : d j ≠ 0) (s : ℂ)
+    : diagonal d * transvection i j s = transvection i j (s * (d i / d j)) * diagonal d := by
   ext a b
   simp only [transvection, Matrix.mul_add, Matrix.add_mul, Matrix.mul_one, Matrix.one_mul,
     Matrix.add_apply, diagonal_mul, mul_diagonal, Matrix.single_apply]
@@ -93,9 +98,10 @@ theorem diagonal_mul_transvection {n : ℕ} {i j : Fin n} (h : i ≠ j) (d : Fin
     · subst hab; simp
     · simp [one_apply_ne hab]
 
-theorem conj_val {n : ℕ} {i j : Fin n} (h : i ≠ j) (D : GL (Fin n) ℂ) (hD : D.val.IsDiag)
-    (s : ℂ) (T : GL (Fin n) ℂ) (hT : T.val = transvection i j s) :
-    (D * T * D⁻¹).val = transvection i j (s * (D.val i i / D.val j j)) := by
+theorem conj_val
+    {n : ℕ} {i j : Fin n} (h : i ≠ j) (D : GL (Fin n) ℂ) (hD : D.val.IsDiag)
+    (s : ℂ) (T : GL (Fin n) ℂ) (hT : T.val = transvection i j s)
+    : (D * T * D⁻¹).val = transvection i j (s * (D.val i i / D.val j j)) := by
   have key : D.val * T.val = transvection i j (s * (D.val i i / D.val j j)) * D.val := by
     have := diagonal_mul_transvection h (fun m => D.val m m) (diag_ne_zero D hD j) s
     rw [← diagonal_eq_of_isDiag _ hD] at this
@@ -110,14 +116,17 @@ namespace GlobalTheory.AlgWtHW.LowerTransv
 
 open Polynomial
 
-def shiftWt {n : ℕ} (ν : Fin n → ℤ) (i j : Fin n) (k : ℕ) : Fin n → ℤ :=
-  fun m => ν m + (k : ℤ) * (if m = i then 1 else 0) - (k : ℤ) * (if m = j then 1 else 0)
+def shiftWt {n : ℕ} (ν : Fin n → ℤ) (i j : Fin n) (k : ℕ) : Fin n → ℤ := fun m =>
+  ν m + (k : ℤ) * (if m = i then 1 else 0) - (k : ℤ) * (if m = j then 1 else 0)
 
-theorem prod_zpow_shiftWt {n : ℕ} (d : Fin n → ℂ) (hd : ∀ m, d m ≠ 0) (ν : Fin n → ℤ)
-    (i j : Fin n) (k : ℕ) :
-    ∏ m, d m ^ (shiftWt ν i j k m) = (∏ m, d m ^ ν m) * (d i / d j) ^ k := by
-  have e : ∀ m, d m ^ (shiftWt ν i j k m) =
-      d m ^ ν m * ((if m = i then d m ^ (k : ℤ) else 1) / (if m = j then d m ^ (k : ℤ) else 1)) := by
+theorem prod_zpow_shiftWt
+    {n : ℕ} (d : Fin n → ℂ) (hd : ∀ m, d m ≠ 0) (ν : Fin n → ℤ) (i j : Fin n) (k : ℕ)
+    : ∏ m, d m ^ (shiftWt ν i j k m) = (∏ m, d m ^ ν m) * (d i / d j) ^ k := by
+  have e
+      : ∀ m,
+        d m ^ (shiftWt ν i j k m)
+          = d m ^ ν m
+            * ((if m = i then d m ^ (k : ℤ) else 1) / (if m = j then d m ^ (k : ℤ) else 1)) := by
     intro m
     simp only [shiftWt]
     rw [zpow_sub₀ (hd m), zpow_add₀ (hd m), mul_div_assoc]
@@ -126,8 +135,9 @@ theorem prod_zpow_shiftWt {n : ℕ} (d : Fin n → ℂ) (hd : ∀ m, d m ≠ 0) 
     Finset.prod_ite_eq', Finset.prod_ite_eq']
   simp [div_pow, zpow_natCast]
 
-theorem domLE_shiftWt {n : ℕ} {ν lam : Fin n → ℤ} (hν : DomLE ν lam) {i j : Fin n} (hji : j < i)
-    (k : ℕ) : DomLE (shiftWt ν i j k) lam := by
+theorem domLE_shiftWt
+    {n : ℕ} {ν lam : Fin n → ℤ} (hν : DomLE ν lam) {i j : Fin n} (hji : j < i) (k : ℕ)
+    : DomLE (shiftWt ν i j k) lam := by
   obtain ⟨h1, h2⟩ := hν
   constructor
   · rw [← h1]
@@ -144,16 +154,19 @@ theorem domLE_shiftWt {n : ℕ} {ν lam : Fin n → ℤ} (hν : DomLE ν lam) {i
       simp only [hi, hj, if_true]
       linarith
     · simp only [hi, if_false, mul_zero, add_zero]
-      have : (0 : ℤ) ≤ (k : ℤ) * (if (j : ℕ) < K then 1 else 0) := by
-        split_ifs <;> simp
+      have : (0 : ℤ) ≤ (k : ℤ) * (if (j : ℕ) < K then 1 else 0) := by split_ifs <;> simp
       linarith
 
-theorem isWtVec_coeff {n : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
-    (Φ : GL (Fin n) ℂ → Matrix ι ι ℂ) (hΦ : IsPolyRep Φ) {i j : Fin n} (h : i ≠ j)
-    (ν : Fin n → ℤ) (w : ι → ℂ) (hw : IsWtVec Φ ν w) (q : ι → ℂ[X])
-    (hq : ∀ (s : ℂ) (T : GL (Fin n) ℂ), T.val = transvection i j s →
-      Φ T *ᵥ w = fun a => (q a).eval s) (k : ℕ) :
-    IsWtVec Φ (shiftWt ν i j k) (fun a => (q a).coeff k) := by
+theorem isWtVec_coeff
+    {n : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
+    (Φ : GL (Fin n) ℂ → Matrix ι ι ℂ) (hΦ : IsPolyRep Φ)
+    {i j : Fin n} (h : i ≠ j)
+    (ν : Fin n → ℤ) (w : ι → ℂ) (hw : IsWtVec Φ ν w)
+    (q : ι → ℂ[X])
+    (hq
+      : ∀ (s : ℂ) (T : GL (Fin n) ℂ), T.val = transvection i j s → Φ T *ᵥ w = fun a => (q a).eval s)
+    (k : ℕ)
+    : IsWtVec Φ (shiftWt ν i j k) (fun a => (q a).coeff k) := by
   intro D hD
   have hd : ∀ m, D.val m m ≠ 0 := diag_ne_zero D hD
   set c : ℂ := D.val i i / D.val j j with hc
@@ -163,8 +176,8 @@ theorem isWtVec_coeff {n : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
     have hT : (tGL i j h s).val = transvection i j s := rfl
     have hc' : Φ D * Φ (tGL i j h s) = Φ (D * tGL i j h s * D⁻¹) * Φ D := by
       rw [← hΦ.mul, ← hΦ.mul, inv_mul_cancel_right]
-    rw [← hq s _ hT, ← hq (s * c) _ (conj_val h D hD s _ hT), mulVec_mulVec, hc',
-      ← mulVec_mulVec, hw D hD, mulVec_smul]
+    rw [← hq s _ hT, ← hq (s * c) _ (conj_val h D hD s _ hT), mulVec_mulVec, hc', ← mulVec_mulVec,
+      hw D hD, mulVec_smul]
   have hpoly : ∀ a, ∑ b, C (Φ D a b) * q b = C P * (q a).comp (C c * X) := by
     intro a
     apply Polynomial.funext
@@ -186,10 +199,17 @@ namespace GlobalTheory.AlgWtHW
 
 open Polynomial LowerTransv
 
-theorem lowerTransvection_mulVec_mem_Sle : ∀ {n : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
-    (Φ : GL (Fin n) ℂ → Matrix ι ι ℂ), IsPolyRep Φ → ∀ (lam ν : Fin n → ℤ), DomLE ν lam →
-    ∀ (w : ι → ℂ), IsWtVec Φ ν w → ∀ (i j : Fin n), j < i → ∀ (s : ℂ) (T : GL (Fin n) ℂ),
-    T.val = transvection i j s → Φ T *ᵥ w ∈ Sle Φ lam := by
+theorem lowerTransvection_mulVec_mem_Sle
+    : ∀ {n : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι] (Φ : GL (Fin n) ℂ → Matrix ι ι ℂ),
+      IsPolyRep Φ
+        → ∀ (lam ν : Fin n → ℤ),
+          DomLE ν lam
+            → ∀ (w : ι → ℂ),
+              IsWtVec Φ ν w
+                → ∀ (i j : Fin n),
+                  j < i
+                    → ∀ (s : ℂ) (T : GL (Fin n) ℂ),
+                      T.val = transvection i j s → Φ T *ᵥ w ∈ Sle Φ lam := by
   intro n ι _ _ Φ hΦ lam ν hν w hw i j hji s T hT
   have h : i ≠ j := hji.ne'
   obtain ⟨q, hq⟩ := expand Φ hΦ h w

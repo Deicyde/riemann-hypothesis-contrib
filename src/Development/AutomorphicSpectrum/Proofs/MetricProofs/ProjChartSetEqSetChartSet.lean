@@ -43,37 +43,52 @@ section Defs
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-def setChartSet (S : Set ((Σ k, ι k) → ℂ)) {m e : ℕ} (σ : Fin m ≃ ((k : K) → ι k))
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) : Set (Fin m → ℂ) :=
+def setChartSet
+    (S : Set ((Σ k, ι k) → ℂ))
+    {m e : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    : Set (Fin m → ℂ) :=
   {x | ∃ z ∈ S, Ψ (segre z) 0 = 1 ∧ x = fun a => segre z (σ a)}
 
-def setChartIdeal (S : Set ((Σ k, ι k) → ℂ)) {m e : ℕ} (σ : Fin m ≃ ((k : K) → ι k))
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) : Ideal (MvPolynomial (Fin m) ℂ) :=
+def setChartIdeal
+    (S : Set ((Σ k, ι k) → ℂ))
+    {m e : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    : Ideal (MvPolynomial (Fin m) ℂ) :=
   vanishingIdeal ℂ (setChartSet S σ Ψ)
 
-def setSegChartSet (S : Set ((Σ k, ι k) → ℂ)) {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k))
-    (i : (k : K) → ι k) : Set (Fin m → ℂ) :=
+def setSegChartSet
+    (S : Set ((Σ k, ι k) → ℂ)) {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k)
+    : Set (Fin m → ℂ) :=
   {x | ∃ z ∈ S, segre z i = 1 ∧ x = fun a => segre z (σ a)}
 
-def setSegChartIdeal (S : Set ((Σ k, ι k) → ℂ)) {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k))
-    (i : (k : K) → ι k) : Ideal (MvPolynomial (Fin m) ℂ) :=
+def setSegChartIdeal
+    (S : Set ((Σ k, ι k) → ℂ)) {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k)
+    : Ideal (MvPolynomial (Fin m) ℂ) :=
   vanishingIdeal ℂ (setSegChartSet S σ i)
 
-def setSegreCone (S : Set ((Σ k, ι k) → ℂ)) {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) : Set (Fin m → ℂ) :=
+def setSegreCone (S : Set ((Σ k, ι k) → ℂ)) {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k))
+    : Set (Fin m → ℂ) :=
   {x | ∃ z ∈ S, x = fun a => segre z (σ a)}
 
-theorem isMultiHomogIdeal_toR {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.ChartRestriction.G.Geo.IsMultiHomogIdeal Q) :
-    ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q := hQ
+theorem isMultiHomogIdeal_toR
+    {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.ChartRestriction.G.Geo.IsMultiHomogIdeal Q)
+    : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q :=
+  hQ
 
-theorem cone_scale {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q) {c : K → ℂ}
-    (hc : ∀ k, c k ≠ 0) {z : (Σ k, ι k) → ℂ} (hz : z ∈ conePts Q) : (fun p => c p.1 * z p) ∈ conePts Q := by
+theorem cone_scale
+    {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q)
+    {c : K → ℂ} (hc : ∀ k, c k ≠ 0)
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ conePts Q)
+    : (fun p => c p.1 * z p) ∈ conePts Q := by
   refine ⟨fun k => ?_, ReciprocityTheory.AnForm.R.eval_eq_zero_of_smul hQ c z hz.2⟩
   obtain ⟨i, hi⟩ := hz.1 k
   exact ⟨i, mul_ne_zero (hc k) hi⟩
 
-theorem exists_segre_smul {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q)
-    [Nonempty K] {z : (Σ k, ι k) → ℂ} (hz : z ∈ conePts Q) {c : ℂ} (hc : c ≠ 0) :
-    ∃ z' ∈ conePts Q, segre z' = c • segre z := by
+theorem exists_segre_smul
+    {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q)
+    [Nonempty K]
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ conePts Q)
+    {c : ℂ} (hc : c ≠ 0)
+    : ∃ z' ∈ conePts Q, segre z' = c • segre z := by
   classical
   obtain ⟨k0⟩ := ‹Nonempty K›
   refine ⟨_, cone_scale hQ (c := fun k => if k = k0 then c else 1) (fun k => ?_) hz, ?_⟩
@@ -88,13 +103,16 @@ section ZeroSet
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-def liftPolyC [DecidableEq K] {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k)
-    (f : MRingOver ℂ ι) : MvPolynomial (Fin m) ℂ :=
+def liftPolyC
+    [DecidableEq K] {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k) (f : MRingOver ℂ ι)
+    : MvPolynomial (Fin m) ℂ :=
   aeval (fun p : Σ k, ι k => (X (σ.symm (Function.update i p.1 p.2)) : MvPolynomial (Fin m) ℂ)) f
 
-theorem eval_liftPolyC [DecidableEq K] {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k)
-    (x : Fin m → ℂ) (f : MRingOver ℂ ι) :
-    eval x (liftPolyC σ i f) = eval (chartLift σ i x) f := by
+theorem eval_liftPolyC
+    [DecidableEq K]
+    {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k))
+    (i : (k : K) → ι k) (x : Fin m → ℂ) (f : MRingOver ℂ ι)
+    : eval x (liftPolyC σ i f) = eval (chartLift σ i x) f := by
   induction f using MvPolynomial.induction_on with
   | C c => simp [liftPolyC]
   | add f g hf hg =>
@@ -105,32 +123,37 @@ theorem eval_liftPolyC [DecidableEq K] {m : ℕ} (σ : Fin m ≃ ((k : K) → ι
     rw [hf]
     simp [chartLift]
 
-theorem segChart_zeroSet {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q) {m : ℕ}
-    (σ : Fin m ≃ ((k : K) → ι k)) (i : (k : K) → ι k) :
-    zeroSet (setSegChartIdeal (conePts Q) σ i) = setSegChartSet (conePts Q) σ i := by
+theorem segChart_zeroSet
+    {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q)
+    {m : ℕ} (σ : Fin m ≃ ((k : K) → ι k))
+    (i : (k : K) → ι k)
+    : zeroSet (setSegChartIdeal (conePts Q) σ i) = setSegChartSet (conePts Q) σ i := by
   classical
   apply Set.Subset.antisymm
   · intro x hx
-    have hv : ∀ q : MvPolynomial (Fin m) ℂ, (∀ y ∈ setSegChartSet (conePts Q) σ i, eval y q = 0) →
-        eval x q = 0 :=
-      fun q hq => hx q (by rw [setSegChartIdeal, mem_vanishingIdeal_iff]; exact hq)
+    have hv
+        : ∀ q : MvPolynomial (Fin m) ℂ,
+          (∀ y ∈ setSegChartSet (conePts Q) σ i, eval y q = 0) → eval x q = 0 := fun q hq =>
+      hx q (by rw [setSegChartIdeal, mem_vanishingIdeal_iff]; exact hq)
     have ha : x (σ.symm i) = 1 := by
-      have h := hv (X (σ.symm i) - 1) (by
-        rintro _ ⟨z, -, hzi, rfl⟩
-        simp [hzi])
+      have h :=
+        hv (X (σ.symm i) - 1) (by
+          rintro _ ⟨z, -, hzi, rfl⟩
+          simp [hzi])
       rw [map_sub, eval_X, map_one] at h
       exact sub_eq_zero.1 h
-    have hb : ∀ i' : (k : K) → ι k,
-        x (σ.symm i') = ∏ k, x (σ.symm (Function.update i k (i' k))) := by
+    have hb
+        : ∀ i' : (k : K) → ι k, x (σ.symm i') = ∏ k, x (σ.symm (Function.update i k (i' k))) := by
       intro i'
-      have h := hv (X (σ.symm i') - ∏ k, X (σ.symm (Function.update i k (i' k)))) (by
-        rintro _ ⟨z, -, hzi, rfl⟩
-        have hs : ∏ k, segre z (Function.update i k (i' k)) = segre z i' := by
-          have h1 := congrFun (segre_chartLift σ i z hzi) i'
-          simpa [ReciprocityTheory.ChartRestriction.G.Geo.segre, chartLift] using h1
-        rw [map_sub, eval_X, map_prod]
-        simp only [eval_X, Equiv.apply_symm_apply]
-        rw [hs, sub_self])
+      have h :=
+        hv (X (σ.symm i') - ∏ k, X (σ.symm (Function.update i k (i' k)))) (by
+          rintro _ ⟨z, -, hzi, rfl⟩
+          have hs : ∏ k, segre z (Function.update i k (i' k)) = segre z i' := by
+            have h1 := congrFun (segre_chartLift σ i z hzi) i'
+            simpa [ReciprocityTheory.ChartRestriction.G.Geo.segre, chartLift] using h1
+          rw [map_sub, eval_X, map_prod]
+          simp only [eval_X, Equiv.apply_symm_apply]
+          rw [hs, sub_self])
       rw [map_sub, eval_X, map_prod] at h
       simp only [eval_X] at h
       exact sub_eq_zero.1 h
@@ -160,9 +183,11 @@ theorem segChart_zeroSet {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.
     rw [setSegChartIdeal, mem_vanishingIdeal_iff] at hq
     exact hq x hx
 
-theorem chart_zeroSet {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q) [Nonempty K]
-    {m e : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) :
-    zeroSet (setChartIdeal (conePts Q) σ Ψ) = setChartSet (conePts Q) σ Ψ := by
+theorem chart_zeroSet
+    {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q)
+    [Nonempty K]
+    {m e : ℕ} (σ : Fin m ≃ ((k : K) → ι k)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    : zeroSet (setChartIdeal (conePts Q) σ Ψ) = setChartSet (conePts Q) σ Ψ := by
   classical
   apply Set.Subset.antisymm
   swap
@@ -170,15 +195,18 @@ theorem chart_zeroSet {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnF
     rw [setChartIdeal, mem_vanishingIdeal_iff] at hq
     exact hq x hx
   intro x hx
-  have hv : ∀ q : MvPolynomial (Fin m) ℂ, (∀ y ∈ setChartSet (conePts Q) σ Ψ, eval y q = 0) → eval x q = 0 :=
-    fun q hq => hx q (by rw [setChartIdeal, mem_vanishingIdeal_iff]; exact hq)
+  have hv
+      : ∀ q : MvPolynomial (Fin m) ℂ,
+        (∀ y ∈ setChartSet (conePts Q) σ Ψ, eval y q = 0) → eval x q = 0 := fun q hq =>
+    hx q (by rw [setChartIdeal, mem_vanishingIdeal_iff]; exact hq)
   have hseg : ∀ z : (Σ k, ι k) → ℂ, (fun i' => segre z (σ (σ.symm i'))) = segre z := fun z => by
     funext i'; rw [Equiv.apply_symm_apply]
 
   have hx1 : Ψ (fun i' => x (σ.symm i')) 0 = 1 := by
-    have h := hv (GoodChartZeroSet.linForm σ Ψ - 1) (by
-      rintro _ ⟨z, -, hz1, rfl⟩
-      rw [map_sub, GoodChartZeroSet.eval_linForm, map_one, hseg, hz1, sub_self])
+    have h :=
+      hv (GoodChartZeroSet.linForm σ Ψ - 1) (by
+        rintro _ ⟨z, -, hz1, rfl⟩
+        rw [map_sub, GoodChartZeroSet.eval_linForm, map_one, hseg, hz1, sub_self])
     rw [map_sub, GoodChartZeroSet.eval_linForm, map_one] at h
     exact sub_eq_zero.1 h
   obtain ⟨a, ha⟩ : ∃ a, x a ≠ 0 := by
@@ -191,18 +219,22 @@ theorem chart_zeroSet {Q : Ideal (MRingOver ℂ ι)} (hQ : ReciprocityTheory.AnF
   have hzero : (x a)⁻¹ • x ∈ zeroSet (setSegChartIdeal (conePts Q) σ (σ a)) := by
     intro f hf
     rw [setSegChartIdeal, mem_vanishingIdeal_iff] at hf
-    have hg := hv (X a * ∑ d ∈ Finset.range (f.totalDegree + 1),
-        X a ^ (f.totalDegree - d) * homogeneousComponent d f) (by
-      rintro _ ⟨z, hz, -, rfl⟩
-      by_cases h0 : segre z (σ a) = 0
-      · simp [h0]
-      · rw [GoodChartZeroSet.eval_homogenize f le_rfl a _ h0]
-        obtain ⟨z', hz', hz'e⟩ := exists_segre_smul hQ hz (inv_ne_zero h0)
-        refine mul_eq_zero_of_right _ (hf _ ⟨z', hz', ?_, ?_⟩)
-        · rw [hz'e, Pi.smul_apply, smul_eq_mul, inv_mul_cancel₀ h0]
-        · funext b
-          rw [hz'e]
-          rfl)
+    have hg :=
+      hv
+        (X a
+          * ∑ d ∈ Finset.range (f.totalDegree + 1),
+            X a ^ (f.totalDegree - d) * homogeneousComponent d f)
+        (by
+          rintro _ ⟨z, hz, -, rfl⟩
+          by_cases h0 : segre z (σ a) = 0
+          · simp [h0]
+          · rw [GoodChartZeroSet.eval_homogenize f le_rfl a _ h0]
+            obtain ⟨z', hz', hz'e⟩ := exists_segre_smul hQ hz (inv_ne_zero h0)
+            refine mul_eq_zero_of_right _ (hf _ ⟨z', hz', ?_, ?_⟩)
+            · rw [hz'e, Pi.smul_apply, smul_eq_mul, inv_mul_cancel₀ h0]
+            · funext b
+              rw [hz'e]
+              rfl)
     rw [GoodChartZeroSet.eval_homogenize f le_rfl a x ha] at hg
     exact (mul_eq_zero.1 hg).resolve_left (pow_ne_zero _ ha)
   rw [segChart_zeroSet hQ σ (σ a)] at hzero

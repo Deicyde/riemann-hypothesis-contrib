@@ -5,13 +5,19 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Lifts
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.AdT Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.AdT
+  Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory
 
-theorem isAdIso_eq_afIso (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (ι : AfE F E ≃+* FiniteAdeleRing (𝓞 E) E) (hι : GlobalTheory.TwU.IsAdIso ι) (x : AfE F E) : ι x = afIso F E x := by
+theorem isAdIso_eq_afIso
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (ι : AfE F E ≃+* FiniteAdeleRing (𝓞 E) E) (hι : GlobalTheory.TwU.IsAdIso ι)
+    (x : AfE F E)
+    : ι x = afIso F E x := by
   have key : ∀ P : HeightOneSpectrum (𝓞 E), ι x P = afIso F E x P := by
     intro P
     have ev : ∀ a b : FiniteAdeleRing (𝓞 E) E, (a + b) P = a P + b P := fun _ _ => rfl
@@ -27,7 +33,9 @@ theorem isAdIso_eq_afIso (F E : Type) [Field F] [NumberField F] [Field E] [Numbe
     have hv : Valued.v d ≠ 0 := (Valuation.ne_zero_iff _).2 hne
     obtain ⟨y, N, r, hr, hN, e⟩ := exists_approx_small (F := F) (E := E) x {P} hv
     have hNP := hN P (Finset.mem_singleton_self P)
-    have h1 : ι (Formalism.UG.inclE (F := F) (FiniteAdeleRing (𝓞 F) F) y) = afIso F E (Formalism.UG.inclE (F := F) (FiniteAdeleRing (𝓞 F) F) y) := by
+    have h1
+        : ι (Formalism.UG.inclE (F := F) (FiniteAdeleRing (𝓞 F) F) y)
+          = afIso F E (Formalism.UG.inclE (F := F) (FiniteAdeleRing (𝓞 F) F) y) := by
       show ι (y ⊗ₜ[F] 1) = afIso F E (y ⊗ₜ[F] 1)
       rw [hι.1, afIso_tmul_one]
     have hd2 : d = (N : P.adicCompletion E) * (ι r P - afIso F E r P) := by

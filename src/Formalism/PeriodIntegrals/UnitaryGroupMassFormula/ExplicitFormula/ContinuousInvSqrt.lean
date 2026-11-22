@@ -206,8 +206,9 @@ lemma sides_arith {C1 C2 u T T' c l1 l2 as large₂ lNu uc : ℝ} (hC1 : 0 ≤ C
   rw [e3]
   linarith
 
-theorem sidesBound_of {κ C1 C2 : ℝ} (hC1 : 0 ≤ C1) (hC2 : 0 ≤ C2) (hH : LogDerivHoriz κ C1)
-    (hL : LogDerivLeft C2) : SidesBound κ (21 * C1 + 8 * C2) := by
+theorem sidesBound_of
+    {κ C1 C2 : ℝ} (hC1 : 0 ≤ C1) (hC2 : 0 ≤ C2) (hH : LogDerivHoriz κ C1) (hL : LogDerivLeft C2)
+    : SidesBound κ (21 * C1 + 8 * C2) := by
   intro N _ χ hχ u T T' hT hTu hTT' hT'1 hgood
   have hu2 : 2 ≤ u := le_trans hT hTu
   have hT'2 : 2 ≤ T' := le_trans hT hTT'
@@ -217,22 +218,34 @@ theorem sidesBound_of {κ C1 C2 : ℝ} (hC1 : 0 ≤ C1) (hC2 : 0 ≤ C2) (hH : L
   have hN : (1 : ℝ) ≤ N := Nat.one_le_cast.mpr (Nat.pos_of_ne_zero (NeZero.ne N))
   obtain ⟨hf1, hf2, hf3, hf4, hf5, hf6, hf7⟩ := log_facts hN hT hTu hTT' hT'1
 
-  have hbot := hor_side (fun s => logDeriv (DirichletCharacter.LFunction χ) s) u (cLine u) T'
-    (C1 * Real.log (N * T') ^ 2) (-T') (by linarith) (by linarith) hT'0
-    (mul_nonneg hC1 (sq_nonneg _)) (by rw [abs_neg, abs_of_pos hT'0])
-    (fun σ h1 h2 => (hH N χ hχ T' hT'2 hgood σ h1 (by linarith)).2)
-  have htop := hor_side (fun s => logDeriv (DirichletCharacter.LFunction χ) s) u (cLine u) T'
-    (C1 * Real.log (N * T') ^ 2) T' (by linarith) (by linarith) hT'0
-    (mul_nonneg hC1 (sq_nonneg _)) (abs_of_pos hT'0)
-    (fun σ h1 h2 => (hH N χ hχ T' hT'2 hgood σ h1 (by linarith)).1)
-  have hleft := left_side (fun s => logDeriv (DirichletCharacter.LFunction χ) s) u T'
-    (C2 * Real.log (N * (T' + 2))) (by linarith) hT'0 (mul_nonneg hC2 hf6)
-    (fun t ht => le_trans (hL N χ hχ t) (mul_le_mul_of_nonneg_left
-      (Real.log_le_log (mul_pos (by linarith) (by positivity))
-        (mul_le_mul_of_nonneg_left (by linarith) (by linarith))) hC2))
+  have hbot :=
+    hor_side
+      (fun s => logDeriv (DirichletCharacter.LFunction χ) s)
+      u (cLine u) T' (C1 * Real.log (N * T') ^ 2) (-T') (by linarith) (by linarith) hT'0
+      (mul_nonneg hC1 (sq_nonneg _)) (by rw [abs_neg, abs_of_pos hT'0])
+      (fun σ h1 h2 => (hH N χ hχ T' hT'2 hgood σ h1 (by linarith)).2)
+  have htop :=
+    hor_side
+      (fun s => logDeriv (DirichletCharacter.LFunction χ) s)
+      u (cLine u) T' (C1 * Real.log (N * T') ^ 2) T' (by linarith) (by linarith) hT'0
+      (mul_nonneg hC1 (sq_nonneg _)) (abs_of_pos hT'0)
+      (fun σ h1 h2 => (hH N χ hχ T' hT'2 hgood σ h1 (by linarith)).1)
+  have hleft :=
+    left_side
+      (fun s => logDeriv (DirichletCharacter.LFunction χ) s)
+      u T' (C2 * Real.log (N * (T' + 2))) (by linarith) hT'0 (mul_nonneg hC2 hf6)
+      (fun t ht =>
+        le_trans (hL N χ hχ t)
+          (mul_le_mul_of_nonneg_left
+            (Real.log_le_log (mul_pos (by linarith) (by positivity))
+              (mul_le_mul_of_nonneg_left (by linarith) (by linarith)))
+            hC2))
 
-  have hv := vert_cancel (fun t => logDeriv (DirichletCharacter.LFunction χ) ((cLine u : ℂ) + t * I))
-    (fun t => (u : ℂ) ^ ((cLine u : ℂ) + t * I) / ((cLine u : ℂ) + t * I)) T'
+  have hv :=
+    vert_cancel
+      (fun t => logDeriv (DirichletCharacter.LFunction χ) ((cLine u : ℂ) + t * I))
+      (fun t => (u : ℂ) ^ ((cLine u : ℂ) + t * I) / ((cLine u : ℂ) + t * I))
+      T'
   unfold rectInt vertInt
   rw [hv]
   simp only [smul_eq_mul]

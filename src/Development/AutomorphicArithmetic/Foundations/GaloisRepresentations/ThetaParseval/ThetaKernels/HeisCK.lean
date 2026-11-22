@@ -10,21 +10,28 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  MeasureTheory
 open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open Formalism.IndefR.DatumF
 noncomputable section
 namespace PositivityTheory.ThKW.AdelicSchwartzProperties
-open PositivityTheory.ThKW.ModulusFactorDefinition PositivityTheory.ThKW.ModulusDerivativeNormalisation GlobalTheory.ThetaTransform
+open PositivityTheory.ThKW.ModulusFactorDefinition
+  PositivityTheory.ThKW.ModulusDerivativeNormalisation GlobalTheory.ThetaTransform
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-theorem heis_C_k {σ : E →ₐ[F] E} {B : Base F E} (hB : _root_.UpperTheory.TP.W.GoodK σ B) {nS nT : ℕ} (JS : Matrix (Fin nS) (Fin nS) E)
-    (JT : Matrix (Fin nT) (Fin nT) E) (ξ₀ : E) (N : ℕ)
+theorem heis_C_k
+    {σ : E →ₐ[F] E} {B : Base F E} (hB : _root_.UpperTheory.TP.W.GoodK σ B)
+    {nS nT : ℕ} (JS : Matrix (Fin nS) (Fin nS) E) (JT : Matrix (Fin nT) (Fin nT) E)
+    (ξ₀ : E) (N : ℕ)
     (α β : WOF F E nS nT ≃ₗ[AF F] (Fin N → AF F)) (e : WOF F E nS (nT + nT) ≃ₗ[AF F] VA F N)
     (hCe : ∀ u v, e (dC (AF F ⊗[F] E) nT * u + dCd F JT * v) = (α v, β u))
-    (he : ∀ w w', symplOF σ JS (GlobalTheory.WeilSchrodinger.DblTargetF.dblG JT) ξ₀ w w' = symV (e w) (e w'))
-    (Φ : (Fin N → AF F) → ℂ) (y : WOF F E nS nT) :
-    heisOF σ JS (GlobalTheory.WeilSchrodinger.DblTargetF.dblG JT) ξ₀ B.ψ (dC (AF F ⊗[F] E) nT * y) (thV B.ψ Φ ∘ e) =
-      thV B.ψ (fun x => B.ψ (x ⬝ᵥ β y) * Φ x) ∘ e := by
+    (he : ∀ w w',
+      symplOF σ JS (GlobalTheory.WeilSchrodinger.DblTargetF.dblG JT) ξ₀ w w' = symV (e w) (e w'))
+    (Φ : (Fin N → AF F) → ℂ)
+    (y : WOF F E nS nT)
+    : heisOF σ JS (GlobalTheory.WeilSchrodinger.DblTargetF.dblG JT) ξ₀ B.ψ (dC (AF F ⊗[F] E) nT * y)
+        (thV B.ψ Φ ∘ e)
+      = thV B.ψ (fun x => B.ψ (x ⬝ᵥ β y) * Φ x) ∘ e := by
   have hCy : e (dC (AF F ⊗[F] E) nT * y) = (0, β y) := by
     have h := hCe y 0
     rw [Matrix.mul_zero, add_zero, map_zero] at h
@@ -36,8 +43,10 @@ theorem heis_C_k {σ : E →ₐ[F] E} {B : Base F E} (hB : _root_.UpperTheory.TP
   funext w
   simp only [Function.comp_apply, heisOF, thV, GlobalTheory.WeilM.thetaSum, GlobalTheory.WeilM.schr]
   rw [map_add (f := _), hCy]
-  have hph : symplOHF σ JS (GlobalTheory.WeilSchrodinger.DblTargetF.dblG JT) ξ₀ w (dC (AF F ⊗[F] E) nT * y) =
-      ⅟(2 : AF F) * ((e w).1 ⬝ᵥ β y) := by
+  have hph
+      : symplOHF σ JS (GlobalTheory.WeilSchrodinger.DblTargetF.dblG JT) ξ₀ w
+          (dC (AF F ⊗[F] E) nT * y)
+        = ⅟(2 : AF F) * ((e w).1 ⬝ᵥ β y) := by
     rw [symplOHF, he, hCy, h2]
     simp [symV]
   rw [hph, ← tsum_mul_left]

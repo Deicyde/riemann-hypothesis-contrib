@@ -6,17 +6,33 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LengthC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published.Kato
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N GlobalTheory.GalOfCusp
+  UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published.Kato
 
-theorem UpperTheory.V.X.Kato.resAway :
-    ∀ (l : ℕ) [Fact l.Prime] (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra ℚ Ω] [Algebra K Ω] [IsScalarTower ℚ K Ω] [IsAlgClosure K Ω] (C V : Type) [CommRing C] [AddCommGroup V] [Module C V] (ρ : Representation C (G ℚ Ω) V) (c : G ℚ Ω → V), (∀ g h, c (g * h) = c g + ρ g (c h)) → (∀ w : HeightOneSpectrum (𝓞 ℚ), ((l : ℕ) : 𝓞 ℚ) ∉ w.asIdeal → ∃ A : ValuationSubring Ω, IsPlaceOver A w ∧ ∃ x : V, ∀ s ∈ Ine (F := ℚ) A, c s = ρ s x - x) → ∀ w : HeightOneSpectrum (𝓞 K), ((l : ℕ) : 𝓞 K) ∉ w.asIdeal → ∃ A : ValuationSubring Ω, IsPlaceOver A w ∧ ∃ x : V, ∀ s ∈ Ine (F := K) A, c (s.restrictScalars ℚ) = ρ (s.restrictScalars ℚ) x - x := by
+theorem UpperTheory.V.X.Kato.resAway
+    : ∀ (l : ℕ) [Fact l.Prime] (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra ℚ Ω]
+        [Algebra K Ω] [IsScalarTower ℚ K Ω] [IsAlgClosure K Ω] (C V : Type) [CommRing C]
+        [AddCommGroup V] [Module C V] (ρ : Representation C (G ℚ Ω) V) (c : G ℚ Ω → V),
+      (∀ g h, c (g * h) = c g + ρ g (c h))
+        → (∀ w : HeightOneSpectrum (𝓞 ℚ),
+          ((l : ℕ) : 𝓞 ℚ) ∉ w.asIdeal
+            → ∃ A : ValuationSubring Ω,
+              IsPlaceOver A w ∧ ∃ x : V, ∀ s ∈ Ine (F := ℚ) A, c s = ρ s x - x)
+        → ∀ w : HeightOneSpectrum (𝓞 K),
+          ((l : ℕ) : 𝓞 K) ∉ w.asIdeal
+            → ∃ A : ValuationSubring Ω,
+              IsPlaceOver A w
+                ∧ ∃ x : V, ∀ s ∈ Ine (F := K) A,
+                  c (s.restrictScalars ℚ) = ρ (s.restrictScalars ℚ) x - x := by
   intro l _ K Ω _ _ _ _ _ _ _ C V _ _ _ ρ c hc hyp w hw
   haveI : IsAlgClosure ℚ Ω := IsAlgClosure.ofAlgebraic ℚ K Ω
   obtain ⟨B, hB⟩ := exists_isPlaceOver (F := K) Ω w
   have hne : w.asIdeal.comap (algebraMap (𝓞 ℚ) (𝓞 K)) ≠ ⊥ := by
     obtain ⟨y, hy, hy0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot w.ne_bot
     exact Ideal.comap_ne_bot_of_integral_mem hy0 hy (Algebra.IsIntegral.isIntegral y)
-  let p : HeightOneSpectrum (𝓞 ℚ) := ⟨w.asIdeal.comap (algebraMap (𝓞 ℚ) (𝓞 K)), Ideal.comap_isPrime _ _, hne⟩
+  let p : HeightOneSpectrum (𝓞 ℚ) :=
+    ⟨w.asIdeal.comap (algebraMap (𝓞 ℚ) (𝓞 K)), Ideal.comap_isPrime _ _, hne⟩
   have hBp : IsPlaceOver B p := by
     intro y
     have key := hB (algebraMap (𝓞 ℚ) (𝓞 K) y)

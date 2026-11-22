@@ -114,8 +114,8 @@ private lemma herm_tor (c : K) (m : EL Δ τ) (z : (Etau K τ)ˣ) (x y : Sp Δ �
       _ = _ := by rw [e, one_mul]
   simp only [herm, tor, e2]
 
-private def mtor (P : Sp Δ τ ≃ₗ[Lsq K Δ] (Fin 3 → Lsq K Δ)) (z : (Etau K τ)ˣ) :
-    Matrix (Fin 3) (Fin 3) (Lsq K Δ) :=
+private def mtor (P : Sp Δ τ ≃ₗ[Lsq K Δ] (Fin 3 → Lsq K Δ)) (z : (Etau K τ)ˣ)
+    : Matrix (Fin 3) (Fin 3) (Lsq K Δ) :=
   LinearMap.toMatrix' (P.toLinearMap ∘ₗ torL Δ z ∘ₗ P.symm.toLinearMap)
 
 private lemma mtor_mulVec (P : Sp Δ τ ≃ₗ[Lsq K Δ] (Fin 3 → Lsq K Δ)) (z : (Etau K τ)ˣ) (u : Fin 3 → Lsq K Δ) :
@@ -241,13 +241,10 @@ variable (Δ τ) in
 private def cdE (Δ τ : K) : Sp Δ τ ≃ₗ[Lsq K Δ] (Fin 3 → Lsq K Δ) where
   toFun x := ![x.1, x.2.re, x.2.im]
   invFun u := (u 0, ⟨u 1, u 2⟩)
-  map_add' x y := by
-    funext i; fin_cases i <;> simp
-  map_smul' a x := by
-    funext i; fin_cases i <;> simp
+  map_add' x y := by funext i; fin_cases i <;> simp
+  map_smul' a x := by funext i; fin_cases i <;> simp
   left_inv x := by simp
-  right_inv u := by
-    funext i; fin_cases i <;> simp
+  right_inv u := by funext i; fin_cases i <;> simp
 
 private lemma cdE_spm (x : Sp Δ τ) : cdE (f Δ) (f τ) (spm f x) = lmap f Δ ∘ cdE Δ τ x := by
   funext i; fin_cases i <;> simp [cdE, spm, elmap]
@@ -267,11 +264,12 @@ private lemma mB_mA (P : Sp Δ τ ≃ₗ[Lsq K Δ] (Fin 3 → Lsq K Δ)) : mB P 
 private lemma mA_mulVec (P : Sp Δ τ ≃ₗ[Lsq K Δ] (Fin 3 → Lsq K Δ)) (x : Sp Δ τ) : mA P *ᵥ cdE Δ τ x = P x := by
   simp [mA, LinearMap.toMatrix'_mulVec]
 
-private def mapP (P : Sp Δ τ ≃ₗ[Lsq K Δ] (Fin 3 → Lsq K Δ)) :
-    Sp (f Δ) (f τ) ≃ₗ[Lsq K' (f Δ)] (Fin 3 → Lsq K' (f Δ)) :=
-  (cdE (f Δ) (f τ)).trans (Matrix.toLin'OfInv (M := (mB P).map (lmap f Δ)) (M' := (mA P).map (lmap f Δ))
-    (by rw [← Matrix.map_mul, mB_mA, Matrix.map_one _ (map_zero _) (map_one _)])
-    (by rw [← Matrix.map_mul, mA_mB, Matrix.map_one _ (map_zero _) (map_one _)]))
+private def mapP (P : Sp Δ τ ≃ₗ[Lsq K Δ] (Fin 3 → Lsq K Δ))
+    : Sp (f Δ) (f τ) ≃ₗ[Lsq K' (f Δ)] (Fin 3 → Lsq K' (f Δ)) :=
+  (cdE (f Δ) (f τ)).trans
+    (Matrix.toLin'OfInv (M := (mB P).map (lmap f Δ)) (M' := (mA P).map (lmap f Δ))
+      (by rw [← Matrix.map_mul, mB_mA, Matrix.map_one _ (map_zero _) (map_one _)])
+      (by rw [← Matrix.map_mul, mA_mB, Matrix.map_one _ (map_zero _) (map_one _)]))
 
 private lemma mapP_spm (P : Sp Δ τ ≃ₗ[Lsq K Δ] (Fin 3 → Lsq K Δ)) (x : Sp Δ τ) :
     mapP f P (spm f x) = lmap f Δ ∘ P x := by
@@ -322,8 +320,10 @@ private lemma semi_map {d : EL Δ τ} {δ : Matrix (Fin 3) (Fin 3) (Lsq K Δ)} (
     funext i
     simp [lmap_star]
 
-private def torHom {c : K'} {Δ' τ' : K'} {m : EL Δ' τ'} (P : Sp Δ' τ' ≃ₗ[Lsq K' Δ'] (Fin 3 → Lsq K' Δ'))
-    (hP : ∀ x y, herm c m x y = ∑ i, P x i * star (P y i)) : (Etau K' τ')ˣ →* U3 Δ' where
+private def torHom
+    {c : K'} {Δ' τ' : K'} {m : EL Δ' τ'} (P : Sp Δ' τ' ≃ₗ[Lsq K' Δ'] (Fin 3 → Lsq K' Δ'))
+    (hP : ∀ x y, herm c m x y = ∑ i, P x i * star (P y i))
+    : (Etau K' τ')ˣ →* U3 Δ' where
   toFun z := ⟨mtor P z, mtor_mem P hP z⟩
   map_one' := Subtype.ext (mtor_one P)
   map_mul' a b := Subtype.ext (mtor_mul P a b)
@@ -346,9 +346,10 @@ private theorem model_map_exists : ModelMap := by
       rw [mapP_spm, LinearEquiv.apply_symm_apply]
       funext k
       simp [Pi.single_apply, apply_ite (lmap f Δ)]
-    rw [← hs, mtor_mulVec, LinearEquiv.symm_apply_apply, tor_spm f z z' h, mapP_spm, hM.tor, map_mulVec', ← mapP_spm]
+    rw [← hs, mtor_mulVec, LinearEquiv.symm_apply_apply, tor_spm f z z' h, mapP_spm, hM.tor,
+      map_mulVec', ← mapP_spm]
 
 end UpperTheory.V.Z.Sym.Glob
 
-theorem UpperTheory.V.Z.Sym.Glob.modelMap :
-    UpperTheory.V.Z.Sym.Glob.ModelMap := UpperTheory.V.Z.Sym.Glob.model_map_exists
+theorem UpperTheory.V.Z.Sym.Glob.modelMap : UpperTheory.V.Z.Sym.Glob.ModelMap :=
+  UpperTheory.V.Z.Sym.Glob.model_map_exists

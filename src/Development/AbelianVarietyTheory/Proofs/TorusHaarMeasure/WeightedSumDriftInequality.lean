@@ -9,10 +9,10 @@ open scoped ComplexOrder ENNReal Pointwise
 
 namespace GlobalTheory
 
-theorem driftWeight_sq_le (ε : ℝ) (h0 : 0 ≤ ε) (h1 : ε ≤ 1) (r i j : ℕ) (hj : 0 < j) (hji : j ≤ i)
-    (hr : i + j ≤ r) :
-    (ε ^ (i * (r - i))) ^ 2 ≤
-      ε ^ 2 * (ε ^ ((i - j) * (r - (i - j))) * ε ^ ((i + j) * (r - (i + j)))) := by
+theorem driftWeight_sq_le
+    (ε : ℝ) (h0 : 0 ≤ ε) (h1 : ε ≤ 1) (r i j : ℕ) (hj : 0 < j) (hji : j ≤ i) (hr : i + j ≤ r)
+    : (ε ^ (i * (r - i))) ^ 2
+      ≤ ε ^ 2 * (ε ^ ((i - j) * (r - (i - j))) * ε ^ ((i + j) * (r - (i + j)))) := by
   obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hji
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hr
   have e1 : j + m + j + k - (j + m) = j + k := by omega
@@ -23,22 +23,37 @@ theorem driftWeight_sq_le (ε : ℝ) (h0 : 0 ≤ ε) (h1 : ε ≤ 1) (r i j : �
   apply pow_le_pow_of_le_one h0 h1
   nlinarith [Nat.mul_le_mul hj hj]
 
-theorem mul_sqrt_le_of_weights (x e₁ e₂ ε u v M : ℝ) (hx : 0 ≤ x) (he₁ : 0 ≤ e₁) (he₂ : 0 ≤ e₂)
-    (hε : 0 ≤ ε) (hu : 0 ≤ u) (hv : 0 ≤ v) (h : x ^ 2 ≤ ε ^ 2 * (e₁ * e₂))
-    (h₁ : e₁ * u ≤ M) (h₂ : e₂ * v ≤ M) : x * Real.sqrt (u * v) ≤ ε * M := by
+theorem mul_sqrt_le_of_weights
+    (x e₁ e₂ ε u v M : ℝ) (hx : 0 ≤ x) (he₁ : 0 ≤ e₁) (he₂ : 0 ≤ e₂) (hε : 0 ≤ ε) (hu : 0 ≤ u)
+    (hv : 0 ≤ v) (h : x ^ 2 ≤ ε ^ 2 * (e₁ * e₂)) (h₁ : e₁ * u ≤ M) (h₂ : e₂ * v ≤ M)
+    : x * Real.sqrt (u * v) ≤ ε * M := by
   have hM : 0 ≤ M := le_trans (mul_nonneg he₁ hu) h₁
   have hs0 := Real.sqrt_nonneg (u * v)
   have k3 : (x * Real.sqrt (u * v)) ^ 2 ≤ (ε * M) ^ 2 := by
     rw [mul_pow, Real.sq_sqrt (mul_nonneg hu hv)]
-    calc x ^ 2 * (u * v) ≤ ε ^ 2 * (e₁ * e₂) * (u * v) :=
-          mul_le_mul_of_nonneg_right h (mul_nonneg hu hv)
+    calc
+      x ^ 2 * (u * v)
+        ≤ ε ^ 2 * (e₁ * e₂) * (u * v) := mul_le_mul_of_nonneg_right h (mul_nonneg hu hv)
       _ = ε ^ 2 * ((e₁ * u) * (e₂ * v)) := by ring
       _ ≤ ε ^ 2 * (M * M) :=
-          mul_le_mul_of_nonneg_left (mul_le_mul h₁ h₂ (mul_nonneg he₂ hv) hM) (sq_nonneg ε)
+        mul_le_mul_of_nonneg_left (mul_le_mul h₁ h₂ (mul_nonneg he₂ hv) hM) (sq_nonneg ε)
       _ = (ε * M) ^ 2 := by ring
   nlinarith [mul_nonneg hx hs0, mul_nonneg hε hM]
 
-theorem weighted_sum_drift_inequality : (∀ (Y σ : Type) [Fintype σ] (r : ℕ) (t : σ → Y → Y) (α : ℕ → Y → ℝ) (c C B : ℝ), 0 ≤ c → c < 1 → 0 ≤ C → (∀ i ≤ r, ∀ y, 0 ≤ α i y) → (∀ y, α 0 y ≤ B ∧ α r y ≤ B) → (∀ (y : Y) (i : ℕ), 0 < i → i < r → (∑ s, α i (t s y) ≤ Fintype.card σ * (c * α i y)) ∨ ∃ j : ℕ, 0 < j ∧ j ≤ i ∧ i + j ≤ r ∧ ∀ s, α i (t s y) ≤ C * Real.sqrt (α (i - j) y * α (i + j) y)) → ∃ (e : ℕ → ℝ) (c' b : ℝ), (∀ i, 0 < e i) ∧ 0 ≤ c' ∧ c' < 1 ∧ 0 ≤ b ∧ ∀ y, ∑ s, (∑ i ∈ Finset.Ioo 0 r, e i * α i (t s y)) ≤ Fintype.card σ * (c' * (∑ i ∈ Finset.Ioo 0 r, e i * α i y) + b)) := by
+theorem weighted_sum_drift_inequality
+    : (∀ (Y σ : Type) [Fintype σ] (r : ℕ) (t : σ → Y → Y) (α : ℕ → Y → ℝ) (c C B : ℝ),
+      0 ≤ c → c < 1 → 0 ≤ C → (∀ i ≤ r, ∀ y, 0 ≤ α i y) → (∀ y, α 0 y ≤ B ∧ α r y ≤ B)
+        → (∀ (y : Y) (i : ℕ),
+          0 < i → i < r
+            → (∑ s, α i (t s y) ≤ Fintype.card σ * (c * α i y))
+              ∨ ∃ j : ℕ,
+                0 < j ∧ j ≤ i ∧ i + j ≤ r
+                  ∧ ∀ s, α i (t s y) ≤ C * Real.sqrt (α (i - j) y * α (i + j) y))
+        → ∃ (e : ℕ → ℝ) (c' b : ℝ),
+          (∀ i, 0 < e i) ∧ 0 ≤ c' ∧ c' < 1 ∧ 0 ≤ b
+            ∧ ∀ y,
+              ∑ s, (∑ i ∈ Finset.Ioo 0 r, e i * α i (t s y))
+                ≤ Fintype.card σ * (c' * (∑ i ∈ Finset.Ioo 0 r, e i * α i y) + b)) := by
   intro Y σ _ r t α c C B hc0 hc1 hC hα hB halt
   have hrC : 0 ≤ (r : ℝ) * C := mul_nonneg (Nat.cast_nonneg r) hC
   obtain ⟨ε, hε0, hε1, hkey⟩ : ∃ ε : ℝ, 0 < ε ∧ ε ≤ 1 ∧ (r : ℝ) * C * ε < 1 - c := by
@@ -50,10 +65,17 @@ theorem weighted_sum_drift_inequality : (∀ (Y σ : Type) [Fintype σ] (r : ℕ
         div_mul_cancel₀ _ hden.ne'
       have hpos : 0 < (1 - c) / (2 * ((r : ℝ) * C + 1)) := div_pos (by linarith) hden
       nlinarith [mul_nonneg hrC hpos.le]
-  refine ⟨fun i => ε ^ (i * (r - i)), c + (r : ℝ) * C * ε, 2 * (r : ℝ) * C * ε * max B 0,
-    fun i => pow_pos hε0 _, add_nonneg hc0 (mul_nonneg hrC hε0.le), by linarith,
+  refine ⟨
+    fun i => ε ^ (i * (r - i)),
+    c + (r : ℝ) * C * ε,
+    2 * (r : ℝ) * C * ε * max B 0,
+    fun i => pow_pos hε0 _,
+    add_nonneg hc0 (mul_nonneg hrC hε0.le),
+    by linarith,
     mul_nonneg (mul_nonneg (mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg r)) hC) hε0.le)
-      (le_max_right _ _), ?_⟩
+      (le_max_right _ _),
+    ?_
+  ⟩
   intro y
   dsimp only
   obtain ⟨Φ, hΦ⟩ : ∃ Φ : ℝ, Φ = ∑ i ∈ Finset.Ioo 0 r, ε ^ (i * (r - i)) * α i y := ⟨_, rfl⟩
@@ -74,57 +96,70 @@ theorem weighted_sum_drift_inequality : (∀ (Y σ : Type) [Fintype σ] (r : ℕ
       linarith [(hB y).2]
     · have h1 : ε ^ (k * (r - k)) * α k y ≤ Φ := by
         rw [hΦ]
-        exact Finset.single_le_sum (f := fun i => ε ^ (i * (r - i)) * α i y)
+        exact Finset.single_le_sum
+          (f := fun i => ε ^ (i * (r - i)) * α i y)
           (fun i hi => mul_nonneg (pow_nonneg hε0.le _) (hα i (Finset.mem_Ioo.1 hi).2.le y))
           (Finset.mem_Ioo.2 ⟨hk0, hkr⟩)
       linarith
-  have hterm : ∀ i ∈ Finset.Ioo 0 r, ∑ s, ε ^ (i * (r - i)) * α i (t s y) ≤
-      (Fintype.card σ : ℝ) * (c * (ε ^ (i * (r - i)) * α i y)) + (Fintype.card σ : ℝ) * (C * ε * M) := by
+  have hterm
+      : ∀ i ∈ Finset.Ioo 0 r,
+        ∑ s, ε ^ (i * (r - i)) * α i (t s y)
+          ≤ (Fintype.card σ : ℝ) * (c * (ε ^ (i * (r - i)) * α i y))
+            + (Fintype.card σ : ℝ) * (C * ε * M) := by
     intro i hi
     obtain ⟨hi0, hir⟩ := Finset.mem_Ioo.1 hi
     have hA : 0 ≤ (Fintype.card σ : ℝ) * (c * (ε ^ (i * (r - i)) * α i y)) :=
-      mul_nonneg (Nat.cast_nonneg _) (mul_nonneg hc0 (mul_nonneg (pow_nonneg hε0.le _) (hα i hir.le y)))
+      mul_nonneg (Nat.cast_nonneg _)
+        (mul_nonneg hc0 (mul_nonneg (pow_nonneg hε0.le _) (hα i hir.le y)))
     have hB' : 0 ≤ (Fintype.card σ : ℝ) * (C * ε * M) :=
       mul_nonneg (Nat.cast_nonneg _) (mul_nonneg (mul_nonneg hC hε0.le) hM0)
     rcases halt y i hi0 hir with hcon | ⟨j, hj0, hji, hjr, hint⟩
     · rw [← Finset.mul_sum]
-      calc ε ^ (i * (r - i)) * ∑ s, α i (t s y)
-          ≤ ε ^ (i * (r - i)) * ((Fintype.card σ : ℝ) * (c * α i y)) :=
-            mul_le_mul_of_nonneg_left hcon (pow_nonneg hε0.le _)
+      calc
+        ε ^ (i * (r - i)) * ∑ s, α i (t s y)
+            ≤ ε ^ (i * (r - i)) * ((Fintype.card σ : ℝ) * (c * α i y)) :=
+          mul_le_mul_of_nonneg_left hcon (pow_nonneg hε0.le _)
         _ = (Fintype.card σ : ℝ) * (c * (ε ^ (i * (r - i)) * α i y)) := by ring
         _ ≤ _ := le_add_of_nonneg_right hB'
     · have hs : ∀ s, ε ^ (i * (r - i)) * α i (t s y) ≤ C * ε * M := by
         intro s
         have h1 := driftWeight_sq_le ε hε0.le hε1 r i j hj0 hji hjr
-        have h2 := mul_sqrt_le_of_weights (ε ^ (i * (r - i))) (ε ^ ((i - j) * (r - (i - j))))
-          (ε ^ ((i + j) * (r - (i + j)))) ε (α (i - j) y) (α (i + j) y) M (pow_nonneg hε0.le _)
-          (pow_nonneg hε0.le _) (pow_nonneg hε0.le _) hε0.le (hα _ (by omega) y) (hα _ hjr y) h1
-          (hbd _ (by omega)) (hbd _ hjr)
-        calc ε ^ (i * (r - i)) * α i (t s y)
-            ≤ ε ^ (i * (r - i)) * (C * Real.sqrt (α (i - j) y * α (i + j) y)) :=
-              mul_le_mul_of_nonneg_left (hint s) (pow_nonneg hε0.le _)
+        have h2 :=
+          mul_sqrt_le_of_weights (ε ^ (i * (r - i))) (ε ^ ((i - j) * (r - (i - j))))
+            (ε ^ ((i + j) * (r - (i + j)))) ε (α (i - j) y) (α (i + j) y) M (pow_nonneg hε0.le _)
+            (pow_nonneg hε0.le _) (pow_nonneg hε0.le _) hε0.le (hα _ (by omega) y) (hα _ hjr y) h1
+            (hbd _ (by omega)) (hbd _ hjr)
+        calc
+          ε ^ (i * (r - i)) * α i (t s y)
+              ≤ ε ^ (i * (r - i)) * (C * Real.sqrt (α (i - j) y * α (i + j) y)) :=
+            mul_le_mul_of_nonneg_left (hint s) (pow_nonneg hε0.le _)
           _ = C * (ε ^ (i * (r - i)) * Real.sqrt (α (i - j) y * α (i + j) y)) := by ring
           _ ≤ C * (ε * M) := mul_le_mul_of_nonneg_left h2 hC
           _ = C * ε * M := by ring
-      calc ∑ s, ε ^ (i * (r - i)) * α i (t s y) ≤ ∑ _s : σ, C * ε * M :=
-            Finset.sum_le_sum fun s _ => hs s
+      calc
+        ∑ s, ε ^ (i * (r - i)) * α i (t s y)
+          ≤ ∑ _s : σ, C * ε * M := Finset.sum_le_sum fun s _ => hs s
         _ = (Fintype.card σ : ℝ) * (C * ε * M) := by
-            rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+          rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
         _ ≤ _ := le_add_of_nonneg_left hA
-  have hcard : ((Finset.Ioo 0 r).card : ℝ) ≤ r := by
-    exact_mod_cast (by rw [Nat.card_Ioo]; omega)
+  have hcard : ((Finset.Ioo 0 r).card : ℝ) ≤ r := by exact_mod_cast (by rw [Nat.card_Ioo]; omega)
   rw [Finset.sum_comm]
-  calc ∑ i ∈ Finset.Ioo 0 r, ∑ s, ε ^ (i * (r - i)) * α i (t s y)
-      ≤ ∑ i ∈ Finset.Ioo 0 r, ((Fintype.card σ : ℝ) * (c * (ε ^ (i * (r - i)) * α i y)) +
-          (Fintype.card σ : ℝ) * (C * ε * M)) := Finset.sum_le_sum hterm
-    _ = (Fintype.card σ : ℝ) * (c * Φ) + ((Finset.Ioo 0 r).card : ℝ) * ((Fintype.card σ : ℝ) * (C * ε * M)) := by
-        rw [Finset.sum_add_distrib, Finset.sum_const, nsmul_eq_mul, ← Finset.mul_sum, ← Finset.mul_sum, hΦ]
+  calc
+    ∑ i ∈ Finset.Ioo 0 r, ∑ s, ε ^ (i * (r - i)) * α i (t s y)
+        ≤ ∑ i ∈ Finset.Ioo 0 r, ((Fintype.card σ : ℝ) * (c * (ε ^ (i * (r - i)) * α i y)) +
+            (Fintype.card σ : ℝ) * (C * ε * M)) :=
+      Finset.sum_le_sum hterm
+    _ = (Fintype.card σ : ℝ) * (c * Φ)
+        + ((Finset.Ioo 0 r).card : ℝ) * ((Fintype.card σ : ℝ) * (C * ε * M)) := by
+      rw [Finset.sum_add_distrib, Finset.sum_const, nsmul_eq_mul, ← Finset.mul_sum,
+        ← Finset.mul_sum, hΦ]
     _ ≤ (Fintype.card σ : ℝ) * (c * Φ) + (r : ℝ) * ((Fintype.card σ : ℝ) * (C * ε * M)) :=
-        add_le_add le_rfl (mul_le_mul_of_nonneg_right hcard
+      add_le_add le_rfl
+        (mul_le_mul_of_nonneg_right hcard
           (mul_nonneg (Nat.cast_nonneg _) (mul_nonneg (mul_nonneg hC hε0.le) hM0)))
     _ = (Fintype.card σ : ℝ) * ((c + (r : ℝ) * C * ε) * Φ + 2 * (r : ℝ) * C * ε * max B 0) := by
-        rw [max_eq_left hB0, hM]
-        ring
+      rw [max_eq_left hB0, hM]
+      ring
     _ = _ := by rw [hΦ]
 
 end GlobalTheory

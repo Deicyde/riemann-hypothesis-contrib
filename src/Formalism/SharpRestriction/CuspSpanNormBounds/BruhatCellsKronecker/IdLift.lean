@@ -13,7 +13,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.LatticeGluingRadicals NumberField Module IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.LatticeGluingRadicals NumberField Module IsDedekindDomain
 
 section Gen
 
@@ -29,8 +30,8 @@ theorem lift_adj_symm {B B' : S.V →ₗ[E] S.V} (h : LAdj S B B') : LAdj S B' B
   rw [← S.herm.eq y (B' x), ← h y x]
   exact S.herm.eq (B y) x
 
-theorem lift_exists_map {ι : Type} (e w : ι → S.V) (hli : LinearIndependent E e) :
-    ∃ U : S.V →ₗ[E] S.V, ∀ a, U (e a) = w a := by
+theorem lift_exists_map {ι : Type} (e w : ι → S.V) (hli : LinearIndependent E e)
+    : ∃ U : S.V →ₗ[E] S.V, ∀ a, U (e a) = w a := by
   obtain ⟨g, hg⟩ := LinearMap.exists_extend ((Finsupp.linearCombination E w).comp hli.repr)
   refine ⟨g, fun a => ?_⟩
   have hmem : e a ∈ Submodule.span E (Set.range e) := Submodule.subset_span ⟨a, rfl⟩
@@ -40,12 +41,13 @@ theorem lift_exists_map {ι : Type} (e w : ι → S.V) (hli : LinearIndependent 
 
 variable {r : ℕ} {T : E}
 
-theorem lift_gen (hA : IntegralAdjointUnimodular) (hI : IsotropicIntegralRetraction) (hF : UnitriangularFrameIntegral) (hcm : Formalism.HermitianLatticesTheory.IsCMUnram E)
+theorem lift_gen
+    (hA : IntegralAdjointUnimodular) (hI : IsotropicIntegralRetraction)
+    (hF : UnitriangularFrameIntegral) (hcm : Formalism.HermitianLatticesTheory.IsCMUnram E)
     (Λ : Submodule (𝓞 E) S.V) (g : ℕ) (F F' : LFlag S r T) (hlat : Submodule.IsLattice E Λ)
-    (huni : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) (hconv : IsFixedConv Λ g F) (hconv' : IsFixedConv Λ g F')
-    (he : ∀ a, F'.fl.e a - F.fl.e a ∈ Xflag F a.val) :
-    ∃ n ∈ NLam Λ F, ∀ a, n (F.fl.e a) = F'.fl.e a := by
-
+    (huni : Formalism.HermitianLatticesTheory.IsUnimodular S.hT Λ) (hconv : IsFixedConv Λ g F)
+    (hconv' : IsFixedConv Λ g F') (he : ∀ a, F'.fl.e a - F.fl.e a ∈ Xflag F a.val)
+    : ∃ n ∈ NLam Λ F, ∀ a, n (F.fl.e a) = F'.fl.e a := by
   have hXiso : ∀ x ∈ Xsp F, ∀ y ∈ Xsp F, S.hT x y = 0 := by
     have h1 : ∀ a, ∀ y ∈ Xsp F, S.hT (F.fl.e a) y = 0 := by
       intro a y hy
@@ -84,7 +86,8 @@ theorem lift_gen (hA : IntegralAdjointUnimodular) (hI : IsotropicIntegralRetract
       obtain ⟨i, hi, rfl⟩ := hz
       rw [hU0]
       exact hXa_mono (by have : i.1 < j := hi; omega) (he i)
-    | zero => simp
+    | zero =>
+      simp
     | add z z' _ _ hz hz' =>
       rw [map_add (f := _), add_sub_add_comm]
       exact Submodule.add_mem _ hz hz'
@@ -106,20 +109,22 @@ theorem lift_gen (hA : IntegralAdjointUnimodular) (hI : IsotropicIntegralRetract
   have hN0onX : ∀ x ∈ Xsp F, N0 x = U0 x - x := fun x hx => by rw [hN0apply, hPX x hx]
   obtain ⟨N1, hN01, hN1int⟩ := hA E S Λ huni N0 hN0int
   have hN10 : LAdj S N1 N0 := lift_adj_symm hN01
-  have hN1X : ∀ x ∈ Xsp F, N1 x = 0 := fun x hx => lift_sep fun w => by
-    rw [← hN01 w x, hXiso _ (hN0X w) x hx, map_zero]
-  have hN1orth : ∀ x ∈ orth S (Xsp F), N1 x = 0 := fun x hx => lift_sep fun w => by
-    rw [← hN01 w x, map_zero]
-    have h' : x ∈ LinearMap.ker (S.hT (N0 w)) := by
-      simp only [orth, Submodule.mem_iInf] at hx
-      exact hx _ (hN0X w)
-    exact LinearMap.mem_ker.1 h'
+  have hN1X : ∀ x ∈ Xsp F, N1 x = 0 := fun x hx =>
+    lift_sep fun w => by rw [← hN01 w x, hXiso _ (hN0X w) x hx, map_zero]
+  have hN1orth : ∀ x ∈ orth S (Xsp F), N1 x = 0 := fun x hx =>
+    lift_sep fun w => by
+      rw [← hN01 w x, map_zero]
+      have h' : x ∈ LinearMap.ker (S.hT (N0 w)) := by
+        simp only [orth, Submodule.mem_iInf] at hx
+        exact hx _ (hN0X w)
+      exact LinearMap.mem_ker.1 h'
   have hP'P : LAdj S P' P := lift_adj_symm hPP'
-  have hPP'0 : ∀ w, P (P' w) = 0 := fun w => lift_sep fun z => by
-    rw [← hP'P z (P' w), hP'iso, map_zero]
-  have hPN1 : ∀ y, P (N1 y) = 0 := fun y => lift_sep fun w => by
-    rw [← hP'P w (N1 y), ← hN01 (P' w) y, hN0apply, hPP'0]
-    simp
+  have hPP'0 : ∀ w, P (P' w) = 0 := fun w =>
+    lift_sep fun z => by rw [← hP'P z (P' w), hP'iso, map_zero]
+  have hPN1 : ∀ y, P (N1 y) = 0 := fun y =>
+    lift_sep fun w => by
+      rw [← hP'P w (N1 y), ← hN01 (P' w) y, hN0apply, hPP'0]
+      simp
   have hN0N1 : ∀ y, N0 (N1 y) = 0 := fun y => by rw [hN0apply, hPN1, map_zero, sub_zero]
   have hN0iso : ∀ a b, S.hT (N0 a) (N0 b) = 0 := fun a b => hXiso _ (hN0X a) _ (hN0X b)
 
@@ -176,7 +181,8 @@ theorem lift_gen (hA : IntegralAdjointUnimodular) (hI : IsotropicIntegralRetract
     intro x hx
     rw [hS1, LinearMap.sum_apply, Finset.sum_range_succ', pow_zero, Module.End.one_apply,
       Finset.sum_eq_zero fun k _ => by
-        rw [pow_succ, Module.End.mul_apply, LinearMap.neg_apply, hx, neg_zero, map_zero], zero_add]
+        rw [pow_succ, Module.End.mul_apply, LinearMap.neg_apply, hx, neg_zero, map_zero],
+      zero_add]
   have hnfix : ∀ x, N1 x = 0 → n x = x + N0 x := by
     intro x hx
     show ((1 + N0) * S1) x = x + N0 x
@@ -206,21 +212,24 @@ theorem lift_gen (hA : IntegralAdjointUnimodular) (hI : IsotropicIntegralRetract
   have lint_neg : ∀ B : Module.End E S.V, LInt Λ B → LInt Λ (-B) := fun B hB l hl => by
     rw [LinearMap.neg_apply]
     exact Submodule.neg_mem _ (hB l hl)
-  have lint_sum : ∀ (f : ℕ → Module.End E S.V) (s : Finset ℕ), (∀ k ∈ s, LInt Λ (f k)) →
-      LInt Λ (∑ k ∈ s, f k) := fun f s hf l hl => by
+  have lint_sum
+      : ∀ (f : ℕ → Module.End E S.V) (s : Finset ℕ),
+        (∀ k ∈ s, LInt Λ (f k)) → LInt Λ (∑ k ∈ s, f k) := fun f s hf l hl => by
     rw [LinearMap.sum_apply]
     exact Submodule.sum_mem _ fun k hk => hf k hk l hl
   have lint_one_add : ∀ B : Module.End E S.V, LInt Λ B → LInt Λ (1 + B) := fun B hB l hl => by
     rw [LinearMap.add_apply, Module.End.one_apply]
     exact Submodule.add_mem _ hl (hB l hl)
-  have lint_mul : ∀ B C : Module.End E S.V, LInt Λ B → LInt Λ C → LInt Λ (B * C) :=
-    fun B C hB hC l hl => by
-      rw [Module.End.mul_apply]
-      exact hB _ (hC l hl)
-  have hnint : LInt Λ ((1 + N0) * S1) := lint_mul _ _ (lint_one_add _ hN0int)
-    (hS1 ▸ lint_sum _ _ fun k _ => lint_pow _ (lint_neg _ hN1int) k)
-  have hninvint : LInt Λ ((1 + N1) * S0) := lint_mul _ _ (lint_one_add _ hN1int)
-    (hS0 ▸ lint_sum _ _ fun k _ => lint_pow _ (lint_neg _ hN0int) k)
+  have lint_mul
+      : ∀ B C : Module.End E S.V, LInt Λ B → LInt Λ C → LInt Λ (B * C) := fun B C hB hC l hl => by
+    rw [Module.End.mul_apply]
+    exact hB _ (hC l hl)
+  have hnint : LInt Λ ((1 + N0) * S1) :=
+    lint_mul _ _ (lint_one_add _ hN0int)
+      (hS1 ▸ lint_sum _ _ fun k _ => lint_pow _ (lint_neg _ hN1int) k)
+  have hninvint : LInt Λ ((1 + N1) * S0) :=
+    lint_mul _ _ (lint_one_add _ hN1int)
+      (hS0 ▸ lint_sum _ _ fun k _ => lint_pow _ (lint_neg _ hN0int) k)
   have hgmap : Formalism.HermitianLatticesTheory.gmap n Λ = Λ := by
     apply le_antisymm
     · rintro _ ⟨l, hl, rfl⟩
@@ -245,7 +254,10 @@ end Gen
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem lift_of_steps (hA : IntegralAdjointUnimodular) (hI : IsotropicIntegralRetraction) (hF : UnitriangularFrameIntegral) (D : D7) : UnitriangularFrameLift D := by
+theorem lift_of_steps
+    (hA : IntegralAdjointUnimodular) (hI : IsotropicIntegralRetraction)
+    (hF : UnitriangularFrameIntegral) (D : D7)
+    : UnitriangularFrameLift D := by
   intro T Λ F F' hfix _ hconv' he _
   obtain ⟨hlat, huni, -, hconv⟩ := hfix
   exact lift_gen hA hI hF D.sp.cm.cmUnram Λ (gS D) F F' hlat huni hconv hconv' he

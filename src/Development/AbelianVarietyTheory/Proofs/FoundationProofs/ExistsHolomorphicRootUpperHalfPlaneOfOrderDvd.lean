@@ -52,10 +52,15 @@ lemma exists_disc (z₀ z : ℂ) (h₀ : 0 < z₀.im) (hz : 0 < z.im) :
   exact ⟨(R : ℂ) * I, R - ε, closedBall_big_sub R ε hε, mem_ball_big z₀ R ε hε h2ε₀ hR₀ hRε,
     mem_ball_big z R ε hε h2ε hR hRε⟩
 
-theorem discRoot : ∀ (h : ℂ → ℂ) (m : ℕ), 0 < m → DifferentiableOn ℂ h Hs →
-    (∀ τ ∈ Hs, ∀ k : ℤ, meromorphicOrderAt h τ = (k : WithTop ℤ) → (m : ℤ) ∣ k) →
-    (∃ z₀ ∈ Hs, h z₀ ≠ 0) → ∀ (c : ℂ) (r : ℝ), Metric.closedBall c r ⊆ Hs →
-    ∃ g : ℂ → ℂ, DifferentiableOn ℂ g (Metric.ball c r) ∧ ∀ z ∈ Metric.ball c r, g z ^ m = h z := by
+theorem discRoot
+    : ∀ (h : ℂ → ℂ) (m : ℕ),
+      0 < m → DifferentiableOn ℂ h Hs
+        → (∀ τ ∈ Hs, ∀ k : ℤ, meromorphicOrderAt h τ = (k : WithTop ℤ) → (m : ℤ) ∣ k)
+        → (∃ z₀ ∈ Hs, h z₀ ≠ 0)
+        → ∀ (c : ℂ) (r : ℝ),
+          Metric.closedBall c r ⊆ Hs
+            → ∃ g : ℂ → ℂ,
+              DifferentiableOn ℂ g (Metric.ball c r) ∧ ∀ z ∈ Metric.ball c r, g z ^ m = h z := by
   rintro h m hm hh hdiv ⟨z₀, hz₀, hne⟩ c r hsub
   rcases le_or_gt r 0 with hr | hr
   · refine ⟨fun _ => 0, differentiableOn_const 0, fun z hz => ?_⟩
@@ -82,9 +87,11 @@ theorem discRoot : ∀ (h : ℂ → ℂ) (m : ℕ), 0 < m → DifferentiableOn �
   obtain ⟨k, hk⟩ := Int.natCast_dvd_natCast.mp (hdiv τ hτ' n hmer)
   exact ⟨k, by rw [← hn, hk]⟩
 
-theorem rootUnique : ∀ (U : Set ℂ) (g₁ g₂ : ℂ → ℂ) (m : ℕ) (z₀ : ℂ), 0 < m → IsOpen U → IsPreconnected U →
-    DifferentiableOn ℂ g₁ U → DifferentiableOn ℂ g₂ U → (∀ z ∈ U, g₁ z ^ m = g₂ z ^ m) → z₀ ∈ U →
-    g₁ z₀ = g₂ z₀ → g₁ z₀ ≠ 0 → Set.EqOn g₁ g₂ U := by
+theorem rootUnique
+    : ∀ (U : Set ℂ) (g₁ g₂ : ℂ → ℂ) (m : ℕ) (z₀ : ℂ),
+      0 < m → IsOpen U → IsPreconnected U → DifferentiableOn ℂ g₁ U → DifferentiableOn ℂ g₂ U
+        → (∀ z ∈ U, g₁ z ^ m = g₂ z ^ m) → z₀ ∈ U → g₁ z₀ = g₂ z₀ → g₁ z₀ ≠ 0
+        → Set.EqOn g₁ g₂ U := by
   intro U g₁ g₂ m z₀ hm hU hC hg₁ hg₂ hpow hz₀ heq hne
   have hc₁ : ContinuousAt g₁ z₀ := (hg₁.differentiableAt (hU.mem_nhds hz₀)).continuousAt
   have hc₂ : ContinuousAt g₂ z₀ := (hg₂.differentiableAt (hU.mem_nhds hz₀)).continuousAt
@@ -104,11 +111,14 @@ theorem rootUnique : ∀ (U : Set ℂ) (g₁ g₂ : ℂ → ℂ) (m : ℕ) (z₀
       exact hzS (Finset.mem_erase.mpr ⟨hne1, Multiset.mem_toFinset.mpr hroot⟩)
     rw [div_eq_one_iff_eq hz1] at h1
     exact h1.symm
-  exact AnalyticOnNhd.eqOn_of_preconnected_of_eventuallyEq (hg₁.analyticOnNhd hU) (hg₂.analyticOnNhd hU) hC hz₀ hev
+  exact AnalyticOnNhd.eqOn_of_preconnected_of_eventuallyEq (hg₁.analyticOnNhd hU)
+    (hg₂.analyticOnNhd hU) hC hz₀ hev
 
-theorem rootHs : ∀ (h : ℂ → ℂ) (m : ℕ), 0 < m → DifferentiableOn ℂ h Hs →
-    (∀ τ ∈ Hs, ∀ k : ℤ, meromorphicOrderAt h τ = (k : WithTop ℤ) → (m : ℤ) ∣ k) →
-    ∃ g : ℂ → ℂ, DifferentiableOn ℂ g Hs ∧ ∀ z ∈ Hs, g z ^ m = h z := by
+theorem rootHs
+    : ∀ (h : ℂ → ℂ) (m : ℕ),
+      0 < m → DifferentiableOn ℂ h Hs
+        → (∀ τ ∈ Hs, ∀ k : ℤ, meromorphicOrderAt h τ = (k : WithTop ℤ) → (m : ℤ) ∣ k)
+        → ∃ g : ℂ → ℂ, DifferentiableOn ℂ g Hs ∧ ∀ z ∈ Hs, g z ^ m = h z := by
   classical
   intro h m hm hh hdiv
   by_cases hz : ∃ z₀ ∈ Hs, h z₀ ≠ 0
@@ -124,8 +134,11 @@ theorem rootHs : ∀ (h : ℂ → ℂ) (m : ℕ), 0 < m → DifferentiableOn ℂ
   have hHsOpen : IsOpen Hs := by
     show IsOpen {z : ℂ | 0 < z.im}
     exact isOpen_lt continuous_const Complex.continuous_im
-  have key : ∀ z ∈ Hs, ∃ (c : ℂ) (r : ℝ), z₀ ∈ ball c r ∧ z ∈ ball c r ∧ ∃ g : ℂ → ℂ,
-      DifferentiableOn ℂ g (ball c r) ∧ (∀ y ∈ ball c r, g y ^ m = h y) ∧ g z₀ = w₀ := by
+  have key
+      : ∀ z ∈ Hs, ∃ (c : ℂ) (r : ℝ),
+        z₀ ∈ ball c r ∧ z ∈ ball c r
+          ∧ ∃ g : ℂ → ℂ,
+            DifferentiableOn ℂ g (ball c r) ∧ (∀ y ∈ ball c r, g y ^ m = h y) ∧ g z₀ = w₀ := by
     intro z hz
     obtain ⟨c, r, hsub, h0, h1⟩ := exists_disc z₀ z hz₀ hz
     obtain ⟨g, hgd, hgp⟩ := discRoot h m hm hh hdiv ⟨z₀, hz₀, hne⟩ c r hsub
@@ -137,19 +150,24 @@ theorem rootHs : ∀ (h : ℂ → ℂ) (m : ℕ), 0 < m → DifferentiableOn ℂ
     · rw [mul_pow, div_pow, hgp y hy, hw₀, hgp z₀ h0, div_self hne, one_mul]
     · exact div_mul_cancel₀ w₀ hg0
   choose c r h0 h1 g hgd hgp hgz using key
-  have hloc : ∀ z₁ (hz₁ : z₁ ∈ Hs) z (hz : z ∈ Hs), z ∈ ball (c z₁ hz₁) (r z₁ hz₁) →
-      g z hz z = g z₁ hz₁ z := by
+  have hloc
+      : ∀ z₁ (hz₁ : z₁ ∈ Hs) z (hz : z ∈ Hs),
+        z ∈ ball (c z₁ hz₁) (r z₁ hz₁) → g z hz z = g z₁ hz₁ z := by
     intro z₁ hz₁ z hz hzb
-    have hU : IsOpen (ball (c z hz) (r z hz) ∩ ball (c z₁ hz₁) (r z₁ hz₁)) := isOpen_ball.inter isOpen_ball
+    have hU : IsOpen (ball (c z hz) (r z hz) ∩ ball (c z₁ hz₁) (r z₁ hz₁)) :=
+      isOpen_ball.inter isOpen_ball
     have hC : IsPreconnected (ball (c z hz) (r z hz) ∩ ball (c z₁ hz₁) (r z₁ hz₁)) :=
       ((convex_ball _ _).inter (convex_ball _ _)).isPreconnected
     refine rootUnique _ (g z hz) (g z₁ hz₁) m z₀ hm hU hC ((hgd z hz).mono Set.inter_subset_left)
-      ((hgd z₁ hz₁).mono Set.inter_subset_right) (fun y hy => by rw [hgp z hz y hy.1, hgp z₁ hz₁ y hy.2])
-      ⟨h0 z hz, h0 z₁ hz₁⟩ ((hgz z hz).trans (hgz z₁ hz₁).symm) (by rw [hgz z hz]; exact hw₀ne) ⟨h1 z hz, hzb⟩
+      ((hgd z₁ hz₁).mono Set.inter_subset_right)
+      (fun y hy => by rw [hgp z hz y hy.1, hgp z₁ hz₁ y hy.2])
+      ⟨h0 z hz, h0 z₁ hz₁⟩ ((hgz z hz).trans (hgz z₁ hz₁).symm) (by rw [hgz z hz]; exact hw₀ne)
+      ⟨h1 z hz, hzb⟩
   refine ⟨fun z => if h' : z ∈ Hs then g z h' z else 0, ?_, ?_⟩
   · intro z₁ hz₁
     have hev : (fun z => if h' : z ∈ Hs then g z h' z else 0) =ᶠ[𝓝 z₁] g z₁ hz₁ := by
-      have hmem : ball (c z₁ hz₁) (r z₁ hz₁) ∩ Hs ∈ 𝓝 z₁ := (isOpen_ball.inter hHsOpen).mem_nhds ⟨h1 z₁ hz₁, hz₁⟩
+      have hmem : ball (c z₁ hz₁) (r z₁ hz₁) ∩ Hs ∈ 𝓝 z₁ :=
+        (isOpen_ball.inter hHsOpen).mem_nhds ⟨h1 z₁ hz₁, hz₁⟩
       filter_upwards [hmem] with z hz
       show (if h' : z ∈ Hs then g z h' z else 0) = g z₁ hz₁ z
       rw [dite_eq_left hz.2]

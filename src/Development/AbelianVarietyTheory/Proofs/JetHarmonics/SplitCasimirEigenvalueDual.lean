@@ -11,12 +11,23 @@ open Formalism.REAL
 
 namespace GlobalTheory
 
-theorem splitCasimir_eigenvalue_dual : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] (n : ℕ) (E : Fin (n + 1) → Fin (n + 1) → Module.End ℂ V) (Et : Fin (n + 1) → Fin (n + 1) → Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (Om : Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (m : Fin (n + 1) → ℂ), GlRel E → (∀ a b x y, inner ℂ (E a b x) y = inner ℂ x (E b a y)) → (∀ w v, qdet E w v = (∏ j, (w + m j)) • v) → (∀ a b y c, Et a b y c = E a b (y c) - if c = b then y a else 0) → (∀ y a, Om y a = ∑ c, E a c (y c)) → ∀ (lam : ℂ) (x : (PiLp 2 (fun _ : Fin (n + 1) => V))), x ≠ 0 → Om x = lam • x → ∃ j, lam = m j + (n : ℂ) := by
+theorem splitCasimir_eigenvalue_dual
+    : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] (n : ℕ)
+        (E : Fin (n + 1) → Fin (n + 1) → Module.End ℂ V)
+        (Et : Fin (n + 1) → Fin (n + 1) → Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V)))
+        (Om : Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (m : Fin (n + 1) → ℂ),
+      GlRel E → (∀ a b x y, inner ℂ (E a b x) y = inner ℂ x (E b a y))
+        → (∀ w v, qdet E w v = (∏ j, (w + m j)) • v)
+        → (∀ a b y c, Et a b y c = E a b (y c) - if c = b then y a else 0)
+        → (∀ y a, Om y a = ∑ c, E a c (y c))
+        → ∀ (lam : ℂ) (x : (PiLp 2 (fun _ : Fin (n + 1) => V))),
+          x ≠ 0 → Om x = lam • x → ∃ j, lam = m j + (n : ℂ) := by
   intro V _ _ _ n E Et Om m hrel hunit hdet hEt hOm lam x hx hxe
   obtain ⟨-, -, -, hcomm⟩ := tensor_dual_standard_rel V n E Et Om hrel hunit hEt hOm
   obtain ⟨K, hK, -⟩ := lastComatrixRow_inverts_dual V n E Om m hrel hdet hOm
-  have key : ∀ z : PiLp 2 (fun _ : Fin (n + 1) => V), Om z = lam • z →
-      z (Fin.last n) ≠ 0 → ∃ j, lam = m j + (n : ℂ) := by
+  have key
+      : ∀ z : PiLp 2 (fun _ : Fin (n + 1) => V),
+        Om z = lam • z → z (Fin.last n) ≠ 0 → ∃ j, lam = m j + (n : ℂ) := by
     intro z hz hzl
     have h0 := hK ((n : ℂ) - lam) z
     have hzero : ((n : ℂ) - lam - (n : ℂ)) • z + Om z = 0 := by

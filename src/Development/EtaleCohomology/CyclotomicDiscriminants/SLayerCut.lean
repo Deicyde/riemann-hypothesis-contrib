@@ -8,13 +8,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LayeredIsom
 
 noncomputable section
 
-open NumberField NumberField.InfinitePlace Polynomial UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Tower
+open NumberField NumberField.InfinitePlace Polynomial UpperTheory.V UpperTheory.V.LDataCardLeFinrank
+  UpperTheory.V.Tower
 
 namespace LateralTheory.Q.SLayerCut
 
-theorem disc_cyc (L L' : Type) [Field L] [NumberField L] [Field L'] [NumberField L'] [Algebra L L'] (N : ℕ)
-    (hN : N ≠ 0) [hc : IsCyclotomicExtension {N} L L'] :
-    (discr L').natAbs ≤ (discr L).natAbs ^ Module.finrank L L' * N ^ Module.finrank ℚ L' := by
+theorem disc_cyc
+    (L L' : Type) [Field L] [NumberField L] [Field L'] [NumberField L'] [Algebra L L']
+    (N : ℕ) (hN : N ≠ 0) [hc : IsCyclotomicExtension {N} L L']
+    : (discr L').natAbs ≤ (discr L).natAbs ^ Module.finrank L L' * N ^ Module.finrank ℚ L' := by
   have : NeZero N := ⟨hN⟩
   have hz := IsCyclotomicExtension.zeta_spec N L L'
   set z := IsCyclotomicExtension.zeta N L L' with hzd
@@ -28,21 +30,27 @@ theorem disc_cyc (L L' : Type) [Field L] [NumberField L] [Field L'] [NumberField
     minpoly.isIntegrallyClosed_dvd hint (by simp [hx])
   obtain ⟨g, hg⟩ := hdvd
   have h1 := congrArg (fun p => aeval x (derivative p) * x) hg
-  simp only [derivative_sub, derivative_X_pow, derivative_one, sub_zero, derivative_mul, map_add (f := _), map_mul,
-    minpoly.aeval, zero_mul, add_zero, map_pow, aeval_X, map_natCast] at h1
+  simp only [derivative_sub, derivative_X_pow, derivative_one, sub_zero, derivative_mul,
+      map_add (f := _), map_mul, minpoly.aeval, zero_mul, add_zero, map_pow, aeval_X, map_natCast]
+    at h1
   have h2 : (N : 𝓞 L') ∈ differentIdeal (𝓞 L) (𝓞 L') := by
     have h3 : (N : 𝓞 L') = aeval x (derivative (minpoly (𝓞 L) x)) * (aeval x g * x) := by
-      rw [← mul_assoc, ← h1, mul_assoc, ← pow_succ, Nat.sub_add_cancel (Nat.pos_of_ne_zero hN), hx, mul_one]
+      rw [← mul_assoc, ← h1, mul_assoc, ← pow_succ, Nat.sub_add_cancel (Nat.pos_of_ne_zero hN), hx,
+        mul_one]
     rw [h3]
     exact Ideal.mul_mem_right _ _ hmem
   have h4 : Ideal.absNorm (differentIdeal (𝓞 L) (𝓞 L')) ∣ N ^ Module.finrank ℚ L' := by
     have h5 := Ideal.absNorm_dvd_absNorm_of_le ((Ideal.span_singleton_le_iff_mem _).2 h2)
     rwa [Ideal.absNorm_span_natCast, RingOfIntegers.rank] at h5
-  rw [NumberField.natAbs_discr_eq_absNorm_differentIdeal_mul_natAbs_discr_pow L (𝓞 L) L' (𝓞 L'), mul_comm]
+  rw [NumberField.natAbs_discr_eq_absNorm_differentIdeal_mul_natAbs_discr_pow L (𝓞 L) L' (𝓞 L'),
+    mul_comm]
   exact Nat.mul_le_mul_left _ (Nat.le_of_dvd (pow_pos (Nat.pos_of_ne_zero hN) _) h4)
 
-theorem sha_le (L L' : Type) [Field L] [NumberField L] [Field L'] [NumberField L'] [Algebra L L'] (l E m : ℕ)
-    [Fact l.Prime] (hμ : HasMuQ l L) (hE : 1 ≤ E) (h : IsLayer l m L L') : shaInv L l E ≤ shaInv L' l E := by
+theorem sha_le
+    (L L' : Type) [Field L] [NumberField L] [Field L'] [NumberField L'] [Algebra L L']
+    (l E m : ℕ) [Fact l.Prime]
+    (hμ : HasMuQ l L) (hE : 1 ≤ E) (h : IsLayer l m L L')
+    : shaInv L l E ≤ shaInv L' l E := by
   obtain ⟨γ, -, -, -, hd⟩ := exists_descends l L (AlgebraicClosure L) hμ
   have h0 : IsLayer l 0 L L := by
     refine ⟨⟨0, ?_⟩, by simp⟩
@@ -50,7 +58,8 @@ theorem sha_le (L L' : Type) [Field L] [NumberField L] [Field L'] [NumberField L
     rw [IsCyclotomicExtension.iff_singleton]
     exact ⟨⟨1, by simp⟩, fun x => Subalgebra.algebraMap_mem _ x⟩
   rw [hd E hE 0 L h0, hd E hE m L' h, pow_zero, pow_one]
-  generalize xTw l l (⊤ : Subgroup (Formalism.ConjugateSelfDual.G L (AlgebraicClosure L))) (E : ℤ) γ = g
+  generalize xTw l l (⊤ : Subgroup (Formalism.ConjugateSelfDual.G L (AlgebraicClosure L))) (E : ℤ) γ
+    = g
   have hr : LinearMap.range (g ^ l ^ m - 1) ≤ LinearMap.range (g - 1) := by
     rw [← mul_geom_sum g (l ^ m), Module.End.mul_eq_comp]
     exact LinearMap.range_comp_le_range _ _
@@ -65,7 +74,9 @@ theorem goal_of : UpperTheory.V.ZK.SLayer := by
   have hm2 : l ^ m ≤ l * (4 * E + 4) := by
     have h1 := Nat.pow_pred_clog_lt_self l (x := 4 * E + 4) (by omega)
     have h2 : 0 < m := Nat.clog_pos hp.one_lt (by omega)
-    calc l ^ m = l * l ^ (m - 1) := by rw [← pow_succ', Nat.sub_add_cancel h2]
+    calc
+      l ^ m
+        = l * l ^ (m - 1) := by rw [← pow_succ', Nat.sub_add_cancel h2]
       _ ≤ _ := Nat.mul_le_mul_left _ h1.le
   have hLay := (layerUniq L Ω l hμ).1 m
   have hcyc := (Kum.fnCyc L Ω l (cZero l L + m)).1
@@ -87,15 +98,29 @@ theorem goal_of : UpperTheory.V.ZK.SLayer := by
     · omega
     · obtain ⟨z, hz⟩ := hμ
       rw [if_neg h2] at hz
-      have h1 := IsPrimitiveRoot.lcm_totient_le_finrank (K := ℚ) hz hz
-        (Polynomial.cyclotomic.irreducible_rat (by rw [Nat.lcm_self]; exact hp.pos))
+      have h1 :=
+        IsPrimitiveRoot.lcm_totient_le_finrank (K := ℚ) hz hz
+          (Polynomial.cyclotomic.irreducible_rat (by rw [Nat.lcm_self]; exact hp.pos))
       rw [Nat.lcm_self, Nat.totient_prime hp] at h1
       omega
   have hpw : l ^ (cZero l L + m) ≤ l ^ cZero l L' := Nat.pow_le_pow_right hp.pos hle
   have hpm : l ^ m ≤ l ^ (cZero l L + m) := Nat.pow_le_pow_right hp.pos (by omega)
-  refine ⟨L', inferInstance, inferInstance, cZero l L', l ^ m, htc, ⟨?_, fun h2 => ?_, (q1 _).2 le_rfl, fun h => ?_⟩,
-    by omega, ?_, hfin, hm2.trans (Nat.mul_le_mul_right _ hln), Win.rootdeg L' l _ hp ((q1 _).2 le_rfl), ?_,
-    sha_le L L' l E m hμ hE hLay⟩
+  refine ⟨
+    L',
+    inferInstance,
+    inferInstance,
+    cZero l L',
+    l ^ m,
+    htc,
+    ⟨?_, fun h2 => ?_, (q1 _).2 le_rfl, fun h => ?_⟩,
+    by omega,
+    ?_,
+    hfin,
+    hm2.trans (Nat.mul_le_mul_right _ hln),
+    Win.rootdeg L' l _ hp ((q1 _).2 le_rfl),
+    ?_,
+    sha_le L L' l E m hμ hE hLay
+  ⟩
   · unfold Base.qExp at hq
     split_ifs at hq <;> omega
   · unfold Base.qExp at hq

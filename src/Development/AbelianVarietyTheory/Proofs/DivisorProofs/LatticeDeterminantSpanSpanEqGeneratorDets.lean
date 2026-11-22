@@ -10,17 +10,19 @@ open NumberField
 
 namespace GlobalTheory.IdxTensor
 
-theorem dets_span_eq {F : Type} [Field F] [NumberField F] (p : ℕ) (S : Set (Fin p → F)) :
-    GlobalTheory.IdxTensor.dets F p (Submodule.span (𝓞 F) S) =
-      Submodule.span (𝓞 F) {d | ∃ y : Fin p → Fin p → F, (∀ i, y i ∈ S) ∧ d = (Matrix.of y).det} := by
+theorem dets_span_eq {F : Type} [Field F] [NumberField F] (p : ℕ) (S : Set (Fin p → F))
+    : GlobalTheory.IdxTensor.dets F p (Submodule.span (𝓞 F) S)
+      = Submodule.span (𝓞 F)
+        {d | ∃ y : Fin p → Fin p → F, (∀ i, y i ∈ S) ∧ d = (Matrix.of y).det} := by
   set T : Set F := {d | ∃ y : Fin p → Fin p → F, (∀ i, y i ∈ S) ∧ d = (Matrix.of y).det} with hT
   apply le_antisymm
   · unfold dets
     rw [Submodule.span_le]
     rintro d ⟨y, hy, rfl⟩
-    have key : ∀ s : Finset (Fin p), ∀ y : Fin p → Fin p → F,
-        (∀ i, y i ∈ Submodule.span (𝓞 F) S) → (∀ i, i ∉ s → y i ∈ S) →
-          (Matrix.of y).det ∈ Submodule.span (𝓞 F) T := by
+    have key
+        : ∀ s : Finset (Fin p), ∀ y : Fin p → Fin p → F,
+          (∀ i, y i ∈ Submodule.span (𝓞 F) S) → (∀ i, i ∉ s → y i ∈ S)
+            → (Matrix.of y).det ∈ Submodule.span (𝓞 F) T := by
       intro s
       induction s using Finset.induction_on with
       | empty =>
@@ -28,9 +30,11 @@ theorem dets_span_eq {F : Type} [Field F] [NumberField F] (p : ℕ) (S : Set (Fi
         exact Submodule.subset_span ⟨y, fun i => h i (Finset.notMem_empty i), rfl⟩
       | insert a s ha ih =>
         intro y hy hs
-        have upd : ∀ v, Matrix.of (Function.update y a v) = Matrix.updateRow (Matrix.of y) a v := fun v => rfl
-        have hv : ∀ v ∈ Submodule.span (𝓞 F) S,
-            (Matrix.updateRow (Matrix.of y) a v).det ∈ Submodule.span (𝓞 F) T := by
+        have upd : ∀ v, Matrix.of (Function.update y a v) = Matrix.updateRow (Matrix.of y) a v :=
+          fun v => rfl
+        have hv
+            : ∀ v ∈ Submodule.span (𝓞 F) S,
+              (Matrix.updateRow (Matrix.of y) a v).det ∈ Submodule.span (𝓞 F) T := by
           intro v hv
           induction hv using Submodule.span_induction with
           | mem x hx =>

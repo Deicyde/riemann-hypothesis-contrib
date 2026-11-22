@@ -26,11 +26,14 @@ theorem schur_orthogonality_idempotent : PI.PhSchurConv.SchurConv := by
       simp only [star_mul', star_star, hstard]
       try ring
     · intro x y
-      have key : ∀ g, PI.PhSchurConv.phOf σ w d g * PI.PhSchurConv.phOf σ w d (x⁻¹ * g⁻¹ * y)
-          = ((d : ℂ) * d) * (⟪σ y w, σ g (σ x w)⟫_ℂ * star ⟪w, σ g w⟫_ℂ) := by
+      have key
+          : ∀ g,
+            PI.PhSchurConv.phOf σ w d g * PI.PhSchurConv.phOf σ w d (x⁻¹ * g⁻¹ * y)
+              = ((d : ℂ) * d) * (⟪σ y w, σ g (σ x w)⟫_ℂ * star ⟪w, σ g w⟫_ℂ) := by
         intro g
         simp only [PI.PhSchurConv.phOf, PI.PhSchurConv.coefM]
-        rw [(PI.UnitaryGroupMassFormula.PhSchurConv.Main.coef_conv hU), PI.UnitaryGroupMassFormula.PhSchurConv.Main.star_inner (σ g (σ x w)) (σ y w)]
+        rw [(PI.UnitaryGroupMassFormula.PhSchurConv.Main.coef_conv hU),
+          PI.UnitaryGroupMassFormula.PhSchurConv.Main.star_inner (σ g (σ x w)) (σ y w)]
         ring
       obtain ⟨hi, he⟩ := hF.2 (σ x w) (σ y w) w w
       simp_rw [key]
@@ -40,8 +43,10 @@ theorem schur_orthogonality_idempotent : PI.PhSchurConv.SchurConv := by
       rw [PI.UnitaryGroupMassFormula.PhSchurConv.Main.star_inner w (σ y w), div_eq_mul_inv]
       linear_combination (⟪w, σ x w⟫_ℂ * ⟪σ y w, w⟫_ℂ * d) * hinv
   · intro u u'
-    have key : ∀ g, PI.PhSchurConv.phOf σ w d g * ⟪u', σ g u⟫_ℂ
-        = (d : ℂ) * (⟪u', σ g u⟫_ℂ * star ⟪w, σ g w⟫_ℂ) := by
+    have key
+        : ∀ g,
+          PI.PhSchurConv.phOf σ w d g * ⟪u', σ g u⟫_ℂ
+            = (d : ℂ) * (⟪u', σ g u⟫_ℂ * star ⟪w, σ g w⟫_ℂ) := by
       intro g
       simp only [PI.PhSchurConv.phOf, PI.PhSchurConv.coefM]
       ring

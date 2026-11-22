@@ -16,8 +16,7 @@ class IsNormalScheme (X : Scheme.{u}) : Prop where
   isDomain_stalk : ∀ x : X, IsDomain (X.presheaf.stalk x)
   isIntegrallyClosed_stalk : ∀ x : X, IsIntegrallyClosed (X.presheaf.stalk x)
 
-def PrimeDivisor (X : Scheme.{u}) : Type u :=
-  {x : X // ringKrullDim (X.presheaf.stalk x) = 1}
+def PrimeDivisor (X : Scheme.{u}) : Type u := {x : X // ringKrullDim (X.presheaf.stalk x) = 1}
 
 abbrev WeilDivisor (X : Scheme.{u}) : Type u := PrimeDivisor X →₀ ℤ
 
@@ -69,12 +68,15 @@ lemma isDedekindDomain_stalk (x : PrimeDivisor X) :
     ⟨inferInstance, inferInstance, inferInstance,
       fun {y} hy => IsIntegrallyClosed.isIntegral_iff.mp hy⟩
 
-noncomputable def heightOneSpectrum (x : PrimeDivisor X) :
-    HeightOneSpectrum (X.presheaf.stalk x.point) :=
-  ⟨IsLocalRing.maximalIdeal _, (IsLocalRing.maximalIdeal.isMaximal _).isPrime,
-    x.maximalIdeal_ne_bot⟩
+noncomputable def heightOneSpectrum (x : PrimeDivisor X)
+    : HeightOneSpectrum (X.presheaf.stalk x.point) := ⟨
+  IsLocalRing.maximalIdeal _,
+  (IsLocalRing.maximalIdeal.isMaximal _).isPrime,
+  x.maximalIdeal_ne_bot
+⟩
 
-noncomputable def valuation (x : PrimeDivisor X) : Valuation X.functionField (WithZero (Multiplicative ℤ)) :=
+noncomputable def valuation (x : PrimeDivisor X)
+    : Valuation X.functionField (WithZero (Multiplicative ℤ)) :=
   @HeightOneSpectrum.valuation _ _ x.isDedekindDomain_stalk _ _ _ _ x.heightOneSpectrum
 
 noncomputable def ord (x : PrimeDivisor X) (f : X.functionField) : ℤ :=
@@ -135,8 +137,8 @@ section Finite
 
 variable [IsIntegral X] [IsNoetherian X] [IsNormalScheme X]
 
-theorem PrimeDivisor.finite_ord_ne_zero {f : X.functionField} (hf : f ≠ 0) :
-    {x : PrimeDivisor X | x.ord f ≠ 0}.Finite := by
+theorem PrimeDivisor.finite_ord_ne_zero {f : X.functionField} (hf : f ≠ 0)
+    : {x : PrimeDivisor X | x.ord f ≠ 0}.Finite := by
   obtain ⟨U, -, g, hne, hgf, hgu⟩ := exists_isUnit_germ_eq X f hf
   set Z : Set X := (U : Set X)ᶜ with hZ
   have hZc : IsClosed Z := U.isOpen.isClosed_compl
@@ -149,20 +151,21 @@ theorem PrimeDivisor.finite_ord_ne_zero {f : X.functionField} (hf : f ≠ 0) :
     simp only [Set.mem_ofPred_eq, hZ, Set.mem_compl_iff, not_not] at hxU
     exact hx (hgf ▸ x.ord_germToFunctionField_of_isUnit hxU hgu)
   refine Set.Finite.subset ?_ hsub
-  have key : ∀ (x : PrimeDivisor X) (hx : x.point ∈ Z) (C : Set Z),
-      C ∈ irreducibleComponents Z → (⟨x.point, hx⟩ : Z) ∈ C →
-      ∃ hT : IsIrreducible (closure (Subtype.val '' C)), x.point = hT.genericPoint := by
+  have key
+      : ∀ (x : PrimeDivisor X) (hx : x.point ∈ Z) (C : Set Z),
+        C ∈ irreducibleComponents Z → (⟨x.point, hx⟩ : Z) ∈ C
+          → ∃ hT : IsIrreducible (closure (Subtype.val '' C)), x.point = hT.genericPoint := by
     intro x hx C hC hxC
     have hT : IsIrreducible (closure (Subtype.val '' C)) :=
       (hC.1.image _ continuous_subtype_val.continuousOn).closure
     refine ⟨hT, x.eq_genericPoint_of_mem hT isClosed_closure ?_ ?_⟩
     · intro hg
-      have : closure (Subtype.val '' C) ⊆ Z :=
-        closure_minimal (Subtype.coe_image_subset _ _) hZc
+      have : closure (Subtype.val '' C) ⊆ Z := closure_minimal (Subtype.coe_image_subset _ _) hZc
       exact this hg hgenU
     · exact subset_closure ⟨_, hxC, rfl⟩
-  have hcomp : ∀ x : {x : PrimeDivisor X | x.point ∈ Z}, ∃ C ∈ irreducibleComponents Z,
-      {(⟨x.1.point, x.2⟩ : Z)} ⊆ C := fun x =>
+  have hcomp
+      : ∀ x : {x : PrimeDivisor X | x.point ∈ Z}, ∃ C ∈ irreducibleComponents Z,
+        {(⟨x.1.point, x.2⟩ : Z)} ⊆ C := fun x =>
     exists_mem_irreducibleComponents_subset_of_isIrreducible _ isIrreducible_singleton
   let φ : {x : PrimeDivisor X | x.point ∈ Z} → irreducibleComponents Z := fun x =>
     ⟨(hcomp x).choose, (hcomp x).choose_spec.1⟩
@@ -187,8 +190,6 @@ end Finite
 section Divisor
 
 variable [IsIntegral X] [IsNoetherian X] [IsNormalScheme X]
-
-
 
 end Divisor
 

@@ -157,78 +157,92 @@ end UpperTheory.Reformulated.B.RamificationLowerIndex
 
 open Polynomial IsLocalRing ValuativeRel GroundTheory.LocalField in
 open IsDiscreteValuationRing hiding maximalIdeal in
-theorem UpperTheory.Reformulated.B.RamificationLowerIndex.ramificationIndex_mul_lowerIndex_restrictNormalHom.{u_1, u_2} :
-    ∀ {K : Type u_1} {L : Type u_2} [inst : Field K] [inst_1 : ValuativeRel K] [inst_2 : TopologicalSpace K]
-      [inst_3 : IsNonarchimedeanLocalField K] [inst_4 : Field L] [inst_5 : ValuativeRel L] [inst_6 : TopologicalSpace L]
-      [inst_7 : IsNonarchimedeanLocalField L] [inst_8 : Algebra K L] [inst_9 : ValuativeExtension K L]
-      [inst_10 : FiniteDimensional K L] (M : IntermediateField K L) [IsGalois K L] [inst_12 : Normal K ↥M] (σ : Gal(L/K)),
-      (↑((_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation (↥M))))) : ℕ∞) *
-          GroundTheory.LocalField.lowerIndex K (↥M) ((AlgEquiv.restrictNormalHom ↥M : Gal(L/K) → Gal(↥M/K)) σ) =
-        ∑ τ : Gal(L/↥M), GroundTheory.LocalField.lowerIndex K L (σ * AlgEquiv.restrictScalars K τ) := by
-  intro K L _ _ _ _ _ _ _ _ _ _ _ M _ _ σ
-  obtain ⟨x, hx⟩ := exists_generator (R := 𝒪[K]) (S := 𝒪[L]) _ (map_maximalIdeal K L).ge
-  have hv := addVal_algebraMap (T := 𝒪[M]) (S := 𝒪[L]) _ (ramificationIndex_pos M L).ne'
-    (map_maximalIdeal M L)
-  set σ' : Gal(M/K) := AlgEquiv.restrictNormalHom M σ with hσ'
-  let r : Gal(L/M) → (𝒪[L] ≃ₐ[𝒪[K]] 𝒪[L]) := fun τ => integerAlgEquiv K L (τ.restrictScalars K)
-  let s := integerAlgEquiv K L σ
-  let a : Gal(L/M) → 𝒪[L] := fun τ => r τ x
-  have ha1 : a 1 = x := rfl
-  have hamul : ∀ ρ τ, r ρ (a τ) = a (ρ * τ) := fun _ _ => rfl
-  have hcomm : ∀ y : 𝒪[M], s (algebraMap 𝒪[M] 𝒪[L] y) =
-      algebraMap 𝒪[M] 𝒪[L] (integerAlgEquiv K M σ' y) := fun y =>
-    Subtype.ext (AlgEquiv.restrictNormal_commutes σ M (y : M)).symm
-  have hfix : ∀ τ (y : 𝒪[M]), r τ (algebraMap 𝒪[M] 𝒪[L] y) = algebraMap 𝒪[M] 𝒪[L] y :=
-    fun τ y => Subtype.ext (τ.commutes (y : M))
-  have hinj : Function.Injective a := by
-    intro τ ρ h
-    have h1 : r (ρ⁻¹ * τ) x - x = 0 := by
-      change a (ρ⁻¹ * τ) - x = 0
-      rw [← hamul, h, hamul, inv_mul_cancel, ha1, sub_self]
-    have h2 : lowerIndex K L ((ρ⁻¹ * τ).restrictScalars K) = ⊤ := by
-      rw [lowerIndex_eq_addVal_of_adjoin_eq_top hx, addVal_eq_top_iff]
-      exact h1
-    rw [lowerIndex_restrictScalars, lowerIndex_eq_top_iff, inv_mul_eq_one] at h2
-    exact h2.symm
-  have hsum : ∑ τ : Gal(L/M), lowerIndex K L (σ * τ.restrictScalars K) =
-      addVal 𝒪[L] (∏ τ, (x - s (a τ))) := by
-    rw [addVal_prod]
-    refine Finset.sum_congr rfl fun τ _ => ?_
-    rw [lowerIndex_eq_addVal_of_adjoin_eq_top hx, ← AddValuation.map_neg, neg_sub]
-    rfl
-  obtain ⟨y₀, hy₀⟩ := ENat.exists_eq_iInf
-    (fun y : 𝒪[M] => addVal 𝒪[M] (integerAlgEquiv K M σ' y - y))
-  have hy₁ : lowerIndex K M σ' = addVal 𝒪[M] (integerAlgEquiv K M σ' y₀ - y₀) := hy₀.symm
-  rw [hsum, hy₁, ← hv]
-  apply le_antisymm
-  · rw [addVal_le_iff_dvd, ← ha1]
-    refine dvd_prod a 1 _ (s : 𝒪[L] →+* 𝒪[L]) fun i => ?_
-    set f : 𝒪[L][X] := ∏ τ, (X - C (a τ)) with hf
-    have hfr : ∀ ρ, r ρ (f.coeff i) = f.coeff i := by
-      intro ρ
-      have : f.map (r ρ : 𝒪[L] →+* 𝒪[L]) = f := by
-        rw [hf, Polynomial.map_prod]
-        refine Fintype.prod_equiv (Equiv.mulLeft ρ) _ _ fun τ => ?_
-        rw [Polynomial.map_sub, map_X, map_C]
-        rfl
-      conv_rhs => rw [← this, coeff_map]
+theorem
+    UpperTheory.Reformulated.B.RamificationLowerIndex.ramificationIndex_mul_lowerIndex_restrictNormalHom.{u_1,
+      u_2}
+    : ∀ {K : Type u_1} {L : Type u_2} [inst : Field K] [inst_1 : ValuativeRel K]
+        [inst_2 : TopologicalSpace K] [inst_3 : IsNonarchimedeanLocalField K] [inst_4 : Field L]
+        [inst_5 : ValuativeRel L] [inst_6 : TopologicalSpace L]
+        [inst_7 : IsNonarchimedeanLocalField L] [inst_8 : Algebra K L]
+        [inst_9 : ValuativeExtension K L] [inst_10 : FiniteDimensional K L]
+        (M : IntermediateField K L) [IsGalois K L] [inst_12 : Normal K ↥M] (σ : Gal(L/K)),
+      (↑((_root_.Ideal.ramificationIdx
+              (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer
+                (_root_.ValuativeRel.valuation L)))
+              (_root_.Valuation.integer (_root_.ValuativeRel.valuation (↥M)))))
+            : ℕ∞)
+          * GroundTheory.LocalField.lowerIndex K (↥M)
+            ((AlgEquiv.restrictNormalHom ↥M : Gal(L/K) → Gal(↥M/K)) σ)
+        = ∑ τ : Gal(L/↥M), GroundTheory.LocalField.lowerIndex K L (σ * AlgEquiv.restrictScalars K τ) :=
+  by
+    intro K L _ _ _ _ _ _ _ _ _ _ _ M _ _ σ
+    obtain ⟨x, hx⟩ := exists_generator (R := 𝒪[K]) (S := 𝒪[L]) _ (map_maximalIdeal K L).ge
+    have hv :=
+      addVal_algebraMap (T := 𝒪[M]) (S := 𝒪[L]) _ (ramificationIndex_pos M L).ne'
+        (map_maximalIdeal M L)
+    set σ' : Gal(M/K) := AlgEquiv.restrictNormalHom M σ with hσ'
+    let r : Gal(L/M) → (𝒪[L] ≃ₐ[𝒪[K]] 𝒪[L]) := fun τ => integerAlgEquiv K L (τ.restrictScalars K)
+    let s := integerAlgEquiv K L σ
+    let a : Gal(L/M) → 𝒪[L] := fun τ => r τ x
+    have ha1 : a 1 = x := rfl
+    have hamul : ∀ ρ τ, r ρ (a τ) = a (ρ * τ) := fun _ _ => rfl
+    have hcomm
+        : ∀ y : 𝒪[M],
+          s (algebraMap 𝒪[M] 𝒪[L] y) = algebraMap 𝒪[M] 𝒪[L] (integerAlgEquiv K M σ' y) := fun y =>
+      Subtype.ext (AlgEquiv.restrictNormal_commutes σ M (y : M)).symm
+    have hfix : ∀ τ (y : 𝒪[M]), r τ (algebraMap 𝒪[M] 𝒪[L] y) = algebraMap 𝒪[M] 𝒪[L] y := fun τ y =>
+      Subtype.ext (τ.commutes (y : M))
+    have hinj : Function.Injective a := by
+      intro τ ρ h
+      have h1 : r (ρ⁻¹ * τ) x - x = 0 := by
+        change a (ρ⁻¹ * τ) - x = 0
+        rw [← hamul, h, hamul, inv_mul_cancel, ha1, sub_self]
+      have h2 : lowerIndex K L ((ρ⁻¹ * τ).restrictScalars K) = ⊤ := by
+        rw [lowerIndex_eq_addVal_of_adjoin_eq_top hx, addVal_eq_top_iff]
+        exact h1
+      rw [lowerIndex_restrictScalars, lowerIndex_eq_top_iff, inv_mul_eq_one] at h2
+      exact h2.symm
+    have hsum
+        : ∑ τ : Gal(L/M), lowerIndex K L (σ * τ.restrictScalars K)
+          = addVal 𝒪[L] (∏ τ, (x - s (a τ))) := by
+      rw [addVal_prod]
+      refine Finset.sum_congr rfl fun τ _ => ?_
+      rw [lowerIndex_eq_addVal_of_adjoin_eq_top hx, ← AddValuation.map_neg, neg_sub]
       rfl
-    obtain ⟨m, hm⟩ := (IsGalois.mem_range_algebraMap_iff_fixed (F := M)
-      ((f.coeff i : 𝒪[L]) : L)).2 fun ρ => congrArg Subtype.val (hfr ρ)
-    have hm1 : m ∈ 𝒪[M] := by
-      have h1 : valuation L (algebraMap M L m) ≤ 1 := by rw [hm]; exact (f.coeff i).2
-      exact (Valuation.HasExtension.val_map_le_one_iff (valuation M) (valuation L) m).1 h1
-    have hy : f.coeff i = algebraMap 𝒪[M] 𝒪[L] ⟨m, hm1⟩ := Subtype.ext hm.symm
-    set_option synthInstance.maxHeartbeats 200000 in
-      rw [hy, RingHom.coe_coe, hcomm, ← map_sub (algebraMap 𝒪[M] 𝒪[L])]
-    apply _root_.map_dvd
-    rw [← addVal_le_iff_dvd, ← hy₁]
-    exact lowerIndex_le _ _
-  · rw [addVal_le_iff_dvd, map_sub, ← hcomm]
-    have hz : algebraMap 𝒪[M] 𝒪[L] y₀ ∈ Algebra.adjoin 𝒪[K] {x} := hx ▸ trivial
-    rw [Algebra.adjoin_singleton_eq_range_aeval] at hz
-    obtain ⟨g, hg⟩ := hz
-    replace hg : aeval x g = algebraMap 𝒪[M] 𝒪[L] y₀ := hg
-    refine prod_dvd_sub a hinj x _ (s : 𝒪[L] →ₐ[𝒪[K]] 𝒪[L]) g (fun τ => ?_) hg
-    rw [← hfix τ, ← hg]
-    exact aeval_algHom_apply (r τ) x g
+    obtain ⟨y₀, hy₀⟩ :=
+      ENat.exists_eq_iInf (fun y : 𝒪[M] => addVal 𝒪[M] (integerAlgEquiv K M σ' y - y))
+    have hy₁ : lowerIndex K M σ' = addVal 𝒪[M] (integerAlgEquiv K M σ' y₀ - y₀) := hy₀.symm
+    rw [hsum, hy₁, ← hv]
+    apply le_antisymm
+    · rw [addVal_le_iff_dvd, ← ha1]
+      refine dvd_prod a 1 _ (s : 𝒪[L] →+* 𝒪[L]) fun i => ?_
+      set f : 𝒪[L][X] := ∏ τ, (X - C (a τ)) with hf
+      have hfr : ∀ ρ, r ρ (f.coeff i) = f.coeff i := by
+        intro ρ
+        have : f.map (r ρ : 𝒪[L] →+* 𝒪[L]) = f := by
+          rw [hf, Polynomial.map_prod]
+          refine Fintype.prod_equiv (Equiv.mulLeft ρ) _ _ fun τ => ?_
+          rw [Polynomial.map_sub, map_X, map_C]
+          rfl
+        conv_rhs => rw [← this, coeff_map]
+        rfl
+      obtain ⟨m, hm⟩ :=
+        (IsGalois.mem_range_algebraMap_iff_fixed (F := M) ((f.coeff i : 𝒪[L]) : L)).2 fun ρ =>
+          congrArg Subtype.val (hfr ρ)
+      have hm1 : m ∈ 𝒪[M] := by
+        have h1 : valuation L (algebraMap M L m) ≤ 1 := by rw [hm]; exact (f.coeff i).2
+        exact (Valuation.HasExtension.val_map_le_one_iff (valuation M) (valuation L) m).1 h1
+      have hy : f.coeff i = algebraMap 𝒪[M] 𝒪[L] ⟨m, hm1⟩ := Subtype.ext hm.symm
+      set_option synthInstance.maxHeartbeats 200000 in
+        rw [hy, RingHom.coe_coe, hcomm, ← map_sub (algebraMap 𝒪[M] 𝒪[L])]
+      apply _root_.map_dvd
+      rw [← addVal_le_iff_dvd, ← hy₁]
+      exact lowerIndex_le _ _
+    · rw [addVal_le_iff_dvd, map_sub, ← hcomm]
+      have hz : algebraMap 𝒪[M] 𝒪[L] y₀ ∈ Algebra.adjoin 𝒪[K] {x} := hx ▸ trivial
+      rw [Algebra.adjoin_singleton_eq_range_aeval] at hz
+      obtain ⟨g, hg⟩ := hz
+      replace hg : aeval x g = algebraMap 𝒪[M] 𝒪[L] y₀ := hg
+      refine prod_dvd_sub a hinj x _ (s : 𝒪[L] →ₐ[𝒪[K]] 𝒪[L]) g (fun τ => ?_) hg
+      rw [← hfix τ, ← hg]
+      exact aeval_algHom_apply (r τ) x g

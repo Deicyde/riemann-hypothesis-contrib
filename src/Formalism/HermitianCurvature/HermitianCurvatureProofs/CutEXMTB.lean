@@ -23,10 +23,12 @@ theorem cd_det : ContDiff ℝ ∞ (fun M : Fin m → Fin m → ℂ => (Matrix.of
   refine ContDiff.const_smul _ ?_
   exact contDiff_prod fun i _ => by fun_prop
 
-theorem cd_adj (i j : Fin m) : ContDiff ℝ ∞ (fun M : Fin m → Fin m → ℂ => (Matrix.of M).adjugate i j) := by
-  have h : (fun M : Fin m → Fin m → ℂ => (Matrix.of M).adjugate i j) =
-      (fun N : Fin m → Fin m → ℂ => (Matrix.of N).det) ∘
-        (fun M : Fin m → Fin m → ℂ => fun a b => (Matrix.of M).updateRow j (Pi.single i 1) a b) := by
+theorem cd_adj (i j : Fin m)
+    : ContDiff ℝ ∞ (fun M : Fin m → Fin m → ℂ => (Matrix.of M).adjugate i j) := by
+  have h
+      : (fun M : Fin m → Fin m → ℂ => (Matrix.of M).adjugate i j)
+        = (fun N : Fin m → Fin m → ℂ => (Matrix.of N).det) ∘ (fun M : Fin m → Fin m → ℂ =>
+          fun a b => (Matrix.of M).updateRow j (Pi.single i 1) a b) := by
     funext M
     rw [Matrix.adjugate_apply]
     rfl
@@ -36,8 +38,10 @@ theorem cd_adj (i j : Fin m) : ContDiff ℝ ∞ (fun M : Fin m → Fin m → ℂ
   simp only [Matrix.updateRow_apply, Matrix.of_apply]
   split_ifs <;> fun_prop
 
-theorem cd_inv (i j : Fin m) :
-    ContDiffOn ℝ ∞ (fun M : Fin m → Fin m → ℂ => (Matrix.of M)⁻¹ i j) {M | (Matrix.of M).det ≠ 0} := by
+theorem cd_inv (i j : Fin m)
+    : ContDiffOn ℝ ∞
+      (fun M : Fin m → Fin m → ℂ => (Matrix.of M)⁻¹ i j)
+      {M | (Matrix.of M).det ≠ 0} := by
   have h1 : ContDiffOn ℝ ∞
       (fun M : Fin m → Fin m → ℂ => ((Matrix.of M).det)⁻¹ * (Matrix.of M).adjugate i j)
       {M | (Matrix.of M).det ≠ 0} :=
@@ -51,7 +55,8 @@ section wm
 
 variable {n : ℕ}
 
-theorem cd_gram (a b : Fin n) : ContDiff ℝ ∞ (fun Z : Fin n → Fin n → ℂ => gram (Matrix.of Z) a b) := by
+theorem cd_gram (a b : Fin n)
+    : ContDiff ℝ ∞ (fun Z : Fin n → Fin n → ℂ => gram (Matrix.of Z) a b) := by
   simp only [gram, Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.of_apply]
   refine ContDiff.sum fun k _ => ContDiff.mul ?_ (by fun_prop)
   exact Complex.conjCLE.contDiff.comp
@@ -85,8 +90,10 @@ private lemma det_gram_castLE_ne_zero_of_det_ne_zero (Z : Fin n → Fin n → �
   have := congrFun h2 (Fin.castLE hk a)
   simpa [hE, Matrix.mulVec, dotProduct, Matrix.one_apply, Fin.castLE_inj] using this
 
-theorem cd_Wm (i j : Fin n) :
-    ContDiffOn ℝ ∞ (fun Z : Fin n → Fin n → ℂ => Wm (Matrix.of Z) i j) {Z | (Matrix.of Z).det ≠ 0} := by
+theorem cd_Wm (i j : Fin n)
+    : ContDiffOn ℝ ∞
+      (fun Z : Fin n → Fin n → ℂ => Wm (Matrix.of Z) i j)
+      {Z | (Matrix.of Z).det ≠ 0} := by
   simp only [Wm, blkJ, colJ, Matrix.of_apply]
   by_cases hij : (i : ℕ) < j
   · simp only [dif_pos hij, Matrix.mulVec, dotProduct, Pi.neg_apply]
@@ -94,13 +101,17 @@ theorem cd_Wm (i j : Fin n) :
         gram (Matrix.of Z) (Fin.castLE j.isLt.le a) (Fin.castLE j.isLt.le b)) :=
       contDiff_pi.2 fun a => contDiff_pi.2 fun b => cd_gram _ _
     refine ContDiffOn.neg (ContDiffOn.sum fun c _ => ContDiffOn.mul ?_ (cd_gram _ _).contDiffOn)
-    exact (cd_inv (m := j) ⟨i, hij⟩ c).comp hg.contDiffOn fun Z hZ => det_gram_castLE_ne_zero_of_det_ne_zero Z hZ j j.isLt.le
+    exact (cd_inv (m := j) ⟨i, hij⟩ c).comp hg.contDiffOn fun Z hZ =>
+      det_gram_castLE_ne_zero_of_det_ne_zero Z hZ j j.isLt.le
   · simp only [dif_neg hij]
     split_ifs <;> exact contDiffOn_const
 
-theorem cd_Sm (i j : Fin n) :
-    ContDiffOn ℝ ∞ (fun Z : Fin n → Fin n → ℂ => Sm (Matrix.of Z) i j) {Z | (Matrix.of Z).det ≠ 0} := by
-  have hW : ContDiffOn ℝ ∞ (fun Z : Fin n → Fin n → ℂ => fun a b => Wm (Matrix.of Z) a b)
+theorem cd_Sm (i j : Fin n)
+    : ContDiffOn ℝ ∞
+      (fun Z : Fin n → Fin n → ℂ => Sm (Matrix.of Z) i j)
+      {Z | (Matrix.of Z).det ≠ 0} := by
+  have hW : ContDiffOn ℝ ∞
+      (fun Z : Fin n → Fin n → ℂ => fun a b => Wm (Matrix.of Z) a b)
       {Z | (Matrix.of Z).det ≠ 0} :=
     contDiffOn_pi.2 fun a => contDiffOn_pi.2 fun b => cd_Wm a b
   exact (cd_adj i j).comp_contDiffOn hW

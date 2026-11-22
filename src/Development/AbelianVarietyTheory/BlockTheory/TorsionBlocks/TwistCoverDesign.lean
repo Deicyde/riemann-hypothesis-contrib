@@ -10,7 +10,8 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.TwistCoverDesign
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Pj Formalism.L2.Indef Formalism.IndefR.Links
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.IndefR.Links
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Level)
 
 variable {D : D7}

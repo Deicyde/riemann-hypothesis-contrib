@@ -4,12 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem resFlag_field {k : Type} [Field k] (u T : M4 k) (d : Fin 4 → k) (hu : IsGSp 1 u)
-    (hT : IsUp T) (e : Matrix.diagonal d * u = u * T) (hd : ∀ i j, lamW i ≠ lamW j → d i - T j j ≠ 0) :
-    u 1 0 = 0 ∧ u 3 0 = 0 ∧ (u 0 0 ≠ 0 ∨ u 2 0 ≠ 0) ∧
-      (u 0 0 ≠ 0 → u 0 0 * u 1 1 - u 0 1 * u 1 0 ≠ 0 ∧ u 0 0 * u 2 1 - u 0 1 * u 2 0 = 0) := by
+private theorem resFlag_field
+    {k : Type} [Field k]
+    (u T : M4 k) (d : Fin 4 → k) (hu : IsGSp 1 u) (hT : IsUp T) (e : Matrix.diagonal d * u = u * T)
+    (hd : ∀ i j, lamW i ≠ lamW j → d i - T j j ≠ 0)
+    : u 1 0 = 0 ∧ u 3 0 = 0 ∧ (u 0 0 ≠ 0 ∨ u 2 0 ≠ 0)
+      ∧ (u 0 0 ≠ 0 → u 0 0 * u 1 1 - u 0 1 * u 1 0 ≠ 0 ∧ u 0 0 * u 2 1 - u 0 1 * u 2 0 = 0) := by
   have t10 : T 1 0 = 0 := hT _ _ (by decide)
   have t20 : T 2 0 = 0 := hT _ _ (by decide)
   have t30 : T 3 0 = 0 := hT _ _ (by decide)
@@ -61,11 +65,15 @@ private theorem resFlag_field {k : Type} [Field k] (u T : M4 k) (d : Fin 4 → k
     apply h00
     linear_combination u 0 1 * s10 - u 0 0 * s11 + adj u 1 2 * key
 
-theorem UpperTheory.V.Ws.Lab.resFlag :
-    ∀ (R : Type) [CommRing R] [IsLocalRing R] (X u : M4 R) (d d' : Fin 4 → R), Cg (maximalIdeal R) X (Matrix.diagonal d) → IsGSp 1 u →
-      IsUp (adj u * X * u) → (∀ i, (adj u * X * u : M4 R) i i - d' i ∈ maximalIdeal R) → (∀ i j, lamW i ≠ lamW j → IsUnit (d i - d' j)) →
-      u 1 0 ∈ maximalIdeal R ∧ u 3 0 ∈ maximalIdeal R ∧ (IsUnit (u 0 0) ∨ IsUnit (u 2 0)) ∧
-        (IsUnit (u 0 0) → IsUnit (u 0 0 * u 1 1 - u 0 1 * u 1 0) ∧ u 0 0 * u 2 1 - u 0 1 * u 2 0 ∈ maximalIdeal R) := by
+theorem UpperTheory.V.Ws.Lab.resFlag
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] (X u : M4 R) (d d' : Fin 4 → R),
+      Cg (maximalIdeal R) X (Matrix.diagonal d) → IsGSp 1 u → IsUp (adj u * X * u)
+        → (∀ i, (adj u * X * u : M4 R) i i - d' i ∈ maximalIdeal R)
+        → (∀ i j, lamW i ≠ lamW j → IsUnit (d i - d' j))
+        → u 1 0 ∈ maximalIdeal R ∧ u 3 0 ∈ maximalIdeal R ∧ (IsUnit (u 0 0) ∨ IsUnit (u 2 0))
+          ∧ (IsUnit (u 0 0)
+            → IsUnit (u 0 0 * u 1 1 - u 0 1 * u 1 0)
+              ∧ u 0 0 * u 2 1 - u 0 1 * u 2 0 ∈ maximalIdeal R) := by
   intro R _ _ X u d d' hX hu hUp hdi hsep
   have hX' : X.map (residue R) = Matrix.diagonal fun i => residue R (d i) := by
     ext i j
@@ -76,16 +84,18 @@ theorem UpperTheory.V.Ws.Lab.resFlag :
     · subst e; simp
     · simp [Matrix.diagonal_apply_ne _ e]
   have hu' : IsGSp 1 (u.map (residue R)) := by simpa using gsp_map (residue R) hu
-  have e : X * u = u * (adj u * X * u) := by
-    rw [← mul_assoc, ← mul_assoc, sp_mul_adj hu, one_mul]
+  have e : X * u = u * (adj u * X * u) := by rw [← mul_assoc, ← mul_assoc, sp_mul_adj hu, one_mul]
   have e' := congrArg (fun M : M4 R => M.map (residue R)) e
   beta_reduce at e'
   rw [Matrix.map_mul, Matrix.map_mul (L := u), hX'] at e'
-  have H := resFlag_field (u.map (residue R)) ((adj u * X * u).map (residue R)) _ hu'
-    (fun i j h => by rw [Matrix.map_apply, hUp i j h, map_zero]) e' (fun i j h => by
-      have h1 := (residue_eq_zero_iff _).2 (hdi j)
-      rw [map_sub, sub_eq_zero] at h1
-      rw [Matrix.map_apply, h1, ← map_sub]
-      exact ((hsep i j h).map _).ne_zero)
+  have H :=
+    resFlag_field (u.map (residue R)) ((adj u * X * u).map (residue R)) _ hu'
+      (fun i j h => by rw [Matrix.map_apply, hUp i j h, map_zero])
+      e'
+      (fun i j h => by
+        have h1 := (residue_eq_zero_iff _).2 (hdi j)
+        rw [map_sub, sub_eq_zero] at h1
+        rw [Matrix.map_apply, h1, ← map_sub]
+        exact ((hsep i j h).map _).ne_zero)
   simp only [Matrix.map_apply, ← map_mul, ← map_sub, residue_eq_zero_iff, Ne] at H
   simpa only [notMem_maximalIdeal] using H

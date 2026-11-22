@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.Supported
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.FinPl
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel GlobalTheory.MixModel
+  GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.FinPl
 
 noncomputable section
 
@@ -17,9 +20,12 @@ namespace GlobalTheory.LocMod.LevelPlaces
 
 open IsDedekindDomain NumberField GlobalTheory.IdemSupport
 
-theorem splitPt_v_eq_under {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (q : SplitPt D k) {P : HeightOneSpectrum (𝓞 D.host.E)}
-    (h : Formalism.L2.NTheta.IsIdemAt q.e P) : q.v = P.under (𝓞 D.host.F) := by
+theorem splitPt_v_eq_under
+    {D : D7} {k : Type}
+    [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (q : SplitPt D k)
+    {P : HeightOneSpectrum (𝓞 D.host.E)} (h : Formalism.L2.NTheta.IsIdemAt q.e P)
+    : q.v = P.under (𝓞 D.host.F) := by
   obtain ⟨Φ, hΦ⟩ := exists_comp D
   have hd := delta_of_isIdemAt hΦ h
   obtain ⟨ε, hε, hsum⟩ := q.above

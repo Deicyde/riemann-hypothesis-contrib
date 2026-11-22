@@ -18,7 +18,8 @@ theorem cast_down {M K : ℕ} (h : K ∣ M) {a b : ℤ} (e : (a : ZMod M) = b) :
   have e' := congrArg (ZMod.castHom h (ZMod K)) e
   rwa [map_intCast, map_intCast] at e'
 
-theorem gamma_le {M K : ℕ} (h : K ∣ M) : CongruenceSubgroup.Gamma M ≤ CongruenceSubgroup.Gamma K := by
+theorem gamma_le {M K : ℕ} (h : K ∣ M)
+    : CongruenceSubgroup.Gamma M ≤ CongruenceSubgroup.Gamma K := by
   intro γ hγ
   rw [CongruenceSubgroup.Gamma_mem] at hγ ⊢
   obtain ⟨h1, h2, h3, h4⟩ := hγ
@@ -28,13 +29,14 @@ theorem gamma_le {M K : ℕ} (h : K ∣ M) : CongruenceSubgroup.Gamma M ≤ Cong
   · simpa using cast_down h (b := 0) (by simpa using h3)
   · simpa using cast_down h (b := 1) (by simpa using h4)
 
-theorem slU_mul (X : Tower Ω ε) (γ γ' : SL(2, ℤ)) (a : X.Kˣ) :
-    slU X (ofSL (γ * γ')) a = slU X (ofSL γ') (slU X (ofSL γ) a) := by
+theorem slU_mul (X : Tower Ω ε) (γ γ' : SL(2, ℤ)) (a : X.Kˣ)
+    : slU X (ofSL (γ * γ')) a = slU X (ofSL γ') (slU X (ofSL γ) a) := by
   ext
   show X.sl (ofSL (γ * γ')) (a : X.K) = X.sl (ofSL γ') (X.sl (ofSL γ) (a : X.K))
   rw [map_mul, X.sl_mul]
 
-theorem cgr_map {K : Type} [Field K] {m : ℕ} (φ : Kˣ →* Kˣ) {a b : Kˣ} (h : Cgr m a b) : Cgr m (φ a) (φ b) := by
+theorem cgr_map {K : Type} [Field K] {m : ℕ} (φ : Kˣ →* Kˣ) {a b : Kˣ} (h : Cgr m a b)
+    : Cgr m (φ a) (φ b) := by
   obtain ⟨k, rfl⟩ := h
   exact ⟨φ k, by rw [map_mul, map_pow]⟩
 

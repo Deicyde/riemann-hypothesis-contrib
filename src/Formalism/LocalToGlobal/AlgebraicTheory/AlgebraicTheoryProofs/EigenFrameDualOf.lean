@@ -28,20 +28,34 @@ theorem norm_natCast (p : ℕ) [Fact p.Prime] {N : ℕ} (h : ¬ p ∣ N) : ‖(N
 
 end CapelliMinorMembership
 
-theorem eigenFrameDual_of (h : ReciprocityTheory.EigenFramesTheory.EigenFrameDual.{0, 0}) : EigenFrameDual := by
+theorem eigenFrameDual_of (h : ReciprocityTheory.EigenFramesTheory.EigenFrameDual.{0, 0})
+    : EigenFrameDual := by
   intro E _ _ p _ ι hd τ₀
   exact h p E _ (NumberField.RingOfIntegers.basis E) ι hd τ₀
 
-theorem CapelliMinorMembership.key_term {X : Fields} (A : Amb X) {a b : ℕ} {p : ℕ} [Fact p.Prime] (ι : ℂ ≃+* ℂ_[p]) {n₀ : ℕ}
-    (hn0 : (n₀ : ℂ_[p]) ≠ 0) (r : X.Tau → Module.Free.ChooseBasisIndex ℤ (𝓞 X.E) → ℂ_[p])
-    (τ₁ τ : X.Tau) (β₁ β' β : Fin b) (α₁ α' α : Fin a) (i : Module.Free.ChooseBasisIndex ℤ (𝓞 X.E)) :
-    (ι : ℂ →+* ℂ_[p]) (((n₀ : ℂ) • vecE A.σ₀ ((NumberField.RingOfIntegers.basis X.E i : 𝓞 X.E) : X.E) β α)
-        (τ₁, β₁, α₁)) *
-      (if β = β' ∧ α = α' then ι (A.cD τ) * r τ i * (n₀ : ℂ_[p])⁻¹ else 0) =
-    if α = α₁ then (if β = β₁ then
-      (if β₁ = β' ∧ α₁ = α' then ι (A.cD τ) *
-        (r τ i * ι (X.embC A.σ₀ τ₁ ((NumberField.RingOfIntegers.basis X.E i : 𝓞 X.E) : X.E))) else 0)
-      else 0) else 0 := by
+theorem CapelliMinorMembership.key_term
+    {X : Fields} (A : Amb X)
+    {a b : ℕ} {p : ℕ} [Fact p.Prime]
+    (ι : ℂ ≃+* ℂ_[p])
+    {n₀ : ℕ} (hn0 : (n₀ : ℂ_[p]) ≠ 0)
+    (r : X.Tau → Module.Free.ChooseBasisIndex ℤ (𝓞 X.E) → ℂ_[p]) (τ₁ τ : X.Tau) (β₁ β' β : Fin b)
+    (α₁ α' α : Fin a) (i : Module.Free.ChooseBasisIndex ℤ (𝓞 X.E))
+    : (ι : ℂ →+* ℂ_[p])
+          (((n₀ : ℂ) • vecE A.σ₀ ((NumberField.RingOfIntegers.basis X.E i : 𝓞 X.E) : X.E) β α)
+            (τ₁, β₁, α₁))
+        * (if β = β' ∧ α = α' then ι (A.cD τ) * r τ i * (n₀ : ℂ_[p])⁻¹ else 0)
+      = if α = α₁ then
+          (if β = β₁ then
+             (if β₁ = β' ∧ α₁ = α' then
+                ι (A.cD τ)
+                  * (r τ i
+                    * ι (X.embC A.σ₀ τ₁ ((NumberField.RingOfIntegers.basis X.E i : 𝓞 X.E) : X.E)))
+              else
+                0)
+           else
+             0)
+        else
+          0 := by
   simp only [Pi.smul_apply, smul_eq_mul]
   by_cases hα : α = α₁
   · subst hα
@@ -57,9 +71,11 @@ theorem CapelliMinorMembership.key_term {X : Fields} (A : Amb X) {a b : ℕ} {p 
     · simp [vecE, hβ, Ne.symm hβ]
   · simp [vecE, hα, Ne.symm hα]
 
-theorem CapelliMinorMembership.collapse {K κ B C : Type} [AddCommMonoid K] [Fintype κ] [Fintype B] [DecidableEq B]
-    [Fintype C] [DecidableEq C] (g : κ → K) (β₁ : B) (α₁ : C) :
-    ∑ i, ∑ β : B, ∑ α : C, (if α = α₁ then (if β = β₁ then g i else 0) else 0) = ∑ i, g i := by
+theorem CapelliMinorMembership.collapse
+    {K κ B C : Type}
+    [AddCommMonoid K] [Fintype κ] [Fintype B] [DecidableEq B] [Fintype C] [DecidableEq C]
+    (g : κ → K) (β₁ : B) (α₁ : C)
+    : ∑ i, ∑ β : B, ∑ α : C, (if α = α₁ then (if β = β₁ then g i else 0) else 0) = ∑ i, g i := by
   simp [Finset.sum_ite_eq', Finset.sum_ite_eq]
 
 theorem kerFrame_of (h : EigenFrameDual) : KerFrame := by
@@ -71,10 +87,17 @@ theorem kerFrame_of (h : EigenFrameDual) : KerFrame := by
     have := CapelliMinorMembership.norm_natCast p hn₀
     rw [h0, norm_zero] at this
     exact zero_ne_one this
-  refine ⟨Module.Free.ChooseBasisIndex ℤ (𝓞 X.E) × Fin b × Fin a, inferInstance,
-    fun j => (n₀ : ℂ) • vecE A.σ₀ ((NumberField.RingOfIntegers.basis X.E j.1 : 𝓞 X.E) : X.E) j.2.1 j.2.2,
-    fun j k => if j.2.1 = k.2.1 ∧ j.2.2 = k.2.2 then ι (A.cD k.1) * r k.1 j.1 * (n₀ : ℂ_[p])⁻¹ else 0,
-    fun j => hv _ _ _, ?_, ?_⟩
+  refine ⟨
+    Module.Free.ChooseBasisIndex ℤ (𝓞 X.E) × Fin b × Fin a,
+    inferInstance,
+    fun j =>
+      (n₀ : ℂ) • vecE A.σ₀ ((NumberField.RingOfIntegers.basis X.E j.1 : 𝓞 X.E) : X.E) j.2.1 j.2.2,
+    fun j k =>
+      if j.2.1 = k.2.1 ∧ j.2.2 = k.2.2 then ι (A.cD k.1) * r k.1 j.1 * (n₀ : ℂ_[p])⁻¹ else 0,
+    fun j => hv _ _ _,
+    ?_,
+    ?_
+  ⟩
   · intro j k
     dsimp only
     split_ifs

@@ -72,8 +72,9 @@ theorem u1 : IsotypicAveragingStatement := by
     rw [hHtL (π i), hπ]
   have part1 : Bt'ᵀ * Ht - Htᵀ * Bt' = cp • E := by
     rw [hA, hB, ← Finset.sum_sub_distrib]
-    have h : ∀ i, (εT i)ᵀ * Btᵀ * Ht * εT (π i) - (εT i)ᵀ * Htᵀ * Bt * εT (π i) =
-        cp • (E * εT (π i)) := by
+    have h
+        : ∀ i,
+          (εT i)ᵀ * Btᵀ * Ht * εT (π i) - (εT i)ᵀ * Htᵀ * Bt * εT (π i) = cp • (E * εT (π i)) := by
       intro i
       rw [Matrix.mul_assoc ((εT i)ᵀ) Btᵀ Ht, Matrix.mul_assoc ((εT i)ᵀ) Htᵀ Bt, ← Matrix.sub_mul,
         ← Matrix.mul_sub, hBH, Matrix.mul_smul, hE i, Matrix.smul_mul, Matrix.mul_assoc, hT,

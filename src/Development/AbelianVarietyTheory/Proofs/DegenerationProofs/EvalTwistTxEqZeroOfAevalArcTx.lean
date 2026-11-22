@@ -17,8 +17,9 @@ variable {C : Type} [NontriviallyNormedField C] [CompleteSpace C]
 def AbsSumAt (u : C) (f : PowerSeries C) (c : C) : Prop :=
   (Summable fun n => ‖PowerSeries.coeff n f * u ^ n‖) ∧ ∑' n, PowerSeries.coeff n f * u ^ n = c
 
-theorem AbsSumAt.add {u : C} {f g : PowerSeries C} {a b : C} (hf : AbsSumAt u f a) (hg : AbsSumAt u g b) :
-    AbsSumAt u (f + g) (a + b) := by
+theorem AbsSumAt.add
+    {u : C} {f g : PowerSeries C} {a b : C} (hf : AbsSumAt u f a) (hg : AbsSumAt u g b)
+    : AbsSumAt u (f + g) (a + b) := by
   constructor
   · refine (hf.1.add hg.1).of_nonneg_of_le (fun _ => norm_nonneg _) fun n => ?_
     rw [map_add (f := _), add_mul]
@@ -28,10 +29,11 @@ theorem AbsSumAt.add {u : C} {f g : PowerSeries C} {a b : C} (hf : AbsSumAt u f 
 
 open scoped BigOperators in
 variable {C : Type} [NontriviallyNormedField C] [CompleteSpace C] in
-private theorem absSumAt_algebraMap (u a : C) :
-    _root_.GlobalTheory.BddArc.AbsSumAt u (algebraMap C (PowerSeries C) a) a := by
-  have h : (fun n => PowerSeries.coeff n (algebraMap C (PowerSeries C) a) * u ^ n) =
-      fun n => if n = 0 then a else 0 := by
+private theorem absSumAt_algebraMap (u a : C)
+    : _root_.GlobalTheory.BddArc.AbsSumAt u (algebraMap C (PowerSeries C) a) a := by
+  have h
+      : (fun n => PowerSeries.coeff n (algebraMap C (PowerSeries C) a) * u ^ n)
+        = fun n => if n = 0 then a else 0 := by
     funext n
     rcases n with _ | n <;> simp [PowerSeries.coeff_C]
   refine ⟨?_, ?_⟩
@@ -42,11 +44,14 @@ private theorem absSumAt_algebraMap (u a : C) :
 
 open scoped BigOperators in
 variable {C : Type} [NontriviallyNormedField C] [CompleteSpace C] in
-private theorem absSumAt_add {u : C} {f g : PowerSeries C} {a b : C}
-    (hf : _root_.GlobalTheory.BddArc.AbsSumAt u f a) (hg : _root_.GlobalTheory.BddArc.AbsSumAt u g b) :
-    _root_.GlobalTheory.BddArc.AbsSumAt u (f + g) (a + b) := by
-  have h : ∀ n, PowerSeries.coeff n (f + g) * u ^ n =
-      PowerSeries.coeff n f * u ^ n + PowerSeries.coeff n g * u ^ n := fun n => by
+private theorem absSumAt_add
+    {u : C} {f g : PowerSeries C} {a b : C} (hf : _root_.GlobalTheory.BddArc.AbsSumAt u f a)
+    (hg : _root_.GlobalTheory.BddArc.AbsSumAt u g b)
+    : _root_.GlobalTheory.BddArc.AbsSumAt u (f + g) (a + b) := by
+  have h
+      : ∀ n,
+        PowerSeries.coeff n (f + g) * u ^ n
+          = PowerSeries.coeff n f * u ^ n + PowerSeries.coeff n g * u ^ n := fun n => by
     rw [map_add (f := _), add_mul]
   refine ⟨?_, ?_⟩
   · refine Summable.of_nonneg_of_le (fun n => norm_nonneg _) (fun n => ?_) (Summable.add hf.1 hg.1)
@@ -57,26 +62,31 @@ private theorem absSumAt_add {u : C} {f g : PowerSeries C} {a b : C}
 
 open scoped BigOperators in
 variable {C : Type} [NontriviallyNormedField C] [CompleteSpace C] in
-private theorem absSumAt_mul {u : C} {f g : PowerSeries C} {a b : C}
-    (hf : _root_.GlobalTheory.BddArc.AbsSumAt u f a) (hg : _root_.GlobalTheory.BddArc.AbsSumAt u g b) :
-    _root_.GlobalTheory.BddArc.AbsSumAt u (f * g) (a * b) := by
-  have h : ∀ n, PowerSeries.coeff n (f * g) * u ^ n =
-      ∑ kl ∈ Finset.HasAntidiagonal.antidiagonal n,
-        (PowerSeries.coeff kl.1 f * u ^ kl.1) * (PowerSeries.coeff kl.2 g * u ^ kl.2) := fun n => by
-    rw [PowerSeries.coeff_mul, Finset.sum_mul]
-    refine Finset.sum_congr rfl fun kl hkl => ?_
-    rw [← Finset.HasAntidiagonal.mem_antidiagonal.1 hkl, pow_add]
-    ring
+private theorem absSumAt_mul
+    {u : C} {f g : PowerSeries C} {a b : C} (hf : _root_.GlobalTheory.BddArc.AbsSumAt u f a)
+    (hg : _root_.GlobalTheory.BddArc.AbsSumAt u g b)
+    : _root_.GlobalTheory.BddArc.AbsSumAt u (f * g) (a * b) := by
+  have h
+      : ∀ n,
+        PowerSeries.coeff n (f * g) * u ^ n
+          = ∑ kl ∈ Finset.HasAntidiagonal.antidiagonal n,
+              (PowerSeries.coeff kl.1 f * u ^ kl.1) * (PowerSeries.coeff kl.2 g * u ^ kl.2) :=
+    fun n => by
+      rw [PowerSeries.coeff_mul, Finset.sum_mul]
+      refine Finset.sum_congr rfl fun kl hkl => ?_
+      rw [← Finset.HasAntidiagonal.mem_antidiagonal.1 hkl, pow_add]
+      ring
   refine ⟨?_, ?_⟩
   · exact (summable_norm_sum_mul_antidiagonal_of_summable_norm hf.1 hg.1).congr fun n => by rw [h]
-  · rw [tsum_congr h, ← tsum_mul_tsum_eq_tsum_sum_antidiagonal_of_summable_norm hf.1 hg.1, hf.2, hg.2]
+  · rw [tsum_congr h, ← tsum_mul_tsum_eq_tsum_sum_antidiagonal_of_summable_norm hf.1 hg.1, hf.2,
+      hg.2]
 
 open scoped BigOperators in
 variable {C : Type} [NontriviallyNormedField C] [CompleteSpace C] in
-theorem _root_.GlobalTheory.BddArc.AbsSumAt.aeval {u : C} {ι : Type} {f : ι → PowerSeries C} {a : ι → C}
-    (h : ∀ i, _root_.GlobalTheory.BddArc.AbsSumAt u (f i) (a i))
-    (F : MvPolynomial ι C) :
-    _root_.GlobalTheory.BddArc.AbsSumAt u (MvPolynomial.aeval f F) (MvPolynomial.eval a F) := by
+theorem _root_.GlobalTheory.BddArc.AbsSumAt.aeval
+    {u : C} {ι : Type} {f : ι → PowerSeries C} {a : ι → C}
+    (h : ∀ i, _root_.GlobalTheory.BddArc.AbsSumAt u (f i) (a i)) (F : MvPolynomial ι C)
+    : _root_.GlobalTheory.BddArc.AbsSumAt u (MvPolynomial.aeval f F) (MvPolynomial.eval a F) := by
   induction F using MvPolynomial.induction_on with
   | C c =>
     rw [MvPolynomial.aeval_C, MvPolynomial.eval_C]
@@ -93,9 +103,11 @@ end
 end GlobalTheory.BddArc
 
 open scoped BigOperators in
-private theorem finite_setOf_bilin_self_le_of_posDef {X : Type} [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
-    (B : LinearMap.BilinForm ℤ X) (hsymm : ∀ y z, B y z = B z y) (hpos : ∀ y, y ≠ 0 → 0 < B y y) (L : ℤ) :
-    {y | B y y ≤ L}.Finite := by
+private theorem finite_setOf_bilin_self_le_of_posDef
+    {X : Type} [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    (B : LinearMap.BilinForm ℤ X) (hsymm : ∀ y z, B y z = B z y) (hpos : ∀ y, y ≠ 0 → 0 < B y y)
+    (L : ℤ)
+    : {y | B y y ≤ L}.Finite := by
   classical
   set b := Module.Free.chooseBasis ℤ X with hb
   let M : Matrix (Module.Free.ChooseBasisIndex ℤ X) (Module.Free.ChooseBasisIndex ℤ X) ℚ :=
@@ -107,8 +119,8 @@ private theorem finite_setOf_bilin_self_le_of_posDef {X : Type} [AddCommGroup X]
     rw [Matrix.toBilin'_apply]
     conv_lhs => rw [← b.sum_repr y, ← b.sum_repr z]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul, Int.cast_sum,
-      Int.cast_mul, Finset.mul_sum, M, φ, Matrix.of_apply]
+      simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, smul_eq_mul,
+        Int.cast_sum, Int.cast_mul, Finset.mul_sum, M, φ, Matrix.of_apply]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
@@ -168,8 +180,10 @@ private theorem finite_setOf_bilin_self_le_of_posDef {X : Type} [AddCommGroup X]
       have h1 : (w.repr v k) ^ 2 * Bq (w k) (w k) ≤ L := by
         rw [hexp] at hv
         refine le_trans ?_ hv
-        exact Finset.single_le_sum (f := fun k => (w.repr v k) ^ 2 * Bq (w k) (w k))
-          (fun k _ => mul_nonneg (sq_nonneg _) (hdpos k).le) (Finset.mem_univ k)
+        exact Finset.single_le_sum
+          (f := fun k => (w.repr v k) ^ 2 * Bq (w k) (w k))
+          (fun k _ => mul_nonneg (sq_nonneg _) (hdpos k).le)
+          (Finset.mem_univ k)
       have h2 : |w.repr v k| ≤ max 1 ((L : ℚ) / Bq (w k) (w k)) := by
         rcases le_or_gt (|w.repr v k|) 1 with h | h
         · exact h.trans (le_max_left _ _)
@@ -178,24 +192,32 @@ private theorem finite_setOf_bilin_self_le_of_posDef {X : Type} [AddCommGroup X]
           have h3 : |w.repr v k| ≤ (w.repr v k) ^ 2 := by rw [← sq_abs]; nlinarith
           nlinarith [hdpos k]
       refine h2.trans ?_
-      exact Finset.single_le_sum (f := fun k => max 1 ((L : ℚ) / Bq (w k) (w k)))
-        (fun k _ => le_trans zero_le_one (le_max_left _ _)) (Finset.mem_univ k)
+      exact Finset.single_le_sum
+        (f := fun k => max 1 ((L : ℚ) / Bq (w k) (w k)))
+        (fun k _ => le_trans zero_le_one (le_max_left _ _))
+        (Finset.mem_univ k)
     have hvi : v i = ∑ k, w.repr v k * w k i := by
       conv_lhs => rw [← w.sum_repr v]
       simp [Finset.sum_apply]
-    calc |v i| ≤ ∑ k, |w.repr v k * w k i| := by rw [hvi]; exact Finset.abs_sum_le_sum_abs _ _
-      _ ≤ ∑ k, A * |w k i| := Finset.sum_le_sum fun k _ => by
+    calc
+      |v i|
+        ≤ ∑ k, |w.repr v k * w k i| := by rw [hvi]; exact Finset.abs_sum_le_sum_abs _ _
+      _ ≤ ∑ k, A * |w k i| :=
+        Finset.sum_le_sum fun k _ => by
           rw [abs_mul]; exact mul_le_mul_of_nonneg_right (hc k) (abs_nonneg _)
       _ = A * ∑ k, |w k i| := (Finset.mul_sum _ _ _).symm
-      _ ≤ T := Finset.single_le_sum (f := fun i => A * ∑ k, |w k i|)
-          (fun i _ => mul_nonneg hA (Finset.sum_nonneg fun k _ => abs_nonneg _)) (Finset.mem_univ i)
+      _ ≤ T :=
+        Finset.single_le_sum
+          (f := fun i => A * ∑ k, |w k i|)
+          (fun i _ => mul_nonneg hA (Finset.sum_nonneg fun k _ => abs_nonneg _))
+          (Finset.mem_univ i)
   let ψ : X → Module.Free.ChooseBasisIndex ℤ X → ℤ := fun y i => b.repr y i
   have hψ : Function.Injective ψ := by
     intro y z h
     apply b.repr.injective
     ext i
     exact congrFun h i
-  refine ((Set.finite_Icc (fun _ => -⌈T⌉) (fun _ => ⌈T⌉)).preimage hψ.injOn).subset ?_
+  refine ((Set.finite_Icc (fun _ => - ⌈T⌉) (fun _ => ⌈T⌉)).preimage hψ.injOn).subset ?_
   intro y hy
   have hy' : Bq (φ y) (φ y) ≤ L := by rw [← hφ]; exact_mod_cast hy
   have h := hcoord _ hy'
@@ -210,8 +232,9 @@ private theorem finite_setOf_bilin_self_le_of_posDef {X : Type} [AddCommGroup X]
     exact_mod_cast h4
 
 open scoped BigOperators in
-private theorem injective_add_nsmul_of_ne_zero {X : Type} [AddCommGroup X] [Module.Free ℤ X] (a : X) {m : ℕ}
-    (hm : m ≠ 0) : Function.Injective (fun χ : X => a + m • χ) := by
+private theorem injective_add_nsmul_of_ne_zero
+    {X : Type} [AddCommGroup X] [Module.Free ℤ X] (a : X) {m : ℕ} (hm : m ≠ 0)
+    : Function.Injective (fun χ : X => a + m • χ) := by
   intro x y h
   have h' : m • x = m • y := add_left_cancel h
   apply (Module.Free.chooseBasis ℤ X).repr.injective
@@ -221,20 +244,23 @@ private theorem injective_add_nsmul_of_ne_zero {X : Type} [AddCommGroup X] [Modu
   exact mul_left_cancel₀ (by exact_mod_cast hm) this
 
 open scoped BigOperators in
-private theorem tsum_subtype_eq_finsum_mem_of_finite {X M : Type} [AddCommMonoid M] [TopologicalSpace M]
-    [T2Space M] (S : Set X) (hS : S.Finite) (g : X → M) : ∑' b : S, g b = ∑ᶠ x ∈ S, g x := by
+private theorem tsum_subtype_eq_finsum_mem_of_finite
+    {X M : Type} [AddCommMonoid M] [TopologicalSpace M] [T2Space M]
+    (S : Set X) (hS : S.Finite)
+    (g : X → M)
+    : ∑' b : S, g b = ∑ᶠ x ∈ S, g x := by
   have h := Finset.tsum_subtype' hS.toFinset g
   rw [hS.coe_toFinset] at h
   rw [finsum_mem_eq_finite_toFinset_sum _ hS, h]
 
 open scoped BigOperators in
-private theorem absSumAt_arcTx_twist_tx {C : Type} [NontriviallyNormedField C]
-    [IsUltrametricDist C] [CompleteSpace C] (N : _root_.GlobalTheory.Ex.NumD C) {k : ℕ}
-    (β : N.Form k) (m : ℕ) (hm : m ^ 2 ∣ k) (hodd : Odd m)
-    (p : N.QT (m ^ 2))
-    (hbd : ∀ χ, ‖N.txT m p χ‖ ≤ 1) (u : Cˣ) (hu : ‖(u : C)‖ < 1) :
-    _root_.GlobalTheory.BddArc.AbsSumAt (u : C)
-      (N.arcTx β.be m p)
+private theorem absSumAt_arcTx_twist_tx
+    {C : Type} [NontriviallyNormedField C] [IsUltrametricDist C] [CompleteSpace C]
+    (N : _root_.GlobalTheory.Ex.NumD C)
+    {k : ℕ} (β : N.Form k)
+    (m : ℕ) (hm : m ^ 2 ∣ k) (hodd : Odd m) (p : N.QT (m ^ 2)) (hbd : ∀ χ, ‖N.txT m p χ‖ ≤ 1)
+    (u : Cˣ) (hu : ‖(u : C)‖ < 1)
+    : _root_.GlobalTheory.BddArc.AbsSumAt (u : C) (N.arcTx β.be m p)
       ((N.twist β u).tx m (N.twQ β u hm p)) := by
   classical
   set a : N.X := Multiplicative.toAdd (p : Multiplicative N.X × N.Gt).1 with ha
@@ -251,16 +277,17 @@ private theorem absSumAt_arcTx_twist_tx {C : Type} [NontriviallyNormedField C]
   have hfin : ∀ K : ℤ, {χ | q χ ≤ K}.Finite := by
     intro K
     refine ((finite_setOf_bilin_self_le_of_posDef β.be β.symm β.pos
-      ((K + 1) * (2 * (m : ℤ) ^ 2))).preimage (injective_add_nsmul_of_ne_zero a hm0).injOn).subset ?_
+        ((K + 1) * (2 * (m : ℤ) ^ 2))).preimage (injective_add_nsmul_of_ne_zero a hm0).injOn).subset
+      ?_
     intro χ hχ
     simp only [Set.mem_setOf_eq, Set.mem_preimage] at hχ ⊢
-    have h1 := Int.lt_mul_ediv_self_add
-      (x := β.be (a + m • χ) (a + m • χ)) hden
-    have h2 : 2 * (m : ℤ) ^ 2 * (β.be (a + m • χ) (a + m • χ) / (2 * (m : ℤ) ^ 2))
-        ≤ 2 * (m : ℤ) ^ 2 * K := mul_le_mul_of_nonneg_left hχ hden.le
+    have h1 := Int.lt_mul_ediv_self_add (x := β.be (a + m • χ) (a + m • χ)) hden
+    have h2
+        : 2 * (m : ℤ) ^ 2 * (β.be (a + m • χ) (a + m • χ) / (2 * (m : ℤ) ^ 2))
+          ≤ 2 * (m : ℤ) ^ 2 * K :=
+      mul_le_mul_of_nonneg_left hχ hden.le
     linarith
-  have hfinS : ∀ n : ℕ, {χ | q χ = n}.Finite := fun n =>
-    (hfin n).subset fun χ hχ => le_of_eq hχ
+  have hfinS : ∀ n : ℕ, {χ | q χ = n}.Finite := fun n => (hfin n).subset fun χ hχ => le_of_eq hχ
   set Q : N.X → ℕ := fun χ => (q χ).toNat with hQdef
   have hQ : ∀ χ, ((Q χ : ℕ) : ℤ) = q χ := fun χ => Int.toNat_of_nonneg (hq0 χ)
   have hpow : ∀ χ, ((u ^ q χ : Cˣ) : C) = (u : C) ^ Q χ := by
@@ -268,20 +295,18 @@ private theorem absSumAt_arcTx_twist_tx {C : Type} [NontriviallyNormedField C]
     conv_lhs => rw [← hQ χ]
     rw [zpow_natCast, Units.val_pow_eq_pow_val]
   set f : N.X → C := fun χ => (u : C) ^ Q χ * N.txT m p χ with hf
-  have htw : (N.twist β u).tx m (N.twQ β u hm p)
-      = ∑' χ, f χ := by
+  have htw : (N.twist β u).tx m (N.twQ β u hm p) = ∑' χ, f χ := by
     unfold _root_.GlobalTheory.Ex.NumD.tx
     refine tsum_congr fun χ => ?_
     rw [N.twist_txT β u m hm hodd p χ]
     exact congrArg (· * N.txT m p χ) (hpow χ)
-  have hcoeff' : ∀ n : ℕ, PowerSeries.coeff n (N.arcTx β.be m p)
-      = ∑ᶠ χ ∈ {χ | q χ = n}, N.txT m p χ := by
+  have hcoeff'
+      : ∀ n : ℕ, PowerSeries.coeff n (N.arcTx β.be m p) = ∑ᶠ χ ∈ {χ | q χ = n}, N.txT m p χ := by
     intro n
     unfold _root_.GlobalTheory.Ex.NumD.arcTx
     rw [PowerSeries.coeff_mk]
     rfl
-  have hcn : ∀ n : ℕ,
-      ‖PowerSeries.coeff n (N.arcTx β.be m p)‖ ≤ 1 := by
+  have hcn : ∀ n : ℕ, ‖PowerSeries.coeff n (N.arcTx β.be m p)‖ ≤ 1 := by
     intro n
     rw [hcoeff', finsum_mem_eq_finite_toFinset_sum _ (hfinS n)]
     exact IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun χ _ => hbd χ
@@ -297,10 +322,12 @@ private theorem absSumAt_arcTx_twist_tx {C : Type} [NontriviallyNormedField C]
   have hsum : Summable f := by
     refine NonarchimedeanAddGroup.summable_of_tendsto_cofinite_zero ?_
     rw [tendsto_zero_iff_norm_tendsto_zero]
-    exact squeeze_zero (fun χ => norm_nonneg _) hnorm
-      ((tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) hu).comp hQtend)
-  have hcoeff : ∀ n : ℕ, ∑' b : ↑(Q ⁻¹' {n}), f b =
-      PowerSeries.coeff n (N.arcTx β.be m p) * (u : C) ^ n := by
+    exact squeeze_zero
+      (fun χ => norm_nonneg _)
+      hnorm ((tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg _) hu).comp hQtend)
+  have hcoeff
+      : ∀ n : ℕ,
+        ∑' b : ↑(Q ⁻¹' {n}), f b = PowerSeries.coeff n (N.arcTx β.be m p) * (u : C) ^ n := by
     intro n
     have hset : Q ⁻¹' {n} = {χ | q χ = n} := by
       ext χ
@@ -312,34 +339,41 @@ private theorem absSumAt_arcTx_twist_tx {C : Type} [NontriviallyNormedField C]
       have hb : Q b = n := b.2
       rw [hf]
       simp only [hb]
-    rw [tsum_congr hterm, tsum_mul_left, hset,
-      tsum_subtype_eq_finsum_mem_of_finite _ (hfinS n), hcoeff', mul_comm]
+    rw [tsum_congr hterm, tsum_mul_left, hset, tsum_subtype_eq_finsum_mem_of_finite _ (hfinS n),
+      hcoeff', mul_comm]
   have hfib := hsum.hasSum.tsum_fiberwise Q
-  rw [show (fun n => ∑' b : ↑(Q ⁻¹' {n}), f b) = fun n =>
-      PowerSeries.coeff n (N.arcTx β.be m p) * (u : C) ^ n
-      from funext hcoeff] at hfib
+  rw [show (fun n => ∑' b : ↑(Q ⁻¹' {n}), f b)
+        = fun n => PowerSeries.coeff n (N.arcTx β.be m p) * (u : C) ^ n from
+      funext hcoeff]
+    at hfib
   refine ⟨?_, ?_⟩
-  · refine Summable.of_nonneg_of_le (fun n => norm_nonneg _) (fun n => ?_)
+  · refine Summable.of_nonneg_of_le
+      (fun n => norm_nonneg _)
+      (fun n => ?_)
       (summable_geometric_of_lt_one (norm_nonneg _) hu)
     rw [norm_mul, norm_pow]
     exact mul_le_of_le_one_left (by positivity) (hcn n)
   · rw [htw]
     exact hfib.tsum_eq
 
-
 open scoped BigOperators in
-theorem _root_.GlobalTheory.eval_twist_tx_eq_zero_of_aeval_arcTx : ∀ (C : Type) [NontriviallyNormedField C]
-    [IsUltrametricDist C] [CompleteSpace C] (N : _root_.GlobalTheory.Ex.NumD C) (k : ℕ)
-    (β : N.Form k) (m : ℕ) (hm : m ^ 2 ∣ k), Odd m →
-    ∀ (ι : Type) (p : ι → N.QT (m ^ 2)),
-    (∀ i χ, ‖N.txT m (p i) χ‖ ≤ 1) → ∀ (F : MvPolynomial ι C),
-    MvPolynomial.aeval (fun i => N.arcTx β.be m (p i)) F = 0 →
-    ∀ u : Cˣ, ‖(u : C)‖ < 1 →
-    MvPolynomial.eval (fun i => (N.twist β u).tx m
-      (N.twQ β u hm (p i))) F = 0 := by
+theorem _root_.GlobalTheory.eval_twist_tx_eq_zero_of_aeval_arcTx
+    : ∀ (C : Type) [NontriviallyNormedField C] [IsUltrametricDist C] [CompleteSpace C]
+        (N : _root_.GlobalTheory.Ex.NumD C) (k : ℕ) (β : N.Form k) (m : ℕ) (hm : m ^ 2 ∣ k),
+      Odd m
+        → ∀ (ι : Type) (p : ι → N.QT (m ^ 2)),
+          (∀ i χ, ‖N.txT m (p i) χ‖ ≤ 1)
+            → ∀ (F : MvPolynomial ι C),
+              MvPolynomial.aeval (fun i => N.arcTx β.be m (p i)) F = 0
+                → ∀ u : Cˣ,
+                  ‖(u : C)‖ < 1
+                    → MvPolynomial.eval (fun i => (N.twist β u).tx m (N.twQ β u hm (p i))) F
+                      = 0 := by
   intro C _ _ _ N k β m hm hodd ι p hbd F hF u hu
-  have h := _root_.GlobalTheory.BddArc.AbsSumAt.aeval (u := (u : C))
-    (fun i => absSumAt_arcTx_twist_tx N β m hm hodd (p i) (hbd i) u hu) F
+  have h :=
+    _root_.GlobalTheory.BddArc.AbsSumAt.aeval (u := (u : C))
+      (fun i => absSumAt_arcTx_twist_tx N β m hm hodd (p i) (hbd i) u hu)
+      F
   rw [hF] at h
   rw [← h.2]
   simp

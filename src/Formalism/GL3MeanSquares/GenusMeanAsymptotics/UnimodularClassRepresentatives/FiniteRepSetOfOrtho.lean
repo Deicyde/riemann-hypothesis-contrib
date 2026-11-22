@@ -11,15 +11,19 @@ noncomputable section
 
 namespace Formalism.HermitianLattices.Ext.L3
 
-theorem sum_inv_card_stab {G X : Type*} [Group G] [Finite G] [MulAction G X] (A : Set X)
-    [Finite A] (hA : ∀ g : G, ∀ x ∈ A, g • x ∈ A) (T : Finset X) (hTA : ∀ t ∈ T, t ∈ A)
-    (hT : ∀ x ∈ A, ∃! t, t ∈ T ∧ ∃ g : G, g • t = x) :
-    (Nat.card A : ℝ) / (Nat.card G : ℝ) =
-      ∑ t ∈ T, ((Nat.card (MulAction.stabilizer G t) : ℕ) : ℝ)⁻¹ := by
+theorem sum_inv_card_stab
+    {G X : Type*} [Group G] [Finite G] [MulAction G X]
+    (A : Set X) [Finite A]
+    (hA : ∀ g : G, ∀ x ∈ A, g • x ∈ A)
+    (T : Finset X) (hTA : ∀ t ∈ T, t ∈ A) (hT : ∀ x ∈ A, ∃! t, t ∈ T ∧ ∃ g : G, g • t = x)
+    : (Nat.card A : ℝ) / (Nat.card G : ℝ)
+      = ∑ t ∈ T, ((Nat.card (MulAction.stabilizer G t) : ℕ) : ℝ)⁻¹ := by
   classical
   have hGpos : (0 : ℝ) < Nat.card G := by exact_mod_cast Nat.card_pos
-  have hos : ∀ t : X, (Nat.card (MulAction.orbit G t) : ℝ) =
-      Nat.card G / Nat.card (MulAction.stabilizer G t) := by
+  have hos
+      : ∀ t : X,
+        (Nat.card (MulAction.orbit G t) : ℝ)
+          = Nat.card G / Nat.card (MulAction.stabilizer G t) := by
     intro t
     have h1 := (MulAction.stabilizer G t).card_mul_index
     rw [MulAction.index_stabilizer, ← Nat.card_coe_set_eq] at h1
@@ -37,16 +41,20 @@ theorem sum_inv_card_stab {G X : Type*} [Group G] [Finite G] [MulAction G X] (A 
       exact ⟨t, htT, hx, g, hg⟩
     · rintro ⟨t, -, hx, -⟩
       exact hx
-  have hdisj : ∀ t₁ ∈ T, ∀ t₂ ∈ T, t₁ ≠ t₂ →
-      Disjoint (A'.filter (fun x => ∃ g : G, g • t₁ = x)) (A'.filter (fun x => ∃ g : G, g • t₂ = x)) := by
+  have hdisj
+      : ∀ t₁ ∈ T, ∀ t₂ ∈ T,
+        t₁ ≠ t₂
+          → Disjoint (A'.filter (fun x => ∃ g : G, g • t₁ = x))
+            (A'.filter (fun x => ∃ g : G, g • t₂ = x)) := by
     intro t₁ h₁ t₂ h₂ hne
     refine Finset.disjoint_left.mpr ?_
     intro x hx1 hx2
     simp only [Finset.mem_filter] at hx1 hx2
     obtain ⟨t, -, huniq⟩ := hT x ((hA' x).mp hx1.1)
     exact hne ((huniq t₁ ⟨h₁, hx1.2⟩).trans (huniq t₂ ⟨h₂, hx2.2⟩).symm)
-  have hcard : ∀ t ∈ T, ((A'.filter (fun x => ∃ g : G, g • t = x)).card : ℝ) =
-      Nat.card (MulAction.orbit G t) := by
+  have hcard
+      : ∀ t ∈ T,
+        ((A'.filter (fun x => ∃ g : G, g • t = x)).card : ℝ) = Nat.card (MulAction.orbit G t) := by
     intro t ht
     have hset : MulAction.orbit G t = ↑(A'.filter (fun x => ∃ g : G, g • t = x)) := by
       ext x
@@ -64,16 +72,19 @@ theorem sum_inv_card_stab {G X : Type*} [Group G] [Finite G] [MulAction G X] (A 
   refine Finset.sum_congr rfl (fun t _ => ?_)
   rw [hos t, div_div, mul_comm, ← div_div, div_self hGpos.ne', one_div]
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V]
 
-theorem autSub_gmap_one (L : Submodule (𝓞 K) V) : Formalism.HermitianLatticesTheory.gmap (1 : V ≃ₗ[K] V) L = L := by
+theorem autSub_gmap_one (L : Submodule (𝓞 K) V)
+    : Formalism.HermitianLatticesTheory.gmap (1 : V ≃ₗ[K] V) L = L := by
   unfold Formalism.HermitianLatticesTheory.gmap
   ext x
   simp [Submodule.mem_map]
 
-theorem autSub_gmap_mul (a b : V ≃ₗ[K] V) (L : Submodule (𝓞 K) V) :
-    Formalism.HermitianLatticesTheory.gmap (a * b) L = Formalism.HermitianLatticesTheory.gmap a (Formalism.HermitianLatticesTheory.gmap b L) := by
+theorem autSub_gmap_mul (a b : V ≃ₗ[K] V) (L : Submodule (𝓞 K) V)
+    : Formalism.HermitianLatticesTheory.gmap (a * b) L
+      = Formalism.HermitianLatticesTheory.gmap a (Formalism.HermitianLatticesTheory.gmap b L) := by
   unfold Formalism.HermitianLatticesTheory.gmap
   ext x
   simp [Submodule.mem_map]

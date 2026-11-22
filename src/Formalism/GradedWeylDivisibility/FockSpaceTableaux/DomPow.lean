@@ -97,7 +97,8 @@ theorem dominancePowerProduct_holds : DomPow := by
   intro r t μ lam ht0 ht hS hT
   rw [ldiag_prod_univ_eq_range, ldiag_prod_univ_eq_range]
   have hext0 : ∀ a, 0 ≤ ldiagExt t a := fun a => by
-    unfold ldiagExt; split_ifs
+    unfold ldiagExt
+    split_ifs
     · exact ht0 _
     · exact le_rfl
   refine ldiag_domPow_nat (ldiagExt t) hext0 ?_ (ldiagExt μ) (ldiagExt lam) r ?_ ?_

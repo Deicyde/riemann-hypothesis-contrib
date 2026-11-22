@@ -13,7 +13,8 @@ end Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
 
 namespace Formalism.FourierDecayAlt.P.CutMP
 
-theorem modelPlaceBuilt2_of_SSnRep (hJ : JfSmoothDS) (h : JA.SSn.SSnRep) : Formalism.FourierDecayAlt.JCT.ModelPlaceBuilt2 :=
+theorem modelPlaceBuilt2_of_SSnRep (hJ : JfSmoothDS) (h : JA.SSn.SSnRep)
+    : Formalism.FourierDecayAlt.JCT.ModelPlaceBuilt2 :=
   modelPlaceBuilt2_of_rotK hJ Gauge.GC.rotation_K_invariance_holds h
 
 end Formalism.FourierDecayAlt.P.CutMP

@@ -12,15 +12,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Fub
 namespace GlobalTheory.CovTop
 
 structure HypothesesX : Prop where
-
   ks : GlobalTheory.Published.ToroidalForFanKS
-
   lie : GlobalTheory.Published.SemiAbelianLieSeminegative
-
   green : GlobalTheory.Published.GreenCuspidal
-
   sep : GlobalTheory.Published.PointSeparationPair
-
   fsch : GlobalTheory.Published.FubiniStudyChowHeight
 
 end GlobalTheory.CovTop

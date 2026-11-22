@@ -19,17 +19,20 @@ variable {p q n : ℕ}
 def BlockOrd (e : Ix p q ≃ Fin n) (ε : Fin n → Bool) : Prop :=
   (∀ i, ε (e (Sum.inl i)) = true) ∧ (∀ j, ε (e (Sum.inr j)) = false) ∧ ∀ a b, posC a b → e a < e b
 
-def Factors {T : GrpData p q} (U : URep T) (e : Ix p q ≃ Fin n)
-    (σ : Matrix (Fin n) (Fin n) ℂ → (U.H →L[ℂ] U.H)) : Prop :=
+def Factors
+    {T : GrpData p q} (U : URep T)
+    (e : Ix p q ≃ Fin n) (σ : Matrix (Fin n) (Fin n) ℂ → (U.H →L[ℂ] U.H))
+    : Prop :=
   ∀ x, U.π x = σ (Matrix.reindex e e ((T.cov x : GL (Ix p q) ℂ) : Mat p q))
 
-theorem BlockOrd.sameBlock_iff {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε) (a b : Ix p q) :
-    sameBlock a b ↔ ε (e a) = ε (e b) := by
+theorem BlockOrd.sameBlock_iff
+    {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε) (a b : Ix p q)
+    : sameBlock a b ↔ ε (e a) = ε (e b) := by
   obtain ⟨h1, h2, -⟩ := h
   cases a <;> cases b <;> simp [sameBlock, h1, h2]
 
-theorem BlockOrd.posC_iff {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε) (a b : Ix p q) :
-    posC a b ↔ e a < e b ∧ ε (e a) = ε (e b) := by
+theorem BlockOrd.posC_iff {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε) (a b : Ix p q)
+    : posC a b ↔ e a < e b ∧ ε (e a) = ε (e b) := by
   constructor
   · intro hab
     refine ⟨h.2.2 a b hab, ?_⟩
@@ -59,14 +62,17 @@ theorem BlockOrd.posC_iff {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : Bloc
         · exact absurd (congrArg Sum.inr hij) hne
         · exact absurd hij hnot
 
-theorem exists_blockOrd (ε : Fin n → Bool) (hp : (Finset.univ.filter fun a => ε a = true).card = p)
-    (hq : (Finset.univ.filter fun a => ε a = false).card = q) : ∃ e : Ix p q ≃ Fin n, BlockOrd e ε := by
+theorem exists_blockOrd
+    (ε : Fin n → Bool) (hp : (Finset.univ.filter fun a => ε a = true).card = p)
+    (hq : (Finset.univ.filter fun a => ε a = false).card = q)
+    : ∃ e : Ix p q ≃ Fin n, BlockOrd e ε := by
   classical
   set S := Finset.univ.filter fun a => ε a = true with hS
   set T := Finset.univ.filter fun a => ε a = false with hT
   have hcard : p + q = n := by
-    have h0 := Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin n)))
-      (fun a => ε a = true)
+    have h0 :=
+      Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin n)))
+        (fun a => ε a = true)
     simp only [Bool.not_eq_true, Finset.card_univ, Fintype.card_fin] at h0
     rw [← hp, ← hq]
     exact h0
@@ -116,26 +122,29 @@ theorem exists_blockOrd (ε : Fin n → Bool) (hp : (Finset.univ.filter fun a =>
       | inl j => exact absurd hab (by simp [posC])
       | inr j => exact (T.orderEmbOfFin hq).strictMono hab
 
-theorem BlockOrd.reindex_Jm {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε) :
-    Matrix.reindex e e (Jm p q) = Formalism.REAL.Jm ε := by
+theorem BlockOrd.reindex_Jm {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε)
+    : Matrix.reindex e e (Jm p q) = Formalism.REAL.Jm ε := by
   obtain ⟨h1, h2, -⟩ := h
   ext a b
   obtain ⟨a', rfl⟩ := e.surjective a
   obtain ⟨b', rfl⟩ := e.surjective b
-  simp only [Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_apply_apply, Formalism.REAL.Jm,
-    Matrix.diagonal_apply, EmbeddingLike.apply_eq_iff_eq, Jm, Formalism.UG.Jpq]
+  simp only [Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_apply_apply,
+    Formalism.REAL.Jm, Matrix.diagonal_apply, EmbeddingLike.apply_eq_iff_eq, Jm, Formalism.UG.Jpq]
   cases a' <;> cases b' <;> simp [h1, h2, Matrix.one_apply] <;> split_ifs <;> simp
 
-theorem BlockOrd.inUJ_iff {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε) (g : Mat p q) :
-    Formalism.REAL.inUJ ε (Matrix.reindex e e g) ↔ gᴴ * Jm p q * g = Jm p q := by
-  have key : ∀ M N : Mat p q, Matrix.reindex e e M * Matrix.reindex e e N = Matrix.reindex e e (M * N) := by
+theorem BlockOrd.inUJ_iff {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε) (g : Mat p q)
+    : Formalism.REAL.inUJ ε (Matrix.reindex e e g) ↔ gᴴ * Jm p q * g = Jm p q := by
+  have key
+      : ∀ M N : Mat p q,
+        Matrix.reindex e e M * Matrix.reindex e e N = Matrix.reindex e e (M * N) := by
     intro M N
     simp [Matrix.reindex_apply, Matrix.submatrix_mul_equiv]
   unfold Formalism.REAL.inUJ
   rw [← h.reindex_Jm, Matrix.conjTranspose_reindex, key, key]
   exact (Matrix.reindex e e).injective.eq_iff
 
-theorem mem_Upq (g : GL (Ix p q) ℂ) : g ∈ Formalism.UG.Upq p q ↔ (g : Mat p q)ᴴ * Jm p q * g = Jm p q := by
+theorem mem_Upq (g : GL (Ix p q) ℂ)
+    : g ∈ Formalism.UG.Upq p q ↔ (g : Mat p q)ᴴ * Jm p q * g = Jm p q := by
   unfold Formalism.UG.Upq Formalism.UG.UJ
   rw [Subgroup.mem_mk]
   show Formalism.UG.cT (starRingEnd ℂ) (g : Mat p q) * Formalism.UG.Jpq p q * (g : Mat p q) = Formalism.UG.Jpq p q ↔ _
@@ -145,22 +154,24 @@ theorem mem_Upq (g : GL (Ix p q) ℂ) : g ∈ Formalism.UG.Upq p q ↔ (g : Mat 
   rw [hc]
   rfl
 
-theorem BlockOrd.cov_mem {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε) (T : GrpData p q) (x : T.G) :
-    Matrix.reindex e e ((T.cov x : GL (Ix p q) ℂ) : Mat p q) ∈ UJset ε := by
+theorem BlockOrd.cov_mem
+    {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε) (T : GrpData p q) (x : T.G)
+    : Matrix.reindex e e ((T.cov x : GL (Ix p q) ℂ) : Mat p q) ∈ UJset ε := by
   show Formalism.REAL.inUJ ε _
   exact (h.inUJ_iff _).mpr ((mem_Upq _).mp (T.cov_mem x))
 
-theorem BlockOrd.cov_surj {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε) (T : GrpData p q)
-    {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε) :
-    ∃ x : T.G, Matrix.reindex e e ((T.cov x : GL (Ix p q) ℂ) : Mat p q) = g := by
+theorem BlockOrd.cov_surj
+    {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : BlockOrd e ε)
+    (T : GrpData p q)
+    {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε)
+    : ∃ x : T.G, Matrix.reindex e e ((T.cov x : GL (Ix p q) ℂ) : Mat p q) = g := by
   have hg' : Formalism.REAL.inUJ ε g := hg
   set g' : Mat p q := (Matrix.reindex e e).symm g
   have hre : Matrix.reindex e e g' = g := (Matrix.reindex e e).apply_symm_apply g
   have hU : g'ᴴ * Jm p q * g' = Jm p q := by
     rw [← h.inUJ_iff, hre]
     exact hg'
-  have hJJ : Jm p q * Jm p q = 1 := by
-    simp [Jm, Formalism.UG.Jpq, Matrix.fromBlocks_multiply]
+  have hJJ : Jm p q * Jm p q = 1 := by simp [Jm, Formalism.UG.Jpq, Matrix.fromBlocks_multiply]
   have hleft : (Jm p q * g'ᴴ * Jm p q) * g' = 1 := by
     rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc g'ᴴ, hU, hJJ]
   have hright : g' * (Jm p q * g'ᴴ * Jm p q) = 1 := mul_eq_one_comm.mp hleft
@@ -178,23 +189,34 @@ theorem BlockOrd.cov_surj {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} (h : Bloc
   rw [hx]
   exact hre
 
-theorem exists_factors {T : GrpData p q} (U : URep T) (e : Ix p q ≃ Fin n)
-    (h : ∀ x, T.cov x = 1 → U.π x = 1) : ∃ σ, Factors U e σ := by
+theorem exists_factors
+    {T : GrpData p q} (U : URep T) (e : Ix p q ≃ Fin n) (h : ∀ x, T.cov x = 1 → U.π x = 1)
+    : ∃ σ, Factors U e σ := by
   classical
-  refine ⟨fun M => if hM : ∃ x, Matrix.reindex e e ((T.cov x : GL (Ix p q) ℂ) : Mat p q) = M
-    then U.π hM.choose else 0, ?_⟩
+  refine ⟨
+    fun M =>
+      if hM : ∃ x, Matrix.reindex e e ((T.cov x : GL (Ix p q) ℂ) : Mat p q) = M then
+        U.π hM.choose
+      else
+        0,
+    ?_
+  ⟩
   intro x
-  have hM : ∃ y, Matrix.reindex e e ((T.cov y : GL (Ix p q) ℂ) : Mat p q) =
-      Matrix.reindex e e ((T.cov x : GL (Ix p q) ℂ) : Mat p q) := ⟨x, rfl⟩
+  have hM
+      : ∃ y,
+        Matrix.reindex e e ((T.cov y : GL (Ix p q) ℂ) : Mat p q)
+          = Matrix.reindex e e ((T.cov x : GL (Ix p q) ℂ) : Mat p q) :=
+    ⟨x, rfl⟩
   simp only [dif_pos hM]
   set y := hM.choose with hy
   have hyx : T.cov y = T.cov x := Units.ext ((Matrix.reindex e e).injective hM.choose_spec)
-  have h1 : T.cov (y⁻¹ * x) = 1 := by
-    rw [map_mul, map_inv, hyx, inv_mul_cancel]
+  have h1 : T.cov (y⁻¹ * x) = 1 := by rw [map_mul, map_inv, hyx, inv_mul_cancel]
   have h2 : U.π y⁻¹ * U.π x = 1 := by
     rw [← map_mul]
     exact h _ h1
-  calc U.π x = U.π (y * y⁻¹) * U.π x := by simp
+  calc
+    U.π x
+      = U.π (y * y⁻¹) * U.π x := by simp
     _ = U.π y * (U.π y⁻¹ * U.π x) := by rw [map_mul, mul_assoc]
     _ = U.π y := by rw [h2, mul_one]
 

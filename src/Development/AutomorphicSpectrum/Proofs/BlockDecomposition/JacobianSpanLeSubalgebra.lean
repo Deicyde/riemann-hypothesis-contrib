@@ -8,14 +8,18 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris ReciprocityTheory.ChartRestriction.G.Geo.Tor CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor CrystallineSemistableComparison
+  CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.Cone
 
-theorem jacSpan_le_jacS : ∀ {K : Type} [Field K] {X : Scheme.{0}} {V W : X.Opens} (h : V ≤ W) [Algebra K Γ(X, V)]
-    (B : Subalgebra K Γ(X, V)), (B : Set Γ(X, V)) = Set.range (rs h) →
-    ∀ {d m : ℕ} (D : Fin d → Derivation K Γ(X, V) Γ(X, V)) (κ : Fin m → Fin d),
-    jacSpan h (RingHom.id _) (fun k => D k) κ ≤ jacS B D κ := by
+theorem jacSpan_le_jacS
+    : ∀ {K : Type} [Field K] {X : Scheme.{0}} {V W : X.Opens} (h : V ≤ W) [Algebra K Γ(X, V)]
+        (B : Subalgebra K Γ(X, V)),
+      (B : Set Γ(X, V)) = Set.range (rs h)
+        → ∀ {d m : ℕ} (D : Fin d → Derivation K Γ(X, V) Γ(X, V)) (κ : Fin m → Fin d),
+          jacSpan h (RingHom.id _) (fun k => D k) κ ≤ jacS B D κ := by
   intro K _ X V W h _ B hB d m D κ
   refine (AddSubgroup.closure_le _).2 ?_
   rintro y ⟨b, bs, rfl⟩

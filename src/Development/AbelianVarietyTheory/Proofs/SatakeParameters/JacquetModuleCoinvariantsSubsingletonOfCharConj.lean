@@ -7,14 +7,17 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.DefU Formalism.BasicNotions Formalism.ConjugateSelfDual GlobalTheory.Cong
+open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU Formalism.BasicNotions Formalism.ConjugateSelfDual GlobalTheory.Cong
 
 namespace GlobalTheory
 
-theorem jacquet_subsingleton_of_char_nontrivial_on_conj :
-    ∀ (G V : Type) [Group G] [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V), π.IsIrreducible →
-      ∀ (N H : Subgroup G) (χ : H →* ℂˣ) (v : V), v ≠ 0 → (∀ h : H, π h v = (χ h : ℂ) • v) →
-      (∀ g : G, ∃ h : H, g * h * g⁻¹ ∈ N ∧ χ h ≠ 1) → Subsingleton (Jacquet π N) := by
+theorem jacquet_subsingleton_of_char_nontrivial_on_conj
+    : ∀ (G V : Type) [Group G] [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G V),
+      π.IsIrreducible
+        → ∀ (N H : Subgroup G) (χ : H →* ℂˣ) (v : V),
+          v ≠ 0 → (∀ h : H, π h v = (χ h : ℂ) • v) → (∀ g : G, ∃ h : H, g * h * g⁻¹ ∈ N ∧ χ h ≠ 1)
+            → Subsingleton (Jacquet π N) := by
   intro G V _ _ _ π hπ N H χ v hv0 hv hconj
   set K : Submodule ℂ V := twKer π N 1 with hK
 
@@ -37,16 +40,16 @@ theorem jacquet_subsingleton_of_char_nontrivial_on_conj :
     have := K.smul_mem ((χ h : ℂ) - 1)⁻¹ hmem
     rwa [smul_smul, inv_mul_cancel₀ hne, one_smul] at this
   let S : Submodule ℂ V := ⨅ g : G, K.comap (π g)
-  have hS : ∀ w, w ∈ S ↔ ∀ g : G, π g w ∈ K := by
-    intro w; simp [S, Submodule.mem_iInf]
-  let Wr : Subrepresentation π :=
-    { toSubmodule := S
-      apply_mem_toSubmodule := by
-        intro g w hw
-        rw [hS] at hw ⊢
-        intro g'
-        rw [← Module.End.mul_apply, ← map_mul]
-        exact hw _ }
+  have hS : ∀ w, w ∈ S ↔ ∀ g : G, π g w ∈ K := by intro w; simp [S, Submodule.mem_iInf]
+  let Wr : Subrepresentation π := {
+    toSubmodule := S
+    apply_mem_toSubmodule := by
+      intro g w hw
+      rw [hS] at hw ⊢
+      intro g'
+      rw [← Module.End.mul_apply, ← map_mul]
+      exact hw _
+  }
   have hvW : v ∈ S := (hS v).2 hgv
   have htop : K = ⊤ := by
     rcases hπ.eq_bot_or_eq_top Wr with e | e

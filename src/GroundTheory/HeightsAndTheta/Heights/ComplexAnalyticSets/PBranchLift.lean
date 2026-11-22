@@ -16,9 +16,10 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Topology
 
-theorem BranchLift.proof (hR : RiemannExtensionAnalytic.Statement)
-    (hB : BranchOffHypersurface.Statement) (hO : NormalModelOpenMapping.Statement)
-    (hP : NormalModelProper.Statement) : BranchLift.Statement := by
+theorem BranchLift.proof
+    (hR : RiemannExtensionAnalytic.Statement) (hB : BranchOffHypersurface.Statement)
+    (hO : NormalModelOpenMapping.Statement) (hP : NormalModelProper.Statement)
+    : BranchLift.Statement := by
   intro n k J p M γ hJ hdim
   set Δ := Metric.ball (0 : Fin k → ℂ) γ.radius with hΔ
   have hγd : DifferentiableOn ℂ γ.toFun Δ := γ.differentiableOn
@@ -41,8 +42,8 @@ theorem BranchLift.proof (hR : RiemannExtensionAnalytic.Statement)
     obtain ⟨i, -, hi⟩ := (Ideal.IsPrime.prod_mem_iff (hp := hJ)).1 h
     exact hbJ i hi
   have hgne : ∀ V, IsOpen V → V ⊆ Δ → V.Nonempty → ∃ t ∈ V, g t ≠ 0 := fun V hV hVΔ hne =>
-    hB n k J _ V γ.toFun hJ hdim hBJ hV hne (hγd.mono hVΔ) (γ.injOn.mono hVΔ)
-      fun τ hτ => hγZ τ (hVΔ hτ)
+    hB n k J _ V γ.toFun hJ hdim hBJ hV hne (hγd.mono hVΔ) (γ.injOn.mono hVΔ) fun τ hτ =>
+      hγZ τ (hVΔ hτ)
   have hbne : ∀ τ, g τ ≠ 0 → ∀ i, eval (γ.toFun τ) (b i) ≠ 0 := fun τ hτ i h =>
     hτ (by simp only [hg, map_prod]; exact Finset.prod_eq_zero (Finset.mem_univ i) h)
   set f : Fin M.m → (Fin k → ℂ) → ℂ := fun i τ => eval (γ.toFun τ) (a i) / eval (γ.toFun τ) (b i)
@@ -60,10 +61,14 @@ theorem BranchLift.proof (hR : RiemannExtensionAnalytic.Statement)
     have hsub : Metric.closedBall τ (ε / 2) ⊆ Δ :=
       (Metric.closedBall_subset_ball (by linarith)).trans hεΔ
     have hK : Bornology.IsBounded (γ.toFun '' Metric.closedBall τ (ε / 2)) :=
-      ((isCompact_closedBall τ (ε / 2)).image_of_continuousOn (hγd.continuousOn.mono hsub)).isBounded
+      ((isCompact_closedBall τ (ε / 2)).image_of_continuousOn
+        (hγd.continuousOn.mono hsub)).isBounded
     obtain ⟨C, hC⟩ := isBounded_iff_forall_norm_le.1 (hP n J M _ hK)
-    refine ⟨Metric.closedBall τ (ε / 2), Metric.closedBall_mem_nhds τ (by linarith),
-      isBounded_iff_forall_norm_le.2 ⟨C, ?_⟩⟩
+    refine ⟨
+      Metric.closedBall τ (ε / 2),
+      Metric.closedBall_mem_nhds τ (by linarith),
+      isBounded_iff_forall_norm_le.2 ⟨C, ?_⟩
+    ⟩
     rintro _ ⟨t, ⟨⟨ht, htΔ⟩, hgt⟩, rfl⟩
     have hw := hC _ ⟨hgraph t htΔ hgt, ⟨t, ht, rfl⟩⟩
     exact (norm_le_pi_norm (Sum.elim (γ.toFun t) fun i => f i t) (Sum.inr i)).trans hw
@@ -79,8 +84,8 @@ theorem BranchLift.proof (hR : RiemannExtensionAnalytic.Statement)
     intro τ hτ
     rw [mem_closure_iff]
     intro o ho hτo
-    obtain ⟨t, ⟨hto, htΔ⟩, hgt⟩ := hgne (o ∩ Δ) (ho.inter Metric.isOpen_ball)
-      Set.inter_subset_right ⟨τ, hτo, hτ⟩
+    obtain ⟨t, ⟨hto, htΔ⟩, hgt⟩ :=
+      hgne (o ∩ Δ) (ho.inter Metric.isOpen_ball) Set.inter_subset_right ⟨τ, hτo, hτ⟩
     exact ⟨t, hto, htΔ, hgt⟩
   have hΓZ : ∀ τ ∈ Δ, Γ τ ∈ zeroSetIn M.ideal := by
     intro τ hτ q hq
@@ -93,8 +98,9 @@ theorem BranchLift.proof (hR : RiemannExtensionAnalytic.Statement)
         exact hFeq i ht
       simp only [hΓt]
       exact hgraph t ht.1 ht.2 q hq
-    exact heq.of_subset_closure ((MvPolynomial.continuous_eval q).comp_continuousOn hΓd.continuousOn)
-      continuousOn_const Set.inter_subset_left hdense hτ
+    exact heq.of_subset_closure
+      ((MvPolynomial.continuous_eval q).comp_continuousOn hΓd.continuousOn) continuousOn_const
+      Set.inter_subset_left hdense hτ
   have hΓinj : Set.InjOn Γ Δ := fun s hs t ht hst =>
     γ.injOn hs ht (by
       have := congrArg firstCoords hst

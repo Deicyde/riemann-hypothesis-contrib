@@ -10,8 +10,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 open UpperTheory.V.Cj.A
 
-theorem UpperTheory.V.Cj.A.coverEx :
-    CoverEx := by
+theorem UpperTheory.V.Cj.A.coverEx : CoverEx := by
   classical
   intro Γ V S _ _ _ _ d G hP A O hAO hA hO
   obtain ⟨W, hW⟩ := UpperTheory.V.Lit.Dr.window Γ V S d G hP
@@ -20,24 +19,33 @@ theorem UpperTheory.V.Cj.A.coverEx :
     intro s j
     by_cases hj : j ∈ A s
     · obtain ⟨r, hr, hb⟩ := Metric.isOpen_iff.1 (hAO s).1 j hj
-      exact ⟨Metric.ball j r, Metric.isOpen_ball, convex_ball j r, hb, fun _ => Metric.mem_ball_self hr⟩
+      exact
+        ⟨Metric.ball j r, Metric.isOpen_ball, convex_ball j r, hb, fun _ => Metric.mem_ball_self hr⟩
     · exact ⟨∅, isOpen_empty, convex_empty, Set.empty_subset _, fun h => absurd h hj⟩
   choose B hBo hBc hBA hBm using hB
-  have hψ := fun s => partBase V G.Y G.isOpen (fun j => if j ∈ O s then O s else B s j)
-    (fun j => by
-      by_cases hj : j ∈ O s
-      · simpa [hj] using (hAO s).2.2.1
-      · simpa [hj] using hBo s j)
-    (fun p hp => by
-      by_cases hj : p ∈ O s
-      · simp [hj]
-      · simpa [hj] using hBm s p (((hAO s).2.2.2 hp).resolve_right hj))
+  have hψ := fun s =>
+    partBase V G.Y G.isOpen
+      (fun j => if j ∈ O s then O s else B s j)
+      (fun j => by
+        by_cases hj : j ∈ O s
+        · simpa [hj] using (hAO s).2.2.1
+        · simpa [hj] using hBo s j)
+      (fun p hp => by
+        by_cases hj : p ∈ O s
+        · simp [hj]
+        · simpa [hj] using hBm s p (((hAO s).2.2.2 hp).resolve_right hj))
   choose ψ h1 h2 h3 h4 using hψ
   have hsub : ∀ (i : Idx Γ V) s, G.ρ i.g⁻¹ ⁻¹' B (G.σ i.g⁻¹ s) i.j ⊆ A s := by
     intro i s p hp
     exact (hA i.g⁻¹ s p).1 (hBA _ _ hp)
-  refine ⟨fun i s => G.ρ i.g⁻¹ ⁻¹' B (G.σ i.g⁻¹ s) i.j, _, ⟨?_, ?_, ?_, ?_⟩,
-    partProd Γ V S V d G u hu ψ h1 h2 h3, hsub, ?_⟩
+  refine ⟨
+    fun i s => G.ρ i.g⁻¹ ⁻¹' B (G.σ i.g⁻¹ s) i.j,
+    _,
+    ⟨?_, ?_, ?_, ?_⟩,
+    partProd Γ V S V d G u hu ψ h1 h2 h3,
+    hsub,
+    ?_
+  ⟩
   · intro i s
     exact (hBo _ _).preimage (G.ρ _).continuous
   · intro i s

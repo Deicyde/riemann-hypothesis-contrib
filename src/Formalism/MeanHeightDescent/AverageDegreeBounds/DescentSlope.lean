@@ -20,17 +20,22 @@ namespace Formalism.ExtensionFiltration
 open Formalism.HN
 
 theorem slope_image_injective
-    {K V ι W κ : Type} [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
-    [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [Fintype ι]
-    [DecidableEq ι] [AddCommGroup W] [Module K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
-    [Fintype κ] [DecidableEq κ] (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ)
-    (b' : Basis κ K W) (X' : InfinitePlace K → Matrix κ κ ℂ)
+    {K V ι W κ : Type} [Field K] [NumberField K] [StarRing K]
+    [_root_.NumberField.IsTotallyComplex K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+    [IsScalarTower (𝓞 K) K V] [Fintype ι] [DecidableEq ι] [AddCommGroup W] [Module K W]
+    [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W] [Fintype κ] [DecidableEq κ]
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ)
+    (b' : Basis κ K W)
+    (X' : InfinitePlace K → Matrix κ κ ℂ)
     (hX : ∀ v, IsUnit (X v).det) (hX' : ∀ v, IsUnit (X' v).det)
-    (φ : V →ₗ[K] W) (A : Submodule (𝓞 K) V) (hAfg : A.FG) (hA0 : A ≠ ⊥)
-    (hinj : Function.Injective φ) :
-    rkK (A.map (φ.restrictScalars (𝓞 K))) = rkK A ∧
-      2 * slope (Formalism.HermitianLatticesTheory.realize b X) A - htMap b X b' X' φ ≤
-        2 * slope (Formalism.HermitianLatticesTheory.realize b' X') (A.map (φ.restrictScalars (𝓞 K))) := by
+    (φ : V →ₗ[K] W)
+    (A : Submodule (𝓞 K) V) (hAfg : A.FG) (hA0 : A ≠ ⊥)
+    (hinj : Function.Injective φ)
+    : rkK (A.map (φ.restrictScalars (𝓞 K))) = rkK A
+      ∧ 2 * slope (Formalism.HermitianLatticesTheory.realize b X) A - htMap b X b' X' φ
+        ≤ 2 * slope (Formalism.HermitianLatticesTheory.realize b' X')
+          (A.map (φ.restrictScalars (𝓞 K))) := by
   have : FiniteDimensional K V := Module.Finite.of_basis b
   have hrkeq := sizeIneq_rk φ A
   obtain ⟨hsat, hht⟩ := height_image_formula K V ι W κ b X b' X' hX hX' φ A hAfg
@@ -63,7 +68,9 @@ theorem slope_image_injective
   have hq := hSBA.2.2.2.2.2.2.2 ⊥ hsat
   have hrb : rk ρ (⊥ : Submodule (𝓞 K) V) = 0 := (hSBA.2.2.2.1 ⊥ bot_le).2 rfl
   have hdb : deg ρ (⊥ : Submodule (𝓞 K) V) = 0 := hSBA.2.2.2.2.1
-  have hslQ : Formalism.F.slope (Formalism.F.quot (zl ρ A) (zl ρ (⊥ : Submodule (𝓞 K) V))) = slope ρ A := by
+  have hslQ
+      : Formalism.F.slope (Formalism.F.quot (zl ρ A) (zl ρ (⊥ : Submodule (𝓞 K) V)))
+        = slope ρ A := by
     unfold Formalism.F.slope
     rw [hq.1, hq.2.2, hrb, hdb, Nat.sub_zero, sub_zero]
     rfl
@@ -102,19 +109,20 @@ theorem slope_image_injective
   have hcore : size b' X' I ≤ P ^ ((1 : ℝ) / (nPl K : ℝ)) * sizeQ b X A ⊥ := by
     unfold size sizeQ
     rw [hrkR]
-    calc ht b' X' I ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ)))
-        ≤ (P ^ (2 * rkK I) * htQ b X A ⊥) ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) :=
-          Real.rpow_le_rpow hhtI.le hht he
-      _ = (P ^ (2 * rkK I)) ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) *
-            htQ b X A ⊥ ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) :=
-          Real.mul_rpow hX0 hQpos.le
-      _ = P ^ ((1 : ℝ) / (nPl K : ℝ)) *
-            htQ b X A ⊥ ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) := by
-          congr 1
-          rw [← Real.rpow_natCast, ← Real.rpow_mul hP]
-          congr 1
-          push_cast
-          field_simp
+    calc
+      ht b' X' I ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ)))
+          ≤ (P ^ (2 * rkK I) * htQ b X A ⊥) ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) :=
+        Real.rpow_le_rpow hhtI.le hht he
+      _ = (P ^ (2 * rkK I)) ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ)))
+          * htQ b X A ⊥ ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) :=
+        Real.mul_rpow hX0 hQpos.le
+      _ = P ^ ((1 : ℝ) / (nPl K : ℝ))
+          * htQ b X A ⊥ ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) := by
+        congr 1
+        rw [← Real.rpow_natCast, ← Real.rpow_mul hP]
+        congr 1
+        push_cast
+        field_simp
   rw [hSI, hsQ', Real.rpow_def_of_pos hPpos, ← Real.exp_add, Real.exp_le_exp] at hcore
   have hht2 : htMap b X b' X' φ = 2 * (Real.log P * (1 / (nPl K : ℝ))) := by
     unfold htMap
@@ -171,8 +179,9 @@ theorem descent_slope : DescentSlope := by
     exact_mod_cast (Module.finrank_pos : 0 < Module.finrank ℚ K)
   rw [hdI, hdB, hrkB, hrkI, hrkeq] at hmin
   push_cast at hmin
-  have hmin' : muMin ρ' B * ((rkK B : ℝ) - rkK A) ≤
-      slope ρ' B * (rkK B : ℝ) - slope ρ' I * (rkK A : ℝ) := by
+  have hmin'
+      : muMin ρ' B * ((rkK B : ℝ) - rkK A)
+        ≤ slope ρ' B * (rkK B : ℝ) - slope ρ' I * (rkK A : ℝ) := by
     refine le_of_mul_le_mul_left ?_ hn
     linarith
   have hra : (0 : ℝ) ≤ (rkK A : ℝ) := Nat.cast_nonneg _

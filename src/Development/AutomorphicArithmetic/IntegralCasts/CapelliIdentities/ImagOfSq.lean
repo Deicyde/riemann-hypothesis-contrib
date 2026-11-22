@@ -4,9 +4,9 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qh67.imag_of_sq :
-    ∀ {c : ℂ} {d : ℕ},
-    (0 : ℕ) < d → c ^ (2 : ℕ) = -(↑d : ℂ) → (starRingEnd ℂ : ℂ → ℂ) c = -c ∧ c ≠ (0 : ℂ) := by
+theorem UpperTheory.Reformulated.B.Qh67.imag_of_sq
+    : ∀ {c : ℂ} {d : ℕ},
+      (0 : ℕ) < d → c ^ (2 : ℕ) = -(↑d : ℂ) → (starRingEnd ℂ : ℂ → ℂ) c = -c ∧ c ≠ (0 : ℂ) := by
   intro c d hd h
   have hd' : (0 : ℝ) < d := Nat.cast_pos.mpr hd
   have h1 : c.re * c.re - c.im * c.im = -(d : ℝ) := by

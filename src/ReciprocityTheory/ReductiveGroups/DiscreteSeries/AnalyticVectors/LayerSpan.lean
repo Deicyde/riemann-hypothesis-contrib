@@ -14,16 +14,18 @@ variable {n : ℕ}
 
 section Unitary
 
-variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-  {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M}
+variable
+  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M}
 
-def layerWtVecs (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (V : Submodule ℂ M)
-    (k : ℕ) : Set M :=
+def layerWtVecs (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ M) (V : Submodule ℂ M) (k : ℕ)
+    : Set M :=
   {w | ∃ ν ω : Fin n → ℝ, ∃ j ≤ k, IsNCSum ε j ω ∧
     (∃ v ∈ V, v ≠ 0 ∧ ∀ a, E a a v = (ν a : ℂ) • v) ∧ ∀ a, E a a w = ((ν + ω) a : ℂ) • w}
 
-theorem isNCSum_add_root {j : ℕ} {ω : Fin n → ℝ} (hω : IsNCSum ε j ω) {a b : Fin n}
-    (hab : ε a ≠ ε b) : IsNCSum ε (j + 1) (ω + root a b) := by
+theorem isNCSum_add_root
+    {j : ℕ} {ω : Fin n → ℝ} (hω : IsNCSum ε j ω) {a b : Fin n} (hab : ε a ≠ ε b)
+    : IsNCSum ε (j + 1) (ω + root a b) := by
   obtain ⟨γ, hγ, rfl⟩ := hω
   refine ⟨Fin.snoc (α := fun _ => Fin n × Fin n) γ (a, b), fun i => ?_, ?_⟩
   · refine Fin.lastCases ?_ (fun i => ?_) i
@@ -32,13 +34,14 @@ theorem isNCSum_add_root {j : ℕ} {ω : Fin n → ℝ} (hω : IsNCSum ε j ω) 
   · rw [Fin.sum_univ_castSucc]
     simp
 
-theorem diag_apply_of_weight (hE : IsGlRep E) {ω : Fin n → ℝ} {w : M}
-    (hw : ∀ c, E c c w = (ω c : ℂ) • w) (a b c : Fin n) :
-    E c c (E a b w) = ((ω + root a b) c : ℂ) • E a b w := by
+theorem diag_apply_of_weight
+    (hE : IsGlRep E) {ω : Fin n → ℝ} {w : M} (hw : ∀ c, E c c w = (ω c : ℂ) • w) (a b c : Fin n)
+    : E c c (E a b w) = ((ω + root a b) c : ℂ) • E a b w := by
   have h := congrArg (fun T : Module.End ℂ M => T w) (hE c c a b)
   simp only [LinearMap.sub_apply, Module.End.mul_apply] at h
-  have h2 : E c c (E a b w) = E a b (E c c w) +
-      ((if c = a then E c b else 0) w - (if b = c then E a c else 0) w) := by
+  have h2
+      : E c c (E a b w)
+        = E a b (E c c w) + ((if c = a then E c b else 0) w - (if b = c then E a c else 0) w) := by
     rw [← h]
     abel
   have e1 : (if c = a then E c b else 0) w = ((if c = a then 1 else 0 : ℝ) : ℂ) • E a b w := by
@@ -56,9 +59,10 @@ theorem diag_apply_of_weight (hE : IsGlRep E) {ω : Fin n → ℝ} {w : M}
   push_cast
   module
 
-theorem le_span_weightVecs (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVf : FiniteDimensional ℂ V)
-    (hVK : IsKStableSub ε E V) :
-    V ≤ Submodule.span ℂ {v | v ∈ V ∧ ∃ ν : Fin n → ℝ, ∀ a, E a a v = (ν a : ℂ) • v} := by
+theorem le_span_weightVecs
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVf : FiniteDimensional ℂ V)
+    (hVK : IsKStableSub ε E V)
+    : V ≤ Submodule.span ℂ {v | v ∈ V ∧ ∃ ν : Fin n → ℝ, ∀ a, E a a v = (ν a : ℂ) • v} := by
   haveI := hVf
   have hst : ∀ a, ∀ v ∈ V, E a a v ∈ V := fun a v hv => hVK a a rfl v hv
   let T : Fin n → Module.End ℂ V := fun a => (E a a).restrict (hst a)
@@ -86,7 +90,8 @@ theorem le_span_weightVecs (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVf : Fini
     rw [htop]
     exact Submodule.mem_top
   show ((⟨x, hx⟩ : V) : M) ∈ _
-  refine Submodule.iSup_induction _ (motive := fun y : V => (y : M) ∈ Submodule.span ℂ _) hy ?_ ?_ ?_
+  refine
+    Submodule.iSup_induction _ (motive := fun y : V => (y : M) ∈ Submodule.span ℂ _) hy ?_ ?_ ?_
   · intro χ y hy
     rw [Submodule.mem_iInf] at hy
     by_cases hy0 : y = 0
@@ -96,8 +101,8 @@ theorem le_span_weightVecs (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVf : Fini
         intro a
         have hev : Module.End.HasEigenvalue (T a) (χ a) := by
           first
-            | exact Module.End.hasEigenvalue_of_hasEigenvector ⟨hy a, hy0⟩
-            | exact (Submodule.ne_bot_iff _).2 ⟨y, hy a, hy0⟩
+          | exact Module.End.hasEigenvalue_of_hasEigenvector ⟨hy a, hy0⟩
+          | exact (Submodule.ne_bot_iff _).2 ⟨y, hy a, hy0⟩
         exact Complex.conj_eq_iff_re.1 ((hsym a).conj_eigenvalue_eq_self hev)
       refine Submodule.subset_span ⟨y.2, fun a => (χ a).re, fun a => ?_⟩
       have h := Module.End.mem_eigenspace_iff.1 (hy a)
@@ -112,9 +117,10 @@ theorem layerWtVecs_mono {k l : ℕ} (h : k ≤ l) : layerWtVecs ε E V k ⊆ la
   rintro w ⟨ν, ω, j, hj, hω, hv, hw⟩
   exact ⟨ν, ω, j, hj.trans h, hω, hv, hw⟩
 
-theorem layer_le_span (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVf : FiniteDimensional ℂ V)
-    (hVK : IsKStableSub ε E V) (k : ℕ) :
-    layer ε E V k ≤ Submodule.span ℂ (layerWtVecs ε E V k) := by
+theorem layer_le_span
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVf : FiniteDimensional ℂ V)
+    (hVK : IsKStableSub ε E V) (k : ℕ)
+    : layer ε E V k ≤ Submodule.span ℂ (layerWtVecs ε E V k) := by
   induction k with
   | zero =>
     refine (le_span_weightVecs hE hU hVf hVK).trans (Submodule.span_le.2 fun w hw => ?_)
@@ -122,8 +128,15 @@ theorem layer_le_span (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVf : FiniteDim
     by_cases hw0 : w = 0
     · rw [hw0]
       exact Submodule.zero_mem _
-    · exact Submodule.subset_span ⟨ν, 0, 0, le_refl 0, ⟨Fin.elim0, fun i => Fin.elim0 i, by simp⟩,
-        ⟨w, hwV, hw0, hν⟩, fun a => by simpa using hν a⟩
+    · exact Submodule.subset_span ⟨
+        ν,
+        0,
+        0,
+        le_refl 0,
+        ⟨Fin.elim0, fun i => Fin.elim0 i, by simp⟩,
+        ⟨w, hwV, hw0, hν⟩,
+        fun a => by simpa using hν a
+      ⟩
   | succ k ih =>
     show layer ε E V k ⊔ ⨆ (a : Fin n) (b : Fin n) (_ : ε a ≠ ε b), (layer ε E V k).map (E a b) ≤ _
     refine sup_le (ih.trans (Submodule.span_mono (layerWtVecs_mono (Nat.le_succ k))))

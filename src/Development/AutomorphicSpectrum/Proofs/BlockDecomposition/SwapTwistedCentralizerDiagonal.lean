@@ -10,9 +10,10 @@ open scoped Classical
 
 namespace GlobalTheory.CompanionTheory.SwapCent
 
-theorem twCent_swap : ∀ (H : Type) [Group H] (N : H),
-    twCent ((MulEquiv.prodComm : H × H ≃* H × H).toMonoidHom) (N, (1 : H)) =
-      (twCent (MonoidHom.id H) N).map ((MonoidHom.id H).prod (MonoidHom.id H)) := by
+theorem twCent_swap
+    : ∀ (H : Type) [Group H] (N : H),
+      twCent ((MulEquiv.prodComm : H × H ≃* H × H).toMonoidHom) (N, (1 : H))
+        = (twCent (MonoidHom.id H) N).map ((MonoidHom.id H).prod (MonoidHom.id H)) := by
   intro H _ N
   ext ⟨a, b⟩
   constructor

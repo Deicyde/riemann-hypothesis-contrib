@@ -19,15 +19,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FamIpAtNonne
 
 @[expose] public section
 
-open Module NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds GlobalTheory.ColRows
+open Module NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Col Formalism.L2.Ker
+  GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds GlobalTheory.ColRows
 open scoped ComplexOrder
 
 namespace GlobalTheory.KernelHalf
 
 open GlobalTheory.ColNorms GlobalTheory.ColNorms.NumMean
 
-theorem exists_le_wtSum {α : Type} [Fintype α] (w f : α → ℝ) (h0 : ∀ a, 0 ≤ w a) (h1 : ∑ a, w a = 1) :
-    ∃ a, w a ≠ 0 ∧ f a ≤ ∑ b, w b * f b := by
+theorem exists_le_wtSum {α : Type} [Fintype α] (w f : α → ℝ) (h0 : ∀ a, 0 ≤ w a) (h1 : ∑ a, w a = 1)
+    : ∃ a, w a ≠ 0 ∧ f a ≤ ∑ b, w b * f b := by
   by_contra hc
   push_neg at hc
   have h2 : ∑ a, w a * (∑ b, w b * f b) < ∑ a, w a * f a := by
@@ -43,10 +45,12 @@ theorem exists_le_wtSum {α : Type} [Fintype α] (w f : α → ℝ) (h0 : ∀ a,
   rw [← Finset.sum_mul, h1, one_mul] at h2
   exact lt_irrefl _ h2
 
-theorem wt_affine {α Z : Type} [Fintype α] [Fintype Z] (w : α → ℝ) (hw : ∑ a, w a = 1) (p q : Z → ℝ) (o : α → Z → ℝ) (t : α → ℝ)
-    (c₁ c₂ : ℝ) :
-    ∑ a, w a * ((∑ z, (p z - q z * o a z)) + t a + c₁ + c₂) =
-      (∑ z, (p z - q z * ∑ a, w a * o a z)) + (∑ a, w a * t a) + c₁ + c₂ := by
+theorem wt_affine
+    {α Z : Type} [Fintype α] [Fintype Z]
+    (w : α → ℝ) (hw : ∑ a, w a = 1)
+    (p q : Z → ℝ) (o : α → Z → ℝ) (t : α → ℝ) (c₁ c₂ : ℝ)
+    : ∑ a, w a * ((∑ z, (p z - q z * o a z)) + t a + c₁ + c₂)
+      = (∑ z, (p z - q z * ∑ a, w a * o a z)) + (∑ a, w a * t a) + c₁ + c₂ := by
   have h1 : ∑ a, w a * ∑ z, (p z - q z * o a z) = ∑ z, (p z - q z * ∑ a, w a * o a z) := by
     simp only [Finset.mul_sum]
     rw [Finset.sum_comm]
@@ -57,22 +61,30 @@ theorem wt_affine {α Z : Type} [Fintype α] [Fintype Z] (w : α → ℝ) (hw : 
     rw [this, hw, one_mul]
   simp only [mul_add, Finset.sum_add_distrib, ← Finset.sum_mul, hw, one_mul, h1]
 
-theorem kernelBound_wt (N : NumDatum) (δ : Code N) (T : ℕ) (CK : ℝ) (j : ℕ) {α : Type} [Fintype α] (w : α → ℝ) (hw : ∑ a, w a = 1)
-    (lo : α → RPl N.R → ℝ) (lt : α → ℝ) (h h' n n' : ℕ) :
-    ∑ a, w a * kernelBound_sq N δ T CK j (lo a) (lt a) h h' n n' =
-      kernelBound_sq N δ T CK j (fun z => ∑ a, w a * lo a z) (∑ a, w a * lt a) h h' n n' := by
+theorem kernelBound_wt
+    (N : NumDatum) (δ : Code N)
+    (T : ℕ) (CK : ℝ) (j : ℕ)
+    {α : Type} [Fintype α]
+    (w : α → ℝ) (hw : ∑ a, w a = 1)
+    (lo : α → RPl N.R → ℝ) (lt : α → ℝ) (h h' n n' : ℕ)
+    : ∑ a, w a * kernelBound_sq N δ T CK j (lo a) (lt a) h h' n n'
+      = kernelBound_sq N δ T CK j (fun z => ∑ a, w a * lo a z) (∑ a, w a * lt a) h h' n n' := by
   unfold kernelBound_sq
   exact wt_affine w hw _ _ lo lt _ _
 
-theorem wt_mean {α Emb : Type} [Fintype α] [Fintype Emb] (wt : Emb → α → ℝ) (c d : ℝ) (h : ∀ a, (∑ v, wt v a) / c = 1 / d) (x : α → ℝ) :
-    (∑ v, ∑ a, wt v a * x a) / c = (∑ a, x a) / d := by
+theorem wt_mean
+    {α Emb : Type} [Fintype α] [Fintype Emb]
+    (wt : Emb → α → ℝ) (c d : ℝ) (h : ∀ a, (∑ v, wt v a) / c = 1 / d)
+    (x : α → ℝ)
+    : (∑ v, ∑ a, wt v a * x a) / c = (∑ a, x a) / d := by
   rw [Finset.sum_comm, Finset.sum_div, Finset.sum_div]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [← Finset.sum_mul, mul_div_right_comm, h a]
   ring
 
-theorem sum_filter_eq {J : Type} [Fintype J] {m : ℕ} (eJ : J ≃ Fin m) (t : J → ℝ) {i : ℕ} (hi : i < m) :
-    ∑ l ∈ Finset.univ.filter (fun l => (eJ l).1 = i), t l = t (eJ.symm ⟨i, hi⟩) := by
+theorem sum_filter_eq
+    {J : Type} [Fintype J] {m : ℕ} (eJ : J ≃ Fin m) (t : J → ℝ) {i : ℕ} (hi : i < m)
+    : ∑ l ∈ Finset.univ.filter (fun l => (eJ l).1 = i), t l = t (eJ.symm ⟨i, hi⟩) := by
   have : Finset.univ.filter (fun l => (eJ l).1 = i) = {eJ.symm ⟨i, hi⟩} := by
     ext l
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton]
@@ -84,18 +96,20 @@ theorem sum_filter_eq {J : Type} [Fintype J] {m : ℕ} (eJ : J ≃ Fin m) (t : J
       simp
   rw [this, Finset.sum_singleton]
 
-theorem sum_filter_ge {J : Type} [Fintype J] {m : ℕ} (hm : 2 ≤ m) (eJ : J ≃ Fin m) (t : J → ℝ) :
-    ∑ l ∈ Finset.univ.filter (fun l => m - 2 ≤ (eJ l).1), t l =
-      t (eJ.symm ⟨m - 2, by omega⟩) + t (eJ.symm ⟨m - 1, by omega⟩) := by
+theorem sum_filter_ge {J : Type} [Fintype J] {m : ℕ} (hm : 2 ≤ m) (eJ : J ≃ Fin m) (t : J → ℝ)
+    : ∑ l ∈ Finset.univ.filter (fun l => m - 2 ≤ (eJ l).1), t l
+      = t (eJ.symm ⟨m - 2, by omega⟩) + t (eJ.symm ⟨m - 1, by omega⟩) := by
   classical
   have hne : eJ.symm ⟨m - 2, by omega⟩ ≠ eJ.symm ⟨m - 1, by omega⟩ := by
     intro h
     have := congrArg Fin.val (eJ.symm.injective h)
     simp only at this
     omega
-  have : Finset.univ.filter (fun l => m - 2 ≤ (eJ l).1) = {eJ.symm ⟨m - 2, by omega⟩, eJ.symm ⟨m - 1, by omega⟩} := by
+  have : Finset.univ.filter (fun l => m - 2 ≤ (eJ l).1)
+      = {eJ.symm ⟨m - 2, by omega⟩, eJ.symm ⟨m - 1, by omega⟩} := by
     ext l
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Finset.mem_singleton]
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert,
+      Finset.mem_singleton]
     constructor
     · intro h
       have h2 := (eJ l).2
@@ -109,14 +123,19 @@ theorem sum_filter_ge {J : Type} [Fintype J] {m : ℕ} (hm : 2 ≤ m) (eJ : J �
     · rintro (rfl | rfl) <;> simp <;> omega
   rw [this, Finset.sum_pair hne]
 
-theorem factorBounds_of_weights {K : Type} [Field K] [NumberField K] [StarRing K] (Q : KerChain K) {α J : Type} [Fintype α] [Fintype J]
-    {m : ℕ} (hm : 2 ≤ m) (hn : Q.n = m - 2) (eJ : J ≃ Fin m) (pu : α → InfinitePlace K) (wt : InfinitePlace K → α → ℝ)
-    (h0 : ∀ v a, 0 ≤ wt v a) (h1 : ∀ v, ∑ a, wt v a = 1) (hup : ∀ v a, wt v a ≠ 0 → pu a = v) (lb : α → ℕ → ℝ)
+theorem factorBounds_of_weights
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    (Q : KerChain K)
+    {α J : Type} [Fintype α] [Fintype J]
+    {m : ℕ} (hm : 2 ≤ m) (hn : Q.n = m - 2) (eJ : J ≃ Fin m)
+    (pu : α → InfinitePlace K) (wt : InfinitePlace K → α → ℝ)
+    (h0 : ∀ v a, 0 ≤ wt v a) (h1 : ∀ v, ∑ a, wt v a = 1) (hup : ∀ v a, wt v a ≠ 0 → pu a = v)
+    (lb : α → ℕ → ℝ)
     (hpos : ∀ i v φ, 0 ≤ (famIpAt (Q.F i) (Q.hF i) v φ φ).re)
     (hS : ∀ a i, i + 2 < m → StepBound_sq Q i (pu a) (lb a (i + 1)))
     (hC : ∀ a, CplBound_sq Q (pu a) (lb a (m - 1) + lb a m))
-    (t : J → InfinitePlace K → ℝ) (ht : ∀ l v, t l v = ∑ a, wt v a * lb a ((eJ l).1 + 1)) :
-    FactorBounds Q (fun l => (eJ l).1) t := by
+    (t : J → InfinitePlace K → ℝ) (ht : ∀ l v, t l v = ∑ a, wt v a * lb a ((eJ l).1 + 1))
+    : FactorBounds Q (fun l => (eJ l).1) t := by
   refine ⟨fun i hi v => ?_, fun v => ?_⟩
   · have hi' : i + 2 < m := by omega
     have hi1 : i < m := by omega
@@ -160,10 +179,10 @@ theorem L_le_La (N : NumDatum) : N.sc.L ≤ N.La := by
     unfold Scale.a
     exact le_mul_of_one_le_left (by linarith) hx.le
   have h2 : N.sc.a ≤ N.sc.a * N.rd := le_mul_of_one_le_right (by linarith) hrd
-  calc N.sc.L = Real.log (Real.exp N.sc.L) := (Real.log_exp _).symm
+  calc
+    N.sc.L
+      = Real.log (Real.exp N.sc.L) := (Real.log_exp _).symm
     _ ≤ Real.log (N.sc.a * N.rd) := Real.log_le_log (Real.exp_pos _) (h1.trans h2)
     _ = N.La := rfl
-
-
 
 end GlobalTheory.KernelHalf

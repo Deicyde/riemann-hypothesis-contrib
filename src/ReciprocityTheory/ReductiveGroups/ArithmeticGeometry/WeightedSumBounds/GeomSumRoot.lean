@@ -13,8 +13,8 @@ noncomputable section
 
 variable {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)} {d : ℕ}
 
-theorem geom_sum_root {p : ℕ} {ζ : C} (hζ : IsPrimitiveRoot ζ p) (m : ℕ) :
-    ∑ j ∈ Finset.range p, (ζ ^ m) ^ j = if p ∣ m then (p : C) else 0 := by
+theorem geom_sum_root {p : ℕ} {ζ : C} (hζ : IsPrimitiveRoot ζ p) (m : ℕ)
+    : ∑ j ∈ Finset.range p, (ζ ^ m) ^ j = if p ∣ m then (p : C) else 0 := by
   split_ifs with h
   · obtain ⟨k, rfl⟩ := h
     rw [pow_mul, hζ.pow_eq_one, one_pow]
@@ -22,10 +22,16 @@ theorem geom_sum_root {p : ℕ} {ζ : C} (hζ : IsPrimitiveRoot ζ p) (m : ℕ) 
   · have hne : ζ ^ m ≠ 1 := fun h1 => h (hζ.dvd_of_pow_eq_one m h1)
     rw [geom_sum_eq hne, pow_right_comm, hζ.pow_eq_one, one_pow, sub_self, zero_div]
 
-theorem exists_average (G : LogFGL v d) {p : ℕ} (hp : p.Prime) {ζ : C}
-    (hζ : IsPrimitiveRoot ζ p) {ga : Fin d → PowerSeries C} (hga : IsCurve v ga) :
-    ∃ δ : Fin d → PowerSeries C, IsCurve v δ ∧ ∀ c j, PowerSeries.coeff j (G.lgCurve δ c) =
-      (p : C) * PowerSeries.coeff (p * j) (G.lgCurve ga c) := by
+theorem exists_average
+    (G : LogFGL v d)
+    {p : ℕ} (hp : p.Prime)
+    {ζ : C} (hζ : IsPrimitiveRoot ζ p)
+    {ga : Fin d → PowerSeries C} (hga : IsCurve v ga)
+    : ∃ δ : Fin d → PowerSeries C,
+      IsCurve v δ
+        ∧ ∀ c j,
+          PowerSeries.coeff j (G.lgCurve δ c)
+            = (p : C) * PowerSeries.coeff (p * j) (G.lgCurve ga c) := by
   classical
   have hp0 : p ≠ 0 := hp.ne_zero
   have h0 : ∀ b, PowerSeries.constantCoeff (ga b) = 0 := fun b => (hga b).1
@@ -34,8 +40,9 @@ theorem exists_average (G : LogFGL v d) {p : ℕ} (hp : p.Prime) {ζ : C}
     rw [v_eq_zero_of_pow_eq_one (v := v) hp0
       (by rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow])]
 
-  obtain ⟨g, hgdef⟩ : ∃ g : Fin p → Fin d → PowerSeries C,
-      ∀ u, g u = rescaleCurve (ζ ^ (u : ℕ)) ga := ⟨fun u => rescaleCurve (ζ ^ (u : ℕ)) ga, fun u => rfl⟩
+  obtain ⟨g, hgdef⟩
+      : ∃ g : Fin p → Fin d → PowerSeries C, ∀ u, g u = rescaleCurve (ζ ^ (u : ℕ)) ga :=
+    ⟨fun u => rescaleCurve (ζ ^ (u : ℕ)) ga, fun u => rfl⟩
   have hg : ∀ u, IsCurve v (g u) := fun u => by
     rw [hgdef]
     exact isCurve_rescale (hζv u) hga
@@ -49,8 +56,10 @@ theorem exists_average (G : LogFGL v d) {p : ℕ} (hp : p.Prime) {ζ : C}
     rw [← geom_sum_root hζ m, Fin.sum_univ_eq_sum_range (fun j => (ζ ^ j) ^ m) p]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [← pow_mul, ← pow_mul, mul_comm]
-  have hlgε : ∀ c m, PowerSeries.coeff m (G.lgCurve ε c) =
-      if p ∣ m then (p : C) * PowerSeries.coeff m (G.lgCurve ga c) else 0 := by
+  have hlgε
+      : ∀ c m,
+        PowerSeries.coeff m (G.lgCurve ε c)
+          = if p ∣ m then (p : C) * PowerSeries.coeff m (G.lgCurve ga c) else 0 := by
     intro c m
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hεdef, lgCurve_sumF G g hg c, map_sum]
@@ -60,16 +69,18 @@ theorem exists_average (G : LogFGL v d) {p : ℕ} (hp : p.Prime) {ζ : C}
 
   have hinv : ∀ a, rescaleCurve ζ ε a = ε a := by
     have hζ1 : IsIntV v ζ := by simpa using hζv 1
-    have hεζc : ∀ b, PowerSeries.constantCoeff (rescaleCurve ζ ε b) = 0 :=
-      fun b => (isCurve_rescale hζ1 hε b).1
+    have hεζc : ∀ b, PowerSeries.constantCoeff (rescaleCurve ζ ε b) = 0 := fun b =>
+      (isCurve_rescale hζ1 hε b).1
     intro a
     have hdvd : ∀ N, (PowerSeries.X : PowerSeries C) ^ N ∣ rescaleCurve ζ ε a - ε a := fun N =>
-      dvd_of_lgCurve_low G hεζc hεc N (fun a' j _ => by
-        rw [lgCurve_rescale G ζ hεc, PowerSeries.coeff_rescale, hlgε]
-        split_ifs with h
-        · obtain ⟨k, rfl⟩ := h
-          rw [pow_mul, hζ.pow_eq_one, one_pow, one_mul]
-        · rw [mul_zero]) a
+      dvd_of_lgCurve_low G hεζc hεc N
+        (fun a' j _ => by
+          rw [lgCurve_rescale G ζ hεc, PowerSeries.coeff_rescale, hlgε]
+          split_ifs with h
+          · obtain ⟨k, rfl⟩ := h
+            rw [pow_mul, hζ.pow_eq_one, one_pow, one_mul]
+          · rw [mul_zero])
+        a
     rw [← sub_eq_zero]
     ext m
     have := (PowerSeries.X_pow_dvd_iff.mp (hdvd (m + 1))) m (Nat.lt_succ_self m)
@@ -79,15 +90,17 @@ theorem exists_average (G : LogFGL v d) {p : ℕ} (hp : p.Prime) {ζ : C}
     have h1 := congrArg (PowerSeries.coeff m) (hinv a)
     simp only [rescaleCurve, PowerSeries.coeff_rescale] at h1
     have hne : ζ ^ m ≠ 1 := fun h => hm (hζ.dvd_of_pow_eq_one m h)
-    have h2 : (ζ ^ m - 1) * PowerSeries.coeff m (ε a) = 0 := by
-      rw [sub_mul, one_mul, h1, sub_self]
+    have h2 : (ζ ^ m - 1) * PowerSeries.coeff m (ε a) = 0 := by rw [sub_mul, one_mul, h1, sub_self]
     exact (mul_eq_zero.mp h2).resolve_left (sub_ne_zero.mpr hne)
 
-  obtain ⟨δ, hδdef⟩ : ∃ δ : Fin d → PowerSeries C,
-      ∀ a, δ a = PowerSeries.mk fun j => PowerSeries.coeff (p * j) (ε a) :=
+  obtain ⟨δ, hδdef⟩
+      : ∃ δ : Fin d → PowerSeries C, ∀ a,
+        δ a = PowerSeries.mk fun j => PowerSeries.coeff (p * j) (ε a) :=
     ⟨fun a => PowerSeries.mk fun j => PowerSeries.coeff (p * j) (ε a), fun a => rfl⟩
-  have hexpand : ∀ (f : PowerSeries C) (m : ℕ), PowerSeries.coeff m (PowerSeries.expand p hp0 f) =
-      if p ∣ m then PowerSeries.coeff (m / p) f else 0 := by
+  have hexpand
+      : ∀ (f : PowerSeries C) (m : ℕ),
+        PowerSeries.coeff m (PowerSeries.expand p hp0 f)
+          = if p ∣ m then PowerSeries.coeff (m / p) f else 0 := by
     intro f m
     have h := coeff_expand_rescale p hp0 1 f m
     rw [PowerSeries.rescale_one, RingHom.id_apply] at h
@@ -107,15 +120,17 @@ theorem exists_average (G : LogFGL v d) {p : ℕ} (hp : p.Prime) {ζ : C}
       exact hεc a
     · rw [hδdef, PowerSeries.coeff_mk]
       exact (hε a).2 (p * j)
-  have hεδ : expC p δ = ε := funext fun a => by
-    rw [expC_apply hp0]
-    exact hexp a
+  have hεδ : expC p δ = ε :=
+    funext fun a => by
+      rw [expC_apply hp0]
+      exact hexp a
   refine ⟨δ, hδ, fun c j => ?_⟩
   have h1 := lgCurve_expC G hp0 (fun b => (hδ b).1) c
   rw [hεδ] at h1
   have h2 := congrArg (PowerSeries.coeff (p * j)) h1
   rw [hlgε, if_pos (dvd_mul_right p j), hexpand, if_pos (dvd_mul_right p j),
-    Nat.mul_div_cancel_left j hp.pos] at h2
+      Nat.mul_div_cancel_left j hp.pos]
+    at h2
   exact h2.symm
 
 end

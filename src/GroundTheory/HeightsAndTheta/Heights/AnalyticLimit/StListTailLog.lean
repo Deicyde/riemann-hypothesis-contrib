@@ -15,10 +15,11 @@ open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Regular (RegChar
 
 def ListTailLog.Statement : Prop :=
   ∀ {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] (D : ℕ) (A : FinHolAtlas D X)
-    (R : RegChartData A), (∀ x ∈ R.Yo, Real.exp 1 ≤ R.r x) → ∀ (Om : KaehlerForm A) (C₁ : ℝ),
-    ∃ CE : ℝ, ∀ (th : Fin D → LocPot X) (u : Fin D → X → ℝ),
-      (∀ j, IsBoundedPotForm A R.Yo R.r Om C₁ (th j) (u j)) →
-      TailLogBound A R.Yo R.r (fun j => potForm (th j) (u j)) CE
+      (R : RegChartData A),
+    (∀ x ∈ R.Yo, Real.exp 1 ≤ R.r x)
+      → ∀ (Om : KaehlerForm A) (C₁ : ℝ), ∃ CE : ℝ, ∀ (th : Fin D → LocPot X) (u : Fin D → X → ℝ),
+        (∀ j, IsBoundedPotForm A R.Yo R.r Om C₁ (th j) (u j))
+          → TailLogBound A R.Yo R.r (fun j => potForm (th j) (u j)) CE
 
 section Inhabitants
 

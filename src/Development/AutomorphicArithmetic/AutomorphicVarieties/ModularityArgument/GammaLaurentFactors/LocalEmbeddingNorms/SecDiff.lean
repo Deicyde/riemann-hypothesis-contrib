@@ -4,17 +4,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-private theorem comp_C_mul_X_ne_zero_and_rootMultiplicity {P : Polynomial ℂ} (hP : P ≠ 0) {r : ℂ} (hr : r ≠ 0) :
-    P.comp (Polynomial.C r * Polynomial.X) ≠ 0 ∧
-      ∀ z, (P.comp (Polynomial.C r * Polynomial.X)).rootMultiplicity z = P.rootMultiplicity (r * z) := by
-  refine ⟨fun h0 => hP ((Polynomial.comp_C_mul_X_eq_zero_iff (mem_nonZeroDivisors_of_ne_zero hr)).mp h0),
-    fun z => ?_⟩
+private theorem comp_C_mul_X_ne_zero_and_rootMultiplicity
+    {P : Polynomial ℂ} (hP : P ≠ 0) {r : ℂ} (hr : r ≠ 0)
+    : P.comp (Polynomial.C r * Polynomial.X) ≠ 0
+      ∧ ∀ z,
+        (P.comp (Polynomial.C r * Polynomial.X)).rootMultiplicity z
+          = P.rootMultiplicity (r * z) := by
+  refine ⟨
+    fun h0 => hP ((Polynomial.comp_C_mul_X_eq_zero_iff (mem_nonZeroDivisors_of_ne_zero hr)).mp h0),
+    fun z => ?_
+  ⟩
   have := Polynomial.rootMultiplicity_comp_C_mul_X_add_C P r 0 z (isUnit_iff_ne_zero.mpr hr)
   simpa using this
 
 open Polynomial in
-theorem UpperTheory.V.Z.Gam.secDiff :
-    UpperTheory.V.Z.Gam.SecDiff := by
+theorem UpperTheory.V.Z.Gam.secDiff : UpperTheory.V.Z.Gam.SecDiff := by
   classical
   intro q hq P P' c hP hP' h
   have hqpos : (0 : ℝ) < q := by linarith
@@ -23,9 +27,7 @@ theorem UpperTheory.V.Z.Gam.secDiff :
   have hc : c = 1 := by
     have h0 := congrArg (Polynomial.eval 0) h
     simp [Polynomial.eval_comp, hP, hP'] at h0
-    first
-      | exact h0.symm
-      | exact h0
+    first | exact h0.symm | exact h0
   subst hc
   have hPne : P ≠ 0 := by
     rintro rfl
@@ -38,18 +40,21 @@ theorem UpperTheory.V.Z.Gam.secDiff :
   obtain ⟨hA', mA'⟩ := comp_C_mul_X_ne_zero_and_rootMultiplicity hP'ne hqi
   obtain ⟨hB', mB'⟩ := comp_C_mul_X_ne_zero_and_rootMultiplicity hP'ne hq0
   rw [map_one, one_mul] at h
-  have key : ∀ z : ℂ, P.rootMultiplicity ((q : ℂ)⁻¹ * z) + P.rootMultiplicity ((q : ℂ) * z) +
-      (P'.rootMultiplicity z + P'.rootMultiplicity z) =
-      P'.rootMultiplicity ((q : ℂ)⁻¹ * z) + P'.rootMultiplicity ((q : ℂ) * z) +
-      (P.rootMultiplicity z + P.rootMultiplicity z) := by
+  have key
+      : ∀ z : ℂ,
+        P.rootMultiplicity ((q : ℂ)⁻¹ * z) + P.rootMultiplicity ((q : ℂ) * z)
+            + (P'.rootMultiplicity z + P'.rootMultiplicity z)
+          = P'.rootMultiplicity ((q : ℂ)⁻¹ * z) + P'.rootMultiplicity ((q : ℂ) * z)
+            + (P.rootMultiplicity z + P.rootMultiplicity z) := by
     intro z
     have hz := congrArg (Polynomial.rootMultiplicity z) h
     rw [Polynomial.rootMultiplicity_mul (mul_ne_zero (mul_ne_zero hA hB) (pow_ne_zero 2 hP'ne)),
-      Polynomial.rootMultiplicity_mul (mul_ne_zero (mul_ne_zero hA' hB') (pow_ne_zero 2 hPne)),
-      Polynomial.rootMultiplicity_mul (mul_ne_zero hA hB),
-      Polynomial.rootMultiplicity_mul (mul_ne_zero hA' hB'), sq, sq,
-      Polynomial.rootMultiplicity_mul (mul_ne_zero hP'ne hP'ne),
-      Polynomial.rootMultiplicity_mul (mul_ne_zero hPne hPne), mA, mB, mA', mB'] at hz
+        Polynomial.rootMultiplicity_mul (mul_ne_zero (mul_ne_zero hA' hB') (pow_ne_zero 2 hPne)),
+        Polynomial.rootMultiplicity_mul (mul_ne_zero hA hB),
+        Polynomial.rootMultiplicity_mul (mul_ne_zero hA' hB'), sq, sq,
+        Polynomial.rootMultiplicity_mul (mul_ne_zero hP'ne hP'ne),
+        Polynomial.rootMultiplicity_mul (mul_ne_zero hPne hPne), mA, mB, mA', mB']
+      at hz
     omega
   obtain ⟨d, hd⟩ : ∃ d : ℂ → ℤ, ∀ z, d z = (P.rootMultiplicity z : ℤ) - P'.rootMultiplicity z :=
     ⟨_, fun z => rfl⟩
@@ -58,14 +63,16 @@ theorem UpperTheory.V.Z.Gam.secDiff :
     have := key z
     simp only [hd]
     omega
-  have p0 : P.rootMultiplicity 0 = 0 := Polynomial.rootMultiplicity_eq_zero (by
-    intro hr
-    have := hr.eq_zero
-    simp [hP] at this)
-  have p0' : P'.rootMultiplicity 0 = 0 := Polynomial.rootMultiplicity_eq_zero (by
-    intro hr
-    have := hr.eq_zero
-    simp [hP'] at this)
+  have p0 : P.rootMultiplicity 0 = 0 :=
+    Polynomial.rootMultiplicity_eq_zero (by
+      intro hr
+      have := hr.eq_zero
+      simp [hP] at this)
+  have p0' : P'.rootMultiplicity 0 = 0 :=
+    Polynomial.rootMultiplicity_eq_zero (by
+      intro hr
+      have := hr.eq_zero
+      simp [hP'] at this)
   have d0 : d 0 = 0 := by simp [hd, p0, p0']
   have supp : ∀ z, d z ≠ 0 → z ∈ (P * P').roots.toFinset := by
     intro z hz
@@ -74,12 +81,14 @@ theorem UpperTheory.V.Z.Gam.secDiff :
     rw [Polynomial.eval_mul]
     by_contra hne
     apply hz
-    have r1 : P.rootMultiplicity z = 0 := Polynomial.rootMultiplicity_eq_zero (by
-      intro hr
-      exact hne (by rw [hr.eq_zero, zero_mul]))
-    have r2 : P'.rootMultiplicity z = 0 := Polynomial.rootMultiplicity_eq_zero (by
-      intro hr
-      exact hne (by rw [hr.eq_zero, mul_zero]))
+    have r1 : P.rootMultiplicity z = 0 :=
+      Polynomial.rootMultiplicity_eq_zero (by
+        intro hr
+        exact hne (by rw [hr.eq_zero, zero_mul]))
+    have r2 : P'.rootMultiplicity z = 0 :=
+      Polynomial.rootMultiplicity_eq_zero (by
+        intro hr
+        exact hne (by rw [hr.eq_zero, mul_zero]))
     simp [hd, r1, r2]
   have hdz : ∀ z, d z = 0 := by
     by_contra hne
@@ -101,8 +110,10 @@ theorem UpperTheory.V.Z.Gam.secDiff :
       have hm := hmax _ (Finset.mem_filter.mpr ⟨supp _ hne2, hne2⟩)
       rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hqpos] at hm
       nlinarith
-    have step : ∀ k : ℕ, d ((q : ℂ)⁻¹ ^ k * z0) = (k + 1) * d z0 ∧
-        d ((q : ℂ)⁻¹ ^ (k + 1) * z0) = (k + 2) * d z0 := by
+    have step
+        : ∀ k : ℕ,
+          d ((q : ℂ)⁻¹ ^ k * z0) = (k + 1) * d z0
+            ∧ d ((q : ℂ)⁻¹ ^ (k + 1) * z0) = (k + 2) * d z0 := by
       intro k
       induction k with
       | zero =>
@@ -145,18 +156,20 @@ theorem UpperTheory.V.Z.Gam.secDiff :
   have hroots : P.roots = P'.roots := by
     ext z
     rw [Polynomial.count_roots, Polynomial.count_roots, hm]
-  have e1 := Polynomial.C_leadingCoeff_mul_prod_multiset_X_sub_C (p := P)
-    IsAlgClosed.card_roots_eq_natDegree
-  have e2 := Polynomial.C_leadingCoeff_mul_prod_multiset_X_sub_C (p := P')
-    IsAlgClosed.card_roots_eq_natDegree
+  have e1 :=
+    Polynomial.C_leadingCoeff_mul_prod_multiset_X_sub_C (p := P) IsAlgClosed.card_roots_eq_natDegree
+  have e2 :=
+    Polynomial.C_leadingCoeff_mul_prod_multiset_X_sub_C (p := P')
+      IsAlgClosed.card_roots_eq_natDegree
   rw [hroots] at e1
   have v1 := congrArg (Polynomial.eval 0) e1
   have v2 := congrArg (Polynomial.eval 0) e2
   rw [Polynomial.eval_mul, Polynomial.eval_C, hP] at v1
   rw [Polynomial.eval_mul, Polynomial.eval_C, hP'] at v2
   have hlc : P.leadingCoeff = P'.leadingCoeff := by
-    have hne : Polynomial.eval 0
-        (Multiset.map (fun a => Polynomial.X - Polynomial.C a) P'.roots).prod ≠ 0 := by
+    have hne
+        : Polynomial.eval 0 (Multiset.map (fun a => Polynomial.X - Polynomial.C a) P'.roots).prod
+          ≠ 0 := by
       intro h0
       rw [h0, mul_zero] at v2
       exact zero_ne_one v2

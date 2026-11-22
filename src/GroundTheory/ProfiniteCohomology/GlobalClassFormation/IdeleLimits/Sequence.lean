@@ -17,11 +17,10 @@ namespace IdeleLimit
 
 local notation "ℚ̄" => AlgebraicClosure ℚ
 
-def unitsIncl (F : FiniteSubfield) : F.1ˣ →* ℚ̄ˣ :=
-  Units.map F.1.val.toRingHom.toMonoidHom
+def unitsIncl (F : FiniteSubfield) : F.1ˣ →* ℚ̄ˣ := Units.map F.1.val.toRingHom.toMonoidHom
 
-theorem unitsIncl_injective (F : FiniteSubfield) : Function.Injective (unitsIncl F) :=
-  fun _ _ h => Units.ext (Subtype.ext (congrArg (fun a : ℚ̄ˣ => (a : ℚ̄)) h))
+theorem unitsIncl_injective (F : FiniteSubfield) : Function.Injective (unitsIncl F) := fun _ _ h =>
+  Units.ext (Subtype.ext (congrArg (fun a : ℚ̄ˣ => (a : ℚ̄)) h))
 
 theorem exists_unitsIncl (a : ℚ̄ˣ) : ∃ (F : FiniteSubfield) (u : F.1ˣ), unitsIncl F u = a := by
   have hint : IsIntegral ℚ (a : ℚ̄) := Algebra.IsIntegral.isIntegral _
@@ -29,24 +28,24 @@ theorem exists_unitsIncl (a : ℚ̄ˣ) : ∃ (F : FiniteSubfield) (u : F.1ˣ), u
   have hmem : (a : ℚ̄) ∈ F.1 := IntermediateField.mem_adjoin_simple_self ℚ (a : ℚ̄)
   refine ⟨F, Units.mk0 ⟨a, hmem⟩ fun h => a.ne_zero (congrArg Subtype.val h), Units.ext rfl⟩
 
-theorem unitsIncl_map {F E : FiniteSubfield} (h : F ≤ E) (u : F.1ˣ) :
-    letI := algebraOfLE h
-    unitsIncl E (Units.map (algebraMap F.1 E.1).toMonoidHom u) = unitsIncl F u :=
+theorem unitsIncl_map {F E : FiniteSubfield} (h : F ≤ E) (u : F.1ˣ)
+    : letI := algebraOfLE h
+      unitsIncl E (Units.map (algebraMap F.1 E.1).toMonoidHom u) = unitsIncl F u :=
   Units.ext rfl
 
-def diagOf (F : FiniteSubfield) : F.1ˣ →* IdeleLimit :=
-  (of F).comp (IdeleGroup.diagonal F.1)
+def diagOf (F : FiniteSubfield) : F.1ˣ →* IdeleLimit := (of F).comp (IdeleGroup.diagonal F.1)
 
-theorem diagOf_map {F E : FiniteSubfield} (h : F ≤ E) (u : F.1ˣ) :
-    letI := algebraOfLE h
-    diagOf E (Units.map (algebraMap F.1 E.1).toMonoidHom u) = diagOf F u := by
+theorem diagOf_map {F E : FiniteSubfield} (h : F ≤ E) (u : F.1ˣ)
+    : letI := algebraOfLE h
+      diagOf E (Units.map (algebraMap F.1 E.1).toMonoidHom u) = diagOf F u := by
   letI := algebraOfLE h
   change of E (IdeleGroup.diagonal E.1 _) = of F (IdeleGroup.diagonal F.1 u)
   rw [← ideleEmbedding_diagonal]
   exact of_ideleMap h _
 
-theorem diagOf_eq_of_unitsIncl_eq {F F' : FiniteSubfield} (u : F.1ˣ) (u' : F'.1ˣ)
-    (h : unitsIncl F u = unitsIncl F' u') : diagOf F u = diagOf F' u' := by
+theorem diagOf_eq_of_unitsIncl_eq
+    {F F' : FiniteSubfield} (u : F.1ˣ) (u' : F'.1ˣ) (h : unitsIncl F u = unitsIncl F' u')
+    : diagOf F u = diagOf F' u' := by
   let M : FiniteSubfield := ⟨F.1 ⊔ F'.1, inferInstance⟩
   have hM : F ≤ M := show F.1 ≤ F.1 ⊔ F'.1 from le_sup_left
   have hM' : F' ≤ M := show F'.1 ≤ F.1 ⊔ F'.1 from le_sup_right
@@ -90,11 +89,12 @@ theorem diag_injective : Function.Injective diag := by
   have h1 : IdeleGroup.diagonal F.1 u = 1 := of_injective F (ha.trans (map_one _).symm)
   rw [IdeleGroup.diagonal_injective F.1 (h1.trans (map_one _).symm), map_one]
 
-theorem diag_map (σ : ℚ̄ ≃ₐ[ℚ] ℚ̄) (a : ℚ̄ˣ) :
-    diag (Units.map (σ : ℚ̄ →* ℚ̄) a) = σ • diag a := by
+theorem diag_map (σ : ℚ̄ ≃ₐ[ℚ] ℚ̄) (a : ℚ̄ˣ) : diag (Units.map (σ : ℚ̄ →* ℚ̄) a) = σ • diag a := by
   obtain ⟨F, u, rfl⟩ := exists_unitsIncl a
-  have h : Units.map (σ : ℚ̄ →* ℚ̄) (unitsIncl F u) =
-      unitsIncl (map σ F) (Units.map (mapEquiv σ F : F.1 →* (map σ F).1) u) := Units.ext rfl
+  have h
+      : Units.map (σ : ℚ̄ →* ℚ̄) (unitsIncl F u)
+        = unitsIncl (map σ F) (Units.map (mapEquiv σ F : F.1 →* (map σ F).1) u) :=
+    Units.ext rfl
   rw [h, diag_unitsIncl, diag_unitsIncl, diagOf, diagOf, MonoidHom.comp_apply, MonoidHom.comp_apply,
     smul_of, ideleEquiv_diagonal]
 

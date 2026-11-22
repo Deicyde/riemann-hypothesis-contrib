@@ -9,16 +9,18 @@ open MeasureTheory Filter Topology Metric Set
 namespace GlobalTheory
 
 theorem translate_chart_ball_distortion
-    (V M G : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup M]
-    [NormedSpace ℝ M] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (e : V → G)
-    (m : G → M) (ι : V →ₗᵢ[ℝ] M) (L : G → M →L[ℝ] M) (he : Continuous e) (he0 : e 0 = 1)
-    (hd : HasStrictFDerivAt (fun x => m (e x)) ι.toContinuousLinearMap 0)
-    (hL : ContinuousAt L 1) (hL1 : L 1 = ContinuousLinearMap.id ℝ M)
-    (hm : ∀ g h, m (g * h) = L g (m h))
-    (hopen : ∀ r : ℝ, 0 < r → e '' ball 0 r ∈ 𝓝 (1 : G)) (κ : ℝ) (hκ : 1 < κ) :
-    ∃ δ : ℝ, 0 < δ ∧ ∀ x ∈ ball (0 : V) δ, ∀ r ∈ Ioo (0 : ℝ) δ,
-      (fun g => e x * g) '' (e '' ball 0 r) ⊆ e '' ball x (κ * r) ∧
-      e '' ball x r ⊆ (fun g => e x * g) '' (e '' ball 0 (κ * r)) := by
+    (V M G : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup M] [NormedSpace ℝ M]
+    [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (e : V → G) (m : G → M) (ι : V →ₗᵢ[ℝ] M) (L : G → M →L[ℝ] M) (he : Continuous e) (he0 : e 0 = 1)
+    (hd : HasStrictFDerivAt (fun x => m (e x)) ι.toContinuousLinearMap 0) (hL : ContinuousAt L 1)
+    (hL1 : L 1 = ContinuousLinearMap.id ℝ M) (hm : ∀ g h, m (g * h) = L g (m h))
+    (hopen : ∀ r : ℝ, 0 < r → e '' ball 0 r ∈ 𝓝 (1 : G))
+    (κ : ℝ) (hκ : 1 < κ)
+    : ∃ δ : ℝ,
+      0 < δ
+        ∧ ∀ x ∈ ball (0 : V) δ, ∀ r ∈ Ioo (0 : ℝ) δ,
+          (fun g => e x * g) '' (e '' ball 0 r) ⊆ e '' ball x (κ * r)
+            ∧ e '' ball x r ⊆ (fun g => e x * g) '' (e '' ball 0 (κ * r)) := by
   set ε : ℝ := (κ - 1) / (2 * (3 + 2 * κ)) with hε
   have hε0 : 0 < ε := div_pos (by linarith) (by linarith)
   have hε1 : ε < 1 / 4 := by
@@ -30,12 +32,12 @@ theorem translate_chart_ball_distortion
       field_simp
     nlinarith [mul_pos (sub_pos.mpr hκ) (mul_pos hε0 hε0)]
   obtain ⟨η, hη0, hη⟩ := Metric.eventually_nhds_iff.mp (hd.isLittleO.bound hε0)
-  have hD : ∀ a b : V, ‖a‖ < η → ‖b‖ < η →
-      ‖m (e a) - m (e b) - ι (a - b)‖ ≤ ε * ‖a - b‖ := by
+  have hD : ∀ a b : V, ‖a‖ < η → ‖b‖ < η → ‖m (e a) - m (e b) - ι (a - b)‖ ≤ ε * ‖a - b‖ := by
     intro a b ha hb
-    have h := @hη (a, b) (by
-      simp only [Prod.dist_eq, dist_zero_right]
-      exact max_lt ha hb)
+    have h :=
+      @hη (a, b) (by
+        simp only [Prod.dist_eq, dist_zero_right]
+        exact max_lt ha hb)
     simpa using h
   have hLc : ContinuousAt (fun x => L (e x)) 0 := hL.comp_of_eq he.continuousAt he0
   obtain ⟨η2, hη20, hη2⟩ := Metric.continuousAt_iff.mp hLc ε hε0
@@ -53,8 +55,7 @@ theorem translate_chart_ball_distortion
     (he.comp continuous_fst).inv.mul (he.comp continuous_snd)
   have hφU : (fun p : V × V => e p.1 * e p.2) ⁻¹' (e '' ball 0 η) ∈ 𝓝 ((0 : V), (0 : V)) :=
     hφ.continuousAt.preimage_mem_nhds (by simpa [he0] using hU)
-  have hψU : (fun p : V × V => (e p.1)⁻¹ * e p.2) ⁻¹' (e '' ball 0 η) ∈
-      𝓝 ((0 : V), (0 : V)) :=
+  have hψU : (fun p : V × V => (e p.1)⁻¹ * e p.2) ⁻¹' (e '' ball 0 η) ∈ 𝓝 ((0 : V), (0 : V)) :=
     hψ.continuousAt.preimage_mem_nhds (by simpa [he0] using hU)
   obtain ⟨η3, hη30, hη3⟩ := Metric.mem_nhds_iff.mp hφU
   obtain ⟨η4, hη40, hη4⟩ := Metric.mem_nhds_iff.mp hψU
@@ -75,22 +76,25 @@ theorem translate_chart_ball_distortion
     obtain ⟨z, hz, hze⟩ := hη4 hab
     exact ⟨z, mem_ball_zero_iff.mp hz, hze⟩
   have h0η : ‖(0 : V)‖ < η := by simpa using hη0
-  refine ⟨min (η / 2) (min η2 (min (η3 / 2) (η4 / 2))),
-    lt_min (by linarith) (lt_min hη20 (lt_min (by linarith) (by linarith))), ?_⟩
+  refine ⟨
+    min (η / 2) (min η2 (min (η3 / 2) (η4 / 2))),
+    lt_min (by linarith) (lt_min hη20 (lt_min (by linarith) (by linarith))),
+    ?_
+  ⟩
   intro x hx r hr
   rw [mem_ball_zero_iff] at hx
   obtain ⟨hr0, hrδ⟩ := hr
   have b1 : ‖x‖ < η / 2 := lt_of_lt_of_le hx (min_le_left _ _)
   have b2 : ‖x‖ < η2 := lt_of_lt_of_le hx ((min_le_right _ _).trans (min_le_left _ _))
-  have b3 : ‖x‖ < η3 / 2 := lt_of_lt_of_le hx
-    ((min_le_right _ _).trans ((min_le_right _ _).trans (min_le_left _ _)))
-  have b4 : ‖x‖ < η4 / 2 := lt_of_lt_of_le hx
-    ((min_le_right _ _).trans ((min_le_right _ _).trans (min_le_right _ _)))
+  have b3 : ‖x‖ < η3 / 2 :=
+    lt_of_lt_of_le hx ((min_le_right _ _).trans ((min_le_right _ _).trans (min_le_left _ _)))
+  have b4 : ‖x‖ < η4 / 2 :=
+    lt_of_lt_of_le hx ((min_le_right _ _).trans ((min_le_right _ _).trans (min_le_right _ _)))
   have r1 : r < η / 2 := lt_of_lt_of_le hrδ (min_le_left _ _)
-  have r3 : r < η3 / 2 := lt_of_lt_of_le hrδ
-    ((min_le_right _ _).trans ((min_le_right _ _).trans (min_le_left _ _)))
-  have r4 : r < η4 / 2 := lt_of_lt_of_le hrδ
-    ((min_le_right _ _).trans ((min_le_right _ _).trans (min_le_right _ _)))
+  have r3 : r < η3 / 2 :=
+    lt_of_lt_of_le hrδ ((min_le_right _ _).trans ((min_le_right _ _).trans (min_le_left _ _)))
+  have r4 : r < η4 / 2 :=
+    lt_of_lt_of_le hrδ ((min_le_right _ _).trans ((min_le_right _ _).trans (min_le_right _ _)))
   have hmx : ∀ y, m (e x * e y) - m (e x) = L (e x) (m (e y) - m (e 0)) := by
     intro y
     rw [map_sub, he0, ← hm, ← hm, mul_one]
@@ -163,8 +167,7 @@ theorem translate_chart_ball_distortion
     have k3 : (1 + ε) * r ≤ (1 + ε) ^ 2 * r := by
       linarith only [mul_pos hε0 hr0, mul_pos (mul_pos hε0 hε0) hr0]
     have k4 : (1 + ε) ^ 2 * r < κ * (1 - ε) ^ 2 * r := mul_lt_mul_of_pos_right hκε hr0
-    have k5 : (1 - ε) ^ 2 * ‖y‖ < (1 - ε) ^ 2 * (κ * r) := by
-      linarith only [k1, s2, s1, k2, k3, k4]
+    have k5 : (1 - ε) ^ 2 * ‖y‖ < (1 - ε) ^ 2 * (κ * r) := by linarith only [k1, s2, s1, k2, k3, k4]
     exact lt_of_mul_lt_mul_left k5 (pow_pos (by linarith) 2).le
 
 end GlobalTheory

@@ -21,8 +21,8 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 
 variable {G V : Type} [Group G] [TopologicalSpace G] [AddCommGroup V] [Module ℂ V]
 
-theorem isSmooth_sub {ρ : Representation ℂ G V} (hρ : IsSmooth ρ) (S : Subrepresentation ρ) :
-    IsSmooth S.toRepresentation := by
+theorem isSmooth_sub {ρ : Representation ℂ G V} (hρ : IsSmooth ρ) (S : Subrepresentation ρ)
+    : IsSmooth S.toRepresentation := by
   intro y
   have e : {g : G | S.toRepresentation g y = y} = {g : G | ρ g (y : V) = y} := by
     ext g
@@ -31,24 +31,33 @@ theorem isSmooth_sub {ρ : Representation ℂ G V} (hρ : IsSmooth ρ) (S : Subr
   rw [e]
   exact hρ (y : V)
 
-theorem injective_of_irred {W : Type} [AddCommGroup W] [Module ℂ W] {ρ : Representation ℂ G V}
-    {σ : Representation ℂ G W} (hi : ρ.IsIrreducible) (f : ρ.IntertwiningMap σ) (hf : f ≠ 0) :
-    Function.Injective f := by
+theorem injective_of_irred
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    {ρ : Representation ℂ G V} {σ : Representation ℂ G W}
+    (hi : ρ.IsIrreducible) (f : ρ.IntertwiningMap σ) (hf : f ≠ 0)
+    : Function.Injective f := by
   have := hi
   exact (Representation.IsIrreducible.injective_or_eq_zero f).resolve_right hf
 
-theorem coe_mem_fixed {ρ : Representation ℂ G V} (S : Subrepresentation ρ) {K : Subgroup G}
-    {s : S.toSubmodule} (hs : s ∈ fixed S.toRepresentation K) : s.1 ∈ fixed ρ K :=
-  GlobalTheory.LGrp.mem_fixed.2 fun g hg => congrArg Subtype.val (GlobalTheory.LGrp.mem_fixed.1 hs g hg)
+theorem coe_mem_fixed
+    {ρ : Representation ℂ G V} (S : Subrepresentation ρ)
+    {K : Subgroup G} {s : S.toSubmodule} (hs : s ∈ fixed S.toRepresentation K)
+    : s.1 ∈ fixed ρ K :=
+  GlobalTheory.LGrp.mem_fixed.2 fun g hg =>
+    congrArg Subtype.val (GlobalTheory.LGrp.mem_fixed.1 hs g hg)
 
-theorem hI {W : Type} [AddCommGroup W] [Module ℂ W] {ρ : Representation ℂ G V} {σ : Representation ℂ G W}
-    (f : ρ.IntertwiningMap σ) (g : G) (y : V) : f (ρ g y) = σ g (f y) :=
+theorem hI
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    {ρ : Representation ℂ G V} {σ : Representation ℂ G W} (f : ρ.IntertwiningMap σ)
+    (g : G) (y : V)
+    : f (ρ g y) = σ g (f y) :=
   Representation.IntertwiningMap.isIntertwining _ _ f g y
 
 set_option maxHeartbeats 4000000 in
 theorem satLink : SatLink := by
   intro E _ _ w c n N h σ P ξ hq hsph ⟨f, hf⟩
-  have hKO : ∀ m, KGL w (n := m) = KO (w.adicCompletion E) (Fin m) := fun m => (SphCompletion.KO_completion w m).symm
+  have hKO : ∀ m, KGL w (n := m) = KO (w.adicCompletion E) (Fin m) := fun m =>
+    (SphCompletion.KO_completion w m).symm
   have hc : IsCompact (KO (w.adicCompletion E) (Fin n) : Set (GL (Fin n) (w.adicCompletion E))) :=
     GlobalTheory.SplitFlip.isCompact_KO
 
@@ -64,7 +73,9 @@ theorem satLink : SatLink := by
   have hsatφ := isSatVecGL_of_isSpherical (w := w) hφ hφ0
   have hsatY : IsSatVecGL w (iP (k := w.adicCompletion E) ξ) (f x) (Finset.univ.val.map ξ) :=
     IsSatVecGL.of_map (ρ' := rightReg ℂ _ ℂ) ((Submodule.subtype _).comp (Submodule.subtype _))
-      (fun _ _ => rfl) (fun u v e => Subtype.ext (Subtype.ext e)) hsatφ
+      (fun _ _ => rfl)
+      (fun u v e => Subtype.ext (Subtype.ext e))
+      hsatφ
   have hsatX : IsSatVecGL w P.ρ x (Finset.univ.val.map ξ) :=
     IsSatVecGL.of_map f.toLinearMap (fun g y => hI f g y) hfi hsatY
 
@@ -73,19 +84,26 @@ theorem satLink : SatLink := by
   have hSs : IsSmooth S.toRepresentation := isSmooth_sub (isSmooth_parInd _ _) S
   set s := GlobalTheory.LocGL.idem hSs hc s0 with hsdef
   have hqs' : q s = x := by
-    rw [hsdef, GlobalTheory.LocGL.map_idem hSs P.smooth hc q s0, hs0, GlobalTheory.LocGL.idem_of_mem P.smooth hc hx]
+    rw [hsdef, GlobalTheory.LocGL.map_idem hSs P.smooth hc q s0, hs0,
+      GlobalTheory.LocGL.idem_of_mem P.smooth hc hx]
   have hsfix : s ∈ fixed S.toRepresentation (KO _ (Fin n)) := GlobalTheory.LocGL.idem_mem hSs hc s0
   have htfix : s.1 ∈ fixed (locProd h w σ) (KGL w (n := n)) := by
     rw [hKO]
     exact coe_mem_fixed S hsfix
   have ht0 : s.1 ≠ 0 := fun e => hx0 (by rw [← hqs', show s = 0 from Subtype.ext e, map_zero])
-  obtain ⟨B, hB, hsat⟩ := GlobalTheory.SatInd.exists_sat_multiProd h (fun i => (σ i).smooth) (fun i => (σ i).irred) htfix ht0
+  obtain ⟨B, hB, hsat⟩ :=
+    GlobalTheory.SatInd.exists_sat_multiProd h
+      (fun i => (σ i).smooth)
+      (fun i => (σ i).irred)
+      htfix ht0
   have hsatS : IsSatVecGL w S.toRepresentation s (∑ i, B i) :=
     IsSatVecGL.of_map (S.toSubmodule.subtype) (fun _ _ => rfl) Subtype.val_injective hsat
   have hsatX' : IsSatVecGL w P.ρ x (∑ i, B i) := by
-    have := hsatS.map q.toLinearMap (fun g y => hI q g y) (by
-      show q s ≠ 0
-      rw [hqs']; exact hx0)
+    have :=
+      hsatS.map q.toLinearMap (fun g y => hI q g y) (by
+        show q s ≠ 0
+        rw [hqs']
+        exact hx0)
     rwa [show q.toLinearMap s = x from hqs'] at this
   exact ⟨fun i => (hB i).1, B, hB, hsatX'.unique hsatX⟩
 

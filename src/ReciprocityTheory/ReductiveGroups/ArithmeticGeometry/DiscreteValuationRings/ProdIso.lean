@@ -161,39 +161,54 @@ private lemma res_linComb_g_eq_prod_tr_zpow (L : LB X) {K : Type} [Fintype K] (�
   simp only [tr, dif_pos c]
   all_goals exact rfl
 
-theorem linCombIso_isGen (w : LB.Iso L M) (hw : w.IsGen) {K : Type} [Fintype K] (φ : K → (Y ⟶ X))
-    (ε : K → ℤ) : (LB.linCombIso w φ ε).IsGen := by
+theorem linCombIso_isGen
+    (w : LB.Iso L M) (hw : w.IsGen) {K : Type} [Fintype K] (φ : K → (Y ⟶ X)) (ε : K → ℤ)
+    : (LB.linCombIso w φ ε).IsGen := by
   intro i j
-  have hW : ∀ k, (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i ⊓
-      (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j ≤
-      φ k ⁻¹ᵁ ((M.U (i.1 k) ⊓ L.U (i.2 k)) ⊓ (M.U (j.1 k) ⊓ L.U (j.2 k))) := fun k y hy =>
+  have hW
+      : ∀ k,
+        (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i
+            ⊓ (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j
+          ≤ φ k ⁻¹ᵁ ((M.U (i.1 k) ⊓ L.U (i.2 k)) ⊓ (M.U (j.1 k) ⊓ L.U (j.2 k))) := fun k y hy =>
     And.intro
       (And.intro (LB.wchart_le M φ i.1 k (And.left (And.left hy)))
         (LB.wchart_le L φ i.2 k (And.right (And.left hy))))
       (And.intro (LB.wchart_le M φ j.1 k (And.left (And.right hy)))
         (LB.wchart_le L φ j.2 k (And.right (And.right hy))))
-  have e1 := linCombIso_res w φ ε i (inf_le_left :
-    (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i ⊓
-      (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j ≤
-      (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i)
-  have e2 := linCombIso_res w φ ε j (inf_le_right :
-    (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i ⊓
-      (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j ≤
-      (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j)
-  have e3 := res_linComb_g_eq_prod_tr_zpow M φ ε i.1 j.1 (V := (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i ⊓
-      (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j)
-    (le_inf (inf_le_left.trans inf_le_left) (inf_le_right.trans inf_le_left))
-  have e4 := res_linComb_g_eq_prod_tr_zpow L φ ε i.2 j.2 (V := (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i ⊓
-      (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j)
-    (le_inf (inf_le_left.trans inf_le_right) (inf_le_right.trans inf_le_right))
+  have e1 :=
+    linCombIso_res w φ ε i
+      (inf_le_left
+        : (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i
+            ⊓ (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j
+          ≤ (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i)
+  have e2 :=
+    linCombIso_res w φ ε j
+      (inf_le_right
+        : (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i
+            ⊓ (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j
+          ≤ (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j)
+  have e3 :=
+    res_linComb_g_eq_prod_tr_zpow M φ ε i.1 j.1
+      (V :=
+        (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i
+          ⊓ (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j)
+      (le_inf (inf_le_left.trans inf_le_left) (inf_le_right.trans inf_le_left))
+  have e4 :=
+    res_linComb_g_eq_prod_tr_zpow L φ ε i.2 j.2
+      (V :=
+        (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i
+          ⊓ (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j)
+      (le_inf (inf_le_left.trans inf_le_right) (inf_le_right.trans inf_le_right))
   have e5 := fun k => wu_gen w hw (hW k)
-  have e6 : (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).g i j =
-      (∏ k, tr M ((LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i ⊓
-        (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j) (φ k) (i.1 k) (j.1 k) ^ ε k) *
-      (∏ k, tr L ((LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i ⊓
-        (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j) (φ k) (i.2 k) (j.2 k) ^ ε k)⁻¹ := by
-    refine Eq.trans ?_ (congrArg₂ (fun x y => x * y⁻¹) e3 e4)
-    rfl
+  have e6
+      : (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).g i j
+        = (∏ k, tr M ((LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i ⊓
+            (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j) (φ k) (i.1 k) (j.1 k) ^ ε k)
+          * (∏ k, tr L ((LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U i ⊓
+              (LB.div (LB.LinComb M φ ε) (LB.LinComb L φ ε)).U j) (φ k) (i.2 k) (j.2 k) ^ ε k)⁻¹ :=
+    by
+      refine Eq.trans ?_ (congrArg₂ (fun x y => x * y⁻¹) e3 e4)
+      rfl
   rw [e1, e2, e6]
   simp only [e5, mul_zpow, inv_zpow, Finset.prod_mul_distrib, Finset.prod_inv_distrib]
 
@@ -214,8 +229,8 @@ lemma divLe (a : A.ι) (b : B.ι) : A.U a ⊓ B.U b ≤ (LB.div B A).U (b, a) :=
     | (show A.U a ⊓ B.U b ≤ B.U b ⊓ A.U a; exact le_inf inf_le_right inf_le_left)
 
 def isoCand (a : A.ι) (b : B.ι) : Γ(Y, A.U a ⊓ B.U b) :=
-  (((res (divLe a b) (u.s (b, a)))⁻¹ : Γ(Y, A.U a ⊓ B.U b)ˣ) : Γ(Y, A.U a ⊓ B.U b)) *
-    rs (inf_le_right : A.U a ⊓ B.U b ≤ B.U b) (t.f b)
+  (((res (divLe a b) (u.s (b, a)))⁻¹ : Γ(Y, A.U a ⊓ B.U b)ˣ) : Γ(Y, A.U a ⊓ B.U b))
+    * rs (inf_le_right : A.U a ⊓ B.U b ≤ B.U b) (t.f b)
 
 lemma isoCand_rs (a : A.ι) (b : B.ι) {V : Y.Opens} (hV : V ≤ A.U a ⊓ B.U b) :
     rs hV (isoCand u t a b) = (((res (hV.trans (divLe a b)) (u.s (b, a)))⁻¹ : Γ(Y, V)ˣ) : Γ(Y, V)) *
@@ -271,8 +286,11 @@ lemma cover_inf (hB : B.IsLB) (a : A.ι) : A.U a ≤ ⨆ b, A.U a ⊓ B.U b := b
     _ ≤ ⨆ b, A.U a ⊓ B.U b := (inf_iSup_eq _ _).le
 
 def secOfIsoF (hu : u.IsGen) (hA : A.IsLB) (hB : B.IsLB) (a : A.ι) : Γ(Y, A.U a) :=
-  Classical.choose (sec_glue (A.U a) (fun b => A.U a ⊓ B.U b) (fun _ => inf_le_left) (cover_inf hB a)
-    (isoCand u t a) (fun b b' => isoCand_compat t hu hA a b b'))
+  Classical.choose (sec_glue (A.U a)
+    (fun b => A.U a ⊓ B.U b)
+    (fun _ => inf_le_left)
+    (cover_inf hB a) (isoCand u t a)
+    (fun b b' => isoCand_compat t hu hA a b b'))
 
 lemma secOfIsoF_spec (hu : u.IsGen) (hA : A.IsLB) (hB : B.IsLB) (a : A.ι) (b : B.ι) :
     rs (inf_le_left : A.U a ⊓ B.U b ≤ A.U a) (secOfIsoF t hu hA hB a) = isoCand u t a b :=
@@ -365,9 +383,10 @@ lemma box_le_pr (jN : Fin 1 → (Fin j → L.ι)) (i : Fin j) :
     Set.mem_iInter.mp (Set.mem_iInter.mp hx 0) i
   exact Set.mem_iInter.mpr (fun _ => h2)
 
-def boxSecF (σ : Fin j → LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => 𝟙 X) (fun _ => k)))
-    (jN : Fin 1 → (Fin j → L.ι)) :
-    Γ(X', LB.wchart (LB.LinComb L pr (fun _ => 1)) (fun _ : Fin 1 => 𝟙 X') jN) :=
+def boxSecF
+    (σ : Fin j → LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => 𝟙 X) (fun _ => k)))
+    (jN : Fin 1 → (Fin j → L.ι))
+    : Γ(X', LB.wchart (LB.LinComb L pr (fun _ => 1)) (fun _ : Fin 1 => 𝟙 X') jN) :=
   ∏ i, rs (box_le_pr L pr jN i) (((pr i).app _).hom ((σ i).f (fun _ => jN 0 i)))
 
 set_option maxHeartbeats 1000000 in
@@ -460,8 +479,9 @@ lemma boxSecF_compat (σ : Fin j → LB.Sec (LB.LinComb L (K := Fin 1) (fun _ =>
   congr 1
   erw [hg, Units.coe_prod]
 
-def boxSec (σ : Fin j → LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => 𝟙 X) (fun _ => k))) :
-    LB.Sec (LB.LinComb (LB.LinComb L pr (fun _ => 1)) (K := Fin 1) (fun _ => 𝟙 X') (fun _ => k)) where
+def boxSec (σ : Fin j → LB.Sec (LB.LinComb L (K := Fin 1) (fun _ => 𝟙 X) (fun _ => k)))
+    : LB.Sec
+      (LB.LinComb (LB.LinComb L pr (fun _ => 1)) (K := Fin 1) (fun _ => 𝟙 X') (fun _ => k)) where
   f jN := boxSecF L pr k σ jN
   compat jN jN' := boxSecF_compat L pr k σ jN jN'
 

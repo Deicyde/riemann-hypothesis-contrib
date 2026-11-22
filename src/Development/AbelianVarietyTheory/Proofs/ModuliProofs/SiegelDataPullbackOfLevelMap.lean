@@ -17,8 +17,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsSquareUniqu
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models
 
@@ -28,18 +30,29 @@ namespace GlobalTheory.SiegelDataPull
 
 open GlobalTheory.SiegelPullComp
 
-theorem isSquare_comp {S S' S'' : Scheme.{0}} {G : Over S} {G' : Over S'} {G'' : Over S''} {φ : G'.left ⟶ G.left}
-    {ψ : G''.left ⟶ G'.left} {φ₂ : (G' ⊗ G').left ⟶ (G ⊗ G).left} {ψ₂ : (G'' ⊗ G'').left ⟶ (G' ⊗ G').left}
-    (h' : Geo.Tor.IsSquare ψ ψ₂) (h : Geo.Tor.IsSquare φ φ₂) : Geo.Tor.IsSquare (ψ ≫ φ) (ψ₂ ≫ φ₂) := by
+theorem isSquare_comp
+    {S S' S'' : Scheme.{0}} {G : Over S} {G' : Over S'} {G'' : Over S''} {φ : G'.left ⟶ G.left}
+    {ψ : G''.left ⟶ G'.left} {φ₂ : (G' ⊗ G').left ⟶ (G ⊗ G).left}
+    {ψ₂ : (G'' ⊗ G'').left ⟶ (G' ⊗ G').left}
+    (h' : Geo.Tor.IsSquare ψ ψ₂) (h : Geo.Tor.IsSquare φ φ₂)
+    : Geo.Tor.IsSquare (ψ ≫ φ) (ψ₂ ≫ φ₂) := by
   refine ⟨?_, ?_⟩
   · rw [Category.assoc, h.1, ← Category.assoc, h'.1, Category.assoc]
   · rw [Category.assoc, h.2, ← Category.assoc, h'.2, Category.assoc]
 
-theorem siegData_pull : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (O : Type) [CommRing O] (T T' : Scheme.{0}) (sT : T ⟶ Sp O) (f : T' ⟶ T) (t : SAB H T) (t' : SAB H T') (ν : SABMap t' t f) (lev : D.La → (𝟙_ (Over T) ⟶ t.G)) (lev' : D.La → (𝟙_ (Over T') ⟶ t'.G)) (g p N : ℕ) (Ag : SiegelFamily g p N) (z : ZP p N →+* O) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] D.La) (w : T ⟶ pullback Ag.s (spMap z)), (∀ x, (lev' x).left ≫ ν.φ = f ≫ (lev x).left) → SiegData sT t lev Ag z bas w → SiegData (f ≫ sT) t' lev' Ag z bas (f ≫ w) := by
+theorem siegData_pull
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (O : Type)
+        [CommRing O] (T T' : Scheme.{0}) (sT : T ⟶ Sp O) (f : T' ⟶ T) (t : SAB H T) (t' : SAB H T')
+        (ν : SABMap t' t f) (lev : D.La → (𝟙_ (Over T) ⟶ t.G)) (lev' : D.La → (𝟙_ (Over T') ⟶ t'.G))
+        (g p N : ℕ) (Ag : SiegelFamily g p N) (z : ZP p N →+* O)
+        (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] D.La) (w : T ⟶ pullback Ag.s (spMap z)),
+      (∀ x, (lev' x).left ≫ ν.φ = f ≫ (lev x).left) → SiegData sT t lev Ag z bas w
+        → SiegData (f ≫ sT) t' lev' Ag z bas (f ≫ w) := by
   intro E _ _ _ H D O _ T T' sT f t t' ν lev lev' g p N Ag z bas w hlev hw
   obtain ⟨o, φ, φ₂, hpb, hsq, hiso, hlv, hsnd, hSPB⟩ := hw
-  obtain ⟨⟨o', ho'⟩, -⟩ := GlobalTheory.siegPre_pullback _ _ _ _ _ _ _ ((f ≫ sT) ≫ spMap z) f o
-    (Category.assoc f sT (spMap z)).symm
+  obtain ⟨⟨o', ho'⟩, -⟩ :=
+    GlobalTheory.siegPre_pullback _ _ _ _ _ _ _ ((f ≫ sT) ≫ spMap z) f o
+      (Category.assoc f sT (spMap z)).symm
   have hpbo := ho'
   obtain ⟨φ₁, φ₁₂, hpb₁, hsq₁, hiso₁, hlv₁⟩ := hpbo
   have hν : IsGrpPullback t'.G t.G f ν.φ := ν.cart
@@ -49,8 +62,10 @@ theorem siegData_pull : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (
   have hpb' : IsGrpPullback o'.A t'.G (𝟙 T') e.hom.left := isGrpPullback_of_iso e
   have hsq' := GlobalTheory.LamPull.exists_isSquare hpb'.1.w
   have hν₂ := GlobalTheory.LamPull.exists_isSquare hν.1.w
-  have hΛ : (abelian₂ t.G t.PP.L).IsLB := ReciprocityTheory.ChartRestriction.G.DVR.linComb_isLB _ t.PP.isLB _ _
-  have hΛ' : (abelian₂ t'.G t'.PP.L).IsLB := ReciprocityTheory.ChartRestriction.G.DVR.linComb_isLB _ t'.PP.isLB _ _
+  have hΛ : (abelian₂ t.G t.PP.L).IsLB :=
+    ReciprocityTheory.ChartRestriction.G.DVR.linComb_isLB _ t.PP.isLB _ _
+  have hΛ' : (abelian₂ t'.G t'.PP.L).IsLB :=
+    ReciprocityTheory.ChartRestriction.G.DVR.linComb_isLB _ t'.PP.isLB _ _
   have sA := isSquare_comp hsq₁ hsq
   have sB := isSquare_comp hsq' hν₂
   rw [hel] at sB
@@ -59,11 +74,14 @@ theorem siegData_pull : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (
   · have h2 := GlobalTheory.SiegelPullComp.iso_pull φ₁₂ hiso
     have h3 := GlobalTheory.SiegelPullComp.iso_pull_pull hΛ φ₂ φ₁₂
     rw [key] at h3
-    have h4 := (GlobalTheory.SiegelPullComp.iso_pull_pull hΛ (lift (pushPt hν.1.w (fst t'.G t'.G))
-      (pushPt hν.1.w (snd t'.G t'.G))).left (lift (pushPt hpb'.1.w (fst o'.A o'.A))
-      (pushPt hpb'.1.w (snd o'.A o'.A))).left).symm
-    have h5 := GlobalTheory.SiegelPullComp.iso_pull (lift (pushPt hpb'.1.w (fst o'.A o'.A))
-      (pushPt hpb'.1.w (snd o'.A o'.A))).left ((GlobalTheory.LamPull.lam_pull E H T T' t t' f).2 ν _ hν₂).symm
+    have h4 :=
+      (GlobalTheory.SiegelPullComp.iso_pull_pull hΛ
+        (lift (pushPt hν.1.w (fst t'.G t'.G)) (pushPt hν.1.w (snd t'.G t'.G))).left
+        (lift (pushPt hpb'.1.w (fst o'.A o'.A)) (pushPt hpb'.1.w (snd o'.A o'.A))).left).symm
+    have h5 :=
+      GlobalTheory.SiegelPullComp.iso_pull
+        (lift (pushPt hpb'.1.w (fst o'.A o'.A)) (pushPt hpb'.1.w (snd o'.A o'.A))).left
+        ((GlobalTheory.LamPull.lam_pull E H T T' t t' f).2 ν _ hν₂).symm
     have l0 := o'.isLB
     have l1 := pull_isLB o.isLB φ₁₂
     have l2 := pull_isLB (pull_isLB hΛ φ₂) φ₁₂

@@ -39,22 +39,25 @@ open Finset Matrix
 namespace ReciprocityTheory.ChartRestriction.DS.G2
 section Gen
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V]
 
 end Gen
 
 section Main
 
-variable {n : ℕ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {n : ℕ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {ε : Fin n → Bool} {lam : Fin n → ℝ} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
   {T : S7.KType ε (lowK ε lam)} {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)}
 
-theorem anyF (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ) :
-    ∃ j : T.V →L[ℂ] H, (∀ v, ‖j v‖ = ‖v‖) ∧
-      (∀ (k : S7.KG ε) (v : T.V), σ (S7.toMK k) (j v) = j (T.op k v)) ∧
-      LinearMap.range (j : T.V →ₗ[ℂ] H) = Formalism.MainNotions.S.lowKSub ε lam σ ∧
-      ∀ g ∈ UJset ε, (ContinuousLinearMap.adjoint j).comp ((σ g).comp j) = Ψ g := by
+theorem anyF
+    (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ)
+    : ∃ j : T.V →L[ℂ] H,
+      (∀ v, ‖j v‖ = ‖v‖) ∧ (∀ (k : S7.KG ε) (v : T.V), σ (S7.toMK k) (j v) = j (T.op k v))
+        ∧ LinearMap.range (j : T.V →ₗ[ℂ] H) = Formalism.MainNotions.S.lowKSub ε lam σ
+        ∧ ∀ g ∈ UJset ε, (ContinuousLinearMap.adjoint j).comp ((σ g).comp j) = Ψ g := by
   have hw : T.w ≠ 0 := fun h0 => by
     have h1 := T.w_norm
     rw [h0, norm_zero] at h1
@@ -71,10 +74,16 @@ theorem anyF (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε la
     simp [inUJ]
   have hkey : ∀ g ∈ UJset ε, ∀ v v', inner ℂ (j v') (σ g (j v)) = inner ℂ v' (Ψ g v) := by
     intro g hg v v'
-    rw [hjv, hjv, map_smul, ← hU g hg, inner_smul_left, inner_smul_right, LinearIsometryEquiv.inner_map_map]
+    rw [hjv, hjv, map_smul, ← hU g hg, inner_smul_left, inner_smul_right,
+      LinearIsometryEquiv.inner_map_map]
     have e := formulaF_sigLam hgap hP hw hg v v'
-    rw [show datumEmbedding hP T.w v = (⟨uniformisationL2 ε Ψ T.w v, datumEmbedding_mem_Hlam hP v⟩ : Hlam ε Ψ T.w) from rfl,
-      show datumEmbedding hP T.w v' = (⟨uniformisationL2 ε Ψ T.w v', datumEmbedding_mem_Hlam hP v'⟩ : Hlam ε Ψ T.w) from rfl, e]
+    rw [show datumEmbedding hP T.w v
+          = (⟨uniformisationL2 ε Ψ T.w v, datumEmbedding_mem_Hlam hP v⟩ : Hlam ε Ψ T.w) from
+        rfl,
+      show datumEmbedding hP T.w v'
+          = (⟨uniformisationL2 ε Ψ T.w v', datumEmbedding_mem_Hlam hP v'⟩ : Hlam ε Ψ T.w) from
+        rfl,
+      e]
     rw [map_inv₀, Complex.conj_ofReal]
     push_cast
     field_simp
@@ -94,34 +103,45 @@ theorem anyF (hDS : Formalism.MainNotions.S.IsDS ε lam σ) (hgap : StdGap ε la
     apply Subtype.ext
     rw [sigLam_coe hgap hP hw (ffa_toMK_mem k)]
     exact rightRegular_datumEmbedding hP T.w v k
-  have hrange : LinearMap.range (j : T.V →ₗ[ℂ] H) =
-      (lowKSubLam ε Ψ T.w).map U.toLinearEquiv.toLinearMap := by
+  have hrange
+      : LinearMap.range (j : T.V →ₗ[ℂ] H)
+        = (lowKSubLam ε Ψ T.w).map U.toLinearEquiv.toLinearMap := by
     show LinearMap.range jl = _
     rw [LinearMap.range_smul _ _ (inv_ne_zero hcne), LinearMap.range_comp, range_datumEmbedding]
-  have hintU : ∀ g ∈ Formalism.REAL.Kset ε, ∀ x, U.toLinearEquiv.toLinearMap (sigLam ε Ψ T.w g x) =
-      σ g (U.toLinearEquiv.toLinearMap x) := by
+  have hintU
+      : ∀ g ∈ Formalism.REAL.Kset ε, ∀ x,
+        U.toLinearEquiv.toLinearMap (sigLam ε Ψ T.w g x) = σ g (U.toLinearEquiv.toLinearMap x) := by
     intro g hg x
     rw [mir_Kset_eq] at hg
     exact hU g (UnitaryGroupOfForm.K_mem_UJ hg) x
-  have hintS : ∀ g ∈ Formalism.REAL.Kset ε, ∀ x, U.toLinearEquiv.symm.toLinearMap (σ g x) =
-      sigLam ε Ψ T.w g (U.toLinearEquiv.symm.toLinearMap x) := by
+  have hintS
+      : ∀ g ∈ Formalism.REAL.Kset ε, ∀ x,
+        U.toLinearEquiv.symm.toLinearMap (σ g x)
+          = sigLam ε Ψ T.w g (U.toLinearEquiv.symm.toLinearMap x) := by
     intro g hg x
     apply U.injective
     have e := hintU g hg (U.toLinearEquiv.symm x)
     simp only [LinearEquiv.coe_coe, LinearIsometryEquiv.coe_toLinearEquiv] at e ⊢
     rw [e]
     simp
-  have hlow : Formalism.MainNotions.S.lowKSub ε lam σ = (lowKSubLam ε Ψ T.w).map U.toLinearEquiv.toLinearMap := by
-    have hdef : Formalism.MainNotions.S.lowKSub ε lam σ =
-        sSup {S : Submodule ℂ H | Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S} := rfl
-    have hset : {S : Submodule ℂ H | Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S} =
-        {(lowKSubLam ε Ψ T.w).map U.toLinearEquiv.toLinearMap} := by
+  have hlow
+      : Formalism.MainNotions.S.lowKSub ε lam σ
+        = (lowKSubLam ε Ψ T.w).map U.toLinearEquiv.toLinearMap := by
+    have hdef
+        : Formalism.MainNotions.S.lowKSub ε lam σ
+          = sSup
+            {S : Submodule ℂ H | Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S} :=
+      rfl
+    have hset
+        : {S : Submodule ℂ H | Formalism.MainNotions.S.IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S}
+          = {(lowKSubLam ε Ψ T.w).map U.toLinearEquiv.toLinearMap} := by
       ext S
       simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff]
       constructor
       · intro hS
-        have h2 := (sigLam_lowK hgap hP hw).2 _
-          ((isKTypeOf_map_iff _ U.toLinearEquiv.symm.injective hintS _ S).1 hS)
+        have h2 :=
+          (sigLam_lowK hgap hP hw).2 _
+            ((isKTypeOf_map_iff _ U.toLinearEquiv.symm.injective hintS _ S).1 hS)
         rw [← h2, ← Submodule.map_comp]
         ext x
         simp

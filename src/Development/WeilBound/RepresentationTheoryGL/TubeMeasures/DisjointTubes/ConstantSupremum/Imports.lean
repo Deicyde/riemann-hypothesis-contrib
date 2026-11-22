@@ -14,9 +14,13 @@ public import Development.WeilBound.RepresentationTheoryGL.TubeMeasures.Disjoint
 
 namespace MainStatements.Tam.Plug
 
-theorem low : LowSt := MainStatements.Tam.low MainStatements.Tam.vol MainStatements.Tam.stab MainStatements.Tam.num
+theorem low : LowSt :=
+  MainStatements.Tam.low MainStatements.Tam.vol MainStatements.Tam.stab MainStatements.Tam.num
 
-theorem comp : CompSt := MainStatements.Tam.comp (tube0 MainStatements.Tam.vol MainStatements.Tam.stab MainStatements.Tam.idx) MainStatements.Tam.num
+theorem comp : CompSt :=
+  MainStatements.Tam.comp
+    (tube0 MainStatements.Tam.vol MainStatements.Tam.stab MainStatements.Tam.idx)
+    MainStatements.Tam.num
 
 theorem size : SizeSt := MainStatements.Tam.size
 

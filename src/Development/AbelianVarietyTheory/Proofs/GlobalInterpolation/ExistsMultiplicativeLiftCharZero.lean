@@ -6,8 +6,8 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem charZero_wittVector_of_field (p : ℕ) [hp : Fact p.Prime] (K : Type) [Field K] [CharP K p] :
-    CharZero (WittVector p K) := by
+theorem charZero_wittVector_of_field (p : ℕ) [hp : Fact p.Prime] (K : Type) [Field K] [CharP K p]
+    : CharZero (WittVector p K) := by
   obtain ⟨l, hl⟩ := CharP.exists (WittVector p K)
   rcases CharP.char_is_prime_or_zero (WittVector p K) l with h | h
   · exfalso

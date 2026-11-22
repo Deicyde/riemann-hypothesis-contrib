@@ -14,13 +14,15 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LogSingularVa
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 open scoped InnerProductSpace ContDiff
 
 namespace GlobalTheory.Dec
 
-theorem GFset_eq_one_of_place (I : AutInst) (γ : I.GA) (hγ : γ ∈ I.GFset) (v : InfinitePlace I.F)
-    (h : uMat (γ.1 v) = 1) : γ = 1 := by
+theorem GFset_eq_one_of_place
+    (I : AutInst) (γ : I.GA) (hγ : γ ∈ I.GFset) (v : InfinitePlace I.F) (h : uMat (γ.1 v) = 1)
+    : γ = 1 := by
   obtain ⟨g, -, hinf, hfin⟩ := hγ
   have hdet : ∀ w, IsUnit (I.P w).det := fun w => (Matrix.isUnit_iff_isUnit_det _).mp (I.P_unit w)
   set M : Matrix (Fin I.n) (Fin I.n) I.E := (g : Matrix (Fin I.n) (Fin I.n) I.E) with hM
@@ -40,8 +42,7 @@ theorem GFset_eq_one_of_place (I : AutInst) (γ : I.GA) (hγ : γ ∈ I.GFset) (
       rw [hinf w, hg, Matrix.map_one _ (map_zero _) (map_one _), Matrix.mul_one,
         Matrix.nonsing_inv_mul _ (hdet w)]
     exact Subtype.ext (Units.ext (by simpa using hw))
-  · have hf : I.fmat γ.2 = 1 := by
-      rw [hfin, hg, Matrix.map_one _ (map_zero _) (map_one _)]
+  · have hf : I.fmat γ.2 = 1 := by rw [hfin, hg, Matrix.map_one _ (map_zero _) (map_one _)]
     exact Subtype.ext (Units.ext (by simpa using hf))
 
 theorem one_mem_GFset_def (I : AutInst) : (1 : I.GA) ∈ I.GFset := by
@@ -52,9 +53,11 @@ theorem one_mem_GFset_def (I : AutInst) : (1 : I.GA) ∈ I.GFset := by
   · rw [Units.val_one, Matrix.map_one _ (map_zero _) (map_one _)]
     rfl
 
-theorem definite_count_of_finite : ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (p : ℕ),
-    GlobalTheory.IndefiniteRowSideFullHecke.DefiniteFiniteCount.DefiniteHyp B d p → FiniteDimensional ℂ (B.I.eHom B.σs B.μf B.fund B.R B.Re) →
-      (B.D : ℝ) = mainTerm B d := by
+theorem definite_count_of_finite
+    : ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (p : ℕ),
+      GlobalTheory.IndefiniteRowSideFullHecke.DefiniteFiniteCount.DefiniteHyp B d p
+        → FiniteDimensional ℂ (B.I.eHom B.σs B.μf B.fund B.R B.Re)
+        → (B.D : ℝ) = mainTerm B d := by
   intro B d p hH hfin
   have hn : B.I.n = p := hH.rank_eq
   obtain ⟨hDS, hSig, hp, -, hprime, hgt, hsplit⟩ := hH
@@ -79,9 +82,11 @@ theorem definite_count_of_finite : ∀ (B : RowsAut) (d : InfinitePlace B.I.F �
   have hdHS : ∀ v (g : Formalism.REAL.UJ (B.I.ε v)), dHS (uMat g) = 0 := fun v g =>
     (GlobalTheory.T.logSingularValuesEuclidNorm_cartan_properties B.I.n (B.I.ε v)).2.2.2 (hrk v) g
 
-  have hrad := GlobalTheory.T.isRadical_span_prime_of_ncard_primesOver_eq_finrank B.I.E B.g₀ hprime hsplit
-  have hNU := (GlobalTheory.NearElement.near_unipotent B d (1 / 10 ^ 5) (by norm_num) le_rfl hn1 hgt hrad _ _
-    rfl rfl).1
+  have hrad :=
+    GlobalTheory.T.isRadical_span_prime_of_ncard_primesOver_eq_finrank B.I.E B.g₀ hprime hsplit
+  have hNU :=
+    (GlobalTheory.NearElement.near_unipotent B d (1 / 10 ^ 5) (by norm_num) le_rfl hn1 hgt hrad _ _
+      rfl rfl).1
   have hkey : ∀ x γ : B.I.GA, γ ∈ B.I.GFset → phe B d (x⁻¹ * γ * x) ≠ 0 → γ = 1 := by
     intro x γ hγ hne
     have hep : (0 : ℝ) ≤ 1 / 10 ^ 5 / ((B.I.n : ℝ) ^ 8 * (B.I.f : ℝ) ^ 2) := by positivity
@@ -115,14 +120,16 @@ theorem definite_count_of_finite : ∀ (B : RowsAut) (d : InfinitePlace B.I.F �
     intro v g
     have hd : decE (rkR (B.I.ε v)) 0 (dOp (uMat g)) = 1 := by simp [decE]
     rw [hd]
-    calc ‖⟪B.w v, B.σ v (uMat g) (B.w v)⟫_ℂ‖ ≤ ‖B.w v‖ * ‖B.σ v (uMat g) (B.w v)‖ :=
-          norm_inner_le_norm _ _
+    calc
+      ‖⟪B.w v, B.σ v (uMat g) (B.w v)⟫_ℂ‖
+        ≤ ‖B.w v‖ * ‖B.σ v (uMat g) (B.w v)‖ := norm_inner_le_norm _ _
       _ = 1 := by rw [(hDS v).2.1.2.2.1.2.1 _ g.2 _, (hDS v).2.2.1.1]; norm_num
   have hbig : HBig B 32 0 := by
     intro v
     rw [hrk v]
     simp
-  obtain ⟨hcont, hbd, hmaj⟩ := GlobalTheory.T.discrete_series_coefficient_integrable_majorant B d 0 hDS hloc
+  obtain ⟨hcont, hbd, hmaj⟩ :=
+    GlobalTheory.T.discrete_series_coefficient_integrable_majorant B d 0 hDS hloc
   have hm := hmaj 0 le_rfl (fun v => Or.inl (hrk v))
   simp only [zero_mul, Real.exp_zero, mul_one] at hm
   have hint : Integrable (ph B d) (muInf B.I) :=
@@ -137,8 +144,9 @@ theorem definite_count_of_finite : ∀ (B : RowsAut) (d : InfinitePlace B.I.F �
   rw [hphe] at hD
   have he1 := (GlobalTheory.rowsAut_idem_elementary B).1
   have hre := congrArg Complex.re hD
-  simp only [Complex.real_smul, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, he1,
-    mul_zero, sub_zero, zero_mul, Complex.natCast_re] at hre
+  simp only [Complex.real_smul, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, he1, mul_zero,
+      sub_zero, zero_mul, Complex.natCast_re]
+    at hre
   unfold mainTerm AutInst.Dstar AutInst.vol
   rw [← hre, measureReal_def]
   ring

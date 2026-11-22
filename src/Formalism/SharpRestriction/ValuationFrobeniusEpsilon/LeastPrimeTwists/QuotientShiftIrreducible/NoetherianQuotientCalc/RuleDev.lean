@@ -12,23 +12,28 @@ open DirectSum
 
 section Prime
 
-theorem isPrime_of_dec {ι B R : Type} [CommRing B] [CommRing R] [Algebra B R]
-    [AddCommMonoid ι] [LinearOrder ι] [IsOrderedCancelAddMonoid ι] [dec : DecidableEq ι]
-    (𝒜 : ι → Submodule B R) [GradedRing 𝒜] {I : Ideal R} (hI : I.IsHomogeneous 𝒜)
-    (hne : I ≠ ⊤)
-    (h : ∀ {x y : R}, SetLike.IsHomogeneousElem 𝒜 x → SetLike.IsHomogeneousElem 𝒜 y →
-      x * y ∈ I → x ∈ I ∨ y ∈ I) : I.IsPrime := by
+theorem isPrime_of_dec
+    {ι B R : Type} [CommRing B] [CommRing R] [Algebra B R] [AddCommMonoid ι] [LinearOrder ι]
+    [IsOrderedCancelAddMonoid ι] [dec : DecidableEq ι]
+    (𝒜 : ι → Submodule B R) [GradedRing 𝒜]
+    {I : Ideal R} (hI : I.IsHomogeneous 𝒜) (hne : I ≠ ⊤)
+    (h : ∀ {x y : R},
+      SetLike.IsHomogeneousElem 𝒜 x → SetLike.IsHomogeneousElem 𝒜 y → x * y ∈ I → x ∈ I ∨ y ∈ I)
+    : I.IsPrime := by
   obtain rfl : dec = LinearOrder.toDecidableEq := Subsingleton.elim _ _
   exact hI.isPrime_of_homogeneous_mem_or_mem hne h
 
 variable {k : ℕ} {B R : Type} [CommRing B] [CommRing R] [Algebra B R]
 
-theorem isPrime_of_hom (𝒜 : Deg k → Submodule B R) [inst : GradedAlgebra 𝒜] {I : Ideal R}
-    (hI : I.IsHomogeneous 𝒜) (hne : I ≠ ⊤)
-    (h : ∀ {x y : R}, SetLike.IsHomogeneousElem 𝒜 x → SetLike.IsHomogeneousElem 𝒜 y →
-      x * y ∈ I → x ∈ I ∨ y ∈ I) : I.IsPrime :=
+theorem isPrime_of_hom
+    (𝒜 : Deg k → Submodule B R) [inst : GradedAlgebra 𝒜]
+    {I : Ideal R} (hI : I.IsHomogeneous 𝒜) (hne : I ≠ ⊤)
+    (h : ∀ {x y : R},
+      SetLike.IsHomogeneousElem 𝒜 x → SetLike.IsHomogeneousElem 𝒜 y → x * y ∈ I → x ∈ I ∨ y ∈ I)
+    : I.IsPrime :=
   @isPrime_of_dec (Lex (Deg k)) B R _ _ _ _ _ _ (inferInstanceAs (DecidableEq (Deg k)))
-    (fun m => 𝒜 (ofLex m)) inst I hI hne h
+    (fun m => 𝒜 (ofLex m))
+    inst I hI hne h
 
 end Prime
 
@@ -36,8 +41,9 @@ section Noeth
 
 variable {k : ℕ} {B R : Type} [CommRing B] [CommRing R] [Algebra B R]
 
-theorem isNoetherianRing_of_std [IsLocalRing B] (𝒜 : Deg k → Submodule B R) [GradedAlgebra 𝒜]
-    (h : Std 𝒜) : IsNoetherianRing R := by
+theorem isNoetherianRing_of_std
+    [IsLocalRing B] (𝒜 : Deg k → Submodule B R) [GradedAlgebra 𝒜] (h : Std 𝒜)
+    : IsNoetherianRing R := by
   classical
   have := h.noeth
   choose s hs using fun i => h.fg i
@@ -47,8 +53,8 @@ theorem isNoetherianRing_of_std [IsLocalRing B] (𝒜 : Deg k → Submodule B R)
     rw [← hs i, Submodule.span_le]
     intro x hx
     exact Algebra.subset_adjoin (Set.mem_iUnion.2 ⟨i, hx⟩)
-  have h2 : ∀ (n : ℕ) (m : Deg k), 0 ≤ m → (∑ i, m i) = (n : ℤ) →
-      𝒜 m ≤ Subalgebra.toSubmodule T := by
+  have h2
+      : ∀ (n : ℕ) (m : Deg k), 0 ≤ m → (∑ i, m i) = (n : ℤ) → 𝒜 m ≤ Subalgebra.toSubmodule T := by
     intro n
     induction n with
     | zero =>
@@ -111,12 +117,17 @@ section Comp
 variable {k : ℕ} {B R : Type} [CommRing B] [CommRing R] [Algebra B R]
 variable (𝒜 : Deg k → Submodule B R) [GradedAlgebra 𝒜]
 
-theorem devComp_smul {F : GMod B R k} (hF : F.IsGr 𝒜) [Decomposition F.gr] {d : Deg k} {x : F.M}
-    (hx : x ∈ F.gr d) (a : R) (m : Deg k) :
-    ((decompose F.gr (a • x) m : F.gr m) : F.M) = ((decompose 𝒜 a (m - d) : 𝒜 (m - d)) : R) • x := by
+theorem devComp_smul
+    {F : GMod B R k} (hF : F.IsGr 𝒜) [Decomposition F.gr]
+    {d : Deg k} {x : F.M} (hx : x ∈ F.gr d)
+    (a : R) (m : Deg k)
+    : ((decompose F.gr (a • x) m : F.gr m) : F.M)
+      = ((decompose 𝒜 a (m - d) : 𝒜 (m - d)) : R) • x := by
   classical
-  have hterm : ∀ j, ((decompose F.gr (((decompose 𝒜 a j : 𝒜 j) : R) • x) m : F.gr m) : F.M) =
-      if j + d = m then ((decompose 𝒜 a j : 𝒜 j) : R) • x else 0 := by
+  have hterm
+      : ∀ j,
+        ((decompose F.gr (((decompose 𝒜 a j : 𝒜 j) : R) • x) m : F.gr m) : F.M)
+          = if j + d = m then ((decompose 𝒜 a j : 𝒜 j) : R) • x else 0 := by
     intro j
     rw [decompose_of_mem F.gr (hF.smul_mem (SetLike.coe_mem _) hx), DirectSum.coe_of_apply]
     split_ifs <;> rfl
@@ -135,8 +146,8 @@ theorem devComp_smul {F : GMod B R k} (hF : F.IsGr 𝒜) [Decomposition F.gr] {d
     rw [hns]
     simp
 
-theorem ker_hom {F : GMod B R k} (hF : F.IsGr 𝒜) {d : Deg k} {x : F.M} (hx : x ∈ F.gr d) :
-    Ideal.IsHomogeneous 𝒜 (LinearMap.ker (LinearMap.toSpanSingleton R F.M x)) := by
+theorem ker_hom {F : GMod B R k} (hF : F.IsGr 𝒜) {d : Deg k} {x : F.M} (hx : x ∈ F.gr d)
+    : Ideal.IsHomogeneous 𝒜 (LinearMap.ker (LinearMap.toSpanSingleton R F.M x)) := by
   let := hF.internal.chooseDecomposition
   intro j a ha
   rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at ha ⊢
@@ -144,20 +155,23 @@ theorem ker_hom {F : GMod B R k} (hF : F.IsGr 𝒜) {d : Deg k} {x : F.M} (hx : 
   rw [ha, decompose_zero, add_sub_cancel_right] at h
   exact h.symm
 
-theorem smul_strict {F : GMod B R k} (hF : F.IsGr 𝒜) {d : Deg k} {x : F.M} (hx : x ∈ F.gr d)
-    (a : R) (m : Deg k) (h : a • x ∈ F.gr m) : ∃ a' ∈ 𝒜 (m - d), a' • x = a • x := by
+theorem smul_strict
+    {F : GMod B R k} (hF : F.IsGr 𝒜)
+    {d : Deg k} {x : F.M} (hx : x ∈ F.gr d)
+    (a : R) (m : Deg k) (h : a • x ∈ F.gr m)
+    : ∃ a' ∈ 𝒜 (m - d), a' • x = a • x := by
   let := hF.internal.chooseDecomposition
   refine ⟨_, SetLike.coe_mem (decompose 𝒜 a (m - d)), ?_⟩
   rw [← devComp_smul 𝒜 hF hx a m, decompose_of_mem_same F.gr h]
 
-theorem exists_prime_ker [IsNoetherianRing R] {G : GMod B R k} (hG : G.IsGr 𝒜)
-    [Nontrivial G.M] :
-    ∃ (d : Deg k) (x : G.M), x ∈ G.gr d ∧
-      Ideal.IsPrime (LinearMap.ker (LinearMap.toSpanSingleton R G.M x)) := by
+theorem exists_prime_ker [IsNoetherianRing R] {G : GMod B R k} (hG : G.IsGr 𝒜) [Nontrivial G.M]
+    : ∃ (d : Deg k) (x : G.M),
+      x ∈ G.gr d ∧ Ideal.IsPrime (LinearMap.ker (LinearMap.toSpanSingleton R G.M x)) := by
   classical
   let := hG.internal.chooseDecomposition
-  let S : Set (Ideal R) := {I | ∃ (d : Deg k) (x : G.M), x ∈ G.gr d ∧ x ≠ 0 ∧
-    I = LinearMap.ker (LinearMap.toSpanSingleton R G.M x)}
+  let S : Set (Ideal R) :=
+    {I | ∃ (d : Deg k) (x : G.M), x ∈ G.gr d ∧ x ≠ 0 ∧
+      I = LinearMap.ker (LinearMap.toSpanSingleton R G.M x)}
   have hS : S.Nonempty := by
     by_contra hcon
     have hall : ∀ (d : Deg k) (x : G.M), x ∈ G.gr d → x = 0 := by
@@ -182,13 +196,13 @@ theorem exists_prime_ker [IsNoetherianRing R] {G : GMod B R k} (hG : G.IsGr 𝒜
       rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply]
       exact hax
     · right
-      have hle : LinearMap.ker (LinearMap.toSpanSingleton R G.M x) ≤
-          LinearMap.ker (LinearMap.toSpanSingleton R G.M (a • x)) := by
+      have hle
+          : LinearMap.ker (LinearMap.toSpanSingleton R G.M x)
+            ≤ LinearMap.ker (LinearMap.toSpanSingleton R G.M (a • x)) := by
         intro c hc
         rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at hc ⊢
         rw [smul_comm, hc, smul_zero]
-      have heq := eq_of_le_of_not_lt hle
-        (hmax _ ⟨i + d, a • x, hG.smul_mem ha hx, hax, rfl⟩)
+      have heq := eq_of_le_of_not_lt hle (hmax _ ⟨i + d, a • x, hG.smul_mem ha hx, hax, rfl⟩)
       rw [heq, LinearMap.mem_ker, LinearMap.toSpanSingleton_apply, smul_smul, mul_comm]
       rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at hab
       exact hab
@@ -199,11 +213,13 @@ section Step
 
 variable {k : ℕ}
 
-theorem step (hGr : RuleGr) (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜)
-    (N : Submodule X.R F.M) (hN : F.IsHomSub N) (hne : N ≠ ⊤) :
-    ∃ (N' : Submodule X.R F.M) (𝔮 : Ideal X.R) (d : Deg k), N < N' ∧ F.IsHomSub N' ∧
-      𝔮.IsPrime ∧ 𝔮.IsHomogeneous X.𝒜 ∧ F.Ann ≤ 𝔮 ∧
-      Nonempty (SES (F.sub N) (F.sub N') (((GMod.self X.𝒜).quo 𝔮).shift d)) := by
+theorem step
+    (hGr : RuleGr)
+    (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜) (N : Submodule X.R F.M)
+    (hN : F.IsHomSub N) (hne : N ≠ ⊤)
+    : ∃ (N' : Submodule X.R F.M) (𝔮 : Ideal X.R) (d : Deg k),
+      N < N' ∧ F.IsHomSub N' ∧ 𝔮.IsPrime ∧ 𝔮.IsHomogeneous X.𝒜 ∧ F.Ann ≤ 𝔮
+        ∧ Nonempty (SES (F.sub N) (F.sub N') (((GMod.self X.𝒜).quo 𝔮).shift d)) := by
   have : IsNoetherianRing X.R := isNoetherianRing_of_std X.𝒜 X.std
   have hG : (F.quo N).IsGr X.𝒜 := ((hGr k X F hF).1 N hN).2
   have : Nontrivial (F.quo N).M := (Submodule.Quotient.nontrivial_iff (p := N)).2 hne
@@ -225,13 +241,12 @@ theorem step (hGr : RuleGr) (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜)
     obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.1 hz
     refine ⟨a, ?_⟩
     show a • N.mkQ x = N.mkQ (n + a • x)
-    rw [map_add (f := _), map_smul, (Submodule.Quotient.mk_eq_zero N).2 hn |> (show N.mkQ n = 0 from ·),
-      zero_add]
+    rw [map_add (f := _), map_smul,
+      (Submodule.Quotient.mk_eq_zero N).2 hn |> (show N.mkQ n = 0 from ·), zero_add]
   let g : N' →ₗ[X.R] X.R ⧸ LinearMap.ker φ :=
-    (φ.quotKerEquivRange.symm : LinearMap.range φ →ₗ[X.R] X.R ⧸ LinearMap.ker φ) ∘ₗ
-      (LinearMap.codRestrict (LinearMap.range φ) (N.mkQ ∘ₗ N'.subtype) hrange)
-  have key : ∀ (y : N') (a : X.R), N.mkQ (y : F.M) = a • xb →
-      g y = (LinearMap.ker φ).mkQ a := by
+    (φ.quotKerEquivRange.symm : LinearMap.range φ →ₗ[X.R] X.R ⧸ LinearMap.ker φ)
+      ∘ₗ (LinearMap.codRestrict (LinearMap.range φ) (N.mkQ ∘ₗ N'.subtype) hrange)
+  have key : ∀ (y : N') (a : X.R), N.mkQ (y : F.M) = a • xb → g y = (LinearMap.ker φ).mkQ a := by
     intro y a hya
     show φ.quotKerEquivRange.symm _ = _
     rw [LinearEquiv.symm_apply_eq]
@@ -259,14 +274,15 @@ theorem step (hGr : RuleGr) (X : HidaSetting k) (F : X.Mod) (hF : F.IsGr X.𝒜)
     rw [LinearMap.mem_ker]
     show a • N.mkQ x = 0
     rw [← map_smul, Module.mem_annihilator.1 ha x, map_zero]
-  · refine
-      { f := Submodule.inclusion hNN'
-        g := g
-        inj := Submodule.inclusion_injective hNN'
-        surj := ?_
-        exact := ?_
-        f_gr := ?_
-        g_gr := ?_ }
+  · refine {
+      f := Submodule.inclusion hNN'
+      g := g
+      inj := Submodule.inclusion_injective hNN'
+      surj := ?_
+      exact := ?_
+      f_gr := ?_
+      g_gr := ?_
+    }
     · intro q
       obtain ⟨a, rfl⟩ := (LinearMap.ker φ).mkQ_surjective q
       exact ⟨⟨a • x, N'.smul_mem a hxN'⟩, key _ a (map_smul _ _ _)⟩
@@ -310,15 +326,17 @@ variable {k : ℕ}
 
 def Good (X : HidaSetting k) (F : X.Mod) (N₀ : Submodule X.R F.M) : Prop :=
   ∃ (t : ℕ) (N : ℕ → Submodule X.R F.M) (𝔮 : ℕ → Ideal X.R) (d : ℕ → Deg k),
-    N 0 = ⊥ ∧ N t = N₀ ∧ (∀ i, F.IsHomSub (N i)) ∧ (∀ i, N i ≤ N (i + 1)) ∧
-    ∀ i < t, (𝔮 i).IsPrime ∧ (𝔮 i).IsHomogeneous X.𝒜 ∧ F.Ann ≤ 𝔮 i ∧
-      Nonempty (SES (F.sub (N i)) (F.sub (N (i + 1))) (((GMod.self X.𝒜).quo (𝔮 i)).shift (d i)))
+    N 0 = ⊥ ∧ N t = N₀ ∧ (∀ i, F.IsHomSub (N i)) ∧ (∀ i, N i ≤ N (i + 1))
+      ∧ ∀ i < t,
+        (𝔮 i).IsPrime ∧ (𝔮 i).IsHomogeneous X.𝒜 ∧ F.Ann ≤ 𝔮 i
+          ∧ Nonempty (SES (F.sub (N i)) (F.sub (N (i + 1)))
+            (((GMod.self X.𝒜).quo (𝔮 i)).shift (d i)))
 
 theorem good_bot (X : HidaSetting k) (F : X.Mod) : Good X F ⊥ := by
   refine ⟨0, fun _ => ⊥, fun _ => ⊥, fun _ => 0, rfl, rfl, ?_, fun _ => le_rfl, ?_⟩
   · intro _
-    change (⊥ : Submodule X.R F.M) = Submodule.span X.R
-      {x | x ∈ (⊥ : Submodule X.R F.M) ∧ ∃ m, x ∈ F.gr m}
+    change (⊥ : Submodule X.R F.M)
+      = Submodule.span X.R {x | x ∈ (⊥ : Submodule X.R F.M) ∧ ∃ m, x ∈ F.gr m}
     symm
     apply Submodule.span_eq_bot.2
     intro x hx
@@ -326,14 +344,24 @@ theorem good_bot (X : HidaSetting k) (F : X.Mod) : Good X F ⊥ := by
   · intro i hi
     exact absurd hi (Nat.not_lt_zero i)
 
-theorem good_step (X : HidaSetting k) (F : X.Mod) {N₀ N' : Submodule X.R F.M} (h : Good X F N₀)
-    (hle : N₀ ≤ N') (hN' : F.IsHomSub N') {𝔮' : Ideal X.R} {d' : Deg k} (h1 : 𝔮'.IsPrime)
-    (h2 : 𝔮'.IsHomogeneous X.𝒜) (h3 : F.Ann ≤ 𝔮')
-    (h4 : Nonempty (SES (F.sub N₀) (F.sub N') (((GMod.self X.𝒜).quo 𝔮').shift d'))) :
-    Good X F N' := by
+theorem good_step
+    (X : HidaSetting k) (F : X.Mod)
+    {N₀ N' : Submodule X.R F.M} (h : Good X F N₀) (hle : N₀ ≤ N') (hN' : F.IsHomSub N')
+    {𝔮' : Ideal X.R} {d' : Deg k} (h1 : 𝔮'.IsPrime) (h2 : 𝔮'.IsHomogeneous X.𝒜) (h3 : F.Ann ≤ 𝔮')
+    (h4 : Nonempty (SES (F.sub N₀) (F.sub N') (((GMod.self X.𝒜).quo 𝔮').shift d')))
+    : Good X F N' := by
   obtain ⟨t, N, 𝔮, d, hN0, rfl, hhom, hmono, hstep⟩ := h
-  refine ⟨t + 1, fun i => if i ≤ t then N i else N', Function.update 𝔮 t 𝔮',
-    Function.update d t d', ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    t + 1,
+    fun i => if i ≤ t then N i else N',
+    Function.update 𝔮 t 𝔮',
+    Function.update d t d',
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · simp only [Nat.zero_le, if_true]
     exact hN0
   · simp
@@ -347,7 +375,8 @@ theorem good_step (X : HidaSetting k) (F : X.Mod) {N₀ N' : Submodule X.R F.M} 
     · by_cases hi' : i ≤ t
       · have hit : i = t := by omega
         subst hit
-        simp only [if_neg hi, if_pos hi']; exact hle
+        simp only [if_neg hi, if_pos hi']
+        exact hle
       · simp only [if_neg hi, if_neg hi']; exact le_rfl
   · intro i hi
     by_cases hit : i = t
@@ -363,8 +392,9 @@ theorem ruleDev : RuleGr → RuleDev := by
   have : IsNoetherianRing X.R := isNoetherianRing_of_std X.𝒜 X.std
   have : Module.Finite X.R F.M := hF.fin
   have : IsNoetherian X.R F.M := isNoetherian_of_isNoetherianRing_of_finite X.R F.M
-  obtain ⟨N, hN, hmax⟩ := (set_has_maximal_iff_noetherian (R := X.R) (M := F.M)).2 inferInstance
-    {N | Good X F N} ⟨⊥, good_bot X F⟩
+  obtain ⟨N, hN, hmax⟩ :=
+    (set_has_maximal_iff_noetherian (R := X.R) (M := F.M)).2 inferInstance {N | Good X F N}
+      ⟨⊥, good_bot X F⟩
   have htop : N = ⊤ := by
     by_contra hne
     have hNhom : F.IsHomSub N := by

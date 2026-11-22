@@ -6,8 +6,10 @@ public import Formalism.LocalToGlobal.IndefiniteReal.SobolevIteration.ArvOSobPfS
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Mult
-  MeasureTheory Matrix Filter Topology
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Mult MeasureTheory Matrix Filter
+  Topology
 
 namespace Formalism.IndefR.Tow.SobPf
 
@@ -32,11 +34,12 @@ theorem continuity_of_sobolev_chart (h4 : SobChart) (h5 : FoldCont) : Cont1 := b
   rw [dist_eq_norm, h0] at h1
   exact h1
 
-theorem one_mem_KAt {n : ℕ} (G s : Matrix (Fin n) (Fin n) ℂ) : (1 : Matrix (Fin n) (Fin n) ℂ) ∈ KAt G s := by
+theorem one_mem_KAt {n : ℕ} (G s : Matrix (Fin n) (Fin n) ℂ)
+    : (1 : Matrix (Fin n) (Fin n) ℂ) ∈ KAt G s := by
   simp [KAt, Formalism.QuantumDeterminants.UH]
 
-theorem continuous_evP {n : ℕ} (q : MvPolynomial ((Fin n × Fin n) ⊕ (Fin n × Fin n)) ℂ) :
-    Continuous (evP q) := by
+theorem continuous_evP {n : ℕ} (q : MvPolynomial ((Fin n × Fin n) ⊕ (Fin n × Fin n)) ℂ)
+    : Continuous (evP q) := by
   unfold evP
   refine (MvPolynomial.continuous_eval q).comp (continuous_pi fun s => ?_)
   rcases s with ⟨i, j⟩ | ⟨i, j⟩
@@ -45,9 +48,10 @@ theorem continuous_evP {n : ℕ} (q : MvPolynomial ((Fin n × Fin n) ⊕ (Fin n 
   · simp only [Sum.elim_inr]
     exact Complex.continuous_conj.comp ((continuous_apply j).comp (continuous_apply i))
 
-theorem exists_delta_list {α : Type*} (S : List α) (P : α → ℝ → Prop)
-    (hP : ∀ a ∈ S, ∃ δ > (0 : ℝ), ∀ δ', 0 < δ' → δ' ≤ δ → P a δ') :
-    ∃ δ > (0 : ℝ), ∀ a ∈ S, ∀ δ', 0 < δ' → δ' ≤ δ → P a δ' := by
+theorem exists_delta_list
+    {α : Type*}
+    (S : List α) (P : α → ℝ → Prop) (hP : ∀ a ∈ S, ∃ δ > (0 : ℝ), ∀ δ', 0 < δ' → δ' ≤ δ → P a δ')
+    : ∃ δ > (0 : ℝ), ∀ a ∈ S, ∀ δ', 0 < δ' → δ' ≤ δ → P a δ' := by
   induction S with
   | nil => exact ⟨1, one_pos, fun a ha => by simp at ha⟩
   | cons a S ih =>
@@ -58,8 +62,10 @@ theorem exists_delta_list {α : Type*} (S : List α) (P : α → ℝ → Prop)
     · exact hδ1 δ' hδ' (hle.trans (min_le_left _ _))
     · exact hδ2 b hb δ' hδ' (hle.trans (min_le_right _ _))
 
-theorem exists_bound_list {α β : Type*} (S : List α) (A : Set β) (f : α → β → ℝ)
-    (h : ∀ a ∈ S, ∃ B : ℝ, ∀ b ∈ A, f a b ≤ B) : ∃ B : ℝ, 0 ≤ B ∧ ∀ a ∈ S, ∀ b ∈ A, f a b ≤ B := by
+theorem exists_bound_list
+    {α β : Type*}
+    (S : List α) (A : Set β) (f : α → β → ℝ) (h : ∀ a ∈ S, ∃ B : ℝ, ∀ b ∈ A, f a b ≤ B)
+    : ∃ B : ℝ, 0 ≤ B ∧ ∀ a ∈ S, ∀ b ∈ A, f a b ≤ B := by
   induction S with
   | nil => exact ⟨0, le_rfl, fun a ha => by simp at ha⟩
   | cons a S ih =>
@@ -70,28 +76,35 @@ theorem exists_bound_list {α β : Type*} (S : List α) (A : Set β) (f : α →
     · exact (hB1 b hb).trans ((le_max_left _ _).trans (le_max_left _ _))
     · exact (hB2 c hc b hb).trans ((le_max_right _ _).trans (le_max_left _ _))
 
-theorem sobApprox_of (h8a : HaarExists) (h8b : PolyKernel) (h8c : AvgSmooth) (h8d : AvgKFin) (h6 : Cont1)
-    (h8e : FoldBddK) : SobApprox := by
+theorem sobApprox_of
+    (h8a : HaarExists) (h8b : PolyKernel) (h8c : AvgSmooth) (h8d : AvgKFin) (h6 : Cont1)
+    (h8e : FoldBddK)
+    : SobApprox := by
   intro n H _ _ _ G s π hs hπ w hw S hS ε hε
   obtain ⟨μ, hμ⟩ := h8a G s hs
   have hμ' := hμ
   obtain ⟨-, hae, -, -⟩ := hμ'
   have hπ1 : π 1 = 1 := hπ.1
   have hε2 : 0 < ε / 2 := by linarith
-  obtain ⟨δ, hδ, hδS⟩ := exists_delta_list S
-    (fun l δ' => ∀ g ∈ Formalism.QuantumDeterminants.UH G, (∀ i j, ‖g i j - (1 : Matrix (Fin n) (Fin n) ℂ) i j‖ < δ') →
-      ‖dL π l (π g w) - dL π l w‖ < ε / 2)
-    (fun l hl => by
-      obtain ⟨δ₀, hδ₀, h⟩ := h6 G s π hs hπ w hw l (hS l hl) (ε / 2) hε2
-      exact ⟨δ₀, hδ₀, fun δ' _ hδ' g hg hgd => h g hg (fun i j => lt_of_lt_of_le (hgd i j) hδ')⟩)
-  obtain ⟨B, hB0, hB⟩ := exists_bound_list S (KAt G s) (fun l k => ‖dL π l (π k w)‖)
-    (fun l hl => h8e G s π hs hπ w hw l (hS l hl))
+  obtain ⟨δ, hδ, hδS⟩ :=
+    exists_delta_list S
+      (fun l δ' =>
+        ∀ g ∈ Formalism.QuantumDeterminants.UH G,
+          (∀ i j, ‖g i j - (1 : Matrix (Fin n) (Fin n) ℂ) i j‖ < δ')
+            → ‖dL π l (π g w) - dL π l w‖ < ε / 2)
+      (fun l hl => by
+        obtain ⟨δ₀, hδ₀, h⟩ := h6 G s π hs hπ w hw l (hS l hl) (ε / 2) hε2
+        exact ⟨δ₀, hδ₀, fun δ' _ hδ' g hg hgd => h g hg (fun i j => lt_of_lt_of_le (hgd i j) hδ')⟩)
+  obtain ⟨B, hB0, hB⟩ :=
+    exists_bound_list S (KAt G s)
+      (fun l k => ‖dL π l (π k w)‖)
+      (fun l hl => h8e G s π hs hπ w hw l (hS l hl))
   set U : Set (Fin n → Fin n → ℂ) := {k | ∀ i j, ‖k i j - (1 : Matrix (Fin n) (Fin n) ℂ) i j‖ < δ} with hU
   have hUo : IsOpen U := by
     rw [hU]
     simp only [Set.ofPred_forall]
-    exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-      isOpen_lt (by fun_prop) continuous_const
+    exact isOpen_iInter_of_finite fun i =>
+      isOpen_iInter_of_finite fun j => isOpen_lt (by fun_prop) continuous_const
   have hU1 : U ∈ 𝓝 (Matrix.of.symm (1 : Matrix (Fin n) (Fin n) ℂ)) := by
     refine hUo.mem_nhds fun i j => ?_
     simpa using hδ
@@ -102,11 +115,11 @@ theorem sobApprox_of (h8a : HaarExists) (h8b : PolyKernel) (h8c : AvgSmooth) (h8
   obtain ⟨hsm, hfold⟩ := h8c G s π hs hπ μ hμ (evP q) hec w hw
   refine ⟨∫ k, evP q k • π (Matrix.of k) w ∂μ, hsm, h8d G s π hs hπ μ hμ q w, fun l hl => ?_⟩
   obtain ⟨hint, hcomm⟩ := hfold l (hS l hl)
-  have hw1 : dL π l w = ∫ k, evP q k • dL π l w ∂μ := by
-    rw [integral_smul_const, hq1, one_smul]
+  have hw1 : dL π l w = ∫ k, evP q k • dL π l w ∂μ := by rw [integral_smul_const, hq1, one_smul]
   rw [hcomm, hw1, ← integral_sub hint (hqi.smul_const _)]
-  have hD : ∀ᵐ k ∂μ, ‖evP q k • dL π l (π (Matrix.of k) w) - evP q k • dL π l w‖ ≤
-      ‖evP q k‖ * (ε / 2) + Uᶜ.indicator (fun k => ‖evP q k‖ * (2 * B)) k := by
+  have hD
+      : ∀ᵐ k ∂μ, ‖evP q k • dL π l (π (Matrix.of k) w) - evP q k • dL π l w‖ ≤
+        ‖evP q k‖ * (ε / 2) + Uᶜ.indicator (fun k => ‖evP q k‖ * (2 * B)) k := by
     filter_upwards [hae] with k hk
     rw [← smul_sub, norm_smul]
     by_cases hkU : k ∈ U
@@ -121,11 +134,13 @@ theorem sobApprox_of (h8a : HaarExists) (h8b : PolyKernel) (h8c : AvgSmooth) (h8
         simp only [hπ1, one_apply_eq_self] at h
         exact h
       have h3 : ‖dL π l (π (Matrix.of k) w) - dL π l w‖ ≤ 2 * B := by
-        calc _ ≤ ‖dL π l (π (Matrix.of k) w)‖ + ‖dL π l w‖ := norm_sub_le _ _
+        calc
+          _ ≤ ‖dL π l (π (Matrix.of k) w)‖ + ‖dL π l w‖ := norm_sub_le _ _
           _ ≤ 2 * B := by linarith
       have h4 : 0 ≤ ‖evP q k‖ * (ε / 2) := by positivity
-      calc ‖evP q k‖ * ‖dL π l (π (Matrix.of k) w) - dL π l w‖ ≤ ‖evP q k‖ * (2 * B) :=
-            mul_le_mul_of_nonneg_left h3 (norm_nonneg _)
+      calc
+        ‖evP q k‖ * ‖dL π l (π (Matrix.of k) w) - dL π l w‖
+          ≤ ‖evP q k‖ * (2 * B) := mul_le_mul_of_nonneg_left h3 (norm_nonneg _)
         _ ≤ _ := by linarith
   have hmeasU : MeasurableSet Uᶜ := hUo.measurableSet.compl
   have hA : Integrable (fun k => ‖evP q k‖ * (ε / 2)) μ := hqi.norm.mul_const _
@@ -136,16 +151,17 @@ theorem sobApprox_of (h8a : HaarExists) (h8b : PolyKernel) (h8c : AvgSmooth) (h8
   have hηB : η * (2 * B) < ε / 2 := by
     rw [hη, div_mul_eq_mul_div, div_lt_div_iff₀ (by positivity) (by norm_num)]
     nlinarith
-  calc ‖∫ k, (evP q k • dL π l (π (Matrix.of k) w) - evP q k • dL π l w) ∂μ‖
-      ≤ ∫ k, ‖evP q k • dL π l (π (Matrix.of k) w) - evP q k • dL π l w‖ ∂μ :=
-        norm_integral_le_integral_norm _
+  calc
+    ‖∫ k, (evP q k • dL π l (π (Matrix.of k) w) - evP q k • dL π l w) ∂μ‖
+        ≤ ∫ k, ‖evP q k • dL π l (π (Matrix.of k) w) - evP q k • dL π l w‖ ∂μ :=
+      norm_integral_le_integral_norm _
     _ ≤ ∫ k, (‖evP q k‖ * (ε / 2) + Uᶜ.indicator (fun k => ‖evP q k‖ * (2 * B)) k) ∂μ :=
-        integral_mono_ae hsub.norm (hA.add hC) hD
+      integral_mono_ae hsub.norm (hA.add hC) hD
     _ = (∫ k, ‖evP q k‖ ∂μ) * (ε / 2) + (∫ k in Uᶜ, ‖evP q k‖ ∂μ) * (2 * B) := by
-        rw [integral_add hA hC, integral_indicator hmeasU, integral_mul_const, integral_mul_const]
+      rw [integral_add hA hC, integral_indicator hmeasU, integral_mul_const, integral_mul_const]
     _ ≤ 1 * (ε / 2) + η * (2 * B) :=
-        add_le_add (mul_le_mul_of_nonneg_right hqn hε2.le)
-          (mul_le_mul_of_nonneg_right hqU.le (by linarith))
+      add_le_add (mul_le_mul_of_nonneg_right hqn hε2.le)
+        (mul_le_mul_of_nonneg_right hqU.le (by linarith))
     _ < ε := by linarith
 
 end Formalism.IndefR.Tow.SobPf

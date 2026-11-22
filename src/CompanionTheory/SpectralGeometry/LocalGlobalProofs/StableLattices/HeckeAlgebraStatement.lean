@@ -20,12 +20,11 @@ def eps (K : Subgroup G) : ((G ⧸ K) →₀ ℂ) →ₗ[ℂ] ℂ := Finsupp.lin
 
 theorem smul_mk (g x : G) : g • (x : G ⧸ K) = ((g * x : G) : G ⧸ K) := rfl
 
-theorem lam_single (g : G) (x : G ⧸ K) (c : ℂ) :
-    lam K g (Finsupp.single x c) = Finsupp.single (g • x) c := by
+theorem lam_single (g : G) (x : G ⧸ K) (c : ℂ)
+    : lam K g (Finsupp.single x c) = Finsupp.single (g • x) c := by
   simp [lam, Finsupp.lmapDomain_apply, Finsupp.mapDomain_single]
 
-theorem eps_single (x : G ⧸ K) (c : ℂ) : eps K (Finsupp.single x c) = c := by
-  simp [eps]
+theorem eps_single (x : G ⧸ K) (c : ℂ) : eps K (Finsupp.single x c) = c := by simp [eps]
 
 theorem eps_lam (g : G) (v : (G ⧸ K) →₀ ℂ) : eps K (lam K g v) = eps K v := by
   induction v using Finsupp.induction_linear with
@@ -34,8 +33,7 @@ theorem eps_lam (g : G) (v : (G ⧸ K) →₀ ℂ) : eps K (lam K g v) = eps K v
   | single x c => rw [lam_single, eps_single, eps_single]
 
 theorem hk_comm (A : Hk K) (g : G) (v : (G ⧸ K) →₀ ℂ) : A.1 (lam K g v) = lam K g (A.1 v) := by
-  have h : lam K g * A.1 = A.1 * lam K g :=
-    (Subalgebra.mem_centralizer_iff ℂ).1 A.2 _ ⟨g, rfl⟩
+  have h : lam K g * A.1 = A.1 * lam K g := (Subalgebra.mem_centralizer_iff ℂ).1 A.2 _ ⟨g, rfl⟩
   exact (LinearMap.congr_fun h v).symm
 
 theorem lam_out_dd (y : G ⧸ K) : lam K (Quotient.out y) (dd K) = Finsupp.single y 1 := by
@@ -49,10 +47,11 @@ theorem lam_dd {k : G} (hk : k ∈ K) : lam K k (dd K) = dd K := by
 theorem hk_fixed (A : Hk K) {k : G} (hk : k ∈ K) : lam K k (A.1 (dd K)) = A.1 (dd K) := by
   rw [← hk_comm, lam_dd hk]
 
-theorem fixed_eq_smul (w : (G ⧸ K) →₀ ℂ) (hw : ∀ k ∈ K, lam K k w = w) (u : G) (S : Finset (G ⧸ K))
-    (hS : (↑S : Set (G ⧸ K)) = MulAction.orbit K (u : G ⧸ K))
-    (hsupp : ∀ y, y ∉ S → w y = 0) :
-    w = w (u : G ⧸ K) • ∑ y ∈ S, Finsupp.single y (1 : ℂ) := by
+theorem fixed_eq_smul
+    (w : (G ⧸ K) →₀ ℂ) (hw : ∀ k ∈ K, lam K k w = w)
+    (u : G) (S : Finset (G ⧸ K))
+    (hS : (↑S : Set (G ⧸ K)) = MulAction.orbit K (u : G ⧸ K)) (hsupp : ∀ y, y ∉ S → w y = 0)
+    : w = w (u : G ⧸ K) • ∑ y ∈ S, Finsupp.single y (1 : ℂ) := by
   classical
   ext y
   have hsum : (∑ x ∈ S, Finsupp.single x (1 : ℂ)) y = if y ∈ S then 1 else 0 := by
@@ -81,10 +80,13 @@ theorem q_ne (g : G) : q hp g ≠ 0 := by
 
 def R (T : G → Hk K) (hp : IsHeckePair K) (g : G) : Hk K := (q hp g)⁻¹ • T g
 
-variable (h1 : ∀ (g : G) (S : Finset (G ⧸ K)), (↑S : Set (G ⧸ K)) = MulAction.orbit K (g : G ⧸ K) →
-    (T g : Module.End ℂ ((G ⧸ K) →₀ ℂ)) (Finsupp.single ((1 : G) : G ⧸ K) 1) =
-      ∑ y ∈ S, Finsupp.single y (1 : ℂ))
-  (h3 : ∀ h : Hk K, (h : Module.End ℂ ((G ⧸ K) →₀ ℂ)) (Finsupp.single ((1 : G) : G ⧸ K) 1) = 0 → h = 0)
+variable
+  (h1 : ∀ (g : G) (S : Finset (G ⧸ K)),
+    (↑S : Set (G ⧸ K)) = MulAction.orbit K (g : G ⧸ K)
+      → (T g : Module.End ℂ ((G ⧸ K) →₀ ℂ)) (Finsupp.single ((1 : G) : G ⧸ K) 1)
+        = ∑ y ∈ S, Finsupp.single y (1 : ℂ))
+  (h3 : ∀ h : Hk K,
+    (h : Module.End ℂ ((G ⧸ K) →₀ ℂ)) (Finsupp.single ((1 : G) : G ⧸ K) 1) = 0 → h = 0)
 
 include h1
 
@@ -104,17 +106,17 @@ theorem ext_dd {A B : Hk K} (h : A.1 (dd K) = B.1 (dd K)) : A = B := by
   show (A.1 - B.1) (dd K) = 0
   rw [LinearMap.sub_apply, h, sub_self]
 
-theorem mul_of {g h u : G} (H : ∀ k ∈ K, ∃ a ∈ K, ∃ b ∈ K, h * k * g = a * u * b) :
-    T g * T h = (q hp g * q hp h / q hp u) • T u := by
-  have hw : (T g * T h).1 (dd K) =
-      ∑ y ∈ (hp h).toFinset, lam K (Quotient.out y) ((T g).1 (dd K)) := by
+theorem mul_of {g h u : G} (H : ∀ k ∈ K, ∃ a ∈ K, ∃ b ∈ K, h * k * g = a * u * b)
+    : T g * T h = (q hp g * q hp h / q hp u) • T u := by
+  have hw
+      : (T g * T h).1 (dd K) = ∑ y ∈ (hp h).toFinset, lam K (Quotient.out y) ((T g).1 (dd K)) := by
     show (T g).1 ((T h).1 (dd K)) = _
     set_option synthInstance.maxHeartbeats 100000 in
       rw [T_dd T hp h1 h, map_sum]
     refine Finset.sum_congr rfl fun y _ => ?_
     rw [← lam_out_dd, hk_comm]
-  have key : ∀ y ∈ (hp h).toFinset, ∀ z ∈ (hp g).toFinset,
-      (Quotient.out y) • z ∈ (hp u).toFinset := by
+  have key
+      : ∀ y ∈ (hp h).toFinset, ∀ z ∈ (hp g).toFinset, (Quotient.out y) • z ∈ (hp u).toFinset := by
     intro y hy z hz
     obtain ⟨k1, rfl⟩ := (hp h).mem_toFinset.1 hy
     obtain ⟨k3, rfl⟩ := (hp g).mem_toFinset.1 hz
@@ -127,11 +129,14 @@ theorem mul_of {g h u : G} (H : ∀ k ∈ K, ∃ a ∈ K, ∃ b ∈ K, h * k * g
     refine ⟨⟨(k1 : G) * a, K.mul_mem k1.2 ha⟩, ?_⟩
     show (((k1 : G) * a * u : G) : G ⧸ K) = (Quotient.out y0 * ((k3 : G) * g) : G)
     rw [QuotientGroup.eq]
-    have e : Quotient.out y0 * ((k3 : G) * g) = (k1 : G) * (h * ((((k1 : G) * h)⁻¹ * Quotient.out y0) * k3) * g) := by
+    have e
+        : Quotient.out y0 * ((k3 : G) * g)
+          = (k1 : G) * (h * ((((k1 : G) * h)⁻¹ * Quotient.out y0) * k3) * g) := by
       group
     rw [e, hab]
     have e2 : ((k1 : G) * a * u)⁻¹ * ((k1 : G) * (a * u * b)) = b := by group
-    rw [e2]; exact hb
+    rw [e2]
+    exact hb
   have hsupp : ∀ y, y ∉ (hp u).toFinset → ((T g * T h).1 (dd K)) y = 0 := by
     classical
     intro y hy
@@ -143,8 +148,10 @@ theorem mul_of {g h u : G} (H : ∀ k ∈ K, ∃ a ∈ K, ∃ b ∈ K, h * k * g
     rw [lam_single, Finsupp.single_apply, if_neg]
     intro e
     exact hy (e ▸ key x hx z hz)
-  have hfix := fixed_eq_smul ((T g * T h).1 (dd K)) (fun k hk => hk_fixed (T g * T h) hk) u
-    (hp u).toFinset (by simp) hsupp
+  have hfix :=
+    fixed_eq_smul ((T g * T h).1 (dd K))
+      (fun k hk => hk_fixed (T g * T h) hk)
+      u (hp u).toFinset (by simp) hsupp
   set c : ℂ := ((T g * T h).1 (dd K)) (u : G ⧸ K) with hc
   have heq : T g * T h = c • T u := by
     apply ext_dd T h1 h3
@@ -161,8 +168,8 @@ theorem mul_of {g h u : G} (H : ∀ k ∈ K, ∃ a ∈ K, ∃ b ∈ K, h * k * g
     rw [← e1, e2]
   rw [heq, eq_div_of_mul_eq (q_ne hp u) hq]
 
-theorem R_mul {g h u : G} (H : ∀ k ∈ K, ∃ a ∈ K, ∃ b ∈ K, h * k * g = a * u * b) :
-    R T hp g * R T hp h = R T hp u := by
+theorem R_mul {g h u : G} (H : ∀ k ∈ K, ∃ a ∈ K, ∃ b ∈ K, h * k * g = a * u * b)
+    : R T hp g * R T hp h = R T hp u := by
   have hg := q_ne hp g
   have hh := q_ne hp h
   have hu := q_ne hp u
@@ -170,20 +177,22 @@ theorem R_mul {g h u : G} (H : ∀ k ∈ K, ∃ a ∈ K, ∃ b ∈ K, h * k * g 
   congr 1
   field_simp
 
-theorem T_congr {g : G} {k k' : G} (hk : k ∈ K) (hk' : k' ∈ K) : T (k * g * k') = T g ∧ q hp (k * g * k') = q hp g := by
+theorem T_congr {g : G} {k k' : G} (hk : k ∈ K) (hk' : k' ∈ K)
+    : T (k * g * k') = T g ∧ q hp (k * g * k') = q hp g := by
   have e : ((k * g * k' : G) : G ⧸ K) = (⟨k, hk⟩ : K) • (g : G ⧸ K) := by
     show ((k * g * k' : G) : G ⧸ K) = ((k * g : G) : G ⧸ K)
     rw [QuotientGroup.eq]
     have : (k * g * k')⁻¹ * (k * g) = k'⁻¹ := by group
-    rw [this]; exact K.inv_mem hk'
+    rw [this]
+    exact K.inv_mem hk'
   have ho : MulAction.orbit K ((k * g * k' : G) : G ⧸ K) = MulAction.orbit K (g : G ⧸ K) := by
     rw [e, MulAction.orbit_smul]
-  have hf : (hp (k * g * k')).toFinset = (hp g).toFinset := by
-    ext x; simp [ho]
+  have hf : (hp (k * g * k')).toFinset = (hp g).toFinset := by ext x; simp [ho]
   refine ⟨ext_dd T h1 h3 ?_, by simp only [q, hf]⟩
   rw [T_dd T hp h1, T_dd T hp h1, hf]
 
-theorem R_congr {g : G} {k k' : G} (hk : k ∈ K) (hk' : k' ∈ K) : R T hp (k * g * k') = R T hp g := by
+theorem R_congr {g : G} {k k' : G} (hk : k ∈ K) (hk' : k' ∈ K)
+    : R T hp (k * g * k') = R T hp g := by
   obtain ⟨a, b⟩ := T_congr T hp h1 h3 (g := g) hk hk'
   rw [R, R, a, b]
 
@@ -212,28 +221,34 @@ theorem stHecke : StHecke := by
     rw [hc i]
     have : c i * ((c i)⁻¹ * k * c i) * (c i)⁻¹ = k := by group
     rwa [this]
-  have hmul : ∀ s ∈ Submonoid.closure (Set.range t), ∀ s' ∈ Submonoid.closure (Set.range t),
-      R T hp s' * R T hp s = R T hp (s * s') := fun s hs s' hs' =>
+  have hmul
+      : ∀ s ∈ Submonoid.closure (Set.range t), ∀ s' ∈ Submonoid.closure (Set.range t),
+        R T hp s' * R T hp s = R T hp (s * s') := fun s hs s' hs' =>
     R_mul T hp h1 h3 (hmon s hs s' hs')
   have hcomm : ∀ i j, Commute (R T hp (t i)) (R T hp (t j)) := by
     intro i j
-    have mi : t i ∈ Submonoid.closure (Set.range t) := Submonoid.subset_closure (Set.mem_range_self i)
-    have mj : t j ∈ Submonoid.closure (Set.range t) := Submonoid.subset_closure (Set.mem_range_self j)
+    have mi : t i ∈ Submonoid.closure (Set.range t) :=
+      Submonoid.subset_closure (Set.mem_range_self i)
+    have mj : t j ∈ Submonoid.closure (Set.range t) :=
+      Submonoid.subset_closure (Set.mem_range_self j)
     show R T hp (t i) * R T hp (t j) = R T hp (t j) * R T hp (t i)
     rw [hmul _ mj _ mi, hmul _ mi _ mj, (ht i j).eq]
-  have hadj : ∀ s ∈ Submonoid.closure (Set.range t),
-      R T hp s ∈ Algebra.adjoin ℂ (Set.range (R T hp ∘ t)) := by
+  have hadj
+      : ∀ s ∈ Submonoid.closure (Set.range t),
+        R T hp s ∈ Algebra.adjoin ℂ (Set.range (R T hp ∘ t)) := by
     intro s hs
     induction hs using Submonoid.closure_induction with
     | mem x hx =>
       obtain ⟨i, rfl⟩ := hx
       exact Algebra.subset_adjoin ⟨i, rfl⟩
-    | one => rw [R_one T hp h1 h3]; exact Subalgebra.one_mem _
+    | one =>
+      rw [R_one T hp h1 h3]; exact Subalgebra.one_mem _
     | mul x y hx hy ihx ihy =>
       rw [← hmul x hx y hy]
       exact Subalgebra.mul_mem _ ihy ihx
-  have hprod : ∀ i j, ∀ s ∈ Submonoid.closure (Set.range t),
-      R T hp (c i * s * c j) = R T hp (c j) * R T hp s * R T hp (c i) := by
+  have hprod
+      : ∀ i j, ∀ s ∈ Submonoid.closure (Set.range t),
+        R T hp (c i * s * c j) = R T hp (c j) * R T hp s * R T hp (c i) := by
     intro i j s _
     have e1 : R T hp s * R T hp (c i) = R T hp (c i * s) := by
       refine R_mul T hp h1 h3 fun k hk => ⟨c i * k * (c i)⁻¹, (hc i k).1 hk, 1, K.one_mem, ?_⟩
@@ -246,7 +261,9 @@ theorem stHecke : StHecke := by
   rw [eq_top_iff, ← h2, Submodule.span_le]
   rintro _ ⟨g, rfl⟩
   obtain ⟨i, j, s, hs, k, hk, k', hk', rfl⟩ := hdec g
-  have hT : T (k * c i * s * c j * k') = q hp (k * c i * s * c j * k') • R T hp (k * c i * s * c j * k') := by
+  have hT
+      : T (k * c i * s * c j * k')
+        = q hp (k * c i * s * c j * k') • R T hp (k * c i * s * c j * k') := by
     rw [R, smul_smul, mul_inv_cancel₀ (q_ne hp _), one_smul]
   rw [hT]
   refine Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, i, R T hp s, hadj s hs, ?_⟩)

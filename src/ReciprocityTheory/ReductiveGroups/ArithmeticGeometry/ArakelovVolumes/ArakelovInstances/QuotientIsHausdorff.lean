@@ -6,7 +6,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Inst
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y MeasureTheory Topology
 
 noncomputable section
 
@@ -19,8 +20,6 @@ def PropDisc {r : ℕ} (X : Data E r) : Prop :=
 def GGConnStatement : Prop := ∀ (r : ℕ) (X : Data E r), IsConnected X.dom
 
 variable {r : ℕ} (X : Data E r) [T2Space (Yq X)] [SecondCountableTopology (Yq X)]
-
-
 
 end
 

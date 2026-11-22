@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Lattic
 
 namespace GlobalTheory.Proof.latticeNormalForm_modulo_unipotentSemidirect
 
-theorem latticeNormalForm : GlobalTheory.IndefiniteRowSideFullHecke.FlagUnipotentSemidirect.LatticeNormalForm :=
+theorem latticeNormalForm
+    : GlobalTheory.IndefiniteRowSideFullHecke.FlagUnipotentSemidirect.LatticeNormalForm :=
   GlobalTheory.Proof.LatticeNormalFormUnipotent.latticeNormalForm
 
 end GlobalTheory.Proof.latticeNormalForm_modulo_unipotentSemidirect

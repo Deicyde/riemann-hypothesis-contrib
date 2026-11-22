@@ -8,7 +8,8 @@ public import GroundTheory.AutomorphicForms.GL2.GJUnramified
 
 noncomputable section
 
-open MeasureTheory Polynomial GroundTheory.Automorphic GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Parabolic
+open MeasureTheory Polynomial GroundTheory.Automorphic GroundTheory.Automorphic.GLnLocal
+  GroundTheory.Automorphic.Parabolic
 open GroundTheory.Automorphic.GodementJacquet
 open scoped NNReal Classical ValuativeRel
 
@@ -18,15 +19,16 @@ section SlopeTestRemainingChoices
 
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 
-private theorem integral_iff_one (g : GL (Fin 1) F) :
-    (∀ i j, (g : Matrix (Fin 1) (Fin 1) F) i j ∈ 𝒪[F]) ↔ 0 ≤ ordDet g := by
+private theorem integral_iff_one (g : GL (Fin 1) F)
+    : (∀ i j, (g : Matrix (Fin 1) (Fin 1) F) i j ∈ 𝒪[F]) ↔ 0 ≤ ordDet g := by
   constructor
   · exact ordDet_nonneg_of_integral
   · intro h i j
     rw [Fin.fin_one_eq_zero i, Fin.fin_one_eq_zero j]
     have hne : (g : Matrix (Fin 1) (Fin 1) F) 0 0 ≠ 0 := by
       simpa [Matrix.det_unique] using det_ne_zero g
-    rw [← GroundTheory.LocalField.mem_valBall_zero_iff, GroundTheory.LocalField.mem_valBall_iff_le_ord hne]
+    rw [← GroundTheory.LocalField.mem_valBall_zero_iff,
+      GroundTheory.LocalField.mem_valBall_iff_le_ord hne]
     simpa [ordDet, Matrix.det_unique] using h
 
 private theorem mem_tile_one (g : GL (Fin 1) F) : g ∈ tile F 1 0 ↔ ordDet g = 0 := by
@@ -50,11 +52,17 @@ private theorem isCompact_tile_one : IsCompact (tile F 1 0) := by
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.local_zeta_integral_tate_comparison :
-    UpperTheory.V.Z.Gam.LdTate := by
+theorem UpperTheory.local_zeta_integral_tate_comparison : UpperTheory.V.Z.Gam.LdTate := by
   intro F _ _ _ _ _ _ μ _
-  refine ⟨integralIndicator F 1, isSchwartzBruhat_integralIndicator, ((μ.real (tile F 1 0) : ℝ) : ℂ), ?_, ?_⟩
-  · have hpos : 0 < μ (tile F 1 0) := (isOpen_tile 0).measure_pos μ ⟨1, (mem_tile_one 1).2 ordDet_one⟩
+  refine ⟨
+    integralIndicator F 1,
+    isSchwartzBruhat_integralIndicator,
+    ((μ.real (tile F 1 0) : ℝ) : ℂ),
+    ?_,
+    ?_
+  ⟩
+  · have hpos : 0 < μ (tile F 1 0) :=
+      (isOpen_tile 0).measure_pos μ ⟨1, (mem_tile_one 1).2 ordDet_one⟩
     have hfin : μ (tile F 1 0) < ⊤ := isCompact_tile_one.measure_lt_top
     show (((μ (tile F 1 0)).toReal : ℝ) : ℂ) ≠ 0
     exact_mod_cast (ENNReal.toReal_pos hpos.ne' hfin.ne).ne'
@@ -62,17 +70,24 @@ theorem UpperTheory.local_zeta_integral_tate_comparison :
     have hs1 : ‖α * qs F s‖ < 1 := by simpa using hs
     have hint := hc.integrable_zeta μ (isSchwartzBruhat_integralIndicator (F := F) (n := 1)) hs
     have h1 := hasSum_integral_tile μ hint
-    have hterm : ∀ j : ℤ, (∫ g in tile F 1 0, integralIndicator F 1 ↑(centralUnif F 1 ^ j * g) *
-        detPow (centralUnif F 1 ^ j * g) s * c (centralUnif F 1 ^ j * g) ∂μ) =
-        if 0 ≤ j then (α * qs F s) ^ j * c 1 * ((μ.real (tile F 1 0) : ℝ) : ℂ) else 0 := by
+    have hterm
+        : ∀ j : ℤ,
+          (∫ g in tile F 1 0, integralIndicator F 1 ↑(centralUnif F 1 ^ j * g) *
+            detPow (centralUnif F 1 ^ j * g) s * c (centralUnif F 1 ^ j * g) ∂μ)
+            = if 0 ≤ j then (α * qs F s) ^ j * c 1 * ((μ.real (tile F 1 0) : ℝ) : ℂ) else 0 := by
       intro j
-      have hEq : Set.EqOn (fun g => integralIndicator F 1 ↑(centralUnif F 1 ^ j * g) *
-          detPow (centralUnif F 1 ^ j * g) s * c (centralUnif F 1 ^ j * g))
-          (fun _ => if 0 ≤ j then (α * qs F s) ^ j * c 1 else 0) (tile F 1 0) := by
+      have hEq : Set.EqOn
+          (fun g =>
+            integralIndicator F 1 ↑(centralUnif F 1 ^ j * g) * detPow (centralUnif F 1 ^ j * g) s
+              * c (centralUnif F 1 ^ j * g))
+          (fun _ => if 0 ≤ j then (α * qs F s) ^ j * c 1 else 0)
+          (tile F 1 0) := by
         intro g hg
         have hgK := int_of_tile hg
         have h0 := (mem_tile_one g).1 hg
-        have hiff : ((↑(centralUnif F 1 ^ j * g) : Matrix (Fin 1) (Fin 1) F) ∈ integralMatrixSet F 1) ↔ 0 ≤ j := by
+        have hiff
+            : ((↑(centralUnif F 1 ^ j * g) : Matrix (Fin 1) (Fin 1) F) ∈ integralMatrixSet F 1)
+              ↔ 0 ≤ j := by
           rw [mem_integralMatrixSet, integral_iff_one, ordDet_centralUnif_zpow_mul, h0]
           push_cast
           omega
@@ -93,9 +108,11 @@ theorem UpperTheory.local_zeta_integral_tate_comparison :
       split_ifs <;> ring
     have h2 := h1
     simp only [hterm] at h2
-    have hgeo : HasSum (fun j : ℤ => if 0 ≤ j then (α * qs F s) ^ j * c 1 * ((μ.real (tile F 1 0) : ℝ) : ℂ) else 0)
+    have hgeo : HasSum
+        (fun j : ℤ => if 0 ≤ j then (α * qs F s) ^ j * c 1 * ((μ.real (tile F 1 0) : ℝ) : ℂ) else 0)
         ((1 - α * qs F s)⁻¹ * (c 1 * ((μ.real (tile F 1 0) : ℝ) : ℂ))) := by
-      have hn := (hasSum_geometric_of_norm_lt_one hs1).mul_right (c 1 * ((μ.real (tile F 1 0) : ℝ) : ℂ))
+      have hn :=
+        (hasSum_geometric_of_norm_lt_one hs1).mul_right (c 1 * ((μ.real (tile F 1 0) : ℝ) : ℂ))
       rw [← Nat.cast_injective.hasSum_iff]
       · simpa [Function.comp_def, zpow_natCast, mul_assoc] using hn
       · intro j hj

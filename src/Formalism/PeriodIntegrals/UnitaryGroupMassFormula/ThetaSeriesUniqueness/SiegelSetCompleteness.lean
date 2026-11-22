@@ -13,14 +13,16 @@ open Complex Filter Topology
 theorem siegel_set_completeness : Complete := by
   intro f hf hper hcoef
   haveI : Fact ((0 : ℝ) < 1) := ⟨one_pos⟩
-  have hpr : Function.Periodic (fun x : ℝ => f x) 1 := fun x => by
-    simpa using hper (x : ℂ)
+  have hpr : Function.Periodic (fun x : ℝ => f x) 1 := fun x => by simpa using hper (x : ℂ)
   have hcont : Continuous (fun x : ℝ => f x) := hf.continuous.comp Complex.continuous_ofReal
-  let F : C(AddCircle (1 : ℝ), ℂ) := ⟨hpr.lift, by
-    first
+  let F : C(AddCircle (1 : ℝ), ℂ) := ⟨
+    hpr.lift,
+    by
+      first
       | exact continuous_coinduced_dom.mpr hcont
       | exact hcont.quotient_liftOn' _
-      | exact (QuotientAddGroup.isQuotientMap_mk _).continuous_iff.mpr hcont⟩
+      | exact (QuotientAddGroup.isQuotientMap_mk _).continuous_iff.mpr hcont
+  ⟩
   have hF : ∀ x : ℝ, F x = f x := fun x => rfl
   have hcF : ∀ n : ℤ, fourierCoeff F n = 0 := by
     intro n
@@ -38,9 +40,9 @@ theorem siegel_set_completeness : Complete := by
     exact hs.unique hasSum_zero
   have hF0 : F = 0 := by
     first
-      | exact ContinuousMap.toLp_injective AddCircle.haarAddCircle (hL.trans (map_zero _).symm)
-      | exact ContinuousMap.toLp_injective (p := 2) (μ := AddCircle.haarAddCircle) (𝕜 := ℂ)
-          (hL.trans (map_zero _).symm)
+    | exact ContinuousMap.toLp_injective AddCircle.haarAddCircle (hL.trans (map_zero _).symm)
+    | exact ContinuousMap.toLp_injective (p := 2) (μ := AddCircle.haarAddCircle) (𝕜 := ℂ)
+        (hL.trans (map_zero _).symm)
   have hreal : ∀ x : ℝ, f x = 0 := fun x => by
     have := DFunLike.congr_fun hF0 (x : AddCircle (1 : ℝ))
     rwa [hF, ContinuousMap.zero_apply] at this

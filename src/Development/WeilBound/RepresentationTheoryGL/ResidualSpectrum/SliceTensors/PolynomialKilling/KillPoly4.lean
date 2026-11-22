@@ -74,10 +74,12 @@ theorem killPoly4 : KillPoly := by
       rfl
   have hint : IsIntegral ℂ (T 1) := Algebra.IsIntegral.isIntegral _
   refine ⟨minpoly ℂ (T 1), minpoly.monic hint, fun g => ?_, ?_⟩
-  · have h0 := congrArg (fun w : V => (w : G → ℂ) g) (LinearMap.congr_fun (minpoly.aeval ℂ (T 1)) v₀)
-    simp only [Polynomial.aeval_eq_sum_range, LinearMap.sum_apply, Finset.sum_apply, LinearMap.smul_apply,
-      Submodule.coe_sum, Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, hpow, LinearMap.zero_apply,
-      Submodule.coe_zero, Pi.zero_apply] at h0
+  · have h0 :=
+      congrArg (fun w : V => (w : G → ℂ) g) (LinearMap.congr_fun (minpoly.aeval ℂ (T 1)) v₀)
+    simp only [Polynomial.aeval_eq_sum_range, LinearMap.sum_apply, Finset.sum_apply,
+        LinearMap.smul_apply, Submodule.coe_sum, Submodule.coe_smul, Pi.smul_apply, smul_eq_mul,
+        hpow, LinearMap.zero_apply, Submodule.coe_zero, Pi.zero_apply]
+      at h0
     exact h0
   · intro z hz
     have hev : Module.End.HasEigenvalue (T 1) z := Module.End.hasEigenvalue_iff_isRoot.2 hz
@@ -92,18 +94,22 @@ theorem killPoly4 : KillPoly := by
     have hf0 : (v : G → ℂ) ≠ 0 := fun h => hv0 (Subtype.ext h)
     obtain ⟨g₀, hg₀⟩ := Function.ne_iff.1 hf0
     have hg₀' : (v : G → ℂ) g₀ ≠ 0 := hg₀
-    have heig : ∀ t g, (v : G → ℂ) (a t * g) = (v : G → ℂ) (a t * g₀) / (v : G → ℂ) g₀ * (v : G → ℂ) g := by
+    have heig
+        : ∀ t g,
+          (v : G → ℂ) (a t * g) = (v : G → ℂ) (a t * g₀) / (v : G → ℂ) g₀ * (v : G → ℂ) g := by
       intro t g
       obtain ⟨μ, hμt⟩ := hμ t
       have e : ∀ g, (v : G → ℂ) (a t * g) = μ * (v : G → ℂ) g := fun g =>
         congrArg (fun w : V => (w : G → ℂ) g) hμt
       rw [e g, e g₀, mul_div_cancel_right₀ _ hg₀']
-    obtain ⟨c, hc⟩ := UpperTheory.V.Lib.Small.exists_eq_exp (fun t => (v : G → ℂ) (a t * g₀) / (v : G → ℂ) g₀)
-      ((hcV _ v.2 g₀).div_const _) (by simp only [ha0, one_mul, div_self hg₀'])
-      (fun s t => by
-        show (v : G → ℂ) (a (s + t) * g₀) / (v : G → ℂ) g₀ =
-          (v : G → ℂ) (a s * g₀) / (v : G → ℂ) g₀ * ((v : G → ℂ) (a t * g₀) / (v : G → ℂ) g₀)
-        rw [ha, mul_assoc, heig s (a t * g₀), mul_div_assoc])
+    obtain ⟨c, hc⟩ :=
+      UpperTheory.V.Lib.Small.exists_eq_exp
+        (fun t => (v : G → ℂ) (a t * g₀) / (v : G → ℂ) g₀)
+        ((hcV _ v.2 g₀).div_const _) (by simp only [ha0, one_mul, div_self hg₀'])
+        (fun s t => by
+          show (v : G → ℂ) (a (s + t) * g₀) / (v : G → ℂ) g₀ =
+            (v : G → ℂ) (a s * g₀) / (v : G → ℂ) g₀ * ((v : G → ℂ) (a t * g₀) / (v : G → ℂ) g₀)
+          rw [ha, mul_assoc, heig s (a t * g₀), mul_div_assoc])
     refine ⟨c, ?_, (v : G → ℂ), v.2, hf0, fun t g => ?_⟩
     · have h1 : (v : G → ℂ) (a 1 * g₀) = z * (v : G → ℂ) g₀ :=
         congrArg (fun w : V => (w : G → ℂ) g₀) (Module.End.mem_eigenspace_iff.1 hvW)

@@ -12,9 +12,9 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.PSer
 
-theorem untilt_injective_zero_and_dvd_of_norm_sh_le :
-    ∀ (l : ℕ) [Fact l.Prime], (∀ x : Fl l, sh x = 0 → x = 0) ∧
-      ∀ x y : Fl l, ‖sh x‖ ≤ ‖sh y‖ → y ∣ x := by
+theorem untilt_injective_zero_and_dvd_of_norm_sh_le
+    : ∀ (l : ℕ) [Fact l.Prime],
+      (∀ x : Fl l, sh x = 0 → x = 0) ∧ ∀ x y : Fl l, ‖sh x‖ ≤ ‖sh y‖ → y ∣ x := by
   intro l _
   obtain ⟨e, he⟩ := GlobalTheory.T.exists_tiltIntegersCpEquiv_compatible_untilt l
   refine ⟨fun x hx => ?_, fun x y hxy => ?_⟩

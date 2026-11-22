@@ -6,16 +6,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.CA UpperTheory.V.Pa Polynomial
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.CA UpperTheory.V.Pa Polynomial
 open scoped TensorProduct
 
-private theorem gdet_eq_ofRep {n : ℕ} {A G E S : Type} [CommRing A] [Group G] [Ring E] [Algebra A E] [CommRing S]
-    [Algebra A S] (D : GDet n A G) (DE : Det n A E) (ι : MonoidAlgebra A G →ₐ[A] E) (hp : DE.pull ι = D.toDet)
-    (hch : DE.IsCH) (ep : Fin n → E) (he : CompleteOrthogonalIdempotents ep)
-    (h1 : ∀ i, DE.D A[X] (1 + X ⊗ₜ ep i) = 1 + X) (φ : E →ₐ[A] Matrix (Fin n) (Fin n) S)
-    (hφ : ∀ i, φ (ep i) = single i i 1) (vr : G →* Matrix (Fin n) (Fin n) S)
-    (hvr : ∀ γ, vr γ = φ (ι (MonoidAlgebra.single γ 1))) :
-    D.map (algebraMap A S) = GDet.ofRep vr := by
+private theorem gdet_eq_ofRep
+    {n : ℕ} {A G E S : Type}
+    [CommRing A] [Group G] [Ring E] [Algebra A E] [CommRing S] [Algebra A S]
+    (D : GDet n A G) (DE : Det n A E) (ι : MonoidAlgebra A G →ₐ[A] E) (hp : DE.pull ι = D.toDet)
+    (hch : DE.IsCH)
+    (ep : Fin n → E)
+    (he : CompleteOrthogonalIdempotents ep) (h1 : ∀ i, DE.D A[X] (1 + X ⊗ₜ ep i) = 1 + X)
+    (φ : E →ₐ[A] Matrix (Fin n) (Fin n) S) (hφ : ∀ i, φ (ep i) = single i i 1)
+    (vr : G →* Matrix (Fin n) (Fin n) S) (hvr : ∀ γ, vr γ = φ (ι (MonoidAlgebra.single γ 1)))
+    : D.map (algebraMap A S) = GDet.ofRep vr := by
   refine GDet.ext fun T _ _ y => ?_
   letI : Algebra A T := ((algebraMap S T).comp (algebraMap A S)).toAlgebra
   haveI : IsScalarTower A S T := .of_algebraMap_eq fun _ => rfl
@@ -45,8 +49,16 @@ private theorem gdet_eq_ofRep {n : ℕ} {A G E S : Type} [CommRing A] [Group G] 
     rw [toT_single, Algebra.TensorProduct.map_tmul, hψ, ← hvr]
     simp [GDet.repAlg]
 
-theorem UpperTheory.V.Pa.gr_det :
-    ∀ {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} {h : G.Hom G0} {n : ℕ} {x : NP G0.frame n} {B : Type} [CommRing B] [IsLocalRing B] {D : GDet n B G.G₀} {I : Set (MonoidAlgebra B G.G₀)} {Bh : Type} [CommRing Bh] [IsLocalRing Bh] [Algebra B Bh] [Algebra Bh (FractionRing x.A)] {e : G.G₀ →* Bˣ} (H : Hat h x D I Bh e) {ep : Fin n → H.E} (g : GrAlg H.T n x.a H.r ep), CompleteOrthogonalIdempotents ep → (∀ i, H.DE.D Bh[X] (1 + X ⊗ₜ ep i) = 1 + X) → ∀ vr : G.G₀ →* Matrix (Fin n) (Fin n) g.AA, (∀ γ, vr γ = g.φ (H.ι (MonoidAlgebra.single γ 1))) → D.map ((algebraMap Bh g.AA).comp (algebraMap B Bh)) = GDet.ofRep vr := by
+theorem UpperTheory.V.Pa.gr_det
+    : ∀ {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} {h : G.Hom G0} {n : ℕ}
+        {x : NP G0.frame n} {B : Type} [CommRing B] [IsLocalRing B] {D : GDet n B G.G₀}
+        {I : Set (MonoidAlgebra B G.G₀)} {Bh : Type} [CommRing Bh] [IsLocalRing Bh] [Algebra B Bh]
+        [Algebra Bh (FractionRing x.A)] {e : G.G₀ →* Bˣ} (H : Hat h x D I Bh e) {ep : Fin n → H.E}
+        (g : GrAlg H.T n x.a H.r ep),
+      CompleteOrthogonalIdempotents ep → (∀ i, H.DE.D Bh[X] (1 + X ⊗ₜ ep i) = 1 + X)
+        → ∀ vr : G.G₀ →* Matrix (Fin n) (Fin n) g.AA,
+          (∀ γ, vr γ = g.φ (H.ι (MonoidAlgebra.single γ 1)))
+            → D.map ((algebraMap Bh g.AA).comp (algebraMap B Bh)) = GDet.ofRep vr := by
   intro l _ L G G0 h n x B _ _ D I Bh _ _ _ _ e H ep g he h1 vr hvr
   rw [← (d_gmap D).2.1]
   exact gdet_eq_ofRep _ H.DE H.ι H.pull H.ch ep he h1 g.φ g.φ_ep vr hvr

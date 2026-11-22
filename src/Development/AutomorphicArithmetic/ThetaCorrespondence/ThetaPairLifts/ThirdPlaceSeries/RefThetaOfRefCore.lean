@@ -24,9 +24,15 @@ section
 set_option autoImplicit false
 set_option synthInstance.maxHeartbeats 400000
 noncomputable section
-open GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.FlatTw GlobalTheory.SlopeRec GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.RefSum
+open GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects NumberField IsDedekindDomain
+  Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AllWt GlobalTheory.FlatLine
+  GlobalTheory.FlatTw GlobalTheory.SlopeRec GlobalTheory.CovTop GlobalTheory.BigTop
+  GlobalTheory.RefSum
 namespace GlobalTheory.RefSum
-theorem refTheta_of_refCore_alt : _root_.GlobalTheory.CovTop.SizeCondition → _root_.GlobalTheory.RefSum.ReferenceCore → _root_.GlobalTheory.RefSum.ReferenceTheta := by
+theorem refTheta_of_refCore_alt
+    : _root_.GlobalTheory.CovTop.SizeCondition → _root_.GlobalTheory.RefSum.ReferenceCore
+      → _root_.GlobalTheory.RefSum.ReferenceTheta := by
   intro hS hR
   have hW := _root_.GlobalTheory.T.quotient_weight_gap_bounds' hS
   refine Closed.imp (Closed.and hR hW) ?_

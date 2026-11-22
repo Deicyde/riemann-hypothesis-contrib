@@ -8,12 +8,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AdditiveVal
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-theorem UpperTheory.V.Two.dualGen :
-    ∀ (l : ℕ) [Fact l.Prime] (D : Type) [AddCommGroup D] [Module ℤ_[l] D] (r : ℕ), (∀ x : D, ∃ k : ℕ, (l : ℤ_[l]) ^ k • x = 0) → CardLe (Submodule.torsionBy ℤ_[l] D (l : ℤ_[l])) (l ^ r) →
-      Tower.GenLE ℤ_[l] (D →ₗ[ℤ_[l]] QZ l) r := by
+theorem UpperTheory.V.Two.dualGen
+    : ∀ (l : ℕ) [Fact l.Prime] (D : Type) [AddCommGroup D] [Module ℤ_[l] D] (r : ℕ),
+      (∀ x : D, ∃ k : ℕ, (l : ℤ_[l]) ^ k • x = 0)
+        → CardLe (Submodule.torsionBy ℤ_[l] D (l : ℤ_[l])) (l ^ r)
+        → Tower.GenLE ℤ_[l] (D →ₗ[ℤ_[l]] QZ l) r := by
   intro l _ D _ _ r htors hcard
   classical
   obtain ⟨f, hf⟩ := embedQZ l D r htors hcard

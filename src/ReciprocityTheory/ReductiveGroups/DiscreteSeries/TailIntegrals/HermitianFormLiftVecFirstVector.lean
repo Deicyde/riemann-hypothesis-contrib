@@ -13,15 +13,15 @@ open Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.Fourier
 
 namespace BL
 
-theorem ell_col (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (g : Mat k r) :
-    ell k r z g = ∑ a : Fin r, (g *ᵥ fvec k r z ⟨a.val + 1, by omega⟩) (eI k r a) := by
+theorem ell_col (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (g : Mat k r)
+    : ell k r z g = ∑ a : Fin r, (g *ᵥ fvec k r z ⟨a.val + 1, by omega⟩) (eI k r a) := by
   unfold ell
   refine Finset.sum_congr rfl fun a _ => ?_
   by_cases h : a.val + 1 < r
   · rw [dif_pos h]
     first
-      | simp [fvec, h, bvec, Matrix.mulVec_single_one]
-      | simp [fvec, h, bvec, Matrix.mulVec, dotProduct, Pi.single_apply]
+    | simp [fvec, h, bvec, Matrix.mulVec_single_one]
+    | simp [fvec, h, bvec, Matrix.mulVec, dotProduct, Pi.single_apply]
   · rw [dif_neg h]
     simp [fvec, h]
 
@@ -30,21 +30,25 @@ variable {k r' : ℕ}
 
 theorem hpk_sh (p q : Fin (2 * r' + k + 1)) : Hpk k (1 + r') (sh p) (sh q) = Hpk k r' p q := by
   simp only [Hpk, sh, Fin.ext_iff, Fin.val_mk]
-  have e1 : (p.val + 1 < 1 + r' ∧ p.val + 1 + (q.val + 1) = 2 * (1 + r') + k) ↔
-      (p.val < r' ∧ p.val + q.val = 2 * r' + k) := by
+  have e1
+      : (p.val + 1 < 1 + r' ∧ p.val + 1 + (q.val + 1) = 2 * (1 + r') + k)
+        ↔ (p.val < r' ∧ p.val + q.val = 2 * r' + k) := by
     constructor <;> intro h <;> omega
-  have e2 : (q.val + 1 < 1 + r' ∧ p.val + 1 + (q.val + 1) = 2 * (1 + r') + k) ↔
-      (q.val < r' ∧ p.val + q.val = 2 * r' + k) := by
+  have e2
+      : (q.val + 1 < 1 + r' ∧ p.val + 1 + (q.val + 1) = 2 * (1 + r') + k)
+        ↔ (q.val < r' ∧ p.val + q.val = 2 * r' + k) := by
     constructor <;> intro h <;> omega
-  have e3 : (1 + r' ≤ p.val + 1 ∧ p.val + 1 ≤ 1 + r' + k ∧ p.val + 1 = q.val + 1) ↔
-      (r' ≤ p.val ∧ p.val ≤ r' + k ∧ p.val = q.val) := by
+  have e3
+      : (1 + r' ≤ p.val + 1 ∧ p.val + 1 ≤ 1 + r' + k ∧ p.val + 1 = q.val + 1)
+        ↔ (r' ≤ p.val ∧ p.val ≤ r' + k ∧ p.val = q.val) := by
     constructor <;> intro h <;> omega
-  have e4 : (p.val + 1 = 1 + r' + k) ↔ (p.val = r' + k) := by
-    constructor <;> intro h <;> omega
+  have e4 : (p.val + 1 = 1 + r' + k) ↔ (p.val = r' + k) := by constructor <;> intro h <;> omega
   simp only [e1, e2, e3, e4]
 
-theorem hpk_out (p : Fin (2 * (1 + r') + k + 1)) (hp : p.val = 0 ∨ p.val = 2 * (1 + r') + k)
-    (q : Fin (2 * r' + k + 1)) : Hpk k (1 + r') p (sh q) = 0 := by
+theorem hpk_out
+    (p : Fin (2 * (1 + r') + k + 1)) (hp : p.val = 0 ∨ p.val = 2 * (1 + r') + k)
+    (q : Fin (2 * r' + k + 1))
+    : Hpk k (1 + r') p (sh q) = 0 := by
   have := p.isLt
   have := q.isLt
   simp only [Hpk, sh, Fin.ext_iff, Fin.val_mk]
@@ -85,8 +89,8 @@ private lemma liftVec_apply_sh (v : Fin (2 * r' + k + 1) → ℂ) (q : Fin (2 * 
   rw [dif_pos h1]
   exact congrArg v (Fin.ext (by simp [sh]))
 
-theorem hpk_lv (v : Fin (2 * r' + k + 1) → ℂ) :
-    Hpk k (1 + r') *ᵥ liftVec k 1 r' v = liftVec k 1 r' (Hpk k r' *ᵥ v) := by
+theorem hpk_lv (v : Fin (2 * r' + k + 1) → ℂ)
+    : Hpk k (1 + r') *ᵥ liftVec k 1 r' v = liftVec k 1 r' (Hpk k r' *ᵥ v) := by
   funext p
   simp only [Matrix.mulVec, dotProduct]
   refine (sum_eq_sum_sh_of_zero_at_edges _ ?_).trans ?_
@@ -104,8 +108,8 @@ theorem hpk_lv (v : Fin (2 * r' + k + 1) → ℂ) :
       rw [hp']
       simp only [hpk_sh, liftVec_apply_sh, Matrix.mulVec, dotProduct]
 
-theorem herm_lv (v w : Fin (2 * r' + k + 1) → ℂ) :
-    herm (Hpk k (1 + r')) (liftVec k 1 r' v) (liftVec k 1 r' w) = herm (Hpk k r') v w := by
+theorem herm_lv (v w : Fin (2 * r' + k + 1) → ℂ)
+    : herm (Hpk k (1 + r')) (liftVec k 1 r' v) (liftVec k 1 r' w) = herm (Hpk k r') v w := by
   unfold herm
   rw [hpk_lv]
   simp only [dotProduct, Pi.star_apply]
@@ -115,7 +119,8 @@ theorem herm_lv (v w : Fin (2 * r' + k + 1) → ℂ) :
     simp only [liftVec, dif_neg h0, mul_zero]
   · simp only [liftVec_apply_sh]
 
-theorem hermitianForm_liftVec_firstVector (v : Fin (2 * r' + k + 1) → ℂ) : herm (Hpk k (1 + r')) (liftVec k 1 r' v) (e0 k r') = 0 := by
+theorem hermitianForm_liftVec_firstVector (v : Fin (2 * r' + k + 1) → ℂ)
+    : herm (Hpk k (1 + r')) (liftVec k 1 r' v) (e0 k r') = 0 := by
   unfold herm
   rw [hpk_lv]
   simp [e0, bvec, dotProduct, Pi.single_apply, liftVec, eI, a0]
@@ -126,10 +131,12 @@ theorem hermitianForm_liftVec_firstVector (v : Fin (2 * r' + k + 1) → ℂ) : h
 theorem firstVector_apply_first (h : 0 < 1 + r') : e0 k r' (eI k (1 + r') ⟨0, h⟩) = 1 := by
   simp [e0, bvec, a0, eI]
 
-theorem firstVector_apply_succ (b : ℕ) (h : b + 1 < 1 + r') : e0 k r' (eI k (1 + r') ⟨b + 1, h⟩) = 0 := by
+theorem firstVector_apply_succ (b : ℕ) (h : b + 1 < 1 + r')
+    : e0 k r' (eI k (1 + r') ⟨b + 1, h⟩) = 0 := by
   simp [e0, bvec, a0, eI, Pi.single_apply]
 
-theorem eI_succ (b : ℕ) (h : b + 1 < 1 + r') : eI k (1 + r') ⟨b + 1, h⟩ = sh (eI k r' ⟨b, by omega⟩) := by
+theorem eI_succ (b : ℕ) (h : b + 1 < 1 + r')
+    : eI k (1 + r') ⟨b + 1, h⟩ = sh (eI k r' ⟨b, by omega⟩) := by
   ext
   simp [eI, sh]
 
@@ -177,18 +184,21 @@ private lemma lev_mulVec_liftVec_eq_liftVec_mulVec (m : Mat k r') (w : Fin (2 * 
       rw [hp']
       simp only [lev_apply_sh_sh, liftVec_apply_sh, Matrix.mulVec, dotProduct]
 
-theorem hcol (hHA : HeisAct) (m : Mat k r') (X : HPar k r') (w : Fin (2 * r' + k + 1) → ℂ) :
-    (heis0 k r' X * ιLev k 1 r' m) *ᵥ liftVec k 1 r' w =
-      liftVec k 1 r' (m *ᵥ w) - herm (Hpk k r') (m *ᵥ w) X.1 • e0 k r' := by
+theorem hcol (hHA : HeisAct) (m : Mat k r') (X : HPar k r') (w : Fin (2 * r' + k + 1) → ℂ)
+    : (heis0 k r' X * ιLev k 1 r' m) *ᵥ liftVec k 1 r' w
+      = liftVec k 1 r' (m *ᵥ w) - herm (Hpk k r') (m *ᵥ w) X.1 • e0 k r' := by
   unfold HeisAct at hHA
   rw [← Matrix.mulVec_mulVec, lev_mulVec_liftVec_eq_liftVec_mulVec]
   unfold heis0
   rw [hHA, herm_lv, hermitianForm_liftVec_firstVector, zero_smul, add_zero]
 
-theorem sum_fin_one_add_eq_add_sum {M : Type} [AddCommMonoid M] (F : Fin (1 + r') → M) :
-    ∑ a, F a = F ⟨0, by omega⟩ + ∑ a' : Fin r', F ⟨a'.val + 1, by omega⟩ := by
+theorem sum_fin_one_add_eq_add_sum {M : Type} [AddCommMonoid M] (F : Fin (1 + r') → M)
+    : ∑ a, F a = F ⟨0, by omega⟩ + ∑ a' : Fin r', F ⟨a'.val + 1, by omega⟩ := by
   rw [← Fintype.sum_equiv (finCongr (Nat.add_comm r' 1))
-    (fun a : Fin (r' + 1) => F (finCongr (Nat.add_comm r' 1) a)) F (fun _ => rfl), Fin.sum_univ_succ]
+      (fun a : Fin (r' + 1) => F (finCongr (Nat.add_comm r' 1) a))
+      F
+      (fun _ => rfl),
+    Fin.sum_univ_succ]
   refine congrArg₂ (· + ·) ?_ ?_
   · exact congrArg F (Fin.ext (by simp))
   · exact Finset.sum_congr rfl fun a _ => congrArg F (Fin.ext (by simp))
@@ -212,8 +222,9 @@ private lemma liftVec_bvec_eq_bvec_sh (i : Fin (2 * r' + k + 1)) :
     rw [hp', liftVec_apply_sh]
     simp [bvec, Pi.single_apply, sh, Fin.ext_iff]
 
-theorem fvec_lift (z1 : Fin (2 * r' + k + 1) → ℂ) (a : Fin (1 + r')) :
-    fvec k (1 + r') (liftVec k 1 r' z1) ⟨a.val + 1, by omega⟩ = liftVec k 1 r' (fvec k r' z1 ⟨a.val, by omega⟩) := by
+theorem fvec_lift (z1 : Fin (2 * r' + k + 1) → ℂ) (a : Fin (1 + r'))
+    : fvec k (1 + r') (liftVec k 1 r' z1) ⟨a.val + 1, by omega⟩
+      = liftVec k 1 r' (fvec k r' z1 ⟨a.val, by omega⟩) := by
   by_cases ha : a.val < r'
   · have h1 : a.val + 1 < 1 + r' := by omega
     simp only [fvec, Fin.val_mk, dif_pos h1, dif_pos ha]
@@ -226,14 +237,17 @@ private lemma liftVec_apply_eI_zero_eq_zero (v : Fin (2 * r' + k + 1) → ℂ) (
     liftVec k 1 r' v (eI k (1 + r') ⟨0, h⟩) = 0 := by
   simp [liftVec, eI]
 
-theorem ell_lev (hHA : HeisAct) (z1 : Fin (2 * r' + k + 1) → ℂ) (m : Mat k r') (X : HPar k r') :
-    ell k (1 + r') (liftVec k 1 r' z1) (heis0 k r' X * ιLev k 1 r' m) =
-      -herm (Hpk k r') (m *ᵥ fvec k r' z1 ⟨0, by omega⟩) X.1 + ell k r' z1 m := by
-  have key : ∀ a : Fin (1 + r'),
-      ((heis0 k r' X * ιLev k 1 r' m) *ᵥ fvec k (1 + r') (liftVec k 1 r' z1) ⟨a.val + 1, by omega⟩)
-        (eI k (1 + r') a) =
-      liftVec k 1 r' (m *ᵥ fvec k r' z1 ⟨a.val, by omega⟩) (eI k (1 + r') a) -
-        herm (Hpk k r') (m *ᵥ fvec k r' z1 ⟨a.val, by omega⟩) X.1 * e0 k r' (eI k (1 + r') a) := by
+theorem ell_lev (hHA : HeisAct) (z1 : Fin (2 * r' + k + 1) → ℂ) (m : Mat k r') (X : HPar k r')
+    : ell k (1 + r') (liftVec k 1 r' z1) (heis0 k r' X * ιLev k 1 r' m)
+      = - herm (Hpk k r') (m *ᵥ fvec k r' z1 ⟨0, by omega⟩) X.1 + ell k r' z1 m := by
+  have key
+      : ∀ a : Fin (1 + r'),
+        ((heis0 k r' X * ιLev k 1 r' m)
+              *ᵥ fvec k (1 + r') (liftVec k 1 r' z1) ⟨a.val + 1, by omega⟩)
+            (eI k (1 + r') a)
+          = liftVec k 1 r' (m *ᵥ fvec k r' z1 ⟨a.val, by omega⟩) (eI k (1 + r') a)
+            - herm (Hpk k r') (m *ᵥ fvec k r' z1 ⟨a.val, by omega⟩) X.1
+              * e0 k r' (eI k (1 + r') a) := by
     intro a
     rw [fvec_lift, hcol hHA]
     simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
@@ -244,17 +258,17 @@ theorem ell_lev (hHA : HeisAct) (z1 : Fin (2 * r' + k + 1) → ℂ) (m : Mat k r
   · beta_reduce
     rw [key, firstVector_apply_succ, mul_zero, sub_zero, eI_succ, liftVec_apply_sh]
 
-theorem lam_lev (hHA : HeisAct) (z1 : Fin (2 * r' + k + 1) → ℂ) (m : Mat k r') (X : HPar k r') :
-    lam k (1 + r') (liftVec k 1 r' z1) (heis0 k r' X * ιLev k 1 r' m) =
-      -2 * (herm (Hpk k r') (m *ᵥ fvec k r' z1 ⟨0, by omega⟩) X.1).im + lam k r' z1 m := by
+theorem lam_lev (hHA : HeisAct) (z1 : Fin (2 * r' + k + 1) → ℂ) (m : Mat k r') (X : HPar k r')
+    : lam k (1 + r') (liftVec k 1 r' z1) (heis0 k r' X * ιLev k 1 r' m)
+      = -2 * (herm (Hpk k r') (m *ᵥ fvec k r' z1 ⟨0, by omega⟩) X.1).im + lam k r' z1 m := by
   simp only [lam, cStd]
   rw [ell_lev hHA]
   simp only [mul_add, mul_neg, Complex.add_re, Complex.neg_re, Complex.mul_re, Complex.mul_im,
     Complex.I_re, Complex.I_im, Complex.neg_im]
   norm_num
 
-theorem z_lift (z : Fin (2 * (1 + r') + k + 1) → ℂ) (hz : inWb k (1 + r') z) :
-    z = liftVec k 1 r' (fun q => z (sh q)) := by
+theorem z_lift (z : Fin (2 * (1 + r') + k + 1) → ℂ) (hz : inWb k (1 + r') z)
+    : z = liftVec k 1 r' (fun q => z (sh q)) := by
   unfold inWb at hz
   funext p
   by_cases hp : p.val = 0 ∨ p.val = 2 * (1 + r') + k
@@ -267,13 +281,15 @@ theorem z_lift (z : Fin (2 * (1 + r') + k + 1) → ℂ) (hz : inWb k (1 + r') z)
       omega
     rw [hp', liftVec_apply_sh]
 
-theorem shifted_mem_weightSpace (z : Fin (2 * (1 + r') + k + 1) → ℂ) (hz : inWb k (1 + r') z) : inWb k r' (fun q => z (sh q)) := by
+theorem shifted_mem_weightSpace (z : Fin (2 * (1 + r') + k + 1) → ℂ) (hz : inWb k (1 + r') z)
+    : inWb k r' (fun q => z (sh q)) := by
   unfold inWb at hz ⊢
   intro i hi
   have := i.isLt
   exact hz (sh i) (by simp only [sh, Fin.val_mk]; omega)
 
-theorem tz_lift (z1 : Fin (2 * r' + k + 1) → ℂ) : Tz k (1 + r') (liftVec k 1 r' z1) = Tz k r' z1 := by
+theorem tz_lift (z1 : Fin (2 * r' + k + 1) → ℂ)
+    : Tz k (1 + r') (liftVec k 1 r' z1) = Tz k r' z1 := by
   unfold Tz
   rw [herm_lv]
 

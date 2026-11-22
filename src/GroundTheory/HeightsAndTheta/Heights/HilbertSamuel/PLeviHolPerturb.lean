@@ -18,9 +18,10 @@ namespace LeviHolPerturb
 
 variable {J : Type} [Fintype J]
 
-theorem hasDerivAt_of_contDiffAt_two {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F] {f : ℝ → F}
-    (hf : ContDiffAt ℝ 2 f 0) :
-    (∀ᶠ t in 𝓝 (0 : ℝ), HasDerivAt f (deriv f t) t) ∧ HasDerivAt (deriv f) (deriv (deriv f) 0) 0 := by
+theorem hasDerivAt_of_contDiffAt_two
+    {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F] {f : ℝ → F} (hf : ContDiffAt ℝ 2 f 0)
+    : (∀ᶠ t in 𝓝 (0 : ℝ), HasDerivAt f (deriv f t) t)
+      ∧ HasDerivAt (deriv f) (deriv (deriv f) 0) 0 := by
   refine ⟨?_, ?_⟩
   · filter_upwards [hf.eventually (by simp)] with t ht
     exact (ht.differentiableAt (by norm_num)).hasDerivAt
@@ -28,9 +29,9 @@ theorem hasDerivAt_of_contDiffAt_two {F : Type*} [NormedAddCommGroup F] [NormedS
       (hf.fderiv_right (m := 1) (by norm_num)).clm_apply contDiffAt_const
     exact (h1.differentiableAt one_ne_zero).hasDerivAt
 
-theorem deriv_deriv_mul {f g : ℝ → ℝ} (hf : ContDiffAt ℝ 2 f 0) (hg : ContDiffAt ℝ 2 g 0) :
-    deriv (deriv fun t => f t * g t) 0 =
-      deriv (deriv f) 0 * g 0 + 2 * (deriv f 0 * deriv g 0) + f 0 * deriv (deriv g) 0 := by
+theorem deriv_deriv_mul {f g : ℝ → ℝ} (hf : ContDiffAt ℝ 2 f 0) (hg : ContDiffAt ℝ 2 g 0)
+    : deriv (deriv fun t => f t * g t) 0
+      = deriv (deriv f) 0 * g 0 + 2 * (deriv f 0 * deriv g 0) + f 0 * deriv (deriv g) 0 := by
   obtain ⟨hf1, hf2⟩ := hasDerivAt_of_contDiffAt_two hf
   obtain ⟨hg1, hg2⟩ := hasDerivAt_of_contDiffAt_two hg
   have hev : deriv (fun t => f t * g t) =ᶠ[𝓝 0] fun t => deriv f t * g t + f t * deriv g t := by
@@ -40,17 +41,21 @@ theorem deriv_deriv_mul {f g : ℝ → ℝ} (hf : ContDiffAt ℝ 2 f 0) (hg : Co
   refine ((hf2.mul hg1.self_of_nhds).add (hf1.self_of_nhds.mul hg2)).deriv.trans ?_
   ring
 
-theorem deriv_line {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F] {f : (J → ℂ) → F} {z : J → ℂ}
-    (hf : DifferentiableAt ℝ f z) (e : J → ℂ) :
-    deriv (fun s : ℝ => f (z + s • e)) 0 = fderiv ℝ f z e := by
+theorem deriv_line
+    {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
+    {f : (J → ℂ) → F} {z : J → ℂ} (hf : DifferentiableAt ℝ f z)
+    (e : J → ℂ)
+    : deriv (fun s : ℝ => f (z + s • e)) 0 = fderiv ℝ f z e := by
   have hline : HasDerivAt (fun s : ℝ => z + s • e) e 0 :=
     (((hasDerivAt_id (0 : ℝ)).smul_const e).const_add z).congr_deriv (one_smul ℝ e)
   have hz0 : z + (0 : ℝ) • e = z := by rw [zero_smul, add_zero]
   exact (hf.hasFDerivAt.comp_hasDerivAt_of_eq (0 : ℝ) hline hz0.symm).deriv
 
-theorem deriv_deriv_line {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F] {f : (J → ℂ) → F}
-    {z : J → ℂ} (hf : ContDiffAt ℝ 2 f z) (e : J → ℂ) :
-    deriv (deriv fun s : ℝ => f (z + s • e)) 0 = fderiv ℝ (fderiv ℝ f) z e e := by
+theorem deriv_deriv_line
+    {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
+    {f : (J → ℂ) → F} {z : J → ℂ} (hf : ContDiffAt ℝ 2 f z)
+    (e : J → ℂ)
+    : deriv (deriv fun s : ℝ => f (z + s • e)) 0 = fderiv ℝ (fderiv ℝ f) z e e := by
   have hline : ∀ s : ℝ, HasDerivAt (fun s : ℝ => z + s • e) e s := fun s =>
     (((hasDerivAt_id s).smul_const e).const_add z).congr_deriv (one_smul ℝ e)
   have hz0 : z + (0 : ℝ) • e = z := by rw [zero_smul, add_zero]
@@ -72,26 +77,30 @@ theorem deriv_deriv_line {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F] 
   rw [hev.deriv_eq]
   exact hd.deriv
 
-theorem contDiffAt_line {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F] {f : (J → ℂ) → F}
-    {z : J → ℂ} (hf : ContDiffAt ℝ 2 f z) (e : J → ℂ) :
-    ContDiffAt ℝ 2 (fun s : ℝ => f (z + s • e)) 0 := by
+theorem contDiffAt_line
+    {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
+    {f : (J → ℂ) → F} {z : J → ℂ} (hf : ContDiffAt ℝ 2 f z)
+    (e : J → ℂ)
+    : ContDiffAt ℝ 2 (fun s : ℝ => f (z + s • e)) 0 := by
   have hl : ContDiffAt ℝ 2 (fun s : ℝ => z + s • e) 0 :=
     (contDiff_const.add (contDiff_id.smul contDiff_const)).contDiffAt
   exact ContDiffAt.comp (g := f) (0 : ℝ) (by simpa using hf) hl
 
-theorem sndDeriv_I_I {φ : (J → ℂ) → ℂ} {z : J → ℂ} (hφ : AnalyticAt ℂ φ z) (a : J → ℂ) :
-    fderiv ℝ (fderiv ℝ φ) z (Complex.I • a) (Complex.I • a) = - fderiv ℝ (fderiv ℝ φ) z a a := by
+theorem sndDeriv_I_I {φ : (J → ℂ) → ℂ} {z : J → ℂ} (hφ : AnalyticAt ℂ φ z) (a : J → ℂ)
+    : fderiv ℝ (fderiv ℝ φ) z (Complex.I • a) (Complex.I • a) = - fderiv ℝ (fderiv ℝ φ) z a a := by
   have hR : AnalyticAt ℝ φ z := hφ.restrictScalars
   have hT : HasFDerivAt (fderiv ℝ φ) (fderiv ℝ (fderiv ℝ φ) z) z :=
     (((hR.contDiffAt (n := 2)).fderiv_right (m := 1) (by norm_num)).differentiableAt
       (by norm_num)).hasFDerivAt
-  have hlin : ∀ a b : J → ℂ, fderiv ℝ (fderiv ℝ φ) z a (Complex.I • b) =
-      Complex.I • fderiv ℝ (fderiv ℝ φ) z a b := by
+  have hlin
+      : ∀ a b : J → ℂ,
+        fderiv ℝ (fderiv ℝ φ) z a (Complex.I • b) = Complex.I • fderiv ℝ (fderiv ℝ φ) z a b := by
     intro a b
     have h1 := hT.clm_apply (hasFDerivAt_const (Complex.I • b) z)
     have h2 := (hT.clm_apply (hasFDerivAt_const b z)).const_smul Complex.I
-    have hev : (fun y => fderiv ℝ φ y (Complex.I • b)) =ᶠ[𝓝 z]
-        (fun y => Complex.I • fderiv ℝ φ y b) := by
+    have hev
+        : (fun y => fderiv ℝ φ y (Complex.I • b)) =ᶠ[𝓝 z]
+          (fun y => Complex.I • fderiv ℝ φ y b) := by
       filter_upwards [hφ.eventually_analyticAt] with y hy
       rw [hy.differentiableAt.fderiv_restrictScalars ℝ]
       simp
@@ -99,19 +108,22 @@ theorem sndDeriv_I_I {φ : (J → ℂ) → ℂ} {z : J → ℂ} (hφ : AnalyticA
     have := congrArg (fun L => L a) h3
     simpa using this
   have hsymm : IsSymmSndFDerivAt ℝ φ z := (hR.contDiffAt (n := ω)).isSymmSndFDerivAt le_top
-  calc fderiv ℝ (fderiv ℝ φ) z (Complex.I • a) (Complex.I • a)
+  calc
+    fderiv ℝ (fderiv ℝ φ) z (Complex.I • a) (Complex.I • a)
       = Complex.I • fderiv ℝ (fderiv ℝ φ) z (Complex.I • a) a := hlin _ _
     _ = Complex.I • fderiv ℝ (fderiv ℝ φ) z a (Complex.I • a) := by rw [hsymm]
     _ = Complex.I • Complex.I • fderiv ℝ (fderiv ℝ φ) z a a := by rw [hlin]
     _ = - fderiv ℝ (fderiv ℝ φ) z a a := by rw [smul_smul, Complex.I_mul_I]; simp
 
-theorem line_key {X : ℝ → ℝ} {A Φ : ℝ → ℂ} (hX : ContDiffAt ℝ 2 X 0) (hA : ContDiffAt ℝ 2 A 0)
-    (hΦ : ContDiffAt ℝ 2 Φ 0) (h0 : Φ 0 = 0) (h1 : deriv Φ 0 = 0) :
-    deriv (fun t => X t * (‖A t + Φ t‖ ^ 2 - ‖A t‖ ^ 2)) 0 = 0 ∧
-      deriv (deriv fun t => X t * (‖A t + Φ t‖ ^ 2 - ‖A t‖ ^ 2)) 0 =
-        2 * X 0 * inner ℝ (A 0) (deriv (deriv Φ) 0) := by
-  have hg : (fun t => X t * (‖A t + Φ t‖ ^ 2 - ‖A t‖ ^ 2)) =
-      fun t => X t * (2 * inner ℝ (A t) (Φ t) + inner ℝ (Φ t) (Φ t)) := by
+theorem line_key
+    {X : ℝ → ℝ} {A Φ : ℝ → ℂ} (hX : ContDiffAt ℝ 2 X 0) (hA : ContDiffAt ℝ 2 A 0)
+    (hΦ : ContDiffAt ℝ 2 Φ 0) (h0 : Φ 0 = 0) (h1 : deriv Φ 0 = 0)
+    : deriv (fun t => X t * (‖A t + Φ t‖ ^ 2 - ‖A t‖ ^ 2)) 0 = 0
+      ∧ deriv (deriv fun t => X t * (‖A t + Φ t‖ ^ 2 - ‖A t‖ ^ 2)) 0
+        = 2 * X 0 * inner ℝ (A 0) (deriv (deriv Φ) 0) := by
+  have hg
+      : (fun t => X t * (‖A t + Φ t‖ ^ 2 - ‖A t‖ ^ 2))
+        = fun t => X t * (2 * inner ℝ (A t) (Φ t) + inner ℝ (Φ t) (Φ t)) := by
     funext t
     rw [norm_add_sq_real, real_inner_self_eq_norm_sq]
     ring
@@ -123,19 +135,23 @@ theorem line_key {X : ℝ → ℝ} {A Φ : ℝ → ℂ} (hX : ContDiffAt ℝ 2 X
     (contDiffAt_const.mul (hA.inner ℝ hΦ)).add (hΦ.inner ℝ hΦ)
   have hN0 : (2 * inner ℝ (A 0) (Φ 0) + inner ℝ (Φ 0) (Φ 0) : ℝ) = 0 := by simp [h0]
   have hNd : HasDerivAt (fun t => 2 * inner ℝ (A t) (Φ t) + inner ℝ (Φ t) (Φ t)) 0 0 := by
-    have h := ((hA1.self_of_nhds.inner ℝ hΦ1.self_of_nhds).const_mul 2).add
-      (hΦ1.self_of_nhds.inner ℝ hΦ1.self_of_nhds)
+    have h :=
+      ((hA1.self_of_nhds.inner ℝ hΦ1.self_of_nhds).const_mul 2).add
+        (hΦ1.self_of_nhds.inner ℝ hΦ1.self_of_nhds)
     exact h.congr_deriv (by simp [h0, h1])
-  have hev : deriv (fun t => 2 * inner ℝ (A t) (Φ t) + inner ℝ (Φ t) (Φ t)) =ᶠ[𝓝 0]
-      fun t => 2 * (inner ℝ (A t) (deriv Φ t) + inner ℝ (deriv A t) (Φ t)) +
-        (inner ℝ (Φ t) (deriv Φ t) + inner ℝ (deriv Φ t) (Φ t)) := by
+  have hev
+      : deriv (fun t => 2 * inner ℝ (A t) (Φ t) + inner ℝ (Φ t) (Φ t)) =ᶠ[𝓝 0]
+        fun t => 2 * (inner ℝ (A t) (deriv Φ t) + inner ℝ (deriv A t) (Φ t)) +
+          (inner ℝ (Φ t) (deriv Φ t) + inner ℝ (deriv Φ t) (Φ t)) := by
     filter_upwards [hA1, hΦ1] with t ha hp
     exact (((ha.inner ℝ hp).const_mul 2).add (hp.inner ℝ hp)).deriv
-  have hNdd : deriv (deriv fun t => 2 * inner ℝ (A t) (Φ t) + inner ℝ (Φ t) (Φ t)) 0 =
-      2 * inner ℝ (A 0) (deriv (deriv Φ) 0) := by
+  have hNdd
+      : deriv (deriv fun t => 2 * inner ℝ (A t) (Φ t) + inner ℝ (Φ t) (Φ t)) 0
+        = 2 * inner ℝ (A 0) (deriv (deriv Φ) 0) := by
     rw [hev.deriv_eq]
-    have h := ((((hA1.self_of_nhds.inner ℝ hΦ2).add (hA2.inner ℝ hΦ1.self_of_nhds)).const_mul 2).add
-      ((hΦ1.self_of_nhds.inner ℝ hΦ2).add (hΦ2.inner ℝ hΦ1.self_of_nhds)))
+    have h :=
+      ((((hA1.self_of_nhds.inner ℝ hΦ2).add (hA2.inner ℝ hΦ1.self_of_nhds)).const_mul 2).add
+        ((hΦ1.self_of_nhds.inner ℝ hΦ2).add (hΦ2.inner ℝ hΦ1.self_of_nhds)))
     refine h.deriv.trans ?_
     simp [h0, h1]
   have key := deriv_deriv_mul hX hN2
@@ -146,13 +162,14 @@ theorem line_key {X : ℝ → ℝ} {A Φ : ℝ → ℂ} (hX : ContDiffAt ℝ 2 X
   · rw [key, hNdd, hN0, hNd.deriv]
     ring
 
-theorem along {ξ : (J → ℂ) → ℝ} {a φ : (J → ℂ) → ℂ} {z : J → ℂ} (hξ : ContDiffAt ℝ 2 ξ z)
-    (ha : AnalyticAt ℂ a z) (hφ : AnalyticAt ℂ φ z) (hφ0 : φ z = 0)
-    (hu : ContDiffAt ℝ 2 (fun x => ξ x * (‖a x + φ x‖ ^ 2 - ‖a x‖ ^ 2)) z) (v : J → ℂ)
-    (hv : fderiv ℂ φ z v = 0) :
-    fderiv ℝ (fun x => ξ x * (‖a x + φ x‖ ^ 2 - ‖a x‖ ^ 2)) z v = 0 ∧
-      fderiv ℝ (fderiv ℝ fun x => ξ x * (‖a x + φ x‖ ^ 2 - ‖a x‖ ^ 2)) z v v =
-        2 * ξ z * inner ℝ (a z) (fderiv ℝ (fderiv ℝ φ) z v v) := by
+theorem along
+    {ξ : (J → ℂ) → ℝ} {a φ : (J → ℂ) → ℂ} {z : J → ℂ}
+    (hξ : ContDiffAt ℝ 2 ξ z) (ha : AnalyticAt ℂ a z) (hφ : AnalyticAt ℂ φ z) (hφ0 : φ z = 0)
+    (hu : ContDiffAt ℝ 2 (fun x => ξ x * (‖a x + φ x‖ ^ 2 - ‖a x‖ ^ 2)) z)
+    (v : J → ℂ) (hv : fderiv ℂ φ z v = 0)
+    : fderiv ℝ (fun x => ξ x * (‖a x + φ x‖ ^ 2 - ‖a x‖ ^ 2)) z v = 0
+      ∧ fderiv ℝ (fderiv ℝ fun x => ξ x * (‖a x + φ x‖ ^ 2 - ‖a x‖ ^ 2)) z v v
+        = 2 * ξ z * inner ℝ (a z) (fderiv ℝ (fderiv ℝ φ) z v v) := by
   have haR : ContDiffAt ℝ 2 a z := ha.restrictScalars.contDiffAt
   have hφR : ContDiffAt ℝ 2 φ z := hφ.restrictScalars.contDiffAt
   have hz0 : z + (0 : ℝ) • v = z := by rw [zero_smul, add_zero]
@@ -161,9 +178,12 @@ theorem along {ξ : (J → ℂ) → ℝ} {a φ : (J → ℂ) → ℂ} {z : J →
     rw [deriv_line (hφR.differentiableAt (by norm_num)) v,
       hφ.differentiableAt.fderiv_restrictScalars ℝ]
     simpa using hv
-  obtain ⟨k1, k2⟩ := line_key (X := fun t => ξ (z + t • v)) (A := fun t => a (z + t • v))
-    (Φ := fun t => φ (z + t • v)) (contDiffAt_line hξ v) (contDiffAt_line haR v)
-    (contDiffAt_line hφR v) h0 h1
+  obtain ⟨k1, k2⟩ :=
+    line_key
+      (X := fun t => ξ (z + t • v))
+      (A := fun t => a (z + t • v))
+      (Φ := fun t => φ (z + t • v))
+      (contDiffAt_line hξ v) (contDiffAt_line haR v) (contDiffAt_line hφR v) h0 h1
   refine ⟨?_, ?_⟩
   · rw [← deriv_line (hu.differentiableAt (by norm_num)) v]
     exact k1

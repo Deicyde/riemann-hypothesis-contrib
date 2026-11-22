@@ -15,23 +15,27 @@ variable {K : Type*} [Field K] [NumberField K]
 
 open IdeleGroup
 
-theorem eq_zero_of_forall_ideleModule_cpow_eq_one {u : ℝ}
-    (h : ∀ x : IdeleGroup K, ((ideleModule K x : ℝ) : ℂ) ^ ((u : ℂ) * I) = 1) : u = 0 := by
+theorem eq_zero_of_forall_ideleModule_cpow_eq_one
+    {u : ℝ} (h : ∀ x : IdeleGroup K, ((ideleModule K x : ℝ) : ℂ) ^ ((u : ℂ) * I) = 1)
+    : u = 0 := by
   by_contra hu
   obtain ⟨x, hx⟩ := ideleModule_surjective (K := K) ⟨Real.exp (Real.pi / u), Real.exp_pos _⟩
   have h1 := h x
   rw [hx] at h1
   change ((Real.exp (Real.pi / u) : ℝ) : ℂ) ^ ((u : ℂ) * I) = 1 at h1
   rw [ofReal_exp, cpow_def_of_ne_zero (exp_ne_zero _),
-    Complex.log_exp (by simp [Real.pi_pos]) (by simp [Real.pi_pos.le])] at h1
+      Complex.log_exp (by simp [Real.pi_pos]) (by simp [Real.pi_pos.le])]
+    at h1
   have e : ((Real.pi / u : ℝ) : ℂ) * ((u : ℂ) * I) = Real.pi * I := by
     push_cast
     field_simp [ofReal_ne_zero.2 hu]
   rw [e, exp_pi_mul_I] at h1
   norm_num at h1
 
-theorem eq_of_continuousAt_of_eventually {f₁ f₂ : ℂ → ℂ} {p : ℂ} (h₁ : ContinuousAt f₁ p)
-    (h₂ : ContinuousAt f₂ p) (h : ∀ᶠ s in 𝓝 p, p.re < s.re → f₁ s = f₂ s) : f₁ p = f₂ p := by
+theorem eq_of_continuousAt_of_eventually
+    {f₁ f₂ : ℂ → ℂ} {p : ℂ}
+    (h₁ : ContinuousAt f₁ p) (h₂ : ContinuousAt f₂ p) (h : ∀ᶠ s in 𝓝 p, p.re < s.re → f₁ s = f₂ s)
+    : f₁ p = f₂ p := by
   have hφ : Tendsto (fun x : ℝ ↦ (x : ℂ) + p) (𝓝[>] 0) (𝓝 p) := by
     have : Tendsto (fun x : ℝ ↦ (x : ℂ) + p) (𝓝 0) (𝓝 ((0 : ℝ) + p)) :=
       ((continuous_ofReal.add continuous_const).tendsto 0)
@@ -45,19 +49,21 @@ namespace HeckeCharacter
 
 variable (χ : HeckeCharacter K)
 
-theorem continuation_ne_zero_of_not_sq (t : ℝ)
+theorem continuation_ne_zero_of_not_sq
+    (t : ℝ)
     (hsq : ¬ ∀ x : IdeleGroup K,
       ((χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I)) ^ 2 = 1)
     {g : ℂ → ℂ} (hg : DifferentiableAt ℂ g (1 + t * I))
-    (hgL : ∀ᶠ s in 𝓝 (1 + t * I), 1 < s.re → g s = χ.LFunction s) :
-    g (1 + t * I) ≠ 0 := by
+    (hgL : ∀ᶠ s in 𝓝 (1 + t * I), 1 < s.re → g s = χ.LFunction s)
+    : g (1 + t * I) ≠ 0 := by
   intro h0
   set p : ℂ := 1 + t * I with hp
   set q : ℂ := 1 + 2 * t * I with hq
 
-  obtain ⟨G₂, hG₂, hG₂L⟩ : ∃ G₂ : ℂ → ℂ, DifferentiableAt ℂ G₂ q ∧
-      ∀ s : ℂ, 1 < s.re → G₂ s = (χ ^ 2).LFunction s := by
-    by_cases hτ : ∃ τ : ℝ, ∀ x : IdeleGroup K,
+  obtain ⟨G₂, hG₂, hG₂L⟩
+      : ∃ G₂ : ℂ → ℂ, DifferentiableAt ℂ G₂ q ∧ ∀ s : ℂ, 1 < s.re → G₂ s = (χ ^ 2).LFunction s := by
+    by_cases hτ
+      : ∃ τ : ℝ, ∀ x : IdeleGroup K,
         ((χ ^ 2).toIdele x : ℂ) = ((ideleModule K x : ℝ) : ℂ) ^ ((τ : ℂ) * I)
     · obtain ⟨τ, hτ⟩ := hτ
       obtain ⟨G₂, hd, hL, -⟩ := (χ ^ 2).exists_LFunction_continuation_of_forall hτ
@@ -85,8 +91,9 @@ theorem continuation_ne_zero_of_not_sq (t : ℝ)
       with x hx hxpos
     exact hx (by simpa [hp] using hxpos)
 
-  have H₀ : (fun _ : ℝ ↦ (1 : ℝ)) =O[𝓝[>] 0] fun x : ℝ ↦
-      dedekindZeta K ((1 + x : ℝ) : ℂ) ^ 3 * g (x + p) ^ 4 * G₂ (x + q) := by
+  have H₀
+      : (fun _ : ℝ ↦ (1 : ℝ)) =O[𝓝[>] 0] fun x : ℝ ↦
+        dedekindZeta K ((1 + x : ℝ) : ℂ) ^ 3 * g (x + p) ^ 4 * G₂ (x + q) := by
     refine IsBigO.of_bound' ?_
     filter_upwards [hev, self_mem_nhdsWithin] with x hx hxpos
     have hxpos' : 0 < x := hxpos
@@ -107,8 +114,9 @@ theorem continuation_ne_zero_of_not_sq (t : ℝ)
       · filter_upwards [self_mem_nhdsWithin] with x hx
         simpa using hx
     have h := (tendsto_sub_one_mul_dedekindZeta_nhdsGT K).comp hmap
-    have hb : (fun x : ℝ ↦ (x : ℂ) * dedekindZeta K ((1 + x : ℝ) : ℂ)) =O[𝓝[>] 0]
-        fun _ ↦ (1 : ℂ) := by
+    have hb
+        : (fun x : ℝ ↦ (x : ℂ) * dedekindZeta K ((1 + x : ℝ) : ℂ)) =O[𝓝[>] 0]
+          fun _ ↦ (1 : ℂ) := by
       refine (h.isBigO_one ℂ).congr_left fun x ↦ ?_
       simp only [Function.comp_apply]
       push_cast
@@ -137,25 +145,26 @@ theorem continuation_ne_zero_of_not_sq (t : ℝ)
   simp only [help] at H
   replace H := (H₀.trans H).norm_right
   simp only [norm_real] at H
-  exact isLittleO_irrefl (.of_forall (fun _ ↦ one_ne_zero)) <|
-    H.of_norm_right.trans_isLittleO <| isLittleO_id_one.mono nhdsWithin_le_nhds
+  exact isLittleO_irrefl (.of_forall (fun _ ↦ one_ne_zero)) <| H.of_norm_right.trans_isLittleO <|
+    isLittleO_id_one.mono nhdsWithin_le_nhds
 
-theorem LFunction_continuation_ne_zero (t : ℝ)
-    (hχ : ¬ ∀ x : IdeleGroup K,
-      (χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I) = 1)
+theorem LFunction_continuation_ne_zero
+    (t : ℝ)
+    (hχ : ¬ ∀ x : IdeleGroup K, (χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I) = 1)
     {g : ℂ → ℂ} (hg : DifferentiableAt ℂ g (1 + t * I))
-    (hgL : ∀ᶠ s in 𝓝 (1 + t * I), 1 < s.re → g s = χ.LFunction s) :
-    g (1 + t * I) ≠ 0 := by
-  by_cases hsq : ∀ x : IdeleGroup K,
-      ((χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I)) ^ 2 = 1
-  ·
-    have hnot : ¬ ∃ τ : ℝ, ∀ x : IdeleGroup K,
+    (hgL : ∀ᶠ s in 𝓝 (1 + t * I), 1 < s.re → g s = χ.LFunction s)
+    : g (1 + t * I) ≠ 0 := by
+  by_cases hsq
+    : ∀ x : IdeleGroup K, ((χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I)) ^ 2 = 1
+  · have hnot : ¬ ∃ τ : ℝ, ∀ x : IdeleGroup K,
         (χ.toIdele x : ℂ) = ((ideleModule K x : ℝ) : ℂ) ^ ((τ : ℂ) * I) := by
       rintro ⟨τ, hτ⟩
       have hm : ∀ x : IdeleGroup K, ((ideleModule K x : ℝ) : ℂ) ≠ 0 := fun x ↦
         ofReal_ne_zero.2 (ideleModule K x).2.ne'
-      have htw : ∀ x : IdeleGroup K, (χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I) =
-          ((ideleModule K x : ℝ) : ℂ) ^ (((τ + t : ℝ) : ℂ) * I) := fun x ↦ by
+      have htw
+          : ∀ x : IdeleGroup K,
+            (χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I)
+              = ((ideleModule K x : ℝ) : ℂ) ^ (((τ + t : ℝ) : ℂ) * I) := fun x ↦ by
         rw [hτ x, ← cpow_add _ _ (hm x)]
         push_cast
         ring_nf
@@ -181,32 +190,34 @@ theorem LFunction_continuation_ne_zero (t : ℝ)
     exact χ.continuation_ne_zero_of_sq_eq_one t hsq hG hGL
   · exact χ.continuation_ne_zero_of_not_sq t hsq hg hgL
 
-theorem toIdele_eq_cpow_of_forall (t : ℝ)
-    (hχ : ∀ x : IdeleGroup K,
-      (χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I) = 1)
-    (x : IdeleGroup K) :
-    (χ.toIdele x : ℂ) = ((ideleModule K x : ℝ) : ℂ) ^ (((-t : ℝ) : ℂ) * I) := by
+theorem toIdele_eq_cpow_of_forall
+    (t : ℝ)
+    (hχ : ∀ x : IdeleGroup K, (χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I) = 1)
+    (x : IdeleGroup K)
+    : (χ.toIdele x : ℂ) = ((ideleModule K x : ℝ) : ℂ) ^ (((-t : ℝ) : ℂ) * I) := by
   have hm : ((ideleModule K x : ℝ) : ℂ) ≠ 0 := ofReal_ne_zero.2 (ideleModule K x).2.ne'
   have e : ((-t : ℝ) : ℂ) * I = -((t : ℂ) * I) := by push_cast; ring
   rw [e]
-  calc (χ.toIdele x : ℂ) = (χ.toIdele x : ℂ) * (((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I) *
-        ((ideleModule K x : ℝ) : ℂ) ^ (-((t : ℂ) * I))) := by
-        rw [← cpow_add _ _ hm, add_neg_cancel, cpow_zero, mul_one]
+  calc
+    (χ.toIdele x : ℂ)
+        = (χ.toIdele x : ℂ)
+          * (((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I)
+            * ((ideleModule K x : ℝ) : ℂ) ^ (-((t : ℂ) * I))) := by
+      rw [← cpow_add _ _ hm, add_neg_cancel, cpow_zero, mul_one]
     _ = _ := by rw [← mul_assoc, hχ x, one_mul]
 
 theorem continuation_ne_zero_of_one_le_re
     (hχ : ¬ ∃ τ : ℝ, ∀ x : IdeleGroup K,
       (χ.toIdele x : ℂ) = ((ideleModule K x : ℝ) : ℂ) ^ ((τ : ℂ) * I))
     {G : ℂ → ℂ} (hG : Differentiable ℂ G) (hGL : ∀ s : ℂ, 1 < s.re → G s = χ.LFunction s)
-    {s : ℂ} (hs : 1 ≤ s.re) : G s ≠ 0 := by
+    {s : ℂ} (hs : 1 ≤ s.re)
+    : G s ≠ 0 := by
   rcases hs.lt_or_eq with hs | hs
   · rw [hGL s hs]
     exact χ.LFunction_ne_zero hs
-  have hse : s = 1 + (s.im : ℂ) * I := by
-    apply Complex.ext <;> simp [hs.symm]
+  have hse : s = 1 + (s.im : ℂ) * I := by apply Complex.ext <;> simp [hs.symm]
   rw [hse]
-  refine χ.LFunction_continuation_ne_zero s.im ?_ (hG _)
-    (Eventually.of_forall fun z hz ↦ hGL z hz)
+  refine χ.LFunction_continuation_ne_zero s.im ?_ (hG _) (Eventually.of_forall fun z hz ↦ hGL z hz)
   intro h
   exact hχ ⟨-s.im, χ.toIdele_eq_cpow_of_forall s.im h⟩
 

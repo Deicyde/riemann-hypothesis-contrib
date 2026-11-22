@@ -16,19 +16,22 @@ variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] {Γ : Type} [Grou
 
 variable (U : Set V) (A : Γ →* (V →L[ℝ] V)) (φ : V → ℝ)
 
-theorem extDeriv_delG (n : ℕ) {q : ℕ} (β : (ℕ → Γ) → V → V [⋀^Fin q]→L[ℝ] ℝ) (σ : ℕ → Γ) (h : V)
-    (hd : ∀ i, DifferentiableAt ℝ (β (skip i σ)) h) :
-    delG n (fun τ => extDeriv (β τ)) σ h = extDeriv (delG n β σ) h := by
+theorem extDeriv_delG
+    (n : ℕ)
+    {q : ℕ} (β : (ℕ → Γ) → V → V [⋀^Fin q]→L[ℝ] ℝ)
+    (σ : ℕ → Γ) (h : V) (hd : ∀ i, DifferentiableAt ℝ (β (skip i σ)) h)
+    : delG n (fun τ => extDeriv (β τ)) σ h = extDeriv (delG n β σ) h := by
   have e : delG n β σ = fun x => ∑ i ∈ Finset.range (n + 2), (-1 : ℝ) ^ i • β (skip i σ) x := by
     funext x; simp [delG, Finset.sum_apply]
-  rw [e, extDeriv, fderiv_fun_sum (A := fun i y => (-1 : ℝ) ^ i • β (skip i σ) y)
-    (fun i _ => (hd i).const_smul ((-1 : ℝ) ^ i))]
+  rw [e, extDeriv,
+    fderiv_fun_sum
+      (A := fun i y => (-1 : ℝ) ^ i • β (skip i σ) y)
+      (fun i _ => (hd i).const_smul ((-1 : ℝ) ^ i))]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [fderiv_fun_const_smul (hd _), delG, Finset.sum_apply, Pi.smul_apply, extDeriv,
+  simp only [fderiv_fun_const_smul (hd _), delG, Finset.sum_apply, Pi.smul_apply, extDeriv,
     ← ContinuousAlternatingMap.alternatizeUncurryFinCLM_apply, map_sum, map_smul]
 
-theorem pCoc (hH : PHom U A φ) (hS : PSmooth U A φ) (hC : PClosed U A φ) :
-    PCoc U A φ := by
+theorem pCoc (hH : PHom U A φ) (hS : PSmooth U A φ) (hC : PClosed U A φ) : PCoc U A φ := by
   intro H k c hc j
   induction j with
   | zero =>
@@ -47,10 +50,13 @@ theorem pCoc (hH : PHom U A φ) (hS : PSmooth U A φ) (hC : PClosed U A φ) :
     have hj' : j ≤ k + 1 := by omega
     have e1 : k + 1 - (j + 1) = k - j := by omega
     rw [e1]
-    have e2 : delG (k - j) (eta A φ c (j + 1)) σ h =
-        delG (k - j) (fun τ => extDeriv (Kf A φ (eta A φ c j) τ)) σ h := rfl
-    rw [e2, extDeriv_delG (k - j) (Kf A φ (eta A φ c j)) σ h (fun i =>
-      ((hS H k c j _).2.contDiffAt (H.isOpen.mem_nhds hh)).differentiableAt (by simp))]
+    have e2
+        : delG (k - j) (eta A φ c (j + 1)) σ h
+          = delG (k - j) (fun τ => extDeriv (Kf A φ (eta A φ c j) τ)) σ h :=
+      rfl
+    rw [e2,
+      extDeriv_delG (k - j) (Kf A φ (eta A φ c j)) σ h
+        (fun i => ((hS H k c j _).2.contDiffAt (H.isOpen.mem_nhds hh)).differentiableAt (by simp))]
     have hev : delG (k - j) (Kf A φ (eta A φ c j)) σ =ᶠ[𝓝 h] eta A φ c j σ := by
       filter_upwards [H.isOpen.mem_nhds hh] with x hx
       rw [hH H j (k - j) (eta A φ c j) σ x hx]

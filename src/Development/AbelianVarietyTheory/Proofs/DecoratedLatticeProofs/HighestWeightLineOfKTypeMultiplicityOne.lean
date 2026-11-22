@@ -11,23 +11,27 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.HighestWeight
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible Formalism.L2.Theta Matrix GlobalTheory.RealPar GlobalTheory.CoverDS
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible Formalism.L2.Theta Matrix
+  GlobalTheory.RealPar GlobalTheory.CoverDS
 open GlobalTheory.IndefiniteRowSideFullHecke.IsotypicSignedParameters (SignedPar IsDSPar)
-open Formalism.MainNotions.S (IsURepOn IsIrredOn IsKFin IsKStableOn IsWtOn IsKTypeOf IsDS IsSqIntOn UJset)
+open Formalism.MainNotions.S
+  (IsURepOn IsIrredOn IsKFin IsKStableOn IsWtOn IsKTypeOf IsDS IsSqIntOn UJset)
 
 namespace GlobalTheory.RealPar.HwLine
 
-open GlobalTheory.RealPar.HwGen (PosRoot mono drop drop_cons mono_weight mono_stable weight_of_mem_span cnt)
+open GlobalTheory.RealPar.HwGen
+  (PosRoot mono drop drop_cons mono_weight mono_stable weight_of_mem_span cnt)
 
 variable {p q n : ℕ}
 
 def ht : Ix p q → ℝ := Sum.elim (fun i => -(i : ℝ)) (fun j => -(j : ℝ))
 
 theorem ht_lt {a b : Ix p q} (h : posC a b) : ht b < ht a := by
-  rcases a with i | i <;> rcases b with j | j <;> simp [posC] at h <;> simp [ht] <;> exact_mod_cast h
+  rcases a with i | i <;> rcases b with j | j <;> simp [posC] at h <;> simp [ht]
+    <;> exact_mod_cast h
 
-theorem ht_drop_cons (r : PosRoot p q) (l : List (PosRoot p q)) :
-    ∑ x, ht x * drop l x < ∑ x, ht x * drop (r :: l) x := by
+theorem ht_drop_cons (r : PosRoot p q) (l : List (PosRoot p q))
+    : ∑ x, ht x * drop l x < ∑ x, ht x * drop (r :: l) x := by
   have hr := ht_lt r.2
   simp only [drop_cons, mul_add, Finset.sum_add_distrib, mul_sub, mul_ite, mul_one, mul_zero,
     Finset.sum_sub_distrib, Finset.sum_ite_eq', Finset.mem_univ, if_true]
@@ -38,14 +42,18 @@ theorem ht_drop_nonneg (l : List (PosRoot p q)) : 0 ≤ ∑ x, ht x * drop l x :
   | nil => simp [drop, cnt]
   | cons r l ih => exact (lt_of_le_of_lt ih (ht_drop_cons r l)).le
 
-theorem eq_smul_of_mem_span {V : Type*} [AddCommGroup V] [Module ℂ V] {act : Mat p q →ₗ[ℂ] Module.End ℂ V}
-    (h : IsLieAct act) {μ : Ix p q → ℚ} {v : V} (hv : ∀ a, act (Eab a a) v = ((μ a : ℚ) : ℂ) • v) {w : V}
-    (hw : w ∈ Submodule.span ℂ (Set.range (mono act v))) (hwt : ∀ a, act (Eab a a) w = ((μ a : ℚ) : ℂ) • w) :
-    ∃ c : ℂ, c • v = w := by
+theorem eq_smul_of_mem_span
+    {V : Type*} [AddCommGroup V] [Module ℂ V]
+    {act : Mat p q →ₗ[ℂ] Module.End ℂ V} (h : IsLieAct act)
+    {μ : Ix p q → ℚ} {v : V} (hv : ∀ a, act (Eab a a) v = ((μ a : ℚ) : ℂ) • v)
+    {w : V} (hw : w ∈ Submodule.span ℂ (Set.range (mono act v)))
+    (hwt : ∀ a, act (Eab a a) w = ((μ a : ℚ) : ℂ) • w)
+    : ∃ c : ℂ, c • v = w := by
   classical
   let m' : {l : List (PosRoot p q) // l ≠ []} → V := fun l => mono act v l.1
-  have hle : Submodule.span ℂ (Set.range (mono act v)) ≤
-      Submodule.span ℂ {v} ⊔ Submodule.span ℂ (Set.range m') := by
+  have hle
+      : Submodule.span ℂ (Set.range (mono act v))
+        ≤ Submodule.span ℂ {v} ⊔ Submodule.span ℂ (Set.range m') := by
     rw [Submodule.span_le]
     rintro _ ⟨l, rfl⟩
     cases l with
@@ -62,9 +70,14 @@ theorem eq_smul_of_mem_span {V : Type*} [AddCommGroup V] [Module ℂ V] {act : M
     have h1 := hwt a
     rw [map_add (f := _), map_smul, hv a, smul_add, smul_comm c] at h1
     exact add_left_cancel h1
-  obtain ⟨⟨l, hl0⟩, hl⟩ := weight_of_mem_span (fun a => act (Eab a a)) m'
-    (fun l a => ((((μ a : ℚ) : ℝ) - drop l.1 a : ℝ) : ℂ)) (fun l a => mono_weight h hv l.1 a)
-    (fun a => ((μ a : ℚ) : ℂ)) z hz hz0 hzw
+  obtain ⟨⟨l, hl0⟩, hl⟩ :=
+    weight_of_mem_span
+      (fun a => act (Eab a a))
+      m'
+      (fun l a => ((((μ a : ℚ) : ℝ) - drop l.1 a : ℝ) : ℂ))
+      (fun l a => mono_weight h hv l.1 a)
+      (fun a => ((μ a : ℚ) : ℂ))
+      z hz hz0 hzw
   have hd : ∀ a, drop l a = 0 := by
     intro a
     have h1 : ((((μ a : ℚ) : ℝ) - drop l a : ℝ) : ℂ) = (((μ a : ℚ) : ℝ) : ℂ) := by
@@ -77,12 +90,17 @@ theorem eq_smul_of_mem_span {V : Type*} [AddCommGroup V] [Module ℂ V] {act : M
   simp only [hd, mul_zero, Finset.sum_const_zero] at h3
   linarith
 
-variable {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} {T : GrpData p q} (R : DSRep T)
+variable
+  {e : Ix p q ≃ Fin n} {ε : Fin n → Bool} {T : GrpData p q} (R : DSRep T)
   {σ : Matrix (Fin n) (Fin n) ℂ → (R.U.H →L[ℂ] R.U.H)}
 
-theorem isKTypeOf_span (h : BlockOrd e ε) (hσ : Factors R.U e σ) (μ : Ix p q → ℚ) {v : R.HK.V}
-    (hv : Formalism.BasicNotions.TH.IsHW R.HK.act μ v) :
-    IsKTypeOf ε σ (fun i => (μ (e.symm i) : ℝ)) ((Submodule.span ℂ (Set.range (mono R.HK.act v))).map R.ι) := by
+theorem isKTypeOf_span
+    (h : BlockOrd e ε) (hσ : Factors R.U e σ)
+    (μ : Ix p q → ℚ)
+    {v : R.HK.V} (hv : Formalism.BasicNotions.TH.IsHW R.HK.act μ v)
+    : IsKTypeOf ε σ
+      (fun i => (μ (e.symm i) : ℝ))
+      ((Submodule.span ℂ (Set.range (mono R.HK.act v))).map R.ι) := by
   classical
   set W := Submodule.span ℂ (Set.range (mono R.HK.act v)) with hWdef
   have hlie : IsLieAct R.HK.act := R.HK.lie
@@ -107,9 +125,12 @@ theorem isKTypeOf_span (h : BlockOrd e ε) (hσ : Factors R.U e σ) (μ : Ix p q
     have hS'f : FiniteDimensional ℂ S' := Submodule.finiteDimensional_of_le hS'le
     have : CompleteSpace S' := FiniteDimensional.complete ℂ S'
     have hCK : IsKStableOn ε σ (S'ᗮ ⊓ W.map R.ι) := fun g hg x hx =>
-      Submodule.mem_inf.2 ⟨kstable_orthogonal R h hσ hS' g hg x (Submodule.mem_inf.1 hx).1,
-        hKs g hg x (Submodule.mem_inf.1 hx).2⟩
-    have hCf : FiniteDimensional ℂ ↥(S'ᗮ ⊓ W.map R.ι) := Submodule.finiteDimensional_of_le inf_le_right
+      Submodule.mem_inf.2 ⟨
+        kstable_orthogonal R h hσ hS' g hg x (Submodule.mem_inf.1 hx).1,
+        hKs g hg x (Submodule.mem_inf.1 hx).2
+      ⟩
+    have hCf : FiniteDimensional ℂ ↥(S'ᗮ ⊓ W.map R.ι) :=
+      Submodule.finiteDimensional_of_le inf_le_right
     obtain ⟨-, hS0map, hS0st⟩ := comap_kstable R h hσ hS'f hS'
     obtain ⟨-, -, hC0st⟩ := comap_kstable R h hσ hCf hCK
     have hdisj : ∀ x, x ∈ S'.comap R.ι → x ∈ (S'ᗮ ⊓ W.map R.ι).comap R.ι → x = 0 := by
@@ -136,8 +157,9 @@ theorem isKTypeOf_span (h : BlockOrd e ε) (hσ : Factors R.U e σ) (μ : Ix p q
       have hm1 : R.HK.act (Eab a a) s - ((μ a : ℚ) : ℂ) • s ∈ S'.comap R.ι :=
         Submodule.sub_mem _ (hS0st _ hK _ hs) (Submodule.smul_mem _ _ hs)
       have hm2 : R.HK.act (Eab a a) s - ((μ a : ℚ) : ℂ) • s ∈ (S'ᗮ ⊓ W.map R.ι).comap R.ι := by
-        have he : R.HK.act (Eab a a) s - ((μ a : ℚ) : ℂ) • s =
-            ((μ a : ℚ) : ℂ) • t - R.HK.act (Eab a a) t := by
+        have he
+            : R.HK.act (Eab a a) s - ((μ a : ℚ) : ℂ) • s
+              = ((μ a : ℚ) : ℂ) • t - R.HK.act (Eab a a) t := by
           rw [sub_eq_sub_iff_add_eq_add, e1]; abel
         rw [he]
         exact Submodule.sub_mem _ (Submodule.smul_mem _ _ ht) (hC0st _ hK _ ht)
@@ -161,7 +183,9 @@ theorem isKTypeOf_span (h : BlockOrd e ε) (hσ : Factors R.U e σ) (μ : Ix p q
         exact Submodule.smul_mem _ _ hs
       have hWS : W ≤ S'.comap R.ι := hWle _ hvS0 hS0st
       refine le_antisymm hS'le ?_
-      calc W.map R.ι ≤ (S'.comap R.ι).map R.ι := Submodule.map_mono hWS
+      calc
+        W.map R.ι
+          ≤ (S'.comap R.ι).map R.ι := Submodule.map_mono hWS
         _ = S' := hS0map
   · refine ⟨R.ι v, Submodule.mem_map_of_mem hvW, fun h0 => hv0 (hι (by rw [h0, map_zero])), ?_⟩
     refine (TorusWt.isWtOn_iff p q n e ε T R σ h hσ _ v).2 fun a => ?_
@@ -170,12 +194,20 @@ theorem isKTypeOf_span (h : BlockOrd e ε) (hσ : Factors R.U e σ) (μ : Ix p q
     obtain ⟨w, hwW, rfl⟩ := Submodule.mem_map.1 hx
     have hw0 : w ≠ 0 := fun h0 => hx0 (by rw [h0, map_zero])
     have hww := (TorusWt.isWtOn_iff p q n e ε T R σ h hσ ν w).1 hxw
-    obtain ⟨l, hl⟩ := weight_of_mem_span (fun a => R.HK.act (Eab a a)) (mono R.HK.act v)
-      (fun l a => ((((μ a : ℚ) : ℝ) - drop l a : ℝ) : ℂ)) (fun l a => mono_weight hlie hvw l a)
-      (fun a => ((ν (e a) : ℝ) : ℂ)) w hwW hw0 hww
-    have hl' : ∀ a, ((μ a : ℚ) : ℝ) - drop l a = ν (e a) :=
-      fun a => Complex.ofReal_injective (congrFun hl a)
-    have key : ∀ x, ∑ i, ∑ j, (cnt l (e.symm i) (e.symm j) : ℝ) * Formalism.REAL.root i j (e x) = drop l x := by
+    obtain ⟨l, hl⟩ :=
+      weight_of_mem_span
+        (fun a => R.HK.act (Eab a a))
+        (mono R.HK.act v)
+        (fun l a => ((((μ a : ℚ) : ℝ) - drop l a : ℝ) : ℂ))
+        (fun l a => mono_weight hlie hvw l a)
+        (fun a => ((ν (e a) : ℝ) : ℂ))
+        w hwW hw0 hww
+    have hl' : ∀ a, ((μ a : ℚ) : ℝ) - drop l a = ν (e a) := fun a =>
+      Complex.ofReal_injective (congrFun hl a)
+    have key
+        : ∀ x,
+          ∑ i, ∑ j, (cnt l (e.symm i) (e.symm j) : ℝ) * Formalism.REAL.root i j (e x)
+            = drop l x := by
       intro x
       rw [← Equiv.sum_comp e]
       refine (Finset.sum_congr rfl fun a _ => (Equiv.sum_comp e _).symm).trans ?_
@@ -188,7 +220,17 @@ theorem isKTypeOf_span (h : BlockOrd e ε) (hσ : Factors R.U e σ) (μ : Ix p q
       simp only [Pi.sub_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Equiv.symm_apply_apply]
       linarith [key x, hl' x]
 
-theorem finrank_hwSub_eq_one : ∀ (p q n : ℕ) (e : Ix p q ≃ Fin n) (ε : Fin n → Bool) (T : GrpData p q) (R : DSRep T) (σ : Matrix (Fin n) (Fin n) ℂ → (R.U.H →L[ℂ] R.U.H)), BlockOrd e ε → Factors R.U e σ → ∀ μ : Ix p q → ℚ, (∃ S, IsKTypeOf ε σ (fun i => (μ (e.symm i) : ℝ)) S) → (∀ S S', IsKTypeOf ε σ (fun i => (μ (e.symm i) : ℝ)) S → IsKTypeOf ε σ (fun i => (μ (e.symm i) : ℝ)) S' → S = S') → Module.finrank ℂ ↥(hwSub R.HK.act μ) = 1 := by
+theorem finrank_hwSub_eq_one
+    : ∀ (p q n : ℕ) (e : Ix p q ≃ Fin n) (ε : Fin n → Bool) (T : GrpData p q) (R : DSRep T)
+        (σ : Matrix (Fin n) (Fin n) ℂ → (R.U.H →L[ℂ] R.U.H)),
+      BlockOrd e ε → Factors R.U e σ
+        → ∀ μ : Ix p q → ℚ,
+          (∃ S, IsKTypeOf ε σ (fun i => (μ (e.symm i) : ℝ)) S)
+            → (∀ S S',
+              IsKTypeOf ε σ (fun i => (μ (e.symm i) : ℝ)) S
+                → IsKTypeOf ε σ (fun i => (μ (e.symm i) : ℝ)) S'
+                → S = S')
+            → Module.finrank ℂ ↥(hwSub R.HK.act μ) = 1 := by
   intro p q n e ε T R σ h hσ μ hex huniq
   classical
   obtain ⟨S, hS⟩ := hex

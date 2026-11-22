@@ -7,7 +7,8 @@ public import Formalism.PolynomialDimension.WeylDim
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.DualWeyl GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.DefPt MvPolynomial
+open NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj
+  GlobalTheory.DualWeyl GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.DefPt MvPolynomial
 open scoped Matrix
 
 namespace GlobalTheory.Neat
@@ -119,10 +120,19 @@ lemma eq_one_of_unipotent_mod_of_unit [IsDomain R] [IsNoetherianRing R] [Module.
 
 end GlobalTheory.Neat
 
-theorem GlobalTheory.eq_one_of_finite_order_unipotent_mod_two_primes : ∀ (E : Type) [Field E] [NumberField E] (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] [Module.Finite (𝓞 E) Λ] [Module.IsTorsionFree (𝓞 E) Λ] (α : Λ →ₗ[𝓞 E] Λ) (m r g₁ g₂ : ℕ) (I₁ I₂ : Ideal (𝓞 E)), 0 < m → α ^ m = 1 → g₁.Prime → g₂.Prime → g₁ ≠ g₂ → I₁ ≠ ⊤ → I₂ ≠ ⊤ → (g₁ : 𝓞 E) ∈ I₁ → (g₂ : 𝓞 E) ∈ I₂ → (∀ x, ((α - 1) ^ r) x ∈ I₁ • (⊤ : Submodule (𝓞 E) Λ)) → (∀ x, ((α - 1) ^ r) x ∈ I₂ • (⊤ : Submodule (𝓞 E) Λ)) → α = 1 := by
+theorem GlobalTheory.eq_one_of_finite_order_unipotent_mod_two_primes
+    : ∀ (E : Type) [Field E] [NumberField E] (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ]
+        [Module.Finite (𝓞 E) Λ] [Module.IsTorsionFree (𝓞 E) Λ] (α : Λ →ₗ[𝓞 E] Λ) (m r g₁ g₂ : ℕ)
+        (I₁ I₂ : Ideal (𝓞 E)),
+      0 < m → α ^ m = 1 → g₁.Prime → g₂.Prime → g₁ ≠ g₂ → I₁ ≠ ⊤ → I₂ ≠ ⊤ → (g₁ : 𝓞 E) ∈ I₁
+        → (g₂ : 𝓞 E) ∈ I₂ → (∀ x, ((α - 1) ^ r) x ∈ I₁ • (⊤ : Submodule (𝓞 E) Λ))
+        → (∀ x, ((α - 1) ^ r) x ∈ I₂ • (⊤ : Submodule (𝓞 E) Λ))
+        → α = 1 := by
   intro E _ _ Λ _ _ _ _ α m r g₁ g₂ I₁ I₂ hm hαm hg₁ hg₂ hne hI₁ hI₂ hg₁I hg₂I h₁ h₂
-  have key : ∀ (p : ℕ) (I : Ideal (𝓞 E)), p.Prime → I ≠ ⊤ → (p : 𝓞 E) ∈ I →
-      (∀ x, ((α - 1) ^ r) x ∈ I • (⊤ : Submodule (𝓞 E) Λ)) → ∃ a : ℕ, α ^ p ^ a = 1 := by
+  have key
+      : ∀ (p : ℕ) (I : Ideal (𝓞 E)),
+        p.Prime → I ≠ ⊤ → (p : 𝓞 E) ∈ I → (∀ x, ((α - 1) ^ r) x ∈ I • (⊤ : Submodule (𝓞 E) Λ))
+          → ∃ a : ℕ, α ^ p ^ a = 1 := by
     intro p I hp hI hpI h
     obtain ⟨a, b, hpb, hmab⟩ := Nat.exists_eq_pow_mul_and_not_dvd hm.ne' p hp.one_lt.ne'
     refine ⟨a, ?_⟩
@@ -132,9 +142,9 @@ theorem GlobalTheory.eq_one_of_finite_order_unipotent_mod_two_primes : ∀ (E : 
     refine GlobalTheory.Neat.eq_one_of_unipotent_mod_of_unit I hI (α ^ p ^ a) b r ?_ v ?_
       (GlobalTheory.Neat.pow_prime_pow_unipotent I α hp hpI a r h)
     · rw [← pow_mul, ← hmab, hαm]
-    · have : 1 - v * (b : 𝓞 E) ^ (r + 1) = u * p := by
-        rw [← huv]; push_cast; ring
-      rw [this]; exact I.mul_mem_left u hpI
+    · have : 1 - v * (b : 𝓞 E) ^ (r + 1) = u * p := by rw [← huv]; push_cast; ring
+      rw [this]
+      exact I.mul_mem_left u hpI
   obtain ⟨a, ha⟩ := key g₁ I₁ hg₁ hI₁ hg₁I h₁
   obtain ⟨c, hc⟩ := key g₂ I₂ hg₂ hI₂ hg₂I h₂
   have hcop : Nat.Coprime (g₁ ^ a) (g₂ ^ c) :=

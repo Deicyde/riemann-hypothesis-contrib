@@ -9,9 +9,13 @@ noncomputable section
 
 namespace UpperTheory.Kd.C7
 
-private theorem mem_zpowers_un_of_primitive_root_mod_sq {l : ℕ} [Fact (Nat.Prime l)] (hl2 : l ≠ 2) (g : ℕ) (hg : ¬ l ∣ g)
-    (ho : orderOf (g : ZMod l) = l - 1) (hnd : ¬ ((l : ℤ) ^ 2 ∣ (g : ℤ) ^ (l - 1) - 1))
-    (r : ℕ) (x : (ZMod (l ^ r))ˣ) : x ∈ Subgroup.zpowers (un g hg r) := by
+private theorem mem_zpowers_un_of_primitive_root_mod_sq
+    {l : ℕ} [Fact (Nat.Prime l)]
+    (hl2 : l ≠ 2)
+    (g : ℕ) (hg : ¬ l ∣ g) (ho : orderOf (g : ZMod l) = l - 1)
+    (hnd : ¬((l : ℤ) ^ 2 ∣ (g : ℤ) ^ (l - 1) - 1))
+    (r : ℕ) (x : (ZMod (l ^ r))ˣ)
+    : x ∈ Subgroup.zpowers (un g hg r) := by
   have hp : l.Prime := Fact.out
   have hgl : (g : ZMod l) ≠ 0 := by
     rw [Ne, ZMod.natCast_eq_zero_iff]
@@ -24,19 +28,18 @@ private theorem mem_zpowers_un_of_primitive_root_mod_sq {l : ℕ} [Fact (Nat.Pri
   have han : ¬ (l : ℤ) ∣ a := by
     rintro ⟨b, rfl⟩
     exact hnd ⟨b, by rw [ha]; ring⟩
-  have hga : (g : ℤ) ^ (l - 1) = 1 + l * a := by
-    rw [← ha]; ring
+  have hga : (g : ℤ) ^ (l - 1) = 1 + l * a := by rw [← ha]; ring
   rcases r with _ | n
-  · have : Subsingleton (ZMod (l ^ 0))ˣ := by
-      rw [pow_zero]; infer_instance
+  · have : Subsingleton (ZMod (l ^ 0))ˣ := by rw [pow_zero]; infer_instance
     rw [Subsingleton.elim x 1]
     exact Subgroup.one_mem _
   set u := un g hg (n + 1) with hu
-  have hcast : (u : ZMod (l ^ (n + 1))) = (g : ZMod (l ^ (n + 1))) := by
-    simp [hu, un]
+  have hcast : (u : ZMod (l ^ (n + 1))) = (g : ZMod (l ^ (n + 1))) := by simp [hu, un]
   have h1 : orderOf (u ^ (l - 1)) = l ^ n := by
     rw [← orderOf_units, Units.val_pow_eq_pow_val, hcast]
-    have e : (g : ZMod (l ^ (n + 1))) ^ (l - 1) = 1 + (l : ZMod (l ^ (n + 1))) * (a : ZMod (l ^ (n + 1))) := by
+    have e
+        : (g : ZMod (l ^ (n + 1))) ^ (l - 1)
+          = 1 + (l : ZMod (l ^ (n + 1))) * (a : ZMod (l ^ (n + 1))) := by
       have := congrArg (Int.cast : ℤ → ZMod (l ^ (n + 1))) hga
       push_cast at this
       exact this
@@ -94,22 +97,22 @@ theorem pGenEx : SGenEx := by
     have h01 : c0 = 0 ∨ c0 = 1 := by omega
     rcases h01 with h0 | h1
     · exact hnd0 (h0 ▸ dvd_zero l)
-    · have h1' : (c : ZMod l) = 1 := by
-        rw [← hc0, h1, Nat.cast_one]
+    · have h1' : (c : ZMod l) = 1 := by rw [← hc0, h1, Nat.cast_one]
       have hc1 : c = 1 := Units.ext h1'
       rw [hc1, orderOf_one] at hc
       have := hp.two_le
       omega
   by_cases hsq : (l : ℤ) ^ 2 ∣ (c0 : ℤ) ^ (l - 1) - 1
-  · have hnd1 : ¬ ((l : ℤ) ^ 2 ∣ ((c0 + l * 1 : ℕ) : ℤ) ^ (l - 1) - 1) := by
+  · have hnd1 : ¬((l : ℤ) ^ 2 ∣ ((c0 + l * 1 : ℕ) : ℤ) ^ (l - 1) - 1) := by
       intro hB
       have key := sq_dvd_add_pow_sub_sub (l : ℤ) (c0 : ℤ) (l - 1)
       have hsum : (l : ℤ) ^ 2 ∣ (c0 : ℤ) ^ (l - 1 - 1) * l * ((l - 1 : ℕ) : ℤ) := by
-        have e : (c0 : ℤ) ^ (l - 1 - 1) * l * ((l - 1 : ℕ) : ℤ) =
-            (((c0 + l * 1 : ℕ) : ℤ) ^ (l - 1) - 1)
-              - (((c0 : ℤ) + l) ^ (l - 1) - (c0 : ℤ) ^ (l - 1 - 1) * l * ((l - 1 : ℕ) : ℤ)
-                - (c0 : ℤ) ^ (l - 1))
-              - ((c0 : ℤ) ^ (l - 1) - 1) := by
+        have e
+            : (c0 : ℤ) ^ (l - 1 - 1) * l * ((l - 1 : ℕ) : ℤ)
+              = (((c0 + l * 1 : ℕ) : ℤ) ^ (l - 1) - 1)
+                - (((c0 : ℤ) + l) ^ (l - 1) - (c0 : ℤ) ^ (l - 1 - 1) * l * ((l - 1 : ℕ) : ℤ)
+                  - (c0 : ℤ) ^ (l - 1))
+                - ((c0 : ℤ) ^ (l - 1) - 1) := by
           push_cast
           ring
         rw [e]
@@ -117,8 +120,10 @@ theorem pGenEx : SGenEx := by
       have h6 : (l : ℤ) ∣ (c0 : ℤ) ^ (l - 1 - 1) * ((l - 1 : ℕ) : ℤ) := by
         have hl0 : (l : ℤ) ≠ 0 := by exact_mod_cast hp.ne_zero
         rw [← mul_dvd_mul_iff_left hl0]
-        have e2 : (l : ℤ) * ((c0 : ℤ) ^ (l - 1 - 1) * ((l - 1 : ℕ) : ℤ))
-            = (c0 : ℤ) ^ (l - 1 - 1) * l * ((l - 1 : ℕ) : ℤ) := by ring
+        have e2
+            : (l : ℤ) * ((c0 : ℤ) ^ (l - 1 - 1) * ((l - 1 : ℕ) : ℤ))
+              = (c0 : ℤ) ^ (l - 1 - 1) * l * ((l - 1 : ℕ) : ℤ) := by
+          ring
         rw [e2, ← sq]
         exact hsum
       have h7 : l ∣ c0 ^ (l - 1 - 1) * (l - 1) := by exact_mod_cast h6
@@ -127,7 +132,12 @@ theorem pGenEx : SGenEx := by
       · have := hp.two_le
         have := Nat.le_of_dvd (by omega) h8
         omega
-    exact ⟨c0 + l * 1, hndk 1, by omega, mem_zpowers_un_of_primitive_root_mod_sq hl2 _ (hndk 1) (hord 1) hnd1⟩
+    exact ⟨
+      c0 + l * 1,
+      hndk 1,
+      by omega,
+      mem_zpowers_un_of_primitive_root_mod_sq hl2 _ (hndk 1) (hord 1) hnd1
+    ⟩
   · have h0 := hord 0
     simp only [mul_zero, add_zero] at h0
     exact ⟨c0, hnd0, hc2, mem_zpowers_un_of_primitive_root_mod_sq hl2 c0 hnd0 h0 hsq⟩

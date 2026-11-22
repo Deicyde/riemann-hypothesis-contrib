@@ -12,23 +12,26 @@ namespace GroundTheory.ProfCoh
 
 open CategoryTheory IntermediateField GroundTheory.LocalField ValuativeRel
 
-variable (F Ω : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  [Field Ω] [Algebra F Ω] [IsSepClosure F Ω]
-  [ValuativeRel Ω] [TopologicalSpace Ω] [IsValuativeTopology Ω] [ValuativeExtension F Ω]
-
+variable
+  (F Ω : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+  [Field Ω] [Algebra F Ω] [IsSepClosure F Ω] [ValuativeRel Ω] [TopologicalSpace Ω]
+  [IsValuativeTopology Ω] [ValuativeExtension F Ω]
 
 omit [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [ValuativeRel Ω]
   [TopologicalSpace Ω] [IsValuativeTopology Ω] [ValuativeExtension F Ω] in
-theorem brauerInflation_unitsInflationOfLE {E E' : IntermediateField F Ω} (h : E ≤ E')
+theorem brauerInflation_unitsInflationOfLE
+    {E E' : IntermediateField F Ω} (h : E ≤ E')
     [FiniteDimensional F E] [Normal F E] [FiniteDimensional F E'] [Normal F E']
-    (y : groupCohomology (galUnits F E) 2) :
-    (brauerInflation E').hom ((unitsInflationOfLE h 2).hom y) = (brauerInflation E).hom y := by
+    (y : groupCohomology (galUnits F E) 2)
+    : (brauerInflation E').hom ((unitsInflationOfLE h 2).hom y) = (brauerInflation E).hom y := by
   have e := congrArg (fun φ => φ.hom y) (unitsInflationOfLE_comp_unitsInflation (L := Ω) h 2)
   simpa only [ModuleCat.hom_comp, LinearMap.comp_apply] using e
 
-theorem exists_unramifiedLevel_brauerInflation_eq (E : IntermediateField F Ω) [FiniteDimensional F E]
-    [IsGalois F E] (N : ℕ+) (hEN : Module.finrank F E = N) (y : groupCohomology (galUnits F E) 2) :
-    ∃ z : groupCohomology (galUnits F (unramifiedLevel F Ω N)) 2,
+theorem exists_unramifiedLevel_brauerInflation_eq
+    (E : IntermediateField F Ω) [FiniteDimensional F E] [IsGalois F E]
+    (N : ℕ+) (hEN : Module.finrank F E = N)
+    (y : groupCohomology (galUnits F E) 2)
+    : ∃ z : groupCohomology (galUnits F (unramifiedLevel F Ω N)) 2,
       (brauerInflation (unramifiedLevel F Ω N)).hom z = (brauerInflation E).hom y := by
   classical
   set n := Module.finrank F E with hn_def
@@ -81,40 +84,44 @@ theorem exists_unramifiedLevel_brauerInflation_eq (E : IntermediateField F Ω) [
 
   have hNM : unramifiedLevel F Ω N ≤ M :=
     (IsUnramifiedSubextension.le_adjoin (isUnramifiedSubextension_unramifiedLevel F Ω N)
-      (mul_ne_zero hf hn) (by rw [finrank_unramifiedLevel, hNn]; exact dvd_mul_left n f) hζ).trans
+        (mul_ne_zero hf hn) (by rw [finrank_unramifiedLevel, hNn]; exact dvd_mul_left n f) hζ).trans
       le_sup_right
   let _ : Algebra (unramifiedLevel F Ω N) M := (IntermediateField.inclusion hNM).toRingHom.toAlgebra
   have : IsScalarTower F (unramifiedLevel F Ω N) M := IsScalarTower.of_algebraMap_eq' rfl
   have : ValuativeExtension (unramifiedLevel F Ω N) M :=
     IntermediateField.valuativeExtension_inclusion hNM
 
-  have hvanish := unitsInfl_comp_unitsRes_eq_zero F E (unramifiedLevel F Ω N) M
-    (by rw [finrank_unramifiedLevel, hNn])
+  have hvanish :=
+    unitsInfl_comp_unitsRes_eq_zero F E (unramifiedLevel F Ω N) M
+      (by rw [finrank_unramifiedLevel, hNn])
 
-  have hAB : LinearMap.range (unitsInfl F (unramifiedLevel F Ω N) M 2).hom ≤
-      LinearMap.range (unitsInfl F E M 2).hom := by
+  have hAB
+      : LinearMap.range (unitsInfl F (unramifiedLevel F Ω N) M 2).hom
+        ≤ LinearMap.range (unitsInfl F E M 2).hom := by
     rintro _ ⟨w, rfl⟩
     rw [range_unitsInfl_two_eq_ker_unitsRes F E M, LinearMap.mem_ker]
     exact congrArg (fun φ => φ.hom w) hvanish
   have hcardA : Nat.card (LinearMap.range (unitsInfl F (unramifiedLevel F Ω N) M 2).hom) = n := by
     rw [← Nat.card_congr (LinearEquiv.ofInjective _
-      (unitsInfl_two_injective F (unramifiedLevel F Ω N) M)).toEquiv,
+        (unitsInfl_two_injective F (unramifiedLevel F Ω N) M)).toEquiv,
       natCard_groupCohomology_two_galUnits, finrank_unramifiedLevel, hNn]
   have hcardB : Nat.card (LinearMap.range (unitsInfl F E M 2).hom) = n := by
     rw [← Nat.card_congr (LinearEquiv.ofInjective _ (unitsInfl_two_injective F E M)).toEquiv,
       natCard_groupCohomology_two_galUnits]
   have : Finite (LinearMap.range (unitsInfl F E M 2).hom) :=
     Nat.finite_of_card_ne_zero (hcardB.trans_ne hn)
-  have hBA : LinearMap.range (unitsInfl F E M 2).hom ≤
-      LinearMap.range (unitsInfl F (unramifiedLevel F Ω N) M 2).hom := by
+  have hBA
+      : LinearMap.range (unitsInfl F E M 2).hom
+        ≤ LinearMap.range (unitsInfl F (unramifiedLevel F Ω N) M 2).hom := by
     have : Finite (LinearMap.range (unitsInfl F E M 2).hom).toAddSubgroup := this
-    have h := AddSubgroup.eq_of_le_of_card_ge (H := (LinearMap.range
-      (unitsInfl F (unramifiedLevel F Ω N) M 2).hom).toAddSubgroup)
-      (K := (LinearMap.range (unitsInfl F E M 2).hom).toAddSubgroup) hAB
-      (by
-        change Nat.card (LinearMap.range (unitsInfl F E M 2).hom) ≤
-          Nat.card (LinearMap.range (unitsInfl F (unramifiedLevel F Ω N) M 2).hom)
-        rw [hcardA, hcardB])
+    have h :=
+      AddSubgroup.eq_of_le_of_card_ge
+        (H := (LinearMap.range (unitsInfl F (unramifiedLevel F Ω N) M 2).hom).toAddSubgroup)
+        (K := (LinearMap.range (unitsInfl F E M 2).hom).toAddSubgroup) hAB
+        (by
+          change Nat.card (LinearMap.range (unitsInfl F E M 2).hom)
+            ≤ Nat.card (LinearMap.range (unitsInfl F (unramifiedLevel F Ω N) M 2).hom)
+          rw [hcardA, hcardB])
     intro v hv
     have hv' : v ∈ (LinearMap.range (unitsInfl F E M 2).hom).toAddSubgroup := hv
     rw [← h] at hv'
@@ -124,12 +131,13 @@ theorem exists_unramifiedLevel_brauerInflation_eq (E : IntermediateField F Ω) [
   rw [← brauerInflation_unitsInflationOfLE F Ω hNM, ← brauerInflation_unitsInflationOfLE F Ω hEM]
   exact congrArg (brauerInflation M).hom hz
 
-theorem exists_brauerInflation_unramifiedLevel (x : galoisBrauerGroup F Ω) :
-    ∃ (n : ℕ+) (y : groupCohomology (galUnits F (unramifiedLevel F Ω n)) 2),
+theorem exists_brauerInflation_unramifiedLevel (x : galoisBrauerGroup F Ω)
+    : ∃ (n : ℕ+) (y : groupCohomology (galUnits F (unramifiedLevel F Ω n)) 2),
       (brauerInflation (unramifiedLevel F Ω n)).hom y = x := by
   obtain ⟨E, y, rfl⟩ := exists_brauerInflation_eq x
-  obtain ⟨z, hz⟩ := exists_unramifiedLevel_brauerInflation_eq F Ω E.toIntermediateField
-    ⟨Module.finrank F E.toIntermediateField, Module.finrank_pos⟩ rfl y
+  obtain ⟨z, hz⟩ :=
+    exists_unramifiedLevel_brauerInflation_eq F Ω E.toIntermediateField
+      ⟨Module.finrank F E.toIntermediateField, Module.finrank_pos⟩ rfl y
   exact ⟨_, z, hz⟩
 
 noncomputable def brauerInv : galoisBrauerGroup F Ω →+ QZ where
@@ -143,21 +151,22 @@ noncomputable def brauerInv : galoisBrauerGroup F Ω →+ QZ where
     have hm : (m : ℕ) ∣ ((m * n : ℕ+) : ℕ) := ⟨n, by simp⟩
     have hn : (n : ℕ) ∣ ((m * n : ℕ+) : ℕ) := ⟨m, by simp [mul_comm]⟩
     rw [← brauerInflation_unitsInflationOfLE F Ω (unramifiedLevel_le F Ω hm) y,
-      ← brauerInflation_unitsInflationOfLE F Ω (unramifiedLevel_le F Ω hn) z,
-      ← LinearMap.map_add]
+      ← brauerInflation_unitsInflationOfLE F Ω (unramifiedLevel_le F Ω hn) z, ← LinearMap.map_add]
     simp only [brauerInvFun_brauerInflation]
     exact map_add _ _ _
 
-theorem brauerInv_brauerInflation (n : ℕ+)
-    (y : groupCohomology (galUnits F (unramifiedLevel F Ω n)) 2) :
-    brauerInv F Ω ((brauerInflation (unramifiedLevel F Ω n)).hom y) = unramifiedLevelInv F Ω n y :=
+theorem brauerInv_brauerInflation
+    (n : ℕ+) (y : groupCohomology (galUnits F (unramifiedLevel F Ω n)) 2)
+    : brauerInv F Ω ((brauerInflation (unramifiedLevel F Ω n)).hom y)
+      = unramifiedLevelInv F Ω n y :=
   brauerInvFun_brauerInflation F Ω n y
 
 theorem unramifiedLevelInv_injective (n : ℕ+) : Function.Injective (unramifiedLevelInv F Ω n) :=
   (unramifiedInv_injective F (unramifiedLevel F Ω n)).comp (h2GalUnitsAddEquiv F _).injective
 
 theorem brauerInv_injective : Function.Injective (brauerInv F Ω) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   obtain ⟨n, y, rfl⟩ := exists_brauerInflation_unramifiedLevel F Ω x
   rw [brauerInv_brauerInflation] at hx

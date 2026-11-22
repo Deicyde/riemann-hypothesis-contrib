@@ -14,11 +14,13 @@ open IsLocalRing GlobalTheory.Toroidal GlobalTheory.TorRef TensorProduct
 
 namespace GlobalTheory.NormalBaseChange
 
-theorem exists_etale_of_isEtaleCompletion (A R : Type) [CommRing A] [IsLocalRing A] [CommRing R] [IsLocalRing R]
-    [Algebra A R] [IsNoetherianRing A] [IsNoetherianRing R] [IsAdicComplete (maximalIdeal R) R]
-    (het : IsEtaleCompletion (algebraMap A R)) (hfu : ((residue R).comp (algebraMap A R)).FormallyUnramified) :
-    ∃ g : AdicCompletion (maximalIdeal A) A →+* R, g.comp (algebraMap A _) = algebraMap A R ∧
-      @Algebra.Etale _ R _ _ g.toAlgebra := by
+theorem exists_etale_of_isEtaleCompletion
+    (A R : Type) [CommRing A] [IsLocalRing A] [CommRing R] [IsLocalRing R] [Algebra A R]
+    [IsNoetherianRing A] [IsNoetherianRing R] [IsAdicComplete (maximalIdeal R) R]
+    (het : IsEtaleCompletion (algebraMap A R))
+    (hfu : ((residue R).comp (algebraMap A R)).FormallyUnramified)
+    : ∃ g : AdicCompletion (maximalIdeal A) A →+* R,
+      g.comp (algebraMap A _) = algebraMap A R ∧ @Algebra.Etale _ R _ _ g.toAlgebra := by
   obtain ⟨hflat, hmap, hfin⟩ := het
   set h := algebraMap A R with hh
   let D := AdicCompletion (maximalIdeal A) A

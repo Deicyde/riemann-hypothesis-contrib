@@ -6,13 +6,15 @@ public import Formalism.LocalToGlobal.HermitianForms.TiedStep
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix GlobalTheory.St.G
+open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix
+  GlobalTheory.St.G
 open scoped TensorProduct
 
 namespace GlobalTheory.St.G.Torus
 
-theorem exists_mulShift {k : Type} [Field k] [Finite k] (ψ ψ' : AddChar k ℂ) (h : ψ ≠ 1) (h' : ψ' ≠ 1) :
-    ∃ a : k, a ≠ 0 ∧ ψ' = ψ.mulShift a := by
+theorem exists_mulShift
+    {k : Type} [Field k] [Finite k] (ψ ψ' : AddChar k ℂ) (h : ψ ≠ 1) (h' : ψ' ≠ 1)
+    : ∃ a : k, a ≠ 0 ∧ ψ' = ψ.mulShift a := by
   classical
   haveI : Fintype k := Fintype.ofFinite k
   have hinj : Function.Injective ψ.mulShift :=
@@ -24,8 +26,11 @@ theorem exists_mulShift {k : Type} [Field k] [Finite k] (ψ ψ' : AddChar k ℂ)
   rintro rfl
   exact h' (by rw [← ha, AddChar.mulShift_zero])
 
-theorem conj_apply {k : Type} [Field k] {n : ℕ} (d : Fin n → kˣ) (M : Matrix (Fin n) (Fin n) k) (x y : Fin n) :
-    (diagonal (fun i => ((d i)⁻¹ : kˣ).1) * M * diagonal (fun i => (d i).1) : Matrix (Fin n) (Fin n) k) x y
+theorem conj_apply
+    {k : Type} [Field k] {n : ℕ} (d : Fin n → kˣ) (M : Matrix (Fin n) (Fin n) k) (x y : Fin n)
+    : (diagonal (fun i => ((d i)⁻¹ : kˣ).1) * M * diagonal (fun i => (d i).1)
+          : Matrix (Fin n) (Fin n) k)
+        x y
       = (((d x)⁻¹ * d y : kˣ) : k) * M x y := by
   rw [mul_diagonal, diagonal_mul, Units.val_mul]
   ring
@@ -50,7 +55,16 @@ private lemma inv_pow_mul_pow_succ_eq {k : Type} [Field k] (u : kˣ) (x y : ℕ)
   subst h
   rw [pow_succ, ← mul_assoc, inv_mul_cancel, one_mul]
 
-theorem torus_transitive : ∀ (k : Type) [Field k] [Finite k] (n t : ℕ) (ψ ψ' : AddChar k ℂ) (χ χ' : ℕ → MulChar k ℂ), ψ ≠ 1 → ψ' ≠ 1 → ∃ d : Fin n → kˣ, ∀ M : Matrix (Fin n) (Fin n) k, (InJ n t n false M ↔ InJ n t n false (diagonal (fun i => ((d i)⁻¹ : kˣ).1) * M * diagonal (fun i => (d i).1))) ∧ lamJ ψ' χ' n t 0 n M = (lamJ ψ χ n t 0 n (diagonal (fun i => ((d i)⁻¹ : kˣ).1) * M * diagonal (fun i => (d i).1)))⁻¹ := by
+theorem torus_transitive
+    : ∀ (k : Type) [Field k] [Finite k] (n t : ℕ) (ψ ψ' : AddChar k ℂ) (χ χ' : ℕ → MulChar k ℂ),
+      ψ ≠ 1 → ψ' ≠ 1
+        → ∃ d : Fin n → kˣ, ∀ M : Matrix (Fin n) (Fin n) k,
+          (InJ n t n false M
+              ↔ InJ n t n false
+                (diagonal (fun i => ((d i)⁻¹ : kˣ).1) * M * diagonal (fun i => (d i).1)))
+            ∧ lamJ ψ' χ' n t 0 n M
+              = (lamJ ψ χ n t 0 n
+                (diagonal (fun i => ((d i)⁻¹ : kˣ).1) * M * diagonal (fun i => (d i).1)))⁻¹ := by
   intro k _ _ n t ψ ψ' χ χ' hψ hψ'
   obtain ⟨a, ha, rfl⟩ := exists_mulShift ψ ψ' hψ hψ'
   set u : kˣ := Units.mk0 (-a) (neg_ne_zero.mpr ha) with hu

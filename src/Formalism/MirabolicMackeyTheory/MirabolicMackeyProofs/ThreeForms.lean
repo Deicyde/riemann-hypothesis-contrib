@@ -26,8 +26,8 @@ variable {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
 
 def qlen (X Y : Submodule R W) : ℕ∞ := Module.length R (↥X ⧸ Y.comap X.subtype)
 
-theorem qlen_congr (X : Submodule R W) {Y Y' : Submodule R W} (h : ∀ x ∈ X, x ∈ Y ↔ x ∈ Y') :
-    qlen X Y = qlen X Y' := by
+theorem qlen_congr (X : Submodule R W) {Y Y' : Submodule R W} (h : ∀ x ∈ X, x ∈ Y ↔ x ∈ Y')
+    : qlen X Y = qlen X Y' := by
   have : Y.comap X.subtype = Y'.comap X.subtype := by
     ext ⟨x, hx⟩
     exact h x hx
@@ -45,8 +45,8 @@ theorem qlen_eq_zero {X Y : Submodule R W} (h : X ≤ Y) : qlen X Y = 0 := by
   rw [this]
   simp
 
-theorem qlen_mono_left {X' X : Submodule R W} (h : X' ≤ X) (Y : Submodule R W) :
-    qlen X' Y ≤ qlen X Y := by
+theorem qlen_mono_left {X' X : Submodule R W} (h : X' ≤ X) (Y : Submodule R W)
+    : qlen X' Y ≤ qlen X Y := by
   unfold qlen
   let f : (↥X' ⧸ Y.comap X'.subtype) →ₗ[R] (↥X ⧸ Y.comap X.subtype) :=
     Submodule.mapQ _ _ (Submodule.inclusion h) (by
@@ -64,8 +64,8 @@ theorem qlen_mono_left {X' X : Submodule R W} (h : X' ≤ X) (Y : Submodule R W)
     rw [Submodule.mem_bot, Submodule.Quotient.mk_eq_zero]
     exact hy
 
-theorem qlen_le_of_sup {X' X Y : Submodule R W} (h : X' ≤ X) (hs : X ≤ X' ⊔ (X ⊓ Y)) :
-    qlen X Y ≤ qlen X' Y := by
+theorem qlen_le_of_sup {X' X Y : Submodule R W} (h : X' ≤ X) (hs : X ≤ X' ⊔ (X ⊓ Y))
+    : qlen X Y ≤ qlen X' Y := by
   unfold qlen
   let f : (↥X' ⧸ Y.comap X'.subtype) →ₗ[R] (↥X ⧸ Y.comap X.subtype) :=
     Submodule.mapQ _ _ (Submodule.inclusion h) (by
@@ -87,8 +87,8 @@ theorem qlen_le_of_sup {X' X Y : Submodule R W} (h : X' ≤ X) (hs : X ≤ X' �
     rw [this]
     exact Y.neg_mem ht.2
 
-theorem qlen_anti_right (X : Submodule R W) {Y Y' : Submodule R W} (h : Y ≤ Y') :
-    qlen X Y' ≤ qlen X Y := by
+theorem qlen_anti_right (X : Submodule R W) {Y Y' : Submodule R W} (h : Y ≤ Y')
+    : qlen X Y' ≤ qlen X Y := by
   unfold qlen
   let g : (↥X ⧸ Y.comap X.subtype) →ₗ[R] (↥X ⧸ Y'.comap X.subtype) :=
     Submodule.mapQ _ _ LinearMap.id (fun x hx => h hx)
@@ -97,12 +97,12 @@ theorem qlen_anti_right (X : Submodule R W) {Y Y' : Submodule R W} (h : Y ≤ Y'
   induction z using Submodule.Quotient.induction_on with
   | H x => exact ⟨Submodule.Quotient.mk x, rfl⟩
 
-theorem qlen_add {N M P : Submodule R W} (hNM : N ≤ M) (hMP : M ≤ P) :
-    qlen P N = qlen M N + qlen P M :=
+theorem qlen_add {N M P : Submodule R W} (hNM : N ≤ M) (hMP : M ≤ P)
+    : qlen P N = qlen M N + qlen P M :=
   indexBasic_len_add N M P hNM hMP
 
-theorem lidx_of_le (p : Ideal R) [p.IsPrime] {X Y : Submodule R W} (h : Y ≤ X) :
-    lidx p X Y = ((qlen (localization₂ p X) (localization₂ p Y)).toNat : ℤ) := by
+theorem lidx_of_le (p : Ideal R) [p.IsPrime] {X Y : Submodule R W} (h : Y ≤ X)
+    : lidx p X Y = ((qlen (localization₂ p X) (localization₂ p Y)).toNat : ℤ) := by
   unfold lidx
   rw [inf_eq_right.mpr h, indexBasic_locLen_self]
   simp [locLen, qlen]
@@ -111,35 +111,36 @@ end Len
 
 section Sc
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K]
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
   {Z : Type} [AddCommGroup Z] [Module K Z] [Module (𝓞 K) Z] [IsScalarTower (𝓞 K) K Z]
 
 def scE (a : K) (ha : a ≠ 0) : Z ≃ₗ[𝓞 K] Z :=
   (LinearEquiv.smulOfNeZero K Z a ha).restrictScalars (𝓞 K)
 
-theorem sc_eq_map (a : K) (ha : a ≠ 0) (X : Submodule (𝓞 K) Z) :
-    sc a X = X.map ((scE a ha : Z ≃ₗ[𝓞 K] Z) : Z →ₗ[𝓞 K] Z) := by
+theorem sc_eq_map (a : K) (ha : a ≠ 0) (X : Submodule (𝓞 K) Z)
+    : sc a X = X.map ((scE a ha : Z ≃ₗ[𝓞 K] Z) : Z →ₗ[𝓞 K] Z) := by
   ext x
   simp [sc, scE]
 
-theorem mem_sc_inv {a : K} (ha : a ≠ 0) (X : Submodule (𝓞 K) Z) (x : Z) :
-    x ∈ sc a⁻¹ X ↔ a • x ∈ X := by
+theorem mem_sc_inv {a : K} (ha : a ≠ 0) (X : Submodule (𝓞 K) Z) (x : Z)
+    : x ∈ sc a⁻¹ X ↔ a • x ∈ X := by
   constructor
   · rintro ⟨y, hy, rfl⟩
     simpa [smul_smul, ha] using hy
   · intro h
     exact ⟨a • x, h, by simp [smul_smul, ha]⟩
 
-theorem localization_sc (p : Ideal (𝓞 K)) [p.IsPrime] {a : K} (ha : a ≠ 0) (X : Submodule (𝓞 K) Z) :
-    localization₂ p (sc a X) = sc a (localization₂ p X) := by
+theorem localization_sc (p : Ideal (𝓞 K)) [p.IsPrime] {a : K} (ha : a ≠ 0) (X : Submodule (𝓞 K) Z)
+    : localization₂ p (sc a X) = sc a (localization₂ p X) := by
   rw [sc_eq_map a ha, sc_eq_map a ha, localization_map']
 
-theorem localization_inf (p : Ideal (𝓞 K)) [p.IsPrime] (X Y : Submodule (𝓞 K) Z) :
-    localization₂ p (X ⊓ Y) = localization₂ p X ⊓ localization₂ p Y :=
+theorem localization_inf (p : Ideal (𝓞 K)) [p.IsPrime] (X Y : Submodule (𝓞 K) Z)
+    : localization₂ p (X ⊓ Y) = localization₂ p X ⊓ localization₂ p Y :=
   locBasic_locS_inf _ X Y
 
-theorem algebraMap_ne_zero_of_notMem (p : Ideal (𝓞 K)) {s : 𝓞 K} (hs : s ∉ p) :
-    algebraMap (𝓞 K) K s ≠ 0 := by
+theorem algebraMap_ne_zero_of_notMem (p : Ideal (𝓞 K)) {s : 𝓞 K} (hs : s ∉ p)
+    : algebraMap (𝓞 K) K s ≠ 0 := by
   intro h
   have : s = 0 := (FaithfulSMul.algebraMap_injective (𝓞 K) K) (by rw [h, map_zero])
   exact hs (this ▸ p.zero_mem)
@@ -147,8 +148,8 @@ theorem algebraMap_ne_zero_of_notMem (p : Ideal (𝓞 K)) {s : 𝓞 K} (hs : s �
 theorem cut_mono (W : Submodule K Z) {X Y : Submodule (𝓞 K) Z} (h : X ≤ Y) : cut W X ≤ cut W Y :=
   inf_le_inf_right _ h
 
-theorem localization_cut (p : Ideal (𝓞 K)) [p.IsPrime] (W : Submodule K Z) (X : Submodule (𝓞 K) Z) :
-    localization₂ p (cut W X) = cut W (localization₂ p X) := by
+theorem localization_cut (p : Ideal (𝓞 K)) [p.IsPrime] (W : Submodule K Z) (X : Submodule (𝓞 K) Z)
+    : localization₂ p (cut W X) = cut W (localization₂ p X) := by
   unfold cut
   rw [localization_inf]
   congr 1
@@ -166,15 +167,19 @@ end Sc
 
 section Core
 
-variable {O K Z : Type*} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [ValuationRing O]
-  [Field K] [Algebra O K] [IsFractionRing O K] [AddCommGroup Z] [Module K Z] [Module O Z]
-  [IsScalarTower O K Z]
+variable
+  {O K Z : Type*}
+  [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [ValuationRing O] [Field K] [Algebra O K]
+  [IsFractionRing O K] [AddCommGroup Z] [Module K Z] [Module O Z] [IsScalarTower O K Z]
 
-theorem split_of_snf (N NB : Submodule O Z) (a : O) (ha : a ≠ 0)
-    {ι : Type*} [Fintype ι] {n : ℕ} (snf : Basis.SmithNormalForm (NB.comap N.subtype) ι n) :
-    ∃ W : Submodule K Z,
-      (∀ x ∈ N, ∃ y ∈ N, ∃ t ∈ N, y ∈ W ∧ a • t ∈ NB ∧ x = y + t) ∧
-      (∀ x ∈ W, a • x ∈ N → a • x ∈ NB → x ∈ N) := by
+theorem split_of_snf
+    (N NB : Submodule O Z)
+    (a : O) (ha : a ≠ 0)
+    {ι : Type*} [Fintype ι]
+    {n : ℕ} (snf : Basis.SmithNormalForm (NB.comap N.subtype) ι n)
+    : ∃ W : Submodule K Z,
+      (∀ x ∈ N, ∃ y ∈ N, ∃ t ∈ N, y ∈ W ∧ a • t ∈ NB ∧ x = y + t)
+        ∧ (∀ x ∈ W, a • x ∈ N → a • x ∈ NB → x ∈ N) := by
   classical
   let v : ι → Z := fun j => (snf.bM j : Z)
   have hvN : ∀ j, v j ∈ N := fun j => (snf.bM j).2
@@ -192,8 +197,15 @@ theorem split_of_snf (N NB : Submodule O Z) (a : O) (ha : a ≠ 0)
     exact ha
   refine ⟨Submodule.span K (v '' {j | ¬ good j}), ?_, ?_⟩
   · intro x hxN
-    refine ⟨∑ j with ¬ good j, (snf.bM.repr ⟨x, hxN⟩ j) • v j, ?_,
-      ∑ j with ¬ ¬ good j, (snf.bM.repr ⟨x, hxN⟩ j) • v j, ?_, ?_, ?_, ?_⟩
+    refine ⟨
+      ∑ j with ¬ good j, (snf.bM.repr ⟨x, hxN⟩ j) • v j,
+      ?_,
+      ∑ j with ¬ ¬ good j, (snf.bM.repr ⟨x, hxN⟩ j) • v j,
+      ?_,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · exact Submodule.sum_mem _ (fun j _ => N.smul_mem _ (hvN j))
     · exact Submodule.sum_mem _ (fun j _ => N.smul_mem _ (hvN j))
     · refine Submodule.sum_mem _ (fun j hj => ?_)
@@ -206,8 +218,9 @@ theorem split_of_snf (N NB : Submodule O Z) (a : O) (ha : a ≠ 0)
       obtain ⟨i, rfl, d, hd⟩ := hj'
       have h1 : (((snf.bN i : ↥(NB.comap N.subtype)) : N) : Z) ∈ NB := (snf.bN i).2
       rw [snf.snf i, Submodule.coe_smul] at h1
-      have h2 : a • ((snf.bM.repr ⟨x, hxN⟩ (snf.f i)) • v (snf.f i)) =
-          ((snf.bM.repr ⟨x, hxN⟩ (snf.f i)) * d) • (snf.a i • (snf.bM (snf.f i) : Z)) := by
+      have h2
+          : a • ((snf.bM.repr ⟨x, hxN⟩ (snf.f i)) • v (snf.f i))
+            = ((snf.bM.repr ⟨x, hxN⟩ (snf.f i)) * d) • (snf.a i • (snf.bM (snf.f i) : Z)) := by
         rw [smul_smul, smul_smul]
         congr 1
         rw [hd]
@@ -222,8 +235,8 @@ theorem split_of_snf (N NB : Submodule O Z) (a : O) (ha : a ≠ 0)
     rw [Finsupp.linearCombination_apply, Finsupp.sum_fintype _ _ (fun i => zero_smul K (v i))]
       at hlx
     let m : ↥(NB.comap N.subtype) := ⟨⟨a • x, haxN⟩, hxC⟩
-    have hsum : ∑ j, (algebraMap O K a * l j - algebraMap O K (snf.bM.repr (m : N) j)) • v j
-        = 0 := by
+    have hsum
+        : ∑ j, (algebraMap O K a * l j - algebraMap O K (snf.bM.repr (m : N) j)) • v j = 0 := by
       simp only [sub_smul, Finset.sum_sub_distrib, mul_smul, algebraMap_smul]
       rw [← Finset.smul_sum, hlx, sub_eq_zero]
       exact hexp (a • x) haxN
@@ -256,10 +269,10 @@ theorem split_of_snf (N NB : Submodule O Z) (a : O) (ha : a ≠ 0)
     rw [hs j, algebraMap_smul]
     exact N.smul_mem (s j) (hvN j)
 
-theorem split_core (N NB : Submodule O Z) (hfg : N.FG) (hle : NB ≤ N) (a : O) (ha : a ≠ 0) :
-    ∃ W : Submodule K Z,
-      (∀ x ∈ N, ∃ y ∈ N, ∃ t ∈ N, y ∈ W ∧ a • t ∈ NB ∧ x = y + t) ∧
-      (∀ x ∈ W, a • x ∈ NB → x ∈ N) := by
+theorem split_core (N NB : Submodule O Z) (hfg : N.FG) (hle : NB ≤ N) (a : O) (ha : a ≠ 0)
+    : ∃ W : Submodule K Z,
+      (∀ x ∈ N, ∃ y ∈ N, ∃ t ∈ N, y ∈ W ∧ a • t ∈ NB ∧ x = y + t)
+        ∧ (∀ x ∈ W, a • x ∈ NB → x ∈ N) := by
   have hfin : Module.Finite O N := Module.Finite.iff_fg.mpr hfg
   have htfZ : Module.IsTorsionFree O Z := Module.IsTorsionFree.trans_faithfulSMul O K Z
   have htf : Module.IsTorsionFree O N := inferInstance
@@ -271,22 +284,24 @@ end Core
 
 section Split
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K]
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
   {Z : Type} [AddCommGroup Z] [Module K Z] [Module (𝓞 K) Z] [IsScalarTower (𝓞 K) K Z]
 
 abbrev OO (w : HeightOneSpectrum (𝓞 K)) : Subalgebra (𝓞 K) K :=
   Localization.subalgebra.ofField K w.asIdeal.primeCompl w.asIdeal.primeCompl_le_nonZeroDivisors
 
-theorem mem_OO (w : HeightOneSpectrum (𝓞 K)) (x : K) :
-    x ∈ OO w ↔ ∃ (a s : 𝓞 K) (_ : s ∈ w.asIdeal.primeCompl),
-      x = algebraMap (𝓞 K) K a * (algebraMap (𝓞 K) K s)⁻¹ :=
+theorem mem_OO (w : HeightOneSpectrum (𝓞 K)) (x : K)
+    : x ∈ OO w
+      ↔ ∃ (a s : 𝓞 K) (_ : s ∈ w.asIdeal.primeCompl),
+        x = algebraMap (𝓞 K) K a * (algebraMap (𝓞 K) K s)⁻¹ :=
   Iff.rfl
 
 theorem isDVR_OO (w : HeightOneSpectrum (𝓞 K)) : IsDiscreteValuationRing (OO w) :=
   IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain (𝓞 K) w.ne_bot (OO w)
 
-theorem mem_localization_iff_mem_span (w : HeightOneSpectrum (𝓞 K)) (M : Submodule (𝓞 K) Z) (x : Z) :
-    x ∈ localization₂ w.asIdeal M ↔ x ∈ Submodule.span (OO w) (M : Set Z) := by
+theorem mem_localization_iff_mem_span (w : HeightOneSpectrum (𝓞 K)) (M : Submodule (𝓞 K) Z) (x : Z)
+    : x ∈ localization₂ w.asIdeal M ↔ x ∈ Submodule.span (OO w) (M : Set Z) := by
   constructor
   · rintro ⟨s, hs, hsx⟩
     have hs0 := algebraMap_ne_zero_of_notMem w.asIdeal hs
@@ -315,8 +330,8 @@ theorem mem_localization_iff_mem_span (w : HeightOneSpectrum (𝓞 K)) (M : Subm
       rw [he]
       exact M.smul_mem r hsy
 
-theorem mem_OO_of_vw_nonneg (w : HeightOneSpectrum (𝓞 K)) {a : K} (ha : a ≠ 0)
-    (h : 0 ≤ vw w a) : a ∈ OO w := by
+theorem mem_OO_of_vw_nonneg (w : HeightOneSpectrum (𝓞 K)) {a : K} (ha : a ≠ 0) (h : 0 ≤ vw w a)
+    : a ∈ OO w := by
   have := isDVR_OO w
   rcases ValuationRing.isInteger_or_isInteger (OO w) a with ⟨c, hc⟩ | ⟨c, hc⟩
   · rw [← hc]
@@ -347,12 +362,15 @@ theorem mem_OO_of_vw_nonneg (w : HeightOneSpectrum (𝓞 K)) {a : K} (ha : a ≠
       rw [← inv_inv a, hc']
       field_simp
 
-theorem exists_split (w : HeightOneSpectrum (𝓞 K)) (A B : Submodule (𝓞 K) Z) (hA : A.FG)
-    (hBA : B ≤ A) {a : K} (ha : a ≠ 0) (hav : a ∈ OO w) :
-    ∃ W : Submodule K Z,
-      localization₂ w.asIdeal A ≤
-        cut W (localization₂ w.asIdeal A) ⊔ (localization₂ w.asIdeal A ⊓ sc a⁻¹ (localization₂ w.asIdeal B)) ∧
-      cut W (sc a⁻¹ (localization₂ w.asIdeal B)) ≤ localization₂ w.asIdeal A := by
+theorem exists_split
+    (w : HeightOneSpectrum (𝓞 K))
+    (A B : Submodule (𝓞 K) Z) (hA : A.FG) (hBA : B ≤ A)
+    {a : K} (ha : a ≠ 0) (hav : a ∈ OO w)
+    : ∃ W : Submodule K Z,
+      localization₂ w.asIdeal A
+          ≤ cut W (localization₂ w.asIdeal A)
+            ⊔ (localization₂ w.asIdeal A ⊓ sc a⁻¹ (localization₂ w.asIdeal B))
+        ∧ cut W (sc a⁻¹ (localization₂ w.asIdeal B)) ≤ localization₂ w.asIdeal A := by
   have hdvr := isDVR_OO w
   have htow : IsScalarTower (𝓞 K) (OO w) Z :=
     ⟨fun r c z => by rw [Subalgebra.smul_def, Subalgebra.smul_def, Subalgebra.coe_smul, smul_assoc]⟩
@@ -360,26 +378,29 @@ theorem exists_split (w : HeightOneSpectrum (𝓞 K)) (A B : Submodule (𝓞 K) 
     obtain ⟨s, hs⟩ := hA
     exact ⟨s, by rw [← hs, Submodule.span_span_of_tower]⟩
   have ha0 : (⟨a, hav⟩ : OO w) ≠ 0 := fun h => ha (congrArg Subtype.val h)
-  obtain ⟨W, h1, h2⟩ := split_core (K := K) (Submodule.span (OO w) (A : Set Z))
-    (Submodule.span (OO w) (B : Set Z)) hfg (Submodule.span_mono hBA) ⟨a, hav⟩ ha0
+  obtain ⟨W, h1, h2⟩ :=
+    split_core (K := K) (Submodule.span (OO w) (A : Set Z)) (Submodule.span (OO w) (B : Set Z)) hfg
+      (Submodule.span_mono hBA) ⟨a, hav⟩ ha0
   refine ⟨W, ?_, ?_⟩
   · intro x hx
     obtain ⟨y, hy, t, ht, hyW, hat, rfl⟩ := h1 x ((mem_localization_iff_mem_span w A x).mp hx)
-    exact Submodule.add_mem_sup ⟨(mem_localization_iff_mem_span w A y).mpr hy, hyW⟩
-      ⟨(mem_localization_iff_mem_span w A t).mpr ht,
-        (mem_sc_inv ha _ _).mpr ((mem_localization_iff_mem_span w B _).mpr hat)⟩
+    exact Submodule.add_mem_sup ⟨(mem_localization_iff_mem_span w A y).mpr hy, hyW⟩ ⟨
+      (mem_localization_iff_mem_span w A t).mpr ht,
+      (mem_sc_inv ha _ _).mpr ((mem_localization_iff_mem_span w B _).mpr hat)
+    ⟩
   · rintro x ⟨hxC, hxW⟩
     exact (mem_localization_iff_mem_span w A x).mpr
       (h2 x hxW ((mem_localization_iff_mem_span w B _).mp ((mem_sc_inv ha _ _).mp hxC)))
 
-theorem le_sc_inv (w : HeightOneSpectrum (𝓞 K)) (L : Submodule (𝓞 K) Z) {a : K} (ha : a ≠ 0)
-    (hav : a ∈ OO w) : localization₂ w.asIdeal L ≤ sc a⁻¹ (localization₂ w.asIdeal L) := by
+theorem le_sc_inv
+    (w : HeightOneSpectrum (𝓞 K)) (L : Submodule (𝓞 K) Z) {a : K} (ha : a ≠ 0) (hav : a ∈ OO w)
+    : localization₂ w.asIdeal L ≤ sc a⁻¹ (localization₂ w.asIdeal L) := by
   intro x hx
   rw [mem_sc_inv ha, mem_localization_iff_mem_span]
   exact Submodule.smul_mem _ (⟨a, hav⟩ : OO w) ((mem_localization_iff_mem_span w L x).mp hx)
 
-theorem sc_inv_cut (W : Submodule K Z) (X : Submodule (𝓞 K) Z) {a : K} (ha : a ≠ 0) :
-    sc a⁻¹ (cut W X) = cut W (sc a⁻¹ X) := by
+theorem sc_inv_cut (W : Submodule K Z) (X : Submodule (𝓞 K) Z) {a : K} (ha : a ≠ 0)
+    : sc a⁻¹ (cut W X) = cut W (sc a⁻¹ X) := by
   ext x
   rw [mem_sc_inv ha]
   constructor
@@ -390,8 +411,8 @@ theorem sc_inv_cut (W : Submodule K Z) (X : Submodule (𝓞 K) Z) {a : K} (ha : 
   · rintro ⟨h1, h2⟩
     exact ⟨(mem_sc_inv ha _ _).mp h1, W.smul_mem a h2⟩
 
-theorem isLatIn_cut (W : Submodule K Z) (B : Submodule (𝓞 K) Z) (hB : IsLatIn ⊤ B) :
-    IsLatIn W (cut W B) := by
+theorem isLatIn_cut (W : Submodule K Z) (B : Submodule (𝓞 K) Z) (hB : IsLatIn ⊤ B)
+    : IsLatIn W (cut W B) := by
   constructor
   · have : IsNoetherian (𝓞 K) B := isNoetherian_of_fg_of_noetherian B hB.1
     exact isNoetherian_submodule.mp this _ inf_le_left
@@ -407,20 +428,29 @@ theorem isLatIn_cut (W : Submodule K Z) (B : Submodule (𝓞 K) Z) (hB : IsLatIn
         change d • x ∈ W
         rw [← algebraMap_smul K d x]
         exact W.smul_mem _ hx
-      have := Submodule.smul_mem (Submodule.span K ((cut W B : Submodule (𝓞 K) Z) : Set Z))
-        (algebraMap (𝓞 K) K d)⁻¹ (Submodule.subset_span hmem)
+      have :=
+        Submodule.smul_mem (Submodule.span K ((cut W B : Submodule (𝓞 K) Z) : Set Z))
+          (algebraMap (𝓞 K) K d)⁻¹ (Submodule.subset_span hmem)
       rwa [← algebraMap_smul K d x, smul_smul, inv_mul_cancel₀ hd0, one_smul] at this
 
-theorem qlen_ne_top (p : Ideal (𝓞 K)) [p.IsPrime] (X Y : Submodule (𝓞 K) Z) (hX : X.FG)
-    (hY : Submodule.span K (Y : Set Z) = ⊤) : qlen (localization₂ p X) (localization₂ p Y) ≠ ⊤ := by
-  obtain ⟨d, hd, hdY⟩ := indexBasic_denom (nonZeroDivisors (𝓞 K)) X Y hX
-    (by rw [indexBasic_locS_top (K := K) Y hY]; exact le_top)
+theorem qlen_ne_top
+    (p : Ideal (𝓞 K)) [p.IsPrime]
+    (X Y : Submodule (𝓞 K) Z) (hX : X.FG) (hY : Submodule.span K (Y : Set Z) = ⊤)
+    : qlen (localization₂ p X) (localization₂ p Y) ≠ ⊤ := by
+  obtain ⟨d, hd, hdY⟩ :=
+    indexBasic_denom (nonZeroDivisors (𝓞 K)) X Y hX
+      (by rw [indexBasic_locS_top (K := K) Y hY]; exact le_top)
   exact Module.length_ne_top_iff.mpr (indexBasic_finLen p X Y hX hd hdY)
 
-theorem qlen_scale [FiniteDimensional K Z] (hS : IdxScaleIn) (w : HeightOneSpectrum (𝓞 K))
-    (W : Submodule K Z) (L : Submodule (𝓞 K) Z) (hL : IsLatIn W L) {a : K} (ha : a ≠ 0) (E : ℕ)
-    (hE : vw w a = (E : ℤ)) :
-    qlen (sc a⁻¹ (localization₂ w.asIdeal L)) (localization₂ w.asIdeal L) = ((E * finrank K W : ℕ) : ℕ∞) := by
+theorem qlen_scale
+    [FiniteDimensional K Z]
+    (hS : IdxScaleIn)
+    (w : HeightOneSpectrum (𝓞 K))
+    (W : Submodule K Z) (L : Submodule (𝓞 K) Z) (hL : IsLatIn W L)
+    {a : K} (ha : a ≠ 0)
+    (E : ℕ) (hE : vw w a = (E : ℤ))
+    : qlen (sc a⁻¹ (localization₂ w.asIdeal L)) (localization₂ w.asIdeal L)
+      = ((E * finrank K W : ℕ) : ℕ∞) := by
   have hav : a ∈ OO w := mem_OO_of_vw_nonneg w ha (by rw [hE]; exact Int.natCast_nonneg E)
   have hloc := le_sc_inv w L ha hav
   have hfin : qlen (sc a⁻¹ (localization₂ w.asIdeal L)) (localization₂ w.asIdeal L) ≠ ⊤ := by
@@ -433,8 +463,8 @@ theorem qlen_scale [FiniteDimensional K Z] (hS : IdxScaleIn) (w : HeightOneSpect
     have hr : r ∈ nonZeroDivisors (𝓞 K) :=
       mem_nonZeroDivisors_of_ne_zero (fun h0 => hr0 (by rw [h0, map_zero]))
     rw [← localization_sc _ (inv_ne_zero ha)]
-    refine Module.length_ne_top_iff.mpr
-      (indexBasic_finLen w.asIdeal (sc a⁻¹ L) L (hL.1.map _) hr ?_)
+    refine Module.length_ne_top_iff.mpr (indexBasic_finLen w.asIdeal (sc a⁻¹ L) L (hL.1.map _) hr
+      ?_)
     intro x hx
     have hx' := (mem_sc_inv ha L x).mp hx
     have : r • x = s • (a • x) := by
@@ -449,18 +479,23 @@ theorem qlen_scale [FiniteDimensional K Z] (hS : IdxScaleIn) (w : HeightOneSpect
     unfold lix
     rw [lidx_of_le _ le_rfl, qlen_eq_zero le_rfl]
     rfl
-  have h1 : lix w L (sc a⁻¹ L) =
-      - ((qlen (sc a⁻¹ (localization₂ w.asIdeal L)) (localization₂ w.asIdeal L)).toNat : ℤ) := by
+  have h1
+      : lix w L (sc a⁻¹ L)
+        = -((qlen (sc a⁻¹ (localization₂ w.asIdeal L)) (localization₂ w.asIdeal L)).toNat : ℤ) := by
     unfold lix lidx locLen
     rw [localization_inf, localization_sc _ (inv_ne_zero ha), inf_eq_left.mpr hloc]
-    change ((qlen (localization₂ w.asIdeal L) (localization₂ w.asIdeal L)).toNat : ℤ) -
-      ((qlen (sc a⁻¹ (localization₂ w.asIdeal L)) (localization₂ w.asIdeal L)).toNat : ℤ) = _
+    change ((qlen (localization₂ w.asIdeal L) (localization₂ w.asIdeal L)).toNat : ℤ)
+        - ((qlen (sc a⁻¹ (localization₂ w.asIdeal L)) (localization₂ w.asIdeal L)).toNat : ℤ)
+      = _
     rw [qlen_eq_zero le_rfl]
     simp
   rw [h1, h0, hinv, hE] at h
-  have h2 : (qlen (sc a⁻¹ (localization₂ w.asIdeal L)) (localization₂ w.asIdeal L)).toNat = E * finrank K W := by
-    have : ((qlen (sc a⁻¹ (localization₂ w.asIdeal L)) (localization₂ w.asIdeal L)).toNat : ℤ) =
-        (E : ℤ) * (finrank K W : ℤ) := by linarith
+  have h2
+      : (qlen (sc a⁻¹ (localization₂ w.asIdeal L)) (localization₂ w.asIdeal L)).toNat
+        = E * finrank K W := by
+    have : ((qlen (sc a⁻¹ (localization₂ w.asIdeal L)) (localization₂ w.asIdeal L)).toNat : ℤ)
+        = (E : ℤ) * (finrank K W : ℤ) := by
+      linarith
     exact_mod_cast this
   rw [← h2, ENat.natCast_toNat hfin]
 
@@ -470,9 +505,12 @@ section Ram
 
 open IsLocalRing
 
-theorem exists_pow_smul_eq_zero (O : Type) [CommRing O] [IsLocalRing O] (ϖ : O)
-    (hϖ : ϖ ∈ maximalIdeal O) (M : Type) [AddCommGroup M] [Module O M] (h : IsFiniteLength O M) :
-    ∃ n : ℕ, ∀ x : M, ϖ ^ n • x = 0 := by
+theorem exists_pow_smul_eq_zero
+    (O : Type) [CommRing O] [IsLocalRing O]
+    (ϖ : O) (hϖ : ϖ ∈ maximalIdeal O)
+    (M : Type) [AddCommGroup M] [Module O M]
+    (h : IsFiniteLength O M)
+    : ∃ n : ℕ, ∀ x : M, ϖ ^ n • x = 0 := by
   induction h with
   | of_subsingleton => exact ⟨0, fun x => Subsingleton.elim _ _⟩
   | @of_simple_quotient M _ _ N hs _ ih =>
@@ -498,24 +536,28 @@ end Ram
 
 end ThreeFormsAlt
 
-
 open ThreeFormsAlt in
 theorem threeForms_of (hS : IdxScaleIn) : ThreeForms := by
   intro K _ _ _ Z _ _ _ _ _ w A B hA hB hBA a E r ha hE
   have hav : a ∈ OO w := mem_OO_of_vw_nonneg w ha (by rw [hE]; exact Int.natCast_nonneg E)
-  have hR : lix w A (A ⊓ sc a⁻¹ B) =
-      ((qlen (localization₂ w.asIdeal A) (sc a⁻¹ (localization₂ w.asIdeal B))).toNat : ℤ) := by
+  have hR
+      : lix w A (A ⊓ sc a⁻¹ B)
+        = ((qlen (localization₂ w.asIdeal A) (sc a⁻¹ (localization₂ w.asIdeal B))).toNat : ℤ) := by
     unfold lix
-    rw [lidx_of_le _ (inf_le_left : A ⊓ sc a⁻¹ B ≤ A), localization_inf, localization_sc _ (inv_ne_zero ha),
-      qlen_inf_self]
-  have hL : ∀ W : Submodule K Z, lix w (cut W A) (cut W B) =
-      ((qlen (cut W (localization₂ w.asIdeal A)) (cut W (localization₂ w.asIdeal B))).toNat : ℤ) := by
+    rw [lidx_of_le _ (inf_le_left : A ⊓ sc a⁻¹ B ≤ A), localization_inf,
+      localization_sc _ (inv_ne_zero ha), qlen_inf_self]
+  have hL
+      : ∀ W : Submodule K Z,
+        lix w (cut W A) (cut W B)
+          = ((qlen (cut W (localization₂ w.asIdeal A)) (cut W (localization₂ w.asIdeal B))).toNat
+            : ℤ) := by
     intro W
     unfold lix
     rw [lidx_of_le _ (cut_mono W hBA), localization_cut, localization_cut]
-  have hSc : ∀ W : Submodule K Z,
-      qlen (cut W (sc a⁻¹ (localization₂ w.asIdeal B))) (cut W (localization₂ w.asIdeal B)) =
-        ((E * finrank K W : ℕ) : ℕ∞) := by
+  have hSc
+      : ∀ W : Submodule K Z,
+        qlen (cut W (sc a⁻¹ (localization₂ w.asIdeal B))) (cut W (localization₂ w.asIdeal B))
+          = ((E * finrank K W : ℕ) : ℕ∞) := by
     intro W
     rw [← sc_inv_cut W _ ha, ← localization_cut]
     exact qlen_scale hS w W (cut W B) (isLatIn_cut W B hB) ha E hE
@@ -530,8 +572,9 @@ theorem threeForms_of (hS : IdxScaleIn) : ThreeForms := by
   generalize localization₂ w.asIdeal B = B' at *
   generalize hC : sc a⁻¹ B' = C' at *
   have hfinC : qlen A' C' ≠ ⊤ := ne_top_of_le_ne_top hfin (qlen_anti_right A' hBC')
-  have hcongr : ∀ (W : Submodule K Z) (Y : Submodule (𝓞 K) Z),
-      qlen (cut W A') (cut W Y) = qlen (cut W A') Y := fun W Y =>
+  have hcongr
+      : ∀ (W : Submodule K Z) (Y : Submodule (𝓞 K) Z),
+        qlen (cut W A') (cut W Y) = qlen (cut W A') Y := fun W Y =>
     qlen_congr _ (fun x hx => ⟨fun h => h.1, fun h => ⟨h, hx.2⟩⟩)
   have hfinW : ∀ W : Submodule K Z, qlen (cut W A') (cut W B') ≠ ⊤ := fun W =>
     ne_top_of_le_ne_top hfin (by rw [hcongr]; exact qlen_mono_left inf_le_left _)
@@ -540,8 +583,8 @@ theorem threeForms_of (hS : IdxScaleIn) : ThreeForms := by
   · intro h
     obtain ⟨W, h1, h2⟩ := hsplit
     obtain ⟨x, hx⟩ := ENat.ne_top_iff_exists.mp (hfinW W)
-    have hadd : qlen (cut W A') (cut W B') =
-        qlen (cut W C') (cut W B') + qlen (cut W A') (cut W C') :=
+    have hadd
+        : qlen (cut W A') (cut W B') = qlen (cut W C') (cut W B') + qlen (cut W A') (cut W C') :=
       qlen_add (cut_mono W hBC') (le_inf h2 inf_le_right)
     have hge : qlen A' C' ≤ qlen (cut W A') (cut W C') := by
       rw [hcongr]
@@ -560,8 +603,9 @@ theorem threeForms_of (hS : IdxScaleIn) : ThreeForms := by
     linarith
   · intro h W
     obtain ⟨x, hx⟩ := ENat.ne_top_iff_exists.mp (hfinW W)
-    have hadd : qlen (cut W A') (cut W B') =
-        qlen (cut W (A' ⊓ C')) (cut W B') + qlen (cut W A') (cut W (A' ⊓ C')) :=
+    have hadd
+        : qlen (cut W A') (cut W B')
+          = qlen (cut W (A' ⊓ C')) (cut W B') + qlen (cut W A') (cut W (A' ⊓ C')) :=
       qlen_add (cut_mono W (le_inf hBA' hBC')) (cut_mono W inf_le_left)
     have hle1 : qlen (cut W (A' ⊓ C')) (cut W B') ≤ qlen (cut W C') (cut W B') :=
       qlen_mono_left (cut_mono W inf_le_right) _
@@ -583,6 +627,5 @@ theorem threeForms_of (hS : IdxScaleIn) : ThreeForms := by
     linarith
 
 theorem three_forms : ThreeForms := threeForms_of index_scale_inclusion
-
 
 end Formalism.EigenvalueLevelCeiling

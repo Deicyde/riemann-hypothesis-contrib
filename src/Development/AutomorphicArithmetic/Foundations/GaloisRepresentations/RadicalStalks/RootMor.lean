@@ -6,13 +6,21 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
+open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
+  GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.Ord.rootMor :
-    ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [IsAlgClosed k] (hk : (p : k) = 0) (A : Over (Sp k)) [GrpObj A] [IsCommMonObj A], IsAbelianScheme A → ∀ (σ σ' : k →+* k) (ψ ψ' : A.left ⟶ A.left), SMor A σ ψ → (∀ x, σ' x ^ p = σ x) →
-      GlobalTheory.VB.frob A.left p (cast_left p k hk A) ≫ ψ' = ψ → SMor A σ' ψ' := by
+theorem UpperTheory.Gal.Ord.rootMor
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [IsAlgClosed k] (hk : (p : k) = 0)
+        (A : Over (Sp k)) [GrpObj A] [IsCommMonObj A],
+      IsAbelianScheme A
+        → ∀ (σ σ' : k →+* k) (ψ ψ' : A.left ⟶ A.left),
+          SMor A σ ψ → (∀ x, σ' x ^ p = σ x)
+            → GlobalTheory.VB.frob A.left p (cast_left p k hk A) ≫ ψ' = ψ
+            → SMor A σ' ψ' := by
   intro p _ k _ _ hk A _ _ hAb σ σ' ψ ψ' hS hpow hfr
   haveI := hAb
   haveI : Smooth A.hom := IsAbelianScheme.smooth
@@ -33,16 +41,19 @@ theorem UpperTheory.Gal.Ord.rootMor :
     apply (cancel_epi (GlobalTheory.VB.frob A.left p (cast_left p k hk A))).mp
     rw [← Category.assoc, hfr, hS.w, ← Category.assoc,
       GlobalTheory.ConjSeq.frob_comp_hom p k hk A.hom (cast_left p k hk A), Category.assoc, hσ]
-  have hnat : ∀ f : (A ⊗ A).left ⟶ A.left,
-      GlobalTheory.VB.frob (A ⊗ A).left p (cast_left p k hk (A ⊗ A)) ≫ f ≫ ψ' = f ≫ ψ := by
+  have hnat
+      : ∀ f : (A ⊗ A).left ⟶ A.left,
+        GlobalTheory.VB.frob (A ⊗ A).left p (cast_left p k hk (A ⊗ A)) ≫ f ≫ ψ' = f ≫ ψ := by
     intro f
-    rw [← Category.assoc, GlobalTheory.VB.frob_naturality p (cast_left p k hk A) f (cast_left p k hk (A ⊗ A)),
+    rw [← Category.assoc,
+      GlobalTheory.VB.frob_naturality p (cast_left p k hk A) f (cast_left p k hk (A ⊗ A)),
       Category.assoc, hfr]
   let F : Over.mk ((A ⊗ A).hom ≫ spMap σ) ⟶ Over.mk ((A ⊗ A).hom ≫ spMap σ') :=
     Over.homMk (GlobalTheory.VB.frob (A ⊗ A).left p (cast_left p k hk (A ⊗ A))) (by
       simp only [Over.mk_hom]
       rw [← Category.assoc,
-        GlobalTheory.ConjSeq.frob_comp_hom p k hk (A ⊗ A).hom (cast_left p k hk (A ⊗ A)), Category.assoc, hσ])
+        GlobalTheory.ConjSeq.frob_comp_hom p k hk (A ⊗ A).hom (cast_left p k hk (A ⊗ A)),
+        Category.assoc, hσ])
   let u : ∀ g : A ⊗ A ⟶ A, Over.mk ((A ⊗ A).hom ≫ spMap σ') ⟶ A := fun g =>
     Over.homMk (g.left ≫ ψ') (by
       simp only [Over.mk_hom]
@@ -63,7 +74,8 @@ theorem UpperTheory.Gal.Ord.rootMor :
       rw [MonObj.comp_mul, hFu, hFu]
     rw [Over.comp_left] at e1
     exact e1.trans (hS.mul (A ⊗ A) (fst A A) (snd A A) (v (fst A A)) (v (snd A A)) rfl rfl)
-  refine GlobalTheory.DeRham.GrpMor.mk (isDPMorphism_of_eq_bot (dp0 k) rfl (dp0 k) σ') (by simp) hw' ?_
+  refine GlobalTheory.DeRham.GrpMor.mk (isDPMorphism_of_eq_bot (dp0 k) rfl (dp0 k) σ') (by simp) hw'
+    ?_
   intro T x y x₀ y₀ hx0 hy0
   let h : T ⟶ A ⊗ A := lift x y
   let hh : Over.mk (T.hom ≫ spMap σ') ⟶ Over.mk ((A ⊗ A).hom ≫ spMap σ') :=

@@ -10,10 +10,11 @@ open CategoryTheory CategoryTheory.Limits DirectSum MvPolynomial TensorProduct G
 
 namespace GlobalTheory
 
-theorem bijOn_ker_and_exact_of_quasiIso {R : Type} [CommRing R]
-    {K C : CochainComplex (ModuleCat.{0} R) ℕ} (φ : K ⟶ C) (h : QuasiIso φ) :
-    Set.BijOn (φ.f 0).hom (LinearMap.ker (K.d 0 1).hom) (LinearMap.ker (C.d 0 1).hom) ∧
-      (Function.Exact (C.d 0 1).hom (C.d 1 2).hom → Function.Exact (K.d 0 1).hom (K.d 1 2).hom) := by
+theorem bijOn_ker_and_exact_of_quasiIso
+    {R : Type} [CommRing R] {K C : CochainComplex (ModuleCat.{0} R) ℕ} (φ : K ⟶ C) (h : QuasiIso φ)
+    : Set.BijOn (φ.f 0).hom (LinearMap.ker (K.d 0 1).hom) (LinearMap.ker (C.d 0 1).hom)
+      ∧ (Function.Exact (C.d 0 1).hom (C.d 1 2).hom
+        → Function.Exact (K.d 0 1).hom (K.d 1 2).hom) := by
   have h0 := (quasiIsoAt_zero_iff φ).1 inferInstance
   have h1 := (quasiIsoAt_succ_iff φ 0).1 inferInstance
   refine ⟨⟨fun x hx => ?_, fun x hx y hy hxy => ?_, fun y hy => ?_⟩, fun hC x => ⟨fun hx => ?_, ?_⟩⟩
@@ -31,14 +32,15 @@ theorem bijOn_ker_and_exact_of_quasiIso {R : Type} [CommRing R]
   · rintro ⟨w, rfl⟩
     exact cochain_d_d_apply K 0 1 2 w
 
-theorem bijOn_ker_and_exact_of_quasiIso_baseChange (R R' : Type) [CommRing R] [CommRing R']
-    [inst : Algebra R R'] (K C : CochainComplex (ModuleCat.{0} R) ℕ) (φ : K ⟶ C)
+theorem bijOn_ker_and_exact_of_quasiIso_baseChange
+    (R R' : Type) [CommRing R] [CommRing R'] [inst : Algebra R R']
+    (K C : CochainComplex (ModuleCat.{0} R) ℕ) (φ : K ⟶ C)
     (h : QuasiIso
-      (((ModuleCat.extendScalars.{0, 0, 0} (algebraMap R R')).mapHomologicalComplex _).map φ)) :
-    Set.BijOn ((φ.f 0).hom.baseChange R') (LinearMap.ker ((K.d 0 1).hom.baseChange R'))
-        (LinearMap.ker ((C.d 0 1).hom.baseChange R')) ∧
-      (Function.Exact ((C.d 0 1).hom.baseChange R') ((C.d 1 2).hom.baseChange R') →
-        Function.Exact ((K.d 0 1).hom.baseChange R') ((K.d 1 2).hom.baseChange R')) := by
+      (((ModuleCat.extendScalars.{0, 0, 0} (algebraMap R R')).mapHomologicalComplex _).map φ))
+    : Set.BijOn ((φ.f 0).hom.baseChange R') (LinearMap.ker ((K.d 0 1).hom.baseChange R'))
+        (LinearMap.ker ((C.d 0 1).hom.baseChange R'))
+      ∧ (Function.Exact ((C.d 0 1).hom.baseChange R') ((C.d 1 2).hom.baseChange R')
+        → Function.Exact ((K.d 0 1).hom.baseChange R') ((K.d 1 2).hom.baseChange R')) := by
   have key := bijOn_ker_and_exact_of_quasiIso _ h
   clear h
   generalize hf : algebraMap R R' = f at key

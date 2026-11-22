@@ -12,8 +12,8 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 noncomputable section
 namespace GlobalTheory.BI
 
-def compoundRep {G : Type} [Group G] {n : ℕ} (j : ℕ) (ρ : G →* GL (Fin n) ℂ) :
-    Representation ℂ G (Set.powersetCard (Fin n) j → ℂ) where
+def compoundRep {G : Type} [Group G] {n : ℕ} (j : ℕ) (ρ : G →* GL (Fin n) ℂ)
+    : Representation ℂ G (Set.powersetCard (Fin n) j → ℂ) where
   toFun g := Matrix.toLin' (GlobalTheory.compoundMatrix j (ρ g : Matrix (Fin n) (Fin n) ℂ))
   map_one' := by
     rw [map_one, Units.val_one, GlobalTheory.compoundMatrix_one, Matrix.toLin'_one]; rfl
@@ -70,20 +70,25 @@ private lemma esymm_roots_charpoly_eq_sum_principal_minors {n : ℕ} (j : ℕ) (
       Multiset.powersetCard_eq_empty _ (by omega)]
     simp
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.BI.isChar_esymm_roots_charpoly :
-    ∀ (G : Type) [Group G] (n j : ℕ) (ρ : G →* GL (Fin n) ℂ), _root_.GlobalTheory.BI.IsChar ℂ ℂ
-      (fun g => (Matrix.charpoly (ρ g : Matrix (Fin n) (Fin n) ℂ)).roots.esymm j) := by
+theorem _root_.GlobalTheory.BI.isChar_esymm_roots_charpoly
+    : ∀ (G : Type) [Group G] (n j : ℕ) (ρ : G →* GL (Fin n) ℂ),
+      _root_.GlobalTheory.BI.IsChar ℂ ℂ
+        (fun g => (Matrix.charpoly (ρ g : Matrix (Fin n) (Fin n) ℂ)).roots.esymm j) := by
   intro G _ n j ρ
-  have h := (_root_.GlobalTheory.BI.isChar_and_isIrrChar_of_rep ℂ ℂ G _ (_root_.GlobalTheory.BI.compoundRep j ρ)).1
-  have heq : (fun g => (Matrix.charpoly (ρ g : Matrix (Fin n) (Fin n) ℂ)).roots.esymm j) =
-      fun g => algebraMap ℂ ℂ ((_root_.GlobalTheory.BI.compoundRep j ρ).character g) := by
+  have h :=
+    (_root_.GlobalTheory.BI.isChar_and_isIrrChar_of_rep ℂ ℂ G _
+      (_root_.GlobalTheory.BI.compoundRep j ρ)).1
+  have heq
+      : (fun g => (Matrix.charpoly (ρ g : Matrix (Fin n) (Fin n) ℂ)).roots.esymm j)
+        = fun g => algebraMap ℂ ℂ ((_root_.GlobalTheory.BI.compoundRep j ρ).character g) := by
     funext g
     rw [Algebra.algebraMap_self, RingHom.id_apply]
-    change _ = LinearMap.trace ℂ _
-      (Matrix.toLin' (_root_.GlobalTheory.compoundMatrix j (ρ g : Matrix (Fin n) (Fin n) ℂ)))
-    rw [Matrix.trace_toLin'_eq, trace_compoundMatrix_eq_sum_principal_minors, esymm_roots_charpoly_eq_sum_principal_minors]
+    change _
+      = LinearMap.trace ℂ _
+        (Matrix.toLin' (_root_.GlobalTheory.compoundMatrix j (ρ g : Matrix (Fin n) (Fin n) ℂ)))
+    rw [Matrix.trace_toLin'_eq, trace_compoundMatrix_eq_sum_principal_minors,
+      esymm_roots_charpoly_eq_sum_principal_minors]
   rw [heq]
   exact h
 

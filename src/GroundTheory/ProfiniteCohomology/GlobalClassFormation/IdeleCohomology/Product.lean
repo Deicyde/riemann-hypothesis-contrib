@@ -15,12 +15,15 @@ universe u
 
 section Complex
 
-variable {R : Type u} [Ring R] {ι' : Type*} {c : ComplexShape ι'} {ι : Type*}
+variable
+  {R : Type u} [Ring R]
+  {ι' : Type*} {c : ComplexShape ι'} {ι : Type*}
   {K : HomologicalComplex (ModuleCat.{u} R) c} {L : ι → HomologicalComplex (ModuleCat.{u} R) c}
 
-theorem homologyMap_pi_bijective (p : ∀ i, K ⟶ L i)
-    (hp : ∀ m, Function.Bijective fun (x : K.X m) (i : ι) => ((p i).f m).hom x) (n : ι') :
-    Function.Bijective fun (x : K.homology n) (i : ι) =>
+theorem homologyMap_pi_bijective
+    (p : ∀ i, K ⟶ L i) (hp : ∀ m, Function.Bijective fun (x : K.X m) (i : ι) => ((p i).f m).hom x)
+    (n : ι')
+    : Function.Bijective fun (x : K.homology n) (i : ι) =>
       (HomologicalComplex.homologyMap (p i) n).hom x := by
   constructor
   · intro x y hxy
@@ -30,8 +33,9 @@ theorem homologyMap_pi_bijective (p : ∀ i, K ⟶ L i)
       rw [map_sub, sub_eq_zero]
       exact congrFun hxy i
     rw [← hz] at h0 ⊢
-    have hw : ∀ i, ∃ w : (L i).X (c.prev n),
-        ((L i).d (c.prev n) n).hom w = ((p i).f n).hom ((K.iCycles n).hom z) := fun i => by
+    have hw
+        : ∀ i, ∃ w : (L i).X (c.prev n),
+          ((L i).d (c.prev n) n).hom w = ((p i).f n).hom ((K.iCycles n).hom z) := fun i => by
       have h := h0 i
       rw [homologyMap_homologyπ_apply, homologyπ_eq_zero_iff, iCycles_cyclesMap_apply] at h
       exact h
@@ -65,8 +69,7 @@ end Complex
 
 section GroupCohomology
 
-variable {k G : Type u} [CommRing k] [Group G] {ι : Type*} {P : Rep.{u} k G}
-  {A : ι → Rep.{u} k G}
+variable {k G : Type u} [CommRing k] [Group G] {ι : Type*} {P : Rep.{u} k G} {A : ι → Rep.{u} k G}
 
 end GroupCohomology
 

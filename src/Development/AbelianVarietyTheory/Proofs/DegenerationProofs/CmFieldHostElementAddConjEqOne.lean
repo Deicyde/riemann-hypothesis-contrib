@@ -6,18 +6,21 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex GlobalTheory.Ex.Arch
 
 noncomputable section
 namespace GlobalTheory.Ex.Arch.AbVal
 
-theorem cmField_host_element_add_conj_eq_one {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) : H.w0 + H.bar H.w0 = 1 := by
-  have h1 : H.bar H.rt ^ 2 = H.rt ^ 2 := by
-    rw [← map_pow, H.rt_sq, map_neg, map_natCast]
+theorem cmField_host_element_add_conj_eq_one
+    {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E)
+    : H.w0 + H.bar H.w0 = 1 := by
+  have h1 : H.bar H.rt ^ 2 = H.rt ^ 2 := by rw [← map_pow, H.rt_sq, map_neg, map_natCast]
   have h2 : 2 * H.bar H.w0 = 1 + H.bar H.rt := by
     have := congrArg H.bar H.two_weight_eq_one_add_root
     simpa [map_ofNat] using this
@@ -41,31 +44,45 @@ theorem cmField_host_element_add_conj_eq_one {E : Type} [Field E] [NumberField E
     rw [mul_add, h2, H.two_weight_eq_one_add_root, h3]; ring
   exact mul_left_cancel₀ two_ne_zero this
 
-theorem rg_ne_zero {R : Type} [CommRing R] [IsDomain R] {D : DegPre R} {F : Type} [Field F] [Algebra (FractionRing R) F]
-    {N : NumD F} (ν : NumOf D F N) : ν.rg ≠ 0 := fun h =>
-  (((Units.isUnit _).map _).map _).ne_zero ((dif_pos (fun z _ =>
-    Good.mem (L := D.P.L) (z := z) (J := ν.J) (fun ψ => ν.good ψ trivial) (fun _ : PUnit => eSec D.P.A)
-      (TF (R := R) F).hom)).symm.trans h)
+theorem rg_ne_zero
+    {R : Type} [CommRing R] [IsDomain R]
+    {D : DegPre R} {F : Type} [Field F] [Algebra (FractionRing R) F]
+    {N : NumD F} (ν : NumOf D F N)
+    : ν.rg ≠ 0 := fun h =>
+  (((Units.isUnit _).map _).map _).ne_zero
+    ((dif_pos (fun z _ =>
+      Good.mem (L := D.P.L) (z := z) (J := ν.J)
+        (fun ψ => ν.good ψ trivial)
+        (fun _ : PUnit => eSec D.P.A)
+        (TF (R := R) F).hom)).symm.trans h)
 
-theorem exists_ringHom_lift {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A] {T : Over S} {O : Type} [CommRing O]
-    (act : RingAct A O) {V : Type} [AddCommGroup V] [Module ℂ V] (ex : V → (T ⟶ A))
-    (hadd : ∀ z w, ex (z + w) = ex z * ex w)
-    (hlift : ∀ f : A ⟶ A, IsMonHom f → ∃! F : V →ₗ[ℂ] V, ∀ z, ex (F z) = ex z ≫ f) :
-    ∃ F : O →+* Module.End ℂ V, ∀ a z, ex (F a z) = ex z ≫ act.act a := by
+theorem exists_ringHom_lift
+    {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A]
+    {T : Over S} {O : Type} [CommRing O]
+    (act : RingAct A O)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ex : V → (T ⟶ A)) (hadd : ∀ z w, ex (z + w) = ex z * ex w)
+    (hlift : ∀ f : A ⟶ A, IsMonHom f → ∃! F : V →ₗ[ℂ] V, ∀ z, ex (F z) = ex z ≫ f)
+    : ∃ F : O →+* Module.End ℂ V, ∀ a z, ex (F a z) = ex z ≫ act.act a := by
   choose F hF hU using fun a => hlift (act.act a) (act.hom a)
-  have add : ∀ a b, F (a + b) = F a + F b := fun a b => (hU _ _ fun z => by
-    rw [LinearMap.add_apply, hadd, hF, hF, act.map_add]
-    exact (MonObj.comp_mul _ _ _).symm).symm
-  refine ⟨RingHom.mk' ⟨⟨F, (hU _ _ fun z => ?_).symm⟩, fun a b => (hU _ _ fun z => ?_).symm⟩ add, hF⟩
+  have add : ∀ a b, F (a + b) = F a + F b := fun a b =>
+    (hU _ _ fun z => by
+      rw [LinearMap.add_apply, hadd, hF, hF, act.map_add]
+      exact (MonObj.comp_mul _ _ _).symm).symm
+  refine
+    ⟨RingHom.mk' ⟨⟨F, (hU _ _ fun z => ?_).symm⟩, fun a b => (hU _ _ fun z => ?_).symm⟩ add, hF⟩
   · rw [act.map_one, Category.comp_id]; rfl
   · rw [act.map_mul, Module.End.mul_apply, hF, hF, Category.assoc]
 
-theorem valSt (hL : Laws) (hFam : BrFamSt) (hEx : FibExSt) (hGrp : FibGrpSt) (hCube : FibCubeSt) (hSym : FibSymSt)
-    (hRos : FibRosSt) (hPrim : FibPrimSt) (hSec : FibSecSt) (hLie : FibLieSt) : ValSt := by
+theorem valSt
+    (hL : Laws) (hFam : BrFamSt) (hEx : FibExSt) (hGrp : FibGrpSt) (hCube : FibCubeSt)
+    (hSym : FibSymSt) (hRos : FibRosSt) (hPrim : FibPrimSt) (hSec : FibSecSt) (hLie : FibLieSt)
+    : ValSt := by
   intro E _ _ _ H D R _ _ _ A
   letI := H.starRing
   obtain ⟨g, Λ, Hm, χ, Ef, ex, fr, hf, hEf, hbij⟩ := hEx R A.D₀.P A.ν.J A.ν.good
-  obtain ⟨hdisc, hfull, hherm, hpos, hnorm, hχ, hadd, hsurj, hker, hfr, hlift⟩ := hGrp R A.D₀ _ g Λ Hm χ ex fr hf
+  obtain ⟨hdisc, hfull, hherm, hpos, hnorm, hχ, hadd, hsurj, hker, hfr, hlift⟩ :=
+    hGrp R A.D₀ _ g Λ Hm χ ex fr hf
   have hcube := hCube R A.D₀ _ g Λ Hm χ ex fr hf
   obtain ⟨hsym, hneg⟩ := hSym R A.D₀ _ g Λ Hm χ ex fr hf
   have hros := hRos R A.D₀ _ g Λ Hm χ ex fr hf
@@ -81,32 +98,81 @@ theorem valSt (hL : Laws) (hFam : BrFamSt) (hEx : FibExSt) (hGrp : FibGrpSt) (hC
     haveI := A.oa.onB.hom (star a)
     obtain ⟨r, hr⟩ := exists_ros hL.globalFns A.D₀.P.isAb A.D₀.P.isLB _ _ (A.oa.onB.rosati a)
     exact (hros _ _ (A.oa.onB.hom a) (A.oa.onB.hom (star a)) _ _ (hF a) (hF (star a)) r hr).1
-  let B : An H :=
-    { gB := g, abelian₂ := Λ, discrete := hdisc, full := hfull, Hm := Hm, Hm_herm := hherm, Hm_pos := hpos, Ef := Ef,
-      Ef_eq := hEf, Ef_bij := hbij, chi := χ, chi_norm := hnorm, chi_add := hχ, chi_neg := hneg, F := F,
-      F_mem := hmem, F_adj := hadj, X := PUnit, ct := 0, ct_smul := fun a _ => (map_zero (F a)).symm, T := 0,
-      T_symm := fun _ _ => rfl, T_adj := fun _ _ _ => rfl, psi := fun _ => 1, psi_neg := fun _ => rfl,
-      psi_add := fun _ _ => by simp, be := 0, be_symm := fun _ _ => rfl, be_pos := fun _ h => (h rfl).elim,
-      be_adj := fun _ _ _ => rfl, be_even := fun _ => dvd_zero _ }
+  let B : An H := {
+    gB := g
+    abelian₂ := Λ
+    discrete := hdisc
+    full := hfull
+    Hm := Hm
+    Hm_herm := hherm
+    Hm_pos := hpos
+    Ef := Ef
+    Ef_eq := hEf
+    Ef_bij := hbij
+    chi := χ
+    chi_norm := hnorm
+    chi_add := hχ
+    chi_neg := hneg
+    F := F
+    F_mem := hmem
+    F_adj := hadj
+    X := PUnit
+    ct := 0
+    ct_smul := fun a _ => (map_zero (F a)).symm
+    T := 0
+    T_symm := fun _ _ => rfl
+    T_adj := fun _ _ _ => rfl
+    psi := fun _ => 1
+    psi_neg := fun _ => rfl
+    psi_add := fun _ _ => by simp
+    be := 0
+    be_symm := fun _ _ => rfl
+    be_pos := fun _ h => (h rfl).elim
+    be_adj := fun _ _ _ => rfl
+    be_even := fun _ => dvd_zero _
+  }
   have hrg := rg_ne_zero A.ν
   have h0 := (fr 0).ne_zero
-  have hw : ∀ z w, hermForm Hm z w = hermForm Hm z (F H.w0 w) + hermForm Hm (F H.w0 z) w := fun z w => by
+  have hw
+      : ∀ z w,
+        hermForm Hm z w = hermForm Hm z (F H.w0 w) + hermForm Hm (F H.w0 z) w := fun z w => by
     rw [hadj]
     refine Eq.trans ?_ (B.H_add_right z (F H.w0 w) (F (star H.w0) w))
-    rw [← LinearMap.add_apply, ← map_add (f := _), show H.w0 + star H.w0 = 1 from cmField_host_element_add_conj_eq_one H, map_one]
+    rw [← LinearMap.add_apply, ← map_add (f := _),
+      show H.w0 + star H.w0 = 1 from cmField_host_element_add_conj_eq_one H, map_one]
     rfl
   have hp := hprim _ (A.oa.onB.hom H.w0) (F H.w0) (hmem H.w0) (hF H.w0) hw Ef hEf
-  have hth : ∀ z, A.N.th (A.ν.eA.symm (ex z)) = θ z * fr 0 / A.ν.rg * ((fr z / fr 0 : ℂˣ) : ℂ) := fun z => by
+  have hth
+      : ∀ z,
+        A.N.th (A.ν.eA.symm (ex z)) = θ z * fr 0 / A.ν.rg * ((fr z / fr 0 : ℂˣ) : ℂ) := fun z => by
     have e := A.ν.th_eq (A.ν.eA.symm (ex z))
     rw [MulEquiv.apply_symm_apply, hθv] at e
     change _ * A.ν.rg = _ at e
     rw [Units.val_div_eq_div_val, eq_div_of_mul_eq hrg e]
     field_simp
-  refine ⟨B, fun z => A.ν.eA.symm (ex z), fun z => fr z / fr 0, fun z => θ z * fr 0 / A.ν.rg,
-    ⟨fun z w => (congrArg A.ν.eA.symm (hadd z w)).trans (map_mul _ _ _), A.ν.eA.symm.surjective.comp hsurj,
-      fun z => (map_eq_one_iff _ A.ν.eA.symm.injective).trans (hker z), div_self' _, fun l z => ?_, fun x y z => ?_,
-      fun x => ?_, ⟨by simp only [div_eq_mul_inv]; exact (hθ.mul_const _).mul_const _, fun l z => ?_⟩, hth⟩, ?_, ?_, fun τ => ?_, fun a z => ?_,
-      fun a b r hr x z => ?_, fun t ht z => ?_⟩
+  refine ⟨
+    B,
+    fun z => A.ν.eA.symm (ex z),
+    fun z => fr z / fr 0,
+    fun z => θ z * fr 0 / A.ν.rg,
+    ⟨
+      fun z w => (congrArg A.ν.eA.symm (hadd z w)).trans (map_mul _ _ _),
+      A.ν.eA.symm.surjective.comp hsurj,
+      fun z => (map_eq_one_iff _ A.ν.eA.symm.injective).trans (hker z),
+      div_self' _,
+      fun l z => ?_,
+      fun x y z => ?_,
+      fun x => ?_,
+      ⟨by simp only [div_eq_mul_inv]; exact (hθ.mul_const _).mul_const _, fun l z => ?_⟩,
+      hth
+    ⟩,
+    ?_,
+    ?_,
+    fun τ => ?_,
+    fun a z => ?_,
+    fun a b r hr x z => ?_,
+    fun t ht z => ?_
+  ⟩
   · beta_reduce
     rw [Units.val_div_eq_div_val, Units.val_div_eq_div_val, hfr l z, mul_div_assoc]
     rfl
@@ -122,8 +188,9 @@ theorem valSt (hL : Laws) (hFam : BrFamSt) (hEx : FibExSt) (hGrp : FibGrpSt) (hC
   · have e₁ := hθv (z + l)
     rw [hadd, (hker l).2 l.2, _root_.mul_one, hθv, hfr l z, ← _root_.mul_assoc] at e₁
     have e₂ := mul_right_cancel₀ (fr (z + l)).ne_zero e₁
-    change θ (z + l) * fr 0 / A.ν.rg = (χ l * Complex.exp (Real.pi * hermForm Hm z l + Real.pi / 2 * hermForm Hm l l)) ^ 1 *
-      Complex.exp (Real.pi * B.H 0 l) * (θ z * fr 0 / A.ν.rg)
+    change θ (z + l) * fr 0 / A.ν.rg
+      = (χ l * Complex.exp (Real.pi * hermForm Hm z l + Real.pi / 2 * hermForm Hm l l)) ^ 1
+        * Complex.exp (Real.pi * B.H 0 l) * (θ z * fr 0 / A.ν.rg)
     rw [← e₂, B.H_zero_left, mul_zero, Complex.exp_zero]
     ring
   · intro hz
@@ -144,7 +211,8 @@ theorem valSt (hL : Laws) (hFam : BrFamSt) (hEx : FibExSt) (hGrp : FibGrpSt) (hC
     exact hF a z
   · have e := (hros _ _ (A.oa.onB.hom a) (A.oa.onB.hom b) _ _ (hF a) (hF b) r hr).2 x z
     simp only [Units.val_div_eq_div_val, MulEquiv.apply_symm_apply]
-    change _ * ((fr (F a x) : ℂ) / _) * _ * ((fr (x + F b z) : ℂ) / _) = (fr (F a x + z) : ℂ) / _ * _ * ((fr (F b z) : ℂ) / _)
+    change _ * ((fr (F a x) : ℂ) / _) * _ * ((fr (x + F b z) : ℂ) / _)
+      = (fr (F a x + z) : ℂ) / _ * _ * ((fr (F b z) : ℂ) / _)
     field_simp
     linear_combination e
   · have e := (hp t ht).2 z

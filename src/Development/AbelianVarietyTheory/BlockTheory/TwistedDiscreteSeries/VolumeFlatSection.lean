@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 noncomputable section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Doubling GlobalTheory.GLDoubling
+open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.Doubling GlobalTheory.GLDoubling
 open scoped NNReal
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection
@@ -18,7 +19,9 @@ variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 
 section Blocks
 
-variable (A D D' : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D] [Fintype D'] [DecidableEq D']
+variable
+  (A D D' : Type)
+  [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D] [Fintype D'] [DecidableEq D']
 
 def parahoric : Subgroup (GL (A ⊕ D) k) :=
   ((parab 𝓀[k] (two (Equiv.refl (A ⊕ D)))).comap
@@ -27,13 +30,17 @@ def parahoric : Subgroup (GL (A ⊕ D) k) :=
 
 variable {k A D D'}
 
-theorem mem_parahoric {g : GL (A ⊕ D) k} : g ∈ parahoric k A D ↔
-    g ∈ KO k (A ⊕ D) ∧ ∀ i j, valuation k (g.1 (.inr i) (.inl j)) < 1 := by
-  have hl : ∀ x : A, GlobalTheory.SmGL.blk (GlobalTheory.SmGL.two (Equiv.refl (A ⊕ D))) (Sum.inl x) = false := by
+theorem mem_parahoric {g : GL (A ⊕ D) k}
+    : g ∈ parahoric k A D ↔ g ∈ KO k (A ⊕ D) ∧ ∀ i j, valuation k (g.1 (.inr i) (.inl j)) < 1 := by
+  have hl
+      : ∀ x : A,
+        GlobalTheory.SmGL.blk (GlobalTheory.SmGL.two (Equiv.refl (A ⊕ D))) (Sum.inl x) = false := by
     intro x
     have e : (Sum.inl x : A ⊕ D) = GlobalTheory.SmGL.two (Equiv.refl (A ⊕ D)) ⟨false, x⟩ := by simp
     rw [e, GlobalTheory.SmGL.blk_apply]
-  have hr : ∀ x : D, GlobalTheory.SmGL.blk (GlobalTheory.SmGL.two (Equiv.refl (A ⊕ D))) (Sum.inr x) = true := by
+  have hr
+      : ∀ x : D,
+        GlobalTheory.SmGL.blk (GlobalTheory.SmGL.two (Equiv.refl (A ⊕ D))) (Sum.inr x) = true := by
     intro x
     have e : (Sum.inr x : A ⊕ D) = GlobalTheory.SmGL.two (Equiv.refl (A ⊕ D)) ⟨true, x⟩ := by simp
     rw [e, GlobalTheory.SmGL.blk_apply]
@@ -58,15 +65,18 @@ theorem mem_parahoric {g : GL (A ⊕ D) k} : g ∈ parahoric k A D ↔
       simp only [GeneralLinearGroup.map_apply, RingHom.mapMatrix_apply, Matrix.map_apply] at h0 ⊢
       exact (hval _).mpr h0
 
-def typeSpace {V : Type} [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (A ⊕ D) k) V) (ξ : kˣ →* ℂˣ) :
-    Submodule ℂ V where
-  carrier := {f | ∀ g ∈ parahoric k A D, ∀ d : kˣ, (d : k) = g.1.toBlocks₂₂.det → π g f = (ξ d : ℂ) • f}
+def typeSpace
+    {V : Type} [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (A ⊕ D) k) V) (ξ : kˣ →* ℂˣ)
+    : Submodule ℂ V where
+  carrier :=
+    {f | ∀ g ∈ parahoric k A D, ∀ d : kˣ, (d : k) = g.1.toBlocks₂₂.det → π g f = (ξ d : ℂ) • f}
   add_mem' hf hf' g hg d hd := by rw [map_add (f := _), hf g hg d hd, hf' g hg d hd, smul_add]
   zero_mem' g _ d _ := by simp
   smul_mem' c f hf g hg d hd := by rw [map_smul, hf g hg d hd, smul_comm]
 
 def InSupp (x : Matrix (A ⊕ D) (A ⊕ D') k) : Prop :=
-  (∀ i j, x i j ∈ 𝒪[k]) ∧ valuation k x.toBlocks₁₁.det = 1 ∧ ∀ i j, valuation k (x (.inr i) (.inl j)) < 1
+  (∀ i j, x i j ∈ 𝒪[k]) ∧ valuation k x.toBlocks₁₁.det = 1
+    ∧ ∀ i j, valuation k (x (.inr i) (.inl j)) < 1
 
 omit [TopologicalSpace k] [IsNonarchimedeanLocalField k] [Fintype D] [DecidableEq D] [Fintype D']
   [DecidableEq D'] in
@@ -75,7 +85,6 @@ theorem InSupp.det_ne {x : Matrix (A ⊕ D) (A ⊕ D') k} (h : InSupp x) : x.toB
   have h1 := h.2.1
   rw [h0, map_zero] at h1
   exact zero_ne_one h1
-
 
 open Classical in
 def datum (ξ : kˣ →* ℂˣ) (x : Matrix (A ⊕ D) (A ⊕ D') k) : ℂ := by
@@ -86,7 +95,8 @@ end Blocks
 
 section Section
 
-variable {k} {a b : Type} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b] [MeasurableSpace k]
+variable
+  {k} {a b : Type} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b] [MeasurableSpace k]
 
 def dblDatum (Φ₁ Φ₂ : Matrix b a k → ℂ) (y : Matrix b (a ⊕ a) k) : ℂ :=
   Φ₁ y.toCols₁ * starRingEnd ℂ (Φ₂ (-y.toCols₂))
@@ -94,9 +104,10 @@ def dblDatum (Φ₁ Φ₂ : Matrix b a k → ℂ) (y : Matrix b (a ⊕ a) k) : �
 def swSection (ν : Measure k) (μ : kˣ →* ℂˣ) (Φ₁ Φ₂ : Matrix b a k → ℂ) (h : GL (a ⊕ a) k) : ℂ :=
   ∫ x : Matrix b a k, om μ h (1 : GL b k) (dblDatum Φ₁ Φ₂) (fromCols x (-x)) ∂(volM ν b a)
 
-def flatSection (ν : Measure k) (μ : kˣ →* ℂˣ) (Φ₁ Φ₂ : Matrix b a k → ℂ) (s : ℂ) (h : GL (a ⊕ a) k) : ℂ :=
-  swSection ν μ Φ₁ Φ₂ h *
-    npow (iwAbs (absRatio k a) (KO k (a ⊕ a)) h) (s - ((Fintype.card b : ℂ) - (Fintype.card a : ℂ)) / 2)
+def flatSection (ν : Measure k) (μ : kˣ →* ℂˣ) (Φ₁ Φ₂ : Matrix b a k → ℂ) (s : ℂ) (h : GL (a ⊕ a) k)
+    : ℂ :=
+  swSection ν μ Φ₁ Φ₂ h * npow (iwAbs (absRatio k a) (KO k (a ⊕ a)) h)
+    (s - ((Fintype.card b : ℂ) - (Fintype.card a : ℂ)) / 2)
 
 end Section
 
@@ -104,7 +115,8 @@ abbrev Blocks (l t : ℕ) : Type := Σ _ : Fin l, Fin t
 
 variable {k}
 
-def blockParam {l : ℕ} (t : ℕ) (ϖ : kˣ) (μ : Fin l → kˣ →* ℂˣ) (μ' : kˣ →* ℂˣ) (x : Blocks l t) : ℂˣ :=
+def blockParam {l : ℕ} (t : ℕ) (ϖ : kˣ) (μ : Fin l → kˣ →* ℂˣ) (μ' : kˣ →* ℂˣ) (x : Blocks l t)
+    : ℂˣ :=
   μ x.1 ϖ / μ' ϖ * absPow k (((x.2 : ℕ) : ℂ) - ((t : ℂ) - 1) / 2) ϖ
 
 def blockL {l : ℕ} (t : ℕ) (ϖ : kˣ) (μ : Fin l → kˣ →* ℂˣ) (μ' : kˣ →* ℂˣ) (s : ℂ) : ℂ :=

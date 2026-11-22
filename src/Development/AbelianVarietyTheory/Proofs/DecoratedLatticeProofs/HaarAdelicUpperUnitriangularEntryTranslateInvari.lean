@@ -13,7 +13,9 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsMulRigh
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -33,7 +35,8 @@ theorem t2AE (D : D7) : T2Space (AE D) := by
   obtain ⟨-, -, -, i4, -⟩ := lattice_Mx D 1 1
   exact @T2Space.of_injective_continuous (AE D) (Matrix (Fin 1) (Fin 1) (AE D)) _ _ i4
     (fun x : AE D => Matrix.of fun _ _ => x)
-    (fun a b h => congrFun (congrFun h 0) 0) (continuous_pi fun _ => continuous_pi fun _ => continuous_id)
+    (fun a b h => congrFun (congrFun h 0) 0)
+    (continuous_pi fun _ => continuous_pi fun _ => continuous_id)
 
 theorem tagMx (D : D7) (ρ : ℕ) : IsTopologicalAddGroup (Mx D ρ ρ) := (lattice_Mx D ρ ρ).1
 theorem lcMx (D : D7) (ρ : ℕ) : LocallyCompactSpace (Mx D ρ ρ) := (lattice_Mx D ρ ρ).2.1
@@ -51,7 +54,7 @@ def supMx (D : D7) (ρ : ℕ) : AddSubgroup (Mx D ρ ρ) where
     rw [hx i j h, hy i j h, add_zero]
   zero_mem' _ _ _ := rfl
   neg_mem' {x} hx i j h := by
-    change -x i j = 0
+    change - x i j = 0
     rw [hx i j h, neg_zero]
 
 theorem isClosed_supMx : IsClosed (supMx D ρ : Set (Mx D ρ ρ)) := by
@@ -75,7 +78,8 @@ def triGrp (D : D7) (ρ : ℕ) : Subgroup (GL (Fin ρ) (AE D)) where
   carrier := {g | BlockTriangular (g : Matrix (Fin ρ) (Fin ρ) (AE D)) id}
   one_mem' := blockTriangular_one
   mul_mem' {a b} ha hb := by
-    change BlockTriangular ((a : Matrix (Fin ρ) (Fin ρ) (AE D)) * (b : Matrix (Fin ρ) (Fin ρ) (AE D))) id
+    change BlockTriangular
+      ((a : Matrix (Fin ρ) (Fin ρ) (AE D)) * (b : Matrix (Fin ρ) (Fin ρ) (AE D))) id
     exact ha.mul hb
   inv_mem' {x} hx := by
     letI : Invertible (x : Matrix (Fin ρ) (Fin ρ) (AE D)) := x.invertible
@@ -83,8 +87,10 @@ def triGrp (D : D7) (ρ : ℕ) : Subgroup (GL (Fin ρ) (AE D)) where
     rw [Matrix.coe_units_inv]
     exact blockTriangular_inv_of_blockTriangular hx
 
-theorem mul_mem_supMx {g : Matrix (Fin ρ) (Fin ρ) (AE D)} (hg : BlockTriangular g id) {s : Mx D ρ ρ}
-    (hs : s ∈ supMx D ρ) : g * s ∈ supMx D ρ := by
+theorem mul_mem_supMx
+    {g : Matrix (Fin ρ) (Fin ρ) (AE D)} (hg : BlockTriangular g id)
+    {s : Mx D ρ ρ} (hs : s ∈ supMx D ρ)
+    : g * s ∈ supMx D ρ := by
   intro i j hij
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_zero fun l _ => ?_
@@ -110,8 +116,7 @@ theorem modChar_eq_one_of_sq {a d : triGrp D ρ} (h : d * a * d⁻¹ = a * a) : 
   have h1 := congrArg (modChar D ρ) h
   rw [map_mul, map_mul, map_mul] at h1
   have h2 : modChar D ρ d * modChar D ρ d⁻¹ = 1 := by rw [← map_mul, mul_inv_cancel, map_one]
-  have h3 : modChar D ρ a * modChar D ρ a = modChar D ρ a * 1 := by
-    rw [← h1, ← h2]; ring
+  have h3 : modChar D ρ a * modChar D ρ a = modChar D ρ a * 1 := by rw [← h1, ← h2]; ring
   exact mul_left_cancel₀ (distribHaarChar_pos (A := supMx D ρ)).ne' h3
 
 theorem one_add_mul_one_sub {x : Mx D ρ ρ} (hx : x * x = 0) : (1 + x) * (1 - x) = 1 := by
@@ -128,8 +133,8 @@ theorem upper_one_add {x : Mx D ρ ρ} (hx : x ∈ supMx D ρ) : BlockTriangular
   have h' : j < i := h
   rw [Matrix.add_apply, one_apply_ne (ne_of_lt h').symm, hx i j (not_lt.2 (le_of_lt h')), add_zero]
 
-theorem sq_col {x : Mx D ρ ρ} (hx : x ∈ supMx D ρ) {j : Fin ρ} (hcol : ∀ i k, k ≠ j → x i k = 0) :
-    x * x = 0 := by
+theorem sq_col {x : Mx D ρ ρ} (hx : x ∈ supMx D ρ) {j : Fin ρ} (hcol : ∀ i k, k ≠ j → x i k = 0)
+    : x * x = 0 := by
   ext i k
   rw [Matrix.mul_apply, Matrix.zero_apply]
   refine Finset.sum_eq_zero fun l _ => ?_
@@ -143,30 +148,37 @@ theorem sq_col {x : Mx D ρ ρ} (hx : x ∈ supMx D ρ) {j : Fin ρ} (hcol : ∀
 def twoInv (D : D7) : AE D := algebraMap D.host.F (AE D) 2⁻¹
 
 theorem two_mul_twoInv : (2 : AE D) * twoInv D = 1 := by
-  rw [twoInv, ← map_ofNat (algebraMap D.host.F (AE D)) 2, ← map_mul, mul_inv_cancel₀ two_ne_zero, map_one]
+  rw [twoInv, ← map_ofNat (algebraMap D.host.F (AE D)) 2, ← map_mul, mul_inv_cancel₀ two_ne_zero,
+    map_one]
 
-def diagU (D : D7) {ρ : ℕ} (j : Fin ρ) : GL (Fin ρ) (AE D) :=
-  ⟨diagonal fun i => if i = j then 1 else 2, diagonal fun i => if i = j then 1 else twoInv D,
-    by
-      rw [diagonal_mul_diagonal, ← diagonal_one]
-      congr 1; funext i
-      split_ifs
-      · exact mul_one 1
-      · exact two_mul_twoInv,
-    by
-      rw [diagonal_mul_diagonal, ← diagonal_one]
-      congr 1; funext i
-      split_ifs
-      · exact mul_one 1
-      · rw [mul_comm]; exact two_mul_twoInv⟩
+def diagU (D : D7) {ρ : ℕ} (j : Fin ρ) : GL (Fin ρ) (AE D) := ⟨
+  diagonal fun i => if i = j then 1 else 2,
+  diagonal fun i => if i = j then 1 else twoInv D,
+  by
+    rw [diagonal_mul_diagonal, ← diagonal_one]
+    congr 1
+    funext i
+    split_ifs
+    · exact mul_one 1
+    · exact two_mul_twoInv,
+  by
+    rw [diagonal_mul_diagonal, ← diagonal_one]
+    congr 1
+    funext i
+    split_ifs
+    · exact mul_one 1
+    · rw [mul_comm]; exact two_mul_twoInv
+⟩
 
-theorem modChar_col {x : Mx D ρ ρ} (hx : x ∈ supMx D ρ) {j : Fin ρ} (hcol : ∀ i k, k ≠ j → x i k = 0) :
-    modChar D ρ ⟨colU x (sq_col hx hcol), upper_one_add hx⟩ = 1 := by
+theorem modChar_col
+    {x : Mx D ρ ρ} (hx : x ∈ supMx D ρ) {j : Fin ρ} (hcol : ∀ i k, k ≠ j → x i k = 0)
+    : modChar D ρ ⟨colU x (sq_col hx hcol), upper_one_add hx⟩ = 1 := by
   have hsq := sq_col hx hcol
   let d : triGrp D ρ := ⟨diagU D j, blockTriangular_diagonal _⟩
   refine modChar_eq_one_of_sq (d := d) (Subtype.ext (Units.ext ?_))
-  change diagonal (fun i => if i = j then (1 : AE D) else 2) * (1 + x) * diagonal (fun i => if i = j then 1 else twoInv D) =
-    (1 + x) * (1 + x)
+  change diagonal (fun i => if i = j then (1 : AE D) else 2) * (1 + x)
+      * diagonal (fun i => if i = j then 1 else twoInv D)
+    = (1 + x) * (1 + x)
   have e : (1 + x) * (1 + x) = 1 + (x + x) := by
     rw [add_mul, one_mul, mul_add, mul_one, hsq, add_zero, add_assoc]
   rw [e]
@@ -191,24 +203,23 @@ def trunc (u : Mx D ρ ρ) (k : ℕ) : Mx D ρ ρ :=
 def colPart (u : Mx D ρ ρ) (k : ℕ) : Mx D ρ ρ :=
   Matrix.of fun i j => if j.1 = k ∧ i < j then u i j else 0
 
-theorem trunc_zero (u : Mx D ρ ρ) : trunc u 0 = 1 := by
-  ext i j; simp [trunc]
+theorem trunc_zero (u : Mx D ρ ρ) : trunc u 0 = 1 := by ext i j; simp [trunc]
 
-theorem trunc_top (u : Mx D ρ ρ) : trunc u ρ = u := by
-  ext i j; simp [trunc, j.2]
+theorem trunc_top (u : Mx D ρ ρ) : trunc u ρ = u := by ext i j; simp [trunc, j.2]
 
 theorem colPart_mem (u : Mx D ρ ρ) (k : ℕ) : colPart u k ∈ supMx D ρ := by
   intro i j h
   change (if j.1 = k ∧ i < j then u i j else 0) = 0
   rw [if_neg (fun h' => h h'.2)]
 
-theorem colPart_col (u : Mx D ρ ρ) {k : ℕ} (hk : k < ρ) : ∀ i l, l ≠ ⟨k, hk⟩ → colPart u k i l = 0 := by
+theorem colPart_col (u : Mx D ρ ρ) {k : ℕ} (hk : k < ρ)
+    : ∀ i l, l ≠ ⟨k, hk⟩ → colPart u k i l = 0 := by
   intro i l hl
   change (if l.1 = k ∧ i < l then u i l else 0) = 0
   rw [if_neg (fun h => hl (Fin.ext h.1))]
 
-theorem trunc_succ {u : Mx D ρ ρ} (hu : u ∈ GlobalTheory.UnitU.uniSet D ρ) (k : ℕ) :
-    trunc u (k + 1) = trunc u k + colPart u k := by
+theorem trunc_succ {u : Mx D ρ ρ} (hu : u ∈ GlobalTheory.UnitU.uniSet D ρ) (k : ℕ)
+    : trunc u (k + 1) = trunc u k + colPart u k := by
   ext i j
   simp only [trunc, colPart, of_apply, Matrix.add_apply]
   rcases lt_trichotomy j.1 k with h | h | h
@@ -224,8 +235,9 @@ theorem trunc_succ {u : Mx D ρ ρ} (hu : u ∈ GlobalTheory.UnitU.uniSet D ρ) 
     have h2 : ¬ j.1 < k := by omega
     simp [h1, h2, h.ne']
 
-theorem colPart_mul_trunc {u : Mx D ρ ρ} (hu : u ∈ GlobalTheory.UnitU.uniSet D ρ) {k : ℕ} (hk : k < ρ) :
-    colPart u k * trunc u k = colPart u k := by
+theorem colPart_mul_trunc
+    {u : Mx D ρ ρ} (hu : u ∈ GlobalTheory.UnitU.uniSet D ρ) {k : ℕ} (hk : k < ρ)
+    : colPart u k * trunc u k = colPart u k := by
   ext i j
   rw [Matrix.mul_apply, Finset.sum_eq_single (⟨k, hk⟩ : Fin ρ)]
   · simp only [colPart, trunc, of_apply]
@@ -240,8 +252,8 @@ theorem colPart_mul_trunc {u : Mx D ρ ρ} (hu : u ∈ GlobalTheory.UnitU.uniSet
     rw [colPart_col u hk i l hl, zero_mul]
   · intro h; exact absurd (Finset.mem_univ _) h
 
-theorem modChar_of_trunc {u : Mx D ρ ρ} (hu : u ∈ GlobalTheory.UnitU.uniSet D ρ) :
-    ∀ k ≤ ρ, ∀ g : triGrp D ρ, (g : GL (Fin ρ) (AE D)).1 = trunc u k → modChar D ρ g = 1 := by
+theorem modChar_of_trunc {u : Mx D ρ ρ} (hu : u ∈ GlobalTheory.UnitU.uniSet D ρ)
+    : ∀ k ≤ ρ, ∀ g : triGrp D ρ, (g : GL (Fin ρ) (AE D)).1 = trunc u k → modChar D ρ g = 1 := by
   intro k
   induction k with
   | zero =>
@@ -263,7 +275,9 @@ theorem modChar_of_trunc {u : Mx D ρ ρ} (hu : u ∈ GlobalTheory.UnitU.uniSet 
         rw [add_mul, one_mul, colPart_mul_trunc hu hk']
       rw [e, ← Matrix.mul_assoc, one_sub_mul_one_add hsq, Matrix.one_mul]
     have h3 := ih (Nat.le_of_succ_le hk) _ h2
-    calc modChar D ρ g = modChar D ρ (a * (a⁻¹ * g)) := by rw [mul_inv_cancel_left]
+    calc
+      modChar D ρ g
+        = modChar D ρ (a * (a⁻¹ * g)) := by rw [mul_inv_cancel_left]
       _ = 1 := by rw [map_mul, ha, h3, one_mul]
 
 def ofUX (u : UX D ρ) : triGrp D ρ := ⟨u.1, fun i j h => (u.2 i j).1 h⟩
@@ -271,8 +285,8 @@ def ofUX (u : UX D ρ) : triGrp D ρ := ⟨u.1, fun i j h => (u.2 i j).1 h⟩
 theorem modChar_ofUX (u : UX D ρ) : modChar D ρ (ofUX u) = 1 :=
   modChar_of_trunc u.2 ρ le_rfl _ (trunc_top _).symm
 
-theorem map_smul_addHaar (u : UX D ρ) :
-    (Measure.addHaar : Measure (supMx D ρ)).map (fun s => ofUX u • s) = Measure.addHaar := by
+theorem map_smul_addHaar (u : UX D ρ)
+    : (Measure.addHaar : Measure (supMx D ρ)).map (fun s => ofUX u • s) = Measure.addHaar := by
   ext S hS
   rw [Measure.map_apply (continuous_const_smul _).measurable hS, Set.preimage_smul,
     ← distribHaarChar_mul, map_inv, modChar_ofUX, inv_one, ENNReal.coe_one, one_mul]
@@ -284,42 +298,50 @@ theorem sub_one_mem (u : UX D ρ) : (u : GL (Fin ρ) (AE D)).1 - 1 ∈ supMx D �
   · rw [(u.2 i j).1 h', one_apply_ne h'.ne', sub_zero]
   · rw [(u.2 j j).2, one_apply_eq, sub_self]
 
-theorem one_add_mem {s : Mx D ρ ρ} (hs : s ∈ supMx D ρ) : 1 + s ∈ GlobalTheory.UnitU.uniSet D ρ := fun i j =>
-  ⟨fun h => by
+theorem one_add_mem {s : Mx D ρ ρ} (hs : s ∈ supMx D ρ)
+    : 1 + s ∈ GlobalTheory.UnitU.uniSet D ρ := fun i j => ⟨
+  fun h => by
     change (1 : Mx D ρ ρ) i j + s i j = 0
     rw [one_apply_ne h.ne', hs i j (not_lt.2 h.le), add_zero],
-   by
+  by
     change (1 : Mx D ρ ρ) i i + s i i = 1
-    rw [hs i i (lt_irrefl i), one_apply_eq, add_zero]⟩
+    rw [hs i i (lt_irrefl i), one_apply_eq, add_zero]
+⟩
 
 def coordU (D : D7) (ρ : ℕ) : UX D ρ ≃ₜ supMx D ρ where
   toFun u := ⟨(u : GL (Fin ρ) (AE D)).1 - 1, sub_one_mem u⟩
   invFun s := ⟨GlobalTheory.UnitU.toUnit (1 + s.1) (one_add_mem s.2), one_add_mem s.2⟩
-  left_inv u := Subtype.ext (Units.ext (by
-    change 1 + ((u : GL (Fin ρ) (AE D)).1 - 1) = (u : GL (Fin ρ) (AE D)).1
-    abel))
-  right_inv s := Subtype.ext (by
-    change 1 + s.1 - 1 = s.1
-    abel)
+  left_inv u :=
+    Subtype.ext (Units.ext (by
+      change 1 + ((u : GL (Fin ρ) (AE D)).1 - 1) = (u : GL (Fin ρ) (AE D)).1
+      abel))
+  right_inv s :=
+    Subtype.ext (by
+      change 1 + s.1 - 1 = s.1
+      abel)
   continuous_toFun :=
-    Continuous.subtype_mk ((GlobalTheory.UnitU.isClosedEmbedding_val D ρ).continuous.sub continuous_const) _
+    Continuous.subtype_mk
+      ((GlobalTheory.UnitU.isClosedEmbedding_val D ρ).continuous.sub continuous_const) _
   continuous_invFun :=
-    (GlobalTheory.UnitU.isClosedEmbedding_val D ρ).isInducing.continuous_iff.2
-      (continuous_const.add continuous_subtype_val)
+    (GlobalTheory.UnitU.isClosedEmbedding_val D ρ).isInducing.continuous_iff.2 (continuous_const.add
+      continuous_subtype_val)
 
 theorem coordU_mul (g u : UX D ρ) : coordU D ρ (g * u) = ofUX g • coordU D ρ u + coordU D ρ g := by
   apply Subtype.ext
-  change (g : GL (Fin ρ) (AE D)).1 * (u : GL (Fin ρ) (AE D)).1 - 1 =
-    (g : GL (Fin ρ) (AE D)).1 * ((u : GL (Fin ρ) (AE D)).1 - 1) + ((g : GL (Fin ρ) (AE D)).1 - 1)
+  change (g : GL (Fin ρ) (AE D)).1 * (u : GL (Fin ρ) (AE D)).1 - 1
+    = (g : GL (Fin ρ) (AE D)).1 * ((u : GL (Fin ρ) (AE D)).1 - 1) + ((g : GL (Fin ρ) (AE D)).1 - 1)
   rw [Matrix.mul_sub, Matrix.mul_one]
   abel
 
-theorem haar_val_add_invariant : ∀ (D : D7) (ρ : ℕ) (ν : Measure (UX D ρ)), ν.IsHaarMeasure →
-    Measurable (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ)) ∧
-    IsFiniteMeasureOnCompacts (Measure.map (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ)) ν) ∧
-    ∀ t : Mx D ρ ρ, (∀ i j, ¬ i < j → t i j = 0) →
-      Measure.map (fun x => x + t) (Measure.map (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ)) ν) =
-        Measure.map (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ)) ν := by
+theorem haar_val_add_invariant
+    : ∀ (D : D7) (ρ : ℕ) (ν : Measure (UX D ρ)),
+      ν.IsHaarMeasure
+        → Measurable (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ))
+          ∧ IsFiniteMeasureOnCompacts (Measure.map (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ)) ν)
+          ∧ ∀ t : Mx D ρ ρ,
+            (∀ i j, ¬ i < j → t i j = 0)
+              → Measure.map (fun x => x + t) (Measure.map (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ)) ν)
+                = Measure.map (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ)) ν := by
   intro D ρ ν hν
   obtain ⟨i1, i2, i3⟩ := GlobalTheory.UnitU.topology D ρ
   have hemb := GlobalTheory.UnitU.isClosedEmbedding_val D ρ
@@ -356,11 +378,13 @@ theorem haar_val_add_invariant : ∀ (D : D7) (ρ : ℕ) (ν : Measure (UX D ρ)
     rw [e1, Measure.map_smul _ hΦ.aemeasurable,
       Measure.map_smul _ (measurable_add_const t).aemeasurable]
     congr 1
-    change Measure.map (· + t) (Measure.map (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ)) (Measure.map Ψ.symm lam)) =
-      Measure.map (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ)) (Measure.map Ψ.symm lam)
+    change Measure.map (· + t)
+        (Measure.map (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ)) (Measure.map Ψ.symm lam))
+      = Measure.map (fun u : UX D ρ => (u.1.1 : Mx D ρ ρ)) (Measure.map Ψ.symm lam)
     rw [Measure.map_map hΦ hΨs, e2, Measure.map_map (measurable_add_const t) hf]
-    have e3 : (· + t) ∘ (fun s : supMx D ρ => 1 + s.1) =
-        (fun s : supMx D ρ => 1 + s.1) ∘ ((⟨t, ht⟩ : supMx D ρ) + ·) := by
+    have e3
+        : (· + t) ∘ (fun s : supMx D ρ => 1 + s.1)
+          = (fun s : supMx D ρ => 1 + s.1) ∘ ((⟨t, ht⟩ : supMx D ρ) + ·) := by
       funext s
       simp only [Function.comp_apply, AddSubgroup.coe_add]
       abel

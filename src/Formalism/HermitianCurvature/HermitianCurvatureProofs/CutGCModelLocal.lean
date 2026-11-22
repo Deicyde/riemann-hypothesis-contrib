@@ -15,31 +15,39 @@ section loc
 variable {r : ℕ} {TT : ℝ}
 
 def LocOpQ (T : Module.End ℂ (MA.SmQ r TT)) : Prop :=
-  ∀ (h₁ h₂ : MA.SmQ r TT) (c : Fin r → ℂ) (V : Set ℂ), IsOpen V →
-    (∀ q : MA.Qp r TT, q.1.1 = c → q.1.2 ∈ V → (h₁ : MA.Qp r TT → ℂ) q = (h₂ : MA.Qp r TT → ℂ) q) →
-    ∀ q : MA.Qp r TT, q.1.1 = c → q.1.2 ∈ V → (T h₁ : MA.Qp r TT → ℂ) q = (T h₂ : MA.Qp r TT → ℂ) q
+  ∀ (h₁ h₂ : MA.SmQ r TT) (c : Fin r → ℂ) (V : Set ℂ),
+    IsOpen V
+      → (∀ q : MA.Qp r TT,
+        q.1.1 = c → q.1.2 ∈ V → (h₁ : MA.Qp r TT → ℂ) q = (h₂ : MA.Qp r TT → ℂ) q)
+      → ∀ q : MA.Qp r TT,
+        q.1.1 = c → q.1.2 ∈ V → (T h₁ : MA.Qp r TT → ℂ) q = (T h₂ : MA.Qp r TT → ℂ) q
 
-theorem locOp_add {T S : Module.End ℂ (MA.SmQ r TT)} (hT : LocOpQ T) (hS : LocOpQ S) : LocOpQ (T + S) := by
+theorem locOp_add {T S : Module.End ℂ (MA.SmQ r TT)} (hT : LocOpQ T) (hS : LocOpQ S)
+    : LocOpQ (T + S) := by
   intro h₁ h₂ c V hV hag q hq hqV
-  have e : ∀ h : MA.SmQ r TT, (((T + S) h : MA.SmQ r TT) : MA.Qp r TT → ℂ) q =
-      (T h : MA.Qp r TT → ℂ) q + (S h : MA.Qp r TT → ℂ) q := fun h => rfl
+  have e
+      : ∀ h : MA.SmQ r TT,
+        (((T + S) h : MA.SmQ r TT) : MA.Qp r TT → ℂ) q
+          = (T h : MA.Qp r TT → ℂ) q + (S h : MA.Qp r TT → ℂ) q := fun h =>
+    rfl
   rw [e, e, hT h₁ h₂ c V hV hag q hq hqV, hS h₁ h₂ c V hV hag q hq hqV]
 
-theorem locOp_mul {T S : Module.End ℂ (MA.SmQ r TT)} (hT : LocOpQ T) (hS : LocOpQ S) : LocOpQ (T * S) :=
-  fun h₁ h₂ c V hV hag q hq hqV =>
-    hT (S h₁) (S h₂) c V hV (fun q' hq' hqV' => hS h₁ h₂ c V hV hag q' hq' hqV') q hq hqV
+theorem locOp_mul {T S : Module.End ℂ (MA.SmQ r TT)} (hT : LocOpQ T) (hS : LocOpQ S)
+    : LocOpQ (T * S) := fun h₁ h₂ c V hV hag q hq hqV =>
+  hT (S h₁) (S h₂) c V hV (fun q' hq' hqV' => hS h₁ h₂ c V hV hag q' hq' hqV') q hq hqV
 
 theorem locOp_smul (z : ℂ) {T : Module.End ℂ (MA.SmQ r TT)} (hT : LocOpQ T) : LocOpQ (z • T) := by
   intro h₁ h₂ c V hV hag q hq hqV
-  have e : ∀ h : MA.SmQ r TT, (((z • T) h : MA.SmQ r TT) : MA.Qp r TT → ℂ) q =
-      z * (T h : MA.Qp r TT → ℂ) q := fun h => rfl
+  have e
+      : ∀ h : MA.SmQ r TT,
+        (((z • T) h : MA.SmQ r TT) : MA.Qp r TT → ℂ) q = z * (T h : MA.Qp r TT → ℂ) q := fun h =>
+    rfl
   rw [e, e, hT h₁ h₂ c V hV hag q hq hqV]
 
-theorem locOp_zero : LocOpQ (0 : Module.End ℂ (MA.SmQ r TT)) :=
-  fun _ _ _ _ _ _ _ _ _ => rfl
+theorem locOp_zero : LocOpQ (0 : Module.End ℂ (MA.SmQ r TT)) := fun _ _ _ _ _ _ _ _ _ => rfl
 
-theorem locOp_one : LocOpQ (1 : Module.End ℂ (MA.SmQ r TT)) :=
-  fun _ _ _ _ _ hag q hq hqV => hag q hq hqV
+theorem locOp_one : LocOpQ (1 : Module.End ℂ (MA.SmQ r TT)) := fun _ _ _ _ _ hag q hq hqV =>
+  hag q hq hqV
 
 theorem locOp_mulOp (f : MA.SmQ r TT) : LocOpQ ((MA.anQ r TT).mulOp f) := by
   intro h₁ h₂ c V hV hag q hq hqV
@@ -47,15 +55,19 @@ theorem locOp_mulOp (f : MA.SmQ r TT) : LocOpQ ((MA.anQ r TT).mulOp f) := by
   simp only [Subalgebra.coe_mul, Pi.mul_apply]
   rw [hag q hq hqV]
 
-theorem dirE_zeta (v : M.Var r) (hv : ((ofLex v).1 : ℕ) = r) : MA.dirE v = ((0 : Fin r → ℂ), (1 : ℂ)) := by
+theorem dirE_zeta (v : M.Var r) (hv : ((ofLex v).1 : ℕ) = r)
+    : MA.dirE v = ((0 : Fin r → ℂ), (1 : ℂ)) := by
   unfold MA.dirE
   rw [dite_eq_right (by omega)]
 
-theorem fderiv_zeta_local {f₁ f₂ : MA.Qp r TT → ℂ} (hf₁ : f₁ ∈ MA.smSub r TT) (hf₂ : f₂ ∈ MA.smSub r TT)
-    (c : Fin r → ℂ) (V : Set ℂ) (hV : IsOpen V)
-    (hag : ∀ q : MA.Qp r TT, q.1.1 = c → q.1.2 ∈ V → f₁ q = f₂ q)
-    (q : MA.Qp r TT) (hq : q.1.1 = c) (hqV : q.1.2 ∈ V) (w : ℂ) :
-    fderiv ℝ (MA.ext f₁) q.1 ((0 : Fin r → ℂ), w) = fderiv ℝ (MA.ext f₂) q.1 ((0 : Fin r → ℂ), w) := by
+theorem fderiv_zeta_local
+    {f₁ f₂ : MA.Qp r TT → ℂ} (hf₁ : f₁ ∈ MA.smSub r TT) (hf₂ : f₂ ∈ MA.smSub r TT)
+    (c : Fin r → ℂ) (V : Set ℂ)
+    (hV : IsOpen V) (hag : ∀ q : MA.Qp r TT, q.1.1 = c → q.1.2 ∈ V → f₁ q = f₂ q)
+    (q : MA.Qp r TT) (hq : q.1.1 = c) (hqV : q.1.2 ∈ V)
+    (w : ℂ)
+    : fderiv ℝ (MA.ext f₁) q.1 ((0 : Fin r → ℂ), w)
+      = fderiv ℝ (MA.ext f₂) q.1 ((0 : Fin r → ℂ), w) := by
   set γ : ℝ → MA.E r := fun t => q.1 + t • ((0 : Fin r → ℂ), w) with hγ
   have hγd : HasDerivAt γ ((0 : Fin r → ℂ), w) 0 := by
     have h := ((hasDerivAt_id (0 : ℝ)).smul_const ((0 : Fin r → ℂ), w)).const_add q.1
@@ -74,7 +86,8 @@ theorem fderiv_zeta_local {f₁ f₂ : MA.Qp r TT → ℂ} (hf₁ : f₁ ∈ MA.
   have hV' : ∀ᶠ t in 𝓝 (0 : ℝ), (γ t).2 ∈ V :=
     (continuous_snd.comp hγc).continuousAt.preimage_mem_nhds (by
       show V ∈ 𝓝 ((γ 0).2)
-      rw [hγ0]; exact hV.mem_nhds hqV)
+      rw [hγ0]
+      exact hV.mem_nhds hqV)
   have heq : MA.ext f₁ ∘ γ =ᶠ[𝓝 0] MA.ext f₂ ∘ γ := by
     filter_upwards [hQ, hV'] with t ht htV
     simp only [Function.comp_apply, MA.ext, dif_pos ht]
@@ -84,14 +97,15 @@ theorem fderiv_zeta_local {f₁ f₂ : MA.Qp r TT → ℂ} (hf₁ : f₁ ∈ MA.
   have := h1.unique (h2.congr_of_eventuallyEq heq)
   rwa [hγ0] at this
 
-theorem locOp_euler (v : M.Var r) (hv : ((ofLex v).1 : ℕ) = r) : LocOpQ (MA.eulerQ (TT := TT) v) := by
+theorem locOp_euler (v : M.Var r) (hv : ((ofLex v).1 : ℕ) = r)
+    : LocOpQ (MA.eulerQ (TT := TT) v) := by
   intro h₁ h₂ c V hV hag q hq hqV
   show MA.coordE v q.1 * MA.wirt v (MA.ext h₁.1) q.1 = MA.coordE v q.1 * MA.wirt v (MA.ext h₂.1) q.1
   unfold MA.wirt
   rw [dirE_zeta v hv]
-  have hI : Complex.I • ((0 : Fin r → ℂ), (1 : ℂ)) = ((0 : Fin r → ℂ), Complex.I) := by
-    ext <;> simp
-  rw [hI, fderiv_zeta_local h₁.2 h₂.2 c V hV hag q hq hqV 1, fderiv_zeta_local h₁.2 h₂.2 c V hV hag q hq hqV Complex.I]
+  have hI : Complex.I • ((0 : Fin r → ℂ), (1 : ℂ)) = ((0 : Fin r → ℂ), Complex.I) := by ext <;> simp
+  rw [hI, fderiv_zeta_local h₁.2 h₂.2 c V hV hag q hq hqV 1,
+    fderiv_zeta_local h₁.2 h₂.2 c V hV hag q hq hqV Complex.I]
 
 end loc
 
@@ -118,14 +132,15 @@ theorem entOK_mul {A B : MA.A P (MA.DQ P)} (hA : EntOK P A) (hB : EntOK P B) : E
       exact locOp_add (locOp_mul (hA π j) (hB j π')) ih
   exact key Finset.univ
 
-theorem entOK_sum {ι : Type} (s : Finset ι) (A : ι → MA.A P (MA.DQ P)) (hA : ∀ i ∈ s, EntOK P (A i)) :
-    EntOK P (∑ i ∈ s, A i) := by
+theorem entOK_sum {ι : Type} (s : Finset ι) (A : ι → MA.A P (MA.DQ P)) (hA : ∀ i ∈ s, EntOK P (A i))
+    : EntOK P (∑ i ∈ s, A i) := by
   classical
   revert hA
   refine Finset.induction_on s (fun _ => by rw [Finset.sum_empty]; exact fun _ _ => locOp_zero) ?_
   intro i s hi ih hA
   rw [Finset.sum_insert hi]
-  exact entOK_add P (hA i (Finset.mem_insert_self i s)) (ih fun j hj => hA j (Finset.mem_insert_of_mem hj))
+  exact entOK_add P (hA i (Finset.mem_insert_self i s))
+    (ih fun j hj => hA j (Finset.mem_insert_of_mem hj))
 
 theorem locOp_algebraMap (z : ℂ) : LocOpQ ((algebraMap ℂ (MA.DQ P).Pr z).1) := by
   rw [show (algebraMap ℂ (MA.DQ P).Pr z).1 = z • 1 by simp [Algebra.algebraMap_eq_smul_one]; rfl]
@@ -141,7 +156,8 @@ theorem entOK_algebraMap (z : ℂ) : EntOK P (algebraMap ℂ (MA.A P (MA.DQ P)) 
   · rw [Matrix.diagonal_apply_ne _ h]
     exact locOp_zero
 
-theorem entOK_diag (x : M.Ty P → (MA.DQ P).Pr) (hx : ∀ π, LocOpQ (x π).1) : EntOK P (Matrix.diagonal x) := by
+theorem entOK_diag (x : M.Ty P → (MA.DQ P).Pr) (hx : ∀ π, LocOpQ (x π).1)
+    : EntOK P (Matrix.diagonal x) := by
   intro π π'
   by_cases h : π = π'
   · subst h
@@ -207,15 +223,17 @@ theorem entOK_nabs : EntOK P (MA.nabsA P (MA.DQ P)) := by
   rw [show -(MA.DQ P).dzbP.1 = (-1 : ℂ) • (MA.DQ P).dzbP.1 by rw [neg_one_smul]]
   exact locOp_smul _ (locOp_dzb P)
 
-private theorem locOpQ_neg {r : ℕ} {TT : ℝ} {T : Module.End ℂ (MA.SmQ r TT)} (hT : LocOpQ T) :
-    LocOpQ (-T) := by
+private theorem locOpQ_neg {r : ℕ} {TT : ℝ} {T : Module.End ℂ (MA.SmQ r TT)} (hT : LocOpQ T)
+    : LocOpQ (-T) := by
   intro h₁ h₂ c V hV hag q hq hqV
-  have e : ∀ h : MA.SmQ r TT, (((-T) h : MA.SmQ r TT) : MA.Qp r TT → ℂ) q =
-      -(T h : MA.Qp r TT → ℂ) q := fun h => rfl
+  have e
+      : ∀ h : MA.SmQ r TT,
+        (((-T) h : MA.SmQ r TT) : MA.Qp r TT → ℂ) q = - (T h : MA.Qp r TT → ℂ) q := fun h =>
+    rfl
   rw [e, e, hT h₁ h₂ c V hV hag q hq hqV]
 
-theorem entOK_neg {A : MA.A P (MA.DQ P)} (hA : EntOK P A) : EntOK P (-A) :=
-  fun π π' => locOpQ_neg (hA π π')
+theorem entOK_neg {A : MA.A P (MA.DQ P)} (hA : EntOK P A) : EntOK P (-A) := fun π π' =>
+  locOpQ_neg (hA π π')
 
 theorem entOK_sub {A B : MA.A P (MA.DQ P)} (hA : EntOK P A) (hB : EntOK P B) : EntOK P (A - B) := by
   rw [sub_eq_add_neg]
@@ -228,22 +246,30 @@ theorem entOK_QQr (Y : ℂ) (a b : Fin 2) : EntOK P (MA.QQr P (MA.DQ P) Y a b) :
   have hggi : EntOK P (MA.ggiA P (MA.DQ P)) := entOK_fnP P _ _
   have hx : EntOK P (MA.xA P (MA.DQ P) Y) := entOK_kap P _
   have hl0 : EntOK P (MA.l0A P (MA.DQ P) Y) :=
-    entOK_sub P (entOK_neg P (entOK_nab P)) (entOK_mul P (entOK_algebraMap P _) (entOK_mul P hzb hggi))
+    entOK_sub P (entOK_neg P (entOK_nab P))
+      (entOK_mul P (entOK_algebraMap P _) (entOK_mul P hzb hggi))
   have hm0 : EntOK P (MA.m0A P (MA.DQ P) Y) :=
-    entOK_sub P (entOK_neg P (entOK_nabs P)) (entOK_mul P (entOK_algebraMap P _) (entOK_mul P hz hggi))
+    entOK_sub P (entOK_neg P (entOK_nabs P))
+      (entOK_mul P (entOK_algebraMap P _) (entOK_mul P hz hggi))
   have hS21 : EntOK P (MA.weightedSumBis P (MA.DQ P) Y) :=
     entOK_sum P _ _ fun l _ => entOK_mul P (entOK_SS P l) (entOK_kap P _)
   have hS12 : EntOK P (MA.S12 P (MA.DQ P) Y) :=
     entOK_sum P _ _ fun l _ => entOK_mul P (entOK_kap P _) (entOK_star_SS P l)
   have hS4 : EntOK P (MA.S4 P (MA.DQ P) Y) :=
-    entOK_sum P _ _ fun l _ => entOK_sum P _ _ fun j _ =>
-      entOK_mul P (entOK_mul P (entOK_star_SS P l) (entOK_SS P j)) (entOK_kap P _)
+    entOK_sum P _ _ fun l _ =>
+      entOK_sum P _ _ fun j _ =>
+        entOK_mul P (entOK_mul P (entOK_star_SS P l) (entOK_SS P j)) (entOK_kap P _)
   fin_cases a <;> fin_cases b
   · show EntOK P (MA.t11 P (MA.DQ P) Y)
     unfold MA.t11
-    exact entOK_add P (entOK_add P (entOK_add P (entOK_add P (entOK_mul P hggi (entOK_kap P _))
-      (entOK_mul P (entOK_mul P (entOK_mul P hgg hx) hm0) hl0))
-      (entOK_mul P (entOK_mul P (entOK_mul P hgg hm0) hggi) hS21)) (entOK_mul P hS12 hl0)) (entOK_mul P hggi hS4)
+    exact entOK_add P
+      (entOK_add P
+        (entOK_add P
+          (entOK_add P (entOK_mul P hggi (entOK_kap P _))
+            (entOK_mul P (entOK_mul P (entOK_mul P hgg hx) hm0) hl0))
+          (entOK_mul P (entOK_mul P (entOK_mul P hgg hm0) hggi) hS21))
+        (entOK_mul P hS12 hl0))
+      (entOK_mul P hggi hS4)
   · show EntOK P (MA.t12 P (MA.DQ P) Y)
     unfold MA.t12
     exact entOK_add P (entOK_mul P (entOK_mul P hgg hx) hm0) hS12
@@ -256,8 +282,9 @@ theorem entOK_QQr (Y : ℂ) (a b : Fin 2) : EntOK P (MA.QQr P (MA.DQ P) Y a b) :
 
 end ent
 
-theorem smq_sum_apply {r : ℕ} {TT : ℝ} {ι : Type} (s : Finset ι) (F : ι → MA.SmQ r TT) (q : MA.Qp r TT) :
-    ((∑ i ∈ s, F i : MA.SmQ r TT) : MA.Qp r TT → ℂ) q = ∑ i ∈ s, (F i : MA.Qp r TT → ℂ) q := by
+theorem smq_sum_apply
+    {r : ℕ} {TT : ℝ} {ι : Type} (s : Finset ι) (F : ι → MA.SmQ r TT) (q : MA.Qp r TT)
+    : ((∑ i ∈ s, F i : MA.SmQ r TT) : MA.Qp r TT → ℂ) q = ∑ i ∈ s, (F i : MA.Qp r TT → ℂ) q := by
   classical
   refine Finset.induction_on s (by rw [Finset.sum_empty, Finset.sum_empty]; rfl) ?_
   intro i s hi ih
@@ -270,9 +297,12 @@ theorem model_locality_holds : ModelLocal := by
   show ((∑ π', (MA.QQr P (MA.DQ P) Y a b ρ π').1 (f π') : MA.SmQ P.r P.TT) : MA.Qp P.r P.TT → ℂ) q =
     ((∑ π', (MA.QQr P (MA.DQ P) Y a b ρ π').1 (g π') : MA.SmQ P.r P.TT) : MA.Qp P.r P.TT → ℂ) q
   refine (smq_sum_apply (r := P.r) (TT := P.TT) Finset.univ
-    (fun π' => (MA.QQr P (MA.DQ P) Y a b ρ π').1 (f π')) q).trans ?_
-  refine Eq.trans ?_ (smq_sum_apply (r := P.r) (TT := P.TT) Finset.univ
-    (fun π' => (MA.QQr P (MA.DQ P) Y a b ρ π').1 (g π')) q).symm
+    (fun π' => (MA.QQr P (MA.DQ P) Y a b ρ π').1 (f π'))
+    q).trans ?_
+  refine Eq.trans ?_
+    (smq_sum_apply (r := P.r) (TT := P.TT) Finset.univ
+      (fun π' => (MA.QQr P (MA.DQ P) Y a b ρ π').1 (g π'))
+      q).symm
   exact Finset.sum_congr rfl fun π' _ =>
     hE ρ π' (f π') (g π') c V hV (fun q' hq' hq'V => hag π' q' hq' hq'V) q hq hqV
 

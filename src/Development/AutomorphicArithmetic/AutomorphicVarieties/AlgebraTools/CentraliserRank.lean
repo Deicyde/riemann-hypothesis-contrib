@@ -8,27 +8,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open Polynomial Matrix IsLocalRing TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.centraliser_rank :
-    ∀ {F : Type} [Field F] {ι : Type} [Fintype ι] [DecidableEq ι] (a : ι → F) (P : Matrix ι ι F), Function.Injective a → P.charpoly = ∏ i, (X - C (a i)) → Module.finrank F (LinearMap.ker (LinearMap.mulLeft F P - LinearMap.mulRight F P)) = Fintype.card ι ∧ ∀ Y, P * Y = Y * P → ∃ q : F[X], Y = aeval P q := by
+theorem UpperTheory.V.AlgebraTools.centraliser_rank
+    : ∀ {F : Type} [Field F] {ι : Type} [Fintype ι] [DecidableEq ι] (a : ι → F) (P : Matrix ι ι F),
+      Function.Injective a → P.charpoly = ∏ i, (X - C (a i))
+        → Module.finrank F (LinearMap.ker (LinearMap.mulLeft F P - LinearMap.mulRight F P))
+            = Fintype.card ι
+          ∧ ∀ Y, P * Y = Y * P → ∃ q : F[X], Y = aeval P q := by
   intro F _ ι _ _ a P ha hP
   have hu : ∀ i j, i ≠ j → IsUnit (a i - a j) := fun i j hij =>
     (sub_ne_zero.2 (fun h => hij (ha h))).isUnit
-  have hCH : aeval P (∏ i, (X - C (a i))) = 0 := by
-    rw [← hP]; exact Matrix.aeval_self_charpoly P
+  have hCH : aeval P (∏ i, (X - C (a i))) = 0 := by rw [← hP]; exact Matrix.aeval_self_charpoly P
   obtain ⟨hcoi, -, -, hcomm⟩ := UpperTheory.V.AlgebraTools.lag_coi a P hu hCH
-  have hne := UpperTheory.V.AlgebraTools.lag_ne_zero a P hu (by
-    rw [hP, Polynomial.map_prod]; simp)
+  have hne := UpperTheory.V.AlgebraTools.lag_ne_zero a P hu (by rw [hP, Polynomial.map_prod]; simp)
   obtain ⟨g, hg⟩ := UpperTheory.V.AlgebraTools.coi_conj_single _ hcoi hne
   have hpoly : ∀ i, ∃ q : F[X], UpperTheory.V.AlgebraTools.lag a P i = aeval P q := fun i =>
     ⟨_ • _, by rw [UpperTheory.V.AlgebraTools.lag, map_smul]⟩
   set f := UpperTheory.V.AlgebraTools.lag a P with hf
-  have hinj : ∀ A B : Matrix ι ι F, (g : Matrix ι ι F) * A * ((g⁻¹ : GL ι F) : Matrix ι ι F) =
-      (g : Matrix ι ι F) * B * ((g⁻¹ : GL ι F) : Matrix ι ι F) → A = B := by
+  have hinj
+      : ∀ A B : Matrix ι ι F,
+        (g : Matrix ι ι F) * A * ((g⁻¹ : GL ι F) : Matrix ι ι F)
+            = (g : Matrix ι ι F) * B * ((g⁻¹ : GL ι F) : Matrix ι ι F)
+          → A = B := by
     intro A B h
     exact (Units.mul_right_inj g).1 ((Units.mul_left_inj g⁻¹).1 h)
-  have hmul : ∀ A B : Matrix ι ι F, (g : Matrix ι ι F) * (A * B) * ((g⁻¹ : GL ι F) : Matrix ι ι F) =
-      ((g : Matrix ι ι F) * A * ((g⁻¹ : GL ι F) : Matrix ι ι F)) *
-      ((g : Matrix ι ι F) * B * ((g⁻¹ : GL ι F) : Matrix ι ι F)) := by
+  have hmul
+      : ∀ A B : Matrix ι ι F,
+        (g : Matrix ι ι F) * (A * B) * ((g⁻¹ : GL ι F) : Matrix ι ι F)
+          = ((g : Matrix ι ι F) * A * ((g⁻¹ : GL ι F) : Matrix ι ι F))
+            * ((g : Matrix ι ι F) * B * ((g⁻¹ : GL ι F) : Matrix ι ι F)) := by
     intro A B
     simp only [mul_assoc, Units.inv_mul_cancel_left]
   have hspan : ∀ Y, P * Y = Y * P → ∃ c : ι → F, Y = ∑ i, c i • f i := by
@@ -68,14 +75,14 @@ theorem UpperTheory.V.AlgebraTools.centraliser_rank :
       · simp
     rw [hc, zero_mul] at h1
     exact (smul_eq_zero.1 h1.symm).resolve_right (hne j)
-  have hker : LinearMap.ker (LinearMap.mulLeft F P - LinearMap.mulRight F P) =
-      Submodule.span F (Set.range f) := by
+  have hker
+      : LinearMap.ker (LinearMap.mulLeft F P - LinearMap.mulRight F P)
+        = Submodule.span F (Set.range f) := by
     apply le_antisymm
     · intro Y hY
       have hY' : P * Y = Y * P := by simpa [sub_eq_zero] using hY
       obtain ⟨c, rfl⟩ := hspan Y hY'
-      exact Submodule.sum_mem _ fun i _ =>
-        Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
+      exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
     · rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩
       have := (hcomm P i (Commute.refl P)).eq

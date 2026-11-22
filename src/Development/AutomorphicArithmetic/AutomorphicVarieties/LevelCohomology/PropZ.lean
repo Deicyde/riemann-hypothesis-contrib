@@ -10,10 +10,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LevelCohomo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.ML UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.ML
+  UpperTheory.V.X
 
-theorem UpperTheory.V.X.propZ :
-    HV.PropZ := by
+theorem UpperTheory.V.X.propZ : HV.PropZ := by
   intro Ω _ _ _ l _ c e h5 h2 hev hd
   by_cases h : l - 1 ∣ e
   · exact UpperTheory.V.X.zOne Ω l c.O (by omega) e (by omega) h

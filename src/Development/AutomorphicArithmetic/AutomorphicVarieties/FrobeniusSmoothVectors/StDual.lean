@@ -4,10 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr
+  UpperTheory.V
 
-theorem UpperTheory.V.Fr.st_dual :
-    ∀ (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [CharP k l] [Module (ZMod (l ^ 1)) k] (Γ : Type) [Group Γ] (μ : Γ →* (ZMod (l ^ 1))ˣ) (ρ : Representation (ZMod (l ^ 1)) Γ k) (g : Γ) (c : k), (∀ m, ρ g m = c * m) → c ≠ ZMod.castHom (dvd_pow_self l one_ne_zero) k (μ g) → H0 (twDual μ ρ) = ⊥ := by
+theorem UpperTheory.V.Fr.st_dual
+    : ∀ (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [CharP k l] [Module (ZMod (l ^ 1)) k] (Γ : Type)
+        [Group Γ] (μ : Γ →* (ZMod (l ^ 1))ˣ) (ρ : Representation (ZMod (l ^ 1)) Γ k) (g : Γ)
+        (c : k),
+      (∀ m, ρ g m = c * m) → c ≠ ZMod.castHom (dvd_pow_self l one_ne_zero) k (μ g)
+        → H0 (twDual μ ρ) = ⊥ := by
   intro l _ k _ _ _ Γ _ μ ρ g c hc hne
   set a : k := ZMod.castHom (dvd_pow_self l one_ne_zero) k (μ g) with ha
   rw [eq_bot_iff]
@@ -31,7 +37,6 @@ theorem UpperTheory.V.Fr.st_dual :
     rw [sub_mul, map_sub, hsmul, map_smul, ← h1, smul_eq_mul, sub_self]
   apply LinearMap.ext
   intro x
-  have hx : x = (c - a) * ((c - a)⁻¹ * x) := by
-    rw [← mul_assoc, mul_inv_cancel₀ hne', one_mul]
+  have hx : x = (c - a) * ((c - a)⁻¹ * x) := by rw [← mul_assoc, mul_inv_cancel₀ hne', one_mul]
   change ψ x = 0
   rw [hx, key]

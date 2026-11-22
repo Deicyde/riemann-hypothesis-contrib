@@ -15,7 +15,8 @@ set_option linter.dupNamespace false in
 abbrev E (M : ℤ) := ComplexShape.embeddingUpIntGE M
 
 section
-variable {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C] (K : CochainComplex C ℤ) (M : ℤ)
+variable
+  {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C] (K : CochainComplex C ℤ) (M : ℤ)
 
 lemma xiso_indep {i j : ℕ} {p : ℤ} (hi : (E M).f i = p) (hj : (E M).f j = p) :
     K.stupidTruncXIso (E M) hi = K.stupidTruncXIso (E M) hj := by
@@ -27,7 +28,6 @@ lemma trd (i j : ℕ) :
       (K.stupidTruncXIso (E M) (i := i) rfl).hom ≫ K.d ((E M).f i) ((E M).f j) := by
   simp [HomologicalComplex.stupidTrunc, HomologicalComplex.stupidTruncXIso,
     HomologicalComplex.extend_d_eq _ _ rfl rfl, HomologicalComplex.restriction]
-
 
 open Classical in
 def iotaf (p : ℤ) : (K.stupidTrunc (E M)).X p ⟶ K.X p :=
@@ -71,8 +71,10 @@ lemma iota_nat {K L : CochainComplex C ℤ} (g : K ⟶ L) :
 end
 
 section
-variable {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C]
-  {A B I : CochainComplex C ℤ} (φ : A ⟶ B) (M : ℤ)
+variable
+  {C : Type u} [Category.{v} C] [Preadditive C] [HasZeroObject C]
+  {A B I : CochainComplex C ℤ} (φ : A ⟶ B)
+  (M : ℤ)
 
 def P (m : ℤ) (c : Cochain B I m) : Cochain A I m := (Cochain.ofHom φ).comp c (zero_add m)
 
@@ -139,7 +141,9 @@ end
 theorem incl_of : LateralTheory.E.stupidPf.incl := by
   intro R _ I _ K L g N
   refine ⟨iota K (-(N : ℤ)), iota L (-(N : ℤ)), iota_nat _ g, fun n hn => ⟨?_, ?_⟩⟩
-  · exact cpull_bij _ (-(N : ℤ)) (iota_iso K _) (stupidTruncation_GE_isZero_below_bound K _) n (by omega)
-  · exact cpull_bij _ (-(N : ℤ)) (iota_iso L _) (stupidTruncation_GE_isZero_below_bound L _) n (by omega)
+  · exact cpull_bij _ (-(N : ℤ)) (iota_iso K _) (stupidTruncation_GE_isZero_below_bound K _) n
+      (by omega)
+  · exact cpull_bij _ (-(N : ℤ)) (iota_iso L _) (stupidTruncation_GE_isZero_below_bound L _) n
+      (by omega)
 
 end LateralTheory.E.inclPf

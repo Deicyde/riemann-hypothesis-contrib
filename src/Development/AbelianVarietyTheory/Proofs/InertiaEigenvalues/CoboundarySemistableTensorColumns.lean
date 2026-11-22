@@ -7,28 +7,37 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ToMatri
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 
 namespace GlobalTheory.PMonCob
 
-theorem coboundary_cols (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (ι : Type) [Fintype ι] [DecidableEq ι]
-    (ρ₀ : ↥(GK K) →* GL ι ℚ_[l]) (c₀ : ↥(GK K) → ι → ℚ_[l]) (b : (ι → ℚ_[l]) ⊗[ℚ_[l]] Bst P) :
-    (∀ g, c₀ g ⊗ₜ[ℚ_[l]] (1 : Bst P) = stRep P (repOf ρ₀) g b - b) →
-    ∃ β : ι → Bst P, ∀ g : ↥(GK K), (fun x => algebraMap ℚ_[l] (Bst P) (c₀ g x)) =
-      ((ρ₀ g : Matrix ι ι ℚ_[l]).map (algebraMap ℚ_[l] (Bst P))).mulVec (fun x => actSt P (g : GQ l) (β x)) - β := by
+theorem coboundary_cols
+    (l : ℕ) [Fact l.Prime]
+    (P : LocPrime l) (K : FinExt l)
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (ρ₀ : ↥(GK K) →* GL ι ℚ_[l]) (c₀ : ↥(GK K) → ι → ℚ_[l]) (b : (ι → ℚ_[l]) ⊗[ℚ_[l]] Bst P)
+    : (∀ g, c₀ g ⊗ₜ[ℚ_[l]] (1 : Bst P) = stRep P (repOf ρ₀) g b - b)
+      → ∃ β : ι → Bst P, ∀ g : ↥(GK K),
+        (fun x => algebraMap ℚ_[l] (Bst P) (c₀ g x))
+          = ((ρ₀ g : Matrix ι ι ℚ_[l]).map (algebraMap ℚ_[l] (Bst P))).mulVec
+              (fun x => actSt P (g : GQ l) (β x))
+            - β := by
   intro h
   let Φ : (ι → ℚ_[l]) ⊗[ℚ_[l]] Bst P →ₗ[ℚ_[l]] (ι → Bst P) :=
-    TensorProduct.lift (LinearMap.mk₂ ℚ_[l] (fun (v : ι → ℚ_[l]) (a : Bst P) (x : ι) => v x • a)
+    TensorProduct.lift (LinearMap.mk₂ ℚ_[l]
+      (fun (v : ι → ℚ_[l]) (a : Bst P) (x : ι) => v x • a)
       (fun v w a => by funext x; simp [add_smul])
       (fun c v a => by funext x; simp [mul_smul])
       (fun v a a' => by funext x; simp [smul_add])
       (fun c v a => by funext x; simp [smul_comm c]))
-  have hΦ : ∀ (v : ι → ℚ_[l]) (a : Bst P), Φ (v ⊗ₜ a) = fun x => v x • a := fun v a => by
-    simp [Φ]
-  have hst : ∀ (g : ↥(GK K)) (y : (ι → ℚ_[l]) ⊗[ℚ_[l]] Bst P),
-      Φ (stRep P (repOf ρ₀) g y) = ((ρ₀ g : Matrix ι ι ℚ_[l]).map (algebraMap ℚ_[l] (Bst P))).mulVec
-        (fun x => actSt P (g : GQ l) (Φ y x)) := by
+  have hΦ : ∀ (v : ι → ℚ_[l]) (a : Bst P), Φ (v ⊗ₜ a) = fun x => v x • a := fun v a => by simp [Φ]
+  have hst
+      : ∀ (g : ↥(GK K)) (y : (ι → ℚ_[l]) ⊗[ℚ_[l]] Bst P),
+        Φ (stRep P (repOf ρ₀) g y)
+          = ((ρ₀ g : Matrix ι ι ℚ_[l]).map (algebraMap ℚ_[l] (Bst P))).mulVec
+            (fun x => actSt P (g : GQ l) (Φ y x)) := by
     intro g y
     induction y using TensorProduct.induction_on with
     | zero => funext x; simp [Matrix.mulVec, dotProduct]

@@ -21,30 +21,35 @@ namespace GlobalTheory.CompanionTheory.ModelS.Fhw
 
 variable {n : ℕ}
 
-theorem muZ_antitone {lam : Fin n → ℤ} (hl : Antitone lam) {lev : Fin n → ℕ} (h : IsLev lam lev) :
-    Antitone (muZ lam lev) := by
+theorem muZ_antitone {lam : Fin n → ℤ} (hl : Antitone lam) {lev : Fin n → ℕ} (h : IsLev lam lev)
+    : Antitone (muZ lam lev) := by
   intro a b hab
   have hm := h.1 hab
   have h1 := hl hab
-  have c1 : ((univ.filter fun c => lev b < lev c).card : ℤ) ≤ ((univ.filter fun c => lev a < lev c).card : ℤ) := by
+  have c1
+      : ((univ.filter fun c => lev b < lev c).card : ℤ)
+        ≤ ((univ.filter fun c => lev a < lev c).card : ℤ) := by
     exact_mod_cast Finset.card_le_card fun c hc => by
       simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hc ⊢
       omega
-  have c2 : ((univ.filter fun c => lev c < lev a).card : ℤ) ≤ ((univ.filter fun c => lev c < lev b).card : ℤ) := by
+  have c2
+      : ((univ.filter fun c => lev c < lev a).card : ℤ)
+        ≤ ((univ.filter fun c => lev c < lev b).card : ℤ) := by
     exact_mod_cast Finset.card_le_card fun c hc => by
       simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hc ⊢
       omega
   delta muZ
   omega
 
-theorem dif_nonneg {v : Fin n → ℤ} (hv : Antitone v) (j : Fin n) (hj : (j : ℕ) + 1 < n) : 0 ≤ dif v j := by
+theorem dif_nonneg {v : Fin n → ℤ} (hv : Antitone v) (j : Fin n) (hj : (j : ℕ) + 1 < n)
+    : 0 ≤ dif v j := by
   have : v ⟨j + 1, hj⟩ ≤ v j := hv (show j ≤ ⟨j + 1, hj⟩ by rw [Fin.le_def]; simp)
   delta dif
   simp only [hj, dite_true]
   omega
 
-theorem sum_range_ite (w : ℕ → ℤ) (a : ℕ) (N : ℕ) (h : a ≤ N) :
-    ∑ i ∈ range N, (if a ≤ i then w i - w (i + 1) else 0) = w a - w N := by
+theorem sum_range_ite (w : ℕ → ℤ) (a : ℕ) (N : ℕ) (h : a ≤ N)
+    : ∑ i ∈ range N, (if a ≤ i then w i - w (i + 1) else 0) = w a - w N := by
   induction N, h using Nat.le_induction with
   | base =>
     rw [sub_self]
@@ -55,19 +60,22 @@ theorem sum_range_ite (w : ℕ → ℤ) (a : ℕ) (N : ℕ) (h : a ≤ N) :
 
 theorem sum_dif (v : Fin n → ℤ) (a : Fin n) : ∑ j, (if a ≤ j then dif v j else 0) = v a := by
   set w : ℕ → ℤ := fun i => if h : i < n then v ⟨i, h⟩ else 0 with hw
-  have e : ∀ j : Fin n, (if a ≤ j then dif v j else 0) =
-      (fun i : ℕ => if (a : ℕ) ≤ i then w i - w (i + 1) else 0) j := by
+  have e
+      : ∀ j : Fin n,
+        (if a ≤ j then dif v j else 0)
+          = (fun i : ℕ => if (a : ℕ) ≤ i then w i - w (i + 1) else 0) j := by
     intro j
     have : dif v j = w j - w (j + 1) := by
       delta dif
       simp [hw]
     simp only [Fin.le_def, this]
-  rw [Finset.sum_congr rfl fun j _ => e j, Fin.sum_univ_eq_sum_range
-    (fun i : ℕ => if (a : ℕ) ≤ i then w i - w (i + 1) else 0) n, sum_range_ite w a n a.isLt.le]
+  rw [Finset.sum_congr rfl fun j _ => e j,
+    Fin.sum_univ_eq_sum_range (fun i : ℕ => if (a : ℕ) ≤ i then w i - w (i + 1) else 0) n,
+    sum_range_ite w a n a.isLt.le]
   simp [hw]
 
-theorem zpow_sum {u : ℂ} (hu : u ≠ 0) {ι : Type*} (s : Finset ι) (f : ι → ℤ) :
-    u ^ (∑ i ∈ s, f i) = ∏ i ∈ s, u ^ f i := by
+theorem zpow_sum {u : ℂ} (hu : u ≠ 0) {ι : Type*} (s : Finset ι) (f : ι → ℤ)
+    : u ^ (∑ i ∈ s, f i) = ∏ i ∈ s, u ^ f i := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -76,12 +84,15 @@ theorem zpow_sum {u : ℂ} (hu : u ≠ 0) {ι : Type*} (s : Finset ι) (f : ι �
 open scoped ComplexOrder in
 theorem gm_ne {g : Mat n} (hg : g ∈ GLs n) (j : Fin n) : gm j g ≠ 0 := by
   have hu : IsUnit g := (Matrix.isUnit_iff_isUnit_det g).2 (isUnit_iff_ne_zero.2 hg)
-  have key : ∀ v : Fin (j + 1) → ℂ, Function.extend (ini j) v 0 ᵥ* g = v ᵥ* g.submatrix (ini j) id := by
+  have key
+      : ∀ v : Fin (j + 1) → ℂ, Function.extend (ini j) v 0 ᵥ* g = v ᵥ* g.submatrix (ini j) id := by
     intro v
     funext c
     simp only [Matrix.vecMul, dotProduct, submatrix_apply, id]
     symm
-    refine Finset.sum_of_injOn (ini j) (ini_injective j).injOn (fun _ _ => Finset.mem_coe.2 (Finset.mem_univ _)) ?_ ?_
+    refine Finset.sum_of_injOn (ini j) (ini_injective j).injOn
+      (fun _ _ => Finset.mem_coe.2 (Finset.mem_univ _))
+      ?_ ?_
     · intro i _ hi
       rw [Function.extend_apply', Pi.zero_apply, zero_mul]
       rintro ⟨r, rfl⟩
@@ -97,9 +108,12 @@ theorem gm_ne {g : Mat n} (hg : g ∈ GLs n) (j : Fin n) : gm j g ≠ 0 := by
     rwa [(ini_injective j).extend_apply, (ini_injective j).extend_apply] at h2
   exact (PosDef.mul_conjTranspose_self _ inj).det_pos.ne'
 
-theorem diffAt_prod {𝕜 E ι : Type} [NontriviallyNormedField 𝕜] [NormedAlgebra 𝕜 ℂ] [NormedAddCommGroup E]
-    [NormedSpace 𝕜 E] (u : Finset ι) (f : ι → E → ℂ) {x : E} (h : ∀ i ∈ u, DifferentiableAt 𝕜 (f i) x) :
-    DifferentiableAt 𝕜 (fun y => ∏ i ∈ u, f i y) x := by
+theorem diffAt_prod
+    {𝕜 E ι : Type}
+    [NontriviallyNormedField 𝕜] [NormedAlgebra 𝕜 ℂ] [NormedAddCommGroup E] [NormedSpace 𝕜 E]
+    (u : Finset ι) (f : ι → E → ℂ)
+    {x : E} (h : ∀ i ∈ u, DifferentiableAt 𝕜 (f i) x)
+    : DifferentiableAt 𝕜 (fun y => ∏ i ∈ u, f i y) x := by
   classical
   induction u using Finset.induction_on with
   | empty => simp
@@ -107,15 +121,18 @@ theorem diffAt_prod {𝕜 E ι : Type} [NontriviallyNormedField 𝕜] [NormedAlg
     simp only [Finset.prod_insert hi]
     exact (h i (Finset.mem_insert_self _ _)).mul (ih fun k hk => h k (Finset.mem_insert_of_mem hk))
 
-theorem diffAt_det {𝕜 E : Type} [NontriviallyNormedField 𝕜] [NormedAlgebra 𝕜 ℂ] [NormedAddCommGroup E]
-    [NormedSpace 𝕜 E] {m : ℕ} (M : E → Matrix (Fin m) (Fin m) ℂ) {x : E}
-    (h : ∀ i j, DifferentiableAt 𝕜 (fun y => M y i j) x) : DifferentiableAt 𝕜 (fun y => (M y).det) x := by
+theorem diffAt_det
+    {𝕜 E : Type}
+    [NontriviallyNormedField 𝕜] [NormedAlgebra 𝕜 ℂ] [NormedAddCommGroup E] [NormedSpace 𝕜 E]
+    {m : ℕ} (M : E → Matrix (Fin m) (Fin m) ℂ)
+    {x : E} (h : ∀ i j, DifferentiableAt 𝕜 (fun y => M y i j) x)
+    : DifferentiableAt 𝕜 (fun y => (M y).det) x := by
   simp only [Matrix.det_apply']
-  exact DifferentiableAt.fun_sum fun σ _ =>
-    (diffAt_prod _ _ fun i _ => h _ _).const_mul _
+  exact DifferentiableAt.fun_sum fun σ _ => (diffAt_prod _ _ fun i _ => h _ _).const_mul _
 
-theorem entry_diff {𝕜 : Type} [NontriviallyNormedField 𝕜] [NormedAlgebra 𝕜 ℂ] (i j : Fin n) (x : Mat n) :
-    DifferentiableAt 𝕜 (fun y : Mat n => y i j) x := by
+theorem entry_diff
+    {𝕜 : Type} [NontriviallyNormedField 𝕜] [NormedAlgebra 𝕜 ℂ] (i j : Fin n) (x : Mat n)
+    : DifferentiableAt 𝕜 (fun y : Mat n => y i j) x := by
   have h : Differentiable 𝕜 (fun y : Mat n => y) := differentiable_id
   exact (differentiable_pi.1 (differentiable_pi.1 h i) j) x
 
@@ -123,27 +140,29 @@ theorem lm_diff (j : Fin n) (x : Mat n) : DifferentiableAt ℂ (lm j) x :=
   diffAt_det (fun y : Mat n => y.submatrix (ini j) (ini j)) fun r c => entry_diff _ _ x
 
 theorem gm_diff (j : Fin n) (x : Mat n) : DifferentiableAt ℝ (gm j) x := by
-  refine diffAt_det (fun y : Mat n => y.submatrix (ini j) id * (y.submatrix (ini j) id)ᴴ) fun r c => ?_
+  refine
+    diffAt_det (fun y : Mat n => y.submatrix (ini j) id * (y.submatrix (ini j) id)ᴴ) fun r c => ?_
   simp only [Matrix.mul_apply, submatrix_apply, conjTranspose_apply, id]
   refine DifferentiableAt.fun_sum fun k _ => (entry_diff _ _ x).mul ?_
   exact (Complex.conjCLE.differentiableAt).comp x (entry_diff (𝕜 := ℝ) _ _ x)
 
-theorem lm_last_ne {g : Mat n} (hg : g ∈ GLs n) (j : Fin n) (hj : ¬ (j : ℕ) + 1 < n) : lm j g ≠ 0 := by
+theorem lm_last_ne {g : Mat n} (hg : g ∈ GLs n) (j : Fin n) (hj : ¬ (j : ℕ) + 1 < n)
+    : lm j g ≠ 0 := by
   have hb : Function.Bijective (ini j) :=
     (Fintype.bijective_iff_injective_and_card _).2 ⟨ini_injective j, by simp; omega⟩
   have : lm j g = g.det := Matrix.det_submatrix_equiv_self (Equiv.ofBijective _ hb) g
   rw [this]
   exact hg
 
-theorem line_apply (g : Mat n) (a b : Fin n) (t : ℂ) (r c : Fin n) :
-    (g + t • (g * Matrix.single a b (1 : ℂ))) r c = g r c + if c = b then t * g r a else 0 := by
+theorem line_apply (g : Mat n) (a b : Fin n) (t : ℂ) (r c : Fin n)
+    : (g + t • (g * Matrix.single a b (1 : ℂ))) r c = g r c + if c = b then t * g r a else 0 := by
   by_cases h : c = b
   · subst h
     simp [Matrix.mul_single_apply_same]
   · simp [h, Matrix.mul_single_apply_of_ne _ _ _ _ _ h]
 
-theorem lm_line_lt (g : Mat n) {a b : Fin n} (hab : a < b) (t : ℂ) (j : Fin n) :
-    lm j (g + t • (g * Matrix.single a b (1 : ℂ))) = lm j g := by
+theorem lm_line_lt (g : Mat n) {a b : Fin n} (hab : a < b) (t : ℂ) (j : Fin n)
+    : lm j (g + t • (g * Matrix.single a b (1 : ℂ))) = lm j g := by
   by_cases hb : b ≤ j
   · have hb' : (b : ℕ) < j + 1 := by have := Fin.le_def.1 hb; omega
     have ha' : (a : ℕ) < j + 1 := by have := Fin.lt_def.1 hab; omega
@@ -154,9 +173,10 @@ theorem lm_line_lt (g : Mat n) {a b : Fin n} (hab : a < b) (t : ℂ) (j : Fin n)
     have hne : b' ≠ a' := fun h => by
       have h' := congrArg (fun z : Fin (j + 1) => (z : ℕ)) h
       exact hab.ne' (Fin.ext h')
-    have e : (g + t • (g * Matrix.single a b (1 : ℂ))).submatrix (ini j) (ini j) =
-        (g.submatrix (ini j) (ini j)).updateCol b' fun k =>
-          g.submatrix (ini j) (ini j) k b' + t • g.submatrix (ini j) (ini j) k a' := by
+    have e
+        : (g + t • (g * Matrix.single a b (1 : ℂ))).submatrix (ini j) (ini j)
+          = (g.submatrix (ini j) (ini j)).updateCol b' fun k =>
+            g.submatrix (ini j) (ini j) k b' + t • g.submatrix (ini j) (ini j) k a' := by
       ext r c
       rw [submatrix_apply, line_apply]
       by_cases hc : c = b'
@@ -166,8 +186,9 @@ theorem lm_line_lt (g : Mat n) {a b : Fin n} (hab : a < b) (t : ℂ) (j : Fin n)
         simp [this, Matrix.updateCol_ne hc]
     delta lm
     rw [e, det_updateCol_add_smul_self _ hne]
-  · have e : (g + t • (g * Matrix.single a b (1 : ℂ))).submatrix (ini j) (ini j) =
-        g.submatrix (ini j) (ini j) := by
+  · have e
+        : (g + t • (g * Matrix.single a b (1 : ℂ))).submatrix (ini j) (ini j)
+          = g.submatrix (ini j) (ini j) := by
       ext r c
       rw [submatrix_apply, line_apply]
       have : ini j c ≠ b := by
@@ -182,14 +203,16 @@ theorem lm_line_lt (g : Mat n) {a b : Fin n} (hab : a < b) (t : ℂ) (j : Fin n)
     delta lm
     rw [e]
 
-theorem lm_line_eq (g : Mat n) (a : Fin n) (t : ℂ) (j : Fin n) :
-    lm j (g + t • (g * Matrix.single a a (1 : ℂ))) = (if a ≤ j then (1 + t) else 1) * lm j g := by
+theorem lm_line_eq (g : Mat n) (a : Fin n) (t : ℂ) (j : Fin n)
+    : lm j (g + t • (g * Matrix.single a a (1 : ℂ))) = (if a ≤ j then (1 + t) else 1) * lm j g := by
   by_cases hb : a ≤ j
   · have hb' : (a : ℕ) < j + 1 := by have := Fin.le_def.1 hb; omega
     set a' : Fin (j + 1) := ⟨a, hb'⟩
     have hia : ini j a' = a := Fin.ext rfl
-    have e : (g + t • (g * Matrix.single a a (1 : ℂ))).submatrix (ini j) (ini j) =
-        (g.submatrix (ini j) (ini j)).updateCol a' ((1 + t) • fun k => g.submatrix (ini j) (ini j) k a') := by
+    have e
+        : (g + t • (g * Matrix.single a a (1 : ℂ))).submatrix (ini j) (ini j)
+          = (g.submatrix (ini j) (ini j)).updateCol a'
+            ((1 + t) • fun k => g.submatrix (ini j) (ini j) k a') := by
       ext r c
       rw [submatrix_apply, line_apply]
       by_cases hc : c = a'
@@ -206,8 +229,9 @@ theorem lm_line_eq (g : Mat n) (a : Fin n) (t : ℂ) (j : Fin n) :
     · subst hc
       simp [Matrix.updateCol_self]
     · simp [Matrix.updateCol_ne hc]
-  · have e : (g + t • (g * Matrix.single a a (1 : ℂ))).submatrix (ini j) (ini j) =
-        g.submatrix (ini j) (ini j) := by
+  · have e
+        : (g + t • (g * Matrix.single a a (1 : ℂ))).submatrix (ini j) (ini j)
+          = g.submatrix (ini j) (ini j) := by
       ext r c
       rw [submatrix_apply, line_apply]
       have : ini j c ≠ a := by
@@ -226,8 +250,9 @@ def Pf (d : Fin n → ℤ) (x : Mat n) : ℂ := ∏ j, lm j x ^ d j
 
 def Qf (y : Fin n → ℤ) (x : Mat n) : ℂ := ∏ j, gm j x ^ y j
 
-theorem Pf_diff {d : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0 ≤ d j) {g : Mat n} (hg : g ∈ GLs n) :
-    DifferentiableAt ℂ (Pf d) g := by
+theorem Pf_diff
+    {d : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0 ≤ d j) {g : Mat n} (hg : g ∈ GLs n)
+    : DifferentiableAt ℂ (Pf d) g := by
   refine diffAt_prod _ _ fun j _ => (lm_diff j g).zpow ?_
   by_cases hj : (j : ℕ) + 1 < n
   · exact Or.inr (hd j hj)
@@ -235,10 +260,11 @@ theorem Pf_diff {d : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0
 
 theorem Qf_diff (y : Fin n → ℤ) {g : Mat n} (hg : g ∈ GLs n) : DifferentiableAt ℝ (Qf y) g := by
   refine diffAt_prod _ _ fun j _ => ?_
-  exact ((differentiableAt_zpow (m := y j)).2 (Or.inl (gm_ne hg j))).restrictScalars ℝ |>.comp g (gm_diff j g)
+  exact ((differentiableAt_zpow (m := y j)).2 (Or.inl (gm_ne hg j))).restrictScalars ℝ
+    |>.comp g (gm_diff j g)
 
-theorem gm_skew (g : Mat n) {X : Mat n} (hX : Xᴴ = -X) (j : Fin n) :
-    HasDerivAt (fun t : ℝ => gm j (g + t • (g * X))) 0 0 := by
+theorem gm_skew (g : Mat n) {X : Mat n} (hX : Xᴴ = -X) (j : Fin n)
+    : HasDerivAt (fun t : ℝ => gm j (g + t • (g * X))) 0 0 := by
   set A := g.submatrix (ini j) id
   set M₀ := A * Aᴴ
   set N := A * (X * X) * Aᴴ
@@ -262,14 +288,16 @@ theorem gm_skew (g : Mat n) {X : Mat n} (hX : Xᴴ = -X) (j : Fin n) :
       rw [h4, Matrix.smul_mul, Matrix.mul_smul, smul_smul]
       push_cast
       rw [pow_two]
-    rw [h3, Matrix.sub_mul, Matrix.mul_sub, Matrix.one_mul, Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_assoc]
+    rw [h3, Matrix.sub_mul, Matrix.mul_sub, Matrix.one_mul, Matrix.smul_mul, Matrix.mul_smul,
+      Matrix.mul_assoc]
   have hψ : DifferentiableAt ℝ (fun s : ℝ => (M₀ - (s : ℂ) • N).det) 0 := by
     refine diffAt_det (fun s : ℝ => M₀ - (s : ℂ) • N) fun r c => ?_
     simp only [Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul]
     fun_prop
   have h2 : HasDerivAt (fun t : ℝ => t ^ 2) 0 0 := by simpa using hasDerivAt_pow 2 (0 : ℝ)
-  have hψ' : HasDerivAt (fun s : ℝ => (M₀ - (s : ℂ) • N).det) (deriv (fun s : ℝ => (M₀ - (s : ℂ) • N).det) 0)
-      ((fun t : ℝ => t ^ 2) 0) := by
+  have hψ' : HasDerivAt
+      (fun s : ℝ => (M₀ - (s : ℂ) • N).det)
+      (deriv (fun s : ℝ => (M₀ - (s : ℂ) • N).det) 0) ((fun t : ℝ => t ^ 2) 0) := by
     simpa using hψ.hasDerivAt
   have h3 : HasDerivAt ((fun s : ℝ => (M₀ - (s : ℂ) • N).det) ∘ fun t : ℝ => t ^ 2)
       ((0 : ℝ) • deriv (fun s : ℝ => (M₀ - (s : ℂ) • N).det) 0) 0 :=
@@ -277,39 +305,48 @@ theorem gm_skew (g : Mat n) {X : Mat n} (hX : Xᴴ = -X) (j : Fin n) :
   rw [zero_smul] at h3
   exact h3.congr_of_eventuallyEq (Filter.Eventually.of_forall fun t => e t)
 
-theorem Qf_skew (y : Fin n → ℤ) {g : Mat n} (hg : g ∈ GLs n) {X : Mat n} (hX : Xᴴ = -X) :
-    fderiv ℝ (Qf y) g (g * X) = 0 := by
+theorem Qf_skew (y : Fin n → ℤ) {g : Mat n} (hg : g ∈ GLs n) {X : Mat n} (hX : Xᴴ = -X)
+    : fderiv ℝ (Qf y) g (g * X) = 0 := by
   have h1 : HasDerivAt (fun t : ℝ => Qf y (g + t • (g * X))) (fderiv ℝ (Qf y) g (g * X)) 0 :=
     (Qf_diff y hg).hasFDerivAt.hasLineDerivAt (g * X)
-  have h2 : ∀ j ∈ (univ : Finset (Fin n)), HasDerivAt (fun t : ℝ => gm j (g + t • (g * X)) ^ y j) 0 0 := by
+  have h2
+      : ∀ j ∈ (univ : Finset (Fin n)),
+        HasDerivAt (fun t : ℝ => gm j (g + t • (g * X)) ^ y j) 0 0 := by
     intro j _
     have h0 := gm_skew g hX j
-    have hz : HasDerivAt (fun z : ℂ => z ^ y j) ((y j : ℂ) * gm j g ^ (y j - 1))
-        ((fun t : ℝ => gm j (g + t • (g * X))) 0) := by
+    have hz : HasDerivAt
+        (fun z : ℂ => z ^ y j)
+        ((y j : ℂ) * gm j g ^ (y j - 1)) ((fun t : ℝ => gm j (g + t • (g * X))) 0) := by
       simpa using hasDerivAt_zpow (y j) (gm j g) (Or.inl (gm_ne hg j))
     have h5 : HasDerivAt ((fun z : ℂ => z ^ y j) ∘ fun t : ℝ => gm j (g + t • (g * X))) 0 0 := by
       simpa using hz.scomp (0 : ℝ) h0
     exact h5
   have h3 : HasDerivAt (∏ j : Fin n, fun t : ℝ => gm j (g + t • (g * X)) ^ y j) 0 0 := by
-    have hp : ∀ s : Finset (Fin n), HasDerivAt (∏ j ∈ s, fun t : ℝ => gm j (g + t • (g * X)) ^ y j) 0 0 := by
+    have hp
+        : ∀ s : Finset (Fin n),
+          HasDerivAt (∏ j ∈ s, fun t : ℝ => gm j (g + t • (g * X)) ^ y j) 0 0 := by
       intro s
       induction s using Finset.induction_on with
       | empty =>
         simp only [Finset.prod_empty]
         change HasDerivAt (fun _ : ℝ => (1 : ℂ)) 0 0
         exact hasDerivAt_const _ _
-      | @insert a s ha ih =>
-        simpa [Finset.prod_insert, ha] using (h2 a (Finset.mem_univ a)).mul ih
+      | @insert a s ha ih => simpa [Finset.prod_insert, ha] using (h2 a (Finset.mem_univ a)).mul ih
     simpa using hp univ
-  have e : (fun t : ℝ => Qf y (g + t • (g * X))) = ∏ j, fun t : ℝ => gm j (g + t • (g * X)) ^ y j := by
+  have e
+      : (fun t : ℝ => Qf y (g + t • (g * X))) = ∏ j, fun t : ℝ => gm j (g + t • (g * X)) ^ y j := by
     funext t
     simp [Qf, Finset.prod_apply]
   rw [e] at h1
   exact h1.unique h3
 
-theorem Pf_lt {d : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0 ≤ d j) {g : Mat n} (hg : g ∈ GLs n)
-    {a b : Fin n} (hab : a < b) : fderiv ℂ (Pf d) g (g * Matrix.single a b 1) = 0 := by
-  have h1 : HasDerivAt (fun t : ℂ => Pf d (g + t • (g * Matrix.single a b 1)))
+theorem Pf_lt
+    {d : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0 ≤ d j)
+    {g : Mat n} (hg : g ∈ GLs n)
+    {a b : Fin n} (hab : a < b)
+    : fderiv ℂ (Pf d) g (g * Matrix.single a b 1) = 0 := by
+  have h1 : HasDerivAt
+      (fun t : ℂ => Pf d (g + t • (g * Matrix.single a b 1)))
       (fderiv ℂ (Pf d) g (g * Matrix.single a b 1)) 0 :=
     (Pf_diff hd hg).hasFDerivAt.hasLineDerivAt (g * Matrix.single a b 1)
   refine h1.unique ?_
@@ -319,10 +356,14 @@ theorem Pf_lt {d : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0 �
   rw [this]
   exact hasDerivAt_const _ _
 
-theorem Pf_eq {d : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0 ≤ d j) {g : Mat n} (hg : g ∈ GLs n)
-    (a : Fin n) : fderiv ℂ (Pf d) g (g * Matrix.single a a 1) =
-      ((∑ j, (if a ≤ j then d j else 0) : ℤ) : ℂ) * Pf d g := by
-  have h1 : HasDerivAt (fun t : ℂ => Pf d (g + t • (g * Matrix.single a a 1)))
+theorem Pf_eq
+    {d : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0 ≤ d j)
+    {g : Mat n} (hg : g ∈ GLs n)
+    (a : Fin n)
+    : fderiv ℂ (Pf d) g (g * Matrix.single a a 1)
+      = ((∑ j, (if a ≤ j then d j else 0) : ℤ) : ℂ) * Pf d g := by
+  have h1 : HasDerivAt
+      (fun t : ℂ => Pf d (g + t • (g * Matrix.single a a 1)))
       (fderiv ℂ (Pf d) g (g * Matrix.single a a 1)) 0 :=
     (Pf_diff hd hg).hasFDerivAt.hasLineDerivAt (g * Matrix.single a a 1)
   set m : ℤ := ∑ j, (if a ≤ j then d j else 0)
@@ -339,38 +380,49 @@ theorem Pf_eq {d : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0 �
   rw [mul_zpow]
   by_cases h : a ≤ j <;> simp [h]
 
-theorem Eu_mul {P Q : Mat n → ℂ} {g : Mat n} (hP : DifferentiableAt ℝ P g) (hQ : DifferentiableAt ℝ Q g)
-    (s : Bool) (a b : Fin n) :
-    Eu s a b (fun x => P x * Q x) g = Eu s a b P g * Q g + P g * Eu s a b Q g := by
-  have h : fderiv ℝ (fun x => P x * Q x) g = P g • fderiv ℝ Q g + Q g • fderiv ℝ P g := fderiv_fun_mul hP hQ
+theorem Eu_mul
+    {P Q : Mat n → ℂ} {g : Mat n} (hP : DifferentiableAt ℝ P g) (hQ : DifferentiableAt ℝ Q g)
+    (s : Bool) (a b : Fin n)
+    : Eu s a b (fun x => P x * Q x) g = Eu s a b P g * Q g + P g * Eu s a b Q g := by
+  have h : fderiv ℝ (fun x => P x * Q x) g = P g • fderiv ℝ Q g + Q g • fderiv ℝ P g :=
+    fderiv_fun_mul hP hQ
   simp only [Eu, Rd, Pi.smul_apply, Pi.add_apply, h, ContinuousLinearMap.add_apply,
     ContinuousLinearMap.smul_apply, smul_eq_mul]
   ring
 
-theorem Qf_kill (y : Fin n → ℤ) {g : Mat n} (hg : g ∈ GLs n) (a b : Fin n) :
-    Eu true a b (Qf y) g - Eu false b a (Qf y) g = 0 := by
-  have s1 : (Matrix.single a b (1 : ℂ) - Matrix.single b a 1)ᴴ = -(Matrix.single a b (1 : ℂ) - Matrix.single b a 1) := by
+theorem Qf_kill (y : Fin n → ℤ) {g : Mat n} (hg : g ∈ GLs n) (a b : Fin n)
+    : Eu true a b (Qf y) g - Eu false b a (Qf y) g = 0 := by
+  have s1
+      : (Matrix.single a b (1 : ℂ) - Matrix.single b a 1)ᴴ
+        = -(Matrix.single a b (1 : ℂ) - Matrix.single b a 1) := by
     simp [conjTranspose_sub, Matrix.conjTranspose_single]
-  have s2 : (Matrix.single a b Complex.I + Matrix.single b a Complex.I)ᴴ =
-      -(Matrix.single a b Complex.I + Matrix.single b a Complex.I) := by
+  have s2
+      : (Matrix.single a b Complex.I + Matrix.single b a Complex.I)ᴴ
+        = -(Matrix.single a b Complex.I + Matrix.single b a Complex.I) := by
     simp [conjTranspose_add, Matrix.conjTranspose_single, Matrix.single_neg]
   have h1 := Qf_skew y hg s1
   have h2 := Qf_skew y hg s2
   rw [Matrix.mul_sub, map_sub] at h1
   rw [Matrix.mul_add, map_add (f := _)] at h2
-  simp only [Eu, Rd, Pi.smul_apply, Pi.add_apply, smul_eq_mul, if_true, Bool.false_eq_true, if_false]
+  simp only [Eu, Rd, Pi.smul_apply, Pi.add_apply, smul_eq_mul, if_true, Bool.false_eq_true,
+    if_false]
   linear_combination (1 / 2 : ℂ) * h1 - (Complex.I / 2) * h2
 
-theorem Kf_apply (a b : Fin n) (h : SmF n) {g : Mat n} (hg : g ∈ GLs n) :
-    (Kf a b h).1 g = Eu true a b h.1 g - Eu false b a h.1 g := by
+theorem Kf_apply (a b : Fin n) (h : SmF n) {g : Mat n} (hg : g ∈ GLs n)
+    : (Kf a b h).1 g = Eu true a b h.1 g - Eu false b a h.1 g := by
   have : Kf a b h = e1 DR a b h - f1 DR b a h := by
     delta Kf GlobalTheory.CompanionTheory.GLK.e2
     simp [sub_eq_add_neg]
-  rw [this, Submodule.coe_sub, Pi.sub_apply, orderedCechToCatCochainsOne_apply_valueAtSubset _ _ _ hg, liftOneFormsToCompatible_apply _ _ _ hg]
+  rw [this, Submodule.coe_sub, Pi.sub_apply,
+    orderedCechToCatCochainsOne_apply_valueAtSubset _ _ _ hg,
+    liftOneFormsToCompatible_apply _ _ _ hg]
 
-theorem Kf_fRaw {d y : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0 ≤ d j) (F : SmF n)
-    (hF : ∀ x ∈ GLs n, F.1 x = Pf d x * Qf y x) (a b : Fin n) {g : Mat n} (hg : g ∈ GLs n) :
-    (Kf a b F).1 g = fderiv ℂ (Pf d) g (g * Matrix.single a b 1) * Qf y g := by
+theorem Kf_fRaw
+    {d y : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0 ≤ d j)
+    (F : SmF n) (hF : ∀ x ∈ GLs n, F.1 x = Pf d x * Qf y x)
+    (a b : Fin n)
+    {g : Mat n} (hg : g ∈ GLs n)
+    : (Kf a b F).1 g = fderiv ℂ (Pf d) g (g * Matrix.single a b 1) * Qf y g := by
   have hc := Pf_diff hd hg
   have hP := hc.restrictScalars ℝ
   have hQ := Qf_diff y hg
@@ -379,22 +431,41 @@ theorem Kf_fRaw {d y : Fin n → ℤ} (hd : ∀ j : Fin n, (j : ℕ) + 1 < n →
   have hk := Qf_kill y hg a b
   have h1 := GlobalTheory.CompanionTheory.RmHol.GelCoef.Eu_of_differentiableAt hc a b
   have h2 := GlobalTheory.CompanionTheory.RmHol.GelCoef.Eu_of_differentiableAt hc b a
-  rw [Kf_apply _ _ _ hg, GlobalTheory.CompanionTheory.RmHol.GelCoef.Eu_congr_germ e, GlobalTheory.CompanionTheory.RmHol.GelCoef.Eu_congr_germ e,
-    Eu_mul hP hQ, Eu_mul hP hQ, h1.1, h2.2]
+  rw [Kf_apply _ _ _ hg, GlobalTheory.CompanionTheory.RmHol.GelCoef.Eu_congr_germ e,
+    GlobalTheory.CompanionTheory.RmHol.GelCoef.Eu_congr_germ e, Eu_mul hP hQ, Eu_mul hP hQ, h1.1,
+    h2.2]
   linear_combination Pf d g * hk
 
 end GlobalTheory.CompanionTheory.ModelS.Fhw
 
-
 open GlobalTheory.CompanionTheory.ModelS.Fhw in
-theorem GlobalTheory.CompanionTheory.ModelS.f_highest (n : ℕ) (lam : Fin n → ℤ) (hl : Antitone lam) (lev : Fin n → ℕ) (hv : IsLev lam lev)
-    (F : GlobalTheory.CompanionTheory.ModelS.SmF n) (hF : F.1 = GlobalTheory.CompanionTheory.ModelS.fRaw lam lev) :
-    (∀ a b : Fin n, a < b → GlobalTheory.CompanionTheory.ModelS.Kf a b F = 0) ∧
-      ∀ a : Fin n, GlobalTheory.CompanionTheory.ModelS.Kf a a F = (GlobalTheory.CompanionTheory.ModelS.muZ lam lev a : ℂ) • F := by
-  have hd : ∀ j : Fin n, (j : ℕ) + 1 < n → 0 ≤ GlobalTheory.CompanionTheory.ModelS.dif (GlobalTheory.CompanionTheory.ModelS.muZ lam lev) j :=
-    fun j hj => GlobalTheory.CompanionTheory.ModelS.Fhw.dif_nonneg (GlobalTheory.CompanionTheory.ModelS.Fhw.muZ_antitone hl hv) j hj
-  have hP : ∀ x ∈ GLs n, F.1 x = GlobalTheory.CompanionTheory.ModelS.Fhw.Pf (GlobalTheory.CompanionTheory.ModelS.dif (GlobalTheory.CompanionTheory.ModelS.muZ lam lev)) x *
-      GlobalTheory.CompanionTheory.ModelS.Fhw.Qf (GlobalTheory.CompanionTheory.ModelS.dif (GlobalTheory.CompanionTheory.ModelS.yZ lam lev)) x := by
+theorem GlobalTheory.CompanionTheory.ModelS.f_highest
+    (n : ℕ) (lam : Fin n → ℤ) (hl : Antitone lam) (lev : Fin n → ℕ) (hv : IsLev lam lev)
+    (F : GlobalTheory.CompanionTheory.ModelS.SmF n)
+    (hF : F.1 = GlobalTheory.CompanionTheory.ModelS.fRaw lam lev)
+    : (∀ a b : Fin n, a < b → GlobalTheory.CompanionTheory.ModelS.Kf a b F = 0)
+      ∧ ∀ a : Fin n,
+        GlobalTheory.CompanionTheory.ModelS.Kf a a F
+          = (GlobalTheory.CompanionTheory.ModelS.muZ lam lev a : ℂ) • F := by
+  have hd
+      : ∀ j : Fin n,
+        (j : ℕ) + 1 < n
+          → 0
+            ≤ GlobalTheory.CompanionTheory.ModelS.dif
+              (GlobalTheory.CompanionTheory.ModelS.muZ lam lev) j := fun j hj =>
+    GlobalTheory.CompanionTheory.ModelS.Fhw.dif_nonneg
+      (GlobalTheory.CompanionTheory.ModelS.Fhw.muZ_antitone hl hv) j hj
+  have hP
+      : ∀ x ∈ GLs n,
+        F.1 x
+          = GlobalTheory.CompanionTheory.ModelS.Fhw.Pf
+              (GlobalTheory.CompanionTheory.ModelS.dif (GlobalTheory.CompanionTheory.ModelS.muZ lam
+                lev))
+              x
+            * GlobalTheory.CompanionTheory.ModelS.Fhw.Qf
+              (GlobalTheory.CompanionTheory.ModelS.dif (GlobalTheory.CompanionTheory.ModelS.yZ lam
+                lev))
+              x := by
     intro x hx
     rw [hF]
     delta GlobalTheory.CompanionTheory.ModelS.fRaw
@@ -404,13 +475,16 @@ theorem GlobalTheory.CompanionTheory.ModelS.f_highest (n : ℕ) (lam : Fin n →
   · apply Subtype.ext
     funext g
     by_cases hg : g ∈ GLs n
-    · rw [GlobalTheory.CompanionTheory.ModelS.Fhw.Kf_fRaw hd F hP a b hg, GlobalTheory.CompanionTheory.ModelS.Fhw.Pf_lt hd hg hab, zero_mul]
+    · rw [GlobalTheory.CompanionTheory.ModelS.Fhw.Kf_fRaw hd F hP a b hg,
+        GlobalTheory.CompanionTheory.ModelS.Fhw.Pf_lt hd hg hab, zero_mul]
       rfl
     · exact (GlobalTheory.CompanionTheory.ModelS.Kf a b F).2.2 g hg
   · apply Subtype.ext
     funext g
     by_cases hg : g ∈ GLs n
-    · rw [GlobalTheory.CompanionTheory.ModelS.Fhw.Kf_fRaw hd F hP a a hg, GlobalTheory.CompanionTheory.ModelS.Fhw.Pf_eq hd hg a, Submodule.coe_smul, Pi.smul_apply, hP g hg, smul_eq_mul,
-        GlobalTheory.CompanionTheory.ModelS.Fhw.sum_dif]
+    · rw [GlobalTheory.CompanionTheory.ModelS.Fhw.Kf_fRaw hd F hP a a hg,
+        GlobalTheory.CompanionTheory.ModelS.Fhw.Pf_eq hd hg a, Submodule.coe_smul, Pi.smul_apply,
+        hP g hg, smul_eq_mul, GlobalTheory.CompanionTheory.ModelS.Fhw.sum_dif]
       ring
-    · rw [(GlobalTheory.CompanionTheory.ModelS.Kf a a F).2.2 g hg, Submodule.coe_smul, Pi.smul_apply, F.2.2 g hg, smul_zero]
+    · rw [(GlobalTheory.CompanionTheory.ModelS.Kf a a F).2.2 g hg, Submodule.coe_smul,
+        Pi.smul_apply, F.2.2 g hg, smul_zero]

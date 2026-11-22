@@ -12,13 +12,17 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem isIntegral_adjoin_of_forall_cdvr (K Ω : Type) [Field K] [NumberField K] [Field Ω]
-    [Algebra K Ω] (gens : Finset Ω)
-    (hcl : Subfield.closure (Set.range (algebraMap K Ω) ∪ (gens : Set Ω)) = ⊤) (x : Ω)
-    (hx : ∀ (T : CDVR), Countable (IsLocalRing.ResidueField T.V) → ∀ φ : Ω →+* T.Fr,
-      (∀ k : K, φ (algebraMap K Ω k) ∈ (algebraMap T.V T.Fr).range) →
-      (∀ g ∈ gens, φ g ∈ (algebraMap T.V T.Fr).range) → φ x ∈ (algebraMap T.V T.Fr).range) :
-    IsIntegral (Algebra.adjoin K (gens : Set Ω)) x := by
+theorem isIntegral_adjoin_of_forall_cdvr
+    (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω]
+    (gens : Finset Ω) (hcl : Subfield.closure (Set.range (algebraMap K Ω) ∪ (gens : Set Ω)) = ⊤)
+    (x : Ω)
+    (hx : ∀ (T : CDVR),
+      Countable (IsLocalRing.ResidueField T.V)
+        → ∀ φ : Ω →+* T.Fr,
+          (∀ k : K, φ (algebraMap K Ω k) ∈ (algebraMap T.V T.Fr).range)
+            → (∀ g ∈ gens, φ g ∈ (algebraMap T.V T.Fr).range)
+            → φ x ∈ (algebraMap T.V T.Fr).range)
+    : IsIntegral (Algebra.adjoin K (gens : Set Ω)) x := by
   classical
   set A := Algebra.adjoin K (gens : Set Ω) with hAdef
 
@@ -37,13 +41,15 @@ theorem isIntegral_adjoin_of_forall_cdvr (K Ω : Type) [Field K] [NumberField K]
   have hΩc : Countable Ω := by
     have hs : (Set.range (algebraMap K Ω) ∪ (gens : Set Ω)).Countable :=
       (Set.countable_range _).union gens.finite_toSet.countable
-    have h1 : Cardinal.mk (Subfield.closure (Set.range (algebraMap K Ω) ∪ (gens : Set Ω))) ≤
-        Cardinal.aleph0 :=
+    have h1
+        : Cardinal.mk (Subfield.closure (Set.range (algebraMap K Ω) ∪ (gens : Set Ω)))
+          ≤ Cardinal.aleph0 :=
       (Subfield.cardinalMk_closure_le_max _).trans
         (max_le (Cardinal.mk_le_aleph0_iff.2 hs.to_subtype) le_rfl)
     have h2 := Cardinal.mk_le_aleph0_iff.1 h1
     rw [hcl] at h2
-    exact Function.Injective.countable (f := fun (z : Ω) => (⟨z, trivial⟩ : (⊤ : Subfield Ω)))
+    exact Function.Injective.countable
+      (f := fun (z : Ω) => (⟨z, trivial⟩ : (⊤ : Subfield Ω)))
       fun a b h => congrArg Subtype.val h
 
   have hAft : Algebra.FiniteType K A := .adjoin_of_finite gens.finite_toSet
@@ -63,8 +69,9 @@ theorem isIntegral_adjoin_of_forall_cdvr (K Ω : Type) [Field K] [NumberField K]
   let xinv : B := ⟨x⁻¹, Algebra.subset_adjoin rfl⟩
   have hne : (⊥ : Ideal A).map (algebraMap A B) ⊔ Ideal.span {xinv} ≠ ⊤ := by
     intro heq
-    obtain ⟨p, hp, hpx⟩ := Algebra.exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top
-      x⁻¹ (⊥ : Ideal A) bot_ne_top heq
+    obtain ⟨p, hp, hpx⟩ :=
+      Algebra.exists_aeval_invOf_eq_zero_of_idealMap_adjoin_sup_span_eq_top x⁻¹ (⊥ : Ideal A)
+        bot_ne_top heq
     have hm : p.Monic := by
       rw [Ideal.mem_bot, sub_eq_zero] at hp
       exact hp
@@ -73,9 +80,11 @@ theorem isIntegral_adjoin_of_forall_cdvr (K Ω : Type) [Field K] [NumberField K]
   obtain ⟨W, hW, hW'⟩ := Ideal.image_subset_nonunits_valuationSubring (A := B.toSubring) _ hne
   have hxW : x⁻¹ ∈ W.nonunits := hW' ⟨xinv, Ideal.mem_sup_right (Ideal.subset_span rfl), rfl⟩
 
-  obtain ⟨V, hV, hAV, -, hxV⟩ := exists_discreteValuationSubring_of_valuationSubring (R := A)
-    W (fun r => hW (B.algebraMap_mem r)) (s := ∅) (t := {x⁻¹}) Set.finite_empty
-    (Set.finite_singleton _) (by simp) (by simpa using hxW) ⟨x⁻¹, rfl, inv_ne_zero hx0⟩
+  obtain ⟨V, hV, hAV, -, hxV⟩ :=
+    exists_discreteValuationSubring_of_valuationSubring (R := A) W
+      (fun r => hW (B.algebraMap_mem r))
+      (s := ∅) (t := {x⁻¹}) Set.finite_empty (Set.finite_singleton _) (by simp) (by simpa using hxW)
+      ⟨x⁻¹, rfl, inv_ne_zero hx0⟩
   have hxV' : x⁻¹ ∈ V.nonunits := hxV _ rfl
   have hKV : ∀ k : K, algebraMap K Ω k ∈ V := fun k => hAV (algebraMap K A k)
   have hgV : ∀ g ∈ gens, g ∈ V := fun g hg => hAV ⟨g, Algebra.subset_adjoin hg⟩
@@ -89,15 +98,13 @@ theorem isIntegral_adjoin_of_forall_cdvr (K Ω : Type) [Field K] [NumberField K]
     have hsurj : Function.Surjective ((residue T.V).comp ι) := by
       intro t0
       obtain ⟨t, rfl⟩ := residue_surjective t0
-      obtain ⟨r, hr⟩ := Ideal.Quotient.mk_surjective
-        (AdicCompletion.evalₐ (maximalIdeal V) 1 t)
+      obtain ⟨r, hr⟩ := Ideal.Quotient.mk_surjective (AdicCompletion.evalₐ (maximalIdeal V) 1 t)
       refine ⟨r, ?_⟩
       change residue T.V (ι r) = residue T.V t
       change Ideal.Quotient.mk _ (ι r) = Ideal.Quotient.mk _ t
       rw [Ideal.Quotient.eq]
       intro hu
-      have hnt : Nontrivial (V ⧸ maximalIdeal V ^ 1) := by
-        rw [pow_one]; infer_instance
+      have hnt : Nontrivial (V ⧸ maximalIdeal V ^ 1) := by rw [pow_one]; infer_instance
       have h1 := hu.map (AdicCompletion.evalₐ (maximalIdeal V) 1)
       rw [map_sub] at h1
       change IsUnit ((AdicCompletion.evalₐ (maximalIdeal V) 1) (AdicCompletion.of _ _ r) - _) at h1
@@ -108,8 +115,10 @@ theorem isIntegral_adjoin_of_forall_cdvr (K Ω : Type) [Field K] [NumberField K]
     (IsFractionRing.injective T.V T.Fr).comp (algebraMap_adicCompletion_injective_of_dvr V)
   let φ : Ω →+* T.Fr := IsFractionRing.lift (A := V) hg
   have hφ : ∀ v : V, φ v = algebraMap T.V T.Fr (ι v) := fun v => IsFractionRing.lift_algebraMap hg v
-  obtain ⟨t, ht⟩ := hx T hres φ (fun k => ⟨ι ⟨_, hKV k⟩, (hφ ⟨_, hKV k⟩).symm⟩)
-    (fun g hg' => ⟨ι ⟨g, hgV g hg'⟩, (hφ ⟨g, hgV g hg'⟩).symm⟩)
+  obtain ⟨t, ht⟩ :=
+    hx T hres φ
+      (fun k => ⟨ι ⟨_, hKV k⟩, (hφ ⟨_, hKV k⟩).symm⟩)
+      (fun g hg' => ⟨ι ⟨g, hgV g hg'⟩, (hφ ⟨g, hgV g hg'⟩).symm⟩)
   let y : V := ⟨x⁻¹, V.nonunits_subset hxV'⟩
   have h1 : algebraMap T.V T.Fr (t * ι y) = 1 := by
     rw [map_mul, ht, ← hφ y]

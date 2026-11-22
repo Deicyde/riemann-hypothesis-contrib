@@ -21,15 +21,18 @@ instance Datum.acgVF : AddCommGroup D.VF := inferInstanceAs (AddCommGroup D.VQ)
 instance Datum.modQVF : Module ℚ D.VF := inferInstanceAs (Module ℚ D.VQ)
 
 instance Datum.modFVF : Module D.F D.VF :=
-  Module.compHom D.VQ ((D.endO.val : D.endO →ₐ[ℚ] Module.End ℚ D.VQ).toRingHom.comp D.actF.toRingHom)
+  Module.compHom D.VQ
+    ((D.endO.val : D.endO →ₐ[ℚ] Module.End ℚ D.VQ).toRingHom.comp D.actF.toRingHom)
 
-theorem Datum.smul_VF (x : D.F) (v : D.VF) :
-    x • v = (((D.actF x : D.endO) : Module.End ℚ D.VQ) (v : D.VQ) : D.VF) := rfl
+theorem Datum.smul_VF (x : D.F) (v : D.VF)
+    : x • v = (((D.actF x : D.endO) : Module.End ℚ D.VQ) (v : D.VQ) : D.VF) :=
+  rfl
 
 instance Datum.towerVF : IsScalarTower ℚ D.F D.VF :=
   ⟨fun q x v => by
     show ((D.actF (q • x) : D.endO) : Module.End ℚ D.VQ) v = q • ((D.actF x : D.endO) : Module.End ℚ D.VQ) v
-    rw [map_smul]; rfl⟩
+    rw [map_smul]
+    rfl⟩
 
 end GlobalTheory.UPel.HT
 
@@ -38,7 +41,8 @@ variable {p : ℕ} [Fact p.Prime] (D : Datum p)
 
 theorem Datum.finrank_VF : Module.finrank D.F D.VF = D.m * D.n := by
   have h1 : Module.finrank ℚ D.VF = D.m * D.n * Module.finrank ℚ D.F := by
-    haveI := D.freeLa; haveI := D.finLa
+    haveI := D.freeLa
+    haveI := D.finLa
     show Module.finrank ℚ (ℚ ⊗[ℤ] D.La) = _
     rw [Module.finrank_baseChange, D.rankLa]
   haveI : FiniteDimensional ℚ D.VF := D.finVQ
@@ -52,8 +56,9 @@ namespace GlobalTheory.UPel.HT.MatUnit
 
 open Module
 
-variable {L U R : Type} [Field L] [AddCommGroup U] [Module L U] [Ring R] {m : ℕ}
-  (σ : Matrix (Fin m) (Fin m) R →+* Module.End L U)
+variable
+  {L U R : Type} [Field L] [AddCommGroup U] [Module L U] [Ring R]
+  {m : ℕ} (σ : Matrix (Fin m) (Fin m) R →+* Module.End L U)
 
 variable {A : Type} [Ring A] (α : A →+* Module.End L U)
 

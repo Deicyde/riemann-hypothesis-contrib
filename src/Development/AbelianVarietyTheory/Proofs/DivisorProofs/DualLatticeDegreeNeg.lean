@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HomFiniteFre
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
 open ReciprocityTheory.DiscreteGroups.LocalClassField
 open scoped TensorProduct
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -25,8 +28,8 @@ variable {p : ℕ} [Fact p.Prime]
 def actAf (D : Datum p) (c : D.O) : Module.End (AfP p) (AfP p ⊗[ℚ] VQ D) :=
   Module.End.baseChangeHom ℚ (AfP p) (VQ D) (actQ D c)
 
-theorem actAf_tmul (D : Datum p) (c : D.O) (a : AfP p) (x : D.La) :
-    actAf D c (a ⊗ₜ ((1 : ℚ) ⊗ₜ x)) = a ⊗ₜ ((1 : ℚ) ⊗ₜ (c • x)) := by
+theorem actAf_tmul (D : Datum p) (c : D.O) (a : AfP p) (x : D.La)
+    : actAf D c (a ⊗ₜ ((1 : ℚ) ⊗ₜ x)) = a ⊗ₜ ((1 : ℚ) ⊗ₜ (c • x)) := by
   show LinearMap.baseChange (AfP p) (actQ D c) (a ⊗ₜ ((1 : ℚ) ⊗ₜ x)) = _
   rw [LinearMap.baseChange_tmul, actQ, LinearMap.baseChange_tmul]
   rfl
@@ -34,8 +37,8 @@ theorem actAf_tmul (D : Datum p) (c : D.O) (a : AfP p) (x : D.La) :
 theorem actAf_inAf (D : Datum p) (c : D.O) (x : D.La) : actAf D c (inAf D x) = inAf D (c • x) :=
   actAf_tmul D c 1 x
 
-theorem actAf_mem_laHat (D : Datum p) (c : D.O) {v : AfP p ⊗[ℚ] VQ D} (hv : v ∈ LaHat D) :
-    actAf D c v ∈ LaHat D := by
+theorem actAf_mem_laHat (D : Datum p) (c : D.O) {v : AfP p ⊗[ℚ] VQ D} (hv : v ∈ LaHat D)
+    : actAf D c v ∈ LaHat D := by
   induction hv using AddSubgroup.closure_induction with
   | mem z hz =>
     obtain ⟨a, x, ha, rfl⟩ := hz
@@ -45,8 +48,9 @@ theorem actAf_mem_laHat (D : Datum p) (c : D.O) {v : AfP p ⊗[ℚ] VQ D} (hv : 
   | add u w _ _ hu hw => rw [map_add]; exact add_mem hu hw
   | neg u _ hu => rw [map_neg]; exact neg_mem hu
 
-theorem actG_actAf {D : Datum p} {G : HTGroup p} (L : Link D G) (g : G.GAf) (c : D.O)
-    (v : AfP p ⊗[ℚ] VQ D) : L.actG g (actAf D c v) = actAf D c (L.actG g v) := by
+theorem actG_actAf
+    {D : Datum p} {G : HTGroup p} (L : Link D G) (g : G.GAf) (c : D.O) (v : AfP p ⊗[ℚ] VQ D)
+    : L.actG g (actAf D c v) = actAf D c (L.actG g v) := by
   have key : ∀ z : AfP p ⊗[ℚ] G.C, Commute (actOn L.rep (AfP p) z) (actAf D c) := by
     intro z
     induction z using TensorProduct.inductionOn with

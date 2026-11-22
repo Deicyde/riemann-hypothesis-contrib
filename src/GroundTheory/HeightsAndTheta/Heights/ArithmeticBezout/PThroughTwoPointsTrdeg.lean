@@ -14,15 +14,19 @@ open MvPolynomial
 
 noncomputable section
 
-theorem ThroughTwoPointsTrdeg.proof (hT : TrdegAdjoinLe.Statement) : ThroughTwoPointsTrdeg.Statement := by
+theorem ThroughTwoPointsTrdeg.proof (hT : TrdegAdjoinLe.Statement)
+    : ThroughTwoPointsTrdeg.Statement := by
   intro K Ω _ _ n k _ _ _ hinj x c hcx y j hyj hprop hy
   let u : Fin k × Fin n → Ω := fun im => algebraMap (MvPolynomial (Fin k × Fin n) K) Ω (X im)
   let z : Fin n → Ω := fun m => y m * (y j)⁻¹
   let x' : Fin n → Ω := fun m => algebraMap K Ω (x m)
   let c' : Fin n → Ω := fun m => algebraMap K Ω (c m)
   let s : Fin k → Ω := fun i => ∑ l, u (i, l) * x' l
-  have hC : ∀ a : K, algebraMap (MvPolynomial (Fin k × Fin n) K) Ω (C a) = algebraMap K Ω a := fun a => by
-    rw [IsScalarTower.algebraMap_apply K (MvPolynomial (Fin k × Fin n) K) Ω, MvPolynomial.algebraMap_eq]
+  have hC
+      : ∀ a : K,
+        algebraMap (MvPolynomial (Fin k × Fin n) K) Ω (C a) = algebraMap K Ω a := fun a => by
+    rw [IsScalarTower.algebraMap_apply K (MvPolynomial (Fin k × Fin n) K) Ω,
+      MvPolynomial.algebraMap_eq]
 
   have heq : ∀ i, ∑ m, u (i, m) * z m = s i * ∑ m, c' m * z m := by
     intro i
@@ -52,10 +56,12 @@ theorem ThroughTwoPointsTrdeg.proof (hT : TrdegAdjoinLe.Statement) : ThroughTwoP
     have hm2 : (algebraMap K Ω (x p) * y m - algebraMap K Ω (x m) * y p) * (y j)⁻¹ = 0 := by
       rw [← hm]; ring
     have hm3 := (mul_eq_zero.1 hm2).resolve_right (inv_ne_zero hyj)
-    have e : y j * (y p * (y j)⁻¹ * (algebraMap K Ω (x p))⁻¹) * algebraMap K Ω (x m) =
-        y p * algebraMap K Ω (x m) * (algebraMap K Ω (x p))⁻¹ := by
-      rw [show y j * (y p * (y j)⁻¹ * (algebraMap K Ω (x p))⁻¹) * algebraMap K Ω (x m) =
-        (y j * (y j)⁻¹) * (y p * algebraMap K Ω (x m)) * (algebraMap K Ω (x p))⁻¹ by ring,
+    have e
+        : y j * (y p * (y j)⁻¹ * (algebraMap K Ω (x p))⁻¹) * algebraMap K Ω (x m)
+          = y p * algebraMap K Ω (x m) * (algebraMap K Ω (x p))⁻¹ := by
+      rw [show y j * (y p * (y j)⁻¹ * (algebraMap K Ω (x p))⁻¹) * algebraMap K Ω (x m)
+            = (y j * (y j)⁻¹) * (y p * algebraMap K Ω (x m)) * (algebraMap K Ω (x p))⁻¹ by
+          ring,
         mul_inv_cancel₀ hyj, one_mul]
     rw [e, eq_mul_inv_iff_mul_eq₀ hx'p]
     linear_combination hm3
@@ -82,10 +88,8 @@ theorem ThroughTwoPointsTrdeg.proof (hT : TrdegAdjoinLe.Statement) : ThroughTwoP
       (isAlgebraic_algebraMap (⟨D, hDB⟩ : B)) (isAlgebraic_algebraMap (⟨D * v, hv⟩ : B))
   have hw : ∀ im, IsAlgebraic B (u im) := by
     rintro ⟨i, m⟩
-    have hSx : ∑ m ∈ E, u (i, m) * x' m ∈ B :=
-      B.sum_mem fun m hm => B.mul_mem (huB i m hm) (hKB _)
-    have hSz : ∑ m ∈ E, u (i, m) * z m ∈ B :=
-      B.sum_mem fun m hm => B.mul_mem (huB i m hm) (hzB m)
+    have hSx : ∑ m ∈ E, u (i, m) * x' m ∈ B := B.sum_mem fun m hm => B.mul_mem (huB i m hm) (hKB _)
+    have hSz : ∑ m ∈ E, u (i, m) * z m ∈ B := B.sum_mem fun m hm => B.mul_mem (huB i m hm) (hzB m)
     have e1 := hsplit (fun m => u (i, m) * x' m)
     have e2 := hsplit (fun m => u (i, m) * z m)
     rw [heq i] at e2
@@ -93,8 +97,9 @@ theorem ThroughTwoPointsTrdeg.proof (hT : TrdegAdjoinLe.Statement) : ThroughTwoP
     by_cases hmp : m = p
     · subst hmp
       refine halg _ ?_
-      have : D * u (i, m) = z q * (s i - ∑ m ∈ E, u (i, m) * x' m) -
-          x' q * (s i * ∑ m, c' m * z m - ∑ m ∈ E, u (i, m) * z m) := by
+      have : D * u (i, m)
+          = z q * (s i - ∑ m ∈ E, u (i, m) * x' m)
+            - x' q * (s i * ∑ m, c' m * z m - ∑ m ∈ E, u (i, m) * z m) := by
         rw [hDdef]; linear_combination -z q * e1 + x' q * e2
       rw [this]
       exact B.sub_mem (B.mul_mem (hzB q) (B.sub_mem (hsB i) hSx))
@@ -102,20 +107,25 @@ theorem ThroughTwoPointsTrdeg.proof (hT : TrdegAdjoinLe.Statement) : ThroughTwoP
     by_cases hmq : m = q
     · subst hmq
       refine halg _ ?_
-      have : D * u (i, m) = x' p * (s i * ∑ m, c' m * z m - ∑ m ∈ E, u (i, m) * z m) -
-          z p * (s i - ∑ m ∈ E, u (i, m) * x' m) := by
+      have : D * u (i, m)
+          = x' p * (s i * ∑ m, c' m * z m - ∑ m ∈ E, u (i, m) * z m)
+            - z p * (s i - ∑ m ∈ E, u (i, m) * x' m) := by
         rw [hDdef]; linear_combination -x' p * e2 + z p * e1
       rw [this]
       exact B.sub_mem (B.mul_mem (hKB _) (B.sub_mem (B.mul_mem (hsB i) hczB) hSz))
         (B.mul_mem (hzB p) (B.sub_mem (hsB i) hSx))
     exact isAlgebraic_algebraMap
-      (⟨u (i, m), huB i m (Finset.mem_erase.2 ⟨hmq, Finset.mem_erase.2 ⟨hmp, Finset.mem_univ m⟩⟩)⟩ : B)
+      (⟨u (i, m), huB i m (Finset.mem_erase.2 ⟨hmq, Finset.mem_erase.2 ⟨hmp, Finset.mem_univ m⟩⟩)⟩
+        : B)
   have hle := hT K Ω (Set.range z) (Fin k ⊕ (Fin k × E)) t (Fin k × Fin n) u hw
 
-  have hadj : Algebra.adjoin K (Set.range u) = (IsScalarTower.toAlgHom K (MvPolynomial (Fin k × Fin n) K) Ω).range := by
+  have hadj
+      : Algebra.adjoin K (Set.range u)
+        = (IsScalarTower.toAlgHom K (MvPolynomial (Fin k × Fin n) K) Ω).range := by
     rw [← Algebra.map_top, ← MvPolynomial.adjoin_range_X, AlgHom.map_adjoin, ← Set.range_comp]
     rfl
-  have hinj' : Function.Injective (IsScalarTower.toAlgHom K (MvPolynomial (Fin k × Fin n) K) Ω) := hinj
+  have hinj' : Function.Injective (IsScalarTower.toAlgHom K (MvPolynomial (Fin k × Fin n) K) Ω) :=
+    hinj
   have htr : Algebra.trdeg K (Algebra.adjoin K (Set.range u)) = ((k * n : ℕ) : Cardinal) := by
     rw [hadj, ← (AlgEquiv.ofInjective _ hinj').trdeg_eq, MvPolynomial.trdeg_of_isDomain]
     simp
@@ -128,7 +138,8 @@ theorem ThroughTwoPointsTrdeg.proof (hT : TrdegAdjoinLe.Statement) : ThroughTwoP
   have hn : 2 ≤ n := by
     have := Fin.val_ne_of_ne hqp
     omega
-  rcases lt_or_ge (Algebra.trdeg K (Algebra.adjoin K (Set.range z))) Cardinal.aleph0 with hfin | hinf
+  rcases lt_or_ge (Algebra.trdeg K (Algebra.adjoin K (Set.range z))) Cardinal.aleph0 with
+    hfin | hinf
   · obtain ⟨d, hd⟩ := Cardinal.lt_aleph0.1 hfin
     rw [hd] at hle ⊢
     norm_cast at hle ⊢

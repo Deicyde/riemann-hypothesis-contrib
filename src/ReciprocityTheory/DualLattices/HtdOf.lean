@@ -21,13 +21,18 @@ namespace ReciprocityTheory.PGsh.Be2
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2
 
 variable {R₀ : Type} [CommRing R₀]
-variable {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw}
-  [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe}
-  {cp : (Tw.O : Type)}
+variable
+  {p : ℕ} [Fact p.Prime]
+  {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)]
+  {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe]
+  {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)}
 
-def Dat.hopf (D : Dat p g B Tw Dt Oe σ cp) (C : Type) [Field C] [Algebra (Tw.O : Type) C]
+def Dat.hopf
+    (D : Dat p g B Tw Dt Oe σ cp)
+    (C : Type) [Field C] [Algebra (Tw.O : Type) C]
     (hdom : IsDomain (Tw.O : Type)) (hinj : Function.Injective (algebraMap (Tw.O : Type) C))
-    (hLat : EvLatStatement D) (hHopf : EvHopfStatement D) : HopfOrder (C := C) (Tw.O : Type) (Nb p g) where
+    (hLat : EvLatStatement D) (hHopf : EvHopfStatement D)
+    : HopfOrder (C := C) (Tw.O : Type) (Nb p g) where
   carrier := D.evImg C
   lat := (hLat C hdom hinj).1
   le_int := (hLat C hdom hinj).2.1
@@ -36,12 +41,16 @@ def Dat.hopf (D : Dat p g B Tw Dt Oe σ cp) (C : Type) [Field C] [Algebra (Tw.O 
   comul := (hHopf C hinj).1
   antipode := (hHopf C hinj).2
 
-def htd_of (D : Dat p g B Tw Dt Oe σ cp) (C : Type) [Field C] (v : Valuation C NNReal)
-    [Algebra (Tw.O : Type) C] (hdom : IsDomain (Tw.O : Type))
-    (hinj : Function.Injective (algebraMap (Tw.O : Type) C))
+def htd_of
+    (D : Dat p g B Tw Dt Oe σ cp)
+    (C : Type) [Field C]
+    (v : Valuation C NNReal)
+    [Algebra (Tw.O : Type) C]
+    (hdom : IsDomain (Tw.O : Type)) (hinj : Function.Injective (algebraMap (Tw.O : Type) C))
     (hLat : EvLatStatement D) (hHopf : EvHopfStatement D) (hAct : EvActStatement D)
-    (hHt : EvHtStatement D) (hBt : EvBtStatement D) (hH5 : EvenTwoEvaluationSign D) (hCot : EvCotStatement D) :
-    HodgeTateDatum p g v (Tw.O : Type) Oe σ cp where
+    (hHt : EvHtStatement D) (hBt : EvBtStatement D) (hH5 : EvenTwoEvaluationSign D)
+    (hCot : EvCotStatement D)
+    : HodgeTateDatum p g v (Tw.O : Type) Oe σ cp where
   ρ := D.H.ρ
   ρL := D.H.ρL
   P := D.H.P

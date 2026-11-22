@@ -13,8 +13,8 @@ namespace GlobalTheory.IndefiniteRowSideFullHecke.PaddedWittNormSquare
 
 open Formalism.BasicNotions Formalism.L2.DIV Formalism.L2.Ker
 
-def padZero {a : ℕ} (b : ℕ) (ν : DomWeight a) : Fin b → ℤ :=
-  fun i => if h : i.1 < a then ν.w ⟨i.1, h⟩ else 0
+def padZero {a : ℕ} (b : ℕ) (ν : DomWeight a) : Fin b → ℤ := fun i =>
+  if h : i.1 < a then ν.w ⟨i.1, h⟩ else 0
 
 def IsStepWeight {a b : ℕ} (lam ν : DomWeight a) (lam' : DomWeight b) (s' s : ℤ) : Prop :=
   (∀ i, ν.w i = lam.w i + s') ∧ (∀ i, 0 ≤ ν.w i) ∧ (∀ i, lam'.w i + s = padZero b ν i)
@@ -26,33 +26,38 @@ def lastEntry {a : ℕ} (ν : DomWeight a) : ℕ := ν.detShift.toNat
 def normSq {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → DomWeight n) (v : VV ℂ lam) : ℝ :=
   (pairK lam (fun _ => (1 : Matrix (Fin n) (Fin n) ℂ)) v v).re
 
-def OpNormSqLe {ι : Type} [Fintype ι] {a b : ℕ} (lam : ι → DomWeight a) (lam' : ι → DomWeight b)
-    (T : VV ℂ lam →ₗ[ℂ] VV ℂ lam') (t : ℝ) : Prop :=
+def OpNormSqLe
+    {ι : Type} [Fintype ι]
+    {a b : ℕ} (lam : ι → DomWeight a) (lam' : ι → DomWeight b) (T : VV ℂ lam →ₗ[ℂ] VV ℂ lam')
+    (t : ℝ)
+    : Prop :=
   ∀ v : VV ℂ lam, normSq lam' (T v) ≤ t * normSq lam v
 
 def unitNormSq {ι : Type} [Fintype ι] {a b : ℕ} (r : ι → ℝ) (z : VCx ι a b) : ℝ :=
   ∑ τ, ∑ β, ∑ α, ‖(r τ : ℂ) * z τ β α‖ ^ 2
 
 def tmax {ι : Type} [Fintype ι] {a : ℕ} (b : ℕ) (ν : ι → DomWeight a) (Om : ι → ℝ) (S : ℝ) : ℝ :=
-  S ^ 2 * ∏ τ, ((Om τ)⁻¹ ^ wtSize (ν τ) * Real.exp 1 * (2 * (wtSize (ν τ) : ℝ) + 2) ^ (2 * (a * b)) *
-    Real.exp (∑ i, Formalism.LatticeIndexTer.ph ((ν τ).w i : ℝ)))
+  S ^ 2
+    * ∏ τ, ((Om τ)⁻¹ ^ wtSize (ν τ) * Real.exp 1 * (2 * (wtSize (ν τ) : ℝ) + 2) ^ (2 * (a * b)) *
+      Real.exp (∑ i, Formalism.LatticeIndexTer.ph ((ν τ).w i : ℝ)))
 
 def BlockBound : Prop :=
-  ∀ (ι : Type) [Fintype ι] (a b : ℕ), a ≤ b →
-  ∀ (lam ν : ι → DomWeight a) (lam' : ι → DomWeight b) (s' s : ι → ℤ),
-    (∀ τ, IsStepWeight (lam τ) (ν τ) (lam' τ) (s' τ) (s τ)) →
-    (∀ τ, a < b ∨ lastEntry (ν τ) = 0) →
-  ∀ (G : VCx ι a b → ℂ) (S : ℝ) (r Om : ι → ℝ) (cD : ι → ℂ),
-    Differentiable ℂ G →
-    (∀ τ, 0 < r τ) →
-    (∀ z, ‖G z‖ ≤ S * Real.exp (unitNormSq r z / 2)) →
-    (∀ τ, 0 < Om τ) →
-    (∀ τ, ‖cD τ * (r τ : ℂ)‖ ^ 2 = 1 / Om τ) →
-    OpNormSqLe lam lam' (jetOp lam lam' (jetC cD G) fun τ => lastEntry (ν τ)) (tmax b ν Om S)
+  ∀ (ι : Type) [Fintype ι] (a b : ℕ),
+    a ≤ b
+      → ∀ (lam ν : ι → DomWeight a) (lam' : ι → DomWeight b) (s' s : ι → ℤ),
+        (∀ τ, IsStepWeight (lam τ) (ν τ) (lam' τ) (s' τ) (s τ)) → (∀ τ, a < b ∨ lastEntry (ν τ) = 0)
+          → ∀ (G : VCx ι a b → ℂ) (S : ℝ) (r Om : ι → ℝ) (cD : ι → ℂ),
+            Differentiable ℂ G → (∀ τ, 0 < r τ) → (∀ z, ‖G z‖ ≤ S * Real.exp (unitNormSq r z / 2))
+              → (∀ τ, 0 < Om τ) → (∀ τ, ‖cD τ * (r τ : ℂ)‖ ^ 2 = 1 / Om τ)
+              → OpNormSqLe lam lam' (jetOp lam lam' (jetC cD G) fun τ => lastEntry (ν τ))
+                (tmax b ν Om S)
 
-theorem natW_eq_padZero {a b : ℕ} (hab : a ≤ b) {lam ν : DomWeight a} {lam' : DomWeight b} {s' s : ℤ}
-    (h : IsStepWeight lam ν lam' s' s) (hg : a < b ∨ lastEntry ν = 0) (i : Fin b) :
-    ((lam'.natW i : ℕ) : ℤ) = padZero b ν i := by
+theorem natW_eq_padZero
+    {a b : ℕ} (hab : a ≤ b)
+    {lam ν : DomWeight a} {lam' : DomWeight b} {s' s : ℤ}
+    (h : IsStepWeight lam ν lam' s' s) (hg : a < b ∨ lastEntry ν = 0)
+    (i : Fin b)
+    : ((lam'.natW i : ℕ) : ℤ) = padZero b ν i := by
   obtain ⟨h1, h2, h3⟩ := h
   have hb : 0 < b := lt_of_le_of_lt (Nat.zero_le _) i.2
   have hpad : ∀ j, 0 ≤ padZero b ν j := by

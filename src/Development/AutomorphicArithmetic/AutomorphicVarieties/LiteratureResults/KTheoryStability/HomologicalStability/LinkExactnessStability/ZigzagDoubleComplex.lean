@@ -8,10 +8,18 @@ open Function
 
 namespace GlobalTheory
 
-theorem zigzag_double_complex : ∀ (A : Type) [AddCommGroup A] (C : ℕ → ℕ → Submodule ℤ A) (h v : A →ₗ[ℤ] A) (p : ℕ), (∀ x, h (h x) = 0) → (∀ x, h (v x) = v (h x)) → (∀ a b, ∀ x ∈ C (a + 1) b, h x ∈ C a b) → (∀ a b, ∀ x ∈ C a (b + 1), v x ∈ C a b) → (∀ b, ∀ x ∈ C 0 b, h x = 0) → (∀ a b, a + b = p → ∀ x ∈ C a b, v x = 0 → ∃ y ∈ C a (b + 1), v y = x) → (∀ a b, a + b = p + 1 → 2 ≤ b → ∀ x ∈ C a b, h x = 0 → ∃ y ∈ C (a + 1) b, h y = x) → (∀ x, v (v x) = 0) → ∀ c ∈ C p 0, h c = 0 → v c = 0 → ∃ z ∈ C p 1, h z = 0 ∧ v z = c := by
+theorem zigzag_double_complex
+    : ∀ (A : Type) [AddCommGroup A] (C : ℕ → ℕ → Submodule ℤ A) (h v : A →ₗ[ℤ] A) (p : ℕ),
+      (∀ x, h (h x) = 0) → (∀ x, h (v x) = v (h x)) → (∀ a b, ∀ x ∈ C (a + 1) b, h x ∈ C a b)
+        → (∀ a b, ∀ x ∈ C a (b + 1), v x ∈ C a b) → (∀ b, ∀ x ∈ C 0 b, h x = 0)
+        → (∀ a b, a + b = p → ∀ x ∈ C a b, v x = 0 → ∃ y ∈ C a (b + 1), v y = x)
+        → (∀ a b, a + b = p + 1 → 2 ≤ b → ∀ x ∈ C a b, h x = 0 → ∃ y ∈ C (a + 1) b, h y = x)
+        → (∀ x, v (v x) = 0)
+        → ∀ c ∈ C p 0, h c = 0 → v c = 0 → ∃ z ∈ C p 1, h z = 0 ∧ v z = c := by
   intro A _ C h v p hh hhv hC1 hC2 h0 hv hH hvv
-  have key : ∀ a b, a + b = p → ∀ c ∈ C a b, h c = 0 → v c = 0 →
-      ∃ z ∈ C a (b + 1), h z = 0 ∧ v z = c := by
+  have key
+      : ∀ a b,
+        a + b = p → ∀ c ∈ C a b, h c = 0 → v c = 0 → ∃ z ∈ C a (b + 1), h z = 0 ∧ v z = c := by
     intro a
     induction a with
     | zero =>

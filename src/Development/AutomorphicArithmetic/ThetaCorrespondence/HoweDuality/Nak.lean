@@ -8,12 +8,18 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.HoweDuality.
 open scoped TensorProduct
 open UpperTheory.Lit.HoweDuality
 
-theorem UpperTheory.Lit.HoweDuality.nak :
-    ∀ {M T R : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup T] [Module ℂ T] (j : R → M →ₗ[ℂ] T) (Op : Set (Module.End ℂ M)) (Rel K : Submodule ℂ M) (N : Submodule ℂ T), (⨆ r, LinearMap.range (j r)) = ⊤ → (∀ g ∈ Op, ∃ Φ : Module.End ℂ T, (∀ r x, Φ (j r x) = j r (g x)) ∧ ∀ t ∈ N, Φ t ∈ N) → (∀ r, ∀ x ∈ Rel, j r x ∈ N) → RadFin Op Rel K → N ⊔ (⨆ r, K.map (j r)) = ⊤ → N = ⊤ := by
+theorem UpperTheory.Lit.HoweDuality.nak
+    : ∀ {M T R : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup T] [Module ℂ T]
+        (j : R → M →ₗ[ℂ] T) (Op : Set (Module.End ℂ M)) (Rel K : Submodule ℂ M) (N : Submodule ℂ T),
+      (⨆ r, LinearMap.range (j r)) = ⊤
+        → (∀ g ∈ Op, ∃ Φ : Module.End ℂ T, (∀ r x, Φ (j r x) = j r (g x)) ∧ ∀ t ∈ N, Φ t ∈ N)
+        → (∀ r, ∀ x ∈ Rel, j r x ∈ N) → RadFin Op Rel K → N ⊔ (⨆ r, K.map (j r)) = ⊤
+        → N = ⊤ := by
   intro M T R _ _ _ _ j Op Rel K N hspan hOp hRel hRad hsup
   classical
-  have h1 : ∀ e ∈ Algebra.adjoin ℂ Op,
-      ∃ Φ : Module.End ℂ T, (∀ r x, Φ (j r x) = j r (e x)) ∧ ∀ t ∈ N, Φ t ∈ N := by
+  have h1
+      : ∀ e ∈ Algebra.adjoin ℂ Op, ∃ Φ : Module.End ℂ T,
+        (∀ r x, Φ (j r x) = j r (e x)) ∧ ∀ t ∈ N, Φ t ∈ N := by
     intro e he
     induction he using Algebra.adjoin_induction with
     | mem g hg => exact hOp g hg
@@ -33,9 +39,11 @@ theorem UpperTheory.Lit.HoweDuality.nak :
       refine ⟨A * B, fun r x => ?_, fun t ht => ?_⟩
       · simp [hA, hB]
       · simpa using hAN _ (hBN t ht)
-  have h2 : ∀ u ∈ (⨆ r, K.map (j r)), ∃ S : Finset M, (∀ k ∈ S, k ∈ K) ∧
-      ∀ (e : Module.End ℂ M) (Φ : Module.End ℂ T), (∀ r x, Φ (j r x) = j r (e x)) →
-        (∀ k ∈ S, e k ∈ Rel) → Φ u ∈ N := by
+  have h2
+      : ∀ u ∈ (⨆ r, K.map (j r)), ∃ S : Finset M,
+        (∀ k ∈ S, k ∈ K)
+          ∧ ∀ (e : Module.End ℂ M) (Φ : Module.End ℂ T),
+            (∀ r x, Φ (j r x) = j r (e x)) → (∀ k ∈ S, e k ∈ Rel) → Φ u ∈ N := by
     intro u hu
     induction hu using Submodule.iSup_induction' with
     | mem r x hx =>
@@ -43,7 +51,8 @@ theorem UpperTheory.Lit.HoweDuality.nak :
       refine ⟨{k}, by simpa using hk, fun e Φ hΦ hS => ?_⟩
       rw [hΦ]
       exact hRel r _ (hS k (Finset.mem_singleton_self k))
-    | zero => exact ⟨∅, by simp, fun e Φ _ _ => by simp⟩
+    | zero =>
+      exact ⟨∅, by simp, fun e Φ _ _ => by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨S, hS, hS'⟩ := hx
       obtain ⟨S2, hS2, hS2'⟩ := hy

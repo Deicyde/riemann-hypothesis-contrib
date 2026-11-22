@@ -11,7 +11,8 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Limits GlobalTheory.LogCris GroundTheory.PAdicHodge
+open CategoryTheory AlgebraicGeometry TensorProduct Limits GlobalTheory.LogCris
+  GroundTheory.PAdicHodge
 
 namespace CrystallineSemistableComparison.Pb
 
@@ -22,7 +23,10 @@ abbrev Amp (M : Model l K) (D : E.LineData M.X) : Prop := IsTautologicalLine M.p
 abbrev lineK {M : Model l K} (D : E.LineData M.X) : E.LineData M.gen := D.pb (pullback.fst _ _)
 
 def LieComplementChartContDiffAt (L : KapL (l := l) (K := K) Amp) : Prop :=
-  ∀ {M : Model l K} (a : (dat Amp).Ch M), M.Sm → ∀ (x : ((dat Amp).H a).N 2) (c : HdR M.q 2), (dat Amp).c1H a x →
-    IsFirstChernDeRham M.q (lineK a.1) c → ∀ φ : Module.Dual K (HdR M.q 2), L.κ a 2 x φ = (per l K).o (φ c)
+  ∀ {M : Model l K} (a : (dat Amp).Ch M),
+    M.Sm
+      → ∀ (x : ((dat Amp).H a).N 2) (c : HdR M.q 2),
+        (dat Amp).c1H a x → IsFirstChernDeRham M.q (lineK a.1) c
+          → ∀ φ : Module.Dual K (HdR M.q 2), L.κ a 2 x φ = (per l K).o (φ c)
 
 end CrystallineSemistableComparison.Pb

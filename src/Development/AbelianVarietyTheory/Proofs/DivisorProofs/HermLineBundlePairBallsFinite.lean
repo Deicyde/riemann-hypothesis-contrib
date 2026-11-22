@@ -17,7 +17,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SmallSection
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
 
 set_option autoImplicit false
@@ -35,7 +36,9 @@ theorem exists_rep (P : Pair p) (a c : ℤ) : ∃ M : HermLB p, P.Rep a c M := b
     · have := GlobalTheory.T.represents_hermitianLineBundle_pow k X p P 1 0 P.L n hL
       rw [mul_one, mul_zero] at this
       exact ⟨_, this⟩
-    · have := GlobalTheory.T.represents_hermitianLineBundle_dual k X p P _ _ _ (GlobalTheory.T.represents_hermitianLineBundle_pow k X p P 1 0 P.L n hL)
+    · have :=
+        GlobalTheory.T.represents_hermitianLineBundle_dual k X p P _ _ _
+          (GlobalTheory.T.represents_hermitianLineBundle_pow k X p P 1 0 P.L n hL)
       rw [mul_one, mul_zero, neg_zero] at this
       exact ⟨_, this⟩
   have h2 : ∃ M : HermLB p, P.Rep 0 c M := by
@@ -43,7 +46,9 @@ theorem exists_rep (P : Pair p) (a c : ℤ) : ∃ M : HermLB p, P.Rep a c M := b
     · have := GlobalTheory.T.represents_hermitianLineBundle_pow k X p P 0 1 P.A n hA
       rw [mul_one, mul_zero] at this
       exact ⟨_, this⟩
-    · have := GlobalTheory.T.represents_hermitianLineBundle_dual k X p P _ _ _ (GlobalTheory.T.represents_hermitianLineBundle_pow k X p P 0 1 P.A n hA)
+    · have :=
+        GlobalTheory.T.represents_hermitianLineBundle_dual k X p P _ _ _
+          (GlobalTheory.T.represents_hermitianLineBundle_pow k X p P 0 1 P.A n hA)
       rw [mul_one, mul_zero, neg_zero] at this
       exact ⟨_, this⟩
   obtain ⟨M₁, h₁⟩ := h1
@@ -52,21 +57,25 @@ theorem exists_rep (P : Pair p) (a c : ℤ) : ∃ M : HermLB p, P.Rep a c M := b
   rw [add_zero, zero_add] at this
   exact ⟨_, this⟩
 
-theorem nu_nonneg (P : Pair p) (a b : ℤ) (σ : k →+* ℂ) (y : CxPts p σ) (f : X.functionField) :
-    0 ≤ P.nu a b σ y f :=
+theorem nu_nonneg (P : Pair p) (a b : ℤ) (σ : k →+* ℂ) (y : CxPts p σ) (f : X.functionField)
+    : 0 ≤ P.nu a b σ y f :=
   mul_nonneg (norm_nonneg _) (Real.exp_pos _).le
 
-theorem smallSec_tens_shift (N M : HermLB p) (t : ℝ) :
-    ((N.tens M).shift (fun _ => t) fun _ => rfl).smallSec ⊆ (N.tens (M.shift (fun _ => t) fun _ => rfl)).smallSec :=
-  fun u hu σ y => by
-    refine le_of_eq_of_le ?_ (hu σ y)
-    simp only [Weight.nsq, HermLB.tens, HermLB.shift, Weight.tens, Weight.addFn]
-    congr 2
-    ring
+theorem smallSec_tens_shift (N M : HermLB p) (t : ℝ)
+    : ((N.tens M).shift (fun _ => t) fun _ => rfl).smallSec
+      ⊆ (N.tens (M.shift (fun _ => t) fun _ => rfl)).smallSec := fun u hu σ y => by
+  refine le_of_eq_of_le ?_ (hu σ y)
+  simp only [Weight.nsq, HermLB.tens, HermLB.shift, Weight.tens, Weight.addFn]
+  congr 2
+  ring
 
-theorem bl_finite : GlobalTheory.Published.ArithHilbertSamuel → ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X]
-    (p : X ⟶ Sp k) (D : ℕ), IsArithVar p D → ∀ (P : Pair p), ∀ (b : ℕ) (s t : X.functionField), P.Good D b s t →
-    ∀ (a c : ℤ) (R : ℝ), GlobalTheory.Published.ArCalc → (P.Bl a c R).Finite := by
+theorem bl_finite
+    : GlobalTheory.Published.ArithHilbertSamuel
+      → ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+        IsArithVar p D
+          → ∀ (P : Pair p), ∀ (b : ℕ) (s t : X.functionField),
+            P.Good D b s t
+              → ∀ (a c : ℤ) (R : ℝ), GlobalTheory.Published.ArCalc → (P.Bl a c R).Finite := by
   intro hHS k _ X _ p D hX P b s t hG a c R hC
   obtain ⟨M, hM⟩ := exists_rep P a c
   obtain ⟨Φ, hΦ⟩ := ((hC.arExists k X p D hX).2 Unit (fun _ => P.A)).1
@@ -83,14 +92,18 @@ theorem bl_finite : GlobalTheory.Published.ArithHilbertSamuel → ∀ (k : Type)
     exact hsm.encard_lt_top
   have hs := hG.s_mem
   obtain ⟨hsH, hsn⟩ := GlobalTheory.T.hermPair_pow_section_mem_and_norm_pow k X p P 0 1 s hs.1 m
-  refine (hB.preimage (f := fun f => s ^ m * f) (mul_right_injective₀ (pow_ne_zero m hG.s_ne)).injOn).subset ?_
+  refine (hB.preimage
+    (f := fun f => s ^ m * f)
+    (mul_right_injective₀ (pow_ne_zero m hG.s_ne)).injOn).subset ?_
   intro f hf
-  obtain ⟨h1, h2⟩ := GlobalTheory.T.hermLineBundlePair_sections_mul_mem_norm_mul k X p P _ _ _ _ (s ^ m) f hsH hf.1
+  obtain ⟨h1, h2⟩ :=
+    GlobalTheory.T.hermLineBundlePair_sections_mul_mem_norm_mul k X p P _ _ _ _ (s ^ m) f hsH hf.1
   refine ⟨h1, fun σ y => ?_⟩
   rw [h2, hsn]
   have n1 : P.nu 0 1 σ y s ≤ 1 := hs.2 σ y
-  calc _ ≤ 1 * P.nu a c σ y f :=
-        mul_le_mul_of_nonneg_right (pow_le_one₀ (nu_nonneg P 0 1 σ y s) n1) (nu_nonneg P a c σ y f)
+  calc
+    _ ≤ 1 * P.nu a c σ y f :=
+      mul_le_mul_of_nonneg_right (pow_le_one₀ (nu_nonneg P 0 1 σ y s) n1) (nu_nonneg P a c σ y f)
     _ ≤ Real.exp R := by rw [one_mul]; exact (hf.2 σ y).trans (by linarith [Real.add_one_le_exp R])
 
 end GlobalTheory.VolBr.BallFinite

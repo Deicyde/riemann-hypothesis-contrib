@@ -13,39 +13,46 @@ open Topology Filter Set
 
 section Abs
 
-variable {K V X : Type} [Field K] [TopologicalSpace K]
-  [AddCommGroup V] [Module K V] [TopologicalSpace V] [IsTopologicalAddGroup V] [ContinuousSMul K V]
-  [AddCommGroup X] [Module K X] [TopologicalSpace X] [IsTopologicalAddGroup X] [ContinuousSMul K X]
+variable
+  {K V X : Type} [Field K] [TopologicalSpace K] [AddCommGroup V] [Module K V] [TopologicalSpace V]
+  [IsTopologicalAddGroup V] [ContinuousSMul K V] [AddCommGroup X] [Module K X] [TopologicalSpace X]
+  [IsTopologicalAddGroup X] [ContinuousSMul K X]
 
 def smulSub {W : Type} [AddCommGroup W] [Module K W] (t : K) (P : AddSubgroup W) : AddSubgroup W :=
   P.map (DistribSMul.toAddMonoidHom W t)
 
 omit [TopologicalSpace K] in
-theorem mem_smulSub {W : Type} [AddCommGroup W] [Module K W] (t : K) (P : AddSubgroup W) (z : W) :
-    z ∈ smulSub t P ↔ ∃ p ∈ P, t • p = z := by
+theorem mem_smulSub {W : Type} [AddCommGroup W] [Module K W] (t : K) (P : AddSubgroup W) (z : W)
+    : z ∈ smulSub t P ↔ ∃ p ∈ P, t • p = z := by
   simp [smulSub, AddSubgroup.mem_map]
 
-theorem coe_smulSub {W : Type} [AddCommGroup W] [Module K W] (t : K) (P : AddSubgroup W) :
-    (smulSub t P : Set W) = (fun p => t • p) '' (P : Set W) := by
+theorem coe_smulSub {W : Type} [AddCommGroup W] [Module K W] (t : K) (P : AddSubgroup W)
+    : (smulSub t P : Set W) = (fun p => t • p) '' (P : Set W) := by
   ext z
   simp [smulSub, AddSubgroup.coe_map]
 
-theorem isOpen_smulSub {W : Type} [AddCommGroup W] [Module K W] [TopologicalSpace W]
-    [ContinuousSMul K W] (t : K) (ht : t ≠ 0) (P : AddSubgroup W) (hP : IsOpen (P : Set W)) :
-    IsOpen (smulSub t P : Set W) := by
+theorem isOpen_smulSub
+    {W : Type} [AddCommGroup W] [Module K W] [TopologicalSpace W] [ContinuousSMul K W]
+    (t : K) (ht : t ≠ 0)
+    (P : AddSubgroup W) (hP : IsOpen (P : Set W))
+    : IsOpen (smulSub t P : Set W) := by
   rw [coe_smulSub]
   exact (Homeomorph.smulOfNeZero t ht).isOpenMap _ hP
 
-theorem isCompact_smulSub {W : Type} [AddCommGroup W] [Module K W] [TopologicalSpace W]
-    [ContinuousSMul K W] (t : K) (P : AddSubgroup W) (hP : IsCompact (P : Set W)) :
-    IsCompact (smulSub t P : Set W) := by
+theorem isCompact_smulSub
+    {W : Type} [AddCommGroup W] [Module K W] [TopologicalSpace W] [ContinuousSMul K W]
+    (t : K)
+    (P : AddSubgroup W) (hP : IsCompact (P : Set W))
+    : IsCompact (smulSub t P : Set W) := by
   rw [coe_smulSub]
   exact hP.image (continuous_const_smul t)
 
-theorem eventually_smul_sub {W : Type} [AddCommGroup W] [Module K W] [TopologicalSpace W]
-    [ContinuousSMul K W] (S : Set W) (hS : IsCompact S) (s : ℕ → K)
-    (hs : Tendsto s atTop (𝓝 0)) (N : Set W) (hN : N ∈ 𝓝 (0 : W)) :
-    ∃ k, ∀ p ∈ S, s k • p ∈ N := by
+theorem eventually_smul_sub
+    {W : Type} [AddCommGroup W] [Module K W] [TopologicalSpace W] [ContinuousSMul K W]
+    (S : Set W) (hS : IsCompact S)
+    (s : ℕ → K) (hs : Tendsto s atTop (𝓝 0))
+    (N : Set W) (hN : N ∈ 𝓝 (0 : W))
+    : ∃ k, ∀ p ∈ S, s k • p ∈ N := by
   have hP : ∀ p ∈ S, ∀ᶠ q : K × W in 𝓝 ((0 : K), p), q.1 • q.2 ∈ N := by
     intro p _
     have h : Tendsto (fun q : K × W => q.1 • q.2) (𝓝 ((0 : K), p)) (𝓝 (0 : W)) := by
@@ -56,12 +63,13 @@ theorem eventually_smul_sub {W : Type} [AddCommGroup W] [Module K W] [Topologica
 
 variable [T2Space X]
 
-theorem reach_of_approx (π : K) (hπ : Tendsto (fun k : ℕ => π ^ k) atTop (𝓝 0))
+theorem reach_of_approx
+    (π : K) (hπ : Tendsto (fun k : ℕ => π ^ k) atTop (𝓝 0))
     (L : AddSubgroup V) (hLc : IsCompact (L : Set V)) (hπL : ∀ w ∈ L, π • w ∈ L)
     (D : V →+ X) (hDc : Continuous D) (hDs : ∀ (t : K) w, D (t • w) = t • D w)
-    (P : AddSubgroup X) (hPc : IsCompact (P : Set X))
-    (hbase : ∀ p ∈ P, ∃ l ∈ L, p - D l ∈ smulSub π P) :
-    ∀ p ∈ P, ∃ l ∈ L, D l = p := by
+    (P : AddSubgroup X)
+    (hPc : IsCompact (P : Set X)) (hbase : ∀ p ∈ P, ∃ l ∈ L, p - D l ∈ smulSub π P)
+    : ∀ p ∈ P, ∃ l ∈ L, D l = p := by
   have hπkL : ∀ k : ℕ, ∀ w ∈ L, π ^ k • w ∈ L := by
     intro k
     induction k with
@@ -105,25 +113,28 @@ theorem reach_of_approx (π : K) (hπ : Tendsto (fun k : ℕ => π ^ k) atTop (�
     (Set.ext_iff.mp (iInter_thick S hSc (fun k => smulSub (π ^ k) P) hb) p).mp hmem
   exact hpS
 
-theorem filt_abstract [ContinuousMul K] (π : K) (hπ0 : π ≠ 0) (hπ : Tendsto (fun k : ℕ => π ^ k) atTop (𝓝 0))
-    (L : AddSubgroup V) (hLo : IsOpen (L : Set V)) (hLc : IsCompact (L : Set V))
-    (hπL : ∀ w ∈ L, π • w ∈ L)
-    (β : V → V → X) (hβc : Continuous fun q : V × V => β q.1 q.2)
-    (hβ1 : ∀ u u' w, β (u + u') w = β u w + β u' w)
-    (hβ2 : ∀ u w w', β u (w + w') = β u w + β u w')
-    (hβs : ∀ (t : K) u w, β u (t • w) = t • β u w)
-    (G : V → X) (hG : ∀ u W, G (u + W) = G u + β u W + G W)
-    (hGs : ∀ (t : K) w, G (t • w) = t • t • G w)
+theorem filt_abstract
+    [ContinuousMul K]
+    (π : K) (hπ0 : π ≠ 0) (hπ : Tendsto (fun k : ℕ => π ^ k) atTop (𝓝 0))
+    (L : AddSubgroup V)
+    (hLo : IsOpen (L : Set V)) (hLc : IsCompact (L : Set V)) (hπL : ∀ w ∈ L, π • w ∈ L)
+    (β : V → V → X)
+    (hβc : Continuous fun q : V × V => β q.1 q.2) (hβ1 : ∀ u u' w, β (u + u') w = β u w + β u' w)
+    (hβ2 : ∀ u w w', β u (w + w') = β u w + β u w') (hβs : ∀ (t : K) u w, β u (t • w) = t • β u w)
+    (G : V → X)
+    (hG : ∀ u W, G (u + W) = G u + β u W + G W) (hGs : ∀ (t : K) w, G (t • w) = t • t • G w)
     (x : V) (hxo : IsOpen (β x '' (L : Set V)))
-    (hsmall : ∀ U ∈ 𝓝 (0 : X), ∃ N2 ∈ 𝓝 (0 : V), ∀ c : K, (∀ w ∈ L, c • w ∈ N2) →
-      ∀ w ∈ L, c • G w ∈ U) :
-    ∃ N ∈ 𝓝 (0 : V), ∀ y, y - x ∈ N → ∀ Λ0 : AddSubgroup V,
-      (∃ c : K, c ≠ 0 ∧ Λ0 = L.map (DistribSMul.toAddMonoidHom V c)) → (Λ0 : Set V) ⊆ N →
-      ∃ (Λ : ℕ → AddSubgroup V) (H : ℕ → AddSubgroup X) (D : V →+ X),
-        Λ 0 = Λ0 ∧ (∀ n, IsOpen (Λ n : Set V)) ∧ (∀ n, IsCompact (Λ n : Set V)) ∧ Antitone Λ ∧
-        (∀ n, IsOpen (H n : Set X)) ∧ (∀ n, IsCompact (H n : Set X)) ∧
-        (∀ N' ∈ 𝓝 (0 : X), ∃ n, (H n : Set X) ⊆ N') ∧ (∀ n, (Λ n).map D = H n) ∧
-        ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n, G (y + Z + W) - G (y + Z) - D W ∈ H (n + 1) := by
+    (hsmall
+      : ∀ U ∈ 𝓝 (0 : X), ∃ N2 ∈ 𝓝 (0 : V), ∀ c : K, (∀ w ∈ L, c • w ∈ N2) → ∀ w ∈ L, c • G w ∈ U)
+    : ∃ N ∈ 𝓝 (0 : V), ∀ y,
+      y - x ∈ N
+        → ∀ Λ0 : AddSubgroup V,
+          (∃ c : K, c ≠ 0 ∧ Λ0 = L.map (DistribSMul.toAddMonoidHom V c)) → (Λ0 : Set V) ⊆ N
+            → ∃ (Λ : ℕ → AddSubgroup V) (H : ℕ → AddSubgroup X) (D : V →+ X),
+              Λ 0 = Λ0 ∧ (∀ n, IsOpen (Λ n : Set V)) ∧ (∀ n, IsCompact (Λ n : Set V)) ∧ Antitone Λ
+                ∧ (∀ n, IsOpen (H n : Set X)) ∧ (∀ n, IsCompact (H n : Set X))
+                ∧ (∀ N' ∈ 𝓝 (0 : X), ∃ n, (H n : Set X) ⊆ N') ∧ (∀ n, (Λ n).map D = H n)
+                ∧ ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n, G (y + Z + W) - G (y + Z) - D W ∈ H (n + 1) := by
   have hβ0 : ∀ w, β 0 w = 0 := fun w => by
     have h := hβ1 0 0 w
     rw [add_zero] at h
@@ -132,8 +143,7 @@ theorem filt_abstract [ContinuousMul K] (π : K) (hπ0 : π ≠ 0) (hπ : Tendst
     have h := hβ2 u 0 0
     rw [add_zero] at h
     simpa using h
-  let Dm : V → V →+ X := fun u =>
-    { toFun := β u, map_zero' := hβ0' u, map_add' := hβ2 u }
+  let Dm : V → V →+ X := fun u => { toFun := β u, map_zero' := hβ0' u, map_add' := hβ2 u }
   have hDm : ∀ u w, Dm u w = β u w := fun _ _ => rfl
   have hDmc : ∀ u, Continuous (Dm u) := fun u =>
     hβc.comp (Continuous.prodMk continuous_const continuous_id)
@@ -167,12 +177,13 @@ theorem filt_abstract [ContinuousMul K] (π : K) (hπ0 : π ≠ 0) (hπ : Tendst
         exact πP.zero_mem
       exact h (hπPo.mem_nhds hm)
     exact hLc.eventually_forall_of_forall_eventually
-      (P := fun (u : V) (w : V) => β u w ∈ (πP : Set X)) hP
+      (P := fun (u : V) (w : V) => β u w ∈ (πP : Set X))
+      hP
   obtain ⟨N2, hN2, hsm⟩ := hsmall πP (hπPo.mem_nhds πP.zero_mem)
   refine ⟨{u | ∀ w ∈ (L : Set V), β u w ∈ (πP : Set X)} ∩ N2, inter_mem hN1 hN2, ?_⟩
   rintro y hy Λ0 ⟨c, hc0, rfl⟩ hsub
-  have hcL : ∀ w ∈ L, c • w ∈ {u | ∀ w ∈ (L : Set V), β u w ∈ (πP : Set X)} ∩ N2 :=
-    fun w hw => hsub (AddSubgroup.mem_map.2 ⟨w, hw, rfl⟩)
+  have hcL : ∀ w ∈ L, c • w ∈ {u | ∀ w ∈ (L : Set V), β u w ∈ (πP : Set X)} ∩ N2 := fun w hw =>
+    hsub (AddSubgroup.mem_map.2 ⟨w, hw, rfl⟩)
   have hcG : ∀ w ∈ L, c • G w ∈ πP := hsm c (fun w hw => (hcL w hw).2)
   have hreach : ∀ p ∈ P, ∃ l ∈ L, Dm y l = p := by
     refine reach_of_approx π hπ L hLc hπL (Dm y) (hDmc y) (fun t w => hβs t y w) P hPc ?_
@@ -208,8 +219,20 @@ theorem filt_abstract [ContinuousMul K] (π : K) (hπ0 : π ≠ 0) (hπ : Tendst
     · rintro ⟨q, hq, rfl⟩
       obtain ⟨l, hl, rfl⟩ := AddSubgroup.mem_map.1 hq
       exact ⟨s n • l, (mem_smulSub _ _ _).2 ⟨l, hl, rfl⟩, by rw [hDm, hDm, hβs]⟩
-  refine ⟨Λ, fun n => (Λ n).map (Dm y), Dm y, ?_, fun n => isOpen_smulSub _ (hs0 n) L hLo,
-    fun n => isCompact_smulSub _ L hLc, ?_, ?_, ?_, ?_, fun n => rfl, ?_⟩
+  refine ⟨
+    Λ,
+    fun n => (Λ n).map (Dm y),
+    Dm y,
+    ?_,
+    fun n => isOpen_smulSub _ (hs0 n) L hLo,
+    fun n => isCompact_smulSub _ L hLc,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    fun n => rfl,
+    ?_
+  ⟩
   · simp only [hΛdef, smulSub, hsc]
   · refine antitone_nat_of_succ_le fun n z hz => ?_
     obtain ⟨l, hl, rfl⟩ := (mem_smulSub _ _ _).1 hz
@@ -241,8 +264,9 @@ theorem filt_abstract [ContinuousMul K] (π : K) (hπ0 : π ≠ 0) (hπ : Tendst
     obtain ⟨w, hw, rfl⟩ := (mem_smulSub _ _ _).1 hW
     rw [hsc]
     show G (y + c • z + s n • w) - G (y + c • z) - β y (s n • w) ∈ (Λ (n + 1)).map (Dm y)
-    have e1 : G (y + c • z + s n • w) - G (y + c • z) - β y (s n • w) =
-        β (c • z) (s n • w) + G (s n • w) := by
+    have e1
+        : G (y + c • z + s n • w) - G (y + c • z) - β y (s n • w)
+          = β (c • z) (s n • w) + G (s n • w) := by
       rw [hG (y + c • z) (s n • w), hβ1 y (c • z)]
       abel
     obtain ⟨p1, hp1, e2⟩ := (mem_smulSub _ _ _).1 ((hcL z hz).1 w hw)

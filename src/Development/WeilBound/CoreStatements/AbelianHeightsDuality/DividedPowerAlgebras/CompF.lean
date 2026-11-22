@@ -11,7 +11,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry DividedPowers
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.PDA
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.PDA
 
 namespace FubiniStudyChowHeightFormula₂.Adr
 
@@ -22,8 +23,8 @@ def InN (κ : DividedPowers I) {s : X ⟶ Sp R} (T : Thick (dp0 R) s) : Prop :=
     IsDPMorphism T.δ δ' (RingHom.id T.B) ∧ IsDPMorphism κ δ' (algebraMap R T.B)
 
 def IsChart (s : X ⟶ Sp R) (U : X.affineOpens) : Prop :=
-  Module.Flat R (Sec s U.1) ∧
-    ∃ (d : ℕ) (t : MvPolynomial (Fin d) R →ₐ[R] Sec s U.1), t.toRingHom.FormallyEtale
+  Module.Flat R (Sec s U.1)
+    ∧ ∃ (d : ℕ) (t : MvPolynomial (Fin d) R →ₐ[R] Sec s U.1), t.toRingHom.FormallyEtale
 
 abbrev Chart (s : X ⟶ Sp R) : Type := {U : X.affineOpens // IsChart s U}
 
@@ -31,16 +32,14 @@ abbrev bas (s : X ⟶ Sp R) (U : X.affineOpens) : Thick (dp0 R) s :=
   Thick.triv (Sec s U.1) (affPt s U) (affPt_w s U)
 
 structure Tag (γ : DividedPowers I) (s : X ⟶ Sp R) {K : Type} (U : K → X.Opens) : Type 1 where
-
   T : Thick γ s
-
   k : K
   le : ⊤ ≤ T.x ⁻¹ᵁ U k
 
 variable {γ : DividedPowers I} {s : X ⟶ Sp R} {K : Type} {U : K → X.Opens}
 
-@[ext] structure Tag.Hom (S T : Tag γ s U) where
-
+@[ext]
+structure Tag.Hom (S T : Tag γ s U) where
   f : S.T ⟶ T.T
   le : U S.k ≤ U T.k
 

@@ -23,8 +23,9 @@ open GroundTheory.Heights₂.Heights.ComplexSets (zeroSet)
 theorem VarIntGraphInt.closed : VarIntGraphInt.Statement :=
   VarIntGraphInt.proof GroundTheory.Heights₂.Heights.IntegralIndep.closed
 
-theorem VarIntGraphCompact.proof (hI : VarIntGraphInt.Statement)
-    (hM : GroundTheory.Heights₂.Heights.ChartMassCompact.Statement) : VarIntGraphCompact.Statement := by
+theorem VarIntGraphCompact.proof
+    (hI : VarIntGraphInt.Statement) (hM : GroundTheory.Heights₂.Heights.ChartMassCompact.Statement)
+    : VarIntGraphCompact.Statement := by
   intro n e J p F Φ hJ hF hFc hΦ
   refine hI n e J p F Φ hJ hF hΦ fun B hB => ?_
   obtain ⟨U, -, hZU, hFU⟩ := hF
@@ -32,12 +33,16 @@ theorem VarIntGraphCompact.proof (hI : VarIntGraphInt.Statement)
     (VarIntAdd.ringKrullDim_of_isFiniteProjection hB) hB (hFU.continuousOn.mono hZU) hΦ (Or.inl hFc)
 
 theorem VarIntGraphCompact.closed : VarIntGraphCompact.Statement :=
-  VarIntGraphCompact.proof VarIntGraphInt.closed GroundTheory.Heights₂.Heights.HilbertSamuel.Closed.ChartMassCompact
+  VarIntGraphCompact.proof VarIntGraphInt.closed
+    GroundTheory.Heights₂.Heights.HilbertSamuel.Closed.ChartMassCompact
 
-theorem LelongPolyLimit.proof_of_compact (hGraph : VarIntGraphCompact.Statement) (hMult : LocalMultComap.Statement)
-    (hWeight : LelongWeightLimit.Statement) : LelongPolyLimit.Statement := by
+theorem LelongPolyLimit.proof_of_compact
+    (hGraph : VarIntGraphCompact.Statement) (hMult : LocalMultComap.Statement)
+    (hWeight : LelongWeightLimit.Statement)
+    : LelongPolyLimit.Statement := by
   intro n d J p f k φ hJ hd hp hf hfc hφ hk hk0
-  obtain ⟨R, hR⟩ := hfc.isCompact.exists_bound_of_continuousOn (MvPolynomial.continuous_eval p).continuousOn
+  obtain ⟨R, hR⟩ :=
+    hfc.isCompact.exists_bound_of_continuousOn (MvPolynomial.continuous_eval p).continuousOn
   let χ : ContDiffBump (0 : ℂ) := ⟨|R| + 1, |R| + 2, by positivity, by linarith⟩
   let F : (Fin (n + 1) → ℂ) → ℝ := fun x => f (Fin.init x) * χ (x (Fin.last n))
   let Φ : Fin d → (Fin (n + 1) → ℂ) → ℝ := fun j x => φ j (Fin.init x)
@@ -55,32 +60,50 @@ theorem LelongPolyLimit.proof_of_compact (hGraph : VarIntGraphCompact.Statement)
     simp only [Φ, graphPt_init]
   have hF : SmoothNear (zeroSet (graphIdeal J p)) F := by
     obtain ⟨U, hU, hJU, hfU⟩ := smoothNear_comp_init p hf
-    exact ⟨U, hU, hJU, hfU.mul ((χ.contDiff.comp (contDiff_apply ℝ (fun _ => ℂ) (Fin.last n))).contDiffOn)⟩
+    exact ⟨
+      U,
+      hU,
+      hJU,
+      hfU.mul ((χ.contDiff.comp (contDiff_apply ℝ (fun _ => ℂ) (Fin.last n))).contDiffOn)
+    ⟩
   have hFc : HasCompactSupport F := by
-    refine HasCompactSupport.intro ((hfc.isCompact.prod χ.hasCompactSupport.isCompact).image
-      (Continuous.finSnoc (A := fun _ => ℂ) continuous_fst continuous_snd :
-        Continuous fun q : (Fin n → ℂ) × ℂ => (Fin.snoc q.1 q.2 : Fin (n + 1) → ℂ))) fun x hx => ?_
+    refine HasCompactSupport.intro
+      ((hfc.isCompact.prod χ.hasCompactSupport.isCompact).image
+        (Continuous.finSnoc (A := fun _ => ℂ) continuous_fst continuous_snd
+          : Continuous fun q : (Fin n → ℂ) × ℂ => (Fin.snoc q.1 q.2 : Fin (n + 1) → ℂ)))
+      fun x hx => ?_
     by_contra h
-    exact hx ⟨(Fin.init x, x (Fin.last n)), ⟨subset_tsupport _ (left_ne_zero_of_mul h),
-      subset_tsupport _ (right_ne_zero_of_mul h)⟩, Fin.snoc_init_self x⟩
-  have hΦ : ∀ j, SmoothNear (zeroSet (graphIdeal J p)) (Φ j) := fun j => smoothNear_comp_init p (hφ j)
-  have key := hWeight (n + 1) d (graphIdeal J p) (Pi.single (Fin.last n) 1) F k' Φ (graphIdeal_isPrime hJ p)
-    ((ringKrullDim_graphIdeal J p).trans hd) (by rw [linForm_single]; exact X_last_not_mem_graphIdeal hp)
-    hF hFc hΦ (smoothNear_comp_init p hk) (fun x hx => hk0 _ (init_mem_zeroSet p hx))
+    exact hx ⟨
+      (Fin.init x, x (Fin.last n)),
+      ⟨subset_tsupport _ (left_ne_zero_of_mul h), subset_tsupport _ (right_ne_zero_of_mul h)⟩,
+      Fin.snoc_init_self x
+    ⟩
+  have hΦ : ∀ j, SmoothNear (zeroSet (graphIdeal J p)) (Φ j) := fun j =>
+    smoothNear_comp_init p (hφ j)
+  have key :=
+    hWeight (n + 1) d (graphIdeal J p) (Pi.single (Fin.last n) 1) F k' Φ (graphIdeal_isPrime hJ p)
+      ((ringKrullDim_graphIdeal J p).trans hd)
+      (by rw [linForm_single]; exact X_last_not_mem_graphIdeal hp) hF hFc hΦ
+      (smoothNear_comp_init p hk) (fun x hx => hk0 _ (init_mem_zeroSet p hx))
   simp only [linEval_single_last, linForm_single] at key
   rw [minimalPrimes_graphIdeal_sup, finsum_mem_image (graphIdeal_injective p).injOn] at key
 
-  have hsum : ∀ W ∈ (J ⊔ Ideal.span {p}).minimalPrimes,
-      (localMult (graphIdeal J p ⊔ Ideal.span {X (Fin.last n)}) (graphIdeal W p) : ℝ) * varInt (graphIdeal W p) d F Φ =
-        (localMult (J ⊔ Ideal.span {p}) W : ℝ) * varInt W d f φ := by
+  have hsum
+      : ∀ W ∈ (J ⊔ Ideal.span {p}).minimalPrimes,
+        (localMult (graphIdeal J p ⊔ Ideal.span {X (Fin.last n)}) (graphIdeal W p) : ℝ)
+            * varInt (graphIdeal W p) d F Φ
+          = (localMult (J ⊔ Ideal.span {p}) W : ℝ) * varInt W d f φ := by
     intro W hW
     have hWp : W.IsPrime := hW.1.1
     have hsub : zeroSet (graphIdeal W p) ⊆ zeroSet (graphIdeal J p) := fun x hx q hq =>
       hx q (graphIdeal_mono p (le_sup_left.trans hW.1.2) hq)
-    have hm : localMult (graphIdeal (J ⊔ Ideal.span {p}) p) (graphIdeal W p) = localMult (J ⊔ Ideal.span {p}) W :=
+    have hm
+        : localMult (graphIdeal (J ⊔ Ideal.span {p}) p) (graphIdeal W p)
+          = localMult (J ⊔ Ideal.span {p}) W :=
       hMult _ _ (graphHom p).toRingHom _ _ (graphHom_surjective p) hWp
-    have hv := hGraph n d W p F Φ hWp (let ⟨U, hU, hJU, hFU⟩ := hF; ⟨U, hU, hsub.trans hJU, hFU⟩) hFc
-      (fun j => let ⟨U, hU, hJU, hΦU⟩ := hΦ j; ⟨U, hU, hsub.trans hJU, hΦU⟩)
+    have hv :=
+      hGraph n d W p F Φ hWp (let ⟨U, hU, hJU, hFU⟩ := hF; ⟨U, hU, hsub.trans hJU, hFU⟩) hFc
+        (fun j => let ⟨U, hU, hJU, hΦU⟩ := hΦ j; ⟨U, hU, hsub.trans hJU, hΦU⟩)
     rw [graphIdeal_sup_span, hm, hv, hFγ, hΦγ]
   rw [finsum_mem_congr rfl hsum] at key
 
@@ -89,8 +112,12 @@ theorem LelongPolyLimit.proof_of_compact (hGraph : VarIntGraphCompact.Statement)
   obtain ⟨U, hU, hJU, hkU⟩ := smoothNear_comp_init p hk
   have hG : SmoothNear (zeroSet (graphIdeal J p))
       (fun x => Real.log (‖x (Fin.last n)‖ ^ 2 + ε * k' x ^ 2) / 2) := by
-    refine ⟨U ∩ k' ⁻¹' Set.Ioi 0, hkU.continuousOn.isOpen_inter_preimage hU isOpen_Ioi,
-      fun x hx => ⟨hJU hx, hk0 _ (init_mem_zeroSet p hx)⟩, ?_⟩
+    refine ⟨
+      U ∩ k' ⁻¹' Set.Ioi 0,
+      hkU.continuousOn.isOpen_inter_preimage hU isOpen_Ioi,
+      fun x hx => ⟨hJU hx, hk0 _ (init_mem_zeroSet p hx)⟩,
+      ?_
+    ⟩
     refine ContDiffOn.div_const (ContDiffOn.log ?_ fun x hx => ?_) _
     · exact ((contDiff_norm_sq ℝ).comp (contDiff_apply ℝ (fun _ => ℂ) (Fin.last n))).contDiffOn.add
         (contDiffOn_const.mul ((hkU.mono Set.inter_subset_left).pow 2))
@@ -102,8 +129,9 @@ theorem LelongPolyLimit.proof_of_compact (hGraph : VarIntGraphCompact.Statement)
   · simp [graphPt_init, graphPt_last, k']
   · simp [Φ, graphPt_init]
 
-theorem LelongPolyLimit.of_mult_weight (hMult : LocalMultComap.Statement) (hWeight : LelongWeightLimit.Statement) :
-    LelongPolyLimit.Statement :=
+theorem LelongPolyLimit.of_mult_weight
+    (hMult : LocalMultComap.Statement) (hWeight : LelongWeightLimit.Statement)
+    : LelongPolyLimit.Statement :=
   LelongPolyLimit.proof_of_compact VarIntGraphCompact.closed hMult hWeight
 
 end GroundTheory.Heights₂.Heights.Targets

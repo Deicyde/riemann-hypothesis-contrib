@@ -9,8 +9,8 @@ open Polynomial GlobalTheory.CuspGL
 
 namespace GlobalTheory.CuspGL.ConvCancel
 
-theorem finite_pairs {F : Type} [Field F] (P : F[X]) (hP : P ≠ 0) :
-    {x : F[X] × F[X] | x.1.Monic ∧ x.2.Monic ∧ x.1 * x.2 = P}.Finite := by
+theorem finite_pairs {F : Type} [Field F] (P : F[X]) (hP : P ≠ 0)
+    : {x : F[X] × F[X] | x.1.Monic ∧ x.2.Monic ∧ x.1 * x.2 = P}.Finite := by
   classical
   have hfin : {g : F[X] | g.Monic ∧ g ∣ P}.Finite := by
     have h := Polynomial.fintypeSubtypeMonicDvd P hP
@@ -19,8 +19,10 @@ theorem finite_pairs {F : Type} [Field F] (P : F[X]) (hP : P ≠ 0) :
   rintro ⟨D, E⟩ ⟨hD, hE, h⟩
   exact ⟨⟨hD, Dvd.intro _ h⟩, ⟨hE, Dvd.intro_left _ h⟩⟩
 
-theorem conv_cancel : ∀ (F : Type) [Field F] (a b m : F[X] → ℂ), m 1 = 1 →
-    (∀ P : F[X], P.Monic → conv a m P = conv b m P) → ∀ P : F[X], P.Monic → a P = b P := by
+theorem conv_cancel
+    : ∀ (F : Type) [Field F] (a b m : F[X] → ℂ),
+      m 1 = 1 → (∀ P : F[X], P.Monic → conv a m P = conv b m P)
+        → ∀ P : F[X], P.Monic → a P = b P := by
   intro F _ a b m hm h P
   classical
   induction hn : P.natDegree using Nat.strong_induction_on generalizing P with
@@ -30,11 +32,11 @@ theorem conv_cancel : ∀ (F : Type) [Field F] (a b m : F[X] → ℂ), m 1 = 1 �
     have h1 := h P hP
     unfold conv at h1
     rw [finsum_mem_eq_finite_toFinset_sum _ hfin, finsum_mem_eq_finite_toFinset_sum _ hfin] at h1
-    have hmem : ((P, 1) : F[X] × F[X]) ∈ hfin.toFinset := by
-      simp [hP]
+    have hmem : ((P, 1) : F[X] × F[X]) ∈ hfin.toFinset := by simp [hP]
     rw [← Finset.add_sum_erase _ _ hmem, ← Finset.add_sum_erase _ _ hmem] at h1
-    have h2 : ∑ x ∈ hfin.toFinset.erase (P, 1), a x.1 * m x.2
-        = ∑ x ∈ hfin.toFinset.erase (P, 1), b x.1 * m x.2 := by
+    have h2
+        : ∑ x ∈ hfin.toFinset.erase (P, 1), a x.1 * m x.2
+          = ∑ x ∈ hfin.toFinset.erase (P, 1), b x.1 * m x.2 := by
       refine Finset.sum_congr rfl ?_
       rintro ⟨D, E⟩ hx
       rw [Finset.mem_erase, Set.Finite.mem_toFinset] at hx

@@ -16,7 +16,9 @@ public import Development.AutomorphicSpectrum.Proofs.NonGaloisProofs.GoodOAdicCo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
 
 noncomputable section
 
@@ -24,13 +26,15 @@ namespace GlobalTheory.CompanionTheory.LatTop
 
 section General
 
-variable {LL O V : Type} [Field LL] [CommRing O] [IsDomain O] [Algebra O LL] [IsFractionRing O LL]
+variable
+  {LL O V : Type} [Field LL] [CommRing O] [IsDomain O] [Algebra O LL] [IsFractionRing O LL]
   [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
 
-theorem exists_basis (M : Submodule O V) (hfg : M.FG) (hfree : Module.Free O M)
-    (hspan : Submodule.span LL (M : Set V) = ⊤) :
-    ∃ (ι : Type) (_ : Fintype ι) (b : Module.Basis ι LL V),
-      ∀ x, x ∈ M ↔ ∀ i, ∃ a : O, b.repr x i = algebraMap O LL a := by
+theorem exists_basis
+    (M : Submodule O V)
+    (hfg : M.FG) (hfree : Module.Free O M) (hspan : Submodule.span LL (M : Set V) = ⊤)
+    : ∃ (ι : Type) (_ : Fintype ι) (b : Module.Basis ι LL V), ∀ x,
+      x ∈ M ↔ ∀ i, ∃ a : O, b.repr x i = algebraMap O LL a := by
   haveI : Module.Finite O M := Module.Finite.iff_fg.2 hfg
   have hfull : ∀ v : V, ∃ c : O, c ≠ 0 ∧ ∃ m : M, algebraMap O LL c • v = (m : V) := by
     intro v
@@ -42,11 +46,11 @@ theorem exists_basis (M : Submodule O V) (hfg : M.FG) (hfree : Module.Free O M)
       obtain ⟨c, hc, m, hm⟩ := hx
       obtain ⟨d, hd, m', hm'⟩ := hy
       refine ⟨c * d, mul_ne_zero hc hd, d • m + c • m', ?_⟩
-      have e1 : ((d • m + c • m' : M) : V) =
-          algebraMap O LL d • (m : V) + algebraMap O LL c • (m' : V) := by
+      have e1
+          : ((d • m + c • m' : M) : V)
+            = algebraMap O LL d • (m : V) + algebraMap O LL c • (m' : V) := by
         simp [algebraMap_smul]
-      rw [e1, ← hm, ← hm', map_mul, smul_add, smul_smul, smul_smul,
-        mul_comm (algebraMap O LL d)]
+      rw [e1, ← hm, ← hm', map_mul, smul_add, smul_smul, smul_smul, mul_comm (algebraMap O LL d)]
     | smul a x _ hx =>
       obtain ⟨c, hc, m, hm⟩ := hx
       obtain ⟨⟨n, d⟩, hnd⟩ := IsLocalization.surj (nonZeroDivisors O) a
@@ -56,9 +60,11 @@ theorem exists_basis (M : Submodule O V) (hfg : M.FG) (hfree : Module.Free O M)
       rw [e1, ← hm, ← hnd, map_mul, smul_smul, smul_smul]
       congr 1
       ring
-  obtain ⟨b, hb, hr⟩ := GlobalTheory.Cyc.exists_basis_of_fullLattice (R := O) (F := LL) (M := M) (V := V)
-    M.subtype.toAddMonoidHom Subtype.val_injective
-    (fun c m => by simp [algebraMap_smul]) (by simpa using hfull) (Module.Free.chooseBasis O M)
+  obtain ⟨b, hb, hr⟩ :=
+    GlobalTheory.Cyc.exists_basis_of_fullLattice (R := O) (F := LL) (M := M) (V := V)
+      M.subtype.toAddMonoidHom Subtype.val_injective
+      (fun c m => by simp [algebraMap_smul])
+      (by simpa using hfull) (Module.Free.chooseBasis O M)
   refine ⟨_, inferInstance, b, fun x => ⟨fun hx i => ⟨_, hr ⟨x, hx⟩ i⟩, fun h => ?_⟩⟩
   choose a ha using h
   rw [← b.sum_repr x]
@@ -68,44 +74,54 @@ theorem exists_basis (M : Submodule O V) (hfg : M.FG) (hfree : Module.Free O M)
   rw [hb i]
   exact (Module.Free.chooseBasis O M i).2
 
-theorem mem_of_dual_dual {V' : Type} [AddCommGroup V'] [Module LL V'] [FiniteDimensional LL V]
-    [FiniteDimensional LL V'] (M : Submodule O V) (hfg : M.FG) (hfree : Module.Free O M)
-    (hspan : Submodule.span LL (M : Set V) = ⊤) (M' : Set V') (P : V →ₗ[LL] V' →ₗ[LL] LL)
-    (hinj : ∀ y, (∀ x, P x y = 0) → y = 0) (hrank : finrank LL V = finrank LL V')
+theorem mem_of_dual_dual
+    {V' : Type} [AddCommGroup V'] [Module LL V'] [FiniteDimensional LL V] [FiniteDimensional LL V']
+    (M : Submodule O V)
+    (hfg : M.FG) (hfree : Module.Free O M) (hspan : Submodule.span LL (M : Set V) = ⊤)
+    (M' : Set V')
+    (P : V →ₗ[LL] V' →ₗ[LL] LL) (hinj : ∀ y, (∀ x, P x y = 0) → y = 0)
+    (hrank : finrank LL V = finrank LL V')
     (hM' : ∀ y, y ∈ M' ↔ ∀ x ∈ M, ∃ a : O, P x y = algebraMap O LL a)
-    (x : V) (hx : ∀ y ∈ M', ∃ a : O, P x y = algebraMap O LL a) : x ∈ M := by
+    (x : V) (hx : ∀ y ∈ M', ∃ a : O, P x y = algebraMap O LL a)
+    : x ∈ M := by
   obtain ⟨ι, _, b, hb⟩ := exists_basis M hfg hfree hspan
   have hi : Function.Injective P.flip := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro y hy
     exact hinj y fun x => by simpa using LinearMap.congr_fun hy x
   have hs : Function.Surjective P.flip :=
-    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
-      (by rw [Subspace.dual_finrank_eq, hrank])).1 hi
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by
+      rw [Subspace.dual_finrank_eq, hrank])).1 hi
   have hy : ∀ i, ∃ y : V', ∀ v, P v y = b.repr v i := fun i => by
     obtain ⟨y, hy⟩ := hs (b.coord i)
     exact ⟨y, fun v => by simpa using LinearMap.congr_fun hy v⟩
   choose y hy using hy
   rw [hb]
   intro i
-  have hyi : y i ∈ M' := (hM' _).2 fun v hv => by
-    obtain ⟨a, ha⟩ := (hb v).1 hv i
-    exact ⟨a, by rw [hy, ha]⟩
+  have hyi : y i ∈ M' :=
+    (hM' _).2 fun v hv => by
+      obtain ⟨a, ha⟩ := (hb v).1 hv i
+      exact ⟨a, by rw [hy, ha]⟩
   obtain ⟨a, ha⟩ := hx _ hyi
   exact ⟨a, by rw [← hy, ha]⟩
 
 variable [TopologicalSpace LL] [IsTopologicalRing LL] [TopologicalSpace V] [IsModuleTopology LL V]
 
-theorem isCompact_lattice (hC : IsCompact (Set.range (algebraMap O LL))) (M : Submodule O V)
-    (hfg : M.FG) (hfree : Module.Free O M) (hspan : Submodule.span LL (M : Set V) = ⊤) :
-    IsCompact (M : Set V) := by
+theorem isCompact_lattice
+    (hC : IsCompact (Set.range (algebraMap O LL)))
+    (M : Submodule O V)
+    (hfg : M.FG) (hfree : Module.Free O M) (hspan : Submodule.span LL (M : Set V) = ⊤)
+    : IsCompact (M : Set V) := by
   obtain ⟨ι, _, b, hb⟩ := exists_basis M hfg hfree hspan
   haveI := IsModuleTopology.toContinuousSMul LL V
   haveI := IsModuleTopology.toContinuousAdd LL V
   have hc : Continuous fun c : ι → LL => ∑ i, c i • b i :=
     continuous_finsetSum _ fun i _ => (continuous_apply i).smul continuous_const
-  have he : (M : Set V) = (fun c : ι → LL => ∑ i, c i • b i) ''
-      Set.pi Set.univ (fun _ => Set.range (algebraMap O LL)) := by
+  have he
+      : (M : Set V)
+        = (fun c : ι → LL => ∑ i, c i • b i)
+          '' Set.pi Set.univ (fun _ => Set.range (algebraMap O LL)) := by
     ext x
     constructor
     · intro hx
@@ -120,11 +136,15 @@ theorem isCompact_lattice (hC : IsCompact (Set.range (algebraMap O LL))) (M : Su
   rw [he]
   exact (isCompact_univ_pi fun _ => hC).image hc
 
-theorem hasBasis_lattice (M : Submodule O V) (hopen : IsOpen (M : Set V))
-    (hcomp : IsCompact (M : Set V)) (ϖ : O) (hϖ : ϖ ≠ 0)
-    (hB : (nhds (0 : LL)).HasBasis (fun _ : ℕ => True)
-      (fun n => (fun o : O => algebraMap O LL (ϖ ^ n * o)) '' Set.univ)) :
-    (nhds (0 : V)).HasBasis (fun _ : ℕ => True) (fun n => (fun x => ϖ ^ n • x) '' (M : Set V)) := by
+theorem hasBasis_lattice
+    (M : Submodule O V) (hopen : IsOpen (M : Set V)) (hcomp : IsCompact (M : Set V))
+    (ϖ : O) (hϖ : ϖ ≠ 0)
+    (hB : (nhds (0 : LL)).HasBasis
+      (fun _ : ℕ => True)
+      (fun n => (fun o : O => algebraMap O LL (ϖ ^ n * o)) '' Set.univ))
+    : (nhds (0 : V)).HasBasis
+      (fun _ : ℕ => True)
+      (fun n => (fun x => ϖ ^ n • x) '' (M : Set V)) := by
   haveI := IsModuleTopology.toContinuousSMul LL V
   have hne : ∀ n : ℕ, algebraMap O LL (ϖ ^ n) ≠ 0 := fun n => by
     rw [Ne, map_eq_zero_iff _ (IsFractionRing.injective O LL)]
@@ -132,8 +152,8 @@ theorem hasBasis_lattice (M : Submodule O V) (hopen : IsOpen (M : Set V))
   refine Filter.hasBasis_iff.2 fun t => ⟨fun ht => ?_, ?_⟩
   · have hn : IsOpen ((fun p : LL × V => p.1 • p.2) ⁻¹' interior t) :=
       isOpen_interior.preimage continuous_smul
-    obtain ⟨u, v, hu, -, h0, hv, huv⟩ := generalized_tube_lemma (isCompact_singleton (x := (0 : LL)))
-      hcomp hn (by
+    obtain ⟨u, v, hu, -, h0, hv, huv⟩ :=
+      generalized_tube_lemma (isCompact_singleton (x := (0 : LL))) hcomp hn (by
         rintro ⟨a, x⟩ ⟨ha, -⟩
         have ha' : a = 0 := ha
         simpa [ha'] using mem_interior_iff_mem_nhds.2 ht)
@@ -151,11 +171,15 @@ theorem hasBasis_lattice (M : Submodule O V) (hopen : IsOpen (M : Set V))
     show ϖ ^ n • (algebraMap O LL (ϖ ^ n))⁻¹ • y = y
     rw [← algebraMap_smul LL (ϖ ^ n), smul_smul, mul_inv_cancel₀ (hne n), one_smul]
 
-theorem exists_pow_smul_mem {G : Type} [TopologicalSpace G] [CompactSpace G] (M : Submodule O V)
-    (hopen : IsOpen (M : Set V)) (ϖ : O)
-    (hB : (nhds (0 : LL)).HasBasis (fun _ : ℕ => True)
+theorem exists_pow_smul_mem
+    {G : Type} [TopologicalSpace G] [CompactSpace G]
+    (M : Submodule O V) (hopen : IsOpen (M : Set V))
+    (ϖ : O)
+    (hB : (nhds (0 : LL)).HasBasis
+      (fun _ : ℕ => True)
       (fun n => (fun o : O => algebraMap O LL (ϖ ^ n * o)) '' Set.univ))
-    (c : G → V) (hc : Continuous c) : ∃ n : ℕ, ∀ g, ϖ ^ n • c g ∈ M := by
+    (c : G → V) (hc : Continuous c)
+    : ∃ n : ℕ, ∀ g, ϖ ^ n • c g ∈ M := by
   haveI := IsModuleTopology.toContinuousSMul LL V
   have hcov : Set.range c ⊆ ⋃ n : ℕ, {x : V | ϖ ^ n • x ∈ M} := by
     rintro _ ⟨g, rfl⟩
@@ -166,18 +190,21 @@ theorem exists_pow_smul_mem {G : Type} [TopologicalSpace G] [CompactSpace G] (M 
     rw [algebraMap_smul] at h1
     exact Set.mem_iUnion.2 ⟨n, h1⟩
   have hop : ∀ n : ℕ, IsOpen {x : V | ϖ ^ n • x ∈ M} := fun n => by
-    have : {x : V | ϖ ^ n • x ∈ M} = (fun x : V => algebraMap O LL (ϖ ^ n) • x) ⁻¹' (M : Set V) := by
+    have : {x : V | ϖ ^ n • x ∈ M}
+        = (fun x : V => algebraMap O LL (ϖ ^ n) • x) ⁻¹' (M : Set V) := by
       ext x
       simp only [Set.mem_setOf_eq, Set.mem_preimage, SetLike.mem_coe, algebraMap_smul]
     rw [this]
     exact hopen.preimage (continuous_const_smul _)
   have hdir : Directed (· ⊆ ·) fun n : ℕ => {x : V | ϖ ^ n • x ∈ M} :=
-    Monotone.directed_le (f := fun n : ℕ => {x : V | ϖ ^ n • x ∈ M}) fun m n hmn x hx => by
-      obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn
-      have : ϖ ^ (m + k) • x = ϖ ^ k • ϖ ^ m • x := by rw [smul_smul, pow_add, mul_comm]
-      show ϖ ^ (m + k) • x ∈ M
-      rw [this]
-      exact M.smul_mem _ hx
+    Monotone.directed_le
+      (f := fun n : ℕ => {x : V | ϖ ^ n • x ∈ M})
+      fun m n hmn x hx => by
+        obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn
+        have : ϖ ^ (m + k) • x = ϖ ^ k • ϖ ^ m • x := by rw [smul_smul, pow_add, mul_comm]
+        show ϖ ^ (m + k) • x ∈ M
+        rw [this]
+        exact M.smul_mem _ hx
   obtain ⟨n, hn⟩ := (isCompact_range hc).elim_directed_cover _ hop hcov hdir
   exact ⟨n, fun g => hn ⟨g, rfl⟩⟩
 

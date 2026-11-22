@@ -7,10 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem residue_eq_map_algebraMap_comp_res_of_isCO {O' C : Type} [CommRing O'] [IsLocalRing O'] [CommRing C] [Algebra O' C]
-    [IsCO O' C] [IsLocalHom (algebraMap O' C)] :
-    IsLocalRing.residue C =
-      (IsLocalRing.ResidueField.map (algebraMap O' C)).comp (res O' C : C →+* ResidueField O') := by
+private theorem residue_eq_map_algebraMap_comp_res_of_isCO
+    {O' C : Type} [CommRing O'] [IsLocalRing O'] [CommRing C] [Algebra O' C] [IsCO O' C]
+    [IsLocalHom (algebraMap O' C)]
+    : IsLocalRing.residue C
+      = (IsLocalRing.ResidueField.map (algebraMap O' C)).comp
+        (res O' C : C →+* ResidueField O') := by
   ext z
   obtain ⟨a, ha⟩ := IsCO.res_surj (O := O') z
   have h1 : (res O' C) z = (res O' C) (algebraMap O' C a) := by
@@ -22,14 +24,22 @@ private theorem residue_eq_map_algebraMap_comp_res_of_isCO {O' C : Type} [CommRi
   rw [RingHom.comp_apply, RingHom.coe_coe, h1, h2, AlgHom.commutes]
   exact (IsLocalRing.ResidueField.map_residue _ a).symm
 
-private theorem nRep_isBar_of_isBar_comp_map {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k} {n : ℕ}
-    {K K' : Type} [Field K] [CommRing K'] [Nontrivial K'] (f : k →+* K) (j : K →+* K')
-    (σ : NRep F n K) (h : NRep.IsBar (j.comp f) (NRep.map j σ)) : NRep.IsBar f σ := by
+private theorem nRep_isBar_of_isBar_comp_map
+    {l : ℕ} [Fact l.Prime]
+    {k : Type} [Field k]
+    {F : Frame l k} {n : ℕ} {K K' : Type} [Field K] [CommRing K'] [Nontrivial K']
+    (f : k →+* K) (j : K →+* K') (σ : NRep F n K) (h : NRep.IsBar (j.comp f) (NRep.map j σ))
+    : NRep.IsBar f σ := by
   unfold NRep.IsBar at h ⊢
   exact ⟨fun g i => j.injective (h.1 g i), fun v i g => j.injective (h.2 v i g)⟩
 
-theorem UpperTheory.V.Fr.pr_res :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (x : Ideal S.A) (L : S.Loc x), (∃ φ : ResidueField O →+* ResidueField L.O', (L.ρ.bar L.O').IsBar φ) ∧ ((∀ g, UpT ((L.ρ.bar L.O').r g)) ∨ ∀ g, UpT ((L.ρ.bar L.O').r g)ᵀ) := by
+theorem UpperTheory.V.Fr.pr_res
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ},
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ S : Space O F n, ∀ (x : Ideal S.A) (L : S.Loc x),
+          (∃ φ : ResidueField O →+* ResidueField L.O', (L.ρ.bar L.O').IsBar φ)
+            ∧ ((∀ g, UpT ((L.ρ.bar L.O').r g)) ∨ ∀ g, UpT ((L.ρ.bar L.O').r g)ᵀ) := by
   intro l _ O _ _ _ _ F C₀ n hF hn S x L
   have hOloc : IsLocalHom (algebraMap O L.O') := by
     refine ⟨fun a ha => ?_⟩

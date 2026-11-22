@@ -6,9 +6,13 @@ public import Mathlib
 
 namespace UpperTheory.Reformulated.B.NormLtOne
 
-theorem norm_lt_one {l : ℕ} [Fact l.Prime] {O R : Type} [CommRing O] [Algebra ℤ_[l] O]
-    [Algebra O (PadicAlgCl l)] [IsScalarTower ℤ_[l] O (PadicAlgCl l)] [CommRing R] [IsLocalRing R] [Algebra O R]
-    (y : R →ₐ[O] PadicAlgCl l) (a : R) (ha : a ∈ IsLocalRing.maximalIdeal R) : ‖y a‖ < 1 := by
+theorem norm_lt_one
+    {l : ℕ} [Fact l.Prime]
+    {O R : Type} [CommRing O] [Algebra ℤ_[l] O] [Algebra O (PadicAlgCl l)]
+    [IsScalarTower ℤ_[l] O (PadicAlgCl l)] [CommRing R] [IsLocalRing R] [Algebra O R]
+    (y : R →ₐ[O] PadicAlgCl l)
+    (a : R) (ha : a ∈ IsLocalRing.maximalIdeal R)
+    : ‖y a‖ < 1 := by
   by_contra hx
   rw [not_lt] at hx
   have hx0 : y a ≠ 0 := by
@@ -27,8 +31,10 @@ theorem norm_lt_one {l : ℕ} [Fact l.Prime] {O R : Type} [CommRing O] [Algebra 
   generalize minpoly ℚ_[l] (y a)⁻¹ = P at hmon hc hz
   rw [Polynomial.aeval_eq_sum_range, Finset.sum_range_succ, hmon.coeff_natDegree, one_smul] at hz
   let c : ℕ → ℤ_[l] := fun i => ⟨P.coeff i, hc i⟩
-  have hr : (∑ i ∈ Finset.range P.natDegree,
-      algebraMap O R (algebraMap ℤ_[l] O (c i)) * a ^ (P.natDegree - i)) ∈ IsLocalRing.maximalIdeal R := by
+  have hr
+      : (∑ i ∈ Finset.range P.natDegree,
+          algebraMap O R (algebraMap ℤ_[l] O (c i)) * a ^ (P.natDegree - i))
+        ∈ IsLocalRing.maximalIdeal R := by
     refine Ideal.sum_mem _ fun i hi => Ideal.mul_mem_left _ _ (Ideal.pow_mem_of_mem _ ha _ ?_)
     have := Finset.mem_range.mp hi
     omega

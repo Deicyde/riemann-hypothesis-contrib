@@ -89,8 +89,8 @@ lemma fp_isUnit (x : fpSub f₁ f₂) (h : IsUnit x.1.1) : IsUnit x := by
     exact h2.mul_val_inv
 
 instance fp_local : IsLocalRing (fpSub f₁ f₂) := by
-  have : Nontrivial (fpSub f₁ f₂) := ⟨⟨0, 1, fun h =>
-    zero_ne_one (α := (R₁ : Type u)) (congrArg (fun z : fpSub f₁ f₂ => z.1.1) h)⟩⟩
+  have : Nontrivial (fpSub f₁ f₂) :=
+    ⟨⟨0, 1, fun h => zero_ne_one (α := (R₁ : Type u)) (congrArg (fun z : fpSub f₁ f₂ => z.1.1) h)⟩⟩
   refine IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun x => ?_
   rcases IsLocalRing.isUnit_or_isUnit_one_sub_self x.1.1 with h | h
   · exact Or.inl (fp_isUnit f₁ f₂ x h)
@@ -103,9 +103,11 @@ def FP.p₁ : LHom (FP f₁ f₂) R₁ :=
 
 lemma FP.mem (x : (FP f₁ f₂ : Type u)) : f₁.1 x.1.1 = f₂.1 x.1.2 := (mem_fpSub f₁ f₂ x.1).1 x.2
 
-def FP.p₂ : LHom (FP f₁ f₂) R₂ :=
-  ⟨(AlgHom.snd R₀ R₁ R₂).comp (fpSub f₁ f₂).val, ⟨fun x h => fp_isUnit f₁ f₂ x
-    (f₁.2.map_nonunit _ (by convert h.map f₂.1 using 1; exact FP.mem f₁ f₂ x))⟩⟩
+def FP.p₂ : LHom (FP f₁ f₂) R₂ := ⟨
+  (AlgHom.snd R₀ R₁ R₂).comp (fpSub f₁ f₂).val,
+  ⟨fun x h =>
+    fp_isUnit f₁ f₂ x (f₁.2.map_nonunit _ (by convert h.map f₂.1 using 1; exact FP.mem f₁ f₂ x))⟩
+⟩
 
 lemma FP.ext {x y : (FP f₁ f₂ : Type u)} (h1 : x.1.1 = y.1.1) (h2 : x.1.2 = y.1.2) : x = y :=
   Subtype.ext (Prod.ext h1 h2)
@@ -116,10 +118,11 @@ lemma FP.isFibreSq (h₁ : f₁.NilSurj) (h₂ : f₂.NilSurj) :
   refine ⟨⟨(a, b), (mem_fpSub f₁ f₂ (a, b)).2 hab⟩, ⟨rfl, rfl⟩, fun c hc => ?_⟩
   exact FP.ext f₁ f₂ hc.1 hc.2
 
-def FP.lift {T : LAlg R₀} (g₁ : LHom T R₁) (g₂ : LHom T R₂)
-    (h : ∀ t, f₁.1 (g₁.1 t) = f₂.1 (g₂.1 t)) : LHom T (FP f₁ f₂) :=
-  ⟨(g₁.1.prod g₂.1).codRestrict (fpSub f₁ f₂) (fun t => (mem_fpSub f₁ f₂ _).2 (h t)),
-    ⟨fun t ht => g₁.2.map_nonunit t (ht.map (FP.p₁ f₁ f₂).1)⟩⟩
+def FP.lift {T : LAlg R₀} (g₁ : LHom T R₁) (g₂ : LHom T R₂) (h : ∀ t, f₁.1 (g₁.1 t) = f₂.1 (g₂.1 t))
+    : LHom T (FP f₁ f₂) := ⟨
+  (g₁.1.prod g₂.1).codRestrict (fpSub f₁ f₂) (fun t => (mem_fpSub f₁ f₂ _).2 (h t)),
+  ⟨fun t ht => g₁.2.map_nonunit t (ht.map (FP.p₁ f₁ f₂).1)⟩
+⟩
 
 end FP
 
@@ -211,14 +214,17 @@ def frAlg (r : (R : Type u)) : (Dp.D : Type u) →ₐ[R₀] (Dp.D : Type u) wher
     linear_combination -(Dp.σ.1 (Dp.κ b) * Dp.σ.1 r * (Dp.σ.1 (Dp.κ b') * Dp.σ.1 r)) * Dp.η_sq
   map_zero' := by rw [map_zero, map_zero, Dp.κ_zero, zero_mul, map_zero, zero_mul, add_zero]
   map_add' b b' := by simp only [map_add (f := _), Dp.κ_add, add_mul]; ring
-  commutes' c := by
-    simp only [Dp.κ_algebraMap, zero_mul, map_zero, add_zero, AlgHom.commutes]
+  commutes' c := by simp only [Dp.κ_algebraMap, zero_mul, map_zero, add_zero, AlgHom.commutes]
 
-def fr (r : (R : Type u)) : LHom Dp.D Dp.D :=
-  ⟨Dp.frAlg r, ⟨fun b hb => Dp.π.2.map_nonunit b (by
-    convert hb.map Dp.π.1 using 1
-    show _ = Dp.π.1 (Dp.σ.1 (Dp.π.1 b) + Dp.σ.1 (Dp.κ b * r) * Dp.η)
-    rw [map_add (f := _), map_mul, Dp.π_η, mul_zero, add_zero, Dp.sect]; rfl)⟩⟩
+def fr (r : (R : Type u)) : LHom Dp.D Dp.D := ⟨
+  Dp.frAlg r,
+  ⟨fun b hb =>
+    Dp.π.2.map_nonunit b (by
+      convert hb.map Dp.π.1 using 1
+      show _ = Dp.π.1 (Dp.σ.1 (Dp.π.1 b) + Dp.σ.1 (Dp.κ b * r) * Dp.η)
+      rw [map_add (f := _), map_mul, Dp.π_η, mul_zero, add_zero, Dp.sect]
+      rfl)⟩
+⟩
 
 lemma fr_apply (r : (R : Type u)) (b : (Dp.D : Type u)) :
     (Dp.fr r).1 b = Dp.σ.1 (Dp.π.1 b) + Dp.σ.1 (Dp.κ b * r) * Dp.η := rfl
@@ -246,8 +252,9 @@ section Eval
 
 variable {M : Type u} [AddCommGroup M] [Module R₀ M]
 
-def evalT {A : Type u} [CommRing A] [Algebra R₀ A] (H : M →ₗ[R₀] A) (K : Submodule R₀ A)
-    (Y : M ⊗[R₀] K) : A :=
+def evalT
+    {A : Type u} [CommRing A] [Algebra R₀ A] (H : M →ₗ[R₀] A) (K : Submodule R₀ A) (Y : M ⊗[R₀] K)
+    : A :=
   LinearMap.mul' R₀ A (TensorProduct.map H K.subtype Y)
 
 lemma evalT_tmul {A : Type u} [CommRing A] [Algebra R₀ A] (H : M →ₗ[R₀] A) (K : Submodule R₀ A)

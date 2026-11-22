@@ -17,27 +17,40 @@ open Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity (IsLat jL Uniformiza
 open Formalism.MainNotions.TaylorLogMetric (lamOf)
 
 def UniqInv : Prop :=
-  ∀ Λ Λ' : AddSubgroup ℂ, Formalism.MainNotions.TaylorLogMetric.discr Λ ≠ 0 → Formalism.MainNotions.TaylorLogMetric.g2 Λ = Formalism.MainNotions.TaylorLogMetric.g2 Λ' →
-    Formalism.MainNotions.TaylorLogMetric.g3 Λ = Formalism.MainNotions.TaylorLogMetric.g3 Λ' → Λ = Λ'
+  ∀ Λ Λ' : AddSubgroup ℂ,
+    Formalism.MainNotions.TaylorLogMetric.discr Λ ≠ 0
+      → Formalism.MainNotions.TaylorLogMetric.g2 Λ = Formalism.MainNotions.TaylorLogMetric.g2 Λ'
+      → Formalism.MainNotions.TaylorLogMetric.g3 Λ = Formalism.MainNotions.TaylorLogMetric.g3 Λ'
+      → Λ = Λ'
 
 def LatOfDiscr : Prop :=
   ∀ Λ : AddSubgroup ℂ, Formalism.MainNotions.TaylorLogMetric.discr Λ ≠ 0 → IsLat Λ
 
 def ExtendEmb : Prop :=
-  ∀ (M : IntermediateField ℚ ℂ), Algebra.IsAlgebraic ℚ M → ∀ ρ : M →ₐ[ℚ] ℂ,
-    ∃ σ : ℂ ≃+* ℂ, ∀ x : M, σ (x : ℂ) = ρ x
+  ∀ (M : IntermediateField ℚ ℂ),
+    Algebra.IsAlgebraic ℚ M → ∀ ρ : M →ₐ[ℚ] ℂ, ∃ σ : ℂ ≃+* ℂ, ∀ x : M, σ (x : ℂ) = ρ x
 
 def CMConjSet (D : D7) : Prop :=
-  ∀ cc : Ideal (𝓞 D.host.K), cc ≠ ⊥ → ∀ (M : IntermediateField ℚ ℂ) [NumberField M]
-    (h : jL (lamOf D cc 1) ∈ M),
-    (∀ ρ : M →ₐ[ℚ] ℂ, ∃ 𝔟 : Ideal (𝓞 D.host.K), 𝔟 ≠ ⊥ ∧ ρ ⟨jL (lamOf D cc 1), h⟩ = jL (lamOf D 𝔟 1)) ∧
-    ∀ 𝔟 : Ideal (𝓞 D.host.K), 𝔟 ≠ ⊥ →
-      ((Finset.univ.filter fun ρ : M →ₐ[ℚ] ℂ => ρ ⟨jL (lamOf D cc 1), h⟩ = jL (lamOf D 𝔟 1)).card : ℝ) *
-        (Fintype.card (ClassGroup (𝓞 D.host.K)) : ℝ) = (Module.finrank ℚ M : ℝ)
+  ∀ cc : Ideal (𝓞 D.host.K),
+    cc ≠ ⊥
+      → ∀ (M : IntermediateField ℚ ℂ) [NumberField M] (h : jL (lamOf D cc 1) ∈ M),
+        (∀ ρ : M →ₐ[ℚ] ℂ, ∃ 𝔟 : Ideal (𝓞 D.host.K),
+            𝔟 ≠ ⊥ ∧ ρ ⟨jL (lamOf D cc 1), h⟩ = jL (lamOf D 𝔟 1))
+          ∧ ∀ 𝔟 : Ideal (𝓞 D.host.K),
+            𝔟 ≠ ⊥
+              → ((Finset.univ.filter fun ρ : M →ₐ[ℚ] ℂ =>
+                      ρ ⟨jL (lamOf D cc 1), h⟩ = jL (lamOf D 𝔟 1)).card
+                    : ℝ)
+                  * (Fintype.card (ClassGroup (𝓞 D.host.K)) : ℝ)
+                = (Module.finrank ℚ M : ℝ)
 
 theorem uniqInv_of_lat (hL : LatOfDiscr) (hU : Uniformization) : UniqInv := by
   intro Λ Λ' hd h2 h3
-  have hd0 : Formalism.MainNotions.TaylorLogMetric.g2 Λ ^ 3 - 27 * Formalism.MainNotions.TaylorLogMetric.g3 Λ ^ 2 ≠ 0 := hd
+  have hd0
+      : Formalism.MainNotions.TaylorLogMetric.g2 Λ ^ 3
+          - 27 * Formalism.MainNotions.TaylorLogMetric.g3 Λ ^ 2
+        ≠ 0 :=
+    hd
   have hd' : Formalism.MainNotions.TaylorLogMetric.discr Λ' ≠ 0 := by
     unfold Formalism.MainNotions.TaylorLogMetric.discr
     rw [← h2, ← h3]

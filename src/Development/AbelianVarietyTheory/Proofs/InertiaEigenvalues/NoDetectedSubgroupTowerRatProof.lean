@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.OrdIsEq
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField GlobalTheory.PMon.Ram
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField
+  GlobalTheory.PMon.Ram
 
 namespace GlobalTheory.PMon.Ram
 
@@ -53,25 +54,34 @@ theorem noTowerQ_holds : NoTowerQ := by
     have h' : τ⁻¹ * σ ∈ N (k + j) := hanti (by omega) (hker h)
     simpa using (N (k + j)).mul_mem hτ h'
   have hE : 0 < Nat.card I := Nat.card_pos
-  have hfin := GlobalTheory.T.inertia_congruenceFiltration_finite_tower_bound ℚ_[l] L l (Nat.card I) T (fun j => (N (k + j)).map res ⊓ I) Fact.out hE
-    (ordIs_eq_card_inertia l L) (GlobalTheory.T.axLemma_finiteGalois_padic l L)
-    (fun i j hij => inf_le_inf_right _ (Subgroup.map_mono (hanti (by omega)))) inf_le_right
-    (fun h => hn₀ (hlift 1 (by omega) σ₀
-      (h ⟨⟨σ₀, hσ₀, rfl⟩, restrictNormalHom_mem_lowerRamificationGroup_zero l L σ₀ hi₀⟩).1))
-    (by
-      rintro _ ⟨⟨σ, hσ, rfl⟩, hσI⟩
-      exact ⟨⟨σ ^ l, h1 k σ hσ, map_pow _ _ _⟩, I.pow_mem hσI l⟩)
-    (by
-      rintro j hj _ ⟨⟨σ, hσ, rfl⟩, hσI⟩ hp
-      refine ⟨⟨σ, h2 (k + j) σ (hanti (Nat.zero_le _) hσ) (hlift (j + 1) hj _ ?_), rfl⟩, hσI⟩
-      rw [map_pow]; exact hp.1)
-    (by
-      intro i hi
-      have := GlobalTheory.T.characters_detect_restrictNormal_inf_finiteLevel l L 8 (N (k + i)) (N (k + i + 8)) I (ι i) (x i) (a i)
-        (fun b => hSL (Set.mem_biUnion (show i ∈ Set.Iic (2 * T) from hi) ⟨b, rfl⟩)) (hxa i) (hdet i)
-      simpa [add_assoc] using this)
-  have hidx := card_le_index_mul_card_map_inf (GQ l) (L ≃ₐ[ℚ_[l]] L) res (N k) I
-    (AlgEquiv.restrictNormalHom_surjective _) hT
+  have hfin :=
+    GlobalTheory.T.inertia_congruenceFiltration_finite_tower_bound ℚ_[l] L l (Nat.card I) T
+      (fun j => (N (k + j)).map res ⊓ I)
+      Fact.out hE (ordIs_eq_card_inertia l L) (GlobalTheory.T.axLemma_finiteGalois_padic l L)
+      (fun i j hij => inf_le_inf_right _ (Subgroup.map_mono (hanti (by omega))))
+      inf_le_right
+      (fun h =>
+        hn₀ (hlift 1 (by omega) σ₀
+          (h ⟨⟨σ₀, hσ₀, rfl⟩, restrictNormalHom_mem_lowerRamificationGroup_zero l L σ₀ hi₀⟩).1))
+      (by
+        rintro _ ⟨⟨σ, hσ, rfl⟩, hσI⟩
+        exact ⟨⟨σ ^ l, h1 k σ hσ, map_pow _ _ _⟩, I.pow_mem hσI l⟩)
+      (by
+        rintro j hj _ ⟨⟨σ, hσ, rfl⟩, hσI⟩ hp
+        refine ⟨⟨σ, h2 (k + j) σ (hanti (Nat.zero_le _) hσ) (hlift (j + 1) hj _ ?_), rfl⟩, hσI⟩
+        rw [map_pow]
+        exact hp.1)
+      (by
+        intro i hi
+        have :=
+          GlobalTheory.T.characters_detect_restrictNormal_inf_finiteLevel l L 8 (N (k + i))
+            (N (k + i + 8)) I (ι i) (x i) (a i)
+            (fun b => hSL (Set.mem_biUnion (show i ∈ Set.Iic (2 * T) from hi) ⟨b, rfl⟩))
+            (hxa i) (hdet i)
+        simpa [add_assoc] using this)
+  have hidx :=
+    card_le_index_mul_card_map_inf (GQ l) (L ≃ₐ[ℚ_[l]] L) res (N k) I
+      (AlgEquiv.restrictNormalHom_surjective _) hT
   have hlt : T < 2 ^ T := Nat.lt_two_pow_self
   have hpos : 0 < Nat.card ↥((N k).map res ⊓ I) := Nat.card_pos
   simp only [add_zero] at hfin

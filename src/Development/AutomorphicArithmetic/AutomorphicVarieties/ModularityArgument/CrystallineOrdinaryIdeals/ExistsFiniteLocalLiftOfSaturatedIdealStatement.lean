@@ -5,9 +5,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module
+  UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_finite_local_lift_of_saturated_ideal : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [Algebra ℤ_[l] O] (R : Type) [CommRing R] [Algebra O R] [IsNoetherianRing R] (J : Ideal R) (d : R), (l : R) ∣ d → (∀ a, d * a ∈ J → a ∈ J) → ∀ (B : Type) [CommRing B] [IsLocalRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [Algebra O B] [Algebra ℤ_[l] B] [IsScalarTower ℤ_[l] O B] [IsScalarTower ℤ_[l] ℚ_[l] B] (f : R →ₐ[O] B), J ≤ RingHom.ker f → ∃ (B' : Type) (_ : CommRing B') (_ : IsLocalRing B') (_ : Algebra ℚ_[l] B') (_ : Module.Finite ℚ_[l] B') (_ : Algebra O B') (_ : Algebra ℤ_[l] B') (_ : IsScalarTower ℤ_[l] O B') (_ : IsScalarTower ℤ_[l] ℚ_[l] B') (f' : R →ₐ[O] B') (q : B' →ₐ[ℚ_[l]] B), J ≤ RingHom.ker f' ∧ (∀ a, q (f' a) = f a) ∧ ∀ b, f' d * b = 0 → q b = 0 := by
+theorem _root_.GlobalTheory.T.exists_finite_local_lift_of_saturated_ideal
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [Algebra ℤ_[l] O] (R : Type) [CommRing R]
+        [Algebra O R] [IsNoetherianRing R] (J : Ideal R) (d : R),
+      (l : R) ∣ d → (∀ a, d * a ∈ J → a ∈ J)
+        → ∀ (B : Type) [CommRing B] [IsLocalRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B]
+            [Algebra O B] [Algebra ℤ_[l] B] [IsScalarTower ℤ_[l] O B] [IsScalarTower ℤ_[l] ℚ_[l] B]
+            (f : R →ₐ[O] B),
+          J ≤ RingHom.ker f
+            → ∃ (B' : Type) (_ : CommRing B') (_ : IsLocalRing B') (_ : Algebra ℚ_[l] B')
+                (_ : Module.Finite ℚ_[l] B') (_ : Algebra O B') (_ : Algebra ℤ_[l] B')
+                (_ : IsScalarTower ℤ_[l] O B') (_ : IsScalarTower ℤ_[l] ℚ_[l] B') (f' : R →ₐ[O] B')
+                (q : B' →ₐ[ℚ_[l]] B),
+              J ≤ RingHom.ker f' ∧ (∀ a, q (f' a) = f a) ∧ ∀ b, f' d * b = 0 → q b = 0 := by
   intro l _ O _ _ R _ _ _ J d _ hreg B _ _ _ _ _ _ _ _ f hJf
   classical
   let M0 : Ideal R := (IsLocalRing.maximalIdeal B).comap f
@@ -81,33 +94,41 @@ theorem _root_.GlobalTheory.T.exists_finite_local_lift_of_saturated_ideal : ∀ 
     refine ⟨t, ht, hreg _ ?_⟩
     rw [mul_left_comm]
     exact htJ
-  obtain ⟨k, hk⟩ := Ideal.exists_pow_inf_eq_pow_smul (IsLocalRing.maximalIdeal RM)
-    (Submodule.span RM {Ideal.Quotient.mk J' (algebraMap R RM d)})
-  have hkey : ∀ c : RM, algebraMap R RM d * c ∈ J' ⊔ IsLocalRing.maximalIdeal RM ^ (N0 + k) →
-      g c = 0 := by
+  obtain ⟨k, hk⟩ :=
+    Ideal.exists_pow_inf_eq_pow_smul (IsLocalRing.maximalIdeal RM)
+      (Submodule.span RM {Ideal.Quotient.mk J' (algebraMap R RM d)})
+  have hkey
+      : ∀ c : RM,
+        algebraMap R RM d * c ∈ J' ⊔ IsLocalRing.maximalIdeal RM ^ (N0 + k) → g c = 0 := by
     intro c hc
     obtain ⟨j, hj, y, hy, hjy⟩ := Submodule.mem_sup.1 hc
-    have hx1 : Ideal.Quotient.mk J' (algebraMap R RM d * c) ∈
-        (IsLocalRing.maximalIdeal RM ^ (N0 + k)) • (⊤ : Submodule RM (RM ⧸ J')) := by
+    have hx1
+        : Ideal.Quotient.mk J' (algebraMap R RM d * c)
+          ∈ (IsLocalRing.maximalIdeal RM ^ (N0 + k)) • (⊤ : Submodule RM (RM ⧸ J')) := by
       rw [Ideal.smul_top_eq_map, Submodule.restrictScalars_mem, ← hjy, map_add (f := _),
         Ideal.Quotient.eq_zero_iff_mem.2 hj, zero_add]
       exact Ideal.mem_map_of_mem _ hy
-    have hx2 : Ideal.Quotient.mk J' (algebraMap R RM d * c) ∈
-        Submodule.span RM {Ideal.Quotient.mk J' (algebraMap R RM d)} := by
-      have : Ideal.Quotient.mk J' (algebraMap R RM d * c) =
-          c • Ideal.Quotient.mk J' (algebraMap R RM d) := by
+    have hx2
+        : Ideal.Quotient.mk J' (algebraMap R RM d * c)
+          ∈ Submodule.span RM {Ideal.Quotient.mk J' (algebraMap R RM d)} := by
+      have : Ideal.Quotient.mk J' (algebraMap R RM d * c)
+          = c • Ideal.Quotient.mk J' (algebraMap R RM d) := by
         rw [Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul, mul_comm c]
       rw [this]
       exact Submodule.smul_mem _ _ (Submodule.subset_span rfl)
     have hx3 := hk (N0 + k) (by omega)
-    have h5 : Ideal.Quotient.mk J' (algebraMap R RM d * c) ∈
-        IsLocalRing.maximalIdeal RM ^ (N0 + k - k) • (IsLocalRing.maximalIdeal RM ^ k • ⊤ ⊓
-          Submodule.span RM {Ideal.Quotient.mk J' (algebraMap R RM d)}) := by
+    have h5
+        : Ideal.Quotient.mk J' (algebraMap R RM d * c)
+          ∈ IsLocalRing.maximalIdeal RM ^ (N0 + k - k)
+            • (IsLocalRing.maximalIdeal RM ^ k • ⊤
+              ⊓ Submodule.span RM {Ideal.Quotient.mk J' (algebraMap R RM d)}) := by
       rw [← hx3]
       exact Submodule.mem_inf.2 ⟨hx1, hx2⟩
     rw [Nat.add_sub_cancel] at h5
-    have hx4 : Ideal.Quotient.mk J' (algebraMap R RM d * c) ∈ IsLocalRing.maximalIdeal RM ^ N0 •
-        Submodule.span RM {Ideal.Quotient.mk J' (algebraMap R RM d)} :=
+    have hx4
+        : Ideal.Quotient.mk J' (algebraMap R RM d * c)
+          ∈ IsLocalRing.maximalIdeal RM ^ N0
+            • Submodule.span RM {Ideal.Quotient.mk J' (algebraMap R RM d)} :=
       Submodule.smul_mono le_rfl inf_le_right h5
     obtain ⟨a, ha, hav⟩ := Submodule.mem_smul_span_singleton.1 hx4
     have hdiff : algebraMap R RM d * (c - a) ∈ J' := by
@@ -136,16 +157,20 @@ theorem _root_.GlobalTheory.T.exists_finite_local_lift_of_saturated_ideal : ∀ 
   haveI t2 : IsScalarTower ℤ_[l] ℚ_[l] (RM ⧸ I) := IsScalarTower.of_algebraMap_eq (fun x => by
     show Ideal.Quotient.mk I (ψ x) = Ideal.Quotient.mk I (φ (algebraMap ℤ_[l] ℚ_[l] x))
     rw [hφ])
-  let f' : R →ₐ[O] (RM ⧸ I) :=
-    { (Ideal.Quotient.mk I).comp (algebraMap R RM) with commutes' := fun o => rfl }
-  let q : (RM ⧸ I) →ₐ[ℚ_[l]] B :=
-    { Ideal.Quotient.lift I g hIg with
-      commutes' := fun c => by
-        show Ideal.Quotient.lift I g hIg (Ideal.Quotient.mk I (φ c)) = algebraMap ℚ_[l] B c
-        rw [Ideal.Quotient.lift_mk]
-        exact RingHom.congr_fun hgφ c }
-  have hmaxQ : IsLocalRing.maximalIdeal (RM ⧸ I) ≤
-      (IsLocalRing.maximalIdeal RM).map (Ideal.Quotient.mk I) := by
+  let f' : R →ₐ[O] (RM ⧸ I) := {
+    (Ideal.Quotient.mk I).comp (algebraMap R RM) with
+    commutes' := fun o => rfl
+  }
+  let q : (RM ⧸ I) →ₐ[ℚ_[l]] B := {
+    Ideal.Quotient.lift I g hIg with
+    commutes' := fun c => by
+      show Ideal.Quotient.lift I g hIg (Ideal.Quotient.mk I (φ c)) = algebraMap ℚ_[l] B c
+      rw [Ideal.Quotient.lift_mk]
+      exact RingHom.congr_fun hgφ c
+  }
+  have hmaxQ
+      : IsLocalRing.maximalIdeal (RM ⧸ I)
+        ≤ (IsLocalRing.maximalIdeal RM).map (Ideal.Quotient.mk I) := by
     intro x hx
     obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective x
     apply Ideal.mem_map_of_mem
@@ -154,11 +179,12 @@ theorem _root_.GlobalTheory.T.exists_finite_local_lift_of_saturated_ideal : ∀ 
     exact hx (hy.map _)
   have hnil : IsLocalRing.maximalIdeal (RM ⧸ I) ^ (N0 + k) = ⊥ := by
     rw [eq_bot_iff]
-    calc IsLocalRing.maximalIdeal (RM ⧸ I) ^ (N0 + k)
-        ≤ ((IsLocalRing.maximalIdeal RM).map (Ideal.Quotient.mk I)) ^ (N0 + k) :=
-          Ideal.pow_right_mono hmaxQ _
+    calc
+      IsLocalRing.maximalIdeal (RM ⧸ I) ^ (N0 + k)
+          ≤ ((IsLocalRing.maximalIdeal RM).map (Ideal.Quotient.mk I)) ^ (N0 + k) :=
+        Ideal.pow_right_mono hmaxQ _
       _ = (IsLocalRing.maximalIdeal RM ^ (N0 + k)).map (Ideal.Quotient.mk I) :=
-          (Ideal.map_pow _ _ _).symm
+        (Ideal.map_pow _ _ _).symm
       _ ≤ I.map (Ideal.Quotient.mk I) := Ideal.map_mono le_sup_right
       _ = ⊥ := Ideal.map_quotient_self I
   haveI hart : IsArtinianRing (RM ⧸ I) := by

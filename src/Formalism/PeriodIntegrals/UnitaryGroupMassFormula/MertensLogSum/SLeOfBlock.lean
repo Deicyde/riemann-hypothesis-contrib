@@ -108,20 +108,17 @@ theorem l31 : (99 : ℝ) / 20 * Real.log 2 ≤ Real.log (31 : ℝ) := by
   push_cast at h
   linarith
 
-private theorem S_zero' : S 0 = 0 := by
-  simp [S]
+private theorem S_zero' : S 0 = 0 := by simp [S]
 
-private theorem S_succ_eq_add_ite_prime (n : ℕ) :
-    S (n + 1) = S n +
-      if (n + 1).Prime then Real.log ((n + 1 : ℕ) : ℝ) / ((n + 1 : ℕ) : ℝ) else 0 := by
+private theorem S_succ_eq_add_ite_prime (n : ℕ)
+    : S (n + 1)
+      = S n + if (n + 1).Prime then Real.log ((n + 1 : ℕ) : ℝ) / ((n + 1 : ℕ) : ℝ) else 0 := by
   simp only [S, Finset.sum_filter]
   rw [Finset.sum_Ioc_succ_top (Nat.zero_le n)]
 
-theorem S_1 : S 1 = 0 := by
-  norm_num [S_succ_eq_add_ite_prime, S_zero']
+theorem S_1 : S 1 = 0 := by norm_num [S_succ_eq_add_ite_prime, S_zero']
 
-theorem S_2 : S 2 = Real.log 2 / 2 := by
-  norm_num [S_succ_eq_add_ite_prime, S_zero']
+theorem S_2 : S 2 = Real.log 2 / 2 := by norm_num [S_succ_eq_add_ite_prime, S_zero']
 
 theorem S_4 : S 4 = Real.log 2 / 2 + Real.log 3 / 3 := by
   norm_num [S_succ_eq_add_ite_prime, S_zero']
@@ -129,16 +126,24 @@ theorem S_4 : S 4 = Real.log 2 / 2 + Real.log 3 / 3 := by
 theorem S_10 : S 10 = Real.log 2 / 2 + Real.log 3 / 3 + Real.log 5 / 5 + Real.log 7 / 7 := by
   norm_num [S_succ_eq_add_ite_prime, S_zero']
 
-theorem S_30 : S 30 = Real.log 2 / 2 + Real.log 3 / 3 + Real.log 5 / 5 + Real.log 7 / 7 + Real.log 11 / 11 + Real.log 13 / 13 + Real.log 17 / 17 + Real.log 19 / 19 + Real.log 23 / 23 + Real.log 29 / 29 := by
+theorem S_30
+    : S 30
+      = Real.log 2 / 2 + Real.log 3 / 3 + Real.log 5 / 5 + Real.log 7 / 7 + Real.log 11 / 11
+        + Real.log 13 / 13 + Real.log 17 / 17 + Real.log 19 / 19 + Real.log 23 / 23
+        + Real.log 29 / 29 := by
   norm_num [S_succ_eq_add_ite_prime, S_zero']
-
 
 set_option maxHeartbeats 800000 in
-theorem S_63 : S 63 = Real.log 2 / 2 + Real.log 3 / 3 + Real.log 5 / 5 + Real.log 7 / 7 + Real.log 11 / 11 + Real.log 13 / 13 + Real.log 17 / 17 + Real.log 19 / 19 + Real.log 23 / 23 + Real.log 29 / 29 + Real.log 31 / 31 + Real.log 37 / 37 + Real.log 41 / 41 + Real.log 43 / 43 + Real.log 47 / 47 + Real.log 53 / 53 + Real.log 59 / 59 + Real.log 61 / 61 := by
+theorem S_63
+    : S 63
+      = Real.log 2 / 2 + Real.log 3 / 3 + Real.log 5 / 5 + Real.log 7 / 7 + Real.log 11 / 11
+        + Real.log 13 / 13 + Real.log 17 / 17 + Real.log 19 / 19 + Real.log 23 / 23
+        + Real.log 29 / 29 + Real.log 31 / 31 + Real.log 37 / 37 + Real.log 41 / 41
+        + Real.log 43 / 43 + Real.log 47 / 47 + Real.log 53 / 53 + Real.log 59 / 59
+        + Real.log 61 / 61 := by
   norm_num [S_succ_eq_add_ite_prime, S_zero']
 
-theorem S_le_1_1 : S 1 ≤ Real.log (1 : ℝ) := by
-  rw [S_1, Real.log_one]
+theorem S_le_1_1 : S 1 ≤ Real.log (1 : ℝ) := by rw [S_1, Real.log_one]
 
 theorem S_le_2_2 : S 2 ≤ Real.log (2 : ℝ) := by
   rw [S_2]
@@ -195,31 +200,29 @@ theorem S_le_31_63 : S 63 ≤ Real.log (31 : ℝ) := by
   have hb15 := u61
   linarith
 
-theorem S_le_of_block {a b n : ℕ} (ha : 0 < a) (h : S b ≤ Real.log (a : ℝ)) (h1 : a ≤ n)
-    (h2 : n ≤ b) : S n ≤ Real.log (n : ℝ) := by
+theorem S_le_of_block
+    {a b n : ℕ} (ha : 0 < a) (h : S b ≤ Real.log (a : ℝ)) (h1 : a ≤ n) (h2 : n ≤ b)
+    : S n ≤ Real.log (n : ℝ) := by
   have ha' : (0 : ℝ) < a := by exact_mod_cast ha
   have h1' : (a : ℝ) ≤ n := by exact_mod_cast h1
-  calc S n ≤ S b := S_mono h2
+  calc
+    S n
+      ≤ S b := S_mono h2
     _ ≤ Real.log (a : ℝ) := h
     _ ≤ Real.log (n : ℝ) := Real.log_le_log ha' h1'
 
 theorem S_le_small (n : ℕ) (h1 : 1 ≤ n) (h2 : n ≤ 63) : S n ≤ Real.log (n : ℝ) := by
   by_cases hA : n ≤ 1
-  · exact S_le_of_block (a := 1) (b := 1) (by norm_num)
-      (by exact_mod_cast S_le_1_1) h1 hA
+  · exact S_le_of_block (a := 1) (b := 1) (by norm_num) (by exact_mod_cast S_le_1_1) h1 hA
   by_cases hB : n ≤ 2
-  · exact S_le_of_block (a := 2) (b := 2) (by norm_num)
-      (by exact_mod_cast S_le_2_2) (by omega) hB
+  · exact S_le_of_block (a := 2) (b := 2) (by norm_num) (by exact_mod_cast S_le_2_2) (by omega) hB
   by_cases hC : n ≤ 4
-  · exact S_le_of_block (a := 3) (b := 4) (by norm_num)
-      (by exact_mod_cast S_le_3_4) (by omega) hC
+  · exact S_le_of_block (a := 3) (b := 4) (by norm_num) (by exact_mod_cast S_le_3_4) (by omega) hC
   by_cases hD : n ≤ 10
-  · exact S_le_of_block (a := 5) (b := 10) (by norm_num)
-      (by exact_mod_cast S_le_5_10) (by omega) hD
+  · exact S_le_of_block (a := 5) (b := 10) (by norm_num) (by exact_mod_cast S_le_5_10) (by omega) hD
   by_cases hE : n ≤ 30
-  · exact S_le_of_block (a := 11) (b := 30) (by norm_num)
-      (by exact_mod_cast S_le_11_30) (by omega) hE
-  exact S_le_of_block (a := 31) (b := 63) (by norm_num)
-    (by exact_mod_cast S_le_31_63) (by omega) h2
+  · exact S_le_of_block (a := 11) (b := 30) (by norm_num) (by exact_mod_cast S_le_11_30) (by omega)
+      hE
+  exact S_le_of_block (a := 31) (b := 63) (by norm_num) (by exact_mod_cast S_le_31_63) (by omega) h2
 
 end PI.PrimeLogOverPWork

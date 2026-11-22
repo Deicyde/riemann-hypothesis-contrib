@@ -11,28 +11,32 @@ namespace GlobalTheory
 
 namespace WeightedInverseBound
 
-theorem wls_fintype {ι : Type} [Fintype ι] [DecidableEq ι] {g : ℕ} (L : Matrix ι (Fin g) ℝ)
-    (hL : L.rank = g) : ∃ K : ℝ, ∀ (D : ι → ℝ) (b : ι → ℝ), (∀ k, 0 < D k) →
-      ‖((L.transpose * Matrix.diagonal D * L)⁻¹ * L.transpose * Matrix.diagonal D).mulVec b‖
-        ≤ K * ‖b‖ := by
+theorem wls_fintype
+    {ι : Type} [Fintype ι] [DecidableEq ι] {g : ℕ} (L : Matrix ι (Fin g) ℝ) (hL : L.rank = g)
+    : ∃ K : ℝ, ∀ (D : ι → ℝ) (b : ι → ℝ),
+      (∀ k, 0 < D k)
+        → ‖((L.transpose * Matrix.diagonal D * L)⁻¹ * L.transpose * Matrix.diagonal D).mulVec b‖
+          ≤ K * ‖b‖ := by
   classical
   let e : Fin (Fintype.card ι) ≃ ι := (Fintype.equivFin ι).symm
-  have hr : (L.submatrix e (Equiv.refl (Fin g))).rank = g := by
-    rw [Matrix.rank_submatrix]; exact hL
+  have hr : (L.submatrix e (Equiv.refl (Fin g))).rank = g := by rw [Matrix.rank_submatrix]; exact hL
   obtain ⟨K, hK⟩ := GlobalTheory.T.exists_norm_weighted_least_squares_le _ g _ hr
   refine ⟨K, fun D b hD => ?_⟩
   have h := hK (D ∘ e) (b ∘ e) (fun k => hD _)
-  have h1 : (L.submatrix e (Equiv.refl (Fin g))).transpose * Matrix.diagonal (D ∘ e) *
-      (L.submatrix e (Equiv.refl (Fin g))) = L.transpose * Matrix.diagonal D * L := by
+  have h1
+      : (L.submatrix e (Equiv.refl (Fin g))).transpose * Matrix.diagonal (D ∘ e)
+          * (L.submatrix e (Equiv.refl (Fin g)))
+        = L.transpose * Matrix.diagonal D * L := by
     ext i j
     simp only [Matrix.mul_apply (M := _ * Matrix.diagonal _), Matrix.mul_diagonal,
       Matrix.transpose_apply, Matrix.submatrix_apply, Equiv.refl_apply, Function.comp]
     exact e.sum_comp (fun k => L k i * D k * L k j)
-  have h2 : ((L.submatrix e (Equiv.refl (Fin g))).transpose * Matrix.diagonal (D ∘ e)).mulVec
-      (b ∘ e) = (L.transpose * Matrix.diagonal D).mulVec b := by
+  have h2
+      : ((L.submatrix e (Equiv.refl (Fin g))).transpose * Matrix.diagonal (D ∘ e)).mulVec (b ∘ e)
+        = (L.transpose * Matrix.diagonal D).mulVec b := by
     ext i
-    simp only [Matrix.mulVec, dotProduct, Matrix.mul_diagonal,
-      Matrix.transpose_apply, Matrix.submatrix_apply, Equiv.refl_apply, Function.comp]
+    simp only [Matrix.mulVec, dotProduct, Matrix.mul_diagonal, Matrix.transpose_apply,
+      Matrix.submatrix_apply, Equiv.refl_apply, Function.comp]
     exact e.sum_comp (fun k => L k i * D k * b k)
   have h3 : ‖b ∘ e‖ = ‖b‖ := e.surjective.pi_norm_comp b
   rw [h1, Matrix.mul_assoc, ← Matrix.mulVec_mulVec, h2, h3] at h
@@ -40,13 +44,14 @@ theorem wls_fintype {ι : Type} [Fintype ι] [DecidableEq ι] {g : ℕ} (L : Mat
   exact h
 
 theorem dot_le_card_mul_norm_mul_norm {g : ℕ} (x y : Fin g → ℝ) : x ⬝ᵥ y ≤ g * (‖x‖ * ‖y‖) := by
-  calc x ⬝ᵥ y = ∑ k, x k * y k := rfl
+  calc
+    x ⬝ᵥ y
+      = ∑ k, x k * y k := rfl
     _ ≤ ∑ _k : Fin g, ‖x‖ * ‖y‖ := by
-        refine Finset.sum_le_sum fun k _ => ?_
-        refine (le_abs_self _).trans ?_
-        rw [abs_mul]
-        exact mul_le_mul (norm_le_pi_norm x k) (norm_le_pi_norm y k) (abs_nonneg _)
-          (norm_nonneg _)
+      refine Finset.sum_le_sum fun k _ => ?_
+      refine (le_abs_self _).trans ?_
+      rw [abs_mul]
+      exact mul_le_mul (norm_le_pi_norm x k) (norm_le_pi_norm y k) (abs_nonneg _) (norm_nonneg _)
     _ = g * (‖x‖ * ‖y‖) := by simp
 
 theorem norm_sq_le_dot {g : ℕ} (x : Fin g → ℝ) : ‖x‖ * ‖x‖ ≤ x ⬝ᵥ x := by
@@ -56,15 +61,19 @@ theorem norm_sq_le_dot {g : ℕ} (x : Fin g → ℝ) : ‖x‖ * ‖x‖ ≤ x �
     rw [Real.norm_eq_abs]
     apply Real.abs_le_sqrt
     rw [sq]
-    exact Finset.single_le_sum (f := fun k => x k * x k) (fun k _ => mul_self_nonneg _)
+    exact Finset.single_le_sum
+      (f := fun k => x k * x k)
+      (fun k _ => mul_self_nonneg _)
       (Finset.mem_univ k)
-  calc ‖x‖ * ‖x‖ ≤ Real.sqrt (x ⬝ᵥ x) * Real.sqrt (x ⬝ᵥ x) :=
-        mul_le_mul this this (norm_nonneg _) (Real.sqrt_nonneg _)
+  calc
+    ‖x‖ * ‖x‖ ≤ Real.sqrt (x ⬝ᵥ x) * Real.sqrt (x ⬝ᵥ x) :=
+      mul_le_mul this this (norm_nonneg _) (Real.sqrt_nonneg _)
     _ = x ⬝ᵥ x := Real.mul_self_sqrt h0
 
-theorem norm_le_of_coercive {g : ℕ} {Y : Matrix (Fin g) (Fin g) ℝ} {c : ℝ} (hc : 0 < c)
-    (hY : ∀ x, c * (x ⬝ᵥ x) ≤ x ⬝ᵥ Y.mulVec x) (z : Fin g → ℝ) :
-    ‖z‖ ≤ g / c * ‖Y.mulVec z‖ := by
+theorem norm_le_of_coercive
+    {g : ℕ} {Y : Matrix (Fin g) (Fin g) ℝ} {c : ℝ}
+    (hc : 0 < c) (hY : ∀ x, c * (x ⬝ᵥ x) ≤ x ⬝ᵥ Y.mulVec x) (z : Fin g → ℝ)
+    : ‖z‖ ≤ g / c * ‖Y.mulVec z‖ := by
   rcases (norm_nonneg z).eq_or_lt with h | h
   · rw [← h]; positivity
   have h1 := hY z
@@ -75,44 +84,51 @@ theorem norm_le_of_coercive {g : ℕ} {Y : Matrix (Fin g) (Fin g) ℝ} {c : ℝ}
   rw [div_mul_eq_mul_div, le_div_iff₀ hc]
   linarith
 
-theorem isUnit_det_of_coercive {g : ℕ} {Y : Matrix (Fin g) (Fin g) ℝ} {c : ℝ} (hc : 0 < c)
-    (hY : ∀ x, c * (x ⬝ᵥ x) ≤ x ⬝ᵥ Y.mulVec x) : IsUnit Y.det := by
+theorem isUnit_det_of_coercive
+    {g : ℕ} {Y : Matrix (Fin g) (Fin g) ℝ} {c : ℝ}
+    (hc : 0 < c) (hY : ∀ x, c * (x ⬝ᵥ x) ≤ x ⬝ᵥ Y.mulVec x)
+    : IsUnit Y.det := by
   rw [← Matrix.isUnit_iff_isUnit_det, ← Matrix.mulVec_injective_iff_isUnit]
   intro x y hxy
   have h := norm_le_of_coercive hc hY (x - y)
   rw [Matrix.mulVec_sub, hxy, sub_self, norm_zero, mul_zero] at h
   exact sub_eq_zero.1 (norm_le_zero_iff.1 h)
 
-theorem norm_mulVec_le {m : Type} [Fintype m] {g : ℕ} {Y : Matrix m (Fin g) ℝ} {C : ℝ}
-    (hC : 0 ≤ C) (h : ∀ j k, |Y j k| ≤ C) (z : Fin g → ℝ) :
-    ‖Y.mulVec z‖ ≤ g * C * ‖z‖ := by
+theorem norm_mulVec_le
+    {m : Type} [Fintype m]
+    {g : ℕ} {Y : Matrix m (Fin g) ℝ} {C : ℝ} (hC : 0 ≤ C) (h : ∀ j k, |Y j k| ≤ C) (z : Fin g → ℝ)
+    : ‖Y.mulVec z‖ ≤ g * C * ‖z‖ := by
   refine (pi_norm_le_iff_of_nonneg (by positivity)).2 fun j => ?_
-  calc ‖Y.mulVec z j‖ = |∑ k, Y j k * z k| := rfl
+  calc
+    ‖Y.mulVec z j‖
+      = |∑ k, Y j k * z k| := rfl
     _ ≤ ∑ k, |Y j k * z k| := Finset.abs_sum_le_sum_abs _ _
     _ ≤ ∑ _k : Fin g, C * ‖z‖ := by
-        refine Finset.sum_le_sum fun k _ => ?_
-        rw [abs_mul]
-        exact mul_le_mul (h j k) (norm_le_pi_norm z k) (abs_nonneg _) hC
+      refine Finset.sum_le_sum fun k _ => ?_
+      rw [abs_mul]
+      exact mul_le_mul (h j k) (norm_le_pi_norm z k) (abs_nonneg _) hC
     _ = g * C * ‖z‖ := by simp [mul_assoc]
 
-theorem abs_entry_le {g : ℕ} {Y : Matrix (Fin g) (Fin g) ℝ} {C : ℝ} (hs : Y.IsSymm)
-    (h0 : ∀ x, 0 ≤ x ⬝ᵥ Y.mulVec x) (h1 : ∀ x, x ⬝ᵥ Y.mulVec x ≤ C * (x ⬝ᵥ x)) (j k : Fin g) :
-    |Y j k| ≤ |C| := by
+theorem abs_entry_le
+    {g : ℕ} {Y : Matrix (Fin g) (Fin g) ℝ} {C : ℝ} (hs : Y.IsSymm) (h0 : ∀ x, 0 ≤ x ⬝ᵥ Y.mulVec x)
+    (h1 : ∀ x, x ⬝ᵥ Y.mulVec x ≤ C * (x ⬝ᵥ x)) (j k : Fin g)
+    : |Y j k| ≤ |C| := by
   have a := h1 (Pi.single j 1)
   have b := h1 (Pi.single k 1)
   have p := h0 (Pi.single j 1 + Pi.single k 1)
   have q := h0 (Pi.single j 1 - Pi.single k 1)
   have s : Y k j = Y j k := hs.apply j k
-  simp only [Matrix.mulVec_add, Matrix.mulVec_sub, add_dotProduct, sub_dotProduct,
-    dotProduct_add, dotProduct_sub, single_dotProduct, Matrix.mulVec_single_one, one_mul,
-    Matrix.col_apply, Pi.single_eq_same, mul_one] at a b p q
+  simp only [Matrix.mulVec_add, Matrix.mulVec_sub, add_dotProduct, sub_dotProduct, dotProduct_add,
+      dotProduct_sub, single_dotProduct, Matrix.mulVec_single_one, one_mul, Matrix.col_apply,
+      Pi.single_eq_same, mul_one]
+    at a b p q
   have := le_abs_self C
   rw [abs_le]
   constructor <;> linarith
 
-theorem bound_one_add {g a : ℕ} (B : Fin a → Matrix (Fin g) (Fin g) ℝ)
-    (hB : ∀ i, (B i).PosSemidef) : ∃ K : ℝ, ∀ t : Fin a → ℝ, (∀ i, 0 < t i) → ∀ i x,
-      ‖(1 + ∑ l, t l • B l)⁻¹.mulVec ((t i • B i).mulVec x)‖ ≤ K * ‖x‖ := by
+theorem bound_one_add {g a : ℕ} (B : Fin a → Matrix (Fin g) (Fin g) ℝ) (hB : ∀ i, (B i).PosSemidef)
+    : ∃ K : ℝ, ∀ t : Fin a → ℝ,
+      (∀ i, 0 < t i) → ∀ i x, ‖(1 + ∑ l, t l • B l)⁻¹.mulVec ((t i • B i).mulVec x)‖ ≤ K * ‖x‖ := by
   classical
   have hR : ∀ i, ∃ R : Matrix (Fin g) (Fin g) ℝ, B i = R.transpose * R := by
     intro i
@@ -124,18 +140,24 @@ theorem bound_one_add {g a : ℕ} (B : Fin a → Matrix (Fin g) (Fin g) ℝ)
     Matrix.fromRows 1 (Matrix.of fun p j => R p.1 p.2 j)
   have hL : L.rank = g := by
     refine le_antisymm (by simpa using L.rank_le_card_width) ?_
-    have h1 : (Matrix.fromCols (1 : Matrix (Fin g) (Fin g) ℝ)
-        (0 : Matrix (Fin g) (Fin a × Fin g) ℝ)) * L = 1 := by
+    have h1
+        : (Matrix.fromCols (1 : Matrix (Fin g) (Fin g) ℝ) (0 : Matrix (Fin g) (Fin a × Fin g) ℝ))
+            * L
+          = 1 := by
       simp [L, Matrix.fromCols_mul_fromRows]
-    have h2 := Matrix.rank_mul_le_right (Matrix.fromCols (1 : Matrix (Fin g) (Fin g) ℝ)
-        (0 : Matrix (Fin g) (Fin a × Fin g) ℝ)) L
+    have h2 :=
+      Matrix.rank_mul_le_right
+        (Matrix.fromCols (1 : Matrix (Fin g) (Fin g) ℝ) (0 : Matrix (Fin g) (Fin a × Fin g) ℝ)) L
     rw [h1, Matrix.rank_one, Fintype.card_fin] at h2
     exact h2
   obtain ⟨K, hK⟩ := wls_fintype L hL
-  obtain ⟨A, hA0, hA⟩ : ∃ A : ℝ, 0 ≤ A ∧ ∀ i j k, |R i j k| ≤ A :=
-    ⟨‖fun i j k => R i j k‖, norm_nonneg _, fun i j k =>
+  obtain ⟨A, hA0, hA⟩ : ∃ A : ℝ, 0 ≤ A ∧ ∀ i j k, |R i j k| ≤ A := ⟨
+    ‖fun i j k => R i j k‖,
+    norm_nonneg _,
+    fun i j k =>
       ((norm_le_pi_norm _ k).trans (norm_le_pi_norm (fun j k => R i j k) j)).trans
-        (norm_le_pi_norm (fun i j k => R i j k) i)⟩
+        (norm_le_pi_norm (fun i j k => R i j k) i)
+  ⟩
   refine ⟨|K| * (g * A), fun t ht i x => ?_⟩
   let D : Fin g ⊕ (Fin a × Fin g) → ℝ := Sum.elim (fun _ => 1) (fun p => t p.1)
   let b : Fin g ⊕ (Fin a × Fin g) → ℝ :=
@@ -158,10 +180,10 @@ theorem bound_one_add {g a : ℕ} (B : Fin a → Matrix (Fin g) (Fin g) ℝ)
   have h2 : (L.transpose * Matrix.diagonal D).mulVec b = (t i • B i).mulVec x := by
     rw [hR i, Matrix.smul_mulVec, ← Matrix.mulVec_mulVec x]
     ext j
-    simp only [Matrix.mulVec, dotProduct, Matrix.mul_diagonal,
-      Matrix.transpose_apply, Fintype.sum_sum_type, Fintype.sum_prod_type, L, D, b,
-      Matrix.fromRows_apply_inl, Matrix.fromRows_apply_inr, Sum.elim_inl, Sum.elim_inr,
-      Matrix.of_apply, Pi.smul_apply, smul_eq_mul, mul_zero, Finset.sum_const_zero, zero_add]
+    simp only [Matrix.mulVec, dotProduct, Matrix.mul_diagonal, Matrix.transpose_apply,
+      Fintype.sum_sum_type, Fintype.sum_prod_type, L, D, b, Matrix.fromRows_apply_inl,
+      Matrix.fromRows_apply_inr, Sum.elim_inl, Sum.elim_inr, Matrix.of_apply, Pi.smul_apply,
+      smul_eq_mul, mul_zero, Finset.sum_const_zero, zero_add]
     rw [Finset.sum_eq_single i]
     · simp only [if_true]
       rw [Finset.mul_sum Finset.univ _ (t i)]
@@ -178,16 +200,22 @@ theorem bound_one_add {g a : ℕ} (B : Fin a → Matrix (Fin g) (Fin g) ℝ)
       · exact (norm_le_pi_norm _ _).trans (norm_mulVec_le hA0 (hA i) x)
       · simp only [norm_zero]; positivity
   rw [h1, Matrix.mul_assoc, ← Matrix.mulVec_mulVec, h2] at h
-  calc _ ≤ K * ‖b‖ := h
+  calc
+    _ ≤ K * ‖b‖ := h
     _ ≤ |K| * ‖b‖ := mul_le_mul_of_nonneg_right (le_abs_self K) (norm_nonneg _)
     _ ≤ |K| * (g * A * ‖x‖) := mul_le_mul_of_nonneg_left h3 (abs_nonneg _)
     _ = _ := by ring
 
 end WeightedInverseBound
 
-
 open WeightedInverseBound in
-theorem smul_inv_mul_posSemidef_uniform_bound : ∀ (g a : ℕ) (B : Fin a → Matrix (Fin g) (Fin g) ℝ) (c C : ℝ), 0 < c → (∀ i, (B i).PosSemidef) → ∃ W : ℝ, ∀ (Y' : Matrix (Fin g) (Fin g) ℝ) (t : Fin a → ℝ), Y'.IsSymm → (∀ x, c * (x ⬝ᵥ x) ≤ x ⬝ᵥ Y'.mulVec x) → (∀ x, x ⬝ᵥ Y'.mulVec x ≤ C * (x ⬝ᵥ x)) → (∀ i, 0 < t i) → ∀ i x, ‖(t i • ((Y' + ∑ l, t l • B l)⁻¹ * B i)).mulVec x‖ ≤ W * ‖x‖ := by
+theorem smul_inv_mul_posSemidef_uniform_bound
+    : ∀ (g a : ℕ) (B : Fin a → Matrix (Fin g) (Fin g) ℝ) (c C : ℝ),
+      0 < c → (∀ i, (B i).PosSemidef)
+        → ∃ W : ℝ, ∀ (Y' : Matrix (Fin g) (Fin g) ℝ) (t : Fin a → ℝ),
+          Y'.IsSymm → (∀ x, c * (x ⬝ᵥ x) ≤ x ⬝ᵥ Y'.mulVec x)
+            → (∀ x, x ⬝ᵥ Y'.mulVec x ≤ C * (x ⬝ᵥ x)) → (∀ i, 0 < t i)
+            → ∀ i x, ‖(t i • ((Y' + ∑ l, t l • B l)⁻¹ * B i)).mulVec x‖ ≤ W * ‖x‖ := by
   intro g a B c C hc hB
   obtain ⟨K, hK⟩ := bound_one_add B hB
   refine ⟨(1 + g / c * (1 + g * |C|)) * K, fun Y' t hs hlo hhi ht i x => ?_⟩
@@ -233,9 +261,10 @@ theorem smul_inv_mul_posSemidef_uniform_bound : ∀ (g a : ℕ) (B : Fin a → M
     rwa [add_sub_cancel] at this
   have hgc : (0 : ℝ) ≤ g / c := by positivity
   have b5 := mul_le_mul_of_nonneg_left b3 hgc
-  calc ‖u‖ ≤ (1 + g / c * (1 + g * |C|)) * ‖w‖ := by linarith
-    _ ≤ (1 + g / c * (1 + g * |C|)) * (K * ‖x‖) :=
-        mul_le_mul_of_nonneg_left hw (by positivity)
+  calc
+    ‖u‖
+      ≤ (1 + g / c * (1 + g * |C|)) * ‖w‖ := by linarith
+    _ ≤ (1 + g / c * (1 + g * |C|)) * (K * ‖x‖) := mul_le_mul_of_nonneg_left hw (by positivity)
     _ = _ := by ring
 
 end GlobalTheory

@@ -5,11 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.W2.Seed.pRepEx :
-    RepEx := by
+theorem UpperTheory.Gal.W2.Seed.pRepEx : RepEx := by
   intro E _ _ n
   classical
   let b := NumberField.RingOfIntegers.basis E
@@ -18,8 +18,8 @@ theorem UpperTheory.Gal.W2.Seed.pRepEx :
   let b1 := Algebra.TensorProduct.basis ℚ bZ
   refine ⟨b1.equiv bQ (Equiv.refl _), ?_⟩
   let f1 : (Fin n → 𝓞 E) →ₗ[ℤ] (Fin n → E) :=
-    ((b1.equiv bQ (Equiv.refl _)).toLinearMap.restrictScalars ℤ) ∘ₗ
-      TensorProduct.mk ℤ ℚ (Fin n → 𝓞 E) 1
+    ((b1.equiv bQ (Equiv.refl _)).toLinearMap.restrictScalars ℤ)
+      ∘ₗ TensorProduct.mk ℤ ℚ (Fin n → 𝓞 E) 1
   let f2 : (Fin n → 𝓞 E) →ₗ[ℤ] (Fin n → E) :=
     LinearMap.pi (fun i => (algebraMap (𝓞 E) E).toIntAlgHom.toLinearMap ∘ₗ LinearMap.proj i)
   have hf : f1 = f2 := by

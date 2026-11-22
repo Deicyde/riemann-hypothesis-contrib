@@ -6,10 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 @[expose] public section
 
 open UpperTheory.V.Lit.Geo.Cs
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.Lit.Dr Filter Topology
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.Lit.Dr Filter Topology
 
-theorem UpperTheory.V.Lit.Geo.Cs.locBd :
-    LocBd := by
+theorem UpperTheory.V.Lit.Geo.Cs.locBd : LocBd := by
   intro E _ _ a p₀ hp
   obtain ⟨τ, h1, h2⟩ := locSec E a p₀ hp
   have c1 : ContinuousAt (fun p => toL (τ p).val) p₀ := h1.continuousAt

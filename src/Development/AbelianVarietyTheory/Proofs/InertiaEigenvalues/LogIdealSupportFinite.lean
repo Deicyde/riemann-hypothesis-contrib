@@ -18,40 +18,51 @@ section Maps
 
 variable {R S : Type} [CommRing R] [CommRing S] (f : R →+* S) {m r : ℕ}
 
-theorem Aof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) : Aof (M.map f) = (Aof M).map f := rfl
-theorem Bof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) : Bof (M.map f) = (Bof M).map f := rfl
-theorem Cof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) : Cof (M.map f) = (Cof M).map f := rfl
-theorem Dof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) : Dof (M.map f) = (Dof M).map f := rfl
+theorem Aof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R)
+    : Aof (M.map f) = (Aof M).map f :=
+  rfl
+theorem Bof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R)
+    : Bof (M.map f) = (Bof M).map f :=
+  rfl
+theorem Cof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R)
+    : Cof (M.map f) = (Cof M).map f :=
+  rfl
+theorem Dof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R)
+    : Dof (M.map f) = (Dof M).map f :=
+  rfl
 
-theorem inv_map_of_isUnit {n : ℕ} (A : Matrix (Fin n) (Fin n) R) (h : IsUnit A.det) :
-    (A⁻¹).map f = (A.map f)⁻¹ := by
+theorem inv_map_of_isUnit {n : ℕ} (A : Matrix (Fin n) (Fin n) R) (h : IsUnit A.det)
+    : (A⁻¹).map f = (A.map f)⁻¹ := by
   symm
   apply Matrix.inv_eq_left_inv
   rw [← Matrix.map_mul, Matrix.nonsing_inv_mul A h, Matrix.map_one f (map_zero f) (map_one f)]
 
-theorem Yof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) (h : IsUnit (Dof M).det) :
-    Yof (M.map f) = (Yof M).map f := by
+theorem Yof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) (h : IsUnit (Dof M).det)
+    : Yof (M.map f) = (Yof M).map f := by
   rw [Yof, Yof, Matrix.map_mul, Dof_map, Cof_map, inv_map_of_isUnit f _ h]
 
-theorem Xof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) (h : IsUnit (Dof M).det) :
-    Xof (M.map f) = (Xof M).map f := by
+theorem Xof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) (h : IsUnit (Dof M).det)
+    : Xof (M.map f) = (Xof M).map f := by
   rw [Xof, Xof, Matrix.map_mul, Dof_map, Bof_map, inv_map_of_isUnit f _ h]
 
-theorem Scof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) (h : IsUnit (Dof M).det) :
-    Scof (M.map f) = (Scof M).map f := by
-  rw [Scof, Scof, Matrix.map_sub _ (map_sub f), Matrix.map_mul, Matrix.map_mul, Aof_map, Dof_map, Bof_map, Cof_map,
-    inv_map_of_isUnit f _ h]
+theorem Scof_map (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) (h : IsUnit (Dof M).det)
+    : Scof (M.map f) = (Scof M).map f := by
+  rw [Scof, Scof, Matrix.map_sub _ (map_sub f), Matrix.map_mul, Matrix.map_mul, Aof_map, Dof_map,
+    Bof_map, Cof_map, inv_map_of_isUnit f _ h]
 
-theorem lowUni_map (Y : Matrix (Fin (r + 1)) (Fin (m + 1)) R) :
-    (lowUni Y).map f = lowUni (Y.map f) := by
+theorem lowUni_map (Y : Matrix (Fin (r + 1)) (Fin (m + 1)) R)
+    : (lowUni Y).map f = lowUni (Y.map f) := by
   ext i j
   simp only [lowUni, unblk, Matrix.map_apply, Matrix.submatrix_apply]
-  rcases (eqv m r i) with a | a <;> rcases (eqv m r j) with b | b <;>
-    simp [Matrix.one_apply, apply_ite f]
+  rcases (eqv m r i) with a | a <;> rcases (eqv m r j) with b | b
+    <;> simp [Matrix.one_apply, apply_ite f]
 
-theorem conjLowUni_map (Y : Matrix (Fin (r + 1)) (Fin (m + 1)) R) (k : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) :
-    (conjLowUni Y k).map f = conjLowUni (Y.map f) (k.map f) := by
-  rw [conjLowUni, conjLowUni, Matrix.map_mul, Matrix.map_mul, lowUni_map, lowUni_map, Matrix.map_neg _ (map_neg f)]
+theorem conjLowUni_map
+    (Y : Matrix (Fin (r + 1)) (Fin (m + 1)) R)
+    (k : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R)
+    : (conjLowUni Y k).map f = conjLowUni (Y.map f) (k.map f) := by
+  rw [conjLowUni, conjLowUni, Matrix.map_mul, Matrix.map_mul, lowUni_map, lowUni_map,
+    Matrix.map_neg _ (map_neg f)]
 
 end Maps
 
@@ -77,10 +88,12 @@ theorem Xof_one : Xof (1 : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R)
 theorem Scof_one : Scof (1 : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) = 1 := by
   rw [Scof, Aof_one, Bof_one, Cof_one]; simp
 
-theorem unblk_mul (P Q : Matrix (Fin (m + 1) ⊕ Fin (r + 1)) (Fin (m + 1) ⊕ Fin (r + 1)) R) :
-    unblk P * unblk Q = unblk (P * Q) := Matrix.submatrix_mul_equiv _ _ _ _ _
+theorem unblk_mul (P Q : Matrix (Fin (m + 1) ⊕ Fin (r + 1)) (Fin (m + 1) ⊕ Fin (r + 1)) R)
+    : unblk P * unblk Q = unblk (P * Q) :=
+  Matrix.submatrix_mul_equiv _ _ _ _ _
 
-theorem unblk_one : unblk (1 : Matrix (Fin (m + 1) ⊕ Fin (r + 1)) (Fin (m + 1) ⊕ Fin (r + 1)) R) = 1 := by
+theorem unblk_one
+    : unblk (1 : Matrix (Fin (m + 1) ⊕ Fin (r + 1)) (Fin (m + 1) ⊕ Fin (r + 1)) R) = 1 := by
   simp [unblk]
 
 theorem lowUni_mul_neg (Y : Matrix (Fin (r + 1)) (Fin (m + 1)) R) : lowUni Y * lowUni (-Y) = 1 := by
@@ -93,19 +106,25 @@ theorem conjLowUni_one (Y : Matrix (Fin (r + 1)) (Fin (m + 1)) R) : conjLowUni Y
 theorem det_lowUni (Y : Matrix (Fin (r + 1)) (Fin (m + 1)) R) : (lowUni (m := m) Y).det = 1 := by
   rw [lowUni, unblk, Matrix.det_submatrix_equiv_self, Matrix.det_fromBlocks_zero₁₂]; simp
 
-theorem det_conjLowUni (Y : Matrix (Fin (r + 1)) (Fin (m + 1)) R) (k : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) :
-    (conjLowUni Y k).det = k.det := by
+theorem det_conjLowUni
+    (Y : Matrix (Fin (r + 1)) (Fin (m + 1)) R)
+    (k : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R)
+    : (conjLowUni Y k).det = k.det := by
   rw [conjLowUni, Matrix.det_mul, Matrix.det_mul, det_lowUni, det_lowUni]; ring
 
-theorem det_eq_det_Dof_mul (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) (h : IsUnit (Dof M).det) :
-    M.det = (Dof M).det * (Scof M).det := by
+theorem det_eq_det_Dof_mul
+    (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) (h : IsUnit (Dof M).det)
+    : M.det = (Dof M).det * (Scof M).det := by
   letI := Matrix.invertibleOfIsUnitDet _ h
   have e : Matrix.fromBlocks (Aof M) (Bof M) (Cof M) (Dof M) = blk M := Matrix.fromBlocks_toBlocks _
   have h1 : M.det = (blk M).det := by rw [blk, Matrix.det_submatrix_equiv_self]
-  rw [h1, ← e, Matrix.det_fromBlocks₂₂, Matrix.invOf_eq_nonsing_inv]; rfl
+  rw [h1, ← e, Matrix.det_fromBlocks₂₂, Matrix.invOf_eq_nonsing_inv]
+  rfl
 
-theorem isUnit_det_Scof (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R) (hM : IsUnit M.det)
-    (h : IsUnit (Dof M).det) : IsUnit (Scof M).det := by
+theorem isUnit_det_Scof
+    (M : Matrix (Fin (m + r + 1 + 1)) (Fin (m + r + 1 + 1)) R)
+    (hM : IsUnit M.det) (h : IsUnit (Dof M).det)
+    : IsUnit (Scof M).det := by
   rw [det_eq_det_Dof_mul M h] at hM
   exact isUnit_of_mul_isUnit_right hM
 
@@ -120,22 +139,26 @@ theorem pInf_sFin_eq_zero (b : Af E) : pInf E (sFin E b) = 0 := map_zero (infEq 
 omit [_root_.NumberField.IsTotallyComplex E] in
 theorem pFin_sFin_eq (b : Af E) : pFin E (sFin E b) = b := rfl
 
-theorem isUnit_of_parts {x : Ad E} (h1 : IsUnit (pInf E x)) (h2 : IsUnit (pFin E x)) : IsUnit x := by
+theorem isUnit_of_parts {x : Ad E} (h1 : IsUnit (pInf E x)) (h2 : IsUnit (pFin E x))
+    : IsUnit x := by
   refine Prod.isUnit_iff.2 ⟨?_, h2⟩
   have e : (infEq E) (pInf E x) = x.1 := (infEq E).apply_symm_apply x.1
-  rw [← e]; exact h1.map _
+  rw [← e]
+  exact h1.map _
 
-theorem map_pInf_finGL {n : ℕ} (k : GL (Fin n) (Af E)) :
-    (finGL E n k : Matrix (Fin n) (Fin n) (Ad E)).map (pInf E) = 1 :=
+theorem map_pInf_finGL {n : ℕ} (k : GL (Fin n) (Af E))
+    : (finGL E n k : Matrix (Fin n) (Fin n) (Ad E)).map (pInf E) = 1 :=
   congrArg (fun g : GL (Fin n) (Cinf E) => (g : Matrix (Fin n) (Fin n) (Cinf E))) (pInf_finGL k)
 
 omit [_root_.NumberField.IsTotallyComplex E] in
-theorem map_pFin_finGL {n : ℕ} (k : GL (Fin n) (Af E)) :
-    (finGL E n k : Matrix (Fin n) (Fin n) (Ad E)).map (pFin E) = (k : Matrix (Fin n) (Fin n) (Af E)) :=
+theorem map_pFin_finGL {n : ℕ} (k : GL (Fin n) (Af E))
+    : (finGL E n k : Matrix (Fin n) (Fin n) (Ad E)).map (pFin E)
+      = (k : Matrix (Fin n) (Fin n) (Af E)) :=
   congrArg (fun g : GL (Fin n) (Af E) => (g : Matrix (Fin n) (Fin n) (Af E))) (pFin_finGL k)
 
-theorem coe_finGL_mkGL {n : ℕ} (M : Matrix (Fin n) (Fin n) (Ad E)) (hi : M.map (pInf E) = 1) (hu : IsUnit M.det) :
-    (finGL E n (mkGL (M.map (pFin E))) : Matrix (Fin n) (Fin n) (Ad E)) = M := by
+theorem coe_finGL_mkGL
+    {n : ℕ} (M : Matrix (Fin n) (Fin n) (Ad E)) (hi : M.map (pInf E) = 1) (hu : IsUnit M.det)
+    : (finGL E n (mkGL (M.map (pFin E))) : Matrix (Fin n) (Fin n) (Ad E)) = M := by
   have hu' : IsUnit (M.map (pFin E)).det := by
     have h := hu.map (pFin E)
     rwa [RingHom.map_det] at h

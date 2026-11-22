@@ -6,13 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Ten
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.SeeSaw GlobalTheory.AdForm GlobalTheory.LocMod
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory Matrix ValuativeRel
+  GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil
+  GlobalTheory.SeeSaw GlobalTheory.AdForm GlobalTheory.LocMod
 
 namespace GlobalTheory.LocMod.Place
 
-theorem intInd_mem_SB : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (Y Y' : Type) [Fintype Y] [DecidableEq Y] [Fintype Y'] [DecidableEq Y'],
-    Place.intInd (k := k) Y Y' ∈ SB (Matrix Y Y' k) := by
+theorem intInd_mem_SB
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (Y Y' : Type) [Fintype Y] [DecidableEq Y] [Fintype Y'] [DecidableEq Y'],
+      Place.intInd (k := k) Y Y' ∈ SB (Matrix Y Y' k) := by
   intro k _ _ _ _ Y Y' _ _ _ _
   have ho : IsOpen (𝒪[k] : Set k) := Valuation.isOpen_integer
   have hc : IsCompact (𝒪[k] : Set k) := IsNonarchimedeanLocalField.isCompact_closedBall k 1
@@ -28,7 +33,8 @@ theorem intInd_mem_SB : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSp
     exact isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => hc
   have hcl : IsClosed K := by
     rw [hKeq]
-    exact isClosed_set_pi fun _ _ => isClosed_set_pi fun _ _ => (Valuation.isClosed_integer (v := valuation k))
+    exact isClosed_set_pi fun _ _ =>
+      isClosed_set_pi fun _ _ => (Valuation.isClosed_integer (v := valuation k))
   refine ⟨?_, ?_⟩
   · show IsLocallyConstant (K.indicator fun _ => (1 : ℂ))
     refine (IsLocallyConstant.iff_eventually_eq _).mpr fun x => ?_

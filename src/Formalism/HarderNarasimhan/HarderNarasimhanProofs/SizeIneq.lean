@@ -16,17 +16,25 @@ namespace Formalism.HN
 
 section SlopeTestRemainingChoices
 
-variable {K : Type*} [Field K] [NumberField K]
+variable
+  {K : Type*} [Field K] [NumberField K]
   {V : Type*} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
   {W : Type*} [AddCommGroup W] [Module K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W]
 
-theorem sizeIneq_exists_mul_mem (A : Submodule (𝓞 K) V) (x : V)
-    (hx : x ∈ Submodule.span K (A : Set V)) : ∃ d : 𝓞 K, d ≠ 0 ∧ d • x ∈ A := by
-  first | exact Bl.general_b_fact_second''''''.goal1 .. | (apply Bl.general_b_fact_second''''''.goal1 <;> assumption) | (intros; apply Bl.general_b_fact_second''''''.goal1 <;> assumption) | (apply @Bl.general_b_fact_second''''''.goal1 <;> assumption) | (intros; apply @Bl.general_b_fact_second''''''.goal1 <;> assumption) | (apply @Bl.general_b_fact_second''''''.goal1 <;> first | assumption | infer_instance)
+theorem sizeIneq_exists_mul_mem
+    (A : Submodule (𝓞 K) V) (x : V) (hx : x ∈ Submodule.span K (A : Set V))
+    : ∃ d : 𝓞 K, d ≠ 0 ∧ d • x ∈ A := by
+  first
+  | exact Bl.general_b_fact_second''''''.goal1 ..
+  | (apply Bl.general_b_fact_second''''''.goal1 <;> assumption)
+  | (intros; apply Bl.general_b_fact_second''''''.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_second''''''.goal1 <;> assumption)
+  | (intros; apply @Bl.general_b_fact_second''''''.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_second''''''.goal1 <;> first | assumption | infer_instance)
 
-theorem sizeIneq_span_inf_ker (φ : V →ₗ[K] W) (A : Submodule (𝓞 K) V) :
-    Submodule.span K ((A ⊓ (LinearMap.ker φ).restrictScalars (𝓞 K) : Submodule (𝓞 K) V) : Set V) =
-      Submodule.span K (A : Set V) ⊓ LinearMap.ker φ := by
+theorem sizeIneq_span_inf_ker (φ : V →ₗ[K] W) (A : Submodule (𝓞 K) V)
+    : Submodule.span K ((A ⊓ (LinearMap.ker φ).restrictScalars (𝓞 K) : Submodule (𝓞 K) V) : Set V)
+      = Submodule.span K (A : Set V) ⊓ LinearMap.ker φ := by
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro x ⟨hxA, hxk⟩
@@ -45,13 +53,14 @@ theorem sizeIneq_span_inf_ker (φ : V →ₗ[K] W) (A : Submodule (𝓞 K) V) :
     rw [hx]
     exact Submodule.smul_mem _ _ (Submodule.subset_span hmem)
 
-theorem sizeIneq_rk [FiniteDimensional K V] (φ : V →ₗ[K] W) (A : Submodule (𝓞 K) V) :
-    rkK (A.map (φ.restrictScalars (𝓞 K))) + rkK (A ⊓ (LinearMap.ker φ).restrictScalars (𝓞 K)) =
-      rkK A := by
+theorem sizeIneq_rk [FiniteDimensional K V] (φ : V →ₗ[K] W) (A : Submodule (𝓞 K) V)
+    : rkK (A.map (φ.restrictScalars (𝓞 K))) + rkK (A ⊓ (LinearMap.ker φ).restrictScalars (𝓞 K))
+      = rkK A := by
   unfold rkK
   set S := Submodule.span K (A : Set V) with hS
-  have h1 : Submodule.span K ((A.map (φ.restrictScalars (𝓞 K)) : Submodule (𝓞 K) W) : Set W) =
-      S.map φ := by
+  have h1
+      : Submodule.span K ((A.map (φ.restrictScalars (𝓞 K)) : Submodule (𝓞 K) W) : Set W)
+        = S.map φ := by
     rw [Submodule.map_coe, hS, Submodule.map_span]
     rfl
   rw [h1, sizeIneq_span_inf_ker]
@@ -118,7 +127,8 @@ theorem sizeIneq_of (h1 : SizeMu) (h2 : HtImage) (h3 : PlLat) : SizeIneq := by
   have hMA := slope_characterization (𝓞 K) V _ ρ A hAlat hA0
   have hmin := (hMA.2.1 (muMin ρ A)).1 le_rfl A₀ hsat.1
   have hslQ : muMin ρ A ≤ Formalism.F.slope (Formalism.F.quot (zl ρ A) (zl ρ A₀)) := by
-    have hr : (Formalism.F.rk (Formalism.F.quot (zl ρ A) (zl ρ A₀)) : ℝ) = (rk ρ A : ℝ) - rk ρ A₀ := by
+    have hr
+        : (Formalism.F.rk (Formalism.F.quot (zl ρ A) (zl ρ A₀)) : ℝ) = (rk ρ A : ℝ) - rk ρ A₀ := by
       rw [hq.1, Nat.cast_sub hq.2.1]
     have hrpos : (0 : ℝ) < (rk ρ A : ℝ) - rk ρ A₀ := by
       have : (rk ρ A₀ : ℝ) < rk ρ A := by exact_mod_cast hlt
@@ -142,8 +152,7 @@ theorem sizeIneq_of (h1 : SizeMu) (h2 : HtImage) (h3 : PlLat) : SizeIneq := by
       rw [hrkI, h, mul_zero] at hrkIpos
       exact lt_irrefl _ hrkIpos
     exact_mod_cast Nat.pos_of_ne_zero this
-  have hrkR : ((rkK A : ℝ) - rkK A₀) = rkK I := by
-    rw [← hrkeq]; push_cast; ring
+  have hrkR : ((rkK A : ℝ) - rkK A₀) = rkK I := by rw [← hrkeq]; push_cast; ring
   rw [Finset.prod_pow] at hht
   have hX0 : 0 ≤ P ^ (2 * rkK I) := pow_nonneg hP _
   have hQpos : 0 < htQ b X A A₀ := pos_of_mul_pos_right (lt_of_lt_of_le hhtI hht) hX0
@@ -151,23 +160,26 @@ theorem sizeIneq_of (h1 : SizeMu) (h2 : HtImage) (h3 : PlLat) : SizeIneq := by
   have hcore : size b' X' I ≤ P ^ ((1 : ℝ) / (nPl K : ℝ)) * sizeQ b X A A₀ := by
     unfold size sizeQ
     rw [hrkR]
-    calc ht b' X' I ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ)))
-        ≤ (P ^ (2 * rkK I) * htQ b X A A₀) ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) :=
-          Real.rpow_le_rpow hhtI.le hht he
-      _ = (P ^ (2 * rkK I)) ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) *
-            htQ b X A A₀ ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) :=
-          Real.mul_rpow hX0 hQpos.le
-      _ = P ^ ((1 : ℝ) / (nPl K : ℝ)) *
-            htQ b X A A₀ ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) := by
-          congr 1
-          rw [← Real.rpow_natCast, ← Real.rpow_mul hP]
-          congr 1
-          push_cast
-          field_simp
+    calc
+      ht b' X' I ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ)))
+          ≤ (P ^ (2 * rkK I) * htQ b X A A₀) ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) :=
+        Real.rpow_le_rpow hhtI.le hht he
+      _ = (P ^ (2 * rkK I)) ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ)))
+          * htQ b X A A₀ ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) :=
+        Real.mul_rpow hX0 hQpos.le
+      _ = P ^ ((1 : ℝ) / (nPl K : ℝ))
+          * htQ b X A A₀ ^ ((1 : ℝ) / (2 * (nPl K : ℝ) * (rkK I : ℝ))) := by
+        congr 1
+        rw [← Real.rpow_natCast, ← Real.rpow_mul hP]
+        congr 1
+        push_cast
+        field_simp
   rw [div_le_iff₀ hlargepos]
-  calc leastSize b' X' B ≤ size b' X' I := hleI
+  calc
+    leastSize b' X' B
+      ≤ size b' X' I := hleI
     _ ≤ P ^ ((1 : ℝ) / (nPl K : ℝ)) * sizeQ b X A A₀ := hcore
     _ ≤ P ^ ((1 : ℝ) / (nPl K : ℝ)) * largestSize b X A :=
-        mul_le_mul_of_nonneg_left hQle (Real.rpow_nonneg hP _)
+      mul_le_mul_of_nonneg_left hQle (Real.rpow_nonneg hP _)
 
 end Formalism.HN

@@ -62,10 +62,12 @@ open GroundTheory.Heights₂.Heights.ComplexSets
 
 noncomputable section
 
-theorem coordinateGraphNear_of_chart {n : ℕ} {X : Set (Fin n → ℂ)} {x : Fin n → ℂ}
-    (A : (Fin n → ℂ) →L[ℂ] ℂ) (O : Set ℂ) (V : Set (Fin n → ℂ)) (g : ℂ → Fin n → ℂ)
+theorem coordinateGraphNear_of_chart
+    {n : ℕ} {X : Set (Fin n → ℂ)} {x : Fin n → ℂ} (A : (Fin n → ℂ) →L[ℂ] ℂ)
+    (O : Set ℂ) (V : Set (Fin n → ℂ)) (g : ℂ → Fin n → ℂ)
     (hO : IsOpen O) (hV : IsOpen V) (hxV : x ∈ V) (hxX : x ∈ X) (hg : AnalyticOnNhd ℂ g O)
-    (hAg : ∀ y ∈ O, A (g y) = y) (hXV : X ∩ V = g '' O) : IsCoordinateGraphNear X x := by
+    (hAg : ∀ y ∈ O, A (g y) = y) (hXV : X ∩ V = g '' O)
+    : IsCoordinateGraphNear X x := by
   obtain ⟨y₀, hy₀O, hgy₀⟩ : x ∈ g '' O := hXV ▸ ⟨hxX, hxV⟩
 
   have hAd : ∀ y ∈ O, A (deriv g y) = 1 := by
@@ -95,10 +97,22 @@ theorem coordinateGraphNear_of_chart {n : ℕ} {X : Set (Fin n → ℂ)} {x : Fi
   set e := ((hs.hasStrictFDerivAt_equiv hi).toOpenPartialHomeomorph φ).restrOpen U hU with hedef
   have he : ∀ y, e y = φ y := fun _ ↦ rfl
   have hsrc : ∀ {y}, y ∈ e.source → y ∈ U := fun hy ↦ hy.2
-  have hy₀e : y₀ ∈ e.source := ⟨(hs.hasStrictFDerivAt_equiv hi).mem_toOpenPartialHomeomorph_source, hy₀U⟩
-  refine ⟨hxX, V ∩ A ⁻¹' e.source ∩ (fun z ↦ z i) ⁻¹' e.target,
-    (hV.inter (e.open_source.preimage A.continuous)).inter (e.open_target.preimage (continuous_apply i)),
-    ⟨⟨hxV, ?_⟩, ?_⟩, i, e.target, fun t ↦ g (e.symm t), e.open_target, ?_, ?_, ?_⟩
+  have hy₀e : y₀ ∈ e.source :=
+    ⟨(hs.hasStrictFDerivAt_equiv hi).mem_toOpenPartialHomeomorph_source, hy₀U⟩
+  refine ⟨
+    hxX,
+    V ∩ A ⁻¹' e.source ∩ (fun z ↦ z i) ⁻¹' e.target,
+    (hV.inter (e.open_source.preimage A.continuous)).inter
+      (e.open_target.preimage (continuous_apply i)),
+    ⟨⟨hxV, ?_⟩, ?_⟩,
+    i,
+    e.target,
+    fun t ↦ g (e.symm t),
+    e.open_target,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · show A x ∈ e.source
     rw [← hgy₀, hAg y₀ hy₀O]
     exact hy₀e
@@ -158,31 +172,44 @@ theorem puncturedCurveDiscInverse : PuncturedCurveDiscInverse.Statement := by
     hha.eventually_analyticAt.and ((hfa.hasStrictDerivAt.eventually_right_inverse hf').and
       (hha.continuousAt.preimage_mem_nhds (by rw [hh0]; exact hDo.mem_nhds hσD)))
   obtain ⟨T, hTsub, hTo, hT⟩ := mem_nhds_iff.1 hev
-  refine ⟨W ∩ (fun z ↦ z i) ⁻¹' T, hWo.inter (hTo.preimage (continuous_apply i)), ⟨hxW, hT⟩,
-    fun z ↦ h (z i), fun z hz ↦ ?_, fun z ⟨hzZ, hzW, hzT⟩ ↦ ?_⟩
-  · exact ((hTsub hz.2).1.differentiableAt.comp z (differentiableAt_apply i z)).differentiableWithinAt
+  refine ⟨
+    W ∩ (fun z ↦ z i) ⁻¹' T,
+    hWo.inter (hTo.preimage (continuous_apply i)),
+    ⟨hxW, hT⟩,
+    fun z ↦ h (z i),
+    fun z hz ↦ ?_,
+    fun z ⟨hzZ, hzW, hzT⟩ ↦ ?_
+  ⟩
+  · exact ((hTsub hz.2).1.differentiableAt.comp z
+      (differentiableAt_apply i z)).differentiableWithinAt
   · obtain ⟨-, hfh, hhD⟩ := hTsub hzT
     refine ⟨h (z i), hhD.1, ?_, rfl⟩
     rw [← hφg _ hhD, hfh]
     exact ((hW z hzW).1 hzZ).2
 
 theorem normalCurveBranchOrder : NormalCurveBranchOrder.Statement :=
-  NormalCurveBranchOrder.proof NormalCurvePointDVR.proof GroundTheory.Heights₂.Heights.AutoClose.UniformiserBranchSimpleZero
+  NormalCurveBranchOrder.proof NormalCurvePointDVR.proof
+    GroundTheory.Heights₂.Heights.AutoClose.UniformiserBranchSimpleZero
 
-theorem normalModelOpenMappingCurve (n : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ))
-    (M : IndefiniteRowSideFullHecke.ComplexSets.NormalModel J) (U : Set (Fin 1 → ℂ)) (φ : (Fin 1 → ℂ) → Fin n ⊕ Fin M.m → ℂ)
-    (_hJ : J.IsPrime) (hdim : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (1 : ℕ))
-    (hU : IsOpen U) (hφd : DifferentiableOn ℂ φ U) (hφi : Set.InjOn φ U)
-    (hφZ : Set.MapsTo φ U (IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal)) :
-    ∃ O : Set (Fin n ⊕ Fin M.m → ℂ), IsOpen O ∧ φ '' U = IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∩ O := by
+theorem normalModelOpenMappingCurve
+    (n : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ))
+    (M : IndefiniteRowSideFullHecke.ComplexSets.NormalModel J)
+    (U : Set (Fin 1 → ℂ)) (φ : (Fin 1 → ℂ) → Fin n ⊕ Fin M.m → ℂ)
+    (_hJ : J.IsPrime) (hdim : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (1 : ℕ)) (hU : IsOpen U)
+    (hφd : DifferentiableOn ℂ φ U) (hφi : Set.InjOn φ U)
+    (hφZ : Set.MapsTo φ U (IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal))
+    : ∃ O : Set (Fin n ⊕ Fin M.m → ℂ),
+      IsOpen O ∧ φ '' U = IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∩ O := by
   have hdim' : ringKrullDim (MvPolynomial (Fin n ⊕ Fin M.m) ℂ ⧸ M.ideal) = (1 : ℕ) := by
     rw [M.ringKrullDim_eq, hdim]
-  have key : ∀ τ ∈ U, ∃ W : Set (Fin n ⊕ Fin M.m → ℂ), IsOpen W ∧ φ τ ∈ W ∧
-      IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∩ W ⊆ φ '' U := by
+  have key
+      : ∀ τ ∈ U, ∃ W : Set (Fin n ⊕ Fin M.m → ℂ),
+        IsOpen W ∧ φ τ ∈ W
+          ∧ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∩ W ⊆ φ '' U := by
     intro τ hτ
     obtain ⟨A, O, V, g, hO, hV, hwV, hg, hAg, hZV⟩ :=
-      GroundTheory.Heights₂.Heights.AutoClose.NormalCurveRegularPoint (Fin n ⊕ Fin M.m) M.ideal (φ τ) M.isPrime
-        M.isIntegrallyClosed hdim' (hφZ hτ)
+      GroundTheory.Heights₂.Heights.AutoClose.NormalCurveRegularPoint (Fin n ⊕ Fin M.m) M.ideal
+        (φ τ) M.isPrime M.isIntegrallyClosed hdim' (hφZ hτ)
     set D : Set (Fin 1 → ℂ) := U ∩ φ ⁻¹' V with hD
     have hDo : IsOpen D := hφd.continuousOn.isOpen_inter_preimage hU hV
     have hφg : ∀ σ ∈ D, ∃ y ∈ O, g y = φ σ := fun σ hσ ↦ by
@@ -197,8 +224,12 @@ theorem normalModelOpenMappingCurve (n : ℕ) (J : Ideal (MvPolynomial (Fin n) �
       hφi hs.1 ht.1 (by rw [← hgA s hs, ← hgA t ht]; exact congrArg g h)
     have hopen : IsOpen ((fun σ ↦ A (φ σ)) '' D) :=
       GroundTheory.Heights₂.Heights.AutoClose.injective_holomorphic_open_holds 1 D _ hDo hhd hhi
-    refine ⟨V ∩ A ⁻¹' ((fun σ ↦ A (φ σ)) '' D), hV.inter (hopen.preimage A.continuous),
-      ⟨hwV, τ, ⟨hτ, hwV⟩, rfl⟩, ?_⟩
+    refine ⟨
+      V ∩ A ⁻¹' ((fun σ ↦ A (φ σ)) '' D),
+      hV.inter (hopen.preimage A.continuous),
+      ⟨hwV, τ, ⟨hτ, hwV⟩, rfl⟩,
+      ?_
+    ⟩
     rintro z ⟨hzZ, hzV, σ, hσ, hσz⟩
     obtain ⟨y, hy, rfl⟩ : z ∈ g '' O := hZV ▸ ⟨hzZ, hzV⟩
     refine ⟨σ, hσ.1, ?_⟩
@@ -214,15 +245,18 @@ theorem normalModelOpenMappingCurve (n : ℕ) (J : Ideal (MvPolynomial (Fin n) �
     exact hWs τ hτ ⟨hzZ, hzW⟩
 
 def BranchLiftCurve : Prop :=
-  ∀ (n : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (p : Fin n → ℂ) (M : IndefiniteRowSideFullHecke.ComplexSets.NormalModel J)
-    (γ : VarBranch J 1 p),
-    J.IsPrime → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (1 : ℕ) →
-    ∃ Γ : (Fin 1 → ℂ) → Fin n ⊕ Fin M.m → ℂ,
-      DifferentiableOn ℂ Γ (Metric.ball 0 γ.radius) ∧
-      (∀ τ ∈ Metric.ball 0 γ.radius, Γ τ ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∧
-        IndefiniteRowSideFullHecke.ComplexSets.firstCoords (Γ τ) = γ.toFun τ) ∧
-      ∀ V ⊆ Metric.ball 0 γ.radius, IsOpen V →
-        ∃ O : Set (Fin n ⊕ Fin M.m → ℂ), IsOpen O ∧ Γ '' V = IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∩ O
+  ∀ (n : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (p : Fin n → ℂ)
+      (M : IndefiniteRowSideFullHecke.ComplexSets.NormalModel J) (γ : VarBranch J 1 p),
+    J.IsPrime → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (1 : ℕ)
+      → ∃ Γ : (Fin 1 → ℂ) → Fin n ⊕ Fin M.m → ℂ,
+        DifferentiableOn ℂ Γ (Metric.ball 0 γ.radius)
+          ∧ (∀ τ ∈ Metric.ball 0 γ.radius,
+            Γ τ ∈ IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal
+              ∧ IndefiniteRowSideFullHecke.ComplexSets.firstCoords (Γ τ) = γ.toFun τ)
+          ∧ ∀ V ⊆ Metric.ball 0 γ.radius,
+            IsOpen V
+              → ∃ O : Set (Fin n ⊕ Fin M.m → ℂ),
+                IsOpen O ∧ Γ '' V = IndefiniteRowSideFullHecke.ComplexSets.zeroSetIn M.ideal ∩ O
 
 open GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets in
 theorem branchLiftCurve : BranchLiftCurve := by
@@ -252,8 +286,8 @@ theorem branchLiftCurve : BranchLiftCurve := by
     obtain ⟨i, -, hi⟩ := (Ideal.IsPrime.prod_mem_iff (hp := hJ)).1 h
     exact hbJ i hi
   have hgne : ∀ V, IsOpen V → V ⊆ Δ → V.Nonempty → ∃ t ∈ V, g t ≠ 0 := fun V hV hVΔ hne =>
-    hB n 1 J _ V γ.toFun hJ hdim hBJ hV hne (hγd.mono hVΔ) (γ.injOn.mono hVΔ)
-      fun τ hτ => hγZ τ (hVΔ hτ)
+    hB n 1 J _ V γ.toFun hJ hdim hBJ hV hne (hγd.mono hVΔ) (γ.injOn.mono hVΔ) fun τ hτ =>
+      hγZ τ (hVΔ hτ)
   have hbne : ∀ τ, g τ ≠ 0 → ∀ i, eval (γ.toFun τ) (b i) ≠ 0 := fun τ hτ i h =>
     hτ (by simp only [hg, map_prod]; exact Finset.prod_eq_zero (Finset.mem_univ i) h)
   set f : Fin M.m → (Fin 1 → ℂ) → ℂ := fun i τ => eval (γ.toFun τ) (a i) / eval (γ.toFun τ) (b i)
@@ -271,10 +305,14 @@ theorem branchLiftCurve : BranchLiftCurve := by
     have hsub : Metric.closedBall τ (ε / 2) ⊆ Δ :=
       (Metric.closedBall_subset_ball (by linarith)).trans hεΔ
     have hK : Bornology.IsBounded (γ.toFun '' Metric.closedBall τ (ε / 2)) :=
-      ((isCompact_closedBall τ (ε / 2)).image_of_continuousOn (hγd.continuousOn.mono hsub)).isBounded
+      ((isCompact_closedBall τ (ε / 2)).image_of_continuousOn
+        (hγd.continuousOn.mono hsub)).isBounded
     obtain ⟨C, hC⟩ := isBounded_iff_forall_norm_le.1 (hP n J M _ hK)
-    refine ⟨Metric.closedBall τ (ε / 2), Metric.closedBall_mem_nhds τ (by linarith),
-      isBounded_iff_forall_norm_le.2 ⟨C, ?_⟩⟩
+    refine ⟨
+      Metric.closedBall τ (ε / 2),
+      Metric.closedBall_mem_nhds τ (by linarith),
+      isBounded_iff_forall_norm_le.2 ⟨C, ?_⟩
+    ⟩
     rintro _ ⟨t, ⟨⟨ht, htΔ⟩, hgt⟩, rfl⟩
     have hw := hC _ ⟨hgraph t htΔ hgt, ⟨t, ht, rfl⟩⟩
     exact (norm_le_pi_norm (Sum.elim (γ.toFun t) fun i => f i t) (Sum.inr i)).trans hw
@@ -290,8 +328,8 @@ theorem branchLiftCurve : BranchLiftCurve := by
     intro τ hτ
     rw [mem_closure_iff]
     intro o ho hτo
-    obtain ⟨t, ⟨hto, htΔ⟩, hgt⟩ := hgne (o ∩ Δ) (ho.inter Metric.isOpen_ball)
-      Set.inter_subset_right ⟨τ, hτo, hτ⟩
+    obtain ⟨t, ⟨hto, htΔ⟩, hgt⟩ :=
+      hgne (o ∩ Δ) (ho.inter Metric.isOpen_ball) Set.inter_subset_right ⟨τ, hτo, hτ⟩
     exact ⟨t, hto, htΔ, hgt⟩
   have hΓZ : ∀ τ ∈ Δ, Γ τ ∈ zeroSetIn M.ideal := by
     intro τ hτ q hq
@@ -304,8 +342,9 @@ theorem branchLiftCurve : BranchLiftCurve := by
         exact hFeq i ht
       simp only [hΓt]
       exact hgraph t ht.1 ht.2 q hq
-    exact heq.of_subset_closure ((MvPolynomial.continuous_eval q).comp_continuousOn hΓd.continuousOn)
-      continuousOn_const Set.inter_subset_left hdense hτ
+    exact heq.of_subset_closure
+      ((MvPolynomial.continuous_eval q).comp_continuousOn hΓd.continuousOn) continuousOn_const
+      Set.inter_subset_left hdense hτ
   have hΓinj : Set.InjOn Γ Δ := fun s hs t ht hst =>
     γ.injOn hs ht (by
       have := congrArg firstCoords hst
@@ -366,14 +405,19 @@ theorem sameOrderBranchesMeet : SameOrderBranchesMeet.Statement := by
   have hΓ0U : Γ 0 ∈ U := by
     rw [hw]
     exact (hU ▸ Set.mem_image_of_mem Γ' (Metric.mem_ball_self γ'.radius_pos)).2
-  have hcont : ContinuousAt Γ 0 := hΓd.continuousOn.continuousAt (Metric.ball_mem_nhds 0 γ.radius_pos)
+  have hcont : ContinuousAt Γ 0 :=
+    hΓd.continuousOn.continuousAt (Metric.ball_mem_nhds 0 γ.radius_pos)
   have hnear : ∀ᶠ τ in 𝓝[≠] (0 : Fin 1 → ℂ), τ ≠ 0 ∧ τ ∈ Metric.ball 0 γ.radius ∧ Γ τ ∈ U := by
     filter_upwards [self_mem_nhdsWithin, nhdsWithin_le_nhds (Metric.ball_mem_nhds 0 γ.radius_pos),
       nhdsWithin_le_nhds (hcont.preimage_mem_nhds (hUo.mem_nhds hΓ0U))] with τ h1 h2 h3 using ⟨h1, h2, h3⟩
   obtain ⟨τ, hτ0, hτ, hτU⟩ := hnear.exists
   obtain ⟨τ', hτ', hτ'eq⟩ : Γ τ ∈ Γ' '' Metric.ball 0 γ'.radius := hU ▸ ⟨(hΓ τ hτ).1, hτU⟩
   have hτc : τ ∈ Metric.ball 0 c.radius := Metric.ball_subset_ball (min_le_right _ _) hτ
-  refine ⟨c.toFun τ, ⟨⟨τ, hτc, rfl⟩, ⟨τ', Metric.ball_subset_ball (min_le_right _ _) hτ', ?_⟩⟩, fun hq ↦ hτ0 ?_⟩
+  refine ⟨
+    c.toFun τ,
+    ⟨⟨τ, hτc, rfl⟩, ⟨τ', Metric.ball_subset_ball (min_le_right _ _) hτ', ?_⟩⟩,
+    fun hq ↦ hτ0 ?_
+  ⟩
   · have e1 := (hΓ' τ' hτ').2
     have e2 := (hΓ τ hτ).2
     rw [hτ'eq] at e1
@@ -382,15 +426,17 @@ theorem sameOrderBranchesMeet : SameOrderBranchesMeet.Statement := by
 
 theorem primePlaceBranchExists : PrimePlaceBranchExists.Statement :=
   PrimePlaceBranchExists.proof
-    (NormalModelPointOfPlace.proof NormalisationModelLocalization.full ModelLocalizationMaximalPoint.proof
-      LocalizationAtPrimeQuotient.proof)
-    GroundTheory.Heights₂.Heights.AutoClose.NormalModelDisc NormalModelProjectionLocallyInjective.proof normalCurveBranchOrder
+    (NormalModelPointOfPlace.proof NormalisationModelLocalization.full
+      ModelLocalizationMaximalPoint.proof LocalizationAtPrimeQuotient.proof)
+    GroundTheory.Heights₂.Heights.AutoClose.NormalModelDisc
+    NormalModelProjectionLocallyInjective.proof normalCurveBranchOrder
 
 theorem placeHasBranch : PlaceHasBranch.Statement :=
   PlaceHasBranch.proof
-    (PlaceBranchExists.proof GroundTheory.Heights₂.Heights.AutoClose.PlaceOnComponent primePlaceBranchExists)
-    (PuncturedBranchInOneBranch.proof
-      (BranchImageNhdOffCentre.proof GroundTheory.Heights₂.Heights.AutoClose.CurveRegularOffCentre))
+    (PlaceBranchExists.proof GroundTheory.Heights₂.Heights.AutoClose.PlaceOnComponent
+      primePlaceBranchExists)
+    (PuncturedBranchInOneBranch.proof (BranchImageNhdOffCentre.proof
+      GroundTheory.Heights₂.Heights.AutoClose.CurveRegularOffCentre))
     (PuncturedBranchSameOrder.proof puncturedCurveDiscInverse)
 
 theorem branchNormalisation : BranchNormalisation.Statement :=

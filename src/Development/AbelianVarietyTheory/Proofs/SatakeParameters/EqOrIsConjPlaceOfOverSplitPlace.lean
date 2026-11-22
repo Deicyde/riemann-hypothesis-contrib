@@ -6,7 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.SplitExEv
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.SplitPlaceOver
@@ -15,8 +18,9 @@ theorem host_conj_eq' (D : D7) (x : D.host.E) : D.host.conj x = IsCMField.comple
   D.host.φ₀.injective (by
     rw [NumberField.IsCMField.complexEmbedding_complexConj, Formalism.HC.HostAx.conjE_apply])
 
-theorem eq_or_isConjPl : ∀ (D : D7) (s : SplitPlace D.host.E) (w : PlE D.host), NG.OverPl w s.v →
-    s.w = w ∨ IsConjPl D.host w s.w := by
+theorem eq_or_isConjPl
+    : ∀ (D : D7) (s : SplitPlace D.host.E) (w : PlE D.host),
+      NG.OverPl w s.v → s.w = w ∨ IsConjPl D.host w s.w := by
   intro D s w hov
   let cO := IsCMField.ringOfIntegersComplexConj D.host.E
   have cc (x : 𝓞 D.host.E) : cO (cO x) = x := by
@@ -30,10 +34,12 @@ theorem eq_or_isConjPl : ∀ (D : D7) (s : SplitPlace D.host.E) (w : PlE D.host)
       obtain ⟨y, hy, hy0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot s.w.ne_bot
       refine (Submodule.ne_bot_iff _).2 ⟨cO y, ?_, ?_⟩
       · show (cO : 𝓞 D.host.E →+* 𝓞 D.host.E) (cO y) ∈ s.w.asIdeal
-        rw [RingHom.coe_coe, cc]; exact hy
+        rw [RingHom.coe_coe, cc]
+        exact hy
       · intro h0
         apply hy0
-        rw [← cc y, h0, map_zero] }
+        rw [← cc y, h0, map_zero]
+  }
   have hQ (x : 𝓞 D.host.E) : x ∈ Q.asIdeal ↔ cO x ∈ s.w.asIdeal := Iff.rfl
   have he : w = s.w ∨ w = Q := by
     by_contra hne
@@ -55,7 +61,8 @@ theorem eq_or_isConjPl : ∀ (D : D7) (s : SplitPlace D.host.E) (w : PlE D.host)
     rw [hQ] at hxQ
     have hfix : cO (x * cO x) = x * cO x := by rw [map_mul, cc, mul_comm]
     obtain ⟨y, hy⟩ := (IsCMField.ringOfIntegersComplexConj_eq_self_iff D.host.E _).1 hfix
-    have hyw : y ∈ w.asIdeal.comap (algebraMap (𝓞 (maximalRealSubfield D.host.E)) (𝓞 D.host.E)) := by
+    have hyw
+        : y ∈ w.asIdeal.comap (algebraMap (𝓞 (maximalRealSubfield D.host.E)) (𝓞 D.host.E)) := by
       rw [Ideal.mem_comap, hy]; exact w.asIdeal.mul_mem_right _ hx
     rw [hov.trans s.w_under.symm, Ideal.mem_comap, hy] at hyw
     rcases s.w.isPrime.mem_or_mem hyw with h | h

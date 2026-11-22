@@ -6,7 +6,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  CrystallineSemistableComparison.Pb
 attribute [local instance] MvPolynomial.gradedAlgebra
 
 noncomputable section
@@ -17,31 +18,40 @@ open HomogeneousLocalization
 
 variable {K : Type} [Field K] {X : Scheme.{0}} {N : ℕ}
 
-theorem evV_awayMap (i : X ⟶ PSpace K N) {f g x : MvPolynomial (Fin (N + 1)) K} {n : ℕ}
-    (hg : g ∈ grK K N n) (hx : x = f * g) (V : X.Opens)
+theorem evV_awayMap
+    (i : X ⟶ PSpace K N)
+    {f g x : MvPolynomial (Fin (N + 1)) K} {n : ℕ} (hg : g ∈ grK K N n) (hx : x = f * g)
+    (V : X.Opens)
     (hf : V ≤ i ⁻¹ᵁ Proj.basicOpen (grK K N) f) (hxV : V ≤ i ⁻¹ᵁ Proj.basicOpen (grK K N) x)
-    (a : Away (grK K N) f) :
-    evV i x V hxV (awayMap (grK K N) hg hx a) = evV i f V hf a := by
+    (a : Away (grK K N) f)
+    : evV i x V hxV (awayMap (grK K N) hg hx a) = evV i f V hf a := by
   have h := congrArg (fun φ => φ.hom a) (Proj.awayMap_awayToSection (grK K N) hg hx)
   simp only [CommRingCat.hom_comp, RingHom.comp_apply, CommRingCat.hom_ofHom] at h
-  change (i.appLE _ V hxV).hom ((Proj.awayToSection (grK K N) x).hom (awayMap (grK K N) hg hx a)) = _
+  change (i.appLE _ V hxV).hom ((Proj.awayToSection (grK K N) x).hom (awayMap (grK K N) hg hx a))
+    = _
   rw [h]
   change ((_ ≫ i.appLE _ V hxV).hom) _ = _
   rw [Scheme.Hom.map_appLE]
   rfl
 
-theorem prod_pow_mem {n e p : ℕ} (y : Fin n → MvPolynomial (Fin (N + 1)) K)
-    (hy : ∀ k, (y k).IsHomogeneous e) (α : Fin n → ℕ) (hp : (∑ j, α j) * e = p) :
-    ∏ j, y j ^ α j ∈ grK K N p := by
-  have h := MvPolynomial.IsHomogeneous.prod Finset.univ (fun j => y j ^ α j) (fun j => e * α j)
-    (fun j _ => (hy j).pow (α j))
+theorem prod_pow_mem
+    {n e p : ℕ} (y : Fin n → MvPolynomial (Fin (N + 1)) K) (hy : ∀ k, (y k).IsHomogeneous e)
+    (α : Fin n → ℕ) (hp : (∑ j, α j) * e = p)
+    : ∏ j, y j ^ α j ∈ grK K N p := by
+  have h :=
+    MvPolynomial.IsHomogeneous.prod Finset.univ
+      (fun j => y j ^ α j)
+      (fun j => e * α j)
+      (fun j _ => (hy j).pow (α j))
   rw [MvPolynomial.mem_homogeneousSubmodule, ← hp, mul_comm, Finset.mul_sum]
   exact h
 
-theorem prod_mk_pow {n e c : ℕ} {g : MvPolynomial (Fin (N + 1)) K} (hg : g ∈ grK K N e)
+theorem prod_mk_pow
+    {n e c : ℕ} {g : MvPolynomial (Fin (N + 1)) K} (hg : g ∈ grK K N e)
     (y : Fin n → MvPolynomial (Fin (N + 1)) K) (h1 : ∀ j, y j ∈ grK K N (1 • e)) (α : Fin n → ℕ)
-    (hc : ∑ j, α j = c) (hm : ∏ j, y j ^ α j ∈ grK K N (c • e)) :
-    ∏ j, Away.mk (grK K N) hg 1 (y j) (h1 j) ^ α j = Away.mk (grK K N) hg c (∏ j, y j ^ α j) hm := by
+    (hc : ∑ j, α j = c) (hm : ∏ j, y j ^ α j ∈ grK K N (c • e))
+    : ∏ j, Away.mk (grK K N) hg 1 (y j) (h1 j) ^ α j
+      = Away.mk (grK K N) hg c (∏ j, y j ^ α j) hm := by
   have hpow : ∀ k : ℕ, g ^ k ∈ Submonoid.powers g := fun k => ⟨k, rfl⟩
   let v : Localization (Submonoid.powers g) := Localization.mk 1 ⟨g, 1, pow_one g⟩
   have hv : ∀ k : ℕ, v ^ k = Localization.mk 1 ⟨g ^ k, hpow k⟩ := by
@@ -51,8 +61,9 @@ theorem prod_mk_pow {n e c : ℕ} {g : MvPolynomial (Fin (N + 1)) K} (hg : g ∈
     | succ k ih =>
       rw [pow_succ, ih, Localization.mk_mul]
       simp [pow_succ]
-  have key : ∀ (k : ℕ) (x) (hx : x ∈ grK K N (k • e)),
-      (Away.mk (grK K N) hg k x hx).val = algebraMap _ _ x * v ^ k := by
+  have key
+      : ∀ (k : ℕ) (x) (hx : x ∈ grK K N (k • e)),
+        (Away.mk (grK K N) hg k x hx).val = algebraMap _ _ x * v ^ k := by
     intro k x hx
     rw [Away.val_mk, hv, ← Localization.mk_one_eq_algebraMap, Localization.mk_mul]
     simp
@@ -61,23 +72,31 @@ theorem prod_mk_pow {n e c : ℕ} {g : MvPolynomial (Fin (N + 1)) K} (hg : g ∈
   simp_rw [map_pow, HomogeneousLocalization.algebraMap_apply, key, pow_one, mul_pow,
     Finset.prod_mul_distrib, map_prod, map_pow, Finset.prod_pow_eq_pow_sum, hc]
 
-theorem exists_shift {n : ℕ} (S : Finset (Fin n)) (v : Fin n → ℤ) (h : ∀ j, j ∉ S → 0 ≤ v j) :
-    ∃ (r : ℕ) (α : Fin n → ℕ), ∀ j, (α j : ℤ) = v j + if j ∈ S then (r : ℤ) else 0 := by
-  refine ⟨∑ j, (v j).natAbs, fun j => (v j + if j ∈ S then ((∑ j, (v j).natAbs : ℕ) : ℤ) else 0).toNat, fun j => ?_⟩
+theorem exists_shift {n : ℕ} (S : Finset (Fin n)) (v : Fin n → ℤ) (h : ∀ j, j ∉ S → 0 ≤ v j)
+    : ∃ (r : ℕ) (α : Fin n → ℕ), ∀ j, (α j : ℤ) = v j + if j ∈ S then (r : ℤ) else 0 := by
+  refine ⟨
+    ∑ j, (v j).natAbs,
+    fun j => (v j + if j ∈ S then ((∑ j, (v j).natAbs : ℕ) : ℤ) else 0).toNat,
+    fun j => ?_
+  ⟩
   refine Int.toNat_of_nonneg ?_
   by_cases hj : j ∈ S
   · have h1 : (v j).natAbs ≤ ∑ j, (v j).natAbs :=
-      Finset.single_le_sum (f := fun j => (v j).natAbs) (fun _ _ => Nat.zero_le _) (Finset.mem_univ j)
+      Finset.single_le_sum
+        (f := fun j => (v j).natAbs)
+        (fun _ _ => Nat.zero_le _)
+        (Finset.mem_univ j)
     simp only [hj, if_true]
     omega
   · simpa [hj] using h j hj
 
-theorem cross_mul {c r e₁ e₂ : ℕ} {f g a : MvPolynomial (Fin (N + 1)) K}
-    (hf : f ∈ grK K N e₁) (hg : g ∈ grK K N e₂) (ha : a ∈ grK K N (r • e₁)) (ha' : a ∈ grK K N (c • e₂))
-    (hF : f ^ r ∈ grK K N (c • e₂)) :
-    awayMap (grK K N) hg (mul_comm g f) (Away.mk (grK K N) hf r a ha) *
-      awayMap (grK K N) hf (rfl : g * f = g * f) (Away.mk (grK K N) hg c (f ^ r) hF) =
-    awayMap (grK K N) hf (rfl : g * f = g * f) (Away.mk (grK K N) hg c a ha') := by
+theorem cross_mul
+    {c r e₁ e₂ : ℕ} {f g a : MvPolynomial (Fin (N + 1)) K}
+    (hf : f ∈ grK K N e₁) (hg : g ∈ grK K N e₂) (ha : a ∈ grK K N (r • e₁))
+    (ha' : a ∈ grK K N (c • e₂)) (hF : f ^ r ∈ grK K N (c • e₂))
+    : awayMap (grK K N) hg (mul_comm g f) (Away.mk (grK K N) hf r a ha)
+        * awayMap (grK K N) hf (rfl : g * f = g * f) (Away.mk (grK K N) hg c (f ^ r) hF)
+      = awayMap (grK K N) hf (rfl : g * f = g * f) (Away.mk (grK K N) hg c a ha') := by
   simp only [awayMap_mk]
   apply HomogeneousLocalization.val_injective
   rw [HomogeneousLocalization.val_mul]
@@ -87,20 +106,22 @@ theorem cross_mul {c r e₁ e₂ : ℕ} {f g a : MvPolynomial (Fin (N + 1)) K}
   simp only [Submonoid.coe_mul, OneMemClass.coe_one, one_mul]
   ring
 
-theorem core {d e : ℕ} (i : X ⟶ PSpace K N) (y : Fin (d + 1) → MvPolynomial (Fin (N + 1)) K)
-    (hy : ∀ k, (y k).IsHomogeneous e) (V : X.Opens) (h0 : V ≤ i ⁻¹ᵁ Proj.basicOpen (grK K N) (y 0))
+theorem core
+    {d e : ℕ}
+    (i : X ⟶ PSpace K N)
+    (y : Fin (d + 1) → MvPolynomial (Fin (N + 1)) K) (hy : ∀ k, (y k).IsHomogeneous e)
+    (V : X.Opens) (h0 : V ≤ i ⁻¹ᵁ Proj.basicOpen (grK K N) (y 0))
     (S : Finset (Fin (d + 1))) (hS : V ≤ i ⁻¹ᵁ Proj.basicOpen (grK K N) (yS y S))
-    (hy0 : y 0 ∈ grK K N e) (h1 : ∀ j, y j ∈ grK K N (1 • e)) (r : ℕ) (α : Fin (d + 1) → ℕ)
-    (hα : ∑ j, α j = r * S.card)
-    (ha : ∏ j, y j ^ α j ∈ grK K N (r • (S.card * e))) :
-    evV i (yS y S) V hS (Away.mk (grK K N) (yS_mem y hy S) r _ ha) *
-        ∏ j, evV i (y 0) V h0 (Away.mk (grK K N) hy0 1 (y j) (h1 j)) ^ (if j ∈ S then r else 0) =
-      ∏ j, evV i (y 0) V h0 (Away.mk (grK K N) hy0 1 (y j) (h1 j)) ^ α j := by
+    (hy0 : y 0 ∈ grK K N e) (h1 : ∀ j, y j ∈ grK K N (1 • e))
+    (r : ℕ) (α : Fin (d + 1) → ℕ)
+    (hα : ∑ j, α j = r * S.card) (ha : ∏ j, y j ^ α j ∈ grK K N (r • (S.card * e)))
+    : evV i (yS y S) V hS (Away.mk (grK K N) (yS_mem y hy S) r _ ha)
+        * ∏ j, evV i (y 0) V h0 (Away.mk (grK K N) hy0 1 (y j) (h1 j)) ^ (if j ∈ S then r else 0)
+      = ∏ j, evV i (y 0) V h0 (Away.mk (grK K N) hy0 1 (y j) (h1 j)) ^ α j := by
   have hP : V ≤ i ⁻¹ᵁ Proj.basicOpen (grK K N) (y 0 * yS y S) := by
     rw [Proj.basicOpen_mul]
     exact le_inf h0 hS
-  have hβ : ∑ j, (if j ∈ S then r else 0) = r * S.card := by
-    simp [Finset.sum_ite_mem, mul_comm]
+  have hβ : ∑ j, (if j ∈ S then r else 0) = r * S.card := by simp [Finset.sum_ite_mem, mul_comm]
   have ha' : ∏ j, y j ^ α j ∈ grK K N ((r * S.card) • e) :=
     prod_pow_mem y hy α (by rw [hα, smul_eq_mul])
   have hF' : ∏ j, y j ^ (if j ∈ S then r else 0) ∈ grK K N ((r * S.card) • e) :=
@@ -112,23 +133,27 @@ theorem core {d e : ℕ} (i : X ⟶ PSpace K N) (y : Fin (d + 1) → MvPolynomia
   rw [prod_mk_pow hy0 y h1 α hα ha', prod_mk_pow hy0 y h1 _ hβ hF']
   simp only [hFeq]
   rw [← evV_awayMap i hy0 (mul_comm (y 0) (yS y S)) V hS hP,
-    ← evV_awayMap i (yS_mem y hy S) rfl V h0 hP, ← evV_awayMap i (yS_mem y hy S) rfl V h0 hP, ← map_mul,
-    cross_mul (yS_mem y hy S) hy0 ha ha' hF]
+    ← evV_awayMap i (yS_mem y hy S) rfl V h0 hP, ← evV_awayMap i (yS_mem y hy S) rfl V h0 hP,
+    ← map_mul, cross_mul (yS_mem y hy S) hy0 ha ha' hF]
 
-theorem tpow_mem_range {K : Type} [Field K] {X : Scheme.{0}} {N d e : ℕ} (i : X ⟶ PSpace K N)
-    (y : Fin (d + 1) → MvPolynomial (Fin (N + 1)) K) (hy : ∀ k, (y k).IsHomogeneous e) {V : X.Opens}
-    (hV : V ≤ ⨅ k, i ⁻¹ᵁ Proj.basicOpen (grK K N) (y k)) : 0 < e →
-    ∀ (S : Finset (Fin (d + 1))) (hS : V ≤ i ⁻¹ᵁ Proj.basicOpen (grK K N) (yS y S))
-      (ht : ∀ k, IsUnit (tV i y hy V hV k)), ∀ m ∈ expS S,
-      tpow (fun k => (ht k).unit) m ∈ Set.range (evV i (yS y S) V hS) := by
+theorem tpow_mem_range
+    {K : Type} [Field K]
+    {X : Scheme.{0}} {N d e : ℕ} (i : X ⟶ PSpace K N)
+    (y : Fin (d + 1) → MvPolynomial (Fin (N + 1)) K) (hy : ∀ k, (y k).IsHomogeneous e)
+    {V : X.Opens} (hV : V ≤ ⨅ k, i ⁻¹ᵁ Proj.basicOpen (grK K N) (y k))
+    : 0 < e
+      → ∀ (S : Finset (Fin (d + 1))) (hS : V ≤ i ⁻¹ᵁ Proj.basicOpen (grK K N) (yS y S))
+          (ht : ∀ k, IsUnit (tV i y hy V hV k)),
+        ∀ m ∈ expS S,
+          tpow (fun k => (ht k).unit) m ∈ Set.range (evV i (yS y S) V hS) := by
   intro _ S hS ht m hm
   have h0 : V ≤ i ⁻¹ᵁ Proj.basicOpen (grK K N) (y 0) :=
     hV.trans (iInf_le (fun k => i ⁻¹ᵁ Proj.basicOpen (grK K N) (y k)) 0)
   have hy0 : y 0 ∈ grK K N e := (MvPolynomial.mem_homogeneousSubmodule e (y 0)).2 (hy 0)
   have h1 : ∀ j, y j ∈ grK K N (1 • e) := fun j => by
     simpa using (MvPolynomial.mem_homogeneousSubmodule e (y j)).2 (hy j)
-  let n : Fin (d + 1) → ℤ := Fin.cons (-∑ k, m k) m
-  have hn0 : n 0 = -∑ k, m k := rfl
+  let n : Fin (d + 1) → ℤ := Fin.cons (- ∑ k, m k) m
+  have hn0 : n 0 = - ∑ k, m k := rfl
   have hns : ∀ k : Fin d, n k.succ = m k := fun _ => rfl
   have hn : ∀ j, j ∉ S → 0 ≤ n j := by
     intro j
@@ -178,9 +203,11 @@ theorem tpow_mem_range {K : Type} [Field K] {X : Scheme.{0}} {N d e : ℕ} (i : 
     refine Finset.prod_congr rfl fun j _ => ?_
     rw [← zpow_natCast, ← zpow_natCast, ← zpow_add, hα]
     split_ifs <;> simp
-  have hc' : evV i (yS y S) V hS (Away.mk (grK K N) (yS_mem y hy S) r _ ha) *
-      ((∏ j, T j ^ (if j ∈ S then r else 0) : (Γ(X, V))ˣ) : Γ(X, V)) =
-      ((∏ j, T j ^ n j : (Γ(X, V))ˣ) : Γ(X, V)) * ((∏ j, T j ^ (if j ∈ S then r else 0) : (Γ(X, V))ˣ) : Γ(X, V)) := by
+  have hc'
+      : evV i (yS y S) V hS (Away.mk (grK K N) (yS_mem y hy S) r _ ha)
+          * ((∏ j, T j ^ (if j ∈ S then r else 0) : (Γ(X, V))ˣ) : Γ(X, V))
+        = ((∏ j, T j ^ n j : (Γ(X, V))ˣ) : Γ(X, V))
+          * ((∏ j, T j ^ (if j ∈ S then r else 0) : (Γ(X, V))ˣ) : Γ(X, V)) := by
     rw [← Units.val_mul, ← hA]
     simpa [Units.coe_prod] using hc
   have := (Units.mul_left_inj _).1 hc'

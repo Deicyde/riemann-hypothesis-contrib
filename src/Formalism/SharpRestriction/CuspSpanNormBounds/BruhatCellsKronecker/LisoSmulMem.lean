@@ -8,15 +8,22 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat NumberField Module IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat NumberField Module
+  IsDedekindDomain
 
-theorem liso_smul_mem {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} (Λ : Submodule (𝓞 E) S.V)
-    (o : 𝓞 E) {v : S.V} (hv : v ∈ Λ) : (o : E) • v ∈ Λ := by
+theorem liso_smul_mem
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {S : HSpace E} (Λ : Submodule (𝓞 E) S.V)
+    (o : 𝓞 E)
+    {v : S.V} (hv : v ∈ Λ)
+    : (o : E) • v ∈ Λ := by
   have h : (o : E) • v = o • v := algebraMap_smul E o v
   rw [h]
   exact Λ.smul_mem o hv
 
-theorem l_iso (h1 : IntegralAdjointUnimodular) (h2 : IntegralRetraction) (h3 : IntegralTraceSurjective) : IsotropicIntegralRetraction := by
+theorem l_iso
+    (h1 : IntegralAdjointUnimodular) (h2 : IntegralRetraction) (h3 : IntegralTraceSurjective)
+    : IsotropicIntegralRetraction := by
   intro E _ _ _ S Λ X hcm hlat huni hiso
   obtain ⟨P0, hid, hX, hint⟩ := h2 E S Λ X hlat
   obtain ⟨P0', hadj, hint'⟩ := h1 E S Λ huni P0 hint
@@ -58,10 +65,8 @@ theorem l_iso (h1 : IntegralAdjointUnimodular) (h2 : IntegralRetraction) (h3 : I
     exact Λ.sub_mem (hint' l hl) (liso_smul_mem Λ (1 - θ) (hint _ (hint' l hl)))
   · intro w y
     have e1 : S.hT (P0' w) (P0' y) = S.hT w (P0 (P0' y)) := hrev _ _
-    have e2 : S.hT (P0' w) (P0 (P0' y)) = S.hT w (P0 (P0' y)) := by
-      rw [hrev, hid _ (hHX y)]
-    have e3 : S.hT (P0 (P0' w)) (P0' y) = S.hT w (P0 (P0' y)) := by
-      rw [← hadj, hid _ (hHX w), hHH]
+    have e2 : S.hT (P0' w) (P0 (P0' y)) = S.hT w (P0 (P0' y)) := by rw [hrev, hid _ (hHX y)]
+    have e3 : S.hT (P0 (P0' w)) (P0' y) = S.hT w (P0 (P0' y)) := by rw [← hadj, hid _ (hHX w), hHH]
     have e4 : S.hT (P0 (P0' w)) (P0 (P0' y)) = 0 := hiso _ (hHX w) _ (hHX y)
     simp only [LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.comp_apply, map_sub, map_smulₛₗ,
       smul_eq_mul, starRingEnd_apply, star_star, RingHom.id_apply]

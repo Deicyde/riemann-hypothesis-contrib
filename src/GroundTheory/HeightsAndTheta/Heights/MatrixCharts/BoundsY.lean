@@ -16,52 +16,58 @@ noncomputable section
 theorem dot_self_nonneg {ι : Type*} [Fintype ι] (v : ι → ℝ) : 0 ≤ v ⬝ᵥ v :=
   Finset.sum_nonneg fun i _ => mul_self_nonneg (v i)
 
-theorem quad_smul_one_sub {ι : Type*} [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℝ) (l : ℝ)
-    (x : ι → ℝ) : x ⬝ᵥ ((l • (1 : Matrix ι ι ℝ) - A) *ᵥ x) = l * (x ⬝ᵥ x) - x ⬝ᵥ (A *ᵥ x) := by
+theorem quad_smul_one_sub
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℝ) (l : ℝ) (x : ι → ℝ)
+    : x ⬝ᵥ ((l • (1 : Matrix ι ι ℝ) - A) *ᵥ x) = l * (x ⬝ᵥ x) - x ⬝ᵥ (A *ᵥ x) := by
   rw [sub_mulVec, dotProduct_sub, smul_mulVec, one_mulVec, dotProduct_smul, smul_eq_mul]
 
-theorem quad_sub_smul_one {ι : Type*} [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℝ) (l : ℝ)
-    (x : ι → ℝ) : x ⬝ᵥ ((A - l • (1 : Matrix ι ι ℝ)) *ᵥ x) = x ⬝ᵥ (A *ᵥ x) - l * (x ⬝ᵥ x) := by
+theorem quad_sub_smul_one
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℝ) (l : ℝ) (x : ι → ℝ)
+    : x ⬝ᵥ ((A - l • (1 : Matrix ι ι ℝ)) *ᵥ x) = x ⬝ᵥ (A *ᵥ x) - l * (x ⬝ᵥ x) := by
   rw [sub_mulVec, dotProduct_sub, smul_mulVec, one_mulVec, dotProduct_smul, smul_eq_mul]
 
-theorem posSemidef_of_real {ι : Type*} [Fintype ι] {A : Matrix ι ι ℝ} (hs : Aᵀ = A)
-    (h : ∀ x : ι → ℝ, 0 ≤ x ⬝ᵥ (A *ᵥ x)) : A.PosSemidef :=
-  PosSemidef.of_dotProduct_mulVec_nonneg
-    ((conjTranspose_eq_transpose_of_trivial A).trans hs) (by simpa using h)
+theorem posSemidef_of_real
+    {ι : Type*} [Fintype ι] {A : Matrix ι ι ℝ} (hs : Aᵀ = A) (h : ∀ x : ι → ℝ, 0 ≤ x ⬝ᵥ (A *ᵥ x))
+    : A.PosSemidef :=
+  PosSemidef.of_dotProduct_mulVec_nonneg ((conjTranspose_eq_transpose_of_trivial A).trans hs)
+    (by simpa using h)
 
-theorem quad_nonneg {ι : Type*} [Fintype ι] {A : Matrix ι ι ℝ} (hA : A.PosSemidef)
-    (x : ι → ℝ) : 0 ≤ x ⬝ᵥ (A *ᵥ x) := by
+theorem quad_nonneg {ι : Type*} [Fintype ι] {A : Matrix ι ι ℝ} (hA : A.PosSemidef) (x : ι → ℝ)
+    : 0 ≤ x ⬝ᵥ (A *ᵥ x) := by
   simpa using hA.dotProduct_mulVec_nonneg x
 
 theorem transpose_of_posSemidef {ι : Type*} {A : Matrix ι ι ℝ} (hA : A.PosSemidef) : Aᵀ = A :=
   (conjTranspose_eq_transpose_of_trivial A).symm.trans hA.isHermitian
 
-theorem quad_symm {ι : Type*} [Fintype ι] {A : Matrix ι ι ℝ} (hs : Aᵀ = A) (u v : ι → ℝ) :
-    v ⬝ᵥ (A *ᵥ u) = u ⬝ᵥ (A *ᵥ v) := by
+theorem quad_symm {ι : Type*} [Fintype ι] {A : Matrix ι ι ℝ} (hs : Aᵀ = A) (u v : ι → ℝ)
+    : v ⬝ᵥ (A *ᵥ u) = u ⬝ᵥ (A *ᵥ v) := by
   rw [dotProduct_mulVec, dotProduct_comm, ← mulVec_transpose, hs]
 
-theorem quad_cs {ι : Type*} [Fintype ι] {A : Matrix ι ι ℝ} (hA : A.PosSemidef) (u v : ι → ℝ) :
-    (u ⬝ᵥ (A *ᵥ v)) ^ 2 ≤ (u ⬝ᵥ (A *ᵥ u)) * (v ⬝ᵥ (A *ᵥ v)) := by
+theorem quad_cs {ι : Type*} [Fintype ι] {A : Matrix ι ι ℝ} (hA : A.PosSemidef) (u v : ι → ℝ)
+    : (u ⬝ᵥ (A *ᵥ v)) ^ 2 ≤ (u ⬝ᵥ (A *ᵥ u)) * (v ⬝ᵥ (A *ᵥ v)) := by
   have hvu := quad_symm (transpose_of_posSemidef hA) u v
-  have key : ∀ t : ℝ, 0 ≤ (v ⬝ᵥ (A *ᵥ v)) * (t * t) + (2 * (u ⬝ᵥ (A *ᵥ v))) * t +
-      u ⬝ᵥ (A *ᵥ u) := by
+  have key
+      : ∀ t : ℝ, 0 ≤ (v ⬝ᵥ (A *ᵥ v)) * (t * t) + (2 * (u ⬝ᵥ (A *ᵥ v))) * t + u ⬝ᵥ (A *ᵥ u) := by
     intro t
     have h := quad_nonneg hA (u + t • v)
     simp only [mulVec_add, mulVec_smul, add_dotProduct, dotProduct_add, smul_dotProduct,
-      dotProduct_smul, smul_eq_mul, hvu] at h
+        dotProduct_smul, smul_eq_mul, hvu]
+      at h
     linarith
   have := discrim_le_zero key
   unfold discrim at this
   nlinarith
 
-theorem posDef_of_ge {ι : Type*} [Fintype ι] [DecidableEq ι] {A : Matrix ι ι ℝ} {c : ℝ}
-    (hc : 0 < c) (h : (A - c • (1 : Matrix ι ι ℝ)).PosSemidef) : A.PosDef := by
+theorem posDef_of_ge
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {A : Matrix ι ι ℝ} {c : ℝ} (hc : 0 < c) (h : (A - c • (1 : Matrix ι ι ℝ)).PosSemidef)
+    : A.PosDef := by
   have hs : Aᵀ = A := by
     have := transpose_of_posSemidef h
     rw [transpose_sub, transpose_smul, transpose_one] at this
     exact sub_left_injective this
-  refine posDef_iff_dotProduct_mulVec.mpr ⟨(conjTranspose_eq_transpose_of_trivial A).trans hs,
-    fun x hx => ?_⟩
+  refine posDef_iff_dotProduct_mulVec.mpr
+    ⟨(conjTranspose_eq_transpose_of_trivial A).trans hs, fun x hx => ?_⟩
   have h1 := quad_nonneg h x
   rw [quad_sub_smul_one] at h1
   have h2 : 0 < x ⬝ᵥ x := by
@@ -70,9 +76,10 @@ theorem posDef_of_ge {ι : Type*} [Fintype ι] [DecidableEq ι] {A : Matrix ι �
     · exact absurd (dotProduct_self_eq_zero.mp h3.symm) hx
   simpa using (by nlinarith : 0 < x ⬝ᵥ (A *ᵥ x))
 
-theorem inv_le_of_ge {ι : Type*} [Fintype ι] [DecidableEq ι] {A : Matrix ι ι ℝ} {c : ℝ}
-    (hc : 0 < c) (h : (A - c • (1 : Matrix ι ι ℝ)).PosSemidef) :
-    (c⁻¹ • (1 : Matrix ι ι ℝ) - A⁻¹).PosSemidef := by
+theorem inv_le_of_ge
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {A : Matrix ι ι ℝ} {c : ℝ} (hc : 0 < c) (h : (A - c • (1 : Matrix ι ι ℝ)).PosSemidef)
+    : (c⁻¹ • (1 : Matrix ι ι ℝ) - A⁻¹).PosSemidef := by
   have hA : A.PosDef := posDef_of_ge hc h
   have hdet : IsUnit A.det := (Matrix.isUnit_iff_isUnit_det A).mp hA.isUnit
   have hs : Aᵀ = A := transpose_of_posSemidef hA.posSemidef
@@ -87,15 +94,18 @@ theorem inv_le_of_ge {ι : Type*} [Fintype ι] [DecidableEq ι] {A : Matrix ι �
       linarith
     have h3 : 0 ≤ (x - c • y) ⬝ᵥ (x - c • y) := dot_self_nonneg _
     simp only [sub_dotProduct, dotProduct_sub, smul_dotProduct, dotProduct_smul, smul_eq_mul,
-      dotProduct_comm y x] at h3
+        dotProduct_comm y x]
+      at h3
     have key : c * (x ⬝ᵥ y) ≤ x ⬝ᵥ x := by nlinarith
     have := mul_le_mul_of_nonneg_left key (inv_nonneg.mpr hc.le)
     rw [← mul_assoc, inv_mul_cancel₀ hc.ne', one_mul] at this
     linarith
 
-theorem inv_ge_of_le {ι : Type*} [Fintype ι] [DecidableEq ι] {A : Matrix ι ι ℝ} {l : ℝ}
-    (hl : 0 < l) (hA : A.PosDef) (h : (l • (1 : Matrix ι ι ℝ) - A).PosSemidef) :
-    (A⁻¹ - l⁻¹ • (1 : Matrix ι ι ℝ)).PosSemidef := by
+theorem inv_ge_of_le
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {A : Matrix ι ι ℝ} {l : ℝ}
+    (hl : 0 < l) (hA : A.PosDef) (h : (l • (1 : Matrix ι ι ℝ) - A).PosSemidef)
+    : (A⁻¹ - l⁻¹ • (1 : Matrix ι ι ℝ)).PosSemidef := by
   have hdet : IsUnit A.det := (Matrix.isUnit_iff_isUnit_det A).mp hA.isUnit
   have hs : Aᵀ = A := transpose_of_posSemidef hA.posSemidef
   refine posSemidef_of_real ?_ fun x => ?_
@@ -122,10 +132,9 @@ theorem inv_ge_of_le {ι : Type*} [Fintype ι] [DecidableEq ι] {A : Matrix ι �
       linarith
     · rw [← hzero]; simpa using hxy
 
-
 open scoped ComplexOrder in
-theorem posSemidef_map_ofReal {ι : Type*} [Fintype ι] {A : Matrix ι ι ℝ} (hA : A.PosSemidef) :
-    (A.map (fun x : ℝ => (x : ℂ))).PosSemidef := by
+theorem posSemidef_map_ofReal {ι : Type*} [Fintype ι] {A : Matrix ι ι ℝ} (hA : A.PosSemidef)
+    : (A.map (fun x : ℝ => (x : ℂ))).PosSemidef := by
   have hs : ∀ j k, A k j = A j k := fun j k => by
     simpa using congrFun (congrFun (transpose_of_posSemidef hA) j) k
   refine PosSemidef.of_dotProduct_mulVec_nonneg ?_ fun w => ?_
@@ -135,21 +144,23 @@ theorem posSemidef_map_ofReal {ι : Type*} [Fintype ι] {A : Matrix ι ι ℝ} (
     set b : ι → ℝ := fun k => (w k).im
     have ha := quad_nonneg hA a
     have hb := quad_nonneg hA b
-    have hre : (star w ⬝ᵥ (A.map (fun x : ℝ => (x : ℂ)) *ᵥ w)).re =
-        a ⬝ᵥ (A *ᵥ a) + b ⬝ᵥ (A *ᵥ b) := by
+    have hre
+        : (star w ⬝ᵥ (A.map (fun x : ℝ => (x : ℂ)) *ᵥ w)).re = a ⬝ᵥ (A *ᵥ a) + b ⬝ᵥ (A *ᵥ b) := by
       simp only [dotProduct, mulVec, map_apply, Pi.star_apply, Complex.re_sum, Complex.mul_re,
         Complex.mul_im, Complex.star_def, Complex.conj_re, Complex.conj_im, Complex.ofReal_re,
         Complex.ofReal_im, a, b, Finset.mul_sum, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => by ring
     have him : (star w ⬝ᵥ (A.map (fun x : ℝ => (x : ℂ)) *ᵥ w)).im = 0 := by
-      have e : (star w ⬝ᵥ (A.map (fun x : ℝ => (x : ℂ)) *ᵥ w)).im =
-          ∑ j, ∑ k, (w j).re * (A j k * (w k).im) - ∑ j, ∑ k, (w j).im * (A j k * (w k).re) := by
+      have e
+          : (star w ⬝ᵥ (A.map (fun x : ℝ => (x : ℂ)) *ᵥ w)).im
+            = ∑ j, ∑ k, (w j).re * (A j k * (w k).im)
+              - ∑ j, ∑ k, (w j).im * (A j k * (w k).re) := by
         simp only [dotProduct, mulVec, map_apply, Pi.star_apply, Complex.mul_im, Complex.mul_re,
           Complex.star_def, Complex.conj_re, Complex.conj_im, Complex.im_sum, Complex.ofReal_re,
           Complex.ofReal_im, Finset.mul_sum, ← Finset.sum_sub_distrib]
         exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => by ring
-      have hsw : ∑ j, ∑ k, (w j).re * (A j k * (w k).im) =
-          ∑ j, ∑ k, (w j).im * (A j k * (w k).re) := by
+      have hsw
+          : ∑ j, ∑ k, (w j).re * (A j k * (w k).im) = ∑ j, ∑ k, (w j).im * (A j k * (w k).re) := by
         rw [Finset.sum_comm]
         exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => by rw [hs]; ring
       rw [e, hsw, sub_self]

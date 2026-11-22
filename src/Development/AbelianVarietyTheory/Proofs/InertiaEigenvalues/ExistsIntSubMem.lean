@@ -6,16 +6,19 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.InjP
 
 @[expose] public section
 
-open GlobalTheory.TypeLeaf Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.ArithmeticCylinders Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+open GlobalTheory.TypeLeaf Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.ArithmeticCylinders Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Polynomial NumberField IsDedekindDomain
 
 namespace GlobalTheory.SplitFrobDense
 
-theorem exists_conj_ne {R : Ranks} (H : Host R) :
-    ∃ x y : 𝓞 H.E, (y : H.E) = H.conj (x : H.E) ∧ y - x ≠ 0 := by
+theorem exists_conj_ne {R : Ranks} (H : Host R)
+    : ∃ x y : 𝓞 H.E, (y : H.E) = H.conj (x : H.E) ∧ y - x ≠ 0 := by
   by_contra hc
   push Not at hc
   have h1 : ∀ x : 𝓞 H.E, H.conj (x : H.E) = x := fun x => by
-    have := hc x ⟨H.conj x, (RingOfIntegers.isIntegral_coe x).map (H.conj.toAlgHom.restrictScalars ℤ)⟩ rfl
+    have :=
+      hc x ⟨H.conj x, (RingOfIntegers.isIntegral_coe x).map (H.conj.toAlgHom.restrictScalars ℤ)⟩ rfl
     exact congrArg (fun z : 𝓞 H.E => (z : H.E)) (sub_eq_zero.1 this)
   have h2 : ∀ z : H.E, H.conj z = z := fun z => by
     obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 H.E) z
@@ -26,8 +29,11 @@ theorem exists_conj_ne {R : Ranks} (H : Host R) :
   ext z
   exact (H.conjE_apply H.φ₀ z).symm.trans (congrArg H.φ₀ (h2 z))
 
-theorem exists_int_sub_mem {E : Type} [Field E] [NumberField E] (v : HeightOneSpectrum (𝓞 E))
-    (hv : v.asIdeal.inertiaDeg ℤ = 1) (x : 𝓞 E) : ∃ n : ℤ, x - n ∈ v.asIdeal := by
+theorem exists_int_sub_mem
+    {E : Type} [Field E] [NumberField E]
+    (v : HeightOneSpectrum (𝓞 E)) (hv : v.asIdeal.inertiaDeg ℤ = 1)
+    (x : 𝓞 E)
+    : ∃ n : ℤ, x - n ∈ v.asIdeal := by
   have := v.isPrime
   have : NeZero v.asIdeal := ⟨v.ne_bot⟩
   have hp := Nat.absNorm_under_prime v.asIdeal
@@ -38,8 +44,9 @@ theorem exists_int_sub_mem {E : Type} [Field E] [NumberField E] (v : HeightOneSp
   have hc : Nat.card (𝓞 E ⧸ v.asIdeal) = Ideal.absNorm v.asIdeal :=
     (Ideal.absNorm_eq_natCard v.asIdeal).symm
   have : Nontrivial (𝓞 E ⧸ v.asIdeal) := Ideal.Quotient.nontrivial_iff.2 v.isPrime.ne_top
-  have hm := mem_zmultiples_of_prime_card hc (g := (1 : 𝓞 E ⧸ v.asIdeal)) (g' := Ideal.Quotient.mk _ x)
-    one_ne_zero
+  have hm :=
+    mem_zmultiples_of_prime_card hc (g := (1 : 𝓞 E ⧸ v.asIdeal)) (g' := Ideal.Quotient.mk _ x)
+      one_ne_zero
   obtain ⟨n, hn⟩ := AddSubgroup.mem_zmultiples_iff.1 hm
   refine ⟨n, Ideal.Quotient.eq.1 ?_⟩
   rw [← hn]
@@ -58,10 +65,12 @@ theorem frobDense : ∀ D : D7, GlobalTheory.TwSys.Cheb → FrobDense D := by
   obtain ⟨x, y, hxy, hne⟩ := exists_conj_ne D.host
   have f1 : {v : PlE D.host | v.asIdeal ∣ Ideal.span {y - x}}.Finite :=
     Ideal.finite_factors (by simpa using hne)
-  obtain ⟨v, hv, hf, -, B, hB, -, σ, hσ, hU⟩ := hC D.host.E D.nd.Om L.fixingSubgroup L.fixingSubgroup_isOpen
-    ((InfiniteGalois.normal_iff_isGalois L).2 hgal) g (f1.toFinset ∪ hT.toFinset)
+  obtain ⟨v, hv, hf, -, B, hB, -, σ, hσ, hU⟩ :=
+    hC D.host.E D.nd.Om L.fixingSubgroup L.fixingSubgroup_isOpen
+      ((InfiniteGalois.normal_iff_isGalois L).2 hgal) g (f1.toFinset ∪ hT.toFinset)
   simp only [Finset.mem_union, Set.Finite.mem_toFinset, Set.mem_setOf_eq, Ideal.dvd_span_singleton,
-    not_or] at hv
+      not_or]
+    at hv
   obtain ⟨h1, h2⟩ := hv
   obtain ⟨n, hx⟩ := exists_int_sub_mem v hf x
   have hsplit : IsSplitPl D.host v := by

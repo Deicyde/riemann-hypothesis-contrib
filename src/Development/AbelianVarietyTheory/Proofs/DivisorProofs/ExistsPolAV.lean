@@ -13,8 +13,10 @@ public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsAmpleL
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -23,12 +25,20 @@ noncomputable section
 
 namespace GlobalTheory.PolFieldDescent
 
-theorem exists_polAV : ∀ (K K' : Type) [Field K] [Field K'] (ga : K →+* K') (G : Over (Sp K)) [GrpObj G] [IsCommMonObj G] (L : LB G.left), L.IsLB → Out.Sym G L → ∀ (A' : PolAV (Sp K')) (α : A'.A.left ⟶ G.left), IsGrpPullback A'.A G (spMap ga) α → LBIso A'.L (L.pull α) → ∃ (A : PolAV (Sp K)) (gen : G ≅ A.A), IsMonHom gen.hom ∧ LBIso (A.L.pull gen.hom.left) L := by
+theorem exists_polAV
+    : ∀ (K K' : Type) [Field K] [Field K'] (ga : K →+* K') (G : Over (Sp K)) [GrpObj G]
+        [IsCommMonObj G] (L : LB G.left),
+      L.IsLB → Out.Sym G L
+        → ∀ (A' : PolAV (Sp K')) (α : A'.A.left ⟶ G.left),
+          IsGrpPullback A'.A G (spMap ga) α → LBIso A'.L (L.pull α)
+            → ∃ (A : PolAV (Sp K)) (gen : G ≅ A.A),
+              IsMonHom gen.hom ∧ LBIso (A.L.pull gen.hom.left) L := by
   intro K K' _ _ ga G _ _ L hL hS A' α hP hw
   letI : Algebra K K' := ga.toAlgebra
   have hP' : IsGrpPullback A'.A G (spMap (algebraMap K K')) α := hP
   have : Flat (spMap ga) := Flat.SpecMap_iff.2 (RingHom.flat_algebraMap_iff.2 inferInstance)
-  have : Surjective (spMap ga) := ⟨PrimeSpectrum.comap_surjective_of_faithfullyFlat (A := K) (B := K')⟩
+  have : Surjective (spMap ga) :=
+    ⟨PrimeSpectrum.comap_surjective_of_faithfullyFlat (A := K) (B := K')⟩
   have : QuasiCompact (spMap ga) := inferInstance
   have hAb : IsAbelianScheme G := PolFlatDescent.isAbelianScheme_of_pull hP A'.isAb
   have hdim : SmoothOfRelativeDimension A'.g G.hom :=

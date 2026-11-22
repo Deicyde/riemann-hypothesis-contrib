@@ -12,8 +12,9 @@ open Formalism.UG
 
 variable {G : Type} [Group G]
 
-theorem conv_mul_right {k : Type} [CommRing k] (K : Subgroup G) (f₁ f₂ : G → k)
-    (hf₂ : IsBiInv K f₂) (g : G) (b : K) : conv K f₁ f₂ (g * b) = conv K f₁ f₂ g := by
+theorem conv_mul_right
+    {k : Type} [CommRing k] (K : Subgroup G) (f₁ f₂ : G → k) (hf₂ : IsBiInv K f₂) (g : G) (b : K)
+    : conv K f₁ f₂ (g * b) = conv K f₁ f₂ g := by
   unfold conv
   congr 1
   funext x
@@ -21,9 +22,11 @@ theorem conv_mul_right {k : Type} [CommRing k] (K : Subgroup G) (f₁ f₂ : G �
   simp only [OneMemClass.coe_one, one_mul] at h
   rw [← mul_assoc, h]
 
-theorem conv_mul_left {k : Type} [CommRing k] (K : Subgroup G) (f₁ f₂ : G → k)
-    (hf₁ : IsBiInv K f₁) (hf₂ : IsBiInv K f₂) (a : K) (g : G) :
-    conv K f₁ f₂ ((a : G) * g) = conv K f₁ f₂ g := by
+theorem conv_mul_left
+    {k : Type} [CommRing k]
+    (K : Subgroup G) (f₁ f₂ : G → k) (hf₁ : IsBiInv K f₁) (hf₂ : IsBiInv K f₂)
+    (a : K) (g : G)
+    : conv K f₁ f₂ ((a : G) * g) = conv K f₁ f₂ g := by
   have key : ∀ y : G ⧸ K, ∃ c : K, ((a : G) • y).out = (a : G) * y.out * c := by
     intro y
     obtain ⟨c, hc⟩ := QuotientGroup.mk_out_eq_mul K ((a : G) * y.out)
@@ -39,27 +42,33 @@ theorem conv_mul_left {k : Type} [CommRing k] (K : Subgroup G) (f₁ f₂ : G �
   obtain ⟨c, hc⟩ := key y
   simp only [MulAction.toPerm_apply]
   rw [hc, hf₁ a c y.out]
-  have e2 : ((a : G) * y.out * c)⁻¹ * ((a : G) * g) = ((c⁻¹ : K) : G) * (y.out⁻¹ * g) * ((1 : K) : G) := by
+  have e2
+      : ((a : G) * y.out * c)⁻¹ * ((a : G) * g)
+        = ((c⁻¹ : K) : G) * (y.out⁻¹ * g) * ((1 : K) : G) := by
     simp only [InvMemClass.coe_inv, OneMemClass.coe_one, mul_one]
     group
   rw [e2, hf₂]
 
-theorem conv_biInv {k : Type} [CommRing k] (K : Subgroup G) (f₁ f₂ : G → k)
-    (hf₁ : IsBiInv K f₁) (hf₂ : IsBiInv K f₂) : IsBiInv K (conv K f₁ f₂) := by
+theorem conv_biInv
+    {k : Type} [CommRing k]
+    (K : Subgroup G) (f₁ f₂ : G → k) (hf₁ : IsBiInv K f₁) (hf₂ : IsBiInv K f₂)
+    : IsBiInv K (conv K f₁ f₂) := by
   intro a b g
   rw [conv_mul_right K f₁ f₂ hf₂ ((a : G) * g) b, conv_mul_left K f₁ f₂ hf₁ hf₂ a g]
 
-theorem conv_finDosetSupp {k : Type} [CommRing k] {K : Subgroup G} (hK : IsCommensurated K)
-    (f₁ f₂ : G → k) (hs₁ : FinDosetSupp K f₁) (hs₂ : FinDosetSupp K f₂) :
-    FinDosetSupp K (conv K f₁ f₂) := by
+theorem conv_finDosetSupp
+    {k : Type} [CommRing k]
+    {K : Subgroup G} (hK : IsCommensurated K)
+    (f₁ f₂ : G → k) (hs₁ : FinDosetSupp K f₁) (hs₂ : FinDosetSupp K f₂)
+    : FinDosetSupp K (conv K f₁ f₂) := by
   classical
   have hX := finite_support_cosets hK hs₁
   obtain ⟨S₂, hS₂⟩ := hs₂
   set T : Set G := ⋃ t ∈ (S₂ : Set G), ⋃ x ∈ {x : G ⧸ K | f₁ x.out ≠ 0},
     ⋃ y ∈ {y : G ⧸ K | ∃ a b : K, y.out = (a : G) * t * b}, {x.out * y.out} with hTdef
   have hT : T.Finite :=
-    S₂.finite_toSet.biUnion fun t _ => hX.biUnion fun x _ =>
-      (finite_cosets_in_doset hK t).biUnion fun y _ => Set.finite_singleton _
+    S₂.finite_toSet.biUnion fun t _ =>
+      hX.biUnion fun x _ => (finite_cosets_in_doset hK t).biUnion fun y _ => Set.finite_singleton _
   refine ⟨hT.toFinset, fun g hg => ?_⟩
   obtain ⟨x, hx⟩ : ∃ x : G ⧸ K, f₁ x.out * f₂ (x.out⁻¹ * g) ≠ 0 := by
     by_contra h
@@ -95,8 +104,9 @@ theorem convolution_count_holds : Formalism.UG.ConvCount := by
     refine (finite_cosets_in_doset hK a).subset fun x hx => ?_
     obtain ⟨h, hh, c, hc, e⟩ := DoubleCoset.mem_doubleCoset.1 hx.1
     exact ⟨⟨h, hh⟩, ⟨c, hc⟩, e⟩
-  have hterm : ∀ x : G ⧸ K, dosetInd k K a x.out * dosetInd k K b (x.out⁻¹ * g) =
-      if x ∈ S then 1 else 0 := by
+  have hterm
+      : ∀ x : G ⧸ K,
+        dosetInd k K a x.out * dosetInd k K b (x.out⁻¹ * g) = if x ∈ S then 1 else 0 := by
     intro x
     simp only [dosetInd, Set.indicator_apply, Pi.one_apply, hSdef, Set.mem_setOf_eq]
     split_ifs <;> simp_all

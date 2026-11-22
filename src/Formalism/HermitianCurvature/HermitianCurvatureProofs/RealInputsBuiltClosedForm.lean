@@ -22,22 +22,28 @@ theorem jct_rd_pos (E : Type) [Field E] [NumberField E] : 0 < S6.rd E := by
   apply Real.rpow_pos_of_pos
   exact Int.cast_pos.mpr (abs_pos.mpr (NumberField.discr_ne_zero E))
 
-theorem jct_isBuiltPlace_mono {E : Type} [Field E] [NumberField E] [IsCMField E] {Wp Wq : InfinitePlace E → Type}
-    [∀ x, NormedAddCommGroup (Wp x)] [∀ x, InnerProductSpace ℂ (Wp x)]
-    [∀ x, NormedAddCommGroup (Wq x)] [∀ x, InnerProductSpace ℂ (Wq x)] [∀ x, FiniteDimensional ℂ (Wq x)]
-    {S : C.HidaSetting E Wp Wq} {T : ∀ v : Fin S.f, D.LevTower S.G.k S.G.r (Wp (S.pl v)) (Wq (S.pl v))}
+theorem jct_isBuiltPlace_mono
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {Wp Wq : InfinitePlace E → Type} [∀ x, NormedAddCommGroup (Wp x)]
+    [∀ x, InnerProductSpace ℂ (Wp x)] [∀ x, NormedAddCommGroup (Wq x)]
+    [∀ x, InnerProductSpace ℂ (Wq x)] [∀ x, FiniteDimensional ℂ (Wq x)]
+    {S : C.HidaSetting E Wp Wq}
+    {T : ∀ v : Fin S.f, D.LevTower S.G.k S.G.r (Wp (S.pl v)) (Wq (S.pl v))}
     {f : ∀ v : Fin S.f, B.Mat S.G.k S.G.r → (Wq (S.pl v) →L[ℂ] Wp (S.pl v))} {χ : ℝ → ℝ}
     {ν' : Fin S.f → Fin (2 * S.G.r + S.G.k + 1) → ℂ} {m₀ : Fin S.f → B.Mat S.G.k S.G.r}
-    {top : ∀ v : Fin S.f, (B.Mat S.G.k S.G.r → (Wq (S.pl v) →L[ℂ] Wp (S.pl v))) → List C.Letter → C.LPt → C.LPt → ℂ}
-    {A₀ Cc c : ℝ} (hc : c ≤ Cc) (h : JCT.IsBuiltPlace Cc S T f χ ν' m₀ top A₀) :
-    JCT.IsBuiltPlace c S T f χ ν' m₀ top A₀ := by
+    {top : ∀ v : Fin S.f,
+      (B.Mat S.G.k S.G.r → (Wq (S.pl v) →L[ℂ] Wp (S.pl v))) → List C.Letter → C.LPt → C.LPt → ℂ}
+    {A₀ Cc c : ℝ} (hc : c ≤ Cc) (h : JCT.IsBuiltPlace Cc S T f χ ν' m₀ top A₀)
+    : JCT.IsBuiltPlace c S T f χ ν' m₀ top A₀ := by
   unfold JCT.IsBuiltPlace at h ⊢
   obtain ⟨h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13⟩ := h
   refine ⟨h1, h2, h3, h4, h5, h6, h7, ?_, le_trans hc h9, h10, h11, ?_, h13⟩
   · unfold JCT.LongCut at h8 ⊢
     intro v
     exact le_trans (mul_le_mul_of_nonneg_right hc (by positivity)) (h8 v)
-  · exact le_trans (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc (by positivity)) (by positivity)) h12
+  · exact le_trans
+      (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc (by positivity)) (by positivity))
+      h12
 
 theorem energy_of_built_setting : JCT.EnergyOfLemmaE := by
   intro hBC
@@ -50,7 +56,9 @@ theorem energy_of_built_setting : JCT.EnergyOfLemmaE := by
   obtain ⟨-, hlim⟩ := hBC E Wp Wq S T f χ ν' m₀ top A₀ hBP v
   have hemp : S.empW.1 v = [] := rfl
   have h1 := hL S.empW v
-  have h2 : Filter.Tendsto (fun ε => (S.pd v).RR ε 0 (S.empW.1 v) [] []) (nhdsWithin 0 (Set.Ioi 0))
+  have h2 : Filter.Tendsto
+      (fun ε => (S.pd v).RR ε 0 (S.empW.1 v) [] [])
+      (nhdsWithin 0 (Set.Ioi 0))
       (nhds ((((1 / Γ : ℝ)) : ℂ) * (((B.normSq (T v).base (f v)).toReal : ℝ) : ℂ))) := by
     refine (hlim.const_mul _).congr' ?_
     filter_upwards [self_mem_nhdsWithin] with ε hε

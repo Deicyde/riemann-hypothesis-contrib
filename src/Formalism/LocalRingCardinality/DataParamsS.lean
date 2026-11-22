@@ -9,7 +9,10 @@ noncomputable section
 
 namespace Formalism.BasicNotions.SizeData₂
 
-def hsSq {D : Formalism.BasicNotions.D7} (_L : Formalism.BasicNotions.SizeData₂ D) (u u' : D.what₂.Word) : ℝ := Formalism.MainNotions.S.hsSqD D u u'
+def hsSq
+    {D : Formalism.BasicNotions.D7} (_L : Formalism.BasicNotions.SizeData₂ D) (u u' : D.what₂.Word)
+    : ℝ :=
+  Formalism.MainNotions.S.hsSqD D u u'
 
 end Formalism.BasicNotions.SizeData₂
 

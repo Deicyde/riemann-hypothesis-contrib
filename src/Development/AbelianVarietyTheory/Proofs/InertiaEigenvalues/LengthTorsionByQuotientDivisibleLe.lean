@@ -8,21 +8,24 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.ExpS
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc TensorProduct
 
 namespace GlobalTheory
 
-theorem length_torsionBy_quotient_divisible_le (O : Type) [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] (Z Q : Type) [AddCommGroup Z] [Module O Z] [AddCommGroup Q]
-    [Module O Q] (π : Z →ₗ[O] Q) (hs : Function.Surjective π)
-    (hdiv : ∀ b : O, b ≠ 0 → ∀ x, π x = 0 → ∃ y, π y = 0 ∧ b • y = x)
-    (htor : ∃ x, x ≠ 0 ∧ π x = 0 ∧ ∃ b : O, b ≠ 0 ∧ b • x = 0) (a : O) (ha : a ≠ 0) (k : ℕ)
-    (hle : Module.length O ↥(Submodule.torsionBy O Z a) ≤
-      ((k + 1 : ℕ) : ℕ∞) * Module.length O (O ⧸ Ideal.span {a})) :
-    Module.length O ↥(Submodule.torsionBy O Q a) ≤
-      (k : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
+theorem length_torsionBy_quotient_divisible_le
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (Z Q : Type) [AddCommGroup Z] [Module O Z] [AddCommGroup Q] [Module O Q]
+    (π : Z →ₗ[O] Q)
+    (hs : Function.Surjective π) (hdiv : ∀ b : O, b ≠ 0 → ∀ x, π x = 0 → ∃ y, π y = 0 ∧ b • y = x)
+    (htor : ∃ x, x ≠ 0 ∧ π x = 0 ∧ ∃ b : O, b ≠ 0 ∧ b • x = 0)
+    (a : O) (ha : a ≠ 0)
+    (k : ℕ)
+    (hle : Module.length O ↥(Submodule.torsionBy O Z a)
+      ≤ ((k + 1 : ℕ) : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}))
+    : Module.length O ↥(Submodule.torsionBy O Q a)
+      ≤ (k : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) := by
   classical
-
   have hLfin : Module.length O (O ⧸ Ideal.span {a}) ≠ ⊤ := by
     rw [Module.length_ne_top_iff]
     exact isFiniteLength_quotient_span_singleton O (mem_nonZeroDivisors_of_ne_zero ha)
@@ -30,21 +33,21 @@ theorem length_torsionBy_quotient_divisible_le (O : Type) [CommRing O] [IsDomain
   let φ : Submodule.torsionBy O Z a →ₗ[O] Submodule.torsionBy O Q a :=
     LinearMap.codRestrict (Submodule.torsionBy O Q a) (π ∘ₗ (Submodule.torsionBy O Z a).subtype)
       (fun z => by
-        rw [Submodule.mem_torsionBy_iff, LinearMap.comp_apply, Submodule.subtype_apply,
-          ← map_smul, (Submodule.mem_torsionBy_iff _ _).mp z.2, map_zero])
+        rw [Submodule.mem_torsionBy_iff, LinearMap.comp_apply, Submodule.subtype_apply, ← map_smul,
+          (Submodule.mem_torsionBy_iff _ _).mp z.2, map_zero])
 
   have hφ : Function.Surjective φ := by
     rintro ⟨q, hq⟩
     obtain ⟨z, rfl⟩ := hs q
-    have h1 : π (a • z) = 0 := by
-      rw [map_smul]; exact (Submodule.mem_torsionBy_iff _ _).mp hq
+    have h1 : π (a • z) = 0 := by rw [map_smul]; exact (Submodule.mem_torsionBy_iff _ _).mp hq
     obtain ⟨y, hy0, hy⟩ := hdiv a ha (a • z) h1
     refine ⟨⟨z - y, ?_⟩, ?_⟩
     · rw [Submodule.mem_torsionBy_iff, smul_sub, hy, sub_self]
     · apply Subtype.ext
       simp [φ, hy0]
-  have hexact := Module.length_eq_add_of_exact (LinearMap.ker φ).subtype φ
-    (Submodule.subtype_injective _) hφ (LinearMap.exact_subtype_ker_map φ)
+  have hexact :=
+    Module.length_eq_add_of_exact (LinearMap.ker φ).subtype φ (Submodule.subtype_injective _) hφ
+      (LinearMap.exact_subtype_ker_map φ)
 
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   have hdvd_unit : ∀ c : O, ¬ ϖ ∣ c → IsUnit c := by
@@ -52,8 +55,8 @@ theorem length_torsionBy_quotient_divisible_le (O : Type) [CommRing O] [IsDomain
     by_contra hnu
     apply hc
     have hmem := (IsLocalRing.mem_maximalIdeal c).mpr hnu
-    rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).mp hϖ,
-      Ideal.mem_span_singleton] at hmem
+    rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).mp hϖ, Ideal.mem_span_singleton]
+      at hmem
     exact hmem
   obtain ⟨x, hx0, hxK, b, hb0, hbx⟩ := htor
   obtain ⟨m, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hb0 hϖ
@@ -70,14 +73,14 @@ theorem length_torsionBy_quotient_divisible_le (O : Type) [CommRing O] [IsDomain
   have he0 : ϖ ^ i • x ≠ 0 := Nat.find_min hex (by omega)
   have hϖe : ϖ • (ϖ ^ i • x) = 0 := by
     rw [hi] at hj
-    rw [smul_smul, ← pow_succ']; exact hj
+    rw [smul_smul, ← pow_succ']
+    exact hj
   have heK : π (ϖ ^ i • x) = 0 := by rw [map_smul, hxK, smul_zero]
   have hunit_e : ∀ w : O, IsUnit w → w • (ϖ ^ i • x) ≠ 0 := by
     intro w hw h
     exact he0 ((hw.smul_eq_zero).mp h)
   obtain ⟨n, v, hav⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible ha hϖ
-  have hadvd : ∀ c : O, a ∣ c ↔ ϖ ^ n ∣ c := by
-    intro c; rw [hav, Units.mul_left_dvd]
+  have hadvd : ∀ c : O, a ∣ c ↔ ϖ ^ n ∣ c := by intro c; rw [hav, Units.mul_left_dvd]
   obtain ⟨y₀, hy₀K, hy₀⟩ : ∃ y₀ : Z, π y₀ = 0 ∧ ∀ c : O, c • y₀ = 0 ↔ a ∣ c := by
     cases n with
     | zero =>
@@ -115,16 +118,19 @@ theorem length_torsionBy_quotient_divisible_le (O : Type) [CommRing O] [IsDomain
     rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply, Ideal.mem_span_singleton, ← hy₀ c]
     simp [Subtype.ext_iff]
   have hK : Module.length O (O ⧸ Ideal.span {a}) ≤ Module.length O (LinearMap.ker φ) := by
-    calc Module.length O (O ⧸ Ideal.span {a})
-        = Module.length O (O ⧸ LinearMap.ker f) :=
-          (Submodule.quotEquivOfEq _ _ hker).length_eq
+    calc
+      Module.length O (O ⧸ Ideal.span {a})
+        = Module.length O (O ⧸ LinearMap.ker f) := (Submodule.quotEquivOfEq _ _ hker).length_eq
       _ = Module.length O (LinearMap.range f) := f.quotKerEquivRange.length_eq
       _ ≤ Module.length O (LinearMap.ker φ) :=
-          Module.length_le_of_injective (LinearMap.range f).subtype (Submodule.subtype_injective _)
-  have h2 : Module.length O ↥(Submodule.torsionBy O Q a) + Module.length O (O ⧸ Ideal.span {a}) ≤
-      (k : ℕ∞) * Module.length O (O ⧸ Ideal.span {a}) + Module.length O (O ⧸ Ideal.span {a}) := by
-    calc _ ≤ Module.length O ↥(Submodule.torsionBy O Q a) + Module.length O (LinearMap.ker φ) := by
-            gcongr
+        Module.length_le_of_injective (LinearMap.range f).subtype (Submodule.subtype_injective _)
+  have h2
+      : Module.length O ↥(Submodule.torsionBy O Q a) + Module.length O (O ⧸ Ideal.span {a})
+        ≤ (k : ℕ∞) * Module.length O (O ⧸ Ideal.span {a})
+          + Module.length O (O ⧸ Ideal.span {a}) := by
+    calc
+      _ ≤ Module.length O ↥(Submodule.torsionBy O Q a) + Module.length O (LinearMap.ker φ) := by
+        gcongr
       _ = Module.length O ↥(Submodule.torsionBy O Z a) := by rw [hexact, add_comm]
       _ ≤ _ := hle
       _ = _ := by push_cast; ring

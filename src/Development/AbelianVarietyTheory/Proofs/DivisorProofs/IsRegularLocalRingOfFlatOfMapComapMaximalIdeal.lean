@@ -10,18 +10,25 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Regul
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Poinc GlobalTheory.SiegJoin GlobalTheory.TChart
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Poinc
+  GlobalTheory.SiegJoin GlobalTheory.TChart
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TChart
 
-theorem isRegularLocalRing_of_flat_of_map_comap_maximalIdeal (V : Type) [CommRing V]
-    [IsRegularLocalRing V] (I : Type) [Fintype I] (S : Type) [CommRing S] [IsLocalRing S]
-    [IsNoetherianRing S] (φ : MvPolynomial I V →+* S) (hflat : φ.Flat)
-    (hmap : ((maximalIdeal S).comap φ).map φ = maximalIdeal S) : IsRegularLocalRing S := by
+theorem isRegularLocalRing_of_flat_of_map_comap_maximalIdeal
+    (V : Type) [CommRing V] [IsRegularLocalRing V]
+    (I : Type) [Fintype I]
+    (S : Type) [CommRing S] [IsLocalRing S] [IsNoetherianRing S]
+    (φ : MvPolynomial I V →+* S)
+    (hflat : φ.Flat) (hmap : ((maximalIdeal S).comap φ).map φ = maximalIdeal S)
+    : IsRegularLocalRing S := by
   haveI : IsRegularRing V := GlobalTheory.isRegularRing_of_isRegularLocalRing V
   set q : Ideal (MvPolynomial I V) := (maximalIdeal S).comap φ with hq
   haveI : q.IsPrime := Ideal.comap_isPrime φ (maximalIdeal S)
@@ -47,11 +54,13 @@ theorem isRegularLocalRing_of_flat_of_map_comap_maximalIdeal (V : Type) [CommRin
     exact hmap.symm
   exact GlobalTheory.isRegularLocalRing_of_flat_of_map_eq_maximalIdeal L S (maximalIdeal L) hm
 
-theorem isRegularLocalRing_quotient_of_isComplAt :
-    ∀ (W : Type) [CommRing W] [IsLocalRing W] [IsNoetherianRing W] (I : Type) [Fintype I] (R : Type) [CommRing R]
-      [IsLocalRing R] (ψ : MvPolynomial I W →+* R), IsComplAt ψ → IsLocalHom (ψ.comp MvPolynomial.C) →
-      ∀ 𝔭 : Ideal W, 𝔭 ≠ ⊤ → IsRegularLocalRing (W ⧸ 𝔭) →
-        IsRegularLocalRing (R ⧸ 𝔭.map (ψ.comp MvPolynomial.C)) := by
+theorem isRegularLocalRing_quotient_of_isComplAt
+    : ∀ (W : Type) [CommRing W] [IsLocalRing W] [IsNoetherianRing W] (I : Type) [Fintype I]
+        (R : Type) [CommRing R] [IsLocalRing R] (ψ : MvPolynomial I W →+* R),
+      IsComplAt ψ → IsLocalHom (ψ.comp MvPolynomial.C)
+        → ∀ 𝔭 : Ideal W,
+          𝔭 ≠ ⊤ → IsRegularLocalRing (W ⧸ 𝔭)
+            → IsRegularLocalRing (R ⧸ 𝔭.map (ψ.comp MvPolynomial.C)) := by
   intro W _ _ _ I _ R _ _ ψ hψ hloc 𝔭 h𝔭 hreg
   obtain ⟨hnoeth, -, hflat, hmap, -⟩ := hψ
   haveI : IsNoetherianRing R := hnoeth
@@ -69,7 +78,9 @@ theorem isRegularLocalRing_quotient_of_isComplAt :
   haveI : IsLocalRing (R ⧸ J) :=
     IsLocalRing.of_surjective' (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective
   let e := MvPolynomial.quotientEquivQuotientMvPolynomial (σ := I) 𝔭
-  have heC : ∀ a : W, e (MvPolynomial.C (Ideal.Quotient.mk 𝔭 a)) = Ideal.Quotient.mk _ (MvPolynomial.C a) := by
+  have heC
+      : ∀ a : W,
+        e (MvPolynomial.C (Ideal.Quotient.mk 𝔭 a)) = Ideal.Quotient.mk _ (MvPolynomial.C a) := by
     intro a; simp [e, MvPolynomial.quotientEquivQuotientMvPolynomial]
   have heX : ∀ i : I, e (MvPolynomial.X i) = Ideal.Quotient.mk _ (MvPolynomial.X i) := by
     intro i; simp [e, MvPolynomial.quotientEquivQuotientMvPolynomial]
@@ -82,7 +93,8 @@ theorem isRegularLocalRing_quotient_of_isComplAt :
     apply MvPolynomial.ringHom_ext
     · intro a
       simp only [RingHom.comp_apply, π, MvPolynomial.map_C, ψ']
-      change Ideal.quotientMap J ψ Ideal.le_comap_map (e (MvPolynomial.C (Ideal.Quotient.mk 𝔭 a))) = _
+      change Ideal.quotientMap J ψ Ideal.le_comap_map (e (MvPolynomial.C (Ideal.Quotient.mk 𝔭 a)))
+        = _
       rw [heC, Ideal.quotientMap_mk]
     · intro i
       simp only [RingHom.comp_apply, π, MvPolynomial.map_X, ψ']

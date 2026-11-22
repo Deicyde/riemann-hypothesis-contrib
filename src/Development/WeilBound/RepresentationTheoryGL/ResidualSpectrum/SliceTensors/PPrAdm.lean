@@ -10,7 +10,8 @@ public import GroundTheory.PAdicHodge.NormalizedTrace
 
 noncomputable section
 
-open NumberField MeasureTheory GlobalTheory.AutomorphicL2Unitary GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.CapOrth
+open NumberField MeasureTheory GlobalTheory.AutomorphicL2Unitary GlobalTheory.CuspRep
+  GlobalTheory.UnitaryBC GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.CapOrth
   GlobalTheory.LevelTypeProj GlobalTheory.PRep GlobalTheory.CuspRep.LocEx
 
 namespace PositivityTheory.Rg.Rs.PrAdm
@@ -31,9 +32,10 @@ theorem cofin_annZ {ψ : Sm E N} (hψ : IsAutForm ψ) : PositivityTheory.Affgl.C
     rintro _ ⟨z, hz, rfl⟩
     exact Submodule.subset_span ⟨z, hz, rfl⟩
   let f : Z →ₗ[ℂ] M := (ev.comp Z.subtype).codRestrict M (fun z => ⟨z.1, z.2, rfl⟩)
-  have hf : LinearMap.range f = ⊤ := LinearMap.range_eq_top.2 (by
-    rintro ⟨_, z, hz, rfl⟩
-    exact ⟨⟨z, hz⟩, rfl⟩)
+  have hf : LinearMap.range f = ⊤ :=
+    LinearMap.range_eq_top.2 (by
+      rintro ⟨_, z, hz, rfl⟩
+      exact ⟨⟨z, hz⟩, rfl⟩)
   obtain ⟨g, hg⟩ := f.exists_rightInverse_of_surjective hf
   refine ⟨(LinearMap.range g).map Z.subtype, inferInstance, fun z hz => ?_⟩
   let zz : Z := ⟨z, hz⟩
@@ -44,10 +46,16 @@ theorem cofin_annZ {ψ : Sm E N} (hψ : IsAutForm ψ) : PositivityTheory.Affgl.C
     change v.1 ψ = z ψ at this
     rw [LinearMap.sub_apply, this, sub_self]
   have hmem : z - v.1 ∈ annZ ψ := ⟨(Zalg E N).sub_mem hz v.2, hk⟩
-  refine Submodule.mem_sup.2 ⟨v.1, ⟨v, ⟨f zz, hv.symm⟩, rfl⟩, 1 * (z - v.1),
-    Submodule.subset_span ⟨1, (Zalg E N).one_mem, z - v.1, hmem, rfl⟩, by rw [one_mul, add_sub_cancel]⟩
+  refine Submodule.mem_sup.2 ⟨
+    v.1,
+    ⟨v, ⟨f zz, hv.symm⟩, rfl⟩,
+    1 * (z - v.1),
+    Submodule.subset_span ⟨1, (Zalg E N).one_mem, z - v.1, hmem, rfl⟩,
+    by rw [one_mul, add_sub_cancel]
+  ⟩
 
-theorem zalg_comm_act {z : Module.End ℂ (Sm E N)} (hz : z ∈ Zalg E N) (o : Op E N) : z * act o = act o * z := by
+theorem zalg_comm_act {z : Module.End ℂ (Sm E N)} (hz : z ∈ Zalg E N) (o : Op E N)
+    : z * act o = act o * z := by
   cases o with
   | fin k => exact GlobalTheory.CuspStab.zalg_comm_fin k hz
   | cpt k => exact GlobalTheory.ZalgCpt.zalg_comm_cptRep E N k z hz
@@ -55,53 +63,77 @@ theorem zalg_comm_act {z : Module.End ℂ (Sm E N)} (hz : z ∈ Zalg E N) (o : O
 
 def SupSpansPsiPart (W : Submodule ℂ (Sm E N)) (ψ : Sm E N) : Submodule ℂ (Sm E N) where
   carrier := {φ | φ ∈ W ∧ ∀ z ∈ annZ ψ, z φ = 0}
-  add_mem' := fun {φ φ'} h h' => ⟨W.add_mem h.1 h'.1, fun z hz => by rw [map_add (f := _), h.2 z hz, h'.2 z hz, add_zero]⟩
+  add_mem' := fun {φ φ'} h h' =>
+    ⟨W.add_mem h.1 h'.1, fun z hz => by rw [map_add (f := _), h.2 z hz, h'.2 z hz, add_zero]⟩
   zero_mem' := ⟨W.zero_mem, fun z _ => map_zero z⟩
   smul_mem' := fun c φ h => ⟨W.smul_mem c h.1, fun z hz => by rw [map_smul, h.2 z hz, smul_zero]⟩
 
-theorem admissible_span_le (W : Submodule ℂ (Sm E N)) (ψ : Sm E N) : SupSpansPsiPart W ψ ≤ W := fun _ h => h.1
+theorem admissible_span_le (W : Submodule ℂ (Sm E N)) (ψ : Sm E N) : SupSpansPsiPart W ψ ≤ W :=
+  fun _ h => h.1
 
-theorem mem_admissible_span_self {W : Submodule ℂ (Sm E N)} {ψ : Sm E N} (h : ψ ∈ W) : ψ ∈ SupSpansPsiPart W ψ := ⟨h, fun _ hz => hz.2⟩
+theorem mem_admissible_span_self {W : Submodule ℂ (Sm E N)} {ψ : Sm E N} (h : ψ ∈ W)
+    : ψ ∈ SupSpansPsiPart W ψ :=
+  ⟨h, fun _ hz => hz.2⟩
 
-theorem isStable_admissible_span {W : Submodule ℂ (Sm E N)} (hW : _root_.GlobalTheory.CuspRep.IsStable W) (ψ : Sm E N) : _root_.GlobalTheory.CuspRep.IsStable (SupSpansPsiPart W ψ) := by
+theorem isStable_admissible_span
+    {W : Submodule ℂ (Sm E N)} (hW : _root_.GlobalTheory.CuspRep.IsStable W) (ψ : Sm E N)
+    : _root_.GlobalTheory.CuspRep.IsStable (SupSpansPsiPart W ψ) := by
   intro o φ hφ
   refine ⟨hW o φ hφ.1, fun z hz => ?_⟩
   rw [← Module.End.mul_apply, zalg_comm_act hz.1 o, Module.End.mul_apply, hφ.2 z hz, map_zero]
 
-theorem finiteDimensional_admissible_isotypic {W : Submodule ℂ (Sm E N)} (hA : ∀ φ ∈ W, IsAutForm φ) {ψ : Sm E N} (hψ : IsAutForm ψ)
-    {L : Subgroup (GL (Fin N) (Af E))} (hL : IsOpen (L : Set (GL (Fin N) (Af E)))) {U : Type} [AddCommGroup U]
-    [Module ℂ U] [FiniteDimensional ℂ U] (ρ : Representation ℂ (Kinf E N) U) (hρ : GlobalTheory.Published.AutFin.IsContRep ρ) :
-    FiniteDimensional ℂ (SupSpansPsiPart W ψ ⊓ typePart L ρ : Submodule ℂ (Sm E N)) := by
+theorem finiteDimensional_admissible_isotypic
+    {W : Submodule ℂ (Sm E N)} (hA : ∀ φ ∈ W, IsAutForm φ)
+    {ψ : Sm E N} (hψ : IsAutForm ψ)
+    {L : Subgroup (GL (Fin N) (Af E))} (hL : IsOpen (L : Set (GL (Fin N) (Af E))))
+    {U : Type} [AddCommGroup U] [Module ℂ U] [FiniteDimensional ℂ U]
+    (ρ : Representation ℂ (Kinf E N) U) (hρ : GlobalTheory.Published.AutFin.IsContRep ρ)
+    : FiniteDimensional ℂ (SupSpansPsiPart W ψ ⊓ typePart L ρ : Submodule ℂ (Sm E N)) := by
   have := PositivityTheory.Rg.HF.GL.genFin E N L hL U ρ hρ (annZ ψ) (cofin_annZ hψ)
-  exact Submodule.finiteDimensional_of_le (S₂ := Submodule.span ℂ (PositivityTheory.Affgl.genSpace L ρ (annZ ψ)))
-    fun φ hφ => Submodule.subset_span
-      (show φ ∈ PositivityTheory.Affgl.genSpace L ρ (annZ ψ) from ⟨hA φ hφ.1.1, hφ.2.1, hφ.2.2, hφ.1.2⟩)
+  exact Submodule.finiteDimensional_of_le
+    (S₂ := Submodule.span ℂ (PositivityTheory.Affgl.genSpace L ρ (annZ ψ)))
+    fun φ hφ =>
+      Submodule.subset_span (show φ ∈ PositivityTheory.Affgl.genSpace L ρ (annZ ψ) from
+        ⟨hA φ hφ.1.1, hφ.2.1, hφ.2.2, hφ.1.2⟩)
 
-theorem exists_type {χ : Sm E N} (hχ : IsAutForm χ) : ∃ L : Subgroup (GL (Fin N) (Af E)),
-    IsOpen (L : Set (GL (Fin N) (Af E))) ∧ IsCompact (L : Set (GL (Fin N) (Af E))) ∧
-      χ ∈ typePart L (sub (cptRep E N) (orbSpan χ) (orbSpan_stable χ)) := by
+theorem exists_type {χ : Sm E N} (hχ : IsAutForm χ)
+    : ∃ L : Subgroup (GL (Fin N) (Af E)),
+      IsOpen (L : Set (GL (Fin N) (Af E))) ∧ IsCompact (L : Set (GL (Fin N) (Af E)))
+        ∧ χ ∈ typePart L (sub (cptRep E N) (orbSpan χ) (orbSpan_stable χ)) := by
   obtain ⟨U0, hU0o, hU0c⟩ := GlobalTheory.GLIntegral.exists_isOpen_isCompact E N
   let L : Subgroup (GL (Fin N) (Af E)) := U0 ⊓ GlobalTheory.DiscClosure.stabSub χ
   have hLo : IsOpen (L : Set (GL (Fin N) (Af E))) := hU0o.inter hχ.level
-  refine ⟨L, hLo, hU0c.of_isClosed_subset (Subgroup.isClosed_of_isOpen _ hLo) Set.inter_subset_left,
-    fun k hk => hk.2, fun g => ?_⟩
-  exact GlobalTheory.Published.AutFinGL.type_of_map _ (orbSpan χ).subtype (fun _ _ => rfl)
+  refine ⟨
+    L,
+    hLo,
+    hU0c.of_isClosed_subset (Subgroup.isClosed_of_isOpen _ hLo) Set.inter_subset_left,
+    fun k hk => hk.2,
+    fun g => ?_
+  ⟩
+  exact GlobalTheory.Published.AutFinGL.type_of_map _ (orbSpan χ).subtype
+    (fun _ _ => rfl)
     ⟨χ, Submodule.subset_span ⟨1, by simp⟩⟩ g
 
 section Proj
 
-variable {μ : Measure (GA E N)} [μ.IsHaarMeasure] [μ.IsMulRightInvariant] {W : Submodule ℂ (Sm E N)}
-  (h : ∀ φ ∈ W, MemL2Quotient (latticeGL E N) μ φ.1)
+variable
+  {μ : Measure (GA E N)} [μ.IsHaarMeasure] [μ.IsMulRightInvariant]
+  {W : Submodule ℂ (Sm E N)} (h : ∀ φ ∈ W, MemL2Quotient (latticeGL E N) μ φ.1)
 
-theorem exists_orth (hW : _root_.GlobalTheory.CuspRep.IsStable W) (hA : ∀ φ ∈ W, IsAutForm φ) (hinj : ∀ x ∈ W, cls h x = 0 → x = 0)
-    {V : Submodule ℂ (Sm E N)} (hV : _root_.GlobalTheory.CuspRep.IsStable V) (hVW : V ≤ W) {χ : Sm E N} (hχ : χ ∈ W)
-    {L : Subgroup (GL (Fin N) (Af E))} (hLo : IsOpen (L : Set (GL (Fin N) (Af E))))
-    (hLc : IsCompact (L : Set (GL (Fin N) (Af E)))) {U : Type} [AddCommGroup U] [Module ℂ U] [FiniteDimensional ℂ U]
-    (ρ : Representation ℂ (Kinf E N) U) (hρ : GlobalTheory.Published.AutFin.IsContRep ρ) (hχT : χ ∈ typePart L ρ)
-    [FiniteDimensional ℂ (V ⊓ typePart L ρ : Submodule ℂ (Sm E N))] :
-    ∃ v ∈ V ⊓ typePart L ρ, ∀ w ∈ V, inner ℂ (cls h (χ - v)) (cls h w) = 0 := by
-  have hF : Function.Injective (toL2ₗ μ W h) := (injective_iff_map_eq_zero _).2 fun x e =>
-    Subtype.ext (hinj x.1 x.2 (by rw [cls_mk h x.2]; exact e))
+theorem exists_orth
+    (hW : _root_.GlobalTheory.CuspRep.IsStable W) (hA : ∀ φ ∈ W, IsAutForm φ)
+    (hinj : ∀ x ∈ W, cls h x = 0 → x = 0)
+    {V : Submodule ℂ (Sm E N)} (hV : _root_.GlobalTheory.CuspRep.IsStable V) (hVW : V ≤ W)
+    {χ : Sm E N} (hχ : χ ∈ W)
+    {L : Subgroup (GL (Fin N) (Af E))}
+    (hLo : IsOpen (L : Set (GL (Fin N) (Af E)))) (hLc : IsCompact (L : Set (GL (Fin N) (Af E))))
+    {U : Type} [AddCommGroup U] [Module ℂ U] [FiniteDimensional ℂ U]
+    (ρ : Representation ℂ (Kinf E N) U) (hρ : GlobalTheory.Published.AutFin.IsContRep ρ)
+    (hχT : χ ∈ typePart L ρ) [FiniteDimensional ℂ (V ⊓ typePart L ρ : Submodule ℂ (Sm E N))]
+    : ∃ v ∈ V ⊓ typePart L ρ, ∀ w ∈ V, inner ℂ (cls h (χ - v)) (cls h w) = 0 := by
+  have hF : Function.Injective (toL2ₗ μ W h) :=
+    (injective_iff_map_eq_zero _).2 fun x e =>
+      Subtype.ext (hinj x.1 x.2 (by rw [cls_mk h x.2]; exact e))
   obtain ⟨p, hpS, hp⟩ := exists_proj h hF (V ⊓ typePart L ρ) (inf_le_left.trans hVW)
   let χW : W := ⟨χ, hχ⟩
   refine ⟨(p χW).1, hpS χW, fun w hw => ?_⟩
@@ -114,12 +146,14 @@ theorem exists_orth (hW : _root_.GlobalTheory.CuspRep.IsStable W) (hA : ∀ φ �
   rw [← map_sub, e, map_sub]
   exact hp χW w' ⟨hw'V, hw'L, hw'T⟩
 
-
 omit [μ.IsHaarMeasure] [μ.IsMulRightInvariant] in
-theorem orth_unique (hinj : ∀ x ∈ W, cls h x = 0 → x = 0) {V : Submodule ℂ (Sm E N)} (hVW : V ≤ W)
-    {χ v v' : Sm E N} (hχ : χ ∈ W) (hv : v ∈ V) (hv' : v' ∈ V)
-    (h1 : ∀ w ∈ V, inner ℂ (cls h (χ - v)) (cls h w) = 0) (h2 : ∀ w ∈ V, inner ℂ (cls h (χ - v')) (cls h w) = 0) :
-    v = v' := by
+theorem orth_unique
+    (hinj : ∀ x ∈ W, cls h x = 0 → x = 0)
+    {V : Submodule ℂ (Sm E N)} (hVW : V ≤ W)
+    {χ v v' : Sm E N}
+    (hχ : χ ∈ W) (hv : v ∈ V) (hv' : v' ∈ V) (h1 : ∀ w ∈ V, inner ℂ (cls h (χ - v)) (cls h w) = 0)
+    (h2 : ∀ w ∈ V, inner ℂ (cls h (χ - v')) (cls h w) = 0)
+    : v = v' := by
   have hm : v' - v ∈ V := V.sub_mem hv' hv
   have e : cls h (v' - v) = cls h (χ - v) - cls h (χ - v') := by
     rw [cls_sub h (hVW hv') (hVW hv), cls_sub h hχ (hVW hv), cls_sub h hχ (hVW hv')]

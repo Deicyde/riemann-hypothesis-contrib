@@ -25,18 +25,18 @@ theorem exists_mem_valBall (y : K) : ∃ M : ℤ, y ∈ valBall (K := K) M := by
 
 variable (p : ℕ) [hp : Fact p.Prime] [CharP 𝓀[K] p] [CharZero K]
 
-theorem padicHom_padicInt_mem_valBall_zero (t : ℤ_[p]) :
-    CharZero.padicHom K p (t : ℚ_[p]) ∈ valBall (K := K) 0 := by
+theorem padicHom_padicInt_mem_valBall_zero (t : ℤ_[p])
+    : CharZero.padicHom K p (t : ℚ_[p]) ∈ valBall (K := K) 0 := by
   rw [mem_valBall, neg_zero, WithZero.exp_zero, ← map_one (normalizedValuation K),
     normalizedValuation_le_iff, map_one]
   exact CharZero.valuation_padicHom_padicInt_le_one K p t
 
-
 include p in
 include p in
-theorem padicLog_mem_valBall_of_mem {k : ℕ} (hk : absRamificationIndex (K := K) ≤ k)
-    {w : Additive (unitFiltrationUnits K 1)} (hw : w ∈ principalFiltration (K := K) k) :
-    padicLog K w ∈ valBall (K := K) (k + 1) := by
+theorem padicLog_mem_valBall_of_mem
+    {k : ℕ} (hk : absRamificationIndex (K := K) ≤ k)
+    {w : Additive (unitFiltrationUnits K 1)} (hw : w ∈ principalFiltration (K := K) k)
+    : padicLog K w ∈ valBall (K := K) (k + 1) := by
   rw [mem_principalFiltration] at hw
   rw [padicLog_apply]
   refine logSeries_mem_valBall p hw ?_
@@ -44,8 +44,8 @@ theorem padicLog_mem_valBall_of_mem {k : ℕ} (hk : absRamificationIndex (K := K
   have : (absRamificationIndex (K := K) : ℤ) ≤ k := by exact_mod_cast hk
   nlinarith
 
-theorem padicLog_smul (a : ℤ_[p]) (u : Additive (unitFiltrationUnits K 1)) :
-    padicLog K (a • u) = CharZero.padicHom K p (a : ℚ_[p]) * padicLog K u := by
+theorem padicLog_smul (a : ℤ_[p]) (u : Additive (unitFiltrationUnits K 1))
+    : padicLog K (a • u) = CharZero.padicHom K p (a : ℚ_[p]) * padicLog K u := by
   rw [← sub_eq_zero]
   refine eq_zero_of_forall_mem_valBall fun N ↦ ?_
   set e := absRamificationIndex (K := K)
@@ -58,20 +58,28 @@ theorem padicLog_smul (a : ℤ_[p]) (u : Additive (unitFiltrationUnits K 1)) :
   have hw := smul_sub_intCast_smul_mem p (dvd_sub_appr p k a) u
   have h1 := padicLog_mem_valBall_of_mem p (by omega : e ≤ k) hw
   rw [map_sub, map_zsmul, zsmul_eq_mul] at h1
-  have h2 : CharZero.padicHom K p (a : ℚ_[p]) - (c : K) =
-      ((p ^ k : ℕ) : K) * CharZero.padicHom K p (t : ℚ_[p]) := by
+  have h2
+      : CharZero.padicHom K p (a : ℚ_[p]) - (c : K)
+        = ((p ^ k : ℕ) : K) * CharZero.padicHom K p (t : ℚ_[p]) := by
     have := congrArg (fun z : ℤ_[p] ↦ CharZero.padicHom K p (z : ℚ_[p])) ht
     simp only [PadicInt.coe_sub, PadicInt.coe_intCast, map_sub, map_intCast, PadicInt.coe_mul,
-      PadicInt.coe_pow, PadicInt.coe_natCast, map_mul, map_pow, map_natCast] at this
-    rw [this]; push_cast; ring
-  have h3 : (CharZero.padicHom K p (a : ℚ_[p]) - (c : K)) * padicLog K u ∈
-      valBall (K := K) (e * k + 0 + M) := by
+        PadicInt.coe_pow, PadicInt.coe_natCast, map_mul, map_pow, map_natCast]
+      at this
+    rw [this]
+    push_cast
+    ring
+  have h3
+      : (CharZero.padicHom K p (a : ℚ_[p]) - (c : K)) * padicLog K u
+        ∈ valBall (K := K) (e * k + 0 + M) := by
     rw [h2]
-    exact mul_mem_valBall (mul_mem_valBall (natCast_prime_pow_mem_valBall p k)
-      (padicHom_padicInt_mem_valBall_zero p t)) hM
-  have heq : padicLog K (a • u) - CharZero.padicHom K p (a : ℚ_[p]) * padicLog K u =
-      (padicLog K (a • u) - (c : K) * padicLog K u) -
-        (CharZero.padicHom K p (a : ℚ_[p]) - (c : K)) * padicLog K u := by ring
+    exact mul_mem_valBall
+      (mul_mem_valBall (natCast_prime_pow_mem_valBall p k) (padicHom_padicInt_mem_valBall_zero p t))
+      hM
+  have heq
+      : padicLog K (a • u) - CharZero.padicHom K p (a : ℚ_[p]) * padicLog K u
+        = (padicLog K (a • u) - (c : K) * padicLog K u)
+          - (CharZero.padicHom K p (a : ℚ_[p]) - (c : K)) * padicLog K u := by
+    ring
   rw [heq]
   have hNt := Int.self_le_toNat N
   have hMa := neg_abs_le M
@@ -81,7 +89,9 @@ theorem padicLog_smul (a : ℤ_[p]) (u : Additive (unitFiltrationUnits K 1)) :
     have : (k : ℤ) ≤ e * k := by
       have : (1 : ℤ) ≤ e := by exact_mod_cast he
       nlinarith [(by positivity : (0 : ℤ) ≤ k)]
-    rw [hk_def] at this ⊢; push_cast at this ⊢; omega
+    rw [hk_def] at this ⊢
+    push_cast at this ⊢
+    omega
   exact sub_mem (valBall_antitone hN1 h1) (valBall_antitone hN2 h3)
 
 end GroundTheory.LocalField

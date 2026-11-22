@@ -11,19 +11,27 @@ namespace GlobalTheory.CompanionTheory.PrincipalCongruence
 variable {k Γ : Type*} [Field k] [LinearOrderedCommGroupWithZero Γ]
 variable {n : Type*} [Fintype n] [DecidableEq n]
 
-theorem entry_mul_le (v : Valuation k Γ) {r s : Γ} (hs : s ≤ 1)
-    {A B : Matrix n n k} (hA : ∀ i j, v (A i j) ≤ r) (hB : ∀ i j, v (B i j) ≤ s) (i j : n) :
-    v ((A * B) i j) ≤ r := by
+theorem entry_mul_le
+    (v : Valuation k Γ)
+    {r s : Γ} (hs : s ≤ 1)
+    {A B : Matrix n n k} (hA : ∀ i j, v (A i j) ≤ r) (hB : ∀ i j, v (B i j) ≤ s)
+    (i j : n)
+    : v ((A * B) i j) ≤ r := by
   rw [Matrix.mul_apply]
   refine Valuation.map_sum_le v fun l _ => ?_
   rw [map_mul]
-  calc v (A i l) * v (B l j) ≤ r * s := mul_le_mul' (hA i l) (hB l j)
+  calc
+    v (A i l) * v (B l j)
+      ≤ r * s := mul_le_mul' (hA i l) (hB l j)
     _ ≤ r * 1 := mul_le_mul' le_rfl hs
     _ = r := mul_one r
 
-theorem inv_entry_le_one (v : Valuation k Γ) {r : Γ} (hr : r < 1)
-    {A B : Matrix n n k} (hBA : B * (1 + A) = 1) (hA : ∀ i j, v (A i j) ≤ r) (i j : n) :
-    v (B i j) ≤ 1 := by
+theorem inv_entry_le_one
+    (v : Valuation k Γ)
+    {r : Γ} (hr : r < 1)
+    {A B : Matrix n n k} (hBA : B * (1 + A) = 1) (hA : ∀ i j, v (A i j) ≤ r)
+    (i j : n)
+    : v (B i j) ≤ 1 := by
   haveI : Nonempty (n × n) := ⟨(i, j)⟩
   obtain ⟨⟨a, b⟩, hmax⟩ := Finite.exists_max (fun p : n × n => v (B p.1 p.2))
   have hM : ∀ i j, v (B i j) ≤ v (B a b) := fun i j => hmax (i, j)
@@ -40,8 +48,9 @@ theorem inv_entry_le_one (v : Valuation k Γ) {r : Γ} (hr : r < 1)
     rw [map_mul]
     exact mul_le_mul' (hM a l) (hA l b)
   have hlt' : v (B a b) * r < v (B a b) := by
-    calc v (B a b) * r < v (B a b) * 1 := by
-          exact mul_lt_mul_of_pos_left hr hpos
+    calc
+      v (B a b) * r
+        < v (B a b) * 1 := by exact mul_lt_mul_of_pos_left hr hpos
       _ = v (B a b) := mul_one _
   have hone : v ((1 : Matrix n n k) a b) ≤ 1 := by
     by_cases h : a = b
@@ -58,8 +67,7 @@ theorem inv_entry_le_one (v : Valuation k Γ) {r : Γ} (hr : r < 1)
   · exact absurd (h.trans hone) (not_le.mpr hgt)
   · exact absurd (h.trans hprod) (not_le.mpr hlt')
 
-def principalCongruence (v : Valuation k Γ) (r : Γ) (hr : r < 1) :
-    Subgroup (GL n k) where
+def principalCongruence (v : Valuation k Γ) (r : Γ) (hr : r < 1) : Subgroup (GL n k) where
   carrier := {g | ∀ i j, v ((g : Matrix n n k) i j - (1 : Matrix n n k) i j) ≤ r}
   one_mem' := by
     intro i j
@@ -68,14 +76,16 @@ def principalCongruence (v : Valuation k Γ) (r : Γ) (hr : r < 1) :
     intro g h hg hh i j
     have hg' : ∀ i j, v (((g : Matrix n n k) - 1) i j) ≤ r := hg
     have hh' : ∀ i j, v (((h : Matrix n n k) - 1) i j) ≤ r := hh
-    have key : ((g * h : GL n k) : Matrix n n k) - 1 =
-        ((g : Matrix n n k) - 1) * ((h : Matrix n n k) - 1) +
-          (((g : Matrix n n k) - 1) + ((h : Matrix n n k) - 1)) := by
+    have key
+        : ((g * h : GL n k) : Matrix n n k) - 1
+          = ((g : Matrix n n k) - 1) * ((h : Matrix n n k) - 1)
+            + (((g : Matrix n n k) - 1) + ((h : Matrix n n k) - 1)) := by
       rw [Units.val_mul]
       noncomm_ring
-    have key' : ((g * h : GL n k) : Matrix n n k) i j - (1 : Matrix n n k) i j =
-        (((g : Matrix n n k) - 1) * ((h : Matrix n n k) - 1)) i j +
-          ((((g : Matrix n n k) - 1) i j) + (((h : Matrix n n k) - 1) i j)) := by
+    have key'
+        : ((g * h : GL n k) : Matrix n n k) i j - (1 : Matrix n n k) i j
+          = (((g : Matrix n n k) - 1) * ((h : Matrix n n k) - 1)) i j
+            + ((((g : Matrix n n k) - 1) i j) + (((h : Matrix n n k) - 1) i j)) := by
       rw [← Matrix.sub_apply, key]
       rfl
     rw [key']
@@ -87,28 +97,33 @@ def principalCongruence (v : Valuation k Γ) (r : Γ) (hr : r < 1) :
     have hBA : ((g⁻¹ : GL n k) : Matrix n n k) * (1 + ((g : Matrix n n k) - 1)) = 1 := by
       rw [add_sub_cancel, ← Units.val_mul, inv_mul_cancel, Units.val_one]
     have hint := inv_entry_le_one v hr hBA hg'
-    have key : ((g⁻¹ : GL n k) : Matrix n n k) - 1 =
-        -(((g⁻¹ : GL n k) : Matrix n n k) * ((g : Matrix n n k) - 1)) := by
+    have key
+        : ((g⁻¹ : GL n k) : Matrix n n k) - 1
+          = -(((g⁻¹ : GL n k) : Matrix n n k) * ((g : Matrix n n k) - 1)) := by
       rw [mul_sub, ← Units.val_mul, inv_mul_cancel, Units.val_one, mul_one]
       abel
-    have key' : ((g⁻¹ : GL n k) : Matrix n n k) i j - (1 : Matrix n n k) i j =
-        -((((g⁻¹ : GL n k) : Matrix n n k) * ((g : Matrix n n k) - 1)) i j) := by
+    have key'
+        : ((g⁻¹ : GL n k) : Matrix n n k) i j - (1 : Matrix n n k) i j
+          = -((((g⁻¹ : GL n k) : Matrix n n k) * ((g : Matrix n n k) - 1)) i j) := by
       rw [← Matrix.sub_apply, key]
       rfl
     rw [key', Valuation.map_neg, Matrix.mul_apply]
     refine Valuation.map_sum_le v fun l _ => ?_
     rw [map_mul]
-    calc v (((g⁻¹ : GL n k) : Matrix n n k) i l) * v (((g : Matrix n n k) - 1) l j)
+    calc
+      v (((g⁻¹ : GL n k) : Matrix n n k) i l) * v (((g : Matrix n n k) - 1) l j)
         ≤ 1 * r := mul_le_mul' (hint i l) (hg' l j)
       _ = r := one_mul r
 
-theorem exists_principalCongruence :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-      (N : ℕ) (t : k), t ≠ 0 → ValuativeRel.valuation k (t) < 1 →
-      ∃ H : Subgroup (GL (Fin N) k), (H : Set (GL (Fin N) k)) =
-        {g : GL (Fin N) k | ∀ i j, ValuativeRel.valuation k
-          ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤
-            ValuativeRel.valuation k (t)} := by
+theorem exists_principalCongruence
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (N : ℕ) (t : k),
+      t ≠ 0 → ValuativeRel.valuation k (t) < 1
+        → ∃ H : Subgroup (GL (Fin N) k),
+          (H : Set (GL (Fin N) k))
+            = {g : GL (Fin N) k | ∀ i j, ValuativeRel.valuation k
+                ((g : Matrix (Fin N) (Fin N) k) i j - (1 : Matrix (Fin N) (Fin N) k) i j) ≤
+                  ValuativeRel.valuation k (t)} := by
   intro k _ _ _ _ N t _ ht
   exact ⟨principalCongruence (ValuativeRel.valuation k) _ ht, rfl⟩
 

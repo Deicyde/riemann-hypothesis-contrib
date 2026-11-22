@@ -6,15 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StandardBaseF
 
 @[expose] public section
 
-open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
+open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
 open scoped ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.LoopC.FrameDiff
 
-theorem dd_zpow_le (D : D7) (a : Fin D.R.rS) :
-    (ddS D ^ (-((D.R.rS : ℤ) - (a : ℕ))) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) ≤
-      ddS D ^ (-(D.R.rS : ℤ)) := by
+theorem dd_zpow_le (D : D7) (a : Fin D.R.rS)
+    : (ddS D ^ (-((D.R.rS : ℤ) - (a : ℕ)))
+        : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)
+      ≤ ddS D ^ (-(D.R.rS : ℤ)) := by
   have ha := a.2
   by_cases h0 : ddS D = 0
   · rw [h0, _root_.zero_zpow _ (by omega)]
@@ -25,14 +27,16 @@ theorem dd_zpow_le (D : D7) (a : Fin D.R.rS) :
       unfold ddS
       rw [← FractionalIdeal.coeIdeal_pow]
       exact FractionalIdeal.coeIdeal_le_one
-    calc _ ≤ ddS D ^ (-(D.R.rS : ℤ)) * 1 := by gcongr
+    calc
+      _ ≤ ddS D ^ (-(D.R.rS : ℤ)) * 1 := by gcongr
       _ = _ := mul_one _
 
-theorem coords_of_mem_XS (D : D7) {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (y : (VS D).V)
-    (hy : y ∈ XS D F0) :
-    ∃ c : Fin D.R.rS → D.host.E,
-      (∀ a, c a ∈ (ddS D ^ (-(D.R.rS : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)) ∧
-      y = ∑ a, c a • F0.e a := by
+theorem coords_of_mem_XS
+    (D : D7) {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (y : (VS D).V) (hy : y ∈ XS D F0)
+    : ∃ c : Fin D.R.rS → D.host.E,
+      (∀ a,
+          c a ∈ (ddS D ^ (-(D.R.rS : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E))
+        ∧ y = ∑ a, c a • F0.e a := by
   unfold XS at hy
   induction hy using Submodule.span_induction with
   | mem y hy =>
@@ -49,7 +53,8 @@ theorem coords_of_mem_XS (D : D7) {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (y
       · intro b _ hb
         simp [Pi.single_eq_of_ne hb]
       · simp
-  | zero => exact ⟨0, fun _ => FractionalIdeal.zero_mem _, by simp⟩
+  | zero =>
+    exact ⟨0, fun _ => FractionalIdeal.zero_mem _, by simp⟩
   | add y y' _ _ h h' =>
     obtain ⟨c, hc, rfl⟩ := h
     obtain ⟨c', hc', rfl⟩ := h'
@@ -66,18 +71,19 @@ variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : �
 
 theorem star_hT (x y : S.V) : star (S.hT x y) = S.hT y x := S.herm.eq x y
 
-theorem gram_eq (F F' : FlagG S r T) (b b' : Fin (r + 1)) :
-    S.hT (F.fvec b) (F.fvec b') = S.hT (F'.fvec b) (F'.fvec b') := by
+theorem gram_eq (F F' : FlagG S r T) (b b' : Fin (r + 1))
+    : S.hT (F.fvec b) (F.fvec b') = S.hT (F'.fvec b) (F'.fvec b') := by
   have hz : ∀ (G : FlagG S r T) a, S.hT G.z (G.e a) = 0 := fun G a => by
     rw [← star_hT, G.z_orth, star_zero]
-  induction b using Fin.lastCases <;> induction b' using Fin.lastCases <;>
-    simp [FlagG.fvec, F.e_iso, F'.e_iso, F.z_orth, F'.z_orth, F.z_norm, F'.z_norm, hz]
+  induction b using Fin.lastCases <;> induction b' using Fin.lastCases
+    <;> simp [FlagG.fvec, F.e_iso, F'.e_iso, F.z_orth, F'.z_orth, F.z_norm, F'.z_norm, hz]
 
 theorem mem_orth_iff (U : Submodule E S.V) (v : S.V) : v ∈ orth S U ↔ ∀ x ∈ U, S.hT x v = 0 := by
   simp [orth, Submodule.mem_iInf]
 
-theorem hT_X_eq_zero (F : FlagG S r T) (v : S.V) (hv : ∀ a, S.hT (F.e a) v = 0) (x : S.V) (hx : x ∈ F.X) :
-    S.hT x v = 0 := by
+theorem hT_X_eq_zero
+    (F : FlagG S r T) (v : S.V) (hv : ∀ a, S.hT (F.e a) v = 0) (x : S.V) (hx : x ∈ F.X)
+    : S.hT x v = 0 := by
   unfold FlagG.X at hx
   induction hx using Submodule.span_induction with
   | mem y hy => obtain ⟨a, rfl⟩ := hy; exact hv a
@@ -85,21 +91,39 @@ theorem hT_X_eq_zero (F : FlagG S r T) (v : S.V) (hv : ∀ a, S.hT (F.e a) v = 0
   | add y y' _ _ h h' => simp [h, h']
   | smul c y _ h => simp [h]
 
-theorem frame_mem (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (h : IsLift Λ F) (he : ∀ a, F.fl.e a ∈ Λ)
-    (b : Fin (r + 1)) : frame F b ∈ Λ := by
+theorem frame_mem
+    (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (h : IsLift Λ F) (he : ∀ a, F.fl.e a ∈ Λ)
+    (b : Fin (r + 1))
+    : frame F b ∈ Λ := by
   induction b using Fin.lastCases with
   | last => simpa [FlagG.fvec] using h.1
   | cast a => simpa [FlagG.fvec] using he a
 
 end Gen
 
-theorem mem_perpE_iff (D : D7) (P : LatW D) (w : (D.sp.X 0).V) :
-    w ∈ perpE D P ↔ ∀ p ∈ P, (D.sp.X 0).hT p w = 0 := by
+theorem mem_perpE_iff (D : D7) (P : LatW D) (w : (D.sp.X 0).V)
+    : w ∈ perpE D P ↔ ∀ p ∈ P, (D.sp.X 0).hT p w = 0 := by
   simp [perpE, Submodule.mem_iInf]
 
-theorem frame_diff : ∀ (D : D7) (u u' : D.what₂.Word) (F0 : Fb D u) (Λ : LatV D), Stand D u u' → IsBase D u F0 → IsRowLat D F0 Λ → ∀ (P : LatW D) (φ : P →ₗ[𝓞 D.host.E] (hS D).V) (Z : GramM D), (∀ p, φ p ∈ XLam Λ (lf D F0)) → ∀ F₁ ∈ FixSet D Λ (lf D F0) ((Tu D u' : ℕ) : D.host.E) Z P φ, ∀ F₂ ∈ FixSet D Λ (lf D F0) ((Tu D u' : ℕ) : D.host.E) Z P φ, (∀ b, ∃ w, IsWcomp D P (frame F₁ b) w ∧ IsWcomp D P (frame F₂ b) w) → ∃ x : Matrix (Fin D.R.rS) (Fin (D.R.rS + 1)) D.host.E, (∀ b, frame F₂ b = frame F₁ b + ∑ a, x a b • F0.e a) ∧ (∀ a b, x a b ∈ (ddS D ^ (-(D.R.rS : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)) ∧ xᴴ * Z.submatrix Fin.castSucc id + (Z.submatrix Fin.castSucc id)ᴴ * x = 0 := by
+theorem frame_diff
+    : ∀ (D : D7) (u u' : D.what₂.Word) (F0 : Fb D u) (Λ : LatV D),
+      Stand D u u' → IsBase D u F0 → IsRowLat D F0 Λ
+        → ∀ (P : LatW D) (φ : P →ₗ[𝓞 D.host.E] (hS D).V) (Z : GramM D),
+          (∀ p, φ p ∈ XLam Λ (lf D F0))
+            → ∀ F₁ ∈ FixSet D Λ (lf D F0) ((Tu D u' : ℕ) : D.host.E) Z P φ,
+              ∀ F₂ ∈ FixSet D Λ (lf D F0) ((Tu D u' : ℕ) : D.host.E) Z P φ,
+                (∀ b, ∃ w, IsWcomp D P (frame F₁ b) w ∧ IsWcomp D P (frame F₂ b) w)
+                  → ∃ x : Matrix (Fin D.R.rS) (Fin (D.R.rS + 1)) D.host.E,
+                    (∀ b, frame F₂ b = frame F₁ b + ∑ a, x a b • F0.e a)
+                      ∧ (∀ a b,
+                        x a b
+                          ∈ (ddS D ^ (-(D.R.rS : ℤ))
+                            : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E))
+                      ∧ xᴴ * Z.submatrix Fin.castSucc id + (Z.submatrix Fin.castSucc id)ᴴ * x
+                        = 0 := by
   intro D u u' F0 Λ hst hb hrow P φ Z hφ F₁ h₁ F₂ h₂ hw
-  obtain ⟨hW, -, hpos, -⟩ := GlobalTheory.T.standardBaseFlag_complement_integralLattice D u u' F0 Λ hst hb hrow
+  obtain ⟨hW, -, hpos, -⟩ :=
+    GlobalTheory.T.standardBaseFlag_complement_integralLattice D u u' F0 Λ hst hb hrow
   obtain ⟨l₁, e₁, z₁, o₁⟩ := h₁
   obtain ⟨l₂, e₂, z₂, o₂⟩ := h₂
   have hiso : ∀ x y, (hS D).hT (D.sp.iXY 0 x) (D.sp.iXY 0 y) = (D.sp.X 0).hT x y :=
@@ -148,8 +172,7 @@ theorem frame_diff : ∀ (D : D7) (u u' : D.what₂.Word) (F0 : Fb D u) (Λ : La
     rw [← hwx]
     exact hx
   choose c hc hcd using fun b => coords_of_mem_XS D F0 _ (hd b)
-  have hfr : ∀ b, frame F₂ b = frame F₁ b + ∑ a, c b a • F0.e a := fun b => by
-    rw [← hcd]; abel
+  have hfr : ∀ b, frame F₂ b = frame F₁ b + ∑ a, c b a • F0.e a := fun b => by rw [← hcd]; abel
   refine ⟨Matrix.of fun a b => c b a, hfr, fun a b => hc b a, ?_⟩
   refine Matrix.ext fun b b' => ?_
   have hg : (hS D).hT (frame F₂ b) (frame F₂ b') = (hS D).hT (frame F₁ b) (frame F₁ b') :=
@@ -160,9 +183,10 @@ theorem frame_diff : ∀ (D : D7) (u u' : D.what₂.Word) (F0 : Fb D u) (Λ : La
     rw [← hY, star_hT]
   rw [hfr b, hfr b'] at hg
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_add (f := _), map_sum, LinearMap.add_apply, LinearMap.sum_apply, map_smul, LinearMap.map_smulₛₗ,
-    LinearMap.smul_apply, hY, hY', F0.e_iso, smul_eq_mul, mul_zero, Finset.sum_const_zero, add_zero,
-    starRingEnd_apply] at hg
+    simp only [map_add (f := _), map_sum, LinearMap.add_apply, LinearMap.sum_apply, map_smul,
+        LinearMap.map_smulₛₗ, LinearMap.smul_apply, hY, hY', F0.e_iso, smul_eq_mul, mul_zero,
+        Finset.sum_const_zero, add_zero, starRingEnd_apply]
+      at hg
   simp only [Matrix.add_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.of_apply,
     Matrix.submatrix_apply, id, Matrix.zero_apply]
   have : ∑ a, star (Z a.castSucc b) * c b' a = ∑ a, c b' a * star (Z a.castSucc b) :=

@@ -32,8 +32,8 @@ private lemma UpperTheory.V.Af.Rs.stripInt_maj (A B s : ℝ) (hs : 1 < s) :
     simp only [if_neg (not_le.mpr hy1)]
     rw [Real.rpow_neg hy0.le, Real.rpow_two, div_eq_mul_inv]
 
-theorem UpperTheory.V.Af.Rs.stripInt :
-    UpperTheory.V.Af.Rs.StripIm → UpperTheory.V.Af.Rs.StripInt := by
+theorem UpperTheory.V.Af.Rs.stripInt
+    : UpperTheory.V.Af.Rs.StripIm → UpperTheory.V.Af.Rs.StripInt := by
   intro hIm F hF s hs
   obtain ⟨hcont, C, hC⟩ := hF
   have hbound : ∀ z : ℍ, ‖F z‖ ≤ 8 * C := by
@@ -53,16 +53,17 @@ theorem UpperTheory.V.Af.Rs.stripInt :
     have hle : z.im ^ s ≤ z.im ^ (3 : ℕ) := by
       rw [← Real.rpow_natCast]
       exact Real.rpow_le_rpow_of_exponent_le hz.le (by push_cast; linarith [hs.2])
-    calc ‖F z‖ * z.im ^ s ≤ ‖F z‖ * z.im ^ 3 :=
-          mul_le_mul_of_nonneg_left hle (norm_nonneg _)
+    calc
+      ‖F z‖ * z.im ^ s
+        ≤ ‖F z‖ * z.im ^ 3 := mul_le_mul_of_nonneg_left hle (norm_nonneg _)
       _ ≤ C := hC'
   have hmeas : Measurable (fun y : ℝ => if y ≤ 1 then 8 * C * y ^ s else C) :=
     Measurable.ite measurableSet_Iic ((measurable_id.pow_const s).const_mul _) measurable_const
   have hφ := hIm _ hmeas (UpperTheory.V.Af.Rs.stripInt_maj (8 * C) C s hs.1)
   refine Integrable.mono' hφ ?_ ?_
   · have hc : Continuous fun z : ℍ => F z * ((z.im ^ s : ℝ) : ℂ) :=
-      hcont.mul (Complex.continuous_ofReal.comp
-        (UpperHalfPlane.continuous_im.rpow_const fun _ => Or.inr (by linarith [hs.1])))
+      hcont.mul (Complex.continuous_ofReal.comp (UpperHalfPlane.continuous_im.rpow_const fun _ =>
+        Or.inr (by linarith [hs.1])))
     exact hc.aestronglyMeasurable
   · refine Filter.Eventually.of_forall fun z => ?_
     have hy := z.im_pos

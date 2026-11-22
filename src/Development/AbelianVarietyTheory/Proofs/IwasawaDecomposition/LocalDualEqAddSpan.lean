@@ -11,18 +11,34 @@ open scoped TensorProduct
 
 namespace GlobalTheory.Mem.LocalDualBase
 
-theorem localDual_eq_add_span : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (w : HeightOneSpectrum (𝓞 F)) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (L : Submodule (𝓞 E) (Fin n → E)) (p : 𝓞 E), J = 1 → p ≠ 0 → (∀ x, x ∈ L ↔ ∀ j : Fin n, ∃ r : 𝓞 E, x j = (r : E) ∧ (j.1 + 1 = n → p ∣ r)) → (∀ x, σ (σ x) = x) → ∃ e : latS (F := F) (w.adicCompletion F) (intV E w) (Submodule.span (𝓞 E) (dualSet (σ : E →+* E) J L)), ∀ t : latS (F := F) (w.adicCompletion F) (intV E w) (Submodule.span (𝓞 E) (dualSet (σ : E →+* E) J L)), ∃ s : intV E w, (t - s • e).1 ∈ latS (F := F) (w.adicCompletion F) (intV E w) L := by
+theorem localDual_eq_add_span
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (w : HeightOneSpectrum (𝓞 F)) (n : ℕ) (J : Matrix (Fin n) (Fin n) E)
+        (L : Submodule (𝓞 E) (Fin n → E)) (p : 𝓞 E),
+      J = 1 → p ≠ 0 → (∀ x, x ∈ L ↔ ∀ j : Fin n, ∃ r : 𝓞 E, x j = (r : E) ∧ (j.1 + 1 = n → p ∣ r))
+        → (∀ x, σ (σ x) = x)
+        → ∃ e : latS (F := F) (w.adicCompletion F) (intV E w)
+            (Submodule.span (𝓞 E) (dualSet (σ : E →+* E) J L)),
+          ∀ t : latS (F := F) (w.adicCompletion F) (intV E w)
+              (Submodule.span (𝓞 E) (dualSet (σ : E →+* E) J L)),
+            ∃ s : intV E w,
+              (t - s • e).1 ∈ latS (F := F) (w.adicCompletion F) (intV E w) L := by
   intro F E _ _ _ _ _ σ w n J L p hJ hp hL _
   subst hJ
-  have hform1 : ∀ x y : Fin n → E, hform (σ : E →+* E) (1 : Matrix (Fin n) (Fin n) E) x y = ∑ i, σ (x i) * y i := by
+  have hform1
+      : ∀ x y : Fin n → E,
+        hform (σ : E →+* E) (1 : Matrix (Fin n) (Fin n) E) x y = ∑ i, σ (x i) * y i := by
     intro x y
     unfold hform
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [Matrix.one_apply]
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · refine ⟨0, fun t => ⟨0, ?_⟩⟩
-    have : (t - (0 : intV E w) • (0 : latS (F := F) (w.adicCompletion F) (intV E w)
-        (Submodule.span (𝓞 E) (dualSet (σ : E →+* E) (1 : Matrix (Fin 0) (Fin 0) E) L)))).1 = 0 :=
+    have : (t
+          - (0 : intV E w)
+            • (0 : latS (F := F) (w.adicCompletion F) (intV E w)
+              (Submodule.span (𝓞 E) (dualSet (σ : E →+* E) (1 : Matrix (Fin 0) (Fin 0) E) L)))).1
+        = 0 :=
       Subsingleton.elim _ _
     rw [this]
     exact Submodule.zero_mem _
@@ -50,8 +66,10 @@ theorem localDual_eq_add_span : ∀ (F E : Type) [Field F] [NumberField F] [Fiel
     push_cast
     rw [map_mul, ← hpb]
     field_simp
-  have hglob : ∀ y ∈ Submodule.span (𝓞 E) (dualSet (σ : E →+* E) (1 : Matrix (Fin n) (Fin n) E) L),
-      ∃ r : 𝓞 E, y - (algebraMap (𝓞 E) E r) • e0 ∈ L := by
+  have hglob
+      : ∀ y ∈ Submodule.span (𝓞 E) (dualSet (σ : E →+* E) (1 : Matrix (Fin n) (Fin n) E) L),
+        ∃ r : 𝓞 E,
+          y - (algebraMap (𝓞 E) E r) • e0 ∈ L := by
     intro y hy
     induction hy using Submodule.span_induction with
     | mem y hy =>
@@ -85,13 +103,14 @@ theorem localDual_eq_add_span : ∀ (F E : Type) [Field F] [NumberField F] [Fiel
         obtain ⟨u, hu⟩ := h2
         refine ⟨u, ?_, fun hj' => absurd (Fin.ext (by omega)) hj⟩
         simp [e0, hj, hu]
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add y z _ _ h1 h2 =>
       obtain ⟨r1, hr1⟩ := h1
       obtain ⟨r2, hr2⟩ := h2
       refine ⟨r1 + r2, ?_⟩
-      have : y + z - (algebraMap (𝓞 E) E (r1 + r2)) • e0 =
-          (y - (algebraMap (𝓞 E) E r1) • e0) + (z - (algebraMap (𝓞 E) E r2) • e0) := by
+      have : y + z - (algebraMap (𝓞 E) E (r1 + r2)) • e0
+          = (y - (algebraMap (𝓞 E) E r1) • e0) + (z - (algebraMap (𝓞 E) E r2) • e0) := by
         rw [map_add (f := _), add_smul]; abel
       rw [this]
       exact L.add_mem hr1 hr2
@@ -108,11 +127,14 @@ theorem localDual_eq_add_span : ∀ (F E : Type) [Field F] [NumberField F] [Fiel
   have hincl : ∀ r : 𝓞 E, inclE (F := F) R (algebraMap (𝓞 E) E r) ∈ intV E w := by
     intro r
     exact Subring.subset_closure (Or.inl ⟨⟨_, r, rfl⟩, rfl⟩)
-  refine ⟨⟨fun i => inclE (F := F) R (e0 i),
-    Submodule.subset_span ⟨e0, Submodule.subset_span he0, rfl⟩⟩, fun t => ?_⟩
+  refine ⟨
+    ⟨fun i => inclE (F := F) R (e0 i), Submodule.subset_span ⟨e0, Submodule.subset_span he0, rfl⟩⟩,
+    fun t => ?_
+  ⟩
   obtain ⟨t, ht⟩ := t
-  suffices H : ∃ s : intV E w, t - (s : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i)) ∈
-      latS (F := F) R (intV E w) L by
+  suffices H
+      : ∃ s : intV E w,
+        t - (s : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i)) ∈ latS (F := F) R (intV E w) L by
     obtain ⟨s, hs⟩ := H
     exact ⟨s, hs⟩
   induction ht using Submodule.span_induction with
@@ -120,29 +142,30 @@ theorem localDual_eq_add_span : ∀ (F E : Type) [Field F] [NumberField F] [Fiel
     obtain ⟨y', hy', rfl⟩ := hy
     obtain ⟨r, hr⟩ := hglob y' hy'
     refine ⟨⟨_, hincl r⟩, ?_⟩
-    have : (fun i => inclE (F := F) R (y' i)) - inclE (F := F) R (algebraMap (𝓞 E) E r) •
-        (fun i => inclE (F := F) R (e0 i)) =
-        fun i => inclE (F := F) R ((y' - (algebraMap (𝓞 E) E r) • e0) i) := by
+    have : (fun i => inclE (F := F) R (y' i))
+          - inclE (F := F) R (algebraMap (𝓞 E) E r) • (fun i => inclE (F := F) R (e0 i))
+        = fun i => inclE (F := F) R ((y' - (algebraMap (𝓞 E) E r) • e0) i) := by
       ext i
       simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, map_sub, map_mul]
     rw [this]
     exact Submodule.subset_span ⟨_, hr, rfl⟩
-  | zero => exact ⟨0, by simp⟩
+  | zero =>
+    exact ⟨0, by simp⟩
   | add x y _ _ h1 h2 =>
     obtain ⟨s1, hs1⟩ := h1
     obtain ⟨s2, hs2⟩ := h2
     refine ⟨s1 + s2, ?_⟩
-    have : x + y - ((s1 + s2 : intV E w) : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i)) =
-        (x - (s1 : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i))) +
-        (y - (s2 : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i))) := by
+    have : x + y - ((s1 + s2 : intV E w) : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i))
+        = (x - (s1 : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i)))
+          + (y - (s2 : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i))) := by
       rw [Subring.coe_add, add_smul]; abel
     rw [this]
     exact Submodule.add_mem _ hs1 hs2
   | smul a x _ h =>
     obtain ⟨s, hs⟩ := h
     refine ⟨a * s, ?_⟩
-    have : a • x - ((a * s : intV E w) : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i)) =
-        a • (x - (s : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i))) := by
+    have : a • x - ((a * s : intV E w) : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i))
+        = a • (x - (s : E ⊗[F] R) • (fun i => inclE (F := F) R (e0 i))) := by
       rw [Subring.coe_mul, mul_smul, smul_sub]
       rfl
     rw [this]

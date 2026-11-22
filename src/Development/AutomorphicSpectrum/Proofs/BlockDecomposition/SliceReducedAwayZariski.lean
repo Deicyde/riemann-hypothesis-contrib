@@ -40,12 +40,15 @@ theorem sliceReducedGeneral : SliceReducedGeneral.Statement :=
   @SliceReducedGeneral.proof sliceUnmixedGeneral sliceReducedAway
 
 theorem sliceMultGeneral : SliceMultGeneral.Statement :=
-  @SliceMultGeneral.proof AutoClose.CMGeneralPoint TransverseSliceGeneral.proof AutoClose.LengthTransverseSlice
+  @SliceMultGeneral.proof AutoClose.CMGeneralPoint TransverseSliceGeneral.proof
+    AutoClose.LengthTransverseSlice
 
 theorem sliceLength : SliceLength.Statement :=
-  @SliceLength.proof IndefiniteRowSideFullHecke.ComplexSets.VanishNearPoint.full sliceReducedGeneral sliceMultGeneral
+  @SliceLength.proof IndefiniteRowSideFullHecke.ComplexSets.VanishNearPoint.full sliceReducedGeneral
+    sliceMultGeneral
 
 theorem localOrder : LocalOrder.Statement :=
-  LocalOrder.proof sliceLength GlobalTheory.T.slice_branches_holds GlobalTheory.T.curve_branch_length_holds
+  LocalOrder.proof sliceLength GlobalTheory.T.slice_branches_holds
+    GlobalTheory.T.curve_branch_length_holds
 
 end GlobalTheory.CompanionTheory.Heights.BranchOrder

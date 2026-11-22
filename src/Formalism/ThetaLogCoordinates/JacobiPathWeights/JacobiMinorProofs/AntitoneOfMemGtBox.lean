@@ -64,12 +64,11 @@ lemma antitone_of_mem_gtBox {n : ℕ} {μ : Fin (n + 1) → ℤ} {κ : Fin n →
       _ ≤ μ i.succ := hμ (Fin.succ_le_castSucc_iff.mpr h)
       _ ≤ κ i := (hκ i).1
 
-
 open Classical in
 def sLe {n : ℕ} (κ : Fin n → ℤ) (b : ℕ) : Finset (Fin n → ℤ) :=
   (Fintype.piFinset fun i => Finset.Icc (κ i) (κ i + b)).filter fun l =>
-    (∀ m, κ m ≤ l m) ∧ (∀ m m' : Fin n, m.val + 1 = m'.val → l m' ≤ κ m) ∧
-      ∑ m, l m - ∑ m, κ m ≤ (b : ℤ)
+    (∀ m, κ m ≤ l m) ∧ (∀ m m' : Fin n, m.val + 1 = m'.val → l m' ≤ κ m)
+      ∧ ∑ m, l m - ∑ m, κ m ≤ (b : ℤ)
 
 lemma mem_sLe {n : ℕ} (κ l : Fin n → ℤ) (b : ℕ) :
     l ∈ sLe κ b ↔ (∀ m, κ m ≤ l m) ∧ (∀ m m' : Fin n, m.val + 1 = m'.val → l m' ≤ κ m) ∧
@@ -108,11 +107,11 @@ lemma sum_sLe {n : ℕ} (κ : Fin n → ℤ) (b : ℕ) (f : (Fin n → ℤ) → 
     have := hnn l h1
     exact ⟨h1, h2, by omega⟩
 
-def Lo {n : ℕ} (μ : Fin (n + 1) → ℤ) (l : Fin n → ℤ) : Fin (n + 1) → ℤ :=
-  fun j => max (μ j) ((Fin.snoc l (μ (Fin.last n)) : Fin (n + 1) → ℤ) j)
+def Lo {n : ℕ} (μ : Fin (n + 1) → ℤ) (l : Fin n → ℤ) : Fin (n + 1) → ℤ := fun j =>
+  max (μ j) ((Fin.snoc l (μ (Fin.last n)) : Fin (n + 1) → ℤ) j)
 
-def Hi {n : ℕ} (μ : Fin (n + 1) → ℤ) (l : Fin n → ℤ) : Fin n → ℤ :=
-  fun i => min (μ i.castSucc) (l i)
+def Hi {n : ℕ} (μ : Fin (n + 1) → ℤ) (l : Fin n → ℤ) : Fin n → ℤ := fun i =>
+  min (μ i.castSucc) (l i)
 
 lemma Lo_castSucc {n : ℕ} (μ : Fin (n + 1) → ℤ) (l : Fin n → ℤ) (i : Fin n) :
     Lo μ l i.castSucc = max (μ i.castSucc) (l i) := by
@@ -205,8 +204,8 @@ lemma cond_low {n : ℕ} (μ : Fin (n + 1) → ℤ) (κ l : Fin n → ℤ) (b : 
   · rintro ⟨⟨h1, h2⟩, h3, h4⟩
     exact ⟨fun i => ⟨h1 i, (h3 i).1⟩, fun i => (h3 i).2, h2, h4⟩
 
-def fw {n : ℕ} (μ : Fin (n + 1) → ℤ) (l : Fin n → ℤ) (ν : Fin (n + 1) → ℤ) : Fin n → ℤ :=
-  fun i => Lo μ l i.succ + Hi μ l i - ν i.succ
+def fw {n : ℕ} (μ : Fin (n + 1) → ℤ) (l : Fin n → ℤ) (ν : Fin (n + 1) → ℤ) : Fin n → ℤ := fun i =>
+  Lo μ l i.succ + Hi μ l i - ν i.succ
 
 def bw {n : ℕ} (μ : Fin (n + 1) → ℤ) (l : Fin n → ℤ) (b : ℕ) (κ : Fin n → ℤ) : Fin (n + 1) → ℤ :=
   Fin.cons (Lo μ l 0 + b - (∑ i, l i - ∑ i, κ i)) (fun i => Lo μ l i.succ + Hi μ l i - κ i)
@@ -286,8 +285,9 @@ lemma hockey (n b : ℕ) : ∑ c ∈ Finset.range (b + 1), (n + c - 1).choose c 
     rw [Finset.sum_range_succ, ih, show n + (b + 1) - 1 = n + b by omega,
       show n + (b + 1) = n + b + 1 by omega, Nat.choose_succ_succ]
 
-theorem up (n : ℕ) : ∀ (μ : Fin n → ℤ) (b : ℕ), Antitone μ →
-    ∑ ν ∈ stripsUp μ b, dGT n ν = dGT n μ * (n + b - 1).choose b := by
+theorem up (n : ℕ)
+    : ∀ (μ : Fin n → ℤ) (b : ℕ),
+      Antitone μ → ∑ ν ∈ stripsUp μ b, dGT n ν = dGT n μ * (n + b - 1).choose b := by
   induction n with
   | zero =>
     intro μ b _
@@ -320,7 +320,7 @@ theorem up (n : ℕ) : ∀ (μ : Fin n → ℤ) (b : ℕ), Antitone μ →
       exact ih κ c (antitone_of_mem_gtBox hμ hκ)
     rw [Finset.sum_congr rfl e, ← Finset.sum_mul, show n + 1 + b - 1 = n + b by omega]
 
-def star {n : ℕ} (μ : Fin n → ℤ) : Fin n → ℤ := fun i => -μ (Fin.rev i)
+def star {n : ℕ} (μ : Fin n → ℤ) : Fin n → ℤ := fun i => - μ (Fin.rev i)
 
 lemma star_star {n : ℕ} (μ : Fin n → ℤ) : star (star μ) = μ := by
   funext i
@@ -372,11 +372,15 @@ lemma HStrip_star {n : ℕ} {μ ν : Fin n → ℤ} {b : ℕ} (h : HStrip μ ν 
   · rw [sum_star, sum_star]
     linarith
 
-theorem down (n : ℕ) (μ : Fin n → ℤ) (b : ℕ) (hμ : Antitone μ) :
-    ∑ ν ∈ stripsDown μ b, dGT n ν = dGT n μ * (n + b - 1).choose b := by
+theorem down (n : ℕ) (μ : Fin n → ℤ) (b : ℕ) (hμ : Antitone μ)
+    : ∑ ν ∈ stripsDown μ b, dGT n ν = dGT n μ * (n + b - 1).choose b := by
   rw [← dGT_star n μ, ← up n (star μ) b (antitone_star hμ)]
-  refine Finset.sum_nbij' star star (fun ν hν => ?_) (fun ν hν => ?_)
-    (fun ν _ => star_star ν) (fun ν _ => star_star ν) (fun ν _ => (dGT_star n ν).symm)
+  refine Finset.sum_nbij' star star
+    (fun ν hν => ?_)
+    (fun ν hν => ?_)
+    (fun ν _ => star_star ν)
+    (fun ν _ => star_star ν)
+    (fun ν _ => (dGT_star n ν).symm)
   · rw [mem_stripsDown] at hν
     rw [mem_stripsUp]
     exact HStrip_star hν

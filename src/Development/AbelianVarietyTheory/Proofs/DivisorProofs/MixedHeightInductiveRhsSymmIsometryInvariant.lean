@@ -12,20 +12,34 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.MixHt
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt
+  GlobalTheory.MixHt
 
 namespace GlobalTheory.MixHt
 
-theorem recVal_iso_symm : ArchInteg → ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y]
-    (q : Y ⟶ Sp k), IsAmb q → ∀ e : ℕ, topologicalKrullDim Y = (e + 1 : ℕ) → ∀ T, IsMix q e T →
-    ∀ (M : HermLB q) (r : M.B.ι → Y.functionFieldˣ) (hr : IsRatSec M.B r),
-    (∀ L L' : Fin e → HermLB q, (∀ a, (L a).Isometric (L' a)) → recVal (T e L) L M hr = recVal (T e L') L' M hr) ∧
-    (∀ (L : Fin e → HermLB q) (τ : Equiv.Perm (Fin e)),
-      recVal (T e fun a => L (τ a)) (fun a => L (τ a)) M hr = recVal (T e L) L M hr) ∧
-    (∀ (L : Fin e → HermLB q) (M' : HermLB q), M.Isometric M' → ∃ (r' : M'.B.ι → Y.functionFieldˣ)
-      (hr' : IsRatSec M'.B r'), recVal (T e L) L M' hr' = recVal (T e L) L M hr) := by
+theorem recVal_iso_symm
+    : ArchInteg
+      → ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y]
+          (q : Y ⟶ Sp k),
+        IsAmb q
+          → ∀ e : ℕ,
+            topologicalKrullDim Y = (e + 1 : ℕ)
+              → ∀ T,
+                IsMix q e T
+                  → ∀ (M : HermLB q) (r : M.B.ι → Y.functionFieldˣ) (hr : IsRatSec M.B r),
+                    (∀ L L' : Fin e → HermLB q,
+                        (∀ a, (L a).Isometric (L' a))
+                          → recVal (T e L) L M hr = recVal (T e L') L' M hr)
+                      ∧ (∀ (L : Fin e → HermLB q) (τ : Equiv.Perm (Fin e)),
+                        recVal (T e fun a => L (τ a)) (fun a => L (τ a)) M hr
+                          = recVal (T e L) L M hr)
+                      ∧ (∀ (L : Fin e → HermLB q) (M' : HermLB q),
+                        M.Isometric M'
+                          → ∃ (r' : M'.B.ι → Y.functionFieldˣ) (hr' : IsRatSec M'.B r'),
+                            recVal (T e L) L M' hr' = recVal (T e L) L M hr) := by
   intro _ k _ Y _ _ q hq e hY T hT M r hr
   have hd : ∀ z : Y, ((M.div hr).mult z : ℝ) ≠ 0 → HasDim z e := fun z hz =>
     ((GlobalTheory.T.coheight_one_iff_pointClosure_dim_projArith k Y q hq e hY).1 z).1
@@ -48,6 +62,8 @@ theorem recVal_iso_symm : ArchInteg → ∀ (k : Type) [CommRing k] (Y : Scheme.
   · obtain ⟨r', hr', hdiv, hlog⟩ := h.exists_isRatSec hr
     refine ⟨r', hr', ?_⟩
     unfold recVal
-    rw [(GlobalTheory.T.mixedArchLogNormIntegral_isometry_symm_congr k Y q e L M r hr).2.2 M' r' hr' hdiv hlog, hdiv]
+    rw [(GlobalTheory.T.mixedArchLogNormIntegral_isometry_symm_congr k Y q e L M r hr).2.2 M' r' hr'
+        hdiv hlog,
+      hdiv]
 
 end GlobalTheory.MixHt

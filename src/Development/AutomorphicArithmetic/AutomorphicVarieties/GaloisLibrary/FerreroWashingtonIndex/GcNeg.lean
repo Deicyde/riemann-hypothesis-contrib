@@ -6,8 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-private theorem div_sub_add_div_add_one_eq (c M a : ℕ) (hM : 0 < M) (hr : a % M ≠ 0) (ha : a < c * M) :
-    (c * M - a) / M + a / M + 1 = c := by
+private theorem div_sub_add_div_add_one_eq
+    (c M a : ℕ) (hM : 0 < M) (hr : a % M ≠ 0) (ha : a < c * M)
+    : (c * M - a) / M + a / M + 1 = c := by
   have hdm := Nat.div_add_mod a M
   have hrl := Nat.mod_lt a hM
   generalize a / M = k at hdm ⊢
@@ -29,8 +30,9 @@ private theorem div_sub_add_div_add_one_eq (c M a : ℕ) (hM : 0 < M) (hr : a % 
   rw [hq]
   omega
 
-theorem UpperTheory.V.FW.gcNeg :
-    ∀ (M c : ℕ) [NeZero M] (s : ZMod M), c.Coprime M → Odd c → s ≠ 0 → gc M c (-s) = -gc M c s := by
+theorem UpperTheory.V.FW.gcNeg
+    : ∀ (M c : ℕ) [NeZero M] (s : ZMod M),
+      c.Coprime M → Odd c → s ≠ 0 → gc M c (-s) = - gc M c s := by
   intro M c _ s hc hodd hs
   unfold gc
   have hcu : IsUnit (c : ZMod M) := (ZMod.isUnit_iff_coprime c M).mpr hc
@@ -38,7 +40,8 @@ theorem UpperTheory.V.FW.gcNeg :
   have ht0 : (c : ZMod M)⁻¹ * s ≠ 0 := by
     intro h0
     apply hs
-    calc s = ((c : ZMod M) * (c : ZMod M)⁻¹) * s := by rw [ZMod.mul_inv_of_unit _ hcu, one_mul]
+    calc
+      s = ((c : ZMod M) * (c : ZMod M)⁻¹) * s := by rw [ZMod.mul_inv_of_unit _ hcu, one_mul]
       _ = (c : ZMod M) * ((c : ZMod M)⁻¹ * s) := by ring
       _ = 0 := by rw [h0, mul_zero]
   haveI : NeZero ((c : ZMod M)⁻¹ * s) := ⟨ht0⟩

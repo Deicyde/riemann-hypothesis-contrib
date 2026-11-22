@@ -10,6 +10,7 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 namespace PositivityTheory.Rg.BcB.SpectralAccumulation
 
-theorem eFinal_holds' : EFinal := eFinal_of Cz.separation_holds FiniteDiscreteTypes.finDisc LV.limVec
+theorem eFinal_holds' : EFinal :=
+  eFinal_of Cz.separation_holds FiniteDiscreteTypes.finDisc LV.limVec
 
 end PositivityTheory.Rg.BcB.SpectralAccumulation

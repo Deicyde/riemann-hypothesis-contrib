@@ -23,9 +23,10 @@ section Ring
 
 variable {R : Type*} [CommRing R]
 
-theorem mem_minimalPrimes_of_cross {V W : Ideal R} {f g u v : R} (hrel : f * v - g * u ∈ V)
-    (hW : W ∈ (V ⊔ Ideal.span {f}).minimalPrimes) (hu : u ∉ W) (hv : v ∉ W) :
-    W ∈ (V ⊔ Ideal.span {g}).minimalPrimes := by
+theorem mem_minimalPrimes_of_cross
+    {V W : Ideal R} {f g u v : R} (hrel : f * v - g * u ∈ V)
+    (hW : W ∈ (V ⊔ Ideal.span {f}).minimalPrimes) (hu : u ∉ W) (hv : v ∉ W)
+    : W ∈ (V ⊔ Ideal.span {g}).minimalPrimes := by
   have hWp := hW.1.1
   have hVW : V ≤ W := le_sup_left.trans hW.1.2
   have hfW : f ∈ W := hW.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self f))
@@ -46,9 +47,11 @@ theorem mem_minimalPrimes_of_cross {V W : Ideal R} {f g u v : R} (hrel : f * v -
     exact (hQ.1.mem_or_mem h).resolve_right fun h' => hv (hQW h')
   exact hW.2 ⟨hQ.1, sup_le hVQ ((Ideal.span_singleton_le_iff_mem _).mpr hfQ)⟩ hQW
 
-theorem locLen_cross {V : Ideal R} (hV : V.IsPrime) {f g u v : R} (hrel : f * v - g * u ∈ V)
-    (p : PrimeSpectrum R) (hVp : V ≤ p.asIdeal) (hu : u ∉ p.asIdeal) (hv : v ∉ p.asIdeal) :
-    locLen (R ⧸ (V ⊔ Ideal.span {f})) p = locLen (R ⧸ (V ⊔ Ideal.span {g})) p := by
+theorem locLen_cross
+    {V : Ideal R} (hV : V.IsPrime)
+    {f g u v : R} (hrel : f * v - g * u ∈ V)
+    (p : PrimeSpectrum R) (hVp : V ≤ p.asIdeal) (hu : u ∉ p.asIdeal) (hv : v ∉ p.asIdeal)
+    : locLen (R ⧸ (V ⊔ Ideal.span {f})) p = locLen (R ⧸ (V ⊔ Ideal.span {g})) p := by
   have e : V ⊔ Ideal.span {v * f} = V ⊔ Ideal.span {u * g} := by
     apply le_antisymm
     · refine sup_le le_sup_left ((Ideal.span_singleton_le_iff_mem _).mpr ?_)
@@ -76,11 +79,12 @@ end Homog
 
 section Models
 
-variable {Ω : Type*} [Field Ω] {ι ν κ : Type u} [Fintype ι] [Fintype ν] [Fintype κ]
-  {E : Type*} [AddCommGroup E] [Module Ω E] {Φ : Type*} [Field Φ] [Algebra Ω Φ]
+variable
+  {Ω : Type*} [Field Ω]
+  {ι ν κ : Type u} [Fintype ι] [Fintype ν] [Fintype κ]
+  {E : Type*} [AddCommGroup E] [Module Ω E]
+  {Φ : Type*} [Field Φ] [Algebra Ω Φ]
   (x : ι → Ω) (δ : ν → Ω) (e : Module.Basis (Fin 2) Ω E) (φ : κ → E →ₗ[Ω] Ω) (a₀ : Φ)
-
-
 
 end Models
 

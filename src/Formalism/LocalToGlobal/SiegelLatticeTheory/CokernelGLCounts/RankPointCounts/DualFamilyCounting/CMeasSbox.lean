@@ -12,7 +12,8 @@ open scoped ENNReal
 
 namespace Formalism.L2.SG.Pf.NcReal.JX
 
-open Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.L2.SG.RealObj.InfCut Formalism.MainNotions.S
+open Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.L2.SG.RealObj.InfCut
+  Formalism.MainNotions.S
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -23,33 +24,43 @@ variable {ι : Type} [Fintype ι] {r k : ℕ}
 def Φc (x : ∀ p : CBlk r, CSpc ι k p) (i : ι × LsNc5.CIdx r k) : ℝ :=
   match i with
   | (v, Sum.inl (Sum.inl (p, t))) => LsNc5.reim ((x (Sum.inl (Sum.inl p)) : ι → ℂ) v) t
-  | (v, Sum.inl (Sum.inr (b, t))) => LsNc5.reim ((x (Sum.inl (Sum.inr b)) : ι → Fin (k + 1) → ℂ) v (Fin.last k)) t
+  | (v, Sum.inl (Sum.inr (b, t))) =>
+    LsNc5.reim ((x (Sum.inl (Sum.inr b)) : ι → Fin (k + 1) → ℂ) v (Fin.last k)) t
   | (v, Sum.inr (Sum.inl (b, j, t))) =>
-      LsNc5.reim ((x (Sum.inl (Sum.inr b)) : ι → Fin (k + 1) → ℂ) v (Fin.castSucc j)) t
+    LsNc5.reim ((x (Sum.inl (Sum.inr b)) : ι → Fin (k + 1) → ℂ) v (Fin.castSucc j)) t
   | (v, Sum.inr (Sum.inr (Sum.inl (p, t)))) => LsNc5.reim ((x (Sum.inr (Sum.inl p)) : ι → ℂ) v) t
   | (v, Sum.inr (Sum.inr (Sum.inr a))) => (x (Sum.inr (Sum.inr a)) : ι → ℝ) v
 
 theorem measurable_Φc : Measurable (Φc (ι := ι) (r := r) (k := k)) := by
   refine Measurable.of_eval fun i => ?_
   rcases i with ⟨v, ((⟨p, t⟩ | ⟨b, t⟩) | (⟨b, j, t⟩ | (⟨p, t⟩ | a)))⟩
-  · exact (reim_cont t).measurable.comp ((measurable_pi_apply v).comp
-      (measurable_pi_apply (Sum.inl (Sum.inl p) : CBlk r)))
-  · exact (reim_cont t).measurable.comp ((measurable_pi_apply (Fin.last k)).comp ((measurable_pi_apply v).comp
-      (measurable_pi_apply (Sum.inl (Sum.inr b) : CBlk r))))
-  · exact (reim_cont t).measurable.comp ((measurable_pi_apply (Fin.castSucc j)).comp ((measurable_pi_apply v).comp
-      (measurable_pi_apply (Sum.inl (Sum.inr b) : CBlk r))))
-  · exact (reim_cont t).measurable.comp ((measurable_pi_apply v).comp
-      (measurable_pi_apply (Sum.inr (Sum.inl p) : CBlk r)))
+  · exact (reim_cont t).measurable.comp
+      ((measurable_pi_apply v).comp (measurable_pi_apply (Sum.inl (Sum.inl p) : CBlk r)))
+  · exact (reim_cont t).measurable.comp
+      ((measurable_pi_apply (Fin.last k)).comp
+        ((measurable_pi_apply v).comp (measurable_pi_apply (Sum.inl (Sum.inr b) : CBlk r))))
+  · exact (reim_cont t).measurable.comp
+      ((measurable_pi_apply (Fin.castSucc j)).comp
+        ((measurable_pi_apply v).comp (measurable_pi_apply (Sum.inl (Sum.inr b) : CBlk r))))
+  · exact (reim_cont t).measurable.comp
+      ((measurable_pi_apply v).comp (measurable_pi_apply (Sum.inr (Sum.inl p) : CBlk r)))
   · exact (measurable_pi_apply v).comp (measurable_pi_apply (Sum.inr (Sum.inr a) : CBlk r))
 
 def Ψc (y : ι × LsNc5.CIdx r k → ℝ) : ∀ p : CBlk r, CSpc ι k p
-  | Sum.inl (Sum.inl p) => fun v => (⟨y (v, Sum.inl (Sum.inl (p, false))), y (v, Sum.inl (Sum.inl (p, true)))⟩ : ℂ)
+  | Sum.inl (Sum.inl p) => fun v =>
+    (⟨y (v, Sum.inl (Sum.inl (p, false))), y (v, Sum.inl (Sum.inl (p, true)))⟩ : ℂ)
   | Sum.inl (Sum.inr b) => fun v j =>
-      if h : j.val < k then (⟨y (v, Sum.inr (Sum.inl (b, ⟨j.val, h⟩, false))),
-        y (v, Sum.inr (Sum.inl (b, ⟨j.val, h⟩, true)))⟩ : ℂ)
-      else (⟨y (v, Sum.inl (Sum.inr (b, false))), y (v, Sum.inl (Sum.inr (b, true)))⟩ : ℂ)
+    if h : j.val < k then
+      (⟨
+         y (v, Sum.inr (Sum.inl (b, ⟨j.val, h⟩, false))),
+         y (v, Sum.inr (Sum.inl (b, ⟨j.val, h⟩, true)))
+       ⟩
+        : ℂ)
+    else
+      (⟨y (v, Sum.inl (Sum.inr (b, false))), y (v, Sum.inl (Sum.inr (b, true)))⟩ : ℂ)
   | Sum.inr (Sum.inl p) => fun v =>
-      (⟨y (v, Sum.inr (Sum.inr (Sum.inl (p, false)))), y (v, Sum.inr (Sum.inr (Sum.inl (p, true))))⟩ : ℂ)
+    (⟨y (v, Sum.inr (Sum.inr (Sum.inl (p, false)))), y (v, Sum.inr (Sum.inr (Sum.inl (p, true))))⟩
+      : ℂ)
   | Sum.inr (Sum.inr a) => fun v => y (v, Sum.inr (Sum.inr (Sum.inr a)))
 
 theorem Φc_Ψc (y : ι × LsNc5.CIdx r k → ℝ) : Φc (Ψc y) = y := by
@@ -84,8 +95,9 @@ theorem Ψc_Φc (x : ∀ p : CBlk r, CSpc ι k p) : Ψc (Φc x) = x := by
   · rfl
 
 theorem measurable_Ψc : Measurable (Ψc (ι := ι) (r := r) (k := k)) := by
-  have hC : ∀ f g : (ι × LsNc5.CIdx r k → ℝ) → ℝ, Measurable f → Measurable g →
-      Measurable fun y => (⟨f y, g y⟩ : ℂ) := fun f g hf hg =>
+  have hC
+      : ∀ f g : (ι × LsNc5.CIdx r k → ℝ) → ℝ,
+        Measurable f → Measurable g → Measurable fun y => (⟨f y, g y⟩ : ℂ) := fun f g hf hg =>
     Complex.measurableEquivRealProd.symm.measurable.comp (hf.prodMk hg)
   refine Measurable.of_eval fun p => ?_
   rcases p with ((p | b) | (p | a))
@@ -110,24 +122,32 @@ def cRow (b : Fin r) (j : Fin (k + 1)) (t : Bool) : LsNc5.CIdx r k :=
   if h : j.val < k then Sum.inr (Sum.inl (b, ⟨j.val, h⟩, t)) else Sum.inl (Sum.inr (b, t))
 
 def Sbox (s : ι × LsNc5.CIdx r k → Set ℝ) : ∀ p : CBlk r, Set (CSpc ι k p)
-  | Sum.inl (Sum.inl p) => Set.univ.pi fun v => {z : ℂ | LsNc5.reim z false ∈ s (v, Sum.inl (Sum.inl (p, false))) ∧
-      LsNc5.reim z true ∈ s (v, Sum.inl (Sum.inl (p, true)))}
-  | Sum.inl (Sum.inr b) => Set.univ.pi fun v => Set.univ.pi fun j : Fin (k + 1) =>
-      {z : ℂ | LsNc5.reim z false ∈ s (v, cRow b j false) ∧ LsNc5.reim z true ∈ s (v, cRow b j true)}
-  | Sum.inr (Sum.inl p) => Set.univ.pi fun v => {z : ℂ | LsNc5.reim z false ∈ s (v, Sum.inr (Sum.inr (Sum.inl (p, false)))) ∧
-      LsNc5.reim z true ∈ s (v, Sum.inr (Sum.inr (Sum.inl (p, true))))}
+  | Sum.inl (Sum.inl p) =>
+    Set.univ.pi fun v =>
+      {z : ℂ | LsNc5.reim z false ∈ s (v, Sum.inl (Sum.inl (p, false))) ∧
+        LsNc5.reim z true ∈ s (v, Sum.inl (Sum.inl (p, true)))}
+  | Sum.inl (Sum.inr b) =>
+    Set.univ.pi fun v =>
+      Set.univ.pi fun j : Fin (k + 1) =>
+        {z : ℂ | LsNc5.reim z false ∈ s (v, cRow b j false) ∧ LsNc5.reim z true ∈ s (v, cRow b j true)}
+  | Sum.inr (Sum.inl p) =>
+    Set.univ.pi fun v =>
+      {z : ℂ | LsNc5.reim z false ∈ s (v, Sum.inr (Sum.inr (Sum.inl (p, false)))) ∧
+        LsNc5.reim z true ∈ s (v, Sum.inr (Sum.inr (Sum.inl (p, true))))}
   | Sum.inr (Sum.inr a) => Set.univ.pi fun v => s (v, Sum.inr (Sum.inr (Sum.inr a)))
 
-theorem Φc_row (x : ∀ p : CBlk r, CSpc ι k p) (v : ι) (b : Fin r) (j : Fin (k + 1)) (t : Bool) :
-    Φc x (v, cRow b j t) = LsNc5.reim ((x (Sum.inl (Sum.inr b)) : ι → Fin (k + 1) → ℂ) v j) t := by
+theorem Φc_row (x : ∀ p : CBlk r, CSpc ι k p) (v : ι) (b : Fin r) (j : Fin (k + 1)) (t : Bool)
+    : Φc x (v, cRow b j t)
+      = LsNc5.reim ((x (Sum.inl (Sum.inr b)) : ι → Fin (k + 1) → ℂ) v j) t := by
   unfold cRow
   split_ifs with h
   · rfl
   · have hj : j = Fin.last k := Fin.ext (by have := j.isLt; simp only [Fin.val_last]; omega)
-    subst hj; rfl
+    subst hj
+    rfl
 
-theorem pre_box (s : ι × LsNc5.CIdx r k → Set ℝ) :
-    Φc ⁻¹' Set.univ.pi s = Set.univ.pi (Sbox (ι := ι) (k := k) s) := by
+theorem pre_box (s : ι × LsNc5.CIdx r k → Set ℝ)
+    : Φc ⁻¹' Set.univ.pi s = Set.univ.pi (Sbox (ι := ι) (k := k) s) := by
   ext x
   simp only [Set.mem_preimage, Set.mem_univ_pi]
   constructor
@@ -138,13 +158,18 @@ theorem pre_box (s : ι × LsNc5.CIdx r k → Set ℝ) :
       refine ⟨?_, ?_⟩
       · have := h (v, cRow b j false); rwa [Φc_row] at this
       · have := h (v, cRow b j true); rwa [Φc_row] at this
-    · intro v _; exact ⟨h (v, Sum.inr (Sum.inr (Sum.inl (p, false)))), h (v, Sum.inr (Sum.inr (Sum.inl (p, true))))⟩
+    · intro v _
+      exact ⟨
+        h (v, Sum.inr (Sum.inr (Sum.inl (p, false)))),
+        h (v, Sum.inr (Sum.inr (Sum.inl (p, true))))
+      ⟩
     · intro v _; exact h (v, Sum.inr (Sum.inr (Sum.inr a)))
   · intro h i
     rcases i with ⟨v, ((⟨p, t⟩ | ⟨b, t⟩) | (⟨b, j, t⟩ | (⟨p, t⟩ | a)))⟩
     · have := h (Sum.inl (Sum.inl p)) v (Set.mem_univ v); cases t; exacts [this.1, this.2]
     · have := h (Sum.inl (Sum.inr b)) v (Set.mem_univ v) (Fin.last k) (Set.mem_univ _)
-      have e : ∀ t, cRow (k := k) b (Fin.last k) t = Sum.inl (Sum.inr (b, t)) := fun t => by simp [cRow]
+      have e : ∀ t, cRow (k := k) b (Fin.last k) t = Sum.inl (Sum.inr (b, t)) := fun t => by
+        simp [cRow]
       have h2 := Φc_row x v b (Fin.last k) t
       rw [e] at h2
       rw [h2]
@@ -163,14 +188,17 @@ theorem pre_box (s : ι × LsNc5.CIdx r k → Set ℝ) :
     · have := h (Sum.inr (Sum.inl p)) v (Set.mem_univ v); cases t; exacts [this.1, this.2]
     · exact h (Sum.inr (Sum.inr a)) v (Set.mem_univ v)
 
-theorem cMeas_Sbox (s : ι × LsNc5.CIdx r k → Set ℝ) (hs : ∀ i, MeasurableSet (s i)) (p : CBlk r) :
-    cMeas ι k p (Sbox s p) =
-      match p with
-      | Sum.inl (Sum.inl p) => ∏ v, volume (s (v, Sum.inl (Sum.inl (p, false)))) * volume (s (v, Sum.inl (Sum.inl (p, true))))
-      | Sum.inl (Sum.inr b) => ∏ v, ∏ j : Fin (k + 1), volume (s (v, cRow b j false)) * volume (s (v, cRow b j true))
-      | Sum.inr (Sum.inl p) => ∏ v, volume (s (v, Sum.inr (Sum.inr (Sum.inl (p, false))))) *
-          volume (s (v, Sum.inr (Sum.inr (Sum.inl (p, true)))))
-      | Sum.inr (Sum.inr a) => ∏ v, volume (s (v, Sum.inr (Sum.inr (Sum.inr a)))) := by
+theorem cMeas_Sbox (s : ι × LsNc5.CIdx r k → Set ℝ) (hs : ∀ i, MeasurableSet (s i)) (p : CBlk r)
+    : cMeas ι k p (Sbox s p)
+      = match p with
+        | Sum.inl (Sum.inl p) =>
+          ∏ v, volume (s (v, Sum.inl (Sum.inl (p, false)))) * volume (s (v, Sum.inl (Sum.inl (p, true))))
+        | Sum.inl (Sum.inr b) =>
+          ∏ v, ∏ j : Fin (k + 1), volume (s (v, cRow b j false)) * volume (s (v, cRow b j true))
+        | Sum.inr (Sum.inl p) =>
+          ∏ v, volume (s (v, Sum.inr (Sum.inr (Sum.inl (p, false))))) *
+            volume (s (v, Sum.inr (Sum.inr (Sum.inl (p, true)))))
+        | Sum.inr (Sum.inr a) => ∏ v, volume (s (v, Sum.inr (Sum.inr (Sum.inr a)))) := by
   rcases p with ((p | b) | (p | a))
   · show (volume : Measure (ι → ℂ)) (Set.univ.pi _) = _
     rw [volume_pi_pi]
@@ -187,17 +215,23 @@ theorem cMeas_Sbox (s : ι × LsNc5.CIdx r k → Set ℝ) (hs : ∀ i, Measurabl
     rw [volume_pi_pi]
 
 theorem map_Φc : (Measure.pi (cMeas ι k (r := r))).map Φc = volume := by
-  refine (Measure.pi_eq (μ := fun _ : ι × LsNc5.CIdx r k => (volume : Measure ℝ))
-    (μ' := (Measure.pi (cMeas ι k (r := r))).map Φc) fun s hs => ?_).symm
+  refine (Measure.pi_eq
+    (μ := fun _ : ι × LsNc5.CIdx r k => (volume : Measure ℝ))
+    (μ' := (Measure.pi (cMeas ι k (r := r))).map Φc)
+    fun s hs => ?_).symm
   rw [Measure.map_apply measurable_Φc (MeasurableSet.univ_pi hs), pre_box, Measure.pi_pi]
   simp_rw [cMeas_Sbox s hs]
   rw [Fintype.prod_prod_type]
-  simp only [Fintype.prod_sum_type, Fintype.prod_prod_type, Fintype.prod_bool, Fin.prod_univ_castSucc,
-    Finset.prod_mul_distrib]
-  have e1 : ∀ (b : Fin r) (t : Bool), cRow (k := k) b (Fin.last k) t = Sum.inl (Sum.inr (b, t)) := fun b t => by
+  simp only [Fintype.prod_sum_type, Fintype.prod_prod_type, Fintype.prod_bool,
+    Fin.prod_univ_castSucc, Finset.prod_mul_distrib]
+  have e1
+      : ∀ (b : Fin r) (t : Bool),
+        cRow (k := k) b (Fin.last k) t = Sum.inl (Sum.inr (b, t)) := fun b t => by
     simp [cRow]
-  have e2 : ∀ (b : Fin r) (j : Fin k) (t : Bool), cRow (k := k) b (Fin.castSucc j) t = Sum.inr (Sum.inl (b, j, t)) :=
-    fun b j t => by simp [cRow]
+  have e2
+      : ∀ (b : Fin r) (j : Fin k) (t : Bool),
+        cRow (k := k) b (Fin.castSucc j) t = Sum.inr (Sum.inl (b, j, t)) := fun b j t => by
+    simp [cRow]
   simp only [e1, e2]
   have swap : ∀ {β : Type} [Fintype β] (f : ι → β → ℝ≥0∞), ∏ v, ∏ b, f v b = ∏ b, ∏ v, f v b :=
     fun f => Finset.prod_comm
@@ -206,8 +240,8 @@ theorem map_Φc : (Measure.pi (cMeas ι k (r := r))).map Φc = volume := by
 
 end Box
 
-theorem kap_eq_Φc {D : D7} (X : HidaSetting D) (u : D.what₂.Word) (s : X.B.I.Ginf) :
-    LsNc5.kap X u s = Φc (blk X u s) := by
+theorem kap_eq_Φc {D : D7} (X : HidaSetting D) (u : D.what₂.Word) (s : X.B.I.Ginf)
+    : LsNc5.kap X u s = Φc (blk X u s) := by
   funext i
   rcases i with ⟨v, ((⟨p, t⟩ | ⟨b, t⟩) | (⟨b, j, t⟩ | (⟨p, t⟩ | a)))⟩
   · rfl

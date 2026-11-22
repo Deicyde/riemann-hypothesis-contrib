@@ -12,8 +12,9 @@ noncomputable section
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem short_vector_bound_le_kappa [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) (hph : 0 < P.ph) :
-    PT.rd E ^ 2 * (dstar (E := E) P.m : ℝ) ^ 4 * P.ph / (2 * PT.f E) ≤ P.ka0 * P.ph := by
+theorem short_vector_bound_le_kappa
+    [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) (hph : 0 < P.ph)
+    : PT.rd E ^ 2 * (dstar (E := E) P.m : ℝ) ^ 4 * P.ph / (2 * PT.f E) ≤ P.ka0 * P.ph := by
   unfold Par.ka0 Par.ph RR
   have hph' : 0 < X.ph (th P.q P.R0) := hph
   have hf1 : 1 ≤ PT.f E := le_trans (Nat.one_le_pow 4 P.m P.hm1) P.hmf
@@ -36,11 +37,14 @@ theorem short_vector_bound_le_kappa [IsCMField E] {X : PT E} {DF : ℕ} (P : Par
   have hd2 := mul_nonneg (sq_nonneg (2 * (PT.f E : ℝ) * P.m)) hph'.le
   nlinarith [mul_le_mul_of_nonneg_right key2 hd2]
 
-theorem tof_inv_sqrt_le [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) (hph : 0 < P.ph) (n : ℕ)
-    (hn : n ≤ dstar (E := E) P.m) (c : ℝ) (hc : 0 < c)
-    (h1 : 1 ≤ c * Real.sqrt (PT.rd E ^ 2 * (dstar (E := E) P.m : ℝ) ^ 4 * P.ph / (2 * PT.f E)) ^ n) :
-    1 / Real.sqrt (c * (2 : ℝ) ^ (-(n : ℝ) / 2)) ≤
-      Real.exp (dstar (E := E) P.m) * (P.ka0 * P.ph) ^ ((dstar (E := E) P.m : ℝ) / 4) := by
+theorem tof_inv_sqrt_le
+    [IsCMField E]
+    {X : PT E} {DF : ℕ} (P : Par X DF) (hph : 0 < P.ph)
+    (n : ℕ) (hn : n ≤ dstar (E := E) P.m)
+    (c : ℝ) (hc : 0 < c)
+    (h1 : 1 ≤ c * Real.sqrt (PT.rd E ^ 2 * (dstar (E := E) P.m : ℝ) ^ 4 * P.ph / (2 * PT.f E)) ^ n)
+    : 1 / Real.sqrt (c * (2 : ℝ) ^ (-(n : ℝ) / 2))
+      ≤ Real.exp (dstar (E := E) P.m) * (P.ka0 * P.ph) ^ ((dstar (E := E) P.m : ℝ) / 4) := by
   have hU := short_vector_bound_le_kappa P hph
   have hf1 : 1 ≤ PT.f E := le_trans (Nat.one_le_pow 4 P.m P.hm1) P.hmf
   have hF : (1 : ℝ) ≤ PT.f E := by exact_mod_cast hf1
@@ -66,9 +70,9 @@ theorem tof_inv_sqrt_le [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) (hph 
   have hom : (1 : ℝ) ≤ omStar (E := E) := by
     unfold omStar
     first
-      | nlinarith [Real.one_le_rpow hF (by norm_num : (0 : ℝ) ≤ 3 / 2)]
-      | nlinarith [one_le_pow₀ (n := 3 / 2) hF]
-      | (norm_num; nlinarith)
+    | nlinarith [Real.one_le_rpow hF (by norm_num : (0 : ℝ) ≤ 3 / 2)]
+    | nlinarith [one_le_pow₀ (n := 3 / 2) hF]
+    | (norm_num; nlinarith)
   have hZ : (1 : ℝ) ≤ ((dstar (E := E) P.m : ℕ) : ℝ) ^ 2 * omStar (E := E) :=
     one_le_mul_of_one_le_of_one_le (one_le_pow₀ hd1) hom
   have h2 := mul_self_lt_mul_self hL0 hlt
@@ -93,12 +97,10 @@ theorem tof_inv_sqrt_le [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) (hph 
     exact Real.sqrt_le_sqrt hK1
   have e1 := by
     first
-      | exact pow_le_pow_left₀ (Real.sqrt_nonneg _) (Real.sqrt_le_sqrt hU) n
-      | exact pow_le_pow_left (Real.sqrt_nonneg _) (Real.sqrt_le_sqrt hU) n
+    | exact pow_le_pow_left₀ (Real.sqrt_nonneg _) (Real.sqrt_le_sqrt hU) n
+    | exact pow_le_pow_left (Real.sqrt_nonneg _) (Real.sqrt_le_sqrt hU) n
   have e2 : √K ^ n ≤ √K ^ (dstar (E := E) P.m) := by
-    first
-      | exact pow_le_pow_right₀ hsK hn
-      | exact pow_le_pow_right hsK hn
+    first | exact pow_le_pow_right₀ hsK hn | exact pow_le_pow_right hsK hn
   have hcK : 1 ≤ c * √K ^ (dstar (E := E) P.m) :=
     h1.trans (mul_le_mul_of_nonneg_left (e1.trans e2) hc.le)
   have hpow : (K ^ (((dstar (E := E) P.m : ℕ) : ℝ) / 4)) ^ 2 = √K ^ (dstar (E := E) P.m) := by
@@ -121,13 +123,17 @@ theorem tof_inv_sqrt_le [IsCMField E] {X : PT E} {DF : ℕ} (P : Par X DF) (hph 
   have hc2 : 0 < c * (2 : ℝ) ^ (-(n : ℝ) / 2) := mul_pos hc (Real.rpow_pos_of_pos (by norm_num) _)
   have hA : 0 < √(c * (2 : ℝ) ^ (-(n : ℝ) / 2)) := Real.sqrt_pos.mpr hc2
   rw [div_le_iff₀ hA]
-  have hx0 : 0 ≤ Real.exp ((dstar (E := E) P.m : ℕ) : ℝ) * K ^ (((dstar (E := E) P.m : ℕ) : ℝ) / 4) *
-      √(c * (2 : ℝ) ^ (-(n : ℝ) / 2)) :=
+  have hx0
+      : 0
+        ≤ Real.exp ((dstar (E := E) P.m : ℕ) : ℝ) * K ^ (((dstar (E := E) P.m : ℕ) : ℝ) / 4)
+          * √(c * (2 : ℝ) ^ (-(n : ℝ) / 2)) :=
     mul_nonneg (mul_nonneg (Real.exp_pos _).le (Real.rpow_nonneg hK0 _)) (Real.sqrt_nonneg _)
-  have hsq : (Real.exp ((dstar (E := E) P.m : ℕ) : ℝ) * K ^ (((dstar (E := E) P.m : ℕ) : ℝ) / 4) *
-      √(c * (2 : ℝ) ^ (-(n : ℝ) / 2))) ^ 2 =
-      (c * √K ^ (dstar (E := E) P.m)) *
-        (Real.exp ((dstar (E := E) P.m : ℕ) : ℝ) ^ 2 * (2 : ℝ) ^ (-(n : ℝ) / 2)) := by
+  have hsq
+      : (Real.exp ((dstar (E := E) P.m : ℕ) : ℝ) * K ^ (((dstar (E := E) P.m : ℕ) : ℝ) / 4)
+            * √(c * (2 : ℝ) ^ (-(n : ℝ) / 2)))
+          ^ 2
+        = (c * √K ^ (dstar (E := E) P.m))
+          * (Real.exp ((dstar (E := E) P.m : ℕ) : ℝ) ^ 2 * (2 : ℝ) ^ (-(n : ℝ) / 2)) := by
     rw [mul_pow, mul_pow, Real.sq_sqrt hc2.le, hpow]
     ring
   have hge := one_le_mul_of_one_le_of_one_le hcK hE

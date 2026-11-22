@@ -20,9 +20,13 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteMax
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.SiegJoin GlobalTheory.TChart
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.SiegJoin
+  GlobalTheory.TChart
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -30,7 +34,14 @@ open TensorProduct
 
 namespace GlobalTheory.HenselLift
 
-theorem exists_dvr_of_finite_etale : ∀ (A R V : Type) [CommRing A] [IsLocalRing A] [CommRing R] [IsLocalRing R] [CommRing V] [IsDomain V] [IsLocalRing V] (ρ : A →+* R) (ψ : A →+* V), IsLocalHom ρ → ρ.Finite → ρ.Etale → IsCN V → IsDiscreteValuationRing V → IsLocalHom ψ → ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsLocalRing V') (f : V →+* V') (κ : R →+* V'), IsCN V' ∧ IsDiscreteValuationRing V' ∧ Function.Injective f ∧ f.Finite ∧ IsLocalHom f ∧ IsLocalHom κ ∧ κ.comp ρ = f.comp ψ := by
+theorem exists_dvr_of_finite_etale
+    : ∀ (A R V : Type) [CommRing A] [IsLocalRing A] [CommRing R] [IsLocalRing R] [CommRing V]
+        [IsDomain V] [IsLocalRing V] (ρ : A →+* R) (ψ : A →+* V),
+      IsLocalHom ρ → ρ.Finite → ρ.Etale → IsCN V → IsDiscreteValuationRing V → IsLocalHom ψ
+        → ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsLocalRing V') (f : V →+* V')
+            (κ : R →+* V'),
+          IsCN V' ∧ IsDiscreteValuationRing V' ∧ Function.Injective f ∧ f.Finite ∧ IsLocalHom f
+            ∧ IsLocalHom κ ∧ κ.comp ρ = f.comp ψ := by
   intro A R V _ _ _ _ _ _ _ ρ ψ hρl hρf hρe hV hdvr hψ
   letI := ρ.toAlgebra
   letI := ψ.toAlgebra
@@ -56,8 +67,9 @@ theorem exists_dvr_of_finite_etale : ∀ (A R V : Type) [CommRing A] [IsLocalRin
     Module.Finite.trans (V ⊗[A] R) _
   have hfl : IsLocalHom (algebraMap V (V ⊗[A] R ⧸ Ideal.span {1 - e})) := by
     refine ((local_hom_tfae _).out 1 5).2 ?_
-    have := Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := V)
-      (maximalIdeal (V ⊗[A] R ⧸ Ideal.span {1 - e}))
+    have :=
+      Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := V)
+        (maximalIdeal (V ⊗[A] R ⧸ Ideal.span {1 - e}))
     exact IsLocalRing.eq_maximalIdeal this
   haveI := hfl
   obtain ⟨hdom, hdvr', -, hff, -⟩ :=
@@ -67,31 +79,54 @@ theorem exists_dvr_of_finite_etale : ∀ (A R V : Type) [CommRing A] [IsLocalRin
   haveI : IsNoetherianRing V := hnoeth
   haveI : IsAdicComplete (maximalIdeal V) V := hcpl
   haveI : CharZero V := hchar
-  obtain ⟨-, hcpl'⟩ := GlobalTheory.isLocalHom_and_isAdicComplete_of_finite_dvr V
-    (V ⊗[A] R ⧸ Ideal.span {1 - e}) inferInstance hinj
-  have hcomm : ((Ideal.Quotient.mk (Ideal.span {1 - e})).comp
-      (Algebra.TensorProduct.includeRight.toRingHom)).comp ρ =
-      (algebraMap V (V ⊗[A] R ⧸ Ideal.span {1 - e})).comp ψ := by
+  obtain ⟨-, hcpl'⟩ :=
+    GlobalTheory.isLocalHom_and_isAdicComplete_of_finite_dvr V (V ⊗[A] R ⧸ Ideal.span {1 - e})
+      inferInstance hinj
+  have hcomm
+      : ((Ideal.Quotient.mk (Ideal.span {1 - e})).comp
+          (Algebra.TensorProduct.includeRight.toRingHom)).comp ρ
+        = (algebraMap V (V ⊗[A] R ⧸ Ideal.span {1 - e})).comp ψ := by
     ext a
     show Ideal.Quotient.mk _ ((1 : V) ⊗ₜ[A] ρ a) = Ideal.Quotient.mk _ (ψ a ⊗ₜ[A] (1 : R))
     rw [show ρ a = a • (1 : R) from Algebra.algebraMap_eq_smul_one a,
       show ψ a = a • (1 : V) from Algebra.algebraMap_eq_smul_one a, TensorProduct.tmul_smul,
       TensorProduct.smul_tmul']
-  refine ⟨V ⊗[A] R ⧸ Ideal.span {1 - e}, inferInstance, hdom, inferInstance,
-    algebraMap V _, (Ideal.Quotient.mk _).comp (Algebra.TensorProduct.includeRight.toRingHom),
-    ⟨?_, inferInstance, hcpl', charZero_of_injective_algebraMap hinj⟩, hdvr', hinj,
-    RingHom.finite_algebraMap.2 inferInstance, inferInstance, ?_, ?_⟩
+  refine ⟨
+    V ⊗[A] R ⧸ Ideal.span {1 - e},
+    inferInstance,
+    hdom,
+    inferInstance,
+    algebraMap V _,
+    (Ideal.Quotient.mk _).comp (Algebra.TensorProduct.includeRight.toRingHom),
+    ⟨?_, inferInstance, hcpl', charZero_of_injective_algebraMap hinj⟩,
+    hdvr',
+    hinj,
+    RingHom.finite_algebraMap.2 inferInstance,
+    inferInstance,
+    ?_,
+    ?_
+  ⟩
   · exact isNoetherian_of_tower V inferInstance
   · refine ((local_hom_tfae _).out 1 5).2 ?_
-    have hA : Ideal.comap (algebraMap A R) (Ideal.comap ((Ideal.Quotient.mk (Ideal.span {1 - e})).comp
-        (Algebra.TensorProduct.includeRight.toRingHom)) (maximalIdeal _)) = maximalIdeal A := by
-      have h1 : Ideal.comap (algebraMap V (V ⊗[A] R ⧸ Ideal.span {1 - e})) (maximalIdeal _) =
-          maximalIdeal V := ((local_hom_tfae _).out 1 5).1 hfl
+    have hA
+        : Ideal.comap (algebraMap A R)
+            (Ideal.comap
+              ((Ideal.Quotient.mk (Ideal.span {1 - e})).comp
+                (Algebra.TensorProduct.includeRight.toRingHom))
+              (maximalIdeal _))
+          = maximalIdeal A := by
+      have h1
+          : Ideal.comap (algebraMap V (V ⊗[A] R ⧸ Ideal.span {1 - e})) (maximalIdeal _)
+            = maximalIdeal V :=
+        ((local_hom_tfae _).out 1 5).1 hfl
       have h2 : Ideal.comap ψ (maximalIdeal V) = maximalIdeal A := ((local_hom_tfae _).out 1 5).1 hψ
       change Ideal.comap ρ _ = _
       rw [Ideal.comap_comap, hcomm, ← Ideal.comap_comap, h1, h2]
-    have hA' : (Ideal.comap (algebraMap A R) (Ideal.comap ((Ideal.Quotient.mk (Ideal.span {1 - e})).comp
-        (Algebra.TensorProduct.includeRight.toRingHom)) (maximalIdeal _))).IsMaximal := by
+    have hA' : (Ideal.comap (algebraMap A R)
+        (Ideal.comap
+          ((Ideal.Quotient.mk (Ideal.span {1 - e})).comp
+            (Algebra.TensorProduct.includeRight.toRingHom))
+          (maximalIdeal _))).IsMaximal := by
       rw [hA]; exact maximalIdeal.isMaximal A
     have hm := Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := A) _ hA'
     exact IsLocalRing.eq_maximalIdeal hm

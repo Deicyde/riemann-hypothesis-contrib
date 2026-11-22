@@ -11,10 +11,14 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.BranchingSystems
 
-open Formalism.REAL Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr
+open Formalism.REAL Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Qr
 
-theorem between {n : ℕ} {L : Fin (n + 1) → ℤ} (hL : StrictAnti L) (i : Fin n) {x : ℤ}
-    (h1 : L i.succ < x) (h2 : x < L i.castSucc) (j : Fin (n + 1)) : x ≠ L j := by
+theorem between
+    {n : ℕ} {L : Fin (n + 1) → ℤ} (hL : StrictAnti L) (i : Fin n)
+    {x : ℤ} (h1 : L i.succ < x) (h2 : x < L i.castSucc)
+    (j : Fin (n + 1))
+    : x ≠ L j := by
   intro hx
   subst hx
   rcases le_or_gt j i.castSucc with hj | hj
@@ -28,9 +32,11 @@ section Comb
 
 variable {n : ℕ} {L : Fin (n + 1) → ℤ} {P : (Fin n → ℤ) → Prop}
 
-theorem runUp (hR : ∀ M, P M → ∀ i, (∀ j, M i ≠ L j) → P (Function.update M i (M i + 1)))
-    (M : Fin n → ℤ) (i : Fin n) (t0 : ℤ) (h0 : P (Function.update M i t0)) (t : ℤ) (ht : t0 ≤ t) :
-    (∀ t', t0 ≤ t' → t' < t → ∀ j, t' ≠ L j) → P (Function.update M i t) := by
+theorem runUp
+    (hR : ∀ M, P M → ∀ i, (∀ j, M i ≠ L j) → P (Function.update M i (M i + 1)))
+    (M : Fin n → ℤ) (i : Fin n) (t0 : ℤ) (h0 : P (Function.update M i t0))
+    (t : ℤ) (ht : t0 ≤ t)
+    : (∀ t', t0 ≤ t' → t' < t → ∀ j, t' ≠ L j) → P (Function.update M i t) := by
   induction t, ht using Int.leInduction with
   | base => intro _; exact h0
   | succ t ht ih =>
@@ -39,9 +45,11 @@ theorem runUp (hR : ∀ M, P M → ∀ i, (∀ j, M i ≠ L j) → P (Function.u
     have h2 := hR _ hP i (by simpa using hv t ht (by omega))
     simpa using h2
 
-theorem runDown (hD : ∀ M, P M → ∀ i, (∀ j, M i - 1 ≠ L j) → P (Function.update M i (M i - 1)))
-    (M : Fin n → ℤ) (i : Fin n) (t0 : ℤ) (h0 : P (Function.update M i t0)) (t : ℤ) (ht : t ≤ t0) :
-    (∀ t', t ≤ t' → t' < t0 → ∀ j, t' ≠ L j) → P (Function.update M i t) := by
+theorem runDown
+    (hD : ∀ M, P M → ∀ i, (∀ j, M i - 1 ≠ L j) → P (Function.update M i (M i - 1)))
+    (M : Fin n → ℤ) (i : Fin n) (t0 : ℤ) (h0 : P (Function.update M i t0))
+    (t : ℤ) (ht : t ≤ t0)
+    : (∀ t', t ≤ t' → t' < t0 → ∀ j, t' ≠ L j) → P (Function.update M i t) := by
   induction t, ht using Int.leInductionDown with
   | base => intro _; exact h0
   | pred t ht ih =>
@@ -63,17 +71,20 @@ theorem Sys.box (h : Sys L P) (M : Fin n → ℤ) (hM : Box L M) : P M := by
     intro s
     refine Finset.induction_on s (by simpa using h.top) ?_
     intro a s ha ih
-    have e : (fun j => if j ∈ insert a s then M j else L j.castSucc) =
-        Function.update (fun j => if j ∈ s then M j else L j.castSucc) a (M a) := by
+    have e
+        : (fun j => if j ∈ insert a s then M j else L j.castSucc)
+          = Function.update (fun j => if j ∈ s then M j else L j.castSucc) a (M a) := by
       funext j
       by_cases hj : j = a
       · subst hj
         simp
       · simp [hj, Function.update_of_ne hj]
     rw [e]
-    have h0 : P (Function.update (fun j => if j ∈ s then M j else L j.castSucc) a (L a.castSucc)) := by
-      have e2 : Function.update (fun j => if j ∈ s then M j else L j.castSucc) a (L a.castSucc) =
-          (fun j => if j ∈ s then M j else L j.castSucc) := by
+    have h0
+        : P (Function.update (fun j => if j ∈ s then M j else L j.castSucc) a (L a.castSucc)) := by
+      have e2
+          : Function.update (fun j => if j ∈ s then M j else L j.castSucc) a (L a.castSucc)
+            = (fun j => if j ∈ s then M j else L j.castSucc) := by
         rw [Function.update_eq_self_iff]
         simp [ha]
       rw [e2]
@@ -83,16 +94,19 @@ theorem Sys.box (h : Sys L P) (M : Fin n → ℤ) (hM : Box L M) : P M := by
       (fun t' h1 h2 j => between h.anti a (by omega) h2 j)
   simpa using key Finset.univ
 
-theorem Sys.noUp (h : Sys L P) (M : Fin n → ℤ) (hM : Box L M) (i : Fin n) (hi : M i = L i.castSucc) :
-    ¬ P (Function.update M i (M i + 1)) := by
+theorem Sys.noUp (h : Sys L P) (M : Fin n → ℤ) (hM : Box L M) (i : Fin n) (hi : M i = L i.castSucc)
+    : ¬ P (Function.update M i (M i + 1)) := by
   intro h0
   by_cases hz : (i : ℕ) = 0
   · have hall : ∀ t, M i + 1 ≤ t → P (Function.update M i t) := fun t ht =>
       runUp h.up M i _ h0 t ht (fun t' a _ j e => by
         have : L j ≤ L i.castSucc := h.anti.antitone (by rw [Fin.le_def]; simp [hz])
         omega)
-    exact (Set.infinite_of_injective_forall_mem (f := fun s : ℕ => M i + 1 + (s : ℤ))
-      (fun a b e => by simpa using e) (fun s => hall _ (by omega))) (h.fin M i)
+    exact (Set.infinite_of_injective_forall_mem
+        (f := fun s : ℕ => M i + 1 + (s : ℤ))
+        (fun a b e => by simpa using e)
+        (fun s => hall _ (by omega)))
+      (h.fin M i)
   · let i' : Fin n := ⟨i - 1, by omega⟩
     have e1 : i'.succ = i.castSucc := by
       ext
@@ -100,8 +114,9 @@ theorem Sys.noUp (h : Sys L P) (M : Fin n → ℤ) (hM : Box L M) (i : Fin n) (h
       omega
     have b1 := (hM i').1
     rw [e1, ← hi] at b1
-    have h1 := runUp h.up M i _ h0 (M i') (by omega)
-      (fun t' a b => between h.anti i' (by rw [e1]; omega) (by have := (hM i').2; omega))
+    have h1 :=
+      runUp h.up M i _ h0 (M i') (by omega)
+        (fun t' a b => between h.anti i' (by rw [e1]; omega) (by have := (hM i').2; omega))
     have hne : i' ≠ i := by
       intro e
       have := congrArg Fin.val e
@@ -109,28 +124,34 @@ theorem Sys.noUp (h : Sys L P) (M : Fin n → ℤ) (hM : Box L M) (i : Fin n) (h
       omega
     exact hne (h.inj _ h1 (by simp [Function.update_of_ne hne]))
 
-theorem Sys.noDown (h : Sys L P) (M : Fin n → ℤ) (hM : Box L M) (i : Fin n) (hi : M i = L i.succ + 1) :
-    ¬ P (Function.update M i (M i - 1)) := by
+theorem Sys.noDown
+    (h : Sys L P) (M : Fin n → ℤ) (hM : Box L M) (i : Fin n) (hi : M i = L i.succ + 1)
+    : ¬ P (Function.update M i (M i - 1)) := by
   intro h0
   by_cases hz : (i : ℕ) + 1 = n
   · have hall : ∀ t, t ≤ M i - 1 → P (Function.update M i t) := fun t ht =>
       runDown h.down M i _ h0 t ht (fun t' _ b j e => by
-        have : L i.succ ≤ L j := h.anti.antitone (by
-          rw [Fin.le_def]
-          have := j.2
-          simp
-          omega)
+        have : L i.succ ≤ L j :=
+          h.anti.antitone (by
+            rw [Fin.le_def]
+            have := j.2
+            simp
+            omega)
         omega)
-    exact (Set.infinite_of_injective_forall_mem (f := fun s : ℕ => M i - 1 - (s : ℤ))
-      (fun a b e => by simpa using e) (fun s => hall _ (by omega))) (h.fin M i)
+    exact (Set.infinite_of_injective_forall_mem
+        (f := fun s : ℕ => M i - 1 - (s : ℤ))
+        (fun a b e => by simpa using e)
+        (fun s => hall _ (by omega)))
+      (h.fin M i)
   · let i' : Fin n := ⟨i + 1, by have := i.2; omega⟩
     have e1 : i'.castSucc = i.succ := by
       ext
       simp [i']
     have b1 := (hM i').2
     rw [e1] at b1
-    have h1 := runDown h.down M i _ h0 (M i') (by omega)
-      (fun t' a b => between h.anti i' (by have := (hM i').1; omega) (by rw [e1]; omega))
+    have h1 :=
+      runDown h.down M i _ h0 (M i') (by omega)
+        (fun t' a b => between h.anti i' (by have := (hM i').1; omega) (by rw [e1]; omega))
     have hne : i' ≠ i := by
       intro e
       have := congrArg Fin.val e
@@ -139,22 +160,22 @@ theorem Sys.noDown (h : Sys L P) (M : Fin n → ℤ) (hM : Box L M) (i : Fin n) 
 
 end Comb
 
-theorem shf_update {n : ℕ} (β : ℂ) (M : Fin n → ℤ) (i : Fin n) (t : ℤ) :
-    Function.update (shf β M) i (β + (t : ℂ)) = shf β (Function.update M i t) := by
+theorem shf_update {n : ℕ} (β : ℂ) (M : Fin n → ℤ) (i : Fin n) (t : ℤ)
+    : Function.update (shf β M) i (β + (t : ℂ)) = shf β (Function.update M i t) := by
   funext j
   by_cases h : j = i
   · subst h
     simp [shf]
   · simp [shf, Function.update_of_ne h]
 
-theorem shf_up {n : ℕ} (β : ℂ) (M : Fin n → ℤ) (i : Fin n) :
-    Function.update (shf β M) i (shf β M i + 1) = shf β (Function.update M i (M i + 1)) := by
+theorem shf_up {n : ℕ} (β : ℂ) (M : Fin n → ℤ) (i : Fin n)
+    : Function.update (shf β M) i (shf β M i + 1) = shf β (Function.update M i (M i + 1)) := by
   rw [← shf_update]
   simp [shf]
   ring
 
-theorem shf_down {n : ℕ} (β : ℂ) (M : Fin n → ℤ) (i : Fin n) :
-    Function.update (shf β M) i (shf β M i - 1) = shf β (Function.update M i (M i - 1)) := by
+theorem shf_down {n : ℕ} (β : ℂ) (M : Fin n → ℤ) (i : Fin n)
+    : Function.update (shf β M) i (shf β M i - 1) = shf β (Function.update M i (M i - 1)) := by
   rw [← shf_update]
   simp [shf]
   ring
@@ -174,8 +195,8 @@ section Cap
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
 
-theorem fin_cap {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (β : ℂ) (M : Fin n → ℤ) (i : Fin n) :
-    {t : ℤ | CapSp E (shf β (Function.update M i t)) ≠ ⊥}.Finite := by
+theorem fin_cap {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (β : ℂ) (M : Fin n → ℤ) (i : Fin n)
+    : {t : ℤ | CapSp E (shf β (Function.update M i t)) ≠ ⊥}.Finite := by
   obtain ⟨w, hw⟩ := Infinite.exists_notMem_finset (Finset.univ.image fun j : Fin n => -(shf β M j))
   have hc : (∏ j ∈ Finset.univ.erase i, (w + shf β M j)) ≠ 0 := by
     rw [Finset.prod_ne_zero_iff]
@@ -183,8 +204,10 @@ theorem fin_cap {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (β : ℂ) 
     apply hw
     rw [Finset.mem_image]
     exact ⟨j, Finset.mem_univ _, by linear_combination -h0⟩
-  have hf : ∀ t : ℤ, cpol (shf β (Function.update M i t)) w =
-      (w + β + (t : ℂ)) * ∏ j ∈ Finset.univ.erase i, (w + shf β M j) := by
+  have hf
+      : ∀ t : ℤ,
+        cpol (shf β (Function.update M i t)) w
+          = (w + β + (t : ℂ)) * ∏ j ∈ Finset.univ.erase i, (w + shf β M j) := by
     intro t
     unfold cpol
     rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ i)]
@@ -194,9 +217,11 @@ theorem fin_cap {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (β : ℂ) 
       intro j hj
       have hne : j ≠ i := Finset.ne_of_mem_erase hj
       simp [shf, Function.update_of_ne hne]
-  refine Set.Finite.subset (Set.Finite.preimage
-    (f := fun t : ℤ => cpol (shf β (Function.update M i t)) w) ?_
-    (Module.End.finite_hasEigenvalue (qdet E w))) ?_
+  refine Set.Finite.subset
+    (Set.Finite.preimage
+      (f := fun t : ℤ => cpol (shf β (Function.update M i t)) w)
+      ?_ (Module.End.finite_hasEigenvalue (qdet E w)))
+    ?_
   · intro a _ b _ e
     simp only [hf] at e
     have e1 := mul_right_cancel₀ hc e
@@ -207,9 +232,11 @@ theorem fin_cap {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (β : ℂ) 
     exact Module.End.hasEigenvalue_of_hasEigenvector
       ⟨Module.End.mem_eigenspace_iff.mpr (mem_CapSp.mp hv w), hv0⟩
 
-theorem sys_of (hSM : ExistsSingMax) (hCS : CapSing) (hSR : SubRel) (hR : RaiseNZ) (hLo : LowerNZ)
+theorem sys_of
+    (hSM : ExistsSingMax) (hCS : CapSing) (hSR : SubRel) (hR : RaiseNZ) (hLo : LowerNZ)
     {n : ℕ} {E : Fin (n + 1) → Fin (n + 1) → Module.End ℂ V} {β : ℂ} {L : Fin (n + 1) → ℤ}
-    (H : Hyp E β L) : Sys L (fun M => CapSp (subA E) (shf β M) ≠ ⊥) := by
+    (H : Hyp E β L)
+    : Sys L (fun M => CapSp (subA E) (shf β M) ≠ ⊥) := by
   have gl' : GlRel (subA E) := (hSR (Module.End ℂ V) n E H.gl).1
   have hinj : ∀ M : Fin n → ℤ, CapSp (subA E) (shf β M) ≠ ⊥ → Function.Injective (shf β M) :=
     fun M hM => (hCS V n (subA E) _ gl' hM).1
@@ -217,7 +244,8 @@ theorem sys_of (hSM : ExistsSingMax) (hCS : CapSing) (hSR : SubRel) (hR : RaiseN
   · intro M hM a b hab
     exact hinj M hM (by simp [shf, hab])
   · have := H.irr.1
-    obtain ⟨ν, v, -, hv0, hHW, -⟩ := hSM V (n + 1) E H.gl ⊤ (fun _ _ _ _ => Submodule.mem_top) top_ne_bot
+    obtain ⟨ν, v, -, hv0, hHW, -⟩ :=
+      hSM V (n + 1) E H.gl ⊤ (fun _ _ _ _ => Submodule.mem_top) top_ne_bot
     have hvL : v ∈ CapSp E (shf β L) := mem_CapSp.mpr fun w => H.cap w v
     have hne : CapSp E (shf β L) ≠ ⊥ := fun e => hv0 (by rw [e] at hvL; simpa using hvL)
     have hν := (hCS V (n + 1) E _ H.gl hne).2 (sdec_shf β H.anti) ν v hvL hv0 hHW
@@ -237,16 +265,19 @@ theorem sys_of (hSM : ExistsSingMax) (hCS : CapSing) (hSR : SubRel) (hR : RaiseN
     rw [e] at hmem
     exact hv0 (by simpa using hmem)
   · intro M hM i hj
-    have := hR V n E (shf β L) H.gl H.cap (shf β M) (hinj M hM) hM i
-      (fun j e => hj j (by simpa [shf] using e))
+    have :=
+      hR V n E (shf β L) H.gl H.cap (shf β M) (hinj M hM) hM i
+        (fun j e => hj j (by simpa [shf] using e))
     rwa [shf_up] at this
   · intro M hM i hj
-    have := hLo V n E (shf β L) H.gl H.cap (shf β M) (hinj M hM) hM i (fun j e => hj j (by
-      simp only [shf] at e
-      have e2 : ((M i - 1 : ℤ) : ℂ) = (L j : ℂ) := by
-        push_cast
-        linear_combination e
-      exact_mod_cast e2))
+    have :=
+      hLo V n E (shf β L) H.gl H.cap (shf β M) (hinj M hM) hM i (fun j e =>
+        hj j (by
+          simp only [shf] at e
+          have e2 : ((M i - 1 : ℤ) : ℂ) = (L j : ℂ) := by
+            push_cast
+            linear_combination e
+          exact_mod_cast e2))
     rwa [shf_down] at this
 
 end Cap
@@ -255,10 +286,13 @@ end Formalism.FourierDecayAlt.P.BranchingSystems
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Qr BranchingSystems
+open Formalism.REAL Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Qr BranchingSystems
 
-theorem qr_decomp_of : Qr.ExistsSingMax → Qr.CapSing → Qr.CapStab → Qr.SubRel → Qr.CovUp → Qr.VecDown →
-    Qr.RaiseNZ → Qr.LowerNZ → Qr.Decomp := by
+theorem qr_decomp_of
+    : Qr.ExistsSingMax → Qr.CapSing → Qr.CapStab → Qr.SubRel → Qr.CovUp → Qr.VecDown → Qr.RaiseNZ
+      → Qr.LowerNZ
+      → Qr.Decomp := by
   intro hSM hCS hSt hSR hCU hVD hR hLo V _ _ _ n E β L H
   have S := sys_of hSM hCS hSR hR hLo H
   obtain ⟨gl', hcov, hvec, -, hyy, hnn⟩ := hSR (Module.End ℂ V) n E H.gl

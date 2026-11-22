@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Exi
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon GlobalTheory.DualOpen
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon GlobalTheory.DualOpen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -19,10 +22,11 @@ namespace GlobalTheory.MilFlat
 
 open TensorProduct
 
-theorem isPullback_iff_elem {A B C D : CommRingCat.{0}} (f : A ⟶ B) (g : A ⟶ C) (h : B ⟶ D) (i : C ⟶ D)
-    (w : f ≫ h = g ≫ i) :
-    IsPullback f g h i ↔ (∀ x y, f.hom x = f.hom y → g.hom x = g.hom y → x = y) ∧
-      ∀ b c, h.hom b = i.hom c → ∃ a, f.hom a = b ∧ g.hom a = c := by
+theorem isPullback_iff_elem
+    {A B C D : CommRingCat.{0}} (f : A ⟶ B) (g : A ⟶ C) (h : B ⟶ D) (i : C ⟶ D) (w : f ≫ h = g ≫ i)
+    : IsPullback f g h i
+      ↔ (∀ x y, f.hom x = f.hom y → g.hom x = g.hom y → x = y)
+        ∧ ∀ b c, h.hom b = i.hom c → ∃ a, f.hom a = b ∧ g.hom a = c := by
   constructor
   · intro H
     have H' := (Types.isPullback_iff _ _ _ _).1 (H.map (forget CommRingCat))
@@ -34,26 +38,36 @@ theorem isPullback_iff_elem {A B C D : CommRingCat.{0}} (f : A ⟶ B) (g : A ⟶
     · exact fun x y hxy ↦ h₁ x y hxy.1 hxy.2
     · exact fun b c hbc ↦ h₂ b c hbc
 
-theorem isoIsPushout_tmul {R A B : Type} [CommRing R] [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
+theorem isoIsPushout_tmul
+    {R A B : Type} [CommRing R] [CommRing A] [CommRing B] [Algebra R A] [Algebra R B]
     {X : CommRingCat.{0}} {f : CommRingCat.of A ⟶ X} {f' : CommRingCat.of B ⟶ X}
-    (h : IsPushout (CommRingCat.ofHom (algebraMap R A)) (CommRingCat.ofHom (algebraMap R B)) f f') (a : A) (b : B) :
-    ((CommRingCat.isPushout_tensorProduct R A B).isoIsPushout _ _ h).hom.hom (a ⊗ₜ b) = f.hom a * f'.hom b := by
-  have e₁ := congrArg (fun φ ↦ φ.hom a)
-    (IsPushout.inl_isoIsPushout_hom _ _ (CommRingCat.isPushout_tensorProduct R A B) h)
-  have e₂ := congrArg (fun φ ↦ φ.hom b)
-    (IsPushout.inr_isoIsPushout_hom _ _ (CommRingCat.isPushout_tensorProduct R A B) h)
+    (h : IsPushout (CommRingCat.ofHom (algebraMap R A)) (CommRingCat.ofHom (algebraMap R B)) f f')
+    (a : A) (b : B)
+    : ((CommRingCat.isPushout_tensorProduct R A B).isoIsPushout _ _ h).hom.hom (a ⊗ₜ b)
+      = f.hom a * f'.hom b := by
+  have e₁ :=
+    congrArg
+      (fun φ ↦ φ.hom a)
+      (IsPushout.inl_isoIsPushout_hom _ _ (CommRingCat.isPushout_tensorProduct R A B) h)
+  have e₂ :=
+    congrArg
+      (fun φ ↦ φ.hom b)
+      (IsPushout.inr_isoIsPushout_hom _ _ (CommRingCat.isPushout_tensorProduct R A B) h)
   simp only [CommRingCat.hom_comp, RingHom.comp_apply, CommRingCat.hom_ofHom] at e₁ e₂
   have : a ⊗ₜ[R] b = (a ⊗ₜ[R] (1 : B)) * ((1 : A) ⊗ₜ[R] b) := by simp
   rw [this, map_mul]
-  simp only [Algebra.TensorProduct.includeLeftRingHom_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
-    Algebra.TensorProduct.includeRight_apply] at e₁ e₂
+  simp only [Algebra.TensorProduct.includeLeftRingHom_apply, AlgHom.toRingHom_eq_coe,
+      RingHom.coe_coe, Algebra.TensorProduct.includeRight_apply]
+    at e₁ e₂
   exact congrArg₂ (· * ·) e₁ e₂
 
-theorem isPullback_of_flat (P C₁ C₂ C₀ E E₁ E₂ E₀ : CommRingCat.{0}) (p₁ : P ⟶ C₁) (p₂ : P ⟶ C₂) (q₁ : C₁ ⟶ C₀)
-    (q₂ : C₂ ⟶ C₀) (hP : IsPullback p₁ p₂ q₁ q₂) (hq : Function.Surjective q₂.hom) (g : P ⟶ E) (g₁ : C₁ ⟶ E₁)
-    (g₂ : C₂ ⟶ E₂) (g₀ : C₀ ⟶ E₀) (i₁ : E ⟶ E₁) (i₂ : E ⟶ E₂) (r₁ : E₁ ⟶ E₀) (r₂ : E₂ ⟶ E₀) (hg : g.hom.Flat)
-    (h₁ : IsPushout g p₁ i₁ g₁) (h₂ : IsPushout g p₂ i₂ g₂) (h₀ : IsPushout g₂ q₂ r₂ g₀)
-    (w₁ : i₁ ≫ r₁ = i₂ ≫ r₂) (w₂ : g₁ ≫ r₁ = q₁ ≫ g₀) : IsPullback i₁ i₂ r₁ r₂ := by
+theorem isPullback_of_flat
+    (P C₁ C₂ C₀ E E₁ E₂ E₀ : CommRingCat.{0}) (p₁ : P ⟶ C₁) (p₂ : P ⟶ C₂) (q₁ : C₁ ⟶ C₀)
+    (q₂ : C₂ ⟶ C₀) (hP : IsPullback p₁ p₂ q₁ q₂) (hq : Function.Surjective q₂.hom) (g : P ⟶ E)
+    (g₁ : C₁ ⟶ E₁) (g₂ : C₂ ⟶ E₂) (g₀ : C₀ ⟶ E₀) (i₁ : E ⟶ E₁) (i₂ : E ⟶ E₂) (r₁ : E₁ ⟶ E₀)
+    (r₂ : E₂ ⟶ E₀) (hg : g.hom.Flat) (h₁ : IsPushout g p₁ i₁ g₁) (h₂ : IsPushout g p₂ i₂ g₂)
+    (h₀ : IsPushout g₂ q₂ r₂ g₀) (w₁ : i₁ ≫ r₁ = i₂ ≫ r₂) (w₂ : g₁ ≫ r₁ = q₁ ≫ g₀)
+    : IsPullback i₁ i₂ r₁ r₂ := by
   letI : Algebra P E := g.hom.toAlgebra
   letI : Algebra P C₁ := p₁.hom.toAlgebra
   letI : Algebra P C₂ := p₂.hom.toAlgebra
@@ -70,14 +84,16 @@ theorem isPullback_of_flat (P C₁ C₂ C₀ E E₁ E₂ E₀ : CommRingCat.{0})
   obtain ⟨hinj, hex⟩ := (isPullback_iff_elem p₁ p₂ q₁ q₂ hP.w).1 hP
 
   let f : P →ₗ[P] C₁ × C₂ := (Algebra.linearMap P C₁).prod (Algebra.linearMap P C₂)
-  let Q₁ : C₁ →ₗ[P] C₀ :=
-    { toFun := q₁.hom, map_add' := map_add _
-      map_smul' := fun a c ↦ by
-        simp [Algebra.smul_def, RingHom.algebraMap_toAlgebra, hw] }
-  let Q₂ : C₂ →ₗ[P] C₀ :=
-    { toFun := q₂.hom, map_add' := map_add _
-      map_smul' := fun a c ↦ by
-        simp [Algebra.smul_def, RingHom.algebraMap_toAlgebra] }
+  let Q₁ : C₁ →ₗ[P] C₀ := {
+    toFun := q₁.hom
+    map_add' := map_add _
+    map_smul' := fun a c ↦ by simp [Algebra.smul_def, RingHom.algebraMap_toAlgebra, hw]
+  }
+  let Q₂ : C₂ →ₗ[P] C₀ := {
+    toFun := q₂.hom
+    map_add' := map_add _
+    map_smul' := fun a c ↦ by simp [Algebra.smul_def, RingHom.algebraMap_toAlgebra]
+  }
   let h : C₁ × C₂ →ₗ[P] C₀ := Q₁ ∘ₗ LinearMap.fst P C₁ C₂ - Q₂ ∘ₗ LinearMap.snd P C₁ C₂
   have hh : ∀ x y, h (x, y) = q₁.hom x - q₂.hom y := fun _ _ ↦ rfl
   have hf : ∀ a, f a = (p₁.hom a, p₂.hom a) := fun _ ↦ rfl
@@ -107,20 +123,26 @@ theorem isPullback_of_flat (P C₁ C₂ C₀ E E₁ E₂ E₀ : CommRingCat.{0})
   let k₀ := (CommRingCat.isPushout_tensorProduct P E C₀).isoIsPushout _ _ h₀'
   have k₁t : ∀ (e : E) (c : C₁), k₁.hom.hom (e ⊗ₜ c) = i₁.hom e * g₁.hom c := isoIsPushout_tmul h₁
   have k₂t : ∀ (e : E) (c : C₂), k₂.hom.hom (e ⊗ₜ c) = i₂.hom e * g₂.hom c := isoIsPushout_tmul h₂
-  have k₀t : ∀ (e : E) (c : C₀), k₀.hom.hom (e ⊗ₜ c) = r₂.hom (i₂.hom e) * g₀.hom c := isoIsPushout_tmul h₀'
-  have kinv : ∀ {X Y : CommRingCat.{0}} (k : X ≅ Y) (y : Y), k.hom.hom (k.inv.hom y) = y := fun k y ↦ by simp
-  have kinj : ∀ {X Y : CommRingCat.{0}} (k : X ≅ Y), Function.Injective k.hom.hom := fun k x y hxy ↦ by
+  have k₀t : ∀ (e : E) (c : C₀), k₀.hom.hom (e ⊗ₜ c) = r₂.hom (i₂.hom e) * g₀.hom c :=
+    isoIsPushout_tmul h₀'
+  have kinv
+      : ∀ {X Y : CommRingCat.{0}} (k : X ≅ Y) (y : Y), k.hom.hom (k.inv.hom y) = y := fun k y ↦ by
+    simp
+  have kinj
+      : ∀ {X Y : CommRingCat.{0}} (k : X ≅ Y), Function.Injective k.hom.hom := fun k x y hxy ↦ by
     simpa using congrArg k.inv.hom hxy
   let pr := TensorProduct.prodRight P P E C₁ C₂
-  have key : ∀ x, k₀.hom.hom (h.lTensor E x) =
-      r₁.hom (k₁.hom.hom (pr x).1) - r₂.hom (k₂.hom.hom (pr x).2) := by
+  have key
+      : ∀ x,
+        k₀.hom.hom (h.lTensor E x)
+          = r₁.hom (k₁.hom.hom (pr x).1) - r₂.hom (k₂.hom.hom (pr x).2) := by
     intro x
     induction x using TensorProduct.induction_on with
     | zero => simp
     | tmul e c =>
       obtain ⟨c₁, c₂⟩ := c
-      rw [LinearMap.lTensor_tmul, hh, TensorProduct.prodRight_tmul, k₀t, k₁t, k₂t, map_mul, map_mul, hw₁, hw₂,
-        hw₀, map_sub]
+      rw [LinearMap.lTensor_tmul, hh, TensorProduct.prodRight_tmul, k₀t, k₁t, k₂t, map_mul, map_mul,
+        hw₁, hw₂, hw₀, map_sub]
       ring
     | add x y hx hy =>
       simp only [map_add (f := _), Prod.fst_add, Prod.snd_add, hx, hy]

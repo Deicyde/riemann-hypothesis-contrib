@@ -6,17 +6,16 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.
 
 namespace ReciprocityTheory.ChartRestriction.G.T0
 
-
 open Polynomial in
-noncomputable def hupsTw {σ R : Type*} [CommRing R] (w : σ → ℕ) :
-    MvPolynomial σ R →ₐ[R] Polynomial (MvPolynomial σ R) :=
+noncomputable def hupsTw {σ R : Type*} [CommRing R] (w : σ → ℕ)
+    : MvPolynomial σ R →ₐ[R] Polynomial (MvPolynomial σ R) :=
   MvPolynomial.aeval fun v => Polynomial.C (MvPolynomial.X v) * Polynomial.X ^ (w v)
 
 def hupsWt {σ : Type*} (w : σ → ℕ) (s : σ →₀ ℕ) : ℕ := s.sum fun v k => k * w v
 
-theorem hupsTw_monomial {σ R : Type*} [CommRing R] (w : σ → ℕ) (s : σ →₀ ℕ) (a : R) :
-    hupsTw w (MvPolynomial.monomial s a) =
-      Polynomial.C (MvPolynomial.monomial s a) * Polynomial.X ^ hupsWt w s := by
+theorem hupsTw_monomial {σ R : Type*} [CommRing R] (w : σ → ℕ) (s : σ →₀ ℕ) (a : R)
+    : hupsTw w (MvPolynomial.monomial s a)
+      = Polynomial.C (MvPolynomial.monomial s a) * Polynomial.X ^ hupsWt w s := by
   rw [hupsTw, MvPolynomial.aeval_monomial, MvPolynomial.monomial_eq]
   simp only [mul_pow, Finsupp.prod_mul, hupsWt, Finsupp.prod, Finsupp.sum, ← pow_mul,
     Finset.prod_pow_eq_pow_sum, map_mul, map_prod, map_pow, Polynomial.algebraMap_apply,
@@ -25,22 +24,24 @@ theorem hupsTw_monomial {σ R : Type*} [CommRing R] (w : σ → ℕ) (s : σ →
   rw [Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum]
   ring
 
-theorem hupsTw_eq {σ R : Type*} [CommRing R] (w : σ → ℕ) (p : MvPolynomial σ R) :
-    hupsTw w p = ∑ s ∈ p.support,
-      Polynomial.C (MvPolynomial.monomial s (p.coeff s)) * Polynomial.X ^ hupsWt w s := by
+theorem hupsTw_eq {σ R : Type*} [CommRing R] (w : σ → ℕ) (p : MvPolynomial σ R)
+    : hupsTw w p
+      = ∑ s ∈ p.support,
+        Polynomial.C (MvPolynomial.monomial s (p.coeff s)) * Polynomial.X ^ hupsWt w s := by
   conv_lhs => rw [p.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   simp only [hupsTw_monomial]
 
-theorem hupsTw_coeff_coeff {σ R : Type*} [CommRing R] (w : σ → ℕ) (p : MvPolynomial σ R)
-    (j : ℕ) (s : σ →₀ ℕ) :
-    ((hupsTw w p).coeff j).coeff s = if hupsWt w s = j then p.coeff s else 0 := by
+theorem hupsTw_coeff_coeff
+    {σ R : Type*} [CommRing R] (w : σ → ℕ) (p : MvPolynomial σ R) (j : ℕ) (s : σ →₀ ℕ)
+    : ((hupsTw w p).coeff j).coeff s = if hupsWt w s = j then p.coeff s else 0 := by
   classical
   rw [hupsTw_eq, Polynomial.finsetSum_coeff]
   simp only [Polynomial.coeff_C_mul_X_pow]
   rw [MvPolynomial.coeff_sum]
-  simp only [apply_ite (AddMonoidAlgebra.coeff · s), MvPolynomial.coeff_monomial, MvPolynomial.coeff_zero]
+  simp only [apply_ite (AddMonoidAlgebra.coeff · s), MvPolynomial.coeff_monomial,
+    MvPolynomial.coeff_zero]
   rw [Finset.sum_eq_single s]
   · by_cases h : hupsWt w s = j
     · rw [if_pos h.symm, if_pos h, if_pos rfl]
@@ -51,16 +52,19 @@ theorem hupsTw_coeff_coeff {σ R : Type*} [CommRing R] (w : σ → ℕ) (p : MvP
     rw [MvPolynomial.mem_support_iff, not_not] at hs
     simp [hs]
 
-theorem hupsTw_ne_zero {σ R : Type*} [CommRing R] (w : σ → ℕ) {p : MvPolynomial σ R}
-    {s : σ →₀ ℕ} (hs : s ∈ p.support) : (hupsTw w p).coeff (hupsWt w s) ≠ 0 := by
+theorem hupsTw_ne_zero
+    {σ R : Type*} [CommRing R] (w : σ → ℕ) {p : MvPolynomial σ R} {s : σ →₀ ℕ} (hs : s ∈ p.support)
+    : (hupsTw w p).coeff (hupsWt w s) ≠ 0 := by
   intro h
   have e := hupsTw_coeff_coeff w p (hupsWt w s) s
   rw [h, MvPolynomial.coeff_zero, if_pos rfl] at e
   exact (MvPolynomial.mem_support_iff.mp hs) e.symm
 
-theorem hupsTw_hom {σ R : Type*} [CommRing R] (w : σ → ℕ) {p : MvPolynomial σ R} {a : ℕ}
-    (hp : ∀ s ∈ p.support, hupsWt w s = a) :
-    hupsTw w p = Polynomial.C p * Polynomial.X ^ a := by
+theorem hupsTw_hom
+    {σ R : Type*} [CommRing R]
+    (w : σ → ℕ)
+    {p : MvPolynomial σ R} {a : ℕ} (hp : ∀ s ∈ p.support, hupsWt w s = a)
+    : hupsTw w p = Polynomial.C p * Polynomial.X ^ a := by
   ext j s
   rw [hupsTw_coeff_coeff, Polynomial.coeff_C_mul_X_pow]
   by_cases hs : s ∈ p.support
@@ -72,10 +76,13 @@ theorem hupsTw_hom {σ R : Type*} [CommRing R] (w : σ → ℕ) {p : MvPolynomia
   · rw [MvPolynomial.mem_support_iff, not_not] at hs
     split_ifs <;> simp [hs]
 
-theorem hups_hom_of_mul {σ R : Type*} [CommRing R] [IsDomain R] (w : σ → ℕ)
-    {F P : MvPolynomial σ R} (hF : F ≠ 0) {a n : ℕ} (hFa : ∀ s ∈ F.support, hupsWt w s = a)
-    (hFP : ∀ s ∈ (F * P).support, hupsWt w s = n) {s0 : σ →₀ ℕ} (hs0 : s0 ∈ P.support) :
-    hupsWt w s0 + a = n := by
+theorem hups_hom_of_mul
+    {σ R : Type*} [CommRing R] [IsDomain R]
+    (w : σ → ℕ)
+    {F P : MvPolynomial σ R} (hF : F ≠ 0)
+    {a n : ℕ} (hFa : ∀ s ∈ F.support, hupsWt w s = a) (hFP : ∀ s ∈ (F * P).support, hupsWt w s = n)
+    {s0 : σ →₀ ℕ} (hs0 : s0 ∈ P.support)
+    : hupsWt w s0 + a = n := by
   have h1 : hupsTw w (F * P) = Polynomial.C (F * P) * Polynomial.X ^ n := hupsTw_hom w hFP
   have h2 : hupsTw w F = Polynomial.C F * Polynomial.X ^ a := hupsTw_hom w hFa
   rw [map_mul, h2, map_mul] at h1
@@ -90,11 +97,13 @@ theorem hups_hom_of_mul {σ R : Type*} [CommRing R] [IsDomain R] (w : σ → ℕ
   rw [if_neg hne] at h4
   exact hupsTw_ne_zero w hs0 h4
 
-theorem hups_deg_of_mul {σ R : Type*} [CommRing R] [IsDomain R] (w : σ → ℕ)
-    {F P : MvPolynomial σ R} {u n : ℕ} {sF : σ →₀ ℕ} (hsF : sF ∈ F.support)
-    (hFu : hupsWt w sF = u)
-    (hFP : ∀ s ∈ (F * P).support, hupsWt w s ≤ n) {s0 : σ →₀ ℕ} (hs0 : s0 ∈ P.support) :
-    hupsWt w s0 + u ≤ n := by
+theorem hups_deg_of_mul
+    {σ R : Type*} [CommRing R] [IsDomain R]
+    (w : σ → ℕ)
+    {F P : MvPolynomial σ R} {u n : ℕ} {sF : σ →₀ ℕ}
+    (hsF : sF ∈ F.support) (hFu : hupsWt w sF = u) (hFP : ∀ s ∈ (F * P).support, hupsWt w s ≤ n)
+    {s0 : σ →₀ ℕ} (hs0 : s0 ∈ P.support)
+    : hupsWt w s0 + u ≤ n := by
   have hTF : (hupsTw w F).coeff u ≠ 0 := by
     rw [← hFu]
     exact hupsTw_ne_zero w hsF

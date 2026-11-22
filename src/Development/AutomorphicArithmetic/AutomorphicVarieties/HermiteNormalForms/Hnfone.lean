@@ -9,10 +9,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open NumberField Matrix UpperTheory.V UpperTheory.V.KT
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.hnfone :
-    ∀ (L : Type) [Field L] [NumberField L] (N : ℕ) (I : ℕ), 0 < I →
-    ∃ S : Finset (Matrix (Fin N) (Fin N) (𝓞 L)), S.card ≤ I ^ (dd L N * N) ∧ ∀ A : Matrix (Fin N) (Fin N) (𝓞 L), A.det ≠ 0 → nrmDet A = I →
-      ∃ g : Gm L N, (g : Matrix (Fin N) (Fin N) (𝓞 L)) * A ∈ S := by
+theorem UpperTheory.V.KT.hnfone
+    : ∀ (L : Type) [Field L] [NumberField L] (N : ℕ) (I : ℕ),
+      0 < I
+        → ∃ S : Finset (Matrix (Fin N) (Fin N) (𝓞 L)),
+          S.card ≤ I ^ (dd L N * N)
+            ∧ ∀ A : Matrix (Fin N) (Fin N) (𝓞 L),
+              A.det ≠ 0 → nrmDet A = I
+                → ∃ g : Gm L N, (g : Matrix (Fin N) (Fin N) (𝓞 L)) * A ∈ S := by
   classical
   intro L _ _ N I hI
   have hr0 : (I : 𝓞 L) ≠ 0 := Nat.cast_ne_zero.mpr hI.ne'
@@ -25,15 +29,19 @@ theorem UpperTheory.V.KT.hnfone :
   haveI : Finite (𝓞 L ⧸ Ideal.span {(I : 𝓞 L)}) :=
     Nat.finite_of_card_ne_zero (by rw [hcardQ]; exact pow_ne_zero _ hI.ne')
   letI : Fintype (𝓞 L ⧸ Ideal.span {(I : 𝓞 L)}) := Fintype.ofFinite _
-  have hB : ∀ A : Matrix (Fin N) (Fin N) (𝓞 L), A.det ≠ 0 ∧ nrmDet A = I →
-      ∃ B, A * B = (I : 𝓞 L) • 1 ∧ B * A = (I : 𝓞 L) • 1 := by
+  have hB
+      : ∀ A : Matrix (Fin N) (Fin N) (𝓞 L),
+        A.det ≠ 0 ∧ nrmDet A = I → ∃ B, A * B = (I : 𝓞 L) • 1 ∧ B * A = (I : 𝓞 L) • 1 := by
     intro A hA
     obtain ⟨_, B, h1, h2⟩ := scinv L N A hA.1
     rw [hA.2] at h1 h2
     exact ⟨B, h1, h2⟩
   let key : Matrix (Fin N) (Fin N) (𝓞 L) → Matrix (Fin N) (Fin N) (𝓞 L ⧸ Ideal.span {(I : 𝓞 L)}) :=
-    fun A => if h : A.det ≠ 0 ∧ nrmDet A = I then
-      (Classical.choose (hB A h)).map (Ideal.Quotient.mk _) else 0
+    fun A =>
+      if h : A.det ≠ 0 ∧ nrmDet A = I then
+        (Classical.choose (hB A h)).map (Ideal.Quotient.mk _)
+      else
+        0
   let rep : Matrix (Fin N) (Fin N) (𝓞 L ⧸ Ideal.span {(I : 𝓞 L)}) → Matrix (Fin N) (Fin N) (𝓞 L) :=
     fun k => if h : ∃ A, (A.det ≠ 0 ∧ nrmDet A = I) ∧ key A = k then Classical.choose h else 0
   refine ⟨Finset.univ.image rep, ?_, ?_⟩
@@ -49,13 +57,17 @@ theorem UpperTheory.V.KT.hnfone :
     obtain ⟨hA'P, hA'k⟩ := Classical.choose_spec hex
     obtain ⟨h1, h2⟩ := Classical.choose_spec (hB A hA)
     obtain ⟨h1', h2'⟩ := Classical.choose_spec (hB _ hA'P)
-    have hkk : (Classical.choose (hB _ hA'P)).map (Ideal.Quotient.mk (Ideal.span {(I : 𝓞 L)})) =
-        (Classical.choose (hB A hA)).map (Ideal.Quotient.mk _) := by
-      have keyeq : ∀ (M : Matrix (Fin N) (Fin N) (𝓞 L)) (h : M.det ≠ 0 ∧ nrmDet M = I),
-          key M = (Classical.choose (hB M h)).map (Ideal.Quotient.mk _) := fun M h => dif_pos h
+    have hkk
+        : (Classical.choose (hB _ hA'P)).map (Ideal.Quotient.mk (Ideal.span {(I : 𝓞 L)}))
+          = (Classical.choose (hB A hA)).map (Ideal.Quotient.mk _) := by
+      have keyeq
+          : ∀ (M : Matrix (Fin N) (Fin N) (𝓞 L)) (h : M.det ≠ 0 ∧ nrmDet M = I),
+            key M = (Classical.choose (hB M h)).map (Ideal.Quotient.mk _) := fun M h =>
+        dif_pos h
       exact (keyeq _ hA'P).symm.trans (hA'k.trans (keyeq A hA))
-    have hent : ∀ i j, ∃ x, Classical.choose (hB A hA) i j - Classical.choose (hB _ hA'P) i j =
-        (I : 𝓞 L) * x := by
+    have hent
+        : ∀ i j, ∃ x,
+          Classical.choose (hB A hA) i j - Classical.choose (hB _ hA'P) i j = (I : 𝓞 L) * x := by
       intro i j
       have h := congrFun (congrFun hkk i) j
       simp only [Matrix.map_apply] at h
@@ -63,8 +75,9 @@ theorem UpperTheory.V.KT.hnfone :
       obtain ⟨c, hc⟩ := h
       exact ⟨-c, by rw [mul_neg, ← hc, neg_sub]⟩
     choose X hX using hent
-    obtain ⟨g, hg⟩ := hnfeq (𝓞 L) N (I : 𝓞 L) hr0 A (Classical.choose hex) _ _ (Matrix.of X)
-      h1 h2 h1' h2' (by ext i j; simp [hX])
+    obtain ⟨g, hg⟩ :=
+      hnfeq (𝓞 L) N (I : 𝓞 L) hr0 A (Classical.choose hex) _ _ (Matrix.of X) h1 h2 h1' h2'
+        (by ext i j; simp [hX])
     refine ⟨g, ?_⟩
     rw [hg, Finset.mem_image]
     exact ⟨key A, Finset.mem_univ _, hrep⟩

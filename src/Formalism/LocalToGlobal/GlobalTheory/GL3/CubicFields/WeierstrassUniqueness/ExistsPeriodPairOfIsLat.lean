@@ -13,8 +13,8 @@ open Formalism.BasicNotions (D7)
 open Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity (IsLat jL Uniformization CMTransitive)
 open Formalism.MainNotions.TaylorLogMetric (lamOf)
 
-theorem exists_periodPair_of_isLat (Λ : AddSubgroup ℂ) (hΛ : IsLat Λ) :
-    ∃ L : PeriodPair, (L.lattice : Set ℂ) = Λ := by
+theorem exists_periodPair_of_isLat (Λ : AddSubgroup ℂ) (hΛ : IsLat Λ)
+    : ∃ L : PeriodPair, (L.lattice : Set ℂ) = Λ := by
   classical
   obtain ⟨hd, hs⟩ := hΛ
   let Λ' : Submodule ℤ ℂ := Λ.toIntSubmodule
@@ -43,8 +43,9 @@ theorem exists_periodPair_of_isLat (Λ : AddSubgroup ℂ) (hΛ : IsLat Λ) :
   rw [hspan]
   rfl
 
-theorem eisG_eq_G_of_lattice (Λ : AddSubgroup ℂ) (L : PeriodPair) (hL : (L.lattice : Set ℂ) = Λ)
-    (n : ℕ) (hn : n ≠ 0) : Formalism.MainNotions.TaylorLogMetric.eisG Λ n = L.G (2 * n) := by
+theorem eisG_eq_G_of_lattice
+    (Λ : AddSubgroup ℂ) (L : PeriodPair) (hL : (L.lattice : Set ℂ) = Λ) (n : ℕ) (hn : n ≠ 0)
+    : Formalism.MainNotions.TaylorLogMetric.eisG Λ n = L.G (2 * n) := by
   unfold Formalism.MainNotions.TaylorLogMetric.eisG PeriodPair.G
   have h1 := tsum_subtype ({w : ℂ | w ∈ Λ ∧ w ≠ 0}) (fun w : ℂ => 1 / w ^ (2 * n))
   have h2 := tsum_subtype ((L.lattice : Set ℂ)) (fun w : ℂ => (w ^ (2 * n))⁻¹)
@@ -55,13 +56,13 @@ theorem eisG_eq_G_of_lattice (Λ : AddSubgroup ℂ) (L : PeriodPair) (hL : (L.la
   · subst hx
     have h0 : (0 : ℂ) ^ (2 * n) = 0 := zero_pow (by omega)
     simp [Set.indicator, h0]
-  · have hm : x ∈ L.lattice ↔ x ∈ Λ := by
-      rw [← SetLike.mem_coe, hL, SetLike.mem_coe]
+  · have hm : x ∈ L.lattice ↔ x ∈ Λ := by rw [← SetLike.mem_coe, hL, SetLike.mem_coe]
     simp only [Set.indicator, Set.mem_setOf_eq, hx, ne_eq, not_false_eq_true, and_true,
       SetLike.mem_coe, hm, one_div]
 
-theorem g2_g3_eq_periodPair (Λ : AddSubgroup ℂ) (L : PeriodPair) (hL : (L.lattice : Set ℂ) = Λ) :
-    Formalism.MainNotions.TaylorLogMetric.g2 Λ = L.g₂ ∧ Formalism.MainNotions.TaylorLogMetric.g3 Λ = L.g₃ := by
+theorem g2_g3_eq_periodPair (Λ : AddSubgroup ℂ) (L : PeriodPair) (hL : (L.lattice : Set ℂ) = Λ)
+    : Formalism.MainNotions.TaylorLogMetric.g2 Λ = L.g₂
+      ∧ Formalism.MainNotions.TaylorLogMetric.g3 Λ = L.g₃ := by
   refine ⟨?_, ?_⟩
   · unfold Formalism.MainNotions.TaylorLogMetric.g2 PeriodPair.g₂
     rw [eisG_eq_G_of_lattice Λ L hL 2 (by norm_num)]

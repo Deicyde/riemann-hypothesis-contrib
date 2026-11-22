@@ -32,10 +32,10 @@ theorem fg_of_le_fg {H K : AddSubgroup A} (hHK : H ≤ K) (hK : K.FG) : H.FG := 
 
 variable [NoZeroSMulDivisors ℕ A]
 
-theorem finite_sandwich (M : AddSubgroup A) {n : ℕ} (hn : 0 < n) :
-    {L : AddSubgroup A | M ≤ L ∧ (∀ x ∈ L, n • x ∈ M) ∧ L.FG}.Finite := by
-  rcases Set.eq_empty_or_nonempty {L : AddSubgroup A | M ≤ L ∧ (∀ x ∈ L, n • x ∈ M) ∧ L.FG}
-    with he | ⟨L₀, hML₀, -, hL₀⟩
+theorem finite_sandwich (M : AddSubgroup A) {n : ℕ} (hn : 0 < n)
+    : {L : AddSubgroup A | M ≤ L ∧ (∀ x ∈ L, n • x ∈ M) ∧ L.FG}.Finite := by
+  rcases Set.eq_empty_or_nonempty {L : AddSubgroup A | M ≤ L ∧ (∀ x ∈ L, n • x ∈ M) ∧ L.FG} with
+    he | ⟨L₀, hML₀, -, hL₀⟩
   · rw [he]
     exact Set.finite_empty
   have hM : M.FG := fg_of_le_fg hML₀ hL₀
@@ -59,8 +59,7 @@ theorem finite_sandwich (M : AddSubgroup A) {n : ℕ} (hn : 0 < n) :
   have hMN : M ≤ N := fun x hx => M.nsmul_mem hx n
   let M' : AddSubgroup N := M.addSubgroupOf N
   have : AddGroup.FG N := (AddGroup.fg_iff_addSubgroup_fg N).2 hN
-  have : AddGroup.FG (N ⧸ M') :=
-    AddGroup.fg_of_surjective (QuotientAddGroup.mk'_surjective M')
+  have : AddGroup.FG (N ⧸ M') := AddGroup.fg_of_surjective (QuotientAddGroup.mk'_surjective M')
   have : Finite (N ⧸ M') := by
     refine AddCommGroup.finite_of_fg_isAddTorsion _ fun q => ?_
     obtain ⟨x, rfl⟩ := QuotientAddGroup.mk'_surjective M' q
@@ -68,8 +67,7 @@ theorem finite_sandwich (M : AddSubgroup A) {n : ℕ} (hn : 0 < n) :
     rw [← map_nsmul, QuotientAddGroup.mk'_apply, QuotientAddGroup.eq_zero_iff]
     exact x.2
 
-  let q : AddSubgroup A → Set (N ⧸ M') := fun L =>
-    QuotientAddGroup.mk' M' '' {y : N | (y : A) ∈ L}
+  let q : AddSubgroup A → Set (N ⧸ M') := fun L => QuotientAddGroup.mk' M' '' {y : N | (y : A) ∈ L}
   refine Set.Finite.of_finite_image (f := q) (Set.toFinite _) ?_
   rintro L ⟨hML, hLn, -⟩ L' ⟨hML', hL'n, -⟩ hq
   have key : ∀ L L' : AddSubgroup A, M ≤ L' → (∀ x ∈ L, n • x ∈ M) → q L ⊆ q L' → L ≤ L' := by
@@ -89,14 +87,18 @@ end Sandwich
 
 section Pairs
 
-variable {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
   [Algebra.IsQuadraticExtension F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
 variable {W : Type u} [AddCommGroup W] [Module E W]
 
-theorem LinePairOrbitsFinite.proof (h : HermitianForm F E W) [FiniteDimensional E W]
+theorem LinePairOrbitsFinite.proof
+    (h : HermitianForm F E W)
+    [FiniteDimensional E W]
     (h₁ : LatticeOrbitsFiniteBelow.{u} F E (finrank E W)) (h₂ : WittPartner.Statement h)
     (h₃ : ComplementForm.Statement h) (h₄ : ComplementExtension.Statement h)
-    (h₅ : AdaptedReduction.Statement h) : LinePairOrbitsFinite.Statement h := by
+    (h₅ : AdaptedReduction.Statement h)
+    : LinePairOrbitsFinite.Statement h := by
   intro D
   by_cases hex : ∃ v₀ : W, v₀ ≠ 0 ∧ h.toSesq v₀ v₀ = 0
   swap
@@ -116,23 +118,26 @@ theorem LinePairOrbitsFinite.proof (h : HermitianForm F E W) [FiniteDimensional 
   have hdim : finrank E (hypComplement h v₀ w₀) < finrank E W := by
     refine Submodule.finrank_lt fun htop => ?_
     have hv : v₀ ∈ hypComplement h v₀ w₀ := htop ▸ Submodule.mem_top
-    have h1 : h.toSesq w₀ v₀ = 1 := by
-      rw [← h.isSymm.eq v₀ w₀, hvw, map_one]
+    have h1 : h.toSesq w₀ v₀ = 1 := by rw [← h.isSymm.eq v₀ w₀, hvw, map_one]
     exact one_ne_zero (h1 ▸ (mem_hypComplement.1 hv).2)
   obtain ⟨S', hS', hS'L⟩ := h₁ (hypComplement h v₀ w₀) h' hdim D'
-  have : NoZeroSMulDivisors ℕ W := ⟨fun {c x} hcx => by
-    rw [← Nat.cast_smul_eq_nsmul E] at hcx
-    rcases smul_eq_zero.1 hcx with h0 | h0
-    · exact Or.inl (Nat.cast_eq_zero.1 h0)
-    · exact Or.inr h0⟩
-  let Mof : AddSubgroup E × AddSubgroup E → AddSubgroup (hypComplement h v₀ w₀) →
-      AddSubgroup W := fun p L =>
-    p.1.map ((smulAddHom E W).flip v₀) ⊔ L.map (hypComplement h v₀ w₀).subtype.toAddMonoidHom ⊔
-      p.2.map ((smulAddHom E W).flip w₀)
-  refine ⟨(⋃ p ∈ KK, ⋃ L ∈ S', {La | Mof p L ≤ La ∧ (∀ x ∈ La, n • x ∈ Mof p L) ∧ La.FG}) ×ˢ
-    {Submodule.span E {v₀}},
+  have : NoZeroSMulDivisors ℕ W :=
+    ⟨fun {c x} hcx => by
+      rw [← Nat.cast_smul_eq_nsmul E] at hcx
+      rcases smul_eq_zero.1 hcx with h0 | h0
+      · exact Or.inl (Nat.cast_eq_zero.1 h0)
+      · exact Or.inr h0⟩
+  let Mof : AddSubgroup E × AddSubgroup E → AddSubgroup (hypComplement h v₀ w₀) → AddSubgroup W :=
+    fun p L =>
+      p.1.map ((smulAddHom E W).flip v₀) ⊔ L.map (hypComplement h v₀ w₀).subtype.toAddMonoidHom
+        ⊔ p.2.map ((smulAddHom E W).flip w₀)
+  refine ⟨
+    (⋃ p ∈ KK, ⋃ L ∈ S', {La | Mof p L ≤ La ∧ (∀ x ∈ La, n • x ∈ Mof p L) ∧ La.FG})
+      ×ˢ {Submodule.span E {v₀}},
     (hKK.biUnion fun p _ => hS'.biUnion fun L _ => finite_sandwich _ hn).prod
-      (Set.finite_singleton _), ?_⟩
+      (Set.finite_singleton _),
+    ?_
+  ⟩
   intro La l hLa hl
   obtain ⟨g, La₁, hgLa, hgv, hK, hsplit, hInt⟩ := hred La l hLa hl
   obtain ⟨L, hL, m, hmL⟩ := hS'L _ hInt
@@ -173,8 +178,7 @@ theorem LinePairOrbitsFinite.proof (h : HermitianForm F E W) [FiniteDimensional 
       rw [hmem] at hx
       obtain ⟨a, ha, b, hb, hz⟩ := hsplit _ hx
       set z : W := n • (gm • x) - a • v₀ - b • w₀ with hzdef
-      have hzL : z ∈ La₁ :=
-        La₁.sub_mem (La₁.sub_mem (La₁.nsmul_mem hx n) ha) hb
+      have hzL : z ∈ La₁ := La₁.sub_mem (La₁.sub_mem (La₁.nsmul_mem hx n) ha) hb
       have hz' : (⟨z, hz⟩ : hypComplement h v₀ w₀) ∈ m • L := by
         rw [hmL]
         exact hzL
@@ -183,8 +187,7 @@ theorem LinePairOrbitsFinite.proof (h : HermitianForm F E W) [FiniteDimensional 
         apply (MulAction.injective gm)
         show gm • (n • x) = gm • (a • v₀ + (y : W) + b • w₀)
         have e1 : gm • (n • x) = n • (gm • x) := map_nsmul (gm : W ≃ₗ[E] W) n x
-        have e2 : gm • (y : W) = z := by
-          rw [hgx, hyz]
+        have e2 : gm • (y : W) = z := by rw [hgx, hyz]
         rw [e1, smul_add, smul_add, hsmul, hsmul, hgv₀, hgw₀, e2, hzdef]
         abel
       rw [hnx]
@@ -192,8 +195,7 @@ theorem LinePairOrbitsFinite.proof (h : HermitianForm F E W) [FiniteDimensional 
       · exact AddSubgroup.mem_sup_left (AddSubgroup.mem_sup_left ⟨a, ha, rfl⟩)
       · exact AddSubgroup.mem_sup_left (AddSubgroup.mem_sup_right ⟨y, hy, rfl⟩)
       · exact AddSubgroup.mem_sup_right ⟨b, hb, rfl⟩
-    · have hLa₁ : La₁ = g⁻¹ • La := by
-        rw [← hgLa, inv_smul_smul]
+    · have hLa₁ : La₁ = g⁻¹ • La := by rw [← hgLa, inv_smul_smul]
       have hfg : ∀ (γ : h.unitaryGroup) (S : AddSubgroup W), S.FG → (γ • S).FG := by
         intro γ S hS
         have : γ • S = S.map (((γ : W ≃ₗ[E] W) : W →ₗ[E] W).toAddMonoidHom) := by
@@ -208,8 +210,7 @@ theorem LinePairOrbitsFinite.proof (h : HermitianForm F E W) [FiniteDimensional 
         exact fg_map_of_fg hS _
       exact hfg _ _ (hLa₁ ▸ hfg _ _ hLa.isLattice.fg)
   · rw [mul_smul, smul_inv_smul, hgLa]
-  · have hgv0 : (g : W ≃ₗ[E] W) v₀ ≠ 0 := fun h0 =>
-      hv₀ ((g : W ≃ₗ[E] W).map_eq_zero_iff.1 h0)
+  · have hgv0 : (g : W ≃ₗ[E] W) v₀ ≠ 0 := fun h0 => hv₀ ((g : W ≃ₗ[E] W).map_eq_zero_iff.1 h0)
     have hg' : ((g * gm : h.unitaryGroup) : W ≃ₗ[E] W) v₀ = (g : W ≃ₗ[E] W) v₀ := by
       change (g : W ≃ₗ[E] W) ((gm : W ≃ₗ[E] W) v₀) = _
       exact congrArg _ hgv₀

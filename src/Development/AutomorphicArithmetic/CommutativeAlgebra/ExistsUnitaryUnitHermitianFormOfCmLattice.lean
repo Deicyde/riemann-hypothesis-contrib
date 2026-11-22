@@ -10,16 +10,20 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField Matrix
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField Matrix
 open IsDedekindDomain
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct Classical ComplexOrder
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.DiscreteGroups.LocalClassField
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKCx GlobalTheory.PELU
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.DiscreteGroups.LocalClassField
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo
+  GlobalTheory.LKCx GlobalTheory.PELU
 attribute [local instance] Over.cartesianMonoidalCategory
 open UpperTheory.ComplexUniformization
 
-private theorem exists_den {Λ : Type} [AddCommGroup Λ] (t : ℚ ⊗[ℤ] Λ) :
-    ∃ (n : ℤ) (z : Λ), n ≠ 0 ∧ n • t = (1 : ℚ) ⊗ₜ[ℤ] z := by
+private theorem exists_den {Λ : Type} [AddCommGroup Λ] (t : ℚ ⊗[ℤ] Λ)
+    : ∃ (n : ℤ) (z : Λ), n ≠ 0 ∧ n • t = (1 : ℚ) ⊗ₜ[ℤ] z := by
   induction t using TensorProduct.induction_on with
   | zero => exact ⟨1, 0, one_ne_zero, by simp⟩
   | tmul q z =>
@@ -32,11 +36,14 @@ private theorem exists_den {Λ : Type} [AddCommGroup Λ] (t : ℚ ⊗[ℤ] Λ) :
     obtain ⟨n, z, hn, h⟩ := ha
     obtain ⟨m, w, hm, h'⟩ := hb
     refine ⟨n * m, m • z + n • w, mul_ne_zero hn hm, ?_⟩
-    rw [smul_add, TensorProduct.tmul_add, TensorProduct.tmul_smul, TensorProduct.tmul_smul, ← h, ← h',
-      smul_smul, smul_smul, mul_comm m n]
+    rw [smul_add, TensorProduct.tmul_add, TensorProduct.tmul_smul, TensorProduct.tmul_smul, ← h,
+      ← h', smul_smul, smul_smul, mul_comm m n]
 
-private theorem sep_bc {Λ : Type} [AddCommGroup Λ] (B : LinearMap.BilinForm ℤ Λ)
-    (hB : ∀ x, (∀ y, B x y = 0) → x = 0) (a : ℚ ⊗[ℤ] Λ) (h : ∀ w, B.baseChange ℚ a w = 0) : a = 0 := by
+private theorem sep_bc
+    {Λ : Type} [AddCommGroup Λ]
+    (B : LinearMap.BilinForm ℤ Λ) (hB : ∀ x, (∀ y, B x y = 0) → x = 0)
+    (a : ℚ ⊗[ℤ] Λ) (h : ∀ w, B.baseChange ℚ a w = 0)
+    : a = 0 := by
   obtain ⟨n, z, hn, e⟩ := exists_den a
   have hz : z = 0 := by
     apply hB
@@ -49,9 +56,11 @@ private theorem sep_bc {Λ : Type} [AddCommGroup Λ] (B : LinearMap.BilinForm �
   rw [← Int.cast_smul_eq_zsmul ℚ] at e
   exact (smul_eq_zero.1 e).resolve_left hn'
 
-private theorem adj_bc {Λ : Type} [AddCommGroup Λ] (B : LinearMap.BilinForm ℤ Λ) (f g : Λ →ₗ[ℤ] Λ)
-    (h : ∀ x y, B (f x) y = B x (g y)) (u w : ℚ ⊗[ℤ] Λ) :
-    B.baseChange ℚ (f.baseChange ℚ u) w = B.baseChange ℚ u (g.baseChange ℚ w) := by
+private theorem adj_bc
+    {Λ : Type} [AddCommGroup Λ]
+    (B : LinearMap.BilinForm ℤ Λ) (f g : Λ →ₗ[ℤ] Λ) (h : ∀ x y, B (f x) y = B x (g y))
+    (u w : ℚ ⊗[ℤ] Λ)
+    : B.baseChange ℚ (f.baseChange ℚ u) w = B.baseChange ℚ u (g.baseChange ℚ w) := by
   induction u using TensorProduct.induction_on with
   | zero => simp
   | add a b ha hb => simp only [map_add (f := _), LinearMap.add_apply, ha, hb]
@@ -61,8 +70,9 @@ private theorem adj_bc {Λ : Type} [AddCommGroup Λ] (B : LinearMap.BilinForm �
     | add a b ha hb => simp only [map_add (f := _), ha, hb]
     | tmul r y => simp [LinearMap.BilinForm.baseChange_tmul, h]
 
-private theorem anti_bc {Λ : Type} [AddCommGroup Λ] (B : LinearMap.BilinForm ℤ Λ) (h : ∀ x, B x x = 0)
-    (u w : ℚ ⊗[ℤ] Λ) : B.baseChange ℚ u w = - B.baseChange ℚ w u := by
+private theorem anti_bc
+    {Λ : Type} [AddCommGroup Λ] (B : LinearMap.BilinForm ℤ Λ) (h : ∀ x, B x x = 0) (u w : ℚ ⊗[ℤ] Λ)
+    : B.baseChange ℚ u w = - B.baseChange ℚ w u := by
   have anti : ∀ x y, B x y = - B y x := fun x y => by
     have := h (x + y)
     simp only [map_add (f := _), LinearMap.add_apply, h, zero_add, add_zero] at this
@@ -79,22 +89,34 @@ private theorem anti_bc {Λ : Type} [AddCommGroup Λ] (B : LinearMap.BilinForm �
       rw [anti x y]
       rw [mul_comm q r, neg_smul]
 
-private theorem exists_rep {V : Type} [AddCommGroup V] [Module ℚ V] [FiniteDimensional ℚ V]
-    (E F : LinearMap.BilinForm ℚ V) (hE : ∀ a, (∀ w, E a w = 0) → a = 0) :
-    ∃ b : Module.End ℚ V, ∀ u w, F u w = 2 * E (b u) w := by
+private theorem exists_rep
+    {V : Type} [AddCommGroup V] [Module ℚ V] [FiniteDimensional ℚ V]
+    (E F : LinearMap.BilinForm ℚ V) (hE : ∀ a, (∀ w, E a w = 0) → a = 0)
+    : ∃ b : Module.End ℚ V, ∀ u w, F u w = 2 * E (b u) w := by
   have inj : Function.Injective (E : V →ₗ[ℚ] Module.Dual ℚ V) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     exact hE a fun w => by rw [ha]; rfl
   let Φ : V ≃ₗ[ℚ] Module.Dual ℚ V :=
-    LinearMap.linearEquivOfInjective (E : V →ₗ[ℚ] Module.Dual ℚ V) inj (Subspace.dual_finrank_eq).symm
+    LinearMap.linearEquivOfInjective (E : V →ₗ[ℚ] Module.Dual ℚ V) inj
+      (Subspace.dual_finrank_eq).symm
   refine ⟨(1 / 2 : ℚ) • (Φ.symm.toLinearMap ∘ₗ (F : V →ₗ[ℚ] Module.Dual ℚ V)), fun u w => ?_⟩
   have h : E (Φ.symm (F u)) = F u := Φ.apply_symm_apply (F u)
-  simp only [LinearMap.smul_apply, LinearMap.comp_apply, LinearEquiv.coe_coe, map_smul, h, smul_eq_mul]
+  simp only [LinearMap.smul_apply, LinearMap.comp_apply, LinearEquiv.coe_coe, map_smul, h,
+    smul_eq_mul]
   ring
 
-theorem UpperTheory.exists_unitary_unit_hermitian_form_of_cm_lattice :
-    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (G : HTGroup p) (L : Link D G) (Y : PLat D.O D.inv) (j : (ℚ ⊗[ℤ] Y.La) ≃ₗ[ℚ] VQ D), (∀ (c : D.O) (u : ℚ ⊗[ℤ] Y.La), j ((DistribSMul.toLinearMap ℤ Y.La c).baseChange ℚ u) = actQ D c (j u)) → ∃ β : G.Cˣ, sh G β = β ∧ ∀ u w : ℚ ⊗[ℤ] Y.La, Y.EF.baseChange ℚ u w = 2 * D.EF.baseChange ℚ (L.rep ((β⁻¹ : G.Cˣ) : G.C) (j u)) (j w) := by
+theorem UpperTheory.exists_unitary_unit_hermitian_form_of_cm_lattice
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (G : HTGroup p) (L : Link D G) (Y : PLat D.O D.inv)
+        (j : (ℚ ⊗[ℤ] Y.La) ≃ₗ[ℚ] VQ D),
+      (∀ (c : D.O) (u : ℚ ⊗[ℤ] Y.La),
+          j ((DistribSMul.toLinearMap ℤ Y.La c).baseChange ℚ u) = actQ D c (j u))
+        → ∃ β : G.Cˣ,
+          sh G β = β
+            ∧ ∀ u w : ℚ ⊗[ℤ] Y.La,
+              Y.EF.baseChange ℚ u w
+                = 2 * D.EF.baseChange ℚ (L.rep ((β⁻¹ : G.Cˣ) : G.C) (j u)) (j w) := by
   intro p _ D G L Y j hj
   haveI := D.finLa
   set E := D.EF.baseChange ℚ with hEdef
@@ -109,19 +131,24 @@ theorem UpperTheory.exists_unitary_unit_hermitian_form_of_cm_lattice :
   have hF : ∀ u w, F u w = Y.EF.baseChange ℚ (j.symm u) (j.symm w) := fun u w => rfl
   obtain ⟨b, hb⟩ := exists_rep E F sepE
   have hinj : Function.Injective b := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro u hu
-    have : j.symm u = 0 := sepY _ fun w => by
-      have h := hb u (j w)
-      rw [hu, map_zero, LinearMap.zero_apply, MulZeroClass.mul_zero, hF, j.symm_apply_apply] at h
-      exact h
+    have : j.symm u = 0 :=
+      sepY _ fun w => by
+        have h := hb u (j w)
+        rw [hu, map_zero, LinearMap.zero_apply, MulZeroClass.mul_zero, hF, j.symm_apply_apply] at h
+        exact h
     simpa using this
   have comm : ∀ c : D.O, b * actQ D c = actQ D c * b := by
     intro c
     refine LinearMap.ext fun u => eqE _ _ fun w => ?_
     have hc : j.symm (actQ D c u) = (DistribSMul.toLinearMap ℤ Y.La c).baseChange ℚ (j.symm u) := by
       rw [LinearEquiv.symm_apply_eq, hj, j.apply_symm_apply]
-    have hc' : ∀ w, j.symm (actQ D (D.inv c) w) = (DistribSMul.toLinearMap ℤ Y.La (D.inv c)).baseChange ℚ (j.symm w) := fun w => by
+    have hc'
+        : ∀ w,
+          j.symm (actQ D (D.inv c) w)
+            = (DistribSMul.toLinearMap ℤ Y.La (D.inv c)).baseChange ℚ (j.symm w) := fun w => by
       rw [LinearEquiv.symm_apply_eq, hj, j.apply_symm_apply]
     have h1 : F (actQ D c u) w = F u (actQ D (D.inv c) w) := by
       rw [hF, hF, hc, hc']
@@ -146,7 +173,9 @@ theorem UpperTheory.exists_unitary_unit_hermitian_form_of_cm_lattice :
   let e : VQ D ≃ₗ[ℚ] VQ D := LinearEquiv.ofInjectiveEndo b hinj
   have he : ∀ u, b (e.symm u) = u := fun u => e.apply_symm_apply u
   have he' : ∀ u, e.symm (b u) = u := fun u => e.symm_apply_apply u
-  have comm' : ∀ c : D.O, (e.symm.toLinearMap : Module.End ℚ (VQ D)) * actQ D c = actQ D c * e.symm.toLinearMap := by
+  have comm'
+      : ∀ c : D.O,
+        (e.symm.toLinearMap : Module.End ℚ (VQ D)) * actQ D c = actQ D c * e.symm.toLinearMap := by
     intro c
     refine LinearMap.ext fun u => hinj ?_
     have h := LinearMap.congr_fun (comm c) (e.symm u)
@@ -179,7 +208,9 @@ theorem UpperTheory.exists_unitary_unit_hermitian_form_of_cm_lattice :
       have h' := shmul b₀ b₁
       rw [h01, shone, hs] at h'
       exact h'.symm
-    calc sh G b₁ = sh G b₁ * (b₀ * b₁) := by rw [h01, _root_.mul_one]
+    calc
+      sh G b₁
+        = sh G b₁ * (b₀ * b₁) := by rw [h01, _root_.mul_one]
       _ = (sh G b₁ * b₀) * b₁ := (_root_.mul_assoc _ _ _).symm
       _ = b₁ := by rw [h, _root_.one_mul]
   refine ⟨⟨b₁, b₀, h10, h01⟩, hs1, fun u w => ?_⟩

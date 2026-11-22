@@ -10,8 +10,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open NumberField Matrix UpperTheory.V UpperTheory.V.KT
 open scoped Pointwise
 
-theorem UpperTheory.minimal_vector_stabilizer_property :
-    UpperTheory.V.Af.BA.MinStab := by
+theorem UpperTheory.minimal_vector_stabilizer_property : UpperTheory.V.Af.BA.MinStab := by
   intro L _ _ _ N h hv hsp
   classical
   have hfin : (minVec h).Finite := by
@@ -21,17 +20,18 @@ theorem UpperTheory.minimal_vector_stabilizer_property :
     exact (hev.self_of_nhds y hn).ne' hy
   obtain ⟨A, hA, hcol⟩ := exbasis L N _ hsp
   haveI : Finite (minVec h) := hfin.to_subtype
-  have hmem : ∀ (g : MulAction.stabilizer (Gm L N) (minVec h)) (a : Fin N),
-      (g.1 • (fun i => A i a : Lat L N)) ∈ minVec h := fun g a => by
+  have hmem
+      : ∀ (g : MulAction.stabilizer (Gm L N) (minVec h)) (a : Fin N),
+        (g.1 • (fun i => A i a : Lat L N)) ∈ minVec h := fun g a => by
     have h1 : g.1 • minVec h = minVec h := g.2
     have h2 := Set.smul_mem_smul_set (a := g.1) (hcol a)
     rw [h1] at h2
     exact h2
   refine Finite.of_injective
-    (fun (g : MulAction.stabilizer (Gm L N) (minVec h)) (a : Fin N) =>
-      (⟨_, hmem g a⟩ : minVec h)) fun g k e => ?_
-  have h1 : (g.1 : Matrix (Fin N) (Fin N) (𝓞 L)) * A =
-      (k.1 : Matrix (Fin N) (Fin N) (𝓞 L)) * A := by
+    (fun (g : MulAction.stabilizer (Gm L N) (minVec h)) (a : Fin N) => (⟨_, hmem g a⟩ : minVec h))
+    fun g k e => ?_
+  have h1
+      : (g.1 : Matrix (Fin N) (Fin N) (𝓞 L)) * A = (k.1 : Matrix (Fin N) (Fin N) (𝓞 L)) * A := by
     refine Matrix.ext fun i a => ?_
     exact congrFun (congrArg Subtype.val (congrFun e a)) i
   have h2 := congrArg (· * A.adjugate) h1

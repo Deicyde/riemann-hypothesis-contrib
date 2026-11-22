@@ -22,11 +22,12 @@ namespace FunctorialResolution.EmbeddedResolution
 
 namespace MarkedIdealWithBoundary
 
-theorem isAdmissible_pullbackAlong_of_smooth (T : MarkedIdealWithBoundary.{u}) (hV : T.IsAdmissible) (Y : Scheme.{u})
-    (q : Y ⟶ Spec (CommRingCat.of T.base)) (h : Y ⟶ T.scheme)
+theorem isAdmissible_pullbackAlong_of_smooth
+    (T : MarkedIdealWithBoundary.{u}) (hV : T.IsAdmissible)
+    (Y : Scheme.{u}) (q : Y ⟶ Spec (CommRingCat.of T.base)) (h : Y ⟶ T.scheme)
     [AlgebraicGeometry.Smooth h] [AlgebraicGeometry.QuasiCompact q]
-    (hq : h ≫ T.structMap = q) :
-    (T.pullbackAlong Y q h).IsAdmissible := by
+    (hq : h ≫ T.structMap = q)
+    : (T.pullbackAlong Y q h).IsAdmissible := by
   have := hV.charZero
   have := hV.smooth
   have := hV.locallyOfFiniteType

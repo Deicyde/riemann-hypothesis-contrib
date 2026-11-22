@@ -8,8 +8,9 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem matrix_stableRange_one (κ : Type) [Field κ] (n : ℕ) (c d p q : Matrix (Fin n) (Fin n) κ)
-    (h : c * p + d * q = 1) : ∃ y : Matrix (Fin n) (Fin n) κ, (c * y + d).det ≠ 0 := by
+theorem matrix_stableRange_one
+    (κ : Type) [Field κ] (n : ℕ) (c d p q : Matrix (Fin n) (Fin n) κ) (h : c * p + d * q = 1)
+    : ∃ y : Matrix (Fin n) (Fin n) κ, (c * y + d).det ≠ 0 := by
   classical
   set C := Matrix.toLin' c with hC
   set D := Matrix.toLin' d with hD
@@ -29,8 +30,8 @@ theorem matrix_stableRange_one (κ : Type) [Field κ] (n : ℕ) (c d p q : Matri
     have := congrArg π (hdec w)
     rw [map_add (f := _), hπD, add_zero, h2] at this
     simpa using this
-  obtain ⟨g, hg⟩ := LinearMap.exists_rightInverse_of_surjective (π ∘ₗ C)
-    (LinearMap.range_eq_top.mpr hsurj)
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_rightInverse_of_surjective (π ∘ₗ C) (LinearMap.range_eq_top.mpr hsurj)
   have hdim : Module.finrank κ (LinearMap.ker D) = Module.finrank κ Wc := by
     have h1 := LinearMap.finrank_range_add_finrank_ker D
     have h2 := Submodule.finrank_add_eq_of_isCompl hW
@@ -64,8 +65,9 @@ theorem matrix_stableRange_one (κ : Type) [Field κ] (n : ℕ) (c d p q : Matri
   have : (⟨v, hvK⟩ : LinearMap.ker D) = 0 := by rw [← h4]; exact hk
   exact hv0 (congrArg Subtype.val this)
 
-theorem matrix_stableRange_one' : ∀ (κ : Type) [Field κ] (n : ℕ) (c d p q : Matrix (Fin n) (Fin n) κ),
-    c * p + d * q = 1 → ∃ y : Matrix (Fin n) (Fin n) κ, (c * y + d).det ≠ 0 :=
+theorem matrix_stableRange_one'
+    : ∀ (κ : Type) [Field κ] (n : ℕ) (c d p q : Matrix (Fin n) (Fin n) κ),
+      c * p + d * q = 1 → ∃ y : Matrix (Fin n) (Fin n) κ, (c * y + d).det ≠ 0 :=
   fun κ _ n c d p q h => matrix_stableRange_one κ n c d p q h
 
 end GlobalTheory

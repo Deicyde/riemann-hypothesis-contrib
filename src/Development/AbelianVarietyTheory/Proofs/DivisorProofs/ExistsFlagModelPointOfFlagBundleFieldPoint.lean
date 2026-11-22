@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 
 set_option autoImplicit false
 
@@ -22,7 +24,23 @@ open GlobalTheory.ShFam (EigFrame FlagCpt)
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (tv)
 open GlobalTheory.Toroidal (gen genι genStr)
 
-theorem exists_rel_of_mem_Vo : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {Y : Model Xo c (RingHom.id c.F)} (X : GlobalTheory.FlagMod.FlagCover Y) (Z : Formalism.L2.Pj.Comp Xo c), GlobalTheory.VarFlag.FramesExist X → ∀ (C : GlobalTheory.ShFam.FlagCpt Y (RingEquiv.refl c.F)), GlobalTheory.VarFlag.CarriesTri C → ∀ (B : GlobalTheory.ProjVar.Var c.F) (j : B.X ⟶ GlobalTheory.Toroidal.gen Y) [IsOpenImmersion j] (f : C.Y.X ⟶ B.X), C.π = f ≫ j → (∀ w : GlobalTheory.Toroidal.gen Y, GlobalTheory.Toroidal.genι Y w ∈ GlobalTheory.CompHS.barComp Y Z ↔ w ∈ Set.range j) → ∀ (K : Type) [Field K] (p : Sp K ⟶ C.Y.X), (∀ s, p s ∈ GlobalTheory.VarFlag.Vo C) → ∃ z : Sp K ⟶ GlobalTheory.CompHS.Y₀ X Z, GlobalTheory.VarFlag.Rel X.F C (z ≫ GlobalTheory.CompHS.inc₀ X Z) p := by
+theorem exists_rel_of_mem_Vo
+    : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+        {Xo : Moduli Dw l} {c : Coeff l} {Y : Model Xo c (RingHom.id c.F)}
+        (X : GlobalTheory.FlagMod.FlagCover Y) (Z : Formalism.L2.Pj.Comp Xo c),
+      GlobalTheory.VarFlag.FramesExist X
+        → ∀ (C : GlobalTheory.ShFam.FlagCpt Y (RingEquiv.refl c.F)),
+          GlobalTheory.VarFlag.CarriesTri C
+            → ∀ (B : GlobalTheory.ProjVar.Var c.F) (j : B.X ⟶ GlobalTheory.Toroidal.gen Y)
+                [IsOpenImmersion j] (f : C.Y.X ⟶ B.X),
+              C.π = f ≫ j
+                → (∀ w : GlobalTheory.Toroidal.gen Y,
+                  GlobalTheory.Toroidal.genι Y w ∈ GlobalTheory.CompHS.barComp Y Z
+                    ↔ w ∈ Set.range j)
+                → ∀ (K : Type) [Field K] (p : Sp K ⟶ C.Y.X),
+                  (∀ s, p s ∈ GlobalTheory.VarFlag.Vo C)
+                    → ∃ z : Sp K ⟶ GlobalTheory.CompHS.Y₀ X Z,
+                      GlobalTheory.VarFlag.Rel X.F C (z ≫ GlobalTheory.CompHS.inc₀ X Z) p := by
   intro E _ _ _ H Dw l Xo c Y X Z hFE C _ B j _ f hπ hbar K _ p hp
 
   obtain ⟨yF, hyF, hcar⟩ := GlobalTheory.Mean4O.CompModel.exists_flagPt C p
@@ -37,13 +55,13 @@ theorem exists_rel_of_mem_Vo : ∀ {E : Type} [Field E] [NumberField E] [IsCMFie
     rw [← Y.jQ_over, ← Category.assoc, hy, hyF]
     exact yF.y_over
 
-  obtain ⟨P, hPy, hPw⟩ := GlobalTheory.ShFam.exists_frPt_ptF_over_of_eigFrame E H Dw l Xo c c.F (RingHom.id c.F) Y K yF.fK y
-    (yF.y ≫ genι Y) yF.frame hys (by rw [← Category.assoc, hy, hyF])
+  obtain ⟨P, hPy, hPw⟩ :=
+    GlobalTheory.ShFam.exists_frPt_ptF_over_of_eigFrame E H Dw l Xo c c.F (RingHom.id c.F) Y K yF.fK
+      y (yF.y ≫ genι Y) yF.frame hys (by rw [← Category.assoc, hy, hyF])
   letI : Algebra c.F K := yF.fK.toAlgebra
   have hPX : GlobalTheory.FlagMod.frX P = y := hPy
   have hl := X.lies_ptY P
-  have hxg : X.ptY P ≫ X.π = yF.y ≫ genι Y := by
-    rw [hl.1, hPX, Model.j, ← Category.assoc, hy, hyF]
+  have hxg : X.ptY P ≫ X.π = yF.y ≫ genι Y := by rw [hl.1, hPX, Model.j, ← Category.assoc, hy, hyF]
 
   have hr₀ : Set.range (X.ptY P) ⊆ Set.range (GlobalTheory.CompHS.inc₀ X Z) := by
     rintro _ ⟨s, rfl⟩
@@ -75,7 +93,10 @@ theorem exists_rel_of_mem_Vo : ∀ {E : Type} [Field E] [NumberField E] [IsCMFie
     intro τ i
     obtain ⟨w, hw1, hw2, hw3⟩ := hPw τ i
     rw [← hPX] at hw1
-    have hL : w = GlobalTheory.FlagMod.liftTan Y (GlobalTheory.FlagMod.frX P) ((GlobalTheory.FlagMod.frX_fst P).symm ▸ P.tan τ i) :=
+    have hL
+        : w
+          = GlobalTheory.FlagMod.liftTan Y (GlobalTheory.FlagMod.frX P)
+            ((GlobalTheory.FlagMod.frX_fst P).symm ▸ P.tan τ i) :=
       Y.m0.cart.1.hom_ext (hw2.trans (GlobalTheory.FlagMod.liftTan_univ _ _).symm)
         (hw1.trans (GlobalTheory.FlagMod.liftTan_over _ _).symm)
     show yF.frame.v τ i = _
@@ -87,10 +108,15 @@ theorem exists_rel_of_mem_Vo : ∀ {E : Type} [Field E] [NumberField E] [IsCMFie
     ext r <;> simp [dualMap]
   have h2 : spMap (RingHom.id K) = 𝟙 _ := Spec.map_id _
   have hd : yF.frame.Tri (RingHom.id K) g₂ (fun τ i => (t⁻¹) (some ⟨τ, i⟩)) := by
-    refine ⟨by rw [h2, Category.id_comp, hxg], rfl, fun τ i => ⟨fun m => b τ m i, hdiag τ i,
-      fun m hm => hb τ hm, ?_⟩⟩
+    refine ⟨
+      by rw [h2, Category.id_comp, hxg],
+      rfl,
+      fun τ i => ⟨fun m => b τ m i, hdiag τ i, fun m hm => hb τ hm, ?_⟩
+    ⟩
     simp only [h1, Category.id_comp]
-    have e : (fun m => yF.frame.v τ m) = fun m => (tv (GlobalTheory.FlagMod.frVec Y P hPx τ m)).left := funext (hgv τ)
+    have e
+        : (fun m => yF.frame.v τ m) = fun m => (tv (GlobalTheory.FlagMod.frVec Y P hPx τ m)).left :=
+      funext (hgv τ)
     rw [e, hg₂ τ i, GlobalTheory.LieMet.isComb_iff, ← hQ.frVec_eq rfl hQ.over τ]
     exact hsum τ i
   exact carries_of_tri C hd hcar

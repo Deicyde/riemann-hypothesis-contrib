@@ -69,12 +69,18 @@ private lemma commutator_left_transform_of_commutation_relation {A : Type*} [Rin
 
 theorem gl_relation_adjoint_holds : GlRelAd := by
   intro A _ _ n E P Q hE hQP
-  have h1 : ∀ a b c d, E a b * E c d - E c d * E a b =
-      (1 : Matrix (Fin n) (Fin n) ℂ) b c • E a d - (1 : Matrix (Fin n) (Fin n) ℂ) d a • E c b := by
+  have h1
+      : ∀ a b c d,
+        E a b * E c d - E c d * E a b
+          = (1 : Matrix (Fin n) (Fin n) ℂ) b c • E a d
+            - (1 : Matrix (Fin n) (Fin n) ℂ) d a • E c b := by
     intro a b c d
     rw [hE a b c d]
     simp only [Matrix.one_apply, ite_smul, one_smul, zero_smul]
-  have h3 := commutator_left_transform_of_commutation_relation (fun a b => ∑ j, Q b j • E a j) (Q * 1) P (commutator_right_transform_of_commutation_relation E 1 Q h1)
+  have h3 :=
+    commutator_left_transform_of_commutation_relation
+      (fun a b => ∑ j, Q b j • E a j)
+      (Q * 1) P (commutator_right_transform_of_commutation_relation E 1 Q h1)
   beta_reduce at h3
   have e : ∀ a b, (∑ c, ∑ d, (P c a * Q b d) • E c d) = ∑ i, P i a • ∑ j, Q b j • E i j := by
     intro a b

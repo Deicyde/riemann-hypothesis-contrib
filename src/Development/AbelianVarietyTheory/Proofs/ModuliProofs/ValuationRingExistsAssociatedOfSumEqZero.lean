@@ -10,9 +10,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem valuationRing_exists_associated_of_sum_eq_zero {V ι : Type} [CommRing V] [IsDomain V]
-    [ValuationRing V] (f : ι → V) (s : Finset ι) (hs : s.Nonempty) (h0 : ∀ i ∈ s, f i ≠ 0)
-    (hsum : ∑ i ∈ s, f i = 0) : ∃ i ∈ s, ∃ j ∈ s, i ≠ j ∧ Associated (f i) (f j) := by
+theorem valuationRing_exists_associated_of_sum_eq_zero
+    {V ι : Type} [CommRing V] [IsDomain V] [ValuationRing V]
+    (f : ι → V) (s : Finset ι) (hs : s.Nonempty) (h0 : ∀ i ∈ s, f i ≠ 0) (hsum : ∑ i ∈ s, f i = 0)
+    : ∃ i ∈ s, ∃ j ∈ s, i ≠ j ∧ Associated (f i) (f j) := by
   classical
   obtain ⟨i, hi, h⟩ := valuationRing_exists_dvd_all f s hs
   by_contra hcon
@@ -34,19 +35,26 @@ theorem valuationRing_exists_associated_of_sum_eq_zero {V ι : Type} [CommRing V
     exact neg_mem (Ideal.sum_mem _ hm)
   exact (IsLocalRing.maximalIdeal.isMaximal V).ne_top ((Ideal.eq_top_iff_one _).2 h3)
 
-theorem valuationRing_exists_pow_eq (O K : Type) [CommRing O] [IsDomain O] [ValuationRing O]
-    [Field K] [IsAlgClosed K] [Algebra O K] [IsFractionRing O K] (c : O) {k : ℕ} (hk : 0 < k) :
-    ∃ r : O, r ^ k = c := by
+theorem valuationRing_exists_pow_eq
+    (O K : Type) [CommRing O] [IsDomain O] [ValuationRing O] [Field K] [IsAlgClosed K] [Algebra O K]
+    [IsFractionRing O K]
+    (c : O)
+    {k : ℕ} (hk : 0 < k)
+    : ∃ r : O, r ^ k = c := by
   obtain ⟨z, hz⟩ := IsAlgClosed.exists_pow_nat_eq (algebraMap O K c) hk
   have hint : IsIntegral O z := IsIntegral.of_pow hk (hz ▸ isIntegral_algebraMap)
   obtain ⟨r, rfl⟩ := (IsIntegrallyClosed.isIntegral_iff (K := K)).1 hint
   exact ⟨r, IsFractionRing.injective O K (by rw [map_pow, hz])⟩
 
-theorem associated_of_associated_mul_pow (O K V : Type) [CommRing O] [IsDomain O]
-    [ValuationRing O] [Field K] [IsAlgClosed K] [Algebra O K] [IsFractionRing O K]
-    [CommRing V] [IsDomain V] [ValuationRing V] (φ : O →+* V) (b : V) (hb : b ≠ 0) (p q : O)
-    {i j : ℕ} (hij : i < j) (hp : φ p ≠ 0) (hq : φ q ≠ 0)
-    (h : Associated (φ p * b ^ i) (φ q * b ^ j)) : ∃ π : O, Associated b (φ π) := by
+theorem associated_of_associated_mul_pow
+    (O K V : Type) [CommRing O] [IsDomain O] [ValuationRing O] [Field K] [IsAlgClosed K]
+    [Algebra O K] [IsFractionRing O K] [CommRing V] [IsDomain V] [ValuationRing V]
+    (φ : O →+* V)
+    (b : V) (hb : b ≠ 0)
+    (p q : O)
+    {i j : ℕ} (hij : i < j)
+    (hp : φ p ≠ 0) (hq : φ q ≠ 0) (h : Associated (φ p * b ^ i) (φ q * b ^ j))
+    : ∃ π : O, Associated b (φ π) := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_lt hij
   have h1 : Associated (φ p) (φ q * b ^ (k + 1)) := by
     refine Associated.of_mul_right (b := b ^ i) (d := b ^ i) ?_ (Associated.refl _)
@@ -57,7 +65,8 @@ theorem associated_of_associated_mul_pow (O K V : Type) [CommRing O] [IsDomain O
   · have h2 : Associated 1 (φ c * b ^ (k + 1)) := by
       refine Associated.of_mul_left (a := φ p) (c := φ p) ?_ (Associated.refl _) hp
       rwa [mul_one, ← mul_assoc, ← map_mul]
-    have h3 : IsUnit (b ^ (k + 1)) := isUnit_of_mul_isUnit_right (associated_one_iff_isUnit.1 h2.symm)
+    have h3 : IsUnit (b ^ (k + 1)) :=
+      isUnit_of_mul_isUnit_right (associated_one_iff_isUnit.1 h2.symm)
     refine ⟨1, ?_⟩
     rw [map_one, associated_one_iff_isUnit]
     exact (isUnit_pow_iff (Nat.succ_ne_zero k)).1 h3
@@ -68,17 +77,21 @@ theorem associated_of_associated_mul_pow (O K V : Type) [CommRing O] [IsDomain O
     rw [map_pow] at h2
     exact ⟨r, ((Associated.pow_iff (Nat.succ_ne_zero k)).1 h2).symm⟩
 
-theorem exists_associated_of_isAlgebraic (O K W V : Type) [CommRing O] [IsDomain O]
-    [ValuationRing O] [Field K] [IsAlgClosed K] [Algebra O K] [IsFractionRing O K]
-    [CommRing W] [CommRing V] [IsDomain V] [ValuationRing V] [Algebra W V] (ψ : O →+* W)
+theorem exists_associated_of_isAlgebraic
+    (O K W V : Type)
+    [CommRing O] [IsDomain O] [ValuationRing O] [Field K] [IsAlgClosed K] [Algebra O K]
+    [IsFractionRing O K] [CommRing W] [CommRing V] [IsDomain V] [ValuationRing V] [Algebra W V]
+    (ψ : O →+* W)
     (hinj : ∀ w : W, w ≠ 0 → algebraMap W V w ≠ 0)
-    (hW : ∀ w : W, w ≠ 0 → ∃ π : O, Associated w (ψ π)) (b : V) (hb : b ≠ 0)
-    (halg : IsAlgebraic W b) : ∃ π : O, Associated b (algebraMap W V (ψ π)) := by
+    (hW : ∀ w : W, w ≠ 0 → ∃ π : O, Associated w (ψ π))
+    (b : V) (hb : b ≠ 0) (halg : IsAlgebraic W b)
+    : ∃ π : O, Associated b (algebraMap W V (ψ π)) := by
   obtain ⟨P, hP, hPb⟩ := halg
   rw [Polynomial.aeval_def, Polynomial.eval₂_eq_sum, Polynomial.sum] at hPb
-  obtain ⟨i, hi, j, hj, hij, h⟩ := valuationRing_exists_associated_of_sum_eq_zero _ _
-    (Polynomial.support_nonempty.2 hP)
-    (fun i hi => mul_ne_zero (hinj _ (Polynomial.mem_support_iff.1 hi)) (pow_ne_zero _ hb)) hPb
+  obtain ⟨i, hi, j, hj, hij, h⟩ :=
+    valuationRing_exists_associated_of_sum_eq_zero _ _ (Polynomial.support_nonempty.2 hP)
+      (fun i hi => mul_ne_zero (hinj _ (Polynomial.mem_support_iff.1 hi)) (pow_ne_zero _ hb))
+      hPb
   have hi' := Polynomial.mem_support_iff.1 hi
   have hj' := Polynomial.mem_support_iff.1 hj
   obtain ⟨p, hp⟩ := hW _ hi'
@@ -93,9 +106,11 @@ theorem exists_associated_of_isAlgebraic (O K W V : Type) [CommRing O] [IsDomain
   · exact associated_of_associated_mul_pow O K V ((algebraMap W V).comp ψ) b hb q p hlt hq0 hp0
       h'.symm
 
-theorem dvd_of_dvd_mul_of_flat {A B : Type} [CommRing A] [CommRing B] [Algebra A B]
-    [Module.Flat A B] (t u : A) (h : ∀ F : A, t ∣ u * F → t ∣ F) (x : B)
-    (hx : algebraMap A B t ∣ algebraMap A B u * x) : algebraMap A B t ∣ x := by
+theorem dvd_of_dvd_mul_of_flat
+    {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Module.Flat A B]
+    (t u : A) (h : ∀ F : A, t ∣ u * F → t ∣ F)
+    (x : B) (hx : algebraMap A B t ∣ algebraMap A B u * x)
+    : algebraMap A B t ∣ x := by
   have hm : IsSMulRegular (A ⧸ Ideal.span {t}) u := by
     rw [isSMulRegular_iff_right_eq_zero_of_smul]
     intro y hy
@@ -121,21 +136,24 @@ theorem dvd_of_dvd_mul_of_flat {A B : Type} [CommRing A] [CommRing B] [Algebra A
     Algebra.TensorProduct.quotIdealMapEquivTensorQuot_mk, TensorProduct.smul_tmul',
     Algebra.smul_def]
 
-theorem map_liesOver_of_flat_of_isPrime {A B : Type} [CommRing A] [CommRing B] [Algebra A B]
-    [Module.Flat A B] (p : Ideal A) [p.IsPrime] [(p.map (algebraMap A B)).IsPrime] :
-    (p.map (algebraMap A B)).LiesOver p := by
-  obtain ⟨P, hP, _, hl⟩ := Ideal.exists_ideal_le_liesOver_of_le (p := p)
-    (q := (p.map (algebraMap A B)).under A) (p.map (algebraMap A B)) Ideal.le_comap_map
-  have : P = p.map (algebraMap A B) :=
-    le_antisymm hP (Ideal.map_le_iff_le_comap.2 hl.over.le)
+theorem map_liesOver_of_flat_of_isPrime
+    {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Module.Flat A B]
+    (p : Ideal A) [p.IsPrime] [(p.map (algebraMap A B)).IsPrime]
+    : (p.map (algebraMap A B)).LiesOver p := by
+  obtain ⟨P, hP, _, hl⟩ :=
+    Ideal.exists_ideal_le_liesOver_of_le (p := p) (q := (p.map (algebraMap A B)).under A)
+      (p.map (algebraMap A B)) Ideal.le_comap_map
+  have : P = p.map (algebraMap A B) := le_antisymm hP (Ideal.map_le_iff_le_comap.2 hl.over.le)
   exact this ▸ hl
 
-theorem gaussLocalization_exists_associated (O : Type) [CommRing O] [IsDomain O] [ValuationRing O]
+theorem gaussLocalization_exists_associated
+    (O : Type) [CommRing O] [IsDomain O] [ValuationRing O]
     (g : ℕ) (p : Ideal (MvPolynomial (Fin g) O)) [p.IsPrime]
     (hp : p = (IsLocalRing.maximalIdeal O).map (MvPolynomial.C : O →+* MvPolynomial (Fin g) O))
-    (w : Localization.AtPrime p) (hw : w ≠ 0) :
-    ∃ π : O, Associated w (algebraMap _ (Localization.AtPrime p)
-      (MvPolynomial.C π : MvPolynomial (Fin g) O)) := by
+    (w : Localization.AtPrime p) (hw : w ≠ 0)
+    : ∃ π : O,
+      Associated w
+        (algebraMap _ (Localization.AtPrime p) (MvPolynomial.C π : MvPolynomial (Fin g) O)) := by
   obtain ⟨⟨a, u⟩, rfl⟩ := IsLocalization.mk'_surjective p.primeCompl w
   have ha : a ≠ 0 := by
     rintro rfl
@@ -149,17 +167,26 @@ theorem gaussLocalization_exists_associated (O : Type) [CommRing O] [IsDomain O]
   rw [← IsLocalization.mul_mk'_eq_mk'_of_mul]
   exact (associated_mul_unit_left _ _ hu)
 
-theorem etale_mvPolynomial_exists_content :
-    ∀ (O K : Type) [CommRing O] [IsDomain O] [ValuationRing O] [Ring.DimensionLEOne O] [Field K] [IsAlgClosed K] [Algebra O K] [IsFractionRing O K] (g : ℕ) (B : Type) [CommRing B] [IsDomain B] [Algebra O B] [Algebra (MvPolynomial (Fin g) O) B] [IsScalarTower O (MvPolynomial (Fin g) O) B] [Algebra.Etale (MvPolynomial (Fin g) O) B], ((IsLocalRing.maximalIdeal O).map (algebraMap O B)).IsPrime → ∀ b : B, b ≠ 0 → ∃ (π : O) (b' : B), b = algebraMap O B π * b' ∧ b' ∉ (IsLocalRing.maximalIdeal O).map (algebraMap O B) := by
+theorem etale_mvPolynomial_exists_content
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [ValuationRing O] [Ring.DimensionLEOne O] [Field K]
+        [IsAlgClosed K] [Algebra O K] [IsFractionRing O K] (g : ℕ) (B : Type) [CommRing B]
+        [IsDomain B] [Algebra O B] [Algebra (MvPolynomial (Fin g) O) B]
+        [IsScalarTower O (MvPolynomial (Fin g) O) B] [Algebra.Etale (MvPolynomial (Fin g) O) B],
+      ((IsLocalRing.maximalIdeal O).map (algebraMap O B)).IsPrime
+        → ∀ b : B,
+          b ≠ 0
+            → ∃ (π : O) (b' : B),
+              b = algebraMap O B π * b'
+                ∧ b' ∉ (IsLocalRing.maximalIdeal O).map (algebraMap O B) := by
   intro O K _ _ _ _ _ _ _ _ g B _ _ _ _ _ _ hη b hb
   obtain ⟨hpp, -, hcanc⟩ := mvPolynomial_content_valuationRing O g
   set p := (IsLocalRing.maximalIdeal O).map (MvPolynomial.C : O →+* MvPolynomial (Fin g) O)
     with hp
-  have hC : ∀ π : O, algebraMap (MvPolynomial (Fin g) O) B (MvPolynomial.C π)
-      = algebraMap O B π := fun π =>
-    (IsScalarTower.algebraMap_apply O (MvPolynomial (Fin g) O) B π).symm
-  have hηp : (IsLocalRing.maximalIdeal O).map (algebraMap O B)
-      = p.map (algebraMap (MvPolynomial (Fin g) O) B) := by
+  have hC : ∀ π : O, algebraMap (MvPolynomial (Fin g) O) B (MvPolynomial.C π) = algebraMap O B π :=
+    fun π => (IsScalarTower.algebraMap_apply O (MvPolynomial (Fin g) O) B π).symm
+  have hηp
+      : (IsLocalRing.maximalIdeal O).map (algebraMap O B)
+        = p.map (algebraMap (MvPolynomial (Fin g) O) B) := by
     rw [hp, Ideal.map_map]
     congr 1
     exact RingHom.ext fun π => (hC π).symm
@@ -185,23 +212,27 @@ theorem etale_mvPolynomial_exists_content :
       rcases ValuationRing.dvd_total a c with h | h
       · left; exact (ha.dvd.trans (map_dvd _ (map_dvd _ h))).trans hc.symm.dvd
       · right; exact (hc.dvd.trans (map_dvd _ (map_dvd _ h))).trans ha.symm.dvd
-    obtain ⟨hV, halg⟩ := GlobalTheory.valuationRing_of_flat_of_formallyUnramified (Localization.AtPrime p) (Localization.AtPrime η)
+    obtain ⟨hV, halg⟩ :=
+      GlobalTheory.valuationRing_of_flat_of_formallyUnramified (Localization.AtPrime p)
+        (Localization.AtPrime η)
     have hBinj : Function.Injective (algebraMap B (Localization.AtPrime η)) :=
       IsLocalization.injective _ η.primeCompl_le_nonZeroDivisors
-    obtain ⟨π, hπ⟩ := exists_associated_of_isAlgebraic O K (Localization.AtPrime p)
-      (Localization.AtPrime η)
-      ((algebraMap (MvPolynomial (Fin g) O) (Localization.AtPrime p)).comp MvPolynomial.C)
-      (fun w hw h0 => by
-        have := Module.Flat.isSMulRegular_of_nonZeroDivisors (M := Localization.AtPrime η)
-          (mem_nonZeroDivisors_of_ne_zero hw)
-        exact one_ne_zero (this.right_eq_zero_of_smul (by rw [Algebra.smul_def, h0, zero_mul])))
-      hW (algebraMap B _ b) (fun h => hb (hBinj (h.trans (map_zero _).symm)))
-      (halg.isAlgebraic _)
+    obtain ⟨π, hπ⟩ :=
+      exists_associated_of_isAlgebraic O K (Localization.AtPrime p) (Localization.AtPrime η)
+        ((algebraMap (MvPolynomial (Fin g) O) (Localization.AtPrime p)).comp MvPolynomial.C)
+        (fun w hw h0 => by
+          have :=
+            Module.Flat.isSMulRegular_of_nonZeroDivisors (M := Localization.AtPrime η)
+              (mem_nonZeroDivisors_of_ne_zero hw)
+          exact one_ne_zero (this.right_eq_zero_of_smul (by rw [Algebra.smul_def, h0, zero_mul])))
+        hW (algebraMap B _ b)
+        (fun h => hb (hBinj (h.trans (map_zero _).symm)))
+        (halg.isAlgebraic _)
     rw [RingHom.comp_apply, ← IsScalarTower.algebraMap_apply,
-      IsScalarTower.algebraMap_apply (MvPolynomial (Fin g) O) B (Localization.AtPrime η), hC] at hπ
+        IsScalarTower.algebraMap_apply (MvPolynomial (Fin g) O) B (Localization.AtPrime η), hC]
+      at hπ
     obtain ⟨v, hv⟩ := hπ
-    obtain ⟨⟨s, t⟩, hst⟩ := IsLocalization.mk'_surjective η.primeCompl
-      (v : Localization.AtPrime η)
+    obtain ⟨⟨s, t⟩, hst⟩ := IsLocalization.mk'_surjective η.primeCompl (v : Localization.AtPrime η)
     simp only at hst
     have hs : s ∈ η.primeCompl :=
       (IsLocalization.AtPrime.isUnit_mk'_iff (Localization.AtPrime η) η s t).1 (hst ▸ v.isUnit)
@@ -224,9 +255,9 @@ theorem etale_mvPolynomial_exists_content :
       have hπQ : algebraMap O B π ∈ Q := hle (Ideal.subset_span (by simp))
       have hmax : (Q.comap (algebraMap O B)).IsMaximal :=
         Ring.DimensionLEOne.maximalOfPrime
-          (fun h => hπ0 (by rw [← Ideal.mem_bot, ← h]; exact hπQ)) inferInstance
-      have hηQ : η ≤ Q := by
-        rw [← hηp, Ideal.map_le_iff_le_comap, IsLocalRing.eq_maximalIdeal hmax]
+          (fun h => hπ0 (by rw [← Ideal.mem_bot, ← h]; exact hπQ))
+          inferInstance
+      have hηQ : η ≤ Q := by rw [← hηp, Ideal.map_le_iff_le_comap, IsLocalRing.eq_maximalIdeal hmax]
       have hunder : η.under (MvPolynomial (Fin g) O) = Q.under (MvPolynomial (Fin g) O) := by
         refine le_antisymm (Ideal.comap_mono hηQ) fun x hx => ?_
         rw [← hlo.over]
@@ -246,7 +277,8 @@ theorem etale_mvPolynomial_exists_content :
   refine ⟨π, b', rfl, fun hb' => ht ?_⟩
   have : s * b' = t := by
     apply mul_left_cancel₀ (left_ne_zero_of_mul hb)
-    rw [← hst]; ring
+    rw [← hst]
+    ring
   rw [← this]
   exact η.mul_mem_left _ hb'
 

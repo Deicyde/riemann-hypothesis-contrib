@@ -10,12 +10,14 @@ public import Development.AbelianVarietyTheory.BlockTheory.AdelicCMFields.Unitar
 open UpperTheory.ConvolutionTheory.R
 
 open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.CuspRep PositivityTheory.RgJS in
-theorem UpperTheory.ConvolutionTheory.R.sysEx :
-    SysEx := by
+theorem UpperTheory.ConvolutionTheory.R.sysEx : SysEx := by
   intro E _ _ _ X hfin hX
   classical
-  have hRSU : RSU := rankin_selberg_unitary_of_pole norm_exponent_equality satake_twist_holds PositivityTheory.AdelicQuotientData.rsPole
-  have hBd : GlobalTheory.Published.JacquetShalikaBound := PositivityTheory.JacquetShalikaLocal.jacquetShalikaBound
+  have hRSU : RSU :=
+    rankin_selberg_unitary_of_pole norm_exponent_equality satake_twist_holds
+      PositivityTheory.AdelicQuotientData.rsPole
+  have hBd : GlobalTheory.Published.JacquetShalikaBound :=
+    PositivityTheory.JacquetShalikaLocal.jacquetShalikaBound
   have hDO : DetOne := determinant_one_condition_holds
   have hPO : PrimeOff := prime_sum_converges_and_diverges
   have : Fintype X := hfin.fintype
@@ -23,8 +25,13 @@ theorem UpperTheory.ConvolutionTheory.R.sysEx :
     hRSU E x.1.1 y.1.1 x.1.2 y.1.2 (hX x x.2).1 (hX y y.2).1 (hX x x.2).2.1 (hX y y.2).2.1
   have hw : ∀ᶠ w in Filter.cofinite, ∀ x : X, ∃ B, x.1.2.HasSat w B :=
     Filter.eventually_all.2 fun x => (hX x x.2).2.2
-  refine ⟨(Filter.eventually_cofinite.1 hw).toFinset ∪ Finset.univ.biUnion (fun p : X × X => S0 p.1 p.2), fun S hS => ?_⟩
-  have hex : ∀ (x : X) (w : Off E S), ∃ f : Fin x.1.1 → ℂˣ, x.1.2.HasSat w.1 (Finset.univ.val.map f) := by
+  refine ⟨
+    (Filter.eventually_cofinite.1 hw).toFinset ∪ Finset.univ.biUnion (fun p : X × X => S0 p.1 p.2),
+    fun S hS => ?_
+  ⟩
+  have hex
+      : ∀ (x : X) (w : Off E S), ∃ f : Fin x.1.1 → ℂˣ,
+        x.1.2.HasSat w.1 (Finset.univ.val.map f) := by
     intro x w
     have h : ∀ x : X, ∃ B, x.1.2.HasSat w.1 B := by
       by_contra h
@@ -36,8 +43,9 @@ theorem UpperTheory.ConvolutionTheory.R.sysEx :
   have hsub : ∀ x y : X, S0 x y ⊆ S := fun x y z hz =>
     hS (Finset.mem_union_right _ (Finset.mem_biUnion.2 ⟨(x, y), Finset.mem_univ _, hz⟩))
   refine ⟨α, hα, hPO E S, fun x => (hX x x.2).1, fun x w a => ?_, fun x w => ?_, fun x y => ?_⟩
-  · have h := (hBd E x.1.1 x.1.2 (hX x x.2).2.1 w.1 _ (hα x w) (α x w a)
-      (Multiset.mem_map_of_mem _ (Finset.mem_univ_val _))).2
+  · have h :=
+      (hBd E x.1.1 x.1.2 (hX x x.2).2.1 w.1 _ (hα x w) (α x w a)
+        (Multiset.mem_map_of_mem _ (Finset.mem_univ_val _))).2
     show ‖((α x w a : ℂˣ) : ℂ)‖ ≤ Real.sqrt ((Ideal.absNorm w.1.asIdeal : ℕ) : ℝ)
     rw [Real.sqrt_eq_rpow]
     exact h.le

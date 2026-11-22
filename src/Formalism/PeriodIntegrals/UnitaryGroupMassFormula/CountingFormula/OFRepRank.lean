@@ -9,7 +9,8 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.CntFormula
 
-open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
+open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
 open Classical
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -37,9 +38,9 @@ theorem rank_gram : RankG := by
     have hBB : B * B⁻¹ = 1 := Matrix.mul_nonsing_inv B (isUnit_iff_ne_zero.2 hBdet)
     ext a i
     rw [← hBB]
-    simp only [Matrix.mul_apply, betaZ, Matrix.submatrix_apply, Matrix.of_apply, Fin.sum_univ_castSucc,
-      Fin.coe_castSucc, Fin.is_lt, dif_pos, Fin.val_last, lt_irrefl, not_false_eq_true, dif_neg, mul_zero,
-      add_zero, id]
+    simp only [Matrix.mul_apply, betaZ, Matrix.submatrix_apply, Matrix.of_apply,
+      Fin.sum_univ_castSucc, Fin.coe_castSucc, Fin.is_lt, dif_pos, Fin.val_last, lt_irrefl,
+      not_false_eq_true, dif_neg, mul_zero, add_zero, id]
     rfl
   · refine ⟨(Z⁻¹).submatrix id Fin.castSucc, ?_⟩
     have hZ : Z * Z⁻¹ = 1 := Matrix.mul_nonsing_inv Z (isUnit_iff_ne_zero.2 hdet)

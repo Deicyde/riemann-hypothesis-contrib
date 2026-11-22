@@ -41,10 +41,12 @@ theorem prSurj : PrSurj := by
       simp [mul_inv_rev]
     have hTm : MeasurableSet ((fun x : B => b0'⁻¹ * x) ⁻¹' S) :=
       (hSo.preimage (continuous_const.mul continuous_id)).measurableSet
-    have hint : (fun b : B => (χ b : ℂ) * (if ((b:G)⁻¹ * (b0 * k0)) ∈ K then c * φ ((b:G)⁻¹ * (b0*k0)) else 0))
-        = ((fun x : B => b0'⁻¹ * x) ⁻¹' S).indicator (fun _ => c * φ (b0 * k0)) := by
+    have hint
+        : (fun b : B =>
+            (χ b : ℂ) * (if ((b : G)⁻¹ * (b0 * k0)) ∈ K then c * φ ((b : G)⁻¹ * (b0 * k0)) else 0))
+          = ((fun x : B => b0'⁻¹ * x) ⁻¹' S).indicator (fun _ => c * φ (b0 * k0)) := by
       funext b
-      by_cases h : ((b:G)⁻¹ * (b0 * k0)) ∈ K
+      by_cases h : ((b : G)⁻¹ * (b0 * k0)) ∈ K
       · rw [if_pos h, Set.indicator_of_mem ((key b).1 h)]
         have h1 := hφB b⁻¹ (b0 * k0)
         rw [Subgroup.coe_inv] at h1

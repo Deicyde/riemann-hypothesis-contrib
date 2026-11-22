@@ -12,8 +12,9 @@ namespace GlobalTheory.FlatPair
 
 open NumberField ReciprocityTheory.ChartRestriction.G.FD
 
-theorem holAlg_isDomain : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
-    X.dom.Nonempty → IsDomain (GlobalTheory.FlatPair.holAlg X) := by
+theorem holAlg_isDomain
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
+      X.dom.Nonempty → IsDomain (GlobalTheory.FlatPair.holAlg X) := by
   intro E _ _ _ r X hne
   obtain ⟨y0, hy0⟩ := hne
   haveI : Nontrivial (holAlg X) := ⟨⟨0, 1, fun h => by

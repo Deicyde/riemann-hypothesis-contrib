@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsI
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct GlobalTheory.HWL
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct GlobalTheory.HWL
 
 noncomputable section
 
@@ -20,7 +21,8 @@ namespace GlobalTheory.HWL.Coord
 
 variable {l : ℕ} [hl : Fact l.Prime]
 
-def large₂ (u : ℤ_[l]ˣ) : ℚ_[l] := Formalism.MainNotions.LocalSituation.logZl l ((u : ℤ_[l]) : ℚ_[l])
+def large₂ (u : ℤ_[l]ˣ) : ℚ_[l] :=
+  Formalism.MainNotions.LocalSituation.logZl l ((u : ℤ_[l]) : ℚ_[l])
 
 theorem norm_coe_unit (u : ℤ_[l]ˣ) : ‖((u : ℤ_[l]) : ℚ_[l])‖ = 1 := PadicInt.norm_units u
 
@@ -33,7 +35,7 @@ theorem Lg_one : large₂ (1 : ℤ_[l]ˣ) = 0 := by
   rw [mul_one] at this
   linear_combination -this
 
-theorem Lg_inv (u : ℤ_[l]ˣ) : large₂ u⁻¹ = -large₂ u := by
+theorem Lg_inv (u : ℤ_[l]ˣ) : large₂ u⁻¹ = - large₂ u := by
   have := Lg_mul u u⁻¹
   rw [mul_inv_cancel, Lg_one] at this
   linear_combination -this
@@ -47,8 +49,10 @@ theorem continuous_Lg : Continuous (large₂ (l := l)) :=
   (GlobalTheory.PadicLogUnits.logZl_hom l).2.1.comp_continuous
     (continuous_subtype_val.comp (Units.continuous_val (M := ℤ_[l]))) norm_coe_unit
 
-theorem norm_Lg {j : ℕ} (h1 : 1 ≤ j) (h2 : l = 2 → 2 ≤ j) (u : ℤ_[l]ˣ)
-    (hu : ‖(u : ℤ_[l]) - 1‖ ≤ (l : ℝ) ^ (-(j : ℤ))) : ‖large₂ u‖ = ‖(u : ℤ_[l]) - 1‖ :=
+theorem norm_Lg
+    {j : ℕ} (h1 : 1 ≤ j) (h2 : l = 2 → 2 ≤ j)
+    (u : ℤ_[l]ˣ) (hu : ‖(u : ℤ_[l]) - 1‖ ≤ (l : ℝ) ^ (-(j : ℤ)))
+    : ‖large₂ u‖ = ‖(u : ℤ_[l]) - 1‖ :=
   (GlobalTheory.PadicLogUnits.logZl_hom l).2.2.2 j h1 h2 _ hu
 
 theorem Lg_eq_zero_iff (u : ℤ_[l]ˣ) : large₂ u = 0 ↔ ∃ k : ℕ, 0 < k ∧ u ^ k = 1 := by
@@ -56,8 +60,10 @@ theorem Lg_eq_zero_iff (u : ℤ_[l]ˣ) : large₂ u = 0 ↔ ∃ k : ℕ, 0 < k �
   · intro h
     have h2 := hl.out.two_le
     refine ⟨l * (l - 1), Nat.mul_pos (by omega) (by omega), ?_⟩
-    have h3 := norm_Lg (j := 2) (by norm_num) (fun _ => le_rfl) (u ^ (l * (l - 1)))
-      (GlobalTheory.PadicLogUnits.norm_unit_pow_sub_one (norm_coe_unit u))
+    have h3 :=
+      norm_Lg (j := 2) (by norm_num)
+        (fun _ => le_rfl)
+        (u ^ (l * (l - 1))) (GlobalTheory.PadicLogUnits.norm_unit_pow_sub_one (norm_coe_unit u))
     rw [Lg_pow, h, mul_zero, norm_zero, eq_comm, norm_eq_zero, sub_eq_zero] at h3
     exact Units.ext h3
   · rintro ⟨k, hk, h⟩
@@ -65,12 +71,11 @@ theorem Lg_eq_zero_iff (u : ℤ_[l]ˣ) : large₂ u = 0 ↔ ∃ k : ℕ, 0 < k �
     rw [h, Lg_one, eq_comm, mul_eq_zero] at this
     exact this.resolve_left (by exact_mod_cast hk.ne')
 
-theorem norm_le_iff_dvd (x : ℤ_[l]) (j : ℕ) :
-    ‖x‖ ≤ (l : ℝ) ^ (-(j : ℤ)) ↔ (l : ℤ_[l]) ^ j ∣ x := by
+theorem norm_le_iff_dvd (x : ℤ_[l]) (j : ℕ) : ‖x‖ ≤ (l : ℝ) ^ (-(j : ℤ)) ↔ (l : ℤ_[l]) ^ j ∣ x := by
   rw [PadicInt.norm_le_pow_iff_mem_span_pow, Ideal.mem_span_singleton]
 
-theorem exists_teich (a : ℤ_[l]ˣ) :
-    ∃ z : ℤ_[l]ˣ, z ^ (l - 1) = 1 ∧ (l : ℤ_[l]) ∣ ((a * z⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
+theorem exists_teich (a : ℤ_[l]ˣ)
+    : ∃ z : ℤ_[l]ˣ, z ^ (l - 1) = 1 ∧ (l : ℤ_[l]) ∣ ((a * z⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
   have h2 := hl.out.two_le
   have hF : (l : ℤ_[l]) ∣ (a : ℤ_[l]) ^ (l - 1) - 1 := by
     rw [← Ideal.mem_span_singleton, ← PadicInt.maximalIdeal_eq_span_p, ← PadicInt.ker_toZMod,
@@ -79,12 +84,14 @@ theorem exists_teich (a : ℤ_[l]ˣ) :
   have hd : ‖(((l - 1 : ℕ) : ℤ_[l]))‖ = 1 := by
     have := GlobalTheory.PadicLogUnits.norm_sub_one (l := l)
     rw [PadicInt.norm_def, PadicInt.coe_natCast, Nat.cast_sub hl.out.one_le, Nat.cast_one, this]
-  obtain ⟨z, hz, hza, -⟩ := hensels_lemma (p := l)
-    (F := (Polynomial.X ^ (l - 1) - 1 : Polynomial ℤ_[l])) (a := (a : ℤ_[l])) (by
-      simp only [map_sub, map_pow, Polynomial.aeval_X, map_one, Polynomial.derivative_sub,
-        Polynomial.derivative_X_pow, Polynomial.derivative_one, sub_zero, map_mul, Polynomial.aeval_C,
-        Algebra.algebraMap_self, RingHom.id_apply, norm_mul, norm_pow, PadicInt.norm_units, hd]
-      simpa using (PadicInt.norm_lt_one_iff_dvd _).2 hF)
+  obtain ⟨z, hz, hza, -⟩ :=
+    hensels_lemma (p := l) (F := (Polynomial.X ^ (l - 1) - 1 : Polynomial ℤ_[l])) (a := (a : ℤ_[l]))
+      (by
+        simp only [map_sub, map_pow, Polynomial.aeval_X, map_one, Polynomial.derivative_sub,
+          Polynomial.derivative_X_pow, Polynomial.derivative_one, sub_zero, map_mul,
+          Polynomial.aeval_C, Algebra.algebraMap_self, RingHom.id_apply, norm_mul, norm_pow,
+          PadicInt.norm_units, hd]
+        simpa using (PadicInt.norm_lt_one_iff_dvd _).2 hF)
   simp only [map_sub, map_pow, Polynomial.aeval_X, map_one, sub_eq_zero] at hz
   have hzu : IsUnit z := IsUnit.of_pow_eq_one hz (by omega)
   obtain ⟨w, rfl⟩ := hzu
@@ -100,9 +107,11 @@ section Sub
 
 variable {S : Subgroup ℤ_[l]ˣ} {s d : ℕ}
 
-theorem dvd_pow_sub_one (hS : ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ s ∣ (u : ℤ_[l]) - 1 → u ∈ S)
-    (hd : ∀ z ∈ S, (∃ k : ℕ, 0 < k ∧ z ^ k = 1) → z ^ d = 1) {a : ℤ_[l]ˣ} (ha : a ∈ S) :
-    (l : ℤ_[l]) ∣ ((a ^ d : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
+theorem dvd_pow_sub_one
+    (hS : ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ s ∣ (u : ℤ_[l]) - 1 → u ∈ S)
+    (hd : ∀ z ∈ S, (∃ k : ℕ, 0 < k ∧ z ^ k = 1) → z ^ d = 1)
+    {a : ℤ_[l]ˣ} (ha : a ∈ S)
+    : (l : ℤ_[l]) ∣ ((a ^ d : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
   have h2 := hl.out.two_le
   obtain ⟨z, hz, haz⟩ := exists_teich a
   have hzl : ∀ m : ℕ, z ^ (l ^ m) = z := by
@@ -129,18 +138,23 @@ theorem dvd_pow_sub_one (hS : ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ s ∣ (u : ℤ_
   rw [one_pow] at this
   exact haz.trans this
 
-theorem mem_of_norm_Lg_lt {j : ℕ} (h1 : 1 ≤ j) (h2 : l = 2 → 2 ≤ j)
-    (hS : ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ s ∣ (u : ℤ_[l]) - 1 → u ∈ S) {b c : ℤ_[l]ˣ} (hb : b ∈ S)
-    (hbj : (l : ℤ_[l]) ^ j ∣ (b : ℤ_[l]) - 1) (hcj : (l : ℤ_[l]) ^ j ∣ (c : ℤ_[l]) - 1)
-    (hlt : ‖large₂ c‖ < ‖large₂ b‖) : c ∈ S := by
+theorem mem_of_norm_Lg_lt
+    {j : ℕ} (h1 : 1 ≤ j) (h2 : l = 2 → 2 ≤ j)
+    (hS : ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ s ∣ (u : ℤ_[l]) - 1 → u ∈ S)
+    {b c : ℤ_[l]ˣ} (hb : b ∈ S) (hbj : (l : ℤ_[l]) ^ j ∣ (b : ℤ_[l]) - 1)
+    (hcj : (l : ℤ_[l]) ^ j ∣ (c : ℤ_[l]) - 1) (hlt : ‖large₂ c‖ < ‖large₂ b‖)
+    : c ∈ S := by
   have hb0 : large₂ b ≠ 0 := norm_pos_iff.1 ((norm_nonneg _).trans_lt hlt)
-  let t : ℤ_[l] := ⟨large₂ c / large₂ b, by
-    rw [PadicInt.mem_subring_iff, norm_div]; exact div_le_one_of_le₀ hlt.le (norm_nonneg _)⟩
+  let t : ℤ_[l] := ⟨
+    large₂ c / large₂ b,
+    by rw [PadicInt.mem_subring_iff, norm_div]; exact div_le_one_of_le₀ hlt.le (norm_nonneg _)
+  ⟩
   have ht := (PadicInt.norm_le_pow_iff_mem_span_pow _ s).2 (PadicInt.appr_spec s t)
   set n := t.appr s
   have hj : (l : ℤ_[l]) ^ j ∣ ((c * (b ^ n)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
-    have e : ((c * (b ^ n)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) - 1 =
-        (((c : ℤ_[l]) - 1) - ((b : ℤ_[l]) ^ n - 1 ^ n)) * (((b ^ n)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) := by
+    have e
+        : ((c * (b ^ n)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) - 1
+          = (((c : ℤ_[l]) - 1) - ((b : ℤ_[l]) ^ n - 1 ^ n)) * (((b ^ n)⁻¹ : ℤ_[l]ˣ) : ℤ_[l]) := by
       rw [Units.val_mul, ← Units.val_pow_eq_pow_val, one_pow]
       linear_combination (b ^ n).mul_inv
     rw [e]
@@ -160,11 +174,11 @@ theorem mem_of_norm_Lg_lt {j : ℕ} (h1 : 1 ≤ j) (h2 : l = 2 → 2 ≤ j)
   have := S.mul_mem h4 (S.pow_mem hb n)
   rwa [inv_mul_cancel_right] at this
 
-theorem two_adic_cases (h : l = 2) (u : ℤ_[l]ˣ) :
-    (l : ℤ_[l]) ^ 2 ∣ (u : ℤ_[l]) - 1 ∨ (l : ℤ_[l]) ^ 2 ∣ ((-u : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
+theorem two_adic_cases (h : l = 2) (u : ℤ_[l]ˣ)
+    : (l : ℤ_[l]) ^ 2 ∣ (u : ℤ_[l]) - 1 ∨ (l : ℤ_[l]) ^ 2 ∣ ((-u : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
   obtain ⟨v, hv⟩ := u.isUnit.map (PadicInt.toZModPow (p := l) 2)
-  simp only [← Ideal.mem_span_singleton, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, map_one,
-    Units.val_neg, map_neg, ← hv]
+  simp only [← Ideal.mem_span_singleton, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub,
+    map_one, Units.val_neg, map_neg, ← hv]
   clear hv
   subst h
   revert v
@@ -174,17 +188,23 @@ theorem Lg_neg (u : ℤ_[l]ˣ) : large₂ (-u) = large₂ u := by
   have h : large₂ (-1 : ℤ_[l]ˣ) = 0 := (Lg_eq_zero_iff _).2 ⟨2, by norm_num, by simp⟩
   rw [← neg_one_mul, Lg_mul, h, zero_add]
 
-theorem norm_Lg_le_of_max (hS : ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ s ∣ (u : ℤ_[l]) - 1 → u ∈ S)
-    (hd0 : d ≠ 0) (hd : ∀ z ∈ S, (∃ k : ℕ, 0 < k ∧ z ^ k = 1) → z ^ d = 1) {a : ℤ_[l]ˣ} (ha : a ∈ S)
+theorem norm_Lg_le_of_max
+    (hS : ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ s ∣ (u : ℤ_[l]) - 1 → u ∈ S) (hd0 : d ≠ 0)
+    (hd : ∀ z ∈ S, (∃ k : ℕ, 0 < k ∧ z ^ k = 1) → z ^ d = 1)
+    {a : ℤ_[l]ˣ} (ha : a ∈ S)
     (hmax : ∀ b ∈ S, ‖((b ^ d : ℤ_[l]ˣ) : ℤ_[l]) - 1‖ ≤ ‖((a ^ d : ℤ_[l]ˣ) : ℤ_[l]) - 1‖)
-    {b : ℤ_[l]ˣ} (hb : b ∈ S) : ‖large₂ b‖ ≤ ‖large₂ a‖ := by
-  have main : ∀ j : ℕ, 1 ≤ j → (l = 2 → 2 ≤ j) →
-      (l : ℤ_[l]) ^ j ∣ ((a ^ d : ℤ_[l]ˣ) : ℤ_[l]) - 1 → ‖large₂ b‖ ≤ ‖large₂ a‖ := by
+    {b : ℤ_[l]ˣ} (hb : b ∈ S)
+    : ‖large₂ b‖ ≤ ‖large₂ a‖ := by
+  have main
+      : ∀ j : ℕ,
+        1 ≤ j → (l = 2 → 2 ≤ j) → (l : ℤ_[l]) ^ j ∣ ((a ^ d : ℤ_[l]ˣ) : ℤ_[l]) - 1
+          → ‖large₂ b‖ ≤ ‖large₂ a‖ := by
     intro j h1 h2 hj
     rw [← norm_le_iff_dvd] at hj
     have h3 := hmax b hb
     rw [← norm_Lg h1 h2 _ hj, ← norm_Lg h1 h2 _ ((hmax b hb).trans hj), Lg_pow, Lg_pow, norm_mul,
-      norm_mul] at h3
+        norm_mul]
+      at h3
     have h4 : 0 < ‖(d : ℚ_[l])‖ := norm_pos_iff.2 (by exact_mod_cast hd0)
     exact le_of_mul_le_mul_left h3 h4
   by_cases h : l = 2
@@ -192,8 +212,9 @@ theorem norm_Lg_le_of_max (hS : ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ s ∣ (u : �
   · exact main 1 le_rfl (fun h' => absurd h' h) (by rw [pow_one]; exact dvd_pow_sub_one hS hd ha)
   by_cases h4 : (l : ℤ_[l]) ^ 2 ∣ ((a ^ d : ℤ_[l]ˣ) : ℤ_[l]) - 1
   · exact main 2 (by norm_num) (fun _ => le_rfl) h4
-  have hdv : ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ 2 ∣ (u : ℤ_[l]) - 1 →
-      (l : ℤ_[l]) ^ 2 ∣ ((u ^ d : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
+  have hdv
+      : ∀ u : ℤ_[l]ˣ,
+        (l : ℤ_[l]) ^ 2 ∣ (u : ℤ_[l]) - 1 → (l : ℤ_[l]) ^ 2 ∣ ((u ^ d : ℤ_[l]ˣ) : ℤ_[l]) - 1 := by
     intro u hu
     have := sub_dvd_pow_sub_pow (u : ℤ_[l]) 1 d
     rw [one_pow] at this
@@ -205,8 +226,10 @@ theorem norm_Lg_le_of_max (hS : ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ s ∣ (u : �
     rcases two_adic_cases h b with hb' | hb'
     · exact mem_of_norm_Lg_lt (by norm_num) (fun _ => le_rfl) hS hb hb' ha' (by rwa [Lg_neg])
     · refine mem_of_norm_Lg_lt (by norm_num) (fun _ => le_rfl) hS (S.mul_mem hb ha) ?_ ha' ?_
-      · have e : ((b * a : ℤ_[l]ˣ) : ℤ_[l]) - 1 = (((-b : ℤ_[l]ˣ) : ℤ_[l]) - 1) * ((-a : ℤ_[l]ˣ) : ℤ_[l]) +
-            (((-a : ℤ_[l]ˣ) : ℤ_[l]) - 1) := by
+      · have e
+            : ((b * a : ℤ_[l]ˣ) : ℤ_[l]) - 1
+              = (((-b : ℤ_[l]ˣ) : ℤ_[l]) - 1) * ((-a : ℤ_[l]ˣ) : ℤ_[l])
+                + (((-a : ℤ_[l]ˣ) : ℤ_[l]) - 1) := by
           simp only [Units.val_mul, Units.val_neg]; ring
         rw [e]
         exact dvd_add (hb'.mul_right _) ha'
@@ -222,18 +245,28 @@ theorem norm_Lg_le_of_max (hS : ∀ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ s ∣ (u : �
 
 end Sub
 
-theorem exists_coord {G : Type} [Group G] [TopologicalSpace G] (χ : G →* ℤ_[l]ˣ) (hχ : Continuous χ)
-    (g₀ : G) (h0 : large₂ (χ g₀) ≠ 0) (hle : ∀ g, ‖large₂ (χ g)‖ ≤ ‖large₂ (χ g₀)‖) :
-    ∃ lam : G →* Multiplicative ℤ_[l], Continuous lam ∧ (∀ g, lam g = 1 ↔ large₂ (χ g) = 0) ∧
-      ∀ g, lam g = Multiplicative.ofAdd 1 ↔ large₂ (χ g) = large₂ (χ g₀) := by
-  let f : G → ℤ_[l] := fun g => ⟨large₂ (χ g) / large₂ (χ g₀), by
-    rw [PadicInt.mem_subring_iff, norm_div]; exact div_le_one_of_le₀ (hle g) (norm_nonneg _)⟩
+theorem exists_coord
+    {G : Type} [Group G] [TopologicalSpace G]
+    (χ : G →* ℤ_[l]ˣ) (hχ : Continuous χ)
+    (g₀ : G) (h0 : large₂ (χ g₀) ≠ 0) (hle : ∀ g, ‖large₂ (χ g)‖ ≤ ‖large₂ (χ g₀)‖)
+    : ∃ lam : G →* Multiplicative ℤ_[l],
+      Continuous lam ∧ (∀ g, lam g = 1 ↔ large₂ (χ g) = 0)
+        ∧ ∀ g, lam g = Multiplicative.ofAdd 1 ↔ large₂ (χ g) = large₂ (χ g₀) := by
+  let f : G → ℤ_[l] := fun g => ⟨
+    large₂ (χ g) / large₂ (χ g₀),
+    by rw [PadicInt.mem_subring_iff, norm_div]; exact div_le_one_of_le₀ (hle g) (norm_nonneg _)
+  ⟩
   have hf : Continuous f := ((continuous_Lg.comp hχ).div_const _).subtype_mk _
-  refine ⟨MonoidHom.mk' (fun g => Multiplicative.ofAdd (f g)) fun a b => ?_,
-    continuous_ofAdd.comp hf, fun g => ?_, fun g => ?_⟩
+  refine ⟨
+    MonoidHom.mk' (fun g => Multiplicative.ofAdd (f g)) fun a b => ?_,
+    continuous_ofAdd.comp hf,
+    fun g => ?_,
+    fun g => ?_
+  ⟩
   · rw [← ofAdd_add]
     refine congrArg _ (Subtype.ext ?_)
-    change large₂ (χ (a * b)) / large₂ (χ g₀) = large₂ (χ a) / large₂ (χ g₀) + large₂ (χ b) / large₂ (χ g₀)
+    change large₂ (χ (a * b)) / large₂ (χ g₀)
+      = large₂ (χ a) / large₂ (χ g₀) + large₂ (χ b) / large₂ (χ g₀)
     rw [map_mul, Lg_mul, add_div]
   · rw [MonoidHom.mk'_apply, ofAdd_eq_one]
     refine Subtype.ext_iff.trans ?_
@@ -244,35 +277,47 @@ theorem exists_coord {G : Type} [Group G] [TopologicalSpace G] (χ : G →* ℤ_
     change large₂ (χ g) / large₂ (χ g₀) = 1 ↔ _
     rw [div_eq_one_iff_eq h0]
 
-theorem norm_algebraMap_ext (LL : FinExt l) (x : ℚ_[l]) :
-    ‖((algebraMap ℚ_[l] ↥LL.1 x : ↥LL.1) : Om l)‖ = ‖x‖ := by
+theorem norm_algebraMap_ext (LL : FinExt l) (x : ℚ_[l])
+    : ‖((algebraMap ℚ_[l] ↥LL.1 x : ↥LL.1) : Om l)‖ = ‖x‖ := by
   change ‖algebraMap ℚ_[l] (Om l) x‖ = ‖x‖
   exact norm_algebraMap' _ x
 
-theorem v_eq_iff (P : LocPrime l) (LL : FinExt l) (x : ℚ_[l]) (j : ℤ) :
-    P.v LL (algebraMap ℚ_[l] ↥LL.1 x) = ((j : ℚ) : WithTop ℚ) ↔ ‖x‖ = (l : ℝ) ^ (-j) := by
+theorem v_eq_iff (P : LocPrime l) (LL : FinExt l) (x : ℚ_[l]) (j : ℤ)
+    : P.v LL (algebraMap ℚ_[l] ↥LL.1 x) = ((j : ℚ) : WithTop ℚ) ↔ ‖x‖ = (l : ℝ) ^ (-j) := by
   rw [(NormVal.locPrime_v_normalised l P LL).1, norm_algebraMap_ext, Rat.cast_intCast,
     ← Int.cast_neg, Real.rpow_intCast]
 
-theorem le_v_iff (P : LocPrime l) (LL : FinExt l) (x : ℚ_[l]) (j : ℤ) :
-    ((j : ℚ) : WithTop ℚ) ≤ P.v LL (algebraMap ℚ_[l] ↥LL.1 x) ↔ ‖x‖ ≤ (l : ℝ) ^ (-j) := by
+theorem le_v_iff (P : LocPrime l) (LL : FinExt l) (x : ℚ_[l]) (j : ℤ)
+    : ((j : ℚ) : WithTop ℚ) ≤ P.v LL (algebraMap ℚ_[l] ↥LL.1 x) ↔ ‖x‖ ≤ (l : ℝ) ^ (-j) := by
   rw [(NormVal.locPrime_v_normalised l P LL).2.1, norm_algebraMap_ext, Rat.cast_intCast,
     ← Int.cast_neg, Real.rpow_intCast]
 
-theorem norm_le_of_v_le (P : LocPrime l) (LL : FinExt l) {x y : ℚ_[l]}
-    (h : P.v LL (algebraMap ℚ_[l] ↥LL.1 x) ≤ P.v LL (algebraMap ℚ_[l] ↥LL.1 y)) : ‖y‖ ≤ ‖x‖ := by
+theorem norm_le_of_v_le
+    (P : LocPrime l) (LL : FinExt l)
+    {x y : ℚ_[l]} (h : P.v LL (algebraMap ℚ_[l] ↥LL.1 x) ≤ P.v LL (algebraMap ℚ_[l] ↥LL.1 y))
+    : ‖y‖ ≤ ‖x‖ := by
   by_cases hx : x = 0
   · rw [hx, map_zero, AddValuation.map_zero, top_le_iff, AddValuation.top_iff,
-      map_eq_zero_iff _ (algebraMap ℚ_[l] ↥LL.1).injective] at h
+        map_eq_zero_iff _ (algebraMap ℚ_[l] ↥LL.1).injective]
+      at h
     rw [h, norm_zero]
     exact norm_nonneg _
   · have h1 := Padic.norm_eq_zpow_neg_valuation hx
     rw [(v_eq_iff P LL x _).2 h1, le_v_iff] at h
     rwa [h1]
 
-
 set_option maxHeartbeats 1600000 in
-theorem exists_gamma_coordinates : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (s : ℕ) (LL : FinExt l), Good K s LL → ∀ Γ : GamS P K s LL, (∃ lam : ↥Γ.GKs →* Multiplicative ℤ_[l], Continuous lam ∧ (∀ g, lam g = 1 ↔ Γ.resΓ (g : ↥(GK K)) = 1) ∧ (∀ g, lam g = Multiplicative.ofAdd 1 ↔ Γ.resΓ (g : ↥(GK K)) = Γ.gam) ∧ (∃ g, lam g = Multiplicative.ofAdd 1) ∧ IsClosed (Γ.GKs : Set ↥(GK K))) ∧ ∃ lam : ↥(GK K) →* Multiplicative ℤ_[l], Continuous lam ∧ (∀ g, lam g = 1 ↔ Γ.resΓ g ∈ Γ.DelF) ∧ (∀ g, Γ.resΓ g = Γ.gamK → lam g = Multiplicative.ofAdd 1) := by
+theorem exists_gamma_coordinates
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (s : ℕ) (LL : FinExt l),
+      Good K s LL
+        → ∀ Γ : GamS P K s LL,
+          (∃ lam : ↥Γ.GKs →* Multiplicative ℤ_[l],
+              Continuous lam ∧ (∀ g, lam g = 1 ↔ Γ.resΓ (g : ↥(GK K)) = 1)
+                ∧ (∀ g, lam g = Multiplicative.ofAdd 1 ↔ Γ.resΓ (g : ↥(GK K)) = Γ.gam)
+                ∧ (∃ g, lam g = Multiplicative.ofAdd 1) ∧ IsClosed (Γ.GKs : Set ↥(GK K)))
+            ∧ ∃ lam : ↥(GK K) →* Multiplicative ℤ_[l],
+              Continuous lam ∧ (∀ g, lam g = 1 ↔ Γ.resΓ g ∈ Γ.DelF)
+                ∧ (∀ g, Γ.resΓ g = Γ.gamK → lam g = Multiplicative.ofAdd 1) := by
   intro l hl P K s LL hg Γ
   obtain ⟨hs1, hs2, hK, -⟩ := hg
   obtain ⟨χ₀, hχ₀, hc₀, hon⟩ := GlobalTheory.Cyc.exists_integral_cyclotomicChar l P
@@ -280,15 +325,19 @@ theorem exists_gamma_coordinates : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l)
   have hc : Continuous χ := hc₀.comp continuous_subtype_val
   have hPD : ∀ g, ((P.PD K).χ g : ℚ_[l]) = ((χ g : ℤ_[l]) : ℚ_[l]) := fun g => by
     rw [P.PD_χ]; exact (hχ₀ _).symm
-  have hres : ∀ g, algebraMap ↥(OL LL) ↥LL.1 (Γ.χΓ (Γ.resΓ g) : ↥(OL LL)) =
-      algebraMap ℚ_[l] ↥LL.1 ((χ g : ℤ_[l]) : ℚ_[l]) := fun g => by rw [Γ.χΓ_res, hPD]
+  have hres
+      : ∀ g,
+        algebraMap ↥(OL LL) ↥LL.1 (Γ.χΓ (Γ.resΓ g) : ↥(OL LL))
+          = algebraMap ℚ_[l] ↥LL.1 ((χ g : ℤ_[l]) : ℚ_[l]) := fun g => by
+    rw [Γ.χΓ_res, hPD]
   have hker : ∀ g, Γ.resΓ g = 1 ↔ χ g = 1 := by
     intro g
     constructor
     · intro h
       have := hres g
       rw [h, Γ.χΓ.map_one, Units.val_one, RingHom.map_one, eq_comm,
-        map_eq_one_iff _ (algebraMap ℚ_[l] ↥LL.1).injective] at this
+          map_eq_one_iff _ (algebraMap ℚ_[l] ↥LL.1).injective]
+        at this
       exact Units.ext (Subtype.ext this)
     · intro h
       have := hres g
@@ -321,17 +370,25 @@ theorem exists_gamma_coordinates : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l)
     intro g
     simp only [Γ.DelF_def, ← map_pow, hker]
   refine ⟨?_, ?_⟩
-  · obtain ⟨lam, h1, h2, h3⟩ := exists_coord (χ.comp Γ.GKs.subtype) (hc.comp continuous_subtype_val)
-      ⟨g₀, hm₀⟩ hL₀ (fun g => by
-        change ‖large₂ (χ g)‖ ≤ ‖large₂ (χ g₀)‖
-        rw [norm_Lg hs1 hs2 _ hn₀.le, hn₀, norm_Lg hs1 hs2 _ ((hmem g).1 g.2)]
-        exact (hmem g).1 g.2)
-    refine ⟨lam, h1, fun g => (h2 g).trans (hz g g.2), fun g => (h3 g).trans ?_,
-      ⟨⟨g₀, hm₀⟩, (h3 _).2 rfl⟩, ?_⟩
+  · obtain ⟨lam, h1, h2, h3⟩ :=
+      exists_coord (χ.comp Γ.GKs.subtype) (hc.comp continuous_subtype_val) ⟨g₀, hm₀⟩ hL₀
+        (fun g => by
+          change ‖large₂ (χ g)‖ ≤ ‖large₂ (χ g₀)‖
+          rw [norm_Lg hs1 hs2 _ hn₀.le, hn₀, norm_Lg hs1 hs2 _ ((hmem g).1 g.2)]
+          exact (hmem g).1 g.2)
+    refine ⟨
+      lam,
+      h1,
+      fun g => (h2 g).trans (hz g g.2),
+      fun g => (h3 g).trans ?_,
+      ⟨⟨g₀, hm₀⟩, (h3 _).2 rfl⟩,
+      ?_
+    ⟩
     · change large₂ (χ g) = large₂ (χ g₀) ↔ _
       have := hz _ (Γ.GKs.mul_mem g.2 (Γ.GKs.inv_mem hm₀))
       rwa [map_mul, map_inv, Lg_mul, Lg_inv, map_mul, map_inv, mul_inv_eq_one, hg₀,
-        ← sub_eq_add_neg, sub_eq_zero] at this
+          ← sub_eq_add_neg, sub_eq_zero]
+        at this
     · have e : (Γ.GKs : Set ↥(GK K)) = {g | ‖(χ g : ℤ_[l]) - 1‖ ≤ (l : ℝ) ^ (-(s : ℤ))} :=
         Set.ext hmem
       rw [e]
@@ -358,7 +415,8 @@ theorem exists_gamma_coordinates : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l)
       · rintro _ ⟨g, rfl⟩
         have := Γ.gamK_gen (Γ.resΓ g)
         rw [← hg₁, map_pow, map_pow, hres, hres, ← map_pow, ← map_pow,
-          ← map_one (algebraMap ℚ_[l] ↥LL.1), ← map_sub, ← map_sub] at this
+            ← map_one (algebraMap ℚ_[l] ↥LL.1), ← map_sub, ← map_sub]
+          at this
         exact norm_le_of_v_le P LL this
     have hL₁ : large₂ (χ g₁) ≠ 0 := norm_pos_iff.1 ((norm_pos_iff.2 hL₀).trans_le (hle g₀))
     obtain ⟨lam, h1, h2, h3⟩ := exists_coord χ hc g₁ hL₁ hle

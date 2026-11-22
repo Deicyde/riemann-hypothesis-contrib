@@ -9,19 +9,22 @@ open Matrix Formalism.IndefR.Datum GlobalTheory.ExportSeries
 
 namespace GlobalTheory
 
-theorem dU_eq_const_mul_det_topL_translate :
-  ∀ (k : Type) [Field k] (r n : ℕ) (β : DetBases k r n) (U : Planes k r n),
-  ∃ (g : GL (Fin n) k) (c : kˣ), ∀ y : Matrix (Fin r) (Fin n) k,
-    dU β U y = (c : k) * (topL r (y * (g : Matrix (Fin n) (Fin n) k))).det := by
+theorem dU_eq_const_mul_det_topL_translate
+    : ∀ (k : Type) [Field k] (r n : ℕ) (β : DetBases k r n) (U : Planes k r n),
+      ∃ (g : GL (Fin n) k) (c : kˣ), ∀ y : Matrix (Fin r) (Fin n) k,
+        dU β U y = (c : k) * (topL r (y * (g : Matrix (Fin n) (Fin n) k))).det := by
   intro k _ r n β U
   have hrn : r ≤ n := by have := U.2; omega
   let b := Module.finBasisOfFinrankEq k _ (finrank_quot U)
   have hU : Module.finrank k U.1 = n - r := by have := U.2; omega
   let bU := Module.finBasisOfFinrankEq k U.1 hU
   obtain ⟨lam, hlam⟩ := LinearMap.exists_extend (bU.equivFun.toLinearMap)
-  let φ : (Fin n → k) →ₗ[k] (Fin n → k) := LinearMap.pi fun j =>
-    if h : j.val < r then (LinearMap.proj (⟨j.val, h⟩ : Fin r)) ∘ₗ b.equivFun.toLinearMap ∘ₗ U.1.mkQ
-    else (LinearMap.proj (⟨j.val - r, by have := j.2; omega⟩ : Fin (n - r))) ∘ₗ lam
+  let φ : (Fin n → k) →ₗ[k] (Fin n → k) :=
+    LinearMap.pi fun j =>
+      if h : j.val < r then
+        (LinearMap.proj (⟨j.val, h⟩ : Fin r)) ∘ₗ b.equivFun.toLinearMap ∘ₗ U.1.mkQ
+      else
+        (LinearMap.proj (⟨j.val - r, by have := j.2; omega⟩ : Fin (n - r))) ∘ₗ lam
   have hφ1 : ∀ v (i : Fin r), φ v ⟨i.val, by omega⟩ = b.repr (U.1.mkQ v) i := by
     intro v i
     simp [φ, i.2]
@@ -58,21 +61,25 @@ theorem dU_eq_const_mul_det_topL_translate :
       refine LinearMap.ext fun v => ?_
       show ψ.symm (ψ v) = v
       exact ψ.symm_apply_apply v
-    simp only [A, B, ← transpose_mul, ← LinearMap.toMatrix'_comp, hc, LinearMap.toMatrix'_id, transpose_one]
+    simp only [A, B, ← transpose_mul, ← LinearMap.toMatrix'_comp, hc, LinearMap.toMatrix'_id,
+      transpose_one]
   have hBA : B * A = 1 := by
     have hc : φ ∘ₗ ψ.symm.toLinearMap = LinearMap.id := by
       refine LinearMap.ext fun v => ?_
       show ψ (ψ.symm v) = v
       exact ψ.apply_symm_apply v
-    simp only [A, B, ← transpose_mul, ← LinearMap.toMatrix'_comp, hc, LinearMap.toMatrix'_id, transpose_one]
+    simp only [A, B, ← transpose_mul, ← LinearMap.toMatrix'_comp, hc, LinearMap.toMatrix'_id,
+      transpose_one]
   let g : GL (Fin n) k := ⟨A, B, hAB, hBA⟩
-  have hb : β.form U b ≠ 0 := fun h0 => β.ne U (by rw [(β.form U).eq_smul_basis_det b, h0, zero_smul])
+  have hb : β.form U b ≠ 0 := fun h0 =>
+    β.ne U (by rw [(β.form U).eq_smul_basis_det b, h0, zero_smul])
   refine ⟨g, Units.mk0 _ hb, fun y => ?_⟩
   have key : ∀ i j, (y * A) i j = φ (y.row i) j := by
     intro i j
     rw [← congrFun (LinearMap.toMatrix'_mulVec φ (y.row i)) j]
     simp [A, Matrix.mul_apply, Matrix.mulVec, dotProduct, mul_comm, Matrix.row]
-  have ht : topL r (y * (g : Matrix (Fin n) (Fin n) k)) = (b.toMatrix fun i => U.1.mkQ (y.row i))ᵀ := by
+  have ht
+      : topL r (y * (g : Matrix (Fin n) (Fin n) k)) = (b.toMatrix fun i => U.1.mkQ (y.row i))ᵀ := by
     ext i j
     have hj : j.val < n := by omega
     have e1 : topL r (y * (g : Matrix (Fin n) (Fin n) k)) i j = (y * A) i ⟨j.val, hj⟩ := by

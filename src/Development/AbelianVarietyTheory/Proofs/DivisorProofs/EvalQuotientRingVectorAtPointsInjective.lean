@@ -8,15 +8,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemAddValuat
 @[expose] public section
 
 open scoped NNReal
-open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity GlobalTheory.HerbrandBridge
+open GlobalTheory.IndefiniteRowSideFullHecke.MultiplicationKernelIdentity
+  GlobalTheory.HerbrandBridge
 
 namespace GlobalTheory.HerbrandBridge
 
 open Polynomial
 
-theorem prod_X_sub_C_dvd_of_eval_zero {O S : Type} [CommRing O] [IsDomain O] [Fintype S]
-    (b : S → O) (hb : Function.Injective b) (g : O[X]) (hg : ∀ s, g.eval (b s) = 0) :
-    (∏ s, (X - C (b s))) ∣ g := by
+theorem prod_X_sub_C_dvd_of_eval_zero
+    {O S : Type} [CommRing O] [IsDomain O] [Fintype S]
+    (b : S → O) (hb : Function.Injective b)
+    (g : O[X]) (hg : ∀ s, g.eval (b s) = 0)
+    : (∏ s, (X - C (b s))) ∣ g := by
   by_cases h0 : g = 0
   · simp [h0]
   have hprod : (∏ s, (X - C (b s))) = ((Finset.univ.val.map b).map (fun t => X - C t)).prod := by
@@ -27,10 +30,13 @@ theorem prod_X_sub_C_dvd_of_eval_zero {O S : Type} [CommRing O] [IsDomain O] [Fi
   obtain ⟨s, -, rfl⟩ := Multiset.mem_map.1 ht
   exact (mem_roots h0).2 (hg s)
 
-theorem evalVec_injective_of_injective (C : Type) [Field C] (w : Valuation C ℝ≥0)
-    (v : AddValuation C (WithTop ℝ)) (hv : ∀ x, x ∈ Int0 v ↔ x ∈ w.valuationSubring)
-    (S : Type) [Fintype S] [DecidableEq S] (a : S → w.valuationSubring) (N : ℕ) :
-    Function.Injective a → Function.Injective (evalVec (liftA hv a) N) := by
+theorem evalVec_injective_of_injective
+    (C : Type) [Field C]
+    (w : Valuation C ℝ≥0) (v : AddValuation C (WithTop ℝ))
+    (hv : ∀ x, x ∈ Int0 v ↔ x ∈ w.valuationSubring)
+    (S : Type) [Fintype S] [DecidableEq S]
+    (a : S → w.valuationSubring) (N : ℕ)
+    : Function.Injective a → Function.Injective (evalVec (liftA hv a) N) := by
   intro ha
   have hinj : Function.Injective (liftA hv a) := by
     intro s t hst

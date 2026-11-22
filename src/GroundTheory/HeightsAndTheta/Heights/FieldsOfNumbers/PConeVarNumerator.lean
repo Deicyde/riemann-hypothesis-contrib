@@ -16,17 +16,19 @@ noncomputable section
 
 universe u
 
-
 set_option maxHeartbeats 400000 in
 set_option synthInstance.maxHeartbeats 200000 in
-theorem ConeVarNumerator.proof (hDZ : DegZeroLocQuot.Statement.{u}) :
-    ConeVarNumerator.Statement.{u} := by
+theorem ConeVarNumerator.proof (hDZ : DegZeroLocQuot.Statement.{u})
+    : ConeVarNumerator.Statement.{u} := by
   intro F _ K _ _ ι _ P hP W hW hPW v _
   have := hP.isPrime
   have := hW.isPrime
   intro p
-  have hne : ∀ g : MRing ι F, g ∉ W →
-      algebraMap (MRing ι F ⧸ P) (FractionRing (MRing ι F ⧸ P)) (Ideal.Quotient.mk P g) ≠ 0 := by
+  have hne
+      : ∀ g : MRing ι F,
+        g ∉ W
+          → algebraMap (MRing ι F ⧸ P) (FractionRing (MRing ι F ⧸ P)) (Ideal.Quotient.mk P g)
+            ≠ 0 := by
     intro g hg
     rw [Ne, IsFractionRing.to_map_eq_zero_iff, Ideal.Quotient.eq_zero_iff_mem]
     exact fun h' => hg (hPW h')
@@ -35,23 +37,42 @@ theorem ConeVarNumerator.proof (hDZ : DegZeroLocQuot.Statement.{u}) :
     rw [Set.mem_singleton_iff.mp hW']
     infer_instance
 
-  have step : ∀ D : Finset (K →₀ ℕ), ∃ (b : K → ℕ) (g : MRing ι F) (hn : (K →₀ ℕ) → MRing ι F),
-      IsMultiHomog g b ∧ g ∉ W ∧ (∀ d, IsMultiHomog (hn d) b) ∧ (∀ d, d ∉ D → hn d = 0) ∧
-      ∀ d ∈ D, ((p.coeff d : degZeroLoc P {W}) : FractionRing (MRing ι F ⧸ P)) =
-        algebraMap (MRing ι F ⧸ P) (FractionRing (MRing ι F ⧸ P)) (Ideal.Quotient.mk P (hn d)) /
-          algebraMap (MRing ι F ⧸ P) _ (Ideal.Quotient.mk P g) := by
+  have step
+      : ∀ D : Finset (K →₀ ℕ), ∃ (b : K → ℕ) (g : MRing ι F) (hn : (K →₀ ℕ) → MRing ι F),
+        IsMultiHomog g b ∧ g ∉ W ∧ (∀ d, IsMultiHomog (hn d) b) ∧ (∀ d, d ∉ D → hn d = 0)
+          ∧ ∀ d ∈ D,
+            ((p.coeff d : degZeroLoc P {W}) : FractionRing (MRing ι F ⧸ P))
+              = algebraMap (MRing ι F ⧸ P) (FractionRing (MRing ι F ⧸ P))
+                  (Ideal.Quotient.mk P (hn d))
+                / algebraMap (MRing ι F ⧸ P) _ (Ideal.Quotient.mk P g) := by
     intro D
     induction D using Finset.induction_on with
     | empty =>
-      refine ⟨0, 1, fun _ => 0, isWeightedHomogeneous_one F _, fun h1 => ?_,
-        fun _ => isWeightedHomogeneous_zero F _ _, fun _ _ => rfl, fun d hd => absurd hd (Finset.notMem_empty d)⟩
+      refine ⟨
+        0,
+        1,
+        fun _ => 0,
+        isWeightedHomogeneous_one F _,
+        fun h1 => ?_,
+        fun _ => isWeightedHomogeneous_zero F _ _,
+        fun _ _ => rfl,
+        fun d hd => absurd hd (Finset.notMem_empty d)
+      ⟩
       exact Ideal.IsPrime.ne_top inferInstance ((Ideal.eq_top_iff_one W).mpr h1)
     | insert d₀ D hd₀ ih =>
       obtain ⟨b, g, hn, hg, hgW, hh, h0, hD⟩ := ih
       obtain ⟨b', f', g', hf', hg', -, hg'W, he⟩ := hDZ F K ι P {W} h𝒲 _ (p.coeff d₀).2
       have hg'W' : g' ∉ W := hg'W W rfl
-      refine ⟨b + b', g * g', fun d => if d = d₀ then g * f' else hn d * g',
-        IsWeightedHomogeneous.mul hg hg', fun hm => ?_, fun d => ?_, fun d hd => ?_, fun d hd => ?_⟩
+      refine ⟨
+        b + b',
+        g * g',
+        fun d => if d = d₀ then g * f' else hn d * g',
+        IsWeightedHomogeneous.mul hg hg',
+        fun hm => ?_,
+        fun d => ?_,
+        fun d hd => ?_,
+        fun d hd => ?_
+      ⟩
       · exact (Ideal.IsPrime.mem_or_mem inferInstance hm).elim hgW hg'W'
       · dsimp only
         split_ifs
@@ -77,10 +98,14 @@ theorem ConeVarNumerator.proof (hDZ : DegZeroLocQuot.Statement.{u}) :
     · rw [notMem_support_iff.mp hd, h0 d hd]
       simp
 
-  have hφ : ∀ x : MvPolynomial K (degZeroLoc P {W}),
-      ((coneVarMap P W hPW v x : coneLocal P W hPW) : FractionRing (MRing ι F ⧸ P)) =
-        eval₂ (degZeroLoc P {W}).val.toRingHom (fun k => algebraMap (MRing ι F ⧸ P)
-          (FractionRing (MRing ι F ⧸ P)) (Ideal.Quotient.mk P (X ⟨k, v k⟩))) x := by
+  have hφ
+      : ∀ x : MvPolynomial K (degZeroLoc P {W}),
+        ((coneVarMap P W hPW v x : coneLocal P W hPW) : FractionRing (MRing ι F ⧸ P))
+          = eval₂ (degZeroLoc P {W}).val.toRingHom
+            (fun k =>
+              algebraMap (MRing ι F ⧸ P) (FractionRing (MRing ι F ⧸ P))
+                (Ideal.Quotient.mk P (X ⟨k, v k⟩)))
+            x := by
     intro x
     induction x using MvPolynomial.induction_on with
     | C a =>

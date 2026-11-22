@@ -23,7 +23,8 @@ theorem mem_stabLat_iff (t : Aˣ) (L : Submodule O A) : t ∈ stabLat O L ↔ t 
     simp only [mulLat, Submodule.mem_map, LinearMap.mulLeft_apply]
     constructor
     · rintro ⟨b, hb, rfl⟩
-      rw [← mul_assoc, Units.inv_mul, one_mul]; exact hb
+      rw [← mul_assoc, Units.inv_mul, one_mul]
+      exact hb
     · intro h
       exact ⟨_, h, by rw [← mul_assoc, Units.mul_inv, one_mul]⟩
   constructor
@@ -39,16 +40,17 @@ end GlobalTheory.UnitLemma.StabIndex
 
 namespace GlobalTheory.UnitLemma.StabIndex
 
-theorem isUnit_algebraMap (K : UQ) (B : InvAlg K) (c : K.O) (hc : c ≠ 0) :
-    IsUnit (algebraMap K.O B.A c) := by
+theorem isUnit_algebraMap (K : UQ) (B : InvAlg K) (c : K.O) (hc : c ≠ 0)
+    : IsUnit (algebraMap K.O B.A c) := by
   rw [IsScalarTower.algebraMap_apply K.O K.E B.A]
   refine (isUnit_iff_ne_zero.mpr ?_).map (algebraMap K.E B.A)
   exact (map_ne_zero_iff _ (IsFractionRing.injective K.O K.E)).mpr hc
 
-theorem relIndex_ne_zero_of_between (K : UQ) (B : InvAlg K) (L : Submodule K.O B.A) (c : K.O) (hc : c ≠ 0)
+theorem relIndex_ne_zero_of_between
+    (K : UQ) (B : InvAlg K) (L : Submodule K.O B.A) (c : K.O) (hc : c ≠ 0)
     (hfin : {M : Submodule K.O B.A | mulLat K.O (algebraMap K.O B.A (c * c)) L ≤ M ∧ M ≤ L}.Finite)
-    (h : ∀ u : B.A, IsIntegral K.O u → ∀ y ∈ L, algebraMap K.O B.A c * u * y ∈ L) :
-    (stabLat K.O L ⊓ B.T).relIndex (intUnits K.O B.A ⊓ B.T) ≠ 0 := by
+    (h : ∀ u : B.A, IsIntegral K.O u → ∀ y ∈ L, algebraMap K.O B.A c * u * y ∈ L)
+    : (stabLat K.O L ⊓ B.T).relIndex (intUnits K.O B.A ⊓ B.T) ≠ 0 := by
   set G := intUnits K.O B.A ⊓ B.T
   set γ : B.Aˣ := (isUnit_algebraMap K B c hc).unit
   have hγ : (γ : B.A) = algebraMap K.O B.A c := rfl
@@ -68,8 +70,12 @@ theorem relIndex_ne_zero_of_between (K : UQ) (B : InvAlg K) (L : Submodule K.O B
     · rintro _ ⟨y, hy, rfl⟩
       refine ⟨algebraMap K.O B.A c * (((u : B.Aˣ)⁻¹ : B.Aˣ) : B.A) * y, h _ hu.2 y hy, ?_⟩
       simp only [LinearMap.mulLeft_apply, map_mul]
-      calc algebraMap K.O B.A c * ((u : B.Aˣ) : B.A) * (algebraMap K.O B.A c * (((u : B.Aˣ)⁻¹ : B.Aˣ) : B.A) * y)
-          = algebraMap K.O B.A c * algebraMap K.O B.A c * (((u : B.Aˣ) : B.A) * (((u : B.Aˣ)⁻¹ : B.Aˣ) : B.A)) * y := by ring
+      calc
+        algebraMap K.O B.A c * ((u : B.Aˣ) : B.A)
+              * (algebraMap K.O B.A c * (((u : B.Aˣ)⁻¹ : B.Aˣ) : B.A) * y)
+            = algebraMap K.O B.A c * algebraMap K.O B.A c
+              * (((u : B.Aˣ) : B.A) * (((u : B.Aˣ)⁻¹ : B.Aˣ) : B.A)) * y := by
+          ring
         _ = _ := by rw [Units.mul_inv, mul_one]
     · rintro _ ⟨y, hy, rfl⟩
       simp only [LinearMap.mulLeft_apply]

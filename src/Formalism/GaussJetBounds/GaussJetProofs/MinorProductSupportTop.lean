@@ -76,8 +76,9 @@ lemma shape_count_le_one {J : Type} [DecidableEq J] {p : ℕ} (τ : Fin p → J)
   simp only [Finset.mem_filter, Finset.mem_univ, true_and] at ha hb
   exact hτ (ha.trans hb.symm)
 
-def shapeSet {R : Type u} [CommRing R] {J : Type} {N1 p : ℕ} (A : Fin p → J → R)
-    (I : Fin p → Fin N1) : Set (J × Fin N1 →₀ ℕ) :=
+def shapeSet
+    {R : Type u} [CommRing R] {J : Type} {N1 p : ℕ} (A : Fin p → J → R) (I : Fin p → Fin N1)
+    : Set (J × Fin N1 →₀ ℕ) :=
   {mono | ∃ τ : Fin p → J, Function.Injective τ ∧
     (∃ π : Equiv.Perm (Fin p), ∀ i, A (π i) (τ i) ≠ 0) ∧ mono = ∑ i, Finsupp.single (τ i, I i) 1}
 

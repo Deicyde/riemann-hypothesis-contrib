@@ -10,57 +10,63 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory
 
-private theorem sum_range_63_primitiveRoot_pow_eq_ite (ω : ℂ) (hω : IsPrimitiveRoot ω 63) (n : ℕ) :
-    ∑ j ∈ Finset.range 63, ω ^ (j * n) = if 63 ∣ n then (63 : ℂ) else 0 := by
+private theorem sum_range_63_primitiveRoot_pow_eq_ite (ω : ℂ) (hω : IsPrimitiveRoot ω 63) (n : ℕ)
+    : ∑ j ∈ Finset.range 63, ω ^ (j * n) = if 63 ∣ n then (63 : ℂ) else 0 := by
   have hpow : ∀ j : ℕ, ω ^ (j * n) = (ω ^ n) ^ j := fun j => by rw [← pow_mul, mul_comm]
   simp_rw [hpow]
   split_ifs with hn
   · rw [(hω.pow_eq_one_iff_dvd n).mpr hn]
     simp
   · have hne : ω ^ n ≠ 1 := fun h => hn ((hω.pow_eq_one_iff_dvd n).mp h)
-    have h63 : (ω ^ n) ^ 63 = 1 := by
-      rw [← pow_mul, mul_comm, pow_mul, hω.pow_eq_one, one_pow]
+    have h63 : (ω ^ n) ^ 63 = 1 := by rw [← pow_mul, mul_comm, pow_mul, hω.pow_eq_one, one_pow]
     have hg := geom_sum_mul (ω ^ n) 63
     rw [h63, sub_self] at hg
     exact (mul_eq_zero.mp hg).resolve_right (sub_ne_zero.mpr hne)
 
-theorem fourier_inv_sixtythree (ω : ℂ) (c : ℕ → ℤ) (hω : IsPrimitiveRoot ω 63) (m : ℕ)
-    (hm : m < 63) :
-    ∑ j ∈ Finset.range 63, (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * m))
+theorem fourier_inv_sixtythree (ω : ℂ) (c : ℕ → ℤ) (hω : IsPrimitiveRoot ω 63) (m : ℕ) (hm : m < 63)
+    : ∑ j ∈ Finset.range 63, (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * m))
       = 63 * (c m : ℂ) := by
   have hsum := sum_range_63_primitiveRoot_pow_eq_ite ω hω
-  calc ∑ j ∈ Finset.range 63, (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * m))
-      = ∑ k ∈ Finset.range 63, (c k : ℂ) * ∑ j ∈ Finset.range 63, ω ^ (j * (k + 62 * m)) := by
-        simp_rw [Finset.sum_mul, Finset.mul_sum]
-        rw [Finset.sum_comm]
-        refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => ?_
-        rw [mul_add, pow_add]
-        ring
+  calc
+    ∑ j ∈ Finset.range 63, (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * m))
+        = ∑ k ∈ Finset.range 63, (c k : ℂ) * ∑ j ∈ Finset.range 63, ω ^ (j * (k + 62 * m)) := by
+      simp_rw [Finset.sum_mul, Finset.mul_sum]
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => ?_
+      rw [mul_add, pow_add]
+      ring
     _ = ∑ k ∈ Finset.range 63, (c k : ℂ) * (if 63 ∣ k + 62 * m then (63 : ℂ) else 0) := by
-        simp_rw [hsum]
+      simp_rw [hsum]
     _ = 63 * (c m : ℂ) := by
-        rw [Finset.sum_eq_single m]
-        · rw [if_pos (by omega)]
-          ring
-        · intro k hk hkm
-          have hk' := Finset.mem_range.mp hk
-          rw [if_neg (by omega)]
-          simp
-        · intro hm'
-          exact absurd (Finset.mem_range.mpr hm) hm'
+      rw [Finset.sum_eq_single m]
+      · rw [if_pos (by omega)]
+        ring
+      · intro k hk hkm
+        have hk' := Finset.mem_range.mp hk
+        rw [if_neg (by omega)]
+        simp
+      · intro hm'
+        exact absurd (Finset.mem_range.mpr hm) hm'
 
-theorem mixed_diff_sixtythree (ω : ℂ) (c : ℕ → ℤ) (hω : IsPrimitiveRoot ω 63)
-    (h : ∀ j : ℕ, j < 63 → ¬ 21 ∣ j → ¬ 9 ∣ j →
-      ∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k) = 0) (m : ℕ) (hm : m < 53) :
-    c (m + 10) - c (m + 3) = c (m + 7) - c m := by
-  have key : ∀ n, n < 63 → (63 : ℂ) * (c n : ℂ) = ∑ j ∈ Finset.range 63,
-      (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * n)) :=
-    fun n hn => (fourier_inv_sixtythree ω c hω n hn).symm
-  have hz : ∑ j ∈ Finset.range 63,
-      ((∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * (m + 10)))
-        - (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * (m + 3)))
-        - (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * (m + 7)))
-        + (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * m))) = 0 := by
+theorem mixed_diff_sixtythree
+    (ω : ℂ) (c : ℕ → ℤ) (hω : IsPrimitiveRoot ω 63)
+    (h : ∀ j : ℕ, j < 63 → ¬ 21 ∣ j → ¬ 9 ∣ j → ∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k) = 0)
+    (m : ℕ) (hm : m < 53)
+    : c (m + 10) - c (m + 3) = c (m + 7) - c m := by
+  have key
+      : ∀ n,
+        n < 63
+          → (63 : ℂ) * (c n : ℂ)
+            = ∑ j ∈ Finset.range 63,
+              (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * n)) := fun n hn =>
+    (fourier_inv_sixtythree ω c hω n hn).symm
+  have hz
+      : ∑ j ∈ Finset.range 63,
+          ((∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * (m + 10)))
+            - (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * (m + 3)))
+            - (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * (m + 7)))
+            + (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * m)))
+        = 0 := by
     apply Finset.sum_eq_zero
     intro j hj
     have hj' := Finset.mem_range.mp hj
@@ -78,8 +84,8 @@ theorem mixed_diff_sixtythree (ω : ℂ) (c : ℕ → ℤ) (hω : IsPrimitiveRoo
         ring
   have h63 : (63 : ℂ) * ((c (m + 10) : ℂ) - c (m + 3) - c (m + 7) + c m) = 0 := by
     rw [mul_add, mul_sub, mul_sub, key (m + 10) (by omega), key (m + 3) (by omega),
-      key (m + 7) (by omega), key m (by omega), ← Finset.sum_sub_distrib,
-      ← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
+      key (m + 7) (by omega), key m (by omega), ← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib,
+      ← Finset.sum_add_distrib]
     exact hz
   have h' : (c (m + 10) : ℂ) - c (m + 3) - c (m + 7) + c m = 0 :=
     (mul_eq_zero.mp h63).resolve_left (by norm_num)
@@ -89,14 +95,16 @@ theorem mixed_diff_sixtythree (ω : ℂ) (c : ℕ → ℤ) (hω : IsPrimitiveRoo
   have h3 := Int.cast_eq_zero.mp h''
   linarith
 
-private theorem apply_add_21_eq_of_fourier_vanish_order_63 (ω : ℂ) (c : ℕ → ℤ) (hω : IsPrimitiveRoot ω 63)
-    (h : ∀ j : ℕ, j < 63 → ¬ 21 ∣ j → ¬ 9 ∣ j →
-      ∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k) = 0) (n : ℕ) (hn : n < 42) :
-    c (n + 21) = c n := by
-  have hs : ∑ j ∈ Finset.range 63,
-      (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * (n + 21)))
-      = ∑ j ∈ Finset.range 63,
-      (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * n)) := by
+private theorem apply_add_21_eq_of_fourier_vanish_order_63
+    (ω : ℂ) (c : ℕ → ℤ) (hω : IsPrimitiveRoot ω 63)
+    (h : ∀ j : ℕ, j < 63 → ¬ 21 ∣ j → ¬ 9 ∣ j → ∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k) = 0)
+    (n : ℕ) (hn : n < 42)
+    : c (n + 21) = c n := by
+  have hs
+      : ∑ j ∈ Finset.range 63,
+          (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * (n + 21)))
+        = ∑ j ∈ Finset.range 63,
+          (∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k)) * ω ^ (j * (62 * n)) := by
     refine Finset.sum_congr rfl fun j hj => ?_
     have hj' := Finset.mem_range.mp hj
     by_cases h3 : 3 ∣ j
@@ -109,10 +117,12 @@ private theorem apply_add_21_eq_of_fourier_vanish_order_63 (ω : ℂ) (c : ℕ �
     (mul_left_cancel₀ (by norm_num : (63 : ℂ) ≠ 0) e1).symm
   exact_mod_cast e2
 
-theorem no_norm_twelve_order_sixtythree : ∀ (ω : ℂ) (c : ℕ → ℤ), IsPrimitiveRoot ω 63 →
-    ∑ k ∈ Finset.range 63, c k ^ 2 = 12 →
-    (∀ j : ℕ, j < 63 → ¬ 21 ∣ j → ¬ 9 ∣ j →
-      ∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k) = 0) → False := by
+theorem no_norm_twelve_order_sixtythree
+    : ∀ (ω : ℂ) (c : ℕ → ℤ),
+      IsPrimitiveRoot ω 63 → ∑ k ∈ Finset.range 63, c k ^ 2 = 12
+        → (∀ j : ℕ,
+          j < 63 → ¬ 21 ∣ j → ¬ 9 ∣ j → ∑ k ∈ Finset.range 63, (c k : ℂ) * ω ^ (j * k) = 0)
+        → False := by
   intro ω c hω hnorm hF
   have hrel := fun m (hm : m < 53) => mixed_diff_sixtythree ω c hω hF m hm
   have hper := fun n (hn : n < 42) => apply_add_21_eq_of_fourier_vanish_order_63 ω c hω hF n hn
@@ -139,8 +149,9 @@ theorem no_norm_twelve_order_sixtythree : ∀ (ω : ℂ) (c : ℕ → ℤ), IsPr
         rw [show 21 + 21 + x = x + 21 + 21 by omega, hper (x + 21) (by omega), hper x (by omega)]
     rw [h1, h2]
     ring
-  have hcolsum : ∑ k ∈ Finset.range 21, c k ^ 2 =
-      ∑ b ∈ Finset.range 7, (c b ^ 2 + c (b + 7) ^ 2 + c (b + 14) ^ 2) := by
+  have hcolsum
+      : ∑ k ∈ Finset.range 21, c k ^ 2
+        = ∑ b ∈ Finset.range 7, (c b ^ 2 + c (b + 7) ^ 2 + c (b + 14) ^ 2) := by
     rw [show (21 : ℕ) = 7 + 7 + 7 from rfl, Finset.sum_range_add, Finset.sum_range_add,
       Finset.sum_add_distrib, Finset.sum_add_distrib]
     have h1 : ∑ x ∈ Finset.range 7, c (7 + x) ^ 2 = ∑ x ∈ Finset.range 7, c (x + 7) ^ 2 :=
@@ -148,8 +159,11 @@ theorem no_norm_twelve_order_sixtythree : ∀ (ω : ℂ) (c : ℕ → ℤ), IsPr
     have h2 : ∑ x ∈ Finset.range 7, c (7 + 7 + x) ^ 2 = ∑ x ∈ Finset.range 7, c (x + 14) ^ 2 :=
       Finset.sum_congr rfl fun x _ => by rw [show 7 + 7 + x = x + 14 by omega]
     rw [h1, h2]
-  have hcol : ∀ b, b < 7 → (c 7 - c 0) ^ 2 + (c 8 - c 1) ^ 2 + (c 9 - c 2) ^ 2 ≤
-      3 * (c b ^ 2 + c (b + 7) ^ 2 + c (b + 14) ^ 2) := by
+  have hcol
+      : ∀ b,
+        b < 7
+          → (c 7 - c 0) ^ 2 + (c 8 - c 1) ^ 2 + (c 9 - c 2) ^ 2
+            ≤ 3 * (c b ^ 2 + c (b + 7) ^ 2 + c (b + 14) ^ 2) := by
     intro b hb
     have e1 := hD b (by omega)
     have e2 := hD (b + 7) (by omega)
@@ -157,8 +171,9 @@ theorem no_norm_twelve_order_sixtythree : ∀ (ω : ℂ) (c : ℕ → ℤ), IsPr
     have p := hper b (by omega)
     rw [show b + 7 + 7 = b + 14 by omega] at e2
     rw [show b + 14 + 7 = b + 21 by omega, p] at e3
-    have key : (c (b + 7) - c b) ^ 2 + (c (b + 14) - c (b + 7)) ^ 2 + (c b - c (b + 14)) ^ 2 ≤
-        3 * (c b ^ 2 + c (b + 7) ^ 2 + c (b + 14) ^ 2) := by
+    have key
+        : (c (b + 7) - c b) ^ 2 + (c (b + 14) - c (b + 7)) ^ 2 + (c b - c (b + 14)) ^ 2
+          ≤ 3 * (c b ^ 2 + c (b + 7) ^ 2 + c (b + 14) ^ 2) := by
       nlinarith [sq_nonneg (c b + c (b + 7) + c (b + 14))]
     rw [e1, e2, e3] at key
     have hb3 : b % 3 = 0 ∨ b % 3 = 1 ∨ b % 3 = 2 := by omega
@@ -215,8 +230,9 @@ theorem no_norm_twelve_order_sixtythree : ∀ (ω : ℂ) (c : ℕ → ℤ), IsPr
     have h2 : c (b + 14) = c b := by linarith
     rw [h1, h2]
     ring
-  have h3 : ∑ b ∈ Finset.range 7, (c b ^ 2 + c (b + 7) ^ 2 + c (b + 14) ^ 2) =
-      3 * ∑ b ∈ Finset.range 7, c b ^ 2 := by
+  have h3
+      : ∑ b ∈ Finset.range 7, (c b ^ 2 + c (b + 7) ^ 2 + c (b + 14) ^ 2)
+        = 3 * ∑ b ∈ Finset.range 7, c b ^ 2 := by
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl fun b hb => hcolc b (Finset.mem_range.mp hb)
   rw [hcolsum, h3] at hS21

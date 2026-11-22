@@ -10,8 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.HeckeCh
 
 open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.ConjSize
 
-private theorem exists_pow_eq_span {L : Type} [Field L] [NumberField L] (v : HeightOneSpectrum (𝓞 L)) :
-    ∃ (h : ℕ) (a : 𝓞 L), 0 < h ∧ a ≠ 0 ∧ v.asIdeal ^ h = Ideal.span {a} := by
+private theorem exists_pow_eq_span
+    {L : Type} [Field L] [NumberField L] (v : HeightOneSpectrum (𝓞 L))
+    : ∃ (h : ℕ) (a : 𝓞 L), 0 < h ∧ a ≠ 0 ∧ v.asIdeal ^ h = Ideal.span {a} := by
   classical
   have hI : v.asIdeal ∈ nonZeroDivisors (Ideal (𝓞 L)) := mem_nonZeroDivisors_of_ne_zero v.ne_bot
   have hpow : v.asIdeal ^ Fintype.card (ClassGroup (𝓞 L)) ∈ nonZeroDivisors (Ideal (𝓞 L)) :=
@@ -27,9 +28,11 @@ private theorem exists_pow_eq_span {L : Type} [Field L] [NumberField L] (v : Hei
   rw [ha]
   simp
 
-private theorem exists_global {L : Type} [Field L] [NumberField L] (χ : HChar L) (w : HeightOneSpectrum (𝓞 L)) :
-    ∃ (k : Lˣ) (N : ℕ), 0 < N ∧ Valued.v ((atFin w k : (w.adicCompletion L)ˣ) : w.adicCompletion L) ≠ 1 ∧
-      (χ.inf k * χ.locK w k) ^ N = 1 := by
+private theorem exists_global
+    {L : Type} [Field L] [NumberField L] (χ : HChar L) (w : HeightOneSpectrum (𝓞 L))
+    : ∃ (k : Lˣ) (N : ℕ),
+      0 < N ∧ Valued.v ((atFin w k : (w.adicCompletion L)ˣ) : w.adicCompletion L) ≠ 1
+        ∧ (χ.inf k * χ.locK w k) ^ N = 1 := by
   classical
   obtain ⟨h, a, hh, ha0, hspan⟩ := exists_pow_eq_span w
   have haw : a ∈ w.asIdeal := by
@@ -50,18 +53,22 @@ private theorem exists_global {L : Type} [Field L] [NumberField L] (χ : HChar L
   have hwS : w ∈ S := by simp [hS]
   choose Nf hNf hNa using fun v => GlobalTheory.Mem.ValAlg.locK_pow χ v
   refine ⟨k, ∏ v ∈ S.erase w, Nf v, Finset.prod_pos (fun v _ => hNf v), ?_, ?_⟩
-  · have hval : Valued.v ((atFin w k : (w.adicCompletion L)ˣ) : w.adicCompletion L) =
-        w.intValuation a := by
+  · have hval
+        : Valued.v ((atFin w k : (w.adicCompletion L)ˣ) : w.adicCompletion L)
+          = w.intValuation a := by
       change Valued.v (algebraMap L (w.adicCompletion L) (algebraMap (𝓞 L) L a)) = _
       rw [← IsScalarTower.algebraMap_apply (𝓞 L) L]
       exact (HeightOneSpectrum.valuedAdicCompletion_eq_valuation w a).trans
         (HeightOneSpectrum.valuation_of_algebraMap w a)
     rw [hval]
     exact ((HeightOneSpectrum.intValuation_lt_one_iff_mem w a).2 haw).ne
-  · have hrule := GlobalTheory.HeckeProduct.hchar_productRule L χ S (by
-      intro v hv
-      by_contra hc
-      exact hv (by simp [hS, hc])) k
+  · have hrule :=
+      GlobalTheory.HeckeProduct.hchar_productRule L χ S
+        (by
+          intro v hv
+          by_contra hc
+          exact hv (by simp [hS, hc]))
+        k
     have hfin : ∏ᶠ (v) (_ : v ∉ S), χ.val v ^ ordF v k = 1 := by
       apply finprod_eq_one_of_forall_eq_one
       intro v
@@ -70,7 +77,8 @@ private theorem exists_global {L : Type} [Field L] [NumberField L] (χ : HChar L
       · rfl
       · have hvw : v ≠ w := fun e => hv (by simp [hS, e])
         have h0 : ordF v k = 0 := by
-          simp [Formalism.L2.Host.ordF, hk, GlobalTheory.Mem.ValAlg.uOf, HeightOneSpectrum.valuation_of_algebraMap,
+          simp [Formalism.L2.Host.ordF, hk, GlobalTheory.Mem.ValAlg.uOf,
+            HeightOneSpectrum.valuation_of_algebraMap,
             HeightOneSpectrum.intValuation_eq_one_iff.2 (hav v hvw)]
         rw [h0, zpow_zero]
     rw [hfin, mul_one, ← Finset.mul_prod_erase S (fun v => χ.locK v k) hwS, ← mul_assoc] at hrule
@@ -84,8 +92,11 @@ private theorem exists_global {L : Type} [Field L] [NumberField L] (χ : HChar L
     rw [mul_pow, hrest, mul_one, one_pow] at hpow
     exact hpow
 
-private theorem exists_pow_inf {L : Type} [Field L] [NumberField L] (χ : HChar L) (w : HeightOneSpectrum (𝓞 L))
-    (x : (w.adicCompletion L)ˣ) : ∃ (b : Lˣ) (M : ℕ), 0 < M ∧ χ.loc w x ^ M * χ.inf b = 1 := by
+private theorem exists_pow_inf
+    {L : Type} [Field L] [NumberField L]
+    (χ : HChar L)
+    (w : HeightOneSpectrum (𝓞 L)) (x : (w.adicCompletion L)ˣ)
+    : ∃ (b : Lˣ) (M : ℕ), 0 < M ∧ χ.loc w x ^ M * χ.inf b = 1 := by
   obtain ⟨k, N, hN, hk1, hkN⟩ := exists_global χ w
   set y := atFin w k with hy
   have hx0 : Valued.v (x : w.adicCompletion L) ≠ 0 := (Valuation.ne_zero_iff _).2 x.ne_zero
@@ -131,12 +142,16 @@ private theorem exists_pow_inf {L : Type} [Field L] [NumberField L] (χ : HChar 
     rw [h, zpow_neg, zpow_natCast] at key
     rw [map_inv, ← inv_mul_eq_one.1 key, mul_inv_cancel]
 
-private theorem exists_qbar_embedding_lift {K : Type} [Field K] [NumberField K] (ι τ : K →+* ℂ) (y : K) :
-    ∃ ψ : Formalism.MainNotions.TaylorLogMetric.Qbar →+* ℂ, ∃ hy : ι y ∈ Formalism.MainNotions.TaylorLogMetric.Qbar, ψ ⟨ι y, hy⟩ = τ y := by
+private theorem exists_qbar_embedding_lift
+    {K : Type} [Field K] [NumberField K] (ι τ : K →+* ℂ) (y : K)
+    : ∃ ψ : Formalism.MainNotions.TaylorLogMetric.Qbar →+* ℂ,
+      ∃ hy : ι y ∈ Formalism.MainNotions.TaylorLogMetric.Qbar,
+        ψ ⟨ι y, hy⟩ = τ y := by
   have hjmem : ∀ t : K, ι t ∈ Formalism.MainNotions.TaylorLogMetric.Qbar := fun t =>
     mem_algebraicClosure_iff.2 ((Algebra.IsAlgebraic.isAlgebraic (R := ℚ) t).algHom ι.toRatAlgHom)
   haveI hQ : Algebra.IsAlgebraic ℚ Formalism.MainNotions.TaylorLogMetric.Qbar := algebraicClosure.isAlgebraic ℚ ℂ
-  let j : K →+* Formalism.MainNotions.TaylorLogMetric.Qbar := ι.codRestrict Formalism.MainNotions.TaylorLogMetric.Qbar hjmem
+  let j : K →+* Formalism.MainNotions.TaylorLogMetric.Qbar :=
+    ι.codRestrict Formalism.MainNotions.TaylorLogMetric.Qbar hjmem
   letI : Algebra K Formalism.MainNotions.TaylorLogMetric.Qbar := j.toAlgebra
   letI : Algebra K ℂ := τ.toAlgebra
   haveI : IsScalarTower ℚ K Formalism.MainNotions.TaylorLogMetric.Qbar := IsScalarTower.of_algebraMap_eq fun r =>
@@ -144,22 +159,31 @@ private theorem exists_qbar_embedding_lift {K : Type} [Field K] [NumberField K] 
       (Subsingleton.elim (algebraMap ℚ Formalism.MainNotions.TaylorLogMetric.Qbar)
         ((algebraMap K Formalism.MainNotions.TaylorLogMetric.Qbar).comp (algebraMap ℚ K)))
   haveI : Algebra.IsAlgebraic K Formalism.MainNotions.TaylorLogMetric.Qbar := Algebra.IsAlgebraic.tower_top (K := ℚ) K
-  refine ⟨(IsAlgClosed.lift : Formalism.MainNotions.TaylorLogMetric.Qbar →ₐ[K] ℂ).toRingHom, hjmem y, ?_⟩
+  refine
+    ⟨(IsAlgClosed.lift : Formalism.MainNotions.TaylorLogMetric.Qbar →ₐ[K] ℂ).toRingHom, hjmem y, ?_⟩
   exact (IsAlgClosed.lift : Formalism.MainNotions.TaylorLogMetric.Qbar →ₐ[K] ℂ).commutes y
 
-theorem UpperTheory.conjSize_heckeChar_local_of_mem_range_embedding :
-    ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (χ : Formalism.L2.Host.HChar L) {I : Type} [Fintype I] (φ : I → L →+* ℂ) (n : I → ℤ), χ.HasInf φ n → ∀ {K : Type} [Field K] [NumberField K] (ι τ : K →+* ℂ) (w : HeightOneSpectrum (𝓞 L)) (x : (w.adicCompletion L)ˣ), ((χ.loc w x : ℂˣ) : ℂ) ∈ Set.range ι → GlobalTheory.ConjSize.Un ι τ ((χ.loc w x : ℂˣ) : ℂ) := by
+theorem UpperTheory.conjSize_heckeChar_local_of_mem_range_embedding
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (χ : Formalism.L2.Host.HChar L)
+        {I : Type} [Fintype I] (φ : I → L →+* ℂ) (n : I → ℤ),
+      χ.HasInf φ n
+        → ∀ {K : Type} [Field K] [NumberField K] (ι τ : K →+* ℂ) (w : HeightOneSpectrum (𝓞 L))
+            (x : (w.adicCompletion L)ˣ),
+          ((χ.loc w x : ℂˣ) : ℂ) ∈ Set.range ι
+            → GlobalTheory.ConjSize.Un ι τ ((χ.loc w x : ℂˣ) : ℂ) := by
   intro L _ _ _ χ I _ φ n hχ K _ _ ι τ w x hx
   obtain ⟨y, hy⟩ := hx
   obtain ⟨b, M, hM, hb⟩ := exists_pow_inf χ w x
-  have hz : ((χ.loc w x : ℂˣ) : ℂ) ^ M * ∏ i, ((φ i) (b : L) / (‖(φ i) (b : L)‖ : ℂ)) ^ n i = 1 := by
+  have hz
+      : ((χ.loc w x : ℂˣ) : ℂ) ^ M * ∏ i, ((φ i) (b : L) / (‖(φ i) (b : L)‖ : ℂ)) ^ n i = 1 := by
     rw [← hχ b]
     have h1 := congrArg (fun u : ℂˣ => (u : ℂ)) hb
     simpa using h1
   obtain ⟨hzQ, hψ⟩ := GlobalTheory.HeckeVal.root_value φ n b _ M hM hz
   obtain ⟨ψ, hyQ, hψy⟩ := exists_qbar_embedding_lift ι τ y
   refine ⟨y, hy, ?_⟩
-  have heq : (⟨_, hzQ⟩ : Formalism.MainNotions.TaylorLogMetric.Qbar) = ⟨ι y, hyQ⟩ := Subtype.ext hy.symm
+  have heq : (⟨_, hzQ⟩ : Formalism.MainNotions.TaylorLogMetric.Qbar) = ⟨ι y, hyQ⟩ :=
+    Subtype.ext hy.symm
   rw [← hψy, ← heq]
   apply hψ ℂ ψ
   intro σ

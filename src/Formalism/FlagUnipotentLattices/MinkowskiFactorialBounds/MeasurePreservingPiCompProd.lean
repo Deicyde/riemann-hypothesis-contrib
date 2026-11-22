@@ -135,32 +135,34 @@ lemma s5b7_smul_top_prod {R M N : Type} [CommRing R] [AddCommGroup M] [Module R 
     rw [e]
     exact Submodule.add_mem _ (h1 ⟨a, ha, rfl⟩) (h2 ⟨b, hb, rfl⟩)
 
-theorem s5b7_quot (p : Ideal O) [hp : p.IsMaximal] [Finite (O ⧸ p)] (Y : Type) [AddCommGroup Y]
-    [Module O Y] [Module.Finite O Y] [Module.Projective O Y] :
-    Nat.card (Y ⧸ p • (⊤ : Submodule O Y)) = Nat.card (O ⧸ p) ^ finrank O Y := by
+theorem s5b7_quot
+    (p : Ideal O) [hp : p.IsMaximal] [Finite (O ⧸ p)]
+    (Y : Type) [AddCommGroup Y] [Module O Y] [Module.Finite O Y] [Module.Projective O Y]
+    : Nat.card (Y ⧸ p • (⊤ : Submodule O Y)) = Nat.card (O ⧸ p) ^ finrank O Y := by
   classical
   obtain ⟨n, f, hf⟩ := Module.Finite.exists_fin' O Y
   obtain ⟨h, hh⟩ := Module.projective_lifting_property f LinearMap.id hf
-  have hfh : ∀ x, f (h x) = x := fun x => by
-    have := congrArg (fun g => g x) hh; simpa using this
+  have hfh : ∀ x, f (h x) = x := fun x => by have := congrArg (fun g => g x) hh; simpa using this
   set Q := LinearMap.ker f with hQ
   have : IsNoetherian O (Fin n → O) := isNoetherian_of_isNoetherianRing_of_finite _ _
   let φ : (Fin n → O) →ₗ[O] Y × Q :=
-    f.prod ((LinearMap.id - h ∘ₗ f).codRestrict Q (fun x => by
-      rw [hQ, LinearMap.mem_ker]; simp [hfh]))
+    f.prod
+      ((LinearMap.id - h ∘ₗ f).codRestrict Q (fun x => by rw [hQ, LinearMap.mem_ker]; simp [hfh]))
   let ψ : Y × Q →ₗ[O] (Fin n → O) := h.coprod Q.subtype
-  let e : (Fin n → O) ≃ₗ[O] Y × Q := LinearEquiv.ofLinearMap φ ψ
-    (by
-      ext x
-      · simp [φ, ψ, hfh]
-      · simp [φ, ψ, hfh]
-      · have : f (x : Fin n → O) = 0 := x.2
-        simp [φ, ψ, this]
-      · have : f (x : Fin n → O) = 0 := x.2
-        simp [φ, ψ, this])
-    (by
-      apply LinearMap.ext; intro x
-      simp [φ, ψ])
+  let e : (Fin n → O) ≃ₗ[O] Y × Q :=
+    LinearEquiv.ofLinearMap φ ψ
+      (by
+        ext x
+        · simp [φ, ψ, hfh]
+        · simp [φ, ψ, hfh]
+        · have : f (x : Fin n → O) = 0 := x.2
+          simp [φ, ψ, this]
+        · have : f (x : Fin n → O) = 0 := x.2
+          simp [φ, ψ, this])
+      (by
+        apply LinearMap.ext
+        intro x
+        simp [φ, ψ])
   obtain ⟨fY, aY⟩ := s5b7_quot_ge p Y
   obtain ⟨fQ, aQ⟩ := s5b7_quot_ge p Q
   have hrank : finrank O Y + finrank O Q = n := by
@@ -168,23 +170,26 @@ theorem s5b7_quot (p : Ideal O) [hp : p.IsMaximal] [Finite (O ⧸ p)] (Y : Type)
     rw [(LinearMap.quotKerEquivOfSurjective f hf).finrank_eq] at this
     simpa using this
   have hF : (p • (⊤ : Submodule O (Fin n → O))).toAddSubgroup.index = Nat.card (O ⧸ p) ^ n := by
-    have : (p • (⊤ : Submodule O (Fin n → O))).toAddSubgroup =
-        AddSubgroup.pi Set.univ fun _ : Fin n => (Submodule.toAddSubgroup p) := by
+    have : (p • (⊤ : Submodule O (Fin n → O))).toAddSubgroup
+        = AddSubgroup.pi Set.univ fun _ : Fin n => (Submodule.toAddSubgroup p) := by
       ext x
       simp only [Submodule.mem_toAddSubgroup, s5b7_smul_top_pi, AddSubgroup.mem_pi, Set.mem_univ,
         forall_true_left]
     rw [this, AddSubgroup.index_pi]
     simp only [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
     congr 1
-  have hPQ : (p • (⊤ : Submodule O (Y × Q))).toAddSubgroup.index =
-      (p • (⊤ : Submodule O Y)).toAddSubgroup.index *
-        (p • (⊤ : Submodule O Q)).toAddSubgroup.index := by
+  have hPQ
+      : (p • (⊤ : Submodule O (Y × Q))).toAddSubgroup.index
+        = (p • (⊤ : Submodule O Y)).toAddSubgroup.index
+          * (p • (⊤ : Submodule O Q)).toAddSubgroup.index := by
     rw [s5b7_smul_top_prod, ← AddSubgroup.index_prod]
     rfl
-  have hE : (p • (⊤ : Submodule O (Fin n → O))).toAddSubgroup.index =
-      (p • (⊤ : Submodule O (Y × Q))).toAddSubgroup.index := by
-    have hm : (p • (⊤ : Submodule O (Fin n → O))).map (e : (Fin n → O) →ₗ[O] Y × Q) =
-        p • (⊤ : Submodule O (Y × Q)) := by
+  have hE
+      : (p • (⊤ : Submodule O (Fin n → O))).toAddSubgroup.index
+        = (p • (⊤ : Submodule O (Y × Q))).toAddSubgroup.index := by
+    have hm
+        : (p • (⊤ : Submodule O (Fin n → O))).map (e : (Fin n → O) →ₗ[O] Y × Q)
+          = p • (⊤ : Submodule O (Y × Q)) := by
       rw [Submodule.map_smul'', Submodule.map_top, LinearEquiv.range]
     exact Nat.card_congr (Submodule.Quotient.equiv _ _ e hm).toEquiv
   change (p • (⊤ : Submodule O Y)).toAddSubgroup.index = _
@@ -194,21 +199,24 @@ theorem s5b7_quot (p : Ideal O) [hp : p.IsMaximal] [Finite (O ⧸ p)] (Y : Type)
   set b := (p • (⊤ : Submodule O Q)).toAddSubgroup.index with hb
   set k := Nat.card (O ⧸ p) with hk
   have hk0 : 0 < k := Nat.card_pos
-  have hab : a * b = k ^ finrank O Y * k ^ finrank O Q := by
-    rw [← hPQ, ← hE, hF, ← pow_add, hrank]
+  have hab : a * b = k ^ finrank O Y * k ^ finrank O Q := by rw [← hPQ, ← hE, hF, ← pow_add, hrank]
   by_contra hne
   have hlt : k ^ finrank O Y < a := lt_of_le_of_ne aY (Ne.symm hne)
   have hpos : 0 < k ^ finrank O Q := pow_pos hk0 _
   have : k ^ finrank O Y * k ^ finrank O Q < a * b :=
-    calc k ^ finrank O Y * k ^ finrank O Q < a * k ^ finrank O Q :=
-          Nat.mul_lt_mul_of_pos_right hlt hpos
+    calc
+      k ^ finrank O Y * k ^ finrank O Q
+        < a * k ^ finrank O Q := Nat.mul_lt_mul_of_pos_right hlt hpos
       _ ≤ a * b := Nat.mul_le_mul_left _ aQ
   omega
 
-theorem s5b7_ideal (p : Ideal O) [hp : p.IsMaximal] (hp0 : p ≠ ⊥) [Finite (O ⧸ p)] (X : Type)
-    [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X] :
-    Nat.card ((p →ₗ[O] X) ⧸ LinearMap.range (LinearMap.lcomp O X (Submodule.subtype p))) =
-      Nat.card (O ⧸ p) ^ finrank O X := by
+theorem s5b7_ideal
+    (p : Ideal O) [hp : p.IsMaximal]
+    (hp0 : p ≠ ⊥)
+    [Finite (O ⧸ p)]
+    (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X]
+    : Nat.card ((p →ₗ[O] X) ⧸ LinearMap.range (LinearMap.lcomp O X (Submodule.subtype p)))
+      = Nat.card (O ⧸ p) ^ finrank O X := by
   classical
   have : Module.Projective O p := s5b7_proj p
   obtain ⟨t, htp, ht0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hp0
@@ -220,27 +228,28 @@ theorem s5b7_ideal (p : Ideal O) [hp : p.IsMaximal] (hp0 : p ≠ ⊥) [Finite (O
     simp [mul_comm]
   have htf : Module.IsTorsionFree O (p →ₗ[O] X) := inferInstance
   have : Module.Projective O (p →ₗ[O] X) := s5b7_proj _
-  have hrange : LinearMap.range (LinearMap.lcomp O X (Submodule.subtype p)) =
-      p • (⊤ : Submodule O (p →ₗ[O] X)) := by
+  have hrange
+      : LinearMap.range (LinearMap.lcomp O X (Submodule.subtype p))
+        = p • (⊤ : Submodule O (p →ₗ[O] X)) := by
     apply le_antisymm
     · rintro _ ⟨ψ, rfl⟩
       obtain ⟨n, g, hg⟩ := Module.Finite.exists_fin' O p
       obtain ⟨s, hs⟩ := Module.projective_lifting_property g LinearMap.id hg
       have hgs : ∀ c, g (s c) = c := fun c => by
         have := congrArg (fun u => u c) hs; simpa using this
-      have key : LinearMap.lcomp O X (Submodule.subtype p) ψ =
-          ∑ i, ((g (fun j => if i = j then 1 else 0) : p) : O) •
-            ((LinearMap.toSpanSingleton O X (ψ 1)) ∘ₗ (LinearMap.proj i) ∘ₗ s) := by
+      have key
+          : LinearMap.lcomp O X (Submodule.subtype p) ψ
+            = ∑ i, ((g (fun j => if i = j then 1 else 0) : p) : O) •
+                ((LinearMap.toSpanSingleton O X (ψ 1)) ∘ₗ (LinearMap.proj i) ∘ₗ s) := by
         ext c
         have h1 : (c : O) = ∑ i, s c i * ((g (fun j => if i = j then 1 else 0) : p) : O) := by
           conv_lhs => rw [← hgs c, pi_eq_sum_univ (s c)]
           set_option synthInstance.maxHeartbeats 100000 in
-            simp [map_sum]
+          simp [map_sum]
         simp only [LinearMap.lcomp_apply, Submodule.subtype_apply, LinearMap.sum_apply,
           LinearMap.smul_apply, LinearMap.comp_apply, LinearMap.proj_apply,
           LinearMap.toSpanSingleton_apply]
-        have h2 : ψ (c : O) = (c : O) • ψ 1 := by
-          rw [← map_smul]; simp
+        have h2 : ψ (c : O) = (c : O) • ψ 1 := by rw [← map_smul]; simp
         rw [h2, h1, Finset.sum_smul]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [smul_smul, mul_comm]
@@ -256,7 +265,8 @@ theorem s5b7_ideal (p : Ideal O) [hp : p.IsMaximal] (hp0 : p ≠ ⊥) [Finite (O
   apply le_antisymm
   · let ev : (p →ₗ[O] X) →ₗ[O] X := LinearMap.applyₗ (⟨t, htp⟩ : p)
     have hev : Function.Injective ev := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro ψ hψ
       ext c
       have h1 := hcomm ψ ⟨t, htp⟩ c
@@ -265,21 +275,24 @@ theorem s5b7_ideal (p : Ideal O) [hp : p.IsMaximal] (hp0 : p ≠ ⊥) [Finite (O
       exact (smul_eq_zero_iff_right ht0).mp h1
     exact LinearMap.finrank_le_finrank_of_injective hev
   · let j : X →ₗ[O] (p →ₗ[O] X) :=
-      (LinearMap.lcomp O X (Submodule.subtype p)) ∘ₗ
-        (LinearMap.ringLmapEquivSelf O O X).symm.toLinearMap
+      (LinearMap.lcomp O X (Submodule.subtype p))
+        ∘ₗ (LinearMap.ringLmapEquivSelf O O X).symm.toLinearMap
     have hj : Function.Injective j := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro x hx
       have h1 : j x ⟨t, htp⟩ = 0 := by rw [hx]; rfl
       have h2 : t • x = 0 := by simpa [j] using h1
       exact (smul_eq_zero_iff_right ht0).mp h2
     exact LinearMap.finrank_le_finrank_of_injective hj
 
-theorem s5b7_step (hO : ¬ IsField O) (M X : Type) [AddCommGroup M] [Module O M]
-    [Module.Finite O M] [Module.Projective O M] [AddCommGroup X] [Module O X] [Module.Finite O X]
-    [Module.Projective O X] (N : Submodule O M) (hN : IsCoatom N) [Finite (M ⧸ N)] :
-    Nat.card ((N →ₗ[O] X) ⧸ LinearMap.range (LinearMap.lcomp O X N.subtype)) =
-      Nat.card (M ⧸ N) ^ finrank O X := by
+theorem s5b7_step
+    (hO : ¬ IsField O)
+    (M X : Type) [AddCommGroup M] [Module O M] [Module.Finite O M] [Module.Projective O M]
+    [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X]
+    (N : Submodule O M) (hN : IsCoatom N) [Finite (M ⧸ N)]
+    : Nat.card ((N →ₗ[O] X) ⧸ LinearMap.range (LinearMap.lcomp O X N.subtype))
+      = Nat.card (M ⧸ N) ^ finrank O X := by
   classical
   have hsimple : IsSimpleModule O (M ⧸ N) := isSimpleModule_iff_isCoatom.mpr hN
   obtain ⟨p, hp, ⟨e⟩⟩ := isSimpleModule_iff_quot_maximal.mp hsimple
@@ -290,8 +303,8 @@ theorem s5b7_step (hO : ¬ IsField O) (M X : Type) [AddCommGroup M] [Module O M]
   have hπN : ∀ m, π m = 0 ↔ m ∈ N := by
     intro m
     simp [π]
-  obtain ⟨l, hl⟩ := Module.projective_lifting_property (Submodule.mkQ p) π
-    (Submodule.mkQ_surjective p)
+  obtain ⟨l, hl⟩ :=
+    Module.projective_lifting_property (Submodule.mkQ p) π (Submodule.mkQ_surjective p)
   have hl' : ∀ m, Submodule.Quotient.mk (l m) = π m := fun m => by
     have := congrArg (fun u => u m) hl; simpa using this
   obtain ⟨x, hx⟩ := hπs (Submodule.Quotient.mk 1)
@@ -358,76 +371,83 @@ theorem s5b7_step (hO : ¬ IsField O) (M X : Type) [AddCommGroup M] [Module O M]
   rw [← hker, Nat.card_congr (LinearMap.quotKerEquivOfSurjective Θ hsurj).toEquiv,
     s5b7_ideal p hp0 X, Nat.card_congr e.toEquiv]
 
-theorem s5b7_main (hO : ¬ IsField O) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X]
-    [Module.Projective O X] : ∀ (n : ℕ) (P M : Type) [AddCommGroup P] [Module O P] [AddCommGroup M]
-    [Module O M] [Module.Finite O M] [Module.Projective O M] (ι : P →ₗ[O] M),
-    Function.Injective ι → n ≠ 0 → Nat.card (M ⧸ LinearMap.range ι) = n →
-    Nat.card ((P →ₗ[O] X) ⧸ LinearMap.range (LinearMap.lcomp O X ι)) = n ^ finrank O X := by
+theorem s5b7_main
+    (hO : ¬ IsField O)
+    (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X]
+    : ∀ (n : ℕ) (P M : Type) [AddCommGroup P] [Module O P] [AddCommGroup M] [Module O M]
+        [Module.Finite O M] [Module.Projective O M] (ι : P →ₗ[O] M),
+      Function.Injective ι → n ≠ 0 → Nat.card (M ⧸ LinearMap.range ι) = n
+        → Nat.card ((P →ₗ[O] X) ⧸ LinearMap.range (LinearMap.lcomp O X ι)) = n ^ finrank O X := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
-  intro P M _ _ _ _ _ _ ι hι hn0 hn
-  classical
-  have hinf : Infinite O := by
-    by_contra h
-    rw [not_infinite_iff_finite] at h
-    exact hO (Finite.isField_of_domain O)
-  rcases eq_top_or_exists_le_coatom (LinearMap.range ι) with htop | ⟨N, hN, hle⟩
-  · have h1 : n = 1 := by
-      rw [← hn, htop]; simp
-    have hs : Function.Surjective ι := LinearMap.range_eq_top.mp htop
-    let e := LinearEquiv.ofBijective ι ⟨hι, hs⟩
-    have h2 : LinearMap.range (LinearMap.lcomp O X ι) = ⊤ := by
-      rw [LinearMap.range_eq_top]
-      intro φ
-      refine ⟨φ ∘ₗ e.symm.toLinearMap, ?_⟩
-      ext y
-      change φ (e.symm (e y)) = φ y
-      rw [e.symm_apply_apply]
-    rw [h2, h1]; simp
-  · let ι1 : P →ₗ[O] N := ι.codRestrict N (fun y => hle ⟨y, rfl⟩)
-    have hι1 : Function.Injective ι1 := fun a b hab => hι (congrArg Subtype.val hab)
-    have hcomp : ι = N.subtype ∘ₗ ι1 := by ext y; rfl
-    have hc := s5b7_card_comp ι1 N.subtype N.injective_subtype
-    rw [← hcomp, hn, Submodule.range_subtype] at hc
-    have hA : Nat.card (N ⧸ LinearMap.range ι1) ≠ 0 := fun h => hn0 (by rw [hc, h, zero_mul])
-    have hB : Nat.card (M ⧸ N) ≠ 0 := fun h => hn0 (by rw [hc, h, mul_zero])
-    have hfB : Finite (M ⧸ N) := Nat.finite_of_card_ne_zero hB
-    have hfA : Finite (N ⧸ LinearMap.range ι1) := Nat.finite_of_card_ne_zero hA
-    have hnt : Nontrivial (M ⧸ N) := Submodule.Quotient.nontrivial_iff.mpr hN.1
-    have hB2 : 1 < Nat.card (M ⧸ N) := Finite.one_lt_card
-    have hlt : Nat.card (N ⧸ LinearMap.range ι1) < n := by
-      rw [hc]
-      have : 0 < Nat.card (N ⧸ LinearMap.range ι1) := Nat.pos_of_ne_zero hA
-      nlinarith
-    have : IsNoetherian O M := isNoetherian_of_isNoetherianRing_of_finite O M
-    have : Module.Projective O N := s5b7_proj N
-    have h1 := ih _ hlt P N ι1 hι1 hA rfl
-    have h2 := s5b7_step hO M X N hN
-    have hinj : Function.Injective (LinearMap.lcomp O X ι1) := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
-      intro φ hφ
-      ext y
-      obtain ⟨a, b, hab, hEq⟩ := Finite.exists_ne_map_eq_of_infinite
-        (fun a : O => (Submodule.Quotient.mk (a • y) : N ⧸ LinearMap.range ι1))
-      rw [Submodule.Quotient.eq, ← sub_smul] at hEq
-      obtain ⟨z, hz⟩ := hEq
-      have h3 : φ (ι1 z) = 0 := by
-        have := congrArg (fun u => u z) hφ
-        simpa using this
-      rw [hz, map_smul] at h3
-      exact (smul_eq_zero_iff_right (sub_ne_zero.mpr hab)).mp h3
-    have hc2 := s5b7_card_comp (LinearMap.lcomp O X N.subtype) (LinearMap.lcomp O X ι1) hinj
-    have hcomp2 : LinearMap.lcomp O X ι1 ∘ₗ LinearMap.lcomp O X N.subtype = LinearMap.lcomp O X ι := by
-      ext φ y
-      rfl
-    rw [hcomp2, h1, h2] at hc2
-    rw [hc2, hc, mul_pow, mul_comm]
+    intro P M _ _ _ _ _ _ ι hι hn0 hn
+    classical
+    have hinf : Infinite O := by
+      by_contra h
+      rw [not_infinite_iff_finite] at h
+      exact hO (Finite.isField_of_domain O)
+    rcases eq_top_or_exists_le_coatom (LinearMap.range ι) with htop | ⟨N, hN, hle⟩
+    · have h1 : n = 1 := by rw [← hn, htop]; simp
+      have hs : Function.Surjective ι := LinearMap.range_eq_top.mp htop
+      let e := LinearEquiv.ofBijective ι ⟨hι, hs⟩
+      have h2 : LinearMap.range (LinearMap.lcomp O X ι) = ⊤ := by
+        rw [LinearMap.range_eq_top]
+        intro φ
+        refine ⟨φ ∘ₗ e.symm.toLinearMap, ?_⟩
+        ext y
+        change φ (e.symm (e y)) = φ y
+        rw [e.symm_apply_apply]
+      rw [h2, h1]
+      simp
+    · let ι1 : P →ₗ[O] N := ι.codRestrict N (fun y => hle ⟨y, rfl⟩)
+      have hι1 : Function.Injective ι1 := fun a b hab => hι (congrArg Subtype.val hab)
+      have hcomp : ι = N.subtype ∘ₗ ι1 := by ext y; rfl
+      have hc := s5b7_card_comp ι1 N.subtype N.injective_subtype
+      rw [← hcomp, hn, Submodule.range_subtype] at hc
+      have hA : Nat.card (N ⧸ LinearMap.range ι1) ≠ 0 := fun h => hn0 (by rw [hc, h, zero_mul])
+      have hB : Nat.card (M ⧸ N) ≠ 0 := fun h => hn0 (by rw [hc, h, mul_zero])
+      have hfB : Finite (M ⧸ N) := Nat.finite_of_card_ne_zero hB
+      have hfA : Finite (N ⧸ LinearMap.range ι1) := Nat.finite_of_card_ne_zero hA
+      have hnt : Nontrivial (M ⧸ N) := Submodule.Quotient.nontrivial_iff.mpr hN.1
+      have hB2 : 1 < Nat.card (M ⧸ N) := Finite.one_lt_card
+      have hlt : Nat.card (N ⧸ LinearMap.range ι1) < n := by
+        rw [hc]
+        have : 0 < Nat.card (N ⧸ LinearMap.range ι1) := Nat.pos_of_ne_zero hA
+        nlinarith
+      have : IsNoetherian O M := isNoetherian_of_isNoetherianRing_of_finite O M
+      have : Module.Projective O N := s5b7_proj N
+      have h1 := ih _ hlt P N ι1 hι1 hA rfl
+      have h2 := s5b7_step hO M X N hN
+      have hinj : Function.Injective (LinearMap.lcomp O X ι1) := by
+        set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+          rw [injective_iff_map_eq_zero]
+        intro φ hφ
+        ext y
+        obtain ⟨a, b, hab, hEq⟩ :=
+          Finite.exists_ne_map_eq_of_infinite (fun a : O =>
+            (Submodule.Quotient.mk (a • y) : N ⧸ LinearMap.range ι1))
+        rw [Submodule.Quotient.eq, ← sub_smul] at hEq
+        obtain ⟨z, hz⟩ := hEq
+        have h3 : φ (ι1 z) = 0 := by
+          have := congrArg (fun u => u z) hφ
+          simpa using this
+        rw [hz, map_smul] at h3
+        exact (smul_eq_zero_iff_right (sub_ne_zero.mpr hab)).mp h3
+      have hc2 := s5b7_card_comp (LinearMap.lcomp O X N.subtype) (LinearMap.lcomp O X ι1) hinj
+      have hcomp2
+          : LinearMap.lcomp O X ι1 ∘ₗ LinearMap.lcomp O X N.subtype = LinearMap.lcomp O X ι := by
+        ext φ y
+        rfl
+      rw [hcomp2, h1, h2] at hc2
+      rw [hc2, hc, mul_pow, mul_comm]
 
-theorem cardCokernelRestriction : Formalism.HermitianLatticeCounting.LatticeSumBounds.HomRestrictIndex := by
+theorem cardCokernelRestriction
+    : Formalism.HermitianLatticeCounting.LatticeSumBounds.HomRestrictIndex := by
   intro O M X _ _ _ _ _ _ _ _ _ _ P hO hfin
-  have h := s5b7_main hO X (Nat.card (M ⧸ P)) P M P.subtype P.injective_subtype Nat.card_pos.ne'
-    (by rw [Submodule.range_subtype])
+  have h :=
+    s5b7_main hO X (Nat.card (M ⧸ P)) P M P.subtype P.injective_subtype Nat.card_pos.ne'
+      (by rw [Submodule.range_subtype])
   exact h
 
 end homRestrict
@@ -701,29 +721,37 @@ lemma s5b7_real_ineq (R t : ℝ) (hR : 0 < R) (ht : 0 ≤ t) (r d s : ℕ) (hs :
     nlinarith
   gcongr
 
-theorem s5b7_vol (R : ℝ) (hR : 0 < R) : ∀ (r d : ℕ), r ≤ d → ∀ t : ℝ, 0 ≤ t →
-    volume (s5b7_A R d r t) ≤ ENNReal.ofReal (t ^ (2 * (d - r)) * R ^ (2 * r ^ 2) *
-      Real.pi ^ (r * d) / ((d - r).factorial : ℝ) ^ r) := by
+theorem s5b7_vol (R : ℝ) (hR : 0 < R)
+    : ∀ (r d : ℕ),
+      r ≤ d
+        → ∀ t : ℝ,
+          0 ≤ t
+            → volume (s5b7_A R d r t)
+              ≤ ENNReal.ofReal
+                (t ^ (2 * (d - r)) * R ^ (2 * r ^ 2) * Real.pi ^ (r * d)
+                  / ((d - r).factorial : ℝ) ^ r) := by
   intro r
   induction r with
   | zero =>
     intro d _ t ht
     by_cases h1 : 1 ≤ t
-    · calc volume (s5b7_A R d 0 t) ≤ volume (univ : Set (Fin 0 → EuclideanSpace ℂ (Fin d))) :=
-            measure_mono (subset_univ _)
+    · calc
+        volume (s5b7_A R d 0 t)
+          ≤ volume (univ : Set (Fin 0 → EuclideanSpace ℂ (Fin d))) := measure_mono (subset_univ _)
         _ = 1 := by rw [Measure.volume_pi_eq_dirac 0]; simp
         _ ≤ _ := by
-            rw [← ENNReal.ofReal_one]
-            apply ENNReal.ofReal_le_ofReal
-            simp only [pow_zero, mul_one, zero_mul, div_one, mul_zero, ne_eq, OfNat.ofNat_ne_zero,
-              not_false_eq_true, zero_pow]
-            exact one_le_pow₀ h1
+          rw [← ENNReal.ofReal_one]
+          apply ENNReal.ofReal_le_ofReal
+          simp only [pow_zero, mul_one, zero_mul, div_one, mul_zero, ne_eq, OfNat.ofNat_ne_zero,
+            not_false_eq_true, zero_pow]
+          exact one_le_pow₀ h1
     · have : s5b7_A R d 0 t = ∅ := by
         ext a
         simp only [s5b7_A, Set.mem_ofPred_eq, mem_empty_iff_false, iff_false, not_and]
         intro _
         simpa using h1
-      rw [this]; simp
+      rw [this]
+      simp
   | succ r ih =>
     intro d hd t ht
     obtain ⟨d, rfl⟩ : ∃ d', d = d' + 1 := ⟨d - 1, by omega⟩
@@ -731,27 +759,30 @@ theorem s5b7_vol (R : ℝ) (hR : 0 < R) : ∀ (r d : ℕ), r ≤ d → ∀ t : �
     have hs' : d + 1 - (r + 1) = d - r := by omega
     rw [hs']
     set s := d - r with hs
-    let e := MeasurableEquiv.piFinSuccAbove
-      (fun _ : Fin (r + 1) => EuclideanSpace ℂ (Fin (d + 1))) 0
-    have he : MeasurePreserving e := volume_preserving_piFinSuccAbove
-      (fun _ : Fin (r + 1) => EuclideanSpace ℂ (Fin (d + 1))) 0
+    let e :=
+      MeasurableEquiv.piFinSuccAbove (fun _ : Fin (r + 1) => EuclideanSpace ℂ (Fin (d + 1))) 0
+    have he : MeasurePreserving e :=
+      volume_preserving_piFinSuccAbove (fun _ : Fin (r + 1) => EuclideanSpace ℂ (Fin (d + 1))) 0
     have hAm : MeasurableSet (s5b7_A R (d + 1) (r + 1) t) := (s5b7_A_closed _ _ _ _).measurableSet
-    have hes : ∀ (x : EuclideanSpace ℂ (Fin (d + 1))) (a' : Fin r → EuclideanSpace ℂ (Fin (d + 1))),
-        e.symm (x, a') = Fin.cons x a' := by
+    have hes
+        : ∀ (x : EuclideanSpace ℂ (Fin (d + 1))) (a' : Fin r → EuclideanSpace ℂ (Fin (d + 1))),
+          e.symm (x, a') = Fin.cons x a' := by
       intro x a'
       simp only [e, MeasurableEquiv.piFinSuccAbove_symm_apply]
       exact Fin.insertNth_zero' x a'
-    have hvol : volume (s5b7_A R (d + 1) (r + 1) t) =
-        ∫⁻ x, volume (Prod.mk x ⁻¹' (e.symm ⁻¹' s5b7_A R (d + 1) (r + 1) t)) := by
+    have hvol
+        : volume (s5b7_A R (d + 1) (r + 1) t)
+          = ∫⁻ x, volume (Prod.mk x ⁻¹' (e.symm ⁻¹' s5b7_A R (d + 1) (r + 1) t)) := by
       rw [← (he.symm e).measure_preimage hAm.nullMeasurableSet, Measure.volume_eq_prod,
         Measure.prod_apply (e.symm.measurable hAm)]
     rw [hvol]
     set C1 : ℝ := (R ^ 2 * Real.pi) ^ r * (t ^ (2 * s) * R ^ (2 * r ^ 2) * Real.pi ^ (r * d) /
         (s.factorial : ℝ) ^ r) with hC1def
     have hC1 : 0 ≤ C1 := by positivity
-    have hbound : ∀ᵐ x : EuclideanSpace ℂ (Fin (d + 1)),
-        volume (Prod.mk x ⁻¹' (e.symm ⁻¹' s5b7_A R (d + 1) (r + 1) t)) ≤
-          ENNReal.ofReal C1 * ENNReal.ofReal (if ‖x‖ ≤ R then (‖x‖ ^ (2 * s))⁻¹ else 0) := by
+    have hbound
+        : ∀ᵐ x : EuclideanSpace ℂ (Fin (d + 1)),
+          volume (Prod.mk x ⁻¹' (e.symm ⁻¹' s5b7_A R (d + 1) (r + 1) t)) ≤
+            ENNReal.ofReal C1 * ENNReal.ofReal (if ‖x‖ ≤ R then (‖x‖ ^ (2 * s))⁻¹ else 0) := by
       have h0 : ({0}ᶜ : Set (EuclideanSpace ℂ (Fin (d + 1)))) ∈ ae volume :=
         compl_mem_ae_iff.mpr (measure_singleton 0)
       filter_upwards [h0] with x hx
@@ -759,24 +790,29 @@ theorem s5b7_vol (R : ℝ) (hR : 0 < R) : ∀ (r d : ℕ), r ≤ d → ∀ t : �
       by_cases hxR : ‖x‖ ≤ R
       · rw [if_pos hxR]
         have hx0 : 0 < ‖x‖ := norm_pos_iff.mpr hx
-        obtain ⟨Φ, hΦ⟩ := s5b7_exists_iso d (((‖x‖⁻¹ : ℝ) : ℂ) • x) (by
-          rw [norm_smul, Complex.norm_real, norm_inv, norm_norm, inv_mul_cancel₀ hx0.ne'])
+        obtain ⟨Φ, hΦ⟩ :=
+          s5b7_exists_iso d (((‖x‖⁻¹ : ℝ) : ℂ) • x)
+            (by rw [norm_smul, Complex.norm_real, norm_inv, norm_norm, inv_mul_cancel₀ hx0.ne'])
         set S : Set ((Fin r → ℂ) × (Fin r → EuclideanSpace ℂ (Fin d))) :=
           (Set.pi univ fun _ => Metric.closedBall (0 : ℂ) R) ×ˢ s5b7_A R d r (t / ‖x‖) with hS
-        have hsub : Prod.mk x ⁻¹' (e.symm ⁻¹' s5b7_A R (d + 1) (r + 1) t) ⊆
-            (fun a : Fin r → EuclideanSpace ℂ (Fin (d + 1)) =>
-              ((fun b => (Φ (a b)).ofLp.1), (fun b => (Φ (a b)).ofLp.2))) ⁻¹' S := by
+        have hsub
+            : Prod.mk x ⁻¹' (e.symm ⁻¹' s5b7_A R (d + 1) (r + 1) t)
+              ⊆ (fun a : Fin r → EuclideanSpace ℂ (Fin (d + 1)) =>
+                  ((fun b => (Φ (a b)).ofLp.1), (fun b => (Φ (a b)).ofLp.2)))
+                ⁻¹' S := by
           intro a' ha'
-          have ha'' : (Fin.cons x a' : Fin (r + 1) → EuclideanSpace ℂ (Fin (d + 1))) ∈
-              s5b7_A R (d + 1) (r + 1) t := by
+          have ha''
+              : (Fin.cons x a' : Fin (r + 1) → EuclideanSpace ℂ (Fin (d + 1)))
+                ∈ s5b7_A R (d + 1) (r + 1) t := by
             rw [← hes]; exact ha'
           obtain ⟨h1, h2⟩ := s5b7_slice R d r t x hx Φ hΦ a' ha''
           exact ⟨fun b _ => by simpa using h1 b, h2⟩
         have hSm : MeasurableSet S :=
           (MeasurableSet.univ_pi fun _ => Metric.isClosed_closedBall.measurableSet).prod
             (s5b7_A_closed _ _ _ _).measurableSet
-        have hball : volume (Set.pi univ fun _ : Fin r => Metric.closedBall (0 : ℂ) R) =
-            ENNReal.ofReal ((R ^ 2 * Real.pi) ^ r) := by
+        have hball
+            : volume (Set.pi univ fun _ : Fin r => Metric.closedBall (0 : ℂ) R)
+              = ENNReal.ofReal ((R ^ 2 * Real.pi) ^ r) := by
           rw [volume_pi_pi]
           simp only [Complex.volume_closedBall, Finset.prod_const, Finset.card_univ,
             Fintype.card_fin]
@@ -784,45 +820,51 @@ theorem s5b7_vol (R : ℝ) (hR : 0 < R) : ∀ (r d : ℕ), r ≤ d → ∀ t : �
             ENNReal.ofReal_pow hR.le]
           congr 2
           exact (ENNReal.ofReal_coe_nnreal (p := NNReal.pi)).symm
-        calc volume (Prod.mk x ⁻¹' (e.symm ⁻¹' s5b7_A R (d + 1) (r + 1) t))
-            ≤ volume ((fun a : Fin r → EuclideanSpace ℂ (Fin (d + 1)) =>
-              ((fun b => (Φ (a b)).ofLp.1), (fun b => (Φ (a b)).ofLp.2))) ⁻¹' S) :=
-              measure_mono hsub
+        calc
+          volume (Prod.mk x ⁻¹' (e.symm ⁻¹' s5b7_A R (d + 1) (r + 1) t))
+              ≤ volume
+                ((fun a : Fin r → EuclideanSpace ℂ (Fin (d + 1)) =>
+                    ((fun b => (Φ (a b)).ofLp.1), (fun b => (Φ (a b)).ofLp.2)))
+                  ⁻¹' S) :=
+            measure_mono hsub
           _ = volume S := (s5b7_mp d r Φ).measure_preimage hSm.nullMeasurableSet
-          _ = volume (Set.pi univ fun _ : Fin r => Metric.closedBall (0 : ℂ) R) *
-                volume (s5b7_A R d r (t / ‖x‖)) := by
-              rw [hS, Measure.volume_eq_prod, Measure.prod_prod]
-          _ ≤ ENNReal.ofReal ((R ^ 2 * Real.pi) ^ r) *
-                ENNReal.ofReal ((t / ‖x‖) ^ (2 * s) * R ^ (2 * r ^ 2) * Real.pi ^ (r * d) /
-                  (s.factorial : ℝ) ^ r) := by
-              rw [hball]
-              gcongr
-              exact ih d hr _ (by positivity)
+          _ = volume (Set.pi univ fun _ : Fin r => Metric.closedBall (0 : ℂ) R)
+              * volume (s5b7_A R d r (t / ‖x‖)) := by
+            rw [hS, Measure.volume_eq_prod, Measure.prod_prod]
+          _ ≤ ENNReal.ofReal ((R ^ 2 * Real.pi) ^ r) * ENNReal.ofReal
+              ((t / ‖x‖) ^ (2 * s) * R ^ (2 * r ^ 2) * Real.pi ^ (r * d)
+                / (s.factorial : ℝ) ^ r) := by
+            rw [hball]
+            gcongr
+            exact ih d hr _ (by positivity)
           _ = ENNReal.ofReal C1 * ENNReal.ofReal ((‖x‖ ^ (2 * s))⁻¹) := by
-              rw [← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_mul hC1]
-              congr 1
-              rw [hC1def, div_pow]
-              field_simp
+            rw [← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_mul hC1]
+            congr 1
+            rw [hC1def, div_pow]
+            field_simp
       · have : Prod.mk x ⁻¹' (e.symm ⁻¹' s5b7_A R (d + 1) (r + 1) t) = ∅ := by
           ext a'
           simp only [mem_preimage, mem_empty_iff_false, iff_false]
           rw [hes]
           intro h
           exact hxR (by simpa using h.1 0)
-        rw [this]; simp
-    calc ∫⁻ x, volume (Prod.mk x ⁻¹' (e.symm ⁻¹' s5b7_A R (d + 1) (r + 1) t))
-        ≤ ∫⁻ x : EuclideanSpace ℂ (Fin (d + 1)),
-            ENNReal.ofReal C1 * ENNReal.ofReal (if ‖x‖ ≤ R then (‖x‖ ^ (2 * s))⁻¹ else 0) :=
-          lintegral_mono_ae hbound
-      _ = ENNReal.ofReal C1 * ∫⁻ x : EuclideanSpace ℂ (Fin (d + 1)),
+        rw [this]
+        simp
+    calc
+      ∫⁻ x, volume (Prod.mk x ⁻¹' (e.symm ⁻¹' s5b7_A R (d + 1) (r + 1) t))
+          ≤ ∫⁻ x : EuclideanSpace ℂ (Fin (d + 1)),
+              ENNReal.ofReal C1 * ENNReal.ofReal (if ‖x‖ ≤ R then (‖x‖ ^ (2 * s))⁻¹ else 0) :=
+        lintegral_mono_ae hbound
+      _ = ENNReal.ofReal C1
+          * ∫⁻ x : EuclideanSpace ℂ (Fin (d + 1)),
             ENNReal.ofReal (if ‖x‖ ≤ R then (‖x‖ ^ (2 * s))⁻¹ else 0) :=
-          lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
+        lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
       _ = ENNReal.ofReal C1 * ENNReal.ofReal
-            (Real.pi ^ (d + 1) / (d.factorial : ℝ) * R ^ (2 * r + 2) / ((r : ℝ) + 1)) := by
-          rw [hs, s5b7_radial d r hr R hR]
-      _ = ENNReal.ofReal (C1 *
-            (Real.pi ^ (d + 1) / (d.factorial : ℝ) * R ^ (2 * r + 2) / ((r : ℝ) + 1))) :=
-          (ENNReal.ofReal_mul hC1).symm
+          (Real.pi ^ (d + 1) / (d.factorial : ℝ) * R ^ (2 * r + 2) / ((r : ℝ) + 1)) := by
+        rw [hs, s5b7_radial d r hr R hR]
+      _ = ENNReal.ofReal
+          (C1 * (Real.pi ^ (d + 1) / (d.factorial : ℝ) * R ^ (2 * r + 2) / ((r : ℝ) + 1))) :=
+        (ENNReal.ofReal_mul hC1).symm
       _ ≤ _ := ENNReal.ofReal_le_ofReal (s5b7_real_ineq R t hR ht r d s (Nat.sub_le d r))
 
 end volume

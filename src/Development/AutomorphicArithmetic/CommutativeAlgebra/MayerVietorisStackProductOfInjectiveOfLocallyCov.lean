@@ -10,12 +10,16 @@ public import Development.AutomorphicArithmetic.CommutativeAlgebra.MayerVietoris
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Blow
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Blow
 
 namespace UpperTheory.FullyFaithfulLift
 
-private theorem cancel_comp {J C D : Type} [Category J] [Category C] [Category D] (F : C ⥤ D)
-    (hobj : Function.Injective F.obj) [F.Faithful] (c c' : J ⥤ C) (h : c ⋙ F = c' ⋙ F) : c = c' := by
+private theorem cancel_comp
+    {J C D : Type} [Category J] [Category C] [Category D]
+    (F : C ⥤ D) (hobj : Function.Injective F.obj) [F.Faithful]
+    (c c' : J ⥤ C) (h : c ⋙ F = c' ⋙ F)
+    : c = c' := by
   have hob : ∀ j, c.obj j = c'.obj j := fun j => hobj (congrArg (fun G => G.obj j) h)
   refine CategoryTheory.Functor.ext hob ?_
   intro X Y f
@@ -25,21 +29,32 @@ private theorem cancel_comp {J C D : Type} [Category J] [Category C] [Category D
   rw [e]
   simp [eqToHom_map]
 
-private theorem lift_comp {J C D : Type} [Category J] [Category C] [Category D] (F : C ⥤ D)
-    [F.Full] [F.Faithful] (c : J ⥤ D) (l : J → C) (hl : ∀ j, F.obj (l j) = c.obj j) :
-    ∃ c' : J ⥤ C, c' ⋙ F = c := by
-  refine ⟨{ obj := l
-            map := fun {i j} f => F.preimage (eqToHom (hl i) ≫ c.map f ≫ eqToHom (hl j).symm)
-            map_id := fun i => F.map_injective (by simp)
-            map_comp := fun f g => F.map_injective (by simp) }, ?_⟩
+private theorem lift_comp
+    {J C D : Type} [Category J] [Category C] [Category D]
+    (F : C ⥤ D) [F.Full] [F.Faithful]
+    (c : J ⥤ D) (l : J → C) (hl : ∀ j, F.obj (l j) = c.obj j)
+    : ∃ c' : J ⥤ C, c' ⋙ F = c := by
+  refine ⟨
+    {
+      obj := l
+      map := fun {i j} f => F.preimage (eqToHom (hl i) ≫ c.map f ≫ eqToHom (hl j).symm)
+      map_id := fun i => F.map_injective (by simp)
+      map_comp := fun f g => F.map_injective (by simp)
+    },
+    ?_
+  ⟩
   refine CategoryTheory.Functor.ext hl (fun i j f => ?_)
   simp
 
-private theorem sp_map_eq {E : Spc} {a b : Act} (φ : Act.Hom a b) {k : ℕ} {T : Scheme.{0}} (x : Sx (Sp E a) k T) :
-    Sx.map (Sp.map E φ) x = ((x.1, Sx.map (spcMap φ) x.2) : Sx (Sp E b) k T) := rfl
+private theorem sp_map_eq
+    {E : Spc} {a b : Act} (φ : Act.Hom a b) {k : ℕ} {T : Scheme.{0}} (x : Sx (Sp E a) k T)
+    : Sx.map (Sp.map E φ) x = ((x.1, Sx.map (spcMap φ) x.2) : Sx (Sp E b) k T) :=
+  rfl
 
-private theorem fn_obj_inj {a b : Act} (φ : Act.Hom a b) (hi : ∀ A, Function.Injective (fun x : a.D.obj A => φ.d.app A x))
-    (A : CommRingCat.{0}) : Function.Injective (φ.fn A).obj := by
+private theorem fn_obj_inj
+    {a b : Act} (φ : Act.Hom a b) (hi : ∀ A, Function.Injective (fun x : a.D.obj A => φ.d.app A x))
+    (A : CommRingCat.{0})
+    : Function.Injective (φ.fn A).obj := by
   intro x y h
   have e : φ.d.app A x.pt = φ.d.app A y.pt := congrArg Ob.pt h
   cases x
@@ -47,12 +62,17 @@ private theorem fn_obj_inj {a b : Act} (φ : Act.Hom a b) (hi : ∀ A, Function.
   congr
   exact hi A e
 
-private theorem fn_faithful {a b : Act} (φ : Act.Hom a b) (hb : ∀ A, Function.Bijective (fun g : a.G.obj A => φ.g.app A g))
-    (A : CommRingCat.{0}) : (φ.fn A).Faithful :=
+private theorem fn_faithful
+    {a b : Act} (φ : Act.Hom a b) (hb : ∀ A, Function.Bijective (fun g : a.G.obj A => φ.g.app A g))
+    (A : CommRingCat.{0})
+    : (φ.fn A).Faithful :=
   ⟨fun {_ _} _ _ h => Subtype.ext ((hb A).1 (congrArg Subtype.val h))⟩
 
-private theorem fn_full {a b : Act} (φ : Act.Hom a b) (hi : ∀ A, Function.Injective (fun x : a.D.obj A => φ.d.app A x))
-    (hb : ∀ A, Function.Bijective (fun g : a.G.obj A => φ.g.app A g)) (A : CommRingCat.{0}) : (φ.fn A).Full := by
+private theorem fn_full
+    {a b : Act} (φ : Act.Hom a b) (hi : ∀ A, Function.Injective (fun x : a.D.obj A => φ.d.app A x))
+    (hb : ∀ A, Function.Bijective (fun g : a.G.obj A => φ.g.app A g))
+    (A : CommRingCat.{0})
+    : (φ.fn A).Full := by
   constructor
   intro x y u
   obtain ⟨g, hg⟩ := (hb A).2 u.1
@@ -65,22 +85,30 @@ private theorem fn_full {a b : Act} (φ : Act.Hom a b) (hi : ∀ A, Function.Inj
   · apply Subtype.ext
     exact hg
 
-private theorem mono_sp (E : Spc) {a b : Act} (φ : Act.Hom a b) (hi : ∀ A, Function.Injective (fun x : a.D.obj A => φ.d.app A x))
-    (hb : ∀ A, Function.Bijective (fun g : a.G.obj A => φ.g.app A g)) : Mono (Sp.map E φ) := by
+private theorem mono_sp
+    (E : Spc)
+    {a b : Act} (φ : Act.Hom a b) (hi : ∀ A, Function.Injective (fun x : a.D.obj A => φ.d.app A x))
+    (hb : ∀ A, Function.Bijective (fun g : a.G.obj A => φ.g.app A g))
+    : Mono (Sp.map E φ) := by
   apply UpperTheory.mono_of_injective_on_simplices
   intro k T x y h
   simp only [sp_map_eq] at h
   obtain ⟨h1, h2⟩ := Prod.mk.inj h
   haveI := fn_faithful φ hb Γ(T, ⊤)
-  have h2' : (show ComposableArrows (Ob a Γ(T, ⊤)) k from x.2) ⋙ φ.fn Γ(T, ⊤) =
-      (show ComposableArrows (Ob a Γ(T, ⊤)) k from y.2) ⋙ φ.fn Γ(T, ⊤) := h2
+  have h2'
+      : (show ComposableArrows (Ob a Γ(T, ⊤)) k from x.2) ⋙ φ.fn Γ(T, ⊤)
+        = (show ComposableArrows (Ob a Γ(T, ⊤)) k from y.2) ⋙ φ.fn Γ(T, ⊤) :=
+    h2
   exact Prod.ext h1 (cancel_comp (φ.fn Γ(T, ⊤)) (fn_obj_inj φ hi _) _ _ h2')
 
-private theorem lift_sp (E : Spc) {a₁ a : Act} (φ : Act.Hom a₁ a) (hi : ∀ A, Function.Injective (fun x : a₁.D.obj A => φ.d.app A x))
-    (hb : ∀ A, Function.Bijective (fun g : a₁.G.obj A => φ.g.app A g)) {k : ℕ} {W : Scheme.{0}} (y : Sx (Sp E a) k W)
-    (y₀ : a₁.D.obj Γ(W, ⊤))
-    (h0 : φ.d.app _ y₀ = ((show ComposableArrows (Ob a Γ(W, ⊤)) k from y.2).obj 0).pt) :
-    ∃ x : Sx (Sp E a₁) k W, Sx.map (Sp.map E φ) x = y := by
+private theorem lift_sp
+    (E : Spc)
+    {a₁ a : Act}
+    (φ : Act.Hom a₁ a) (hi : ∀ A, Function.Injective (fun x : a₁.D.obj A => φ.d.app A x))
+    (hb : ∀ A, Function.Bijective (fun g : a₁.G.obj A => φ.g.app A g))
+    {k : ℕ} {W : Scheme.{0}} (y : Sx (Sp E a) k W) (y₀ : a₁.D.obj Γ(W, ⊤))
+    (h0 : φ.d.app _ y₀ = ((show ComposableArrows (Ob a Γ(W, ⊤)) k from y.2).obj 0).pt)
+    : ∃ x : Sx (Sp E a₁) k W, Sx.map (Sp.map E φ) x = y := by
   classical
   set c : ComposableArrows (Ob a Γ(W, ⊤)) k := y.2 with hc
   have hl : ∀ j : Fin (k + 1), ∃ o : Ob a₁ Γ(W, ⊤), (φ.fn Γ(W, ⊤)).obj o = c.obj j := by
@@ -105,15 +133,20 @@ private theorem lift_sp (E : Spc) {a₁ a : Act} (φ : Act.Hom a₁ a) (hi : ∀
 
 end UpperTheory.FullyFaithfulLift
 
-theorem UpperTheory.mayerVietoris_stackProduct_of_injective_of_locally_covered :
-    ∀ (R : Type) [CommRing R] (E : Spc) {a₁ a₂ a : Act} (φ₁ : Act.Hom a₁ a) (φ₂ : Act.Hom a₂ a),
-        (∀ A, Function.Injective (fun x : a₁.D.obj A => φ₁.d.app A x)) → (∀ A, Function.Injective (fun x : a₂.D.obj A => φ₂.d.app A x)) →
-        (∀ A, Function.Bijective (fun g : a₁.G.obj A => φ₁.g.app A g)) → (∀ A, Function.Bijective (fun g : a₂.G.obj A => φ₂.g.app A g)) →
-        (∀ (T : Scheme.{0}) (x : a.D.obj Γ(T, ⊤)), Loc T fun V g =>
-          (∃ y, φ₁.d.app _ y = a.D.map g.appTop x) ∨ (∃ y, φ₂.d.app _ y = a.D.map g.appTop x)) →
-        Cover2 R (Sp.map E φ₁) (Sp.map E φ₂) := by
+theorem UpperTheory.mayerVietoris_stackProduct_of_injective_of_locally_covered
+    : ∀ (R : Type) [CommRing R] (E : Spc) {a₁ a₂ a : Act} (φ₁ : Act.Hom a₁ a) (φ₂ : Act.Hom a₂ a),
+      (∀ A, Function.Injective (fun x : a₁.D.obj A => φ₁.d.app A x))
+        → (∀ A, Function.Injective (fun x : a₂.D.obj A => φ₂.d.app A x))
+        → (∀ A, Function.Bijective (fun g : a₁.G.obj A => φ₁.g.app A g))
+        → (∀ A, Function.Bijective (fun g : a₂.G.obj A => φ₂.g.app A g))
+        → (∀ (T : Scheme.{0}) (x : a.D.obj Γ(T, ⊤)),
+          Loc T fun V g =>
+            (∃ y, φ₁.d.app _ y = a.D.map g.appTop x) ∨ (∃ y, φ₂.d.app _ y = a.D.map g.appTop x))
+        → Cover2 R (Sp.map E φ₁) (Sp.map E φ₂) := by
   intro R _ E a₁ a₂ a φ₁ φ₂ i₁ i₂ b₁ b₂ hl
-  refine UpperTheory.mayerVietorisCover_of_mono_of_zariskiLocal R _ _ (UpperTheory.FullyFaithfulLift.mono_sp E φ₁ i₁ b₁) (UpperTheory.FullyFaithfulLift.mono_sp E φ₂ i₂ b₂) (fun k T y => ?_)
+  refine UpperTheory.mayerVietorisCover_of_mono_of_zariskiLocal R _ _
+    (UpperTheory.FullyFaithfulLift.mono_sp E φ₁ i₁ b₁)
+    (UpperTheory.FullyFaithfulLift.mono_sp E φ₂ i₂ b₂) (fun k T y => ?_)
   obtain ⟨S, hS, hP⟩ := hl T ((show ComposableArrows (Ob a Γ(T, ⊤)) k from y.2).obj 0).pt
   refine ⟨S, hS, fun W h hh => ?_⟩
   rcases hP W h hh with ⟨y₀, e⟩ | ⟨y₀, e⟩

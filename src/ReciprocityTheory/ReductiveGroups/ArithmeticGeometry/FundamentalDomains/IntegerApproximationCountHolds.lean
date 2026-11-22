@@ -22,9 +22,12 @@ theorem integerApproximationCount_holds : IntegerApproximationCount (E := E) := 
     have := X.cmType (ComplexEmbedding.conjugate φ)
     rw [TraceIntegralBasis.conj_conj] at this
     exact this.mpr h
-  let Z : TraceIntegralBasis.VS E := WithLp.toLp 2 (fun w : TraceIntegralBasis.CP E =>
-    if h : w.1.embedding ∈ X.Ψ then w' ⟨w.1.embedding, h⟩
-    else conj (w' ⟨ComplexEmbedding.conjugate w.1.embedding, hconjmem _ h⟩))
+  let Z : TraceIntegralBasis.VS E :=
+    WithLp.toLp 2 (fun w : TraceIntegralBasis.CP E =>
+      if h : w.1.embedding ∈ X.Ψ then
+        w' ⟨w.1.embedding, h⟩
+      else
+        conj (w' ⟨ComplexEmbedding.conjugate w.1.embedding, hconjmem _ h⟩))
   obtain ⟨α, hα⟩ := RingOfIntegersCovering.cover_OE Z
   refine ⟨α, fun τ => ?_⟩
   set w : TraceIntegralBasis.CP E := ⟨InfinitePlace.mk τ.1, IsTotallyComplex.isComplex _⟩ with hw
@@ -32,8 +35,13 @@ theorem integerApproximationCount_holds : IntegerApproximationCount (E := E) := 
     have h := PiLp.norm_apply_le (Z - TraceIntegralBasis.iota E (α : E)) w
     rw [PiLp.sub_apply, TraceIntegralBasis.iota_apply] at h
     exact h.trans hα
-  have hZw : Z w = if h : w.1.embedding ∈ X.Ψ then w' ⟨w.1.embedding, h⟩
-      else conj (w' ⟨ComplexEmbedding.conjugate w.1.embedding, hconjmem _ h⟩) := rfl
+  have hZw
+      : Z w
+        = if h : w.1.embedding ∈ X.Ψ then
+            w' ⟨w.1.embedding, h⟩
+          else
+            conj (w' ⟨ComplexEmbedding.conjugate w.1.embedding, hconjmem _ h⟩) :=
+    rfl
   have hmk : InfinitePlace.mk w.1.embedding = InfinitePlace.mk τ.1 := mk_embedding _
   rcases InfinitePlace.mk_eq_iff.mp hmk with h | h
   · have hmem : w.1.embedding ∈ X.Ψ := h ▸ τ.2

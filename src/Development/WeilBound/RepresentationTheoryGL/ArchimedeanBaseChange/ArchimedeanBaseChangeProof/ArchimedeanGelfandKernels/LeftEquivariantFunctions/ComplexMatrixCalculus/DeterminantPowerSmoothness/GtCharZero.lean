@@ -37,12 +37,17 @@ theorem delta_eq (j : Fin n) : delta n j = ((n - 1 - (j : ℕ) : ℕ) : ℤ) := 
   unfold delta
   omega
 
-theorem gt_eq_weyl (lam : Fin n → ℤ) (hlam : Antitone lam) (t : Fin n → ℂ) (ht : ∀ a, t a ≠ 0)
-    (hinj : Function.Injective t) : gtChar n lam t = weylChar lam t := by
+theorem gt_eq_weyl
+    (lam : Fin n → ℤ) (hlam : Antitone lam)
+    (t : Fin n → ℂ) (ht : ∀ a, t a ≠ 0) (hinj : Function.Injective t)
+    : gtChar n lam t = weylChar lam t := by
   have h1 := ReciprocityTheory.ChartRestriction.TR.Weyl.weylGT ℂ n lam hlam t ht
-  have h0 := ReciprocityTheory.ChartRestriction.TR.Weyl.weylGT ℂ n (0 : Fin n → ℤ) antitone_const t ht
+  have h0 :=
+    ReciprocityTheory.ChartRestriction.TR.Weyl.weylGT ℂ n (0 : Fin n → ℤ) antitone_const t ht
   rw [gtChar_zero, mul_one, zero_add] at h0
-  have hnum : (Matrix.of fun i j : Fin n => t i ^ (lam j + (n - 1 - (j : ℕ) : ℕ))).det = alt n (lam + delta n) t := by
+  have hnum
+      : (Matrix.of fun i j : Fin n => t i ^ (lam j + (n - 1 - (j : ℕ) : ℕ))).det
+        = alt n (lam + delta n) t := by
     unfold alt
     congr 1
     ext i j
@@ -64,8 +69,11 @@ theorem rmChar' : RmChar := by
   have hu : IsUnit (diagonal t).det := by
     rw [det_diagonal]
     exact isUnit_iff_ne_zero.2 (Finset.prod_ne_zero_iff.2 fun a _ => ht a)
-  obtain ⟨f, hf, htr⟩ := ReciprocityTheory.ChartRestriction.TR.Weyl.sqChar n (dw lam) (Matrix.nonsingInvUnit (diagonal t) hu) t rfl
-  have hfe : f = GlobalTheory.Branching.sqRep ℂ n (dw lam) (Matrix.nonsingInvUnit (diagonal t) hu) :=
+  obtain ⟨f, hf, htr⟩ :=
+    ReciprocityTheory.ChartRestriction.TR.Weyl.sqChar n (dw lam)
+      (Matrix.nonsingInvUnit (diagonal t) hu) t rfl
+  have hfe
+      : f = GlobalTheory.Branching.sqRep ℂ n (dw lam) (Matrix.nonsingInvUnit (diagonal t) hu) :=
     LinearMap.ext fun x => Subtype.ext (by rw [hf x, GlobalTheory.Branching.sqRep_coe])
   have hdw : (dw lam).w = lam := by unfold dw; rw [dite_eq_left hlam]
   unfold Rm

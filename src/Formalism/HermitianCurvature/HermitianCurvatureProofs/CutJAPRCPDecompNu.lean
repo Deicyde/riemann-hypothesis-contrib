@@ -4,12 +4,14 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJAPRCPDec
 
 @[expose] public section
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q NumberField
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q NumberField
 open scoped ComplexConjugate Matrix
 
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Rep.Core.TC.PR.CP.Dc
 
-open Formalism.FourierDecayAlt.P.B2x3 Formalism.FourierDecayAlt.P.SettingConstruction Formalism.FourierDecayAlt.P.TheSec Formalism.FourierDecayAlt.B2
+open Formalism.FourierDecayAlt.P.B2x3 Formalism.FourierDecayAlt.P.SettingConstruction
+  Formalism.FourierDecayAlt.P.TheSec Formalism.FourierDecayAlt.B2
 
 noncomputable section
 
@@ -27,7 +29,8 @@ lemma Su_mul (i j j' m : Fin (k + 1)) : Su k i j * Su k j' m = if j = j' then Su
   · rw [Matrix.single_mul_single_of_ne _ _ _ _ h]
 
 def nuG (k : ℕ) (v s w : ℂ) : Mb k :=
-  1 + (v - 1) • Su k 0 0 + s • (Su k 0 (Fin.last k) + Su k (Fin.last k) 0) + (w - 1) • Su k (Fin.last k) (Fin.last k)
+  1 + (v - 1) • Su k 0 0 + s • (Su k 0 (Fin.last k) + Su k (Fin.last k) 0)
+    + (w - 1) • Su k (Fin.last k) (Fin.last k)
 
 lemma nu_eq (w s : ℂ) : nu k w s = nuG k (star w) s w := by
   unfold nu nuG Su

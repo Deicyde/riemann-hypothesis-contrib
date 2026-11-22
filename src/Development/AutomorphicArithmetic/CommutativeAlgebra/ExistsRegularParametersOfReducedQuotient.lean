@@ -8,12 +8,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BoundaryChar
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.HodgeCoh GlobalTheory.CechDR GlobalTheory.PD KaehlerDifferential GlobalTheory.W1 GlobalTheory.WH
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
+  GlobalTheory.HodgeCoh GlobalTheory.CechDR GlobalTheory.PD KaehlerDifferential GlobalTheory.W1
+  GlobalTheory.WH
 
 set_option maxHeartbeats 1000000 in
 set_option synthInstance.maxHeartbeats 200000 in
-theorem UpperTheory.exists_regular_parameters_of_reduced_quotient :
-    ∀ (F K : Type) [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K] (d : ℕ) (x : Fin (d + 1) → F), IsFinCover ℂ K x → IsReduced ((rB ℂ K x {0}) ⧸ (Ideal.span (Set.range fun j : Fin d => (⟨_, tco_mem ℂ K x j⟩ : rB ℂ K x {0})))) → ∀ φ : rB ℂ K x {0} →ₐ[ℂ] ℂ, (∀ j : Fin d, φ ⟨_, tco_mem ℂ K x j⟩ = 0) → ∀ b : rB ℂ K x {0}, φ b = 0 → ∃ (c : rB ℂ K x {0}) (g : Fin d → rB ℂ K x {0}), φ c ≠ 0 ∧ c * b = ∑ l, g l * ⟨_, tco_mem ℂ K x l⟩ := by
+theorem UpperTheory.exists_regular_parameters_of_reduced_quotient
+    : ∀ (F K : Type) [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K]
+        [IsScalarTower ℂ F K] (d : ℕ) (x : Fin (d + 1) → F),
+      IsFinCover ℂ K x
+        → IsReduced
+          ((rB ℂ K x {0}) ⧸ (Ideal.span (Set.range fun j : Fin d => (⟨_, tco_mem ℂ K x j⟩ : rB ℂ K x {0}))))
+        → ∀ φ : rB ℂ K x {0} →ₐ[ℂ] ℂ,
+          (∀ j : Fin d, φ ⟨_, tco_mem ℂ K x j⟩ = 0)
+            → ∀ b : rB ℂ K x {0},
+              φ b = 0
+                → ∃ (c : rB ℂ K x {0}) (g : Fin d → rB ℂ K x {0}),
+                  φ c ≠ 0 ∧ c * b = ∑ l, g l * ⟨_, tco_mem ℂ K x l⟩ := by
   intro F K _ _ _ _ _ _ d x hc hred φ hφ b hb
   set I : Ideal (rB ℂ K x {0}) := Ideal.span (Set.range fun j : Fin d => (⟨_, tco_mem ℂ K x j⟩ : rB ℂ K x {0})) with hI
   have hφI : ∀ a ∈ I, φ a = 0 := by
@@ -28,10 +40,11 @@ theorem UpperTheory.exists_regular_parameters_of_reduced_quotient :
   let ι : ↥(rA ℂ x {0}) →+* ↥(rB ℂ K x {0}) :=
     (algebraMap (↥(rA ℂ x {0})) K).codRestrict (rB ℂ K x {0}) (fun r => isIntegral_algebraMap)
   have hι : ∀ r, (ι r : K) = algebraMap F K (r : F) := fun r => rfl
-  have hbot : ∀ y (hy : y ∈ rA ℂ x {0}), ∃ c : ℂ,
-      Ideal.Quotient.mk I (ι ⟨y, hy⟩) = algebraMap ℂ _ c := by
+  have hbot
+      : ∀ y (hy : y ∈ rA ℂ x {0}), ∃ c : ℂ, Ideal.Quotient.mk I (ι ⟨y, hy⟩) = algebraMap ℂ _ c := by
     intro y hy
-    have hy' : y ∈ Algebra.adjoin ℂ {y | ∃ i ∈ ({0} : Finset (Fin (d + 1))), ∃ j, y = x j / x i} := hy
+    have hy' : y ∈ Algebra.adjoin ℂ {y | ∃ i ∈ ({0} : Finset (Fin (d + 1))), ∃ j, y = x j / x i} :=
+      hy
     induction hy' using Algebra.adjoin_induction with
     | mem z hz =>
       obtain ⟨i, hi, j, rfl⟩ := hz
@@ -101,16 +114,18 @@ theorem UpperTheory.exists_regular_parameters_of_reduced_quotient :
     exact this.symm
   have hft : Algebra.FiniteType ℂ (rB ℂ K x {0} ⧸ I) := by
     have := hc.3 0
-    exact Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ ℂ I) (Ideal.Quotient.mkₐ_surjective ℂ I)
+    exact Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ ℂ I)
+      (Ideal.Quotient.mkₐ_surjective ℂ I)
   have hfin : Module.Finite ℂ (rB ℂ K x {0} ⧸ I) := Algebra.IsIntegral.finite
   have hart : IsArtinianRing (rB ℂ K x {0} ⧸ I) := IsArtinianRing.of_finite ℂ _
-  obtain ⟨n, y, hy⟩ := IsArtinian.exists_pow_succ_smul_dvd (Ideal.Quotient.mk I b) (1 : rB ℂ K x {0} ⧸ I)
+  obtain ⟨n, y, hy⟩ :=
+    IsArtinian.exists_pow_succ_smul_dvd (Ideal.Quotient.mk I b) (1 : rB ℂ K x {0} ⧸ I)
   obtain ⟨y0, rfl⟩ := Ideal.Quotient.mk_surjective y
   refine ⟨1 - b * y0, ?_⟩
-  have hc1 : φ (1 - b * y0) ≠ 0 := by
-    simp [map_sub, map_mul, hb]
+  have hc1 : φ (1 - b * y0) ≠ 0 := by simp [map_sub, map_mul, hb]
   have hkill : Ideal.Quotient.mk I ((1 - b * y0) * b) = 0 := by
-    have hy2 : Ideal.Quotient.mk I b ^ (n + 1) * Ideal.Quotient.mk I y0 = Ideal.Quotient.mk I b ^ n := by
+    have hy2
+        : Ideal.Quotient.mk I b ^ (n + 1) * Ideal.Quotient.mk I y0 = Ideal.Quotient.mk I b ^ n := by
       simpa [smul_eq_mul] using hy
     have h0 : Ideal.Quotient.mk I (1 - b * y0) * Ideal.Quotient.mk I b ^ n = 0 := by
       rw [map_sub, map_one, map_mul]
@@ -118,9 +133,11 @@ theorem UpperTheory.exists_regular_parameters_of_reduced_quotient :
     apply IsReduced.eq_zero
     refine ⟨n + 1, ?_⟩
     rw [map_mul, mul_pow]
-    calc Ideal.Quotient.mk I (1 - b * y0) ^ (n + 1) * Ideal.Quotient.mk I b ^ (n + 1)
-        = Ideal.Quotient.mk I (1 - b * y0) ^ n * Ideal.Quotient.mk I b
-          * (Ideal.Quotient.mk I (1 - b * y0) * Ideal.Quotient.mk I b ^ n) := by ring
+    calc
+      Ideal.Quotient.mk I (1 - b * y0) ^ (n + 1) * Ideal.Quotient.mk I b ^ (n + 1)
+          = Ideal.Quotient.mk I (1 - b * y0) ^ n * Ideal.Quotient.mk I b
+            * (Ideal.Quotient.mk I (1 - b * y0) * Ideal.Quotient.mk I b ^ n) := by
+        ring
       _ = 0 := by rw [h0, mul_zero]
   rw [Ideal.Quotient.eq_zero_iff_mem, hI, Ideal.mem_span_range_iff_exists_fun] at hkill
   obtain ⟨gg, hgg⟩ := hkill

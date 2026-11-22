@@ -10,29 +10,33 @@ namespace DualFramesAlt.eigenRingInvariants
 
 open PowerSeries
 
-noncomputable abbrev Ia {O : Type*} [CommRing O] (a : O) : Ideal (PowerSeries O) := Ideal.span {X - C a}
+noncomputable abbrev Ia {O : Type*} [CommRing O] (a : O) : Ideal (PowerSeries O) :=
+  Ideal.span {X - C a}
 
-theorem mk_X {O : Type*} [CommRing O] (a : O) : Ideal.Quotient.mk (Ia a) X = Ideal.Quotient.mk (Ia a) (C a) :=
+theorem mk_X {O : Type*} [CommRing O] (a : O)
+    : Ideal.Quotient.mk (Ia a) X = Ideal.Quotient.mk (Ia a) (C a) :=
   Ideal.Quotient.eq.mpr (Ideal.mem_span_singleton.mpr dvd_rfl)
 
 section Ev
 
 variable {O : Type*} [CommRing O] [IsLocalRing O]
 
-theorem map_residue_X_sub_C {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O) :
-    (X - C a : PowerSeries O).map (IsLocalRing.residue O) = X := by
-  rw [map_sub, PowerSeries.map_X, PowerSeries.map_C, (IsLocalRing.residue_eq_zero_iff a).mpr ha, map_zero, sub_zero]
+theorem map_residue_X_sub_C {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O)
+    : (X - C a : PowerSeries O).map (IsLocalRing.residue O) = X := by
+  rw [map_sub, PowerSeries.map_X, PowerSeries.map_C, (IsLocalRing.residue_eq_zero_iff a).mpr ha,
+    map_zero, sub_zero]
 
-theorem order_map_X_sub_C {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O) :
-    ((X - C a : PowerSeries O).map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal O))).order.toNat = 1 := by
+theorem order_map_X_sub_C {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O)
+    : ((X - C a : PowerSeries O).map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal O))).order.toNat
+      = 1 := by
   change ((X - C a : PowerSeries O).map (IsLocalRing.residue O)).order.toNat = 1
   rw [map_residue_X_sub_C ha, PowerSeries.order_X]
   rfl
 
 variable [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
 
-theorem ev_exists {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O) (f : PowerSeries O) :
-    ∃ c : O, Ideal.Quotient.mk (Ia a) f = Ideal.Quotient.mk (Ia a) (C c) := by
+theorem ev_exists {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O) (f : PowerSeries O)
+    : ∃ c : O, Ideal.Quotient.mk (Ia a) f = Ideal.Quotient.mk (Ia a) (C c) := by
   have hg : (X - C a : PowerSeries O).map (IsLocalRing.residue O) ≠ 0 := by
     rw [map_residue_X_sub_C ha]
     exact PowerSeries.X_ne_zero
@@ -42,21 +46,24 @@ theorem ev_exists {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O) (f : PowerSeri
   have hr : r = Polynomial.C (r.coeff 0) :=
     Polynomial.eq_C_of_degree_le_zero (Nat.WithBot.lt_one_iff_le_zero.mp (by exact_mod_cast hdeg))
   refine ⟨r.coeff 0, ?_⟩
-  rw [heq, map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton.mpr (dvd_mul_right _ _)),
-    zero_add]
+  rw [heq, map_add (f := _),
+    Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mem_span_singleton.mpr (dvd_mul_right _ _)), zero_add]
   congr 1
   conv_lhs => rw [hr]
   exact Polynomial.coe_C _
 
-theorem ev_inj {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O) {c c' : O}
-    (h : Ideal.Quotient.mk (Ia a) (C c) = Ideal.Quotient.mk (Ia a) (C c')) : c = c' := by
+theorem ev_inj
+    {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O)
+    {c c' : O} (h : Ideal.Quotient.mk (Ia a) (C c) = Ideal.Quotient.mk (Ia a) (C c'))
+    : c = c' := by
   rw [Ideal.Quotient.eq, ← map_sub] at h
   obtain ⟨H, hH⟩ := Ideal.mem_span_singleton.mp h
   have hrec : ∀ n, PowerSeries.coeff (R := O) n H = a * PowerSeries.coeff (R := O) (n + 1) H := by
     intro n
     have hn := congrArg (PowerSeries.coeff (R := O) (n + 1)) hH
-    rw [PowerSeries.coeff_C, if_neg (by omega : n + 1 ≠ 0), sub_mul, map_sub, PowerSeries.coeff_succ_X_mul,
-      PowerSeries.coeff_C_mul] at hn
+    rw [PowerSeries.coeff_C, if_neg (by omega : n + 1 ≠ 0), sub_mul, map_sub,
+        PowerSeries.coeff_succ_X_mul, PowerSeries.coeff_C_mul]
+      at hn
     linear_combination -hn
   have hmem : ∀ n, PowerSeries.coeff (R := O) 0 H ∈ (IsLocalRing.maximalIdeal O) ^ n := by
     intro n
@@ -72,22 +79,28 @@ theorem ev_inj {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O) {c c' : O}
     rw [SModEq.sub_mem, sub_zero, smul_eq_mul, Ideal.mul_top]
     exact hmem n
   have hc := congrArg (PowerSeries.coeff (R := O) 0) hH
-  rw [PowerSeries.coeff_zero_C, sub_mul, map_sub, PowerSeries.coeff_zero_X_mul, PowerSeries.coeff_C_mul, h0,
-    mul_zero, sub_zero] at hc
+  rw [PowerSeries.coeff_zero_C, sub_mul, map_sub, PowerSeries.coeff_zero_X_mul,
+      PowerSeries.coeff_C_mul, h0, mul_zero, sub_zero]
+    at hc
   exact sub_eq_zero.mp hc
 
-theorem ev_zero {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O) {c : O}
-    (h : Ideal.Quotient.mk (Ia a) (C c) = 0) : c = 0 := by
+theorem ev_zero
+    {a : O} (ha : a ∈ IsLocalRing.maximalIdeal O) {c : O} (h : Ideal.Quotient.mk (Ia a) (C c) = 0)
+    : c = 0 := by
   exact ev_inj ha (by rw [h, map_zero, map_zero])
 
 end Ev
 
-theorem ev_subst {O : Type*} [CommRing O] {P : PowerSeries O} (hP : constantCoeff P = 0) {a b c : O}
-    {F : PowerSeries O}
-    (hPb : Ideal.Quotient.mk (Ideal.span {X - C a}) P = Ideal.Quotient.mk (Ideal.span {X - C a}) (C b))
-    (hF : Ideal.Quotient.mk (Ideal.span {X - C b}) F = Ideal.Quotient.mk (Ideal.span {X - C b}) (C c)) :
-    Ideal.Quotient.mk (Ideal.span {X - C a}) (PowerSeries.subst P F) =
-      Ideal.Quotient.mk (Ideal.span {X - C a}) (C c) := by
+theorem ev_subst
+    {O : Type*} [CommRing O]
+    {P : PowerSeries O} (hP : constantCoeff P = 0)
+    {a b c : O} {F : PowerSeries O}
+    (hPb
+      : Ideal.Quotient.mk (Ideal.span {X - C a}) P = Ideal.Quotient.mk (Ideal.span {X - C a}) (C b))
+    (hF
+      : Ideal.Quotient.mk (Ideal.span {X - C b}) F = Ideal.Quotient.mk (Ideal.span {X - C b}) (C c))
+    : Ideal.Quotient.mk (Ideal.span {X - C a}) (PowerSeries.subst P F)
+      = Ideal.Quotient.mk (Ideal.span {X - C a}) (C c) := by
   have hs : HasSubst P := HasSubst.of_constantCoeff_zero' hP
   rw [Ideal.Quotient.mk_eq_mk_iff_sub_mem, Ideal.mem_span_singleton'] at hF
   obtain ⟨k, hk⟩ := hF
@@ -96,22 +109,27 @@ theorem ev_subst {O : Type*} [CommRing O] {P : PowerSeries O} (hP : constantCoef
     have := congrArg (PowerSeries.subst P) hk
     rw [subst_mul hs, subst_sub hs, subst_sub hs, subst_X hs, subst_C, subst_C] at this
     exact this.symm
-  rw [e]; exact Ideal.mul_mem_left _ _ hPb
+  rw [e]
+  exact Ideal.mul_mem_left _ _ hPb
 
 section Dvd
 
-variable {O : Type*} [CommRing O] [IsLocalRing O] [IsDomain O]
-  [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
+variable
+  {O : Type*}
+  [CommRing O] [IsLocalRing O] [IsDomain O] [IsAdicComplete (IsLocalRing.maximalIdeal O) O]
 
-theorem prod_dvd (T : Finset O) (hT : ∀ t ∈ T, t ∈ IsLocalRing.maximalIdeal O) (f : PowerSeries O)
-    (hf : ∀ t ∈ T, Ideal.Quotient.mk (Ia t) f = 0) : (∏ t ∈ T, (X - C t)) ∣ f := by
+theorem prod_dvd
+    (T : Finset O) (hT : ∀ t ∈ T, t ∈ IsLocalRing.maximalIdeal O)
+    (f : PowerSeries O) (hf : ∀ t ∈ T, Ideal.Quotient.mk (Ia t) f = 0)
+    : (∏ t ∈ T, (X - C t)) ∣ f := by
   classical
   induction T using Finset.induction_on generalizing f with
   | empty => simp
   | @insert t0 T ht0 ih =>
     rw [Finset.prod_insert ht0]
     have h0 : (X - C t0) ∣ f :=
-      Ideal.mem_span_singleton.mp (Ideal.Quotient.eq_zero_iff_mem.mp (hf t0 (Finset.mem_insert_self _ _)))
+      Ideal.mem_span_singleton.mp (Ideal.Quotient.eq_zero_iff_mem.mp (hf t0
+        (Finset.mem_insert_self _ _)))
     obtain ⟨g, rfl⟩ := h0
     apply mul_dvd_mul_left
     apply ih (fun t ht => hT t (Finset.mem_insert_of_mem ht))
@@ -133,18 +151,20 @@ section Order
 
 variable {O : Type*} [CommRing O] [IsLocalRing O]
 
-theorem card_le_of_dvd {f v k : PowerSeries O} {s : ℕ} (T : Finset O)
-    (hT : ∀ t ∈ T, t ∈ IsLocalRing.maximalIdeal O) (hv : IsUnit v)
-    (hf : f.map (IsLocalRing.residue O) = (X ^ s * v).map (IsLocalRing.residue O))
-    (hk : f = (∏ t ∈ T, (X - C t)) * k) :
-    T.card ≤ s ∧ (T.card = s → IsUnit k) := by
+theorem card_le_of_dvd
+    {f v k : PowerSeries O} {s : ℕ}
+    (T : Finset O) (hT : ∀ t ∈ T, t ∈ IsLocalRing.maximalIdeal O)
+    (hv : IsUnit v) (hf : f.map (IsLocalRing.residue O) = (X ^ s * v).map (IsLocalRing.residue O))
+    (hk : f = (∏ t ∈ T, (X - C t)) * k)
+    : T.card ≤ s ∧ (T.card = s → IsUnit k) := by
   set κ := IsLocalRing.ResidueField O
   have hprod : (∏ t ∈ T, (X - C t) : PowerSeries O).map (IsLocalRing.residue O) = X ^ T.card := by
     rw [map_prod]
     rw [Finset.prod_congr rfl fun t ht => (map_residue_X_sub_C (hT t ht))]
     rw [Finset.prod_const]
-  have e : (X : PowerSeries κ) ^ s * v.map (IsLocalRing.residue O) =
-      X ^ T.card * k.map (IsLocalRing.residue O) := by
+  have e
+      : (X : PowerSeries κ) ^ s * v.map (IsLocalRing.residue O)
+        = X ^ T.card * k.map (IsLocalRing.residue O) := by
     rw [← map_X (IsLocalRing.residue O), ← map_pow, ← map_mul, ← hf, hk, map_mul, hprod, map_X]
   have hv' : constantCoeff (v.map (IsLocalRing.residue O)) ≠ 0 := by
     have := (hv.map (PowerSeries.map (IsLocalRing.residue O)))
@@ -162,8 +182,9 @@ theorem card_le_of_dvd {f v k : PowerSeries O} {s : ℕ} (T : Finset O)
       (IsLocalRing.residue_eq_zero_iff _).mpr ((IsLocalRing.mem_maximalIdeal _).mpr hnu)]
   · exfalso
     replace hle := not_le.mp hle
-    have e2 : (X : PowerSeries κ) ^ s * v.map (IsLocalRing.residue O) =
-        X ^ s * (X ^ (T.card - s) * k.map (IsLocalRing.residue O)) := by
+    have e2
+        : (X : PowerSeries κ) ^ s * v.map (IsLocalRing.residue O)
+          = X ^ s * (X ^ (T.card - s) * k.map (IsLocalRing.residue O)) := by
       rw [e, ← mul_assoc, ← pow_add, Nat.add_sub_cancel' hle.le]
     have e3 := mul_left_cancel₀ (pow_ne_zero _ hX) e2
     apply hv'

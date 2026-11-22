@@ -14,8 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.CardT
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.LN
@@ -24,6 +26,7 @@ namespace GlobalTheory
 
 theorem homExtension_semiAbelian_dvr_unconditional : HomExtSt :=
   GlobalTheory.existsUnique_hom_extension_semiAbelian_dvr
-    (GlobalTheory.AbelianSubgroupFinite.finite_of_no_torsion GlobalTheory.UU.TorsionCount.card_torsion_points_unconditional)
+    (GlobalTheory.AbelianSubgroupFinite.finite_of_no_torsion
+      GlobalTheory.UU.TorsionCount.card_torsion_points_unconditional)
 
 end GlobalTheory

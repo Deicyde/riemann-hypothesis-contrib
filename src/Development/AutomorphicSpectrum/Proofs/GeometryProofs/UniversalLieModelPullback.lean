@@ -24,26 +24,34 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.StdSmoothMvP
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
 
 namespace GlobalTheory.CompanionTheory.Ar.LieTransport
 
-private theorem mul_left_eq_of_isGrpPullback {S S' : Scheme} {G' : Over S'} [GrpObj G'] {G : Over S} [GrpObj G]
-    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) (T : Over S')
-    (g : T.left ⟶ S) (hg : g = T.hom ≫ f) (x y : T ⟶ G') (x₀ y₀ : Over.mk g ⟶ G)
-    (hx : x₀.left = x.left ≫ φ) (hy : y₀.left = y.left ≫ φ) :
-    (x₀ * y₀).left = (x * y).left ≫ φ := by
+private theorem mul_left_eq_of_isGrpPullback
+    {S S' : Scheme} {G' : Over S'} [GrpObj G']
+    {G : Over S} [GrpObj G]
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    (T : Over S') (g : T.left ⟶ S) (hg : g = T.hom ≫ f) (x y : T ⟶ G') (x₀ y₀ : Over.mk g ⟶ G)
+    (hx : x₀.left = x.left ≫ φ) (hy : y₀.left = y.left ≫ φ)
+    : (x₀ * y₀).left = (x * y).left ≫ φ := by
   subst hg
   exact h.2 T x y x₀ y₀ hx hy
 
-private theorem one_left_eq_of_isGrpPullback {S S' : Scheme} {G' : Over S'} [GrpObj G'] {G : Over S} [GrpObj G]
-    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) (T : Over S')
-    (g : T.left ⟶ S) (hg : g = T.hom ≫ f) :
-    (1 : Over.mk g ⟶ G).left = (1 : T ⟶ G').left ≫ φ := by
+private theorem one_left_eq_of_isGrpPullback
+    {S S' : Scheme} {G' : Over S'} [GrpObj G']
+    {G : Over S} [GrpObj G]
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    (T : Over S') (g : T.left ⟶ S) (hg : g = T.hom ≫ f)
+    : (1 : Over.mk g ⟶ G).left = (1 : T ⟶ G').left ≫ φ := by
   subst hg
-  let o : Over.mk (T.hom ≫ f) ⟶ G := Over.homMk ((1 : T ⟶ G').left ≫ φ)
-    (by rw [Category.assoc, h.1.w, ← Category.assoc, Over.w]; rfl)
+  let o : Over.mk (T.hom ≫ f) ⟶ G :=
+    Over.homMk ((1 : T ⟶ G').left ≫ φ)
+      (by rw [Category.assoc, h.1.w, ← Category.assoc, Over.w]; rfl)
   have hm : (o * o).left = o.left := by
     rw [mul_left_eq_of_isGrpPullback h T _ rfl 1 1 o o rfl rfl, _root_.mul_one]
     rfl
@@ -54,19 +62,24 @@ private theorem one_left_eq_of_isGrpPullback {S S' : Scheme} {G' : Over S'} [Grp
   rw [← ho1]
   rfl
 
-private theorem specMap_fstHom_comp_algebraMap_eq_id (R : Type) [CommRing R] :
-    Spec.map (CommRingCat.ofHom (TrivSqZeroExt.fstHom R R R).toRingHom) ≫
-      Spec.map (CommRingCat.ofHom (algebraMap R (DualNumber R))) = 𝟙 _ := by
+private theorem specMap_fstHom_comp_algebraMap_eq_id (R : Type) [CommRing R]
+    : Spec.map (CommRingCat.ofHom (TrivSqZeroExt.fstHom R R R).toRingHom)
+        ≫ Spec.map (CommRingCat.ofHom (algebraMap R (DualNumber R)))
+      = 𝟙 _ := by
   rw [← Spec.map_comp]
   convert Spec.map_id (CommRingCat.of R)
   ext r
   simp
 
-private theorem exists_lieModel_pullback {S S' : Scheme} {G' : Over S'} [GrpObj G'] {G : Over S} [GrpObj G]
-    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) {R : Type} [CommRing R]
+private theorem exists_lieModel_pullback
+    {S S' : Scheme} {G' : Over S'} [GrpObj G']
+    {G : Over S} [GrpObj G]
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    {R : Type} [CommRing R]
     (x : Spec (CommRingCat.of R) ⟶ S') (x' : Spec (CommRingCat.of R) ⟶ S) (hx : x' = x ≫ f)
-    {W : Type} [AddCommGroup W] [Module R W] (M : LieModel G' x W) :
-    ∃ N : LieModel G x' W, ∀ e, (N.pt e).left = (M.pt e).left ≫ φ := by
+    {W : Type} [AddCommGroup W] [Module R W]
+    (M : LieModel G' x W)
+    : ∃ N : LieModel G x' W, ∀ e, (N.pt e).left = (M.pt e).left ≫ φ := by
   subst hx
   have hw : ∀ e, ((M.pt e).left ≫ φ) ≫ G.hom = (epsAt (x ≫ f)).hom := by
     intro e
@@ -76,8 +89,9 @@ private theorem exists_lieModel_pullback {S S' : Scheme} {G' : Over S'} [GrpObj 
     Over.homMk (U := epsAt (x ≫ f)) (V := G) ((M.pt e).left ≫ φ) (hw e)
   have hP : ∀ e, (P e).left = (M.pt e).left ≫ φ := fun e => rfl
   have one_eq := one_left_eq_of_isGrpPullback h (Over.mk x) (x ≫ f) rfl
-  have hg : Spec.map (CommRingCat.ofHom (algebraMap R (DualNumber R))) ≫ x ≫ f =
-      (epsAt x).hom ≫ f := by simp [epsAt]
+  have hg
+      : Spec.map (CommRingCat.ofHom (algebraMap R (DualNumber R))) ≫ x ≫ f = (epsAt x).hom ≫ f := by
+    simp [epsAt]
   refine ⟨⟨P, ?_, ?_, ?_, ?_, ?_⟩, hP⟩
   · intro e
     have ht := M.tan e
@@ -92,8 +106,7 @@ private theorem exists_lieModel_pullback {S S' : Scheme} {G' : Over S'} [GrpObj 
       simpa [P] using this
     · rw [Over.w, Over.w]
   · intro v hv
-    have hvw : v.left ≫ G.hom = (epsAt x).hom ≫ f := by
-      rw [Over.w]; simp [epsAt]
+    have hvw : v.left ≫ G.hom = (epsAt x).hom ≫ f := by rw [Over.w]; simp [epsAt]
     let v' : epsAt x ⟶ G' := Over.homMk (h.1.lift v.left (epsAt x).hom hvw) (h.1.lift_snd _ _ _)
     have hv' : IsTanAt G' x v' := by
       unfold IsTanAt at hv ⊢
@@ -113,7 +126,8 @@ private theorem exists_lieModel_pullback {S S' : Scheme} {G' : Over S'} [GrpObj 
     exact h.1.lift_fst _ _ _
   · intro e e'
     apply Over.OverMorphism.ext
-    have hm := mul_left_eq_of_isGrpPullback h (epsAt x) _ hg (M.pt e) (M.pt e') (P e) (P e') (hP e) (hP e')
+    have hm :=
+      mul_left_eq_of_isGrpPullback h (epsAt x) _ hg (M.pt e) (M.pt e') (P e) (P e') (hP e) (hP e')
     refine Eq.trans ?_ hm.symm
     rw [hP, M.add]
   · intro c e
@@ -121,10 +135,14 @@ private theorem exists_lieModel_pullback {S S' : Scheme} {G' : Over S'} [GrpObj 
     rw [M.smul, Category.assoc]
     rfl
 
-private theorem exists_isActOf_geometry {S : Scheme} {G : Over S} [GrpObj G] {R : Type} [CommRing R]
+private theorem exists_isActOf_geometry
+    {S : Scheme} {G : Over S} [GrpObj G]
+    {R : Type} [CommRing R]
     {x : Spec (CommRingCat.of R) ⟶ S} {W : Type} [AddCommGroup W] [Module R W]
-    (M : LieModel G x W) {O : Type} [CommRing O] (a : OAct O G) :
-    ∃ ρ : O →+* Module.End R W, M.IsActOf a.act ρ := by
+    (M : LieModel G x W)
+    {O : Type} [CommRing O]
+    (a : OAct O G)
+    : ∃ ρ : O →+* Module.End R W, M.IsActOf a.act ρ := by
   have hpt0 : M.pt 0 = 1 := by
     have h0 := M.add 0 0
     rw [add_zero] at h0
@@ -147,8 +165,11 @@ private theorem exists_isActOf_geometry {S : Scheme} {G : Over S} [GrpObj G] {R 
     apply M.inj
     apply Over.OverMorphism.ext
     rw [hA, Over.comp_left, M.smul, M.smul, hA, Over.comp_left, Category.assoc]
-  let L : O → Module.End R W := fun b =>
-    { toFun := A b, map_add' := hadd b, map_smul' := fun c e => by simpa using hsmul b c e }
+  let L : O → Module.End R W := fun b => {
+    toFun := A b
+    map_add' := hadd b
+    map_smul' := fun c e => by simpa using hsmul b c e
+  }
   have hL : ∀ b e, L b e = A b e := fun _ _ => rfl
   have hone : L 1 = 1 := by
     ext e
@@ -168,20 +189,30 @@ private theorem exists_isActOf_geometry {S : Scheme} {G : Over S} [GrpObj G] {R 
   let ρ : O →+* Module.End R W := RingHom.mk' ⟨⟨L, hone⟩, hmul⟩ haddL
   exact ⟨ρ, fun b e => hA b e⟩
 
-private theorem isActOf_of_pullback {S S' : Scheme} {G' : Over S'} [GrpObj G'] {G : Over S} [GrpObj G]
+private theorem isActOf_of_pullback
+    {S S' : Scheme} {G' : Over S'} [GrpObj G']
+    {G : Over S} [GrpObj G]
     {φ : G'.left ⟶ G.left} {R : Type} [CommRing R]
-    {x : Spec (CommRingCat.of R) ⟶ S'} {x' : Spec (CommRingCat.of R) ⟶ S}
-    {W : Type} [AddCommGroup W] [Module R W] (M : LieModel G' x W) (N : LieModel G x' W)
-    (hN : ∀ e, (N.pt e).left = (M.pt e).left ≫ φ) {O : Type} [CommRing O]
-    (act' : O → (G' ⟶ G')) (act : O → (G ⟶ G))
-    (hact : ∀ b, (act' b).left ≫ φ = φ ≫ (act b).left)
-    (ρ : O →+* Module.End R W) (hM : M.IsActOf act' ρ) : N.IsActOf act ρ := by
+    {x : Spec (CommRingCat.of R) ⟶ S'} {x' : Spec (CommRingCat.of R) ⟶ S} {W : Type}
+    [AddCommGroup W] [Module R W]
+    (M : LieModel G' x W) (N : LieModel G x' W) (hN : ∀ e, (N.pt e).left = (M.pt e).left ≫ φ)
+    {O : Type} [CommRing O]
+    (act' : O → (G' ⟶ G')) (act : O → (G ⟶ G)) (hact : ∀ b, (act' b).left ≫ φ = φ ≫ (act b).left)
+    (ρ : O →+* Module.End R W) (hM : M.IsActOf act' ρ)
+    : N.IsActOf act ρ := by
   intro b e
   apply Over.OverMorphism.ext
   have h1 := hM b e
   rw [hN, h1, Over.comp_left, Over.comp_left, hN, Category.assoc, hact, Category.assoc]
 
-theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (F : Type) [Field F] (y : Sp F ⟶ Xo.XF c), ∃ (W : Type) (_ : AddCommGroup W) (_ : Module F W) (Mu : LieModel Xo.univ.t.G (under y) W) (Mz : LieModel Y.t.G (y ≫ Y.j) W) (ρ : 𝓞 E →+* Module.End F W), Mu.IsActOf Xo.univ.t.act.act ρ ∧ Mz.IsActOf Y.t.act.act ρ ∧ ∀ e, SameVec Y y (Mu.pt e) (Mz.pt e) := by
+theorem main
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
+        (F : Type) [Field F] (y : Sp F ⟶ Xo.XF c),
+      ∃ (W : Type) (_ : AddCommGroup W) (_ : Module F W) (Mu : LieModel Xo.univ.t.G (under y) W)
+          (Mz : LieModel Y.t.G (y ≫ Y.j) W) (ρ : 𝓞 E →+* Module.End F W),
+        Mu.IsActOf Xo.univ.t.act.act ρ ∧ Mz.IsActOf Y.t.act.act ρ
+          ∧ ∀ e, SameVec Y y (Mu.pt e) (Mz.pt e) := by
   intro E _ _ _ H D l Xo c O _ β Y F _ y
   obtain ⟨W, i1, i2, ⟨M0⟩⟩ := lieModel_exists _ Y.oF.t.G F y
   obtain ⟨ρ, hρ⟩ := exists_isActOf_geometry M0 Y.oF.t.act

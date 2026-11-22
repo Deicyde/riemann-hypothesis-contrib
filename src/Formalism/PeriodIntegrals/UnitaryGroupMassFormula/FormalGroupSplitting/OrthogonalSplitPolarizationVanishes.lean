@@ -14,12 +14,18 @@ theorem compositionalInverseSymm : S1 := by
   intro K _ l ex hex hinv
   have hsub : PowerSeries.HasSubst ex := PowerSeries.HasSubst.of_constantCoeff_zero' hex
   have hl0 : PowerSeries.constantCoeff l = 0 := by
-    have hsplit : l = PowerSeries.C (PowerSeries.constantCoeff l) +
-        (l - PowerSeries.C (PowerSeries.constantCoeff l)) := by ring
-    have h0 : MvPowerSeries.constantCoeff
-        (PowerSeries.subst ex (l - PowerSeries.C (PowerSeries.constantCoeff l))) = 0 :=
+    have hsplit
+        : l
+          = PowerSeries.C (PowerSeries.constantCoeff l)
+            + (l - PowerSeries.C (PowerSeries.constantCoeff l)) := by
+      ring
+    have h0
+        : MvPowerSeries.constantCoeff (PowerSeries.subst ex
+            (l - PowerSeries.C (PowerSeries.constantCoeff l)))
+          = 0 :=
       PowerSeries.constantCoeff_subst_eq_zero hex _ (by simp)
-    have key : MvPowerSeries.constantCoeff (PowerSeries.subst ex l) = PowerSeries.constantCoeff l := by
+    have key
+        : MvPowerSeries.constantCoeff (PowerSeries.subst ex l) = PowerSeries.constantCoeff l := by
       conv_lhs => rw [hsplit]
       rw [PowerSeries.subst_add hsub, map_add (f := _), h0, PowerSeries.subst_C]
       simp
@@ -41,13 +47,15 @@ theorem compositionalInverseSymm : S1 := by
   have hQ := PowerSeries.HasSubst.substInvOfIsUnit ex hu
   have hexQ := PowerSeries.subst_substInvOfIsUnit_right ex hex hu
   have hlQ : l = PowerSeries.substInvOfIsUnit ex hu := by
-    calc l = PowerSeries.subst (PowerSeries.X : PowerSeries K) l := (PowerSeries.X_subst l).symm
+    calc
+      l = PowerSeries.subst (PowerSeries.X : PowerSeries K) l := (PowerSeries.X_subst l).symm
       _ = PowerSeries.subst (PowerSeries.subst (PowerSeries.substInvOfIsUnit ex hu) ex) l := by
-          rw [hexQ]
+        rw [hexQ]
       _ = PowerSeries.subst (PowerSeries.substInvOfIsUnit ex hu) (PowerSeries.subst ex l) :=
-          (PowerSeries.subst_comp_subst_apply hsub hQ l).symm
-      _ = PowerSeries.subst (PowerSeries.substInvOfIsUnit ex hu) (PowerSeries.X : PowerSeries K) := by
-          rw [hinv]
+        (PowerSeries.subst_comp_subst_apply hsub hQ l).symm
+      _ = PowerSeries.subst (PowerSeries.substInvOfIsUnit ex hu)
+          (PowerSeries.X : PowerSeries K) := by
+        rw [hinv]
       _ = PowerSeries.substInvOfIsUnit ex hu := PowerSeries.subst_X hQ
   refine ⟨hl0, ?_⟩
   rw [hlQ]

@@ -7,12 +7,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
 
 namespace UpperTheory.V.Af
 
-theorem continuous_restrictScalarsHom (F E Ω : Type) [Field F] [Field E] [Field Ω] [Algebra F E] [Algebra F Ω] [Algebra E Ω]
-    [IsScalarTower F E Ω] : Continuous (AlgEquiv.restrictScalarsHom F : G E Ω →* G F Ω) := by
+theorem continuous_restrictScalarsHom
+    (F E Ω : Type)
+    [Field F] [Field E] [Field Ω] [Algebra F E] [Algebra F Ω] [Algebra E Ω] [IsScalarTower F E Ω]
+    : Continuous (AlgEquiv.restrictScalarsHom F : G E Ω →* G F Ω) := by
   apply continuous_of_continuousAt_one
   intro s hs
   rw [map_one, krullTopology_mem_nhds_one_iff] at hs
@@ -24,8 +27,8 @@ theorem continuous_restrictScalarsHom (F E Ω : Type) [Field F] [Field E] [Field
     have h := congrArg (fun y : M => (y : Ω)) (b.sum_repr ⟨m, hm⟩)
     simp only [IntermediateField.coe_sum, IntermediateField.coe_smul] at h
     rw [← h]
-    exact sum_mem fun i _ => IntermediateField.smul_mem _
-      (IntermediateField.subset_adjoin F t (Set.mem_range_self i))
+    exact sum_mem fun i _ =>
+      IntermediateField.smul_mem _ (IntermediateField.subset_adjoin F t (Set.mem_range_self i))
   have hint : ∀ x ∈ t, IsIntegral E x := by
     rintro x ⟨i, rfl⟩
     have : IsIntegral F (b i) := IsIntegral.of_finite F _
@@ -35,9 +38,11 @@ theorem continuous_restrictScalarsHom (F E Ω : Type) [Field F] [Field E] [Field
     IntermediateField.finiteDimensional_adjoin hint
   rw [Filter.mem_map, krullTopology_mem_nhds_one_iff]
   refine ⟨IntermediateField.adjoin E t, inferInstance, fun σ hσ => hMs ?_⟩
-  have hH : IntermediateField.adjoin F t ≤ IntermediateField.fixedField
-      (Subgroup.map (AlgEquiv.restrictScalarsHom F (A := Ω) (S := E))
-        (IntermediateField.adjoin E t).fixingSubgroup) := by
+  have hH
+      : IntermediateField.adjoin F t
+        ≤ IntermediateField.fixedField (Subgroup.map
+          (AlgEquiv.restrictScalarsHom F (A := Ω) (S := E))
+          (IntermediateField.adjoin E t).fixingSubgroup) := by
     rw [IntermediateField.adjoin_le_iff]
     intro x hx
     rw [SetLike.mem_coe, IntermediateField.mem_fixedField_iff]
@@ -49,18 +54,24 @@ theorem continuous_restrictScalarsHom (F E Ω : Type) [Field F] [Field E] [Field
 
 section Iso
 
-variable {F₀ F₁ Ω : Type} [Field F₀] [Field F₁] [Field Ω] [Algebra F₀ F₁] [Algebra F₀ Ω] [Algebra F₁ Ω]
+variable
+  {F₀ F₁ Ω : Type} [Field F₀] [Field F₁] [Field Ω] [Algebra F₀ F₁] [Algebra F₀ Ω] [Algebra F₁ Ω]
   [IsScalarTower F₀ F₁ Ω]
 
-variable [NumberField F₀] [NumberField F₁] {l : ℕ} [Fact l.Prime]
+variable
+  [NumberField F₀] [NumberField F₁]
+  {l : ℕ} [Fact l.Prime]
   {C V : Type} [CommRing C] [Algebra ℚ_[l] C] [AddCommGroup V] [Module C V] [Module ℚ_[l] V]
   [IsScalarTower ℚ_[l] C V] [TopologicalSpace V] [IsTopologicalAddGroup V] [ContinuousConstSMul C V]
 
 end Iso
 
-theorem surjective_algebraMap_real (K : Type) [Field K] [NumberField K] [IsCMField K] (h : Module.finrank ℚ K = 2) :
-    Function.Surjective (algebraMap ℚ (maximalRealSubfield K)) := by
-  have h1 := (letI : Module.Free (maximalRealSubfield K) K := Module.Free.of_divisionRing _ _; Module.finrank_mul_finrank ℚ (maximalRealSubfield K) K)
+theorem surjective_algebraMap_real
+    (K : Type) [Field K] [NumberField K] [IsCMField K] (h : Module.finrank ℚ K = 2)
+    : Function.Surjective (algebraMap ℚ (maximalRealSubfield K)) := by
+  have h1 :=
+    (letI : Module.Free (maximalRealSubfield K) K := Module.Free.of_divisionRing _ _
+     Module.finrank_mul_finrank ℚ (maximalRealSubfield K) K)
   rw [h, Algebra.IsQuadraticExtension.finrank_eq_two (maximalRealSubfield K) K] at h1
   have h2 : Module.finrank ℚ (maximalRealSubfield K) = 1 := by omega
   exact ((Algebra.finrank_eq_one_iff_bijective_algebraMap).1 h2).2

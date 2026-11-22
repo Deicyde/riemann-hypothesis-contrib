@@ -33,7 +33,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free
 open GlobalTheory.CompanionTheory.SW.BB GlobalTheory.CompanionTheory.SW.EulerDens
@@ -42,8 +43,13 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.WeilSiegel.Free.EstZero
 
-attribute [local instance] GlobalTheory.CompanionTheory.SW.EulerDens.instLCv GlobalTheory.CompanionTheory.SW.EulerDens.instSCv GlobalTheory.CompanionTheory.SW.EulerDens.instBorv
-  GlobalTheory.CompanionTheory.SW.EulerDens.instBorf GlobalTheory.CompanionTheory.SW.EulerDens.instLCf GlobalTheory.CompanionTheory.SW.EulerDens.instSCf
+attribute [local instance]
+  GlobalTheory.CompanionTheory.SW.EulerDens.instLCv
+  GlobalTheory.CompanionTheory.SW.EulerDens.instSCv
+  GlobalTheory.CompanionTheory.SW.EulerDens.instBorv
+  GlobalTheory.CompanionTheory.SW.EulerDens.instBorf
+  GlobalTheory.CompanionTheory.SW.EulerDens.instLCf
+  GlobalTheory.CompanionTheory.SW.EulerDens.instSCf
 
 theorem hasProd_free_mass_zero : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → 3 ≤ M → ∀ (h₀ : ∀ a b : Fin 1, σ ((0 : Matrix (Fin 1) (Fin 1) E) b a) = (0 : Matrix (Fin 1) (Fin 1) E) a b), ∀ (d : ℕ) (b : Module.Basis (Fin d) F E) (lam : ∀ v : HeightOneSpectrum (𝓞 F), Measure (Fv F v)), (∀ v, IsStdV v (lam v)) → ∀ (m : ∀ v : HeightOneSpectrum (𝓞 F), HermR (Fv F v) σ 1 → Measure (Fin 1 → Fin M → Fv F v ⊗[F] E)), (∀ v, IsGramFibFree (Fv F v) σ J 1 (coordW (Fv F v) b (lam v) 1 M) (coordHerm (Fv F v) σ b (lam v) 1) (m v)) → ∀ (lf : Measure (Af F)), lf.IsAddHaarMeasure → lf {x | ∀ v, x v ∈ v.adicCompletionIntegers F} = 1 → ∀ a : ℕ, 0 < a → ∀ D : Af F → ℝ, Continuous D → (∀ y, 0 ≤ D y) → (∀ U : Set (Af F), MeasurableSet U → coordW (Af F) b lf 1 M {X | (∀ v, projV v X ∈ {X : (Fin 1 → Fin M → Fv F v ⊗[F] E) | (fun p i => (a : Fv F v ⊗[F] E) * X p i) ∈ latV b v}) ∧ algebraMap F (Af F) (1 / 2) * Algebra.trace (Af F) (Af F ⊗[F] E) (gramR (Af F) σ J X 0 0) ∈ U} = ∫⁻ y in U, ENNReal.ofReal (D y) ∂lf) → HasProd (fun v => (m v (hermOf (Fv F v) σ (0 : Matrix (Fin 1) (Fin 1) E) h₀) {X : (Fin 1 → Fin M → Fv F v ⊗[F] E) | (fun p i => (a : Fv F v ⊗[F] E) * X p i) ∈ latV b v}).toReal) (D 0) := by
   intro F E _ _ _ _ _ σ hcm M J hJ hM h₀ d b lam hlam m hm lf hlf hlf1 a ha D hDc hD0 hUD
@@ -130,16 +136,22 @@ theorem hasProd_free_mass_zero : ∀ (F E : Type) [Field F] [NumberField F] [Fie
   rw [abs_lt]
   constructor <;> linarith
 
-theorem ofF_mem_framesE_zero {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J)
+theorem ofF_mem_framesE_zero
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E) (hσ : IsCMExt F E σ)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (hJ : IsHermND σ J)
     {d : ℕ} (b : Module.Basis (Fin d) F E) (B : Matrix (Fin M × Fin d) (Fin M × Fin d) F)
-    (hB : ∀ x : Fin M → E, Algebra.trace F E (hE σ J x x) = (fun p : Fin M × Fin d => b.repr (x p.1) p.2) ⬝ᵥ (B *ᵥ fun p : Fin M × Fin d => b.repr (x p.1) p.2))
-    (x : Fin M × Fin d → F) :
-    ofF b x ∈ framesE σ J (0 : Matrix (Fin 1) (Fin 1) E) ↔
-      x ≠ 0 ∧ (1 / 2 : F) * (x ⬝ᵥ (B *ᵥ x)) = 0 := by
+    (hB : ∀ x : Fin M → E,
+      Algebra.trace F E (hE σ J x x)
+        = (fun p : Fin M × Fin d => b.repr (x p.1) p.2)
+          ⬝ᵥ (B *ᵥ fun p : Fin M × Fin d => b.repr (x p.1) p.2))
+    (x : Fin M × Fin d → F)
+    : ofF b x ∈ framesE σ J (0 : Matrix (Fin 1) (Fin 1) E)
+      ↔ x ≠ 0 ∧ (1 / 2 : F) * (x ⬝ᵥ (B *ᵥ x)) = 0 := by
   obtain ⟨-, h2, h3⟩ := GlobalTheory.T.coordinate_bijection_trace_form F E σ hσ M J hJ d b
-  have hg : gramE σ J (ofF b x) = (0 : Matrix (Fin 1) (Fin 1) E) ↔
-      (1 / 2 : F) * (x ⬝ᵥ (B *ᵥ x)) = 0 := by
+  have hg
+      : gramE σ J (ofF b x) = (0 : Matrix (Fin 1) (Fin 1) E)
+        ↔ (1 / 2 : F) * (x ⬝ᵥ (B *ᵥ x)) = 0 := by
     rw [← h3 B hB 0 x]
     simp only [map_zero]
     rfl

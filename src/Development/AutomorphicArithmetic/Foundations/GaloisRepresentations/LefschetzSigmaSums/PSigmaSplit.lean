@@ -11,22 +11,24 @@ open AlgebraicGeometry CategoryTheory Limits
 private lemma UpperTheory.Gal.LocalSmoothExtension.sp_subsingleton (Ω : Type) [Field Ω] : Subsingleton (UpperTheory.Gal.G3.sp Ω) :=
   inferInstanceAs (Subsingleton (PrimeSpectrum Ω))
 
-theorem UpperTheory.Gal.LocalSmoothExtension.sigmaSplit_of :
-    SigmaFEt → UpperTheory.Gal.G3.SplitsPts → UpperTheory.Gal.G3.PtsOfSplits → SigmaSplit := by
+theorem UpperTheory.Gal.LocalSmoothExtension.sigmaSplit_of
+    : SigmaFEt → UpperTheory.Gal.G3.SplitsPts → UpperTheory.Gal.G3.PtsOfSplits → SigmaSplit := by
   intro hF hSP hPS Y Z W s _ _ I _ c Δ _ σ hs
   obtain ⟨hF1, hF2⟩ := hF Y Z s I
   obtain ⟨hsc, hiso⟩ := hs
   have hne : ∀ (Ω : Type) [Field Ω], Nonempty (UpperTheory.Gal.G3.sp Ω) := fun Ω _ =>
     inferInstanceAs (Nonempty (PrimeSpectrum Ω))
-  have hpt : ∀ (Ω : Type) [Field Ω] (y : UpperTheory.Gal.G3.sp Ω ⟶ ∐ fun _ : I => Y),
-      ∃ i : I, ∃ y' : UpperTheory.Gal.G3.sp Ω ⟶ Y, y' ≫ Sigma.ι (fun _ : I => Y) i = y := by
+  have hpt
+      : ∀ (Ω : Type) [Field Ω] (y : UpperTheory.Gal.G3.sp Ω ⟶ ∐ fun _ : I => Y), ∃ i : I,
+        ∃ y' : UpperTheory.Gal.G3.sp Ω ⟶ Y,
+          y' ≫ Sigma.ι (fun _ : I => Y) i = y := by
     intro Ω _ y
     haveI := UpperTheory.Gal.LocalSmoothExtension.sp_subsingleton Ω
     obtain ⟨p⟩ := hne Ω
     obtain ⟨⟨i, a⟩, ha⟩ := (sigmaMk (fun _ : I => Y)).surjective (y.base p)
     rw [sigmaMk_mk] at ha
-    refine ⟨i, IsOpenImmersion.lift (Sigma.ι (fun _ : I => Y) i) y ?_,
-      IsOpenImmersion.lift_fac _ _ _⟩
+    refine
+      ⟨i, IsOpenImmersion.lift (Sigma.ι (fun _ : I => Y) i) y ?_, IsOpenImmersion.lift_fac _ _ _⟩
     rintro _ ⟨q, rfl⟩
     exact ⟨a, by rw [Subsingleton.elim q p]; exact ha⟩
   refine hSP _ c (I × Δ) _ ?_ ?_

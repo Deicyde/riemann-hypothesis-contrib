@@ -20,17 +20,17 @@ theorem mellin_Gchi_of_ne_one_ne {s : ℂ} (hs : 1 < s.re) : s ≠ 0 ∧ s - 1 �
     rw [sub_eq_zero.mp h] at hs
     simp at hs
 
-theorem mellin_Gchi_of_ne_one_int (n : ℕ) (hn : 1 ≤ n) (s : ℂ) (hs : 1 < s.re) :
-    IntegrableOn (fun y : ℝ => ((max (y / n - 1) 0 : ℝ) : ℂ) * (y : ℂ) ^ (-s - 1)) (Ioi 1) := by
+theorem mellin_Gchi_of_ne_one_int (n : ℕ) (hn : 1 ≤ n) (s : ℂ) (hs : 1 < s.re)
+    : IntegrableOn (fun y : ℝ => ((max (y / n - 1) 0 : ℝ) : ℂ) * (y : ℂ) ^ (-s - 1)) (Ioi 1) := by
   obtain ⟨h0, h1⟩ := mellin_Gchi_of_ne_one_ne hs
   apply Integrable.of_integral_ne_zero
   rw [mellin_ramp n hn s hs]
   have hnC : (n : ℂ) ≠ 0 := by exact_mod_cast (by omega : n ≠ 0)
   exact div_ne_zero (cpow_ne_zero_iff.mpr (Or.inl hnC)) (mul_ne_zero h0 h1)
 
-theorem mellin_Gchi_of_ne_one_norm (n : ℕ) (hn : 1 ≤ n) (s : ℂ) (hs : 1 < s.re) :
-    ∫ y in Ioi (1 : ℝ), ‖((max (y / n - 1) 0 : ℝ) : ℂ) * (y : ℂ) ^ (-s - 1)‖ =
-      (n : ℝ) ^ (-s.re) / (s.re * (s.re - 1)) := by
+theorem mellin_Gchi_of_ne_one_norm (n : ℕ) (hn : 1 ≤ n) (s : ℂ) (hs : 1 < s.re)
+    : ∫ y in Ioi (1 : ℝ), ‖((max (y / n - 1) 0 : ℝ) : ℂ) * (y : ℂ) ^ (-s - 1)‖
+      = (n : ℝ) ^ (-s.re) / (s.re * (s.re - 1)) := by
   have h := mellin_ramp n hn (s.re : ℂ) (by simpa using hs)
   apply ofReal_injective
   rw [← integral_complex_ofReal, ofReal_div, ofReal_cpow (Nat.cast_nonneg n)]
@@ -44,9 +44,11 @@ theorem mellin_Gchi_of_ne_one_norm (n : ℕ) (hn : 1 ≤ n) (s : ℂ) (hs : 1 < 
   rw [ofReal_mul, ofReal_cpow hy0.le]
   simp
 
-theorem mellin_Gchi_of_ne_one_hasSum (f : ℕ → ℂ) (y : ℝ) :
-    HasSum (fun n : ℕ => ((ArithmeticFunction.vonMangoldt n : ℝ) : ℂ) * f n *
-      ((max (y / n - 1) 0 : ℝ) : ℂ)) (ramp f y) := by
+theorem mellin_Gchi_of_ne_one_hasSum (f : ℕ → ℂ) (y : ℝ)
+    : HasSum
+      (fun n : ℕ =>
+        ((ArithmeticFunction.vonMangoldt n : ℝ) : ℂ) * f n * ((max (y / n - 1) 0 : ℝ) : ℂ))
+      (ramp f y) := by
   unfold ramp
   apply hasSum_sum_of_ne_finset_zero
   intro n hn
@@ -66,14 +68,16 @@ theorem mellin_Gchi_of_ne_one_hasSum (f : ℕ → ℂ) (y : ℝ) :
   rw [this]
   simp
 
-theorem mellin_Gchi_of_ne_one_ramp (f : ℕ → ℂ) (s : ℂ) (hs : 1 < s.re)
+theorem mellin_Gchi_of_ne_one_ramp
+    (f : ℕ → ℂ) (s : ℂ) (hs : 1 < s.re)
     (hf : LSeriesSummable (fun n => f n * ((ArithmeticFunction.vonMangoldt n : ℝ) : ℂ)) s)
-    (g : ℝ → ℂ) (hg : IntegrableOn g (Ioi 1)) :
-    ∫ y in Ioi (1 : ℝ), (ramp f y * (y : ℂ) ^ (-s - 1) + g y) =
-      LSeries (fun n => f n * ((ArithmeticFunction.vonMangoldt n : ℝ) : ℂ)) s / (s * (s - 1)) +
-        ∫ y in Ioi (1 : ℝ), g y := by
+    (g : ℝ → ℂ) (hg : IntegrableOn g (Ioi 1))
+    : ∫ y in Ioi (1 : ℝ), (ramp f y * (y : ℂ) ^ (-s - 1) + g y)
+      = LSeries (fun n => f n * ((ArithmeticFunction.vonMangoldt n : ℝ) : ℂ)) s / (s * (s - 1))
+        + ∫ y in Ioi (1 : ℝ), g y := by
   set a : ℕ → ℂ := fun n => f n * ((ArithmeticFunction.vonMangoldt n : ℝ) : ℂ) with ha
-  let F : ℕ → ℝ → ℂ := fun n y => match n with
+  let F : ℕ → ℝ → ℂ := fun n y =>
+    match n with
     | 0 => g y
     | m + 1 => a (m + 1) * (((max (y / ((m + 1 : ℕ) : ℝ) - 1) 0 : ℝ) : ℂ) * (y : ℂ) ^ (-s - 1))
   have hint : ∀ n, Integrable (F n) (volume.restrict (Ioi 1)) := by
@@ -92,8 +96,9 @@ theorem mellin_Gchi_of_ne_one_ramp (f : ℕ → ℂ) (s : ℂ) (hs : 1 < s.re)
   have h := hasSum_integral_of_summable_integral_norm hint hsum
   have hF : ∀ y, ∑' n, F n y = ramp f y * (y : ℂ) ^ (-s - 1) + g y := by
     intro y
-    have h1 := (hasSum_nat_add_iff' 1).mpr
-      ((mellin_Gchi_of_ne_one_hasSum f y).mul_right ((y : ℂ) ^ (-s - 1)))
+    have h1 :=
+      (hasSum_nat_add_iff' 1).mpr
+        ((mellin_Gchi_of_ne_one_hasSum f y).mul_right ((y : ℂ) ^ (-s - 1)))
     have h2 : HasSum (fun n => F (n + 1) y) (ramp f y * (y : ℂ) ^ (-s - 1)) := by
       convert h1 using 1
       · funext m
@@ -115,22 +120,29 @@ theorem mellin_Gchi_of_ne_one_ramp (f : ℕ → ℂ) (s : ℂ) (hs : 1 < s.re)
   have h3 := (hasSum_nat_add_iff (f := fun n => ∫ y in Ioi (1 : ℝ), F n y) 1).mp h2
   simpa [F] using h.unique h3
 
-theorem mellin_Gchi_of_ne_one {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) (s : ℂ) (hs : 1 < s.re) :
-    ∫ y in Ioi (1 : ℝ), Gchi χ y * (y : ℂ) ^ (-s - 1) =
-      -(deriv (DirichletCharacter.LFunction χ) s / DirichletCharacter.LFunction χ s -
-          s * (deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1)) / (s * (s - 1)) := by
+theorem mellin_Gchi_of_ne_one
+    {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) (s : ℂ) (hs : 1 < s.re)
+    : ∫ y in Ioi (1 : ℝ), Gchi χ y * (y : ℂ) ^ (-s - 1)
+      = -(deriv (DirichletCharacter.LFunction χ) s / DirichletCharacter.LFunction χ s
+          - s * (deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1))
+        / (s * (s - 1)) := by
   obtain ⟨h0, h1⟩ := mellin_Gchi_of_ne_one_ne hs
   set c := deriv (DirichletCharacter.LFunction χ) 1 / DirichletCharacter.LFunction χ 1 with hc
   have ha : (-s).re < -1 := by simp; linarith
-  have h := mellin_Gchi_of_ne_one_ramp (fun n => χ n) s hs
-    (χ.LSeriesSummable_twist_vonMangoldt hs) (fun y => c * (y : ℂ) ^ (-s))
-    ((integrableOn_Ioi_cpow_of_lt ha one_pos).const_mul c)
+  have h :=
+    mellin_Gchi_of_ne_one_ramp
+      (fun n => χ n)
+      s hs (χ.LSeriesSummable_twist_vonMangoldt hs)
+      (fun y => c * (y : ℂ) ^ (-s))
+      ((integrableOn_Ioi_cpow_of_lt ha one_pos).const_mul c)
   have hL : LSeries (fun n : ℕ => χ n * ((ArithmeticFunction.vonMangoldt n : ℝ) : ℂ)) s = _ :=
     χ.LSeries_twist_vonMangoldt_eq hs
-  rw [hL, ← χ.LFunction_eq_LSeries hs, ← χ.deriv_LFunction_eq_deriv_LSeries hs,
-    integral_const_mul, integral_Ioi_cpow_of_lt ha one_pos] at h
-  rw [setIntegral_congr_fun measurableSet_Ioi (g := fun y : ℝ =>
-    ramp (fun n => χ n) y * (y : ℂ) ^ (-s - 1) + c * (y : ℂ) ^ (-s)), h]
+  rw [hL, ← χ.LFunction_eq_LSeries hs, ← χ.deriv_LFunction_eq_deriv_LSeries hs, integral_const_mul,
+      integral_Ioi_cpow_of_lt ha one_pos]
+    at h
+  rw [setIntegral_congr_fun measurableSet_Ioi
+      (g := fun y : ℝ => ramp (fun n => χ n) y * (y : ℂ) ^ (-s - 1) + c * (y : ℂ) ^ (-s)),
+    h]
   · have e2 : -s + 1 = -(s - 1) := by ring
     rw [e2, neg_div (DirichletCharacter.LFunction χ s)]
     generalize deriv (DirichletCharacter.LFunction χ) s / DirichletCharacter.LFunction χ s = d

@@ -15,8 +15,10 @@ open GroundTheory.Automorphic UpperTheory.ConvolutionTheory.C
 namespace UpperTheory.ConvolutionTheory.L1
 
 section
-variable {Γ G H : Type} [Group Γ] [TopologicalSpace Γ] [Group G] [NormedAddCommGroup H]
-  [InnerProductSpace ℂ H] [CompleteSpace H] {π : UnitaryRep Γ H} {V : Submodule ℂ H} {m : ℕ}
+variable
+  {Γ G H : Type} [Group Γ] [TopologicalSpace Γ] [Group G] [NormedAddCommGroup H]
+  [InnerProductSpace ℂ H] [CompleteSpace H]
+  {π : UnitaryRep Γ H} {V : Submodule ℂ H} {m : ℕ}
   {ι : Fin (m + 1) → G →* Γ} {E : H →L[ℂ] H} {A : Fin (m + 1) → H →L[ℂ] H} {U : H ≃ₗᵢ[ℂ] H}
 
 private lemma mem_eigIn {W : Submodule ℂ H} {T : H →L[ℂ] H} {c : ℝ} {v : H} :
@@ -218,8 +220,7 @@ end
 
 end UpperTheory.ConvolutionTheory.L1
 
-theorem UpperTheory.ConvolutionTheory.L1.jointEx :
-    UpperTheory.ConvolutionTheory.L1.JointEx := by
+theorem UpperTheory.ConvolutionTheory.L1.jointEx : UpperTheory.ConvolutionTheory.L1.JointEx := by
   intro Γ G H _ _ _ _ _ _ π V m ι E A U h hcomp
   have hofn : List.ofFn A = (List.finRange (m + 1)).map A := List.ofFn_eq_map
   obtain ⟨hcl, -, -⟩ := cutIrr Γ G H π V m ι E A U h
@@ -245,8 +246,9 @@ theorem UpperTheory.ConvolutionTheory.L1.jointEx :
     exact list_sa h _
   have hPm : ∀ v, prj (eigIn V E 1) v ∈ eigIn V E 1 := prj_mem hcl
   have hPsa : IsSelfAdjoint (prj (eigIn V E 1)) := isSelfAdjoint_starProjection _
-  have hTeq : (List.ofFn A).prod ∘L prj (eigIn V E 1) =
-      prj (eigIn V E 1) ∘L (List.ofFn A).prod ∘L prj (eigIn V E 1) := by
+  have hTeq
+      : (List.ofFn A).prod ∘L prj (eigIn V E 1)
+        = prj (eigIn V E 1) ∘L (List.ofFn A).prod ∘L prj (eigIn V E 1) := by
     ext v
     simp only [ContinuousLinearMap.comp_apply]
     exact (prj_fix (hQmem _ (hPm v))).symm
@@ -254,8 +256,8 @@ theorem UpperTheory.ConvolutionTheory.L1.jointEx :
     rw [hTeq]
     have := hQsa.conj_adjoint (prj (eigIn V E 1))
     rwa [ContinuousLinearMap.isSelfAdjoint_iff'.1 hPsa] at this
-  obtain ⟨lj, bj, hj, hv0, hTv⟩ := spectral_ne hcomp hTsa (u := u)
-    (by rwa [ContinuousLinearMap.comp_apply, prj_fix hu])
+  obtain ⟨lj, bj, hj, hv0, hTv⟩ :=
+    spectral_ne hcomp hTsa (u := u) (by rwa [ContinuousLinearMap.comp_apply, prj_fix hu])
   have hjc : (lj : ℂ) ≠ 0 := by exact_mod_cast hj
   rw [ContinuousLinearMap.comp_apply] at hTv
   have hvm : bj ∈ eigIn V E 1 := by
@@ -293,9 +295,7 @@ theorem UpperTheory.ConvolutionTheory.L1.jointEx :
     have h4 : 0 < ‖(w : H)‖ ^ 2 := by positivity
     have h5 : RCLike.re (inner ℂ (w : H) ((r : ℂ) • (w : H))) = r * ‖(w : H)‖ ^ 2 := by
       rw [inner_smul_right, ← inner_self_eq_norm_sq (𝕜 := ℂ) (w : H)]
-      first
-        | exact RCLike.re_ofReal_mul _ _
-        | simp
+      first | exact RCLike.re_ofReal_mul _ _ | simp
     rw [hw1] at h3
     have h6 : 0 ≤ r * ‖(w : H)‖ ^ 2 := h5 ▸ h3
     by_contra hneg

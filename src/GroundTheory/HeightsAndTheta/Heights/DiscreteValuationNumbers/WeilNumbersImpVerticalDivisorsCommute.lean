@@ -30,9 +30,9 @@ namespace VerticalDivisorsCommuting
 
 variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem intNum_snoc {F : Type u} [Field F] (V : Ideal (MRing ι F)) {n : ℕ} (L : Fin n → K → ℤ)
-    (b : K → ℤ) :
-    intNum F V (Fin.snoc (α := fun _ => K → ℤ) L b) = intNum F V (Matrix.vecCons b L) := by
+theorem intNum_snoc
+    {F : Type u} [Field F] (V : Ideal (MRing ι F)) {n : ℕ} (L : Fin n → K → ℤ) (b : K → ℤ)
+    : intNum F V (Fin.snoc (α := fun _ => K → ℤ) L b) = intNum F V (Matrix.vecCons b L) := by
   rw [← CutByFormField.vecCons_comp_finRotate]
   exact FieldNumbers.IntNumSymm.proof F K ι V (n + 1) _ _
 

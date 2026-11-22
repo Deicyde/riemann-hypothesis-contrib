@@ -16,11 +16,15 @@ theorem CurveMinimalPrimeQuotient.proof : CurveMinimalPrimeQuotient.Statement :=
   have hpP : p.IsPrime := hp.1.1
 
   let ext : Ideal (MvPolynomial (Fin n) ℂ) → Ideal (Localization.AtPrime (RingHom.ker (eval q))) :=
-    fun K ↦ K.map (algebraMap (MvPolynomial (Fin n) ℂ) (Localization.AtPrime (RingHom.ker (eval q))))
+    fun K ↦
+      K.map (algebraMap (MvPolynomial (Fin n) ℂ) (Localization.AtPrime (RingHom.ker (eval q))))
   let mk := Ideal.Quotient.mk (ext I)
   have hmk : Function.Surjective mk := Ideal.Quotient.mk_surjective
-  have hcomp : algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) =
-      mk.comp (algebraMap (MvPolynomial (Fin n) ℂ) (Localization.AtPrime (RingHom.ker (eval q)))) := rfl
+  have hcomp
+      : algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q)
+        = mk.comp (algebraMap (MvPolynomial (Fin n) ℂ)
+          (Localization.AtPrime (RingHom.ker (eval q)))) :=
+    rfl
 
   let P : Ideal (Localization.AtPrime (RingHom.ker (eval q))) := p.comap mk
   have hPP : P.IsPrime := Ideal.comap_isPrime mk p
@@ -32,7 +36,8 @@ theorem CurveMinimalPrimeQuotient.proof : CurveMinimalPrimeQuotient.Statement :=
   let J : Ideal (MvPolynomial (Fin n) ℂ) :=
     P.comap (algebraMap (MvPolynomial (Fin n) ℂ) (Localization.AtPrime (RingHom.ker (eval q))))
   have hJP : J.IsPrime := Ideal.comap_isPrime _ P
-  have hJmem : ∀ f, f ∈ J ↔ algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) f ∈ p := fun f ↦ by
+  have hJmem
+      : ∀ f, f ∈ J ↔ algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) f ∈ p := fun f ↦ by
     rw [hcomp]; rfl
   have hextJ : ext J = P := IsLocalization.map_under (RingHom.ker (eval q)).primeCompl _ P
   have hIJ : I ≤ J := fun f hf ↦ hIP (Ideal.mem_map_of_mem _ hf)
@@ -50,8 +55,7 @@ theorem CurveMinimalPrimeQuotient.proof : CurveMinimalPrimeQuotient.Statement :=
     have hP'P : (ext J').IsPrime :=
       IsLocalization.isPrime_of_isPrime_disjoint (RingHom.ker (eval q)).primeCompl _ J' hJ'P hdisj
     have hIP' : ext I ≤ ext J' := Ideal.map_mono hIJ'
-    have hker : RingHom.ker mk ≤ ext J' := by
-      rw [Ideal.mk_ker]; exact hIP'
+    have hker : RingHom.ker mk ≤ ext J' := by rw [Ideal.mk_ker]; exact hIP'
     have hp'P : ((ext J').map mk).IsPrime := Ideal.map_isPrime_of_surjective hmk hker
     have hp'le : (ext J').map mk ≤ p := by
       rw [← hpmap, ← hextJ]
@@ -60,16 +64,25 @@ theorem CurveMinimalPrimeQuotient.proof : CurveMinimalPrimeQuotient.Statement :=
     intro f hf
     have h1 : mk (algebraMap _ (Localization.AtPrime (RingHom.ker (eval q))) f) ∈ (ext J').map mk :=
       hpp' ((hJmem f).1 hf)
-    rw [← Ideal.mem_comap, Ideal.comap_map_of_surjective mk hmk, ← RingHom.ker_eq_comap_bot, Ideal.mk_ker,
-      sup_eq_left.2 hIP'] at h1
-    have h2 := (IsLocalization.under_map_of_isPrime_disjoint (RingHom.ker (eval q)).primeCompl
-      (Localization.AtPrime (RingHom.ker (eval q))) hJ'P hdisj)
+    rw [← Ideal.mem_comap, Ideal.comap_map_of_surjective mk hmk, ← RingHom.ker_eq_comap_bot,
+        Ideal.mk_ker, sup_eq_left.2 hIP']
+      at h1
+    have h2 :=
+      (IsLocalization.under_map_of_isPrime_disjoint (RingHom.ker (eval q)).primeCompl
+        (Localization.AtPrime (RingHom.ker (eval q))) hJ'P hdisj)
     rw [← h2]
     exact h1
 
   have hle : ext I ≤ ext J := Ideal.map_mono hIJ
-  refine ⟨J, hJmin, hJm, (Ideal.Quotient.factor hle : curveLocalRing I q →+* curveLocalRing J q),
-    Ideal.Quotient.factor_surjective hle, ?_, fun f ↦ Ideal.Quotient.factor_mk hle _⟩
+  refine ⟨
+    J,
+    hJmin,
+    hJm,
+    (Ideal.Quotient.factor hle : curveLocalRing I q →+* curveLocalRing J q),
+    Ideal.Quotient.factor_surjective hle,
+    ?_,
+    fun f ↦ Ideal.Quotient.factor_mk hle _
+  ⟩
   change RingHom.ker (Ideal.Quotient.factor hle) = p
   rw [Ideal.Quotient.factor_ker, hextJ]
   exact hpmap
