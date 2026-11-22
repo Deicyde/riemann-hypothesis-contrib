@@ -20,7 +20,7 @@ checking. Follow [Checking the proof](#checking-the-proof) for the verification 
 consult the [verification notes](verification/NOTES.md) for recorded results and the source
 revisions they cover.
 
-The [`literature/`](literature/README.md) directory collects a reader's proposals for matching the formal statements with published results.
+The [`docs/references.bib`](docs/references.bib) bibliography lists the works cited in docstrings under `src/`.
 
 ## What is claimed
 

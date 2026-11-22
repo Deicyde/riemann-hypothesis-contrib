@@ -70,6 +70,15 @@ structure PropsB (π : CuspSub E a) (ι : Qbar l ≃+* ℂ)
       (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
       (Bw : LocBridge l E Ω (Dec (F := E) A) O) (hj : Pst.Induces Bw), AboveB Rc π ι r HT P h Bw hj
 
+/-- Existence of a Galois representation attached to a regular algebraic cuspidal automorphic
+representation `π` of `GL_a` over a CM field that is polarized by a character `χ`, with the
+properties recorded in `PropsB`.
+
+Related:
+[A. Caraiani, *Monodromy and local-global compatibility for l = p* (Theorem 1.1)][caraiani2014],
+which gives the comparison at the places above `l` when `π` is conjugate self-dual with trivial
+twist. It does not cover the whole statement.
+This reference is a reader's proposal and has not been checked by a mathematician. -/
 def Row0b : Prop :=
   ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
     (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (a : ℕ), 1 ≤ a →
