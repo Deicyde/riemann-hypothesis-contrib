@@ -17,8 +17,7 @@ namespace PI.LocLatEq.W
 theorem core_fg_of_le {R M : Type*} [CommRing R] [IsNoetherianRing R] [AddCommGroup M]
     [Module R M] {N P : Submodule R M} (hN : N.FG) (h : P ≤ N) : P.FG := by
   have : IsNoetherian R N := isNoetherian_of_fg_of_noetherian N hN
-  have h1 : (P.comap N.subtype).FG := IsNoetherian.noetherian _
-  have h2 := h1.map N.subtype
+  have h2 := (IsNoetherian.noetherian (P.comap N.subtype)).map N.subtype
   rwa [Submodule.map_comap_subtype, inf_eq_right.2 h] at h2
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]

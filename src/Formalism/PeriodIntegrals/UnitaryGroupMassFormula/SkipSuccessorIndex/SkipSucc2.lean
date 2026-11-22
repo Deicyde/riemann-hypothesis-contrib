@@ -18,8 +18,7 @@ theorem skipSucc : PI.SkipSucc := by
   unfold PI.SkipSucc
   intro t i j
   apply Fin.ext
-  rw [PI.QmSkipWork.val_succAbove]
-  unfold PI.skip1
+  simp only [PI.QmSkipWork.val_succAbove, PI.skip1]
   split_ifs <;> rfl
 
 theorem skipSucc2 : PI.SkipSucc2 := by

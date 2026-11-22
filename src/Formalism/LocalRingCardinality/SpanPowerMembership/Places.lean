@@ -187,8 +187,7 @@ theorem vAdd_resCharW (w : HeightOneSpectrum (𝓞 K)) :
     vAdd w (((resCharW w : ℕ) : K)) = (eWL K w : ℤ) := by
   have := w.isPrime
   set p := resCharW w with hpdef
-  have hp := resCharW_prime w
-  have hr : ((p : ℕ) : 𝓞 K) ≠ 0 := Nat.cast_ne_zero.2 hp.ne_zero
+  have hr : ((p : ℕ) : 𝓞 K) ≠ 0 := Nat.cast_ne_zero.2 (resCharW_prime w).ne_zero
   have hmap : (Ideal.span {((p : ℕ) : ℤ)}).map (algebraMap ℤ (𝓞 K)) =
       Ideal.span {((p : ℕ) : 𝓞 K)} := by
     rw [Ideal.map_span, Set.image_singleton]
@@ -205,8 +204,7 @@ theorem vAdd_resCharW (w : HeightOneSpectrum (𝓞 K)) :
 
 theorem valW_resCharW (w : HeightOneSpectrum (𝓞 K)) :
     valW w (((resCharW w : ℕ) : K)) = (((eWL K w : ℕ) : ℤ) : WithTop ℤ) := by
-  have hp := resCharW_prime w
-  rw [valW_of_ne w (Nat.cast_ne_zero.2 hp.ne_zero), vAdd_resCharW]
+  rw [valW_of_ne w (Nat.cast_ne_zero.2 (resCharW_prime w).ne_zero), vAdd_resCharW]
 
 end PlacesToy
 
@@ -248,8 +246,7 @@ theorem mem_conjW_pow (w : HeightOneSpectrum (𝓞 K)) (r : 𝓞 K) (n : ℕ) :
 omit [NumberField K] in
 theorem conjW_conjW (w : HeightOneSpectrum (𝓞 K)) : conjW (conjW w) = w := by
   ext x
-  change x ∈ Ideal.comap _ (Ideal.comap _ w.asIdeal) ↔ x ∈ w.asIdeal
-  simp only [Ideal.mem_comap, RingHom.coe_coe, starO_symm, starO_starO]
+  simp [conjW_asIdeal, Ideal.mem_comap, starO_symm]
 
 theorem intValuation_conjW (w : HeightOneSpectrum (𝓞 K)) (r : 𝓞 K) :
     (conjW w).intValuation r = w.intValuation (starO r) := by
@@ -276,7 +273,6 @@ theorem intValuation_conjW (w : HeightOneSpectrum (𝓞 K)) (r : 𝓞 K) :
 theorem valuation_conjW (w : HeightOneSpectrum (𝓞 K)) (x : K) :
     (conjW w).valuation K x = w.valuation K (star x) := by
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 K) x
-  have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
   have hs : star (algebraMap (𝓞 K) K a / algebraMap (𝓞 K) K b) =
       algebraMap (𝓞 K) K (starO a) / algebraMap (𝓞 K) K (starO b) := by
     rw [star_div₀]
@@ -287,15 +283,13 @@ theorem valuation_conjW (w : HeightOneSpectrum (𝓞 K)) (x : K) :
 
 theorem vAdd_conjW (w : HeightOneSpectrum (𝓞 K)) (x : K) :
     vAdd (conjW w) x = vAdd w (star x) := by
-  unfold vAdd
-  rw [valuation_conjW]
+  simp [vAdd, valuation_conjW]
 
 theorem valW_conjW (w : HeightOneSpectrum (𝓞 K)) (x : K) :
     valW (conjW w) x = valW w (star x) := by
   by_cases hx : x = 0
-  · subst hx; rw [star_zero, valW_zero, valW_zero]
-  have hx' : star x ≠ 0 := by rwa [Ne, star_eq_zero]
-  rw [valW_of_ne _ hx, valW_of_ne _ hx', vAdd_conjW]
+  · simp [hx]
+  rw [valW_of_ne _ hx, valW_of_ne _ (by rwa [Ne, star_eq_zero]), vAdd_conjW]
 
 def placesOf (K : Type) [Field K] [NumberField K] [StarRing K] : Formalism.BasicNotions.Rows.Places K where
   Pl := HeightOneSpectrum (𝓞 K)

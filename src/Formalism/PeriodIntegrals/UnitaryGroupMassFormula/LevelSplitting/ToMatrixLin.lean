@@ -321,10 +321,9 @@ private theorem uni_lin' (g : HA R σ J) : (datR R σ J P T).Uni (lin R σ J g) 
 theorem piU_mem (g : HA R σ J) (hg : g ∈ Ssub R σ J P) : piU hσσ hJ hP g hg ∈ HR R σ J := by
   have hU := SemiG.Dat.Pi_uni (D := datR R σ J P T) (datR_hyp hσσ hJ hP)
     (mapW_lin_of_mem_Ssub hσσ hJ hP hg) (uni_lin' hσσ hJ hP g)
-  have hm := uj_of_uni (sigR R σ) (JR R J) (piMat (P := P) (T := T) g) (fun x y => by
+  exact uj_of_uni (sigR R σ) (JR R J) (piMat (P := P) (T := T) g) (fun x y => by
     rw [piMat_mulVec, piMat_mulVec]
     exact hU x y)
-  exact hm
 
 def piG (g : HA R σ J) (hg : g ∈ Ssub R σ J P) : HA R σ J :=
   ⟨piU hσσ hJ hP g hg, piU_mem hσσ hJ hP g hg⟩

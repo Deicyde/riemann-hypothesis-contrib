@@ -121,9 +121,8 @@ theorem anisoPeel_of_valCount (hv : ValCount) : AnisoPeel := by
       obtain ⟨hxW, hxx⟩ := hx
       have hee : hf (Fintype.card K) M x x ≠ 0 := hxx ▸ hb0
       rw [Finset.filter_filter, an_fiber hadd hinv hM W b w x hxW hxx hb0]
-      have hk' := hk _ (nondeg_perp_aniso hadd W hW x hxW hee) (finrank_perp_aniso W x hxW hee)
-      rw [an_cntT_eq] at hk'
-      exact hk'
+      rw [← an_cntT_eq]
+      exact hk _ (nondeg_perp_aniso hadd W hW x hxW hee) (finrank_perp_aniso W x hxW hee)
     rw [Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul]
     have hcard : ((Finset.univ.filter (fun x : Fin n → L =>
         x ∈ W ∧ hf (Fintype.card K) M x x = b)).card : ℤ) =

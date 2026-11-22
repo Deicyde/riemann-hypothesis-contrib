@@ -64,8 +64,7 @@ theorem wMat_mul_self (n : ℕ) : G.wMat n * G.wMat n = 1 := by
   ext a b
   rw [wMat_mul_apply]
   by_cases h : a = b
-  · subst h
-    simp [G.wMat]
+  · simp [G.wMat, Matrix.one_apply, h]
   · simp [G.wMat, Matrix.one_apply, h, Ne.symm h]
 
 theorem hat_z_of_block3 (A11 : Matrix (Fin j) (Fin j) ℂ) (A12 : Matrix (Fin j) (Fin (2 * ρ + k + 1)) ℂ) (A13 : Matrix (Fin j) (Fin j) ℂ)
@@ -113,9 +112,7 @@ theorem hpk_row (k r : ℕ) (a : ℕ) (ha : a < r) (c : Fin (2 * r + k + 1)) :
   by_cases hc : c = ⟨2 * r + k - a, by omega⟩
   · rw [if_pos hc, if_pos]
     subst hc
-    refine ⟨ha, ?_⟩
-    show a + (2 * r + k - a) = 2 * r + k
-    omega
+    exact ⟨ha, Nat.add_sub_of_le (by omega : a ≤ 2 * r + k)⟩
   · rw [if_neg hc]
     have hv : c.val ≠ 2 * r + k - a := fun h => hc (Fin.ext h)
     have e1 : ¬ ((⟨a, by omega⟩ : Fin (2 * r + k + 1)).val < r ∧ (⟨a, by omega⟩ : Fin (2 * r + k + 1)).val + c.val = 2 * r + k) := by
@@ -172,9 +169,7 @@ theorem det_upper {p : ℕ} (u : G.UT p → ℂ) : (G.upper u).det = 1 := by
   · simp [G.upper, G.strictUpper]
   · intro a b hab
     have hab' : b < a := hab
-    have hne : a ≠ b := (ne_of_lt hab').symm
-    have hnl : ¬ a < b := not_lt.mpr hab'.le
-    simp [G.upper, G.strictUpper, Matrix.one_apply, hne, hnl]
+    simp [G.upper, G.strictUpper, Matrix.one_apply, (ne_of_lt hab').symm, not_lt.mpr hab'.le]
 
 theorem det_lowW {p : ℕ} (σ : Equiv.Perm (Fin p)) (v : LW σ → ℂ) : (lowW σ v).det = 1 := by
   rw [Matrix.det_of_lowerTriangular]
@@ -226,10 +221,8 @@ theorem skewOf_conjTranspose {n : ℕ} (q : (G.UT n → ℂ) × (Fin n → ℝ))
     star_add, star_sub, star_star, Matrix.diagonal_apply]
   by_cases h : b = a
   · subst h
-    simp [Complex.conj_ofReal]
-    try ring
+    simp [Complex.conj_ofReal] <;> ring
   · simp [h, Ne.symm h]
-    try ring
 
 theorem hpk_herm (k r : ℕ) : (Hpk k r)ᴴ = Hpk k r := (hpkFacts k r).1
 theorem hpk_sq (k r : ℕ) : Hpk k r * Hpk k r = 1 := (hpkFacts k r).2.1
@@ -281,11 +274,7 @@ theorem rn_nset (x : RC k j ρ) : Rn k j ρ x ∈ Nset k (j + ρ) := by
 
 theorem nset_sset {r : ℕ} (z : Fin (2 * r + k + 1) → ℂ) {m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
     (hm : m ∈ Nset k r) : m ∈ Sset k r z := by
-  refine ⟨1, ⟨?_, fun a => ⟨?_, ?_⟩, ?_⟩, m, hm, by simp⟩
-  · simp [UH]
-  · simp
-  · simp
-  · simp
+  refine ⟨1, ⟨?_, fun a => ⟨?_, ?_⟩, ?_⟩, m, hm, by simp⟩ <;> simp [UH]
 
 def eC (j ρ : ℕ) : Fin j ⊕ Fin (ρ + 1) ≃ Fin (j + ρ + 1) := finSumFinEquiv.trans (finCongr (by omega))
 
@@ -391,8 +380,7 @@ theorem tz_low (v : Fin (2 * (j + ρ) + k + 1) → ℂ) (hv : inWb k (j + ρ) v)
     Tz k (j + ρ) v = Tz k ρ (lowV k j ρ v) := by
   unfold Tz
   rw [herm_eq_zhat, herm_eq_zhat,
-    show (1 : Matrix (Fin (2 * (j + ρ) + k + 1)) (Fin (2 * (j + ρ) + k + 1)) ℂ) = blk3 1 0 0 0 1 0 0 0 1 from
-      block3_one.symm, z_hat_of_block3 v v hv hv]
+    ← block3_one (k := k) (j := j) (ρ := ρ), z_hat_of_block3 v v hv hv]
   have hl : (Fin.last (j + ρ)) = eC j ρ (Sum.inr (Fin.last ρ)) := by ext; rw [column_index_second_val]; simp
   rw [hl, Matrix.reindex_apply, Matrix.submatrix_apply, Equiv.symm_apply_apply, Matrix.fromBlocks_apply₂₂,
     Formalism.QuantumDeterminants.Zhat_eq, Matrix.mul_one, Matrix.mul_one, Matrix.mul_assoc]
@@ -508,10 +496,9 @@ theorem skewOf_inj {n : ℕ} (q q' : (G.UT n → ℂ) × (Fin n → ℝ)) (h : s
     simpa only [skewOf_apply_lt _ _ _ hab] using this
   have h2 : d = d' := by
     funext i
-    have := congrFun (congrFun h i) i
-    simp only [skewOf_apply_diag] at this
-    have h3 := mul_left_cancel₀ Complex.I_ne_zero this
-    simpa using h3
+    have h3 := congrFun (congrFun h i) i
+    simp only [skewOf_apply_diag] at h3
+    simpa using mul_left_cancel₀ Complex.I_ne_zero h3
   rw [h1, h2]
 
 theorem bigCell_uniq (x1 x1' x2 x2' : RC k j ρ) (Z1 Z2 : Matrix (Fin j) (Fin j) ℂ) (γ1 γ2 : B.Mat k ρ)
@@ -611,19 +598,16 @@ theorem skewOf_coords {n : ℕ} (S : Matrix (Fin n) (Fin n) ℂ) (hS : Sᴴ = -S
   · rw [skewOf_apply_lt _ _ _ h]
     rfl
   · rw [skewOf_apply_diag]
-    have h1 : star (S a a) = -S a a := by
-      simpa [Matrix.conjTranspose_apply] using congrFun (congrFun hS a) a
-    have h2 := congrArg Complex.re h1
-    simp at h2
+    have h2 : (S a a).re = -((S a a).re) := by
+      simpa [Matrix.conjTranspose_apply] using
+        congrArg Complex.re (congrFun (congrFun hS a) a)
     apply Complex.ext
     · simp
       linarith
     · simp [skewCoords]
   · rw [skewOf_apply_gt _ _ _ h]
-    have h1 : star (S b a) = -S a b := by
-      simpa [Matrix.conjTranspose_apply] using congrFun (congrFun hS a) b
-    simp only [skewCoords]
-    rw [h1, neg_neg]
+    simpa [skewCoords, Matrix.conjTranspose_apply] using
+      congrArg (fun z => -z) (congrFun (congrFun hS a) b)
 
 theorem wMat_mul_wMat_mul {m : Type*} (n : ℕ) (X : Matrix (Fin n) m ℂ) : G.wMat n * (G.wMat n * X) = X := by
   rw [← Matrix.mul_assoc, wMat_mul_self, Matrix.one_mul]
@@ -634,8 +618,7 @@ theorem hpk_mul_hpk_mul {m : Type*} (k r : ℕ) (X : Matrix (Fin (2 * r + k + 1)
 theorem rn_of (c : Matrix (Fin (2 * ρ + k + 1)) (Fin j) ℂ) (S : Matrix (Fin j) (Fin j) ℂ) (hS : Sᴴ = -S) :
     Rn k j ρ (Matrix.of.symm c, skewCoords S) = blk3 1 (-(G.wMat j * cᴴ * Hpk k ρ))
       (G.wMat j * ((-(1 / 2 : ℂ)) • (cᴴ * Hpk k ρ * c) + S)) 0 1 c 0 0 1 := by
-  rw [rn_eq]
-  simp only [Equiv.apply_symm_apply, skewOf_coords S hS]
+  simp [rn_eq, skewOf_coords S hS]
 
 theorem bigCell_exists (g : B.Mat k (j + ρ)) (hg : g ∈ B.GV k (j + ρ)) (hD : DjU k j ρ g ≠ 0) :
     ∃ (x x' : RC k j ρ) (Z : Matrix (Fin j) (Fin j) ℂ) (γ : B.Mat k ρ), Z.det ≠ 0 ∧ γ ∈ B.GV k ρ ∧

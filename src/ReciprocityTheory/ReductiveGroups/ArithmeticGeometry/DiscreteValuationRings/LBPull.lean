@@ -70,10 +70,9 @@ lemma inverse_generator_isGenerator {X Y : Scheme.{0}} (L : LB X) {K : Type} [Fi
       (LB.LinComb L φ (fun k => -ε k)).g i j *
         res (inf_le_right : (LB.LinComb L φ (fun k => -ε k)).U i ⊓ (LB.LinComb L φ (fun k => -ε k)).U j ≤
           (LB.LinComb L φ (fun k => -ε k)).U j) ((LB.invGen L φ ε t).s j) := by
-  have h1 := ht i j
   have hg : (LB.LinComb L φ (fun k => -ε k)).g i j = ((LB.LinComb L φ ε).g i j)⁻¹ := by
     (simp only [LB.LinComb, zpow_neg, Finset.prod_inv_distrib]) <;> rfl
-  have h2 := congrArg (fun z => z⁻¹) h1
+  have h2 := congrArg (fun z => z⁻¹) (ht i j)
   simp only [mul_inv, ← map_inv] at h2
   rw [hg]
   exact h2

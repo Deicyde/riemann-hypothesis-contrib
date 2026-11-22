@@ -90,8 +90,7 @@ theorem nuJ_sigLam_coe (hgap : StdGap ε lam) (hP : IsPsiFor ε lam T Ψ) (hv₀
     {Ws : List (List (Matrix (Fin n) (Fin n) ℂ))} (hWs : ∀ w ∈ Ws, ∀ X ∈ w, inG ε X) (y : Hlam ε Ψ v₀) :
     nuJ (rreg ε) Ws (y : L2 ε) = nuJ (sigLam ε Ψ v₀) Ws y := by
   unfold nuJ
-  congr 1
-  refine List.map_congr_left fun w hw => ?_
-  rw [← dSW_sigLam_coe hgap hP hv₀ w (hWs w hw) y, Submodule.coe_norm]
+  exact congrArg List.sum (List.map_congr_left fun w hw => by
+    rw [← dSW_sigLam_coe hgap hP hv₀ w (hWs w hw) y, Submodule.coe_norm])
 
 end ReciprocityTheory.ChartRestriction.DS.DecInf
