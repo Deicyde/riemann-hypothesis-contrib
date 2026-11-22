@@ -2,7 +2,8 @@ module
 
 public import Development.AutomorphicArithmetic.Foundations.Convolution.BlockHeckeSlices.DatDatum
 
-public import all Development.AutomorphicArithmetic.Foundations.Convolution.CentreSplitting.TsphVec
+public import Development.AutomorphicArithmetic.Foundations.Convolution.CentreSplitting.TsphVec
+import all Development.AutomorphicArithmetic.Foundations.Convolution.CentreSplitting.TsphVec
 import Batteries.Tactic.OpenPrivate
 public import Development.AutomorphicArithmetic.Foundations.Convolution.BlockHeckeSlices.CuspidalNormBounds.HkApply
 public import Development.AutomorphicArithmetic.Foundations.Convolution.BlockHeckeSlices.CuspidalNormBounds.UmgOps
