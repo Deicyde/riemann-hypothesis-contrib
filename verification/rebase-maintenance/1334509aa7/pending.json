@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsGeneratorsDualPointDerivationsAugmented.lean",
+      "stages": {
+        "1": "2ae6ff0091b3cd9dd1c9b18a53708043ba63dbae",
+        "2": "256ebc4a3336de25d3209e4df4c1373f98a691e8",
+        "3": "90fa9337b310dbccbe07da571d525b1e5d72f063"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "7034f3d2c002cbcd2babb11fbf9ded5ff26f7d36",
+  "checkpoint_head": "9b4fb64063b19a50bf1e8eb7fdb42e21d6ca1fef"
+}
