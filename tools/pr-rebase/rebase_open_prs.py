@@ -9,6 +9,7 @@ import base64
 import collections
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -69,6 +70,90 @@ def conflict_details():
     return {'conflict_count': len(entries), 'stage_types': dict(types),
             'conflicts': [{'path': k, 'stages': v} for k, v in list(entries.items())[:200]],
             'conflict_list_truncated': len(entries) > 200}
+
+
+def resolve_module_conflicts(number):
+    """Replay edits through the known module-header conversion, preserving proof edits."""
+    entries = collections.defaultdict(dict)
+    for row in git('ls-files', '-u', '-z').stdout.split('\0'):
+        if row:
+            meta, path = row.split('\t', 1)
+            mode, sha, stage = meta.split()
+            entries[path][stage] = sha
+    resolved = []
+    for path, stages in entries.items():
+        if not path.endswith('.lean') or number in (44, 63, 85):
+            continue
+        if set(stages) == {'1', '3'}:
+            # The port pruned this module. Do not resurrect edits to the old dead file.
+            git('rm', '--force', '--ignore-unmatch', '--', path)
+            resolved.append({'path': path, 'reason': 'retain-main-pruning'})
+            continue
+        if set(stages) == {'1', '2'}:
+            # Preserve this PR's intentional file deletion; validate imports after replay.
+            git('rm', '--force', '--', path)
+            resolved.append({'path': path, 'reason': 'retain-PR-deletion'})
+            continue
+        if set(stages) != {'1', '2', '3'}:
+            continue
+        blobs = {stage: git('cat-file', 'blob', sha).stdout for stage, sha in stages.items()}
+        ours = blobs['2']
+        if not ours.startswith('module\n') or '@[expose] public section' not in ours:
+            continue
+        if any(re.match(r'^import\s', line) for line in ours.splitlines()):
+            continue  # A privately imported module requires a separate visibility review.
+        def normalize(source):
+            source = re.sub(r'\Amodule\n', '', source)
+            source = re.sub(r'^public import ', 'import ', source, flags=re.M)
+            source = re.sub(r'^@\[expose\] public section\n', '', source, flags=re.M)
+            return source.lstrip('\n')
+        temporary = ROOT / 'merge-inputs'
+        temporary.mkdir(exist_ok=True)
+        paths = []
+        for stage in ['2', '1', '3']:
+            f = temporary / stage
+            f.write_text(normalize(blobs[stage]))
+            paths.append(str(f))
+        merged = subprocess.run(['git', 'merge-file', '-p', *paths],
+                                capture_output=True, text=True)
+        if merged.returncode:
+            continue
+        lines = merged.stdout.splitlines(keepends=True)
+        imports = [i for i, line in enumerate(lines) if re.match(r'^import\s', line)]
+        if not imports:
+            continue
+        for i in imports:
+            lines[i] = 'public ' + lines[i]
+        lines.insert(imports[-1] + 1, '\n@[expose] public section\n')
+        (REPO / path).write_text('module\n\n' + ''.join(lines))
+        git('add', '--', path)
+        resolved.append({'path': path, 'reason': 'three-way-replay-through-module-header'})
+    return resolved
+
+
+def import_check():
+    names = value('ls-tree', '-r', '--name-only', 'HEAD', '--', 'src').splitlines()
+    modules = {p[4:-5].replace('/', '.') for p in names if p.endswith('.lean')}
+    roots = {p.split('.')[0] for p in modules} | {'BuildAid', 'CompanionTheory', 'Development', 'Formalism', 'GroundTheory', 'Lemmata', 'PositivityTheory', 'ReciprocityTheory', 'Supplements'}
+    missing = []
+    proc = subprocess.Popen(['git', '-C', str(REPO), 'grep', '-n', '-E',
+                             '^([[:space:]]*(public|meta))*[[:space:]]*import[[:space:]]',
+                             'HEAD', '--', 'src'], stdout=subprocess.PIPE,
+                            stderr=subprocess.DEVNULL, text=True, env=ENV)
+    for line in proc.stdout:
+        try:
+            _, path, number, source = line.rstrip('\n').split(':', 3)
+        except ValueError:
+            continue
+        match = re.match(r'\s*(?:(?:public|meta)\s+)*import\s+(.+)', source)
+        if match:
+            for name in match[1].split('--')[0].split():
+                if name.split('.')[0] in roots and name not in modules:
+                    missing.append({'path': path, 'line': number, 'module': name})
+    proc.wait()
+    if proc.returncode not in (0, 1):
+        raise RuntimeError('Import scan failed')
+    return {'modules': len(modules), 'missing_count': len(missing), 'missing': missing[:100]}
 
 
 def finish_report(results, run_tag):
@@ -141,6 +226,17 @@ def main():
                     git('checkout', '--detach', '--force', actual, timeout=1800)
                     replay = git('rebase', '--no-update-refs', '--empty=drop', '--onto', BASE,
                                  ancestor, timeout=1800, check=False)
+                    resolutions = []
+                    for _ in range(500):
+                        if not replay.returncode:
+                            break
+                        changes = resolve_module_conflicts(number)
+                        resolutions.extend(changes)
+                        if not changes or git('ls-files', '-u').stdout:
+                            break
+                        replay = git('rebase', '--continue', check=False, timeout=1800)
+                    result['automatic_resolution_count'] = len(resolutions)
+                    result['automatic_resolutions'] = resolutions[:50]
                     if replay.returncode:
                         result.update(status='conflict', **conflict_details())
                         result['rebase_head'] = git('rev-parse', 'REBASE_HEAD', check=False).stdout.strip()
@@ -165,6 +261,7 @@ def main():
                             result['protected_files'][path] = (before.returncode == after.returncode
                                                              and before.stdout == after.stdout)
                         result['changes'] = value('diff', '--shortstat', BASE, new)
+                        result['imports'] = import_check()
                         branch = 'maintenance/rebased-pr-' + str(number) + '-' + TAG + '-' + run_tag
                         publish_ref(new, branch)
                         result['prepared_branch'] = branch
