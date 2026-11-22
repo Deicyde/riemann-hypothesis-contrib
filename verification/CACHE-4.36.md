@@ -145,6 +145,15 @@ independently because their imported OLeans already exist. A mismatch stops the
 import. The controller does not publish, activate a baseline, or run a full source
 build. Its final acceptance command is stock `lake --rehash --no-build build`.
 
+The wider attempt uses jack's `rh436-reuse-full.service` on ffmain, a separate
+checkout at `/home/jack/rh436-cache-import/project-import`, 16 runtime workers,
+a 16-CPU quota and a 128 GiB memory limit. Its live status is
+`/home/jack/rh436-cache-import/reuse-records/full/import-state.json`, with the
+normalization journal, importer provenance and per-module runtime receipts beside
+it. The log is `/home/jack/rh436-cache-import/reuse-full.log`.
+Keep `rh436-volunteer-fs.service` alive while using its temporary filesystem.
+This attempt has no automatic publication/finalizer step.
+
 The importer must demonstrate retained archived proof artifacts, valid runtime
 symbols, correct stock Lake input hashes, and a cold restoration that elaborates
 no project modules. Successful source compilation alone is not that test.
